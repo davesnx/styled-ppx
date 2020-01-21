@@ -1,0 +1,13 @@
+# Supresses the lock folder from the diffs
+esy.lock/* linguist-generated=true
+
+# Tell github that .re and .rei files are Reason
+*.re linguist-language=Reason
+*.rei linguist-language=Reason
+
+# Declare shell files to have LF endings on checkout
+# On Windows, the default git setting for `core.autocrlf`
+# means that when checking out code, LF endings get converted
+# to CRLF. This causes problems for shell scripts, as bash
+# gets choked up on the extra `\r` character.
+* text eol=lf

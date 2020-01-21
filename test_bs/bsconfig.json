@@ -1,0 +1,21 @@
+{
+  "name": "test_bs",
+  "reason": {
+    "react-jsx": 2
+  },
+  "sources": {
+    "dir" : "src",
+    "subdirs" : true
+  },
+  "package-specs": [{
+    "module": "commonjs",
+    "in-source": true
+  }],
+  "ppx-flags": [
+    "esy x re-styled-ppx.exe"
+  ],
+  "suffix": ".bs.js",
+  "namespace": true,
+  "bs-dependencies": [],
+  "refmt": 3
+}

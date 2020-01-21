@@ -1,0 +1,11 @@
+(library
+ (name Re_styled_ppx)
+ (public_name re-styled-ppx.lib)
+ (modules (:standard))
+ (libraries base ppxlib sedlex menhirLib)
+ (kind ppx_rewriter)
+ (preprocess
+  (pps ppxlib.metaquot ppxlib.runner))
+ (flags -open Base))
+
+(include_subdirs unqualified)

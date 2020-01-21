@@ -1,0 +1,8 @@
+(executable
+ (name re_styled_ppx_app)
+ (modules (:standard))
+ (public_name re-styled-ppx.exe)
+ (libraries base re-styled-ppx.lib)
+ (flags -open Base))
+
+(include_subdirs unqualified)

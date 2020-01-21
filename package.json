@@ -1,0 +1,47 @@
+{
+  "name": "re-styled-ppx",
+  "version": "0.1.0",
+  "description": "",
+  "author": "David Sancho",
+  "license": "MIT",
+  "homepage": "https://github.com/davesnx/re-styled-ppx",
+  "bugs": { "url": "https://github.com/davesnx/re-styled-ppx/issues" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/davesnx/re-styled-ppx.git"
+  },
+  "esy": {
+    "build": "dune build -p #{self.name}",
+    "buildDev": "refmterr dune build -p #{self.name}",
+    "buildEnv": { "ODOC_SYNTAX": "re" }
+  },
+  "peerDependencies": { "ocaml": ">= 4.6.0" },
+  "dependencies": {
+    "@esy-ocaml/reason": "*",
+    "@opam/base": "v0.13.0",
+    "@opam/dune": "*",
+    "@opam/menhir": "20190924",
+    "@opam/ppxlib": "*",
+    "@opam/sedlex": "2.1",
+    "@reason-native/rely": "*",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "reason-react": "^0.7.0"
+  },
+  "devDependencies": {
+    "@opam/merlin": "*",
+    "@opam/odoc": "*",
+    "@opam/utop": "*",
+    "@pesy/esy-pesy": "0.1.0-alpha.5",
+    "ocaml": "~4.8.1000",
+    "refmterr": "*"
+  },
+  "scripts": {
+    "test": "esy x test-runner.exe",
+    "doc": "esy dune build @doc",
+    "doc-path": "esy echo #{self.target_dir}/default/_doc/_html/index.html",
+    "format": "esy dune build @fmt --auto-promote",
+    "watch": "esy dune build -p #{self.name} --watch",
+    "utop": "esy dune utop lib -- -implicit-bindings"
+  }
+}

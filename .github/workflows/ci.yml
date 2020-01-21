@@ -1,0 +1,112 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build and test native
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        node-version: [12.x]
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Cache esy dependencies
+        uses: actions/cache@v1
+        id: cache
+        with:
+          path: _export
+          key: ${{ runner.OS }}-build-${{ hashFiles('esy.lock/index.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-build-${{ env.cache-name }}-
+            ${{ runner.OS }}-build-
+            ${{ runner.OS }}-
+
+      - name: Install esy
+        run: npm install -g esy@latest
+
+      - name: Import dependencies
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: esy import-build _export/*
+
+      - name: Install dependencies
+        run: esy install
+
+      - name: Build
+        run: esy build
+
+      - name: Check formatting
+        run: esy dune build @fmt
+
+      - name: Run tests
+        run: esy test
+
+      - name: Export dependencies
+        run: esy export-dependencies
+
+  test_bs:
+    name: Build and test bucklescript
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        node-version: [12.x]
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Cache esy dependencies
+        uses: actions/cache@v1
+        id: cache
+        with:
+          path: test_bs/_export
+          key: test_bs-${{ runner.OS }}-build-${{ hashFiles('test_bs/esy.lock/index.json') }}
+          restore-keys: |
+            test_bs-${{ runner.OS }}-build-${{ env.cache-name }}-
+            test_bs-${{ runner.OS }}-build-
+            test_bs-${{ runner.OS }}-
+
+      - name: Install esy
+        run: npm install -g esy@latest
+
+      - name: Import dependencies
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: esy import-build _export/*
+        working-directory: ./test_bs
+
+      - name: Install Esy dependencies
+        run: esy install
+        working-directory: ./test_bs
+
+      - name: Build Esy
+        run: esy build
+        working-directory: ./test_bs
+
+      - name: Install NPM dependencies
+        run: yarn install
+        working-directory: ./test_bs
+
+      - name: Build
+        run: yarn build
+        working-directory: ./test_bs
+
+      - name: Export dependencies
+        run: esy export-dependencies
+        working-directory: ./test_bs
