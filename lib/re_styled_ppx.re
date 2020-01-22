@@ -4,13 +4,9 @@ open Ast_mapper;
 open Asttypes;
 open Parsetree;
 
-module CssToEmotion = {
-  let render = ast => {};
-};
-
 let expr = (mapper, expression) =>
   switch (expression.pexp_desc) {
-  | Pexp_extension(({txt: "styled", loc}, payload)) =>
+  | Pexp_extension(({txt: "re_styled_ppx", loc: _}, _payload)) =>
     Ast_helper.Exp.constant(Pconst_integer("42", None))
   | _ => default_mapper.expr(mapper, expression)
   };

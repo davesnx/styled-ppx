@@ -1,0 +1,3 @@
+let StyledComponentInline = 42
+let StyledComponentMultiline = 42
+let StyledComponentWithProps = 42
