@@ -15,18 +15,13 @@
     "buildDev": "refmterr dune build -p #{self.name}",
     "buildEnv": { "ODOC_SYNTAX": "re" }
   },
-  "peerDependencies": { "ocaml": ">= 4.6.0" },
   "dependencies": {
     "@esy-ocaml/reason": "*",
-    "@opam/base": "v0.13.0",
     "@opam/dune": "*",
     "@opam/menhir": "20190924",
     "@opam/ppxlib": "*",
     "@opam/sedlex": "2.1",
-    "@reason-native/rely": "*",
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0",
-    "reason-react": "^0.7.0"
+    "ocaml": "~4.6.1000"
   },
   "resolution": {
     "@opam/sedlex": "ocaml-community/sedlex"
@@ -35,8 +30,7 @@
     "@opam/merlin": "*",
     "@opam/odoc": "*",
     "@opam/utop": "*",
-    "@pesy/esy-pesy": "0.1.0-alpha.5",
-    "ocaml": "~4.8.1000",
+    "ocaml": "~4.6.1000",
     "refmterr": "*"
   },
   "scripts": {
