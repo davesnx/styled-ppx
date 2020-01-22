@@ -21,3 +21,12 @@ _export/
 npm-debug.log
 yarn-error.log
 node_modules/
+
+.merlin
+
+/lib/*
+!/lib/js/*
+/bundledOutputs/
+npm-debug.log
+.DS_Store
+.bsb.lock
