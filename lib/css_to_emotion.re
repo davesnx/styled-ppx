@@ -125,7 +125,7 @@ let to_caml_case = s => {
       s
       ++ (
         if (s != "") {
-          String.capitalize(part);
+          String.capitalize_ascii(part);
         } else {
           part;
         }

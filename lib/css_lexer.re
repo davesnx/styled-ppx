@@ -98,6 +98,7 @@ let token_to_string =
       | _ => None,
     );
    */
+
 /* Regexes */
 let newline = [%sedlex.regexp? '\n' | "\r\n" | '\r' | '\012'];
 

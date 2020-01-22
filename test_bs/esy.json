@@ -2,6 +2,7 @@
   "name": "test_bs",
   "version": "0.0.0",
   "dependencies": {
+    "@glennsl/bs-jest": "^0.4.9",
     "ocaml": "~4.6.1000",
     "re-styled-ppx": "*",
     "react": "^16.12.0",

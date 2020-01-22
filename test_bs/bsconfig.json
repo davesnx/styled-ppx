@@ -5,7 +5,8 @@
   },
   "sources": {
     "dir" : "src",
-    "subdirs" : true
+    "subdirs" : true,
+    "type": "dev"
   },
   "package-specs": [{
     "module": "commonjs",
@@ -17,5 +18,6 @@
   "suffix": ".bs.js",
   "namespace": true,
   "bs-dependencies": [],
+  "bs-dev-dependencies": ["@glennsl/bs-jest"],
   "refmt": 3
 }
