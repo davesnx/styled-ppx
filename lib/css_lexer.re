@@ -111,12 +111,12 @@ let digit = [%sedlex.regexp? '0'..'9'];
 
 let non_ascii = [%sedlex.regexp? '\160'..'\255'];
 
-let up_to_6_hex_digits = [%sedlex.regexp? Rep(hex_digit, 1 .. 6)];
+let up_to_6_hex_digits = [%sedlex.regexp? Rep(hex_digit, 1..6)];
 
 let unicode = [%sedlex.regexp? ('\\', up_to_6_hex_digits, Opt(white_space))];
 
 let unicode_range = [%sedlex.regexp?
-  Rep(hex_digit | '?', 1 .. 6) | (up_to_6_hex_digits, '-', up_to_6_hex_digits)
+  Rep(hex_digit | '?', 1..6) | (up_to_6_hex_digits, '-', up_to_6_hex_digits)
 ];
 
 let escape = [%sedlex.regexp?

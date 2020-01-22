@@ -2,8 +2,6 @@
 
 [![Actions Status](https://github.com/davesnx/re-styled-ppx/workflows/CI/badge.svg)](https://github.com/davesnx/re-styled-ppx/actions)
 
-
-
 ## Features
 
 - Deploy prebuilt binaries to be consumed from Bucklescript projects
@@ -37,7 +35,7 @@ Create an `esy.json` file with the content:
     "ocaml": "~4.6.1000"
   },
   "resolutions": {
-    "re-styled-ppx": "tmattio/re-styled-ppx"
+    "re-styled-ppx": "davesnx/re-styled-ppx"
   }
 }
 ```
