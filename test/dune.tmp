@@ -1,0 +1,7 @@
+(library
+ (name Re_styled_ppx_test)
+ (public_name re-styled-ppx.test)
+ (preprocess
+  (pps re-styled-ppx.lib))
+ (libraries re-styled-ppx.lib)
+ (flags -linkall -g -w -9))

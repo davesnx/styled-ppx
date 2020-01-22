@@ -6,11 +6,6 @@
  (name Re_styled_ppx)
  (wrapped false)
  (public_name re-styled-ppx.lib)
- (modules (:standard))
- (libraries base ppxlib sedlex menhirLib)
  (kind ppx_rewriter)
- (preprocess
-  (pps ppxlib.metaquot ppxlib.runner sedlex.ppx))
- (flags -open Base))
-
-(include_subdirs unqualified)
+ (libraries sedlex menhirLib ocaml-migrate-parsetree)
+ (preprocess (pps sedlex.ppx)))

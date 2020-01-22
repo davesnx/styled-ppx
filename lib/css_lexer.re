@@ -65,7 +65,7 @@ let token_to_string =
   | HASH(s) => "HASH(" ++ s ++ ")"
   | NUMBER(s) => "NUMBER(" ++ s ++ ")"
   | UNICODE_RANGE(s) => "UNICODE_RANGE(" ++ s ++ ")"
-  | [@implicit_arity] FLOAT_DIMENSION(n, s, d) =>
+  | FLOAT_DIMENSION((n, s, d)) =>
     "FLOAT_DIMENSION("
     ++ n
     ++ ", "
@@ -73,17 +73,17 @@ let token_to_string =
     ++ ", "
     ++ dimension_to_string(d)
     ++ ")"
-  | [@implicit_arity] DIMENSION(n, d) =>
+  | DIMENSION((n, d)) =>
     "DIMENSION(" ++ n ++ ", " ++ d ++ ")";
 
 /* let () =
     Location.register_error_of_exn(
       fun
-      | [@implicit_arity] LexingError(pos, msg) => {
+      | LexingError((pos, msg)) => {
           let loc = Lex_buffer.make_loc_and_fix(pos, pos);
           Some({loc, msg, sub: [], if_highlight: ""});
         }
-      | [@implicit_arity] ParseError(token, start_pos, end_pos) => {
+      | ParseError((token, start_pos, end_pos)) => {
           let loc = Lex_buffer.make_loc_and_fix(start_pos, end_pos);
           let msg =
             Printf.sprintf(
@@ -93,7 +93,7 @@ let token_to_string =
 
           Some({loc, msg, sub: [], if_highlight: ""});
         }
-      | [@implicit_arity] GrammarError(msg, loc) =>
+      | GrammarError((msg, loc)) =>
         Some({loc, msg, sub: [], if_highlight: ""})
       | _ => None,
     );
@@ -111,12 +111,12 @@ let digit = [%sedlex.regexp? '0'..'9'];
 
 let non_ascii = [%sedlex.regexp? '\160'..'\255'];
 
-let up_to_6_hex_digits = [%sedlex.regexp? Rep(hex_digit, 1..6)];
+let up_to_6_hex_digits = [%sedlex.regexp? Rep(hex_digit, 1 .. 6)];
 
 let unicode = [%sedlex.regexp? ('\\', up_to_6_hex_digits, Opt(white_space))];
 
 let unicode_range = [%sedlex.regexp?
-  Rep(hex_digit | '?', 1..6) | (up_to_6_hex_digits, '-', up_to_6_hex_digits)
+  Rep(hex_digit | '?', 1 .. 6) | (up_to_6_hex_digits, '-', up_to_6_hex_digits)
 ];
 
 let escape = [%sedlex.regexp?
@@ -305,12 +305,12 @@ let rec get_next_token = buf => {
 }
 and get_dimension = (n, buf) =>
   switch%sedlex (buf) {
-  | length => FLOAT_DIMENSION(n, Lex_buffer.latin1(buf), Css_types.Length)
-  | angle => FLOAT_DIMENSION(n, Lex_buffer.latin1(buf), Css_types.Angle)
-  | time => FLOAT_DIMENSION(n, Lex_buffer.latin1(buf), Css_types.Time)
+  | length => FLOAT_DIMENSION((n, Lex_buffer.latin1(buf), Css_types.Length))
+  | angle => FLOAT_DIMENSION((n, Lex_buffer.latin1(buf), Css_types.Angle))
+  | time => FLOAT_DIMENSION((n, Lex_buffer.latin1(buf), Css_types.Time))
   | frequency =>
-    FLOAT_DIMENSION(n, Lex_buffer.latin1(buf), Css_types.Frequency)
-  | ident => DIMENSION(n, Lex_buffer.latin1(buf))
+    FLOAT_DIMENSION((n, Lex_buffer.latin1(buf), Css_types.Frequency))
+  | ident => DIMENSION((n, Lex_buffer.latin1(buf)))
   | _ => NUMBER(n)
   }
 and get_url = (url, buf) =>
@@ -318,13 +318,13 @@ and get_url = (url, buf) =>
   | ws => get_url(url, buf)
   | url => get_url(Lex_buffer.latin1(buf), buf)
   | ")" => URI(url)
-  | eof => raise(LexingError(buf.Lex_buffer.pos, "Incomplete URI"))
+  | eof => raise(LexingError((buf.Lex_buffer.pos, "Incomplete URI")))
   | any =>
     raise(
-      LexingError(
+      LexingError((
         buf.Lex_buffer.pos,
         "Unexpected token: " ++ Lex_buffer.latin1(buf) ++ " parsing an URI",
-      ),
+      )),
     )
   | _ => assert(false)
   };
