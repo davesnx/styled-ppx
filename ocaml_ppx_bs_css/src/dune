@@ -1,0 +1,12 @@
+(menhir
+ (modules css_parser)
+ (flags --explain))
+
+(library
+ (name ppx_css)
+ (wrapped false)
+ (public_name ppx_bs_css.lib)
+ (kind ppx_rewriter)
+ (libraries sedlex menhirLib ocaml-migrate-parsetree console.lib)
+ (preprocess (pps sedlex.ppx)))
+

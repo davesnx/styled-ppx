@@ -1,0 +1,18 @@
+{
+  "name": "test_bs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "bsb -clean-world -make-world -w",
+    "build": "bsb -clean-world -make-world",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bs-css": "10.0.1",
+    "bs-platform": "^5.0.6",
+    "bs-typed-glamor": "https://github.com/glennsl/bs-typed-glamor"
+  }
+}

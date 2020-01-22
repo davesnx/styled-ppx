@@ -1,0 +1,632 @@
+{
+  "hash": "49359a9809558782373e18e03f0d9131",
+  "root": "root@path:./package.json",
+  "node": {
+    "root@path:./package.json": {
+      "record": {
+        "name": "root",
+        "version": "path:./package.json",
+        "source": "path:./package.json",
+        "files": [],
+        "opam": null
+      },
+      "dependencies": [
+        "@esy-ocaml/merlin@3.0.5005", "@opam/alcotest@opam:0.8.4",
+        "@opam/dune@opam:1.4.0", "@opam/gen@opam:0.5.1",
+        "@opam/menhir@opam:20171222",
+        "@opam/ocaml-migrate-parsetree@opam:1.1.0",
+        "@opam/ppx_tools_versioned@opam:5.2.1",
+        "@opam/sedlex@git:https://github.com/ocaml-community/sedlex.git#739b047fec6c5e5d5a225bb9741e2d43e19dd902",
+        "ocaml@4.2.3006"
+      ]
+    },
+    "ocaml@4.2.3006": {
+      "record": {
+        "name": "ocaml",
+        "version": "4.2.3006",
+        "source":
+          "archive:https://registry.npmjs.org/ocaml/-/ocaml-4.2.3006.tgz#sha1:ecd4e034a3b9337383a3ace583b62a7c8fcf2879",
+        "files": [],
+        "opam": null
+      },
+      "dependencies": [ "flexdll-prebuilt@0.37.2" ]
+    },
+    "flexdll-prebuilt@0.37.2": {
+      "record": {
+        "name": "flexdll-prebuilt",
+        "version": "0.37.2",
+        "source":
+          "archive:https://registry.npmjs.org/flexdll-prebuilt/-/flexdll-prebuilt-0.37.2.tgz#sha1:9777bfa364ba0b58536043ccf5d8c8679d5214b8",
+        "files": [],
+        "opam": null
+      },
+      "dependencies": []
+    },
+    "@opam/yojson@opam:1.4.1": {
+      "record": {
+        "name": "@opam/yojson",
+        "version": "opam:1.4.1",
+        "source":
+          "archive:https://github.com/mjambon/yojson/archive/v1.4.1.tar.gz#md5:3ea6e36422dd670e8ab880710d5f7398",
+        "files": [],
+        "opam": {
+          "name": "yojson",
+          "version": "1.4.1",
+          "opam":
+            "opam-version: \"2.0\"\nname: \"yojson\"\nversion: \"1.4.1\"\nsynopsis:\n  \"Yojson is an optimized parsing and printing library for the JSON format\"\ndescription: \"\"\"\nIt addresses a few shortcomings of json-wheel including 2x speedup,\npolymorphic variants and optional syntax for tuples and variants.\n\nydump is a pretty-printing command-line program provided with the\nyojson package.\n\nThe program atdgen can be used to derive OCaml-JSON serializers and\ndeserializers from type definitions.\"\"\"\nmaintainer: \"martin@mjambon.com\"\nauthors: \"Martin Jambon\"\nhomepage: \"http://mjambon.com/yojson.html\"\nbug-reports: \"https://github.com/mjambon/yojson/issues\"\ndepends: [\n  \"ocaml\" {>= \"4.02.3\"}\n  \"jbuilder\" {build}\n  \"cppo\" {build}\n  \"easy-format\"\n  \"biniou\" {>= \"1.2.0\"}\n]\nbuild: [\n  [\"jbuilder\" \"build\" \"-p\" name \"-j\" jobs]\n  [\"jbuilder\" \"runtest\" \"-p\" name] {with-test}\n]\ndev-repo: \"git+https://github.com/mjambon/yojson.git\"\nurl {\n  src: \"https://github.com/mjambon/yojson/archive/v1.4.1.tar.gz\"\n  checksum: \"md5=3ea6e36422dd670e8ab880710d5f7398\"\n}",
+          "override": null
+        }
+      },
+      "dependencies": [
+        "@esy-ocaml/substs@0.0.1", "@opam/biniou@opam:1.2.0",
+        "@opam/cppo@opam:1.6.5", "@opam/easy-format@opam:1.3.1",
+        "@opam/jbuilder@opam:transition", "ocaml@4.2.3006"
+      ]
+    },
+    "@opam/uuidm@opam:0.9.6": {
+      "record": {
+        "name": "@opam/uuidm",
+        "version": "opam:0.9.6",
+        "source":
+          "archive:http://erratique.ch/software/uuidm/releases/uuidm-0.9.6.tbz#md5:98ef30cd99ad4e4f7b4c33affa19465b",
+        "files": [],
+        "opam": {
+          "name": "uuidm",
+          "version": "0.9.6",
+          "opam":
+            "opam-version: \"2.0\"\nname: \"uuidm\"\nversion: \"0.9.6\"\nsynopsis: \"Universally unique identifiers (UUIDs) for OCaml\"\ndescription: \"\"\"\nUuidm is an OCaml module implementing 128 bits universally unique\nidentifiers version 3, 5 (named based with MD5, SHA-1 hashing) and 4\n(random based) according to [RFC 4122][rfc4122].\n\nUuidm has no dependency and is distributed under the ISC license.\n\n[rfc4122]: http://tools.ietf.org/html/rfc4122\"\"\"\nmaintainer: \"Daniel Bünzli <daniel.buenzl i@erratique.ch>\"\nauthors: \"Daniel Bünzli <daniel.buenzl i@erratique.ch>\"\nlicense: \"ISC\"\ntags: [\"uuid\" \"codec\" \"org:erratique\"]\nhomepage: \"http://erratique.ch/software/uuidm\"\ndoc: \"http://erratique.ch/software/uuidm/doc/Uuidm\"\nbug-reports: \"https://github.com/dbuenzli/uuidm/issues\"\ndepends: [\n  \"ocaml\" {>= \"4.01.0\"}\n  \"ocamlfind\" {build}\n  \"ocamlbuild\" {build}\n  \"topkg\" {build}\n  \"base-bytes\"\n]\ndepopts: [\"cmdliner\"]\nconflicts: [\n  \"cmdliner\" {< \"0.9.8\"}\n]\nbuild: [\n  \"ocaml\"\n  \"pkg/pkg.ml\"\n  \"build\"\n  \"--pinned\"\n  \"%{pinned}%\"\n  \"--with-cmdliner\"\n  \"%{cmdliner:installed}%\"\n]\ndev-repo: \"git+http://erratique.ch/repos/uuidm.git\"\nurl {\n  src: \"http://erratique.ch/software/uuidm/releases/uuidm-0.9.6.tbz\"\n  checksum: \"md5=98ef30cd99ad4e4f7b4c33affa19465b\"\n}",
+          "override": null
+        }
+      },
+      "dependencies": [
+        "@esy-ocaml/substs@0.0.1", "@opam/base-bytes@opam:base",
+        "@opam/ocamlbuild@opam:0", "@opam/ocamlfind@opam:1.8.0",
+        "@opam/topkg@opam:1.0.0", "ocaml@4.2.3006"
+      ]
+    },
+    "@opam/uchar@opam:0.0.2": {
+      "record": {
+        "name": "@opam/uchar",
+        "version": "opam:0.0.2",
+        "source":
+          "archive:https://github.com/ocaml/uchar/releases/download/v0.0.2/uchar-0.0.2.tbz#md5:c9ba2c738d264c420c642f7bb1cf4a36",
+        "files": [],
+        "opam": {
+          "name": "uchar",
+          "version": "0.0.2",
+          "opam":
+            "opam-version: \"2.0\"\nname: \"uchar\"\nversion: \"0.0.2\"\nsynopsis: \"Compatibility library for OCaml's Uchar module\"\ndescription: \"\"\"\nThe `uchar` package provides a compatibility library for the\n[`Uchar`][1] module introduced in OCaml 4.03.\n\nThe `uchar` package is distributed under the license of the OCaml\ncompiler. See [LICENSE](LICENSE) for details.\n\n[1]: http://caml.inria.fr/pub/docs/manual-ocaml/libref/Uchar.html\"\"\"\nmaintainer: \"Daniel Bünzli <daniel.buenzl i@erratique.ch>\"\nauthors: \"Daniel Bünzli <daniel.buenzl i@erratique.ch>\"\nlicense: \"typeof OCaml system\"\ntags: [\"text\" \"character\" \"unicode\" \"compatibility\" \"org:ocaml.org\"]\nhomepage: \"http://ocaml.org\"\ndoc: \"https://ocaml.github.io/uchar/\"\nbug-reports: \"https://github.com/ocaml/uchar/issues\"\ndepends: [\n  \"ocaml\" {>= \"3.12.0\"}\n  \"ocamlbuild\" {build}\n]\nbuild: [\n  [\"ocaml\" \"pkg/git.ml\"]\n  [\n    \"ocaml\"\n    \"pkg/build.ml\"\n    \"native=%{ocaml:native}%\"\n    \"native-dynlink=%{ocaml:native-dynlink}%\"\n  ]\n]\ndev-repo: \"git+https://github.com/ocaml/uchar.git\"\nurl {\n  src:\n    \"https://github.com/ocaml/uchar/releases/download/v0.0.2/uchar-0.0.2.tbz\"\n  checksum: \"md5=c9ba2c738d264c420c642f7bb1cf4a36\"\n}",
+          "override": null
+        }
+      },
+      "dependencies": [
+        "@esy-ocaml/substs@0.0.1", "@opam/ocamlbuild@opam:0",
+        "ocaml@4.2.3006"
+      ]
+    },
+    "@opam/topkg@opam:1.0.0": {
+      "record": {
+        "name": "@opam/topkg",
+        "version": "opam:1.0.0",
+        "source":
+          "archive:http://erratique.ch/software/topkg/releases/topkg-1.0.0.tbz#md5:e3d76bda06bf68cb5853caf6627da603",
+        "files": [],
+        "opam": {
+          "name": "topkg",
+          "version": "1.0.0",
+          "opam":
+            "opam-version: \"2.0\"\nname: \"topkg\"\nversion: \"1.0.0\"\nsynopsis: \"The transitory OCaml software packager\"\ndescription: \"\"\"\nTopkg is a packager for distributing OCaml software. It provides an\nAPI to describe the files a package installs in a given build\nconfiguration and to specify information about the package's\ndistribution, creation and publication procedures.\n\nThe optional topkg-care package provides the `topkg` command line tool\nwhich helps with various aspects of a package's life cycle: creating\nand linting a distribution, releasing it on the WWW, publish its\ndocumentation, add it to the OCaml opam repository, etc.\n\nTopkg is distributed under the ISC license and has **no**\ndependencies. This is what your packages will need as a *build*\ndependency.\n\nTopkg-care is distributed under the ISC license it depends on\n[fmt][fmt], [logs][logs], [bos][bos], [cmdliner][cmdliner],\n[webbrowser][webbrowser] and `opam-format`.\n\n[fmt]: http://erratique.ch/software/fmt\n[logs]: http://erratique.ch/software/logs\n[bos]: http://erratique.ch/software/bos\n[cmdliner]: http://erratique.ch/software/cmdliner\n[webbrowser]: http://erratique.ch/software/webbrowser\"\"\"\nmaintainer: \"Daniel Bünzli <daniel.buenzl i@erratique.ch>\"\nauthors: \"Daniel Bünzli <daniel.buenzl i@erratique.ch>\"\nlicense: \"ISC\"\ntags: [\"packaging\" \"ocamlbuild\" \"org:erratique\"]\nhomepage: \"http://erratique.ch/software/topkg\"\ndoc: \"http://erratique.ch/software/topkg/doc\"\nbug-reports: \"https://github.com/dbuenzli/topkg/issues\"\ndepends: [\n  \"ocaml\" {>= \"4.01.0\"}\n  \"ocamlfind\" {build & >= \"1.6.1\"}\n  \"ocamlbuild\"\n  \"result\"\n]\nbuild: [\n  \"ocaml\" \"pkg/pkg.ml\" \"build\" \"--pkg-name\" name \"--dev-pkg\" \"%{pinned}%\"\n]\ndev-repo: \"git+http://erratique.ch/repos/topkg.git\"\nurl {\n  src: \"http://erratique.ch/software/topkg/releases/topkg-1.0.0.tbz\"\n  checksum: \"md5=e3d76bda06bf68cb5853caf6627da603\"\n}",
+          "override": null
+        }
+      },
+      "dependencies": [
+        "@esy-ocaml/substs@0.0.1", "@opam/ocamlbuild@opam:0",
+        "@opam/ocamlfind@opam:1.8.0", "@opam/result@opam:1.3",
+        "ocaml@4.2.3006"
+      ]
+    },
+    "@opam/sedlex@git:https://github.com/ocaml-community/sedlex.git#739b047fec6c5e5d5a225bb9741e2d43e19dd902": {
+      "record": {
+        "name": "@opam/sedlex",
+        "version":
+          "git:https://github.com/ocaml-community/sedlex.git#739b047fec6c5e5d5a225bb9741e2d43e19dd902",
+        "source":
+          "git:https://github.com/ocaml-community/sedlex.git#739b047fec6c5e5d5a225bb9741e2d43e19dd902",
+        "files": [],
+        "opam": null
+      },
+      "dependencies": []
+    },
+    "@opam/result@opam:1.3": {
+      "record": {
+        "name": "@opam/result",
+        "version": "opam:1.3",
+        "source":
+          "archive:https://github.com/janestreet/result/releases/download/1.3/result-1.3.tbz#md5:4beebefd41f7f899b6eeba7414e7ae01",
+        "files": [],
+        "opam": {
+          "name": "result",
+          "version": "1.3",
+          "opam":
+            "opam-version: \"2.0\"\nname: \"result\"\nversion: \"1.3\"\nsynopsis: \"Compatibility Result module\"\ndescription: \"\"\"\nProjects that want to use the new result type defined in OCaml >= 4.03\nwhile staying compatible with older version of OCaml should use the\nResult module defined in this library.\"\"\"\nmaintainer: \"opensource@janestreet.com\"\nauthors: \"Jane Street Group, LLC <opensource@janestreet.com>\"\nlicense: \"BSD3\"\nhomepage: \"https://github.com/janestreet/result\"\nbug-reports: \"https://github.com/janestreet/result/issues\"\ndepends: [\n  \"ocaml\"\n  \"jbuilder\" {build & >= \"1.0+beta11\"}\n]\nbuild: [\"jbuilder\" \"build\" \"-p\" name \"-j\" jobs]\ndev-repo: \"git+https://github.com/janestreet/result.git\"\nurl {\n  src:\n    \"https://github.com/janestreet/result/releases/download/1.3/result-1.3.tbz\"\n  checksum: \"md5=4beebefd41f7f899b6eeba7414e7ae01\"\n}",
+          "override": null
+        }
+      },
+      "dependencies": [
+        "@esy-ocaml/substs@0.0.1", "@opam/jbuilder@opam:transition",
+        "ocaml@4.2.3006"
+      ]
+    },
+    "@opam/ppx_tools_versioned@opam:5.2.1": {
+      "record": {
+        "name": "@opam/ppx_tools_versioned",
+        "version": "opam:5.2.1",
+        "source":
+          "archive:https://github.com/ocaml-ppx/ppx_tools_versioned/archive/5.2.1.tar.gz#md5:1ae6ae43ec161fbbf12c2b4d3a7e26f5",
+        "files": [],
+        "opam": {
+          "name": "ppx_tools_versioned",
+          "version": "5.2.1",
+          "opam":
+            "opam-version: \"2.0\"\nname: \"ppx_tools_versioned\"\nversion: \"5.2.1\"\nsynopsis: \"A variant of ppx_tools based on ocaml-migrate-parsetree\"\nmaintainer: \"frederic.bour@lakaban.net\"\nauthors: [\n  \"Frédéric Bour <frederic.bour@lakaban.net>\"\n  \"Alain Frisch <alain.frisch@lexifi.com>\"\n]\nlicense: \"MIT\"\ntags: \"syntax\"\nhomepage: \"https://github.com/let-def/ppx_tools_versioned\"\nbug-reports: \"https://github.com/let-def/ppx_tools_versioned/issues\"\ndepends: [\n  \"ocaml\" {>= \"4.02.0\"}\n  \"jbuilder\" {build & >= \"1.0+beta17\"}\n  \"ocaml-migrate-parsetree\" {>= \"1.0.10\"}\n]\nbuild: [\n  [\"jbuilder\" \"subst\" \"-p\" name] {pinned}\n  [\"jbuilder\" \"build\" \"-p\" name \"-j\" jobs]\n  [\"jbuilder\" \"runtest\" \"-p\" name \"-j\" jobs] {with-test}\n]\ndev-repo: \"git://github.com/let-def/ppx_tools_versioned.git\"\nurl {\n  src:\n    \"https://github.com/ocaml-ppx/ppx_tools_versioned/archive/5.2.1.tar.gz\"\n  checksum: \"md5=1ae6ae43ec161fbbf12c2b4d3a7e26f5\"\n}",
+          "override": null
+        }
+      },
+      "dependencies": [
+        "@esy-ocaml/substs@0.0.1", "@opam/jbuilder@opam:transition",
+        "@opam/ocaml-migrate-parsetree@opam:1.1.0", "ocaml@4.2.3006"
+      ]
+    },
+    "@opam/ocamlfind@opam:1.8.0": {
+      "record": {
+        "name": "@opam/ocamlfind",
+        "version": "opam:1.8.0",
+        "source": [
+          "archive:http://download.camlcity.org/download/findlib-1.8.0.tar.gz#md5:a710c559667672077a93d34eb6a42e5b",
+          "archive:http://download2.camlcity.org/download/findlib-1.8.0.tar.gz#md5:a710c559667672077a93d34eb6a42e5b"
+        ],
+        "files": [
+          {
+            "name": "ocamlfind.install",
+            "content":
+              "bin: [\n  \"src/findlib/ocamlfind\" {\"ocamlfind\"}\n  \"?src/findlib/ocamlfind_opt\" {\"ocamlfind\"}\n  \"?tools/safe_camlp4\"\n]\ntoplevel: [\"src/findlib/topfind\"]\n"
+          },
+          {
+            "name": "ocaml-stub",
+            "content":
+              "#!/bin/sh\n\nBINDIR=$(dirname \"$(command -v ocamlc)\")\n\"$BINDIR/ocaml\" -I \"$OCAML_TOPLEVEL_PATH\" \"$@\"\n"
+          },
+          {
+            "name": "findlib-1.8.0.patch",
+            "content":
+              "--- ./Makefile\n+++ ./Makefile\n@@ -57,16 +57,16 @@\n \tcat findlib.conf.in | \\\n \t    $(SH) tools/patch '@SITELIB@' '$(OCAML_SITELIB)' >findlib.conf\n \tif ./tools/cmd_from_same_dir ocamlc; then \\\n-\t\techo 'ocamlc=\"ocamlc.opt\"' >>findlib.conf; \\\n+\t\techo 'ocamlc=\"ocamlc.opt$(EXEC_SUFFIX)\"' >>findlib.conf; \\\n \tfi\n \tif ./tools/cmd_from_same_dir ocamlopt; then \\\n-\t\techo 'ocamlopt=\"ocamlopt.opt\"' >>findlib.conf; \\\n+\t\techo 'ocamlopt=\"ocamlopt.opt$(EXEC_SUFFIX)\"' >>findlib.conf; \\\n \tfi\n \tif ./tools/cmd_from_same_dir ocamldep; then \\\n-\t\techo 'ocamldep=\"ocamldep.opt\"' >>findlib.conf; \\\n+\t\techo 'ocamldep=\"ocamldep.opt$(EXEC_SUFFIX)\"' >>findlib.conf; \\\n \tfi\n \tif ./tools/cmd_from_same_dir ocamldoc; then \\\n-\t\techo 'ocamldoc=\"ocamldoc.opt\"' >>findlib.conf; \\\n+\t\techo 'ocamldoc=\"ocamldoc.opt$(EXEC_SUFFIX)\"' >>findlib.conf; \\\n \tfi\n \n .PHONY: install-doc\n--- ./src/findlib/findlib_config.mlp\n+++ ./src/findlib/findlib_config.mlp\n@@ -24,3 +24,5 @@\n     | \"MacOS\" -> \"\"        (* don't know *)\n     | _ -> failwith \"Unknown Sys.os_type\"\n ;;\n+\n+let exec_suffix = \"@EXEC_SUFFIX@\";;\n--- ./src/findlib/findlib.ml\n+++ ./src/findlib/findlib.ml\n@@ -28,15 +28,20 @@\n let conf_ldconf = ref \"\";;\n let conf_ignore_dups_in = ref ([] : string list);;\n \n-let ocamlc_default = \"ocamlc\";;\n-let ocamlopt_default = \"ocamlopt\";;\n-let ocamlcp_default = \"ocamlcp\";;\n-let ocamloptp_default = \"ocamloptp\";;\n-let ocamlmklib_default = \"ocamlmklib\";;\n-let ocamlmktop_default = \"ocamlmktop\";;\n-let ocamldep_default = \"ocamldep\";;\n-let ocamlbrowser_default = \"ocamlbrowser\";;\n-let ocamldoc_default = \"ocamldoc\";;\n+let add_exec str =\n+  match Findlib_config.exec_suffix with\n+  | \"\" -> str\n+  | a  -> str ^ a ;;\n+let ocamlc_default = add_exec \"ocamlc\";;\n+let ocamlopt_default = add_exec \"ocamlopt\";;\n+let ocamlcp_default = add_exec \"ocamlcp\";;\n+let ocamloptp_default = add_exec \"ocamloptp\";;\n+let ocamlmklib_default = add_exec \"ocamlmklib\";;\n+let ocamlmktop_default = add_exec \"ocamlmktop\";;\n+let ocamldep_default = add_exec \"ocamldep\";;\n+let ocamlbrowser_default = add_exec \"ocamlbrowser\";;\n+let ocamldoc_default = add_exec \"ocamldoc\";;\n+\n \n \n let init_manually \n--- ./src/findlib/fl_package_base.ml\n+++ ./src/findlib/fl_package_base.ml\n@@ -133,7 +133,15 @@\n \t  List.find (fun def -> def.def_var = \"exists_if\") p.package_defs  in\n \tlet files = Fl_split.in_words def.def_value in\n \tList.exists \n-\t  (fun file -> Sys.file_exists (Filename.concat d' file))\n+\t  (fun file ->\n+            let fln = Filename.concat d' file in\n+            let e = Sys.file_exists fln in\n+            (* necessary for ppx executables *)\n+            if e || Sys.os_type <> \"Win32\" || Filename.check_suffix fln \".exe\" then\n+              e\n+            else\n+              Sys.file_exists (fln ^ \".exe\")\n+          )\n \t  files\n       with Not_found -> true in\n \n--- ./src/findlib/fl_split.ml\n+++ ./src/findlib/fl_split.ml\n@@ -126,10 +126,17 @@\n     | '/' | '\\\\' -> true\n     | _ -> false in\n   let norm_dir_win() =\n-    if l >= 1 && s.[0] = '/' then\n-      Buffer.add_char b '\\\\' else Buffer.add_char b s.[0];\n-    if l >= 2 && s.[1] = '/' then\n-      Buffer.add_char b '\\\\' else Buffer.add_char b s.[1];\n+    if l >= 1 then (\n+      if s.[0] = '/' then\n+        Buffer.add_char b '\\\\'\n+      else\n+        Buffer.add_char b s.[0] ;\n+      if l >= 2 then\n+        if s.[1] = '/' then\n+          Buffer.add_char b '\\\\'\n+        else\n+          Buffer.add_char b s.[1];\n+    );\n     for k = 2 to l - 1 do\n       let c = s.[k] in\n       if is_slash c then (\n--- ./src/findlib/frontend.ml\n+++ ./src/findlib/frontend.ml\n@@ -31,10 +31,18 @@\n   else\n     Sys_error (arg ^ \": \" ^ Unix.error_message code)\n \n+let is_win = Sys.os_type = \"Win32\"\n+\n+let () =\n+  match Findlib_config.system with\n+    | \"win32\" | \"win64\" | \"mingw\" | \"cygwin\" | \"mingw64\" | \"cygwin64\" ->\n+      (try set_binary_mode_out stdout true with _ -> ());\n+      (try set_binary_mode_out stderr true with _ -> ());\n+    | _ -> ()\n \n let slashify s =\n   match Findlib_config.system with\n-    | \"mingw\" | \"mingw64\" | \"cygwin\" ->\n+    | \"win32\" | \"win64\" | \"mingw\" | \"cygwin\" | \"mingw64\" | \"cygwin64\" ->\n         let b = Buffer.create 80 in\n         String.iter\n           (function\n@@ -49,7 +57,7 @@\n \n let out_path ?(prefix=\"\") s =\n   match Findlib_config.system with\n-    | \"mingw\" | \"mingw64\" | \"cygwin\" ->\n+   | \"win32\" | \"win64\" | \"mingw\" | \"mingw64\" | \"cygwin\" ->\n \tlet u = slashify s in\n \tprefix ^ \n \t  (if String.contains u ' ' then\n@@ -273,11 +281,9 @@\n \n \n let identify_dir d =\n-  match Sys.os_type with\n-    | \"Win32\" ->\n-\tfailwith \"identify_dir\"   (* not available *)\n-    | _ ->\n-\tlet s = Unix.stat d in\n+  if is_win then\n+    failwith \"identify_dir\";   (* not available *)\n+  let s = Unix.stat d in\n \t(s.Unix.st_dev, s.Unix.st_ino)\n ;;\n \n@@ -459,6 +465,96 @@\n       )\n       packages\n \n+let rewrite_cmd s =\n+  if s = \"\" || not is_win then\n+    s\n+  else\n+    let s =\n+      let l = String.length s in\n+      let b = Buffer.create l in\n+      for i = 0 to pred l do\n+        match s.[i] with\n+        | '/' -> Buffer.add_char b '\\\\'\n+        | x -> Buffer.add_char b x\n+      done;\n+      Buffer.contents b\n+    in\n+    if (Filename.is_implicit s && String.contains s '\\\\' = false) ||\n+      Filename.check_suffix (String.lowercase s) \".exe\" then\n+      s\n+    else\n+      let s' = s ^ \".exe\" in\n+      if Sys.file_exists s' then\n+        s'\n+      else\n+        s\n+\n+let rewrite_cmd s =\n+  if s = \"\" || not is_win then s else\n+  let s =\n+    let l = String.length s in\n+    let b = Buffer.create l in\n+    for i = 0 to pred l do\n+      match s.[i] with\n+      | '/' -> Buffer.add_char b '\\\\'\n+      | x -> Buffer.add_char b x\n+    done;\n+    Buffer.contents b\n+  in\n+  if (Filename.is_implicit s && String.contains s '\\\\' = false) ||\n+     Filename.check_suffix (String.lowercase s) \".exe\" then\n+    s\n+  else\n+    let s' = s ^ \".exe\" in\n+    if Sys.file_exists s' then\n+      s'\n+    else\n+      s\n+\n+let rewrite_pp cmd =\n+  if not is_win then cmd else\n+  let module T = struct exception Keep end in\n+  let is_whitespace = function\n+  | ' ' | '\\011' | '\\012' | '\\n' | '\\r' | '\\t' -> true\n+  | _ -> false in\n+  (* characters that triggers special behaviour (cmd.exe, not unix shell) *)\n+  let is_unsafe_char = function\n+  | '(' | ')' | '%' | '!' | '^' | '<' | '>' | '&' -> true\n+  | _ -> false in\n+  let len = String.length cmd in\n+  let buf = Buffer.create (len + 4) in\n+  let buf_cmd = Buffer.create len in\n+  let rec iter_ws i =\n+    if i >= len then () else\n+    let cur = cmd.[i] in\n+    if is_whitespace cur then (\n+      Buffer.add_char buf cur;\n+      iter_ws (succ i)\n+    )\n+    else\n+      iter_cmd i\n+  and iter_cmd i =\n+    if i >= len then add_buf_cmd () else\n+    let cur = cmd.[i] in\n+    if is_unsafe_char cur || cur = '\"' || cur = '\\'' then\n+      raise T.Keep;\n+    if is_whitespace cur then (\n+      add_buf_cmd ();\n+      Buffer.add_substring buf cmd i (len - i)\n+    )\n+    else (\n+      Buffer.add_char buf_cmd cur;\n+      iter_cmd (succ i)\n+    )\n+  and add_buf_cmd () =\n+    if Buffer.length buf_cmd > 0 then\n+      Buffer.add_string buf (rewrite_cmd (Buffer.contents buf_cmd))\n+  in\n+  try\n+    iter_ws 0;\n+    Buffer.contents buf\n+  with\n+  | T.Keep -> cmd\n \n let process_pp_spec syntax_preds packages pp_opts =\n   (* Returns: pp_command *)\n@@ -549,7 +645,7 @@\n       None -> []\n     | Some cmd ->\n \t[\"-pp\";\n-\t cmd ^ \" \" ^\n+\t (rewrite_cmd cmd) ^ \" \" ^\n \t String.concat \" \" (List.map Filename.quote pp_i_options) ^ \" \" ^\n \t String.concat \" \" (List.map Filename.quote pp_archives) ^ \" \" ^\n \t String.concat \" \" (List.map Filename.quote pp_opts)]\n@@ -625,9 +721,11 @@\n           in\n           try\n             let preprocessor =\n+              rewrite_cmd (\n               resolve_path\n                 ~base ~explicit:true\n-                (package_property predicates pname \"ppx\") in\n+                  (package_property predicates pname \"ppx\") )\n+            in\n             [\"-ppx\"; String.concat \" \" (preprocessor :: options)]\n           with Not_found -> []\n        )\n@@ -895,6 +993,14 @@\n        switch (e.g. -L<path> instead of -L <path>)\n      *)\n \n+(* We may need to remove files on which we do not have complete control.\n+   On Windows, removing a read-only file fails so try to change the\n+   mode of the file first. *)\n+let remove_file fname =\n+  try Sys.remove fname\n+  with Sys_error _ when is_win ->\n+    (try Unix.chmod fname 0o666 with Unix.Unix_error _ -> ());\n+    Sys.remove fname\n \n let ocamlc which () =\n \n@@ -1022,9 +1128,12 @@\n               \n \t      \"-intf\", \n \t      Arg.String (fun s -> pass_files := !pass_files @ [ Intf(slashify s) ]);\n-              \n+\n \t      \"-pp\", \n-\t      Arg.String (fun s -> pp_specified := true; add_spec_fn \"-pp\" s);\n+\t      Arg.String (fun s -> pp_specified := true; add_spec_fn \"-pp\" (rewrite_pp s));\n+\n+              \"-ppx\",\n+              Arg.String (fun s -> add_spec_fn \"-ppx\" (rewrite_pp s));\n \t      \n \t      \"-thread\", \n \t      Arg.Unit (fun _ -> threads := threads_default);\n@@ -1237,7 +1346,7 @@\n     with\n       any ->\n \tclose_out initl;\n-\tSys.remove initl_file_name;\n+\tremove_file initl_file_name;\n \traise any\n   end;\n \n@@ -1245,9 +1354,9 @@\n     at_exit\n       (fun () ->\n \tlet tr f x = try f x with _ -> () in\n-\ttr Sys.remove initl_file_name;\n-\ttr Sys.remove (Filename.chop_extension initl_file_name ^ \".cmi\");\n-\ttr Sys.remove (Filename.chop_extension initl_file_name ^ \".cmo\");\n+\ttr remove_file initl_file_name;\n+\ttr remove_file (Filename.chop_extension initl_file_name ^ \".cmi\");\n+\ttr remove_file (Filename.chop_extension initl_file_name ^ \".cmo\");\n       );\n \n   let exclude_list = [ stdlibdir; threads_dir; vmthreads_dir ] in\n@@ -1493,7 +1602,9 @@\n \t  [ \"-v\", Arg.Unit (fun () -> verbose := Verbose);\n \t    \"-pp\", Arg.String (fun s ->\n \t\t\t\t pp_specified := true;\n-\t\t\t\t options := !options @ [\"-pp\"; s]);\n+\t\t\t\t options := !options @ [\"-pp\"; rewrite_pp s]);\n+            \"-ppx\", Arg.String (fun s ->\n+\t\t\t\t options := !options @ [\"-ppx\"; rewrite_pp s]);\n \t  ]\n       )\n     )\n@@ -1672,7 +1783,9 @@\n \t      Arg.String (fun s -> add_spec_fn \"-I\" (slashify (resolve_path s)));\n \n \t      \"-pp\", Arg.String (fun s -> pp_specified := true;\n-\t\t \t           add_spec_fn \"-pp\" s);\n+                           add_spec_fn \"-pp\" (rewrite_pp s));\n+              \"-ppx\", Arg.String (fun s -> add_spec_fn \"-ppx\" (rewrite_pp s));\n+\n \t    ]\n \t)\n     )\n@@ -1830,7 +1943,10 @@\n       output_string ch_out append;\n       close_out ch_out;\n       close_in ch_in;\n-      Unix.utimes outpath s.Unix.st_mtime s.Unix.st_mtime;\n+      (try Unix.utimes outpath s.Unix.st_mtime s.Unix.st_mtime\n+       with Unix.Unix_error(e,_,_) ->\n+         prerr_endline(\"Warning: setting utimes for \" ^ outpath\n+                       ^ \": \" ^ Unix.error_message e));\n \n       prerr_endline(\"Installed \" ^ outpath);\n     with\n@@ -1882,6 +1998,8 @@\n              Unix.openfile (Filename.concat dir owner_file) [Unix.O_RDONLY] 0 in\n            let f =\n              Unix.in_channel_of_descr fd in\n+           if is_win then\n+             set_binary_mode_in f false;\n            try\n              let line = input_line f in\n              let is_my_file = (line = pkg) in\n@@ -2208,7 +2326,7 @@\n     let lines = read_ldconf !ldconf in\n     let dlldir_norm = Fl_split.norm_dir dlldir in\n     let dlldir_norm_lc = string_lowercase_ascii dlldir_norm in\n-    let ci_filesys = (Sys.os_type = \"Win32\") in\n+    let ci_filesys = is_win in\n     let check_dir d =\n       let d' = Fl_split.norm_dir d in\n       (d' = dlldir_norm) || \n@@ -2356,7 +2474,7 @@\n       List.iter\n         (fun file ->\n            let absfile = Filename.concat dlldir file in\n-           Sys.remove absfile;\n+           remove_file absfile;\n            prerr_endline (\"Removed \" ^ absfile)\n         )\n         dll_files\n@@ -2365,7 +2483,7 @@\n     (* Remove the files from the package directory: *)\n     if Sys.file_exists pkgdir then begin\n       let files = Sys.readdir pkgdir in\n-      Array.iter (fun f -> Sys.remove (Filename.concat pkgdir f)) files;\n+      Array.iter (fun f -> remove_file (Filename.concat pkgdir f)) files;\n       Unix.rmdir pkgdir;\n       prerr_endline (\"Removed \" ^ pkgdir)\n     end\n@@ -2415,7 +2533,9 @@\n \n \n let print_configuration() =\n+  let sl = slashify in\n   let dir s =\n+    let s = sl s in\n     if Sys.file_exists s then\n       s\n     else\n@@ -2453,27 +2573,27 @@\n \t   if md = \"\" then \"the corresponding package directories\" else dir md\n \t  );\n \tPrintf.printf \"The standard library is assumed to reside in:\\n    %s\\n\"\n-\t  (Findlib.ocaml_stdlib());\n+    (sl (Findlib.ocaml_stdlib()));\n \tPrintf.printf \"The ld.conf file can be found here:\\n    %s\\n\"\n-\t  (Findlib.ocaml_ldconf());\n+    (sl (Findlib.ocaml_ldconf()));\n \tflush stdout\n     | Some \"conf\" ->\n-\tprint_endline Findlib_config.config_file\n+  print_endline (sl Findlib_config.config_file)\n     | Some \"path\" ->\n-\tList.iter print_endline (Findlib.search_path())\n+  List.iter ( fun x -> print_endline (sl x)) (Findlib.search_path())\n     | Some \"destdir\" ->\n-\tprint_endline (Findlib.default_location())\n+  print_endline ( sl (Findlib.default_location()))\n     | Some \"metadir\" ->\n-\tprint_endline (Findlib.meta_directory())\n+  print_endline ( sl (Findlib.meta_directory()))\n     | Some \"metapath\" ->\n         let mdir = Findlib.meta_directory() in\n         let ddir = Findlib.default_location() in\n-\tprint_endline \n-          (if mdir <> \"\" then mdir ^ \"/META.%s\" else ddir ^ \"/%s/META\")\n+  print_endline ( sl\n+          (if mdir <> \"\" then mdir ^ \"/META.%s\" else ddir ^ \"/%s/META\"))\n     | Some \"stdlib\" ->\n-\tprint_endline (Findlib.ocaml_stdlib())\n+  print_endline ( sl (Findlib.ocaml_stdlib()))\n     | Some \"ldconf\" ->\n-\tprint_endline (Findlib.ocaml_ldconf())\n+  print_endline ( sl (Findlib.ocaml_ldconf()))\n     | _ ->\n \tassert false\n ;;\n@@ -2481,7 +2601,7 @@\n \n let ocamlcall pkg cmd =\n   let dir = package_directory pkg in\n-  let path = Filename.concat dir cmd in\n+  let path = rewrite_cmd (Filename.concat dir cmd) in\n   begin\n     try Unix.access path [ Unix.X_OK ]\n     with\n@@ -2647,6 +2767,10 @@\n   | Sys_error f ->\n       prerr_endline (\"ocamlfind: \" ^ f);\n       exit 2\n+  | Unix.Unix_error (e, fn, f) ->\n+      prerr_endline (\"ocamlfind: \" ^ fn ^ \" \" ^ f\n+                     ^ \": \" ^ Unix.error_message e);\n+      exit 2\n   | Findlib.No_such_package(pkg,info) ->\n       prerr_endline (\"ocamlfind: Package `\" ^ pkg ^ \"' not found\" ^\n \t\t     (if info <> \"\" then \" - \" ^ info else \"\"));\n--- ./src/findlib/Makefile\n+++ ./src/findlib/Makefile\n@@ -90,6 +90,7 @@\n \tcat findlib_config.mlp | \\\n \t        $(SH) $(TOP)/tools/patch '@CONFIGFILE@' '$(OCAMLFIND_CONF)' | \\\n \t        $(SH) $(TOP)/tools/patch '@STDLIB@' '$(OCAML_CORE_STDLIB)' | \\\n+\t\t\t$(SH) $(TOP)/tools/patch '@EXEC_SUFFIX@' '$(EXEC_SUFFIX)' | \\\n \t\tsed -e 's;@AUTOLINK@;$(OCAML_AUTOLINK);g' \\\n \t\t    -e 's;@SYSTEM@;$(SYSTEM);g' \\\n \t\t     >findlib_config.ml\n@@ -113,7 +114,7 @@\n \t$(OCAMLC) -a -o num_top.cma $(NUMTOP_OBJECTS)\n \n clean:\n-\trm -f *.cmi *.cmo *.cma *.cmx *.a *.o *.cmxa \\\n+\trm -f *.cmi *.cmo *.cma *.cmx *.lib *.a *.o *.cmxa \\\n \t  fl_meta.ml findlib_config.ml findlib.mml topfind.ml topfind \\\n \t  ocamlfind$(EXEC_SUFFIX) ocamlfind_opt$(EXEC_SUFFIX)\n \n@@ -121,7 +122,7 @@\n \tmkdir -p \"$(prefix)$(OCAML_SITELIB)/$(NAME)\"\n \tmkdir -p \"$(prefix)$(OCAMLFIND_BIN)\"\n \ttest $(INSTALL_TOPFIND) -eq 0 || cp topfind \"$(prefix)$(OCAML_CORE_STDLIB)\"\n-\tfiles=`$(SH) $(TOP)/tools/collect_files $(TOP)/Makefile.config findlib.cmi findlib.mli findlib.cma findlib.cmxa findlib.a findlib.cmxs topfind.cmi topfind.mli fl_package_base.mli fl_package_base.cmi fl_metascanner.mli fl_metascanner.cmi fl_metatoken.cmi findlib_top.cma findlib_top.cmxa findlib_top.a findlib_top.cmxs findlib_dynload.cma findlib_dynload.cmxa findlib_dynload.a findlib_dynload.cmxs fl_dynload.mli fl_dynload.cmi META` && \\\n+\tfiles=`$(SH) $(TOP)/tools/collect_files $(TOP)/Makefile.config findlib.cmi findlib.mli findlib.cma findlib.cmxa findlib$(LIB_SUFFIX) findlib.cmxs topfind.cmi topfind.mli fl_package_base.mli fl_package_base.cmi fl_metascanner.mli fl_metascanner.cmi fl_metatoken.cmi findlib_top.cma findlib_top.cmxa findlib_top$(LIB_SUFFIX) findlib_top.cmxs findlib_dynload.cma findlib_dynload.cmxa findlib_dynload$(LIB_SUFFIX) findlib_dynload.cmxs fl_dynload.mli fl_dynload.cmi META` && \\\n \tcp $$files \"$(prefix)$(OCAML_SITELIB)/$(NAME)\"\n \tf=\"ocamlfind$(EXEC_SUFFIX)\"; { test -f ocamlfind_opt$(EXEC_SUFFIX) && f=\"ocamlfind_opt$(EXEC_SUFFIX)\"; }; \\\n \tcp $$f \"$(prefix)$(OCAMLFIND_BIN)/ocamlfind$(EXEC_SUFFIX)\"\n"
+          }
+        ],
+        "opam": {
+          "name": "ocamlfind",
+          "version": "1.8.0",
+          "opam":
+            "opam-version: \"2.0\"\nname: \"ocamlfind\"\nversion: \"1.8.0\"\nsynopsis: \"A library manager for OCaml\"\ndescription: \"\"\"\nFindlib is a library manager for OCaml. It provides a convention how\nto store libraries, and a file format (\"META\") to describe the\nproperties of libraries. There is also a tool (ocamlfind) for\ninterpreting the META files, so that it is very easy to use libraries\nin programs and scripts.\"\"\"\nmaintainer: \"Thomas Gazagnaire <thomas@gazagnaire.org>\"\nauthors: \"Gerd Stolpmann <gerd@gerd-stolpmann.de>\"\nhomepage: \"http://projects.camlcity.org/projects/findlib.html\"\nbug-reports: \"https://gitlab.camlcity.org/gerd/lib-findlib/issues\"\ndepends: [\n  \"ocaml\" {>= \"4.00.0\"}\n  \"conf-m4\" {build}\n]\nbuild: [\n  [\n    \"./configure\"\n    \"-bindir\"\n    bin\n    \"-sitelib\"\n    lib\n    \"-mandir\"\n    man\n    \"-config\"\n    \"%{lib}%/findlib.conf\"\n    \"-no-custom\"\n    \"-no-topfind\" {ocaml:preinstalled}\n  ]\n  [make \"all\"]\n  [make \"opt\"] {ocaml:native}\n]\ninstall: [\n  [make \"install\"]\n  [\"install\" \"-m\" \"0755\" \"ocaml-stub\" \"%{bin}%/ocaml\"] {ocaml:preinstalled}\n]\nremove: [\n  [\"ocamlfind\" \"remove\" \"bytes\"]\n  [\n    \"./configure\"\n    \"-bindir\"\n    bin\n    \"-sitelib\"\n    lib\n    \"-mandir\"\n    man\n    \"-config\"\n    \"%{lib}%/findlib.conf\"\n    \"-no-topfind\" {ocaml:preinstalled}\n  ]\n  [make \"uninstall\"]\n  [\"rm\" \"-f\" \"%{bin}%/ocaml\"] {ocaml:preinstalled}\n]\ndev-repo: \"git+https://gitlab.camlcity.org/gerd/lib-findlib.git\"\nextra-files: [\n  [\"ocamlfind.install\" \"md5=06f2c282ab52d93aa6adeeadd82a2543\"]\n  [\"ocaml-stub\" \"md5=181f259c9e0bad9ef523e7d4abfdf87a\"]\n]\nurl {\n  src: \"http://download.camlcity.org/download/findlib-1.8.0.tar.gz\"\n  checksum: \"md5=a710c559667672077a93d34eb6a42e5b\"\n  mirrors: \"http://download2.camlcity.org/download/findlib-1.8.0.tar.gz\"\n}",
+          "override": {
+            "build": [
+              [
+                "bash", "-c",
+                "#{os == 'windows' ? 'patch -p1 < findlib-1.8.0.patch' : 'true'}"
+              ],
+              [
+                "./configure", "-bindir", "#{self.bin}", "-sitelib",
+                "#{self.lib}", "-mandir", "#{self.man}", "-config",
+                "#{self.lib}/findlib.conf", "-no-custom", "-no-topfind"
+              ],
+              [ "make", "all" ],
+              [ "make", "opt" ]
+            ],
+            "install": [
+              [ "make", "install" ],
+              [ "install", "-m", "0755", "ocaml-stub", "#{self.bin}/ocaml" ],
+              [ "mkdir", "-p", "#{self.toplevel}" ],
+              [
+                "install", "-m", "0644", "src/findlib/topfind",
+                "#{self.toplevel}/topfind"
+              ]
+            ],
+            "exportedEnv": {
+              "OCAML_TOPLEVEL_PATH": {
+                "val": "#{self.toplevel}",
+                "scope": "global",
+                "exclusive": false
+              }
+            }
+          }
+        }
+      },
+      "dependencies": [
+        "@esy-ocaml/substs@0.0.1", "@opam/conf-m4@opam:1", "ocaml@4.2.3006"
+      ]
+    },
+    "@opam/ocamlbuild@opam:0": {
+      "record": {
+        "name": "@opam/ocamlbuild",
+        "version": "opam:0",
+        "source": "no-source:",
+        "files": [],
+        "opam": {
+          "name": "ocamlbuild",
+          "version": "0",
+          "opam":
+            "opam-version: \"2.0\"\nname: \"ocamlbuild\"\nversion: \"0\"\nsynopsis:\n  \"Build system distributed with the OCaml compiler since OCaml 3.10.0\"\nmaintainer: \"Gabriel Scherer <gabriel.scherer@gmail.com>\"\nauthors: [\"Nicolas Pouillard\" \"Berke Durak\"]\nlicense: \"LGPL-2 with OCaml linking exception\"\nhomepage: \"https://github.com/ocaml/ocaml\"\ndoc: [\n  \"http://caml.inria.fr/pub/docs/manual-ocaml/ocamlbuild.html\"\n  \"https://github.com/gasche/manual-ocamlbuild/blob/master/manual.md\"\n]\nbug-reports: \"http://caml.inria.fr/mantis/\"\ndepends: [\"ocaml\" \"base-ocamlbuild\"]\ndev-repo: \"git+https://github.com/ocaml/ocaml.git\"",
+          "override": null
+        }
+      },
+      "dependencies": [
+        "@esy-ocaml/substs@0.0.1", "@opam/base-ocamlbuild@opam:base",
+        "ocaml@4.2.3006"
+      ]
+    },
+    "@opam/ocaml-migrate-parsetree@opam:1.1.0": {
+      "record": {
+        "name": "@opam/ocaml-migrate-parsetree",
+        "version": "opam:1.1.0",
+        "source":
+          "archive:https://github.com/ocaml-ppx/ocaml-migrate-parsetree/releases/download/v1.1.0/ocaml-migrate-parsetree-1.1.0.tbz#md5:7dd4808e27af98065f63604c9658d311",
+        "files": [],
+        "opam": {
+          "name": "ocaml-migrate-parsetree",
+          "version": "1.1.0",
+          "opam":
+            "opam-version: \"2.0\"\nname: \"ocaml-migrate-parsetree\"\nversion: \"1.1.0\"\nsynopsis: \"\"\ndescription: \"\"\"\nConvert OCaml parsetrees between different versions \n\nThis library converts parsetrees, outcometree and ast mappers between different OCaml versions.\nHigh-level functions help making PPX rewriters independent of a compiler version.\"\"\"\nmaintainer: \"frederic.bour@lakaban.net\"\nauthors: [\n  \"Frédéric Bour <frederic.bour@lakaban.net>\"\n  \"Jérémie Dimino <jeremie@dimino.org>\"\n]\nlicense: \"LGPL-2.1\"\ntags: [\"syntax\" \"org:ocamllabs\"]\nhomepage: \"https://github.com/ocaml-ppx/ocaml-migrate-parsetree\"\ndoc: \"https://ocaml-ppx.github.io/ocaml-migrate-parsetree/\"\nbug-reports: \"https://github.com/ocaml-ppx/ocaml-migrate-parsetree/issues\"\ndepends: [\n  \"result\"\n  \"dune\" {build}\n  \"ocaml\" {>= \"4.02.0\"}\n]\nbuild: [\"jbuilder\" \"build\" \"-p\" name \"-j\" jobs]\ndev-repo: \"git+https://github.com/ocaml-ppx/ocaml-migrate-parsetree.git\"\nurl {\n  src:\n    \"https://github.com/ocaml-ppx/ocaml-migrate-parsetree/releases/download/v1.1.0/ocaml-migrate-parsetree-1.1.0.tbz\"\n  checksum: \"md5=7dd4808e27af98065f63604c9658d311\"\n}",
+          "override": null
+        }
+      },
+      "dependencies": [
+        "@esy-ocaml/substs@0.0.1", "@opam/dune@opam:1.4.0",
+        "@opam/result@opam:1.3", "ocaml@4.2.3006"
+      ]
+    },
+    "@opam/menhir@opam:20171222": {
+      "record": {
+        "name": "@opam/menhir",
+        "version": "opam:20171222",
+        "source":
+          "archive:http://gallium.inria.fr/~fpottier/menhir/menhir-20171222.tar.gz#md5:6bbea6ad7b390904c9ce6d3e11d73438",
+        "files": [],
+        "opam": {
+          "name": "menhir",
+          "version": "20171222",
+          "opam":
+            "opam-version: \"2.0\"\nname: \"menhir\"\nversion: \"20171222\"\nsynopsis: \"LR(1) parser generator\"\nmaintainer: \"francois.pottier@inria.fr\"\nauthors: [\n  \"François Pottier <francois.pottier@inria.fr>\"\n  \"Yann Régis-Gianas <yrg@pps.univ-paris-diderot.fr>\"\n]\nhomepage: \"http://gallium.inria.fr/~fpottier/menhir/\"\nbug-reports: \"menhir@inria.fr\"\ndepends: [\n  \"ocaml\" {>= \"4.02\"}\n  \"ocamlfind\"\n  \"ocamlbuild\" {build}\n]\nbuild: [\n  make\n  \"-f\"\n  \"Makefile\"\n  \"PREFIX=%{prefix}%\"\n  \"USE_OCAMLFIND=true\"\n  \"docdir=%{doc}%/menhir\"\n  \"libdir=%{lib}%/menhir\"\n  \"mandir=%{man}%/man1\"\n]\ninstall: [\n  make\n  \"-f\"\n  \"Makefile\"\n  \"install\"\n  \"PREFIX=%{prefix}%\"\n  \"docdir=%{doc}%/menhir\"\n  \"libdir=%{lib}%/menhir\"\n  \"mandir=%{man}%/man1\"\n]\nremove: [\n  make\n  \"-f\"\n  \"Makefile\"\n  \"uninstall\"\n  \"PREFIX=%{prefix}%\"\n  \"docdir=%{doc}%/menhir\"\n  \"libdir=%{lib}%/menhir\"\n  \"mandir=%{man}%/man1\"\n]\ndev-repo: \"git+https://gitlab.inria.fr/fpottier/menhir.git\"\nurl {\n  src: \"http://gallium.inria.fr/~fpottier/menhir/menhir-20171222.tar.gz\"\n  checksum: \"md5=6bbea6ad7b390904c9ce6d3e11d73438\"\n}",
+          "override": null
+        }
+      },
+      "dependencies": [
+        "@esy-ocaml/substs@0.0.1", "@opam/ocamlbuild@opam:0",
+        "@opam/ocamlfind@opam:1.8.0", "ocaml@4.2.3006"
+      ]
+    },
+    "@opam/jbuilder@opam:transition": {
+      "record": {
+        "name": "@opam/jbuilder",
+        "version": "opam:transition",
+        "source": "no-source:",
+        "files": [],
+        "opam": {
+          "name": "jbuilder",
+          "version": "transition",
+          "opam":
+            "opam-version: \"2.0\"\nname: \"jbuilder\"\nversion: \"transition\"\nsynopsis:\n  \"This is a transition package, jbuilder is now named dune. Use the dune\"\ndescription: \"package instead.\"\nmaintainer: \"opensource@janestreet.com\"\nauthors: \"Jane Street Group, LLC <opensource@janestreet.com>\"\nlicense: \"MIT\"\nhomepage: \"https://github.com/ocaml/dune\"\nbug-reports: \"https://github.com/ocaml/dune/issues\"\ndepends: [\"ocaml\" \"dune\"]\npost-messages:\n  \"Jbuilder has been renamed and the jbuilder package is now a transition package. Use the dune package instead.\"\ndev-repo: \"git+https://github.com/ocaml/dune.git\"",
+          "override": null
+        }
+      },
+      "dependencies": [
+        "@esy-ocaml/substs@0.0.1", "@opam/dune@opam:1.4.0", "ocaml@4.2.3006"
+      ]
+    },
+    "@opam/gen@opam:0.5.1": {
+      "record": {
+        "name": "@opam/gen",
+        "version": "opam:0.5.1",
+        "source":
+          "archive:https://github.com/c-cube/gen/archive/0.5.1.tar.gz#md5:4fb545ddde26dd084f01210681df4c14",
+        "files": [],
+        "opam": {
+          "name": "gen",
+          "version": "0.5.1",
+          "opam":
+            "opam-version: \"2.0\"\nname: \"gen\"\nversion: \"0.5.1\"\nsynopsis: \"Simple and efficient iterators (modules Gen and GenLabels).\"\ndescription: \"\"\"\nNow provides additional modules GenClone and GenMList for lower-level control\nover persistency and duplication of iterators.\"\"\"\nmaintainer: \"simon.cruanes.2007@m4x.org\"\nauthors: \"Simon Cruanes\"\ntags: [\"gen\" \"iterator\" \"iter\" \"fold\"]\nhomepage: \"https://github.com/c-cube/gen/\"\ndoc: \"http://cedeela.fr/~simon/software/gen/\"\nbug-reports: \"https://github.com/c-cube/gen/issues\"\ndepends: [\n  \"ocaml\"\n  \"jbuilder\" {build}\n  \"base-bytes\"\n  \"odoc\" {with-doc}\n  \"qtest\" {with-test}\n  \"qcheck\" {with-test}\n]\nbuild: [\n  [\"jbuilder\" \"build\" \"-p\" name]\n  [\"jbuilder\" \"runtest\"] {with-test}\n  [\"jbuilder\" \"build\" \"@doc\"] {with-doc}\n]\ndev-repo: \"git+https://github.com/c-cube/gen.git\"\nurl {\n  src: \"https://github.com/c-cube/gen/archive/0.5.1.tar.gz\"\n  checksum: \"md5=4fb545ddde26dd084f01210681df4c14\"\n}",
+          "override": null
+        }
+      },
+      "dependencies": [
+        "@esy-ocaml/substs@0.0.1", "@opam/base-bytes@opam:base",
+        "@opam/jbuilder@opam:transition", "ocaml@4.2.3006"
+      ]
+    },
+    "@opam/fmt@opam:0.8.5": {
+      "record": {
+        "name": "@opam/fmt",
+        "version": "opam:0.8.5",
+        "source":
+          "archive:http://erratique.ch/software/fmt/releases/fmt-0.8.5.tbz#md5:77b64aa6f20f09de28f2405d6195f12c",
+        "files": [],
+        "opam": {
+          "name": "fmt",
+          "version": "0.8.5",
+          "opam":
+            "opam-version: \"2.0\"\nname: \"fmt\"\nversion: \"0.8.5\"\nsynopsis: \"OCaml Format pretty-printer combinators\"\ndescription: \"\"\"\nFmt exposes combinators to devise `Format` pretty-printing functions.\n\nFmt depends only on the OCaml standard library. The optional `Fmt_tty`\nlibrary that allows to setup formatters for terminal color output\ndepends on the Unix library. The optional `Fmt_cli` library that\nprovides command line support for Fmt depends on [`Cmdliner`][cmdliner].\n\nFmt is distributed under the ISC license.\n\n[cmdliner]: http://erratique.ch/software/cmdliner\"\"\"\nmaintainer: \"Daniel Bünzli <daniel.buenzl i@erratique.ch>\"\nauthors: [\"Daniel Bünzli <daniel.buenzl i@erratique.ch>\" \"Gabriel Radanne\"]\nlicense: \"ISC\"\ntags: [\"string\" \"format\" \"pretty-print\" \"org:erratique\"]\nhomepage: \"http://erratique.ch/software/fmt\"\ndoc: \"http://erratique.ch/software/fmt\"\nbug-reports: \"https://github.com/dbuenzli/fmt/issues\"\ndepends: [\n  \"ocaml\" {>= \"4.01.0\"}\n  \"ocamlfind\" {build}\n  \"ocamlbuild\" {build}\n  \"topkg\" {build & >= \"0.9.0\"}\n  \"result\"\n  \"uchar\"\n]\ndepopts: [\"base-unix\" \"cmdliner\"]\nconflicts: [\n  \"cmdliner\" {< \"0.9.8\"}\n]\nbuild: [\n  \"ocaml\"\n  \"pkg/pkg.ml\"\n  \"build\"\n  \"--dev-pkg\"\n  \"%{pinned}%\"\n  \"--with-base-unix\"\n  \"%{base-unix:installed}%\"\n  \"--with-cmdliner\"\n  \"%{cmdliner:installed}%\"\n]\ndev-repo: \"git+http://erratique.ch/repos/fmt.git\"\nurl {\n  src: \"http://erratique.ch/software/fmt/releases/fmt-0.8.5.tbz\"\n  checksum: \"md5=77b64aa6f20f09de28f2405d6195f12c\"\n}",
+          "override": null
+        }
+      },
+      "dependencies": [
+        "@esy-ocaml/substs@0.0.1", "@opam/ocamlbuild@opam:0",
+        "@opam/ocamlfind@opam:1.8.0", "@opam/result@opam:1.3",
+        "@opam/topkg@opam:1.0.0", "@opam/uchar@opam:0.0.2", "ocaml@4.2.3006"
+      ]
+    },
+    "@opam/easy-format@opam:1.3.1": {
+      "record": {
+        "name": "@opam/easy-format",
+        "version": "opam:1.3.1",
+        "source":
+          "archive:https://github.com/mjambon/easy-format/archive/v1.3.1.tar.gz#md5:4e163700fb88fdcd6b8976c3a216c8ea",
+        "files": [],
+        "opam": {
+          "name": "easy-format",
+          "version": "1.3.1",
+          "opam":
+            "opam-version: \"2.0\"\nname: \"easy-format\"\nversion: \"1.3.1\"\nsynopsis:\n  \"High-level and functional interface to the Format module of the OCaml standard library\"\nmaintainer: \"martin@mjambon.com\"\nauthors: \"Martin Jambon\"\nhomepage: \"http://mjambon.com/easy-format.html\"\nbug-reports: \"https://github.com/mjambon/easy-format/issues\"\ndepends: [\n  \"ocaml\" {>= \"4.02.3\"}\n  \"jbuilder\" {build}\n]\nbuild: [\n  [\"jbuilder\" \"build\" \"-p\" name \"-j\" jobs]\n  [\"jbuilder\" \"runtest\" \"-p\" name] {with-test}\n]\ndev-repo: \"git+https://github.com/mjambon/easy-format.git\"\nurl {\n  src: \"https://github.com/mjambon/easy-format/archive/v1.3.1.tar.gz\"\n  checksum: \"md5=4e163700fb88fdcd6b8976c3a216c8ea\"\n}",
+          "override": null
+        }
+      },
+      "dependencies": [
+        "@esy-ocaml/substs@0.0.1", "@opam/jbuilder@opam:transition",
+        "ocaml@4.2.3006"
+      ]
+    },
+    "@opam/dune@opam:1.4.0": {
+      "record": {
+        "name": "@opam/dune",
+        "version": "opam:1.4.0",
+        "source":
+          "archive:https://github.com/ocaml/dune/releases/download/1.4.0/dune-1.4.0.tbz#md5:dc862e5d821ff4d8bef16a78bd472431",
+        "files": [],
+        "opam": {
+          "name": "dune",
+          "version": "1.4.0",
+          "opam":
+            "opam-version: \"2.0\"\nname: \"dune\"\nversion: \"1.4.0\"\nsynopsis: \"Fast, portable and opinionated build system\"\ndescription: \"\"\"\ndune is a build system that was designed to simplify the release of\nJane Street packages. It reads metadata from \"dune\" files following a\nvery simple s-expression syntax.\n\ndune is fast, it has very low-overhead and support parallel builds on\nall platforms. It has no system dependencies, all you need to build\ndune and packages using dune is OCaml. You don't need or make or bash\nas long as the packages themselves don't use bash explicitly.\n\ndune supports multi-package development by simply dropping multiple\nrepositories into the same directory.\n\nIt also supports multi-context builds, such as building against\nseveral opam roots/switches simultaneously. This helps maintaining\npackages across several versions of OCaml and gives cross-compilation\nfor free.\"\"\"\nmaintainer: \"opensource@janestreet.com\"\nauthors: \"Jane Street Group, LLC <opensource@janestreet.com>\"\nlicense: \"MIT\"\nhomepage: \"https://github.com/ocaml/dune\"\nbug-reports: \"https://github.com/ocaml/dune/issues\"\ndepends: [\n  \"ocaml\" {>= \"4.02\"}\n]\nconflicts: [\n  \"jbuilder\" {!= \"transition\"}\n]\nbuild: [\n  [\"ocaml\" \"configure.ml\" \"--libdir\" lib] {opam-version < \"2\"}\n  [\"ocaml\" \"bootstrap.ml\"]\n  [\"./boot.exe\" \"--release\" \"--subst\"] {pinned}\n  [\"./boot.exe\" \"--release\" \"-j\" jobs]\n]\ndev-repo: \"git+https://github.com/ocaml/dune.git\"\nurl {\n  src: \"https://github.com/ocaml/dune/releases/download/1.4.0/dune-1.4.0.tbz\"\n  checksum: \"md5=dc862e5d821ff4d8bef16a78bd472431\"\n}",
+          "override": {
+            "build": [
+              [ "ocaml", "bootstrap.ml" ],
+              [ "./boot.exe", "--release", "-j", "4" ]
+            ]
+          }
+        }
+      },
+      "dependencies": [ "@esy-ocaml/substs@0.0.1", "ocaml@4.2.3006" ]
+    },
+    "@opam/cppo@opam:1.6.5": {
+      "record": {
+        "name": "@opam/cppo",
+        "version": "opam:1.6.5",
+        "source":
+          "archive:https://github.com/mjambon/cppo/archive/v1.6.5.tar.gz#md5:1cd25741d31417995b0973fe0b6f6c82",
+        "files": [],
+        "opam": {
+          "name": "cppo",
+          "version": "1.6.5",
+          "opam":
+            "opam-version: \"2.0\"\nname: \"cppo\"\nversion: \"1.6.5\"\nsynopsis: \"Equivalent of the C preprocessor for OCaml programs\"\nmaintainer: \"martin@mjambon.com\"\nauthors: \"Martin Jambon\"\nlicense: \"BSD-3-Clause\"\nhomepage: \"https://github.com/mjambon/cppo\"\nbug-reports: \"https://github.com/mjambon/cppo/issues\"\ndepends: [\n  \"ocaml\"\n  \"jbuilder\" {build & >= \"1.0+beta17\"}\n  \"base-unix\"\n]\nbuild: [\n  [\"jbuilder\" \"subst\" \"-p\" name] {pinned}\n  [\"jbuilder\" \"build\" \"-p\" name \"-j\" jobs]\n  [\"jbuilder\" \"runtest\" \"-p\" name] {with-test}\n]\ndev-repo: \"git+https://github.com/mjambon/cppo.git\"\nurl {\n  src: \"https://github.com/mjambon/cppo/archive/v1.6.5.tar.gz\"\n  checksum: \"md5=1cd25741d31417995b0973fe0b6f6c82\"\n}",
+          "override": null
+        }
+      },
+      "dependencies": [
+        "@esy-ocaml/substs@0.0.1", "@opam/base-unix@opam:base",
+        "@opam/jbuilder@opam:transition", "ocaml@4.2.3006"
+      ]
+    },
+    "@opam/conf-which@opam:1": {
+      "record": {
+        "name": "@opam/conf-which",
+        "version": "opam:1",
+        "source": "no-source:",
+        "files": [],
+        "opam": {
+          "name": "conf-which",
+          "version": "1",
+          "opam":
+            "opam-version: \"2.0\"\nname: \"conf-which\"\nversion: \"1\"\nsynopsis: \"Virtual package relying on which\"\ndescription:\n  \"This package can only install if the which program is installed on the system.\"\nmaintainer: \"unixjunkie@sdf.org\"\nauthors: \"Carlo Wood\"\nlicense: \"GPL-2+\"\nhomepage: \"http://www.gnu.org/software/which/\"\nbug-reports: \"https://github.com/ocaml/opam-repository/issues\"\nbuild: [\"which\" \"which\"]\ndepexts: [\n  [\"which\"] {os-distribution = \"centos\"}\n  [\"which\"] {os-distribution = \"fedora\"}\n  [\"which\"] {os-distribution = \"opensuse\"}\n  [\"debianutils\"] {os-distribution = \"debian\"}\n  [\"debianutils\"] {os-distribution = \"ubuntu\"}\n  [\"which\"] {os-distribution = \"nixos\"}\n  [\"which\"] {os-distribution = \"archlinux\"}\n]",
+          "override": null
+        }
+      },
+      "dependencies": [ "@esy-ocaml/substs@0.0.1" ]
+    },
+    "@opam/conf-m4@opam:1": {
+      "record": {
+        "name": "@opam/conf-m4",
+        "version": "opam:1",
+        "source": "no-source:",
+        "files": [],
+        "opam": {
+          "name": "conf-m4",
+          "version": "1",
+          "opam":
+            "opam-version: \"2.0\"\nname: \"conf-m4\"\nversion: \"1\"\nsynopsis: \"Virtual package relying on m4\"\ndescription:\n  \"This package can only install if the m4 binary is installed on the system.\"\nmaintainer: \"tim@gfxmonk.net\"\nauthors: \"GNU Project\"\nlicense: \"GPL-3\"\nhomepage: \"http://www.gnu.org/software/m4/m4.html\"\nbug-reports: \"https://github.com/ocaml/opam-repository/issues\"\nbuild: [\"sh\" \"-exc\" \"echo | m4\"]\ndepexts: [\n  [\"m4\"] {os-distribution = \"debian\"}\n  [\"m4\"] {os-distribution = \"ubuntu\"}\n  [\"m4\"] {os-distribution = \"fedora\"}\n  [\"m4\"] {os-distribution = \"rhel\"}\n  [\"m4\"] {os-distribution = \"centos\"}\n  [\"m4\"] {os-distribution = \"alpine\"}\n  [\"m4\"] {os-distribution = \"nixos\"}\n  [\"m4\"] {os-distribution = \"opensuse\"}\n  [\"m4\"] {os-distribution = \"oraclelinux\"}\n  [\"m4\"] {os-distribution = \"archlinux\"}\n]",
+          "override": null
+        }
+      },
+      "dependencies": [ "@esy-ocaml/substs@0.0.1" ]
+    },
+    "@opam/cmdliner@opam:1.0.2": {
+      "record": {
+        "name": "@opam/cmdliner",
+        "version": "opam:1.0.2",
+        "source":
+          "archive:http://erratique.ch/software/cmdliner/releases/cmdliner-1.0.2.tbz#md5:ab2f0130e88e8dcd723ac6154c98a881",
+        "files": [],
+        "opam": {
+          "name": "cmdliner",
+          "version": "1.0.2",
+          "opam":
+            "opam-version: \"2.0\"\nname: \"cmdliner\"\nversion: \"1.0.2\"\nsynopsis: \"Declarative definition of command line interfaces for OCaml\"\ndescription: \"\"\"\nCmdliner allows the declarative definition of command line interfaces\nfor OCaml.\n\nIt provides a simple and compositional mechanism to convert command\nline arguments to OCaml values and pass them to your functions. The\nmodule automatically handles syntax errors, help messages and UNIX man\npage generation. It supports programs with single or multiple commands\nand respects most of the [POSIX][1] and [GNU][2] conventions.\n\nCmdliner has no dependencies and is distributed under the ISC license.\n\n[1]: http://pubs.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap12.html\n[2]: http://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html\"\"\"\nmaintainer: \"Daniel Bünzli <daniel.buenzl i@erratique.ch>\"\nauthors: \"Daniel Bünzli <daniel.buenzl i@erratique.ch>\"\nlicense: \"ISC\"\ntags: [\"cli\" \"system\" \"declarative\" \"org:erratique\"]\nhomepage: \"http://erratique.ch/software/cmdliner\"\ndoc: \"http://erratique.ch/software/cmdliner/doc/Cmdliner\"\nbug-reports: \"https://github.com/dbuenzli/cmdliner/issues\"\ndepends: [\n  \"ocaml\" {>= \"4.01.0\"}\n  \"ocamlfind\" {build}\n  \"ocamlbuild\" {build}\n  \"topkg\" {build}\n  \"result\"\n]\nbuild: [\"ocaml\" \"pkg/pkg.ml\" \"build\" \"--pinned\" \"%{pinned}%\"]\ndev-repo: \"git+http://erratique.ch/repos/cmdliner.git\"\nurl {\n  src: \"http://erratique.ch/software/cmdliner/releases/cmdliner-1.0.2.tbz\"\n  checksum: \"md5=ab2f0130e88e8dcd723ac6154c98a881\"\n}",
+          "override": null
+        }
+      },
+      "dependencies": [
+        "@esy-ocaml/substs@0.0.1", "@opam/ocamlbuild@opam:0",
+        "@opam/ocamlfind@opam:1.8.0", "@opam/result@opam:1.3",
+        "@opam/topkg@opam:1.0.0", "ocaml@4.2.3006"
+      ]
+    },
+    "@opam/biniou@opam:1.2.0": {
+      "record": {
+        "name": "@opam/biniou",
+        "version": "opam:1.2.0",
+        "source":
+          "archive:https://github.com/mjambon/biniou/archive/v1.2.0.tar.gz#md5:f3e92358e832ed94eaf23ce622ccc2f9",
+        "files": [],
+        "opam": {
+          "name": "biniou",
+          "version": "1.2.0",
+          "opam":
+            "opam-version: \"2.0\"\nname: \"biniou\"\nversion: \"1.2.0\"\nsynopsis:\n  \"Binary data format designed for speed, safety, ease of use and backward compatibility as protocols evolve\"\nmaintainer: \"martin@mjambon.com\"\nauthors: \"Martin Jambon\"\nlicense: \"BSD-3-Clause\"\nhomepage: \"https://github.com/mjambon/biniou\"\nbug-reports: \"https://github.com/mjambon/biniou/issues\"\ndepends: [\n  \"ocaml\" {>= \"4.02.3\"}\n  \"conf-which\" {build}\n  \"jbuilder\" {build & >= \"1.0+beta7\"}\n  \"easy-format\"\n]\nbuild: [\n  [\"jbuilder\" \"build\" \"-p\" name \"-j\" jobs]\n  [\"jbuilder\" \"runtest\" \"-p\" name] {with-test}\n]\ndev-repo: \"git+https://github.com/mjambon/biniou.git\"\nurl {\n  src: \"https://github.com/mjambon/biniou/archive/v1.2.0.tar.gz\"\n  checksum: \"md5=f3e92358e832ed94eaf23ce622ccc2f9\"\n}",
+          "override": null
+        }
+      },
+      "dependencies": [
+        "@esy-ocaml/substs@0.0.1", "@opam/conf-which@opam:1",
+        "@opam/easy-format@opam:1.3.1", "@opam/jbuilder@opam:transition",
+        "ocaml@4.2.3006"
+      ]
+    },
+    "@opam/base-unix@opam:base": {
+      "record": {
+        "name": "@opam/base-unix",
+        "version": "opam:base",
+        "source": "no-source:",
+        "files": [],
+        "opam": {
+          "name": "base-unix",
+          "version": "base",
+          "opam":
+            "opam-version: \"2.0\"\nname: \"base-unix\"\nversion: \"base\"\nsynopsis: \"\"\ndescription: \"Unix library distributed with the OCaml compiler\"\nmaintainer: \"https://github.com/ocaml/opam-repository/issues\"",
+          "override": null
+        }
+      },
+      "dependencies": [ "@esy-ocaml/substs@0.0.1" ]
+    },
+    "@opam/base-ocamlbuild@opam:base": {
+      "record": {
+        "name": "@opam/base-ocamlbuild",
+        "version": "opam:base",
+        "source": "no-source:",
+        "files": [],
+        "opam": {
+          "name": "base-ocamlbuild",
+          "version": "base",
+          "opam":
+            "opam-version: \"2.0\"\nname: \"base-ocamlbuild\"\nversion: \"base\"\nsynopsis:\n  \"OCamlbuild binary and libraries distributed with the OCaml compiler\"\nmaintainer: \"gabriel.scherer@gmail.com\"\ndepends: [\n  \"ocaml\" {>= \"3.10\" & < \"4.03\"}\n]",
+          "override": null
+        }
+      },
+      "dependencies": [ "@esy-ocaml/substs@0.0.1", "ocaml@4.2.3006" ]
+    },
+    "@opam/base-bytes@opam:base": {
+      "record": {
+        "name": "@opam/base-bytes",
+        "version": "opam:base",
+        "source": "no-source:",
+        "files": [],
+        "opam": {
+          "name": "base-bytes",
+          "version": "base",
+          "opam":
+            "opam-version: \"2.0\"\nname: \"base-bytes\"\nversion: \"base\"\nsynopsis: \"Bytes library distributed with the OCaml compiler\"\nmaintainer: \" \"\nauthors: \" \"\nhomepage: \" \"\ndepends: [\n  \"ocaml\" {>= \"4.02.0\"}\n  \"ocamlfind\" {>= \"1.5.3\"}\n]",
+          "override": null
+        }
+      },
+      "dependencies": [
+        "@esy-ocaml/substs@0.0.1", "@opam/ocamlfind@opam:1.8.0",
+        "ocaml@4.2.3006"
+      ]
+    },
+    "@opam/astring@opam:0.8.3": {
+      "record": {
+        "name": "@opam/astring",
+        "version": "opam:0.8.3",
+        "source":
+          "archive:http://erratique.ch/software/astring/releases/astring-0.8.3.tbz#md5:c5bf6352b9ac27fbeab342740f4fa870",
+        "files": [],
+        "opam": {
+          "name": "astring",
+          "version": "0.8.3",
+          "opam":
+            "opam-version: \"2.0\"\nname: \"astring\"\nversion: \"0.8.3\"\nsynopsis: \"Alternative String module for OCaml\"\ndescription: \"\"\"\nAstring exposes an alternative `String` module for OCaml. This module\ntries to balance minimality and expressiveness for basic, index-free,\nstring processing and provides types and functions for substrings,\nstring sets and string maps.\n\nRemaining compatible with the OCaml `String` module is a non-goal. The\n`String` module exposed by Astring has exception safe functions,\nremoves deprecated and rarely used functions, alters some signatures\nand names, adds a few missing functions and fully exploits OCaml's\nnewfound string immutability.\n\nAstring depends only on the OCaml standard library. It is distributed\nunder the ISC license.\"\"\"\nmaintainer: \"Daniel Bünzli <daniel.buenzl i@erratique.ch>\"\nauthors: \"Daniel Bünzli <daniel.buenzl i@erratique.ch>\"\nlicense: \"ISC\"\ntags: [\"string\" \"org:erratique\"]\nhomepage: \"http://erratique.ch/software/astring\"\ndoc: \"http://erratique.ch/software/astring/doc\"\nbug-reports: \"https://github.com/dbuenzli/astring/issues\"\ndepends: [\n  \"ocaml\" {>= \"4.01.0\"}\n  \"ocamlfind\" {build}\n  \"ocamlbuild\" {build}\n  \"topkg\" {build}\n  \"base-bytes\"\n]\nbuild: [\"ocaml\" \"pkg/pkg.ml\" \"build\" \"--pinned\" \"%{pinned}%\"]\ndev-repo: \"git+http://erratique.ch/repos/astring.git\"\nurl {\n  src: \"http://erratique.ch/software/astring/releases/astring-0.8.3.tbz\"\n  checksum: \"md5=c5bf6352b9ac27fbeab342740f4fa870\"\n}",
+          "override": null
+        }
+      },
+      "dependencies": [
+        "@esy-ocaml/substs@0.0.1", "@opam/base-bytes@opam:base",
+        "@opam/ocamlbuild@opam:0", "@opam/ocamlfind@opam:1.8.0",
+        "@opam/topkg@opam:1.0.0", "ocaml@4.2.3006"
+      ]
+    },
+    "@opam/alcotest@opam:0.8.4": {
+      "record": {
+        "name": "@opam/alcotest",
+        "version": "opam:0.8.4",
+        "source":
+          "archive:https://github.com/mirage/alcotest/releases/download/0.8.4/alcotest-0.8.4.tbz#md5:c940f89a2bb2e23d3f1422ce61d1396b",
+        "files": [],
+        "opam": {
+          "name": "alcotest",
+          "version": "0.8.4",
+          "opam":
+            "opam-version: \"2.0\"\nname: \"alcotest\"\nversion: \"0.8.4\"\nsynopsis: \"Alcotest is a lightweight and colourful test framework.\"\ndescription: \"\"\"\nAlcotest exposes simple interface to perform unit tests. It exposes\na simple TESTABLE module type, a check function to assert test\npredicates and a run function to perform a list of unit -> unit\ntest callbacks.\n\nAlcotest provides a quiet and colorful output where only faulty runs\nare fully displayed at the end of the run (with the full logs ready to\ninspect), with a simple (yet expressive) query language to select the\ntests to run.\"\"\"\nmaintainer: \"thomas@gazagnaire.org\"\nauthors: \"Thomas Gazagnaire\"\nlicense: \"ISC\"\nhomepage: \"https://github.com/mirage/alcotest/\"\ndoc: \"https://mirage.github.io/alcotest/\"\nbug-reports: \"https://github.com/mirage/alcotest/issues/\"\ndepends: [\n  \"ocaml\" {>= \"4.02.3\"}\n  \"jbuilder\" {build & >= \"1.0+beta10\"}\n  \"fmt\" {>= \"0.8.0\"}\n  \"astring\"\n  \"result\"\n  \"cmdliner\"\n  \"uuidm\"\n]\nbuild: [\n  [\"jbuilder\" \"subst\" \"-p\" name] {pinned}\n  [\"jbuilder\" \"build\" \"-p\" name \"-j\" jobs]\n  [\"jbuilder\" \"runtest\" \"-p\" name \"-j\" jobs] {with-test}\n]\ndev-repo: \"git+https://github.com/mirage/alcotest.git\"\nurl {\n  src:\n    \"https://github.com/mirage/alcotest/releases/download/0.8.4/alcotest-0.8.4.tbz\"\n  checksum: \"md5=c940f89a2bb2e23d3f1422ce61d1396b\"\n}",
+          "override": null
+        }
+      },
+      "dependencies": [
+        "@esy-ocaml/substs@0.0.1", "@opam/astring@opam:0.8.3",
+        "@opam/cmdliner@opam:1.0.2", "@opam/fmt@opam:0.8.5",
+        "@opam/jbuilder@opam:transition", "@opam/result@opam:1.3",
+        "@opam/uuidm@opam:0.9.6", "ocaml@4.2.3006"
+      ]
+    },
+    "@esy-ocaml/substs@0.0.1": {
+      "record": {
+        "name": "@esy-ocaml/substs",
+        "version": "0.0.1",
+        "source":
+          "archive:https://registry.npmjs.org/@esy-ocaml/substs/-/substs-0.0.1.tgz#sha1:59ebdbbaedcda123fc7ed8fb2b302b7d819e9a46",
+        "files": [],
+        "opam": null
+      },
+      "dependencies": []
+    },
+    "@esy-ocaml/merlin@3.0.5005": {
+      "record": {
+        "name": "@esy-ocaml/merlin",
+        "version": "3.0.5005",
+        "source":
+          "archive:https://registry.npmjs.org/@esy-ocaml/merlin/-/merlin-3.0.5005.tgz#sha1:4a9e2b4df20672524603b7b1797b7761d5d0d9ad",
+        "files": [],
+        "opam": null
+      },
+      "dependencies": [
+        "@esy-ocaml/esy-installer@0.0.0", "@esy-ocaml/substs@0.0.1",
+        "@opam/ocamlfind@opam:1.8.0", "@opam/yojson@opam:1.4.1"
+      ]
+    },
+    "@esy-ocaml/esy-installer@0.0.0": {
+      "record": {
+        "name": "@esy-ocaml/esy-installer",
+        "version": "0.0.0",
+        "source":
+          "archive:https://registry.npmjs.org/@esy-ocaml/esy-installer/-/esy-installer-0.0.0.tgz#sha1:6b0e2bd4ee43531ac74793fe55cfcc3aca197a66",
+        "files": [],
+        "opam": null
+      },
+      "dependencies": []
+    }
+  }
+}

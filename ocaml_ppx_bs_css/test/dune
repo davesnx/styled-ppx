@@ -1,0 +1,5 @@
+(executable
+ (name test_suite)
+ (libraries ppx_bs_css.lib fmt alcotest)
+ (preprocess
+  (pps ppx_bs_css.lib)))

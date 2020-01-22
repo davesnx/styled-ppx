@@ -1,0 +1,11 @@
+steps:
+  - task: NodeTool@0
+    displayName: "Use Node 12.x"
+    inputs:
+      versionSpec: 12.x
+
+  - script: "npm install -g esy@0.6.0"
+    displayName: "npm install -g esy@0.6.0"
+
+  - script: esy
+    displayName: "esy"

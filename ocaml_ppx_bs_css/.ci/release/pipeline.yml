@@ -1,0 +1,17 @@
+parameters: # defaults to macOS
+  name: "macOS"
+  vmImage: "macOS-10.13"
+  platform: "macOS"
+
+jobs:
+  - job: ${{ parameters.name }}
+    pool:
+      vmImage: ${{ parameters.vmImage }}
+      demands: node.js
+
+    steps:
+      - template: install.yml
+      - template: build.yml
+      - template: publish.yml
+        parameters:
+          platform: ${{ parameters.platform }}

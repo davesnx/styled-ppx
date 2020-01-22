@@ -1,0 +1,6 @@
+(executable
+  (name bin)
+  (public_name ppx_bs_css)
+  (libraries ppx_bs_css.lib)
+  (ocamlopt_flags ( -linkall ))
+)

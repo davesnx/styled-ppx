@@ -1,0 +1,3 @@
+steps:
+  - script: esy build
+    displayName: "esy build"
