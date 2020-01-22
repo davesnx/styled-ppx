@@ -28,6 +28,9 @@
     "react-dom": "^16.12.0",
     "reason-react": "^0.7.0"
   },
+  "resolution": {
+    "@opam/sedlex": "ocaml-community/sedlex"
+  },
   "devDependencies": {
     "@opam/merlin": "*",
     "@opam/odoc": "*",

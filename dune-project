@@ -18,3 +18,4 @@
   rely
   base
   ppxlib))
+(using menhir 2.0)

@@ -76,28 +76,28 @@ let token_to_string =
   | [@implicit_arity] DIMENSION(n, d) =>
     "DIMENSION(" ++ n ++ ", " ++ d ++ ")";
 
-let () =
-  Location.register_error_of_exn(
-    fun
-    | [@implicit_arity] LexingError(pos, msg) => {
-        let loc = Lex_buffer.make_loc_and_fix(pos, pos);
-        Some({loc, msg, sub: [], if_highlight: ""});
-      }
-    | [@implicit_arity] ParseError(token, start_pos, end_pos) => {
-        let loc = Lex_buffer.make_loc_and_fix(start_pos, end_pos);
-        let msg =
-          Printf.sprintf(
-            "Parse error while reading token '%s'",
-            token_to_string(token),
-          );
+/* let () =
+    Location.register_error_of_exn(
+      fun
+      | [@implicit_arity] LexingError(pos, msg) => {
+          let loc = Lex_buffer.make_loc_and_fix(pos, pos);
+          Some({loc, msg, sub: [], if_highlight: ""});
+        }
+      | [@implicit_arity] ParseError(token, start_pos, end_pos) => {
+          let loc = Lex_buffer.make_loc_and_fix(start_pos, end_pos);
+          let msg =
+            Printf.sprintf(
+              "Parse error while reading token '%s'",
+              token_to_string(token),
+            );
 
-        Some({loc, msg, sub: [], if_highlight: ""});
-      }
-    | [@implicit_arity] GrammarError(msg, loc) =>
-      Some({loc, msg, sub: [], if_highlight: ""})
-    | _ => None,
-  );
-
+          Some({loc, msg, sub: [], if_highlight: ""});
+        }
+      | [@implicit_arity] GrammarError(msg, loc) =>
+        Some({loc, msg, sub: [], if_highlight: ""})
+      | _ => None,
+    );
+   */
 /* Regexes */
 let newline = [%sedlex.regexp? '\n' | "\r\n" | '\r' | '\012'];
 
@@ -111,15 +111,12 @@ let digit = [%sedlex.regexp? '0'..'9'];
 
 let non_ascii = [%sedlex.regexp? '\160'..'\255'];
 
-let up_to_6_hex_digits = [%sedlex.regexp?
-  [@implicit_arity] Rep(hex_digit, 1..6)
-];
+let up_to_6_hex_digits = [%sedlex.regexp? Rep(hex_digit, 1 .. 6)];
 
 let unicode = [%sedlex.regexp? ('\\', up_to_6_hex_digits, Opt(white_space))];
 
 let unicode_range = [%sedlex.regexp?
-  [@implicit_arity] Rep(hex_digit | '?', 1..6) |
-  (up_to_6_hex_digits, '-', up_to_6_hex_digits)
+  Rep(hex_digit | '?', 1 .. 6) | (up_to_6_hex_digits, '-', up_to_6_hex_digits)
 ];
 
 let escape = [%sedlex.regexp?
@@ -158,16 +155,16 @@ let name = [%sedlex.regexp? Plus(ident_char)];
 
 let number = [%sedlex.regexp?
   (
-    [@implicit_arity] Opt('+', '-'),
+    Opt('+', '-'),
     Plus(digit),
-    [@implicit_arity] Opt('.', Plus(digit)),
-    [@implicit_arity] Opt('e' | 'E', '+' | '-', Plus(digit)),
+    Opt('.', Plus(digit)),
+    Opt('e' | 'E', '+' | '-', Plus(digit)),
   ) |
   (
-    [@implicit_arity] Opt('+', '-'),
+    Opt('+', '-'),
     '.',
     Plus(digit),
-    [@implicit_arity] Opt('e' | 'E', '+' | '-', Plus(digit)),
+    Opt('e' | 'E', '+' | '-', Plus(digit)),
   )
 ];
 
@@ -308,19 +305,12 @@ let rec get_next_token = buf => {
 }
 and get_dimension = (n, buf) =>
   switch%sedlex (buf) {
-  | length =>
-    [@implicit_arity]
-    FLOAT_DIMENSION(n, Lex_buffer.latin1(buf), Css_types.Length)
-  | angle =>
-    [@implicit_arity]
-    FLOAT_DIMENSION(n, Lex_buffer.latin1(buf), Css_types.Angle)
-  | time =>
-    [@implicit_arity]
-    FLOAT_DIMENSION(n, Lex_buffer.latin1(buf), Css_types.Time)
+  | length => FLOAT_DIMENSION(n, Lex_buffer.latin1(buf), Css_types.Length)
+  | angle => FLOAT_DIMENSION(n, Lex_buffer.latin1(buf), Css_types.Angle)
+  | time => FLOAT_DIMENSION(n, Lex_buffer.latin1(buf), Css_types.Time)
   | frequency =>
-    [@implicit_arity]
     FLOAT_DIMENSION(n, Lex_buffer.latin1(buf), Css_types.Frequency)
-  | ident => [@implicit_arity] DIMENSION(n, Lex_buffer.latin1(buf))
+  | ident => DIMENSION(n, Lex_buffer.latin1(buf))
   | _ => NUMBER(n)
   }
 and get_url = (url, buf) =>
@@ -328,13 +318,9 @@ and get_url = (url, buf) =>
   | ws => get_url(url, buf)
   | url => get_url(Lex_buffer.latin1(buf), buf)
   | ")" => URI(url)
-  | eof =>
-    raise(
-      [@implicit_arity] LexingError(buf.Lex_buffer.pos, "Incomplete URI"),
-    )
+  | eof => raise(LexingError(buf.Lex_buffer.pos, "Incomplete URI"))
   | any =>
     raise(
-      [@implicit_arity]
       LexingError(
         buf.Lex_buffer.pos,
         "Unexpected token: " ++ Lex_buffer.latin1(buf) ++ " parsing an URI",
@@ -358,7 +344,7 @@ let parse = (buf, p) => {
     last_token^;
   };
 
-  try (MenhirLib.Convert.Simplified.traditional2revised(p, next_token)) {
+  try(MenhirLib.Convert.Simplified.traditional2revised(p, next_token)) {
   | LexingError(_) as e => raise(e)
   | _ => raise(ParseError(last_token^))
   };

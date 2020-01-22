@@ -1,11 +1,16 @@
+(menhir
+ (modules css_parser)
+ (flags --explain))
+
 (library
  (name Re_styled_ppx)
+ (wrapped false)
  (public_name re-styled-ppx.lib)
  (modules (:standard))
  (libraries base ppxlib sedlex menhirLib)
  (kind ppx_rewriter)
  (preprocess
-  (pps ppxlib.metaquot ppxlib.runner))
+  (pps ppxlib.metaquot ppxlib.runner sedlex.ppx))
  (flags -open Base))
 
 (include_subdirs unqualified)

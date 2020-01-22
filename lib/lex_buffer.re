@@ -6,6 +6,8 @@
     not provide this functionality. */;
 
 /** the lex buffer type */
+open Stdlib;
+open Stdio;
 
 type t = {
   buf: Sedlexing.lexbuf,
@@ -34,7 +36,7 @@ let of_ascii_string = (~pos=?, s) =>
   of_sedlex(~pos?, Sedlexing.Latin1.from_string(s));
 
 let of_ascii_file = file => {
-  let chan = open_in(file);
+  let chan = In_channel.create(file);
   of_sedlex(~file, Sedlexing.Latin1.from_channel(chan));
 };
 
@@ -78,6 +80,13 @@ let next = lexbuf => {
       | Invalid_argument(_) => None
       }
     };
+
+  let last_char =
+    switch (lexbuf.last_char) {
+    | None => 0
+    | Some(c) => c
+    };
+
   switch (ch) {
   | Some('\r') =>
     lexbuf.pos = {
@@ -85,7 +94,7 @@ let next = lexbuf => {
       pos_bol: pos.pos_cnum - 1,
       pos_lnum: pos.pos_lnum + 1,
     }
-  | Some('\n') when !(lexbuf.last_char == Some(cr)) =>
+  | Some('\n') when !(last_char == cr) =>
     lexbuf.pos = {
       ...pos,
       pos_bol: pos.pos_cnum - 1,
