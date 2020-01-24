@@ -8,9 +8,12 @@
     "test": "jest"
   },
   "devDependencies": {
-    "bs-platform": "7.0.1"
+    "bs-platform": "7.0.1",
+    "@glennsl/bs-jest": "^0.4.9"
   },
   "jest": {
-    "testMatch": ["./src/**"]
+    "testMatch": [
+      "./src/**"
+    ]
   }
 }

@@ -3,9 +3,9 @@
  (flags --explain))
 
 (library
- (name Re_styled_ppx)
+ (name re_styled_ppx)
  (wrapped false)
- (public_name re-styled-ppx.lib)
+ (public_name re_styled_ppx.lib)
  (kind ppx_rewriter)
  (libraries sedlex menhirLib ocaml-migrate-parsetree)
  (preprocess (pps sedlex.ppx)))

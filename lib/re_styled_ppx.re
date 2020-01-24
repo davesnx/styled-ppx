@@ -6,7 +6,7 @@ open Parsetree;
 
 let expr = (mapper, expression) =>
   switch (expression.pexp_desc) {
-  | Pexp_extension(({txt: "re_styled_ppx", loc: _}, _payload)) =>
+  | Pexp_extension(({txt: "styled", loc: _}, _payload)) =>
     Ast_helper.Exp.constant(Pconst_integer("42", None))
   | _ => default_mapper.expr(mapper, expression)
   };
