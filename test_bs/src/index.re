@@ -1,52 +1,53 @@
+open Jest;
+open Expect;
+
 module Result = {
   module Styles = {
     open Emotion;
-    let className = [%css display(`block)];
+    let className = css([display(`block)]);
   };
   [@react.component]
   let make = (~children) => {
-    <div className> children </div>;
+    <div className={Styles.className}> children </div>;
   };
 };
 
 module ResultWithProps = {
   module Styles = {
     open Emotion;
-    let className = (~color) => [%css [display(`block), color(color)]];
+    let className = (~color: Emotion.Css.Color.t) => css([display(`block), backgroundColor(color)]);
   };
   [@react.component]
   let make = (~children, ~color) => {
-    <div className={className(color)}> children </div>;
+    <div className={Styles.className(color)}> children </div>;
   };
 };
 
-describe("Test", ({test, _describe, _}) => {
-  test("inline", ({expect}) => {
-    let StyledComponentInline = [%re_styled_ppx "display: block;"];
+describe("Test", () => {
+  test("inline", () => {
+    let styledComponentInline = [%styled "display: block;"];
 
-    expect(StyledComponentInline).toEqual(Result);
+    expect(styledComponentInline).toEqual(Result);
   });
 
-  test("multiline", ({expect}) => {
-    let StyledComponentMultiline = [%re_styled_ppx
+  test("multiline", () => {
+    let styledComponentMultiline = [%styled
       {|
         display: block;
       |}
     ];
 
-    expect(StyledComponentInline).toEqual(Result);
+    expect(styledComponentInline).toEqual(Result);
   });
 
-  test("with props", ({expect}) => {
+  /* test("with props", ({expect}) => {
     let StyledComponentWithProps = [%re_styled_ppx
-      (~color) => {
-        {j|
-          display: block;
-          color: $color;
-        |j};
-      }
+      (~color) => {|
+        display: block;
+        color: $color;
+      |};
     ];
 
     expect(StyledComponentInline).toEqual(ResultWithProps);
-  });
+  }); */
 });

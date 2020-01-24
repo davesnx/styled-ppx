@@ -13,11 +13,11 @@
     "in-source": true
   }],
   "ppx-flags": [
-    "esy x re_styled_ppx"
+    "esy x re_styled_ppx", "@ahrefs/bs-emotion-ppx/bin/bs-emotion-ppx"
   ],
   "suffix": ".bs.js",
   "namespace": true,
-  "bs-dependencies": [],
+  "bs-dependencies": ["reason-react", "@ahrefs/bs-emotion"],
   "bs-dev-dependencies": ["@glennsl/bs-jest"],
   "refmt": 3
 }
