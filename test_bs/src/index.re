@@ -40,8 +40,8 @@ describe("Test", () => {
     expect(styledComponentInline).toEqual(Result);
   });
 
-  /* test("with props", ({expect}) => {
-    let StyledComponentWithProps = [%re_styled_ppx
+  test("with props", ({expect}) => {
+    let StyledComponentWithProps = [%styled
       (~color) => {|
         display: block;
         color: $color;
@@ -49,5 +49,5 @@ describe("Test", () => {
     ];
 
     expect(StyledComponentInline).toEqual(ResultWithProps);
-  }); */
+  });
 });
