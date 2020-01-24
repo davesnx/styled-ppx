@@ -13,7 +13,7 @@
     "in-source": true
   }],
   "ppx-flags": [
-    "esy x re-styled-ppx.exe"
+    "esy x re_styled_ppx"
   ],
   "suffix": ".bs.js",
   "namespace": true,

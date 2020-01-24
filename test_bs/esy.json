@@ -1,13 +1,10 @@
 {
   "name": "test_bs",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "dependencies": {
-    "@glennsl/bs-jest": "^0.4.9",
-    "ocaml": "~4.6.1000",
-    "re-styled-ppx": "*",
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0",
-    "reason-react": "^0.7.0"
+    "re_styled_ppx": "*"
   },
-  "resolutions": { "re-styled-ppx": "link:../" }
+  "resolutions": {
+    "re_styled_ppx": "link:../"
+  }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "re-styled-ppx",
+  "name": "re_styled_ppx",
   "version": "0.1.0",
   "description": "",
   "author": "David Sancho",
@@ -12,14 +12,13 @@
   },
   "esy": {
     "build": "dune build -p #{self.name}",
-    "buildDev": "refmterr dune build -p #{self.name}",
     "buildEnv": { "ODOC_SYNTAX": "re" }
   },
   "dependencies": {
-    "@esy-ocaml/reason": "*",
-    "@opam/dune": "*",
+    "@esy-ocaml/reason": "3.5.2",
+    "@opam/dune": "1.11.4",
     "@opam/menhir": "20190924",
-    "@opam/ppxlib": "*",
+    "@opam/ocaml-migrate-parsetree": "1.5.0",
     "@opam/sedlex": "2.1",
     "ocaml": "~4.6.1000"
   },
@@ -28,10 +27,7 @@
   },
   "devDependencies": {
     "@opam/merlin": "*",
-    "@opam/odoc": "*",
-    "@opam/utop": "*",
-    "ocaml": "~4.6.1000",
-    "refmterr": "*"
+    "ocaml": "~4.6.1000"
   },
   "scripts": {
     "test": "esy x test-runner.exe",
