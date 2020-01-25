@@ -5,100 +5,8 @@ open Asttypes;
 open Parsetree;
 open Css_types;
 
-type mode =
-  | Bs_css
-  | Bs_typed_css;
-
 let grammar_error = (loc, message) =>
   raise([@implicit_arity] Css_lexer.GrammarError(message, loc));
-
-let is_overloaded = (mode, declaration) =>
-  /* Overloaded declarations are rendered as function applications where function name
-        ends with a number that specifies the number of parameters.
-        E.g.: margin: 1em 2px -> margin2 em(1.) px(2.)
-     */
-  switch (mode) {
-  | Bs_css => false
-  | Bs_typed_css =>
-    switch (declaration) {
-    | "unsafe" => false
-    | _ => true
-    }
-  };
-
-let is_variant = (mode, ident) =>
-  /* bs-css uses polymorphic variants to enumerate values. Some of them
-        have corresponding constant, but some others have conflicting names
-        (e.g.: left) or don't have a corresponding constant (e.g.: justify).
-     */
-  switch (mode) {
-  | Bs_css =>
-    switch (ident) {
-    /* float/clear/text-align */
-    | "left"
-    | "right"
-    | "justify"
-    /* cursor */
-    | "pointer"
-    | "alias"
-    | "all-scroll"
-    | "cell"
-    | "context-menu"
-    | "default"
-    | "crosshair"
-    | "copy"
-    | "grab"
-    | "grabbing"
-    | "help"
-    | "move"
-    | "not-allowed"
-    | "progress"
-    | "text"
-    | "wait"
-    | "zoom-in"
-    | "zoom-out"
-    /* list-style-type */
-    | "disc"
-    | "circle"
-    | "decimal"
-    | "lower-alpha"
-    | "upper-alpha"
-    | "lower-greek"
-    | "upper-greek"
-    | "lower-latin"
-    | "upper-latin"
-    | "lower-roman"
-    | "upper-roman"
-    /* outline-style */
-    | "groove"
-    | "ridge"
-    | "inset"
-    | "outset"
-    /* transform-style */
-    | "preserve-3d"
-    | "flat"
-    /* font-variant */
-    | "small-caps"
-    /* step-timing-function */
-    | "start"
-    | "end"
-    /* display */
-    | "flex"
-    | "inline-flex"
-    /* font-weight */
-    | "thin"
-    | "extra-light"
-    | "light"
-    | "medium"
-    | "semi-bold"
-    | "bold"
-    | "extra-bold"
-    | "lighter"
-    | "bolder" => true
-    | _ => false
-    }
-  | Bs_typed_css => false
-  };
 
 let split = (c, s) => {
   let rec loop = (s, accu) =>
@@ -345,8 +253,7 @@ let is_line_style = component_value =>
     }
   );
 
-let rec render_component_value =
-        (mode, (cv, loc): with_loc(Component_value.t)): expression => {
+let rec render_component_value = ((cv, loc): with_loc(Component_value.t)): expression => {
   let render_block = (start_char, _, _) =>
     grammar_error(loc, "Unsupported " ++ start_char ++ "-block");
 
@@ -384,7 +291,7 @@ let rec render_component_value =
         {txt: Lident(caml_case_name), loc: name_loc},
       );
     let grouped_params = group_params(params);
-    let rcv = render_component_value(mode);
+    let rcv = render_component_value;
     let args = {
       open Component_value;
       let side_or_corner_expr = (deg, loc) =>
@@ -579,12 +486,8 @@ let rec render_component_value =
     let arg = Exp.constant(~loc, const);
     Exp.apply(~loc, ident, [(Nolabel, arg)]);
   | Ident(i) =>
-    let name = to_caml_case(i);
-    if (is_variant(mode, i)) {
-      Exp.variant(~loc, name, None);
-    } else {
+      let name = to_caml_case(i);
       Exp.ident(~loc, {txt: Lident(name), loc});
-    };
   | String(s) => string_to_const(~loc, s)
   | Uri(s) =>
     let ident = Exp.ident(~loc, {txt: Lident("url"), loc});
@@ -604,7 +507,7 @@ let rec render_component_value =
     }
   | Unicode_range(_) => grammar_error(loc, "Unsupported unicode range")
   | [@implicit_arity] Function(f, params) => render_function(f, params)
-  | [@implicit_arity] Float_dimension(number, "ms", Time) when mode == Bs_css =>
+  | [@implicit_arity] Float_dimension(number, "ms", Time) =>
     /* bs-css expects milliseconds as an int constant */
     let const = Const.integer(number);
     Exp.constant(~loc, const);
@@ -615,10 +518,10 @@ let rec render_component_value =
         Const.integer(
           number,
         );
-      } else if (mode == Bs_css && dimension == "pt") {
+      } else if (dimension == "pt") {
         /* bs-css uses int points */
         Const.integer(number);
-      } else if (mode == Bs_typed_css && dimension == "ms") {
+      } else if (dimension == "ms") {
         /* bs-typed-css uses int milliseconds */
         Const.integer(number);
       } else {
@@ -630,9 +533,9 @@ let rec render_component_value =
     render_dimension(number, dimension, const);
   };
 }
-and render_at_rule = (mode, ar: At_rule.t): expression =>
+and render_at_rule = (ar: At_rule.t): expression =>
   switch (ar.At_rule.name) {
-  | ("keyframes" as n, loc) when mode == Bs_css =>
+  | ("keyframes" as n, loc) =>
     let ident = Exp.ident(~loc, {txt: Lident(n), loc});
     switch (ar.At_rule.block) {
     | [@implicit_arity] Brace_block.Stylesheet(rs, loc) =>
@@ -660,7 +563,7 @@ and render_at_rule = (mode, ar: At_rule.t): expression =>
                   grammar_error(loc, "Unexpected @keyframes prelude")
                 };
               let block_expr =
-                render_declaration_list(mode, sr.Style_rule.block);
+                render_declaration_list(sr.Style_rule.block);
               let tuple =
                 Exp.tuple(
                   ~loc=sr.Style_rule.loc,
@@ -697,9 +600,9 @@ and render_at_rule = (mode, ar: At_rule.t): expression =>
     grammar_error(ar.At_rule.loc, "At-rule @" ++ n ++ " not supported")
   }
 and render_declaration =
-    (mode, d: Declaration.t, d_loc: Location.t): expression => {
+    (d: Declaration.t, d_loc: Location.t): expression => {
   open Component_value;
-  let rcv = render_component_value(mode);
+  let rcv = render_component_value;
   let (name, name_loc) = d.Declaration.name;
 
   /* https://developer.mozilla.org/en-US/docs/Web/CSS/animation */
@@ -831,12 +734,7 @@ and render_declaration =
         grammar_error(loc, "Unexpected box-shadow value");
       };
 
-    let txt =
-      if (mode == Bs_css) {
-        [@implicit_arity] Longident.Ldot(Longident.Lident("Shadow"), "box");
-      } else {
-        Longident.Lident("shadow");
-      };
+    let txt = Longident.Lident("shadow");
     let box_shadow_ident = Exp.ident(~loc=name_loc, {txt, loc: name_loc});
     let box_shadow_args = ((grouped_param, _)) =>
       List.fold_left(box_shadow_args, [], grouped_param);
@@ -990,17 +888,6 @@ and render_declaration =
   let render_standard_declaration = () => {
     let name = to_caml_case(name);
     let (vs, _) = d.Declaration.value;
-    let name =
-      if (is_overloaded(mode, name)) {
-        let parameter_count = List.length(vs);
-        if (parameter_count > 1) {
-          name ++ string_of_int(parameter_count);
-        } else {
-          name;
-        };
-      } else {
-        name;
-      };
     let ident =
       Exp.ident(~loc=name_loc, {txt: Lident(name), loc: name_loc});
     let args = List.map(v => rcv(v), vs);
@@ -1025,52 +912,6 @@ and render_declaration =
 
   let render_font_family = () => {
     let (vs, loc) = d.Declaration.value;
-    switch (mode) {
-    | Bs_css =>
-      let arg = {
-        let s =
-          List.fold_left(
-            (s, (v, loc)) =>
-              switch (v) {
-              | Ident(x) =>
-                s
-                ++ (
-                  if (String.length(s) > 0) {
-                    " ";
-                  } else {
-                    "";
-                  }
-                )
-                ++ x
-              | String(x) =>
-                s
-                ++ (
-                  if (String.length(s) > 0) {
-                    " ";
-                  } else {
-                    "";
-                  }
-                )
-                ++ "\""
-                ++ x
-                ++ "\""
-              | Delim("," as x) => s ++ x
-              | _ => grammar_error(loc, "Unexpected font-family value")
-              },
-            "",
-            vs,
-          );
-
-        rcv((String(s), loc));
-      };
-
-      let ident =
-        Exp.ident(
-          ~loc=name_loc,
-          {txt: Lident("fontFamily"), loc: name_loc},
-        );
-      Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
-    | Bs_typed_css =>
       let font_family_args = ((params, _)) => {
         let s =
           List.fold_left(
@@ -1109,7 +950,6 @@ and render_declaration =
         ident,
         [(Nolabel, list_to_expr(name_loc, args))],
       );
-    };
   };
 
   let render_z_index = () => {
@@ -1233,16 +1073,16 @@ and render_declaration =
   };
 
   switch (name) {
-  | "animation" when mode == Bs_css => render_animation()
+  | "animation" => render_animation()
   | "box-shadow" => render_box_shadow()
-  | "text-shadow" when mode == Bs_css => render_text_shadow()
-  | "transform" when mode == Bs_css => render_transform()
-  | "transition" when mode == Bs_css => render_transition()
+  | "text-shadow" => render_text_shadow()
+  | "transform" => render_transform()
+  | "transition" => render_transition()
   | "font-family" => render_font_family()
-  | "z-index" when mode == Bs_typed_css => render_z_index()
+  | "z-index" => render_z_index()
   | "flex-grow"
-  | "flex-shrink" when mode == Bs_css => render_flex_grow_shrink()
-  | "font-weight" when mode == Bs_css => render_font_weight()
+  | "flex-shrink" => render_flex_grow_shrink()
+  | "font-weight" => render_font_weight()
   | "padding"
   | "margin" =>
     render_with_labels([
@@ -1259,37 +1099,36 @@ and render_declaration =
   | "border-top-right-radius"
   | "border-top-left-radius"
   | "border-bottom-right-radius"
-  | "border-bottom-left-radius" when mode == Bs_typed_css =>
+  | "border-bottom-left-radius"  =>
     render_with_labels([((2, 0), "v"), ((2, 1), "h")])
   | "background-position"
-  | "transform-origin" when mode == Bs_typed_css =>
+  | "transform-origin"  =>
     render_with_labels([((2, 0), "h"), ((2, 1), "v")])
-  | "flex" when mode == Bs_typed_css =>
+  | "flex"  =>
     render_with_labels([((3, 0), "grow"), ((3, 1), "shrink")])
   | "border"
-  | "outline"
-      when mode == Bs_typed_css && List.length(fst(d.Declaration.value)) == 2 =>
+  | "outline" when List.length(fst(d.Declaration.value)) == 2 =>
     render_border_outline_2()
   | _ => render_standard_declaration()
   };
 }
 and render_declarations =
-    (mode, ds: list(Declaration_list.kind)): list(expression) =>
+    (ds: list(Declaration_list.kind)): list(expression) =>
   List.rev_map(
     declaration =>
       switch (declaration) {
       | Declaration_list.Declaration(decl) =>
-        render_declaration(mode, decl, decl.loc)
-      | Declaration_list.At_rule(ar) => render_at_rule(mode, ar)
+        render_declaration(decl, decl.loc)
+      | Declaration_list.At_rule(ar) => render_at_rule(ar)
       },
     ds,
   )
 and render_declaration_list =
-    (mode, (dl, loc): Declaration_list.t): expression => {
-  let expr_with_loc_list = render_declarations(mode, dl);
+    ((dl, loc): Declaration_list.t): expression => {
+  let expr_with_loc_list = render_declarations(dl);
   list_to_expr(loc, expr_with_loc_list);
 }
-and render_style_rule = (mode, sr: Style_rule.t): expression => {
+and render_style_rule = (sr: Style_rule.t): expression => {
   let (prelude, prelude_loc) = sr.Style_rule.prelude;
   let selector =
     List.fold_left(
@@ -1310,12 +1149,8 @@ and render_style_rule = (mode, sr: Style_rule.t): expression => {
       List.rev(prelude),
     );
   let selector_expr = string_to_const(~loc=prelude_loc, selector);
-  let dl_expr = render_declaration_list(mode, sr.Style_rule.block);
-  let lident =
-    switch (mode) {
-    | Bs_css => "selector"
-    | Bs_typed_css => "select"
-    };
+  let dl_expr = render_declaration_list(sr.Style_rule.block);
+  let lident = "selector";
   let ident =
     Exp.ident(~loc=prelude_loc, {txt: Lident(lident), loc: prelude_loc});
   Exp.apply(
@@ -1324,12 +1159,12 @@ and render_style_rule = (mode, sr: Style_rule.t): expression => {
     [(Nolabel, selector_expr), (Nolabel, dl_expr)],
   );
 }
-and render_rule = (mode, r: Rule.t): expression =>
+and render_rule = (r: Rule.t): expression =>
   switch (r) {
-  | Rule.Style_rule(sr) => render_style_rule(mode, sr)
-  | Rule.At_rule(ar) => render_at_rule(mode, ar)
+  | Rule.Style_rule(sr) => render_style_rule(sr)
+  | Rule.At_rule(ar) => render_at_rule(ar)
   }
-and render_stylesheet = (mode, (rs, loc): Stylesheet.t): expression => {
+and render_stylesheet = ((rs, loc): Stylesheet.t): expression => {
   let rule_expr_list =
     List.rev_map(
       rule =>
@@ -1339,9 +1174,9 @@ and render_stylesheet = (mode, (rs, loc): Stylesheet.t): expression => {
             block: (ds, _),
             loc: _,
           }) =>
-          render_declarations(mode, ds)
+          render_declarations(ds)
         | Rule.Style_rule(_)
-        | Rule.At_rule(_) => [render_rule(mode, rule)]
+        | Rule.At_rule(_) => [render_rule(rule)]
         },
       rs,
     )
