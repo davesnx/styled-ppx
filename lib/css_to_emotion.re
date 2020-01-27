@@ -26,6 +26,73 @@ let split = (c, s) => {
   loop(s, []);
 };
 
+/* https://github.com/ahrefs/bs-emotion/blob/master/bs-emotion/src/Emotion.rei#L68 */
+let is_variant = (ident) =>
+    switch (ident) {
+    /* float/clear/text-align */
+    | "left"
+    | "right"
+    | "justify"
+    /* cursor */
+    | "pointer"
+    | "alias"
+    | "all-scroll"
+    | "cell"
+    | "context-menu"
+    | "default"
+    | "crosshair"
+    | "copy"
+    | "grab"
+    | "grabbing"
+    | "help"
+    | "move"
+    | "not-allowed"
+    | "progress"
+    | "text"
+    | "wait"
+    | "zoom-in"
+    | "zoom-out"
+    /* list-style-type */
+    | "disc"
+    | "circle"
+    | "decimal"
+    | "lower-alpha"
+    | "upper-alpha"
+    | "lower-greek"
+    | "upper-greek"
+    | "lower-latin"
+    | "upper-latin"
+    | "lower-roman"
+    | "upper-roman"
+    /* outline-style */
+    | "groove"
+    | "ridge"
+    | "inset"
+    | "outset"
+    /* transform-style */
+    | "preserve-3d"
+    | "flat"
+    /* font-variant */
+    | "small-caps"
+    /* step-timing-function */
+    | "start"
+    | "end"
+    /* display */
+    | "flex"
+    | "inline-flex"
+    /* font-weight */
+    | "thin"
+    | "extra-light"
+    | "light"
+    | "medium"
+    | "semi-bold"
+    | "bold"
+    | "extra-bold"
+    | "lighter"
+    | "bolder" => true
+    | _ => false
+  };
+
 let to_caml_case = s => {
   let splitted = split('-', s);
   List.fold_left(
@@ -486,8 +553,12 @@ let rec render_component_value = ((cv, loc): with_loc(Component_value.t)): expre
     let arg = Exp.constant(~loc, const);
     Exp.apply(~loc, ident, [(Nolabel, arg)]);
   | Ident(i) =>
-      let name = to_caml_case(i);
+    let name = to_caml_case(i);
+    if (is_variant(i)) {
+      Exp.variant(~loc, name, None);
+    } else {
       Exp.ident(~loc, {txt: Lident(name), loc});
+    };
   | String(s) => string_to_const(~loc, s)
   | Uri(s) =>
     let ident = Exp.ident(~loc, {txt: Lident("url"), loc});
