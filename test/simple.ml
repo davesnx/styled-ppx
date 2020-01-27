@@ -1,9 +1,9 @@
-let StyledComponentInline = [%re_styled_ppx "display: block;"]
-let StyledComponentMultiline = [%re_styled_ppx {|
+let StyledComponentInline = [%styled "display: block;"]
+let StyledComponentMultiline = [%styled {|
   display: block;
 |}]
 let StyledComponentWithProps =
-  [%re_styled_ppx
+  [%styled
     fun ~color -> {j|
       display: block;
       color: $color;

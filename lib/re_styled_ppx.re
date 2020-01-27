@@ -29,8 +29,7 @@ let expr = (mapper, expression) =>
             Css_parser.declaration_list,
           );
 
-          Console.log(ast);
-        Ast_helper.Exp.constant(Pconst_integer("42", None))
+        Css_to_emotion.render_declaration_list(ast);
       | _ =>
       let message = "Invalid syntax";
       raise(Location.Error(Location.error(~loc, message)));
