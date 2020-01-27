@@ -6,7 +6,7 @@ open Parsetree;
 open Css_types;
 
 let grammar_error = (loc, message) =>
-  raise([@implicit_arity] Css_lexer.GrammarError(message, loc));
+  raise(Css_lexer.GrammarError((message, loc)));
 
 let split = (c, s) => {
   let rec loop = (s, accu) =>
@@ -114,7 +114,7 @@ let group_params = params => {
 let is_time = component_value =>
   Component_value.(
     switch (component_value) {
-    | [@implicit_arity] Float_dimension(_, _, Time) => true
+    | Float_dimension((_, _, Time)) => true
     | _ => false
     }
   );
@@ -128,13 +128,13 @@ let is_timing_function = component_value =>
     | Ident("ease-in")
     | Ident("ease-out")
     | Ident("ease-in-out")
-    | [@implicit_arity] Function(("cubic-bezier", _), _)
+    | Function((("cubic-bezier", _)), _)
     /* step-timing-function */
     | Ident("step-start")
     | Ident("step-end")
-    | [@implicit_arity] Function(("steps", _), _)
+    | Function((("steps", _)), _)
     /* frames-timing-function */
-    | [@implicit_arity] Function(("frames", _), _) => true
+    | Function((("frames", _)), _) => true
     | _ => false
     }
   );
@@ -143,7 +143,7 @@ let is_animation_iteration_count = component_value =>
   Component_value.(
     switch (component_value) {
     | Ident("infinite")
-    | [@implicit_arity] Function(("count", _), _) => true
+    | Function((("count", _)), _) => true
     | _ => false
     }
   );
@@ -200,7 +200,7 @@ let is_length = component_value =>
   Component_value.(
     switch (component_value) {
     | Number("0")
-    | [@implicit_arity] Float_dimension(_, _, Length) => true
+    | Float_dimension((_, _, Length)) => true
     | _ => false
     }
   );
@@ -208,10 +208,10 @@ let is_length = component_value =>
 let is_color = component_value =>
   Component_value.(
     switch (component_value) {
-    | [@implicit_arity] Function(("rgb", _), _)
-    | [@implicit_arity] Function(("rgba", _), _)
-    | [@implicit_arity] Function(("hsl", _), _)
-    | [@implicit_arity] Function(("hsla", _), _)
+    | Function((("rgb", _)), _)
+    | Function((("rgba", _)), _)
+    | Function((("hsl", _)), _)
+    | Function((("hsla", _)), _)
     | Hash(_)
     | Ident(_) => true
     | _ => false
@@ -295,7 +295,7 @@ let rec render_component_value = ((cv, loc): with_loc(Component_value.t)): expre
     let args = {
       open Component_value;
       let side_or_corner_expr = (deg, loc) =>
-        rcv(([@implicit_arity] Float_dimension(deg, "deg", Angle), loc));
+        rcv((Float_dimension((deg, "deg", Angle)), loc));
 
       let color_stops_to_expr_list = color_stop_params =>
         List.rev_map(
@@ -344,7 +344,7 @@ let rec render_component_value = ((cv, loc): with_loc(Component_value.t)): expre
           switch (List.hd(grouped_params)) {
           | (
               [
-                ([@implicit_arity] Float_dimension(_, "deg", Angle), _) as cv,
+                (Float_dimension((_, "deg", Angle)), _) as cv,
               ],
               _,
             ) => (
@@ -376,7 +376,7 @@ let rec render_component_value = ((cv, loc): with_loc(Component_value.t)): expre
               );
             (
               rcv((
-                [@implicit_arity] Float_dimension("180", "deg", Angle),
+                Float_dimension(("180", "deg", Angle)),
                 implicit_side_or_corner_loc,
               )),
               grouped_params,
@@ -406,11 +406,11 @@ let rec render_component_value = ((cv, loc): with_loc(Component_value.t)): expre
         switch (ps) {
         | [(Number(n), l1), (Percentage(p1), l2), (Percentage(p2), l3)]
         | [
-            ([@implicit_arity] Float_dimension(n, "deg", Angle), l1),
+            (Float_dimension((n, "deg", Angle)), l1),
             (Percentage(p1), l2),
             (Percentage(p2), l3),
           ] => [
-            rcv(([@implicit_arity] Float_dimension(n, "deg", Angle), l1)),
+            rcv((Float_dimension((n, "deg", Angle)), l1)),
             Exp.constant(~loc=l2, float_to_const(p1)),
             Exp.constant(~loc=l3, float_to_const(p2)),
           ]
@@ -433,12 +433,12 @@ let rec render_component_value = ((cv, loc): with_loc(Component_value.t)): expre
             (Number(p3), l4),
           ]
         | [
-            ([@implicit_arity] Float_dimension(n, "deg", Angle), l1),
+            (Float_dimension((n, "deg", Angle)), l1),
             (Percentage(p1), l2),
             (Percentage(p2), l3),
             (Number(p3), l4),
           ] => [
-            rcv(([@implicit_arity] Float_dimension(n, "deg", Angle), l1)),
+            rcv((Float_dimension((n, "deg", Angle)), l1)),
             Exp.constant(~loc=l2, float_to_const(p1)),
             Exp.constant(~loc=l3, float_to_const(p2)),
             Exp.variant(
@@ -454,12 +454,12 @@ let rec render_component_value = ((cv, loc): with_loc(Component_value.t)): expre
             (Percentage(p3), l4),
           ]
         | [
-            ([@implicit_arity] Float_dimension(n, "deg", Angle), l1),
+            (Float_dimension((n, "deg", Angle)), l1),
             (Percentage(p1), l2),
             (Percentage(p2), l3),
             (Percentage(p3), l4),
           ] => [
-            rcv(([@implicit_arity] Float_dimension(n, "deg", Angle), l1)),
+            rcv((Float_dimension((n, "deg", Angle)), l1)),
             Exp.constant(~loc=l2, float_to_const(p1)),
             Exp.constant(~loc=l3, float_to_const(p2)),
             Exp.variant(
@@ -506,12 +506,12 @@ let rec render_component_value = ((cv, loc): with_loc(Component_value.t)): expre
       Exp.constant(~loc, number_to_const(s));
     }
   | Unicode_range(_) => grammar_error(loc, "Unsupported unicode range")
-  | [@implicit_arity] Function(f, params) => render_function(f, params)
-  | [@implicit_arity] Float_dimension(number, "ms", Time) =>
+  | Function(f, params) => render_function(f, params)
+  | Float_dimension((number, "ms", Time)) =>
     /* bs-css expects milliseconds as an int constant */
     let const = Const.integer(number);
     Exp.constant(~loc, const);
-  | [@implicit_arity] Float_dimension(number, dimension, _) =>
+  | Float_dimension((number, dimension, _)) =>
     let const =
       if (dimension == "px") {
         /* Pixels are treated as integers by both libraries */
@@ -528,7 +528,7 @@ let rec render_component_value = ((cv, loc): with_loc(Component_value.t)): expre
         float_to_const(number);
       };
     render_dimension(number, dimension, const);
-  | [@implicit_arity] Dimension(number, dimension) =>
+  | Dimension((number, dimension)) =>
     let const = number_to_const(number);
     render_dimension(number, dimension, const);
   };
@@ -538,7 +538,7 @@ and render_at_rule = (ar: At_rule.t): expression =>
   | ("keyframes" as n, loc) =>
     let ident = Exp.ident(~loc, {txt: Lident(n), loc});
     switch (ar.At_rule.block) {
-    | [@implicit_arity] Brace_block.Stylesheet(rs, loc) =>
+    | Brace_block.Stylesheet((rs, loc)) =>
       let end_loc =
         Lex_buffer.make_loc(
           ~loc_ghost=true,
@@ -611,7 +611,7 @@ and render_declaration =
       Exp.ident(
         ~loc=name_loc,
         {
-          txt: [@implicit_arity] Ldot(Lident("Animation"), "shorthand"),
+          txt: Ldot(Lident("Animation"), "shorthand"),
           loc: name_loc,
         },
       );
@@ -802,7 +802,7 @@ and render_declaration =
       Exp.ident(
         ~loc=name_loc,
         {
-          txt: [@implicit_arity] Ldot(Lident("Shadow"), "text"),
+          txt: Ldot(Lident("Shadow"), "text"),
           loc: name_loc,
         },
       );
@@ -829,7 +829,7 @@ and render_declaration =
       Exp.ident(
         ~loc=name_loc,
         {
-          txt: [@implicit_arity] Ldot(Lident("Transition"), "shorthand"),
+          txt: Ldot(Lident("Transition"), "shorthand"),
           loc: name_loc,
         },
       );
