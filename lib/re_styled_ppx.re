@@ -39,4 +39,4 @@ let expr = (mapper, expression) =>
 
 let mapper = (_, _) => {...default_mapper, expr};
 
-let () = Driver.register(~name="re-styled-ppx", Versions.ocaml_406, mapper);
+let () = Driver.register(~name="styled", Versions.ocaml_406, mapper);
