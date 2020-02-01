@@ -5,34 +5,29 @@ open Asttypes;
 open Parsetree;
 open Css_types;
 
-type mode =
-  | Bs_css
-  | Bs_typed_css;
-
 let grammar_error = (loc, message) =>
-  raise([@implicit_arity] Css_lexer.GrammarError(message, loc));
+  raise(Css_lexer.GrammarError((message, loc)));
 
-let is_overloaded = (mode, declaration) =>
-  /* Overloaded declarations are rendered as function applications where function name
-        ends with a number that specifies the number of parameters.
-        E.g.: margin: 1em 2px -> margin2 em(1.) px(2.)
-     */
-  switch (mode) {
-  | Bs_css => false
-  | Bs_typed_css =>
-    switch (declaration) {
-    | "unsafe" => false
-    | _ => true
-    }
-  };
+let split = (c, s) => {
+  let rec loop = (s, accu) =>
+    try({
+      let index = String.index(s, c);
+      [
+        String.sub(s, 0, index),
+        ...loop(
+             String.sub(s, index + 1, String.length(s) - index - 1),
+             accu,
+           ),
+      ];
+    }) {
+    | Not_found => [s, ...accu]
+    };
 
-let is_variant = (mode, ident) =>
-  /* bs-css uses polymorphic variants to enumerate values. Some of them
-        have corresponding constant, but some others have conflicting names
-        (e.g.: left) or don't have a corresponding constant (e.g.: justify).
-     */
-  switch (mode) {
-  | Bs_css =>
+  loop(s, []);
+};
+
+/* https://github.com/ahrefs/bs-emotion/blob/master/bs-emotion/src/Emotion.rei#L68 */
+let is_variant = (ident) =>
     switch (ident) {
     /* float/clear/text-align */
     | "left"
@@ -96,27 +91,7 @@ let is_variant = (mode, ident) =>
     | "lighter"
     | "bolder" => true
     | _ => false
-    }
-  | Bs_typed_css => false
   };
-
-let split = (c, s) => {
-  let rec loop = (s, accu) =>
-    try({
-      let index = String.index(s, c);
-      [
-        String.sub(s, 0, index),
-        ...loop(
-             String.sub(s, index + 1, String.length(s) - index - 1),
-             accu,
-           ),
-      ];
-    }) {
-    | Not_found => [s, ...accu]
-    };
-
-  loop(s, []);
-};
 
 let to_caml_case = s => {
   let splitted = split('-', s);
@@ -206,7 +181,7 @@ let group_params = params => {
 let is_time = component_value =>
   Component_value.(
     switch (component_value) {
-    | [@implicit_arity] Float_dimension(_, _, Time) => true
+    | Float_dimension((_, _, Time)) => true
     | _ => false
     }
   );
@@ -220,13 +195,13 @@ let is_timing_function = component_value =>
     | Ident("ease-in")
     | Ident("ease-out")
     | Ident("ease-in-out")
-    | [@implicit_arity] Function(("cubic-bezier", _), _)
+    | Function((("cubic-bezier", _)), _)
     /* step-timing-function */
     | Ident("step-start")
     | Ident("step-end")
-    | [@implicit_arity] Function(("steps", _), _)
+    | Function((("steps", _)), _)
     /* frames-timing-function */
-    | [@implicit_arity] Function(("frames", _), _) => true
+    | Function((("frames", _)), _) => true
     | _ => false
     }
   );
@@ -235,7 +210,7 @@ let is_animation_iteration_count = component_value =>
   Component_value.(
     switch (component_value) {
     | Ident("infinite")
-    | [@implicit_arity] Function(("count", _), _) => true
+    | Function((("count", _)), _) => true
     | _ => false
     }
   );
@@ -292,7 +267,7 @@ let is_length = component_value =>
   Component_value.(
     switch (component_value) {
     | Number("0")
-    | [@implicit_arity] Float_dimension(_, _, Length) => true
+    | Float_dimension((_, _, Length)) => true
     | _ => false
     }
   );
@@ -300,10 +275,10 @@ let is_length = component_value =>
 let is_color = component_value =>
   Component_value.(
     switch (component_value) {
-    | [@implicit_arity] Function(("rgb", _), _)
-    | [@implicit_arity] Function(("rgba", _), _)
-    | [@implicit_arity] Function(("hsl", _), _)
-    | [@implicit_arity] Function(("hsla", _), _)
+    | Function((("rgb", _)), _)
+    | Function((("rgba", _)), _)
+    | Function((("hsl", _)), _)
+    | Function((("hsla", _)), _)
     | Hash(_)
     | Ident(_) => true
     | _ => false
@@ -345,8 +320,7 @@ let is_line_style = component_value =>
     }
   );
 
-let rec render_component_value =
-        (mode, (cv, loc): with_loc(Component_value.t)): expression => {
+let rec render_component_value = ((cv, loc): with_loc(Component_value.t)): expression => {
   let render_block = (start_char, _, _) =>
     grammar_error(loc, "Unsupported " ++ start_char ++ "-block");
 
@@ -384,11 +358,11 @@ let rec render_component_value =
         {txt: Lident(caml_case_name), loc: name_loc},
       );
     let grouped_params = group_params(params);
-    let rcv = render_component_value(mode);
+    let rcv = render_component_value;
     let args = {
       open Component_value;
       let side_or_corner_expr = (deg, loc) =>
-        rcv(([@implicit_arity] Float_dimension(deg, "deg", Angle), loc));
+        rcv((Float_dimension((deg, "deg", Angle)), loc));
 
       let color_stops_to_expr_list = color_stop_params =>
         List.rev_map(
@@ -437,7 +411,7 @@ let rec render_component_value =
           switch (List.hd(grouped_params)) {
           | (
               [
-                ([@implicit_arity] Float_dimension(_, "deg", Angle), _) as cv,
+                (Float_dimension((_, "deg", Angle)), _) as cv,
               ],
               _,
             ) => (
@@ -469,7 +443,7 @@ let rec render_component_value =
               );
             (
               rcv((
-                [@implicit_arity] Float_dimension("180", "deg", Angle),
+                Float_dimension(("180", "deg", Angle)),
                 implicit_side_or_corner_loc,
               )),
               grouped_params,
@@ -499,11 +473,11 @@ let rec render_component_value =
         switch (ps) {
         | [(Number(n), l1), (Percentage(p1), l2), (Percentage(p2), l3)]
         | [
-            ([@implicit_arity] Float_dimension(n, "deg", Angle), l1),
+            (Float_dimension((n, "deg", Angle)), l1),
             (Percentage(p1), l2),
             (Percentage(p2), l3),
           ] => [
-            rcv(([@implicit_arity] Float_dimension(n, "deg", Angle), l1)),
+            rcv((Float_dimension((n, "deg", Angle)), l1)),
             Exp.constant(~loc=l2, float_to_const(p1)),
             Exp.constant(~loc=l3, float_to_const(p2)),
           ]
@@ -526,12 +500,12 @@ let rec render_component_value =
             (Number(p3), l4),
           ]
         | [
-            ([@implicit_arity] Float_dimension(n, "deg", Angle), l1),
+            (Float_dimension((n, "deg", Angle)), l1),
             (Percentage(p1), l2),
             (Percentage(p2), l3),
             (Number(p3), l4),
           ] => [
-            rcv(([@implicit_arity] Float_dimension(n, "deg", Angle), l1)),
+            rcv((Float_dimension((n, "deg", Angle)), l1)),
             Exp.constant(~loc=l2, float_to_const(p1)),
             Exp.constant(~loc=l3, float_to_const(p2)),
             Exp.variant(
@@ -547,12 +521,12 @@ let rec render_component_value =
             (Percentage(p3), l4),
           ]
         | [
-            ([@implicit_arity] Float_dimension(n, "deg", Angle), l1),
+            (Float_dimension((n, "deg", Angle)), l1),
             (Percentage(p1), l2),
             (Percentage(p2), l3),
             (Percentage(p3), l4),
           ] => [
-            rcv(([@implicit_arity] Float_dimension(n, "deg", Angle), l1)),
+            rcv((Float_dimension((n, "deg", Angle)), l1)),
             Exp.constant(~loc=l2, float_to_const(p1)),
             Exp.constant(~loc=l3, float_to_const(p2)),
             Exp.variant(
@@ -580,7 +554,7 @@ let rec render_component_value =
     Exp.apply(~loc, ident, [(Nolabel, arg)]);
   | Ident(i) =>
     let name = to_caml_case(i);
-    if (is_variant(mode, i)) {
+    if (is_variant(i)) {
       Exp.variant(~loc, name, None);
     } else {
       Exp.ident(~loc, {txt: Lident(name), loc});
@@ -603,39 +577,39 @@ let rec render_component_value =
       Exp.constant(~loc, number_to_const(s));
     }
   | Unicode_range(_) => grammar_error(loc, "Unsupported unicode range")
-  | [@implicit_arity] Function(f, params) => render_function(f, params)
-  | [@implicit_arity] Float_dimension(number, "ms", Time) when mode == Bs_css =>
+  | Function(f, params) => render_function(f, params)
+  | Float_dimension((number, "ms", Time)) =>
     /* bs-css expects milliseconds as an int constant */
     let const = Const.integer(number);
     Exp.constant(~loc, const);
-  | [@implicit_arity] Float_dimension(number, dimension, _) =>
+  | Float_dimension((number, dimension, _)) =>
     let const =
       if (dimension == "px") {
         /* Pixels are treated as integers by both libraries */
         Const.integer(
           number,
         );
-      } else if (mode == Bs_css && dimension == "pt") {
+      } else if (dimension == "pt") {
         /* bs-css uses int points */
         Const.integer(number);
-      } else if (mode == Bs_typed_css && dimension == "ms") {
+      } else if (dimension == "ms") {
         /* bs-typed-css uses int milliseconds */
         Const.integer(number);
       } else {
         float_to_const(number);
       };
     render_dimension(number, dimension, const);
-  | [@implicit_arity] Dimension(number, dimension) =>
+  | Dimension((number, dimension)) =>
     let const = number_to_const(number);
     render_dimension(number, dimension, const);
   };
 }
-and render_at_rule = (mode, ar: At_rule.t): expression =>
+and render_at_rule = (ar: At_rule.t): expression =>
   switch (ar.At_rule.name) {
-  | ("keyframes" as n, loc) when mode == Bs_css =>
+  | ("keyframes" as n, loc) =>
     let ident = Exp.ident(~loc, {txt: Lident(n), loc});
     switch (ar.At_rule.block) {
-    | [@implicit_arity] Brace_block.Stylesheet(rs, loc) =>
+    | Brace_block.Stylesheet((rs, loc)) =>
       let end_loc =
         Lex_buffer.make_loc(
           ~loc_ghost=true,
@@ -660,7 +634,7 @@ and render_at_rule = (mode, ar: At_rule.t): expression =>
                   grammar_error(loc, "Unexpected @keyframes prelude")
                 };
               let block_expr =
-                render_declaration_list(mode, sr.Style_rule.block);
+                render_declaration_list(sr.Style_rule.block);
               let tuple =
                 Exp.tuple(
                   ~loc=sr.Style_rule.loc,
@@ -697,9 +671,9 @@ and render_at_rule = (mode, ar: At_rule.t): expression =>
     grammar_error(ar.At_rule.loc, "At-rule @" ++ n ++ " not supported")
   }
 and render_declaration =
-    (mode, d: Declaration.t, d_loc: Location.t): expression => {
+    (d: Declaration.t, d_loc: Location.t): expression => {
   open Component_value;
-  let rcv = render_component_value(mode);
+  let rcv = render_component_value;
   let (name, name_loc) = d.Declaration.name;
 
   /* https://developer.mozilla.org/en-US/docs/Web/CSS/animation */
@@ -708,7 +682,7 @@ and render_declaration =
       Exp.ident(
         ~loc=name_loc,
         {
-          txt: [@implicit_arity] Ldot(Lident("Animation"), "shorthand"),
+          txt: Ldot(Lident("Animation"), "shorthand"),
           loc: name_loc,
         },
       );
@@ -831,12 +805,7 @@ and render_declaration =
         grammar_error(loc, "Unexpected box-shadow value");
       };
 
-    let txt =
-      if (mode == Bs_css) {
-        [@implicit_arity] Longident.Ldot(Longident.Lident("Shadow"), "box");
-      } else {
-        Longident.Lident("shadow");
-      };
+    let txt = Longident.Lident("shadow");
     let box_shadow_ident = Exp.ident(~loc=name_loc, {txt, loc: name_loc});
     let box_shadow_args = ((grouped_param, _)) =>
       List.fold_left(box_shadow_args, [], grouped_param);
@@ -904,7 +873,7 @@ and render_declaration =
       Exp.ident(
         ~loc=name_loc,
         {
-          txt: [@implicit_arity] Ldot(Lident("Shadow"), "text"),
+          txt: Ldot(Lident("Shadow"), "text"),
           loc: name_loc,
         },
       );
@@ -931,7 +900,7 @@ and render_declaration =
       Exp.ident(
         ~loc=name_loc,
         {
-          txt: [@implicit_arity] Ldot(Lident("Transition"), "shorthand"),
+          txt: Ldot(Lident("Transition"), "shorthand"),
           loc: name_loc,
         },
       );
@@ -990,17 +959,6 @@ and render_declaration =
   let render_standard_declaration = () => {
     let name = to_caml_case(name);
     let (vs, _) = d.Declaration.value;
-    let name =
-      if (is_overloaded(mode, name)) {
-        let parameter_count = List.length(vs);
-        if (parameter_count > 1) {
-          name ++ string_of_int(parameter_count);
-        } else {
-          name;
-        };
-      } else {
-        name;
-      };
     let ident =
       Exp.ident(~loc=name_loc, {txt: Lident(name), loc: name_loc});
     let args = List.map(v => rcv(v), vs);
@@ -1025,52 +983,6 @@ and render_declaration =
 
   let render_font_family = () => {
     let (vs, loc) = d.Declaration.value;
-    switch (mode) {
-    | Bs_css =>
-      let arg = {
-        let s =
-          List.fold_left(
-            (s, (v, loc)) =>
-              switch (v) {
-              | Ident(x) =>
-                s
-                ++ (
-                  if (String.length(s) > 0) {
-                    " ";
-                  } else {
-                    "";
-                  }
-                )
-                ++ x
-              | String(x) =>
-                s
-                ++ (
-                  if (String.length(s) > 0) {
-                    " ";
-                  } else {
-                    "";
-                  }
-                )
-                ++ "\""
-                ++ x
-                ++ "\""
-              | Delim("," as x) => s ++ x
-              | _ => grammar_error(loc, "Unexpected font-family value")
-              },
-            "",
-            vs,
-          );
-
-        rcv((String(s), loc));
-      };
-
-      let ident =
-        Exp.ident(
-          ~loc=name_loc,
-          {txt: Lident("fontFamily"), loc: name_loc},
-        );
-      Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
-    | Bs_typed_css =>
       let font_family_args = ((params, _)) => {
         let s =
           List.fold_left(
@@ -1109,7 +1021,6 @@ and render_declaration =
         ident,
         [(Nolabel, list_to_expr(name_loc, args))],
       );
-    };
   };
 
   let render_z_index = () => {
@@ -1233,16 +1144,16 @@ and render_declaration =
   };
 
   switch (name) {
-  | "animation" when mode == Bs_css => render_animation()
+  | "animation" => render_animation()
   | "box-shadow" => render_box_shadow()
-  | "text-shadow" when mode == Bs_css => render_text_shadow()
-  | "transform" when mode == Bs_css => render_transform()
-  | "transition" when mode == Bs_css => render_transition()
+  | "text-shadow" => render_text_shadow()
+  | "transform" => render_transform()
+  | "transition" => render_transition()
   | "font-family" => render_font_family()
-  | "z-index" when mode == Bs_typed_css => render_z_index()
+  | "z-index" => render_z_index()
   | "flex-grow"
-  | "flex-shrink" when mode == Bs_css => render_flex_grow_shrink()
-  | "font-weight" when mode == Bs_css => render_font_weight()
+  | "flex-shrink" => render_flex_grow_shrink()
+  | "font-weight" => render_font_weight()
   | "padding"
   | "margin" =>
     render_with_labels([
@@ -1259,37 +1170,36 @@ and render_declaration =
   | "border-top-right-radius"
   | "border-top-left-radius"
   | "border-bottom-right-radius"
-  | "border-bottom-left-radius" when mode == Bs_typed_css =>
+  | "border-bottom-left-radius"  =>
     render_with_labels([((2, 0), "v"), ((2, 1), "h")])
   | "background-position"
-  | "transform-origin" when mode == Bs_typed_css =>
+  | "transform-origin"  =>
     render_with_labels([((2, 0), "h"), ((2, 1), "v")])
-  | "flex" when mode == Bs_typed_css =>
+  | "flex"  =>
     render_with_labels([((3, 0), "grow"), ((3, 1), "shrink")])
   | "border"
-  | "outline"
-      when mode == Bs_typed_css && List.length(fst(d.Declaration.value)) == 2 =>
+  | "outline" when List.length(fst(d.Declaration.value)) == 2 =>
     render_border_outline_2()
   | _ => render_standard_declaration()
   };
 }
 and render_declarations =
-    (mode, ds: list(Declaration_list.kind)): list(expression) =>
+    (ds: list(Declaration_list.kind)): list(expression) =>
   List.rev_map(
     declaration =>
       switch (declaration) {
       | Declaration_list.Declaration(decl) =>
-        render_declaration(mode, decl, decl.loc)
-      | Declaration_list.At_rule(ar) => render_at_rule(mode, ar)
+        render_declaration(decl, decl.loc)
+      | Declaration_list.At_rule(ar) => render_at_rule(ar)
       },
     ds,
   )
 and render_declaration_list =
-    (mode, (dl, loc): Declaration_list.t): expression => {
-  let expr_with_loc_list = render_declarations(mode, dl);
+    ((dl, loc): Declaration_list.t): expression => {
+  let expr_with_loc_list = render_declarations(dl);
   list_to_expr(loc, expr_with_loc_list);
 }
-and render_style_rule = (mode, sr: Style_rule.t): expression => {
+and render_style_rule = (sr: Style_rule.t): expression => {
   let (prelude, prelude_loc) = sr.Style_rule.prelude;
   let selector =
     List.fold_left(
@@ -1310,12 +1220,8 @@ and render_style_rule = (mode, sr: Style_rule.t): expression => {
       List.rev(prelude),
     );
   let selector_expr = string_to_const(~loc=prelude_loc, selector);
-  let dl_expr = render_declaration_list(mode, sr.Style_rule.block);
-  let lident =
-    switch (mode) {
-    | Bs_css => "selector"
-    | Bs_typed_css => "select"
-    };
+  let dl_expr = render_declaration_list(sr.Style_rule.block);
+  let lident = "selector";
   let ident =
     Exp.ident(~loc=prelude_loc, {txt: Lident(lident), loc: prelude_loc});
   Exp.apply(
@@ -1324,12 +1230,12 @@ and render_style_rule = (mode, sr: Style_rule.t): expression => {
     [(Nolabel, selector_expr), (Nolabel, dl_expr)],
   );
 }
-and render_rule = (mode, r: Rule.t): expression =>
+and render_rule = (r: Rule.t): expression =>
   switch (r) {
-  | Rule.Style_rule(sr) => render_style_rule(mode, sr)
-  | Rule.At_rule(ar) => render_at_rule(mode, ar)
+  | Rule.Style_rule(sr) => render_style_rule(sr)
+  | Rule.At_rule(ar) => render_at_rule(ar)
   }
-and render_stylesheet = (mode, (rs, loc): Stylesheet.t): expression => {
+and render_stylesheet = ((rs, loc): Stylesheet.t): expression => {
   let rule_expr_list =
     List.rev_map(
       rule =>
@@ -1339,9 +1245,9 @@ and render_stylesheet = (mode, (rs, loc): Stylesheet.t): expression => {
             block: (ds, _),
             loc: _,
           }) =>
-          render_declarations(mode, ds)
+          render_declarations(ds)
         | Rule.Style_rule(_)
-        | Rule.At_rule(_) => [render_rule(mode, rule)]
+        | Rule.At_rule(_) => [render_rule(rule)]
         },
       rs,
     )

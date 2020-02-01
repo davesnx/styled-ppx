@@ -1,7 +1,28 @@
 {
-  "checksum": "3126535d49fe794248325733a29f7a35",
+  "checksum": "bccde640d1247350c8ec69bebdf3ffb6",
   "root": "re_styled_ppx@link-dev:./package.json",
   "node": {
+    "re_styled_ppx@link-dev:./package.json": {
+      "id": "re_styled_ppx@link-dev:./package.json",
+      "name": "re_styled_ppx",
+      "version": "link-dev:./package.json",
+      "source": {
+        "type": "link-dev",
+        "path": ".",
+        "manifest": "package.json"
+      },
+      "overrides": [],
+      "dependencies": [
+        "ocaml@4.6.1000@d41d8cd9", "@reason-native/console@0.1.0@d41d8cd9",
+        "@opam/sedlex@opam:2.1@400920d8",
+        "@opam/ocaml-migrate-parsetree@opam:1.5.0@3e319dbc",
+        "@opam/menhir@opam:20190924@004407ff",
+        "@opam/dune@opam:1.11.4@a7ccb7ae", "@esy-ocaml/reason@3.5.2@d41d8cd9"
+      ],
+      "devDependencies": [
+        "ocaml@4.6.1000@d41d8cd9", "@opam/merlin@opam:3.3.3@d653b06a"
+      ]
+    },
     "ocaml@4.6.1000@d41d8cd9": {
       "id": "ocaml@4.6.1000@d41d8cd9",
       "name": "ocaml",
@@ -16,25 +37,22 @@
       "dependencies": [],
       "devDependencies": []
     },
-    "re_styled_ppx@link-dev:./package.json": {
-      "id": "re_styled_ppx@link-dev:./package.json",
-      "name": "re_styled_ppx",
-      "version": "link-dev:./package.json",
+    "@reason-native/console@0.1.0@d41d8cd9": {
+      "id": "@reason-native/console@0.1.0@d41d8cd9",
+      "name": "@reason-native/console",
+      "version": "0.1.0",
       "source": {
-        "type": "link-dev",
-        "path": ".",
-        "manifest": "package.json"
+        "type": "install",
+        "source": [
+          "archive:https://registry.npmjs.org/@reason-native/console/-/console-0.1.0.tgz#sha1:3b56f0e9e1be8464329793df29020aa90e71c22c"
+        ]
       },
       "overrides": [],
       "dependencies": [
-        "ocaml@4.6.1000@d41d8cd9", "@opam/sedlex@opam:2.1@400920d8",
-        "@opam/ocaml-migrate-parsetree@opam:1.5.0@3e319dbc",
-        "@opam/menhir@opam:20190924@004407ff",
-        "@opam/dune@opam:1.11.4@a7ccb7ae", "@esy-ocaml/reason@3.5.2@d41d8cd9"
+        "ocaml@4.6.1000@d41d8cd9", "@opam/dune@opam:1.11.4@a7ccb7ae",
+        "@esy-ocaml/reason@3.5.2@d41d8cd9"
       ],
-      "devDependencies": [
-        "ocaml@4.6.1000@d41d8cd9", "@opam/merlin@opam:3.3.3@d653b06a"
-      ]
+      "devDependencies": []
     },
     "@opam/yojson@opam:1.7.0@7056d985": {
       "id": "@opam/yojson@opam:1.7.0@7056d985",

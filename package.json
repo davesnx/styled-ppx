@@ -20,19 +20,14 @@
     "@opam/menhir": "20190924",
     "@opam/ocaml-migrate-parsetree": "1.5.0",
     "@opam/sedlex": "2.1",
+    "@reason-native/console": "^0.1.0",
     "ocaml": "~4.6.1000"
   },
-  "resolution": {
-    "@opam/sedlex": "ocaml-community/sedlex"
-  },
-  "devDependencies": {
-    "@opam/merlin": "*",
-    "ocaml": "~4.6.1000"
-  },
+  "resolution": { "@opam/sedlex": "ocaml-community/sedlex" },
+  "devDependencies": { "@opam/merlin": "*", "ocaml": "~4.6.1000" },
   "scripts": {
     "test": "dune runtest",
     "test:promote": "dune runtest --auto-promote",
-    "test:regen": "sh -c \"refmt ./test/simple_src.re -p ml > ./test/simple.ml\"",
     "doc": "esy dune build @doc",
     "doc-path": "esy echo #{self.target_dir}/default/_doc/_html/index.html",
     "format": "esy dune build @fmt --auto-promote",
