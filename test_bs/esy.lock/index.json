@@ -1,5 +1,5 @@
 {
-  "checksum": "0d6a41d82ffdf8ba64d5b7f86dd57dbe",
+  "checksum": "cfddbb9d6bf29de77fe0f126b568a0e6",
   "root": "test_bs@link-dev:./esy.json",
   "node": {
     "test_bs@link-dev:./esy.json": {
@@ -18,7 +18,8 @@
       "source": { "type": "link", "path": ".." },
       "overrides": [],
       "dependencies": [
-        "ocaml@4.6.1000@d41d8cd9", "@opam/sedlex@opam:2.1@400920d8",
+        "ocaml@4.6.1000@d41d8cd9", "@reason-native/console@0.1.0@d41d8cd9",
+        "@opam/sedlex@opam:2.1@400920d8",
         "@opam/ocaml-migrate-parsetree@opam:1.5.0@3e319dbc",
         "@opam/menhir@opam:20190924@004407ff",
         "@opam/dune@opam:1.11.4@a7ccb7ae", "@esy-ocaml/reason@3.5.2@d41d8cd9"
@@ -37,6 +38,23 @@
       },
       "overrides": [],
       "dependencies": [],
+      "devDependencies": []
+    },
+    "@reason-native/console@0.1.0@d41d8cd9": {
+      "id": "@reason-native/console@0.1.0@d41d8cd9",
+      "name": "@reason-native/console",
+      "version": "0.1.0",
+      "source": {
+        "type": "install",
+        "source": [
+          "archive:https://registry.npmjs.org/@reason-native/console/-/console-0.1.0.tgz#sha1:3b56f0e9e1be8464329793df29020aa90e71c22c"
+        ]
+      },
+      "overrides": [],
+      "dependencies": [
+        "ocaml@4.6.1000@d41d8cd9", "@opam/dune@opam:1.11.4@a7ccb7ae",
+        "@esy-ocaml/reason@3.5.2@d41d8cd9"
+      ],
       "devDependencies": []
     },
     "@opam/uchar@opam:0.0.2@c8218eea": {
