@@ -1,9 +1,1 @@
-let styledComponentInline =
-  [color red;
-  backgroundColor white;
-  margin4 ~top:auto ~right:zero ~bottom:(px 10) ~left:(em 1.);
-  borderBottom `thin dashed (hex {js|eee|js});
-  borderRightColor (rgb 1 0 1);
-  width (pct 70.);
-  background (url {js|http://example.com/test.jpg|js})]
-let styledComponentMultiline = [display block]
+let styledComponentMultiline = Emotion.(css([display(`block)]));

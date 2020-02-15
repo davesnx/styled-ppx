@@ -78,6 +78,7 @@ let is_variant = (ident) =>
     | "start"
     | "end"
     /* display */
+    | "block"
     | "flex"
     | "inline-flex"
     /* font-weight */
@@ -319,6 +320,13 @@ let is_line_style = component_value =>
     | _ => false
     }
   );
+
+
+
+
+
+
+
 
 let rec render_component_value = ((cv, loc): with_loc(Component_value.t)): expression => {
   let render_block = (start_char, _, _) =>
@@ -1082,7 +1090,7 @@ and render_declaration =
     Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
   };
 
-  let render_border_outline_2 = () => {
+  let render_border_outline = () => {
     let border_outline_args = (params, _) =>
       List.fold_left(
         (args, (v, loc) as cv) =>
@@ -1179,7 +1187,7 @@ and render_declaration =
     render_with_labels([((3, 0), "grow"), ((3, 1), "shrink")])
   | "border"
   | "outline" when List.length(fst(d.Declaration.value)) == 2 =>
-    render_border_outline_2()
+    render_border_outline()
   | _ => render_standard_declaration()
   };
 }
@@ -1197,7 +1205,17 @@ and render_declarations =
 and render_declaration_list =
     ((dl, loc): Declaration_list.t): expression => {
   let expr_with_loc_list = render_declarations(dl);
-  list_to_expr(loc, expr_with_loc_list);
+
+  let cssFn = Exp.ident(~loc, {txt: Lident("Emotion.(css"), loc});
+  let open_bracket = Exp.ident(~loc, {txt: Lident("("), loc});
+  let close_bracket = Exp.ident(~loc, {txt: Lident("))"), loc});
+  let css_expression = list_to_expr(loc, expr_with_loc_list);
+
+  Exp.apply(cssFn, [
+    (Nolabel, open_bracket),
+    (Nolabel, css_expression),
+    (Nolabel, close_bracket)
+  ])
 }
 and render_style_rule = (sr: Style_rule.t): expression => {
   let (prelude, prelude_loc) = sr.Style_rule.prelude;
