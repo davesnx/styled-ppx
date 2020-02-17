@@ -2,12 +2,12 @@
   "name": "demo",
   "version": "0.0.0",
   "scripts": {
-    "start": "parcel src/index.html",
-    "prestart": "yarn run clean:bs && yarn run build:bs",
+    "start": "concurrently 'parcel src/index.html' 'yarn run re:watch'",
     "build": "parcel build src/index.html",
-    "prebuild": "yarn run clean:dist && yarn run clean:bs && yarn run build:bs",
-    "build:bs": "bsb -make-world",
-    "clean:bs": "bsb -clean-world",
+    "prebuild": "yarn run clean:dist && yarn run re:clean && yarn run re:build",
+    "re:build": "bsb -make-world",
+    "re:watch": "bsb -make-world -w",
+    "re:clean": "bsb -clean-world",
     "test": "jest"
   },
   "devDependencies": {
@@ -24,6 +24,7 @@
   "dependencies": {
     "@ahrefs/bs-emotion": "^1.0.0",
     "bs-emotion": "^0.2.0",
+    "concurrently": "^5.1.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "reason-react": "^0.7.0"
