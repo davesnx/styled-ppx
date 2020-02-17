@@ -6,3 +6,7 @@ node_modules
 /build/
 bs-ppx-css
 *.bs.js
+dist/
+esy.lock
+.cache
+_esy

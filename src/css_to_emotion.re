@@ -321,13 +321,6 @@ let is_line_style = component_value =>
     }
   );
 
-
-
-
-
-
-
-
 let rec render_component_value = ((cv, loc): with_loc(Component_value.t)): expression => {
   let render_block = (start_char, _, _) =>
     grammar_error(loc, "Unsupported " ++ start_char ++ "-block");
@@ -1205,17 +1198,15 @@ and render_declarations =
 and render_declaration_list =
     ((dl, loc): Declaration_list.t): expression => {
   let expr_with_loc_list = render_declarations(dl);
+  let styles = list_to_expr(loc, expr_with_loc_list);
+  let ident =
+    Exp.ident(
+      ~loc,
+      {txt: Lident("css"), loc},
+    );
+  let expression = Exp.apply(~loc, ident, [(Nolabel, styles)]);
 
-  let cssFn = Exp.ident(~loc, {txt: Lident("Emotion.(css"), loc});
-  let open_bracket = Exp.ident(~loc, {txt: Lident("("), loc});
-  let close_bracket = Exp.ident(~loc, {txt: Lident("))"), loc});
-  let css_expression = list_to_expr(loc, expr_with_loc_list);
-
-  Exp.apply(cssFn, [
-    (Nolabel, open_bracket),
-    (Nolabel, css_expression),
-    (Nolabel, close_bracket)
-  ])
+  Exp.open_(~loc, Fresh , {txt: Lident("Emotion"), loc}, expression);
 }
 and render_style_rule = (sr: Style_rule.t): expression => {
   let (prelude, prelude_loc) = sr.Style_rule.prelude;

@@ -1,1 +1,1 @@
-let styledComponentMultiline = Emotion.(css([display(`block)]));
+let styledComponentMultiline = let open Emotion in css [display `block]
