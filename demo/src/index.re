@@ -1,17 +1,28 @@
-let ppx = [%styled "display: flex; color: #000000; padding: 10px"];
+/* let ppx = [%styled "display: flex; color: #000000; padding: 10px; font-size: 10px; background-color: green; "]; */
 let emotion = Emotion.(css([display(`inline), color(hex("000000")), padding(px(10))]));
+
+module Style = {
+  [%styled "display: flex;"]
+};
+
+module Style = {
+  [%react.component]
+  let styled = Emotion.(css([display(`flex)]));
+  let make = (~children) => {
+    <div className=styled>
+      {children}
+    </div>
+  }
+};
 
 module Demo = {
   [@react.component]
   let make = () =>
     <div>
-      <div className=emotion>
-        {React.string("Hello world")}
-      </div>
-      <div className=ppx>
-        {React.string("from ppx")}
+      <div>
+        {React.string("React API")}
       </div>
     </div>
-}
+};
 
 ReactDOMRe.renderToElementWithId(<Demo />, "app");

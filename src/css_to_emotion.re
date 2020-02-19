@@ -3,6 +3,7 @@ open Ast_406;
 open Ast_helper;
 open Asttypes;
 open Parsetree;
+open Longident;
 open Css_types;
 
 let grammar_error = (loc, message) =>
@@ -806,8 +807,7 @@ and render_declaration =
         grammar_error(loc, "Unexpected box-shadow value");
       };
 
-    let txt = Longident.Lident("shadow");
-    let box_shadow_ident = Exp.ident(~loc=name_loc, {txt, loc: name_loc});
+    let box_shadow_ident = Exp.ident(~loc=name_loc, {txt: Lident("shadow"), loc: name_loc});
     let box_shadow_args = ((grouped_param, _)) =>
       List.fold_left(box_shadow_args, [], grouped_param);
 
@@ -1206,7 +1206,17 @@ and render_declaration_list =
     );
   let expression = Exp.apply(~loc, ident, [(Nolabel, styles)]);
 
-  Exp.open_(~loc, Fresh , {txt: Lident("Emotion"), loc}, expression);
+  let styled_defintion = Exp.open_(~loc, Fresh , {txt: Lident("Emotion"), loc}, expression);
+  /* let var = Exp.constant(~loc, Pconst_string("styled", None), ~exp={ styled_defintion }); */
+  let styled_variable_name = {
+    ppat_desc: Ppat_var({ txt: "styled", loc}),
+    ppat_loc: loc,
+    ppat_attributes: [],
+  };
+  Val.mk(~loc, Ppat_var({ txt: "styled", loc}), styled_defintion);
+
+  /* val mk: ?loc: loc -> ?attrs:attrs -> ?docs:docs -> ?text:text ->
+      pattern -> expression -> value_binding */
 }
 and render_style_rule = (sr: Style_rule.t): expression => {
   let (prelude, prelude_loc) = sr.Style_rule.prelude;

@@ -1,6 +1,8 @@
-let styledComponentMultiline = [%styled {|
-  display: block;
-|}]
+module Style =
+  struct
+    let _ =
+      [%styled "display: flex;"]
+  end
 
 (* let styledComponentInline = [%styled
     {|

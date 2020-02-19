@@ -1,1 +1,5 @@
-let styledComponentMultiline = let open Emotion in css [display `block]
+module Style =
+  struct
+    let _ = [%react.component]
+    let styled = let open Emotion in css [display `flex]
+  end
