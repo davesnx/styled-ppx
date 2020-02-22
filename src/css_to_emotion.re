@@ -1198,25 +1198,37 @@ and render_declarations =
 and render_declaration_list =
     ((dl, loc): Declaration_list.t): expression => {
   let expr_with_loc_list = render_declarations(dl);
-  let styles = list_to_expr(loc, expr_with_loc_list);
+  let styleExpression = list_to_expr(loc, expr_with_loc_list);
   let ident =
     Exp.ident(
       ~loc,
       {txt: Lident("css"), loc},
     );
-  let expression = Exp.apply(~loc, ident, [(Nolabel, styles)]);
 
-  let styled_defintion = Exp.open_(~loc, Fresh , {txt: Lident("Emotion"), loc}, expression);
-  /* let var = Exp.constant(~loc, Pconst_string("styled", None), ~exp={ styled_defintion }); */
-  let styled_variable_name = {
+  let cssFunc = Exp.apply(~loc, ident, [(Nolabel, styleExpression)]);
+  let styled_defintion = Exp.open_(~loc, Fresh, {txt: Lident("Emotion"), loc}, cssFunc);
+
+  /* let variableName = {
     ppat_desc: Ppat_var({ txt: "styled", loc}),
     ppat_loc: loc,
     ppat_attributes: [],
-  };
-  Val.mk(~loc, Ppat_var({ txt: "styled", loc}), styled_defintion);
+  }; */
 
-  /* val mk: ?loc: loc -> ?attrs:attrs -> ?docs:docs -> ?text:text ->
-      pattern -> expression -> value_binding */
+  /* let reactComponentExpression = Pstr_attribute({ txt: "react.component", loc }); */
+  /* let styled = Pstr_value(Nonrecursive, [Vb.mk(~loc, variableName, styled_defintion)]);
+
+  let makeName = {
+    ppat_desc: Ppat_var({ txt: "make", loc}),
+    ppat_loc: loc,
+    ppat_attributes: [],
+  };
+  let makeFn = Pstr_value(Nonrecursive, [
+    pattern: makeName,
+    expression: Pexp_fun([(Labelled("children"))], None)
+    generateJSX (className)
+  ]) */
+
+  styled_defintion;
 }
 and render_style_rule = (sr: Style_rule.t): expression => {
   let (prelude, prelude_loc) = sr.Style_rule.prelude;

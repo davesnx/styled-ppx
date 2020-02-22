@@ -5,7 +5,7 @@ module Style = {
   [%styled "display: flex;"]
 };
 
-module Style = {
+module Component = {
   [%react.component]
   let styled = Emotion.(css([display(`flex)]));
   let make = (~children) => {
