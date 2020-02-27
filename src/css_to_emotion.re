@@ -1208,26 +1208,6 @@ and render_declaration_list =
   let cssFunc = Exp.apply(~loc, ident, [(Nolabel, styleExpression)]);
   let styled_defintion = Exp.open_(~loc, Fresh, {txt: Lident("Emotion"), loc}, cssFunc);
 
-  /* let variableName = {
-    ppat_desc: Ppat_var({ txt: "styled", loc}),
-    ppat_loc: loc,
-    ppat_attributes: [],
-  }; */
-
-  /* let reactComponentExpression = Pstr_attribute({ txt: "react.component", loc }); */
-  /* let styled = Pstr_value(Nonrecursive, [Vb.mk(~loc, variableName, styled_defintion)]);
-
-  let makeName = {
-    ppat_desc: Ppat_var({ txt: "make", loc}),
-    ppat_loc: loc,
-    ppat_attributes: [],
-  };
-  let makeFn = Pstr_value(Nonrecursive, [
-    pattern: makeName,
-    expression: Pexp_fun([(Labelled("children"))], None)
-    generateJSX (className)
-  ]) */
-
   styled_defintion;
 }
 and render_style_rule = (sr: Style_rule.t): expression => {

@@ -7,5 +7,5 @@
  (wrapped false)
  (public_name re_styled_ppx.lib)
  (kind ppx_rewriter)
- (libraries sedlex menhirLib ocaml-migrate-parsetree)
+ (libraries sedlex menhirLib ocaml-migrate-parsetree console.lib)
  (preprocess (pps sedlex.ppx)))

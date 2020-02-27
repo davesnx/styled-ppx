@@ -17,7 +17,6 @@ module Style =
   ]
  *)
 
-
 (* Not supported yet
 
 let styledComponentWithProps =
