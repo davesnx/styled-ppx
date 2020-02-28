@@ -136,8 +136,12 @@ let createReactComponent = (~loc) =>
             Pat.mk(~loc, Ppat_var({txt: "children", loc })),
             Exp.apply(
               ~loc,
+              ~attrs=[({ txt: "JSX", loc }, PStr([]))],
               Exp.ident({ txt: Lident("div"), loc }),
-              []
+              [(
+                Labelled("className"),
+                Exp.ident({ txt: Lident("styled"), loc })
+              )]
             )
           )
         )
