@@ -1,5 +1,6 @@
 module Component =
   struct
-    [@@@react.component ]
     let styled = let open Emotion in css [display `block]
+    let make ~children  = ((div ~className:styled)[@JSX ])[@@react.component
+                                                            ]
   end
