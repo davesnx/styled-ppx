@@ -108,32 +108,53 @@ let createStyles = (loc, name, exp) => {
     ppat_attributes: [],
   };
 
+  Str.mk(
+    ~loc,
+    Pstr_value(
+      Nonrecursive,
+      [Vb.mk(~loc, variableName, exp)],
+    )
+  )
+};
+
+/* let createStyles = (loc, name, exp) => {
+  let variableName = {
+    ppat_desc: Ppat_var({ txt: name, loc}),
+    ppat_loc: loc,
+    ppat_attributes: [],
+  };
+
   {
     pstr_loc: loc,
     pstr_desc: Pstr_value(Nonrecursive, [Vb.mk(~loc, variableName, exp)])
   }
-};
+}; */
 
-/* let createComponentPpxNotation = (loc) => {
-  {
+/*let createComponentPpxNotation = () => {
+{
     pval_loc: loc,
     pval_type: {
 	     ptyp_desc: Ptyp_var("s"),
 	     ptyp_loc: loc,
-	     ptyp_attributes: [], /* attributes; (* ... [@id1] [@id2] *) */
+	     ptyp_attributes: [],
     },
     pval_name: {txt: "react.component", loc},
     pval_prim: [""],
-    pval_attributes: [PStr([]))],
+    pval_attributes: [],
+  }
+
+ {
+    pstr_desc: Pstr_attribute({ txt: "react.component", loc }),
+    pstr_loc: loc,
   }
 }
- */
+*/
 
-let createModule = (~loc as _l,/*  ~typeDef as _td, ~typeName as _t, */ ~ast as _a) =>
+let createModule = (~loc,/*  ~typeDef as _td, ~typeName as _t, */ ~ast) =>
   Mod.mk(
     Pmod_structure([
-      /* createStyles(loc, "styled", Css_to_emotion.render_declaration_list(ast)), */
-      /* createComponentPpxNotation(loc), */
+      createStyles(loc, "styled", Css_to_emotion.render_declaration_list(ast)),
+   /*    createComponentPpxNotation(loc) */
       /*
       createComponentMakeFn - https://github.com/jchavarri/jsoo-react/blob/master/ppx/Rroo_jsoo_ppx.re#L304
       let makeName = {

@@ -1,8 +1,4 @@
-module Style =
-  struct
-    let _ =
-      [%styled "display: flex;"]
-  end
+module Component = [%styled ("display: block")]
 
 (* let styledComponentInline = [%styled
     {|

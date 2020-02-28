@@ -1,5 +1,5 @@
-module Style =
+module Component =
   struct
-    let _ = [%react.component]
-    let styled = let open Emotion in css [display `flex]
+    [@@@react.component ]
+    let styled = let open Emotion in css [display `block]
   end
