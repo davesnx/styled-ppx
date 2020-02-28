@@ -5,7 +5,7 @@ open Asttypes;
 open Parsetree;
 
 open Ast_helper;
-/* open Longident; */
+open Longident;
 
 /* let expr = (mapper, expression) =>
   switch (expression.pexp_desc) {
@@ -117,56 +117,39 @@ let createStyles = (loc, name, exp) => {
   )
 };
 
-/* let createStyles = (loc, name, exp) => {
-  let variableName = {
-    ppat_desc: Ppat_var({ txt: name, loc}),
-    ppat_loc: loc,
-    ppat_attributes: [],
-  };
+let createReactComponent = (~loc) =>
+  Str.mk(
+    ~loc,
+    Pstr_value(
+      Nonrecursive,
+      [
+        Vb.mk(
+          ~loc,
+          ~attrs=[({ txt: "react.component", loc }, PStr([]))],
+          Pat.mk(~loc,
+            Ppat_var({ txt: "make", loc }),
+          ),
+          Exp.fun_(
+            ~loc,
+            Labelled("children"),
+            None,
+            Pat.mk(~loc, Ppat_var({txt: "children", loc })),
+            Exp.apply(
+              ~loc,
+              Exp.ident({ txt: Lident("div"), loc }),
+              []
+            )
+          )
+        )
+      ]
+    )
+  );
 
-  {
-    pstr_loc: loc,
-    pstr_desc: Pstr_value(Nonrecursive, [Vb.mk(~loc, variableName, exp)])
-  }
-}; */
-
-/*let createComponentPpxNotation = () => {
-{
-    pval_loc: loc,
-    pval_type: {
-	     ptyp_desc: Ptyp_var("s"),
-	     ptyp_loc: loc,
-	     ptyp_attributes: [],
-    },
-    pval_name: {txt: "react.component", loc},
-    pval_prim: [""],
-    pval_attributes: [],
-  }
-
- {
-    pstr_desc: Pstr_attribute({ txt: "react.component", loc }),
-    pstr_loc: loc,
-  }
-}
-*/
-
-let createModule = (~loc,/*  ~typeDef as _td, ~typeName as _t, */ ~ast) =>
+let createModule = (~loc, ~ast) =>
   Mod.mk(
     Pmod_structure([
       createStyles(loc, "styled", Css_to_emotion.render_declaration_list(ast)),
-   /*    createComponentPpxNotation(loc) */
-      /*
-      createComponentMakeFn - https://github.com/jchavarri/jsoo-react/blob/master/ppx/Rroo_jsoo_ppx.re#L304
-      let makeName = {
-        ppat_desc: Ppat_var({ txt: "make", loc}),
-        ppat_loc: loc,
-        ppat_attributes: [],
-      };
-      let makeFn = Pstr_value(Nonrecursive, [
-        pattern: makeName,
-        expression: Pexp_fun([(Labelled("children"))], None)
-        generateJSX (className)
-      ]) */
+      createReactComponent(~loc),
     ]),
   );
 
