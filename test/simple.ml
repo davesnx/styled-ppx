@@ -1,4 +1,6 @@
-let styledComponentInline = [%styled
+module Component = [%styled ("display: block")]
+
+(* let styledComponentInline = [%styled
     {|
       color: red;
       background-color: white;
@@ -6,13 +8,10 @@ let styledComponentInline = [%styled
       border-bottom: thin dashed #eee;
       border-right-color: rgb(1, 0, 1);
       width: 70%;
-      background: url(http://example.com/test.jpg)
+      background: url(http://example.com/test.jpg);
     |}
   ]
-
-let styledComponentMultiline = [%styled {|
-  display: block;
-|}]
+ *)
 
 (* Not supported yet
 
@@ -22,5 +21,5 @@ let styledComponentWithProps =
       display: block;
       color: $color;
     |})]
-    
+
 *)

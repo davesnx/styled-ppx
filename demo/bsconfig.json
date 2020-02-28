@@ -1,19 +1,22 @@
 {
   "name": "test_bs",
   "reason": {
-    "react-jsx": 2
+    "react-jsx": 3
   },
   "sources": {
-    "dir" : "src",
-    "subdirs" : true,
+    "dir": "src",
+    "subdirs": true,
     "type": "dev"
   },
-  "package-specs": [{
-    "module": "commonjs",
-    "in-source": true
-  }],
+  "package-specs": [
+    {
+      "module": "commonjs",
+      "in-source": true
+    }
+  ],
   "ppx-flags": [
-    "esy x re_styled_ppx", "@ahrefs/bs-emotion-ppx/bin/bs-emotion-ppx"
+    "../_esy/default/build/default/bin/Bin.exe",
+    "@ahrefs/bs-emotion-ppx/bin/bs-emotion-ppx"
   ],
   "suffix": ".bs.js",
   "namespace": true,
