@@ -3,6 +3,7 @@ open Ast_406;
 open Ast_helper;
 open Asttypes;
 open Parsetree;
+open Longident;
 open Css_types;
 
 let grammar_error = (loc, message) =>
@@ -78,6 +79,7 @@ let is_variant = (ident) =>
     | "start"
     | "end"
     /* display */
+    | "block"
     | "flex"
     | "inline-flex"
     /* font-weight */
@@ -805,8 +807,7 @@ and render_declaration =
         grammar_error(loc, "Unexpected box-shadow value");
       };
 
-    let txt = Longident.Lident("shadow");
-    let box_shadow_ident = Exp.ident(~loc=name_loc, {txt, loc: name_loc});
+    let box_shadow_ident = Exp.ident(~loc=name_loc, {txt: Lident("shadow"), loc: name_loc});
     let box_shadow_args = ((grouped_param, _)) =>
       List.fold_left(box_shadow_args, [], grouped_param);
 
@@ -1082,7 +1083,7 @@ and render_declaration =
     Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
   };
 
-  let render_border_outline_2 = () => {
+  let render_border_outline = () => {
     let border_outline_args = (params, _) =>
       List.fold_left(
         (args, (v, loc) as cv) =>
@@ -1179,7 +1180,7 @@ and render_declaration =
     render_with_labels([((3, 0), "grow"), ((3, 1), "shrink")])
   | "border"
   | "outline" when List.length(fst(d.Declaration.value)) == 2 =>
-    render_border_outline_2()
+    render_border_outline()
   | _ => render_standard_declaration()
   };
 }
@@ -1197,7 +1198,17 @@ and render_declarations =
 and render_declaration_list =
     ((dl, loc): Declaration_list.t): expression => {
   let expr_with_loc_list = render_declarations(dl);
-  list_to_expr(loc, expr_with_loc_list);
+  let styleExpression = list_to_expr(loc, expr_with_loc_list);
+  let ident =
+    Exp.ident(
+      ~loc,
+      {txt: Lident("css"), loc},
+    );
+
+  let cssFunc = Exp.apply(~loc, ident, [(Nolabel, styleExpression)]);
+  let styled_defintion = Exp.open_(~loc, Fresh, {txt: Lident("Emotion"), loc}, cssFunc);
+
+  styled_defintion;
 }
 and render_style_rule = (sr: Style_rule.t): expression => {
   let (prelude, prelude_loc) = sr.Style_rule.prelude;
