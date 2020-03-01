@@ -6,16 +6,13 @@
 module Sedlexing = Lex_buffer;
 
 /** Signals a lexing error at the provided source location.  */
-
 exception LexingError((Lexing.position, string));
 
 /** Signals a parsing error at the provided token and its start and end
  * locations. */
-
 exception ParseError((Css_parser.token, Lexing.position, Lexing.position));
 
 /** Signals a grammar error at the provided location. */
-
 exception GrammarError((string, Location.t));
 
 let position_to_string = pos =>
@@ -76,7 +73,7 @@ let token_to_string =
   | DIMENSION((n, d)) =>
     "DIMENSION(" ++ n ++ ", " ++ d ++ ")";
 
-/* let () =
+let () =
     Location.register_error_of_exn(
       fun
       | LexingError((pos, msg)) => {
@@ -97,7 +94,6 @@ let token_to_string =
         Some({loc, msg, sub: [], if_highlight: ""})
       | _ => None,
     );
-   */
 
 /* Regexes */
 let newline = [%sedlex.regexp? '\n' | "\r\n" | '\r' | '\012'];

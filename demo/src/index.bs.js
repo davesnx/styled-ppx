@@ -6,7 +6,7 @@ var Emotion = require("@ahrefs/bs-emotion/src/Emotion.bs.js");
 var ReactDOMRe = require("reason-react/src/ReactDOMRe.js");
 
 var styles = Emotion.css(undefined, /* :: */[
-      Emotion.display(/* flex */-1010954439),
+      Emotion.display(Emotion.grid),
       /* :: */[
         Emotion.alignItems(Emotion.center),
         /* :: */[

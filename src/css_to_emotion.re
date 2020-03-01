@@ -585,21 +585,12 @@ let rec render_component_value = ((cv, loc): with_loc(Component_value.t)): expre
     let const = Const.integer(number);
     Exp.constant(~loc, const);
   | Float_dimension((number, dimension, _)) =>
-    let const =
-      if (dimension == "px") {
-        /* Pixels are treated as integers by both libraries */
-        Const.integer(
-          number,
-        );
-      } else if (dimension == "pt") {
-        /* bs-css uses int points */
-        Const.integer(number);
-      } else if (dimension == "ms") {
-        /* bs-typed-css uses int milliseconds */
-        Const.integer(number);
-      } else {
-        float_to_const(number);
-      };
+    let const = switch (dimension) {
+      | "px"
+      | "pt"
+      | "ms" =>  Const.integer(number);
+      | _ => float_to_const(number)
+    };
     render_dimension(number, dimension, const);
   | Dimension((number, dimension)) =>
     let const = number_to_const(number);
