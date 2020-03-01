@@ -5,34 +5,47 @@ var React = require("react");
 var Emotion = require("@ahrefs/bs-emotion/src/Emotion.bs.js");
 var ReactDOMRe = require("reason-react/src/ReactDOMRe.js");
 
-var emotion = Emotion.css(undefined, /* :: */[
-      Emotion.display(/* inline */423610969),
+var styles = Emotion.css(undefined, /* :: */[
+      Emotion.display(/* flex */-1010954439),
       /* :: */[
-        Emotion.color(Emotion.hex("000000")),
-        /* :: */[
-          Emotion.padding(Emotion.px(10)),
-          /* [] */0
-        ]
+        Emotion.color(Emotion.hex("333")),
+        /* [] */0
       ]
     ]);
+
+function Index$Style(Props) {
+  var children = Props.children;
+  return React.createElement("div", {
+              className: styles
+            }, children);
+}
+
+var Style = {
+  styles: styles,
+  make: Index$Style
+};
 
 var styled = Emotion.css(undefined, /* :: */[
       Emotion.display(/* flex */-1010954439),
       /* [] */0
     ]);
 
-function Index$Style(Props) {
-  Props.children;
-  return React.createElement("div", undefined);
+function Index$Component2(Props) {
+  var children = Props.children;
+  return React.createElement("div", {
+              className: styled
+            }, children);
 }
 
-var Style = {
+var Component2 = {
   styled: styled,
-  make: Index$Style
+  make: Index$Component2
 };
 
 function Index$Demo(Props) {
-  return React.createElement("div", undefined, React.createElement("div", undefined, "React API"));
+  return React.createElement(Index$Style, {
+              children: "React API"
+            });
 }
 
 var Demo = {
@@ -41,7 +54,7 @@ var Demo = {
 
 ReactDOMRe.renderToElementWithId(React.createElement(Index$Demo, { }), "app");
 
-exports.emotion = emotion;
 exports.Style = Style;
+exports.Component2 = Component2;
 exports.Demo = Demo;
-/* emotion Not a pure module */
+/* styles Not a pure module */

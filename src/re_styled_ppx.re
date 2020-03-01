@@ -6,7 +6,7 @@ open Parsetree;
 open Ast_helper;
 open Longident;
 
-let styleVariableName = "styled";
+let styleVariableName = "styles";
 
 /* let styles = Emotion.(css(exp)) */
 let createStyles = (loc, name, exp) => {
@@ -49,6 +49,14 @@ let createMakeFn = (~loc, ~classNameValue) =>
                 ]
               )
             )
+          )
+        ),
+        (
+          Nolabel,
+          Exp.construct(
+            ~loc,
+            {txt: Lident("()"), loc},
+            None
           )
         )
       ],
