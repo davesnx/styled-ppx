@@ -3,11 +3,10 @@ open Ast_406;
 open Ast_mapper;
 open Asttypes;
 open Parsetree;
-
 open Ast_helper;
 open Longident;
 
-let styleVariableName = "styled"
+let styleVariableName = "styled";
 
 /* let styles = Emotion.(css(exp)) */
 let createStyles = (loc, name, exp) => {
@@ -31,7 +30,25 @@ let createMakeFn = (~loc, ~classNameValue) =>
       ~loc,
       ~attrs=[({txt: "JSX", loc}, PStr([]))],
       Exp.ident({txt: Lident("div"), loc}),
-      [(Labelled("className"), Exp.ident({txt: Lident(classNameValue), loc}))],
+      [
+        (
+          Labelled("className"),
+          Exp.ident({txt: Lident(classNameValue), loc}),
+        ),
+/*         (
+          Labelled("children"),
+          Exp.construct(
+            ~loc,
+            {txt: Lident("::"), loc},
+            Some(
+              Exp.tuple(
+                ~loc,
+                [Exp.ident(~loc, {txt: Lident("children"), loc})],
+              ),
+            ),
+          ),
+        ), */
+      ],
     ),
   );
 

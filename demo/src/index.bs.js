@@ -16,12 +16,20 @@ var emotion = Emotion.css(undefined, /* :: */[
       ]
     ]);
 
-Emotion.css(undefined, /* :: */[
+var styled = Emotion.css(undefined, /* :: */[
       Emotion.display(/* flex */-1010954439),
       /* [] */0
     ]);
 
-var Style = { };
+function Index$Style(Props) {
+  Props.children;
+  return React.createElement("div", undefined);
+}
+
+var Style = {
+  styled: styled,
+  make: Index$Style
+};
 
 function Index$Demo(Props) {
   return React.createElement("div", undefined, React.createElement("div", undefined, "React API"));
