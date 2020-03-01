@@ -26,16 +26,16 @@ let createMakeFn = (~loc, ~classNameValue) =>
     Labelled("children"),
     None,
     Pat.mk(~loc, Ppat_var({txt: "children", loc})),
-    Exp.apply(
+    Exp.apply( /* Create a function div() */
       ~loc,
-      ~attrs=[({txt: "JSX", loc}, PStr([]))],
+      ~attrs=[({txt: "JSX", loc}, PStr([]))], /* Add [@JSX]*/
       Exp.ident({txt: Lident("div"), loc}),
-      [
+      [ /* Arguments */
         (
           Labelled("className"),
           Exp.ident({txt: Lident(classNameValue), loc}),
         ),
-/*         (
+        (
           Labelled("children"),
           Exp.construct(
             ~loc,
@@ -43,11 +43,14 @@ let createMakeFn = (~loc, ~classNameValue) =>
             Some(
               Exp.tuple(
                 ~loc,
-                [Exp.ident(~loc, {txt: Lident("children"), loc})],
-              ),
-            ),
-          ),
-        ), */
+                [
+                  Exp.ident(~loc, {txt: Lident("children"), loc}),
+                  Exp.construct(~loc, {txt: Lident("[]"), loc}, None)
+                ]
+              )
+            )
+          )
+        )
       ],
     ),
   );
