@@ -51,7 +51,7 @@ let createMakeFn = (~loc, ~classNameValue) =>
             )
           )
         ),
-        (
+        ( /* Last arg is a unit */
           Nolabel,
           Exp.construct(
             ~loc,
