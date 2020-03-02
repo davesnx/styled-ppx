@@ -5,7 +5,7 @@
 node_modules
 /build/
 bs-ppx-css
-*.bs.js
+**/*.bs.js
 dist/
 esy.lock
 .cache
