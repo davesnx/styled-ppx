@@ -1,4 +1,4 @@
-This has the same module API as styled-ppx
+similar module API
 https://github.com/Astrocoders/lenses-ppx/blob/master/packages/ppx/src/LensesPpx.re
 
 jsoo-react ppx
@@ -9,3 +9,6 @@ https://github.com/BuckleScript/bucklescript/blob/master/jscomp/syntax/reactjs_j
 
 bs-emotion ppx
 https://github.com/ahrefs/bs-emotion/blob/master/bs-emotion-ppx/src/EmotionPpx.re
+
+oficial ocaml manual
+https://caml.inria.fr/pub/docs/manual-ocaml/extn.html

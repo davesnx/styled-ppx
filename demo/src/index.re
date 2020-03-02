@@ -1,5 +1,5 @@
 module Component = [%styled {|
-  display: grid;
+  display: flex;
   align-items: center;
   justify-content: center;
   width: 200px;
@@ -9,10 +9,6 @@ module Component = [%styled {|
   border-radius: 2%;
 
   font-size: 24px;
-  /* font-weight: 800; */
-  /* font-weight: bold; */
-  /* font-family: fantasy; */
-  /* text-transform: uppercase; */
 
   /* margin: 10; */
   /* margin: 10px 5px; */
@@ -23,13 +19,8 @@ module Component = [%styled {|
 
   /* box-shadow: 5px 4px #ebebeb; */
 
-  color: #FFFFFF;
-  /* color: white */
-  background-color: #444;
-
   /* transition-property: border-radius; */
   /* transition-duration: 100ms; */
-  transition-timing-function: easeInOut;
 
   /* Ordered list of default properties */
   align-content: normal;
@@ -105,6 +96,7 @@ module Component = [%styled {|
   clip-path: none;
   /* clip-rule: nonzero; */
   color: rgb(255, 255, 255);
+  /* color: white */
   /* color-interpolation: srgb; */
   /* color-interpolation-filters: linearrgb; */
   /* color-rendering: auto; */
@@ -369,6 +361,10 @@ module Component = [%styled {|
   /* -webkit-user-modify: read-only; */
   /* -webkit-border-image: none; */
   /* -webkit-text-orientation: vertical-right; */
+
+  /* &:hover {
+    color: #000000;
+  } */
 |}];
 
 ReactDOMRe.renderToElementWithId(
