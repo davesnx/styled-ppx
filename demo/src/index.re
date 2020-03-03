@@ -369,7 +369,7 @@ module Component = [%styled
 |}
 ];
 
-module StyledComponent = [%styled "opacity: 0"];
+module StyledComponent = [%styled "opacity: 0.9"];
 
 module Emotion = {
   let styles = Emotion.(css([opacity(0.3)]));

@@ -1,27 +1,23 @@
 {
-  "name": "test_bs",
+  "name": "demo",
   "version": "0.0.0",
   "scripts": {
+    "start": "concurrently 'yarn run re:watch' 'parcel src/index.html'",
+    "build": "parcel build src/index.html",
     "prebuild": "yarn run re:clean && yarn run re:build",
     "re:build": "bsb -make-world",
     "re:watch": "bsb -make-world -w",
-    "re:clean": "bsb -clean-world",
-    "test": "jest"
+    "re:clean": "bsb -clean-world"
   },
   "dependencies": {
     "@ahrefs/bs-emotion-ppx": "^1.0.0",
-    "@glennsl/bs-jest": "^0.4.9",
     "bs-platform": "7.0.1",
+    "parcel-bundler": "1.12.4",
     "@ahrefs/bs-emotion": "^1.0.0",
     "bs-emotion": "^0.2.0",
     "concurrently": "^5.1.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "reason-react": "^0.7.0"
-  },
-  "jest": {
-    "testMatch": [
-      "**/src/**/*_test.bs.js"
-    ]
   }
 }
