@@ -1,7 +1,5 @@
 {
   "[reason]": {
-    /* Since css_lexer usese sedlex and when you run refmt you break
-    range between twoo integers */
-    "editor.formatOnSave": false,
+    "editor.formatOnSave": false, /* Since css_lexer usese sedlex and when you run refmt you break range between twoo integers */
   },
 }
