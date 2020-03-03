@@ -1124,7 +1124,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
     let (vs, loc) = d.Declaration.value;
     let arg =
       if (List.length(vs) == 1) {
-        let (v, loc) as c = List.hd(vs);
+        let (v, loc) = List.hd(vs);
         switch (v) {
         | Number(n) =>
           Exp.constant(~loc, Pconst_float(n, None));
