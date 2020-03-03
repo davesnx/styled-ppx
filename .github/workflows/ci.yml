@@ -94,7 +94,7 @@ jobs:
         working-directory: ./test_bs
 
       - name: Build
-        run: yarn build
+        run: yarn re:build
         working-directory: ./test_bs
 
       - name: Run tests
