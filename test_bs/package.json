@@ -2,10 +2,10 @@
   "name": "test_bs",
   "version": "0.0.0",
   "scripts": {
-    "prebuild": "yarn run re:clean && yarn run re:build",
-    "re:build": "bsb -make-world",
-    "re:watch": "bsb -make-world -w",
-    "re:clean": "bsb -clean-world",
+    "prebuild": "yarn run clean && yarn run build",
+    "build": "bsb -make-world",
+    "watch": "bsb -make-world -w",
+    "clean": "bsb -clean-world",
     "test": "jest",
     "start": "yarn test"
   },
