@@ -1,5 +1,4 @@
-module Component = [%styled
-  {|
+module Component = [%styled {|
   display: flex;
   align-items: center;
   justify-content: center;
@@ -122,7 +121,7 @@ module Component = [%styled
   /* dominant-baseline: auto; */
   /* empty-cells: show; */
   fill: rgb(0, 0, 0);
-  fill-opacity: 1;
+  /* fill-opacity: 1; */
   /* fill-rule: nonzero; */
   filter: none;
   flex-basis: auto;
@@ -132,7 +131,7 @@ module Component = [%styled
   flex-wrap: nowrap;
   float: none;
   /* flood-color: rgb(0, 0, 0); */
-  flood-opacity: 1;
+  /* flood-opacity: 1; */
   /* font-family: Times; */
   /* font-feature-settings: normal; */
   font-kerning: auto;
@@ -199,7 +198,7 @@ module Component = [%styled
   /* offset-distance: 0px; */
   /* offset-path: none; */
   /* offset-rotate: auto 0deg; */
-  opacity: 1;
+  /* opacity: 1; */
   /* order: 0; */
   /* orphans: 2; */
   outline-color: rgb(255, 255, 255);
@@ -259,14 +258,14 @@ module Component = [%styled
   /* shape-rendering: auto; */
   /* speak: normal; */
   stop-color: rgb(0, 0, 0);
-  stop-opacity: 1;
+  /* stop-opacity: 1; */
   /* stroke: none; */
   /* stroke-dasharray: none; */
   /* stroke-dashoffset: 0px; */
   /* stroke-linecap: butt; */
   /* stroke-linejoin: miter; */
   /* stroke-miterlimit: 4; */
-  stroke-opacity: 1;
+  /* stroke-opacity: 1; */
   stroke-width: 1px;
   /* tab-size: 8; */
   table-layout: auto;
@@ -366,21 +365,11 @@ module Component = [%styled
   /* &:hover {
     color: #000000;
   } */
-|}
-];
-
-module StyledComponent = [%styled "opacity: 0.9"];
-
-module Emotion = {
-  let styles = Emotion.(css([opacity(0.3)]));
-  [@react.component]
-  let make = (~children) => <div className=styles> children </div>;
-};
+|}];
 
 ReactDOMRe.renderToElementWithId(
-  <>
-    <StyledComponent> {React.string("React API")} </StyledComponent>
-    <Emotion> {React.string("React API")} </Emotion>
-  </>,
-  "app",
+  <Component>
+    {React.string("React API")}
+  </Component>,
+  "app"
 );
