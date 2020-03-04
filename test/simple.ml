@@ -1,4 +1,4 @@
-module Component = [%styled ("display: block")]
+module Component = [%styled ("z-index: 100")]
 
 (*
 

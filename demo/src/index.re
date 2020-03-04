@@ -367,9 +367,20 @@ module Component = [%styled {|
   } */
 |}];
 
+/* module M = [%styled "z-index: 100"]; */
+
+module M = {
+  let styled = Emotion.(css([zIndex(1000)]));
+  [@react.component]
+  let make = (~children) => <div className=styled> children </div>;
+};
+
 ReactDOMRe.renderToElementWithId(
   <Component>
     {React.string("React API")}
+    <M>
+      {React.string("zindexxx")}
+    </M>
   </Component>,
   "app"
 );

@@ -1006,10 +1006,9 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
       if (List.length(vs) == 1) {
         let (v, loc) as c = List.hd(vs);
         switch (v) {
-        | Ident(_) => rcv(c)
-        | Number(_) =>
-          let ident = Exp.ident(~loc=name_loc, {txt: Lident("int"), loc});
-          Exp.apply(~loc, ident, [(Nolabel, rcv(c))]);
+        /* | Ident(_) => rcv(c) */
+        | Number(n) =>
+          Exp.constant(~loc, Pconst_integer(n, None));
         | _ => grammar_error(loc, "Unexpected z-index value")
         };
       } else {
