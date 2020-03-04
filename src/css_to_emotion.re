@@ -1107,9 +1107,8 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   let render_margin_padding = () => {
     let (vs, _) = d.Declaration.value;
     let parameter_count = List.length(vs);
-    let fnNameN = parameter_count > 1
-      ? fnName ++ string_of_int(parameter_count)
-      : fnName;
+    let fnNameN =
+      parameter_count > 1 ? fnName ++ string_of_int(parameter_count) : fnName;
 
     let ident =
       Exp.ident(~loc=name_loc, {txt: Lident(fnNameN), loc: name_loc});
@@ -1153,9 +1152,15 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   | "font-weight" => render_font_weight()
   | "padding"
   | "margin" => render_margin_padding()
-  | "background-position"
-  /* | "transform-origin" => render_margin_padding()
-     | "flex" => render_margin_padding() */
+  /* | "background-position"
+     | "transform-origin" => render_margin_padding()
+     | "flex" => render_margin_padding()  */
+
+/* border-top-right-radius
+   border-top-left-radius
+   border-bottom-right-radius
+   border-bottom-left-radius
+*/
   | "border"
   | "outline" when List.length(fst(d.Declaration.value)) == 2 =>
     render_border_outline()
