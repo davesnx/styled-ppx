@@ -28,71 +28,71 @@ let split = (c, s) => {
 };
 
 /* https://github.com/ahrefs/bs-emotion/blob/master/bs-emotion/src/Emotion.rei#L68 */
-let is_variant = (ident) =>
-    switch (ident) {
-    /* float/clear/text-align */
-    | "left"
-    | "right"
-    | "justify"
-    /* cursor */
-    | "pointer"
-    | "alias"
-    | "all-scroll"
-    | "cell"
-    | "context-menu"
-    | "default"
-    | "crosshair"
-    | "copy"
-    | "grab"
-    | "grabbing"
-    | "help"
-    | "move"
-    | "not-allowed"
-    | "progress"
-    | "text"
-    | "wait"
-    | "zoom-in"
-    | "zoom-out"
-    /* list-style-type */
-    | "disc"
-    | "circle"
-    | "decimal"
-    | "lower-alpha"
-    | "upper-alpha"
-    | "lower-greek"
-    | "upper-greek"
-    | "lower-latin"
-    | "upper-latin"
-    | "lower-roman"
-    | "upper-roman"
-    /* outline-style */
-    | "groove"
-    | "ridge"
-    | "inset"
-    | "outset"
-    /* transform-style */
-    | "preserve-3d"
-    | "flat"
-    /* font-variant */
-    | "small-caps"
-    /* step-timing-function */
-    | "start"
-    | "end"
-    /* display */
-    | "block"
-    | "flex"
-    | "inline-flex"
-    /* font-weight */
-    | "thin"
-    | "extra-light"
-    | "light"
-    | "medium"
-    | "semi-bold"
-    | "bold"
-    | "extra-bold"
-    | "lighter"
-    | "bolder" => true
-    | _ => false
+let is_variant = ident =>
+  switch (ident) {
+  /* float/clear/text-align */
+  | "left"
+  | "right"
+  | "justify"
+  /* cursor */
+  | "pointer"
+  | "alias"
+  | "all-scroll"
+  | "cell"
+  | "context-menu"
+  | "default"
+  | "crosshair"
+  | "copy"
+  | "grab"
+  | "grabbing"
+  | "help"
+  | "move"
+  | "not-allowed"
+  | "progress"
+  | "text"
+  | "wait"
+  | "zoom-in"
+  | "zoom-out"
+  /* list-style-type */
+  | "disc"
+  | "circle"
+  | "decimal"
+  | "lower-alpha"
+  | "upper-alpha"
+  | "lower-greek"
+  | "upper-greek"
+  | "lower-latin"
+  | "upper-latin"
+  | "lower-roman"
+  | "upper-roman"
+  /* outline-style */
+  | "groove"
+  | "ridge"
+  | "inset"
+  | "outset"
+  /* transform-style */
+  | "preserve-3d"
+  | "flat"
+  /* font-variant */
+  | "small-caps"
+  /* step-timing-function */
+  | "start"
+  | "end"
+  /* display */
+  | "block"
+  | "flex"
+  | "inline-flex"
+  /* font-weight */
+  | "thin"
+  | "extra-light"
+  | "light"
+  | "medium"
+  | "semi-bold"
+  | "bold"
+  | "extra-bold"
+  | "lighter"
+  | "bolder" => true
+  | _ => false
   };
 
 let to_caml_case = s => {
@@ -197,13 +197,13 @@ let is_timing_function = component_value =>
     | Ident("ease-in")
     | Ident("ease-out")
     | Ident("ease-in-out")
-    | Function((("cubic-bezier", _)), _)
+    | Function(("cubic-bezier", _), _)
     /* step-timing-function */
     | Ident("step-start")
     | Ident("step-end")
-    | Function((("steps", _)), _)
+    | Function(("steps", _), _)
     /* frames-timing-function */
-    | Function((("frames", _)), _) => true
+    | Function(("frames", _), _) => true
     | _ => false
     }
   );
@@ -212,7 +212,7 @@ let is_animation_iteration_count = component_value =>
   Component_value.(
     switch (component_value) {
     | Ident("infinite")
-    | Function((("count", _)), _) => true
+    | Function(("count", _), _) => true
     | _ => false
     }
   );
@@ -277,10 +277,10 @@ let is_length = component_value =>
 let is_color = component_value =>
   Component_value.(
     switch (component_value) {
-    | Function((("rgb", _)), _)
-    | Function((("rgba", _)), _)
-    | Function((("hsl", _)), _)
-    | Function((("hsla", _)), _)
+    | Function(("rgb", _), _)
+    | Function(("rgba", _), _)
+    | Function(("hsl", _), _)
+    | Function(("hsla", _), _)
     | Hash(_)
     | Ident(_) => true
     | _ => false
@@ -322,7 +322,8 @@ let is_line_style = component_value =>
     }
   );
 
-let rec render_component_value = ((cv, loc): with_loc(Component_value.t)): expression => {
+let rec render_component_value =
+        ((cv, loc): with_loc(Component_value.t)): expression => {
   let render_block = (start_char, _, _) =>
     grammar_error(loc, "Unsupported " ++ start_char ++ "-block");
 
@@ -411,12 +412,7 @@ let rec render_component_value = ((cv, loc): with_loc(Component_value.t)): expre
       | "repeating-linear-gradient" =>
         let (side_or_corner, color_stop_params) =
           switch (List.hd(grouped_params)) {
-          | (
-              [
-                (Float_dimension((_, "deg", Angle)), _) as cv,
-              ],
-              _,
-            ) => (
+          | ([(Float_dimension((_, "deg", Angle)), _) as cv], _) => (
               rcv(cv),
               List.tl(grouped_params),
             )
@@ -551,8 +547,7 @@ let rec render_component_value = ((cv, loc): with_loc(Component_value.t)): expre
   | Bracket_block(cs) => render_block("[", "]", cs)
   | Percentage(p) =>
     let ident = Exp.ident(~loc, {txt: Lident("pct"), loc});
-    let const = float_to_const(p);
-    let arg = Exp.constant(~loc, const);
+    let arg = Exp.constant(~loc, float_to_const(p));
     Exp.apply(~loc, ident, [(Nolabel, arg)]);
   | Ident(i) =>
     let name = to_caml_case(i);
@@ -582,15 +577,15 @@ let rec render_component_value = ((cv, loc): with_loc(Component_value.t)): expre
   | Function(f, params) => render_function(f, params)
   | Float_dimension((number, "ms", Time)) =>
     /* bs-css expects milliseconds as an int constant */
-    let const = Const.integer(number);
-    Exp.constant(~loc, const);
+    Exp.constant(~loc, Const.integer(number))
   | Float_dimension((number, dimension, _)) =>
-    let const = switch (dimension) {
+    let const =
+      switch (dimension) {
       | "px"
       | "pt"
-      | "ms" =>  Const.integer(number);
+      | "ms" => Const.integer(number)
       | _ => float_to_const(number)
-    };
+      };
     render_dimension(number, dimension, const);
   | Dimension((number, dimension)) =>
     let const = number_to_const(number);
@@ -626,8 +621,7 @@ and render_at_rule = (ar: At_rule.t): expression =>
                 | (_, loc) =>
                   grammar_error(loc, "Unexpected @keyframes prelude")
                 };
-              let block_expr =
-                render_declaration_list(sr.Style_rule.block);
+              let block_expr = render_declaration_list(sr.Style_rule.block);
               let tuple =
                 Exp.tuple(
                   ~loc=sr.Style_rule.loc,
@@ -663,8 +657,7 @@ and render_at_rule = (ar: At_rule.t): expression =>
   | (n, _) =>
     grammar_error(ar.At_rule.loc, "At-rule @" ++ n ++ " not supported")
   }
-and render_declaration =
-    (d: Declaration.t, d_loc: Location.t): expression => {
+and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   open Component_value;
   let rcv = render_component_value;
   let (name, name_loc) = d.Declaration.name;
@@ -674,10 +667,7 @@ and render_declaration =
     let animation_ident =
       Exp.ident(
         ~loc=name_loc,
-        {
-          txt: Ldot(Lident("Animation"), "shorthand"),
-          loc: name_loc,
-        },
+        {txt: Ldot(Lident("Animation"), "shorthand"), loc: name_loc},
       );
     let animation_args = ((grouped_param, _)) =>
       List.fold_left(
@@ -798,7 +788,8 @@ and render_declaration =
         grammar_error(loc, "Unexpected box-shadow value");
       };
 
-    let box_shadow_ident = Exp.ident(~loc=name_loc, {txt: Lident("shadow"), loc: name_loc});
+    let box_shadow_ident =
+      Exp.ident(~loc=name_loc, {txt: Lident("shadow"), loc: name_loc});
     let box_shadow_args = ((grouped_param, _)) =>
       List.fold_left(box_shadow_args, [], grouped_param);
 
@@ -864,10 +855,7 @@ and render_declaration =
     let text_shadow_ident =
       Exp.ident(
         ~loc=name_loc,
-        {
-          txt: Ldot(Lident("Shadow"), "text"),
-          loc: name_loc,
-        },
+        {txt: Ldot(Lident("Shadow"), "text"), loc: name_loc},
       );
     let text_shadow_args = ((grouped_param, _)) =>
       List.fold_left(text_shadow_args, [], grouped_param);
@@ -891,10 +879,7 @@ and render_declaration =
     let transition_ident =
       Exp.ident(
         ~loc=name_loc,
-        {
-          txt: Ldot(Lident("Transition"), "shorthand"),
-          loc: name_loc,
-        },
+        {txt: Ldot(Lident("Transition"), "shorthand"), loc: name_loc},
       );
     let render_property = (property, loc) =>
       Exp.constant(~loc, Const.string(property));
@@ -975,44 +960,44 @@ and render_declaration =
 
   let render_font_family = () => {
     let (vs, loc) = d.Declaration.value;
-      let font_family_args = ((params, _)) => {
-        let s =
-          List.fold_left(
-            (s, (v, loc)) =>
-              switch (v) {
-              | Ident(x)
-              | String(x) =>
-                s
-                ++ (
-                  if (String.length(s) > 0) {
-                    " ";
-                  } else {
-                    "";
-                  }
-                )
-                ++ x
-              | _ => grammar_error(loc, "Unexpected font-family value")
-              },
-            "",
-            params,
-          );
-
-        rcv((String(s), loc));
-      };
-
-      let grouped_params = group_params(vs);
-      let args =
-        List.rev_map(params => font_family_args(params), grouped_params);
-      let ident =
-        Exp.ident(
-          ~loc=name_loc,
-          {txt: Lident("fontFamilies"), loc: name_loc},
+    let font_family_args = ((params, _)) => {
+      let s =
+        List.fold_left(
+          (s, (v, loc)) =>
+            switch (v) {
+            | Ident(x)
+            | String(x) =>
+              s
+              ++ (
+                if (String.length(s) > 0) {
+                  " ";
+                } else {
+                  "";
+                }
+              )
+              ++ x
+            | _ => grammar_error(loc, "Unexpected font-family value")
+            },
+          "",
+          params,
         );
-      Exp.apply(
+
+      rcv((String(s), loc));
+    };
+
+    let grouped_params = group_params(vs);
+    let args =
+      List.rev_map(params => font_family_args(params), grouped_params);
+    let ident =
+      Exp.ident(
         ~loc=name_loc,
-        ident,
-        [(Nolabel, list_to_expr(name_loc, args))],
+        {txt: Lident("fontFamilies"), loc: name_loc},
       );
+    Exp.apply(
+      ~loc=name_loc,
+      ident,
+      [(Nolabel, list_to_expr(name_loc, args))],
+    );
   };
 
   let render_z_index = () => {
@@ -1135,6 +1120,25 @@ and render_declaration =
     );
   };
 
+  let render_opacity = () => {
+    let (vs, loc) = d.Declaration.value;
+    let arg =
+      if (List.length(vs) == 1) {
+        let (v, loc) = List.hd(vs);
+        switch (v) {
+        | Number(n) =>
+          Exp.constant(~loc, Pconst_float(n, None));
+        | _ => grammar_error(loc, "Unexpected opacity value")
+        };
+      } else {
+        grammar_error(loc, "opacity should have a single value");
+      };
+
+    let ident =
+      Exp.ident(~loc=name_loc, {txt: Lident("opacity"), loc: name_loc});
+    Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
+  };
+
   switch (name) {
   | "animation" => render_animation()
   | "box-shadow" => render_box_shadow()
@@ -1143,6 +1147,11 @@ and render_declaration =
   | "transition" => render_transition()
   | "font-family" => render_font_family()
   | "z-index" => render_z_index()
+  | "stroke-opacity"
+  | "stop-opacity"
+  | "flood-opacity"
+  | "fill-opacity"
+  | "opacity" => render_opacity()
   | "flex-grow"
   | "flex-shrink" => render_flex_grow_shrink()
   | "font-weight" => render_font_weight()
@@ -1162,13 +1171,12 @@ and render_declaration =
   | "border-top-right-radius"
   | "border-top-left-radius"
   | "border-bottom-right-radius"
-  | "border-bottom-left-radius"  =>
+  | "border-bottom-left-radius" =>
     render_with_labels([((2, 0), "v"), ((2, 1), "h")])
   | "background-position"
-  | "transform-origin"  =>
+  | "transform-origin" =>
     render_with_labels([((2, 0), "h"), ((2, 1), "v")])
-  | "flex"  =>
-    render_with_labels([((3, 0), "grow"), ((3, 1), "shrink")])
+  | "flex" => render_with_labels([((3, 0), "grow"), ((3, 1), "shrink")])
   | "border"
   | "outline" when List.length(fst(d.Declaration.value)) == 2 =>
     render_border_outline()
@@ -1186,18 +1194,14 @@ and render_declarations =
       },
     ds,
   )
-and render_declaration_list =
-    ((dl, loc): Declaration_list.t): expression => {
+and render_declaration_list = ((dl, loc): Declaration_list.t): expression => {
   let expr_with_loc_list = render_declarations(dl);
   let styleExpression = list_to_expr(loc, expr_with_loc_list);
-  let ident =
-    Exp.ident(
-      ~loc,
-      {txt: Lident("css"), loc},
-    );
+  let ident = Exp.ident(~loc, {txt: Lident("css"), loc});
 
   let cssFunc = Exp.apply(~loc, ident, [(Nolabel, styleExpression)]);
-  let styled_defintion = Exp.open_(~loc, Fresh, {txt: Lident("Emotion"), loc}, cssFunc);
+  let styled_defintion =
+    Exp.open_(~loc, Fresh, {txt: Lident("Emotion"), loc}, cssFunc);
 
   styled_defintion;
 }

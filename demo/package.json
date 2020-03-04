@@ -2,26 +2,17 @@
   "name": "demo",
   "version": "0.0.0",
   "scripts": {
-    "start": "concurrently 'parcel src/index.html' 'yarn run re:watch'",
+    "start": "concurrently 'yarn run re:watch' 'parcel src/index.html'",
     "build": "parcel build src/index.html",
-    "prebuild": "yarn run clean:dist && yarn run re:clean && yarn run re:build",
+    "prebuild": "yarn run re:clean && yarn run re:build",
     "re:build": "bsb -make-world",
     "re:watch": "bsb -make-world -w",
-    "re:clean": "bsb -clean-world",
-    "test": "jest"
-  },
-  "devDependencies": {
-    "@ahrefs/bs-emotion-ppx": "^1.0.0",
-    "@glennsl/bs-jest": "^0.4.9",
-    "bs-platform": "7.0.1",
-    "parcel-bundler": "1.12.4"
-  },
-  "jest": {
-    "testMatch": [
-      "./__tests__/**"
-    ]
+    "re:clean": "bsb -clean-world"
   },
   "dependencies": {
+    "@ahrefs/bs-emotion-ppx": "^1.0.0",
+    "bs-platform": "7.0.1",
+    "parcel-bundler": "1.12.4",
     "@ahrefs/bs-emotion": "^1.0.0",
     "bs-emotion": "^0.2.0",
     "concurrently": "^5.1.0",

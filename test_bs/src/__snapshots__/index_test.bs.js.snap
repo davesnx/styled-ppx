@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Component renders 1`] = `
+<div>
+  <div
+    class="css-cyc7w5"
+  >
+    <h1>
+      Heading
+    </h1>
+  </div>
+</div>
+`;

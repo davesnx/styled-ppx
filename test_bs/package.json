@@ -1,0 +1,29 @@
+{
+  "name": "test_bs",
+  "version": "0.0.0",
+  "scripts": {
+    "build": "bsb -make-world",
+    "watch": "bsb -make-world -w",
+    "clean": "bsb -clean-world",
+    "test": "jest",
+    "start": "yarn test"
+  },
+  "dependencies": {
+    "@ahrefs/bs-emotion": "^1.0.0",
+    "@ahrefs/bs-emotion-ppx": "^1.0.0",
+    "@glennsl/bs-jest": "^0.4.10",
+    "bs-emotion": "^0.2.0",
+    "bs-platform": "7.0.1",
+    "bs-react-testing-library": "^0.6.0",
+    "concurrently": "^5.1.0",
+    "jest": "^25.1.0",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "reason-react": "^0.7.0"
+  },
+  "jest": {
+    "testMatch": [
+      "**/src/**/*_test.bs.js"
+    ]
+  }
+}

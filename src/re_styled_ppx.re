@@ -6,7 +6,7 @@ open Parsetree;
 open Ast_helper;
 open Longident;
 
-let styleVariableName = "styles";
+let styleVariableName = "styled";
 
 /* let styles = Emotion.(css(exp)) */
 let createStyles = (loc, name, exp) => {

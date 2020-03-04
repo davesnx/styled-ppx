@@ -6,9 +6,7 @@ const fs = require("fs");
 
 const platform = process.platform;
 
-const binariesToCopy = [
-  "re-styled-ppx.exe"
-];
+const binariesToCopy = ["re-styled-ppx.exe"];
 
 function find_arch() {
   // The running binary is 64-bit, so the OS is clearly 64-bit.
@@ -27,8 +25,10 @@ function find_arch() {
   if (process.platform === "win32") {
     var useEnv = false;
     try {
-      useEnv = !!(process.env.SYSTEMROOT && fs.statSync(process.env.SYSTEMROOT));
-    } catch (err) { }
+      useEnv = !!(
+        process.env.SYSTEMROOT && fs.statSync(process.env.SYSTEMROOT)
+      );
+    } catch (err) {}
 
     const sysRoot = useEnv ? process.env.SYSTEMROOT : "C:\\Windows";
 
@@ -36,7 +36,7 @@ function find_arch() {
     const isWOW64 = false;
     try {
       isWOW64 = !!fs.statSync(path.join(sysRoot, "sysnative"));
-    } catch (err) { }
+    } catch (err) {}
 
     return isWOW64 ? "x64" : "x86";
   }

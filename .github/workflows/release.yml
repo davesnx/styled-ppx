@@ -62,7 +62,7 @@ jobs:
           # from https://stackoverflow.com/a/24848739/617787
           s=$(pwd); d=$(dirname $(esy x which re-styled-ppx.exe));
           while [ "${d#$s/}" == "${d}" ]
-          do s=$(dirname $s);b="../${b}"; done; 
+          do s=$(dirname $s);b="../${b}"; done;
           ESY__BINARY_PATH=${b}${d#$s/}/re-styled-ppx.exe
           echo "ESY__BINARY_PATH: $ESY__BINARY_PATH"
           echo "##[set-output name=path;]$ESY__BINARY_PATH"
@@ -131,7 +131,7 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload re-styled-ppx-darwin-x64.zip to Github release 
+      - name: Upload re-styled-ppx-darwin-x64.zip to Github release
         uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -141,7 +141,7 @@ jobs:
           asset_name: re-styled-ppx-darwin-x64.zip
           asset_content_type: application/gzip
 
-      - name: Upload re-styled-ppx-linux-x64.zip to Github release 
+      - name: Upload re-styled-ppx-linux-x64.zip to Github release
         uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -151,7 +151,7 @@ jobs:
           asset_name: re-styled-ppx-linux-x64.zip
           asset_content_type: application/gzip
 
-      # - name: Upload re-styled-ppx-windows-x64.zip to Github release 
+      # - name: Upload re-styled-ppx-windows-x64.zip to Github release
       #   uses: actions/upload-release-asset@v1.0.1
       #   env:
       #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -161,12 +161,12 @@ jobs:
       #     asset_name: re-styled-ppx-windows-x64.zip
       #     asset_content_type: application/gzip
 
-      - name: Publish NPM package
-        run: |
-          npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
-          npm config set scope "@{{ npm_username }}"
-          npm config list
-          npm publish --access public
-        working-directory: ./_release
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      # - name: Publish NPM package
+      #  run: |
+      #    npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
+      #    npm config set scope "@{{ npm_username }}"
+      #    npm config list
+      #    npm publish --access public
+      #  working-directory: ./_release
+      #  env:
+      #    NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}

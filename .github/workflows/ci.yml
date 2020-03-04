@@ -76,12 +76,12 @@ jobs:
         uses: actions/cache@v1
         id: cache
         with:
-          path: test_bs/_export
-          key: test_bs-${{ runner.OS }}-build-${{ hashFiles('test_bs/esy.lock/index.json') }}
+          path: _export
+          key: ${{ runner.OS }}-build-${{ hashFiles('esy.lock/index.json') }}
           restore-keys: |
-            test_bs-${{ runner.OS }}-build-${{ env.cache-name }}-
-            test_bs-${{ runner.OS }}-build-
-            test_bs-${{ runner.OS }}-
+            ${{ runner.OS }}-build-${{ env.cache-name }}-
+            ${{ runner.OS }}-build-
+            ${{ runner.OS }}-
 
       - name: Install esy
         run: npm install -g esy@latest
@@ -89,24 +89,38 @@ jobs:
       - name: Import dependencies
         if: steps.cache.outputs.cache-hit == 'true'
         run: esy import-build _export/*
-        working-directory: ./test_bs
 
-      - name: Install Esy dependencies
+      - name: Install dependencies
         run: esy install
-        working-directory: ./test_bs
 
-      - name: Build Esy
+      - name: Build
         run: esy build
-        working-directory: ./test_bs
 
-      - name: Install NPM dependencies
-        run: yarn install
+      # - name: Cache node modules
+      #   uses: actions/cache@v1
+      #   env:
+      #     cache-name: cache-node-modules
+      #   with:
+      #     path: ~/.yarn-cache
+      #     key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-build-${{ env.cache-name }}-
+      #       ${{ runner.os }}-build-
+      #       ${{ runner.os }}-
+
+      # - name: Import dependencies
+      #   if: steps.cache.outputs.cache-hit == 'true'
+      #   run: esy import-build _export/*
+      #   working-directory: ./test_bs
+
+      - name: Install Yarn dependencies
+        run: yarn
         working-directory: ./test_bs
 
       - name: Build
         run: yarn build
         working-directory: ./test_bs
 
-      - name: Export dependencies
-        run: esy export-dependencies
+      - name: Run tests
+        run: yarn test
         working-directory: ./test_bs
