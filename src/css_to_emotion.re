@@ -661,6 +661,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   open Component_value;
   let rcv = render_component_value;
   let (name, name_loc) = d.Declaration.name;
+  let fnName = to_caml_case(name);
 
   /* https://developer.mozilla.org/en-US/docs/Web/CSS/animation */
   let render_animation = () => {
@@ -1016,12 +1017,32 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
       };
 
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Lident("zIndex"), loc: name_loc});
+      Exp.ident(~loc=name_loc, {txt: Lident(fnName), loc: name_loc});
     Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
   };
 
+/*  TODO: Initial abstraction over custom-renders
+
+    let renderHoF = (value, name, number_to_exp) => {
+    let fnName = to_caml_case(name);
+    let (vs, loc) = value;
+    let arg =
+      if (List.length(vs) == 1) {
+        let (v, loc) = List.hd(vs);
+        switch (v) {
+        | Number(n) => number_to_exp(n)
+        | _ => grammar_error(loc, "Unexpected " ++ name ++ " value")
+        };
+      } else {
+        grammar_error(loc, name ++ " should have a single value");
+      };
+
+    let ident =
+      Exp.ident(~loc=name_loc, {txt: Lident(fnName), loc: name_loc});
+    Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
+  }; */
+
   let render_flex_grow_shrink = () => {
-    let name = to_caml_case(name);
     let (vs, loc) = d.Declaration.value;
     let arg =
       if (List.length(vs) == 1) {
@@ -1035,7 +1056,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
       };
 
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Lident(name), loc: name_loc});
+      Exp.ident(~loc=name_loc, {txt: Lident(fnName), loc: name_loc});
     Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
   };
 
@@ -1054,7 +1075,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
       };
 
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Lident("fontWeight"), loc: name_loc});
+      Exp.ident(~loc=name_loc, {txt: Lident(fnName), loc: name_loc});
     Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
   };
 
@@ -1077,9 +1098,9 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
 
     let (params, loc) = d.Declaration.value;
     let args = border_outline_args(params, loc);
-    let name = to_caml_case(name) ++ "2";
+    let fnName2 = fnName ++ "2";
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Lident(name), loc: name_loc});
+      Exp.ident(~loc=name_loc, {txt: Lident(fnName2), loc: name_loc});
     Exp.apply(ident, args);
   };
 
