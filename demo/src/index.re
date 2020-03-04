@@ -125,7 +125,7 @@ module Component = [%styled {|
   /* fill-rule: nonzero; */
   filter: none;
   flex-basis: auto;
-  flex-direction: row;
+  flex-direction: column;
   flex-grow: 0;
   flex-shrink: 1;
   flex-wrap: nowrap;
@@ -367,17 +367,19 @@ module Component = [%styled {|
   } */
 |}];
 
-/* module M = [%styled "z-index: 100"]; */
+module EM = [%styled {|font-weight: 400;|}];
 
 module M = {
-  let styled = Emotion.(css([zIndex(1000)]));
+  let styled = Emotion.(css([fontWeight(400)]));
   [@react.component]
   let make = (~children) => <div className=styled> children </div>;
 };
 
 ReactDOMRe.renderToElementWithId(
   <Component>
-    {React.string("React API")}
+    <EM>
+      {React.string("React API")}
+    </EM>
     <M>
       {React.string("zindexxx")}
     </M>
