@@ -367,10 +367,13 @@ module Component = [%styled {|
   } */
 |}];
 
-module EM = [%styled {|flex-grow: 1;|}];
+module EM = [%styled {|
+  margin: 10% auto;
+  margin-top: 10%;
+|}];
 
 module M = {
-  let styled = Emotion.(css([flexGrow(1.)]));
+  let styled = Emotion.(css([margin3(px(2), px(2), px(4))]));
   [@react.component]
   let make = (~children) => <div className=styled> children </div>;
 };
