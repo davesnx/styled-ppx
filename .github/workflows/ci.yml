@@ -72,6 +72,30 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Cache esy dependencies
+        uses: actions/cache@v1
+        id: cache
+        with:
+          path: _export
+          key: ${{ runner.OS }}-build-${{ hashFiles('esy.lock/index.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-build-${{ env.cache-name }}-
+            ${{ runner.OS }}-build-
+            ${{ runner.OS }}-
+
+      - name: Install esy
+        run: npm install -g esy@latest
+
+      - name: Import dependencies
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: esy import-build _export/*
+
+      - name: Install dependencies
+        run: esy install
+
+      - name: Build
+        run: esy build
+
       # - name: Cache node modules
       #   uses: actions/cache@v1
       #   env:
