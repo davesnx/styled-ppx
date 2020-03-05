@@ -1038,6 +1038,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
         Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
       }; */
 
+  /* https://developer.mozilla.org/en-US/docs/Web/CSS/flex-grow */
   let render_flex_grow_shrink = () => {
     let (vs, loc) = d.Declaration.value;
     let arg =
@@ -1056,13 +1057,16 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
     Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
   };
 
+  /* https://developer.mozilla.org/en/docs/Web/CSS/font-weight */
   let render_font_weight = () => {
     let (vs, loc) = d.Declaration.value;
     let arg =
-      if (List.length(vs) == 1) {
-        let (v, loc) as c = List.hd(vs);
+      switch (List.length(vs)) {
+      | 0 => grammar_error(loc, "font-weight should have a single value")
+      | _ =>
+        let (v, loc) = List.hd(vs);
         switch (v) {
-        | Ident(_) => rcv(c)
+        /* TODO: Support `normal`, `bold`, `lighter`, `bolder` */
         | Number(n) => Exp.constant(~loc, Pconst_integer(n, None))
         | _ =>
           grammar_error(
@@ -1070,8 +1074,6 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
             "Unexpected font-weight value, expects an integer",
           )
         };
-      } else {
-        grammar_error(loc, "font-weight should have a single value");
       };
 
     let ident =
@@ -1079,6 +1081,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
     Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
   };
 
+  /* https://developer.mozilla.org/en-US/docs/Web/CSS/border */
   let render_border_outline = () => {
     let border_outline_args = (params, _) =>
       List.fold_left(
@@ -1118,20 +1121,59 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
 
   let render_opacity = () => {
     let (vs, loc) = d.Declaration.value;
+
     let arg =
-      if (List.length(vs) == 1) {
+      switch (List.length(vs)) {
+      | 0 => grammar_error(loc, "opacity should have a single value")
+      | _ =>
         let (v, loc) = List.hd(vs);
         switch (v) {
         | Number(n) => Exp.constant(~loc, Pconst_float(n, None))
         | _ => grammar_error(loc, "Unexpected opacity value")
         };
-      } else {
-        grammar_error(loc, "opacity should have a single value");
       };
 
     let ident =
       Exp.ident(~loc=name_loc, {txt: Lident("opacity"), loc: name_loc});
     Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
+  };
+
+  let render_flex = () => {
+    let (vs, loc) = d.Declaration.value;
+
+    let expression =
+      switch (List.length(vs)) {
+      | 0 => grammar_error(loc, "flex should have a single value")
+      /*
+        TODO: Right now bs-css  https://github.com/MinimaHQ/re-css/issues/11
+        | 1 => {
+        let (v, loc) = List.hd(vs);
+        switch (v) {
+          | Number(n) => Exp.constant(~loc, Pconst_float(n, None))
+          | _  => grammar_error(loc, "Unexpected flex value")
+        }} */
+      | _ =>
+        Exp.tuple(~loc, List.map(
+          ((v, loc)) => {
+            switch (v) {
+            | Percentage(_) => rcv((v, loc))
+            | Number(n) => Exp.constant(~loc, Pconst_float(n, None))
+            | _ => rcv((v, loc))
+            /* TODO: Better handling `flex-basis in px and add grammar_error`
+              | _  => grammar_error(loc, "Unexpected flex value") */
+            }
+          },
+          vs,
+        ))
+      };
+
+    let args = [
+      (Nolabel, Exp.variant(~loc, "some", Some(expression))),
+    ];
+
+    let ident =
+      Exp.ident(~loc=name_loc, {txt: Lident(fnName), loc: name_loc});
+    Exp.apply(~loc=name_loc, ident, args);
   };
 
   switch (name) {
@@ -1150,17 +1192,18 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   | "flex-grow"
   | "flex-shrink" => render_flex_grow_shrink()
   | "font-weight" => render_font_weight()
+  | "flex" => render_flex()
   | "padding"
   | "margin" => render_margin_padding()
   /* | "background-position"
      | "transform-origin" => render_margin_padding()
      | "flex" => render_margin_padding()  */
 
-/* border-top-right-radius
-   border-top-left-radius
-   border-bottom-right-radius
-   border-bottom-left-radius
-*/
+  /* border-top-right-radius
+        border-top-left-radius
+        border-bottom-right-radius
+        border-bottom-left-radius
+     */
   | "border"
   | "outline" when List.length(fst(d.Declaration.value)) == 2 =>
     render_border_outline()
