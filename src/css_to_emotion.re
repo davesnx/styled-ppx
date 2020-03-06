@@ -1138,6 +1138,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
     Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
   };
 
+  /* https://developer.mozilla.org/en-US/docs/Web/CSS/flex */
   let render_flex = () => {
     let (vs, loc) = d.Declaration.value;
 
@@ -1195,15 +1196,6 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   | "flex" => render_flex()
   | "padding"
   | "margin" => render_margin_padding()
-  /* | "background-position"
-     | "transform-origin" => render_margin_padding()
-     | "flex" => render_margin_padding()  */
-
-  /* border-top-right-radius
-        border-top-left-radius
-        border-bottom-right-radius
-        border-bottom-left-radius
-     */
   | "border"
   | "outline" when List.length(fst(d.Declaration.value)) == 2 =>
     render_border_outline()

@@ -6,7 +6,7 @@ module Component = [%styled {|
   align-content: normal;
   align-items: center;
   align-self: auto;
-  /* alignment-baseline: auto; */
+  /* alignment-baseline: auto; */ /* bs-motion doesn't support it */
   animation-delay: 0s;
   animation-direction: normal;
   animation-duration: 0s;
@@ -15,7 +15,7 @@ module Component = [%styled {|
   /* animation-name: none; */
   /* animation-play-state: running; */
   animation-timing-function: ease;
-  /* backdrop-filter: none; */
+  /* backdrop-filter: none; */ /* bs-motion doesn't support it */
   /* backface-visibility: visible; */
   /* background-attachment: scroll; */
   background-blend-mode: normal;
@@ -26,31 +26,32 @@ module Component = [%styled {|
   /* background-position-x: 0%; */
   /* background-position-y: 0%; */
   background-size: auto;
-  /* baseline-shift: 0px; */
-  /* block-size: 200px; */
-  /* border-block-end-color: rgb(255, 255, 255); */
-  /* border-block-end-style: none; */
-  /* border-block-end-width: 0px; */
-  /* border-block-start-color: rgb(255, 255, 255); */
-  /* border-block-start-style: none; */
-  /* border-block-start-width: 0px; */
+  /* baseline-shift: 0px; */ /* bs-motion doesn't support it */
+  /* block-size: 200px; */ /* bs-motion doesn't support it */
+  /* border-block-end-color: rgb(255, 255, 255); */ /* bs-motion doesn't support it */
+  /* border-block-end-style: none; */ /* bs-motion doesn't support it */
+  /* border-block-end-width: 0px; */ /* bs-motion doesn't support it */
+  /* border-block-start-color: rgb(255, 255, 255); */ /* bs-motion doesn't support it */
+  /* border-block-start-style: none; */ /* bs-motion doesn't support it */
+  /* border-block-start-width: 0px; */ /* bs-motion doesn't support it */
   border-bottom-color: rgb(255, 255, 255);
   border-bottom-left-radius: 2%;
+  /* border-bottom-left-radius: 5px 2px; */
   border-bottom-right-radius: 2%;
   border-bottom-style: none;
   border-bottom-width: 0px;
   /* border-collapse: separate; */
-  /* border-image-outset: 0px; */
-  /* border-image-repeat: stretch; */
-  /* border-image-slice: 100%; */
-  /* border-image-source: none; */
-  /* border-image-width: 1; */
-  /* border-inline-end-color: rgb(255, 255, 255); */
-  /* border-inline-end-style: none; */
-  /* border-inline-end-width: 0px; */
-  /* border-inline-start-color: rgb(255, 255, 255); */
-  /* border-inline-start-style: none; */
-  /* border-inline-start-width: 0px; */
+  /* border-image-outset: 0px; */ /* bs-motion doesn't support it */
+  /* border-image-repeat: stretch; */ /* bs-motion doesn't support it */
+  /* border-image-slice: 100%; */ /* bs-motion doesn't support it */
+  /* border-image-source: none; */ /* bs-motion doesn't support it */
+  /* border-image-width: 1; */ /* bs-motion doesn't support it */
+  /* border-inline-end-color: rgb(255, 255, 255); */ /* bs-motion doesn't support it */
+  /* border-inline-end-style: none; */ /* bs-motion doesn't support it */
+  /* border-inline-end-width: 0px; */ /* bs-motion doesn't support it */
+  /* border-inline-start-color: rgb(255, 255, 255); */ /* bs-motion doesn't support it */
+  /* border-inline-start-style: none; */ /* bs-motion doesn't support it */
+  /* border-inline-start-width: 0px; */ /* bs-motion doesn't support it */
   border-left-color: rgb(255, 255, 255);
   border-left-style: none;
   border-left-width: 0px;
@@ -66,44 +67,44 @@ module Component = [%styled {|
   bottom: 20px;
   /* box-shadow: none; */
   /* box-sizing: content-box; */
-  /* break-after: auto; */
-  /* break-before: auto; */
-  /* break-inside: auto; */
-  /* buffered-rendering: auto; */
-  /* caption-side: top; */
-  /* caret-color: rgb(255, 255, 255); */
+  /* break-after: auto; */ /* bs-motion doesn't support it */
+  /* break-before: auto; */ /* bs-motion doesn't support it */
+  /* break-inside: auto; */ /* bs-motion doesn't support it */
+  /* buffered-rendering: auto; */ /* bs-motion doesn't support it */
+  /* caption-side: top; */ /* bs-motion doesn't support it */
+  /* caret-color: rgb(255, 255, 255); */ /* bs-motion doesn't support it */
   /* clear: none; */
-  /* clip: auto; */
+  /* clip: auto; */ /* bs-motion doesn't support it */
   clip-path: none;
-  /* clip-rule: nonzero; */
+  /* clip-rule: nonzero; */ /* bs-motion doesn't support it */
   /* color: white */
   color: rgb(255, 255, 255);
-  /* color-interpolation: srgb; */
-  /* color-interpolation-filters: linearrgb; */
-  /* color-rendering: auto; */
-  /* column-count: auto; */
-  /* column-fill: balance; */
-  /* column-gap: normal; */
-  /* column-rule-color: rgb(255, 255, 255); */
-  /* column-rule-style: none; */
-  /* column-rule-width: 0px; */
-  /* column-span: none; */
-  /* column-width: auto; */
-  /* contain: none; */
+  /* color-interpolation: srgb; */ /* bs-motion doesn't support it */
+  /* color-interpolation-filters: linearrgb; */ /* bs-motion doesn't support it */
+  /* color-rendering: auto; */ /* bs-motion doesn't support it */
+  /* column-count: auto; */ /* bs-motion doesn't support it */
+  /* column-fill: balance; */ /* bs-motion doesn't support it */
+  /* column-gap: normal; */ /* bs-motion doesn't support it */
+  /* column-rule-color: rgb(255, 255, 255); */ /* bs-motion doesn't support it */
+  /* column-rule-style: none; */ /* bs-motion doesn't support it */
+  /* column-rule-width: 0px; */ /* bs-motion doesn't support it */
+  /* column-span: none; */ /* bs-motion doesn't support it */
+  /* column-width: auto; */ /* bs-motion doesn't support it */
+  /* contain: none; */ /* bs-motion doesn't support it */
   /* content: normal; */
-  /* counter-increment: none; */
-  /* counter-reset: none; */
+  /* counter-increment: none; */ /* bs-motion doesn't support it */
+  /* counter-reset: none; */ /* bs-motion doesn't support it */
   cursor: auto;
-  /* cx: 0px; */
-  /* cy: 0px; */
-  /* d: none; */
+  /* cx: 0px; */ /* bs-motion doesn't support it */
+  /* cy: 0px; */ /* bs-motion doesn't support it */
+  /* d: none; */ /* bs-motion doesn't support it */
   /* direction: ltr; */
   display: flex;
-  /* dominant-baseline: auto; */
-  /* empty-cells: show; */
+  /* dominant-baseline: auto; */ /* bs-motion doesn't support it */
+  /* empty-cells: show; */ /* bs-motion doesn't support it */
   fill: rgb(0, 0, 0);
-  /* fill-opacity: 1; */
-  /* fill-rule: nonzero; */
+  fill-opacity: 1;
+  /* fill-rule: nonzero; */ /* bs-motion doesn't support it */
   /* flex: 1; */
   /* flex: 1 1; */
   flex: 1 1 100px;
@@ -114,20 +115,20 @@ module Component = [%styled {|
   flex-shrink: 1;
   flex-wrap: nowrap;
   float: none;
-  /* flood-color: rgb(0, 0, 0); */
+  /* flood-color: rgb(0, 0, 0); */ /* bs-motion doesn't support it */
   flood-opacity: 1;
   /* font-family: Times; */
-  /* font-feature-settings: normal; */
+  /* font-feature-settings: normal; */ /* bs-motion doesn't support it */
   font-kerning: auto;
-  /* font-optical-sizing: auto; */
+  /* font-optical-sizing: auto; */ /* bs-motion doesn't support it */
   font-size: 24px;
   /* font-stretch: 100%; */
   font-style: normal;
-  /* font-variant-caps: normal; */
-  /* font-variant-east-asian: normal; */
-  /* font-variant-ligatures: normal; */
-  /* font-variant-numeric: normal; */
-  /* font-variation-settings: normal; */
+  /* font-variant-caps: normal; */ /* bs-motion doesn't support it */
+  /* font-variant-east-asian: normal; */ /* bs-motion doesn't support it */
+  /* font-variant-ligatures: normal; */ /* bs-motion doesn't support it */
+  /* font-variant-numeric: normal; */ /* bs-motion doesn't support it */
+  /* font-variation-settings: normal; */ /* bs-motion doesn't support it */
   font-weight: 400;
   /* font-weight: bold; */
   grid-auto-columns: auto;
@@ -143,25 +144,25 @@ module Component = [%styled {|
   height: 200px;
   height: auto;
   /* hyphens: manual; */
-  /* image-rendering: auto; */
-  /* inline-size: 200px; */
-  /* isolation: auto; */
+  /* image-rendering: auto; */ /* bs-motion doesn't support it */
+  /* inline-size: 200px; */ /* bs-motion doesn't support it */
+  /* isolation: auto; */ /* bs-motion doesn't support it */
   justify-content: center;
   justify-items: normal;
   justify-self: auto;
   left: auto;
   letter-spacing: normal;
-  /* lighting-color: rgb(255, 255, 255); */
-  /* line-break: auto; */
+  /* lighting-color: rgb(255, 255, 255); */ /* bs-motion doesn't support it */
+  /* line-break: auto; */ /* bs-motion doesn't support it */
   line-height: normal;
   list-style-image: none;
   /* list-style-position: outside; */
   list-style-type: disc;
-  /* margin-block-end: 5px; */
-  /* margin-block-start: 5px; */
+  /* margin-block-end: 5px; */ /* bs-motion doesn't support it */
+  /* margin-block-start: 5px; */ /* bs-motion doesn't support it */
   margin-bottom: 5px;
-  /* margin-inline-end: 5px; */
-  /* margin-inline-start: 5px; */
+  /* margin-inline-end: 5px; */ /* bs-motion doesn't support it */
+  /* margin-inline-start: 5px; */ /* bs-motion doesn't support it */
   margin-left: 5px;
   margin-right: 5px;
   margin-top: 5px;
@@ -169,44 +170,44 @@ module Component = [%styled {|
   margin: 10px 5px;
   margin: 10px 5px 10px;
   margin: 5px;
-  /* marker-end: none; */
-  /* marker-mid: none; */
-  /* marker-start: none; */
-  /* mask: none; */
-  /* mask-type: luminance; */
-  /* max-block-size: none; */
+  /* marker-end: none; */ /* bs-motion doesn't support it */
+  /* marker-mid: none; */ /* bs-motion doesn't support it */
+  /* marker-start: none; */ /* bs-motion doesn't support it */
+  /* mask: none; */ /* bs-motion doesn't support it */
+  /* mask-type: luminance; */ /* bs-motion doesn't support it */
+  /* max-block-size: none; */ /* bs-motion doesn't support it */
   max-height: none;
-  /* max-inline-size: none; */
+  /* max-inline-size: none; */ /* bs-motion doesn't support it */
   max-width: none;
-  /* min-block-size: 0px; */
+  /* min-block-size: 0px; */ /* bs-motion doesn't support it */
   min-height: 0px;
-  /* min-inline-size: 0px; */
+  /* min-inline-size: 0px; */ /* bs-motion doesn't support it */
   min-width: 0px;
-  /* mix-blend-mode: normal; */
-  /* object-fit: fill; */
-  /* object-position: 50% 50%; */
-  /* offset-distance: 0px; */
-  /* offset-path: none; */
-  /* offset-rotate: auto 0deg; */
+  /* mix-blend-mode: normal; */ /* bs-motion doesn't support it */
+  /* object-fit: fill; */ /* bs-motion doesn't support it */
+  /* object-position: 50% 50%; */ /* bs-motion doesn't support it */
+  /* offset-distance: 0px; */ /* bs-motion doesn't support it */
+  /* offset-path: none; */ /* bs-motion doesn't support it */
+  /* offset-rotate: auto 0deg; */ /* bs-motion doesn't support it */
   opacity: 1;
   /* order: 0; */
-  /* orphans: 2; */
+  /* orphans: 2; */ /* bs-motion doesn't support it */
   outline-color: rgb(255, 255, 255);
   outline-offset: 0px;
   outline-style: none;
   outline-width: 0px;
-  /* overflow-anchor: auto; */
+  /* overflow-anchor: auto; */ /* bs-motion doesn't support it */
   overflow-wrap: normal;
   /* overflow-x: visible; */
   /* overflow-y: visible; */
-  /* overscroll-behavior-block: auto; */
-  /* overscroll-behavior-inline: auto; */
-  /* overscroll-behavior-x: auto; */
-  /* overscroll-behavior-y: auto; */
-  /* padding-block-end: 2px; */
-  /* padding-block-start: 2px; */
-  /* padding-inline-end: 5px; */
-  /* padding-inline-start: 5px; */
+  /* overscroll-behavior-block: auto; */ /* bs-motion doesn't support it */
+  /* overscroll-behavior-inline: auto; */ /* bs-motion doesn't support it */
+  /* overscroll-behavior-x: auto; */ /* bs-motion doesn't support it */
+  /* overscroll-behavior-y: auto; */ /* bs-motion doesn't support it */
+  /* padding-block-end: 2px; */ /* bs-motion doesn't support it */
+  /* padding-block-start: 2px; */ /* bs-motion doesn't support it */
+  /* padding-inline-end: 5px; */ /* bs-motion doesn't support it */
+  /* padding-inline-start: 5px; */ /* bs-motion doesn't support it */
   padding-left: 5px;
   padding-right: 5px;
   padding-top: 2px;
@@ -215,97 +216,99 @@ module Component = [%styled {|
   padding: 5px 10px 5px;
   padding: 5px 10px 5px 3px;
   padding: 5px;
-  /* paint-order: normal; */
+  /* paint-order: normal; */ /* bs-motion doesn't support it */
   perspective: none;
   perspective-origin: 105px 102px;
   pointer-events: auto;
   position: static;
-  /* r: 0px; */
-  /* resize: none; */
+  /* r: 0px; */ /* bs-motion doesn't support it */
+  /* resize: none; */ /* bs-motion doesn't support it */
   right: auto;
-  /* row-gap: normal; */
-  /* rx: auto; */
-  /* ry: auto; */
-  /* scroll-behavior: auto; */
-  /* scroll-margin-block-end: 0px; */
-  /* scroll-margin-block-start: 0px; */
-  /* scroll-margin-bottom: 0px; */
-  /* scroll-margin-inline-end: 0px; */
-  /* scroll-margin-inline-start: 0px; */
-  /* scroll-margin-left: 0px; */
-  /* scroll-margin-right: 0px; */
-  /* scroll-margin-top: 0px; */
-  /* scroll-padding-block-end: auto; */
-  /* scroll-padding-block-start: auto; */
-  /* scroll-padding-bottom: auto; */
-  /* scroll-padding-inline-end: auto; */
-  /* scroll-padding-inline-start: auto; */
-  /* scroll-padding-left: auto; */
-  /* scroll-padding-right: auto; */
-  /* scroll-padding-top: auto; */
-  /* scroll-snap-align: none; */
-  /* scroll-snap-stop: normal; */
-  /* scroll-snap-type: none; */
-  /* shape-image-threshold: 0; */
-  /* shape-margin: 0px; */
-  /* shape-outside: none; */
-  /* shape-rendering: auto; */
-  /* speak: normal; */
+  /* row-gap: normal; */ /* bs-motion doesn't support it */
+  /* rx: auto; */ /* bs-motion doesn't support it */
+  /* ry: auto; */ /* bs-motion doesn't support it */
+  /* scroll-behavior: auto; */ /* bs-motion doesn't support it */
+  /* scroll-margin-block-end: 0px; */ /* bs-motion doesn't support it */
+  /* scroll-margin-block-start: 0px; */ /* bs-motion doesn't support it */
+  /* scroll-margin-bottom: 0px; */ /* bs-motion doesn't support it */
+  /* scroll-margin-inline-end: 0px; */ /* bs-motion doesn't support it */
+  /* scroll-margin-inline-start: 0px; */ /* bs-motion doesn't support it */
+  /* scroll-margin-left: 0px; */ /* bs-motion doesn't support it */
+  /* scroll-margin-right: 0px; */ /* bs-motion doesn't support it */
+  /* scroll-margin-top: 0px; */ /* bs-motion doesn't support it */
+  /* scroll-padding-block-end: auto; */ /* bs-motion doesn't support it */
+  /* scroll-padding-block-start: auto; */ /* bs-motion doesn't support it */
+  /* scroll-padding-bottom: auto; */ /* bs-motion doesn't support it */
+  /* scroll-padding-inline-end: auto; */ /* bs-motion doesn't support it */
+  /* scroll-padding-inline-start: auto; */ /* bs-motion doesn't support it */
+  /* scroll-padding-left: auto; */ /* bs-motion doesn't support it */
+  /* scroll-padding-right: auto; */ /* bs-motion doesn't support it */
+  /* scroll-padding-top: auto; */ /* bs-motion doesn't support it */
+  /* scroll-snap-align: none; */ /* bs-motion doesn't support it */
+  /* scroll-snap-stop: normal; */ /* bs-motion doesn't support it */
+  /* scroll-snap-type: none; */ /* bs-motion doesn't support it */
+  /* shape-image-threshold: 0; */ /* bs-motion doesn't support it */
+  /* shape-margin: 0px; */ /* bs-motion doesn't support it */
+  /* shape-outside: none; */ /* bs-motion doesn't support it */
+  /* shape-rendering: auto; */ /* bs-motion doesn't support it */
+  /* speak: normal; */ /* bs-motion doesn't support it */
   stop-color: rgb(0, 0, 0);
-  /* stop-opacity: 1; */
+  stop-opacity: 1;
   /* stroke: none; */
-  /* stroke-dasharray: none; */
-  /* stroke-dashoffset: 0px; */
+  /* stroke-dasharray: none; */ /* bs-motion doesn't support it */
+  /* stroke-dashoffset: 0px; */ /* bs-motion doesn't support it */
   /* stroke-linecap: butt; */
-  /* stroke-linejoin: miter; */
+  /* stroke-linejoin: miter; */ /* bs-motion doesn't support it */
   /* stroke-miterlimit: 4; */
-  /* stroke-opacity: 1; */
+  stroke-opacity: 1;
   stroke-width: 1px;
-  /* tab-size: 8; */
+  /* tab-size: 8; */ /* bs-motion doesn't support it */
   table-layout: auto;
   /* text-align: start; */
-  /* text-align-last: auto; */
-  /* text-anchor: start; */
-  /* text-combine-upright: none; */
+  /* text-align-last: auto; */ /* bs-motion doesn't support it */
+  /* text-anchor: start; */ /* bs-motion doesn't support it */
+  /* text-combine-upright: none; */ /* bs-motion doesn't support it */
   text-decoration-color: rgb(255, 255, 255);
-  /* text-decoration-line: none; */
-  /* text-decoration-skip-ink: auto; */
+  /* text-decoration-line: none; */ /* bs-motion doesn't support it */
+  /* text-decoration-skip-ink: auto; */ /* bs-motion doesn't support it */
   text-decoration-style: solid;
   text-indent: 0px;
-  /* text-orientation: mixed; */
+  /* text-orientation: mixed; */ /* bs-motion doesn't support it */
   /* text-overflow: clip; */
-  /* text-rendering: auto; */
-  /* text-shadow: none; */
-  /* text-size-adjust: auto; */
+  /* text-rendering: auto; */ /* bs-motion doesn't support it */
+  /* text-shadow: none; */ /* bs-motion doesn't support it */
+  /* text-size-adjust: auto; */ /* bs-motion doesn't support it */
   text-transform: none;
-  /* text-underline-position: auto; */
+  /* text-underline-position: auto; */ /* bs-motion doesn't support it */
   top: auto;
-  /* touch-action: auto; */
+  /* touch-action: auto; */ /* bs-motion doesn't support it */
   transform: none;
-  /* transform-box: view-box; */
-  /* transform-origin: 105px 102px; */
+  /* transform-box: view-box; */ /* bs-motion doesn't support it */
+  transform-origin: 105px 102px;
+  /* transform-origin: left top; */
   transform-style: flat;
   transition-delay: 0s;
   transition-duration: 0s;
   /* transition-property: all; */
   transition-timing-function: ease-in-out;
-  /* unicode-bidi: normal; */
+  /* unicode-bidi: normal; */ /* bs-motion doesn't support it */
   user-select: auto;
-  /* vector-effect: none; */
+  /* vector-effect: none; */ /* bs-motion doesn't support it */
   vertical-align: baseline;
   /* visibility: visible; */
   white-space: normal;
-  /* widows: 2; */
+  /* widows: 2; */ /* bs-motion doesn't support it */
   width: 200px;
-  /* will-change: auto; */
+  /* will-change: auto; */ /* bs-motion doesn't support it */
   word-break: normal;
   word-spacing: 0px;
-  /* writing-mode: horizontal-tb; */
-  /* x: 0px; */
-  /* y: 0px; */
+  /* writing-mode: horizontal-tb; */ /* bs-motion doesn't support it */
+  /* x: 0px; */ /* bs-motion doesn't support it */
+  /* y: 0px; */ /* bs-motion doesn't support it */
   /* z-index: auto; */
   z-index: 100;
-  /* zoom: 1; */
+  /* zoom: 1; */ /* bs-motion doesn't support it */
+
   /* -webkit-app-region: none; */
   /* -webkit-appearance: none; */
   /* -webkit-border-horizontal-spacing: 0px; */
@@ -362,12 +365,11 @@ module Component = [%styled {|
   } */
 |}];
 
-  /* transition: all 500ms ease; */
 module EM = [%styled {| flex: 1 0 auto; |}];
 
 module M = {
   let styled = Emotion.(css([
-    flex(`some(1., 1., pct(90.)))
+    flex(`some(1., 0., `auto))
   ]));
   [@react.component]
   let make = (~children) => <div className=styled> children </div>;
