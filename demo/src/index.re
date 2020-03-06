@@ -1,27 +1,6 @@
-module Component = [%styled
-  {|
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 200px;
-  height: 200px;
-
-  border-radius: 4px;
-  border-radius: 2%;
-
-  font-size: 24px;
-
-  /* margin: 10; */
-  /* margin: 10px 5px; */
-  margin: 5px;
-  padding: 5px;
-  padding-top: 2px;
-  padding-bottom: 2px;
-
-  /* box-shadow: 5px 4px #ebebeb; */
-
-  /* transition-property: border-radius; */
-  /* transition-duration: 100ms; */
+module Component = [%styled {|
+  /* "any": inherit; */
+  /* "any": unset; */
 
   /* Ordered list of default properties */
   align-content: normal;
@@ -84,6 +63,7 @@ module Component = [%styled
   border-top-style: none;
   border-top-width: 0px;
   bottom: auto;
+  bottom: 20px;
   /* box-shadow: none; */
   /* box-sizing: content-box; */
   /* break-after: auto; */
@@ -96,8 +76,8 @@ module Component = [%styled
   /* clip: auto; */
   clip-path: none;
   /* clip-rule: nonzero; */
-  color: rgb(255, 255, 255);
   /* color: white */
+  color: rgb(255, 255, 255);
   /* color-interpolation: srgb; */
   /* color-interpolation-filters: linearrgb; */
   /* color-rendering: auto; */
@@ -122,11 +102,14 @@ module Component = [%styled
   /* dominant-baseline: auto; */
   /* empty-cells: show; */
   fill: rgb(0, 0, 0);
-  fill-opacity: 1;
+  /* fill-opacity: 1; */
   /* fill-rule: nonzero; */
+  /* flex: 1; */
+  /* flex: 1 1; */
+  flex: 1 1 100px;
   filter: none;
   flex-basis: auto;
-  flex-direction: row;
+  flex-direction: column;
   flex-grow: 0;
   flex-shrink: 1;
   flex-wrap: nowrap;
@@ -145,7 +128,8 @@ module Component = [%styled
   /* font-variant-ligatures: normal; */
   /* font-variant-numeric: normal; */
   /* font-variation-settings: normal; */
-  /* font-weight: 400; */
+  font-weight: 400;
+  /* font-weight: bold; */
   grid-auto-columns: auto;
   grid-auto-flow: row;
   grid-auto-rows: auto;
@@ -157,6 +141,7 @@ module Component = [%styled
   grid-template-columns: none;
   grid-template-rows: none;
   height: 200px;
+  height: auto;
   /* hyphens: manual; */
   /* image-rendering: auto; */
   /* inline-size: 200px; */
@@ -180,6 +165,10 @@ module Component = [%styled
   margin-left: 5px;
   margin-right: 5px;
   margin-top: 5px;
+  margin-bottom: 5px;
+  margin: 10px 5px;
+  margin: 10px 5px 10px;
+  margin: 5px;
   /* marker-end: none; */
   /* marker-mid: none; */
   /* marker-start: none; */
@@ -216,12 +205,16 @@ module Component = [%styled
   /* overscroll-behavior-y: auto; */
   /* padding-block-end: 2px; */
   /* padding-block-start: 2px; */
-  padding-bottom: 2px;
   /* padding-inline-end: 5px; */
   /* padding-inline-start: 5px; */
   padding-left: 5px;
   padding-right: 5px;
   padding-top: 2px;
+  padding-bottom: 2px;
+  padding: 5px 10px;
+  padding: 5px 10px 5px;
+  padding: 5px 10px 5px 3px;
+  padding: 5px;
   /* paint-order: normal; */
   perspective: none;
   perspective-origin: 105px 102px;
@@ -259,14 +252,14 @@ module Component = [%styled
   /* shape-rendering: auto; */
   /* speak: normal; */
   stop-color: rgb(0, 0, 0);
-  stop-opacity: 1;
+  /* stop-opacity: 1; */
   /* stroke: none; */
   /* stroke-dasharray: none; */
   /* stroke-dashoffset: 0px; */
   /* stroke-linecap: butt; */
   /* stroke-linejoin: miter; */
   /* stroke-miterlimit: 4; */
-  stroke-opacity: 1;
+  /* stroke-opacity: 1; */
   stroke-width: 1px;
   /* tab-size: 8; */
   table-layout: auto;
@@ -311,6 +304,7 @@ module Component = [%styled
   /* x: 0px; */
   /* y: 0px; */
   /* z-index: auto; */
+  z-index: 100;
   /* zoom: 1; */
   /* -webkit-app-region: none; */
   /* -webkit-appearance: none; */
@@ -366,21 +360,27 @@ module Component = [%styled
   /* &:hover {
     color: #000000;
   } */
-|}
-];
+|}];
 
-module StyledComponent = [%styled "opacity: 0.9"];
+  /* transition: all 500ms ease; */
+module EM = [%styled {| flex: 1 0 auto; |}];
 
-module Emotion = {
-  let styles = Emotion.(css([opacity(0.3)]));
+module M = {
+  let styled = Emotion.(css([
+    flex(`some(1., 1., pct(90.)))
+  ]));
   [@react.component]
-  let make = (~children) => <div className=styles> children </div>;
+  let make = (~children) => <div className=styled> children </div>;
 };
 
 ReactDOMRe.renderToElementWithId(
-  <>
-    <StyledComponent> {React.string("React API")} </StyledComponent>
-    <Emotion> {React.string("React API")} </Emotion>
-  </>,
-  "app",
+  <Component>
+    <EM>
+      {React.string("React API")}
+    </EM>
+    <M>
+      {React.string("zindexxx")}
+    </M>
+  </Component>,
+  "app"
 );

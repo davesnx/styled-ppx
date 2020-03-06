@@ -661,6 +661,16 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   open Component_value;
   let rcv = render_component_value;
   let (name, name_loc) = d.Declaration.name;
+  let fnName = to_caml_case(name);
+
+  let render_standard_declaration = () => {
+    let name = to_caml_case(name);
+    let (vs, _) = d.Declaration.value;
+    let ident =
+      Exp.ident(~loc=name_loc, {txt: Lident(name), loc: name_loc});
+    let args = List.map(v => rcv(v), vs);
+    Exp.apply(~loc=d_loc, ident, List.map(a => (Nolabel, a), args));
+  };
 
   /* https://developer.mozilla.org/en-US/docs/Web/CSS/animation */
   let render_animation = () => {
@@ -933,15 +943,6 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
     Exp.apply(ident, [(Nolabel, list_to_expr(name_loc, transition_list))]);
   };
 
-  let render_standard_declaration = () => {
-    let name = to_caml_case(name);
-    let (vs, _) = d.Declaration.value;
-    let ident =
-      Exp.ident(~loc=name_loc, {txt: Lident(name), loc: name_loc});
-    let args = List.map(v => rcv(v), vs);
-    Exp.apply(~loc=d_loc, ident, List.map(a => (Nolabel, a), args));
-  };
-
   let render_transform = () => {
     let (vs, loc) = d.Declaration.value;
     if (List.length(vs) == 1) {
@@ -989,10 +990,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
     let args =
       List.rev_map(params => font_family_args(params), grouped_params);
     let ident =
-      Exp.ident(
-        ~loc=name_loc,
-        {txt: Lident("fontFamilies"), loc: name_loc},
-      );
+      Exp.ident(~loc=name_loc, {txt: Lident("fontFamily"), loc: name_loc});
     Exp.apply(
       ~loc=name_loc,
       ident,
@@ -1007,9 +1005,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
         let (v, loc) as c = List.hd(vs);
         switch (v) {
         | Ident(_) => rcv(c)
-        | Number(_) =>
-          let ident = Exp.ident(~loc=name_loc, {txt: Lident("int"), loc});
-          Exp.apply(~loc, ident, [(Nolabel, rcv(c))]);
+        | Number(n) => Exp.constant(~loc, Pconst_integer(n, None))
         | _ => grammar_error(loc, "Unexpected z-index value")
         };
       } else {
@@ -1017,12 +1013,33 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
       };
 
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Lident("zIndex"), loc: name_loc});
+      Exp.ident(~loc=name_loc, {txt: Lident(fnName), loc: name_loc});
     Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
   };
 
+  /*  TODO: Initial abstraction over custom-renders
+
+        let renderHoF = (value, name, number_to_exp) => {
+        let fnName = to_caml_case(name);
+        let (vs, loc) = value;
+        let arg =
+          if (List.length(vs) == 1) {
+            let (v, loc) = List.hd(vs);
+            switch (v) {
+            | Number(n) => number_to_exp(n)
+            | _ => grammar_error(loc, "Unexpected " ++ name ++ " value")
+            };
+          } else {
+            grammar_error(loc, name ++ " should have a single value");
+          };
+
+        let ident =
+          Exp.ident(~loc=name_loc, {txt: Lident(fnName), loc: name_loc});
+        Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
+      }; */
+
+  /* https://developer.mozilla.org/en-US/docs/Web/CSS/flex-grow */
   let render_flex_grow_shrink = () => {
-    let name = to_caml_case(name);
     let (vs, loc) = d.Declaration.value;
     let arg =
       if (List.length(vs) == 1) {
@@ -1036,29 +1053,35 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
       };
 
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Lident(name), loc: name_loc});
+      Exp.ident(~loc=name_loc, {txt: Lident(fnName), loc: name_loc});
     Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
   };
 
+  /* https://developer.mozilla.org/en/docs/Web/CSS/font-weight */
   let render_font_weight = () => {
     let (vs, loc) = d.Declaration.value;
     let arg =
-      if (List.length(vs) == 1) {
-        let (v, loc) as c = List.hd(vs);
+      switch (List.length(vs)) {
+      | 0 => grammar_error(loc, "font-weight should have a single value")
+      | _ =>
+        let (v, loc) = List.hd(vs);
         switch (v) {
-        | Ident(_) => rcv(c)
-        | Number(_) => Exp.variant(~loc, "num", Some(rcv(c)))
-        | _ => grammar_error(loc, "Unexpected font-weight value")
+        /* TODO: Support `normal`, `bold`, `lighter`, `bolder` */
+        | Number(n) => Exp.constant(~loc, Pconst_integer(n, None))
+        | _ =>
+          grammar_error(
+            loc,
+            "Unexpected font-weight value, expects an integer",
+          )
         };
-      } else {
-        grammar_error(loc, "font-weight should have a single value");
       };
 
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Lident("fontWeight"), loc: name_loc});
+      Exp.ident(~loc=name_loc, {txt: Lident(fnName), loc: name_loc});
     Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
   };
 
+  /* https://developer.mozilla.org/en-US/docs/Web/CSS/border */
   let render_border_outline = () => {
     let border_outline_args = (params, _) =>
       List.fold_left(
@@ -1078,65 +1101,79 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
 
     let (params, loc) = d.Declaration.value;
     let args = border_outline_args(params, loc);
-    let name = to_caml_case(name) ++ "2";
+    let fnName2 = fnName ++ "2";
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Lident(name), loc: name_loc});
+      Exp.ident(~loc=name_loc, {txt: Lident(fnName2), loc: name_loc});
     Exp.apply(ident, args);
   };
 
-  let render_with_labels = labels => {
-    let name = to_caml_case(name);
+  let render_margin_padding = () => {
     let (vs, _) = d.Declaration.value;
     let parameter_count = List.length(vs);
-    let name =
-      if (parameter_count > 1) {
-        name ++ string_of_int(parameter_count);
-      } else {
-        name;
-      };
+    let fnNameN =
+      parameter_count > 1 ? fnName ++ string_of_int(parameter_count) : fnName;
 
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Lident(name), loc: name_loc});
-    let args = List.map(v => rcv(v), vs);
-    Exp.apply(
-      ~loc=d_loc,
-      ident,
-      List.mapi(
-        (i, a) =>
-          try({
-            let (_, matching_label) =
-              List.find(
-                (((params, param), _)) =>
-                  params == parameter_count && param == i,
-                labels,
-              );
-
-            (Labelled(matching_label), a);
-          }) {
-          | Not_found => (Nolabel, a)
-          },
-        args,
-      ),
-    );
+      Exp.ident(~loc=name_loc, {txt: Lident(fnNameN), loc: name_loc});
+    let args = List.map(v => (Nolabel, rcv(v)), vs);
+    Exp.apply(~loc=d_loc, ident, args);
   };
 
   let render_opacity = () => {
     let (vs, loc) = d.Declaration.value;
+
     let arg =
-      if (List.length(vs) == 1) {
+      switch (List.length(vs)) {
+      | 0 => grammar_error(loc, "opacity should have a single value")
+      | _ =>
         let (v, loc) = List.hd(vs);
         switch (v) {
-        | Number(n) =>
-          Exp.constant(~loc, Pconst_float(n, None));
+        | Number(n) => Exp.constant(~loc, Pconst_float(n, None))
         | _ => grammar_error(loc, "Unexpected opacity value")
         };
-      } else {
-        grammar_error(loc, "opacity should have a single value");
       };
 
     let ident =
       Exp.ident(~loc=name_loc, {txt: Lident("opacity"), loc: name_loc});
     Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
+  };
+
+  let render_flex = () => {
+    let (vs, loc) = d.Declaration.value;
+
+    let expression =
+      switch (List.length(vs)) {
+      | 0 => grammar_error(loc, "flex should have a single value")
+      /*
+        TODO: Right now bs-css  https://github.com/MinimaHQ/re-css/issues/11
+        | 1 => {
+        let (v, loc) = List.hd(vs);
+        switch (v) {
+          | Number(n) => Exp.constant(~loc, Pconst_float(n, None))
+          | _  => grammar_error(loc, "Unexpected flex value")
+        }} */
+      | _ =>
+        Exp.tuple(~loc, List.map(
+          ((v, loc)) => {
+            switch (v) {
+            | Percentage(_) => rcv((v, loc))
+            | Number(n) => Exp.constant(~loc, Pconst_float(n, None))
+            | _ => rcv((v, loc))
+            /* TODO: Better handling `flex-basis in px and add grammar_error`
+              | _  => grammar_error(loc, "Unexpected flex value") */
+            }
+          },
+          vs,
+        ))
+      };
+
+    let args = [
+      (Nolabel, Exp.variant(~loc, "some", Some(expression))),
+    ];
+
+    let ident =
+      Exp.ident(~loc=name_loc, {txt: Lident(fnName), loc: name_loc});
+    Exp.apply(~loc=name_loc, ident, args);
   };
 
   switch (name) {
@@ -1155,28 +1192,18 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   | "flex-grow"
   | "flex-shrink" => render_flex_grow_shrink()
   | "font-weight" => render_font_weight()
+  | "flex" => render_flex()
   | "padding"
-  | "margin" =>
-    render_with_labels([
-      ((2, 0), "v"),
-      ((2, 1), "h"),
-      ((3, 0), "top"),
-      ((3, 1), "h"),
-      ((3, 2), "bottom"),
-      ((4, 0), "top"),
-      ((4, 1), "right"),
-      ((4, 2), "bottom"),
-      ((4, 3), "left"),
-    ])
-  | "border-top-right-radius"
-  | "border-top-left-radius"
-  | "border-bottom-right-radius"
-  | "border-bottom-left-radius" =>
-    render_with_labels([((2, 0), "v"), ((2, 1), "h")])
-  | "background-position"
-  | "transform-origin" =>
-    render_with_labels([((2, 0), "h"), ((2, 1), "v")])
-  | "flex" => render_with_labels([((3, 0), "grow"), ((3, 1), "shrink")])
+  | "margin" => render_margin_padding()
+  /* | "background-position"
+     | "transform-origin" => render_margin_padding()
+     | "flex" => render_margin_padding()  */
+
+  /* border-top-right-radius
+        border-top-left-radius
+        border-bottom-right-radius
+        border-bottom-left-radius
+     */
   | "border"
   | "outline" when List.length(fst(d.Declaration.value)) == 2 =>
     render_border_outline()
