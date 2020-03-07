@@ -19,18 +19,58 @@ let createStyles = (loc, name, exp) => {
   Str.mk(~loc, Pstr_value(Nonrecursive, [Vb.mk(~loc, variableName, exp)]));
 };
 
+/* switch (chidren) {
+  | Some(child) => child
+  | None => React.null
+} */
+let createSwitchChildren = (~loc) => {
+  let noneCase =
+    Exp.case(
+      Pat.mk(~loc, Ppat_construct({txt: Lident("None"), loc}, None)),
+      Exp.ident(~loc, {txt: Ldot(Lident("React"), "null"), loc}),
+    );
+
+  let someChildCase =
+    Exp.case(
+      Pat.mk(
+        ~loc,
+        ~attrs=[({txt: "explicit_arity", loc}, PStr([]))], /* Add [@explicit_arity]*/
+        Ppat_construct(
+          {txt: Lident("Some"), loc},
+          Some(
+            Pat.mk(
+              ~loc,
+              Ppat_tuple(
+                [
+                  Pat.mk(~loc, Ppat_var({txt: "chil", loc}))
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+      Exp.ident(~loc, {txt: Lident("chil"), loc}),
+    );
+
+  let matchingExp = Exp.ident(~loc, { txt: Lident("children"), loc });
+
+  Exp.match(~loc, matchingExp, [someChildCase, noneCase]);
+};
+
 /* let make = (~children) => <div className=classNameValue> */
 let createMakeFn = (~loc, ~classNameValue) =>
   Exp.fun_(
     ~loc,
-    Labelled("children"),
+    Optional("children"),
     None,
     Pat.mk(~loc, Ppat_var({txt: "children", loc})),
-    Exp.apply( /* Create a function div() */
+    Exp.apply(
+      /* Create a function div() */
       ~loc,
       ~attrs=[({txt: "JSX", loc}, PStr([]))], /* Add [@JSX]*/
       Exp.ident({txt: Lident("div"), loc}),
-      [ /* Arguments */
+      [
+        /* Arguments */
         (
           Labelled("className"),
           Exp.ident({txt: Lident(classNameValue), loc}),
@@ -44,21 +84,18 @@ let createMakeFn = (~loc, ~classNameValue) =>
               Exp.tuple(
                 ~loc,
                 [
-                  Exp.ident(~loc, {txt: Lident("children"), loc}),
-                  Exp.construct(~loc, {txt: Lident("[]"), loc}, None)
-                ]
-              )
-            )
-          )
+                  createSwitchChildren(~loc),
+                  Exp.construct(~loc, {txt: Lident("[]"), loc}, None),
+                ],
+              ),
+            ),
+          ),
         ),
-        ( /* Last arg is a unit */
+        (
+          /* Last arg is a unit */
           Nolabel,
-          Exp.construct(
-            ~loc,
-            {txt: Lident("()"), loc},
-            None
-          )
-        )
+          Exp.construct(~loc, {txt: Lident("()"), loc}, None),
+        ),
       ],
     ),
   );

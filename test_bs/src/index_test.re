@@ -25,7 +25,7 @@ module Border = [%styled "border-collapse: separate"];
  */
 
 /*
- module Transition = [%styled "transition-property: all"];
+module Transition = [%styled "transition-property: all"];
  | "animation" => render_animation()
  | "box-shadow" => render_box_shadow()
  | "text-shadow" => render_text_shadow()
@@ -40,7 +40,7 @@ module Child = {
 };
 
 let componentsList = [
-  ("Opacity", <Opacity><Child /></Opacity>),
+  ("Opacity", <Opacity />),
   /* ("Overflow", Overflow),
   ("Visibility", Visibility),
   ("Hypens", Hypens),
