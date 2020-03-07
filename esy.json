@@ -1,17 +1,5 @@
 {
-  "name": "@davesnx/styled-ppx",
-  "version": "0.1.0",
-  "description": "CSS-in-Reason and OCaml",
-  "author": "David Sancho <dsnxmoreno@gmail.com>",
-  "license": "MIT",
-  "homepage": "https://github.com/davesnx/styled-ppx",
-  "bugs": {
-    "url": "https://github.com/davesnx/styled-ppx/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/davesnx/styled-ppx.git"
-  },
+  "name": "styled-ppx",
   "esy": {
     "build": "dune build -p #{self.name}",
     "buildEnv": {
