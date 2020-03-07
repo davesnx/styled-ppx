@@ -160,7 +160,7 @@ jobs:
       #     asset_name: styled-ppx-windows-x64.zip
       #     asset_content_type: application/gzip
 
-       - name: Publish NPM package
+      - name: Publish NPM package
         run: |
           npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
           npm config set scope "@{{ npm_username }}"
