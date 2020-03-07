@@ -1,7 +1,7 @@
 {
   "name": "styled-ppx",
   "version": "0.1.0",
-  "description": "CSS-in-Reason",
+  "description": "CSS-in-Reason and OCaml",
   "author": "David Sancho",
   "license": "MIT",
   "homepage": "https://github.com/davesnx/styled-ppx",
@@ -24,7 +24,6 @@
     "@opam/menhir": "20190924",
     "@opam/ocaml-migrate-parsetree": "1.5.0",
     "@opam/sedlex": "2.1",
-    "@reason-native/console": "^0.1.0",
     "ocaml": "~4.6.1000"
   },
   "resolution": {
