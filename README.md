@@ -1,6 +1,6 @@
 # re-styled-ppx
 
-**styled-pxx** is the ppx that enables *CSS-in-Reason*.
+**styled-ppx** is the ppx that enables *CSS-in-Reason*.
 
 Allows you to create **React Components** with style definitions with CSS that don't rely on a specific DSL and keeps type-safety with great error messages. Build on top of [bs-emotion](https://github.com/ahrefs/bs-emotion), it allows you to style apps quickly, performant and as you always done it.
 
