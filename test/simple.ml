@@ -14,34 +14,21 @@ module ComponentMultiline = [%styled
 
 module EmptyComponent = [%styled ()]
 
-(* /* z-index: auto; */
-  /* visibility: visible; */
-  /* transition-property: all; */
-  /* stroke: none; */
-  /* overflow: visible; */   /* overflow-y: visible; */   /* overflow-x: visible; */
-  /* order: 0; */
-  /* hyphens: manual; */
-  /* direction: ltr; */
-  /* content: normal; */
-  /* clear: none; */
-  /* box-shadow: none; */
-  /* box-sizing: content-box; */
-  /* border-collapse: separate; */
-  | "animation" => render_animation()
-  | "box-shadow" => render_box_shadow()
-  | "text-shadow" => render_text_shadow()
-  | "transform" => render_transform()
-  | "transition" => render_transition()
-  | "font-family" => render_font_family() *)
-
-(* module Props = [%styled {||}] *)
-
 (* Not supported yet
 
-module StyledComponentWithProps = [%styled
-  (~color) => {|
-    color: $color;
-  |}
+module StyledWithProps = [%styled (~color) => {| color: $color |}];
+
+type size =
+  | Small
+  | Big
+  | Full;
+
+module StyledWithPatternMatcing = [%styled
+  (~size) => switch (size) {
+    | Small => "width: 33%"
+    | Big => "width: 80%"
+    | Full => "width: 100%"
+  }
 ];
 
 *)
