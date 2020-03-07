@@ -1,6 +1,6 @@
 {
   "name": "styled-ppx",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "CSS-in-Reason and OCaml",
   "author": "David Sancho",
   "license": "MIT",
@@ -28,8 +28,7 @@
     "@opam/dune": "1.11.4",
     "@opam/menhir": "20190924",
     "@opam/ocaml-migrate-parsetree": "1.5.0",
-    "@opam/sedlex": "2.1",
-    "ocaml": "~4.6.1000"
+    "@opam/sedlex": "2.1"
   },
   "scripts": {
     "test": "dune runtest",
