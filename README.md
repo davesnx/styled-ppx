@@ -26,6 +26,13 @@ module ComponentWithMultiline = [%styled {|
   justify-content: center;
   align-items: center;
 |}];
+
+ReactDOMRe.renderToElementWithId(
+  <ComponentWithMultiline>
+    {React.string("- Middle -")}
+  </ComponentWithMultiline>,
+  "app"
+);
 ```
 
 After running the ppx:
@@ -122,6 +129,28 @@ Thanks to [ahrefs/bs-emotion](https://github.com/ahrefs/bs-emotion) and [emotion
 We would love your help improving re-styled-ppx, there's still a lot to do.
 The ROADMAP is full and well organized, take a look in [here](./ROADMAP.md).
 
+Next big think would be support all CSS Properties and dynamic props.
+
+Instead of using a string, provide a function that will be executed to generate styles on run-time.
+```re
+/* This is not implemented yet! */
+module StyledWithProps = [%styled (~color) => {| color: $color |}];
+
+type size =
+  | Small
+  | Big
+  | Full;
+
+/* And you would be able to create components with Pattern Matching... */
+module StyledWithPatternMatcing = [%styled
+  (~size) => switch (size) {
+    | Small => "width: 33%"
+    | Big => "width: 80%"
+    | Full => "width: 100%"
+  }
+];
+```
+
 ### Developing
 You need `esy`, you can install the latest version from [npm](https://npmjs.com):
 
@@ -163,6 +192,7 @@ This will run the native unit test.
 ```bash
 esy test
 ```
+> This tests only ensures that the output looks exactly as a snapshot, so their mission are to ensure the ppx transforms to a valid OCaml syntax.
 
 If you want to run Bucklescript's integration test instead, you can do:
 ```bash
@@ -171,6 +201,7 @@ esy
 yarn install
 yarn test
 ```
+> This tests are more like an end to end tests, that ensures that emotion have the correct methods for each CSS property.
 
 ---
 
