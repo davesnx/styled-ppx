@@ -4,10 +4,6 @@ exports[`Component Opacity renders  1`] = `
 <div>
   <div
     class="css-cyc7w5"
-  >
-    <h1>
-      Heading
-    </h1>
-  </div>
+  />
 </div>
 `;
