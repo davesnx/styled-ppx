@@ -1,6 +1,6 @@
 {
   "name": "styled-ppx",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "CSS-in-Reason and OCaml",
   "author": "David Sancho",
   "license": "MIT",
