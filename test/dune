@@ -1,8 +1,8 @@
 (executable
  (name main)
- (libraries re_styled_ppx.lib)
+ (libraries re-styled-ppx.lib)
  (preprocess
-  (pps re_styled_ppx.lib)))
+  (pps re-styled-ppx.lib)))
 
 (rule
  (targets pp.result)

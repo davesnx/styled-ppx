@@ -1,5 +1,5 @@
 {
-  "name": "@davesnx/re-styled-ppx",
+  "name": "re-styled-ppx",
   "version": "0.1.0",
   "description": "CSS-in-Reason",
   "author": "David Sancho",

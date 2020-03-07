@@ -183,4 +183,4 @@ let moduleMapper = (_, _) => {
 };
 
 let () =
-  Driver.register(~name="re_styled_ppx", Versions.ocaml_406, moduleMapper);
+  Driver.register(~name="re-styled-ppx", Versions.ocaml_406, moduleMapper);
