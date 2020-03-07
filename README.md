@@ -26,6 +26,13 @@ module ComponentWithMultiline = [%styled {|
   justify-content: center;
   align-items: center;
 |}];
+
+ReactDOMRe.renderToElementWithId(
+  <ComponentWithMultiline>
+    {React.string("- Middle -")}
+  </ComponentWithMultiline>,
+  "app"
+);
 ```
 
 After running the ppx:
