@@ -42,7 +42,7 @@ fs.copyFileSync(
 );
 
 const filesToTouch = [
-  "re-styled-ppx.exe"
+  "styled-ppx.exe"
 ];
 
 for (const file of filesToTouch) {
@@ -52,7 +52,7 @@ for (const file of filesToTouch) {
 }
 
 const pkgJson = {
-  name: "@davesnx/re-styled-ppx",
+  name: "@davesnx/styled-ppx",
   version: package.version,
   description: package.description,
   homepage: package.homepage,
@@ -62,14 +62,14 @@ const pkgJson = {
     postinstall: "node postinstall.js"
   },
   bin: {
-    re-styled-ppx: "re-styled-ppx.exe"
+    styled-ppx: "styled-ppx.exe"
   },
   files: [
     "platform-windows-x64/",
     "platform-linux-x64/",
     "platform-darwin-x64/",
     "postinstall.js",
-    "re-styled-ppx.exe"
+    "styled-ppx.exe"
   ]
 };
 

@@ -1,10 +1,10 @@
 {
   "checksum": "bccde640d1247350c8ec69bebdf3ffb6",
-  "root": "re-styled-ppx@link-dev:./package.json",
+  "root": "styled-ppx@link-dev:./package.json",
   "node": {
-    "re-styled-ppx@link-dev:./package.json": {
-      "id": "re-styled-ppx@link-dev:./package.json",
-      "name": "re-styled-ppx",
+    "styled-ppx@link-dev:./package.json": {
+      "id": "styled-ppx@link-dev:./package.json",
+      "name": "styled-ppx",
       "version": "link-dev:./package.json",
       "source": {
         "type": "link-dev",

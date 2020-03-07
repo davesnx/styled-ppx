@@ -1,4 +1,4 @@
-# re-styled-ppx
+# styled-ppx
 
 **styled-ppx** is the ppx that enables *CSS-in-Reason*.
 
@@ -14,7 +14,7 @@ I love CSS and I'm comming from the JavaScript world, writing React code with st
 As well, saw a few people asking for it ([a](https://reasonml.chat/t/idiomatic-way-to-bind-to-styled-components/886) [f](https://reasonml.chat/t/styled-components-possible/554)[e](https://reasonml.chat/t/styling-solutions-reasonreact-as-of-aug-18/958)[w](https://reasonml.chat/t/options-and-best-practices-for-styling-in-reasonreact/261) [t](https://twitter.com/lyovson/status/1233397294311100417) [i](https://discord.gg/byjdYFH) [m](https://discord.gg/byjdYFH) [e](https://discord.gg/byjdYFH) [s](https://discord.gg/byjdYFH)). So I took the time to create it with help from [@jchavarri](https://github.com/jchavarri) 🙌.
 
 ## Usage
-`re-styled-ppx` implements a ppx that transforms `[%styled]` extensions into [bs-emotion](https://github.com/ahrefs/bs-emotion) calls, that does all the CSS-in-JS that provides [emotion](https://emotion.sh).
+`styled-ppx` implements a ppx that transforms `[%styled]` extensions into [bs-emotion](https://github.com/ahrefs/bs-emotion) calls, that does all the CSS-in-JS that provides [emotion](https://emotion.sh).
 
 This is how you write components in ReasonML:
 ```re
@@ -72,22 +72,22 @@ module ComponentMultiline = [%styled
 ### With `esy` on native projects
 
 ```bash
-esy add davesnx/re-styled-ppx
+esy add davesnx/styled-ppx
 ```
 
 ### With `npm` or `yarn` on BuckleScript projects
 
 ```bash
-yarn global add @davesnx/re-styled-ppx
+yarn global add @davesnx/styled-ppx
 # Or
-npm -g install @davesnx/re-styled-ppx
+npm -g install @davesnx/styled-ppx
 ```
 
 And add the PPX in your `bsconfig.json` file:
 
 ```json
 {
-  "ppx-flags": ["@davesnx/re-styled-ppx"]
+  "ppx-flags": ["@davesnx/styled-ppx"]
 }
 ```
 
@@ -99,11 +99,11 @@ Create an `esy.json` file with the content:
   "name": "test_bs",
   "version": "0.0.0",
   "dependencies": {
-    "re-styled-ppx": "*",
+    "styled-ppx": "*",
     "ocaml": "~4.6.1000"
   },
   "resolutions": {
-    "re-styled-ppx": "davesnx/re-styled-ppx"
+    "styled-ppx": "davesnx/styled-ppx"
   }
 }
 ```
@@ -112,7 +112,7 @@ And add the PPX in your `bsconfig.json` file:
 
 ```json
 {
-  "ppx-flags": ["esy x re-styled-ppx.exe"]
+  "ppx-flags": ["esy x styled-ppx.exe"]
 }
 ```
 
@@ -122,7 +122,7 @@ Inspired by [@astrada](https://github.com/astrada/) `bs-css-ppx` and their CSS P
 Thanks to [ahrefs/bs-emotion](https://github.com/ahrefs/bs-emotion) and [emotion](https://github.com/emotion-js/emotion).
 
 ## Contributing
-We would love your help improving re-styled-ppx, there's still a lot to do.
+We would love your help improving styled-ppx, there's still a lot to do.
 The ROADMAP is full and well organized, take a look in [here](./ROADMAP.md).
 
 Next big think would be support all CSS Properties and dynamic props.

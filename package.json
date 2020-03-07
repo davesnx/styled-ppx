@@ -1,16 +1,16 @@
 {
-  "name": "re-styled-ppx",
+  "name": "styled-ppx",
   "version": "0.1.0",
   "description": "CSS-in-Reason",
   "author": "David Sancho",
   "license": "MIT",
-  "homepage": "https://github.com/davesnx/re-styled-ppx",
+  "homepage": "https://github.com/davesnx/styled-ppx",
   "bugs": {
-    "url": "https://github.com/davesnx/re-styled-ppx/issues"
+    "url": "https://github.com/davesnx/styled-ppx/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/davesnx/re-styled-ppx.git"
+    "url": "https://github.com/davesnx/styled-ppx.git"
   },
   "esy": {
     "build": "dune build -p #{self.name}",

@@ -1,6 +1,6 @@
 (Source ppx)
-(Cfg_str project_name re-styled-ppx)
-(Cfg_str project_slug re-styled-ppx)
+(Cfg_str project_name styled-ppx)
+(Cfg_str project_slug styled-ppx)
 (Cfg_str project_description"")
 (Cfg_str author_name"David Sancho")
 (Cfg_str github_username davesnx)
