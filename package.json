@@ -18,19 +18,17 @@
       "ODOC_SYNTAX": "re"
     }
   },
-  "dependencies": {
-    "@esy-ocaml/reason": "3.5.2",
-    "@opam/dune": "1.11.4",
-    "@opam/menhir": "20190924",
-    "@opam/ocaml-migrate-parsetree": "1.5.0",
-    "@opam/sedlex": "2.1",
-    "ocaml": "~4.6.1000"
-  },
   "resolution": {
     "@opam/sedlex": "ocaml-community/sedlex"
   },
   "devDependencies": {
     "@opam/merlin": "*",
+    "ocaml": "~4.6.1000",
+    "@esy-ocaml/reason": "3.5.2",
+    "@opam/dune": "1.11.4",
+    "@opam/menhir": "20190924",
+    "@opam/ocaml-migrate-parsetree": "1.5.0",
+    "@opam/sedlex": "2.1",
     "ocaml": "~4.6.1000"
   },
   "scripts": {
