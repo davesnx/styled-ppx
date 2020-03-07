@@ -192,6 +192,7 @@ This will run the native unit test.
 ```bash
 esy test
 ```
+> This tests only ensures that the output looks exactly as a snapshot, so their mission are to ensure the ppx transforms to a valid OCaml syntax.
 
 If you want to run Bucklescript's integration test instead, you can do:
 ```bash
@@ -200,6 +201,7 @@ esy
 yarn install
 yarn test
 ```
+> This tests are more like an end to end tests, that ensures that emotion have the correct methods for each CSS property.
 
 ---
 
