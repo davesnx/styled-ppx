@@ -1,7 +1,7 @@
 {
-  "name": "re_styled_ppx",
+  "name": "@davesnx/re-styled-ppx",
   "version": "0.1.0",
-  "description": "",
+  "description": "CSS-in-Reason",
   "author": "David Sancho",
   "license": "MIT",
   "homepage": "https://github.com/davesnx/re-styled-ppx",

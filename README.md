@@ -1,23 +1,22 @@
 # re-styled-ppx
 
-**styled** is the ppx that enables *CSS-in-Reason*.
+**styled-pxx** is the ppx that enables *CSS-in-Reason*.
 
-Allows you to create React Components with style definitions with CSS that doesn't rely on a specific DSL and keeps type-safety with great error messages.Build on top of [bs-emotion](https://github.com/ahrefs/bs-emotion), it allows you to style apps quickly, performant and as you always done it.
+Allows you to create **React Components** with style definitions with CSS that don't rely on a specific DSL and keeps type-safety with great error messages. Build on top of [bs-emotion](https://github.com/ahrefs/bs-emotion), it allows you to style apps quickly, performant and as you always done it.
 
 > ⚠️ **Early stage** This ppx is in a early stage. Meaning that it doesn't support full functionality as [emotion](https://emotion.sh) or [styled-components](https://styled-components.com/).
-
-> But you can safely use it, as it woudn't break any existing code.
+> But you can safely use it, as it woudn't break any existing code in further releases.
 > In case you want to know more, take a look at the [ROADMAP](./ROADMAP.md), or feel free to chat on Discord: @davesnx#5641
 
 ## Motivation
-I love CSS and comming from the JavaScript world, writing React code with styled-components. I found it, one of the best combos to write scalable frontend applications and wasn't a reality in ReasonML/OCaml.
+I love CSS and I'm comming from the JavaScript world, writing React code with styled-components. I found it, one of the best combos to write scalable frontend applications and wasn't a reality in ReasonML/OCaml.
 
-Saw a few people asking for it as well (on [Discord](https://discordapp.com/channels/235176658175262720/235176658175262720), [reasonml.chat](https://reasonml.chat) or twitter) So I took the time to create it with help from [@jchavarri](https://github.com/jchavarri).
+As well, saw a few people asking for it ([a](https://reasonml.chat/t/idiomatic-way-to-bind-to-styled-components/886) [f](https://reasonml.chat/t/styled-components-possible/554)[e](https://reasonml.chat/t/styling-solutions-reasonreact-as-of-aug-18/958)[w](https://reasonml.chat/t/options-and-best-practices-for-styling-in-reasonreact/261) [t](https://twitter.com/lyovson/status/1233397294311100417) [i](https://discord.gg/byjdYFH) [m](https://discord.gg/byjdYFH) [e](https://discord.gg/byjdYFH) [s](https://discord.gg/byjdYFH)). So I took the time to create it with help from [@jchavarri](https://github.com/jchavarri) 🙌.
 
 ## Usage
-`re-styled-ppx` implements a ppx that transforms `[%styled]` extensions into [bs-emotion](https://github.com/ahrefs/bs-emotion) APIs.
+`re-styled-ppx` implements a ppx that transforms `[%styled]` extensions into [bs-emotion](https://github.com/ahrefs/bs-emotion) calls, that does all the CSS-in-JS that provides [emotion](https://emotion.sh).
 
-How you write the components:
+This is how you write components in ReasonML:
 ```re
 module Component = [%styled "display: flex"];
 
@@ -38,23 +37,20 @@ ReactDOMRe.renderToElementWithId(
 After running the ppx:
 ```re
 module Component = {
-  let styled = Emotion.(css([display(`flex)]));
-  [@react.component]
-  let make = (~children) => {
-    <div className=styled> children </div>
-  }
-};
-
-module ComponentWithMultiline = {
   let styled = Emotion.(css([display(`flex), justifyContent(`center), alignItems(`center)]));
   [@react.component]
-  let make = (~children) => {
-    <div className=styled> children </div>
+  let make = (~children=?) => {
+    <div className=styled>
+      {switch (children) {
+        | Some(child) => child
+        | None => React.null
+      }
+    </div>
   }
 };
 ```
 
-It works in OCaml as well:
+This is how you write components in OCaml:
 ```ocaml
 module Component = [%styled ("display: flex")]
 
