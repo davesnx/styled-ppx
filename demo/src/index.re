@@ -1,7 +1,4 @@
 module Component = [%styled {|
-  /* "any": inherit; */
-  /* "any": unset; */
-
   /* Ordered list of default properties */
   align-content: normal;
   align-items: center;
