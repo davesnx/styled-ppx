@@ -1,11 +1,9 @@
 module Component = [%styled ("display: block")]
 
-(*
-
 module ComponentMultiline = [%styled
   {|
-    color: red;
-    background-color: white;
+    color: #333;
+    background-color: #333;
     margin: auto 0 10px 1em;
     border-bottom: thin dashed #eee;
     border-right-color: rgb(1, 0, 1);
@@ -14,14 +12,23 @@ module ComponentMultiline = [%styled
   |}
 ]
 
-*)
+module EmptyComponent = [%styled ()]
 
 (* Not supported yet
 
-module StyledComponentWithProps = [%styled
-  (~color) => {|
-    color: $color;
-  |}
+module StyledWithProps = [%styled (~color) => {| color: $color |}];
+
+type size =
+  | Small
+  | Big
+  | Full;
+
+module StyledWithPatternMatcing = [%styled
+  (~size) => switch (size) {
+    | Small => "width: 33%"
+    | Big => "width: 80%"
+    | Full => "width: 100%"
+  }
 ];
 
 *)

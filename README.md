@@ -1,29 +1,97 @@
 # re-styled-ppx
 
-[![Actions Status](https://github.com/davesnx/re-styled-ppx/workflows/CI/badge.svg)](https://github.com/davesnx/re-styled-ppx/actions)
+**styled-pxx** is the ppx that enables *CSS-in-Reason*.
 
-## Features
+Allows you to create **React Components** with style definitions with CSS that don't rely on a specific DSL and keeps type-safety with great error messages. Build on top of [bs-emotion](https://github.com/ahrefs/bs-emotion), it allows you to style apps quickly, performant and as you always done it.
 
-- Deploy prebuilt binaries to be consumed from Bucklescript projects
+> ⚠️ **Early stage** This ppx is in a early stage. Meaning that it doesn't support full functionality as [emotion](https://emotion.sh) or [styled-components](https://styled-components.com/).
+> But you can safely use it, as it woudn't break any existing code in further releases.
+> In case you want to know more, take a look at the [ROADMAP](./ROADMAP.md), or feel free to chat on Discord: @davesnx#5641
+
+## Motivation
+I love CSS and I'm comming from the JavaScript world, writing React code with styled-components. I found it, one of the best combos to write scalable frontend applications and wasn't a reality in ReasonML/OCaml.
+
+As well, saw a few people asking for it ([a](https://reasonml.chat/t/idiomatic-way-to-bind-to-styled-components/886) [f](https://reasonml.chat/t/styled-components-possible/554)[e](https://reasonml.chat/t/styling-solutions-reasonreact-as-of-aug-18/958)[w](https://reasonml.chat/t/options-and-best-practices-for-styling-in-reasonreact/261) [t](https://twitter.com/lyovson/status/1233397294311100417) [i](https://discord.gg/byjdYFH) [m](https://discord.gg/byjdYFH) [e](https://discord.gg/byjdYFH) [s](https://discord.gg/byjdYFH)). So I took the time to create it with help from [@jchavarri](https://github.com/jchavarri) 🙌.
+
+## Usage
+`re-styled-ppx` implements a ppx that transforms `[%styled]` extensions into [bs-emotion](https://github.com/ahrefs/bs-emotion) calls, that does all the CSS-in-JS that provides [emotion](https://emotion.sh).
+
+This is how you write components in ReasonML:
+```re
+module Component = [%styled "display: flex"];
+
+module ComponentWithMultiline = [%styled {|
+  display: flex;
+  justify-content: center;
+  align-items: center;
+|}];
+
+ReactDOMRe.renderToElementWithId(
+  <ComponentWithMultiline>
+    {React.string("- Middle -")}
+  </ComponentWithMultiline>,
+  "app"
+);
+```
+
+After running the ppx:
+```re
+module Component = {
+  let styled = Emotion.(css([display(`flex), justifyContent(`center), alignItems(`center)]));
+  [@react.component]
+  let make = (~children=?) => {
+    <div className=styled>
+      {switch (children) {
+        | Some(child) => child
+        | None => React.null
+      }
+    </div>
+  }
+};
+```
+
+This is how you write components in OCaml:
+```ocaml
+module Component = [%styled ("display: flex")]
+
+module ComponentMultiline = [%styled
+  {|
+    color: #333;
+    background-color: #333;
+    margin: auto 0 10px 1em;
+    border-bottom: thin dashed #eee;
+    border-right-color: rgb(1, 0, 1);
+    width: 70%;
+    background: url(http://example.com/test.jpg);
+  |}
+]
+```
 
 ## Installation
-
-### With `opam` on native projects
-
-```bash
-opam pin add re-styled-ppx https://github.com/davesnx/re-styled-ppx.git#master
-```
 
 ### With `esy` on native projects
 
 ```bash
-esy add tmattio/re-styled-ppx
+esy add davesnx/re-styled-ppx
 ```
 
-### With `npm` on Bucklescript projects
+### With `npm` or `yarn` on BuckleScript projects
 
-The recommended way to use PPX libraries in Bucklescript projects is to use `esy`.
+```bash
+yarn global add @davesnx/re-styled-ppx
+# Or
+npm -g install @davesnx/re-styled-ppx
+```
 
+And add the PPX in your `bsconfig.json` file:
+
+```json
+{
+  "ppx-flags": ["@davesnx/re-styled-ppx"]
+}
+```
+
+However, if you want to use `esy` in BuckleScript:
 Create an `esy.json` file with the content:
 
 ```json
@@ -44,53 +112,43 @@ And add the PPX in your `bsconfig.json` file:
 
 ```json
 {
-  "ppx-flags": [
-    "ppx-flags": ["esy x re-styled-ppx.exe"]
-  ]
+  "ppx-flags": ["esy x re-styled-ppx.exe"]
 }
 ```
 
-However, is using `esy` bothers you, we also provide a NPM package with prebuilt binaries.
-
-```bash
-yarn global add @davesnx/re-styled-ppx
-# Or
-npm -g install @davesnx/re-styled-ppx
-```
-
-And add the PPX in your `bsconfig.json` file:
-
-```json
-{
-  "ppx-flags": [
-    "ppx-flags": ["@davesnx/re-styled-ppx"]
-  ]
-}
-```
-
-## Usage
-
-`re_styled_ppx` implements a ppx that transforms the `[%re_styled_ppx]` extension into an expression that adds 5 to the integer passed in parameter.
-
-The code:
-
-```ocaml
-[%re_styled_ppx 5]
-```
-
-Will transform to something like:
-
-```ocaml
-5 + 5
-```
+## Thanks to
+Thanks to [Javier Chávarri](https://github.com/jchavarri), for helping me understand all the world of OCaml and his knowledge about ppx's. It has been a great experience.
+Inspired by [@astrada](https://github.com/astrada/) `bs-css-ppx` and their CSS Parser.
+Thanks to [ahrefs/bs-emotion](https://github.com/ahrefs/bs-emotion) and [emotion](https://github.com/emotion-js/emotion).
 
 ## Contributing
+We would love your help improving re-styled-ppx, there's still a lot to do.
+The ROADMAP is full and well organized, take a look in [here](./ROADMAP.md).
 
-We would love your help improving re-styled-ppx!
+Next big think would be support all CSS Properties and dynamic props.
+
+Instead of using a string, provide a function that will be executed to generate styles on run-time.
+```re
+/* This is not implemented yet! */
+module StyledWithProps = [%styled (~color) => {| color: $color |}];
+
+type size =
+  | Small
+  | Big
+  | Full;
+
+/* And you would be able to create components with Pattern Matching... */
+module StyledWithPatternMatcing = [%styled
+  (~size) => switch (size) {
+    | Small => "width: 33%"
+    | Big => "width: 80%"
+    | Full => "width: 100%"
+  }
+];
+```
 
 ### Developing
-
-You need Esy, you can install the latest version from [npm](https://npmjs.com):
+You need `esy`, you can install the latest version from [npm](https://npmjs.com):
 
 ```bash
 yarn global add esy@latest
@@ -113,57 +171,39 @@ esy $EDITOR
 esy vim
 ```
 
-Alternatively you can try [vim-reasonml](https://github.com/jordwalke/vim-reasonml)
-which loads esy project environments automatically.
-
 After you make some changes to source code, you can re-run project's build
-again with the same simple `esy` command.
-
-```bash
-esy
-```
-
-This project uses [Dune](https://dune.build/) as a build system, if you add a dependency in your `package.json` file, don't forget to add it to your `dune` and `dune-project` files too.
-
-### Running Binary
-
-After building the project, you can run the main binary that is produced.
-
-```bash
-esy start
-```
-
-### Running Tests
-
-You can test compiled executable (runs `scripts.tests` specified in `package.json`):
+again with the same simple `esy` command and run the native tests with
 
 ```bash
 esy test
 ```
 
-This will run the native unit test. If you want to run Bucklescript's integration test instead, you can do:
+This project uses [Dune](https://dune.build/) as a build system, if you add a dependency in your `package.json` file, don't forget to add it to your `dune` and `dune-project` files too.
 
+### Running Tests
+
+You can test compiled executable (runs `scripts.tests` specified in `package.json`):
+
+This will run the native unit test.
+```bash
+esy test
+```
+> This tests only ensures that the output looks exactly as a snapshot, so their mission are to ensure the ppx transforms to a valid OCaml syntax.
+
+If you want to run Bucklescript's integration test instead, you can do:
 ```bash
 cd test_bs
 esy
 yarn install
-yarn build
+yarn test
 ```
+> This tests are more like an end to end tests, that ensures that emotion have the correct methods for each CSS property.
 
-### Building documentation
+---
 
-Documentation for the libraries in the project can be generated with:
+Happy reasoning!
 
-```bash
-esy doc
-open-cli $(esy doc-path)
-```
-
-This assumes you have a command like [open-cli](https://github.com/sindresorhus/open-cli) installed on your system.
-
-> NOTE: On macOS, you can use the system command `open`, for instance `open $(esy doc-path)`
-
-### Creating release builds
+<!-- ### Creating release builds
 
 To release prebuilt binaries to all platforms, we use Github Actions to build each binary individually.
 
@@ -182,44 +222,4 @@ For instance, to release a new patch version, you can run:
 ```bash
 ./scripts/release.sh patch
 ```
-
-### Repository Structure
-
-The following snippet describes re-styled-ppx's repository structure.
-
-```text
-.
-├── .github/
-|   Contains Github specific files such as actions definitions and issue templates.
-│
-├── bin/
-|   Source for re-styled-ppx's binary. This links to the library defined in `lib/`.
-│
-├── lib/
-|   Source for re-styled-ppx's library. Contains re-styled-ppx's core functionnalities.
-│
-├── test/
-|   Unit tests and integration tests for re-styled-ppx.
-│
-├── test_bs/
-|   Bucklescript integration tests for re-styled-ppx.
-│
-├── test_runner/
-|   Source for the test runner's binary.
-|
-├── dune-project
-|   Dune file used to mark the root of the project and define project-wide parameters.
-|   For the documentation of the syntax, see https://dune.readthedocs.io/en/stable/dune-files.html#dune-project
-│
-├── LICENSE
-│
-├── package.json
-|   Esy package definition.
-|   To know more about creating Esy packages, see https://esy.sh/docs/en/configuration.html.
-│
-├── README.md
-│
-└── re-styled-ppx.opam
-    Opam package definition.
-    To know more about creating and publishing opam packages, see https://opam.ocaml.org/doc/Packaging.html.
-```
+ -->

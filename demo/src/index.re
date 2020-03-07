@@ -1,8 +1,4 @@
 module Component = [%styled {|
-  /* "any": inherit; */
-  /* "any": unset; */
-
-  /* Ordered list of default properties */
   align-content: normal;
   align-items: center;
   align-self: auto;
@@ -141,8 +137,8 @@ module Component = [%styled {|
   grid-template-areas: none;
   grid-template-columns: none;
   grid-template-rows: none;
-  height: 200px;
   height: auto;
+  height: 500px;
   /* hyphens: manual; */
   /* image-rendering: auto; */ /* bs-motion doesn't support it */
   /* inline-size: 200px; */ /* bs-motion doesn't support it */
@@ -298,14 +294,14 @@ module Component = [%styled {|
   /* visibility: visible; */
   white-space: normal;
   /* widows: 2; */ /* bs-motion doesn't support it */
-  width: 200px;
+  width: 500px;
   /* will-change: auto; */ /* bs-motion doesn't support it */
   word-break: normal;
   word-spacing: 0px;
   /* writing-mode: horizontal-tb; */ /* bs-motion doesn't support it */
   /* x: 0px; */ /* bs-motion doesn't support it */
   /* y: 0px; */ /* bs-motion doesn't support it */
-  /* z-index: auto; */
+  /* z-index: auto; */ /* bs-motion doesn't support it */
   z-index: 100;
   /* zoom: 1; */ /* bs-motion doesn't support it */
 
@@ -365,24 +361,9 @@ module Component = [%styled {|
   } */
 |}];
 
-module EM = [%styled {| flex: 1 0 auto; |}];
-
-module M = {
-  let styled = Emotion.(css([
-    flex(`some(1., 0., `auto))
-  ]));
-  [@react.component]
-  let make = (~children) => <div className=styled> children </div>;
-};
-
 ReactDOMRe.renderToElementWithId(
   <Component>
-    <EM>
-      {React.string("React API")}
-    </EM>
-    <M>
-      {React.string("zindexxx")}
-    </M>
+    {React.string("- styled-ppx -")}
   </Component>,
   "app"
 );
