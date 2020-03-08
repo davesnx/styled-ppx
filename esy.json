@@ -18,7 +18,7 @@
       "ODOC_SYNTAX": "re"
     },
     "release": {
-      "bin": ["styled-ppx"]
+      "bin": ["Bin"]
     }
   },
   "resolution": {
