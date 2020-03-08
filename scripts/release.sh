@@ -8,8 +8,7 @@ function bump_dune() {
 }
 
 function bump_all() {
-  output=$(npm version "${release}" --no-git-tag-version)
-  version=${output:1}
+  version=$(jq ".version" esy.json)
   bump_dune "dune-project" "$version"
 }
 
@@ -38,7 +37,7 @@ if [ -d ".git" ]; then
     bump_all
     git add .
     git commit -m "Bump to ${version}"
-    git tag -a "${output}" -m "${version}"
+    git tag -a "${version}" -m "${version}"
     git push origin --tags
   fi
 else
