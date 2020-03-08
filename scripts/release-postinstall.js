@@ -72,7 +72,6 @@ const copyPlatformBinaries = platformPath => {
 };
 
 const arch = find_arch();
-
 const platformPath = "platform-" + platform + "-" + arch;
 const supported = fs.existsSync(platformPath);
 
@@ -80,7 +79,9 @@ if (!supported) {
   console.error("styled-ppx does not support this platform :(");
   console.error("");
   console.error("If you want styled-ppx to support this platform natively,");
-  console.error("please open an issue at our repository, linked above.");
+  console.error(
+    "please open an issue here: https://github.com/davesnx/styled-ppx/issues/new"
+  );
   console.error("Specify that you are on the " + platform + " platform,");
   console.error("and on the " + arch + " architecture.");
   process.exit(1);
