@@ -1,0 +1,125 @@
+name: CI
+
+on:
+  push:
+    tags:
+      - v*
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test_and_build:
+    name: Test and build ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node-version: [12.x]
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install esy
+        run: npm install -g esy@0.5.8
+      - name: Get esy store path
+        id: esy_cache_path
+        shell: bash
+        run: |
+          # COMPUTE THE ESY INSTALL CACHE LOCATION AHEAD OF TIME
+          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+            THE_ESY__CACHE_INSTALL_PATH=$HOME/.esy/3_/i
+            THE_ESY__CACHE_INSTALL_PATH=$( cygpath --mixed --absolute "$THE_ESY__CACHE_INSTALL_PATH")
+          else
+            DESIRED_LEN="86"
+            HOME_ESY3="$HOME/.esy/3"
+            HOME_ESY3_LEN=${#HOME_ESY3}
+            NUM_UNDERS=$(echo "$(($DESIRED_LEN-$HOME_ESY3_LEN))")
+            UNDERS=$(printf "%-${NUM_UNDERS}s" "_")
+            UNDERS="${UNDERS// /_}"
+            THE_ESY__CACHE_INSTALL_PATH=${HOME_ESY3}${UNDERS}/i
+          fi
+          echo "THE_ESY__CACHE_INSTALL_PATH: $THE_ESY__CACHE_INSTALL_PATH"
+          echo "##[set-output name=path;]$THE_ESY__CACHE_INSTALL_PATH"
+      - name: Restore esy cache
+        uses: actions/cache@v1
+        with:
+          path: ${{ steps.esy_cache_path.outputs.path }}
+          key: v1-esy-${{ matrix.os }}-${{ hashFiles('**/index.json') }}
+          restore-keys: |
+            v1-esy-${{ matrix.os }}-
+      - name: esy install and build
+        run: |
+          esy install
+          esy build
+      - name: Get esy binary path
+        id: esy_binary_path
+        shell: bash
+        run: |
+          # from https://stackoverflow.com/a/24848739/617787
+          s=$(pwd); d=$(dirname $(esy x which styled-ppx));
+          while [ "${d#$s/}" == "${d}" ]
+          do s=$(dirname $s);b="../${b}"; done;
+          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+            ESY__BINARY_PATH=${b}${d#$s/}/styled-ppx.exe
+          else
+            ESY__BINARY_PATH=${b}${d#$s/}/styled-ppx
+          fi
+          echo "ESY__BINARY_PATH: $ESY__BINARY_PATH"
+          echo "##[set-output name=path;]$ESY__BINARY_PATH"
+      - name: (only on release) Upload artifacts ${{ matrix.os }}
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@master
+        with:
+          name: ${{ matrix.os }}
+          path: ${{ steps.esy_binary_path.outputs.path }}
+
+  publish:
+    needs: test_and_build
+    if: github.event_name != 'pull_request'
+    name: Publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "12.x"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Download linux artifacts
+        if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master') && success()
+        uses: actions/download-artifact@master
+        with:
+          name: ubuntu-latest
+          path: binaries/linux
+
+      - name: Download macOS artifacts
+        if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master') && success()
+        uses: actions/download-artifact@master
+        with:
+          name: macOS-latest
+          path: binaries/darwin
+
+      - name: Download windows artifacts
+        if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master') && success()
+        uses: actions/download-artifact@master
+        with:
+          name: windows-latest
+          path: binaries/windows
+
+      - name: Move artifacts
+        if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master') && success()
+        run: |
+          mkdir -p bin
+          mv binaries/darwin/styled-ppx bin/styled-ppx-darwin-x64.exe
+          mv binaries/windows/styled-ppx.exe bin/styled-ppx-win-x64.exe
+          mv binaries/linux/styled-ppx bin/styled-ppx-linux-x64.exe
+
+      - name: Publish
+        if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master') && success()
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
