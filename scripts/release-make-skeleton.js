@@ -1,9 +1,9 @@
-// @flow
+#!/usr/bin/env node
 
 const { execSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
-const package = require("../package.json");
+const esy = require("../esy.json");
 
 const filesToCopy = ["LICENSE", "README.md"];
 
@@ -41,9 +41,7 @@ fs.copyFileSync(
   path.join(dst, "postinstall.js")
 );
 
-const filesToTouch = [
-  "styled-ppx.exe"
-];
+const filesToTouch = ["styled-ppx.exe"];
 
 for (const file of filesToTouch) {
   const p = path.join(dst, file);
@@ -53,16 +51,16 @@ for (const file of filesToTouch) {
 
 const pkgJson = {
   name: "@davesnx/styled-ppx",
-  version: package.version,
-  description: package.description,
-  homepage: package.homepage,
-  license: package.license,
-  repository: package.repository,
+  version: esy.version,
+  description: esy.description,
+  homepage: esy.homepage,
+  license: esy.license,
+  repository: esy.repository,
   scripts: {
     postinstall: "node postinstall.js"
   },
   bin: {
-    styled-ppx: "styled-ppx.exe"
+    "styled-ppx": "styled-ppx.exe"
   },
   files: [
     "platform-windows-x64/",
@@ -73,4 +71,7 @@ const pkgJson = {
   ]
 };
 
-fs.writeFileSync(path.join(dst, "package.json"), JSON.stringify(pkgJson, null, 2));
+fs.writeFileSync(
+  path.join(dst, "package.json"),
+  JSON.stringify(pkgJson, null, 2)
+);
