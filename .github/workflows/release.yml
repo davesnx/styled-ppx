@@ -63,7 +63,7 @@ jobs:
           s=$(pwd); d=$(dirname $(esy x which styled-ppx));
           while [ "${d#$s/}" == "${d}" ]
           do s=$(dirname $s);b="../${b}"; done;
-          ESY__BINARY_PATH=${b}${d#$s/}/styled-ppx.exe
+          ESY__BINARY_PATH=${b}${d#$s/}/styled-ppx
           echo "ESY__BINARY_PATH: $ESY__BINARY_PATH"
           echo "##[set-output name=path;]$ESY__BINARY_PATH"
 
