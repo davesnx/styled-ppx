@@ -8,6 +8,10 @@ Allows you to create **React Components** with style definitions with CSS that d
 > But you can safely use it, as it woudn't break any existing code in further releases.
 > In case you want to know more, take a look at the [ROADMAP](./ROADMAP.md), or feel free to chat on Discord: @davesnx#5641
 
+The biggest missing features are:
+- Only support `div`. [Here is the issue](https://github.com/davesnx/styled-ppx/issues/26)
+- Dynamic components not supported. [Here is the issue](https://github.com/davesnx/styled-ppx/issues/12)
+
 ## Motivation
 I love CSS and I'm comming from the JavaScript world, writing React code with styled-components. I found it, one of the best combos to write scalable frontend applications and wasn't a reality in ReasonML/OCaml.
 
@@ -68,6 +72,8 @@ module ComponentMultiline = [%styled
 ```
 
 ## Installation
+
+This package depends on bs-emotion, make sure you follow the instalation as well: https://github.com/ahrefs/bs-emotion#installation
 
 ### With `esy` on native projects
 

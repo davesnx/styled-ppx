@@ -169,4 +169,4 @@ jobs:
           npm publish --access public
         working-directory: ./_release
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
