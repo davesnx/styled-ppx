@@ -60,7 +60,7 @@ jobs:
         shell: bash
         run: |
           # from https://stackoverflow.com/a/24848739/617787
-          s=$(pwd); d=$(dirname $(esy x which styled-ppx.exe));
+          s=$(pwd); d=$(dirname $(esy x which styled-ppx));
           while [ "${d#$s/}" == "${d}" ]
           do s=$(dirname $s);b="../${b}"; done;
           ESY__BINARY_PATH=${b}${d#$s/}/styled-ppx.exe
