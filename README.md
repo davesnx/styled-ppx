@@ -21,7 +21,7 @@ As well, saw a few people asking for it ([a](https://reasonml.chat/t/idiomatic-w
 **`styled-ppx`** implements a ppx that transforms `[%styled]` extensions into [bs-emotion](https://github.com/ahrefs/bs-emotion) calls, that does all the CSS-in-JS that provides [emotion](https://emotion.sh).
 
 This is how you write components in ReasonML
-```re
+```reason
 module Component = [%styled "display: flex"];
 
 module ComponentWithMultiline = [%styled {|
@@ -39,7 +39,7 @@ ReactDOMRe.renderToElementWithId(
 ```
 
 After running the ppx
-```re
+```reason
 module Component = {
   let styled = Emotion.(css([display(`flex), justifyContent(`center), alignItems(`center)]));
   [@react.component]
@@ -134,7 +134,7 @@ The ROADMAP is full and well organized, take a look in [here](./ROADMAP.md).
 Next big think would be support all CSS Properties and dynamic props.
 
 Instead of using a string, provide a function that will be executed to generate styles on run-time.
-```re
+```reason
 /* This is not implemented yet! */
 module StyledWithProps = [%styled (~color) => {| color: $color |}];
 

@@ -1,3 +1,1 @@
-open Migrate_parsetree;
-
-let _ = Driver.run_as_ppx_rewriter();
+let _ = Migrate_parsetree.Driver.run_as_ppx_rewriter();
