@@ -205,7 +205,9 @@ yarn test
 
 ---
 
-Happy reasoning!
+##### Happy reasoning!
+
+<!--
 
 ### Creating release builds
 
