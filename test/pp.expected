@@ -8,7 +8,6 @@ module Component =
                       | None -> React.null)] ())
       [@JSX ])[@@react.component ]
   end
-  
 module ComponentMultiline =
   struct
     let styled =
