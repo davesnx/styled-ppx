@@ -20,7 +20,7 @@ As well, saw a few people asking for it ([a](https://reasonml.chat/t/idiomatic-w
 ## Usage
 **`styled-ppx`** implements a ppx that transforms `[%styled]` extensions into [bs-emotion](https://github.com/ahrefs/bs-emotion) calls, that does all the CSS-in-JS that provides [emotion](https://emotion.sh).
 
-This is how you write components in ReasonML
+This is how you write components in ReasonML with this ppx:
 ```reason
 module Component = [%styled "display: flex"];
 
@@ -40,7 +40,7 @@ ReactDOMRe.renderToElementWithId(
 
 After running the ppx
 ```reason
-module Component = {
+module ComponentWithMultiline = {
   let styled = Emotion.(css([display(`flex), justifyContent(`center), alignItems(`center)]));
   [@react.component]
   let make = (~children=?) => {
@@ -54,7 +54,7 @@ module Component = {
 };
 ```
 
-This is how you write components in OCaml
+This is how you write components in OCaml with this ppx:
 ```ocaml
 module Component = [%styled ("display: flex")]
 
@@ -127,7 +127,7 @@ Thanks to [ahrefs/bs-emotion](https://github.com/ahrefs/bs-emotion) and [emotion
 
 ## Contributing
 We would love your help improving styled-ppx, there's still a lot to do.
-The ROADMAP is full and well organized, take a look in [here](./ROADMAP.md).
+The ROADMAP is well organized, take a look in [here](./ROADMAP.md).
 
 Next big think would be support all CSS Properties and dynamic props.
 
@@ -141,7 +141,7 @@ type size =
   | Big
   | Full;
 
-/* And you would be able to create components with Pattern Matching... */
+/* And you would be able to create components with Pattern Matching, or compose functions! */
 module StyledWithPatternMatcing = [%styled
   (~size) => switch (size) {
     | Small => "width: 33%"
@@ -207,7 +207,7 @@ yarn test
 
 Happy reasoning!
 
-<!-- ### Creating release builds
+### Creating release builds
 
 To release prebuilt binaries to all platforms, we use Github Actions to build each binary individually.
 
