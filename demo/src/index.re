@@ -1,4 +1,4 @@
-module Component = [%styled {|
+module Component = [%styled.span {|
   align-content: normal;
   align-items: center;
   align-self: auto;

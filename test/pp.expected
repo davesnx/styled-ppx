@@ -27,4 +27,13 @@ module ComponentMultiline =
                       | None -> React.null)] ())
       [@JSX ])[@@react.component ]
   end
-module EmptyComponent = [%styled ()]
+module Link =
+  struct
+    let styled = let open Emotion in css [color (hex {js|C0FFEE|js})]
+    let make ?children  =
+      ((a ~className:styled
+          ~children:[(match children with
+                      | ((Some (chil))[@explicit_arity ]) -> chil
+                      | None -> React.null)] ())
+      [@JSX ])[@@react.component ]
+  end

@@ -146,9 +146,9 @@ let createStyles = (loc, name, exp) => {
 };
 
 /* switch (chidren) {
-  | Some(child) => child
-  | None => React.null
-} */
+     | Some(child) => child
+     | None => React.null
+   } */
 let createSwitchChildren = (~loc) => {
   let noneCase =
     Exp.case(
@@ -259,12 +259,12 @@ let moduleMapper = (_, _) => {
     switch (expr) {
     | {
         pmod_desc:
-          /* that are defined with the ppx [%styled] */
+          /* that are defined with a ppx like [%txt] */
           Pmod_extension((
-            {txt: "styled", _},
+            {txt, _},
             PStr([
               {
-                /* and contains a string */
+                /* and contains a string as a payload */
                 pstr_desc:
                   Pstr_eval(
                     {
@@ -280,6 +280,18 @@ let moduleMapper = (_, _) => {
           )),
         _,
       } =>
+      let tag =
+        switch (String.split_on_char('.', txt)) {
+        | ["styled"] => "div"
+        | ["styled", tag] => tag
+        | _ => "div"
+        };
+
+      if (!List.exists(t => t === tag, htmlTags)) {
+        ();
+        /* TODO: Add warning into an invalid html tag */
+      };
+
       let loc = pexp_loc;
       let loc_start =
         switch (delim) {
@@ -299,50 +311,7 @@ let moduleMapper = (_, _) => {
           Css_parser.declaration_list,
         );
 
-      transformModule(~loc, ~ast, ~tag="div");
-    | {
-        pmod_desc:
-          /* that are defined with the ppx [%styled] */
-          Pmod_extension((
-            {txt: "styled.div", _},
-            PStr([
-              {
-                /* and contains a string */
-                pstr_desc:
-                  Pstr_eval(
-                    {
-                      pexp_desc: Pexp_constant(Pconst_string(str, delim)),
-                      pexp_loc,
-                      _,
-                    },
-                    _,
-                  ),
-                _,
-              },
-            ]),
-          )),
-        _,
-      } =>
-      let loc = pexp_loc;
-      let loc_start =
-        switch (delim) {
-        | None => loc.Location.loc_start
-        | Some(s) => {
-            ...loc.Location.loc_start,
-            Lexing.pos_cnum:
-              loc.Location.loc_start.Lexing.pos_cnum + String.length(s) + 1,
-          }
-        };
-
-      let ast =
-        Css_lexer.parse_string(
-          ~container_lnum=loc_start.Lexing.pos_lnum,
-          ~pos=loc_start,
-          str,
-          Css_parser.declaration_list,
-        );
-
-      transformModule(~loc, ~ast, ~tag="div");
+      transformModule(~loc, ~ast, ~tag);
     | _ => default_mapper.module_expr(mapper, expr)
     },
 };
