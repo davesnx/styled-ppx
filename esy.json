@@ -18,7 +18,9 @@
       "ODOC_SYNTAX": "re"
     },
     "release": {
-      "bin": ["Bin"]
+      "bin": [
+        "Bin"
+      ]
     }
   },
   "resolution": {
@@ -35,6 +37,7 @@
   },
   "scripts": {
     "test": "dune runtest",
+    "test_bs": "cd test_bs; yarn test",
     "test:promote": "dune runtest --auto-promote",
     "doc": "esy dune build @doc",
     "doc-path": "esy echo #{self.target_dir}/default/_doc/_html/index.html",

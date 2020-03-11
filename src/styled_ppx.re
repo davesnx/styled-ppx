@@ -40,11 +40,7 @@ let createSwitchChildren = (~loc) => {
           Some(
             Pat.mk(
               ~loc,
-              Ppat_tuple(
-                [
-                  Pat.mk(~loc, Ppat_var({txt: "chil", loc}))
-                ],
-              ),
+              Ppat_tuple([Pat.mk(~loc, Ppat_var({txt: "chil", loc}))]),
             ),
           ),
         ),
@@ -52,7 +48,7 @@ let createSwitchChildren = (~loc) => {
       Exp.ident(~loc, {txt: Lident("chil"), loc}),
     );
 
-  let matchingExp = Exp.ident(~loc, { txt: Lident("children"), loc });
+  let matchingExp = Exp.ident(~loc, {txt: Lident("children"), loc});
 
   Exp.match(~loc, matchingExp, [someChildCase, noneCase]);
 };
