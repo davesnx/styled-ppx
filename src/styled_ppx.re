@@ -114,7 +114,7 @@ let createReactComponent = (~loc) =>
   );
 
 /* module X = { createStyle + createReactComponent } */
-let createModule = (~loc, ~ast) =>
+let transformModule = (~loc, ~ast) =>
   Mod.mk(
     Pmod_structure([
       createStyles(
@@ -173,7 +173,7 @@ let moduleMapper = (_, _) => {
           Css_parser.declaration_list,
         );
 
-      createModule(~loc, ~ast);
+      transformModule(~loc, ~ast);
     | _ => default_mapper.module_expr(mapper, expr)
     },
 };
