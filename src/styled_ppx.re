@@ -6,6 +6,132 @@ open Parsetree;
 open Ast_helper;
 open Longident;
 
+let htmlTags = [
+  "a",
+  "abbr",
+  "acronym",
+  "address",
+  "applet",
+  "area",
+  "article",
+  "aside",
+  "audio",
+  "b",
+  "base",
+  "basefont",
+  "bb",
+  "bdo",
+  "big",
+  "blockquote",
+  "body",
+  "br",
+  "button",
+  "canvas",
+  "caption",
+  "center",
+  "cite",
+  "code",
+  "col",
+  "colgroup",
+  "command",
+  "datagrid",
+  "datalist",
+  "dd",
+  "del",
+  "details",
+  "dfn",
+  "dialog",
+  "dir",
+  "div",
+  "dl",
+  "dt",
+  "em",
+  "embed",
+  "eventsource",
+  "fieldset",
+  "figcaption",
+  "figure",
+  "font",
+  "footer",
+  "form",
+  "frame",
+  "frameset",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "head",
+  "header",
+  "hgroup",
+  "hr",
+  "html",
+  "i",
+  "iframe",
+  "img",
+  "input",
+  "ins",
+  "isindex",
+  "kbd",
+  "keygen",
+  "label",
+  "legend",
+  "li",
+  "link",
+  "map",
+  "mark",
+  "menu",
+  "meta",
+  "meter",
+  "nav",
+  "noframes",
+  "noscript",
+  "object",
+  "ol",
+  "optgroup",
+  "option",
+  "output",
+  "p",
+  "param",
+  "pre",
+  "progress",
+  "q",
+  "rp",
+  "rt",
+  "ruby",
+  "s",
+  "samp",
+  "script",
+  "section",
+  "select",
+  "small",
+  "source",
+  "span",
+  "strike",
+  "strong",
+  "style",
+  "sub",
+  "sup",
+  "table",
+  "tbody",
+  "td",
+  "textarea",
+  "tfoot",
+  "th",
+  "thead",
+  "time",
+  "title",
+  "tr",
+  "track",
+  "tt",
+  "u",
+  "ul",
+  "var",
+  "video",
+  "wbr",
+];
+
 let styleVariableName = "styled";
 
 /* let styles = Emotion.(css(exp)) */
@@ -54,7 +180,7 @@ let createSwitchChildren = (~loc) => {
 };
 
 /* let make = (~children) => <div className=classNameValue> */
-let createMakeFn = (~loc, ~classNameValue) =>
+let createMakeFn = (~loc, ~classNameValue, ~tag) =>
   Exp.fun_(
     ~loc,
     Optional("children"),
@@ -64,7 +190,7 @@ let createMakeFn = (~loc, ~classNameValue) =>
       /* Create a function div() */
       ~loc,
       ~attrs=[({txt: "JSX", loc}, PStr([]))], /* Add [@JSX]*/
-      Exp.ident({txt: Lident("div"), loc}),
+      Exp.ident({txt: Lident(tag), loc}),
       [
         /* Arguments */
         (
@@ -97,7 +223,7 @@ let createMakeFn = (~loc, ~classNameValue) =>
   );
 
 /* [@react.component] + createMakeFn */
-let createReactComponent = (~loc) =>
+let createReactComponent = (~loc, ~tag) =>
   Str.mk(
     ~loc,
     Pstr_value(
@@ -107,14 +233,14 @@ let createReactComponent = (~loc) =>
           ~loc,
           ~attrs=[({txt: "react.component", loc}, PStr([]))],
           Pat.mk(~loc, Ppat_var({txt: "make", loc})),
-          createMakeFn(~loc, ~classNameValue=styleVariableName),
+          createMakeFn(~loc, ~classNameValue=styleVariableName, ~tag),
         ),
       ],
     ),
   );
 
 /* module X = { createStyle + createReactComponent } */
-let transformModule = (~loc, ~ast) =>
+let transformModule = (~loc, ~ast, ~tag) =>
   Mod.mk(
     Pmod_structure([
       createStyles(
@@ -122,7 +248,7 @@ let transformModule = (~loc, ~ast) =>
         styleVariableName,
         Css_to_emotion.render_declaration_list(ast),
       ),
-      createReactComponent(~loc),
+      createReactComponent(~loc, ~tag),
     ]),
   );
 
@@ -173,7 +299,50 @@ let moduleMapper = (_, _) => {
           Css_parser.declaration_list,
         );
 
-      transformModule(~loc, ~ast);
+      transformModule(~loc, ~ast, ~tag="div");
+    | {
+        pmod_desc:
+          /* that are defined with the ppx [%styled] */
+          Pmod_extension((
+            {txt: "styled.div", _},
+            PStr([
+              {
+                /* and contains a string */
+                pstr_desc:
+                  Pstr_eval(
+                    {
+                      pexp_desc: Pexp_constant(Pconst_string(str, delim)),
+                      pexp_loc,
+                      _,
+                    },
+                    _,
+                  ),
+                _,
+              },
+            ]),
+          )),
+        _,
+      } =>
+      let loc = pexp_loc;
+      let loc_start =
+        switch (delim) {
+        | None => loc.Location.loc_start
+        | Some(s) => {
+            ...loc.Location.loc_start,
+            Lexing.pos_cnum:
+              loc.Location.loc_start.Lexing.pos_cnum + String.length(s) + 1,
+          }
+        };
+
+      let ast =
+        Css_lexer.parse_string(
+          ~container_lnum=loc_start.Lexing.pos_lnum,
+          ~pos=loc_start,
+          str,
+          Css_parser.declaration_list,
+        );
+
+      transformModule(~loc, ~ast, ~tag="div");
     | _ => default_mapper.module_expr(mapper, expr)
     },
 };
