@@ -200,6 +200,15 @@ let createRecordLabel = (~loc, name, kind) =>
     Typ.constr(~loc, {txt: Lident(kind), loc}, []),
   );
 
+/* [@bs.optional] ref: domRef */
+let createDomRefLabel = (~loc) =>
+  Type.field(
+    ~loc,
+    ~attrs=[({txt: "bs.optional", loc}, PStr([]))],
+    {txt: "ref", loc},
+    Typ.constr(~loc, {txt: Ldot(Lident("ReactDOMRe"), "domRef"), loc}, []),
+  );
+
 /* [@bs.optional] onDragOver: ReactEvent.Mouse.t => unit */
 let createRecordEventLabel = (~loc, name, kind) => {
   Type.field(
@@ -220,8 +229,9 @@ let createRecordEventLabel = (~loc, name, kind) => {
 };
 
 /*
-   prop: type
-   [@bs.optional]
+   List of
+      prop: type
+      [@bs.optional]
 
    ref: domRef
    [@bs.optional]
@@ -229,13 +239,16 @@ let createRecordEventLabel = (~loc, name, kind) => {
    ...
  */
 let createMakePropsLabels = (~loc) => {
-  List.map(
-    ({name, kind, isEvent}) =>
-      isEvent
-        ? createRecordEventLabel(~loc, name, kind)
-        : createRecordLabel(~loc, name, kind),
-    domPropsList,
-  );
+  [
+    createDomRefLabel(~loc),
+    ...List.map(
+         ({name, type_, isEvent}) =>
+           isEvent
+             ? createRecordEventLabel(~loc, name, type_)
+             : createRecordLabel(~loc, name, type_),
+         domPropsList,
+       ),
+  ];
 };
 
 let createMakeProps = (~loc) => {
