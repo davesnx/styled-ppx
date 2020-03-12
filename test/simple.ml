@@ -12,12 +12,12 @@ module ComponentMultiline = [%styled
   |}
 ]
 
-(* module EmptyComponent = [%styled.div ()]
-module EmptyComponent2 = [%styled.div]
- *)
 module Link = [%styled.a ("color: #C0FFEE")]
 
 (* Not supported yet
+(* module EmptyComponent = [%styled.div ()]
+module EmptyComponent2 = [%styled.div]
+ *)
 
 module StyledWithProps = [%styled (~color) => {| color: $color |}];
 

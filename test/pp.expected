@@ -1,16 +1,16 @@
 module Component =
   struct
-    let styled = let open Emotion in css [display `block]
+    let styles = let open Emotion in css [display `block]
     let make ?children  =
-      ((div ~className:styled
+      ((div
           ~children:[(match children with
                       | ((Some (chil))[@explicit_arity ]) -> chil
-                      | None -> React.null)] ())
+                      | None -> React.null)] () ~className:styles)
       [@JSX ])[@@react.component ]
   end
 module ComponentMultiline =
   struct
-    let styled =
+    let styles =
       let open Emotion in
         css
           [color (hex {js|333|js});
@@ -21,19 +21,19 @@ module ComponentMultiline =
           width (pct 70.);
           background (url {js|http://example.com/test.jpg|js})]
     let make ?children  =
-      ((div ~className:styled
+      ((div
           ~children:[(match children with
                       | ((Some (chil))[@explicit_arity ]) -> chil
-                      | None -> React.null)] ())
+                      | None -> React.null)] () ~className:styles)
       [@JSX ])[@@react.component ]
   end
 module Link =
   struct
-    let styled = let open Emotion in css [color (hex {js|C0FFEE|js})]
+    let styles = let open Emotion in css [color (hex {js|C0FFEE|js})]
     let make ?children  =
-      ((a ~className:styled
+      ((a
           ~children:[(match children with
                       | ((Some (chil))[@explicit_arity ]) -> chil
-                      | None -> React.null)] ())
+                      | None -> React.null)] () ~className:styles)
       [@JSX ])[@@react.component ]
   end

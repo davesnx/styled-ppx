@@ -1,4 +1,8 @@
-module Component = [%styled.span {|
+module App = [%styled {|
+
+|}];
+
+module Component = [%styled.a {|
   align-content: normal;
   align-items: center;
   align-self: auto;
@@ -362,8 +366,10 @@ module Component = [%styled.span {|
 |}];
 
 ReactDOMRe.renderToElementWithId(
-  <Component>
-    {React.string("- styled-ppx -")}
-  </Component>,
+  <App>
+    <Component href="https://sancho.dev">
+      {React.string("- styled-ppx -")}
+    </Component>
+  </App>,
   "app"
 );
