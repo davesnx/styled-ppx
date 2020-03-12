@@ -1,5 +1,7 @@
 module App = [%styled {|
-
+  display: flex;
+  justify-content: center;
+  align-items: center;
 |}];
 
 module Component = [%styled.a {|
@@ -367,7 +369,7 @@ module Component = [%styled.a {|
 
 ReactDOMRe.renderToElementWithId(
   <App>
-    <Component href="https://sancho.dev">
+    <Component>
       {React.string("- styled-ppx -")}
     </Component>
   </App>,
