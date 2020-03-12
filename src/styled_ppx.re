@@ -79,7 +79,7 @@ let createSwitchChildren = (~loc) => {
   Exp.match(~loc, matchingExp, [someChildCase, noneCase]);
 };
 
-/* div(~className=styles, ~children, ()) [@JSX] + createSwitchChildren */
+/* div(~className=styles, ~children, ()) + createSwitchChildren */
 let createElement = (~loc, ~tag) => {
   Exp.apply(
     ~loc,
@@ -197,7 +197,7 @@ let createRecordLabel = (~loc, name, kind) =>
     ~loc,
     ~attrs=[({txt: "bs.optional", loc}, PStr([]))],
     {txt: name, loc},
-    Typ.constr(~loc, {txt: Lident(kind), loc}, [])
+    Typ.constr(~loc, {txt: Lident(kind), loc}, []),
   );
 
 /* [@bs.optional] onDragOver: ReactEvent.Mouse.t => unit */
@@ -206,27 +206,36 @@ let createRecordEventLabel = (~loc, name, kind) => {
     ~loc,
     ~attrs=[({txt: "bs.optional", loc}, PStr([]))],
     {txt: name, loc},
-    Typ.arrow(~loc, Nolabel,
-      Typ.constr(~loc, {txt: Ldot(Ldot(Lident("ReactEvent"), kind), "t"), loc}, []),
-      Typ.constr(~loc, {txt: Lident("unit"), loc}, [])
-    )
+    Typ.arrow(
+      ~loc,
+      Nolabel,
+      Typ.constr(
+        ~loc,
+        {txt: Ldot(Ldot(Lident("ReactEvent"), kind), "t"), loc},
+        [],
+      ),
+      Typ.constr(~loc, {txt: Lident("unit"), loc}, []),
+    ),
   );
-}
+};
 
 /*
-  prop: type
-  [@bs.optional]
+   prop: type
+   [@bs.optional]
 
-  ref: domRef
-  [@bs.optional]
+   ref: domRef
+   [@bs.optional]
 
-  ...
-*/
+   ...
+ */
 let createMakePropsLabels = (~loc) => {
-  List.map(({ name, kind, isEvent }) => switch (isEvent) {
-    | true => createRecordEventLabel(~loc, name, kind)
-    | false => createRecordLabel(~loc, name, kind)
-  }, domPropsList)
+  List.map(
+    ({name, kind, isEvent}) =>
+      isEvent
+        ? createRecordEventLabel(~loc, name, kind)
+        : createRecordLabel(~loc, name, kind),
+    domPropsList,
+  );
 };
 
 let createMakeProps = (~loc) => {
@@ -236,10 +245,7 @@ let createMakeProps = (~loc) => {
     PStr([
       Str.mk(
         ~loc,
-        Pstr_eval(
-          Exp.ident(~loc, {txt: Lident("abstract"), loc}),
-          [],
-        ),
+        Pstr_eval(Exp.ident(~loc, {txt: Lident("abstract"), loc}), []),
       ),
     ]),
   );
@@ -305,6 +311,7 @@ let moduleMapper = (_, _) => {
         _,
       } =>
       let tag =
+        /* TODO: Improve splitting */
         switch (String.split_on_char('.', txt)) {
         | ["styled"] => "div"
         | ["styled", tag] => tag
