@@ -27,7 +27,7 @@ let transformModule = (~loc, ~ast, ~tag) =>
         styleVariableName,
         Css_to_emotion.render_declaration_list(ast),
       ),
-      ReactComponent.create(~loc, ~tag, ~styles=styleVariableName),
+      React_component.create(~loc, ~tag, ~styles=styleVariableName),
     ]),
   );
 

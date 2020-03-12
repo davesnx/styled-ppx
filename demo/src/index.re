@@ -120,6 +120,7 @@ module Component = [%styled.a {|
   /* flood-color: rgb(0, 0, 0); */ /* bs-motion doesn't support it */
   flood-opacity: 1;
   /* font-family: Times; */
+  /* font-family: "SF Mono"; */
   /* font-feature-settings: normal; */ /* bs-motion doesn't support it */
   font-kerning: auto;
   /* font-optical-sizing: auto; */ /* bs-motion doesn't support it */

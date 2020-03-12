@@ -5,7 +5,7 @@ open Parsetree;
 open Ast_helper;
 
 /*
-/* Build an AST node representing all named args for the `external` definition for a component's props */
+Build an AST node representing all named args for the `external` definition for a component's props
 let rec recursivelyMakeNamedArgsForExternal = (list, args) =>
   switch (list) {
   | [(label, default, loc, interiorType), ...tl] =>
@@ -71,7 +71,7 @@ let rec recursivelyMakeNamedArgsForExternal = (list, args) =>
   | [] => args
   };
 
-/* Build an AST node for the [@bs.obj] representing props for a component */
+Build an AST node for the [@bs.obj] representing props for a component
 let makePropsValue = (fnName, loc, namedArgListWithKeyAndRef, propsType) => {
   let propsName = fnName ++ "Props";
   {
@@ -99,7 +99,7 @@ let makePropsValue = (fnName, loc, namedArgListWithKeyAndRef, propsType) => {
   };
 };
 
-/* Build an AST node representing an `external` with the definition of the [@bs.obj] */
+Build an AST node representing an `external` with the definition of the [@bs.obj]
 let makePropsExternal = (fnName, loc, namedArgListWithKeyAndRef, propsType) => {
   pstr_loc: loc,
   pstr_desc:
@@ -108,7 +108,7 @@ let makePropsExternal = (fnName, loc, namedArgListWithKeyAndRef, propsType) => {
     ),
 };
 
-/* Build an AST node for the signature of the `external` definition */
+Build an AST node for the signature of the `external` definition
 let makePropsExternalSig = (fnName, loc, namedArgListWithKeyAndRef, propsType) => {
   psig_loc: loc,
   psig_desc:
@@ -117,7 +117,7 @@ let makePropsExternalSig = (fnName, loc, namedArgListWithKeyAndRef, propsType) =
     ),
 };
 
-/* Build an AST node for the props name when converted to a Js.t inside the function signature  */
+Build an AST node for the props name when converted to a Js.t inside the function signature
 let makePropsName = (~loc, name) => {
   ppat_desc: Ppat_var({txt: name, loc}),
   ppat_loc: loc,
@@ -127,7 +127,7 @@ let makePropsName = (~loc, name) => {
 let makeObjectField = (loc, (str, attrs, type_)) =>
   [@implicit_arity] Otag({loc, txt: str}, attrs, type_);
 
-/* Build an AST node representing a "closed" Js.t object representing a component's props */
+Build an AST node representing a "closed" Js.t object representing a component's props
 let makePropsType = (~loc, namedTypeList) =>
   Typ.mk(
     ~loc,
@@ -149,7 +149,7 @@ let makePropsType = (~loc, namedTypeList) =>
     ),
   );
 
-/* Builds an AST node for the entire `external` definition of props */
+Builds an AST node for the entire `external` definition of props
 let makeExternalDecl = (fnName, loc, namedArgListWithKeyAndRef, namedTypeList) =>
   makePropsExternal(
     fnName,
@@ -157,18 +157,6 @@ let makeExternalDecl = (fnName, loc, namedArgListWithKeyAndRef, namedTypeList) =
     List.map(pluckLabelDefaultLocType, namedArgListWithKeyAndRef),
     makePropsType(~loc, namedTypeList),
   );
-
-
-
-
-
-
-
-
-
-
-
-
 */
 
 /* switch (chidren) {
