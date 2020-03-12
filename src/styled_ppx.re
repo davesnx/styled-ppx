@@ -80,7 +80,7 @@ let createSwitchChildren = (~loc) => {
 };
 
 /* div(~className=styles, ~children, ()) [@JSX] + createSwitchChildren */
-let createJSX = (~loc, ~tag) => {
+let createElement = (~loc, ~tag) => {
   Exp.apply(
     ~loc,
     Exp.ident(~loc, {txt: Ldot(Lident("React"), "createElement"), loc}),
@@ -156,7 +156,7 @@ let createMakeBody = (~loc, ~tag, ~classNameValue) =>
     ~loc,
     ~attrs=[({txt: "reason.preserve_braces", loc}, PStr([]))],
     createSetClassName(~loc, ~classNameValue),
-    createJSX(~loc, ~tag),
+    createElement(~loc, ~tag),
   );
 
 /* let make = (~children, props: makeProps) => + createMakeBody */
