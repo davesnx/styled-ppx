@@ -1,6 +1,6 @@
 module Component = [%styled ("display: block")]
 
-module ComponentMultiline = [%styled
+(* module ComponentMultiline = [%styled
   {|
     color: #333;
     background-color: #333;
@@ -11,8 +11,8 @@ module ComponentMultiline = [%styled
     background: url(http://example.com/test.jpg);
   |}
 ]
-
-module Link = [%styled.a ("color: #C0FFEE")]
+ *)
+(* module Link = [%styled.a ("color: #C0FFEE")] *)
 
 (* Not supported yet
 (* module EmptyComponent = [%styled.div ()]

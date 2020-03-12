@@ -1,39 +1,18 @@
 module Component =
   struct
+    type makeProps =
+      {
+      key: string [@bs.optional ];
+      suppressContentEditableWarning: bool [@bs.optional ]}[@@bs.deriving
+                                                             abstract]
+    external setClassName : makeProps -> string -> unit = "className"
+    [@@bs.set ]
     let styles = let open Emotion in css [display `block]
-    let make ?children  =
-      ((div
-          ~children:[(match children with
-                      | ((Some (chil))[@explicit_arity ]) -> chil
-                      | None -> React.null)] () ~className:styles)
-      [@JSX ])[@@react.component ]
-  end
-module ComponentMultiline =
-  struct
-    let styles =
-      let open Emotion in
-        css
-          [color (hex {js|333|js});
-          backgroundColor (hex {js|333|js});
-          margin4 auto zero (px 10) (em 1.);
-          borderBottom `thin dashed (hex {js|eee|js});
-          borderRightColor (rgb 1 0 1);
-          width (pct 70.);
-          background (url {js|http://example.com/test.jpg|js})]
-    let make ?children  =
-      ((div
-          ~children:[(match children with
-                      | ((Some (chil))[@explicit_arity ]) -> chil
-                      | None -> React.null)] () ~className:styles)
-      [@JSX ])[@@react.component ]
-  end
-module Link =
-  struct
-    let styles = let open Emotion in css [color (hex {js|C0FFEE|js})]
-    let make ?children  =
-      ((a
-          ~children:[(match children with
-                      | ((Some (chil))[@explicit_arity ]) -> chil
-                      | None -> React.null)] () ~className:styles)
-      [@JSX ])[@@react.component ]
+    let make ?children  (props : makeProps) =
+      ((setClassName props styles;
+        React.createElement (("div")[@reason.raw_literal "div"]) ~props
+          [|((match children with
+              | ((Some (chil))[@explicit_arity ]) -> chil
+              | None -> React.null));[]|])
+      [@reason.preserve_braces ])
   end
