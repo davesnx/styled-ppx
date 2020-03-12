@@ -159,10 +159,10 @@ let makeExternalDecl = (fnName, loc, namedArgListWithKeyAndRef, namedTypeList) =
   );
 */
 
-/* switch (chidren) {
-     | Some(child) => child
-     | None => React.null
-   } */
+/* switch (children) {
+   | Some(child) => child
+   | None => React.null
+} */
 let createSwitchChildren = (~loc) => {
   let noneCase =
     Exp.case(
@@ -193,9 +193,9 @@ let createSwitchChildren = (~loc) => {
   Exp.match(~loc, matchingExp, [someChildCase, noneCase]);
 };
 
+/* div(~className=styles, ~children, ()) [@JSX] + createSwitchChildren */
 let createJSX = (~loc, ~tag, args) => {
   Exp.apply(
-    /* Create a function div() */
     ~loc,
     ~attrs=[({txt: "JSX", loc}, PStr([]))], /* Add [@JSX]*/
     Exp.ident({txt: Lident(tag), loc}),
@@ -228,7 +228,7 @@ let createJSX = (~loc, ~tag, args) => {
 };
 
 /* let make = (~children) => <div className=classNameValue> */
-let createMakeFn = (~loc, ~styles, ~tag) =>
+let createMakeFn = (~loc, ~classNameValue, ~tag) =>
   Exp.fun_(
     ~loc,
     Optional("children"),
@@ -240,12 +240,11 @@ let createMakeFn = (~loc, ~styles, ~tag) =>
         [
           (
             Labelled("className"),
-            Exp.ident({txt: Lident(styles), loc}),
+            Exp.ident({txt: Lident(classNameValue), loc}),
           ),
         ]
       )
     );
-
 
 /* [@react.component] + createMakeFn */
 let create = (~loc, ~tag, ~styles) =>
@@ -258,7 +257,7 @@ let create = (~loc, ~tag, ~styles) =>
           ~loc,
           ~attrs=[({txt: "react.component", loc}, PStr([]))],
           Pat.mk(~loc, Ppat_var({txt: "make", loc})),
-          createMakeFn(~loc, ~styles, ~tag),
+          createMakeFn(~loc, ~classNameValue=styles, ~tag),
         ),
       ],
     ),
