@@ -163,16 +163,10 @@ let createMakeBody = (~loc, ~tag, ~classNameValue) =>
 let createMakeFn = (~loc, ~classNameValue, ~tag) =>
   Exp.fun_(
     ~loc,
-    Optional("children"),
+    Nolabel,
     None,
-    Pat.mk(~loc, Ppat_var({txt: "children", loc})),
-    Exp.fun_(
-      ~loc,
-      Nolabel,
-      None,
-      createMakeArguments(~loc),
-      createMakeBody(~loc, ~tag, ~classNameValue),
-    ),
+    createMakeArguments(~loc),
+    createMakeBody(~loc, ~tag, ~classNameValue),
   );
 
 /* [@react.component] + createMakeFn */

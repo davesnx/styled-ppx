@@ -12,3 +12,5 @@ https://github.com/ahrefs/bs-emotion/blob/master/bs-emotion-ppx/src/EmotionPpx.r
 
 oficial ocaml manual
 https://caml.inria.fr/pub/docs/manual-ocaml/extn.html
+
+https://github.com/cristianoc/genType

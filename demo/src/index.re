@@ -2,19 +2,17 @@ module Component = {
   [@bs.deriving abstract]
   type makeProps = {
     [@bs.optional]
-    color: string,
+    key: string,
     [@bs.optional]
-    contentEditable: bool,
-    [@bs.optional]
-    cols: int,
+    ref: ReactDOMRe.domRef,
   };
+
   [@bs.set] external setClassName: (makeProps, string) => unit = "className";
   let styles = Emotion.(css([display(`block)]));
-  let make = (~children=?, props: makeProps) =>
+  let make = (props: makeProps) =>
     [@reason.preserve_braces]
     {
       setClassName(props, styles);
-
       React.createElement(
         "div",
         ~props,
@@ -30,55 +28,8 @@ module Component = {
 };
 
 ReactDOMRe.renderToElementWithId(
-    <Component>
-      {React.string("- styled-ppx -")}
-    </Component>
+  <Component>
+    {React.string("- styled-ppx -")}
+  </Component>,
   "app"
 );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-module Component = {
-  [@react.component]
-  let make = (~visible) => {
-    <div />
-  }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

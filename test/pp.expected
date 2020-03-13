@@ -2,6 +2,7 @@ module Component =
   struct
     type makeProps =
       {
+      ref: ReactDOMRe.domRef [@bs.optional ];
       key: string [@bs.optional ];
       ref: domRef [@bs.optional ];
       defaultChecked: bool [@bs.optional ];
@@ -75,7 +76,6 @@ module Component =
       maxLength: int [@bs.optional ];
       media: string [@bs.optional ];
       mediaGroup: string [@bs.optional ];
-      method: string [@bs.optional ];
       min: int [@bs.optional ];
       minLength: int [@bs.optional ];
       multiple: bool [@bs.optional ];
@@ -438,7 +438,7 @@ module Component =
     external setClassName : makeProps -> string -> unit = "className"
     [@@bs.set ]
     let styles = let open Emotion in css [display `block]
-    let make ?children  (props : makeProps) =
+    let make (props : makeProps) =
       ((setClassName props styles;
         React.createElement (("div")[@reason.raw_literal "div"]) ~props
           [|((match children with
