@@ -9,7 +9,7 @@ module App = [%styled.div {|
 
   font-size: 30px;
 |}];
-module Component = [%styled {| display: flex; color: #333; |}];
+module Component = [%styled {| margin-left: -10px |}];
 module Link = [%styled.a {| color: #454545 |}];
 
 ReactDOMRe.renderToElementWithId(

@@ -57,7 +57,7 @@ jobs:
       - name: Export dependencies
         run: esy export-dependencies
 
-  test_bs:
+  test/bucklescript:
     name: Build and test bucklescript
     runs-on: ${{ matrix.os }}
     strategy:
@@ -111,16 +111,16 @@ jobs:
 #     - name: Import dependencies
 #       if: steps.cache.outputs.cache-hit == 'true'
 #       run: esy import-build _export/*
-#       working-directory: ./test_bs
+#       working-directory: ./test/bucklescript
 
       - name: Install Yarn dependencies
         run: yarn
-        working-directory: ./test_bs
+        working-directory: ./test/bucklescript
 
       - name: Build
         run: yarn build
-        working-directory: ./test_bs
+        working-directory: ./test/bucklescript
 
       - name: Run tests
         run: yarn test
-        working-directory: ./test_bs
+        working-directory: ./test/bucklescript

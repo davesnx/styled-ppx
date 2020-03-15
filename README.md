@@ -176,9 +176,10 @@ esy test
 
 If you want to run Bucklescript's integration test instead, you can do:
 ```bash
-cd test_bs
 esy
+cd test/bucklescript
 yarn install
+yarn build
 yarn test
 ```
 > This tests are more like an end to end tests, that ensures that emotion have the correct methods for each CSS property.
