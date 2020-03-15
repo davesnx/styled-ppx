@@ -57,7 +57,7 @@ jobs:
       - name: Export dependencies
         run: esy export-dependencies
 
-  test/bucklescript:
+  test_bucklescript:
     name: Build and test bucklescript
     runs-on: ${{ matrix.os }}
     strategy:
