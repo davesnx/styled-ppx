@@ -8,9 +8,7 @@ Allows you to create **React Components** with style definitions with CSS that d
 > But you can safely use it, as it woudn't break any existing code in further releases.
 > In case you want to know more, take a look at the [ROADMAP](./ROADMAP.md), or feel free to chat on Discord: @davesnx#5641
 
-The biggest missing features are:
-- Only support `div`. [Here is the issue](https://github.com/davesnx/styled-ppx/issues/26)
-- Dynamic components not supported. [Here is the issue](https://github.com/davesnx/styled-ppx/issues/12)
+The biggest missing features is: **Dynamic components not supported** [Here is the issue](https://github.com/davesnx/styled-ppx/issues/12)
 
 ## Motivation
 I love CSS and I'm coming from the JavaScript world, writing React code with styled-components. I found it, one of the best combos to write scalable frontend applications and wasn't a reality in ReasonML/OCaml.
@@ -22,51 +20,33 @@ As well, saw a few people asking for it ([a](https://reasonml.chat/t/idiomatic-w
 
 This is how you write components in ReasonML with this ppx:
 ```reason
-module Component = [%styled "display: flex"];
-
-module ComponentWithMultiline = [%styled {|
+module StyledComponent = [%styled.div {|
   display: flex;
   justify-content: center;
   align-items: center;
+
+  height: 100vh;
+  width: 100vw;
 |}];
 
 ReactDOMRe.renderToElementWithId(
-  <ComponentWithMultiline>
+  <StyledComponent>
     {React.string("- Middle -")}
-  </ComponentWithMultiline>,
+  </StyledComponent>,
   "app"
 );
 ```
 
-After running the ppx
-```reason
-module ComponentWithMultiline = {
-  let styled = Emotion.(css([display(`flex), justifyContent(`center), alignItems(`center)]));
-  [@react.component]
-  let make = (~children=?) => {
-    <div className=styled>
-      {switch (children) {
-        | Some(child) => child
-        | None => React.null
-      }
-    </div>
-  }
-};
-```
-
 This is how you write components in OCaml with this ppx:
 ```ocaml
-module Component = [%styled ("display: flex")]
-
-module ComponentMultiline = [%styled
+module StyledComponent = [%styled.div
   {|
-    color: #333;
-    background-color: #333;
-    margin: auto 0 10px 1em;
-    border-bottom: thin dashed #eee;
-    border-right-color: rgb(1, 0, 1);
-    width: 70%;
-    background: url(http://example.com/test.jpg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: 100vh;
+    width: 100vw;
   |}
 ]
 ```
@@ -129,9 +109,9 @@ Thanks to [ahrefs/bs-emotion](https://github.com/ahrefs/bs-emotion) and [emotion
 We would love your help improving styled-ppx, there's still a lot to do.
 The ROADMAP is well organized, take a look in [here](./ROADMAP.md).
 
-Next big think would be support all CSS Properties and dynamic props.
+Next big feature would be: support all CSS Properties and dynamic props.
 
-Instead of using a string, provide a function that will be executed to generate styles on run-time.
+Instead of using a string to define a "styled" component, provide a function that will be executed to generate styles on run-time, based on component's props.
 ```reason
 /* This is not implemented yet! */
 module StyledWithProps = [%styled (~color) => {| color: $color |}];
@@ -196,9 +176,10 @@ esy test
 
 If you want to run Bucklescript's integration test instead, you can do:
 ```bash
-cd test_bs
 esy
+cd test/bucklescript
 yarn install
+yarn build
 yarn test
 ```
 > This tests are more like an end to end tests, that ensures that emotion have the correct methods for each CSS property.

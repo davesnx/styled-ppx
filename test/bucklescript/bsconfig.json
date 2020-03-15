@@ -1,5 +1,5 @@
 {
-  "name": "test_bs",
+  "name": "bucklescript",
   "reason": {
     "react-jsx": 3
   },
@@ -14,10 +14,18 @@
       "in-source": true
     }
   ],
-  "ppx-flags": ["../_esy/default/build/default/bin/Bin.exe"],
+  "ppx-flags": [
+    "../../_esy/default/build/default/bin/Bin.exe"
+  ],
   "suffix": ".bs.js",
   "namespace": true,
-  "bs-dependencies": ["reason-react", "@ahrefs/bs-emotion"],
-  "bs-dev-dependencies": ["@glennsl/bs-jest", "bs-react-testing-library"],
+  "bs-dependencies": [
+    "reason-react",
+    "@ahrefs/bs-emotion"
+  ],
+  "bs-dev-dependencies": [
+    "@glennsl/bs-jest",
+    "bs-react-testing-library"
+  ],
   "refmt": 3
 }

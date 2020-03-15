@@ -1,7 +1,22 @@
 {
   "checksum": "3126535d49fe794248325733a29f7a35",
-  "root": "@davesnx/styled-ppx@link-dev:./esy.json",
+  "root": "styled-ppx@link-dev:./esy.json",
   "node": {
+    "styled-ppx@link-dev:./esy.json": {
+      "id": "styled-ppx@link-dev:./esy.json",
+      "name": "styled-ppx",
+      "version": "link-dev:./esy.json",
+      "source": { "type": "link-dev", "path": ".", "manifest": "esy.json" },
+      "overrides": [],
+      "dependencies": [],
+      "devDependencies": [
+        "ocaml@4.6.1000@d41d8cd9", "@opam/sedlex@opam:2.1@400920d8",
+        "@opam/ocaml-migrate-parsetree@opam:1.5.0@3e319dbc",
+        "@opam/merlin@opam:3.3.3@d653b06a",
+        "@opam/menhir@opam:20190924@004407ff",
+        "@opam/dune@opam:1.11.4@a7ccb7ae", "@esy-ocaml/reason@3.5.2@d41d8cd9"
+      ]
+    },
     "ocaml@4.6.1000@d41d8cd9": {
       "id": "ocaml@4.6.1000@d41d8cd9",
       "name": "ocaml",
@@ -576,21 +591,6 @@
         "@opam/dune@opam:1.11.4@a7ccb7ae"
       ],
       "devDependencies": []
-    },
-    "@davesnx/styled-ppx@link-dev:./esy.json": {
-      "id": "@davesnx/styled-ppx@link-dev:./esy.json",
-      "name": "@davesnx/styled-ppx",
-      "version": "link-dev:./esy.json",
-      "source": { "type": "link-dev", "path": ".", "manifest": "esy.json" },
-      "overrides": [],
-      "dependencies": [],
-      "devDependencies": [
-        "ocaml@4.6.1000@d41d8cd9", "@opam/sedlex@opam:2.1@400920d8",
-        "@opam/ocaml-migrate-parsetree@opam:1.5.0@3e319dbc",
-        "@opam/merlin@opam:3.3.3@d653b06a",
-        "@opam/menhir@opam:20190924@004407ff",
-        "@opam/dune@opam:1.11.4@a7ccb7ae", "@esy-ocaml/reason@3.5.2@d41d8cd9"
-      ]
     }
   }
 }

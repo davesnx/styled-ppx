@@ -1,5 +1,5 @@
 {
-  "name": "test_bs",
+  "name": "bucklescript",
   "version": "0.0.0",
   "scripts": {
     "build": "bsb -make-world",
