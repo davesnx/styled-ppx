@@ -1,19 +1,25 @@
-module Component = [%styled "color: #333"];
 module App = [%styled.div {|
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 
   height: 100vh;
+  width: 100vw;
+
+  font-size: 30px;
 |}];
-module Link = [%styled.a "color: #454545"];
+module Component = [%styled {| display: flex; color: #333; |}];
+module Link = [%styled.a {| color: #454545 |}];
 
 ReactDOMRe.renderToElementWithId(
-  <App key="1">
-    <Component key="http://sancho.dev">
+  <App onClick={Js.log}>
+    <Component>
       {React.string("- styled-ppx -")}
     </Component>
-    <Link href="http://sancho.dev" />
+    <Link href="http://sancho.dev">
+      {React.string("sancho.dev")}
+    </Link>
   </App>,
   "app"
 );

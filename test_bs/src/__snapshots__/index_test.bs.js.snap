@@ -1,9 +1,34 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Component Opacity renders  1`] = `
+exports[`Component renders  1`] = `
 <div>
   <div
-    class="css-cyc7w5"
+    class="css-61f5x5"
+  />
+</div>
+`;
+
+exports[`ComponentInline renders and defaults to a div 1`] = `
+<div>
+  <div
+    class="css-6577wb"
+  />
+</div>
+`;
+
+exports[`ComponentLink should receive href props 1`] = `
+<div>
+  <a
+    class="css-6577wb"
+    href="https://sancho.dev"
+  />
+</div>
+`;
+
+exports[`ComponentLink should render an <a /> tag 1`] = `
+<div>
+  <a
+    class="css-6577wb"
   />
 </div>
 `;

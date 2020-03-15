@@ -2,65 +2,51 @@ open Jest;
 open Expect;
 open ReactTestingLibrary;
 
-module Opacity = [%styled "opacity: 0.9"];
+module Component = [%styled.div {|
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 
-/* module Overflow = [%styled
-  {|
-  overflow-y: visible;
-  overflow-x: visible;
-  overflow: hidden;
-|}
-];
+  height: 100vh;
+  width: 100vw;
 
-module Visibility = [%styled "visibility: visible"];
-module Hyphens = [%styled "hyphens: manual"];
-module Stroke = [%styled "stroke: none"];
-module Order = [%styled "order: 0"];
-module Direction = [%styled "direction: ltr"];
-module Content = [%styled "content: normal"];
-module Clear = [%styled "clear: none"];
-module Box = [%styled "box-shadow: none"];
-module Box = [%styled "box-sizing: content-box"];
-module Border = [%styled "border-collapse: separate"];
- */
+  font-size: 30px;
+|}];
+module ComponentInline = [%styled "color: #454545"];
+module ComponentLink = [%styled.a {| color: #454545 |}];
 
-/*
-module Transition = [%styled "transition-property: all"];
- | "animation" => render_animation()
- | "box-shadow" => render_box_shadow()
- | "text-shadow" => render_text_shadow()
- | "transform" => render_transform()
- | "transition" => render_transition()
- | "font-family" => render_font_family()
- */
+test("Component renders ", () => {
+  <Component />
+  |> render
+  |> container
+  |> expect
+  |> toMatchSnapshot
+});
 
-module Child = {
-  [@react.component]
-  let make = () => <h1> {ReasonReact.string("Heading")} </h1>;
-};
+test("ComponentInline renders and defaults to a div", () => {
+  <ComponentInline />
+  |> render
+  |> container
+  |> expect
+  |> toMatchSnapshot
+});
 
-let componentsList = [
-  ("Opacity", <Opacity />),
-  /* ("Overflow", Overflow),
-  ("Visibility", Visibility),
-  ("Hypens", Hypens),
-  ("Stroke", Stroke),
-  ("Order", Order),
-  ("Direction", Direction),
-  ("Content", Content),
-  ("Clear", Clear),
-  ("Box", Box),
-  ("Box", Box),
-  ("Border", Border), */
-];
-
-Belt.List.forEach(componentsList, (((name, component)) => {
-  test("Component " ++ name ++ " renders ", () => {
-    component
+describe("ComponentLink", () => {
+  test("should render an <a /> tag", () => {
+    <ComponentLink />
     |> render
     |> container
     |> expect
     |> toMatchSnapshot
   });
-}));
+
+  test("should receive href props", () => {
+    <ComponentLink href="https://sancho.dev"/>
+    |> render
+    |> container
+    |> expect
+    |> toMatchSnapshot
+  });
+})
 
