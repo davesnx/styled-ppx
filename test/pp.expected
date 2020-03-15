@@ -3,8 +3,8 @@ module Component =
     type makeProps =
       {
       ref: ReactDOMRe.domRef [@bs.optional ];
+      children: React.element [@bs.optional ];
       key: string [@bs.optional ];
-      ref: domRef [@bs.optional ];
       defaultChecked: bool [@bs.optional ];
       defaultValue: string [@bs.optional ];
       accessKey: string [@bs.optional ];
@@ -435,14 +435,18 @@ module Component =
       vocab: string [@bs.optional ];
       suppressContentEditableWarning: bool [@bs.optional ]}[@@bs.deriving
                                                              abstract]
-    external setClassName : makeProps -> string -> unit = "className"
-    [@@bs.set ]
+    external createElement :
+      string -> < .. >  Js.t -> React.element array -> React.element =
+        "createElement"[@@bs.val ][@@bs.module
+                                    (("react")[@reason.raw_literal ])]
     let styles = let open Emotion in css [display `block]
     let make (props : makeProps) =
-      ((setClassName props styles;
-        React.createElement (("div")[@reason.raw_literal "div"]) ~props
-          [|((match children with
+      ((let stylesObject = [%bs.obj { className = styles }] in
+        let newProps = Js.Obj.assign (Js.Obj.empty ()) (Obj.magic props) in
+        createElement (("div")[@reason.raw_literal "div"])
+          (Js.Obj.assign newProps stylesObject)
+          [|((match childrenGet props with
               | ((Some (chil))[@explicit_arity ]) -> chil
-              | None -> React.null));[]|])
+              | None -> React.null))|])
       [@reason.preserve_braces ])
   end

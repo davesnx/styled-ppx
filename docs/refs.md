@@ -14,3 +14,7 @@ oficial ocaml manual
 https://caml.inria.fr/pub/docs/manual-ocaml/extn.html
 
 https://github.com/cristianoc/genType
+
+https://github.com/jccampagne/ocaml_ppx_extension_simple_tutorial
+
+https://github.com/ocaml-ppx/ppx_tools_versioned

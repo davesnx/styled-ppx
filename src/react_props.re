@@ -10,7 +10,6 @@ type prop = {
 */
 let domPropsList = [
   {name: "key", type_: "string", isEvent: false},
-  {name: "ref", type_: "domRef", isEvent: false},
   {name: "defaultChecked", type_: "bool", isEvent: false},
   {name: "defaultValue", type_: "string", isEvent: false},
   {name: "accessKey", type_: "string", isEvent: false},

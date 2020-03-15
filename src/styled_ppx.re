@@ -11,41 +11,81 @@ let styleVariableName = "styles";
 
 /* let styles = Emotion.(css(exp)) */
 let createStyles = (loc, name, exp) => {
-  let variableName = {
-    ppat_desc: Ppat_var({txt: name, loc}),
-    ppat_loc: loc,
-    ppat_attributes: [],
-  };
-
+  let variableName = Pat.mk(~loc, Ppat_var({txt: name, loc}));
   Str.mk(~loc, Pstr_value(Nonrecursive, [Vb.mk(~loc, variableName, exp)]));
 };
 
-/* [@bs.set] external setClassName: (makeProps, string) => unit = "className"; */
-let createExternalSetClassName = (~loc) => {
+/*
+   [@bs.val] [@bs.module "react"] external createElement:
+   (string, Js.t({ .. }), array(React.element)) => React.element =
+   "createElement";
+ */
+let createReactBinding = (~loc) => {
   Str.primitive({
     pval_loc: loc,
     pval_name: {
-      txt: "setClassName",
+      txt: "createElement",
       loc,
     },
     pval_type:
       Typ.arrow(
         ~loc,
         Nolabel,
-        Typ.constr(~loc, {txt: Lident("makeProps"), loc}, []),
+        Typ.constr(~loc, {txt: Lident("string"), loc}, []),
         Typ.arrow(
           ~loc,
           Nolabel,
-          Typ.constr(~loc, {txt: Lident("string"), loc}, []),
-          Typ.constr(~loc, {txt: Lident("unit"), loc}, []),
+          Typ.constr(
+            ~loc,
+            {txt: Ldot(Lident("Js"), "t"), loc},
+            [Typ.object_(~loc, [], Open)],
+          ),
+          Typ.arrow(
+            ~loc,
+            Nolabel,
+            Typ.constr(
+              ~loc,
+              {txt: Lident("array"), loc},
+              [
+                Typ.constr(
+                  ~loc,
+                  {txt: Ldot(Lident("React"), "element"), loc},
+                  [],
+                ),
+              ],
+            ),
+            Typ.constr(
+              ~loc,
+              {txt: Ldot(Lident("React"), "element"), loc},
+              [],
+            ),
+          ),
         ),
       ),
-    pval_prim: ["className"],
-    pval_attributes: [({txt: "bs.set", loc}, PStr([]))],
+    pval_prim: ["createElement"],
+    pval_attributes: [
+      ({txt: "bs.val", loc}, PStr([])),
+      (
+        {txt: "bs.module", loc},
+        PStr([
+          Str.mk(
+            ~loc,
+            Pstr_eval(
+              Exp.constant(
+                ~loc,
+                ~attrs=[({txt: "reason.raw_literal", loc}, PStr([]))],
+                Pconst_string("react", None),
+              ),
+              [],
+            ),
+          ),
+        ]),
+      ),
+    ],
   });
 };
 
-/* switch (children) {
+/* switch (props->childrenGet) {
       | Some(child) => child
       | None => React.null
    } */
@@ -74,7 +114,14 @@ let createSwitchChildren = (~loc) => {
       Exp.ident(~loc, {txt: Lident("chil"), loc}),
     );
 
-  let matchingExp = Exp.ident(~loc, {txt: Lident("children"), loc});
+  let matchingExp =
+    Exp.apply(
+      ~loc,
+      Exp.ident(~loc, {txt: Lident("childrenGet"), loc}),
+      [
+        (Nolabel, Exp.ident(~loc, {txt: Lident("props"), loc}))
+      ],
+    );
 
   Exp.match(~loc, matchingExp, [someChildCase, noneCase]);
 };
@@ -83,7 +130,7 @@ let createSwitchChildren = (~loc) => {
 let createElement = (~loc, ~tag) => {
   Exp.apply(
     ~loc,
-    Exp.ident(~loc, {txt: Ldot(Lident("React"), "createElement"), loc}),
+    Exp.ident(~loc, {txt: Lident("createElement"), loc}),
     /* Arguments */
     [
       (
@@ -107,14 +154,27 @@ let createElement = (~loc, ~tag) => {
           Pconst_string(tag, None),
         ),
       ),
-      (Labelled("props"), Exp.ident(~loc, {txt: Lident("props"), loc})),
+      (
+        Nolabel,
+        Exp.apply(
+          ~loc,
+          Exp.ident(
+            ~loc,
+            {txt: Ldot(Ldot(Lident("Js"), "Obj"), "assign"), loc},
+          ),
+          [
+            (Nolabel, Exp.ident(~loc, {txt: Lident("newProps"), loc})),
+            (Nolabel, Exp.ident(~loc, {txt: Lident("stylesObject"), loc})),
+          ],
+        ),
+      ),
       (
         Nolabel,
         Exp.array(
           ~loc,
           [
             createSwitchChildren(~loc),
-            Exp.construct(~loc, {txt: Lident("[]"), loc}, None),
+            /* Exp.construct(~loc, {txt: Lident("[]"), loc}, None), */
           ],
         ),
       ),
@@ -122,24 +182,61 @@ let createElement = (~loc, ~tag) => {
   );
 };
 
-/* ~children, props: makeProps */
-let createMakeArguments = (~loc) => {
-  Pat.constraint_(
+/* let stylesObject = {"className": styles}; */
+let createStylesObject = (~loc, ~classNameValue) =>
+  Vb.mk(
     ~loc,
-    Pat.mk(~loc, Ppat_var({txt: "props", loc})),
-    Typ.constr(~loc, {txt: Lident("makeProps"), loc}, []),
+    Pat.mk(~loc, Ppat_var({txt: "stylesObject", loc})),
+    Exp.extension(
+      ~loc,
+      (
+        {txt: "bs.obj", loc},
+        PStr([
+          Str.mk(
+            ~loc,
+            Pstr_eval(
+              Exp.record(~loc, [
+                ({ txt: Lident("className"), loc}, Exp.ident(~loc, {txt: Lident(classNameValue), loc})),
+              ],
+              None
+              ),
+              []
+            ),
+          ),
+        ]),
+      ),
+    ),
   );
-};
 
-/* setClassName(props, styled) */
-let createSetClassName = (~loc, ~classNameValue) =>
+/* Obj.magic(props) */
+let objMagicProps = (~loc) =>
   Exp.apply(
     ~loc,
-    Exp.ident(~loc, {txt: Lident("setClassName"), loc}),
-    [
-      (Nolabel, Exp.ident(~loc, {txt: Lident("props"), loc})),
-      (Nolabel, Exp.ident(~loc, {txt: Lident(classNameValue), loc})),
-    ],
+    Exp.ident(~loc, {txt: Ldot(Lident("Obj"), "magic"), loc}),
+    [(Nolabel, Exp.ident(~loc, {txt: Lident("props"), loc}))],
+  );
+
+/* Js.Obj.empty() */
+let jsObjEmpty = (~loc) =>
+  Exp.apply(
+    ~loc,
+    Exp.ident(~loc, {txt: Ldot(Ldot(Lident("Js"), "Obj"), "empty"), loc}),
+    [(Nolabel, Exp.construct(~loc, {txt: Lident("()"), loc}, None))],
+  );
+
+/* let newProps = Js.Obj.assign(Js.Obj.empty(), Obj.magic(props)); */
+let createNewProps = (~loc) =>
+  Vb.mk(
+    ~loc,
+    Pat.mk(~loc, Ppat_var({txt: "newProps", loc})),
+    Exp.apply(
+      ~loc,
+      Exp.ident(
+        ~loc,
+        {txt: Ldot(Ldot(Lident("Js"), "Obj"), "assign"), loc},
+      ),
+      [(Nolabel, jsObjEmpty(~loc)), (Nolabel, objMagicProps(~loc))],
+    ),
   );
 
 /*
@@ -152,14 +249,31 @@ let createSetClassName = (~loc, ~classNameValue) =>
    }|]);
  */
 let createMakeBody = (~loc, ~tag, ~classNameValue) =>
-  Exp.sequence(
+  /* Exp.sequence(
     ~loc,
     ~attrs=[({txt: "reason.preserve_braces", loc}, PStr([]))],
-    createSetClassName(~loc, ~classNameValue),
+    createStylesObject(~loc, ~classNameValue),
+    createNewProps(~loc),
     createElement(~loc, ~tag),
+  ); */
+  Exp.let_(
+    ~loc,
+    ~attrs=[({txt: "reason.preserve_braces", loc}, PStr([]))],
+    Nonrecursive,
+    [createStylesObject(~loc, ~classNameValue)],
+    Exp.let_(~loc, Nonrecursive, [createNewProps(~loc)], createElement(~loc, ~tag))
   );
 
-/* let make = (~children, props: makeProps) => + createMakeBody */
+/* props: makeProps */
+let createMakeArguments = (~loc) => {
+  Pat.constraint_(
+    ~loc,
+    Pat.mk(~loc, Ppat_var({txt: "props", loc})),
+    Typ.constr(~loc, {txt: Lident("makeProps"), loc}, []),
+  );
+};
+
+/* let make = (props: makeProps) => + createMakeBody */
 let createMakeFn = (~loc, ~classNameValue, ~tag) =>
   Exp.fun_(
     ~loc,
@@ -203,6 +317,15 @@ let createDomRefLabel = (~loc) =>
     Typ.constr(~loc, {txt: Ldot(Lident("ReactDOMRe"), "domRef"), loc}, []),
   );
 
+/* [@bs.optional] children: React.element */
+let createChildrenLabel = (~loc) =>
+  Type.field(
+    ~loc,
+    ~attrs=[({txt: "bs.optional", loc}, PStr([]))],
+    {txt: "children", loc},
+    Typ.constr(~loc, {txt: Ldot(Lident("React"), "element"), loc}, []),
+  );
+
 /* [@bs.optional] onDragOver: ReactEvent.Mouse.t => unit */
 let createRecordEventLabel = (~loc, name, kind) => {
   Type.field(
@@ -235,6 +358,7 @@ let createRecordEventLabel = (~loc, name, kind) => {
 let createMakePropsLabels = (~loc) => {
   [
     createDomRefLabel(~loc),
+    createChildrenLabel(~loc),
     ...List.map(
          ({name, type_, isEvent}) =>
            isEvent
@@ -274,12 +398,12 @@ let createMakeProps = (~loc) => {
   );
 };
 
-/* module X = { createStyle + createReactComponent } */
+/* module X = { createMakeProps + createReactBinding + createStyle + createReactComponent } */
 let transformModule = (~loc, ~ast, ~tag) =>
   Mod.mk(
     Pmod_structure([
       createMakeProps(~loc),
-      createExternalSetClassName(~loc),
+      createReactBinding(~loc),
       createStyles(
         loc,
         styleVariableName,

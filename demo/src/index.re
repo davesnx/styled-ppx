@@ -1,35 +1,19 @@
-module Component = {
-  [@bs.deriving abstract]
-  type makeProps = {
-    [@bs.optional]
-    key: string,
-    [@bs.optional]
-    ref: ReactDOMRe.domRef,
-  };
+module Component = [%styled "color: #333"];
+module App = [%styled.div {|
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-  [@bs.set] external setClassName: (makeProps, string) => unit = "className";
-  let styles = Emotion.(css([display(`block)]));
-  let make = (props: makeProps) =>
-    [@reason.preserve_braces]
-    {
-      setClassName(props, styles);
-      React.createElement(
-        "div",
-        ~props,
-        [|
-          switch (children) {
-          | Some(chil) => chil
-          | None => React.null
-          },
-          [],
-        |],
-      );
-    };
-};
+  height: 100vh;
+|}];
+module Link = [%styled.a "color: #454545"];
 
 ReactDOMRe.renderToElementWithId(
-  <Component>
-    {React.string("- styled-ppx -")}
-  </Component>,
+  <App key="1">
+    <Component key="http://sancho.dev">
+      {React.string("- styled-ppx -")}
+    </Component>
+    <Link href="http://sancho.dev" />
+  </App>,
   "app"
 );
