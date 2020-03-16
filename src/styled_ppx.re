@@ -413,11 +413,110 @@ let transformModule = (~loc, ~ast, ~tag) =>
     ]),
   );
 
+
+let isOptional = str =>
+  switch (str) {
+  | Optional(_) => true
+  | _ => false
+  };
+
+let isLabelled = str =>
+  switch (str) {
+  | Labelled(_) => true
+  | _ => false
+  };
+
+let getLabel = str =>
+  switch (str) {
+  | Optional(str)
+  | Labelled(str) => str
+  | Nolabel => ""
+  };
+
+let rec recursivelyTransformNamedArgs = (mapper, expr, list) => {
+  let expr = mapper.expr(mapper, expr);
+  switch (expr.pexp_desc) {
+  | Pexp_fun(arg, default, pattern, expression)
+      when isOptional(arg) || isLabelled(arg) =>
+    let alias =
+      switch (pattern) {
+      | {ppat_desc: Ppat_alias(_, {txt, _}) | Ppat_var({txt, _}), _} => txt
+      | {ppat_desc: Ppat_any, _} => "_"
+      | _ => getLabel(arg)
+      };
+
+    let type_ =
+      switch (pattern) {
+      | {ppat_desc: Ppat_constraint(_, type_), _} => Some(type_)
+      | _ => None
+      };
+
+    recursivelyTransformNamedArgs(
+      mapper,
+      expression,
+      [(arg, default, pattern, alias, pattern.ppat_loc, type_), ...list],
+    );
+  | Pexp_fun(
+      Nolabel,
+      _,
+      {ppat_desc: Ppat_construct({txt: Lident("()"), _}, _) | Ppat_any, _},
+      expression,
+    ) => (
+      expression.pexp_desc,
+      list,
+      None,
+    )
+  | Pexp_fun(Nolabel, _, {ppat_desc: Ppat_var({txt, _}), _}, expression) => (
+      expression.pexp_desc,
+      list,
+      Some(txt),
+    )
+  | innerExpression => (innerExpression, list, None)
+  };
+};
+
 let moduleMapper = (_, _) => {
   ...default_mapper,
   /* We map all the modules */
   module_expr: (mapper, expr) =>
     switch (expr) {
+    | {
+      pmod_desc:
+          /* that are defined with a ppx like [%txt] */
+          Pmod_extension((
+            {txt, _},
+            PStr([
+              {
+                /* and contains a function as a payload */
+                pstr_desc:
+                  Pstr_eval(
+                    {
+                      pexp_desc: Pexp_fun(
+                        _label,
+                        _args,
+                        _pattern,
+                        expression
+                      ),
+                      _,
+                    },
+                    _,
+                  ),
+                _,
+              },
+            ]),
+          )),
+        _,
+      } => {
+        let (_innerFunctionExpression, _namedArgList, _forwardRef) = recursivelyTransformNamedArgs(mapper, expression, []);
+        let tag =
+          switch (String.split_on_char('.', txt)) {
+          | ["styled"] => "div"
+          | ["styled", tag] => tag
+          | _ => "div"
+          };
+
+        default_mapper.module_expr(mapper, expr);
+      }
     | {
         pmod_desc:
           /* that are defined with a ppx like [%txt] */
@@ -442,7 +541,6 @@ let moduleMapper = (_, _) => {
         _,
       } =>
       let tag =
-        /* TODO: Improve splitting */
         switch (String.split_on_char('.', txt)) {
         | ["styled"] => "div"
         | ["styled", tag] => tag

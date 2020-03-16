@@ -8,3 +8,7 @@ module StateLenses = [%lenses
 
 module Component = [%styled ("display: block")]
 module Component = [%styled.section ("display: block")]
+
+module Component =
+  [%styled
+    fun () -> ("display: block")]
