@@ -18,7 +18,7 @@ As well, saw a few people asking for it ([a](https://reasonml.chat/t/idiomatic-w
 ## Usage
 **`styled-ppx`** implements a ppx that transforms `[%styled]` extensions into [bs-emotion](https://github.com/ahrefs/bs-emotion) calls, that does all the CSS-in-JS that provides [emotion](https://emotion.sh).
 
-This is how you write components in ReasonML with this ppx:
+This is how you write components in ReasonML/OCaml with this ppx:
 ```reason
 module StyledComponent = [%styled.div {|
   display: flex;
@@ -37,23 +37,9 @@ ReactDOMRe.renderToElementWithId(
 );
 ```
 
-This is how you write components in OCaml with this ppx:
-```ocaml
-module StyledComponent = [%styled.div
-  {|
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    height: 100vh;
-    width: 100vw;
-  |}
-]
-```
-
 ## Installation
 
-This package depends on bs-emotion, make sure you follow the instalation as well: https://github.com/ahrefs/bs-emotion#installation
+This package depends on [bs-emotion](https://github.com/ahrefs/bs-emotion), [ReasonReact](https://reasonml.github.io/reason-react/) and [BuckleScript](https://bucklescript.github.io) make sure you follow their instalations.
 
 ### With `esy` on native projects
 
