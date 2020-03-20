@@ -59,7 +59,11 @@ And add the PPX in your `bsconfig.json` file:
 
 ```json
 {
-  "ppx-flags": ["@davesnx/styled-ppx/styled-ppx", "@ahrefs/bs-emotion"]
+  "bs-dependencies": [
+    "reason-react",
+    "@ahrefs/bs-emotion"
+  ],
+  "ppx-flags": ["@davesnx/styled-ppx/styled-ppx"]
 }
 ```
 
@@ -85,6 +89,8 @@ And add the PPX in your `bsconfig.json` file:
   "ppx-flags": ["esy x styled-ppx.exe"]
 }
 ```
+
+If you want to try out of the box a project, just visit https://github.com/davesnx/try-styled-ppx and follow the instalation process there.
 
 ## Thanks to
 Thanks to [Javier Chávarri](https://github.com/jchavarri), for helping me understand all the world of OCaml and his knowledge about ppx's. It has been a great experience.

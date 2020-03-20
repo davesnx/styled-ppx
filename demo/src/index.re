@@ -9,10 +9,11 @@ module App = [%styled.div {|
 
   font-size: 30px;
 |}];
+
+module Component = [%styled {| margin-left: 10px |}];
 module Link = [%styled.a {| color: #454545 |}];
 
-/* module Component = [%styled () => {| margin-left: 10px |}]; */
-module Component = {
+module Component2 = {
   [@bs.deriving abstract]
   type makeProps = {
     [@bs.optional]
