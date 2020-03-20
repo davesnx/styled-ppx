@@ -5,27 +5,17 @@
   "author": "David Sancho <dsnxmoreno@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davesnx/styled-ppx",
-  "bugs": {
-    "url": "https://github.com/davesnx/styled-ppx/issues"
-  },
+  "bugs": { "url": "https://github.com/davesnx/styled-ppx/issues" },
   "repository": {
     "type": "git",
     "url": "https://github.com/davesnx/styled-ppx.git"
   },
   "esy": {
     "build": "dune build -p #{self.name}",
-    "buildEnv": {
-      "ODOC_SYNTAX": "re"
-    },
-    "release": {
-      "bin": [
-        "Bin"
-      ]
-    }
+    "buildEnv": { "ODOC_SYNTAX": "re" },
+    "release": { "bin": [ "Bin" ] }
   },
-  "resolution": {
-    "@opam/sedlex": "ocaml-community/sedlex"
-  },
+  "resolution": { "@opam/sedlex": "ocaml-community/sedlex" },
   "devDependencies": {
     "@opam/merlin": "*",
     "ocaml": "~4.6.1000",
@@ -44,5 +34,9 @@
     "format": "esy dune build @fmt --auto-promote",
     "watch": "esy dune build -p styled-ppx --watch",
     "utop": "esy dune utop lib -- -implicit-bindings"
+  },
+  "dependencies": {
+    "@opam/ppxlib": "0.12.0",
+    "@reason-native/console": "^0.1.0"
   }
 }

@@ -10,9 +10,21 @@ open React_props;
 let styleVariableName = "styles";
 
 /* let styles = Emotion.(css(exp)) */
-let createStyles = (loc, name, exp) => {
+let createStyles = (~loc, ~name, ~exp) => {
   let variableName = Pat.mk(~loc, Ppat_var({txt: name, loc}));
   Str.mk(~loc, Pstr_value(Nonrecursive, [Vb.mk(~loc, variableName, exp)]));
+};
+
+/* let styles = () => Emotion.(css(exp)) */
+let createDynamicStyles = (~loc, ~name, ~args, ~exp) => {
+  let variableName = Pat.mk(~loc, Ppat_var({txt: name, loc}));
+  Str.mk(
+    ~loc,
+    Pstr_value(
+      Nonrecursive,
+      [Vb.mk(~loc, variableName, Exp.fun_(~loc, Nolabel, None, args, exp))],
+    ),
+  );
 };
 
 /*
@@ -118,9 +130,7 @@ let createSwitchChildren = (~loc) => {
     Exp.apply(
       ~loc,
       Exp.ident(~loc, {txt: Lident("childrenGet"), loc}),
-      [
-        (Nolabel, Exp.ident(~loc, {txt: Lident("props"), loc}))
-      ],
+      [(Nolabel, Exp.ident(~loc, {txt: Lident("props"), loc}))],
     );
 
   Exp.match(~loc, matchingExp, [someChildCase, noneCase]);
@@ -195,12 +205,17 @@ let createStylesObject = (~loc, ~classNameValue) =>
           Str.mk(
             ~loc,
             Pstr_eval(
-              Exp.record(~loc, [
-                ({ txt: Lident("className"), loc}, Exp.ident(~loc, {txt: Lident(classNameValue), loc})),
-              ],
-              None
+              Exp.record(
+                ~loc,
+                [
+                  (
+                    {txt: Lident("className"), loc},
+                    Exp.ident(~loc, {txt: Lident(classNameValue), loc}),
+                  ),
+                ],
+                None,
               ),
-              []
+              [],
             ),
           ),
         ]),
@@ -250,18 +265,23 @@ let createNewProps = (~loc) =>
  */
 let createMakeBody = (~loc, ~tag, ~classNameValue) =>
   /* Exp.sequence(
-    ~loc,
-    ~attrs=[({txt: "reason.preserve_braces", loc}, PStr([]))],
-    createStylesObject(~loc, ~classNameValue),
-    createNewProps(~loc),
-    createElement(~loc, ~tag),
-  ); */
+       ~loc,
+       ~attrs=[({txt: "reason.preserve_braces", loc}, PStr([]))],
+       createStylesObject(~loc, ~classNameValue),
+       createNewProps(~loc),
+       createElement(~loc, ~tag),
+     ); */
   Exp.let_(
     ~loc,
     ~attrs=[({txt: "reason.preserve_braces", loc}, PStr([]))],
     Nonrecursive,
     [createStylesObject(~loc, ~classNameValue)],
-    Exp.let_(~loc, Nonrecursive, [createNewProps(~loc)], createElement(~loc, ~tag))
+    Exp.let_(
+      ~loc,
+      Nonrecursive,
+      [createNewProps(~loc)],
+      createElement(~loc, ~tag),
+    ),
   );
 
 /* props: makeProps */
@@ -405,14 +425,13 @@ let transformModule = (~loc, ~ast, ~tag) =>
       createMakeProps(~loc),
       createReactBinding(~loc),
       createStyles(
-        loc,
-        styleVariableName,
-        Css_to_emotion.render_declaration_list(ast),
+        ~loc,
+        ~name=styleVariableName,
+        ~exp=Css_to_emotion.render_declaration_list(ast),
       ),
       create(~loc, ~tag, ~styles=styleVariableName),
     ]),
   );
-
 
 let isOptional = str =>
   switch (str) {
@@ -432,6 +451,80 @@ let getLabel = str =>
   | Labelled(str) => str
   | Nolabel => ""
   };
+
+let optionIdent = Lident("option");
+
+let safeTypeFromValue = valueStr => {
+  let valueStr = getLabel(valueStr);
+  switch (String.sub(valueStr, 0, 1)) {
+  | "_" => "T" ++ valueStr
+  | _ => valueStr
+  };
+};
+
+let argToType = (types, (name, default, _noLabelName, _alias, loc, type_)) =>
+  switch (type_, name, default) {
+  | (
+      Some({
+        ptyp_desc: Ptyp_constr({txt: Lident("option"), _}, [type_]),
+        _,
+      }),
+      name,
+      _,
+    )
+      when isOptional(name) => [
+      (
+        getLabel(name),
+        [],
+        {
+          ...type_,
+          ptyp_desc:
+            Ptyp_constr({loc: type_.ptyp_loc, txt: optionIdent}, [type_]),
+        },
+      ),
+      ...types,
+    ]
+  | (Some(type_), name, Some(_default)) => [
+      (
+        getLabel(name),
+        [],
+        Typ.mk(~loc, Ptyp_constr({loc, txt: optionIdent}, [type_])),
+      ),
+      ...types,
+    ]
+  | (Some(type_), name, _) => [(getLabel(name), [], type_), ...types]
+  | (None, name, _) when isOptional(name) => [
+      (
+        getLabel(name),
+        [],
+        Typ.mk(
+          ~loc,
+          Ptyp_constr(
+            {loc, txt: optionIdent},
+            [Typ.mk(~loc, Ptyp_var(safeTypeFromValue(name)))],
+          ),
+        ),
+      ),
+      ...types,
+    ]
+  | (None, name, _) when isLabelled(name) => [
+      (
+        getLabel(name),
+        [],
+        Typ.mk(~loc, Ptyp_var(safeTypeFromValue(name))),
+      ),
+      ...types,
+    ]
+  | _ => types
+  };
+
+let getTag = str => {
+  switch (String.split_on_char('.', str)) {
+  | ["styled"] => "div"
+  | ["styled", tag] => tag
+  | _ => "div"
+  };
+};
 
 let rec recursivelyTransformNamedArgs = (mapper, expr, list) => {
   let expr = mapper.expr(mapper, expr);
@@ -481,7 +574,7 @@ let moduleMapper = (_, _) => {
   module_expr: (mapper, expr) =>
     switch (expr) {
     | {
-      pmod_desc:
+        pmod_desc:
           /* that are defined with a ppx like [%txt] */
           Pmod_extension((
             {txt, _},
@@ -491,12 +584,13 @@ let moduleMapper = (_, _) => {
                 pstr_desc:
                   Pstr_eval(
                     {
-                      pexp_desc: Pexp_fun(
-                        _label,
-                        _args,
-                        _pattern,
-                        expression
-                      ),
+                      pexp_desc:
+                        Pexp_fun(
+                          _label,
+                          _args,
+                          pattern,
+                          expression
+                        ),
                       _,
                     },
                     _,
@@ -506,17 +600,61 @@ let moduleMapper = (_, _) => {
             ]),
           )),
         _,
-      } => {
-        let (_innerFunctionExpression, _namedArgList, _forwardRef) = recursivelyTransformNamedArgs(mapper, expression, []);
-        let tag =
-          switch (String.split_on_char('.', txt)) {
-          | ["styled"] => "div"
-          | ["styled", tag] => tag
-          | _ => "div"
-          };
+      } =>
+      let (innerFunctionExpression, namedArgList, _forwardRef) =
+        recursivelyTransformNamedArgs(mapper, expression, []);
+      let tag = getTag(txt);
 
-        default_mapper.module_expr(mapper, expr);
-      }
+      if (List.length(namedArgList) === 0) {
+        ();
+          /* TODO: Show warning or doing the static analysis */
+      };
+
+      let makePropsName = (~loc, name) => {
+        ppat_desc: Ppat_var({txt: name, loc}),
+        ppat_loc: loc,
+        ppat_attributes: [],
+      };
+
+      let (str, delim) = switch (innerFunctionExpression) {
+        | Pexp_constant(Pconst_string(str, delim)) => (str, delim)
+        | _ => ("", Some("")); /* TODO: Throw an error */
+      };
+
+      let loc = expression.pexp_loc;
+      let loc_start =
+        switch (delim) {
+        | None => loc.Location.loc_start
+        | Some(s) => {
+            ...loc.Location.loc_start,
+            Lexing.pos_cnum:
+              loc.Location.loc_start.Lexing.pos_cnum + String.length(s) + 1,
+          }
+        };
+
+      let namedTypeList = List.fold_left(argToType, [], namedArgList);
+
+      let ast =
+        Css_lexer.parse_string(
+          ~container_lnum=loc_start.Lexing.pos_lnum,
+          ~pos=loc_start,
+          str,
+          Css_parser.declaration_list,
+        );
+
+      Mod.mk(
+        Pmod_structure([
+          createMakeProps(~loc),
+          createReactBinding(~loc),
+          createDynamicStyles(
+            ~loc,
+            ~name=styleVariableName,
+            ~args=makePropsType(~loc, namedTypeList),
+            ~exp=Css_to_emotion.render_declaration_list(ast),
+          ),
+          create(~loc, ~tag, ~styles=styleVariableName),
+        ]),
+      );
     | {
         pmod_desc:
           /* that are defined with a ppx like [%txt] */
@@ -540,12 +678,7 @@ let moduleMapper = (_, _) => {
           )),
         _,
       } =>
-      let tag =
-        switch (String.split_on_char('.', txt)) {
-        | ["styled"] => "div"
-        | ["styled", tag] => tag
-        | _ => "div"
-        };
+      let tag = getTag(txt);
 
       if (!List.exists(t => t === tag, HTML.tags)) {
         ();
