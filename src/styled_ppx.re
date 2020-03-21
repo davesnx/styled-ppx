@@ -16,13 +16,15 @@ let createStyles = (~loc, ~name, ~exp) => {
 };
 
 /* let styles = () => Emotion.(css(exp)) */
-let createDynamicStyles = (~loc, ~name, ~args, ~exp) => {
+let createDynamicStyles = (~loc, ~name, ~args as _, ~exp) => {
   let variableName = Pat.mk(~loc, Ppat_var({txt: name, loc}));
+  let functionBody = Exp.fun_(~loc, Nolabel, None, variableName, exp);
+
   Str.mk(
     ~loc,
     Pstr_value(
       Nonrecursive,
-      [Vb.mk(~loc, variableName, Exp.fun_(~loc, Nolabel, None, args, exp))],
+      [Vb.mk(~loc, variableName, functionBody)],
     ),
   );
 };
@@ -588,7 +590,7 @@ let moduleMapper = (_, _) => {
                         Pexp_fun(
                           _label,
                           _args,
-                          pattern,
+                          _pattern,
                           expression
                         ),
                       _,
@@ -608,12 +610,6 @@ let moduleMapper = (_, _) => {
       if (List.length(namedArgList) === 0) {
         ();
           /* TODO: Show warning or doing the static analysis */
-      };
-
-      let makePropsName = (~loc, name) => {
-        ppat_desc: Ppat_var({txt: name, loc}),
-        ppat_loc: loc,
-        ppat_attributes: [],
       };
 
       let (str, delim) = switch (innerFunctionExpression) {
@@ -649,7 +645,7 @@ let moduleMapper = (_, _) => {
           createDynamicStyles(
             ~loc,
             ~name=styleVariableName,
-            ~args=makePropsType(~loc, namedTypeList),
+            ~args=namedTypeList,
             ~exp=Css_to_emotion.render_declaration_list(ast),
           ),
           create(~loc, ~tag, ~styles=styleVariableName),

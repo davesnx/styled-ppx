@@ -20,6 +20,8 @@ module Component2 = {
     ref: ReactDOMRe.domRef,
     [@bs.optional]
     children: React.element,
+
+    mierda: string
   };
 
   [@bs.val] [@bs.module "react"]
@@ -27,12 +29,12 @@ module Component2 = {
     (string, Js.t({..}), array(React.element)) => React.element =
     "createElement";
 
-  let styles = () => Emotion.(css([display(`block)]));
+  let styles = (~mierda) => Emotion.(css([display(`block), color(hex(mierda))]));
 
   let make = (props: makeProps) =>
     [@reason.preserve_braces]
     {
-      let stylesObject = {"className": styles() };
+      let stylesObject = {"className": styles(~mierda=mierdaGet(props)) };
       let newProps = Js.Obj.assign(Js.Obj.empty(), Obj.magic(props));
       createElement(
         "section",
@@ -49,9 +51,9 @@ module Component2 = {
 
 ReactDOMRe.renderToElementWithId(
   <App onClick={Js.log}>
-    <Component>
+    <Component2 mierda="dd6c0f">
       {React.string("- styled-ppx -")}
-    </Component>
+    </Component2>
     <Link href="http://sancho.dev">
       {React.string("sancho.dev")}
     </Link>

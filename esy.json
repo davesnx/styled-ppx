@@ -5,17 +5,27 @@
   "author": "David Sancho <dsnxmoreno@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davesnx/styled-ppx",
-  "bugs": { "url": "https://github.com/davesnx/styled-ppx/issues" },
+  "bugs": {
+    "url": "https://github.com/davesnx/styled-ppx/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/davesnx/styled-ppx.git"
   },
   "esy": {
     "build": "dune build -p #{self.name}",
-    "buildEnv": { "ODOC_SYNTAX": "re" },
-    "release": { "bin": [ "Bin" ] }
+    "buildEnv": {
+      "ODOC_SYNTAX": "re"
+    },
+    "release": {
+      "bin": [
+        "Bin"
+      ]
+    }
   },
-  "resolution": { "@opam/sedlex": "ocaml-community/sedlex" },
+  "resolution": {
+    "@opam/sedlex": "ocaml-community/sedlex"
+  },
   "devDependencies": {
     "@opam/merlin": "*",
     "ocaml": "~4.6.1000",
@@ -23,12 +33,12 @@
     "@opam/dune": "1.11.4",
     "@opam/menhir": "20190924",
     "@opam/ocaml-migrate-parsetree": "1.5.0",
-    "@opam/sedlex": "2.1"
+    "@opam/sedlex": "2.1",
+    "@reason-native/rely": "^3.2.1"
   },
   "scripts": {
-    "test": "dune runtest",
+    "test": "dune exec test/native/TestRunner.exe",
     "test_bs": "cd test/bucklescript; yarn test",
-    "test:promote": "dune runtest --auto-promote",
     "doc": "esy dune build @doc",
     "doc-path": "esy echo #{self.target_dir}/default/_doc/_html/index.html",
     "format": "esy dune build @fmt --auto-promote",
@@ -36,7 +46,6 @@
     "utop": "esy dune utop lib -- -implicit-bindings"
   },
   "dependencies": {
-    "@opam/ppxlib": "0.12.0",
-    "@reason-native/console": "^0.1.0"
+    "@opam/ppxlib": "0.12.0"
   }
 }
