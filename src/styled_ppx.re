@@ -587,6 +587,11 @@ let moduleMapper = (_, _) => {
 
       let tag = getTag(txt);
 
+      if (!List.exists(t => t === tag, Html.tags)) {
+        ();
+          /* TODO: Add warning into an invalid html tag */
+      };
+
       if (List.length(namedArgList) === 0) {
         ();
           /* TODO: Show warning or doing the static analysis */
@@ -666,7 +671,7 @@ let moduleMapper = (_, _) => {
       } =>
       let tag = getTag(txt);
 
-      if (!List.exists(t => t === tag, HTML.tags)) {
+      if (!List.exists(t => t === tag, Html.tags)) {
         ();
           /* TODO: Add warning into an invalid html tag */
       };
