@@ -10,8 +10,10 @@ module App = [%styled.div {|
   font-size: 30px;
 |}];
 
-module Component = [%styled {| margin-left: 10px |}];
-module Link = [%styled.a {| color: #454545 |}];
+module Link = [%styled.a {|
+  color: #333;
+|}];
+
 
 module Component2 = {
   [@bs.deriving abstract]
@@ -29,12 +31,12 @@ module Component2 = {
     (string, Js.t({..}), array(React.element)) => React.element =
     "createElement";
 
-  let styles = (~mierda) => Emotion.(css([display(`block), color(hex(mierda))]));
+  let styled = (~mierda) => Emotion.(css([display(`block), color(hex(mierda))]));
 
   let make = (props: makeProps) =>
     [@reason.preserve_braces]
     {
-      let stylesObject = {"className": styles(~mierda=mierdaGet(props)) };
+      let stylesObject = {"className": styled() };
       let newProps = Js.Obj.assign(Js.Obj.empty(), Obj.magic(props));
       createElement(
         "section",
