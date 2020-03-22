@@ -2,5 +2,5 @@
   (name Lib_Test)
   (library_flags (-linkall -g))
   (modules (:standard))
-  (libraries rely.lib)
+  (libraries rely.lib styled-ppx.lib)
 )
