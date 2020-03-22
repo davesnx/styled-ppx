@@ -320,17 +320,10 @@ let createElement = (~loc, ~tag) => {
       ),
       (
         Nolabel,
-        Exp.apply(
-          ~loc,
           Exp.ident(
             ~loc,
-            {txt: Ldot(Ldot(Lident("Js"), "Obj"), "assign"), loc},
+            {txt: Lident("newProps"), loc},
           ),
-          [
-            (Nolabel, Exp.ident(~loc, {txt: Lident("newProps"), loc})),
-            (Nolabel, Exp.ident(~loc, {txt: Lident("stylesObject"), loc})),
-          ],
-        ),
       ),
       (
         Nolabel,
@@ -338,7 +331,6 @@ let createElement = (~loc, ~tag) => {
           ~loc,
           [
             createSwitchChildren(~loc),
-            /* Exp.construct(~loc, {txt: Lident("[]"), loc}, None), */
           ],
         ),
       ),
@@ -385,15 +377,7 @@ let objMagicProps = (~loc) =>
     [(Nolabel, Exp.ident(~loc, {txt: Lident("props"), loc}))],
   );
 
-/* Js.Obj.empty() */
-let jsObjEmpty = (~loc) =>
-  Exp.apply(
-    ~loc,
-    Exp.ident(~loc, {txt: Ldot(Ldot(Lident("Js"), "Obj"), "empty"), loc}),
-    [(Nolabel, Exp.construct(~loc, {txt: Lident("()"), loc}, None))],
-  );
-
-/* let newProps = Js.Obj.assign(Js.Obj.empty(), Obj.magic(props)); */
+/* let newProps = Js.Obj.assign(stylesObject, Obj.magic(props)); */
 let createNewProps = (~loc) =>
   Vb.mk(
     ~loc,
@@ -404,7 +388,7 @@ let createNewProps = (~loc) =>
         ~loc,
         {txt: Ldot(Ldot(Lident("Js"), "Obj"), "assign"), loc},
       ),
-      [(Nolabel, jsObjEmpty(~loc)), (Nolabel, objMagicProps(~loc))],
+      [(Nolabel, Exp.ident(~loc, {txt: Lident("stylesObject"), loc})), (Nolabel, objMagicProps(~loc))],
     ),
   );
 
@@ -682,7 +666,7 @@ let moduleMapper = (_, _) => {
       } =>
       let tag = getTag(txt);
 
-      if (!List.exists(t => t === tag, Html.tags)) {
+      if (!List.exists(t => t === tag, HTML.tags)) {
         ();
           /* TODO: Add warning into an invalid html tag */
       };

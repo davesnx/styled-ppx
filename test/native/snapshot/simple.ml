@@ -11,9 +11,4 @@ module Component = [%styled.section ("display: block")]
 
 module Component =
   [%styled
-    fun ~color ~mierda -> ({| color: color; display: block; |})]
-
-(* module Component =
-  [%styled
-    fun () -> ("display: block")]
- *)
+    fun ~color -> ({| color: color; display: block; |})]
