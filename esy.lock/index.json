@@ -8,7 +8,10 @@
       "version": "link-dev:./esy.json",
       "source": { "type": "link-dev", "path": ".", "manifest": "esy.json" },
       "overrides": [],
-      "dependencies": [ "@opam/ppxlib@opam:0.12.0@fcf5cabc" ],
+      "dependencies": [
+        "@reason-native/rely@3.2.1@d41d8cd9",
+        "@opam/ppxlib@opam:0.12.0@fcf5cabc"
+      ],
       "devDependencies": [
         "ocaml@4.6.1000@d41d8cd9", "@reason-native/rely@3.2.1@d41d8cd9",
         "@opam/sedlex@opam:2.1@400920d8",
