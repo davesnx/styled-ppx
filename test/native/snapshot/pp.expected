@@ -445,9 +445,8 @@ module Component =
     let styles = let open Emotion in css [display `block]
     let make (props : makeProps) =
       ((let stylesObject = [%bs.obj { className = styles }] in
-        let newProps = Js.Obj.assign (Js.Obj.empty ()) (Obj.magic props) in
-        createElement (("div")[@reason.raw_literal "div"])
-          (Js.Obj.assign newProps stylesObject)
+        let newProps = Js.Obj.assign stylesObject (Obj.magic props) in
+        createElement (("div")[@reason.raw_literal "div"]) newProps
           [|((match childrenGet props with
               | ((Some (chil))[@explicit_arity ]) -> chil
               | None -> React.null))|])
@@ -897,9 +896,8 @@ module Component =
     let styles = let open Emotion in css [display `block]
     let make (props : makeProps) =
       ((let stylesObject = [%bs.obj { className = styles }] in
-        let newProps = Js.Obj.assign (Js.Obj.empty ()) (Obj.magic props) in
-        createElement (("section")[@reason.raw_literal "section"])
-          (Js.Obj.assign newProps stylesObject)
+        let newProps = Js.Obj.assign stylesObject (Obj.magic props) in
+        createElement (("section")[@reason.raw_literal "section"]) newProps
           [|((match childrenGet props with
               | ((Some (chil))[@explicit_arity ]) -> chil
               | None -> React.null))|])
@@ -1346,14 +1344,11 @@ module Component =
       string -> < .. >  Js.t -> React.element array -> React.element =
         "createElement"[@@bs.val ][@@bs.module
                                     (("react")[@reason.raw_literal ])]
-    let styles ~mierda  =
-      let open Emotion in css [color color; display `block]
+    let styles = let open Emotion in css [color color; display `block]
     let make (props : makeProps) =
-      ((let stylesObject =
-          [%bs.obj { className = (styles ~mierda:(mierdaGet props)) }] in
-        let newProps = Js.Obj.assign (Js.Obj.empty ()) (Obj.magic props) in
-        createElement (("div")[@reason.raw_literal "div"])
-          (Js.Obj.assign newProps stylesObject)
+      ((let stylesObject = [%bs.obj { className = (styles ) }] in
+        let newProps = Js.Obj.assign stylesObject (Obj.magic props) in
+        createElement (("div")[@reason.raw_literal "div"]) newProps
           [|((match childrenGet props with
               | ((Some (chil))[@explicit_arity ]) -> chil
               | None -> React.null))|])
