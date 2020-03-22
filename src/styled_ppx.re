@@ -682,7 +682,7 @@ let moduleMapper = (_, _) => {
       } =>
       let tag = getTag(txt);
 
-      if (!List.exists(t => t === tag, HTML.tags)) {
+      if (!List.exists(t => t === tag, Html.tags)) {
         ();
           /* TODO: Add warning into an invalid html tag */
       };
