@@ -11,4 +11,4 @@ module Component = [%styled.section ("display: block")]
 
 module Component =
   [%styled
-    fun ~color -> ({| color: color; display: block; |})]
+    fun ~color ~otraProp -> ({| color: $otraProp; display: block; |})]

@@ -36,62 +36,69 @@ let safeTypeFromValue = valueStr => {
   };
 };
 
+let getAlias = (pattern, label) =>
+  switch (pattern) {
+  | {ppat_desc: Ppat_alias(_, {txt, _}) | Ppat_var({txt, _}), _} => txt
+  | {ppat_desc: Ppat_any, _} => "_"
+  | _ => getLabel(label)
+  };
+
 /* let argToType = (types, (name, default, _noLabelName, _alias, loc, type_)) =>
-  switch (type_, name, default) {
-  | (
-      Some({
-        ptyp_desc: Ptyp_constr({txt: Lident("option"), _}, [type_]),
+    switch (type_, name, default) {
+    | (
+        Some({
+          ptyp_desc: Ptyp_constr({txt: Lident("option"), _}, [type_]),
+          _,
+        }),
+        name,
         _,
-      }),
-      name,
-      _,
-    )
-      when isOptional(name) => [
-      (
-        getLabel(name),
-        [],
-        {
-          ...type_,
-          ptyp_desc:
-            Ptyp_constr({loc: type_.ptyp_loc, txt: optionIdent}, [type_]),
-        },
-      ),
-      ...types,
-    ]
-  | (Some(type_), name, Some(_default)) => [
-      (
-        getLabel(name),
-        [],
-        Typ.mk(~loc, Ptyp_constr({loc, txt: optionIdent}, [type_])),
-      ),
-      ...types,
-    ]
-  | (Some(type_), name, _) => [(getLabel(name), [], type_), ...types]
-  | (None, name, _) when isOptional(name) => [
-      (
-        getLabel(name),
-        [],
-        Typ.mk(
-          ~loc,
-          Ptyp_constr(
-            {loc, txt: optionIdent},
-            [Typ.mk(~loc, Ptyp_var(safeTypeFromValue(name)))],
+      )
+        when isOptional(name) => [
+        (
+          getLabel(name),
+          [],
+          {
+            ...type_,
+            ptyp_desc:
+              Ptyp_constr({loc: type_.ptyp_loc, txt: optionIdent}, [type_]),
+          },
+        ),
+        ...types,
+      ]
+    | (Some(type_), name, Some(_default)) => [
+        (
+          getLabel(name),
+          [],
+          Typ.mk(~loc, Ptyp_constr({loc, txt: optionIdent}, [type_])),
+        ),
+        ...types,
+      ]
+    | (Some(type_), name, _) => [(getLabel(name), [], type_), ...types]
+    | (None, name, _) when isOptional(name) => [
+        (
+          getLabel(name),
+          [],
+          Typ.mk(
+            ~loc,
+            Ptyp_constr(
+              {loc, txt: optionIdent},
+              [Typ.mk(~loc, Ptyp_var(safeTypeFromValue(name)))],
+            ),
           ),
         ),
-      ),
-      ...types,
-    ]
-  | (None, name, _) when isLabelled(name) => [
-      (
-        getLabel(name),
-        [],
-        Typ.mk(~loc, Ptyp_var(safeTypeFromValue(name))),
-      ),
-      ...types,
-    ]
-  | _ => types
-  };
- */
+        ...types,
+      ]
+    | (None, name, _) when isLabelled(name) => [
+        (
+          getLabel(name),
+          [],
+          Typ.mk(~loc, Ptyp_var(safeTypeFromValue(name))),
+        ),
+        ...types,
+      ]
+    | _ => types
+    };
+   */
 
 let getTag = str => {
   switch (String.split_on_char('.', str)) {
@@ -107,34 +114,24 @@ let rec createFnWithLabeledArgs = (list, args) =>
   | [(label, default, pattern, _alias, loc, _interiorType), ...rest] =>
     createFnWithLabeledArgs(
       rest,
-      Exp.fun_(
-        ~loc,
-        label,
-        default,
-        pattern,
-        args
-      ),
+      Exp.fun_(~loc, label, default, pattern, args),
     )
   | [] => args
-};
+  };
+
+let getType = pattern =>
+  switch (pattern) {
+  | {ppat_desc: Ppat_constraint(_, type_), _} => Some(type_)
+  | _ => None
+  };
 
 let rec recursivelyTransformNamedArgs = (mapper, expr, list) => {
   let expr = mapper.expr(mapper, expr);
   switch (expr.pexp_desc) {
   | Pexp_fun(arg, default, pattern, expression)
       when isOptional(arg) || isLabelled(arg) =>
-    let alias =
-      switch (pattern) {
-      | {ppat_desc: Ppat_alias(_, {txt, _}) | Ppat_var({txt, _}), _} => txt
-      | {ppat_desc: Ppat_any, _} => "_"
-      | _ => getLabel(arg)
-      };
-
-    let type_ =
-      switch (pattern) {
-      | {ppat_desc: Ppat_constraint(_, type_), _} => Some(type_)
-      | _ => None
-      };
+    let alias = getAlias(pattern, arg);
+    let type_ = getType(pattern);
 
     recursivelyTransformNamedArgs(
       mapper,
@@ -252,9 +249,9 @@ let createReactBinding = (~loc) => {
 };
 
 /* switch (props->childrenGet) {
-  | Some(child) => child
-  | None => React.null
-} */
+     | Some(child) => child
+     | None => React.null
+   } */
 let createSwitchChildren = (~loc) => {
   let noneCase =
     Exp.case(
@@ -317,22 +314,8 @@ let createElement = (~loc, ~tag) => {
           Pconst_string(tag, None),
         ),
       ),
-      (
-        Nolabel,
-          Exp.ident(
-            ~loc,
-            {txt: Lident("newProps"), loc},
-          ),
-      ),
-      (
-        Nolabel,
-        Exp.array(
-          ~loc,
-          [
-            createSwitchChildren(~loc),
-          ],
-        ),
-      ),
+      (Nolabel, Exp.ident(~loc, {txt: Lident("newProps"), loc})),
+      (Nolabel, Exp.array(~loc, [createSwitchChildren(~loc)])),
     ],
   );
 };
@@ -352,12 +335,7 @@ let createStylesObject = (~loc, ~value) =>
             Pstr_eval(
               Exp.record(
                 ~loc,
-                [
-                  (
-                    {txt: Lident("className"), loc},
-                    value,
-                  ),
-                ],
+                [({txt: Lident("className"), loc}, value)],
                 None,
               ),
               [],
@@ -387,7 +365,10 @@ let createNewProps = (~loc) =>
         ~loc,
         {txt: Ldot(Ldot(Lident("Js"), "Obj"), "assign"), loc},
       ),
-      [(Nolabel, Exp.ident(~loc, {txt: Lident("stylesObject"), loc})), (Nolabel, objMagicProps(~loc))],
+      [
+        (Nolabel, Exp.ident(~loc, {txt: Lident("stylesObject"), loc})),
+        (Nolabel, objMagicProps(~loc)),
+      ],
     ),
   );
 
@@ -564,13 +545,7 @@ let moduleMapper = (_, _) => {
                 pstr_desc:
                   Pstr_eval(
                     {
-                      pexp_desc:
-                        Pexp_fun(
-                          _label,
-                          _args,
-                          _pattern,
-                          expression
-                        ),
+                      pexp_desc: Pexp_fun(label, args, pattern, expression),
                       _,
                     },
                     _,
@@ -581,8 +556,16 @@ let moduleMapper = (_, _) => {
           )),
         _,
       } =>
+      let alias = getAlias(pattern, label);
+      let type_ = getType(pattern);
+
+      let firstArg = [
+        (label, args, pattern, alias, pattern.ppat_loc, type_),
+      ];
       let (functionExpr, namedArgList, _) =
         recursivelyTransformNamedArgs(mapper, expression, []);
+
+      let argList = List.append(namedArgList, firstArg);
 
       let tag = getTag(txt);
 
@@ -596,10 +579,11 @@ let moduleMapper = (_, _) => {
           /* TODO: Show warning or doing the static analysis */
       };
 
-      let (str, delim) = switch (functionExpr) {
+      let (str, delim) =
+        switch (functionExpr) {
         | Pexp_constant(Pconst_string(str, delim)) => (str, delim)
-        | _ => ("", Some("")); /* TODO: Throw an error */
-      };
+        | _ => ("", Some("")) /* TODO: Throw an error */
+        };
 
       let loc = expression.pexp_loc;
       let loc_start =
@@ -623,14 +607,24 @@ let moduleMapper = (_, _) => {
       let propExpr = Exp.ident(~loc, {txt: Lident("props"), loc});
       let propToGetter = str => str ++ "Get";
 
-      let args = List.map(((arg, _, _, _, _, _)) => {
-        let labelText = getLabel(arg);
-        let value = Exp.ident(~loc, {txt: Lident(propToGetter(labelText)), loc});
+      let args =
+        List.map(
+          ((arg, _, _, _, _, _)) => {
+            let labelText = getLabel(arg);
+            let value =
+              Exp.ident(~loc, {txt: Lident(propToGetter(labelText)), loc});
 
-        (arg, Exp.apply(~loc, value, [(Nolabel, propExpr)]))
-      }, namedArgList);
+            (arg, Exp.apply(~loc, value, [(Nolabel, propExpr)]));
+          },
+          argList,
+        );
 
-      let styledExpr = Exp.apply(~loc, Exp.ident(~loc, {txt: Lident(styleVariableName), loc}), args);
+      let styledExpr =
+        Exp.apply(
+          ~loc,
+          Exp.ident(~loc, {txt: Lident(styleVariableName), loc}),
+          args,
+        );
 
       Mod.mk(
         Pmod_structure([
@@ -639,7 +633,7 @@ let moduleMapper = (_, _) => {
           createDynamicStyles(
             ~loc,
             ~name=styleVariableName,
-            ~args=namedArgList,
+            ~args=argList,
             ~exp=Css_to_emotion.render_declaration_list(ast),
           ),
           createComponent(~loc, ~tag, ~styledExpr),
@@ -694,7 +688,8 @@ let moduleMapper = (_, _) => {
           Css_parser.declaration_list,
         );
 
-      let styledExpr = Exp.ident(~loc, {txt: Lident(styleVariableName), loc});
+      let styledExpr =
+        Exp.ident(~loc, {txt: Lident(styleVariableName), loc});
 
       Mod.mk(
         Pmod_structure([

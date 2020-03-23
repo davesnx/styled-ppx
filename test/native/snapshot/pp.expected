@@ -1344,9 +1344,15 @@ module Component =
       string -> < .. >  Js.t -> React.element array -> React.element =
         "createElement"[@@bs.val ][@@bs.module
                                     (("react")[@reason.raw_literal ])]
-    let styles = let open Emotion in css [color color; display `block]
+    let styles ~color  ~otraProp  =
+      let open Emotion in css [color ($otraProp); display `block]
     let make (props : makeProps) =
-      ((let stylesObject = [%bs.obj { className = (styles ) }] in
+      ((let stylesObject =
+          [%bs.obj
+            {
+              className =
+                (styles ~otraProp:(otraPropGet props) ~color:(colorGet props))
+            }] in
         let newProps = Js.Obj.assign stylesObject (Obj.magic props) in
         createElement (("div")[@reason.raw_literal "div"]) newProps
           [|((match childrenGet props with
