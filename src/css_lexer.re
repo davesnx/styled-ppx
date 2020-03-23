@@ -121,7 +121,7 @@ let escape = [%sedlex.regexp?
 ];
 
 let ident_start = [%sedlex.regexp?
-  '_' | 'a'..'z' | 'A'..'Z' | non_ascii | escape
+  '_' | 'a'..'z' | 'A'..'Z' | '$' | non_ascii | escape
 ];
 
 let ident_char = [%sedlex.regexp?

@@ -36,7 +36,7 @@ let safeTypeFromValue = valueStr => {
   };
 };
 
-let argToType = (types, (name, default, _noLabelName, _alias, loc, type_)) =>
+/* let argToType = (types, (name, default, _noLabelName, _alias, loc, type_)) =>
   switch (type_, name, default) {
   | (
       Some({
@@ -91,7 +91,7 @@ let argToType = (types, (name, default, _noLabelName, _alias, loc, type_)) =>
     ]
   | _ => types
   };
-
+ */
 
 let getTag = str => {
   switch (String.split_on_char('.', str)) {
@@ -252,9 +252,9 @@ let createReactBinding = (~loc) => {
 };
 
 /* switch (props->childrenGet) {
-      | Some(child) => child
-      | None => React.null
-   } */
+  | Some(child) => child
+  | None => React.null
+} */
 let createSwitchChildren = (~loc) => {
   let noneCase =
     Exp.case(
@@ -295,7 +295,6 @@ let createElement = (~loc, ~tag) => {
   Exp.apply(
     ~loc,
     Exp.ident(~loc, {txt: Lident("createElement"), loc}),
-    /* Arguments */
     [
       (
         Nolabel,
