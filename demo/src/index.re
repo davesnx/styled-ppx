@@ -36,7 +36,7 @@ module Component2 = {
   let make = (props: makeProps) =>
     [@reason.preserve_braces]
     {
-      let stylesObject = {"className": styled() };
+      let stylesObject = {"className": styled(~mierda=mierdaGet(props)) };
       let newProps = Js.Obj.assign(Js.Obj.empty(), Obj.magic(props));
       createElement(
         "section",
