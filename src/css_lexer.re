@@ -152,13 +152,13 @@ let name = [%sedlex.regexp? Plus(ident_char)];
 
 let number = [%sedlex.regexp?
   (
-    Opt('+', '-'),
+    Opt('-'),
     Plus(digit),
     Opt('.', Plus(digit)),
     Opt('e' | 'E', '+' | '-', Plus(digit)),
   ) |
   (
-    Opt('+', '-'),
+    Opt('-'),
     '.',
     Plus(digit),
     Opt('e' | 'E', '+' | '-', Plus(digit)),

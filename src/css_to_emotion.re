@@ -1260,22 +1260,3 @@ and render_rule = (r: Rule.t): expression =>
   | Rule.Style_rule(sr) => render_style_rule(sr)
   | Rule.At_rule(ar) => render_at_rule(ar)
   }
-and render_stylesheet = ((rs, loc): Stylesheet.t): expression => {
-  let rule_expr_list =
-    List.rev_map(
-      rule =>
-        switch (rule) {
-        | Rule.Style_rule({
-            Style_rule.prelude: ([], _),
-            block: (ds, _),
-            loc: _,
-          }) =>
-          render_declarations(ds)
-        | Rule.Style_rule(_)
-        | Rule.At_rule(_) => [render_rule(rule)]
-        },
-      rs,
-    )
-    |> List.concat;
-  list_to_expr(loc, rule_expr_list);
-};

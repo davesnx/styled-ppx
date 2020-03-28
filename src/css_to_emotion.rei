@@ -33,4 +33,3 @@ let render_declaration_list:
   Css_types.Declaration_list.t => Parsetree.expression;
 let render_style_rule: Css_types.Style_rule.t => Parsetree.expression;
 let render_rule: Css_types.Rule.t => Parsetree.expression;
-let render_stylesheet: Css_types.Stylesheet.t => Parsetree.expression;
