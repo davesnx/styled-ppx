@@ -430,6 +430,14 @@ let createComponent = (~loc, ~tag, ~styledExpr) =>
     ),
   );
 
+/* [@bs.optional] color: string */
+let createCustomPropLabel = (~loc, name, kind) =>
+  Type.field(
+    ~loc,
+    {txt: name, loc},
+    Typ.constr(~loc, {txt: Lident(kind), loc}, []),
+  );
+
 /* [@bs.optional] ahref: string */
 let createRecordLabel = (~loc, name, kind) =>
   Type.field(
@@ -476,30 +484,6 @@ let createRecordEventLabel = (~loc, name, kind) => {
   );
 };
 
-/*
-   List of
-      prop: type
-      [@bs.optional]
-
-   ref: domRef
-   [@bs.optional]
-
-   ...
- */
-let createMakePropsLabels = (~loc) => {
-  [
-    createDomRefLabel(~loc),
-    createChildrenLabel(~loc),
-    ...List.map(
-         ({name, type_, isEvent}) =>
-           isEvent
-             ? createRecordEventLabel(~loc, name, type_)
-             : createRecordLabel(~loc, name, type_),
-         domPropsList,
-       ),
-  ];
-};
-
 let createMakeProps = (~loc) => {
   /* [@bs.deriving abstract] */
   let bsDerivingAbstract = (
@@ -521,7 +505,70 @@ let createMakeProps = (~loc) => {
           ~loc,
           ~priv=Public,
           ~attrs=[bsDerivingAbstract],
-          ~kind=Ptype_record(createMakePropsLabels(~loc)),
+          ~kind=Ptype_record(
+            [
+              /*
+                List of
+                    prop: type
+                    [@bs.optional]
+
+                ref: domRef
+                [@bs.optional]
+              */
+              createDomRefLabel(~loc),
+              createChildrenLabel(~loc),
+              ...List.map(
+                  ({name, type_, isEvent}) =>
+                    isEvent
+                      ? createRecordEventLabel(~loc, name, type_)
+                      : createRecordLabel(~loc, name, type_),
+                  domPropsList,
+                ),
+            ]
+          ),
+          {txt: "makeProps", loc},
+        ),
+      ],
+    ),
+  );
+};
+
+let createMakePropsDynamic = (~loc, ~extraProps) => {
+  /* [@bs.deriving abstract] */
+  let bsDerivingAbstract = (
+    {txt: "bs.deriving", loc},
+    PStr([
+      Str.mk(
+        ~loc,
+        Pstr_eval(Exp.ident(~loc, {txt: Lident("abstract"), loc}), []),
+      ),
+    ]),
+  );
+
+  Str.mk(
+    ~loc,
+    Pstr_type(
+      Recursive,
+      [
+        Type.mk(
+          ~loc,
+          ~priv=Public,
+          ~attrs=[bsDerivingAbstract],
+          ~kind=Ptype_record(
+            [
+              /*
+                List of
+                    prop: type
+                    [@bs.optional]
+
+                ref: domRef
+                [@bs.optional]
+              */
+              createDomRefLabel(~loc),
+              createChildrenLabel(~loc),
+              ...List.map(((arg, _, _, _, _, _)) => createCustomPropLabel(~loc, getLabel(arg), "string"), extraProps)
+            ]
+          ),
           {txt: "makeProps", loc},
         ),
       ],
@@ -628,7 +675,7 @@ let moduleMapper = (_, _) => {
 
       Mod.mk(
         Pmod_structure([
-          createMakeProps(~loc),
+          createMakePropsDynamic(~loc, ~extraProps=argList),
           createReactBinding(~loc),
           createDynamicStyles(
             ~loc,

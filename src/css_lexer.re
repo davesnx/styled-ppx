@@ -71,7 +71,9 @@ let token_to_string =
     ++ dimension_to_string(d)
     ++ ")"
   | DIMENSION((n, d)) =>
-    "DIMENSION(" ++ n ++ ", " ++ d ++ ")";
+    "DIMENSION(" ++ n ++ ", " ++ d ++ ")"
+  | VARIABLE(x) =>
+    "VARIABLE(" ++ x ++ ")";
 
 let () =
     Location.register_error_of_exn(
@@ -121,7 +123,7 @@ let escape = [%sedlex.regexp?
 ];
 
 let ident_start = [%sedlex.regexp?
-  '_' | 'a'..'z' | 'A'..'Z' | '$' | non_ascii | escape
+  '_' | 'a'..'z' | 'A'..'Z' | '$'| non_ascii | escape
 ];
 
 let ident_char = [%sedlex.regexp?
@@ -293,6 +295,7 @@ let rec get_next_token = buf => {
   /* NOTE: should be placed above ident, otherwise pattern with
    * '-[0-9a-z]{1,6}' cannot be matched */
   | (_u, '+', unicode_range) => UNICODE_RANGE(Lex_buffer.latin1(buf))
+  /* | (_u, '-', unicode_range) => UNICODE_RANGE(Lex_buffer.latin1(buf)) */
   | (ident, '(') => FUNCTION(Lex_buffer.latin1(~drop=1, buf))
   | ident => IDENT(Lex_buffer.latin1(buf))
   | ('#', name) => HASH(Lex_buffer.latin1(~skip=1, buf))

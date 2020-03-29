@@ -14,15 +14,17 @@ module Link = [%styled.a {|
   color: #333;
 |}];
 
-module M2 = [%styled.a () => {|
-  color: $color;
-|}];
+module M2 = [%styled.div (~otraProp) => {j|
+  color: $otraProp;
+  margin-left: -10px;
+  display: block;
+|j}];
 
 ReactDOMRe.renderToElementWithId(
   <App onClick={Js.log}>
-    <Component2 mierda="dd6c0f">
+    <M2 otraProp="#dd6c0f">
       {React.string("- styled-ppx -")}
-    </Component2>
+    </M2>
     <Link href="http://sancho.dev">
       {React.string("sancho.dev")}
     </Link>
