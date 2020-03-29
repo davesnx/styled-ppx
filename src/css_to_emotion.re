@@ -5,6 +5,7 @@ open Asttypes;
 open Parsetree;
 open Longident;
 open Css_types;
+open Component_value;
 
 let grammar_error = (loc, message) =>
   raise(Css_lexer.GrammarError((message, loc)));
@@ -155,7 +156,7 @@ let group_params = params => {
   let rec group_param = ((accu, loc), xs) =>
     switch (xs) {
     | [] => ((accu, loc), [])
-    | [(Component_value.Delim(","), _), ...rest] => ((accu, loc), rest)
+    | [(Delim(","), _), ...rest] => ((accu, loc), rest)
     | [(_, cv_loc) as hd, ...rest] =>
       let loc = {
         let loc_start =
@@ -180,155 +181,123 @@ let group_params = params => {
   group_params([], params);
 };
 
-let is_time = component_value =>
-  Component_value.(
-    switch (component_value) {
-    | Float_dimension((_, _, Time)) => true
+let is_time = value =>
+  switch (value) {
+  | Float_dimension((_, _, Time)) => true
+  | _ => false
+  };
+
+let is_timing_function = value =>
+  switch (value) {
+  | Ident("linear")
+  /* cubic-bezier-timing-function */
+  | Ident("ease")
+  | Ident("ease-in")
+  | Ident("ease-out")
+  | Ident("ease-in-out")
+  | Function(("cubic-bezier", _), _)
+  /* step-timing-function */
+  | Ident("step-start")
+  | Ident("step-end")
+  | Function(("steps", _), _)
+  /* frames-timing-function */
+  | Function(("frames", _), _) => true
+  | _ => false
+  };
+
+let is_animation_iteration_count = value =>
+  switch (value) {
+  | Ident("infinite")
+  | Function(("count", _), _) => true
+  | _ => false
+  };
+
+let is_animation_direction = value =>
+  switch (value) {
+  | Ident("normal")
+  | Ident("reverse")
+  | Ident("alternate")
+  | Ident("alternate-reverse") => true
+  | _ => false
+  };
+
+let is_animation_fill_mode = value =>
+  switch (value) {
+  | Ident("none")
+  | Ident("forwards")
+  | Ident("backwards")
+  | Ident("both") => true
+  | _ => false
+  };
+
+let is_animation_play_state = value =>
+  switch (value) {
+  | Ident("running")
+  | Ident("paused") => true
+  | _ => false
+  };
+
+let is_keyframes_name = value =>
+  switch (value) {
+  | Ident(_)
+  | String(_) => true
+  | _ => false
+  };
+
+let is_ident = (ident, value) =>
+  switch (value) {
+  | Ident(i) when i == ident => true
+  | _ => false
+  };
+
+let is_length = value =>
+  switch (value) {
+  | Number("0")
+  | Float_dimension((_, _, Length)) => true
+  | _ => false
+  };
+
+let is_color = value =>
+  switch (value) {
+  | Function(("rgb", _), _)
+  | Function(("rgba", _), _)
+  | Function(("hsl", _), _)
+  | Function(("hsla", _), _)
+  | Hash(_)
+  | Ident(_) => true
+  | _ => false
+  };
+
+let is_line_width = value =>
+  switch (value) {
+  | Ident(i) =>
+    switch (i) {
+    | "thin"
+    | "medium"
+    | "thick" => true
     | _ => false
     }
-  );
+  | _ => is_length(value)
+  };
 
-let is_timing_function = component_value =>
-  Component_value.(
-    switch (component_value) {
-    | Ident("linear")
-    /* cubic-bezier-timing-function */
-    | Ident("ease")
-    | Ident("ease-in")
-    | Ident("ease-out")
-    | Ident("ease-in-out")
-    | Function(("cubic-bezier", _), _)
-    /* step-timing-function */
-    | Ident("step-start")
-    | Ident("step-end")
-    | Function(("steps", _), _)
-    /* frames-timing-function */
-    | Function(("frames", _), _) => true
+let is_line_style = value =>
+  switch (value) {
+  | Ident(i) =>
+    switch (i) {
+    | "none"
+    | "hidden"
+    | "dotted"
+    | "dashed"
+    | "solid"
+    | "double"
+    | "groove"
+    | "ridge"
+    | "inset"
+    | "outset" => true
     | _ => false
     }
-  );
-
-let is_animation_iteration_count = component_value =>
-  Component_value.(
-    switch (component_value) {
-    | Ident("infinite")
-    | Function(("count", _), _) => true
-    | _ => false
-    }
-  );
-
-let is_animation_direction = component_value =>
-  Component_value.(
-    switch (component_value) {
-    | Ident("normal")
-    | Ident("reverse")
-    | Ident("alternate")
-    | Ident("alternate-reverse") => true
-    | _ => false
-    }
-  );
-
-let is_animation_fill_mode = component_value =>
-  Component_value.(
-    switch (component_value) {
-    | Ident("none")
-    | Ident("forwards")
-    | Ident("backwards")
-    | Ident("both") => true
-    | _ => false
-    }
-  );
-
-let is_animation_play_state = component_value =>
-  Component_value.(
-    switch (component_value) {
-    | Ident("running")
-    | Ident("paused") => true
-    | _ => false
-    }
-  );
-
-let is_keyframes_name = component_value =>
-  Component_value.(
-    switch (component_value) {
-    | Ident(_)
-    | String(_) => true
-    | _ => false
-    }
-  );
-
-let is_ident = (ident, component_value) =>
-  Component_value.(
-    switch (component_value) {
-    | Ident(i) when i == ident => true
-    | _ => false
-    }
-  );
-
-let is_variable = (component_value) =>
-  Component_value.(
-    switch (component_value) {
-    | Variable(_) => true
-    | _ => false
-    }
-  );
-
-let is_length = component_value =>
-  Component_value.(
-    switch (component_value) {
-    | Number("0")
-    | Float_dimension((_, _, Length)) => true
-    | _ => false
-    }
-  );
-
-let is_color = component_value =>
-  Component_value.(
-    switch (component_value) {
-    | Function(("rgb", _), _)
-    | Function(("rgba", _), _)
-    | Function(("hsl", _), _)
-    | Function(("hsla", _), _)
-    | Hash(_)
-    | Ident(_) => true
-    | _ => false
-    }
-  );
-
-let is_line_width = component_value =>
-  Component_value.(
-    switch (component_value) {
-    | Ident(i) =>
-      switch (i) {
-      | "thin"
-      | "medium"
-      | "thick" => true
-      | _ => false
-      }
-    | _ => is_length(component_value)
-    }
-  );
-
-let is_line_style = component_value =>
-  Component_value.(
-    switch (component_value) {
-    | Ident(i) =>
-      switch (i) {
-      | "none"
-      | "hidden"
-      | "dotted"
-      | "dashed"
-      | "solid"
-      | "double"
-      | "groove"
-      | "ridge"
-      | "inset"
-      | "outset" => true
-      | _ => false
-      }
-    | _ => false
-    }
-  );
+  | _ => false
+  };
 
 let render_dimension = (~loc, number, dimension, const) => {
   let number_loc = {
@@ -356,8 +325,7 @@ let render_dimension = (~loc, number, dimension, const) => {
   Exp.apply(~loc, ident, [(Nolabel, arg)]);
 };
 
-let rec render_component_value =
-        ((cv, loc): with_loc(Component_value.t)): expression => {
+let rec render_component_value = ((cv, loc): with_loc(t)): expression => {
   let render_block = (start_char, _, _) =>
     grammar_error(loc, "Unsupported " ++ start_char ++ "-block");
 
@@ -383,7 +351,8 @@ let rec render_component_value =
               _,
             ) => {
               let color_expr = render_component_value(color_cv);
-              let perc_expr = render_component_value((Percentage(perc), end_loc));
+              let perc_expr =
+                render_component_value((Percentage(perc), end_loc));
               let loc =
                 Lex_buffer.make_loc(
                   start_loc.Location.loc_start,
@@ -550,7 +519,7 @@ let rec render_component_value =
   };
 
   switch (cv) {
-  | Component_value.Paren_block(cs) => render_block("(", ")", cs)
+  | Paren_block(cs) => render_block("(", ")", cs)
   | Bracket_block(cs) => render_block("[", "]", cs)
   | Percentage(p) =>
     let ident = Exp.ident(~loc, {txt: Lident("pct"), loc});
@@ -568,17 +537,14 @@ let rec render_component_value =
     let ident = Exp.ident(~loc, {txt: Lident("url"), loc});
     let arg = string_to_const(~loc, s);
     Exp.apply(~loc, ident, [(Nolabel, arg)]);
-  | Operator(_) => grammar_error(loc, "Unsupported operator")
-  | Delim(_) => grammar_error(loc, "Unsupported delimiter")
   | Hash(s) =>
     let ident = Exp.ident(~loc, {txt: Lident("hex"), loc});
     let arg = string_to_const(~loc, s);
     Exp.apply(~loc, ident, [(Nolabel, arg)]);
   | Number(s) =>
-    if (s == "0") {
-      Exp.ident(~loc, {txt: Lident("zero"), loc});
-    } else {
-      Exp.constant(~loc, number_to_const(s));
+    switch (s) {
+    | "0" => Exp.ident(~loc, {txt: Lident("zero"), loc})
+    | _ => Exp.constant(~loc, number_to_const(s))
     }
   | Unicode_range(_) => grammar_error(loc, "Unsupported unicode range")
   | Function(f, params) => render_function(f, params)
@@ -597,7 +563,10 @@ let rec render_component_value =
   | Dimension((number, dimension)) =>
     let const = number_to_const(number);
     render_dimension(~loc, number, dimension, const);
-  | Variable(x) => string_to_const(~loc, x);
+  | Operator(_) => grammar_error(loc, "Unsupported operator")
+  | Delim(_) => grammar_error(loc, "Unsupported delimiter")
+  | Variable(x) =>
+    string_to_const(~loc, String.sub(x, 1, String.length(x) - 1))
   };
 }
 and render_at_rule = (ar: At_rule.t): expression =>
@@ -619,12 +588,12 @@ and render_at_rule = (ar: At_rule.t): expression =>
             | Rule.Style_rule(sr) =>
               let progress_expr =
                 switch (sr.Style_rule.prelude) {
-                | ([(Component_value.Percentage(p), loc)], _) =>
+                | ([(Percentage(p), loc)], _) =>
                   Exp.constant(~loc, number_to_const(p))
-                | ([(Component_value.Ident("from"), loc)], _)
-                | ([(Component_value.Number("0"), loc)], _) =>
+                | ([(Ident("from"), loc)], _)
+                | ([(Number("0"), loc)], _) =>
                   Exp.constant(~loc, Const.int(0))
-                | ([(Component_value.Ident("to"), loc)], _) =>
+                | ([(Ident("to"), loc)], _) =>
                   Exp.constant(~loc, Const.int(100))
                 | (_, loc) =>
                   grammar_error(loc, "Unexpected @keyframes prelude")
@@ -672,10 +641,12 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
 
   let render_standard_declaration = () => {
     let name = to_caml_case(name);
-    let (vs, _) = d.Declaration.value;
+    let (vs, _loc) = d.Declaration.value;
+
+    let args = List.map(render_component_value, vs);
     let ident =
       Exp.ident(~loc=name_loc, {txt: Lident(name), loc: name_loc});
-    let args = List.map(render_component_value, vs);
+
     Exp.apply(~loc=d_loc, ident, List.map(a => (Nolabel, a), args));
   };
 
@@ -697,7 +668,10 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
                     | _ => false,
                     args,
                   )) {
-              [(Labelled("duration"), render_component_value(cv)), ...args];
+              [
+                (Labelled("duration"), render_component_value(cv)),
+                ...args,
+              ];
             } else if (!
                          List.exists(
                            fun
@@ -713,9 +687,15 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
               );
             };
           } else if (is_timing_function(v)) {
-            [(Labelled("timingFunction"), render_component_value(cv)), ...args];
+            [
+              (Labelled("timingFunction"), render_component_value(cv)),
+              ...args,
+            ];
           } else if (is_animation_iteration_count(v)) {
-            [(Labelled("iterationCount"), render_component_value(cv)), ...args];
+            [
+              (Labelled("iterationCount"), render_component_value(cv)),
+              ...args,
+            ];
           } else if (is_animation_direction(v)) {
             [(Labelled("direction"), render_component_value(cv)), ...args];
           } else if (is_animation_fill_mode(v)) {
@@ -912,7 +892,10 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
                     | _ => false,
                     args,
                   )) {
-              [(Labelled("duration"), render_component_value(cv)), ...args];
+              [
+                (Labelled("duration"), render_component_value(cv)),
+                ...args,
+              ];
             } else if (!
                          List.exists(
                            fun
@@ -928,7 +911,10 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
               );
             };
           } else if (is_timing_function(v)) {
-            [(Labelled("timingFunction"), render_component_value(cv)), ...args];
+            [
+              (Labelled("timingFunction"), render_component_value(cv)),
+              ...args,
+            ];
           } else {
             switch (v) {
             | Ident(p) => [(Nolabel, render_property(p, loc)), ...args]
@@ -1025,24 +1011,24 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   };
 
   /* TODO: Initial abstraction over custom-renders
-    let renderHoF = (value, name, number_to_exp) => {
-    let fnName = to_caml_case(name);
-    let (vs, loc) = value;
-    let arg =
-      if (List.length(vs) == 1) {
-        let (v, loc) = List.hd(vs);
-        switch (v) {
-        | Number(n) => number_to_exp(n)
-        | _ => grammar_error(loc, "Unexpected " ++ name ++ " value")
-        };
-      } else {
-        grammar_error(loc, name ++ " should have a single value");
-      };
+       let renderHoF = (value, name, number_to_exp) => {
+       let fnName = to_caml_case(name);
+       let (vs, loc) = value;
+       let arg =
+         if (List.length(vs) == 1) {
+           let (v, loc) = List.hd(vs);
+           switch (v) {
+           | Number(n) => number_to_exp(n)
+           | _ => grammar_error(loc, "Unexpected " ++ name ++ " value")
+           };
+         } else {
+           grammar_error(loc, name ++ " should have a single value");
+         };
 
-    let ident =
-      Exp.ident(~loc=name_loc, {txt: Lident(fnName), loc: name_loc});
-    Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
-  }; */
+       let ident =
+         Exp.ident(~loc=name_loc, {txt: Lident(fnName), loc: name_loc});
+       Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
+     }; */
 
   /* https://developer.mozilla.org/en-US/docs/Web/CSS/flex-grow */
   let render_flex_grow_shrink = () => {
@@ -1152,31 +1138,32 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
       switch (List.length(vs)) {
       | 0 => grammar_error(loc, "flex should have a single value")
       /*
-        TODO: Right now bs-css  https://github.com/MinimaHQ/re-css/issues/11
-        | 1 => {
-        let (v, loc) = List.hd(vs);
-        switch (v) {
-          | Number(n) => Exp.constant(~loc, Pconst_float(n, None))
-          | _  => grammar_error(loc, "Unexpected flex value")
-        }} */
+       TODO: Right now bs-css  https://github.com/MinimaHQ/re-css/issues/11
+       | 1 => {
+       let (v, loc) = List.hd(vs);
+       switch (v) {
+         | Number(n) => Exp.constant(~loc, Pconst_float(n, None))
+         | _  => grammar_error(loc, "Unexpected flex value")
+       }} */
       | _ =>
-        Exp.tuple(~loc, List.map(
-          ((v, loc)) => {
-            switch (v) {
-            | Percentage(_) => render_component_value((v, loc))
-            | Number(n) => Exp.constant(~loc, Pconst_float(n, None))
-            | _ => render_component_value((v, loc))
-            /* TODO: Better handling `flex-basis in px and add grammar_error`
-              | _  => grammar_error(loc, "Unexpected flex value") */
-            }
-          },
-          vs,
-        ))
+        Exp.tuple(
+          ~loc,
+          List.map(
+            ((v, loc)) => {
+              switch (v) {
+              | Percentage(_) => render_component_value((v, loc))
+              | Number(n) => Exp.constant(~loc, Pconst_float(n, None))
+              | _ => render_component_value((v, loc))
+              /* TODO: Better handling `flex-basis in px and add grammar_error`
+                 | _  => grammar_error(loc, "Unexpected flex value") */
+              }
+            },
+            vs,
+          ),
+        )
       };
 
-    let args = [
-      (Nolabel, Exp.variant(~loc, "some", Some(expression))),
-    ];
+    let args = [(Nolabel, Exp.variant(~loc, "some", Some(expression)))];
 
     let ident =
       Exp.ident(~loc=name_loc, {txt: Lident(fnName), loc: name_loc});
@@ -1236,7 +1223,7 @@ and render_style_rule = (sr: Style_rule.t): expression => {
     List.fold_left(
       (s, (value, value_loc)) =>
         switch (value) {
-        | Component_value.Delim(":") => ":" ++ s
+        | Delim(":") => ":" ++ s
         | Ident(v)
         | Operator(v)
         | Delim(v) =>
@@ -1265,4 +1252,4 @@ and render_rule = (r: Rule.t): expression =>
   switch (r) {
   | Rule.Style_rule(sr) => render_style_rule(sr)
   | Rule.At_rule(ar) => render_at_rule(ar)
-  }
+  };

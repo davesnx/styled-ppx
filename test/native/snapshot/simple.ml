@@ -9,8 +9,7 @@ module StateLenses = [%lenses
 module Component = [%styled ("display: block")]
 module Component = [%styled.section ("display: block")]
 
-module Component = [%styled fun ~otraProp -> {j|
-  color: $otraProp;
-  margin-left: -10px;
+module Component = [%styled fun ~var -> {j|
+  color: $var;
   display: block;
 |j}]
