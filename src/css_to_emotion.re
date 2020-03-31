@@ -130,6 +130,24 @@ let float_to_const = number => {
   Const.float(number);
 };
 
+let removeDollar = str => String.sub(str, 1, String.length(str) - 1)
+
+let raw_literal = (~loc, str) =>
+  Exp.constant(
+    ~loc,
+    ~attrs=[({txt: "reason.raw_literal", loc}, PStr([]))],
+    Pconst_string(str, None),
+  );
+
+/* let p = (prop, value) => [(prop, value)]->Declaration.pack; */
+let render_unsafe = (~loc, prop, value) => {
+  let unsafeFnP = Exp.ident(~loc,{txt: Lident("p"), loc});
+  let valueName = Exp.ident(~loc, { txt: Lident(removeDollar(value)), loc });
+
+  Exp.apply(~loc, unsafeFnP, [
+      (Nolabel, raw_literal(~loc, prop)), (Nolabel, valueName)]);
+}
+
 let string_to_const = (~loc, s) =>
   Exp.constant(~loc, Const.string(~quotation_delimiter="js", s));
 
@@ -280,6 +298,12 @@ let is_line_width = value =>
   | _ => is_length(value)
   };
 
+/* let is_variable = value =>
+  switch (value) {
+  | Variable(v) => true
+  | _ => false
+  };
+ */
 let is_line_style = value =>
   switch (value) {
   | Ident(i) =>
@@ -325,7 +349,7 @@ let render_dimension = (~loc, number, dimension, const) => {
   Exp.apply(~loc, ident, [(Nolabel, arg)]);
 };
 
-let rec render_component_value = ((cv, loc): with_loc(t)): expression => {
+let rec render_value = ((cv, loc): with_loc(t)): expression => {
   let render_block = (start_char, _, _) =>
     grammar_error(loc, "Unsupported " ++ start_char ++ "-block");
 
@@ -338,9 +362,8 @@ let rec render_component_value = ((cv, loc): with_loc(t)): expression => {
       );
     let grouped_params = group_params(params);
     let args = {
-      open Component_value;
       let side_or_corner_expr = (deg, loc) =>
-        render_component_value((Float_dimension((deg, "deg", Angle)), loc));
+        render_value((Float_dimension((deg, "deg", Angle)), loc));
 
       let color_stops_to_expr_list = color_stop_params =>
         List.rev_map(
@@ -350,9 +373,9 @@ let rec render_component_value = ((cv, loc): with_loc(t)): expression => {
               [(_, start_loc) as color_cv, (Number("0" as perc), end_loc)],
               _,
             ) => {
-              let color_expr = render_component_value(color_cv);
+              let color_expr = render_value(color_cv);
               let perc_expr =
-                render_component_value((Percentage(perc), end_loc));
+                render_value((Percentage(perc), end_loc));
               let loc =
                 Lex_buffer.make_loc(
                   start_loc.Location.loc_start,
@@ -380,7 +403,7 @@ let rec render_component_value = ((cv, loc): with_loc(t)): expression => {
         |> List.map(
              fun
              | (Number("0"), loc) => Exp.constant(~loc, Const.int(0))
-             | c => render_component_value(c),
+             | c => render_value(c),
            );
 
       switch (name) {
@@ -389,7 +412,7 @@ let rec render_component_value = ((cv, loc): with_loc(t)): expression => {
         let (side_or_corner, color_stop_params) =
           switch (List.hd(grouped_params)) {
           | ([(Float_dimension((_, "deg", Angle)), _) as cv], _) => (
-              render_component_value(cv),
+              render_value(cv),
               List.tl(grouped_params),
             )
           | ([(Ident("to"), _), (Ident("bottom"), _)], loc) => (
@@ -416,7 +439,7 @@ let rec render_component_value = ((cv, loc): with_loc(t)): expression => {
                 params_loc.Location.loc_start,
               );
             (
-              render_component_value((
+              render_value((
                 Float_dimension(("180", "deg", Angle)),
                 implicit_side_or_corner_loc,
               )),
@@ -451,7 +474,7 @@ let rec render_component_value = ((cv, loc): with_loc(t)): expression => {
             (Percentage(p1), l2),
             (Percentage(p2), l3),
           ] => [
-            render_component_value((Float_dimension((n, "deg", Angle)), l1)),
+            render_value((Float_dimension((n, "deg", Angle)), l1)),
             Exp.constant(~loc=l2, float_to_const(p1)),
             Exp.constant(~loc=l3, float_to_const(p2)),
           ]
@@ -479,7 +502,7 @@ let rec render_component_value = ((cv, loc): with_loc(t)): expression => {
             (Percentage(p2), l3),
             (Number(p3), l4),
           ] => [
-            render_component_value((Float_dimension((n, "deg", Angle)), l1)),
+            render_value((Float_dimension((n, "deg", Angle)), l1)),
             Exp.constant(~loc=l2, float_to_const(p1)),
             Exp.constant(~loc=l3, float_to_const(p2)),
             Exp.variant(
@@ -500,7 +523,7 @@ let rec render_component_value = ((cv, loc): with_loc(t)): expression => {
             (Percentage(p2), l3),
             (Percentage(p3), l4),
           ] => [
-            render_component_value((Float_dimension((n, "deg", Angle)), l1)),
+            render_value((Float_dimension((n, "deg", Angle)), l1)),
             Exp.constant(~loc=l2, float_to_const(p1)),
             Exp.constant(~loc=l3, float_to_const(p2)),
             Exp.variant(
@@ -546,7 +569,6 @@ let rec render_component_value = ((cv, loc): with_loc(t)): expression => {
     | "0" => Exp.ident(~loc, {txt: Lident("zero"), loc})
     | _ => Exp.constant(~loc, number_to_const(s))
     }
-  | Unicode_range(_) => grammar_error(loc, "Unsupported unicode range")
   | Function(f, params) => render_function(f, params)
   | Float_dimension((number, "ms", Time)) =>
     /* bs-css expects milliseconds as an int constant */
@@ -563,10 +585,10 @@ let rec render_component_value = ((cv, loc): with_loc(t)): expression => {
   | Dimension((number, dimension)) =>
     let const = number_to_const(number);
     render_dimension(~loc, number, dimension, const);
+  | Unicode_range(_) => grammar_error(loc, "Unsupported unicode range")
   | Operator(_) => grammar_error(loc, "Unsupported operator")
   | Delim(_) => grammar_error(loc, "Unsupported delimiter")
-  | Variable(x) =>
-    string_to_const(~loc, String.sub(x, 1, String.length(x) - 1))
+  | Variable(x) => grammar_error(loc, "Unsupported delimiter in here " ++ x)
   };
 }
 and render_at_rule = (ar: At_rule.t): expression =>
@@ -635,18 +657,16 @@ and render_at_rule = (ar: At_rule.t): expression =>
     grammar_error(ar.At_rule.loc, "At-rule @" ++ n ++ " not supported")
   }
 and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
-  open Component_value;
   let (name, name_loc) = d.Declaration.name;
   let fnName = to_caml_case(name);
 
   let render_standard_declaration = () => {
     let name = to_caml_case(name);
-    let (vs, _loc) = d.Declaration.value;
+    let (valueList, _loc) = d.Declaration.value;
 
-    let args = List.map(render_component_value, vs);
+    let args = List.map(render_value, valueList);
     let ident =
       Exp.ident(~loc=name_loc, {txt: Lident(name), loc: name_loc});
-
     Exp.apply(~loc=d_loc, ident, List.map(a => (Nolabel, a), args));
   };
 
@@ -669,7 +689,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
                     args,
                   )) {
               [
-                (Labelled("duration"), render_component_value(cv)),
+                (Labelled("duration"), render_value(cv)),
                 ...args,
               ];
             } else if (!
@@ -679,7 +699,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
                            | _ => false,
                            args,
                          )) {
-              [(Labelled("delay"), render_component_value(cv)), ...args];
+              [(Labelled("delay"), render_value(cv)), ...args];
             } else {
               grammar_error(
                 loc,
@@ -688,20 +708,20 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
             };
           } else if (is_timing_function(v)) {
             [
-              (Labelled("timingFunction"), render_component_value(cv)),
+              (Labelled("timingFunction"), render_value(cv)),
               ...args,
             ];
           } else if (is_animation_iteration_count(v)) {
             [
-              (Labelled("iterationCount"), render_component_value(cv)),
+              (Labelled("iterationCount"), render_value(cv)),
               ...args,
             ];
           } else if (is_animation_direction(v)) {
-            [(Labelled("direction"), render_component_value(cv)), ...args];
+            [(Labelled("direction"), render_value(cv)), ...args];
           } else if (is_animation_fill_mode(v)) {
-            [(Labelled("fillMode"), render_component_value(cv)), ...args];
+            [(Labelled("fillMode"), render_value(cv)), ...args];
           } else if (is_animation_play_state(v)) {
-            [(Labelled("playState"), render_component_value(cv)), ...args];
+            [(Labelled("playState"), render_value(cv)), ...args];
           } else if (is_keyframes_name(v)) {
             let s =
               switch (v) {
@@ -748,7 +768,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
                 | _ => false,
                 args,
               )) {
-          [(Labelled("x"), render_component_value(cv)), ...args];
+          [(Labelled("x"), render_value(cv)), ...args];
         } else if (!
                      List.exists(
                        fun
@@ -756,7 +776,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
                        | _ => false,
                        args,
                      )) {
-          [(Labelled("y"), render_component_value(cv)), ...args];
+          [(Labelled("y"), render_value(cv)), ...args];
         } else if (!
                      List.exists(
                        fun
@@ -764,7 +784,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
                        | _ => false,
                        args,
                      )) {
-          [(Labelled("blur"), render_component_value(cv)), ...args];
+          [(Labelled("blur"), render_value(cv)), ...args];
         } else if (!
                      List.exists(
                        fun
@@ -772,7 +792,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
                        | _ => false,
                        args,
                      )) {
-          [(Labelled("spread"), render_component_value(cv)), ...args];
+          [(Labelled("spread"), render_value(cv)), ...args];
         } else {
           grammar_error(
             loc,
@@ -780,7 +800,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
           );
         };
       } else if (is_color(v)) {
-        [(Nolabel, render_component_value(cv)), ...args];
+        [(Nolabel, render_value(cv)), ...args];
       } else {
         grammar_error(loc, "Unexpected box-shadow value");
       };
@@ -820,7 +840,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
                 | _ => false,
                 args,
               )) {
-          [(Labelled("x"), render_component_value(cv)), ...args];
+          [(Labelled("x"), render_value(cv)), ...args];
         } else if (!
                      List.exists(
                        fun
@@ -828,7 +848,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
                        | _ => false,
                        args,
                      )) {
-          [(Labelled("y"), render_component_value(cv)), ...args];
+          [(Labelled("y"), render_value(cv)), ...args];
         } else if (!
                      List.exists(
                        fun
@@ -836,7 +856,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
                        | _ => false,
                        args,
                      )) {
-          [(Labelled("blur"), render_component_value(cv)), ...args];
+          [(Labelled("blur"), render_value(cv)), ...args];
         } else {
           grammar_error(
             loc,
@@ -844,7 +864,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
           );
         };
       } else if (is_color(v)) {
-        [(Nolabel, render_component_value(cv)), ...args];
+        [(Nolabel, render_value(cv)), ...args];
       } else {
         grammar_error(loc, "Unexpected box-shadow value");
       };
@@ -893,7 +913,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
                     args,
                   )) {
               [
-                (Labelled("duration"), render_component_value(cv)),
+                (Labelled("duration"), render_value(cv)),
                 ...args,
               ];
             } else if (!
@@ -903,7 +923,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
                            | _ => false,
                            args,
                          )) {
-              [(Labelled("delay"), render_component_value(cv)), ...args];
+              [(Labelled("delay"), render_value(cv)), ...args];
             } else {
               grammar_error(
                 loc,
@@ -912,7 +932,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
             };
           } else if (is_timing_function(v)) {
             [
-              (Labelled("timingFunction"), render_component_value(cv)),
+              (Labelled("timingFunction"), render_value(cv)),
               ...args,
             ];
           } else {
@@ -941,7 +961,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
     if (List.length(vs) == 1) {
       render_standard_declaration();
     } else {
-      let cvs = List.rev_map(v => render_component_value(v), vs);
+      let cvs = List.rev_map(v => render_value(v), vs);
       let arg = list_to_expr(loc, cvs);
       let ident =
         Exp.ident(
@@ -976,7 +996,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
           params,
         );
 
-      render_component_value((String(s), loc));
+      render_value((String(s), loc));
     };
 
     let grouped_params = group_params(vs);
@@ -997,7 +1017,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
       if (List.length(vs) == 1) {
         let (v, loc) as c = List.hd(vs);
         switch (v) {
-        | Ident(_) => render_component_value(c)
+        | Ident(_) => render_value(c)
         | Number(n) => Exp.constant(~loc, Pconst_integer(n, None))
         | _ => grammar_error(loc, "Unexpected z-index value")
         };
@@ -1079,11 +1099,11 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
       List.fold_left(
         (args, (v, loc) as cv) =>
           if (is_line_width(v)) {
-            [(Labelled("width"), render_component_value(cv)), ...args];
+            [(Labelled("width"), render_value(cv)), ...args];
           } else if (is_line_style(v)) {
-            [(Nolabel, render_component_value(cv)), ...args];
+            [(Nolabel, render_value(cv)), ...args];
           } else if (is_color(v)) {
-            [(Labelled("color"), render_component_value(cv)), ...args];
+            [(Labelled("color"), render_value(cv)), ...args];
           } else {
             grammar_error(loc, "Unexpected " ++ name ++ " value");
           },
@@ -1107,7 +1127,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
 
     let ident =
       Exp.ident(~loc=name_loc, {txt: Lident(fnNameN), loc: name_loc});
-    let args = List.map(v => (Nolabel, render_component_value(v)), vs);
+    let args = List.map(v => (Nolabel, render_value(v)), vs);
     Exp.apply(~loc=d_loc, ident, args);
   };
 
@@ -1151,9 +1171,9 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
           List.map(
             ((v, loc)) => {
               switch (v) {
-              | Percentage(_) => render_component_value((v, loc))
+              | Percentage(_) => render_value((v, loc))
               | Number(n) => Exp.constant(~loc, Pconst_float(n, None))
-              | _ => render_component_value((v, loc))
+              | _ => render_value((v, loc))
               /* TODO: Better handling `flex-basis in px and add grammar_error`
                  | _  => grammar_error(loc, "Unexpected flex value") */
               }
@@ -1192,7 +1212,18 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   | "border"
   | "outline" when List.length(fst(d.Declaration.value)) == 2 =>
     render_border_outline()
-  | _ => render_standard_declaration()
+  | _ => {
+    let (valueList, loc) = d.Declaration.value;
+    if (List.length(valueList) > 1) {
+      /* grammar_error(loc, "Something is wrong with dynamic props, $"); */
+      render_standard_declaration()
+    } else {
+      switch (List.nth(valueList, 0)) {
+        | (Variable(v), _loc) => render_unsafe(~loc, name, v)
+        | _ => render_standard_declaration()
+      }
+    }
+  }
   };
 }
 and render_declarations =
