@@ -134,6 +134,10 @@ let variable = [%sedlex.regexp?
   ('$', Star(ident_char))
 ];
 
+let interpolate_variable = [%sedlex.regexp?
+  ('$', '(', Star(ident_char), ')', Star(ident_char))
+];
+
 let string_quote = [%sedlex.regexp?
   (
     '"',
@@ -285,7 +289,8 @@ let rec get_next_token = buf => {
   | '[' => LEFT_BRACKET
   | ']' => RIGHT_BRACKET
   | '%' => PERCENTAGE
-  | variable => VARIABLE(Lex_buffer.latin1(buf))
+  | variable => VARIABLE(Lex_buffer.latin1(~skip=1, buf))
+  | interpolate_variable => VARIABLE(Lex_buffer.latin1(~skip=2, buf))
   /* | '&' => SELECTOR */
   | operator => OPERATOR(Lex_buffer.latin1(buf))
   | string => STRING(Lex_buffer.latin1(~skip=1, ~drop=1, buf))

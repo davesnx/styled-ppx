@@ -130,8 +130,6 @@ let float_to_const = number => {
   Const.float(number);
 };
 
-let removeDollar = str => String.sub(str, 1, String.length(str) - 1)
-
 let raw_literal = (~loc, str) =>
   Exp.constant(
     ~loc,
@@ -142,7 +140,7 @@ let raw_literal = (~loc, str) =>
 /* let p = (prop, value) => [(prop, value)]->Declaration.pack; */
 let render_unsafe = (~loc, prop, value) => {
   let unsafeFnP = Exp.ident(~loc,{txt: Lident("p"), loc});
-  let valueName = Exp.ident(~loc, { txt: Lident(removeDollar(value)), loc });
+  let valueName = Exp.ident(~loc, { txt: Lident(value), loc });
 
   Exp.apply(~loc, unsafeFnP, [
       (Nolabel, raw_literal(~loc, prop)), (Nolabel, valueName)]);
@@ -1190,41 +1188,35 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
     Exp.apply(~loc=name_loc, ident, args);
   };
 
-  switch (name) {
-  | "animation" => render_animation()
-  | "box-shadow" => render_box_shadow()
-  | "text-shadow" => render_text_shadow()
-  | "transform" => render_transform()
-  | "transition" => render_transition()
-  | "font-family" => render_font_family()
-  | "z-index" => render_z_index()
-  | "stroke-opacity"
-  | "stop-opacity"
-  | "flood-opacity"
-  | "fill-opacity"
-  | "opacity" => render_opacity()
-  | "flex-grow"
-  | "flex-shrink" => render_flex_grow_shrink()
-  | "font-weight" => render_font_weight()
-  | "flex" => render_flex()
-  | "padding"
-  | "margin" => render_margin_padding()
-  | "border"
-  | "outline" when List.length(fst(d.Declaration.value)) == 2 =>
-    render_border_outline()
-  | _ => {
-    let (valueList, loc) = d.Declaration.value;
-    if (List.length(valueList) > 1) {
-      /* grammar_error(loc, "Something is wrong with dynamic props, $"); */
-      render_standard_declaration()
-    } else {
-      switch (List.nth(valueList, 0)) {
-        | (Variable(v), _loc) => render_unsafe(~loc, name, v)
-        | _ => render_standard_declaration()
-      }
-    }
+  let (valueList, loc) = d.Declaration.value;
+
+  switch (List.nth(valueList, 0)) {
+    | (Variable(v), _loc) => render_unsafe(~loc, name, v)
+    | _ => switch (name) {
+      | "animation" => render_animation()
+      | "box-shadow" => render_box_shadow()
+      | "text-shadow" => render_text_shadow()
+      | "transform" => render_transform()
+      | "transition" => render_transition()
+      | "font-family" => render_font_family()
+      | "z-index" => render_z_index()
+      | "stroke-opacity"
+      | "stop-opacity"
+      | "flood-opacity"
+      | "fill-opacity"
+      | "opacity" => render_opacity()
+      | "flex-grow"
+      | "flex-shrink" => render_flex_grow_shrink()
+      | "font-weight" => render_font_weight()
+      | "flex" => render_flex()
+      | "padding"
+      | "margin" => render_margin_padding()
+      | "border"
+      | "outline" when List.length(fst(d.Declaration.value)) == 2 =>
+        render_border_outline()
+      | _ => render_standard_declaration()
+      };
   }
-  };
 }
 and render_declarations =
     (ds: list(Declaration_list.kind)): list(expression) =>

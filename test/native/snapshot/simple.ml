@@ -18,6 +18,12 @@ module Component = [%styled {j|
   display: block;
 |j}]
 
+let space = "10"
+module Component = [%styled {j|
+  margin: $(space)px;
+  display: block;
+|j}]
+
 (* module Component = [%styled fun ~var -> {j|
   color: $var;
   display: block;

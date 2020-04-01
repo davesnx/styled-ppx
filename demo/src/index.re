@@ -14,15 +14,14 @@ module Link = [%styled.a {|
   color: #333;
 |}];
 
-let var = "#333333"
-module Component = [%styled {j|
-  color: $var;
+module Component = [%styled (~c) => {j|
+  color: $(c);
   display: block;
 |j}];
 
 ReactDOMRe.renderToElementWithId(
   <App onClick={Js.log}>
-    <Component>
+    <Component c="#443434">
       {React.string("- styled-ppx -")}
     </Component>
     <Link href="http://sancho.dev">
