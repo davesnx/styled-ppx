@@ -138,13 +138,17 @@ let raw_literal = (~loc, str) =>
   );
 
 /* let p = (prop, value) => [(prop, value)]->Declaration.pack; */
-let render_unsafe = (~loc, prop, value) => {
-  let unsafeFnP = Exp.ident(~loc,{txt: Lident("p"), loc});
-  let valueName = Exp.ident(~loc, { txt: Lident(value), loc });
+let render_unsafe = (~loc, prop, v) => {
+  /* let (_, value) = List.nth(valueList, 0); */
+  let unsafeFnP = Exp.ident(~loc, {txt: Lident("p"), loc});
+  let valueName = Exp.ident(~loc, {txt: Lident(v), loc});
 
-  Exp.apply(~loc, unsafeFnP, [
-      (Nolabel, raw_literal(~loc, prop)), (Nolabel, valueName)]);
-}
+  Exp.apply(
+    ~loc,
+    unsafeFnP,
+    [(Nolabel, raw_literal(~loc, prop)), (Nolabel, valueName)],
+  );
+};
 
 let string_to_const = (~loc, s) =>
   Exp.constant(~loc, Const.string(~quotation_delimiter="js", s));
@@ -298,10 +302,11 @@ let is_line_width = value =>
 
 /* let is_variable = value =>
   switch (value) {
-  | Variable(v) => true
+  | Variable(_v) => true
   | _ => false
   };
  */
+
 let is_line_style = value =>
   switch (value) {
   | Ident(i) =>
@@ -372,8 +377,7 @@ let rec render_value = ((cv, loc): with_loc(t)): expression => {
               _,
             ) => {
               let color_expr = render_value(color_cv);
-              let perc_expr =
-                render_value((Percentage(perc), end_loc));
+              let perc_expr = render_value((Percentage(perc), end_loc));
               let loc =
                 Lex_buffer.make_loc(
                   start_loc.Location.loc_start,
@@ -587,6 +591,7 @@ let rec render_value = ((cv, loc): with_loc(t)): expression => {
   | Operator(_) => grammar_error(loc, "Unsupported operator")
   | Delim(_) => grammar_error(loc, "Unsupported delimiter")
   | Variable(x) => grammar_error(loc, "Unsupported delimiter in here " ++ x)
+  | TypedVariable(_) => grammar_error(loc, "Unsupported delimiter in here")
   };
 }
 and render_at_rule = (ar: At_rule.t): expression =>
@@ -657,14 +662,12 @@ and render_at_rule = (ar: At_rule.t): expression =>
 and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   let (name, name_loc) = d.Declaration.name;
   let fnName = to_caml_case(name);
+  let (valueList, _loc) = d.Declaration.value;
 
-  let render_standard_declaration = () => {
-    let name = to_caml_case(name);
-    let (valueList, _loc) = d.Declaration.value;
-
+  let render_standard_declaration = (fnName, valueList) => {
     let args = List.map(render_value, valueList);
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Lident(name), loc: name_loc});
+      Exp.ident(~loc=name_loc, {txt: Lident(fnName), loc: name_loc});
     Exp.apply(~loc=d_loc, ident, List.map(a => (Nolabel, a), args));
   };
 
@@ -686,10 +689,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
                     | _ => false,
                     args,
                   )) {
-              [
-                (Labelled("duration"), render_value(cv)),
-                ...args,
-              ];
+              [(Labelled("duration"), render_value(cv)), ...args];
             } else if (!
                          List.exists(
                            fun
@@ -705,15 +705,9 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
               );
             };
           } else if (is_timing_function(v)) {
-            [
-              (Labelled("timingFunction"), render_value(cv)),
-              ...args,
-            ];
+            [(Labelled("timingFunction"), render_value(cv)), ...args];
           } else if (is_animation_iteration_count(v)) {
-            [
-              (Labelled("iterationCount"), render_value(cv)),
-              ...args,
-            ];
+            [(Labelled("iterationCount"), render_value(cv)), ...args];
           } else if (is_animation_direction(v)) {
             [(Labelled("direction"), render_value(cv)), ...args];
           } else if (is_animation_fill_mode(v)) {
@@ -910,10 +904,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
                     | _ => false,
                     args,
                   )) {
-              [
-                (Labelled("duration"), render_value(cv)),
-                ...args,
-              ];
+              [(Labelled("duration"), render_value(cv)), ...args];
             } else if (!
                          List.exists(
                            fun
@@ -929,10 +920,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
               );
             };
           } else if (is_timing_function(v)) {
-            [
-              (Labelled("timingFunction"), render_value(cv)),
-              ...args,
-            ];
+            [(Labelled("timingFunction"), render_value(cv)), ...args];
           } else {
             switch (v) {
             | Ident(p) => [(Nolabel, render_property(p, loc)), ...args]
@@ -957,7 +945,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   let render_transform = () => {
     let (vs, loc) = d.Declaration.value;
     if (List.length(vs) == 1) {
-      render_standard_declaration();
+      render_standard_declaration(fnName, valueList);
     } else {
       let cvs = List.rev_map(v => render_value(v), vs);
       let arg = list_to_expr(loc, cvs);
@@ -1214,8 +1202,8 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
       | "border"
       | "outline" when List.length(fst(d.Declaration.value)) == 2 =>
         render_border_outline()
-      | _ => render_standard_declaration()
-      };
+  | _ => render_standard_declaration(fnName, valueList)
+    }
   }
 }
 and render_declarations =

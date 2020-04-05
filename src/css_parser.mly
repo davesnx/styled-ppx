@@ -30,6 +30,7 @@ open Css_types
 %token <string * string * Css_types.dimension> FLOAT_DIMENSION
 %token <string * string> DIMENSION
 %token <string> VARIABLE
+%token <string * string> TYPED_VARIABLE
 
 %start <Css_types.Stylesheet.t> stylesheet
 %start <Css_types.Declaration_list.t> declaration_list
