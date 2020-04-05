@@ -484,7 +484,7 @@ let createRecordEventLabel = (~loc, name, kind) => {
   );
 };
 
-let createMakeProps = (~loc) => {
+let createMakeProps = (~loc, extraProps) => {
   /* [@bs.deriving abstract] */
   let bsDerivingAbstract = (
     {txt: "bs.deriving", loc},
@@ -496,54 +496,34 @@ let createMakeProps = (~loc) => {
     ]),
   );
 
-  Str.mk(
-    ~loc,
-    Pstr_type(
-      Recursive,
-      [
-        Type.mk(
-          ~loc,
-          ~priv=Public,
-          ~attrs=[bsDerivingAbstract],
-          ~kind=Ptype_record(
-            [
-              /*
-                List of
-                    prop: type
-                    [@bs.optional]
+  let dynamicProps =
+    switch (extraProps) {
+    | None => []
+    | Some(props) => props
+    };
+  /*
+     List of
+         prop: type
+         [@bs.optional]
 
-                ref: domRef
-                [@bs.optional]
-              */
-              createDomRefLabel(~loc),
-              createChildrenLabel(~loc),
-              ...List.map(
-                  ({name, type_, isEvent}) =>
-                    isEvent
-                      ? createRecordEventLabel(~loc, name, type_)
-                      : createRecordLabel(~loc, name, type_),
-                  domPropsList,
-                ),
-            ]
-          ),
-          {txt: "makeProps", loc},
-        ),
+     ref: domRef
+     [@bs.optional]
+   */
+  let reactProps =
+    List.append(
+      [
+        createDomRefLabel(~loc),
+        createChildrenLabel(~loc),
+        ...List.map(
+             ({name, type_, isEvent}) =>
+               isEvent
+                 ? createRecordEventLabel(~loc, name, type_)
+                 : createRecordLabel(~loc, name, type_),
+             domPropsList,
+           ),
       ],
-    ),
-  );
-};
-
-let createMakePropsDynamic = (~loc, ~extraProps) => {
-  /* [@bs.deriving abstract] */
-  let bsDerivingAbstract = (
-    {txt: "bs.deriving", loc},
-    PStr([
-      Str.mk(
-        ~loc,
-        Pstr_eval(Exp.ident(~loc, {txt: Lident("abstract"), loc}), []),
-      ),
-    ]),
-  );
+      dynamicProps,
+    );
 
   Str.mk(
     ~loc,
@@ -554,21 +534,7 @@ let createMakePropsDynamic = (~loc, ~extraProps) => {
           ~loc,
           ~priv=Public,
           ~attrs=[bsDerivingAbstract],
-          ~kind=Ptype_record(
-            [
-              /*
-                List of
-                    prop: type
-                    [@bs.optional]
-
-                ref: domRef
-                [@bs.optional]
-              */
-              createDomRefLabel(~loc),
-              createChildrenLabel(~loc),
-              ...List.map(((arg, _, _, _, _, _)) => createCustomPropLabel(~loc, getLabel(arg), "string"), extraProps)
-            ]
-          ),
+          ~kind=Ptype_record(reactProps),
           {txt: "makeProps", loc},
         ),
       ],
@@ -673,9 +639,16 @@ let moduleMapper = (_, _) => {
           args,
         );
 
+      let extraProps =
+        Some(List.map(
+          ((arg, _, _, _, _, _)) =>
+            createCustomPropLabel(~loc, getLabel(arg), "string"),
+          argList,
+        ));
+
       Mod.mk(
         Pmod_structure([
-          createMakePropsDynamic(~loc, ~extraProps=argList),
+          createMakeProps(~loc, extraProps),
           createReactBinding(~loc),
           createDynamicStyles(
             ~loc,
@@ -740,7 +713,7 @@ let moduleMapper = (_, _) => {
 
       Mod.mk(
         Pmod_structure([
-          createMakeProps(~loc),
+          createMakeProps(~loc, None),
           createReactBinding(~loc),
           createStyles(
             ~loc,

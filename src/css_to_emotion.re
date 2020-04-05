@@ -138,15 +138,14 @@ let raw_literal = (~loc, str) =>
   );
 
 /* let p = (prop, value) => [(prop, value)]->Declaration.pack; */
-let render_unsafe = (~loc, prop, v) => {
-  /* let (_, value) = List.nth(valueList, 0); */
+let render_unsafe = (~loc, proproperty, value) => {
   let unsafeFnP = Exp.ident(~loc, {txt: Lident("p"), loc});
-  let valueName = Exp.ident(~loc, {txt: Lident(v), loc});
+  let valueName = Exp.ident(~loc, {txt: Lident(value), loc});
 
   Exp.apply(
     ~loc,
     unsafeFnP,
-    [(Nolabel, raw_literal(~loc, prop)), (Nolabel, valueName)],
+    [(Nolabel, raw_literal(~loc, proproperty)), (Nolabel, valueName)],
   );
 };
 
@@ -307,6 +306,12 @@ let is_line_width = value =>
   };
  */
 
+/* let is_typed_variable = value =>
+  switch (value) {
+  | TypedVariable((_v, _type)) => true
+  | _ => false
+  };
+ */
 let is_line_style = value =>
   switch (value) {
   | Ident(i) =>
@@ -590,8 +595,12 @@ let rec render_value = ((cv, loc): with_loc(t)): expression => {
   | Unicode_range(_) => grammar_error(loc, "Unsupported unicode range")
   | Operator(_) => grammar_error(loc, "Unsupported operator")
   | Delim(_) => grammar_error(loc, "Unsupported delimiter")
-  | Variable(x) => grammar_error(loc, "Unsupported delimiter in here " ++ x)
-  | TypedVariable(_) => grammar_error(loc, "Unsupported delimiter in here")
+  | TypedVariable((variable, func)) => {
+    let ident = Exp.ident(~loc, {txt: Lident(func), loc});
+    let arg = string_to_const(~loc, variable);
+    Exp.apply(~loc, ident, [(Nolabel, arg)]);
+  }
+  | Variable(x) => grammar_error(loc, "Unsupported variable in here, you wrote this: " ++ x ++ ". If you think that's a bug, please open an issue https://github.com/davesnx/styled-ppx/issues/new")
   };
 }
 and render_at_rule = (ar: At_rule.t): expression =>
@@ -662,7 +671,6 @@ and render_at_rule = (ar: At_rule.t): expression =>
 and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   let (name, name_loc) = d.Declaration.name;
   let fnName = to_caml_case(name);
-  let (valueList, _loc) = d.Declaration.value;
 
   let render_standard_declaration = (fnName, valueList) => {
     let args = List.map(render_value, valueList);
@@ -672,7 +680,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   };
 
   /* https://developer.mozilla.org/en-US/docs/Web/CSS/animation */
-  let render_animation = () => {
+  let render_animation = (params, _loc) => {
     let animation_ident =
       Exp.ident(
         ~loc=name_loc,
@@ -730,7 +738,6 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
         grouped_param,
       );
 
-    let (params, _) = d.Declaration.value;
     let grouped_params = group_params(params);
     let args =
       List.rev_map(params => animation_args(params), grouped_params);
@@ -742,7 +749,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   };
 
   /* https://developer.mozilla.org/en-US/docs/Web/CSS/box-shadow */
-  let render_box_shadow = () => {
+  let render_box_shadow = (params, _loc) => {
     let box_shadow_args = (args, (v, loc) as cv) =>
       if (is_ident("inset", v)) {
         [
@@ -802,7 +809,6 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
     let box_shadow_args = ((grouped_param, _)) =>
       List.fold_left(box_shadow_args, [], grouped_param);
 
-    let (params, _) = d.Declaration.value;
     let grouped_params = group_params(params);
     let args =
       List.rev_map(params => box_shadow_args(params), grouped_params);
@@ -814,7 +820,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   };
 
   /* https://developer.mozilla.org/en-US/docs/Web/CSS/text-shadow */
-  let render_text_shadow = () => {
+  let render_text_shadow = (params, _loc) => {
     let text_shadow_args = (args, (v, loc) as cv) =>
       if (is_ident("inset", v)) {
         [
@@ -869,7 +875,6 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
     let text_shadow_args = ((grouped_param, _)) =>
       List.fold_left(text_shadow_args, [], grouped_param);
 
-    let (params, _) = d.Declaration.value;
     let grouped_params = group_params(params);
     let args =
       List.rev_map(params => text_shadow_args(params), grouped_params);
@@ -884,7 +889,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   };
 
   /* https://developer.mozilla.org/en-US/docs/Web/CSS/transition */
-  let render_transition = () => {
+  let render_transition = (params, _loc) => {
     let transition_ident =
       Exp.ident(
         ~loc=name_loc,
@@ -931,7 +936,6 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
         grouped_param,
       );
 
-    let (params, _) = d.Declaration.value;
     let grouped_params = group_params(params);
     let args =
       List.rev_map(params => transition_args(params), grouped_params);
@@ -942,10 +946,9 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
     Exp.apply(ident, [(Nolabel, list_to_expr(name_loc, transition_list))]);
   };
 
-  let render_transform = () => {
-    let (vs, loc) = d.Declaration.value;
+  let render_transform = (vs, loc) => {
     if (List.length(vs) == 1) {
-      render_standard_declaration(fnName, valueList);
+      render_standard_declaration(fnName, vs);
     } else {
       let cvs = List.rev_map(v => render_value(v), vs);
       let arg = list_to_expr(loc, cvs);
@@ -958,8 +961,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
     };
   };
 
-  let render_font_family = () => {
-    let (vs, loc) = d.Declaration.value;
+  let render_font_family = (vs, loc) => {
     let font_family_args = ((params, _)) => {
       let s =
         List.fold_left(
@@ -997,8 +999,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
     );
   };
 
-  let render_z_index = () => {
-    let (vs, loc) = d.Declaration.value;
+  let render_z_index = (vs, loc) => {
     let arg =
       if (List.length(vs) == 1) {
         let (v, loc) as c = List.hd(vs);
@@ -1016,29 +1017,8 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
     Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
   };
 
-  /* TODO: Initial abstraction over custom-renders
-       let renderHoF = (value, name, number_to_exp) => {
-       let fnName = to_caml_case(name);
-       let (vs, loc) = value;
-       let arg =
-         if (List.length(vs) == 1) {
-           let (v, loc) = List.hd(vs);
-           switch (v) {
-           | Number(n) => number_to_exp(n)
-           | _ => grammar_error(loc, "Unexpected " ++ name ++ " value")
-           };
-         } else {
-           grammar_error(loc, name ++ " should have a single value");
-         };
-
-       let ident =
-         Exp.ident(~loc=name_loc, {txt: Lident(fnName), loc: name_loc});
-       Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
-     }; */
-
   /* https://developer.mozilla.org/en-US/docs/Web/CSS/flex-grow */
-  let render_flex_grow_shrink = () => {
-    let (vs, loc) = d.Declaration.value;
+  let render_flex_grow_shrink = (vs, loc) => {
     let arg =
       if (List.length(vs) == 1) {
         let (v, loc) = List.hd(vs);
@@ -1056,8 +1036,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   };
 
   /* https://developer.mozilla.org/en/docs/Web/CSS/font-weight */
-  let render_font_weight = () => {
-    let (vs, loc) = d.Declaration.value;
+  let render_font_weight = (vs, loc) => {
     let arg =
       switch (List.length(vs)) {
       | 0 => grammar_error(loc, "font-weight should have a single value")
@@ -1080,7 +1059,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   };
 
   /* https://developer.mozilla.org/en-US/docs/Web/CSS/border */
-  let render_border_outline = () => {
+  let render_border_outline = (params, loc) => {
     let border_outline_args = (params, _) =>
       List.fold_left(
         (args, (v, loc) as cv) =>
@@ -1097,7 +1076,6 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
         params,
       );
 
-    let (params, loc) = d.Declaration.value;
     let args = border_outline_args(params, loc);
     let fnName2 = fnName ++ "2";
     let ident =
@@ -1105,8 +1083,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
     Exp.apply(ident, args);
   };
 
-  let render_margin_padding = () => {
-    let (vs, _) = d.Declaration.value;
+  let render_margin_padding = (vs, _loc) => {
     let parameter_count = List.length(vs);
     let fnNameN =
       parameter_count > 1 ? fnName ++ string_of_int(parameter_count) : fnName;
@@ -1117,9 +1094,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
     Exp.apply(~loc=d_loc, ident, args);
   };
 
-  let render_opacity = () => {
-    let (vs, loc) = d.Declaration.value;
-
+  let render_opacity = (vs, loc) => {
     let arg =
       switch (List.length(vs)) {
       | 0 => grammar_error(loc, "opacity should have a single value")
@@ -1137,9 +1112,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   };
 
   /* https://developer.mozilla.org/en-US/docs/Web/CSS/flex */
-  let render_flex = () => {
-    let (vs, loc) = d.Declaration.value;
-
+  let render_flex = (vs, loc) => {
     let expression =
       switch (List.length(vs)) {
       | 0 => grammar_error(loc, "flex should have a single value")
@@ -1178,30 +1151,36 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
 
   let (valueList, loc) = d.Declaration.value;
 
+  let newValueList = List.map((value) => value, valueList);
+
+  /* TODO: Right know we only support variables with functions that
+  accepts only one argument, in order to change/improve that, we need to
+  "render" variables/typed_variables and static params.
+   */
   switch (List.nth(valueList, 0)) {
     | (Variable(v), _loc) => render_unsafe(~loc, name, v)
     | _ => switch (name) {
-      | "animation" => render_animation()
-      | "box-shadow" => render_box_shadow()
-      | "text-shadow" => render_text_shadow()
-      | "transform" => render_transform()
-      | "transition" => render_transition()
-      | "font-family" => render_font_family()
-      | "z-index" => render_z_index()
+      | "animation" => render_animation(newValueList, loc)
+      | "box-shadow" => render_box_shadow(newValueList, loc)
+      | "text-shadow" => render_text_shadow(newValueList, loc)
+      | "transform" => render_transform(newValueList, loc)
+      | "transition" => render_transition(newValueList, loc)
+      | "font-family" => render_font_family(newValueList, loc)
+      | "z-index" => render_z_index(newValueList, loc)
       | "stroke-opacity"
       | "stop-opacity"
       | "flood-opacity"
       | "fill-opacity"
-      | "opacity" => render_opacity()
+      | "opacity" => render_opacity(newValueList, loc)
       | "flex-grow"
-      | "flex-shrink" => render_flex_grow_shrink()
-      | "font-weight" => render_font_weight()
-      | "flex" => render_flex()
+      | "flex-shrink" => render_flex_grow_shrink(newValueList, loc)
+      | "font-weight" => render_font_weight(newValueList, loc)
+      | "flex" => render_flex(newValueList, loc)
       | "padding"
-      | "margin" => render_margin_padding()
+      | "margin" => render_margin_padding(newValueList, loc)
       | "border"
       | "outline" when List.length(fst(d.Declaration.value)) == 2 =>
-        render_border_outline()
+        render_border_outline(newValueList, loc)
   | _ => render_standard_declaration(fnName, valueList)
     }
   }
@@ -1221,12 +1200,9 @@ and render_declaration_list = ((list, loc): Declaration_list.t): expression => {
   let expr_with_loc_list = render_declarations(list);
   let styleExpression = list_to_expr(loc, expr_with_loc_list);
   let ident = Exp.ident(~loc, {txt: Lident("css"), loc});
-
   let cssFunc = Exp.apply(~loc, ident, [(Nolabel, styleExpression)]);
-  let styled_defintion =
-    Exp.open_(~loc, Fresh, {txt: Lident("Emotion"), loc}, cssFunc);
 
-  styled_defintion;
+  Exp.open_(~loc, Fresh, {txt: Lident("Emotion"), loc}, cssFunc);
 }
 and render_style_rule = (sr: Style_rule.t): expression => {
   let (prelude, prelude_loc) = sr.Style_rule.prelude;

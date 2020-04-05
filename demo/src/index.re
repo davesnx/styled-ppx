@@ -17,10 +17,11 @@ module Link = [%styled.a {|
 let space = "10px";
 let b = "flex";
 
-module Component = [%styled {j|
-  margin: $(space);
+module Component = [%styled (~c) => {j|
+  color: $c;
   display: $b;
-|j}]
+  margin: $space;
+|j}];
 
 ReactDOMRe.renderToElementWithId(
   <App onClick={Js.log}>

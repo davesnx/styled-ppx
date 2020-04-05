@@ -18,11 +18,11 @@ module Component = [%styled {j|
   display: block;
 |j}]
 
-let space = "10"
+let space = "10px"
 let b = "flex"
   (* margin: 10px $(space)px; *)
 module Component = [%styled {j|
-  margin: $(space)px;
+  margin: $space 12px;
   display: $b;
 |j}]
 
