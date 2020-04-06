@@ -43,63 +43,6 @@ let getAlias = (pattern, label) =>
   | _ => getLabel(label)
   };
 
-/* let argToType = (types, (name, default, _noLabelName, _alias, loc, type_)) =>
-    switch (type_, name, default) {
-    | (
-        Some({
-          ptyp_desc: Ptyp_constr({txt: Lident("option"), _}, [type_]),
-          _,
-        }),
-        name,
-        _,
-      )
-        when isOptional(name) => [
-        (
-          getLabel(name),
-          [],
-          {
-            ...type_,
-            ptyp_desc:
-              Ptyp_constr({loc: type_.ptyp_loc, txt: optionIdent}, [type_]),
-          },
-        ),
-        ...types,
-      ]
-    | (Some(type_), name, Some(_default)) => [
-        (
-          getLabel(name),
-          [],
-          Typ.mk(~loc, Ptyp_constr({loc, txt: optionIdent}, [type_])),
-        ),
-        ...types,
-      ]
-    | (Some(type_), name, _) => [(getLabel(name), [], type_), ...types]
-    | (None, name, _) when isOptional(name) => [
-        (
-          getLabel(name),
-          [],
-          Typ.mk(
-            ~loc,
-            Ptyp_constr(
-              {loc, txt: optionIdent},
-              [Typ.mk(~loc, Ptyp_var(safeTypeFromValue(name)))],
-            ),
-          ),
-        ),
-        ...types,
-      ]
-    | (None, name, _) when isLabelled(name) => [
-        (
-          getLabel(name),
-          [],
-          Typ.mk(~loc, Ptyp_var(safeTypeFromValue(name))),
-        ),
-        ...types,
-      ]
-    | _ => types
-    };
-   */
-
 let getTag = str => {
   switch (String.split_on_char('.', str)) {
   | ["styled"] => "div"
