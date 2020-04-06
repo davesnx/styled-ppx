@@ -1,4 +1,4 @@
-Overview of the uses of styled-ppx
+Overview of the interface of styled-ppx
 
 ### styled
 **Styled component without define an HTML tag, defaults to div**
@@ -51,21 +51,6 @@ module Box = [%styled.a {|
 <Box />
 ```
 
-### styled.div with a variable typed
-**Styled component with styles defined by a variable but specifying the type explicitly.**
-This might be not working for all the cases, but this would bring type-safety into the variables that comes from the outside of the style definition.
-
-```reason
-let space = 10;
-
-module Wrap = [%styled.a {|
-  margin: $(space)px;
-|}];
-
-/* Later on any component... */
-<Wrap />
-```
-
 ### Dynamic styled components
 **Styled component with styles defined by props**
 In this case, `styled` recieves a function, it doesn't recieve a string as the other cases. This allows to create styled components with a component API.
@@ -80,4 +65,39 @@ module Component = [%styled (~content, ~background) => {j|
 
 /* Later on any component... */
 <Component content="#EB5757" background="#516CF0" />
+```
+
+### styled.div with a variable typed
+**Styled component with styles defined by a variable but specifying the type explicitly.**
+This might be not working for all the cases, but this would bring type-safety into the variables that comes from the outside of the style definition.
+
+> This is currently on development, it works for simple cases.
+```reason
+let space = 10;
+
+module Wrap = [%styled.a {|
+  margin: $(space)px;
+|}];
+
+/* Later on any component... */
+<Wrap />
+```
+
+### Pattern match or any other expression that returns a string
+> This is not implemented and the api isn't final.
+```reason
+/* This is not implemented yet! */
+type size =
+  | Small
+  | Big
+  | Full;
+
+/* And you would be able to create components with Pattern Matching, or compose functions! */
+module StyledWithPatternMatcing = [%styled
+  (~size) => switch (size) {
+    | Small => "width: 33%"
+    | Big => "width: 80%"
+    | Full => "width: 100%"
+  }
+];
 ```

@@ -487,17 +487,19 @@ let createMakeProps = (~loc, extraProps) => {
 
 let moduleMapper = (_, _) => {
   ...default_mapper,
-  /* We map all the modules */
+  /**
+   * This is what defines [%styled] as an extension point and provides the PPX
+   * with how to transform the modules that contain the extension.
+  */
   module_expr: (mapper, expr) =>
     switch (expr) {
     | {
         pmod_desc:
-          /* that are defined with a ppx like [%txt] */
+          /* This case is [%styled.div () => {||}] */
           Pmod_extension((
             {txt, _},
             PStr([
               {
-                /* and contains a function as a payload */
                 pstr_desc:
                   Pstr_eval(
                     {
@@ -604,12 +606,11 @@ let moduleMapper = (_, _) => {
       );
     | {
         pmod_desc:
-          /* that are defined with a ppx like [%txt] */
+          /* This case is [%styled.div {||}] */
           Pmod_extension((
             {txt, _},
             PStr([
               {
-                /* and contains a string as a payload */
                 pstr_desc:
                   Pstr_eval(
                     {
