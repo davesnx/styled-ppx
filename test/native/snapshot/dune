@@ -1,0 +1,16 @@
+(executable
+ (name main)
+ (libraries styled-ppx.lib)
+ (preprocess
+  (pps styled-ppx.lib)))
+
+(rule
+ (targets pp.result)
+ (deps simple.ml)
+ (action
+  (run ./main.exe --impl %{deps} -o %{targets})))
+
+(alias
+ (name runtest)
+ (action
+  (diff pp.expected pp.result)))

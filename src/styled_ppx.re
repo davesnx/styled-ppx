@@ -7,12 +7,118 @@ open Ast_helper;
 open Longident;
 open React_props;
 
+let isOptional = str =>
+  switch (str) {
+  | Optional(_) => true
+  | _ => false
+  };
+
+let isLabelled = str =>
+  switch (str) {
+  | Labelled(_) => true
+  | _ => false
+  };
+
+let getLabel = str =>
+  switch (str) {
+  | Optional(str)
+  | Labelled(str) => str
+  | Nolabel => ""
+  };
+
+let optionIdent = Lident("option");
+
+let safeTypeFromValue = valueStr => {
+  let valueStr = getLabel(valueStr);
+  switch (String.sub(valueStr, 0, 1)) {
+  | "_" => "T" ++ valueStr
+  | _ => valueStr
+  };
+};
+
+let getAlias = (pattern, label) =>
+  switch (pattern) {
+  | {ppat_desc: Ppat_alias(_, {txt, _}) | Ppat_var({txt, _}), _} => txt
+  | {ppat_desc: Ppat_any, _} => "_"
+  | _ => getLabel(label)
+  };
+
+let getTag = str => {
+  switch (String.split_on_char('.', str)) {
+  | ["styled"] => "div"
+  | ["styled", tag] => tag
+  | _ => "div"
+  };
+};
+
+/* (~a, ~b, ~c, etc...) => args */
+let rec createFnWithLabeledArgs = (list, args) =>
+  switch (list) {
+  | [(label, default, pattern, _alias, loc, _interiorType), ...rest] =>
+    createFnWithLabeledArgs(
+      rest,
+      Exp.fun_(~loc, label, default, pattern, args),
+    )
+  | [] => args
+  };
+
+let getType = pattern =>
+  switch (pattern) {
+  | {ppat_desc: Ppat_constraint(_, type_), _} => Some(type_)
+  | _ => None
+  };
+
+let rec recursivelyTransformNamedArgs = (mapper, expr, list) => {
+  let expr = mapper.expr(mapper, expr);
+  switch (expr.pexp_desc) {
+  | Pexp_fun(arg, default, pattern, expression)
+      when isOptional(arg) || isLabelled(arg) =>
+    let alias = getAlias(pattern, arg);
+    let type_ = getType(pattern);
+
+    recursivelyTransformNamedArgs(
+      mapper,
+      expression,
+      [(arg, default, pattern, alias, pattern.ppat_loc, type_), ...list],
+    );
+  | Pexp_fun(
+      Nolabel,
+      _,
+      {ppat_desc: Ppat_construct({txt: Lident("()"), _}, _) | Ppat_any, _},
+      expression,
+    ) => (
+      expression.pexp_desc,
+      list,
+      None,
+    )
+  | Pexp_fun(Nolabel, _, {ppat_desc: Ppat_var({txt, _}), _}, expression) => (
+      expression.pexp_desc,
+      list,
+      Some(txt),
+    )
+  | innerExpression => (innerExpression, list, None)
+  };
+};
+
 let styleVariableName = "styles";
 
 /* let styles = Emotion.(css(exp)) */
-let createStyles = (loc, name, exp) => {
+let createStyles = (~loc, ~name, ~exp) => {
   let variableName = Pat.mk(~loc, Ppat_var({txt: name, loc}));
   Str.mk(~loc, Pstr_value(Nonrecursive, [Vb.mk(~loc, variableName, exp)]));
+};
+
+/* let styles = (~arg1, ~arg2) => Emotion.(css(exp)) */
+let createDynamicStyles = (~loc, ~name, ~args, ~exp) => {
+  let variableName = Pat.mk(~loc, Ppat_var({txt: name, loc}));
+
+  Str.mk(
+    ~loc,
+    Pstr_value(
+      Nonrecursive,
+      [Vb.mk(~loc, variableName, createFnWithLabeledArgs(args, exp))],
+    ),
+  );
 };
 
 /*
@@ -86,8 +192,8 @@ let createReactBinding = (~loc) => {
 };
 
 /* switch (props->childrenGet) {
-      | Some(child) => child
-      | None => React.null
+     | Some(child) => child
+     | None => React.null
    } */
 let createSwitchChildren = (~loc) => {
   let noneCase =
@@ -118,9 +224,7 @@ let createSwitchChildren = (~loc) => {
     Exp.apply(
       ~loc,
       Exp.ident(~loc, {txt: Lident("childrenGet"), loc}),
-      [
-        (Nolabel, Exp.ident(~loc, {txt: Lident("props"), loc}))
-      ],
+      [(Nolabel, Exp.ident(~loc, {txt: Lident("props"), loc}))],
     );
 
   Exp.match(~loc, matchingExp, [someChildCase, noneCase]);
@@ -131,7 +235,6 @@ let createElement = (~loc, ~tag) => {
   Exp.apply(
     ~loc,
     Exp.ident(~loc, {txt: Lident("createElement"), loc}),
-    /* Arguments */
     [
       (
         Nolabel,
@@ -154,36 +257,14 @@ let createElement = (~loc, ~tag) => {
           Pconst_string(tag, None),
         ),
       ),
-      (
-        Nolabel,
-        Exp.apply(
-          ~loc,
-          Exp.ident(
-            ~loc,
-            {txt: Ldot(Ldot(Lident("Js"), "Obj"), "assign"), loc},
-          ),
-          [
-            (Nolabel, Exp.ident(~loc, {txt: Lident("newProps"), loc})),
-            (Nolabel, Exp.ident(~loc, {txt: Lident("stylesObject"), loc})),
-          ],
-        ),
-      ),
-      (
-        Nolabel,
-        Exp.array(
-          ~loc,
-          [
-            createSwitchChildren(~loc),
-            /* Exp.construct(~loc, {txt: Lident("[]"), loc}, None), */
-          ],
-        ),
-      ),
+      (Nolabel, Exp.ident(~loc, {txt: Lident("newProps"), loc})),
+      (Nolabel, Exp.array(~loc, [createSwitchChildren(~loc)])),
     ],
   );
 };
 
-/* let stylesObject = {"className": styles}; */
-let createStylesObject = (~loc, ~classNameValue) =>
+/* let stylesObject = {"className": styled}; */
+let createStylesObject = (~loc, ~value) =>
   Vb.mk(
     ~loc,
     Pat.mk(~loc, Ppat_var({txt: "stylesObject", loc})),
@@ -195,12 +276,12 @@ let createStylesObject = (~loc, ~classNameValue) =>
           Str.mk(
             ~loc,
             Pstr_eval(
-              Exp.record(~loc, [
-                ({ txt: Lident("className"), loc}, Exp.ident(~loc, {txt: Lident(classNameValue), loc})),
-              ],
-              None
+              Exp.record(
+                ~loc,
+                [({txt: Lident("className"), loc}, value)],
+                None,
               ),
-              []
+              [],
             ),
           ),
         ]),
@@ -216,15 +297,7 @@ let objMagicProps = (~loc) =>
     [(Nolabel, Exp.ident(~loc, {txt: Lident("props"), loc}))],
   );
 
-/* Js.Obj.empty() */
-let jsObjEmpty = (~loc) =>
-  Exp.apply(
-    ~loc,
-    Exp.ident(~loc, {txt: Ldot(Ldot(Lident("Js"), "Obj"), "empty"), loc}),
-    [(Nolabel, Exp.construct(~loc, {txt: Lident("()"), loc}, None))],
-  );
-
-/* let newProps = Js.Obj.assign(Js.Obj.empty(), Obj.magic(props)); */
+/* let newProps = Js.Obj.assign(stylesObject, Obj.magic(props)); */
 let createNewProps = (~loc) =>
   Vb.mk(
     ~loc,
@@ -235,7 +308,10 @@ let createNewProps = (~loc) =>
         ~loc,
         {txt: Ldot(Ldot(Lident("Js"), "Obj"), "assign"), loc},
       ),
-      [(Nolabel, jsObjEmpty(~loc)), (Nolabel, objMagicProps(~loc))],
+      [
+        (Nolabel, Exp.ident(~loc, {txt: Lident("stylesObject"), loc})),
+        (Nolabel, objMagicProps(~loc)),
+      ],
     ),
   );
 
@@ -248,20 +324,18 @@ let createNewProps = (~loc) =>
      | None => React.null
    }|]);
  */
-let createMakeBody = (~loc, ~tag, ~classNameValue) =>
-  /* Exp.sequence(
-    ~loc,
-    ~attrs=[({txt: "reason.preserve_braces", loc}, PStr([]))],
-    createStylesObject(~loc, ~classNameValue),
-    createNewProps(~loc),
-    createElement(~loc, ~tag),
-  ); */
+let createMakeBody = (~loc, ~tag, ~styledExpr) =>
   Exp.let_(
     ~loc,
     ~attrs=[({txt: "reason.preserve_braces", loc}, PStr([]))],
     Nonrecursive,
-    [createStylesObject(~loc, ~classNameValue)],
-    Exp.let_(~loc, Nonrecursive, [createNewProps(~loc)], createElement(~loc, ~tag))
+    [createStylesObject(~loc, ~value=styledExpr)],
+    Exp.let_(
+      ~loc,
+      Nonrecursive,
+      [createNewProps(~loc)],
+      createElement(~loc, ~tag),
+    ),
   );
 
 /* props: makeProps */
@@ -274,17 +348,17 @@ let createMakeArguments = (~loc) => {
 };
 
 /* let make = (props: makeProps) => + createMakeBody */
-let createMakeFn = (~loc, ~classNameValue, ~tag) =>
+let createMakeFn = (~loc, ~tag, ~styledExpr) =>
   Exp.fun_(
     ~loc,
     Nolabel,
     None,
     createMakeArguments(~loc),
-    createMakeBody(~loc, ~tag, ~classNameValue),
+    createMakeBody(~loc, ~tag, ~styledExpr),
   );
 
 /* [@react.component] + createMakeFn */
-let create = (~loc, ~tag, ~styles) =>
+let createComponent = (~loc, ~tag, ~styledExpr) =>
   Str.mk(
     ~loc,
     Pstr_value(
@@ -293,10 +367,18 @@ let create = (~loc, ~tag, ~styles) =>
         Vb.mk(
           ~loc,
           Pat.mk(~loc, Ppat_var({txt: "make", loc})),
-          createMakeFn(~loc, ~classNameValue=styles, ~tag),
+          createMakeFn(~loc, ~tag, ~styledExpr),
         ),
       ],
     ),
+  );
+
+/* [@bs.optional] color: string */
+let createCustomPropLabel = (~loc, name, kind) =>
+  Type.field(
+    ~loc,
+    {txt: name, loc},
+    Typ.constr(~loc, {txt: Lident(kind), loc}, []),
   );
 
 /* [@bs.optional] ahref: string */
@@ -345,31 +427,7 @@ let createRecordEventLabel = (~loc, name, kind) => {
   );
 };
 
-/*
-   List of
-      prop: type
-      [@bs.optional]
-
-   ref: domRef
-   [@bs.optional]
-
-   ...
- */
-let createMakePropsLabels = (~loc) => {
-  [
-    createDomRefLabel(~loc),
-    createChildrenLabel(~loc),
-    ...List.map(
-         ({name, type_, isEvent}) =>
-           isEvent
-             ? createRecordEventLabel(~loc, name, type_)
-             : createRecordLabel(~loc, name, type_),
-         domPropsList,
-       ),
-  ];
-};
-
-let createMakeProps = (~loc) => {
+let createMakeProps = (~loc, extraProps) => {
   /* [@bs.deriving abstract] */
   let bsDerivingAbstract = (
     {txt: "bs.deriving", loc},
@@ -381,6 +439,35 @@ let createMakeProps = (~loc) => {
     ]),
   );
 
+  let dynamicProps =
+    switch (extraProps) {
+    | None => []
+    | Some(props) => props
+    };
+  /*
+     List of
+         prop: type
+         [@bs.optional]
+
+     ref: domRef
+     [@bs.optional]
+   */
+  let reactProps =
+    List.append(
+      [
+        createDomRefLabel(~loc),
+        createChildrenLabel(~loc),
+        ...List.map(
+             ({name, type_, isEvent}) =>
+               isEvent
+                 ? createRecordEventLabel(~loc, name, type_)
+                 : createRecordLabel(~loc, name, type_),
+             domPropsList,
+           ),
+      ],
+      dynamicProps,
+    );
+
   Str.mk(
     ~loc,
     Pstr_type(
@@ -390,7 +477,7 @@ let createMakeProps = (~loc) => {
           ~loc,
           ~priv=Public,
           ~attrs=[bsDerivingAbstract],
-          ~kind=Ptype_record(createMakePropsLabels(~loc)),
+          ~kind=Ptype_record(reactProps),
           {txt: "makeProps", loc},
         ),
       ],
@@ -398,34 +485,132 @@ let createMakeProps = (~loc) => {
   );
 };
 
-/* module X = { createMakeProps + createReactBinding + createStyle + createReactComponent } */
-let transformModule = (~loc, ~ast, ~tag) =>
-  Mod.mk(
-    Pmod_structure([
-      createMakeProps(~loc),
-      createReactBinding(~loc),
-      createStyles(
-        loc,
-        styleVariableName,
-        Css_to_emotion.render_declaration_list(ast),
-      ),
-      create(~loc, ~tag, ~styles=styleVariableName),
-    ]),
-  );
-
 let moduleMapper = (_, _) => {
   ...default_mapper,
-  /* We map all the modules */
+  /**
+   * This is what defines [%styled] as an extension point and provides the PPX
+   * with how to transform the modules that contain the extension.
+  */
   module_expr: (mapper, expr) =>
     switch (expr) {
     | {
         pmod_desc:
-          /* that are defined with a ppx like [%txt] */
+          /* This case is [%styled.div () => {||}] */
           Pmod_extension((
             {txt, _},
             PStr([
               {
-                /* and contains a string as a payload */
+                pstr_desc:
+                  Pstr_eval(
+                    {
+                      pexp_desc: Pexp_fun(label, args, pattern, expression),
+                      _,
+                    },
+                    _,
+                  ),
+                _,
+              },
+            ]),
+          )),
+        _,
+      } =>
+      let alias = getAlias(pattern, label);
+      let type_ = getType(pattern);
+
+      let firstArg = [
+        (label, args, pattern, alias, pattern.ppat_loc, type_),
+      ];
+      let (functionExpr, namedArgList, _) =
+        recursivelyTransformNamedArgs(mapper, expression, []);
+
+      let argList = List.append(namedArgList, firstArg);
+
+      let tag = getTag(txt);
+
+      if (!List.exists(t => t === tag, Html.tags)) {
+        ();
+          /* TODO: Add warning into an invalid html tag */
+      };
+
+      if (List.length(namedArgList) === 0) {
+        ();
+          /* TODO: Show warning or doing the static analysis */
+      };
+
+      let (str, delim) =
+        switch (functionExpr) {
+        | Pexp_constant(Pconst_string(str, delim)) => (str, delim)
+        | _ => ("", Some("")) /* TODO: Throw an error */
+        };
+
+      let loc = expression.pexp_loc;
+      let loc_start =
+        switch (delim) {
+        | None => loc.Location.loc_start
+        | Some(s) => {
+            ...loc.Location.loc_start,
+            Lexing.pos_cnum:
+              loc.Location.loc_start.Lexing.pos_cnum + String.length(s) + 1,
+          }
+        };
+
+      let ast =
+        Css_lexer.parse_string(
+          ~container_lnum=loc_start.Lexing.pos_lnum,
+          ~pos=loc_start,
+          str,
+          Css_parser.declaration_list,
+        );
+
+      let propExpr = Exp.ident(~loc, {txt: Lident("props"), loc});
+      let propToGetter = str => str ++ "Get";
+
+      let args =
+        List.map(
+          ((arg, _, _, _, _, _)) => {
+            let labelText = getLabel(arg);
+            let value =
+              Exp.ident(~loc, {txt: Lident(propToGetter(labelText)), loc});
+
+            (arg, Exp.apply(~loc, value, [(Nolabel, propExpr)]));
+          },
+          argList,
+        );
+
+      let styledExpr =
+        Exp.apply(
+          ~loc,
+          Exp.ident(~loc, {txt: Lident(styleVariableName), loc}),
+          args,
+        );
+
+      let extraProps =
+        Some(List.map(
+          ((arg, _, _, _, _, _)) =>
+            createCustomPropLabel(~loc, getLabel(arg), "string"),
+          argList,
+        ));
+
+      Mod.mk(
+        Pmod_structure([
+          createMakeProps(~loc, extraProps),
+          createReactBinding(~loc),
+          createDynamicStyles(
+            ~loc,
+            ~name=styleVariableName,
+            ~args=argList,
+            ~exp=Css_to_emotion.render_declaration_list(ast),
+          ),
+          createComponent(~loc, ~tag, ~styledExpr),
+        ]),
+      );
+    | {
+        pmod_desc:
+          /* This case is [%styled.div {||}] */
+          Pmod_extension((
+            {txt, _},
+            PStr([
+              {
                 pstr_desc:
                   Pstr_eval(
                     {
@@ -441,15 +626,9 @@ let moduleMapper = (_, _) => {
           )),
         _,
       } =>
-      let tag =
-        /* TODO: Improve splitting */
-        switch (String.split_on_char('.', txt)) {
-        | ["styled"] => "div"
-        | ["styled", tag] => tag
-        | _ => "div"
-        };
+      let tag = getTag(txt);
 
-      if (!List.exists(t => t === tag, HTML.tags)) {
+      if (!List.exists(t => t === tag, Html.tags)) {
         ();
           /* TODO: Add warning into an invalid html tag */
       };
@@ -473,7 +652,21 @@ let moduleMapper = (_, _) => {
           Css_parser.declaration_list,
         );
 
-      transformModule(~loc, ~ast, ~tag);
+      let styledExpr =
+        Exp.ident(~loc, {txt: Lident(styleVariableName), loc});
+
+      Mod.mk(
+        Pmod_structure([
+          createMakeProps(~loc, None),
+          createReactBinding(~loc),
+          createStyles(
+            ~loc,
+            ~name=styleVariableName,
+            ~exp=Css_to_emotion.render_declaration_list(ast),
+          ),
+          createComponent(~loc, ~tag, ~styledExpr),
+        ]),
+      );
     | _ => default_mapper.module_expr(mapper, expr)
     },
 };

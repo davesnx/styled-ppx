@@ -49,7 +49,7 @@ jobs:
       - name: Build
         run: esy build
 
-      - name: Run tests
+      - name: Run Native tests
         run: esy test
 
       - name: Export dependencies

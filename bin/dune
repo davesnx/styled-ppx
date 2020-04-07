@@ -3,4 +3,5 @@
   (public_name styled-ppx)
   (libraries styled-ppx.lib)
   (ocamlopt_flags ( -linkall ))
+  (package styled-ppx)
 )

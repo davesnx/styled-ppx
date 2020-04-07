@@ -5,20 +5,13 @@
 Allows you to create **React Components** with style definitions with CSS that don't rely on a specific DSL and keeps type-safety with great error messages. Build on top of [bs-emotion](https://github.com/ahrefs/bs-emotion), it allows you to style apps quickly, performant and as you always done it.
 
 > ⚠️ **Early stage** This ppx is in a early stage. Meaning that it doesn't support full functionality as [emotion](https://emotion.sh) or [styled-components](https://styled-components.com/).
-> But you can safely use it, as it woudn't break any existing code in further releases.
+> But you can safely use it, as it would respect Semantic Versioning.
 > In case you want to know more, take a look at the [ROADMAP](./ROADMAP.md), or feel free to chat on Discord: @davesnx#5641
 
-The biggest missing features is: **Dynamic components not supported** [Here is the issue](https://github.com/davesnx/styled-ppx/issues/12)
-
-## Motivation
-I love CSS and I'm coming from the JavaScript world, writing React code with styled-components. I found it, one of the best combos to write scalable frontend applications and wasn't a reality in ReasonML/OCaml.
-
-As well, saw a few people asking for it ([a](https://reasonml.chat/t/idiomatic-way-to-bind-to-styled-components/886) [f](https://reasonml.chat/t/styled-components-possible/554)[e](https://reasonml.chat/t/styling-solutions-reasonreact-as-of-aug-18/958)[w](https://reasonml.chat/t/options-and-best-practices-for-styling-in-reasonreact/261) [t](https://twitter.com/lyovson/status/1233397294311100417)[i](https://discord.gg/byjdYFH)[m](https://discord.gg/byjdYFH)[e](https://discord.gg/byjdYFH)[s](https://discord.gg/byjdYFH)). So I took the time to create it with help from [@jchavarri](https://github.com/jchavarri) 🙌.
-
 ## Usage
-**`styled-ppx`** implements a ppx that transforms `[%styled]` extensions into [bs-emotion](https://github.com/ahrefs/bs-emotion) calls, that does all the CSS-in-JS that provides [emotion](https://emotion.sh).
+**`styled-ppx`** implements a ppx that transforms `[%styled]` extensions points into `[@react.components]` modules with [bs-emotion](https://github.com/ahrefs/bs-emotion) as styles, which does all the CSS-in-JS under the hood thanks to [emotion](https://emotion.sh).
 
-This is how you write components in ReasonML with this ppx:
+This is how you write components in ReasonML/OCaml with this ppx:
 ```reason
 module StyledComponent = [%styled.div {|
   display: flex;
@@ -37,23 +30,14 @@ ReactDOMRe.renderToElementWithId(
 );
 ```
 
-This is how you write components in OCaml with this ppx:
-```ocaml
-module StyledComponent = [%styled.div
-  {|
-    display: flex;
-    justify-content: center;
-    align-items: center;
+## Motivation
+I love CSS and I'm coming from the JavaScript world: writing React with styled-components mostly. I found it, one of the best combos to write scalable frontend applications and wasn't a reality in ReasonML/OCaml.
 
-    height: 100vh;
-    width: 100vw;
-  |}
-]
-```
+As well, saw a few people asking for it ([a](https://reasonml.chat/t/idiomatic-way-to-bind-to-styled-components/886) [f](https://reasonml.chat/t/styled-components-possible/554)[e](https://reasonml.chat/t/styling-solutions-reasonreact-as-of-aug-18/958)[w](https://reasonml.chat/t/options-and-best-practices-for-styling-in-reasonreact/261) [t](https://twitter.com/lyovson/status/1233397294311100417)[i](https://discord.gg/byjdYFH)[m](https://discord.gg/byjdYFH)[e](https://discord.gg/byjdYFH)[s](https://discord.gg/byjdYFH)). So I took the time to create it with help from [@jchavarri](https://github.com/jchavarri) 🙌.
 
 ## Installation
 
-This package depends on bs-emotion, make sure you follow the instalation as well: https://github.com/ahrefs/bs-emotion#installation
+This package depends on [bs-emotion](https://github.com/ahrefs/bs-emotion), [ReasonReact](https://reasonml.github.io/reason-react/) and [BuckleScript](https://bucklescript.github.io) make sure you follow their instalations.
 
 ### With `esy` on native projects
 
@@ -108,36 +92,13 @@ If you want to try out of the box a project, just visit https://github.com/daves
 
 ## Thanks to
 Thanks to [Javier Chávarri](https://github.com/jchavarri), for helping me understand all the world of OCaml and his knowledge about ppx's. It has been a great experience.
-Inspired by [@astrada](https://github.com/astrada/) `bs-css-ppx` and their CSS Parser.
+Inspired by [@astrada](https://github.com/astrada/) `bs-css-ppx` and his [CSS Parser](https://github.com/astrada/ocaml-css-parser).
 Thanks to [ahrefs/bs-emotion](https://github.com/ahrefs/bs-emotion) and [emotion](https://github.com/emotion-js/emotion).
 
 ## Contributing
 We would love your help improving styled-ppx, there's still a lot to do.
-The ROADMAP is well organized, take a look in [here](./ROADMAP.md).
+The roadmap lives under the [Projects](https://github.com/davesnx/styled-ppx/projects) in GitHub. Take a look, the tasks are well organized and clear for everybody to pick any!
 
-Next big feature would be: support all CSS Properties and dynamic props.
-
-Instead of using a string to define a "styled" component, provide a function that will be executed to generate styles on run-time, based on component's props.
-```reason
-/* This is not implemented yet! */
-module StyledWithProps = [%styled (~color) => {| color: $color |}];
-
-type size =
-  | Small
-  | Big
-  | Full;
-
-/* And you would be able to create components with Pattern Matching, or compose functions! */
-module StyledWithPatternMatcing = [%styled
-  (~size) => switch (size) {
-    | Small => "width: 33%"
-    | Big => "width: 80%"
-    | Full => "width: 100%"
-  }
-];
-```
-
-### Developing
 You need `esy`, you can install the latest version from [npm](https://npmjs.com):
 
 ```bash
@@ -172,7 +133,7 @@ This project uses [Dune](https://dune.build/) as a build system, if you add a de
 
 ### Running Tests
 
-You can test compiled executable (runs `scripts.tests` specified in `package.json`):
+You can test compiled executable (runs `scripts.tests` specified in `esy.json`):
 
 This will run the native unit test.
 ```bash

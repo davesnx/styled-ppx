@@ -1,7 +1,7 @@
 /** CSS lexer.
   * Reference:
   * https://www.w3.org/TR/css-syntax-3/
-  * https://github.com/yahoo/css-js/blob/master/src/l/css.3.l */;
+  * https://github.com/yahoo/css-js/blob/master/src/l/css.3.l */
 
 module Sedlexing = Lex_buffer;
 
@@ -70,8 +70,9 @@ let token_to_string =
     ++ ", "
     ++ dimension_to_string(d)
     ++ ")"
-  | DIMENSION((n, d)) =>
-    "DIMENSION(" ++ n ++ ", " ++ d ++ ")";
+  | DIMENSION((n, d)) => "DIMENSION(" ++ n ++ ", " ++ d ++ ")"
+  | VARIABLE(v) => "VARIABLE(" ++ v ++ ")"
+  | TYPED_VARIABLE((v, type_)) => "TYPED_VARIABLE(" ++ v ++ " " ++ type_ ++ ")";
 
 let () =
     Location.register_error_of_exn(
@@ -100,7 +101,7 @@ let newline = [%sedlex.regexp? '\n' | "\r\n" | '\r' | '\012'];
 
 let white_space = [%sedlex.regexp? " " | '\t' | newline];
 
-let ws = [%sedlex.regexp? Star(white_space)];
+let white_spaces = [%sedlex.regexp? Star(white_space)];
 
 let hex_digit = [%sedlex.regexp? '0'..'9' | 'a'..'f' | 'A'..'F'];
 
@@ -121,7 +122,7 @@ let escape = [%sedlex.regexp?
 ];
 
 let ident_start = [%sedlex.regexp?
-  '_' | 'a'..'z' | 'A'..'Z' | non_ascii | escape
+  '_' | 'a'..'z' | 'A'..'Z' | '$' | non_ascii | escape
 ];
 
 let ident_char = [%sedlex.regexp?
@@ -129,6 +130,14 @@ let ident_char = [%sedlex.regexp?
 ];
 
 let ident = [%sedlex.regexp? (Opt('-'), ident_start, Star(ident_char))];
+
+let variable = [%sedlex.regexp?
+  ('$', Opt('('), Star(ident_char), Opt(')'))
+];
+
+let variable_with_type = [%sedlex.regexp?
+  ('$', '(', Star(ident_char), ')', Star(ident_char))
+];
 
 let string_quote = [%sedlex.regexp?
   (
@@ -152,13 +161,13 @@ let name = [%sedlex.regexp? Plus(ident_char)];
 
 let number = [%sedlex.regexp?
   (
-    Opt('+', '-'),
+    Opt('-'),
     Plus(digit),
     Opt('.', Plus(digit)),
     Opt('e' | 'E', '+' | '-', Plus(digit)),
   ) |
   (
-    Opt('+', '-'),
+    Opt('-'),
     '.',
     Plus(digit),
     Opt('e' | 'E', '+' | '-', Plus(digit)),
@@ -215,7 +224,7 @@ let _y = [%sedlex.regexp? 'Y' | 'y'];
 let _z = [%sedlex.regexp? 'Z' | 'z'];
 
 let important = [%sedlex.regexp?
-  ("!", ws, _i, _m, _p, _o, _r, _t, _a, _n, _t)
+  ("!", white_spaces, _i, _m, _p, _o, _r, _t, _a, _n, _t)
 ];
 
 let length = [%sedlex.regexp?
@@ -256,8 +265,7 @@ let discard_comments_and_white_spaces = buf => {
     switch%sedlex (buf) {
     | eof =>
       raise(
-        [@implicit_arity]
-        LexingError(buf.Lex_buffer.pos, "Unterminated comment at EOF"),
+        LexingError((buf.Lex_buffer.pos, "Unterminated comment at EOF"))
       )
     | "*/" => discard_white_spaces(buf)
     | any => discard_comments(buf)
@@ -281,6 +289,16 @@ let rec get_next_token = buf => {
   | '[' => LEFT_BRACKET
   | ']' => RIGHT_BRACKET
   | '%' => PERCENTAGE
+  | variable => VARIABLE(Lex_buffer.latin1(~skip=1, buf))
+  | variable_with_type => {
+      let variableAndType = Lex_buffer.latin1(~skip=2, buf); /* cosa)type */
+      let variableAndTypeLength = String.length(variableAndType);
+      let closedParentesisIndex = String.index(variableAndType, ')');
+      let variableName = String.sub(variableAndType, 0, closedParentesisIndex);
+      let variableType = String.sub(variableAndType, closedParentesisIndex + 1, variableAndTypeLength - closedParentesisIndex - 1);
+
+      TYPED_VARIABLE((variableName, variableType))
+  }
   /* | '&' => SELECTOR */
   | operator => OPERATOR(Lex_buffer.latin1(buf))
   | string => STRING(Lex_buffer.latin1(~skip=1, ~drop=1, buf))
@@ -313,7 +331,7 @@ and get_dimension = (n, buf) =>
   }
 and get_url = (url, buf) =>
   switch%sedlex (buf) {
-  | ws => get_url(url, buf)
+  | white_spaces => get_url(url, buf)
   | url => get_url(Lex_buffer.latin1(buf), buf)
   | ")" => URI(url)
   | eof => raise(LexingError((buf.Lex_buffer.pos, "Incomplete URI")))

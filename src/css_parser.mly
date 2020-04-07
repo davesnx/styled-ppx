@@ -29,6 +29,8 @@ open Css_types
 %token <string> UNICODE_RANGE
 %token <string * string * Css_types.dimension> FLOAT_DIMENSION
 %token <string * string> DIMENSION
+%token <string * string> TYPED_VARIABLE
+%token <string> VARIABLE
 
 %start <Css_types.Stylesheet.t> stylesheet
 %start <Css_types.Declaration_list.t> declaration_list
@@ -158,4 +160,6 @@ component_value:
   | r = UNICODE_RANGE { Component_value.Unicode_range r }
   | d = FLOAT_DIMENSION { Component_value.Float_dimension d }
   | d = DIMENSION { Component_value.Dimension d }
+  | v = VARIABLE { Component_value.Variable v }
+  | x = TYPED_VARIABLE { Component_value.TypedVariable x }
   ;

@@ -9,12 +9,23 @@ module App = [%styled.div {|
 
   font-size: 30px;
 |}];
-module Component = [%styled {| margin-left: 10px |}];
-module Link = [%styled.a {| color: #454545 |}];
+
+module Link = [%styled.a {|
+  color: #333;
+|}];
+
+let space = "10px";
+let b = "flex";
+
+module Component = [%styled (~c) => {j|
+  color: $c;
+  display: $b;
+  margin: $space;
+|j}];
 
 ReactDOMRe.renderToElementWithId(
   <App onClick={Js.log}>
-    <Component>
+    <Component c="#443434">
       {React.string("- styled-ppx -")}
     </Component>
     <Link href="http://sancho.dev">
