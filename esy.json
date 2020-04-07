@@ -23,9 +23,6 @@
       ]
     }
   },
-  "resolution": {
-    "@opam/sedlex": "ocaml-community/sedlex"
-  },
   "devDependencies": {
     "@opam/merlin": "*",
     "ocaml": "~4.6.1000",
@@ -35,6 +32,9 @@
     "@opam/ocaml-migrate-parsetree": "1.5.0",
     "@opam/sedlex": "2.1",
     "@reason-native/rely": "^3.2.1"
+  },
+  "resolutions": {
+    "@opam/dune": "1.11.4"
   },
   "scripts": {
     "test_snapshot": "dune runtest",
@@ -46,9 +46,5 @@
     "format": "esy dune build @fmt --auto-promote",
     "watch": "esy dune build -p styled-ppx --watch",
     "utop": "esy dune utop lib -- -implicit-bindings"
-  },
-  "dependencies": {
-    "@opam/ppxlib": "0.12.0",
-    "@reason-native/rely": "^3.2.1"
   }
 }
