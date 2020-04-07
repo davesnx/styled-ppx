@@ -48,14 +48,11 @@ jobs:
       - name: Build
         run: esy build
 
-      - name: Check formatting
-        run: esy dune build @fmt
+      # - name: Check formatting
+      #   run: esy dune build @fmt
 
       - name: Run Native tests
         run: esy test
-
-      - name: Run Snapshot test
-        run: dune runtest
 
       - name: Export dependencies
         run: esy export-dependencies

@@ -7,13 +7,27 @@ module StateLenses = [%lenses
 ]
 
 module Component = [%styled ("display: block")]
-module Component = [%styled.section ("display: block")]
+module Component = [%styled.section {|
+  display: flex;
+  justify-content: center;
+|}]
 
-module Component =
-  [%styled
-    fun ~color ~mierda -> ({| color: color; display: block; |})]
+let var = "#333333"
+module Component = [%styled {j|
+  color: $var;
+  display: block;
+|j}]
 
-(* module Component =
-  [%styled
-    fun () -> ("display: block")]
+let space = "10px"
+let b = "flex"
+  (* margin: 10px $(space)px; *)
+module Component = [%styled {j|
+  margin: $space 12px;
+  display: $b;
+|j}]
+
+(* module Component = [%styled fun ~var -> {j|
+  color: $var;
+  display: block;
+|j}]
  *)

@@ -5,6 +5,7 @@ open Asttypes;
 open Parsetree;
 open Longident;
 open Css_types;
+open Component_value;
 
 let grammar_error = (loc, message) =>
   raise(Css_lexer.GrammarError((message, loc)));
@@ -129,6 +130,25 @@ let float_to_const = number => {
   Const.float(number);
 };
 
+let raw_literal = (~loc, str) =>
+  Exp.constant(
+    ~loc,
+    ~attrs=[({txt: "reason.raw_literal", loc}, PStr([]))],
+    Pconst_string(str, None),
+  );
+
+/* let p = (prop, value) => [(prop, value)]->Declaration.pack; */
+let render_unsafe = (~loc, proproperty, value) => {
+  let unsafeFnP = Exp.ident(~loc, {txt: Lident("p"), loc});
+  let valueName = Exp.ident(~loc, {txt: Lident(value), loc});
+
+  Exp.apply(
+    ~loc,
+    unsafeFnP,
+    [(Nolabel, raw_literal(~loc, proproperty)), (Nolabel, valueName)],
+  );
+};
+
 let string_to_const = (~loc, s) =>
   Exp.constant(~loc, Const.string(~quotation_delimiter="js", s));
 
@@ -155,7 +175,7 @@ let group_params = params => {
   let rec group_param = ((accu, loc), xs) =>
     switch (xs) {
     | [] => ((accu, loc), [])
-    | [(Component_value.Delim(","), _), ...rest] => ((accu, loc), rest)
+    | [(Delim(","), _), ...rest] => ((accu, loc), rest)
     | [(_, cv_loc) as hd, ...rest] =>
       let loc = {
         let loc_start =
@@ -180,178 +200,166 @@ let group_params = params => {
   group_params([], params);
 };
 
-let is_time = component_value =>
-  Component_value.(
-    switch (component_value) {
-    | Float_dimension((_, _, Time)) => true
+let is_time = value =>
+  switch (value) {
+  | Float_dimension((_, _, Time)) => true
+  | _ => false
+  };
+
+let is_timing_function = value =>
+  switch (value) {
+  | Ident("linear")
+  /* cubic-bezier-timing-function */
+  | Ident("ease")
+  | Ident("ease-in")
+  | Ident("ease-out")
+  | Ident("ease-in-out")
+  | Function(("cubic-bezier", _), _)
+  /* step-timing-function */
+  | Ident("step-start")
+  | Ident("step-end")
+  | Function(("steps", _), _)
+  /* frames-timing-function */
+  | Function(("frames", _), _) => true
+  | _ => false
+  };
+
+let is_animation_iteration_count = value =>
+  switch (value) {
+  | Ident("infinite")
+  | Function(("count", _), _) => true
+  | _ => false
+  };
+
+let is_animation_direction = value =>
+  switch (value) {
+  | Ident("normal")
+  | Ident("reverse")
+  | Ident("alternate")
+  | Ident("alternate-reverse") => true
+  | _ => false
+  };
+
+let is_animation_fill_mode = value =>
+  switch (value) {
+  | Ident("none")
+  | Ident("forwards")
+  | Ident("backwards")
+  | Ident("both") => true
+  | _ => false
+  };
+
+let is_animation_play_state = value =>
+  switch (value) {
+  | Ident("running")
+  | Ident("paused") => true
+  | _ => false
+  };
+
+let is_keyframes_name = value =>
+  switch (value) {
+  | Ident(_)
+  | String(_) => true
+  | _ => false
+  };
+
+let is_ident = (ident, value) =>
+  switch (value) {
+  | Ident(i) when i == ident => true
+  | _ => false
+  };
+
+let is_length = value =>
+  switch (value) {
+  | Number("0")
+  | Float_dimension((_, _, Length)) => true
+  | _ => false
+  };
+
+let is_color = value =>
+  switch (value) {
+  | Function(("rgb", _), _)
+  | Function(("rgba", _), _)
+  | Function(("hsl", _), _)
+  | Function(("hsla", _), _)
+  | Hash(_)
+  | Ident(_) => true
+  | _ => false
+  };
+
+let is_line_width = value =>
+  switch (value) {
+  | Ident(i) =>
+    switch (i) {
+    | "thin"
+    | "medium"
+    | "thick" => true
     | _ => false
     }
-  );
+  | _ => is_length(value)
+  };
 
-let is_timing_function = component_value =>
-  Component_value.(
-    switch (component_value) {
-    | Ident("linear")
-    /* cubic-bezier-timing-function */
-    | Ident("ease")
-    | Ident("ease-in")
-    | Ident("ease-out")
-    | Ident("ease-in-out")
-    | Function(("cubic-bezier", _), _)
-    /* step-timing-function */
-    | Ident("step-start")
-    | Ident("step-end")
-    | Function(("steps", _), _)
-    /* frames-timing-function */
-    | Function(("frames", _), _) => true
+/* let is_variable = value =>
+  switch (value) {
+  | Variable(_v) => true
+  | _ => false
+  };
+ */
+
+/* let is_typed_variable = value =>
+  switch (value) {
+  | TypedVariable((_v, _type)) => true
+  | _ => false
+  };
+ */
+let is_line_style = value =>
+  switch (value) {
+  | Ident(i) =>
+    switch (i) {
+    | "none"
+    | "hidden"
+    | "dotted"
+    | "dashed"
+    | "solid"
+    | "double"
+    | "groove"
+    | "ridge"
+    | "inset"
+    | "outset" => true
     | _ => false
     }
-  );
+  | _ => false
+  };
 
-let is_animation_iteration_count = component_value =>
-  Component_value.(
-    switch (component_value) {
-    | Ident("infinite")
-    | Function(("count", _), _) => true
-    | _ => false
-    }
-  );
+let render_dimension = (~loc, number, dimension, const) => {
+  let number_loc = {
+    ...loc,
+    Location.loc_end: {
+      ...loc.Location.loc_end,
+      Lexing.pos_cnum:
+        loc.Location.loc_end.Lexing.pos_cnum - String.length(dimension),
+    },
+  };
+  let dimension_loc = {
+    ...loc,
+    Location.loc_start: {
+      ...loc.Location.loc_start,
+      Lexing.pos_cnum:
+        loc.Location.loc_start.Lexing.pos_cnum + String.length(number),
+    },
+  };
+  let ident =
+    Exp.ident(
+      ~loc=dimension_loc,
+      {txt: Lident(dimension), loc: dimension_loc},
+    );
+  let arg = Exp.constant(~loc=number_loc, const);
+  Exp.apply(~loc, ident, [(Nolabel, arg)]);
+};
 
-let is_animation_direction = component_value =>
-  Component_value.(
-    switch (component_value) {
-    | Ident("normal")
-    | Ident("reverse")
-    | Ident("alternate")
-    | Ident("alternate-reverse") => true
-    | _ => false
-    }
-  );
-
-let is_animation_fill_mode = component_value =>
-  Component_value.(
-    switch (component_value) {
-    | Ident("none")
-    | Ident("forwards")
-    | Ident("backwards")
-    | Ident("both") => true
-    | _ => false
-    }
-  );
-
-let is_animation_play_state = component_value =>
-  Component_value.(
-    switch (component_value) {
-    | Ident("running")
-    | Ident("paused") => true
-    | _ => false
-    }
-  );
-
-let is_keyframes_name = component_value =>
-  Component_value.(
-    switch (component_value) {
-    | Ident(_)
-    | String(_) => true
-    | _ => false
-    }
-  );
-
-let is_ident = (ident, component_value) =>
-  Component_value.(
-    switch (component_value) {
-    | Ident(i) when i == ident => true
-    | _ => false
-    }
-  );
-
-let is_length = component_value =>
-  Component_value.(
-    switch (component_value) {
-    | Number("0")
-    | Float_dimension((_, _, Length)) => true
-    | _ => false
-    }
-  );
-
-let is_color = component_value =>
-  Component_value.(
-    switch (component_value) {
-    | Function(("rgb", _), _)
-    | Function(("rgba", _), _)
-    | Function(("hsl", _), _)
-    | Function(("hsla", _), _)
-    | Hash(_)
-    | Ident(_) => true
-    | _ => false
-    }
-  );
-
-let is_line_width = component_value =>
-  Component_value.(
-    switch (component_value) {
-    | Ident(i) =>
-      switch (i) {
-      | "thin"
-      | "medium"
-      | "thick" => true
-      | _ => false
-      }
-    | _ => is_length(component_value)
-    }
-  );
-
-let is_line_style = component_value =>
-  Component_value.(
-    switch (component_value) {
-    | Ident(i) =>
-      switch (i) {
-      | "none"
-      | "hidden"
-      | "dotted"
-      | "dashed"
-      | "solid"
-      | "double"
-      | "groove"
-      | "ridge"
-      | "inset"
-      | "outset" => true
-      | _ => false
-      }
-    | _ => false
-    }
-  );
-
-let rec render_component_value =
-        ((cv, loc): with_loc(Component_value.t)): expression => {
+let rec render_value = ((cv, loc): with_loc(t)): expression => {
   let render_block = (start_char, _, _) =>
     grammar_error(loc, "Unsupported " ++ start_char ++ "-block");
-
-  let render_dimension = (number, dimension, const) => {
-    let number_loc = {
-      ...loc,
-      Location.loc_end: {
-        ...loc.Location.loc_end,
-        Lexing.pos_cnum:
-          loc.Location.loc_end.Lexing.pos_cnum - String.length(dimension),
-      },
-    };
-    let dimension_loc = {
-      ...loc,
-      Location.loc_start: {
-        ...loc.Location.loc_start,
-        Lexing.pos_cnum:
-          loc.Location.loc_start.Lexing.pos_cnum + String.length(number),
-      },
-    };
-    let ident =
-      Exp.ident(
-        ~loc=dimension_loc,
-        {txt: Lident(dimension), loc: dimension_loc},
-      );
-    let arg = Exp.constant(~loc=number_loc, const);
-    Exp.apply(~loc, ident, [(Nolabel, arg)]);
-  };
 
   let render_function = ((name, name_loc), (params, params_loc)) => {
     let caml_case_name = to_caml_case(name);
@@ -361,11 +369,9 @@ let rec render_component_value =
         {txt: Lident(caml_case_name), loc: name_loc},
       );
     let grouped_params = group_params(params);
-    let rcv = render_component_value;
     let args = {
-      open Component_value;
       let side_or_corner_expr = (deg, loc) =>
-        rcv((Float_dimension((deg, "deg", Angle)), loc));
+        render_value((Float_dimension((deg, "deg", Angle)), loc));
 
       let color_stops_to_expr_list = color_stop_params =>
         List.rev_map(
@@ -375,8 +381,8 @@ let rec render_component_value =
               [(_, start_loc) as color_cv, (Number("0" as perc), end_loc)],
               _,
             ) => {
-              let color_expr = rcv(color_cv);
-              let perc_expr = rcv((Percentage(perc), end_loc));
+              let color_expr = render_value(color_cv);
+              let perc_expr = render_value((Percentage(perc), end_loc));
               let loc =
                 Lex_buffer.make_loc(
                   start_loc.Location.loc_start,
@@ -404,7 +410,7 @@ let rec render_component_value =
         |> List.map(
              fun
              | (Number("0"), loc) => Exp.constant(~loc, Const.int(0))
-             | c => rcv(c),
+             | c => render_value(c),
            );
 
       switch (name) {
@@ -413,7 +419,7 @@ let rec render_component_value =
         let (side_or_corner, color_stop_params) =
           switch (List.hd(grouped_params)) {
           | ([(Float_dimension((_, "deg", Angle)), _) as cv], _) => (
-              rcv(cv),
+              render_value(cv),
               List.tl(grouped_params),
             )
           | ([(Ident("to"), _), (Ident("bottom"), _)], loc) => (
@@ -440,7 +446,7 @@ let rec render_component_value =
                 params_loc.Location.loc_start,
               );
             (
-              rcv((
+              render_value((
                 Float_dimension(("180", "deg", Angle)),
                 implicit_side_or_corner_loc,
               )),
@@ -475,7 +481,7 @@ let rec render_component_value =
             (Percentage(p1), l2),
             (Percentage(p2), l3),
           ] => [
-            rcv((Float_dimension((n, "deg", Angle)), l1)),
+            render_value((Float_dimension((n, "deg", Angle)), l1)),
             Exp.constant(~loc=l2, float_to_const(p1)),
             Exp.constant(~loc=l3, float_to_const(p2)),
           ]
@@ -503,7 +509,7 @@ let rec render_component_value =
             (Percentage(p2), l3),
             (Number(p3), l4),
           ] => [
-            rcv((Float_dimension((n, "deg", Angle)), l1)),
+            render_value((Float_dimension((n, "deg", Angle)), l1)),
             Exp.constant(~loc=l2, float_to_const(p1)),
             Exp.constant(~loc=l3, float_to_const(p2)),
             Exp.variant(
@@ -524,7 +530,7 @@ let rec render_component_value =
             (Percentage(p2), l3),
             (Percentage(p3), l4),
           ] => [
-            rcv((Float_dimension((n, "deg", Angle)), l1)),
+            render_value((Float_dimension((n, "deg", Angle)), l1)),
             Exp.constant(~loc=l2, float_to_const(p1)),
             Exp.constant(~loc=l3, float_to_const(p2)),
             Exp.variant(
@@ -543,7 +549,7 @@ let rec render_component_value =
   };
 
   switch (cv) {
-  | Component_value.Paren_block(cs) => render_block("(", ")", cs)
+  | Paren_block(cs) => render_block("(", ")", cs)
   | Bracket_block(cs) => render_block("[", "]", cs)
   | Percentage(p) =>
     let ident = Exp.ident(~loc, {txt: Lident("pct"), loc});
@@ -561,19 +567,15 @@ let rec render_component_value =
     let ident = Exp.ident(~loc, {txt: Lident("url"), loc});
     let arg = string_to_const(~loc, s);
     Exp.apply(~loc, ident, [(Nolabel, arg)]);
-  | Operator(_) => grammar_error(loc, "Unsupported operator")
-  | Delim(_) => grammar_error(loc, "Unsupported delimiter")
   | Hash(s) =>
     let ident = Exp.ident(~loc, {txt: Lident("hex"), loc});
     let arg = string_to_const(~loc, s);
     Exp.apply(~loc, ident, [(Nolabel, arg)]);
   | Number(s) =>
-    if (s == "0") {
-      Exp.ident(~loc, {txt: Lident("zero"), loc});
-    } else {
-      Exp.constant(~loc, number_to_const(s));
+    switch (s) {
+    | "0" => Exp.ident(~loc, {txt: Lident("zero"), loc})
+    | _ => Exp.constant(~loc, number_to_const(s))
     }
-  | Unicode_range(_) => grammar_error(loc, "Unsupported unicode range")
   | Function(f, params) => render_function(f, params)
   | Float_dimension((number, "ms", Time)) =>
     /* bs-css expects milliseconds as an int constant */
@@ -586,10 +588,19 @@ let rec render_component_value =
       | "ms" => Const.integer(number)
       | _ => float_to_const(number)
       };
-    render_dimension(number, dimension, const);
+    render_dimension(~loc, number, dimension, const);
   | Dimension((number, dimension)) =>
     let const = number_to_const(number);
-    render_dimension(number, dimension, const);
+    render_dimension(~loc, number, dimension, const);
+  | Unicode_range(_) => grammar_error(loc, "Unsupported unicode range")
+  | Operator(_) => grammar_error(loc, "Unsupported operator")
+  | Delim(_) => grammar_error(loc, "Unsupported delimiter")
+  | TypedVariable((variable, func)) => {
+    let ident = Exp.ident(~loc, {txt: Lident(func), loc});
+    let arg = string_to_const(~loc, variable);
+    Exp.apply(~loc, ident, [(Nolabel, arg)]);
+  }
+  | Variable(x) => grammar_error(loc, "Unsupported variable in here, you wrote this: " ++ x ++ ". If you think that's a bug, please open an issue https://github.com/davesnx/styled-ppx/issues/new")
   };
 }
 and render_at_rule = (ar: At_rule.t): expression =>
@@ -611,12 +622,12 @@ and render_at_rule = (ar: At_rule.t): expression =>
             | Rule.Style_rule(sr) =>
               let progress_expr =
                 switch (sr.Style_rule.prelude) {
-                | ([(Component_value.Percentage(p), loc)], _) =>
+                | ([(Percentage(p), loc)], _) =>
                   Exp.constant(~loc, number_to_const(p))
-                | ([(Component_value.Ident("from"), loc)], _)
-                | ([(Component_value.Number("0"), loc)], _) =>
+                | ([(Ident("from"), loc)], _)
+                | ([(Number("0"), loc)], _) =>
                   Exp.constant(~loc, Const.int(0))
-                | ([(Component_value.Ident("to"), loc)], _) =>
+                | ([(Ident("to"), loc)], _) =>
                   Exp.constant(~loc, Const.int(100))
                 | (_, loc) =>
                   grammar_error(loc, "Unexpected @keyframes prelude")
@@ -658,22 +669,18 @@ and render_at_rule = (ar: At_rule.t): expression =>
     grammar_error(ar.At_rule.loc, "At-rule @" ++ n ++ " not supported")
   }
 and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
-  open Component_value;
-  let rcv = render_component_value;
   let (name, name_loc) = d.Declaration.name;
   let fnName = to_caml_case(name);
 
-  let render_standard_declaration = () => {
-    let name = to_caml_case(name);
-    let (vs, _) = d.Declaration.value;
+  let render_standard_declaration = (fnName, valueList) => {
+    let args = List.map(render_value, valueList);
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Lident(name), loc: name_loc});
-    let args = List.map(v => rcv(v), vs);
+      Exp.ident(~loc=name_loc, {txt: Lident(fnName), loc: name_loc});
     Exp.apply(~loc=d_loc, ident, List.map(a => (Nolabel, a), args));
   };
 
   /* https://developer.mozilla.org/en-US/docs/Web/CSS/animation */
-  let render_animation = () => {
+  let render_animation = (params, _loc) => {
     let animation_ident =
       Exp.ident(
         ~loc=name_loc,
@@ -690,7 +697,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
                     | _ => false,
                     args,
                   )) {
-              [(Labelled("duration"), rcv(cv)), ...args];
+              [(Labelled("duration"), render_value(cv)), ...args];
             } else if (!
                          List.exists(
                            fun
@@ -698,7 +705,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
                            | _ => false,
                            args,
                          )) {
-              [(Labelled("delay"), rcv(cv)), ...args];
+              [(Labelled("delay"), render_value(cv)), ...args];
             } else {
               grammar_error(
                 loc,
@@ -706,15 +713,15 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
               );
             };
           } else if (is_timing_function(v)) {
-            [(Labelled("timingFunction"), rcv(cv)), ...args];
+            [(Labelled("timingFunction"), render_value(cv)), ...args];
           } else if (is_animation_iteration_count(v)) {
-            [(Labelled("iterationCount"), rcv(cv)), ...args];
+            [(Labelled("iterationCount"), render_value(cv)), ...args];
           } else if (is_animation_direction(v)) {
-            [(Labelled("direction"), rcv(cv)), ...args];
+            [(Labelled("direction"), render_value(cv)), ...args];
           } else if (is_animation_fill_mode(v)) {
-            [(Labelled("fillMode"), rcv(cv)), ...args];
+            [(Labelled("fillMode"), render_value(cv)), ...args];
           } else if (is_animation_play_state(v)) {
-            [(Labelled("playState"), rcv(cv)), ...args];
+            [(Labelled("playState"), render_value(cv)), ...args];
           } else if (is_keyframes_name(v)) {
             let s =
               switch (v) {
@@ -731,7 +738,6 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
         grouped_param,
       );
 
-    let (params, _) = d.Declaration.value;
     let grouped_params = group_params(params);
     let args =
       List.rev_map(params => animation_args(params), grouped_params);
@@ -743,7 +749,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   };
 
   /* https://developer.mozilla.org/en-US/docs/Web/CSS/box-shadow */
-  let render_box_shadow = () => {
+  let render_box_shadow = (params, _loc) => {
     let box_shadow_args = (args, (v, loc) as cv) =>
       if (is_ident("inset", v)) {
         [
@@ -761,7 +767,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
                 | _ => false,
                 args,
               )) {
-          [(Labelled("x"), rcv(cv)), ...args];
+          [(Labelled("x"), render_value(cv)), ...args];
         } else if (!
                      List.exists(
                        fun
@@ -769,7 +775,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
                        | _ => false,
                        args,
                      )) {
-          [(Labelled("y"), rcv(cv)), ...args];
+          [(Labelled("y"), render_value(cv)), ...args];
         } else if (!
                      List.exists(
                        fun
@@ -777,7 +783,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
                        | _ => false,
                        args,
                      )) {
-          [(Labelled("blur"), rcv(cv)), ...args];
+          [(Labelled("blur"), render_value(cv)), ...args];
         } else if (!
                      List.exists(
                        fun
@@ -785,7 +791,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
                        | _ => false,
                        args,
                      )) {
-          [(Labelled("spread"), rcv(cv)), ...args];
+          [(Labelled("spread"), render_value(cv)), ...args];
         } else {
           grammar_error(
             loc,
@@ -793,7 +799,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
           );
         };
       } else if (is_color(v)) {
-        [(Nolabel, rcv(cv)), ...args];
+        [(Nolabel, render_value(cv)), ...args];
       } else {
         grammar_error(loc, "Unexpected box-shadow value");
       };
@@ -803,7 +809,6 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
     let box_shadow_args = ((grouped_param, _)) =>
       List.fold_left(box_shadow_args, [], grouped_param);
 
-    let (params, _) = d.Declaration.value;
     let grouped_params = group_params(params);
     let args =
       List.rev_map(params => box_shadow_args(params), grouped_params);
@@ -815,7 +820,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   };
 
   /* https://developer.mozilla.org/en-US/docs/Web/CSS/text-shadow */
-  let render_text_shadow = () => {
+  let render_text_shadow = (params, _loc) => {
     let text_shadow_args = (args, (v, loc) as cv) =>
       if (is_ident("inset", v)) {
         [
@@ -833,7 +838,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
                 | _ => false,
                 args,
               )) {
-          [(Labelled("x"), rcv(cv)), ...args];
+          [(Labelled("x"), render_value(cv)), ...args];
         } else if (!
                      List.exists(
                        fun
@@ -841,7 +846,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
                        | _ => false,
                        args,
                      )) {
-          [(Labelled("y"), rcv(cv)), ...args];
+          [(Labelled("y"), render_value(cv)), ...args];
         } else if (!
                      List.exists(
                        fun
@@ -849,7 +854,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
                        | _ => false,
                        args,
                      )) {
-          [(Labelled("blur"), rcv(cv)), ...args];
+          [(Labelled("blur"), render_value(cv)), ...args];
         } else {
           grammar_error(
             loc,
@@ -857,7 +862,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
           );
         };
       } else if (is_color(v)) {
-        [(Nolabel, rcv(cv)), ...args];
+        [(Nolabel, render_value(cv)), ...args];
       } else {
         grammar_error(loc, "Unexpected box-shadow value");
       };
@@ -870,7 +875,6 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
     let text_shadow_args = ((grouped_param, _)) =>
       List.fold_left(text_shadow_args, [], grouped_param);
 
-    let (params, _) = d.Declaration.value;
     let grouped_params = group_params(params);
     let args =
       List.rev_map(params => text_shadow_args(params), grouped_params);
@@ -885,7 +889,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   };
 
   /* https://developer.mozilla.org/en-US/docs/Web/CSS/transition */
-  let render_transition = () => {
+  let render_transition = (params, _loc) => {
     let transition_ident =
       Exp.ident(
         ~loc=name_loc,
@@ -905,7 +909,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
                     | _ => false,
                     args,
                   )) {
-              [(Labelled("duration"), rcv(cv)), ...args];
+              [(Labelled("duration"), render_value(cv)), ...args];
             } else if (!
                          List.exists(
                            fun
@@ -913,7 +917,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
                            | _ => false,
                            args,
                          )) {
-              [(Labelled("delay"), rcv(cv)), ...args];
+              [(Labelled("delay"), render_value(cv)), ...args];
             } else {
               grammar_error(
                 loc,
@@ -921,7 +925,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
               );
             };
           } else if (is_timing_function(v)) {
-            [(Labelled("timingFunction"), rcv(cv)), ...args];
+            [(Labelled("timingFunction"), render_value(cv)), ...args];
           } else {
             switch (v) {
             | Ident(p) => [(Nolabel, render_property(p, loc)), ...args]
@@ -932,7 +936,6 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
         grouped_param,
       );
 
-    let (params, _) = d.Declaration.value;
     let grouped_params = group_params(params);
     let args =
       List.rev_map(params => transition_args(params), grouped_params);
@@ -943,12 +946,11 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
     Exp.apply(ident, [(Nolabel, list_to_expr(name_loc, transition_list))]);
   };
 
-  let render_transform = () => {
-    let (vs, loc) = d.Declaration.value;
+  let render_transform = (vs, loc) => {
     if (List.length(vs) == 1) {
-      render_standard_declaration();
+      render_standard_declaration(fnName, vs);
     } else {
-      let cvs = List.rev_map(v => rcv(v), vs);
+      let cvs = List.rev_map(v => render_value(v), vs);
       let arg = list_to_expr(loc, cvs);
       let ident =
         Exp.ident(
@@ -959,8 +961,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
     };
   };
 
-  let render_font_family = () => {
-    let (vs, loc) = d.Declaration.value;
+  let render_font_family = (vs, loc) => {
     let font_family_args = ((params, _)) => {
       let s =
         List.fold_left(
@@ -983,7 +984,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
           params,
         );
 
-      rcv((String(s), loc));
+      render_value((String(s), loc));
     };
 
     let grouped_params = group_params(vs);
@@ -998,13 +999,12 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
     );
   };
 
-  let render_z_index = () => {
-    let (vs, loc) = d.Declaration.value;
+  let render_z_index = (vs, loc) => {
     let arg =
       if (List.length(vs) == 1) {
         let (v, loc) as c = List.hd(vs);
         switch (v) {
-        | Ident(_) => rcv(c)
+        | Ident(_) => render_value(c)
         | Number(n) => Exp.constant(~loc, Pconst_integer(n, None))
         | _ => grammar_error(loc, "Unexpected z-index value")
         };
@@ -1017,30 +1017,8 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
     Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
   };
 
-  /*  TODO: Initial abstraction over custom-renders
-
-        let renderHoF = (value, name, number_to_exp) => {
-        let fnName = to_caml_case(name);
-        let (vs, loc) = value;
-        let arg =
-          if (List.length(vs) == 1) {
-            let (v, loc) = List.hd(vs);
-            switch (v) {
-            | Number(n) => number_to_exp(n)
-            | _ => grammar_error(loc, "Unexpected " ++ name ++ " value")
-            };
-          } else {
-            grammar_error(loc, name ++ " should have a single value");
-          };
-
-        let ident =
-          Exp.ident(~loc=name_loc, {txt: Lident(fnName), loc: name_loc});
-        Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
-      }; */
-
   /* https://developer.mozilla.org/en-US/docs/Web/CSS/flex-grow */
-  let render_flex_grow_shrink = () => {
-    let (vs, loc) = d.Declaration.value;
+  let render_flex_grow_shrink = (vs, loc) => {
     let arg =
       if (List.length(vs) == 1) {
         let (v, loc) = List.hd(vs);
@@ -1058,8 +1036,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   };
 
   /* https://developer.mozilla.org/en/docs/Web/CSS/font-weight */
-  let render_font_weight = () => {
-    let (vs, loc) = d.Declaration.value;
+  let render_font_weight = (vs, loc) => {
     let arg =
       switch (List.length(vs)) {
       | 0 => grammar_error(loc, "font-weight should have a single value")
@@ -1082,16 +1059,16 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   };
 
   /* https://developer.mozilla.org/en-US/docs/Web/CSS/border */
-  let render_border_outline = () => {
+  let render_border_outline = (params, loc) => {
     let border_outline_args = (params, _) =>
       List.fold_left(
         (args, (v, loc) as cv) =>
           if (is_line_width(v)) {
-            [(Labelled("width"), rcv(cv)), ...args];
+            [(Labelled("width"), render_value(cv)), ...args];
           } else if (is_line_style(v)) {
-            [(Nolabel, rcv(cv)), ...args];
+            [(Nolabel, render_value(cv)), ...args];
           } else if (is_color(v)) {
-            [(Labelled("color"), rcv(cv)), ...args];
+            [(Labelled("color"), render_value(cv)), ...args];
           } else {
             grammar_error(loc, "Unexpected " ++ name ++ " value");
           },
@@ -1099,7 +1076,6 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
         params,
       );
 
-    let (params, loc) = d.Declaration.value;
     let args = border_outline_args(params, loc);
     let fnName2 = fnName ++ "2";
     let ident =
@@ -1107,21 +1083,18 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
     Exp.apply(ident, args);
   };
 
-  let render_margin_padding = () => {
-    let (vs, _) = d.Declaration.value;
+  let render_margin_padding = (vs, _loc) => {
     let parameter_count = List.length(vs);
     let fnNameN =
       parameter_count > 1 ? fnName ++ string_of_int(parameter_count) : fnName;
 
     let ident =
       Exp.ident(~loc=name_loc, {txt: Lident(fnNameN), loc: name_loc});
-    let args = List.map(v => (Nolabel, rcv(v)), vs);
+    let args = List.map(v => (Nolabel, render_value(v)), vs);
     Exp.apply(~loc=d_loc, ident, args);
   };
 
-  let render_opacity = () => {
-    let (vs, loc) = d.Declaration.value;
-
+  let render_opacity = (vs, loc) => {
     let arg =
       switch (List.length(vs)) {
       | 0 => grammar_error(loc, "opacity should have a single value")
@@ -1139,68 +1112,78 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   };
 
   /* https://developer.mozilla.org/en-US/docs/Web/CSS/flex */
-  let render_flex = () => {
-    let (vs, loc) = d.Declaration.value;
-
+  let render_flex = (vs, loc) => {
     let expression =
       switch (List.length(vs)) {
       | 0 => grammar_error(loc, "flex should have a single value")
       /*
-        TODO: Right now bs-css  https://github.com/MinimaHQ/re-css/issues/11
-        | 1 => {
-        let (v, loc) = List.hd(vs);
-        switch (v) {
-          | Number(n) => Exp.constant(~loc, Pconst_float(n, None))
-          | _  => grammar_error(loc, "Unexpected flex value")
-        }} */
+       TODO: Right now bs-css  https://github.com/MinimaHQ/re-css/issues/11
+       | 1 => {
+       let (v, loc) = List.hd(vs);
+       switch (v) {
+         | Number(n) => Exp.constant(~loc, Pconst_float(n, None))
+         | _  => grammar_error(loc, "Unexpected flex value")
+       }} */
       | _ =>
-        Exp.tuple(~loc, List.map(
-          ((v, loc)) => {
-            switch (v) {
-            | Percentage(_) => rcv((v, loc))
-            | Number(n) => Exp.constant(~loc, Pconst_float(n, None))
-            | _ => rcv((v, loc))
-            /* TODO: Better handling `flex-basis in px and add grammar_error`
-              | _  => grammar_error(loc, "Unexpected flex value") */
-            }
-          },
-          vs,
-        ))
+        Exp.tuple(
+          ~loc,
+          List.map(
+            ((v, loc)) => {
+              switch (v) {
+              | Percentage(_) => render_value((v, loc))
+              | Number(n) => Exp.constant(~loc, Pconst_float(n, None))
+              | _ => render_value((v, loc))
+              /* TODO: Better handling `flex-basis in px and add grammar_error`
+                 | _  => grammar_error(loc, "Unexpected flex value") */
+              }
+            },
+            vs,
+          ),
+        )
       };
 
-    let args = [
-      (Nolabel, Exp.variant(~loc, "some", Some(expression))),
-    ];
+    let args = [(Nolabel, Exp.variant(~loc, "some", Some(expression)))];
 
     let ident =
       Exp.ident(~loc=name_loc, {txt: Lident(fnName), loc: name_loc});
     Exp.apply(~loc=name_loc, ident, args);
   };
 
-  switch (name) {
-  | "animation" => render_animation()
-  | "box-shadow" => render_box_shadow()
-  | "text-shadow" => render_text_shadow()
-  | "transform" => render_transform()
-  | "transition" => render_transition()
-  | "font-family" => render_font_family()
-  | "z-index" => render_z_index()
-  | "stroke-opacity"
-  | "stop-opacity"
-  | "flood-opacity"
-  | "fill-opacity"
-  | "opacity" => render_opacity()
-  | "flex-grow"
-  | "flex-shrink" => render_flex_grow_shrink()
-  | "font-weight" => render_font_weight()
-  | "flex" => render_flex()
-  | "padding"
-  | "margin" => render_margin_padding()
-  | "border"
-  | "outline" when List.length(fst(d.Declaration.value)) == 2 =>
-    render_border_outline()
-  | _ => render_standard_declaration()
-  };
+  let (valueList, loc) = d.Declaration.value;
+
+  let newValueList = List.map((value) => value, valueList);
+
+  /* TODO: Right know we only support variables with functions that
+  accepts only one argument, in order to change/improve that, we need to
+  "render" variables/typed_variables and static params.
+   */
+  switch (List.nth(valueList, 0)) {
+    | (Variable(v), _loc) => render_unsafe(~loc, name, v)
+    | _ => switch (name) {
+      | "animation" => render_animation(newValueList, loc)
+      | "box-shadow" => render_box_shadow(newValueList, loc)
+      | "text-shadow" => render_text_shadow(newValueList, loc)
+      | "transform" => render_transform(newValueList, loc)
+      | "transition" => render_transition(newValueList, loc)
+      | "font-family" => render_font_family(newValueList, loc)
+      | "z-index" => render_z_index(newValueList, loc)
+      | "stroke-opacity"
+      | "stop-opacity"
+      | "flood-opacity"
+      | "fill-opacity"
+      | "opacity" => render_opacity(newValueList, loc)
+      | "flex-grow"
+      | "flex-shrink" => render_flex_grow_shrink(newValueList, loc)
+      | "font-weight" => render_font_weight(newValueList, loc)
+      | "flex" => render_flex(newValueList, loc)
+      | "padding"
+      | "margin" => render_margin_padding(newValueList, loc)
+      | "border"
+      | "outline" when List.length(fst(d.Declaration.value)) == 2 =>
+        render_border_outline(newValueList, loc)
+  | _ => render_standard_declaration(fnName, valueList)
+    }
+  }
 }
 and render_declarations =
     (ds: list(Declaration_list.kind)): list(expression) =>
@@ -1213,16 +1196,13 @@ and render_declarations =
       },
     ds,
   )
-and render_declaration_list = ((dl, loc): Declaration_list.t): expression => {
-  let expr_with_loc_list = render_declarations(dl);
+and render_declaration_list = ((list, loc): Declaration_list.t): expression => {
+  let expr_with_loc_list = render_declarations(list);
   let styleExpression = list_to_expr(loc, expr_with_loc_list);
   let ident = Exp.ident(~loc, {txt: Lident("css"), loc});
-
   let cssFunc = Exp.apply(~loc, ident, [(Nolabel, styleExpression)]);
-  let styled_defintion =
-    Exp.open_(~loc, Fresh, {txt: Lident("Emotion"), loc}, cssFunc);
 
-  styled_defintion;
+  Exp.open_(~loc, Fresh, {txt: Lident("Emotion"), loc}, cssFunc);
 }
 and render_style_rule = (sr: Style_rule.t): expression => {
   let (prelude, prelude_loc) = sr.Style_rule.prelude;
@@ -1230,7 +1210,7 @@ and render_style_rule = (sr: Style_rule.t): expression => {
     List.fold_left(
       (s, (value, value_loc)) =>
         switch (value) {
-        | Component_value.Delim(":") => ":" ++ s
+        | Delim(":") => ":" ++ s
         | Ident(v)
         | Operator(v)
         | Delim(v) =>
@@ -1259,23 +1239,4 @@ and render_rule = (r: Rule.t): expression =>
   switch (r) {
   | Rule.Style_rule(sr) => render_style_rule(sr)
   | Rule.At_rule(ar) => render_at_rule(ar)
-  }
-and render_stylesheet = ((rs, loc): Stylesheet.t): expression => {
-  let rule_expr_list =
-    List.rev_map(
-      rule =>
-        switch (rule) {
-        | Rule.Style_rule({
-            Style_rule.prelude: ([], _),
-            block: (ds, _),
-            loc: _,
-          }) =>
-          render_declarations(ds)
-        | Rule.Style_rule(_)
-        | Rule.At_rule(_) => [render_rule(rule)]
-        },
-      rs,
-    )
-    |> List.concat;
-  list_to_expr(loc, rule_expr_list);
-};
+  };

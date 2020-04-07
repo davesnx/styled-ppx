@@ -22,7 +22,7 @@ let is_length: Css_types.Component_value.t => bool;
 let is_color: Css_types.Component_value.t => bool;
 let is_line_width: Css_types.Component_value.t => bool;
 let is_line_style: Css_types.Component_value.t => bool;
-let render_component_value:
+let render_value:
   Css_types.with_loc(Css_types.Component_value.t) => Parsetree.expression;
 let render_at_rule: Css_types.At_rule.t => Parsetree.expression;
 let render_declaration:
@@ -33,4 +33,3 @@ let render_declaration_list:
   Css_types.Declaration_list.t => Parsetree.expression;
 let render_style_rule: Css_types.Style_rule.t => Parsetree.expression;
 let render_rule: Css_types.Rule.t => Parsetree.expression;
-let render_stylesheet: Css_types.Stylesheet.t => Parsetree.expression;

@@ -3,6 +3,9 @@
   "reason": {
     "react-jsx": 3
   },
+  "bsc-flags": [
+    "-bs-super-errors"
+  ],
   "sources": {
     "dir": "src",
     "subdirs": true,
@@ -20,6 +23,9 @@
   ],
   "suffix": ".bs.js",
   "namespace": true,
-  "bs-dependencies": ["reason-react", "@ahrefs/bs-emotion"],
+  "bs-dependencies": [
+    "reason-react",
+    "@ahrefs/bs-emotion"
+  ],
   "refmt": 3
 }
