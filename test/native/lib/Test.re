@@ -2,7 +2,7 @@ open Setup;
 
 describe("Transform CSS AST to Emotion", ({test, _}) =>
   test("1 + 1 should equal 2", ({expect, _}) =>
-    expect.int(1 + 1).toBe(3)
+    expect.int(1 + 1).toBe(2)
   )
 );
 
@@ -128,7 +128,7 @@ describe("Transform CSS AST to Emotion", ({test, _}) =>
    |};
 
 
-     Alcotest.(check(testable(Css_fmt_printer.dump_stylesheet, eq_ast)))(
+     Alcotest.(check(testable(Css_printer.dump_stylesheet, eq_ast)))(
        "different CSS AST",
        expected_ast,
        ast,
@@ -185,7 +185,7 @@ describe("Transform CSS AST to Emotion", ({test, _}) =>
        Location.none,
      );
 
-     Alcotest.(check(testable(Css_fmt_printer.dump_stylesheet, eq_ast)))(
+     Alcotest.(check(testable(Css_printer.dump_stylesheet, eq_ast)))(
        "different CSS AST",
        expected_ast,
        ast,
@@ -233,7 +233,7 @@ describe("Transform CSS AST to Emotion", ({test, _}) =>
        Location.none,
      );
 
-     Alcotest.(check(testable(Css_fmt_printer.dump_stylesheet, eq_ast)))(
+     Alcotest.(check(testable(Css_printer.dump_stylesheet, eq_ast)))(
        "different CSS AST",
        expected_ast,
        ast,
@@ -261,7 +261,7 @@ describe("Transform CSS AST to Emotion", ({test, _}) =>
        Location.none,
      );
 
-     Alcotest.(check(testable(Css_fmt_printer.dump_stylesheet, eq_ast)))(
+     Alcotest.(check(testable(Css_printer.dump_stylesheet, eq_ast)))(
        "different CSS AST",
        expected_ast,
        ast,
@@ -292,7 +292,7 @@ describe("Transform CSS AST to Emotion", ({test, _}) =>
        Location.none,
      );
 
-     Alcotest.(check(testable(Css_fmt_printer.dump_stylesheet, eq_ast)))(
+     Alcotest.(check(testable(Css_printer.dump_stylesheet, eq_ast)))(
        "different CSS AST",
        expected_ast,
        ast,
@@ -325,7 +325,7 @@ describe("Transform CSS AST to Emotion", ({test, _}) =>
        Location.none,
      );
 
-     Alcotest.(check(testable(Css_fmt_printer.dump_stylesheet, eq_ast)))(
+     Alcotest.(check(testable(Css_printer.dump_stylesheet, eq_ast)))(
        "different CSS AST",
        expected_ast,
        ast,
@@ -418,7 +418,7 @@ describe("Transform CSS AST to Emotion", ({test, _}) =>
        Location.none,
      );
 
-     Alcotest.(check(testable(Css_fmt_printer.dump_stylesheet, eq_ast)))(
+     Alcotest.(check(testable(Css_printer.dump_stylesheet, eq_ast)))(
        "different CSS AST",
        expected_ast,
        ast,
@@ -529,7 +529,7 @@ describe("Transform CSS AST to Emotion", ({test, _}) =>
        Location.none,
      );
 
-     Alcotest.(check(testable(Css_fmt_printer.dump_stylesheet, eq_ast)))(
+     Alcotest.(check(testable(Css_printer.dump_stylesheet, eq_ast)))(
        "different CSS AST",
        expected_ast,
        ast,
@@ -593,7 +593,7 @@ describe("Transform CSS AST to Emotion", ({test, _}) =>
        Location.none,
      );
 
-     Alcotest.(check(testable(Css_fmt_printer.dump_stylesheet, eq_ast)))(
+     Alcotest.(check(testable(Css_printer.dump_stylesheet, eq_ast)))(
        "different CSS AST",
        expected_ast,
        ast,
@@ -682,7 +682,7 @@ describe("Transform CSS AST to Emotion", ({test, _}) =>
        Location.none,
      );
 
-     Alcotest.(check(testable(Css_fmt_printer.dump_stylesheet, eq_ast)))(
+     Alcotest.(check(testable(Css_printer.dump_stylesheet, eq_ast)))(
        "different CSS AST",
        expected_ast,
        ast,
@@ -792,7 +792,7 @@ describe("Transform CSS AST to Emotion", ({test, _}) =>
        Location.none,
      );
 
-     Alcotest.(check(testable(Css_fmt_printer.dump_stylesheet, eq_ast)))(
+     Alcotest.(check(testable(Css_printer.dump_stylesheet, eq_ast)))(
        "different CSS AST",
        expected_ast,
        ast,
@@ -834,7 +834,7 @@ describe("Transform CSS AST to Emotion", ({test, _}) =>
        Location.none,
      );
 
-     Alcotest.(check(testable(Css_fmt_printer.dump_stylesheet, eq_ast)))(
+     Alcotest.(check(testable(Css_printer.dump_stylesheet, eq_ast)))(
        "different CSS AST",
        expected_ast,
        ast,
@@ -899,7 +899,7 @@ describe("Transform CSS AST to Emotion", ({test, _}) =>
        Location.none,
      );
 
-     Alcotest.(check(testable(Css_fmt_printer.dump_stylesheet, eq_ast)))(
+     Alcotest.(check(testable(Css_printer.dump_stylesheet, eq_ast)))(
        "different CSS AST",
        expected_ast,
        ast,
@@ -961,7 +961,7 @@ describe("Transform CSS AST to Emotion", ({test, _}) =>
        Location.none,
      );
 
-     Alcotest.(check(testable(Css_fmt_printer.dump_stylesheet, eq_ast)))(
+     Alcotest.(check(testable(Css_printer.dump_stylesheet, eq_ast)))(
        "different CSS AST",
        expected_ast,
        ast,
@@ -1006,7 +1006,7 @@ describe("Transform CSS AST to Emotion", ({test, _}) =>
        Location.none,
      );
 
-     Alcotest.(check(testable(Css_fmt_printer.dump_stylesheet, eq_ast)))(
+     Alcotest.(check(testable(Css_printer.dump_stylesheet, eq_ast)))(
        "different CSS AST",
        expected_ast,
        ast,
@@ -1048,7 +1048,7 @@ describe("Transform CSS AST to Emotion", ({test, _}) =>
        Location.none,
      );
 
-     Alcotest.(check(testable(Css_fmt_printer.dump_stylesheet, eq_ast)))(
+     Alcotest.(check(testable(Css_printer.dump_stylesheet, eq_ast)))(
        "different CSS AST",
        expected_ast,
        ast,
@@ -1093,7 +1093,7 @@ describe("Transform CSS AST to Emotion", ({test, _}) =>
        Location.none,
      );
 
-     Alcotest.(check(testable(Css_fmt_printer.dump_stylesheet, eq_ast)))(
+     Alcotest.(check(testable(Css_printer.dump_stylesheet, eq_ast)))(
        "different CSS AST",
        expected_ast,
        ast,

@@ -37,9 +37,9 @@
     "@reason-native/rely": "^3.2.1"
   },
   "scripts": {
-    "test": "dune runtest",
-    "test:promote": "dune runtest --auto-promote",
-    "rely": "dune exec test/native/TestRunner.exe",
+    "test_snapshot": "dune runtest",
+    "test_snapshot:promote": "dune runtest --auto-promote",
+    "test_native": "esy dune exec test/native/TestRunner.exe",
     "test_bs": "cd test/bucklescript; yarn test",
     "doc": "esy dune build @doc",
     "doc-path": "esy echo #{self.target_dir}/default/_doc/_html/index.html",

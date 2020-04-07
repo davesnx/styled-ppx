@@ -1,8 +1,7 @@
 (executable
   (name TestRunner)
-  (public_name TestRunner)
-  (package styled-ppx-test-native)
+  (public_name StyledPpxTestRunner)
   (libraries
-    StyledPpxNativeLibTest
+    StyledPpxTestNativeLib
   )
 )

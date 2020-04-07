@@ -1,7 +1,5 @@
 (library
-  (name StyledPpxNativeLibTest)
+  (name StyledPpxTestNativeLib)
   (library_flags (-linkall -g))
-  (modules (:standard))
   (libraries rely.lib styled-ppx.lib)
 )
-
