@@ -1,4 +1,4 @@
-module App = [%styled.div {|
+module App = [%styled.div (~background) => {j|
   display: flex;
   justify-content: center;
   align-items: center;
@@ -7,8 +7,8 @@ module App = [%styled.div {|
   height: 100vh;
   width: 100vw;
 
-  font-size: 30px;
-|}];
+  background-color: $background;
+|j}];
 
 module Link = [%styled.a {|
   color: #333;
@@ -19,13 +19,11 @@ let b = "flex";
 
 module Component = [%styled (~c) => {j|
   color: $c;
-  display: $b;
-  margin: $space;
 |j}];
 
 ReactDOMRe.renderToElementWithId(
-  <App onClick={Js.log}>
-    <Component c="#443434">
+  <App onClick={Js.log} background="#443434">
+    <Component c="#FFFFFF">
       {React.string("- styled-ppx -")}
     </Component>
     <Link href="http://sancho.dev">

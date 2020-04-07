@@ -1,1 +1,1 @@
-/* Lib_Test.Setup.run(Rely.RunConfig.initialize()); */
+StyledPpxNativeLibTest.Setup.run(Rely.RunConfig.initialize());

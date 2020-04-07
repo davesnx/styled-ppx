@@ -34,11 +34,6 @@ module Transition = [%styled "transition-property: all"];
  | "font-family" => render_font_family()
  */
 
-module Child = {
-  [@react.component]
-  let make = () => <h1> {ReasonReact.string("Heading")} </h1>;
-};
-
 let componentsList = [
   ("Opacity", <Opacity />),
   /* ("Overflow", Overflow),
