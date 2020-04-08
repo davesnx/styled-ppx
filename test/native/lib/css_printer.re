@@ -22,6 +22,8 @@ let rec dump_component_value = (ppf, (cv, _)) => {
   | Operator(s)
   | Delim(s)
   | Number(s)
+  | Variable(s)
+  | TypedVariable((s, _))
   | Unicode_range(s) =>
     let pp = Fmt.string;
     pp(ppf, s);
