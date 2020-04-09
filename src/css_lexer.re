@@ -1,8 +1,3 @@
-/** CSS lexer.
-  * Reference:
-  * https://www.w3.org/TR/css-syntax-3/
-  * https://github.com/yahoo/css-js/blob/master/src/l/css.3.l */
-
 module Sedlexing = Lex_buffer;
 
 /** Signals a lexing error at the provided source location.  */
@@ -373,3 +368,11 @@ let parse_string = (~container_lnum=?, ~pos=?, s, p) => {
   };
   parse(Lex_buffer.of_ascii_string(~pos?, s), p);
 };
+
+let parse_declaration_list = (~container_lnum=?, ~pos=?, css) =>
+  parse_string(
+    ~container_lnum?,
+    ~pos?,
+    css,
+    Css_parser.declaration_list,
+  );
