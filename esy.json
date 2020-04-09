@@ -5,15 +5,23 @@
   "author": "David Sancho <dsnxmoreno@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davesnx/styled-ppx",
-  "bugs": { "url": "https://github.com/davesnx/styled-ppx/issues" },
+  "bugs": {
+    "url": "https://github.com/davesnx/styled-ppx/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/davesnx/styled-ppx.git"
   },
   "esy": {
-    "build": "esy b dune build -p #{self.name}",
-    "buildEnv": { "ODOC_SYNTAX": "re" },
-    "release": { "bin": [ "Bin" ] }
+    "build": "dune build -p #{self.name}",
+    "buildEnv": {
+      "ODOC_SYNTAX": "re"
+    },
+    "release": {
+      "bin": [
+        "Bin"
+      ]
+    }
   },
   "devDependencies": {
     "@opam/merlin": "*",
@@ -25,7 +33,9 @@
     "@opam/sedlex": "2.1",
     "@reason-native/rely": "^3.2.1"
   },
-  "resolutions": { "@opam/dune": "1.11.4" },
+  "resolutions": {
+    "@opam/dune": "1.11.4"
+  },
   "scripts": {
     "test_snapshot": "dune runtest",
     "test_snapshot:promote": "dune runtest --auto-promote",
@@ -36,6 +46,5 @@
     "format": "esy dune build @fmt --auto-promote",
     "watch": "esy dune build -p styled-ppx --watch",
     "utop": "esy dune utop lib -- -implicit-bindings"
-  },
-  "dependencies": { "@opam/fmt": "0.8.8" }
+  }
 }

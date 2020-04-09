@@ -11,6 +11,8 @@ module App = [%styled.div (~background) => {j|
   flex-direction: column;
 
   background-color: $background;
+
+  cursor: pointer;
 |j}];
 
 module Link = [%styled.a {|

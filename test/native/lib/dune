@@ -1,5 +1,5 @@
 (library
   (name StyledPpxTestNativeLib)
   (library_flags (-linkall -g))
-  (libraries rely.lib styled-ppx.lib fmt)
+  (libraries rely.lib styled-ppx.lib)
 )

@@ -1,5 +1,5 @@
 {
-  "checksum": "5a52d0b6f43d1ca3d9362b74621ed4a0",
+  "checksum": "965fc81980beed501d400bd7ecf6eb8e",
   "root": "styled-ppx@link-dev:./esy.json",
   "node": {
     "styled-ppx@link-dev:./esy.json": {
@@ -8,7 +8,7 @@
       "version": "link-dev:./esy.json",
       "source": { "type": "link-dev", "path": ".", "manifest": "esy.json" },
       "overrides": [],
-      "dependencies": [ "@opam/fmt@opam:0.8.8@01c3a23c" ],
+      "dependencies": [],
       "devDependencies": [
         "ocaml@4.6.1000@d41d8cd9", "@reason-native/rely@3.2.1@d41d8cd9",
         "@opam/sedlex@opam:2.1@400920d8",
@@ -236,31 +236,6 @@
       ],
       "devDependencies": [
         "ocaml@4.6.1000@d41d8cd9", "@opam/ocamlbuild@opam:0.14.0@6ac75d03"
-      ]
-    },
-    "@opam/stdlib-shims@opam:0.1.0@d957c903": {
-      "id": "@opam/stdlib-shims@opam:0.1.0@d957c903",
-      "name": "@opam/stdlib-shims",
-      "version": "opam:0.1.0",
-      "source": {
-        "type": "install",
-        "source": [
-          "archive:https://opam.ocaml.org/cache/md5/12/12b5704eed70c6bff5ac39a16db1425d#md5:12b5704eed70c6bff5ac39a16db1425d",
-          "archive:https://github.com/ocaml/stdlib-shims/releases/download/0.1.0/stdlib-shims-0.1.0.tbz#md5:12b5704eed70c6bff5ac39a16db1425d"
-        ],
-        "opam": {
-          "name": "stdlib-shims",
-          "version": "0.1.0",
-          "path": "esy.lock/opam/stdlib-shims.0.1.0"
-        }
-      },
-      "overrides": [],
-      "dependencies": [
-        "ocaml@4.6.1000@d41d8cd9", "@opam/dune@opam:1.11.4@a7ccb7ae",
-        "@esy-ocaml/substs@0.0.1@d41d8cd9"
-      ],
-      "devDependencies": [
-        "ocaml@4.6.1000@d41d8cd9", "@opam/dune@opam:1.11.4@a7ccb7ae"
       ]
     },
     "@opam/seq@opam:0.2.2@e9144e45": {
@@ -663,37 +638,6 @@
       "devDependencies": [
         "@opam/dune@opam:1.11.4@a7ccb7ae",
         "@opam/base-bytes@opam:base@19d0c2ff"
-      ]
-    },
-    "@opam/fmt@opam:0.8.8@01c3a23c": {
-      "id": "@opam/fmt@opam:0.8.8@01c3a23c",
-      "name": "@opam/fmt",
-      "version": "opam:0.8.8",
-      "source": {
-        "type": "install",
-        "source": [
-          "archive:https://opam.ocaml.org/cache/md5/47/473490fcfdf3ff0a8ccee226b873d4b2#md5:473490fcfdf3ff0a8ccee226b873d4b2",
-          "archive:https://erratique.ch/software/fmt/releases/fmt-0.8.8.tbz#md5:473490fcfdf3ff0a8ccee226b873d4b2"
-        ],
-        "opam": {
-          "name": "fmt",
-          "version": "0.8.8",
-          "path": "esy.lock/opam/fmt.0.8.8"
-        }
-      },
-      "overrides": [],
-      "dependencies": [
-        "ocaml@4.6.1000@d41d8cd9", "@opam/topkg@opam:1.0.1@a42c631e",
-        "@opam/stdlib-shims@opam:0.1.0@d957c903",
-        "@opam/seq@opam:0.2.2@e9144e45",
-        "@opam/ocamlfind@opam:1.8.1@ff07b0f9",
-        "@opam/ocamlbuild@opam:0.14.0@6ac75d03",
-        "@opam/base-unix@opam:base@87d0b2eb",
-        "@esy-ocaml/substs@0.0.1@d41d8cd9"
-      ],
-      "devDependencies": [
-        "ocaml@4.6.1000@d41d8cd9", "@opam/stdlib-shims@opam:0.1.0@d957c903",
-        "@opam/seq@opam:0.2.2@e9144e45"
       ]
     },
     "@opam/easy-format@opam:1.3.2@0484b3c4": {
