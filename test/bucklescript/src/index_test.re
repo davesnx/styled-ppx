@@ -16,7 +16,7 @@ module Component = [%styled.div {|
 module ComponentInline = [%styled "color: #454545"];
 module ComponentLink = [%styled.a {| color: #454545 |}];
 
-test("Component renders ", () => {
+test("Component renders", () => {
   <Component />
   |> render
   |> container
