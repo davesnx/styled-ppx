@@ -24,8 +24,9 @@ module Link = [%styled.a {|
 let space = "10px";
 let b = "flex";
 
-module Component = [%styled {j|
-  color: white;
+module Component = [%styled (~c) => {j|
+  color: $c;
+  font-size: 42px;
 |j}];
 
 ReactDOMRe.renderToElementWithId(
