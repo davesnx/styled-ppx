@@ -23,9 +23,6 @@
       ]
     }
   },
-  "resolution": {
-    "@opam/sedlex": "ocaml-community/sedlex"
-  },
   "devDependencies": {
     "@opam/merlin": "*",
     "ocaml": "~4.6.1000",
@@ -36,17 +33,19 @@
     "@opam/sedlex": "2.1",
     "@reason-native/rely": "^3.2.1"
   },
+  "resolutions": {
+    "@opam/sedlex": "ocaml-community/sedlex"
+    "@opam/dune": "1.11.4"
+  },
   "scripts": {
-    "test": "dune runtest",
-    "test:promote": "dune runtest --auto-promote",
+    "test_snapshot": "dune runtest",
+    "test_snapshot:promote": "dune runtest --auto-promote",
+    "test_native": "esy dune exec test/native/TestRunner.exe",
+    "test_bs": "cd test/bucklescript; yarn test",
     "doc": "esy dune build @doc",
     "doc-path": "esy echo #{self.target_dir}/default/_doc/_html/index.html",
     "format": "esy dune build @fmt --auto-promote",
     "watch": "esy dune build -p styled-ppx --watch",
     "utop": "esy dune utop lib -- -implicit-bindings"
-  },
-  "dependencies": {
-    "@opam/ppxlib": "0.12.0",
-    "@reason-native/rely": "^3.2.1"
   }
 }

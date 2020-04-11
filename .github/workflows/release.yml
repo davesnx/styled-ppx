@@ -50,7 +50,10 @@ jobs:
         run: esy build
 
       - name: Run Native tests
-        run: esy test
+        run: esy test_native
+
+      - name: Run Native snapshot tests
+        run: esy test_snapshot
 
       - name: Export dependencies
         run: esy export-dependencies
