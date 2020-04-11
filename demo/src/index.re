@@ -24,20 +24,13 @@ module Link = [%styled.a {|
 let space = "10px";
 let b = "flex";
 
-let bshadow = Emotion.(css([
-  color(black)
-]))
-
-Js.log(bshadow);
-
-module Component = [%styled (~c) => {j|
-  color: $c;
-  font-size: 42px;
+module Component = [%styled {j|
+  color: white;
 |j}];
 
 ReactDOMRe.renderToElementWithId(
   <App onClick={Js.log} background="#443434">
-    <Component c="#FFFFFF">
+    <Component>
       {React.string("Demo of...")}
     </Component>
     <Link href="https://github.com/davesnx/styled-ppx">

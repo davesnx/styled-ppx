@@ -155,6 +155,9 @@ let render_unsafe = (~loc, proproperty, value) => {
 let string_to_const = (~loc, s) =>
   Exp.constant(~loc, Const.string(~quotation_delimiter="js", s));
 
+let render_html_color = (~loc, v) =>
+  Exp.ident(~loc, {txt: Ldot(Ldot(Lident("Css"), "Color"), v), loc: loc});
+
 let list_to_expr = (end_loc, xs) =>
   List.fold_left(
     (e, param) => {
@@ -718,6 +721,7 @@ let rec render_value = ((cv, loc): with_loc(t)): expression => {
     } else {
       Exp.ident(~loc, {txt: Lident(name), loc});
     };
+  | String(i) when isHtmlColor(i) => render_html_color(~loc, i);
   | String(s) => string_to_const(~loc, s)
   | Uri(s) =>
     let ident = Exp.ident(~loc, {txt: Lident("url"), loc});
@@ -733,9 +737,6 @@ let rec render_value = ((cv, loc): with_loc(t)): expression => {
     | _ => Exp.constant(~loc, number_to_const(s))
     }
   | Function(f, params) => render_function(f, params)
-  | Float_dimension((number, "ms", Time)) =>
-    /* bs-css expects milliseconds as an int constant */
-    Exp.constant(~loc, Const.integer(number))
   | Float_dimension((number, dimension, _)) =>
     let const =
       switch (dimension) {

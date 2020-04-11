@@ -8,6 +8,14 @@ exports[`Component renders  1`] = `
 </div>
 `;
 
+exports[`Component renders 1`] = `
+<div>
+  <div
+    class="css-61f5x5"
+  />
+</div>
+`;
+
 exports[`ComponentInline renders and defaults to a div 1`] = `
 <div>
   <div
