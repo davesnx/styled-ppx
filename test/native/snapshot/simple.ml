@@ -1,4 +1,4 @@
-(* (* Shoudn't break other ppxs with similar APIs *)
+(* Shoudn't break other ppxs with similar APIs *)
 module StateLenses = [%lenses
   type state = {
     email: string;
@@ -20,10 +20,10 @@ module Component = [%styled {j|
 
 let space = "10px"
 let b = "flex"
- *)
-
+  (* margin: 10px $(space)px; *)
 module Component = [%styled {j|
-  background-color: 20px 20px 0px black;
+  margin: $space 12px;
+  display: $b;
 |j}]
 
 (* module Component = [%styled fun ~var -> {j|
