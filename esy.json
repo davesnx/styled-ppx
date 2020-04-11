@@ -34,7 +34,6 @@
     "@reason-native/rely": "^3.2.1"
   },
   "resolutions": {
-    "@opam/sedlex": "ocaml-community/sedlex"
     "@opam/dune": "1.11.4"
   },
   "scripts": {
