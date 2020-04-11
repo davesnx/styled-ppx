@@ -3,9 +3,9 @@ open Expect;
 open ReactTestingLibrary;
 
 module Opacity = [%styled "opacity: 0.9"];
-module Color = [%styled {| color: blue; |}];
+/* module Color = [%styled {| color: blue; |}];
 module BackgroundColor = [%styled {| background-color: blue; |}];
-
+ */
 /* module Overflow = [%styled
   {|
   overflow-y: visible;
@@ -38,9 +38,9 @@ module Transition = [%styled "transition-property: all"];
 
 let componentsList = [
   ("Opacity", <Opacity />),
+/*   ("Color", <Color />),
   ("Color", <Color />),
-  ("Color", <Color />),
-  /* ("Overflow", Overflow),
+ */  /* ("Overflow", Overflow),
   ("Visibility", Visibility),
   ("Hypens", Hypens),
   ("Stroke", Stroke),
@@ -59,7 +59,7 @@ Belt.List.forEach(componentsList, (((name, component)) => {
     |> render
     |> container
     |> expect
-    |> toMatchInlineSnapshot
+    |> toMatchSnapshot
   });
 }));
 
