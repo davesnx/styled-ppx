@@ -24,6 +24,9 @@
   "jest": {
     "testMatch": [
       "**/src/**/*_test.bs.js"
+    ],
+    "snapshotSerializers": [
+      "jest-emotion"
     ]
   }
 }

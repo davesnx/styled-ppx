@@ -5,17 +5,27 @@
   "author": "David Sancho <dsnxmoreno@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davesnx/styled-ppx",
-  "bugs": { "url": "https://github.com/davesnx/styled-ppx/issues" },
+  "bugs": {
+    "url": "https://github.com/davesnx/styled-ppx/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/davesnx/styled-ppx.git"
   },
   "esy": {
     "build": "dune build -p #{self.name}",
-    "buildEnv": { "ODOC_SYNTAX": "re" },
-    "release": { "bin": [ "Bin" ] }
+    "buildEnv": {
+      "ODOC_SYNTAX": "re"
+    },
+    "release": {
+      "bin": [
+        "Bin"
+      ]
+    }
   },
-  "resolution": { "@opam/sedlex": "ocaml-community/sedlex" },
+  "resolution": {
+    "@opam/sedlex": "ocaml-community/sedlex"
+  },
   "devDependencies": {
     "@opam/merlin": "*",
     "ocaml": "~4.6.1000",
@@ -29,8 +39,6 @@
   "scripts": {
     "test": "dune runtest",
     "test:promote": "dune runtest --auto-promote",
-    "rely": "dune exec test/native/TestRunner.exe",
-    "test_bs": "cd test/bucklescript; yarn test",
     "doc": "esy dune build @doc",
     "doc-path": "esy echo #{self.target_dir}/default/_doc/_html/index.html",
     "format": "esy dune build @fmt --auto-promote",

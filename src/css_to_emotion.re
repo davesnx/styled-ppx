@@ -276,14 +276,167 @@ let is_length = value =>
   | _ => false
   };
 
+let colorList = [
+  "aliceblue",
+  "antiquewhite",
+  "aqua",
+  "aquamarine",
+  "azure",
+  "beige",
+  "bisque",
+  "black",
+  "blanchedalmond",
+  "blue",
+  "blueviolet",
+  "brown",
+  "burlywood",
+  "cadetblue",
+  "chartreuse",
+  "chocolate",
+  "coral",
+  "cornflowerblue",
+  "cornsilk",
+  "crimson",
+  "cyan",
+  "darkblue",
+  "darkcyan",
+  "darkgoldenrod",
+  "darkgray",
+  "darkgreen",
+  "darkgrey",
+  "darkkhaki",
+  "darkmagenta",
+  "darkolivegreen",
+  "darkorange",
+  "darkorchid",
+  "darkred",
+  "darksalmon",
+  "darkseagreen",
+  "darkslateblue",
+  "darkslategray",
+  "darkslategrey",
+  "darkturquoise",
+  "darkviolet",
+  "deeppink",
+  "deepskyblue",
+  "dimgray",
+  "dimgrey",
+  "dodgerblue",
+  "firebrick",
+  "floralwhite",
+  "forestgreen",
+  "fuchsia",
+  "gainsboro",
+  "ghostwhite",
+  "gold",
+  "goldenrod",
+  "gray",
+  "green",
+  "greenyellow",
+  "grey",
+  "honeydew",
+  "hotpink",
+  "indianred",
+  "indigo",
+  "ivory",
+  "khaki",
+  "lavender",
+  "lavenderblush",
+  "lawngreen",
+  "lemonchiffon",
+  "lightblue",
+  "lightcoral",
+  "lightcyan",
+  "lightgoldenrodyellow",
+  "lightgray",
+  "lightgreen",
+  "lightgrey",
+  "lightpink",
+  "lightsalmon",
+  "lightseagreen",
+  "lightskyblue",
+  "lightslategray",
+  "lightslategrey",
+  "lightsteelblue",
+  "lightyellow",
+  "lime",
+  "limegreen",
+  "linen",
+  "magenta",
+  "maroon",
+  "mediumaquamarine",
+  "mediumblue",
+  "mediumorchid",
+  "mediumpurple",
+  "mediumseagreen",
+  "mediumslateblue",
+  "mediumspringgreen",
+  "mediumturquoise",
+  "mediumvioletred",
+  "midnightblue",
+  "mintcream",
+  "mistyrose",
+  "moccasin",
+  "navajowhite",
+  "navy",
+  "oldlace",
+  "olive",
+  "olivedrab",
+  "orange",
+  "orangered",
+  "orchid",
+  "palegoldenrod",
+  "palegreen",
+  "paleturquoise",
+  "palevioletred",
+  "papayawhip",
+  "peachpuff",
+  "peru",
+  "pink",
+  "plum",
+  "powderblue",
+  "purple",
+  "rebeccapurple",
+  "red",
+  "rosybrown",
+  "royalblue",
+  "saddlebrown",
+  "salmon",
+  "sandybrown",
+  "seagreen",
+  "seashell",
+  "sienna",
+  "silver",
+  "skyblue",
+  "slateblue",
+  "slategray",
+  "slategrey",
+  "snow",
+  "springgreen",
+  "steelblue",
+  "tan",
+  "teal",
+  "thistle",
+  "tomato",
+  "turquoise",
+  "violet",
+  "wheat",
+  "white",
+  "whitesmoke",
+  "yellow",
+  "yellowgreen",
+];
+
+let isHtmlColor = color => List.exists(c => c === color, colorList);
+
 let is_color = value =>
   switch (value) {
   | Function(("rgb", _), _)
   | Function(("rgba", _), _)
   | Function(("hsl", _), _)
   | Function(("hsla", _), _)
-  | Hash(_)
-  | Ident(_) => true
+  | Hash(_) => true
+  | Ident(i) => isHtmlColor(i)
   | _ => false
   };
 
@@ -680,7 +833,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   };
 
   /* https://developer.mozilla.org/en-US/docs/Web/CSS/animation */
-  let render_animation = (params, _loc) => {
+  let _render_animation = (params, _loc) => {
     let animation_ident =
       Exp.ident(
         ~loc=name_loc,
@@ -748,140 +901,20 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
     Exp.apply(ident, [(Nolabel, list_to_expr(name_loc, box_shadow_list))]);
   };
 
-  /* https://developer.mozilla.org/en-US/docs/Web/CSS/box-shadow */
-  let render_box_shadow = (params, _loc) => {
-    let box_shadow_args = (args, (v, loc) as cv) =>
-      if (is_ident("inset", v)) {
-        [
-          (
-            Labelled("inset"),
-            Exp.construct(~loc, {txt: Lident("true"), loc}, None),
-          ),
-          ...args,
-        ];
-      } else if (is_length(v)) {
-        if (!
-              List.exists(
-                fun
-                | (Labelled("x"), _) => true
-                | _ => false,
-                args,
-              )) {
-          [(Labelled("x"), render_value(cv)), ...args];
-        } else if (!
-                     List.exists(
-                       fun
-                       | (Labelled("y"), _) => true
-                       | _ => false,
-                       args,
-                     )) {
-          [(Labelled("y"), render_value(cv)), ...args];
-        } else if (!
-                     List.exists(
-                       fun
-                       | (Labelled("blur"), _) => true
-                       | _ => false,
-                       args,
-                     )) {
-          [(Labelled("blur"), render_value(cv)), ...args];
-        } else if (!
-                     List.exists(
-                       fun
-                       | (Labelled("spread"), _) => true
-                       | _ => false,
-                       args,
-                     )) {
-          [(Labelled("spread"), render_value(cv)), ...args];
-        } else {
-          grammar_error(
-            loc,
-            "box-shadow cannot have more than 4 length values",
-          );
-        };
-      } else if (is_color(v)) {
-        [(Nolabel, render_value(cv)), ...args];
-      } else {
-        grammar_error(loc, "Unexpected box-shadow value");
-      };
-
-    let box_shadow_ident =
-      Exp.ident(~loc=name_loc, {txt: Lident("shadow"), loc: name_loc});
-    let box_shadow_args = ((grouped_param, _)) =>
-      List.fold_left(box_shadow_args, [], grouped_param);
-
-    let grouped_params = group_params(params);
-    let args =
-      List.rev_map(params => box_shadow_args(params), grouped_params);
-    let ident =
-      Exp.ident(~loc=name_loc, {txt: Lident("boxShadows"), loc: name_loc});
-    let box_shadow_list =
-      List.map(arg => Exp.apply(box_shadow_ident, arg), args);
-    Exp.apply(ident, [(Nolabel, list_to_expr(name_loc, box_shadow_list))]);
-  };
-
   /* https://developer.mozilla.org/en-US/docs/Web/CSS/text-shadow */
-  let render_text_shadow = (params, _loc) => {
-    let text_shadow_args = (args, (v, loc) as cv) =>
-      if (is_ident("inset", v)) {
-        [
-          (
-            Labelled("inset"),
-            Exp.construct(~loc, {txt: Lident("true"), loc}, None),
-          ),
-          ...args,
-        ];
-      } else if (is_length(v)) {
-        if (!
-              List.exists(
-                fun
-                | (Labelled("x"), _) => true
-                | _ => false,
-                args,
-              )) {
-          [(Labelled("x"), render_value(cv)), ...args];
-        } else if (!
-                     List.exists(
-                       fun
-                       | (Labelled("y"), _) => true
-                       | _ => false,
-                       args,
-                     )) {
-          [(Labelled("y"), render_value(cv)), ...args];
-        } else if (!
-                     List.exists(
-                       fun
-                       | (Labelled("blur"), _) => true
-                       | _ => false,
-                       args,
-                     )) {
-          [(Labelled("blur"), render_value(cv)), ...args];
-        } else {
-          grammar_error(
-            loc,
-            "box-shadow cannot have more than 3 length values",
-          );
-        };
-      } else if (is_color(v)) {
-        [(Nolabel, render_value(cv)), ...args];
-      } else {
-        grammar_error(loc, "Unexpected box-shadow value");
-      };
-
-    let text_shadow_ident =
-      Exp.ident(
-        ~loc=name_loc,
-        {txt: Ldot(Lident("Shadow"), "text"), loc: name_loc},
-      );
+  /* https://developer.mozilla.org/en-US/docs/Web/CSS/box-shadow */
+  let render_shadow = (name, params, loc) => {
     let text_shadow_args = ((grouped_param, _)) =>
-      List.fold_left(text_shadow_args, [], grouped_param);
+      List.fold_right((cv, args) => [render_value(cv), ...args], grouped_param, []);
 
     let grouped_params = group_params(params);
     let args =
       List.rev_map(params => text_shadow_args(params), grouped_params);
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Lident("textShadows"), loc: name_loc});
+      Exp.ident(~loc=name_loc, {txt: Lident(name), loc: name_loc});
     let text_shadow_list =
-      List.map(arg => Exp.apply(text_shadow_ident, arg), args);
+      List.map(arg => Exp.tuple(~loc, arg), args);
+
     Exp.apply(
       ident,
       [(Nolabel, list_to_expr(name_loc, text_shadow_list))],
@@ -1160,9 +1193,9 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   switch (List.nth(valueList, 0)) {
     | (Variable(v), _loc) => render_unsafe(~loc, name, v)
     | _ => switch (name) {
-      | "animation" => render_animation(newValueList, loc)
-      | "box-shadow" => render_box_shadow(newValueList, loc)
-      | "text-shadow" => render_text_shadow(newValueList, loc)
+      /* | "animation" => render_animation(newValueList, loc) */
+      | "box-shadow" => render_shadow("boxShadows", newValueList, loc)
+      | "text-shadow" => render_shadow("textShadows", newValueList, loc)
       | "transform" => render_transform(newValueList, loc)
       | "transition" => render_transition(newValueList, loc)
       | "font-family" => render_font_family(newValueList, loc)

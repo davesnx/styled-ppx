@@ -3,6 +3,8 @@ open Expect;
 open ReactTestingLibrary;
 
 module Opacity = [%styled "opacity: 0.9"];
+module Color = [%styled {| color: blue; |}];
+module BackgroundColor = [%styled {| background-color: blue; |}];
 
 /* module Overflow = [%styled
   {|
@@ -34,13 +36,10 @@ module Transition = [%styled "transition-property: all"];
  | "font-family" => render_font_family()
  */
 
-module Child = {
-  [@react.component]
-  let make = () => <h1> {ReasonReact.string("Heading")} </h1>;
-};
-
 let componentsList = [
   ("Opacity", <Opacity />),
+  ("Color", <Color />),
+  ("Color", <Color />),
   /* ("Overflow", Overflow),
   ("Visibility", Visibility),
   ("Hypens", Hypens),
@@ -60,7 +59,7 @@ Belt.List.forEach(componentsList, (((name, component)) => {
     |> render
     |> container
     |> expect
-    |> toMatchSnapshot
+    |> toMatchInlineSnapshot
   });
 }));
 

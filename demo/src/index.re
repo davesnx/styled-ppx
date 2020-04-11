@@ -11,11 +11,18 @@ module App = [%styled.div {|
 |}];
 
 module Link = [%styled.a {|
-  color: #333;
+  color: currentColor;
+  z-index: 100;
 |}];
 
 let space = "10px";
 let b = "flex";
+
+let bshadow = Emotion.(css([
+  color(black)
+]))
+
+Js.log(bshadow);
 
 module Component = [%styled (~c) => {j|
   color: $c;
