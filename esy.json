@@ -37,6 +37,7 @@
     "@opam/dune": "1.11.4"
   },
   "scripts": {
+    "test": "esy test_snapshot",
     "test_snapshot": "dune runtest",
     "test_snapshot:promote": "dune runtest --auto-promote",
     "test_native": "esy dune exec test/native/TestRunner.exe",

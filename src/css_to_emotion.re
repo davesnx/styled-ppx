@@ -1,6 +1,25 @@
-/* This file transform CSS AST to Emotion API calls
+/*
+  This file transform CSS AST to Emotion API calls, a simplified example:
 
- */
+  -- CSS Definition
+  display: block;
+
+  -- CSS AST
+  Declaration: {
+    important: false,
+    property: "display",
+    value: Value {
+      "children": [
+        Identifier {
+          "name": "block"
+        }
+      ]
+    }
+  }
+
+  -- Emotion output
+  Emotion.(css([display(`block)]))
+*/
 open Migrate_parsetree;
 open Ast_406;
 open Ast_helper;
@@ -282,158 +301,6 @@ let is_length = value =>
   | _ => false
   };
 
-let colorList = [
-  "aliceblue",
-  "antiquewhite",
-  "aqua",
-  "aquamarine",
-  "azure",
-  "beige",
-  "bisque",
-  "black",
-  "blanchedalmond",
-  "blue",
-  "blueviolet",
-  "brown",
-  "burlywood",
-  "cadetblue",
-  "chartreuse",
-  "chocolate",
-  "coral",
-  "cornflowerblue",
-  "cornsilk",
-  "crimson",
-  "cyan",
-  "darkblue",
-  "darkcyan",
-  "darkgoldenrod",
-  "darkgray",
-  "darkgreen",
-  "darkgrey",
-  "darkkhaki",
-  "darkmagenta",
-  "darkolivegreen",
-  "darkorange",
-  "darkorchid",
-  "darkred",
-  "darksalmon",
-  "darkseagreen",
-  "darkslateblue",
-  "darkslategray",
-  "darkslategrey",
-  "darkturquoise",
-  "darkviolet",
-  "deeppink",
-  "deepskyblue",
-  "dimgray",
-  "dimgrey",
-  "dodgerblue",
-  "firebrick",
-  "floralwhite",
-  "forestgreen",
-  "fuchsia",
-  "gainsboro",
-  "ghostwhite",
-  "gold",
-  "goldenrod",
-  "gray",
-  "green",
-  "greenyellow",
-  "grey",
-  "honeydew",
-  "hotpink",
-  "indianred",
-  "indigo",
-  "ivory",
-  "khaki",
-  "lavender",
-  "lavenderblush",
-  "lawngreen",
-  "lemonchiffon",
-  "lightblue",
-  "lightcoral",
-  "lightcyan",
-  "lightgoldenrodyellow",
-  "lightgray",
-  "lightgreen",
-  "lightgrey",
-  "lightpink",
-  "lightsalmon",
-  "lightseagreen",
-  "lightskyblue",
-  "lightslategray",
-  "lightslategrey",
-  "lightsteelblue",
-  "lightyellow",
-  "lime",
-  "limegreen",
-  "linen",
-  "magenta",
-  "maroon",
-  "mediumaquamarine",
-  "mediumblue",
-  "mediumorchid",
-  "mediumpurple",
-  "mediumseagreen",
-  "mediumslateblue",
-  "mediumspringgreen",
-  "mediumturquoise",
-  "mediumvioletred",
-  "midnightblue",
-  "mintcream",
-  "mistyrose",
-  "moccasin",
-  "navajowhite",
-  "navy",
-  "oldlace",
-  "olive",
-  "olivedrab",
-  "orange",
-  "orangered",
-  "orchid",
-  "palegoldenrod",
-  "palegreen",
-  "paleturquoise",
-  "palevioletred",
-  "papayawhip",
-  "peachpuff",
-  "peru",
-  "pink",
-  "plum",
-  "powderblue",
-  "purple",
-  "rebeccapurple",
-  "red",
-  "rosybrown",
-  "royalblue",
-  "saddlebrown",
-  "salmon",
-  "sandybrown",
-  "seagreen",
-  "seashell",
-  "sienna",
-  "silver",
-  "skyblue",
-  "slateblue",
-  "slategray",
-  "slategrey",
-  "snow",
-  "springgreen",
-  "steelblue",
-  "tan",
-  "teal",
-  "thistle",
-  "tomato",
-  "turquoise",
-  "violet",
-  "wheat",
-  "white",
-  "whitesmoke",
-  "yellow",
-  "yellowgreen",
-];
-
-let isHtmlColor = color => List.exists(c => c == color, colorList);
 
 let is_color = value =>
   switch (value) {
@@ -442,7 +309,7 @@ let is_color = value =>
   | Function(("hsl", _), _)
   | Function(("hsla", _), _)
   | Hash(_) => true
-  | Ident(i) => isHtmlColor(i)
+  | Ident(i) => Html.isColor(i)
   | _ => false
   };
 
@@ -714,7 +581,7 @@ let rec render_value = ((cv, loc): with_loc(t)): expression => {
     let ident = Exp.ident(~loc, {txt: Lident("pct"), loc});
     let arg = Exp.constant(~loc, float_to_const(p));
     Exp.apply(~loc, ident, [(Nolabel, arg)]);
-  | Ident(i) when isHtmlColor(i) => render_html_color(~loc, i);
+  | Ident(i) when Html.isColor(i) => render_html_color(~loc, i);
   | Ident(i) =>
     let name = to_caml_case(i);
     if (is_variant(i)) {
