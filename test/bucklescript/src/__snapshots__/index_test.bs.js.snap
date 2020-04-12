@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Component renders  1`] = `
+exports[`Component renders 1`] = `
 <div>
   <div
     class="css-61f5x5"
