@@ -155,6 +155,9 @@ let render_unsafe = (~loc, proproperty, value) => {
 let string_to_const = (~loc, s) =>
   Exp.constant(~loc, Const.string(~quotation_delimiter="js", s));
 
+let render_html_color = (~loc, v) =>
+  Exp.ident(~loc, {txt: Ldot(Ldot(Lident("Css"), "Color"), v), loc: loc});
+
 let list_to_expr = (end_loc, xs) =>
   List.fold_left(
     (e, param) => {
@@ -430,7 +433,7 @@ let colorList = [
   "yellowgreen",
 ];
 
-let isHtmlColor = color => List.exists(c => c === color, colorList);
+let isHtmlColor = color => List.exists(c => c == color, colorList);
 
 let is_color = value =>
   switch (value) {
@@ -711,6 +714,7 @@ let rec render_value = ((cv, loc): with_loc(t)): expression => {
     let ident = Exp.ident(~loc, {txt: Lident("pct"), loc});
     let arg = Exp.constant(~loc, float_to_const(p));
     Exp.apply(~loc, ident, [(Nolabel, arg)]);
+  | Ident(i) when isHtmlColor(i) => render_html_color(~loc, i);
   | Ident(i) =>
     let name = to_caml_case(i);
     if (is_variant(i)) {
@@ -733,9 +737,6 @@ let rec render_value = ((cv, loc): with_loc(t)): expression => {
     | _ => Exp.constant(~loc, number_to_const(s))
     }
   | Function(f, params) => render_function(f, params)
-  | Float_dimension((number, "ms", Time)) =>
-    /* bs-css expects milliseconds as an int constant */
-    Exp.constant(~loc, Const.integer(number))
   | Float_dimension((number, dimension, _)) =>
     let const =
       switch (dimension) {
