@@ -433,7 +433,7 @@ let colorList = [
   "yellowgreen",
 ];
 
-let isHtmlColor = color => List.exists(c => c === color, colorList);
+let isHtmlColor = color => List.exists(c => c == color, colorList);
 
 let is_color = value =>
   switch (value) {
@@ -714,6 +714,7 @@ let rec render_value = ((cv, loc): with_loc(t)): expression => {
     let ident = Exp.ident(~loc, {txt: Lident("pct"), loc});
     let arg = Exp.constant(~loc, float_to_const(p));
     Exp.apply(~loc, ident, [(Nolabel, arg)]);
+  | Ident(i) when isHtmlColor(i) => render_html_color(~loc, i);
   | Ident(i) =>
     let name = to_caml_case(i);
     if (is_variant(i)) {
@@ -721,7 +722,6 @@ let rec render_value = ((cv, loc): with_loc(t)): expression => {
     } else {
       Exp.ident(~loc, {txt: Lident(name), loc});
     };
-  | String(i) when isHtmlColor(i) => render_html_color(~loc, i);
   | String(s) => string_to_const(~loc, s)
   | Uri(s) =>
     let ident = Exp.ident(~loc, {txt: Lident("url"), loc});
