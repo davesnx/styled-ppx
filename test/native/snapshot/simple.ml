@@ -18,12 +18,8 @@ module Component = [%styled {j|
   display: block;
 |j}]
 
-let space = "10px"
-let b = "flex"
-  (* margin: 10px $(space)px; *)
-module Component = [%styled {j|
-  margin: $space 12px;
-  display: $b;
+module Component = [%styled fun ~space:(space : string) -> {j|
+  margin: 10px $(space)px;
 |j}]
 
 (* module Component = [%styled fun ~var -> {j|

@@ -37,7 +37,7 @@ As well, saw a few people asking for it ([a](https://reasonml.chat/t/idiomatic-w
 
 ## Installation
 
-This package depends on [bs-emotion](https://github.com/ahrefs/bs-emotion), [ReasonReact](https://reasonml.github.io/reason-react/) and [BuckleScript](https://bucklescript.github.io) make sure you follow their instalations.
+This package depends on [bs-emotion](https://github.com/ahrefs/bs-emotion), [ReasonReact](https://reasonml.github.io/reason-react/) and [BuckleScript](https://bucklescript.github.io), make sure you follow their instalations.
 
 ### With `esy` on native projects
 

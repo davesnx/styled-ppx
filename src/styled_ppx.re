@@ -516,6 +516,7 @@ let moduleMapper = (_, _) => {
       } =>
       let alias = getAlias(pattern, label);
       let type_ = getType(pattern);
+      let tag = getTag(txt);
 
       let firstArg = [
         (label, args, pattern, alias, pattern.ppat_loc, type_),
@@ -524,8 +525,7 @@ let moduleMapper = (_, _) => {
         recursivelyTransformNamedArgs(mapper, expression, []);
 
       let argList = List.append(namedArgList, firstArg);
-
-      let tag = getTag(txt);
+      /* TODO: Raise if there's any NonLabel'ed arg */
 
       if (!List.exists(t => t === tag, Html.tags)) {
         ();
@@ -584,22 +584,40 @@ let moduleMapper = (_, _) => {
           args,
         );
 
-      let extraProps =
+      let variableList = List.map(
+        ((arg, _, _, _, _, type_)) => {
+            /* Gets the type of the argument from the fn definition
+              (~width: int, ~height: int) => {}
+            */
+            let typeName = switch (type_) {
+              | Some(t) => switch (t) {
+              | {
+                  ptyp_desc: Ptyp_constr({txt: Lident(t), _}, _),
+                  ptyp_loc: _,
+                  ptyp_attributes: _,
+                } => t
+                | _ => "string"
+              }
+              | None => "string"
+            };
+            (getLabel(arg), typeName);
+          }, argList);
+
+      let variableProps =
         Some(List.map(
-          ((arg, _, _, _, _, _)) =>
-            createCustomPropLabel(~loc, getLabel(arg), "string"),
-          argList,
+          ((label, typeName)) => createCustomPropLabel(~loc, label, typeName),
+          variableList,
         ));
 
       Mod.mk(
         Pmod_structure([
-          createMakeProps(~loc, extraProps),
+          createMakeProps(~loc, variableProps),
           createReactBinding(~loc),
           createDynamicStyles(
             ~loc,
             ~name=styleVariableName,
             ~args=argList,
-            ~exp=Css_to_emotion.render_declaration_list(ast),
+            ~exp=Css_to_emotion.render_declaration_list(ast, Some(variableList)),
           ),
           createComponent(~loc, ~tag, ~styledExpr),
         ]),
@@ -662,7 +680,7 @@ let moduleMapper = (_, _) => {
           createStyles(
             ~loc,
             ~name=styleVariableName,
-            ~exp=Css_to_emotion.render_declaration_list(ast),
+            ~exp=Css_to_emotion.render_declaration_list(ast, None),
           ),
           createComponent(~loc, ~tag, ~styledExpr),
         ]),

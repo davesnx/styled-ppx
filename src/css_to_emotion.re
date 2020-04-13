@@ -29,6 +29,14 @@ open Longident;
 open Css_types;
 open Component_value;
 
+
+module Option {
+  let get = (opt, def) => switch (opt) {
+    | None => def
+    | Some(o) => o
+  };
+}
+
 let grammar_error = (loc, message) =>
   raise(Css_lexer.GrammarError((message, loc)));
 
@@ -656,7 +664,7 @@ and render_at_rule = (ar: At_rule.t): expression =>
                 | (_, loc) =>
                   grammar_error(loc, "Unexpected @keyframes prelude")
                 };
-              let block_expr = render_declaration_list(sr.Style_rule.block);
+              let block_expr = render_declaration_list(sr.Style_rule.block, None);
               let tuple =
                 Exp.tuple(
                   ~loc=sr.Style_rule.loc,
@@ -692,7 +700,7 @@ and render_at_rule = (ar: At_rule.t): expression =>
   | (n, _) =>
     grammar_error(ar.At_rule.loc, "At-rule @" ++ n ++ " not supported")
   }
-and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
+and render_declaration = (d: Declaration.t, d_loc: Location.t, _variables: list((string, string))): expression => {
   let (name, name_loc) = d.Declaration.name;
   let fnName = to_caml_case(name);
 
@@ -1090,18 +1098,18 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t): expression => {
   }
 }
 and render_declarations =
-    (ds: list(Declaration_list.kind)): list(expression) =>
+    (ds: list(Declaration_list.kind), variables): list(expression) =>
   List.rev_map(
     declaration =>
       switch (declaration) {
       | Declaration_list.Declaration(decl) =>
-        render_declaration(decl, decl.loc)
+        render_declaration(decl, decl.loc, Option.get(variables, []))
       | Declaration_list.At_rule(ar) => render_at_rule(ar)
       },
     ds,
   )
-and render_declaration_list = ((list, loc): Declaration_list.t): expression => {
-  let expr_with_loc_list = render_declarations(list);
+and render_declaration_list = ((list, loc): Declaration_list.t, variables): expression => {
+  let expr_with_loc_list = render_declarations(list, variables);
   let styleExpression = list_to_expr(loc, expr_with_loc_list);
   let ident = Exp.ident(~loc, {txt: Lident("css"), loc});
   let cssFunc = Exp.apply(~loc, ident, [(Nolabel, styleExpression)]);
@@ -1129,7 +1137,7 @@ and render_style_rule = (sr: Style_rule.t): expression => {
       List.rev(prelude),
     );
   let selector_expr = string_to_const(~loc=prelude_loc, selector);
-  let dl_expr = render_declaration_list(sr.Style_rule.block);
+  let dl_expr = render_declaration_list(sr.Style_rule.block, None);
   let lident = "selector";
   let ident =
     Exp.ident(~loc=prelude_loc, {txt: Lident(lident), loc: prelude_loc});
