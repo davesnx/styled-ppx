@@ -1358,8 +1358,6 @@ module Component =
               | None -> React.null))|])
       [@reason.preserve_braces ])
   end
-let space = "10px"
-let b = "flex"
 module Component =
   struct
     type makeProps =
@@ -1795,19 +1793,17 @@ module Component =
       resource: string [@bs.optional ];
       typeof: string [@bs.optional ];
       vocab: string [@bs.optional ];
-      suppressContentEditableWarning: bool [@bs.optional ]}[@@bs.deriving
-                                                             abstract]
+      suppressContentEditableWarning: bool [@bs.optional ];
+      space: string }[@@bs.deriving abstract]
     external createElement :
       string -> < .. >  Js.t -> React.element array -> React.element =
         "createElement"[@@bs.val ][@@bs.module
                                     (("react")[@reason.raw_literal ])]
-    let styles =
-      let open Emotion in
-        css
-          [p (("margin")[@reason.raw_literal ]) space;
-          p (("display")[@reason.raw_literal ]) b]
+    let styles ~space:(space : string)  =
+      let open Emotion in css [margin2 (px 10) (px {js|space|js})]
     let make (props : makeProps) =
-      ((let stylesObject = [%bs.obj { className = styles }] in
+      ((let stylesObject =
+          [%bs.obj { className = (styles ~space:(spaceGet props)) }] in
         let newProps = Js.Obj.assign stylesObject (Obj.magic props) in
         createElement (("div")[@reason.raw_literal "div"]) newProps
           [|((match childrenGet props with
