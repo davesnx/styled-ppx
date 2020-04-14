@@ -1,4 +1,4 @@
-Overview of the interface of styled-ppx
+Overview of the interfaces of styled-ppx
 
 ### styled
 **Styled component without define an HTML tag, defaults to div**
@@ -19,6 +19,12 @@ ReactDOMRe.renderToElementWithId(
   </StyledComponent>,
   "app"
 );
+```
+
+### styled "inline"
+**Styled component with one CSS property**
+```reason
+module StyledComponent = [%styled "display: flex"];
 ```
 
 ### styled.section/span/a/...
