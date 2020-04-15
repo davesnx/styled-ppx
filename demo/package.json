@@ -12,6 +12,7 @@
   "dependencies": {
     "@ahrefs/bs-emotion": "^1.0.0",
     "@ahrefs/bs-emotion-ppx": "^1.0.0",
+    "acorn": "^6.4.1",
     "bs-emotion": "^0.2.0",
     "bs-platform": "7.0.1",
     "concurrently": "^5.1.0",
