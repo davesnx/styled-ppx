@@ -35,8 +35,7 @@ I love CSS and I'm coming from the JavaScript world: writing React with styled-c
 
 As well, saw a few people asking for it ([a](https://reasonml.chat/t/idiomatic-way-to-bind-to-styled-components/886) [f](https://reasonml.chat/t/styled-components-possible/554)[e](https://reasonml.chat/t/styling-solutions-reasonreact-as-of-aug-18/958)[w](https://reasonml.chat/t/options-and-best-practices-for-styling-in-reasonreact/261) [t](https://twitter.com/lyovson/status/1233397294311100417)[i](https://discord.gg/byjdYFH)[m](https://discord.gg/byjdYFH)[e](https://discord.gg/byjdYFH)[s](https://discord.gg/byjdYFH)). So I took the time to create it with help from [@jchavarri](https://github.com/jchavarri) 🙌.
 
-Here's a presentation from **WFH (Working From Home Conf) 2020**. Where I explain in more detail. <a href="http://www.youtube.com/watch?feature=player_embedded&v=D8WhIeMIZQc&feature=youtu.be&t=468
-" target="_blank">CSS in Reason/OCaml by David Sancho</a>
+If you want to know more, I really do recommend [watching my talk at WFH 2020](http://www.youtube.com/watch?feature=player_embedded&v=D8WhIeMIZQc&feature=youtu.be&t=468).
 
 ## Installation
 
