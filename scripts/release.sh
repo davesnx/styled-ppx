@@ -8,7 +8,7 @@ function bump_dune() {
 }
 
 function bump_all() {
-  versionNumber=$(jq -r ".version" esy.json)
+  versionNumber=$(jq -r ".version" package.json)
   version="v$versionNumber"
   bump_dune "dune-project" "$version"
 }
