@@ -22,6 +22,8 @@ module Component = [%styled fun ~space:(space : string) -> {j|
   margin: 10px $(space)px;
 |j}]
 
+let _ = [%css (("display: block")[@reason.raw_literal "display: block"])]
+
 (* module Component = [%styled fun ~var -> {j|
   color: $var;
   display: block;

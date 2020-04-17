@@ -485,17 +485,61 @@ let createMakeProps = (~loc, extraProps) => {
   );
 };
 
-let moduleMapper = (_, _) => {
+let styledPpxMapper = (_, _) => {
   ...default_mapper,
+  /*
+    This is what defines where the ppx should be hooked into, in this case
+    we transform expr ("expressions").
+  */
+  expr: (mapper, expr) => {
+    switch (expr) {
+    | { pexp_desc: Pexp_extension((
+      {txt: "css", _},
+      PStr([
+        {
+          pstr_desc:
+            Pstr_eval(
+              {
+                pexp_loc: loc,
+                pexp_desc: Pexp_constant(Pconst_string(styles, delim)),
+                _,
+              },
+              _,
+            ),
+          _,
+        },
+      ]),
+    )), pexp_loc: _, pexp_attributes: _} => {
+      let loc_start =
+        switch (delim) {
+        | None => loc.Location.loc_start
+        | Some(s) => {
+            ...loc.Location.loc_start,
+            Lexing.pos_cnum:
+              loc.Location.loc_start.Lexing.pos_cnum + String.length(s) + 1,
+          }
+        };
+
+        let ast = Css_lexer.parse_string(
+          ~container_lnum=loc_start.Lexing.pos_lnum,
+          ~pos=loc_start,
+          styles,
+          Css_parser.declaration_list,
+        );
+
+        Css_to_emotion.render_declaration_list(ast, None)
+    }
+    | _ => default_mapper.expr(mapper, expr)
+    };
+  },
   /**
-   * This is what defines [%styled] as an extension point and provides the PPX
-   * with how to transform the modules that contain the extension.
+   * This is what defines [%styled] as an extension point that hooks into module_expr,
+   so all the modules pass into here and we patter-match the ones with [%styled.div () => {||}]
   */
   module_expr: (mapper, expr) =>
     switch (expr) {
     | {
         pmod_desc:
-          /* This case is [%styled.div () => {||}] */
           Pmod_extension((
             {txt, _},
             PStr([
@@ -690,4 +734,4 @@ let moduleMapper = (_, _) => {
 };
 
 let () =
-  Driver.register(~name="styled-ppx", Versions.ocaml_406, moduleMapper);
+  Driver.register(~name="styled-ppx", Versions.ocaml_406, styledPpxMapper);
