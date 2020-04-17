@@ -1811,3 +1811,4 @@ module Component =
               | None -> React.null))|])
       [@reason.preserve_braces ])
   end
+let _ = let open Emotion in css [display `block]
