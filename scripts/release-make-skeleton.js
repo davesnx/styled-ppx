@@ -3,7 +3,7 @@
 const { execSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
-const esy = require("../esy.json");
+const esy = require("../package.json");
 
 const filesToCopy = ["LICENSE", "README.md"];
 
@@ -57,18 +57,18 @@ const pkgJson = {
   license: esy.license,
   repository: esy.repository,
   scripts: {
-    postinstall: "node postinstall.js"
+    postinstall: "node postinstall.js",
   },
   bin: {
-    "styled-ppx": "styled-ppx.exe"
+    "styled-ppx": "styled-ppx.exe",
   },
   files: [
     "platform-windows-x64/",
     "platform-linux-x64/",
     "platform-darwin-x64/",
     "postinstall.js",
-    "styled-ppx.exe"
-  ]
+    "styled-ppx.exe",
+  ],
 };
 
 fs.writeFileSync(
