@@ -23,14 +23,15 @@ module Link = [%styled.a {|
 
 let space = "10px";
 
-module Component = [%styled (~background, ~space) => {j|
+module Component = [%styled (~background: string, ~space: int) => {j|
   background-color: $background;
-  margin: $space;
+  padding: $space;
+  border-radius: 20px;
 |j}];
 
 ReactDOMRe.renderToElementWithId(
   <App onClick={Js.log} background="#443434">
-    <Component background="#FFFFFF" space="3">
+    <Component background="#FFFFFF" space=30>
       {React.string("Demo of...")}
     </Component>
     <Link href="https://github.com/davesnx/styled-ppx">
