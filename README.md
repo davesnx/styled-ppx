@@ -30,6 +30,8 @@ ReactDOMRe.renderToElementWithId(
 );
 ```
 
+Take a look at all the methods in [here](./docs/apis.md).
+
 ## Motivation
 I love CSS and I'm coming from the JavaScript world: writing React with styled-components mostly. I found it, one of the best combos to write scalable frontend applications and wasn't a reality in ReasonML/OCaml.
 
