@@ -17,3 +17,5 @@ This are some resources that I collect while creating this ppx. It showcase some
   - https://github.com/thierry-martinez/metapp
 
 - OCaml CSS Parser https://github.com/astrada/ocaml-css-parser
+
+CSS Syntax https://csstree.github.io/docs/syntax/
