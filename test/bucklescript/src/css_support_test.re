@@ -79,4 +79,4 @@ Belt.List.forEachWithIndex(supportList, (index, css) => {
     |> expect
     |> toMatchSnapshot
   });
-}));
+});
