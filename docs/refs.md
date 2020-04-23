@@ -12,8 +12,11 @@ This are some resources that I collect while creating this ppx. It showcase some
   - jsoo-react ppx https://github.com/jchavarri/jsoo-react/blob/master/ppx/Rroo_jsoo_ppx.re
   - bs-emotion ppx https://github.com/ahrefs/bs-emotion/blob/master/bs-emotion-ppx/src/EmotionPpx.re
   - genType https://github.com/cristianoc/genType
-  - AstUtils https://github.com/rrdelaney/reason-dre/blob/master/lib/AstUtils.re
   - https://github.com/roddyyaga/ppx_rapper
   - https://github.com/thierry-martinez/metapp
+
+- Compilation of AST Helpers from ppx's
+  - https://github.com/MinimaHQ/re-formality/blob/make-all-folds-tail-recursive/lib/ppx/AstHelpers.re
+  - https://github.com/rrdelaney/reason-dre/blob/master/lib/AstUtils.re
 
 - OCaml CSS Parser https://github.com/astrada/ocaml-css-parser
