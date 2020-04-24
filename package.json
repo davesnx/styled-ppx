@@ -5,6 +5,15 @@
   "author": "David Sancho <dsnxmoreno@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/davesnx/styled-ppx",
+  "keywords": [
+    "reason",
+    "ocaml",
+    "ppx",
+    "bucklescript",
+    "css",
+    "styled-components",
+    "emotion"
+  ],
   "bugs": {
     "url": "https://github.com/davesnx/styled-ppx/issues"
   },
