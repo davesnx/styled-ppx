@@ -16,7 +16,7 @@ This are some resources that I collect while creating this ppx. It showcase some
   - https://github.com/thierry-martinez/metapp
 
 - Compilation of AST Helpers from ppx's
-  - https://github.com/MinimaHQ/re-formality/blob/make-all-folds-tail-recursive/lib/ppx/AstHelpers.re
+  - https://github.com/MinimaHQ/re-formality/blob/master/lib/ppx/AstHelpers.re
   - https://github.com/rrdelaney/reason-dre/blob/master/lib/AstUtils.re
 
 - OCaml CSS Parser https://github.com/astrada/ocaml-css-parser
