@@ -632,8 +632,8 @@ let rec render_value = ((cv, loc): with_loc(t)): expression => {
     let const = number_to_const(number);
     render_dimension(~loc, number, dimension, const);
   | Unicode_range(_) => grammar_error(loc, "Unsupported unicode range")
-  | Operator(_) => grammar_error(loc, "Unsupported operator")
-  | Delim(_) => grammar_error(loc, "Unsupported delimiter")
+  | Operator(o) => grammar_error(loc, "Unsupported operator:" ++ o)
+  | Delim(d) => grammar_error(loc, "Unsupported delimiter: " ++ d)
   | TypedVariable((variable, func)) => {
     let ident = Exp.ident(~loc, {txt: Lident(func), loc});
     let arg = string_to_const(~loc, variable);
