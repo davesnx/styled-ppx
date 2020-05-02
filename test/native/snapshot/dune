@@ -1,4 +1,4 @@
-(executable
+(test
  (name main)
  (libraries styled-ppx.lib)
  (preprocess

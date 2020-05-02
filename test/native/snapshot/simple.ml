@@ -29,3 +29,7 @@ let _ = [%css (("display: block")[@reason.raw_literal "display: block"])]
   display: block;
 |j}]
  *)
+
+module Component = [%styled.section {|
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1.0fr));
+|}]

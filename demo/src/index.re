@@ -23,15 +23,32 @@ module Link = [%styled.div {|
 
 let space = "10px";
 
-module Component = [%styled (~background: string, ~space: int) => {j|
-  background-color: $background;
-  padding: $space;
+module Component = [%styled.div {j|
   border-radius: 20px;
 |j}];
 
+let styles = Emotion.(
+  css([
+    gridTemplateColumns(
+      list(
+        [
+          repeat(
+            autoFill,
+            [
+              minmax(
+                px(200), fr(1.0)
+              )
+            ]
+          )
+        ]
+      ),
+    ),
+  ])
+);
+
 ReactDOMRe.renderToElementWithId(
   <App onClick={Js.log} background="#443434">
-    <Component background="#FFFFFF" space=30>
+    <Component>
       {React.string("Demo of...")}
     </Component>
     <Link href="https://github.com/davesnx/styled-ppx">

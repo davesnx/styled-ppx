@@ -579,7 +579,14 @@ let rec render_value = ((cv, loc): with_loc(t)): expression => {
       };
     };
 
-    Exp.apply(~loc, ident, List.map(a => (Nolabel, a), args));
+    switch (name) {
+      | "repeat" => {
+        /* let repeatValue = List.rev_map(render_params, grouped_params); */
+        /* let (repeatParams, _) = List.tl(List.nth(grouped_params, 0)); */
+        Exp.apply(~loc, ident, List.map(a => (Nolabel, a), []));
+      }
+      | _ => Exp.apply(~loc, ident, List.map(a => (Nolabel, a), args));
+    }
   };
 
   switch (cv) {
@@ -778,6 +785,29 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t, _variables: list(
     let box_shadow_list =
       List.map(arg => Exp.apply(animation_ident, arg), args);
     Exp.apply(ident, [(Nolabel, list_to_expr(name_loc, box_shadow_list))]);
+  };
+
+  /* https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template */
+  let render_grid_template = (params, loc) => {
+    let grid_args = ((grouped_param, _)) =>
+      List.fold_right((cv, args) => [render_value(cv), ...args], grouped_param, []);
+
+    let grouped_params = group_params(params);
+    let args =
+      List.rev_map(params => grid_args(params), grouped_params);
+
+    let gridValues =
+      List.map(arg => Exp.tuple(~loc, arg), args);
+    let propertyFnName =
+      Exp.ident(~loc=name_loc, {txt: Lident(fnName), loc: name_loc});
+
+    let listValues = Exp.ident(~loc=name_loc, {txt: Lident("list"), loc: name_loc});
+    let gridListValues = Exp.apply(~loc=name_loc, listValues, [(Nolabel, list_to_expr(name_loc, gridValues))]);
+
+    Exp.apply(
+      propertyFnName,
+      [(Nolabel, gridListValues)],
+    );
   };
 
   /* https://developer.mozilla.org/en-US/docs/Web/CSS/text-shadow */
@@ -1088,6 +1118,8 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t, _variables: list(
       | "flex-shrink" => render_flex_grow_shrink(newValueList, loc)
       | "font-weight" => render_font_weight(newValueList, loc)
       | "flex" => render_flex(newValueList, loc)
+      | "grid-template-rows"
+      | "grid-template-columns" => render_grid_template(newValueList, loc)
       | "padding"
       | "margin" => render_margin_padding(newValueList, loc)
       | "border"
