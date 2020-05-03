@@ -25,9 +25,10 @@ let space = "10px";
 
 module Component = [%styled.div {j|
   border-radius: 20px;
+  grid-template-columns: repeat(auto-fill, 250px);
 |j}];
 
-let styles = Emotion.(
+/* let styles = Emotion.(
   css([
     gridTemplateColumns(
       list(
@@ -46,6 +47,19 @@ let styles = Emotion.(
   ])
 );
 
+  css([gridTemplateColumns(
+    list(
+      [
+        repeat(
+          minmax(
+            px(200),
+            fr(1.0)
+          )
+        )
+      ]
+    )
+)])
+ */
 ReactDOMRe.renderToElementWithId(
   <App onClick={Js.log} background="#443434">
     <Component>

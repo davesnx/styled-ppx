@@ -29,7 +29,6 @@ open Longident;
 open Css_types;
 open Component_value;
 
-
 module Option {
   let get = (opt, def) => switch (opt) {
     | None => def
@@ -231,6 +230,16 @@ let group_params = params => {
     };
 
   group_params([], params);
+};
+
+let _removeItem = (e, l) => {
+  let rec remove = (l, acc) =>
+    switch (l) {
+    | [] => List.rev(acc)
+    | [x, ...xs] when e == x => remove(xs, acc)
+    | [x, ...xs] => remove(xs, [x, ...acc])
+    };
+  remove(l, []);
 };
 
 let is_time = value =>
@@ -579,14 +588,7 @@ let rec render_value = ((cv, loc): with_loc(t)): expression => {
       };
     };
 
-    switch (name) {
-      | "repeat" => {
-        /* let repeatValue = List.rev_map(render_params, grouped_params); */
-        /* let (repeatParams, _) = List.tl(List.nth(grouped_params, 0)); */
-        Exp.apply(~loc, ident, List.map(a => (Nolabel, a), []));
-      }
-      | _ => Exp.apply(~loc, ident, List.map(a => (Nolabel, a), args));
-    }
+    Exp.apply(~loc, ident, List.map(a => (Nolabel, a), args));
   };
 
   switch (cv) {
@@ -789,12 +791,11 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t, _variables: list(
 
   /* https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template */
   let render_grid_template = (params, loc) => {
-    let grid_args = ((grouped_param, _)) =>
-      List.fold_right((cv, args) => [render_value(cv), ...args], grouped_param, []);
-
     let grouped_params = group_params(params);
     let args =
-      List.rev_map(params => grid_args(params), grouped_params);
+      List.rev_map(((params, _)) => {
+        List.fold_right((cv, args) => [render_value(cv), ...args], params, [])
+      }, grouped_params);
 
     let gridValues =
       List.map(arg => Exp.tuple(~loc, arg), args);
