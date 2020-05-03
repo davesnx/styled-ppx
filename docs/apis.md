@@ -63,12 +63,24 @@ module Box = [%styled.a {|
 
 ### styled.global
 **Inject global css**, method to apply general styles to your website.
-
 ```reason
 [%styled.global {|
   html, body {
     margin: 0;
     padding: 0;
+  }
+|}];
+```
+Accepts only one selector declaration, so this will not compile:
+```reason
+[%styled.global {|
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+
+  .div {
+    display: flex;
   }
 |}];
 ```
