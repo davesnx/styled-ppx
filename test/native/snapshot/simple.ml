@@ -1,3 +1,9 @@
+[%styled.global {|
+  html, body {
+    margin: 0;
+  }
+|}]
+
 (* Shoudn't break other ppxs with similar APIs *)
 module StateLenses = [%lenses
   type state = {

@@ -1,3 +1,4 @@
+;;let open Emotion in Emotion.global {js|html , body|js} [margin zero]
 module StateLenses = [%lenses type state = {
                                 email: string ;
                                 age: int }]

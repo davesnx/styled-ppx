@@ -1,3 +1,10 @@
+[%styled.global {|
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+|}];
+
 module App = [%styled.div (~background) => {j|
   position: absolute;
   top: 0;
