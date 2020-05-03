@@ -527,7 +527,48 @@ let styledPpxMapper = (_, _) => {
           Css_parser.declaration_list,
         );
 
-      Css_to_emotion.render_declaration_list(ast, None);
+      Css_to_emotion.render_emotion_css(ast, None);
+    | {
+        pexp_desc:
+          Pexp_extension((
+            {txt: "styled.global", _},
+            PStr([
+              {
+                pstr_desc:
+                  Pstr_eval(
+                    {
+                      pexp_loc: loc,
+                      pexp_desc: Pexp_constant(Pconst_string(styles, delim)),
+                      _,
+                    },
+                    _,
+                  ),
+                _,
+              },
+            ]),
+          )),
+        pexp_loc: _,
+        pexp_attributes: _,
+      } =>
+      let loc_start =
+        switch (delim) {
+        | None => loc.Location.loc_start
+        | Some(s) => {
+            ...loc.Location.loc_start,
+            Lexing.pos_cnum:
+              loc.Location.loc_start.Lexing.pos_cnum + String.length(s) + 1,
+          }
+        };
+
+      let ast =
+        Css_lexer.parse_string(
+          ~container_lnum=loc_start.Lexing.pos_lnum,
+          ~pos=loc_start,
+          styles,
+          Css_parser.stylesheet,
+        );
+
+      Css_to_emotion.render_global(ast);
     | _ => default_mapper.expr(mapper, expr)
     };
   },
@@ -667,7 +708,7 @@ let styledPpxMapper = (_, _) => {
             ~name=styleVariableName,
             ~args=argList,
             ~exp=
-              Css_to_emotion.render_declaration_list(
+              Css_to_emotion.render_emotion_css(
                 ast,
                 Some(variableList),
               ),
@@ -735,7 +776,7 @@ let styledPpxMapper = (_, _) => {
           createStyles(
             ~loc,
             ~name=styleVariableName,
-            ~exp=Css_to_emotion.render_declaration_list(ast, None),
+            ~exp=Css_to_emotion.render_emotion_css(ast, None),
           ),
           createComponent(~loc, ~tag, ~styledExpr),
         ]),

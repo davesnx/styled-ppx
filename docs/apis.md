@@ -61,6 +61,18 @@ module Box = [%styled.a {|
 <Box />
 ```
 
+### styled.global
+**Inject global css**, method to apply general styles to your website.
+
+```reason
+[%styled.global {|
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+|}];
+```
+
 ### Dynamic styled components
 **Styled component with styles defined by props**
 In this case, `styled` recieves a function, it doesn't recieve a string as the other cases. This allows to create styled components with a component API.

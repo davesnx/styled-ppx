@@ -1,3 +1,24 @@
+[%styled.global {|
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+|}];
+/* Emotion.global(
+  "html, body",
+  [
+    Emotion.minHeight(`pct(100.)),
+    Emotion.fontFamily("Tahoma, sans-serif")
+  ],
+);
+
+Emotion.(Emotion.global({js|html , body|js}, [Emotion.margin(zero)]));
+ */
+/* Emotion.global(
+  selector({js|html , body|js}, Emotion.(css([margin(zero)])))
+);
+ */
+
 module App = [%styled.div (~background) => {j|
   position: absolute;
   top: 0;
