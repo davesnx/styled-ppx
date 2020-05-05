@@ -29,13 +29,16 @@ open Longident;
 open Css_types;
 open Component_value;
 
-
 module Option {
   let get = (opt, def) => switch (opt) {
     | None => def
     | Some(o) => o
   };
-}
+};
+
+module Emotion = {
+  let wrapper = name => Ldot(Lident("Emotion"), name);
+};
 
 let grammar_error = (loc, message) =>
   raise(Css_lexer.GrammarError((message, loc)));
@@ -169,7 +172,7 @@ let raw_literal = (~loc, str) =>
 
 /* let p = (prop, value) => [(prop, value)]->Declaration.pack; */
 let render_unsafe = (~loc, proproperty, value) => {
-  let unsafeFnP = Exp.ident(~loc, {txt: Lident("p"), loc});
+  let unsafeFnP = Exp.ident(~loc, {txt: Emotion.wrapper("p"), loc});
   let valueName = Exp.ident(~loc, {txt: Lident(value), loc});
 
   Exp.apply(
@@ -385,7 +388,7 @@ let render_dimension = (~loc, number, dimension, const) => {
   let ident =
     Exp.ident(
       ~loc=dimension_loc,
-      {txt: Lident(dimension), loc: dimension_loc},
+      {txt: Emotion.wrapper(dimension), loc: dimension_loc},
     );
   let arg = Exp.constant(~loc=number_loc, const);
   Exp.apply(~loc, ident, [(Nolabel, arg)]);
@@ -400,7 +403,7 @@ let rec render_value = ((cv, loc): with_loc(t)): expression => {
     let ident =
       Exp.ident(
         ~loc=name_loc,
-        {txt: Lident(caml_case_name), loc: name_loc},
+        {txt: Emotion.wrapper(caml_case_name), loc: name_loc},
       );
     let grouped_params = group_params(params);
     let args = {
@@ -586,7 +589,7 @@ let rec render_value = ((cv, loc): with_loc(t)): expression => {
   | Paren_block(cs) => render_block("(", ")", cs)
   | Bracket_block(cs) => render_block("[", "]", cs)
   | Percentage(p) =>
-    let ident = Exp.ident(~loc, {txt: Lident("pct"), loc});
+    let ident = Exp.ident(~loc, {txt: Emotion.wrapper("pct"), loc});
     let arg = Exp.constant(~loc, float_to_const(p));
     Exp.apply(~loc, ident, [(Nolabel, arg)]);
   | Ident(i) when Html.isColor(i) => render_html_color(~loc, i);
@@ -595,20 +598,20 @@ let rec render_value = ((cv, loc): with_loc(t)): expression => {
     if (is_variant(i)) {
       Exp.variant(~loc, name, None);
     } else {
-      Exp.ident(~loc, {txt: Lident(name), loc});
+      Exp.ident(~loc, {txt: Emotion.wrapper(name), loc});
     };
   | String(s) => string_to_const(~loc, s)
   | Uri(s) =>
-    let ident = Exp.ident(~loc, {txt: Lident("url"), loc});
+    let ident = Exp.ident(~loc, {txt: Emotion.wrapper("url"), loc});
     let arg = string_to_const(~loc, s);
     Exp.apply(~loc, ident, [(Nolabel, arg)]);
   | Hash(s) =>
-    let ident = Exp.ident(~loc, {txt: Lident("hex"), loc});
+    let ident = Exp.ident(~loc, {txt: Emotion.wrapper("hex"), loc});
     let arg = string_to_const(~loc, s);
     Exp.apply(~loc, ident, [(Nolabel, arg)]);
   | Number(s) =>
     switch (s) {
-    | "0" => Exp.ident(~loc, {txt: Lident("zero"), loc})
+    | "0" => Exp.variant(~loc, "zero", None)
     | _ => Exp.constant(~loc, number_to_const(s))
     }
   | Function(f, params) => render_function(f, params)
@@ -628,7 +631,7 @@ let rec render_value = ((cv, loc): with_loc(t)): expression => {
   | Operator(_) => grammar_error(loc, "Unsupported operator")
   | Delim(_) => grammar_error(loc, "Unsupported delimiter")
   | TypedVariable((variable, func)) => {
-    let ident = Exp.ident(~loc, {txt: Lident(func), loc});
+    let ident = Exp.ident(~loc, {txt: Emotion.wrapper(func), loc});
     let arg = string_to_const(~loc, variable);
     Exp.apply(~loc, ident, [(Nolabel, arg)]);
   }
@@ -707,7 +710,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t, _variables: list(
   let render_standard_declaration = (fnName, valueList) => {
     let args = List.map(render_value, valueList);
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Lident(fnName), loc: name_loc});
+      Exp.ident(~loc=name_loc, {txt: Emotion.wrapper(fnName), loc: name_loc});
     Exp.apply(~loc=d_loc, ident, List.map(a => (Nolabel, a), args));
   };
 
@@ -790,7 +793,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t, _variables: list(
     let args =
       List.rev_map(params => text_shadow_args(params), grouped_params);
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Lident(name), loc: name_loc});
+      Exp.ident(~loc=name_loc, {txt: Emotion.wrapper(name), loc: name_loc});
     let text_shadow_list =
       List.map(arg => Exp.tuple(~loc, arg), args);
 
@@ -903,7 +906,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t, _variables: list(
     let args =
       List.rev_map(params => font_family_args(params), grouped_params);
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Lident("fontFamily"), loc: name_loc});
+      Exp.ident(~loc=name_loc, {txt: Emotion.wrapper("fontFamily"), loc: name_loc});
     Exp.apply(
       ~loc=name_loc,
       ident,
@@ -925,7 +928,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t, _variables: list(
       };
 
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Lident(fnName), loc: name_loc});
+      Exp.ident(~loc=name_loc, {txt: Emotion.wrapper(fnName), loc: name_loc});
     Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
   };
 
@@ -943,7 +946,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t, _variables: list(
       };
 
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Lident(fnName), loc: name_loc});
+      Exp.ident(~loc=name_loc, {txt: Emotion.wrapper(fnName), loc: name_loc});
     Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
   };
 
@@ -966,7 +969,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t, _variables: list(
       };
 
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Lident(fnName), loc: name_loc});
+      Exp.ident(~loc=name_loc, {txt: Emotion.wrapper(fnName), loc: name_loc});
     Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
   };
 
@@ -991,7 +994,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t, _variables: list(
     let args = border_outline_args(params, loc);
     let fnName2 = fnName ++ "2";
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Lident(fnName2), loc: name_loc});
+      Exp.ident(~loc=name_loc, {txt: Emotion.wrapper(fnName2), loc: name_loc});
     Exp.apply(ident, args);
   };
 
@@ -1001,7 +1004,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t, _variables: list(
       parameter_count > 1 ? fnName ++ string_of_int(parameter_count) : fnName;
 
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Lident(fnNameN), loc: name_loc});
+      Exp.ident(~loc=name_loc, {txt: Emotion.wrapper(fnNameN), loc: name_loc});
     let args = List.map(v => (Nolabel, render_value(v)), vs);
     Exp.apply(~loc=d_loc, ident, args);
   };
@@ -1019,7 +1022,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t, _variables: list(
       };
 
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Lident("opacity"), loc: name_loc});
+      Exp.ident(~loc=name_loc, {txt: Emotion.wrapper("opacity"), loc: name_loc});
     Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
   };
 
@@ -1057,7 +1060,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t, _variables: list(
     let args = [(Nolabel, Exp.variant(~loc, "some", Some(expression)))];
 
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Lident(fnName), loc: name_loc});
+      Exp.ident(~loc=name_loc, {txt: Emotion.wrapper(fnName), loc: name_loc});
     Exp.apply(~loc=name_loc, ident, args);
   };
 
@@ -1113,16 +1116,11 @@ and render_declaration_list = ((list, loc): Declaration_list.t, variables): expr
   list_to_expr(loc, expr_with_loc_list);
 }
 
-let openEmotionWrapper = (~loc, expr) => {
-  Exp.open_(~loc, Fresh, {txt: Lident("Emotion"), loc}, expr);
-};
-
 let render_emotion_css = ((list, loc): Declaration_list.t, variables): expression => {
   let declarationListValues = render_declaration_list((list, loc), variables);
-  let ident = Exp.ident(~loc, {txt: Lident("css"), loc});
-  let cssFunc = Exp.apply(~loc, ident, [(Nolabel, declarationListValues)]);
+  let ident = Exp.ident(~loc, {txt: Emotion.wrapper("css"), loc});
 
-  openEmotionWrapper(~loc, cssFunc);
+  Exp.apply(~loc, ident, [(Nolabel, declarationListValues)]);
 };
 
 let render_style_rule = (ident, sr: Style_rule.t): expression => {
@@ -1163,11 +1161,11 @@ let render_rule = (ident, r: Rule.t): expression => {
 };
 
 let render_global = ((ruleList, loc): Stylesheet.t): expression => {
-  let emotionGlobal = Exp.ident(~loc, {txt: Ldot(Lident("Emotion"), "global"), loc});
+  let emotionGlobal = Exp.ident(~loc, {txt: Emotion.wrapper("global"), loc});
 
   switch (ruleList) {
     /* There's only one rule: */
-    | [rule] => openEmotionWrapper(~loc, render_rule(emotionGlobal, rule))
+    | [rule] => render_rule(emotionGlobal, rule)
     /* There's more than one */
     | [..._res] => grammar_error(loc, {|
       styled.global only supports one style selector, add one styled.global per selector.
