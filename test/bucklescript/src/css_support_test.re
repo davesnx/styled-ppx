@@ -1,5 +1,4 @@
 open Jest;
-open Expect;
 
 let supportList = [
   [%css "opacity: 0.9"],
@@ -71,12 +70,15 @@ let supportList = [
   /* [%css "transform: perspective(17px)" */
 
   /* [%css "font-family: 'Open Sans', '-system', sans-serif"], */
+
+  /* [%css "grid-template-columns: repeat(auto-fill, minmax(200px, 1.0fr))" */
+  /* [%css "grid-gap: 1rem" */
 ];
 
 Belt.List.forEachWithIndex(supportList, (index, css) => {
-  test("Component " ++ string_of_int(index) ++ " renders ", () => {
+  test("Component " ++ string_of_int(index) ++ " renders", () => {
     css
-    |> expect
-    |> toMatchSnapshot
+    |> Expect.expect
+    |> Expect.toMatchSnapshot
   });
 });
