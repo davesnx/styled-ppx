@@ -1,11 +1,5 @@
 open Jest;
 
-/* https://github.com/emotion-js/emotion/tree/master/packages/jest-emotion#snapshot-serializer */
-[%%raw "
-const { createSerializer } = require('jest-emotion');
-expect.addSnapshotSerializer(createSerializer());
-"]
-
 let supportList = [
   [%css "opacity: 0.9"],
   /* [%css "box-shadow: 1px 54px 1px blue"], */
