@@ -20,3 +20,5 @@ This are some resources that I collect while creating this ppx. It showcase some
   - https://github.com/rrdelaney/reason-dre/blob/master/lib/AstUtils.re
 
 - OCaml CSS Parser https://github.com/astrada/ocaml-css-parser
+
+CSS Syntax https://csstree.github.io/docs/syntax/
