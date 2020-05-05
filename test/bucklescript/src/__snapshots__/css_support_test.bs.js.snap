@@ -1,9 +1,3 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Component Opacity renders  1`] = `
-<div>
-  <div
-    class="css-cyc7w5"
-  />
-</div>
-`;
+exports[`Component 0 renders  1`] = `"css-cyc7w5"`;
