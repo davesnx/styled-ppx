@@ -1,3 +1,10 @@
+[%styled.global {|
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+|}];
+
 module App = [%styled.div (~background) => {j|
   position: absolute;
   top: 0;
@@ -15,7 +22,7 @@ module App = [%styled.div (~background) => {j|
   cursor: pointer;
 |j}];
 
-module Link = [%styled.a {|
+module Link = [%styled.div {|
   color: #FFFFFF;
   font-size: 36px;
   margin-top: 16px;

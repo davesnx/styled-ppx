@@ -1110,13 +1110,22 @@ and render_declarations =
   )
 and render_declaration_list = ((list, loc): Declaration_list.t, variables): expression => {
   let expr_with_loc_list = render_declarations(list, variables);
-  let styleExpression = list_to_expr(loc, expr_with_loc_list);
-  let ident = Exp.ident(~loc, {txt: Lident("css"), loc});
-  let cssFunc = Exp.apply(~loc, ident, [(Nolabel, styleExpression)]);
-
-  Exp.open_(~loc, Fresh, {txt: Lident("Emotion"), loc}, cssFunc);
+  list_to_expr(loc, expr_with_loc_list);
 }
-and render_style_rule = (sr: Style_rule.t): expression => {
+
+let openEmotionWrapper = (~loc, expr) => {
+  Exp.open_(~loc, Fresh, {txt: Lident("Emotion"), loc}, expr);
+};
+
+let render_emotion_css = ((list, loc): Declaration_list.t, variables): expression => {
+  let declarationListValues = render_declaration_list((list, loc), variables);
+  let ident = Exp.ident(~loc, {txt: Lident("css"), loc});
+  let cssFunc = Exp.apply(~loc, ident, [(Nolabel, declarationListValues)]);
+
+  openEmotionWrapper(~loc, cssFunc);
+};
+
+let render_style_rule = (ident, sr: Style_rule.t): expression => {
   let (prelude, prelude_loc) = sr.Style_rule.prelude;
   let selector =
     List.fold_left(
@@ -1138,17 +1147,36 @@ and render_style_rule = (sr: Style_rule.t): expression => {
     );
   let selector_expr = string_to_const(~loc=prelude_loc, selector);
   let dl_expr = render_declaration_list(sr.Style_rule.block, None);
-  let lident = "selector";
-  let ident =
-    Exp.ident(~loc=prelude_loc, {txt: Lident(lident), loc: prelude_loc});
+
   Exp.apply(
     ~loc=sr.Style_rule.loc,
     ident,
     [(Nolabel, selector_expr), (Nolabel, dl_expr)],
   );
 }
-and render_rule = (r: Rule.t): expression =>
+
+let render_rule = (ident, r: Rule.t): expression => {
   switch (r) {
-  | Rule.Style_rule(sr) => render_style_rule(sr)
+  | Rule.Style_rule(sr) => render_style_rule(ident, sr)
   | Rule.At_rule(ar) => render_at_rule(ar)
-  };
+  }
+};
+
+let render_global = ((ruleList, loc): Stylesheet.t): expression => {
+  let emotionGlobal = Exp.ident(~loc, {txt: Ldot(Lident("Emotion"), "global"), loc});
+
+  switch (ruleList) {
+    /* There's only one rule: */
+    | [rule] => openEmotionWrapper(~loc, render_rule(emotionGlobal, rule))
+    /* There's more than one */
+    | [..._res] => grammar_error(loc, {|
+      styled.global only supports one style selector, add one styled.global per selector.
+
+      Like following:
+
+        [%styled.global ""];
+        [%styled.global ""];
+    |})
+    /* TODO: Add rule to string to finish this error message */
+  }
+};

@@ -1,0 +1,33 @@
+{
+  "name": "nextjs-default",
+  "version": "0.0.1",
+  "author": "David Sancho <dsnxmoreno@gmail.com>",
+  "license": "Apache License 2.0",
+  "dependencies": {
+    "@ahrefs/bs-emotion": "^1.0.1",
+    "@glennsl/bs-json": "^3.0.0",
+    "bs-fetch": "^0.3.1",
+    "gentype": "^3.6.0",
+    "isomorphic-unfetch": "^3.0.0",
+    "next": "^9.3.5",
+    "next-transpile-modules": "^3.2.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "reason-react": "^0.7.0",
+    "request": "^2.88.0"
+  },
+  "scripts": {
+    "dev": "next",
+    "build": "bsb -clean-world -make-world && next build",
+    "now-build": "bsb -clean-world -make-world && next build",
+    "export": "next export",
+    "start": "next start",
+    "re:build": "bsb -make-world",
+    "re:clean": "bsb -clean-world",
+    "re:start": "bsb -make-world -w"
+  },
+  "devDependencies": {
+    "bs-platform": "^7.1.1",
+    "concurrently": "^5.1.0"
+  }
+}

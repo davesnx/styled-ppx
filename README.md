@@ -13,7 +13,9 @@ Allows you to create **React Components** with style definitions with CSS that d
 ## Usage
 **`styled-ppx`** implements a ppx that transforms `[%styled]` extensions points into `[@react.components]` modules with [bs-emotion](https://github.com/ahrefs/bs-emotion) as styles, which does all the CSS-in-JS under the hood thanks to [emotion](https://emotion.sh).
 
-This is how you write components in ReasonML/OCaml with this ppx:
+This is how you can write components in ReasonML or OCaml with this ppx:
+
+### Standard styled component
 ```reason
 module StyledComponent = [%styled.div {|
   display: flex;
@@ -32,7 +34,32 @@ ReactDOMRe.renderToElementWithId(
 );
 ```
 
-Take a look at all the methods in [here](./docs/apis.md).
+### Dynamic styled component
+```reason
+module Dynamic = [%styled (~content, ~background) => {j|
+  color: $(content);
+  background-color: $(background);
+|j}];
+
+ReactDOMRe.renderToElementWithId(
+  <Dynamic content="#EB5757" background="#516CF0" />
+      {React.string("Hello!")}
+  </Dynamic>,
+  "app"
+);
+```
+
+### Inline css function
+```reason
+ReactDOMRe.renderToElementWithId(
+  <span className=[%css "font-size: 34px"]/>
+    {React.string("Hello!")}
+  </span>,
+  "app"
+);
+```
+
+For further detail, take a look in [here](./docs/apis.md).
 
 ## Motivation
 I love CSS and I'm coming from the JavaScript world: writing React with styled-components mostly. I found it, one of the best combos to write scalable frontend applications and wasn't a reality in ReasonML/OCaml.

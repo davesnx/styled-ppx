@@ -1,0 +1,46 @@
+{
+  "name": "styled-ppx/website",
+  "namespace": false,
+  "reason": {
+    "react-jsx": 3
+  },
+  "refmt": 3,
+  "bs-dependencies": [
+    "reason-react"
+  ],
+  "ppx-flags": [
+    "../_esy/default/build/default/bin/Bin.exe"
+  ],
+  "sources": [
+    {
+      "dir": "common"
+    },
+    {
+      "dir": "bindings"
+    },
+    {
+      "dir": "pages",
+      "subdirs": true
+    },
+    {
+      "dir": "components",
+      "subdirs": true
+    },
+    "layouts"
+  ],
+  "package-specs": {
+    "module": "es6",
+    "in-source": true
+  },
+  "suffix": ".bs.js",
+  "bsc-flags": [
+    "-bs-no-version-header",
+    "-bs-super-errors",
+    "-bs-g"
+  ],
+  "gentypeconfig": {
+    "language": "untyped",
+    "shims": [],
+    "module": "es6"
+  }
+}

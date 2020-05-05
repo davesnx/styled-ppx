@@ -7,6 +7,10 @@ open Ast_helper;
 open Longident;
 open React_props;
 
+let raiseWithLocation = (~loc, msg) => {
+  raise(Location.Error(Location.error(~loc, msg)));
+};
+
 let isOptional = str =>
   switch (str) {
   | Optional(_) => true
@@ -68,7 +72,7 @@ let getType = pattern =>
   | _ => None
   };
 
-let rec recursivelyTransformNamedArgs = (mapper, expr, list) => {
+let rec getLabeledArgs = (mapper, expr, list) => {
   let expr = mapper.expr(mapper, expr);
   switch (expr.pexp_desc) {
   | Pexp_fun(arg, default, pattern, expression)
@@ -76,25 +80,15 @@ let rec recursivelyTransformNamedArgs = (mapper, expr, list) => {
     let alias = getAlias(pattern, arg);
     let type_ = getType(pattern);
 
-    recursivelyTransformNamedArgs(
+    getLabeledArgs(
       mapper,
       expression,
       [(arg, default, pattern, alias, pattern.ppat_loc, type_), ...list],
     );
-  | Pexp_fun(
-      Nolabel,
-      _,
-      {ppat_desc: Ppat_construct({txt: Lident("()"), _}, _) | Ppat_any, _},
-      expression,
-    ) => (
-      expression.pexp_desc,
-      list,
-      None,
-    )
-  | Pexp_fun(Nolabel, _, {ppat_desc: Ppat_var({txt, _}), _}, expression) => (
-      expression.pexp_desc,
-      list,
-      Some(txt),
+  | Pexp_fun(arg, _, pattern, _) when !isLabelled(arg) =>
+    raiseWithLocation(
+      ~loc=pattern.ppat_loc,
+      "Dynamic components are defined with labeled arguments. If you want to know more check the documentation: https://reasonml.org/docs/manual/latest/function#labeled-arguments",
     )
   | innerExpression => (innerExpression, list, None)
   };
@@ -488,28 +482,33 @@ let createMakeProps = (~loc, extraProps) => {
 let styledPpxMapper = (_, _) => {
   ...default_mapper,
   /*
-    This is what defines where the ppx should be hooked into, in this case
-    we transform expr ("expressions").
-  */
+     This is what defines where the ppx should be hooked into, in this case
+     we transform expr ("expressions").
+   */
   expr: (mapper, expr) => {
     switch (expr) {
-    | { pexp_desc: Pexp_extension((
-      {txt: "css", _},
-      PStr([
-        {
-          pstr_desc:
-            Pstr_eval(
+    | {
+        pexp_desc:
+          Pexp_extension((
+            {txt: "css", _},
+            PStr([
               {
-                pexp_loc: loc,
-                pexp_desc: Pexp_constant(Pconst_string(styles, delim)),
+                pstr_desc:
+                  Pstr_eval(
+                    {
+                      pexp_loc: loc,
+                      pexp_desc: Pexp_constant(Pconst_string(styles, delim)),
+                      _,
+                    },
+                    _,
+                  ),
                 _,
               },
-              _,
-            ),
-          _,
-        },
-      ]),
-    )), pexp_loc: _, pexp_attributes: _} => {
+            ]),
+          )),
+        pexp_loc: _,
+        pexp_attributes: _,
+      } =>
       let loc_start =
         switch (delim) {
         | None => loc.Location.loc_start
@@ -520,28 +519,69 @@ let styledPpxMapper = (_, _) => {
           }
         };
 
-        let ast = Css_lexer.parse_string(
+      let ast =
+        Css_lexer.parse_string(
           ~container_lnum=loc_start.Lexing.pos_lnum,
           ~pos=loc_start,
           styles,
           Css_parser.declaration_list,
         );
 
-        Css_to_emotion.render_declaration_list(ast, None)
-    }
+      Css_to_emotion.render_emotion_css(ast, None);
+    | {
+        pexp_desc:
+          Pexp_extension((
+            {txt: "styled.global", _},
+            PStr([
+              {
+                pstr_desc:
+                  Pstr_eval(
+                    {
+                      pexp_loc: loc,
+                      pexp_desc: Pexp_constant(Pconst_string(styles, delim)),
+                      _,
+                    },
+                    _,
+                  ),
+                _,
+              },
+            ]),
+          )),
+        pexp_loc: _,
+        pexp_attributes: _,
+      } =>
+      let loc_start =
+        switch (delim) {
+        | None => loc.Location.loc_start
+        | Some(s) => {
+            ...loc.Location.loc_start,
+            Lexing.pos_cnum:
+              loc.Location.loc_start.Lexing.pos_cnum + String.length(s) + 1,
+          }
+        };
+
+      let ast =
+        Css_lexer.parse_string(
+          ~container_lnum=loc_start.Lexing.pos_lnum,
+          ~pos=loc_start,
+          styles,
+          Css_parser.stylesheet,
+        );
+
+      Css_to_emotion.render_global(ast);
     | _ => default_mapper.expr(mapper, expr)
     };
   },
-  /**
-   * This is what defines [%styled] as an extension point that hooks into module_expr,
-   so all the modules pass into here and we patter-match the ones with [%styled.div () => {||}]
-  */
+  /***
+    * This is what defines [%styled] as an extension point that hooks into module_expr,
+    so all the modules pass into here and we patter-match the ones with [%styled.div () => {||}]
+   */
   module_expr: (mapper, expr) =>
     switch (expr) {
     | {
         pmod_desc:
           Pmod_extension((
-            {txt, _},
+            {txt, loc: txtLoc},
             PStr([
               {
                 pstr_desc:
@@ -558,34 +598,32 @@ let styledPpxMapper = (_, _) => {
           )),
         _,
       } =>
-      let alias = getAlias(pattern, label);
-      let type_ = getType(pattern);
       let tag = getTag(txt);
 
-      let firstArg = [
-        (label, args, pattern, alias, pattern.ppat_loc, type_),
-      ];
-      let (functionExpr, namedArgList, _) =
-        recursivelyTransformNamedArgs(mapper, expression, []);
+      /* Fix getLabeledArgs, to stop ignoring the first arg */
+      let alias = getAlias(pattern, label);
+      let type_ = getType(pattern);
 
-      let argList = List.append(namedArgList, firstArg);
-      /* TODO: Raise if there's any NonLabel'ed arg */
+      let firstArg =
+        (label, args, pattern, alias, pattern.ppat_loc, type_);
 
-      if (!List.exists(t => t === tag, Html.tags)) {
-        ();
-          /* TODO: Add warning into an invalid html tag */
-      };
+      let (functionExpr, argList, _) =
+        getLabeledArgs(mapper, expression, [firstArg]);
 
-      if (List.length(namedArgList) === 0) {
-        ();
-          /* TODO: Show warning or doing the static analysis */
+      if (!List.exists(t => t == tag, Html.tags)) {
+        raiseWithLocation(
+          ~loc=txtLoc,
+          "Unexpected HTML tag in [%styled." ++ tag ++ "]",
+        );
       };
 
       let (str, delim) =
         switch (functionExpr) {
         | Pexp_constant(Pconst_string(str, delim)) => (str, delim)
-        | _ => ("", Some("")) /* TODO: Throw an error */
-        };
+        | _ => raiseWithLocation(
+          ~loc=pattern.ppat_loc, "Unexpected error happened.",
+        );
+      };
 
       let loc = expression.pexp_loc;
       let loc_start =
@@ -628,30 +666,38 @@ let styledPpxMapper = (_, _) => {
           args,
         );
 
-      let variableList = List.map(
-        ((arg, _, _, _, _, type_)) => {
+      let variableList =
+        List.map(
+          ((arg, _, _, _, _, type_)) => {
             /* Gets the type of the argument from the fn definition
-              (~width: int, ~height: int) => {}
-            */
-            let typeName = switch (type_) {
-              | Some(t) => switch (t) {
-              | {
-                  ptyp_desc: Ptyp_constr({txt: Lident(t), _}, _),
-                  ptyp_loc: _,
-                  ptyp_attributes: _,
-                } => t
+                 (~width: int, ~height: int) => {}
+               */
+            let typeName =
+              switch (type_) {
+              | Some(t) =>
+                switch (t) {
+                | {
+                    ptyp_desc: Ptyp_constr({txt: Lident(t), _}, _),
+                    ptyp_loc: _,
+                    ptyp_attributes: _,
+                  } => t
                 | _ => "string"
-              }
+                }
               | None => "string"
-            };
+              };
             (getLabel(arg), typeName);
-          }, argList);
+          },
+          argList,
+        );
 
       let variableProps =
-        Some(List.map(
-          ((label, typeName)) => createCustomPropLabel(~loc, label, typeName),
-          variableList,
-        ));
+        Some(
+          List.map(
+            ((label, typeName)) =>
+              createCustomPropLabel(~loc, label, typeName),
+            variableList,
+          ),
+        );
 
       Mod.mk(
         Pmod_structure([
@@ -661,7 +707,11 @@ let styledPpxMapper = (_, _) => {
             ~loc,
             ~name=styleVariableName,
             ~args=argList,
-            ~exp=Css_to_emotion.render_declaration_list(ast, Some(variableList)),
+            ~exp=
+              Css_to_emotion.render_emotion_css(
+                ast,
+                Some(variableList),
+              ),
           ),
           createComponent(~loc, ~tag, ~styledExpr),
         ]),
@@ -670,7 +720,7 @@ let styledPpxMapper = (_, _) => {
         pmod_desc:
           /* This case is [%styled.div {||}] */
           Pmod_extension((
-            {txt, _},
+            {txt, loc: txtLoc},
             PStr([
               {
                 pstr_desc:
@@ -690,9 +740,11 @@ let styledPpxMapper = (_, _) => {
       } =>
       let tag = getTag(txt);
 
-      if (!List.exists(t => t === tag, Html.tags)) {
-        ();
-          /* TODO: Add warning into an invalid html tag */
+      if (!List.exists(t => t == tag, Html.tags)) {
+        raiseWithLocation(
+          ~loc=txtLoc,
+          "Unexpected HTML tag in [%styled." ++ tag ++ "]",
+        );
       };
 
       let loc = pexp_loc;
@@ -724,7 +776,7 @@ let styledPpxMapper = (_, _) => {
           createStyles(
             ~loc,
             ~name=styleVariableName,
-            ~exp=Css_to_emotion.render_declaration_list(ast, None),
+            ~exp=Css_to_emotion.render_emotion_css(ast, None),
           ),
           createComponent(~loc, ~tag, ~styledExpr),
         ]),
