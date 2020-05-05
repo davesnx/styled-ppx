@@ -70,9 +70,6 @@ let supportList = [
   /* [%css "transform: perspective(17px)" */
 
   /* [%css "font-family: 'Open Sans', '-system', sans-serif"], */
-
-  /* [%css "grid-template-columns: repeat(auto-fill, minmax(200px, 1.0fr))" */
-  /* [%css "grid-gap: 1rem" */
 ];
 
 Belt.List.forEachWithIndex(supportList, (index, css) => {
