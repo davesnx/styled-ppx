@@ -1,4 +1,4 @@
-;;let open Emotion in Emotion.global {js|html , body|js} [margin zero]
+;;Emotion.global {js|html , body|js} [Emotion.margin `zero]
 module StateLenses = [%lenses type state = {
                                 email: string ;
                                 age: int }]
@@ -443,7 +443,7 @@ module Component =
       string -> < .. >  Js.t -> React.element array -> React.element =
         "createElement"[@@bs.val ][@@bs.module
                                     (("react")[@reason.raw_literal ])]
-    let styles = let open Emotion in css [display `block]
+    let styles = Emotion.css [Emotion.display `block]
     let make (props : makeProps) =
       ((let stylesObject = [%bs.obj { className = styles }] in
         let newProps = Js.Obj.assign stylesObject (Obj.magic props) in
@@ -895,7 +895,8 @@ module Component =
         "createElement"[@@bs.val ][@@bs.module
                                     (("react")[@reason.raw_literal ])]
     let styles =
-      let open Emotion in css [display `flex; justifyContent center]
+      Emotion.css
+        [Emotion.display `flex; Emotion.justifyContent Emotion.center]
     let make (props : makeProps) =
       ((let stylesObject = [%bs.obj { className = styles }] in
         let newProps = Js.Obj.assign stylesObject (Obj.magic props) in
@@ -1348,8 +1349,9 @@ module Component =
         "createElement"[@@bs.val ][@@bs.module
                                     (("react")[@reason.raw_literal ])]
     let styles =
-      let open Emotion in
-        css [p (("color")[@reason.raw_literal ]) var; display `block]
+      Emotion.css
+        [Emotion.p (("color")[@reason.raw_literal ]) var;
+        Emotion.display `block]
     let make (props : makeProps) =
       ((let stylesObject = [%bs.obj { className = styles }] in
         let newProps = Js.Obj.assign stylesObject (Obj.magic props) in
@@ -1801,7 +1803,8 @@ module Component =
         "createElement"[@@bs.val ][@@bs.module
                                     (("react")[@reason.raw_literal ])]
     let styles ~space:(space : string)  =
-      let open Emotion in css [margin2 (px 10) (px {js|space|js})]
+      Emotion.css
+        [Emotion.margin2 (Emotion.px 10) (Emotion.px {js|space|js})]
     let make (props : makeProps) =
       ((let stylesObject =
           [%bs.obj { className = (styles ~space:(spaceGet props)) }] in
@@ -1812,4 +1815,4 @@ module Component =
               | None -> React.null))|])
       [@reason.preserve_braces ])
   end
-let _ = let open Emotion in css [display `block]
+let _ = Emotion.css [Emotion.display `block]
