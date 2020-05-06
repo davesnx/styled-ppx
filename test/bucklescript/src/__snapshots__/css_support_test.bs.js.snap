@@ -1,3 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Component 0 renders 1`] = `"css-cyc7w5"`;
+
+exports[`Component 1 renders 1`] = `"css-g393ep"`;
+
+exports[`Component 2 renders 1`] = `"css-roynbj"`;

@@ -34,6 +34,7 @@ module Component = [%styled (~background: string, ~space: int) => {j|
   background-color: $background;
   padding: $space;
   border-radius: 20px;
+  box-sizing: border-box;
 |j}];
 
 ReactDOMRe.renderToElementWithId(

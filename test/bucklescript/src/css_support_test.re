@@ -17,7 +17,8 @@ let supportList = [
   /* [%css "content: normal"], */
   /* [%css "clear: none"], */
 
-  /* [%css "box-sizing: content-box"], */
+  [%css "box-sizing: content-box"],
+  [%css "box-sizing: border-box"],
   /* [%css "box-shadow: none"], */
   /* [%css "border-collapse: separate"], */
 

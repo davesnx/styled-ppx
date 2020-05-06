@@ -125,7 +125,10 @@ let is_variant = ident =>
   | "bold"
   | "extra-bold"
   | "lighter"
-  | "bolder" => true
+  | "bolder"
+  /* box-sizing */
+  | "content-box"
+  | "border-box" => true
   | _ => false
   };
 
