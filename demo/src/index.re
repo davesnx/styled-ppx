@@ -28,6 +28,9 @@ module Link = [%styled.div {|
   margin-top: 16px;
 |}];
 
+module Empty = [%styled.span]
+module Empty1 = [%styled ""]
+
 let space = "10px";
 
 module Component = [%styled (~background: string, ~space: int) => {j|
@@ -44,6 +47,8 @@ ReactDOMRe.renderToElementWithId(
     <Link href="https://github.com/davesnx/styled-ppx">
       {React.string("styled-ppx")}
     </Link>
+    <Empty />
+    <Empty1 />
   </App>,
   "app"
 );
