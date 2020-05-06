@@ -14,6 +14,8 @@ This are some resources that I collect while creating this ppx. It showcase some
   - genType https://github.com/cristianoc/genType
   - https://github.com/roddyyaga/ppx_rapper
   - https://github.com/thierry-martinez/metapp
+  - https://github.com/tizoc/refractive-ppx/blob/master/lib/refractive_ppx.re
+  - https://github.com/tizoc/ppx_pgsql#named-arguments-syntax
 
 - Compilation of AST Helpers from ppx's
   - https://github.com/MinimaHQ/re-formality/blob/master/lib/ppx/AstHelpers.re
