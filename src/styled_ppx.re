@@ -718,6 +718,51 @@ let styledPpxMapper = (_, _) => {
       );
     | {
         pmod_desc:
+          /* This case is [%styled.div] */
+          Pmod_extension((
+            {txt, loc: txtLoc},
+            PStr([]),
+          )),
+	pmod_loc: pexp_loc,
+        _,
+      } =>
+      let tag = getTag(txt);
+
+      if (!List.exists(t => t == tag, Html.tags)) {
+        raiseWithLocation(
+          ~loc=txtLoc,
+          "Unexpected HTML tag in [%styled." ++ tag ++ "]",
+        );
+      };
+
+      let loc = pexp_loc;
+      let loc_start = loc.Location.loc_start;
+
+      let ast =
+        Css_lexer.parse_string(
+          ~container_lnum=loc_start.Lexing.pos_lnum,
+          ~pos=loc_start,
+          "",
+          Css_parser.declaration_list,
+        );
+
+      let styledExpr =
+        Exp.ident(~loc, {txt: Lident(styleVariableName), loc});
+
+      Mod.mk(
+        Pmod_structure([
+          createMakeProps(~loc, None),
+          createReactBinding(~loc),
+          createStyles(
+            ~loc,
+            ~name=styleVariableName,
+            ~exp=Css_to_emotion.render_emotion_css(ast, None),
+          ),
+          createComponent(~loc, ~tag, ~styledExpr),
+        ]),
+      );
+    | {
+        pmod_desc:
           /* This case is [%styled.div {||}] */
           Pmod_extension((
             {txt, loc: txtLoc},

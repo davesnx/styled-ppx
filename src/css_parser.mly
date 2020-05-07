@@ -46,7 +46,8 @@ stylesheet_without_eof:
   ;
 
 declaration_list:
-  ds = declarations_with_loc; EOF { ds }
+  | EOF { ([], Lex_buffer.make_loc_and_fix $startpos $endpos) }
+  | ds = declarations_with_loc; EOF { ds }
   ;
 
 rule:
