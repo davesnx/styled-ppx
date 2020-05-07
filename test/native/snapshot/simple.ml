@@ -35,3 +35,6 @@ let _ = [%css (("display: block")[@reason.raw_literal "display: block"])]
   display: block;
 |j}]
  *)
+
+module Component = [%styled]
+module Component = [%styled ""]
