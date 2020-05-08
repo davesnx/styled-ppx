@@ -830,5 +830,10 @@ let styledPpxMapper = (_, _) => {
     },
 };
 
-let () =
-  Driver.register(~name="styled-ppx", Versions.ocaml_406, styledPpxMapper);
+let () = 
+  Driver.register(
+    ~name="styled-ppx",
+    ~position=-1,
+    Versions.ocaml_406,
+    styledPpxMapper
+  );
