@@ -1,10 +1,25 @@
+[@ocaml.ppx.context
+  {
+    tool_name: "migrate_driver",
+    include_dirs: [],
+    load_path: [],
+    open_modules: [],
+    for_package: None,
+    debug: false,
+    use_threads: false,
+    use_vmthreads: false,
+    cookies: [],
+  }
+];
 Emotion.global({js|html , body|js}, [Emotion.margin(`zero)]);
+
 module StateLenses = [%lenses
   type state = {
     email: string,
     age: int,
   }
 ];
+
 module Component = {
   [@bs.deriving abstract]
   type makeProps = {
@@ -877,6 +892,7 @@ module Component = {
   external createElement:
     (string, Js.t({..}), array(React.element)) => React.element =
     "createElement";
+
   let styles = Emotion.css([Emotion.display(`block)]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
@@ -1765,6 +1781,7 @@ module Component = {
   external createElement:
     (string, Js.t({..}), array(React.element)) => React.element =
     "createElement";
+
   let styles =
     Emotion.css([
       Emotion.display(`flex),
@@ -1785,6 +1802,7 @@ module Component = {
     );
   };
 };
+
 let var = "#333333";
 module Component = {
   [@bs.deriving abstract]
@@ -2658,6 +2676,7 @@ module Component = {
   external createElement:
     (string, Js.t({..}), array(React.element)) => React.element =
     "createElement";
+
   let styles =
     Emotion.css([
       Emotion.p([@reason.raw_literal] "color", var),
@@ -2678,6 +2697,7 @@ module Component = {
     );
   };
 };
+
 module Component = {
   [@bs.deriving abstract]
   type makeProps = {
@@ -3551,6 +3571,7 @@ module Component = {
   external createElement:
     (string, Js.t({..}), array(React.element)) => React.element =
     "createElement";
+
   let styles = (~space: string) =>
     Emotion.css([
       Emotion.margin2(Emotion.px(10), Emotion.px({js|space|js})),
@@ -3570,7 +3591,9 @@ module Component = {
     );
   };
 };
+
 Emotion.css([Emotion.display(`block)]);
+
 module Component = {
   [@bs.deriving abstract]
   type makeProps = {
@@ -4443,6 +4466,7 @@ module Component = {
   external createElement:
     (string, Js.t({..}), array(React.element)) => React.element =
     "createElement";
+
   let styles = Emotion.css([]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
@@ -5331,6 +5355,7 @@ module Component = {
   external createElement:
     (string, Js.t({..}), array(React.element)) => React.element =
     "createElement";
+
   let styles = Emotion.css([]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};

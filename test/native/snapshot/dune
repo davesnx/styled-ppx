@@ -1,22 +1,17 @@
-(executable
- (name main)
- (libraries styled-ppx.lib)
- (preprocess
-  (pps styled-ppx.lib)))
-
-(rule
- (targets pp.result.ml)
- (deps simple.re.ml)
- (action
-  (run ./main.exe --impl %{deps} -o %{targets})))
+(library
+  (name StyledPpxTestNativeSnapshot)
+  (library_flags (-linkall -g))
+  (libraries styled-ppx.lib)
+  (preprocess (pps styled-ppx.lib))
+)
 
 (rule
  (targets pp.result)
- (deps pp.result.ml)
+ (deps simple.re.pp.ml)
  (action
   (with-stdout-to
     %{targets}
-    (run refmt %{deps}))))
+    (run refmt --parse=binary %{deps}))))
 
 (alias
  (name runtest)
