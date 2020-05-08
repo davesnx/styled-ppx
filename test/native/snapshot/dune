@@ -5,10 +5,18 @@
   (pps styled-ppx.lib)))
 
 (rule
- (targets pp.result)
- (deps simple.ml)
+ (targets pp.result.ml)
+ (deps simple.re.ml)
  (action
   (run ./main.exe --impl %{deps} -o %{targets})))
+
+(rule
+ (targets pp.result)
+ (deps pp.result.ml)
+ (action
+  (with-stdout-to
+    %{targets}
+    (run refmt %{deps}))))
 
 (alias
  (name runtest)
