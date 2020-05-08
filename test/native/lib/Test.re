@@ -104,3 +104,20 @@ describe("Transform CSS AST to Emotion", ({test, _}) =>
     expect.bool(eq_ast(ast, expected_ast)).toBeTrue();
   })
 );
+
+let eq_expr = (expr1, expr2) =>
+  Pprintast.string_of_expression(expr1) == Pprintast.string_of_expression(expr2);
+
+describe("emit bs-emotion from css", ({ test, _}) => {
+  open Migrate_parsetree;
+
+  test("styled.global", ({ expect, _}) => {
+    let expr = [%expr
+      [%styled.global {js| body { margin: 0; } |js}]
+    ];
+    let expected = [%expr
+      Emotion.global({js|body|js}, [Emotion.margin(`zero)]);
+    ];
+    expect.bool(eq_expr(expr, expected)).toBeTrue();
+  });
+});

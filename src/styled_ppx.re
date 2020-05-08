@@ -830,5 +830,12 @@ let styledPpxMapper = (_, _) => {
     },
 };
 
-let () =
-  Driver.register(~name="styled-ppx", Versions.ocaml_406, styledPpxMapper);
+let () = 
+  Driver.register(
+    ~name="styled-ppx",
+    /* this is required to run before ppx_metaquot during tests */
+    /* any change regarding this behavior not related to metaquot is a bug */
+    ~position=-1,
+    Versions.ocaml_406,
+    styledPpxMapper
+  );
