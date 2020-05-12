@@ -20,6 +20,10 @@ module App = [%styled.div (~background) => {j|
   background-color: $background;
 
   cursor: pointer;
+
+  & > div {
+    background-color: red;
+  }
 |j}];
 
 module Link = [%styled.div {|

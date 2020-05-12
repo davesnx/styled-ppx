@@ -189,7 +189,7 @@ let string_to_const = (~loc, s) =>
   Exp.constant(~loc, Const.string(~quotation_delimiter="js", s));
 
 let render_html_color = (~loc, v) =>
-  Exp.ident(~loc, {txt: Ldot(Ldot(Lident("Css"), "Color"), v), loc: loc});
+  Exp.ident(~loc, {txt: Ldot(Ldot(Emotion.lident("Css"), "Color"), v), loc: loc});
 
 let list_to_expr = (end_loc, xs) =>
   List.fold_left(
@@ -604,6 +604,8 @@ let rec render_value = ((cv, loc): with_loc(t)): expression => {
       Exp.ident(~loc, {txt: Emotion.lident(name), loc});
     };
   | String(s) => string_to_const(~loc, s)
+  | Selector(s) =>
+    Exp.ident(~loc, {txt: Lident(s), loc});
   | Uri(s) =>
     let ident = Exp.ident(~loc, {txt: Emotion.lident("url"), loc});
     let arg = string_to_const(~loc, s);
@@ -1111,6 +1113,10 @@ and render_declarations =
       | Declaration_list.Declaration(decl) =>
         render_declaration(decl, decl.loc, Option.get(variables, []))
       | Declaration_list.At_rule(ar) => render_at_rule(ar)
+      | Declaration_list.Style_rule(ar) =>
+        let (loc: Location.t) = ar.loc;
+        let ident = Exp.ident(~loc, {txt: Emotion.lident("select"), loc});
+        render_style_rule(ident, ar)
       },
     ds,
   )
@@ -1118,15 +1124,7 @@ and render_declaration_list = ((list, loc): Declaration_list.t, variables): expr
   let expr_with_loc_list = render_declarations(list, variables);
   list_to_expr(loc, expr_with_loc_list);
 }
-
-let render_emotion_css = ((list, loc): Declaration_list.t, variables): expression => {
-  let declarationListValues = render_declaration_list((list, loc), variables);
-  let ident = Exp.ident(~loc, {txt: Emotion.lident("css"), loc});
-
-  Exp.apply(~loc, ident, [(Nolabel, declarationListValues)]);
-};
-
-let render_style_rule = (ident, sr: Style_rule.t): expression => {
+and render_style_rule = (ident, sr: Style_rule.t): expression => {
   let (prelude, prelude_loc) = sr.Style_rule.prelude;
   let selector =
     List.fold_left(
@@ -1135,7 +1133,8 @@ let render_style_rule = (ident, sr: Style_rule.t): expression => {
         | Delim(":") => ":" ++ s
         | Ident(v)
         | Operator(v)
-        | Delim(v) =>
+        | Delim(v)
+        | Selector(v) =>
           if (String.length(s) > 0) {
             v ++ " " ++ s;
           } else {
@@ -1155,6 +1154,14 @@ let render_style_rule = (ident, sr: Style_rule.t): expression => {
     [(Nolabel, selector_expr), (Nolabel, dl_expr)],
   );
 }
+
+
+let render_emotion_css = ((list, loc): Declaration_list.t, variables): expression => {
+  let declarationListValues = render_declaration_list((list, loc), variables);
+  let ident = Exp.ident(~loc, {txt: Emotion.lident("css"), loc});
+
+  Exp.apply(~loc, ident, [(Nolabel, declarationListValues)]);
+};
 
 let render_rule = (ident, r: Rule.t): expression => {
   switch (r) {

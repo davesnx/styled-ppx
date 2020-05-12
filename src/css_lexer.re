@@ -49,6 +49,7 @@ let token_to_string =
   | COLON => ":"
   | SEMI_COLON => ";"
   | PERCENTAGE => "%"
+  | SELECTOR(s) => "SELECTOR(" ++ s ++ ")"
   | IMPORTANT => "!important"
   | IDENT(s) => "IDENT(" ++ s ++ ")"
   | STRING(s) => "STRING(" ++ s ++ ")"
@@ -299,7 +300,7 @@ let rec get_next_token = buf => {
 
       TYPED_VARIABLE((variableName, variableType))
   }
-  /* | '&' => SELECTOR */
+  | '&' => SELECTOR("&")
   | operator => OPERATOR(Lex_buffer.latin1(buf))
   | string => STRING(Lex_buffer.latin1(~skip=1, ~drop=1, buf))
   | "url(" => get_url("", buf)

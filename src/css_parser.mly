@@ -15,6 +15,7 @@ open Css_types
 %token SEMI_COLON
 %token PERCENTAGE
 %token IMPORTANT
+%token <string> SELECTOR
 %token <string> IDENT
 %token <string> STRING
 %token <string> URI
@@ -119,6 +120,7 @@ declarations_without_ending_semi_colon:
 declaration_or_at_rule:
   | d = declaration { Declaration_list.Declaration d }
   | r = at_rule { Declaration_list.At_rule r }
+  | s = style_rule { Declaration_list.Style_rule s }
   ;
 
 declaration:
@@ -163,4 +165,5 @@ component_value:
   | d = DIMENSION { Component_value.Dimension d }
   | v = VARIABLE { Component_value.Variable v }
   | x = TYPED_VARIABLE { Component_value.TypedVariable x }
+  | s = SELECTOR { Component_value.Selector s }
   ;
