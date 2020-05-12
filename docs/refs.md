@@ -16,6 +16,7 @@ This are some resources that I collect while creating this ppx. It showcase some
   - https://github.com/thierry-martinez/metapp
   - https://github.com/tizoc/refractive-ppx/blob/master/lib/refractive_ppx.re
   - https://github.com/tizoc/ppx_pgsql#named-arguments-syntax
+  - https://github.com/wiltonlazary/lang_ppx/blob/master/src/Lang_ppx.re
 
 - Compilation of AST Helpers from ppx's
   - https://github.com/MinimaHQ/re-formality/blob/master/lib/ppx/AstHelpers.re

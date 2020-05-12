@@ -28,8 +28,8 @@ module Link = [%styled.div {|
   margin-top: 16px;
 |}];
 
-module Line = [%styled.span]
-module Wrapper = [%styled ""]
+module Line = [%styled.span];
+module Wrapper = [%styled ""];
 
 let space = "10px";
 
@@ -50,7 +50,7 @@ ReactDOMRe.renderToElementWithId(
     </Link>
     <Wrapper>
       <Line />
-    <Wrapper>
+    </Wrapper>
   </App>,
   "app"
 );
