@@ -605,7 +605,7 @@ let rec render_value = ((cv, loc): with_loc(t)): expression => {
     };
   | String(s) => string_to_const(~loc, s)
   | Selector(s) =>
-    Exp.ident(~loc, {txt: Lident(s), loc});
+    Exp.ident(~loc, {txt: Emotion.lident(s), loc});
   | Uri(s) =>
     let ident = Exp.ident(~loc, {txt: Emotion.lident("url"), loc});
     let arg = string_to_const(~loc, s);
