@@ -1,5 +1,5 @@
 {
-  "name": "styled-ppx",
+  "name": "@davesnx/styled-ppx",
   "version": "0.13.0",
   "description": "CSS-in-Reason and OCaml",
   "author": "David Sancho <dsnxmoreno@gmail.com>",
