@@ -2,7 +2,6 @@
 
 function bump_all() {
   versionNumber=$(npm version "$1")
-  version="v$versionNumber"
 }
 
 function help() {
@@ -27,8 +26,8 @@ if [ -d ".git" ]; then
   else
     bump_all "$1"
     git add .
-    git commit -m "Bump to ${version}"
-    git tag -a "${version}" -m "${version}"
+    git commit -m "Bump to ${versionNumber}"
+    git tag -a "${versionNumber}" -m "${versionNumber}"
     git push origin --tags
   fi
 else
