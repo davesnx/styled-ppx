@@ -42,3 +42,13 @@ module Component = [%styled
 
 module Component = [%styled];
 module Component = [%styled ""];
+
+module NestedSelectors = [%styled.body
+  {|
+  display: flex;
+  justify-content: center;
+  & > a {
+    background-color: green;
+  }
+|}
+];
