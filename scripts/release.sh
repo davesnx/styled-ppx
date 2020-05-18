@@ -1,28 +1,18 @@
 #!/bin/bash
 
-function bump_dune() {
-  search="(\(version ).+(\))"
-  replace="\1$2\2"
-  sed -i ".tmp" -E "s/${search}/${replace}/g" "$1"
-  rm "$1.tmp"
-}
-
 function bump_all() {
-  versionNumber=$(jq -r ".version" package.json)
+  versionNumber=$(npm version "$1")
   version="v$versionNumber"
-  bump_dune "dune-project" "$version"
 }
 
 function help() {
-  echo "Usage: $(basename $0) [<newversion> | major | minor | patch | premajor | preminor | prepatch | prerelease]"
+  echo "Usage: $(basename "$0") [<newversion> | major | minor | patch | premajor | preminor | prepatch | prerelease]"
 }
 
 if [ -z "$1" ] || [ "$1" = "help" ]; then
   help
   exit
 fi
-
-release=$1
 
 if [ -d ".git" ]; then
   changes=$(git status --porcelain)
@@ -35,7 +25,7 @@ if [ -d ".git" ]; then
     echo "Please run the release script on master"
     exit 1
   else
-    bump_all
+    bump_all "$1"
     git add .
     git commit -m "Bump to ${version}"
     git tag -a "${version}" -m "${version}"
