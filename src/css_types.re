@@ -13,6 +13,7 @@ module rec Component_value: {
     | Percentage(string)
     | Ident(string)
     | String(string)
+    | Selector(string)
     | Uri(string)
     | Operator(string)
     | Delim(string)
@@ -50,7 +51,8 @@ and Declaration: {
 and Declaration_list: {
   type kind =
     | Declaration(Declaration.t)
-    | At_rule(At_rule.t);
+    | At_rule(At_rule.t)
+    | Style_rule(Style_rule.t);
   type t = with_loc(list(kind));
 } = Declaration_list
 and Style_rule: {

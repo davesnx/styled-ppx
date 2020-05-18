@@ -38,3 +38,6 @@ npm-debug.log
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
+
+# Vim
+.*.swp
