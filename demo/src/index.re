@@ -22,7 +22,7 @@ module App = [%styled.div (~background) => {j|
   cursor: pointer;
 
   & > div {
-    background-color: red;
+    padding: 20px;
   }
 |j}];
 
