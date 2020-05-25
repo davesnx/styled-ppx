@@ -8,6 +8,11 @@
     debug: false,
     use_threads: false,
     use_vmthreads: false,
+    recursive_types: false,
+    principal: false,
+    transparent_modules: false,
+    unboxed_types: false,
+    unsafe_string: false,
     cookies: [],
   }
 ];

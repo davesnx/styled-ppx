@@ -21,7 +21,7 @@
   Emotion.(css([display(`block)]))
 */
 open Migrate_parsetree;
-open Ast_406;
+open Ast_408;
 open Ast_helper;
 open Asttypes;
 open Parsetree;
@@ -169,7 +169,7 @@ let float_to_const = number => {
 let raw_literal = (~loc, str) =>
   Exp.constant(
     ~loc,
-    ~attrs=[({txt: "reason.raw_literal", loc}, PStr([]))],
+    ~attrs=[Attr.mk({txt: "reason.raw_literal", loc}, PStr([]))],
     Pconst_string(str, None),
   );
 

@@ -3,6 +3,9 @@
   * https://www.w3.org/TR/css-syntax-3/
   * https://github.com/yahoo/css-js/blob/master/src/l/css.3.l */
 
+open Migrate_parsetree;
+open Ast_408;
+
 module Sedlexing = Lex_buffer;
 
 /** Signals a lexing error at the provided source location.  */
@@ -80,7 +83,7 @@ let () =
       fun
       | LexingError((pos, msg)) => {
           let loc = Lex_buffer.make_loc_and_fix(pos, pos);
-          Some({loc, msg, sub: [], if_highlight: ""});
+          Some(Location.error(~loc, msg));
         }
       | ParseError((token, start_pos, end_pos)) => {
           let loc = Lex_buffer.make_loc_and_fix(start_pos, end_pos);
@@ -89,11 +92,10 @@ let () =
               "Parse error while reading token '%s'",
               token_to_string(token),
             );
-
-          Some({loc, msg, sub: [], if_highlight: ""});
+          Some(Location.error(~loc, msg));
         }
       | GrammarError((msg, loc)) =>
-        Some({loc, msg, sub: [], if_highlight: ""})
+        Some(Location.error(~loc, msg))
       | _ => None,
     );
 
