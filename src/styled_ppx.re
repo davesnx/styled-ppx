@@ -173,7 +173,9 @@ let createReactBinding = (~loc) => {
             Pstr_eval(
               Exp.constant(
                 ~loc,
-                ~attrs=[Attr.mk({txt: "reason.raw_literal", loc}, PStr([]))],
+                ~attrs=[
+                  Attr.mk({txt: "reason.raw_literal", loc}, PStr([])),
+                ],
                 Pconst_string("react", None),
               ),
               [],
@@ -423,15 +425,16 @@ let createRecordEventLabel = (~loc, name, kind) => {
 
 let createMakeProps = (~loc, extraProps) => {
   /* [@bs.deriving abstract] */
-  let bsDerivingAbstract = Attr.mk(
-    {txt: "bs.deriving", loc},
-    PStr([
-      Str.mk(
-        ~loc,
-        Pstr_eval(Exp.ident(~loc, {txt: Lident("abstract"), loc}), []),
-      ),
-    ]),
-  );
+  let bsDerivingAbstract =
+    Attr.mk(
+      {txt: "bs.deriving", loc},
+      PStr([
+        Str.mk(
+          ~loc,
+          Pstr_eval(Exp.ident(~loc, {txt: Lident("abstract"), loc}), []),
+        ),
+      ]),
+    );
 
   let dynamicProps =
     switch (extraProps) {
@@ -602,8 +605,7 @@ let styledPpxMapper = (_, _) => {
       let alias = getAlias(pattern, label);
       let type_ = getType(pattern);
 
-      let firstArg =
-        (label, args, pattern, alias, pattern.ppat_loc, type_);
+      let firstArg = (label, args, pattern, alias, pattern.ppat_loc, type_);
 
       let (functionExpr, argList, _) =
         getLabeledArgs(mapper, expression, [firstArg]);
@@ -618,10 +620,12 @@ let styledPpxMapper = (_, _) => {
       let (str, delim) =
         switch (functionExpr) {
         | Pexp_constant(Pconst_string(str, delim)) => (str, delim)
-        | _ => raiseWithLocation(
-          ~loc=pattern.ppat_loc, "Unexpected error happened.",
-        );
-      };
+        | _ =>
+          raiseWithLocation(
+            ~loc=pattern.ppat_loc,
+            "Unexpected error happened.",
+          )
+        };
 
       let loc = expression.pexp_loc;
       let loc_start =
@@ -674,10 +678,7 @@ let styledPpxMapper = (_, _) => {
               switch (type_) {
               | Some(t) =>
                 switch (t) {
-                | {
-                    ptyp_desc: Ptyp_constr({txt: Lident(t), _}, _),
-                    _,
-                  } => t
+                | {ptyp_desc: Ptyp_constr({txt: Lident(t), _}, _), _} => t
                 | _ => "string"
                 }
               | None => "string"
@@ -704,11 +705,7 @@ let styledPpxMapper = (_, _) => {
             ~loc,
             ~name=styleVariableName,
             ~args=argList,
-            ~exp=
-              Css_to_emotion.render_emotion_css(
-                ast,
-                Some(variableList),
-              ),
+            ~exp=Css_to_emotion.render_emotion_css(ast, Some(variableList)),
           ),
           createComponent(~loc, ~tag, ~styledExpr),
         ]),
@@ -716,11 +713,8 @@ let styledPpxMapper = (_, _) => {
     | {
         pmod_desc:
           /* This case is [%styled.div] */
-          Pmod_extension((
-            {txt, loc: txtLoc},
-            PStr([]),
-          )),
-	pmod_loc: pexp_loc,
+          Pmod_extension(({txt, loc: txtLoc}, PStr([]))),
+        pmod_loc: pexp_loc,
         _,
       } =>
       let tag = getTag(txt);
@@ -827,12 +821,12 @@ let styledPpxMapper = (_, _) => {
     },
 };
 
-let () = 
+let () =
   Driver.register(
     ~name="styled-ppx",
     /* this is required to run before ppx_metaquot during tests */
     /* any change regarding this behavior not related to metaquot is a bug */
     ~position=-1,
     Versions.ocaml_408,
-    styledPpxMapper
+    styledPpxMapper,
   );
