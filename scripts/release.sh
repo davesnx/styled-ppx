@@ -19,7 +19,6 @@ elif [ "${branch}" != "master" ]; then
   echo "Please run the release script on master"
   exit 1
 else
-  versionNumber=$(npm version "$1")
-  git tag -a "${versionNumber}" -m "${versionNumber}"
+  npm version "$1"
   git push origin --tags
 fi
