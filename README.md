@@ -197,6 +197,7 @@ To release prebuilt binaries to all platforms, we use Github Actions to build ea
 The binaries are then uploaded to a Github Release and NPM automatically.
 
 To trigger the Release workflow, you need to push a git tag to the repository.
+
 We provide a script that will bump the version of the project, tag the commit and push it to Github:
 
 ```bash
@@ -207,6 +208,9 @@ The script uses `npm version` to bump the project, so you can use the same argum
 For instance, to release a new patch version, you can run:
 
 ```bash
-./scripts/release.sh patch
+./scripts/release.sh minor
 ```
+
+Since we use Compatible Versioning, we only run major and minor versions.
+
  -->
