@@ -1,5 +1,5 @@
 open Migrate_parsetree;
-open Ast_406;
+open Ast_408;
 open Ast_mapper;
 open Asttypes;
 open Parsetree;
@@ -164,8 +164,8 @@ let createReactBinding = (~loc) => {
       ),
     pval_prim: ["createElement"],
     pval_attributes: [
-      ({txt: "bs.val", loc}, PStr([])),
-      (
+      Attr.mk({txt: "bs.val", loc}, PStr([])),
+      Attr.mk(
         {txt: "bs.module", loc},
         PStr([
           Str.mk(
@@ -173,7 +173,7 @@ let createReactBinding = (~loc) => {
             Pstr_eval(
               Exp.constant(
                 ~loc,
-                ~attrs=[({txt: "reason.raw_literal", loc}, PStr([]))],
+                ~attrs=[Attr.mk({txt: "reason.raw_literal", loc}, PStr([]))],
                 Pconst_string("react", None),
               ),
               [],
@@ -200,7 +200,7 @@ let createSwitchChildren = (~loc) => {
     Exp.case(
       Pat.mk(
         ~loc,
-        ~attrs=[({txt: "explicit_arity", loc}, PStr([]))], /* Add [@explicit_arity] */
+        ~attrs=[Attr.mk({txt: "explicit_arity", loc}, PStr([]))], /* Add [@explicit_arity] */
         Ppat_construct(
           {txt: Lident("Some"), loc},
           Some(
@@ -235,7 +235,7 @@ let createElement = (~loc, ~tag) => {
         Exp.constant(
           ~loc,
           ~attrs=[
-            (
+            Attr.mk(
               {txt: "reason.raw_literal", loc},
               PStr([
                 Str.mk(
@@ -321,7 +321,7 @@ let createNewProps = (~loc) =>
 let createMakeBody = (~loc, ~tag, ~styledExpr) =>
   Exp.let_(
     ~loc,
-    ~attrs=[({txt: "reason.preserve_braces", loc}, PStr([]))],
+    ~attrs=[Attr.mk({txt: "reason.preserve_braces", loc}, PStr([]))],
     Nonrecursive,
     [createStylesObject(~loc, ~value=styledExpr)],
     Exp.let_(
@@ -379,7 +379,7 @@ let createCustomPropLabel = (~loc, name, kind) =>
 let createRecordLabel = (~loc, name, kind) =>
   Type.field(
     ~loc,
-    ~attrs=[({txt: "bs.optional", loc}, PStr([]))],
+    ~attrs=[Attr.mk({txt: "bs.optional", loc}, PStr([]))],
     {txt: name, loc},
     Typ.constr(~loc, {txt: Lident(kind), loc}, []),
   );
@@ -388,7 +388,7 @@ let createRecordLabel = (~loc, name, kind) =>
 let createDomRefLabel = (~loc) =>
   Type.field(
     ~loc,
-    ~attrs=[({txt: "bs.optional", loc}, PStr([]))],
+    ~attrs=[Attr.mk({txt: "bs.optional", loc}, PStr([]))],
     {txt: "ref", loc},
     Typ.constr(~loc, {txt: Ldot(Lident("ReactDOMRe"), "domRef"), loc}, []),
   );
@@ -397,7 +397,7 @@ let createDomRefLabel = (~loc) =>
 let createChildrenLabel = (~loc) =>
   Type.field(
     ~loc,
-    ~attrs=[({txt: "bs.optional", loc}, PStr([]))],
+    ~attrs=[Attr.mk({txt: "bs.optional", loc}, PStr([]))],
     {txt: "children", loc},
     Typ.constr(~loc, {txt: Ldot(Lident("React"), "element"), loc}, []),
   );
@@ -406,7 +406,7 @@ let createChildrenLabel = (~loc) =>
 let createRecordEventLabel = (~loc, name, kind) => {
   Type.field(
     ~loc,
-    ~attrs=[({txt: "bs.optional", loc}, PStr([]))],
+    ~attrs=[Attr.mk({txt: "bs.optional", loc}, PStr([]))],
     {txt: name, loc},
     Typ.arrow(
       ~loc,
@@ -423,7 +423,7 @@ let createRecordEventLabel = (~loc, name, kind) => {
 
 let createMakeProps = (~loc, extraProps) => {
   /* [@bs.deriving abstract] */
-  let bsDerivingAbstract = (
+  let bsDerivingAbstract = Attr.mk(
     {txt: "bs.deriving", loc},
     PStr([
       Str.mk(
@@ -506,8 +506,7 @@ let styledPpxMapper = (_, _) => {
               },
             ]),
           )),
-        pexp_loc: _,
-        pexp_attributes: _,
+        _,
       } =>
       let loc_start =
         switch (delim) {
@@ -547,8 +546,7 @@ let styledPpxMapper = (_, _) => {
               },
             ]),
           )),
-        pexp_loc: _,
-        pexp_attributes: _,
+        _,
       } =>
       let loc_start =
         switch (delim) {
@@ -678,8 +676,7 @@ let styledPpxMapper = (_, _) => {
                 switch (t) {
                 | {
                     ptyp_desc: Ptyp_constr({txt: Lident(t), _}, _),
-                    ptyp_loc: _,
-                    ptyp_attributes: _,
+                    _,
                   } => t
                 | _ => "string"
                 }
@@ -836,6 +833,6 @@ let () =
     /* this is required to run before ppx_metaquot during tests */
     /* any change regarding this behavior not related to metaquot is a bug */
     ~position=-1,
-    Versions.ocaml_406,
+    Versions.ocaml_408,
     styledPpxMapper
   );

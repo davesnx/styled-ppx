@@ -34,16 +34,14 @@
   },
   "devDependencies": {
     "@opam/merlin": "*",
-    "ocaml": "~4.6.1000",
-    "@esy-ocaml/reason": "3.5.2",
-    "@opam/dune": "1.11.4",
+    "ocaml": "4.8.1000",
+    "@esy-ocaml/reason": "^3.5.2",
+    "@opam/dune": "*",
     "@opam/menhir": "20190924",
-    "@opam/ocaml-migrate-parsetree": "1.5.0",
-    "@opam/sedlex": "2.1",
-    "@reason-native/rely": "^3.2.1"
-  },
-  "resolutions": {
-    "@opam/dune": "1.11.4"
+    "@opam/ocaml-migrate-parsetree": "^1.7.3",
+    "@opam/sedlex": "*",
+    "@reason-native/rely": "^3.2.1",
+    "@opam/ocaml-lsp-server": "ocaml/ocaml-lsp:ocaml-lsp-server.opam"
   },
   "scripts": {
     "test": "esy test_snapshot",
