@@ -506,8 +506,7 @@ let styledPpxMapper = (_, _) => {
               },
             ]),
           )),
-        pexp_loc: _,
-        pexp_attributes: _,
+        _,
       } =>
       let loc_start =
         switch (delim) {
@@ -547,8 +546,7 @@ let styledPpxMapper = (_, _) => {
               },
             ]),
           )),
-        pexp_loc: _,
-        pexp_attributes: _,
+        _,
       } =>
       let loc_start =
         switch (delim) {
@@ -678,8 +676,7 @@ let styledPpxMapper = (_, _) => {
                 switch (t) {
                 | {
                     ptyp_desc: Ptyp_constr({txt: Lident(t), _}, _),
-                    ptyp_loc: _,
-                    ptyp_attributes: _,
+                    _,
                   } => t
                 | _ => "string"
                 }
