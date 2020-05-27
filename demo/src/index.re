@@ -24,6 +24,12 @@ module App = [%styled.div (~background) => {j|
   & > div {
     padding: 20px;
   }
+  & > a:nth-child(3n+2) {
+    background-color: green;
+  }
+  & > a:nth-child(even) {
+    background-color: red;
+  }
 |j}];
 
 module Link = [%styled.a {|
@@ -49,6 +55,12 @@ ReactDOMRe.renderToElementWithId(
     <Component background="#FFFFFF" space=30>
       {React.string("Demo of...")}
     </Component>
+    <Link href="https://github.com/davesnx/styled-ppx">
+      {React.string("styled-ppx")}
+    </Link>
+    <Link href="https://github.com/davesnx/styled-ppx">
+      {React.string("styled-ppx")}
+    </Link>
     <Link href="https://github.com/davesnx/styled-ppx">
       {React.string("styled-ppx")}
     </Link>

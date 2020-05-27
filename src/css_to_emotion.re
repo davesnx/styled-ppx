@@ -1125,22 +1125,35 @@ and render_declaration_list = ((list, loc): Declaration_list.t, variables): expr
 }
 and render_style_rule = (ident, sr: Style_rule.t): expression => {
   let (prelude, prelude_loc) = sr.Style_rule.prelude;
+  let rec render_prelude_value = (s, (value, value_loc)) => {
+    switch (value) {
+    | Delim(":") => ":" ++ s
+    | Delim(v) => " " ++ v ++ " " ++ s;
+    | Ident(v)
+    | Operator(v)
+    | Number(v)
+    | Selector(v) =>
+      v ++ s;
+    | Dimension((number, dimension)) =>
+      number ++ dimension ++ " " ++ s
+    | Paren_block(c) =>
+      List.fold_left(
+        render_prelude_value,
+        "",
+        List.rev(c)
+      ) ++ s
+    | Function((f, _l), (args, _la)) =>
+      f ++ "(" ++ List.fold_left(
+        render_prelude_value,
+        ")",
+        List.rev(args)
+      )
+    | _ => grammar_error(value_loc, "Unexpected selector")
+    }
+  };
   let selector =
     List.fold_left(
-      (s, (value, value_loc)) =>
-        switch (value) {
-        | Delim(":") => ":" ++ s
-        | Ident(v)
-        | Operator(v)
-        | Delim(v)
-        | Selector(v) =>
-          if (String.length(s) > 0) {
-            v ++ " " ++ s;
-          } else {
-            v ++ s;
-          }
-        | _ => grammar_error(value_loc, "Unexpected selector")
-        },
+      render_prelude_value,
       "",
       List.rev(prelude),
     );

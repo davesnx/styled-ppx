@@ -114,6 +114,7 @@ declarations:
 
 declarations_without_ending_semi_colon:
   | d = declaration_or_at_rule { [d] }
+  | ds = declarations_without_ending_semi_colon; d = declaration_or_at_rule { d :: ds }
   | ds = declarations_without_ending_semi_colon; SEMI_COLON; d = declaration_or_at_rule { d :: ds }
   ;
 
