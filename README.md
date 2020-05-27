@@ -81,9 +81,9 @@ esy add davesnx/styled-ppx
 ### With `npm` or `yarn` on BuckleScript projects
 
 ```bash
-yarn global add @davesnx/styled-ppx @ahrefs/bs-emotion
+yarn add @davesnx/styled-ppx @ahrefs/bs-emotion
 # Or
-npm -g install @davesnx/styled-ppx @ahrefs/bs-emotion
+npm install @davesnx/styled-ppx @ahrefs/bs-emotion
 ```
 
 And add the PPX in your `bsconfig.json` file:
