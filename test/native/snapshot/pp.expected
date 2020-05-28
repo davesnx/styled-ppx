@@ -6259,8 +6259,8 @@ module NestedSelectors = {
         {js|& > a|js},
         [Emotion.backgroundColor(Emotion.Css.Color.green)],
       ),
-      Emotion.select(
-        {js|&:nth-child(even)|js},
+      Emotion.nthChild(
+        {js|even|js},
         [Emotion.backgroundColor(Emotion.Css.Color.red)],
       ),
       Emotion.select(

@@ -1126,8 +1126,35 @@ and render_declaration_list = ((list, loc): Declaration_list.t, variables): expr
 and render_style_rule = (ident, sr: Style_rule.t): expression => {
   let (prelude, prelude_loc) = sr.Style_rule.prelude;
   let dl_expr = render_declaration_list(sr.Style_rule.block, None);
+  let rec render_prelude_value = (s, (value, value_loc)) => {
+    switch (value) {
+    | Delim(":") => ":" ++ s
+    | Delim(v) => " " ++ v ++ " " ++ s;
+    | Ident(v)
+    | Operator(v)
+    | Number(v)
+    | Selector(v) =>
+      v ++ s;
+    | Dimension((number, dimension)) => /*<number><string> is parsed as Dimension */
+      number ++ dimension ++ " " ++ s
+    | Paren_block(c) =>
+      List.fold_left(
+        render_prelude_value,
+        "",
+        List.rev(c)
+      ) ++ s
+    | Function((f, _l), (args, _la)) =>
+      f ++ "(" ++ List.fold_left(
+        render_prelude_value,
+        ")",
+        List.rev(args)
+      )
+    | _ => grammar_error(value_loc, "Unexpected selector")
+    }
+  };
   switch (prelude) {
   | [(Selector("&"),_),(Delim(":"),_),(Delim(":"),_),(Ident(pc),loc)] =>
+    /* two-colons pseudoclasses */
     let f = switch (pc) {
     | "active" => "active"
     | "after" => "after"
@@ -1145,6 +1172,7 @@ and render_style_rule = (ident, sr: Style_rule.t): expression => {
       [(Nolabel, dl_expr)],
     );
   | [(Selector("&"),_),(Delim(":"),_),(Ident(pc),loc)] =>
+    /* single-colon pseudoclasses */
     let f = switch (pc) {
     | "checked" => "checked"
     | "disabled" => "disabled"
@@ -1176,33 +1204,29 @@ and render_style_rule = (ident, sr: Style_rule.t): expression => {
       ident,
       [(Nolabel, dl_expr)],
     );
-  | _ =>
-    let rec render_prelude_value = (s, (value, value_loc)) => {
-      switch (value) {
-      | Delim(":") => ":" ++ s
-      | Delim(v) => " " ++ v ++ " " ++ s;
-      | Ident(v)
-      | Operator(v)
-      | Number(v)
-      | Selector(v) =>
-        v ++ s;
-      | Dimension((number, dimension)) => /*<number><string> is parsed as Dimension */
-        number ++ dimension ++ " " ++ s
-      | Paren_block(c) =>
-        List.fold_left(
-          render_prelude_value,
-          "",
-          List.rev(c)
-        ) ++ s
-      | Function((f, _l), (args, _la)) =>
-        f ++ "(" ++ List.fold_left(
-          render_prelude_value,
-          ")",
-          List.rev(args)
-        )
-      | _ => grammar_error(value_loc, "Unexpected selector")
-      }
+  | [(Selector("&"),_),(Delim(":"),_),(Function((pc,loc),(args, _args_loc)),_f_loc)] =>
+    /* nth-child & friends */
+    let f = switch (pc) {
+    | "nth-child" => "nthChild"
+    | "nth-last-child" => "nthLastChild"
+    | "nth-of-type" => "nthOfType"
+    | "nth-last-of-type" => "nthLastOfType"
+    | _ => grammar_error(loc, "Unexpected pseudo-class")
     };
+    let ident = Exp.ident(~loc, {txt: Emotion.lident(f), loc});
+    let selector =
+      List.fold_left(
+        render_prelude_value,
+        "",
+        List.rev(args),
+      );
+    let selector_expr = string_to_const(~loc=prelude_loc, selector);
+    Exp.apply(
+      ~loc=sr.Style_rule.loc,
+      ident,
+      [(Nolabel, selector_expr), (Nolabel, dl_expr)],
+    );
+  | _ =>
     let selector =
       List.fold_left(
         render_prelude_value,
