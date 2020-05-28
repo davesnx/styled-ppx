@@ -6276,6 +6276,8 @@ module NestedSelectors = {
         {js|& > div:nth-child(even)|js},
         [Emotion.backgroundColor(Emotion.Css.Color.green)],
       ),
+      Emotion.active([Emotion.backgroundColor(Emotion.Css.Color.blue)]),
+      Emotion.hover([Emotion.backgroundColor(Emotion.Css.Color.pink)]),
     ]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};

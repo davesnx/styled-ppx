@@ -30,12 +30,18 @@ module App = [%styled.div (~background) => {j|
   & > a:nth-child(even) {
     background-color: red;
   }
+  &::active {
+    background-color: blue;
+  }
 |j}];
 
 module Link = [%styled.a {|
   color: #FFFFFF;
   font-size: 36px;
   margin-top: 16px;
+  &:hover {
+    background-color: pink;
+  }
 |}];
 
 module Line = [%styled.span];

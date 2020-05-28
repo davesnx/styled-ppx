@@ -1125,46 +1125,98 @@ and render_declaration_list = ((list, loc): Declaration_list.t, variables): expr
 }
 and render_style_rule = (ident, sr: Style_rule.t): expression => {
   let (prelude, prelude_loc) = sr.Style_rule.prelude;
-  let rec render_prelude_value = (s, (value, value_loc)) => {
-    switch (value) {
-    | Delim(":") => ":" ++ s
-    | Delim(v) => " " ++ v ++ " " ++ s;
-    | Ident(v)
-    | Operator(v)
-    | Number(v)
-    | Selector(v) =>
-      v ++ s;
-    | Dimension((number, dimension)) =>
-      number ++ dimension ++ " " ++ s
-    | Paren_block(c) =>
+  let dl_expr = render_declaration_list(sr.Style_rule.block, None);
+  switch (prelude) {
+  | [(Selector("&"),_),(Delim(":"),_),(Delim(":"),_),(Ident(pc),loc)] =>
+    let f = switch (pc) {
+    | "active" => "active"
+    | "after" => "after"
+    | "before" => "before"
+    | "first-line" => "firstLine"
+    | "first-letter" => "firstLetter"
+    | "selection" => "selection"
+    | "placeholder" => "placeholder"
+    | _ => grammar_error(loc, "Unexpected pseudo-class")
+    };
+    let ident = Exp.ident(~loc, {txt: Emotion.lident(f), loc});
+    Exp.apply(
+      ~loc=sr.Style_rule.loc,
+      ident,
+      [(Nolabel, dl_expr)],
+    );
+  | [(Selector("&"),_),(Delim(":"),_),(Ident(pc),loc)] =>
+    let f = switch (pc) {
+    | "checked" => "checked"
+    | "disabled" => "disabled"
+    | "first-child" => "firstChild"
+    | "first-of-type" => "firstOfType"
+    | "focus" => "focus"
+    | "hover" => "hover"
+    | "last-child" => "lastChild"
+    | "last-of-type" => "lastOfType"
+    | "link" => "link"
+    | "read-only" => "readOnly"
+    | "required" => "required"
+    | "visited" => "visited"
+    | "enabled" => "enabled"
+    | "empty" => "noContent"
+    | "default" => "default"
+    | "any-link" => "anyLink"
+    | "only-child" => "onlyChild"
+    | "only-of-type" => "onlyOfType"
+    | "optional" => "optional"
+    | "invalid" => "invalid"
+    | "out-of-range" => "outOfRange"
+    | "target" => "target"
+    | _ => grammar_error(loc, "Unexpected pseudo-class")
+    };
+    let ident = Exp.ident(~loc, {txt: Emotion.lident(f), loc});
+    Exp.apply(
+      ~loc=sr.Style_rule.loc,
+      ident,
+      [(Nolabel, dl_expr)],
+    );
+  | _ =>
+    let rec render_prelude_value = (s, (value, value_loc)) => {
+      switch (value) {
+      | Delim(":") => ":" ++ s
+      | Delim(v) => " " ++ v ++ " " ++ s;
+      | Ident(v)
+      | Operator(v)
+      | Number(v)
+      | Selector(v) =>
+        v ++ s;
+      | Dimension((number, dimension)) => /*<number><string> is parsed as Dimension */
+        number ++ dimension ++ " " ++ s
+      | Paren_block(c) =>
+        List.fold_left(
+          render_prelude_value,
+          "",
+          List.rev(c)
+        ) ++ s
+      | Function((f, _l), (args, _la)) =>
+        f ++ "(" ++ List.fold_left(
+          render_prelude_value,
+          ")",
+          List.rev(args)
+        )
+      | _ => grammar_error(value_loc, "Unexpected selector")
+      }
+    };
+    let selector =
       List.fold_left(
         render_prelude_value,
         "",
-        List.rev(c)
-      ) ++ s
-    | Function((f, _l), (args, _la)) =>
-      f ++ "(" ++ List.fold_left(
-        render_prelude_value,
-        ")",
-        List.rev(args)
-      )
-    | _ => grammar_error(value_loc, "Unexpected selector")
-    }
-  };
-  let selector =
-    List.fold_left(
-      render_prelude_value,
-      "",
-      List.rev(prelude),
+        List.rev(prelude),
+      );
+    let selector_expr = string_to_const(~loc=prelude_loc, selector);
+  
+    Exp.apply(
+      ~loc=sr.Style_rule.loc,
+      ident,
+      [(Nolabel, selector_expr), (Nolabel, dl_expr)],
     );
-  let selector_expr = string_to_const(~loc=prelude_loc, selector);
-  let dl_expr = render_declaration_list(sr.Style_rule.block, None);
-
-  Exp.apply(
-    ~loc=sr.Style_rule.loc,
-    ident,
-    [(Nolabel, selector_expr), (Nolabel, dl_expr)],
-  );
+  }
 }
 
 

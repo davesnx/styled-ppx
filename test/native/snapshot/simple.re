@@ -67,5 +67,11 @@ module NestedSelectors = [%styled.body
     background-color: green;
   }
 
+  &::active {
+    background-color: blue;
+  }
+  &:hover {
+    background-color: pink;
+  }
 |}
 ];
