@@ -21,7 +21,7 @@ let of_sedlex = (~file="<n/a>", ~pos=?, buf) => {
         Lexing.pos_fname: file,
         pos_lnum: 1, /* line number */
         pos_bol: 0, /* offset of beginning of current line */
-        pos_cnum: 0, /* total offset */
+        pos_cnum: 0 /* total offset */
       }
     | Some(p) => p
     };
