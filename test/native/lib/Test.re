@@ -123,67 +123,67 @@ describe("emit static css properties to bs-emotion", ({test, _}) => {
     (
       "align-items",
       [%expr [%css "align-items: center"]],
-      [%expr [Emotion.alignItems(Emotion.center)]],
+      [%expr [Css.alignItems(Css.center)]],
     ),
     (
       "box-sizing",
       [%expr [%css "box-sizing: border-box"]],
-      [%expr [Emotion.boxSizing(`borderBox)]],
+      [%expr [Css.boxSizing(`borderBox)]],
     ),
     (
       "box-sizing",
       [%expr [%css "box-sizing: content-box"]],
-      [%expr [Emotion.boxSizing(`contentBox)]],
+      [%expr [Css.boxSizing(`contentBox)]],
     ),
     (
       "color",
       [%expr [%css "color: #454545"]],
-      [%expr [Emotion.color(Emotion.hex({js|454545|js}))]],
+      [%expr [Css.color(Css.hex({js|454545|js}))]],
     ),
     (
       "color",
       [%expr [%css "color: red"]],
-      [%expr [Emotion.color(Emotion.Css.Color.red)]],
+      [%expr [Css.color(Css.red)]],
     ),
     (
       "display",
       [%expr [%css "display: flex"]],
-      [%expr [Emotion.display(`flex)]],
+      [%expr [Css.display(`flex)]],
     ),
     (
       "flex-direction",
       [%expr [%css "flex-direction: column"]],
-      [%expr [Emotion.flexDirection(Emotion.column)]],
+      [%expr [Css.flexDirection(Css.column)]],
     ),
     (
       "font-size",
       [%expr [%css "font-size: 30px"]],
-      [%expr [Emotion.fontSize(Emotion.px(30))]],
+      [%expr [Css.fontSize(Css.px(30))]],
     ),
     (
       "height",
       [%expr [%css "height: 100vh"]],
-      [%expr [Emotion.height(Emotion.vh(100.))]],
+      [%expr [Css.height(Css.vh(100.))]],
     ),
     (
       "justify-content",
       [%expr [%css "justify-content: center"]],
-      [%expr [Emotion.justifyContent(Emotion.center)]],
+      [%expr [Css.justifyContent(Css.center)]],
     ),
     (
       "margin",
       [%expr [%css "margin: 0"]],
-      [%expr [Emotion.margin(`zero)]]
+      [%expr [Css.margin(`zero)]]
     ),
     (
       "opacity",
       [%expr [%css "opacity: 0.9"]],
-      [%expr [Emotion.opacity(0.9)]],
+      [%expr [Css.opacity(0.9)]],
     ),
     (
       "width",
       [%expr [%css "width: 100vw"]],
-      [%expr [Emotion.width(Emotion.vw(100.))]],
+      [%expr [Css.width(Css.vw(100.))]],
     ),
   ];
 

@@ -38,7 +38,7 @@ module Option = {
 };
 
 module Emotion = {
-  let lident = name => Ldot(Lident("Emotion"), name);
+  let lident = name => Ldot(Lident("Css"), name);
 };
 
 let grammar_error = (loc, message) =>
@@ -189,10 +189,7 @@ let string_to_const = (~loc, s) =>
   Exp.constant(~loc, Const.string(~quotation_delimiter="js", s));
 
 let render_html_color = (~loc, v) =>
-  Exp.ident(
-    ~loc,
-    {txt: Ldot(Ldot(Emotion.lident("Css"), "Color"), v), loc},
-  );
+  Exp.ident(~loc, {txt: Emotion.lident(v), loc});
 
 let list_to_expr = (end_loc, xs) =>
   List.fold_left(
@@ -1286,7 +1283,7 @@ let render_emotion_css =
     ((list, loc): Declaration_list.t, variables): expression => {
   let declarationListValues =
     render_declaration_list((list, loc), variables);
-  let ident = Exp.ident(~loc, {txt: Emotion.lident("css"), loc});
+  let ident = Exp.ident(~loc, {txt: Emotion.lident("style"), loc});
 
   Exp.apply(~loc, ident, [(Nolabel, declarationListValues)]);
 };
