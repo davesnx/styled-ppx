@@ -2,7 +2,6 @@
   * Reference:
   * https://www.w3.org/TR/css-syntax-3/
   * https://github.com/yahoo/css-js/blob/master/src/l/css.3.l */
-
 open Migrate_parsetree;
 open Ast_408;
 
@@ -76,28 +75,28 @@ let token_to_string =
     ++ ")"
   | DIMENSION((n, d)) => "DIMENSION(" ++ n ++ ", " ++ d ++ ")"
   | VARIABLE(v) => "VARIABLE(" ++ v ++ ")"
-  | TYPED_VARIABLE((v, type_)) => "TYPED_VARIABLE(" ++ v ++ " " ++ type_ ++ ")";
+  | TYPED_VARIABLE((v, type_)) =>
+    "TYPED_VARIABLE(" ++ v ++ " " ++ type_ ++ ")";
 
 let () =
-    Location.register_error_of_exn(
-      fun
-      | LexingError((pos, msg)) => {
-          let loc = Lex_buffer.make_loc_and_fix(pos, pos);
-          Some(Location.error(~loc, msg));
-        }
-      | ParseError((token, start_pos, end_pos)) => {
-          let loc = Lex_buffer.make_loc_and_fix(start_pos, end_pos);
-          let msg =
-            Printf.sprintf(
-              "Parse error while reading token '%s'",
-              token_to_string(token),
-            );
-          Some(Location.error(~loc, msg));
-        }
-      | GrammarError((msg, loc)) =>
-        Some(Location.error(~loc, msg))
-      | _ => None,
-    );
+  Location.register_error_of_exn(
+    fun
+    | LexingError((pos, msg)) => {
+        let loc = Lex_buffer.make_loc_and_fix(pos, pos);
+        Some(Location.error(~loc, msg));
+      }
+    | ParseError((token, start_pos, end_pos)) => {
+        let loc = Lex_buffer.make_loc_and_fix(start_pos, end_pos);
+        let msg =
+          Printf.sprintf(
+            "Parse error while reading token '%s'",
+            token_to_string(token),
+          );
+        Some(Location.error(~loc, msg));
+      }
+    | GrammarError((msg, loc)) => Some(Location.error(~loc, msg))
+    | _ => None,
+  );
 
 /* Regexes */
 let newline = [%sedlex.regexp? '\n' | "\r\n" | '\r' | '\012'];
@@ -106,18 +105,19 @@ let white_space = [%sedlex.regexp? " " | '\t' | newline];
 
 let white_spaces = [%sedlex.regexp? Star(white_space)];
 
-let hex_digit = [%sedlex.regexp? '0'..'9' | 'a'..'f' | 'A'..'F'];
+let hex_digit = [%sedlex.regexp? '0' .. '9' | 'a' .. 'f' | 'A' .. 'F'];
 
-let digit = [%sedlex.regexp? '0'..'9'];
+let digit = [%sedlex.regexp? '0' .. '9'];
 
-let non_ascii = [%sedlex.regexp? '\160'..'\255'];
+let non_ascii = [%sedlex.regexp? '\160' .. '\255'];
 
 let up_to_6_hex_digits = [%sedlex.regexp? Rep(hex_digit, 1 .. 6)];
 
 let unicode = [%sedlex.regexp? ('\\', up_to_6_hex_digits, Opt(white_space))];
 
 let unicode_range = [%sedlex.regexp?
-  Rep(hex_digit | '?', 1 .. 6) | (up_to_6_hex_digits, '-', up_to_6_hex_digits)
+  Rep(hex_digit | '?', 1 .. 6) |
+  (up_to_6_hex_digits, '-', up_to_6_hex_digits)
 ];
 
 let escape = [%sedlex.regexp?
@@ -125,18 +125,16 @@ let escape = [%sedlex.regexp?
 ];
 
 let ident_start = [%sedlex.regexp?
-  '_' | 'a'..'z' | 'A'..'Z' | '$' | non_ascii | escape
+  '_' | 'a' .. 'z' | 'A' .. 'Z' | '$' | non_ascii | escape
 ];
 
 let ident_char = [%sedlex.regexp?
-  '_' | 'a'..'z' | 'A'..'Z' | '0'..'9' | '-' | non_ascii | escape
+  '_' | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' | non_ascii | escape
 ];
 
 let ident = [%sedlex.regexp? (Opt('-'), ident_start, Star(ident_char))];
 
-let variable = [%sedlex.regexp?
-  ('$', Opt('('), Star(ident_char), Opt(')'))
-];
+let variable = [%sedlex.regexp? ('$', Opt('('), Star(ident_char), Opt(')'))];
 
 let variable_with_type = [%sedlex.regexp?
   ('$', '(', Star(ident_char), ')', Star(ident_char))
@@ -169,16 +167,11 @@ let number = [%sedlex.regexp?
     Opt('.', Plus(digit)),
     Opt('e' | 'E', '+' | '-', Plus(digit)),
   ) |
-  (
-    Opt('-'),
-    '.',
-    Plus(digit),
-    Opt('e' | 'E', '+' | '-', Plus(digit)),
-  )
+  (Opt('-'), '.', Plus(digit), Opt('e' | 'E', '+' | '-', Plus(digit)))
 ];
 
 let non_printable = [%sedlex.regexp?
-  '\000'..'\b' | '\011' | '\014'..'\031' | '\127'
+  '\000' .. '\b' | '\011' | '\014' .. '\031' | '\127'
 ];
 
 let url_unquoted = [%sedlex.regexp?
@@ -267,9 +260,7 @@ let discard_comments_and_white_spaces = buf => {
   and discard_comments = buf =>
     switch%sedlex (buf) {
     | eof =>
-      raise(
-        LexingError((buf.Lex_buffer.pos, "Unterminated comment at EOF"))
-      )
+      raise(LexingError((buf.Lex_buffer.pos, "Unterminated comment at EOF")))
     | "*/" => discard_white_spaces(buf)
     | any => discard_comments(buf)
     | _ => assert(false)
@@ -293,15 +284,19 @@ let rec get_next_token = buf => {
   | ']' => RIGHT_BRACKET
   | '%' => PERCENTAGE
   | variable => VARIABLE(Lex_buffer.latin1(~skip=1, buf))
-  | variable_with_type => {
-      let variableAndType = Lex_buffer.latin1(~skip=2, buf); /* cosa)type */
-      let variableAndTypeLength = String.length(variableAndType);
-      let closedParentesisIndex = String.index(variableAndType, ')');
-      let variableName = String.sub(variableAndType, 0, closedParentesisIndex);
-      let variableType = String.sub(variableAndType, closedParentesisIndex + 1, variableAndTypeLength - closedParentesisIndex - 1);
+  | variable_with_type =>
+    let variableAndType = Lex_buffer.latin1(~skip=2, buf); /* cosa)type */
+    let variableAndTypeLength = String.length(variableAndType);
+    let closedParentesisIndex = String.index(variableAndType, ')');
+    let variableName = String.sub(variableAndType, 0, closedParentesisIndex);
+    let variableType =
+      String.sub(
+        variableAndType,
+        closedParentesisIndex + 1,
+        variableAndTypeLength - closedParentesisIndex - 1,
+      );
 
-      TYPED_VARIABLE((variableName, variableType))
-  }
+    TYPED_VARIABLE((variableName, variableType));
   | '&' => SELECTOR("&")
   | operator => OPERATOR(Lex_buffer.latin1(buf))
   | string => STRING(Lex_buffer.latin1(~skip=1, ~drop=1, buf))
@@ -378,9 +373,4 @@ let parse_string = (~container_lnum=?, ~pos=?, s, p) => {
 };
 
 let parse_declaration_list = (~container_lnum=?, ~pos=?, css) =>
-  parse_string(
-    ~container_lnum?,
-    ~pos?,
-    css,
-    Css_parser.declaration_list,
-  );
+  parse_string(~container_lnum?, ~pos?, css, Css_parser.declaration_list);

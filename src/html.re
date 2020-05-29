@@ -119,7 +119,7 @@ let tags = [
   "ul",
   "var",
   "video",
-  "wbr"
+  "wbr",
 ];
 
 let colorList = [
@@ -274,4 +274,3 @@ let colorList = [
 ];
 
 let isColor = color => List.exists(c => c == color, colorList);
-
