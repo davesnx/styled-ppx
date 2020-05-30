@@ -2679,11 +2679,7 @@ module Component = {
     (string, Js.t({..}), array(React.element)) => React.element =
     "createElement";
 
-  let styles =
-    Css.style([
-      Css.p([@reason.raw_literal] "color", var),
-      Css.display(`block),
-    ]);
+  let styles = Css.style([Css.unsafe("color", var), Css.display(`block)]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
@@ -6250,18 +6246,21 @@ module NestedSelectors = {
     Css.style([
       Css.display(`flex),
       Css.justifyContent(Css.center),
-      Css.select({js|& > a|js}, [Css.backgroundColor(Css.green)]),
-      Css.nthChild({js|even|js}, [Css.backgroundColor(Css.red)]),
-      Css.select(
+      Css.selector({js|& > a|js}, [Css.backgroundColor(Css.green)]),
+      Css.selector(
+        {js|&:nth-child(even)|js},
+        [Css.backgroundColor(Css.red)],
+      ),
+      Css.selector(
         {js|& > div:nth-child(3n  + 1)|js},
         [Css.backgroundColor(Css.red)],
       ),
-      Css.select({js|& > div|js}, [Css.padding(Css.px(20))]),
-      Css.select(
+      Css.selector({js|& > div|js}, [Css.padding(Css.px(20))]),
+      Css.selector(
         {js|& > div:nth-child(3n  + 1)|js},
         [Css.backgroundColor(Css.green)],
       ),
-      Css.select(
+      Css.selector(
         {js|& > div:nth-child(even)|js},
         [Css.backgroundColor(Css.green)],
       ),

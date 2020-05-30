@@ -167,22 +167,12 @@ let float_to_const = number => {
   Const.float(number);
 };
 
-let raw_literal = (~loc, str) =>
-  Exp.constant(
-    ~loc,
-    ~attrs=[Attr.mk({txt: "reason.raw_literal", loc}, PStr([]))],
-    Pconst_string(str, None),
-  );
-
 /* let p = (prop, value) => [(prop, value)]->Declaration.pack; */
 let render_unsafe = (~loc, proproperty, value) => {
-  let unsafeFnP = Exp.ident(~loc, {txt: Emotion.lident("p"), loc});
+  let unsafeFnP = Exp.ident(~loc, {txt: Emotion.lident("unsafe"), loc});
+  let labelName = Exp.constant(Pconst_string(proproperty, None));
 
-  Exp.apply(
-    ~loc,
-    unsafeFnP,
-    [(Nolabel, raw_literal(~loc, proproperty)), (Nolabel, value)],
-  );
+  Exp.apply(~loc, unsafeFnP, [(Nolabel, labelName), (Nolabel, value)]);
 };
 
 let string_to_const = (~loc, s) =>
@@ -1163,7 +1153,7 @@ and render_declarations =
       | Declaration_list.At_rule(ar) => render_at_rule(ar)
       | Declaration_list.Style_rule(ar) =>
         let loc: Location.t = ar.loc;
-        let ident = Exp.ident(~loc, {txt: Emotion.lident("select"), loc});
+        let ident = Exp.ident(~loc, {txt: Emotion.lident("selector"), loc});
         render_style_rule(ident, ar);
       },
     ds,
@@ -1247,19 +1237,13 @@ and render_style_rule = (ident, sr: Style_rule.t): expression => {
   | [
       (Selector("&"), _),
       (Delim(":"), _),
-      (Function((pc, loc), (args, _args_loc)), _f_loc),
+      (Function((_pc, loc), (_args, _args_loc)), _f_loc),
     ] =>
     /* nth-child & friends */
-    let f =
-      switch (pc) {
-      | "nth-child" => "nthChild"
-      | "nth-last-child" => "nthLastChild"
-      | "nth-of-type" => "nthOfType"
-      | "nth-last-of-type" => "nthLastOfType"
-      | _ => grammar_error(loc, "Unexpected pseudo-class")
-      };
-    let ident = Exp.ident(~loc, {txt: Emotion.lident(f), loc});
-    let selector = List.fold_left(render_prelude_value, "", List.rev(args));
+    // TODO: parses and use the correct functions instead of just strings selector
+    let ident = Exp.ident(~loc, {txt: Emotion.lident("selector"), loc});
+    let selector =
+      List.fold_left(render_prelude_value, "", List.rev(prelude));
     let selector_expr = string_to_const(~loc=prelude_loc, selector);
     Exp.apply(
       ~loc=sr.Style_rule.loc,
