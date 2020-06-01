@@ -50,5 +50,28 @@ module NestedSelectors = [%styled.body
   & > a {
     background-color: green;
   }
+  &:nth-child(even) {
+    background-color: red;
+  }
+  & > div:nth-child(3n+1) {
+    background-color: red;
+  }
+
+  & > div {
+    padding: 20px;
+  }
+  & > div:nth-child(3n+1) {
+    background-color: green;
+  }
+  & > div:nth-child(even) {
+    background-color: green;
+  }
+
+  &::active {
+    background-color: blue;
+  }
+  &:hover {
+    background-color: pink;
+  }
 |}
 ];
