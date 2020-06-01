@@ -19,7 +19,7 @@
 
   -- Emotion output
   Emotion.(css([display(`block)]))
-*/
+ */
 open Migrate_parsetree;
 open Ast_408;
 open Ast_helper;
@@ -29,11 +29,12 @@ open Longident;
 open Css_types;
 open Component_value;
 
-module Option {
-  let get = (opt, def) => switch (opt) {
+module Option = {
+  let get = (opt, def) =>
+    switch (opt) {
     | None => def
     | Some(o) => o
-  };
+    };
 };
 
 module Emotion = {
@@ -189,7 +190,10 @@ let string_to_const = (~loc, s) =>
   Exp.constant(~loc, Const.string(~quotation_delimiter="js", s));
 
 let render_html_color = (~loc, v) =>
-  Exp.ident(~loc, {txt: Ldot(Ldot(Emotion.lident("Css"), "Color"), v), loc: loc});
+  Exp.ident(
+    ~loc,
+    {txt: Ldot(Ldot(Emotion.lident("Css"), "Color"), v), loc},
+  );
 
 let list_to_expr = (end_loc, xs) =>
   List.fold_left(
@@ -315,7 +319,6 @@ let is_length = value =>
   | _ => false
   };
 
-
 let is_color = value =>
   switch (value) {
   | Function(("rgb", _), _)
@@ -340,18 +343,18 @@ let is_line_width = value =>
   };
 
 /* let is_variable = value =>
-  switch (value) {
-  | Variable(_v) => true
-  | _ => false
-  };
- */
+   switch (value) {
+   | Variable(_v) => true
+   | _ => false
+   };
+   */
 
 /* let is_typed_variable = value =>
-  switch (value) {
-  | TypedVariable((_v, _type)) => true
-  | _ => false
-  };
- */
+   switch (value) {
+   | TypedVariable((_v, _type)) => true
+   | _ => false
+   };
+   */
 let is_line_style = value =>
   switch (value) {
   | Ident(i) =>
@@ -595,7 +598,7 @@ let rec render_value = ((cv, loc): with_loc(t)): expression => {
     let ident = Exp.ident(~loc, {txt: Emotion.lident("pct"), loc});
     let arg = Exp.constant(~loc, float_to_const(p));
     Exp.apply(~loc, ident, [(Nolabel, arg)]);
-  | Ident(i) when Html.isColor(i) => render_html_color(~loc, i);
+  | Ident(i) when Html.isColor(i) => render_html_color(~loc, i)
   | Ident(i) =>
     let name = to_caml_case(i);
     if (is_variant(i)) {
@@ -634,12 +637,17 @@ let rec render_value = ((cv, loc): with_loc(t)): expression => {
   | Unicode_range(_) => grammar_error(loc, "Unsupported unicode range")
   | Operator(_) => grammar_error(loc, "Unsupported operator")
   | Delim(_) => grammar_error(loc, "Unsupported delimiter")
-  | TypedVariable((variable, func)) => {
+  | TypedVariable((variable, func)) =>
     let ident = Exp.ident(~loc, {txt: Emotion.lident(func), loc});
     let arg = string_to_const(~loc, variable);
     Exp.apply(~loc, ident, [(Nolabel, arg)]);
-  }
-  | Variable(x) => grammar_error(loc, "Unsupported variable in here, you wrote this: " ++ x ++ ". If you think that's a bug, please open an issue https://github.com/davesnx/styled-ppx/issues/new")
+  | Variable(x) =>
+    grammar_error(
+      loc,
+      "Unsupported variable in here, you wrote this: "
+      ++ x
+      ++ ". If you think that's a bug, please open an issue https://github.com/davesnx/styled-ppx/issues/new",
+    )
   };
 }
 and render_at_rule = (ar: At_rule.t): expression =>
@@ -671,7 +679,8 @@ and render_at_rule = (ar: At_rule.t): expression =>
                 | (_, loc) =>
                   grammar_error(loc, "Unexpected @keyframes prelude")
                 };
-              let block_expr = render_declaration_list(sr.Style_rule.block, None);
+              let block_expr =
+                render_declaration_list(sr.Style_rule.block, None);
               let tuple =
                 Exp.tuple(
                   ~loc=sr.Style_rule.loc,
@@ -707,14 +716,23 @@ and render_at_rule = (ar: At_rule.t): expression =>
   | (n, _) =>
     grammar_error(ar.At_rule.loc, "At-rule @" ++ n ++ " not supported")
   }
-and render_declaration = (d: Declaration.t, d_loc: Location.t, _variables: list((string, string))): expression => {
+and render_declaration =
+    (
+      d: Declaration.t,
+      d_loc: Location.t,
+      _variables: list((string, string)),
+    )
+    : expression => {
   let (name, name_loc) = d.Declaration.name;
   let fnName = to_caml_case(name);
 
   let render_standard_declaration = (fnName, valueList) => {
     let args = List.map(render_value, valueList);
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Emotion.lident(fnName), loc: name_loc});
+      Exp.ident(
+        ~loc=name_loc,
+        {txt: Emotion.lident(fnName), loc: name_loc},
+      );
     Exp.apply(~loc=d_loc, ident, List.map(a => (Nolabel, a), args));
   };
 
@@ -791,15 +809,18 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t, _variables: list(
   /* https://developer.mozilla.org/en-US/docs/Web/CSS/box-shadow */
   let render_shadow = (name, params, loc) => {
     let text_shadow_args = ((grouped_param, _)) =>
-      List.fold_right((cv, args) => [render_value(cv), ...args], grouped_param, []);
+      List.fold_right(
+        (cv, args) => [render_value(cv), ...args],
+        grouped_param,
+        [],
+      );
 
     let grouped_params = group_params(params);
     let args =
       List.rev_map(params => text_shadow_args(params), grouped_params);
     let ident =
       Exp.ident(~loc=name_loc, {txt: Emotion.lident(name), loc: name_loc});
-    let text_shadow_list =
-      List.map(arg => Exp.tuple(~loc, arg), args);
+    let text_shadow_list = List.map(arg => Exp.tuple(~loc, arg), args);
 
     Exp.apply(
       ident,
@@ -865,7 +886,7 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t, _variables: list(
     Exp.apply(ident, [(Nolabel, list_to_expr(name_loc, transition_list))]);
   };
 
-  let render_transform = (vs, loc) => {
+  let render_transform = (vs, loc) =>
     if (List.length(vs) == 1) {
       render_standard_declaration(fnName, vs);
     } else {
@@ -878,7 +899,6 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t, _variables: list(
         );
       Exp.apply(~loc=d_loc, ident, [(Nolabel, arg)]);
     };
-  };
 
   let render_font_family = (vs, loc) => {
     let font_family_args = ((params, _)) => {
@@ -910,7 +930,10 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t, _variables: list(
     let args =
       List.rev_map(params => font_family_args(params), grouped_params);
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Emotion.lident("fontFamily"), loc: name_loc});
+      Exp.ident(
+        ~loc=name_loc,
+        {txt: Emotion.lident("fontFamily"), loc: name_loc},
+      );
     Exp.apply(
       ~loc=name_loc,
       ident,
@@ -932,7 +955,10 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t, _variables: list(
       };
 
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Emotion.lident(fnName), loc: name_loc});
+      Exp.ident(
+        ~loc=name_loc,
+        {txt: Emotion.lident(fnName), loc: name_loc},
+      );
     Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
   };
 
@@ -950,7 +976,10 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t, _variables: list(
       };
 
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Emotion.lident(fnName), loc: name_loc});
+      Exp.ident(
+        ~loc=name_loc,
+        {txt: Emotion.lident(fnName), loc: name_loc},
+      );
     Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
   };
 
@@ -973,7 +1002,10 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t, _variables: list(
       };
 
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Emotion.lident(fnName), loc: name_loc});
+      Exp.ident(
+        ~loc=name_loc,
+        {txt: Emotion.lident(fnName), loc: name_loc},
+      );
     Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
   };
 
@@ -998,7 +1030,10 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t, _variables: list(
     let args = border_outline_args(params, loc);
     let fnName2 = fnName ++ "2";
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Emotion.lident(fnName2), loc: name_loc});
+      Exp.ident(
+        ~loc=name_loc,
+        {txt: Emotion.lident(fnName2), loc: name_loc},
+      );
     Exp.apply(ident, args);
   };
 
@@ -1008,7 +1043,10 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t, _variables: list(
       parameter_count > 1 ? fnName ++ string_of_int(parameter_count) : fnName;
 
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Emotion.lident(fnNameN), loc: name_loc});
+      Exp.ident(
+        ~loc=name_loc,
+        {txt: Emotion.lident(fnNameN), loc: name_loc},
+      );
     let args = List.map(v => (Nolabel, render_value(v)), vs);
     Exp.apply(~loc=d_loc, ident, args);
   };
@@ -1026,7 +1064,10 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t, _variables: list(
       };
 
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Emotion.lident("opacity"), loc: name_loc});
+      Exp.ident(
+        ~loc=name_loc,
+        {txt: Emotion.lident("opacity"), loc: name_loc},
+      );
     Exp.apply(~loc=name_loc, ident, [(Nolabel, arg)]);
   };
 
@@ -1064,45 +1105,49 @@ and render_declaration = (d: Declaration.t, d_loc: Location.t, _variables: list(
     let args = [(Nolabel, Exp.variant(~loc, "some", Some(expression)))];
 
     let ident =
-      Exp.ident(~loc=name_loc, {txt: Emotion.lident(fnName), loc: name_loc});
+      Exp.ident(
+        ~loc=name_loc,
+        {txt: Emotion.lident(fnName), loc: name_loc},
+      );
     Exp.apply(~loc=name_loc, ident, args);
   };
 
   let (valueList, loc) = d.Declaration.value;
 
-  let newValueList = List.map((value) => value, valueList);
+  let newValueList = List.map(value => value, valueList);
 
   /* TODO: Right know we only support variables with functions that
-  accepts only one argument, in order to change/improve that, we need to
-  "render" variables/typed_variables and static params.
-   */
+     accepts only one argument, in order to change/improve that, we need to
+     "render" variables/typed_variables and static params.
+      */
   switch (List.nth(valueList, 0)) {
-    | (Variable(v), _loc) => render_unsafe(~loc, name, v)
-    | _ => switch (name) {
-      /* | "animation" => render_animation(newValueList, loc) */
-      | "box-shadow" => render_shadow("boxShadows", newValueList, loc)
-      | "text-shadow" => render_shadow("textShadows", newValueList, loc)
-      | "transform" => render_transform(newValueList, loc)
-      | "transition" => render_transition(newValueList, loc)
-      | "font-family" => render_font_family(newValueList, loc)
-      | "z-index" => render_z_index(newValueList, loc)
-      | "stroke-opacity"
-      | "stop-opacity"
-      | "flood-opacity"
-      | "fill-opacity"
-      | "opacity" => render_opacity(newValueList, loc)
-      | "flex-grow"
-      | "flex-shrink" => render_flex_grow_shrink(newValueList, loc)
-      | "font-weight" => render_font_weight(newValueList, loc)
-      | "flex" => render_flex(newValueList, loc)
-      | "padding"
-      | "margin" => render_margin_padding(newValueList, loc)
-      | "border"
-      | "outline" when List.length(fst(d.Declaration.value)) == 2 =>
-        render_border_outline(newValueList, loc)
-  | _ => render_standard_declaration(fnName, valueList)
+  | (Variable(v), _loc) => render_unsafe(~loc, name, v)
+  | _ =>
+    switch (name) {
+    /* | "animation" => render_animation(newValueList, loc) */
+    | "box-shadow" => render_shadow("boxShadows", newValueList, loc)
+    | "text-shadow" => render_shadow("textShadows", newValueList, loc)
+    | "transform" => render_transform(newValueList, loc)
+    | "transition" => render_transition(newValueList, loc)
+    | "font-family" => render_font_family(newValueList, loc)
+    | "z-index" => render_z_index(newValueList, loc)
+    | "stroke-opacity"
+    | "stop-opacity"
+    | "flood-opacity"
+    | "fill-opacity"
+    | "opacity" => render_opacity(newValueList, loc)
+    | "flex-grow"
+    | "flex-shrink" => render_flex_grow_shrink(newValueList, loc)
+    | "font-weight" => render_font_weight(newValueList, loc)
+    | "flex" => render_flex(newValueList, loc)
+    | "padding"
+    | "margin" => render_margin_padding(newValueList, loc)
+    | "border"
+    | "outline" when List.length(fst(d.Declaration.value)) == 2 =>
+      render_border_outline(newValueList, loc)
+    | _ => render_standard_declaration(fnName, valueList)
     }
-  }
+  };
 }
 and render_declarations =
     (ds: list(Declaration_list.kind), variables): list(expression) =>
@@ -1113,13 +1158,14 @@ and render_declarations =
         render_declaration(decl, decl.loc, Option.get(variables, []))
       | Declaration_list.At_rule(ar) => render_at_rule(ar)
       | Declaration_list.Style_rule(ar) =>
-        let (loc: Location.t) = ar.loc;
+        let loc: Location.t = ar.loc;
         let ident = Exp.ident(~loc, {txt: Emotion.lident("select"), loc});
-        render_style_rule(ident, ar)
+        render_style_rule(ident, ar);
       },
     ds,
   )
-and render_declaration_list = ((list, loc): Declaration_list.t, variables): expression => {
+and render_declaration_list =
+    ((list, loc): Declaration_list.t, variables): expression => {
   let expr_with_loc_list = render_declarations(list, variables);
   list_to_expr(loc, expr_with_loc_list);
 }
@@ -1135,7 +1181,8 @@ and render_style_rule = (ident, sr: Style_rule.t): expression => {
     | Number(v)
     | Selector(v) =>
       v ++ s;
-    | Dimension((number, dimension)) => /*<number><string> is parsed as Dimension */
+    /*<number><string> is parsed as Dimension */
+    | Dimension((number, dimension)) =>
       number ++ dimension ++ " " ++ s
     | Paren_block(c) =>
       List.fold_left(
@@ -1153,8 +1200,8 @@ and render_style_rule = (ident, sr: Style_rule.t): expression => {
     }
   };
   switch (prelude) {
+  /* two-colons pseudoclasses */
   | [(Selector("&"),_),(Delim(":"),_),(Delim(":"),_),(Ident(pc),loc)] =>
-    /* two-colons pseudoclasses */
     let f = switch (pc) {
     | "active" => "active"
     | "after" => "after"
@@ -1234,18 +1281,19 @@ and render_style_rule = (ident, sr: Style_rule.t): expression => {
         List.rev(prelude),
       );
     let selector_expr = string_to_const(~loc=prelude_loc, selector);
-  
+
     Exp.apply(
       ~loc=sr.Style_rule.loc,
       ident,
       [(Nolabel, selector_expr), (Nolabel, dl_expr)],
     );
   }
-}
+};
 
-
-let render_emotion_css = ((list, loc): Declaration_list.t, variables): expression => {
-  let declarationListValues = render_declaration_list((list, loc), variables);
+let render_emotion_css =
+    ((list, loc): Declaration_list.t, variables): expression => {
+  let declarationListValues =
+    render_declaration_list((list, loc), variables);
   let ident = Exp.ident(~loc, {txt: Emotion.lident("css"), loc});
 
   Exp.apply(~loc, ident, [(Nolabel, declarationListValues)]);
@@ -1255,24 +1303,28 @@ let render_rule = (ident, r: Rule.t): expression => {
   switch (r) {
   | Rule.Style_rule(sr) => render_style_rule(ident, sr)
   | Rule.At_rule(ar) => render_at_rule(ar)
-  }
+  };
 };
 
 let render_global = ((ruleList, loc): Stylesheet.t): expression => {
   let emotionGlobal = Exp.ident(~loc, {txt: Emotion.lident("global"), loc});
 
   switch (ruleList) {
-    /* There's only one rule: */
-    | [rule] => render_rule(emotionGlobal, rule)
-    /* There's more than one */
-    | [..._res] => grammar_error(loc, {|
+  /* There's only one rule: */
+  | [rule] => render_rule(emotionGlobal, rule)
+  /* There's more than one */
+  | _res =>
+    grammar_error(
+      loc,
+      {|
       styled.global only supports one style selector, add one styled.global per selector.
 
       Like following:
 
         [%styled.global ""];
         [%styled.global ""];
-    |})
-    /* TODO: Add rule to string to finish this error message */
-  }
+    |},
+    )
+  /* TODO: Add rule to string to finish this error message */
+  };
 };
