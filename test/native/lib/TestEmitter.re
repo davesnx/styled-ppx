@@ -15,7 +15,9 @@ let compare = (result, expected, {expect, _}) => {
   expect.string(result).toEqual(expected);
 };
 
-let static_css_tests = [
+// TODO: ideas, selectors . properties, to have a bigger test matrix
+// somehow programatically generate strings to test css
+let properties_static_css_tests = [
   (
     [%expr [%css "align-items: center"]],
     [%expr [Css.alignItems(Css.center)]],
@@ -49,19 +51,54 @@ let static_css_tests = [
   ([%expr [%css "opacity: 0.9"]], [%expr [Css.opacity(0.9)]]),
   ([%expr [%css "width: 100vw"]], [%expr [Css.width(Css.vw(100.))]]),
 ];
-
+let selectors_static_css_tests = [
+  (
+    [%expr [%css "& > a { color: green; }"]],
+    [%expr [Css.selector({js|& > a|js}, [Css.color(Css.green)])]],
+  ),
+  (
+    [%expr [%css "&:nth-child(even) { color: red; }"]],
+    [%expr
+      [Css.selector({js|&:nth-child(even)|js}, [Css.color(Css.red)])]
+    ],
+  ),
+  (
+    [%expr [%css "& > div:nth-child(3n+1) { color: blue; }"]],
+    [%expr
+      [
+        Css.selector(
+          {js|& > div:nth-child(3n  + 1)|js},
+          [Css.color(Css.blue)],
+        ),
+      ]
+    ],
+  ),
+  (
+    [%expr [%css "&::active { color: brown; }"]],
+    [%expr [Css.active([Css.color(Css.brown)])]],
+  ),
+  (
+    [%expr [%css "&:hover { color: gray; }"]],
+    [%expr [Css.hover([Css.color(Css.gray)])]],
+  ),
+];
 describe("emit bs-css from static [%css]", ({test, _}) => {
-  let test = (index, (result, expected)) =>
-    test("static css: " ++ string_of_int(index), compare(result, expected));
-  List.iteri(test, static_css_tests);
+  let test = (prefix, index, (result, expected)) =>
+    test(prefix ++ string_of_int(index), compare(result, expected));
+
+  List.iteri(test("properties static: "), properties_static_css_tests);
+  List.iteri(test("selectors static: "), selectors_static_css_tests);
 });
 
-let var_css_tests = [
+let properties_variable_css_tests = [
   ([%expr [%css "color: $var"]], [%expr [Css.unsafe("color", var)]]),
   ([%expr [%css "margin: $var"]], [%expr [Css.unsafe("margin", var)]]),
 ];
 describe("emit bs-css from variable [%css]", ({test, _}) => {
   let test = (index, (result, expected)) =>
-    test("variable: " ++ string_of_int(index), compare(result, expected));
-  List.iteri(test, var_css_tests);
+    test(
+      "simple variable: " ++ string_of_int(index),
+      compare(result, expected),
+    );
+  List.iteri(test, properties_variable_css_tests);
 });
