@@ -1,0 +1,21 @@
+[@deriving show]
+type token =
+  | INT(int)
+  | STRING(string)
+  | LOWER_THAN
+  | GREATER_THAN
+  | QUOTE
+  | DOUBLE_AMPERSAND
+  | DOUBLE_BAR
+  | BAR
+  | LEFT_BRACKET
+  | RIGHT_BRACKET
+  | ASTERISK
+  | PLUS
+  | QUESTION_MARK
+  | LEFT_BRACE
+  | RIGHT_BRACE
+  | COMMA
+  | HASH
+  | EXCLAMATION_POINT
+  | EOF;
