@@ -1,0 +1,11 @@
+(menhir
+ (flags --external-tokens Tokens)
+ (modules Parser))
+
+(executable
+ (name reason_css_vds)
+ (public_name reason-css-vds)
+ (package reason-css-vds)
+ (libraries sedlex menhirLib)
+ (preprocess
+  (pps sedlex.ppx ppx_deriving.show)))
