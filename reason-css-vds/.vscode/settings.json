@@ -1,3 +1,7 @@
 {
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "ocaml.sandbox": {
+    "root": "/home/eduardo/reason/reason-css-vds",
+    "kind": "esy"
+  }
 }
