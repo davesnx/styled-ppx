@@ -10,53 +10,53 @@ let compare_ast = (expected, result, {expect, _}) => {
 let parse_tests = [
   (
     "A? B? C?",
-    Static(
-      Static(Keyword("A", Optional), Keyword("B", Optional)),
+    Static([
+      Keyword("A", Optional),
+      Keyword("B", Optional),
       Keyword("C", Optional),
-    ),
+    ]),
   ),
   (
     "[ A? B? C? ]!",
     Group(
-      Static(
-        Static(Keyword("A", Optional), Keyword("B", Optional)),
+      Static([
+        Keyword("A", Optional),
+        Keyword("B", Optional),
         Keyword("C", Optional),
-      ),
+      ]),
       At_least_one,
     ),
   ),
   (
     "A B C",
-    Static(
-      Static(Keyword("A", One), Keyword("B", One)),
-      Keyword("C", One),
-    ),
+    Static([Keyword("A", One), Keyword("B", One), Keyword("C", One)]),
   ),
   (
     "A? || B? || C?",
-    Or(
-      Or(Keyword("A", Optional), Keyword("B", Optional)),
+    Or([
+      Keyword("A", Optional),
+      Keyword("B", Optional),
       Keyword("C", Optional),
-    ),
+    ]),
   ),
   (
     "A || B || C",
-    Or(Or(Keyword("A", One), Keyword("B", One)), Keyword("C", One)),
+    Or([Keyword("A", One), Keyword("B", One), Keyword("C", One)]),
   ),
   (
     "A && B && C",
-    And(And(Keyword("A", One), Keyword("B", One)), Keyword("C", One)),
+    And([Keyword("A", One), Keyword("B", One), Keyword("C", One)]),
   ),
   // groups
   ("[A]", Keyword("A", One)),
-  ("[A && B]", And(Keyword("A", One), Keyword("B", One))),
+  ("[A && B]", And([Keyword("A", One), Keyword("B", One)])),
   (
     "A && [B && C]",
-    And(Keyword("A", One), And(Keyword("B", One), Keyword("C", One))),
+    And([Keyword("A", One), And([Keyword("B", One), Keyword("C", One)])]),
   ),
   (
     "[A && B] && C",
-    And(And(Keyword("A", One), Keyword("B", One)), Keyword("C", One)),
+    And([And([Keyword("A", One), Keyword("B", One)]), Keyword("C", One)]),
   ),
   // multipliers
   ("A*", Keyword("A", Zero_or_more)),

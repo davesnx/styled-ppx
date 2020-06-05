@@ -53,17 +53,18 @@ let rec value_to_string = value => {
   let child = child =>
     child_needs_brackets(value, child)
       ? "[ " ++ value_to_string(child) ++ " ]" : value_to_string(child);
-
+  let childs = (sep, childs) =>
+    childs |> List.map(child) |> String.concat(sep);
   let (string, multiplier) =
     switch (value) {
     | Keyword(name, m) => (name, Some(m))
     | Data_type(name, m) => ("<" ++ name ++ ">", Some(m))
     | Property_type(name, m) => ("<'" ++ name ++ "'>", Some(m))
     | Group(v1, m) => (child(v1), Some(m))
-    | Static(v1, v2) => (child(v1) ++ " " ++ child(v2), None)
-    | And(v1, v2) => (child(v1) ++ " && " ++ child(v2), None)
-    | Or(v1, v2) => (child(v1) ++ " || " ++ child(v2), None)
-    | Xor(v1, v2) => (child(v1) ++ " | " ++ child(v2), None)
+    | Static(vs) => (childs(" ", vs), None)
+    | And(vs) => (childs(" && ", vs), None)
+    | Or(vs) => (childs(" || ", vs), None)
+    | Xor(vs) => (childs(" | ", vs), None)
     };
 
   switch (value, multiplier) {
@@ -77,4 +78,12 @@ let rec value_to_string = value => {
   };
 };
 let value_of_string = string =>
-  Sedlexing.Utf8.from_string(string) |> provider |> value_of_lex;
+  Sedlexing.Utf8.from_string(string) |> provider |> value_of_lex /*        ocaml -> ast -> ocam*/;
+
+// pretty printer: code -> ast -> code
+// refmt: reason -> ast -> reason
+//        reason -> ast -> ocaml
+//        ocaml -> ast -> reason
+
+// compiler: code -> ast -> ir -> code | binary
+// babel: code -> ast -> ast' -> code
