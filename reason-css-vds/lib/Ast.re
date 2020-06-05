@@ -4,6 +4,7 @@
 
 // TODO: maybe polymorphic variant?
 // TODO: best naming to no multiplier
+// TODO: can a value have two multipliers?
 [@deriving show({with_path: false})]
 type multiplier =
   | One /* */
@@ -12,7 +13,7 @@ type multiplier =
   | Optional /* ? */
   | Repeat(int, option(int)) /* {A} {A,B} {A,} */
   | Repeat_by_comma(int, option(int)) /* # #{A, B} */
-  | At_least_one /* ! */;
+  | At_least_one /* ! */; // TODO: ! is only allowed for groups
 
 // TODO: non-terminals https://drafts.csswg.org/css-values-3/#component-types item 4
 [@deriving show({with_path: false})]
@@ -23,7 +24,7 @@ type value =
   // group is only useful because [ A* ]*
   | Group(value, multiplier) /* [ A ] */
   // combinators
-  | Static(value, value) /* a b */
-  | And(value, value) /* a && b */
-  | Or(value, value) /* a || b */
-  | Xor(value, value) /* a | b */;
+  | Static(list(value)) /* a b */
+  | And(list(value)) /* a && b */
+  | Or(list(value)) /* a || b */
+  | Xor(list(value)) /* a | b */;

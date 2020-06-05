@@ -79,25 +79,17 @@ let terminal :=
   | LEFT_BRACKET; v = value; RIGHT_BRACKET; m = multiplier;
     { Group(v, m) }
 
-let combinator(op, sub) :=
-  | sub
-  | v1 = combinator(op, sub); ~ = op; v2 = sub;
-    { op (v1, v2) }
+let combinator(sep, sub, fn) == 
+  | vs = separated_nonempty_list(sep, sub); ~ = fn;
+    { match vs with | v::[] -> v | vs -> fn vs }
 
-let static_op ==
-  | { fun ((v1, v2)) -> (Static (v1, v2)) }
-let static_expr := combinator(static_op, terminal)
-
-let and_op ==
-  | DOUBLE_AMPERSAND; { fun ((v1, v2)) -> (And (v1, v2)) }
-let and_expr := combinator(and_op, static_expr)
-
-let or_op ==
-  | DOUBLE_BAR; { fun ((v1, v2)) -> (Or (v1, v2)) }
-let or_expr := combinator(or_op, and_expr)
-
-let xor_op ==
-  | BAR; { fun ((v1, v2)) -> (Xor (v1, v2)) }
-let xor_expr := combinator(xor_op, or_expr)
+let static_expr ==
+  | combinator(| {}, terminal, | { fun vs -> Static vs })
+let and_expr == 
+  | combinator(DOUBLE_AMPERSAND, static_expr, | { fun vs -> And vs })
+let or_expr ==
+  | combinator(DOUBLE_BAR, and_expr, | { fun vs -> Or vs })
+let xor_expr ==
+  | combinator(BAR, or_expr, | { fun vs -> Xor vs })
 
 let value := xor_expr
