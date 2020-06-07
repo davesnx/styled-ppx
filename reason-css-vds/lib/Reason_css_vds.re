@@ -32,14 +32,11 @@ let rec value_to_string = value => {
   let child_needs_brackets = (parent, child) => {
     let precedence =
       fun
-      | Keyword(_, _)
-      | Data_type(_, _)
-      | Property_type(_, _) => None
-      | Group(_) => None
-      | Static(_) => Some(0)
-      | And(_) => Some(1)
-      | Or(_) => Some(2)
-      | Xor(_) => Some(3);
+      | Combinator(Static, _) => Some(0)
+      | Combinator(And, _) => Some(1)
+      | Combinator(Or, _) => Some(2)
+      | Combinator(Xor, _) => Some(3)
+      | _ => None;
 
     let parent = precedence(parent);
     let child = precedence(child);
@@ -57,14 +54,24 @@ let rec value_to_string = value => {
     childs |> List.map(child) |> String.concat(sep);
   let (string, multiplier) =
     switch (value) {
-    | Keyword(name, m) => (name, Some(m))
-    | Data_type(name, m) => ("<" ++ name ++ ">", Some(m))
-    | Property_type(name, m) => ("<'" ++ name ++ "'>", Some(m))
+    | Terminal(kind, multiplier) =>
+      let full_name =
+        switch (kind) {
+        | Keyword(name) => name
+        | Data_type(name) => "<" ++ name ++ ">"
+        | Property_type(name) => "<'" ++ name ++ "'>"
+        };
+      (full_name, Some(multiplier));
+    | Combinator(kind, values) =>
+      let separator =
+        switch (kind) {
+        | Static => " "
+        | And => " && "
+        | Or => " || "
+        | Xor => " | "
+        };
+      (childs(separator, values), None);
     | Group(v1, m) => (child(v1), Some(m))
-    | Static(vs) => (childs(" ", vs), None)
-    | And(vs) => (childs(" && ", vs), None)
-    | Or(vs) => (childs(" || ", vs), None)
-    | Xor(vs) => (childs(" | ", vs), None)
     };
 
   switch (value, multiplier) {

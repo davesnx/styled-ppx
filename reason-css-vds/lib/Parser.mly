@@ -2,11 +2,6 @@
 
 open Ast
 
-let multiplier value =
-  match value with
-  | None  -> One
-  | Some (value) -> value
-
 %}
 %token <int> INT
 %token <string> STRING
@@ -67,29 +62,31 @@ let multiplier :=
   | EXCLAMATION_POINT;
     { At_least_one }
 
-let terminal :=
-  | s = STRING; m = option(multiplier);
-    { Keyword (s, multiplier m) }
-  | LOWER_THAN; QUOTE; s = STRING; QUOTE; GREATER_THAN; m = option(multiplier);
-    { Property_type (s, multiplier m) }
-  | LOWER_THAN; s = STRING; GREATER_THAN; m = option(multiplier);
-    { Data_type (s, multiplier m) }
-  | LEFT_BRACKET; v = value; RIGHT_BRACKET;
-    { v }
-  | LEFT_BRACKET; v = value; RIGHT_BRACKET; m = multiplier;
-    { Group(v, m) }
+let terminal ==
+  | s = STRING; { Keyword s }
+  | LOWER_THAN; QUOTE; s = STRING; QUOTE; GREATER_THAN; { Property_type s }
+  | LOWER_THAN; s = STRING; GREATER_THAN; { Data_type s }
 
-let combinator(sep, sub, fn) == 
-  | vs = separated_nonempty_list(sep, sub); ~ = fn;
-    { match vs with | v::[] -> v | vs -> fn vs }
+let terminal_multiplier ==
+  | t = terminal; { Terminal(t, One) }
+  | t = terminal; m = multiplier; { Terminal(t, m) }
+
+let group ==
+  | terminal_multiplier
+  | LEFT_BRACKET; v = value; RIGHT_BRACKET; { v }
+  | LEFT_BRACKET; v = value; RIGHT_BRACKET; m = multiplier; { Group(v, m) }
+
+let combinator(sep, sub, kind) == 
+  | vs = separated_nonempty_list(sep, sub); ~ = kind;
+    { match vs with | v::[] -> v | vs -> Combinator(kind, vs) }
 
 let static_expr ==
-  | combinator(| {}, terminal, | { fun vs -> Static vs })
+  | combinator(| {}, group, | { Static })
 let and_expr == 
-  | combinator(DOUBLE_AMPERSAND, static_expr, | { fun vs -> And vs })
+  | combinator(DOUBLE_AMPERSAND, static_expr, | { And })
 let or_expr ==
-  | combinator(DOUBLE_BAR, and_expr, | { fun vs -> Or vs })
+  | combinator(DOUBLE_BAR, and_expr, | { Or })
 let xor_expr ==
-  | combinator(BAR, or_expr, | { fun vs -> Xor vs })
+  | combinator(BAR, or_expr, | { Xor })
 
 let value := xor_expr

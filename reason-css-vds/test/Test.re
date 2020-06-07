@@ -10,64 +10,118 @@ let compare_ast = (expected, result, {expect, _}) => {
 let parse_tests = [
   (
     "A? B? C?",
-    Static([
-      Keyword("A", Optional),
-      Keyword("B", Optional),
-      Keyword("C", Optional),
-    ]),
+    Combinator(
+      Static,
+      [
+        Terminal(Keyword("A"), Optional),
+        Terminal(Keyword("B"), Optional),
+        Terminal(Keyword("C"), Optional),
+      ],
+    ),
   ),
   (
     "[ A? B? C? ]!",
     Group(
-      Static([
-        Keyword("A", Optional),
-        Keyword("B", Optional),
-        Keyword("C", Optional),
-      ]),
+      Combinator(
+        Static,
+        [
+          Terminal(Keyword("A"), Optional),
+          Terminal(Keyword("B"), Optional),
+          Terminal(Keyword("C"), Optional),
+        ],
+      ),
       At_least_one,
     ),
   ),
   (
     "A B C",
-    Static([Keyword("A", One), Keyword("B", One), Keyword("C", One)]),
+    Combinator(
+      Static,
+      [
+        Terminal(Keyword("A"), One),
+        Terminal(Keyword("B"), One),
+        Terminal(Keyword("C"), One),
+      ],
+    ),
   ),
   (
     "A? || B? || C?",
-    Or([
-      Keyword("A", Optional),
-      Keyword("B", Optional),
-      Keyword("C", Optional),
-    ]),
+    Combinator(
+      Or,
+      [
+        Terminal(Keyword("A"), Optional),
+        Terminal(Keyword("B"), Optional),
+        Terminal(Keyword("C"), Optional),
+      ],
+    ),
   ),
   (
     "A || B || C",
-    Or([Keyword("A", One), Keyword("B", One), Keyword("C", One)]),
+    Combinator(
+      Or,
+      [
+        Terminal(Keyword("A"), One),
+        Terminal(Keyword("B"), One),
+        Terminal(Keyword("C"), One),
+      ],
+    ),
   ),
   (
     "A && B && C",
-    And([Keyword("A", One), Keyword("B", One), Keyword("C", One)]),
+    Combinator(
+      And,
+      [
+        Terminal(Keyword("A"), One),
+        Terminal(Keyword("B"), One),
+        Terminal(Keyword("C"), One),
+      ],
+    ),
   ),
   // groups
-  ("[A]", Keyword("A", One)),
-  ("[A && B]", And([Keyword("A", One), Keyword("B", One)])),
+  ("[A]", Terminal(Keyword("A"), One)),
+  (
+    "[A && B]",
+    Combinator(
+      And,
+      [Terminal(Keyword("A"), One), Terminal(Keyword("B"), One)],
+    ),
+  ),
   (
     "A && [B && C]",
-    And([Keyword("A", One), And([Keyword("B", One), Keyword("C", One)])]),
+    Combinator(
+      And,
+      [
+        Terminal(Keyword("A"), One),
+        Combinator(
+          And,
+          [Terminal(Keyword("B"), One), Terminal(Keyword("C"), One)],
+        ),
+      ],
+    ),
   ),
   (
     "[A && B] && C",
-    And([And([Keyword("A", One), Keyword("B", One)]), Keyword("C", One)]),
+    Combinator(
+      And,
+      [
+        Combinator(
+          And,
+          [Terminal(Keyword("A"), One), Terminal(Keyword("B"), One)],
+        ),
+        Terminal(Keyword("C"), One),
+      ],
+    ),
   ),
   // multipliers
-  ("A*", Keyword("A", Zero_or_more)),
-  ("A+", Keyword("A", One_or_more)),
-  ("A?", Keyword("A", Optional)),
-  ("A{4}", Keyword("A", Repeat(4, Some(4)))),
-  ("A{4,5}", Keyword("A", Repeat(4, Some(5)))),
-  ("A{4,}", Keyword("A", Repeat(4, None))),
-  ("A!", Keyword("A", At_least_one)),
+  ("A*", Terminal(Keyword("A"), Zero_or_more)),
+  ("A+", Terminal(Keyword("A"), One_or_more)),
+  ("A?", Terminal(Keyword("A"), Optional)),
+  ("A{4}", Terminal(Keyword("A"), Repeat(4, Some(4)))),
+  ("A{4,5}", Terminal(Keyword("A"), Repeat(4, Some(5)))),
+  ("A{4,}", Terminal(Keyword("A"), Repeat(4, None))),
+  ("A!", Terminal(Keyword("A"), At_least_one)),
   // why Group exists:
-  ("[A?]!", Group(Keyword("A", Optional), At_least_one)),
+  ("[A?]!", Group(Terminal(Keyword("A"), Optional), At_least_one)),
 ];
 describe("correctly parse value", ({test, _}) => {
   let test = (index, (result, expected)) =>
