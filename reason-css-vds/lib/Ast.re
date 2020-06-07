@@ -15,16 +15,34 @@ type multiplier =
   | Repeat_by_comma(int, option(int)) /* # #{A, B} */
   | At_least_one /* ! */; // TODO: ! is only allowed for groups
 
+[@deriving show({with_path: false})]
+type terminal =
+  | Keyword(string) /* auto */
+  | Data_type(string) /* <color > */
+  | Property_type(string) /* <'color'> */;
+
+[@deriving show({with_path: false})]
+type combinator =
+  | Static /* a b */
+  | And /* a && b */
+  | Or /* a || b */
+  | Xor /* a | b */;
+
 // TODO: non-terminals https://drafts.csswg.org/css-values-3/#component-types item 4
 [@deriving show({with_path: false})]
 type value =
-  | Keyword(string, multiplier) /* auto */
-  | Data_type(string, multiplier) /* <color > */
-  | Property_type(string, multiplier) /* <'color'> */
-  // group is only useful because [ A* ]*
-  | Group(value, multiplier) /* [ A ] */
-  // combinators
-  | Static(list(value)) /* a b */
-  | And(list(value)) /* a && b */
-  | Or(list(value)) /* a || b */
-  | Xor(list(value)) /* a | b */;
+  | Terminal(terminal, multiplier)
+  | Combinator(combinator, list(value))
+  | Group(value, multiplier) /* [ A ] */;
+
+// the only case where At_least_one makes sense, is with static
+// A? || B? = A? && B?
+// [ A? || B? ]! = [ A? && B? ]! = A || B
+// A? | B? ... what would that mean? true | true ?
+// [ A? | B? ]! = A | B
+// [ A? B? ]! != A B
+
+// [ A? B? ]! != [ A B ]
+// [ A? && B? ]! == A || B
+// [ A? || B? ]! == A || B
+// [ A? | B? ]! == A | B
