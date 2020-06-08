@@ -122,6 +122,18 @@ let parse_tests = [
   ("A!", Terminal(Keyword("A"), At_least_one)),
   // why Group exists:
   ("[A?]!", Group(Terminal(Keyword("A"), Optional), At_least_one)),
+  // property name
+  (
+    "<font-weight-absolute> | bolder | lighter",
+    Combinator(
+      Xor,
+      [
+        Terminal(Data_type("font-weight-absolute"), One),
+        Terminal(Keyword("bolder"), One),
+        Terminal(Keyword("lighter"), One),
+      ],
+    ),
+  ),
 ];
 describe("correctly parse value", ({test, _}) => {
   let test = (index, (result, expected)) =>

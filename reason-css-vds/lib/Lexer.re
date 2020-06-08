@@ -5,7 +5,7 @@ let digit = [%sedlex.regexp? '0'..'9'];
 let int = [%sedlex.regexp? Plus(digit)];
 
 // TODO: keyword characters, like . and , also escape like '*'
-let string = [%sedlex.regexp? Plus('a'..'z' | 'A'..'Z')];
+let string = [%sedlex.regexp? Plus('a'..'z' | 'A'..'Z' | '-')];
 
 let read_char = buf => {
   let char =
