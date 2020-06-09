@@ -4,6 +4,8 @@ open Tokens;
 let digit = [%sedlex.regexp? '0'..'9'];
 let int = [%sedlex.regexp? Plus(digit)];
 
+// TODO: is rgb(255 255 255/0) valid?
+
 // TODO: keyword characters, like . and , also escape like '*'
 let string = [%sedlex.regexp? Plus('a'..'z' | 'A'..'Z' | '-')];
 
@@ -26,6 +28,9 @@ let read_char = buf => {
     | "," => COMMA
     | "#" => HASH
     | "!" => EXCLAMATION_POINT
+    | "(" => LEFT_PARENS
+    | ")" => RIGHT_PARENS
+    | "/" => SLASH
     | _ => failwith("Unexpected character")
     };
   let _ = lexeme(buf);

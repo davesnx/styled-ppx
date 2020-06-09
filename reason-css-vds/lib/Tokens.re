@@ -18,4 +18,7 @@ type token =
   | COMMA
   | HASH
   | EXCLAMATION_POINT
+  | LEFT_PARENS
+  | RIGHT_PARENS
+  | SLASH
   | EOF;

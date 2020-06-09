@@ -21,6 +21,9 @@ open Ast
 %token COMMA
 %token HASH
 %token EXCLAMATION_POINT
+%token LEFT_PARENS
+%token RIGHT_PARENS
+%token SLASH
 %token EOF
 
 %start <Ast.value option> value_of_lex
@@ -64,15 +67,22 @@ let multiplier :=
 
 let terminal ==
   | s = STRING; { Keyword s }
+  | SLASH; { Keyword "/" }
+  | COMMA; { Keyword "," }
   | LOWER_THAN; QUOTE; s = STRING; QUOTE; GREATER_THAN; { Property_type s }
   | LOWER_THAN; s = STRING; GREATER_THAN; { Data_type s }
+  | s = STRING; LEFT_PARENS; RIGHT_PARENS; { Function s }
 
 let terminal_multiplier ==
   | t = terminal; { Terminal(t, One) }
   | t = terminal; m = multiplier; { Terminal(t, m) }
 
-let group ==
+let function_call ==
   | terminal_multiplier
+  | s = STRING; LEFT_PARENS; v = value; RIGHT_PARENS; { Function_call (s, v) }
+
+let group ==
+  | function_call
   | LEFT_BRACKET; v = value; RIGHT_BRACKET; { v }
   | LEFT_BRACKET; v = value; RIGHT_BRACKET; m = multiplier; { Group(v, m) }
 

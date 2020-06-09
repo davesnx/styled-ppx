@@ -60,6 +60,7 @@ let rec value_to_string = value => {
         | Keyword(name) => name
         | Data_type(name) => "<" ++ name ++ ">"
         | Property_type(name) => "<'" ++ name ++ "'>"
+        | Function(name) => name ++ "()"
         };
       (full_name, Some(multiplier));
     | Combinator(kind, values) =>
@@ -71,7 +72,11 @@ let rec value_to_string = value => {
         | Xor => " | "
         };
       (childs(separator, values), None);
-    | Group(v1, m) => (child(v1), Some(m))
+    | Group(value, multiplier) => (child(value), Some(multiplier))
+    | Function_call(name, value) => (
+        name ++ "( " ++ child(value) ++ " )",
+        None,
+      )
     };
 
   switch (value, multiplier) {
