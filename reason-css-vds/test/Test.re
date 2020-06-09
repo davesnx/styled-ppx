@@ -134,6 +134,37 @@ let parse_tests = [
       ],
     ),
   ),
+  // function declaration
+  (
+    "rgb() | hsl()",
+    Combinator(
+      Xor,
+      [Terminal(Function("rgb"), One), Terminal(Function("hsl"), One)],
+    ),
+  ),
+  (
+    // function call
+    "rgb( <percentage>{3} [ / <alpha-value> ]? )",
+    Function_call(
+      "rgb",
+      Combinator(
+        Static,
+        [
+          Terminal(Data_type("percentage"), Repeat(3, Some(3))),
+          Group(
+            Combinator(
+              Static,
+              [
+                Terminal(Keyword("/"), One),
+                Terminal(Data_type("alpha-value"), One),
+              ],
+            ),
+            Optional,
+          ),
+        ],
+      ),
+    ),
+  ),
 ];
 describe("correctly parse value", ({test, _}) => {
   let test = (index, (result, expected)) =>
