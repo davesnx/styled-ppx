@@ -31,6 +31,7 @@ let read_char = buf => {
     | "(" => LEFT_PARENS
     | ")" => RIGHT_PARENS
     | "/" => SLASH
+    | "%" => PERCENT
     | _ => failwith("Unexpected character")
     };
   let _ = lexeme(buf);
