@@ -1,6 +1,6 @@
 type error = string;
 type data('a) = result('a, error);
-type rule('a);
+type rule('a) = list(Tokens.token) => (data('a), list(Tokens.token));
 
 type return('a, 'b) = 'b => rule('a);
 type bind('a, 'b, 'c) = (rule('a), 'b => rule('c)) => rule('c);
