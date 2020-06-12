@@ -1,0 +1,6 @@
+(library
+ (name reason_css_parser_ppx)
+ (kind ppx_rewriter)
+ (libraries sedlex ocaml-migrate-parsetree reason-css-vds.lib)
+ (preprocess
+  (pps ppx_tools_versioned.metaquot_410 sedlex.ppx)))
