@@ -34,10 +34,10 @@
   },
   "devDependencies": {
     "@opam/merlin": "*",
-    "ocaml": "4.8.1000",
+    "ocaml": "4.10.0",
     "@esy-ocaml/reason": "^3.5.2",
     "@opam/dune": "*",
-    "@opam/menhir": "20190924",
+    "@opam/menhir": "20200211",
     "@opam/ocaml-migrate-parsetree": "^1.7.3",
     "@opam/sedlex": "*",
     "@reason-native/rely": "^3.2.1",

@@ -3,7 +3,7 @@
   * https://www.w3.org/TR/css-syntax-3/
   * https://github.com/yahoo/css-js/blob/master/src/l/css.3.l */
 open Migrate_parsetree;
-open Ast_408;
+open Ast_410;
 
 module Sedlexing = Lex_buffer;
 
