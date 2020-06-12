@@ -8,7 +8,6 @@
   "dependencies": {
     "@esy-ocaml/reason": "^3.6.0",
     "@opam/dune": "2.5.1",
-    "@opam/menhir": "20200211",
     "@opam/ocaml-migrate-parsetree": "1.7.3",
     "@opam/ocamlformat": "0.14.2",
     "@opam/ppx_deriving": "4.5",

@@ -1,5 +1,5 @@
 {
-  "checksum": "a2da5ae8131e78e25a8b20f1021836ae",
+  "checksum": "019100821f73d2c5d8c735ed4933271a",
   "root": "reason-css-parser@link-dev:./package.json",
   "node": {
     "reason-css-vds@github:EduardoRFS/reason-css-vds:package.json#86633fe91a927920929a384403c87f902f414f6e@d41d8cd9": {
@@ -43,7 +43,6 @@
         "@opam/ppx_deriving@opam:4.5@bb81afdc",
         "@opam/ocamlformat@opam:0.14.2@d742ffd5",
         "@opam/ocaml-migrate-parsetree@opam:1.7.3@dbcf3b47",
-        "@opam/menhir@opam:20200211@26571604",
         "@opam/dune@opam:2.5.1@f38f376e", "@esy-ocaml/reason@3.6.0@d41d8cd9"
       ],
       "devDependencies": [
