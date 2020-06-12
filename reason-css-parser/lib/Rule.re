@@ -4,6 +4,7 @@ type rule('a) = list(Tokens.token) => (data('a), list(Tokens.token));
 
 type return('a, 'b) = 'b => rule('a);
 type bind('a, 'b, 'c) = (rule('a), 'b => rule('c)) => rule('c);
+type map('a, 'b, 'c, 'd) = (rule('a), 'b => 'c) => rule('d);
 type best('left_in, 'left_v, 'right_in, 'right_v, 'c) =
   (
     (rule('left_in), rule('right_in)),
@@ -18,6 +19,7 @@ module Data = {
     let (data, tokens) = rule(tokens);
     f(data, tokens);
   };
+  let map = (rule, f) => bind(rule, value => return(f(value)));
   let bind_shortest_or_longest = (shortest, (left, right), f, tokens) => {
     let (left_data, left_tokens) = left(tokens);
     let (right_data, right_tokens) = right(tokens);
@@ -37,14 +39,14 @@ module Data = {
 // monad when match is successful
 module Match = {
   let return = value => Data.return(Ok(value));
-  let bind: bind('a, 'a, 'b) =
-    (rule, f) =>
-      Data.bind(
-        rule,
-        fun
-        | Ok(value) => f(value)
-        | Error(error) => Data.return(Error(error)),
-      );
+  let bind = (rule, f) =>
+    Data.bind(
+      rule,
+      fun
+      | Ok(value) => f(value)
+      | Error(error) => Data.return(Error(error)),
+    );
+  let map = (rule, f) => bind(rule, value => return(f(value)));
   let bind_shortest_or_longest = (shortest, (left, right), f, tokens) => {
     let (left_data, left_tokens) = left(tokens);
     let (right_data, right_tokens) = right(tokens);
@@ -72,11 +74,13 @@ module Match = {
 module Let = {
   let return_data = Data.return;
   let (let.bind_data) = Data.bind;
+  let (let.map_data) = Data.map;
   let (let.bind_shortest_data) = Data.bind_shortest;
   let (let.bind_longest_data) = Data.bind_longest;
 
   let return_match = Match.return;
   let (let.bind_match) = Match.bind;
+  let (let.map_match) = Match.map;
   let (let.bind_shortest_match) = Match.bind_shortest;
   let (let.bind_longest_match) = Match.bind_longest;
 };
