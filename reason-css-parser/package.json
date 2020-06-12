@@ -1,0 +1,24 @@
+{
+  "name": "reason-css-parser",
+  "version": "0.0.1",
+  "esy": {
+    "build": "dune build -p #{self.name}",
+    "buildDev": "dune build @install"
+  },
+  "dependencies": {
+    "@esy-ocaml/reason": "^3.6.0",
+    "@opam/dune": "2.5.1",
+    "@opam/menhir": "20200211",
+    "@opam/ocaml-migrate-parsetree": "1.7.3",
+    "@opam/ocamlformat": "0.14.2",
+    "@opam/ppx_deriving": "4.5",
+    "@opam/ppx_tools_versioned": "5.4.0",
+    "@opam/sedlex": "ocaml-community/sedlex:sedlex.opam#25c0dbd82c7fc5d91102f5bd21db1411f2c46323",
+    "@reason-native/rely": "^3.2.1",
+    "ocaml": "^4.08.1000",
+    "reason-css-vds": "EduardoRFS/reason-css-vds:package.json#86633fe91a927920929a384403c87f902f414f6e"
+  },
+  "devDependencies": {
+    "@opam/ocaml-lsp-server": "ocaml/ocaml-lsp:ocaml-lsp-server.opam"
+  }
+}
