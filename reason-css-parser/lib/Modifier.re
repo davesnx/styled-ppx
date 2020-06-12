@@ -8,12 +8,12 @@ type range = (int, option(int));
 let one = Fun.id;
 let optional = rule => {
   let.bind_data value = rule;
-  return_match(
+  let value =
     switch (value) {
     | Ok(value) => Some(value)
     | Error(_) => None
-    },
-  );
+    };
+  return_match(value);
 };
 let match_n_values = (sep, rule) => {
   let rule_with_comma = {
@@ -39,12 +39,12 @@ let zero_or_more = rule => {
 };
 let one_or_more = rule => {
   let.bind_match (values, last_error) = match_n_values(identity, rule);
-  return_data(
+  let data =
     switch (values) {
     | [] => Error(last_error)
     | values => Ok(values)
-    },
-  );
+    };
+  return_data(data);
 };
 let repeat_by_sep = (sep, (min, max), rule) => {
   let.bind_match (values, last_error) = match_n_values(sep, rule);
@@ -58,13 +58,13 @@ let repeat_by_sep = (sep, (min, max), rule) => {
         : Error("expected up to " ++ string_of_int(max) ++ " elements")
     | None => Ok()
     };
-  return_data(
+  let data =
     switch (values_length >= min, hit_max) {
     | (false, _) => Error(last_error)
     | (_, Error(error)) => Error(error)
     | (true, Ok ()) => Ok(values)
-    },
-  );
+    };
+  return_data(data);
 };
 let repeat = ((min, max), rule) =>
   repeat_by_sep(identity, (min, max), rule);
@@ -73,10 +73,10 @@ let repeat_by_comma = ((min, max), rule) =>
 
 let at_least_one = rule => {
   let.bind_match (left, right) = rule;
-  return_data(
+  let data =
     switch (left, right) {
     | (None, None) => Error("should match at least one")
     | (left, right) => Ok((left, right))
-    },
-  );
+    };
+  return_data(data);
 };
