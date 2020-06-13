@@ -19,3 +19,13 @@ let%value property_justify_content = "flex-start | flex-end | center | space-bet
 let%value property_align_items = "flex-start | flex-end | center | baseline | stretch";
 let%value property_align_self = "auto | flex-start | flex-end | center | baseline | stretch";
 let%value property_align_content = "flex-start | flex-end | center | space-between | space-around | stretch";
+
+let parse = (prop, str) => {
+  let (output, _) =
+    Sedlexing.Utf8.from_string(str) |> Lexer.read_all |> prop;
+  output;
+};
+let parse_property = prop =>
+  map(prop, value => `Property_value(value))
+  lxor map(css_wide_keywords, value => `Css_wide_value(value))
+  |> parse;
