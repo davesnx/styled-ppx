@@ -54,5 +54,5 @@ let read_all = buf => {
     | token => read_all([token, ...tokens], buf)
     };
   };
-  read_all([], buf);
+  read_all([], buf) |> List.rev;
 };
