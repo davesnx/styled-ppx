@@ -3,53 +3,36 @@ open Ast_408;
 open Ast_mapper;
 open Asttypes;
 open Parsetree;
-open Ast_helper;
 
 let mapper = (_, _) => {
   ...default_mapper,
-  structure_item: mapper =>
+  expr: mapper =>
     fun
     | {
-        pstr_desc:
-          Pstr_extension(
-            (
-              {txt: "value", _},
-              PStr([
-                {
-                  pstr_desc:
-                    Pstr_value(
+        pexp_desc:
+          Pexp_extension((
+            {txt: "value", _},
+            PStr([
+              {
+                pstr_desc:
+                  Pstr_eval(
+                    {
+                      pexp_desc: Pexp_constant(Pconst_string(value, None)),
                       _,
-                      [
-                        {
-                          pvb_pat: {ppat_desc: Ppat_var({txt: name, _}), _},
-                          pvb_expr: {
-                            pexp_desc:
-                              Pexp_constant(Pconst_string(value, None)),
-                            _,
-                          },
-                          _,
-                        },
-                      ],
-                    ),
-                  _,
-                },
-              ]),
-            ),
-            _,
-          ),
+                    },
+                    _,
+                  ),
+                _,
+              },
+            ]),
+          )),
         _,
       } =>
       switch (Reason_css_vds.value_of_string(value)) {
-      | Some(value_ast) =>
-        let value_declaration =
-          Vb.mk(
-            Pat.var({txt: name, loc: Location.none}),
-            Emit.create_value_parser(value_ast),
-          );
-        Str.value(Nonrecursive, [value_declaration]);
+      | Some(value_ast) => Emit.create_value_parser(value_ast)
       | None => failwith("couldn't parse this value")
       }
-    | stri => default_mapper.structure_item(mapper, stri),
+    | expr => default_mapper.expr(mapper, expr),
 };
 Driver.register(
   ~name="styled-ppx",

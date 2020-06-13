@@ -5,20 +5,32 @@ open Rule.Match;
 open Rule.Pattern;
 // TODO: split by modules
 
-let%value property_width = "auto";
+let property_width = [%value "auto"];
 
-let%value property_flex_direction = "row | row-reverse | column | column-reverse";
-let%value property_flex_wrap = "nowrap | wrap | wrap-reverse";
-let%value property_flex_flow = "<'flex-direction'> || <'flex-wrap'>";
-let%value property_order = "<integer>";
-let%value property_flex_grow = "<number>";
-let%value property_flex_shrink = "<number>";
-let%value property_flex_basis = "content | <'width'>";
-let%value property_flex = "none | [ <'flex-grow'> <'flex-shrink'>? || <'flex-basis'> ]";
-let%value property_justify_content = "flex-start | flex-end | center | space-between | space-around";
-let%value property_align_items = "flex-start | flex-end | center | baseline | stretch";
-let%value property_align_self = "auto | flex-start | flex-end | center | baseline | stretch";
-let%value property_align_content = "flex-start | flex-end | center | space-between | space-around | stretch";
+let property_flex_direction = [%value
+  "row | row-reverse | column | column-reverse"
+];
+let property_flex_wrap = [%value "nowrap | wrap | wrap-reverse"];
+let property_flex_flow = [%value "<'flex-direction'> || <'flex-wrap'>"];
+let property_order = [%value "<integer>"];
+let property_flex_grow = [%value "<number>"];
+let property_flex_shrink = [%value "<number>"];
+let property_flex_basis = [%value "content | <'width'>"];
+let property_flex = [%value
+  "none | [ <'flex-grow'> <'flex-shrink'>? || <'flex-basis'> ]"
+];
+let property_justify_content = [%value
+  "flex-start | flex-end | center | space-between | space-around"
+];
+let property_align_items = [%value
+  "flex-start | flex-end | center | baseline | stretch"
+];
+let property_align_self = [%value
+  "auto | flex-start | flex-end | center | baseline | stretch"
+];
+let property_align_content = [%value
+  "flex-start | flex-end | center | space-between | space-around | stretch"
+];
 
 let parse = (prop, str) => {
   let (output, _) =
