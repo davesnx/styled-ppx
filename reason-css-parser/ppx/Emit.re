@@ -26,8 +26,7 @@ let first_uppercase = name =>
   (String.sub(name, 0, 1) |> String.uppercase_ascii)
   ++ String.sub(name, 1, String.length(name) - 1);
 
-let property_value_name = property_name => "property-value-" ++ property_name;
-let property_name = property_name => "property-" ++ property_name;
+let property_value_name = property_name => "property-" ++ property_name;
 let function_value_name = function_name => "function-" ++ function_name;
 let value_name_of_css = kebab_case_to_snake_case;
 
@@ -39,7 +38,7 @@ let rec variant_name = value => {
     | Terminal(Function(name), _)
     | Terminal(Data_type(name), _) => value_name_of_css(name)
     | Terminal(Property_type(name), _) =>
-      property_name(name) |> value_name_of_css
+      property_value_name(name) |> value_name_of_css
     | Group(value, _) => variant_name(value)
     | Combinator(Static, _) => "static"
     | Combinator(And, _) => "and"
@@ -186,14 +185,3 @@ let rec create_value_parser = value => {
   | Function_call(name, value) => function_call(name, value)
   };
 };
-
-let create_property_parser = name =>
-  create_value_parser(
-    Combinator(
-      Xor,
-      [
-        Terminal(Data_type("css-wide-keywords"), One),
-        Terminal(Data_type(name), One),
-      ],
-    ),
-  );
