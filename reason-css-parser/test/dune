@@ -1,0 +1,21 @@
+(library
+ (name reason_css_parser_test)
+ (ocamlopt_flags -linkall -g)
+ (libraries reason-css-parser.lib rely.lib)
+ (modules
+  (:standard \ RunTests))
+ (preprocess
+  (pps reason_css_parser_ppx sedlex.ppx)))
+
+(executable
+ (name RunTests)
+ (libraries reason_css_parser_test)
+ (modules RunTests)
+ (preprocess
+  (pps reason_css_parser_ppx sedlex.ppx)))
+
+(rule
+ (alias runtest)
+ (deps RunTests.exe)
+ (action
+  (run %{deps})))

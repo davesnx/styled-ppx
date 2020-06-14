@@ -96,7 +96,12 @@ module Pattern = {
     token(
       fun
       | token when token == expected => Ok()
-      | _ => Error("expected "),
+      // TODO: serialize tokens
+      | _ =>
+        switch (expected) {
+        | Tokens.STRING(str) => Error("expected " ++ str)
+        | _ => Error("expected ")
+        },
     );
   let value = (value, rule) => Match.bind(rule, () => Match.return(value));
 };
