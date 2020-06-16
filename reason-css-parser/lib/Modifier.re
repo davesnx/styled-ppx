@@ -24,7 +24,7 @@ let match_n_values = (sep, rule) => {
     let.bind_data value = rule_with_comma;
     switch (value) {
     | Ok(value) => match_until_fails([value, ...values])
-    | Error(last_error) => return_match((values, last_error))
+    | Error(last_error) => return_match((values |> List.rev, last_error))
     };
   };
   let.bind_data value = rule;
