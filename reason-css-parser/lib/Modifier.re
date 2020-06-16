@@ -72,11 +72,7 @@ let repeat_by_comma = ((min, max), rule) =>
   repeat_by_sep(expect(COMMA), (min, max), rule);
 
 let at_least_one = rule => {
-  let.bind_match (left, right) = rule;
-  let data =
-    switch (left, right) {
-    | (None, None) => Error("should match at least one")
-    | (left, right) => Ok((left, right))
-    };
-  return_data(data);
+  let.bind_match values = rule;
+  let have_one = List.exists(Option.is_some, values);
+  return_data(have_one ? Ok(values) : Error("should match at least one"));
 };

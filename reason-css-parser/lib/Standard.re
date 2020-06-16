@@ -36,6 +36,8 @@ let percentage = {
 };
 
 let css_wide_keywords =
-  value(`Initial, keyword("initial"))
-  lxor value(`Inherit, keyword("inherit"))
-  lxor value(`Unset, keyword("unset"));
+  combine_xor([
+    value(`Initial, keyword("initial")),
+    value(`Inherit, keyword("inherit")),
+    value(`Unset, keyword("unset")),
+  ]);

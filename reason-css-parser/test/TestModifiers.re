@@ -4,6 +4,7 @@ open Combinator;
 open Standard;
 open Modifier;
 open Parser;
+open Rule.Match;
 
 let parse_exn = (prop, str) =>
   switch (parse(prop, str)) {
@@ -31,7 +32,7 @@ describe("zero_or_more", ({test, _}) => {
     expect.list(parse("15")).toEqual([15]);
     expect.list(parse("16 17")).toEqual([16, 17]);
   });
-  test("[<integer> A]?", ({expect, _}) => {
+  test("[<integer> A]*", ({expect, _}) => {
     let parse = parse_exn([%value "[<integer> A]*"]);
     expect.list(parse("")).toEqual([]);
     expect.list(parse("18 A")).toEqual([(18, ())]);

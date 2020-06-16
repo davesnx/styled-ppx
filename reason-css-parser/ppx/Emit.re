@@ -68,7 +68,8 @@ let variant_names = values => {
        fun
        | (value, None) => value
        | (value, Some(int)) => value ++ "_" ++ string_of_int(int),
-     );
+     )
+  |> List.rev;
 };
 
 let apply_modifier = {
@@ -123,52 +124,83 @@ let rec create_value_parser = value => {
   let group_op = (value, modifier) =>
     create_value_parser(value) |> apply_modifier(modifier);
   let combinator_op = (kind, values) => {
-    let apply = (fn, a, b) => [%expr [%e fn]([%e a], [%e b])];
+    // TODO: please improve that code, it sucks
+    let to_list = (tuple, construct, list) =>
+      List.fold_right(
+        (acc, item) => {
+          let tuple = tuple([acc, item]);
+          construct(txt(Lident("::")), Some(tuple));
+        },
+        list,
+        construct(txt(Lident("[]")), None),
+      );
+    let pat_list = to_list(Pat.tuple, Pat.construct);
+    let exp_list = to_list(Exp.tuple, Exp.construct);
+    let apply = (fn, args) => {
+      let args = exp_list(args);
+      let expr = [%expr [%e fn]([%e args])];
+      expr;
+    };
     let op_ident =
       fun
-      | Static => [%expr (+)]
-      | And => [%expr (land)]
-      | Or => [%expr (lor)]
-      | Xor => [%expr (lxor)];
-    let emit_xor_values = (v1, vs) => {
-      let parse_value = ((name, value)) => {
-        let value_expr = create_value_parser(value);
-        switch (value) {
-        | Terminal(Keyword(_), _) =>
-          apply([%expr value], Exp.variant(name, None), value_expr)
-        | _ =>
-          let body = Exp.variant(name, Some(lident("value")));
-          let map_fn = [%expr (value => [%e body])];
-          apply([%expr map], value_expr, map_fn);
-        };
-      };
+      | Static => [%expr combine_static]
+      | Xor => [%expr combine_xor]
+      | And => [%expr combine_and]
+      | Or => [%expr combine_or];
 
-      let all_values = [v1, ...vs];
-      let names = variant_names(all_values) |> List.rev;
-      // TODO: can raise
-      let (v1, vs) =
-        switch (List.combine(names, all_values)) {
-        | [v1, ...vs] => (v1, vs)
-        | [] => failwith("what? That is impossible")
-        };
-
-      (parse_value(v1), List.map(parse_value, vs));
+    let map_value = (content, (name, value)) => {
+      let value = create_value_parser(value);
+      let variant = Exp.variant(name, content ? Some([%expr v]) : None);
+      let map_fn = [%expr v => [%e variant]];
+      let expr = [%expr map([%e value], [%e map_fn])];
+      expr;
     };
 
-    let emit_combinator = (kind, v1, vs) => {
-      let apply = apply(op_ident(kind));
-      let (v1, vs) =
-        switch (kind) {
-        | Xor => emit_xor_values(v1, vs)
-        | _ => (create_value_parser(v1), List.map(create_value_parser, vs))
-        };
-      List.fold_left(apply, v1, vs);
-    };
-
-    switch (kind, values) {
-    | (_, []) => failwith("should be unreachable")
-    | (_, [v1]) => create_value_parser(v1)
-    | (kind, [v1, ...vs]) => emit_combinator(kind, v1, vs)
+    switch (kind) {
+    | Xor =>
+      let names = variant_names(values);
+      let args =
+        List.combine(names, values)
+        |> List.map(((_, value) as pair) => {
+             let has_content =
+               switch (value) {
+               | Terminal(Keyword(_), _) => false
+               | _ => true
+               };
+             map_value(has_content, pair);
+           });
+      apply(op_ident(kind), args);
+    | _ =>
+      let combinator_args =
+        values
+        |> List.mapi((index, v) => ("V" ++ string_of_int(index), v))
+        |> List.map(map_value(true));
+      let combinator = apply(op_ident(kind), combinator_args);
+      let (args, body) =
+        values
+        |> List.mapi((index, _) => {
+             let id_name = "v" ++ string_of_int(index);
+             let id_expr = Exp.ident(txt(Lident(id_name)));
+             let id_pat = Pat.var(txt(id_name));
+             let extract_variant =
+               Pat.variant("V" ++ string_of_int(index), Some(id_pat));
+             switch (kind) {
+             | Or =>
+               let expr =
+                 switch%expr ([%e id_expr]) {
+                 | Some([%p extract_variant]) => Some([%e id_expr])
+                 | None => None
+                 };
+               (id_pat, expr);
+             | _ => (extract_variant, id_expr)
+             };
+           })
+        |> List.split;
+      let args = pat_list(args);
+      let body = Exp.tuple(body);
+      let map_fn = [%expr ([@warning "-8"] (([%p args]) => [%e body]))];
+      let expr = [%expr map([%e combinator], [%e map_fn])];
+      expr;
     };
   };
   let function_call = (name, value) => {

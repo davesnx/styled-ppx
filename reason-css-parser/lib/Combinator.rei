@@ -1,15 +1,10 @@
-type combinator('a, 'b, 'c) =
-  (Rule.rule('a), Rule.rule('b)) => Rule.rule('c);
+type combinator('a, 'b) = list(Rule.rule('a)) => Rule.rule('b);
 
 // TODO: docs for infix operators
-let combine_static: combinator('a, 'b, ('a, 'b));
-let (+): combinator('a, 'b, ('a, 'b));
+let combine_static: combinator('a, list('a));
 
-let combine_xor: combinator('a, 'a, 'a);
-let (lxor): combinator('a, 'a, 'a);
+let combine_xor: combinator('a, 'a);
 
-let combine_and: combinator('a, 'b, ('a, 'b));
-let (land): combinator('a, 'b, ('a, 'b));
+let combine_and: combinator('a, list('a));
 
-let combine_or: combinator('a, 'b, (option('a), option('b)));
-let (lor): combinator('a, 'b, (option('a), option('b)));
+let combine_or: combinator('a, list(option('a)));

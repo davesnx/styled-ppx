@@ -2,7 +2,6 @@ open Standard;
 open Combinator;
 open Modifier;
 open Rule.Match;
-open Rule.Pattern;
 // TODO: split by modules
 
 let property_width = [%value "auto"];
@@ -37,7 +36,3 @@ let parse = (prop, str) => {
     Sedlexing.Utf8.from_string(str) |> Lexer.read_all |> prop;
   output;
 };
-let parse_property = prop =>
-  map(prop, value => `Property_value(value))
-  lxor map(css_wide_keywords, value => `Css_wide_value(value))
-  |> parse;
