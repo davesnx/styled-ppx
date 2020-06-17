@@ -5,6 +5,9 @@
     "build": "dune build -p #{self.name}",
     "buildDev": "dune build @install"
   },
+  "scripts": {
+    "test": "dune runtest"
+  },
   "dependencies": {
     "@esy-ocaml/reason": "^3.6.0",
     "@opam/dune": "2.5.1",
