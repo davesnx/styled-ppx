@@ -249,6 +249,12 @@ describe("pattern helpers", ({test, _}) => {
     | (Ok(1), []) => ()
     | _ => failwith("should be (Ok(1), [])")
     };
+
+    // shouldn't consume tokens
+    switch (rule([STRING("invalid")])) {
+    | (Error(_), [STRING("invalid")]) => ()
+    | _ => failwith({|should be (Error(_), [STRING("invalid")])|})
+    };
   });
   test("expect", _ => {
     let rule = {
@@ -259,6 +265,13 @@ describe("pattern helpers", ({test, _}) => {
     | (Ok(2), []) => ()
     | _ => failwith("should be (Ok(2), [])")
     };
+
+    // shouldn't consume tokens
+    switch (rule([STRING("invalid")])) {
+    | (Error(_), [STRING("invalid")]) => ()
+    | _ => failwith({|should be (Error(_), [STRING("invalid")])|})
+    };
+    ();
   });
   test("value", _ => {
     let rule = value(3, expect(STRING("none")));

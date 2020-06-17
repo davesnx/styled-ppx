@@ -88,10 +88,15 @@ module Let = {
 module Pattern = {
   // TODO: errors
   let identity = Match.return();
-  let token = expected =>
-    fun
-    | [token, ...tokens] => (expected(token), tokens)
-    | [] => (Error("missing the token expected"), []);
+  let token = (expected, tokens) =>
+    switch (tokens) {
+    | [token, ...tokens] =>
+      let data = expected(token);
+      // if failed then keep the tokens intact
+      let tokens = Result.is_ok(data) ? tokens : [token, ...tokens];
+      (data, tokens);
+    | [] => (Error("missing the token expected"), [])
+    };
   let expect = expected =>
     token(
       fun
