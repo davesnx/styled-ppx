@@ -46,9 +46,9 @@ let combine_and = rules => {
   // TODO: an array is a better choice
   let rec match_everything = (values, rules) =>
     switch (rules) {
-    | [] => return_match(values)
-    | [left, ...rules] =>
-      let.bind_match (key, value) = match_longest(left, rules);
+    | [] => return_match(values |> List.rev)
+    | [left, ...new_rules] =>
+      let.bind_match (key, value) = match_longest(left, new_rules);
       let rules = List.remove_assoc(key, rules);
       match_everything([(key, value), ...values], rules);
     };
@@ -61,5 +61,4 @@ let combine_and = rules => {
 };
 
 // [ A || B ] = [ A? && B? ]!
-let combine_or = rules =>
-  rules |> List.map(optional) |> combine_and |> at_least_one;
+let combine_or = rules => rules |> List.map(optional) |> combine_and;
