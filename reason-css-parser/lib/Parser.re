@@ -32,7 +32,13 @@ let property_align_content = [%value
 ];
 
 let parse = (prop, str) => {
-  let (output, _) =
+  let (output, tokens) =
     Sedlexing.Utf8.from_string(str) |> Lexer.read_all |> prop;
-  output;
+
+  let matched_everything =
+    switch (tokens) {
+    | [] => Ok()
+    | _ => Error("tokens remaining")
+    };
+  Result.bind(matched_everything, () => output);
 };
