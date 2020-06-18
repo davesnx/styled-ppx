@@ -29,14 +29,6 @@ open Longident;
 open Css_types;
 open Component_value;
 
-module Option = {
-  let get = (opt, def) =>
-    switch (opt) {
-    | None => def
-    | Some(o) => o
-    };
-};
-
 module Emotion = {
   let lident = name => Ldot(Lident("Css"), name);
 };
@@ -1149,7 +1141,11 @@ and render_declarations =
     declaration =>
       switch (declaration) {
       | Declaration_list.Declaration(decl) =>
-        render_declaration(decl, decl.loc, Option.get(variables, []))
+        render_declaration(
+          decl,
+          decl.loc,
+          Option.value(~default=[], variables),
+        )
       | Declaration_list.At_rule(ar) => render_at_rule(ar)
       | Declaration_list.Style_rule(ar) =>
         let loc: Location.t = ar.loc;
