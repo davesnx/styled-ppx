@@ -12,6 +12,8 @@ module Component = [%styled.div {|
   width: 100vw;
 
   font-size: 30px;
+
+  width: unset;
 |}];
 module ComponentInline = [%styled "color: #454545"];
 module ComponentLink = [%styled.a {| color: #454545 |}];
@@ -49,4 +51,3 @@ describe("ComponentLink", () => {
     |> toMatchSnapshot
   });
 })
-

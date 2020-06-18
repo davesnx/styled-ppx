@@ -71,6 +71,7 @@ let supportList = [
   /* [%css "transform: perspective(17px)" */
 
   /* [%css "font-family: 'Open Sans', '-system', sans-serif"], */
+  [%css "transform: initial"]
 ];
 
 Belt.List.forEachWithIndex(supportList, (index, css) => {
