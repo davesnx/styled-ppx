@@ -21,7 +21,8 @@
   "namespace": true,
   "bs-dependencies": [
     "reason-react",
-    "@ahrefs/bs-emotion"
+    "bs-css",
+    "bs-css-emotion"
   ],
   "bs-dev-dependencies": [
     "@glennsl/bs-jest",
