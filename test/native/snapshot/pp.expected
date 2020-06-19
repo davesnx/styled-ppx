@@ -16,7 +16,7 @@
     cookies: [],
   }
 ];
-Emotion.global({js|html , body|js}, [Emotion.margin(`zero)]);
+Css.global({js|html , body|js}, [Css.margin(`zero)]);
 
 module StateLenses = [%lenses
   type state = {
@@ -898,7 +898,7 @@ module Component = {
     (string, Js.t({..}), array(React.element)) => React.element =
     "createElement";
 
-  let styles = Emotion.css([Emotion.display(`block)]);
+  let styles = Css.style([Css.display(`block)]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
@@ -1788,10 +1788,7 @@ module Component = {
     "createElement";
 
   let styles =
-    Emotion.css([
-      Emotion.display(`flex),
-      Emotion.justifyContent(Emotion.center),
-    ]);
+    Css.style([Css.display(`flex), Css.justifyContent(Css.center)]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
@@ -2682,11 +2679,7 @@ module Component = {
     (string, Js.t({..}), array(React.element)) => React.element =
     "createElement";
 
-  let styles =
-    Emotion.css([
-      Emotion.p([@reason.raw_literal] "color", var),
-      Emotion.display(`block),
-    ]);
+  let styles = Css.style([Css.unsafe("color", var), Css.display(`block)]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
@@ -3578,9 +3571,7 @@ module Component = {
     "createElement";
 
   let styles = (~space: string) =>
-    Emotion.css([
-      Emotion.margin2(Emotion.px(10), Emotion.px({js|space|js})),
-    ]);
+    Css.style([Css.margin2(Css.px(10), Css.px({js|space|js}))]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles(~space=spaceGet(props))};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
@@ -3597,7 +3588,7 @@ module Component = {
   };
 };
 
-Emotion.css([Emotion.display(`block)]);
+Css.style([Css.display(`block)]);
 
 module Component = {
   [@bs.deriving abstract]
@@ -4472,7 +4463,7 @@ module Component = {
     (string, Js.t({..}), array(React.element)) => React.element =
     "createElement";
 
-  let styles = Emotion.css([]);
+  let styles = Css.style([]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
@@ -5361,7 +5352,7 @@ module Component = {
     (string, Js.t({..}), array(React.element)) => React.element =
     "createElement";
 
-  let styles = Emotion.css([]);
+  let styles = Css.style([]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
@@ -6252,32 +6243,29 @@ module NestedSelectors = {
     "createElement";
 
   let styles =
-    Emotion.css([
-      Emotion.display(`flex),
-      Emotion.justifyContent(Emotion.center),
-      Emotion.select(
-        {js|& > a|js},
-        [Emotion.backgroundColor(Emotion.Css.Color.green)],
+    Css.style([
+      Css.display(`flex),
+      Css.justifyContent(Css.center),
+      Css.selector({js|& > a|js}, [Css.backgroundColor(Css.green)]),
+      Css.selector(
+        {js|&:nth-child(even)|js},
+        [Css.backgroundColor(Css.red)],
       ),
-      Emotion.nthChild(
-        {js|even|js},
-        [Emotion.backgroundColor(Emotion.Css.Color.red)],
-      ),
-      Emotion.select(
+      Css.selector(
         {js|& > div:nth-child(3n  + 1)|js},
-        [Emotion.backgroundColor(Emotion.Css.Color.red)],
+        [Css.backgroundColor(Css.red)],
       ),
-      Emotion.select({js|& > div|js}, [Emotion.padding(Emotion.px(20))]),
-      Emotion.select(
+      Css.selector({js|& > div|js}, [Css.padding(Css.px(20))]),
+      Css.selector(
         {js|& > div:nth-child(3n  + 1)|js},
-        [Emotion.backgroundColor(Emotion.Css.Color.green)],
+        [Css.backgroundColor(Css.green)],
       ),
-      Emotion.select(
+      Css.selector(
         {js|& > div:nth-child(even)|js},
-        [Emotion.backgroundColor(Emotion.Css.Color.green)],
+        [Css.backgroundColor(Css.green)],
       ),
-      Emotion.active([Emotion.backgroundColor(Emotion.Css.Color.blue)]),
-      Emotion.hover([Emotion.backgroundColor(Emotion.Css.Color.pink)]),
+      Css.active([Css.backgroundColor(Css.blue)]),
+      Css.hover([Css.backgroundColor(Css.pink)]),
     ]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};

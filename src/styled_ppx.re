@@ -1,5 +1,5 @@
 open Migrate_parsetree;
-open Ast_408;
+open Ast_410;
 open Ast_mapper;
 open Asttypes;
 open Parsetree;
@@ -827,6 +827,6 @@ let () =
     /* this is required to run before ppx_metaquot during tests */
     /* any change regarding this behavior not related to metaquot is a bug */
     ~position=-1,
-    Versions.ocaml_408,
+    Versions.ocaml_410,
     styledPpxMapper,
   );
