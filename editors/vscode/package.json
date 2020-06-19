@@ -1,0 +1,55 @@
+{
+  "name": "vscode-styled-components",
+  "displayName": "vscode-styled-components",
+  "description": "Syntax highlighting for styled-components",
+  "version": "0.0.1",
+  "publisher": "davesnx",
+  "icon": "logo.png",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/styled-components/vscode-styled-components.git"
+  },
+  "engines": {
+    "vscode": "^1.5.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "scripts": {
+    "format": "prettier --write '**/*.{js,jsx,md,json,css}'",
+    "prepare": "node ./node_modules/vscode/bin/install",
+    "test": "node ./node_modules/vscode/bin/test ./test"
+  },
+  "contributes": {
+    "languages": [
+      {
+        "id": "source.css.styled",
+        "configuration": "./css.styled.configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "source.css.styled",
+        "scopeName": "source.css.styled",
+        "path": "./syntaxes/css.styled.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.css": "css"
+        }
+      },
+      {
+        "injectTo": [
+          "source.reason",
+          "source.ml"
+        ],
+        "scopeName": "inline.styled.reason",
+        "path": "./syntaxes/styled-ppx.json"
+      }
+    ]
+  },
+  "devDependencies": {
+    "prettier": "^1.14.3",
+    "prettier-cli": "^0.1.0",
+    "vscode": "^1.1.26"
+  }
+}

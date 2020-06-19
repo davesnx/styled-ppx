@@ -18,7 +18,7 @@
         "ocaml@4.10.0@d41d8cd9", "@reason-native/rely@3.2.1@d41d8cd9",
         "@opam/sedlex@opam:2.2@ffde36c0",
         "@opam/ocaml-migrate-parsetree@opam:1.7.3@dbcf3b47",
-        "@opam/ocaml-lsp-server@github:ocaml/ocaml-lsp:ocaml-lsp-server.opam#058c9b44f64b6e7957f057b1078e6ba6c91cc10e@d41d8cd9",
+        "@opam/ocaml-lsp-server@github:ocaml/ocaml-lsp:ocaml-lsp-server.opam#c117cb5bbf8a1ede3c663033e04d9b8e8e1d72a6@d41d8cd9",
         "@opam/merlin@opam:3.3.6@7ca67060",
         "@opam/menhir@opam:20200211@26571604",
         "@opam/dune@opam:2.5.1@f38f376e",
@@ -775,7 +775,7 @@
         "@opam/result@opam:1.5@6b753c82", "@opam/fpath@opam:0.7.2@45477b93",
         "@opam/dune@opam:2.5.1@f38f376e", "@opam/cppo@opam:1.6.6@f4f83858",
         "@opam/cmdliner@opam:1.0.4@93208aac",
-        "@opam/astring@opam:0.8.3@4e5e17d5",
+        "@opam/astring@opam:0.8.4@1215f84d",
         "@esy-ocaml/substs@0.0.1@d41d8cd9"
       ],
       "devDependencies": [
@@ -783,7 +783,7 @@
         "@opam/result@opam:1.5@6b753c82", "@opam/fpath@opam:0.7.2@45477b93",
         "@opam/dune@opam:2.5.1@f38f376e",
         "@opam/cmdliner@opam:1.0.4@93208aac",
-        "@opam/astring@opam:0.8.3@4e5e17d5"
+        "@opam/astring@opam:0.8.4@1215f84d"
       ]
     },
     "@opam/ocamlformat@opam:0.14.2@d742ffd5": {
@@ -975,16 +975,16 @@
         "@opam/dune@opam:2.5.1@f38f376e"
       ]
     },
-    "@opam/ocaml-lsp-server@github:ocaml/ocaml-lsp:ocaml-lsp-server.opam#058c9b44f64b6e7957f057b1078e6ba6c91cc10e@d41d8cd9": {
+    "@opam/ocaml-lsp-server@github:ocaml/ocaml-lsp:ocaml-lsp-server.opam#c117cb5bbf8a1ede3c663033e04d9b8e8e1d72a6@d41d8cd9": {
       "id":
-        "@opam/ocaml-lsp-server@github:ocaml/ocaml-lsp:ocaml-lsp-server.opam#058c9b44f64b6e7957f057b1078e6ba6c91cc10e@d41d8cd9",
+        "@opam/ocaml-lsp-server@github:ocaml/ocaml-lsp:ocaml-lsp-server.opam#c117cb5bbf8a1ede3c663033e04d9b8e8e1d72a6@d41d8cd9",
       "name": "@opam/ocaml-lsp-server",
       "version":
-        "github:ocaml/ocaml-lsp:ocaml-lsp-server.opam#058c9b44f64b6e7957f057b1078e6ba6c91cc10e",
+        "github:ocaml/ocaml-lsp:ocaml-lsp-server.opam#c117cb5bbf8a1ede3c663033e04d9b8e8e1d72a6",
       "source": {
         "type": "install",
         "source": [
-          "github:ocaml/ocaml-lsp:ocaml-lsp-server.opam#058c9b44f64b6e7957f057b1078e6ba6c91cc10e"
+          "github:ocaml/ocaml-lsp:ocaml-lsp-server.opam#c117cb5bbf8a1ede3c663033e04d9b8e8e1d72a6"
         ]
       },
       "overrides": [],
@@ -1223,12 +1223,12 @@
         "@opam/result@opam:1.5@6b753c82",
         "@opam/ocamlfind@opam:1.8.1@ff07b0f9",
         "@opam/ocamlbuild@opam:0.14.0@6ac75d03",
-        "@opam/astring@opam:0.8.3@4e5e17d5",
+        "@opam/astring@opam:0.8.4@1215f84d",
         "@esy-ocaml/substs@0.0.1@d41d8cd9"
       ],
       "devDependencies": [
         "ocaml@4.10.0@d41d8cd9", "@opam/result@opam:1.5@6b753c82",
-        "@opam/astring@opam:0.8.3@4e5e17d5"
+        "@opam/astring@opam:0.8.4@1215f84d"
       ]
     },
     "@opam/fix@opam:20200131@0ecd2f01": {
@@ -1566,20 +1566,20 @@
         "@opam/dune@opam:2.5.1@f38f376e"
       ]
     },
-    "@opam/astring@opam:0.8.3@4e5e17d5": {
-      "id": "@opam/astring@opam:0.8.3@4e5e17d5",
+    "@opam/astring@opam:0.8.4@1215f84d": {
+      "id": "@opam/astring@opam:0.8.4@1215f84d",
       "name": "@opam/astring",
-      "version": "opam:0.8.3",
+      "version": "opam:0.8.4",
       "source": {
         "type": "install",
         "source": [
-          "archive:https://opam.ocaml.org/cache/md5/c5/c5bf6352b9ac27fbeab342740f4fa870#md5:c5bf6352b9ac27fbeab342740f4fa870",
-          "archive:http://erratique.ch/software/astring/releases/astring-0.8.3.tbz#md5:c5bf6352b9ac27fbeab342740f4fa870"
+          "archive:https://opam.ocaml.org/cache/md5/54/548fcbf501ca4cb816d219ca4f25f660#md5:548fcbf501ca4cb816d219ca4f25f660",
+          "archive:https://erratique.ch/software/astring/releases/astring-0.8.4.tbz#md5:548fcbf501ca4cb816d219ca4f25f660"
         ],
         "opam": {
           "name": "astring",
-          "version": "0.8.3",
-          "path": "esy.lock/opam/astring.0.8.3"
+          "version": "0.8.4",
+          "path": "esy.lock/opam/astring.0.8.4"
         }
       },
       "overrides": [],
@@ -1587,12 +1587,9 @@
         "ocaml@4.10.0@d41d8cd9", "@opam/topkg@opam:1.0.1@a42c631e",
         "@opam/ocamlfind@opam:1.8.1@ff07b0f9",
         "@opam/ocamlbuild@opam:0.14.0@6ac75d03",
-        "@opam/base-bytes@opam:base@19d0c2ff",
         "@esy-ocaml/substs@0.0.1@d41d8cd9"
       ],
-      "devDependencies": [
-        "ocaml@4.10.0@d41d8cd9", "@opam/base-bytes@opam:base@19d0c2ff"
-      ]
+      "devDependencies": [ "ocaml@4.10.0@d41d8cd9" ]
     },
     "@esy-ocaml/substs@0.0.1@d41d8cd9": {
       "id": "@esy-ocaml/substs@0.0.1@d41d8cd9",
