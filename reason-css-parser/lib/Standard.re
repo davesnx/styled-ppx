@@ -49,10 +49,10 @@ let length = {
     keyword("cm") |> value(`Cm(number)),
     keyword("mm") |> value(`Mm(number)),
     keyword("Q") |> value(`Q(number)),
-    keyword("In") |> value(`In(number)),
-    keyword("Pt") |> value(`Pt(number)),
-    keyword("Pc") |> value(`Pc(number)),
-    keyword("Px") |> value(`Px(number)),
+    keyword("in") |> value(`In(number)),
+    keyword("pt") |> value(`Pt(number)),
+    keyword("pc") |> value(`Pc(number)),
+    keyword("px") |> value(`Px(number)),
   ]);
 };
 
