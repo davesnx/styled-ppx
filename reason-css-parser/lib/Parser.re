@@ -68,6 +68,42 @@ let property_line_clamp = [%value "none | <integer> <'block-ellipsis'>?"];
 let property_max_lines = [%value "none | <integer>"];
 let property_continue = [%value "auto | discard"];
 
+// css-text-3
+let property_text_transform = [%value
+  "none | [capitalize | uppercase | lowercase ] || full-width || full-size-kana"
+];
+let property_white_space = [%value
+  "normal | pre | nowrap | pre-wrap | break-spaces | pre-line"
+];
+let property_tab_size = [%value "<number> | <length>"];
+let property_word_break = [%value
+  "normal | keep-all | break-all | break-word"
+];
+let property_line_break = [%value "auto | loose | normal | strict | anywhere"];
+let property_hyphens = [%value "none | manual | auto"];
+let property_overflow_wrap = [%value "normal | break-word | anywhere"];
+let property_word_wrap = [%value "normal | break-word | anywhere"];
+let property_text_align = [%value
+  "start | end | left | right | center | justify | match-parent | justify-all"
+];
+let property_text_align_all = [%value
+  "start | end | left | right | center | justify | match-parent"
+];
+let property_text_align_last = [%value
+  "auto | start | end | left | right | center | justify | match-parent"
+];
+let property_text_justify = [%value
+  "auto | none | inter-word | inter-character"
+];
+let property_word_spacing = [%value "normal | <length>"];
+let property_letter_spacing = [%value "normal | <length>"];
+let property_text_indent = [%value
+  "[ <length-percentage> ] && hanging? && each-line?"
+];
+let property_hanging_punctuation = [%value
+  "none | [ first || [ force-end | allow-end ] || last ]"
+];
+
 // css-flexbox-1
 let property_flex_direction = [%value
   "row | row-reverse | column | column-reverse"
