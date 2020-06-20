@@ -93,6 +93,13 @@ let supportList = [
   [%css "padding: 1px 2px"],
   [%css "padding: 1px 2px 3px"],
   [%css "padding: 1px 2px 3px 4px"],
+  // css-overflow-3
+  [%css "overflow-x: auto"],
+  [%css "overflow-y: hidden"],
+  [%css "overflow: scroll"],
+  [%css "overflow: scroll visible"],
+  [%css "text-overflow: clip"],
+  [%css "text-overflow: ellipsis"],
 ];
 
 Belt.List.forEachWithIndex(supportList, (index, css) => {

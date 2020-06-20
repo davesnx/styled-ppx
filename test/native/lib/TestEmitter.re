@@ -146,6 +146,19 @@ let properties_static_css_tests = [
       ]
     ],
   ),
+  // css-overflow-3
+  ([%expr [%css "overflow-x: auto"]], [%expr [Css.overflowX(`auto)]]),
+  ([%expr [%css "overflow-y: hidden"]], [%expr [Css.overflowY(`hidden)]]),
+  ([%expr [%css "overflow: scroll"]], [%expr [Css.overflow(`scroll)]]),
+  (
+    [%expr [%css "overflow: scroll visible"]],
+    [%expr [Css.overflowX(`scroll), Css.overflowY(`visible)]],
+  ),
+  ([%expr [%css "text-overflow: clip"]], [%expr [Css.textOverflow(`clip)]]),
+  (
+    [%expr [%css "text-overflow: ellipsis"]],
+    [%expr [Css.textOverflow(`ellipsis)]],
+  ),
   // css-flexbox-1
   ([%expr [%css "flex-wrap: wrap"]], [%expr [Css.flexWrap(`wrap)]]),
   // TODO: generate tests with variables in the future

@@ -32,7 +32,14 @@ let transform = (parser, value_of_ast, value_to_expr) => {
     ast_of_string(string) |> Result.map(ast_to_expr);
   {ast_of_string, value_of_ast, value_to_expr, ast_to_expr, string_to_expr};
 };
-
+let unsupported = _parser =>
+  transform(
+    property_block_ellipsis,
+    fun
+    | _ => raise(Unsupported_feature),
+    fun
+    | _ => raise(Unsupported_feature),
+  );
 let render_css_wide_keywords = (name, value) => {
   let.ok value = Parser.parse(Standard.css_wide_keywords, value);
   let value =
@@ -74,7 +81,12 @@ let variants_to_expression =
   | `Auto => id([%expr `auto])
   | `None => id([%expr `none])
   | `Content_box => id([%expr `contentBox])
-  | `Border_box => id([%expr `borderBox]);
+  | `Border_box => id([%expr `borderBox])
+  | `Clip => id([%expr `clip])
+  | `Hidden => id([%expr `hidden])
+  | `Visible => id([%expr `visible])
+  | `Scroll => id([%expr `scroll])
+  | `Ellipsis => id([%expr `ellipsis]);
 
 let variable_rule = {
   open Rule;
@@ -189,8 +201,7 @@ let max_height =
   );
 let box_sizing =
   apply(property_box_sizing, variants_to_expression, [%expr Css.boxSizing]);
-// TODO: bs-css doesn't support columnWidth
-// let column_width =
+let column_width = unsupported(property_column_width);
 
 // css-box-3
 let margin_top =
@@ -288,6 +299,38 @@ let padding =
     | _ => failwith("unreachable"),
   );
 
+// css-overflow-3
+// TODO: maybe implement using strings?
+let overflow_x =
+  apply(
+    property_overflow_x,
+    fun
+    | `Clip => raise(Unsupported_feature)
+    | otherwise => variants_to_expression(otherwise),
+    [%expr Css.overflowX],
+  );
+let overflow_y = variants(property_overflow_y, [%expr Css.overflowY]);
+let overflow =
+  transform(
+    property_overflow,
+    List.map(apply_value(overflow_x.value_of_ast)),
+    fun
+    | [all] => [[%expr Css.overflow([%e all])]]
+    | [x, y] =>
+      List.concat([
+        overflow_x.value_to_expr(x),
+        overflow_y.value_to_expr(y),
+      ])
+    | _ => failwith("unreachable"),
+  );
+let overflow_clip_margin = unsupported(property_overflow_clip_margin);
+let overflow_inline = unsupported(property_overflow_inline);
+let text_overflow =
+  variants(property_text_overflow, [%expr Css.textOverflow]);
+let block_ellipsis = unsupported(property_block_ellipsis);
+let max_lines = unsupported(property_max_lines);
+let continue = unsupported(property_continue);
+
 // css-flexbox-1
 // using id() because refmt
 let flex_direction =
@@ -373,6 +416,7 @@ let properties = [
   ("max-width", found(max_width)),
   ("max-height", found(max_height)),
   ("box-sizing", found(box_sizing)),
+  ("column-width", found(column_width)),
   // css-box-3
   ("margin-top", found(margin_top)),
   ("margin-right", found(margin_right)),
@@ -384,6 +428,16 @@ let properties = [
   ("padding-bottom", found(padding_bottom)),
   ("padding-left", found(padding_left)),
   ("padding", found(padding)),
+  // css-overflow-3
+  ("overflow-x", found(overflow_x)),
+  ("overflow-y", found(overflow_y)),
+  ("overflow", found(overflow)),
+  ("overflow-clip-margin", found(overflow_clip_margin)),
+  ("overflow-inline", found(overflow_inline)),
+  ("text-overflow", found(text_overflow)),
+  ("block-ellipsis", found(block_ellipsis)),
+  ("max-lines", found(max_lines)),
+  ("continue", found(continue)),
   // css-flexbox-1
   ("flex-direction", found(flex_direction)),
   ("flex-wrap", found(flex_wrap)),
