@@ -30,6 +30,28 @@ let property_column_width = [%value
   "min-content | max-content | fit-content(<length-percentage>)"
 ];
 
+// css-box-3
+let visual_box = [%value "content-box | padding-box | border-box"];
+let layout_box = [%value
+  "content-box | padding-box | border-box | margin-box"
+];
+let paint_box = [%value
+  "content-box | padding-box | border-box | fill-box | stroke-box"
+];
+let coord_box = [%value
+  "content-box | padding-box | border-box | fill-box | stroke-box | view-box"
+];
+let property_margin_top = [%value "<length-percentage> | auto"];
+let property_margin_right = [%value "<length-percentage> | auto"];
+let property_margin_bottom = [%value "<length-percentage> | auto"];
+let property_margin_left = [%value "<length-percentage> | auto"];
+let property_margin = [%value "<'margin-top'>{1,4}"];
+let property_padding_top = [%value "<length-percentage>"];
+let property_padding_right = [%value "<length-percentage>"];
+let property_padding_bottom = [%value "<length-percentage>"];
+let property_padding_left = [%value "<length-percentage>"];
+let property_padding = [%value "<'padding-top'>{1,4}"];
+
 // css-flexbox-1
 let property_flex_direction = [%value
   "row | row-reverse | column | column-reverse"
