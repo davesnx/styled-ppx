@@ -8,7 +8,7 @@
   "patterns": [
     {
       "contentName": "meta.embedded.block.css",
-      "begin": "(\\[%(styled\\.([a-zA-Z]*)))s*$",
+      "begin": "[%(styled\\.([a-zA-Z].*$",
       "end": "(?<=])",
       "patterns": [
         {

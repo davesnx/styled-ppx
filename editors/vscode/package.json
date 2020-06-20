@@ -24,15 +24,19 @@
   "contributes": {
     "languages": [
       {
-        "id": "source.css.styled",
-        "configuration": "./css.styled.configuration.json"
+        "id": "reason",
+        "extensions": [
+          ".re",
+          ".ml"
+        ],
+        "configuration": "./reason.configuration.json"
       }
     ],
     "grammars": [
       {
-        "language": "source.css.styled",
-        "scopeName": "source.css.styled",
+        "language": "reason",
         "path": "./syntaxes/css.styled.json",
+        "scopeName": "source.css",
         "embeddedLanguages": {
           "meta.embedded.block.css": "css"
         }
@@ -40,7 +44,9 @@
       {
         "injectTo": [
           "source.reason",
-          "source.ml"
+          "source.re",
+          "source.ml",
+          "source.ocaml"
         ],
         "scopeName": "inline.styled.reason",
         "path": "./syntaxes/styled-ppx.json"
