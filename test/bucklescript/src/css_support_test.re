@@ -67,6 +67,7 @@ let supportList = [
   [%css "flex-flow: row wrap"],
   [%css "flex: 1 2 content"],
   [%css "flex: unset"],
+  // css-sizing-3
   [%css "width: auto"],
   [%css "width: 0"],
   [%css "height: 5px"],
@@ -75,6 +76,23 @@ let supportList = [
   [%css "max-width: none"],
   [%css "max-height: 3vh"],
   [%css "box-sizing: border-box"],
+  // css-box-3
+  [%css "margin-top: auto"],
+  [%css "margin-right: 1px"],
+  [%css "margin-bottom: 2px"],
+  [%css "margin-left: 3px"],
+  [%css "margin: 1px"],
+  [%css "margin: 1px 2px"],
+  [%css "margin: 1px 2px 3px"],
+  [%css "margin: 1px 2px 3px 4px"],
+  [%css "padding-top: 0"],
+  [%css "padding-right: 1px"],
+  [%css "padding-bottom: 2px"],
+  [%css "padding-left: 3px"],
+  [%css "padding: 1px"],
+  [%css "padding: 1px 2px"],
+  [%css "padding: 1px 2px 3px"],
+  [%css "padding: 1px 2px 3px 4px"],
 ];
 
 Belt.List.forEachWithIndex(supportList, (index, css) => {

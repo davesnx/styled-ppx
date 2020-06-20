@@ -44,7 +44,7 @@ let properties_static_css_tests = [
     [%expr [Css.justifyContent(`center)]],
   ),
   ([%expr [%css "margin: 0"]], [%expr [Css.margin(`zero)]]),
-  ([%expr [%css "margin: 5px"]], [%expr [Css.margin(Css.px(5))]]),
+  ([%expr [%css "margin: 5px"]], [%expr [Css.margin(`pxFloat(5.))]]),
   ([%expr [%css "opacity: 0.9"]], [%expr [Css.opacity(0.9)]]),
   ([%expr [%css "width: 100vw"]], [%expr [Css.width(`vw(100.))]]),
   // css-sizing-3
@@ -58,6 +58,93 @@ let properties_static_css_tests = [
   (
     [%expr [%css "box-sizing: border-box"]],
     [%expr [Css.boxSizing(`borderBox)]],
+  ),
+  // css-box-3
+  ([%expr [%css "margin-top: auto"]], [%expr [Css.marginTop(`auto)]]),
+  (
+    [%expr [%css "margin-right: 1px"]],
+    [%expr [Css.marginRight(`pxFloat(1.))]],
+  ),
+  (
+    [%expr [%css "margin-bottom: 2px"]],
+    [%expr [Css.marginBottom(`pxFloat(2.))]],
+  ),
+  (
+    [%expr [%css "margin-left: 3px"]],
+    [%expr [Css.marginLeft(`pxFloat(3.))]],
+  ),
+  ([%expr [%css "margin: 1px"]], [%expr [Css.margin(`pxFloat(1.))]]),
+  (
+    [%expr [%css "margin: 1px 2px"]],
+    [%expr [Css.margin2(~v=`pxFloat(1.), ~h=`pxFloat(2.))]],
+  ),
+  (
+    [%expr [%css "margin: 1px 2px 3px"]],
+    [%expr
+      [
+        Css.margin3(
+          ~top=`pxFloat(1.),
+          ~h=`pxFloat(2.),
+          ~bottom=`pxFloat(3.),
+        ),
+      ]
+    ],
+  ),
+  (
+    [%expr [%css "margin: 1px 2px 3px 4px"]],
+    [%expr
+      [
+        Css.margin4(
+          ~top=`pxFloat(1.),
+          ~right=`pxFloat(2.),
+          ~bottom=`pxFloat(3.),
+          ~left=`pxFloat(4.),
+        ),
+      ]
+    ],
+  ),
+  ([%expr [%css "padding-top: 0"]], [%expr [Css.paddingTop(`zero)]]),
+  (
+    [%expr [%css "padding-right: 1px"]],
+    [%expr [Css.paddingRight(`pxFloat(1.))]],
+  ),
+  (
+    [%expr [%css "padding-bottom: 2px"]],
+    [%expr [Css.paddingBottom(`pxFloat(2.))]],
+  ),
+  (
+    [%expr [%css "padding-left: 3px"]],
+    [%expr [Css.paddingLeft(`pxFloat(3.))]],
+  ),
+  ([%expr [%css "padding: 1px"]], [%expr [Css.padding(`pxFloat(1.))]]),
+  (
+    [%expr [%css "padding: 1px 2px"]],
+    [%expr [Css.padding2(~v=`pxFloat(1.), ~h=`pxFloat(2.))]],
+  ),
+  (
+    [%expr [%css "padding: 1px 2px 3px"]],
+    [%expr
+      [
+        Css.padding3(
+          ~top=`pxFloat(1.),
+          ~h=`pxFloat(2.),
+          ~bottom=`pxFloat(3.),
+        ),
+      ]
+    ],
+  ),
+  (
+    [%expr [%css "padding: 1px 2px 3px 4px"]],
+    [%expr
+      [
+        Css.padding4(
+          ~top=`pxFloat(1.),
+          ~right=`pxFloat(2.),
+          ~bottom=`pxFloat(3.),
+          ~left=`pxFloat(4.),
+        ),
+      ]
+    ],
   ),
   // css-flexbox-1
   ([%expr [%css "flex-wrap: wrap"]], [%expr [Css.flexWrap(`wrap)]]),
@@ -129,7 +216,7 @@ describe("emit bs-css from static [%css]", ({test, _}) => {
 
 let properties_variable_css_tests = [
   ([%expr [%css "color: $var"]], [%expr [Css.unsafe("color", var)]]),
-  ([%expr [%css "margin: $var"]], [%expr [Css.unsafe("margin", var)]]),
+  // TODO: ([%expr [%css "margin: $var"]], [%expr [Css.margin("margin", var)]]),
 ];
 describe("emit bs-css from variable [%css]", ({test, _}) => {
   let test = (index, (result, expected)) =>
