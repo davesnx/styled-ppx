@@ -53,6 +53,7 @@ let length = {
     keyword("pt") |> value(`Pt(number)),
     keyword("pc") |> value(`Pc(number)),
     keyword("px") |> value(`Px(number)),
+    identity |> value(`Zero),
   ]);
 };
 
