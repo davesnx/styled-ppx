@@ -4,6 +4,7 @@ open Ast_helper;
 open Reason_css_parser;
 open Parser;
 
+let (let.ok) = Result.bind;
 let id = Fun.id;
 
 type transform('ast, 'value) = {
@@ -22,6 +23,23 @@ let transform = (parser, value_of_ast, value_to_expr) => {
   {ast_of_string, value_of_ast, value_to_expr, ast_to_expr, string_to_expr};
 };
 
+let render_css_wide_keywords = (name, value) => {
+  let.ok value = Parser.parse(Standard.css_wide_keywords, value);
+  let value =
+    switch (value) {
+    | `Inherit =>
+      %expr
+      "inherit"
+    | `Initial =>
+      %expr
+      "initial"
+    | `Unset =>
+      %expr
+      "unset"
+    };
+  let name = Const.string(name) |> Exp.constant;
+  Ok([[%expr Css.unsafe([%e name], [%e value])]]);
+};
 let render_integer = integer => Const.int(integer) |> Exp.constant;
 let render_number = number =>
   Const.float(number |> string_of_float) |> Exp.constant;
@@ -141,5 +159,9 @@ let parse_declarations = ((name, value)) => {
     properties
     |> List.find_opt(((key, _)) => key == name)
     |> Option.to_result(~none=`Not_found);
-  string_to_expr(value) |> Result.map_error(str => `Invalid_value(str));
+  switch (render_css_wide_keywords(name, value)) {
+  | Ok(value) => Ok(value)
+  | Error(_) =>
+    string_to_expr(value) |> Result.map_error(str => `Invalid_value(str))
+  };
 };

@@ -74,6 +74,7 @@ let supportList = [
   [%css "transform: initial"],
   [%css "flex-flow: row wrap"],
   [%css "flex: 1 2 content"],
+  [%css "flex: unset"],
 ];
 
 Belt.List.forEachWithIndex(supportList, (index, css) => {
