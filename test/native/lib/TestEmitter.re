@@ -18,10 +18,7 @@ let compare = (result, expected, {expect, _}) => {
 // TODO: ideas, selectors . properties, to have a bigger test matrix
 // somehow programatically generate strings to test css
 let properties_static_css_tests = [
-  (
-    [%expr [%css "align-items: center"]],
-    [%expr [Css.alignItems(Css.center)]],
-  ),
+  ([%expr [%css "align-items: center"]], [%expr [Css.alignItems(`center)]]),
   (
     [%expr [%css "box-sizing: border-box"]],
     [%expr [Css.boxSizing(`borderBox)]],
@@ -38,18 +35,49 @@ let properties_static_css_tests = [
   ([%expr [%css "display: flex"]], [%expr [Css.display(`flex)]]),
   (
     [%expr [%css "flex-direction: column"]],
-    [%expr [Css.flexDirection(Css.column)]],
+    [%expr [Css.flexDirection(`column)]],
   ),
   ([%expr [%css "font-size: 30px"]], [%expr [Css.fontSize(Css.px(30))]]),
   ([%expr [%css "height: 100vh"]], [%expr [Css.height(Css.vh(100.))]]),
   (
     [%expr [%css "justify-content: center"]],
-    [%expr [Css.justifyContent(Css.center)]],
+    [%expr [Css.justifyContent(`center)]],
   ),
   ([%expr [%css "margin: 0"]], [%expr [Css.margin(`zero)]]),
   ([%expr [%css "margin: 5px"]], [%expr [Css.margin(Css.px(5))]]),
   ([%expr [%css "opacity: 0.9"]], [%expr [Css.opacity(0.9)]]),
   ([%expr [%css "width: 100vw"]], [%expr [Css.width(Css.vw(100.))]]),
+  ([%expr [%css "flex-wrap: wrap"]], [%expr [Css.flexWrap(`wrap)]]),
+  (
+    [%expr [%css "flex-flow: row nowrap"]],
+    [%expr [Css.flexDirection(`row), Css.flexWrap(`nowrap)]],
+  ),
+  ([%expr [%css "order: 5"]], [%expr [Css.order(5)]]),
+  ([%expr [%css "flex-grow: 2"]], [%expr [Css.flexGrow(2.)]]),
+  // TODO: parser problems with decimal values
+  // (
+  //   [%expr [%css "flex-grow: 2.5"]],
+  //   [%expr [Css.flexGrow(2.5)]],
+  // ),
+  ([%expr [%css "flex-shrink: 2"]], [%expr [Css.flexShrink(2.)]]),
+  // TODO: parser problems with decimal values
+  // (
+  //   [%expr [%css "flex-shrink: 2.5"]],
+  //   [%expr [Css.flexShrink(2.5)]],
+  // ),
+  ([%expr [%css "flex-basis: content"]], [%expr [Css.flexBasis(`content)]]),
+  ([%expr [%css "flex: none"]], [%expr [Css.flex(`none)]]),
+  (
+    [%expr [%css "flex: 1 2 content"]],
+    [%expr
+      [Css.flexGrow(1.), Css.flexShrink(2.), Css.flexBasis(`content)]
+    ],
+  ),
+  ([%expr [%css "align-self: stretch"]], [%expr [Css.alignSelf(`stretch)]]),
+  (
+    [%expr [%css "align-content: space-around"]],
+    [%expr [Css.alignContent(`spaceAround)]],
+  ),
 ];
 let selectors_static_css_tests = [
   (

@@ -7,3 +7,5 @@ exports[`Component 1 renders 1`] = `"css-g393ep"`;
 exports[`Component 2 renders 1`] = `"css-roynbj"`;
 
 exports[`Component 3 renders 1`] = `"css-14y7xed"`;
+
+exports[`Component 4 renders 1`] = `"css-mi7h12"`;

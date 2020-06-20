@@ -1787,8 +1787,7 @@ module Component = {
     (string, Js.t({..}), array(React.element)) => React.element =
     "createElement";
 
-  let styles =
-    Css.style([Css.display(`flex), Css.justifyContent(Css.center)]);
+  let styles = Css.style([Css.display(`flex), Css.justifyContent(`center)]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
@@ -6245,7 +6244,7 @@ module NestedSelectors = {
   let styles =
     Css.style([
       Css.display(`flex),
-      Css.justifyContent(Css.center),
+      Css.justifyContent(`center),
       Css.selector({js|& > a|js}, [Css.backgroundColor(Css.green)]),
       Css.selector(
         {js|&:nth-child(even)|js},
