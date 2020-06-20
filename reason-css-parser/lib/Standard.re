@@ -2,6 +2,7 @@ open Tokens;
 open Combinator;
 open Rule.Let;
 open Rule.Pattern;
+open Rule.Match;
 
 let keyword = string => expect(STRING(string));
 let function_call = (name, rule) => {
@@ -12,7 +13,6 @@ let function_call = (name, rule) => {
   return_match(value);
 };
 
-type integer = int;
 let integer =
   token(
     fun
@@ -20,7 +20,6 @@ let integer =
     | _ => Error("expected an integer"),
   );
 
-type number = float;
 let number =
   token(
     fun
@@ -28,12 +27,47 @@ let number =
     | _ => Error("expected a number"),
   );
 
-type percentage = number;
+let length = {
+  let.bind_match number = number;
+  combine_xor([
+    // relative
+    keyword("em") |> value(`Em(number)),
+    keyword("ex") |> value(`Ex(number)),
+    keyword("cap") |> value(`Cap(number)),
+    keyword("ch") |> value(`Ch(number)),
+    keyword("ic") |> value(`Ic(number)),
+    keyword("rem") |> value(`Rem(number)),
+    keyword("lh") |> value(`Lh(number)),
+    keyword("rlh") |> value(`Rlh(number)),
+    keyword("vw") |> value(`Vw(number)),
+    keyword("vh") |> value(`Vh(number)),
+    keyword("vi") |> value(`Vi(number)),
+    keyword("vb") |> value(`Vb(number)),
+    keyword("vmin") |> value(`Vmin(number)),
+    keyword("vmax") |> value(`Vmax(number)),
+    // absolute
+    keyword("cm") |> value(`Cm(number)),
+    keyword("mm") |> value(`Mm(number)),
+    keyword("Q") |> value(`Q(number)),
+    keyword("In") |> value(`In(number)),
+    keyword("Pt") |> value(`Pt(number)),
+    keyword("Pc") |> value(`Pc(number)),
+    keyword("Px") |> value(`Px(number)),
+  ]);
+};
+
+// TODO: positive numbers like <number [0,infinity]>
 let percentage = {
   let.bind_match number = number;
   let.bind_match () = expect(PERCENT);
   return_match(number);
 };
+
+let length_percentage =
+  combine_xor([
+    map(length, v => `Length(v)),
+    map(percentage, v => `Percentage(v)),
+  ]);
 
 let css_wide_keywords =
   combine_xor([
