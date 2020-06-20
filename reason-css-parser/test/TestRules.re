@@ -238,6 +238,12 @@ describe("pattern helpers", ({test, _}) => {
   open! Let;
   open! Pattern;
 
+  test("identity", _ => {
+    switch (identity([STRING("tomato")])) {
+    | (Ok (), [STRING("tomato")]) => ()
+    | _ => failwith({|should be (Ok(), [STRING("TOMATO")]|})
+    }
+  });
   test("token", _ => {
     let rule =
       token(
