@@ -24,7 +24,7 @@
   "contributes": {
     "languages": [
       {
-        "id": "reason",
+        "id": "source.css.styled-ppx",
         "extensions": [
           ".re",
           ".ml"
@@ -34,12 +34,9 @@
     ],
     "grammars": [
       {
-        "language": "reason",
-        "path": "./syntaxes/css.styled.json",
-        "scopeName": "source.css",
-        "embeddedLanguages": {
-          "meta.embedded.block.css": "css"
-        }
+        "language": "source.css.styled-ppx",
+        "scopeName": "source.css.styled-ppx",
+        "path": "./syntaxes/css.styled.json"
       },
       {
         "injectTo": [
@@ -49,7 +46,11 @@
           "source.ocaml"
         ],
         "scopeName": "inline.styled.reason",
-        "path": "./syntaxes/styled-ppx.json"
+        "path": "./syntaxes/styled-ppx.json",
+        "embeddedLanguages": {
+          "source.css.scss": "css",
+          "meta.embedded.block.css": "css"
+        }
       }
     ]
   },
