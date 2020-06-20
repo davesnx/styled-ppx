@@ -4,8 +4,33 @@ open Modifier;
 open Rule.Match;
 // TODO: split by modules
 
-let property_width = [%value "auto"];
+// css-sizing-3
+// let function_fit_content = () => [%value "fit-content(<length-percentage>)"];
+let function_fit_content = [%value "not-implemented"];
+let property_width = [%value
+  "auto | <length-percentage> | min-content | max-content | fit-content(<length-percentage>)"
+];
+let property_height = [%value
+  "auto | <length-percentage> | min-content | max-content | fit-content(<length-percentage>)"
+];
+let property_min_width = [%value
+  "auto | <length-percentage> | min-content | max-content | fit-content(<length-percentage>)"
+];
+let property_min_height = [%value
+  "auto | <length-percentage> | min-content | max-content | fit-content(<length-percentage>)"
+];
+let property_max_width = [%value
+  "none | <length-percentage> | min-content | max-content | fit-content(<length-percentage>)"
+];
+let property_max_height = [%value
+  "none | <length-percentage> | min-content | max-content | fit-content(<length-percentage>)"
+];
+let property_box_sizing = [%value "content-box | border-box"];
+let property_column_width = [%value
+  "min-content | max-content | fit-content(<length-percentage>)"
+];
 
+// css-flexbox-1
 let property_flex_direction = [%value
   "row | row-reverse | column | column-reverse"
 ];
@@ -18,6 +43,7 @@ let property_flex_basis = [%value "content | <'width'>"];
 let property_flex = [%value
   "none | [ <'flex-grow'> <'flex-shrink'>? || <'flex-basis'> ]"
 ];
+// TODO: new draft https://drafts.csswg.org/css-align-3/#propdef-justify-content
 let property_justify_content = [%value
   "flex-start | flex-end | center | space-between | space-around"
 ];
