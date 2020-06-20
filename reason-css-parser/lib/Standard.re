@@ -53,6 +53,7 @@ let length = {
     keyword("pt") |> value(`Pt(number)),
     keyword("pc") |> value(`Pc(number)),
     keyword("px") |> value(`Px(number)),
+    // TODO: only if number is zero
     identity |> value(`Zero),
   ]);
 };
@@ -69,6 +70,9 @@ let length_percentage =
     map(length, v => `Length(v)),
     map(percentage, v => `Percentage(v)),
   ]);
+
+// TODO: implement
+let string = Rule.Data.return(Error("not implemented"));
 
 let css_wide_keywords =
   combine_xor([

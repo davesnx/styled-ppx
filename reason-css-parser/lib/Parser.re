@@ -52,6 +52,22 @@ let property_padding_bottom = [%value "<length-percentage>"];
 let property_padding_left = [%value "<length-percentage>"];
 let property_padding = [%value "<'padding-top'>{1,4}"];
 
+// css-overflow-3
+let property_overflow_x = [%value "visible | hidden | clip | scroll | auto"];
+let property_overflow_y = [%value "visible | hidden | clip | scroll | auto"];
+let property_overflow = [%value
+  "[ visible | hidden | clip | scroll | auto ]{1,2}"
+];
+// TODO: let property_overflow_clip_margin = [%value "<length [0,∞]>"];
+let property_overflow_clip_margin = [%value "<length>"];
+let property_overflow_inline = [%value "<'overflow'>"];
+let property_overflow_block = [%value "<'overflow'>"];
+let property_text_overflow = [%value "clip | ellipsis"];
+let property_block_ellipsis = [%value "none | auto | <string>"];
+let property_line_clamp = [%value "none | <integer> <'block-ellipsis'>?"];
+let property_max_lines = [%value "none | <integer>"];
+let property_continue = [%value "auto | discard"];
+
 // css-flexbox-1
 let property_flex_direction = [%value
   "row | row-reverse | column | column-reverse"
