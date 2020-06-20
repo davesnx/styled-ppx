@@ -100,6 +100,19 @@ let supportList = [
   [%css "overflow: scroll visible"],
   [%css "text-overflow: clip"],
   [%css "text-overflow: ellipsis"],
+  // css-text-3
+  [%css "text-transform: capitalize"],
+  [%css "white-space: break-spaces"],
+  [%css "word-break: keep-all"],
+  [%css "overflow-wrap: anywhere"],
+  [%css "word-wrap: normal"],
+  // [%css "text-align: start"],
+  [%css "text-align: left"],
+  [%css "word-spacing: normal"],
+  [%css "word-spacing: 5px"],
+  [%css "letter-spacing: normal"],
+  [%css "letter-spacing: 5px"],
+  [%css "text-indent: 5%"],
 ];
 
 Belt.List.forEachWithIndex(supportList, (index, css) => {

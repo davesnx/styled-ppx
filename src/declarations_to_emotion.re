@@ -86,7 +86,26 @@ let variants_to_expression =
   | `Hidden => id([%expr `hidden])
   | `Visible => id([%expr `visible])
   | `Scroll => id([%expr `scroll])
-  | `Ellipsis => id([%expr `ellipsis]);
+  | `Ellipsis => id([%expr `ellipsis])
+  | `Capitalize => id([%expr `capitalize])
+  | `Lowercase => id([%expr `lowercase])
+  | `Uppercase => id([%expr `uppercase])
+  | `Break_spaces => id([%expr `breakSpaces])
+  | `Normal => id([%expr `normal])
+  | `Pre => id([%expr `pre])
+  | `Pre_line => id([%expr `preLine])
+  | `Pre_wrap => id([%expr `preWrap])
+  | `Break_all => id([%expr `breakAll])
+  | `Break_word => raise(Unsupported_feature)
+  | `Keep_all => id([%expr `keepAll])
+  | `Anywhere => id([%expr `anywhere])
+  | `End => raise(Unsupported_feature)
+  | `Justify => id([%expr `justify])
+  | `Justify_all => raise(Unsupported_feature)
+  | `Left => id([%expr `left])
+  | `Match_parent => raise(Unsupported_feature)
+  | `Right => id([%expr `right])
+  | `Start => id([%expr `start]);
 
 let variable_rule = {
   open Rule;
@@ -331,6 +350,56 @@ let block_ellipsis = unsupported(property_block_ellipsis);
 let max_lines = unsupported(property_max_lines);
 let continue = unsupported(property_continue);
 
+// css-text-3
+let text_transform =
+  apply(
+    property_text_transform,
+    fun
+    | `None => variants_to_expression(`None)
+    | `Or(Some(value), None, None) => variants_to_expression(value)
+    | `Or(_, Some(_), _)
+    | `Or(_, _, Some(_)) => raise(Unsupported_feature)
+    | `Or(None, None, None) => failwith("unrecheable"),
+    [%expr Css.textTransform],
+  );
+let white_space = variants(property_white_space, [%expr Css.whiteSpace]);
+let tab_size = unsupported(property_tab_size);
+let word_break = variants(property_word_break, [%expr Css.wordBreak]);
+let line_break = unsupported(property_line_break);
+let hyphens = unsupported(property_hyphens);
+let overflow_wrap =
+  variants(property_overflow_wrap, [%expr Css.overflowWrap]);
+let word_wrap = variants(property_word_wrap, [%expr Css.wordWrap]);
+let text_align = variants(property_text_align, [%expr Css.textAlign]);
+let text_align_all = unsupported(property_text_align_all);
+let text_align_last = unsupported(property_text_align_last);
+let text_justify = unsupported(property_text_justify);
+let word_spacing =
+  apply(
+    property_word_spacing,
+    fun
+    | `Normal => variants_to_expression(`Normal)
+    | `Length(l) => render_length(l),
+    [%expr Css.wordSpacing],
+  );
+let letter_spacing =
+  apply(
+    property_word_spacing,
+    fun
+    | `Normal => variants_to_expression(`Normal)
+    | `Length(l) => render_length(l),
+    [%expr Css.letterSpacing],
+  );
+let text_indent =
+  apply(
+    property_text_indent,
+    fun
+    | (lp, None, None) => render_length_percentage(lp)
+    | _ => raise(Unsupported_feature),
+    [%expr Css.textIndent],
+  );
+let hanging_punctuation = unsupported(property_hanging_punctuation);
+
 // css-flexbox-1
 // using id() because refmt
 let flex_direction =
@@ -438,6 +507,23 @@ let properties = [
   ("block-ellipsis", found(block_ellipsis)),
   ("max-lines", found(max_lines)),
   ("continue", found(continue)),
+  // css-box-3
+  ("text-transform", found(text_transform)),
+  ("white-space", found(white_space)),
+  ("tab-size", found(tab_size)),
+  ("word-break", found(word_break)),
+  ("line-break", found(line_break)),
+  ("hyphens", found(hyphens)),
+  ("overflow-wrap", found(overflow_wrap)),
+  ("word-wrap", found(word_wrap)),
+  ("text-align", found(text_align)),
+  ("text-align-all", found(text_align_all)),
+  ("text-align-last", found(text_align_last)),
+  ("text-justify", found(text_justify)),
+  ("word-spacing", found(word_spacing)),
+  ("letter-spacing", found(letter_spacing)),
+  ("text-indent", found(text_indent)),
+  ("hanging-punctuation", found(hanging_punctuation)),
   // css-flexbox-1
   ("flex-direction", found(flex_direction)),
   ("flex-wrap", found(flex_wrap)),
@@ -446,7 +532,6 @@ let properties = [
   ("flex-grow", found(flex_grow)),
   ("flex-shrink", found(flex_shrink)),
   ("flex-basis", found(flex_basis)),
-  // TODO: missing a proper implementation
   ("flex", found(flex)),
   ("justify-content", found(justify_content)),
   ("align-items", found(align_items)),

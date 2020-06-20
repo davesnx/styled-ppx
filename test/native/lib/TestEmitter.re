@@ -159,6 +159,45 @@ let properties_static_css_tests = [
     [%expr [%css "text-overflow: ellipsis"]],
     [%expr [Css.textOverflow(`ellipsis)]],
   ),
+  // css-text-3
+  (
+    [%expr [%css "text-transform: capitalize"]],
+    [%expr [Css.textTransform(`capitalize)]],
+  ),
+  (
+    [%expr [%css "white-space: break-spaces"]],
+    [%expr [Css.whiteSpace(`breakSpaces)]],
+  ),
+  (
+    [%expr [%css "word-break: keep-all"]],
+    [%expr [Css.wordBreak(`keepAll)]],
+  ),
+  (
+    [%expr [%css "overflow-wrap: anywhere"]],
+    [%expr [Css.overflowWrap(`anywhere)]],
+  ),
+  ([%expr [%css "word-wrap: normal"]], [%expr [Css.wordWrap(`normal)]]),
+  ([%expr [%css "text-align: start"]], [%expr [Css.textAlign(`start)]]),
+  (
+    [%expr [%css "word-spacing: normal"]],
+    [%expr [Css.wordSpacing(`normal)]],
+  ),
+  (
+    [%expr [%css "word-spacing: 5px"]],
+    [%expr [Css.wordSpacing(`pxFloat(5.))]],
+  ),
+  (
+    [%expr [%css "letter-spacing: normal"]],
+    [%expr [Css.letterSpacing(`normal)]],
+  ),
+  (
+    [%expr [%css "letter-spacing: 5px"]],
+    [%expr [Css.letterSpacing(`pxFloat(5.))]],
+  ),
+  (
+    [%expr [%css "text-indent: 5%"]],
+    [%expr [Css.textIndent(`percent(5.))]],
+  ),
   // css-flexbox-1
   ([%expr [%css "flex-wrap: wrap"]], [%expr [Css.flexWrap(`wrap)]]),
   // TODO: generate tests with variables in the future
