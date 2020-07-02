@@ -352,7 +352,8 @@ let consume = buf => {
     };
   | ":" => Ok(COLON)
   | ";" => Ok(SEMICOLON)
-  | "<" => failwith("wtf")
+  | "<!--" => Ok(CDO)
+  | "<" => Ok(DELIM("<"))
   | "@" =>
     if (check_if_three_codepoints_would_start_an_identifier(buf)) {
       // TODO: grr BAD_IDENT
