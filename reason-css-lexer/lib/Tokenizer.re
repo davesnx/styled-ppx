@@ -59,6 +59,7 @@ let check_if_three_code_points_would_start_a_number = buf =>
   switch%sedlex (buf) {
   | ("+" | "-", digit)
   | ("+" | "-", ".", digit) => true
+  | ('.', digit) => true
   | _ => false
   };
 
