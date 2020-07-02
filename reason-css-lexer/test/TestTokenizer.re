@@ -1,42 +1,43 @@
 open TestFramework;
 open Reason_css_lexer;
+open Location;
 
 let single_token_tests = [
-  (" \n\t ", WHITESPACE),
-  ({|"something"|}, STRING("something")),
+  (" \n\t ", WHITESPACE, 4),
+  ({|"something"|}, STRING("something"), 11),
   // TODO: is that right?
-  ("#2", HASH("2", `UNRESTRICTED)),
-  ("#abc", HASH("abc", `ID)),
-  ("#", DELIM("#")),
-  ({|'tuturu'|}, STRING("tuturu")),
-  ("(", LEFT_PARENS),
-  (")", RIGHT_PARENS),
-  ("+12.3", NUMBER(12.3)),
-  ("+", DELIM("+")),
-  (",", COMMA),
-  ("-45.6", NUMBER(-45.6)),
-  ("-->", CDC),
-  ("--potato", IDENT("--potato")),
-  ("-", DELIM("-")),
-  (".7", NUMBER(0.7)),
-  (".", DELIM(".")),
-  (":", COLON),
-  (";", SEMICOLON),
-  ("<!--", CDO),
-  ("<", DELIM("<")),
-  ("@mayushii", AT_KEYWORD("mayushii")),
-  ("@", DELIM("@")),
-  ("[", LEFT_SQUARE),
-  ("\\@desu", IDENT("@desu")),
-  ("]", RIGHT_SQUARE),
-  ("12345678.9", NUMBER(12345678.9)),
-  ("bar", IDENT("bar")),
-  ("", EOF),
-  ("!", DELIM("!")),
+  ("#2", HASH("2", `UNRESTRICTED), 2),
+  ("#abc", HASH("abc", `ID), 4),
+  ("#", DELIM("#"), 1),
+  ({|'tuturu'|}, STRING("tuturu"), 8),
+  ("(", LEFT_PARENS, 1),
+  (")", RIGHT_PARENS, 1),
+  ("+12.3", NUMBER(12.3), 5),
+  ("+", DELIM("+"), 1),
+  (",", COMMA, 1),
+  ("-45.6", NUMBER(-45.6), 5),
+  ("-->", CDC, 3),
+  ("--potato", IDENT("--potato"), 8),
+  ("-", DELIM("-"), 1),
+  (".7", NUMBER(0.7), 2),
+  (".", DELIM("."), 1),
+  (":", COLON, 1),
+  (";", SEMICOLON, 1),
+  ("<!--", CDO, 4),
+  ("<", DELIM("<"), 1),
+  ("@mayushii", AT_KEYWORD("mayushii"), 9),
+  ("@", DELIM("@"), 1),
+  ("[", LEFT_SQUARE, 1),
+  ("\\@desu", IDENT("@desu"), 6),
+  ("]", RIGHT_SQUARE, 1),
+  ("12345678.9", NUMBER(12345678.9), 10),
+  ("bar", IDENT("bar"), 3),
+  ("", EOF, 0),
+  ("!", DELIM("!"), 1),
 ];
 
 describe("single token tests", ({test, _}) => {
-  let test = ((input, output)) =>
+  let test = ((input, output, last_position)) =>
     test(
       input,
       _ => {
@@ -45,7 +46,8 @@ describe("single token tests", ({test, _}) => {
           | Ok(values) => values
           | Error(`Frozen) => failwith("frozen somehow")
           };
-        let values = values |> List.map(({Location.txt, _}) => txt);
+        let {loc, _} = List.hd(values);
+        let values = values |> List.map(({txt, _}) => txt);
         switch (values) {
         | [Ok(EOF), Ok(token)] =>
           token == output
@@ -73,6 +75,15 @@ describe("single token tests", ({test, _}) => {
             ),
           )
         };
+
+        loc.loc_end.pos_cnum == last_position
+          ? ()
+          : failwith(
+              "position should be "
+              ++ string_of_int(last_position)
+              ++ " received "
+              ++ string_of_int(loc.loc_end.pos_cnum),
+            );
       },
     );
   List.iter(test, single_token_tests);
