@@ -297,9 +297,7 @@ let consume = buf => {
       consume_numeric(buf);
     } else {
       switch%sedlex (buf) {
-      | "->" =>
-        let _ = next(buf);
-        Ok(CDC);
+      | "-->" => Ok(CDC)
       | _ =>
         if (check_if_three_codepoints_would_start_an_identifier(buf)) {
           consume_ident_like(buf);
