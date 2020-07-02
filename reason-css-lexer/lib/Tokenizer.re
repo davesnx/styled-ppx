@@ -315,7 +315,7 @@ let consume = buf => {
 
   switch%sedlex (buf) {
   | whitespace => Ok(consume_whitespace(buf))
-  | "\"" => consume_string("", buf)
+  | "\"" => consume_string("\"", buf)
   | "#" => failwith("x")
   | "'" => consume_string("'", buf)
   | "(" => Ok(LEFT_PARENS)
