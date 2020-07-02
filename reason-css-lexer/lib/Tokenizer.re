@@ -43,6 +43,7 @@ let check_if_two_code_points_are_a_valid_escape = buf =>
   | ("\\", any) => true
   | _ => false
   };
+let starts_with_a_valid_escape = [%sedlex.regexp? ('\\', Sub(any, '\n'))];
 
 // https://drafts.csswg.org/css-syntax-3/#would-start-an-identifier
 let check_if_three_codepoints_would_start_an_identifier = buf =>
@@ -53,7 +54,10 @@ let check_if_three_codepoints_would_start_an_identifier = buf =>
   | identifier_start_code_point => true
   | _ => check_if_two_code_points_are_a_valid_escape(buf)
   };
-
+let starts_an_identifier = [%sedlex.regexp?
+  ('-', '-' | identifier_start_code_point | starts_with_a_valid_escape) |
+  identifier_start_code_point
+];
 // https://drafts.csswg.org/css-syntax-3/#starts-with-a-number
 let check_if_three_code_points_would_start_a_number = buf =>
   switch%sedlex (buf) {
@@ -62,6 +66,9 @@ let check_if_three_code_points_would_start_a_number = buf =>
   | ('.', digit) => true
   | _ => false
   };
+let starts_a_number = [%sedlex.regexp?
+  ("+" | "-", digit) | ("+" | "-", ".", digit) | ('.', digit)
+];
 
 let check_if_two_code_points_are_a_valid_escape =
   check(check_if_two_code_points_are_a_valid_escape);
@@ -293,19 +300,17 @@ let consume_comment = buf => {
 let consume = buf => {
   // TODO: this is terrible
   let consume_minus = () =>
-    if (check_if_three_code_points_would_start_a_number(buf)) {
+    switch%sedlex (buf) {
+    | starts_a_number =>
+      Sedlexing.rollback(buf);
       consume_numeric(buf);
-    } else {
-      switch%sedlex (buf) {
-      | "-->" => Ok(CDC)
-      | _ =>
-        if (check_if_three_codepoints_would_start_an_identifier(buf)) {
-          consume_ident_like(buf);
-        } else {
-          let _ = next(buf);
-          Ok(DELIM("-"));
-        }
-      };
+    | "-->" => Ok(CDC)
+    | starts_an_identifier =>
+      Sedlexing.rollback(buf);
+      consume_ident_like(buf);
+    | _ =>
+      let _ = next(buf);
+      Ok(DELIM("-"));
     };
 
   switch%sedlex (buf) {
@@ -325,7 +330,7 @@ let consume = buf => {
     };
   | "," => Ok(COMMA)
   | "-" =>
-    let _ = Sedlexing.backtrack(buf);
+    Sedlexing.rollback(buf);
     consume_minus();
   | "." =>
     let _ = Sedlexing.backtrack(buf);
