@@ -148,7 +148,10 @@ let consume_identifier = buf => {
     };
   read("");
 };
-
+let handle_consume_identifier =
+  fun
+  | Error((_, error)) => Error((BAD_IDENT, error))
+  | Ok(string) => Ok(string);
 // https://drafts.csswg.org/css-syntax-3/#consume-remnants-of-bad-url
 let rec consume_remnants_bad_url = buf =>
   switch%sedlex (buf) {
@@ -249,11 +252,7 @@ let consume_ident_like = buf => {
   };
 
   // TODO: should it return IDENT() when error?
-  let.ok string =
-    switch (consume_identifier(buf)) {
-    | Error((_, error)) => Error((BAD_IDENT, error))
-    | Ok(string) => Ok(string)
-    };
+  let.ok string = consume_identifier(buf) |> handle_consume_identifier;
   switch%sedlex (buf) {
   | '(' =>
     switch (string) {
@@ -270,11 +269,7 @@ let consume_numeric = buf => {
   let (number, _kind) = consume_number(buf);
   if (check_if_three_codepoints_would_start_an_identifier(buf)) {
     // TODO: should it be BAD_IDENT?
-    let.ok string =
-      switch (consume_identifier(buf)) {
-      | Error((_, error)) => Error((BAD_IDENT, error))
-      | Ok(string) => Ok(string)
-      };
+    let.ok string = consume_identifier(buf) |> handle_consume_identifier;
     Ok(DIMENSION(number, string));
   } else {
     switch%sedlex (buf) {
@@ -298,7 +293,22 @@ let consume_comment = buf => {
   };
 };
 let consume = buf => {
-  // TODO: this is terrible
+  let consume_hash = () =>
+    switch%sedlex (buf) {
+    | identifier_code_point
+    | starts_with_a_valid_escape =>
+      rollback(buf);
+      switch%sedlex (buf) {
+      | identifier_start_code_point =>
+        rollback(buf);
+        let.ok string = consume_identifier(buf) |> handle_consume_identifier;
+        Ok(HASH(string, `ID));
+      | _ =>
+        let.ok string = consume_identifier(buf) |> handle_consume_identifier;
+        Ok(HASH(string, `UNRESTRICTED));
+      };
+    | _ => Ok(DELIM("#"))
+    };
   let consume_minus = () =>
     switch%sedlex (buf) {
     | starts_a_number =>
@@ -316,7 +326,7 @@ let consume = buf => {
   switch%sedlex (buf) {
   | whitespace => Ok(consume_whitespace(buf))
   | "\"" => consume_string("\"", buf)
-  | "#" => failwith("x")
+  | "#" => consume_hash()
   | "'" => consume_string("'", buf)
   | "(" => Ok(LEFT_PARENS)
   | ")" => Ok(RIGHT_PARENS)
@@ -346,11 +356,7 @@ let consume = buf => {
   | "@" =>
     if (check_if_three_codepoints_would_start_an_identifier(buf)) {
       // TODO: grr BAD_IDENT
-      let.ok string =
-        switch (consume_identifier(buf)) {
-        | Error((_, error)) => Error((BAD_IDENT, error))
-        | Ok(string) => Ok(string)
-        };
+      let.ok string = consume_identifier(buf) |> handle_consume_identifier;
       Ok(AT_KEYWORD(string));
     } else {
       Ok(DELIM("@"));

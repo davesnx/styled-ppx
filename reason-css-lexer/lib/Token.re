@@ -5,7 +5,7 @@ type token =
   | BAD_IDENT // TODO: this is needed?
   | FUNCTION(string) // <function-token>
   | AT_KEYWORD(string) // <at-keyword-token>
-  | HASH(string) // <hash-token>
+  | HASH(string, [ | `ID | `UNRESTRICTED]) // <hash-token>
   | STRING(string) // <string-token>
   | BAD_STRING(string) // <bad-string-token>
   | URL(string) // <url-token>
