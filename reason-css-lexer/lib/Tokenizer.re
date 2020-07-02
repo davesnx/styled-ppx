@@ -357,16 +357,14 @@ let consume = buf => {
     }
   | "[" => Ok(LEFT_SQUARE)
   | "\\" =>
-    if (check_if_two_code_points_are_a_valid_escape(buf)) {
-      // TODO: this error should be different
-      Error((
-        DELIM("/"),
-        `Invalid_code_point,
-      ));
-    } else {
-      let _ = Sedlexing.backtrack(buf);
+    rollback(buf);
+    switch%sedlex (buf) {
+    | starts_with_a_valid_escape =>
+      rollback(buf);
       consume_ident_like(buf);
-    }
+    // TODO: this error should be different
+    | _ => Error((DELIM("/"), `Invalid_code_point))
+    };
 
   | "]" => Ok(RIGHT_SQUARE)
   | digit =>
