@@ -1,6 +1,8 @@
+open Reason_css_lexer;
+
 type error = string;
 type data('a) = result('a, error);
-type rule('a) = list(Tokens.token) => (data('a), list(Tokens.token));
+type rule('a) = list(token) => (data('a), list(token));
 
 type return('a, 'b) = 'b => rule('a);
 type bind('a, 'b, 'c) = (rule('a), 'b => rule('c)) => rule('c);
@@ -44,7 +46,7 @@ module Let: {
 
 module Pattern: {
   let identity: rule(unit);
-  let token: (Tokens.token => data('a)) => rule('a);
-  let expect: Tokens.token => rule(unit);
+  let token: (token => data('a)) => rule('a);
+  let expect: token => rule(unit);
   let value: ('a, rule(unit)) => rule('a);
 };

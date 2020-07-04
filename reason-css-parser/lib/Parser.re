@@ -2,6 +2,7 @@ open Standard;
 open Combinator;
 open Modifier;
 open Rule.Match;
+open Reason_css_lexer;
 // TODO: split by modules
 
 // css-sizing-3
@@ -206,12 +207,25 @@ let property_grid_column = [%value "<grid-line> [ / <grid-line> ]?"];
 let property_grid_area = [%value "<grid-line> [ / <grid-line> ]{0,3}"];
 
 let parse = (prop, str) => {
-  let (output, tokens) =
-    Sedlexing.Utf8.from_string(str) |> Lexer.read_all |> prop;
+  let (let.ok) = Result.bind;
+  let.ok tokens_with_loc =
+    Reason_css_lexer.from_string(str) |> Result.map_error(_ => "frozen");
+  let tokens =
+    tokens_with_loc
+    |> List.map(({Location.txt, _}) =>
+         switch (txt) {
+         | Ok(token) => token
+         | Error((token, _)) => token
+         }
+       )
+    |> List.filter((!=)(WHITESPACE))
+    |> List.rev;
+  let (output, tokens) = prop(tokens);
 
   let matched_everything =
     switch (tokens) {
     | [] => Ok()
+    | [EOF] => Ok()
     | _ => Error("tokens remaining")
     };
   Result.bind(matched_everything, () => output);

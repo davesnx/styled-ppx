@@ -18,6 +18,7 @@
     "@opam/sedlex": "ocaml-community/sedlex:sedlex.opam#25c0dbd82c7fc5d91102f5bd21db1411f2c46323",
     "@reason-native/rely": "^3.2.1",
     "ocaml": "^4.8.1000",
+    "reason-css-lexer": "EduardoRFS/reason-css-lexer:package.json#33d95c56005d6c169c46869da7e6aac75c36c441",
     "reason-css-vds": "EduardoRFS/reason-css-vds:package.json#4116998a814e98b07d1b2d7e9d1bd1e68e04e8ca"
   },
   "devDependencies": {

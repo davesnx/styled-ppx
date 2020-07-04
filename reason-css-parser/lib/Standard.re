@@ -1,29 +1,34 @@
-open Tokens;
+open Reason_css_lexer;
 open Combinator;
 open Rule.Let;
 open Rule.Pattern;
 open Rule.Match;
 
-let keyword = string => expect(STRING(string));
+let keyword = string => expect(IDENT(string));
 let function_call = (name, rule) => {
   let.bind_match () = keyword(name);
   let.bind_match () = expect(LEFT_PARENS);
   let.bind_match value = rule;
   let.bind_match () = expect(RIGHT_PARENS);
-  return_match(value);
+  return_match((name, value));
 };
 
 let integer =
   token(
     fun
-    | INT(int) => Ok(int)
+    | NUMBER(float) =>
+      Float.(
+        is_integer(float)
+          ? Ok(float |> to_int)
+          : Error("expected an integer, received a float")
+      )
     | _ => Error("expected an integer"),
   );
 
 let number =
   token(
     fun
-    | INT(int) => Ok(int |> float_of_int)
+    | NUMBER(float) => Ok(float)
     | _ => Error("expected a number"),
   );
 
@@ -59,11 +64,12 @@ let length = {
 };
 
 // TODO: positive numbers like <number [0,infinity]>
-let percentage = {
-  let.bind_match number = number;
-  let.bind_match () = expect(PERCENT);
-  return_match(number);
-};
+let percentage =
+  token(
+    fun
+    | PERCENTAGE(float) => Ok(float)
+    | _ => Error("expected percentage"),
+  );
 
 let length_percentage =
   combine_xor([
@@ -73,6 +79,13 @@ let length_percentage =
 
 // TODO: implement
 let string = Rule.Data.return(Error("not implemented"));
+
+let custom_ident =
+  token(
+    fun
+    | STRING(string) => Ok(string)
+    | _ => Error("expected <custom-ident>"),
+  );
 
 let css_wide_keywords =
   combine_xor([

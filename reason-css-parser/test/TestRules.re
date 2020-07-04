@@ -1,6 +1,6 @@
 open TestFramework;
 open Reason_css_parser;
-open Tokens;
+open Reason_css_lexer;
 open Rule;
 
 describe("data monad", ({test, _}) => {
