@@ -17,10 +17,10 @@
     "@opam/ppx_tools_versioned": "5.4.0",
     "@opam/sedlex": "ocaml-community/sedlex:sedlex.opam#25c0dbd82c7fc5d91102f5bd21db1411f2c46323",
     "@reason-native/rely": "^3.2.1",
-    "ocaml": "^4.08.1000",
-    "reason-css-vds": "EduardoRFS/reason-css-vds:package.json#86633fe91a927920929a384403c87f902f414f6e"
+    "ocaml": "^4.8.1000",
+    "reason-css-vds": "EduardoRFS/reason-css-vds:package.json#4116998a814e98b07d1b2d7e9d1bd1e68e04e8ca"
   },
   "devDependencies": {
-    "@opam/ocaml-lsp-server": "ocaml/ocaml-lsp:ocaml-lsp-server.opam"
+    "@opam/ocaml-lsp-server": "ocaml/ocaml-lsp:ocaml-lsp-server.opam#fbc433e14035d520c7137916ae710b8ec3b415e9"
   }
 }
