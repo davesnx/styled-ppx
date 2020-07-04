@@ -43,6 +43,15 @@ describe("standard values", ({test, _}) => {
     expect.result(parse("0")).toBeError();
     expect.result(parse("60")).toBeError();
   });
+  test("<frequency>", ({expect, _}) => {
+    let parse = parse([%value "<frequency>"]);
+    expect.result(parse("6hz")).toBe(Ok(`Hz(6.)));
+    expect.result(parse(".6kHz")).toBe(Ok(`KHz(0.6)));
+    expect.result(parse("59px")).toBeError();
+
+    expect.result(parse("0")).toBeError();
+    expect.result(parse("60")).toBeError();
+  });
   test("<percentage>", ({expect, _}) => {
     let parse = parse([%value "<percentage>"]);
     expect.result(parse("61%")).toBe(Ok(61.));

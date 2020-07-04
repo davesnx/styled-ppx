@@ -103,6 +103,20 @@ let time =
     }
   );
 
+// https://drafts.csswg.org/css-values-4/#frequency
+let frequency =
+  token(token =>
+    switch (token) {
+    | DIMENSION(number, dimension) =>
+      switch (dimension |> String.lowercase_ascii) {
+      | "hz" => Ok(`Hz(number))
+      | "khz" => Ok(`KHz(number))
+      | _ => Error("unknown dimension")
+      }
+    | _ => Error("expected frequency")
+    }
+  );
+
 // TODO: positive numbers like <number [0,infinity]>
 let percentage =
   token(
