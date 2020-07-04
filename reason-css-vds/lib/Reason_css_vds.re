@@ -90,12 +90,4 @@ let rec value_to_string = value => {
   };
 };
 let value_of_string = string =>
-  Sedlexing.Utf8.from_string(string) |> provider |> value_of_lex /*        ocaml -> ast -> ocam*/;
-
-// pretty printer: code -> ast -> code
-// refmt: reason -> ast -> reason
-//        reason -> ast -> ocaml
-//        ocaml -> ast -> reason
-
-// compiler: code -> ast -> ir -> code | binary
-// babel: code -> ast -> ast' -> code
+  Sedlexing.Utf8.from_string(string) |> provider |> value_of_lex;
