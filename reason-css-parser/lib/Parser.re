@@ -5,8 +5,7 @@ open Rule.Match;
 // TODO: split by modules
 
 // css-sizing-3
-// let function_fit_content = () => [%value "fit-content(<length-percentage>)"];
-let function_fit_content = [%value "not-implemented"];
+let function_fit_content = () => [%value "fit-content( <length-percentage> )"];
 let property_width = [%value
   "auto | <length-percentage> | min-content | max-content | fit-content(<length-percentage>)"
 ];
@@ -130,6 +129,81 @@ let property_align_self = [%value
 let property_align_content = [%value
   "flex-start | flex-end | center | space-between | space-around | stretch"
 ];
+
+// TODO: fix https://drafts.csswg.org/css-values-4/#component-types
+// the # on properties part
+
+// css-grid-1
+let line_names = [%value "'[' <custom-ident>* ']'"];
+// let track_breadth = [%value
+//   "<length-percentage> | <flex> | min-content | max-content | auto"
+// ];
+let inflexible_breadth = [%value
+  "<length-percentage> | min-content | max-content | auto"
+];
+let track_breadth = [%value
+  "<length-percentage> | <'flex'> | min-content | max-content | auto"
+];
+let track_size = [%value
+  "<track-breadth> | minmax( <inflexible-breadth> , <track-breadth> ) | fit-content( <length-percentage> )"
+];
+// let track_repeat = [%value
+//   "repeat( [ <integer [1,∞]> ] , [ <line-names>? <track-size> ]+ <line-names>? )"
+// ];
+let track_repeat = [%value
+  "repeat( [ <integer> ] , [ <line-names>? <track-size> ]+ <line-names>? )"
+];
+let track_list = [%value
+  "[ <line-names>? [ <track-size> | <track-repeat> ] ]+ <line-names>?"
+];
+let fixed_breadth = [%value "<length-percentage>"];
+let fixed_size = [%value
+  "<fixed-breadth> | minmax( <fixed-breadth> , <track-breadth> ) | minmax( <inflexible-breadth> , <fixed-breadth> )"
+];
+let fixed_repeat = [%value
+  "repeat( [ <integer> ] , [ <line-names>? <fixed-size> ]+ <line-names>? )"
+];
+// let fixed_repeat = [%value
+//   "repeat( [ <integer [1,∞]> ] , [ <line-names>? <fixed-size> ]+ <line-names>? )"
+// ];
+let auto_repeat = [%value
+  "repeat( [ auto-fill | auto-fit ] , [ <line-names>? <fixed-size> ]+ <line-names>? )"
+];
+let auto_track_list = [%value
+  "[ <line-names>? [ <fixed-size> | <fixed-repeat> ] ]* <line-names>? <auto-repeat> [ <line-names>? [ <fixed-size> | <fixed-repeat> ] ]* <line-names>?"
+];
+let explicit_track_list = [%value
+  "[ <line-names>? <track-size> ]+ <line-names>?"
+];
+let grid_line = [%value
+  "auto | <custom-ident> | [ <integer> && <custom-ident>? ] | [ span && [ <integer> || <custom-ident> ] ]"
+];
+let function_minmax = () => [%value "minmax(min, max)"];
+// let function_fit_content = () => [%value "fit-content( <length-percentage> )"];
+let property_display = [%value "undefined"];
+let property_grid_template_columns = [%value
+  "none | <track-list> | <auto-track-list>"
+];
+let property_grid_template_rows = [%value
+  "none | <track-list> | <auto-track-list>"
+];
+let property_grid_template_areas = [%value "none | <string>+"];
+let property_grid_template = [%value
+  "none | [ <'grid-template-rows'> / <'grid-template-columns'> ] | [ <line-names>? <string> <track-size>? <line-names>? ]+ [ / <explicit-track-list> ]?"
+];
+let property_grid_auto_columns = [%value "<track-size>+"];
+let property_grid_auto_rows = [%value "<track-size>+"];
+let property_grid_auto_flow = [%value "[ row | column ] || dense"];
+let property_grid = [%value
+  "<'grid-template'> | <'grid-template-rows'> / [ auto-flow && dense? ] <'grid-auto-columns'>? | [ auto-flow && dense? ] <'grid-auto-rows'>? / <'grid-template-columns'>"
+];
+let property_grid_row_start = [%value "<grid-line>"];
+let property_grid_column_start = [%value "<grid-line>"];
+let property_grid_row_end = [%value "<grid-line>"];
+let property_grid_column_end = [%value "<grid-line>"];
+let property_grid_row = [%value "<grid-line> [ / <grid-line> ]?"];
+let property_grid_column = [%value "<grid-line> [ / <grid-line> ]?"];
+let property_grid_area = [%value "<grid-line> [ / <grid-line> ]{0,3}"];
 
 let parse = (prop, str) => {
   let (output, tokens) =
