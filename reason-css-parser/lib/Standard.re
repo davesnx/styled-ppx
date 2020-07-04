@@ -192,3 +192,13 @@ let url = {
   let url_fun = function_call("url", string);
   combine_xor([url_token, url_fun]);
 };
+
+// css-color-4
+// https://drafts.csswg.org/css-color-4/#hex-notation
+let hex_color =
+  token(
+    fun
+    | HASH(str, _) when String.length(str) >= 3 && String.length(str) <= 8 =>
+      Ok(str)
+    | _ => Error("expected a hex-color"),
+  );

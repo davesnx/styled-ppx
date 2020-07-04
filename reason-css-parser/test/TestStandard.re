@@ -112,4 +112,12 @@ describe("standard values", ({test, _}) => {
       Ok("https://duckduckgo.com"),
     );
   });
+
+  // css-color-4
+  test("<hex-color>", ({expect, _}) => {
+    let parse = parse([%value "<hex-color>"]);
+    expect.result(parse("#abc")).toBe(Ok("abc"));
+    expect.result(parse("#abcdefgh")).toBe(Ok("abcdefgh"));
+    expect.result(parse("#abcdefghi")).toBeError();
+  });
 });
