@@ -1141,7 +1141,7 @@ and render_declaration =
     let pos_offset = pos.Lexing.pos_cnum;
     let loc_start = loc_start.Lexing.pos_cnum - pos_offset;
     let loc_end = loc_end.Lexing.pos_cnum - pos_offset;
-    Sedlexing.Utf8.sub_lexeme(buf, loc_start - 1, loc_end - loc_start);
+    Sedlexing.Latin1.sub_lexeme(buf, loc_start - 1, loc_end - loc_start);
   };
 
   Declarations_to_emotion.support_property(name)
