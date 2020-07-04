@@ -4,6 +4,8 @@ open Rule.Let;
 open Rule.Pattern;
 open Rule.Match;
 
+let (let.ok) = Result.bind;
+
 let keyword = string => expect(IDENT(string));
 let function_call = (name, rule) => {
   let.bind_match () = keyword(name);
@@ -29,39 +31,42 @@ let number =
   token(
     fun
     | NUMBER(float) => Ok(float)
-    | _ => Error("expected a number"),
+    | token => Error("expected a number, receveid " ++ show_token(token)),
   );
 
-let length = {
-  let.bind_match number = number;
-  combine_xor([
-    // relative
-    keyword("em") |> value(`Em(number)),
-    keyword("ex") |> value(`Ex(number)),
-    keyword("cap") |> value(`Cap(number)),
-    keyword("ch") |> value(`Ch(number)),
-    keyword("ic") |> value(`Ic(number)),
-    keyword("rem") |> value(`Rem(number)),
-    keyword("lh") |> value(`Lh(number)),
-    keyword("rlh") |> value(`Rlh(number)),
-    keyword("vw") |> value(`Vw(number)),
-    keyword("vh") |> value(`Vh(number)),
-    keyword("vi") |> value(`Vi(number)),
-    keyword("vb") |> value(`Vb(number)),
-    keyword("vmin") |> value(`Vmin(number)),
-    keyword("vmax") |> value(`Vmax(number)),
-    // absolute
-    keyword("cm") |> value(`Cm(number)),
-    keyword("mm") |> value(`Mm(number)),
-    keyword("Q") |> value(`Q(number)),
-    keyword("in") |> value(`In(number)),
-    keyword("pt") |> value(`Pt(number)),
-    keyword("pc") |> value(`Pc(number)),
-    keyword("px") |> value(`Px(number)),
-    // TODO: only if number is zero
-    identity |> value(`Zero),
-  ]);
-};
+let length =
+  token(token =>
+    switch (token) {
+    | DIMENSION(number, dimension) =>
+      switch (dimension) {
+      | "em" => Ok(`Em(number))
+      | "ex" => Ok(`Ex(number))
+      | "cap" => Ok(`Cap(number))
+      | "ch" => Ok(`Ch(number))
+      | "ic" => Ok(`Ic(number))
+      | "rem" => Ok(`Rem(number))
+      | "lh" => Ok(`Lh(number))
+      | "rlh" => Ok(`Rlh(number))
+      | "vw" => Ok(`Vw(number))
+      | "vh" => Ok(`Vh(number))
+      | "vi" => Ok(`Vi(number))
+      | "vb" => Ok(`Vb(number))
+      | "vmin" => Ok(`Vmin(number))
+      | "vmax" => Ok(`Vmax(number))
+      // absolute
+      | "cm" => Ok(`Cm(number))
+      | "mm" => Ok(`Mm(number))
+      | "Q" => Ok(`Q(number))
+      | "in" => Ok(`In(number))
+      | "pt" => Ok(`Pt(number))
+      | "pc" => Ok(`Pc(number))
+      | "px" => Ok(`Px(number))
+      | _ => Error("unknown dimension")
+      }
+    | NUMBER(0.) => Ok(`Zero)
+    | _ => Error("expected length")
+    }
+  );
 
 // TODO: positive numbers like <number [0,infinity]>
 let percentage =
