@@ -72,6 +72,22 @@ let length =
     }
   );
 
+let angle =
+  token(token =>
+    switch (token) {
+    | DIMENSION(number, dimension) =>
+      switch (dimension) {
+      | "deg" => Ok(`Deg(number))
+      | "grad" => Ok(`Grad(number))
+      | "rad" => Ok(`Rad(number))
+      | "turn" => Ok(`Turn(number))
+      | _ => Error("unknown dimension")
+      }
+    | NUMBER(0.) => Ok(`Deg(0.))
+    | _ => Error("expected angle")
+    }
+  );
+
 // TODO: positive numbers like <number [0,infinity]>
 let percentage =
   token(

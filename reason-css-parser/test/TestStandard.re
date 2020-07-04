@@ -25,6 +25,15 @@ describe("standard values", ({test, _}) => {
     expect.result(parse("0")).toBe(Ok(`Zero));
     expect.result(parse("60")).toBeError();
   });
+  test("<angle>", ({expect, _}) => {
+    let parse = parse([%value "<angle>"]);
+    expect.result(parse("1deg")).toBe(Ok(`Deg(1.)));
+    expect.result(parse("0.2turn")).toBe(Ok(`Turn(0.2)));
+    expect.result(parse("59px")).toBeError();
+
+    expect.result(parse("0")).toBe(Ok(`Deg(0.)));
+    expect.result(parse("60")).toBeError();
+  });
   test("<percentage>", ({expect, _}) => {
     let parse = parse([%value "<percentage>"]);
     expect.result(parse("61%")).toBe(Ok(61.));
