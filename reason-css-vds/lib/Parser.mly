@@ -71,6 +71,7 @@ let terminal ==
   | COMMA; { Keyword "," }
   | LOWER_THAN; QUOTE; s = STRING; QUOTE; GREATER_THAN; { Property_type s }
   | LOWER_THAN; s = STRING; GREATER_THAN; { Data_type s }
+  | LOWER_THAN; s = STRING; LEFT_PARENS; RIGHT_PARENS; GREATER_THAN; { Data_type (s ^ "()") }
   | s = STRING; LEFT_PARENS; RIGHT_PARENS; { Function s }
 
 let terminal_multiplier ==
