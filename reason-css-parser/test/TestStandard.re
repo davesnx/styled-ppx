@@ -52,6 +52,15 @@ describe("standard values", ({test, _}) => {
     expect.result(parse("0")).toBeError();
     expect.result(parse("60")).toBeError();
   });
+  test("<resolution>", ({expect, _}) => {
+    let parse = parse([%value "<resolution>"]);
+    expect.result(parse("6x")).toBe(Ok(`Dppx(6.)));
+    expect.result(parse("3dpi")).toBe(Ok(`Dpi(3.)));
+    expect.result(parse("59px")).toBeError();
+
+    expect.result(parse("0")).toBeError();
+    expect.result(parse("60")).toBeError();
+  });
   test("<percentage>", ({expect, _}) => {
     let parse = parse([%value "<percentage>"]);
     expect.result(parse("61%")).toBe(Ok(61.));

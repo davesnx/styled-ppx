@@ -117,6 +117,22 @@ let frequency =
     }
   );
 
+// https://drafts.csswg.org/css-values-4/#resolution
+let resolution =
+  token(token =>
+    switch (token) {
+    | DIMENSION(number, dimension) =>
+      switch (dimension |> String.lowercase_ascii) {
+      | "dpi" => Ok(`Dpi(number))
+      | "dpcm" => Ok(`Dpcm(number))
+      | "x"
+      | "dppx" => Ok(`Dppx(number))
+      | _ => Error("unknown dimension")
+      }
+    | _ => Error("expected resolution")
+    }
+  );
+
 // TODO: positive numbers like <number [0,infinity]>
 let percentage =
   token(
