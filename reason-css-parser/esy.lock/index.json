@@ -1,17 +1,17 @@
 {
-  "checksum": "f4d1a87b9d84e41c7b14c09418bc9d3e",
+  "checksum": "eac24f6b8c02f41b247c983347c895b6",
   "root": "reason-css-parser@link-dev:./package.json",
   "node": {
-    "reason-css-vds@github:EduardoRFS/reason-css-vds:package.json#4116998a814e98b07d1b2d7e9d1bd1e68e04e8ca@d41d8cd9": {
+    "reason-css-vds@github:EduardoRFS/reason-css-vds:package.json#62124663c320bfd4a27ec45e639b741d9ac1e74f@d41d8cd9": {
       "id":
-        "reason-css-vds@github:EduardoRFS/reason-css-vds:package.json#4116998a814e98b07d1b2d7e9d1bd1e68e04e8ca@d41d8cd9",
+        "reason-css-vds@github:EduardoRFS/reason-css-vds:package.json#62124663c320bfd4a27ec45e639b741d9ac1e74f@d41d8cd9",
       "name": "reason-css-vds",
       "version":
-        "github:EduardoRFS/reason-css-vds:package.json#4116998a814e98b07d1b2d7e9d1bd1e68e04e8ca",
+        "github:EduardoRFS/reason-css-vds:package.json#62124663c320bfd4a27ec45e639b741d9ac1e74f",
       "source": {
         "type": "install",
         "source": [
-          "github:EduardoRFS/reason-css-vds:package.json#4116998a814e98b07d1b2d7e9d1bd1e68e04e8ca"
+          "github:EduardoRFS/reason-css-vds:package.json#62124663c320bfd4a27ec45e639b741d9ac1e74f"
         ]
       },
       "overrides": [],
@@ -38,7 +38,7 @@
       },
       "overrides": [],
       "dependencies": [
-        "reason-css-vds@github:EduardoRFS/reason-css-vds:package.json#4116998a814e98b07d1b2d7e9d1bd1e68e04e8ca@d41d8cd9",
+        "reason-css-vds@github:EduardoRFS/reason-css-vds:package.json#62124663c320bfd4a27ec45e639b741d9ac1e74f@d41d8cd9",
         "reason-css-lexer@github:EduardoRFS/reason-css-lexer:package.json#33d95c56005d6c169c46869da7e6aac75c36c441@d41d8cd9",
         "ocaml@4.10.0@d41d8cd9", "@reason-native/rely@3.2.1@d41d8cd9",
         "@opam/sedlex@github:ocaml-community/sedlex:sedlex.opam#25c0dbd82c7fc5d91102f5bd21db1411f2c46323@d41d8cd9",

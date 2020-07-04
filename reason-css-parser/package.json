@@ -19,7 +19,7 @@
     "@reason-native/rely": "^3.2.1",
     "ocaml": "^4.8.1000",
     "reason-css-lexer": "EduardoRFS/reason-css-lexer:package.json#33d95c56005d6c169c46869da7e6aac75c36c441",
-    "reason-css-vds": "EduardoRFS/reason-css-vds:package.json#4116998a814e98b07d1b2d7e9d1bd1e68e04e8ca"
+    "reason-css-vds": "EduardoRFS/reason-css-vds:package.json#62124663c320bfd4a27ec45e639b741d9ac1e74f"
   },
   "devDependencies": {
     "@opam/ocaml-lsp-server": "ocaml/ocaml-lsp:ocaml-lsp-server.opam#fbc433e14035d520c7137916ae710b8ec3b415e9"
