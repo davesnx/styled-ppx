@@ -177,6 +177,8 @@ let parse_tests = [
       ],
     ),
   ),
+  // TODO: shouldn't be a special case
+  ("<rgb()>", Terminal(Data_type("rgb()"), One)),
 ];
 describe("correctly parse value", ({test, _}) => {
   let test = (index, (result, expected)) =>
