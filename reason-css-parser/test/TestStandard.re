@@ -34,6 +34,15 @@ describe("standard values", ({test, _}) => {
     expect.result(parse("0")).toBe(Ok(`Deg(0.)));
     expect.result(parse("60")).toBeError();
   });
+  test("<time>", ({expect, _}) => {
+    let parse = parse([%value "<time>"]);
+    expect.result(parse(".5s")).toBe(Ok(`S(0.5)));
+    expect.result(parse("50ms")).toBe(Ok(`Ms(50.)));
+    expect.result(parse("59px")).toBeError();
+
+    expect.result(parse("0")).toBeError();
+    expect.result(parse("60")).toBeError();
+  });
   test("<percentage>", ({expect, _}) => {
     let parse = parse([%value "<percentage>"]);
     expect.result(parse("61%")).toBe(Ok(61.));

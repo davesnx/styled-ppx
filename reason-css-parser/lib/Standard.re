@@ -88,6 +88,19 @@ let angle =
     }
   );
 
+let time =
+  token(token =>
+    switch (token) {
+    | DIMENSION(number, dimension) =>
+      switch (dimension) {
+      | "s" => Ok(`S(number))
+      | "ms" => Ok(`Ms(number))
+      | _ => Error("unknown dimension")
+      }
+    | _ => Error("expected time")
+    }
+  );
+
 // TODO: positive numbers like <number [0,infinity]>
 let percentage =
   token(
