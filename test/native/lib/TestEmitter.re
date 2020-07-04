@@ -54,17 +54,9 @@ let properties_static_css_tests = [
   ),
   ([%expr [%css "order: 5"]], [%expr [Css.order(5)]]),
   ([%expr [%css "flex-grow: 2"]], [%expr [Css.flexGrow(2.)]]),
-  // TODO: parser problems with decimal values
-  // (
-  //   [%expr [%css "flex-grow: 2.5"]],
-  //   [%expr [Css.flexGrow(2.5)]],
-  // ),
+  ([%expr [%css "flex-grow: 2.5"]], [%expr [Css.flexGrow(2.5)]]),
   ([%expr [%css "flex-shrink: 2"]], [%expr [Css.flexShrink(2.)]]),
-  // TODO: parser problems with decimal values
-  // (
-  //   [%expr [%css "flex-shrink: 2.5"]],
-  //   [%expr [Css.flexShrink(2.5)]],
-  // ),
+  ([%expr [%css "flex-shrink: 2.5"]], [%expr [Css.flexShrink(2.5)]]),
   ([%expr [%css "flex-basis: content"]], [%expr [Css.flexBasis(`content)]]),
   ([%expr [%css "flex: none"]], [%expr [Css.flex(`none)]]),
   (
