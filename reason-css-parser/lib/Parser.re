@@ -222,11 +222,14 @@ let parse = (prop, str) => {
     |> List.rev;
   let (output, tokens) = prop(tokens);
 
-  let matched_everything =
+  let.ok output = output;
+  let.ok () =
     switch (tokens) {
-    | [] => Ok()
+    | []
     | [EOF] => Ok()
-    | _ => Error("tokens remaining")
+    | tokens =>
+      let tokens = List.map(show_token, tokens) |> String.concat(" * ");
+      Error("tokens remaining: " ++ tokens);
     };
-  Result.bind(matched_everything, () => output);
+  Ok(output);
 };
