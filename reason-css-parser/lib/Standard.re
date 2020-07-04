@@ -90,7 +90,8 @@ let css_wide_keywords =
     value(`Unset, keyword("unset")),
   ]);
 
-// TODO: proper implement https://drafts.csswg.org/css-values-4/#custom-idents
+// TODO: proper implement
+// https://drafts.csswg.org/css-values-4/#custom-idents
 let custom_ident =
   token(
     fun
@@ -98,12 +99,15 @@ let custom_ident =
     | _ => Error("expected an identifier"),
   );
 
+// https://drafts.csswg.org/css-values-4/#dashed-idents
 let dashed_ident =
   token(
     fun
     | IDENT(string) when String.sub(string, 0, 2) == "--" => Ok(string)
     | _ => Error("expected a --variable"),
   );
+
+// https://drafts.csswg.org/css-values-4/#strings
 let string =
   token(
     fun
