@@ -28,7 +28,20 @@ let first_uppercase = name =>
 
 let property_value_name = property_name => "property-" ++ property_name;
 let function_value_name = function_name => "function-" ++ function_name;
-let value_name_of_css = kebab_case_to_snake_case;
+let value_name_of_css = str =>
+  String.(
+    {
+      let length = length(str);
+      let str =
+        if (length >= 2 && sub(str, length - 2, 2) == "()") {
+          let str = sub(str, 0, length - 2);
+          function_value_name(str);
+        } else {
+          str;
+        };
+      kebab_case_to_snake_case(str);
+    }
+  );
 
 // TODO: multiplier name
 let rec variant_name = value => {
