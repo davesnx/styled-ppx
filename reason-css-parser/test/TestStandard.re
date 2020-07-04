@@ -67,4 +67,13 @@ describe("standard values", ({test, _}) => {
     expect.result(parse("--random")).toBe(Ok("--random"));
     expect.result(parse("random'")).toBeError();
   });
+  test("<url>", ({expect, _}) => {
+    let parse = parse([%value "<url>"]);
+    expect.result(parse("url(https://google.com)")).toBe(
+      Ok("https://google.com"),
+    );
+    expect.result(parse("url(\"https://duckduckgo.com\")")).toBe(
+      Ok("https://duckduckgo.com"),
+    );
+  });
 });

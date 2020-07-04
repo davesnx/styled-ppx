@@ -8,11 +8,15 @@ let (let.ok) = Result.bind;
 
 let keyword = string => expect(IDENT(string));
 let function_call = (name, rule) => {
-  let.bind_match () = keyword(name);
-  let.bind_match () = expect(LEFT_PARENS);
+  let.bind_match () =
+    token(
+      fun
+      | FUNCTION(called_name) when name == called_name => Ok()
+      | _ => Error("expected a function " ++ name),
+    );
   let.bind_match value = rule;
   let.bind_match () = expect(RIGHT_PARENS);
-  return_match((name, value));
+  return_match(value);
 };
 
 let integer =
@@ -114,3 +118,16 @@ let string =
     | STRING(string) => Ok(string)
     | _ => Error("expected a string"),
   );
+
+// TODO: <url-modifier>
+// https://drafts.csswg.org/css-values-4/#urls
+let url = {
+  let url_token =
+    token(
+      fun
+      | URL(url) => Ok(url)
+      | _ => Error("expected a url"),
+    );
+  let url_fun = function_call("url", string);
+  combine_xor([url_token, url_fun]);
+};
