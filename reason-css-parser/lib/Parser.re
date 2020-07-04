@@ -5,8 +5,10 @@ open Rule.Match;
 open Reason_css_lexer;
 // TODO: split by modules
 
+let number_percentage = [%value "<number> | <percentage>"];
+
 // css-sizing-3
-let function_fit_content = () => [%value "fit-content( <length-percentage> )"];
+let function_fit_content = [%value "fit-content( <length-percentage> )"];
 let property_width = [%value
   "auto | <length-percentage> | min-content | max-content | fit-content(<length-percentage>)"
 ];
@@ -51,6 +53,43 @@ let property_padding_right = [%value "<length-percentage>"];
 let property_padding_bottom = [%value "<length-percentage>"];
 let property_padding_left = [%value "<length-percentage>"];
 let property_padding = [%value "<'padding-top'>{1,4}"];
+
+// css-color-4
+let named_color = [%value
+  "aliceblue | antiquewhite | aqua | aquamarine | azure | beige | bisque | black | blanchedalmond | blue | blueviolet | brown | burlywood | cadetblue | chartreuse | chocolate | coral | cornflowerblue | cornsilk | crimson | cyan | darkblue | darkcyan | darkgoldenrod | darkgray | darkgreen | darkgrey | darkkhaki | darkmagenta | darkolivegreen | darkorange | darkorchid | darkred | darksalmon | darkseagreen | darkslateblue | darkslategray | darkslategrey | darkturquoise | darkviolet | deeppink | deepskyblue | dimgray | dimgrey | dodgerblue | firebrick | floralwhite | forestgreen | fuchsia | gainsboro | ghostwhite | gold | goldenrod | gray | green | greenyellow | grey | honeydew | hotpink | indianred | indigo | ivory | khaki | lavender | lavenderblush | lawngreen | lemonchiffon | lightblue | lightcoral | lightcyan | lightgoldenrodyellow | lightgray | lightgreen | lightgrey | lightpink | lightsalmon | lightseagreen | lightskyblue | lightslategray | lightslategrey | lightsteelblue | lightyellow | lime | limegreen | linen | magenta | maroon | mediumaquamarine | mediumblue | mediumorchid | mediumpurple | mediumseagreen | mediumslateblue | mediumspringgreen | mediumturquoise | mediumvioletred | midnightblue | mintcream | mistyrose | moccasin | navajowhite | navy | oldlace | olive | olivedrab | orange | orangered | orchid | palegoldenrod | palegreen | paleturquoise | palevioletred | papayawhip | peachpuff | peru | pink | plum | powderblue | purple | rebeccapurple | red | rosybrown | royalblue | saddlebrown | salmon | sandybrown | seagreen | seashell | sienna | silver | skyblue | slateblue | slategray | slategrey | snow | springgreen | steelblue | tan | teal | thistle | tomato | turquoise | violet | wheat | white | whitesmoke | yellow | yellowgreen"
+];
+let alpha_value = [%value "<number> | <percentage>"];
+// TODO: should accept rgba
+let function_rgb = [%value
+  "rgb( <percentage>{3} [ / <alpha-value> ]? ) | rgb( <number>{3} [ / <alpha-value> ]? )"
+];
+let hue = [%value "<number> | <angle>"];
+// TODO: should accept hsl
+let function_hsl = [%value
+  "hsl( <hue> <percentage> <percentage> [ / <alpha-value> ]? )"
+];
+let function_hwb = [%value
+  "hwb( <hue> <percentage> <percentage> [ / <alpha-value> ]? )"
+];
+let function_lab = [%value
+  "lab( <percentage> <number> <number> [ / <alpha-value> ]? )"
+];
+let function_lch = [%value
+  "lch( <percentage> <number> <hue> [ / <alpha-value> ]? )"
+];
+let cmyk_component = [%value "<number> | <percentage>"];
+// TODO: <system-color>?
+let rec color = [%value.rec
+  "<hex-color> | <named-color> | currentcolor | transparent | <rgb()> | <hsl()> | <hsl()> | <hwb()> | <lab()> | <lch()> | <color()> | <device-cmyk()>"
+]
+and function_color = [%value.rec
+  "color( [ [<ident> | <dashed-ident>]? [ <number-percentage>+ | <string> ] [ / <alpha-value> ]? ]# , <color>? )"
+]
+and function_device_cmyk = [%value.rec
+  "device-cmyk( <cmyk-component>{4} [ / <alpha-value> ]? , <color>? )"
+];
+let property_color = [%value "<color>"];
+let property_opacity = [%value "<alpha-value>"];
 
 // css-overflow-3
 let property_overflow_x = [%value "visible | hidden | clip | scroll | auto"];
