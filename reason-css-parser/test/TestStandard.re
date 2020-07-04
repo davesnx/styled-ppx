@@ -78,6 +78,11 @@ describe("standard values", ({test, _}) => {
     expect.result(parse("gintoki")).toBe(Ok());
     expect.result(parse("nope")).toBeError();
   });
+  test("<ident>", ({expect, _}) => {
+    let parse = parse([%value "<ident>"]);
+    expect.result(parse("test")).toBe(Ok("test"));
+    expect.result(parse("'ohno'")).toBeError();
+  });
   test("<css-wide-keywords>", ({expect, _}) => {
     let parse = parse([%value "<css-wide-keywords>"]);
     expect.result(parse("initial")).toBe(Ok(`Initial));

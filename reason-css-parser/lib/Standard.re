@@ -147,6 +147,15 @@ let length_percentage =
     map(percentage, v => `Percentage(v)),
   ]);
 
+// https://drafts.csswg.org/css-values-4/#css-identifier
+// TODO: differences between <ident> and keyword
+let ident =
+  token(
+    fun
+    | IDENT(string) => Ok(string)
+    | _ => Error("expected an indentifier"),
+  );
+
 // https://drafts.csswg.org/css-values-4/#textual-values
 let css_wide_keywords =
   combine_xor([
