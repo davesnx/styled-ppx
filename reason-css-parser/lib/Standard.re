@@ -98,6 +98,12 @@ let custom_ident =
     | _ => Error("expected an identifier"),
   );
 
+let dashed_ident =
+  token(
+    fun
+    | IDENT(string) when String.sub(string, 0, 2) == "--" => Ok(string)
+    | _ => Error("expected a --variable"),
+  );
 let string =
   token(
     fun

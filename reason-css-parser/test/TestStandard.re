@@ -62,4 +62,9 @@ describe("standard values", ({test, _}) => {
     expect.result(parse("'mayushii'")).toBeError();
     expect.result(parse("68.9")).toBeError();
   });
+  test("<dashed-ident>", ({expect, _}) => {
+    let parse = parse([%value "<dashed-ident>"]);
+    expect.result(parse("--random")).toBe(Ok("--random"));
+    expect.result(parse("random'")).toBeError();
+  });
 });
