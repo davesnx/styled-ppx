@@ -26,10 +26,14 @@ let mapper = (_, _) => {
               },
             ]),
           )),
+        pexp_loc,
+        pexp_loc_stack,
         _,
       } =>
       switch (Reason_css_vds.value_of_string(value)) {
-      | Some(value_ast) => Emit.create_value_parser(value_ast)
+      | Some(value_ast) =>
+        let {pexp_desc, _} = Emit.create_value_parser(value_ast);
+        {pexp_loc, pexp_loc_stack, pexp_desc, pexp_attributes: []};
       | None => failwith("couldn't parse this value")
       }
     | expr => default_mapper.expr(mapper, expr),
