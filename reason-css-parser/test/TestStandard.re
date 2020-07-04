@@ -37,4 +37,11 @@ describe("standard values", ({test, _}) => {
     expect.result(parse("65%")).toBe(Ok(`Percentage(65.)));
     expect.result(parse("66dsa")).toBeError();
   });
+  test("<string>", ({expect, _}) => {
+    let parse = parse([%value "<string>"]);
+    expect.result(parse("'tuturu'")).toBe(Ok("tuturu"));
+    expect.result(parse("'67.8'")).toBe(Ok("67.8"));
+    expect.result(parse("ident")).toBeError();
+    expect.result(parse("68.9")).toBeError();
+  });
 });

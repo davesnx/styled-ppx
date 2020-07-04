@@ -83,7 +83,12 @@ let length_percentage =
   ]);
 
 // TODO: implement
-let string = Rule.Data.return(Error("not implemented"));
+let string =
+  token(
+    fun
+    | STRING(string) => Ok(string)
+    | _ => Error("expected a string"),
+  );
 
 let custom_ident =
   token(
