@@ -72,6 +72,7 @@ let length =
     }
   );
 
+// https://drafts.csswg.org/css-values-4/#angles
 let angle =
   token(token =>
     switch (token) {
@@ -88,6 +89,7 @@ let angle =
     }
   );
 
+// https://drafts.csswg.org/css-values-4/#time
 let time =
   token(token =>
     switch (token) {
