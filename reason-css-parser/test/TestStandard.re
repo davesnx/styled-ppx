@@ -42,6 +42,13 @@ describe("standard values", ({test, _}) => {
     expect.result(parse("gintoki")).toBe(Ok());
     expect.result(parse("nope")).toBeError();
   });
+  test("<css-wide-keywords>", ({expect, _}) => {
+    let parse = parse([%value "<css-wide-keywords>"]);
+    expect.result(parse("initial")).toBe(Ok(`Initial));
+    expect.result(parse("inherit")).toBe(Ok(`Inherit));
+    expect.result(parse("unset")).toBe(Ok(`Unset));
+    expect.result(parse("nope")).toBeError();
+  });
   test("<string>", ({expect, _}) => {
     let parse = parse([%value "<string>"]);
     expect.result(parse("'tuturu'")).toBe(Ok("tuturu"));
