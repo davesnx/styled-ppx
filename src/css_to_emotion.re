@@ -1135,9 +1135,19 @@ and render_declaration =
     };
   };
   let (valueList, loc) = d.Declaration.value;
+  let value_source = {
+    let Warnings.{loc_start, loc_end, _} = loc;
+    let Lex_buffer.{buf, pos, _} = Lex_buffer.last_buffer^;
+    let pos_offset = pos.Lexing.pos_cnum;
+    let loc_start = loc_start.Lexing.pos_cnum - pos_offset;
+    let loc_end = loc_end.Lexing.pos_cnum - pos_offset;
+    Sedlexing.Utf8.sub_lexeme(buf, loc_start - 1, loc_end - loc_start);
+  };
 
   Declarations_to_emotion.support_property(name)
-    ? switch (Declarations_to_emotion.parse_declarations((name, valueList))) {
+    ? switch (
+        Declarations_to_emotion.parse_declarations((name, value_source))
+      ) {
       | Ok(exprs) => exprs
       | Error(`Not_found) => grammar_error(loc, "something weird happened")
       | Error(`Invalid_value(error)) => grammar_error(loc, error)

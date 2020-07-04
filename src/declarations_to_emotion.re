@@ -1,8 +1,6 @@
 open Migrate_parsetree;
 open Ast_410;
 open Ast_helper;
-open Css_types;
-open Component_value;
 open Reason_css_parser;
 open Parser;
 
@@ -135,38 +133,10 @@ let properties = [
   ("align-content", found(align_content)),
 ];
 
-// TODO: this is a terrible workaround
-let rec string_of_values = values => {
-  let string_of_value =
-    fun
-    | Percentage(s) => s ++ "%"
-    | String(s) => "'" ++ s ++ "'"
-    | Uri(s) => "url(" ++ s ++ ")"
-    | Function((name, _), (values, _)) =>
-      name ++ "(" ++ string_of_values(values) ++ ")"
-    | Hash(s) => "#" ++ s
-    | Float_dimension((n, s, _))
-    | Dimension((n, s)) => n ++ s
-    | Ident(s)
-    | Selector(s)
-    | Operator(s)
-    | Delim(s)
-    | Number(s) => s
-    | Variable(_)
-    | Paren_block(_)
-    | Bracket_block(_)
-    | TypedVariable(_)
-    | Unicode_range(_) => failwith("unsupported right know");
-  values
-  |> List.map(((value, _)) => string_of_value(value))
-  |> String.concat(" ");
-};
-
 let support_property = name =>
   properties |> List.exists(((key, _)) => key == name);
 let parse_declarations = ((name, value)) => {
   let (let.ok) = Result.bind;
-  let value = string_of_values(value);
   let.ok (_, string_to_expr) =
     properties
     |> List.find_opt(((key, _)) => key == name)

@@ -29,11 +29,15 @@ let of_sedlex = (~file="<n/a>", ~pos=?, buf) => {
   {buf, pos, pos_mark: pos, last_char: None, last_char_mark: None};
 };
 
-let of_ascii_string = (~pos=?, s) =>
+let last_buffer = ref(of_sedlex(Sedlexing.Latin1.from_string("")));
+let of_ascii_string = (~pos=?, s) => {
+  last_buffer := of_sedlex(~pos?, Sedlexing.Latin1.from_string(s));
   of_sedlex(~pos?, Sedlexing.Latin1.from_string(s));
+};
 
 let of_ascii_file = file => {
   let chan = open_in(file);
+  last_buffer := of_sedlex(~file, Sedlexing.Latin1.from_channel(chan));
   of_sedlex(~file, Sedlexing.Latin1.from_channel(chan));
 };
 
