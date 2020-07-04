@@ -11,14 +11,16 @@
   "dependencies": {
     "@esy-ocaml/reason": "^3.6.0",
     "@opam/dune": "2.5.1",
+    "@opam/dune-private-libs": "2.5.1",
+    "@opam/dune-configurator": "2.5.1",
     "@opam/menhir": "20200211",
     "@opam/ocamlformat": "0.14.2",
     "@opam/ppx_deriving": "4.5",
     "@opam/sedlex": "*",
     "@reason-native/rely": "^3.2.1",
-    "ocaml": "^4.10.0"
+    "ocaml": "^4.8.1000"
   },
   "devDependencies": {
-    "@opam/ocaml-lsp-server": "ocaml/ocaml-lsp:ocaml-lsp-server.opam"
+    "@opam/ocaml-lsp-server": "ocaml/ocaml-lsp:ocaml-lsp-server.opam#fbc433e14035d520c7137916ae710b8ec3b415e9"
   }
 }
