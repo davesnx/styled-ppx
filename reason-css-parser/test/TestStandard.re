@@ -44,4 +44,10 @@ describe("standard values", ({test, _}) => {
     expect.result(parse("ident")).toBeError();
     expect.result(parse("68.9")).toBeError();
   });
+  test("<custom-ident>", ({expect, _}) => {
+    let parse = parse([%value "<custom-ident>"]);
+    expect.result(parse("potato")).toBe(Ok("potato"));
+    expect.result(parse("'mayushii'")).toBeError();
+    expect.result(parse("68.9")).toBeError();
+  });
 });

@@ -82,7 +82,14 @@ let length_percentage =
     map(percentage, v => `Percentage(v)),
   ]);
 
-// TODO: implement
+// TODO: proper implement https://drafts.csswg.org/css-values-4/#custom-idents
+let custom_ident =
+  token(
+    fun
+    | IDENT(string) => Ok(string)
+    | _ => Error("expected an identifier"),
+  );
+
 let string =
   token(
     fun
@@ -90,13 +97,7 @@ let string =
     | _ => Error("expected a string"),
   );
 
-let custom_ident =
-  token(
-    fun
-    | STRING(string) => Ok(string)
-    | _ => Error("expected <custom-ident>"),
-  );
-
+// https://drafts.csswg.org/css-values-4/#textual-values
 let css_wide_keywords =
   combine_xor([
     value(`Initial, keyword("initial")),
