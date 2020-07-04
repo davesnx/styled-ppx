@@ -165,6 +165,18 @@ let parse_tests = [
       ),
     ),
   ),
+  (
+    // special characters
+    "'[' <custom-ident>* ']'",
+    Combinator(
+      Static,
+      [
+        Terminal(Keyword("["), One),
+        Terminal(Data_type("custom-ident"), Zero_or_more),
+        Terminal(Keyword("]"), One),
+      ],
+    ),
+  ),
 ];
 describe("correctly parse value", ({test, _}) => {
   let test = (index, (result, expected)) =>

@@ -44,5 +44,8 @@ let rec read = buf =>
     let _ = lexeme(buf);
     read(buf);
   | string => STRING(lexeme(buf))
+  | ("'", any, "'") =>
+    let chars = lexeme(buf);
+    STRING(String.sub(chars, 1, String.length(chars) - 2));
   | _ => read_char(buf)
   };
