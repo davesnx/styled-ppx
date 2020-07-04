@@ -12,7 +12,7 @@
       "end": "(?<=])",
       "patterns": [
         {
-          "include": "source.reason"
+          "include": "source.css.styled"
         }
       ]
     }
