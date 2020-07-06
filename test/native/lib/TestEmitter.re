@@ -38,7 +38,7 @@ let properties_static_css_tests = [
     [%expr [Css.flexDirection(`column)]],
   ),
   ([%expr [%css "font-size: 30px"]], [%expr [Css.fontSize(Css.px(30))]]),
-  ([%expr [%css "height: 100vh"]], [%expr [Css.height(Css.vh(100.))]]),
+  ([%expr [%css "height: 100vh"]], [%expr [Css.height(`vh(100.))]]),
   (
     [%expr [%css "justify-content: center"]],
     [%expr [Css.justifyContent(`center)]],
@@ -46,7 +46,20 @@ let properties_static_css_tests = [
   ([%expr [%css "margin: 0"]], [%expr [Css.margin(`zero)]]),
   ([%expr [%css "margin: 5px"]], [%expr [Css.margin(Css.px(5))]]),
   ([%expr [%css "opacity: 0.9"]], [%expr [Css.opacity(0.9)]]),
-  ([%expr [%css "width: 100vw"]], [%expr [Css.width(Css.vw(100.))]]),
+  ([%expr [%css "width: 100vw"]], [%expr [Css.width(`vw(100.))]]),
+  // css-sizing-3
+  ([%expr [%css "width: auto"]], [%expr [Css.width(`auto)]]),
+  ([%expr [%css "width: 0"]], [%expr [Css.width(`zero)]]),
+  ([%expr [%css "height: 5px"]], [%expr [Css.height(`pxFloat(5.))]]),
+  ([%expr [%css "min-width: 5%"]], [%expr [Css.minWidth(`percent(5.))]]),
+  ([%expr [%css "min-height: 5em"]], [%expr [Css.minHeight(`em(5.))]]),
+  ([%expr [%css "max-width: none"]], [%expr [Css.maxWidth(`none)]]),
+  ([%expr [%css "max-height: 3vh"]], [%expr [Css.maxHeight(`vh(3.))]]),
+  (
+    [%expr [%css "box-sizing: border-box"]],
+    [%expr [Css.boxSizing(`borderBox)]],
+  ),
+  // css-flexbox-1
   ([%expr [%css "flex-wrap: wrap"]], [%expr [Css.flexWrap(`wrap)]]),
   // TODO: generate tests with variables in the future
   ([%expr [%css "flex-wrap: $var"]], [%expr [Css.flexWrap(var)]]),

@@ -4,10 +4,8 @@ let supportList = [
   [%css "opacity: 0.9"],
   /* [%css "box-shadow: 1px 54px 1px blue"], */
   /* [%css "box-shadow: 2px 3px blue"], */
-
   /* [%css "text-shadow: 0px 0px blue"], */
   /* [%css "text-shadow: 10px 0px 0px blue"], */
-
   /* [%css {| overflow-y: visible; overflow-x: visible; overflow: hidden; |}], */
   /* [%css "visibility: visible"], */
   /* [%css "hyphens: manual"], */
@@ -16,24 +14,20 @@ let supportList = [
   /* [%css "direction: ltr"], */
   /* [%css "content: normal"], */
   /* [%css "clear: none"], */
-
   [%css "box-sizing: content-box"],
   [%css "box-sizing: border-box"],
   /* [%css "box-shadow: none"], */
   /* [%css "border-collapse: separate"], */
-
   /* [%css "transition-property: all"], */
   /* [%css "transition-duration: 0.5s"], */
   /* [%css "transition-timing-function: ease"], */
   /* [%css "transition-timing-function: step-end"], */
   /* [%css "transition-delay: 0.5s"], */
-
   /* [%css "transition: none;"], */
   /* [%css "transition: ease 250ms"], */
   /* [%css "transition: ease 250ms"], */
   /* [%css "transition: margin-left 4s ease-in-out 1s"], */
   /* [%css "transition: width 2s, height 2s, background-color 2s, transform 2s"], */
-
   /* [%css "animation-name: slidein"], */
   /* [%css "animation-duration: 3s"], */
   /* [%css "animation-timing-function: ease"], */
@@ -45,7 +39,6 @@ let supportList = [
   /* [%css "animation-fill-mode: backwards"], */
   /* [%css "animation-play-state: "], */
   /* [%css "animation: 3s infinite alternate slidein"], */
-
   /* [%css "transform: translate(10px, 10px)"], */
   /* [%css "transform: translateX(10px) rotate(10deg) translateY(5px)"], */
   /* [%css "transform: matrix(1.0, 2.0, 3.0, 4.0, 5.0, 6.0)" */
@@ -69,18 +62,23 @@ let supportList = [
   /* [%css "transform: rotateY(10deg)" */
   /* [%css "transform: rotateZ(10deg)" */
   /* [%css "transform: perspective(17px)" */
-
   /* [%css "font-family: 'Open Sans', '-system', sans-serif"], */
   [%css "transform: initial"],
   [%css "flex-flow: row wrap"],
   [%css "flex: 1 2 content"],
   [%css "flex: unset"],
+  [%css "width: auto"],
+  [%css "width: 0"],
+  [%css "height: 5px"],
+  [%css "min-width: 5%"],
+  [%css "min-height: 5em"],
+  [%css "max-width: none"],
+  [%css "max-height: 3vh"],
+  [%css "box-sizing: border-box"],
 ];
 
 Belt.List.forEachWithIndex(supportList, (index, css) => {
   test("Component " ++ string_of_int(index) ++ " renders", () => {
-    css
-    |> Expect.expect
-    |> Expect.toMatchSnapshot
-  });
+    css |> Expect.expect |> Expect.toMatchSnapshot
+  })
 });

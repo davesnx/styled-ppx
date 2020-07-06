@@ -11,7 +11,11 @@ let txt = txt => {Location.loc: Location.none, txt};
 let lid = name => txt(Lident(name));
 
 let (let.ok) = Result.bind;
+
+exception Unsupported_feature;
+
 let id = Fun.id;
+let apply_value = (f, v) => f(`Value(v));
 
 type transform('ast, 'value) = {
   ast_of_string: string => result('ast, string),
@@ -67,7 +71,10 @@ let variants_to_expression =
   | `Space_around => id([%expr `spaceAround])
   | `Baseline => id([%expr `baseline])
   | `Stretch => id([%expr `stretch])
-  | `Auto => id([%expr `auto]);
+  | `Auto => id([%expr `auto])
+  | `None => id([%expr `none])
+  | `Content_box => id([%expr `contentBox])
+  | `Border_box => id([%expr `borderBox]);
 
 let variable_rule = {
   open Rule;
@@ -97,8 +104,95 @@ let apply = (parser, map, id) =>
 let variants = (parser, identifier) =>
   apply(parser, variants_to_expression, identifier);
 
-let width = _x => [%expr `cm(1.0)];
+// TODO: all of them could be float, but bs-css doesn't support it
+let render_length =
+  fun
+  | `Cap(_n) => raise(Unsupported_feature)
+  | `Ch(n) => [%expr `ch([%e render_number(n)])]
+  | `Cm(n) => [%expr `cm([%e render_number(n)])]
+  | `Em(n) => [%expr `em([%e render_number(n)])]
+  | `Ex(n) => [%expr `ex([%e render_number(n)])]
+  | `Ic(_n) => raise(Unsupported_feature)
+  | `In(_n) => raise(Unsupported_feature)
+  | `Lh(_n) => raise(Unsupported_feature)
+  | `Mm(n) => [%expr `mm([%e render_number(n)])]
+  | `Pc(n) => [%expr `pc([%e render_number(n)])]
+  | `Pt(n) => [%expr `pt([%e render_integer(n |> int_of_float)])]
+  | `Px(n) => [%expr `pxFloat([%e render_number(n)])]
+  | `Q(_n) => raise(Unsupported_feature)
+  | `Rem(n) => [%expr `rem([%e render_number(n)])]
+  | `Rlh(_n) => raise(Unsupported_feature)
+  | `Vb(_n) => raise(Unsupported_feature)
+  | `Vh(n) => [%expr `vh([%e render_number(n)])]
+  | `Vi(_n) => raise(Unsupported_feature)
+  | `Vmax(n) => [%expr `vmax([%e render_number(n)])]
+  | `Vmin(n) => [%expr `vmin([%e render_number(n)])]
+  | `Vw(n) => [%expr `vw([%e render_number(n)])]
+  | `Zero => [%expr `zero];
+let render_percentage = render_number;
 
+let render_length_percentage =
+  fun
+  | `Length(length) => render_length(length)
+  | `Percentage(percentage) => [%expr
+      `percent([%e render_percentage(percentage)])
+    ];
+
+// css-sizing-3
+let render_function_fit_content = _lp => raise(Unsupported_feature);
+let width =
+  apply(
+    property_width,
+    fun
+    | `Auto => variants_to_expression(`Auto)
+    | `Length_percentage(lp) => render_length_percentage(lp)
+    | `Max_content
+    | `Min_content => raise(Unsupported_feature)
+    | `Fit_content(lp) => render_function_fit_content(lp),
+    [%expr Css.width],
+  );
+let height =
+  apply(
+    property_height,
+    apply_value(width.value_of_ast),
+    [%expr Css.height],
+  );
+let min_width =
+  apply(
+    property_min_width,
+    apply_value(width.value_of_ast),
+    [%expr Css.minWidth],
+  );
+let min_height =
+  apply(
+    property_min_height,
+    apply_value(width.value_of_ast),
+    [%expr Css.minHeight],
+  );
+let max_width =
+  apply(
+    property_max_width,
+    fun
+    | `None => variants_to_expression(`None)
+    | `Length_percentage(lp) =>
+      apply_value(width.value_of_ast, `Length_percentage(lp))
+    | `Max_content => apply_value(width.value_of_ast, `Max_content)
+    | `Min_content => apply_value(width.value_of_ast, `Min_content)
+    | `Fit_content(lp) => apply_value(width.value_of_ast, `Fit_content(lp)),
+    [%expr Css.maxWidth],
+  );
+let max_height =
+  apply(
+    property_max_height,
+    data => max_width.value_of_ast(`Value(data)),
+    [%expr Css.maxHeight],
+  );
+let box_sizing =
+  apply(property_box_sizing, variants_to_expression, [%expr Css.boxSizing]);
+// TODO: bs-css doesn't support columnWidth
+// let column_width =
+
+// css-flexbox-1
 // using id() because refmt
 let flex_direction =
   variants(property_flex_direction, [%expr Css.flexDirection]);
@@ -132,7 +226,8 @@ let flex_basis =
     property_flex_basis,
     fun
     | `Content => variants_to_expression(`Content)
-    | `Property_width(value_width) => width(value_width),
+    | `Property_width(value_width) =>
+      width.value_of_ast(`Value(value_width)),
     [%expr Css.flexBasis],
   );
 // TODO: this is incomplete
@@ -174,6 +269,15 @@ let align_content =
 
 let found = ({string_to_expr, _}) => string_to_expr;
 let properties = [
+  // css-sizing-3
+  ("width", found(width)),
+  ("height", found(height)),
+  ("min-width", found(min_width)),
+  ("min-height", found(min_height)),
+  ("max-width", found(max_width)),
+  ("max-height", found(max_height)),
+  ("box-sizing", found(box_sizing)),
+  // css-flexbox-1
   ("flex-direction", found(flex_direction)),
   ("flex-wrap", found(flex_wrap)),
   ("flex-flow", found(flex_flow)),
