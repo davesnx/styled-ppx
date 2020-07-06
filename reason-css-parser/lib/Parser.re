@@ -80,7 +80,7 @@ let function_lch = [%value
 let cmyk_component = [%value "<number> | <percentage>"];
 // TODO: <system-color>?
 let rec color = [%value.rec
-  "<hex-color> | <named-color> | currentcolor | transparent | <rgb()> | <hsl()> | <hsl()> | <hwb()> | <lab()> | <lch()> | <color()> | <device-cmyk()>"
+  "<hex-color> | <named-color> | currentcolor | transparent | <rgb()> | <hsl()> | <hwb()> | <lab()> | <lch()> | <color()> | <device-cmyk()>"
 ]
 and function_color = [%value.rec
   "color( [ [<ident> | <dashed-ident>]? [ <number-percentage>+ | <string> ] [ / <alpha-value> ]? ]# , <color>? )"
