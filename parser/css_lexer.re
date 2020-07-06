@@ -82,11 +82,11 @@ let () =
   Location.register_error_of_exn(
     fun
     | LexingError((pos, msg)) => {
-        let loc = Lex_buffer.make_loc_and_fix(pos, pos);
+        let loc = Lex_buffer.make_loc(pos, pos);
         Some(Location.error(~loc, msg));
       }
     | ParseError((token, start_pos, end_pos)) => {
-        let loc = Lex_buffer.make_loc_and_fix(start_pos, end_pos);
+        let loc = Lex_buffer.make_loc(start_pos, end_pos);
         let msg =
           Printf.sprintf(
             "Parse error while reading token '%s'",

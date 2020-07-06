@@ -71,7 +71,10 @@ let supportList = [
   /* [%css "transform: perspective(17px)" */
 
   /* [%css "font-family: 'Open Sans', '-system', sans-serif"], */
-  [%css "transform: initial"]
+  [%css "transform: initial"],
+  [%css "flex-flow: row wrap"],
+  [%css "flex: 1 2 content"],
+  [%css "flex: unset"],
 ];
 
 Belt.List.forEachWithIndex(supportList, (index, css) => {
@@ -81,5 +84,3 @@ Belt.List.forEachWithIndex(supportList, (index, css) => {
     |> Expect.toMatchSnapshot
   });
 });
-
-

@@ -1,5 +1,5 @@
 {
-  "checksum": "dced84b50069821b567c430329541dca",
+  "checksum": "4d654661c0586dad634ff2fd7a45b967",
   "root": "styled-ppx@link-dev:./package.json",
   "node": {
     "styled-ppx@link-dev:./package.json": {
@@ -14,27 +14,27 @@
       "overrides": [],
       "dependencies": [],
       "devDependencies": [
-        "reason-css-parser@github:EduardoRFS/reason-css-parser:package.json#6987406d414c3bd9fe32204d45dd97b0401bbfa2@d41d8cd9",
+        "reason-css-parser@github:EduardoRFS/reason-css-parser:package.json#8cdbf80e4add7b65a37ee90e7d33f4fcf2a84a64@d41d8cd9",
         "ocaml@4.10.0@d41d8cd9", "@reason-native/rely@3.2.1@d41d8cd9",
         "@opam/sedlex@opam:2.2@ffde36c0",
         "@opam/ocaml-migrate-parsetree@opam:1.7.3@dbcf3b47",
-        "@opam/ocaml-lsp-server@github:ocaml/ocaml-lsp:ocaml-lsp-server.opam#058c9b44f64b6e7957f057b1078e6ba6c91cc10e@d41d8cd9",
+        "@opam/ocaml-lsp-server@github:ocaml/ocaml-lsp:ocaml-lsp-server.opam#fbc433e14035d520c7137916ae710b8ec3b415e9@d41d8cd9",
         "@opam/merlin@opam:3.3.6@7ca67060",
         "@opam/menhir@opam:20200211@26571604",
         "@opam/dune@opam:2.5.1@f38f376e",
         "@esy-ocaml/reason@github:facebook/reason:reason.json#773dbcd@d41d8cd9"
       ]
     },
-    "reason-css-vds@github:EduardoRFS/reason-css-vds:package.json#86633fe91a927920929a384403c87f902f414f6e@d41d8cd9": {
+    "reason-css-vds@github:EduardoRFS/reason-css-vds:package.json#62124663c320bfd4a27ec45e639b741d9ac1e74f@d41d8cd9": {
       "id":
-        "reason-css-vds@github:EduardoRFS/reason-css-vds:package.json#86633fe91a927920929a384403c87f902f414f6e@d41d8cd9",
+        "reason-css-vds@github:EduardoRFS/reason-css-vds:package.json#62124663c320bfd4a27ec45e639b741d9ac1e74f@d41d8cd9",
       "name": "reason-css-vds",
       "version":
-        "github:EduardoRFS/reason-css-vds:package.json#86633fe91a927920929a384403c87f902f414f6e",
+        "github:EduardoRFS/reason-css-vds:package.json#62124663c320bfd4a27ec45e639b741d9ac1e74f",
       "source": {
         "type": "install",
         "source": [
-          "github:EduardoRFS/reason-css-vds:package.json#86633fe91a927920929a384403c87f902f414f6e"
+          "github:EduardoRFS/reason-css-vds:package.json#62124663c320bfd4a27ec45e639b741d9ac1e74f"
         ]
       },
       "overrides": [],
@@ -44,32 +44,57 @@
         "@opam/ppx_deriving@opam:4.5@bb81afdc",
         "@opam/ocamlformat@opam:0.14.2@d742ffd5",
         "@opam/menhir@opam:20200211@26571604",
+        "@opam/dune-private-libs@opam:2.5.1@60c1661f",
+        "@opam/dune-configurator@opam:2.5.1@aeb9d8d5",
         "@opam/dune@opam:2.5.1@f38f376e",
         "@esy-ocaml/reason@github:facebook/reason:reason.json#773dbcd@d41d8cd9"
       ],
       "devDependencies": []
     },
-    "reason-css-parser@github:EduardoRFS/reason-css-parser:package.json#6987406d414c3bd9fe32204d45dd97b0401bbfa2@d41d8cd9": {
+    "reason-css-parser@github:EduardoRFS/reason-css-parser:package.json#8cdbf80e4add7b65a37ee90e7d33f4fcf2a84a64@d41d8cd9": {
       "id":
-        "reason-css-parser@github:EduardoRFS/reason-css-parser:package.json#6987406d414c3bd9fe32204d45dd97b0401bbfa2@d41d8cd9",
+        "reason-css-parser@github:EduardoRFS/reason-css-parser:package.json#8cdbf80e4add7b65a37ee90e7d33f4fcf2a84a64@d41d8cd9",
       "name": "reason-css-parser",
       "version":
-        "github:EduardoRFS/reason-css-parser:package.json#6987406d414c3bd9fe32204d45dd97b0401bbfa2",
+        "github:EduardoRFS/reason-css-parser:package.json#8cdbf80e4add7b65a37ee90e7d33f4fcf2a84a64",
       "source": {
         "type": "install",
         "source": [
-          "github:EduardoRFS/reason-css-parser:package.json#6987406d414c3bd9fe32204d45dd97b0401bbfa2"
+          "github:EduardoRFS/reason-css-parser:package.json#8cdbf80e4add7b65a37ee90e7d33f4fcf2a84a64"
         ]
       },
       "overrides": [],
       "dependencies": [
-        "reason-css-vds@github:EduardoRFS/reason-css-vds:package.json#86633fe91a927920929a384403c87f902f414f6e@d41d8cd9",
+        "reason-css-vds@github:EduardoRFS/reason-css-vds:package.json#62124663c320bfd4a27ec45e639b741d9ac1e74f@d41d8cd9",
+        "reason-css-lexer@github:EduardoRFS/reason-css-lexer:package.json#33d95c56005d6c169c46869da7e6aac75c36c441@d41d8cd9",
         "ocaml@4.10.0@d41d8cd9", "@reason-native/rely@3.2.1@d41d8cd9",
         "@opam/sedlex@github:ocaml-community/sedlex:sedlex.opam#25c0dbd82c7fc5d91102f5bd21db1411f2c46323@d41d8cd9",
         "@opam/ppx_tools_versioned@opam:5.4.0@48c10ee1",
         "@opam/ppx_deriving@opam:4.5@bb81afdc",
         "@opam/ocamlformat@opam:0.14.2@d742ffd5",
         "@opam/ocaml-migrate-parsetree@opam:1.7.3@dbcf3b47",
+        "@opam/dune@opam:2.5.1@f38f376e",
+        "@esy-ocaml/reason@github:facebook/reason:reason.json#773dbcd@d41d8cd9"
+      ],
+      "devDependencies": []
+    },
+    "reason-css-lexer@github:EduardoRFS/reason-css-lexer:package.json#33d95c56005d6c169c46869da7e6aac75c36c441@d41d8cd9": {
+      "id":
+        "reason-css-lexer@github:EduardoRFS/reason-css-lexer:package.json#33d95c56005d6c169c46869da7e6aac75c36c441@d41d8cd9",
+      "name": "reason-css-lexer",
+      "version":
+        "github:EduardoRFS/reason-css-lexer:package.json#33d95c56005d6c169c46869da7e6aac75c36c441",
+      "source": {
+        "type": "install",
+        "source": [
+          "github:EduardoRFS/reason-css-lexer:package.json#33d95c56005d6c169c46869da7e6aac75c36c441"
+        ]
+      },
+      "overrides": [],
+      "dependencies": [
+        "ocaml@4.10.0@d41d8cd9", "@reason-native/rely@3.2.1@d41d8cd9",
+        "@opam/sedlex@github:ocaml-community/sedlex:sedlex.opam#25c0dbd82c7fc5d91102f5bd21db1411f2c46323@d41d8cd9",
+        "@opam/ppx_deriving@opam:4.5@bb81afdc",
         "@opam/dune@opam:2.5.1@f38f376e",
         "@esy-ocaml/reason@github:facebook/reason:reason.json#773dbcd@d41d8cd9"
       ],
@@ -775,7 +800,7 @@
         "@opam/result@opam:1.5@6b753c82", "@opam/fpath@opam:0.7.2@45477b93",
         "@opam/dune@opam:2.5.1@f38f376e", "@opam/cppo@opam:1.6.6@f4f83858",
         "@opam/cmdliner@opam:1.0.4@93208aac",
-        "@opam/astring@opam:0.8.3@4e5e17d5",
+        "@opam/astring@opam:0.8.4@1215f84d",
         "@esy-ocaml/substs@0.0.1@d41d8cd9"
       ],
       "devDependencies": [
@@ -783,7 +808,7 @@
         "@opam/result@opam:1.5@6b753c82", "@opam/fpath@opam:0.7.2@45477b93",
         "@opam/dune@opam:2.5.1@f38f376e",
         "@opam/cmdliner@opam:1.0.4@93208aac",
-        "@opam/astring@opam:0.8.3@4e5e17d5"
+        "@opam/astring@opam:0.8.4@1215f84d"
       ]
     },
     "@opam/ocamlformat@opam:0.14.2@d742ffd5": {
@@ -975,16 +1000,16 @@
         "@opam/dune@opam:2.5.1@f38f376e"
       ]
     },
-    "@opam/ocaml-lsp-server@github:ocaml/ocaml-lsp:ocaml-lsp-server.opam#058c9b44f64b6e7957f057b1078e6ba6c91cc10e@d41d8cd9": {
+    "@opam/ocaml-lsp-server@github:ocaml/ocaml-lsp:ocaml-lsp-server.opam#fbc433e14035d520c7137916ae710b8ec3b415e9@d41d8cd9": {
       "id":
-        "@opam/ocaml-lsp-server@github:ocaml/ocaml-lsp:ocaml-lsp-server.opam#058c9b44f64b6e7957f057b1078e6ba6c91cc10e@d41d8cd9",
+        "@opam/ocaml-lsp-server@github:ocaml/ocaml-lsp:ocaml-lsp-server.opam#fbc433e14035d520c7137916ae710b8ec3b415e9@d41d8cd9",
       "name": "@opam/ocaml-lsp-server",
       "version":
-        "github:ocaml/ocaml-lsp:ocaml-lsp-server.opam#058c9b44f64b6e7957f057b1078e6ba6c91cc10e",
+        "github:ocaml/ocaml-lsp:ocaml-lsp-server.opam#fbc433e14035d520c7137916ae710b8ec3b415e9",
       "source": {
         "type": "install",
         "source": [
-          "github:ocaml/ocaml-lsp:ocaml-lsp-server.opam#058c9b44f64b6e7957f057b1078e6ba6c91cc10e"
+          "github:ocaml/ocaml-lsp:ocaml-lsp-server.opam#fbc433e14035d520c7137916ae710b8ec3b415e9"
         ]
       },
       "overrides": [],
@@ -994,7 +1019,7 @@
         "@opam/ppx_yojson_conv_lib@opam:v0.14.0@116b53d6",
         "@opam/ocamlfind@opam:1.8.1@ff07b0f9",
         "@opam/menhir@opam:20200211@26571604",
-        "@opam/dune-build-info@opam:2.5.1@921e5578",
+        "@opam/dune-build-info@opam:2.6.1@611bb155",
         "@opam/dune@opam:2.5.1@f38f376e", "@esy-ocaml/substs@0.0.1@d41d8cd9"
       ],
       "devDependencies": [
@@ -1003,7 +1028,7 @@
         "@opam/ppx_yojson_conv_lib@opam:v0.14.0@116b53d6",
         "@opam/ocamlfind@opam:1.8.1@ff07b0f9",
         "@opam/menhir@opam:20200211@26571604",
-        "@opam/dune-build-info@opam:2.5.1@921e5578",
+        "@opam/dune-build-info@opam:2.6.1@611bb155",
         "@opam/dune@opam:2.5.1@f38f376e"
       ]
     },
@@ -1060,20 +1085,20 @@
         "@opam/dune@opam:2.5.1@f38f376e"
       ]
     },
-    "@opam/menhirSdk@opam:20200612@7fa3ce5b": {
-      "id": "@opam/menhirSdk@opam:20200612@7fa3ce5b",
+    "@opam/menhirSdk@opam:20200624@2a05b5a7": {
+      "id": "@opam/menhirSdk@opam:20200624@2a05b5a7",
       "name": "@opam/menhirSdk",
-      "version": "opam:20200612",
+      "version": "opam:20200624",
       "source": {
         "type": "install",
         "source": [
-          "archive:https://opam.ocaml.org/cache/md5/eb/eb1c13439a00195ee01e4a2e83b3e991#md5:eb1c13439a00195ee01e4a2e83b3e991",
-          "archive:https://gitlab.inria.fr/fpottier/menhir/repository/20200612/archive.tar.gz#md5:eb1c13439a00195ee01e4a2e83b3e991"
+          "archive:https://opam.ocaml.org/cache/md5/c3/c37ff53a4a69059e1f8223067b91bb8b#md5:c37ff53a4a69059e1f8223067b91bb8b",
+          "archive:https://gitlab.inria.fr/fpottier/menhir/repository/20200624/archive.tar.gz#md5:c37ff53a4a69059e1f8223067b91bb8b"
         ],
         "opam": {
           "name": "menhirSdk",
-          "version": "20200612",
-          "path": "esy.lock/opam/menhirSdk.20200612"
+          "version": "20200624",
+          "path": "esy.lock/opam/menhirSdk.20200624"
         }
       },
       "overrides": [],
@@ -1085,20 +1110,20 @@
         "ocaml@4.10.0@d41d8cd9", "@opam/dune@opam:2.5.1@f38f376e"
       ]
     },
-    "@opam/menhirLib@opam:20200612@a92e9802": {
-      "id": "@opam/menhirLib@opam:20200612@a92e9802",
+    "@opam/menhirLib@opam:20200624@8bdd2b0e": {
+      "id": "@opam/menhirLib@opam:20200624@8bdd2b0e",
       "name": "@opam/menhirLib",
-      "version": "opam:20200612",
+      "version": "opam:20200624",
       "source": {
         "type": "install",
         "source": [
-          "archive:https://opam.ocaml.org/cache/md5/eb/eb1c13439a00195ee01e4a2e83b3e991#md5:eb1c13439a00195ee01e4a2e83b3e991",
-          "archive:https://gitlab.inria.fr/fpottier/menhir/repository/20200612/archive.tar.gz#md5:eb1c13439a00195ee01e4a2e83b3e991"
+          "archive:https://opam.ocaml.org/cache/md5/c3/c37ff53a4a69059e1f8223067b91bb8b#md5:c37ff53a4a69059e1f8223067b91bb8b",
+          "archive:https://gitlab.inria.fr/fpottier/menhir/repository/20200624/archive.tar.gz#md5:c37ff53a4a69059e1f8223067b91bb8b"
         ],
         "opam": {
           "name": "menhirLib",
-          "version": "20200612",
-          "path": "esy.lock/opam/menhirLib.20200612"
+          "version": "20200624",
+          "path": "esy.lock/opam/menhirLib.20200624"
         }
       },
       "overrides": [],
@@ -1133,14 +1158,14 @@
         }
       ],
       "dependencies": [
-        "ocaml@4.10.0@d41d8cd9", "@opam/menhirSdk@opam:20200612@7fa3ce5b",
-        "@opam/menhirLib@opam:20200612@a92e9802",
+        "ocaml@4.10.0@d41d8cd9", "@opam/menhirSdk@opam:20200624@2a05b5a7",
+        "@opam/menhirLib@opam:20200624@8bdd2b0e",
         "@opam/fix@opam:20200131@0ecd2f01", "@opam/dune@opam:2.5.1@f38f376e",
         "@esy-ocaml/substs@0.0.1@d41d8cd9"
       ],
       "devDependencies": [
-        "ocaml@4.10.0@d41d8cd9", "@opam/menhirSdk@opam:20200612@7fa3ce5b",
-        "@opam/menhirLib@opam:20200612@a92e9802",
+        "ocaml@4.10.0@d41d8cd9", "@opam/menhirSdk@opam:20200624@2a05b5a7",
+        "@opam/menhirLib@opam:20200624@8bdd2b0e",
         "@opam/dune@opam:2.5.1@f38f376e"
       ]
     },
@@ -1223,12 +1248,12 @@
         "@opam/result@opam:1.5@6b753c82",
         "@opam/ocamlfind@opam:1.8.1@ff07b0f9",
         "@opam/ocamlbuild@opam:0.14.0@6ac75d03",
-        "@opam/astring@opam:0.8.3@4e5e17d5",
+        "@opam/astring@opam:0.8.4@1215f84d",
         "@esy-ocaml/substs@0.0.1@d41d8cd9"
       ],
       "devDependencies": [
         "ocaml@4.10.0@d41d8cd9", "@opam/result@opam:1.5@6b753c82",
-        "@opam/astring@opam:0.8.3@4e5e17d5"
+        "@opam/astring@opam:0.8.4@1215f84d"
       ]
     },
     "@opam/fix@opam:20200131@0ecd2f01": {
@@ -1332,20 +1357,20 @@
         "@opam/dune@opam:2.5.1@f38f376e"
       ]
     },
-    "@opam/dune-build-info@opam:2.5.1@921e5578": {
-      "id": "@opam/dune-build-info@opam:2.5.1@921e5578",
+    "@opam/dune-build-info@opam:2.6.1@611bb155": {
+      "id": "@opam/dune-build-info@opam:2.6.1@611bb155",
       "name": "@opam/dune-build-info",
-      "version": "opam:2.5.1",
+      "version": "opam:2.6.1",
       "source": {
         "type": "install",
         "source": [
-          "archive:https://opam.ocaml.org/cache/sha256/8f/8f77d3a87f208e0d7cccaa1c48c4bb1bb87d62d07c3f25e9b8ba298e028ce52b#sha256:8f77d3a87f208e0d7cccaa1c48c4bb1bb87d62d07c3f25e9b8ba298e028ce52b",
-          "archive:https://github.com/ocaml/dune/releases/download/2.5.1/dune-2.5.1.tbz#sha256:8f77d3a87f208e0d7cccaa1c48c4bb1bb87d62d07c3f25e9b8ba298e028ce52b"
+          "archive:https://opam.ocaml.org/cache/sha256/5e/5ef959f286448ee172f1cffc86c439a6f7b662676e6015b282db071bb88899a0#sha256:5ef959f286448ee172f1cffc86c439a6f7b662676e6015b282db071bb88899a0",
+          "archive:https://github.com/ocaml/dune/releases/download/2.6.1/dune-2.6.1.tbz#sha256:5ef959f286448ee172f1cffc86c439a6f7b662676e6015b282db071bb88899a0"
         ],
         "opam": {
           "name": "dune-build-info",
-          "version": "2.5.1",
-          "path": "esy.lock/opam/dune-build-info.2.5.1"
+          "version": "2.6.1",
+          "path": "esy.lock/opam/dune-build-info.2.6.1"
         }
       },
       "overrides": [],
@@ -1566,20 +1591,20 @@
         "@opam/dune@opam:2.5.1@f38f376e"
       ]
     },
-    "@opam/astring@opam:0.8.3@4e5e17d5": {
-      "id": "@opam/astring@opam:0.8.3@4e5e17d5",
+    "@opam/astring@opam:0.8.4@1215f84d": {
+      "id": "@opam/astring@opam:0.8.4@1215f84d",
       "name": "@opam/astring",
-      "version": "opam:0.8.3",
+      "version": "opam:0.8.4",
       "source": {
         "type": "install",
         "source": [
-          "archive:https://opam.ocaml.org/cache/md5/c5/c5bf6352b9ac27fbeab342740f4fa870#md5:c5bf6352b9ac27fbeab342740f4fa870",
-          "archive:http://erratique.ch/software/astring/releases/astring-0.8.3.tbz#md5:c5bf6352b9ac27fbeab342740f4fa870"
+          "archive:https://opam.ocaml.org/cache/md5/54/548fcbf501ca4cb816d219ca4f25f660#md5:548fcbf501ca4cb816d219ca4f25f660",
+          "archive:https://erratique.ch/software/astring/releases/astring-0.8.4.tbz#md5:548fcbf501ca4cb816d219ca4f25f660"
         ],
         "opam": {
           "name": "astring",
-          "version": "0.8.3",
-          "path": "esy.lock/opam/astring.0.8.3"
+          "version": "0.8.4",
+          "path": "esy.lock/opam/astring.0.8.4"
         }
       },
       "overrides": [],
@@ -1587,12 +1612,9 @@
         "ocaml@4.10.0@d41d8cd9", "@opam/topkg@opam:1.0.1@a42c631e",
         "@opam/ocamlfind@opam:1.8.1@ff07b0f9",
         "@opam/ocamlbuild@opam:0.14.0@6ac75d03",
-        "@opam/base-bytes@opam:base@19d0c2ff",
         "@esy-ocaml/substs@0.0.1@d41d8cd9"
       ],
-      "devDependencies": [
-        "ocaml@4.10.0@d41d8cd9", "@opam/base-bytes@opam:base@19d0c2ff"
-      ]
+      "devDependencies": [ "ocaml@4.10.0@d41d8cd9" ]
     },
     "@esy-ocaml/substs@0.0.1@d41d8cd9": {
       "id": "@esy-ocaml/substs@0.0.1@d41d8cd9",
