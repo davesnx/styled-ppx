@@ -3,6 +3,7 @@ open Tokens;
 
 let digit = [%sedlex.regexp? '0'..'9'];
 let int = [%sedlex.regexp? Plus(digit)];
+let whitespace = [%sedlex.regexp? ' ' | '\t' | '\n'];
 
 // TODO: is rgb(255 255 255/0) valid?
 
@@ -40,7 +41,7 @@ let rec read = buf =>
   switch%sedlex (buf) {
   | eof => EOF
   | int => INT(lexeme(buf) |> int_of_string)
-  | " " =>
+  | whitespace =>
     let _ = lexeme(buf);
     read(buf);
   | string => STRING(lexeme(buf))
