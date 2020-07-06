@@ -48,10 +48,14 @@ let properties_static_css_tests = [
   ([%expr [%css "opacity: 0.9"]], [%expr [Css.opacity(0.9)]]),
   ([%expr [%css "width: 100vw"]], [%expr [Css.width(Css.vw(100.))]]),
   ([%expr [%css "flex-wrap: wrap"]], [%expr [Css.flexWrap(`wrap)]]),
+  // TODO: generate tests with variables in the future
+  ([%expr [%css "flex-wrap: $var"]], [%expr [Css.flexWrap(var)]]),
+  ([%expr [%css "flex-wrap: $(var)"]], [%expr [Css.flexWrap(var)]]),
   (
     [%expr [%css "flex-flow: row nowrap"]],
     [%expr [Css.flexDirection(`row), Css.flexWrap(`nowrap)]],
   ),
+  // TODO: flex-flow + variables
   ([%expr [%css "order: 5"]], [%expr [Css.order(5)]]),
   ([%expr [%css "flex-grow: 2"]], [%expr [Css.flexGrow(2.)]]),
   ([%expr [%css "flex-grow: 2.5"]], [%expr [Css.flexGrow(2.5)]]),

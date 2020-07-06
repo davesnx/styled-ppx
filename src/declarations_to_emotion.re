@@ -1,8 +1,14 @@
 open Migrate_parsetree;
 open Ast_410;
 open Ast_helper;
+open Longident;
 open Reason_css_parser;
+open Reason_css_lexer;
 open Parser;
+
+/* helpers */
+let txt = txt => {Location.loc: Location.none, txt};
+let lid = name => txt(Lident(name));
 
 let (let.ok) = Result.bind;
 let id = Fun.id;
@@ -63,8 +69,31 @@ let variants_to_expression =
   | `Stretch => id([%expr `stretch])
   | `Auto => id([%expr `auto]);
 
+let variable_rule = {
+  open Rule;
+  open Let;
+
+  let.bind_match () = Pattern.expect(DELIM("$"));
+  let.bind_match _ = Pattern.expect(LEFT_PARENS) |> Modifier.optional;
+  let.bind_match string = Standard.ident;
+  let.bind_match _ = Pattern.expect(RIGHT_PARENS) |> Modifier.optional;
+  return_match(string);
+};
+let variable = parser =>
+  Combinator.combine_xor([
+    Rule.Match.map(variable_rule, data => `Variable(data)),
+    Rule.Match.map(parser, data => `Value(data)),
+  ]);
 let apply = (parser, map, id) =>
-  transform(parser, map, arg => [[%expr [%e id]([%e arg])]]);
+  transform(
+    variable(parser),
+    fun
+    | `Variable(name) => name |> lid |> Exp.ident
+    | `Value(ast) => map(ast),
+    arg =>
+    [[%expr [%e id]([%e arg])]]
+  );
+
 let variants = (parser, identifier) =>
   apply(parser, variants_to_expression, identifier);
 
@@ -74,14 +103,20 @@ let width = _x => [%expr `cm(1.0)];
 let flex_direction =
   variants(property_flex_direction, [%expr Css.flexDirection]);
 let flex_wrap = variants(property_flex_wrap, [%expr Css.flexWrap]);
+
 // shorthand - https://drafts.csswg.org/css-flexbox-1/#flex-flow-property
 let flex_flow =
   transform(
     property_flex_flow,
     id,
     ((direction_ast, wrap_ast)) => {
-      let direction = Option.map(flex_direction.ast_to_expr, direction_ast);
-      let wrap = Option.map(flex_wrap.ast_to_expr, wrap_ast);
+      let direction =
+        Option.map(
+          ast => flex_direction.ast_to_expr(`Value(ast)),
+          direction_ast,
+        );
+      let wrap =
+        Option.map(ast => flex_wrap.ast_to_expr(`Value(ast)), wrap_ast);
       [direction, wrap] |> List.concat_map(Option.value(~default=[]));
     },
   );
@@ -113,15 +148,18 @@ let flex =
           | None => []
           | Some((grow, shrink)) =>
             List.concat([
-              flex_grow.ast_to_expr(grow),
-              Option.map(flex_shrink.ast_to_expr, shrink)
+              flex_grow.ast_to_expr(`Value(grow)),
+              Option.map(
+                ast => flex_shrink.ast_to_expr(`Value(ast)),
+                shrink,
+              )
               |> Option.value(~default=[]),
             ])
           };
         let basis =
           switch (basis) {
           | None => []
-          | Some(basis) => flex_basis.ast_to_expr(basis)
+          | Some(basis) => flex_basis.ast_to_expr(`Value(basis))
           };
         List.concat([grow_shrink, basis]);
       },
@@ -154,7 +192,6 @@ let properties = [
 let support_property = name =>
   properties |> List.exists(((key, _)) => key == name);
 let parse_declarations = ((name, value)) => {
-  let (let.ok) = Result.bind;
   let.ok (_, string_to_expr) =
     properties
     |> List.find_opt(((key, _)) => key == name)
