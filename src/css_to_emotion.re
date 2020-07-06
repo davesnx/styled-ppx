@@ -29,14 +29,6 @@ open Longident;
 open Css_types;
 open Component_value;
 
-module Option = {
-  let get = (opt, def) =>
-    switch (opt) {
-    | None => def
-    | Some(o) => o
-    };
-};
-
 module Emotion = {
   let lident = name => Ldot(Lident("Css"), name);
 };
@@ -713,7 +705,7 @@ and render_declaration =
       d_loc: Location.t,
       _variables: list((string, string)),
     )
-    : expression => {
+    : list(expression) => {
   let (name, name_loc) = d.Declaration.name;
   let fnName = to_caml_case(name);
 
@@ -1103,61 +1095,85 @@ and render_declaration =
     Exp.apply(~loc=name_loc, ident, args);
   };
 
-  let (valueList, loc) = d.Declaration.value;
+  let render_legacy = (valueList, loc) => {
+    let newValueList = List.map(value => value, valueList);
 
-  let newValueList = List.map(value => value, valueList);
-
-  /* TODO: Right know we only support variables with functions that
-     accepts only one argument, in order to change/improve that, we need to
-     "render" variables/typed_variables and static params.
-      */
-  switch (valueList) {
-  | [(Variable(v), _loc)] =>
-    Exp.ident(~loc, {txt: Lident(v), loc}) |> render_unsafe(~loc, name)
-  | [(Ident(string), _loc)] when string |> is_css_wide_keyword =>
-    Const.string(string) |> Exp.constant |> render_unsafe(~loc, name)
-  | _ =>
-    switch (name) {
-    /* | "animation" => render_animation(newValueList, loc) */
-    | "box-shadow" => render_shadow("boxShadows", newValueList, loc)
-    | "text-shadow" => render_shadow("textShadows", newValueList, loc)
-    | "transform" => render_transform(newValueList, loc)
-    | "transition" => render_transition(newValueList, loc)
-    | "font-family" => render_font_family(newValueList, loc)
-    | "z-index" => render_z_index(newValueList, loc)
-    | "stroke-opacity"
-    | "stop-opacity"
-    | "flood-opacity"
-    | "fill-opacity"
-    | "opacity" => render_opacity(newValueList, loc)
-    | "flex-grow"
-    | "flex-shrink" => render_flex_grow_shrink(newValueList, loc)
-    | "font-weight" => render_font_weight(newValueList, loc)
-    | "flex" => render_flex(newValueList, loc)
-    | "padding"
-    | "margin" => render_margin_padding(newValueList, loc)
-    | "border"
-    | "outline" when List.length(fst(d.Declaration.value)) == 2 =>
-      render_border_outline(newValueList, loc)
-    | _ => render_standard_declaration(fnName, valueList)
-    }
+    switch (valueList) {
+    /* TODO: Right know we only support variables with functions that
+       accepts only one argument, in order to change/improve that, we need to
+       "render" variables/typed_variables and static params.
+        */
+    | [(Variable(v), _loc)] =>
+      Exp.ident(~loc, {txt: Lident(v), loc}) |> render_unsafe(~loc, name)
+    | [(Ident(string), _loc)] when string |> is_css_wide_keyword =>
+      Const.string(string) |> Exp.constant |> render_unsafe(~loc, name)
+    | _ =>
+      switch (name) {
+      /* | "animation" => render_animation(newValueList, loc) */
+      | "box-shadow" => render_shadow("boxShadows", newValueList, loc)
+      | "text-shadow" => render_shadow("textShadows", newValueList, loc)
+      | "transform" => render_transform(newValueList, loc)
+      | "transition" => render_transition(newValueList, loc)
+      | "font-family" => render_font_family(newValueList, loc)
+      | "z-index" => render_z_index(newValueList, loc)
+      | "stroke-opacity"
+      | "stop-opacity"
+      | "flood-opacity"
+      | "fill-opacity"
+      | "opacity" => render_opacity(newValueList, loc)
+      | "flex-grow"
+      | "flex-shrink" => render_flex_grow_shrink(newValueList, loc)
+      | "font-weight" => render_font_weight(newValueList, loc)
+      | "flex" => render_flex(newValueList, loc)
+      | "padding"
+      | "margin" => render_margin_padding(newValueList, loc)
+      | "border"
+      | "outline" when List.length(fst(d.Declaration.value)) == 2 =>
+        render_border_outline(newValueList, loc)
+      | _ => render_standard_declaration(fnName, valueList)
+      }
+    };
   };
+  let (valueList, loc) = d.Declaration.value;
+  let value_source = {
+    let Warnings.{loc_start, loc_end, _} = loc;
+    let Lex_buffer.{buf, pos, _} = Lex_buffer.last_buffer^;
+    let pos_offset = pos.Lexing.pos_cnum;
+    let loc_start = loc_start.Lexing.pos_cnum - pos_offset;
+    let loc_end = loc_end.Lexing.pos_cnum - pos_offset;
+    Sedlexing.Latin1.sub_lexeme(buf, loc_start - 1, loc_end - loc_start);
+  };
+
+  Declarations_to_emotion.support_property(name)
+    ? switch (
+        Declarations_to_emotion.parse_declarations((name, value_source))
+      ) {
+      | Ok(exprs) => exprs
+      | Error(`Not_found) => grammar_error(loc, "something weird happened")
+      | Error(`Invalid_value(error)) => grammar_error(loc, error)
+      }
+    : [render_legacy(valueList, loc)];
 }
 and render_declarations =
     (ds: list(Declaration_list.kind), variables): list(expression) =>
-  List.rev_map(
+  List.concat_map(
     declaration =>
       switch (declaration) {
       | Declaration_list.Declaration(decl) =>
-        render_declaration(decl, decl.loc, Option.get(variables, []))
-      | Declaration_list.At_rule(ar) => render_at_rule(ar)
+        render_declaration(
+          decl,
+          decl.loc,
+          Option.value(~default=[], variables),
+        )
+      | Declaration_list.At_rule(ar) => [render_at_rule(ar)]
       | Declaration_list.Style_rule(ar) =>
         let loc: Location.t = ar.loc;
         let ident = Exp.ident(~loc, {txt: Emotion.lident("selector"), loc});
-        render_style_rule(ident, ar);
+        [render_style_rule(ident, ar)];
       },
     ds,
   )
+  |> List.rev
 and render_declaration_list =
     ((list, loc): Declaration_list.t, variables): expression => {
   let expr_with_loc_list = render_declarations(list, variables);

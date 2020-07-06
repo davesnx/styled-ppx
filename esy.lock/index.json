@@ -1,5 +1,5 @@
 {
-  "checksum": "97295476278239d7499cd4dad6cf9f4b",
+  "checksum": "4d654661c0586dad634ff2fd7a45b967",
   "root": "styled-ppx@link-dev:./package.json",
   "node": {
     "styled-ppx@link-dev:./package.json": {
@@ -14,7 +14,7 @@
       "overrides": [],
       "dependencies": [],
       "devDependencies": [
-        "reason-css-parser@github:EduardoRFS/reason-css-parser:package.json#6987406d414c3bd9fe32204d45dd97b0401bbfa2@d41d8cd9",
+        "reason-css-parser@github:EduardoRFS/reason-css-parser:package.json#8cdbf80e4add7b65a37ee90e7d33f4fcf2a84a64@d41d8cd9",
         "ocaml@4.10.0@d41d8cd9", "@reason-native/rely@3.2.1@d41d8cd9",
         "@opam/sedlex@opam:2.2@ffde36c0",
         "@opam/ocaml-migrate-parsetree@opam:1.7.3@dbcf3b47",
@@ -25,16 +25,16 @@
         "@esy-ocaml/reason@github:facebook/reason:reason.json#773dbcd@d41d8cd9"
       ]
     },
-    "reason-css-vds@github:EduardoRFS/reason-css-vds:package.json#86633fe91a927920929a384403c87f902f414f6e@d41d8cd9": {
+    "reason-css-vds@github:EduardoRFS/reason-css-vds:package.json#62124663c320bfd4a27ec45e639b741d9ac1e74f@d41d8cd9": {
       "id":
-        "reason-css-vds@github:EduardoRFS/reason-css-vds:package.json#86633fe91a927920929a384403c87f902f414f6e@d41d8cd9",
+        "reason-css-vds@github:EduardoRFS/reason-css-vds:package.json#62124663c320bfd4a27ec45e639b741d9ac1e74f@d41d8cd9",
       "name": "reason-css-vds",
       "version":
-        "github:EduardoRFS/reason-css-vds:package.json#86633fe91a927920929a384403c87f902f414f6e",
+        "github:EduardoRFS/reason-css-vds:package.json#62124663c320bfd4a27ec45e639b741d9ac1e74f",
       "source": {
         "type": "install",
         "source": [
-          "github:EduardoRFS/reason-css-vds:package.json#86633fe91a927920929a384403c87f902f414f6e"
+          "github:EduardoRFS/reason-css-vds:package.json#62124663c320bfd4a27ec45e639b741d9ac1e74f"
         ]
       },
       "overrides": [],
@@ -44,32 +44,57 @@
         "@opam/ppx_deriving@opam:4.5@bb81afdc",
         "@opam/ocamlformat@opam:0.14.2@d742ffd5",
         "@opam/menhir@opam:20200211@26571604",
+        "@opam/dune-private-libs@opam:2.5.1@60c1661f",
+        "@opam/dune-configurator@opam:2.5.1@aeb9d8d5",
         "@opam/dune@opam:2.5.1@f38f376e",
         "@esy-ocaml/reason@github:facebook/reason:reason.json#773dbcd@d41d8cd9"
       ],
       "devDependencies": []
     },
-    "reason-css-parser@github:EduardoRFS/reason-css-parser:package.json#6987406d414c3bd9fe32204d45dd97b0401bbfa2@d41d8cd9": {
+    "reason-css-parser@github:EduardoRFS/reason-css-parser:package.json#8cdbf80e4add7b65a37ee90e7d33f4fcf2a84a64@d41d8cd9": {
       "id":
-        "reason-css-parser@github:EduardoRFS/reason-css-parser:package.json#6987406d414c3bd9fe32204d45dd97b0401bbfa2@d41d8cd9",
+        "reason-css-parser@github:EduardoRFS/reason-css-parser:package.json#8cdbf80e4add7b65a37ee90e7d33f4fcf2a84a64@d41d8cd9",
       "name": "reason-css-parser",
       "version":
-        "github:EduardoRFS/reason-css-parser:package.json#6987406d414c3bd9fe32204d45dd97b0401bbfa2",
+        "github:EduardoRFS/reason-css-parser:package.json#8cdbf80e4add7b65a37ee90e7d33f4fcf2a84a64",
       "source": {
         "type": "install",
         "source": [
-          "github:EduardoRFS/reason-css-parser:package.json#6987406d414c3bd9fe32204d45dd97b0401bbfa2"
+          "github:EduardoRFS/reason-css-parser:package.json#8cdbf80e4add7b65a37ee90e7d33f4fcf2a84a64"
         ]
       },
       "overrides": [],
       "dependencies": [
-        "reason-css-vds@github:EduardoRFS/reason-css-vds:package.json#86633fe91a927920929a384403c87f902f414f6e@d41d8cd9",
+        "reason-css-vds@github:EduardoRFS/reason-css-vds:package.json#62124663c320bfd4a27ec45e639b741d9ac1e74f@d41d8cd9",
+        "reason-css-lexer@github:EduardoRFS/reason-css-lexer:package.json#33d95c56005d6c169c46869da7e6aac75c36c441@d41d8cd9",
         "ocaml@4.10.0@d41d8cd9", "@reason-native/rely@3.2.1@d41d8cd9",
         "@opam/sedlex@github:ocaml-community/sedlex:sedlex.opam#25c0dbd82c7fc5d91102f5bd21db1411f2c46323@d41d8cd9",
         "@opam/ppx_tools_versioned@opam:5.4.0@48c10ee1",
         "@opam/ppx_deriving@opam:4.5@bb81afdc",
         "@opam/ocamlformat@opam:0.14.2@d742ffd5",
         "@opam/ocaml-migrate-parsetree@opam:1.7.3@dbcf3b47",
+        "@opam/dune@opam:2.5.1@f38f376e",
+        "@esy-ocaml/reason@github:facebook/reason:reason.json#773dbcd@d41d8cd9"
+      ],
+      "devDependencies": []
+    },
+    "reason-css-lexer@github:EduardoRFS/reason-css-lexer:package.json#33d95c56005d6c169c46869da7e6aac75c36c441@d41d8cd9": {
+      "id":
+        "reason-css-lexer@github:EduardoRFS/reason-css-lexer:package.json#33d95c56005d6c169c46869da7e6aac75c36c441@d41d8cd9",
+      "name": "reason-css-lexer",
+      "version":
+        "github:EduardoRFS/reason-css-lexer:package.json#33d95c56005d6c169c46869da7e6aac75c36c441",
+      "source": {
+        "type": "install",
+        "source": [
+          "github:EduardoRFS/reason-css-lexer:package.json#33d95c56005d6c169c46869da7e6aac75c36c441"
+        ]
+      },
+      "overrides": [],
+      "dependencies": [
+        "ocaml@4.10.0@d41d8cd9", "@reason-native/rely@3.2.1@d41d8cd9",
+        "@opam/sedlex@github:ocaml-community/sedlex:sedlex.opam#25c0dbd82c7fc5d91102f5bd21db1411f2c46323@d41d8cd9",
+        "@opam/ppx_deriving@opam:4.5@bb81afdc",
         "@opam/dune@opam:2.5.1@f38f376e",
         "@esy-ocaml/reason@github:facebook/reason:reason.json#773dbcd@d41d8cd9"
       ],
@@ -1281,20 +1306,20 @@
         "ocaml@4.10.0@d41d8cd9", "@opam/dune@opam:2.5.1@f38f376e"
       ]
     },
-    "@opam/dune-private-libs@opam:2.6.1@31997d39": {
-      "id": "@opam/dune-private-libs@opam:2.6.1@31997d39",
+    "@opam/dune-private-libs@opam:2.5.1@60c1661f": {
+      "id": "@opam/dune-private-libs@opam:2.5.1@60c1661f",
       "name": "@opam/dune-private-libs",
-      "version": "opam:2.6.1",
+      "version": "opam:2.5.1",
       "source": {
         "type": "install",
         "source": [
-          "archive:https://opam.ocaml.org/cache/sha256/5e/5ef959f286448ee172f1cffc86c439a6f7b662676e6015b282db071bb88899a0#sha256:5ef959f286448ee172f1cffc86c439a6f7b662676e6015b282db071bb88899a0",
-          "archive:https://github.com/ocaml/dune/releases/download/2.6.1/dune-2.6.1.tbz#sha256:5ef959f286448ee172f1cffc86c439a6f7b662676e6015b282db071bb88899a0"
+          "archive:https://opam.ocaml.org/cache/sha256/8f/8f77d3a87f208e0d7cccaa1c48c4bb1bb87d62d07c3f25e9b8ba298e028ce52b#sha256:8f77d3a87f208e0d7cccaa1c48c4bb1bb87d62d07c3f25e9b8ba298e028ce52b",
+          "archive:https://github.com/ocaml/dune/releases/download/2.5.1/dune-2.5.1.tbz#sha256:8f77d3a87f208e0d7cccaa1c48c4bb1bb87d62d07c3f25e9b8ba298e028ce52b"
         ],
         "opam": {
           "name": "dune-private-libs",
-          "version": "2.6.1",
-          "path": "esy.lock/opam/dune-private-libs.2.6.1"
+          "version": "2.5.1",
+          "path": "esy.lock/opam/dune-private-libs.2.5.1"
         }
       },
       "overrides": [],
@@ -1324,11 +1349,11 @@
       },
       "overrides": [],
       "dependencies": [
-        "@opam/dune-private-libs@opam:2.6.1@31997d39",
+        "@opam/dune-private-libs@opam:2.5.1@60c1661f",
         "@opam/dune@opam:2.5.1@f38f376e", "@esy-ocaml/substs@0.0.1@d41d8cd9"
       ],
       "devDependencies": [
-        "@opam/dune-private-libs@opam:2.6.1@31997d39",
+        "@opam/dune-private-libs@opam:2.5.1@60c1661f",
         "@opam/dune@opam:2.5.1@f38f376e"
       ]
     },

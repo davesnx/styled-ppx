@@ -29,11 +29,15 @@ let of_sedlex = (~file="<n/a>", ~pos=?, buf) => {
   {buf, pos, pos_mark: pos, last_char: None, last_char_mark: None};
 };
 
-let of_ascii_string = (~pos=?, s) =>
+let last_buffer = ref(of_sedlex(Sedlexing.Latin1.from_string("")));
+let of_ascii_string = (~pos=?, s) => {
+  last_buffer := of_sedlex(~pos?, Sedlexing.Latin1.from_string(s));
   of_sedlex(~pos?, Sedlexing.Latin1.from_string(s));
+};
 
 let of_ascii_file = file => {
   let chan = open_in(file);
+  last_buffer := of_sedlex(~file, Sedlexing.Latin1.from_channel(chan));
   of_sedlex(~file, Sedlexing.Latin1.from_channel(chan));
 };
 
@@ -121,28 +125,8 @@ let utf8 = (~skip=0, ~drop=0, lexbuf) => {
 
 let container_lnum_ref = ref(0);
 
-let fix_loc = loc => {
-  let fix_pos = pos => {
-    /* It looks like lex_buffer.ml returns a position with 2 extra
-     * chars for parsed lines after the first one. Bug? */
-    let pos_cnum =
-      if (pos.Lexing.pos_lnum > container_lnum_ref^) {
-        pos.Lexing.pos_cnum - 2;
-      } else {
-        pos.Lexing.pos_cnum;
-      };
-    {...pos, Lexing.pos_cnum};
-  };
-  let loc_start = fix_pos(loc.Location.loc_start);
-  let loc_end = fix_pos(loc.Location.loc_end);
-  {...loc, Location.loc_start, loc_end};
-};
-
 let make_loc = (~loc_ghost=false, start_pos, end_pos): Location.t => {
   Location.loc_start: start_pos,
   loc_end: end_pos,
   loc_ghost,
 };
-
-let make_loc_and_fix = (~loc_ghost=false, start_pos, end_pos): Location.t =>
-  make_loc(~loc_ghost, start_pos, end_pos) |> fix_loc;
