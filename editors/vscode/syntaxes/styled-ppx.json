@@ -1,0 +1,20 @@
+{
+  "scopeName": "inline.styled.reason",
+  "fileTypes": [
+    "re",
+    "ml"
+  ],
+  "injectionSelector": "L:source -comment -string",
+  "patterns": [
+    {
+      "contentName": "meta.embedded.block.css",
+      "begin": "(\\[%(styled\\.?([a-zA-Z]*)?))",
+      "end": "(?<=])",
+      "patterns": [
+        {
+          "include": "source.css.styled"
+        }
+      ]
+    }
+  ]
+}

@@ -694,20 +694,20 @@
         "@opam/dune@opam:2.5.1@f38f376e"
       ]
     },
-    "@opam/ppx_tools@opam:6.1+4.10.0@d7f16ed7": {
-      "id": "@opam/ppx_tools@opam:6.1+4.10.0@d7f16ed7",
+    "@opam/ppx_tools@opam:6.2@62a3aff2": {
+      "id": "@opam/ppx_tools@opam:6.2@62a3aff2",
       "name": "@opam/ppx_tools",
-      "version": "opam:6.1+4.10.0",
+      "version": "opam:6.2",
       "source": {
         "type": "install",
         "source": [
-          "archive:https://opam.ocaml.org/cache/md5/02/02fe2fab316e4a8b39d899e5839d7eec#md5:02fe2fab316e4a8b39d899e5839d7eec",
-          "archive:https://github.com/ocaml-ppx/ppx_tools/archive/6.1+4.10.0.tar.gz#md5:02fe2fab316e4a8b39d899e5839d7eec"
+          "archive:https://opam.ocaml.org/cache/md5/68/68b05e0794c475c384b9285d1156d1f3#md5:68b05e0794c475c384b9285d1156d1f3",
+          "archive:https://github.com/ocaml-ppx/ppx_tools/archive/6.2.tar.gz#md5:68b05e0794c475c384b9285d1156d1f3"
         ],
         "opam": {
           "name": "ppx_tools",
-          "version": "6.1+4.10.0",
-          "path": "esy.lock/opam/ppx_tools.6.1+4.10.0"
+          "version": "6.2",
+          "path": "esy.lock/opam/ppx_tools.6.2"
         }
       },
       "overrides": [],
@@ -739,7 +739,7 @@
       "dependencies": [
         "ocaml@4.10.0@d41d8cd9", "@opam/result@opam:1.5@6b753c82",
         "@opam/ppxfind@opam:1.4@1e01d2a5",
-        "@opam/ppx_tools@opam:6.1+4.10.0@d7f16ed7",
+        "@opam/ppx_tools@opam:6.2@62a3aff2",
         "@opam/ppx_derivers@opam:1.2.1@ecf0aa45",
         "@opam/ocaml-migrate-parsetree@opam:1.7.3@dbcf3b47",
         "@opam/dune@opam:2.5.1@f38f376e", "@opam/cppo@opam:1.6.6@f4f83858",
@@ -747,7 +747,7 @@
       ],
       "devDependencies": [
         "ocaml@4.10.0@d41d8cd9", "@opam/result@opam:1.5@6b753c82",
-        "@opam/ppx_tools@opam:6.1+4.10.0@d7f16ed7",
+        "@opam/ppx_tools@opam:6.2@62a3aff2",
         "@opam/ppx_derivers@opam:1.2.1@ecf0aa45",
         "@opam/ocaml-migrate-parsetree@opam:1.7.3@dbcf3b47",
         "@opam/dune@opam:2.5.1@f38f376e"

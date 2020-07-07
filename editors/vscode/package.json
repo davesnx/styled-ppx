@@ -1,0 +1,61 @@
+{
+  "name": "vscode-styled-ppx",
+  "displayName": "vscode-styled-ppx",
+  "description": "Syntax highlighting for styled-ppx",
+  "version": "0.0.1",
+  "publisher": "davesnx",
+  "icon": "logo.png",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/davesnx/styled-ppx.git"
+  },
+  "engines": {
+    "vscode": "^1.5.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "scripts": {
+    "format": "prettier --write '**/*.{js,jsx,md,json,css}'",
+    "prepare": "node ./node_modules/vscode/bin/install"
+  },
+  "contributes": {
+    "languages": [
+      {
+        "id": "source.css.styled-ppx",
+        "extensions": [
+          ".re",
+          ".ml"
+        ],
+        "configuration": "./reason.configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "source.css.styled-ppx",
+        "scopeName": "source.css.styled-ppx",
+        "path": "./syntaxes/css.styled.json"
+      },
+      {
+        "injectTo": [
+          "source.reason",
+          "source.re",
+          "source.ml",
+          "source.ocaml"
+        ],
+        "scopeName": "inline.styled.reason",
+        "path": "./syntaxes/styled-ppx.json",
+        "embeddedLanguages": {
+          "source.css.scss": "css",
+          "meta.embedded.block.css": "css"
+        }
+      }
+    ]
+  },
+  "devDependencies": {
+    "prettier": "^1.14.3",
+    "prettier-cli": "^0.1.0",
+    "vscode": "^1.1.26"
+  }
+}
