@@ -25,12 +25,14 @@ module App = [%styled.div
   & > div {
     padding: 20px;
   }
+
   & > a:nth-child(3n+2) {
     background-color: green;
   }
   & > a:nth-child(even) {
     background-color: red;
   }
+
   &::active {
     background-color: blue;
   }
@@ -55,10 +57,10 @@ let space = "10px";
 
 module Component = [%styled
   (~background: string, ~space: string) => {j|
-  background-color: $background;
-  padding: $space;
-  border-radius: 20px;
-  box-sizing: border-box;
+    background-color: $background;
+    padding: $space;
+    border-radius: 20px;
+    box-sizing: border-box;
 |j}
 ];
 

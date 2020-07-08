@@ -1,12 +1,8 @@
-(menhir
- (modules css_parser)
- (flags --explain))
-
 (library
  (name styled_ppx)
  (wrapped false)
  (public_name styled-ppx.lib)
  (kind ppx_rewriter)
- (libraries sedlex menhirLib ocaml-migrate-parsetree reason-css-parser.lib)
+ (libraries styled_ppx_parser ocaml-migrate-parsetree reason-css-parser.lib)
  (preprocess
-  (pps sedlex.ppx)))
+  (pps ppx_tools_versioned.metaquot_410)))

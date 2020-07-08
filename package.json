@@ -41,8 +41,8 @@
     "@opam/ocaml-migrate-parsetree": "^1.7.3",
     "@opam/sedlex": "*",
     "@reason-native/rely": "^3.2.1",
-    "@opam/ocaml-lsp-server": "ocaml/ocaml-lsp:ocaml-lsp-server.opam",
-    "reason-css-parser": "EduardoRFS/reason-css-parser:package.json#6987406d414c3bd9fe32204d45dd97b0401bbfa2"
+    "@opam/ocaml-lsp-server": "ocaml/ocaml-lsp:ocaml-lsp-server.opam#fbc433e14035d520c7137916ae710b8ec3b415e9",
+    "reason-css-parser": "EduardoRFS/reason-css-parser:package.json#8cdbf80e4add7b65a37ee90e7d33f4fcf2a84a64"
   },
   "resolutions": {
     "@esy-ocaml/reason": "facebook/reason:reason.json#773dbcd"

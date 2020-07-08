@@ -4,6 +4,7 @@
   "description": "Syntax highlighting for styled-ppx",
   "version": "0.0.1",
   "publisher": "davesnx",
+  "icon": "logo.png",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -17,32 +18,38 @@
   ],
   "scripts": {
     "format": "prettier --write '**/*.{js,jsx,md,json,css}'",
-    "prepare": "node ./node_modules/vscode/bin/install",
-    "test": "node ./node_modules/vscode/bin/test ./test"
+    "prepare": "node ./node_modules/vscode/bin/install"
   },
   "contributes": {
     "languages": [
       {
-        "id": "source.css.styled",
-        "configuration": "./css.styled.configuration.json"
+        "id": "source.css.styled-ppx",
+        "extensions": [
+          ".re",
+          ".ml"
+        ],
+        "configuration": "./reason.configuration.json"
       }
     ],
     "grammars": [
       {
-        "language": "source.css.styled",
-        "scopeName": "source.css.styled",
-        "path": "./syntaxes/css.styled.json",
-        "embeddedLanguages": {
-          "meta.embedded.block.css": "css"
-        }
+        "language": "source.css.styled-ppx",
+        "scopeName": "source.css.styled-ppx",
+        "path": "./syntaxes/css.styled.json"
       },
       {
         "injectTo": [
           "source.reason",
-          "source.ml"
+          "source.re",
+          "source.ml",
+          "source.ocaml"
         ],
         "scopeName": "inline.styled.reason",
-        "path": "./syntaxes/styled-ppx.json"
+        "path": "./syntaxes/styled-ppx.json",
+        "embeddedLanguages": {
+          "source.css.scss": "css",
+          "meta.embedded.block.css": "css"
+        }
       }
     ]
   },

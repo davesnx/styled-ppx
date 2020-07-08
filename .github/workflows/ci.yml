@@ -36,7 +36,7 @@ jobs:
             ${{ runner.OS }}-
 
       - name: Install esy
-        run: npm install -g esy@0.6.0
+        run: npm install -g esy@0.6.6
 
       - name: Import dependencies
         if: steps.cache.outputs.cache-hit == 'true'
@@ -87,7 +87,7 @@ jobs:
             ${{ runner.OS }}-
 
       - name: Install esy
-        run: npm install -g esy@0.6.0
+        run: npm install -g esy@0.6.6
 
       - name: Import dependencies
         if: steps.cache.outputs.cache-hit == 'true'
@@ -111,10 +111,10 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
 
-#     - name: Import dependencies
-#       if: steps.cache.outputs.cache-hit == 'true'
-#       run: esy import-build _export/*
-#       working-directory: ./test/bucklescript
+      #     - name: Import dependencies
+      #       if: steps.cache.outputs.cache-hit == 'true'
+      #       run: esy import-build _export/*
+      #       working-directory: ./test/bucklescript
 
       - name: Install Yarn dependencies
         run: yarn
