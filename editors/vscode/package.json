@@ -1,14 +1,13 @@
 {
-  "name": "vscode-styled-components",
-  "displayName": "vscode-styled-components",
-  "description": "Syntax highlighting for styled-components",
+  "name": "vscode-styled-ppx",
+  "displayName": "vscode-styled-ppx",
+  "description": "Syntax highlighting for styled-ppx",
   "version": "0.0.1",
   "publisher": "davesnx",
-  "icon": "logo.png",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/styled-components/vscode-styled-components.git"
+    "url": "https://github.com/davesnx/styled-ppx.git"
   },
   "engines": {
     "vscode": "^1.5.0"
