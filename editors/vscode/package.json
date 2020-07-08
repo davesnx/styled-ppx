@@ -4,7 +4,6 @@
   "description": "Syntax highlighting for styled-ppx",
   "version": "0.0.1",
   "publisher": "davesnx",
-  "icon": "logo.png",
   "license": "MIT",
   "repository": {
     "type": "git",
