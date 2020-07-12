@@ -38,15 +38,167 @@ let properties_static_css_tests = [
     [%expr [Css.flexDirection(`column)]],
   ),
   ([%expr [%css "font-size: 30px"]], [%expr [Css.fontSize(Css.px(30))]]),
-  ([%expr [%css "height: 100vh"]], [%expr [Css.height(Css.vh(100.))]]),
+  ([%expr [%css "height: 100vh"]], [%expr [Css.height(`vh(100.))]]),
   (
     [%expr [%css "justify-content: center"]],
     [%expr [Css.justifyContent(`center)]],
   ),
   ([%expr [%css "margin: 0"]], [%expr [Css.margin(`zero)]]),
-  ([%expr [%css "margin: 5px"]], [%expr [Css.margin(Css.px(5))]]),
+  ([%expr [%css "margin: 5px"]], [%expr [Css.margin(`pxFloat(5.))]]),
   ([%expr [%css "opacity: 0.9"]], [%expr [Css.opacity(0.9)]]),
-  ([%expr [%css "width: 100vw"]], [%expr [Css.width(Css.vw(100.))]]),
+  ([%expr [%css "width: 100vw"]], [%expr [Css.width(`vw(100.))]]),
+  // css-sizing-3
+  ([%expr [%css "width: auto"]], [%expr [Css.width(`auto)]]),
+  ([%expr [%css "width: 0"]], [%expr [Css.width(`zero)]]),
+  ([%expr [%css "height: 5px"]], [%expr [Css.height(`pxFloat(5.))]]),
+  ([%expr [%css "min-width: 5%"]], [%expr [Css.minWidth(`percent(5.))]]),
+  ([%expr [%css "min-height: 5em"]], [%expr [Css.minHeight(`em(5.))]]),
+  ([%expr [%css "max-width: none"]], [%expr [Css.maxWidth(`none)]]),
+  ([%expr [%css "max-height: 3vh"]], [%expr [Css.maxHeight(`vh(3.))]]),
+  (
+    [%expr [%css "box-sizing: border-box"]],
+    [%expr [Css.boxSizing(`borderBox)]],
+  ),
+  // css-box-3
+  ([%expr [%css "margin-top: auto"]], [%expr [Css.marginTop(`auto)]]),
+  (
+    [%expr [%css "margin-right: 1px"]],
+    [%expr [Css.marginRight(`pxFloat(1.))]],
+  ),
+  (
+    [%expr [%css "margin-bottom: 2px"]],
+    [%expr [Css.marginBottom(`pxFloat(2.))]],
+  ),
+  (
+    [%expr [%css "margin-left: 3px"]],
+    [%expr [Css.marginLeft(`pxFloat(3.))]],
+  ),
+  ([%expr [%css "margin: 1px"]], [%expr [Css.margin(`pxFloat(1.))]]),
+  (
+    [%expr [%css "margin: 1px 2px"]],
+    [%expr [Css.margin2(~v=`pxFloat(1.), ~h=`pxFloat(2.))]],
+  ),
+  (
+    [%expr [%css "margin: 1px 2px 3px"]],
+    [%expr
+      [
+        Css.margin3(
+          ~top=`pxFloat(1.),
+          ~h=`pxFloat(2.),
+          ~bottom=`pxFloat(3.),
+        ),
+      ]
+    ],
+  ),
+  (
+    [%expr [%css "margin: 1px 2px 3px 4px"]],
+    [%expr
+      [
+        Css.margin4(
+          ~top=`pxFloat(1.),
+          ~right=`pxFloat(2.),
+          ~bottom=`pxFloat(3.),
+          ~left=`pxFloat(4.),
+        ),
+      ]
+    ],
+  ),
+  ([%expr [%css "padding-top: 0"]], [%expr [Css.paddingTop(`zero)]]),
+  (
+    [%expr [%css "padding-right: 1px"]],
+    [%expr [Css.paddingRight(`pxFloat(1.))]],
+  ),
+  (
+    [%expr [%css "padding-bottom: 2px"]],
+    [%expr [Css.paddingBottom(`pxFloat(2.))]],
+  ),
+  (
+    [%expr [%css "padding-left: 3px"]],
+    [%expr [Css.paddingLeft(`pxFloat(3.))]],
+  ),
+  ([%expr [%css "padding: 1px"]], [%expr [Css.padding(`pxFloat(1.))]]),
+  (
+    [%expr [%css "padding: 1px 2px"]],
+    [%expr [Css.padding2(~v=`pxFloat(1.), ~h=`pxFloat(2.))]],
+  ),
+  (
+    [%expr [%css "padding: 1px 2px 3px"]],
+    [%expr
+      [
+        Css.padding3(
+          ~top=`pxFloat(1.),
+          ~h=`pxFloat(2.),
+          ~bottom=`pxFloat(3.),
+        ),
+      ]
+    ],
+  ),
+  (
+    [%expr [%css "padding: 1px 2px 3px 4px"]],
+    [%expr
+      [
+        Css.padding4(
+          ~top=`pxFloat(1.),
+          ~right=`pxFloat(2.),
+          ~bottom=`pxFloat(3.),
+          ~left=`pxFloat(4.),
+        ),
+      ]
+    ],
+  ),
+  // css-overflow-3
+  ([%expr [%css "overflow-x: auto"]], [%expr [Css.overflowX(`auto)]]),
+  ([%expr [%css "overflow-y: hidden"]], [%expr [Css.overflowY(`hidden)]]),
+  ([%expr [%css "overflow: scroll"]], [%expr [Css.overflow(`scroll)]]),
+  (
+    [%expr [%css "overflow: scroll visible"]],
+    [%expr [Css.overflowX(`scroll), Css.overflowY(`visible)]],
+  ),
+  ([%expr [%css "text-overflow: clip"]], [%expr [Css.textOverflow(`clip)]]),
+  (
+    [%expr [%css "text-overflow: ellipsis"]],
+    [%expr [Css.textOverflow(`ellipsis)]],
+  ),
+  // css-text-3
+  (
+    [%expr [%css "text-transform: capitalize"]],
+    [%expr [Css.textTransform(`capitalize)]],
+  ),
+  (
+    [%expr [%css "white-space: break-spaces"]],
+    [%expr [Css.whiteSpace(`breakSpaces)]],
+  ),
+  (
+    [%expr [%css "word-break: keep-all"]],
+    [%expr [Css.wordBreak(`keepAll)]],
+  ),
+  (
+    [%expr [%css "overflow-wrap: anywhere"]],
+    [%expr [Css.overflowWrap(`anywhere)]],
+  ),
+  ([%expr [%css "word-wrap: normal"]], [%expr [Css.wordWrap(`normal)]]),
+  ([%expr [%css "text-align: start"]], [%expr [Css.textAlign(`start)]]),
+  (
+    [%expr [%css "word-spacing: normal"]],
+    [%expr [Css.wordSpacing(`normal)]],
+  ),
+  (
+    [%expr [%css "word-spacing: 5px"]],
+    [%expr [Css.wordSpacing(`pxFloat(5.))]],
+  ),
+  (
+    [%expr [%css "letter-spacing: normal"]],
+    [%expr [Css.letterSpacing(`normal)]],
+  ),
+  (
+    [%expr [%css "letter-spacing: 5px"]],
+    [%expr [Css.letterSpacing(`pxFloat(5.))]],
+  ),
+  (
+    [%expr [%css "text-indent: 5%"]],
+    [%expr [Css.textIndent(`percent(5.))]],
+  ),
+  // css-flexbox-1
   ([%expr [%css "flex-wrap: wrap"]], [%expr [Css.flexWrap(`wrap)]]),
   // TODO: generate tests with variables in the future
   ([%expr [%css "flex-wrap: $var"]], [%expr [Css.flexWrap(var)]]),
@@ -116,7 +268,7 @@ describe("emit bs-css from static [%css]", ({test, _}) => {
 
 let properties_variable_css_tests = [
   ([%expr [%css "color: $var"]], [%expr [Css.unsafe("color", var)]]),
-  ([%expr [%css "margin: $var"]], [%expr [Css.unsafe("margin", var)]]),
+  // TODO: ([%expr [%css "margin: $var"]], [%expr [Css.margin("margin", var)]]),
 ];
 describe("emit bs-css from variable [%css]", ({test, _}) => {
   let test = (index, (result, expected)) =>

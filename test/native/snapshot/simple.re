@@ -26,11 +26,12 @@ module Component = [%styled {j|
   display: block;
 |j}];
 
-module Component = [%styled
-  (~space: string) => {j|
-  margin: 10px $(space)px;
-|j}
-];
+// TODO:
+// module Component = [%styled
+//   (~space: string) => {j|
+//   margin: 10px $(space)px;
+// |j}
+// ];
 
 [%css "display: block"];
 
