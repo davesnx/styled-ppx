@@ -36,26 +36,26 @@ ReactDOMRe.renderToElementWithId(
 
 ### Dynamic styled component
 ```reason
-module Dynamic = [%styled (~content, ~background) => {j|
-  color: $(content);
-  background-color: $(background);
+module Dynamic = [%styled (~color, ~background) => {j|
+  color: $color;
+  background-color: $background;
 |j}];
 
 ReactDOMRe.renderToElementWithId(
-  <Dynamic content="#EB5757" background="#516CF0" />
-      {React.string("Hello!")}
+  <Dynamic color="#EB5757" background="#516CF0">
+    {React.string("Hello!")}
   </Dynamic>,
-  "app"
+  "app",
 );
 ```
 
 ### Inline css function
 ```reason
 ReactDOMRe.renderToElementWithId(
-  <span className=[%css "font-size: 34px"]/>
+  <span className=[%css "font-size: 34px"]>
     {React.string("Hello!")}
   </span>,
-  "app"
+  "app",
 );
 ```
 
