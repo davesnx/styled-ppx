@@ -18,8 +18,12 @@ type best('left_in, 'left_v, 'right_in, 'right_v, 'c) =
 module Data = {
   let return = (data, tokens) => (data, tokens);
   let bind = (rule, f, tokens) => {
-    let (data, tokens) = rule(tokens);
-    f(data, tokens);
+    let (data, remaining_tokens) = rule(tokens);
+    // TODO: maybe combinators should guarantee that
+    switch (data) {
+    | Ok(data) => f(Ok(data), remaining_tokens)
+    | Error(message) => f(Error(message), tokens)
+    };
   };
   let map = (rule, f) => bind(rule, value => return(f(value)));
   let bind_shortest_or_longest = (shortest, (left, right), f, tokens) => {

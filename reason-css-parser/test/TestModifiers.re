@@ -85,6 +85,7 @@ describe("repeat", ({test, _}) => {
     expect.result(parse("53")).toBeError();
     expect.result(parse("54, 55")).toBe(Ok([54, 55]));
     expect.result(parse("56, 57, 58")).toBe(Ok([56, 57, 58]));
+    expect.result(parse("59, 60, 61,")).toBeError();
     expect.result(parse("59, 60, 61, 62")).toBeError();
   });
   test("[<integer> A]{2,3}", ({expect, _}) => {
