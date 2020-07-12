@@ -103,12 +103,7 @@ module Pattern = {
     token(
       fun
       | token when token == expected => Ok()
-      // TODO: serialize tokens
-      | _ =>
-        switch (expected) {
-        | STRING(str) => Error("expected " ++ str)
-        | _ => Error("expected ")
-        },
+      | _ => Error("expected " ++ show_token(expected)),
     );
   let value = (value, rule) => Match.bind(rule, () => Match.return(value));
 };
