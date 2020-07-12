@@ -7,6 +7,9 @@ open Rule.Match;
 let (let.ok) = Result.bind;
 
 let keyword = string => expect(IDENT(string));
+let comma = expect(COMMA);
+let delim = string => expect(DELIM(string));
+
 let function_call = (name, rule) => {
   let.bind_match () =
     token(

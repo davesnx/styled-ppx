@@ -123,9 +123,19 @@ let rec create_value_parser = value => {
     let rule =
       switch (kind) {
       | Keyword(name) =>
-        let name = Const.string(name) |> Exp.constant;
-        let expr = [%expr keyword([%e name])];
-        expr;
+        // TODO: find a better way to separate keywords of delimiters
+        switch (name) {
+        | "," =>
+          %expr
+          comma
+        | "/" =>
+          %expr
+          delim("/")
+        | _ =>
+          let name = Const.string(name) |> Exp.constant;
+          let expr = [%expr keyword([%e name])];
+          expr;
+        }
       | Data_type(name) => value_name_of_css(name) |> lident
       | Property_type(name) =>
         property_value_name(name) |> value_name_of_css |> lident
