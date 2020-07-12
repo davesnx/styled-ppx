@@ -17,29 +17,30 @@ This is how you can write components in ReasonML or OCaml with this ppx:
 
 ### Standard styled component
 ```reason
-module StyledComponent = [%styled.div {|
-  display: flex;
-  justify-content: center;
+module StyledComponent = [%styled.div
+  {|
   align-items: center;
-
+  display: flex;
   height: 100vh;
+  justify-content: center;
   width: 100vw;
-|}];
+|}
+];
 
 ReactDOMRe.renderToElementWithId(
-  <StyledComponent>
-    {React.string("- Middle -")}
-  </StyledComponent>,
-  "app"
+  <StyledComponent> {React.string("- Middle -")} </StyledComponent>,
+  "app",
 );
 ```
 
 ### Dynamic styled component
 ```reason
-module Dynamic = [%styled (~color, ~background) => {j|
+module Dynamic = [%styled
+  (~color, ~background) => {j|
   color: $color;
   background-color: $background;
-|j}];
+|j}
+];
 
 ReactDOMRe.renderToElementWithId(
   <Dynamic color="#EB5757" background="#516CF0">
@@ -52,9 +53,7 @@ ReactDOMRe.renderToElementWithId(
 ### Inline css function
 ```reason
 ReactDOMRe.renderToElementWithId(
-  <span className=[%css "font-size: 34px"]>
-    {React.string("Hello!")}
-  </span>,
+  <span className=[%css "font-size: 32px"]> {React.string("Hello!")} </span>,
   "app",
 );
 ```
