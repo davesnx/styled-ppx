@@ -65,3 +65,13 @@ let at_least_one = rule => {
   let have_one = List.exists(Option.is_some, values);
   return_data(have_one ? Ok(values) : Error("should match at least one"));
 };
+// TODO: make that more dynamic
+let at_least_one_2 = rule => {
+  let.bind_match (a, b) = rule;
+  let.bind_match _ = {
+    let a = Option.map(a => `A(a), a);
+    let b = Option.map(b => `B(b), b);
+    at_least_one(return_match([a, b]));
+  };
+  return_match((a, b));
+};
