@@ -15,57 +15,46 @@ let optional = rule => {
     };
   return_match(value);
 };
-let match_n_values = (sep, rule) => {
+let match_n_values = ((min, max), sep, rule) => {
+  // TODO: this definitly needs to be cleaned up
+
   let rule_with_comma = {
     let.bind_match () = sep;
     rule;
   };
   let rec match_until_fails = values => {
     let.bind_data value = rule_with_comma;
+
+    let length = List.length(values) + (Result.is_ok(value) ? 1 : 0);
+    let hit_min = length >= min;
+    let hit_max =
+      switch (max) {
+      | Some(max) => length >= max
+      | None => false
+      };
+
     switch (value) {
-    | Ok(value) => match_until_fails([value, ...values])
-    | Error(last_error) => return_match((values |> List.rev, last_error))
+    | Ok(value) =>
+      hit_max
+        ? return_match([value, ...values] |> List.rev)
+        : match_until_fails([value, ...values])
+    | Error(last_error) =>
+      hit_min
+        ? return_match(values |> List.rev) : return_data(Error(last_error))
     };
   };
+
   let.bind_data value = rule;
   switch (value) {
   | Ok(value) => match_until_fails([value])
-  | Error(last_error) => return_match(([], last_error))
+  | Error(last_error) =>
+    min == 0 ? return_data(Ok([])) : return_data(Error(last_error))
   };
 };
-let zero_or_more = rule => {
-  let.bind_match (values, _) = match_n_values(identity, rule);
-  return_match(values);
-};
-let one_or_more = rule => {
-  let.bind_match (values, last_error) = match_n_values(identity, rule);
-  let data =
-    switch (values) {
-    | [] => Error(last_error)
-    | values => Ok(values)
-    };
-  return_data(data);
-};
-let repeat_by_sep = (sep, (min, max), rule) => {
-  let.bind_match (values, last_error) = match_n_values(sep, rule);
-  let values_length = List.length(values);
-  // TODO: technically it could be more than max, but we shouldn't match
-  let hit_max =
-    switch (max) {
-    | Some(max) =>
-      values_length <= max
-        ? Ok()
-        : Error("expected up to " ++ string_of_int(max) ++ " elements")
-    | None => Ok()
-    };
-  let data =
-    switch (values_length >= min, hit_max) {
-    | (false, _) => Error(last_error)
-    | (_, Error(error)) => Error(error)
-    | (true, Ok ()) => Ok(values)
-    };
-  return_data(data);
-};
+let zero_or_more = rule => match_n_values((0, None), identity, rule);
+let one_or_more = rule => match_n_values((1, None), identity, rule);
+let repeat_by_sep = (sep, (min, max), rule) =>
+  match_n_values((min, max), sep, rule);
 let repeat = ((min, max), rule) =>
   repeat_by_sep(identity, (min, max), rule);
 let repeat_by_comma = ((min, max), rule) =>

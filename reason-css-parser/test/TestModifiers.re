@@ -63,6 +63,13 @@ describe("repeat", ({test, _}) => {
     expect.result(parse("28 29")).toBe(Ok([28, 29]));
     expect.result(parse("30 31 32")).toBeError();
   });
+  test("<integer>{2} <integer>", ({expect, _}) => {
+    let parse = parse([%value "<integer>{2} <integer>"]);
+    expect.result(parse("")).toBeError();
+    expect.result(parse("27")).toBeError();
+    expect.result(parse("28 29 30")).toBe(Ok(([28, 29], 30)));
+    expect.result(parse("30 31 32 33")).toBeError();
+  });
   test("<integer>{2,3}", ({expect, _}) => {
     let parse = parse([%value "<integer>{2,3}"]);
     expect.result(parse("")).toBeError();
@@ -85,6 +92,15 @@ describe("repeat", ({test, _}) => {
     expect.result(parse("53")).toBeError();
     expect.result(parse("54, 55")).toBe(Ok([54, 55]));
     expect.result(parse("56, 57, 58")).toBe(Ok([56, 57, 58]));
+    expect.result(parse("59, 60, 61,")).toBeError();
+    expect.result(parse("59, 60, 61, 62")).toBeError();
+  });
+  test("<integer>#{2} , <integer>", ({expect, _}) => {
+    let parse = parse([%value "<integer>#{2} , <integer>"]);
+    expect.result(parse("")).toBeError();
+    expect.result(parse("53")).toBeError();
+    expect.result(parse("54, 55")).toBeError();
+    expect.result(parse("56, 57, 58")).toBe(Ok(([56, 57], (), 58)));
     expect.result(parse("59, 60, 61,")).toBeError();
     expect.result(parse("59, 60, 61, 62")).toBeError();
   });
