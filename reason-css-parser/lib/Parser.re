@@ -5,7 +5,27 @@ open Rule.Match;
 open Reason_css_lexer;
 // TODO: split by modules
 
-let number_percentage = [%value "<number> | <percentage>"];
+let wq_name = [%value "not implemented"];
+let declaration_value = [%value "not implemented"];
+
+// css-values-4
+let time_percentage = [%value "[ <time> | <percentage> ]"];
+let angle_percentage = [%value "[ <angle> | <percentage> ]"];
+let frequency_percentage = [%value "[ <frequency> | <percentage> ]"];
+let length_percentage = [%value "[ <length> | <percentage> ]"];
+// TODO: note on <number-percentage> https://drafts.csswg.org/css-values-4/#mixed-percentages
+let number_percentage = [%value "[ <number> | <percentage> ]"];
+let attr_type = [%value
+  "string | url | ident | color | number | percentage | length | angle | time | frequency | flex | <dimension-unit>"
+];
+let function_attr = [%value
+  "attr( <wq-name> <attr-type>? , <declaration-value>?)"
+];
+let position = [%value
+  "[ [ left | center | right ] || [ top | center | bottom ] | [ left | center | right | <length-percentage> ] [ top | center | bottom | <length-percentage> ]? | [ [ left | right ] <length-percentage> ] && [ [ top | bottom ] <length-percentage> ] ]"
+];
+// TODO: let ratio = [%value "<number [0,∞]> [ / <number [0,∞]> ]?"];
+let ratio = [%value "<number> [ / <number> ]?"];
 
 // css-sizing-3
 let function_fit_content = [%value "fit-content( <length-percentage> )"];

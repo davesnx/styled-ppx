@@ -192,6 +192,8 @@ let string =
     | _ => Error("expected a string"),
   );
 
+let dimension_unit = return_data(Error("not implemented"));
+
 // TODO: <url-modifier>
 // https://drafts.csswg.org/css-values-4/#urls
 let url = {
