@@ -109,6 +109,9 @@ let supportList = [
   [%css "color: hsl(120deg 100% 50%)"],
   [%css "opacity: 0.5"],
   [%css "opacity: 60%"],
+  // css-images-4
+  [%css "object-fit: fill"],
+  [%css "object-position: right bottom"],
   // css-overflow-3
   [%css "overflow-x: auto"],
   [%css "overflow-y: hidden"],

@@ -185,6 +185,12 @@ let properties_static_css_tests = [
   ),
   ([%expr [%css "opacity: 0.5"]], [%expr [Css.opacity(0.5)]]),
   ([%expr [%css "opacity: 60%"]], [%expr [Css.opacity(0.6)]]),
+  // css-images-4
+  ([%expr [%css "object-fit: fill"]], [%expr [Css.objectFit(`fill)]]),
+  (
+    [%expr [%css "object-position: right bottom"]],
+    [%expr [Css.objectPosition(`hv((`right, `bottom)))]],
+  ),
   // css-overflow-3
   ([%expr [%css "overflow-x: auto"]], [%expr [Css.overflowX(`auto)]]),
   ([%expr [%css "overflow-y: hidden"]], [%expr [Css.overflowY(`hidden)]]),

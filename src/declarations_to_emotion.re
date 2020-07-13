@@ -118,7 +118,10 @@ let variants_to_expression =
   | `Right => id([%expr `right])
   | `Start => id([%expr `start])
   | `Currentcolor => id([%expr `currentColor])
-  | `Transparent => id([%expr `transparent]);
+  | `Transparent => id([%expr `transparent])
+  | `Bottom => id([%expr `bottom])
+  | `Top => id([%expr `top])
+  | `Fill => id([%expr `fill]);
 
 let variable_rule = {
   open Rule;
@@ -568,6 +571,80 @@ let opacity =
       string_of_float(number /. 100.0) |> Const.float |> Exp.constant,
     [%expr Css.opacity],
   );
+
+// css-images-4
+let render_position = position => {
+  let pos_to_percentage_offset =
+    fun
+    | `Left
+    | `Top => 0.
+    | `Right
+    | `Bottom => 100.
+    | `Center => 50.;
+  let to_value =
+    fun
+    | `Position(pos) => variants_to_expression(pos)
+    | `Length(length) => render_length(length)
+    | `Percentage(percentage) => render_percentage(percentage);
+
+  let horizontal =
+    switch (position) {
+    | `Or(Some(pos), _) => (pos, `Zero)
+    | `Or(None, _) => (`Center, `Zero)
+    | `Static(`Length_percentage(offset), _) => (`Left, offset)
+    | `Static((`Center | `Left | `Right) as pos, _) => (pos, `Zero)
+    | `And((pos, offset), _) => (pos, offset)
+    };
+  let horizontal =
+    switch (horizontal) {
+    | (`Left, `Length(length)) => `Length(length)
+    | (_, `Length(_)) => raise(Unsupported_feature)
+    | (pos, `Zero) => `Position(pos)
+    | (pos, `Percentage(percentage)) =>
+      `Percentage(percentage +. pos_to_percentage_offset(pos))
+    };
+  let horizontal = to_value(horizontal);
+
+  let vertical =
+    switch (position) {
+    | `Or(_, Some(pos)) => (pos, `Zero)
+    | `Or(_, None) => (`Center, `Zero)
+    | `Static(_, None) => (`Center, `Zero)
+    | `Static(_, Some(`Length_percentage(offset))) => (`Top, offset)
+    | `Static(_, Some((`Center | `Bottom | `Top) as pos)) => (pos, `Zero)
+    | `And(_, (pos, offset)) => (pos, offset)
+    };
+  let vertical =
+    switch (vertical) {
+    | (`Top, `Length(length)) => `Length(length)
+    | (_, `Length(_)) => raise(Unsupported_feature)
+    | (pos, `Zero) => `Position(pos)
+    | (pos, `Percentage(percentage)) =>
+      `Percentage(percentage +. pos_to_percentage_offset(pos))
+    };
+  let vertical = to_value(vertical);
+
+  id([%expr `hv(([%e horizontal], [%e vertical]))]);
+};
+
+let object_fit =
+  apply(
+    property_object_fit,
+    fun
+    | (`Fill | `None) as variant => variants_to_expression(variant)
+    | `Or(_) => raise(Unsupported_feature),
+    [%expr Css.objectFit],
+  );
+let object_position =
+  apply(
+    property_object_position,
+    render_position,
+    [%expr Css.objectPosition],
+  );
+let image_resolution = unsupported(property_image_resolution);
+let image_orientation = unsupported(property_image_orientation);
+let image_rendering = unsupported(property_image_rendering);
+
 // css-overflow-3
 // TODO: maybe implement using strings?
 let overflow_x =
@@ -756,6 +833,12 @@ let properties = [
   // css-color-4
   ("color", found(color)),
   ("opacity", found(opacity)),
+  // css-images-4
+  ("object-fit", found(object_fit)),
+  ("object-position", found(object_position)),
+  ("image-resolution", found(image_resolution)),
+  ("image-orientation", found(image_orientation)),
+  ("image-rendering", found(image_rendering)),
   // css-overflow-3
   ("overflow-x", found(overflow_x)),
   ("overflow-y", found(overflow_y)),
