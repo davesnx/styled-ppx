@@ -46,6 +46,13 @@ let tests = [
       ),
     ),
   ),
+  test(
+    [%value "<rgb()>"],
+    "rgba(2.5, 3.3, 4.4, 0.5)",
+    `Rgba(
+      `Number(`Static_1(([2.5, 3.3, 4.4], Some(((), `Number(0.5)))))),
+    ),
+  ),
 ];
 
 describe("parser tests", ({test, _}) => {
