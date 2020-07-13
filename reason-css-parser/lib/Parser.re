@@ -182,6 +182,96 @@ let property_image_rendering = [%value
   "auto | smooth | high-quality | crisp-edges | pixelated"
 ];
 
+// css-backgrounds-3
+// let shadow = [%value "<color>? && [<length>{2} <length [0,∞]>? <length>?] && inset?"];
+let shadow = [%value
+  "<color>? && [<length>{2} <length>? <length>?] && inset?"
+];
+// let line_width = [%value "<length [0,∞]> | thin | medium | thick"];
+let line_width = [%value "<length> | thin | medium | thick"];
+let line_style = [%value
+  "none | hidden | dotted | dashed | solid | double | groove | ridge | inset | outset"
+];
+
+// let bg_size = [%value "[ <length-percentage [0,∞]> | auto ]{1,2} | cover | contain"];
+let bg_size = [%value "[ <length-percentage> | auto ]{1,2} | cover | contain"];
+let box = [%value "border-box | padding-box | content-box"];
+let bg_position = [%value
+  "[ left | center | right | top | bottom | <length-percentage> ] | [ left | center | right | <length-percentage> ] [ top | center | bottom | <length-percentage> ] | [ center | [ left | right ] <length-percentage>? ] && [ center | [ top | bottom ] <length-percentage>? ]"
+];
+let attachment = [%value "scroll | fixed | local"];
+let repeat_style = [%value
+  "repeat-x | repeat-y | [repeat | space | round | no-repeat]{1,2}"
+];
+let bg_image = [%value "<image> | none"];
+let bg_layer = [%value
+  "<bg-image> || <bg-position> [ / <bg-size> ]? || <repeat-style> || <attachment> || <box> || <box>"
+];
+let rec final_bg_layer = [%value.rec
+  "<\'background-color'> || <bg-image> || <bg-position> [ / <bg-size> ]? || <repeat-style> || <attachment> || <box> || <box>"
+]
+and property_background_color = [%value "<color>"];
+let property_background_image = [%value "<bg-image>#"];
+let property_background_repeat = [%value "<repeat-style>#"];
+let property_background_attachment = [%value "<attachment>#"];
+let property_background_position = [%value "<bg-position>#"];
+let property_background_clip = [%value "<box>#"];
+let property_background_origin = [%value "<box>#"];
+let property_background_size = [%value "<bg-size>#"];
+let property_background = [%value "[<bg-layer># ,]? <final-bg-layer>"];
+let property_border_top_color = [%value "<color>"];
+let property_border_right_color = [%value "<color>"];
+let property_border_bottom_color = [%value "<color>"];
+let property_border_left_color = [%value "<color>"];
+let property_border_color = [%value "<color>{1,4}"];
+let property_border_top_style = [%value "<line-style>"];
+let property_border_right_style = [%value "<line-style>"];
+let property_border_bottom_style = [%value "<line-style>"];
+let property_border_left_style = [%value "<line-style>"];
+let property_border_style = [%value "<line-style>{1,4}"];
+let property_border_top_width = [%value "<line-width>"];
+let property_border_right_width = [%value "<line-width>"];
+let property_border_bottom_width = [%value "<line-width>"];
+let property_border_left_width = [%value "<line-width>"];
+let property_border_width = [%value "<line-width>{1,4}"];
+let property_border_top = [%value "<line-width> || <line-style> || <color>"];
+let property_border_right = [%value "<line-width> || <line-style> || <color>"];
+let property_border_bottom = [%value
+  "<line-width> || <line-style> || <color>"
+];
+let property_border_left = [%value "<line-width> || <line-style> || <color>"];
+let property_border = [%value "<line-width> || <line-style> || <color>"];
+// let property_border_top_left_radius = [%value "<length-percentage [0,∞]>{1,2}"];
+let property_border_top_left_radius = [%value "<length-percentage>{1,2}"];
+// let property_border_top_right_radius = [%value "<length-percentage [0,∞]>{1,2}"];
+let property_border_top_right_radius = [%value "<length-percentage>{1,2}"];
+// let property_border_bottom_right_radius = [%value "<length-percentage [0,∞]>{1,2}"];
+let property_border_bottom_right_radius = [%value "<length-percentage>{1,2}"];
+// let property_border_bottom_left_radius = [%value "<length-percentage [0,∞]>{1,2}"];
+let property_border_bottom_left_radius = [%value "<length-percentage>{1,2}"];
+// let property_border_radius = [%value "<length-percentage [0,∞]>{1,4} [ / <length-percentage [0,∞]>{1,4} ]?"];
+let property_border_radius = [%value
+  "<length-percentage>{1,4} [ / <length-percentage>{1,4} ]?"
+];
+let property_border_image_source = [%value "none | <image>"];
+// let property_border_image_slice = [%value "[<number [0,∞]> | <percentage [0,∞]>]{1,4} && fill?"];
+let property_border_image_slice = [%value
+  "[<number> | <percentage>]{1,4} && fill?"
+];
+// let property_border_image_width = [%value "[ <length-percentage [0,∞]> | <number [0,∞]> | auto ]{1,4}"];
+let property_border_image_width = [%value
+  "[ <length-percentage> | <number> | auto ]{1,4}"
+];
+// let property_border_image_outset = [%value "[ <length [0,∞]> | <number [0,∞]> ]{1,4}"];
+let property_border_image_outset = [%value "[ <length> | <number> ]{1,4}"];
+let property_border_image_repeat = [%value
+  "[ stretch | repeat | round | space ]{1,2}"
+];
+let property_border_image = [%value
+  "<'border-image-source'> || <'border-image-slice'> [ / <'border-image-width'> | / <'border-image-width'>? / <'border-image-outset'> ]? || <'border-image-repeat'>"
+];
+let property_box_shadow = [%value "none | <shadow>#"];
+
 // css-overflow-3
 let property_overflow_x = [%value "visible | hidden | clip | scroll | auto"];
 let property_overflow_y = [%value "visible | hidden | clip | scroll | auto"];
