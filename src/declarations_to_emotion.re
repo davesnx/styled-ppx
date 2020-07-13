@@ -57,9 +57,20 @@ let render_css_wide_keywords = (name, value) => {
   let name = Const.string(name) |> Exp.constant;
   Ok([[%expr Css.unsafe([%e name], [%e value])]]);
 };
+
+let render_string = string => Const.string(string) |> Exp.constant;
 let render_integer = integer => Const.int(integer) |> Exp.constant;
 let render_number = number =>
   Const.float(number |> string_of_float) |> Exp.constant;
+let render_percentage = number => [%expr
+  `percent([%e render_number(number)])
+];
+let render_angle =
+  fun
+  | `Deg(number) => id([%expr `deg([%e render_number(number)])])
+  | `Rad(number) => id([%expr `rad([%e render_number(number)])])
+  | `Grad(number) => id([%expr `grad([%e render_number(number)])])
+  | `Turn(number) => id([%expr `turn([%e render_number(number)])]);
 
 let variants_to_expression =
   fun
@@ -105,7 +116,9 @@ let variants_to_expression =
   | `Left => id([%expr `left])
   | `Match_parent => raise(Unsupported_feature)
   | `Right => id([%expr `right])
-  | `Start => id([%expr `start]);
+  | `Start => id([%expr `start])
+  | `Currentcolor => id([%expr `currentColor])
+  | `Transparent => id([%expr `transparent]);
 
 let variable_rule = {
   open Rule;
@@ -160,14 +173,11 @@ let render_length =
   | `Vmin(n) => [%expr `vmin([%e render_number(n)])]
   | `Vw(n) => [%expr `vw([%e render_number(n)])]
   | `Zero => [%expr `zero];
-let render_percentage = render_number;
 
 let render_length_percentage =
   fun
   | `Length(length) => render_length(length)
-  | `Percentage(percentage) => [%expr
-      `percent([%e render_percentage(percentage)])
-    ];
+  | `Percentage(percentage) => render_percentage(percentage);
 
 // css-sizing-3
 let render_function_fit_content = _lp => raise(Unsupported_feature);
@@ -318,6 +328,246 @@ let padding =
     | _ => failwith("unreachable"),
   );
 
+let render_named_color =
+  fun
+  | `Aliceblue => [%expr Css.aliceblue]
+  | `Antiquewhite => [%expr Css.antiquewhite]
+  | `Aqua => [%expr Css.aqua]
+  | `Aquamarine => [%expr Css.aquamarine]
+  | `Azure => [%expr Css.azure]
+  | `Beige => [%expr Css.beige]
+  | `Bisque => [%expr Css.bisque]
+  | `Black => [%expr Css.black]
+  | `Blanchedalmond => [%expr Css.blanchedalmond]
+  | `Blue => [%expr Css.blue]
+  | `Blueviolet => [%expr Css.blueviolet]
+  | `Brown => [%expr Css.brown]
+  | `Burlywood => [%expr Css.burlywood]
+  | `Cadetblue => [%expr Css.cadetblue]
+  | `Chartreuse => [%expr Css.chartreuse]
+  | `Chocolate => [%expr Css.chocolate]
+  | `Coral => [%expr Css.coral]
+  | `Cornflowerblue => [%expr Css.cornflowerblue]
+  | `Cornsilk => [%expr Css.cornsilk]
+  | `Crimson => [%expr Css.crimson]
+  | `Cyan => [%expr Css.cyan]
+  | `Darkblue => [%expr Css.darkblue]
+  | `Darkcyan => [%expr Css.darkcyan]
+  | `Darkgoldenrod => [%expr Css.darkgoldenrod]
+  | `Darkgray => [%expr Css.darkgray]
+  | `Darkgreen => [%expr Css.darkgreen]
+  | `Darkgrey => [%expr Css.darkgrey]
+  | `Darkkhaki => [%expr Css.darkkhaki]
+  | `Darkmagenta => [%expr Css.darkmagenta]
+  | `Darkolivegreen => [%expr Css.darkolivegreen]
+  | `Darkorange => [%expr Css.darkorange]
+  | `Darkorchid => [%expr Css.darkorchid]
+  | `Darkred => [%expr Css.darkred]
+  | `Darksalmon => [%expr Css.darksalmon]
+  | `Darkseagreen => [%expr Css.darkseagreen]
+  | `Darkslateblue => [%expr Css.darkslateblue]
+  | `Darkslategray => [%expr Css.darkslategray]
+  | `Darkslategrey => [%expr Css.darkslategrey]
+  | `Darkturquoise => [%expr Css.darkturquoise]
+  | `Darkviolet => [%expr Css.darkviolet]
+  | `Deeppink => [%expr Css.deeppink]
+  | `Deepskyblue => [%expr Css.deepskyblue]
+  | `Dimgray => [%expr Css.dimgray]
+  | `Dimgrey => [%expr Css.dimgrey]
+  | `Dodgerblue => [%expr Css.dodgerblue]
+  | `Firebrick => [%expr Css.firebrick]
+  | `Floralwhite => [%expr Css.floralwhite]
+  | `Forestgreen => [%expr Css.forestgreen]
+  | `Fuchsia => [%expr Css.fuchsia]
+  | `Gainsboro => [%expr Css.gainsboro]
+  | `Ghostwhite => [%expr Css.ghostwhite]
+  | `Gold => [%expr Css.gold]
+  | `Goldenrod => [%expr Css.goldenrod]
+  | `Gray => [%expr Css.gray]
+  | `Green => [%expr Css.green]
+  | `Greenyellow => [%expr Css.greenyellow]
+  | `Grey => [%expr Css.grey]
+  | `Honeydew => [%expr Css.honeydew]
+  | `Hotpink => [%expr Css.hotpink]
+  | `Indianred => [%expr Css.indianred]
+  | `Indigo => [%expr Css.indigo]
+  | `Ivory => [%expr Css.ivory]
+  | `Khaki => [%expr Css.khaki]
+  | `Lavender => [%expr Css.lavender]
+  | `Lavenderblush => [%expr Css.lavenderblush]
+  | `Lawngreen => [%expr Css.lawngreen]
+  | `Lemonchiffon => [%expr Css.lemonchiffon]
+  | `Lightblue => [%expr Css.lightblue]
+  | `Lightcoral => [%expr Css.lightcoral]
+  | `Lightcyan => [%expr Css.lightcyan]
+  | `Lightgoldenrodyellow => [%expr Css.lightgoldenrodyellow]
+  | `Lightgray => [%expr Css.lightgray]
+  | `Lightgreen => [%expr Css.lightgreen]
+  | `Lightgrey => [%expr Css.lightgrey]
+  | `Lightpink => [%expr Css.lightpink]
+  | `Lightsalmon => [%expr Css.lightsalmon]
+  | `Lightseagreen => [%expr Css.lightseagreen]
+  | `Lightskyblue => [%expr Css.lightskyblue]
+  | `Lightslategray => [%expr Css.lightslategray]
+  | `Lightslategrey => [%expr Css.lightslategrey]
+  | `Lightsteelblue => [%expr Css.lightsteelblue]
+  | `Lightyellow => [%expr Css.lightyellow]
+  | `Lime => [%expr Css.lime]
+  | `Limegreen => [%expr Css.limegreen]
+  | `Linen => [%expr Css.linen]
+  | `Magenta => [%expr Css.magenta]
+  | `Maroon => [%expr Css.maroon]
+  | `Mediumaquamarine => [%expr Css.mediumaquamarine]
+  | `Mediumblue => [%expr Css.mediumblue]
+  | `Mediumorchid => [%expr Css.mediumorchid]
+  | `Mediumpurple => [%expr Css.mediumpurple]
+  | `Mediumseagreen => [%expr Css.mediumseagreen]
+  | `Mediumslateblue => [%expr Css.mediumslateblue]
+  | `Mediumspringgreen => [%expr Css.mediumspringgreen]
+  | `Mediumturquoise => [%expr Css.mediumturquoise]
+  | `Mediumvioletred => [%expr Css.mediumvioletred]
+  | `Midnightblue => [%expr Css.midnightblue]
+  | `Mintcream => [%expr Css.mintcream]
+  | `Mistyrose => [%expr Css.mistyrose]
+  | `Moccasin => [%expr Css.moccasin]
+  | `Navajowhite => [%expr Css.navajowhite]
+  | `Navy => [%expr Css.navy]
+  | `Oldlace => [%expr Css.oldlace]
+  | `Olive => [%expr Css.olive]
+  | `Olivedrab => [%expr Css.olivedrab]
+  | `Orange => [%expr Css.orange]
+  | `Orangered => [%expr Css.orangered]
+  | `Orchid => [%expr Css.orchid]
+  | `Palegoldenrod => [%expr Css.palegoldenrod]
+  | `Palegreen => [%expr Css.palegreen]
+  | `Paleturquoise => [%expr Css.paleturquoise]
+  | `Palevioletred => [%expr Css.palevioletred]
+  | `Papayawhip => [%expr Css.papayawhip]
+  | `Peachpuff => [%expr Css.peachpuff]
+  | `Peru => [%expr Css.peru]
+  | `Pink => [%expr Css.pink]
+  | `Plum => [%expr Css.plum]
+  | `Powderblue => [%expr Css.powderblue]
+  | `Purple => [%expr Css.purple]
+  | `Rebeccapurple => [%expr Css.rebeccapurple]
+  | `Red => [%expr Css.red]
+  | `Rosybrown => [%expr Css.rosybrown]
+  | `Royalblue => [%expr Css.royalblue]
+  | `Saddlebrown => [%expr Css.saddlebrown]
+  | `Salmon => [%expr Css.salmon]
+  | `Sandybrown => [%expr Css.sandybrown]
+  | `Seagreen => [%expr Css.seagreen]
+  | `Seashell => [%expr Css.seashell]
+  | `Sienna => [%expr Css.sienna]
+  | `Silver => [%expr Css.silver]
+  | `Skyblue => [%expr Css.skyblue]
+  | `Slateblue => [%expr Css.slateblue]
+  | `Slategray => [%expr Css.slategray]
+  | `Slategrey => [%expr Css.slategrey]
+  | `Snow => [%expr Css.snow]
+  | `Springgreen => [%expr Css.springgreen]
+  | `Steelblue => [%expr Css.steelblue]
+  | `Tan => [%expr Css.tan]
+  | `Teal => [%expr Css.teal]
+  | `Thistle => [%expr Css.thistle]
+  | `Tomato => [%expr Css.tomato]
+  | `Turquoise => [%expr Css.turquoise]
+  | `Violet => [%expr Css.violet]
+  | `Wheat => [%expr Css.wheat]
+  | `White => [%expr Css.white]
+  | `Whitesmoke => [%expr Css.whitesmoke]
+  | `Yellow => [%expr Css.yellow]
+  | `Yellowgreen => [%expr Css.yellowgreen];
+let render_color_alpha =
+  fun
+  | `Number(number) => render_number(number)
+  | `Percentage(percentage) => render_number(percentage /. 100.0);
+
+let render_function_rgb = ast => {
+  let to_number = percentage => percentage *. 2.55;
+
+  let (colors, alpha) =
+    switch (ast) {
+    | `Number(`Static_0(colors, alpha))
+    | `Number(`Static_1(colors, alpha)) => (colors, alpha)
+    | `Percentage(`Static_0(colors, alpha))
+    | `Percentage(`Static_1(colors, alpha)) => (
+        colors |> List.map(to_number),
+        alpha,
+      )
+    };
+  let (red, green, blue) =
+    switch (colors) {
+    | [red, green, blue] => (red, green, blue)
+    | _ => failwith("unreachable")
+    };
+  let alpha =
+    switch (alpha) {
+    | Some(((), alpha)) => Some(alpha)
+    | None => None
+    };
+
+  // TODO: bs-css rgb(float, float, float)
+  let red = render_integer(red |> int_of_float);
+  let green = render_integer(green |> int_of_float);
+  let blue = render_integer(blue |> int_of_float);
+  let alpha = Option.map(render_color_alpha, alpha);
+
+  switch (alpha) {
+  | Some(alpha) =>
+    id([%expr `rgba(([%e red], [%e green], [%e blue], [%e alpha]))])
+  | None => id([%expr `rgb(([%e red], [%e green], [%e blue]))])
+  };
+};
+let render_function_hsl = ((hue, saturation, lightness, alpha)) => {
+  let hue =
+    switch (hue) {
+    | `Angle(angle) => angle
+    | `Number(degs) => `Deg(degs)
+    };
+
+  let hue = render_angle(hue);
+  let saturation = render_percentage(saturation);
+  let lightness = render_percentage(lightness);
+  let alpha =
+    Option.map((((), alpha)) => render_color_alpha(alpha), alpha);
+
+  switch (alpha) {
+  | Some(alpha) =>
+    id(
+      [%expr `hsla(([%e hue], [%e saturation], [%e lightness], [%e alpha]))],
+    )
+  | None => id([%expr `hsl(([%e hue], [%e saturation], [%e lightness]))])
+  };
+};
+let color =
+  apply(
+    property_color,
+    fun
+    | `Hex_color(hex) => id([%expr `hex([%e render_string(hex)])])
+    | `Named_color(color) => render_named_color(color)
+    | `Currentcolor => variants_to_expression(`Currentcolor)
+    | `Transparent => variants_to_expression(`Transparent)
+    | `Function_rgb(`Rgb(rgb))
+    | `Function_rgb(`Rgba(rgb)) => render_function_rgb(rgb)
+    | `Function_hsl(hsl) => render_function_hsl(hsl)
+    | `Function_hwb(_)
+    | `Function_lab(_)
+    | `Function_lch(_)
+    | `Function_color(_)
+    | `Function_device_cmyk(_) => raise(Unsupported_feature),
+    [%expr Css.color],
+  );
+let opacity =
+  apply(
+    property_opacity,
+    fun
+    | `Number(number) =>
+      string_of_float(number) |> Const.float |> Exp.constant
+    | `Percentage(number) =>
+      string_of_float(number /. 100.0) |> Const.float |> Exp.constant,
+    [%expr Css.opacity],
+  );
 // css-overflow-3
 // TODO: maybe implement using strings?
 let overflow_x =
@@ -497,6 +747,9 @@ let properties = [
   ("padding-bottom", found(padding_bottom)),
   ("padding-left", found(padding_left)),
   ("padding", found(padding)),
+  // css-color-4
+  ("color", found(color)),
+  ("opacity", found(opacity)),
   // css-overflow-3
   ("overflow-x", found(overflow_x)),
   ("overflow-y", found(overflow_y)),
