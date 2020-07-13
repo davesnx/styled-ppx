@@ -1,6 +1,7 @@
 open Jest;
 
 let supportList = [
+  [%css "overflow-x: clip"],
   [%css "opacity: 0.9"],
   /* [%css "box-shadow: 1px 54px 1px blue"], */
   /* [%css "box-shadow: 2px 3px blue"], */

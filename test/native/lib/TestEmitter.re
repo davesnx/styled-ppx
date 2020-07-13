@@ -18,6 +18,11 @@ let compare = (result, expected, {expect, _}) => {
 // TODO: ideas, selectors . properties, to have a bigger test matrix
 // somehow programatically generate strings to test css
 let properties_static_css_tests = [
+  // unsupported
+  (
+    [%expr [%css "overflow-x: clip"]],
+    [%expr [Css.unsafe("overflow-x", "clip")]],
+  ),
   ([%expr [%css "align-items: center"]], [%expr [Css.alignItems(`center)]]),
   (
     [%expr [%css "box-sizing: border-box"]],
