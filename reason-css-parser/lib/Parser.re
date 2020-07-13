@@ -118,6 +118,70 @@ and function_device_cmyk = [%value.rec
 let property_color = [%value "<color>"];
 let property_opacity = [%value "<alpha-value>"];
 
+// css-images-4
+let image_tags = [%value "[ ltr | rtl ]"];
+let image_src = [%value "[ <url> | <string> ]"];
+// TODO: let function_image = [%value "image( <image-tags>? [ <image-src>? , <color>? ]! )"];
+let function_image = {
+  let image_src_color =
+    at_least_one_2([%value "<image-src>? [ , <color> ]?"]);
+  Fun.id([%value "image( <image-tags>? <image-src-color> )"]);
+};
+// let function_image = [%value "xxx"];
+let side_or_corner = [%value "[left | right] || [top | bottom]"];
+let linear_color_hint = [%value "<length-percentage>"];
+let color_stop_length = [%value "<length-percentage>{1,2}"];
+let linear_color_stop = [%value "<color> && <color-stop-length>?"];
+let color_stop_list = [%value
+  "<linear-color-stop> , [ <linear-color-hint>? , <linear-color-stop> ]#"
+];
+let color_stop_angle = [%value "<angle-percentage>{1,2}"];
+let color_stop = [%value "<color-stop-length> | <color-stop-angle>"];
+let function_linear_gradient = [%value
+  "linear-gradient( [ <angle> | to <side-or-corner> ]? , <color-stop-list> )"
+];
+let function_repeating_linear_gradient = function_linear_gradient;
+let extent_keyword = [%value
+  "closest-corner | closest-side | farthest-corner | farthest-side"
+];
+let function_radial_gradient = [%value
+  "radial-gradient( [ [ circle || <length> ] [ at <position> ]? , | [ ellipse || <length-percentage>{2} ] [ at <position> ]? , | [ [ circle | ellipse ] || <extent-keyword> ] [ at <position> ]? , | at <position> , ]? <color-stop> [ , <color-stop> ]+ )"
+];
+let function_repeating_radial_gradient = function_radial_gradient;
+let angular_color_stop = [%value "<color> && <color-stop-angle>?"];
+let angular_color_hint = [%value "<angle-percentage>"];
+let angular_color_stop_list = [%value
+  "<angular-color-stop> , [ <angular-color-hint>? , <angular-color-stop> ]#"
+];
+let function_conic_gradient = [%value
+  "conic-gradient( [ from <angle> ]? [ at <position> ]?, <angular-color-stop-list> )"
+];
+let function_repeating_conic_gradient = function_conic_gradient;
+let gradient = [%value
+  "[ <linear-gradient()> | <repeating-linear-gradient()> | <radial-gradient()> | <repeating-radial-gradient()> | <conic-gradient()> | <repeating-conic-gradient()> ]"
+];
+let rec image = [%value.rec
+  "<url> | <image()> | <image-set()> | <cross-fade()> | <gradient>"
+]
+and function_image_set = [%value.rec "image-set( <image-set-option># )"]
+and image_set_option = [%value.rec "[ <image> | <string> ] <resolution>"]
+and function_cross_fade = [%value.rec "cross-fade( <cf-image># )"]
+and cf_image = [%value.rec "<percentage>? && [ <image> | <color> ]"];
+// let function_element = [%value "element( <id-selector> )"];
+let property_object_fit = [%value
+  "fill | none | [contain | cover] || scale-down"
+];
+let property_object_position = [%value "<position>"];
+let property_image_resolution = [%value
+  "[ from-image || <resolution> ] && snap?"
+];
+let property_image_orientation = [%value
+  "from-image | none | <angle> | [ <angle>? flip ]"
+];
+let property_image_rendering = [%value
+  "auto | smooth | high-quality | crisp-edges | pixelated"
+];
+
 // css-overflow-3
 let property_overflow_x = [%value "visible | hidden | clip | scroll | auto"];
 let property_overflow_y = [%value "visible | hidden | clip | scroll | auto"];
