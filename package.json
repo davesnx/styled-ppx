@@ -42,7 +42,7 @@
     "@opam/sedlex": "*",
     "@reason-native/rely": "^3.2.1",
     "@opam/ocaml-lsp-server": "ocaml/ocaml-lsp:ocaml-lsp-server.opam#fbc433e14035d520c7137916ae710b8ec3b415e9",
-    "reason-css-parser": "EduardoRFS/reason-css-parser:package.json#8cdbf80e4add7b65a37ee90e7d33f4fcf2a84a64"
+    "reason-css-parser": "EduardoRFS/reason-css-parser:package.json#bba47cd3228cb6f71b9beac7673f3d31516521fe"
   },
   "resolutions": {
     "@esy-ocaml/reason": "facebook/reason:reason.json#773dbcd"

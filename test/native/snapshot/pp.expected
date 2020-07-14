@@ -2678,7 +2678,7 @@ module Component = {
     (string, Js.t({..}), array(React.element)) => React.element =
     "createElement";
 
-  let styles = Css.style([Css.unsafe("color", var), Css.display(`block)]);
+  let styles = Css.style([Css.color(var), Css.display(`block)]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));

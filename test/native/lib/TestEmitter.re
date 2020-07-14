@@ -27,10 +27,7 @@ let properties_static_css_tests = [
     [%expr [%css "box-sizing: content-box"]],
     [%expr [Css.boxSizing(`contentBox)]],
   ),
-  (
-    [%expr [%css "color: #454545"]],
-    [%expr [Css.color(Css.hex({js|454545|js}))]],
-  ),
+  ([%expr [%css "color: #454545"]], [%expr [Css.color(`hex("454545"))]]),
   ([%expr [%css "color: red"]], [%expr [Css.color(Css.red)]]),
   ([%expr [%css "display: flex"]], [%expr [Css.display(`flex)]]),
   (
@@ -146,6 +143,43 @@ let properties_static_css_tests = [
       ]
     ],
   ),
+  ([%expr [%css "color: #012"]], [%expr [Css.color(`hex("012"))]]),
+  ([%expr [%css "color: #0123"]], [%expr [Css.color(`hex("0123"))]]),
+  ([%expr [%css "color: #012345"]], [%expr [Css.color(`hex("012345"))]]),
+  (
+    [%expr [%css "color: #01234567"]],
+    [%expr [Css.color(`hex("01234567"))]],
+  ),
+  ([%expr [%css "color: blue"]], [%expr [Css.color(Css.blue)]]),
+  (
+    [%expr [%css "color: currentcolor"]],
+    [%expr [Css.color(`currentColor)]],
+  ),
+  ([%expr [%css "color: transparent"]], [%expr [Css.color(`transparent)]]),
+  (
+    [%expr [%css "color: rgb(1 2 3)"]],
+    [%expr [Css.color(`rgb((1, 2, 3)))]],
+  ),
+  (
+    [%expr [%css "color: rgb(1 2 3 / .4)"]],
+    [%expr [Css.color(`rgba((1, 2, 3, 0.4)))]],
+  ),
+  (
+    [%expr [%css "color: rgba(1, 2, 3)"]],
+    [%expr [Css.color(`rgb((1, 2, 3)))]],
+  ),
+  (
+    [%expr [%css "color: rgba(1, 2, 3, .4)"]],
+    [%expr [Css.color(`rgba((1, 2, 3, 0.4)))]],
+  ),
+  (
+    [%expr [%css "color: hsl(120deg 100% 50%)"]],
+    [%expr
+      [Css.color(`hsl((`deg(120.), `percent(100.), `percent(50.))))]
+    ],
+  ),
+  ([%expr [%css "opacity: 0.5"]], [%expr [Css.opacity(0.5)]]),
+  ([%expr [%css "opacity: 60%"]], [%expr [Css.opacity(0.6)]]),
   // css-overflow-3
   ([%expr [%css "overflow-x: auto"]], [%expr [Css.overflowX(`auto)]]),
   ([%expr [%css "overflow-y: hidden"]], [%expr [Css.overflowY(`hidden)]]),
@@ -267,7 +301,7 @@ describe("emit bs-css from static [%css]", ({test, _}) => {
 });
 
 let properties_variable_css_tests = [
-  ([%expr [%css "color: $var"]], [%expr [Css.unsafe("color", var)]]),
+  ([%expr [%css "color: $var"]], [%expr [Css.color(var)]]),
   // TODO: ([%expr [%css "margin: $var"]], [%expr [Css.margin("margin", var)]]),
 ];
 describe("emit bs-css from variable [%css]", ({test, _}) => {
