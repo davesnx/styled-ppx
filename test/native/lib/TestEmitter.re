@@ -21,7 +21,7 @@ let properties_static_css_tests = [
   // unsupported
   (
     [%expr [%css "overflow-x: clip"]],
-    [%expr [Css.unsafe("overflow-x", "clip")]],
+    [%expr [Css.unsafe("overflowX", "clip")]],
   ),
   ([%expr [%css "align-items: center"]], [%expr [Css.alignItems(`center)]]),
   (

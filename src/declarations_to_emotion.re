@@ -802,7 +802,14 @@ let support_property = name =>
   properties |> List.exists(((key, _)) => key == name);
 
 let render_when_unsupported_features = (name, value) => {
-  let name = name |> Const.string |> Exp.constant;
+  let to_camel_case = name =>
+    name
+    |> String.split_on_char('-')
+    |> List.map(String.capitalize_ascii)
+    |> String.concat("")
+    |> String.uncapitalize_ascii;
+
+  let name = to_camel_case(name) |> Const.string |> Exp.constant;
   let value = value |> Const.string |> Exp.constant;
 
   id([%expr Css.unsafe([%e name], [%e value])]);
