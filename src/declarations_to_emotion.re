@@ -725,7 +725,13 @@ let align_self = variants(property_align_self, [%expr Css.alignSelf]);
 let align_content =
   variants(property_align_content, [%expr Css.alignContent]);
 
-let found = ({string_to_expr, _}) => string_to_expr;
+let found = ({ast_of_string, string_to_expr, _}) => {
+  let check_value = string => {
+    let.ok _ = ast_of_string(string);
+    Ok();
+  };
+  (check_value, string_to_expr);
+};
 let properties = [
   // css-sizing-3
   ("width", found(width)),
@@ -794,14 +800,37 @@ let properties = [
 
 let support_property = name =>
   properties |> List.exists(((key, _)) => key == name);
+
+let render_when_unsupported_features = (name, value) => {
+  let to_camel_case = name =>
+    name
+    |> String.split_on_char('-')
+    |> List.map(String.capitalize_ascii)
+    |> String.concat("")
+    |> String.uncapitalize_ascii;
+
+  let name = to_camel_case(name) |> Const.string |> Exp.constant;
+  let value = value |> Const.string |> Exp.constant;
+
+  id([%expr Css.unsafe([%e name], [%e value])]);
+};
 let parse_declarations = ((name, value)) => {
-  let.ok (_, string_to_expr) =
+  let map_parse_error = result =>
+    Result.map_error(str => `Invalid_value(str), result);
+
+  let.ok (_, (check_string, string_to_expr)) =
     properties
     |> List.find_opt(((key, _)) => key == name)
     |> Option.to_result(~none=`Not_found);
+
   switch (render_css_wide_keywords(name, value)) {
   | Ok(value) => Ok(value)
   | Error(_) =>
-    string_to_expr(value) |> Result.map_error(str => `Invalid_value(str))
+    let.ok () = check_string(value) |> map_parse_error;
+    switch (string_to_expr(value)) {
+    | result => map_parse_error(result)
+    | exception Unsupported_feature =>
+      Ok([render_when_unsupported_features(name, value)])
+    };
   };
 };
