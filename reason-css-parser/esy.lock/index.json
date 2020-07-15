@@ -1,17 +1,17 @@
 {
-  "checksum": "f0aa5a5636a0c76d5ecb9898e7a9c2d8",
+  "checksum": "2417231fc11df22995d7e535e25c8fcd",
   "root": "reason-css-parser@link-dev:./package.json",
   "node": {
-    "reason-css-vds@github:EduardoRFS/reason-css-vds:package.json#7c04926465e9031b14b6193bd836cabc7aacb7a8@d41d8cd9": {
+    "reason-css-vds@github:EduardoRFS/reason-css-vds:package.json#84da87fcf7d441909c4ba07a6853ef4d6a10a415@d41d8cd9": {
       "id":
-        "reason-css-vds@github:EduardoRFS/reason-css-vds:package.json#7c04926465e9031b14b6193bd836cabc7aacb7a8@d41d8cd9",
+        "reason-css-vds@github:EduardoRFS/reason-css-vds:package.json#84da87fcf7d441909c4ba07a6853ef4d6a10a415@d41d8cd9",
       "name": "reason-css-vds",
       "version":
-        "github:EduardoRFS/reason-css-vds:package.json#7c04926465e9031b14b6193bd836cabc7aacb7a8",
+        "github:EduardoRFS/reason-css-vds:package.json#84da87fcf7d441909c4ba07a6853ef4d6a10a415",
       "source": {
         "type": "install",
         "source": [
-          "github:EduardoRFS/reason-css-vds:package.json#7c04926465e9031b14b6193bd836cabc7aacb7a8"
+          "github:EduardoRFS/reason-css-vds:package.json#84da87fcf7d441909c4ba07a6853ef4d6a10a415"
         ]
       },
       "overrides": [],
@@ -38,7 +38,7 @@
       },
       "overrides": [],
       "dependencies": [
-        "reason-css-vds@github:EduardoRFS/reason-css-vds:package.json#7c04926465e9031b14b6193bd836cabc7aacb7a8@d41d8cd9",
+        "reason-css-vds@github:EduardoRFS/reason-css-vds:package.json#84da87fcf7d441909c4ba07a6853ef4d6a10a415@d41d8cd9",
         "reason-css-lexer@github:EduardoRFS/reason-css-lexer:package.json#33d95c56005d6c169c46869da7e6aac75c36c441@d41d8cd9",
         "ocaml@4.10.0@d41d8cd9", "@reason-native/rely@3.2.1@d41d8cd9",
         "@opam/sedlex@github:ocaml-community/sedlex:sedlex.opam#25c0dbd82c7fc5d91102f5bd21db1411f2c46323@d41d8cd9",
@@ -852,12 +852,12 @@
       ],
       "dependencies": [
         "@opam/ocamlfind@opam:1.8.1@ff07b0f9",
-        "@opam/ocaml-secondary-compiler@opam:4.08.1-1@ba28931b",
+        "@opam/ocaml-secondary-compiler@opam:4.08.1-1@85df5d8f",
         "@esy-ocaml/substs@0.0.1@d41d8cd9"
       ],
       "devDependencies": [
         "@opam/ocamlfind@opam:1.8.1@ff07b0f9",
-        "@opam/ocaml-secondary-compiler@opam:4.08.1-1@ba28931b"
+        "@opam/ocaml-secondary-compiler@opam:4.08.1-1@85df5d8f"
       ]
     },
     "@opam/ocamlfind@opam:1.8.1@ff07b0f9": {
@@ -916,8 +916,8 @@
       ],
       "devDependencies": [ "ocaml@4.10.0@d41d8cd9" ]
     },
-    "@opam/ocaml-secondary-compiler@opam:4.08.1-1@ba28931b": {
-      "id": "@opam/ocaml-secondary-compiler@opam:4.08.1-1@ba28931b",
+    "@opam/ocaml-secondary-compiler@opam:4.08.1-1@85df5d8f": {
+      "id": "@opam/ocaml-secondary-compiler@opam:4.08.1-1@85df5d8f",
       "name": "@opam/ocaml-secondary-compiler",
       "version": "opam:4.08.1-1",
       "source": {
