@@ -185,6 +185,108 @@ let properties_static_css_tests = [
   ),
   ([%expr [%css "opacity: 0.5"]], [%expr [Css.opacity(0.5)]]),
   ([%expr [%css "opacity: 60%"]], [%expr [Css.opacity(0.6)]]),
+  // css-images-4
+  ([%expr [%css "object-fit: fill"]], [%expr [Css.objectFit(`fill)]]),
+  (
+    [%expr [%css "object-position: right bottom"]],
+    [%expr [Css.objectPosition(`hv((`right, `bottom)))]],
+  ),
+  // css-backgrounds-3
+  (
+    [%expr [%css "background-color: red"]],
+    [%expr [Css.backgroundColor(Css.red)]],
+  ),
+  (
+    [%expr [%css "border-top-color: blue"]],
+    [%expr [Css.borderTopColor(Css.blue)]],
+  ),
+  (
+    [%expr [%css "border-right-color: green"]],
+    [%expr [Css.borderRightColor(Css.green)]],
+  ),
+  (
+    [%expr [%css "border-bottom-color: purple"]],
+    [%expr [Css.borderBottomColor(Css.purple)]],
+  ),
+  (
+    [%expr [%css "border-left-color: #fff"]],
+    [%expr [Css.borderLeftColor(`hex("fff"))]],
+  ),
+  (
+    [%expr [%css "border-top-width: 15px"]],
+    [%expr [Css.borderTopWidth(`pxFloat(15.))]],
+  ),
+  (
+    [%expr [%css "border-right-width: 16px"]],
+    [%expr [Css.borderRightWidth(`pxFloat(16.))]],
+  ),
+  (
+    [%expr [%css "border-bottom-width: 17px"]],
+    [%expr [Css.borderBottomWidth(`pxFloat(17.))]],
+  ),
+  (
+    [%expr [%css "border-left-width: 18px"]],
+    [%expr [Css.borderLeftWidth(`pxFloat(18.))]],
+  ),
+  (
+    [%expr [%css "border-top-left-radius: 12%"]],
+    [%expr [Css.borderTopLeftRadius(`percent(12.))]],
+  ),
+  (
+    [%expr [%css "border-top-right-radius: 15%"]],
+    [%expr [Css.borderTopRightRadius(`percent(15.))]],
+  ),
+  (
+    [%expr [%css "border-bottom-left-radius: 14%"]],
+    [%expr [Css.borderBottomLeftRadius(`percent(14.))]],
+  ),
+  (
+    [%expr [%css "border-bottom-right-radius: 13%"]],
+    [%expr [Css.borderBottomRightRadius(`percent(13.))]],
+  ),
+  (
+    [%expr [%css "box-shadow: 12px 12px 2px 1px rgba(0, 0, 255, .2)"]],
+    [%expr
+      [
+        Css.boxShadows([
+          Css.Shadow.box(
+            ~x=`pxFloat(12.),
+            ~y=`pxFloat(12.),
+            ~blur=`pxFloat(2.),
+            ~spread=`pxFloat(1.),
+            `rgba((0, 0, 255, 0.2)),
+          ),
+        ]),
+      ]
+    ],
+  ),
+  (
+    [%expr
+      [%css
+        "box-shadow: 12px 12px 2px 1px rgba(0, 0, 255, .2), 13px 14px 5px 6px rgba(2, 1, 255, 50%)"
+      ]
+    ],
+    [%expr
+      [
+        Css.boxShadows([
+          Css.Shadow.box(
+            ~x=`pxFloat(12.),
+            ~y=`pxFloat(12.),
+            ~blur=`pxFloat(2.),
+            ~spread=`pxFloat(1.),
+            `rgba((0, 0, 255, 0.2)),
+          ),
+          Css.Shadow.box(
+            ~x=`pxFloat(13.),
+            ~y=`pxFloat(14.),
+            ~blur=`pxFloat(5.),
+            ~spread=`pxFloat(6.),
+            `rgba((2, 1, 255, 0.5)),
+          ),
+        ]),
+      ]
+    ],
+  ),
   // css-overflow-3
   ([%expr [%css "overflow-x: auto"]], [%expr [Css.overflowX(`auto)]]),
   ([%expr [%css "overflow-y: hidden"]], [%expr [Css.overflowY(`hidden)]]),
