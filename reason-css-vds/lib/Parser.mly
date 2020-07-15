@@ -4,7 +4,7 @@ open Ast
 
 %}
 %token <int> INT
-%token <string> STRING
+%token <string> KEYWORD
 %token LOWER_THAN
 %token GREATER_THAN
 %token QUOTE
@@ -66,13 +66,13 @@ let multiplier :=
     { At_least_one }
 
 let terminal ==
-  | s = STRING; { Keyword s }
+  | k = KEYWORD; { Keyword k }
   | SLASH; { Keyword "/" }
   | COMMA; { Keyword "," }
-  | LOWER_THAN; QUOTE; s = STRING; QUOTE; GREATER_THAN; { Property_type s }
-  | LOWER_THAN; s = STRING; GREATER_THAN; { Data_type s }
-  | LOWER_THAN; s = STRING; LEFT_PARENS; RIGHT_PARENS; GREATER_THAN; { Data_type (s ^ "()") }
-  | s = STRING; LEFT_PARENS; RIGHT_PARENS; { Function s }
+  | LOWER_THAN; QUOTE; s = KEYWORD; QUOTE; GREATER_THAN; { Property_type s }
+  | LOWER_THAN; s = KEYWORD; GREATER_THAN; { Data_type s }
+  | LOWER_THAN; s = KEYWORD; LEFT_PARENS; RIGHT_PARENS; GREATER_THAN; { Data_type (s ^ "()") }
+  | s = KEYWORD; LEFT_PARENS; RIGHT_PARENS; { Function s }
 
 let terminal_multiplier ==
   | t = terminal; { Terminal(t, One) }
@@ -80,7 +80,7 @@ let terminal_multiplier ==
 
 let function_call ==
   | terminal_multiplier
-  | s = STRING; LEFT_PARENS; v = value; RIGHT_PARENS; { Function_call (s, v) }
+  | s = KEYWORD; LEFT_PARENS; v = value; RIGHT_PARENS; { Function_call (s, v) }
 
 let group ==
   | function_call
