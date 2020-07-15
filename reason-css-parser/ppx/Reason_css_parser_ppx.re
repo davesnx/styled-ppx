@@ -65,7 +65,13 @@ let mapper = (_, _) => {
           | _ => failwith("unreachable")
           };
         expr;
-      | None => failwith("couldn't parse this value")
+      | exception _
+      | None =>
+        raise(
+          Location.Error(
+            Location.error(~loc=pexp_loc, "couldn't parse this value"),
+          ),
+        )
       }
     | expr => default_mapper.expr(mapper, expr),
 };
