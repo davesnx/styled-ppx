@@ -1,5 +1,5 @@
 {
-  "scopeName": "inline.styled.reason",
+  "scopeName": "source.styled-ppx",
   "fileTypes": [
     "re",
     "ml"
@@ -7,12 +7,90 @@
   "injectionSelector": "L:source -comment -string",
   "patterns": [
     {
-      "contentName": "meta.embedded.block.css",
-      "begin": "(\\[%(styled\\.?([a-zA-Z]*)?))",
-      "end": "(?<=])",
+      "begin": "\\[(%)(styled.global)\\b",
+      "end": "]",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.operator.extension.styled-ppx"
+        },
+        "2": {
+          "name": "keyword.other.extension.styled-ppx"
+        }
+      },
       "patterns": [
         {
-          "include": "source.css.styled"
+          "begin": "\\{[a-z_]*\\|",
+          "end": "\\|[a-z_]*\\}",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.styled-ppx"
+            }
+          },
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.styled-ppx"
+            }
+          },
+          "contentName": "meta.embedded.block.css",
+          "patterns": [
+            {
+              "include": "source.css.styled-ppx"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "begin": "\\[(%)(styled(\\.[a-zA-Z]*)?|css)\\b",
+      "end": "]",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.operator.extension.styled-ppx"
+        },
+        "2": {
+          "name": "keyword.other.extension.styled-ppx"
+        }
+      },
+      "patterns": [
+        {
+          "begin": "\\{[a-z_]*\\|",
+          "end": "\\|[a-z_]*\\}",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.styled-ppx"
+            }
+          },
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.styled-ppx"
+            }
+          },
+          "contentName": "meta.embedded.block.css",
+          "patterns": [
+            {
+              "include": "source.css.styled-ppx"
+            }
+          ]
+        },
+        {
+          "begin": "\"",
+          "end": "\"",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.styled-ppx"
+            }
+          },
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.styled-ppx"
+            }
+          },
+          "contentName": "meta.embedded.block.css",
+          "patterns": [
+            {
+              "include": "source.css.styled-ppx"
+            }
+          ]
         }
       ]
     }
