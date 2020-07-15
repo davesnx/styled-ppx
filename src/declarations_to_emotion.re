@@ -1,12 +1,16 @@
 open Migrate_parsetree;
 open Ast_410;
 open Ast_helper;
+open Asttypes;
 open Longident;
 open Reason_css_parser;
 open Reason_css_lexer;
 open Parser;
 
+module Ast_builder = Ppxlib.Ast_builder.Default;
+
 /* helpers */
+let loc = Location.none;
 let txt = txt => {Location.loc: Location.none, txt};
 let lid = name => txt(Lident(name));
 
@@ -121,7 +125,15 @@ let variants_to_expression =
   | `Transparent => id([%expr `transparent])
   | `Bottom => id([%expr `bottom])
   | `Top => id([%expr `top])
-  | `Fill => id([%expr `fill]);
+  | `Fill => id([%expr `fill])
+  | `Dotted => id([%expr `dotted])
+  | `Dashed => id([%expr `dashed])
+  | `Solid => id([%expr `solid])
+  | `Double => id([%expr `double])
+  | `Groove => id([%expr `groove])
+  | `Ridge => id([%expr `ridge])
+  | `Inset => id([%expr `inset])
+  | `Outset => id([%expr `outset]);
 
 let variable_rule = {
   open Rule;
@@ -543,24 +555,21 @@ let render_function_hsl = ((hue, saturation, lightness, alpha)) => {
   | None => id([%expr `hsl(([%e hue], [%e saturation], [%e lightness]))])
   };
 };
-let color =
-  apply(
-    property_color,
-    fun
-    | `Hex_color(hex) => id([%expr `hex([%e render_string(hex)])])
-    | `Named_color(color) => render_named_color(color)
-    | `Currentcolor => variants_to_expression(`Currentcolor)
-    | `Transparent => variants_to_expression(`Transparent)
-    | `Function_rgb(`Rgb(rgb))
-    | `Function_rgb(`Rgba(rgb)) => render_function_rgb(rgb)
-    | `Function_hsl(hsl) => render_function_hsl(hsl)
-    | `Function_hwb(_)
-    | `Function_lab(_)
-    | `Function_lch(_)
-    | `Function_color(_)
-    | `Function_device_cmyk(_) => raise(Unsupported_feature),
-    [%expr Css.color],
-  );
+let render_color =
+  fun
+  | `Hex_color(hex) => id([%expr `hex([%e render_string(hex)])])
+  | `Named_color(color) => render_named_color(color)
+  | `Currentcolor => variants_to_expression(`Currentcolor)
+  | `Transparent => variants_to_expression(`Transparent)
+  | `Function_rgb(`Rgb(rgb))
+  | `Function_rgb(`Rgba(rgb)) => render_function_rgb(rgb)
+  | `Function_hsl(hsl) => render_function_hsl(hsl)
+  | `Function_hwb(_)
+  | `Function_lab(_)
+  | `Function_lch(_)
+  | `Function_color(_)
+  | `Function_device_cmyk(_) => raise(Unsupported_feature);
+let color = apply(property_color, render_color, [%expr Css.color]);
 let opacity =
   apply(
     property_opacity,
@@ -644,6 +653,176 @@ let object_position =
 let image_resolution = unsupported(property_image_resolution);
 let image_orientation = unsupported(property_image_orientation);
 let image_rendering = unsupported(property_image_rendering);
+
+// css-backgrounds-3
+let render_shadow = shadow => {
+  let (color, x, y, blur, spread, inset) =
+    switch (shadow) {
+    | `Box(color, position, inset) =>
+      let color = Option.value(~default=`Currentcolor, color);
+      let (x, y, blur, spread) = {
+        let (x, y) =
+          switch (position) {
+          | ([x, y], _, _) => (x, y)
+          | _ => failwith("unreachable")
+          };
+        let (_, blur, spread) = position;
+        (x, y, blur, spread);
+      };
+      (color, x, y, blur, spread, inset);
+    };
+
+  let color = render_color(color);
+  let x = render_length(x);
+  let y = render_length(y);
+  let blur = Option.map(render_length, blur);
+  let spread = Option.map(render_length, spread);
+  let inset =
+    Option.map(
+      () => Exp.construct({txt: Lident("true"), loc: Location.none}, None),
+      inset,
+    );
+
+  let args =
+    [
+      (Labelled("x"), Some(x)),
+      (Labelled("y"), Some(y)),
+      (Labelled("blur"), blur),
+      (Labelled("spread"), spread),
+      (Labelled("inset"), inset),
+      (Nolabel, Some(color)),
+    ]
+    |> List.filter_map(((label, value)) =>
+         Option.map(value => (label, value), value)
+       );
+  let id =
+    switch (shadow) {
+    | `Box(_) => id([%expr Css.Shadow.box])
+    };
+  Exp.apply(id, args);
+};
+let background_color =
+  apply(property_background_color, render_color, [%expr Css.backgroundColor]);
+let background_image = unsupported(property_background_image);
+let background_repeat = unsupported(property_background_repeat);
+let background_attachment = unsupported(property_background_attachment);
+let background_position = unsupported(property_background_position);
+let background_clip = unsupported(property_background_clip);
+let background_origin = unsupported(property_background_origin);
+let background_size = unsupported(property_background_size);
+let background = unsupported(property_background);
+let border_top_color =
+  apply(property_border_top_color, render_color, [%expr Css.borderTopColor]);
+let border_right_color =
+  apply(
+    property_border_right_color,
+    apply_value(border_top_color.value_of_ast),
+    [%expr Css.borderRightColor],
+  );
+let border_bottom_color =
+  apply(
+    property_border_bottom_color,
+    apply_value(border_top_color.value_of_ast),
+    [%expr Css.borderBottomColor],
+  );
+let border_left_color =
+  apply(
+    property_border_left_color,
+    apply_value(border_top_color.value_of_ast),
+    [%expr Css.borderLeftColor],
+  );
+let border_color = unsupported(property_border_color);
+let border_top_style =
+  variants(property_border_top_style, [%expr Css.borderTopStyle]);
+let border_right_style =
+  variants(property_border_right_style, [%expr Css.borderRightStyle]);
+let border_bottom_style =
+  variants(property_border_bottom_style, [%expr Css.borderBottomStyle]);
+let border_left_style =
+  variants(property_border_left_style, [%expr Css.borderLeftStyle]);
+let border_style = unsupported(property_border_style);
+
+let render_line_width =
+  fun
+  | `Length(length) => render_length(length)
+  | _ => raise(Unsupported_feature);
+let border_top_width =
+  apply(
+    property_border_top_width,
+    render_line_width,
+    [%expr Css.borderTopWidth],
+  );
+let border_right_width =
+  apply(
+    property_border_right_width,
+    render_line_width,
+    [%expr Css.borderRightWidth],
+  );
+let border_bottom_width =
+  apply(
+    property_border_bottom_width,
+    render_line_width,
+    [%expr Css.borderBottomWidth],
+  );
+let border_left_width =
+  apply(
+    property_border_left_width,
+    render_line_width,
+    [%expr Css.borderLeftWidth],
+  );
+let border_width = unsupported(property_border_width);
+let border_top = unsupported(property_border_top);
+let border_right = unsupported(property_border_right);
+let border_bottom = unsupported(property_border_bottom);
+let border_left = unsupported(property_border_left);
+let border = unsupported(property_border);
+let border_top_left_radius =
+  apply(
+    property_border_top_left_radius,
+    fun
+    | [lp] => render_length_percentage(lp)
+    | _ => raise(Unsupported_feature),
+    [%expr Css.borderTopLeftRadius],
+  );
+let border_top_right_radius =
+  apply(
+    property_border_top_right_radius,
+    apply_value(border_top_left_radius.value_of_ast),
+    [%expr Css.borderTopRightRadius],
+  );
+let border_bottom_right_radius =
+  apply(
+    property_border_bottom_right_radius,
+    apply_value(border_top_left_radius.value_of_ast),
+    [%expr Css.borderBottomRightRadius],
+  );
+let border_bottom_left_radius =
+  apply(
+    property_border_bottom_left_radius,
+    apply_value(border_top_left_radius.value_of_ast),
+    [%expr Css.borderBottomLeftRadius],
+  );
+let border_radius = unsupported(property_border_radius);
+let border_image_source = unsupported(property_border_image_source);
+let border_image_slice = unsupported(property_border_image_slice);
+let border_image_width = unsupported(property_border_image_width);
+let border_image_outset = unsupported(property_border_image_outset);
+let border_image_repeat = unsupported(property_border_image_repeat);
+let border_image = unsupported(property_border_image);
+let box_shadow =
+  apply(
+    property_box_shadow,
+    fun
+    | `None => variants_to_expression(`None)
+    | `Shadow(shadows) => {
+        let shadows =
+          shadows
+          |> List.map(shadow => `Box(shadow))
+          |> List.map(render_shadow);
+        Ast_builder.elist(~loc, shadows);
+      },
+    [%expr Css.boxShadows],
+  );
 
 // css-overflow-3
 // TODO: maybe implement using strings?
@@ -839,6 +1018,48 @@ let properties = [
   ("image-resolution", found(image_resolution)),
   ("image-orientation", found(image_orientation)),
   ("image-rendering", found(image_rendering)),
+  // css-background-3
+  ("background-color", found(background_color)),
+  ("background-image", found(background_image)),
+  ("background-repeat", found(background_repeat)),
+  ("background-attachment", found(background_attachment)),
+  ("background-position", found(background_position)),
+  ("background-clip", found(background_clip)),
+  ("background-origin", found(background_origin)),
+  ("background-size", found(background_size)),
+  ("background", found(background)),
+  ("border-top-color", found(border_top_color)),
+  ("border-right-color", found(border_right_color)),
+  ("border-bottom-color", found(border_bottom_color)),
+  ("border-left-color", found(border_left_color)),
+  ("border-color", found(border_color)),
+  ("border-top-style", found(border_top_style)),
+  ("border-right-style", found(border_right_style)),
+  ("border-bottom-style", found(border_bottom_style)),
+  ("border-left-style", found(border_left_style)),
+  ("border-style", found(border_style)),
+  ("border-top-width", found(border_top_width)),
+  ("border-right-width", found(border_right_width)),
+  ("border-bottom-width", found(border_bottom_width)),
+  ("border-left-width", found(border_left_width)),
+  ("border-width", found(border_width)),
+  ("border-top", found(border_top)),
+  ("border-right", found(border_right)),
+  ("border-bottom", found(border_bottom)),
+  ("border-left", found(border_left)),
+  ("border", found(border)),
+  ("border-top-left-radius", found(border_top_left_radius)),
+  ("border-top-right-radius", found(border_top_right_radius)),
+  ("border-bottom-right-radius", found(border_bottom_right_radius)),
+  ("border-bottom-left-radius", found(border_bottom_left_radius)),
+  ("border-radius", found(border_radius)),
+  ("border-image-source", found(border_image_source)),
+  ("border-image-slice", found(border_image_slice)),
+  ("border-image-width", found(border_image_width)),
+  ("border-image-outset", found(border_image_outset)),
+  ("border-image-repeat", found(border_image_repeat)),
+  ("border-image", found(border_image)),
+  ("box-shadow", found(box_shadow)),
   // css-overflow-3
   ("overflow-x", found(overflow_x)),
   ("overflow-y", found(overflow_y)),
@@ -849,7 +1070,7 @@ let properties = [
   ("block-ellipsis", found(block_ellipsis)),
   ("max-lines", found(max_lines)),
   ("continue", found(continue)),
-  // css-box-3
+  // css-text-3
   ("text-transform", found(text_transform)),
   ("white-space", found(white_space)),
   ("tab-size", found(tab_size)),

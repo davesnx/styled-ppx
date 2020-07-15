@@ -1,6 +1,6 @@
 [@ocaml.ppx.context
   {
-    tool_name: "migrate_driver",
+    tool_name: "ppxlib_driver",
     include_dirs: [],
     load_path: [],
     open_modules: [],
