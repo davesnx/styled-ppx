@@ -1,7 +1,8 @@
 [@deriving show]
 type token =
+  | KEYWORD(string)
+  | FUNCTION(string)
   | INT(int)
-  | STRING(string)
   | LOWER_THAN
   | GREATER_THAN
   | QUOTE

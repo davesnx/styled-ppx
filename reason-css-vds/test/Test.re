@@ -179,6 +179,18 @@ let parse_tests = [
   ),
   // TODO: shouldn't be a special case
   ("<rgb()>", Terminal(Data_type("rgb()"), One)),
+  // ident with number
+  (
+    "[ jis04 | simplified | traditional ]",
+    Combinator(
+      Xor,
+      [
+        Terminal(Keyword("jis04"), One),
+        Terminal(Keyword("simplified"), One),
+        Terminal(Keyword("traditional"), One),
+      ],
+    ),
+  ),
 ];
 describe("correctly parse value", ({test, _}) => {
   let test = (index, (result, expected)) =>

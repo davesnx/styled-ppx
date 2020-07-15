@@ -1,6 +1,7 @@
 open Sedlexing.Utf8;
 open Tokens;
 
+let alpha = [%sedlex.regexp? 'a'..'z' | 'A'..'Z'];
 let digit = [%sedlex.regexp? '0'..'9'];
 let int = [%sedlex.regexp? Plus(digit)];
 let whitespace = [%sedlex.regexp? ' ' | '\t' | '\n'];
@@ -8,7 +9,7 @@ let whitespace = [%sedlex.regexp? ' ' | '\t' | '\n'];
 // TODO: is rgb(255 255 255/0) valid?
 
 // TODO: keyword characters, like . and , also escape like '*'
-let string = [%sedlex.regexp? Plus('a'..'z' | 'A'..'Z' | '-')];
+let keyword = [%sedlex.regexp? (alpha, Star(alpha | digit | '-'))];
 
 let read_char = buf => {
   let char =
@@ -44,9 +45,9 @@ let rec read = buf =>
   | whitespace =>
     let _ = lexeme(buf);
     read(buf);
-  | string => STRING(lexeme(buf))
+  | keyword => KEYWORD(lexeme(buf))
   | ("'", any, "'") =>
     let chars = lexeme(buf);
-    STRING(String.sub(chars, 1, String.length(chars) - 2));
+    KEYWORD(String.sub(chars, 1, String.length(chars) - 2));
   | _ => read_char(buf)
   };
