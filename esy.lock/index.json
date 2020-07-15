@@ -1,5 +1,5 @@
 {
-  "checksum": "ede53681be697eb4ee58261b0f8db96d",
+  "checksum": "c14fdfd2d6ecf16d2bce296f925b7bf8",
   "root": "styled-ppx@link-dev:./package.json",
   "node": {
     "styled-ppx@link-dev:./package.json": {
@@ -12,9 +12,9 @@
         "manifest": "package.json"
       },
       "overrides": [],
-      "dependencies": [],
+      "dependencies": [ "@opam/ppxlib@opam:0.14.0@c02ad40d" ],
       "devDependencies": [
-        "reason-css-parser@github:EduardoRFS/reason-css-parser:package.json#af422f9f3a7973b48ae92fe363221d7e17461450@d41d8cd9",
+        "reason-css-parser@github:EduardoRFS/reason-css-parser:package.json#99da696f761823b959214f89b1687d0c4b261538@d41d8cd9",
         "ocaml@4.10.0@d41d8cd9", "@reason-native/rely@3.2.1@d41d8cd9",
         "@opam/sedlex@opam:2.2@ffde36c0",
         "@opam/ocaml-migrate-parsetree@opam:1.7.3@dbcf3b47",
@@ -51,16 +51,16 @@
       ],
       "devDependencies": []
     },
-    "reason-css-parser@github:EduardoRFS/reason-css-parser:package.json#af422f9f3a7973b48ae92fe363221d7e17461450@d41d8cd9": {
+    "reason-css-parser@github:EduardoRFS/reason-css-parser:package.json#99da696f761823b959214f89b1687d0c4b261538@d41d8cd9": {
       "id":
-        "reason-css-parser@github:EduardoRFS/reason-css-parser:package.json#af422f9f3a7973b48ae92fe363221d7e17461450@d41d8cd9",
+        "reason-css-parser@github:EduardoRFS/reason-css-parser:package.json#99da696f761823b959214f89b1687d0c4b261538@d41d8cd9",
       "name": "reason-css-parser",
       "version":
-        "github:EduardoRFS/reason-css-parser:package.json#af422f9f3a7973b48ae92fe363221d7e17461450",
+        "github:EduardoRFS/reason-css-parser:package.json#99da696f761823b959214f89b1687d0c4b261538",
       "source": {
         "type": "install",
         "source": [
-          "github:EduardoRFS/reason-css-parser:package.json#af422f9f3a7973b48ae92fe363221d7e17461450"
+          "github:EduardoRFS/reason-css-parser:package.json#99da696f761823b959214f89b1687d0c4b261538"
         ]
       },
       "overrides": [],
@@ -612,6 +612,39 @@
         "ocaml@4.10.0@d41d8cd9", "@opam/result@opam:1.5@6b753c82"
       ]
     },
+    "@opam/ppxlib@opam:0.14.0@c02ad40d": {
+      "id": "@opam/ppxlib@opam:0.14.0@c02ad40d",
+      "name": "@opam/ppxlib",
+      "version": "opam:0.14.0",
+      "source": {
+        "type": "install",
+        "source": [
+          "archive:https://opam.ocaml.org/cache/sha256/a1/a1a398f7c8f670d7de80468ff4639862b126f4dcac3de416e0c5c4d5860f3854#sha256:a1a398f7c8f670d7de80468ff4639862b126f4dcac3de416e0c5c4d5860f3854",
+          "archive:https://github.com/ocaml-ppx/ppxlib/releases/download/0.14.0/ppxlib-0.14.0.tbz#sha256:a1a398f7c8f670d7de80468ff4639862b126f4dcac3de416e0c5c4d5860f3854"
+        ],
+        "opam": {
+          "name": "ppxlib",
+          "version": "0.14.0",
+          "path": "esy.lock/opam/ppxlib.0.14.0"
+        }
+      },
+      "overrides": [],
+      "dependencies": [
+        "ocaml@4.10.0@d41d8cd9", "@opam/stdio@opam:v0.13.0@eb59d879",
+        "@opam/ppx_derivers@opam:1.2.1@ecf0aa45",
+        "@opam/ocaml-migrate-parsetree@opam:1.7.3@dbcf3b47",
+        "@opam/ocaml-compiler-libs@opam:v0.12.1@5c34eb0d",
+        "@opam/dune@opam:2.5.1@f38f376e", "@opam/base@opam:v0.13.2@c3150775",
+        "@esy-ocaml/substs@0.0.1@d41d8cd9"
+      ],
+      "devDependencies": [
+        "ocaml@4.10.0@d41d8cd9", "@opam/stdio@opam:v0.13.0@eb59d879",
+        "@opam/ppx_derivers@opam:1.2.1@ecf0aa45",
+        "@opam/ocaml-migrate-parsetree@opam:1.7.3@dbcf3b47",
+        "@opam/ocaml-compiler-libs@opam:v0.12.1@5c34eb0d",
+        "@opam/dune@opam:2.5.1@f38f376e", "@opam/base@opam:v0.13.2@c3150775"
+      ]
+    },
     "@opam/ppxfind@opam:1.4@1e01d2a5": {
       "id": "@opam/ppxfind@opam:1.4@1e01d2a5",
       "name": "@opam/ppxfind",
@@ -1030,6 +1063,31 @@
         "@opam/menhir@opam:20200211@26571604",
         "@opam/dune-build-info@opam:2.6.1@611bb155",
         "@opam/dune@opam:2.5.1@f38f376e"
+      ]
+    },
+    "@opam/ocaml-compiler-libs@opam:v0.12.1@5c34eb0d": {
+      "id": "@opam/ocaml-compiler-libs@opam:v0.12.1@5c34eb0d",
+      "name": "@opam/ocaml-compiler-libs",
+      "version": "opam:v0.12.1",
+      "source": {
+        "type": "install",
+        "source": [
+          "archive:https://opam.ocaml.org/cache/md5/2f/2f929af7c764a3f681a5671f271210c4#md5:2f929af7c764a3f681a5671f271210c4",
+          "archive:https://github.com/janestreet/ocaml-compiler-libs/archive/v0.12.1.tar.gz#md5:2f929af7c764a3f681a5671f271210c4"
+        ],
+        "opam": {
+          "name": "ocaml-compiler-libs",
+          "version": "v0.12.1",
+          "path": "esy.lock/opam/ocaml-compiler-libs.v0.12.1"
+        }
+      },
+      "overrides": [],
+      "dependencies": [
+        "ocaml@4.10.0@d41d8cd9", "@opam/dune@opam:2.5.1@f38f376e",
+        "@esy-ocaml/substs@0.0.1@d41d8cd9"
+      ],
+      "devDependencies": [
+        "ocaml@4.10.0@d41d8cd9", "@opam/dune@opam:2.5.1@f38f376e"
       ]
     },
     "@opam/merlin-extend@opam:0.5@675b1611": {

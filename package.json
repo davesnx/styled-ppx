@@ -6,31 +6,18 @@
   "license": "MIT",
   "homepage": "https://github.com/davesnx/styled-ppx",
   "keywords": [
-    "reason",
-    "ocaml",
-    "ppx",
-    "bucklescript",
-    "css",
-    "styled-components",
+    "reason", "ocaml", "ppx", "bucklescript", "css", "styled-components",
     "emotion"
   ],
-  "bugs": {
-    "url": "https://github.com/davesnx/styled-ppx/issues"
-  },
+  "bugs": { "url": "https://github.com/davesnx/styled-ppx/issues" },
   "repository": {
     "type": "git",
     "url": "https://github.com/davesnx/styled-ppx.git"
   },
   "esy": {
     "build": "dune build -p #{self.name}",
-    "buildEnv": {
-      "ODOC_SYNTAX": "re"
-    },
-    "release": {
-      "bin": [
-        "Bin"
-      ]
-    }
+    "buildEnv": { "ODOC_SYNTAX": "re" },
+    "release": { "bin": [ "Bin" ] }
   },
   "devDependencies": {
     "@opam/merlin": "*",
@@ -41,8 +28,10 @@
     "@opam/ocaml-migrate-parsetree": "^1.7.3",
     "@opam/sedlex": "*",
     "@reason-native/rely": "^3.2.1",
-    "@opam/ocaml-lsp-server": "ocaml/ocaml-lsp:ocaml-lsp-server.opam#fbc433e14035d520c7137916ae710b8ec3b415e9",
-    "reason-css-parser": "EduardoRFS/reason-css-parser:package.json#af422f9f3a7973b48ae92fe363221d7e17461450"
+    "@opam/ocaml-lsp-server":
+      "ocaml/ocaml-lsp:ocaml-lsp-server.opam#fbc433e14035d520c7137916ae710b8ec3b415e9",
+    "reason-css-parser":
+      "EduardoRFS/reason-css-parser:package.json#99da696f761823b959214f89b1687d0c4b261538"
   },
   "resolutions": {
     "@esy-ocaml/reason": "facebook/reason:reason.json#773dbcd"
@@ -58,5 +47,6 @@
     "format": "esy dune build @fmt --auto-promote",
     "watch": "esy dune build -p styled-ppx --watch",
     "utop": "esy dune utop lib -- -implicit-bindings"
-  }
+  },
+  "dependencies": { "@opam/ppxlib": "0.14.0" }
 }
