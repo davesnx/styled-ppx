@@ -2,17 +2,16 @@
 
 # styled-ppx
 
+**styled-ppx** is the [ppx](https://victor.darvariu.me/jekyll/update/2018/06/19/ppx-tutorial.html) that enables *CSS-in-Reason*.
+Build on top of [emotion](https://emotion.sh), it allows you to style apps quickly, performant and as you always done it.
+
 ![](./docs/images/demo.png)
 
-**styled-ppx** is the [ppx](https://victor.darvariu.me/jekyll/update/2018/06/19/ppx-tutorial.html) that enables *CSS-in-Reason*.
-
-Allows you to create **React Components** with Type-safe CSS style definitions that don't rely on a specific [DSL](https://en.wikipedia.org/wiki/Domain-specific_language) and great error messages.
+Allows you to create **React Components** with Type-safe CSS style definitions that don't rely on a specific [DSL](https://en.wikipedia.org/wiki/Domain-specific_language) and great error messages:
 
 ![](./docs/images/compile-error.png)
 
-Build on top of [emotion](https://emotion.sh), it allows you to style apps quickly, performant and as you always done it.
-
-> ⚠️ **Early stage** This ppx is in an early stage. Meaning that it doesn't support full functionality as [emotion](https://emotion.sh) or [styled-components](https://styled-components.com/).
+> ⚠️ **BETA** This ppx is in an early stage. Meaning that it doesn't support full functionality as [emotion](https://emotion.sh) or [styled-components](https://styled-components.com/).
 > But you can safely use it, as it would respect [Compatible Versioning](https://gitlab.com/staltz/comver).
 > In case you want to know more, take a look at the [ROADMAP](./ROADMAP.md), or feel free to chat on Discord: @davesnx#5641
 
