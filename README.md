@@ -2,13 +2,13 @@
 
 # styled-ppx
 
-![](./docs/demo.png)
+![](./docs/images/demo.png)
 
 **styled-ppx** is the [ppx](https://victor.darvariu.me/jekyll/update/2018/06/19/ppx-tutorial.html) that enables *CSS-in-Reason*.
 
 Allows you to create **React Components** with Type-safe CSS style definitions that don't rely on a specific [DSL](https://en.wikipedia.org/wiki/Domain-specific_language) and great error messages.
 
-![](./docs/compile-error.png)
+![](./docs/images/compile-error.png)
 
 Build on top of [emotion](https://emotion.sh), it allows you to style apps quickly, performant and as you always done it.
 
