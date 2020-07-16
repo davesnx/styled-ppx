@@ -1,12 +1,18 @@
-# styled-ppx
-
 [![Actions Status](https://github.com/davesnx/styled-ppx/workflows/CI/badge.svg)](https://github.com/davesnx/styled-ppx/actions) [![ComVer](https://img.shields.io/badge/ComVer-compliant-brightgreen.svg)](https://github.com/staltz/comver)
 
-**styled-ppx** is the ppx that enables *CSS-in-Reason*.
+# styled-ppx
 
-Allows you to create **React Components** with style definitions with CSS that don't rely on a specific DSL and keeps type-safety with great error messages. Build on top of [bs-emotion](https://github.com/ahrefs/bs-emotion), it allows you to style apps quickly, performant and as you always done it.
+![](./docs/demo.png)
 
-> ⚠️ **Early stage** This ppx is in a early stage. Meaning that it doesn't support full functionality as [emotion](https://emotion.sh) or [styled-components](https://styled-components.com/).
+**styled-ppx** is the [ppx](https://victor.darvariu.me/jekyll/update/2018/06/19/ppx-tutorial.html) that enables *CSS-in-Reason*.
+
+Allows you to create **React Components** with Type-safe CSS style definitions that don't rely on a specific [DSL](https://en.wikipedia.org/wiki/Domain-specific_language) and great error messages.
+
+![](./docs/compile-error.png)
+
+Build on top of [emotion](https://emotion.sh), it allows you to style apps quickly, performant and as you always done it.
+
+> ⚠️ **Early stage** This ppx is in an early stage. Meaning that it doesn't support full functionality as [emotion](https://emotion.sh) or [styled-components](https://styled-components.com/).
 > But you can safely use it, as it would respect [Compatible Versioning](https://gitlab.com/staltz/comver).
 > In case you want to know more, take a look at the [ROADMAP](./ROADMAP.md), or feel free to chat on Discord: @davesnx#5641
 
@@ -61,11 +67,11 @@ ReactDOMRe.renderToElementWithId(
 For further detail, take a look in [here](./docs/apis.md).
 
 ## Motivation
-I love CSS and I'm coming from the JavaScript world: writing React with styled-components mostly. I found it, one of the best combos to write scalable frontend applications and wasn't a reality in ReasonML/OCaml.
+I love CSS and I'm coming from the JavaScript world: writing React with styled-components mostly. I found to be one of the best combos for writting scalable frontend applications. When I arrived to Reason wasn't a thing. Even people were asking for it ([a](https://reasonml.chat/t/idiomatic-way-to-bind-to-styled-components/886) [f](https://reasonml.chat/t/styled-components-possible/554)[e](https://reasonml.chat/t/styling-solutions-reasonreact-as-of-aug-18/958)[w](https://reasonml.chat/t/options-and-best-practices-for-styling-in-reasonreact/261) [t](https://twitter.com/lyovson/status/1233397294311100417)[i](https://discord.gg/byjdYFH)[m](https://discord.gg/byjdYFH)[e](https://discord.gg/byjdYFH)[s](https://discord.gg/byjdYFH)).
 
-As well, saw a few people asking for it ([a](https://reasonml.chat/t/idiomatic-way-to-bind-to-styled-components/886) [f](https://reasonml.chat/t/styled-components-possible/554)[e](https://reasonml.chat/t/styling-solutions-reasonreact-as-of-aug-18/958)[w](https://reasonml.chat/t/options-and-best-practices-for-styling-in-reasonreact/261) [t](https://twitter.com/lyovson/status/1233397294311100417)[i](https://discord.gg/byjdYFH)[m](https://discord.gg/byjdYFH)[e](https://discord.gg/byjdYFH)[s](https://discord.gg/byjdYFH)). So I took the time to create it with help from [@jchavarri](https://github.com/jchavarri) 🙌.
+So I took the time to create it with help from [@jchavarri](https://github.com/jchavarri) 🙌.
 
-If you want to know more, I really do recommend [watching my talk at WFH 2020](http://www.youtube.com/watch?feature=player_embedded&v=D8WhIeMIZQc&feature=youtu.be&t=468).
+If you want to know more about how it works or what are the benefits I recommend to watch [my talk at ReasonSTHLM Meetup](https://www.youtube.com/watch?v=ekHCBZiCviM)
 
 ## Installation
 
@@ -121,6 +127,14 @@ And add the PPX in your `bsconfig.json` file:
 ```
 
 If you want to try out of the box a project, just visit https://github.com/davesnx/try-styled-ppx and follow the instalation process there.
+
+## Editor Support
+
+One of the fears of using a ppx is editor support, we belive that having compiling errors and syntax highlight would be an amazing experience. Install the VSCode extension:
+
+**[VSCode Extension](https://marketplace.visualstudio.com/items?itemName=davesnx.vscode-styled-ppx)**
+
+- If you are interested on another editor, please fill an issue and we would consider.
 
 ## Thanks to
 Thanks to [Javier Chávarri](https://github.com/jchavarri), for helping me understand all the world of OCaml and his knowledge about ppx's. It has been a great experience.
