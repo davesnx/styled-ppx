@@ -182,6 +182,8 @@ let property_image_rendering = [%value
   "auto | smooth | high-quality | crisp-edges | pixelated"
 ];
 
+// TODO: optional keyword should be a boolean, not option(unit)
+
 // css-backgrounds-3
 // let shadow = [%value "<color>? && [<length>{2} <length [0,∞]>? <length>?] && inset?"];
 let shadow = [%value
@@ -323,6 +325,120 @@ let property_text_indent = [%value
 let property_hanging_punctuation = [%value
   "none | [ first || [ force-end | allow-end ] || last ]"
 ];
+
+// css2
+let property_line_height = [%value
+  "normal | <number> | <length> | <percentage>"
+];
+
+// css-fonts-4
+
+let relative_size = [%value "[ larger | smaller ]"];
+let absolute_size = [%value
+  "[ xx-small | x-small | small | medium | large | x-large | xx-large ]"
+];
+
+// TODO:
+let palette_identifier = [%value "undefined"];
+let generic_family = [%value
+  "serif | sans-serif | cursive | fantasy | monospace | system-ui | emoji | math | fangsong | ui-serif | ui-sans-serif | ui-monospace | ui-rounded"
+];
+let family_name = [%value "<custom-ident>* | <string>"];
+
+let feature_value_name = [%value "<ident>"];
+let function_annotation = [%value "annotation(<feature-value-name>)"];
+let function_ornaments = [%value "ornaments(<feature-value-name>)"];
+let function_swash = [%value "swash(<feature-value-name>)"];
+let function_character_variant = [%value
+  "character-variant(<feature-value-name>#)"
+];
+let function_styleset = [%value "styleset(<feature-value-name>#)"];
+let function_stylistic = [%value "stylistic(<feature-value-name>)"];
+let feature_tag_value = [%value "<string> [ <integer> | on | off ]?"];
+let east_asian_width_values = [%value "[ full-width | proportional-width ]"];
+let east_asian_variant_values = [%value
+  "[ jis78 | jis83 | jis90 | jis04 | simplified | traditional ]"
+];
+// let font_feature_value_type = [%value
+//   "@stylistic | @historical-forms | @styleset | @character-variant | @swash | @ornaments | @annotation"
+// ];
+// let feature_value_block = [%value
+//   "<font-feature-value-type> { <declaration-list> }"
+// ];
+let numeric_fraction_values = [%value
+  "[ diagonal-fractions | stacked-fractions ]"
+];
+let numeric_spacing_values = [%value "[ proportional-nums | tabular-nums ]"];
+let numeric_figure_values = [%value "[ lining-nums | oldstyle-nums ]"];
+let contextual_alt_values = [%value "[ contextual | no-contextual ]"];
+let historical_lig_values = [%value
+  "[ historical-ligatures | no-historical-ligatures ]"
+];
+let discretionary_lig_values = [%value
+  "[ discretionary-ligatures | no-discretionary-ligatures ]"
+];
+let common_lig_values = [%value "[ common-ligatures | no-common-ligatures ]"];
+let font_variant_css21 = [%value "[normal | small-caps]"];
+let color_font_technology = [%value "[COLR | SVG | sbix | CBDT ]"];
+let font_technology = [%value
+  "[features | variations | color(<color-font-technology>) | palettes]"
+];
+let font_format = [%value
+  "[<string> | woff | truetype | opentype | woff2 | embedded-opentype | collection | svg]"
+];
+let font_stretch_css3 = [%value
+  "[normal | ultra-condensed | extra-condensed | condensed | semi-condensed | semi-expanded | expanded | extra-expanded | ultra-expanded]"
+];
+let font_variant_css2 = [%value "[normal | small-caps]"];
+let font_weight_absolute = [%value "[normal | bold | <number>]"];
+let property_font_family = [%value "[ <family-name> | <generic-family> ]#"];
+let property_font_weight = [%value
+  "<font-weight-absolute> | bolder | lighter"
+];
+let property_font_stretch = [%value
+  "normal | ultra-condensed | extra-condensed | condensed | semi-condensed | semi-expanded | expanded | extra-expanded | ultra-expanded"
+];
+let property_font_style = [%value "normal | italic | oblique <angle>?"];
+let property_font_size = [%value
+  "<absolute-size> | <relative-size> | <length-percentage>"
+];
+let property_font_size_adjust = [%value "none | <number>"];
+let property_font = [%value
+  "[ [ <'font-style'> || <font-variant-css2> || <'font-weight'> || <font-stretch-css3> ]? <'font-size'> [ / <'line-height'> ]? <'font-family'> ] | caption | icon | menu | message-box | small-caption | status-bar"
+];
+let property_font_synthesis_weight = [%value "auto | none"];
+let property_font_synthesis_style = [%value "auto | none"];
+let property_font_synthesis_small_caps = [%value "auto | none"];
+let property_font_synthesis = [%value "none | [ weight || style ]"];
+let property_font_kerning = [%value "auto | normal | none"];
+let property_font_variant_ligatures = [%value
+  "normal | none | [ <common-lig-values> || <discretionary-lig-values> || <historical-lig-values> || <contextual-alt-values> ]"
+];
+let property_font_variant_position = [%value "normal | sub | super"];
+let property_font_variant_caps = [%value
+  "normal | small-caps | all-small-caps | petite-caps | all-petite-caps | unicase | titling-caps"
+];
+let property_font_variant_numeric = [%value
+  "normal | [ <numeric-figure-values> || <numeric-spacing-values> || <numeric-fraction-values> || ordinal || slashed-zero ]"
+];
+let property_font_variant_alternates = [%value
+  "normal | [ stylistic(<feature-value-name>) || historical-forms || styleset(<feature-value-name>#) || character-variant(<feature-value-name>#) || swash(<feature-value-name>) || ornaments(<feature-value-name>) || annotation(<feature-value-name>) ]"
+];
+let property_font_variant_east_asian = [%value
+  "normal | [ <east-asian-variant-values> || <east-asian-width-values> || ruby ]"
+];
+let property_font_variant = [%value
+  "normal | none | [ <common-lig-values> || <discretionary-lig-values> || <historical-lig-values> || <contextual-alt-values> || [ small-caps | all-small-caps | petite-caps | all-petite-caps | unicase | titling-caps ] || [ stylistic(<feature-value-name>) || historical-forms || styleset(<feature-value-name>#) || character-variant(<feature-value-name>#) || swash(<feature-value-name>) || ornaments(<feature-value-name>) || annotation(<feature-value-name>) ] || <numeric-figure-values> || <numeric-spacing-values> || <numeric-fraction-values> || ordinal || slashed-zero || <east-asian-variant-values> || <east-asian-width-values> || ruby || [ sub | super ] ]"
+];
+let property_font_feature_settings = [%value "normal | <feature-tag-value>#"];
+let property_font_optical_sizing = [%value "auto | none"];
+let property_font_variation_settings = [%value
+  "normal | [ <string> <number>]#"
+];
+let property_font_palette = [%value
+  "none | normal | light | dark | <palette-identifier>"
+];
+let property_font_variant_emoji = [%value "auto | text | emoji | unicode"];
 
 // css-flexbox-1
 let property_flex_direction = [%value
