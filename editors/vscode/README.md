@@ -3,10 +3,10 @@
 Syntax highlighting for [styled-ppx](https://github.com/davesnx/styled-ppx) in Reason and OCaml.
 
 ### Reason
-![](./docs/reason.png)
+![](./docs/images/reason.png)
 
 ### OCaml
-![](./docs/ocaml.png)
+![](./docs/images/ocaml.png)
 
 ## Credits
 - Thanks to [@mnxn](https://github.com/mnxn).
