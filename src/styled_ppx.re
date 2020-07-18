@@ -455,10 +455,11 @@ let createMakeProps = (~loc, extraProps) => {
         createDomRefLabel(~loc),
         createChildrenLabel(~loc),
         ...List.map(
-             ({name, type_, isEvent}) =>
-               isEvent
-                 ? createRecordEventLabel(~loc, name, type_)
-                 : createRecordLabel(~loc, name, type_),
+             (domProp) =>
+               switch (domProp) {
+                 | Event({ name, type_ }) => createRecordEventLabel(~loc, name, type_)
+                 | Attribute({ name, type_ }) => createRecordLabel(~loc, name, type_)
+               },
              domPropsList,
            ),
       ],

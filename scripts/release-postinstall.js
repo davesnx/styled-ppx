@@ -57,10 +57,10 @@ function copyFileSync(sourcePath, destPath) {
   fs.chmodSync(destPath, stat.mode);
 }
 
-const copyPlatformBinaries = platformPath => {
+const copyPlatformBinaries = (platformPath) => {
   const platformBuildPath = path.join(__dirname, platformPath);
 
-  binariesToCopy.forEach(binaryPath => {
+  binariesToCopy.forEach((binaryPath) => {
     const sourcePath = path.join(platformBuildPath, binaryPath);
     const destPath = path.join(__dirname, binaryPath);
     if (fs.existsSync(destPath)) {
