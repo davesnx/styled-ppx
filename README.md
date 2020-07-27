@@ -1,4 +1,4 @@
-# styled-ppx &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [![Actions Status](https://github.com/davesnx/styled-ppx/workflows/CI/badge.svg)](https://github.com/davesnx/styled-ppx/actions) [![ComVer](https://img.shields.io/badge/ComVer-compliant-brightgreen.svg)](https://github.com/staltz/comver)
+<h1> styled-ppx<a href="https://github.com/davesnx/styled-ppx/actions"><img alt="CI" align="right" src="https://github.com/davesnx/styled-ppx/workflows/CI/badge.svg"></a><a href="https://github.com/staltz/comver"><img alt="ComVer" align="right" src="https://img.shields.io/badge/ComVer-compliant-brightgreen.svg" /></a></h1>
 
 **styled-ppx** is the [ppx](https://victor.darvariu.me/jekyll/update/2018/06/19/ppx-tutorial.html) that enables *CSS-in-Reason*.
 Build on top of [emotion](https://emotion.sh), it allows you to style apps quickly, performant and as you always done it.
