@@ -931,6 +931,37 @@ let text_indent =
   );
 let hanging_punctuation = unsupported(property_hanging_punctuation);
 
+// css-fonts-4
+let font_family =
+  unsupported(property_font_family, ~call=[%expr Css.fontFamily]);
+let font_weight =
+  unsupported(property_font_weight, ~call=[%expr Css.fontWeight]);
+let font_stretch = unsupported(property_font_stretch);
+let font_style =
+  unsupported(property_font_style, ~call=[%expr Css.fontStyle]);
+let font_size = unsupported(property_font_size, ~call=[%expr Css.fontSize]);
+let font_size_adjust = unsupported(property_font_size_adjust);
+let font = unsupported(property_font);
+let font_synthesis_weight = unsupported(property_font_synthesis_weight);
+let font_synthesis_style = unsupported(property_font_synthesis_style);
+let font_synthesis_small_caps =
+  unsupported(property_font_synthesis_small_caps);
+let font_synthesis = unsupported(property_font_synthesis);
+let font_kerning = unsupported(property_font_kerning);
+let font_variant_ligatures = unsupported(property_font_variant_ligatures);
+let font_variant_position = unsupported(property_font_variant_position);
+let font_variant_caps = unsupported(property_font_variant_caps);
+let font_variant_numeric = unsupported(property_font_variant_numeric);
+let font_variant_alternates = unsupported(property_font_variant_alternates);
+let font_variant_east_asian = unsupported(property_font_variant_east_asian);
+let font_variant =
+  unsupported(property_font_variant, ~call=[%expr Css.fontVariant]);
+let font_feature_settings = unsupported(property_font_feature_settings);
+let font_optical_sizing = unsupported(property_font_optical_sizing);
+let font_variation_settings = unsupported(property_font_variation_settings);
+let font_palette = unsupported(property_font_palette);
+let font_variant_emoji = unsupported(property_font_variant_emoji);
+
 // css-flexbox-1
 // using id() because refmt
 let flex_direction =
@@ -1112,6 +1143,31 @@ let properties = [
   ("letter-spacing", found(letter_spacing)),
   ("text-indent", found(text_indent)),
   ("hanging-punctuation", found(hanging_punctuation)),
+  // css-fonts-4
+  ("font-family", found(font_family)),
+  ("font-weight", found(font_weight)),
+  ("font-stretch", found(font_stretch)),
+  ("font-style", found(font_style)),
+  ("font-size", found(font_size)),
+  ("font-size-adjust", found(font_size_adjust)),
+  ("font", found(font)),
+  ("font-synthesis-weight", found(font_synthesis_weight)),
+  ("font-synthesis-style", found(font_synthesis_style)),
+  ("font-synthesis-small-caps", found(font_synthesis_small_caps)),
+  ("font-synthesis", found(font_synthesis)),
+  ("font-kerning", found(font_kerning)),
+  ("font-variant-ligatures", found(font_variant_ligatures)),
+  ("font-variant-position", found(font_variant_position)),
+  ("font-variant-caps", found(font_variant_caps)),
+  ("font-variant-numeric", found(font_variant_numeric)),
+  ("font-variant-alternates", found(font_variant_alternates)),
+  ("font-variant-east-asian", found(font_variant_east_asian)),
+  ("font-variant", found(font_variant)),
+  ("font-feature-settings", found(font_feature_settings)),
+  ("font-optical-sizing", found(font_optical_sizing)),
+  ("font-variation-settings", found(font_variation_settings)),
+  ("font-palette", found(font_palette)),
+  ("font-variant-emoji", found(font_variant_emoji)),
   // css-flexbox-1
   ("flex-direction", found(flex_direction)),
   ("flex-wrap", found(flex_wrap)),
