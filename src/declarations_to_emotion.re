@@ -29,7 +29,7 @@ type transform('ast, 'value) = {
   string_to_expr: string => result(list(Parsetree.expression), string),
 };
 
-let transform = (parser, value_of_ast, value_to_expr) => {
+let emit = (parser, value_of_ast, value_to_expr) => {
   let ast_of_string = Parser.parse(parser);
   let ast_to_expr = ast => value_of_ast(ast) |> value_to_expr;
   let string_to_expr = string =>
@@ -145,7 +145,7 @@ let variable = parser =>
   ]);
 
 let transform_with_variable = (parser, map, value_to_expr) =>
-  transform(
+  emit(
     variable(parser),
     fun
     | `Variable(name) => name |> lid |> Exp.ident
@@ -278,7 +278,7 @@ let margin_left =
     [%expr Css.marginLeft],
   );
 let margin =
-  transform(
+  emit(
     property_margin,
     List.map(apply_value(margin_top.value_of_ast)),
     fun
@@ -324,7 +324,7 @@ let padding_left =
     [%expr Css.paddingLeft],
   );
 let padding =
-  transform(
+  emit(
     property_padding,
     List.map(apply_value(padding_top.value_of_ast)),
     fun
@@ -861,7 +861,7 @@ let overflow_x =
   );
 let overflow_y = variants(property_overflow_y, [%expr Css.overflowY]);
 let overflow =
-  transform(
+  emit(
     property_overflow,
     List.map(apply_value(overflow_x.value_of_ast)),
     fun
@@ -962,6 +962,26 @@ let font_variation_settings = unsupported(property_font_variation_settings);
 let font_palette = unsupported(property_font_palette);
 let font_variant_emoji = unsupported(property_font_variant_emoji);
 
+// css-transforms-2
+let transform = unsupported(property_transform, ~call=[%expr Css.transform]);
+let transform_origin =
+  unsupported(property_transform_origin, ~call=[%expr Css.transformOrigin]);
+let transform_box =
+  unsupported(property_transform_box, ~call=[%expr Css.transformOrigin]);
+let translate = unsupported(property_translate, ~call=[%expr Css.translate]);
+let rotate = unsupported(property_rotate, ~call=[%expr Css.rotate]);
+let scale = unsupported(property_scale, ~call=[%expr Css.scale]);
+let transform_style =
+  unsupported(property_transform_style, ~call=[%expr Css.transformStyle]);
+let perspective = unsupported(property_perspective);
+let perspective_origin =
+  unsupported(property_perspective_origin, ~call=[%expr Css.transformStyle]);
+let backface_visibility =
+  unsupported(
+    property_backface_visibility,
+    ~call=[%expr Css.backfaceVisibility],
+  );
+
 // css-flexbox-1
 // using id() because refmt
 let flex_direction =
@@ -970,7 +990,7 @@ let flex_wrap = variants(property_flex_wrap, [%expr Css.flexWrap]);
 
 // shorthand - https://drafts.csswg.org/css-flexbox-1/#flex-flow-property
 let flex_flow =
-  transform(
+  emit(
     property_flex_flow,
     id,
     ((direction_ast, wrap_ast)) => {
@@ -1002,7 +1022,7 @@ let flex_basis =
   );
 // TODO: this is incomplete
 let flex =
-  transform(
+  emit(
     property_flex,
     id,
     fun
@@ -1168,6 +1188,17 @@ let properties = [
   ("font-variation-settings", found(font_variation_settings)),
   ("font-palette", found(font_palette)),
   ("font-variant-emoji", found(font_variant_emoji)),
+  // css-transforms2
+  ("transform", found(transform)),
+  ("transform-origin", found(transform_origin)),
+  ("transform-box", found(transform_box)),
+  ("translate", found(translate)),
+  ("rotate", found(rotate)),
+  ("scale", found(scale)),
+  ("transform-style", found(transform_style)),
+  ("perspective", found(perspective)),
+  ("perspective-origin", found(perspective_origin)),
+  ("backface-visibility", found(backface_visibility)),
   // css-flexbox-1
   ("flex-direction", found(flex_direction)),
   ("flex-wrap", found(flex_wrap)),
