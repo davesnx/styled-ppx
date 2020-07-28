@@ -47,6 +47,12 @@ let getAlias = (pattern, label) =>
   | _ => getLabel(label)
   };
 
+let isStyledTag = str =>
+  switch (String.split_on_char('.', str)) {
+  | ["styled", ..._] => true
+  | _ => false
+  };
+
 let getTag = str => {
   switch (String.split_on_char('.', str)) {
   | ["styled"] => "div"
@@ -455,10 +461,12 @@ let createMakeProps = (~loc, extraProps) => {
         createDomRefLabel(~loc),
         createChildrenLabel(~loc),
         ...List.map(
-             (domProp) =>
+             domProp =>
                switch (domProp) {
-                 | Event({ name, type_ }) => createRecordEventLabel(~loc, name, type_)
-                 | Attribute({ name, type_ }) => createRecordLabel(~loc, name, type_)
+               | Event({name, type_}) =>
+                 createRecordEventLabel(~loc, name, type_)
+               | Attribute({name, type_}) =>
+                 createRecordLabel(~loc, name, type_)
                },
              domPropsList,
            ),
@@ -599,7 +607,8 @@ let styledPpxMapper = (_, _) => {
             ]),
           )),
         _,
-      } =>
+      }
+        when isStyledTag(txt) =>
       let tag = getTag(txt);
 
       /* Fix getLabeledArgs, to stop ignoring the first arg */
@@ -717,7 +726,8 @@ let styledPpxMapper = (_, _) => {
           Pmod_extension(({txt, loc: txtLoc}, PStr([]))),
         pmod_loc: pexp_loc,
         _,
-      } =>
+      }
+        when isStyledTag(txt) =>
       let tag = getTag(txt);
 
       if (!List.exists(t => t == tag, Html.tags)) {
@@ -774,7 +784,8 @@ let styledPpxMapper = (_, _) => {
             ]),
           )),
         _,
-      } =>
+      }
+        when isStyledTag(txt) =>
       let tag = getTag(txt);
 
       if (!List.exists(t => t == tag, Html.tags)) {
