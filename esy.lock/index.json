@@ -1,5 +1,5 @@
 {
-  "checksum": "be0e35f319a4f38c8c09802e18fda3d5",
+  "checksum": "c29accf7d2b22a4c85526d3d78261dec",
   "root": "styled-ppx@link-dev:./package.json",
   "node": {
     "styled-ppx@link-dev:./package.json": {
@@ -14,7 +14,7 @@
       "overrides": [],
       "dependencies": [ "@opam/ppxlib@opam:0.14.0@c02ad40d" ],
       "devDependencies": [
-        "reason-css-parser@github:EduardoRFS/reason-css-parser:package.json#c8f1ecdb6dd3d7455611d0b891b901edd264e4b2@d41d8cd9",
+        "reason-css-parser@github:EduardoRFS/reason-css-parser:package.json#9fab749e5af3d2fa4b9418aa43d908a575dd1d0f@d41d8cd9",
         "ocaml@4.10.0@d41d8cd9", "@reason-native/rely@3.2.1@d41d8cd9",
         "@opam/sedlex@opam:2.2@ffde36c0",
         "@opam/ocaml-migrate-parsetree@opam:1.7.3@dbcf3b47",
@@ -51,16 +51,16 @@
       ],
       "devDependencies": []
     },
-    "reason-css-parser@github:EduardoRFS/reason-css-parser:package.json#c8f1ecdb6dd3d7455611d0b891b901edd264e4b2@d41d8cd9": {
+    "reason-css-parser@github:EduardoRFS/reason-css-parser:package.json#9fab749e5af3d2fa4b9418aa43d908a575dd1d0f@d41d8cd9": {
       "id":
-        "reason-css-parser@github:EduardoRFS/reason-css-parser:package.json#c8f1ecdb6dd3d7455611d0b891b901edd264e4b2@d41d8cd9",
+        "reason-css-parser@github:EduardoRFS/reason-css-parser:package.json#9fab749e5af3d2fa4b9418aa43d908a575dd1d0f@d41d8cd9",
       "name": "reason-css-parser",
       "version":
-        "github:EduardoRFS/reason-css-parser:package.json#c8f1ecdb6dd3d7455611d0b891b901edd264e4b2",
+        "github:EduardoRFS/reason-css-parser:package.json#9fab749e5af3d2fa4b9418aa43d908a575dd1d0f",
       "source": {
         "type": "install",
         "source": [
-          "github:EduardoRFS/reason-css-parser:package.json#c8f1ecdb6dd3d7455611d0b891b901edd264e4b2"
+          "github:EduardoRFS/reason-css-parser:package.json#9fab749e5af3d2fa4b9418aa43d908a575dd1d0f"
         ]
       },
       "overrides": [],
