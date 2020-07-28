@@ -1154,6 +1154,43 @@ let align_self = variants(property_align_self, [%expr Css.alignSelf]);
 let align_content =
   variants(property_align_content, [%expr Css.alignContent]);
 
+// css-grid-1
+let grid_template_columns =
+  unsupported(
+    property_grid_template_columns,
+    ~call=[%expr Css.gridTemplateColumns],
+  );
+let grid_template_rows =
+  unsupported(
+    property_grid_template_rows,
+    ~call=[%expr Css.gridTemplateRows],
+  );
+let grid_template_areas =
+  unsupported(
+    property_grid_template_areas,
+    ~call=[%expr Css.gridTemplateAreas],
+  );
+let grid_template = unsupported(property_grid_template);
+let grid_auto_columns =
+  unsupported(property_grid_auto_columns, ~call=[%expr Css.gridAutoColumns]);
+let grid_auto_rows =
+  unsupported(property_grid_auto_rows, ~call=[%expr Css.gridAutoRows]);
+let grid_auto_flow =
+  unsupported(property_grid_auto_flow, ~call=[%expr Css.gridAutoFlow]);
+let grid = unsupported(property_grid, ~call=[%expr Css.grid]);
+let grid_row_start =
+  unsupported(property_grid_row_start, ~call=[%expr Css.gridRowStart]);
+let grid_column_start =
+  unsupported(property_grid_column_start, ~call=[%expr Css.gridColumnStart]);
+let grid_row_end =
+  unsupported(property_grid_row_end, ~call=[%expr Css.gridRowEnd]);
+let grid_column_end =
+  unsupported(property_grid_column_end, ~call=[%expr Css.gridColumnEnd]);
+let grid_row = unsupported(property_grid_row, ~call=[%expr Css.gridRow]);
+let grid_column =
+  unsupported(property_grid_column, ~call=[%expr Css.gridColumn]);
+let grid_area = unsupported(property_grid_area, ~call=[%expr Css.gridArea]);
+
 let found = ({ast_of_string, string_to_expr, _}) => {
   let check_value = string => {
     let.ok _ = ast_of_string(string);
@@ -1345,6 +1382,22 @@ let properties = [
   ("align-items", found(align_items)),
   ("align-self", found(align_self)),
   ("align-content", found(align_content)),
+  // css-grid-1
+  ("grid-template-columns", found(grid_template_columns)),
+  ("grid-template-rows", found(grid_template_rows)),
+  ("grid-template-areas", found(grid_template_areas)),
+  ("grid-template", found(grid_template)),
+  ("grid-auto-columns", found(grid_auto_columns)),
+  ("grid-auto-rows", found(grid_auto_rows)),
+  ("grid-auto-flow", found(grid_auto_flow)),
+  ("grid", found(grid)),
+  ("grid-row-start", found(grid_row_start)),
+  ("grid-column-start", found(grid_column_start)),
+  ("grid-row-end", found(grid_row_end)),
+  ("grid-column-end", found(grid_column_end)),
+  ("grid-row", found(grid_row)),
+  ("grid-column", found(grid_column)),
+  ("grid-area", found(grid_area)),
 ];
 
 let support_property = name =>
