@@ -1,7 +1,0 @@
-(executable
-  (name TestRunner)
-  (public_name StyledPpxTestRunner)
-  (libraries
-    StyledPpxTestNativeLib
-  )
-)

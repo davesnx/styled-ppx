@@ -51,7 +51,7 @@
     "test": "esy test_snapshot",
     "test_snapshot": "dune runtest",
     "test_snapshot:promote": "dune runtest --auto-promote",
-    "test_native": "esy dune exec test/native/TestRunner.exe",
+    "test_native": "esy dune exec test/native/lib/TestRunner.exe",
     "test_bs": "cd test/bucklescript; yarn test",
     "doc": "esy dune build @doc",
     "doc-path": "esy echo #{self.target_dir}/default/_doc/_html/index.html",

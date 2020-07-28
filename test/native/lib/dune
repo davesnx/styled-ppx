@@ -1,7 +1,16 @@
 (library
  (name StyledPpxTestNativeLib)
+ (modules
+  (:standard \ TestRunner))
  (library_flags
   (-linkall -g))
  (libraries StyledPpxTestNativeBSCSS rely.lib styled-ppx.lib ppxlib)
+ (preprocess
+  (pps ppx_tools_versioned.metaquot_410 styled-ppx.lib)))
+
+(executable
+ (name TestRunner)
+ (modules TestRunner)
+ (libraries StyledPpxTestNativeLib)
  (preprocess
   (pps ppx_tools_versioned.metaquot_410 styled-ppx.lib)))
