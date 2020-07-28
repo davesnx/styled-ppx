@@ -56,7 +56,7 @@ let properties_static_css_tests = [%expr
     ([%css "color: red"], [Css.color(Css.red)]),
     ([%css "display: flex"], [Css.display(`flex)]),
     ([%css "flex-direction: column"], [Css.flexDirection(`column)]),
-    ([%css "font-size: 30px"], [Css.fontSize(Css.px(30))]),
+    ([%css "font-size: 30px"], [Css.unsafe("fontSize", "30px")]),
     ([%css "height: 100vh"], [Css.height(`vh(100.))]),
     ([%css "justify-content: center"], [Css.justifyContent(`center)]),
     ([%css "margin: 0"], [Css.margin(`zero)]),
