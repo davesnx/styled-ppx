@@ -504,6 +504,36 @@ let property_transition_timing_function = [%value "<easing-function>#"];
 let property_transition_delay = [%value "<time>#"];
 let property_transition = [%value "<single-transition>#"];
 
+// css-animation-1
+let keyframe_selector = [%value "from | to | <percentage>"];
+// let keyframe_block = [%value
+//   "<keyframe-selector># '{' <declaration-list> '}'"
+// ];
+let keyframe_block = [%value
+  "<keyframe-selector>#"
+];
+let keyframes_name = [%value "<custom-ident> | <string>"];
+let single_animation_fill_mode = [%value "none | forwards | backwards | both"];
+let single_animation_play_state = [%value "running | paused"];
+let single_animation_direction = [%value
+  "normal | reverse | alternate | alternate-reverse"
+];
+let single_animation_iteration_count = [%value "infinite | <number>"];
+let single_animation = [%value
+  "<time> || <easing-function> || <time> || <single-animation-iteration-count> || <single-animation-direction> || <single-animation-fill-mode> || <single-animation-play-state> || [ none | <keyframes-name> ]"
+];
+let property_animation_name = [%value "[ none | <keyframes-name> ]#"];
+let property_animation_duration = [%value "<time>#"];
+let property_animation_timing_function = [%value "<easing-function>#"];
+let property_animation_iteration_count = [%value
+  "<single-animation-iteration-count>#"
+];
+let property_animation_direction = [%value "<single-animation-direction>#"];
+let property_animation_play_state = [%value "<single-animation-play-state>#"];
+let property_animation_delay = [%value "<time>#"];
+let property_animation_fill_mode = [%value "<single-animation-fill-mode>#"];
+let property_animation = [%value "<single-animation>#"];
+
 // css-flexbox-1
 let property_flex_direction = [%value
   "row | row-reverse | column | column-reverse"
