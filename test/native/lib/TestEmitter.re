@@ -19,6 +19,16 @@ let extract_tests = array_expr => {
     ),
   );
 };
+let write_tests_to_file = (tests, file) => {
+  let code =
+    tests
+    |> List.map(((expected, _)) => [%stri let _ = [%e expected]])
+    |> List.append([[%stri open StyledPpxTestNativeBSCSS]])
+    |> Pprintast.string_of_structure;
+  let fd = open_out(file);
+  output_string(fd, code);
+  close_out(fd);
+};
 
 let compare = (result, expected, {expect, _}) => {
   open Parsetree;
@@ -309,6 +319,9 @@ describe("emit bs-css from static [%css]", ({test, _}) => {
   let properties_static_css_tests =
     extract_tests(properties_static_css_tests);
   let selectors_static_css_tests = extract_tests(selectors_static_css_tests);
+
+  write_tests_to_file(properties_static_css_tests, "static_css_tests.ml");
+  write_tests_to_file(selectors_static_css_tests, "selectors_css_tests.ml");
 
   List.iteri(test("properties static: "), properties_static_css_tests);
   List.iteri(test("selectors static: "), selectors_static_css_tests);

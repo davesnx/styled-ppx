@@ -1,1 +1,1 @@
-Setup.cli();
+StyledPpxTestNativeLib.Setup.cli();
