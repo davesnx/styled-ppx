@@ -13,17 +13,27 @@ module type CssImplementationIntf = {
 type rule;
 type animationName;
 
-module Make:
-  (CssImplementationIntf) =>
-   {
-    let global: (string, list(rule)) => unit;
-    let insertRule: string => unit;
-    let merge: list(string) => string;
-    let style: list(rule) => string;
-    let keyframes: list((int, list(rule))) => animationName;
-  };
+/* original */
+/*
+ module Make:
+   (CssImplementationIntf) =>
+    {
+     let global: (string, list(rule)) => unit;
+     let insertRule: string => unit;
+     let merge: list(string) => string;
+     let style: list(rule) => string;
+     let keyframes: list((int, list(rule))) => animationName;
+   };
 
-// let empty: list(rule);
+ let empty: list(rule);
+ */
+
+let global: (string, list(rule)) => unit;
+let insertRule: string => unit;
+let merge: list(string) => string;
+let style: list(rule) => string;
+let keyframes: list((int, list(rule))) => animationName;
+
 let toJson: list(rule) => Js.Json.t;
 
 let important: rule => rule;
