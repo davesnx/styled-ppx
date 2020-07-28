@@ -2,6 +2,24 @@ open Migrate_parsetree;
 open Ast_410;
 open Setup;
 
+let extract_tests = array_expr => {
+  open Ppxlib.Ast_pattern;
+  let fail = () =>
+    failwith("can only extract from array((result, expected))");
+  let payload = pexp_array(many(pexp_tuple(many(__))));
+  parse(
+    payload,
+    Location.none,
+    ~on_error=fail,
+    array_expr,
+    List.map(
+      fun
+      | [result, expected] => (result, expected)
+      | _ => fail(),
+    ),
+  );
+};
+
 let compare = (result, expected, {expect, _}) => {
   open Parsetree;
   let result =
@@ -17,84 +35,55 @@ let compare = (result, expected, {expect, _}) => {
 
 // TODO: ideas, selectors . properties, to have a bigger test matrix
 // somehow programatically generate strings to test css
-let properties_static_css_tests = [
-  // unsupported
-  (
-    [%expr [%css "overflow-x: clip"]],
-    [%expr [Css.unsafe("overflowX", "clip")]],
-  ),
-  ([%expr [%css "align-items: center"]], [%expr [Css.alignItems(`center)]]),
-  (
-    [%expr [%css "box-sizing: border-box"]],
-    [%expr [Css.boxSizing(`borderBox)]],
-  ),
-  (
-    [%expr [%css "box-sizing: content-box"]],
-    [%expr [Css.boxSizing(`contentBox)]],
-  ),
-  ([%expr [%css "color: #454545"]], [%expr [Css.color(`hex("454545"))]]),
-  ([%expr [%css "color: red"]], [%expr [Css.color(Css.red)]]),
-  ([%expr [%css "display: flex"]], [%expr [Css.display(`flex)]]),
-  (
-    [%expr [%css "flex-direction: column"]],
-    [%expr [Css.flexDirection(`column)]],
-  ),
-  ([%expr [%css "font-size: 30px"]], [%expr [Css.fontSize(Css.px(30))]]),
-  ([%expr [%css "height: 100vh"]], [%expr [Css.height(`vh(100.))]]),
-  (
-    [%expr [%css "justify-content: center"]],
-    [%expr [Css.justifyContent(`center)]],
-  ),
-  ([%expr [%css "margin: 0"]], [%expr [Css.margin(`zero)]]),
-  ([%expr [%css "margin: 5px"]], [%expr [Css.margin(`pxFloat(5.))]]),
-  ([%expr [%css "opacity: 0.9"]], [%expr [Css.opacity(0.9)]]),
-  ([%expr [%css "width: 100vw"]], [%expr [Css.width(`vw(100.))]]),
-  // css-sizing-3
-  ([%expr [%css "width: auto"]], [%expr [Css.width(`auto)]]),
-  ([%expr [%css "width: 0"]], [%expr [Css.width(`zero)]]),
-  ([%expr [%css "height: 5px"]], [%expr [Css.height(`pxFloat(5.))]]),
-  ([%expr [%css "min-width: 5%"]], [%expr [Css.minWidth(`percent(5.))]]),
-  ([%expr [%css "min-height: 5em"]], [%expr [Css.minHeight(`em(5.))]]),
-  ([%expr [%css "max-width: none"]], [%expr [Css.maxWidth(`none)]]),
-  ([%expr [%css "max-height: 3vh"]], [%expr [Css.maxHeight(`vh(3.))]]),
-  (
-    [%expr [%css "box-sizing: border-box"]],
-    [%expr [Css.boxSizing(`borderBox)]],
-  ),
-  // css-box-3
-  ([%expr [%css "margin-top: auto"]], [%expr [Css.marginTop(`auto)]]),
-  (
-    [%expr [%css "margin-right: 1px"]],
-    [%expr [Css.marginRight(`pxFloat(1.))]],
-  ),
-  (
-    [%expr [%css "margin-bottom: 2px"]],
-    [%expr [Css.marginBottom(`pxFloat(2.))]],
-  ),
-  (
-    [%expr [%css "margin-left: 3px"]],
-    [%expr [Css.marginLeft(`pxFloat(3.))]],
-  ),
-  ([%expr [%css "margin: 1px"]], [%expr [Css.margin(`pxFloat(1.))]]),
-  (
-    [%expr [%css "margin: 1px 2px"]],
-    [%expr [Css.margin2(~v=`pxFloat(1.), ~h=`pxFloat(2.))]],
-  ),
-  (
-    [%expr [%css "margin: 1px 2px 3px"]],
-    [%expr
+let properties_static_css_tests = [%expr
+  [|
+    // unsupported
+    ([%css "overflow-x: clip"], [Css.unsafe("overflowX", "clip")]),
+    ([%css "align-items: center"], [Css.alignItems(`center)]),
+    ([%css "box-sizing: border-box"], [Css.boxSizing(`borderBox)]),
+    ([%css "box-sizing: content-box"], [Css.boxSizing(`contentBox)]),
+    ([%css "color: #454545"], [Css.color(`hex("454545"))]),
+    ([%css "color: red"], [Css.color(Css.red)]),
+    ([%css "display: flex"], [Css.display(`flex)]),
+    ([%css "flex-direction: column"], [Css.flexDirection(`column)]),
+    ([%css "font-size: 30px"], [Css.fontSize(Css.px(30))]),
+    ([%css "height: 100vh"], [Css.height(`vh(100.))]),
+    ([%css "justify-content: center"], [Css.justifyContent(`center)]),
+    ([%css "margin: 0"], [Css.margin(`zero)]),
+    ([%css "margin: 5px"], [Css.margin(`pxFloat(5.))]),
+    ([%css "opacity: 0.9"], [Css.opacity(0.9)]),
+    ([%css "width: 100vw"], [Css.width(`vw(100.))]),
+    // css-sizing-3
+    ([%css "width: auto"], [Css.width(`auto)]),
+    ([%css "width: 0"], [Css.width(`zero)]),
+    ([%css "height: 5px"], [Css.height(`pxFloat(5.))]),
+    ([%css "min-width: 5%"], [Css.minWidth(`percent(5.))]),
+    ([%css "min-height: 5em"], [Css.minHeight(`em(5.))]),
+    ([%css "max-width: none"], [Css.maxWidth(`none)]),
+    ([%css "max-height: 3vh"], [Css.maxHeight(`vh(3.))]),
+    ([%css "box-sizing: border-box"], [Css.boxSizing(`borderBox)]),
+    // css-box-3
+    ([%css "margin-top: auto"], [Css.marginTop(`auto)]),
+    ([%css "margin-right: 1px"], [Css.marginRight(`pxFloat(1.))]),
+    ([%css "margin-bottom: 2px"], [Css.marginBottom(`pxFloat(2.))]),
+    ([%css "margin-left: 3px"], [Css.marginLeft(`pxFloat(3.))]),
+    ([%css "margin: 1px"], [Css.margin(`pxFloat(1.))]),
+    (
+      [%css "margin: 1px 2px"],
+      [Css.margin2(~v=`pxFloat(1.), ~h=`pxFloat(2.))],
+    ),
+    (
+      [%css "margin: 1px 2px 3px"],
       [
         Css.margin3(
           ~top=`pxFloat(1.),
           ~h=`pxFloat(2.),
           ~bottom=`pxFloat(3.),
         ),
-      ]
-    ],
-  ),
-  (
-    [%expr [%css "margin: 1px 2px 3px 4px"]],
-    [%expr
+      ],
+    ),
+    (
+      [%css "margin: 1px 2px 3px 4px"],
       [
         Css.margin4(
           ~top=`pxFloat(1.),
@@ -102,42 +91,29 @@ let properties_static_css_tests = [
           ~bottom=`pxFloat(3.),
           ~left=`pxFloat(4.),
         ),
-      ]
-    ],
-  ),
-  ([%expr [%css "padding-top: 0"]], [%expr [Css.paddingTop(`zero)]]),
-  (
-    [%expr [%css "padding-right: 1px"]],
-    [%expr [Css.paddingRight(`pxFloat(1.))]],
-  ),
-  (
-    [%expr [%css "padding-bottom: 2px"]],
-    [%expr [Css.paddingBottom(`pxFloat(2.))]],
-  ),
-  (
-    [%expr [%css "padding-left: 3px"]],
-    [%expr [Css.paddingLeft(`pxFloat(3.))]],
-  ),
-  ([%expr [%css "padding: 1px"]], [%expr [Css.padding(`pxFloat(1.))]]),
-  (
-    [%expr [%css "padding: 1px 2px"]],
-    [%expr [Css.padding2(~v=`pxFloat(1.), ~h=`pxFloat(2.))]],
-  ),
-  (
-    [%expr [%css "padding: 1px 2px 3px"]],
-    [%expr
+      ],
+    ),
+    ([%css "padding-top: 0"], [Css.paddingTop(`zero)]),
+    ([%css "padding-right: 1px"], [Css.paddingRight(`pxFloat(1.))]),
+    ([%css "padding-bottom: 2px"], [Css.paddingBottom(`pxFloat(2.))]),
+    ([%css "padding-left: 3px"], [Css.paddingLeft(`pxFloat(3.))]),
+    ([%css "padding: 1px"], [Css.padding(`pxFloat(1.))]),
+    (
+      [%css "padding: 1px 2px"],
+      [Css.padding2(~v=`pxFloat(1.), ~h=`pxFloat(2.))],
+    ),
+    (
+      [%css "padding: 1px 2px 3px"],
       [
         Css.padding3(
           ~top=`pxFloat(1.),
           ~h=`pxFloat(2.),
           ~bottom=`pxFloat(3.),
         ),
-      ]
-    ],
-  ),
-  (
-    [%expr [%css "padding: 1px 2px 3px 4px"]],
-    [%expr
+      ],
+    ),
+    (
+      [%css "padding: 1px 2px 3px 4px"],
       [
         Css.padding4(
           ~top=`pxFloat(1.),
@@ -145,108 +121,74 @@ let properties_static_css_tests = [
           ~bottom=`pxFloat(3.),
           ~left=`pxFloat(4.),
         ),
-      ]
-    ],
-  ),
-  ([%expr [%css "color: #012"]], [%expr [Css.color(`hex("012"))]]),
-  ([%expr [%css "color: #0123"]], [%expr [Css.color(`hex("0123"))]]),
-  ([%expr [%css "color: #012345"]], [%expr [Css.color(`hex("012345"))]]),
-  (
-    [%expr [%css "color: #01234567"]],
-    [%expr [Css.color(`hex("01234567"))]],
-  ),
-  ([%expr [%css "color: blue"]], [%expr [Css.color(Css.blue)]]),
-  (
-    [%expr [%css "color: currentcolor"]],
-    [%expr [Css.color(`currentColor)]],
-  ),
-  ([%expr [%css "color: transparent"]], [%expr [Css.color(`transparent)]]),
-  (
-    [%expr [%css "color: rgb(1 2 3)"]],
-    [%expr [Css.color(`rgb((1, 2, 3)))]],
-  ),
-  (
-    [%expr [%css "color: rgb(1 2 3 / .4)"]],
-    [%expr [Css.color(`rgba((1, 2, 3, 0.4)))]],
-  ),
-  (
-    [%expr [%css "color: rgba(1, 2, 3)"]],
-    [%expr [Css.color(`rgb((1, 2, 3)))]],
-  ),
-  (
-    [%expr [%css "color: rgba(1, 2, 3, .4)"]],
-    [%expr [Css.color(`rgba((1, 2, 3, 0.4)))]],
-  ),
-  (
-    [%expr [%css "color: hsl(120deg 100% 50%)"]],
-    [%expr
-      [Css.color(`hsl((`deg(120.), `percent(100.), `percent(50.))))]
-    ],
-  ),
-  ([%expr [%css "opacity: 0.5"]], [%expr [Css.opacity(0.5)]]),
-  ([%expr [%css "opacity: 60%"]], [%expr [Css.opacity(0.6)]]),
-  // css-images-4
-  ([%expr [%css "object-fit: fill"]], [%expr [Css.objectFit(`fill)]]),
-  (
-    [%expr [%css "object-position: right bottom"]],
-    [%expr [Css.objectPosition(`hv((`right, `bottom)))]],
-  ),
-  // css-backgrounds-3
-  (
-    [%expr [%css "background-color: red"]],
-    [%expr [Css.backgroundColor(Css.red)]],
-  ),
-  (
-    [%expr [%css "border-top-color: blue"]],
-    [%expr [Css.borderTopColor(Css.blue)]],
-  ),
-  (
-    [%expr [%css "border-right-color: green"]],
-    [%expr [Css.borderRightColor(Css.green)]],
-  ),
-  (
-    [%expr [%css "border-bottom-color: purple"]],
-    [%expr [Css.borderBottomColor(Css.purple)]],
-  ),
-  (
-    [%expr [%css "border-left-color: #fff"]],
-    [%expr [Css.borderLeftColor(`hex("fff"))]],
-  ),
-  (
-    [%expr [%css "border-top-width: 15px"]],
-    [%expr [Css.borderTopWidth(`pxFloat(15.))]],
-  ),
-  (
-    [%expr [%css "border-right-width: 16px"]],
-    [%expr [Css.borderRightWidth(`pxFloat(16.))]],
-  ),
-  (
-    [%expr [%css "border-bottom-width: 17px"]],
-    [%expr [Css.borderBottomWidth(`pxFloat(17.))]],
-  ),
-  (
-    [%expr [%css "border-left-width: 18px"]],
-    [%expr [Css.borderLeftWidth(`pxFloat(18.))]],
-  ),
-  (
-    [%expr [%css "border-top-left-radius: 12%"]],
-    [%expr [Css.borderTopLeftRadius(`percent(12.))]],
-  ),
-  (
-    [%expr [%css "border-top-right-radius: 15%"]],
-    [%expr [Css.borderTopRightRadius(`percent(15.))]],
-  ),
-  (
-    [%expr [%css "border-bottom-left-radius: 14%"]],
-    [%expr [Css.borderBottomLeftRadius(`percent(14.))]],
-  ),
-  (
-    [%expr [%css "border-bottom-right-radius: 13%"]],
-    [%expr [Css.borderBottomRightRadius(`percent(13.))]],
-  ),
-  (
-    [%expr [%css "box-shadow: 12px 12px 2px 1px rgba(0, 0, 255, .2)"]],
-    [%expr
+      ],
+    ),
+    ([%css "color: #012"], [Css.color(`hex("012"))]),
+    ([%css "color: #0123"], [Css.color(`hex("0123"))]),
+    ([%css "color: #012345"], [Css.color(`hex("012345"))]),
+    ([%css "color: #01234567"], [Css.color(`hex("01234567"))]),
+    ([%css "color: blue"], [Css.color(Css.blue)]),
+    ([%css "color: currentcolor"], [Css.color(`currentColor)]),
+    ([%css "color: transparent"], [Css.color(`transparent)]),
+    ([%css "color: rgb(1 2 3)"], [Css.color(`rgb((1, 2, 3)))]),
+    ([%css "color: rgb(1 2 3 / .4)"], [Css.color(`rgba((1, 2, 3, 0.4)))]),
+    ([%css "color: rgba(1, 2, 3)"], [Css.color(`rgb((1, 2, 3)))]),
+    (
+      [%css "color: rgba(1, 2, 3, .4)"],
+      [Css.color(`rgba((1, 2, 3, 0.4)))],
+    ),
+    (
+      [%css "color: hsl(120deg 100% 50%)"],
+      [Css.color(`hsl((`deg(120.), `percent(100.), `percent(50.))))],
+    ),
+    ([%css "opacity: 0.5"], [Css.opacity(0.5)]),
+    ([%css "opacity: 60%"], [Css.opacity(0.6)]),
+    // css-images-4
+    ([%css "object-fit: fill"], [Css.objectFit(`fill)]),
+    (
+      [%css "object-position: right bottom"],
+      [Css.objectPosition(`hv((`right, `bottom)))],
+    ),
+    // css-backgrounds-3
+    ([%css "background-color: red"], [Css.backgroundColor(Css.red)]),
+    ([%css "border-top-color: blue"], [Css.borderTopColor(Css.blue)]),
+    ([%css "border-right-color: green"], [Css.borderRightColor(Css.green)]),
+    (
+      [%css "border-bottom-color: purple"],
+      [Css.borderBottomColor(Css.purple)],
+    ),
+    ([%css "border-left-color: #fff"], [Css.borderLeftColor(`hex("fff"))]),
+    ([%css "border-top-width: 15px"], [Css.borderTopWidth(`pxFloat(15.))]),
+    (
+      [%css "border-right-width: 16px"],
+      [Css.borderRightWidth(`pxFloat(16.))],
+    ),
+    (
+      [%css "border-bottom-width: 17px"],
+      [Css.borderBottomWidth(`pxFloat(17.))],
+    ),
+    (
+      [%css "border-left-width: 18px"],
+      [Css.borderLeftWidth(`pxFloat(18.))],
+    ),
+    (
+      [%css "border-top-left-radius: 12%"],
+      [Css.borderTopLeftRadius(`percent(12.))],
+    ),
+    (
+      [%css "border-top-right-radius: 15%"],
+      [Css.borderTopRightRadius(`percent(15.))],
+    ),
+    (
+      [%css "border-bottom-left-radius: 14%"],
+      [Css.borderBottomLeftRadius(`percent(14.))],
+    ),
+    (
+      [%css "border-bottom-right-radius: 13%"],
+      [Css.borderBottomRightRadius(`percent(13.))],
+    ),
+    (
+      [%css "box-shadow: 12px 12px 2px 1px rgba(0, 0, 255, .2)"],
       [
         Css.boxShadows([
           Css.Shadow.box(
@@ -257,16 +199,12 @@ let properties_static_css_tests = [
             `rgba((0, 0, 255, 0.2)),
           ),
         ]),
-      ]
-    ],
-  ),
-  (
-    [%expr
+      ],
+    ),
+    (
       [%css
         "box-shadow: 12px 12px 2px 1px rgba(0, 0, 255, .2), 13px 14px 5px 6px rgba(2, 1, 255, 50%)"
-      ]
-    ],
-    [%expr
+      ],
       [
         Css.boxShadows([
           Css.Shadow.box(
@@ -284,124 +222,93 @@ let properties_static_css_tests = [
             `rgba((2, 1, 255, 0.5)),
           ),
         ]),
-      ]
-    ],
-  ),
-  // css-overflow-3
-  ([%expr [%css "overflow-x: auto"]], [%expr [Css.overflowX(`auto)]]),
-  ([%expr [%css "overflow-y: hidden"]], [%expr [Css.overflowY(`hidden)]]),
-  ([%expr [%css "overflow: scroll"]], [%expr [Css.overflow(`scroll)]]),
-  (
-    [%expr [%css "overflow: scroll visible"]],
-    [%expr [Css.overflowX(`scroll), Css.overflowY(`visible)]],
-  ),
-  ([%expr [%css "text-overflow: clip"]], [%expr [Css.textOverflow(`clip)]]),
-  (
-    [%expr [%css "text-overflow: ellipsis"]],
-    [%expr [Css.textOverflow(`ellipsis)]],
-  ),
-  // css-text-3
-  (
-    [%expr [%css "text-transform: capitalize"]],
-    [%expr [Css.textTransform(`capitalize)]],
-  ),
-  (
-    [%expr [%css "white-space: break-spaces"]],
-    [%expr [Css.whiteSpace(`breakSpaces)]],
-  ),
-  (
-    [%expr [%css "word-break: keep-all"]],
-    [%expr [Css.wordBreak(`keepAll)]],
-  ),
-  (
-    [%expr [%css "overflow-wrap: anywhere"]],
-    [%expr [Css.overflowWrap(`anywhere)]],
-  ),
-  ([%expr [%css "word-wrap: normal"]], [%expr [Css.wordWrap(`normal)]]),
-  ([%expr [%css "text-align: start"]], [%expr [Css.textAlign(`start)]]),
-  (
-    [%expr [%css "word-spacing: normal"]],
-    [%expr [Css.wordSpacing(`normal)]],
-  ),
-  (
-    [%expr [%css "word-spacing: 5px"]],
-    [%expr [Css.wordSpacing(`pxFloat(5.))]],
-  ),
-  (
-    [%expr [%css "letter-spacing: normal"]],
-    [%expr [Css.letterSpacing(`normal)]],
-  ),
-  (
-    [%expr [%css "letter-spacing: 5px"]],
-    [%expr [Css.letterSpacing(`pxFloat(5.))]],
-  ),
-  (
-    [%expr [%css "text-indent: 5%"]],
-    [%expr [Css.textIndent(`percent(5.))]],
-  ),
-  // css-flexbox-1
-  ([%expr [%css "flex-wrap: wrap"]], [%expr [Css.flexWrap(`wrap)]]),
-  // TODO: generate tests with variables in the future
-  ([%expr [%css "flex-wrap: $var"]], [%expr [Css.flexWrap(var)]]),
-  ([%expr [%css "flex-wrap: $(var)"]], [%expr [Css.flexWrap(var)]]),
-  (
-    [%expr [%css "flex-flow: row nowrap"]],
-    [%expr [Css.flexDirection(`row), Css.flexWrap(`nowrap)]],
-  ),
-  // TODO: flex-flow + variables
-  ([%expr [%css "order: 5"]], [%expr [Css.order(5)]]),
-  ([%expr [%css "flex-grow: 2"]], [%expr [Css.flexGrow(2.)]]),
-  ([%expr [%css "flex-grow: 2.5"]], [%expr [Css.flexGrow(2.5)]]),
-  ([%expr [%css "flex-shrink: 2"]], [%expr [Css.flexShrink(2.)]]),
-  ([%expr [%css "flex-shrink: 2.5"]], [%expr [Css.flexShrink(2.5)]]),
-  ([%expr [%css "flex-basis: content"]], [%expr [Css.flexBasis(`content)]]),
-  ([%expr [%css "flex: none"]], [%expr [Css.flex(`none)]]),
-  (
-    [%expr [%css "flex: 1 2 content"]],
-    [%expr
-      [Css.flexGrow(1.), Css.flexShrink(2.), Css.flexBasis(`content)]
-    ],
-  ),
-  ([%expr [%css "align-self: stretch"]], [%expr [Css.alignSelf(`stretch)]]),
-  (
-    [%expr [%css "align-content: space-around"]],
-    [%expr [Css.alignContent(`spaceAround)]],
-  ),
+      ],
+    ),
+    // css-overflow-3
+    ([%css "overflow-x: auto"], [Css.overflowX(`auto)]),
+    ([%css "overflow-y: hidden"], [Css.overflowY(`hidden)]),
+    ([%css "overflow: scroll"], [Css.overflow(`scroll)]),
+    (
+      [%css "overflow: scroll visible"],
+      [Css.overflowX(`scroll), Css.overflowY(`visible)],
+    ),
+    ([%css "text-overflow: clip"], [Css.textOverflow(`clip)]),
+    ([%css "text-overflow: ellipsis"], [Css.textOverflow(`ellipsis)]),
+    // css-text-3
+    ([%css "text-transform: capitalize"], [Css.textTransform(`capitalize)]),
+    ([%css "white-space: break-spaces"], [Css.whiteSpace(`breakSpaces)]),
+    ([%css "word-break: keep-all"], [Css.wordBreak(`keepAll)]),
+    ([%css "overflow-wrap: anywhere"], [Css.overflowWrap(`anywhere)]),
+    ([%css "word-wrap: normal"], [Css.wordWrap(`normal)]),
+    ([%css "text-align: start"], [Css.textAlign(`start)]),
+    ([%css "word-spacing: normal"], [Css.wordSpacing(`normal)]),
+    ([%css "word-spacing: 5px"], [Css.wordSpacing(`pxFloat(5.))]),
+    ([%css "letter-spacing: normal"], [Css.letterSpacing(`normal)]),
+    ([%css "letter-spacing: 5px"], [Css.letterSpacing(`pxFloat(5.))]),
+    ([%css "text-indent: 5%"], [Css.textIndent(`percent(5.))]),
+    // css-flexbox-1
+    ([%css "flex-wrap: wrap"], [Css.flexWrap(`wrap)]),
+    // TODO: generate tests with variables in the future
+    ([%css "flex-wrap: $var"], [Css.flexWrap(var)]),
+    ([%css "flex-wrap: $(var)"], [Css.flexWrap(var)]),
+    (
+      [%css "flex-flow: row nowrap"],
+      [Css.flexDirection(`row), Css.flexWrap(`nowrap)],
+    ),
+    // TODO: flex-flow + variables
+    ([%css "order: 5"], [Css.order(5)]),
+    ([%css "flex-grow: 2"], [Css.flexGrow(2.)]),
+    ([%css "flex-grow: 2.5"], [Css.flexGrow(2.5)]),
+    ([%css "flex-shrink: 2"], [Css.flexShrink(2.)]),
+    ([%css "flex-shrink: 2.5"], [Css.flexShrink(2.5)]),
+    ([%css "flex-basis: content"], [Css.flexBasis(`content)]),
+    ([%css "flex: none"], [Css.flex(`none)]),
+    (
+      [%css "flex: 1 2 content"],
+      [Css.flexGrow(1.), Css.flexShrink(2.), Css.flexBasis(`content)],
+    ),
+    ([%css "align-self: stretch"], [Css.alignSelf(`stretch)]),
+    (
+      [%css "align-content: space-around"],
+      [Css.alignContent(`spaceAround)],
+    ),
+  |]
 ];
-let selectors_static_css_tests = [
-  (
-    [%expr [%css "& > a { color: green; }"]],
-    [%expr [Css.selector({js|& > a|js}, [Css.color(Css.green)])]],
-  ),
-  (
-    [%expr [%css "&:nth-child(even) { color: red; }"]],
-    [%expr
-      [Css.selector({js|&:nth-child(even)|js}, [Css.color(Css.red)])]
-    ],
-  ),
-  (
-    [%expr [%css "& > div:nth-child(3n+1) { color: blue; }"]],
-    [%expr
+let selectors_static_css_tests = [%expr
+  [|
+    (
+      [%css "& > a { color: green; }"],
+      [Css.selector({js|& > a|js}, [Css.color(Css.green)])],
+    ),
+    (
+      [%css "&:nth-child(even) { color: red; }"],
+      [Css.selector({js|&:nth-child(even)|js}, [Css.color(Css.red)])],
+    ),
+    (
+      [%css "& > div:nth-child(3n+1) { color: blue; }"],
       [
         Css.selector(
           {js|& > div:nth-child(3n  + 1)|js},
           [Css.color(Css.blue)],
         ),
-      ]
-    ],
-  ),
-  (
-    [%expr [%css "&::active { color: brown; }"]],
-    [%expr [Css.active([Css.color(Css.brown)])]],
-  ),
-  (
-    [%expr [%css "&:hover { color: gray; }"]],
-    [%expr [Css.hover([Css.color(Css.gray)])]],
-  ),
+      ],
+    ),
+    (
+      [%css "&::active { color: brown; }"],
+      [Css.active([Css.color(Css.brown)])],
+    ),
+    (
+      [%css "&:hover { color: gray; }"],
+      [Css.hover([Css.color(Css.gray)])],
+    ),
+  |]
 ];
 describe("emit bs-css from static [%css]", ({test, _}) => {
   let test = (prefix, index, (result, expected)) =>
     test(prefix ++ string_of_int(index), compare(result, expected));
+  let properties_static_css_tests =
+    extract_tests(properties_static_css_tests);
+  let selectors_static_css_tests = extract_tests(selectors_static_css_tests);
 
   List.iteri(test("properties static: "), properties_static_css_tests);
   List.iteri(test("selectors static: "), selectors_static_css_tests);
@@ -409,7 +316,7 @@ describe("emit bs-css from static [%css]", ({test, _}) => {
 
 let properties_variable_css_tests = [
   ([%expr [%css "color: $var"]], [%expr [Css.color(var)]]),
-  // TODO: ([%expr [%css "margin: $var"]], [%expr [Css.margin("margin", var)]]),
+  // TODO: ([%css "margin: $var"], [%expr [Css.margin("margin", var)]),
 ];
 describe("emit bs-css from variable [%css]", ({test, _}) => {
   let test = (index, (result, expected)) =>
