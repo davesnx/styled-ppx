@@ -490,6 +490,20 @@ let property_scale = [%value "none | <number>{1,3}"];
 let property_transform_style = [%value "flat | preserve-3d"];
 let property_perspective_origin = [%value "<position>"];
 
+// css-transition-1
+// let single_transition_property = [%value "all | <custom-ident>;"];
+let single_transition_property = [%value "all | <custom-ident>"];
+let single_transition = [%value
+  "[ none | <single-transition-property> ] || <time> || <easing-function> || <time>"
+];
+let property_transition_property = [%value
+  "none | <single-transition-property>#"
+];
+let property_transition_duration = [%value "<time>#"];
+let property_transition_timing_function = [%value "<easing-function>#"];
+let property_transition_delay = [%value "<time>#"];
+let property_transition = [%value "<single-transition>#"];
+
 // css-flexbox-1
 let property_flex_direction = [%value
   "row | row-reverse | column | column-reverse"
