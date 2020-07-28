@@ -460,7 +460,7 @@ let property_font_palette = [%value
 ];
 let property_font_variant_emoji = [%value "auto | text | emoji | unicode"];
 
-// css-text-decor-3
+// css-text-decor-4
 let property_text_decoration_line = [%value
   "none | [ underline || overline || line-through || blink ] | spelling-error | grammar-error"
 ];
