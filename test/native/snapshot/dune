@@ -1,19 +1,20 @@
 (library
-  (name StyledPpxTestNativeSnapshot)
-  (library_flags (-linkall -g))
-  (libraries styled-ppx.lib)
-  (preprocess (pps styled-ppx.lib))
-)
+ (name StyledPpxTestNativeSnapshot)
+ (library_flags
+  (-linkall -g))
+ (libraries styled-ppx.lib)
+ (preprocess
+  (pps styled-ppx.lib)))
 
 (rule
  (targets pp.result)
  (deps simple.re.pp.ml)
  (action
   (with-stdout-to
-    %{targets}
-    (run refmt --parse=binary %{deps}))))
+   %{targets}
+   (run refmt --parse=binary %{deps}))))
 
-(alias
- (name runtest)
+(rule
+ (alias runtest)
  (action
   (diff pp.expected pp.result)))
