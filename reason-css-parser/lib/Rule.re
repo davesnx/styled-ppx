@@ -94,6 +94,10 @@ module Let = {
 module Pattern = {
   // TODO: errors
   let identity = Match.return();
+  let next =
+    fun
+    | [token, ...tokens] => Match.return(token, tokens)
+    | _ => (Error("missing the token expected"), []);
   let token = (expected, tokens) =>
     switch (tokens) {
     | [token, ...tokens] =>

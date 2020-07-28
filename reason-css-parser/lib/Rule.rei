@@ -46,6 +46,7 @@ module Let: {
 
 module Pattern: {
   let identity: rule(unit);
+  let next: rule(token);
   let token: (token => data('a)) => rule('a);
   let expect: token => rule(unit);
   let value: ('a, rule(unit)) => rule('a);
