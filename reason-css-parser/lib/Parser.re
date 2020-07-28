@@ -440,6 +440,28 @@ let property_font_palette = [%value
 ];
 let property_font_variant_emoji = [%value "auto | text | emoji | unicode"];
 
+// css-transforms-2
+// let function_perspective = [%value "perspective( <length [0,∞]> )"];
+let function_perspective = [%value "perspective( <length> )"];
+// let function_rotateZ = [%value "rotateZ( [ <angle> | <zero> ] )"];
+// let function_rotateY = [%value "rotateY( [ <angle> | <zero> ] )"];
+// let function_rotateX = [%value "rotateX( [ <angle> | <zero> ] )"];
+// let function_rotate3d = [%value "rotate3d( <number> , <number> , <number> , [ <angle> | <zero> ] )"];
+let function_rotateZ = [%value "rotateZ( <angle> )"];
+let function_rotateY = [%value "rotateY( <angle> )"];
+let function_rotateX = [%value "rotateX( <angle> )"];
+let function_rotate3d = [%value "rotate3d( <number> , <number> , <number> , <angle> )"];
+let function_scaleZ = [%value "scaleZ( <number> )"];
+let function_scale3d = [%value "scale3d( <number> , <number>, <number> )"];
+let function_translateZ = [%value "translateZ( <length> )"];
+let function_translate3d = [%value "translate3d( <length-percentage> , <length-percentage> , <length> )"];
+let function_matrix3d = [%value "matrix3d( <number>#{16} )"];
+let property_translate = [%value "none | <length-percentage> [ <length-percentage> <length>? ]?"];
+let property_rotate = [%value "none | <angle> | [ x | y | z | <number>{3} ] && <angle>"];
+let property_scale = [%value "none | <number>{1,3}"];
+let property_transform_style = [%value "flat | preserve-3d"];
+let property_perspective_origin = [%value "<position>"];
+
 // css-flexbox-1
 let property_flex_direction = [%value
   "row | row-reverse | column | column-reverse"
