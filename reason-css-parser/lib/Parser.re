@@ -521,12 +521,10 @@ let function_translate3d = [%value
   "translate3d( <length-percentage> , <length-percentage> , <length> )"
 ];
 let function_matrix3d = [%value "matrix3d( <number>#{16} )"];
-let function_skewY = [%value "skewY( [ <angle> | <zero> ] )"];
-let function_skewX = [%value "skewX( [ <angle> | <zero> ] )"];
-let function_skew = [%value
-  "skew( [ <angle> | <zero> ] , [ <angle> | <zero> ]? )"
-];
-let function_rotate = [%value "rotate( [ <angle> | <zero> ] )"];
+let function_skewY = [%value "skewY( [ <angle> ] )"];
+let function_skewX = [%value "skewX( [ <angle> ] )"];
+let function_skew = [%value "skew( [ <angle> ] , [ <angle> ]? )"];
+let function_rotate = [%value "rotate( [ <angle> ] )"];
 let function_scaleY = [%value "scaleY( <number> )"];
 let function_scaleX = [%value "scaleX( <number> )"];
 let function_scale = [%value "scale( <number> , <number>? )"];
@@ -536,6 +534,9 @@ let function_translate = [%value
   "translate( <length-percentage> , <length-percentage>? )"
 ];
 let function_matrix = [%value "matrix( <number>#{6} )"];
+let transform_function = [%value
+  "<matrix()> | <translate()> | <translateX()> | <translateY()> | <scale()> | <scaleX()> | <scaleY()> | <rotate()> | <skew()> | <skewX()> | <skewY()> | <matrix3d()> | <translate3d()> | <translateZ()> | <scale3d()> | <scaleZ()> | <rotate3d()> | <rotateX()> | <rotateY()> | <rotateZ()> | <perspective()>"
+];
 let transform_list = [%value "<transform-function>+"];
 let property_transform = [%value "none | <transform-list>"];
 let property_transform_origin = [%value
