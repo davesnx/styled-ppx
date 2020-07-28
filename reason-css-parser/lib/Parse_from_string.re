@@ -14,8 +14,12 @@ let parse_tokens = (prop, tokens_with_loc) => {
     |> List.filter((!=)(WHITESPACE))
     |> List.rev;
   let (output, tokens) = prop(tokens);
-
-  let.ok output = output;
+  let.ok output =
+    switch (output) {
+    | Ok(data) => Ok(data)
+    | Error([message, ..._]) => Error(message)
+    | Error([]) => Error("weird")
+    };
   let.ok () =
     switch (tokens) {
     | []

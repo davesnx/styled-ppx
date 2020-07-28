@@ -15,7 +15,7 @@ let function_call = (name, rule) => {
     token(
       fun
       | FUNCTION(called_name) when name == called_name => Ok()
-      | _ => Error("expected a function " ++ name),
+      | _ => Error(["expected a function " ++ name]),
     );
   let.bind_match value = rule;
   let.bind_match () = expect(RIGHT_PARENS);
@@ -29,16 +29,16 @@ let integer =
       Float.(
         is_integer(float)
           ? Ok(float |> to_int)
-          : Error("expected an integer, received a float")
+          : Error(["expected an integer, received a float"])
       )
-    | _ => Error("expected an integer"),
+    | _ => Error(["expected an integer"]),
   );
 
 let number =
   token(
     fun
     | NUMBER(float) => Ok(float)
-    | token => Error("expected a number, receveid " ++ show_token(token)),
+    | token => Error(["expected a number, receveid " ++ show_token(token)]),
   );
 
 let length =
@@ -68,10 +68,10 @@ let length =
       | "pt" => Ok(`Pt(number))
       | "pc" => Ok(`Pc(number))
       | "px" => Ok(`Px(number))
-      | _ => Error("unknown dimension")
+      | _ => Error(["unknown dimension"])
       }
     | NUMBER(0.) => Ok(`Zero)
-    | _ => Error("expected length")
+    | _ => Error(["expected length"])
     }
   );
 
@@ -85,10 +85,10 @@ let angle =
       | "grad" => Ok(`Grad(number))
       | "rad" => Ok(`Rad(number))
       | "turn" => Ok(`Turn(number))
-      | _ => Error("unknown dimension")
+      | _ => Error(["unknown dimension"])
       }
     | NUMBER(0.) => Ok(`Deg(0.))
-    | _ => Error("expected angle")
+    | _ => Error(["expected angle"])
     }
   );
 
@@ -100,9 +100,9 @@ let time =
       switch (dimension) {
       | "s" => Ok(`S(number))
       | "ms" => Ok(`Ms(number))
-      | _ => Error("unknown dimension")
+      | _ => Error(["unknown dimension"])
       }
-    | _ => Error("expected time")
+    | _ => Error(["expected time"])
     }
   );
 
@@ -114,9 +114,9 @@ let frequency =
       switch (dimension |> String.lowercase_ascii) {
       | "hz" => Ok(`Hz(number))
       | "khz" => Ok(`KHz(number))
-      | _ => Error("unknown dimension")
+      | _ => Error(["unknown dimension"])
       }
-    | _ => Error("expected frequency")
+    | _ => Error(["expected frequency"])
     }
   );
 
@@ -130,9 +130,9 @@ let resolution =
       | "dpcm" => Ok(`Dpcm(number))
       | "x"
       | "dppx" => Ok(`Dppx(number))
-      | _ => Error("unknown dimension")
+      | _ => Error(["unknown dimension"])
       }
-    | _ => Error("expected resolution")
+    | _ => Error(["expected resolution"])
     }
   );
 
@@ -141,7 +141,7 @@ let percentage =
   token(
     fun
     | PERCENTAGE(float) => Ok(float)
-    | _ => Error("expected percentage"),
+    | _ => Error(["expected percentage"]),
   );
 
 let length_percentage =
@@ -156,7 +156,7 @@ let ident =
   token(
     fun
     | IDENT(string) => Ok(string)
-    | _ => Error("expected an indentifier"),
+    | _ => Error(["expected an indentifier"]),
   );
 
 // https://drafts.csswg.org/css-values-4/#textual-values
@@ -173,7 +173,7 @@ let custom_ident =
   token(
     fun
     | IDENT(string) => Ok(string)
-    | _ => Error("expected an identifier"),
+    | _ => Error(["expected an identifier"]),
   );
 
 // https://drafts.csswg.org/css-values-4/#dashed-idents
@@ -181,7 +181,7 @@ let dashed_ident =
   token(
     fun
     | IDENT(string) when String.sub(string, 0, 2) == "--" => Ok(string)
-    | _ => Error("expected a --variable"),
+    | _ => Error(["expected a --variable"]),
   );
 
 // https://drafts.csswg.org/css-values-4/#strings
@@ -189,10 +189,10 @@ let string =
   token(
     fun
     | STRING(string) => Ok(string)
-    | _ => Error("expected a string"),
+    | _ => Error(["expected a string"]),
   );
 
-let dimension_unit = return_data(Error("not implemented"));
+let dimension_unit = return_data(Error(["not implemented"]));
 
 // TODO: <url-modifier>
 // https://drafts.csswg.org/css-values-4/#urls
@@ -201,7 +201,7 @@ let url = {
     token(
       fun
       | URL(url) => Ok(url)
-      | _ => Error("expected a url"),
+      | _ => Error(["expected a url"]),
     );
   let url_fun = function_call("url", string);
   combine_xor([url_token, url_fun]);
@@ -214,5 +214,5 @@ let hex_color =
     fun
     | HASH(str, _) when String.length(str) >= 3 && String.length(str) <= 8 =>
       Ok(str)
-    | _ => Error("expected a hex-color"),
+    | _ => Error(["expected a hex-color"]),
   );

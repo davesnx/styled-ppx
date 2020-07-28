@@ -63,7 +63,7 @@ let repeat_by_comma = ((min, max), rule) =>
 let at_least_one = rule => {
   let.bind_match values = rule;
   let have_one = List.exists(Option.is_some, values);
-  return_data(have_one ? Ok(values) : Error("should match at least one"));
+  return_data(have_one ? Ok(values) : Error(["should match at least one"]));
 };
 // TODO: make that more dynamic
 let at_least_one_2 = rule => {

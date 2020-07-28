@@ -1,6 +1,6 @@
 open Reason_css_lexer;
 
-type error = string;
+type error = list(string);
 type data('a) = result('a, error);
 type rule('a) = list(token) => (data('a), list(token));
 
@@ -97,7 +97,7 @@ module Pattern = {
   let next =
     fun
     | [token, ...tokens] => Match.return(token, tokens)
-    | _ => (Error("missing the token expected"), []);
+    | _ => (Error(["missing the token expected"]), []);
   let token = (expected, tokens) =>
     switch (tokens) {
     | [token, ...tokens] =>
@@ -105,13 +105,13 @@ module Pattern = {
       // if failed then keep the tokens intact
       let tokens = Result.is_ok(data) ? tokens : [token, ...tokens];
       (data, tokens);
-    | [] => (Error("missing the token expected"), [])
+    | [] => (Error(["missing the token expected"]), [])
     };
   let expect = expected =>
     token(
       fun
       | token when token == expected => Ok()
-      | _ => Error("expected " ++ show_token(expected)),
+      | _ => Error(["expected " ++ show_token(expected)]),
     );
   let value = (value, rule) => Match.bind(rule, () => Match.return(value));
 };

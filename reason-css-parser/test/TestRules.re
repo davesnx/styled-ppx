@@ -46,11 +46,11 @@ describe("data monad", ({test, _}) => {
     let comma =
       fun
       | [COMMA, ...tokens] => (Ok(6), tokens)
-      | tokens => (Error(""), tokens);
+      | tokens => (Error([""]), tokens);
     let two_comma =
       fun
       | [COMMA, COMMA, ...tokens] => (Ok(7), tokens)
-      | tokens => (Error(""), tokens);
+      | tokens => (Error([""]), tokens);
     let () = {
       let rule =
         bind_shortest(
@@ -84,11 +84,11 @@ describe("data monad", ({test, _}) => {
     let comma =
       fun
       | [COMMA, ...tokens] => (Ok(9), tokens)
-      | tokens => (Error(""), tokens);
+      | tokens => (Error([""]), tokens);
     let two_comma =
       fun
       | [COMMA, COMMA, ...tokens] => (Ok(10), tokens)
-      | tokens => (Error(""), tokens);
+      | tokens => (Error([""]), tokens);
     let () = {
       let rule =
         bind_longest(
@@ -161,11 +161,11 @@ describe("match monad", ({test, _}) => {
     let comma =
       fun
       | [COMMA, ...tokens] => (Ok(6), tokens)
-      | tokens => (Error(""), tokens);
+      | tokens => (Error([""]), tokens);
     let two_comma =
       fun
       | [COMMA, COMMA, ...tokens] => (Ok(7), tokens)
-      | tokens => (Error(""), tokens);
+      | tokens => (Error([""]), tokens);
     let () = {
       let rule =
         bind_shortest(
@@ -199,11 +199,11 @@ describe("match monad", ({test, _}) => {
     let comma =
       fun
       | [COMMA, ...tokens] => (Ok(9), tokens)
-      | tokens => (Error(""), tokens);
+      | tokens => (Error([""]), tokens);
     let two_comma =
       fun
       | [COMMA, COMMA, ...tokens] => (Ok(10), tokens)
-      | tokens => (Error(""), tokens);
+      | tokens => (Error([""]), tokens);
     let () = {
       let rule =
         bind_longest(
@@ -249,7 +249,7 @@ describe("pattern helpers", ({test, _}) => {
       token(
         fun
         | STRING("potato") => Ok(1)
-        | _ => Error(""),
+        | _ => Error([""]),
       );
     switch (rule([STRING("potato")])) {
     | (Ok(1), []) => ()

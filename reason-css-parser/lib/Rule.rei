@@ -1,6 +1,6 @@
 open Reason_css_lexer;
 
-type error = string;
+type error = list(string);
 type data('a) = result('a, error);
 type rule('a) = list(token) => (data('a), list(token));
 
