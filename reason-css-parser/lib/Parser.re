@@ -27,6 +27,26 @@ let position = [%value
 // TODO: let ratio = [%value "<number [0,∞]> [ / <number [0,∞]> ]?"];
 let ratio = [%value "<number> [ / <number> ]?"];
 
+// css-easing-1
+let step_position = [%value
+  "jump-start | jump-end | jump-none | jump-both | start | end"
+];
+let step_easing_function = [%value
+  "step-start | step-end | steps(<integer>[, <step-position>]?)"
+];
+// let cubic_bezier_easing_function = [%value "ease | ease-in | ease-out | ease-in-out | cubic-bezier(<number [0,1]>, <number>, <number [0,1]>, <number>)"];
+let cubic_bezier_easing_function = [%value
+  "ease | ease-in | ease-out | ease-in-out | cubic-bezier(<number>, <number>, <number>, <number>)"
+];
+let easing_function = [%value
+  "linear | <cubic-bezier-easing-function> | <step-easing-function>"
+];
+let function_steps = [%value "steps(<integer>[, <step-position> ]?)"];
+// let function_cubic_bezier = [%value "cubic-bezier(<number [0,1]>, <number>, <number [0,1]>, <number>)"];
+let function_cubic_bezier = [%value
+  "cubic-bezier(<number>, <number>, <number>, <number>)"
+];
+
 // css-sizing-3
 let function_fit_content = [%value "fit-content( <length-percentage> )"];
 let property_width = [%value
@@ -450,14 +470,22 @@ let function_perspective = [%value "perspective( <length> )"];
 let function_rotateZ = [%value "rotateZ( <angle> )"];
 let function_rotateY = [%value "rotateY( <angle> )"];
 let function_rotateX = [%value "rotateX( <angle> )"];
-let function_rotate3d = [%value "rotate3d( <number> , <number> , <number> , <angle> )"];
+let function_rotate3d = [%value
+  "rotate3d( <number> , <number> , <number> , <angle> )"
+];
 let function_scaleZ = [%value "scaleZ( <number> )"];
 let function_scale3d = [%value "scale3d( <number> , <number>, <number> )"];
 let function_translateZ = [%value "translateZ( <length> )"];
-let function_translate3d = [%value "translate3d( <length-percentage> , <length-percentage> , <length> )"];
+let function_translate3d = [%value
+  "translate3d( <length-percentage> , <length-percentage> , <length> )"
+];
 let function_matrix3d = [%value "matrix3d( <number>#{16} )"];
-let property_translate = [%value "none | <length-percentage> [ <length-percentage> <length>? ]?"];
-let property_rotate = [%value "none | <angle> | [ x | y | z | <number>{3} ] && <angle>"];
+let property_translate = [%value
+  "none | <length-percentage> [ <length-percentage> <length>? ]?"
+];
+let property_rotate = [%value
+  "none | <angle> | [ x | y | z | <number>{3} ] && <angle>"
+];
 let property_scale = [%value "none | <number>{1,3}"];
 let property_transform_style = [%value "flat | preserve-3d"];
 let property_perspective_origin = [%value "<position>"];
