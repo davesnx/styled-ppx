@@ -1021,6 +1021,27 @@ let backface_visibility =
     ~call=[%expr Css.backfaceVisibility],
   );
 
+// css-transition-1
+let transition_property =
+  unsupported(
+    property_transition_property,
+    ~call=[%expr Css.transitionProperty],
+  );
+let transition_duration =
+  unsupported(
+    property_transition_duration,
+    ~call=[%expr Css.transitionDuration],
+  );
+let transition_timing_function =
+  unsupported(
+    property_transition_timing_function,
+    ~call=[%expr Css.transitionTimingFunction],
+  );
+let transition_delay =
+  unsupported(property_transition_delay, ~call=[%expr Css.transitionDelay]);
+let transition =
+  unsupported(property_transition, ~call=[%expr Css.transition]);
+
 // css-animation-1
 let animation_name =
   unsupported(property_animation_name, ~call=[%expr Css.animationName]);
@@ -1295,6 +1316,12 @@ let properties = [
   ("perspective", found(perspective)),
   ("perspective-origin", found(perspective_origin)),
   ("backface-visibility", found(backface_visibility)),
+  // css-transition-1
+  ("transition-property", found(transition_property)),
+  ("transition-duration", found(transition_duration)),
+  ("transition-timing-function", found(transition_timing_function)),
+  ("transition-delay", found(transition_delay)),
+  ("transition", found(transition)),
   // css-animation-1
   ("animation-name", found(animation_name)),
   ("animation-duration", found(animation_duration)),
