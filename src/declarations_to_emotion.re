@@ -1021,6 +1021,43 @@ let backface_visibility =
     ~call=[%expr Css.backfaceVisibility],
   );
 
+// css-animation-1
+let animation_name =
+  unsupported(property_animation_name, ~call=[%expr Css.animationName]);
+let animation_duration =
+  unsupported(
+    property_animation_duration,
+    ~call=[%expr Css.animationDuration],
+  );
+let animation_timing_function =
+  unsupported(
+    property_animation_timing_function,
+    ~call=[%expr Css.Css.animationTimingFunction],
+  );
+let animation_iteration_count =
+  unsupported(
+    property_animation_iteration_count,
+    ~call=[%expr Css.animationIterationCount],
+  );
+let animation_direction =
+  unsupported(
+    property_animation_direction,
+    ~call=[%expr Css.animationDirection],
+  );
+let animation_play_state =
+  unsupported(
+    property_animation_play_state,
+    ~call=[%expr Css.animationPlayState],
+  );
+let animation_delay =
+  unsupported(property_animation_delay, ~call=[%expr Css.animationDelay]);
+let animation_fill_mode =
+  unsupported(
+    property_animation_fill_mode,
+    ~call=[%expr Css.animationFillMode],
+  );
+let animation = unsupported(property_animation, ~call=[%expr Css.animation]);
+
 // css-flexbox-1
 // using id() because refmt
 let flex_direction =
@@ -1258,6 +1295,16 @@ let properties = [
   ("perspective", found(perspective)),
   ("perspective-origin", found(perspective_origin)),
   ("backface-visibility", found(backface_visibility)),
+  // css-animation-1
+  ("animation-name", found(animation_name)),
+  ("animation-duration", found(animation_duration)),
+  ("animation-timing-function", found(animation_timing_function)),
+  ("animation-iteration-count", found(animation_iteration_count)),
+  ("animation-direction", found(animation_direction)),
+  ("animation-play-state", found(animation_play_state)),
+  ("animation-delay", found(animation_delay)),
+  ("animation-fill-mode", found(animation_fill_mode)),
+  ("animation", found(animation)),
   // css-flexbox-1
   ("flex-direction", found(flex_direction)),
   ("flex-wrap", found(flex_wrap)),
