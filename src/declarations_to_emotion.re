@@ -36,14 +36,7 @@ let transform = (parser, value_of_ast, value_to_expr) => {
     ast_of_string(string) |> Result.map(ast_to_expr);
   {ast_of_string, value_of_ast, value_to_expr, ast_to_expr, string_to_expr};
 };
-let unsupported = _parser =>
-  transform(
-    property_block_ellipsis,
-    fun
-    | _ => raise(Unsupported_feature),
-    fun
-    | _ => raise(Unsupported_feature),
-  );
+
 let render_css_wide_keywords = (name, value) => {
   let.ok value = Parser.parse(Standard.css_wide_keywords, value);
   let value =
@@ -150,14 +143,24 @@ let variable = parser =>
     Rule.Match.map(variable_rule, data => `Variable(data)),
     Rule.Match.map(parser, data => `Value(data)),
   ]);
-let apply = (parser, map, id) =>
+
+let transform_with_variable = (parser, map, value_to_expr) =>
   transform(
     variable(parser),
     fun
     | `Variable(name) => name |> lid |> Exp.ident
     | `Value(ast) => map(ast),
-    arg =>
-    [[%expr [%e id]([%e arg])]]
+    value_to_expr,
+  );
+let apply = (parser, map, id) =>
+  transform_with_variable(parser, map, arg => [[%expr [%e id]([%e arg])]]);
+let unsupported = (~call=?, parser) =>
+  transform_with_variable(
+    parser,
+    _ => raise(Unsupported_feature),
+    call
+    |> Option.map((call, arg) => [[%expr [%e call]([%e arg])]])
+    |> Option.value(~default=_ => raise(Unsupported_feature)),
   );
 
 let variants = (parser, identifier) =>
@@ -703,14 +706,28 @@ let render_shadow = shadow => {
 };
 let background_color =
   apply(property_background_color, render_color, [%expr Css.backgroundColor]);
-let background_image = unsupported(property_background_image);
-let background_repeat = unsupported(property_background_repeat);
-let background_attachment = unsupported(property_background_attachment);
-let background_position = unsupported(property_background_position);
-let background_clip = unsupported(property_background_clip);
-let background_origin = unsupported(property_background_origin);
-let background_size = unsupported(property_background_size);
-let background = unsupported(property_background);
+let background_image =
+  unsupported(property_background_image, ~call=[%expr Css.backgroundImage]);
+let background_repeat =
+  unsupported(property_background_repeat, ~call=[%expr Css.backgroundRepeat]);
+let background_attachment =
+  unsupported(
+    property_background_attachment,
+    ~call=[%expr Css.backgroundAttachment],
+  );
+let background_position =
+  unsupported(
+    property_background_position,
+    ~call=[%expr Css.backgroundPosition],
+  );
+let background_clip =
+  unsupported(property_background_clip, ~call=[%expr Css.backgroundClip]);
+let background_origin =
+  unsupported(property_background_origin, ~call=[%expr Css.backgroundOrigin]);
+let background_size =
+  unsupported(property_background_size, ~call=[%expr Css.backgroundSize]);
+let background =
+  unsupported(property_background, ~call=[%expr Css.background]);
 let border_top_color =
   apply(property_border_top_color, render_color, [%expr Css.borderTopColor]);
 let border_right_color =
@@ -731,7 +748,8 @@ let border_left_color =
     apply_value(border_top_color.value_of_ast),
     [%expr Css.borderLeftColor],
   );
-let border_color = unsupported(property_border_color);
+let border_color =
+  unsupported(property_border_color, ~call=[%expr Css.borderColor]);
 let border_top_style =
   variants(property_border_top_style, [%expr Css.borderTopStyle]);
 let border_right_style =
@@ -740,7 +758,8 @@ let border_bottom_style =
   variants(property_border_bottom_style, [%expr Css.borderBottomStyle]);
 let border_left_style =
   variants(property_border_left_style, [%expr Css.borderLeftStyle]);
-let border_style = unsupported(property_border_style);
+let border_style =
+  unsupported(property_border_style, ~call=[%expr Css.borderStyle]);
 
 let render_line_width =
   fun
@@ -770,12 +789,17 @@ let border_left_width =
     render_line_width,
     [%expr Css.borderLeftWidth],
   );
-let border_width = unsupported(property_border_width);
-let border_top = unsupported(property_border_top);
-let border_right = unsupported(property_border_right);
-let border_bottom = unsupported(property_border_bottom);
-let border_left = unsupported(property_border_left);
-let border = unsupported(property_border);
+let border_width =
+  unsupported(property_border_width, ~call=[%expr Css.borderWidth]);
+let border_top =
+  unsupported(property_border_top, ~call=[%expr Css.borderTop]);
+let border_right =
+  unsupported(property_border_right, ~call=[%expr Css.borderRight]);
+let border_bottom =
+  unsupported(property_border_bottom, ~call=[%expr Css.borderBottom]);
+let border_left =
+  unsupported(property_border_left, ~call=[%expr Css.borderLeft]);
+let border = unsupported(property_border, ~call=[%expr Css.border]);
 let border_top_left_radius =
   apply(
     property_border_top_left_radius,
@@ -802,7 +826,8 @@ let border_bottom_left_radius =
     apply_value(border_top_left_radius.value_of_ast),
     [%expr Css.borderBottomLeftRadius],
   );
-let border_radius = unsupported(property_border_radius);
+let border_radius =
+  unsupported(property_border_radius, ~call=[%expr Css.borderRadius]);
 let border_image_source = unsupported(property_border_image_source);
 let border_image_slice = unsupported(property_border_image_slice);
 let border_image_width = unsupported(property_border_image_width);
