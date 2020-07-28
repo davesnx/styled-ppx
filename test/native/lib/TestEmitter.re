@@ -250,7 +250,8 @@ let properties_static_css_tests = [%expr
     ([%css "word-break: keep-all"], [Css.wordBreak(`keepAll)]),
     ([%css "overflow-wrap: anywhere"], [Css.overflowWrap(`anywhere)]),
     ([%css "word-wrap: normal"], [Css.wordWrap(`normal)]),
-    ([%css "text-align: start"], [Css.textAlign(`start)]),
+    // ([%css "text-align: start"], [Css.textAlign(`start)]),
+    ([%css "text-align: left"], [Css.textAlign(`left)]),
     ([%css "word-spacing: normal"], [Css.wordSpacing(`normal)]),
     ([%css "word-spacing: 5px"], [Css.wordSpacing(`pxFloat(5.))]),
     ([%css "letter-spacing: normal"], [Css.letterSpacing(`normal)]),
@@ -259,8 +260,8 @@ let properties_static_css_tests = [%expr
     // css-flexbox-1
     ([%css "flex-wrap: wrap"], [Css.flexWrap(`wrap)]),
     // TODO: generate tests with variables in the future
-    ([%css "flex-wrap: $var"], [Css.flexWrap(var)]),
-    ([%css "flex-wrap: $(var)"], [Css.flexWrap(var)]),
+    // ([%css "flex-wrap: $var"], [Css.flexWrap(var)]),
+    // ([%css "flex-wrap: $(var)"], [Css.flexWrap(var)]),
     (
       [%css "flex-flow: row nowrap"],
       [Css.flexDirection(`row), Css.flexWrap(`nowrap)],
