@@ -508,11 +508,11 @@ let function_perspective = [%value "perspective( <length> )"];
 // let function_rotateY = [%value "rotateY( [ <angle> | <zero> ] )"];
 // let function_rotateX = [%value "rotateX( [ <angle> | <zero> ] )"];
 // let function_rotate3d = [%value "rotate3d( <number> , <number> , <number> , [ <angle> | <zero> ] )"];
-let function_rotateZ = [%value "rotateZ( <angle> )"];
-let function_rotateY = [%value "rotateY( <angle> )"];
-let function_rotateX = [%value "rotateX( <angle> )"];
+let function_rotateZ = [%value "rotateZ( [ <angle> ] )"];
+let function_rotateY = [%value "rotateY( [ <angle> ] )"];
+let function_rotateX = [%value "rotateX( [ <angle> ] )"];
 let function_rotate3d = [%value
-  "rotate3d( <number> , <number> , <number> , <angle> )"
+  "rotate3d( <number> , <number> , <number> , [ <angle> ] )"
 ];
 let function_scaleZ = [%value "scaleZ( <number> )"];
 let function_scale3d = [%value "scale3d( <number> , <number>, <number> )"];
@@ -521,6 +521,29 @@ let function_translate3d = [%value
   "translate3d( <length-percentage> , <length-percentage> , <length> )"
 ];
 let function_matrix3d = [%value "matrix3d( <number>#{16} )"];
+let function_skewY = [%value "skewY( [ <angle> | <zero> ] )"];
+let function_skewX = [%value "skewX( [ <angle> | <zero> ] )"];
+let function_skew = [%value
+  "skew( [ <angle> | <zero> ] , [ <angle> | <zero> ]? )"
+];
+let function_rotate = [%value "rotate( [ <angle> | <zero> ] )"];
+let function_scaleY = [%value "scaleY( <number> )"];
+let function_scaleX = [%value "scaleX( <number> )"];
+let function_scale = [%value "scale( <number> , <number>? )"];
+let function_translateY = [%value "translateY( <length-percentage> )"];
+let function_translateX = [%value "translateX( <length-percentage> )"];
+let function_translate = [%value
+  "translate( <length-percentage> , <length-percentage>? )"
+];
+let function_matrix = [%value "matrix( <number>#{6} )"];
+let transform_list = [%value "<transform-function>+"];
+let property_transform = [%value "none | <transform-list>"];
+let property_transform_origin = [%value
+  "[ left | center | right | top | bottom | <length-percentage> ] | [ left | center | right | <length-percentage> ] [ top | center | bottom | <length-percentage> ] <length>? | [[ center | left | right ] && [ center | top | bottom ]] <length>?"
+];
+let property_transform_box = [%value
+  "content-box | border-box | fill-box | stroke-box | view-box"
+];
 let property_translate = [%value
   "none | <length-percentage> [ <length-percentage> <length>? ]?"
 ];
@@ -529,7 +552,10 @@ let property_rotate = [%value
 ];
 let property_scale = [%value "none | <number>{1,3}"];
 let property_transform_style = [%value "flat | preserve-3d"];
+// let property_perspective = [%value "none | <length [0,∞]>"];
+let property_perspective = [%value "none | <length>"];
 let property_perspective_origin = [%value "<position>"];
+let property_backface_visibility = [%value "visible | hidden"];
 
 // css-transition-1
 // let single_transition_property = [%value "all | <custom-ident>;"];
