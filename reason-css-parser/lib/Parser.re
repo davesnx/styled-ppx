@@ -460,6 +460,47 @@ let property_font_palette = [%value
 ];
 let property_font_variant_emoji = [%value "auto | text | emoji | unicode"];
 
+// css-text-decor-3
+let property_text_decoration_line = [%value
+  "none | [ underline || overline || line-through || blink ] | spelling-error | grammar-error"
+];
+let property_text_decoration_style = [%value
+  "solid | double | dotted | dashed | wavy"
+];
+let property_text_decoration_color = [%value "<color>"];
+let property_text_decoration_thickness = [%value
+  "auto | from-font | <length> | <percentage>"
+];
+let property_text_decoration = [%value
+  "<'text-decoration-line'> || <'text-decoration-thickness'> || <'text-decoration-style'> || <'text-decoration-color'>"
+];
+let property_text_underline_position = [%value
+  "auto | [ from-font | under ] || [ left | right ]"
+];
+let property_text_underline_offset = [%value "auto | <length> | <percentage>"];
+let property_text_decoration_skip = [%value "none | auto"];
+let property_text_decoration_skip_self = [%value "none | objects"];
+let property_text_decoration_skip_box = [%value "none | all"];
+let property_text_decoration_skip_inset = [%value "none | auto"];
+let property_text_decoration_skip_spaces = [%value
+  "none | all | [ start || end ]"
+];
+let property_text_decoration_skip_ink = [%value "auto | none | all"];
+let property_text_emphasis_style = [%value
+  "none | [ [ filled | open ] || [ dot | circle | double-circle | triangle | sesame ] ] | <string>"
+];
+let property_text_emphasis_color = [%value "<color>"];
+let property_text_emphasis = [%value
+  "<'text-emphasis-style'> || <'text-emphasis-color'>"
+];
+let property_text_emphasis_position = [%value
+  "[ over | under ] && [ right | left ]?"
+];
+let property_text_emphasis_skip = [%value
+  "spaces || punctuation || symbols || narrow"
+];
+let property_text_shadow = [%value "none | [ <color>? && <length>{2,4} ]#"];
+
 // css-transforms-2
 // let function_perspective = [%value "perspective( <length [0,∞]> )"];
 let function_perspective = [%value "perspective( <length> )"];
@@ -509,9 +550,7 @@ let keyframe_selector = [%value "from | to | <percentage>"];
 // let keyframe_block = [%value
 //   "<keyframe-selector># '{' <declaration-list> '}'"
 // ];
-let keyframe_block = [%value
-  "<keyframe-selector>#"
-];
+let keyframe_block = [%value "<keyframe-selector>#"];
 let keyframes_name = [%value "<custom-ident> | <string>"];
 let single_animation_fill_mode = [%value "none | forwards | backwards | both"];
 let single_animation_play_state = [%value "running | paused"];
