@@ -962,6 +962,45 @@ let font_variation_settings = unsupported(property_font_variation_settings);
 let font_palette = unsupported(property_font_palette);
 let font_variant_emoji = unsupported(property_font_variant_emoji);
 
+// css-text-decor-3
+let text_decoration_line =
+  unsupported(
+    property_text_decoration_line,
+    ~call=[%expr Css.textDecorationLine],
+  );
+let text_decoration_style =
+  unsupported(
+    property_text_decoration_style,
+    ~call=[%expr Css.textDecorationStyle],
+  );
+let text_decoration_color =
+  unsupported(
+    property_text_decoration_color,
+    ~call=[%expr Css.textDecorationColor],
+  );
+let text_decoration_thickness =
+  unsupported(property_text_decoration_thickness);
+let text_decoration =
+  unsupported(property_text_decoration, ~call=[%expr Css.textDecoration]);
+let text_underline_position = unsupported(property_text_underline_position);
+let text_underline_offset = unsupported(property_text_underline_offset);
+let text_decoration_skip = unsupported(property_text_decoration_skip);
+let text_decoration_skip_self =
+  unsupported(property_text_decoration_skip_self);
+let text_decoration_skip_box = unsupported(property_text_decoration_skip_box);
+let text_decoration_skip_inset =
+  unsupported(property_text_decoration_skip_inset);
+let text_decoration_skip_spaces =
+  unsupported(property_text_decoration_skip_spaces);
+let text_decoration_skip_ink = unsupported(property_text_decoration_skip_ink);
+let text_emphasis_style = unsupported(property_text_emphasis_style);
+let text_emphasis_color = unsupported(property_text_emphasis_color);
+let text_emphasis = unsupported(property_text_emphasis);
+let text_emphasis_position = unsupported(property_text_emphasis_position);
+let text_emphasis_skip = unsupported(property_text_emphasis_skip);
+let text_shadow =
+  unsupported(property_text_shadow, ~call=[%expr Css.textShadow]);
+
 // css-transforms-2
 let transform = unsupported(property_transform, ~call=[%expr Css.transform]);
 let transform_origin =
@@ -1188,6 +1227,26 @@ let properties = [
   ("font-variation-settings", found(font_variation_settings)),
   ("font-palette", found(font_palette)),
   ("font-variant-emoji", found(font_variant_emoji)),
+  // css-text-decor-3
+  ("text-decoration-line", found(text_decoration_line)),
+  ("text-decoration-style", found(text_decoration_style)),
+  ("text-decoration-color", found(text_decoration_color)),
+  ("text-decoration-thickness", found(text_decoration_thickness)),
+  ("text-decoration", found(text_decoration)),
+  ("text-underline-position", found(text_underline_position)),
+  ("text-underline-offset", found(text_underline_offset)),
+  ("text-decoration-skip", found(text_decoration_skip)),
+  ("text-decoration-skip-self", found(text_decoration_skip_self)),
+  ("text-decoration-skip-box", found(text_decoration_skip_box)),
+  ("text-decoration-skip-inset", found(text_decoration_skip_inset)),
+  ("text-decoration-skip-spaces", found(text_decoration_skip_spaces)),
+  ("text-decoration-skip-ink", found(text_decoration_skip_ink)),
+  ("text-emphasis-style", found(text_emphasis_style)),
+  ("text-emphasis-color", found(text_emphasis_color)),
+  ("text-emphasis", found(text_emphasis)),
+  ("text-emphasis-position", found(text_emphasis_position)),
+  ("text-emphasis-skip", found(text_emphasis_skip)),
+  ("text-shadow", found(text_shadow)),
   // css-transforms2
   ("transform", found(transform)),
   ("transform-origin", found(transform_origin)),
