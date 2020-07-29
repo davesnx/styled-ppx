@@ -9,7 +9,7 @@ let whitespace = [%sedlex.regexp? ' ' | '\t' | '\n'];
 // TODO: is rgb(255 255 255/0) valid?
 
 // TODO: keyword characters, like . and , also escape like '*'
-let keyword = [%sedlex.regexp? (alpha, Star(alpha | digit | '-'))];
+let keyword = [%sedlex.regexp? (alpha | '@', Star(alpha | digit | '-'))];
 
 let read_char = buf => {
   let char =

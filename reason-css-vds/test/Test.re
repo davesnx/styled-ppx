@@ -191,6 +191,8 @@ let parse_tests = [
       ],
     ),
   ),
+  // at keyword
+  ("@stylistic", Terminal(Keyword("@stylistic"), One)),
 ];
 describe("correctly parse value", ({test, _}) => {
   let test = (index, (result, expected)) =>
