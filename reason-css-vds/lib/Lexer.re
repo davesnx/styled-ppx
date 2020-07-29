@@ -11,9 +11,14 @@ let stop_literal = [%sedlex.regexp?
   ' ' | '\t' | '\n' | '?' | '!' | '*' | '+' | '#' | '{' | ']'
 ];
 
-let data = [%sedlex.regexp? ("<", Plus(any), Opt(range_restriction), ">")];
-let function_ = [%sedlex.regexp? ("<", Plus(any), "()>")];
-let property = [%sedlex.regexp? ("<'", Plus(any), ">'")];
+let literal = [%sedlex.regexp? Plus(Sub(any, stop_literal))];
+let string = [%sedlex.regexp? ('\'', Plus(Sub(any, '\''), '\''))];
+
+let data = [%sedlex.regexp?
+  ("<", Plus(Sub(any, '>')), Opt(range_restriction), ">")
+];
+let function_ = [%sedlex.regexp? ("<", Plus(Sub(any, '(')), "()>")];
+let property = [%sedlex.regexp? ("<'", Plus(Sub(any, '\'')), "'>")];
 
 let range = [%sedlex.regexp?
   (Opt('#'), '{', Plus(digit), Opt(',', Star(digit)), '}')
@@ -41,28 +46,10 @@ let range = str => {
 };
 
 let literal_and_string = buf => {
-  let rec string = () => {
-    switch (Sedlexing.next(buf)) {
-    // TODO: escaping
-    | Some(char) when char == Uchar.of_char('\'') => ()
-    | Some(_) => string()
-    | None => ()
-    };
-  };
-  let rec literal = acc =>
-    switch%sedlex (buf) {
-    | stop_literal =>
-      Sedlexing.rollback(buf);
-      acc;
-    | any => literal(acc ++ lexeme(buf))
-    | _ => acc
-    };
-
   switch%sedlex (buf) {
-  | '\'' =>
-    string();
-    LITERAL(lexeme(buf) |> slice(1, -1));
-  | _ => LITERAL(literal(""))
+  | string => LITERAL(lexeme(buf) |> slice(1, -1))
+  | literal => LITERAL(lexeme(buf))
+  | _ => failwith("something is wrong here")
   };
 };
 let rec tokenizer = buf =>
