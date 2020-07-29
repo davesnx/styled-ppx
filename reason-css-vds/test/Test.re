@@ -193,6 +193,8 @@ let parse_tests = [
   ),
   // at keyword
   ("@stylistic", Terminal(Keyword("@stylistic"), One)),
+  // range restriction
+  ("<number [1, 5]>", Terminal(Data_type("number"), One))
 ];
 describe("correctly parse value", ({test, _}) => {
   let test = (index, (result, expected)) =>
