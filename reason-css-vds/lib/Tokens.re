@@ -5,8 +5,6 @@ type token =
   | DATA(string) // <number>
   | FUNCTION(string) // <rgb()>
   | PROPERTY(string) // <'color'>
-  | OPEN_FUNCTION(string) // rgb(
-  | CLOSE_FUNCTION // )
   // combinators
   | DOUBLE_AMPERSAND // &&
   | DOUBLE_BAR // ||
@@ -19,4 +17,7 @@ type token =
   | QUESTION_MARK // ?
   | RANGE(([ | `Comma | `Space], int, option(int))) // {1} {1,} {1, 2} #{1}
   | EXCLAMATION_POINT // !
+  // for functions
+  | LEFT_PARENS // (
+  | RIGHT_PARENS // )
   | EOF;

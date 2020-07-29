@@ -8,7 +8,7 @@ let number = [%sedlex.regexp? (Opt('+' | '-'), digit | "∞")];
 let range_restriction = [%sedlex.regexp? ('[', number, ',', number, ']')];
 
 let stop_literal = [%sedlex.regexp?
-  ' ' | '\t' | '\n' | '?' | '!' | '*' | '+' | '#' | '{' | ']'
+  ' ' | '\t' | '\n' | '?' | '!' | '*' | '+' | '#' | '{' | ']' | '('
 ];
 
 let literal = [%sedlex.regexp? Plus(Sub(any, stop_literal))];
@@ -74,6 +74,9 @@ let rec tokenizer = buf =>
   | "|" => BAR
   | "[" => LEFT_BRACKET
   | "]" => RIGHT_BRACKET
+  // functions
+  | '(' => LEFT_PARENS
+  | ')' => RIGHT_PARENS
   | eof => EOF
   | _ => literal_and_string(buf)
   };
