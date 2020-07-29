@@ -1,8 +1,4 @@
 (menhir
- (flags --external-tokens Tokens_legacy --explain)
- (modules Parser_legacy))
-
-(menhir
  (flags --external-tokens Tokens --explain)
  (modules Parser))
 
