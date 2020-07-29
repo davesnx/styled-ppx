@@ -3,7 +3,6 @@ type token =
   // literals
   | LITERAL(string) // auto 'auto'
   | DATA(string) // <number>
-  | FUNCTION(string) // <rgb()>
   | PROPERTY(string) // <'color'>
   // combinators
   | DOUBLE_AMPERSAND // &&

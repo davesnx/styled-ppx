@@ -17,7 +17,6 @@ let string = [%sedlex.regexp? ('\'', Plus(Sub(any, '\'')), '\'')];
 let data = [%sedlex.regexp?
   ("<", Plus(Sub(any, '>')), Opt(range_restriction), ">")
 ];
-let function_ = [%sedlex.regexp? ("<", Plus(Sub(any, '(')), "()>")];
 let property = [%sedlex.regexp? ("<'", Plus(Sub(any, '\'')), "'>")];
 
 let range = [%sedlex.regexp?
@@ -56,7 +55,6 @@ let rec tokenizer = buf =>
   switch%sedlex (buf) {
   | whitespace => tokenizer(buf)
   | property => PROPERTY(lexeme(buf) |> slice(2, -2))
-  | function_ => FUNCTION(lexeme(buf) |> slice(1, -3))
   | data =>
     switch (lexeme(buf) |> slice(1, -1) |> String.split_on_char(' ')) {
     | [value, ..._] => DATA(value)

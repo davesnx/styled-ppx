@@ -60,7 +60,6 @@ let rec value_to_string = value => {
         | Keyword(name) => name
         | Data_type(name) => "<" ++ name ++ ">"
         | Property_type(name) => "<'" ++ name ++ "'>"
-        | Function(name) => name ++ "()"
         };
       (full_name, Some(multiplier));
     | Combinator(kind, values) =>

@@ -5,7 +5,6 @@ open Ast
 %}
 %token <string> LITERAL
 %token <string> DATA
-%token <string> FUNCTION
 %token <string> PROPERTY
 %token DOUBLE_AMPERSAND
 %token DOUBLE_BAR
@@ -51,7 +50,6 @@ let multiplier :=
 let terminal ==
   | l = LITERAL; { Keyword l }
   | d = DATA; { Data_type d }
-  | f = FUNCTION; { Function f }
   | p = PROPERTY; { Property_type p }
 
 let terminal_multiplier(terminal) ==
