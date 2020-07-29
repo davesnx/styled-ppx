@@ -70,7 +70,11 @@ let rec tokenizer = buf =>
   | whitespace => tokenizer(buf)
   | property => PROPERTY(lexeme(buf) |> slice(2, -2))
   | function_ => FUNCTION(lexeme(buf) |> slice(1, -3))
-  | data => DATA(lexeme(buf) |> slice(1, -1))
+  | data =>
+    switch (lexeme(buf) |> slice(1, -1) |> String.split_on_char(' ')) {
+    | [value, ..._] => DATA(value)
+    | [] => failwith("unreachable")
+    }
   | '*' => ASTERISK
   | '+' => PLUS
   | '?' => QUESTION_MARK
