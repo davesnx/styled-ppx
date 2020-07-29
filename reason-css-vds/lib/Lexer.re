@@ -8,7 +8,7 @@ let number = [%sedlex.regexp? (Opt('+' | '-'), digit | "∞")];
 let range_restriction = [%sedlex.regexp? ('[', number, ',', number, ']')];
 
 let string = [%sedlex.regexp? ("'", Plus(any), "'")];
-let literal = [%sedlex.regexp? Plus(Sub(any, ' '))];
+let literal = [%sedlex.regexp? Plus(Sub(any, ' ' | '?' | '!' | '*' | '+'))];
 let data = [%sedlex.regexp? ("<", Plus(any), Opt(range_restriction), ">")];
 let function_ = [%sedlex.regexp? ("<", Plus(any), "()>")];
 let property = [%sedlex.regexp? ("<'", Plus(any), ">'")];
@@ -44,8 +44,13 @@ let rec tokenizer = buf =>
   | property => PROPERTY(lexeme(buf) |> slice(2, -2))
   | function_ => FUNCTION(lexeme(buf) |> slice(1, -3))
   | data => DATA(lexeme(buf) |> slice(1, -1))
+  | '*' => ASTERISK
+  | '+' => PLUS
+  | '?' => QUESTION_MARK
   | '#' => RANGE((`Comma, 1, None))
   | range => range(lexeme(buf))
+  | '!' => EXCLAMATION_POINT
+  // combinators
   | "&&" => DOUBLE_AMPERSAND
   | "||" => DOUBLE_BAR
   | "|" => BAR
