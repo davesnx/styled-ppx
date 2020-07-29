@@ -19,8 +19,7 @@ type multiplier =
 type terminal =
   | Keyword(string) /* auto */
   | Data_type(string) /* <color > */
-  | Property_type(string) /* <'color'> */
-  | Function(string) /* <color()> */;
+  | Property_type(string) /* <'color'> */;
 
 [@deriving show({with_path: false})]
 type combinator =

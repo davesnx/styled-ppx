@@ -170,7 +170,7 @@ let parse_tests = [
     ),
   ),
   // TODO: shouldn't be a special case
-  ("<rgb()>", Terminal(Function("rgb"), One)),
+  ("<rgb()>", Terminal(Data_type("rgb()"), One)),
   // ident with number
   (
     "[ jis04 | simplified | traditional ]",
