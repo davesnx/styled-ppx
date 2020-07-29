@@ -134,14 +134,6 @@ let parse_tests = [
       ],
     ),
   ),
-  // function declaration
-  (
-    "rgb() | hsl()",
-    Combinator(
-      Xor,
-      [Terminal(Function("rgb"), One), Terminal(Function("hsl"), One)],
-    ),
-  ),
   (
     // function call
     "rgb( <percentage>{3} [ / <alpha-value> ]? )",
@@ -178,7 +170,7 @@ let parse_tests = [
     ),
   ),
   // TODO: shouldn't be a special case
-  ("<rgb()>", Terminal(Data_type("rgb()"), One)),
+  ("<rgb()>", Terminal(Function("rgb"), One)),
   // ident with number
   (
     "[ jis04 | simplified | traditional ]",
@@ -194,7 +186,9 @@ let parse_tests = [
   // at keyword
   ("@stylistic", Terminal(Keyword("@stylistic"), One)),
   // range restriction
-  ("<number [1, 5]>", Terminal(Data_type("number"), One))
+  ("<number [1, 5]>", Terminal(Data_type("number"), One)),
+  // escaped combinator
+  ("'||'", Terminal(Keyword("||"), One)),
 ];
 describe("correctly parse value", ({test, _}) => {
   let test = (index, (result, expected)) =>
