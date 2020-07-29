@@ -8,7 +8,7 @@ let number = [%sedlex.regexp? (Opt('+' | '-'), digit | "∞")];
 let range_restriction = [%sedlex.regexp? ('[', number, ',', number, ']')];
 
 let stop_literal = [%sedlex.regexp?
-  ' ' | '\t' | '\n' | '?' | '!' | '*' | '+' | '#' | '{' | ']' | '('
+  ' ' | '\t' | '\n' | '?' | '!' | '*' | '+' | '#' | '{' | ']' | '(' | ')' | ','
 ];
 
 let literal = [%sedlex.regexp? Plus(Sub(any, stop_literal))];
@@ -48,6 +48,7 @@ let range = str => {
 let literal = buf =>
   switch%sedlex (buf) {
   | literal => LITERAL(lexeme(buf))
+  | ',' => LITERAL(",")
   | _ => failwith("something is wrong here")
   };
 

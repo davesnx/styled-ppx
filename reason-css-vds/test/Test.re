@@ -189,6 +189,21 @@ let parse_tests = [
   ("<number [1, 5]>", Terminal(Data_type("number"), One)),
   // escaped combinator
   ("'||'", Terminal(Keyword("||"), One)),
+  // function without space
+  (
+    "minmax(min, max)",
+    Function_call(
+      "minmax",
+      Combinator(
+        Static,
+        [
+          Terminal(Keyword("min"), One),
+          Terminal(Keyword(","), One),
+          Terminal(Keyword("max"), One),
+        ],
+      ),
+    ),
+  ),
 ];
 describe("correctly parse value", ({test, _}) => {
   let test = (index, (result, expected)) =>
