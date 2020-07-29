@@ -7,8 +7,10 @@ let digit = [%sedlex.regexp? '0'..'9'];
 let number = [%sedlex.regexp? (Opt('+' | '-'), digit | "∞")];
 let range_restriction = [%sedlex.regexp? ('[', number, ',', number, ']')];
 
-let string = [%sedlex.regexp? ("'", Plus(any), "'")];
-let literal = [%sedlex.regexp? Plus(Sub(any, ' ' | '?' | '!' | '*' | '+'))];
+let stop_literal = [%sedlex.regexp?
+  ' ' | '\t' | '\n' | '?' | '!' | '*' | '+' | '#' | '{' | ']'
+];
+
 let data = [%sedlex.regexp? ("<", Plus(any), Opt(range_restriction), ">")];
 let function_ = [%sedlex.regexp? ("<", Plus(any), "()>")];
 let property = [%sedlex.regexp? ("<'", Plus(any), ">'")];
@@ -38,6 +40,31 @@ let range = str => {
   RANGE((kind, min, max));
 };
 
+let literal_and_string = buf => {
+  let rec string = () => {
+    switch (Sedlexing.next(buf)) {
+    // TODO: escaping
+    | Some(char) when char == Uchar.of_char('\'') => ()
+    | Some(_) => string()
+    | None => ()
+    };
+  };
+  let rec literal = acc =>
+    switch%sedlex (buf) {
+    | stop_literal =>
+      Sedlexing.rollback(buf);
+      acc;
+    | any => literal(acc ++ lexeme(buf))
+    | _ => acc
+    };
+
+  switch%sedlex (buf) {
+  | '\'' =>
+    string();
+    LITERAL(lexeme(buf) |> slice(1, -1));
+  | _ => LITERAL(literal(""))
+  };
+};
 let rec tokenizer = buf =>
   switch%sedlex (buf) {
   | whitespace => tokenizer(buf)
@@ -56,8 +83,6 @@ let rec tokenizer = buf =>
   | "|" => BAR
   | "[" => LEFT_BRACKET
   | "]" => RIGHT_BRACKET
-  | string => LITERAL(lexeme(buf) |> slice(1, -1))
-  | literal => LITERAL(lexeme(buf))
   | eof => EOF
-  | _ => failwith("shouldn't be reacheable")
+  | _ => literal_and_string(buf)
   };
