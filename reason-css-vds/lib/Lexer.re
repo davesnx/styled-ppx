@@ -12,7 +12,7 @@ let stop_literal = [%sedlex.regexp?
 ];
 
 let literal = [%sedlex.regexp? Plus(Sub(any, stop_literal))];
-let string = [%sedlex.regexp? ('\'', Plus(Sub(any, '\''), '\''))];
+let string = [%sedlex.regexp? ('\'', Plus(Sub(any, '\'')), '\'')];
 
 let data = [%sedlex.regexp?
   ("<", Plus(Sub(any, '>')), Opt(range_restriction), ">")
@@ -45,13 +45,12 @@ let range = str => {
   RANGE((kind, min, max));
 };
 
-let literal_and_string = buf => {
+let literal = buf =>
   switch%sedlex (buf) {
-  | string => LITERAL(lexeme(buf) |> slice(1, -1))
   | literal => LITERAL(lexeme(buf))
   | _ => failwith("something is wrong here")
   };
-};
+
 let rec tokenizer = buf =>
   switch%sedlex (buf) {
   | whitespace => tokenizer(buf)
@@ -77,6 +76,7 @@ let rec tokenizer = buf =>
   // functions
   | '(' => LEFT_PARENS
   | ')' => RIGHT_PARENS
+  | string => LITERAL(lexeme(buf) |> slice(1, -1))
   | eof => EOF
-  | _ => literal_and_string(buf)
+  | _ => literal(buf)
   };
