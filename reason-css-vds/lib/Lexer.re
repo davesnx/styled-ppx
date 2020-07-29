@@ -1,53 +1,58 @@
 open Sedlexing.Utf8;
 open Tokens;
 
-let alpha = [%sedlex.regexp? 'a'..'z' | 'A'..'Z'];
-let digit = [%sedlex.regexp? '0'..'9'];
-let int = [%sedlex.regexp? Plus(digit)];
-let whitespace = [%sedlex.regexp? ' ' | '\t' | '\n'];
-
 // TODO: is rgb(255 255 255/0) valid?
+let whitespace = [%sedlex.regexp? Plus(' ' | '\t' | '\n')];
+let digit = [%sedlex.regexp? '0'..'9'];
+let number = [%sedlex.regexp? (Opt('+' | '-'), digit | "∞")];
+let range_restriction = [%sedlex.regexp? ('[', number, ',', number, ']')];
 
-// TODO: keyword characters, like . and , also escape like '*'
-let keyword = [%sedlex.regexp? (alpha | '@', Star(alpha | digit | '-'))];
+let string = [%sedlex.regexp? ("'", Plus(any), "'")];
+let literal = [%sedlex.regexp? Plus(Sub(any, ' '))];
+let data = [%sedlex.regexp? ("<", Plus(any), Opt(range_restriction), ">")];
+let function_ = [%sedlex.regexp? ("<", Plus(any), "()>")];
+let property = [%sedlex.regexp? ("<'", Plus(any), ">'")];
 
-let read_char = buf => {
-  let char =
-    switch%sedlex (buf) {
-    | "<" => LOWER_THAN
-    | ">" => GREATER_THAN
-    | "'" => QUOTE
-    | "&&" => DOUBLE_AMPERSAND
-    | "||" => DOUBLE_BAR
-    | "|" => BAR
-    | "[" => LEFT_BRACKET
-    | "]" => RIGHT_BRACKET
-    | "*" => ASTERISK
-    | "+" => PLUS
-    | "?" => QUESTION_MARK
-    | "{" => LEFT_BRACE
-    | "}" => RIGHT_BRACE
-    | "," => COMMA
-    | "#" => HASH
-    | "!" => EXCLAMATION_POINT
-    | "(" => LEFT_PARENS
-    | ")" => RIGHT_PARENS
-    | "/" => SLASH
-    | _ => failwith("Unexpected character")
-    };
-  let _ = lexeme(buf);
-  char;
+let range = [%sedlex.regexp?
+  (Opt('#'), '{', Plus(digit), Opt(',', Star(digit)), '}')
+];
+
+let slice = (start, end_, string) => {
+  let len = String.length(string);
+  let end_ = len - start + end_;
+  String.sub(string, start, end_);
 };
-let rec read = buf =>
+
+let range = str => {
+  let int = int_of_string;
+
+  let (kind, starts_at) = str.[0] == '#' ? (`Comma, 2) : (`Space, 1);
+  let content = str |> slice(starts_at, -1);
+  let (min, max) =
+    switch (String.split_on_char(',', content)) {
+    | [min] => (int(min), Some(int(min)))
+    | [min, ""] => (int(min), None)
+    | [min, max] => (int(min), Some(int(max)))
+    | _ => failwith("cannot understand " ++ content)
+    };
+  RANGE((kind, min, max));
+};
+
+let rec tokenizer = buf =>
   switch%sedlex (buf) {
+  | whitespace => tokenizer(buf)
+  | property => PROPERTY(lexeme(buf) |> slice(2, -2))
+  | function_ => FUNCTION(lexeme(buf) |> slice(1, -3))
+  | data => DATA(lexeme(buf) |> slice(1, -1))
+  | '#' => RANGE((`Comma, 1, None))
+  | range => range(lexeme(buf))
+  | "&&" => DOUBLE_AMPERSAND
+  | "||" => DOUBLE_BAR
+  | "|" => BAR
+  | "[" => LEFT_BRACKET
+  | "]" => RIGHT_BRACKET
+  | string => LITERAL(lexeme(buf) |> slice(1, -1))
+  | literal => LITERAL(lexeme(buf))
   | eof => EOF
-  | int => INT(lexeme(buf) |> int_of_string)
-  | whitespace =>
-    let _ = lexeme(buf);
-    read(buf);
-  | keyword => KEYWORD(lexeme(buf))
-  | ("'", any, "'") =>
-    let chars = lexeme(buf);
-    KEYWORD(String.sub(chars, 1, String.length(chars) - 2));
-  | _ => read_char(buf)
+  | _ => failwith("shouldn't be reacheable")
   };
