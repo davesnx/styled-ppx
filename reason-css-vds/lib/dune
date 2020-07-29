@@ -1,6 +1,6 @@
 (menhir
- (flags --external-tokens Tokens --explain)
- (modules Parser))
+ (flags --external-tokens Tokens_legacy --explain)
+ (modules Parser_legacy))
 
 (library
  (name reason_css_vds)
