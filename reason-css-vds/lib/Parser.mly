@@ -65,12 +65,15 @@ let multiplier :=
   | EXCLAMATION_POINT;
     { At_least_one }
 
+let range_restriction ==
+  | LEFT_BRACKET; INT; COMMA; INT; RIGHT_BRACKET; {}
+
 let terminal ==
   | k = KEYWORD; { Keyword k }
   | SLASH; { Keyword "/" }
   | COMMA; { Keyword "," }
   | LOWER_THAN; QUOTE; s = KEYWORD; QUOTE; GREATER_THAN; { Property_type s }
-  | LOWER_THAN; s = KEYWORD; GREATER_THAN; { Data_type s }
+  | LOWER_THAN; s = KEYWORD; option(range_restriction); GREATER_THAN; { Data_type s }
   | LOWER_THAN; s = KEYWORD; LEFT_PARENS; RIGHT_PARENS; GREATER_THAN; { Data_type (s ^ "()") }
   | s = KEYWORD; LEFT_PARENS; RIGHT_PARENS; { Function s }
 
