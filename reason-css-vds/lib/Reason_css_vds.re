@@ -1,15 +1,13 @@
 include Ast;
 
 let provider = (buf, ()) => {
-  let token = Lexer_legacy.read(buf);
+  let token = Lexer.tokenizer(buf);
   let (start, stop) = Sedlexing.lexing_positions(buf);
   (token, start, stop);
 };
 
 let multiplier_of_lex =
-  MenhirLib.Convert.Simplified.traditional2revised(
-    Parser_legacy.multiplier_of_lex,
-  );
+  MenhirLib.Convert.Simplified.traditional2revised(Parser.multiplier_of_lex);
 let rec multiplier_to_string =
   fun
   | One => ""
@@ -29,9 +27,7 @@ let _multiplier_of_string = string =>
   Sedlexing.Utf8.from_string(string) |> provider |> multiplier_of_lex;
 
 let value_of_lex =
-  MenhirLib.Convert.Simplified.traditional2revised(
-    Parser_legacy.value_of_lex,
-  );
+  MenhirLib.Convert.Simplified.traditional2revised(Parser.value_of_lex);
 let rec value_to_string = value => {
   let child_needs_brackets = (parent, child) => {
     let precedence =
