@@ -26,14 +26,21 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     (String.sub(name, 0, 1) |> String.uppercase_ascii)
     ++ String.sub(name, 1, String.length(name) - 1);
 
-  let property_value_name = property_name => "property-" ++ property_name;
+  let is_function = str => {
+    open String;
+    let length = length(str);
+    length >= 2 && sub(str, length - 2, 2) == "()";
+  };
   let function_value_name = function_name => "function-" ++ function_name;
+  let property_value_name = property_name =>
+    is_function(property_name)
+      ? function_value_name(property_name) : "property-" ++ property_name;
   let value_name_of_css = str =>
     String.(
       {
         let length = length(str);
         let str =
-          if (length >= 2 && sub(str, length - 2, 2) == "()") {
+          if (is_function(str)) {
             let str = sub(str, 0, length - 2);
             function_value_name(str);
           } else {
@@ -48,7 +55,6 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     let value_name =
       switch (value) {
       | Terminal(Keyword(name), _)
-      | Terminal(Function(name), _)
       | Terminal(Data_type(name), _) => value_name_of_css(name)
       | Terminal(Property_type(name), _) =>
         property_value_name(name) |> value_name_of_css
@@ -59,7 +65,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       | Combinator(Xor, _) => "xor"
       | Function_call(name, _) => value_name_of_css(name)
       };
-    value_name |> first_uppercase;
+    value_name |> first_uppercase |> Escape.variant;
   };
   let variant_names = values => {
     // TODO: not exactly a fast algorithm
@@ -133,8 +139,6 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
         | Data_type(name) => value_name_of_css(name) |> evar
         | Property_type(name) =>
           property_value_name(name) |> value_name_of_css |> evar
-        | Function(name) =>
-          function_value_name(name) |> value_name_of_css |> evar
         };
       apply_modifier(modifier, rule);
     };

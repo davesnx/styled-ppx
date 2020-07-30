@@ -4,6 +4,9 @@ open Ast_mapper;
 open Asttypes;
 open Parsetree;
 
+module Escape = Escape;
+module Emit = Emit;
+
 let extract_value = {
   open Ppxlib.Ast_pattern;
 
