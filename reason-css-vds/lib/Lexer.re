@@ -10,8 +10,8 @@ let range_restriction = [%sedlex.regexp? ('[', number, ',', number, ']')];
 let stop_literal = [%sedlex.regexp?
   ' ' | '\t' | '\n' | '?' | '!' | '*' | '+' | '#' | '{' | ']' | '(' | ')' | ','
 ];
-
-let literal = [%sedlex.regexp? Plus(Sub(any, stop_literal))];
+let single_token_literal = [%sedlex.regexp? ',' | '{'];
+let literal = [%sedlex.regexp? Star(Sub(any, stop_literal))];
 let string = [%sedlex.regexp? ('\'', Plus(Sub(any, '\'')), '\'')];
 
 let data = [%sedlex.regexp?
@@ -47,7 +47,7 @@ let range = str => {
 let literal = buf =>
   switch%sedlex (buf) {
   | literal => LITERAL(lexeme(buf))
-  | ',' => LITERAL(",")
+  | single_token_literal => LITERAL(lexeme(buf))
   | _ => failwith("something is wrong here")
   };
 
