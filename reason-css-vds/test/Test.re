@@ -204,6 +204,17 @@ let parse_tests = [
       ),
     ),
   ),
+  (
+    "{ a }",
+    Combinator(
+      Static,
+      [
+        Terminal(Keyword("{"), One),
+        Terminal(Keyword("a"), One),
+        Terminal(Keyword("}"), One),
+      ],
+    ),
+  ),
 ];
 describe("correctly parse value", ({test, _}) => {
   let test = (index, (result, expected)) =>
