@@ -57,7 +57,7 @@ let rec value_to_string = value => {
     | Terminal(kind, multiplier) =>
       let full_name =
         switch (kind) {
-        | Keyword(name) => name
+        | Keyword(name) => "'" ++ name ++ "'"
         | Data_type(name) => "<" ++ name ++ ">"
         | Property_type(name) => "<'" ++ name ++ "'>"
         };

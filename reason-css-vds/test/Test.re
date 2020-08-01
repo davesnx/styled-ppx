@@ -233,8 +233,9 @@ describe("correctly parse value", ({test, _}) => {
 });
 
 let print_tests = [
-  ("  a b   |   c ||   d &&   e f", "a b | c || d && e f"),
-  ("[ a b ] | [ c || [ d && [ e f ]]]", "a b | c || d && e f"),
+  ("  a b   |   c ||   d &&   e f", "'a' 'b' | 'c' || 'd' && 'e' 'f'"),
+  ("[ a b ] | [ c || [ d && [ e f ]]]", "'a' 'b' | 'c' || 'd' && 'e' 'f'"),
+  ("'[' abc ']'", "'[' 'abc' ']'"),
 ];
 describe("correctly print value", ({test, _}) => {
   let test = (index, (result, expected)) =>
