@@ -153,7 +153,7 @@ module Emit = {
   };
   let emit_code = (~values, ~properties) => {
     let properties =
-      properties |> List.map(((key, value)) => ("property_" ++ key, value));
+      properties |> List.map(((key, value)) => ("property-" ++ key, value));
     let values =
       values |> List.map(((key, value)) => (value_name(key), value));
     let (_missing, values) =
