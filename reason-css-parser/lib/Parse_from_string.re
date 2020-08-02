@@ -1,37 +1,15 @@
-let (let.ok) = Result.bind;
-let parse_tokens = (prop, tokens_with_loc) => {
-  open Standard;
-  open Reason_css_lexer;
+let parse_tokens = Parser_helper.parse_tokens;
+let parse = Parser_helper.parse;
 
-  let tokens =
-    tokens_with_loc
-    |> List.map(({Location.txt, _}) =>
-         switch (txt) {
-         | Ok(token) => token
-         | Error((token, _)) => token
-         }
-       )
-    |> List.filter((!=)(WHITESPACE))
-    |> List.rev;
-  let (output, tokens) = prop(tokens);
-  let.ok output =
-    switch (output) {
-    | Ok(data) => Ok(data)
-    | Error([message, ..._]) => Error(message)
-    | Error([]) => Error("weird")
-    };
-  let.ok () =
-    switch (tokens) {
-    | []
-    | [EOF] => Ok()
-    | tokens =>
-      let tokens = List.map(show_token, tokens) |> String.concat(" * ");
-      Error("tokens remaining: " ++ tokens);
-    };
-  Ok(output);
+module StringMap = Map.Make(String);
+let check_value = {
+  let (let.ok) = Result.bind;
+  (~name, value) => {
+    let.ok check =
+      Parser.check_map
+      |> StringMap.find_opt(name)
+      |> Option.to_result(~none=`Unknown_value);
+    Ok(check(value));
+  };
 };
-let parse = (prop: Rule.rule('a), str) => {
-  let.ok tokens_with_loc =
-    Reason_css_lexer.from_string(str) |> Result.map_error(_ => "frozen");
-  parse_tokens(prop, tokens_with_loc);
-};
+let check_property = (~name) => check_value(~name="property-" ++ name);
