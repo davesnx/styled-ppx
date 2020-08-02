@@ -239,7 +239,7 @@ let max_width =
   apply(
     property_max_width,
     fun
-    | `Auto
+    | `Auto => raise(Unsupported_feature)
     | `None => variants_to_expression(`None)
     | `Length(_) as ast
     | `Percentage(_) as ast

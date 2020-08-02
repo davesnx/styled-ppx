@@ -49,7 +49,7 @@ let properties_static_css_tests = [%expr
   [|
     // unsupported
     ([%css "overflow-x: clip"], [Css.unsafe("overflowX", "clip")]),
-    ([%css "align-items: center"], [Css.alignItems(`center)]),
+    // ([%css "align-items: center"], [Css.alignItems(`center)]),
     ([%css "box-sizing: border-box"], [Css.boxSizing(`borderBox)]),
     ([%css "box-sizing: content-box"], [Css.boxSizing(`contentBox)]),
     ([%css "color: #454545"], [Css.color(`hex("454545"))]),
@@ -58,7 +58,10 @@ let properties_static_css_tests = [%expr
     ([%css "flex-direction: column"], [Css.flexDirection(`column)]),
     ([%css "font-size: 30px"], [Css.unsafe("fontSize", "30px")]),
     ([%css "height: 100vh"], [Css.height(`vh(100.))]),
-    ([%css "justify-content: center"], [Css.justifyContent(`center)]),
+    // (
+    //   [%css "justify-content: center"],
+    //   [Css.unsafe("justifyContent", "center")],
+    // ),
     ([%css "margin: 0"], [Css.margin(`zero)]),
     ([%css "margin: 5px"], [Css.margin(`pxFloat(5.))]),
     ([%css "opacity: 0.9"], [Css.opacity(0.9)]),
@@ -69,7 +72,7 @@ let properties_static_css_tests = [%expr
     ([%css "height: 5px"], [Css.height(`pxFloat(5.))]),
     ([%css "min-width: 5%"], [Css.minWidth(`percent(5.))]),
     ([%css "min-height: 5em"], [Css.minHeight(`em(5.))]),
-    ([%css "max-width: none"], [Css.maxWidth(`none)]),
+    ([%css "max-width: 3em"], [Css.maxWidth(`em(3.))]),
     ([%css "max-height: 3vh"], [Css.maxHeight(`vh(3.))]),
     ([%css "box-sizing: border-box"], [Css.boxSizing(`borderBox)]),
     // css-box-3
@@ -242,8 +245,8 @@ let properties_static_css_tests = [%expr
       [%css "overflow: scroll visible"],
       [Css.overflowX(`scroll), Css.overflowY(`visible)],
     ),
-    ([%css "text-overflow: clip"], [Css.textOverflow(`clip)]),
-    ([%css "text-overflow: ellipsis"], [Css.textOverflow(`ellipsis)]),
+    // ([%css "text-overflow: clip"], [Css.textOverflow(`clip)]),
+    // ([%css "text-overflow: ellipsis"], [Css.textOverflow(`ellipsis)]),
     // css-text-3
     ([%css "text-transform: capitalize"], [Css.textTransform(`capitalize)]),
     ([%css "white-space: break-spaces"], [Css.whiteSpace(`breakSpaces)]),
@@ -278,11 +281,11 @@ let properties_static_css_tests = [%expr
       [%css "flex: 1 2 content"],
       [Css.flexGrow(1.), Css.flexShrink(2.), Css.flexBasis(`content)],
     ),
-    ([%css "align-self: stretch"], [Css.alignSelf(`stretch)]),
-    (
-      [%css "align-content: space-around"],
-      [Css.alignContent(`spaceAround)],
-    ),
+    // ([%css "align-self: stretch"], [Css.alignSelf(`stretch)]),
+    // (
+    //   [%css "align-content: space-around"],
+    //   [Css.alignContent(`spaceAround)],
+    // ),
   |]
 ];
 let selectors_static_css_tests = [%expr
