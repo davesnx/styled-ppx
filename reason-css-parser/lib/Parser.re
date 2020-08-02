@@ -4,9 +4,73 @@ open Modifier;
 open Rule.Match;
 open Parser_helper;
 
-let rec absolute_size = [%value.rec
+let rec _legacy_gradient = [%value.rec
+  "<-webkit-gradient()> | <-legacy-linear-gradient> | <-legacy-repeating-linear-gradient> | <-legacy-radial-gradient> | <-legacy-repeating-radial-gradient>"
+]
+and _legacy_linear_gradient = [%value.rec
+  "-moz-linear-gradient( <-legacy-linear-gradient-arguments> ) | -webkit-linear-gradient( <-legacy-linear-gradient-arguments> ) | -o-linear-gradient( <-legacy-linear-gradient-arguments> )"
+]
+and _legacy_linear_gradient_arguments = [%value.rec
+  "[ <angle> | <side-or-corner> ]? ',' <color-stop-list>"
+]
+and _legacy_radial_gradient = [%value.rec
+  "-moz-radial-gradient( <-legacy-radial-gradient-arguments> ) | -webkit-radial-gradient( <-legacy-radial-gradient-arguments> ) | -o-radial-gradient( <-legacy-radial-gradient-arguments> )"
+]
+and _legacy_radial_gradient_arguments = [%value.rec
+  "[ <position> ',' ]? [ [ <-legacy-radial-gradient-shape> || <-legacy-radial-gradient-size> | [ <length> | <percentage> ]{2} ] ',' ]? <color-stop-list>"
+]
+and _legacy_radial_gradient_shape = [%value.rec "'circle' | 'ellipse'"]
+and _legacy_radial_gradient_size = [%value.rec
+  "'closest-side' | 'closest-corner' | 'farthest-side' | 'farthest-corner' | 'contain' | 'cover'"
+]
+and _legacy_repeating_linear_gradient = [%value.rec
+  "-moz-repeating-linear-gradient( <-legacy-linear-gradient-arguments> ) | -webkit-repeating-linear-gradient( <-legacy-linear-gradient-arguments> ) | -o-repeating-linear-gradient( <-legacy-linear-gradient-arguments> )"
+]
+and _legacy_repeating_radial_gradient = [%value.rec
+  "-moz-repeating-radial-gradient( <-legacy-radial-gradient-arguments> ) | -webkit-repeating-radial-gradient( <-legacy-radial-gradient-arguments> ) | -o-repeating-radial-gradient( <-legacy-radial-gradient-arguments> )"
+]
+and _ms_filter = [%value.rec "<string>"]
+and _ms_filter_function = [%value.rec
+  "<-ms-filter-function-progid> | <-ms-filter-function-legacy>"
+]
+and _ms_filter_function_legacy = [%value.rec
+  "<ident-token> | <function-token> [ <any-value> ]? ')'"
+]
+and _ms_filter_function_list = [%value.rec "[ <-ms-filter-function> ]+"]
+and _ms_filter_function_progid = [%value.rec
+  "'progid:' [ <ident-token> '.' ]* [ <ident-token> | <function-token> [ <any-value> ]? ')' ]"
+]
+and _non_standard_color = [%value.rec
+  "'-moz-ButtonDefault' | '-moz-ButtonHoverFace' | '-moz-ButtonHoverText' | '-moz-CellHighlight' | '-moz-CellHighlightText' | '-moz-Combobox' | '-moz-ComboboxText' | '-moz-Dialog' | '-moz-DialogText' | '-moz-dragtargetzone' | '-moz-EvenTreeRow' | '-moz-Field' | '-moz-FieldText' | '-moz-html-CellHighlight' | '-moz-html-CellHighlightText' | '-moz-mac-accentdarkestshadow' | '-moz-mac-accentdarkshadow' | '-moz-mac-accentface' | '-moz-mac-accentlightesthighlight' | '-moz-mac-accentlightshadow' | '-moz-mac-accentregularhighlight' | '-moz-mac-accentregularshadow' | '-moz-mac-chrome-active' | '-moz-mac-chrome-inactive' | '-moz-mac-focusring' | '-moz-mac-menuselect' | '-moz-mac-menushadow' | '-moz-mac-menutextselect' | '-moz-MenuHover' | '-moz-MenuHoverText' | '-moz-MenuBarText' | '-moz-MenuBarHoverText' | '-moz-nativehyperlinktext' | '-moz-OddTreeRow' | '-moz-win-communicationstext' | '-moz-win-mediatext' | '-moz-activehyperlinktext' | '-moz-default-background-color' | '-moz-default-color' | '-moz-hyperlinktext' | '-moz-visitedhyperlinktext' | '-webkit-activelink' | '-webkit-focus-ring-color' | '-webkit-link' | '-webkit-text'"
+]
+and _non_standard_font = [%value.rec
+  "'-apple-system-body' | '-apple-system-headline' | '-apple-system-subheadline' | '-apple-system-caption1' | '-apple-system-caption2' | '-apple-system-footnote' | '-apple-system-short-body' | '-apple-system-short-headline' | '-apple-system-short-subheadline' | '-apple-system-short-caption1' | '-apple-system-short-footnote' | '-apple-system-tall-body'"
+]
+and _non_standard_image_rendering = [%value.rec
+  "'optimize-contrast' | '-moz-crisp-edges' | '-o-crisp-edges' | '-webkit-optimize-contrast'"
+]
+and _non_standard_overflow = [%value.rec
+  "'-moz-scrollbars-none' | '-moz-scrollbars-horizontal' | '-moz-scrollbars-vertical' | '-moz-hidden-unscrollable'"
+]
+and _non_standard_width = [%value.rec
+  "'min-intrinsic' | 'intrinsic' | '-moz-min-content' | '-moz-max-content' | '-webkit-min-content' | '-webkit-max-content'"
+]
+and _webkit_gradient_color_stop = [%value.rec
+  "from( <color> ) | color-stop( [ <number-zero-one> | <percentage> ] ',' <color> ) | to( <color> )"
+]
+and _webkit_gradient_point = [%value.rec
+  "[ 'left' | 'center' | 'right' | <length-percentage> ] [ 'top' | 'center' | 'bottom' | <length-percentage> ]"
+]
+and _webkit_gradient_radius = [%value.rec "<length> | <percentage>"]
+and _webkit_gradient_type = [%value.rec "'linear' | 'radial'"]
+and _webkit_mask_box_repeat = [%value.rec "'repeat' | 'stretch' | 'round'"]
+and _webkit_mask_clip_style = [%value.rec
+  "'border' | 'border-box' | 'padding' | 'padding-box' | 'content' | 'content-box' | 'text'"
+]
+and absolute_size = [%value.rec
   "'xx-small' | 'x-small' | 'small' | 'medium' | 'large' | 'x-large' | 'xx-large' | 'xxx-large'"
 ]
+and age = [%value.rec "'child' | 'young' | 'old'"]
 and alpha_value = [%value.rec "<number> | <percentage>"]
 and angle_percentage = [%value.rec "<angle> | <percentage>"]
 and angular_color_hint = [%value.rec "<angle-percentage>"]
@@ -18,8 +82,10 @@ and animateable_feature = [%value.rec
   "'scroll-position' | 'contents' | <custom-ident>"
 ]
 and attachment = [%value.rec "'scroll' | 'fixed' | 'local'"]
+and attr_fallback = [%value.rec "<any-value>"]
 and attr_matcher = [%value.rec "[ '~' | '|' | '^' | '$' | '*' ]? '='"]
 and attr_modifier = [%value.rec "'i' | 's'"]
+and attr_name = [%value.rec "<wq-name>"]
 and attribute_selector = [%value.rec
   "'[' <wq-name> ']' | '[' <wq-name> <attr-matcher> [ <string-token> | <ident-token> ] [ <attr-modifier> ]? ']'"
 ]
@@ -46,6 +112,8 @@ and bg_size = [%value.rec
 and blend_mode = [%value.rec
   "'normal' | 'multiply' | 'screen' | 'overlay' | 'darken' | 'lighten' | 'color-dodge' | 'color-burn' | 'hard-light' | 'soft-light' | 'difference' | 'exclusion' | 'hue' | 'saturation' | 'color' | 'luminosity'"
 ]
+and border_radius = [%value.rec "[ <length-percentage> ]{1,2}"]
+and bottom = [%value.rec "<length> | 'auto'"]
 and box = [%value.rec "'border-box' | 'padding-box' | 'content-box'"]
 and calc_product = [%value.rec
   "<calc-value> [ '*' <calc-value> | '/' <number> ]*"
@@ -92,7 +160,7 @@ and content_distribution = [%value.rec
   "'space-between' | 'space-around' | 'space-evenly' | 'stretch'"
 ]
 and content_list = [%value.rec
-  "[ <string> | 'contents' | <image> | <quote> | <target> | <leader()> ]+"
+  "[ <string> | 'contents' | <url> | <quote> | <attr()> | counter( <ident> ',' [ <'list-style-type'> ]? ) ]+"
 ]
 and content_position = [%value.rec
   "'center' | 'start' | 'end' | 'flex-start' | 'flex-end'"
@@ -103,6 +171,12 @@ and counter_style = [%value.rec "<counter-style-name>"]
 and counter_style_name = [%value.rec "<custom-ident>"]
 and cubic_bezier_timing_function = [%value.rec
   "'ease' | 'ease-in' | 'ease-out' | 'ease-in-out' | cubic-bezier( <number> ',' <number> ',' <number> ',' <number> )"
+]
+and declaration = [%value.rec
+  "<ident-token> ':' [ <declaration-value> ]? [ '!' 'important' ]?"
+]
+and declaration_list = [%value.rec
+  "[ [ <declaration> ]? ';' ]* [ <declaration> ]?"
 ]
 and deprecated_system_color = [%value.rec
   "'ActiveBorder' | 'ActiveCaption' | 'AppWorkspace' | 'Background' | 'ButtonFace' | 'ButtonHighlight' | 'ButtonShadow' | 'ButtonText' | 'CaptionText' | 'GrayText' | 'Highlight' | 'HighlightText' | 'InactiveBorder' | 'InactiveCaption' | 'InactiveCaptionText' | 'InfoBackground' | 'InfoText' | 'Menu' | 'MenuText' | 'Scrollbar' | 'ThreeDDarkShadow' | 'ThreeDFace' | 'ThreeDHighlight' | 'ThreeDLightShadow' | 'ThreeDShadow' | 'Window' | 'WindowFrame' | 'WindowText'"
@@ -169,6 +243,9 @@ and font_stretch_absolute = [%value.rec
 and font_variant_css21 = [%value.rec "'normal' | 'small-caps'"]
 and font_weight_absolute = [%value.rec "'normal' | 'bold' | <number>"]
 and frequency_percentage = [%value.rec "<frequency> | <percentage>"]
+and function__webkit_gradient = [%value.rec
+  "-webkit-gradient( <-webkit-gradient-type> ',' <-webkit-gradient-point> [ ',' <-webkit-gradient-point> | ',' <-webkit-gradient-radius> ',' <-webkit-gradient-point> ] [ ',' <-webkit-gradient-radius> ]? [ ',' <-webkit-gradient-color-stop> ]* )"
+]
 and function_attr = [%value.rec
   "attr( <attr-name> [ <type-or-unit> ]? [ ',' <attr-fallback> ]? )"
 ]
@@ -207,16 +284,16 @@ and function_fit_content = [%value.rec
 ]
 and function_grayscale = [%value.rec "grayscale( <number-percentage> )"]
 and function_hsl = [%value.rec
-  "
-  hsl( <hue> <percentage> <percentage> [ '/' <alpha-value> ]? ) |
-  hsl( <hue> ',' <percentage> ',' <percentage> [ ',' <alpha-value> ]? )"
+  " hsl( <hue> <percentage> <percentage> [ '/' <alpha-value> ]? )
+  | hsl( <hue> ',' <percentage> ',' <percentage> [ ',' <alpha-value> ]? )"
 ]
 and function_hsla = [%value.rec
-  "hsla( <hue> <percentage> <percentage> [ '/' <alpha-value> ]? ) | hsla( <hue> ',' <percentage> ',' <percentage> ',' [ <alpha-value> ]? )"
+  " hsla( <hue> <percentage> <percentage> [ '/' <alpha-value> ]? )
+  | hsla( <hue> ',' <percentage> ',' <percentage> ',' [ <alpha-value> ]? )"
 ]
 and function_hue_rotate = [%value.rec "hue-rotate( <angle> )"]
 and function_image = [%value.rec
-  "image( <image-tags>? [ <image-src> ]? ',' [ <color> ]? )"
+  "image( [ <image-tags> ]? [ <image-src> ]? ',' [ <color> ]? )"
 ]
 and function_image_set = [%value.rec "image-set( [ <image-set-option> ]# )"]
 and function_inset = [%value.rec
@@ -232,13 +309,13 @@ and function_matrix3d = [%value.rec "matrix3d( [ <number> ]#{16} )"]
 and function_max = [%value.rec "max( [ <calc-sum> ]# )"]
 and function_min = [%value.rec "min( [ <calc-sum> ]# )"]
 and function_minmax = [%value.rec
-  "minmax( [ <length> | <percentage> | 'min-content' | 'max-content' | 'auto' ] ',' [ <length> | <percentage> | <property_flex> | 'min-content' | 'max-content' | 'auto' ] )"
+  "minmax( [ <length> | <percentage> | 'min-content' | 'max-content' | 'auto' ] ',' [ <length> | <percentage> | <'flex'> | 'min-content' | 'max-content' | 'auto' ] )"
 ]
 and function_opacity = [%value.rec "opacity( <number-percentage> )"]
 and function_paint = [%value.rec
   "paint( <ident> ',' [ <declaration-value> ]? )"
 ]
-and function_path = [%value.rec "path( [ <fill-rule> ',' ]? <string> )"]
+and function_path = [%value.rec "path( <string> )"]
 and function_perspective = [%value.rec "perspective( <length> )"]
 and function_polygon = [%value.rec
   "polygon( [ <fill-rule> ]? ',' [ <length-percentage> <length-percentage> ]# )"
@@ -303,20 +380,22 @@ and function_translateZ = [%value.rec "translateZ( <length> )"]
 and function_var = [%value.rec
   "var( <custom-property-name> ',' [ <declaration-value> ]? )"
 ]
+and gender = [%value.rec "'male' | 'female' | 'neutral'"]
 and general_enclosed = [%value.rec
   "<function-token> <any-value> ')' | '(' <ident> <any-value> ')'"
 ]
 and generic_family = [%value.rec
-  "'serif' | 'sans-serif' | 'cursive' | 'fantasy' | 'monospace'"
+  "'serif' | 'sans-serif' | 'cursive' | 'fantasy' | 'monospace' | '-apple-system'"
 ]
 and generic_name = [%value.rec
   "'serif' | 'sans-serif' | 'cursive' | 'fantasy' | 'monospace'"
 ]
+and generic_voice = [%value.rec "[ <age> ]? <gender> [ <integer> ]?"]
 and geometry_box = [%value.rec
   "<shape-box> | 'fill-box' | 'stroke-box' | 'view-box'"
 ]
 and gradient = [%value.rec
-  "<linear-gradient()> | <repeating-linear-gradient()> | <radial-gradient()> | <repeating-radial-gradient()> | <conic-gradient()>"
+  "<linear-gradient()> | <repeating-linear-gradient()> | <radial-gradient()> | <repeating-radial-gradient()> | <conic-gradient()> | <-legacy-gradient>"
 ]
 and grid_line = [%value.rec
   "'auto' | <custom-ident> | <integer> && [ <custom-ident> ]? | 'span' && [ <integer> || <custom-ident> ]"
@@ -342,6 +421,7 @@ and keyframe_block_list = [%value.rec "[ <keyframe-block> ]+"]
 and keyframe_selector = [%value.rec "'from' | 'to' | <percentage>"]
 and keyframes_name = [%value.rec "<custom-ident> | <string>"]
 and leader_type = [%value.rec "'dotted' | 'solid' | 'space' | <string>"]
+and left = [%value.rec "<length> | 'auto'"]
 and length_percentage = [%value.rec "<length> | <percentage>"]
 and line_name_list = [%value.rec "[ <line-names> | <name-repeat> ]+"]
 and line_names = [%value.rec "'[' [ <custom-ident> ]* ']'"]
@@ -351,6 +431,7 @@ and line_style = [%value.rec
 and line_width = [%value.rec "<length> | 'thin' | 'medium' | 'thick'"]
 and linear_color_hint = [%value.rec "<length-percentage>"]
 and linear_color_stop = [%value.rec "<color> [ <color-stop-length> ]?"]
+and mask_image = [%value.rec "[ <mask-reference> ]#"]
 and mask_layer = [%value.rec
   "<mask-reference> || <position> [ '/' <bg-size> ]? || <repeat-style> || <geometry-box> || [ <geometry-box> | 'no-clip' ] || <compositing-operator> || <masking-mode>"
 ]
@@ -387,13 +468,18 @@ and mf_range = [%value.rec
   "<mf-name> [ '<' | '>' ]? [ '=' ]? <mf-value> | <mf-value> [ '<' | '>' ]? [ '=' ]? <mf-name> | <mf-value> '<' [ '=' ]? <mf-name> '<' [ '=' ]? <mf-value> | <mf-value> '>' [ '=' ]? <mf-name> '>' [ '=' ]? <mf-value>"
 ]
 and mf_value = [%value.rec "<number> | <dimension> | <ident> | <ratio>"]
+and name_repeat = [%value.rec
+  "repeat( [ <positive-integer> | 'auto-fill' ] ',' [ <line-names> ]+ )"
+]
 and named_color = [%value.rec
-  "'transparent' | 'aliceblue' | 'antiquewhite' | 'aqua' | 'aquamarine' | 'azure' | 'beige' | 'bisque' | 'black' | 'blanchedalmond' | 'blue' | 'blueviolet' | 'brown' | 'burlywood' | 'cadetblue' | 'chartreuse' | 'chocolate' | 'coral' | 'cornflowerblue' | 'cornsilk' | 'crimson' | 'cyan' | 'darkblue' | 'darkcyan' | 'darkgoldenrod' | 'darkgray' | 'darkgreen' | 'darkgrey' | 'darkkhaki' | 'darkmagenta' | 'darkolivegreen' | 'darkorange' | 'darkorchid' | 'darkred' | 'darksalmon' | 'darkseagreen' | 'darkslateblue' | 'darkslategray' | 'darkslategrey' | 'darkturquoise' | 'darkviolet' | 'deeppink' | 'deepskyblue' | 'dimgray' | 'dimgrey' | 'dodgerblue' | 'firebrick' | 'floralwhite' | 'forestgreen' | 'fuchsia' | 'gainsboro' | 'ghostwhite' | 'gold' | 'goldenrod' | 'gray' | 'green' | 'greenyellow' | 'grey' | 'honeydew' | 'hotpink' | 'indianred' | 'indigo' | 'ivory' | 'khaki' | 'lavender' | 'lavenderblush' | 'lawngreen' | 'lemonchiffon' | 'lightblue' | 'lightcoral' | 'lightcyan' | 'lightgoldenrodyellow' | 'lightgray' | 'lightgreen' | 'lightgrey' | 'lightpink' | 'lightsalmon' | 'lightseagreen' | 'lightskyblue' | 'lightslategray' | 'lightslategrey' | 'lightsteelblue' | 'lightyellow' | 'lime' | 'limegreen' | 'linen' | 'magenta' | 'maroon' | 'mediumaquamarine' | 'mediumblue' | 'mediumorchid' | 'mediumpurple' | 'mediumseagreen' | 'mediumslateblue' | 'mediumspringgreen' | 'mediumturquoise' | 'mediumvioletred' | 'midnightblue' | 'mintcream' | 'mistyrose' | 'moccasin' | 'navajowhite' | 'navy' | 'oldlace' | 'olive' | 'olivedrab' | 'orange' | 'orangered' | 'orchid' | 'palegoldenrod' | 'palegreen' | 'paleturquoise' | 'palevioletred' | 'papayawhip' | 'peachpuff' | 'peru' | 'pink' | 'plum' | 'powderblue' | 'purple' | 'rebeccapurple' | 'red' | 'rosybrown' | 'royalblue' | 'saddlebrown' | 'salmon' | 'sandybrown' | 'seagreen' | 'seashell' | 'sienna' | 'silver' | 'skyblue' | 'slateblue' | 'slategray' | 'slategrey' | 'snow' | 'springgreen' | 'steelblue' | 'tan' | 'teal' | 'thistle' | 'tomato' | 'turquoise' | 'violet' | 'wheat' | 'white' | 'whitesmoke' | 'yellow' | 'yellowgreen'"
+  "'transparent' | 'aliceblue' | 'antiquewhite' | 'aqua' | 'aquamarine' | 'azure' | 'beige' | 'bisque' | 'black' | 'blanchedalmond' | 'blue' | 'blueviolet' | 'brown' | 'burlywood' | 'cadetblue' | 'chartreuse' | 'chocolate' | 'coral' | 'cornflowerblue' | 'cornsilk' | 'crimson' | 'cyan' | 'darkblue' | 'darkcyan' | 'darkgoldenrod' | 'darkgray' | 'darkgreen' | 'darkgrey' | 'darkkhaki' | 'darkmagenta' | 'darkolivegreen' | 'darkorange' | 'darkorchid' | 'darkred' | 'darksalmon' | 'darkseagreen' | 'darkslateblue' | 'darkslategray' | 'darkslategrey' | 'darkturquoise' | 'darkviolet' | 'deeppink' | 'deepskyblue' | 'dimgray' | 'dimgrey' | 'dodgerblue' | 'firebrick' | 'floralwhite' | 'forestgreen' | 'fuchsia' | 'gainsboro' | 'ghostwhite' | 'gold' | 'goldenrod' | 'gray' | 'green' | 'greenyellow' | 'grey' | 'honeydew' | 'hotpink' | 'indianred' | 'indigo' | 'ivory' | 'khaki' | 'lavender' | 'lavenderblush' | 'lawngreen' | 'lemonchiffon' | 'lightblue' | 'lightcoral' | 'lightcyan' | 'lightgoldenrodyellow' | 'lightgray' | 'lightgreen' | 'lightgrey' | 'lightpink' | 'lightsalmon' | 'lightseagreen' | 'lightskyblue' | 'lightslategray' | 'lightslategrey' | 'lightsteelblue' | 'lightyellow' | 'lime' | 'limegreen' | 'linen' | 'magenta' | 'maroon' | 'mediumaquamarine' | 'mediumblue' | 'mediumorchid' | 'mediumpurple' | 'mediumseagreen' | 'mediumslateblue' | 'mediumspringgreen' | 'mediumturquoise' | 'mediumvioletred' | 'midnightblue' | 'mintcream' | 'mistyrose' | 'moccasin' | 'navajowhite' | 'navy' | 'oldlace' | 'olive' | 'olivedrab' | 'orange' | 'orangered' | 'orchid' | 'palegoldenrod' | 'palegreen' | 'paleturquoise' | 'palevioletred' | 'papayawhip' | 'peachpuff' | 'peru' | 'pink' | 'plum' | 'powderblue' | 'purple' | 'rebeccapurple' | 'red' | 'rosybrown' | 'royalblue' | 'saddlebrown' | 'salmon' | 'sandybrown' | 'seagreen' | 'seashell' | 'sienna' | 'silver' | 'skyblue' | 'slateblue' | 'slategray' | 'slategrey' | 'snow' | 'springgreen' | 'steelblue' | 'tan' | 'teal' | 'thistle' | 'tomato' | 'turquoise' | 'violet' | 'wheat' | 'white' | 'whitesmoke' | 'yellow' | 'yellowgreen' | <-non-standard-color>"
 ]
 and namespace_prefix = [%value.rec "<ident>"]
 and ns_prefix = [%value.rec "[ <ident-token> | '*' ]? '|'"]
 and nth = [%value.rec "<an-plus-b> | 'even' | 'odd'"]
+and number_one_or_greater = [%value.rec "<number>"]
 and number_percentage = [%value.rec "<number> | <percentage>"]
+and number_zero_one = [%value.rec "<number>"]
 and numeric_figure_values = [%value.rec "'lining-nums' | 'oldstyle-nums'"]
 and numeric_fraction_values = [%value.rec
   "'diagonal-fractions' | 'stacked-fractions'"
@@ -416,19 +502,39 @@ and page_selector = [%value.rec
   "[ <pseudo-page> ]+ | <ident> [ <pseudo-page> ]*"
 ]
 and page_selector_list = [%value.rec "[ [ <page-selector> ]# ]?"]
+and paint = [%value.rec
+  "'none' | <color> | <url> [ 'none' | <color> ]? | 'context-fill' | 'context-stroke'"
+]
 and position = [%value.rec
   "[ 'left' | 'center' | 'right' ] || [ 'top' | 'center' | 'bottom' ] | [ 'left' | 'center' | 'right' | <length-percentage> ] [ 'top' | 'center' | 'bottom' | <length-percentage> ]? | [ 'left' | 'right' ] <length-percentage> && [ 'top' | 'bottom' ] <length-percentage>"
 ]
+and positive_integer = [%value.rec "<integer>"]
 and property__moz_appearance = [%value.rec
   "'none' | 'button' | 'button-arrow-down' | 'button-arrow-next' | 'button-arrow-previous' | 'button-arrow-up' | 'button-bevel' | 'button-focus' | 'caret' | 'checkbox' | 'checkbox-container' | 'checkbox-label' | 'checkmenuitem' | 'dualbutton' | 'groupbox' | 'listbox' | 'listitem' | 'menuarrow' | 'menubar' | 'menucheckbox' | 'menuimage' | 'menuitem' | 'menuitemtext' | 'menulist' | 'menulist-button' | 'menulist-text' | 'menulist-textfield' | 'menupopup' | 'menuradio' | 'menuseparator' | 'meterbar' | 'meterchunk' | 'progressbar' | 'progressbar-vertical' | 'progresschunk' | 'progresschunk-vertical' | 'radio' | 'radio-container' | 'radio-label' | 'radiomenuitem' | 'range' | 'range-thumb' | 'resizer' | 'resizerpanel' | 'scale-horizontal' | 'scalethumbend' | 'scalethumb-horizontal' | 'scalethumbstart' | 'scalethumbtick' | 'scalethumb-vertical' | 'scale-vertical' | 'scrollbarbutton-down' | 'scrollbarbutton-left' | 'scrollbarbutton-right' | 'scrollbarbutton-up' | 'scrollbarthumb-horizontal' | 'scrollbarthumb-vertical' | 'scrollbartrack-horizontal' | 'scrollbartrack-vertical' | 'searchfield' | 'separator' | 'sheet' | 'spinner' | 'spinner-downbutton' | 'spinner-textfield' | 'spinner-upbutton' | 'splitter' | 'statusbar' | 'statusbarpanel' | 'tab' | 'tabpanel' | 'tabpanels' | 'tab-scroll-arrow-back' | 'tab-scroll-arrow-forward' | 'textfield' | 'textfield-multiline' | 'toolbar' | 'toolbarbutton' | 'toolbarbutton-dropdown' | 'toolbargripper' | 'toolbox' | 'tooltip' | 'treeheader' | 'treeheadercell' | 'treeheadersortarrow' | 'treeitem' | 'treeline' | 'treetwisty' | 'treetwistyopen' | 'treeview' | '-moz-mac-unified-toolbar' | '-moz-win-borderless-glass' | '-moz-win-browsertabbar-toolbox' | '-moz-win-communicationstext' | '-moz-win-communications-toolbox' | '-moz-win-exclude-glass' | '-moz-win-glass' | '-moz-win-mediatext' | '-moz-win-media-toolbox' | '-moz-window-button-box' | '-moz-window-button-box-maximized' | '-moz-window-button-close' | '-moz-window-button-maximize' | '-moz-window-button-minimize' | '-moz-window-button-restore' | '-moz-window-frame-bottom' | '-moz-window-frame-left' | '-moz-window-frame-right' | '-moz-window-titlebar' | '-moz-window-titlebar-maximized'"
 ]
+and property__moz_background_clip = [%value.rec "'padding' | 'border'"]
 and property__moz_binding = [%value.rec "<url> | 'none'"]
 and property__moz_border_bottom_colors = [%value.rec "[ <color> ]+ | 'none'"]
 and property__moz_border_left_colors = [%value.rec "[ <color> ]+ | 'none'"]
+and property__moz_border_radius_bottomleft = [%value.rec
+  "<'border-bottom-left-radius'>"
+]
+and property__moz_border_radius_bottomright = [%value.rec
+  "<'border-bottom-right-radius'>"
+]
+and property__moz_border_radius_topleft = [%value.rec
+  "<'border-top-left-radius'>"
+]
+and property__moz_border_radius_topright = [%value.rec
+  "<'border-bottom-right-radius'>"
+]
 and property__moz_border_right_colors = [%value.rec "[ <color> ]+ | 'none'"]
 and property__moz_border_top_colors = [%value.rec "[ <color> ]+ | 'none'"]
 and property__moz_context_properties = [%value.rec
   "'none' | [ 'fill' | 'fill-opacity' | 'stroke' | 'stroke-opacity' ]#"
+]
+and property__moz_control_character_visibility = [%value.rec
+  "'visible' | 'hidden'"
 ]
 and property__moz_float_edge = [%value.rec
   "'border-box' | 'content-box' | 'margin-box' | 'padding-box'"
@@ -438,6 +544,7 @@ and property__moz_image_region = [%value.rec "<shape> | 'auto'"]
 and property__moz_orient = [%value.rec
   "'inline' | 'block' | 'horizontal' | 'vertical'"
 ]
+and property__moz_osx_font_smoothing = [%value.rec "'auto' | 'grayscale'"]
 and property__moz_outline_radius = [%value.rec
   "[ <outline-radius> ]{1,4} [ '/' [ <outline-radius> ]{1,4} ]?"
 ]
@@ -455,6 +562,9 @@ and property__moz_user_input = [%value.rec
 ]
 and property__moz_user_modify = [%value.rec
   "'read-only' | 'read-write' | 'write-only'"
+]
+and property__moz_user_select = [%value.rec
+  "'none' | 'text' | 'all' | '-moz-none'"
 ]
 and property__moz_window_dragging = [%value.rec "'drag' | 'no-drag'"]
 and property__moz_window_shadow = [%value.rec
@@ -479,15 +589,45 @@ and property__ms_content_zoom_snap_type = [%value.rec
 ]
 and property__ms_content_zooming = [%value.rec "'none' | 'zoom'"]
 and property__ms_filter = [%value.rec "<string>"]
+and property__ms_flex_align = [%value.rec
+  "'start' | 'end' | 'center' | 'baseline' | 'stretch'"
+]
+and property__ms_flex_item_align = [%value.rec
+  "'auto' | 'start' | 'end' | 'center' | 'baseline' | 'stretch'"
+]
+and property__ms_flex_line_pack = [%value.rec
+  "'start' | 'end' | 'center' | 'justify' | 'distribute' | 'stretch'"
+]
+and property__ms_flex_negative = [%value.rec "<'flex-shrink'>"]
+and property__ms_flex_order = [%value.rec "<integer>"]
+and property__ms_flex_pack = [%value.rec
+  "'start' | 'end' | 'center' | 'justify' | 'distribute'"
+]
+and property__ms_flex_positive = [%value.rec "<'flex-grow'>"]
+and property__ms_flex_preferred_size = [%value.rec "<'flex-basis'>"]
 and property__ms_flow_from = [%value.rec "[ 'none' | <custom-ident> ]#"]
 and property__ms_flow_into = [%value.rec "[ 'none' | <custom-ident> ]#"]
+and property__ms_grid_column_align = [%value.rec
+  "'start' | 'end' | 'center' | 'stretch'"
+]
+and property__ms_grid_columns = [%value.rec "<track-list-v0>"]
+and property__ms_grid_row_align = [%value.rec
+  "'start' | 'end' | 'center' | 'stretch'"
+]
+and property__ms_grid_rows = [%value.rec "<track-list-v0>"]
 and property__ms_high_contrast_adjust = [%value.rec "'auto' | 'none'"]
 and property__ms_hyphenate_limit_chars = [%value.rec
   "'auto' | [ <integer> ]{1,3}"
 ]
+and property__ms_hyphenate_limit_last = [%value.rec
+  "'none' | 'always' | 'column' | 'page' | 'spread'"
+]
 and property__ms_hyphenate_limit_lines = [%value.rec "'no-limit' | <integer>"]
 and property__ms_hyphenate_limit_zone = [%value.rec "<percentage> | <length>"]
 and property__ms_ime_align = [%value.rec "'auto' | 'after'"]
+and property__ms_interpolation_mode = [%value.rec
+  "'nearest-neighbor' | 'bicubic'"
+]
 and property__ms_overflow_style = [%value.rec
   "'auto' | 'none' | 'scrollbar' | '-ms-autohiding-scrollbar'"
 ]
@@ -537,7 +677,10 @@ and property__ms_wrap_flow = [%value.rec
 and property__ms_wrap_margin = [%value.rec "<length>"]
 and property__ms_wrap_through = [%value.rec "'wrap' | 'none'"]
 and property__webkit_appearance = [%value.rec
-  "'none' | 'button' | 'button-bevel' | 'caret' | 'checkbox' | 'default-button' | 'inner-spin-button' | 'listbox' | 'listitem' | 'media-controls-background' | 'media-controls-fullscreen-background' | 'media-current-time-display' | 'media-enter-fullscreen-button' | 'media-exit-fullscreen-button' | 'media-fullscreen-button' | 'media-mute-button' | 'media-overlay-play-button' | 'media-play-button' | 'media-seek-back-button' | 'media-seek-forward-button' | 'media-slider' | 'media-sliderthumb' | 'media-time-remaining-display' | 'media-toggle-closed-captions-button' | 'media-volume-slider' | 'media-volume-slider-container' | 'media-volume-sliderthumb' | 'menulist' | 'menulist-button' | 'menulist-text' | 'menulist-textfield' | 'meter' | 'progress-bar' | 'progress-bar-value' | 'push-button' | 'radio' | 'searchfield' | 'searchfield-cancel-button' | 'searchfield-decoration' | 'searchfield-results-button' | 'searchfield-results-decoration' | 'slider-horizontal' | 'slider-vertical' | 'sliderthumb-horizontal' | 'sliderthumb-vertical' | 'square-button' | 'textarea' | 'textfield'"
+  "'none' | 'button' | 'button-bevel' | 'caps-lock-indicator' | 'caret' | 'checkbox' | 'default-button' | 'listbox' | 'listitem' | 'media-fullscreen-button' | 'media-mute-button' | 'media-play-button' | 'media-seek-back-button' | 'media-seek-forward-button' | 'media-slider' | 'media-sliderthumb' | 'menulist' | 'menulist-button' | 'menulist-text' | 'menulist-textfield' | 'push-button' | 'radio' | 'scrollbarbutton-down' | 'scrollbarbutton-left' | 'scrollbarbutton-right' | 'scrollbarbutton-up' | 'scrollbargripper-horizontal' | 'scrollbargripper-vertical' | 'scrollbarthumb-horizontal' | 'scrollbarthumb-vertical' | 'scrollbartrack-horizontal' | 'scrollbartrack-vertical' | 'searchfield' | 'searchfield-cancel-button' | 'searchfield-decoration' | 'searchfield-results-button' | 'searchfield-results-decoration' | 'slider-horizontal' | 'slider-vertical' | 'sliderthumb-horizontal' | 'sliderthumb-vertical' | 'square-button' | 'textarea' | 'textfield'"
+]
+and property__webkit_background_clip = [%value.rec
+  "[ <box> | 'border' | 'padding' | 'content' | 'text' ]#"
 ]
 and property__webkit_border_before = [%value.rec
   "<'border-width'> || <'border-style'> || <'color'>"
@@ -548,11 +691,26 @@ and property__webkit_border_before_width = [%value.rec "<'border-width'>"]
 and property__webkit_box_reflect = [%value.rec
   "[ 'above' | 'below' | 'right' | 'left' ]? [ <length> ]? [ <image> ]?"
 ]
+and property__webkit_column_break_after = [%value.rec
+  "'always' | 'auto' | 'avoid'"
+]
+and property__webkit_column_break_before = [%value.rec
+  "'always' | 'auto' | 'avoid'"
+]
+and property__webkit_column_break_inside = [%value.rec
+  "'always' | 'auto' | 'avoid'"
+]
+and property__webkit_font_smoothing = [%value.rec
+  "'auto' | 'none' | 'antialiased' | 'subpixel-antialiased'"
+]
 and property__webkit_line_clamp = [%value.rec "'none' | <integer>"]
 and property__webkit_mask = [%value.rec
   "[ <mask-reference> || <position> [ '/' <bg-size> ]? || <repeat-style> || [ <box> | 'border' | 'padding' | 'content' | 'text' ] || [ <box> | 'border' | 'padding' | 'content' ] ]#"
 ]
 and property__webkit_mask_attachment = [%value.rec "[ <attachment> ]#"]
+and property__webkit_mask_box_image = [%value.rec
+  "[ <url> | <gradient> | 'none' ] [ [ <length-percentage> ]{4} [ <-webkit-mask-box-repeat> ]{2} ]?"
+]
 and property__webkit_mask_clip = [%value.rec
   "[ <box> | 'border' | 'padding' | 'content' | 'text' ]#"
 ]
@@ -577,14 +735,22 @@ and property__webkit_mask_repeat_y = [%value.rec
 ]
 and property__webkit_mask_size = [%value.rec "[ <bg-size> ]#"]
 and property__webkit_overflow_scrolling = [%value.rec "'auto' | 'touch'"]
+and property__webkit_print_color_adjust = [%value.rec "'economy' | 'exact'"]
 and property__webkit_tap_highlight_color = [%value.rec "<color>"]
 and property__webkit_text_fill_color = [%value.rec "<color>"]
+and property__webkit_text_security = [%value.rec
+  "'none' | 'circle' | 'disc' | 'square'"
+]
 and property__webkit_text_stroke = [%value.rec "<length> || <color>"]
 and property__webkit_text_stroke_color = [%value.rec "<color>"]
 and property__webkit_text_stroke_width = [%value.rec "<length>"]
 and property__webkit_touch_callout = [%value.rec "'default' | 'none'"]
+and property__webkit_user_drag = [%value.rec "'none' | 'element' | 'auto'"]
 and property__webkit_user_modify = [%value.rec
   "'read-only' | 'read-write' | 'read-write-plaintext-only'"
+]
+and property__webkit_user_select = [%value.rec
+  "'auto' | 'none' | 'text' | 'all'"
 ]
 and property_align_content = [%value.rec
   "'normal' | <baseline-position> | <content-distribution> | [ <overflow-position> ]? <content-position>"
@@ -594,6 +760,9 @@ and property_align_items = [%value.rec
 ]
 and property_align_self = [%value.rec
   "'auto' | 'normal' | 'stretch' | <baseline-position> | [ <overflow-position> ]? <self-position>"
+]
+and property_alignment_baseline = [%value.rec
+  "'auto' | 'baseline' | 'before-edge' | 'text-before-edge' | 'middle' | 'central' | 'after-edge' | 'text-after-edge' | 'ideographic' | 'alphabetic' | 'hanging' | 'mathematical'"
 ]
 and property_all = [%value.rec "'initial' | 'inherit' | 'unset' | 'revert'"]
 and property_animation = [%value.rec "[ <single-animation> ]#"]
@@ -638,6 +807,10 @@ and property_background_position_y = [%value.rec
 ]
 and property_background_repeat = [%value.rec "[ <repeat-style> ]#"]
 and property_background_size = [%value.rec "[ <bg-size> ]#"]
+and property_baseline_shift = [%value.rec
+  "'baseline' | 'sub' | 'super' | <svg-length>"
+]
+and property_behavior = [%value.rec "[ <url> ]+"]
 and property_block_overflow = [%value.rec "'clip' | 'ellipsis' | <string>"]
 and property_block_size = [%value.rec "<'width'>"]
 and property_border = [%value.rec "<line-width> || <line-style> || <color>"]
@@ -783,6 +956,7 @@ and property_clip = [%value.rec "<shape> | 'auto'"]
 and property_clip_path = [%value.rec
   "<clip-source> | <basic-shape> || <geometry-box> | 'none'"
 ]
+and property_clip_rule = [%value.rec "'nonzero' | 'evenodd'"]
 and property_color = [%value.rec "<color>"]
 and property_color_adjust = [%value.rec "'economy' | 'exact'"]
 and property_column_count = [%value.rec "<integer> | 'auto'"]
@@ -812,15 +986,26 @@ and property_counter_reset = [%value.rec
 and property_counter_set = [%value.rec
   "[ <custom-ident> [ <integer> ]? ]+ | 'none'"
 ]
+and property_cue = [%value.rec "<'cue-before'> [ <'cue-after'> ]?"]
+and property_cue_after = [%value.rec "<url> [ <decibel> ]? | 'none'"]
+and property_cue_before = [%value.rec "<url> [ <decibel> ]? | 'none'"]
 and property_cursor = [%value.rec
-  "[ <url> [ <x> <y> ]? ',' ]* [ 'auto' | 'default' | 'none' | 'context-menu' | 'help' | 'pointer' | 'progress' | 'wait' | 'cell' | 'crosshair' | 'text' | 'vertical-text' | 'alias' | 'copy' | 'move' | 'no-drop' | 'not-allowed' | 'e-resize' | 'n-resize' | 'ne-resize' | 'nw-resize' | 's-resize' | 'se-resize' | 'sw-resize' | 'w-resize' | 'ew-resize' | 'ns-resize' | 'nesw-resize' | 'nwse-resize' | 'col-resize' | 'row-resize' | 'all-scroll' | 'zoom-in' | 'zoom-out' | 'grab' | 'grabbing' ]"
+  "[ <url> [ <x> <y> ]? ',' ]* [ 'auto' | 'default' | 'none' | 'context-menu' | 'help' | 'pointer' | 'progress' | 'wait' | 'cell' | 'crosshair' | 'text' | 'vertical-text' | 'alias' | 'copy' | 'move' | 'no-drop' | 'not-allowed' | 'e-resize' | 'n-resize' | 'ne-resize' | 'nw-resize' | 's-resize' | 'se-resize' | 'sw-resize' | 'w-resize' | 'ew-resize' | 'ns-resize' | 'nesw-resize' | 'nwse-resize' | 'col-resize' | 'row-resize' | 'all-scroll' | 'zoom-in' | 'zoom-out' | 'grab' | 'grabbing' | 'hand' | '-webkit-grab' | '-webkit-grabbing' | '-webkit-zoom-in' | '-webkit-zoom-out' | '-moz-grab' | '-moz-grabbing' | '-moz-zoom-in' | '-moz-zoom-out' ]"
 ]
 and property_direction = [%value.rec "'ltr' | 'rtl'"]
 and property_display = [%value.rec
-  "<display-outside> || <display-inside> | <display-listitem> | <display-internal> | <display-box> | <display-legacy>"
+  "'block' | 'contents' | 'flex' | 'flow' | 'flow-root' | 'grid' | 'inline' | 'inline-block' | 'inline-flex' | 'inline-grid' | 'inline-list-item' | 'inline-table' | 'list-item' | 'none' | 'ruby' | 'ruby-base' | 'ruby-base-container' | 'ruby-text' | 'ruby-text-container' | 'run-in' | 'table' | 'table-caption' | 'table-cell' | 'table-column' | 'table-column-group' | 'table-footer-group' | 'table-header-group' | 'table-row' | 'table-row-group' | '-ms-flexbox' | '-ms-inline-flexbox' | '-ms-grid' | '-ms-inline-grid' | '-webkit-flex' | '-webkit-inline-flex' | '-webkit-box' | '-webkit-inline-box' | '-moz-inline-stack' | '-moz-box' | '-moz-inline-box'"
+]
+and property_dominant_baseline = [%value.rec
+  "'auto' | 'use-script' | 'no-change' | 'reset-size' | 'ideographic' | 'alphabetic' | 'hanging' | 'mathematical' | 'central' | 'middle' | 'text-after-edge' | 'text-before-edge'"
 ]
 and property_empty_cells = [%value.rec "'show' | 'hide'"]
-and property_filter = [%value.rec "'none' | <filter-function-list>"]
+and property_fill = [%value.rec "<paint>"]
+and property_fill_opacity = [%value.rec "<number-zero-one>"]
+and property_fill_rule = [%value.rec "'nonzero' | 'evenodd'"]
+and property_filter = [%value.rec
+  "'none' | <filter-function-list> | <-ms-filter-function-list>"
+]
 and property_flex = [%value.rec
   "'none' | <'flex-grow'> [ <'flex-shrink'> ]? || <'flex-basis'>"
 ]
@@ -883,6 +1068,8 @@ and property_font_weight = [%value.rec
   "<font-weight-absolute> | 'bolder' | 'lighter'"
 ]
 and property_gap = [%value.rec "<'row-gap'> [ <'column-gap'> ]?"]
+and property_glyph_orientation_horizontal = [%value.rec "<angle>"]
+and property_glyph_orientation_vertical = [%value.rec "<angle>"]
 and property_grid = [%value.rec
   "<'grid-template'> | <'grid-template-rows'> '/' [ 'auto-flow' && [ 'dense' ]? ] [ <'grid-auto-columns'> ]? | [ 'auto-flow' && [ 'dense' ]? ] [ <'grid-auto-rows'> ]? '/' <'grid-template-columns'>"
 ]
@@ -922,7 +1109,7 @@ and property_image_orientation = [%value.rec
   "'from-image' | <angle> | [ <angle> ]? 'flip'"
 ]
 and property_image_rendering = [%value.rec
-  "'auto' | 'crisp-edges' | 'pixelated'"
+  "'auto' | 'crisp-edges' | 'pixelated' | 'optimizeSpeed' | 'optimizeQuality' | <-non-standard-image-rendering>"
 ]
 and property_image_resolution = [%value.rec
   "[ 'from-image' || <resolution> ] && [ 'snap' ]?"
@@ -952,8 +1139,9 @@ and property_justify_items = [%value.rec
 and property_justify_self = [%value.rec
   "'auto' | 'normal' | 'stretch' | <baseline-position> | [ <overflow-position> ]? [ <self-position> | 'left' | 'right' ]"
 ]
+and property_kerning = [%value.rec "'auto' | <svg-length>"]
 and property_left = [%value.rec "<length> | <percentage> | 'auto'"]
-and property_letter_spacing = [%value.rec "'normal' | <length>"]
+and property_letter_spacing = [%value.rec "'normal' | <length-percentage>"]
 and property_line_break = [%value.rec
   "'auto' | 'loose' | 'normal' | 'strict' | 'anywhere'"
 ]
@@ -982,6 +1170,10 @@ and property_margin_left = [%value.rec "<length> | <percentage> | 'auto'"]
 and property_margin_right = [%value.rec "<length> | <percentage> | 'auto'"]
 and property_margin_top = [%value.rec "<length> | <percentage> | 'auto'"]
 and property_margin_trim = [%value.rec "'none' | 'in-flow' | 'all'"]
+and property_marker = [%value.rec "'none' | <url>"]
+and property_marker_end = [%value.rec "'none' | <url>"]
+and property_marker_mid = [%value.rec "'none' | <url>"]
+and property_marker_start = [%value.rec "'none' | <url>"]
 and property_mask = [%value.rec "[ <mask-layer> ]#"]
 and property_mask_border = [%value.rec
   "<'mask-border-source'> || <'mask-border-slice'> [ '/' [ <'mask-border-width'> ]? [ '/' <'mask-border-outset'> ]? ]? || <'mask-border-repeat'> || <'mask-border-mode'>"
@@ -1014,7 +1206,7 @@ and property_max_height = [%value.rec
 and property_max_inline_size = [%value.rec "<'max-width'>"]
 and property_max_lines = [%value.rec "'none' | <integer>"]
 and property_max_width = [%value.rec
-  "'auto' | <length> | <percentage> | 'min-content' | 'max-content' | fit-content( <length-percentage> )"
+  "<length> | <percentage> | 'none' | 'max-content' | 'min-content' | 'fit-content' | 'fill-available' | <-non-standard-width>"
 ]
 and property_min_block_size = [%value.rec "<'min-width'>"]
 and property_min_height = [%value.rec
@@ -1022,7 +1214,7 @@ and property_min_height = [%value.rec
 ]
 and property_min_inline_size = [%value.rec "<'min-width'>"]
 and property_min_width = [%value.rec
-  "'auto' | <length> | <percentage> | 'min-content' | 'max-content' | fit-content( <length-percentage> )"
+  "<length> | <percentage> | 'auto' | 'max-content' | 'min-content' | 'fit-content' | 'fill-available' | <-non-standard-width>"
 ]
 and property_mix_blend_mode = [%value.rec "<blend-mode>"]
 and property_object_fit = [%value.rec
@@ -1030,7 +1222,7 @@ and property_object_fit = [%value.rec
 ]
 and property_object_position = [%value.rec "<position>"]
 and property_offset = [%value.rec
-  "[ <'offset-position'> ]? [ <'offset-path'> [ <'offset-distance'> || <'offset-rotate'> ]? ]? [ '/' <'offset-anchor'> ]?"
+  "[ [ <'offset-position'> ]? <'offset-path'> [ <'offset-distance'> || <'offset-rotate'> ]? ]? [ '/' <'offset-anchor'> ]?"
 ]
 and property_offset_anchor = [%value.rec "'auto' | <position>"]
 and property_offset_distance = [%value.rec "<length-percentage>"]
@@ -1039,7 +1231,7 @@ and property_offset_path = [%value.rec
 ]
 and property_offset_position = [%value.rec "'auto' | <position>"]
 and property_offset_rotate = [%value.rec "[ 'auto' | 'reverse' ] || <angle>"]
-and property_opacity = [%value.rec "<alpha-value>"]
+and property_opacity = [%value.rec "<number-zero-one>"]
 and property_order = [%value.rec "<integer>"]
 and property_orphans = [%value.rec "<integer>"]
 and property_outline = [%value.rec
@@ -1050,7 +1242,7 @@ and property_outline_offset = [%value.rec "<length>"]
 and property_outline_style = [%value.rec "'auto' | <'border-style'>"]
 and property_outline_width = [%value.rec "<line-width>"]
 and property_overflow = [%value.rec
-  "[ 'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' ]{1,2}"
+  "[ 'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' ]{1,2} | <-non-standard-overflow>"
 ]
 and property_overflow_anchor = [%value.rec "'auto' | 'none'"]
 and property_overflow_block = [%value.rec
@@ -1101,6 +1293,13 @@ and property_page_break_inside = [%value.rec "'auto' | 'avoid'"]
 and property_paint_order = [%value.rec
   "'normal' | 'fill' || 'stroke' || 'markers'"
 ]
+and property_pause = [%value.rec "<'pause-before'> [ <'pause-after'> ]?"]
+and property_pause_after = [%value.rec
+  "<time> | 'none' | 'x-weak' | 'weak' | 'medium' | 'strong' | 'x-strong'"
+]
+and property_pause_before = [%value.rec
+  "<time> | 'none' | 'x-weak' | 'weak' | 'medium' | 'strong' | 'x-strong'"
+]
 and property_perspective = [%value.rec "'none' | <length>"]
 and property_perspective_origin = [%value.rec "<position>"]
 and property_place_content = [%value.rec
@@ -1114,11 +1313,18 @@ and property_pointer_events = [%value.rec
   "'auto' | 'none' | 'visiblePainted' | 'visibleFill' | 'visibleStroke' | 'visible' | 'painted' | 'fill' | 'stroke' | 'all' | 'inherit'"
 ]
 and property_position = [%value.rec
-  "'static' | 'relative' | 'absolute' | 'sticky' | 'fixed'"
+  "'static' | 'relative' | 'absolute' | 'sticky' | 'fixed' | '-webkit-sticky'"
 ]
 and property_quotes = [%value.rec "'none' | 'auto' | [ <string> <string> ]+"]
 and property_resize = [%value.rec
   "'none' | 'both' | 'horizontal' | 'vertical' | 'block' | 'inline'"
+]
+and property_rest = [%value.rec "<'rest-before'> [ <'rest-after'> ]?"]
+and property_rest_after = [%value.rec
+  "<time> | 'none' | 'x-weak' | 'weak' | 'medium' | 'strong' | 'x-strong'"
+]
+and property_rest_before = [%value.rec
+  "<time> | 'none' | 'x-weak' | 'weak' | 'medium' | 'strong' | 'x-strong'"
 ]
 and property_right = [%value.rec "<length> | <percentage> | 'auto'"]
 and property_rotate = [%value.rec
@@ -1202,6 +1408,24 @@ and property_shape_margin = [%value.rec "<length-percentage>"]
 and property_shape_outside = [%value.rec
   "'none' | <shape-box> || <basic-shape> | <image>"
 ]
+and property_shape_rendering = [%value.rec
+  "'auto' | 'optimizeSpeed' | 'crispEdges' | 'geometricPrecision'"
+]
+and property_speak = [%value.rec "'auto' | 'none' | 'normal'"]
+and property_speak_as = [%value.rec
+  "'normal' | 'spell-out' || 'digits' || [ 'literal-punctuation' | 'no-punctuation' ]"
+]
+and property_src = [%value.rec
+  "[ <url> [ format( [ <string> ]# ) ]? | local( <family-name> ) ]#"
+]
+and property_stroke = [%value.rec "<paint>"]
+and property_stroke_dasharray = [%value.rec "'none' | [ [ <svg-length> ]+ ]#"]
+and property_stroke_dashoffset = [%value.rec "<svg-length>"]
+and property_stroke_linecap = [%value.rec "'butt' | 'round' | 'square'"]
+and property_stroke_linejoin = [%value.rec "'miter' | 'round' | 'bevel'"]
+and property_stroke_miterlimit = [%value.rec "<number-one-or-greater>"]
+and property_stroke_opacity = [%value.rec "<number-zero-one>"]
+and property_stroke_width = [%value.rec "<svg-length>"]
 and property_tab_size = [%value.rec "<integer> | <length>"]
 and property_table_layout = [%value.rec "'auto' | 'fixed'"]
 and property_text_align = [%value.rec
@@ -1210,6 +1434,7 @@ and property_text_align = [%value.rec
 and property_text_align_last = [%value.rec
   "'auto' | 'start' | 'end' | 'left' | 'right' | 'center' | 'justify'"
 ]
+and property_text_anchor = [%value.rec "'start' | 'middle' | 'end'"]
 and property_text_combine_upright = [%value.rec
   "'none' | 'all' | 'digits' [ <integer> ]?"
 ]
@@ -1287,8 +1512,9 @@ and property_translate = [%value.rec
   "'none' | <length-percentage> [ <length-percentage> [ <length> ]? ]?"
 ]
 and property_unicode_bidi = [%value.rec
-  "'normal' | 'embed' | 'isolate' | 'bidi-override' | 'isolate-override' | 'plaintext'"
+  "'normal' | 'embed' | 'isolate' | 'bidi-override' | 'isolate-override' | 'plaintext' | '-moz-isolate' | '-moz-isolate-override' | '-moz-plaintext' | '-webkit-isolate'"
 ]
+and property_unicode_range = [%value.rec "[ <urange> ]#"]
 and property_user_select = [%value.rec
   "'auto' | 'text' | 'none' | 'contain' | 'all'"
 ]
@@ -1296,6 +1522,28 @@ and property_vertical_align = [%value.rec
   "'baseline' | 'sub' | 'super' | 'text-top' | 'text-bottom' | 'middle' | 'top' | 'bottom' | <percentage> | <length>"
 ]
 and property_visibility = [%value.rec "'visible' | 'hidden' | 'collapse'"]
+and property_voice_balance = [%value.rec
+  "<number> | 'left' | 'center' | 'right' | 'leftwards' | 'rightwards'"
+]
+and property_voice_duration = [%value.rec "'auto' | <time>"]
+and property_voice_family = [%value.rec
+  "[ [ <family-name> | <generic-voice> ] ',' ]* [ <family-name> | <generic-voice> ] | 'preserve'"
+]
+and property_voice_pitch = [%value.rec
+  "<frequency> && 'absolute' | [ 'x-low' | 'low' | 'medium' | 'high' | 'x-high' ] || [ <frequency> | <semitones> | <percentage> ]"
+]
+and property_voice_range = [%value.rec
+  "<frequency> && 'absolute' | [ 'x-low' | 'low' | 'medium' | 'high' | 'x-high' ] || [ <frequency> | <semitones> | <percentage> ]"
+]
+and property_voice_rate = [%value.rec
+  "[ 'normal' | 'x-slow' | 'slow' | 'medium' | 'fast' | 'x-fast' ] || <percentage>"
+]
+and property_voice_stress = [%value.rec
+  "'normal' | 'strong' | 'moderate' | 'none' | 'reduced'"
+]
+and property_voice_volume = [%value.rec
+  "'silent' | [ 'x-soft' | 'soft' | 'medium' | 'loud' | 'x-loud' ] || <decibel>"
+]
 and property_white_space = [%value.rec
   "'normal' | 'pre' | 'nowrap' | 'pre-wrap' | 'pre-line' | 'break-spaces'"
 ]
@@ -1310,7 +1558,7 @@ and property_word_break = [%value.rec
 and property_word_spacing = [%value.rec "'normal' | <length-percentage>"]
 and property_word_wrap = [%value.rec "'normal' | 'break-word'"]
 and property_writing_mode = [%value.rec
-  "'horizontal-tb' | 'vertical-rl' | 'vertical-lr' | 'sideways-rl' | 'sideways-lr'"
+  "'horizontal-tb' | 'vertical-rl' | 'vertical-lr' | 'sideways-rl' | 'sideways-lr' | <svg-writing-mode>"
 ]
 and property_z_index = [%value.rec "'auto' | <integer>"]
 and property_zoom = [%value.rec "'normal' | 'reset' | <number> | <percentage>"]
@@ -1322,19 +1570,21 @@ and pseudo_page = [%value.rec "':' [ 'left' | 'right' | 'first' | 'blank' ]"]
 and quote = [%value.rec
   "'open-quote' | 'close-quote' | 'no-open-quote' | 'no-close-quote'"
 ]
+and ratio = [%value.rec "<integer> '/' <integer>"]
 and relative_selector = [%value.rec "[ <combinator> ]? <complex-selector>"]
 and relative_selector_list = [%value.rec "[ <relative-selector> ]#"]
 and relative_size = [%value.rec "'larger' | 'smaller'"]
 and repeat_style = [%value.rec
   "'repeat-x' | 'repeat-y' | [ 'repeat' | 'space' | 'round' | 'no-repeat' ]{1,2}"
 ]
+and right = [%value.rec "<length> | 'auto'"]
 and self_position = [%value.rec
   "'center' | 'start' | 'end' | 'self-start' | 'self-end' | 'flex-start' | 'flex-end'"
 ]
 and shadow = [%value.rec "[ 'inset' ]? && [ <length> ]{2,4} && [ <color> ]?"]
 and shadow_t = [%value.rec "[ <length> ]{2,3} && [ <color> ]?"]
 and shape = [%value.rec
-  "rect( <property_top> ',' <property_right> ',' <property_bottom> ',' <property_left> )"
+  "rect( <top> ',' <right> ',' <bottom> ',' <left> ) | rect( <top> <right> <bottom> <left> )"
 ]
 and shape_box = [%value.rec "<box> | 'margin-box'"]
 and shape_radius = [%value.rec
@@ -1379,6 +1629,10 @@ and supports_in_parens = [%value.rec
   "'(' <supports-condition> ')' | <supports-feature> | <general-enclosed>"
 ]
 and supports_selector_fn = [%value.rec "selector( <complex-selector> )"]
+and svg_length = [%value.rec "<percentage> | <length> | <number>"]
+and svg_writing_mode = [%value.rec
+  "'lr-tb' | 'rl-tb' | 'tb-rl' | 'lr' | 'rl' | 'tb'"
+]
 and symbol = [%value.rec "<string> | <image> | <custom-ident>"]
 and target = [%value.rec
   "<target-counter()> | <target-counters()> | <target-text()>"
@@ -1387,11 +1641,21 @@ and time_percentage = [%value.rec "<time> | <percentage>"]
 and timing_function = [%value.rec
   "'linear' | <cubic-bezier-timing-function> | <step-timing-function>"
 ]
+and top = [%value.rec "<length> | 'auto'"]
 and track_breadth = [%value.rec
-  "<length-percentage> | <property_flex> | 'min-content' | 'max-content' | 'auto'"
+  "<length-percentage> | <'flex'> | 'min-content' | 'max-content' | 'auto'"
+]
+and track_group = [%value.rec
+  "'(' [ [ <string> ]* <track-minmax> [ <string> ]* ]+ ')' [ '[' <positive-integer> ']' ]? | <track-minmax>"
 ]
 and track_list = [%value.rec
   "[ [ <line-names> ]? [ <track-size> | <track-repeat> ] ]+ [ <line-names> ]?"
+]
+and track_list_v0 = [%value.rec
+  "[ [ <string> ]* <track-group> [ <string> ]* ]+ | 'none'"
+]
+and track_minmax = [%value.rec
+  "minmax( <track-breadth> ',' <track-breadth> ) | 'auto' | <track-breadth> | 'fit-content'"
 ]
 and track_repeat = [%value.rec
   "repeat( <positive-integer> ',' [ [ <line-names> ]? <track-size> ]+ [ <line-names> ]? )"
@@ -1408,11 +1672,57 @@ and type_or_unit = [%value.rec
 ]
 and type_selector = [%value.rec "<wq-name> | [ <ns-prefix> ]? '*'"]
 and viewport_length = [%value.rec "'auto' | <length-percentage>"]
-and wq_name = [%value.rec "[ <ns-prefix> ]? <ident-token>"];
+and wq_name = [%value.rec "[ <ns-prefix> ]? <ident-token>"]
+and x = [%value.rec "<number>"]
+and y = [%value.rec "<number>"];
 let check_map =
   StringMap.of_seq(
     List.to_seq([
+      ("-legacy-gradient", check(_legacy_gradient)),
+      ("-legacy-linear-gradient", check(_legacy_linear_gradient)),
+      (
+        "-legacy-linear-gradient-arguments",
+        check(_legacy_linear_gradient_arguments),
+      ),
+      ("-legacy-radial-gradient", check(_legacy_radial_gradient)),
+      (
+        "-legacy-radial-gradient-arguments",
+        check(_legacy_radial_gradient_arguments),
+      ),
+      (
+        "-legacy-radial-gradient-shape",
+        check(_legacy_radial_gradient_shape),
+      ),
+      ("-legacy-radial-gradient-size", check(_legacy_radial_gradient_size)),
+      (
+        "-legacy-repeating-linear-gradient",
+        check(_legacy_repeating_linear_gradient),
+      ),
+      (
+        "-legacy-repeating-radial-gradient",
+        check(_legacy_repeating_radial_gradient),
+      ),
+      ("-ms-filter", check(_ms_filter)),
+      ("-ms-filter-function", check(_ms_filter_function)),
+      ("-ms-filter-function-legacy", check(_ms_filter_function_legacy)),
+      ("-ms-filter-function-list", check(_ms_filter_function_list)),
+      ("-ms-filter-function-progid", check(_ms_filter_function_progid)),
+      ("-non-standard-color", check(_non_standard_color)),
+      ("-non-standard-font", check(_non_standard_font)),
+      (
+        "-non-standard-image-rendering",
+        check(_non_standard_image_rendering),
+      ),
+      ("-non-standard-overflow", check(_non_standard_overflow)),
+      ("-non-standard-width", check(_non_standard_width)),
+      ("-webkit-gradient-color-stop", check(_webkit_gradient_color_stop)),
+      ("-webkit-gradient-point", check(_webkit_gradient_point)),
+      ("-webkit-gradient-radius", check(_webkit_gradient_radius)),
+      ("-webkit-gradient-type", check(_webkit_gradient_type)),
+      ("-webkit-mask-box-repeat", check(_webkit_mask_box_repeat)),
+      ("-webkit-mask-clip-style", check(_webkit_mask_clip_style)),
       ("absolute-size", check(absolute_size)),
+      ("age", check(age)),
       ("alpha-value", check(alpha_value)),
       ("angle-percentage", check(angle_percentage)),
       ("angular-color-hint", check(angular_color_hint)),
@@ -1420,8 +1730,10 @@ let check_map =
       ("angular-color-stop-list", check(angular_color_stop_list)),
       ("animateable-feature", check(animateable_feature)),
       ("attachment", check(attachment)),
+      ("attr-fallback", check(attr_fallback)),
       ("attr-matcher", check(attr_matcher)),
       ("attr-modifier", check(attr_modifier)),
+      ("attr-name", check(attr_name)),
       ("attribute-selector", check(attribute_selector)),
       ("auto-repeat", check(auto_repeat)),
       ("auto-track-list", check(auto_track_list)),
@@ -1432,6 +1744,8 @@ let check_map =
       ("bg-position", check(bg_position)),
       ("bg-size", check(bg_size)),
       ("blend-mode", check(blend_mode)),
+      ("border-radius", check(border_radius)),
+      ("bottom", check(bottom)),
       ("box", check(box)),
       ("calc-product", check(calc_product)),
       ("calc-sum", check(calc_sum)),
@@ -1462,6 +1776,8 @@ let check_map =
       ("counter-style", check(counter_style)),
       ("counter-style-name", check(counter_style_name)),
       ("cubic-bezier-timing-function", check(cubic_bezier_timing_function)),
+      ("declaration", check(declaration)),
+      ("declaration-list", check(declaration_list)),
       ("deprecated-system-color", check(deprecated_system_color)),
       ("discretionary-lig-values", check(discretionary_lig_values)),
       ("display-box", check(display_box)),
@@ -1496,6 +1812,7 @@ let check_map =
       ("font-variant-css21", check(font_variant_css21)),
       ("font-weight-absolute", check(font_weight_absolute)),
       ("frequency-percentage", check(frequency_percentage)),
+      ("function_-webkit-gradient", check(function__webkit_gradient)),
       ("function_attr", check(function_attr)),
       ("function_blur", check(function_blur)),
       ("function_brightness", check(function_brightness)),
@@ -1567,9 +1884,11 @@ let check_map =
       ("function_translateY", check(function_translateY)),
       ("function_translateZ", check(function_translateZ)),
       ("function_var", check(function_var)),
+      ("gender", check(gender)),
       ("general-enclosed", check(general_enclosed)),
       ("generic-family", check(generic_family)),
       ("generic-name", check(generic_name)),
+      ("generic-voice", check(generic_voice)),
       ("geometry-box", check(geometry_box)),
       ("gradient", check(gradient)),
       ("grid-line", check(grid_line)),
@@ -1586,6 +1905,7 @@ let check_map =
       ("keyframe-selector", check(keyframe_selector)),
       ("keyframes-name", check(keyframes_name)),
       ("leader-type", check(leader_type)),
+      ("left", check(left)),
       ("length-percentage", check(length_percentage)),
       ("line-name-list", check(line_name_list)),
       ("line-names", check(line_names)),
@@ -1593,6 +1913,7 @@ let check_map =
       ("line-width", check(line_width)),
       ("linear-color-hint", check(linear_color_hint)),
       ("linear-color-stop", check(linear_color_stop)),
+      ("mask-image", check(mask_image)),
       ("mask-layer", check(mask_layer)),
       ("mask-position", check(mask_position)),
       ("mask-reference", check(mask_reference)),
@@ -1613,11 +1934,14 @@ let check_map =
       ("mf-plain", check(mf_plain)),
       ("mf-range", check(mf_range)),
       ("mf-value", check(mf_value)),
+      ("name-repeat", check(name_repeat)),
       ("named-color", check(named_color)),
       ("namespace-prefix", check(namespace_prefix)),
       ("ns-prefix", check(ns_prefix)),
       ("nth", check(nth)),
+      ("number-one-or-greater", check(number_one_or_greater)),
       ("number-percentage", check(number_percentage)),
+      ("number-zero-one", check(number_zero_one)),
       ("numeric-figure-values", check(numeric_figure_values)),
       ("numeric-fraction-values", check(numeric_fraction_values)),
       ("numeric-spacing-values", check(numeric_spacing_values)),
@@ -1628,8 +1952,14 @@ let check_map =
       ("page-margin-box-type", check(page_margin_box_type)),
       ("page-selector", check(page_selector)),
       ("page-selector-list", check(page_selector_list)),
+      ("paint", check(paint)),
       ("position", check(position)),
+      ("positive-integer", check(positive_integer)),
       ("property--moz-appearance", check(property__moz_appearance)),
+      (
+        "property--moz-background-clip",
+        check(property__moz_background_clip),
+      ),
       ("property--moz-binding", check(property__moz_binding)),
       (
         "property--moz-border-bottom-colors",
@@ -1638,6 +1968,22 @@ let check_map =
       (
         "property--moz-border-left-colors",
         check(property__moz_border_left_colors),
+      ),
+      (
+        "property--moz-border-radius-bottomleft",
+        check(property__moz_border_radius_bottomleft),
+      ),
+      (
+        "property--moz-border-radius-bottomright",
+        check(property__moz_border_radius_bottomright),
+      ),
+      (
+        "property--moz-border-radius-topleft",
+        check(property__moz_border_radius_topleft),
+      ),
+      (
+        "property--moz-border-radius-topright",
+        check(property__moz_border_radius_topright),
       ),
       (
         "property--moz-border-right-colors",
@@ -1651,6 +1997,10 @@ let check_map =
         "property--moz-context-properties",
         check(property__moz_context_properties),
       ),
+      (
+        "property--moz-control-character-visibility",
+        check(property__moz_control_character_visibility),
+      ),
       ("property--moz-float-edge", check(property__moz_float_edge)),
       (
         "property--moz-force-broken-image-icon",
@@ -1658,6 +2008,10 @@ let check_map =
       ),
       ("property--moz-image-region", check(property__moz_image_region)),
       ("property--moz-orient", check(property__moz_orient)),
+      (
+        "property--moz-osx-font-smoothing",
+        check(property__moz_osx_font_smoothing),
+      ),
       ("property--moz-outline-radius", check(property__moz_outline_radius)),
       (
         "property--moz-outline-radius-bottomleft",
@@ -1680,6 +2034,7 @@ let check_map =
       ("property--moz-user-focus", check(property__moz_user_focus)),
       ("property--moz-user-input", check(property__moz_user_input)),
       ("property--moz-user-modify", check(property__moz_user_modify)),
+      ("property--moz-user-select", check(property__moz_user_select)),
       (
         "property--moz-window-dragging",
         check(property__moz_window_dragging),
@@ -1720,8 +2075,26 @@ let check_map =
       ),
       ("property--ms-content-zooming", check(property__ms_content_zooming)),
       ("property--ms-filter", check(property__ms_filter)),
+      ("property--ms-flex-align", check(property__ms_flex_align)),
+      ("property--ms-flex-item-align", check(property__ms_flex_item_align)),
+      ("property--ms-flex-line-pack", check(property__ms_flex_line_pack)),
+      ("property--ms-flex-negative", check(property__ms_flex_negative)),
+      ("property--ms-flex-order", check(property__ms_flex_order)),
+      ("property--ms-flex-pack", check(property__ms_flex_pack)),
+      ("property--ms-flex-positive", check(property__ms_flex_positive)),
+      (
+        "property--ms-flex-preferred-size",
+        check(property__ms_flex_preferred_size),
+      ),
       ("property--ms-flow-from", check(property__ms_flow_from)),
       ("property--ms-flow-into", check(property__ms_flow_into)),
+      (
+        "property--ms-grid-column-align",
+        check(property__ms_grid_column_align),
+      ),
+      ("property--ms-grid-columns", check(property__ms_grid_columns)),
+      ("property--ms-grid-row-align", check(property__ms_grid_row_align)),
+      ("property--ms-grid-rows", check(property__ms_grid_rows)),
       (
         "property--ms-high-contrast-adjust",
         check(property__ms_high_contrast_adjust),
@@ -1729,6 +2102,10 @@ let check_map =
       (
         "property--ms-hyphenate-limit-chars",
         check(property__ms_hyphenate_limit_chars),
+      ),
+      (
+        "property--ms-hyphenate-limit-last",
+        check(property__ms_hyphenate_limit_last),
       ),
       (
         "property--ms-hyphenate-limit-lines",
@@ -1739,6 +2116,10 @@ let check_map =
         check(property__ms_hyphenate_limit_zone),
       ),
       ("property--ms-ime-align", check(property__ms_ime_align)),
+      (
+        "property--ms-interpolation-mode",
+        check(property__ms_interpolation_mode),
+      ),
       ("property--ms-overflow-style", check(property__ms_overflow_style)),
       ("property--ms-scroll-chaining", check(property__ms_scroll_chaining)),
       ("property--ms-scroll-limit", check(property__ms_scroll_limit)),
@@ -1817,6 +2198,10 @@ let check_map =
       ("property--ms-wrap-through", check(property__ms_wrap_through)),
       ("property--webkit-appearance", check(property__webkit_appearance)),
       (
+        "property--webkit-background-clip",
+        check(property__webkit_background_clip),
+      ),
+      (
         "property--webkit-border-before",
         check(property__webkit_border_before),
       ),
@@ -1833,11 +2218,31 @@ let check_map =
         check(property__webkit_border_before_width),
       ),
       ("property--webkit-box-reflect", check(property__webkit_box_reflect)),
+      (
+        "property--webkit-column-break-after",
+        check(property__webkit_column_break_after),
+      ),
+      (
+        "property--webkit-column-break-before",
+        check(property__webkit_column_break_before),
+      ),
+      (
+        "property--webkit-column-break-inside",
+        check(property__webkit_column_break_inside),
+      ),
+      (
+        "property--webkit-font-smoothing",
+        check(property__webkit_font_smoothing),
+      ),
       ("property--webkit-line-clamp", check(property__webkit_line_clamp)),
       ("property--webkit-mask", check(property__webkit_mask)),
       (
         "property--webkit-mask-attachment",
         check(property__webkit_mask_attachment),
+      ),
+      (
+        "property--webkit-mask-box-image",
+        check(property__webkit_mask_box_image),
       ),
       ("property--webkit-mask-clip", check(property__webkit_mask_clip)),
       (
@@ -1873,12 +2278,20 @@ let check_map =
         check(property__webkit_overflow_scrolling),
       ),
       (
+        "property--webkit-print-color-adjust",
+        check(property__webkit_print_color_adjust),
+      ),
+      (
         "property--webkit-tap-highlight-color",
         check(property__webkit_tap_highlight_color),
       ),
       (
         "property--webkit-text-fill-color",
         check(property__webkit_text_fill_color),
+      ),
+      (
+        "property--webkit-text-security",
+        check(property__webkit_text_security),
       ),
       ("property--webkit-text-stroke", check(property__webkit_text_stroke)),
       (
@@ -1893,10 +2306,13 @@ let check_map =
         "property--webkit-touch-callout",
         check(property__webkit_touch_callout),
       ),
+      ("property--webkit-user-drag", check(property__webkit_user_drag)),
       ("property--webkit-user-modify", check(property__webkit_user_modify)),
+      ("property--webkit-user-select", check(property__webkit_user_select)),
       ("property-align-content", check(property_align_content)),
       ("property-align-items", check(property_align_items)),
       ("property-align-self", check(property_align_self)),
+      ("property-alignment-baseline", check(property_alignment_baseline)),
       ("property-all", check(property_all)),
       ("property-animation", check(property_animation)),
       ("property-animation-delay", check(property_animation_delay)),
@@ -1945,6 +2361,8 @@ let check_map =
       ),
       ("property-background-repeat", check(property_background_repeat)),
       ("property-background-size", check(property_background_size)),
+      ("property-baseline-shift", check(property_baseline_shift)),
+      ("property-behavior", check(property_behavior)),
       ("property-block-overflow", check(property_block_overflow)),
       ("property-block-size", check(property_block_size)),
       ("property-border", check(property_border)),
@@ -2091,6 +2509,7 @@ let check_map =
       ("property-clear", check(property_clear)),
       ("property-clip", check(property_clip)),
       ("property-clip-path", check(property_clip_path)),
+      ("property-clip-rule", check(property_clip_rule)),
       ("property-color", check(property_color)),
       ("property-color-adjust", check(property_color_adjust)),
       ("property-column-count", check(property_column_count)),
@@ -2108,10 +2527,17 @@ let check_map =
       ("property-counter-increment", check(property_counter_increment)),
       ("property-counter-reset", check(property_counter_reset)),
       ("property-counter-set", check(property_counter_set)),
+      ("property-cue", check(property_cue)),
+      ("property-cue-after", check(property_cue_after)),
+      ("property-cue-before", check(property_cue_before)),
       ("property-cursor", check(property_cursor)),
       ("property-direction", check(property_direction)),
       ("property-display", check(property_display)),
+      ("property-dominant-baseline", check(property_dominant_baseline)),
       ("property-empty-cells", check(property_empty_cells)),
+      ("property-fill", check(property_fill)),
+      ("property-fill-opacity", check(property_fill_opacity)),
+      ("property-fill-rule", check(property_fill_rule)),
       ("property-filter", check(property_filter)),
       ("property-flex", check(property_flex)),
       ("property-flex-basis", check(property_flex_basis)),
@@ -2167,6 +2593,14 @@ let check_map =
       ),
       ("property-font-weight", check(property_font_weight)),
       ("property-gap", check(property_gap)),
+      (
+        "property-glyph-orientation-horizontal",
+        check(property_glyph_orientation_horizontal),
+      ),
+      (
+        "property-glyph-orientation-vertical",
+        check(property_glyph_orientation_vertical),
+      ),
       ("property-grid", check(property_grid)),
       ("property-grid-area", check(property_grid_area)),
       ("property-grid-auto-columns", check(property_grid_auto_columns)),
@@ -2212,6 +2646,7 @@ let check_map =
       ("property-justify-content", check(property_justify_content)),
       ("property-justify-items", check(property_justify_items)),
       ("property-justify-self", check(property_justify_self)),
+      ("property-kerning", check(property_kerning)),
       ("property-left", check(property_left)),
       ("property-letter-spacing", check(property_letter_spacing)),
       ("property-line-break", check(property_line_break)),
@@ -2234,6 +2669,10 @@ let check_map =
       ("property-margin-right", check(property_margin_right)),
       ("property-margin-top", check(property_margin_top)),
       ("property-margin-trim", check(property_margin_trim)),
+      ("property-marker", check(property_marker)),
+      ("property-marker-end", check(property_marker_end)),
+      ("property-marker-mid", check(property_marker_mid)),
+      ("property-marker-start", check(property_marker_start)),
       ("property-mask", check(property_mask)),
       ("property-mask-border", check(property_mask_border)),
       ("property-mask-border-mode", check(property_mask_border_mode)),
@@ -2320,6 +2759,9 @@ let check_map =
       ("property-page-break-before", check(property_page_break_before)),
       ("property-page-break-inside", check(property_page_break_inside)),
       ("property-paint-order", check(property_paint_order)),
+      ("property-pause", check(property_pause)),
+      ("property-pause-after", check(property_pause_after)),
+      ("property-pause-before", check(property_pause_before)),
       ("property-perspective", check(property_perspective)),
       ("property-perspective-origin", check(property_perspective_origin)),
       ("property-place-content", check(property_place_content)),
@@ -2329,6 +2771,9 @@ let check_map =
       ("property-position", check(property_position)),
       ("property-quotes", check(property_quotes)),
       ("property-resize", check(property_resize)),
+      ("property-rest", check(property_rest)),
+      ("property-rest-after", check(property_rest_after)),
+      ("property-rest-before", check(property_rest_before)),
       ("property-right", check(property_right)),
       ("property-rotate", check(property_rotate)),
       ("property-row-gap", check(property_row_gap)),
@@ -2430,10 +2875,23 @@ let check_map =
       ),
       ("property-shape-margin", check(property_shape_margin)),
       ("property-shape-outside", check(property_shape_outside)),
+      ("property-shape-rendering", check(property_shape_rendering)),
+      ("property-speak", check(property_speak)),
+      ("property-speak-as", check(property_speak_as)),
+      ("property-src", check(property_src)),
+      ("property-stroke", check(property_stroke)),
+      ("property-stroke-dasharray", check(property_stroke_dasharray)),
+      ("property-stroke-dashoffset", check(property_stroke_dashoffset)),
+      ("property-stroke-linecap", check(property_stroke_linecap)),
+      ("property-stroke-linejoin", check(property_stroke_linejoin)),
+      ("property-stroke-miterlimit", check(property_stroke_miterlimit)),
+      ("property-stroke-opacity", check(property_stroke_opacity)),
+      ("property-stroke-width", check(property_stroke_width)),
       ("property-tab-size", check(property_tab_size)),
       ("property-table-layout", check(property_table_layout)),
       ("property-text-align", check(property_text_align)),
       ("property-text-align-last", check(property_text_align_last)),
+      ("property-text-anchor", check(property_text_anchor)),
       (
         "property-text-combine-upright",
         check(property_text_combine_upright),
@@ -2502,9 +2960,18 @@ let check_map =
       ),
       ("property-translate", check(property_translate)),
       ("property-unicode-bidi", check(property_unicode_bidi)),
+      ("property-unicode-range", check(property_unicode_range)),
       ("property-user-select", check(property_user_select)),
       ("property-vertical-align", check(property_vertical_align)),
       ("property-visibility", check(property_visibility)),
+      ("property-voice-balance", check(property_voice_balance)),
+      ("property-voice-duration", check(property_voice_duration)),
+      ("property-voice-family", check(property_voice_family)),
+      ("property-voice-pitch", check(property_voice_pitch)),
+      ("property-voice-range", check(property_voice_range)),
+      ("property-voice-rate", check(property_voice_rate)),
+      ("property-voice-stress", check(property_voice_stress)),
+      ("property-voice-volume", check(property_voice_volume)),
       ("property-white-space", check(property_white_space)),
       ("property-widows", check(property_widows)),
       ("property-width", check(property_width)),
@@ -2519,10 +2986,12 @@ let check_map =
       ("pseudo-element-selector", check(pseudo_element_selector)),
       ("pseudo-page", check(pseudo_page)),
       ("quote", check(quote)),
+      ("ratio", check(ratio)),
       ("relative-selector", check(relative_selector)),
       ("relative-selector-list", check(relative_selector_list)),
       ("relative-size", check(relative_size)),
       ("repeat-style", check(repeat_style)),
+      ("right", check(right)),
       ("self-position", check(self_position)),
       ("shadow", check(shadow)),
       ("shadow-t", check(shadow_t)),
@@ -2549,12 +3018,18 @@ let check_map =
       ("supports-feature", check(supports_feature)),
       ("supports-in-parens", check(supports_in_parens)),
       ("supports-selector-fn", check(supports_selector_fn)),
+      ("svg-length", check(svg_length)),
+      ("svg-writing-mode", check(svg_writing_mode)),
       ("symbol", check(symbol)),
       ("target", check(target)),
       ("time-percentage", check(time_percentage)),
       ("timing-function", check(timing_function)),
+      ("top", check(top)),
       ("track-breadth", check(track_breadth)),
+      ("track-group", check(track_group)),
       ("track-list", check(track_list)),
+      ("track-list-v0", check(track_list_v0)),
+      ("track-minmax", check(track_minmax)),
       ("track-repeat", check(track_repeat)),
       ("track-size", check(track_size)),
       ("transform-function", check(transform_function)),
@@ -2563,5 +3038,7 @@ let check_map =
       ("type-selector", check(type_selector)),
       ("viewport-length", check(viewport_length)),
       ("wq-name", check(wq_name)),
+      ("x", check(x)),
+      ("y", check(y)),
     ]),
   );

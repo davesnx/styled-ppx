@@ -66,3 +66,7 @@ let an_plus_b = invalid;
 let declaration = invalid;
 let y = invalid;
 let x = invalid;
+let decibel = invalid;
+let urange = invalid;
+let semitones = invalid;
+let url_token = invalid;
