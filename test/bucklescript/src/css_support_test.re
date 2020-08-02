@@ -152,6 +152,9 @@ let supportList = [
   [%css "letter-spacing: normal"],
   [%css "letter-spacing: 5px"],
   [%css "text-indent: 5%"],
+  // not supported
+  [%css "-moz-text-blink: blink"],
+  [%css "display: -webkit-inline-box"],
 ];
 
 Belt.List.forEachWithIndex(supportList, (index, css) => {

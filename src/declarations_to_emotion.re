@@ -1200,6 +1200,8 @@ let grid_column =
   unsupported(property_grid_column, ~call=[%expr Css.gridColumn]);
 let grid_area = unsupported(property_grid_area, ~call=[%expr Css.gridArea]);
 
+let display = unsupported(property_display, ~call=[%expr Css.display]);
+
 let found = ({ast_of_string, string_to_expr, _}) => {
   let check_value = string => {
     let.ok _ = ast_of_string(string);
@@ -1208,6 +1210,7 @@ let found = ({ast_of_string, string_to_expr, _}) => {
   (check_value, string_to_expr);
 };
 let properties = [
+  ("display", found(display)),
   // css-sizing-3
   ("width", found(width)),
   ("height", found(height)),
@@ -1410,38 +1413,52 @@ let properties = [
 ];
 
 let support_property = name =>
-  properties |> List.exists(((key, _)) => key == name);
+  Parser.check_map
+  |> StringMap.find_opt("property-" ++ name)
+  |> Option.is_some;
 
 let render_when_unsupported_features = (name, value) => {
   let to_camel_case = name =>
-    name
-    |> String.split_on_char('-')
-    |> List.map(String.capitalize_ascii)
-    |> String.concat("")
-    |> String.uncapitalize_ascii;
+    (
+      switch (String.split_on_char('-', name)) {
+      | [first, ...remaining] => [
+          first,
+          ...List.map(String.capitalize_ascii, remaining),
+        ]
+      | [] => []
+      }
+    )
+    |> String.concat("");
 
   let name = to_camel_case(name) |> Const.string |> Exp.constant;
   let value = value |> Const.string |> Exp.constant;
 
   id([%expr Css.unsafe([%e name], [%e value])]);
 };
+
+let render_to_expr = (name, value) => {
+  let.ok string_to_expr =
+    switch (properties |> List.find_opt(((key, _)) => key == name)) {
+    | Some((_, (_, string_to_expr))) => Ok(string_to_expr)
+    | None => Error(`Not_found)
+    };
+  string_to_expr(value) |> Result.map_error(str => `Invalid_value(str));
+};
 let parse_declarations = ((name, value)) => {
-  let map_parse_error = result =>
-    Result.map_error(str => `Invalid_value(str), result);
+  open Parser;
 
-  let.ok (_, (check_string, string_to_expr)) =
-    properties
-    |> List.find_opt(((key, _)) => key == name)
-    |> Option.to_result(~none=`Not_found);
-
+  let.ok is_valid_string =
+    check_property(~name, value)
+    |> Result.map_error((`Unknown_value) => `Not_found);
   switch (render_css_wide_keywords(name, value)) {
   | Ok(value) => Ok(value)
   | Error(_) =>
-    let.ok () = check_string(value) |> map_parse_error;
-    switch (string_to_expr(value)) {
-    | result => map_parse_error(result)
+    switch (render_to_expr(name, value)) {
+    | Ok(value) => Ok(value)
+    | Error(_)
     | exception Unsupported_feature =>
-      Ok([render_when_unsupported_features(name, value)])
-    };
+      let.ok () = is_valid_string ? Ok() : Error(`Invalid_value(value));
+      Ok([render_when_unsupported_features(name, value)]);
+    }
   };
 };

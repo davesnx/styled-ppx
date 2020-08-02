@@ -54,7 +54,7 @@ let properties_static_css_tests = [%expr
     ([%css "box-sizing: content-box"], [Css.boxSizing(`contentBox)]),
     ([%css "color: #454545"], [Css.color(`hex("454545"))]),
     ([%css "color: red"], [Css.color(Css.red)]),
-    ([%css "display: flex"], [Css.display(`flex)]),
+    ([%css "display: flex"], [Css.unsafe("display", "flex")]),
     ([%css "flex-direction: column"], [Css.flexDirection(`column)]),
     ([%css "font-size: 30px"], [Css.unsafe("fontSize", "30px")]),
     ([%css "height: 100vh"], [Css.height(`vh(100.))]),
@@ -286,6 +286,15 @@ let properties_static_css_tests = [%expr
     //   [%css "align-content: space-around"],
     //   [Css.alignContent(`spaceAround)],
     // ),
+    // not supported
+    (
+      [%css "-moz-text-blink: blink"],
+      [Css.unsafe("MozTextBlink", "blink")],
+    ),
+    (
+      [%css "display: -webkit-inline-box"],
+      [Css.unsafe("display", "-webkit-inline-box")],
+    ),
   |]
 ];
 let selectors_static_css_tests = [%expr
