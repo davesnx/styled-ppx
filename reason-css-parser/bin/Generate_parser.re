@@ -119,13 +119,7 @@ module Emit = {
     sub(key, len - 2, 2) == "()" ? "function_" ++ sub(key, 0, len - 2) : key;
   };
 
-  let emit_code = (~values, ~properties) => {
-    let properties =
-      properties |> List.map(((key, value)) => ("property_" ++ key, value));
-    let values =
-      values |> List.map(((key, value)) => (value_name(key), value));
-    let (_missing, values) =
-      List.append(values, properties) |> Patch.patch_values;
+  let emit_values = values =>
     values
     |> List.map(((name, value)) => {
          let name = Escape.name(name);
@@ -136,6 +130,31 @@ module Emit = {
          value_binding(~pat=pvar(name), ~expr);
        })
     |> pstr_value(Asttypes.Recursive);
+  let emit_check_map = values => {
+    let key_to_value_list =
+      values
+      |> List.map(((name, _)) =>
+           pexp_tuple([
+             estring(name),
+             eapply(evar("check"), [Escape.name(name) |> evar]),
+           ])
+         )
+      |> elist;
+    let key_to_value_seq = eapply(evar("List.to_seq"), [key_to_value_list]);
+    let key_to_value_map =
+      eapply(evar("StringMap.of_seq"), [key_to_value_seq]);
+    let binding =
+      value_binding(~pat=pvar("check_map"), ~expr=key_to_value_map);
+    pstr_value(Asttypes.Nonrecursive, [binding]);
+  };
+  let emit_code = (~values, ~properties) => {
+    let properties =
+      properties |> List.map(((key, value)) => ("property_" ++ key, value));
+    let values =
+      values |> List.map(((key, value)) => (value_name(key), value));
+    let (_missing, values) =
+      List.append(values, properties) |> Patch.patch_values;
+    [emit_values(values), emit_check_map(values)];
   };
 };
 
@@ -153,5 +172,6 @@ let values =
 let properties =
   read_file("./bin/properties.json") |> Yojson.from_string |> pairs_of_yojson;
 
-Pprintast.string_of_structure([emit_code(~values, ~properties)])
+emit_code(~values, ~properties)
+|> Pprintast.string_of_structure
 |> print_endline;
