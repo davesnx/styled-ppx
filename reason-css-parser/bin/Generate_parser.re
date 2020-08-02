@@ -120,7 +120,8 @@ module Emit = {
   let value_name = key => {
     open String;
     let len = length(key);
-    sub(key, len - 2, 2) == "()" ? "function_" ++ sub(key, 0, len - 2) : key;
+    len > 2 && sub(key, len - 2, 2) == "()"
+      ? "function_" ++ sub(key, 0, len - 2) : key;
   };
 
   let emit_values = values =>
