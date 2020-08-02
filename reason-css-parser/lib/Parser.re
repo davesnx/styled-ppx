@@ -1206,7 +1206,7 @@ and property_max_height = [%value.rec
 and property_max_inline_size = [%value.rec "<'max-width'>"]
 and property_max_lines = [%value.rec "'none' | <integer>"]
 and property_max_width = [%value.rec
-  "<length> | <percentage> | 'none' | 'max-content' | 'min-content' | 'fit-content' | 'fill-available' | <-non-standard-width>"
+  "<length> | <percentage> | 'none' | 'max-content' | 'min-content' | fit-content( <length-percentage> ) | 'fill-available' | <-non-standard-width>"
 ]
 and property_min_block_size = [%value.rec "<'min-width'>"]
 and property_min_height = [%value.rec
@@ -1214,7 +1214,7 @@ and property_min_height = [%value.rec
 ]
 and property_min_inline_size = [%value.rec "<'min-width'>"]
 and property_min_width = [%value.rec
-  "<length> | <percentage> | 'auto' | 'max-content' | 'min-content' | 'fit-content' | 'fill-available' | <-non-standard-width>"
+  "<length> | <percentage> | 'auto' | 'max-content' | 'min-content' | fit-content( <length-percentage> ) | 'fill-available' | <-non-standard-width>"
 ]
 and property_mix_blend_mode = [%value.rec "<blend-mode>"]
 and property_object_fit = [%value.rec
@@ -1655,7 +1655,7 @@ and track_list_v0 = [%value.rec
   "[ [ <string> ]* <track-group> [ <string> ]* ]+ | 'none'"
 ]
 and track_minmax = [%value.rec
-  "minmax( <track-breadth> ',' <track-breadth> ) | 'auto' | <track-breadth> | 'fit-content'"
+  "minmax( <track-breadth> ',' <track-breadth> ) | 'auto' | <track-breadth> | fit-content( <length-percentage> )"
 ]
 and track_repeat = [%value.rec
   "repeat( <positive-integer> ',' [ [ <line-names> ]? <track-size> ]+ [ <line-names> ]? )"
