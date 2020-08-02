@@ -898,7 +898,7 @@ module Component = {
     (string, Js.t({..}), array(React.element)) => React.element =
     "createElement";
 
-  let styles = Css.style([Css.display(`block)]);
+  let styles = Css.style([Css.unsafe("display", "block")]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
@@ -1787,7 +1787,11 @@ module Component = {
     (string, Js.t({..}), array(React.element)) => React.element =
     "createElement";
 
-  let styles = Css.style([Css.display(`flex), Css.justifyContent(`center)]);
+  let styles =
+    Css.style([
+      Css.unsafe("display", "flex"),
+      Css.unsafe("justifyContent", "center"),
+    ]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
@@ -2678,7 +2682,7 @@ module Component = {
     (string, Js.t({..}), array(React.element)) => React.element =
     "createElement";
 
-  let styles = Css.style([Css.color(var), Css.display(`block)]);
+  let styles = Css.style([Css.color(var), Css.unsafe("display", "block")]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
@@ -2695,7 +2699,7 @@ module Component = {
   };
 };
 
-Css.style([Css.display(`block)]);
+Css.style([Css.unsafe("display", "block")]);
 
 module Component = {
   [@bs.deriving abstract]
@@ -5351,8 +5355,8 @@ module NestedSelectors = {
 
   let styles =
     Css.style([
-      Css.display(`flex),
-      Css.justifyContent(`center),
+      Css.unsafe("display", "flex"),
+      Css.unsafe("justifyContent", "center"),
       Css.selector({js|& > a|js}, [Css.backgroundColor(Css.green)]),
       Css.selector(
         {js|&:nth-child(even)|js},

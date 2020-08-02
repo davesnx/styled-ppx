@@ -126,7 +126,12 @@ let variants_to_expression =
   | `Groove => id([%expr `groove])
   | `Ridge => id([%expr `ridge])
   | `Inset => id([%expr `inset])
-  | `Outset => id([%expr `outset]);
+  | `Outset => id([%expr `outset])
+  | `Contain => id([%expr `contain])
+  | `Scale_down => id([%expr `scaleDown])
+  | `Cover => id([%expr `cover])
+  | `Full_width => raise(Unsupported_feature)
+  | `Full_size_kana => raise(Unsupported_feature);
 
 let variable_rule = {
   open Rule;
@@ -204,10 +209,12 @@ let width =
     property_width,
     fun
     | `Auto => variants_to_expression(`Auto)
-    | `Length_percentage(lp) => render_length_percentage(lp)
+    | `Length(_) as lp
+    | `Percentage(_) as lp => render_length_percentage(lp)
     | `Max_content
     | `Min_content => raise(Unsupported_feature)
-    | `Fit_content(lp) => render_function_fit_content(lp),
+    | `Fit_content(lp) => render_function_fit_content(lp)
+    | _ => raise(Unsupported_feature),
     [%expr Css.width],
   );
 let height =
@@ -232,12 +239,14 @@ let max_width =
   apply(
     property_max_width,
     fun
+    | `Auto => raise(Unsupported_feature)
     | `None => variants_to_expression(`None)
-    | `Length_percentage(lp) =>
-      apply_value(width.value_of_ast, `Length_percentage(lp))
-    | `Max_content => apply_value(width.value_of_ast, `Max_content)
-    | `Min_content => apply_value(width.value_of_ast, `Min_content)
-    | `Fit_content(lp) => apply_value(width.value_of_ast, `Fit_content(lp)),
+    | `Length(_) as ast
+    | `Percentage(_) as ast
+    | `Max_content as ast
+    | `Min_content as ast
+    | `Fit_content(_) as ast => apply_value(width.value_of_ast, ast)
+    | _ => raise(Unsupported_feature),
     [%expr Css.maxWidth],
   );
 let max_height =
@@ -256,7 +265,8 @@ let margin_top =
     property_margin_top,
     fun
     | `Auto => variants_to_expression(`Auto)
-    | `Length_percentage(lp) => render_length_percentage(lp),
+    | `Length(_) as lp
+    | `Percentage(_) as lp => render_length_percentage(lp),
     [%expr Css.marginTop],
   );
 let margin_right =
@@ -348,6 +358,7 @@ let padding =
 
 let render_named_color =
   fun
+  | `Transparent => variants_to_expression(`Transparent)
   | `Aliceblue => [%expr Css.aliceblue]
   | `Antiquewhite => [%expr Css.antiquewhite]
   | `Aqua => [%expr Css.aqua]
@@ -495,7 +506,8 @@ let render_named_color =
   | `White => [%expr Css.white]
   | `Whitesmoke => [%expr Css.whitesmoke]
   | `Yellow => [%expr Css.yellow]
-  | `Yellowgreen => [%expr Css.yellowgreen];
+  | `Yellowgreen => [%expr Css.yellowgreen]
+  | _ => raise(Unsupported_feature);
 let render_color_alpha =
   fun
   | `Number(number) => render_number(number)
@@ -506,13 +518,15 @@ let render_function_rgb = ast => {
 
   let (colors, alpha) =
     switch (ast) {
-    | `Number(`Static_0(colors, alpha))
-    | `Number(`Static_1(colors, alpha)) => (colors, alpha)
-    | `Percentage(`Static_0(colors, alpha))
-    | `Percentage(`Static_1(colors, alpha)) => (
-        colors |> List.map(to_number),
-        alpha,
-      )
+    /* 1 and 3 = numbers, 0 and 2 = percentage */
+    | `Rgb_1(colors, alpha)
+    | `Rgba_1(colors, alpha)
+    | `Rgb_3(colors, alpha)
+    | `Rgba_3(colors, alpha) => (colors, alpha)
+    | `Rgb_0(colors, alpha)
+    | `Rgba_0(colors, alpha)
+    | `Rgb_2(colors, alpha)
+    | `Rgba_2(colors, alpha) => (colors |> List.map(to_number), alpha)
     };
   let (red, green, blue) =
     switch (colors) {
@@ -558,20 +572,25 @@ let render_function_hsl = ((hue, saturation, lightness, alpha)) => {
   | None => id([%expr `hsl(([%e hue], [%e saturation], [%e lightness]))])
   };
 };
+
 let render_color =
   fun
   | `Hex_color(hex) => id([%expr `hex([%e render_string(hex)])])
   | `Named_color(color) => render_named_color(color)
   | `Currentcolor => variants_to_expression(`Currentcolor)
-  | `Transparent => variants_to_expression(`Transparent)
-  | `Function_rgb(`Rgb(rgb))
-  | `Function_rgb(`Rgba(rgb)) => render_function_rgb(rgb)
-  | `Function_hsl(hsl) => render_function_hsl(hsl)
+  | `Function_rgb(rgb)
+  | `Function_rgba(rgb) => render_function_rgb(rgb)
+  | `Function_hsl(`Hsl_0(hsl))
+  | `Function_hsla(`Hsl_0(hsl)) => render_function_hsl(hsl)
+  | `Function_hsl(_)
+  | `Function_hsla(_)
   | `Function_hwb(_)
   | `Function_lab(_)
   | `Function_lch(_)
   | `Function_color(_)
-  | `Function_device_cmyk(_) => raise(Unsupported_feature);
+  | `Function_device_cmyk(_)
+  | `Deprecated_system_color(_) => raise(Unsupported_feature);
+
 let color = apply(property_color, render_color, [%expr Css.color]);
 let opacity =
   apply(
@@ -639,14 +658,7 @@ let render_position = position => {
   id([%expr `hv(([%e horizontal], [%e vertical]))]);
 };
 
-let object_fit =
-  apply(
-    property_object_fit,
-    fun
-    | (`Fill | `None) as variant => variants_to_expression(variant)
-    | `Or(_) => raise(Unsupported_feature),
-    [%expr Css.objectFit],
-  );
+let object_fit = variants(property_object_fit, [%expr Css.objectFit]);
 let object_position =
   apply(
     property_object_position,
@@ -661,15 +673,16 @@ let image_rendering = unsupported(property_image_rendering);
 let render_shadow = shadow => {
   let (color, x, y, blur, spread, inset) =
     switch (shadow) {
-    | `Box(color, position, inset) =>
+    | `Box(inset, position, color) =>
       let color = Option.value(~default=`Currentcolor, color);
       let (x, y, blur, spread) = {
-        let (x, y) =
+        let (x, y, blur, spread) =
           switch (position) {
-          | ([x, y], _, _) => (x, y)
+          | [x, y] => (x, y, None, None)
+          | [x, y, blur] => (x, y, Some(blur), None)
+          | [x, y, blur, spread] => (x, y, Some(blur), Some(spread))
           | _ => failwith("unreachable")
           };
-        let (_, blur, spread) = position;
         (x, y, blur, spread);
       };
       (color, x, y, blur, spread, inset);
@@ -863,7 +876,10 @@ let overflow_y = variants(property_overflow_y, [%expr Css.overflowY]);
 let overflow =
   emit(
     property_overflow,
-    List.map(apply_value(overflow_x.value_of_ast)),
+    fun
+    | `Xor(values) =>
+      values |> List.map(apply_value(overflow_x.value_of_ast))
+    | _ => raise(Unsupported_feature),
     fun
     | [all] => [[%expr Css.overflow([%e all])]]
     | [x, y] =>
@@ -873,26 +889,17 @@ let overflow =
       ])
     | _ => failwith("unreachable"),
   );
-let overflow_clip_margin = unsupported(property_overflow_clip_margin);
+// let overflow_clip_margin = unsupported(property_overflow_clip_margin);
 let overflow_inline = unsupported(property_overflow_inline);
 let text_overflow =
-  variants(property_text_overflow, [%expr Css.textOverflow]);
-let block_ellipsis = unsupported(property_block_ellipsis);
+  unsupported(property_text_overflow, ~call=[%expr Css.textOverflow]);
+// let block_ellipsis = unsupported(property_block_ellipsis);
 let max_lines = unsupported(property_max_lines);
-let continue = unsupported(property_continue);
+// let continue = unsupported(property_continue);
 
 // css-text-3
 let text_transform =
-  apply(
-    property_text_transform,
-    fun
-    | `None => variants_to_expression(`None)
-    | `Or(Some(value), None, None) => variants_to_expression(value)
-    | `Or(_, Some(_), _)
-    | `Or(_, _, Some(_)) => raise(Unsupported_feature)
-    | `Or(None, None, None) => failwith("unrecheable"),
-    [%expr Css.textTransform],
-  );
+  variants(property_text_transform, [%expr Css.textTransform]);
 let white_space = variants(property_white_space, [%expr Css.whiteSpace]);
 let tab_size = unsupported(property_tab_size);
 let word_break = variants(property_word_break, [%expr Css.wordBreak]);
@@ -902,7 +909,7 @@ let overflow_wrap =
   variants(property_overflow_wrap, [%expr Css.overflowWrap]);
 let word_wrap = variants(property_word_wrap, [%expr Css.wordWrap]);
 let text_align = variants(property_text_align, [%expr Css.textAlign]);
-let text_align_all = unsupported(property_text_align_all);
+// let text_align_all = unsupported(property_text_align_all);
 let text_align_last = unsupported(property_text_align_last);
 let text_justify = unsupported(property_text_justify);
 let word_spacing =
@@ -910,7 +917,7 @@ let word_spacing =
     property_word_spacing,
     fun
     | `Normal => variants_to_expression(`Normal)
-    | `Length(l) => render_length(l),
+    | `Length_percentage(lp) => render_length_percentage(lp),
     [%expr Css.wordSpacing],
   );
 let letter_spacing =
@@ -918,7 +925,7 @@ let letter_spacing =
     property_word_spacing,
     fun
     | `Normal => variants_to_expression(`Normal)
-    | `Length(l) => render_length(l),
+    | `Length_percentage(lp) => render_length_percentage(lp),
     [%expr Css.letterSpacing],
   );
 let text_indent =
@@ -942,10 +949,10 @@ let font_style =
 let font_size = unsupported(property_font_size, ~call=[%expr Css.fontSize]);
 let font_size_adjust = unsupported(property_font_size_adjust);
 let font = unsupported(property_font);
-let font_synthesis_weight = unsupported(property_font_synthesis_weight);
-let font_synthesis_style = unsupported(property_font_synthesis_style);
-let font_synthesis_small_caps =
-  unsupported(property_font_synthesis_small_caps);
+// let font_synthesis_weight = unsupported(property_font_synthesis_weight);
+// let font_synthesis_style = unsupported(property_font_synthesis_style);
+// let font_synthesis_small_caps =
+// unsupported(property_font_synthesis_small_caps);
 let font_synthesis = unsupported(property_font_synthesis);
 let font_kerning = unsupported(property_font_kerning);
 let font_variant_ligatures = unsupported(property_font_variant_ligatures);
@@ -959,8 +966,8 @@ let font_variant =
 let font_feature_settings = unsupported(property_font_feature_settings);
 let font_optical_sizing = unsupported(property_font_optical_sizing);
 let font_variation_settings = unsupported(property_font_variation_settings);
-let font_palette = unsupported(property_font_palette);
-let font_variant_emoji = unsupported(property_font_variant_emoji);
+// let font_palette = unsupported(property_font_palette);
+// let font_variant_emoji = unsupported(property_font_variant_emoji);
 
 // css-text-decor-3
 let text_decoration_line =
@@ -985,19 +992,19 @@ let text_decoration =
 let text_underline_position = unsupported(property_text_underline_position);
 let text_underline_offset = unsupported(property_text_underline_offset);
 let text_decoration_skip = unsupported(property_text_decoration_skip);
-let text_decoration_skip_self =
-  unsupported(property_text_decoration_skip_self);
-let text_decoration_skip_box = unsupported(property_text_decoration_skip_box);
-let text_decoration_skip_inset =
-  unsupported(property_text_decoration_skip_inset);
-let text_decoration_skip_spaces =
-  unsupported(property_text_decoration_skip_spaces);
+// let text_decoration_skip_self =
+//   unsupported(property_text_decoration_skip_self);
+// let text_decoration_skip_box = unsupported(property_text_decoration_skip_box);
+// let text_decoration_skip_inset =
+//   unsupported(property_text_decoration_skip_inset);
+// let text_decoration_skip_spaces =
+//   unsupported(property_text_decoration_skip_spaces);
 let text_decoration_skip_ink = unsupported(property_text_decoration_skip_ink);
 let text_emphasis_style = unsupported(property_text_emphasis_style);
 let text_emphasis_color = unsupported(property_text_emphasis_color);
 let text_emphasis = unsupported(property_text_emphasis);
 let text_emphasis_position = unsupported(property_text_emphasis_position);
-let text_emphasis_skip = unsupported(property_text_emphasis_skip);
+// let text_emphasis_skip = unsupported(property_text_emphasis_skip);
 let text_shadow =
   unsupported(property_text_shadow, ~call=[%expr Css.textShadow]);
 
@@ -1148,11 +1155,13 @@ let flex =
   );
 // TODO: justify_content, align_items, align_self, align_content are only for flex, missing the css-align-3 at parser
 let justify_content =
-  variants(property_justify_content, [%expr Css.justifyContent]);
-let align_items = variants(property_align_items, [%expr Css.alignItems]);
-let align_self = variants(property_align_self, [%expr Css.alignSelf]);
+  unsupported(property_justify_content, ~call=[%expr Css.justifyContent]);
+let align_items =
+  unsupported(property_align_items, ~call=[%expr Css.alignItems]);
+let align_self =
+  unsupported(property_align_self, ~call=[%expr Css.alignSelf]);
 let align_content =
-  variants(property_align_content, [%expr Css.alignContent]);
+  unsupported(property_align_content, ~call=[%expr Css.alignContent]);
 
 // css-grid-1
 let grid_template_columns =
@@ -1191,6 +1200,8 @@ let grid_column =
   unsupported(property_grid_column, ~call=[%expr Css.gridColumn]);
 let grid_area = unsupported(property_grid_area, ~call=[%expr Css.gridArea]);
 
+let display = unsupported(property_display, ~call=[%expr Css.display]);
+
 let found = ({ast_of_string, string_to_expr, _}) => {
   let check_value = string => {
     let.ok _ = ast_of_string(string);
@@ -1199,6 +1210,7 @@ let found = ({ast_of_string, string_to_expr, _}) => {
   (check_value, string_to_expr);
 };
 let properties = [
+  ("display", found(display)),
   // css-sizing-3
   ("width", found(width)),
   ("height", found(height)),
@@ -1274,12 +1286,12 @@ let properties = [
   ("overflow-x", found(overflow_x)),
   ("overflow-y", found(overflow_y)),
   ("overflow", found(overflow)),
-  ("overflow-clip-margin", found(overflow_clip_margin)),
+  // ("overflow-clip-margin", found(overflow_clip_margin)),
   ("overflow-inline", found(overflow_inline)),
   ("text-overflow", found(text_overflow)),
-  ("block-ellipsis", found(block_ellipsis)),
+  // ("block-ellipsis", found(block_ellipsis)),
   ("max-lines", found(max_lines)),
-  ("continue", found(continue)),
+  // ("continue", found(continue)),
   // css-text-3
   ("text-transform", found(text_transform)),
   ("white-space", found(white_space)),
@@ -1290,7 +1302,7 @@ let properties = [
   ("overflow-wrap", found(overflow_wrap)),
   ("word-wrap", found(word_wrap)),
   ("text-align", found(text_align)),
-  ("text-align-all", found(text_align_all)),
+  // ("text-align-all", found(text_align_all)),
   ("text-align-last", found(text_align_last)),
   ("text-justify", found(text_justify)),
   ("word-spacing", found(word_spacing)),
@@ -1305,9 +1317,9 @@ let properties = [
   ("font-size", found(font_size)),
   ("font-size-adjust", found(font_size_adjust)),
   ("font", found(font)),
-  ("font-synthesis-weight", found(font_synthesis_weight)),
-  ("font-synthesis-style", found(font_synthesis_style)),
-  ("font-synthesis-small-caps", found(font_synthesis_small_caps)),
+  // ("font-synthesis-weight", found(font_synthesis_weight)),
+  // ("font-synthesis-style", found(font_synthesis_style)),
+  // ("font-synthesis-small-caps", found(font_synthesis_small_caps)),
   ("font-synthesis", found(font_synthesis)),
   ("font-kerning", found(font_kerning)),
   ("font-variant-ligatures", found(font_variant_ligatures)),
@@ -1320,8 +1332,8 @@ let properties = [
   ("font-feature-settings", found(font_feature_settings)),
   ("font-optical-sizing", found(font_optical_sizing)),
   ("font-variation-settings", found(font_variation_settings)),
-  ("font-palette", found(font_palette)),
-  ("font-variant-emoji", found(font_variant_emoji)),
+  // ("font-palette", found(font_palette)),
+  // ("font-variant-emoji", found(font_variant_emoji)),
   // css-text-decor-3
   ("text-decoration-line", found(text_decoration_line)),
   ("text-decoration-style", found(text_decoration_style)),
@@ -1331,16 +1343,16 @@ let properties = [
   ("text-underline-position", found(text_underline_position)),
   ("text-underline-offset", found(text_underline_offset)),
   ("text-decoration-skip", found(text_decoration_skip)),
-  ("text-decoration-skip-self", found(text_decoration_skip_self)),
-  ("text-decoration-skip-box", found(text_decoration_skip_box)),
-  ("text-decoration-skip-inset", found(text_decoration_skip_inset)),
-  ("text-decoration-skip-spaces", found(text_decoration_skip_spaces)),
+  // ("text-decoration-skip-self", found(text_decoration_skip_self)),
+  // ("text-decoration-skip-box", found(text_decoration_skip_box)),
+  // ("text-decoration-skip-inset", found(text_decoration_skip_inset)),
+  // ("text-decoration-skip-spaces", found(text_decoration_skip_spaces)),
   ("text-decoration-skip-ink", found(text_decoration_skip_ink)),
   ("text-emphasis-style", found(text_emphasis_style)),
   ("text-emphasis-color", found(text_emphasis_color)),
   ("text-emphasis", found(text_emphasis)),
   ("text-emphasis-position", found(text_emphasis_position)),
-  ("text-emphasis-skip", found(text_emphasis_skip)),
+  // ("text-emphasis-skip", found(text_emphasis_skip)),
   ("text-shadow", found(text_shadow)),
   // css-transforms2
   ("transform", found(transform)),
@@ -1401,38 +1413,52 @@ let properties = [
 ];
 
 let support_property = name =>
-  properties |> List.exists(((key, _)) => key == name);
+  Parser.check_map
+  |> StringMap.find_opt("property-" ++ name)
+  |> Option.is_some;
 
 let render_when_unsupported_features = (name, value) => {
   let to_camel_case = name =>
-    name
-    |> String.split_on_char('-')
-    |> List.map(String.capitalize_ascii)
-    |> String.concat("")
-    |> String.uncapitalize_ascii;
+    (
+      switch (String.split_on_char('-', name)) {
+      | [first, ...remaining] => [
+          first,
+          ...List.map(String.capitalize_ascii, remaining),
+        ]
+      | [] => []
+      }
+    )
+    |> String.concat("");
 
   let name = to_camel_case(name) |> Const.string |> Exp.constant;
   let value = value |> Const.string |> Exp.constant;
 
   id([%expr Css.unsafe([%e name], [%e value])]);
 };
+
+let render_to_expr = (name, value) => {
+  let.ok string_to_expr =
+    switch (properties |> List.find_opt(((key, _)) => key == name)) {
+    | Some((_, (_, string_to_expr))) => Ok(string_to_expr)
+    | None => Error(`Not_found)
+    };
+  string_to_expr(value) |> Result.map_error(str => `Invalid_value(str));
+};
 let parse_declarations = ((name, value)) => {
-  let map_parse_error = result =>
-    Result.map_error(str => `Invalid_value(str), result);
+  open Parser;
 
-  let.ok (_, (check_string, string_to_expr)) =
-    properties
-    |> List.find_opt(((key, _)) => key == name)
-    |> Option.to_result(~none=`Not_found);
-
+  let.ok is_valid_string =
+    check_property(~name, value)
+    |> Result.map_error((`Unknown_value) => `Not_found);
   switch (render_css_wide_keywords(name, value)) {
   | Ok(value) => Ok(value)
   | Error(_) =>
-    let.ok () = check_string(value) |> map_parse_error;
-    switch (string_to_expr(value)) {
-    | result => map_parse_error(result)
+    switch (render_to_expr(name, value)) {
+    | Ok(value) => Ok(value)
+    | Error(_)
     | exception Unsupported_feature =>
-      Ok([render_when_unsupported_features(name, value)])
-    };
+      let.ok () = is_valid_string ? Ok() : Error(`Invalid_value(value));
+      Ok([render_when_unsupported_features(name, value)]);
+    }
   };
 };

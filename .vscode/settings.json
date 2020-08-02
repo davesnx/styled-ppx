@@ -3,7 +3,7 @@
     "editor.formatOnSave": true
   },
   "ocaml.sandbox": {
-    "root": "/Users/davesnx/dev/github/styled-ppx",
+    "root": "/home/eduardo/reason/styled-ppx",
     "kind": "esy"
   },
 }
