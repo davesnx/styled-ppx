@@ -30,7 +30,7 @@ let parse_tokens = (prop, tokens_with_loc) => {
     };
   Ok(output);
 };
-let parse = (prop, str) => {
+let parse = (prop: Rule.rule('a), str) => {
   let.ok tokens_with_loc =
     Reason_css_lexer.from_string(str) |> Result.map_error(_ => "frozen");
   parse_tokens(prop, tokens_with_loc);
