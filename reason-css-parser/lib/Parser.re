@@ -56,7 +56,7 @@ and _non_standard_width = [%value.rec
   "'min-intrinsic' | 'intrinsic' | '-moz-min-content' | '-moz-max-content' | '-webkit-min-content' | '-webkit-max-content'"
 ]
 and _webkit_gradient_color_stop = [%value.rec
-  "from( <color> ) | color-stop( [ <number-zero-one> | <percentage> ] ',' <color> ) | to( <color> )"
+  "from( <color> ) | color-stop( [ <alpha-value> | <percentage> ] ',' <color> ) | to( <color> )"
 ]
 and _webkit_gradient_point = [%value.rec
   "[ 'left' | 'center' | 'right' | <length-percentage> ] [ 'top' | 'center' | 'bottom' | <length-percentage> ]"
@@ -1001,7 +1001,7 @@ and property_dominant_baseline = [%value.rec
 ]
 and property_empty_cells = [%value.rec "'show' | 'hide'"]
 and property_fill = [%value.rec "<paint>"]
-and property_fill_opacity = [%value.rec "<number-zero-one>"]
+and property_fill_opacity = [%value.rec "<alpha-value>"]
 and property_fill_rule = [%value.rec "'nonzero' | 'evenodd'"]
 and property_filter = [%value.rec
   "'none' | <filter-function-list> | <-ms-filter-function-list>"
@@ -1231,7 +1231,7 @@ and property_offset_path = [%value.rec
 ]
 and property_offset_position = [%value.rec "'auto' | <position>"]
 and property_offset_rotate = [%value.rec "[ 'auto' | 'reverse' ] || <angle>"]
-and property_opacity = [%value.rec "<number-zero-one>"]
+and property_opacity = [%value.rec "<alpha-value>"]
 and property_order = [%value.rec "<integer>"]
 and property_orphans = [%value.rec "<integer>"]
 and property_outline = [%value.rec
@@ -1424,7 +1424,7 @@ and property_stroke_dashoffset = [%value.rec "<svg-length>"]
 and property_stroke_linecap = [%value.rec "'butt' | 'round' | 'square'"]
 and property_stroke_linejoin = [%value.rec "'miter' | 'round' | 'bevel'"]
 and property_stroke_miterlimit = [%value.rec "<number-one-or-greater>"]
-and property_stroke_opacity = [%value.rec "<number-zero-one>"]
+and property_stroke_opacity = [%value.rec "<alpha-value>"]
 and property_stroke_width = [%value.rec "<svg-length>"]
 and property_tab_size = [%value.rec "<integer> | <length>"]
 and property_table_layout = [%value.rec "'auto' | 'fixed'"]
@@ -1941,7 +1941,7 @@ let check_map =
       ("nth", check(nth)),
       ("number-one-or-greater", check(number_one_or_greater)),
       ("number-percentage", check(number_percentage)),
-      ("number-zero-one", check(number_zero_one)),
+      ("alpha-value", check(number_zero_one)),
       ("numeric-figure-values", check(numeric_figure_values)),
       ("numeric-fraction-values", check(numeric_fraction_values)),
       ("numeric-spacing-values", check(numeric_spacing_values)),
