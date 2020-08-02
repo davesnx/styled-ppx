@@ -71,8 +71,12 @@ module Patch = {
            );
       let values = values |> List.rev;
       (missing, Combinator(kind, values));
-    | Group(value, _) => patch_dependencies(value_map, value)
-    | Function_call(_, value) => patch_dependencies(value_map, value)
+    | Group(value, multiplier) =>
+      let (missing, value) = patch_dependencies(value_map, value);
+      (missing, Group(value, multiplier));
+    | Function_call(name, value) =>
+      let (missing, value) = patch_dependencies(value_map, value);
+      (missing, Function_call(name, value));
     };
 
   let patch_values = values => {
