@@ -28,6 +28,7 @@ open Parsetree;
 open Longident;
 open Css_types;
 open Component_value;
+open Ppxlib.Ast_builder.Default;
 
 module Emotion = {
   let lident = name => Ldot(Lident("Css"), name);
@@ -65,6 +66,14 @@ let list_to_expr = (end_loc, xs) =>
     xs,
   );
 
+let source_code_of_loc = loc => {
+  let Warnings.{loc_start, loc_end, _} = loc;
+  let Lex_buffer.{buf, pos, _} = Lex_buffer.last_buffer^;
+  let pos_offset = pos.Lexing.pos_cnum;
+  let loc_start = loc_start.Lexing.pos_cnum - pos_offset;
+  let loc_end = loc_end.Lexing.pos_cnum - pos_offset;
+  Sedlexing.Latin1.sub_lexeme(buf, loc_start - 1, loc_end - loc_start);
+};
 let rec render_at_rule = (ar: At_rule.t): expression =>
   switch (ar.At_rule.name) {
   | ("keyframes" as n, loc) =>
@@ -128,9 +137,69 @@ let rec render_at_rule = (ar: At_rule.t): expression =>
       Exp.apply(~loc=ar.At_rule.loc, ident, [(Nolabel, arg)]);
     | _ => assert(false)
     };
+  | ("media", _) => render_media_query(ar)
   | (n, _) =>
     grammar_error(ar.At_rule.loc, "At-rule @" ++ n ++ " not supported")
   }
+and render_media_query = (ar: At_rule.t): expression => {
+  let invalid_format = loc =>
+    grammar_error(loc, "@media value isn't a valid format");
+
+  let loc = ar.At_rule.loc;
+  let (_, name_loc) = ar.At_rule.name;
+  let (prelude, prelude_loc) = ar.At_rule.prelude;
+  let parse_condition =
+    fun
+    | (
+        Paren_block([
+          (Ident(ident), ident_loc),
+          (Delim(":"), _),
+          (_, first_value_loc),
+          ...values,
+        ]),
+        complete_loc,
+      ) => {
+        let values = values |> List.map(((_, loc)) => loc);
+        let values_length = List.length(values);
+        let last_value_loc =
+          values_length == 0
+            ? first_value_loc : List.nth(values, values_length - 1);
+        let loc = {
+          ...first_value_loc,
+          loc_end: last_value_loc.Location.loc_end,
+        };
+        let value = source_code_of_loc(loc);
+        let () =
+          switch (Declarations_to_emotion.parse_declarations((ident, value))) {
+          | Error(`Not_found) =>
+            grammar_error(ident_loc, "unsupported property: " ++ ident)
+          | Error(`Invalid_value(_)) => grammar_error(loc, "invalid value")
+          | Ok(_) => ()
+          };
+        source_code_of_loc(complete_loc);
+      }
+    | (Ident("and"), _) => "and"
+    | (Ident("or"), _) => "or"
+    | (_, loc) => invalid_format(loc);
+  let query = prelude |> List.map(parse_condition) |> String.concat(" ");
+  if (query == "") {
+    invalid_format(prelude_loc);
+  };
+
+  let rules =
+    switch (ar.At_rule.block) {
+    | Brace_block.Empty => invalid_format(loc)
+    | Declaration_list(declaration) =>
+      render_declaration_list(declaration, None)
+    | Stylesheet(_) => invalid_format(loc)
+    };
+
+  let media_ident =
+    Emotion.lident("media")
+    |> Located.mk(~loc=name_loc)
+    |> pexp_ident(~loc=name_loc);
+  eapply(~loc, media_ident, [estring(~loc=prelude_loc, query), rules]);
+}
 and render_declaration =
     (
       d: Declaration.t,
@@ -141,14 +210,7 @@ and render_declaration =
   let (name, _name_loc) = d.Declaration.name;
   let (_valueList, loc) = d.Declaration.value;
 
-  let value_source = {
-    let Warnings.{loc_start, loc_end, _} = loc;
-    let Lex_buffer.{buf, pos, _} = Lex_buffer.last_buffer^;
-    let pos_offset = pos.Lexing.pos_cnum;
-    let loc_start = loc_start.Lexing.pos_cnum - pos_offset;
-    let loc_end = loc_end.Lexing.pos_cnum - pos_offset;
-    Sedlexing.Latin1.sub_lexeme(buf, loc_start - 1, loc_end - loc_start);
-  };
+  let value_source = source_code_of_loc(loc);
 
   switch (Declarations_to_emotion.parse_declarations((name, value_source))) {
   | Ok(exprs) => exprs

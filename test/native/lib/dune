@@ -1,7 +1,8 @@
 (library
  (name StyledPpxTestNativeLib)
  (modules
-  (:standard \ static_css_tests selectors_css_tests TestRunner))
+  (:standard \ static_css_tests selectors_css_tests media_query_css_tests
+    TestRunner))
  (library_flags
   (-linkall -g))
  (libraries StyledPpxTestNativeBSCSS rely.lib styled-ppx.lib ppxlib)
@@ -11,14 +12,14 @@
 (executable
  (name TestRunner)
  (modules TestRunner)
- (libraries StyledPpxTestNativeLib)
+ (libraries StyledPpxTestNativeLib styled-ppx.parser)
  (preprocess
   (pps ppx_tools_versioned.metaquot_410 styled-ppx.lib)))
 
 ; type check
 
 (rule
- (targets static_css_tests.ml selectors_css_tests.ml)
+ (targets static_css_tests.ml selectors_css_tests.ml media_query_css_tests.ml)
  (deps ./TestRunner.exe)
  (action
   (run %{deps})))
@@ -26,7 +27,7 @@
 (library
  (name StyledPpxTestNativeTypeCheck)
  (libraries StyledPpxTestNativeBSCSS)
- (modules static_css_tests selectors_css_tests)
+ (modules static_css_tests selectors_css_tests media_query_css_tests)
  (preprocess
   (pps ppx_tools_versioned.metaquot_410 styled-ppx.lib)))
 
@@ -34,7 +35,8 @@
  (alias run_typecheck_test)
  (deps
    .StyledPpxTestNativeTypeCheck.objs/byte/styledPpxTestNativeTypeCheck__Static_css_tests.cmi
-   .StyledPpxTestNativeTypeCheck.objs/byte/styledPpxTestNativeTypeCheck__Selectors_css_tests.cmi)
+   .StyledPpxTestNativeTypeCheck.objs/byte/styledPpxTestNativeTypeCheck__Selectors_css_tests.cmi
+   .StyledPpxTestNativeTypeCheck.objs/byte/styledPpxTestNativeTypeCheck__Media_query_css_tests.cmi)
  (action
   ; this is only because a action is required
   (echo %{deps})))
