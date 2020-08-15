@@ -78,6 +78,13 @@ at_rule:
         loc = Lex_buffer.make_loc $startpos $endpos;
       }
     }
+  | name = NESTED_AT_RULE; xs = prelude_with_loc; LEFT_BRACE; ds = declarations_with_loc; RIGHT_BRACE {
+      { At_rule.name = (name, Lex_buffer.make_loc $startpos(name) $endpos(name));
+        prelude = xs;
+        block = Brace_block.Declaration_list ds;
+        loc = Lex_buffer.make_loc $startpos $endpos;
+      }
+    }
   ;
 
 style_rule:

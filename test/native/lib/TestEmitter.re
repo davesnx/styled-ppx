@@ -326,18 +326,47 @@ let selectors_static_css_tests = [%expr
     ),
   |]
 ];
+let media_query_static_css_tests = [%expr
+  [|
+    (
+      [%css {|color: blue; @media (min-width: 30em) { color: red; }|}],
+      [
+        Css.color(Css.blue),
+        Css.media("(min-width: 30em)", [Css.color(Css.red)]),
+      ],
+    ),
+    (
+      [%css
+        {|@media (min-width: 30em) and (min-height: 20em) { color: brown; }|}
+      ],
+      [
+        Css.media(
+          "(min-width: 30em) and (min-height: 20em)",
+          [Css.color(Css.brown)],
+        ),
+      ],
+    ),
+  |]
+];
 describe("emit bs-css from static [%css]", ({test, _}) => {
   let test = (prefix, index, (result, expected)) =>
     test(prefix ++ string_of_int(index), compare(result, expected));
   let properties_static_css_tests =
     extract_tests(properties_static_css_tests);
   let selectors_static_css_tests = extract_tests(selectors_static_css_tests);
+  let media_query_static_css_tests =
+    extract_tests(media_query_static_css_tests);
 
   write_tests_to_file(properties_static_css_tests, "static_css_tests.ml");
   write_tests_to_file(selectors_static_css_tests, "selectors_css_tests.ml");
+  write_tests_to_file(
+    media_query_static_css_tests,
+    "media_query_css_tests.ml",
+  );
 
   List.iteri(test("properties static: "), properties_static_css_tests);
   List.iteri(test("selectors static: "), selectors_static_css_tests);
+  List.iteri(test("media query static: "), media_query_static_css_tests);
 });
 
 let properties_variable_css_tests = [

@@ -14,6 +14,9 @@ module Component = [%styled.div {|
   font-size: 30px;
 
   width: unset;
+  @media (min-width: 30em) and (min-height: 20em) {
+    color: brown;
+  }
 |}];
 module ComponentInline = [%styled "color: #454545"];
 module ComponentLink = [%styled.a {| color: #454545 |}];

@@ -155,6 +155,8 @@ let supportList = [
   // not supported
   [%css "-moz-text-blink: blink"],
   [%css "display: -webkit-inline-box"],
+  // media-query
+  [%css "@media (min-width: 30em) and (min-height: 20em) { color: brown; }"],
 ];
 
 Belt.List.forEachWithIndex(supportList, (index, css) => {
