@@ -491,6 +491,26 @@ let createMakeProps = (~loc, extraProps) => {
   );
 };
 
+let match_exp_string_payload = expr => {
+  open Ppxlib.Ast_pattern;
+  let pattern =
+    pexp_extension(
+      extension(
+        __,
+        pstr(
+          pstr_eval(pexp_constant(pconst_string(__', __)), nil) ^:: nil,
+        ),
+      ),
+    );
+  parse(
+    pattern,
+    expr.pexp_loc,
+    ~on_error=_ => None,
+    expr,
+    (key, payload, delim) => Some((key, payload, delim)),
+  );
+};
+
 let styledPpxMapper = (_, _) => {
   ...default_mapper,
   /*
@@ -498,28 +518,9 @@ let styledPpxMapper = (_, _) => {
      we transform expr ("expressions").
    */
   expr: (mapper, expr) => {
-    switch (expr) {
-    | {
-        pexp_desc:
-          Pexp_extension((
-            {txt: "css", _},
-            PStr([
-              {
-                pstr_desc:
-                  Pstr_eval(
-                    {
-                      pexp_loc: loc,
-                      pexp_desc: Pexp_constant(Pconst_string(styles, delim)),
-                      _,
-                    },
-                    _,
-                  ),
-                _,
-              },
-            ]),
-          )),
-        _,
-      } =>
+    switch (match_exp_string_payload(expr)) {
+    | Some(("css", payload, delim)) =>
+      let {txt: styles, loc} = payload;
       let loc_start =
         switch (delim) {
         | None => loc.Location.loc_start
@@ -539,27 +540,8 @@ let styledPpxMapper = (_, _) => {
         );
 
       Css_to_emotion.render_emotion_css(ast, None);
-    | {
-        pexp_desc:
-          Pexp_extension((
-            {txt: "styled.global", _},
-            PStr([
-              {
-                pstr_desc:
-                  Pstr_eval(
-                    {
-                      pexp_loc: loc,
-                      pexp_desc: Pexp_constant(Pconst_string(styles, delim)),
-                      _,
-                    },
-                    _,
-                  ),
-                _,
-              },
-            ]),
-          )),
-        _,
-      } =>
+    | Some(("styled.global", payload, delim)) =>
+      let {txt: styles, loc} = payload;
       let loc_start =
         switch (delim) {
         | None => loc.Location.loc_start
