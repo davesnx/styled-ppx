@@ -511,6 +511,41 @@ let match_exp_string_payload = expr => {
   );
 };
 
+let match_mod_payload = mod_expr => {
+  open Ppxlib.Ast_pattern;
+
+  let pattern =
+    pmod_extension(
+      extension(
+        __',
+        pstr(
+          pstr_eval(
+            map(
+              ~f=
+                (f, lbl, def, param, body) =>
+                  f(`Fun((lbl, def, param, body))),
+              pexp_fun(__, __, __, __),
+            )
+            ||| map(
+                  ~f=(f, payload, delim) => f(`String((payload, delim))),
+                  pexp_constant(pconst_string(__', __)),
+                ),
+            nil,
+          )
+          ^:: nil
+          ||| map(~f=f => f(`None), nil),
+        ),
+      ),
+    );
+  parse(
+    pattern,
+    mod_expr.pmod_loc,
+    ~on_error=_ => None,
+    mod_expr,
+    (key, payload) => Some((key, payload)),
+  );
+};
+
 let renderStringPayload = (kind, payload, delim, variableList) => {
   let {txt: string, loc} = payload;
   let loc_start =
@@ -560,30 +595,14 @@ let styledPpxMapper = (_, _) => {
     * This is what defines [%styled] as an extension point that hooks into module_expr,
     so all the modules pass into here and we patter-match the ones with [%styled.div () => {||}]
    */
-  module_expr: (mapper, expr) =>
-    switch (expr) {
-    | {
-        pmod_desc:
-          Pmod_extension((
-            {txt, loc: txtLoc},
-            PStr([
-              {
-                pstr_desc:
-                  Pstr_eval(
-                    {
-                      pexp_desc: Pexp_fun(label, args, pattern, expression),
-                      _,
-                    },
-                    _,
-                  ),
-                _,
-              },
-            ]),
-          )),
-        _,
-      }
-        when isStyledTag(txt) =>
-      let tag = getTag(txt);
+  module_expr: (mapper, expr) => {
+    switch (match_mod_payload(expr)) {
+    | Some((
+        {txt: name, loc: nameLoc},
+        `Fun(label, args, pattern, expression),
+      ))
+        when isStyledTag(name) =>
+      let tag = getTag(name);
 
       /* Fix getLabeledArgs, to stop ignoring the first arg */
       let alias = getAlias(pattern, label);
@@ -596,7 +615,7 @@ let styledPpxMapper = (_, _) => {
 
       if (!List.exists(t => t == tag, Html.tags)) {
         raiseWithLocation(
-          ~loc=txtLoc,
+          ~loc=nameLoc,
           "Unexpected HTML tag in [%styled." ++ tag ++ "]",
         );
       };
@@ -683,24 +702,42 @@ let styledPpxMapper = (_, _) => {
           createComponent(~loc, ~tag, ~styledExpr),
         ]),
       );
-    | {
-        pmod_desc:
-          /* This case is [%styled.div] */
-          Pmod_extension(({txt, loc: txtLoc}, PStr([]))),
-        pmod_loc: pexp_loc,
-        _,
-      }
-        when isStyledTag(txt) =>
-      let tag = getTag(txt);
+    | Some(({txt: name, loc: nameLoc}, `String(str, delim)))
+        when isStyledTag(name) =>
+      let tag = getTag(name);
 
       if (!List.exists(t => t == tag, Html.tags)) {
         raiseWithLocation(
-          ~loc=txtLoc,
+          ~loc=nameLoc,
           "Unexpected HTML tag in [%styled." ++ tag ++ "]",
         );
       };
 
-      let loc = pexp_loc;
+      let loc = str.loc;
+      let css_expr = renderStringPayload(`Style, str, delim, None);
+
+      let styledExpr =
+        Exp.ident(~loc, {txt: Lident(styleVariableName), loc});
+
+      Mod.mk(
+        Pmod_structure([
+          createMakeProps(~loc, None),
+          createReactBinding(~loc),
+          createStyles(~loc, ~name=styleVariableName, ~exp=css_expr),
+          createComponent(~loc, ~tag, ~styledExpr),
+        ]),
+      );
+    | Some(({txt: name, loc: nameLoc}, `None)) when isStyledTag(name) =>
+      let tag = getTag(name);
+
+      if (!List.exists(t => t == tag, Html.tags)) {
+        raiseWithLocation(
+          ~loc=nameLoc,
+          "Unexpected HTML tag in [%styled." ++ tag ++ "]",
+        );
+      };
+
+      let loc = nameLoc;
       let css_expr = renderStringPayload(`Style, {txt: "", loc}, None, None);
 
       let styledExpr =
@@ -714,55 +751,9 @@ let styledPpxMapper = (_, _) => {
           createComponent(~loc, ~tag, ~styledExpr),
         ]),
       );
-    | {
-        pmod_desc:
-          /* This case is [%styled.div {||}] */
-          Pmod_extension((
-            {txt, loc: txtLoc},
-            PStr([
-              {
-                pstr_desc:
-                  Pstr_eval(
-                    {
-                      pexp_desc: Pexp_constant(Pconst_string(str, delim)),
-                      pexp_loc,
-                      _,
-                    },
-                    _,
-                  ),
-                _,
-              },
-            ]),
-          )),
-        _,
-      }
-        when isStyledTag(txt) =>
-      let tag = getTag(txt);
-
-      if (!List.exists(t => t == tag, Html.tags)) {
-        raiseWithLocation(
-          ~loc=txtLoc,
-          "Unexpected HTML tag in [%styled." ++ tag ++ "]",
-        );
-      };
-
-      let loc = pexp_loc;
-      let css_expr =
-        renderStringPayload(`Style, {txt: str, loc}, delim, None);
-
-      let styledExpr =
-        Exp.ident(~loc, {txt: Lident(styleVariableName), loc});
-
-      Mod.mk(
-        Pmod_structure([
-          createMakeProps(~loc, None),
-          createReactBinding(~loc),
-          createStyles(~loc, ~name=styleVariableName, ~exp=css_expr),
-          createComponent(~loc, ~tag, ~styledExpr),
-        ]),
-      );
     | _ => default_mapper.module_expr(mapper, expr)
-    },
+    };
+  },
 };
 
 let () =
