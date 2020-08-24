@@ -511,59 +511,51 @@ let match_exp_string_payload = expr => {
   );
 };
 
+let renderStringPayload = (kind, payload, delim, variableList) => {
+  let {txt: string, loc} = payload;
+  let loc_start =
+    switch (delim) {
+    | None => loc.Location.loc_start
+    | Some(s) => {
+        ...loc.Location.loc_start,
+        Lexing.pos_cnum:
+          loc.Location.loc_start.Lexing.pos_cnum + String.length(s) + 1,
+      }
+    };
+
+  let parse = parser =>
+    Css_lexer.parse_string(
+      ~container_lnum=loc_start.Lexing.pos_lnum,
+      ~pos=loc_start,
+      string,
+      parser,
+    );
+
+  switch (kind) {
+  | `Style =>
+    let ast = parse(Css_parser.declaration_list);
+    Css_to_emotion.render_emotion_css(ast, variableList);
+  | `Global =>
+    let ast = parse(Css_parser.stylesheet);
+    Css_to_emotion.render_global(ast);
+  };
+};
+
 let styledPpxMapper = (_, _) => {
   ...default_mapper,
   /*
      This is what defines where the ppx should be hooked into, in this case
      we transform expr ("expressions").
    */
-  expr: (mapper, expr) => {
+  expr: (mapper, expr) =>
     switch (match_exp_string_payload(expr)) {
     | Some(("css", payload, delim)) =>
-      let {txt: styles, loc} = payload;
-      let loc_start =
-        switch (delim) {
-        | None => loc.Location.loc_start
-        | Some(s) => {
-            ...loc.Location.loc_start,
-            Lexing.pos_cnum:
-              loc.Location.loc_start.Lexing.pos_cnum + String.length(s) + 1,
-          }
-        };
-
-      let ast =
-        Css_lexer.parse_string(
-          ~container_lnum=loc_start.Lexing.pos_lnum,
-          ~pos=loc_start,
-          styles,
-          Css_parser.declaration_list,
-        );
-
-      Css_to_emotion.render_emotion_css(ast, None);
+      renderStringPayload(`Style, payload, delim, None)
     | Some(("styled.global", payload, delim)) =>
-      let {txt: styles, loc} = payload;
-      let loc_start =
-        switch (delim) {
-        | None => loc.Location.loc_start
-        | Some(s) => {
-            ...loc.Location.loc_start,
-            Lexing.pos_cnum:
-              loc.Location.loc_start.Lexing.pos_cnum + String.length(s) + 1,
-          }
-        };
-
-      let ast =
-        Css_lexer.parse_string(
-          ~container_lnum=loc_start.Lexing.pos_lnum,
-          ~pos=loc_start,
-          styles,
-          Css_parser.stylesheet,
-        );
-
-      Css_to_emotion.render_global(ast);
+      renderStringPayload(`Global, payload, delim, None)
+    | exception _
     | _ => default_mapper.expr(mapper, expr)
-    };
-  },
+    },
   /***
     * This is what defines [%styled] as an extension point that hooks into module_expr,
     so all the modules pass into here and we patter-match the ones with [%styled.div () => {||}]
@@ -620,23 +612,6 @@ let styledPpxMapper = (_, _) => {
         };
 
       let loc = expression.pexp_loc;
-      let loc_start =
-        switch (delim) {
-        | None => loc.Location.loc_start
-        | Some(s) => {
-            ...loc.Location.loc_start,
-            Lexing.pos_cnum:
-              loc.Location.loc_start.Lexing.pos_cnum + String.length(s) + 1,
-          }
-        };
-
-      let ast =
-        Css_lexer.parse_string(
-          ~container_lnum=loc_start.Lexing.pos_lnum,
-          ~pos=loc_start,
-          str,
-          Css_parser.declaration_list,
-        );
 
       let propExpr = Exp.ident(~loc, {txt: Lident("props"), loc});
       let propToGetter = str => str ++ "Get";
@@ -688,7 +663,13 @@ let styledPpxMapper = (_, _) => {
             variableList,
           ),
         );
-
+      let css_expr =
+        renderStringPayload(
+          `Style,
+          {txt: str, loc},
+          delim,
+          Some(variableList),
+        );
       Mod.mk(
         Pmod_structure([
           createMakeProps(~loc, variableProps),
@@ -697,7 +678,7 @@ let styledPpxMapper = (_, _) => {
             ~loc,
             ~name=styleVariableName,
             ~args=argList,
-            ~exp=Css_to_emotion.render_emotion_css(ast, Some(variableList)),
+            ~exp=css_expr,
           ),
           createComponent(~loc, ~tag, ~styledExpr),
         ]),
@@ -720,15 +701,7 @@ let styledPpxMapper = (_, _) => {
       };
 
       let loc = pexp_loc;
-      let loc_start = loc.Location.loc_start;
-
-      let ast =
-        Css_lexer.parse_string(
-          ~container_lnum=loc_start.Lexing.pos_lnum,
-          ~pos=loc_start,
-          "",
-          Css_parser.declaration_list,
-        );
+      let css_expr = renderStringPayload(`Style, {txt: "", loc}, None, None);
 
       let styledExpr =
         Exp.ident(~loc, {txt: Lident(styleVariableName), loc});
@@ -737,11 +710,7 @@ let styledPpxMapper = (_, _) => {
         Pmod_structure([
           createMakeProps(~loc, None),
           createReactBinding(~loc),
-          createStyles(
-            ~loc,
-            ~name=styleVariableName,
-            ~exp=Css_to_emotion.render_emotion_css(ast, None),
-          ),
+          createStyles(~loc, ~name=styleVariableName, ~exp=css_expr),
           createComponent(~loc, ~tag, ~styledExpr),
         ]),
       );
@@ -778,23 +747,8 @@ let styledPpxMapper = (_, _) => {
       };
 
       let loc = pexp_loc;
-      let loc_start =
-        switch (delim) {
-        | None => loc.Location.loc_start
-        | Some(s) => {
-            ...loc.Location.loc_start,
-            Lexing.pos_cnum:
-              loc.Location.loc_start.Lexing.pos_cnum + String.length(s) + 1,
-          }
-        };
-
-      let ast =
-        Css_lexer.parse_string(
-          ~container_lnum=loc_start.Lexing.pos_lnum,
-          ~pos=loc_start,
-          str,
-          Css_parser.declaration_list,
-        );
+      let css_expr =
+        renderStringPayload(`Style, {txt: str, loc}, delim, None);
 
       let styledExpr =
         Exp.ident(~loc, {txt: Lident(styleVariableName), loc});
@@ -803,11 +757,7 @@ let styledPpxMapper = (_, _) => {
         Pmod_structure([
           createMakeProps(~loc, None),
           createReactBinding(~loc),
-          createStyles(
-            ~loc,
-            ~name=styleVariableName,
-            ~exp=Css_to_emotion.render_emotion_css(ast, None),
-          ),
+          createStyles(~loc, ~name=styleVariableName, ~exp=css_expr),
           createComponent(~loc, ~tag, ~styledExpr),
         ]),
       );
