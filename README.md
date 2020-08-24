@@ -72,7 +72,7 @@ If you want to know more about how it works or what are the benefits I recommend
 
 ## Installation
 
-This package depends on [bs-emotion](https://github.com/ahrefs/bs-emotion), [ReasonReact](https://reasonml.github.io/reason-react/) and [BuckleScript](https://bucklescript.github.io), make sure you follow their instalations.
+This package depends on [bs-emotion](https://github.com/ahrefs/bs-emotion), [ReasonReact](https://reasonml.github.io/reason-react/) and [BuckleScript](https://bucklescript.github.io), make sure you follow their installations.
 
 ### With `esy` on native projects
 
