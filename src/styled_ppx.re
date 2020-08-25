@@ -576,192 +576,110 @@ let renderStringPayload = (kind, payload, delim, variableList) => {
   };
 };
 
-let styledPpxMapper = (_, _) => {
-  ...default_mapper,
-  /*
-     This is what defines where the ppx should be hooked into, in this case
-     we transform expr ("expressions").
-   */
-  expr: (mapper, expr) =>
-    switch (match_exp_string_payload(expr)) {
-    | Some(("css", payload, delim)) =>
-      renderStringPayload(`Style, payload, delim, None)
-    | Some(("styled.global", payload, delim)) =>
-      renderStringPayload(`Global, payload, delim, None)
-    | exception _
-    | _ => default_mapper.expr(mapper, expr)
-    },
-  /***
-    * This is what defines [%styled] as an extension point that hooks into module_expr,
-    so all the modules pass into here and we patter-match the ones with [%styled.div () => {||}]
-   */
-  module_expr: (mapper, expr) => {
-    switch (match_mod_payload(expr)) {
-    | Some((
-        {txt: name, loc: nameLoc},
-        `Fun(label, args, pattern, expression),
-      ))
-        when isStyledTag(name) =>
-      let tag = getTag(name);
+module B = Ppxlib.Ast_builder.Default;
+module P = Ppxlib.Ast_pattern;
 
-      /* Fix getLabeledArgs, to stop ignoring the first arg */
-      let alias = getAlias(pattern, label);
-      let type_ = getType(pattern);
-
-      let firstArg = (label, args, pattern, alias, pattern.ppat_loc, type_);
-
-      let (functionExpr, argList, _) =
-        getLabeledArgs(mapper, expression, [firstArg]);
-
-      if (!List.exists(t => t == tag, Html.tags)) {
-        raiseWithLocation(
-          ~loc=nameLoc,
-          "Unexpected HTML tag in [%styled." ++ tag ++ "]",
-        );
-      };
-
-      let (str, delim) =
-        switch (functionExpr) {
-        | Pexp_constant(Pconst_string(str, delim)) => (str, delim)
-        | _ =>
-          raiseWithLocation(
-            ~loc=pattern.ppat_loc,
-            "Unexpected error happened.",
-          )
-        };
-
-      let loc = expression.pexp_loc;
-
-      let propExpr = Exp.ident(~loc, {txt: Lident("props"), loc});
-      let propToGetter = str => str ++ "Get";
-
-      let args =
-        List.map(
-          ((arg, _, _, _, _, _)) => {
-            let labelText = getLabel(arg);
-            let value =
-              Exp.ident(~loc, {txt: Lident(propToGetter(labelText)), loc});
-
-            (arg, Exp.apply(~loc, value, [(Nolabel, propExpr)]));
-          },
-          argList,
-        );
-
-      let styledExpr =
-        Exp.apply(
-          ~loc,
-          Exp.ident(~loc, {txt: Lident(styleVariableName), loc}),
-          args,
-        );
-
-      let variableList =
-        List.map(
-          ((arg, _, _, _, _, type_)) => {
-            /* Gets the type of the argument from the fn definition
-                 (~width: int, ~height: int) => {}
-               */
-            let typeName =
-              switch (type_) {
-              | Some(t) =>
-                switch (t) {
-                | {ptyp_desc: Ptyp_constr({txt: Lident(t), _}, _), _} => t
-                | _ => "string"
-                }
-              | None => "string"
-              };
-            (getLabel(arg), typeName);
-          },
-          argList,
-        );
-
-      let variableProps =
-        Some(
-          List.map(
-            ((label, typeName)) =>
-              createCustomPropLabel(~loc, label, typeName),
-            variableList,
-          ),
-        );
-      let css_expr =
-        renderStringPayload(
-          `Style,
-          {txt: str, loc},
-          delim,
-          Some(variableList),
-        );
-      Mod.mk(
-        Pmod_structure([
-          createMakeProps(~loc, variableProps),
-          createReactBinding(~loc),
-          createDynamicStyles(
-            ~loc,
-            ~name=styleVariableName,
-            ~args=argList,
-            ~exp=css_expr,
-          ),
-          createComponent(~loc, ~tag, ~styledExpr),
-        ]),
-      );
-    | Some(({txt: name, loc: nameLoc}, `String(str, delim)))
-        when isStyledTag(name) =>
-      let tag = getTag(name);
-
-      if (!List.exists(t => t == tag, Html.tags)) {
-        raiseWithLocation(
-          ~loc=nameLoc,
-          "Unexpected HTML tag in [%styled." ++ tag ++ "]",
-        );
-      };
-
-      let loc = str.loc;
-      let css_expr = renderStringPayload(`Style, str, delim, None);
-
-      let styledExpr =
-        Exp.ident(~loc, {txt: Lident(styleVariableName), loc});
-
-      Mod.mk(
-        Pmod_structure([
-          createMakeProps(~loc, None),
-          createReactBinding(~loc),
-          createStyles(~loc, ~name=styleVariableName, ~exp=css_expr),
-          createComponent(~loc, ~tag, ~styledExpr),
-        ]),
-      );
-    | Some(({txt: name, loc: nameLoc}, `None)) when isStyledTag(name) =>
-      let tag = getTag(name);
-
-      if (!List.exists(t => t == tag, Html.tags)) {
-        raiseWithLocation(
-          ~loc=nameLoc,
-          "Unexpected HTML tag in [%styled." ++ tag ++ "]",
-        );
-      };
-
-      let loc = nameLoc;
-      let css_expr = renderStringPayload(`Style, {txt: "", loc}, None, None);
-
-      let styledExpr =
-        Exp.ident(~loc, {txt: Lident(styleVariableName), loc});
-
-      Mod.mk(
-        Pmod_structure([
-          createMakeProps(~loc, None),
-          createReactBinding(~loc),
-          createStyles(~loc, ~name=styleVariableName, ~exp=css_expr),
-          createComponent(~loc, ~tag, ~styledExpr),
-        ]),
-      );
-    | _ => default_mapper.module_expr(mapper, expr)
-    };
-  },
+let isHTMLTag = tag => {
+  List.exists(t => t == tag, Html.tags);
 };
 
-let () =
-  Driver.register(
-    ~name="styled-ppx",
-    /* this is required to run before ppx_metaquot during tests */
-    /* any change regarding this behavior not related to metaquot is a bug */
-    ~position=-1,
-    Versions.ocaml_410,
-    styledPpxMapper,
+let makeConstantStyledComponent = (~tag, ~cssString, ~delimiter) => {
+  let loc = cssString.loc;
+  let css_expr = renderStringPayload(`Style, cssString, delimiter, None);
+
+  let styledExpr = Exp.ident(~loc, {txt: Lident(styleVariableName), loc});
+
+  Mod.mk(
+    Pmod_structure([
+      createMakeProps(~loc, None),
+      createReactBinding(~loc),
+      createStyles(~loc, ~name=styleVariableName, ~exp=css_expr),
+      createComponent(~loc, ~tag, ~styledExpr),
+    ]),
   );
+};
+
+let func_pattern = P.(pexp_fun(__, __, __, __));
+
+let makeParametrizedStyledComponent =
+    (
+      ~loc,
+      ~tag as _,
+      ~label as _,
+      ~defaultValue as _,
+      ~param as _,
+      ~body as _,
+    ) => {
+  B.pmod_structure(~loc, [[%stri let x = ()]]);
+};
+
+type styledComponent =
+  | Constant({
+      cssString: Ppxlib.Location.loc(string),
+      delimiter: option(string),
+    })
+  | Dynamic({
+      label: Ppxlib.arg_label,
+      defaultValue: option(Ppxlib.expression),
+      param: Ppxlib.pattern,
+      body: Ppxlib.expression,
+    });
+
+let makeStyledComponent = (~loc, ~payload, ~tag) =>
+  switch (payload) {
+  | Constant({cssString, delimiter}) =>
+    makeConstantStyledComponent(~tag, ~cssString, ~delimiter)
+  | Dynamic({label, defaultValue, param, body}) =>
+    makeParametrizedStyledComponent(
+      ~loc,
+      ~tag,
+      ~label,
+      ~defaultValue,
+      ~param,
+      ~body,
+    )
+  };
+
+Ppxlib.(
+  Driver.register_transformation(
+    "styled-ppx",
+    ~extensions=[
+      Ppxlib.Extension.declare_with_path_arg(
+        "styled",
+        Ppxlib.Extension.Context.module_expr,
+        Ast_pattern.(
+          pstr(
+            pstr_eval(
+              func_pattern
+              |> map(~f=(f, label, defaultValue, param, body) =>
+                   f(Dynamic({label, defaultValue, param, body}))
+                 )
+              ||| (
+                pexp_constant(pconst_string(__', __))
+                |> map2(~f=(cssString, delimiter) =>
+                     Constant({cssString, delimiter})
+                   )
+              ),
+              nil,
+            )
+            ^:: nil,
+          )
+        ),
+        (~loc as extensionLoc, ~path as _, ~arg, payload) => {
+        switch (arg) {
+        | Some({txt: Lident(tag), loc}) when isHTMLTag(tag) =>
+          makeStyledComponent(~loc, ~tag, ~payload)
+        | None => makeStyledComponent(~loc=extensionLoc, ~tag="div", ~payload)
+        | Some({txt: Lident(tag), loc}) =>
+          raiseWithLocation(~loc, "Unknown HTML tag: [%styled." ++ tag ++ "]")
+        | Some({loc, txt}) =>
+          raiseWithLocation(
+            ~loc,
+            Longident.name(txt)
+            ++ " is not an HTML tag. Try something like [%styled.div",
+          )
+        }
+      }),
+    ],
+  )
+);
