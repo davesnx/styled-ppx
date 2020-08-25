@@ -491,125 +491,118 @@ let createMakeProps = (~loc, extraProps) => {
   );
 };
 
+let match_exp_string_payload = expr => {
+  open Ppxlib.Ast_pattern;
+  let pattern =
+    pexp_extension(
+      extension(
+        __,
+        pstr(
+          pstr_eval(pexp_constant(pconst_string(__', __)), nil) ^:: nil,
+        ),
+      ),
+    );
+  parse(
+    pattern,
+    expr.pexp_loc,
+    ~on_error=_ => None,
+    expr,
+    (key, payload, delim) => Some((key, payload, delim)),
+  );
+};
+
+let match_mod_payload = mod_expr => {
+  open Ppxlib.Ast_pattern;
+
+  let pattern =
+    pmod_extension(
+      extension(
+        __',
+        pstr(
+          pstr_eval(
+            map(
+              ~f=
+                (f, lbl, def, param, body) =>
+                  f(`Fun((lbl, def, param, body))),
+              pexp_fun(__, __, __, __),
+            )
+            ||| map(
+                  ~f=(f, payload, delim) => f(`String((payload, delim))),
+                  pexp_constant(pconst_string(__', __)),
+                ),
+            nil,
+          )
+          ^:: nil
+          ||| map(~f=f => f(`None), nil),
+        ),
+      ),
+    );
+  parse(
+    pattern,
+    mod_expr.pmod_loc,
+    ~on_error=_ => None,
+    mod_expr,
+    (key, payload) => Some((key, payload)),
+  );
+};
+
+let renderStringPayload = (kind, payload, delim, variableList) => {
+  let {txt: string, loc} = payload;
+  let loc_start =
+    switch (delim) {
+    | None => loc.Location.loc_start
+    | Some(s) => {
+        ...loc.Location.loc_start,
+        Lexing.pos_cnum:
+          loc.Location.loc_start.Lexing.pos_cnum + String.length(s) + 1,
+      }
+    };
+
+  let parse = parser =>
+    Css_lexer.parse_string(
+      ~container_lnum=loc_start.Lexing.pos_lnum,
+      ~pos=loc_start,
+      string,
+      parser,
+    );
+
+  switch (kind) {
+  | `Style =>
+    let ast = parse(Css_parser.declaration_list);
+    Css_to_emotion.render_emotion_css(ast, variableList);
+  | `Global =>
+    let ast = parse(Css_parser.stylesheet);
+    Css_to_emotion.render_global(ast);
+  };
+};
+
 let styledPpxMapper = (_, _) => {
   ...default_mapper,
   /*
      This is what defines where the ppx should be hooked into, in this case
      we transform expr ("expressions").
    */
-  expr: (mapper, expr) => {
-    switch (expr) {
-    | {
-        pexp_desc:
-          Pexp_extension((
-            {txt: "css", _},
-            PStr([
-              {
-                pstr_desc:
-                  Pstr_eval(
-                    {
-                      pexp_loc: loc,
-                      pexp_desc: Pexp_constant(Pconst_string(styles, delim)),
-                      _,
-                    },
-                    _,
-                  ),
-                _,
-              },
-            ]),
-          )),
-        _,
-      } =>
-      let loc_start =
-        switch (delim) {
-        | None => loc.Location.loc_start
-        | Some(s) => {
-            ...loc.Location.loc_start,
-            Lexing.pos_cnum:
-              loc.Location.loc_start.Lexing.pos_cnum + String.length(s) + 1,
-          }
-        };
-
-      let ast =
-        Css_lexer.parse_string(
-          ~container_lnum=loc_start.Lexing.pos_lnum,
-          ~pos=loc_start,
-          styles,
-          Css_parser.declaration_list,
-        );
-
-      Css_to_emotion.render_emotion_css(ast, None);
-    | {
-        pexp_desc:
-          Pexp_extension((
-            {txt: "styled.global", _},
-            PStr([
-              {
-                pstr_desc:
-                  Pstr_eval(
-                    {
-                      pexp_loc: loc,
-                      pexp_desc: Pexp_constant(Pconst_string(styles, delim)),
-                      _,
-                    },
-                    _,
-                  ),
-                _,
-              },
-            ]),
-          )),
-        _,
-      } =>
-      let loc_start =
-        switch (delim) {
-        | None => loc.Location.loc_start
-        | Some(s) => {
-            ...loc.Location.loc_start,
-            Lexing.pos_cnum:
-              loc.Location.loc_start.Lexing.pos_cnum + String.length(s) + 1,
-          }
-        };
-
-      let ast =
-        Css_lexer.parse_string(
-          ~container_lnum=loc_start.Lexing.pos_lnum,
-          ~pos=loc_start,
-          styles,
-          Css_parser.stylesheet,
-        );
-
-      Css_to_emotion.render_global(ast);
+  expr: (mapper, expr) =>
+    switch (match_exp_string_payload(expr)) {
+    | Some(("css", payload, delim)) =>
+      renderStringPayload(`Style, payload, delim, None)
+    | Some(("styled.global", payload, delim)) =>
+      renderStringPayload(`Global, payload, delim, None)
+    | exception _
     | _ => default_mapper.expr(mapper, expr)
-    };
-  },
+    },
   /***
     * This is what defines [%styled] as an extension point that hooks into module_expr,
     so all the modules pass into here and we patter-match the ones with [%styled.div () => {||}]
    */
-  module_expr: (mapper, expr) =>
-    switch (expr) {
-    | {
-        pmod_desc:
-          Pmod_extension((
-            {txt, loc: txtLoc},
-            PStr([
-              {
-                pstr_desc:
-                  Pstr_eval(
-                    {
-                      pexp_desc: Pexp_fun(label, args, pattern, expression),
-                      _,
-                    },
-                    _,
-                  ),
-                _,
-              },
-            ]),
-          )),
-        _,
-      }
-        when isStyledTag(txt) =>
-      let tag = getTag(txt);
+  module_expr: (mapper, expr) => {
+    switch (match_mod_payload(expr)) {
+    | Some((
+        {txt: name, loc: nameLoc},
+        `Fun(label, args, pattern, expression),
+      ))
+        when isStyledTag(name) =>
+      let tag = getTag(name);
 
       /* Fix getLabeledArgs, to stop ignoring the first arg */
       let alias = getAlias(pattern, label);
@@ -622,7 +615,7 @@ let styledPpxMapper = (_, _) => {
 
       if (!List.exists(t => t == tag, Html.tags)) {
         raiseWithLocation(
-          ~loc=txtLoc,
+          ~loc=nameLoc,
           "Unexpected HTML tag in [%styled." ++ tag ++ "]",
         );
       };
@@ -638,23 +631,6 @@ let styledPpxMapper = (_, _) => {
         };
 
       let loc = expression.pexp_loc;
-      let loc_start =
-        switch (delim) {
-        | None => loc.Location.loc_start
-        | Some(s) => {
-            ...loc.Location.loc_start,
-            Lexing.pos_cnum:
-              loc.Location.loc_start.Lexing.pos_cnum + String.length(s) + 1,
-          }
-        };
-
-      let ast =
-        Css_lexer.parse_string(
-          ~container_lnum=loc_start.Lexing.pos_lnum,
-          ~pos=loc_start,
-          str,
-          Css_parser.declaration_list,
-        );
 
       let propExpr = Exp.ident(~loc, {txt: Lident("props"), loc});
       let propToGetter = str => str ++ "Get";
@@ -706,7 +682,13 @@ let styledPpxMapper = (_, _) => {
             variableList,
           ),
         );
-
+      let css_expr =
+        renderStringPayload(
+          `Style,
+          {txt: str, loc},
+          delim,
+          Some(variableList),
+        );
       Mod.mk(
         Pmod_structure([
           createMakeProps(~loc, variableProps),
@@ -715,38 +697,24 @@ let styledPpxMapper = (_, _) => {
             ~loc,
             ~name=styleVariableName,
             ~args=argList,
-            ~exp=Css_to_emotion.render_emotion_css(ast, Some(variableList)),
+            ~exp=css_expr,
           ),
           createComponent(~loc, ~tag, ~styledExpr),
         ]),
       );
-    | {
-        pmod_desc:
-          /* This case is [%styled.div] */
-          Pmod_extension(({txt, loc: txtLoc}, PStr([]))),
-        pmod_loc: pexp_loc,
-        _,
-      }
-        when isStyledTag(txt) =>
-      let tag = getTag(txt);
+    | Some(({txt: name, loc: nameLoc}, `String(str, delim)))
+        when isStyledTag(name) =>
+      let tag = getTag(name);
 
       if (!List.exists(t => t == tag, Html.tags)) {
         raiseWithLocation(
-          ~loc=txtLoc,
+          ~loc=nameLoc,
           "Unexpected HTML tag in [%styled." ++ tag ++ "]",
         );
       };
 
-      let loc = pexp_loc;
-      let loc_start = loc.Location.loc_start;
-
-      let ast =
-        Css_lexer.parse_string(
-          ~container_lnum=loc_start.Lexing.pos_lnum,
-          ~pos=loc_start,
-          "",
-          Css_parser.declaration_list,
-        );
+      let loc = str.loc;
+      let css_expr = renderStringPayload(`Style, str, delim, None);
 
       let styledExpr =
         Exp.ident(~loc, {txt: Lident(styleVariableName), loc});
@@ -755,64 +723,22 @@ let styledPpxMapper = (_, _) => {
         Pmod_structure([
           createMakeProps(~loc, None),
           createReactBinding(~loc),
-          createStyles(
-            ~loc,
-            ~name=styleVariableName,
-            ~exp=Css_to_emotion.render_emotion_css(ast, None),
-          ),
+          createStyles(~loc, ~name=styleVariableName, ~exp=css_expr),
           createComponent(~loc, ~tag, ~styledExpr),
         ]),
       );
-    | {
-        pmod_desc:
-          /* This case is [%styled.div {||}] */
-          Pmod_extension((
-            {txt, loc: txtLoc},
-            PStr([
-              {
-                pstr_desc:
-                  Pstr_eval(
-                    {
-                      pexp_desc: Pexp_constant(Pconst_string(str, delim)),
-                      pexp_loc,
-                      _,
-                    },
-                    _,
-                  ),
-                _,
-              },
-            ]),
-          )),
-        _,
-      }
-        when isStyledTag(txt) =>
-      let tag = getTag(txt);
+    | Some(({txt: name, loc: nameLoc}, `None)) when isStyledTag(name) =>
+      let tag = getTag(name);
 
       if (!List.exists(t => t == tag, Html.tags)) {
         raiseWithLocation(
-          ~loc=txtLoc,
+          ~loc=nameLoc,
           "Unexpected HTML tag in [%styled." ++ tag ++ "]",
         );
       };
 
-      let loc = pexp_loc;
-      let loc_start =
-        switch (delim) {
-        | None => loc.Location.loc_start
-        | Some(s) => {
-            ...loc.Location.loc_start,
-            Lexing.pos_cnum:
-              loc.Location.loc_start.Lexing.pos_cnum + String.length(s) + 1,
-          }
-        };
-
-      let ast =
-        Css_lexer.parse_string(
-          ~container_lnum=loc_start.Lexing.pos_lnum,
-          ~pos=loc_start,
-          str,
-          Css_parser.declaration_list,
-        );
+      let loc = nameLoc;
+      let css_expr = renderStringPayload(`Style, {txt: "", loc}, None, None);
 
       let styledExpr =
         Exp.ident(~loc, {txt: Lident(styleVariableName), loc});
@@ -821,16 +747,13 @@ let styledPpxMapper = (_, _) => {
         Pmod_structure([
           createMakeProps(~loc, None),
           createReactBinding(~loc),
-          createStyles(
-            ~loc,
-            ~name=styleVariableName,
-            ~exp=Css_to_emotion.render_emotion_css(ast, None),
-          ),
+          createStyles(~loc, ~name=styleVariableName, ~exp=css_expr),
           createComponent(~loc, ~tag, ~styledExpr),
         ]),
       );
     | _ => default_mapper.module_expr(mapper, expr)
-    },
+    };
+  },
 };
 
 let () =
