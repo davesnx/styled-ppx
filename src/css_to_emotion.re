@@ -103,8 +103,7 @@ let rec render_at_rule = (ar: At_rule.t): expression =>
                 | (_, loc) =>
                   grammar_error(loc, "Unexpected @keyframes prelude")
                 };
-              let block_expr =
-                render_declaration_list(sr.Style_rule.block, None);
+              let block_expr = render_declaration_list(sr.Style_rule.block);
               let tuple =
                 Exp.tuple(
                   ~loc=sr.Style_rule.loc,
@@ -189,8 +188,7 @@ and render_media_query = (ar: At_rule.t): expression => {
   let rules =
     switch (ar.At_rule.block) {
     | Brace_block.Empty => invalid_format(loc)
-    | Declaration_list(declaration) =>
-      render_declaration_list(declaration, None)
+    | Declaration_list(declaration) => render_declaration_list(declaration)
     | Stylesheet(_) => invalid_format(loc)
     };
 
@@ -201,12 +199,7 @@ and render_media_query = (ar: At_rule.t): expression => {
   eapply(~loc, media_ident, [estring(~loc=prelude_loc, query), rules]);
 }
 and render_declaration =
-    (
-      d: Declaration.t,
-      _d_loc: Location.t,
-      _variables: list((string, string)),
-    )
-    : list(expression) => {
+    (d: Declaration.t, _d_loc: Location.t): list(expression) => {
   let (name, _name_loc) = d.Declaration.name;
   let (_valueList, loc) = d.Declaration.value;
 
@@ -219,16 +212,12 @@ and render_declaration =
   };
 }
 and render_declarations =
-    (ds: list(Declaration_list.kind), variables): list(expression) =>
+    (ds: list(Declaration_list.kind)): list(expression) =>
   List.concat_map(
     declaration =>
       switch (declaration) {
       | Declaration_list.Declaration(decl) =>
-        render_declaration(
-          decl,
-          decl.loc,
-          Option.value(~default=[], variables),
-        )
+        render_declaration(decl, decl.loc)
       | Declaration_list.At_rule(ar) => [render_at_rule(ar)]
       | Declaration_list.Style_rule(ar) =>
         let loc: Location.t = ar.loc;
@@ -238,14 +227,13 @@ and render_declarations =
     ds,
   )
   |> List.rev
-and render_declaration_list =
-    ((list, loc): Declaration_list.t, variables): expression => {
-  let expr_with_loc_list = render_declarations(list, variables);
+and render_declaration_list = ((list, loc): Declaration_list.t): expression => {
+  let expr_with_loc_list = render_declarations(list);
   list_to_expr(loc, expr_with_loc_list);
 }
 and render_style_rule = (ident, sr: Style_rule.t): expression => {
   let (prelude, prelude_loc) = sr.Style_rule.prelude;
-  let dl_expr = render_declaration_list(sr.Style_rule.block, None);
+  let dl_expr = render_declaration_list(sr.Style_rule.block);
   let rec render_prelude_value = (s, (value, value_loc)) => {
     switch (value) {
     | Delim(":") => ":" ++ s
@@ -343,10 +331,8 @@ and render_style_rule = (ident, sr: Style_rule.t): expression => {
   };
 };
 
-let render_emotion_css =
-    ((list, loc): Declaration_list.t, variables): expression => {
-  let declarationListValues =
-    render_declaration_list((list, loc), variables);
+let render_emotion_css = ((list, loc): Declaration_list.t): expression => {
+  let declarationListValues = render_declaration_list((list, loc));
   let ident = Exp.ident(~loc, {txt: Emotion.lident("style"), loc});
 
   Exp.apply(~loc, ident, [(Nolabel, declarationListValues)]);
