@@ -36,7 +36,7 @@ exports[`ComponentLink should render an <a /> tag 1`] = `
 exports[`ComponentWithParameter renders 1`] = `
 <div>
   <div
-    class="background,blue,backgroundColor,#F0F0F0,color,#FF0000,0"
+    class="css-6hpeuv"
     color="5194459,FF0000"
     theme="136970422"
   />

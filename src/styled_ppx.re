@@ -598,7 +598,8 @@ let renderPayload = (kind, default_mapper, expr) => {
   switch (expr.pexp_desc) {
   | Pexp_constant(Pconst_string(str, delim)) =>
     renderStringPayload(kind, {txt: str, loc: expr.pexp_loc}, delim)
-  | _ => mapper.Ast_mapper.expr(mapper, expr)
+  | _ =>
+    Css_to_emotion.render_emotion_style(mapper.Ast_mapper.expr(mapper, expr))
   };
 };
 
