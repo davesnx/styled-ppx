@@ -7,6 +7,8 @@ open Ast_helper;
 open Longident;
 open React_props;
 
+module Ast_builder = Ppxlib.Ast_builder.Default;
+
 let raiseWithLocation = (~loc, msg) => {
   raise(Location.Error(Location.error(~loc, msg)));
 };
@@ -376,12 +378,8 @@ let createComponent = (~loc, ~tag, ~styledExpr) =>
   );
 
 /* [@bs.optional] color: string */
-let createCustomPropLabel = (~loc, name, kind) =>
-  Type.field(
-    ~loc,
-    {txt: name, loc},
-    Typ.constr(~loc, {txt: Lident(kind), loc}, []),
-  );
+let createCustomPropLabel = (~loc, name, type_) =>
+  Type.field(~loc, {txt: name, loc}, type_);
 
 /* [@bs.optional] ahref: string */
 let createRecordLabel = (~loc, name, kind) =>
@@ -546,7 +544,7 @@ let match_mod_payload = mod_expr => {
   );
 };
 
-let renderStringPayload = (kind, payload, delim, variableList) => {
+let renderStringPayload = (kind, payload, delim) => {
   let {txt: string, loc} = payload;
   let loc_start =
     switch (delim) {
@@ -569,7 +567,7 @@ let renderStringPayload = (kind, payload, delim, variableList) => {
   switch (kind) {
   | `Style =>
     let ast = parse(Css_parser.declaration_list);
-    Css_to_emotion.render_emotion_css(ast, variableList);
+    Css_to_emotion.render_emotion_css(ast);
   | `Global =>
     let ast = parse(Css_parser.stylesheet);
     Css_to_emotion.render_global(ast);
@@ -585,9 +583,9 @@ let styledPpxMapper = (_, _) => {
   expr: (mapper, expr) =>
     switch (match_exp_string_payload(expr)) {
     | Some(("css", payload, delim)) =>
-      renderStringPayload(`Style, payload, delim, None)
+      renderStringPayload(`Style, payload, delim)
     | Some(("styled.global", payload, delim)) =>
-      renderStringPayload(`Global, payload, delim, None)
+      renderStringPayload(`Global, payload, delim)
     | exception _
     | _ => default_mapper.expr(mapper, expr)
     },
@@ -656,20 +654,18 @@ let styledPpxMapper = (_, _) => {
 
       let variableList =
         List.map(
-          ((arg, _, _, _, _, type_)) => {
-            /* Gets the type of the argument from the fn definition
-                 (~width: int, ~height: int) => {}
-               */
-            let typeName =
+          ((arg, _, _, _, loc, type_)) => {
+            open Ast_builder; /* Gets the type of the argument from the fn definition
+                      (~width: int, ~height: int) => {}
+                    */
+
+            let type_ =
               switch (type_) {
-              | Some(t) =>
-                switch (t) {
-                | {ptyp_desc: Ptyp_constr({txt: Lident(t), _}, _), _} => t
-                | _ => "string"
-                }
-              | None => "string"
+              | Some(type_) => type_
+              | None =>
+                ptyp_constr(~loc, Located.mk(~loc, Lident("string")), [])
               };
-            (getLabel(arg), typeName);
+            (getLabel(arg), type_);
           },
           argList,
         );
@@ -677,18 +673,11 @@ let styledPpxMapper = (_, _) => {
       let variableProps =
         Some(
           List.map(
-            ((label, typeName)) =>
-              createCustomPropLabel(~loc, label, typeName),
+            ((label, type_)) => createCustomPropLabel(~loc, label, type_),
             variableList,
           ),
         );
-      let css_expr =
-        renderStringPayload(
-          `Style,
-          {txt: str, loc},
-          delim,
-          Some(variableList),
-        );
+      let css_expr = renderStringPayload(`Style, {txt: str, loc}, delim);
       Mod.mk(
         Pmod_structure([
           createMakeProps(~loc, variableProps),
@@ -714,7 +703,7 @@ let styledPpxMapper = (_, _) => {
       };
 
       let loc = str.loc;
-      let css_expr = renderStringPayload(`Style, str, delim, None);
+      let css_expr = renderStringPayload(`Style, str, delim);
 
       let styledExpr =
         Exp.ident(~loc, {txt: Lident(styleVariableName), loc});
@@ -738,7 +727,7 @@ let styledPpxMapper = (_, _) => {
       };
 
       let loc = nameLoc;
-      let css_expr = renderStringPayload(`Style, {txt: "", loc}, None, None);
+      let css_expr = renderStringPayload(`Style, {txt: "", loc}, None);
 
       let styledExpr =
         Exp.ident(~loc, {txt: Lident(styleVariableName), loc});

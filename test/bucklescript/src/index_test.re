@@ -21,8 +21,21 @@ module Component = [%styled.div {|
 module ComponentInline = [%styled "color: #454545"];
 module ComponentLink = [%styled.a {| color: #454545 |}];
 
+module ComponentWithParameter = [%styled.div
+  (~color: Css.Types.Color.t) => 
+    "color: $(color)"
+];
+
 test("Component renders", () => {
   <Component />
+  |> render
+  |> container
+  |> expect
+  |> toMatchSnapshot
+});
+
+test("ComponentWithParameter renders", () => {
+  <ComponentWithParameter color=Css.red />
   |> render
   |> container
   |> expect
