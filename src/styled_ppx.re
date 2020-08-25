@@ -378,12 +378,9 @@ let createComponent = (~loc, ~tag, ~styledExpr) =>
   );
 
 /* [@bs.optional] color: string */
-let createCustomPropLabel = (~loc, name, kind) =>
-  Type.field(
-    ~loc,
-    {txt: name, loc},
-    Typ.constr(~loc, {txt: Lident(kind), loc}, []),
-  );
+let createCustomPropLabel = (~loc, name, type_) =>
+  Type.field(~loc, {txt: name, loc}, type_);
+
 /* [@bs.optional] ahref: string */
 let createRecordLabel = (~loc, name, kind) =>
   Type.field(
@@ -657,20 +654,18 @@ let styledPpxMapper = (_, _) => {
 
       let variableList =
         List.map(
-          ((arg, _, _, _, _, type_)) => {
-            /* Gets the type of the argument from the fn definition
-                 (~width: int, ~height: int) => {}
-               */
-            let typeName =
+          ((arg, _, _, _, loc, type_)) => {
+            open Ast_builder; /* Gets the type of the argument from the fn definition
+                      (~width: int, ~height: int) => {}
+                    */
+
+            let type_ =
               switch (type_) {
-              | Some(t) =>
-                switch (t) {
-                | {ptyp_desc: Ptyp_constr({txt: Lident(t), _}, _), _} => t
-                | _ => "string"
-                }
-              | None => "string"
+              | Some(type_) => type_
+              | None =>
+                ptyp_constr(~loc, Located.mk(~loc, Lident("string")), [])
               };
-            (getLabel(arg), typeName);
+            (getLabel(arg), type_);
           },
           argList,
         );
@@ -678,8 +673,7 @@ let styledPpxMapper = (_, _) => {
       let variableProps =
         Some(
           List.map(
-            ((label, typeName)) =>
-              createCustomPropLabel(~loc, label, typeName),
+            ((label, type_)) => createCustomPropLabel(~loc, label, type_),
             variableList,
           ),
         );
