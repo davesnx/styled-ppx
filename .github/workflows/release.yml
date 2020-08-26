@@ -1,13 +1,15 @@
 name: Release
 
 on:
-  label:
-    types: [created]
   push:
     branches:
       - master
     tags:
       - v*
+  pull_request:
+    branches:
+      - master
+    types: [labeled]
 
 jobs:
   build:
@@ -84,7 +86,7 @@ jobs:
     needs: build
     name: Publish
     runs-on: ubuntu-latest
-    if: "github.event.label.name == 'release: nightly' || github.tag != ''"
+    if: "contains(github.event.pull_request.labels.*.name, 'release: nightly') || github.tag != ''"
     steps:
       - uses: actions/checkout@v1
 
@@ -185,7 +187,9 @@ jobs:
 
       - name: Nightly NPM package
         if: "!startsWith(github.ref, 'refs/tags/v')"
-        run: npm publish --access public --tag nightly
+        run: |
+          npm version nightly.${{ github.event.pull_request.issue_number }}.${GITHUB_SHA}
+          npm publish --access public --tag nightly
         working-directory: ./_release
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
