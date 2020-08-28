@@ -175,19 +175,11 @@ jobs:
       #     asset_name: styled-ppx-windows-x64.zip
       #     asset_content_type: application/gzip
 
-      - name: Config NPM package
-        run: |
-          npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
-          npm config set scope "@davesnx"
-          npm config list
-
-        working-directory: ./_release
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
-
       - name: Nightly NPM package
         if: "!startsWith(github.ref, 'refs/tags/v')"
         run: |
+          npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
+          npm config set scope "@davesnx"
           npm version prerelease --preid nightly.${{ github.sha }}
           npm publish --access public --tag nightly
         working-directory: ./_release
@@ -196,7 +188,10 @@ jobs:
 
       - name: Release NPM package
         if: "startsWith(github.ref, 'refs/tags/v')"
-        run: npm publish --access public
+        run: |
+          npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
+          npm config set scope "@davesnx"
+          npm publish --access public
         working-directory: ./_release
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
