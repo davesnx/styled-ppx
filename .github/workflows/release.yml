@@ -17,9 +17,6 @@ jobs:
         os: [ubuntu-latest, macos-latest]
         # os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
-      - name: Log Github reference
-        run: echo "Checking out ${{ github.ref }}"
-
       - uses: actions/checkout@v1
 
       - name: Use Node.js 12.x
@@ -83,7 +80,6 @@ jobs:
     needs: build
     name: Publish
     runs-on: ubuntu-latest
-    if: "contains(github.event.pull_request.labels.*.name, 'release: nightly') || github.tag != ''"
     steps:
       - uses: actions/checkout@v1
 
