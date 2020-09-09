@@ -9,8 +9,8 @@ on:
       - master
 
 jobs:
-  build:
-    name: Build and test native
+  test_native:
+    name: Native
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -61,7 +61,7 @@ jobs:
         run: esy export-dependencies
 
   test_bucklescript:
-    name: Build and test bucklescript
+    name: BuckleScript
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
