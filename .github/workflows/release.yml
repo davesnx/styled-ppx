@@ -174,12 +174,16 @@ jobs:
       #     asset_name: styled-ppx-windows-x64.zip
       #     asset_content_type: application/gzip
 
+      - name: Print short SHA
+        id: sha
+        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+
       - name: Release nightly NPM package
         if: github.event_name == 'pull_request'
         run: |
           npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
           npm config set scope "@davesnx"
-          npm version prerelease --preid nightly.${{ github.sha:8 }}
+          npm version prerelease --preid nightly.${{ steps.sha.outputs.sha_short }} -no-git-tag-version
           npm publish --access public --tag nightly
         working-directory: ./_release
         env:
