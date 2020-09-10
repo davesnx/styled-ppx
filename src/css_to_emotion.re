@@ -172,7 +172,8 @@ and render_media_query = (ar: At_rule.t): expression => {
           switch (Declarations_to_emotion.parse_declarations((ident, value))) {
           | Error(`Not_found) =>
             grammar_error(ident_loc, "unsupported property: " ++ ident)
-          | Error(`Invalid_value(_)) => grammar_error(loc, "invalid value")
+          | Error(`Invalid_value(_error)) =>
+            grammar_error(loc, "invalid value")
           | Ok(_) => ()
           };
         source_code_of_loc(complete_loc);
@@ -200,15 +201,16 @@ and render_media_query = (ar: At_rule.t): expression => {
 }
 and render_declaration =
     (d: Declaration.t, _d_loc: Location.t): list(expression) => {
-  let (name, _name_loc) = d.Declaration.name;
+  let (name, name_loc) = d.Declaration.name;
   let (_valueList, loc) = d.Declaration.value;
 
   let value_source = source_code_of_loc(loc);
 
   switch (Declarations_to_emotion.parse_declarations((name, value_source))) {
   | Ok(exprs) => exprs
-  | Error(`Not_found) => grammar_error(loc, "something weird happened")
-  | Error(`Invalid_value(error)) => grammar_error(loc, error)
+  | Error(`Not_found) => grammar_error(name_loc, "unknown property " ++ name)
+  | Error(`Invalid_value(_error)) =>
+    grammar_error(loc, "invalid property value")
   };
 }
 and render_declarations =
