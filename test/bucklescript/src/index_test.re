@@ -22,8 +22,14 @@ module ComponentInline = [%styled "color: #454545"];
 module ComponentLink = [%styled.a {| color: #454545 |}];
 
 module ComponentWithParameter = [%styled.div
-  (~color: Css.Types.Color.t) => 
-    "color: $(color)"
+  (~color: Css.Types.Color.t, ~theme: [`Light | `Dark]) => {
+    "background: blue";
+    switch (theme) {
+    | `Light => "background-color: #F0F0F0"
+    | `Dark => "background-color: #202020"
+    };
+    "color: $(color)";
+  }
 ];
 
 test("Component renders", () => {
@@ -35,7 +41,7 @@ test("Component renders", () => {
 });
 
 test("ComponentWithParameter renders", () => {
-  <ComponentWithParameter color=Css.red />
+  <ComponentWithParameter color=Css.red theme=`Light/>
   |> render
   |> container
   |> expect

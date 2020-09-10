@@ -98,7 +98,7 @@ let rec getLabeledArgs = (mapper, expr, list) => {
       ~loc=pattern.ppat_loc,
       "Dynamic components are defined with labeled arguments. If you want to know more check the documentation: https://reasonml.org/docs/manual/latest/function#labeled-arguments",
     )
-  | innerExpression => (innerExpression, list, None)
+  | _ => (expr, list, None)
   };
 };
 
@@ -527,7 +527,8 @@ let match_mod_payload = mod_expr => {
             ||| map(
                   ~f=(f, payload, delim) => f(`String((payload, delim))),
                   pexp_constant(pconst_string(__', __)),
-                ),
+                )
+            ||| map(~f=(f, expr) => f(`Expr(expr)), __),
             nil,
           )
           ^:: nil
@@ -568,9 +569,37 @@ let renderStringPayload = (kind, payload, delim) => {
   | `Style =>
     let ast = parse(Css_parser.declaration_list);
     Css_to_emotion.render_emotion_css(ast);
+  | `Declarations =>
+    let ast = parse(Css_parser.declaration_list);
+    Css_to_emotion.render_declaration_list(ast);
   | `Global =>
     let ast = parse(Css_parser.stylesheet);
     Css_to_emotion.render_global(ast);
+  };
+};
+
+let renderPayload = (kind, default_mapper, expr) => {
+  // this mapper is used inside of [%styled.div expr]
+  let mapper = {
+    ...default_mapper,
+    expr: (mapper, expr) => {
+      let map = expr => mapper.Ast_mapper.expr(mapper, expr);
+      let loc = expr.pexp_loc;
+      switch (expr.pexp_desc) {
+      | Pexp_constant(Pconst_string(payload, delim)) =>
+        renderStringPayload(`Declarations, {txt: payload, loc}, delim)
+      | Pexp_sequence(left, right) =>
+        Ast_builder.eapply(~loc, [%expr (@)], [map(left), map(right)])
+      | _ => default_mapper.expr(mapper, expr)
+      };
+    },
+  };
+
+  switch (expr.pexp_desc) {
+  | Pexp_constant(Pconst_string(str, delim)) =>
+    renderStringPayload(kind, {txt: str, loc: expr.pexp_loc}, delim)
+  | _ =>
+    Css_to_emotion.render_emotion_style(mapper.Ast_mapper.expr(mapper, expr))
   };
 };
 
@@ -617,16 +646,6 @@ let styledPpxMapper = (_, _) => {
           "Unexpected HTML tag in [%styled." ++ tag ++ "]",
         );
       };
-
-      let (str, delim) =
-        switch (functionExpr) {
-        | Pexp_constant(Pconst_string(str, delim)) => (str, delim)
-        | _ =>
-          raiseWithLocation(
-            ~loc=pattern.ppat_loc,
-            "Unexpected error happened.",
-          )
-        };
 
       let loc = expression.pexp_loc;
 
@@ -677,7 +696,7 @@ let styledPpxMapper = (_, _) => {
             variableList,
           ),
         );
-      let css_expr = renderStringPayload(`Style, {txt: str, loc}, delim);
+      let css_expr = renderPayload(`Style, default_mapper, functionExpr);
       Mod.mk(
         Pmod_structure([
           createMakeProps(~loc, variableProps),
@@ -740,6 +759,7 @@ let styledPpxMapper = (_, _) => {
           createComponent(~loc, ~tag, ~styledExpr),
         ]),
       );
+    // | Some(({txt: name, loc: nameLoc}, `Expr(expr))) => assert(false)
     | _ => default_mapper.module_expr(mapper, expr)
     };
   },
