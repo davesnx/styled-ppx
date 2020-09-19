@@ -39,6 +39,7 @@
     "@opam/dune": "*",
     "@opam/menhir": "20200211",
     "@opam/ocaml-migrate-parsetree": "^1.7.3",
+    "@opam/ppxlib": "0.14.0",
     "@opam/sedlex": "*",
     "@reason-native/rely": "^3.2.1",
     "@opam/ocaml-lsp-server": "ocaml/ocaml-lsp:ocaml-lsp-server.opam#fbc433e14035d520c7137916ae710b8ec3b415e9",
@@ -58,8 +59,5 @@
     "format": "esy dune build @fmt --auto-promote",
     "watch": "esy dune build -p styled-ppx --watch",
     "utop": "esy dune utop lib -- -implicit-bindings"
-  },
-  "dependencies": {
-    "@opam/ppxlib": "0.14.0"
   }
 }
