@@ -581,6 +581,9 @@ let renderStringPayload = (kind, payload, delim) => {
   | `Global =>
     let ast = parse(Css_parser.stylesheet);
     Css_to_emotion.render_global(ast);
+  | `Keyframe =>
+    let ast = parse(Css_parser.stylesheet);
+    Css_to_emotion.render_emotion_keyframe(ast);
   };
 };
 
@@ -621,6 +624,8 @@ let styledPpxMapper = (_, _) => {
       renderStringPayload(`Style, payload, delim)
     | Some(("styled.global", payload, delim)) =>
       renderStringPayload(`Global, payload, delim)
+    | Some(("styled.keyframe", payload, delim)) =>
+      renderStringPayload(`Keyframe, payload, delim)
     | exception _
     | _ => default_mapper.expr(mapper, expr)
     },

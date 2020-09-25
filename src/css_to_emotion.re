@@ -351,6 +351,53 @@ let render_rule = (ident, r: Rule.t): expression => {
   };
 };
 
+let render_emotion_keyframe = ((ruleList, loc)): expression => {
+  let invalidSelectorErrorMessage = {|
+    keyframe selector can be from | to | <percentage>
+
+    Like following:
+        [%styled.keyframe "
+          0% { opacity: 1; }
+          to { opacity: 0; }
+        "];
+  |};
+
+  let get_percentage_from_prelude =
+    fun
+    | ([(Percentage(n), loc)], _) =>
+      // TODO: can percentage be a decimal value?
+      switch (int_of_string_opt(n)) {
+      | Some(n) when n >= 0 && n <= 100 => n
+      | _ => grammar_error(loc, invalidSelectorErrorMessage)
+      }
+    // https://drafts.csswg.org/css-animations/#keyframes
+    // The keyword from is equivalent to the value 0%
+    | ([(Ident("from"), _)], _) => 0
+    // The keyword to is equivalent to the value 100%
+    | ([(Ident("to"), _)], _) => 100
+    | _ => grammar_error(loc, invalidSelectorErrorMessage);
+
+  let keyframes =
+    ruleList
+    |> List.map(rule => {
+         switch (rule) {
+         | Rule.Style_rule({
+             prelude: (_, prelude_loc) as prelude,
+             block,
+             loc: style_loc,
+           }) =>
+           let percentage =
+             get_percentage_from_prelude(prelude) |> eint(~loc=prelude_loc);
+           let rules = render_declaration_list(block);
+           pexp_tuple(~loc=style_loc, [percentage, rules]);
+         | Rule.At_rule(_) => grammar_error(loc, invalidSelectorErrorMessage)
+         }
+       })
+    |> elist(~loc);
+  let emotionKeyframes =
+    pexp_ident(~loc, {txt: Emotion.lident("keyframes"), loc});
+  eapply(~loc, emotionKeyframes, [keyframes]);
+};
 let render_global = ((ruleList, loc): Stylesheet.t): expression => {
   let emotionGlobal = Exp.ident(~loc, {txt: Emotion.lident("global"), loc});
 
