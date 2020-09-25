@@ -22,7 +22,7 @@ module ComponentInline = [%styled "color: #454545"];
 module ComponentLink = [%styled.a {| color: #454545 |}];
 
 module ComponentWithParameter = [%styled.div
-  (~color: Css.Types.Color.t, ~theme: [`Light | `Dark]) => {
+  (~color, ~theme: [`Light | `Dark]) => {
     "background: blue";
     switch (theme) {
     | `Light => "background-color: #F0F0F0"

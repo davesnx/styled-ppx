@@ -35,11 +35,12 @@ module Component = [%styled {j|
 
 [%css "display: block"];
 
-/* module Component = [%styled fun ~var -> {j|
+module Component = [%styled
+  (~var) => {j|
      color: $var;
      display: block;
-   |j}]
-    */
+   |j}
+];
 
 module Component = [%styled];
 module Component = [%styled ""];
