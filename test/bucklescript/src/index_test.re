@@ -2,6 +2,11 @@ open Jest;
 open Expect;
 open ReactTestingLibrary;
 
+let fadeIn = [%styled.keyframe {|
+  0% { opacity: 0 }
+  100% { opacity: 1 }
+|}];
+
 module Component = [%styled.div {|
   display: flex;
   justify-content: center;
@@ -12,6 +17,9 @@ module Component = [%styled.div {|
   width: 100vw;
 
   font-size: 30px;
+
+  animation-name: $(fadeIn);
+  /* animation: $(fadeIn) ease-in 200ms; */
 
   width: unset;
   @media (min-width: 30em) and (min-height: 20em) {
