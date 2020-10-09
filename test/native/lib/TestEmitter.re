@@ -348,6 +348,42 @@ let media_query_static_css_tests = [%expr
     ),
   |]
 ];
+let keyframe_static_css_tests = [%expr
+  [|
+    (
+      [%styled.keyframe
+        {|
+        from { opacity: 0 }
+        50% {
+          background: red;
+          border: 1px solid blue
+        }
+        to { opacity: 1 }
+        |}
+      ],
+      [
+        (0, [Css.opacity(0.)]),
+        (
+          50,
+          [
+            Css.unsafe("background", "red"),
+            Css.unsafe("border", "1px solid blue"),
+          ],
+        ),
+        (100, [Css.opacity(1.)]),
+      ],
+    ),
+    (
+      [%styled.keyframe
+        {|
+        0% { opacity: 0 }
+        100% { opacity: 1 }
+        |}
+      ],
+      [(0, [Css.opacity(0.)]), (100, [Css.opacity(1.)])],
+    ),
+  |]
+];
 describe("emit bs-css from static [%css]", ({test, _}) => {
   let test = (prefix, index, (result, expected)) =>
     test(prefix ++ string_of_int(index), compare(result, expected));
@@ -356,6 +392,7 @@ describe("emit bs-css from static [%css]", ({test, _}) => {
   let selectors_static_css_tests = extract_tests(selectors_static_css_tests);
   let media_query_static_css_tests =
     extract_tests(media_query_static_css_tests);
+  let keyframe_static_css_tests = extract_tests(keyframe_static_css_tests);
 
   write_tests_to_file(properties_static_css_tests, "static_css_tests.ml");
   write_tests_to_file(selectors_static_css_tests, "selectors_css_tests.ml");
@@ -363,10 +400,12 @@ describe("emit bs-css from static [%css]", ({test, _}) => {
     media_query_static_css_tests,
     "media_query_css_tests.ml",
   );
+  write_tests_to_file(keyframe_static_css_tests, "keyframe_css_tests.ml");
 
   List.iteri(test("properties static: "), properties_static_css_tests);
   List.iteri(test("selectors static: "), selectors_static_css_tests);
   List.iteri(test("media query static: "), media_query_static_css_tests);
+  List.iteri(test("keyframes static: "), keyframe_static_css_tests);
 });
 
 let properties_variable_css_tests = [

@@ -2,6 +2,11 @@ open Jest;
 open Expect;
 open ReactTestingLibrary;
 
+let fadeIn = [%styled.keyframe {|
+  0% { opacity: 0 }
+  100% { opacity: 1 }
+|}];
+
 module Component = [%styled.div {|
   display: flex;
   justify-content: center;
@@ -13,6 +18,9 @@ module Component = [%styled.div {|
 
   font-size: 30px;
 
+  animation-name: $(fadeIn);
+  /* animation: $(fadeIn) ease-in 200ms; */
+
   width: unset;
   @media (min-width: 30em) and (min-height: 20em) {
     color: brown;
@@ -22,7 +30,7 @@ module ComponentInline = [%styled "color: #454545"];
 module ComponentLink = [%styled.a {| color: #454545 |}];
 
 module ComponentWithParameter = [%styled.div
-  (~color: Css.Types.Color.t, ~theme: [`Light | `Dark]) => {
+  (~color, ~theme: [`Light | `Dark]) => {
     "background: blue";
     switch (theme) {
     | `Light => "background-color: #F0F0F0"

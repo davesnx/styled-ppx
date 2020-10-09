@@ -343,26 +343,27 @@ let createMakeBody = (~loc, ~tag, ~styledExpr) =>
   );
 
 /* props: makeProps */
-let createMakeArguments = (~loc) => {
+let createMakeArguments = (~loc, ~params) => {
   Pat.constraint_(
     ~loc,
     Pat.mk(~loc, Ppat_var({txt: "props", loc})),
-    Typ.constr(~loc, {txt: Lident("makeProps"), loc}, []),
+    Typ.constr(~loc, {txt: Lident("makeProps"), loc}, params),
   );
 };
 
 /* let make = (props: makeProps) => + createMakeBody */
-let createMakeFn = (~loc, ~tag, ~styledExpr) =>
+let createMakeFn = (~loc, ~tag, ~styledExpr, ~params) =>
   Exp.fun_(
     ~loc,
     Nolabel,
     None,
-    createMakeArguments(~loc),
+    createMakeArguments(~loc, ~params),
     createMakeBody(~loc, ~tag, ~styledExpr),
   );
 
 /* [@react.component] + createMakeFn */
-let createComponent = (~loc, ~tag, ~styledExpr) =>
+let createComponent = (~loc, ~tag, ~styledExpr, ~params) => {
+  let params = Option.value(~default=[], params);
   Str.mk(
     ~loc,
     Pstr_value(
@@ -371,15 +372,18 @@ let createComponent = (~loc, ~tag, ~styledExpr) =>
         Vb.mk(
           ~loc,
           Pat.mk(~loc, Ppat_var({txt: "make", loc})),
-          createMakeFn(~loc, ~tag, ~styledExpr),
+          createMakeFn(~loc, ~tag, ~styledExpr, ~params),
         ),
       ],
     ),
   );
+};
 
 /* [@bs.optional] color: string */
 let createCustomPropLabel = (~loc, name, type_) =>
   Type.field(~loc, {txt: name, loc}, type_);
+
+let createTypeVariable = (~loc, name) => Ast_builder.ptyp_var(~loc, name);
 
 /* [@bs.optional] ahref: string */
 let createRecordLabel = (~loc, name, kind) =>
@@ -440,10 +444,10 @@ let createMakeProps = (~loc, extraProps) => {
       ]),
     );
 
-  let dynamicProps =
+  let (params, dynamicProps) =
     switch (extraProps) {
-    | None => []
-    | Some(props) => props
+    | None => ([], [])
+    | Some((params, props)) => (params, props)
     };
   /*
      List of
@@ -472,6 +476,7 @@ let createMakeProps = (~loc, extraProps) => {
       dynamicProps,
     );
 
+  let params = params |> List.map(type_ => (type_, Invariant));
   Str.mk(
     ~loc,
     Pstr_type(
@@ -482,6 +487,7 @@ let createMakeProps = (~loc, extraProps) => {
           ~priv=Public,
           ~attrs=[bsDerivingAbstract],
           ~kind=Ptype_record(reactProps),
+          ~params,
           {txt: "makeProps", loc},
         ),
       ],
@@ -575,6 +581,9 @@ let renderStringPayload = (kind, payload, delim) => {
   | `Global =>
     let ast = parse(Css_parser.stylesheet);
     Css_to_emotion.render_global(ast);
+  | `Keyframe =>
+    let ast = parse(Css_parser.stylesheet);
+    Css_to_emotion.render_emotion_keyframe(ast);
   };
 };
 
@@ -615,6 +624,8 @@ let styledPpxMapper = (_, _) => {
       renderStringPayload(`Style, payload, delim)
     | Some(("styled.global", payload, delim)) =>
       renderStringPayload(`Global, payload, delim)
+    | Some(("styled.keyframe", payload, delim)) =>
+      renderStringPayload(`Keyframe, payload, delim)
     | exception _
     | _ => default_mapper.expr(mapper, expr)
     },
@@ -674,32 +685,32 @@ let styledPpxMapper = (_, _) => {
       let variableList =
         List.map(
           ((arg, _, _, _, loc, type_)) => {
-            open Ast_builder; /* Gets the type of the argument from the fn definition
-                      (~width: int, ~height: int) => {}
-                    */
-
-            let type_ =
+            let label = getLabel(arg);
+            let (kind, type_) =
               switch (type_) {
-              | Some(type_) => type_
-              | None =>
-                ptyp_constr(~loc, Located.mk(~loc, Lident("string")), [])
+              | Some(type_) => (`Typed, type_)
+              | None => (`Open, createTypeVariable(~loc, label))
               };
-            (getLabel(arg), type_);
+            (label, kind, type_);
           },
           argList,
         );
-
+      let variableParams =
+        variableList
+        |> List.filter_map(
+             fun
+             | (_, `Open, type_) => Some(type_)
+             | _ => None,
+           );
       let variableProps =
-        Some(
-          List.map(
-            ((label, type_)) => createCustomPropLabel(~loc, label, type_),
-            variableList,
-          ),
+        List.map(
+          ((label, _, type_)) => createCustomPropLabel(~loc, label, type_),
+          variableList,
         );
       let css_expr = renderPayload(`Style, default_mapper, functionExpr);
       Mod.mk(
         Pmod_structure([
-          createMakeProps(~loc, variableProps),
+          createMakeProps(~loc, Some((variableParams, variableProps))),
           createReactBinding(~loc),
           createDynamicStyles(
             ~loc,
@@ -707,7 +718,12 @@ let styledPpxMapper = (_, _) => {
             ~args=argList,
             ~exp=css_expr,
           ),
-          createComponent(~loc, ~tag, ~styledExpr),
+          createComponent(
+            ~loc,
+            ~tag,
+            ~styledExpr,
+            ~params=Some(variableParams),
+          ),
         ]),
       );
     | Some(({txt: name, loc: nameLoc}, `String(str, delim)))
@@ -732,7 +748,7 @@ let styledPpxMapper = (_, _) => {
           createMakeProps(~loc, None),
           createReactBinding(~loc),
           createStyles(~loc, ~name=styleVariableName, ~exp=css_expr),
-          createComponent(~loc, ~tag, ~styledExpr),
+          createComponent(~loc, ~tag, ~styledExpr, ~params=None),
         ]),
       );
     | Some(({txt: name, loc: nameLoc}, `None)) when isStyledTag(name) =>
@@ -756,7 +772,7 @@ let styledPpxMapper = (_, _) => {
           createMakeProps(~loc, None),
           createReactBinding(~loc),
           createStyles(~loc, ~name=styleVariableName, ~exp=css_expr),
-          createComponent(~loc, ~tag, ~styledExpr),
+          createComponent(~loc, ~tag, ~styledExpr, ~params=None),
         ]),
       );
     // | Some(({txt: name, loc: nameLoc}, `Expr(expr))) => assert(false)
