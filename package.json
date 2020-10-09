@@ -1,5 +1,5 @@
 {
-  "name": "styled-ppx",
+  "name": "@davesnx/styled-ppx",
   "version": "1.0.1-0",
   "description": "CSS-in-Reason and OCaml",
   "author": "David Sancho <dsnxmoreno@gmail.com>",
@@ -22,7 +22,7 @@
     "url": "https://github.com/davesnx/styled-ppx.git"
   },
   "esy": {
-    "build": "dune build -p #{self.name}",
+    "build": "dune build",
     "buildEnv": {
       "ODOC_SYNTAX": "re"
     },
