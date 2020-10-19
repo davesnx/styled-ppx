@@ -77,3 +77,5 @@ module NestedSelectors = [%styled.body
   }
 |}
 ];
+
+module Input = [%styled.input ""];
