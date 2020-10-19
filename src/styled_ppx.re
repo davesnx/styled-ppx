@@ -6,6 +6,7 @@ open Parsetree;
 open Ast_helper;
 open Longident;
 open React_props;
+open Styled_ppx_parser;
 
 module Ast_builder = Ppxlib.Ast_builder.Default;
 

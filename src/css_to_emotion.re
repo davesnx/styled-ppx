@@ -26,6 +26,7 @@ open Ast_helper;
 open Asttypes;
 open Parsetree;
 open Longident;
+open Styled_ppx_parser;
 open Css_types;
 open Component_value;
 open Ppxlib.Ast_builder.Default;

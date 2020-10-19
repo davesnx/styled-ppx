@@ -1,4 +1,4 @@
-open Css_types;
+open Styled_ppx_parser.Css_types;
 let render_declaration_list:
   ((list(Declaration_list.kind), Warnings.loc)) => Parsetree.expression;
 let render_emotion_style: Parsetree.expression => Parsetree.expression;
