@@ -58,23 +58,11 @@ jobs:
       - name: Export dependencies
         run: esy export-dependencies
 
-      - name: Get Esy binary path
-        id: esy_binary_path
-        shell: bash
-        run: |
-          # from https://stackoverflow.com/a/24848739/617787
-          s=$(pwd); d=$(dirname $(esy x which styled-ppx));
-          while [ "${d#$s/}" == "${d}" ]
-          do s=$(dirname $s);b="../${b}"; done;
-          ESY__BINARY_PATH=${b}${d#$s/}/styled-ppx
-          echo "ESY__BINARY_PATH: $ESY__BINARY_PATH"
-          echo "##[set-output name=path;]$ESY__BINARY_PATH"
-
       - name: Upload artifacts for ${{ matrix.os }}
         uses: actions/upload-artifact@master
         with:
           name: ${{ matrix.os }}
-          path: ${{ steps.esy_binary_path.outputs.path }}
+          path: _build/default/bin/Bin.exe
 
   publish:
     needs: build
