@@ -15,7 +15,7 @@
     }
   ],
   "ppx-flags": [
-    "../../_esy/default/build/default/bin/Bin.exe"
+    "../../_build/default/bin/Bin.exe"
   ],
   "suffix": ".bs.js",
   "namespace": true,
