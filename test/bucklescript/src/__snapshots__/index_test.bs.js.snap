@@ -42,3 +42,11 @@ exports[`ComponentWithParameter renders 1`] = `
   />
 </div>
 `;
+
+exports[`StyledInput renders and self-closing element (whithout children) 1`] = `
+<div>
+  <input
+    class="css-6577wb"
+  />
+</div>
+`;
