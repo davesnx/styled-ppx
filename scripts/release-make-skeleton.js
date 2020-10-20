@@ -3,7 +3,7 @@
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const esy = require('../package.json');
+const packageJson = require('../package.json');
 
 const filesToCopy = ['LICENSE', 'README.md'];
 
@@ -50,12 +50,12 @@ for (const file of filesToTouch) {
 }
 
 const pkgJson = {
-  name,
-  version: esy.version,
-  description: esy.description,
-  homepage: esy.homepage,
-  license: esy.license,
-  repository: esy.repository,
+  name: packageJson.name,
+  version: packageJson.version,
+  description: packageJson.description,
+  homepage: packageJson.homepage,
+  license: packageJson.license,
+  repository: packageJson.repository,
   scripts: {
     postinstall: 'node postinstall.js',
   },
