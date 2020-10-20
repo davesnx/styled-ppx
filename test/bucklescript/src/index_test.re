@@ -1,6 +1,7 @@
 open Jest;
 open Expect;
 open ReactTestingLibrary;
+Emotion.loadSerializer();
 
 let fadeIn = [%styled.keyframe {|
   0% { opacity: 0 }
