@@ -1,44 +1,113 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Component renders 1`] = `
+@keyframes animation-0 {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.emotion-0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  height: 100vh;
+  width: unset;
+  font-size: 30px;
+  -webkit-animation-name: animation-0;
+  animation-name: animation-0;
+}
+
+@media (min-width:30em) and (min-height:20em) {
+  .emotion-0 {
+    color: #A52A2A;
+  }
+}
+
 <div>
   <div
-    class="css-1hbubrx"
+    class="emotion-0"
   />
 </div>
 `;
 
 exports[`ComponentInline renders and defaults to a div 1`] = `
+.emotion-0 {
+  color: #454545;
+}
+
 <div>
   <div
-    class="css-6577wb"
+    class="emotion-0"
   />
 </div>
 `;
 
 exports[`ComponentLink should receive href props 1`] = `
+.emotion-0 {
+  color: #454545;
+}
+
 <div>
   <a
-    class="css-6577wb"
+    class="emotion-0"
     href="https://sancho.dev"
   />
 </div>
 `;
 
 exports[`ComponentLink should render an <a /> tag 1`] = `
+.emotion-0 {
+  color: #454545;
+}
+
 <div>
   <a
-    class="css-6577wb"
+    class="emotion-0"
   />
 </div>
 `;
 
 exports[`ComponentWithParameter renders 1`] = `
+.emotion-0 {
+  background: blue;
+  background-color: #F0F0F0;
+  color: #FF0000;
+}
+
 <div>
   <div
-    class="css-6hpeuv"
+    class="emotion-0"
     color="5194459,FF0000"
     theme="136970422"
+  />
+</div>
+`;
+
+exports[`StyledInput renders and self-closing element (whithout children) 1`] = `
+.emotion-0 {
+  color: #454545;
+}
+
+<div>
+  <input
+    class="emotion-0"
   />
 </div>
 `;

@@ -4,7 +4,7 @@ type domProp = | Event(event) | Attribute(attr);
 
 /* This list contains all React.component's DOM Props.
    current list: https://gist.github.com/davesnx/22f0e81b6d7450e3e0dcc157595426f2
-   taken from: https://github.com/reasonml/reason-react/blob/master/src/ReactDOMRe.re
+   taken from: https://github.com/reasonml/reason-react/blob/master/src/ReactDOM.re
    */
 let domPropsList = [
   Attribute({name: "key", type_: "string"}),

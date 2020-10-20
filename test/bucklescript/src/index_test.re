@@ -1,6 +1,7 @@
 open Jest;
 open Expect;
 open ReactTestingLibrary;
+Emotion.loadSerializer();
 
 let fadeIn = [%styled.keyframe {|
   0% { opacity: 0 }
@@ -28,6 +29,7 @@ module Component = [%styled.div {|
 |}];
 module ComponentInline = [%styled "color: #454545"];
 module ComponentLink = [%styled.a {| color: #454545 |}];
+module StyledInput = [%styled.input "color: #454545"];
 
 module ComponentWithParameter = [%styled.div
   (~color, ~theme: [`Light | `Dark]) => {
@@ -58,6 +60,14 @@ test("ComponentWithParameter renders", () => {
 
 test("ComponentInline renders and defaults to a div", () => {
   <ComponentInline />
+  |> render
+  |> container
+  |> expect
+  |> toMatchSnapshot
+});
+
+test("StyledInput renders and self-closing element (whithout children)", () => {
+  <StyledInput />
   |> render
   |> container
   |> expect

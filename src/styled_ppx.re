@@ -128,7 +128,7 @@ let createDynamicStyles = (~loc, ~name, ~args, ~exp) => {
    (string, Js.t({ .. }), array(React.element)) => React.element =
    "createElement";
  */
-let createReactBinding = (~loc) => {
+let externalCreateElement = (~loc) => {
   Str.primitive({
     pval_loc: loc,
     pval_name: {
@@ -168,6 +168,63 @@ let createReactBinding = (~loc) => {
               [],
             ),
           ),
+        ),
+      ),
+    pval_prim: ["createElement"],
+    pval_attributes: [
+      Attr.mk({txt: "bs.val", loc}, PStr([])),
+      Attr.mk(
+        {txt: "bs.module", loc},
+        PStr([
+          Str.mk(
+            ~loc,
+            Pstr_eval(
+              Exp.constant(
+                ~loc,
+                ~attrs=[
+                  Attr.mk({txt: "reason.raw_literal", loc}, PStr([])),
+                ],
+                Pconst_string("react", None),
+              ),
+              [],
+            ),
+          ),
+        ]),
+      ),
+    ],
+  });
+};
+
+/*
+   [@bs.val] [@bs.module "react"] external createVariadicElement:
+   (string, Js.t({ .. })) => React.element =
+   "createElement";
+ */
+let externalCreateVariadicElement = (~loc) => {
+  Str.primitive({
+    pval_loc: loc,
+    pval_name: {
+      txt: "createVariadicElement",
+      loc,
+    },
+    pval_type:
+      Typ.arrow(
+        ~loc,
+        Nolabel,
+        Typ.constr(~loc, {txt: Lident("string"), loc}, []),
+        Typ.arrow(
+          ~loc,
+          Nolabel,
+          Typ.constr(
+            ~loc,
+            {txt: Ldot(Lident("Js"), "t"), loc},
+            [Typ.object_(~loc, [], Open)],
+          ),
+          Typ.constr(
+              ~loc,
+              {txt: Ldot(Lident("React"), "element"), loc},
+              [],
+            ),
         ),
       ),
     pval_prim: ["createElement"],
@@ -267,6 +324,38 @@ let createElement = (~loc, ~tag) => {
   );
 };
 
+/* div(~className=styles, ()) + createSwitchChildren */
+let createVariadicElement = (~loc, ~tag) => {
+  Exp.apply(
+    ~loc,
+    Exp.ident(~loc, {txt: Lident("createVariadicElement"), loc}),
+    [
+      (
+        Nolabel,
+        Exp.constant(
+          ~loc,
+          ~attrs=[
+            Attr.mk(
+              {txt: "reason.raw_literal", loc},
+              PStr([
+                Str.mk(
+                  ~loc,
+                  Pstr_eval(
+                    Exp.constant(~loc, Pconst_string(tag, None)),
+                    [],
+                  ),
+                ),
+              ]),
+            ),
+          ],
+          Pconst_string(tag, None),
+        ),
+      ),
+      (Nolabel, Exp.ident(~loc, {txt: Lident("newProps"), loc})),
+    ],
+  );
+};
+
 /* let stylesObject = {"className": styled}; */
 let createStylesObject = (~loc, ~value) =>
   Vb.mk(
@@ -338,7 +427,9 @@ let createMakeBody = (~loc, ~tag, ~styledExpr) =>
       ~loc,
       Nonrecursive,
       [createNewProps(~loc)],
-      createElement(~loc, ~tag),
+      Html.isValidSelfClosingTag(tag)
+        ? createVariadicElement(~loc, ~tag)
+        : createElement(~loc, ~tag),
     ),
   );
 
@@ -651,7 +742,7 @@ let styledPpxMapper = (_, _) => {
       let (functionExpr, argList, _) =
         getLabeledArgs(mapper, expression, [firstArg]);
 
-      if (!List.exists(t => t == tag, Html.tags)) {
+      if (!Html.isValidTag(tag)) {
         raiseWithLocation(
           ~loc=nameLoc,
           "Unexpected HTML tag in [%styled." ++ tag ++ "]",
@@ -711,7 +802,8 @@ let styledPpxMapper = (_, _) => {
       Mod.mk(
         Pmod_structure([
           createMakeProps(~loc, Some((variableParams, variableProps))),
-          createReactBinding(~loc),
+          externalCreateElement(~loc),
+          externalCreateVariadicElement(~loc),
           createDynamicStyles(
             ~loc,
             ~name=styleVariableName,
@@ -730,7 +822,7 @@ let styledPpxMapper = (_, _) => {
         when isStyledTag(name) =>
       let tag = getTag(name);
 
-      if (!List.exists(t => t == tag, Html.tags)) {
+      if (!Html.isValidTag(tag)) {
         raiseWithLocation(
           ~loc=nameLoc,
           "Unexpected HTML tag in [%styled." ++ tag ++ "]",
@@ -746,7 +838,8 @@ let styledPpxMapper = (_, _) => {
       Mod.mk(
         Pmod_structure([
           createMakeProps(~loc, None),
-          createReactBinding(~loc),
+          externalCreateElement(~loc),
+          externalCreateVariadicElement(~loc),
           createStyles(~loc, ~name=styleVariableName, ~exp=css_expr),
           createComponent(~loc, ~tag, ~styledExpr, ~params=None),
         ]),
@@ -754,7 +847,7 @@ let styledPpxMapper = (_, _) => {
     | Some(({txt: name, loc: nameLoc}, `None)) when isStyledTag(name) =>
       let tag = getTag(name);
 
-      if (!List.exists(t => t == tag, Html.tags)) {
+      if (!Html.isValidTag(tag)) {
         raiseWithLocation(
           ~loc=nameLoc,
           "Unexpected HTML tag in [%styled." ++ tag ++ "]",
@@ -770,7 +863,8 @@ let styledPpxMapper = (_, _) => {
       Mod.mk(
         Pmod_structure([
           createMakeProps(~loc, None),
-          createReactBinding(~loc),
+          externalCreateElement(~loc),
+          externalCreateVariadicElement(~loc),
           createStyles(~loc, ~name=styleVariableName, ~exp=css_expr),
           createComponent(~loc, ~tag, ~styledExpr, ~params=None),
         ]),
