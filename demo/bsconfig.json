@@ -3,7 +3,9 @@
   "reason": {
     "react-jsx": 3
   },
-  "bsc-flags": ["-bs-super-errors"],
+  "bsc-flags": [
+    "-bs-super-errors"
+  ],
   "sources": {
     "dir": "src",
     "subdirs": true,
@@ -15,9 +17,15 @@
       "in-source": true
     }
   ],
-  "ppx-flags": ["../_esy/default/build/default/bin/Bin.exe"],
+  "ppx-flags": [
+    "../_build/default/bin/Bin.exe"
+  ],
   "suffix": ".bs.js",
   "namespace": true,
-  "bs-dependencies": ["bs-css", "bs-css-emotion", "reason-react"],
+  "bs-dependencies": [
+    "bs-css",
+    "bs-css-emotion",
+    "reason-react"
+  ],
   "refmt": 3
 }

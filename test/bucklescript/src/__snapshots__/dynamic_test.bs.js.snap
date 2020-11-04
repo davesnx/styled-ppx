@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ComponentWithParameter renders 1`] = `
+.emotion-0 {
+  background: blue;
+  background-color: #F0F0F0;
+  color: #FF0000;
+}
+
+<div>
+  <div
+    class="emotion-0"
+    color="5194459,FF0000"
+    theme="136970422"
+  />
+</div>
+`;

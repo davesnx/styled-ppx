@@ -124,78 +124,6 @@ let createDynamicStyles = (~loc, ~name, ~args, ~exp) => {
 };
 
 /*
-   [@bs.val] [@bs.module "react"] external createElement:
-   (string, Js.t({ .. }), array(React.element)) => React.element =
-   "createElement";
- */
-let externalCreateElement = (~loc) => {
-  Str.primitive({
-    pval_loc: loc,
-    pval_name: {
-      txt: "createElement",
-      loc,
-    },
-    pval_type:
-      Typ.arrow(
-        ~loc,
-        Nolabel,
-        Typ.constr(~loc, {txt: Lident("string"), loc}, []),
-        Typ.arrow(
-          ~loc,
-          Nolabel,
-          Typ.constr(
-            ~loc,
-            {txt: Ldot(Lident("Js"), "t"), loc},
-            [Typ.object_(~loc, [], Open)],
-          ),
-          Typ.arrow(
-            ~loc,
-            Nolabel,
-            Typ.constr(
-              ~loc,
-              {txt: Lident("array"), loc},
-              [
-                Typ.constr(
-                  ~loc,
-                  {txt: Ldot(Lident("React"), "element"), loc},
-                  [],
-                ),
-              ],
-            ),
-            Typ.constr(
-              ~loc,
-              {txt: Ldot(Lident("React"), "element"), loc},
-              [],
-            ),
-          ),
-        ),
-      ),
-    pval_prim: ["createElement"],
-    pval_attributes: [
-      Attr.mk({txt: "bs.val", loc}, PStr([])),
-      Attr.mk(
-        {txt: "bs.module", loc},
-        PStr([
-          Str.mk(
-            ~loc,
-            Pstr_eval(
-              Exp.constant(
-                ~loc,
-                ~attrs=[
-                  Attr.mk({txt: "reason.raw_literal", loc}, PStr([])),
-                ],
-                Pconst_string("react", None),
-              ),
-              [],
-            ),
-          ),
-        ]),
-      ),
-    ],
-  });
-};
-
-/*
    [@bs.val] [@bs.module "react"] external createVariadicElement:
    (string, Js.t({ .. })) => React.element =
    "createElement";
@@ -252,78 +180,6 @@ let externalCreateVariadicElement = (~loc) => {
   });
 };
 
-/* switch (props->childrenGet) {
-     | Some(child) => child
-     | None => React.null
-   } */
-let createSwitchChildren = (~loc) => {
-  let noneCase =
-    Exp.case(
-      Pat.mk(~loc, Ppat_construct({txt: Lident("None"), loc}, None)),
-      Exp.ident(~loc, {txt: Ldot(Lident("React"), "null"), loc}),
-    );
-
-  let someChildCase =
-    Exp.case(
-      Pat.mk(
-        ~loc,
-        ~attrs=[Attr.mk({txt: "explicit_arity", loc}, PStr([]))], /* Add [@explicit_arity] */
-        Ppat_construct(
-          {txt: Lident("Some"), loc},
-          Some(
-            Pat.mk(
-              ~loc,
-              Ppat_tuple([Pat.mk(~loc, Ppat_var({txt: "chil", loc}))]),
-            ),
-          ),
-        ),
-      ),
-      Exp.ident(~loc, {txt: Lident("chil"), loc}),
-    );
-
-  let matchingExp =
-    Exp.apply(
-      ~loc,
-      Exp.ident(~loc, {txt: Lident("childrenGet"), loc}),
-      [(Nolabel, Exp.ident(~loc, {txt: Lident("props"), loc}))],
-    );
-
-  Exp.match(~loc, matchingExp, [someChildCase, noneCase]);
-};
-
-/* div(~className=styles, ~children, ()) + createSwitchChildren */
-let createElement = (~loc, ~tag) => {
-  Exp.apply(
-    ~loc,
-    Exp.ident(~loc, {txt: Lident("createElement"), loc}),
-    [
-      (
-        Nolabel,
-        Exp.constant(
-          ~loc,
-          ~attrs=[
-            Attr.mk(
-              {txt: "reason.raw_literal", loc},
-              PStr([
-                Str.mk(
-                  ~loc,
-                  Pstr_eval(
-                    Exp.constant(~loc, Pconst_string(tag, None)),
-                    [],
-                  ),
-                ),
-              ]),
-            ),
-          ],
-          Pconst_string(tag, None),
-        ),
-      ),
-      (Nolabel, Exp.ident(~loc, {txt: Lident("newProps"), loc})),
-      (Nolabel, Exp.array(~loc, [createSwitchChildren(~loc)])),
-    ],
-  );
-};
-
 /* div(~className=styles, ()) + createSwitchChildren */
 let createVariadicElement = (~loc, ~tag) => {
   Exp.apply(
@@ -371,7 +227,7 @@ let createStylesObject = (~loc, ~value) =>
             Pstr_eval(
               Exp.record(
                 ~loc,
-                [({txt: Lident("className"), loc}, value)],
+                [ ({txt: Lident("className"), loc}, value) ],
                 None,
               ),
               [],
@@ -427,9 +283,7 @@ let createMakeBody = (~loc, ~tag, ~styledExpr) =>
       ~loc,
       Nonrecursive,
       [createNewProps(~loc)],
-      Html.isValidSelfClosingTag(tag)
-        ? createVariadicElement(~loc, ~tag)
-        : createElement(~loc, ~tag),
+      createVariadicElement(~loc, ~tag)
     ),
   );
 
@@ -476,7 +330,7 @@ let createCustomPropLabel = (~loc, name, type_) =>
 
 let createTypeVariable = (~loc, name) => Ast_builder.ptyp_var(~loc, name);
 
-/* [@bs.optional] ahref: string */
+/* [@bs.optional] href: string */
 let createRecordLabel = (~loc, name, kind) =>
   Type.field(
     ~loc,
@@ -802,7 +656,6 @@ let styledPpxMapper = (_, _) => {
       Mod.mk(
         Pmod_structure([
           createMakeProps(~loc, Some((variableParams, variableProps))),
-          externalCreateElement(~loc),
           externalCreateVariadicElement(~loc),
           createDynamicStyles(
             ~loc,
@@ -838,7 +691,6 @@ let styledPpxMapper = (_, _) => {
       Mod.mk(
         Pmod_structure([
           createMakeProps(~loc, None),
-          externalCreateElement(~loc),
           externalCreateVariadicElement(~loc),
           createStyles(~loc, ~name=styleVariableName, ~exp=css_expr),
           createComponent(~loc, ~tag, ~styledExpr, ~params=None),
@@ -863,7 +715,6 @@ let styledPpxMapper = (_, _) => {
       Mod.mk(
         Pmod_structure([
           createMakeProps(~loc, None),
-          externalCreateElement(~loc),
           externalCreateVariadicElement(~loc),
           createStyles(~loc, ~name=styleVariableName, ~exp=css_expr),
           createComponent(~loc, ~tag, ~styledExpr, ~params=None),

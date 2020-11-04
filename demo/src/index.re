@@ -5,8 +5,7 @@
   }
 |}];
 
-module App = [%styled.div
-  (~background) => {j|
+module App = [%styled.div {j|
   position: absolute;
   top: 0;
   left: 0;
@@ -18,57 +17,50 @@ module App = [%styled.div
   align-items: center;
   flex-direction: column;
 
-  background-color: $background;
-
   cursor: pointer;
 
   & > div {
     padding: 20px;
   }
-
-  & > a:nth-child(3n+2) {
-    background-color: green;
-  }
-  & > a:nth-child(even) {
-    background-color: red;
-  }
-
-  &::active {
-    background-color: blue;
-  }
 |j}
 ];
 
+module App2 = {
+  [@react.component]
+  let make = (~children) => {
+    <div>
+      children
+    </div>
+  }
+}
+
 module Link = [%styled.a
   {|
-  color: #FFFFFF;
   font-size: 36px;
   margin-top: 16px;
-  &:hover {
-    background-color: pink;
-  }
 |}
 ];
 
 module Line = [%styled.span];
 module Wrapper = [%styled ""];
 
-let space = "10px";
-
-module Component = [%styled
-  (~background: string, ~space: string) => {j|
-    background-color: $background;
-    padding: $space;
-    border-radius: 20px;
-    box-sizing: border-box;
+module Component = [%styled {j|
+  background-color: red;
+  border-radius: 20px;
+  box-sizing: border-box;
 |j}
 ];
 
 ReactDOMRe.renderToElementWithId(
-  <App onClick=Js.log background="#443434">
-    <Component background="#FFFFFF" space="30">
-      {React.string("Demo of...")}
+  <App onClick=Js.log>
+    <Component>
+      {React.string("test..")}
     </Component>
+    <App2>
+      <Component>
+        {React.string("Demo of...")}
+      </Component>
+    </App2>
     <Link href="https://github.com/davesnx/styled-ppx">
       {React.string("styled-ppx")}
     </Link>

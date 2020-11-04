@@ -894,10 +894,6 @@ module Component = {
     suppressContentEditableWarning: bool,
   };
   [@bs.val] [@bs.module "react"]
-  external createElement:
-    (string, Js.t({..}), array(React.element)) => React.element =
-    "createElement";
-  [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
 
@@ -905,16 +901,7 @@ module Component = {
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
-    createElement(
-      "div",
-      newProps,
-      [|
-        switch (childrenGet(props)) {
-        | Some(chil) => chil
-        | None => React.null
-        },
-      |],
-    );
+    createVariadicElement("div", newProps);
   };
 };
 module Component = {
@@ -1786,10 +1773,6 @@ module Component = {
     suppressContentEditableWarning: bool,
   };
   [@bs.val] [@bs.module "react"]
-  external createElement:
-    (string, Js.t({..}), array(React.element)) => React.element =
-    "createElement";
-  [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
 
@@ -1801,16 +1784,7 @@ module Component = {
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
-    createElement(
-      "section",
-      newProps,
-      [|
-        switch (childrenGet(props)) {
-        | Some(chil) => chil
-        | None => React.null
-        },
-      |],
-    );
+    createVariadicElement("section", newProps);
   };
 };
 
@@ -2684,10 +2658,6 @@ module Component = {
     suppressContentEditableWarning: bool,
   };
   [@bs.val] [@bs.module "react"]
-  external createElement:
-    (string, Js.t({..}), array(React.element)) => React.element =
-    "createElement";
-  [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
 
@@ -2695,16 +2665,7 @@ module Component = {
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
-    createElement(
-      "div",
-      newProps,
-      [|
-        switch (childrenGet(props)) {
-        | Some(chil) => chil
-        | None => React.null
-        },
-      |],
-    );
+    createVariadicElement("div", newProps);
   };
 };
 
@@ -3580,10 +3541,6 @@ module Component = {
     var: 'var,
   };
   [@bs.val] [@bs.module "react"]
-  external createElement:
-    (string, Js.t({..}), array(React.element)) => React.element =
-    "createElement";
-  [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
 
@@ -3592,16 +3549,7 @@ module Component = {
   let make = (props: makeProps('var)) => {
     let stylesObject = {"className": styles(~var=varGet(props))};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
-    createElement(
-      "div",
-      newProps,
-      [|
-        switch (childrenGet(props)) {
-        | Some(chil) => chil
-        | None => React.null
-        },
-      |],
-    );
+    createVariadicElement("div", newProps);
   };
 };
 
@@ -4474,10 +4422,6 @@ module Component = {
     suppressContentEditableWarning: bool,
   };
   [@bs.val] [@bs.module "react"]
-  external createElement:
-    (string, Js.t({..}), array(React.element)) => React.element =
-    "createElement";
-  [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
 
@@ -4485,16 +4429,7 @@ module Component = {
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
-    createElement(
-      "div",
-      newProps,
-      [|
-        switch (childrenGet(props)) {
-        | Some(chil) => chil
-        | None => React.null
-        },
-      |],
-    );
+    createVariadicElement("div", newProps);
   };
 };
 module Component = {
@@ -5366,10 +5301,6 @@ module Component = {
     suppressContentEditableWarning: bool,
   };
   [@bs.val] [@bs.module "react"]
-  external createElement:
-    (string, Js.t({..}), array(React.element)) => React.element =
-    "createElement";
-  [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
 
@@ -5377,16 +5308,7 @@ module Component = {
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
-    createElement(
-      "div",
-      newProps,
-      [|
-        switch (childrenGet(props)) {
-        | Some(chil) => chil
-        | None => React.null
-        },
-      |],
-    );
+    createVariadicElement("div", newProps);
   };
 };
 
@@ -6259,10 +6181,6 @@ module NestedSelectors = {
     suppressContentEditableWarning: bool,
   };
   [@bs.val] [@bs.module "react"]
-  external createElement:
-    (string, Js.t({..}), array(React.element)) => React.element =
-    "createElement";
-  [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
 
@@ -6294,16 +6212,7 @@ module NestedSelectors = {
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
-    createElement(
-      "body",
-      newProps,
-      [|
-        switch (childrenGet(props)) {
-        | Some(chil) => chil
-        | None => React.null
-        },
-      |],
-    );
+    createVariadicElement("body", newProps);
   };
 };
 
@@ -7175,10 +7084,6 @@ module Input = {
     [@bs.optional]
     suppressContentEditableWarning: bool,
   };
-  [@bs.val] [@bs.module "react"]
-  external createElement:
-    (string, Js.t({..}), array(React.element)) => React.element =
-    "createElement";
   [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
