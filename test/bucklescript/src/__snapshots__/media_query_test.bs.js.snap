@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MediaQueryComponent renders 1`] = `
+.emotion-0 {
+  color: #FF0000;
+}
+
+@media (min-width:30em) and (min-height:20em) {
+  .emotion-0 {
+    color: #A52A2A;
+  }
+}
+
+<div>
+  <div
+    class="emotion-0"
+  />
+</div>
+`;

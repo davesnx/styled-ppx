@@ -34,12 +34,6 @@ exports[`Component renders 1`] = `
   animation-name: animation-0;
 }
 
-@media (min-width:30em) and (min-height:20em) {
-  .emotion-0 {
-    color: #A52A2A;
-  }
-}
-
 <div>
   <div
     class="emotion-0"
@@ -80,22 +74,6 @@ exports[`ComponentLink should render an <a /> tag 1`] = `
 <div>
   <a
     class="emotion-0"
-  />
-</div>
-`;
-
-exports[`ComponentWithParameter renders 1`] = `
-.emotion-0 {
-  background: blue;
-  background-color: #F0F0F0;
-  color: #FF0000;
-}
-
-<div>
-  <div
-    class="emotion-0"
-    color="5194459,FF0000"
-    theme="136970422"
   />
 </div>
 `;

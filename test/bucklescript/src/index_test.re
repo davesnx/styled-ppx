@@ -23,35 +23,14 @@ module Component = [%styled.div {|
   /* animation: $(fadeIn) ease-in 200ms; */
 
   width: unset;
-  @media (min-width: 30em) and (min-height: 20em) {
-    color: brown;
-  }
 |}];
-module ComponentInline = [%styled "color: #454545"];
-module ComponentLink = [%styled.a {| color: #454545 |}];
-module StyledInput = [%styled.input "color: #454545"];
 
-module ComponentWithParameter = [%styled.div
-  (~color, ~theme: [`Light | `Dark]) => {
-    "background: blue";
-    switch (theme) {
-    | `Light => "background-color: #F0F0F0"
-    | `Dark => "background-color: #202020"
-    };
-    "color: $(color)";
-  }
-];
+module ComponentInline = [%styled "color: #454545"];
+module StyledInput = [%styled.input "color: #454545"];
+module ComponentLink = [%styled.a {| color: #454545 |}];
 
 test("Component renders", () => {
   <Component />
-  |> render
-  |> container
-  |> expect
-  |> toMatchSnapshot
-});
-
-test("ComponentWithParameter renders", () => {
-  <ComponentWithParameter color=Css.red theme=`Light/>
   |> render
   |> container
   |> expect
