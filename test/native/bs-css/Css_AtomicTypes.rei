@@ -905,7 +905,7 @@ module BackdropFilter: {
     | `contrast([ | `num(int) | `percent(float)])
     | `dropShadow([ | `num(int) | `percent(float)])
     | `grayscale([ | `num(int) | `percent(float)])
-    | `hueRotate([ | Angle.t | `zero])
+    | `hueRotate([ Angle.t | `zero])
     | `invert([ | `num(int) | `percent(float)])
     | `none
     | `opacity([ | `num(int) | `percent(float)])
