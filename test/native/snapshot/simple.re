@@ -1,5 +1,9 @@
 [%styled.global {|
-  html, body {
+  html {
+    margin: 0;
+  }
+
+  body {
     margin: 0;
   }
 |}];

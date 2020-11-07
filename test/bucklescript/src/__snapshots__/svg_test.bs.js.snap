@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ComponentWithParameter renders 1`] = `
+exports[`Svg renders 1`] = `
 .emotion-0 {
   width: 16px;
   height: 16px;

@@ -401,22 +401,21 @@ let render_emotion_keyframe = ((ruleList, loc)): expression => {
 let render_global = ((ruleList, loc): Stylesheet.t): expression => {
   let emotionGlobal = Exp.ident(~loc, {txt: Emotion.lident("global"), loc});
 
+  let rec seq = (~exp, ~make, list) => {
+    switch (list) {
+    | [] => exp
+    | [x, ...list] => seq(~exp=x |> make |> Exp.sequence(exp), ~make, list)
+    };
+  };
+
   switch (ruleList) {
-  /* There's only one rule: */
   | [rule] => render_rule(emotionGlobal, rule)
-  /* There's more than one */
-  | _res =>
-    grammar_error(
-      loc,
-      {|
-      styled.global only supports one style selector, add one styled.global per selector.
-
-      Like following:
-
-        [%styled.global ""];
-        [%styled.global ""];
-    |},
+  | [rule, ...rules] =>
+    seq(
+      ~exp=render_rule(emotionGlobal, rule),
+      ~make=render_rule(emotionGlobal),
+      rules,
     )
-  /* TODO: Add rule to string to finish this error message */
+  | [] => grammar_error(loc, "styled.global shoudn't be empty.")
   };
 };

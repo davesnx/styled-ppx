@@ -3,12 +3,15 @@ open Expect;
 open ReactTestingLibrary;
 Emotion.loadSerializer();
 
-let fadeIn = [%styled.keyframe {|
+let fadeIn = [%styled.keyframe
+  {|
   0% { opacity: 0 }
   100% { opacity: 1 }
-|}];
+|}
+];
 
-module Component = [%styled.div {|
+module Component = [%styled.div
+  {|
   display: flex;
   justify-content: center;
   align-items: center;
@@ -23,50 +26,35 @@ module Component = [%styled.div {|
   /* animation: $(fadeIn) ease-in 200ms; */
 
   width: unset;
-|}];
+|}
+];
 
 module ComponentInline = [%styled "color: #454545"];
 module StyledInput = [%styled.input "color: #454545"];
 module ComponentLink = [%styled.a {| color: #454545 |}];
 
 test("Component renders", () => {
-  <Component />
-  |> render
-  |> container
-  |> expect
-  |> toMatchSnapshot
+  <Component /> |> render |> container |> expect |> toMatchSnapshot
 });
 
 test("ComponentInline renders and defaults to a div", () => {
-  <ComponentInline />
-  |> render
-  |> container
-  |> expect
-  |> toMatchSnapshot
+  <ComponentInline /> |> render |> container |> expect |> toMatchSnapshot
 });
 
 test("StyledInput renders and self-closing element (whithout children)", () => {
-  <StyledInput />
-  |> render
-  |> container
-  |> expect
-  |> toMatchSnapshot
+  <StyledInput /> |> render |> container |> expect |> toMatchSnapshot
 });
 
 describe("ComponentLink", () => {
   test("should render an <a /> tag", () => {
-    <ComponentLink />
-    |> render
-    |> container
-    |> expect
-    |> toMatchSnapshot
+    <ComponentLink /> |> render |> container |> expect |> toMatchSnapshot
   });
 
   test("should receive href props", () => {
-    <ComponentLink href="https://sancho.dev"/>
+    <ComponentLink href="https://sancho.dev" />
     |> render
     |> container
     |> expect
     |> toMatchSnapshot
   });
-})
+});

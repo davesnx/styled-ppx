@@ -16,7 +16,11 @@
     cookies: [],
   }
 ];
-Css.global({js|html , body|js}, [Css.margin(`zero)]);
+{
+  Css.global({js|html|js}, [Css.margin(`zero)]);
+
+  Css.global({js|body|js}, [Css.margin(`zero)]);
+};
 
 module StateLenses = [%lenses
   type state = {

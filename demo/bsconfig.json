@@ -8,7 +8,7 @@
   ],
   "sources": {
     "dir": "src",
-    "subdirs": true,
+    "subdirs": false,
     "type": "dev"
   },
   "package-specs": [
