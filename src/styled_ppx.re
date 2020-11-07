@@ -331,13 +331,35 @@ let createCustomPropLabel = (~loc, name, type_) =>
 let createTypeVariable = (~loc, name) => Ast_builder.ptyp_var(~loc, name);
 
 /* [@bs.optional] href: string */
-let createRecordLabel = (~loc, name, kind) =>
-  Type.field(
+let createRecordLabel = (~loc, name, kind, alias) =>
+  {
+    let bsOptional = Attr.mk({txt: "bs.optional", loc}, PStr([]));
+    let bsAlias = (alias) => Attr.mk({txt: "bs.as", loc}, PStr([
+        Str.mk(
+          ~loc,
+          Pstr_eval(
+            Exp.constant(
+              ~loc,
+              ~attrs=[],
+              Pconst_string(alias, None),
+            ),
+            []
+          ),
+        ),
+      ]));
+
+    let attrs = switch (alias) {
+      | Some(alias) => [bsOptional, bsAlias(alias)]
+      | None => [bsOptional]
+    };
+
+    Type.field(
     ~loc,
-    ~attrs=[Attr.mk({txt: "bs.optional", loc}, PStr([]))],
+    ~attrs,
     {txt: name, loc},
     Typ.constr(~loc, {txt: Lident(kind), loc}, []),
-  );
+  )
+  };
 
 /* [@bs.optional] ref: domRef */
 let createDomRefLabel = (~loc) =>
@@ -412,10 +434,10 @@ let createMakeProps = (~loc, extraProps) => {
                switch (domProp) {
                | Event({name, type_}) =>
                  createRecordEventLabel(~loc, name, type_)
-               | Attribute({name, type_}) =>
-                 createRecordLabel(~loc, name, type_)
+               | Attribute({name, type_, alias}) =>
+                 createRecordLabel(~loc, name, type_, alias)
                },
-             domPropsList,
+             makePropList,
            ),
       ],
       dynamicProps,
@@ -720,7 +742,6 @@ let styledPpxMapper = (_, _) => {
           createComponent(~loc, ~tag, ~styledExpr, ~params=None),
         ]),
       );
-    // | Some(({txt: name, loc: nameLoc}, `Expr(expr))) => assert(false)
     | _ => default_mapper.module_expr(mapper, expr)
     };
   },
