@@ -1,9 +1,0 @@
-{
-  "[reason]": {
-    "editor.formatOnSave": true
-  },
-  "ocaml.sandbox": {
-    "kind": "esy",
-    "root": "/Users/davesnx/dev/github/styled-ppx"
-  },
-}
