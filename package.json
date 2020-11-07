@@ -43,7 +43,7 @@
     "@opam/ppxlib": "0.14.0",
     "@opam/sedlex": "*",
     "@reason-native/rely": "^3.2.1",
-    "@opam/ocaml-lsp-server": "ocaml/ocaml-lsp:ocaml-lsp-server.opam#fbc433e14035d520c7137916ae710b8ec3b415e9",
+    "@opam/ocaml-lsp-server": "1.1.0",
     "reason-css-parser": "EduardoRFS/reason-css-parser:package.json#a8772a12b65fe3d1ac51de98f50a95bf27b3b9d4"
   },
   "resolutions": {
