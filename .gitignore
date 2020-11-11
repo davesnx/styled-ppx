@@ -21,6 +21,7 @@ _export/
 npm-debug.log
 yarn-error.log
 node_modules/
+_build
 
 /lib/*
 !/lib/js/*
