@@ -1,0 +1,25 @@
+{
+  "name": "reason-css-lexer",
+  "version": "0.0.1",
+  "esy": {
+    "build": "dune build -p #{self.name}",
+    "buildDev": "dune build @install"
+  },
+  "scripts": {
+    "test": "dune runtest"
+  },
+  "dependencies": {
+    "@esy-ocaml/reason": "^3.6.0",
+    "@opam/dune": "2.5.1",
+    "@opam/ppx_deriving": "4.5",
+    "@opam/sedlex": "ocaml-community/sedlex:sedlex.opam#25c0dbd82c7fc5d91102f5bd21db1411f2c46323",
+    "@reason-native/rely": "^3.2.1",
+    "ocaml": "^4.08.1000"
+  },
+  "devDependencies": {
+    "@opam/ocaml-lsp-server": "ocaml/ocaml-lsp:ocaml-lsp-server.opam"
+  },
+  "resolutions": {
+    "@esy-ocaml/reason": "facebook/reason:reason.json#773dbcd"
+  }
+}
