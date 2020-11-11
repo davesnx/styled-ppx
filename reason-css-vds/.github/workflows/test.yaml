@@ -1,0 +1,25 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  tests:
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - uses: actions/checkout@v2
+      - name: Install esy
+        run: npm install -g esy
+      - name: Install dependencies
+        run: esy
+      - name: Run tests
+        run: esy test
