@@ -35,19 +35,15 @@
   },
   "devDependencies": {
     "@opam/merlin": "*",
-    "ocaml": "4.10.0",
-    "@esy-ocaml/reason": "^3.5.2",
+    "ocaml": "~4.10.0",
+    "@esy-ocaml/reason": "^3.6.2",
     "@opam/dune": "*",
+    "@opam/ppx_deriving": "*",
     "@opam/menhir": "20200211",
-    "@opam/ocaml-migrate-parsetree": "^1.7.3",
     "@opam/ppxlib": "0.14.0",
     "@opam/sedlex": "*",
     "@reason-native/rely": "^3.2.1",
-    "@opam/ocaml-lsp-server": "ocaml/ocaml-lsp:ocaml-lsp-server.opam#fbc433e14035d520c7137916ae710b8ec3b415e9",
-    "reason-css-parser": "EduardoRFS/reason-css-parser:package.json#a8772a12b65fe3d1ac51de98f50a95bf27b3b9d4"
-  },
-  "resolutions": {
-    "@esy-ocaml/reason": "facebook/reason:reason.json#773dbcd"
+    "@opam/ocaml-lsp-server": "*"
   },
   "scripts": {
     "test": "esy test_snapshot",
