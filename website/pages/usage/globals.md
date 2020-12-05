@@ -23,4 +23,4 @@
 |}];
 ```
 
-<!-- TODO: Add warning here about not adding @font-face here, a link to a way of adding fonts -->
+TODO: Add warning here about not adding @font-face here, a link to a way of adding fonts

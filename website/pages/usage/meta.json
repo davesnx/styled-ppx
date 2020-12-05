@@ -1,7 +1,10 @@
 {
-  "basic": "Basic",
-  "css": "CSS",
+  "basic": "Basic component",
+  "css": "Inline styles",
   "dynamic": "Dynamic components",
+  "globals": "Inject global styles",
+  "type-safety": "Type-safe CSS",
   "how-it-works": "How it works",
-  "type-safety": "Type-safety"
+  "keyframes": "keyframes",
+  "migrate": "Migrate"
 }

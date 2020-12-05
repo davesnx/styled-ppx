@@ -1,36 +1,7 @@
-# Global Configuration
+# How it works
 
-The context `SWRConfig` can provide global configurations ([options](/docs/options)) for all SWR hooks.
-
-```jsx
-<SWRConfig value={options}>
-  <Component/>
-</SWRConfig>
-```
-
-In this example, all SWR hooks will use the same fetcher provided to load JSON data, and refresh every 3 seconds by default:
-
-```jsx
-import useSWR, { SWRConfig } from 'swr'
-
-function Dashboard () {
-  const { data: events } = useSWR('/api/events')
-  const { data: projects } = useSWR('/api/projects')
-  const { data: user } = useSWR('/api/user', { refreshInterval: 0 }) // override
-
-  // ...
-}
-
-function App () {
-  return (
-    <SWRConfig
-      value={{
-        refreshInterval: 3000,
-        fetcher: (resource, init) => fetch(resource, init).then(res => res.json())
-      }}
-    >
-      <Dashboard />
-    </SWRConfig>
-  )
-}
-```
+TODO:
+- ppx transforms this to that
+- The generated looks like this
+- CSS Parser
+- bs-css-emotion as a "backend"
