@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ComponentWithParameter renders 1`] = `
+exports[`Svg renders 1`] = `
 .emotion-0 {
   width: 16px;
   height: 16px;
@@ -8,7 +8,10 @@ exports[`ComponentWithParameter renders 1`] = `
 
 <div>
   <svg
+    aria-hidden="true"
     class="emotion-0"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
   />
 </div>
 `;
