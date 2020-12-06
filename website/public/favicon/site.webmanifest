@@ -1,6 +1,6 @@
 {
-    "name": "SWR",
-    "short_name": "SWR",
+    "name": "styled-ppx",
+    "short_name": "styled-ppx",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",

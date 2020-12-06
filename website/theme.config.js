@@ -9,7 +9,7 @@ const Logo = ({ height }) => (
   </svg>
 );
 
-const Vercel = ({ height = 20 }) => (
+const Avatar = ({ height = 20 }) => (
   <svg height={height} viewBox="0 0 283 64" fill="none">
     <path
       fill="currentColor"
@@ -18,15 +18,19 @@ const Vercel = ({ height = 20 }) => (
   </svg>
 );
 
+const description =
+  'styled-ppx is a ppx that allows you to write typed styled components in Reason, OCaml and ReScript.';
+const short = 'Typed styled components in Reason, OCaml and ReScript';
+
 export default {
-  github: 'https://github.com/@davesnx/styled-ppx',
-  siteGithub: 'https://github.com/@davesnx/styled-ppx',
+  github: 'https://github.com/davesnx/styled-ppx',
+  siteGithub: 'https://github.com/davesnx/styled-ppx',
   titleSuffix: ' – styled-ppx',
   customSearch: <DocSearch />,
   logo: (
     <>
       {/* <Logo height={18} /> */}
-      <span className="font-extrabold hidden md:inline">styled-ppx</span>
+      <span className="font-extrabold hidden md:inline">▵ styled-ppx</span>
     </>
   ),
   head: (
@@ -59,21 +63,15 @@ export default {
       <meta name="theme-color" content="#ffffff" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <meta httpEquiv="Content-Language" content="en" />
-      <meta
-        name="description"
-        content="SWR is a React Hooks library for data fetching. SWR first returns the data from cache (stale), then sends the fetch request (revalidate), and finally comes with the up-to-date data again."
-      />
-      <meta
-        name="og:description"
-        content="SWR is a React Hooks library for data fetching. SWR first returns the data from cache (stale), then sends the fetch request (revalidate), and finally comes with the up-to-date data again."
-      />
+      <meta name="description" content={description} />
+      <meta name="og:description" content={description} />
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:site" content="@vercel" />
+      <meta name="twitter:site" content="@davesnx" />
       <meta
         name="twitter:image"
         content="https://assets.vercel.com/image/upload/v1572282926/swr/twitter-card.jpg"
       />
-      <meta name="og:title" content="SWR: React Hooks for Data Fetching" />
+      <meta name="og:title" content={short} />
       <meta name="og:url" content="https://swr.vercel.com" />
       <meta
         name="og:image"
@@ -90,14 +88,14 @@ export default {
   ),
   footerText: (
     <a
-      href="https://vercel.com/?utm_source=swr"
+      href="https://sancho.dev/?utm_source=styled-ppx"
       target="_blank"
       rel="noopener"
       className="inline-flex items-center no-underline text-current font-semibold"
     >
-      <span className="mr-1">Powered by</span>
+      <span className="mr-1">Written by</span>
       <span>
-        <Vercel />
+        <Avatar />
       </span>
     </a>
   ),

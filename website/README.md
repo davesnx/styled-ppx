@@ -1,6 +1,4 @@
-# [SWR website](https://swr.vercel.app)
-
-The official website for [SWR](https://github.com/vercel/swr).
+# website
 
 To contribute, just clone this repository and run the following command to start the local dev server:
 
@@ -8,3 +6,5 @@ To contribute, just clone this repository and run the following command to start
 yarn
 yarn dev
 ```
+
+This website uses nextra https://github.com/shuding/nextra
