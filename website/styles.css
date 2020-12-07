@@ -33,3 +33,15 @@ h1, h2, h3, h4, h5, h6, div, span, p {
 code, code div, code span {
   font-family: 'SF Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
+
+h1 {
+  letter-spacing: 0.025em !important;
+}
+
+h2 {
+  letter-spacing: 0.015em !important;
+}
+
+h3 {
+  letter-spacing: 0.010em !important;
+}
