@@ -2,9 +2,14 @@
  (modules css_parser)
  (flags --explain))
 
+(menhir
+ (flags --external-tokens New_css_types --explain)
+ (modules new_css_parser))
+
 (library
  (name styled_ppx_parser)
  (public_name styled-ppx.parser)
- (libraries sedlex menhirLib ocaml-migrate-parsetree)
+ (libraries sedlex menhirLib menhirSdk ocaml-migrate-parsetree
+   reason-css-parser.lib)
  (preprocess
-  (pps sedlex.ppx)))
+  (pps sedlex.ppx ppx_deriving.show)))

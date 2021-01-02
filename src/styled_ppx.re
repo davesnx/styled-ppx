@@ -150,10 +150,10 @@ let externalCreateVariadicElement = (~loc) => {
             [Typ.object_(~loc, [], Open)],
           ),
           Typ.constr(
-              ~loc,
-              {txt: Ldot(Lident("React"), "element"), loc},
-              [],
-            ),
+            ~loc,
+            {txt: Ldot(Lident("React"), "element"), loc},
+            [],
+          ),
         ),
       ),
     pval_prim: ["createElement"],
@@ -228,7 +228,7 @@ let createStylesObject = (~loc, ~value) =>
             Pstr_eval(
               Exp.record(
                 ~loc,
-                [ ({txt: Lident("className"), loc}, value) ],
+                [({txt: Lident("className"), loc}, value)],
                 None,
               ),
               [],
@@ -284,7 +284,7 @@ let createMakeBody = (~loc, ~tag, ~styledExpr) =>
       ~loc,
       Nonrecursive,
       [createNewProps(~loc)],
-      createVariadicElement(~loc, ~tag)
+      createVariadicElement(~loc, ~tag),
     ),
   );
 
@@ -332,35 +332,35 @@ let createCustomPropLabel = (~loc, name, type_) =>
 let createTypeVariable = (~loc, name) => Ast_builder.ptyp_var(~loc, name);
 
 /* [@bs.optional] href: string */
-let createRecordLabel = (~loc, name, kind, alias) =>
-  {
-    let bsOptional = Attr.mk({txt: "bs.optional", loc}, PStr([]));
-    let bsAlias = (alias) => Attr.mk({txt: "bs.as", loc}, PStr([
+let createRecordLabel = (~loc, name, kind, alias) => {
+  let bsOptional = Attr.mk({txt: "bs.optional", loc}, PStr([]));
+  let bsAlias = alias =>
+    Attr.mk(
+      {txt: "bs.as", loc},
+      PStr([
         Str.mk(
           ~loc,
           Pstr_eval(
-            Exp.constant(
-              ~loc,
-              ~attrs=[],
-              Pconst_string(alias, None),
-            ),
-            []
+            Exp.constant(~loc, ~attrs=[], Pconst_string(alias, None)),
+            [],
           ),
         ),
-      ]));
+      ]),
+    );
 
-    let attrs = switch (alias) {
-      | Some(alias) => [bsOptional, bsAlias(alias)]
-      | None => [bsOptional]
+  let attrs =
+    switch (alias) {
+    | Some(alias) => [bsOptional, bsAlias(alias)]
+    | None => [bsOptional]
     };
 
-    Type.field(
+  Type.field(
     ~loc,
     ~attrs,
     {txt: name, loc},
     Typ.constr(~loc, {txt: Lident(kind), loc}, []),
-  )
-  };
+  );
+};
 
 /* [@bs.optional] ref: domRef */
 let createDomRefLabel = (~loc) =>

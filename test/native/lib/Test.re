@@ -1,6 +1,7 @@
 open Migrate_parsetree;
 open Ast_410;
 open Setup;
+open Styled_ppx_parser;
 open Css_types;
 
 let rec zip = (xs, ys) =>
