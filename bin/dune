@@ -1,7 +1,7 @@
 (executable
-  (name Bin)
-  (public_name styled-ppx)
-  (libraries styled-ppx.lib)
-  (ocamlopt_flags ( -linkall ))
-  (package styled-ppx)
-)
+ (name Bin)
+ (public_name styled-ppx)
+ (libraries styled-ppx.lib)
+ (ocamlopt_flags
+  (:standard -linkall))
+ (package styled-ppx))
