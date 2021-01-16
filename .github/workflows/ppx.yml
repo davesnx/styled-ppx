@@ -57,9 +57,8 @@ jobs:
       - name: Run ppx Native snapshot tests
         run: esy test_snapshot
 
-      # - name: Run Lexer Tests
-      #   run: esy dune test
-      #   working-directory: ./reason-css-vds
+      - name: Run runtests for Parser, vds & Lexer
+        run: esy dune runtest --force
 
       # - name: Run Parser Tests
       #   run: esy dune test
