@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [master]
 
+defaults:
+  run:
+    working-directory: ./reason-css-parser
+
 jobs:
   tests:
     strategy:
