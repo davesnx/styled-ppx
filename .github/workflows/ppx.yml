@@ -1,4 +1,4 @@
-name: ppx test & publish
+name: CI
 
 on:
   push:
@@ -60,11 +60,8 @@ jobs:
       - name: Build
         run: esy build
 
-      # - name: Check formatting
-      #   run: esy dune build @fmt
-
       - name: Run ppx Native tests
-        run: esy build
+        run: esy test_native
 
       - name: Run ppx Native snapshot tests
         run: esy test_snapshot
