@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    name: Native
+    name: Build and test
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
