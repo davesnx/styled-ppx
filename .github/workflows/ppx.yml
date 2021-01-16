@@ -74,15 +74,15 @@ jobs:
 
       - name: Install Yarn dependencies for test_bucklescript
         run: yarn
-        working-directory: ./test/bucklescript
+        working-directory: ./packages/ppx/test/bucklescript
 
       - name: Build test_bucklescript
         run: yarn build
-        working-directory: ./test/bucklescript
+        working-directory: ./packages/ppx/test/bucklescript
 
       - name: Run test_bucklescript
         run: yarn test
-        working-directory: ./test/bucklescript
+        working-directory: ./packages/ppx/test/bucklescript
 
       - name: Export dependencies
         run: esy export-dependencies
