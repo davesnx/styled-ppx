@@ -35,19 +35,17 @@
   },
   "devDependencies": {
     "@opam/merlin": "*",
-    "ocaml": "4.10.0",
-    "@esy-ocaml/reason": "^3.5.2",
+    "ocaml": "~4.10.0",
+    "@esy-ocaml/reason": "^3.6.2",
     "@opam/dune": "*",
-    "@opam/menhir": "20200211",
-    "@opam/ocaml-migrate-parsetree": "^1.7.3",
+    "@opam/ppx_deriving": "4.5",
+    "@opam/menhir": "20201216",
+    "@opam/ocaml-migrate-parsetree": "1.7.3",
     "@opam/ppxlib": "0.14.0",
-    "@opam/sedlex": "*",
+    "@opam/ppx_tools_versioned": "5.4.0",
+    "@opam/sedlex": "ocaml-community/sedlex:sedlex.opam#25c0dbd82c7fc5d91102f5bd21db1411f2c46323",
     "@reason-native/rely": "^3.2.1",
-    "@opam/ocaml-lsp-server": "ocaml/ocaml-lsp:ocaml-lsp-server.opam#fbc433e14035d520c7137916ae710b8ec3b415e9",
-    "reason-css-parser": "EduardoRFS/reason-css-parser:package.json#a8772a12b65fe3d1ac51de98f50a95bf27b3b9d4"
-  },
-  "resolutions": {
-    "@esy-ocaml/reason": "facebook/reason:reason.json#773dbcd"
+    "@opam/ocaml-lsp-server": "*"
   },
   "scripts": {
     "test": "esy test_snapshot",

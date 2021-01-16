@@ -1,0 +1,17 @@
+(library
+ (name reason_css_lexer_test)
+ (ocamlopt_flags -linkall -g)
+ (libraries reason-css-lexer.lib rely.lib)
+ (modules
+  (:standard \ RunTests)))
+
+(executable
+ (name RunTests)
+ (libraries reason_css_lexer_test)
+ (modules RunTests))
+
+(rule
+ (alias runtest)
+ (deps RunTests.exe)
+ (action
+  (run %{deps})))
