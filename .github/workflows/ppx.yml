@@ -57,6 +57,10 @@ jobs:
       - name: Install dependencies
         run: esy install
 
+      - name: Build dependencies
+        if: steps.deps-cache.outputs.cache-hit != 'true'
+        run: esy build-dependencies
+
       - name: Build
         run: esy build
 
