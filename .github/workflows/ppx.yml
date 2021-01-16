@@ -58,12 +58,16 @@ jobs:
         run: esy test_snapshot
 
       - name: Run Lexer Tests
-        run: dune test
+        run: esy dune test
         working-directory: ./reason-css-vds
 
       - name: Run Parser Tests
-        run: dune test
+        run: esy dune test
         working-directory: ./reason-css-parser
+
+      - name: Run vds Tests
+        run: esy dune test
+        working-directory: ./reason-css-vds
 
       - name: Export dependencies
         run: esy export-dependencies

@@ -3,4 +3,6 @@
  (public_name reason-css-lexer.lib)
  (libraries compiler-libs sedlex)
  (preprocess
-  (pps sedlex.ppx ppx_deriving.show)))
+  (pps sedlex.ppx ppx_deriving.show)
+ )
+)
