@@ -1,5 +1,11 @@
-// This file is used as a filename shim for the actual
-// App.re Reason component
-import { make } from "../common/App.bs";
+import '../styles.css';
+import '../fonts.css';
+import 'nextra-theme-docs/style.css';
 
-export default make;
+export default function Nextra({ Component, pageProps }) {
+  return (
+    <>
+      <Component {...pageProps} />
+    </>
+  );
+}
