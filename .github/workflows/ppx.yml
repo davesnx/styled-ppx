@@ -59,11 +59,11 @@ jobs:
 
       - name: Run Lexer Tests
         run: dune test
-          working-directory: ./reason-css-vds
+        working-directory: ./reason-css-vds
 
       - name: Run Parser Tests
         run: dune test
-          working-directory: ./reason-css-parser
+        working-directory: ./reason-css-parser
 
       - name: Export dependencies
         run: esy export-dependencies
