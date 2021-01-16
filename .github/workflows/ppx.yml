@@ -143,7 +143,7 @@ jobs:
         working-directory: ./test/bucklescript
 
   publish:
-    needs: build
+    needs: test_native
     name: Publish
     runs-on: ubuntu-latest
     steps:
