@@ -9,7 +9,7 @@
     "reason-react"
   ],
   "ppx-flags": [
-    "../_build/default/bin/Bin.exe"
+    "../../_build/default/bin/Bin.exe"
   ],
   "sources": [
     {

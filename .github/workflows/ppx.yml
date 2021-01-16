@@ -1,4 +1,4 @@
-name: ppx test & publish
+name: CI
 
 on:
   push:
@@ -10,31 +10,31 @@ on:
 
 jobs:
   build:
-    name: Native
+    name: Build
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        node-version: [12.x]
+
     steps:
       - uses: actions/checkout@v2
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 12
 
-     - name: Restore global node modules cache
-       uses: actions/cache@v1
-       env:
-         cache-name: cache-node-modules
-       with:
-        path: ~/.npm
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
+      - name: Restore global node modules cache
+        uses: actions/cache@v1
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
 
       - name: Cache esy dependencies
         uses: actions/cache@v1
@@ -57,14 +57,15 @@ jobs:
       - name: Install dependencies
         run: esy install
 
+      - name: Build dependencies
+        if: steps.deps-cache.outputs.cache-hit != 'true'
+        run: esy build-dependencies
+
       - name: Build
         run: esy build
 
-      # - name: Check formatting
-      #   run: esy dune build @fmt
-
       - name: Run ppx Native tests
-        run: esy build
+        run: esy test_native
 
       - name: Run ppx Native snapshot tests
         run: esy test_snapshot
@@ -74,15 +75,15 @@ jobs:
 
       - name: Install Yarn dependencies for test_bucklescript
         run: yarn
-        working-directory: ./test/bucklescript
+        working-directory: ./packages/ppx/test/bucklescript
 
       - name: Build test_bucklescript
         run: yarn build
-        working-directory: ./test/bucklescript
+        working-directory: ./packages/ppx/test/bucklescript
 
       - name: Run test_bucklescript
         run: yarn test
-        working-directory: ./test/bucklescript
+        working-directory: ./packages/ppx/test/bucklescript
 
       - name: Export dependencies
         run: esy export-dependencies

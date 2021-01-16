@@ -1,16 +1,5 @@
-[%styled.global {|
-  html, body {
-    margin: 0;
-    padding: 0;
-  }
-|}];
-
 module App = [%styled.div {j|
   position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
 
   display: flex;
   justify-content: center;
@@ -18,10 +7,6 @@ module App = [%styled.div {j|
   flex-direction: column;
 
   cursor: pointer;
-
-  & > div {
-    padding: 20px;
-  }
 |j}
 ];
 

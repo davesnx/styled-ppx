@@ -12,6 +12,7 @@
   "dependencies": {
     "acorn": "^6.4.1",
     "bs-css": "^12.2.0",
+    "bs-css-emotion": "^2.2.0",
     "bs-platform": "^7.0.1",
     "concurrently": "^5.1.0",
     "minimist": "^1.2.3",

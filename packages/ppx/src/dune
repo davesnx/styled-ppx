@@ -6,4 +6,6 @@
  (libraries styled_ppx_parser ocaml-migrate-parsetree reason-css-parser.lib
    ppxlib)
  (preprocess
-  (pps ppx_tools_versioned.metaquot_410)))
+  (pps ppx_tools_versioned.metaquot_410)
+ )
+)
