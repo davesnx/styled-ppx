@@ -1,4 +1,4 @@
-name: Release
+name: ppx test & publish
 
 on:
   push:
@@ -9,21 +9,20 @@ on:
       - master
 
 jobs:
-  build:
-    name: Build and test
+  test_native:
+    name: Native
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        # os: [ubuntu-latest, macos-latest, windows-latest]
+        node-version: [12.x]
     steps:
       - uses: actions/checkout@v1
 
-      - name: Use Node.js 12.x
+      - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
-          node-version: 12.x
-          registry-url: "https://registry.npmjs.org"
+          node-version: ${{ matrix.node-version }}
 
       - name: Cache esy dependencies
         uses: actions/cache@v1
@@ -49,6 +48,9 @@ jobs:
       - name: Build
         run: esy build
 
+      # - name: Check formatting
+      #   run: esy dune build @fmt
+
       - name: Run Native tests
         run: esy test_native
 
@@ -63,6 +65,74 @@ jobs:
         with:
           name: ${{ matrix.os }}
           path: _build/default/bin/Bin.exe
+
+  test_bucklescript:
+    name: BuckleScript
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        node-version: [12.x]
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Cache esy dependencies
+        uses: actions/cache@v1
+        id: cache
+        with:
+          path: _export
+          key: ${{ runner.OS }}-build-${{ hashFiles('esy.lock/index.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-build-${{ env.cache-name }}-
+            ${{ runner.OS }}-build-
+            ${{ runner.OS }}-
+
+      - name: Install esy
+        run: npm install -g esy@0.6.6
+
+      - name: Import dependencies
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: esy import-build _export/*
+
+      - name: Install dependencies
+        run: esy install
+
+      - name: Build
+        run: esy build
+
+      - name: Cache node modules
+        uses: actions/cache@v1
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.yarn-cache
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      #     - name: Import dependencies
+      #       if: steps.cache.outputs.cache-hit == 'true'
+      #       run: esy import-build _export/*
+      #       working-directory: ./test/bucklescript
+
+      - name: Install Yarn dependencies
+        run: yarn
+        working-directory: ./test/bucklescript
+
+      - name: Build
+        run: yarn build
+        working-directory: ./test/bucklescript
+
+      - name: Run tests
+        run: yarn test
+        working-directory: ./test/bucklescript
 
   publish:
     needs: build
