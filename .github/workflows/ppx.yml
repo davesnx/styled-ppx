@@ -51,11 +51,19 @@ jobs:
       # - name: Check formatting
       #   run: esy dune build @fmt
 
-      - name: Run Native tests
+      - name: Run ppx Native tests
         run: esy test_native
 
-      - name: Run Native snapshot tests
+      - name: Run ppx Native snapshot tests
         run: esy test_snapshot
+
+      - name: Run Lexer Tests
+        run: dune test
+          working-directory: ./reason-css-vds
+
+      - name: Run Parser Tests
+        run: dune test
+          working-directory: ./reason-css-parser
 
       - name: Export dependencies
         run: esy export-dependencies
