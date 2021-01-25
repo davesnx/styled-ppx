@@ -4,7 +4,7 @@
   "description": "CSS-in-Reason and OCaml",
   "author": "David Sancho <dsnxmoreno@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/davesnx/styled-ppx",
+  "homepage": "https://styled-ppx.vercel.app",
   "keywords": [
     "reason",
     "ocaml",
