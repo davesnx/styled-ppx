@@ -3,11 +3,11 @@ g_pkg_flg = -bs-package-name styled-ppx/website
 src_root_dir = /Users/davesnx/dev/github/styled-ppx/website
 bsc = /Users/davesnx/dev/github/styled-ppx/website/node_modules/bs-platform/darwin/bsc.exe
 bsdep = /Users/davesnx/dev/github/styled-ppx/website/node_modules/bs-platform/darwin/bsb_helper.exe
-warnings = 
+warnings =
 bsc_flags = -bs-no-version-header -bs-super-errors -bs-g
-ppx_flags = -ppx /Users/davesnx/dev/github/styled-ppx/website/../_build/default/bin/Bin.exe
-g_dpkg_incls = 
-g_ns = 
+ppx_flags = -ppx /Users/davesnx/dev/github/styled-ppx/website/../_build/default/bin/ppx.exe
+g_dpkg_incls =
+g_ns =
 bsb_dir_group = 0
 g_lib_incls = -I common -I bindings -I pages -I layouts -I /Users/davesnx/dev/github/styled-ppx/website/node_modules/reason-react/lib/ocaml
 rule build_ast_from_re

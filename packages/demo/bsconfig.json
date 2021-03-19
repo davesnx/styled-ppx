@@ -18,13 +18,12 @@
     }
   ],
   "ppx-flags": [
-    "../../_build/default/bin/Bin.exe"
+    "../../_build/default/bin/ppx.exe"
   ],
   "suffix": ".bs.js",
   "namespace": true,
   "bs-dependencies": [
     "bs-css-emotion",
     "reason-react"
-  ],
-  "refmt": 3
+  ]
 }

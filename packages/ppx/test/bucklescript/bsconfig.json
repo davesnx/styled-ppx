@@ -15,7 +15,7 @@
     }
   ],
   "ppx-flags": [
-    "../../../../_build/default/bin/Bin.exe"
+    "../../../../_build/default/bin/ppx.exe"
   ],
   "suffix": ".bs.js",
   "namespace": true,
@@ -27,6 +27,5 @@
   "bs-dev-dependencies": [
     "@glennsl/bs-jest",
     "bs-react-testing-library"
-  ],
-  "refmt": 3
+  ]
 }

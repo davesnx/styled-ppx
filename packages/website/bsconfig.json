@@ -4,12 +4,11 @@
   "reason": {
     "react-jsx": 3
   },
-  "refmt": 3,
   "bs-dependencies": [
     "reason-react"
   ],
   "ppx-flags": [
-    "../../_build/default/bin/Bin.exe"
+    "../../_build/default/bin/ppx.exe"
   ],
   "sources": [
     {

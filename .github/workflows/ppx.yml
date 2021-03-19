@@ -92,7 +92,7 @@ jobs:
         uses: actions/upload-artifact@master
         with:
           name: ${{ matrix.os }}
-          path: _build/default/bin/Bin.exe
+          path: _build/default/bin/ppx.exe
 
   publish:
     needs: build
