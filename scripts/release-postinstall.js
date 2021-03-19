@@ -6,7 +6,7 @@ const fs = require("fs");
 
 const platform = process.platform;
 
-const binariesToCopy = ["ppx"];
+const binariesToCopy = ["ppx.exe"];
 
 function find_arch() {
   // The running binary is 64-bit, so the OS is clearly 64-bit.
@@ -59,16 +59,13 @@ function copyFileSync(sourcePath, destPath) {
 
 const copyPlatformBinaries = (platformPath) => {
   const platformBuildPath = path.join(__dirname, platformPath);
-
-  binariesToCopy.forEach((binaryPath) => {
-    const sourcePath = path.join(platformBuildPath, binaryPath);
-    const destPath = path.join(__dirname, binaryPath);
-    if (fs.existsSync(destPath)) {
-      fs.unlinkSync(destPath);
-    }
-    copyFileSync(sourcePath, destPath);
-    fs.chmodSync(destPath, 0o755);
-  });
+  const sourcePath = path.join(platformBuildPath, "ppx.exe");
+  const destPath = path.join(__dirname, "ppx");
+  if (fs.existsSync(destPath)) {
+    fs.unlinkSync(destPath);
+  }
+  copyFileSync(sourcePath, destPath);
+  fs.chmodSync(destPath, 0o755);
 };
 
 const arch = find_arch();
