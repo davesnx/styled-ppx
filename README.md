@@ -1,11 +1,11 @@
 <h1> styled-ppx <a href="https://github.com/davesnx/styled-ppx/actions"><img alt="CI" align="right" src="https://github.com/davesnx/styled-ppx/workflows/CI/badge.svg"></a><a href="https://github.com/staltz/comver"><img alt="ComVer" align="right" src="https://img.shields.io/badge/ComVer-compliant-brightgreen.svg" /></a></h1>
 
 **styled-ppx** is the [ppx](https://victor.darvariu.me/jekyll/update/2018/06/19/ppx-tutorial.html) that enables *CSS-in-Reason*.
-Build on top of [emotion](https://emotion.sh), it allows you to style apps quickly, performant and as you always done it.
+Build on top of [emotion](https://emotion.sh), it allows you to style apps safe, quickly, performant and as you always done it.
 
 ![](./docs/images/demo.png)
 
-Allows you to create **React Components** with Type-safe CSS style definitions that don't rely on a specific [DSL](https://en.wikipedia.org/wiki/Domain-specific_language) and great error messages:
+Allows you to create **React Components** with type-safe CSS style definitions that don't rely on a specific [DSL](https://en.wikipedia.org/wiki/Domain-specific_language) and great error messages:
 
 ![](./docs/images/compile-error.png)
 
@@ -14,9 +14,9 @@ Allows you to create **React Components** with Type-safe CSS style definitions t
 > In case you want to know more, take a look at the [ROADMAP](./ROADMAP.md), or feel free to chat on Discord: @davesnx#5641
 
 ## Usage
-**`styled-ppx`** implements a ppx that transforms `[%styled]` extensions points into `[@react.components]` modules with [bs-emotion](https://github.com/ahrefs/bs-emotion) as styles, which does all the CSS-in-JS under the hood thanks to [emotion](https://emotion.sh).
+**`styled-ppx`** implements a ppx that transforms `[%styled]` extensions points into `[@react.component]` modules with the additional styles converted to [emotion](https://emotion.sh).
 
-This is how you can write components in ReasonML or OCaml with this ppx:
+This is how you can write components in ReasonML/OCaml/ReScript with this ppx:
 
 ### Standard styled component
 ```reason
@@ -38,12 +38,13 @@ ReactDOMRe.renderToElementWithId(
 
 ### Dynamic styled component
 ```reason
-module Dynamic = [%styled
-  (~color, ~background) => {j|
+module Dynamic = [%styled (~color, ~background) => {j|
   color: $color;
   background-color: $background;
 |j}
 ];
+
+> Dynamic components are somehow not fully supported, and it's the reason why is still in BETA. The main problem is casting any parameter into a valid CSS value, since the language doesn't allow polymorphism (allowing a function to recieve a type with different shapes). It makes dynamic styling a challenge, for now we rely on an slight unsafe behaviour. This will be improved in further releases.
 
 ReactDOMRe.renderToElementWithId(
   <Dynamic color="#EB5757" background="#516CF0">
@@ -71,6 +72,8 @@ So I took the time to create it with help from [@jchavarri](https://github.com/j
 If you want to know more about how it works or what are the benefits I recommend to watch [my talk at ReasonSTHLM Meetup](https://www.youtube.com/watch?v=ekHCBZiCviM)
 
 ## Installation
+
+The installation process refers to the npm version (v0.20) which differs from master (v1.x). In (v1.x) we won't rely on bs-emotion.
 
 This package depends on [bs-emotion](https://github.com/ahrefs/bs-emotion), [ReasonReact](https://reasonml.github.io/reason-react/) and [BuckleScript](https://bucklescript.github.io), make sure you follow their installations.
 

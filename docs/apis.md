@@ -97,6 +97,8 @@ module Component = [%styled (~content, ~background) => {j|
   display: block;
 |j}];
 
+> Dynamic components are somehow not fully supported, and it's the reason why is still in BETA. The main problem is casting any parameter into a valid CSS value, since the language doesn't allow polymorphism (allowing a function to recieve a type with different shapes). It makes dynamic styling a challenge, for now we rely on an slight unsafe behaviour. This will be improved in further releases.
+
 /* Later on any component... */
 <Component content="#EB5757" background="#516CF0" />
 ```
@@ -117,7 +119,28 @@ module Wrap = [%styled.a {|
 <Wrap />
 ```
 
-### Pattern match or any other expression that returns a string
+### Pattern match on a value
+> This is not implemented and the api isn't final.
+```reason
+/* This is not implemented yet! */
+type size =
+  | Small
+  | Big
+  | Full;
+
+/* And you would be able to create components with Pattern Matching, or compose functions! */
+module StyledWithPatternMatcing = [%styled (~size) =>
+  {|
+    width: switch (size) {
+      | Small => 33%;
+      | Big => 80%;
+      | Full => 100%;
+    }
+  |}
+];
+```
+
+### Pattern match on any expression
 > This is not implemented and the api isn't final.
 ```reason
 /* This is not implemented yet! */
