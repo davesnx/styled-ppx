@@ -29,7 +29,7 @@
     },
     "release": {
       "bin": [
-        "Bin"
+        "ppx"
       ]
     }
   },
