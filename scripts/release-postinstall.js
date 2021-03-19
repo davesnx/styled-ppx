@@ -6,8 +6,6 @@ const fs = require("fs");
 
 const platform = process.platform;
 
-const binariesToCopy = ["ppx.exe"];
-
 function find_arch() {
   // The running binary is 64-bit, so the OS is clearly 64-bit.
   if (process.arch === "x64") {
