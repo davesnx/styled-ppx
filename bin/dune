@@ -1,5 +1,5 @@
 (executable
-  (name Bin)
+  (name ppx)
   (public_name styled-ppx)
   (libraries styled-ppx.lib)
   (ocamlopt_flags ( -linkall ))
