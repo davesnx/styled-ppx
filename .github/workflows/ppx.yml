@@ -48,17 +48,18 @@ jobs:
             ${{ runner.OS }}-
 
       - name: Install esy
-        run: npm install -g esy@0.6.6
+        if: steps.cache.outputs.cache-node-modules != 'true'
+        run: npm install -g esy@0.6.8
 
       - name: Import dependencies
-        if: steps.cache.outputs.cache-hit == 'true'
+        if: steps.cache.outputs.cache == 'true'
         run: esy import-build _export/*
 
       - name: Install dependencies
         run: esy install
 
       - name: Build dependencies
-        if: steps.deps-cache.outputs.cache-hit != 'true'
+        if: steps.deps-cache.outputs.cache != 'true'
         run: esy build-dependencies
 
       - name: Build
