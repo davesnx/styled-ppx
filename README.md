@@ -195,7 +195,6 @@ yarn install
 yarn build
 yarn test
 ```
-> This tests are more like an end to end tests, that ensures that emotion have the correct methods for each CSS property.
 
 ---
 
