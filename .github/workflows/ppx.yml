@@ -115,6 +115,7 @@ jobs:
           restore-keys: yarn-${{ matrix.os }}-
 
       - name: Install dependencies
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn
         working-directory: ./packages/ppx/test/bucklescript
 
