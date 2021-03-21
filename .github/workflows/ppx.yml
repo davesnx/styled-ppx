@@ -68,6 +68,7 @@ jobs:
 
       - name: Load test_bucklescript's cache dependencies
         uses: c-hive/gha-yarn-cache@v1
+        working-directory: ./packages/ppx/test/bucklescript
 
       - name: Install test_bucklescript's dependencies
         run: yarn
