@@ -24,41 +24,34 @@ jobs:
         with:
           node-version: 12
 
-      - name: Restore global node modules cache
-        uses: actions/cache@v1
-        env:
-          cache-name: cache-node-modules
+      - name: Load global cache (~/.esy/source)
+        uses: actions/cache@v2
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-
-      - name: Cache esy dependencies
-        uses: actions/cache@v1
-        id: cache
-        with:
-          path: _export
-          key: ${{ runner.OS }}-build-${{ hashFiles('esy.lock/index.json') }}
-          restore-keys: |
-            ${{ runner.OS }}-build-${{ env.cache-name }}-
-            ${{ runner.OS }}-build-
-            ${{ runner.OS }}-
+          path: ~/.esy/source
+          key: source-${{ matrix.os }}-${{ hashFiles('**/index.json') }}
 
       - name: Install esy
         run: npm install -g esy@0.6.8
 
-      - name: Import dependencies
-        if: steps.cache.outputs.cache-hit == 'true'
-        run: esy import-build _export/*
-
       - name: Install dependencies
         run: esy install
 
+      - name: Print esy cache
+        id: print_esy_cache
+        run: node .github/workflows/print-esy-cache.js
+
+      - name: Load dependencies cache
+        id: deps-cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.print_esy_cache.outputs.esy_cache }}
+          key: build-${{ matrix.os }}-${{ hashFiles('**/index.json') }}
+          restore-keys: build-${{ matrix.os }}-
+
+      - name: Import dependencies
+        run: esy import-build
+
       - name: Build dependencies
-        if: steps.deps-cache.outputs.cache-hit != 'true'
         run: esy build-dependencies
 
       - name: Build
@@ -73,19 +66,8 @@ jobs:
       - name: Run runtests for Parser, vds & Lexer
         run: esy dune runtest --force
 
-      - name: Install Yarn dependencies for test_bucklescript
-        run: yarn
-        working-directory: ./packages/ppx/test/bucklescript
-
-      - name: Build test_bucklescript
-        run: yarn build
-        working-directory: ./packages/ppx/test/bucklescript
-
-      - name: Run test_bucklescript
-        run: yarn test
-        working-directory: ./packages/ppx/test/bucklescript
-
       - name: Export dependencies
+        if: steps.deps-cache.outputs.cache-hit != 'true'
         run: esy export-dependencies
 
       - name: Upload artifacts for ${{ matrix.os }}
@@ -93,6 +75,56 @@ jobs:
         with:
           name: ${{ matrix.os }}
           path: _build/default/bin/ppx.exe
+
+  e2e:
+    needs: build
+    name: BuckleScript tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Download artifacts
+        uses: actions/download-artifact@master
+        with:
+          name: ${{ matrix.os }}
+          path: _build/default/bin
+
+      - name: Grant permission to run ppx
+        run: chmod +x _build/default/bin/ppx.exe
+
+      - name: Get cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+        working-directory: ./packages/ppx/test/bucklescript
+
+      - name: Load global cache
+        uses: actions/cache@v1
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: yarn-${{ matrix.os }}-${{ hashFiles('./packages/ppx/test/bucklescript/yarn.lock') }}
+          restore-keys: yarn-${{ matrix.os }}-
+
+      - name: Install dependencies
+        run: yarn
+        working-directory: ./packages/ppx/test/bucklescript
+
+      - name: Build
+        run: yarn build
+        working-directory: ./packages/ppx/test/bucklescript
+
+      - name: Test
+        run: yarn test
+        working-directory: ./packages/ppx/test/bucklescript
 
   publish:
     needs: build
