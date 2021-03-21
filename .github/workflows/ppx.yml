@@ -100,7 +100,8 @@ jobs:
 
       - name: Grant permission to run ppx
         run: |
-          chmod +x _build/default/bin/ppx.exe;
+          # chmod +x _build/default/bin/ppx.exe;
+          ls _build/default/bin/ppx.exe;
           _build/default/bin/ppx.exe --help;
 
       - name: Get cache directory path
