@@ -77,7 +77,6 @@ jobs:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
           key: yarn-${{ matrix.os }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: yarn-${{ matrix.os }}-
-        working-directory: ./packages/ppx/test/bucklescript
 
       - name: Install test_bucklescript's dependencies
         run: yarn
