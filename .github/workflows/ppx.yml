@@ -24,41 +24,34 @@ jobs:
         with:
           node-version: 12
 
-      - name: Restore global node modules cache
-        uses: actions/cache@v1
-        env:
-          cache-name: cache-node-modules
+      - name: Load global cache (~/.esy/source)
+        uses: actions/cache@v2
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-
-      - name: Cache esy dependencies
-        uses: actions/cache@v1
-        id: cache
-        with:
-          path: _export
-          key: ${{ runner.OS }}-build-${{ hashFiles('esy.lock/index.json') }}
-          restore-keys: |
-            ${{ runner.OS }}-build-${{ env.cache-name }}-
-            ${{ runner.OS }}-build-
-            ${{ runner.OS }}-
+          path: ~/.esy/source
+          key: source-${{ matrix.os }}-${{ hashFiles('**/index.json') }}
 
       - name: Install esy
-        run: npm install -g esy@0.6.6
-
-      - name: Import dependencies
-        if: steps.cache.outputs.cache-hit == 'true'
-        run: esy import-build _export/*
+        run: npm install -g esy@0.6.8
 
       - name: Install dependencies
         run: esy install
 
+      - name: Print esy cache
+        id: print_esy_cache
+        run: node .github/workflows/print-esy-cache.js
+
+      - name: Load dependencies cache
+        id: deps-cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.print_esy_cache.outputs.esy_cache }}
+          key: build-${{ matrix.os }}-${{ hashFiles('**/index.json') }}
+          restore-keys: build-${{ matrix.os }}-
+
+      - name: Import dependencies
+        run: esy import-build
+
       - name: Build dependencies
-        if: steps.deps-cache.outputs.cache-hit != 'true'
         run: esy build-dependencies
 
       - name: Build
@@ -86,6 +79,7 @@ jobs:
         working-directory: ./packages/ppx/test/bucklescript
 
       - name: Export dependencies
+        if: steps.deps-cache.outputs.cache-hit = 'true'
         run: esy export-dependencies
 
       - name: Upload artifacts for ${{ matrix.os }}
