@@ -48,7 +48,7 @@ jobs:
             ${{ runner.OS }}-
 
       - name: Install esy
-        run: npm install -g esy@0.6.6
+        run: npm install -g esy@0.6.8
 
       - name: Import dependencies
         if: steps.cache.outputs.cache-hit == 'true'
