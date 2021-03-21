@@ -73,8 +73,8 @@ jobs:
       - name: Upload artifacts for ${{ matrix.os }}
         uses: actions/upload-artifact@master
         with:
-          name: ppx-${{ matrix.os }}
-          path: _build/default/bin
+          name: ${{ matrix.os }}
+          path: _build/default/bin/ppx.exe
 
   e2e:
     needs: build
@@ -95,13 +95,11 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@master
         with:
-          name: ppx-${{ matrix.os }}
+          name: ${{ matrix.os }}
           path: _build/default/bin
 
       - name: Grant permission to run ppx
-        run: |
-          chmod +x _build/default/bin/ppx.exe;
-          _build/default/bin/ppx.exe --help;
+        run: chmod +x _build/default/bin/ppx.exe
 
       - name: Get cache directory path
         id: yarn-cache-dir-path
