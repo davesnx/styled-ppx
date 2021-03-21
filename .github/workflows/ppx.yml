@@ -98,6 +98,11 @@ jobs:
           name: ppx-${{ matrix.os }}
           path: _build/default/bin/ppx.exe
 
+      - name: Grant permission to run ppx
+        run: |
+          chmod +x _build/default/bin/ppx.exe;
+          _build/default/bin/ppx.exe --help;
+
       - name: Get cache directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -108,7 +113,7 @@ jobs:
         id: yarn-cache
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: yarn-${{ matrix.os }}-${{ hashFiles('**/yarn.lock') }}
+          key: yarn-${{ matrix.os }}-${{ hashFiles('./packages/ppx/test/bucklescript/yarn.lock') }}
           restore-keys: yarn-${{ matrix.os }}-
 
       - name: Install dependencies

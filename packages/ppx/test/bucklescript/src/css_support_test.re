@@ -1,5 +1,5 @@
 open Jest;
-Emotion.loadSerializer();
+Emotion.loadSerializer;
 
 let supportList = [
   [%css "overflow-x: clip"],
