@@ -66,8 +66,17 @@ jobs:
       - name: Run runtests for Parser, vds & Lexer
         run: esy dune runtest --force
 
-      - name: Load test_bucklescript's cache dependencies
-        uses: c-hive/gha-yarn-cache@v1
+      - name: Get test_bucklescript's cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+        working-directory: ./packages/ppx/test/bucklescript
+
+      - uses: actions/cache@v1
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: yarn-${{ matrix.os }}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: yarn-${{ matrix.os }}-
         working-directory: ./packages/ppx/test/bucklescript
 
       - name: Install test_bucklescript's dependencies
