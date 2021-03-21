@@ -1,6 +1,6 @@
 <h1> styled-ppx <a href="https://github.com/davesnx/styled-ppx/actions"></a></h1>
 
-**styled-ppx** is the [ppx](https://victor.darvariu.me/jekyll/update/2018/06/19/ppx-tutorial.html) that enables *CSS-in-Reason*.
+**styled-ppx** is the [ppx](https://victor.darvariu.me/jekyll/update/2018/06/19/ppx-tutorial.html) that enables *css-in-reason*.
 Build on top of [emotion](https://emotion.sh), it allows you to style apps safe, quickly, performant and as you always done it.
 
 ![](./docs/images/demo.png)
