@@ -82,7 +82,7 @@ jobs:
         working-directory: ./packages/ppx/test/bucklescript
 
       - name: Export dependencies
-        if: steps.deps-cache.outputs.cache-hit = 'true'
+        if: steps.deps-cache.outputs.cache-hit != 'true'
         run: esy export-dependencies
 
       - name: Upload artifacts for ${{ matrix.os }}
