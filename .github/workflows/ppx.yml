@@ -98,6 +98,9 @@ jobs:
           name: ${{ matrix.os }}
           path: _build/default/bin/ppx.exe
 
+      - name: Grant permission on ppx.exe
+        run: chmod +x ppx.exe
+
       - name: Get cache directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
