@@ -66,30 +66,6 @@ jobs:
       - name: Run runtests for Parser, vds & Lexer
         run: esy dune runtest --force
 
-      - name: Get test_bucklescript's cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-        working-directory: ./packages/ppx/test/bucklescript
-
-      - uses: actions/cache@v1
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: yarn-${{ matrix.os }}-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: yarn-${{ matrix.os }}-
-
-      - name: Install test_bucklescript's dependencies
-        run: yarn
-        working-directory: ./packages/ppx/test/bucklescript
-
-      - name: Build test_bucklescript
-        run: yarn build
-        working-directory: ./packages/ppx/test/bucklescript
-
-      - name: Run test_bucklescript
-        run: yarn test
-        working-directory: ./packages/ppx/test/bucklescript
-
       - name: Export dependencies
         if: steps.deps-cache.outputs.cache-hit != 'true'
         run: esy export-dependencies
@@ -99,6 +75,54 @@ jobs:
         with:
           name: ${{ matrix.os }}
           path: _build/default/bin/ppx.exe
+
+  e2e:
+    needs: build
+    name: BuckleScript tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Download artifacts
+        uses: actions/download-artifact@master
+        with:
+          name: ${{ matrix.os }}
+          path: _build/default/bin/ppx.exe
+
+      - name: Get cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+        working-directory: ./packages/ppx/test/bucklescript
+
+      - name: Load cache
+        uses: actions/cache@v1
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: yarn-${{ matrix.os }}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: yarn-${{ matrix.os }}-
+
+      - name: Install dependencies
+        run: yarn
+        working-directory: ./packages/ppx/test/bucklescript
+
+      - name: Build
+        run: yarn build
+        working-directory: ./packages/ppx/test/bucklescript
+
+      - name: Test
+        run: yarn test
+        working-directory: ./packages/ppx/test/bucklescript
+
 
   publish:
     needs: build
