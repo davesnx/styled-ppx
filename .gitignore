@@ -1,3 +1,30 @@
+# MacOS - https://github.com/github/gitignore/blob/master/Global/macOS.gitignore
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
 # ocamlbuild working directory
 _build/
 
@@ -23,11 +50,11 @@ yarn-error.log
 node_modules/
 _build
 
+# BuckleScript
 /lib/*
 !/lib/js/*
 /bundledOutputs/
 npm-debug.log
-.DS_Store
 .bsb.lock
 
 # Yarn Integrity file
@@ -43,3 +70,24 @@ npm-debug.log
 # Vim
 .*.swp
 .vscode
+
+# Vim - https://github.com/github/gitignore/blob/master/Global/Vim.gitignore
+[._]*.s[a-v][a-z]
+!*.svg  # comment out if you don't need vector files
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+
+# Persistent undo
+[._]*.un~
+
+# Vim session
+Session.vim
+Sessionx.vim
+
+# vim temporary
+.netrwhist
+*~
+# Auto-generated tag files
+tags
