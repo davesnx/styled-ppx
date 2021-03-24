@@ -6,4 +6,3 @@ let parse_declarations:
     [ | `Invalid_value(string) | `Not_found],
   );
 let render_when_unsupported_features: (string, string) => Parsetree.expression
-
