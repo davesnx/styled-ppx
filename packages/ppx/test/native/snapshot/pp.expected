@@ -2895,7 +2895,12 @@ module Component = {
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
 
-  let styles = Css.style([Css.color(var), Css.unsafe("display", "block")]);
+  let styles =
+    Css.style([
+      Css.color(var),
+      Css.unsafe("color", "trust-me"),
+      Css.unsafe("display", "block"),
+    ]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
