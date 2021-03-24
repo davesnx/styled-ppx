@@ -76,7 +76,8 @@ let token_to_string =
   | DIMENSION((n, d)) => "DIMENSION(" ++ n ++ ", " ++ d ++ ")"
   | VARIABLE(v) => "VARIABLE(" ++ v ++ ")"
   | TYPED_VARIABLE((v, type_)) =>
-    "TYPED_VARIABLE(" ++ v ++ " " ++ type_ ++ ")";
+    "TYPED_VARIABLE(" ++ v ++ " " ++ type_ ++ ")"
+  | UNSAFE => "~";
 
 let () =
   Location.register_error_of_exn(
@@ -283,6 +284,7 @@ let rec get_next_token = buf => {
   | '[' => LEFT_BRACKET
   | ']' => RIGHT_BRACKET
   | '%' => PERCENTAGE
+  | '~' => UNSAFE
   | variable => VARIABLE(Lex_buffer.latin1(~skip=1, buf))
   | variable_with_type =>
     let variableAndType = Lex_buffer.latin1(~skip=2, buf); /* cosa)type */
