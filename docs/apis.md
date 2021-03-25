@@ -1,38 +1,29 @@
+# API surface definition
+This document explains what are the interfaces that styled-ppx offers.
+
 ### styled
-**Styled component without define an HTML tag, defaults to div**
-
-```reason
-module StyledComponent = [%styled {|
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  height: 100vh;
-  width: 100vw;
-|}];
-
-ReactDOMRe.renderToElementWithId(
-  <StyledComponent>
-    {React.string("- Middle -")}
-  </StyledComponent>,
-  "app"
-);
-```
-
-### styled "inline"
 **Styled component with one CSS property**
 ```reason
 module StyledComponent = [%styled "display: flex"];
 ```
 
+### styled
+**Styled component with more than one CSS property**
+```reason
+module Box = [%styled {|
+  width: 100px;
+  height: 100px;
+|}];
+```
+
 ### css
-**Styled component defined inline as className**
+**React component with a className by css**
 ```reason
 <span className=[%css "display: flex"] />
 ```
 
 ### styled.section/span/a/...
-**Styled component with a defined HTML tag. `styled.{{ HTMLElement }}`**
+**Styled component with a defined HTML tag. `styled.{{ HTMLElement }}`**, if it's missing, defaults to `div`.
 
 ```reason
 module Link = [%styled.a {|
@@ -45,8 +36,8 @@ module Link = [%styled.a {|
 </Link>
 ```
 
-### styled.div with a variable
-**Styled component with styles defined by a variable**, this is not typed since we treat the variable as a string, so we can't ensure that the actual color is the same type as background-color expects.
+### styled with interpolation
+**Styled component with styles defined by variables outside of the defintion**, this is not type-safe since we cast it as a string. Any interpolation that isn't a string might cause the ppx to not compile. Allowing any 
 
 ```reason
 let black = "#333";
@@ -62,7 +53,7 @@ module Box = [%styled.a {|
 ```
 
 ### styled.global
-**Inject global css**, method to apply general styles to your website.
+**Inject global styles**, method to apply general styles to your website.
 ```reason
 [%styled.global {|
   html, body {
@@ -71,23 +62,10 @@ module Box = [%styled.a {|
   }
 |}];
 ```
-Accepts only one selector declaration, so this will not compile:
-```reason
-[%styled.global {|
-  html, body {
-    margin: 0;
-    padding: 0;
-  }
 
-  .div {
-    display: flex;
-  }
-|}];
-```
-
-### Dynamic styled components
-**Styled component with styles defined by props**
-In this case, `styled` recieves a function, it doesn't recieve a string as the other cases. This allows to create styled components with a component API.
+### styled with dynamic styles
+**Styled component with CSS defined by component props**
+`styled` instead of a   recieves a function, it doesn't recieve a string as the other cases. This allows to create styled components with a component API.
 
 ```reason
 module Component = [%styled (~content, ~background) => {j|
@@ -97,30 +75,30 @@ module Component = [%styled (~content, ~background) => {j|
   display: block;
 |j}];
 
-> Dynamic components are somehow not fully supported, and it's the reason why is still in BETA. The main problem is casting any parameter into a valid CSS value, since the language doesn't allow polymorphism (allowing a function to recieve a type with different shapes). It makes dynamic styling a challenge, for now we rely on an slight unsafe behaviour. This will be improved in further releases.
-
 /* Later on any component... */
 <Component content="#EB5757" background="#516CF0" />
 ```
 
-### styled.div with a variable typed
-**Styled component with styles defined by a variable but specifying the type explicitly.**
+> Dynamic components are somehow not fully supported, and it's the reason why is still in BETA. The main problem is casting any parameter into a valid CSS value, since the language doesn't allow polymorphism (allowing a function to recieve a type with different shapes). It makes dynamic styling a challenge, for now we rely on an slight unsafe behaviour. This will be improved in further releases.
+
+### styled with typed interpolation
+**styled component with styles defined by a variable but specifying the type explicitly.**
 This might be not working for all the cases, but this would bring type-safety into the variables that comes from the outside of the style definition.
 
-> This is currently on development, it works for simple cases.
+> This is currently on development, it works only for simple cases.
 ```reason
 let space = 10;
 
 module Wrap = [%styled.a {|
   margin: $(space)px;
 |}];
-
-/* Later on any component... */
-<Wrap />
 ```
 
+# Exploration
+
+All of this below it's just exploration on APIs we want to support.
+
 ### Pattern match on a value
-> This is not implemented and the api isn't final.
 ```reason
 /* This is not implemented yet! */
 type size =
@@ -141,7 +119,6 @@ module StyledWithPatternMatcing = [%styled (~size) =>
 ```
 
 ### Pattern match on any expression
-> This is not implemented and the api isn't final.
 ```reason
 /* This is not implemented yet! */
 type size =
