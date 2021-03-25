@@ -7,7 +7,6 @@ This document explains what are the interfaces that styled-ppx offers.
 module StyledComponent = [%styled "display: flex"];
 ```
 
-### styled
 **Styled component with more than one CSS property**
 ```reason
 module Box = [%styled {|
