@@ -110,9 +110,9 @@ type size =
 module StyledWithPatternMatcing = [%styled (~size) =>
   {|
     width: switch (size) {
-      | Small => 33%;
-      | Big => 80%;
-      | Full => 100%;
+      | Small => 33%
+      | Big => 80%
+      | Full => 100%
     }
   |}
 ];
