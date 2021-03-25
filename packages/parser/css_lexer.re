@@ -77,7 +77,7 @@ let token_to_string =
   | VARIABLE(v) => "VARIABLE(" ++ v ++ ")"
   | TYPED_VARIABLE((v, type_)) =>
     "TYPED_VARIABLE(" ++ v ++ " " ++ type_ ++ ")"
-  | UNSAFE => "~";
+  | UNSAFE => "UNSAFE";
 
 let () =
   Location.register_error_of_exn(
@@ -193,6 +193,8 @@ let nested_at_rule = [%sedlex.regexp?
   ("@", "document" | "keyframes" | "media" | "supports" | "scope")
 ];
 
+let unsafe = [%sedlex.regexp? ("__UNSAFE__")];
+
 let _a = [%sedlex.regexp? 'A' | 'a'];
 let _b = [%sedlex.regexp? 'B' | 'b'];
 let _c = [%sedlex.regexp? 'C' | 'c'];
@@ -284,7 +286,7 @@ let rec get_next_token = buf => {
   | '[' => LEFT_BRACKET
   | ']' => RIGHT_BRACKET
   | '%' => PERCENTAGE
-  | '~' => UNSAFE
+  | unsafe => UNSAFE
   | variable => VARIABLE(Lex_buffer.latin1(~skip=1, buf))
   | variable_with_type =>
     let variableAndType = Lex_buffer.latin1(~skip=2, buf); /* cosa)type */

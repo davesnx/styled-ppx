@@ -23,7 +23,7 @@ module Component = [%styled.section
 let var = "#333333";
 module Component = [%styled {j|
   color: $var;
-  ~color: trust-me;
+  __UNSAFE__ color: trust-me;
   display: block;
 |j}];
 
