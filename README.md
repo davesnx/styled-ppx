@@ -44,8 +44,6 @@ module Dynamic = [%styled (~color, ~background) => {j|
 |j}
 ];
 
-> Dynamic components are somehow not fully supported, and it's the reason why is still in BETA. The main problem is casting any parameter into a valid CSS value, since the language doesn't allow polymorphism (allowing a function to recieve a type with different shapes). It makes dynamic styling a challenge, for now we rely on an slight unsafe behaviour. This will be improved in further releases.
-
 ReactDOMRe.renderToElementWithId(
   <Dynamic color="#EB5757" background="#516CF0">
     {React.string("Hello!")}
@@ -53,6 +51,8 @@ ReactDOMRe.renderToElementWithId(
   "app",
 );
 ```
+
+> Dynamic components are somehow not fully supported, and it's the reason why the project is still in BETA.
 
 ### Inline css function
 ```reason
@@ -65,7 +65,7 @@ ReactDOMRe.renderToElementWithId(
 For further detail, take a look in [here](./docs/apis.md).
 
 ## Motivation
-I love CSS and I'm coming from the JavaScript world: writing React with styled-components mostly. I found to be one of the best combos for writting scalable frontend applications. When I arrived to Reason wasn't a thing. Even people were asking for it ([a](https://reasonml.chat/t/idiomatic-way-to-bind-to-styled-components/886) [f](https://reasonml.chat/t/styled-components-possible/554)[e](https://reasonml.chat/t/styling-solutions-reasonreact-as-of-aug-18/958)[w](https://reasonml.chat/t/options-and-best-practices-for-styling-in-reasonreact/261) [t](https://twitter.com/lyovson/status/1233397294311100417)[i](https://discord.gg/byjdYFH)[m](https://discord.gg/byjdYFH)[e](https://discord.gg/byjdYFH)[s](https://discord.gg/byjdYFH)).
+I love CSS and coming from the JavaScript world, writing React with styled-components. I found to be one of the best combos for writting scalable frontend UIs. When I arrived to Reason, it wasn't a thing, many people have been asking for it ([a](https://reasonml.chat/t/idiomatic-way-to-bind-to-styled-components/886) [f](https://reasonml.chat/t/styled-components-possible/554)[e](https://reasonml.chat/t/styling-solutions-reasonreact-as-of-aug-18/958)[w](https://reasonml.chat/t/options-and-best-practices-for-styling-in-reasonreact/261) [t](https://twitter.com/lyovson/status/1233397294311100417)[i](https://discord.gg/byjdYFH)[m](https://discord.gg/byjdYFH)[e](https://discord.gg/byjdYFH)[s](https://discord.gg/byjdYFH)).
 
 So I took the time to create it with help from [@jchavarri](https://github.com/jchavarri) 🙌.
 
@@ -73,7 +73,7 @@ If you want to know more about how it works or what are the benefits I recommend
 
 ## Installation
 
-The installation process refers to the npm version (v0.20) which differs from master (v1.x). In (v1.x) we won't rely on bs-emotion.
+The installation process refers to the stable NPM published version (v0.20) which differs from master (v1.x). In master we won't rely on bs-emotion, so this installation will be different.
 
 This package depends on [bs-emotion](https://github.com/ahrefs/bs-emotion), [ReasonReact](https://reasonml.github.io/reason-react/) and [BuckleScript](https://bucklescript.github.io), make sure you follow their installations.
 
@@ -91,7 +91,7 @@ yarn add @davesnx/styled-ppx @ahrefs/bs-emotion
 npm install @davesnx/styled-ppx @ahrefs/bs-emotion
 ```
 
-And add the PPX in your `bsconfig.json` file:
+Add the PPX in your `bsconfig.json` file:
 
 ```json
 {
@@ -103,22 +103,7 @@ And add the PPX in your `bsconfig.json` file:
 }
 ```
 
-However, if you want to use `esy` in BuckleScript:
-Create an `esy.json` file with the content:
-
-```json
-{
-  "dependencies": {
-    "styled-ppx": "*",
-    "ocaml": "~4.6.1000"
-  },
-  "resolutions": {
-    "styled-ppx": "davesnx/styled-ppx"
-  }
-}
-```
-
-And add the PPX in your `bsconfig.json` file:
+Add the PPX in your `bsconfig.json` file under `"ppx-flags"`
 
 ```json
 {
@@ -126,7 +111,7 @@ And add the PPX in your `bsconfig.json` file:
 }
 ```
 
-If you want to try out of the box a project, just visit https://github.com/davesnx/try-styled-ppx and follow the instalation process there.
+If you want to try it out, just fork https://github.com/davesnx/try-styled-ppx and follow the instalation process there.
 
 ## Editor Support
 
@@ -136,24 +121,20 @@ One of the fears of using a ppx is editor support, we belive that having compili
 
 - If you are interested on another editor, please fill an issue and we would consider.
 
-## Thanks to
-Thanks to [Javier Chávarri](https://github.com/jchavarri), for helping me understand all the world of OCaml and his knowledge about ppx's. It has been a great experience.
-Inspired by [@astrada](https://github.com/astrada/) `bs-css-ppx` and his [CSS Parser](https://github.com/astrada/ocaml-css-parser).
-Thanks to [ahrefs/bs-emotion](https://github.com/ahrefs/bs-emotion) and [emotion](https://github.com/emotion-js/emotion).
+## Acknowledgement
+Thanks to [Javier Chávarri](https://github.com/jchavarri), for helping me understand all the world of OCaml and his knowledge about ppx's. It has been a great experience. Inspired by [@astrada](https://github.com/astrada/) `bs-css-ppx` and his implementation of [CSS Parser](https://github.com/astrada/ocaml-css-parser) in OCaml.
 
 ## Contributing
 We would love your help improving styled-ppx, there's still a lot to do.
 The roadmap lives under the [Projects](https://github.com/davesnx/styled-ppx/projects) in GitHub. Take a look, the tasks are well organized and clear for everybody to pick any!
 
-You need `esy`, you can install the latest version from [npm](https://npmjs.com):
+You would need `esy`, you can install the latest version from [npm](https://npmjs.com):
 
 ```bash
-yarn global add esy@latest
+yarn global add esy@0.6.8
 # Or
-npm install -g esy@latest
+npm install -g esy@0.6.8
 ```
-
-> NOTE: Make sure `esy --version` returns at least `0.5.8` for this project to build.
 
 Then run the `esy` command from this project root to install and build depenencies.
 
@@ -175,7 +156,7 @@ again with the same simple `esy` command and run the native tests with
 esy test
 ```
 
-This project uses [Dune](https://dune.build/) as a build system, if you add a dependency in your `package.json` file, don't forget to add it to your `dune` and `dune-project` files too.
+This project uses [Dune](https://dune.build/) as a build system, if you add a dependency in your `package.json` file, don't forget to add it to your `dune`.
 
 ### Running Tests
 
@@ -190,7 +171,7 @@ esy test
 If you want to run Bucklescript's integration test instead, you can do:
 ```bash
 esy
-cd test/bucklescript
+cd packages/ppx/test/bucklescript
 yarn install
 yarn build
 yarn test
@@ -201,31 +182,4 @@ yarn test
 
 ##### Happy reasoning!
 
-<!--
-
-### Creating release builds
-
-To release prebuilt binaries to all platforms, we use Github Actions to build each binary individually.
-
-The binaries are then uploaded to a Github Release and NPM automatically.
-
-To trigger the Release workflow, you need to push a git tag to the repository.
-
-We provide a script that will bump the version of the project, tag the commit and push it to Github:
-
-```bash
-./scripts/release.sh
-```
-
-The script uses `npm version` to bump the project, so you can use the same argument.
-For instance, to release a new patch version, you can run:
-
-```bash
-./scripts/release.sh minor
-```
-
-Since we use Compatible Versioning, we only run major and minor versions.
-
--->
-
-<img alt="CI" align="right" src="https://github.com/davesnx/styled-ppx/workflows/CI/badge.svg"></a><a href="https://github.com/staltz/comver"><img alt="ComVer" align="right" src="https://img.shields.io/badge/ComVer-compliant-brightgreen.svg" />
+<img alt="CI" src="https://github.com/davesnx/styled-ppx/workflows/CI/badge.svg"></a><a href="https://github.com/staltz/comver"><img alt="ComVer" src="https://img.shields.io/badge/ComVer-compliant-brightgreen.svg" />
