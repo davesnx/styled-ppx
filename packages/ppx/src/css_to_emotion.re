@@ -239,11 +239,14 @@ and render_style_rule = (ident, sr: Style_rule.t): expression => {
   let rec render_prelude_value = (s, (value, value_loc)) => {
     switch (value) {
     | Delim(":") => ":" ++ s
+    | Delim(",") => ", " ++ s
+    | Delim(".") => "." ++ s
     | Delim(v) => " " ++ v ++ " " ++ s
     | Ident(v)
     | Operator(v)
     | Number(v)
     | Selector(v) => v ++ s
+    | Hash(v) => "#" ++ v ++ s
     /*<number><string> is parsed as Dimension */
     | Dimension((number, dimension)) => number ++ dimension ++ " " ++ s
     | Paren_block(c) =>

@@ -1,5 +1,5 @@
 [%styled.global {|
-  html, body {
+  html, body, #root, .mainClass {
     margin: 0;
   }
 |}];
@@ -52,6 +52,13 @@ module NestedSelectors = [%styled.body
   & > a {
     background-color: green;
   }
+  & > .someClass {
+    background-color: yellow;
+  }
+  & > #someId {
+    background-color: blue;
+  }
+
   &:nth-child(even) {
     background-color: red;
   }
