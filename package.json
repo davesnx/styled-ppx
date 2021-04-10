@@ -52,11 +52,9 @@
     "test_snapshot": "esy dune runtest",
     "test_snapshot:promote": "esy dune runtest --auto-promote",
     "test_native": "esy dune build @run_typecheck_test",
-    "test_bs": "cd test/bucklescript; yarn test",
-    "doc": "esy dune build @doc",
-    "doc-path": "esy echo #{self.target_dir}/default/_doc/_html/index.html",
+    "test_bs": "cd packages/ppx/test/bucklescript; yarn test",
     "format": "esy dune build @fmt --auto-promote",
-    "watch": "esy dune build -p styled-ppx --watch",
+    "watch": "esy dune build --root . --watch",
     "utop": "esy dune utop lib -- -implicit-bindings"
   }
 }
