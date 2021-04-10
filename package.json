@@ -40,7 +40,7 @@
     "@opam/dune": "*",
     "@opam/ppx_deriving": "4.5",
     "@opam/menhir": "20201216",
-    "@opam/ocaml-migrate-parsetree": "1.7.3",
+    "@opam/ocaml-migrate-parsetree": "1.8.0",
     "@opam/ppxlib": "0.14.0",
     "@opam/ppx_tools_versioned": "5.4.0",
     "@opam/sedlex": "ocaml-community/sedlex:sedlex.opam#25c0dbd82c7fc5d91102f5bd21db1411f2c46323",
@@ -56,7 +56,7 @@
     "doc": "esy dune build @doc",
     "doc-path": "esy echo #{self.target_dir}/default/_doc/_html/index.html",
     "format": "esy dune build @fmt --auto-promote",
-    "watch": "esy dune build -p styled-ppx --watch",
+    "watch": "esy dune build --promote-install-files --root . --watch",
     "utop": "esy dune utop lib -- -implicit-bindings"
   }
 }
