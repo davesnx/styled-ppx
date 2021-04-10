@@ -1,16 +1,13 @@
-open Migrate_parsetree;
-open Ast_410;
-open Ast_mapper;
+open Ppxlib;
 open Asttypes;
 open Parsetree;
 open Ast_helper;
 open Longident;
-open React_props;
 
 module Ast_builder = Ppxlib.Ast_builder.Default;
 
 let raiseWithLocation = (~loc, msg) => {
-  raise(Location.Error(Location.error(~loc, msg)));
+  raise(Location.raise_errorf(~loc, msg))
 };
 
 let isOptional = str =>
@@ -32,29 +29,6 @@ let getLabel = str =>
   | Nolabel => ""
   };
 
-let optionIdent = Lident("option");
-
-let safeTypeFromValue = valueStr => {
-  let valueStr = getLabel(valueStr);
-  switch (String.sub(valueStr, 0, 1)) {
-  | "_" => "T" ++ valueStr
-  | _ => valueStr
-  };
-};
-
-let getAlias = (pattern, label) =>
-  switch (pattern) {
-  | {ppat_desc: Ppat_alias(_, {txt, _}) | Ppat_var({txt, _}), _} => txt
-  | {ppat_desc: Ppat_any, _} => "_"
-  | _ => getLabel(label)
-  };
-
-let isStyledTag = str =>
-  switch (String.split_on_char('.', str)) {
-  | ["styled", ..._] => true
-  | _ => false
-  };
-
 let getTag = str => {
   switch (String.split_on_char('.', str)) {
   | ["styled"] => "div"
@@ -63,22 +37,27 @@ let getTag = str => {
   };
 };
 
-/* (~a, ~b, ~c, etc...) => args */
-let rec createFnWithLabeledArgs = (list, args) =>
-  switch (list) {
-  | [(label, default, pattern, _alias, loc, _interiorType), ...rest] =>
-    createFnWithLabeledArgs(
-      rest,
-      Exp.fun_(~loc, label, default, pattern, args),
-    )
-  | [] => args
-  };
-
 let getType = pattern =>
   switch (pattern) {
   | {ppat_desc: Ppat_constraint(_, type_), _} => Some(type_)
   | _ => None
   };
+
+let getAlias = (pattern, label) =>
+  switch (pattern) {
+  | {ppat_desc: Ppat_alias(_, {txt, _}) | Ppat_var({txt, _}), _} => txt
+  | {ppat_desc: Ppat_any, _} => "_"
+  | _ => getLabel(label)
+  };
+
+/* let safeTypeFromValue = valueStr => {
+  let valueStr = getLabel(valueStr);
+  switch (String.sub(valueStr, 0, 1)) {
+  | "_" => "T" ++ valueStr
+  | _ => valueStr
+  };
+}; */
+
 
 let rec getLabeledArgs = (mapper, expr, list) => {
   let expr = mapper.expr(mapper, expr);
@@ -104,372 +83,20 @@ let rec getLabeledArgs = (mapper, expr, list) => {
 
 let styleVariableName = "styles";
 
-/* let styles = Emotion.(css(exp)) */
-let createStyles = (~loc, ~name, ~exp) => {
-  let variableName = Pat.mk(~loc, Ppat_var({txt: name, loc}));
-  Str.mk(~loc, Pstr_value(Nonrecursive, [Vb.mk(~loc, variableName, exp)]));
-};
-
-/* let styles = (~arg1, ~arg2) => Emotion.(css(exp)) */
-let createDynamicStyles = (~loc, ~name, ~args, ~exp) => {
-  let variableName = Pat.mk(~loc, Ppat_var({txt: name, loc}));
-
-  Str.mk(
-    ~loc,
-    Pstr_value(
-      Nonrecursive,
-      [Vb.mk(~loc, variableName, createFnWithLabeledArgs(args, exp))],
-    ),
-  );
-};
-
-/*
-   [@bs.val] [@bs.module "react"] external createVariadicElement:
-   (string, Js.t({ .. })) => React.element =
-   "createElement";
- */
-let externalCreateVariadicElement = (~loc) => {
-  Str.primitive({
-    pval_loc: loc,
-    pval_name: {
-      txt: "createVariadicElement",
-      loc,
-    },
-    pval_type:
-      Typ.arrow(
-        ~loc,
-        Nolabel,
-        Typ.constr(~loc, {txt: Lident("string"), loc}, []),
-        Typ.arrow(
-          ~loc,
-          Nolabel,
-          Typ.constr(
-            ~loc,
-            {txt: Ldot(Lident("Js"), "t"), loc},
-            [Typ.object_(~loc, [], Open)],
-          ),
-          Typ.constr(
-              ~loc,
-              {txt: Ldot(Lident("React"), "element"), loc},
-              [],
-            ),
-        ),
-      ),
-    pval_prim: ["createElement"],
-    pval_attributes: [
-      Attr.mk({txt: "bs.val", loc}, PStr([])),
-      Attr.mk(
-        {txt: "bs.module", loc},
-        PStr([
-          Str.mk(
-            ~loc,
-            Pstr_eval(
-              Exp.constant(
-                ~loc,
-                ~attrs=[
-                  Attr.mk({txt: "reason.raw_literal", loc}, PStr([])),
-                ],
-                Pconst_string("react", None),
-              ),
-              [],
-            ),
-          ),
-        ]),
-      ),
-    ],
-  });
-};
-
-/* div(~className=styles, ()) + createSwitchChildren */
-let createVariadicElement = (~loc, ~tag) => {
-  Exp.apply(
-    ~loc,
-    Exp.ident(~loc, {txt: Lident("createVariadicElement"), loc}),
-    [
-      (
-        Nolabel,
-        Exp.constant(
-          ~loc,
-          ~attrs=[
-            Attr.mk(
-              {txt: "reason.raw_literal", loc},
-              PStr([
-                Str.mk(
-                  ~loc,
-                  Pstr_eval(
-                    Exp.constant(~loc, Pconst_string(tag, None)),
-                    [],
-                  ),
-                ),
-              ]),
-            ),
-          ],
-          Pconst_string(tag, None),
-        ),
-      ),
-      (Nolabel, Exp.ident(~loc, {txt: Lident("newProps"), loc})),
-    ],
-  );
-};
-
-/* let stylesObject = {"className": styled}; */
-let createStylesObject = (~loc, ~value) =>
-  Vb.mk(
-    ~loc,
-    Pat.mk(~loc, Ppat_var({txt: "stylesObject", loc})),
-    Exp.extension(
-      ~loc,
-      (
-        {txt: "bs.obj", loc},
-        PStr([
-          Str.mk(
-            ~loc,
-            Pstr_eval(
-              Exp.record(
-                ~loc,
-                [ ({txt: Lident("className"), loc}, value) ],
-                None,
-              ),
-              [],
-            ),
-          ),
-        ]),
-      ),
-    ),
-  );
-
-/* Obj.magic(props) */
-let objMagicProps = (~loc) =>
-  Exp.apply(
-    ~loc,
-    Exp.ident(~loc, {txt: Ldot(Lident("Obj"), "magic"), loc}),
-    [(Nolabel, Exp.ident(~loc, {txt: Lident("props"), loc}))],
-  );
-
-/* let newProps = Js.Obj.assign(stylesObject, Obj.magic(props)); */
-let createNewProps = (~loc) =>
-  Vb.mk(
-    ~loc,
-    Pat.mk(~loc, Ppat_var({txt: "newProps", loc})),
-    Exp.apply(
-      ~loc,
-      Exp.ident(
-        ~loc,
-        {txt: Ldot(Ldot(Lident("Js"), "Obj"), "assign"), loc},
-      ),
-      [
-        (Nolabel, Exp.ident(~loc, {txt: Lident("stylesObject"), loc})),
-        (Nolabel, objMagicProps(~loc)),
-      ],
-    ),
-  );
-
-/*
-   setClassName(props, styled);
-
-   React.createElement("a", ~props,
-     [|switch (children) {
-     | Some(chil) => chil
-     | None => React.null
-   }|]);
- */
-let createMakeBody = (~loc, ~tag, ~styledExpr) =>
-  Exp.let_(
-    ~loc,
-    ~attrs=[Attr.mk({txt: "reason.preserve_braces", loc}, PStr([]))],
-    Nonrecursive,
-    [createStylesObject(~loc, ~value=styledExpr)],
-    Exp.let_(
-      ~loc,
-      Nonrecursive,
-      [createNewProps(~loc)],
-      createVariadicElement(~loc, ~tag)
-    ),
-  );
-
-/* props: makeProps */
-let createMakeArguments = (~loc, ~params) => {
-  Pat.constraint_(
-    ~loc,
-    Pat.mk(~loc, Ppat_var({txt: "props", loc})),
-    Typ.constr(~loc, {txt: Lident("makeProps"), loc}, params),
-  );
-};
-
-/* let make = (props: makeProps) => + createMakeBody */
-let createMakeFn = (~loc, ~tag, ~styledExpr, ~params) =>
-  Exp.fun_(
-    ~loc,
-    Nolabel,
-    None,
-    createMakeArguments(~loc, ~params),
-    createMakeBody(~loc, ~tag, ~styledExpr),
-  );
-
-/* [@react.component] + createMakeFn */
-let createComponent = (~loc, ~tag, ~styledExpr, ~params) => {
-  let params = Option.value(~default=[], params);
-  Str.mk(
-    ~loc,
-    Pstr_value(
-      Nonrecursive,
-      [
-        Vb.mk(
-          ~loc,
-          Pat.mk(~loc, Ppat_var({txt: "make", loc})),
-          createMakeFn(~loc, ~tag, ~styledExpr, ~params),
-        ),
-      ],
-    ),
-  );
-};
-
-/* [@bs.optional] color: string */
-let createCustomPropLabel = (~loc, name, type_) =>
-  Type.field(~loc, {txt: name, loc}, type_);
-
-let createTypeVariable = (~loc, name) => Ast_builder.ptyp_var(~loc, name);
-
-/* [@bs.optional] href: string */
-let createRecordLabel = (~loc, name, kind, alias) =>
-  {
-    let bsOptional = Attr.mk({txt: "bs.optional", loc}, PStr([]));
-    let bsAlias = (alias) => Attr.mk({txt: "bs.as", loc}, PStr([
-        Str.mk(
-          ~loc,
-          Pstr_eval(
-            Exp.constant(
-              ~loc,
-              ~attrs=[],
-              Pconst_string(alias, None),
-            ),
-            []
-          ),
-        ),
-      ]));
-
-    let attrs = switch (alias) {
-      | Some(alias) => [bsOptional, bsAlias(alias)]
-      | None => [bsOptional]
-    };
-
-    Type.field(
-    ~loc,
-    ~attrs,
-    {txt: name, loc},
-    Typ.constr(~loc, {txt: Lident(kind), loc}, []),
-  )
+let isStyledTag = str =>
+  switch (String.split_on_char('.', str)) {
+  | ["styled", ..._] => true
+  | _ => false
   };
 
-/* [@bs.optional] ref: domRef */
-let createDomRefLabel = (~loc) =>
-  Type.field(
-    ~loc,
-    ~attrs=[Attr.mk({txt: "bs.optional", loc}, PStr([]))],
-    {txt: "ref", loc},
-    Typ.constr(~loc, {txt: Ldot(Lident("ReactDOMRe"), "domRef"), loc}, []),
-  );
-
-/* [@bs.optional] children: React.element */
-let createChildrenLabel = (~loc) =>
-  Type.field(
-    ~loc,
-    ~attrs=[Attr.mk({txt: "bs.optional", loc}, PStr([]))],
-    {txt: "children", loc},
-    Typ.constr(~loc, {txt: Ldot(Lident("React"), "element"), loc}, []),
-  );
-
-/* [@bs.optional] onDragOver: ReactEvent.Mouse.t => unit */
-let createRecordEventLabel = (~loc, name, kind) => {
-  Type.field(
-    ~loc,
-    ~attrs=[Attr.mk({txt: "bs.optional", loc}, PStr([]))],
-    {txt: name, loc},
-    Typ.arrow(
-      ~loc,
-      Nolabel,
-      Typ.constr(
-        ~loc,
-        {txt: Ldot(Ldot(Lident("ReactEvent"), kind), "t"), loc},
-        [],
-      ),
-      Typ.constr(~loc, {txt: Lident("unit"), loc}, []),
-    ),
-  );
-};
-
-let createMakeProps = (~loc, extraProps) => {
-  /* [@bs.deriving abstract] */
-  let bsDerivingAbstract =
-    Attr.mk(
-      {txt: "bs.deriving", loc},
-      PStr([
-        Str.mk(
-          ~loc,
-          Pstr_eval(Exp.ident(~loc, {txt: Lident("abstract"), loc}), []),
-        ),
-      ]),
-    );
-
-  let (params, dynamicProps) =
-    switch (extraProps) {
-    | None => ([], [])
-    | Some((params, props)) => (params, props)
-    };
-  /*
-     List of
-         prop: type
-         [@bs.optional]
-
-     ref: domRef
-     [@bs.optional]
-   */
-  let reactProps =
-    List.append(
-      [
-        createDomRefLabel(~loc),
-        createChildrenLabel(~loc),
-        ...List.map(
-             domProp =>
-               switch (domProp) {
-               | Event({name, type_}) =>
-                 createRecordEventLabel(~loc, name, type_)
-               | Attribute({name, type_, alias}) =>
-                 createRecordLabel(~loc, name, type_, alias)
-               },
-             makePropList,
-           ),
-      ],
-      dynamicProps,
-    );
-
-  let params = params |> List.map(type_ => (type_, Invariant));
-  Str.mk(
-    ~loc,
-    Pstr_type(
-      Recursive,
-      [
-        Type.mk(
-          ~loc,
-          ~priv=Public,
-          ~attrs=[bsDerivingAbstract],
-          ~kind=Ptype_record(reactProps),
-          ~params,
-          {txt: "makeProps", loc},
-        ),
-      ],
-    ),
-  );
-};
-
-let match_exp_string_payload = expr => {
+let match_exp_string_payload = (expr: Ppxlib.expression) => {
   open Ppxlib.Ast_pattern;
   let pattern =
     pexp_extension(
       extension(
         __,
         pstr(
-          pstr_eval(pexp_constant(pconst_string(__', __)), nil) ^:: nil,
+          pstr_eval(pexp_constant(pconst_string(__', __, none)), nil) ^:: nil,
         ),
       ),
     );
@@ -482,53 +109,15 @@ let match_exp_string_payload = expr => {
   );
 };
 
-let match_mod_payload = mod_expr => {
-  open Ppxlib.Ast_pattern;
-
-  let pattern =
-    pmod_extension(
-      extension(
-        __',
-        pstr(
-          pstr_eval(
-            map(
-              ~f=
-                (f, lbl, def, param, body) =>
-                  f(`Fun((lbl, def, param, body))),
-              pexp_fun(__, __, __, __),
-            )
-            ||| map(
-                  ~f=(f, payload, delim) => f(`String((payload, delim))),
-                  pexp_constant(pconst_string(__', __)),
-                )
-            ||| map(~f=(f, expr) => f(`Expr(expr)), __),
-            nil,
-          )
-          ^:: nil
-          ||| map(~f=f => f(`None), nil),
-        ),
-      ),
-    );
-  parse(
-    pattern,
-    mod_expr.pmod_loc,
-    ~on_error=_ => None,
-    mod_expr,
-    (key, payload) => Some((key, payload)),
-  );
-};
-
-let renderStringPayload = (kind, payload, delim) => {
+let renderStringPayload = (
+  kind,
+  ~loc as _: location,
+  ~path as _: label,
+  ~arg as _,
+  payload, _
+) => {
   let {txt: string, loc} = payload;
-  let loc_start =
-    switch (delim) {
-    | None => loc.Location.loc_start
-    | Some(s) => {
-        ...loc.Location.loc_start,
-        Lexing.pos_cnum:
-          loc.Location.loc_start.Lexing.pos_cnum + String.length(s) + 1,
-      }
-    };
+  let loc_start = loc.Location.loc_start;
 
   let parse = parser =>
     Css_lexer.parse_string(
@@ -554,7 +143,7 @@ let renderStringPayload = (kind, payload, delim) => {
   };
 };
 
-let renderPayload = (kind, default_mapper, expr) => {
+/* let renderPayload = (kind, default_mapper, expr) => {
   // this mapper is used inside of [%styled.div expr]
   let mapper = {
     ...default_mapper,
@@ -578,181 +167,197 @@ let renderPayload = (kind, default_mapper, expr) => {
     Css_to_emotion.render_emotion_style(mapper.Ast_mapper.expr(mapper, expr))
   };
 };
+ */
 
-let styledPpxMapper = (_, _) => {
-  ...default_mapper,
-  /*
-     This is what defines where the ppx should be hooked into, in this case
-     we transform expr ("expressions").
-   */
-  expr: (mapper, expr) =>
-    switch (match_exp_string_payload(expr)) {
-    | Some(("css", payload, delim)) =>
-      renderStringPayload(`Style, payload, delim)
-    | Some(("styled.global", payload, delim)) =>
-      renderStringPayload(`Global, payload, delim)
-    | Some(("styled.keyframe", payload, delim)) =>
-      renderStringPayload(`Keyframe, payload, delim)
-    | exception _
-    | _ => default_mapper.expr(mapper, expr)
-    },
-  /***
-    * This is what defines [%styled] as an extension point that hooks into module_expr,
-    so all the modules pass into here and we patter-match the ones with [%styled.div () => {||}]
-   */
-  module_expr: (mapper, expr) => {
-    switch (match_mod_payload(expr)) {
-    | Some((
-        {txt: name, loc: nameLoc},
-        `Fun(label, args, pattern, expression),
-      ))
-        when isStyledTag(name) =>
-      let tag = getTag(name);
+let renderStyledDynamic = (~tag, ) => {
+  /* Fix getLabeledArgs, to stop ignoring the first arg */
+  let alias = getAlias(pattern, label);
+  let type_ = getType(pattern);
 
-      /* Fix getLabeledArgs, to stop ignoring the first arg */
-      let alias = getAlias(pattern, label);
-      let type_ = getType(pattern);
+  let firstArg = (label, args, pattern, alias, pattern.ppat_loc, type_);
 
-      let firstArg = (label, args, pattern, alias, pattern.ppat_loc, type_);
+  let (functionExpr, argList, _) =
+    getLabeledArgs(mapper, expression, [firstArg]);
 
-      let (functionExpr, argList, _) =
-        getLabeledArgs(mapper, expression, [firstArg]);
+  if (!Html.isValidTag(tag)) {
+    raiseWithLocation(
+      ~loc=nameLoc,
+      "Unexpected HTML tag in [%styled." ++ tag ++ "]",
+    );
+  };
 
-      if (!Html.isValidTag(tag)) {
-        raiseWithLocation(
-          ~loc=nameLoc,
-          "Unexpected HTML tag in [%styled." ++ tag ++ "]",
+  let loc = expression.pexp_loc;
+
+  let propExpr = Exp.ident(~loc, {txt: Lident("props"), loc});
+  let propToGetter = str => str ++ "Get";
+
+  let args =
+    List.map(
+      ((arg, _, _, _, _, _)) => {
+        let labelText = getLabel(arg);
+        let value =
+          Exp.ident(~loc, {txt: Lident(propToGetter(labelText)), loc});
+
+        (arg, Exp.apply(~loc, value, [(Nolabel, propExpr)]));
+      },
+      argList,
+    );
+
+  let styledExpr =
+    Exp.apply(
+      ~loc,
+      Exp.ident(~loc, {txt: Lident(styleVariableName), loc}),
+      args,
+    );
+
+  let variableList =
+    List.map(
+      ((arg, _, _, _, loc, type_)) => {
+        let label = getLabel(arg);
+        let (kind, type_) =
+          switch (type_) {
+          | Some(type_) => (`Typed, type_)
+          | None => (`Open, Create.typeVariable(~loc, label))
+          };
+        (label, kind, type_);
+      },
+      argList,
+    );
+  let variableParams =
+    variableList
+    |> List.filter_map(
+          fun
+          | (_, `Open, type_) => Some(type_)
+          | _ => None,
         );
-      };
+  let _variableProps =
+    List.map(
+      ((label, _, type_)) => Create.customPropLabel(~loc, label, type_),
+      variableList,
+    );
+  let _css_expr = renderPayload(`Style, default_mapper, functionExpr);
 
-      let loc = expression.pexp_loc;
+  Ast_builder.pmod_structure(~loc, [[%stri let x = ()]]);
 
-      let propExpr = Exp.ident(~loc, {txt: Lident("props"), loc});
-      let propToGetter = str => str ++ "Get";
-
-      let args =
-        List.map(
-          ((arg, _, _, _, _, _)) => {
-            let labelText = getLabel(arg);
-            let value =
-              Exp.ident(~loc, {txt: Lident(propToGetter(labelText)), loc});
-
-            (arg, Exp.apply(~loc, value, [(Nolabel, propExpr)]));
-          },
-          argList,
-        );
-
-      let styledExpr =
-        Exp.apply(
-          ~loc,
-          Exp.ident(~loc, {txt: Lident(styleVariableName), loc}),
-          args,
-        );
-
-      let variableList =
-        List.map(
-          ((arg, _, _, _, loc, type_)) => {
-            let label = getLabel(arg);
-            let (kind, type_) =
-              switch (type_) {
-              | Some(type_) => (`Typed, type_)
-              | None => (`Open, createTypeVariable(~loc, label))
-              };
-            (label, kind, type_);
-          },
-          argList,
-        );
-      let variableParams =
-        variableList
-        |> List.filter_map(
-             fun
-             | (_, `Open, type_) => Some(type_)
-             | _ => None,
-           );
-      let variableProps =
-        List.map(
-          ((label, _, type_)) => createCustomPropLabel(~loc, label, type_),
-          variableList,
-        );
-      let css_expr = renderPayload(`Style, default_mapper, functionExpr);
-      Mod.mk(
-        Pmod_structure([
-          createMakeProps(~loc, Some((variableParams, variableProps))),
-          externalCreateVariadicElement(~loc),
-          createDynamicStyles(
-            ~loc,
-            ~name=styleVariableName,
-            ~args=argList,
-            ~exp=css_expr,
-          ),
-          createComponent(
-            ~loc,
-            ~tag,
-            ~styledExpr,
-            ~params=Some(variableParams),
-          ),
-        ]),
-      );
-    | Some(({txt: name, loc: nameLoc}, `String(str, delim)))
-        when isStyledTag(name) =>
-      let tag = getTag(name);
-
-      if (!Html.isValidTag(tag)) {
-        raiseWithLocation(
-          ~loc=nameLoc,
-          "Unexpected HTML tag in [%styled." ++ tag ++ "]",
-        );
-      };
-
-      let loc = str.loc;
-      let css_expr = renderStringPayload(`Style, str, delim);
-
-      let styledExpr =
-        Exp.ident(~loc, {txt: Lident(styleVariableName), loc});
-
-      Mod.mk(
-        Pmod_structure([
-          createMakeProps(~loc, None),
-          externalCreateVariadicElement(~loc),
-          createStyles(~loc, ~name=styleVariableName, ~exp=css_expr),
-          createComponent(~loc, ~tag, ~styledExpr, ~params=None),
-        ]),
-      );
-    | Some(({txt: name, loc: nameLoc}, `None)) when isStyledTag(name) =>
-      let tag = getTag(name);
-
-      if (!Html.isValidTag(tag)) {
-        raiseWithLocation(
-          ~loc=nameLoc,
-          "Unexpected HTML tag in [%styled." ++ tag ++ "]",
-        );
-      };
-
-      let loc = nameLoc;
-      let css_expr = renderStringPayload(`Style, {txt: "", loc}, None);
-
-      let styledExpr =
-        Exp.ident(~loc, {txt: Lident(styleVariableName), loc});
-
-      Mod.mk(
-        Pmod_structure([
-          createMakeProps(~loc, None),
-          externalCreateVariadicElement(~loc),
-          createStyles(~loc, ~name=styleVariableName, ~exp=css_expr),
-          createComponent(~loc, ~tag, ~styledExpr, ~params=None),
-        ]),
-      );
-    | _ => default_mapper.module_expr(mapper, expr)
-    };
-  },
+  /* Mod.mk(
+    Pmod_structure([
+      Create.makeProps(~loc, Some((variableParams, variableProps))),
+      Create.externalCreateVariadicElement(~loc),
+      Create.dynamicStyles(
+        ~loc,
+        ~name=styleVariableName,
+        ~args=argList,
+        ~exp=css_expr,
+      ),
+      Create.component(
+        ~loc,
+        ~tag,
+        ~styledExpr,
+        ~params=Some(variableParams),
+      ),
+    ]),
+  ); */
 };
 
-let () =
-  Driver.register(
-    ~name="styled-ppx",
-    /* this is required to run before ppx_metaquot during tests */
-    /* any change regarding this behavior not related to metaquot is a bug */
-    ~position=-1,
-    Versions.ocaml_410,
-    styledPpxMapper,
+let renderStyledStatic = (~tag as _, ~str, ~delim) => {
+  let loc = str.loc;
+  let _css_expr = renderStringPayload(`Style, str, delim);
+  let _styledExpr =
+    Exp.ident(~loc, {txt: Lident(styleVariableName), loc});
+
+  /* Ast_builder.pmod_structure(~loc, [
+    Create.makeProps(~loc, None),
+    Create.externalCreateVariadicElement(~loc),
+    Create.styles(~loc, ~name=styleVariableName, ~exp=css_expr),
+    Create.component(~loc, ~tag, ~styledExpr, ~params=None)
+  ]); */
+  Ast_builder.pmod_structure(~loc, [[%stri let x = ()]]);
+};
+
+let string_payload =
+  Ast_pattern.(
+    pstr(
+      pstr_eval(pexp_constant(pconst_string(__', __, none)), nil) ^:: nil,
+    ),
+);
+
+let pattern =
+  Ast_pattern.(
+    pstr(
+      pstr_eval(
+        map(
+          ~f=
+            (f, lbl, def, param, body) =>
+              f(`Fun((lbl, def, param, body))),
+          pexp_fun(__, __, __, __),
+        )
+        ||| map(
+              ~f=(f, payload, delim) => f(`String((payload, delim))),
+              pexp_constant(pconst_string(__', __, none)),
+            )
+        ||| map(~f=(f, expr) => f(`Expr(expr)), __),
+        nil,
+      )
+      ^:: nil
+      ||| map(~f=f => f(`None), nil),
+    )
   );
+
+let renderStyledComponent = (~loc, ~payload, ~tag) =>
+  switch (payload) {
+  | `String((cssString, delimiter)) =>
+    renderStyledStatic(~tag, ~str, ~delim)
+  | `None =>
+    renderStyledStatic(~tag="div", ~str={loc: Location.none, txt:""}, ~delim)
+  | `Fun((label, defaultValue, param, body)) =>
+    renderStyledDynamic(
+      ~loc,
+      ~tag,
+      ~label,
+      ~defaultValue,
+      ~param,
+      ~body,
+    )
+  };
+
+let extensions = [
+  Ppxlib.Extension.declare_with_path_arg(
+    "css",
+    Ppxlib.Extension.Context.Expression,
+    string_payload,
+    renderStringPayload(`Style),
+  ),
+  Ppxlib.Extension.declare_with_path_arg(
+    "styled.global",
+    Ppxlib.Extension.Context.Expression,
+    string_payload,
+    renderStringPayload(`Global)
+  ),
+  Ppxlib.Extension.declare_with_path_arg(
+    "styled.keyframe",
+    Ppxlib.Extension.Context.Expression,
+    string_payload,
+    renderStringPayload(`Keyframe)
+  ),
+  Ppxlib.Extension.declare_with_path_arg(
+    "styled",
+    Ppxlib.Extension.Context.Module_expr,
+    pattern,
+    (~loc as extensionLoc, ~path as _, ~arg, payload) => {
+      switch (arg) {
+      | Some({txt: Lident(tag), loc}) when Html.isValidTag(tag) =>
+        renderStyledComponent(~loc, ~tag, ~payload)
+      | None => renderStyledComponent(~loc=extensionLoc, ~tag="div", ~payload)
+      | Some({loc, txt: _}) =>
+        raiseWithLocation(
+          ~loc,
+          "Unknown HTML tag. Try something like styled.div",
+          /* Longident.name(txt) */
+        )
+      }
+    }
+  )
+];
+
+let _ =
+  Driver.register_transformation(~extensions, "styled-ppx");

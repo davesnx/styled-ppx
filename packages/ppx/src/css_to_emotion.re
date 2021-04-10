@@ -20,15 +20,15 @@
   -- Emotion output
   Emotion.(css([display(`block)]))
  */
-open Migrate_parsetree;
-open Ast_410;
+open Ppxlib;
 open Ast_helper;
 open Asttypes;
 open Parsetree;
 open Longident;
 open Css_types;
 open Component_value;
-open Ppxlib.Ast_builder.Default;
+
+module Ast_builder = Ast_builder.Default;
 
 module Emotion = {
   let lident = name => Ldot(Lident("Css"), name);
@@ -194,10 +194,8 @@ and render_media_query = (ar: At_rule.t): expression => {
     };
 
   let media_ident =
-    Emotion.lident("media")
-    |> Located.mk(~loc=name_loc)
-    |> pexp_ident(~loc=name_loc);
-  eapply(~loc, media_ident, [estring(~loc=prelude_loc, query), rules]);
+    Ast_builder.pexp_ident(~loc=name_loc, {txt: Emotion.lident("media"), loc});
+  Ast_builder.eapply(~loc, media_ident, [Ast_builder.estring(~loc=prelude_loc, query), rules]);
 }
 and render_declaration =
     (d: Declaration.t, _d_loc: Location.t): list(expression) => {
@@ -387,16 +385,16 @@ let render_emotion_keyframe = ((ruleList, loc)): expression => {
              loc: style_loc,
            }) =>
            let percentage =
-             get_percentage_from_prelude(prelude) |> eint(~loc=prelude_loc);
+             get_percentage_from_prelude(prelude) |> Ast_builder.eint(~loc=prelude_loc);
            let rules = render_declaration_list(block);
-           pexp_tuple(~loc=style_loc, [percentage, rules]);
+           Ast_builder.pexp_tuple(~loc=style_loc, [percentage, rules]);
          | Rule.At_rule(_) => grammar_error(loc, invalidSelectorErrorMessage)
          }
        })
-    |> elist(~loc);
+    |> Ast_builder.elist(~loc);
   let emotionKeyframes =
-    pexp_ident(~loc, {txt: Emotion.lident("keyframes"), loc});
-  eapply(~loc, emotionKeyframes, [keyframes]);
+    Ast_builder.pexp_ident(~loc, {txt: Emotion.lident("keyframes"), loc});
+  Ast_builder.eapply(~loc, emotionKeyframes, [keyframes]);
 };
 let render_global = ((ruleList, loc): Stylesheet.t): expression => {
   let emotionGlobal = Exp.ident(~loc, {txt: Emotion.lident("global"), loc});

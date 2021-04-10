@@ -1,5 +1,3 @@
-open Migrate_parsetree;
-open Ast_410;
 open Setup;
 open Css_types;
 

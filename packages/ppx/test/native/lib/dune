@@ -7,14 +7,14 @@
   (-linkall -g))
  (libraries StyledPpxTestNativeBSCSS rely.lib styled-ppx.lib ppxlib)
  (preprocess
-  (pps ppx_tools_versioned.metaquot_410 styled-ppx.lib)))
+  (pps ppxlib.metaquot styled-ppx.lib)))
 
 (executable
  (name TestRunner)
  (modules TestRunner)
  (libraries StyledPpxTestNativeLib styled-ppx.parser)
  (preprocess
-  (pps ppx_tools_versioned.metaquot_410 styled-ppx.lib)))
+  (pps ppxlib.metaquot styled-ppx.lib)))
 
 ; type check
 
@@ -31,7 +31,7 @@
  (modules static_css_tests selectors_css_tests media_query_css_tests
    keyframe_css_tests)
  (preprocess
-  (pps ppx_tools_versioned.metaquot_410 styled-ppx.lib)))
+  (pps ppxlib.metaquot styled-ppx.lib)))
 
 (rule
  (alias run_typecheck_test)

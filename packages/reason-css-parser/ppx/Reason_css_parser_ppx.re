@@ -1,6 +1,5 @@
 open Ppxlib;
 open Asttypes;
-open Parsetree;
 
 let expander = (
   recursive,
@@ -8,13 +7,13 @@ let expander = (
   ~path as _: label,
   ~arg as _: option(loc(Ppxlib.Longident.t)),
   value,
-  _itemList: list(structure_item)
+  _,
+  _
 ) => {
-  let {loc, txt: value} = value;
   switch (Reason_css_vds.value_of_string(value)) {
   | Some(value_ast) =>
     module Loc: {let loc: Location.t;} = {
-      let loc = loc;
+      let loc = exprLoc;
     };
     module Ast_builder = Ppxlib.Ast_builder.Make(Loc);
     module Emit = EmitPatch.Make(Ast_builder);
@@ -40,7 +39,7 @@ let expander = (
 let payload_pattern =
   Ast_pattern.(
     pstr(
-      pstr_eval(pexp_constant(pconst_string(__', none)), nil) ^:: __,
+      pstr_eval(pexp_constant(pconst_string(__, __', none)), nil) ^:: __,
     )
   );
 

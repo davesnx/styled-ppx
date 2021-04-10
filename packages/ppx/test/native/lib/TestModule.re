@@ -1,5 +1,3 @@
-open Migrate_parsetree;
-open Ast_410;
 open Setup;
 
 open Ppxlib.Ast_builder.Make({

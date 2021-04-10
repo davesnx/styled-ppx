@@ -14,4 +14,4 @@ let argv =
   | _ => Sys.argv
   };
 
-let () = Migrate_parsetree.Driver.run_main(~argv, ());
+let () = Ppxlib.Driver.run_as_ppx_rewriter()
