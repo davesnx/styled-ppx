@@ -56,7 +56,7 @@
     "doc": "esy dune build @doc",
     "doc-path": "esy echo #{self.target_dir}/default/_doc/_html/index.html",
     "format": "esy dune build @fmt --auto-promote",
-    "watch": "esy dune build -p styled-ppx --watch",
+    "watch": "esy dune build --root . --watch",
     "utop": "esy dune utop lib -- -implicit-bindings"
   }
 }
