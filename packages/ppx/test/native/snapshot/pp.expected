@@ -16,7 +16,7 @@
     cookies: [],
   }
 ];
-Css.global({js|html , body|js}, [Css.margin(`zero)]);
+Css.global({js|html, body, #root, .mainClass|js}, [Css.margin(`zero)]);
 
 module StateLenses = [%lenses
   type state = {
@@ -6735,6 +6735,11 @@ module NestedSelectors = {
       Css.unsafe("display", "flex"),
       Css.unsafe("justifyContent", "center"),
       Css.selector({js|& > a|js}, [Css.backgroundColor(Css.green)]),
+      Css.selector(
+        {js|& > .someClass|js},
+        [Css.backgroundColor(Css.yellow)],
+      ),
+      Css.selector({js|& > #someId|js}, [Css.backgroundColor(Css.blue)]),
       Css.selector(
         {js|&:nth-child(even)|js},
         [Css.backgroundColor(Css.red)],
