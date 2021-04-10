@@ -1,5 +1,3 @@
-open Migrate_parsetree;
-open Ast_410;
 open Longident;
 
 module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
