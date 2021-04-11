@@ -25,5 +25,6 @@ let from_string = string => {
     | _ => read(acc)
     };
   };
+
   read([]);
 };

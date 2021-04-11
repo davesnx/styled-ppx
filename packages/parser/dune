@@ -1,6 +1,7 @@
 (menhir
  (modules css_parser)
- (flags --explain))
+ (flags --explain)
+)
 
 (library
  (name styled_ppx_parser)
@@ -8,4 +9,6 @@
  (public_name styled-ppx.parser)
  (libraries sedlex menhirLib ocaml-migrate-parsetree)
  (preprocess
-  (pps sedlex.ppx)))
+  (pps sedlex.ppx)
+ )
+)
