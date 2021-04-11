@@ -48,9 +48,10 @@
     "@opam/ocaml-lsp-server": "*"
   },
   "scripts": {
-    "test": "esy test_snapshot",
+    "test": "esy dune runtest --force",
+    "test:promote": "esy dune runtest --auto-promote",
     "test_snapshot": "esy dune runtest",
-    "test_snapshot:promote": "esy dune runtest --auto-promote",
+    "test_snapshot:promote": "esy dune runtest",
     "test_native": "esy dune build @run_typecheck_test",
     "test_bs": "cd packages/ppx/test/bucklescript; yarn test",
     "format": "esy dune build @fmt --auto-promote",
