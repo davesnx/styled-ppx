@@ -4,9 +4,9 @@
 )
 
 (library
- (name parser)
+ (name styled_ppx_css_parser)
  (wrapped false)
- (public_name parser)
+ (public_name styled_ppx_css_parser)
  (libraries sedlex menhirLib ocaml-migrate-parsetree)
  (preprocess
   (pps sedlex.ppx)

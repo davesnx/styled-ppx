@@ -1,5 +1,6 @@
 (lang dune 2.5)
-(name parser)
+(using menhir 2.1)
+(name styled_ppx_css_parser)
 
 (source
  (github davesnx/styled-ppx))
@@ -9,8 +10,7 @@
 (maintainers "davesnx")
 
 (package
- (name parser)
+ (name styled_ppx_css_parser)
  (synopsis "CSS Parser, forked and migrated to Reason from astrada/ocaml-css-parser")
  (description "It's incomplete, supports most of the spec but lacks some. styled-ppx uses this parser to handle stylesheet/declaration/rule/keyframes/media structure. The rest of the property/value parsing/lexing happens in reason-css-lexer and reason-css-parser.")
 )
-(using menhir 2.1)
