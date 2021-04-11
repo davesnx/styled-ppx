@@ -13,7 +13,7 @@
 (executable
  (name TestRunner)
  (modules TestRunner)
- (libraries StyledPpxTestNativeLib styled-ppx.parser)
+ (libraries StyledPpxTestNativeLib styled_ppx_css_parser)
  (preprocess
   (pps ppx_tools_versioned.metaquot_410 styled-ppx.lib)
  )
