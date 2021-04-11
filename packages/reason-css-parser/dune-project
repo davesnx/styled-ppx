@@ -1,2 +1,16 @@
 (lang dune 2.0)
 (using menhir 2.0)
+(name reason-css-parser)
+
+(source
+ (github davesnx/styled-ppx))
+
+(license MIT)
+(authors "davesnx")
+(maintainers "davesnx")
+
+(package
+ (name reason-css-parser)
+ (synopsis "Reason CSS Parser")
+ (description "Reason CSS Parser")
+)

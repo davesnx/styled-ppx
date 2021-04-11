@@ -65,13 +65,13 @@ let group :=
   | LEFT_BRACKET; v = value; RIGHT_BRACKET; { v }
   | LEFT_BRACKET; v = value; RIGHT_BRACKET; m = multiplier; { Group(v, m) }
 
-let combinator(sep, sub, kind) == 
+let combinator(sep, sub, kind) ==
   | vs = separated_nonempty_list(sep, sub); ~ = kind;
     { match vs with | v::[] -> v | vs -> Combinator(kind, vs) }
 
 let static_expr ==
   | combinator(| {}, group, | { Static })
-let and_expr == 
+let and_expr ==
   | combinator(DOUBLE_AMPERSAND, static_expr, | { And })
 let or_expr ==
   | combinator(DOUBLE_BAR, and_expr, | { Or })

@@ -29,6 +29,10 @@ module Link = [%styled.a
 module Line = [%styled.span];
 module Wrapper = [%styled ""];
 
+module Dynamic = [%styled.input (~a as _) => "
+  display: inline;
+"];
+
 module Component = [%styled {j|
   background-color: red;
   border-radius: 20px;
@@ -38,6 +42,7 @@ module Component = [%styled {j|
 
 ReactDOMRe.renderToElementWithId(
   <App onClick=Js.log>
+    <Dynamic a="23"/>
     <Component>
       {React.string("test..")}
     </Component>

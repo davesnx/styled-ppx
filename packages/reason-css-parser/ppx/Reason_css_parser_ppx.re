@@ -42,7 +42,7 @@ let transform = (mapper, expr) =>
   switch (extract_value(expr)) {
   | Some((recursive, value)) =>
     let {loc, txt: value} = value;
-    switch (Reason_css_vds.value_of_string(value)) {
+    switch (Css_spec_parser.value_of_string(value)) {
     | Some(value_ast) =>
       module Loc: {let loc: Location.t;} = {
         let loc = loc;
