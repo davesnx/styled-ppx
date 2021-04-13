@@ -48,15 +48,13 @@
     "@opam/ocaml-lsp-server": "*"
   },
   "scripts": {
-    "test": "esy test_snapshot",
-    "test_snapshot": "esy dune runtest",
-    "test_snapshot:promote": "esy dune runtest --auto-promote",
-    "test_native": "esy dune build @run_typecheck_test",
-    "test_bs": "cd test/bucklescript; yarn test",
-    "doc": "esy dune build @doc",
-    "doc-path": "esy echo #{self.target_dir}/default/_doc/_html/index.html",
+    "test": "esy dune runtest --force",
+    "test:promote": "esy dune runtest --auto-promote",
+    "test_native": "esy dune build @native_typecheck_test",
+    "test_snapshot": "esy dune build @snapshot_test",
+    "test_snapshot:promote": "esy dune build @snapshot_test --auto-promote",
+    "test_bs": "cd packages/ppx/test/bucklescript; yarn test",
     "format": "esy dune build @fmt --auto-promote",
-    "watch": "esy dune build -p styled-ppx --watch",
-    "utop": "esy dune utop lib -- -implicit-bindings"
+    "watch": "esy dune build --root . --watch"
   }
 }
