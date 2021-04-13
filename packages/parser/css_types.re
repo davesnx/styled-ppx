@@ -51,6 +51,7 @@ and Declaration: {
 and Declaration_list: {
   type kind =
     | Declaration(Declaration.t)
+    | Unsafe(Declaration.t)
     | At_rule(At_rule.t)
     | Style_rule(Style_rule.t);
   type t = with_loc(list(kind));
