@@ -58,9 +58,7 @@ let getAlias = (pattern, label) =>
   };
 }; */
 
-
-let rec getLabeledArgs = (mapper, expr, list) => {
-  let expr = mapper.expr(mapper, expr);
+let rec getLabeledArgs = (expr, list) => {
   switch (expr.pexp_desc) {
   | Pexp_fun(arg, default, pattern, expression)
       when isOptional(arg) || isLabelled(arg) =>
@@ -68,7 +66,6 @@ let rec getLabeledArgs = (mapper, expr, list) => {
     let type_ = getType(pattern);
 
     getLabeledArgs(
-      mapper,
       expression,
       [(arg, default, pattern, alias, pattern.ppat_loc, type_), ...list],
     );
@@ -115,7 +112,7 @@ let renderStringPayload = (
   ~path as _: label,
   ~arg as _,
   payload, _
-) => {
+): Parsetree.expression => {
   let {txt: string, loc} = payload;
   let loc_start = loc.Location.loc_start;
 
@@ -169,7 +166,7 @@ let renderStringPayload = (
 };
  */
 
-let renderStyledDynamic = (~tag, ) => {
+/* let renderStyledDynamic = (~tag, ) => {
   /* Fix getLabeledArgs, to stop ignoring the first arg */
   let alias = getAlias(pattern, label);
   let type_ = getType(pattern);
@@ -223,6 +220,7 @@ let renderStyledDynamic = (~tag, ) => {
       },
       argList,
     );
+
   let variableParams =
     variableList
     |> List.filter_map(
@@ -257,9 +255,9 @@ let renderStyledDynamic = (~tag, ) => {
       ),
     ]),
   ); */
-};
+}; */
 
-let renderStyledStatic = (~tag as _, ~str, ~delim) => {
+let renderStyledStatic = (~htmlTag as _, ~str, ~delim) => {
   let loc = str.loc;
   let _css_expr = renderStringPayload(`Style, str, delim);
   let _styledExpr =
@@ -303,13 +301,32 @@ let pattern =
     )
   );
 
-let renderStyledComponent = (~loc, ~payload, ~tag) =>
+/* TODO: Find a better name */
+type api = [
+  | `None
+  | `Expr(expression)
+  | `Fun(arg_label, option(expression), pattern, expression)
+  | `String(with_loc(label), location)
+];
+
+let renderStyledComponent = (~loc: Location.t, ~htmlTag, ~payload: api) =>
   switch (payload) {
-  | `String((cssString, delimiter)) =>
-    renderStyledStatic(~tag, ~str, ~delim)
+  | `String((str, delim)) =>
+    renderStyledStatic(~htmlTag, ~str, ~delim)
   | `None =>
-    renderStyledStatic(~tag="div", ~str={loc: Location.none, txt:""}, ~delim)
-  | `Fun((label, defaultValue, param, body)) =>
+    renderStyledStatic(~htmlTag="div", ~str={loc, txt:""}, ~delim=loc)
+  /* TODO: Ask Eduardo what's Expr here? Does styled.div can have a expr as payload? */
+  | `Expr({
+  pexp_desc: _,
+  pexp_loc,
+  pexp_loc_stack: _,
+  pexp_attributes: _
+}) =>
+    renderStyledStatic(~htmlTag="div", ~str={loc: pexp_loc, txt:""}, ~delim=pexp_loc)
+  | `Fun((_label, _defaultValue, _param, _body)) =>
+    Ast_builder.pmod_structure(~loc, [[%stri let x = ()]]);
+    /*
+    TODO: Support dynamic components
     renderStyledDynamic(
       ~loc,
       ~tag,
@@ -317,7 +334,7 @@ let renderStyledComponent = (~loc, ~payload, ~tag) =>
       ~defaultValue,
       ~param,
       ~body,
-    )
+    ) */
   };
 
 let extensions = [
@@ -346,8 +363,8 @@ let extensions = [
     (~loc as extensionLoc, ~path as _, ~arg, payload) => {
       switch (arg) {
       | Some({txt: Lident(tag), loc}) when Html.isValidTag(tag) =>
-        renderStyledComponent(~loc, ~tag, ~payload)
-      | None => renderStyledComponent(~loc=extensionLoc, ~tag="div", ~payload)
+        renderStyledComponent(~loc, ~htmlTag=tag, ~payload)
+      | None => renderStyledComponent(~loc=extensionLoc, ~htmlTag="div", ~payload)
       | Some({loc, txt: _}) =>
         raiseWithLocation(
           ~loc,

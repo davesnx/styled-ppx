@@ -67,7 +67,7 @@ let list_to_expr = (end_loc, xs) =>
   );
 
 let source_code_of_loc = loc => {
-  let Warnings.{loc_start, loc_end, _} = loc;
+  let Location.{loc_start, loc_end, _} = loc;
   let Lex_buffer.{buf, pos, _} = Lex_buffer.last_buffer^;
   let pos_offset = pos.Lexing.pos_cnum;
   let loc_start = loc_start.Lexing.pos_cnum - pos_offset;
