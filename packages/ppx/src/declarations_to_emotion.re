@@ -1,3 +1,4 @@
+open Ppxlib;
 open Ast_helper;
 open Asttypes;
 open Longident;
@@ -39,16 +40,11 @@ let render_css_wide_keywords = (name, value) => {
   let.ok value = Parser.parse(Standard.css_wide_keywords, value);
   let value =
     switch (value) {
-    | `Inherit =>
-      %expr
-      "inherit"
-    | `Initial =>
-      %expr
-      "initial"
-    | `Unset =>
-      %expr
-      "unset"
+    | `Inherit => [%expr "inherit"]
+    | `Initial => [%expr "initial"]
+    | `Unset => [%expr "unset"]
     };
+
   let name = Const.string(name) |> Exp.constant;
   Ok([[%expr Css.unsafe([%e name], [%e value])]]);
 };
