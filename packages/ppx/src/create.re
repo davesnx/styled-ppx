@@ -1,3 +1,4 @@
+open Ppxlib;
 open Asttypes;
 open Parsetree;
 open Ast_helper;
@@ -81,7 +82,7 @@ let externalCreateVariadicElement = (~loc) => {
                 ~attrs=[
                   Attr.mk({txt: "reason.raw_literal", loc}, PStr([])),
                 ],
-                Pconst_string("react", None),
+                Pconst_string("react", loc, None),
               ),
               [],
             ),
@@ -93,7 +94,7 @@ let externalCreateVariadicElement = (~loc) => {
 };
 
 /* div(~className=styles, ()) + switchChildren */
-let variadicElement = (~loc, ~tag) => {
+let variadicElement = (~loc, ~htmlTag) => {
   Exp.apply(
     ~loc,
     Exp.ident(~loc, {txt: Lident("createVariadicElement"), loc}),
@@ -109,14 +110,14 @@ let variadicElement = (~loc, ~tag) => {
                 Str.mk(
                   ~loc,
                   Pstr_eval(
-                    Exp.constant(~loc, Pconst_string(tag, None)),
+                    Exp.constant(~loc, Pconst_string(htmlTag, loc, None)),
                     [],
                   ),
                 ),
               ]),
             ),
           ],
-          Pconst_string(tag, None),
+          Pconst_string(htmlTag, loc, None),
         ),
       ),
       (Nolabel, Exp.ident(~loc, {txt: Lident("newProps"), loc})),
@@ -185,7 +186,7 @@ let newProps = (~loc) =>
      | None => React.null
    }|]);
  */
-let makeBody = (~loc, ~tag, ~styledExpr) =>
+let makeBody = (~loc, ~htmlTag, ~styledExpr) =>
   Exp.let_(
     ~loc,
     ~attrs=[Attr.mk({txt: "reason.preserve_braces", loc}, PStr([]))],
@@ -195,7 +196,7 @@ let makeBody = (~loc, ~tag, ~styledExpr) =>
       ~loc,
       Nonrecursive,
       [newProps(~loc)],
-      variadicElement(~loc, ~tag)
+      variadicElement(~loc, ~htmlTag)
     ),
   );
 
@@ -209,17 +210,17 @@ let makeArguments = (~loc, ~params) => {
 };
 
 /* let make = (props: makeProps) => + makeBody */
-let makeFn = (~loc, ~tag, ~styledExpr, ~params) =>
+let makeFn = (~loc, ~htmlTag, ~styledExpr, ~params) =>
   Exp.fun_(
     ~loc,
     Nolabel,
     None,
     makeArguments(~loc, ~params),
-    makeBody(~loc, ~tag, ~styledExpr),
+    makeBody(~loc, ~htmlTag, ~styledExpr),
   );
 
 /* [@react.component] + makeFn */
-let component = (~loc, ~tag, ~styledExpr, ~params) => {
+let component = (~loc, ~htmlTag, ~styledExpr, ~params) => {
   let params = Option.value(~default=[], params);
   Str.mk(
     ~loc,
@@ -229,7 +230,7 @@ let component = (~loc, ~tag, ~styledExpr, ~params) => {
         Vb.mk(
           ~loc,
           Pat.mk(~loc, Ppat_var({txt: "make", loc})),
-          makeFn(~loc, ~tag, ~styledExpr, ~params),
+          makeFn(~loc, ~htmlTag, ~styledExpr, ~params),
         ),
       ],
     ),
@@ -253,7 +254,7 @@ let recordLabel = (~loc, name, kind, alias) =>
             Exp.constant(
               ~loc,
               ~attrs=[],
-              Pconst_string(alias, None),
+              Pconst_string(alias, loc, None),
             ),
             []
           ),
@@ -310,7 +311,7 @@ let recordEventLabel = (~loc, name, kind) => {
   );
 };
 
-let makeProps = (~loc, extraProps) => {
+let makeMakeProps = (~loc, ~customProps) => {
   /* [@bs.deriving abstract] */
   let bsDerivingAbstract =
     Attr.mk(
@@ -324,7 +325,7 @@ let makeProps = (~loc, extraProps) => {
     );
 
   let (params, dynamicProps) =
-    switch (extraProps) {
+    switch (customProps) {
     | None => ([], [])
     | Some((params, props)) => (params, props)
     };
@@ -355,7 +356,11 @@ let makeProps = (~loc, extraProps) => {
       dynamicProps,
     );
 
-  let params = params |> List.map(type_ => (type_, Invariant));
+  let params = params |> List.map(type_ => (
+    type_,
+    (Ppxlib.Asttypes.NoVariance, Asttypes.NoInjectivity)) /* TODO: Made correct ast, not sure if it matter */
+  );
+
   Str.mk(
     ~loc,
     Pstr_type(

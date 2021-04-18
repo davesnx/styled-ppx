@@ -29,14 +29,6 @@ let getLabel = str =>
   | Nolabel => ""
   };
 
-let getTag = str => {
-  switch (String.split_on_char('.', str)) {
-  | ["styled"] => "div"
-  | ["styled", tag] => tag
-  | _ => "div"
-  };
-};
-
 let getType = pattern =>
   switch (pattern) {
   | {ppat_desc: Ppat_constraint(_, type_), _} => Some(type_)
@@ -86,56 +78,33 @@ let isStyledTag = str =>
   | _ => false
   };
 
-let match_exp_string_payload = (expr: Ppxlib.expression) => {
-  open Ppxlib.Ast_pattern;
-  let pattern =
-    pexp_extension(
-      extension(
-        __,
-        pstr(
-          pstr_eval(pexp_constant(pconst_string(__', __, none)), nil) ^:: nil,
-        ),
-      ),
-    );
-  parse(
-    pattern,
-    expr.pexp_loc,
-    ~on_error=_ => None,
-    expr,
-    (key, payload, delim) => Some((key, payload, delim)),
-  );
-};
-
-let renderStringPayload = (
-  kind,
-  ~loc as _: location,
-  ~path as _: label,
-  ~arg as _,
-  payload, _
-): Parsetree.expression => {
-  let {txt: string, loc} = payload;
+/* TODO: Bring back "delimiter location conditional logic" */
+let renderStringPayload = (kind, {txt: string, loc}, _delim): Parsetree.expression => {
   let loc_start = loc.Location.loc_start;
 
-  let parse = parser =>
+  let makeParser = parser =>
     Css_lexer.parse_string(
       ~container_lnum=loc_start.Lexing.pos_lnum,
       ~pos=loc_start,
-      string,
-      parser,
+      parser
     );
 
   switch (kind) {
   | `Style =>
-    let ast = parse(Css_parser.declaration_list);
+    let parser = makeParser(Css_parser.declaration_list);
+    let ast = parser(string);
     Css_to_emotion.render_emotion_css(ast);
   | `Declarations =>
-    let ast = parse(Css_parser.declaration_list);
+    let parser = makeParser(Css_parser.declaration_list);
+    let ast = parser(string);
     Css_to_emotion.render_declaration_list(ast);
   | `Global =>
-    let ast = parse(Css_parser.stylesheet);
+    let parser = makeParser(Css_parser.stylesheet);
+    let ast = parser(string);
     Css_to_emotion.render_global(ast);
   | `Keyframe =>
-    let ast = parse(Css_parser.stylesheet);
+    let parser = makeParser(Css_parser.stylesheet);
+    let ast = parser(string);
     Css_to_emotion.render_emotion_keyframe(ast);
   };
 };
@@ -239,7 +208,7 @@ let renderStringPayload = (
 
   /* Mod.mk(
     Pmod_structure([
-      Create.makeProps(~loc, Some((variableParams, variableProps))),
+      Create.makeMakeProps(~loc, ~customProps=Some((variableParams, variableProps))),
       Create.externalCreateVariadicElement(~loc),
       Create.dynamicStyles(
         ~loc,
@@ -257,19 +226,18 @@ let renderStringPayload = (
   ); */
 }; */
 
-let renderStyledStatic = (~htmlTag as _, ~str, ~delim) => {
+let renderStyledStatic = (~htmlTag, ~str, ~delim) => {
   let loc = str.loc;
-  let _css_expr = renderStringPayload(`Style, str, delim);
-  let _styledExpr =
+  let css_expr = renderStringPayload(`Style, str, delim);
+  let styledExpr =
     Exp.ident(~loc, {txt: Lident(styleVariableName), loc});
 
-  /* Ast_builder.pmod_structure(~loc, [
-    Create.makeProps(~loc, None),
+  Ast_builder.pmod_structure(~loc, [
+    Create.makeMakeProps(~loc, ~customProps=None),
     Create.externalCreateVariadicElement(~loc),
     Create.styles(~loc, ~name=styleVariableName, ~exp=css_expr),
-    Create.component(~loc, ~tag, ~styledExpr, ~params=None)
-  ]); */
-  Ast_builder.pmod_structure(~loc, [[%stri let x = ()]]);
+    Create.component(~loc, ~htmlTag, ~styledExpr, ~params=None)
+  ]);
 };
 
 let string_payload =
@@ -301,15 +269,25 @@ let pattern =
     )
   );
 
-/* TODO: Find a better name */
-type api = [
+type payloadType = [
   | `None
   | `Expr(expression)
   | `Fun(arg_label, option(expression), pattern, expression)
   | `String(with_loc(label), location)
 ];
 
-let renderStyledComponent = (~loc: Location.t, ~htmlTag, ~payload: api) =>
+let renderStyledComponent = (~loc, ~path as _, ~arg, payload: payloadType) => {
+  let htmlTag = switch (arg) {
+  | None => "div"
+  | Some({txt: Lident(tag), _}) when Html.isValidTag(tag) => tag
+  | Some({loc, txt: _}) =>
+    raiseWithLocation(
+      ~loc,
+      "Unknown HTML tag. Try something like styled.div",
+      /* Longident.name(txt) */
+    )
+  };
+
   switch (payload) {
   | `String((str, delim)) =>
     renderStyledStatic(~htmlTag, ~str, ~delim)
@@ -336,43 +314,32 @@ let renderStyledComponent = (~loc: Location.t, ~htmlTag, ~payload: api) =>
       ~body,
     ) */
   };
+};
 
 let extensions = [
   Ppxlib.Extension.declare_with_path_arg(
     "css",
     Ppxlib.Extension.Context.Expression,
     string_payload,
-    renderStringPayload(`Style),
+    (~loc as _: location, ~path as _: label, ~arg as _) => renderStringPayload(`Style),
   ),
   Ppxlib.Extension.declare_with_path_arg(
     "styled.global",
     Ppxlib.Extension.Context.Expression,
     string_payload,
-    renderStringPayload(`Global)
+    (~loc as _: location, ~path as _: label, ~arg as _) => renderStringPayload(`Global)
   ),
   Ppxlib.Extension.declare_with_path_arg(
     "styled.keyframe",
     Ppxlib.Extension.Context.Expression,
     string_payload,
-    renderStringPayload(`Keyframe)
+    (~loc as _: location, ~path as _: label, ~arg as _) => renderStringPayload(`Keyframe)
   ),
   Ppxlib.Extension.declare_with_path_arg(
     "styled",
     Ppxlib.Extension.Context.Module_expr,
     pattern,
-    (~loc as extensionLoc, ~path as _, ~arg, payload) => {
-      switch (arg) {
-      | Some({txt: Lident(tag), loc}) when Html.isValidTag(tag) =>
-        renderStyledComponent(~loc, ~htmlTag=tag, ~payload)
-      | None => renderStyledComponent(~loc=extensionLoc, ~htmlTag="div", ~payload)
-      | Some({loc, txt: _}) =>
-        raiseWithLocation(
-          ~loc,
-          "Unknown HTML tag. Try something like styled.div",
-          /* Longident.name(txt) */
-        )
-      }
-    }
+    renderStyledComponent
   )
 ];
 
