@@ -30,15 +30,15 @@ let getLabel = str =>
   };
 
 let getType = pattern =>
-  switch (pattern) {
-  | {ppat_desc: Ppat_constraint(_, type_), _} => Some(type_)
+  switch (pattern.ppat_desc) {
+  | Ppat_constraint(_, type_) => Some(type_)
   | _ => None
   };
 
 let getAlias = (pattern, label) =>
-  switch (pattern) {
-  | {ppat_desc: Ppat_alias(_, {txt, _}) | Ppat_var({txt, _}), _} => txt
-  | {ppat_desc: Ppat_any, _} => "_"
+  switch (pattern.ppat_desc) {
+  | Ppat_alias(_, {txt, _}) | Ppat_var({txt, _}) => txt
+  | Ppat_any => "_"
   | _ => getLabel(label)
   };
 
@@ -72,11 +72,6 @@ let rec getLabeledArgs = (expr, list) => {
 
 let styleVariableName = "styles";
 
-let isStyledTag = str =>
-  switch (String.split_on_char('.', str)) {
-  | ["styled", ..._] => true
-  | _ => false
-  };
 
 /* TODO: Bring back "delimiter location conditional logic" */
 let renderStringPayload = (kind, {txt: string, loc}, _delim): Parsetree.expression => {
@@ -233,8 +228,8 @@ let renderStyledStatic = (~htmlTag, ~str, ~delim) => {
     Exp.ident(~loc, {txt: Lident(styleVariableName), loc});
 
   Ast_builder.pmod_structure(~loc, [
-    Create.makeMakeProps(~loc, ~customProps=None),
-    Create.externalCreateVariadicElement(~loc),
+    /* Create.makeMakeProps(~loc, ~customProps=None),
+    Create.externalCreateVariadicElement(~loc), */
     Create.styles(~loc, ~name=styleVariableName, ~exp=css_expr),
     Create.component(~loc, ~htmlTag, ~styledExpr, ~params=None)
   ]);
@@ -247,6 +242,7 @@ let string_payload =
     ),
 );
 
+/* TODO: Ensure we are capturing String and Fun properly */
 let pattern =
   Ast_pattern.(
     pstr(
@@ -258,49 +254,25 @@ let pattern =
           pexp_fun(__, __, __, __),
         )
         ||| map(
-              ~f=(f, payload, delim) => f(`String((payload, delim))),
-              pexp_constant(pconst_string(__', __, none)),
+              ~f=(f, payload, delim, m) => f(`String((payload, delim, m))),
+              pexp_constant(pconst_string(__', __, __)),
             )
-        ||| map(~f=(f, expr) => f(`Expr(expr)), __),
+        ,
         nil,
       )
       ^:: nil
-      ||| map(~f=f => f(`None), nil),
     )
   );
 
 type payloadType = [
-  | `None
-  | `Expr(expression)
   | `Fun(arg_label, option(expression), pattern, expression)
-  | `String(with_loc(label), location)
+  | `String(with_loc(label), location, option(string))
 ];
 
-let renderStyledComponent = (~loc, ~path as _, ~arg, payload: payloadType) => {
-  let htmlTag = switch (arg) {
-  | None => "div"
-  | Some({txt: Lident(tag), _}) when Html.isValidTag(tag) => tag
-  | Some({loc, txt: _}) =>
-    raiseWithLocation(
-      ~loc,
-      "Unknown HTML tag. Try something like styled.div",
-      /* Longident.name(txt) */
-    )
-  };
-
+let renderStyledComponent = (~loc, ~path as _, ~arg as _, htmlTag, payload: payloadType) => {
   switch (payload) {
-  | `String((str, delim)) =>
+  | `String((str, delim, _)) =>
     renderStyledStatic(~htmlTag, ~str, ~delim)
-  | `None =>
-    renderStyledStatic(~htmlTag="div", ~str={loc, txt:""}, ~delim=loc)
-  /* TODO: Ask Eduardo what's Expr here? Does styled.div can have a expr as payload? */
-  | `Expr({
-  pexp_desc: _,
-  pexp_loc,
-  pexp_loc_stack: _,
-  pexp_attributes: _
-}) =>
-    renderStyledStatic(~htmlTag="div", ~str={loc: pexp_loc, txt:""}, ~delim=pexp_loc)
   | `Fun((_label, _defaultValue, _param, _body)) =>
     Ast_builder.pmod_structure(~loc, [[%stri let x = ()]]);
     /*
@@ -335,12 +307,15 @@ let extensions = [
     string_payload,
     (~loc as _: location, ~path as _: label, ~arg as _) => renderStringPayload(`Keyframe)
   ),
-  Ppxlib.Extension.declare_with_path_arg(
-    "styled",
-    Ppxlib.Extension.Context.Module_expr,
-    pattern,
-    renderStyledComponent
-  )
+  /* Currently there's no way to define extensions like `lola.x` with Pplib.Extension, we generate one ppxlib.extension per html tag. Is possible to achive it with Ppxlib.Driver.register_transformation(~preprocess_impl).  */
+  ...List.map(htmlTag => {
+    Ppxlib.Extension.declare_with_path_arg(
+      "styled." ++ htmlTag,
+      Ppxlib.Extension.Context.Module_expr,
+      pattern,
+      renderStyledComponent(htmlTag)
+    )
+  }, Html.allTags),
 ];
 
 let _ =
