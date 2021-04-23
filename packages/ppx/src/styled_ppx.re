@@ -85,7 +85,6 @@ let getLabeledArgs = (label, defaultValue, param, expr) => {
 
 let styleVariableName = "styles";
 
-
 /* TODO: Bring back "delimiter location conditional logic" */
 let renderStringPayload = (kind, {txt: string, loc}, _delim): Parsetree.expression => {
   let loc_start = loc.Location.loc_start;
@@ -117,39 +116,14 @@ let renderStringPayload = (kind, {txt: string, loc}, _delim): Parsetree.expressi
   };
 };
 
-/* let renderPayload = (kind, default_mapper, expr) => {
-  // this mapper is used inside of [%styled.div expr]
-  let mapper = {
-    ...default_mapper,
-    expr: (mapper, expr) => {
-      let map = expr => mapper.Ast_mapper.expr(mapper, expr);
-      let loc = expr.pexp_loc;
-      switch (expr.pexp_desc) {
-      | Pexp_constant(Pconst_string(payload, delim)) =>
-        renderStringPayload(`Declarations, {txt: payload, loc}, delim)
-      | Pexp_sequence(left, right) =>
-        Ast_builder.eapply(~loc, [%expr (@)], [map(left), map(right)])
-      | _ => default_mapper.expr(mapper, expr)
-      };
-    },
-  };
-
-  switch (expr.pexp_desc) {
-  | Pexp_constant(Pconst_string(str, delim)) =>
-    renderStringPayload(kind, {txt: str, loc: expr.pexp_loc}, delim)
-  | _ =>
-    Css_to_emotion.render_emotion_style(mapper.Ast_mapper.expr(mapper, expr))
-  };
-};
- */
-
 let renderStyledDynamic = (~loc as _,
       ~htmlTag,
       ~label,
       ~defaultValue,
       ~param,
       ~body) => {
-  let (_functionExpr, argList, _) =
+  /* TODO: What's the last arg. None? */
+  let (functionExpr, argList, _) =
     getLabeledArgs(label, defaultValue, param, body);
 
   let loc = body.pexp_loc;
@@ -204,8 +178,41 @@ let renderStyledDynamic = (~loc as _,
       variableList,
     );
 
-  /* let css_expr = renderPayload(`Style, default_mapper, functionExpr); */
-  let css_expr = [%expr [%stri "CSS STUFF"]];
+  let css_expr = switch (functionExpr.pexp_desc) {
+  | Pexp_constant(Pconst_string(str, delim, _)) =>
+    renderStringPayload(`Declarations, {txt: str, loc: functionExpr.pexp_loc}, delim)
+  | _ => [%expr ""]
+    /*
+      This case is when `Fun doesn't contain a string, this is an attempt to support dynamic components with functions, such as:
+      module Component = [%styled.section (~a, ~b) => switch () {}]
+
+      The implementation below is the previous way to handle the nested transformation inside those functions, such as:
+
+      module Component = [%styled.section (~a) => switch (a) {
+        | Black => [%css ""]
+        | White => [%css ""]
+      }];
+
+      Right now we don't support this syntax, the output is [%expr ""], we could raise an error if somebody relied on this (which is pretty unlikely).
+    */
+    /*
+      // this mapper is used inside of [%styled.div expr]
+      let mapper = {
+        ...default_mapper,
+        expr: (mapper, expr) => {
+          let map = expr => mapper.Ast_mapper.expr(mapper, expr);
+          let loc = expr.pexp_loc;
+          switch (expr.pexp_desc) {
+          | Pexp_constant(Pconst_string(payload, delim)) =>
+            renderStringPayload(`Declarations, {txt: payload, loc}, delim)
+          | Pexp_sequence(left, right) =>
+            Ast_builder.eapply(~loc, [%expr (@)], [map(left), map(right)])
+          | _ => default_mapper.expr(mapper, expr)
+          };
+        },
+      };
+     */
+  };
 
   Mod.mk(
     Pmod_structure([
@@ -215,7 +222,7 @@ let renderStyledDynamic = (~loc as _,
         ~loc,
         ~name=styleVariableName,
         ~args=argList,
-        ~exp=css_expr,
+        ~exp=Css_to_emotion.render_emotion_style(css_expr),
       ),
       Create.component(
         ~loc,
@@ -229,13 +236,13 @@ let renderStyledDynamic = (~loc as _,
 
 let renderStyledStatic = (~htmlTag, ~str, ~delim) => {
   let loc = str.loc;
-  let css_expr = renderStringPayload(`Style, str, delim);
+  let css_expr = renderStringPayload(`Style, str, Some(delim));
   let styledExpr =
     Exp.ident(~loc, {txt: Lident(styleVariableName), loc});
 
   Ast_builder.pmod_structure(~loc, [
-    /* Create.makeMakeProps(~loc, ~customProps=None),
-    Create.externalCreateVariadicElement(~loc), */
+    Create.makeMakeProps(~loc, ~customProps=None),
+    Create.externalCreateVariadicElement(~loc),
     Create.styles(~loc, ~name=styleVariableName, ~exp=css_expr),
     Create.component(~loc, ~htmlTag, ~styledExpr, ~params=None)
   ]);
