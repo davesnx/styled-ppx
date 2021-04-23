@@ -50,14 +50,14 @@ let getAlias = (pattern, label) =>
   };
 }; */
 
-let rec getLabeledArgs = (expr, list) => {
+let rec getArgs = (expr, list) => {
   switch (expr.pexp_desc) {
   | Pexp_fun(arg, default, pattern, expression)
       when isOptional(arg) || isLabelled(arg) =>
     let alias = getAlias(pattern, arg);
     let type_ = getType(pattern);
 
-    getLabeledArgs(
+    getArgs(
       expression,
       [(arg, default, pattern, alias, pattern.ppat_loc, type_), ...list],
     );
@@ -68,6 +68,19 @@ let rec getLabeledArgs = (expr, list) => {
     )
   | _ => (expr, list, None)
   };
+};
+
+/* label, defaultValue, param, body */
+let getLabeledArgs = (label, defaultValue, param, expr) => {
+  /* Get the first argument of the Pexp_fun */
+  let alias = getAlias(param, label);
+  let type_ = getType(param);
+
+  /* [(arg, default, pattern, alias, pattern.ppat_loc, type_) */
+
+  let firstArg = (label, defaultValue, param, alias, param.ppat_loc, type_);
+
+  getArgs(expr, [firstArg]);
 };
 
 let styleVariableName = "styles";
@@ -130,24 +143,16 @@ let renderStringPayload = (kind, {txt: string, loc}, _delim): Parsetree.expressi
 };
  */
 
-/* let renderStyledDynamic = (~tag, ) => {
-  /* Fix getLabeledArgs, to stop ignoring the first arg */
-  let alias = getAlias(pattern, label);
-  let type_ = getType(pattern);
+let renderStyledDynamic = (~loc as _,
+      ~htmlTag,
+      ~label,
+      ~defaultValue,
+      ~param,
+      ~body) => {
+  let (_functionExpr, argList, _) =
+    getLabeledArgs(label, defaultValue, param, body);
 
-  let firstArg = (label, args, pattern, alias, pattern.ppat_loc, type_);
-
-  let (functionExpr, argList, _) =
-    getLabeledArgs(mapper, expression, [firstArg]);
-
-  if (!Html.isValidTag(tag)) {
-    raiseWithLocation(
-      ~loc=nameLoc,
-      "Unexpected HTML tag in [%styled." ++ tag ++ "]",
-    );
-  };
-
-  let loc = expression.pexp_loc;
+  let loc = body.pexp_loc;
 
   let propExpr = Exp.ident(~loc, {txt: Lident("props"), loc});
   let propToGetter = str => str ++ "Get";
@@ -192,16 +197,17 @@ let renderStringPayload = (kind, {txt: string, loc}, _delim): Parsetree.expressi
           | (_, `Open, type_) => Some(type_)
           | _ => None,
         );
-  let _variableProps =
+
+  let variableProps =
     List.map(
       ((label, _, type_)) => Create.customPropLabel(~loc, label, type_),
       variableList,
     );
-  let _css_expr = renderPayload(`Style, default_mapper, functionExpr);
 
-  Ast_builder.pmod_structure(~loc, [[%stri let x = ()]]);
+  /* let css_expr = renderPayload(`Style, default_mapper, functionExpr); */
+  let css_expr = [%expr [%stri "CSS STUFF"]];
 
-  /* Mod.mk(
+  Mod.mk(
     Pmod_structure([
       Create.makeMakeProps(~loc, ~customProps=Some((variableParams, variableProps))),
       Create.externalCreateVariadicElement(~loc),
@@ -213,13 +219,13 @@ let renderStringPayload = (kind, {txt: string, loc}, _delim): Parsetree.expressi
       ),
       Create.component(
         ~loc,
-        ~tag,
+        ~htmlTag,
         ~styledExpr,
         ~params=Some(variableParams),
       ),
     ]),
-  ); */
-}; */
+  );
+};
 
 let renderStyledStatic = (~htmlTag, ~str, ~delim) => {
   let loc = str.loc;
@@ -273,18 +279,15 @@ let renderStyledComponent = (~loc, ~path as _, ~arg as _, htmlTag, payload: payl
   switch (payload) {
   | `String((str, delim, _)) =>
     renderStyledStatic(~htmlTag, ~str, ~delim)
-  | `Fun((_label, _defaultValue, _param, _body)) =>
-    Ast_builder.pmod_structure(~loc, [[%stri let x = ()]]);
-    /*
-    TODO: Support dynamic components
+  | `Fun((label, defaultValue, param, body)) =>
     renderStyledDynamic(
       ~loc,
-      ~tag,
+      ~htmlTag,
       ~label,
       ~defaultValue,
       ~param,
       ~body,
-    ) */
+    )
   };
 };
 

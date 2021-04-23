@@ -15,13 +15,19 @@ module StateLenses = [%lenses
 module StringAsPayloadPpx = [%ppx ""];
 module MultiStringAsPayloadPpx = [%ppx {| stuff |}];
 
-module Component = [%styled "display: block"];
-module Component = [%styled.section
-  {|
+/* One single property  */
+module Component = [%styled.div "display: block"];
+/* Single quote strings */
+module Component = [%styled.section "
   display: flex;
   justify-content: center;
-|}
-];
+"];
+
+/* Multi-line strings */
+module Component = [%styled.section {|
+  display: flex;
+  justify-content: center;
+|}];
 
 let var = "#333333";
 module Component = [%styled {j|
@@ -44,9 +50,6 @@ module Component = [%styled
      display: block;
    |j}
 ];
-
-module Component = [%styled];
-module Component = [%styled ""];
 
 module NestedSelectors = [%styled.body
   {|
