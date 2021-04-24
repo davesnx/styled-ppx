@@ -41,7 +41,7 @@ let dynamicStyles = (~loc, ~name, ~args, ~exp) => {
    (string, Js.t({ .. })) => React.element =
    "createElement";
  */
-let externalCreateVariadicElement = (~loc) => {
+let bindingCreateVariadicElement = (~loc) => {
   Str.primitive({
     pval_loc: loc,
     pval_name: {
@@ -93,7 +93,7 @@ let externalCreateVariadicElement = (~loc) => {
   });
 };
 
-/* div(~className=styles, ()) + switchChildren */
+/* createVariadicElement("div", newProps) */
 let variadicElement = (~loc, ~htmlTag) => {
   Exp.apply(
     ~loc,
@@ -178,13 +178,9 @@ let newProps = (~loc) =>
   );
 
 /*
-   setClassName(props, styled);
-
-   React.createElement("a", ~props,
-     [|switch (children) {
-     | Some(chil) => chil
-     | None => React.null
-   }|]);
+  let stylesObject = {"className": styles};
+  let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
+  createVariadicElement("div", newProps);
  */
 let makeBody = (~loc, ~htmlTag, ~styledExpr) =>
   Exp.let_(
@@ -221,7 +217,6 @@ let makeFn = (~loc, ~htmlTag, ~styledExpr, ~params) =>
 
 /* [@react.component] + makeFn */
 let component = (~loc, ~htmlTag, ~styledExpr, ~params) => {
-  let params = Option.value(~default=[], params);
   Str.mk(
     ~loc,
     Pstr_value(
@@ -311,6 +306,8 @@ let recordEventLabel = (~loc, name, kind) => {
   );
 };
 
+/* type makeProps = { } */
+/* type makeProps('a, 'b) = { } */
 let makeMakeProps = (~loc, ~customProps) => {
   /* [@bs.deriving abstract] */
   let bsDerivingAbstract =
