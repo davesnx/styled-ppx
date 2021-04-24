@@ -2,7 +2,7 @@ open Ppxlib;
 open Asttypes;
 
 let expander = (
-  recursive,
+  ~recursive,
   ~loc as exprLoc,
   ~path as _: label,
   ~arg as _: option(loc(Ppxlib.Longident.t)),
@@ -48,7 +48,7 @@ let valueExtension =
     "value",
     Ppxlib.Extension.Context.Expression,
     payload_pattern,
-    expander(false),
+    expander(~recursive=false),
   );
 
 let valueRecExtension =
@@ -56,7 +56,7 @@ let valueRecExtension =
     "value.rec",
     Ppxlib.Extension.Context.Expression,
     payload_pattern,
-    expander(true),
+    expander(~recursive=true),
   );
 
 Driver.register_transformation(~extensions=[valueExtension, valueRecExtension], "css-value-parser-ppx");
