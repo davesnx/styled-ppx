@@ -70,14 +70,11 @@ let rec getArgs = (expr, list) => {
   };
 };
 
-/* label, defaultValue, param, body */
 let getLabeledArgs = (label, defaultValue, param, expr) => {
-  /* Get the first argument of the Pexp_fun */
+  /* Get the first argument of the Pexp_fun, since it's a recursive type.
+  getArgs gets all the function parameters from the first nested resursive node. */
   let alias = getAlias(param, label);
   let type_ = getType(param);
-
-  /* [(arg, default, pattern, alias, pattern.ppat_loc, type_) */
-
   let firstArg = (label, defaultValue, param, alias, param.ppat_loc, type_);
 
   getArgs(expr, [firstArg]);
@@ -122,16 +119,15 @@ let renderStyledDynamic = (~loc as _,
       ~defaultValue,
       ~param,
       ~body) => {
-  /* TODO: What's the last arg. None? */
-  let (functionExpr, argList, _) =
+  /* TODO: What's the last arg here, None? */
+  let (functionExpr, labeledArguments, _) =
     getLabeledArgs(label, defaultValue, param, body);
 
   let loc = body.pexp_loc;
-
   let propExpr = Exp.ident(~loc, {txt: Lident("props"), loc});
   let propToGetter = str => str ++ "Get";
 
-  let args =
+  let styledFunctionArguments =
     List.map(
       ((arg, _, _, _, _, _)) => {
         let labelText = getLabel(arg);
@@ -140,14 +136,14 @@ let renderStyledDynamic = (~loc as _,
 
         (arg, Exp.apply(~loc, value, [(Nolabel, propExpr)]));
       },
-      argList,
+      labeledArguments,
     );
 
-  let styledExpr =
+  let styledFunctionExpr =
     Exp.apply(
       ~loc,
       Exp.ident(~loc, {txt: Lident(styleVariableName), loc}),
-      args,
+      styledFunctionArguments,
     );
 
   let variableList =
@@ -161,10 +157,10 @@ let renderStyledDynamic = (~loc as _,
           };
         (label, kind, type_);
       },
-      argList,
+      labeledArguments,
     );
 
-  let variableParams =
+  let makePropsParameters =
     variableList
     |> List.filter_map(
           fun
@@ -172,13 +168,13 @@ let renderStyledDynamic = (~loc as _,
           | _ => None,
         );
 
-  let variableProps =
+  let variableMakeProps =
     List.map(
       ((label, _, type_)) => Create.customPropLabel(~loc, label, type_),
       variableList,
     );
 
-  let css_expr = switch (functionExpr.pexp_desc) {
+  let styles = switch (functionExpr.pexp_desc) {
   | Pexp_constant(Pconst_string(str, delim, _)) =>
     renderStringPayload(`Declarations, {txt: str, loc: functionExpr.pexp_loc}, delim)
   | _ => [%expr ""]
@@ -216,19 +212,23 @@ let renderStyledDynamic = (~loc as _,
 
   Mod.mk(
     Pmod_structure([
-      Create.makeMakeProps(~loc, ~customProps=Some((variableParams, variableProps))),
-      Create.externalCreateVariadicElement(~loc),
+      Create.makeMakeProps(
+        ~loc,
+        ~customProps=Some((makePropsParameters, variableMakeProps))
+      ),
+      /* We inline a createVariadicElement binding on each styled component, since styled-ppx doesn't come as a lib */
+      Create.bindingCreateVariadicElement(~loc),
       Create.dynamicStyles(
         ~loc,
         ~name=styleVariableName,
-        ~args=argList,
-        ~exp=Css_to_emotion.render_emotion_style(css_expr),
+        ~args=labeledArguments,
+        ~exp=Css_to_emotion.render_emotion_style(styles),
       ),
       Create.component(
         ~loc,
         ~htmlTag,
-        ~styledExpr,
-        ~params=Some(variableParams),
+        ~styledExpr=styledFunctionExpr,
+        ~params=makePropsParameters,
       ),
     ]),
   );
@@ -242,9 +242,10 @@ let renderStyledStatic = (~htmlTag, ~str, ~delim) => {
 
   Ast_builder.pmod_structure(~loc, [
     Create.makeMakeProps(~loc, ~customProps=None),
-    Create.externalCreateVariadicElement(~loc),
+    /* We inline a createVariadicElement binding on each styled component, since styled-ppx doesn't come as a lib */
+    Create.bindingCreateVariadicElement(~loc),
     Create.styles(~loc, ~name=styleVariableName, ~exp=css_expr),
-    Create.component(~loc, ~htmlTag, ~styledExpr, ~params=None)
+    Create.component(~loc, ~htmlTag, ~styledExpr, ~params=[])
   ]);
 };
 
