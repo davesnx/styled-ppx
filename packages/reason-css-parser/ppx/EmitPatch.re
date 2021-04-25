@@ -2,7 +2,7 @@ open Longident;
 
 module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
   open Ast_builder;
-  open Reason_css_vds;
+  open Css_spec_parser;
 
   let create_variant_name = (type_name, name) =>
     type_name ++ "__make__" ++ name;

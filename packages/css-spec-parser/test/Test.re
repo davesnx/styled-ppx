@@ -1,5 +1,5 @@
 open TestFramework;
-open Reason_css_vds;
+open Css_spec_parser;
 
 let compare_ast = (expected, result, {expect, _}) => {
   let expected = show_value(expected);
@@ -216,6 +216,7 @@ let parse_tests = [
     ),
   ),
 ];
+
 describe("correctly parse value", ({test, _}) => {
   let test = (index, (result, expected)) =>
     test(
@@ -237,6 +238,7 @@ let print_tests = [
   ("[ a b ] | [ c || [ d && [ e f ]]]", "'a' 'b' | 'c' || 'd' && 'e' 'f'"),
   ("'[' abc ']'", "'[' 'abc' ']'"),
 ];
+
 describe("correctly print value", ({test, _}) => {
   let test = (index, (result, expected)) =>
     test(

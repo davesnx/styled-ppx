@@ -10,7 +10,7 @@ let expander = (
   _,
   _
 ) => {
-  switch (Reason_css_vds.value_of_string(value)) {
+  switch (Css_spec_parser.value_of_string(value)) {
   | Some(value_ast) =>
     module Loc: {let loc: Location.t;} = {
       let loc = exprLoc;

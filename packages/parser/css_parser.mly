@@ -32,6 +32,7 @@ open Css_types
 %token <string * string> DIMENSION
 %token <string * string> TYPED_VARIABLE
 %token <string> VARIABLE
+%token UNSAFE
 
 %start <Css_types.Stylesheet.t> stylesheet
 %start <Css_types.Declaration_list.t> declaration_list
@@ -127,12 +128,23 @@ declarations_without_ending_semi_colon:
 
 declaration_or_at_rule:
   | d = declaration { Declaration_list.Declaration d }
+  | u = unsafe { Declaration_list.Unsafe u }
   | r = at_rule { Declaration_list.At_rule r }
   | s = style_rule { Declaration_list.Style_rule s }
   ;
 
 declaration:
   n = IDENT; COLON; v = list(component_value_with_loc); i = boption(IMPORTANT) {
+    { Declaration.name = (n, Lex_buffer.make_loc $startpos(n) $endpos(n));
+      value = (v, Lex_buffer.make_loc $startpos(v) $endpos(v));
+      important = (i, Lex_buffer.make_loc $startpos(i) $endpos(i));
+      loc = Lex_buffer.make_loc $startpos $endpos;
+    }
+  }
+  ;
+
+unsafe:
+  UNSAFE; n = IDENT; COLON; v = list(component_value_with_loc); i = boption(IMPORTANT) {
     { Declaration.name = (n, Lex_buffer.make_loc $startpos(n) $endpos(n));
       value = (v, Lex_buffer.make_loc $startpos(v) $endpos(v));
       important = (i, Lex_buffer.make_loc $startpos(i) $endpos(i));

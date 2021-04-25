@@ -28,7 +28,7 @@ module Json = {
 };
 
 module Patch = {
-  open Reason_css_vds;
+  open Css_spec_parser;
   module StringMap = Map.Make(String);
 
   exception Missing_value_;
@@ -84,7 +84,7 @@ module Patch = {
       values
       |> List.map(((name, value)) => {
            let value =
-             switch (Reason_css_vds.value_of_string(value)) {
+             switch (Css_spec_parser.value_of_string(value)) {
              | None => failwith(name)
              | Some(value) => value
              | exception _ => failwith(name)
@@ -102,7 +102,7 @@ module Patch = {
     let values =
       values
       |> List.map(((name, value)) =>
-           (name, Reason_css_vds.value_to_string(value))
+           (name, Css_spec_parser.value_to_string(value))
          );
     (missing, values);
   };

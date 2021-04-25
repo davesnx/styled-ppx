@@ -1,5 +1,4 @@
 /*
-
 This tests ensure that the ppx transform the right extensions, to the right form.
 There's one case for each of the different methods.
 
@@ -32,6 +31,7 @@ module SelfClosingElement = [%styled.input ""];
 let var = "#333333";
 module StringInterpolation = [%styled.div {j|
   color: $var;
+  __UNSAFE__ color: trust-me;
   display: block;
 |j}];
 

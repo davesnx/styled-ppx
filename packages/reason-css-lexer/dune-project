@@ -1,1 +1,15 @@
 (lang dune 2.5)
+(name reason-css-lexer)
+
+(source
+ (github davesnx/styled-ppx))
+
+(license MIT)
+(authors "davesnx")
+(maintainers "davesnx")
+
+(package
+ (name reason-css-lexer)
+ (synopsis "Reason CSS Lexer handles the lexing for CSS values")
+ (description "This lexer implements the CSS Syntax 3 on the values")
+)

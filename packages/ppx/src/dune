@@ -4,7 +4,7 @@
  (public_name styled-ppx.lib)
  (kind ppx_rewriter)
  (libraries
-  styled_ppx_parser
+  styled_ppx_css_parser
   reason-css-parser.lib
   ppxlib
  )

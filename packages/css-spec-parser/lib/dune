@@ -1,0 +1,13 @@
+(menhir
+ (flags --external-tokens Tokens --explain)
+ (modules Parser)
+)
+
+(library
+ (name css_spec_parser)
+ (public_name css-spec-parser.lib)
+ (libraries sedlex menhirLib)
+ (preprocess
+  (pps sedlex.ppx ppx_deriving.show)
+ )
+)

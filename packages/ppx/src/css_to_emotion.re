@@ -211,13 +211,24 @@ and render_declaration =
     grammar_error(loc, "invalid property value")
   };
 }
+and render_unsafe_declaration =
+    (d: Declaration.t, _d_loc: Location.t): list(Parsetree.expression) => {
+  let (name, _name_loc) = d.Declaration.name;
+  let (_valueList, loc) = d.Declaration.value;
+
+  let value_source = source_code_of_loc(loc);
+
+  [Declarations_to_emotion.render_when_unsupported_features(name, value_source)];
+}
 and render_declarations =
-    (ds: list(Declaration_list.kind)): list(Parsetree.expression) =>
+    (ds: list(Declaration_list.kind)): list(Parsetree.expression) => {
   List.concat_map(
     declaration =>
       switch (declaration) {
       | Declaration_list.Declaration(decl) =>
         render_declaration(decl, decl.loc)
+      | Declaration_list.Unsafe(decl) =>
+        render_unsafe_declaration(decl, decl.loc)
       | Declaration_list.At_rule(ar) => [render_at_rule(ar)]
       | Declaration_list.Style_rule(ar) =>
         let loc: Location.t = ar.loc;
@@ -227,6 +238,7 @@ and render_declarations =
     ds,
   )
   |> List.rev
+}
 and render_declaration_list = ((list, loc): Declaration_list.t): Parsetree.expression => {
   let expr_with_loc_list = render_declarations(list);
   list_to_expr(loc, expr_with_loc_list);
@@ -237,11 +249,14 @@ and render_style_rule = (ident, sr: Style_rule.t): Parsetree.expression => {
   let rec render_prelude_value = (s, (value, value_loc)) => {
     switch (value) {
     | Delim(":") => ":" ++ s
+    | Delim(",") => ", " ++ s
+    | Delim(".") => "." ++ s
     | Delim(v) => " " ++ v ++ " " ++ s
     | Ident(v)
     | Operator(v)
     | Number(v)
     | Selector(v) => v ++ s
+    | Hash(v) => "#" ++ v ++ s
     /*<number><string> is parsed as Dimension */
     | Dimension((number, dimension)) => number ++ dimension ++ " " ++ s
     | Paren_block(c) =>
