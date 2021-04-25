@@ -37,8 +37,11 @@ let write_tests_to_file = (
 let compare = (input: expression, expected, {expect, _}) => {
   let inputExpr =
     switch (input.pexp_desc) {
+    /* input: Css.style([Css.unsafe("display", "block")]) */
+    /* We want to compare the arguments of style(), in this case Css.unsafe("display", "block") */
     | Pexp_apply(_, [(_, expr)]) => expr
-    | _ => failwith("probably the result changed: " ++ Pprintast.string_of_expression(input))
+    | Pexp_extension(_) => failwith("Transformation by the ppx didn't happened. Expected an apply, got an extension.")
+    | _ => failwith("Unexpected AST for the comparision. Probably the result changed: " ++ Pprintast.string_of_expression(input))
     };
 
   let result = Pprintast.string_of_expression(inputExpr);
@@ -332,7 +335,13 @@ let selectors_static_css_tests = [%expr
 let media_query_static_css_tests = [%expr
   [|
     (
-      [%css {|color: blue; @media (min-width: 30em) { color: red; }|}],
+      [%css {|
+        color: blue;
+
+        @media (min-width: 30em) {
+          color: red;
+        }
+      |}],
       [
         Css.color(Css.blue),
         Css.media("(min-width: 30em)", [Css.color(Css.red)]),
@@ -356,12 +365,12 @@ let keyframe_static_css_tests = [%expr
     (
       [%styled.keyframe
         {|
-        from { opacity: 0 }
-        50% {
-          background: red;
-          border: 1px solid blue
-        }
-        to { opacity: 1 }
+          from { opacity: 0 }
+          50% {
+            background: red;
+            border: 1px solid blue
+          }
+          to { opacity: 1 }
         |}
       ],
       [
@@ -377,19 +386,19 @@ let keyframe_static_css_tests = [%expr
       ],
     ),
     (
-      [%styled.keyframe
-        {|
+      [%styled.keyframe {|
         0% { opacity: 0 }
         100% { opacity: 1 }
-        |}
-      ],
+      |}],
       [(0, [Css.opacity(0.)]), (100, [Css.opacity(1.)])],
     ),
   |]
 ];
-describe("emit bs-css from static [%css]", ({test, _}) => {
+
+describe("Transform [%css] to bs-css", ({test, _}) => {
   let test = (prefix, index, (result, expected)) =>
     test(prefix ++ string_of_int(index), compare(result, expected));
+
   let properties_static_css_tests =
     extract_tests(properties_static_css_tests);
   let selectors_static_css_tests = extract_tests(selectors_static_css_tests);
@@ -397,6 +406,8 @@ describe("emit bs-css from static [%css]", ({test, _}) => {
     extract_tests(media_query_static_css_tests);
   let keyframe_static_css_tests = extract_tests(keyframe_static_css_tests);
 
+  /* We write the tests to files so the Typecheker runs on them and ensures
+  it's a valid with bs-css interfaces */
   write_tests_to_file(properties_static_css_tests, "static_css_tests.ml");
   write_tests_to_file(selectors_static_css_tests, "selectors_css_tests.ml");
   write_tests_to_file(
@@ -416,11 +427,12 @@ let properties_variable_css_tests = [
   // TODO: ([%css "margin: $var"], [%expr [Css.margin("margin", var)]),
 ];
 
-describe("emit bs-css from variable [%css]", ({test, _}) => {
+describe("Transform [%css] to bs-css with a variable interpolatated", ({test, _}) => {
   let test = (index, (result, expected)) =>
     test(
       "simple variable: " ++ string_of_int(index),
       compare(result, expected),
     );
+
   List.iteri(test, properties_variable_css_tests);
 });
