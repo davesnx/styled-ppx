@@ -32,7 +32,7 @@
  (modules static_css_tests selectors_css_tests media_query_css_tests
    keyframe_css_tests)
  (preprocess
-  (pps ppxlib.metaquot styled-ppx.lib)
+  (pps styled-ppx.lib ppxlib.metaquot)
  )
 )
 

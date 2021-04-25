@@ -252,7 +252,10 @@ let renderStyledStatic = (~htmlTag, ~str, ~delim) => {
 let string_payload =
   Ast_pattern.(
     pstr(
-      pstr_eval(pexp_constant(pconst_string(__', __, none)), nil) ^:: nil,
+      pstr_eval(
+        pexp_constant(pconst_string(__', __, none)),
+        nil
+      ) ^:: nil,
     ),
 );
 
@@ -329,5 +332,7 @@ let extensions = [
   }, Html.allTags),
 ];
 
-let _ =
-  Driver.register_transformation(~extensions, "styled-ppx");
+/* Instrument is needed to run metaquote before styled-ppx, we rely on this order for the native tests */
+let instrument = Driver.Instrument.make(i => i, ~position=Before);
+
+Driver.register_transformation(~extensions, ~instrument, "styled-ppx");

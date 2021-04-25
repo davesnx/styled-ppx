@@ -5,7 +5,15 @@ let loc = Location.none;
 let extract_tests = array_expr => {
   let fail = () =>
     failwith("Extracting the expression from the test cases failed. The expected type is `array((result, expected))`.");
-  let payload = Ast_pattern.(pexp_array(many(pexp_tuple(many(__)))));
+  let payload = Ast_pattern.(
+    pexp_array(
+      many(
+        pexp_tuple(
+          many(__)
+        )
+      )
+    )
+  );
 
   Ast_pattern.parse(
     payload,
@@ -40,7 +48,7 @@ let compare = (input: expression, expected, {expect, _}) => {
     /* input: Css.style([Css.unsafe("display", "block")]) */
     /* We want to compare the arguments of style(), in this case Css.unsafe("display", "block") */
     | Pexp_apply(_, [(_, expr)]) => expr
-    | Pexp_extension(_) => failwith("Transformation by the ppx didn't happened. Expected an apply, got an extension.")
+    | Pexp_extension(_) => failwith("Transformation by the ppx didn't happen. Expected an apply, got an extension.")
     | _ => failwith("Unexpected AST for the comparision. Probably the result changed: " ++ Pprintast.string_of_expression(input))
     };
 
@@ -335,21 +343,14 @@ let selectors_static_css_tests = [%expr
 let media_query_static_css_tests = [%expr
   [|
     (
-      [%css {|
-        color: blue;
-
-        @media (min-width: 30em) {
-          color: red;
-        }
-      |}],
+      [%css "color: blue; @media (min-width: 30em) { color: red; }"],
       [
         Css.color(Css.blue),
         Css.media("(min-width: 30em)", [Css.color(Css.red)]),
       ],
     ),
     (
-      [%css
-        {|@media (min-width: 30em) and (min-height: 20em) { color: brown; }|}
+      [%css "@media (min-width: 30em) and (min-height: 20em) { color: brown; }"
       ],
       [
         Css.media(
@@ -364,14 +365,14 @@ let keyframe_static_css_tests = [%expr
   [|
     (
       [%styled.keyframe
-        {|
+        "
           from { opacity: 0 }
           50% {
             background: red;
             border: 1px solid blue
           }
           to { opacity: 1 }
-        |}
+        "
       ],
       [
         (0, [Css.opacity(0.)]),
@@ -386,18 +387,18 @@ let keyframe_static_css_tests = [%expr
       ],
     ),
     (
-      [%styled.keyframe {|
+      [%styled.keyframe "
         0% { opacity: 0 }
         100% { opacity: 1 }
-      |}],
+      "],
       [(0, [Css.opacity(0.)]), (100, [Css.opacity(1.)])],
     ),
   |]
 ];
 
 describe("Transform [%css] to bs-css", ({test, _}) => {
-  let test = (prefix, index, (result, expected)) =>
-    test(prefix ++ string_of_int(index), compare(result, expected));
+  let test = (prefix, index, (input, expected)) =>
+    test(prefix ++ string_of_int(index), compare(input, expected));
 
   let properties_static_css_tests =
     extract_tests(properties_static_css_tests);
