@@ -1,11 +1,13 @@
 open Setup;
+open Ppxlib;
+let loc = Location.none;
 
 let extract_tests = array_expr => {
-  open Ppxlib.Ast_pattern;
   let fail = () =>
-    failwith("can only extract from array((result, expected))");
-  let payload = pexp_array(many(pexp_tuple(many(__))));
-  parse(
+    failwith("Extracting the expression from the test cases failed. The expected type is `array((result, expected))`.");
+  let payload = Ast_pattern.(pexp_array(many(pexp_tuple(many(__)))));
+
+  Ast_pattern.parse(
     payload,
     Location.none,
     ~on_error=fail,
@@ -17,7 +19,11 @@ let extract_tests = array_expr => {
     ),
   );
 };
-let write_tests_to_file = (tests, file) => {
+
+let write_tests_to_file = (
+  tests: list((expression, expression)),
+  file
+) => {
   let code =
     tests
     |> List.map(((expected, _)) => [%stri let _ = [%e expected]])
@@ -28,15 +34,14 @@ let write_tests_to_file = (tests, file) => {
   close_out(fd);
 };
 
-let compare = (result, expected, {expect, _}) => {
-  open Parsetree;
-  let result =
-    switch (result) {
-    | {pexp_desc: Pexp_apply(_, [(_, expr)]), _} => expr
-    | _ => failwith("probably the result changed")
+let compare = (input: expression, expected, {expect, _}) => {
+  let inputExpr =
+    switch (input.pexp_desc) {
+    | Pexp_apply(_, [(_, expr)]) => expr
+    | _ => failwith("probably the result changed: " ++ Pprintast.string_of_expression(input))
     };
 
-  let result = Pprintast.string_of_expression(result);
+  let result = Pprintast.string_of_expression(inputExpr);
   let expected = Pprintast.string_of_expression(expected);
   expect.string(result).toEqual(expected);
 };
@@ -410,6 +415,7 @@ let properties_variable_css_tests = [
   ([%expr [%css "color: $var"]], [%expr [Css.color(var)]]),
   // TODO: ([%css "margin: $var"], [%expr [Css.margin("margin", var)]),
 ];
+
 describe("emit bs-css from variable [%css]", ({test, _}) => {
   let test = (index, (result, expected)) =>
     test(

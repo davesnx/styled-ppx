@@ -1,8 +1,9 @@
 open Setup;
+open Ppxlib;
+let loc = Location.none;
 
-open Ppxlib.Ast_builder.Make({
-       let loc = Location.none;
-     });
+module Ast_builder = Ppxlib.Ast_builder.Default;
+open Ast_builder;
 
 let compare = (result, expected, {expect, _}) => {
   let result = Pprintast.string_of_structure([result]);
@@ -17,9 +18,16 @@ describe("transform module ppx", ({test, _}) => {
       [%stri module X = [%graphql]],
       // the AST needs to be here by hand otherwise we would will always have success
       pstr_module(
+        ~loc,
         module_binding(
-          ~name=Located.mk(Some("X")),
-          ~expr=pmod_extension((Located.mk("graphql"), PStr([]))),
+          ~loc,
+          ~name=Located.mk(~loc, Some("X")),
+          ~expr=pmod_extension(~loc,
+            (
+              Located.mk(~loc, "graphql"),
+              PStr([])
+            )
+          ),
         ),
       ),
     ),
