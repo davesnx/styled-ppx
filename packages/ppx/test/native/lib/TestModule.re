@@ -1,9 +1,7 @@
 open Setup;
 open Ppxlib;
+open Ast_builder.Default;
 let loc = Location.none;
-
-module Ast_builder = Ppxlib.Ast_builder.Default;
-open Ast_builder;
 
 let compare = (result, expected, {expect, _}) => {
   let result = Pprintast.string_of_structure([result]);
@@ -11,9 +9,9 @@ let compare = (result, expected, {expect, _}) => {
   expect.string(result).toEqual(expected);
 };
 
-describe("transform module ppx", ({test, _}) => {
+describe("Should not transform other module ppx", ({test, _}) => {
   test(
-    "doesn't start with styled",
+    "If doesn't start with styled",
     compare(
       [%stri module X = [%graphql]],
       // the AST needs to be here by hand otherwise we would will always have success
