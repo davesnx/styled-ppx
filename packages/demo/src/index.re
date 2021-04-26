@@ -26,14 +26,14 @@ module Link = [%styled.a
 |}
 ];
 
-module Line = [%styled.span];
-module Wrapper = [%styled ""];
+module Line = [%styled.span "display: inline;"];
+module Wrapper = [%styled.div "display: inline;"];
 
 module Dynamic = [%styled.input (~a as _) => "
   display: inline;
 "];
 
-module Component = [%styled {j|
+module Component = [%styled.div {j|
   background-color: red;
   border-radius: 20px;
   box-sizing: border-box;
