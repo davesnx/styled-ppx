@@ -1,6 +1,5 @@
 open Ppxlib;
-
-module Ast_builder = Ppxlib.Ast_builder.Default;
+open Ast_builder.Default;
 
 let raiseWithLocation = (~loc, msg) => {
   raise(Location.raise_errorf(~loc, msg))
@@ -112,7 +111,7 @@ let renderStyledDynamic = (~loc as _,
     getLabeledArgs(label, defaultValue, param, body);
 
   let loc = body.pexp_loc;
-  let propExpr = Ast_helper.Exp.ident(~loc, {txt: Lident("props"), loc});
+  let propExpr = pexp_ident(~loc, {txt: Lident("props"), loc});
   let propToGetter = str => str ++ "Get";
 
   let styledFunctionArguments =
@@ -120,17 +119,17 @@ let renderStyledDynamic = (~loc as _,
       ((arg, _, _, _, _, _)) => {
         let labelText = getLabel(arg);
         let value =
-          Ast_helper.Exp.ident(~loc, {txt: Lident(propToGetter(labelText)), loc});
+          pexp_ident(~loc, {txt: Lident(propToGetter(labelText)), loc});
 
-        (arg, Ast_helper.Exp.apply(~loc, value, [(Nolabel, propExpr)]));
+        (arg, pexp_apply(~loc, value, [(Nolabel, propExpr)]));
       },
       labeledArguments,
     );
 
   let styledFunctionExpr =
-    Ast_helper.Exp.apply(
+    pexp_apply(
       ~loc,
-      Ast_helper.Exp.ident(~loc, {txt: Lident(styleVariableName), loc}),
+      pexp_ident(~loc, {txt: Lident(styleVariableName), loc}),
       styledFunctionArguments,
     );
 
@@ -198,37 +197,35 @@ let renderStyledDynamic = (~loc as _,
      */
   };
 
-  Ast_helper.Mod.mk(
-    Pmod_structure([
-      Create.makeMakeProps(
-        ~loc,
-        ~customProps=Some((makePropsParameters, variableMakeProps))
-      ),
-      /* We inline a createVariadicElement binding on each styled component, since styled-ppx doesn't come as a lib */
-      Create.bindingCreateVariadicElement(~loc),
-      Create.dynamicStyles(
-        ~loc,
-        ~name=styleVariableName,
-        ~args=labeledArguments,
-        ~exp=Css_to_emotion.render_emotion_style(styles),
-      ),
-      Create.component(
-        ~loc,
-        ~htmlTag,
-        ~styledExpr=styledFunctionExpr,
-        ~params=makePropsParameters,
-      ),
-    ]),
-  );
+  pmod_structure(~loc, [
+    Create.makeMakeProps(
+      ~loc,
+      ~customProps=Some((makePropsParameters, variableMakeProps))
+    ),
+    /* We inline a createVariadicElement binding on each styled component, since styled-ppx doesn't come as a lib */
+    Create.bindingCreateVariadicElement(~loc),
+    Create.dynamicStyles(
+      ~loc,
+      ~name=styleVariableName,
+      ~args=labeledArguments,
+      ~exp=Css_to_emotion.render_emotion_style(styles),
+    ),
+    Create.component(
+      ~loc,
+      ~htmlTag,
+      ~styledExpr=styledFunctionExpr,
+      ~params=makePropsParameters,
+    ),
+  ]);
 };
 
 let renderStyledStatic = (~htmlTag, ~str, ~delim) => {
   let loc = str.loc;
   let css_expr = renderStringPayload(`Style, str, Some(delim));
   let styledExpr =
-    Ast_helper.Exp.ident(~loc, {txt: Lident(styleVariableName), loc});
+    pexp_ident(~loc, {txt: Lident(styleVariableName), loc});
 
-  Ast_builder.pmod_structure(~loc, [
+  pmod_structure(~loc, [
     Create.makeMakeProps(~loc, ~customProps=None),
     /* We inline a createVariadicElement binding on each styled component, since styled-ppx doesn't come as a lib */
     Create.bindingCreateVariadicElement(~loc),
