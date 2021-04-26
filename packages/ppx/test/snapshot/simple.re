@@ -35,8 +35,8 @@ module StringInterpolation = [%styled.div {j|
   display: block;
 |j}];
 
-let classNameHash = [%cx "display: block;"];
-let classNameHashWithMultiLine = [%cx {| display: block; |}];
+let className = [%cx "display: block;"];
+let classNameWithMultiLine = [%cx {| display: block; |}];
 
 let cssRule = [%css "color: blue;"];
 
