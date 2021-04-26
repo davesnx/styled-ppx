@@ -1411,7 +1411,20 @@ let support_property = name =>
   |> Option.is_some;
 
 let render_when_unsupported_features = (name, value) => {
-  let name = name |> Const.string |> Exp.constant;
+  let to_camel_case = name =>
+    (
+      switch (String.split_on_char('-', name)) {
+      | [first, ...remaining] => [
+          first,
+          ...List.map(String.capitalize_ascii, remaining),
+        ]
+      | [] => []
+      }
+    )
+    |> String.concat("");
+
+  /* Transform property name to camelCase since we bind emotion to the Object API */
+  let name = name |> to_camel_case |> Const.string |> Exp.constant;
   let value = value |> Const.string |> Exp.constant;
 
   id([%expr Css.unsafe([%e name], [%e value])]);

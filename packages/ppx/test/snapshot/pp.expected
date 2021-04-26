@@ -1934,7 +1934,7 @@ module SingleQuoteStrings = {
   let styles =
     Css.style([
       Css.unsafe("display", "flex"),
-      Css.unsafe("justify-content", "center"),
+      Css.unsafe("justifyContent", "center"),
     ]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
@@ -2896,7 +2896,7 @@ module MultiLineStrings = {
   let styles =
     Css.style([
       Css.unsafe("display", "flex"),
-      Css.unsafe("justify-content", "center"),
+      Css.unsafe("justifyContent", "center"),
     ]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
