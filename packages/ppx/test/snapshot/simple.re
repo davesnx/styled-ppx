@@ -1,6 +1,6 @@
 /*
 This tests ensure that the ppx transform the right extensions, to the right form.
-There's one case for each of the different methods.
+There's one case for each of the different methods and doesn't need to type-check.
 
 If you are looking to add some tests for CSS support,
 check packages/ppx/test/native folder.
@@ -35,8 +35,10 @@ module StringInterpolation = [%styled.div {j|
   display: block;
 |j}];
 
-let classNameHash = [%css "display: block"];
-let classNameHashWithMultiLine = [%css {| display: block; |}];
+let classNameHash = [%cx "display: block;"];
+let classNameHashWithMultiLine = [%cx {| display: block; |}];
+
+let cssRule = [%css "color: blue;"];
 
 module DynamicComponent = [%styled.div
   (~var) => {j|
