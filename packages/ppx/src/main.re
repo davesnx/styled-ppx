@@ -70,7 +70,7 @@ let getLabeledArgs = (label, defaultValue, param, expr) => {
 let styleVariableName = "styles";
 
 /* TODO: Bring back "delimiter location conditional logic" */
-let renderStringPayload = (kind, {txt: string, loc}, _delim): Parsetree.expression => {
+let renderStringPayload = (kind, {txt: string, loc}, _delim, _): Parsetree.expression => {
   let loc_start = loc.Location.loc_start;
 
   let makeParser = parser =>
@@ -162,8 +162,8 @@ let renderStyledDynamic = (~loc as _,
     );
 
   let styles = switch (functionExpr.pexp_desc) {
-  | Pexp_constant(Pconst_string(str, delim, _)) =>
-    renderStringPayload(`Declarations, {txt: str, loc: functionExpr.pexp_loc}, delim)
+  | Pexp_constant(Pconst_string(str, delim, label)) =>
+    renderStringPayload(`Declarations, {txt: str, loc: functionExpr.pexp_loc}, delim, label)
   | _ => [%expr ""]
     /*
       This case is when `Fun doesn't contain a string, this is an attempt to support dynamic components with functions, such as:
@@ -219,9 +219,9 @@ let renderStyledDynamic = (~loc as _,
   ]);
 };
 
-let renderStyledStatic = (~htmlTag, ~str, ~delim) => {
+let renderStyledStatic = (~htmlTag, ~str, ~delim, ~label) => {
   let loc = str.loc;
-  let css_expr = renderStringPayload(`Style, str, Some(delim));
+  let css_expr = renderStringPayload(`Style, str, Some(delim), label);
   let styledExpr =
     Build.pexp_ident(~loc, {txt: Lident(styleVariableName), loc});
 
@@ -238,7 +238,7 @@ let string_payload =
   Ast_pattern.(
     pstr(
       pstr_eval(
-        pexp_constant(pconst_string(__', __, none)),
+        pexp_constant(pconst_string(__', __, __)),
         nil
       ) ^:: nil,
     ),
@@ -273,8 +273,8 @@ type payloadType = [
 
 let renderStyledComponent = (~loc, ~path as _, ~arg as _, htmlTag, payload: payloadType) => {
   switch (payload) {
-  | `String((str, delim, _)) =>
-    renderStyledStatic(~htmlTag, ~str, ~delim)
+  | `String((str, delim, label)) =>
+    renderStyledStatic(~htmlTag, ~str, ~delim, ~label)
   | `Fun((label, defaultValue, param, body)) =>
     renderStyledDynamic(
       ~loc,
@@ -317,7 +317,8 @@ let extensions = [
   }, Html.allTags),
 ];
 
+let id = a => a;
 /* Instrument is needed to run metaquote before styled-ppx, we rely on this order for the native tests */
-let instrument = Driver.Instrument.make(i => i, ~position=Before);
+let instrument = Driver.Instrument.make(id, ~position=Before);
 
 Driver.register_transformation(~extensions, ~instrument, "styled-ppx");

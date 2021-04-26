@@ -6,11 +6,11 @@ If you are looking to add some tests for CSS support,
 check packages/ppx/test/native folder.
 */
 
-/* [%styled.global {|
+[%styled.global {|
   html, body {
     margin: 0;
   }
-|}]; */
+|}];
 
 module ShoudNotBreakOtherModulesPpxsWithStringAsPayload = [%ppx ""];
 module ShoudNotBreakOtherModulesPpxsWithMultiStringAsPayload = [%ppx {| stuff |}];
@@ -36,6 +36,7 @@ module StringInterpolation = [%styled.div {j|
 |j}];
 
 let classNameHash = [%css "display: block"];
+let classNameHashWithMultiLine = [%css {| display: block; |}];
 
 module DynamicComponent = [%styled.div
   (~var) => {j|

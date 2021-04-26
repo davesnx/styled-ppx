@@ -50,6 +50,7 @@
     "test:promote": "esy dune runtest --auto-promote",
     "test_native": "esy dune build @native_typecheck_test",
     "test_snapshot": "esy dune build @snapshot_test",
+    "test_snapshot:watch": "esy test_snapshot --watch",
     "test_snapshot:promote": "esy dune build @snapshot_test --auto-promote",
     "test_bs": "cd packages/ppx/test/bucklescript; yarn test",
     "format": "esy dune build @fmt --auto-promote",
