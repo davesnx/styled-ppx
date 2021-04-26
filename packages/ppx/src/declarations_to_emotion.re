@@ -1193,7 +1193,6 @@ let grid_row = unsupported(property_grid_row, ~call=[%expr Css.gridRow]);
 let grid_column =
   unsupported(property_grid_column, ~call=[%expr Css.gridColumn]);
 let grid_area = unsupported(property_grid_area, ~call=[%expr Css.gridArea]);
-
 let display = unsupported(property_display, ~call=[%expr Css.display]);
 
 let found = ({ast_of_string, string_to_expr, _}) => {
@@ -1412,19 +1411,7 @@ let support_property = name =>
   |> Option.is_some;
 
 let render_when_unsupported_features = (name, value) => {
-  let to_camel_case = name =>
-    (
-      switch (String.split_on_char('-', name)) {
-      | [first, ...remaining] => [
-          first,
-          ...List.map(String.capitalize_ascii, remaining),
-        ]
-      | [] => []
-      }
-    )
-    |> String.concat("");
-
-  let name = to_camel_case(name) |> Const.string |> Exp.constant;
+  let name = name |> Const.string |> Exp.constant;
   let value = value |> Const.string |> Exp.constant;
 
   id([%expr Css.unsafe([%e name], [%e value])]);
