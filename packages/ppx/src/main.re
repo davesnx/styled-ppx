@@ -70,7 +70,13 @@ let getLabeledArgs = (label, defaultValue, param, expr) => {
 let styleVariableName = "styles";
 
 /* TODO: Bring back "delimiter location conditional logic" */
-let renderStringPayload = (kind, {txt: string, loc}, _delim, _): Parsetree.expression => {
+let renderStringPayload = (
+  ~loc as _: location,
+  ~path as _: label,
+  kind,
+  {txt: string, loc},
+  _delim,
+_): Parsetree.expression => {
   let loc_start = loc.Location.loc_start;
 
   let makeParser = parser =>
@@ -100,17 +106,19 @@ let renderStringPayload = (kind, {txt: string, loc}, _delim, _): Parsetree.expre
   };
 };
 
-let renderStyledDynamic = (~loc as _,
-      ~htmlTag,
-      ~label,
-      ~defaultValue,
-      ~param,
-      ~body) => {
+let renderStyledDynamic = (
+  ~loc,
+  ~path,
+  ~htmlTag,
+  ~label,
+  ~defaultValue,
+  ~param,
+  ~body
+) => {
   /* TODO: What's the last arg here, None? */
   let (functionExpr, labeledArguments, _) =
     getLabeledArgs(label, defaultValue, param, body);
 
-  let loc = body.pexp_loc;
   let propExpr = Build.pexp_ident(~loc, {txt: Lident("props"), loc});
   let propToGetter = str => str ++ "Get";
 
@@ -163,7 +171,7 @@ let renderStyledDynamic = (~loc as _,
 
   let styles = switch (functionExpr.pexp_desc) {
   | Pexp_constant(Pconst_string(str, delim, label)) =>
-    renderStringPayload(`Declarations, {txt: str, loc: functionExpr.pexp_loc}, delim, label)
+    renderStringPayload(~loc, ~path, `Declarations, {txt: str, loc: functionExpr.pexp_loc}, delim, label)
   | _ => [%expr ""]
     /*
       This case is when `Fun doesn't contain a string, this is an attempt to support dynamic components with functions, such as:
@@ -219,9 +227,8 @@ let renderStyledDynamic = (~loc as _,
   ]);
 };
 
-let renderStyledStatic = (~htmlTag, ~str, ~delim, ~label) => {
-  let loc = str.loc;
-  let css_expr = renderStringPayload(`Style, str, Some(delim), label);
+let renderStyledStatic = (~loc, ~path, ~htmlTag, ~str, ~delim, ~label) => {
+  let css_expr = renderStringPayload(~loc, ~path, `Style, str, Some(delim), label);
   let styledExpr =
     Build.pexp_ident(~loc, {txt: Lident(styleVariableName), loc});
 
@@ -271,13 +278,14 @@ type payloadType = [
   | `String(Ast_helper.with_loc(label), location, option(string))
 ];
 
-let renderStyledComponent = (~loc, ~path as _, ~arg as _, htmlTag, payload: payloadType) => {
+let renderStyledComponent = (~loc, ~path, htmlTag, payload: payloadType) => {
   switch (payload) {
   | `String((str, delim, label)) =>
-    renderStyledStatic(~htmlTag, ~str, ~delim, ~label)
+    renderStyledStatic(~loc, ~path, ~htmlTag, ~str, ~delim, ~label)
   | `Fun((label, defaultValue, param, body)) =>
     renderStyledDynamic(
       ~loc,
+      ~path,
       ~htmlTag,
       ~label,
       ~defaultValue,
@@ -288,27 +296,27 @@ let renderStyledComponent = (~loc, ~path as _, ~arg as _, htmlTag, payload: payl
 };
 
 let extensions = [
-  Ppxlib.Extension.declare_with_path_arg(
+  Ppxlib.Extension.declare(
     "css",
     Ppxlib.Extension.Context.Expression,
     string_payload,
-    (~loc as _: location, ~path as _: label, ~arg as _) => renderStringPayload(`Style),
+    renderStringPayload(`Style)
   ),
-  Ppxlib.Extension.declare_with_path_arg(
+  Ppxlib.Extension.declare(
     "styled.global",
     Ppxlib.Extension.Context.Expression,
     string_payload,
-    (~loc as _: location, ~path as _: label, ~arg as _) => renderStringPayload(`Global)
+    renderStringPayload(`Global)
   ),
-  Ppxlib.Extension.declare_with_path_arg(
+  Ppxlib.Extension.declare(
     "styled.keyframe",
     Ppxlib.Extension.Context.Expression,
     string_payload,
-    (~loc as _: location, ~path as _: label, ~arg as _) => renderStringPayload(`Keyframe)
+    renderStringPayload(`Keyframe)
   ),
   /* Currently there's no way to define extensions like `lola.x` with Pplib.Extension, we generate one ppxlib.extension per html tag. Is possible to achive it with Ppxlib.Driver.register_transformation(~preprocess_impl).  */
   ...List.map(htmlTag => {
-    Ppxlib.Extension.declare_with_path_arg(
+    Ppxlib.Extension.declare(
       "styled." ++ htmlTag,
       Ppxlib.Extension.Context.Module_expr,
       pattern,
