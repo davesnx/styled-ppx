@@ -3,6 +3,12 @@
   "reason": {
     "react-jsx": 3
   },
+  "bsc-flags": [
+    "-bs-super-errors"
+  ],
+  "warnings": {
+    "number": "-48"
+  },
   "sources": {
     "dir": "src",
     "subdirs": true,
