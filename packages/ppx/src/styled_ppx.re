@@ -1,5 +1,5 @@
 open Ppxlib;
-open Ast_builder.Default;
+module Build = Ast_builder.Default;
 
 let raiseWithLocation = (~loc, msg) => {
   raise(Location.raise_errorf(~loc, msg))
@@ -111,7 +111,7 @@ let renderStyledDynamic = (~loc as _,
     getLabeledArgs(label, defaultValue, param, body);
 
   let loc = body.pexp_loc;
-  let propExpr = pexp_ident(~loc, {txt: Lident("props"), loc});
+  let propExpr = Build.pexp_ident(~loc, {txt: Lident("props"), loc});
   let propToGetter = str => str ++ "Get";
 
   let styledFunctionArguments =
@@ -119,17 +119,17 @@ let renderStyledDynamic = (~loc as _,
       ((arg, _, _, _, _, _)) => {
         let labelText = getLabel(arg);
         let value =
-          pexp_ident(~loc, {txt: Lident(propToGetter(labelText)), loc});
+          Build.pexp_ident(~loc, {txt: Lident(propToGetter(labelText)), loc});
 
-        (arg, pexp_apply(~loc, value, [(Nolabel, propExpr)]));
+        (arg, Build.pexp_apply(~loc, value, [(Nolabel, propExpr)]));
       },
       labeledArguments,
     );
 
   let styledFunctionExpr =
-    pexp_apply(
+    Build.pexp_apply(
       ~loc,
-      pexp_ident(~loc, {txt: Lident(styleVariableName), loc}),
+      Build.pexp_ident(~loc, {txt: Lident(styleVariableName), loc}),
       styledFunctionArguments,
     );
 
@@ -197,7 +197,7 @@ let renderStyledDynamic = (~loc as _,
      */
   };
 
-  pmod_structure(~loc, [
+  Build.pmod_structure(~loc, [
     Create.makeMakeProps(
       ~loc,
       ~customProps=Some((makePropsParameters, variableMakeProps))
@@ -223,9 +223,9 @@ let renderStyledStatic = (~htmlTag, ~str, ~delim) => {
   let loc = str.loc;
   let css_expr = renderStringPayload(`Style, str, Some(delim));
   let styledExpr =
-    pexp_ident(~loc, {txt: Lident(styleVariableName), loc});
+    Build.pexp_ident(~loc, {txt: Lident(styleVariableName), loc});
 
-  pmod_structure(~loc, [
+  Build.pmod_structure(~loc, [
     Create.makeMakeProps(~loc, ~customProps=None),
     /* We inline a createVariadicElement binding on each styled component, since styled-ppx doesn't come as a lib */
     Create.bindingCreateVariadicElement(~loc),
