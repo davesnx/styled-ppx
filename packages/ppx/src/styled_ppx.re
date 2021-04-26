@@ -1,8 +1,4 @@
 open Ppxlib;
-open Asttypes;
-open Parsetree;
-open Ast_helper;
-open Longident;
 
 module Ast_builder = Ppxlib.Ast_builder.Default;
 
@@ -116,7 +112,7 @@ let renderStyledDynamic = (~loc as _,
     getLabeledArgs(label, defaultValue, param, body);
 
   let loc = body.pexp_loc;
-  let propExpr = Exp.ident(~loc, {txt: Lident("props"), loc});
+  let propExpr = Ast_helper.Exp.ident(~loc, {txt: Lident("props"), loc});
   let propToGetter = str => str ++ "Get";
 
   let styledFunctionArguments =
@@ -124,17 +120,17 @@ let renderStyledDynamic = (~loc as _,
       ((arg, _, _, _, _, _)) => {
         let labelText = getLabel(arg);
         let value =
-          Exp.ident(~loc, {txt: Lident(propToGetter(labelText)), loc});
+          Ast_helper.Exp.ident(~loc, {txt: Lident(propToGetter(labelText)), loc});
 
-        (arg, Exp.apply(~loc, value, [(Nolabel, propExpr)]));
+        (arg, Ast_helper.Exp.apply(~loc, value, [(Nolabel, propExpr)]));
       },
       labeledArguments,
     );
 
   let styledFunctionExpr =
-    Exp.apply(
+    Ast_helper.Exp.apply(
       ~loc,
-      Exp.ident(~loc, {txt: Lident(styleVariableName), loc}),
+      Ast_helper.Exp.ident(~loc, {txt: Lident(styleVariableName), loc}),
       styledFunctionArguments,
     );
 
@@ -202,7 +198,7 @@ let renderStyledDynamic = (~loc as _,
      */
   };
 
-  Mod.mk(
+  Ast_helper.Mod.mk(
     Pmod_structure([
       Create.makeMakeProps(
         ~loc,
@@ -230,7 +226,7 @@ let renderStyledStatic = (~htmlTag, ~str, ~delim) => {
   let loc = str.loc;
   let css_expr = renderStringPayload(`Style, str, Some(delim));
   let styledExpr =
-    Exp.ident(~loc, {txt: Lident(styleVariableName), loc});
+    Ast_helper.Exp.ident(~loc, {txt: Lident(styleVariableName), loc});
 
   Ast_builder.pmod_structure(~loc, [
     Create.makeMakeProps(~loc, ~customProps=None),
@@ -275,7 +271,7 @@ let pattern =
 
 type payloadType = [
   | `Fun(arg_label, option(expression), pattern, expression)
-  | `String(with_loc(label), location, option(string))
+  | `String(Ast_helper.with_loc(label), location, option(string))
 ];
 
 let renderStyledComponent = (~loc, ~path as _, ~arg as _, htmlTag, payload: payloadType) => {
