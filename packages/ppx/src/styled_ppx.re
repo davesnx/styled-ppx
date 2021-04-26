@@ -42,14 +42,6 @@ let getAlias = (pattern, label) =>
   | _ => getLabel(label)
   };
 
-/* let safeTypeFromValue = valueStr => {
-  let valueStr = getLabel(valueStr);
-  switch (String.sub(valueStr, 0, 1)) {
-  | "_" => "T" ++ valueStr
-  | _ => valueStr
-  };
-}; */
-
 let rec getArgs = (expr, list) => {
   switch (expr.pexp_desc) {
   | Pexp_fun(arg, default, pattern, expression)
