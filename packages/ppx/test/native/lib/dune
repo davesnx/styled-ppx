@@ -52,6 +52,6 @@
    ; .StyledPpxTestNativeTypeCheck.objs/byte/styledPpxTestNativeTypeCheck__Media_query_css_tests.cmi
    .StyledPpxTestNativeTypeCheck.objs/byte/styledPpxTestNativeTypeCheck__Keyframe_css_tests.cmi)
  (action ; this is only because a action is required
-  (echo %{deps})
+  (echo "Typecheck tests runned successfully")
  )
 )
