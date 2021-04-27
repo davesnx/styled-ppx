@@ -130,7 +130,7 @@ let supportList = [
   [%cx "border-bottom-left-radius: 14%"],
   [%cx "border-bottom-right-radius: 13%"],
   [%cx "box-shadow: 12px 12px 2px 1px rgba(0, 0, 255, .2)"],
-  [%css
+  [%cx
     "box-shadow: 12px 12px 2px 1px rgba(0, 0, 255, .2), 13px 14px 5px 6px rgba(2, 1, 255, 50%)"
   ],
   // css-overflow-3
