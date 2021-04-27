@@ -12,14 +12,14 @@
     "@glennsl/bs-jest": "^0.4.10",
     "bs-css": "^12.2.0",
     "bs-css-emotion": "^1.2.0",
-    "bs-platform": "7.0.1",
-    "bs-react-testing-library": "^0.6.0",
+    "bs-platform": "^9.0.2",
+    "bs-react-testing-library": "^0.7.0",
     "concurrently": "^5.1.0",
     "jest": "^25.1.0",
     "jest-emotion": "^10.0.32",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
-    "reason-react": "^0.7.0"
+    "reason-react": "^0.8.0"
   },
   "jest": {
     "testMatch": [

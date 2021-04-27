@@ -25,7 +25,7 @@ module Component = [%styled.div {|
   width: unset;
 |}];
 
-module ComponentInline = [%styled "color: #454545"];
+module ComponentInline = [%styled.div "color: #454545"];
 module StyledInput = [%styled.input "color: #454545"];
 module ComponentLink = [%styled.a {| color: #454545 |}];
 

@@ -2,9 +2,6 @@
   * Reference:
   * https://www.w3.org/TR/css-syntax-3/
   * https://github.com/yahoo/css-js/blob/master/src/l/css.3.l */
-open Migrate_parsetree;
-open Ast_410;
-
 module Sedlexing = Lex_buffer;
 
 /** Signals a lexing error at the provided source location.  */
@@ -355,26 +352,26 @@ let get_next_token_with_location = buf => {
   (token, loc_start, loc_end);
 };
 
-let parse = (buf, p) => {
+let parse = (buf, parser) => {
   let last_token = ref((Css_parser.EOF, Lexing.dummy_pos, Lexing.dummy_pos));
   let next_token = () => {
     last_token := get_next_token_with_location(buf);
     last_token^;
   };
 
-  try(MenhirLib.Convert.Simplified.traditional2revised(p, next_token)) {
+  try(MenhirLib.Convert.Simplified.traditional2revised(parser, next_token)) {
   | LexingError(_) as e => raise(e)
   | _ => raise(ParseError(last_token^))
   };
 };
 
-let parse_string = (~container_lnum=?, ~pos=?, s, p) => {
+let parse_string = (~container_lnum=?, ~pos=?, parser, string) => {
   switch (container_lnum) {
   | None => ()
   | Some(lnum) => Lex_buffer.container_lnum_ref := lnum
   };
-  parse(Lex_buffer.of_ascii_string(~pos?, s), p);
+  parse(Lex_buffer.of_ascii_string(~pos?, string), parser);
 };
 
 let parse_declaration_list = (~container_lnum=?, ~pos=?, css) =>
-  parse_string(~container_lnum?, ~pos?, css, Css_parser.declaration_list);
+  parse_string(~container_lnum?, ~pos?, Css_parser.declaration_list, css);

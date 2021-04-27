@@ -117,7 +117,6 @@ describe("combine_and", ({test, _}) => {
   });
   test("prefer longest with optional", _ => {
     let () = {
-      print_string("wat");
       let parse = parse_exn([%value "A? && B"]);
       let () =
         switch (parse("A B")) {

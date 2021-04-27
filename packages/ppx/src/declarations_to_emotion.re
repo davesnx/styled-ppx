@@ -1,5 +1,4 @@
-open Migrate_parsetree;
-open Ast_410;
+open Ppxlib;
 open Ast_helper;
 open Asttypes;
 open Longident;
@@ -41,16 +40,11 @@ let render_css_wide_keywords = (name, value) => {
   let.ok value = Parser.parse(Standard.css_wide_keywords, value);
   let value =
     switch (value) {
-    | `Inherit =>
-      %expr
-      "inherit"
-    | `Initial =>
-      %expr
-      "initial"
-    | `Unset =>
-      %expr
-      "unset"
+    | `Inherit => [%expr "inherit"]
+    | `Initial => [%expr "initial"]
+    | `Unset => [%expr "unset"]
     };
+
   let name = Const.string(name) |> Exp.constant;
   Ok([[%expr Css.unsafe([%e name], [%e value])]]);
 };
@@ -1199,7 +1193,6 @@ let grid_row = unsupported(property_grid_row, ~call=[%expr Css.gridRow]);
 let grid_column =
   unsupported(property_grid_column, ~call=[%expr Css.gridColumn]);
 let grid_area = unsupported(property_grid_area, ~call=[%expr Css.gridArea]);
-
 let display = unsupported(property_display, ~call=[%expr Css.display]);
 
 let found = ({ast_of_string, string_to_expr, _}) => {
@@ -1430,7 +1423,8 @@ let render_when_unsupported_features = (name, value) => {
     )
     |> String.concat("");
 
-  let name = to_camel_case(name) |> Const.string |> Exp.constant;
+  /* Transform property name to camelCase since we bind emotion to the Object API */
+  let name = name |> to_camel_case |> Const.string |> Exp.constant;
   let value = value |> Const.string |> Exp.constant;
 
   id([%expr Css.unsafe([%e name], [%e value])]);
@@ -1444,6 +1438,7 @@ let render_to_expr = (name, value) => {
     };
   string_to_expr(value) |> Result.map_error(str => `Invalid_value(str));
 };
+
 let parse_declarations = ((name, value)) => {
   open Parser;
 

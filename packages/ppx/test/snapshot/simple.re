@@ -1,89 +1,46 @@
+/*
+This tests ensure that the ppx transform the right extensions, to the right form.
+There's one case for each of the different methods.
+
+If you are looking to add some tests for CSS support,
+check packages/ppx/test/native folder.
+*/
+
 [%styled.global {|
-  html, body, #root, .mainClass {
+  html, body {
     margin: 0;
   }
 |}];
 
-/* Shoudn't break other ppxs with similar APIs */
-module StateLenses = [%lenses
-  type state = {
-    email: string,
-    age: int,
-  }
-];
+module ShoudNotBreakOtherModulesPpxsWithStringAsPayload = [%ppx ""];
+module ShoudNotBreakOtherModulesPpxsWithMultiStringAsPayload = [%ppx {| stuff |}];
 
-module Component = [%styled "display: block"];
-module Component = [%styled.section
-  {|
+module OneSingleProperty = [%styled.div "display: block"];
+module SingleQuoteStrings = [%styled.section "
   display: flex;
   justify-content: center;
-|}
-];
+"];
+
+module MultiLineStrings = [%styled.section {|
+  display: flex;
+  justify-content: center;
+|}];
+
+module SelfClosingElement = [%styled.input ""];
 
 let var = "#333333";
-module Component = [%styled {j|
+module StringInterpolation = [%styled.div {j|
   color: $var;
   __UNSAFE__ color: trust-me;
   display: block;
 |j}];
 
-// TODO:
-// module Component = [%styled
-//   (~space: string) => {j|
-//   margin: 10px $(space)px;
-// |j}
-// ];
+let classNameHash = [%css "display: block"];
+let classNameHashWithMultiLine = [%css {| display: block; |}];
 
-[%css "display: block"];
-
-module Component = [%styled
+module DynamicComponent = [%styled.div
   (~var) => {j|
      color: $var;
      display: block;
    |j}
 ];
-
-module Component = [%styled];
-module Component = [%styled ""];
-
-module NestedSelectors = [%styled.body
-  {|
-  display: flex;
-  justify-content: center;
-  & > a {
-    background-color: green;
-  }
-  & > .someClass {
-    background-color: yellow;
-  }
-  & > #someId {
-    background-color: blue;
-  }
-
-  &:nth-child(even) {
-    background-color: red;
-  }
-  & > div:nth-child(3n+1) {
-    background-color: red;
-  }
-
-  & > div {
-    padding: 20px;
-  }
-  & > div:nth-child(3n+1) {
-    background-color: green;
-  }
-  & > div:nth-child(even) {
-    background-color: green;
-  }
-
-  &::active {
-    background-color: blue;
-  }
-  &:hover {
-    background-color: pink;
-  }
-|}
-];
-
-module Input = [%styled.input ""];

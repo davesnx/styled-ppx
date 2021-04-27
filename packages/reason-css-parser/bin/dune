@@ -2,4 +2,6 @@
  (name generate_parser)
  (libraries reason_css_parser reason_css_parser_ppx yojson)
  (preprocess
-  (pps ppx_tools_versioned.metaquot_410)))
+  (pps ppxlib.metaquot)
+ )
+)

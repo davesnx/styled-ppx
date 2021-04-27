@@ -276,6 +276,8 @@ let colorList = [
   "yellowgreen",
 ];
 
+let allTags = List.append(selfClosingTags, openTags);
+
 let isColor = color => List.exists(c => c == color, colorList);
 let isValidSelfClosingTag = tag => List.exists(t => t == tag, selfClosingTags);
 let isValidOpenTag = tag => List.exists(t => t == tag, openTags);
