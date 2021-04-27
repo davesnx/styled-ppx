@@ -28,7 +28,7 @@ module OneSingleProperty = {
   [@bs.deriving abstract]
   type makeProps = {
     [@bs.optional]
-    ref: ReactDOMRe.domRef,
+    ref: ReactDOM.domRef,
     [@bs.optional]
     children: React.element,
     [@bs.optional]
@@ -985,7 +985,7 @@ module SingleQuoteStrings = {
   [@bs.deriving abstract]
   type makeProps = {
     [@bs.optional]
-    ref: ReactDOMRe.domRef,
+    ref: ReactDOM.domRef,
     [@bs.optional]
     children: React.element,
     [@bs.optional]
@@ -1947,7 +1947,7 @@ module MultiLineStrings = {
   [@bs.deriving abstract]
   type makeProps = {
     [@bs.optional]
-    ref: ReactDOMRe.domRef,
+    ref: ReactDOM.domRef,
     [@bs.optional]
     children: React.element,
     [@bs.optional]
@@ -2909,7 +2909,7 @@ module SelfClosingElement = {
   [@bs.deriving abstract]
   type makeProps = {
     [@bs.optional]
-    ref: ReactDOMRe.domRef,
+    ref: ReactDOM.domRef,
     [@bs.optional]
     children: React.element,
     [@bs.optional]
@@ -3868,7 +3868,7 @@ module StringInterpolation = {
   [@bs.deriving abstract]
   type makeProps = {
     [@bs.optional]
-    ref: ReactDOMRe.domRef,
+    ref: ReactDOM.domRef,
     [@bs.optional]
     children: React.element,
     [@bs.optional]
@@ -4836,7 +4836,7 @@ module DynamicComponent = {
   [@bs.deriving abstract]
   type makeProps('var) = {
     [@bs.optional]
-    ref: ReactDOMRe.domRef,
+    ref: ReactDOM.domRef,
     [@bs.optional]
     children: React.element,
     [@bs.optional]

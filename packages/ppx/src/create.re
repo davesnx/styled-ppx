@@ -272,7 +272,7 @@ let domRefLabel = (~loc) =>
     ~loc,
     ~attrs=[Helper.Attr.mk({txt: "bs.optional", loc}, PStr([]))],
     {txt: "ref", loc},
-    Helper.Typ.constr(~loc, {txt: Ldot(Lident("ReactDOMRe"), "domRef"), loc}, []),
+    Helper.Typ.constr(~loc, {txt: Ldot(Lident("ReactDOM"), "domRef"), loc}, []),
   );
 
 /* [@bs.optional] children: React.element */
