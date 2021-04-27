@@ -1,0 +1,14 @@
+.merlin
+.bsb.lock
+*.log
+/lib/bs/
+node_modules
+/build/
+**/*.bs.js
+dist/
+esy.lock
+.cache
+_esy
+
+src/bundle.js
+src/bundle.js.map
