@@ -1,5 +1,5 @@
 {
-  "name": "demo",
+  "name": "demo-rescript",
   "version": "0.0.0",
   "scripts": {
     "start": "concurrently --names re,js,www --kill-others yarn:re:watch yarn:bundle:watch yarn:dev-server",
