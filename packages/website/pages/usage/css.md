@@ -5,8 +5,5 @@ of that component or just one case or I particuraly don't like the components AP
 the `css` transform.
 
 ```reason
-ReactDOMRe.renderToElementWithId(
-  <span className=[%css "font-size: 32px"]> {React.string("Hello!")} </span>,
-  "app",
-);
+<span className=[%css "font-size: 32px"]> {React.string("Hello!")} </span>,
 ```
