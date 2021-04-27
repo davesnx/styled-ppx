@@ -4827,8 +4827,8 @@ module StringInterpolation = {
   };
 };
 
-let classNameHash = Css.style([Css.unsafe("display", "block")]);
-let classNameHashWithMultiLine = Css.style([Css.unsafe("display", "block")]);
+let className = Css.style([Css.unsafe("display", "block")]);
+let classNameWithMultiLine = Css.style([Css.unsafe("display", "block")]);
 
 let cssRule = Css.style(Css.color(Css.blue));
 
