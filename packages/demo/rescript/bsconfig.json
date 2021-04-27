@@ -1,5 +1,5 @@
 {
-  "name": "demo",
+  "name": "demo-rescript",
   "reason": {
     "react-jsx": 3
   },
@@ -18,7 +18,7 @@
     }
   ],
   "ppx-flags": [
-    "../../_build/default/bin/ppx.exe"
+    "../../../_build/default/bin/ppx.exe"
   ],
   "suffix": ".bs.js",
   "namespace": true,
