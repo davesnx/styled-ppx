@@ -1,0 +1,10 @@
+.DS_Store
+node_modules
+lib
+_build
+_esy
+.bsb.lock
+.merlin
+dune
+dune.bsb
+.melange.eobjs
