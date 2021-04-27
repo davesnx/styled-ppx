@@ -42,26 +42,28 @@ module Component = [%styled.div {j|
 
 switch (ReactDOM.querySelector("#app")) {
   | Some(el) =>
-    <App onClick=Js.log>
-      <Dynamic a="23"/>
-      <Component>
-        {React.string("test..")}
-      </Component>
-      <App2>
+    ReactDOM.render(
+      <App onClick=Js.log>
+        <Dynamic a="23"/>
         <Component>
-          {React.string("Demo of...")}
+          {React.string("test..")}
         </Component>
-      </App2>
-      <Link href="https://github.com/davesnx/styled-ppx">
-        {React.string("styled-ppx")}
-      </Link>
-      <Link href="https://github.com/davesnx/styled-ppx">
-        {React.string("styled-ppx")}
-      </Link>
-      <Link href="https://github.com/davesnx/styled-ppx">
-        {React.string("styled-ppx")}
-      </Link>
-      <Wrapper> <Line /> </Wrapper>
-    </App>
+        <App2>
+          <Component>
+            {React.string("Demo of...")}
+          </Component>
+        </App2>
+        <Link href="https://github.com/davesnx/styled-ppx">
+          {React.string("styled-ppx")}
+        </Link>
+        <Link href="https://github.com/davesnx/styled-ppx">
+          {React.string("styled-ppx")}
+        </Link>
+        <Link href="https://github.com/davesnx/styled-ppx">
+          {React.string("styled-ppx")}
+        </Link>
+      </App>,
+      el
+    )
   | None => ()
 };

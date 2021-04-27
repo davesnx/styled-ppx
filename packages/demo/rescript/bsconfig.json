@@ -24,6 +24,6 @@
   "namespace": true,
   "bs-dependencies": [
     "bs-css-emotion",
-    "reason-react"
+    "@rescript/react"
   ]
 }
