@@ -90,7 +90,14 @@ _): Parsetree.expression => {
   | `Style =>
     let parser = makeParser(Css_parser.declaration_list);
     let ast = parser(string);
-    Css_to_emotion.render_emotion_css(ast);
+    let declarationListValues = Css_to_emotion.render_declaration_list(ast);
+    Css_to_emotion.render_style_call(declarationListValues);
+  | `ClassName =>
+    let parser = makeParser(Css_parser.declaration);
+    let ast = parser(string);
+    let declarationListValues = Css_to_emotion.render_declaration(ast, ast.loc);
+    /* TODO: Instead of getting the first element, fail when there's more than one declaration. */
+    Css_to_emotion.render_style_call(List.nth(declarationListValues, 0));
   | `Declarations =>
     let parser = makeParser(Css_parser.declaration_list);
     let ast = parser(string);
@@ -216,7 +223,7 @@ let renderStyledDynamic = (
       ~loc,
       ~name=styleVariableName,
       ~args=labeledArguments,
-      ~exp=Css_to_emotion.render_emotion_style(styles),
+      ~exp=Css_to_emotion.render_style_call(styles),
     ),
     Create.component(
       ~loc,
@@ -297,10 +304,16 @@ let renderStyledComponent = (~loc, ~path, htmlTag, payload: payloadType) => {
 
 let extensions = [
   Ppxlib.Extension.declare(
-    "css",
+    "cx",
     Ppxlib.Extension.Context.Expression,
     string_payload,
     renderStringPayload(`Style)
+  ),
+  Ppxlib.Extension.declare(
+    "css",
+    Ppxlib.Extension.Context.Expression,
+    string_payload,
+    renderStringPayload(`ClassName)
   ),
   Ppxlib.Extension.declare(
     "styled.global",

@@ -346,15 +346,10 @@ and render_style_rule = (ident, sr: Style_rule.t): Parsetree.expression => {
   };
 };
 
-let render_emotion_style = (declaration_list): Parsetree.expression => {
+let render_style_call = (declaration_list): Parsetree.expression => {
   let loc = declaration_list.pexp_loc;
   let ident = Exp.ident(~loc, {txt: Emotion.lident("style"), loc});
-
   Exp.apply(~loc, ident, [(Nolabel, declaration_list)]);
-};
-let render_emotion_css = ((list, loc): Declaration_list.t): Parsetree.expression => {
-  let declarationListValues = render_declaration_list((list, loc));
-  render_emotion_style(declarationListValues);
 };
 
 let render_rule = (ident, r: Rule.t): Parsetree.expression => {

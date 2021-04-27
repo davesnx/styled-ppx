@@ -1202,6 +1202,7 @@ let found = ({ast_of_string, string_to_expr, _}) => {
   };
   (check_value, string_to_expr);
 };
+
 let properties = [
   ("display", found(display)),
   // css-sizing-3
@@ -1445,6 +1446,7 @@ let parse_declarations = ((name, value)) => {
   let.ok is_valid_string =
     check_property(~name, value)
     |> Result.map_error((`Unknown_value) => `Not_found);
+
   switch (render_css_wide_keywords(name, value)) {
   | Ok(value) => Ok(value)
   | Error(_) =>

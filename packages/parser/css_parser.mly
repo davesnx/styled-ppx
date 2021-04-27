@@ -36,6 +36,7 @@ open Css_types
 
 %start <Css_types.Stylesheet.t> stylesheet
 %start <Css_types.Declaration_list.t> declaration_list
+%start <Css_types.Declaration.t> declaration
 
 %%
 
@@ -127,13 +128,17 @@ declarations_without_ending_semi_colon:
   ;
 
 declaration_or_at_rule:
-  | d = declaration { Declaration_list.Declaration d }
+  | d = declaration_without_eof { Declaration_list.Declaration d }
   | u = unsafe { Declaration_list.Unsafe u }
   | r = at_rule { Declaration_list.At_rule r }
   | s = style_rule { Declaration_list.Style_rule s }
   ;
 
 declaration:
+  d = declaration_without_eof; SEMI_COLON?; EOF { d }
+  ;
+
+declaration_without_eof:
   n = IDENT; COLON; v = list(component_value_with_loc); i = boption(IMPORTANT) {
     { Declaration.name = (n, Lex_buffer.make_loc $startpos(n) $endpos(n));
       value = (v, Lex_buffer.make_loc $startpos(v) $endpos(v));
