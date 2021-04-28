@@ -1,3 +1,11 @@
+[%styled.global {|
+  html, body, #app {
+    margin: 0;
+    height: 100%;
+    width: 100%;
+  }
+|}];
+
 module App = [%styled.div {j|
   position: absolute;
 

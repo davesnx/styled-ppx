@@ -17,7 +17,7 @@
   }
 ];
 
-Css.global({js|html, body|js}, [Css.margin(`zero)]);
+Css.global({js|html, body, #root, .class|js}, [Css.margin(`zero)]);
 
 module ShoudNotBreakOtherModulesPpxsWithStringAsPayload = [%ppx ""];
 module ShoudNotBreakOtherModulesPpxsWithMultiStringAsPayload = [%ppx

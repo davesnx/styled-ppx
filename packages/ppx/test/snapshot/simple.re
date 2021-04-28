@@ -7,7 +7,7 @@ check packages/ppx/test/native folder.
 */
 
 [%styled.global {|
-  html, body {
+  html, body, #root, .class {
     margin: 0;
   }
 |}];
