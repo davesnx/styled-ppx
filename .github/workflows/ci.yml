@@ -130,6 +130,7 @@ jobs:
     needs: build
     name: Publish
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v1
 
@@ -242,3 +243,41 @@ jobs:
         working-directory: ./_release
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+
+  vscode:
+    name: VSCode extension
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Get cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+        working-directory: ./packages/editors/vscode
+
+      - name: Load global cache
+        uses: actions/cache@v1
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: yarn-${{ matrix.os }}-${{ hashFiles('./packages/editors/vscode/yarn.lock') }}
+          restore-keys: yarn-${{ matrix.os }}-
+
+      - name: Install
+        run: yarn install
+        working-directory: ./packages/editors/vscode
+
+      - name: Test
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: npm test
+          working-directory: ./packages/editors/vscode
