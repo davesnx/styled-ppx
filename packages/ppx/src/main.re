@@ -217,7 +217,6 @@ let renderStyledDynamic = (
       ~loc,
       ~customProps=Some((makePropsParameters, variableMakeProps))
     ),
-    /* We inline a createVariadicElement binding on each styled component, since styled-ppx doesn't come as a lib */
     Create.bindingCreateVariadicElement(~loc),
     Create.dynamicStyles(
       ~loc,
@@ -241,7 +240,6 @@ let renderStyledStatic = (~loc, ~path, ~htmlTag, ~str, ~delim, ~label) => {
 
   Build.pmod_structure(~loc, [
     Create.makeMakeProps(~loc, ~customProps=None),
-    /* We inline a createVariadicElement binding on each styled component, since styled-ppx doesn't come as a lib */
     Create.bindingCreateVariadicElement(~loc),
     Create.styles(~loc, ~name=styleVariableName, ~exp=css_expr),
     Create.component(~loc, ~htmlTag, ~styledExpr, ~params=[])

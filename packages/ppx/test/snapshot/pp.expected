@@ -17,7 +17,7 @@
   }
 ];
 
-Css.global({js|html, body, #root, .class|js}, [Css.margin(`zero)]);
+CssJs.global({js|html, body, #root, .class|js}, [|CssJs.margin(`zero)|]);
 
 module ShoudNotBreakOtherModulesPpxsWithStringAsPayload = [%ppx ""];
 module ShoudNotBreakOtherModulesPpxsWithMultiStringAsPayload = [%ppx
@@ -974,7 +974,7 @@ module OneSingleProperty = {
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
 
-  let styles = Css.style([Css.unsafe("display", "block")]);
+  let styles = CssJs.style([|CssJs.unsafe("display", "block")|]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
@@ -1932,10 +1932,10 @@ module SingleQuoteStrings = {
     "createElement";
 
   let styles =
-    Css.style([
-      Css.unsafe("display", "flex"),
-      Css.unsafe("justifyContent", "center"),
-    ]);
+    CssJs.style([|
+      CssJs.unsafe("display", "flex"),
+      CssJs.unsafe("justifyContent", "center"),
+    |]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
@@ -2894,10 +2894,10 @@ module MultiLineStrings = {
     "createElement";
 
   let styles =
-    Css.style([
-      Css.unsafe("display", "flex"),
-      Css.unsafe("justifyContent", "center"),
-    ]);
+    CssJs.style([|
+      CssJs.unsafe("display", "flex"),
+      CssJs.unsafe("justifyContent", "center"),
+    |]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
@@ -3855,7 +3855,7 @@ module SelfClosingElement = {
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
 
-  let styles = Css.style([]);
+  let styles = CssJs.style([||]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
@@ -4815,11 +4815,11 @@ module StringInterpolation = {
     "createElement";
 
   let styles =
-    Css.style([
-      Css.color(var),
-      Css.unsafe("color", "trust-me"),
-      Css.unsafe("display", "block"),
-    ]);
+    CssJs.style([|
+      CssJs.color(var),
+      CssJs.unsafe("color", "trust-me"),
+      CssJs.unsafe("display", "block"),
+    |]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
@@ -4827,10 +4827,11 @@ module StringInterpolation = {
   };
 };
 
-let className = Css.style([Css.unsafe("display", "block")]);
-let classNameWithMultiLine = Css.style([Css.unsafe("display", "block")]);
+let className = CssJs.style([|CssJs.unsafe("display", "block")|]);
+let classNameWithMultiLine =
+  CssJs.style([|CssJs.unsafe("display", "block")|]);
 
-let cssRule = Css.style(Css.color(Css.blue));
+let cssRule = CssJs.style(CssJs.color(CssJs.blue));
 
 module DynamicComponent = {
   [@bs.deriving abstract]
@@ -5784,7 +5785,7 @@ module DynamicComponent = {
     "createElement";
 
   let styles = (~var) =>
-    Css.style([Css.color(var), Css.unsafe("display", "block")]);
+    CssJs.style([|CssJs.color(var), CssJs.unsafe("display", "block")|]);
   let make = (props: makeProps('var)) => {
     let stylesObject = {"className": styles(~var=varGet(props))};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
