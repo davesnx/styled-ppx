@@ -103,8 +103,8 @@ jobs:
 
       - name: Get cache directory path
         id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
         working-directory: ./packages/ppx/test/bucklescript
+        run: echo "::set-output name=dir::$(yarn cache dir)"
 
       - name: Load global cache
         uses: actions/cache@v1
@@ -115,16 +115,16 @@ jobs:
           restore-keys: yarn-${{ matrix.os }}-
 
       - name: Install dependencies
-        run: yarn
         working-directory: ./packages/ppx/test/bucklescript
+        run: yarn
 
       - name: Build
-        run: yarn build
         working-directory: ./packages/ppx/test/bucklescript
+        run: yarn build
 
       - name: Test
-        run: yarn test
         working-directory: ./packages/ppx/test/bucklescript
+        run: yarn test
 
   publish:
     needs: build
@@ -141,6 +141,10 @@ jobs:
 
       - name: Make NPM release skeleton
         run: node scripts/release-make-skeleton.js
+
+      - name: Print short SHA
+        id: sha
+        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
 
       - name: Download linux artifacts
         uses: actions/download-artifact@master
@@ -219,30 +223,33 @@ jobs:
       #     asset_name: styled-ppx-windows-x64.zip
       #     asset_content_type: application/gzip
 
-      - name: Print short SHA
-        id: sha
-        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
-
       - name: Release nightly NPM package
-        if: github.event_name == 'pull_request'
-        run: |
-          npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
-          npm config set scope "@davesnx"
-          npm version prerelease --preid nightly.${{ steps.sha.outputs.sha_short }} -no-git-tag-version
-          npm publish --access public --tag nightly
+        if: ${{ success() && github.event_name == 'pull_request' && github.event.pull_request.user.login == 'davesnx' }}
         working-directory: ./_release
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+        run: |
+          npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
+          npm config set scope "@davesnx"
+          npm version prerelease --preid ${{ steps.sha.outputs.sha_short }} -no-git-tag-version
+          npm publish --access public --tag nightly
 
       - name: Release NPM package
-        if: "startsWith(github.ref, 'refs/tags/v')"
-        run: |
-          npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
-          npm config set scope "@davesnx"
-          npm publish --access public
+        if: ${{ success() && github.event_name != 'pull_request' }}
         working-directory: ./_release
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+        run: |
+          npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
+          npm config set scope "@davesnx"
+          REMOTE=$(npm view @davesnx/styled-ppx version)
+          CURRENT=$(jq -r '.version' package.json)
+          if [ "$REMOTE" != "$CURRENT" ]
+          then
+              npm publish --access public
+          else
+              echo "New verison and remote version are equal, nothing to publish"
+          fi
 
   vscode:
     name: VSCode extension
@@ -261,8 +268,8 @@ jobs:
 
       - name: Get cache directory path
         id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
         working-directory: ./packages/editors/vscode
+        run: echo "::set-output name=dir::$(yarn cache dir)"
 
       - name: Load global cache
         uses: actions/cache@v1
@@ -273,11 +280,11 @@ jobs:
           restore-keys: yarn-${{ matrix.os }}-
 
       - name: Install
-        run: yarn install
         working-directory: ./packages/editors/vscode
+        run: yarn install
 
       - name: Test
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: npm test
           working-directory: ./packages/editors/vscode
+          run: npm test
