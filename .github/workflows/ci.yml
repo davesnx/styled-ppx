@@ -224,7 +224,7 @@ jobs:
       #     asset_content_type: application/gzip
 
       - name: Release nightly NPM package
-        if: ${{ success() && github.event_name == 'pull_request' && GITHUB_ACTOR == 'davesnx' }}
+        if: ${{ success() && github.event_name == 'pull_request' && github.event.pull_request.user.login == 'davesnx' }}
         working-directory: ./_release
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
