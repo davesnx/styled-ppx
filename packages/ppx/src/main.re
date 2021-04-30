@@ -96,7 +96,7 @@ _): Parsetree.expression => {
     let parser = makeParser(Css_parser.declaration);
     let ast = parser(string);
     let declarationListValues = Css_to_emotion.render_declaration(ast, ast.loc);
-    /* TODO: Instead of getting the first element, fail when there's more than one declaration. */
+    /* TODO: Instead of getting the first element, fail when there's more than one declaration or make a mechanism to flatt all the properties */
     Css_to_emotion.render_style_call(List.nth(declarationListValues, 0));
   | `Declarations =>
     let parser = makeParser(Css_parser.declaration_list);
@@ -135,7 +135,6 @@ let renderStyledDynamic = (
         let labelText = getLabel(arg);
         let value =
           Build.pexp_ident(~loc, {txt: Lident(propToGetter(labelText)), loc});
-
         (arg, Build.pexp_apply(~loc, value, [(Nolabel, propExpr)]));
       },
       labeledArguments,

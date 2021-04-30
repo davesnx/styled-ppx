@@ -1427,8 +1427,10 @@ let render_when_unsupported_features = (name, value) => {
   /* Transform property name to camelCase since we bind emotion to the Object API */
   let name = name |> to_camel_case |> Const.string |> Exp.constant;
   let value = value |> Const.string |> Exp.constant;
+  let unsafe = "CssJs.unsafe" |> Const.string |> Exp.constant;
 
-  id([%expr CssJs.unsafe([%e name], [%e value])]);
+  /* [%expr CssJs.unsafe([%e name], [%e value])]; */
+  id(Exp.apply(~loc=Location.none, ~attrs=[], unsafe, [(Nolabel, name), (Nolabel, value)]));
 };
 
 let render_to_expr = (name, value) => {

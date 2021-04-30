@@ -25,6 +25,7 @@ open Css_types;
 open Component_value;
 open Ast_helper;
 
+module Helper = Ast_helper;
 module Builder = Ast_builder.Default;
 
 module Emotion = {
@@ -138,7 +139,6 @@ and render_declaration =
     (d: Declaration.t, _d_loc: Location.t): list(Parsetree.expression) => {
   let (name, name_loc) = d.Declaration.name;
   let (_valueList, loc) = d.Declaration.value;
-
   let value_source = source_code_of_loc(loc);
 
   switch (Declarations_to_emotion.parse_declarations((name, value_source))) {
@@ -152,7 +152,6 @@ and render_unsafe_declaration =
     (d: Declaration.t, _d_loc: Location.t): list(Parsetree.expression) => {
   let (name, _name_loc) = d.Declaration.name;
   let (_valueList, loc) = d.Declaration.value;
-
   let value_source = source_code_of_loc(loc);
 
   [Declarations_to_emotion.render_when_unsupported_features(name, value_source)];
@@ -281,10 +280,19 @@ and render_style_rule = (ident, sr: Style_rule.t): Parsetree.expression => {
   };
 };
 
+let withLoc = (~loc, txt) => {
+  { loc, txt }
+};
+
+let uncurried = (~loc) => {
+  Builder.attribute(~name=withLoc(~loc, "bs"), ~loc, ~payload=PStr([]))
+};
+
 let render_style_call = (declaration_list): Parsetree.expression => {
   let loc = declaration_list.pexp_loc;
   let ident = Exp.ident(~loc, {txt: Emotion.lident("style"), loc});
-  Exp.apply(~loc, ident, [(Nolabel, declaration_list)]);
+
+  Exp.apply(~loc, ~attrs=[uncurried(~loc)], ident, [(Nolabel, declaration_list)]);
 };
 
 let render_rule = (ident, r: Rule.t): Parsetree.expression => {
