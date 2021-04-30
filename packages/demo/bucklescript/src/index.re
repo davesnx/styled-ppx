@@ -48,11 +48,7 @@ module Component = [%styled.div {j|
 |j}
 ];
 
-
 let cssRule = Css.style([Css.color(Css.blue)]);
-
-Js.log(cssRule);
-Js.log(Css.color(Css.blue));
 
 switch (ReactDOM.querySelector("#app")) {
   | Some(el) =>
