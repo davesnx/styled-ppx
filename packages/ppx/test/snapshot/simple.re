@@ -52,9 +52,20 @@ module DynamicComponent = [%styled.div
    |j}
 ];
 
-module DynamicComponentWithArray = [%styled.div
-  (~var) => [|
+module DynamicComponentWithArray = [%styled.div (~var) =>
+  [|
+    [%css "color: $var;"],
+    [%css "display: block;"]
+  |]
+];
+
+module DynamicComponentWithSequence = [%styled.div
+  (~var) => {
+    Js.log("Logging when render");
+
+    [|
      [%css "color: $var;"],
      [%css "display: block;"]
   |]
+  }
 ];

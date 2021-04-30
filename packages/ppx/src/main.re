@@ -114,6 +114,16 @@ _): Parsetree.expression => {
   };
 };
 
+let getLastSequence = (expr) => {
+  let rec inner = (expr) =>
+    switch (expr.pexp_desc) {
+      | Pexp_sequence(_, sequence) => inner(sequence)
+      | _ => expr
+  };
+
+  inner(expr);
+};
+
 let renderStyledDynamic = (
   ~loc,
   ~path,
@@ -179,9 +189,17 @@ let renderStyledDynamic = (
 
   let styles = switch (functionExpr.pexp_desc) {
   | Pexp_constant(Pconst_string(str, delim, label)) =>
-    renderStringPayload(~loc, ~path, `Declarations, {txt: str, loc: functionExpr.pexp_loc}, delim, label)
-  | Pexp_array(arr) => Css_to_emotion.list_to_expr(loc, List.rev(arr))
-  | _ => raiseWithLocation(~loc, "Expected an array or a string")
+    renderStringPayload(~loc, ~path, `Declarations, {txt: str, loc: functionExpr.pexp_loc}, delim, label) |> Css_to_emotion.render_style_call
+  | Pexp_array(arr) => Create.list_to_expr(loc, List.rev(arr)) |> Css_to_emotion.render_style_call
+  | Pexp_sequence(expr, sequence) => {
+    /* Generate a new sequence where the last expression is
+      wrapped in render_style_call and render the other expressions. */
+    let return = getLastSequence(sequence);
+    let styles = Css_to_emotion.render_style_call(return);
+    Build.pexp_sequence(~loc, expr, styles);
+  }
+  /* TODO: Support more cases, like apply? */
+  | _ => raiseWithLocation(~loc, "Expected an array, a string or a function")
   };
 
   Build.pmod_structure(~loc, [
@@ -195,7 +213,7 @@ let renderStyledDynamic = (
       ~loc,
       ~name=styleVariableName,
       ~args=labeledArguments,
-      ~exp=Css_to_emotion.render_style_call(styles),
+      ~exp=styles,
     ),
     Create.component(
       ~loc,
