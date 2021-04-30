@@ -3863,7 +3863,7 @@ module SelfClosingElement = {
   };
 };
 
-module ArrayApi = {
+module ArrayStatic = {
   [@bs.deriving abstract]
   type makeProps = {
     [@bs.optional]
@@ -4814,10 +4814,10 @@ module ArrayApi = {
     "createElement";
 
   let styles =
-    Css.style([|
+    Css.style([
       Css.unsafe("display", "flex"),
       Css.unsafe("justifyContent", "center"),
-    |]);
+    ]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
@@ -6754,7 +6754,7 @@ module DynamicComponent = {
   };
 };
 
-module DynamicComponentWithArray = {
+module ArrayDynamicComponent = {
   [@bs.deriving abstract]
   type makeProps('var) = {
     [@bs.optional]
@@ -7714,7 +7714,7 @@ module DynamicComponentWithArray = {
   };
 };
 
-module DynamicComponentWithSequence = {
+module SequenceDynamicComponent = {
   [@bs.deriving abstract]
   type makeProps('var) = {
     [@bs.optional]

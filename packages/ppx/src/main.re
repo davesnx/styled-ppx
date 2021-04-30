@@ -247,7 +247,9 @@ let renderStyledStaticList = (~loc, ~path as _, ~htmlTag, list) => {
     Create.bindingCreateVariadicElement(~loc),
     Create.styles(~loc,
       ~name=styleVariableName,
-      ~exp=Css_to_emotion.render_style_call(Build.pexp_array(~loc, list))
+      ~exp=Css_to_emotion.render_style_call(
+        Create.list_to_expr(loc, List.rev(list))
+      )
     ),
     Create.component(~loc, ~htmlTag, ~styledExpr, ~params=[])
   ]);

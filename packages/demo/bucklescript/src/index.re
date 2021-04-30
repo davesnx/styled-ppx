@@ -50,9 +50,16 @@ module Component = [%styled.div {j|
 
 let cssRule = Css.style([Css.color(Css.blue)]);
 
+let styles =
+    Css.style([
+      Css.unsafe("display", "flex"),
+      Css.unsafe("justifyContent", "center"),
+    ]);
+
 switch (ReactDOM.querySelector("#app")) {
   | Some(el) =>
     ReactDOM.render(
+      <div className=styles>
       <App onClick=Js.log>
         <Dynamic a="23"/>
         <Component>
@@ -73,7 +80,8 @@ switch (ReactDOM.querySelector("#app")) {
           {React.string("styled-ppx")}
         </Link>
         <Wrapper> <Line /> </Wrapper>
-      </App>,
+      </App>
+      </div>,
     el)
   | None => ()
 };

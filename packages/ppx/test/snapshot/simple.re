@@ -28,7 +28,7 @@ module MultiLineStrings = [%styled.section {|
 
 module SelfClosingElement = [%styled.input ""];
 
-module ArrayApi = [%styled.section [|
+module ArrayStatic = [%styled.section [|
   [%css "display: flex;"],
   [%css "justify-content: center;"]
 |]];
@@ -52,14 +52,14 @@ module DynamicComponent = [%styled.div
    |j}
 ];
 
-module DynamicComponentWithArray = [%styled.div (~var) =>
+module ArrayDynamicComponent = [%styled.div (~var) =>
   [|
     [%css "color: $var;"],
     [%css "display: block;"]
   |]
 ];
 
-module DynamicComponentWithSequence = [%styled.div
+module SequenceDynamicComponent = [%styled.div
   (~var) => {
     Js.log("Logging when render");
 
