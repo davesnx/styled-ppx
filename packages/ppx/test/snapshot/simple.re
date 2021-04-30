@@ -28,6 +28,11 @@ module MultiLineStrings = [%styled.section {|
 
 module SelfClosingElement = [%styled.input ""];
 
+module ArrayApi = [%styled.section [|
+  [%css "display: flex;"],
+  [%css "justify-content: center;"]
+|]];
+
 let var = "#333333";
 module StringInterpolation = [%styled.div {j|
   color: $var;
@@ -45,4 +50,11 @@ module DynamicComponent = [%styled.div
      color: $var;
      display: block;
    |j}
+];
+
+module DynamicComponentWithArray = [%styled.div
+  (~var) => [|
+     [%css "color: $var;"],
+     [%css "display: block;"]
+  |]
 ];
