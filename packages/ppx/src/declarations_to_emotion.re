@@ -1,11 +1,9 @@
 open Ppxlib;
-open Ast_helper;
-open Asttypes;
-open Longident;
 open Reason_css_parser;
 open Reason_css_lexer;
 open Parser;
 
+module Helper = Ast_helper;
 module Builder = Ppxlib.Ast_builder.Default;
 
 /* helpers */
@@ -36,6 +34,14 @@ let emit = (parser, value_of_ast, value_to_expr) => {
   {ast_of_string, value_of_ast, value_to_expr, ast_to_expr, string_to_expr};
 };
 
+let render_string = string => Helper.Const.string(string) |> Helper.Exp.constant;
+let render_integer = integer => Helper.Const.int(integer) |> Helper.Exp.constant;
+let render_number = number =>
+  Helper.Const.float(number |> string_of_float) |> Helper.Exp.constant;
+let render_percentage = number => [%expr
+  `percent([%e render_number(number)])
+];
+
 let render_css_wide_keywords = (name, value) => {
   let.ok value = Parser.parse(Standard.css_wide_keywords, value);
   let value =
@@ -45,17 +51,10 @@ let render_css_wide_keywords = (name, value) => {
     | `Unset => [%expr "unset"]
     };
 
-  let name = Const.string(name) |> Exp.constant;
+  let name = render_string(name);
   Ok([[%expr CssJs.unsafe([%e name], [%e value])]]);
 };
 
-let render_string = string => Const.string(string) |> Exp.constant;
-let render_integer = integer => Const.int(integer) |> Exp.constant;
-let render_number = number =>
-  Const.float(number |> string_of_float) |> Exp.constant;
-let render_percentage = number => [%expr
-  `percent([%e render_number(number)])
-];
 let render_angle =
   fun
   | `Deg(number) => id([%expr `deg([%e render_number(number)])])
@@ -137,6 +136,7 @@ let variable_rule = {
   let.bind_match _ = Pattern.expect(RIGHT_PARENS) |> Modifier.optional;
   return_match(string);
 };
+
 let variable = parser =>
   Combinator.combine_xor([
     Rule.Match.map(variable_rule, data => `Variable(data)),
@@ -147,7 +147,7 @@ let transform_with_variable = (parser, map, value_to_expr) =>
   emit(
     variable(parser),
     fun
-    | `Variable(name) => name |> lid |> Exp.ident
+    | `Variable(name) => name |> lid |> Helper.Exp.ident
     | `Value(ast) => map(ast),
     value_to_expr,
   );
@@ -355,7 +355,7 @@ let render_named_color =
   | `Transparent => variants_to_expression(`Transparent)
   | `Aliceblue => [%expr CssJs.aliceblue]
   | `Antiquewhite => [%expr CssJs.antiquewhite]
-  | `Aqua => [%expr CssJs.aqua]
+  | `Aqua => Builder.pexp_ident(~loc, {loc: Location.none, txt: Ldot(Lident("CssJs"), "aqua")})
   | `Aquamarine => [%expr CssJs.aquamarine]
   | `Azure => [%expr CssJs.azure]
   | `Beige => [%expr CssJs.beige]
@@ -560,9 +560,7 @@ let render_function_hsl = ((hue, saturation, lightness, alpha)) => {
 
   switch (alpha) {
   | Some(alpha) =>
-    id(
-      [%expr `hsla(([%e hue], [%e saturation], [%e lightness], [%e alpha]))],
-    )
+    id([%expr `hsla(([%e hue], [%e saturation], [%e lightness], [%e alpha]))])
   | None => id([%expr `hsl(([%e hue], [%e saturation], [%e lightness]))])
   };
 };
@@ -590,10 +588,8 @@ let opacity =
   apply(
     property_opacity,
     fun
-    | `Number(number) =>
-      string_of_float(number) |> Const.float |> Exp.constant
-    | `Percentage(number) =>
-      string_of_float(number /. 100.0) |> Const.float |> Exp.constant,
+    | `Number(number) => render_number(number)
+    | `Percentage(number) => render_number(number /. 100.0),
     [%expr CssJs.opacity],
   );
 
@@ -689,7 +685,7 @@ let render_shadow = shadow => {
   let spread = Option.map(render_length, spread);
   let inset =
     Option.map(
-      () => Exp.construct({txt: Lident("true"), loc: Location.none}, None),
+      () => Helper.Exp.construct({txt: Lident("true"), loc: Location.none}, None),
       inset,
     );
 
@@ -709,7 +705,7 @@ let render_shadow = shadow => {
     switch (shadow) {
     | `Box(_) => id([%expr CssJs.Shadow.box])
     };
-  Exp.apply(id, args);
+  Helper.Exp.apply(id, args);
 };
 let background_color =
   apply(property_background_color, render_color, [%expr CssJs.backgroundColor]);
@@ -1425,12 +1421,10 @@ let render_when_unsupported_features = (name, value) => {
     |> String.concat("");
 
   /* Transform property name to camelCase since we bind emotion to the Object API */
-  let name = name |> to_camel_case |> Const.string |> Exp.constant;
-  let value = value |> Const.string |> Exp.constant;
-  let unsafe = "CssJs.unsafe" |> Const.string |> Exp.constant;
+  let name = name |> to_camel_case |> render_string;
+  let value = value |> render_string;
 
-  /* [%expr CssJs.unsafe([%e name], [%e value])]; */
-  id(Exp.apply(~loc=Location.none, ~attrs=[], unsafe, [(Nolabel, name), (Nolabel, value)]));
+  [%expr CssJs.unsafe([%e name], [%e value])];
 };
 
 let render_to_expr = (name, value) => {
@@ -1439,6 +1433,7 @@ let render_to_expr = (name, value) => {
     | Some((_, (_, string_to_expr))) => Ok(string_to_expr)
     | None => Error(`Not_found)
     };
+
   string_to_expr(value) |> Result.map_error(str => `Invalid_value(str));
 };
 
