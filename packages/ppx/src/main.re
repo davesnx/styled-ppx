@@ -1,9 +1,6 @@
 open Ppxlib;
-module Build = Ast_builder.Default;
 
-let raiseWithLocation = (~loc, msg) => {
-  raise(Location.raise_errorf(~loc, msg))
-};
+module Build = Ast_builder.Default;
 
 let isOptional = str =>
   switch (str) {
@@ -49,11 +46,13 @@ let rec getArgs = (expr, list) => {
       [(arg, default, pattern, alias, pattern.ppat_loc, type_), ...list],
     );
   | Pexp_fun(arg, _, pattern, _) when !isLabelled(arg) =>
-    raiseWithLocation(
-      ~loc=pattern.ppat_loc,
-      "Dynamic components are defined with labeled arguments. If you want to know more check the documentation: https://reasonml.org/docs/manual/latest/function#labeled-arguments",
-    )
-  | _ => (expr, list, None)
+    raise(
+      Location.raise_errorf(
+        ~loc=pattern.ppat_loc,
+        "Dynamic components are defined with labeled arguments. If you want to know more check the documentation: https://reasonml.org/docs/manual/latest/function#labeled-arguments",
+      )
+    );
+  | _ => (expr, list)
   };
 };
 
@@ -122,8 +121,7 @@ let renderStyledDynamic = (
   ~param,
   ~body
 ) => {
-  /* TODO: What's the last arg here, None? */
-  let (functionExpr, labeledArguments, _) =
+  let (functionExpr, labeledArguments) =
     getLabeledArgs(label, defaultValue, param, body);
 
   let propExpr = Build.pexp_ident(~loc, {txt: Lident("props"), loc});
