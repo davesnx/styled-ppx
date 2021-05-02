@@ -1,4 +1,4 @@
-[%styled.global {|
+/* [%styled.global {|
   html, body, #app {
     margin: 0;
     height: 100%;
@@ -7,7 +7,7 @@
     justify-content: center;
     align-items: center;
   }
-|}];
+|}]; */
 
 module App = [%styled.div {j|
   cursor: pointer;
