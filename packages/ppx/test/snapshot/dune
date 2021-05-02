@@ -9,7 +9,7 @@
 
 (rule
  (targets pp.result)
- (deps simple.re.pp.ml)
+ (deps test.re.pp.ml)
  (action
   (with-stdout-to
    %{targets}
@@ -21,6 +21,6 @@
 (rule
  (alias snapshot_test)
  (action
-  (diff pp.expected pp.result)
+  (diff test.expected.re pp.result)
  )
 )
