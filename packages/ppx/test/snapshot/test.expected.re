@@ -1,29 +1,8 @@
-[@ocaml.ppx.context
-  {
-    tool_name: "ppx_driver",
-    include_dirs: [],
-    load_path: [],
-    open_modules: [],
-    for_package: None,
-    debug: false,
-    use_threads: false,
-    use_vmthreads: false,
-    recursive_types: false,
-    principal: false,
-    transparent_modules: false,
-    unboxed_types: false,
-    unsafe_string: false,
-    cookies: [("library-name", "StyledPpxTestNativeSnapshot")],
-  }
-];
-
 CssJs.global({js|html, body, #root, .class|js}, [|CssJs.margin(`zero)|]);
-
 module ShoudNotBreakOtherModulesPpxsWithStringAsPayload = [%ppx ""];
 module ShoudNotBreakOtherModulesPpxsWithMultiStringAsPayload = [%ppx
   {| stuff |}
 ];
-
 module OneSingleProperty = {
   [@bs.deriving abstract]
   type makeProps = {
@@ -973,8 +952,7 @@ module OneSingleProperty = {
   [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
-
-  let styles = CssJs.style([|CssJs.unsafe("display", "block")|]);
+  let styles = CssJs.style(. [|CssJs.unsafe("display", "block")|]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
@@ -1930,9 +1908,8 @@ module SingleQuoteStrings = {
   [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
-
   let styles =
-    CssJs.style([|
+    CssJs.style(. [|
       CssJs.unsafe("display", "flex"),
       CssJs.unsafe("justifyContent", "center"),
     |]);
@@ -1942,7 +1919,6 @@ module SingleQuoteStrings = {
     createVariadicElement("section", newProps);
   };
 };
-
 module MultiLineStrings = {
   [@bs.deriving abstract]
   type makeProps = {
@@ -2892,9 +2868,8 @@ module MultiLineStrings = {
   [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
-
   let styles =
-    CssJs.style([|
+    CssJs.style(. [|
       CssJs.unsafe("display", "flex"),
       CssJs.unsafe("justifyContent", "center"),
     |]);
@@ -2904,7 +2879,6 @@ module MultiLineStrings = {
     createVariadicElement("section", newProps);
   };
 };
-
 module SelfClosingElement = {
   [@bs.deriving abstract]
   type makeProps = {
@@ -3854,15 +3828,13 @@ module SelfClosingElement = {
   [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
-
-  let styles = CssJs.style([||]);
+  let styles = CssJs.style(. [||]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
     createVariadicElement("input", newProps);
   };
 };
-
 let var = "#333333";
 module StringInterpolation = {
   [@bs.deriving abstract]
@@ -4813,9 +4785,8 @@ module StringInterpolation = {
   [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
-
   let styles =
-    CssJs.style([|
+    CssJs.style(. [|
       CssJs.color(var),
       CssJs.unsafe("color", "trust-me"),
       CssJs.unsafe("display", "block"),
@@ -4826,13 +4797,10 @@ module StringInterpolation = {
     createVariadicElement("div", newProps);
   };
 };
-
-let className = CssJs.style([|CssJs.unsafe("display", "block")|]);
+let className = CssJs.style(. [|CssJs.unsafe("display", "block")|]);
 let classNameWithMultiLine =
-  CssJs.style([|CssJs.unsafe("display", "block")|]);
-
-let cssRule = CssJs.style(CssJs.color(CssJs.blue));
-
+  CssJs.style(. [|CssJs.unsafe("display", "block")|]);
+let cssRule = CssJs.style(. CssJs.color(CssJs.blue));
 module DynamicComponent = {
   [@bs.deriving abstract]
   type makeProps('var) = {
@@ -5783,9 +5751,8 @@ module DynamicComponent = {
   [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
-
   let styles = (~var) =>
-    CssJs.style([|CssJs.color(var), CssJs.unsafe("display", "block")|]);
+    CssJs.style(. [|CssJs.color(var), CssJs.unsafe("display", "block")|]);
   let make = (props: makeProps('var)) => {
     let stylesObject = {"className": styles(~var=varGet(props))};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
