@@ -504,8 +504,8 @@ let render_named_color =
   | _ => raise(Unsupported_feature);
 let render_color_alpha =
   fun
-  | `Number(number) => render_number(number)
-  | `Percentage(percentage) => render_number(percentage /. 100.0);
+  | `Number(number) => [%expr `num([%e render_number(number)])]
+  | `Percentage(percentage) => [%expr `percent([%e render_number(percentage /. 100.0)])];
 
 let render_function_rgb = ast => {
   let to_number = percentage => percentage *. 2.55;
