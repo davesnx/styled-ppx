@@ -1,26 +1,27 @@
-(library
- (name StyledPpxTestNativeSnapshot)
- (library_flags (-linkall -g))
- (libraries styled-ppx.lib)
- (preprocess
-  (pps styled-ppx.lib)
- )
+(executables
+ (names pp)
+ (modules pp)
+ (libraries styled-ppx.lib ppxlib)
 )
 
 (rule
- (targets pp.result)
- (deps simple.re.pp.ml)
+ (targets test.actual.re)
+ (deps (:pp pp.exe) (:input test.re))
  (action
-  (with-stdout-to
-   %{targets}
-   (run refmt --parse=binary %{deps})
+  (progn
+   (with-stdout-to %{targets}
+    (run refmt --parse re --print ml %{input})
+   )
+   (run ./%{pp} --impl %{targets} -o %{targets})
+   (run refmt --parse ml --print re --in-place %{targets})
   )
  )
 )
 
 (rule
  (alias snapshot_test)
+ (deps (file test.expected.re) (file test.actual.re))
  (action
-  (diff pp.expected pp.result)
+  (diff test.expected.re test.actual.re)
  )
 )

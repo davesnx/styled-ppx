@@ -1,19 +1,15 @@
-[%styled.global {|
+/* [%styled.global {|
   html, body, #app {
     margin: 0;
     height: 100%;
     width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
-|}];
+|}]; */
 
 module App = [%styled.div {j|
-  position: absolute;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-
   cursor: pointer;
 |j}
 ];
@@ -34,9 +30,6 @@ module Link = [%styled.a
 |}
 ];
 
-module Line = [%styled.span "display: inline;"];
-module Wrapper = [%styled.div "display: inline;"];
-
 module Dynamic = [%styled.input (~a as _) => "
   display: inline;
 "];
@@ -45,6 +38,16 @@ module Component = [%styled.div {j|
   background-color: red;
   border-radius: 20px;
   box-sizing: border-box;
+
+  @media (min-width: 600px) {
+    background: blue;
+  }
+
+  &:hover {
+    background: green;
+  }
+
+  & > p { color: pink; font-size: 24px; }
 |j}
 ];
 
@@ -58,19 +61,14 @@ switch (ReactDOM.querySelector("#app")) {
         </Component>
         <App2>
           <Component>
-            {React.string("Demo of...")}
+            <p>
+              {React.string("Demo of...")}
+            </p>
           </Component>
         </App2>
         <Link href="https://github.com/davesnx/styled-ppx">
           {React.string("styled-ppx")}
         </Link>
-        <Link href="https://github.com/davesnx/styled-ppx">
-          {React.string("styled-ppx")}
-        </Link>
-        <Link href="https://github.com/davesnx/styled-ppx">
-          {React.string("styled-ppx")}
-        </Link>
-        <Wrapper> <Line /> </Wrapper>
       </App>,
     el)
   | None => ()

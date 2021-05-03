@@ -1,12 +1,10 @@
 open Ppxlib;
-open Ast_helper;
-open Asttypes;
-open Longident;
 open Reason_css_parser;
 open Reason_css_lexer;
 open Parser;
 
-module Ast_builder = Ppxlib.Ast_builder.Default;
+module Helper = Ast_helper;
+module Builder = Ppxlib.Ast_builder.Default;
 
 /* helpers */
 let loc = Location.none;
@@ -36,6 +34,14 @@ let emit = (parser, value_of_ast, value_to_expr) => {
   {ast_of_string, value_of_ast, value_to_expr, ast_to_expr, string_to_expr};
 };
 
+let render_string = string => Helper.Const.string(string) |> Helper.Exp.constant;
+let render_integer = integer => Helper.Const.int(integer) |> Helper.Exp.constant;
+let render_number = number =>
+  Helper.Const.float(number |> string_of_float) |> Helper.Exp.constant;
+let render_percentage = number => [%expr
+  `percent([%e render_number(number)])
+];
+
 let render_css_wide_keywords = (name, value) => {
   let.ok value = Parser.parse(Standard.css_wide_keywords, value);
   let value =
@@ -45,17 +51,10 @@ let render_css_wide_keywords = (name, value) => {
     | `Unset => [%expr "unset"]
     };
 
-  let name = Const.string(name) |> Exp.constant;
-  Ok([[%expr Css.unsafe([%e name], [%e value])]]);
+  let name = render_string(name);
+  Ok([[%expr CssJs.unsafe([%e name], [%e value])]]);
 };
 
-let render_string = string => Const.string(string) |> Exp.constant;
-let render_integer = integer => Const.int(integer) |> Exp.constant;
-let render_number = number =>
-  Const.float(number |> string_of_float) |> Exp.constant;
-let render_percentage = number => [%expr
-  `percent([%e render_number(number)])
-];
 let render_angle =
   fun
   | `Deg(number) => id([%expr `deg([%e render_number(number)])])
@@ -137,6 +136,7 @@ let variable_rule = {
   let.bind_match _ = Pattern.expect(RIGHT_PARENS) |> Modifier.optional;
   return_match(string);
 };
+
 let variable = parser =>
   Combinator.combine_xor([
     Rule.Match.map(variable_rule, data => `Variable(data)),
@@ -147,7 +147,7 @@ let transform_with_variable = (parser, map, value_to_expr) =>
   emit(
     variable(parser),
     fun
-    | `Variable(name) => name |> lid |> Exp.ident
+    | `Variable(name) => name |> lid |> Helper.Exp.ident
     | `Value(ast) => map(ast),
     value_to_expr,
   );
@@ -209,25 +209,25 @@ let width =
     | `Min_content => raise(Unsupported_feature)
     | `Fit_content(lp) => render_function_fit_content(lp)
     | _ => raise(Unsupported_feature),
-    [%expr Css.width],
+    [%expr CssJs.width],
   );
 let height =
   apply(
     property_height,
     apply_value(width.value_of_ast),
-    [%expr Css.height],
+    [%expr CssJs.height],
   );
 let min_width =
   apply(
     property_min_width,
     apply_value(width.value_of_ast),
-    [%expr Css.minWidth],
+    [%expr CssJs.minWidth],
   );
 let min_height =
   apply(
     property_min_height,
     apply_value(width.value_of_ast),
-    [%expr Css.minHeight],
+    [%expr CssJs.minHeight],
   );
 let max_width =
   apply(
@@ -241,16 +241,16 @@ let max_width =
     | `Min_content as ast
     | `Fit_content(_) as ast => apply_value(width.value_of_ast, ast)
     | _ => raise(Unsupported_feature),
-    [%expr Css.maxWidth],
+    [%expr CssJs.maxWidth],
   );
 let max_height =
   apply(
     property_max_height,
     data => max_width.value_of_ast(`Value(data)),
-    [%expr Css.maxHeight],
+    [%expr CssJs.maxHeight],
   );
 let box_sizing =
-  apply(property_box_sizing, variants_to_expression, [%expr Css.boxSizing]);
+  apply(property_box_sizing, variants_to_expression, [%expr CssJs.boxSizing]);
 let column_width = unsupported(property_column_width);
 
 // css-box-3
@@ -261,39 +261,39 @@ let margin_top =
     | `Auto => variants_to_expression(`Auto)
     | `Length(_) as lp
     | `Percentage(_) as lp => render_length_percentage(lp),
-    [%expr Css.marginTop],
+    [%expr CssJs.marginTop],
   );
 let margin_right =
   apply(
     property_margin_right,
     apply_value(margin_top.value_of_ast),
-    [%expr Css.marginRight],
+    [%expr CssJs.marginRight],
   );
 let margin_bottom =
   apply(
     property_margin_bottom,
     apply_value(margin_top.value_of_ast),
-    [%expr Css.marginBottom],
+    [%expr CssJs.marginBottom],
   );
 let margin_left =
   apply(
     property_margin_left,
     apply_value(margin_top.value_of_ast),
-    [%expr Css.marginLeft],
+    [%expr CssJs.marginLeft],
   );
 let margin =
   emit(
     property_margin,
     List.map(apply_value(margin_top.value_of_ast)),
     fun
-    | [all] => [[%expr Css.margin([%e all])]]
-    | [v, h] => [[%expr Css.margin2(~v=[%e v], ~h=[%e h])]]
+    | [all] => [[%expr CssJs.margin([%e all])]]
+    | [v, h] => [[%expr CssJs.margin2(~v=[%e v], ~h=[%e h])]]
     | [t, h, b] => [
-        [%expr Css.margin3(~top=[%e t], ~h=[%e h], ~bottom=[%e b])],
+        [%expr CssJs.margin3(~top=[%e t], ~h=[%e h], ~bottom=[%e b])],
       ]
     | [t, r, b, l] => [
         [%expr
-          Css.margin4(
+          CssJs.margin4(
             ~top=[%e t],
             ~right=[%e r],
             ~bottom=[%e b],
@@ -307,39 +307,39 @@ let padding_top =
   apply(
     property_padding_top,
     render_length_percentage,
-    [%expr Css.paddingTop],
+    [%expr CssJs.paddingTop],
   );
 let padding_right =
   apply(
     property_padding_right,
     apply_value(padding_top.value_of_ast),
-    [%expr Css.paddingRight],
+    [%expr CssJs.paddingRight],
   );
 let padding_bottom =
   apply(
     property_padding_bottom,
     apply_value(padding_top.value_of_ast),
-    [%expr Css.paddingBottom],
+    [%expr CssJs.paddingBottom],
   );
 let padding_left =
   apply(
     property_padding_left,
     apply_value(padding_top.value_of_ast),
-    [%expr Css.paddingLeft],
+    [%expr CssJs.paddingLeft],
   );
 let padding =
   emit(
     property_padding,
     List.map(apply_value(padding_top.value_of_ast)),
     fun
-    | [all] => [[%expr Css.padding([%e all])]]
-    | [v, h] => [[%expr Css.padding2(~v=[%e v], ~h=[%e h])]]
+    | [all] => [[%expr CssJs.padding([%e all])]]
+    | [v, h] => [[%expr CssJs.padding2(~v=[%e v], ~h=[%e h])]]
     | [t, h, b] => [
-        [%expr Css.padding3(~top=[%e t], ~h=[%e h], ~bottom=[%e b])],
+        [%expr CssJs.padding3(~top=[%e t], ~h=[%e h], ~bottom=[%e b])],
       ]
     | [t, r, b, l] => [
         [%expr
-          Css.padding4(
+          CssJs.padding4(
             ~top=[%e t],
             ~right=[%e r],
             ~bottom=[%e b],
@@ -353,159 +353,159 @@ let padding =
 let render_named_color =
   fun
   | `Transparent => variants_to_expression(`Transparent)
-  | `Aliceblue => [%expr Css.aliceblue]
-  | `Antiquewhite => [%expr Css.antiquewhite]
-  | `Aqua => [%expr Css.aqua]
-  | `Aquamarine => [%expr Css.aquamarine]
-  | `Azure => [%expr Css.azure]
-  | `Beige => [%expr Css.beige]
-  | `Bisque => [%expr Css.bisque]
-  | `Black => [%expr Css.black]
-  | `Blanchedalmond => [%expr Css.blanchedalmond]
-  | `Blue => [%expr Css.blue]
-  | `Blueviolet => [%expr Css.blueviolet]
-  | `Brown => [%expr Css.brown]
-  | `Burlywood => [%expr Css.burlywood]
-  | `Cadetblue => [%expr Css.cadetblue]
-  | `Chartreuse => [%expr Css.chartreuse]
-  | `Chocolate => [%expr Css.chocolate]
-  | `Coral => [%expr Css.coral]
-  | `Cornflowerblue => [%expr Css.cornflowerblue]
-  | `Cornsilk => [%expr Css.cornsilk]
-  | `Crimson => [%expr Css.crimson]
-  | `Cyan => [%expr Css.cyan]
-  | `Darkblue => [%expr Css.darkblue]
-  | `Darkcyan => [%expr Css.darkcyan]
-  | `Darkgoldenrod => [%expr Css.darkgoldenrod]
-  | `Darkgray => [%expr Css.darkgray]
-  | `Darkgreen => [%expr Css.darkgreen]
-  | `Darkgrey => [%expr Css.darkgrey]
-  | `Darkkhaki => [%expr Css.darkkhaki]
-  | `Darkmagenta => [%expr Css.darkmagenta]
-  | `Darkolivegreen => [%expr Css.darkolivegreen]
-  | `Darkorange => [%expr Css.darkorange]
-  | `Darkorchid => [%expr Css.darkorchid]
-  | `Darkred => [%expr Css.darkred]
-  | `Darksalmon => [%expr Css.darksalmon]
-  | `Darkseagreen => [%expr Css.darkseagreen]
-  | `Darkslateblue => [%expr Css.darkslateblue]
-  | `Darkslategray => [%expr Css.darkslategray]
-  | `Darkslategrey => [%expr Css.darkslategrey]
-  | `Darkturquoise => [%expr Css.darkturquoise]
-  | `Darkviolet => [%expr Css.darkviolet]
-  | `Deeppink => [%expr Css.deeppink]
-  | `Deepskyblue => [%expr Css.deepskyblue]
-  | `Dimgray => [%expr Css.dimgray]
-  | `Dimgrey => [%expr Css.dimgrey]
-  | `Dodgerblue => [%expr Css.dodgerblue]
-  | `Firebrick => [%expr Css.firebrick]
-  | `Floralwhite => [%expr Css.floralwhite]
-  | `Forestgreen => [%expr Css.forestgreen]
-  | `Fuchsia => [%expr Css.fuchsia]
-  | `Gainsboro => [%expr Css.gainsboro]
-  | `Ghostwhite => [%expr Css.ghostwhite]
-  | `Gold => [%expr Css.gold]
-  | `Goldenrod => [%expr Css.goldenrod]
-  | `Gray => [%expr Css.gray]
-  | `Green => [%expr Css.green]
-  | `Greenyellow => [%expr Css.greenyellow]
-  | `Grey => [%expr Css.grey]
-  | `Honeydew => [%expr Css.honeydew]
-  | `Hotpink => [%expr Css.hotpink]
-  | `Indianred => [%expr Css.indianred]
-  | `Indigo => [%expr Css.indigo]
-  | `Ivory => [%expr Css.ivory]
-  | `Khaki => [%expr Css.khaki]
-  | `Lavender => [%expr Css.lavender]
-  | `Lavenderblush => [%expr Css.lavenderblush]
-  | `Lawngreen => [%expr Css.lawngreen]
-  | `Lemonchiffon => [%expr Css.lemonchiffon]
-  | `Lightblue => [%expr Css.lightblue]
-  | `Lightcoral => [%expr Css.lightcoral]
-  | `Lightcyan => [%expr Css.lightcyan]
-  | `Lightgoldenrodyellow => [%expr Css.lightgoldenrodyellow]
-  | `Lightgray => [%expr Css.lightgray]
-  | `Lightgreen => [%expr Css.lightgreen]
-  | `Lightgrey => [%expr Css.lightgrey]
-  | `Lightpink => [%expr Css.lightpink]
-  | `Lightsalmon => [%expr Css.lightsalmon]
-  | `Lightseagreen => [%expr Css.lightseagreen]
-  | `Lightskyblue => [%expr Css.lightskyblue]
-  | `Lightslategray => [%expr Css.lightslategray]
-  | `Lightslategrey => [%expr Css.lightslategrey]
-  | `Lightsteelblue => [%expr Css.lightsteelblue]
-  | `Lightyellow => [%expr Css.lightyellow]
-  | `Lime => [%expr Css.lime]
-  | `Limegreen => [%expr Css.limegreen]
-  | `Linen => [%expr Css.linen]
-  | `Magenta => [%expr Css.magenta]
-  | `Maroon => [%expr Css.maroon]
-  | `Mediumaquamarine => [%expr Css.mediumaquamarine]
-  | `Mediumblue => [%expr Css.mediumblue]
-  | `Mediumorchid => [%expr Css.mediumorchid]
-  | `Mediumpurple => [%expr Css.mediumpurple]
-  | `Mediumseagreen => [%expr Css.mediumseagreen]
-  | `Mediumslateblue => [%expr Css.mediumslateblue]
-  | `Mediumspringgreen => [%expr Css.mediumspringgreen]
-  | `Mediumturquoise => [%expr Css.mediumturquoise]
-  | `Mediumvioletred => [%expr Css.mediumvioletred]
-  | `Midnightblue => [%expr Css.midnightblue]
-  | `Mintcream => [%expr Css.mintcream]
-  | `Mistyrose => [%expr Css.mistyrose]
-  | `Moccasin => [%expr Css.moccasin]
-  | `Navajowhite => [%expr Css.navajowhite]
-  | `Navy => [%expr Css.navy]
-  | `Oldlace => [%expr Css.oldlace]
-  | `Olive => [%expr Css.olive]
-  | `Olivedrab => [%expr Css.olivedrab]
-  | `Orange => [%expr Css.orange]
-  | `Orangered => [%expr Css.orangered]
-  | `Orchid => [%expr Css.orchid]
-  | `Palegoldenrod => [%expr Css.palegoldenrod]
-  | `Palegreen => [%expr Css.palegreen]
-  | `Paleturquoise => [%expr Css.paleturquoise]
-  | `Palevioletred => [%expr Css.palevioletred]
-  | `Papayawhip => [%expr Css.papayawhip]
-  | `Peachpuff => [%expr Css.peachpuff]
-  | `Peru => [%expr Css.peru]
-  | `Pink => [%expr Css.pink]
-  | `Plum => [%expr Css.plum]
-  | `Powderblue => [%expr Css.powderblue]
-  | `Purple => [%expr Css.purple]
-  | `Rebeccapurple => [%expr Css.rebeccapurple]
-  | `Red => [%expr Css.red]
-  | `Rosybrown => [%expr Css.rosybrown]
-  | `Royalblue => [%expr Css.royalblue]
-  | `Saddlebrown => [%expr Css.saddlebrown]
-  | `Salmon => [%expr Css.salmon]
-  | `Sandybrown => [%expr Css.sandybrown]
-  | `Seagreen => [%expr Css.seagreen]
-  | `Seashell => [%expr Css.seashell]
-  | `Sienna => [%expr Css.sienna]
-  | `Silver => [%expr Css.silver]
-  | `Skyblue => [%expr Css.skyblue]
-  | `Slateblue => [%expr Css.slateblue]
-  | `Slategray => [%expr Css.slategray]
-  | `Slategrey => [%expr Css.slategrey]
-  | `Snow => [%expr Css.snow]
-  | `Springgreen => [%expr Css.springgreen]
-  | `Steelblue => [%expr Css.steelblue]
-  | `Tan => [%expr Css.tan]
-  | `Teal => [%expr Css.teal]
-  | `Thistle => [%expr Css.thistle]
-  | `Tomato => [%expr Css.tomato]
-  | `Turquoise => [%expr Css.turquoise]
-  | `Violet => [%expr Css.violet]
-  | `Wheat => [%expr Css.wheat]
-  | `White => [%expr Css.white]
-  | `Whitesmoke => [%expr Css.whitesmoke]
-  | `Yellow => [%expr Css.yellow]
-  | `Yellowgreen => [%expr Css.yellowgreen]
+  | `Aliceblue => [%expr CssJs.aliceblue]
+  | `Antiquewhite => [%expr CssJs.antiquewhite]
+  | `Aqua => Builder.pexp_ident(~loc, {loc: Location.none, txt: Ldot(Lident("CssJs"), "aqua")})
+  | `Aquamarine => [%expr CssJs.aquamarine]
+  | `Azure => [%expr CssJs.azure]
+  | `Beige => [%expr CssJs.beige]
+  | `Bisque => [%expr CssJs.bisque]
+  | `Black => [%expr CssJs.black]
+  | `Blanchedalmond => [%expr CssJs.blanchedalmond]
+  | `Blue => [%expr CssJs.blue]
+  | `Blueviolet => [%expr CssJs.blueviolet]
+  | `Brown => [%expr CssJs.brown]
+  | `Burlywood => [%expr CssJs.burlywood]
+  | `Cadetblue => [%expr CssJs.cadetblue]
+  | `Chartreuse => [%expr CssJs.chartreuse]
+  | `Chocolate => [%expr CssJs.chocolate]
+  | `Coral => [%expr CssJs.coral]
+  | `Cornflowerblue => [%expr CssJs.cornflowerblue]
+  | `Cornsilk => [%expr CssJs.cornsilk]
+  | `Crimson => [%expr CssJs.crimson]
+  | `Cyan => [%expr CssJs.cyan]
+  | `Darkblue => [%expr CssJs.darkblue]
+  | `Darkcyan => [%expr CssJs.darkcyan]
+  | `Darkgoldenrod => [%expr CssJs.darkgoldenrod]
+  | `Darkgray => [%expr CssJs.darkgray]
+  | `Darkgreen => [%expr CssJs.darkgreen]
+  | `Darkgrey => [%expr CssJs.darkgrey]
+  | `Darkkhaki => [%expr CssJs.darkkhaki]
+  | `Darkmagenta => [%expr CssJs.darkmagenta]
+  | `Darkolivegreen => [%expr CssJs.darkolivegreen]
+  | `Darkorange => [%expr CssJs.darkorange]
+  | `Darkorchid => [%expr CssJs.darkorchid]
+  | `Darkred => [%expr CssJs.darkred]
+  | `Darksalmon => [%expr CssJs.darksalmon]
+  | `Darkseagreen => [%expr CssJs.darkseagreen]
+  | `Darkslateblue => [%expr CssJs.darkslateblue]
+  | `Darkslategray => [%expr CssJs.darkslategray]
+  | `Darkslategrey => [%expr CssJs.darkslategrey]
+  | `Darkturquoise => [%expr CssJs.darkturquoise]
+  | `Darkviolet => [%expr CssJs.darkviolet]
+  | `Deeppink => [%expr CssJs.deeppink]
+  | `Deepskyblue => [%expr CssJs.deepskyblue]
+  | `Dimgray => [%expr CssJs.dimgray]
+  | `Dimgrey => [%expr CssJs.dimgrey]
+  | `Dodgerblue => [%expr CssJs.dodgerblue]
+  | `Firebrick => [%expr CssJs.firebrick]
+  | `Floralwhite => [%expr CssJs.floralwhite]
+  | `Forestgreen => [%expr CssJs.forestgreen]
+  | `Fuchsia => [%expr CssJs.fuchsia]
+  | `Gainsboro => [%expr CssJs.gainsboro]
+  | `Ghostwhite => [%expr CssJs.ghostwhite]
+  | `Gold => [%expr CssJs.gold]
+  | `Goldenrod => [%expr CssJs.goldenrod]
+  | `Gray => [%expr CssJs.gray]
+  | `Green => [%expr CssJs.green]
+  | `Greenyellow => [%expr CssJs.greenyellow]
+  | `Grey => [%expr CssJs.grey]
+  | `Honeydew => [%expr CssJs.honeydew]
+  | `Hotpink => [%expr CssJs.hotpink]
+  | `Indianred => [%expr CssJs.indianred]
+  | `Indigo => [%expr CssJs.indigo]
+  | `Ivory => [%expr CssJs.ivory]
+  | `Khaki => [%expr CssJs.khaki]
+  | `Lavender => [%expr CssJs.lavender]
+  | `Lavenderblush => [%expr CssJs.lavenderblush]
+  | `Lawngreen => [%expr CssJs.lawngreen]
+  | `Lemonchiffon => [%expr CssJs.lemonchiffon]
+  | `Lightblue => [%expr CssJs.lightblue]
+  | `Lightcoral => [%expr CssJs.lightcoral]
+  | `Lightcyan => [%expr CssJs.lightcyan]
+  | `Lightgoldenrodyellow => [%expr CssJs.lightgoldenrodyellow]
+  | `Lightgray => [%expr CssJs.lightgray]
+  | `Lightgreen => [%expr CssJs.lightgreen]
+  | `Lightgrey => [%expr CssJs.lightgrey]
+  | `Lightpink => [%expr CssJs.lightpink]
+  | `Lightsalmon => [%expr CssJs.lightsalmon]
+  | `Lightseagreen => [%expr CssJs.lightseagreen]
+  | `Lightskyblue => [%expr CssJs.lightskyblue]
+  | `Lightslategray => [%expr CssJs.lightslategray]
+  | `Lightslategrey => [%expr CssJs.lightslategrey]
+  | `Lightsteelblue => [%expr CssJs.lightsteelblue]
+  | `Lightyellow => [%expr CssJs.lightyellow]
+  | `Lime => [%expr CssJs.lime]
+  | `Limegreen => [%expr CssJs.limegreen]
+  | `Linen => [%expr CssJs.linen]
+  | `Magenta => [%expr CssJs.magenta]
+  | `Maroon => [%expr CssJs.maroon]
+  | `Mediumaquamarine => [%expr CssJs.mediumaquamarine]
+  | `Mediumblue => [%expr CssJs.mediumblue]
+  | `Mediumorchid => [%expr CssJs.mediumorchid]
+  | `Mediumpurple => [%expr CssJs.mediumpurple]
+  | `Mediumseagreen => [%expr CssJs.mediumseagreen]
+  | `Mediumslateblue => [%expr CssJs.mediumslateblue]
+  | `Mediumspringgreen => [%expr CssJs.mediumspringgreen]
+  | `Mediumturquoise => [%expr CssJs.mediumturquoise]
+  | `Mediumvioletred => [%expr CssJs.mediumvioletred]
+  | `Midnightblue => [%expr CssJs.midnightblue]
+  | `Mintcream => [%expr CssJs.mintcream]
+  | `Mistyrose => [%expr CssJs.mistyrose]
+  | `Moccasin => [%expr CssJs.moccasin]
+  | `Navajowhite => [%expr CssJs.navajowhite]
+  | `Navy => [%expr CssJs.navy]
+  | `Oldlace => [%expr CssJs.oldlace]
+  | `Olive => [%expr CssJs.olive]
+  | `Olivedrab => [%expr CssJs.olivedrab]
+  | `Orange => [%expr CssJs.orange]
+  | `Orangered => [%expr CssJs.orangered]
+  | `Orchid => [%expr CssJs.orchid]
+  | `Palegoldenrod => [%expr CssJs.palegoldenrod]
+  | `Palegreen => [%expr CssJs.palegreen]
+  | `Paleturquoise => [%expr CssJs.paleturquoise]
+  | `Palevioletred => [%expr CssJs.palevioletred]
+  | `Papayawhip => [%expr CssJs.papayawhip]
+  | `Peachpuff => [%expr CssJs.peachpuff]
+  | `Peru => [%expr CssJs.peru]
+  | `Pink => [%expr CssJs.pink]
+  | `Plum => [%expr CssJs.plum]
+  | `Powderblue => [%expr CssJs.powderblue]
+  | `Purple => [%expr CssJs.purple]
+  | `Rebeccapurple => [%expr CssJs.rebeccapurple]
+  | `Red => [%expr CssJs.red]
+  | `Rosybrown => [%expr CssJs.rosybrown]
+  | `Royalblue => [%expr CssJs.royalblue]
+  | `Saddlebrown => [%expr CssJs.saddlebrown]
+  | `Salmon => [%expr CssJs.salmon]
+  | `Sandybrown => [%expr CssJs.sandybrown]
+  | `Seagreen => [%expr CssJs.seagreen]
+  | `Seashell => [%expr CssJs.seashell]
+  | `Sienna => [%expr CssJs.sienna]
+  | `Silver => [%expr CssJs.silver]
+  | `Skyblue => [%expr CssJs.skyblue]
+  | `Slateblue => [%expr CssJs.slateblue]
+  | `Slategray => [%expr CssJs.slategray]
+  | `Slategrey => [%expr CssJs.slategrey]
+  | `Snow => [%expr CssJs.snow]
+  | `Springgreen => [%expr CssJs.springgreen]
+  | `Steelblue => [%expr CssJs.steelblue]
+  | `Tan => [%expr CssJs.tan]
+  | `Teal => [%expr CssJs.teal]
+  | `Thistle => [%expr CssJs.thistle]
+  | `Tomato => [%expr CssJs.tomato]
+  | `Turquoise => [%expr CssJs.turquoise]
+  | `Violet => [%expr CssJs.violet]
+  | `Wheat => [%expr CssJs.wheat]
+  | `White => [%expr CssJs.white]
+  | `Whitesmoke => [%expr CssJs.whitesmoke]
+  | `Yellow => [%expr CssJs.yellow]
+  | `Yellowgreen => [%expr CssJs.yellowgreen]
   | _ => raise(Unsupported_feature);
 let render_color_alpha =
   fun
-  | `Number(number) => render_number(number)
-  | `Percentage(percentage) => render_number(percentage /. 100.0);
+  | `Number(number) => [%expr `num([%e render_number(number)])]
+  | `Percentage(percentage) => [%expr `percent([%e render_number(percentage /. 100.0)])];
 
 let render_function_rgb = ast => {
   let to_number = percentage => percentage *. 2.55;
@@ -560,9 +560,7 @@ let render_function_hsl = ((hue, saturation, lightness, alpha)) => {
 
   switch (alpha) {
   | Some(alpha) =>
-    id(
-      [%expr `hsla(([%e hue], [%e saturation], [%e lightness], [%e alpha]))],
-    )
+    id([%expr `hsla(([%e hue], [%e saturation], [%e lightness], [%e alpha]))])
   | None => id([%expr `hsl(([%e hue], [%e saturation], [%e lightness]))])
   };
 };
@@ -585,16 +583,14 @@ let render_color =
   | `Function_device_cmyk(_)
   | `Deprecated_system_color(_) => raise(Unsupported_feature);
 
-let color = apply(property_color, render_color, [%expr Css.color]);
+let color = apply(property_color, render_color, [%expr CssJs.color]);
 let opacity =
   apply(
     property_opacity,
     fun
-    | `Number(number) =>
-      string_of_float(number) |> Const.float |> Exp.constant
-    | `Percentage(number) =>
-      string_of_float(number /. 100.0) |> Const.float |> Exp.constant,
-    [%expr Css.opacity],
+    | `Number(number) => render_number(number)
+    | `Percentage(number) => render_number(number /. 100.0),
+    [%expr CssJs.opacity],
   );
 
 // css-images-4
@@ -652,12 +648,12 @@ let render_position = position => {
   id([%expr `hv(([%e horizontal], [%e vertical]))]);
 };
 
-let object_fit = variants(property_object_fit, [%expr Css.objectFit]);
+let object_fit = variants(property_object_fit, [%expr CssJs.objectFit]);
 let object_position =
   apply(
     property_object_position,
     render_position,
-    [%expr Css.objectPosition],
+    [%expr CssJs.objectPosition],
   );
 let image_resolution = unsupported(property_image_resolution);
 let image_orientation = unsupported(property_image_orientation);
@@ -689,7 +685,7 @@ let render_shadow = shadow => {
   let spread = Option.map(render_length, spread);
   let inset =
     Option.map(
-      () => Exp.construct({txt: Lident("true"), loc: Location.none}, None),
+      () => Helper.Exp.construct({txt: Lident("true"), loc: Location.none}, None),
       inset,
     );
 
@@ -707,66 +703,66 @@ let render_shadow = shadow => {
        );
   let id =
     switch (shadow) {
-    | `Box(_) => id([%expr Css.Shadow.box])
+    | `Box(_) => id([%expr CssJs.Shadow.box])
     };
-  Exp.apply(id, args);
+  Helper.Exp.apply(id, args);
 };
 let background_color =
-  apply(property_background_color, render_color, [%expr Css.backgroundColor]);
+  apply(property_background_color, render_color, [%expr CssJs.backgroundColor]);
 let background_image =
-  unsupported(property_background_image, ~call=[%expr Css.backgroundImage]);
+  unsupported(property_background_image, ~call=[%expr CssJs.backgroundImage]);
 let background_repeat =
-  unsupported(property_background_repeat, ~call=[%expr Css.backgroundRepeat]);
+  unsupported(property_background_repeat, ~call=[%expr CssJs.backgroundRepeat]);
 let background_attachment =
   unsupported(
     property_background_attachment,
-    ~call=[%expr Css.backgroundAttachment],
+    ~call=[%expr CssJs.backgroundAttachment],
   );
 let background_position =
   unsupported(
     property_background_position,
-    ~call=[%expr Css.backgroundPosition],
+    ~call=[%expr CssJs.backgroundPosition],
   );
 let background_clip =
-  unsupported(property_background_clip, ~call=[%expr Css.backgroundClip]);
+  unsupported(property_background_clip, ~call=[%expr CssJs.backgroundClip]);
 let background_origin =
-  unsupported(property_background_origin, ~call=[%expr Css.backgroundOrigin]);
+  unsupported(property_background_origin, ~call=[%expr CssJs.backgroundOrigin]);
 let background_size =
-  unsupported(property_background_size, ~call=[%expr Css.backgroundSize]);
+  unsupported(property_background_size, ~call=[%expr CssJs.backgroundSize]);
 let background =
-  unsupported(property_background, ~call=[%expr Css.background]);
+  unsupported(property_background, ~call=[%expr CssJs.background]);
 let border_top_color =
-  apply(property_border_top_color, render_color, [%expr Css.borderTopColor]);
+  apply(property_border_top_color, render_color, [%expr CssJs.borderTopColor]);
 let border_right_color =
   apply(
     property_border_right_color,
     apply_value(border_top_color.value_of_ast),
-    [%expr Css.borderRightColor],
+    [%expr CssJs.borderRightColor],
   );
 let border_bottom_color =
   apply(
     property_border_bottom_color,
     apply_value(border_top_color.value_of_ast),
-    [%expr Css.borderBottomColor],
+    [%expr CssJs.borderBottomColor],
   );
 let border_left_color =
   apply(
     property_border_left_color,
     apply_value(border_top_color.value_of_ast),
-    [%expr Css.borderLeftColor],
+    [%expr CssJs.borderLeftColor],
   );
 let border_color =
-  unsupported(property_border_color, ~call=[%expr Css.borderColor]);
+  unsupported(property_border_color, ~call=[%expr CssJs.borderColor]);
 let border_top_style =
-  variants(property_border_top_style, [%expr Css.borderTopStyle]);
+  variants(property_border_top_style, [%expr CssJs.borderTopStyle]);
 let border_right_style =
-  variants(property_border_right_style, [%expr Css.borderRightStyle]);
+  variants(property_border_right_style, [%expr CssJs.borderRightStyle]);
 let border_bottom_style =
-  variants(property_border_bottom_style, [%expr Css.borderBottomStyle]);
+  variants(property_border_bottom_style, [%expr CssJs.borderBottomStyle]);
 let border_left_style =
-  variants(property_border_left_style, [%expr Css.borderLeftStyle]);
+  variants(property_border_left_style, [%expr CssJs.borderLeftStyle]);
 let border_style =
-  unsupported(property_border_style, ~call=[%expr Css.borderStyle]);
+  unsupported(property_border_style, ~call=[%expr CssJs.borderStyle]);
 
 let render_line_width =
   fun
@@ -776,65 +772,65 @@ let border_top_width =
   apply(
     property_border_top_width,
     render_line_width,
-    [%expr Css.borderTopWidth],
+    [%expr CssJs.borderTopWidth],
   );
 let border_right_width =
   apply(
     property_border_right_width,
     render_line_width,
-    [%expr Css.borderRightWidth],
+    [%expr CssJs.borderRightWidth],
   );
 let border_bottom_width =
   apply(
     property_border_bottom_width,
     render_line_width,
-    [%expr Css.borderBottomWidth],
+    [%expr CssJs.borderBottomWidth],
   );
 let border_left_width =
   apply(
     property_border_left_width,
     render_line_width,
-    [%expr Css.borderLeftWidth],
+    [%expr CssJs.borderLeftWidth],
   );
 let border_width =
-  unsupported(property_border_width, ~call=[%expr Css.borderWidth]);
+  unsupported(property_border_width, ~call=[%expr CssJs.borderWidth]);
 let border_top =
-  unsupported(property_border_top, ~call=[%expr Css.borderTop]);
+  unsupported(property_border_top, ~call=[%expr CssJs.borderTop]);
 let border_right =
-  unsupported(property_border_right, ~call=[%expr Css.borderRight]);
+  unsupported(property_border_right, ~call=[%expr CssJs.borderRight]);
 let border_bottom =
-  unsupported(property_border_bottom, ~call=[%expr Css.borderBottom]);
+  unsupported(property_border_bottom, ~call=[%expr CssJs.borderBottom]);
 let border_left =
-  unsupported(property_border_left, ~call=[%expr Css.borderLeft]);
-let border = unsupported(property_border, ~call=[%expr Css.border]);
+  unsupported(property_border_left, ~call=[%expr CssJs.borderLeft]);
+let border = unsupported(property_border, ~call=[%expr CssJs.border]);
 let border_top_left_radius =
   apply(
     property_border_top_left_radius,
     fun
     | [lp] => render_length_percentage(lp)
     | _ => raise(Unsupported_feature),
-    [%expr Css.borderTopLeftRadius],
+    [%expr CssJs.borderTopLeftRadius],
   );
 let border_top_right_radius =
   apply(
     property_border_top_right_radius,
     apply_value(border_top_left_radius.value_of_ast),
-    [%expr Css.borderTopRightRadius],
+    [%expr CssJs.borderTopRightRadius],
   );
 let border_bottom_right_radius =
   apply(
     property_border_bottom_right_radius,
     apply_value(border_top_left_radius.value_of_ast),
-    [%expr Css.borderBottomRightRadius],
+    [%expr CssJs.borderBottomRightRadius],
   );
 let border_bottom_left_radius =
   apply(
     property_border_bottom_left_radius,
     apply_value(border_top_left_radius.value_of_ast),
-    [%expr Css.borderBottomLeftRadius],
+    [%expr CssJs.borderBottomLeftRadius],
   );
 let border_radius =
-  unsupported(property_border_radius, ~call=[%expr Css.borderRadius]);
+  unsupported(property_border_radius, ~call=[%expr CssJs.borderRadius]);
 let border_image_source = unsupported(property_border_image_source);
 let border_image_slice = unsupported(property_border_image_slice);
 let border_image_width = unsupported(property_border_image_width);
@@ -851,9 +847,9 @@ let box_shadow =
           shadows
           |> List.map(shadow => `Box(shadow))
           |> List.map(render_shadow);
-        Ast_builder.elist(~loc, shadows);
+        Builder.pexp_array(~loc, shadows);
       },
-    [%expr Css.boxShadows],
+    [%expr CssJs.boxShadows],
   );
 
 // css-overflow-3
@@ -864,9 +860,9 @@ let overflow_x =
     fun
     | `Clip => raise(Unsupported_feature)
     | otherwise => variants_to_expression(otherwise),
-    [%expr Css.overflowX],
+    [%expr CssJs.overflowX],
   );
-let overflow_y = variants(property_overflow_y, [%expr Css.overflowY]);
+let overflow_y = variants(property_overflow_y, [%expr CssJs.overflowY]);
 let overflow =
   emit(
     property_overflow,
@@ -875,7 +871,7 @@ let overflow =
       values |> List.map(apply_value(overflow_x.value_of_ast))
     | _ => raise(Unsupported_feature),
     fun
-    | [all] => [[%expr Css.overflow([%e all])]]
+    | [all] => [[%expr CssJs.overflow([%e all])]]
     | [x, y] =>
       List.concat([
         overflow_x.value_to_expr(x),
@@ -886,23 +882,23 @@ let overflow =
 // let overflow_clip_margin = unsupported(property_overflow_clip_margin);
 let overflow_inline = unsupported(property_overflow_inline);
 let text_overflow =
-  unsupported(property_text_overflow, ~call=[%expr Css.textOverflow]);
+  unsupported(property_text_overflow, ~call=[%expr CssJs.textOverflow]);
 // let block_ellipsis = unsupported(property_block_ellipsis);
 let max_lines = unsupported(property_max_lines);
 // let continue = unsupported(property_continue);
 
 // css-text-3
 let text_transform =
-  variants(property_text_transform, [%expr Css.textTransform]);
-let white_space = variants(property_white_space, [%expr Css.whiteSpace]);
+  variants(property_text_transform, [%expr CssJs.textTransform]);
+let white_space = variants(property_white_space, [%expr CssJs.whiteSpace]);
 let tab_size = unsupported(property_tab_size);
-let word_break = variants(property_word_break, [%expr Css.wordBreak]);
+let word_break = variants(property_word_break, [%expr CssJs.wordBreak]);
 let line_break = unsupported(property_line_break);
 let hyphens = unsupported(property_hyphens);
 let overflow_wrap =
-  variants(property_overflow_wrap, [%expr Css.overflowWrap]);
-let word_wrap = variants(property_word_wrap, [%expr Css.wordWrap]);
-let text_align = variants(property_text_align, [%expr Css.textAlign]);
+  variants(property_overflow_wrap, [%expr CssJs.overflowWrap]);
+let word_wrap = variants(property_word_wrap, [%expr CssJs.wordWrap]);
+let text_align = variants(property_text_align, [%expr CssJs.textAlign]);
 // let text_align_all = unsupported(property_text_align_all);
 let text_align_last = unsupported(property_text_align_last);
 let text_justify = unsupported(property_text_justify);
@@ -912,7 +908,7 @@ let word_spacing =
     fun
     | `Normal => variants_to_expression(`Normal)
     | `Length_percentage(lp) => render_length_percentage(lp),
-    [%expr Css.wordSpacing],
+    [%expr CssJs.wordSpacing],
   );
 let letter_spacing =
   apply(
@@ -920,7 +916,7 @@ let letter_spacing =
     fun
     | `Normal => variants_to_expression(`Normal)
     | `Length_percentage(lp) => render_length_percentage(lp),
-    [%expr Css.letterSpacing],
+    [%expr CssJs.letterSpacing],
   );
 let text_indent =
   apply(
@@ -928,19 +924,19 @@ let text_indent =
     fun
     | (lp, None, None) => render_length_percentage(lp)
     | _ => raise(Unsupported_feature),
-    [%expr Css.textIndent],
+    [%expr CssJs.textIndent],
   );
 let hanging_punctuation = unsupported(property_hanging_punctuation);
 
 // css-fonts-4
 let font_family =
-  unsupported(property_font_family, ~call=[%expr Css.fontFamily]);
+  unsupported(property_font_family, ~call=[%expr CssJs.fontFamily]);
 let font_weight =
-  unsupported(property_font_weight, ~call=[%expr Css.fontWeight]);
+  unsupported(property_font_weight, ~call=[%expr CssJs.fontWeight]);
 let font_stretch = unsupported(property_font_stretch);
 let font_style =
-  unsupported(property_font_style, ~call=[%expr Css.fontStyle]);
-let font_size = unsupported(property_font_size, ~call=[%expr Css.fontSize]);
+  unsupported(property_font_style, ~call=[%expr CssJs.fontStyle]);
+let font_size = unsupported(property_font_size, ~call=[%expr CssJs.fontSize]);
 let font_size_adjust = unsupported(property_font_size_adjust);
 let font = unsupported(property_font);
 // let font_synthesis_weight = unsupported(property_font_synthesis_weight);
@@ -956,7 +952,7 @@ let font_variant_numeric = unsupported(property_font_variant_numeric);
 let font_variant_alternates = unsupported(property_font_variant_alternates);
 let font_variant_east_asian = unsupported(property_font_variant_east_asian);
 let font_variant =
-  unsupported(property_font_variant, ~call=[%expr Css.fontVariant]);
+  unsupported(property_font_variant, ~call=[%expr CssJs.fontVariant]);
 let font_feature_settings = unsupported(property_font_feature_settings);
 let font_optical_sizing = unsupported(property_font_optical_sizing);
 let font_variation_settings = unsupported(property_font_variation_settings);
@@ -967,22 +963,22 @@ let font_variation_settings = unsupported(property_font_variation_settings);
 let text_decoration_line =
   unsupported(
     property_text_decoration_line,
-    ~call=[%expr Css.textDecorationLine],
+    ~call=[%expr CssJs.textDecorationLine],
   );
 let text_decoration_style =
   unsupported(
     property_text_decoration_style,
-    ~call=[%expr Css.textDecorationStyle],
+    ~call=[%expr CssJs.textDecorationStyle],
   );
 let text_decoration_color =
   unsupported(
     property_text_decoration_color,
-    ~call=[%expr Css.textDecorationColor],
+    ~call=[%expr CssJs.textDecorationColor],
   );
 let text_decoration_thickness =
   unsupported(property_text_decoration_thickness);
 let text_decoration =
-  unsupported(property_text_decoration, ~call=[%expr Css.textDecoration]);
+  unsupported(property_text_decoration, ~call=[%expr CssJs.textDecoration]);
 let text_underline_position = unsupported(property_text_underline_position);
 let text_underline_offset = unsupported(property_text_underline_offset);
 let text_decoration_skip = unsupported(property_text_decoration_skip);
@@ -1000,91 +996,91 @@ let text_emphasis = unsupported(property_text_emphasis);
 let text_emphasis_position = unsupported(property_text_emphasis_position);
 // let text_emphasis_skip = unsupported(property_text_emphasis_skip);
 let text_shadow =
-  unsupported(property_text_shadow, ~call=[%expr Css.textShadow]);
+  unsupported(property_text_shadow, ~call=[%expr CssJs.textShadow]);
 
 // css-transforms-2
-let transform = unsupported(property_transform, ~call=[%expr Css.transform]);
+let transform = unsupported(property_transform, ~call=[%expr CssJs.transform]);
 let transform_origin =
-  unsupported(property_transform_origin, ~call=[%expr Css.transformOrigin]);
+  unsupported(property_transform_origin, ~call=[%expr CssJs.transformOrigin]);
 let transform_box =
-  unsupported(property_transform_box, ~call=[%expr Css.transformOrigin]);
-let translate = unsupported(property_translate, ~call=[%expr Css.translate]);
-let rotate = unsupported(property_rotate, ~call=[%expr Css.rotate]);
-let scale = unsupported(property_scale, ~call=[%expr Css.scale]);
+  unsupported(property_transform_box, ~call=[%expr CssJs.transformOrigin]);
+let translate = unsupported(property_translate, ~call=[%expr CssJs.translate]);
+let rotate = unsupported(property_rotate, ~call=[%expr CssJs.rotate]);
+let scale = unsupported(property_scale, ~call=[%expr CssJs.scale]);
 let transform_style =
-  unsupported(property_transform_style, ~call=[%expr Css.transformStyle]);
+  unsupported(property_transform_style, ~call=[%expr CssJs.transformStyle]);
 let perspective = unsupported(property_perspective);
 let perspective_origin =
-  unsupported(property_perspective_origin, ~call=[%expr Css.transformStyle]);
+  unsupported(property_perspective_origin, ~call=[%expr CssJs.transformStyle]);
 let backface_visibility =
   unsupported(
     property_backface_visibility,
-    ~call=[%expr Css.backfaceVisibility],
+    ~call=[%expr CssJs.backfaceVisibility],
   );
 
 // css-transition-1
 let transition_property =
   unsupported(
     property_transition_property,
-    ~call=[%expr Css.transitionProperty],
+    ~call=[%expr CssJs.transitionProperty],
   );
 let transition_duration =
   unsupported(
     property_transition_duration,
-    ~call=[%expr Css.transitionDuration],
+    ~call=[%expr CssJs.transitionDuration],
   );
 let transition_timing_function =
   unsupported(
     property_transition_timing_function,
-    ~call=[%expr Css.transitionTimingFunction],
+    ~call=[%expr CssJs.transitionTimingFunction],
   );
 let transition_delay =
-  unsupported(property_transition_delay, ~call=[%expr Css.transitionDelay]);
+  unsupported(property_transition_delay, ~call=[%expr CssJs.transitionDelay]);
 let transition =
-  unsupported(property_transition, ~call=[%expr Css.transition]);
+  unsupported(property_transition, ~call=[%expr CssJs.transition]);
 
 // css-animation-1
 let animation_name =
-  unsupported(property_animation_name, ~call=[%expr Css.animationName]);
+  unsupported(property_animation_name, ~call=[%expr CssJs.animationName]);
 let animation_duration =
   unsupported(
     property_animation_duration,
-    ~call=[%expr Css.animationDuration],
+    ~call=[%expr CssJs.animationDuration],
   );
 let animation_timing_function =
   unsupported(
     property_animation_timing_function,
-    ~call=[%expr Css.Css.animationTimingFunction],
+    ~call=[%expr CssJs.CssJs.animationTimingFunction],
   );
 let animation_iteration_count =
   unsupported(
     property_animation_iteration_count,
-    ~call=[%expr Css.animationIterationCount],
+    ~call=[%expr CssJs.animationIterationCount],
   );
 let animation_direction =
   unsupported(
     property_animation_direction,
-    ~call=[%expr Css.animationDirection],
+    ~call=[%expr CssJs.animationDirection],
   );
 let animation_play_state =
   unsupported(
     property_animation_play_state,
-    ~call=[%expr Css.animationPlayState],
+    ~call=[%expr CssJs.animationPlayState],
   );
 let animation_delay =
-  unsupported(property_animation_delay, ~call=[%expr Css.animationDelay]);
+  unsupported(property_animation_delay, ~call=[%expr CssJs.animationDelay]);
 let animation_fill_mode =
   unsupported(
     property_animation_fill_mode,
-    ~call=[%expr Css.animationFillMode],
+    ~call=[%expr CssJs.animationFillMode],
   );
-let animation = unsupported(property_animation, ~call=[%expr Css.animation]);
+let animation = unsupported(property_animation, ~call=[%expr CssJs.animation]);
 
 // css-flexbox-1
 // using id() because refmt
 let flex_direction =
-  variants(property_flex_direction, [%expr Css.flexDirection]);
-let flex_wrap = variants(property_flex_wrap, [%expr Css.flexWrap]);
+  variants(property_flex_direction, [%expr CssJs.flexDirection]);
+let flex_wrap = variants(property_flex_wrap, [%expr CssJs.flexWrap]);
 
 // shorthand - https://drafts.csswg.org/css-flexbox-1/#flex-flow-property
 let flex_flow =
@@ -1103,12 +1099,12 @@ let flex_flow =
     },
   );
 // TODO: this is safe?
-let order = apply(property_order, render_integer, [%expr Css.order]);
+let order = apply(property_order, render_integer, [%expr CssJs.order]);
 let flex_grow =
-  apply(property_flex_grow, render_number, [%expr Css.flexGrow]);
+  apply(property_flex_grow, render_number, [%expr CssJs.flexGrow]);
 let flex_shrink =
-  apply(property_flex_shrink, render_number, [%expr Css.flexShrink]);
-// TODO: is safe to just return Css.width when flex_basis?
+  apply(property_flex_shrink, render_number, [%expr CssJs.flexShrink]);
+// TODO: is safe to just return CssJs.width when flex_basis?
 let flex_basis =
   apply(
     property_flex_basis,
@@ -1116,7 +1112,7 @@ let flex_basis =
     | `Content => variants_to_expression(`Content)
     | `Property_width(value_width) =>
       width.value_of_ast(`Value(value_width)),
-    [%expr Css.flexBasis],
+    [%expr CssJs.flexBasis],
   );
 // TODO: this is incomplete
 let flex =
@@ -1124,7 +1120,7 @@ let flex =
     property_flex,
     id,
     fun
-    | `None => [[%expr Css.flex(`none)]]
+    | `None => [[%expr CssJs.flex(`none)]]
     | `Or(grow_shrink, basis) => {
         let grow_shrink =
           switch (grow_shrink) {
@@ -1149,51 +1145,51 @@ let flex =
   );
 // TODO: justify_content, align_items, align_self, align_content are only for flex, missing the css-align-3 at parser
 let justify_content =
-  unsupported(property_justify_content, ~call=[%expr Css.justifyContent]);
+  unsupported(property_justify_content, ~call=[%expr CssJs.justifyContent]);
 let align_items =
-  unsupported(property_align_items, ~call=[%expr Css.alignItems]);
+  unsupported(property_align_items, ~call=[%expr CssJs.alignItems]);
 let align_self =
-  unsupported(property_align_self, ~call=[%expr Css.alignSelf]);
+  unsupported(property_align_self, ~call=[%expr CssJs.alignSelf]);
 let align_content =
-  unsupported(property_align_content, ~call=[%expr Css.alignContent]);
+  unsupported(property_align_content, ~call=[%expr CssJs.alignContent]);
 
 // css-grid-1
 let grid_template_columns =
   unsupported(
     property_grid_template_columns,
-    ~call=[%expr Css.gridTemplateColumns],
+    ~call=[%expr CssJs.gridTemplateColumns],
   );
 let grid_template_rows =
   unsupported(
     property_grid_template_rows,
-    ~call=[%expr Css.gridTemplateRows],
+    ~call=[%expr CssJs.gridTemplateRows],
   );
 let grid_template_areas =
   unsupported(
     property_grid_template_areas,
-    ~call=[%expr Css.gridTemplateAreas],
+    ~call=[%expr CssJs.gridTemplateAreas],
   );
 let grid_template = unsupported(property_grid_template);
 let grid_auto_columns =
-  unsupported(property_grid_auto_columns, ~call=[%expr Css.gridAutoColumns]);
+  unsupported(property_grid_auto_columns, ~call=[%expr CssJs.gridAutoColumns]);
 let grid_auto_rows =
-  unsupported(property_grid_auto_rows, ~call=[%expr Css.gridAutoRows]);
+  unsupported(property_grid_auto_rows, ~call=[%expr CssJs.gridAutoRows]);
 let grid_auto_flow =
-  unsupported(property_grid_auto_flow, ~call=[%expr Css.gridAutoFlow]);
-let grid = unsupported(property_grid, ~call=[%expr Css.grid]);
+  unsupported(property_grid_auto_flow, ~call=[%expr CssJs.gridAutoFlow]);
+let grid = unsupported(property_grid, ~call=[%expr CssJs.grid]);
 let grid_row_start =
-  unsupported(property_grid_row_start, ~call=[%expr Css.gridRowStart]);
+  unsupported(property_grid_row_start, ~call=[%expr CssJs.gridRowStart]);
 let grid_column_start =
-  unsupported(property_grid_column_start, ~call=[%expr Css.gridColumnStart]);
+  unsupported(property_grid_column_start, ~call=[%expr CssJs.gridColumnStart]);
 let grid_row_end =
-  unsupported(property_grid_row_end, ~call=[%expr Css.gridRowEnd]);
+  unsupported(property_grid_row_end, ~call=[%expr CssJs.gridRowEnd]);
 let grid_column_end =
-  unsupported(property_grid_column_end, ~call=[%expr Css.gridColumnEnd]);
-let grid_row = unsupported(property_grid_row, ~call=[%expr Css.gridRow]);
+  unsupported(property_grid_column_end, ~call=[%expr CssJs.gridColumnEnd]);
+let grid_row = unsupported(property_grid_row, ~call=[%expr CssJs.gridRow]);
 let grid_column =
-  unsupported(property_grid_column, ~call=[%expr Css.gridColumn]);
-let grid_area = unsupported(property_grid_area, ~call=[%expr Css.gridArea]);
-let display = unsupported(property_display, ~call=[%expr Css.display]);
+  unsupported(property_grid_column, ~call=[%expr CssJs.gridColumn]);
+let grid_area = unsupported(property_grid_area, ~call=[%expr CssJs.gridArea]);
+let display = unsupported(property_display, ~call=[%expr CssJs.display]);
 
 let found = ({ast_of_string, string_to_expr, _}) => {
   let check_value = string => {
@@ -1425,10 +1421,10 @@ let render_when_unsupported_features = (name, value) => {
     |> String.concat("");
 
   /* Transform property name to camelCase since we bind emotion to the Object API */
-  let name = name |> to_camel_case |> Const.string |> Exp.constant;
-  let value = value |> Const.string |> Exp.constant;
+  let name = name |> to_camel_case |> render_string;
+  let value = value |> render_string;
 
-  id([%expr Css.unsafe([%e name], [%e value])]);
+  [%expr CssJs.unsafe([%e name], [%e value])];
 };
 
 let render_to_expr = (name, value) => {
@@ -1437,6 +1433,7 @@ let render_to_expr = (name, value) => {
     | Some((_, (_, string_to_expr))) => Ok(string_to_expr)
     | None => Error(`Not_found)
     };
+
   string_to_expr(value) |> Result.map_error(str => `Invalid_value(str));
 };
 

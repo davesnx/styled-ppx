@@ -10,8 +10,8 @@
   },
   "dependencies": {
     "@glennsl/bs-jest": "^0.4.10",
-    "bs-css": "^12.2.0",
-    "bs-css-emotion": "^1.2.0",
+    "bs-css": "^14.0.1",
+    "bs-css-emotion": "^2.5.1",
     "bs-platform": "^9.0.2",
     "bs-react-testing-library": "^0.7.0",
     "concurrently": "^5.1.0",

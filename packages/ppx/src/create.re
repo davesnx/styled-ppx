@@ -3,6 +3,15 @@ open Ppxlib;
 module Helper = Ast_helper;
 module Builder = Ppxlib.Ast_builder.Default;
 
+let withLoc = (~loc, txt) => {
+  { loc, txt }
+};
+
+/* fn(. ) */
+let uncurried = (~loc) => {
+  Builder.attribute(~name=withLoc(~loc, "bs"), ~loc, ~payload=PStr([]))
+};
+
 /* (~a, ~b, ~c, etc...) => args */
 let rec fnWithLabeledArgs = (list, args) =>
   switch (list) {
