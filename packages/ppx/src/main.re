@@ -1,6 +1,7 @@
 open Ppxlib;
 
 module Build = Ast_builder.Default;
+module Helper = Ast_helper;
 
 let isOptional = str =>
   switch (str) {
@@ -89,14 +90,15 @@ _): Parsetree.expression => {
   | `Style =>
     let parser = makeParser(Css_parser.declaration_list);
     let ast = parser(string);
-    let declarationListValues = Css_to_emotion.render_declaration_list(ast);
-    Css_to_emotion.render_style_call(declarationListValues);
-  | `ClassName =>
+    Css_to_emotion.render_style_call(
+      Css_to_emotion.render_declaration_list(ast)
+    );
+  | `Rule =>
     let parser = makeParser(Css_parser.declaration);
     let ast = parser(string);
     let declarationListValues = Css_to_emotion.render_declaration(ast, ast.loc);
-    /* TODO: Instead of getting the first element, fail when there's more than one declaration or make a mechanism to flatt all the properties */
-    Css_to_emotion.render_style_call(List.nth(declarationListValues, 0));
+    /* TODO: Instead of getting the first element, fail when there's more than one declaration or make a mechanism to flatten all the properties */
+    List.nth(declarationListValues, 0);
   | `Declarations =>
     let parser = makeParser(Css_parser.declaration_list);
     let ast = parser(string);
@@ -110,6 +112,16 @@ _): Parsetree.expression => {
     let ast = parser(string);
     Css_to_emotion.render_emotion_keyframe(ast);
   };
+};
+
+let getLastSequence = (expr) => {
+  let rec inner = (expr) =>
+    switch (expr.pexp_desc) {
+      | Pexp_sequence(_, sequence) => inner(sequence)
+      | _ => expr
+  };
+
+  inner(expr);
 };
 
 let renderStyledDynamic = (
@@ -174,39 +186,27 @@ let renderStyledDynamic = (
     );
 
   let styles = switch (functionExpr.pexp_desc) {
-  | Pexp_constant(Pconst_string(str, delim, label)) =>
-    renderStringPayload(~loc, ~path, `Declarations, {txt: str, loc: functionExpr.pexp_loc}, delim, label)
-  | _ => [%expr ""]
-    /*
-      This case is when `Fun doesn't contain a string, this is an attempt to support dynamic components with functions, such as:
-      module Component = [%styled.section (~a, ~b) => switch () {}]
-
-      The implementation below is the previous way to handle the nested transformation inside those functions, such as:
-
-      module Component = [%styled.section (~a) => switch (a) {
-        | Black => [%css ""]
-        | White => [%css ""]
-      }];
-
-      Right now we don't support this syntax, the output is [%expr ""], we could raise an error if somebody relied on this (which is pretty unlikely).
-    */
-    /*
-      // this mapper is used inside of [%styled.div expr]
-      let mapper = {
-        ...default_mapper,
-        expr: (mapper, expr) => {
-          let map = expr => mapper.Ast_mapper.expr(mapper, expr);
-          let loc = expr.pexp_loc;
-          switch (expr.pexp_desc) {
-          | Pexp_constant(Pconst_string(payload, delim)) =>
-            renderStringPayload(`Declarations, {txt: payload, loc}, delim)
-          | Pexp_sequence(left, right) =>
-            Ast_builder.eapply(~loc, [%expr (@)], [map(left), map(right)])
-          | _ => default_mapper.expr(mapper, expr)
-          };
-        },
-      };
-     */
+    | Pexp_constant(Pconst_string(str, delim, label)) =>
+      renderStringPayload(
+        ~loc,
+        ~path,
+        `Declarations,
+        {txt: str, loc: functionExpr.pexp_loc},
+        delim,
+        label
+      ) |> Css_to_emotion.render_style_call
+    | Pexp_array(arr) => Build.pexp_array(~loc, List.rev(arr)) |> Css_to_emotion.render_style_call
+    | Pexp_sequence(expr, sequence) => {
+      /* Generate a new sequence where the last expression is
+        wrapped in render_style_call and render the other expressions. */
+      let styles = sequence |> getLastSequence |> Css_to_emotion.render_style_call;
+      Build.pexp_sequence(~loc, expr, styles);
+    }
+    /* TODO: Support more cases, like an apply as a payload or a variable as payload */
+    | _ =>
+      raise(
+        Location.raise_errorf(~loc, "Expected an array, a string or a function")
+      );
   };
 
   Build.pmod_structure(~loc, [
@@ -219,7 +219,7 @@ let renderStyledDynamic = (
       ~loc,
       ~name=styleVariableName,
       ~args=labeledArguments,
-      ~exp=Css_to_emotion.render_style_call(styles),
+      ~expr=styles,
     ),
     Create.component(
       ~loc,
@@ -230,15 +230,33 @@ let renderStyledDynamic = (
   ]);
 };
 
-let renderStyledStatic = (~loc, ~path, ~htmlTag, ~str, ~delim, ~label) => {
-  let css_expr = renderStringPayload(~loc, ~path, `Style, str, Some(delim), label);
+let renderStyledStaticString = (~loc, ~path, ~htmlTag, ~str, ~delim, ~label) => {
   let styledExpr =
     Build.pexp_ident(~loc, {txt: Lident(styleVariableName), loc});
+  let cssExpr = renderStringPayload(~loc, ~path, `Style, str, Some(delim), label);
 
   Build.pmod_structure(~loc, [
     Create.makeMakeProps(~loc, ~customProps=None),
     Create.bindingCreateVariadicElement(~loc),
-    Create.styles(~loc, ~name=styleVariableName, ~exp=css_expr),
+    Create.styles(~loc, ~name=styleVariableName, ~expr=cssExpr),
+    Create.component(~loc, ~htmlTag, ~styledExpr, ~params=[])
+  ]);
+};
+
+let renderStyledStaticList = (~loc, ~path as _, ~htmlTag, list) => {
+  let styledExpr =
+    Build.pexp_ident(~loc, {txt: Lident(styleVariableName), loc});
+  let cssExpr = Css_to_emotion.render_style_call(
+    Build.pexp_array(~loc, List.rev(list))
+  );
+
+  Build.pmod_structure(~loc, [
+    Create.makeMakeProps(~loc, ~customProps=None),
+    Create.bindingCreateVariadicElement(~loc),
+    Create.styles(~loc,
+      ~name=styleVariableName,
+      ~expr=cssExpr
+    ),
     Create.component(~loc, ~htmlTag, ~styledExpr, ~params=[])
   ]);
 };
@@ -261,12 +279,16 @@ let pattern =
         map(
           ~f=
             (f, lbl, def, param, body) =>
-              f(`Fun((lbl, def, param, body))),
+              f(`Function((lbl, def, param, body))),
           pexp_fun(__, __, __, __),
         )
         ||| map(
               ~f=(f, payload, delim, m) => f(`String((payload, delim, m))),
               pexp_constant(pconst_string(__', __, __)),
+            )
+        ||| map(
+              ~f=(f, payload) => f(`Array((payload))),
+              pexp_array(__),
             )
         ,
         nil,
@@ -274,28 +296,6 @@ let pattern =
       ^:: nil
     )
   );
-
-type payloadType = [
-  | `Fun(arg_label, option(expression), pattern, expression)
-  | `String(Ast_helper.with_loc(label), location, option(string))
-];
-
-let renderStyledComponent = (~loc, ~path, htmlTag, payload: payloadType) => {
-  switch (payload) {
-  | `String((str, delim, label)) =>
-    renderStyledStatic(~loc, ~path, ~htmlTag, ~str, ~delim, ~label)
-  | `Fun((label, defaultValue, param, body)) =>
-    renderStyledDynamic(
-      ~loc,
-      ~path,
-      ~htmlTag,
-      ~label,
-      ~defaultValue,
-      ~param,
-      ~body,
-    )
-  };
-};
 
 let extensions = [
   Ppxlib.Extension.declare(
@@ -308,7 +308,7 @@ let extensions = [
     "css",
     Ppxlib.Extension.Context.Expression,
     string_payload,
-    renderStringPayload(`ClassName)
+    renderStringPayload(`Rule)
   ),
   Ppxlib.Extension.declare(
     "styled.global",
@@ -328,13 +328,29 @@ let extensions = [
       "styled." ++ htmlTag,
       Ppxlib.Extension.Context.Module_expr,
       pattern,
-      renderStyledComponent(htmlTag)
+      (~loc, ~path, payload) => {
+        switch (payload) {
+        | `String((str, delim, label)) =>
+          renderStyledStaticString(~loc, ~path, ~htmlTag, ~str, ~delim, ~label)
+        | `Array(arr) =>
+          renderStyledStaticList(~loc, ~path, ~htmlTag, arr)
+        | `Function((label, defaultValue, param, body)) =>
+          renderStyledDynamic(
+            ~loc,
+            ~path,
+            ~htmlTag,
+            ~label,
+            ~defaultValue,
+            ~param,
+            ~body,
+          )
+        };
+      }
     )
   }, Html.allTags),
 ];
 
-let id = a => a;
 /* Instrument is needed to run metaquote before styled-ppx, we rely on this order for the native tests */
-let instrument = Driver.Instrument.make(id, ~position=Before);
+let instrument = Driver.Instrument.make(Fun.id, ~position=Before);
 
 Driver.register_transformation(~extensions, ~instrument, "styled-ppx");

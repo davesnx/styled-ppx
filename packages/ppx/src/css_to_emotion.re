@@ -45,25 +45,6 @@ let number_to_const = number =>
 let string_to_const = (~loc, s) =>
   Exp.constant(~loc, Const.string(~quotation_delimiter="js", s));
 
-let list_to_expr = (end_loc, xs) =>
-  List.fold_left(
-    (e, param) => {
-      let loc =
-        Lex_buffer.make_loc(
-          ~loc_ghost=true,
-          e.pexp_loc.Location.loc_start,
-          end_loc.Location.loc_end,
-        );
-      Exp.construct(
-        ~loc,
-        {txt: Lident("::"), loc},
-        Some(Exp.tuple(~loc, [param, e])),
-      );
-    },
-    Exp.construct(~loc=end_loc, {txt: Lident("[]"), loc: end_loc}, None),
-    xs,
-  );
-
 let source_code_of_loc = loc => {
   let Location.{loc_start, loc_end, _} = loc;
   let Lex_buffer.{buf, pos, _} = Lex_buffer.last_buffer^;
@@ -178,9 +159,6 @@ and render_declarations =
 }
 and render_declaration_list = ((list, loc): Declaration_list.t): Parsetree.expression => {
   Builder.pexp_array(~loc, render_declarations(list));
-}
-and loglist = (f, list) => {
-  List.iter((a) => Printf.printf("%s ", f(a)), list)
 }
 and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
   let (prelude, prelude_loc) = rule.Style_rule.prelude;

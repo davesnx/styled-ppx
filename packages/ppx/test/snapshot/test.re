@@ -1,4 +1,5 @@
-/* This tests ensure that the ppx transform the right extensions, to the right form. There's one case for each of the different methods and doesn't need to type-check.
+/* This tests ensure that the ppx transform the right extensions, to the right form.
+There's one case for each of the different methods and doesn't need to type-check.
 
 If you are looking to add some tests for CSS support,
 check packages/ppx/test/native folder. */
@@ -24,6 +25,11 @@ module MultiLineStrings = [%styled.section {|
 |}];
 
 module SelfClosingElement = [%styled.input ""];
+
+module ArrayStatic = [%styled.section [|
+  [%css "display: flex;"],
+  [%css "justify-content: center;"]
+|]];
 
 let var = "#333333";
 module StringInterpolation = [%styled.div {j|
@@ -60,3 +66,21 @@ let keyframe = [%styled.keyframe {|
   0% { opacity: 0 }
   100% { opacity: 1 }
 |}];
+
+module ArrayDynamicComponent = [%styled.div (~var) =>
+  [|
+    [%css "color: $var;"],
+    [%css "display: block;"]
+  |]
+];
+
+module SequenceDynamicComponent = [%styled.div
+  (~var) => {
+    Js.log("Logging when render");
+
+    [|
+     [%css "color: $var;"],
+     [%css "display: block;"]
+  |]
+  }
+];

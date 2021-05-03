@@ -51,25 +51,30 @@ module Component = [%styled.div {j|
 |j}
 ];
 
+let styles = [%cx "display: flex; justify-content: center; color: blue"];
+
 switch (ReactDOM.querySelector("#app")) {
   | Some(el) =>
     ReactDOM.render(
-      <App onClick=Js.log>
-        <Dynamic a="23"/>
-        <Component>
-          {React.string("test..")}
-        </Component>
-        <App2>
+      <div className=cssRule>
+        <App onClick=Js.log>
+          <Dynamic a="23"/>
           <Component>
-            <p>
-              {React.string("Demo of...")}
-            </p>
+            {React.string("test..")}
           </Component>
-        </App2>
-        <Link href="https://github.com/davesnx/styled-ppx">
-          {React.string("styled-ppx")}
-        </Link>
-      </App>,
-    el)
+          <App2>
+            <Component>
+              <p>
+                {React.string("Demo of...")}
+              </p>
+            </Component>
+          </App2>
+          <Link href="https://github.com/davesnx/styled-ppx">
+            {React.string("styled-ppx")}
+          </Link>
+        </App>
+      </div>,
+      el
+    )
   | None => ()
 };
