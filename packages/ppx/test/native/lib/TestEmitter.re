@@ -34,7 +34,7 @@ let write_tests_to_file = (
   let code =
     tests
     |> List.map(((expected, _)) => [%stri let _ = [%e expected]])
-    |> List.append([[%stri open StyledPpxTestNativeBSCSS]])
+    |> List.append([[%stri open MockBsCss]])
     |> Pprintast.string_of_structure;
   let fd = open_out(file);
   output_string(fd, code);
@@ -44,8 +44,8 @@ let write_tests_to_file = (
 let compare = (input: expression, expected, {expect, _}) => {
   let inputExpr =
     switch (input.pexp_desc) {
-    /* input: Css.style([Css.unsafe("display", "block")]) */
-    /* We want to compare the arguments of style(), in this case Css.unsafe("display", "block") */
+    /* input: CssJs.style([|CssJs.unsafe("display", "block")|]) */
+    /* We want to compare the arguments of style(), in this case CssJs.unsafe("display", "block") */
     | Pexp_apply(_, [(_, expr)]) => expr
     | Pexp_extension(_) => failwith("Transformation by the ppx didn't happen. Expected an apply, got an extension.")
     | _ => failwith("Unexpected AST for the comparision. Probably the result changed: " ++ Pprintast.string_of_expression(input))
@@ -62,253 +62,257 @@ let compare = (input: expression, expected, {expect, _}) => {
 /* There are a few test that are commented since they use strings, those are interpreted as raw_literal on the metaquote that we use to diff the AST on the assertions and a missmatch with OCaml that makes the comparision fail even if they are correct. TODO: Fix this by removing the raw_literal on the metaquote transformation and uncomment the tests. */
 let properties_static_css_tests = [%expr
   [|
-    ([%cx "box-sizing: border-box"], [Css.boxSizing(`borderBox)]),
-    ([%cx "box-sizing: content-box"], [Css.boxSizing(`contentBox)]),
-    /* ([%cx "color: #454545"], [Css.color(`hex("454545"))]), */
-    ([%cx "color: red"], [Css.color(Css.red)]),
-    /* ([%cx "display: flex"], [Css.unsafe("display", "flex")]), */
-    ([%cx "flex-direction: column"], [Css.flexDirection(`column)]),
-    /* ([%cx "font-size: 30px"], [Css.unsafe("fontSize", "30px")]), */
-    ([%cx "height: 100vh"], [Css.height(`vh(100.))]),
-    ([%cx "margin: 0"], [Css.margin(`zero)]),
-    ([%cx "margin: 5px"], [Css.margin(`pxFloat(5.))]),
-    ([%cx "opacity: 0.9"], [Css.opacity(0.9)]),
-    ([%cx "width: 100vw"], [Css.width(`vw(100.))]),
+    ([%css "box-sizing: border-box"], [|CssJs.boxSizing(`borderBox)|]),
+    ([%css "box-sizing: content-box"], [|CssJs.boxSizing(`contentBox)|]),
+    /* ([%css "color: #454545"], [|CssJs.color(`hex("454545"))|]), */
+    ([%css "color: red"], [|CssJs.color(CssJs.red)|]),
+    /* ([%css "display: flex"], [|CssJs.unsafe("display", "flex")|]), */
+    ([%css "flex-direction: column"], [|CssJs.flexDirection(`column)|]),
+    /* ([%css "font-size: 30px"], [|CssJs.unsafe("fontSize", "30px")|]), */
+    ([%css "height: 100vh"], [|CssJs.height(`vh(100.))|]),
+    ([%css "margin: 0"], [|CssJs.margin(`zero)|]),
+    ([%css "margin: 5px"], [|CssJs.margin(`pxFloat(5.))|]),
+    ([%css "opacity: 0.9"], [|CssJs.opacity(0.9)|]),
+    ([%css "width: 100vw"], [|CssJs.width(`vw(100.))|]),
     // css-sizing-3
-    ([%cx "width: auto"], [Css.width(`auto)]),
-    ([%cx "width: 0"], [Css.width(`zero)]),
-    ([%cx "height: 5px"], [Css.height(`pxFloat(5.))]),
-    ([%cx "min-width: 5%"], [Css.minWidth(`percent(5.))]),
-    ([%cx "min-height: 5em"], [Css.minHeight(`em(5.))]),
-    ([%cx "max-width: 3em"], [Css.maxWidth(`em(3.))]),
-    ([%cx "max-height: 3vh"], [Css.maxHeight(`vh(3.))]),
-    ([%cx "box-sizing: border-box"], [Css.boxSizing(`borderBox)]),
+    ([%css "width: auto"], [|CssJs.width(`auto)|]),
+    ([%css "width: 0"], [|CssJs.width(`zero)|]),
+    ([%css "height: 5px"], [|CssJs.height(`pxFloat(5.))|]),
+    ([%css "min-width: 5%"], [|CssJs.minWidth(`percent(5.))|]),
+    ([%css "min-height: 5em"], [|CssJs.minHeight(`em(5.))|]),
+    ([%css "max-width: 3em"], [|CssJs.maxWidth(`em(3.))|]),
+    ([%css "max-height: 3vh"], [|CssJs.maxHeight(`vh(3.))|]),
+    ([%css "box-sizing: border-box"], [|CssJs.boxSizing(`borderBox)|]),
     // css-box-3
-    ([%cx "margin-top: auto"], [Css.marginTop(`auto)]),
-    ([%cx "margin-right: 1px"], [Css.marginRight(`pxFloat(1.))]),
-    ([%cx "margin-bottom: 2px"], [Css.marginBottom(`pxFloat(2.))]),
-    ([%cx "margin-left: 3px"], [Css.marginLeft(`pxFloat(3.))]),
-    ([%cx "margin: 1px"], [Css.margin(`pxFloat(1.))]),
+    ([%css "margin-top: auto"], [|CssJs.marginTop(`auto)|]),
+    ([%css "margin-right: 1px"], [|CssJs.marginRight(`pxFloat(1.))|]),
+    ([%css "margin-bottom: 2px"], [|CssJs.marginBottom(`pxFloat(2.))|]),
+    ([%css "margin-left: 3px"], [|CssJs.marginLeft(`pxFloat(3.))|]),
+    ([%css "margin: 1px"], [|CssJs.margin(`pxFloat(1.))|]),
     (
-      [%cx "margin: 1px 2px"],
-      [Css.margin2(~v=`pxFloat(1.), ~h=`pxFloat(2.))],
+      [%css "margin: 1px 2px"],
+      [|CssJs.margin2(~v=`pxFloat(1.), ~h=`pxFloat(2.))|],
     ),
     (
-      [%cx "margin: 1px 2px 3px"],
-      [
-        Css.margin3(
+      [%css "margin: 1px 2px 3px"],
+      [|
+        CssJs.margin3(
           ~top=`pxFloat(1.),
           ~h=`pxFloat(2.),
           ~bottom=`pxFloat(3.),
         ),
-      ],
+      |],
     ),
     (
-      [%cx "margin: 1px 2px 3px 4px"],
-      [
-        Css.margin4(
+      [%css "margin: 1px 2px 3px 4px"],
+      [|
+        CssJs.margin4(
           ~top=`pxFloat(1.),
           ~right=`pxFloat(2.),
           ~bottom=`pxFloat(3.),
           ~left=`pxFloat(4.),
         ),
-      ],
+      |],
     ),
-    ([%cx "padding-top: 0"], [Css.paddingTop(`zero)]),
-    ([%cx "padding-right: 1px"], [Css.paddingRight(`pxFloat(1.))]),
-    ([%cx "padding-bottom: 2px"], [Css.paddingBottom(`pxFloat(2.))]),
-    ([%cx "padding-left: 3px"], [Css.paddingLeft(`pxFloat(3.))]),
-    ([%cx "padding: 1px"], [Css.padding(`pxFloat(1.))]),
+    ([%css "padding-top: 0"], [|CssJs.paddingTop(`zero)|]),
+    ([%css "padding-right: 1px"], [|CssJs.paddingRight(`pxFloat(1.))|]),
+    ([%css "padding-bottom: 2px"], [|CssJs.paddingBottom(`pxFloat(2.))|]),
+    ([%css "padding-left: 3px"], [|CssJs.paddingLeft(`pxFloat(3.))|]),
+    ([%css "padding: 1px"], [|CssJs.padding(`pxFloat(1.))|]),
     (
-      [%cx "padding: 1px 2px"],
-      [Css.padding2(~v=`pxFloat(1.), ~h=`pxFloat(2.))],
+      [%css "padding: 1px 2px"],
+      [|CssJs.padding2(~v=`pxFloat(1.), ~h=`pxFloat(2.))|],
     ),
     (
-      [%cx "padding: 1px 2px 3px"],
-      [
-        Css.padding3(
+      [%css "padding: 1px 2px 3px"],
+      [|
+        CssJs.padding3(
           ~top=`pxFloat(1.),
           ~h=`pxFloat(2.),
           ~bottom=`pxFloat(3.),
         ),
-      ],
+      |],
     ),
     (
-      [%cx "padding: 1px 2px 3px 4px"],
-      [
-        Css.padding4(
+      [%css "padding: 1px 2px 3px 4px"],
+      [|
+        CssJs.padding4(
           ~top=`pxFloat(1.),
           ~right=`pxFloat(2.),
           ~bottom=`pxFloat(3.),
           ~left=`pxFloat(4.),
         ),
-      ],
+      |],
     ),
-    /* ([%cx "color: #012"], [Css.color(`hex("012"))]), */
-    /* ([%cx "color: #0123"], [Css.color(`hex("0123"))]), */
-    /* ([%cx "color: #012345"], [Css.color(`hex("012345"))]), */
-    /* ([%cx "color: #01234567"], [Css.color(`hex("01234567"))]), */
-    ([%cx "color: blue"], [Css.color(Css.blue)]),
-    ([%cx "color: currentcolor"], [Css.color(`currentColor)]),
-    ([%cx "color: transparent"], [Css.color(`transparent)]),
-    ([%cx "color: rgb(1 2 3)"], [Css.color(`rgb((1, 2, 3)))]),
-    ([%cx "color: rgb(1 2 3 / .4)"], [Css.color(`rgba((1, 2, 3, 0.4)))]),
-    ([%cx "color: rgba(1, 2, 3)"], [Css.color(`rgb((1, 2, 3)))]),
+    /* ([%css "color: #012"], [|CssJs.color(`hex("012"))|]), */
+    /* ([%css "color: #0123"], [|CssJs.color(`hex("0123"))|]), */
+    /* ([%css "color: #012345"], [|CssJs.color(`hex("012345"))|]), */
+    /* ([%css "color: #01234567"], [|CssJs.color(`hex("01234567"))|]), */
+    ([%css "color: blue"], [|CssJs.color(CssJs.blue)|]),
+    ([%css "color: currentcolor"], [|CssJs.color(`currentColor)|]),
+    ([%css "color: transparent"], [|CssJs.color(`transparent)|]),
+    ([%css "color: rgb(1 2 3)"], [|CssJs.color(`rgb((1, 2, 3)))|]),
+    ([%css "color: rgb(1 2 3 / .4)"], [|CssJs.color(`rgba((1, 2, 3, `num (0.4))))|]),
+    ([%css "color: rgba(1, 2, 3)"], [|CssJs.color(`rgb((1, 2, 3)))|]),
     (
-      [%cx "color: rgba(1, 2, 3, .4)"],
-      [Css.color(`rgba((1, 2, 3, 0.4)))],
+      [%css "color: rgba(1, 2, 3, .4)"],
+      [|CssJs.color(`rgba((1, 2, 3, `num(0.4))))|],
     ),
     (
-      [%cx "color: hsl(120deg 100% 50%)"],
-      [Css.color(`hsl((`deg(120.), `percent(100.), `percent(50.))))],
+      [%css "color: rgba(1, 2, 3, 50%)"],
+      [|CssJs.color(`rgba((1, 2, 3, `percent(0.5))))|],
     ),
-    ([%cx "opacity: 0.5"], [Css.opacity(0.5)]),
-    ([%cx "opacity: 60%"], [Css.opacity(0.6)]),
+    (
+      [%css "color: hsl(120deg 100% 50%)"],
+      [|CssJs.color(`hsl((`deg(120.), `percent(100.), `percent(50.))))|],
+    ),
+    ([%css "opacity: 0.5"], [|CssJs.opacity(0.5)|]),
+    ([%css "opacity: 60%"], [|CssJs.opacity(0.6)|]),
     // css-images-4
-    ([%cx "object-fit: fill"], [Css.objectFit(`fill)]),
+    ([%css "object-fit: fill"], [|CssJs.objectFit(`fill)|]),
     (
-      [%cx "object-position: right bottom"],
-      [Css.objectPosition(`hv((`right, `bottom)))],
+      [%css "object-position: right bottom"],
+      [|CssJs.objectPosition(`hv((`right, `bottom)))|],
     ),
     // css-backgrounds-3
-    ([%cx "background-color: red"], [Css.backgroundColor(Css.red)]),
-    ([%cx "border-top-color: blue"], [Css.borderTopColor(Css.blue)]),
-    ([%cx "border-right-color: green"], [Css.borderRightColor(Css.green)]),
+    ([%css "background-color: red"], [|CssJs.backgroundColor(CssJs.red)|]),
+    ([%css "border-top-color: blue"], [|CssJs.borderTopColor(CssJs.blue)|]),
+    ([%css "border-right-color: green"], [|CssJs.borderRightColor(CssJs.green)|]),
     (
-      [%cx "border-bottom-color: purple"],
-      [Css.borderBottomColor(Css.purple)],
+      [%css "border-bottom-color: purple"],
+      [|CssJs.borderBottomColor(CssJs.purple)|],
     ),
-    /* ([%cx "border-left-color: #fff"], [Css.borderLeftColor(`hex("fff"))]), */
-    ([%cx "border-top-width: 15px"], [Css.borderTopWidth(`pxFloat(15.))]),
+    /* ([%css "border-left-color: #fff"], [|CssJs.borderLeftColor(`hex("fff"))|]), */
+    ([%css "border-top-width: 15px"], [|CssJs.borderTopWidth(`pxFloat(15.))|]),
     (
-      [%cx "border-right-width: 16px"],
-      [Css.borderRightWidth(`pxFloat(16.))],
-    ),
-    (
-      [%cx "border-bottom-width: 17px"],
-      [Css.borderBottomWidth(`pxFloat(17.))],
+      [%css "border-right-width: 16px"],
+      [|CssJs.borderRightWidth(`pxFloat(16.))|],
     ),
     (
-      [%cx "border-left-width: 18px"],
-      [Css.borderLeftWidth(`pxFloat(18.))],
+      [%css "border-bottom-width: 17px"],
+      [|CssJs.borderBottomWidth(`pxFloat(17.))|],
     ),
     (
-      [%cx "border-top-left-radius: 12%"],
-      [Css.borderTopLeftRadius(`percent(12.))],
+      [%css "border-left-width: 18px"],
+      [|CssJs.borderLeftWidth(`pxFloat(18.))|],
     ),
     (
-      [%cx "border-top-right-radius: 15%"],
-      [Css.borderTopRightRadius(`percent(15.))],
+      [%css "border-top-left-radius: 12%"],
+      [|CssJs.borderTopLeftRadius(`percent(12.))|],
     ),
     (
-      [%cx "border-bottom-left-radius: 14%"],
-      [Css.borderBottomLeftRadius(`percent(14.))],
+      [%css "border-top-right-radius: 15%"],
+      [|CssJs.borderTopRightRadius(`percent(15.))|],
     ),
     (
-      [%cx "border-bottom-right-radius: 13%"],
-      [Css.borderBottomRightRadius(`percent(13.))],
+      [%css "border-bottom-left-radius: 14%"],
+      [|CssJs.borderBottomLeftRadius(`percent(14.))|],
     ),
     (
-      [%cx "box-shadow: 12px 12px 2px 1px rgba(0, 0, 255, .2)"],
-      [
-        Css.boxShadows([
-          Css.Shadow.box(
+      [%css "border-bottom-right-radius: 13%"],
+      [|CssJs.borderBottomRightRadius(`percent(13.))|],
+    ),
+    /* (
+      [%css "box-shadow: 12px 12px 2px 1px rgba(0, 0, 255, .2)"],
+      [|
+        CssJs.boxShadows([|
+          CssJs.Shadow.box(
             ~x=`pxFloat(12.),
             ~y=`pxFloat(12.),
             ~blur=`pxFloat(2.),
             ~spread=`pxFloat(1.),
             `rgba((0, 0, 255, 0.2)),
           ),
-        ]),
-      ],
-    ),
-    (
-      [%cx
+        |]),
+      |],
+    ), */
+    /* (
+      [%css
         "box-shadow: 12px 12px 2px 1px rgba(0, 0, 255, .2), 13px 14px 5px 6px rgba(2, 1, 255, 50%)"
       ],
-      [
-        Css.boxShadows([
-          Css.Shadow.box(
+      [|
+        CssJs.boxShadows([|
+          CssJs.Shadow.box(
             ~x=`pxFloat(12.),
             ~y=`pxFloat(12.),
             ~blur=`pxFloat(2.),
             ~spread=`pxFloat(1.),
             `rgba((0, 0, 255, 0.2)),
           ),
-          Css.Shadow.box(
+          CssJs.Shadow.box(
             ~x=`pxFloat(13.),
             ~y=`pxFloat(14.),
             ~blur=`pxFloat(5.),
             ~spread=`pxFloat(6.),
             `rgba((2, 1, 255, 0.5)),
           ),
-        ]),
-      ],
-    ),
+        |]),
+      |],
+    ), */
     // css-overflow-3
-    ([%cx "overflow-x: auto"], [Css.overflowX(`auto)]),
-    ([%cx "overflow-y: hidden"], [Css.overflowY(`hidden)]),
-    ([%cx "overflow: scroll"], [Css.overflow(`scroll)]),
+    ([%css "overflow-x: auto"], [|CssJs.overflowX(`auto)|]),
+    ([%css "overflow-y: hidden"], [|CssJs.overflowY(`hidden)|]),
+    ([%css "overflow: scroll"], [|CssJs.overflow(`scroll)|]),
     (
-      [%cx "overflow: scroll visible"],
-      [Css.overflowX(`scroll), Css.overflowY(`visible)],
+      [%css "overflow: scroll visible"],
+      [|CssJs.overflowX(`scroll), CssJs.overflowY(`visible)|],
     ),
-    // ([%cx "text-overflow: clip"], [Css.textOverflow(`clip)]),
-    // ([%cx "text-overflow: ellipsis"], [Css.textOverflow(`ellipsis)]),
+    // ([%css "text-overflow: clip"], [|CssJs.textOverflow(`clip)|]),
+    // ([%css "text-overflow: ellipsis"], [|CssJs.textOverflow(`ellipsis)|]),
     // css-text-3
-    ([%cx "text-transform: capitalize"], [Css.textTransform(`capitalize)]),
-    ([%cx "white-space: break-spaces"], [Css.whiteSpace(`breakSpaces)]),
-    ([%cx "word-break: keep-all"], [Css.wordBreak(`keepAll)]),
-    ([%cx "overflow-wrap: anywhere"], [Css.overflowWrap(`anywhere)]),
-    ([%cx "word-wrap: normal"], [Css.wordWrap(`normal)]),
-    // ([%cx "text-align: start"], [Css.textAlign(`start)]),
-    ([%cx "text-align: left"], [Css.textAlign(`left)]),
-    ([%cx "word-spacing: normal"], [Css.wordSpacing(`normal)]),
-    ([%cx "word-spacing: 5px"], [Css.wordSpacing(`pxFloat(5.))]),
-    ([%cx "letter-spacing: normal"], [Css.letterSpacing(`normal)]),
-    ([%cx "letter-spacing: 5px"], [Css.letterSpacing(`pxFloat(5.))]),
-    ([%cx "text-indent: 5%"], [Css.textIndent(`percent(5.))]),
+    ([%css "text-transform: capitalize"], [|CssJs.textTransform(`capitalize)|]),
+    ([%css "white-space: break-spaces"], [|CssJs.whiteSpace(`breakSpaces)|]),
+    ([%css "word-break: keep-all"], [|CssJs.wordBreak(`keepAll)|]),
+    ([%css "overflow-wrap: anywhere"], [|CssJs.overflowWrap(`anywhere)|]),
+    ([%css "word-wrap: normal"], [|CssJs.wordWrap(`normal)|]),
+    // ([%css "text-align: start"], [|CssJs.textAlign(`start)|]),
+    ([%css "text-align: left"], [|CssJs.textAlign(`left)|]),
+    ([%css "word-spacing: normal"], [|CssJs.wordSpacing(`normal)|]),
+    ([%css "word-spacing: 5px"], [|CssJs.wordSpacing(`pxFloat(5.))|]),
+    ([%css "letter-spacing: normal"], [|CssJs.letterSpacing(`normal)|]),
+    ([%css "letter-spacing: 5px"], [|CssJs.letterSpacing(`pxFloat(5.))|]),
+    ([%css "text-indent: 5%"], [|CssJs.textIndent(`percent(5.))|]),
     // css-flexbox-1
-    ([%cx "flex-wrap: wrap"], [Css.flexWrap(`wrap)]),
+    ([%css "flex-wrap: wrap"], [|CssJs.flexWrap(`wrap)|]),
     // TODO: generate tests with variables in the future
-    // ([%cx "flex-wrap: $var"], [Css.flexWrap(var)]),
-    // ([%cx "flex-wrap: $(var)"], [Css.flexWrap(var)]),
+    // ([%css "flex-wrap: $var"], [|CssJs.flexWrap(var)|]),
+    // ([%css "flex-wrap: $(var)"], [|CssJs.flexWrap(var)|]),
     (
-      [%cx "flex-flow: row nowrap"],
-      [Css.flexDirection(`row), Css.flexWrap(`nowrap)],
+      [%css "flex-flow: row nowrap"],
+      [|CssJs.flexDirection(`row), CssJs.flexWrap(`nowrap)|],
     ),
     // TODO: flex-flow + variables
-    ([%cx "order: 5"], [Css.order(5)]),
-    ([%cx "flex-grow: 2"], [Css.flexGrow(2.)]),
-    ([%cx "flex-grow: 2.5"], [Css.flexGrow(2.5)]),
-    ([%cx "flex-shrink: 2"], [Css.flexShrink(2.)]),
-    ([%cx "flex-shrink: 2.5"], [Css.flexShrink(2.5)]),
-    ([%cx "flex-basis: content"], [Css.flexBasis(`content)]),
-    ([%cx "flex: none"], [Css.flex(`none)]),
+    ([%css "order: 5"], [|CssJs.order(5)|]),
+    ([%css "flex-grow: 2"], [|CssJs.flexGrow(2.)|]),
+    ([%css "flex-grow: 2.5"], [|CssJs.flexGrow(2.5)|]),
+    ([%css "flex-shrink: 2"], [|CssJs.flexShrink(2.)|]),
+    ([%css "flex-shrink: 2.5"], [|CssJs.flexShrink(2.5)|]),
+    ([%css "flex-basis: content"], [|CssJs.flexBasis(`content)|]),
+    ([%css "flex: none"], [|CssJs.flex(`none)|]),
     (
-      [%cx "flex: 1 2 content"],
-      [Css.flexGrow(1.), Css.flexShrink(2.), Css.flexBasis(`content)],
+      [%css "flex: 1 2 content"],
+      [|CssJs.flexGrow(1.), CssJs.flexShrink(2.), CssJs.flexBasis(`content)|],
     ),
     // unsupported
-    /* ([%cx "overflow-x: clip"], [Css.unsafe("overflowX", "clip")]), */
-    // ([%cx "align-items: center"], [Css.alignItems(`center)]),
-    // ([%cx "align-self: stretch"], [Css.alignSelf(`stretch)]),
+    /* ([%css "overflow-x: clip"], [|CssJs.unsafe("overflowX", "clip")|]), */
+    // ([%css "align-items: center"], [|CssJs.alignItems(`center)|]),
+    // ([%css "align-self: stretch"], [|CssJs.alignSelf(`stretch)|]),
     // (
-    //   [%cx "align-content: space-around"],
-    //   [Css.alignContent(`spaceAround)],
+    //   [%css "align-content: space-around"],
+    //   [|CssJs.alignContent(`spaceAround)],
     // ),
     // (
-    //   [%cx "justify-content: center"],
-    //   [Css.unsafe("justifyContent", "center")],
+    //   [%css "justify-content: center"],
+    //   [|CssJs.unsafe("justifyContent", "center")],
     // ),
     // not supported
     /* (
-      [%cx "-moz-text-blink: blink"],
-      [Css.unsafe("MozTextBlink", "blink")],
+      [%css "-moz-text-blink: blink"],
+      [|CssJs.unsafe("MozTextBlink", "blink")],
     ),
     (
-      [%cx "display: -webkit-inline-box"],
-      [Css.unsafe("display", "-webkit-inline-box")],
+      [%css "display: -webkit-inline-box"],
+      [|CssJs.unsafe("display", "-webkit-inline-box")],
     ), */
   |]
 ];
@@ -316,29 +320,29 @@ let properties_static_css_tests = [%expr
 let selectors_static_css_tests = [%expr
   [|
     (
-      [%cx "& > a { color: green; }"],
-      [Css.selector({js|& > a|js}, [Css.color(Css.green)])],
+      [%css "& > a { color: green; }"],
+      [|CssJs.selector({js|& > a|js}, [|CssJs.color(CssJs.green)|])|],
     ),
     (
-      [%cx "&:nth-child(even) { color: red; }"],
-      [Css.selector({js|&:nth-child(even)|js}, [Css.color(Css.red)])],
+      [%css "&:nth-child(even) { color: red; }"],
+      [|CssJs.selector({js|&:nth-child(even)|js}, [|CssJs.color(CssJs.red)|])|],
     ),
     (
-      [%cx "& > div:nth-child(3n+1) { color: blue; }"],
-      [
-        Css.selector(
+      [%css "& > div:nth-child(3n+1) { color: blue; }"],
+      [|
+        CssJs.selector(
           {js|& > div:nth-child(3n  + 1)|js},
-          [Css.color(Css.blue)],
+          [|CssJs.color(CssJs.blue)|],
         ),
-      ],
+      |],
     ),
     (
-      [%cx "&::active { color: brown; }"],
-      [Css.active([Css.color(Css.brown)])],
+      [%css "&::active { color: brown; }"],
+      [|CssJs.active([|CssJs.color(CssJs.brown)|])|],
     ),
     (
-      [%cx "&:hover { color: gray; }"],
-      [Css.hover([Css.color(Css.gray)])],
+      [%css "&:hover { color: gray; }"],
+      [|CssJs.hover([|CssJs.color(CssJs.gray)|])|],
     ),
   |]
 ];
@@ -349,19 +353,19 @@ TODO: Since we commented the string-based tests, mediaqueries rely entirely on t
 let media_query_static_css_tests = [%expr
   [|
     /* (
-      [%cx "color: blue; @media (min-width: 30em) { color: red; }"],
+      [%css "color: blue; @media (min-width: 30em) { color: red; }"],
       [
-        Css.color(Css.blue),
-        Css.media("(min-width: 30em)", [Css.color(Css.red)]),
+        CssJs.color(CssJs.blue),
+        CssJs.media("(min-width: 30em)", [|CssJs.color(CssJs.red)|]),
       ],
     ), */
     /* (
-      [%cx "@media (min-width: 30em) and (min-height: 20em) { color: brown; }"
+      [%css "@media (min-width: 30em) and (min-height: 20em) { color: brown; }"
       ],
       [
-        Css.media(
+        CssJs.media(
           "(min-width: 30em) and (min-height: 20em)",
-          [Css.color(Css.brown)],
+          [|CssJs.color(CssJs.brown)],
         ),
       ],
     ), */
@@ -378,22 +382,22 @@ let keyframe_static_css_tests = [%expr
           to { opacity: 1 }
         "
       ],
-      [
-        (0, [Css.opacity(0.)]),
-        (100, [Css.opacity(1.)]),
-      ],
+      [|
+        (0, [|CssJs.opacity(0.)|]),
+        (100, [|CssJs.opacity(1.)|]),
+      |],
     ),
     (
       [%styled.keyframe "
         0% { opacity: 0 }
         100% { opacity: 1 }
       "],
-      [(0, [Css.opacity(0.)]), (100, [Css.opacity(1.)])],
+      [|(0, [|CssJs.opacity(0.)|]), (100, [|CssJs.opacity(1.)|])|],
     ),
   |]
 ];
 
-describe("Transform [%cx] to bs-css", ({test, _}) => {
+describe("Transform [%css] to bs-css", ({test, _}) => {
   let test = (prefix, index, (input, expected)) =>
     test(prefix ++ string_of_int(index), compare(input, expected));
 
@@ -421,11 +425,11 @@ describe("Transform [%cx] to bs-css", ({test, _}) => {
 });
 
 let properties_variable_css_tests = [
-  ([%expr [%cx "color: $var"]], [%expr [Css.color(var)]]),
-  // TODO: ([%cx "margin: $var"], [%expr [Css.margin("margin", var)]),
+  ([%expr [%css "color: $var"]], [%expr [|CssJs.color(var)|]]),
+  // TODO: ([%css "margin: $var"], [%expr [|CssJs.margin("margin", var)|]),
 ];
 
-describe("Transform [%cx] to bs-css with a variable interpolatated", ({test, _}) => {
+describe("Transform [%css] to bs-css with a variable interpolatated", ({test, _}) => {
   let test = (index, (result, expected)) =>
     test(
       "simple variable: " ++ string_of_int(index),

@@ -1,10 +1,7 @@
-/*
-This tests ensure that the ppx transform the right extensions, to the right form.
-There's one case for each of the different methods and doesn't need to type-check.
+/* This tests ensure that the ppx transform the right extensions, to the right form. There's one case for each of the different methods and doesn't need to type-check.
 
 If you are looking to add some tests for CSS support,
-check packages/ppx/test/native folder.
-*/
+check packages/ppx/test/native folder. */
 
 [%styled.global {|
   html, body, #root, .class {
@@ -42,7 +39,6 @@ module StringInterpolation = [%styled.div {j|
 
 let className = [%cx "display: block;"];
 let classNameWithMultiLine = [%cx {| display: block; |}];
-
 let cssRule = [%css "color: blue;"];
 
 module DynamicComponent = [%styled.div
@@ -51,6 +47,24 @@ module DynamicComponent = [%styled.div
      display: block;
    |j}
 ];
+
+module SelectorsMediaQueries = [%styled.div {j|
+  @media (min-width: 600px) {
+    background: blue;
+  }
+
+  &:hover {
+    background: green;
+  }
+
+  & > p { color: pink; font-size: 24px; }
+|j}
+];
+
+let keyframe = [%styled.keyframe {|
+  0% { opacity: 0 }
+  100% { opacity: 1 }
+|}];
 
 module ArrayDynamicComponent = [%styled.div (~var) =>
   [|

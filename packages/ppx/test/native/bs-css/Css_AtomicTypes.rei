@@ -10,6 +10,15 @@ module Cascading: {
   let toString: t => string;
 };
 
+module Var: {
+  type t = [ | `var(string) | `varDefault(string, string)];
+
+  let var: string => [> t];
+  let varDefault: (string, string) => [> t];
+
+  let toString: t => string;
+};
+
 module Time: {
   /**
    The <time> CSS data type represents a time value expressed in seconds or milliseconds.
@@ -228,7 +237,13 @@ module GridAutoFlow: {
   let toString: t => string;
 };
 
-module GridColumnGap: {
+module RowGap: {
+  type t = [ | `normal];
+
+  let toString: t => string;
+};
+
+module ColumnGap: {
   type t = [ | `normal];
 
   let toString: t => string;
@@ -510,13 +525,13 @@ module Cursor: {
 module Color: {
   type t = [
     | `rgb(int, int, int)
-    | `rgba(int, int, int, float)
-    | `hsl(Angle.t, [ | `percent(float)], [ | `percent(float)])
+    | `rgba(int, int, int, [ | `num(float) | Percentage.t])
+    | `hsl(Angle.t, Percentage.t, Percentage.t)
     | `hsla(
         Angle.t,
-        [ | `percent(float)],
-        [ | `percent(float)],
-        [ | `num(float) | `percent(float)],
+        Percentage.t,
+        Percentage.t,
+        [ | `num(float) | Percentage.t],
       )
     | `hex(string)
     | `transparent
@@ -524,10 +539,11 @@ module Color: {
   ];
 
   let rgb: (int, int, int) => [> t];
-  let rgba: (int, int, int, float) => [> t];
-  let hsl: (Angle.t, float, float) => [> t];
+  let rgba: (int, int, int, [ | `num(float) | Percentage.t]) => [> t];
+  let hsl: (Angle.t, Percentage.t, Percentage.t) => [> t];
   let hsla:
-    (Angle.t, float, float, [ | `num(float) | `percent(float)]) => [> t];
+    (Angle.t, Percentage.t, Percentage.t, [ | `num(float) | Percentage.t]) =>
+    [> t];
   let hex: string => [> t];
   let transparent: [> t];
   let currentColor: [> t];
@@ -684,10 +700,22 @@ module PositionalAlignment: {
 };
 
 /**
- https://developer.mozilla.org/docs/Web/CSS/justify-self
+ https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Alignment#Overflow_alignment
+ */
+module OverflowAlignment: {
+  type t = [
+    | `safe(PositionalAlignment.t)
+    | `unsafe(PositionalAlignment.t)
+  ];
+
+  let toString: t => string;
+};
+
+/**
+ https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Alignment#Baseline_alignment
  */
 module BaselineAlignment: {
-  type t = [ | `baseline];
+  type t = [ | `baseline | `firstBaseline | `lastBaseline ];
 
   let toString: t => string;
 };
@@ -706,6 +734,15 @@ module NormalAlignment: {
  */
 module DistributedAlignment: {
   type t = [ | `spaceBetween | `spaceAround | `spaceEvenly | `stretch];
+
+  let toString: t => string;
+};
+
+/**
+ https://drafts.csswg.org/css-align-3/#propdef-justify-items
+ */
+module LegacyAlignment: {
+  type t = [ | `legacy | `legacyRight | `legacyLeft | `legacyCenter];
 
   let toString: t => string;
 };
@@ -1052,24 +1089,24 @@ module OverflowWrap: {
  https://developer.mozilla.org/docs/Web/CSS/gradient
  */
 module Gradient: {
-  type t = [
-    | `linearGradient(Angle.t, list((Length.t, Color.t)))
-    | `repeatingLinearGradient(Angle.t, list((Length.t, Color.t)))
-    | `radialGradient(list((Length.t, Color.t)))
-    | `repeatingRadialGradient(list((Length.t, Color.t)))
+  type t('colorOrVar) = [
+    | `linearGradient(Angle.t, list((Length.t, [< Color.t | Var.t] as 'colorOrVar)))
+    | `repeatingLinearGradient(Angle.t, list((Length.t, [< Color.t | Var.t] as 'colorOrVar)))
+    | `radialGradient(list((Length.t, [< Color.t | Var.t] as 'colorOrVar)))
+    | `repeatingRadialGradient(list((Length.t, [< Color.t | Var.t] as 'colorOrVar)))
   ];
 
   /** Linear gradients transition colors progressively along an imaginary line. */
-  let linearGradient: (Angle.t, list((Length.t, Color.t))) => [> t];
+  let linearGradient: (Angle.t, list((Length.t, [< Color.t | Var.t] as 'colorOrVar))) => [> t('colorOrVar)];
   /** Radial gradients transition colors progressively from a center point (origin). */
-  let radialGradient: list((Length.t, Color.t)) => [> t];
+  let radialGradient: list((Length.t, [< Color.t | Var.t] as 'colorOrVar)) => [> t('colorOrVar)];
 
   /** Repeating gradients duplicate a gradient as much as necessary to fill a given area (linearGradient function). */
-  let repeatingLinearGradient: (Angle.t, list((Length.t, Color.t))) => [> t];
+  let repeatingLinearGradient: (Angle.t, list((Length.t, [< Color.t | Var.t] as 'colorOrVar))) => [> t('colorOrVar)];
   /** Repeating gradients duplicate a gradient as much as necessary to fill a given area (radialGradient function). */
-  let repeatingRadialGradient: list((Length.t, Color.t)) => [> t];
+  let repeatingRadialGradient: list((Length.t, [< Color.t | Var.t] as 'colorOrVar)) => [> t('colorOrVar)];
 
-  let toString: t => string;
+  let toString: t([< Color.t | Var.t]) => string;
 };
 
 /**
@@ -1274,4 +1311,15 @@ module Content: {
   ];
 
   let toString: t => string;
+};
+
+module SVG: {
+  module Fill: {
+    type t = [ | `none | `contextFill | `contextStroke];
+
+    let contextFill: [> t];
+    let contextStroke: [> t];
+
+    let toString: t => string;
+  };
 };

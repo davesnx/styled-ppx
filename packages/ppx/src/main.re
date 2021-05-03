@@ -1,10 +1,7 @@
 open Ppxlib;
+
 module Build = Ast_builder.Default;
 module Helper = Ast_helper;
-
-let raiseWithLocation = (~loc, msg) => {
-  raise(Location.raise_errorf(~loc, msg))
-};
 
 let isOptional = str =>
   switch (str) {
@@ -50,11 +47,13 @@ let rec getArgs = (expr, list) => {
       [(arg, default, pattern, alias, pattern.ppat_loc, type_), ...list],
     );
   | Pexp_fun(arg, _, pattern, _) when !isLabelled(arg) =>
-    raiseWithLocation(
-      ~loc=pattern.ppat_loc,
-      "Dynamic components are defined with labeled arguments. If you want to know more check the documentation: https://reasonml.org/docs/manual/latest/function#labeled-arguments",
-    )
-  | _ => (expr, list, None)
+    raise(
+      Location.raise_errorf(
+        ~loc=pattern.ppat_loc,
+        "Dynamic components are defined with labeled arguments. If you want to know more check the documentation: https://reasonml.org/docs/manual/latest/function#labeled-arguments",
+      )
+    );
+  | _ => (expr, list)
   };
 };
 
@@ -88,17 +87,18 @@ _): Parsetree.expression => {
     );
 
   switch (kind) {
-  | `Rule =>
-    let parser = makeParser(Css_parser.declaration);
-    let ast = parser(string);
-    let declarationListValues = Css_to_emotion.render_declaration(ast, ast.loc);
-    /* TODO: Instead of getting the first element, fail when there's more than one declaration. */
-    List.nth(declarationListValues, 0);
   | `Style =>
     let parser = makeParser(Css_parser.declaration_list);
     let ast = parser(string);
-    let declarationListValues = Css_to_emotion.render_declaration_list(ast);
-    Css_to_emotion.render_style_call(declarationListValues);
+    Css_to_emotion.render_style_call(
+      Css_to_emotion.render_declaration_list(ast)
+    );
+  | `ClassName =>
+    let parser = makeParser(Css_parser.declaration);
+    let ast = parser(string);
+    let declarationListValues = Css_to_emotion.render_declaration(ast, ast.loc);
+    /* TODO: Instead of getting the first element, fail when there's more than one declaration or make a mechanism to flatten all the properties */
+    Css_to_emotion.render_style_call(List.nth(declarationListValues, 0));
   | `Declarations =>
     let parser = makeParser(Css_parser.declaration_list);
     let ast = parser(string);
@@ -133,8 +133,7 @@ let renderStyledDynamic = (
   ~param,
   ~body
 ) => {
-  /* TODO: What's the last arg here, None? */
-  let (functionExpr, labeledArguments, _) =
+  let (functionExpr, labeledArguments) =
     getLabeledArgs(label, defaultValue, param, body);
 
   let propExpr = Build.pexp_ident(~loc, {txt: Lident("props"), loc});
@@ -146,7 +145,6 @@ let renderStyledDynamic = (
         let labelText = getLabel(arg);
         let value =
           Build.pexp_ident(~loc, {txt: Lident(propToGetter(labelText)), loc});
-
         (arg, Build.pexp_apply(~loc, value, [(Nolabel, propExpr)]));
       },
       labeledArguments,
@@ -199,7 +197,10 @@ let renderStyledDynamic = (
     Build.pexp_sequence(~loc, expr, styles);
   }
   /* TODO: Support more cases, like apply? */
-  | _ => raiseWithLocation(~loc, "Expected an array, a string or a function")
+  | _ =>
+    raise(
+      Location.raise_errorf(~loc, "Expected an array, a string or a function")
+    );
   };
 
   Build.pmod_structure(~loc, [
@@ -207,7 +208,6 @@ let renderStyledDynamic = (
       ~loc,
       ~customProps=Some((makePropsParameters, variableMakeProps))
     ),
-    /* We inline a createVariadicElement binding on each styled component, since styled-ppx doesn't come as a lib */
     Create.bindingCreateVariadicElement(~loc),
     Create.dynamicStyles(
       ~loc,
@@ -231,7 +231,6 @@ let renderStyledStatic = (~loc, ~path, ~htmlTag, ~str, ~delim, ~label) => {
 
   Build.pmod_structure(~loc, [
     Create.makeMakeProps(~loc, ~customProps=None),
-    /* We inline a createVariadicElement binding on each styled component, since styled-ppx doesn't come as a lib */
     Create.bindingCreateVariadicElement(~loc),
     Create.styles(~loc, ~name=styleVariableName, ~exp=css_expr),
     Create.component(~loc, ~htmlTag, ~styledExpr, ~params=[])
@@ -321,13 +320,13 @@ let extensions = [
     "cx",
     Ppxlib.Extension.Context.Expression,
     string_payload,
-    renderStringPayload(`Style)
+    renderStringPayload(`ClassName)
   ),
   Ppxlib.Extension.declare(
     "css",
     Ppxlib.Extension.Context.Expression,
     string_payload,
-    renderStringPayload(`Rule)
+    renderStringPayload(`Style)
   ),
   Ppxlib.Extension.declare(
     "styled.global",

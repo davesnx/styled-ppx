@@ -109,6 +109,7 @@ let supportList = [
   [%cx "color: rgb(1 2 3 / .4)"],
   [%cx "color: rgba(1, 2, 3)"],
   [%cx "color: rgba(1, 2, 3, .4)"],
+  [%cx "color: rgba(1, 2, 3, 40%)"],
   [%cx "color: hsl(120deg 100% 50%)"],
   [%cx "opacity: 0.5"],
   [%cx "opacity: 60%"],
