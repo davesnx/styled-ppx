@@ -55,3 +55,8 @@ module SelectorsMediaQueries = [%styled.div {j|
   & > p { color: pink; font-size: 24px; }
 |j}
 ];
+
+let keyframe = [%styled.keyframe {|
+  0% { opacity: 0 }
+  100% { opacity: 1 }
+|}];

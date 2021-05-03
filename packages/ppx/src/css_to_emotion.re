@@ -350,7 +350,10 @@ let render_emotion_keyframe = ((ruleList, loc)): Parsetree.expression => {
   let emotionKeyframes =
     Builder.pexp_ident(~loc, {txt: Emotion.lident("keyframes"), loc});
 
-  Builder.eapply(~loc, emotionKeyframes, [keyframes]);
+  {
+    ...Builder.eapply(~loc, emotionKeyframes, [keyframes]),
+    pexp_attributes: [Create.uncurried(~loc)]
+  };
 };
 
 let render_global = ((ruleList, loc): Stylesheet.t): Parsetree.expression => {
