@@ -24,20 +24,20 @@ let rec fnWithLabeledArgs = (list, args) =>
   };
 
 /* let styles = Emotion.(css(exp)) */
-let styles = (~loc, ~name, ~exp) => {
+let styles = (~loc, ~name, ~expr) => {
   let variableName = Helper.Pat.mk(~loc, Ppat_var({txt: name, loc}));
-  Helper.Str.mk(~loc, Pstr_value(Nonrecursive, [Helper.Vb.mk(~loc, variableName, exp)]));
+  Helper.Str.mk(~loc, Pstr_value(Nonrecursive, [Helper.Vb.mk(~loc, variableName, expr)]));
 };
 
 /* let styles = (~arg1, ~arg2) => Emotion.(css(exp)) */
-let dynamicStyles = (~loc, ~name, ~args, ~exp) => {
+let dynamicStyles = (~loc, ~name, ~args, ~expr) => {
   let variableName = Helper.Pat.mk(~loc, Ppat_var({txt: name, loc}));
 
   Helper.Str.mk(
     ~loc,
     Pstr_value(
       Nonrecursive,
-      [Helper.Vb.mk(~loc, variableName, fnWithLabeledArgs(args, exp))],
+      [Helper.Vb.mk(~loc, variableName, fnWithLabeledArgs(args, expr))],
     ),
   );
 };
