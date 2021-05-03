@@ -4785,10 +4785,10 @@ module ArrayStatic = {
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
   let styles =
-    CssJs.style(. [
-      CssJs.unsafe("display", "flex"),
+    CssJs.style(. [|
       CssJs.unsafe("justifyContent", "center"),
-    ]);
+      CssJs.unsafe("display", "flex"),
+    |]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
@@ -8642,7 +8642,7 @@ module ArrayDynamicComponent = {
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
   let styles = (~var) =>
-    CssJs.style(. [CssJs.color(var), CssJs.unsafe("display", "block")]);
+    CssJs.style(. [|CssJs.unsafe("display", "block"), CssJs.color(var)|]);
   let make = (props: makeProps('var)) => {
     let stylesObject = {"className": styles(~var=varGet(props))};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));

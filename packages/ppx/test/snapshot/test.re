@@ -1,4 +1,5 @@
-/* This tests ensure that the ppx transform the right extensions, to the right form. There's one case for each of the different methods and doesn't need to type-check.
+/* This tests ensure that the ppx transform the right extensions, to the right form.
+There's one case for each of the different methods and doesn't need to type-check.
 
 If you are looking to add some tests for CSS support,
 check packages/ppx/test/native folder. */
