@@ -62,39 +62,39 @@ let compare = (input: expression, expected, {expect, _}) => {
 /* There are a few test that are commented since they use strings, those are interpreted as raw_literal on the metaquote that we use to diff the AST on the assertions and a missmatch with OCaml that makes the comparision fail even if they are correct. TODO: Fix this by removing the raw_literal on the metaquote transformation and uncomment the tests. */
 let properties_static_css_tests = [%expr
   [|
-    ([%css "box-sizing: border-box"], [|CssJs.boxSizing(`borderBox)|]),
-    ([%css "box-sizing: content-box"], [|CssJs.boxSizing(`contentBox)|]),
-    /* ([%css "color: #454545"], [|CssJs.color(`hex("454545"))|]), */
-    ([%css "color: red"], [|CssJs.color(CssJs.red)|]),
-    /* ([%css "display: flex"], [|CssJs.unsafe("display", "flex")|]), */
-    ([%css "flex-direction: column"], [|CssJs.flexDirection(`column)|]),
-    /* ([%css "font-size: 30px"], [|CssJs.unsafe("fontSize", "30px")|]), */
-    ([%css "height: 100vh"], [|CssJs.height(`vh(100.))|]),
-    ([%css "margin: 0"], [|CssJs.margin(`zero)|]),
-    ([%css "margin: 5px"], [|CssJs.margin(`pxFloat(5.))|]),
-    ([%css "opacity: 0.9"], [|CssJs.opacity(0.9)|]),
-    ([%css "width: 100vw"], [|CssJs.width(`vw(100.))|]),
+    ([%cx "box-sizing: border-box"], [|CssJs.boxSizing(`borderBox)|]),
+    ([%cx "box-sizing: content-box"], [|CssJs.boxSizing(`contentBox)|]),
+    /* ([%cx "color: #454545"], [|CssJs.color(`hex("454545"))|]), */
+    ([%cx "color: red"], [|CssJs.color(CssJs.red)|]),
+    /* ([%cx "display: flex"], [|CssJs.unsafe("display", "flex")|]), */
+    ([%cx "flex-direction: column"], [|CssJs.flexDirection(`column)|]),
+    /* ([%cx "font-size: 30px"], [|CssJs.unsafe("fontSize", "30px")|]), */
+    ([%cx "height: 100vh"], [|CssJs.height(`vh(100.))|]),
+    ([%cx "margin: 0"], [|CssJs.margin(`zero)|]),
+    ([%cx "margin: 5px"], [|CssJs.margin(`pxFloat(5.))|]),
+    ([%cx "opacity: 0.9"], [|CssJs.opacity(0.9)|]),
+    ([%cx "width: 100vw"], [|CssJs.width(`vw(100.))|]),
     // css-sizing-3
-    ([%css "width: auto"], [|CssJs.width(`auto)|]),
-    ([%css "width: 0"], [|CssJs.width(`zero)|]),
-    ([%css "height: 5px"], [|CssJs.height(`pxFloat(5.))|]),
-    ([%css "min-width: 5%"], [|CssJs.minWidth(`percent(5.))|]),
-    ([%css "min-height: 5em"], [|CssJs.minHeight(`em(5.))|]),
-    ([%css "max-width: 3em"], [|CssJs.maxWidth(`em(3.))|]),
-    ([%css "max-height: 3vh"], [|CssJs.maxHeight(`vh(3.))|]),
-    ([%css "box-sizing: border-box"], [|CssJs.boxSizing(`borderBox)|]),
+    ([%cx "width: auto"], [|CssJs.width(`auto)|]),
+    ([%cx "width: 0"], [|CssJs.width(`zero)|]),
+    ([%cx "height: 5px"], [|CssJs.height(`pxFloat(5.))|]),
+    ([%cx "min-width: 5%"], [|CssJs.minWidth(`percent(5.))|]),
+    ([%cx "min-height: 5em"], [|CssJs.minHeight(`em(5.))|]),
+    ([%cx "max-width: 3em"], [|CssJs.maxWidth(`em(3.))|]),
+    ([%cx "max-height: 3vh"], [|CssJs.maxHeight(`vh(3.))|]),
+    ([%cx "box-sizing: border-box"], [|CssJs.boxSizing(`borderBox)|]),
     // css-box-3
-    ([%css "margin-top: auto"], [|CssJs.marginTop(`auto)|]),
-    ([%css "margin-right: 1px"], [|CssJs.marginRight(`pxFloat(1.))|]),
-    ([%css "margin-bottom: 2px"], [|CssJs.marginBottom(`pxFloat(2.))|]),
-    ([%css "margin-left: 3px"], [|CssJs.marginLeft(`pxFloat(3.))|]),
-    ([%css "margin: 1px"], [|CssJs.margin(`pxFloat(1.))|]),
+    ([%cx "margin-top: auto"], [|CssJs.marginTop(`auto)|]),
+    ([%cx "margin-right: 1px"], [|CssJs.marginRight(`pxFloat(1.))|]),
+    ([%cx "margin-bottom: 2px"], [|CssJs.marginBottom(`pxFloat(2.))|]),
+    ([%cx "margin-left: 3px"], [|CssJs.marginLeft(`pxFloat(3.))|]),
+    ([%cx "margin: 1px"], [|CssJs.margin(`pxFloat(1.))|]),
     (
-      [%css "margin: 1px 2px"],
+      [%cx "margin: 1px 2px"],
       [|CssJs.margin2(~v=`pxFloat(1.), ~h=`pxFloat(2.))|],
     ),
     (
-      [%css "margin: 1px 2px 3px"],
+      [%cx "margin: 1px 2px 3px"],
       [|
         CssJs.margin3(
           ~top=`pxFloat(1.),
@@ -104,7 +104,7 @@ let properties_static_css_tests = [%expr
       |],
     ),
     (
-      [%css "margin: 1px 2px 3px 4px"],
+      [%cx "margin: 1px 2px 3px 4px"],
       [|
         CssJs.margin4(
           ~top=`pxFloat(1.),
@@ -114,17 +114,17 @@ let properties_static_css_tests = [%expr
         ),
       |],
     ),
-    ([%css "padding-top: 0"], [|CssJs.paddingTop(`zero)|]),
-    ([%css "padding-right: 1px"], [|CssJs.paddingRight(`pxFloat(1.))|]),
-    ([%css "padding-bottom: 2px"], [|CssJs.paddingBottom(`pxFloat(2.))|]),
-    ([%css "padding-left: 3px"], [|CssJs.paddingLeft(`pxFloat(3.))|]),
-    ([%css "padding: 1px"], [|CssJs.padding(`pxFloat(1.))|]),
+    ([%cx "padding-top: 0"], [|CssJs.paddingTop(`zero)|]),
+    ([%cx "padding-right: 1px"], [|CssJs.paddingRight(`pxFloat(1.))|]),
+    ([%cx "padding-bottom: 2px"], [|CssJs.paddingBottom(`pxFloat(2.))|]),
+    ([%cx "padding-left: 3px"], [|CssJs.paddingLeft(`pxFloat(3.))|]),
+    ([%cx "padding: 1px"], [|CssJs.padding(`pxFloat(1.))|]),
     (
-      [%css "padding: 1px 2px"],
+      [%cx "padding: 1px 2px"],
       [|CssJs.padding2(~v=`pxFloat(1.), ~h=`pxFloat(2.))|],
     ),
     (
-      [%css "padding: 1px 2px 3px"],
+      [%cx "padding: 1px 2px 3px"],
       [|
         CssJs.padding3(
           ~top=`pxFloat(1.),
@@ -134,7 +134,7 @@ let properties_static_css_tests = [%expr
       |],
     ),
     (
-      [%css "padding: 1px 2px 3px 4px"],
+      [%cx "padding: 1px 2px 3px 4px"],
       [|
         CssJs.padding4(
           ~top=`pxFloat(1.),
@@ -144,76 +144,76 @@ let properties_static_css_tests = [%expr
         ),
       |],
     ),
-    /* ([%css "color: #012"], [|CssJs.color(`hex("012"))|]), */
-    /* ([%css "color: #0123"], [|CssJs.color(`hex("0123"))|]), */
-    /* ([%css "color: #012345"], [|CssJs.color(`hex("012345"))|]), */
-    /* ([%css "color: #01234567"], [|CssJs.color(`hex("01234567"))|]), */
-    ([%css "color: blue"], [|CssJs.color(CssJs.blue)|]),
-    ([%css "color: currentcolor"], [|CssJs.color(`currentColor)|]),
-    ([%css "color: transparent"], [|CssJs.color(`transparent)|]),
-    ([%css "color: rgb(1 2 3)"], [|CssJs.color(`rgb((1, 2, 3)))|]),
-    ([%css "color: rgb(1 2 3 / .4)"], [|CssJs.color(`rgba((1, 2, 3, `num (0.4))))|]),
-    ([%css "color: rgba(1, 2, 3)"], [|CssJs.color(`rgb((1, 2, 3)))|]),
+    /* ([%cx "color: #012"], [|CssJs.color(`hex("012"))|]), */
+    /* ([%cx "color: #0123"], [|CssJs.color(`hex("0123"))|]), */
+    /* ([%cx "color: #012345"], [|CssJs.color(`hex("012345"))|]), */
+    /* ([%cx "color: #01234567"], [|CssJs.color(`hex("01234567"))|]), */
+    ([%cx "color: blue"], [|CssJs.color(CssJs.blue)|]),
+    ([%cx "color: currentcolor"], [|CssJs.color(`currentColor)|]),
+    ([%cx "color: transparent"], [|CssJs.color(`transparent)|]),
+    ([%cx "color: rgb(1 2 3)"], [|CssJs.color(`rgb((1, 2, 3)))|]),
+    ([%cx "color: rgb(1 2 3 / .4)"], [|CssJs.color(`rgba((1, 2, 3, `num (0.4))))|]),
+    ([%cx "color: rgba(1, 2, 3)"], [|CssJs.color(`rgb((1, 2, 3)))|]),
     (
-      [%css "color: rgba(1, 2, 3, .4)"],
+      [%cx "color: rgba(1, 2, 3, .4)"],
       [|CssJs.color(`rgba((1, 2, 3, `num(0.4))))|],
     ),
     (
-      [%css "color: rgba(1, 2, 3, 50%)"],
+      [%cx "color: rgba(1, 2, 3, 50%)"],
       [|CssJs.color(`rgba((1, 2, 3, `percent(0.5))))|],
     ),
     (
-      [%css "color: hsl(120deg 100% 50%)"],
+      [%cx "color: hsl(120deg 100% 50%)"],
       [|CssJs.color(`hsl((`deg(120.), `percent(100.), `percent(50.))))|],
     ),
-    ([%css "opacity: 0.5"], [|CssJs.opacity(0.5)|]),
-    ([%css "opacity: 60%"], [|CssJs.opacity(0.6)|]),
+    ([%cx "opacity: 0.5"], [|CssJs.opacity(0.5)|]),
+    ([%cx "opacity: 60%"], [|CssJs.opacity(0.6)|]),
     // css-images-4
-    ([%css "object-fit: fill"], [|CssJs.objectFit(`fill)|]),
+    ([%cx "object-fit: fill"], [|CssJs.objectFit(`fill)|]),
     (
-      [%css "object-position: right bottom"],
+      [%cx "object-position: right bottom"],
       [|CssJs.objectPosition(`hv((`right, `bottom)))|],
     ),
     // css-backgrounds-3
-    ([%css "background-color: red"], [|CssJs.backgroundColor(CssJs.red)|]),
-    ([%css "border-top-color: blue"], [|CssJs.borderTopColor(CssJs.blue)|]),
-    ([%css "border-right-color: green"], [|CssJs.borderRightColor(CssJs.green)|]),
+    ([%cx "background-color: red"], [|CssJs.backgroundColor(CssJs.red)|]),
+    ([%cx "border-top-color: blue"], [|CssJs.borderTopColor(CssJs.blue)|]),
+    ([%cx "border-right-color: green"], [|CssJs.borderRightColor(CssJs.green)|]),
     (
-      [%css "border-bottom-color: purple"],
+      [%cx "border-bottom-color: purple"],
       [|CssJs.borderBottomColor(CssJs.purple)|],
     ),
-    /* ([%css "border-left-color: #fff"], [|CssJs.borderLeftColor(`hex("fff"))|]), */
-    ([%css "border-top-width: 15px"], [|CssJs.borderTopWidth(`pxFloat(15.))|]),
+    /* ([%cx "border-left-color: #fff"], [|CssJs.borderLeftColor(`hex("fff"))|]), */
+    ([%cx "border-top-width: 15px"], [|CssJs.borderTopWidth(`pxFloat(15.))|]),
     (
-      [%css "border-right-width: 16px"],
+      [%cx "border-right-width: 16px"],
       [|CssJs.borderRightWidth(`pxFloat(16.))|],
     ),
     (
-      [%css "border-bottom-width: 17px"],
+      [%cx "border-bottom-width: 17px"],
       [|CssJs.borderBottomWidth(`pxFloat(17.))|],
     ),
     (
-      [%css "border-left-width: 18px"],
+      [%cx "border-left-width: 18px"],
       [|CssJs.borderLeftWidth(`pxFloat(18.))|],
     ),
     (
-      [%css "border-top-left-radius: 12%"],
+      [%cx "border-top-left-radius: 12%"],
       [|CssJs.borderTopLeftRadius(`percent(12.))|],
     ),
     (
-      [%css "border-top-right-radius: 15%"],
+      [%cx "border-top-right-radius: 15%"],
       [|CssJs.borderTopRightRadius(`percent(15.))|],
     ),
     (
-      [%css "border-bottom-left-radius: 14%"],
+      [%cx "border-bottom-left-radius: 14%"],
       [|CssJs.borderBottomLeftRadius(`percent(14.))|],
     ),
     (
-      [%css "border-bottom-right-radius: 13%"],
+      [%cx "border-bottom-right-radius: 13%"],
       [|CssJs.borderBottomRightRadius(`percent(13.))|],
     ),
     /* (
-      [%css "box-shadow: 12px 12px 2px 1px rgba(0, 0, 255, .2)"],
+      [%cx "box-shadow: 12px 12px 2px 1px rgba(0, 0, 255, .2)"],
       [|
         CssJs.boxShadows([|
           CssJs.Shadow.box(
@@ -227,7 +227,7 @@ let properties_static_css_tests = [%expr
       |],
     ), */
     /* (
-      [%css
+      [%cx
         "box-shadow: 12px 12px 2px 1px rgba(0, 0, 255, .2), 13px 14px 5px 6px rgba(2, 1, 255, 50%)"
       ],
       [|
@@ -250,68 +250,68 @@ let properties_static_css_tests = [%expr
       |],
     ), */
     // css-overflow-3
-    ([%css "overflow-x: auto"], [|CssJs.overflowX(`auto)|]),
-    ([%css "overflow-y: hidden"], [|CssJs.overflowY(`hidden)|]),
-    ([%css "overflow: scroll"], [|CssJs.overflow(`scroll)|]),
+    ([%cx "overflow-x: auto"], [|CssJs.overflowX(`auto)|]),
+    ([%cx "overflow-y: hidden"], [|CssJs.overflowY(`hidden)|]),
+    ([%cx "overflow: scroll"], [|CssJs.overflow(`scroll)|]),
     (
-      [%css "overflow: scroll visible"],
+      [%cx "overflow: scroll visible"],
       [|CssJs.overflowX(`scroll), CssJs.overflowY(`visible)|],
     ),
-    // ([%css "text-overflow: clip"], [|CssJs.textOverflow(`clip)|]),
-    // ([%css "text-overflow: ellipsis"], [|CssJs.textOverflow(`ellipsis)|]),
+    // ([%cx "text-overflow: clip"], [|CssJs.textOverflow(`clip)|]),
+    // ([%cx "text-overflow: ellipsis"], [|CssJs.textOverflow(`ellipsis)|]),
     // css-text-3
-    ([%css "text-transform: capitalize"], [|CssJs.textTransform(`capitalize)|]),
-    ([%css "white-space: break-spaces"], [|CssJs.whiteSpace(`breakSpaces)|]),
-    ([%css "word-break: keep-all"], [|CssJs.wordBreak(`keepAll)|]),
-    ([%css "overflow-wrap: anywhere"], [|CssJs.overflowWrap(`anywhere)|]),
-    ([%css "word-wrap: normal"], [|CssJs.wordWrap(`normal)|]),
-    // ([%css "text-align: start"], [|CssJs.textAlign(`start)|]),
-    ([%css "text-align: left"], [|CssJs.textAlign(`left)|]),
-    ([%css "word-spacing: normal"], [|CssJs.wordSpacing(`normal)|]),
-    ([%css "word-spacing: 5px"], [|CssJs.wordSpacing(`pxFloat(5.))|]),
-    ([%css "letter-spacing: normal"], [|CssJs.letterSpacing(`normal)|]),
-    ([%css "letter-spacing: 5px"], [|CssJs.letterSpacing(`pxFloat(5.))|]),
-    ([%css "text-indent: 5%"], [|CssJs.textIndent(`percent(5.))|]),
+    ([%cx "text-transform: capitalize"], [|CssJs.textTransform(`capitalize)|]),
+    ([%cx "white-space: break-spaces"], [|CssJs.whiteSpace(`breakSpaces)|]),
+    ([%cx "word-break: keep-all"], [|CssJs.wordBreak(`keepAll)|]),
+    ([%cx "overflow-wrap: anywhere"], [|CssJs.overflowWrap(`anywhere)|]),
+    ([%cx "word-wrap: normal"], [|CssJs.wordWrap(`normal)|]),
+    // ([%cx "text-align: start"], [|CssJs.textAlign(`start)|]),
+    ([%cx "text-align: left"], [|CssJs.textAlign(`left)|]),
+    ([%cx "word-spacing: normal"], [|CssJs.wordSpacing(`normal)|]),
+    ([%cx "word-spacing: 5px"], [|CssJs.wordSpacing(`pxFloat(5.))|]),
+    ([%cx "letter-spacing: normal"], [|CssJs.letterSpacing(`normal)|]),
+    ([%cx "letter-spacing: 5px"], [|CssJs.letterSpacing(`pxFloat(5.))|]),
+    ([%cx "text-indent: 5%"], [|CssJs.textIndent(`percent(5.))|]),
     // css-flexbox-1
-    ([%css "flex-wrap: wrap"], [|CssJs.flexWrap(`wrap)|]),
+    ([%cx "flex-wrap: wrap"], [|CssJs.flexWrap(`wrap)|]),
     // TODO: generate tests with variables in the future
-    // ([%css "flex-wrap: $var"], [|CssJs.flexWrap(var)|]),
-    // ([%css "flex-wrap: $(var)"], [|CssJs.flexWrap(var)|]),
+    // ([%cx "flex-wrap: $var"], [|CssJs.flexWrap(var)|]),
+    // ([%cx "flex-wrap: $(var)"], [|CssJs.flexWrap(var)|]),
     (
-      [%css "flex-flow: row nowrap"],
+      [%cx "flex-flow: row nowrap"],
       [|CssJs.flexDirection(`row), CssJs.flexWrap(`nowrap)|],
     ),
     // TODO: flex-flow + variables
-    ([%css "order: 5"], [|CssJs.order(5)|]),
-    ([%css "flex-grow: 2"], [|CssJs.flexGrow(2.)|]),
-    ([%css "flex-grow: 2.5"], [|CssJs.flexGrow(2.5)|]),
-    ([%css "flex-shrink: 2"], [|CssJs.flexShrink(2.)|]),
-    ([%css "flex-shrink: 2.5"], [|CssJs.flexShrink(2.5)|]),
-    ([%css "flex-basis: content"], [|CssJs.flexBasis(`content)|]),
-    ([%css "flex: none"], [|CssJs.flex(`none)|]),
+    ([%cx "order: 5"], [|CssJs.order(5)|]),
+    ([%cx "flex-grow: 2"], [|CssJs.flexGrow(2.)|]),
+    ([%cx "flex-grow: 2.5"], [|CssJs.flexGrow(2.5)|]),
+    ([%cx "flex-shrink: 2"], [|CssJs.flexShrink(2.)|]),
+    ([%cx "flex-shrink: 2.5"], [|CssJs.flexShrink(2.5)|]),
+    ([%cx "flex-basis: content"], [|CssJs.flexBasis(`content)|]),
+    ([%cx "flex: none"], [|CssJs.flex(`none)|]),
     (
-      [%css "flex: 1 2 content"],
+      [%cx "flex: 1 2 content"],
       [|CssJs.flexGrow(1.), CssJs.flexShrink(2.), CssJs.flexBasis(`content)|],
     ),
     // unsupported
-    /* ([%css "overflow-x: clip"], [|CssJs.unsafe("overflowX", "clip")|]), */
-    // ([%css "align-items: center"], [|CssJs.alignItems(`center)|]),
-    // ([%css "align-self: stretch"], [|CssJs.alignSelf(`stretch)|]),
+    /* ([%cx "overflow-x: clip"], [|CssJs.unsafe("overflowX", "clip")|]), */
+    // ([%cx "align-items: center"], [|CssJs.alignItems(`center)|]),
+    // ([%cx "align-self: stretch"], [|CssJs.alignSelf(`stretch)|]),
     // (
-    //   [%css "align-content: space-around"],
+    //   [%cx "align-content: space-around"],
     //   [|CssJs.alignContent(`spaceAround)],
     // ),
     // (
-    //   [%css "justify-content: center"],
+    //   [%cx "justify-content: center"],
     //   [|CssJs.unsafe("justifyContent", "center")],
     // ),
     // not supported
     /* (
-      [%css "-moz-text-blink: blink"],
+      [%cx "-moz-text-blink: blink"],
       [|CssJs.unsafe("MozTextBlink", "blink")],
     ),
     (
-      [%css "display: -webkit-inline-box"],
+      [%cx "display: -webkit-inline-box"],
       [|CssJs.unsafe("display", "-webkit-inline-box")],
     ), */
   |]
@@ -320,15 +320,15 @@ let properties_static_css_tests = [%expr
 let selectors_static_css_tests = [%expr
   [|
     (
-      [%css "& > a { color: green; }"],
+      [%cx "& > a { color: green; }"],
       [|CssJs.selector({js|& > a|js}, [|CssJs.color(CssJs.green)|])|],
     ),
     (
-      [%css "&:nth-child(even) { color: red; }"],
+      [%cx "&:nth-child(even) { color: red; }"],
       [|CssJs.selector({js|&:nth-child(even)|js}, [|CssJs.color(CssJs.red)|])|],
     ),
     (
-      [%css "& > div:nth-child(3n+1) { color: blue; }"],
+      [%cx "& > div:nth-child(3n+1) { color: blue; }"],
       [|
         CssJs.selector(
           {js|& > div:nth-child(3n  + 1)|js},
@@ -337,11 +337,11 @@ let selectors_static_css_tests = [%expr
       |],
     ),
     (
-      [%css "&::active { color: brown; }"],
+      [%cx "&::active { color: brown; }"],
       [|CssJs.active([|CssJs.color(CssJs.brown)|])|],
     ),
     (
-      [%css "&:hover { color: gray; }"],
+      [%cx "&:hover { color: gray; }"],
       [|CssJs.hover([|CssJs.color(CssJs.gray)|])|],
     ),
   |]
@@ -353,14 +353,14 @@ TODO: Since we commented the string-based tests, mediaqueries rely entirely on t
 let media_query_static_css_tests = [%expr
   [|
     /* (
-      [%css "color: blue; @media (min-width: 30em) { color: red; }"],
+      [%cx "color: blue; @media (min-width: 30em) { color: red; }"],
       [
         CssJs.color(CssJs.blue),
         CssJs.media("(min-width: 30em)", [|CssJs.color(CssJs.red)|]),
       ],
     ), */
     /* (
-      [%css "@media (min-width: 30em) and (min-height: 20em) { color: brown; }"
+      [%cx "@media (min-width: 30em) and (min-height: 20em) { color: brown; }"
       ],
       [
         CssJs.media(
@@ -397,7 +397,7 @@ let keyframe_static_css_tests = [%expr
   |]
 ];
 
-describe("Transform [%css] to bs-css", ({test, _}) => {
+describe("Transform [%cx] to bs-css", ({test, _}) => {
   let test = (prefix, index, (input, expected)) =>
     test(prefix ++ string_of_int(index), compare(input, expected));
 
@@ -425,11 +425,11 @@ describe("Transform [%css] to bs-css", ({test, _}) => {
 });
 
 let properties_variable_css_tests = [
-  ([%expr [%css "color: $var"]], [%expr [|CssJs.color(var)|]]),
-  // TODO: ([%css "margin: $var"], [%expr [|CssJs.margin("margin", var)|]),
+  ([%expr [%cx "color: $var"]], [%expr [|CssJs.color(var)|]]),
+  // TODO: ([%cx "margin: $var"], [%expr [|CssJs.margin("margin", var)|]),
 ];
 
-describe("Transform [%css] to bs-css with a variable interpolatated", ({test, _}) => {
+describe("Transform [%cx] to bs-css with a variable interpolatated", ({test, _}) => {
   let test = (index, (result, expected)) =>
     test(
       "simple variable: " ++ string_of_int(index),

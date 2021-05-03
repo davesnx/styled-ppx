@@ -93,12 +93,12 @@ _): Parsetree.expression => {
     Css_to_emotion.render_style_call(
       Css_to_emotion.render_declaration_list(ast)
     );
-  | `ClassName =>
+  | `Rule =>
     let parser = makeParser(Css_parser.declaration);
     let ast = parser(string);
     let declarationListValues = Css_to_emotion.render_declaration(ast, ast.loc);
     /* TODO: Instead of getting the first element, fail when there's more than one declaration or make a mechanism to flatten all the properties */
-    Css_to_emotion.render_style_call(List.nth(declarationListValues, 0));
+    List.nth(declarationListValues, 0);
   | `Declarations =>
     let parser = makeParser(Css_parser.declaration_list);
     let ast = parser(string);
@@ -320,13 +320,13 @@ let extensions = [
     "cx",
     Ppxlib.Extension.Context.Expression,
     string_payload,
-    renderStringPayload(`ClassName)
+    renderStringPayload(`Style)
   ),
   Ppxlib.Extension.declare(
     "css",
     Ppxlib.Extension.Context.Expression,
     string_payload,
-    renderStringPayload(`Style)
+    renderStringPayload(`Rule)
   ),
   Ppxlib.Extension.declare(
     "styled.global",

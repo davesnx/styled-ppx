@@ -4786,8 +4786,8 @@ module ArrayStatic = {
     "createElement";
   let styles =
     CssJs.style(. [
-      CssJs.style(. [|CssJs.unsafe("display", "flex")|]),
-      CssJs.style(. [|CssJs.unsafe("justifyContent", "center")|]),
+      CssJs.unsafe("display", "flex"),
+      CssJs.unsafe("justifyContent", "center"),
     ]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
@@ -5757,9 +5757,10 @@ module StringInterpolation = {
     createVariadicElement("div", newProps);
   };
 };
-let className = CssJs.style(. CssJs.unsafe("display", "block"));
-let classNameWithMultiLine = CssJs.style(. CssJs.unsafe("display", "block"));
-let cssRule = CssJs.style(. [|CssJs.color(CssJs.blue)|]);
+let className = CssJs.style(. [|CssJs.unsafe("display", "block")|]);
+let classNameWithMultiLine =
+  CssJs.style(. [|CssJs.unsafe("display", "block")|]);
+let cssRule = CssJs.color(CssJs.blue);
 module DynamicComponent = {
   [@bs.deriving abstract]
   type makeProps('var) = {
@@ -8641,10 +8642,7 @@ module ArrayDynamicComponent = {
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
   let styles = (~var) =>
-    CssJs.style(. [
-      CssJs.style(. [|CssJs.color(var)|]),
-      CssJs.style(. [|CssJs.unsafe("display", "block")|]),
-    ]);
+    CssJs.style(. [CssJs.color(var), CssJs.unsafe("display", "block")]);
   let make = (props: makeProps('var)) => {
     let stylesObject = {"className": styles(~var=varGet(props))};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
@@ -9603,10 +9601,7 @@ module SequenceDynamicComponent = {
     "createElement";
   let styles = (~var) => {
     Js.log("Logging when render");
-    CssJs.style(. [|
-      CssJs.style(. [|CssJs.color(var)|]),
-      CssJs.style(. [|CssJs.unsafe("display", "block")|]),
-    |]);
+    CssJs.style(. [|CssJs.color(var), CssJs.unsafe("display", "block")|]);
   };
   let make = (props: makeProps('var)) => {
     let stylesObject = {"className": styles(~var=varGet(props))};
