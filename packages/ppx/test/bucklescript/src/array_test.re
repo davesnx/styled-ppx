@@ -22,13 +22,13 @@ module SequenceDynamicComponent = [%styled.div
   (~var) => {
     Js.log("Logging when render");
 
-    [
+    [|
       switch (var) {
         | `Black => [%css "color: #999999"]
         | `White => [%css "color: #FAFAFA"]
       },
       [%css "display: block;"]
-    ]
+    |]
   }
 ];
 

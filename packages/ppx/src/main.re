@@ -188,7 +188,7 @@ let renderStyledDynamic = (
   let styles = switch (functionExpr.pexp_desc) {
   | Pexp_constant(Pconst_string(str, delim, label)) =>
     renderStringPayload(~loc, ~path, `Declarations, {txt: str, loc: functionExpr.pexp_loc}, delim, label) |> Css_to_emotion.render_style_call
-  | Pexp_array(arr) => Create.list_to_expr(loc, List.rev(arr)) |> Css_to_emotion.render_style_call
+  | Pexp_array(arr) => Build.pexp_array(~loc, List.rev(arr)) |> Css_to_emotion.render_style_call
   | Pexp_sequence(expr, sequence) => {
     /* Generate a new sequence where the last expression is
       wrapped in render_style_call and render the other expressions. */
@@ -247,7 +247,7 @@ let renderStyledStaticList = (~loc, ~path as _, ~htmlTag, list) => {
     Create.styles(~loc,
       ~name=styleVariableName,
       ~exp=Css_to_emotion.render_style_call(
-        Create.list_to_expr(loc, List.rev(list))
+        Build.pexp_array(~loc, List.rev(list))
       )
     ),
     Create.component(~loc, ~htmlTag, ~styledExpr, ~params=[])

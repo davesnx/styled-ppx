@@ -2,8 +2,8 @@
 
 exports[`ArrayDynamicComponent renders 1`] = `
 .emotion-0 {
-  color: #999999;
   display: block;
+  color: #999999;
 }
 
 <div>
@@ -16,14 +16,14 @@ exports[`ArrayDynamicComponent renders 1`] = `
 
 exports[`ArrayStatic renders 1`] = `
 .emotion-0 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
   -webkit-box-pack: center;
   -webkit-justify-content: center;
   -ms-flex-pack: center;
   justify-content: center;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
 }
 
 <div>
