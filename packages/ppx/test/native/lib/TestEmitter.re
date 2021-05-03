@@ -34,7 +34,7 @@ let write_tests_to_file = (
   let code =
     tests
     |> List.map(((expected, _)) => [%stri let _ = [%e expected]])
-    |> List.append([[%stri open StyledPpxTestNativeBSCSS]])
+    |> List.append([[%stri open MockBsCss]])
     |> Pprintast.string_of_structure;
   let fd = open_out(file);
   output_string(fd, code);

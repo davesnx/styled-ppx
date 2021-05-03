@@ -4,7 +4,7 @@
   (:standard \ static_css_tests selectors_css_tests ; media_query_css_tests
     keyframe_css_tests TestRunner))
  (library_flags (-linkall -g))
- (libraries StyledPpxTestNativeBSCSS rely.lib styled-ppx.lib ppxlib)
+ (libraries MockBsCss rely.lib styled-ppx.lib ppxlib)
  (preprocess (pps ppxlib.metaquot styled-ppx.lib))
 )
 
@@ -32,7 +32,7 @@
 
 (library
  (name StyledPpxTestNativeTypeCheck)
- (libraries StyledPpxTestNativeBSCSS)
+ (libraries MockBsCss)
  (modules
    static_css_tests
    selectors_css_tests
