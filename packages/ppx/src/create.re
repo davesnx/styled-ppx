@@ -381,22 +381,3 @@ let makeMakeProps = (~loc, ~customProps) => {
     ),
   );
 };
-
-let list_to_expr = (end_loc, xs) =>
-  List.fold_left(
-    (e, param) => {
-      let loc =
-        Lex_buffer.make_loc(
-          ~loc_ghost=true,
-          e.pexp_loc.Location.loc_start,
-          end_loc.Location.loc_end,
-        );
-      Helper.Exp.construct(
-        ~loc,
-        {txt: Lident("::"), loc},
-        Some(Helper.Exp.tuple(~loc, [param, e])),
-      );
-    },
-    Helper.Exp.construct(~loc=end_loc, {txt: Lident("[]"), loc: end_loc}, None),
-    xs,
-  );
