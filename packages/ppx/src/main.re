@@ -271,6 +271,16 @@ let string_payload =
     ),
 );
 
+let any_payload =
+  Ast_pattern.(
+    pstr(
+      pstr_eval(
+        __,
+        nil
+      ) ^:: nil,
+    ),
+);
+
 /* TODO: Ensure we are capturing String and Fun properly */
 let pattern =
   Ast_pattern.(
@@ -297,6 +307,8 @@ let pattern =
     )
   );
 
+
+
 let extensions = [
   Ppxlib.Extension.declare(
     "cx",
@@ -321,6 +333,26 @@ let extensions = [
     Ppxlib.Extension.Context.Expression,
     string_payload,
     renderStringPayload(`Keyframe)
+  ),
+  /* This extension just raises an error to educate users in case of wrong payload or missing html tag. */
+  Ppxlib.Extension.declare(
+    "styled",
+    Ppxlib.Extension.Context.Module_expr,
+    any_payload,
+    (~loc, ~path as _, payload) => {
+      raise(
+        Location.raise_errorf(
+          ~loc,
+          {|An styled component without a tag is not valid. You must define an HTML tag, like, `styled.div`.
+
+  [%sstyled.div %s]
+
+  More info: https://developer.mozilla.org/en-US/docs/Learn/Accessibility/HTML.|},
+          "%",
+          Pprintast.string_of_expression(payload)
+        )
+      );
+    }
   ),
   /* Currently there's no way to define extensions like `lola.x` with Pplib.Extension, we generate one ppxlib.extension per html tag. Is possible to achive it with Ppxlib.Driver.register_transformation(~preprocess_impl).  */
   ...List.map(htmlTag => {

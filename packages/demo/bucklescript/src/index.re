@@ -56,7 +56,7 @@ let styles = [%cx "display: flex; justify-content: center; color: blue"];
 switch (ReactDOM.querySelector("#app")) {
   | Some(el) =>
     ReactDOM.render(
-      <div className=cssRule>
+      <div className=styles>
         <App onClick=Js.log>
           <Dynamic a="23"/>
           <Component>
