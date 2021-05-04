@@ -3,6 +3,15 @@ open Ppxlib;
 module Build = Ast_builder.Default;
 module Helper = Ast_helper;
 
+let raiseError = (~loc, ~description, ~example, ~link) => {
+  raise(
+    Location.raise_errorf(
+      ~loc,
+      "%s\n\n  %s\n\n  More info: %s", description, example, link
+    )
+  );
+};
+
 let isOptional = str =>
   switch (str) {
   | Optional(_) => true
@@ -47,11 +56,11 @@ let rec getArgs = (expr, list) => {
       [(arg, default, pattern, alias, pattern.ppat_loc, type_), ...list],
     );
   | Pexp_fun(arg, _, pattern, _) when !isLabelled(arg) =>
-    raise(
-      Location.raise_errorf(
-        ~loc=pattern.ppat_loc,
-        "Dynamic components are defined with labeled arguments. If you want to know more check the documentation: https://reasonml.org/docs/manual/latest/function#labeled-arguments",
-      )
+    raiseError(
+      ~loc=pattern.ppat_loc,
+      ~description="Dynamic components are defined with labeled arguments.",
+      ~example="[%styled.div (~a, ~b) => {}]",
+      ~link="https://reasonml.org/docs/manual/latest/function#labeled-arguments",
     );
   | _ => (expr, list)
   };
@@ -202,11 +211,9 @@ let renderStyledDynamic = (
       let styles = sequence |> getLastSequence |> Css_to_emotion.render_style_call;
       Build.pexp_sequence(~loc, expr, styles);
     }
-    /* TODO: Support more cases, like an apply as a payload or a variable as payload */
-    | _ =>
-      raise(
-        Location.raise_errorf(~loc, "Expected an array, a string or a function")
-      );
+    /* TODO: With this default case we support all expressions here.
+    Users might find this confusing, we could give some warnings before the type-checker does. */
+    | _ => functionExpr
   };
 
   Build.pmod_structure(~loc, [
@@ -271,6 +278,16 @@ let string_payload =
     ),
 );
 
+let any_payload =
+  Ast_pattern.(
+    pstr(
+      pstr_eval(
+        __,
+        nil
+      ) ^:: nil,
+    ),
+);
+
 /* TODO: Ensure we are capturing String and Fun properly */
 let pattern =
   Ast_pattern.(
@@ -297,6 +314,8 @@ let pattern =
     )
   );
 
+
+
 let extensions = [
   Ppxlib.Extension.declare(
     "cx",
@@ -322,7 +341,20 @@ let extensions = [
     string_payload,
     renderStringPayload(`Keyframe)
   ),
-  /* Currently there's no way to define extensions like `lola.x` with Pplib.Extension, we generate one ppxlib.extension per html tag. Is possible to achive it with Ppxlib.Driver.register_transformation(~preprocess_impl).  */
+  /* This extension just raises an error to educate users in case of wrong payload or missing html tag. */
+  Ppxlib.Extension.declare(
+    "styled",
+    Ppxlib.Extension.Context.Module_expr,
+    any_payload,
+    (~loc, ~path as _, payload) => {
+      raiseError(~loc,
+        ~description="An styled component without a tag is not valid. You must define an HTML tag, like, `styled.div`",
+        ~example="[%styled.div " ++ Pprintast.string_of_expression(payload) ++ "]",
+        ~link="https://developer.mozilla.org/en-US/docs/Learn/Accessibility/HTML"
+      )
+    }
+  ),
+  /* Currently there's no way to define extensions like `lola.x` with Pplib.Extension, we generate one ppxlib.extension per html tag. Is possible to achive it with Ppxlib.Driver.register_transformation(~preprocess_impl). */
   ...List.map(htmlTag => {
     Ppxlib.Extension.declare(
       "styled." ++ htmlTag,
