@@ -1,0 +1,7 @@
+{
+  "type": "module",
+  "scripts": {
+    "start": "node generate/index.mjs",
+    "generate": "node generate/index.mjs"
+  }
+}
