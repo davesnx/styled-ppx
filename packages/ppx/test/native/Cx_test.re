@@ -429,7 +429,7 @@ let properties_variable_css_tests = [
   // TODO: ([%cx "margin: $var"], [%expr [|CssJs.margin("margin", var)|]),
 ];
 
-describe("Transform [%cx] to bs-css with a variable interpolatated", ({test, _}) => {
+describe("Transform [%cx] to bs-css with interpolatated variables", ({test, _}) => {
   let test = (index, (result, expected)) =>
     test(
       "simple variable: " ++ string_of_int(index),

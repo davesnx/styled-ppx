@@ -2,15 +2,15 @@
  (name StyledPpxTestNativeLib)
  (modules
   (:standard \ static_css_tests selectors_css_tests ; media_query_css_tests
-    keyframe_css_tests TestRunner))
+    keyframe_css_tests Runner))
  (library_flags (-linkall -g))
  (libraries MockBsCss rely.lib styled-ppx.lib ppxlib)
  (preprocess (pps ppxlib.metaquot styled-ppx.lib))
 )
 
 (executable
- (name TestRunner)
- (modules TestRunner)
+ (name Runner)
+ (modules Runner)
  (libraries StyledPpxTestNativeLib styled_ppx_css_parser)
  (preprocess
   (pps ppxlib.metaquot styled-ppx.lib)
@@ -26,7 +26,7 @@
     ; media_query_css_tests.ml
     keyframe_css_tests.ml
   )
- (deps ./TestRunner.exe)
+ (deps ./Runner.exe)
  (action (run %{deps}))
 )
 
