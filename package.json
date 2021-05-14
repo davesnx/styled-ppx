@@ -34,7 +34,6 @@
     }
   },
   "devDependencies": {
-    "@opam/merlin": "*",
     "ocaml": "~4.10.0",
     "@esy-ocaml/reason": "^3.6.2",
     "@opam/dune": ">=2.8.4",
@@ -43,7 +42,7 @@
     "@opam/ppxlib": "0.22.0",
     "@opam/sedlex": "2.3",
     "@reason-native/rely": "^3.2.1",
-    "@opam/ocaml-lsp-server": "*"
+    "@opam/ocaml-lsp-server": "1.4.1"
   },
   "scripts": {
     "test": "esy dune runtest --force",
