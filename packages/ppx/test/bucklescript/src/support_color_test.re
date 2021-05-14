@@ -14,6 +14,9 @@ let testData = [
   ("background", [%cx "background-color: red"], CssJs.style(. [|CssJs.backgroundColor(CssJs.red)|])),
   ("currentColor", [%cx "color: currentcolor"], CssJs.style(. [|CssJs.color(`currentColor)|])),
   ("transparent", [%cx "color: transparent"], CssJs.style(. [|CssJs.color(`transparent)|])),
+  ("border-top-color", [%cx "border-top-color: blue"], CssJs.style(. [|CssJs.borderTopColor(CssJs.blue)|])),
+  ("border-right-color", [%cx "border-right-color: green"], CssJs.style(. [|CssJs.borderRightColor(CssJs.green)|])),
+  ("border-bottom-color", [%cx "border-bottom-color: purple"], CssJs.style(. [|CssJs.borderBottomColor(CssJs.purple)|])),
 ];
 
 describe("color", _ => {
