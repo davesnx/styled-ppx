@@ -64,7 +64,7 @@ If you want to know more about how it works or what are the benefits I recommend
 
 ## Installation
 
-The installation process refers to the stable NPM published version (v0.20) which differs from master (v1.x). In master we won't rely on bs-emotion, so this installation will be different.
+The installation process refers to the stable NPM published version (v0.20) which differs from `main` (v1.x). In `master`  we won't rely on bs-emotion, so this installation will be different.
 
 This package depends on [bs-emotion](https://github.com/ahrefs/bs-emotion), [ReasonReact](https://reasonml.github.io/reason-react/) and [BuckleScript](https://bucklescript.github.io), make sure you follow their installations.
 
