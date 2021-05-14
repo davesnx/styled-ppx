@@ -12,7 +12,6 @@
     "clean": "rm -rf src/bundle.js; yarn run re:clean"
   },
   "dependencies": {
-    "bs-css": "^14.0.1",
     "bs-css-emotion": "^2.5.1",
     "@rescript/react": "^0.10.2",
     "bs-platform": "^9.0.2",
