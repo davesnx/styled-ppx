@@ -101,6 +101,7 @@ let testData = [
   ([%cx "padding: 1px 2px 3px"], ),
   ([%cx "padding: 1px 2px 3px 4px"], ),
   // css-color-4
+<<<<<<< HEAD
   ([%cx "color: #012"], ),
   ([%cx "color: #0123"], ),
   ([%cx "color: #012345"], ),
@@ -115,6 +116,23 @@ let testData = [
   ([%cx "color: hsl(120deg 100% 50%)"], ),
   ([%cx "opacity: 0.5"], ),
   ([%cx "opacity: 60%"], ),
+=======
+  [%cx "color: #012"],
+  [%cx "color: #0123"],
+  [%cx "color: #012345"],
+  [%cx "color: #01234567"],
+  [%cx "color: blue"],
+  [%cx "color: currentcolor"],
+  [%cx "color: transparent"],
+  [%cx "color: rgb(1 2 3)"],
+  [%cx "color: rgb(1 2 3 / .4)"],
+  [%cx "color: rgba(1, 2, 3)"],
+  [%cx "color: rgba(1, 2, 3, .4)"],
+  [%cx "color: rgba(1, 2, 3, 40%)"],
+  [%cx "color: hsl(120deg 100% 50%)"],
+  [%cx "opacity: 0.5"],
+  [%cx "opacity: 60%"],
+>>>>>>> a09a0ae84e044dcd5682607d1c660dbd0983d8ba
   // css-images-4
   ([%cx "object-fit: fill"], ),
   ([%cx "object-position: right bottom"], ),

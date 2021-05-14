@@ -21,17 +21,15 @@
   Emotion.(css([display(`block)]))
  */
 open Ppxlib;
-open Ast_helper;
-open Asttypes;
-open Parsetree;
-open Longident;
 open Css_types;
 open Component_value;
+open Ast_helper;
 
-module Ast_builder = Ast_builder.Default;
+module Helper = Ast_helper;
+module Builder = Ast_builder.Default;
 
 module Emotion = {
-  let lident = name => Ldot(Lident("Css"), name);
+  let lident = name => Ldot(Lident("CssJs"), name);
 };
 
 let grammar_error = (loc, message) =>
@@ -47,25 +45,6 @@ let number_to_const = number =>
 let string_to_const = (~loc, s) =>
   Exp.constant(~loc, Const.string(~quotation_delimiter="js", s));
 
-let list_to_expr = (end_loc, xs) =>
-  List.fold_left(
-    (e, param) => {
-      let loc =
-        Lex_buffer.make_loc(
-          ~loc_ghost=true,
-          e.pexp_loc.Location.loc_start,
-          end_loc.Location.loc_end,
-        );
-      Exp.construct(
-        ~loc,
-        {txt: Lident("::"), loc},
-        Some(Exp.tuple(~loc, [param, e])),
-      );
-    },
-    Exp.construct(~loc=end_loc, {txt: Lident("[]"), loc: end_loc}, None),
-    xs,
-  );
-
 let source_code_of_loc = loc => {
   let Location.{loc_start, loc_end, _} = loc;
   let Lex_buffer.{buf, pos, _} = Lex_buffer.last_buffer^;
@@ -74,68 +53,9 @@ let source_code_of_loc = loc => {
   let loc_end = loc_end.Lexing.pos_cnum - pos_offset;
   Sedlexing.Latin1.sub_lexeme(buf, loc_start - 1, loc_end - loc_start);
 };
+
 let rec render_at_rule = (ar: At_rule.t): Parsetree.expression =>
   switch (ar.At_rule.name) {
-  | ("keyframes" as n, loc) =>
-    let ident = Exp.ident(~loc, {txt: Lident(n), loc});
-    switch (ar.At_rule.block) {
-    | Brace_block.Stylesheet((rs, loc)) =>
-      let end_loc =
-        Lex_buffer.make_loc(
-          ~loc_ghost=true,
-          loc.Location.loc_end,
-          loc.Location.loc_end,
-        );
-      let arg =
-        List.fold_left(
-          (e, r) =>
-            switch (r) {
-            | Rule.Style_rule(sr) =>
-              let progress_expr =
-                switch (sr.Style_rule.prelude) {
-                | ([(Percentage(p), loc)], _) =>
-                  Exp.constant(~loc, number_to_const(p))
-                | ([(Ident("from"), loc)], _)
-                | ([(Number("0"), loc)], _) =>
-                  Exp.constant(~loc, Const.int(0))
-                | ([(Ident("to"), loc)], _) =>
-                  Exp.constant(~loc, Const.int(100))
-                | (_, loc) =>
-                  grammar_error(loc, "Unexpected @keyframes prelude")
-                };
-              let block_expr = render_declaration_list(sr.Style_rule.block);
-              let tuple =
-                Exp.tuple(
-                  ~loc=sr.Style_rule.loc,
-                  [progress_expr, block_expr],
-                );
-              let loc =
-                Lex_buffer.make_loc(
-                  ~loc_ghost=true,
-                  sr.Style_rule.loc.Location.loc_start,
-                  loc.Location.loc_end,
-                );
-              Exp.construct(
-                ~loc,
-                {txt: Lident("::"), loc},
-                Some(Exp.tuple(~loc, [tuple, e])),
-              );
-            | Rule.At_rule(ar) =>
-              grammar_error(
-                ar.At_rule.loc,
-                "Unexpected at-rule in @keyframes body",
-              )
-            },
-          Exp.construct(
-            ~loc=end_loc,
-            {txt: Lident("[]"), loc: end_loc},
-            None,
-          ),
-          List.rev(rs),
-        );
-      Exp.apply(~loc=ar.At_rule.loc, ident, [(Nolabel, arg)]);
-    | _ => assert(false)
-    };
   | ("media", _) => render_media_query(ar)
   | (n, _) =>
     grammar_error(ar.At_rule.loc, "At-rule @" ++ n ++ " not supported")
@@ -181,6 +101,7 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
     | (Ident("and"), _) => "and"
     | (Ident("or"), _) => "or"
     | (_, loc) => invalid_format(loc);
+
   let query = prelude |> List.map(parse_condition) |> String.concat(" ");
   if (query == "") {
     invalid_format(prelude_loc);
@@ -188,20 +109,19 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
 
   let rules =
     switch (ar.At_rule.block) {
-    | Brace_block.Empty => invalid_format(loc)
-    | Declaration_list(declaration) => render_declaration_list(declaration)
+    | Empty => invalid_format(loc)
     | Stylesheet(_) => invalid_format(loc)
+    | Declaration_list(declaration) => render_declaration_list(declaration)
     };
 
   let media_ident =
-    Ast_builder.pexp_ident(~loc=name_loc, {txt: Emotion.lident("media"), loc});
-  Ast_builder.eapply(~loc, media_ident, [Ast_builder.estring(~loc=prelude_loc, query), rules]);
+    Builder.pexp_ident(~loc=name_loc, {txt: Emotion.lident("media"), loc});
+  Builder.eapply(~loc, media_ident, [Builder.estring(~loc=prelude_loc, query), rules]);
 }
 and render_declaration =
     (d: Declaration.t, _d_loc: Location.t): list(Parsetree.expression) => {
   let (name, name_loc) = d.Declaration.name;
   let (_valueList, loc) = d.Declaration.value;
-
   let value_source = source_code_of_loc(loc);
 
   switch (Declarations_to_emotion.parse_declarations((name, value_source))) {
@@ -215,7 +135,6 @@ and render_unsafe_declaration =
     (d: Declaration.t, _d_loc: Location.t): list(Parsetree.expression) => {
   let (name, _name_loc) = d.Declaration.name;
   let (_valueList, loc) = d.Declaration.value;
-
   let value_source = source_code_of_loc(loc);
 
   [Declarations_to_emotion.render_when_unsupported_features(name, value_source)];
@@ -237,20 +156,19 @@ and render_declarations =
       },
     ds,
   )
-  |> List.rev
 }
 and render_declaration_list = ((list, loc): Declaration_list.t): Parsetree.expression => {
-  let expr_with_loc_list = render_declarations(list);
-  list_to_expr(loc, expr_with_loc_list);
+  Builder.pexp_array(~loc, render_declarations(list));
 }
-and render_style_rule = (ident, sr: Style_rule.t): Parsetree.expression => {
-  let (prelude, prelude_loc) = sr.Style_rule.prelude;
-  let dl_expr = render_declaration_list(sr.Style_rule.block);
+and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
+  let (prelude, prelude_loc) = rule.Style_rule.prelude;
+  let dl_expr = render_declaration_list(rule.Style_rule.block);
+
   let rec render_prelude_value = (s, (value, value_loc)) => {
     switch (value) {
     | Delim(":") => ":" ++ s
-    | Delim(",") => ", " ++ s
     | Delim(".") => "." ++ s
+    | Delim(",") => ", " ++ s
     | Delim(v) => " " ++ v ++ " " ++ s
     | Ident(v)
     | Operator(v)
@@ -266,16 +184,17 @@ and render_style_rule = (ident, sr: Style_rule.t): Parsetree.expression => {
     | _ => grammar_error(value_loc, "Unexpected selector")
     };
   };
+
   switch (prelude) {
-  /* two-colons pseudoclasses */
-  | [
+  | /* two-colons pseudoclasses */
+    [
       (Selector("&"), _),
       (Delim(":"), _),
       (Delim(":"), _),
-      (Ident(pc), loc),
+      (Ident(pseudoclasses), loc),
     ] =>
-    let f =
-      switch (pc) {
+    let pseudoclass =
+      switch (pseudoclasses) {
       | "active" => "active"
       | "after" => "after"
       | "before" => "before"
@@ -285,12 +204,16 @@ and render_style_rule = (ident, sr: Style_rule.t): Parsetree.expression => {
       | "placeholder" => "placeholder"
       | _ => grammar_error(loc, "Unexpected pseudo-class")
       };
-    let ident = Exp.ident(~loc, {txt: Emotion.lident(f), loc});
-    Exp.apply(~loc=sr.Style_rule.loc, ident, [(Nolabel, dl_expr)]);
-  | [(Selector("&"), _), (Delim(":"), _), (Ident(pc), loc)] =>
-    /* single-colon pseudoclasses */
-    let f =
-      switch (pc) {
+    let ident = Exp.ident(~loc, {txt: Emotion.lident(pseudoclass), loc});
+    Exp.apply(~loc=rule.Style_rule.loc, ident, [(Nolabel, dl_expr)]);
+  | /* single-colon pseudoclasses */
+    [
+      (Selector("&"), _),
+      (Delim(":"), _),
+      (Ident(pseudoclasses), loc)
+    ] =>
+    let pseudoclass =
+      switch (pseudoclasses) {
       | "checked" => "checked"
       | "disabled" => "disabled"
       | "first-child" => "firstChild"
@@ -315,21 +238,21 @@ and render_style_rule = (ident, sr: Style_rule.t): Parsetree.expression => {
       | "target" => "target"
       | _ => grammar_error(loc, "Unexpected pseudo-class")
       };
-    let ident = Exp.ident(~loc, {txt: Emotion.lident(f), loc});
-    Exp.apply(~loc=sr.Style_rule.loc, ident, [(Nolabel, dl_expr)]);
-  | [
+    let ident = Exp.ident(~loc, {txt: Emotion.lident(pseudoclass), loc});
+    Exp.apply(~loc=rule.Style_rule.loc, ident, [(Nolabel, dl_expr)]);
+  | /* nth-child & friends */
+    [
       (Selector("&"), _),
       (Delim(":"), _),
       (Function((_pc, loc), (_args, _args_loc)), _f_loc),
     ] =>
-    /* nth-child & friends */
     // TODO: parses and use the correct functions instead of just strings selector
     let ident = Exp.ident(~loc, {txt: Emotion.lident("selector"), loc});
     let selector =
       List.fold_left(render_prelude_value, "", List.rev(prelude));
     let selector_expr = string_to_const(~loc=prelude_loc, selector);
     Exp.apply(
-      ~loc=sr.Style_rule.loc,
+      ~loc=rule.Style_rule.loc,
       ident,
       [(Nolabel, selector_expr), (Nolabel, dl_expr)],
     );
@@ -339,7 +262,7 @@ and render_style_rule = (ident, sr: Style_rule.t): Parsetree.expression => {
     let selector_expr = string_to_const(~loc=prelude_loc, selector);
 
     Exp.apply(
-      ~loc=sr.Style_rule.loc,
+      ~loc=rule.Style_rule.loc,
       ident,
       [(Nolabel, selector_expr), (Nolabel, dl_expr)],
     );
@@ -349,7 +272,7 @@ and render_style_rule = (ident, sr: Style_rule.t): Parsetree.expression => {
 let render_style_call = (declaration_list): Parsetree.expression => {
   let loc = declaration_list.pexp_loc;
   let ident = Exp.ident(~loc, {txt: Emotion.lident("style"), loc});
-  Exp.apply(~loc, ident, [(Nolabel, declaration_list)]);
+  Exp.apply(~loc, ~attrs=[Create.uncurried(~loc)], ident, [(Nolabel, declaration_list)]);
 };
 
 let render_rule = (ident, r: Rule.t): Parsetree.expression => {
@@ -395,17 +318,22 @@ let render_emotion_keyframe = ((ruleList, loc)): Parsetree.expression => {
              loc: style_loc,
            }) =>
            let percentage =
-             get_percentage_from_prelude(prelude) |> Ast_builder.eint(~loc=prelude_loc);
+             get_percentage_from_prelude(prelude) |> Builder.eint(~loc=prelude_loc);
            let rules = render_declaration_list(block);
-           Ast_builder.pexp_tuple(~loc=style_loc, [percentage, rules]);
+           Builder.pexp_tuple(~loc=style_loc, [percentage, rules]);
          | Rule.At_rule(_) => grammar_error(loc, invalidSelectorErrorMessage)
          }
        })
-    |> Ast_builder.elist(~loc);
+    |> Builder.pexp_array(~loc);
   let emotionKeyframes =
-    Ast_builder.pexp_ident(~loc, {txt: Emotion.lident("keyframes"), loc});
-  Ast_builder.eapply(~loc, emotionKeyframes, [keyframes]);
+    Builder.pexp_ident(~loc, {txt: Emotion.lident("keyframes"), loc});
+
+  {
+    ...Builder.eapply(~loc, emotionKeyframes, [keyframes]),
+    pexp_attributes: [Create.uncurried(~loc)]
+  };
 };
+
 let render_global = ((ruleList, loc): Stylesheet.t): Parsetree.expression => {
   let emotionGlobal = Exp.ident(~loc, {txt: Emotion.lident("global"), loc});
 

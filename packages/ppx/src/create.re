@@ -3,6 +3,15 @@ open Ppxlib;
 module Helper = Ast_helper;
 module Builder = Ppxlib.Ast_builder.Default;
 
+let withLoc = (~loc, txt) => {
+  { loc, txt }
+};
+
+/* fn(. ) */
+let uncurried = (~loc) => {
+  Builder.attribute(~name=withLoc(~loc, "bs"), ~loc, ~payload=PStr([]))
+};
+
 /* (~a, ~b, ~c, etc...) => args */
 let rec fnWithLabeledArgs = (list, args) =>
   switch (list) {
@@ -15,20 +24,20 @@ let rec fnWithLabeledArgs = (list, args) =>
   };
 
 /* let styles = Emotion.(css(exp)) */
-let styles = (~loc, ~name, ~exp) => {
+let styles = (~loc, ~name, ~expr) => {
   let variableName = Helper.Pat.mk(~loc, Ppat_var({txt: name, loc}));
-  Helper.Str.mk(~loc, Pstr_value(Nonrecursive, [Helper.Vb.mk(~loc, variableName, exp)]));
+  Helper.Str.mk(~loc, Pstr_value(Nonrecursive, [Helper.Vb.mk(~loc, variableName, expr)]));
 };
 
 /* let styles = (~arg1, ~arg2) => Emotion.(css(exp)) */
-let dynamicStyles = (~loc, ~name, ~args, ~exp) => {
+let dynamicStyles = (~loc, ~name, ~args, ~expr) => {
   let variableName = Helper.Pat.mk(~loc, Ppat_var({txt: name, loc}));
 
   Helper.Str.mk(
     ~loc,
     Pstr_value(
       Nonrecursive,
-      [Helper.Vb.mk(~loc, variableName, fnWithLabeledArgs(args, exp))],
+      [Helper.Vb.mk(~loc, variableName, fnWithLabeledArgs(args, expr))],
     ),
   );
 };
@@ -272,7 +281,7 @@ let domRefLabel = (~loc) =>
     ~loc,
     ~attrs=[Helper.Attr.mk({txt: "bs.optional", loc}, PStr([]))],
     {txt: "ref", loc},
-    Helper.Typ.constr(~loc, {txt: Ldot(Lident("ReactDOMRe"), "domRef"), loc}, []),
+    Helper.Typ.constr(~loc, {txt: Ldot(Lident("ReactDOM"), "domRef"), loc}, []),
   );
 
 /* [@bs.optional] children: React.element */
