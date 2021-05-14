@@ -1,7 +1,8 @@
 open Jest;
 open Expect;
 open ReactTestingLibrary;
-Emotion.loadSerializer();
+
+EmotionSerializer.load();
 
 let fadeIn = [%styled.keyframe {|
   0% { opacity: 0 }
@@ -13,7 +14,6 @@ module Animate = [%styled.div {|
   height: 100vh;
   width: 100vw;
   animation-name: $(fadeIn);
-  /* animation: $(fadeIn) ease-in 200ms; */
 |}];
 
 test("Animate should render keyframes", () => {

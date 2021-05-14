@@ -1,8 +1,8 @@
 open Jest;
 open Expect;
 open ReactTestingLibrary;
-Emotion.loadSerializer();
 
+EmotionSerializer.load();
 module Nested = [%styled.div
   {|
     align-items: center;

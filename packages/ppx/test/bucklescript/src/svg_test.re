@@ -1,8 +1,8 @@
 open Jest;
 open Expect;
 open ReactTestingLibrary;
-Emotion.loadSerializer();
 
+EmotionSerializer.load();
 module Svg = [%styled.svg "width: 16px; height: 16px;"];
 
 test("Svg renders", () => {

@@ -1,7 +1,8 @@
 open Jest;
 open Expect;
 open ReactTestingLibrary;
-Emotion.loadSerializer();
+
+EmotionSerializer.load();
 
 module ArrayStatic = [%styled.section [|
   [%css "display: flex;"],
