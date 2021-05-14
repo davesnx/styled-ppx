@@ -36,7 +36,7 @@ module Link = [%styled.a {|
 ```
 
 ### styled with interpolation
-**Styled component with styles defined by variables outside of the defintion**, this is not type-safe since we cast it as a string. Any interpolation that isn't a string might cause the ppx to not compile. Allowing any 
+**Styled component with styles defined by variables outside of the defintion**, this is not type-safe since we cast it as a string. Any interpolation that isn't a string might cause the ppx to not compile. Allowing any
 
 ```reason
 let black = "#333";

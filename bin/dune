@@ -2,4 +2,5 @@
   (name ppx)
   (public_name styled-ppx)
   (libraries styled-ppx.lib)
-  (package styled-ppx))
+  (package styled-ppx)
+)
