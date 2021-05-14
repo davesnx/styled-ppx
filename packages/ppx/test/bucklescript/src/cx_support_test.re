@@ -73,6 +73,20 @@ let testData = [
       |]),
     |])
   ), */
+  /* (
+      [%css "box-shadow: 12px 12px 2px 1px rgba(0, 0, 255, .2)"],
+      [|
+        CssJs.boxShadows([|
+          CssJs.Shadow.box(
+            ~x=`pxFloat(12.),
+            ~y=`pxFloat(12.),
+            ~blur=`pxFloat(2.),
+            ~spread=`pxFloat(1.),
+            `rgba((0, 0, 255, 0.2)),
+          ),
+        |]),
+      |],
+    ), */
 ];
 
 Belt.List.forEachWithIndex(testData, (index, (cssIn, emotionOut)) => {
