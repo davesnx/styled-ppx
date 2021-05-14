@@ -49,6 +49,26 @@ let testData = [
     [%cx "&:hover { color: gray; }"],
     CssJs.style(. [|CssJs.hover([|CssJs.color(CssJs.gray)|])|]),
   ),
+  (
+    "& + &",
+    [%cx "& + & { margin: 10px; }"],
+    CssJs.style(. [|
+      CssJs.selector(
+        {js|& + &|js},
+        [|CssJs.margin(CssJs.px(10))|]
+      )
+    |]),
+  ),
+  /* (
+    "*:not(:last-child)",
+    [%cx "& > *:not(:last-child) { margin: 10px; }"],
+    CssJs.style(. [|
+      CssJs.selector(
+        {js|& > *:not(:last-child)|js},
+        [|CssJs.margin(CssJs.px(10))|]
+      )
+    |]),
+  ) */
 ];
 
 describe("Selectors", _ => {
