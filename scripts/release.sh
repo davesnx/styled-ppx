@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -eo pipefail
+set -x
+
 function help() {
   echo "Usage: $(basename "$0") [<newversion> | major | minor | patch | premajor | preminor | prepatch | prerelease]"
 }
@@ -15,8 +18,8 @@ branch=$(git rev-parse --abbrev-ref HEAD)
 if [ -n "${changes}" ]; then
   echo "Please commit staged files prior to bumping"
   exit 1
-elif [ "${branch}" != "master" ]; then
-  echo "Please run the release script on master"
+elif [ "${branch}" != "main" ]; then
+  echo "Please run the release script on main"
   exit 1
 else
   npm version "$1"

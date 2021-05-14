@@ -1,8 +1,8 @@
 open Jest;
 open Expect;
 open ReactTestingLibrary;
-Emotion.loadSerializer();
 
+EmotionSerializer.load();
 let fadeIn = [%styled.keyframe {|
   0% { opacity: 0 }
   100% { opacity: 1 }
@@ -20,14 +20,13 @@ module Component = [%styled.div {|
   font-size: 30px;
 
   animation-name: $(fadeIn);
-  /* animation: $(fadeIn) ease-in 200ms; */
 
   width: unset;
 |}];
 
 module ComponentInline = [%styled.div "color: #454545"];
 module StyledInput = [%styled.input "color: #454545"];
-module ComponentLink = [%styled.a {| color: #454545 |}];
+module ComponentLink = [%styled.a "color: #454545"];
 
 test("Component renders", () => {
   <Component />

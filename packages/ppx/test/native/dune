@@ -1,0 +1,42 @@
+(library
+ (name StyledPpxTestNativeLib)
+ (modules
+  (:standard \ Runner static_css_tests))
+ (library_flags (-linkall -g))
+ (libraries MockBsCss rely.lib styled-ppx.lib ppxlib)
+ (preprocess (pps ppxlib.metaquot styled-ppx.lib))
+)
+
+(executable
+ (name Runner)
+ (modules Runner)
+ (libraries StyledPpxTestNativeLib styled_ppx_css_parser)
+ (preprocess
+  (pps ppxlib.metaquot styled-ppx.lib)
+ )
+)
+
+; type check
+
+(rule
+ (targets static_css_tests.ml)
+ (deps ./Runner.exe)
+ (action (run %{deps}))
+)
+
+(library
+ (name StyledPpxTestNativeTypeCheck)
+ (libraries MockBsCss)
+ (modules static_css_tests)
+ (preprocess
+  (pps styled-ppx.lib ppxlib.metaquot)
+ )
+)
+
+(rule
+ (alias native_typecheck_test)
+ (deps .StyledPpxTestNativeTypeCheck.objs/byte/styledPpxTestNativeTypeCheck__Static_css_tests.cmi)
+ (action ; this is only because a action is required
+  (echo "Typecheck tests runned successfully")
+ )
+)

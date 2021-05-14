@@ -1,0 +1,48 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ArrayDynamicComponent renders 1`] = `
+.emotion-0 {
+  display: block;
+  color: #999999;
+}
+
+<div>
+  <div
+    class="emotion-0"
+    var="Black"
+  />
+</div>
+`;
+
+exports[`ArrayStatic renders 1`] = `
+.emotion-0 {
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+<div>
+  <section
+    class="emotion-0"
+  />
+</div>
+`;
+
+exports[`SequenceDynamicComponent renders 1`] = `
+.emotion-0 {
+  color: #FAFAFA;
+  display: block;
+}
+
+<div>
+  <div
+    class="emotion-0"
+    var="White"
+  />
+</div>
+`;

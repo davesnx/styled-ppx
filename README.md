@@ -30,10 +30,7 @@ module StyledComponent = [%styled.div
 |}
 ];
 
-ReactDOMRe.renderToElementWithId(
-  <StyledComponent> {React.string("- Middle -")} </StyledComponent>,
-  "app",
-);
+<StyledComponent> {React.string("- Middle -")} </StyledComponent>,
 ```
 
 ### Dynamic styled component
@@ -44,22 +41,16 @@ module Dynamic = [%styled (~color, ~background) => {j|
 |j}
 ];
 
-ReactDOMRe.renderToElementWithId(
-  <Dynamic color="#EB5757" background="#516CF0">
-    {React.string("Hello!")}
-  </Dynamic>,
-  "app",
-);
+<Dynamic color="#EB5757" background="#516CF0">
+  {React.string("Hello!")}
+</Dynamic>
 ```
 
 > Dynamic components are somehow not fully supported, and it's the reason why the project is still in BETA.
 
 ### Inline css function
 ```reason
-ReactDOMRe.renderToElementWithId(
-  <span className=[%css "font-size: 32px"]> {React.string("Hello!")} </span>,
-  "app",
-);
+<span className=[%css "font-size: 32px"]> {React.string("Hello!")} </span>
 ```
 
 For further detail, take a look in [here](./docs/apis.md).
@@ -73,7 +64,7 @@ If you want to know more about how it works or what are the benefits I recommend
 
 ## Installation
 
-The installation process refers to the stable NPM published version (v0.20) which differs from master (v1.x). In master we won't rely on bs-emotion, so this installation will be different.
+The installation process refers to the stable NPM published version (v0.20) which differs from `main` (v1.x). In `master`  we won't rely on bs-emotion, so this installation will be different.
 
 This package depends on [bs-emotion](https://github.com/ahrefs/bs-emotion), [ReasonReact](https://reasonml.github.io/reason-react/) and [BuckleScript](https://bucklescript.github.io), make sure you follow their installations.
 

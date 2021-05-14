@@ -10,14 +10,14 @@
     "url": "https://github.com/davesnx/styled-ppx.git"
   },
   "engines": {
-    "vscode": "^1.5.0"
+    "vscode": "^1.49.0"
   },
   "categories": [
     "Programming Languages"
   ],
   "scripts": {
     "prepare": "node ./node_modules/vscode/bin/install",
-    "test": "node ./node_modules/vscode/bin/test ./test"
+    "test": "node ./tests/index.js"
   },
   "contributes": {
     "languages": [
@@ -52,6 +52,9 @@
     ]
   },
   "devDependencies": {
-    "vscode": "^1.1.26"
+    "vscode": "^1.1.26",
+    "vscode-test": "^1.4.0",
+    "glob": "7.1.6",
+    "mocha": "^8.1.3"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@davesnx/styled-ppx",
-  "version": "1.3.0",
+  "version": "1.5.0",
   "description": "CSS-in-Reason and OCaml",
   "author": "David Sancho <dsnxmoreno@gmail.com>",
   "license": "MIT",
@@ -34,7 +34,6 @@
     }
   },
   "devDependencies": {
-    "@opam/merlin": "*",
     "ocaml": "~4.10.0",
     "@esy-ocaml/reason": "^3.6.2",
     "@opam/dune": ">=2.8.4",
@@ -43,18 +42,14 @@
     "@opam/ppxlib": "0.22.0",
     "@opam/sedlex": "2.3",
     "@reason-native/rely": "^3.2.1",
-    "@opam/ocaml-lsp-server": "*"
+    "@opam/ocaml-lsp-server": "1.4.1"
   },
   "scripts": {
     "test": "esy dune runtest --force",
-    "test:promote": "esy dune runtest --auto-promote",
     "test_native": "esy dune build @native_typecheck_test",
-    "test_native:watch": "esy test_native --watch",
+    "test_css_support": "esy dune build @css_support_test",
     "test_snapshot": "esy dune build @snapshot_test",
-    "test_snapshot:watch": "esy test_snapshot --watch",
-    "test_snapshot:promote": "esy dune build @snapshot_test --auto-promote",
     "test_bs": "cd packages/ppx/test/bucklescript; yarn test",
-    "format": "esy dune build @fmt --auto-promote",
     "watch": "esy dune build --root . --watch"
   }
 }
