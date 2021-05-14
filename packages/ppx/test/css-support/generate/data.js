@@ -1,4 +1,5 @@
-/* Data comming from https://github.com/LeaVerou/css3test */
+/* CSS 3 Spec Tests */
+/* Data from https://github.com/LeaVerou/css3test */
 
 Array.prototype.and = function (arr2, separator) {
 	separator = separator || ' ';
