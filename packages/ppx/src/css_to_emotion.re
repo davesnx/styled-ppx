@@ -169,6 +169,7 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
     | Delim(":") => ":" ++ s
     | Delim(".") => "." ++ s
     | Delim(",") => ", " ++ s
+    /* v can be ">", so we need an empty space between */
     | Delim(v) => " " ++ v ++ " " ++ s
     | Ident(v)
     | Operator(v)
@@ -221,6 +222,7 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
       | "focus" => "focus"
       | "hover" => "hover"
       | "last-child" => "lastChild"
+      | "not" => "not"
       | "last-of-type" => "lastOfType"
       | "link" => "link"
       | "read-only" => "readOnly"
