@@ -177,15 +177,13 @@ let testData = [
     [%cx "grid-gap: 20px;"],
     CssJs.style(. [|CssJs.unsafe("gridGap", "20px")|])
   ),
-
   /* [%cx "-moz-text-blink: blink"], */
   /* [%cx "display: -webkit-inline-box"], */
-    /* ([%cx {|
+  ([%cx {|
     box-shadow:
       12px 12px 2px 1px rgba(0, 0, 255, .2),
       13px 14px 5px 6px rgba(2, 1, 255, 50%);
     |}],
-
     CssJs.style(.
       [|
       CssJs.boxShadows([|
@@ -194,32 +192,33 @@ let testData = [
           ~y=`pxFloat(12.),
           ~blur=`pxFloat(2.),
           ~spread=`pxFloat(1.),
-          `rgba((0, 0, 255, `num(0.2))),
+          `rgba(0, 0, 255, `num(0.2)),
         ),
         CssJs.Shadow.box(
           ~x=`pxFloat(13.),
           ~y=`pxFloat(14.),
           ~blur=`pxFloat(5.),
           ~spread=`pxFloat(6.),
-          `rgba((2, 1, 255, `percent(0.5))),
+          `rgba(2, 1, 255, `percent(0.5)),
         ),
       |]),
     |])
-  ), */
-  /* (
-      [%css "box-shadow: 12px 12px 2px 1px rgba(0, 0, 255, .2)"],
+  ),
+  (
+    [%cx "box-shadow: 12px 12px 2px 1px rgba(0, 0, 255, 0.2)"],
+    CssJs.style(.
       [|
-        CssJs.boxShadows([|
-          CssJs.Shadow.box(
-            ~x=`pxFloat(12.),
-            ~y=`pxFloat(12.),
-            ~blur=`pxFloat(2.),
-            ~spread=`pxFloat(1.),
-            `rgba((0, 0, 255, 0.2)),
-          ),
-        |]),
-      |],
-  ), */
+      CssJs.boxShadows([|
+        CssJs.Shadow.box(
+          ~x=`pxFloat(12.),
+          ~y=`pxFloat(12.),
+          ~blur=`pxFloat(2.),
+          ~spread=`pxFloat(1.),
+          `rgba(0, 0, 255, `num(0.2)),
+        ),
+      |]),
+    |]),
+  ),
 ];
 
 Belt.List.forEachWithIndex(testData, (index, (cssIn, emotionOut)) => {

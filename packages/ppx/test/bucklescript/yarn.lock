@@ -1213,14 +1213,15 @@ bs-css-emotion@^2.5.1:
     bs-css "14.0.1"
     emotion "^10.0.0"
 
-<<<<<<< HEAD
 bs-css@14.0.1:
-=======
-bs-css@14.0.1, bs-css@^14.0.1:
->>>>>>> a09a0ae84e044dcd5682607d1c660dbd0983d8ba
   version "14.0.1"
   resolved "https://registry.yarnpkg.com/bs-css/-/bs-css-14.0.1.tgz#983394472d825c590a8f91230bfcb082e9474670"
   integrity sha512-gNaKpU7sQKjyVCTgNa+ReHt0yAx19HcOYbGU4Sg7Jlv04NXK3FCvqffF60xb+x+jMMquOTLIj4VyQPiPSZ82Nw==
+
+bs-css@^14.0.2:
+  version "14.0.2"
+  resolved "https://registry.yarnpkg.com/bs-css/-/bs-css-14.0.2.tgz#21786202533b66c0da5bbb3de9d0491b263d7e44"
+  integrity sha512-Dr3zr/xgBdxpwZHaYRq2+gf8V1qFDFVU+qLU9P/0zf7/uYhXMwJuvXFA/o1VCV2U5cEu+lywngXHo/BCEBcNpg==
 
 bs-dom-testing-library@^0.6.2:
   version "0.6.2"

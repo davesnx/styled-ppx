@@ -220,6 +220,25 @@ CssJs.style(. [|
     ),
   |]),
 |]);
+CssJs.style(. [|
+  CssJs.boxShadows([|
+    CssJs.Shadow.box(
+      ~x=`pxFloat(1.),
+      ~y=`pxFloat(2.),
+      ~blur=`pxFloat(3.),
+      ~spread=`pxFloat(4.),
+      ~inset=true,
+      CssJs.black,
+    ),
+    CssJs.Shadow.box(
+      ~x=`pxFloat(1.),
+      ~y=`pxFloat(2.),
+      ~blur=`pxFloat(3.),
+      ~spread=`pxFloat(4.),
+      CssJs.black,
+    ),
+  |]),
+|]);
 CssJs.style(. [|CssJs.unsafe("backgroundPositionX", "right")|]);
 CssJs.style(. [|CssJs.unsafe("backgroundPositionX", "center")|]);
 CssJs.style(. [|CssJs.unsafe("backgroundPositionX", "50%")|]);

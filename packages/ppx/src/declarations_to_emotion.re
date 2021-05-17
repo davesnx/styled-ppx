@@ -42,7 +42,7 @@ let render_percentage = number => [%expr
   `percent([%e render_number(number)])
 ];
 
-let render_css_wide_keywords = (name, value) => {
+let render_css_global_values = (name, value) => {
   let.ok value = Parser.parse(Standard.css_wide_keywords, value);
   let value =
     switch (value) {
@@ -1438,13 +1438,11 @@ let render_to_expr = (name, value) => {
 };
 
 let parse_declarations = ((name, value)) => {
-  open Parser;
-
   let.ok is_valid_string =
-    check_property(~name, value)
+    Parser.check_property(~name, value)
     |> Result.map_error((`Unknown_value) => `Not_found);
 
-  switch (render_css_wide_keywords(name, value)) {
+  switch (render_css_global_values(name, value)) {
   | Ok(value) => Ok(value)
   | Error(_) =>
     switch (render_to_expr(name, value)) {
