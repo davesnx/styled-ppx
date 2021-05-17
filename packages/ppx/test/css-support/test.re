@@ -159,6 +159,7 @@
 [%cx {|box-shadow: 1px 2px 3px 4px black|}];
 [%cx {|box-shadow: inset 1px 1px|}];
 [%cx {|box-shadow: 1px 2px 3px 4px black inset|}];
+[%cx {|box-shadow: 1px 2px 3px 4px black inset, 1px 2px 3px 4px black|}];
 
 /*CSS Backgrounds and Borders Module Level 4*/
 [%cx {|background-position-x: right|}];
