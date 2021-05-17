@@ -51,12 +51,12 @@ module Component = [%styled.div {j|
 |j}
 ];
 
-let styles = [%cx "display: flex; justify-content: center; color: blue"];
+let stilos = [%cx "box-shadow: 1px 2px 0 0 #ff0000 inset, 1px 2px 0 0 #ff0000"];
 
 switch (ReactDOM.querySelector("#app")) {
   | Some(el) =>
     ReactDOM.render(
-      <div className=styles>
+      <div className=stilos>
         <App onClick=Js.log>
           <Dynamic a="23"/>
           <Component>
