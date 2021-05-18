@@ -109,7 +109,6 @@ let variants_to_expression =
   | `Match_parent => raise(Unsupported_feature)
   | `Right => id([%expr `right])
   | `Start => id([%expr `start])
-  | `CurrentColor => id([%expr `currentColor])
   | `Transparent => id([%expr `transparent])
   | `Bottom => id([%expr `bottom])
   | `Top => id([%expr `top])
@@ -547,8 +546,7 @@ let render_function_rgb = ast => {
   let alpha = Option.map(render_color_alpha, alpha);
 
   switch (alpha) {
-  | Some(alpha) =>
-    id([%expr `rgba(([%e red], [%e green], [%e blue], [%e alpha]))])
+  | Some(a) => id([%expr `rgba(([%e red], [%e green], [%e blue], [%e a]))])
   | None => id([%expr `rgb(([%e red], [%e green], [%e blue]))])
   };
 };
@@ -576,7 +574,7 @@ let render_color =
   fun
   | `Hex_color(hex) => id([%expr `hex([%e render_string(hex)])])
   | `Named_color(color) => render_named_color(color)
-  | `CurrentColor => variants_to_expression(`CurrentColor)
+  | `CurrentColor => id([%expr `currentColor])
   | `Function_rgb(rgb)
   | `Function_rgba(rgb) => render_function_rgb(rgb)
   | `Function_hsl(`Hsl_0(hsl))
