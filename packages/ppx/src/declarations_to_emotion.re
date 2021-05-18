@@ -31,6 +31,7 @@ let emit = (parser, value_of_ast, value_to_expr) => {
   let ast_to_expr = ast => value_of_ast(ast) |> value_to_expr;
   let string_to_expr = string =>
     ast_of_string(string) |> Result.map(ast_to_expr);
+
   {ast_of_string, value_of_ast, value_to_expr, ast_to_expr, string_to_expr};
 };
 
@@ -100,6 +101,7 @@ let variants_to_expression =
   | `Break_word => raise(Unsupported_feature)
   | `Keep_all => id([%expr `keepAll])
   | `Anywhere => id([%expr `anywhere])
+  | `BreakWord => id([%expr `breakWord])
   | `End => raise(Unsupported_feature)
   | `Justify => id([%expr `justify])
   | `Justify_all => raise(Unsupported_feature)
@@ -107,7 +109,6 @@ let variants_to_expression =
   | `Match_parent => raise(Unsupported_feature)
   | `Right => id([%expr `right])
   | `Start => id([%expr `start])
-  | `Currentcolor => id([%expr `currentColor])
   | `Transparent => id([%expr `transparent])
   | `Bottom => id([%expr `bottom])
   | `Top => id([%expr `top])
@@ -151,8 +152,10 @@ let transform_with_variable = (parser, map, value_to_expr) =>
     | `Value(ast) => map(ast),
     value_to_expr,
   );
-let apply = (parser, map, id) =>
+
+let apply = (parser, id, map) =>
   transform_with_variable(parser, map, arg => [[%expr [%e id]([%e arg])]]);
+
 let unsupported = (~call=?, parser) =>
   transform_with_variable(
     parser,
@@ -163,7 +166,7 @@ let unsupported = (~call=?, parser) =>
   );
 
 let variants = (parser, identifier) =>
-  apply(parser, variants_to_expression, identifier);
+  apply(parser, identifier, variants_to_expression);
 
 // TODO: all of them could be float, but bs-css doesn't support it
 let render_length =
@@ -198,40 +201,44 @@ let render_length_percentage =
 
 // css-sizing-3
 let render_function_fit_content = _lp => raise(Unsupported_feature);
-let width =
-  apply(
-    property_width,
-    fun
+let render_width =
+  fun
     | `Auto => variants_to_expression(`Auto)
     | `Length(_) as lp
     | `Percentage(_) as lp => render_length_percentage(lp)
     | `Max_content
     | `Min_content => raise(Unsupported_feature)
     | `Fit_content(lp) => render_function_fit_content(lp)
-    | _ => raise(Unsupported_feature),
+    | _ => raise(Unsupported_feature);
+
+let width =
+  apply(
+    property_width,
     [%expr CssJs.width],
+    render_width,
   );
 let height =
   apply(
     property_height,
-    apply_value(width.value_of_ast),
     [%expr CssJs.height],
+    apply_value(width.value_of_ast),
   );
 let min_width =
   apply(
     property_min_width,
-    apply_value(width.value_of_ast),
     [%expr CssJs.minWidth],
+    apply_value(width.value_of_ast),
   );
 let min_height =
   apply(
     property_min_height,
-    apply_value(width.value_of_ast),
     [%expr CssJs.minHeight],
+    apply_value(width.value_of_ast),
   );
 let max_width =
   apply(
     property_max_width,
+    [%expr CssJs.maxWidth],
     fun
     | `Auto => raise(Unsupported_feature)
     | `None => variants_to_expression(`None)
@@ -241,45 +248,44 @@ let max_width =
     | `Min_content as ast
     | `Fit_content(_) as ast => apply_value(width.value_of_ast, ast)
     | _ => raise(Unsupported_feature),
-    [%expr CssJs.maxWidth],
   );
 let max_height =
   apply(
     property_max_height,
-    data => max_width.value_of_ast(`Value(data)),
     [%expr CssJs.maxHeight],
+    data => max_width.value_of_ast(`Value(data)),
   );
 let box_sizing =
-  apply(property_box_sizing, variants_to_expression, [%expr CssJs.boxSizing]);
+  apply(property_box_sizing, [%expr CssJs.boxSizing], variants_to_expression);
 let column_width = unsupported(property_column_width);
 
 // css-box-3
 let margin_top =
   apply(
     property_margin_top,
+    [%expr CssJs.marginTop],
     fun
     | `Auto => variants_to_expression(`Auto)
     | `Length(_) as lp
     | `Percentage(_) as lp => render_length_percentage(lp),
-    [%expr CssJs.marginTop],
   );
 let margin_right =
   apply(
     property_margin_right,
-    apply_value(margin_top.value_of_ast),
     [%expr CssJs.marginRight],
+    apply_value(margin_top.value_of_ast),
   );
 let margin_bottom =
   apply(
     property_margin_bottom,
-    apply_value(margin_top.value_of_ast),
     [%expr CssJs.marginBottom],
+    apply_value(margin_top.value_of_ast),
   );
 let margin_left =
   apply(
     property_margin_left,
-    apply_value(margin_top.value_of_ast),
     [%expr CssJs.marginLeft],
+    apply_value(margin_top.value_of_ast),
   );
 let margin =
   emit(
@@ -306,26 +312,26 @@ let margin =
 let padding_top =
   apply(
     property_padding_top,
-    render_length_percentage,
     [%expr CssJs.paddingTop],
+    render_length_percentage,
   );
 let padding_right =
   apply(
     property_padding_right,
-    apply_value(padding_top.value_of_ast),
     [%expr CssJs.paddingRight],
+    apply_value(padding_top.value_of_ast),
   );
 let padding_bottom =
   apply(
     property_padding_bottom,
-    apply_value(padding_top.value_of_ast),
     [%expr CssJs.paddingBottom],
+    apply_value(padding_top.value_of_ast),
   );
 let padding_left =
   apply(
     property_padding_left,
-    apply_value(padding_top.value_of_ast),
     [%expr CssJs.paddingLeft],
+    apply_value(padding_top.value_of_ast),
   );
 let padding =
   emit(
@@ -540,8 +546,7 @@ let render_function_rgb = ast => {
   let alpha = Option.map(render_color_alpha, alpha);
 
   switch (alpha) {
-  | Some(alpha) =>
-    id([%expr `rgba(([%e red], [%e green], [%e blue], [%e alpha]))])
+  | Some(a) => id([%expr `rgba(([%e red], [%e green], [%e blue], [%e a]))])
   | None => id([%expr `rgb(([%e red], [%e green], [%e blue]))])
   };
 };
@@ -569,7 +574,7 @@ let render_color =
   fun
   | `Hex_color(hex) => id([%expr `hex([%e render_string(hex)])])
   | `Named_color(color) => render_named_color(color)
-  | `Currentcolor => variants_to_expression(`Currentcolor)
+  | `CurrentColor => id([%expr `currentColor])
   | `Function_rgb(rgb)
   | `Function_rgba(rgb) => render_function_rgb(rgb)
   | `Function_hsl(`Hsl_0(hsl))
@@ -583,14 +588,14 @@ let render_color =
   | `Function_device_cmyk(_)
   | `Deprecated_system_color(_) => raise(Unsupported_feature);
 
-let color = apply(property_color, render_color, [%expr CssJs.color]);
+let color = apply(property_color, [%expr CssJs.color], render_color);
 let opacity =
   apply(
     property_opacity,
+    [%expr CssJs.opacity],
     fun
     | `Number(number) => render_number(number)
     | `Percentage(number) => render_number(number /. 100.0),
-    [%expr CssJs.opacity],
   );
 
 // css-images-4
@@ -616,6 +621,7 @@ let render_position = position => {
     | `Static((`Center | `Left | `Right) as pos, _) => (pos, `Zero)
     | `And((pos, offset), _) => (pos, offset)
     };
+
   let horizontal =
     switch (horizontal) {
     | (`Left, `Length(length)) => `Length(length)
@@ -624,6 +630,7 @@ let render_position = position => {
     | (pos, `Percentage(percentage)) =>
       `Percentage(percentage +. pos_to_percentage_offset(pos))
     };
+
   let horizontal = to_value(horizontal);
 
   let vertical =
@@ -635,6 +642,7 @@ let render_position = position => {
     | `Static(_, Some((`Center | `Bottom | `Top) as pos)) => (pos, `Zero)
     | `And(_, (pos, offset)) => (pos, offset)
     };
+
   let vertical =
     switch (vertical) {
     | (`Top, `Length(length)) => `Length(length)
@@ -643,6 +651,7 @@ let render_position = position => {
     | (pos, `Percentage(percentage)) =>
       `Percentage(percentage +. pos_to_percentage_offset(pos))
     };
+
   let vertical = to_value(vertical);
 
   id([%expr `hv(([%e horizontal], [%e vertical]))]);
@@ -652,8 +661,8 @@ let object_fit = variants(property_object_fit, [%expr CssJs.objectFit]);
 let object_position =
   apply(
     property_object_position,
-    render_position,
     [%expr CssJs.objectPosition],
+    render_position,
   );
 let image_resolution = unsupported(property_image_resolution);
 let image_orientation = unsupported(property_image_orientation);
@@ -664,7 +673,7 @@ let render_shadow = shadow => {
   let (color, x, y, blur, spread, inset) =
     switch (shadow) {
     | `Box(inset, position, color) =>
-      let color = Option.value(~default=`Currentcolor, color);
+      let color = Option.value(~default=`CurrentColor, color);
       let (x, y, blur, spread) = {
         let (x, y, blur, spread) =
           switch (position) {
@@ -708,7 +717,7 @@ let render_shadow = shadow => {
   Helper.Exp.apply(id, args);
 };
 let background_color =
-  apply(property_background_color, render_color, [%expr CssJs.backgroundColor]);
+  apply(property_background_color, [%expr CssJs.backgroundColor], render_color);
 let background_image =
   unsupported(property_background_image, ~call=[%expr CssJs.backgroundImage]);
 let background_repeat =
@@ -732,27 +741,34 @@ let background_size =
 let background =
   unsupported(property_background, ~call=[%expr CssJs.background]);
 let border_top_color =
-  apply(property_border_top_color, render_color, [%expr CssJs.borderTopColor]);
+  apply(property_border_top_color, [%expr CssJs.borderTopColor], render_color);
 let border_right_color =
   apply(
     property_border_right_color,
-    apply_value(border_top_color.value_of_ast),
     [%expr CssJs.borderRightColor],
+    apply_value(border_top_color.value_of_ast),
   );
 let border_bottom_color =
   apply(
     property_border_bottom_color,
-    apply_value(border_top_color.value_of_ast),
     [%expr CssJs.borderBottomColor],
+    apply_value(border_top_color.value_of_ast),
   );
 let border_left_color =
   apply(
     property_border_left_color,
-    apply_value(border_top_color.value_of_ast),
     [%expr CssJs.borderLeftColor],
+    apply_value(border_top_color.value_of_ast),
   );
 let border_color =
-  unsupported(property_border_color, ~call=[%expr CssJs.borderColor]);
+  apply(
+    property_border_color,
+    [%expr CssJs.borderColor],
+    c => switch c {
+      | [c] => render_color(c)
+      | _ => raise(Unsupported_feature)
+    }
+  );
 let border_top_style =
   variants(property_border_top_style, [%expr CssJs.borderTopStyle]);
 let border_right_style =
@@ -771,29 +787,37 @@ let render_line_width =
 let border_top_width =
   apply(
     property_border_top_width,
-    render_line_width,
     [%expr CssJs.borderTopWidth],
+    render_line_width,
   );
 let border_right_width =
   apply(
     property_border_right_width,
-    render_line_width,
     [%expr CssJs.borderRightWidth],
+    render_line_width,
   );
 let border_bottom_width =
   apply(
     property_border_bottom_width,
-    render_line_width,
     [%expr CssJs.borderBottomWidth],
+    render_line_width,
   );
 let border_left_width =
   apply(
     property_border_left_width,
-    render_line_width,
     [%expr CssJs.borderLeftWidth],
+    render_line_width,
   );
 let border_width =
-  unsupported(property_border_width, ~call=[%expr CssJs.borderWidth]);
+  apply(
+    property_border_width,
+    [%expr CssJs.borderWidth],
+    (w) =>
+      switch (w) {
+        | [w] => render_width(w)
+        | _ => raise(Unsupported_feature)
+      },
+    );
 let border_top =
   unsupported(property_border_top, ~call=[%expr CssJs.borderTop]);
 let border_right =
@@ -806,28 +830,28 @@ let border = unsupported(property_border, ~call=[%expr CssJs.border]);
 let border_top_left_radius =
   apply(
     property_border_top_left_radius,
+    [%expr CssJs.borderTopLeftRadius],
     fun
     | [lp] => render_length_percentage(lp)
     | _ => raise(Unsupported_feature),
-    [%expr CssJs.borderTopLeftRadius],
   );
 let border_top_right_radius =
   apply(
     property_border_top_right_radius,
-    apply_value(border_top_left_radius.value_of_ast),
     [%expr CssJs.borderTopRightRadius],
+    apply_value(border_top_left_radius.value_of_ast),
   );
 let border_bottom_right_radius =
   apply(
     property_border_bottom_right_radius,
-    apply_value(border_top_left_radius.value_of_ast),
     [%expr CssJs.borderBottomRightRadius],
+    apply_value(border_top_left_radius.value_of_ast),
   );
 let border_bottom_left_radius =
   apply(
     property_border_bottom_left_radius,
-    apply_value(border_top_left_radius.value_of_ast),
     [%expr CssJs.borderBottomLeftRadius],
+    apply_value(border_top_left_radius.value_of_ast),
   );
 let border_radius =
   unsupported(property_border_radius, ~call=[%expr CssJs.borderRadius]);
@@ -840,6 +864,7 @@ let border_image = unsupported(property_border_image);
 let box_shadow =
   apply(
     property_box_shadow,
+    [%expr CssJs.boxShadows],
     fun
     | `None => variants_to_expression(`None)
     | `Shadow(shadows) => {
@@ -849,7 +874,6 @@ let box_shadow =
           |> List.map(render_shadow);
         Builder.pexp_array(~loc, shadows);
       },
-    [%expr CssJs.boxShadows],
   );
 
 // css-overflow-3
@@ -857,10 +881,10 @@ let box_shadow =
 let overflow_x =
   apply(
     property_overflow_x,
+    [%expr CssJs.overflowX],
     fun
     | `Clip => raise(Unsupported_feature)
     | otherwise => variants_to_expression(otherwise),
-    [%expr CssJs.overflowX],
   );
 let overflow_y = variants(property_overflow_y, [%expr CssJs.overflowY]);
 let overflow =
@@ -905,26 +929,26 @@ let text_justify = unsupported(property_text_justify);
 let word_spacing =
   apply(
     property_word_spacing,
+    [%expr CssJs.wordSpacing],
     fun
     | `Normal => variants_to_expression(`Normal)
     | `Length_percentage(lp) => render_length_percentage(lp),
-    [%expr CssJs.wordSpacing],
   );
 let letter_spacing =
   apply(
     property_word_spacing,
+    [%expr CssJs.letterSpacing],
     fun
     | `Normal => variants_to_expression(`Normal)
     | `Length_percentage(lp) => render_length_percentage(lp),
-    [%expr CssJs.letterSpacing],
   );
 let text_indent =
   apply(
     property_text_indent,
+    [%expr CssJs.textIndent],
     fun
     | (lp, None, None) => render_length_percentage(lp)
     | _ => raise(Unsupported_feature),
-    [%expr CssJs.textIndent],
   );
 let hanging_punctuation = unsupported(property_hanging_punctuation);
 
@@ -971,9 +995,10 @@ let text_decoration_style =
     ~call=[%expr CssJs.textDecorationStyle],
   );
 let text_decoration_color =
-  unsupported(
+  apply(
     property_text_decoration_color,
-    ~call=[%expr CssJs.textDecorationColor],
+    [%expr CssJs.textDecorationColor],
+    render_color
   );
 let text_decoration_thickness =
   unsupported(property_text_decoration_thickness);
@@ -1099,20 +1124,20 @@ let flex_flow =
     },
   );
 // TODO: this is safe?
-let order = apply(property_order, render_integer, [%expr CssJs.order]);
+let order = apply(property_order, [%expr CssJs.order], render_integer);
 let flex_grow =
-  apply(property_flex_grow, render_number, [%expr CssJs.flexGrow]);
+  apply(property_flex_grow, [%expr CssJs.flexGrow], render_number);
 let flex_shrink =
-  apply(property_flex_shrink, render_number, [%expr CssJs.flexShrink]);
+  apply(property_flex_shrink, [%expr CssJs.flexShrink], render_number);
 // TODO: is safe to just return CssJs.width when flex_basis?
 let flex_basis =
   apply(
     property_flex_basis,
+    [%expr CssJs.flexBasis],
     fun
     | `Content => variants_to_expression(`Content)
     | `Property_width(value_width) =>
       width.value_of_ast(`Value(value_width)),
-    [%expr CssJs.flexBasis],
   );
 // TODO: this is incomplete
 let flex =
@@ -1189,7 +1214,52 @@ let grid_row = unsupported(property_grid_row, ~call=[%expr CssJs.gridRow]);
 let grid_column =
   unsupported(property_grid_column, ~call=[%expr CssJs.gridColumn]);
 let grid_area = unsupported(property_grid_area, ~call=[%expr CssJs.gridArea]);
-let display = unsupported(property_display, ~call=[%expr CssJs.display]);
+let display = apply(
+  property_display,
+  [%expr CssJs.display],
+  fun
+  | `Block => [%expr `block]
+  | `Contents => [%expr `contents]
+  | `Flex => [%expr `flex]
+  | `Grid => [%expr `grid]
+  | `Inline => [%expr `inline]
+  | `Inline_block => [%expr `inlineBlock]
+  | `Inline_flex => [%expr `inlineFlex]
+  | `Inline_grid => [%expr `inlineGrid]
+  | `Inline_list_item => [%expr `inlineListItem]
+  | `Inline_table => [%expr `inlineTable]
+  | `List_item => [%expr `listItem]
+  | `None => [%expr `none]
+  | `Table => [%expr `table]
+  | `Table_caption => [%expr `tableCaption]
+  | `Table_cell => [%expr `tableCell]
+  | `Table_column => [%expr `tableColumn]
+  | `Table_column_group => [%expr `tableColumnGroup]
+  | `Table_footer_group => [%expr `tableFooterGroup]
+  | `Table_header_group => [%expr `tableHeaderGroup]
+  | `Table_row => [%expr `tableRow ]
+  | `Table_row_group => [%expr `tableRowGroup]
+  | `Flow
+  | `Flow_root
+  | `Ruby
+  | `Ruby_base
+  | `Ruby_base_container
+  | `Ruby_text
+  | `Ruby_text_container
+  | `Run_in
+  | `_moz_box
+  | `_moz_inline_box
+  | `_moz_inline_stack
+  | `_ms_flexbox
+  | `_ms_grid
+  | `_ms_inline_flexbox
+  | `_ms_inline_grid
+  | `_webkit_box
+  | `_webkit_flex
+  | `_webkit_inline_box
+  | `_webkit_inline_flex
+  | _ => raise(Unsupported_feature),
+);
 
 let found = ({ast_of_string, string_to_expr, _}) => {
   let check_value = string => {

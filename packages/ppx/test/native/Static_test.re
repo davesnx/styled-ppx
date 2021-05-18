@@ -138,7 +138,7 @@ let properties_static_css_tests = [%expr
     /* ([%css "color: #012345"], CssJs.color(`hex("012345"))), */
     /* ([%css "color: #01234567"], CssJs.color(`hex("01234567"))), */
     ([%css "color: blue"], CssJs.color(CssJs.blue)),
-    ([%css "color: currentcolor"], CssJs.color(`currentColor)),
+    ([%css "color: currentColor"], CssJs.color(`currentColor)),
     ([%css "color: transparent"], CssJs.color(`transparent)),
     ([%css "color: rgb(1 2 3)"], CssJs.color(`rgb((1, 2, 3)))),
     ([%css "color: rgb(1 2 3 / .4)"], CssJs.color(`rgba((1, 2, 3, `num (0.4))))),
