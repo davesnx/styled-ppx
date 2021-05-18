@@ -785,12 +785,12 @@ CssJs.style(. [|CssJs.backgroundColor(`hex("FF0066"))|]);
 CssJs.style(. [|CssJs.unsafe("backgroundColor", "hsl(0,0%,0%)")|]);
 CssJs.style(. [|CssJs.unsafe("backgroundColor", "hsl(0,0%,0%,.5)")|]);
 CssJs.style(. [|CssJs.backgroundColor(`transparent)|]);
-CssJs.style(. [|CssJs.unsafe("borderColor", "rgba(0,0,0,.5)")|]);
-CssJs.style(. [|CssJs.unsafe("borderColor", "#F06")|]);
-CssJs.style(. [|CssJs.unsafe("borderColor", "#FF0066")|]);
+CssJs.style(. [|CssJs.borderColor(`rgba((0, 0, 0, `num(0.5))))|]);
+CssJs.style(. [|CssJs.borderColor(`hex("F06"))|]);
+CssJs.style(. [|CssJs.borderColor(`hex("FF0066"))|]);
 CssJs.style(. [|CssJs.unsafe("borderColor", "hsl(0,0%,0%)")|]);
 CssJs.style(. [|CssJs.unsafe("borderColor", "hsl(0,0%,0%,.5)")|]);
-CssJs.style(. [|CssJs.unsafe("borderColor", "transparent")|]);
+CssJs.style(. [|CssJs.borderColor(`transparent)|]);
 CssJs.style(. [|CssJs.unsafe("textDecorationColor", "rgba(0,0,0,.5)")|]);
 CssJs.style(. [|CssJs.unsafe("textDecorationColor", "#F06")|]);
 CssJs.style(. [|CssJs.unsafe("textDecorationColor", "#FF0066")|]);
@@ -853,22 +853,28 @@ CssJs.style(. [|
 CssJs.style(. [|CssJs.backgroundColor(`hex("000F"))|]);
 CssJs.style(. [|CssJs.backgroundColor(`hex("000000FF"))|]);
 CssJs.style(. [|CssJs.backgroundColor(CssJs.rebeccapurple)|]);
-CssJs.style(. [|CssJs.unsafe("borderColor", "rgb(0% 20% 70%)")|]);
-CssJs.style(. [|CssJs.unsafe("borderColor", "rgb(0 64 185)")|]);
-CssJs.style(. [|CssJs.unsafe("borderColor", "hsl(0 0% 0%)")|]);
-CssJs.style(. [|CssJs.unsafe("borderColor", "rgba(0% 20% 70% / 50%)")|]);
-CssJs.style(. [|CssJs.unsafe("borderColor", "rgba(0% 20% 70% / .5)")|]);
-CssJs.style(. [|CssJs.unsafe("borderColor", "rgba(0 64 185 / 50%)")|]);
-CssJs.style(. [|CssJs.unsafe("borderColor", "rgba(0 64 185 / .5)")|]);
+CssJs.style(. [|CssJs.borderColor(`rgb((0, 51, 178)))|]);
+CssJs.style(. [|CssJs.borderColor(`rgb((0, 64, 185)))|]);
+CssJs.style(. [|
+  CssJs.borderColor(`hsl((`deg(0.), `percent(0.), `percent(0.)))),
+|]);
+CssJs.style(. [|CssJs.borderColor(`rgba((0, 51, 178, `percent(0.5))))|]);
+CssJs.style(. [|CssJs.borderColor(`rgba((0, 51, 178, `num(0.5))))|]);
+CssJs.style(. [|CssJs.borderColor(`rgba((0, 64, 185, `percent(0.5))))|]);
+CssJs.style(. [|CssJs.borderColor(`rgba((0, 64, 185, `num(0.5))))|]);
 CssJs.style(. [|CssJs.unsafe("borderColor", "hsla(0 0% 0% /.5)")|]);
-CssJs.style(. [|CssJs.unsafe("borderColor", "rgb(0% 20% 70% / 50%)")|]);
-CssJs.style(. [|CssJs.unsafe("borderColor", "rgb(0% 20% 70% / .5)")|]);
-CssJs.style(. [|CssJs.unsafe("borderColor", "rgb(0 64 185 / 50%)")|]);
-CssJs.style(. [|CssJs.unsafe("borderColor", "rgb(0 64 185 / .5)")|]);
-CssJs.style(. [|CssJs.unsafe("borderColor", "hsl(0 0% 0% / .5)")|]);
-CssJs.style(. [|CssJs.unsafe("borderColor", "#000F")|]);
-CssJs.style(. [|CssJs.unsafe("borderColor", "#000000FF")|]);
-CssJs.style(. [|CssJs.unsafe("borderColor", "rebeccapurple")|]);
+CssJs.style(. [|CssJs.borderColor(`rgba((0, 51, 178, `percent(0.5))))|]);
+CssJs.style(. [|CssJs.borderColor(`rgba((0, 51, 178, `num(0.5))))|]);
+CssJs.style(. [|CssJs.borderColor(`rgba((0, 64, 185, `percent(0.5))))|]);
+CssJs.style(. [|CssJs.borderColor(`rgba((0, 64, 185, `num(0.5))))|]);
+CssJs.style(. [|
+  CssJs.borderColor(
+    `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
+  ),
+|]);
+CssJs.style(. [|CssJs.borderColor(`hex("000F"))|]);
+CssJs.style(. [|CssJs.borderColor(`hex("000000FF"))|]);
+CssJs.style(. [|CssJs.borderColor(CssJs.rebeccapurple)|]);
 CssJs.style(. [|CssJs.unsafe("textDecorationColor", "rgb(0% 20% 70%)")|]);
 CssJs.style(. [|CssJs.unsafe("textDecorationColor", "rgb(0 64 185)")|]);
 CssJs.style(. [|CssJs.unsafe("textDecorationColor", "hsl(0 0% 0%)")|]);
