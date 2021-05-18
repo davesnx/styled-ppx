@@ -958,8 +958,8 @@ CssJs.style(. [|CssJs.unsafe("alignItems", "flex-start")|]);
 CssJs.style(. [|CssJs.unsafe("alignItems", "flex-end")|]);
 CssJs.style(. [|CssJs.unsafe("alignSelf", "flex-start")|]);
 CssJs.style(. [|CssJs.unsafe("alignSelf", "flex-end")|]);
-CssJs.style(. [|CssJs.unsafe("display", "flex")|]);
-CssJs.style(. [|CssJs.unsafe("display", "inline-flex")|]);
+CssJs.style(. [|CssJs.display(`flex)|]);
+CssJs.style(. [|CssJs.display(`inlineFlex)|]);
 CssJs.style(. [|CssJs.flex(`none)|]);
 CssJs.style(. [|
   CssJs.flexGrow(5.),
@@ -994,8 +994,8 @@ CssJs.style(. [|CssJs.minHeight(`auto)|]);
 CssJs.style(. [|CssJs.minWidth(`auto)|]);
 CssJs.style(. [|CssJs.order(0)|]);
 CssJs.style(. [|CssJs.order(1)|]);
-CssJs.style(. [|CssJs.unsafe("display", "grid")|]);
-CssJs.style(. [|CssJs.unsafe("display", "inline-grid")|]);
+CssJs.style(. [|CssJs.display(`grid)|]);
+CssJs.style(. [|CssJs.display(`inlineGrid)|]);
 CssJs.style(. [|CssJs.unsafe("alignSelf", "auto")|]);
 CssJs.style(. [|CssJs.unsafe("alignSelf", "normal")|]);
 CssJs.style(. [|CssJs.unsafe("alignSelf", "stretch")|]);

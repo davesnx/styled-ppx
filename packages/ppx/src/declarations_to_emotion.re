@@ -151,8 +151,10 @@ let transform_with_variable = (parser, map, value_to_expr) =>
     | `Value(ast) => map(ast),
     value_to_expr,
   );
+
 let apply = (parser, map, id) =>
   transform_with_variable(parser, map, arg => [[%expr [%e id]([%e arg])]]);
+
 let unsupported = (~call=?, parser) =>
   transform_with_variable(
     parser,
@@ -616,6 +618,7 @@ let render_position = position => {
     | `Static((`Center | `Left | `Right) as pos, _) => (pos, `Zero)
     | `And((pos, offset), _) => (pos, offset)
     };
+
   let horizontal =
     switch (horizontal) {
     | (`Left, `Length(length)) => `Length(length)
@@ -624,6 +627,7 @@ let render_position = position => {
     | (pos, `Percentage(percentage)) =>
       `Percentage(percentage +. pos_to_percentage_offset(pos))
     };
+
   let horizontal = to_value(horizontal);
 
   let vertical =
@@ -635,6 +639,7 @@ let render_position = position => {
     | `Static(_, Some((`Center | `Bottom | `Top) as pos)) => (pos, `Zero)
     | `And(_, (pos, offset)) => (pos, offset)
     };
+
   let vertical =
     switch (vertical) {
     | (`Top, `Length(length)) => `Length(length)
@@ -643,6 +648,7 @@ let render_position = position => {
     | (pos, `Percentage(percentage)) =>
       `Percentage(percentage +. pos_to_percentage_offset(pos))
     };
+
   let vertical = to_value(vertical);
 
   id([%expr `hv(([%e horizontal], [%e vertical]))]);
@@ -1189,7 +1195,52 @@ let grid_row = unsupported(property_grid_row, ~call=[%expr CssJs.gridRow]);
 let grid_column =
   unsupported(property_grid_column, ~call=[%expr CssJs.gridColumn]);
 let grid_area = unsupported(property_grid_area, ~call=[%expr CssJs.gridArea]);
-let display = unsupported(property_display, ~call=[%expr CssJs.display]);
+let display = apply(
+  property_display,
+  fun
+  | `Block => [%expr `block]
+  | `Contents => [%expr `contents]
+  | `Flex => [%expr `flex]
+  | `Grid => [%expr `grid]
+  | `Inline => [%expr `inline]
+  | `Inline_block => [%expr `inlineBlock]
+  | `Inline_flex => [%expr `inlineFlex]
+  | `Inline_grid => [%expr `inlineGrid]
+  | `Inline_list_item => [%expr `inlineListItem]
+  | `Inline_table => [%expr `inlineTable]
+  | `List_item => [%expr `listItem]
+  | `None => [%expr `none]
+  | `Table => [%expr `table]
+  | `Table_caption => [%expr `tableCaption]
+  | `Table_cell => [%expr `tableCell]
+  | `Table_column => [%expr `tableColumn]
+  | `Table_column_group => [%expr `tableColumnGroup]
+  | `Table_footer_group => [%expr `tableFooterGroup]
+  | `Table_header_group => [%expr `tableHeaderGroup]
+  | `Table_row => [%expr `tableRow ]
+  | `Table_row_group => [%expr `tableRowGroup]
+  | `Flow
+  | `Flow_root
+  | `Ruby
+  | `Ruby_base
+  | `Ruby_base_container
+  | `Ruby_text
+  | `Ruby_text_container
+  | `Run_in
+  | `_moz_box
+  | `_moz_inline_box
+  | `_moz_inline_stack
+  | `_ms_flexbox
+  | `_ms_grid
+  | `_ms_inline_flexbox
+  | `_ms_inline_grid
+  | `_webkit_box
+  | `_webkit_flex
+  | `_webkit_inline_box
+  | `_webkit_inline_flex
+  | _ => raise(Unsupported_feature),
+  [%expr CssJs.display]
+);
 
 let found = ({ast_of_string, string_to_expr, _}) => {
   let check_value = string => {
