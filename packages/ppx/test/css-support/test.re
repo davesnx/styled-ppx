@@ -988,35 +988,35 @@
 [%cx {|color: hsl(0,0%,0%);|}];
 [%cx {|color: hsl(0,0%,0%,.5);|}];
 [%cx {|color: transparent;|}];
-/* [%cx {|color: currentColor;|}]; */
+[%cx {|color: currentColor;|}];
 [%cx {|background-color: rgba(0,0,0,.5);|}];
 [%cx {|background-color: #F06;|}];
 [%cx {|background-color: #FF0066;|}];
 [%cx {|background-color: hsl(0,0%,0%);|}];
 [%cx {|background-color: hsl(0,0%,0%,.5);|}];
 [%cx {|background-color: transparent;|}];
-/* [%cx {|background-color: currentColor;|}]; */
+[%cx {|background-color: currentColor;|}];
 [%cx {|border-color: rgba(0,0,0,.5);|}];
 [%cx {|border-color: #F06;|}];
 [%cx {|border-color: #FF0066;|}];
 [%cx {|border-color: hsl(0,0%,0%);|}];
 [%cx {|border-color: hsl(0,0%,0%,.5);|}];
 [%cx {|border-color: transparent;|}];
-/* [%cx {|border-color: currentColor;|}]; */
+[%cx {|border-color: currentColor;|}];
 [%cx {|text-decoration-color: rgba(0,0,0,.5);|}];
 [%cx {|text-decoration-color: #F06;|}];
 [%cx {|text-decoration-color: #FF0066;|}];
 [%cx {|text-decoration-color: hsl(0,0%,0%);|}];
 [%cx {|text-decoration-color: hsl(0,0%,0%,.5);|}];
 [%cx {|text-decoration-color: transparent;|}];
-/* [%cx {|text-decoration-color: currentColor;|}]; */
+[%cx {|text-decoration-color: currentColor;|}];
 [%cx {|column-rule-color: rgba(0,0,0,.5);|}];
 [%cx {|column-rule-color: #F06;|}];
 [%cx {|column-rule-color: #FF0066;|}];
 [%cx {|column-rule-color: hsl(0,0%,0%);|}];
 [%cx {|column-rule-color: hsl(0,0%,0%,.5);|}];
 [%cx {|column-rule-color: transparent;|}];
-/* [%cx {|column-rule-color: currentColor;|}]; */
+[%cx {|column-rule-color: currentColor;|}];
 
 /*CSS Color Module Level 4*/
 [%cx {|color: rgb(0% 20% 70%);|}];

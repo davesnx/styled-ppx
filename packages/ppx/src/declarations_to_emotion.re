@@ -109,7 +109,7 @@ let variants_to_expression =
   | `Match_parent => raise(Unsupported_feature)
   | `Right => id([%expr `right])
   | `Start => id([%expr `start])
-  | `Currentcolor => id([%expr `currentColor])
+  | `CurrentColor => id([%expr `currentColor])
   | `Transparent => id([%expr `transparent])
   | `Bottom => id([%expr `bottom])
   | `Top => id([%expr `top])
@@ -576,7 +576,7 @@ let render_color =
   fun
   | `Hex_color(hex) => id([%expr `hex([%e render_string(hex)])])
   | `Named_color(color) => render_named_color(color)
-  | `Currentcolor => variants_to_expression(`Currentcolor)
+  | `CurrentColor => variants_to_expression(`CurrentColor)
   | `Function_rgb(rgb)
   | `Function_rgba(rgb) => render_function_rgb(rgb)
   | `Function_hsl(`Hsl_0(hsl))
@@ -675,7 +675,7 @@ let render_shadow = shadow => {
   let (color, x, y, blur, spread, inset) =
     switch (shadow) {
     | `Box(inset, position, color) =>
-      let color = Option.value(~default=`Currentcolor, color);
+      let color = Option.value(~default=`CurrentColor, color);
       let (x, y, blur, spread) = {
         let (x, y, blur, spread) =
           switch (position) {
@@ -997,9 +997,10 @@ let text_decoration_style =
     ~call=[%expr CssJs.textDecorationStyle],
   );
 let text_decoration_color =
-  unsupported(
+  apply(
     property_text_decoration_color,
-    ~call=[%expr CssJs.textDecorationColor],
+    [%expr CssJs.textDecorationColor],
+    render_color
   );
 let text_decoration_thickness =
   unsupported(property_text_decoration_thickness);

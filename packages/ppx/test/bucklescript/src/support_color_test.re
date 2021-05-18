@@ -12,7 +12,7 @@ let testData = [
   ("red", [%cx "color: red"], CssJs.style(. [|CssJs.color(CssJs.red)|])),
   ("blue", [%cx "color: blue"], CssJs.style(. [|CssJs.color(CssJs.blue)|])),
   ("background", [%cx "background-color: red"], CssJs.style(. [|CssJs.backgroundColor(CssJs.red)|])),
-  ("currentColor", [%cx "color: currentcolor"], CssJs.style(. [|CssJs.color(`currentColor)|])),
+  ("currentColor", [%cx "color: currentColor"], CssJs.style(. [|CssJs.color(`currentColor)|])),
   ("transparent", [%cx "color: transparent"], CssJs.style(. [|CssJs.color(`transparent)|])),
   ("border-top-color", [%cx "border-top-color: blue"], CssJs.style(. [|CssJs.borderTopColor(CssJs.blue)|])),
   ("border-right-color", [%cx "border-right-color: green"], CssJs.style(. [|CssJs.borderRightColor(CssJs.green)|])),
