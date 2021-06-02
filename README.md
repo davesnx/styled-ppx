@@ -9,9 +9,7 @@ Allows you to create **React Components** with type-safe CSS style definitions t
 
 ![](./docs/images/compile-error.png)
 
-> **BETA**: This ppx is in an early stage ⚠️. Meaning that it doesn't support full functionality as [emotion](https://emotion.sh) or [styled-components](https://styled-components.com/).
-> But you can safely use it, as it would respect [Compatible Versioning](https://gitlab.com/staltz/comver).
-> In case you want to know more, take a look at the [ROADMAP](./ROADMAP.md), or feel free to chat on Discord: @davesnx#5641
+> **Alert**: This documentaiton points to v0.20.0 ⚠️. There are a few things that have changed since then. Since v1.x is tagged as "latest" on npm. Please install v1.x with caution and don't update if you aren't completly sure.
 
 ## Usage
 **`styled-ppx`** implements a ppx that transforms `[%styled]` extensions points into `[@react.component]` modules with the additional styles converted to [emotion](https://emotion.sh).
