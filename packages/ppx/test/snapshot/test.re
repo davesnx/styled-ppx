@@ -81,9 +81,14 @@ module SequenceDynamicComponent = [%styled.div
   (~var) => {
     Js.log("Logging when render");
 
-    [|
-     [%css "color: $var;"],
-     [%css "display: block;"]
+  [|
+    [%css "color: $var;"],
+    [%css "display: block;"]
   |]
   }
 ];
+
+module DynamicComponentWithDefaultValue = [%styled.div (~var="green") => [|
+  [%css "color: $var;"],
+  [%css "display: block;"]
+|]];

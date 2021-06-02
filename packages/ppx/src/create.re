@@ -246,16 +246,19 @@ let component = (~loc, ~htmlTag, ~styledExpr, ~params) => {
   );
 };
 
+/* [@bs.optional] */
+let bsOptional = (~loc) => Helper.Attr.mk({txt: "bs.optional", loc}, PStr([]));
+
 /* [@bs.optional] color: string */
-let customPropLabel = (~loc, name, type_) =>
-  Helper.Type.field(~loc, {txt: name, loc}, type_);
+let customPropLabel = (~loc, name, type_, isOptional) => {
+  Helper.Type.field(~loc, ~attrs=(isOptional ? [bsOptional(~loc)] : []), {txt: name, loc}, type_);
+}
 
 let typeVariable = (~loc, name) => Builder.ptyp_var(~loc, name);
 
 /* [@bs.optional] href: string */
 let recordLabel = (~loc, name, kind, alias) =>
   {
-    let bsOptional = Helper.Attr.mk({txt: "bs.optional", loc}, PStr([]));
     let bsAlias = (alias) => Helper.Attr.mk({txt: "bs.as", loc}, PStr([
         Helper.Str.mk(
           ~loc,
@@ -271,16 +274,16 @@ let recordLabel = (~loc, name, kind, alias) =>
       ]));
 
     let attrs = switch (alias) {
-      | Some(alias) => [bsOptional, bsAlias(alias)]
-      | None => [bsOptional]
+      | Some(alias) => [bsOptional(~loc), bsAlias(alias)]
+      | None => [bsOptional(~loc)]
     };
 
     Helper.Type.field(
-    ~loc,
-    ~attrs,
-    {txt: name, loc},
-    Helper.Typ.constr(~loc, {txt: Lident(kind), loc}, []),
-  )
+      ~loc,
+      ~attrs,
+      {txt: name, loc},
+      Helper.Typ.constr(~loc, {txt: Lident(kind), loc}, []),
+    )
   };
 
 /* [@bs.optional] ref: domRef */
@@ -320,21 +323,21 @@ let recordEventLabel = (~loc, name, kind) => {
   );
 };
 
-/* type makeProps = { } */
-/* type makeProps('a, 'b) = { } */
-let makeMakeProps = (~loc, ~customProps) => {
-  /* [@bs.deriving abstract] */
-  let bsDerivingAbstract =
-    Helper.Attr.mk(
-      {txt: "bs.deriving", loc},
-      PStr([
-        Helper.Str.mk(
-          ~loc,
-          Pstr_eval(Helper.Exp.ident(~loc, {txt: Lident("abstract"), loc}), []),
-        ),
-      ]),
-    );
+/* [@bs.deriving abstract] */
+let bsDerivingAbstract = (~loc) =>
+  Helper.Attr.mk(
+    {txt: "bs.deriving", loc},
+    PStr([
+      Helper.Str.mk(
+        ~loc,
+        Pstr_eval(Helper.Exp.ident(~loc, {txt: Lident("abstract"), loc}), []),
+      ),
+    ]),
+  );
 
+/* type makeProps = { ... } */
+/* type makeProps('a, 'b) = { ... } */
+let makeMakeProps = (~loc, ~customProps) => {
   let (params, dynamicProps) =
     switch (customProps) {
     | None => ([], [])
@@ -369,7 +372,8 @@ let makeMakeProps = (~loc, ~customProps) => {
 
   let params = params |> List.map(type_ => (
     type_,
-    (Asttypes.NoVariance, Asttypes.NoInjectivity)) /* TODO: Made correct ast, not sure if it matter */
+    (Asttypes.NoVariance, Asttypes.NoInjectivity))
+    /* TODO: Made correct ast, not sure if it matter */
   );
 
   Helper.Str.mk(
@@ -380,7 +384,7 @@ let makeMakeProps = (~loc, ~customProps) => {
         Helper.Type.mk(
           ~loc,
           ~priv=Public,
-          ~attrs=[bsDerivingAbstract],
+          ~attrs=[bsDerivingAbstract(~loc)],
           ~kind=Ptype_record(reactProps),
           ~params,
           {txt: "makeProps", loc},

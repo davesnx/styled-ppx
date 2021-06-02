@@ -12,13 +12,13 @@ let raiseError = (~loc, ~description, ~example, ~link) => {
   );
 };
 
-let isOptional = str =>
+let getIsOptional = str =>
   switch (str) {
   | Optional(_) => true
   | _ => false
   };
 
-let isLabelled = str =>
+let getIsLabelled = str =>
   switch (str) {
   | Labelled(_) => true
   | _ => false
@@ -47,7 +47,7 @@ let getAlias = (pattern, label) =>
 let rec getArgs = (expr, list) => {
   switch (expr.pexp_desc) {
   | Pexp_fun(arg, default, pattern, expression)
-      when isOptional(arg) || isLabelled(arg) =>
+      when getIsOptional(arg) || getIsLabelled(arg) =>
     let alias = getAlias(pattern, arg);
     let type_ = getType(pattern);
 
@@ -55,7 +55,7 @@ let rec getArgs = (expr, list) => {
       expression,
       [(arg, default, pattern, alias, pattern.ppat_loc, type_), ...list],
     );
-  | Pexp_fun(arg, _, pattern, _) when !isLabelled(arg) =>
+  | Pexp_fun(arg, _, pattern, _) when !getIsLabelled(arg) =>
     raiseError(
       ~loc=pattern.ppat_loc,
       ~description="Dynamic components are defined with labeled arguments.",
@@ -182,22 +182,23 @@ let renderStyledDynamic = (
           | Some(type_) => (`Typed, type_)
           | None => (`Open, Create.typeVariable(~loc, label))
           };
-        (label, kind, type_);
+
+        (arg, kind, type_);
       },
       labeledArguments,
     );
 
-  let makePropsParameters =
+  let makePropsParameters: list(core_type) =
     variableList
     |> List.filter_map(
-          fun
-          | (_, `Open, type_) => Some(type_)
-          | _ => None,
-        );
+      fun
+      | (_, `Open, type_) => Some(type_)
+      | _ => None,
+    );
 
   let variableMakeProps =
     List.map(
-      ((label, _, type_)) => Create.customPropLabel(~loc, label, type_),
+      ((arg, _, type_)) => Create.customPropLabel(~loc, getLabel(arg), type_, getIsOptional(label)),
       variableList,
     );
 
