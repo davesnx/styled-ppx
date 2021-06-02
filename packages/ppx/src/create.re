@@ -99,6 +99,14 @@ let bindingCreateVariadicElement = (~loc) => {
   });
 };
 
+let applyIgnore = (~loc, expr) => {
+  Helper.Exp.apply(
+    ~loc,
+    Helper.Exp.ident(~loc, {txt: Lident("ignore"), loc}),
+    [(Nolabel, expr)]
+  );
+};
+
 /* createVariadicElement("div", newProps) */
 let variadicElement = (~loc, ~htmlTag) => {
   Helper.Exp.apply(

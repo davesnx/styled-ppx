@@ -1,13 +1,19 @@
-/* [%styled.global {|
-  html, body, #app {
-    margin: 0;
-    height: 100%;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+[%styled.global {|
+  body {
+    font-size: 1em;
+    -webkit-font-smoothing: antialiased;
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    color: white;
+    background-color: hsla(165, 80%, 15%, 0.03);
   }
-|}]; */
+|}];
+
+[%styled.global {|
+  html, body, #root, .class {
+    box-sizing: border-box;
+  }
+|}];
 
 module App = [%styled.div {j|
   cursor: pointer;

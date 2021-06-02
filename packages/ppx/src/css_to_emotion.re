@@ -152,7 +152,7 @@ and render_declarations =
       | Declaration_list.Style_rule(ar) =>
         let loc: Location.t = ar.loc;
         let ident = Exp.ident(~loc, {txt: Emotion.lident("selector"), loc});
-        [render_style_rule(ident, ar)];
+        [render_style_rule(~isUncurried=false, ident, ar)];
       },
     ds,
   )
@@ -160,7 +160,7 @@ and render_declarations =
 and render_declaration_list = ((list, loc): Declaration_list.t): Parsetree.expression => {
   Builder.pexp_array(~loc, render_declarations(list));
 }
-and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
+and render_style_rule = (~isUncurried, ident, rule: Style_rule.t): Parsetree.expression => {
   let (prelude, prelude_loc) = rule.Style_rule.prelude;
   let dl_expr = render_declaration_list(rule.Style_rule.block);
 
@@ -265,6 +265,7 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
 
     Exp.apply(
       ~loc=rule.Style_rule.loc,
+      ~attrs=(isUncurried ? [Create.uncurried(~loc=rule.Style_rule.loc)] : []),
       ident,
       [(Nolabel, selector_expr), (Nolabel, dl_expr)],
     );
@@ -277,9 +278,9 @@ let render_style_call = (declaration_list): Parsetree.expression => {
   Exp.apply(~loc, ~attrs=[Create.uncurried(~loc)], ident, [(Nolabel, declaration_list)]);
 };
 
-let render_rule = (ident, r: Rule.t): Parsetree.expression => {
+let render_rule = (~isGlobalCall, ident, r: Rule.t): Parsetree.expression => {
   switch (r) {
-  | Rule.Style_rule(sr) => render_style_rule(ident, sr)
+  | Rule.Style_rule(sr) => render_style_rule(~isUncurried=isGlobalCall, ident, sr)
   | Rule.At_rule(ar) => render_at_rule(ar)
   };
 };
@@ -336,25 +337,24 @@ let render_emotion_keyframe = ((ruleList, loc)): Parsetree.expression => {
   };
 };
 
-let render_global = ((ruleList, loc): Stylesheet.t): Parsetree.expression => {
+let render_global = ((ruleList, loc): Stylesheet.t) => {
   let emotionGlobal = Exp.ident(~loc, {txt: Emotion.lident("global"), loc});
 
-  switch (ruleList) {
-  /* There's only one rule: */
-  | [rule] => render_rule(emotionGlobal, rule)
-  /* There's more than one */
-  | _res =>
-    grammar_error(
-      loc,
-      {|
-      styled.global only supports one style selector, add one styled.global per selector.
+    switch (ruleList) {
+    /* There's only one rule: */
+    | [rule] => Create.applyIgnore(~loc, render_rule(~isGlobalCall=true, emotionGlobal, rule))
+    /* There's more than one */
+    | _res =>
+      grammar_error(
+        loc,
+        {|
+        `styled.global` only supports one style definition. Transform each definition into a separate styled.global call
 
-      Like following:
-
-        [%styled.global ""];
-        [%styled.global ""];
-    |},
-    )
-  /* TODO: Add rule to string to finish this error message */
-  };
+        Like following:
+          [%styled.global " ... "];
+          [%styled.global " ... "];
+      |},
+      )
+    /* TODO: Add rule to string to finish this error message */
+    };
 };
