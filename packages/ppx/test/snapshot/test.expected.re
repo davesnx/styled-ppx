@@ -1,4 +1,9 @@
-CssJs.global({js|html, body, #root, .class|js}, [|CssJs.margin(`zero)|]);
+ignore(
+  CssJs.global(.
+    {js|html, body, #root, .class|js},
+    [|CssJs.margin(`zero)|],
+  ),
+);
 module ShoudNotBreakOtherModulesPpxsWithStringAsPayload = [%ppx ""];
 module ShoudNotBreakOtherModulesPpxsWithMultiStringAsPayload = [%ppx
   {| stuff |}
@@ -4786,8 +4791,8 @@ module ArrayStatic = {
     "createElement";
   let styles =
     CssJs.style(. [|
-      CssJs.unsafe("justifyContent", "center"),
       CssJs.display(`flex),
+      CssJs.unsafe("justifyContent", "center"),
     |]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
@@ -5759,7 +5764,10 @@ module StringInterpolation = {
 };
 let className = CssJs.style(. [|CssJs.display(`block)|]);
 let classNameWithMultiLine = CssJs.style(. [|CssJs.display(`block)|]);
+let classNameWithArray = CssJs.style(. [|cssProperty|]);
 let cssRule = CssJs.color(CssJs.blue);
+let classNameWithCss =
+  CssJs.style(. [|cssRule, CssJs.backgroundColor(CssJs.green)|]);
 module DynamicComponent = {
   [@bs.deriving abstract]
   type makeProps('var) = {

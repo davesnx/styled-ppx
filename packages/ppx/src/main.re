@@ -106,7 +106,9 @@ _): Parsetree.expression => {
     let parser = makeParser(Css_parser.declaration);
     let ast = parser(string);
     let declarationListValues = Css_to_emotion.render_declaration(ast, ast.loc);
-    /* TODO: Instead of getting the first element, fail when there's more than one declaration or make a mechanism to flatten all the properties */
+    /* TODO: Instead of getting the first element,
+       fail when there's more than one declaration or
+      make a mechanism to flatten all the properties */
     List.nth(declarationListValues, 0);
   | `Declarations =>
     let parser = makeParser(Css_parser.declaration_list);
@@ -121,6 +123,11 @@ _): Parsetree.expression => {
     let ast = parser(string);
     Css_to_emotion.render_emotion_keyframe(ast);
   };
+};
+
+let renderArrayPayload = (~loc, arr) => {
+  Build.pexp_array(~loc, arr) |>
+    Css_to_emotion.render_style_call;
 };
 
 let getLastSequence = (expr) => {
@@ -204,7 +211,9 @@ let renderStyledDynamic = (
         delim,
         label
       ) |> Css_to_emotion.render_style_call
-    | Pexp_array(arr) => Build.pexp_array(~loc, List.rev(arr)) |> Css_to_emotion.render_style_call
+    | Pexp_array(arr) =>
+      Build.pexp_array(~loc, List.rev(arr))
+        |> Css_to_emotion.render_style_call
     | Pexp_sequence(expr, sequence) => {
       /* Generate a new sequence where the last expression is
         wrapped in render_style_call and render the other expressions. */
@@ -237,32 +246,17 @@ let renderStyledDynamic = (
   ]);
 };
 
-let renderStyledStaticString = (~loc, ~path, ~htmlTag, ~str, ~delim, ~label) => {
+let renderStyledComponent = (~loc, ~htmlTag, styles) => {
   let styledExpr =
     Build.pexp_ident(~loc, {txt: Lident(styleVariableName), loc});
-  let cssExpr = renderStringPayload(~loc, ~path, `Style, str, Some(delim), label);
 
   Build.pmod_structure(~loc, [
     Create.makeMakeProps(~loc, ~customProps=None),
     Create.bindingCreateVariadicElement(~loc),
-    Create.styles(~loc, ~name=styleVariableName, ~expr=cssExpr),
-    Create.component(~loc, ~htmlTag, ~styledExpr, ~params=[])
-  ]);
-};
-
-let renderStyledStaticList = (~loc, ~path as _, ~htmlTag, list) => {
-  let styledExpr =
-    Build.pexp_ident(~loc, {txt: Lident(styleVariableName), loc});
-  let cssExpr = Css_to_emotion.render_style_call(
-    Build.pexp_array(~loc, List.rev(list))
-  );
-
-  Build.pmod_structure(~loc, [
-    Create.makeMakeProps(~loc, ~customProps=None),
-    Create.bindingCreateVariadicElement(~loc),
-    Create.styles(~loc,
+    Create.styles(
+      ~loc,
       ~name=styleVariableName,
-      ~expr=cssExpr
+      ~expr=styles
     ),
     Create.component(~loc, ~htmlTag, ~styledExpr, ~params=[])
   ]);
@@ -288,40 +282,79 @@ let any_payload =
     ),
 );
 
-/* TODO: Ensure we are capturing String and Fun properly */
-let pattern =
+/* TODO: Throw better errors when this pattern doesn't match */
+let static_pattern =
   Ast_pattern.(
     pstr(
       pstr_eval(
-        map(
-          ~f=
-            (f, lbl, def, param, body) =>
-              f(`Function((lbl, def, param, body))),
-          pexp_fun(__, __, __, __),
-        )
-        ||| map(
-              ~f=(f, payload, delim, m) => f(`String((payload, delim, m))),
-              pexp_constant(pconst_string(__', __, __)),
-            )
-        ||| map(
-              ~f=(f, payload) => f(`Array((payload))),
-              pexp_array(__),
-            )
-        ,
-        nil,
-      )
-      ^:: nil
+        map(~f=(f, payload, delim, m) =>
+          f(`String((payload, delim, m))), pexp_constant(pconst_string(__', __, __)))
+        ||| map(~f=(f, payload) =>
+          f(`Array((payload))), pexp_array(__)), nil)
+        ^:: nil
     )
   );
 
+/* TODO: Throw better errors when this pattern doesn't match */
+let dynamic_pattern =
+  Ast_pattern.(
+    pstr(
+      pstr_eval(
+        map(~f=(f, payload, delim, m) =>
+          f(`String((payload, delim, m))), pexp_constant(pconst_string(__', __, __)))
+        ||| map(~f=(f, payload) =>
+          f(`Array((payload))), pexp_array(__))
+        ||| map(~f=(f, lbl, def, param, body) =>
+          f(`Function((lbl, def, param, body))), pexp_fun(__, __, __, __)), nil)
+        ^:: nil
+    )
+  );
 
+/* Currently there's no way to define extensions like `lola.x` with Pplib.Extension, we generate one ppxlib.extension per html tag. Is possible to achive it with Ppxlib.Driver.register_transformation(~preprocess_impl). */
+let styledDotAnyHtmlTagExtensions =
+  Html.allTags |> List.map(htmlTag => {
+    Ppxlib.Extension.declare(
+      "styled." ++ htmlTag,
+      Ppxlib.Extension.Context.Module_expr,
+      dynamic_pattern,
+      (~loc, ~path, payload) => {
+        switch (payload) {
+        | `String((str, delim, label)) => {
+          let styles = renderStringPayload(~loc, ~path, `Style, str, Some(delim), label);
+          renderStyledComponent(~loc, ~htmlTag, styles);
+        }
+        | `Array(arr) => {
+          let styles = renderArrayPayload(~loc, arr);
+          renderStyledComponent(~loc, ~htmlTag, styles);
+        }
+        | `Function((label, defaultValue, param, body)) =>
+          renderStyledDynamic(
+            ~loc,
+            ~path,
+            ~htmlTag,
+            ~label,
+            ~defaultValue,
+            ~param,
+            ~body,
+          )
+        };
+      }
+    )
+  });
 
 let extensions = [
   Ppxlib.Extension.declare(
     "cx",
     Ppxlib.Extension.Context.Expression,
-    string_payload,
-    renderStringPayload(`Style)
+    static_pattern,
+    (~loc, ~path, payload) => {
+      switch (payload) {
+        | `String((str, delim, label)) =>
+          renderStringPayload(~loc, ~path, `Style, str, Some(delim), label)
+        | `Array(arr) =>
+          renderArrayPayload(~loc, arr)
+      }
+    }
   ),
   Ppxlib.Extension.declare(
     "css",
@@ -341,7 +374,7 @@ let extensions = [
     string_payload,
     renderStringPayload(`Keyframe)
   ),
-  /* This extension just raises an error to educate users in case of wrong payload or missing html tag. */
+  /* This extension just raises an error to educate users, since before 1.x this was valid */
   Ppxlib.Extension.declare(
     "styled",
     Ppxlib.Extension.Context.Module_expr,
@@ -354,32 +387,7 @@ let extensions = [
       )
     }
   ),
-  /* Currently there's no way to define extensions like `lola.x` with Pplib.Extension, we generate one ppxlib.extension per html tag. Is possible to achive it with Ppxlib.Driver.register_transformation(~preprocess_impl). */
-  ...List.map(htmlTag => {
-    Ppxlib.Extension.declare(
-      "styled." ++ htmlTag,
-      Ppxlib.Extension.Context.Module_expr,
-      pattern,
-      (~loc, ~path, payload) => {
-        switch (payload) {
-        | `String((str, delim, label)) =>
-          renderStyledStaticString(~loc, ~path, ~htmlTag, ~str, ~delim, ~label)
-        | `Array(arr) =>
-          renderStyledStaticList(~loc, ~path, ~htmlTag, arr)
-        | `Function((label, defaultValue, param, body)) =>
-          renderStyledDynamic(
-            ~loc,
-            ~path,
-            ~htmlTag,
-            ~label,
-            ~defaultValue,
-            ~param,
-            ~body,
-          )
-        };
-      }
-    )
-  }, Html.allTags),
+  ...styledDotAnyHtmlTagExtensions,
 ];
 
 /* Instrument is needed to run metaquote before styled-ppx, we rely on this order for the native tests */
