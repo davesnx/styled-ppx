@@ -155,17 +155,19 @@ let renderStyledDynamic = (
   let propExpr = Build.pexp_ident(~loc, {txt: Lident("props"), loc});
   let propToGetter = str => str ++ "Get";
 
+  /* (~arg1=arg1Get(props), ~arg2=arg2Get(props), ...) */
   let styledFunctionArguments =
     List.map(
       ((arg, _, _, _, _, _)) => {
-        let labelText = getLabel(arg);
+        let label = arg |> getLabel |> propToGetter;
         let value =
-          Build.pexp_ident(~loc, {txt: Lident(propToGetter(labelText)), loc});
+          Build.pexp_ident(~loc, {txt: Lident(label), loc});
         (arg, Build.pexp_apply(~loc, value, [(Nolabel, propExpr)]));
       },
       labeledArguments,
     );
 
+  /* let styles = styled(...) */
   let styledFunctionExpr =
     Build.pexp_apply(
       ~loc,
@@ -188,6 +190,7 @@ let renderStyledDynamic = (
       labeledArguments,
     );
 
+  /* ('a, 'b) */
   let makePropsParameters: list(core_type) =
     variableList
     |> List.filter_map(
@@ -196,6 +199,7 @@ let renderStyledDynamic = (
       | _ => None,
     );
 
+  /* type makeProps('a) = { a: 'a } */
   let variableMakeProps =
     variableList
     |> List.map(((arg, optional, _, type_)) =>
