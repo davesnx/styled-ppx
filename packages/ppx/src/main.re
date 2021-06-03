@@ -7,7 +7,7 @@ let raiseError = (~loc, ~description, ~example, ~link) => {
   raise(
     Location.raise_errorf(
       ~loc,
-      "%s\n\n  %s\n\n  More info: %s", description, example, link
+      "%s\n\n%s\n\nMore info: %s", description, example, link
     )
   );
 };
@@ -21,6 +21,12 @@ let getIsOptional = str =>
 let getIsLabelled = str =>
   switch (str) {
   | Labelled(_) => true
+  | _ => false
+  };
+
+let getNotLabelled = str =>
+  switch (str) {
+  | Nolabel => true
   | _ => false
   };
 
@@ -72,6 +78,15 @@ let getLabeledArgs = (label, defaultValue, param, expr) => {
   let alias = getAlias(param, label);
   let type_ = getType(param);
   let firstArg = (label, defaultValue, param, alias, param.ppat_loc, type_);
+
+  if (getNotLabelled(label)) {
+    raiseError(
+      ~loc=param.ppat_loc,
+      ~description="Dynamic components are defined with labeled arguments.",
+      ~example="[%styled.div (~a, ~b) => {}]",
+      ~link="https://reasonml.org/docs/manual/latest/function#labeled-arguments",
+    );
+  }
 
   getArgs(expr, [firstArg]);
 };

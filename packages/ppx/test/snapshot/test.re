@@ -92,3 +92,9 @@ module DynamicComponentWithDefaultValue = [%styled.div (~var="green") => [|
   [%css "color: $var;"],
   [%css "display: block;"]
 |]];
+
+/* This test ensures that the warning is being triggered */
+/* module T = [%styled.span () => [|
+  [%css "font-size: 16px"]
+|]];
+*/

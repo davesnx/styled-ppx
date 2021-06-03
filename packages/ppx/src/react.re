@@ -4,7 +4,7 @@ type attr = { name: string, type_: string, alias: alias };
 type domProp = | Event(event) | Attribute(attr);
 
 /*
-  This list contains all React component's DOM Props aka makeProps in Reason.
+  Contains all React DOM Props aka `makeProps` in ReasonReact.
     snapshot: https://gist.github.com/davesnx/22f0e81b6d7450e3e0dcc157595426f2
     taken from: https://github.com/reasonml/reason-react/blob/master/src/ReactDOM.re
 */

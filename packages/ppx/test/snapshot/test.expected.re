@@ -614,8 +614,6 @@ module OneSingleProperty = {
     [@bs.optional]
     shapeRendering: string,
     [@bs.optional]
-    size: int,
-    [@bs.optional]
     sizes: string,
     [@bs.optional]
     slope: string,
@@ -1569,8 +1567,6 @@ module SingleQuoteStrings = {
     shape: string,
     [@bs.optional]
     shapeRendering: string,
-    [@bs.optional]
-    size: int,
     [@bs.optional]
     sizes: string,
     [@bs.optional]
@@ -2530,8 +2526,6 @@ module MultiLineStrings = {
     [@bs.optional]
     shapeRendering: string,
     [@bs.optional]
-    size: int,
-    [@bs.optional]
     sizes: string,
     [@bs.optional]
     slope: string,
@@ -3490,8 +3484,6 @@ module SelfClosingElement = {
     [@bs.optional]
     shapeRendering: string,
     [@bs.optional]
-    size: int,
-    [@bs.optional]
     sizes: string,
     [@bs.optional]
     slope: string,
@@ -4445,8 +4437,6 @@ module ArrayStatic = {
     shape: string,
     [@bs.optional]
     shapeRendering: string,
-    [@bs.optional]
-    size: int,
     [@bs.optional]
     sizes: string,
     [@bs.optional]
@@ -5406,8 +5396,6 @@ module StringInterpolation = {
     shape: string,
     [@bs.optional]
     shapeRendering: string,
-    [@bs.optional]
-    size: int,
     [@bs.optional]
     sizes: string,
     [@bs.optional]
@@ -6374,8 +6362,6 @@ module DynamicComponent = {
     [@bs.optional]
     shapeRendering: string,
     [@bs.optional]
-    size: int,
-    [@bs.optional]
     sizes: string,
     [@bs.optional]
     slope: string,
@@ -7331,8 +7317,6 @@ module SelectorsMediaQueries = {
     shape: string,
     [@bs.optional]
     shapeRendering: string,
-    [@bs.optional]
-    size: int,
     [@bs.optional]
     sizes: string,
     [@bs.optional]
@@ -8304,8 +8288,6 @@ module ArrayDynamicComponent = {
     [@bs.optional]
     shapeRendering: string,
     [@bs.optional]
-    size: int,
-    [@bs.optional]
     sizes: string,
     [@bs.optional]
     slope: string,
@@ -9261,8 +9243,6 @@ module SequenceDynamicComponent = {
     shape: string,
     [@bs.optional]
     shapeRendering: string,
-    [@bs.optional]
-    size: int,
     [@bs.optional]
     sizes: string,
     [@bs.optional]
@@ -10221,8 +10201,6 @@ module DynamicComponentWithDefaultValue = {
     shape: string,
     [@bs.optional]
     shapeRendering: string,
-    [@bs.optional]
-    size: int,
     [@bs.optional]
     sizes: string,
     [@bs.optional]
