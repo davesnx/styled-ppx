@@ -324,14 +324,12 @@ let styledDotAnyHtmlTagExtensions =
       dynamic_pattern,
       (~loc, ~path, payload) => {
         switch (payload) {
-        | `String((str, delim, label)) => {
+        | `String((str, delim, label)) =>
           let styles = renderStringPayload(~loc, ~path, `Style, str, Some(delim), label);
           renderStyledComponent(~loc, ~htmlTag, styles);
-        }
-        | `Array(arr) => {
+        | `Array(arr) =>
           let styles = renderArrayPayload(~loc, arr);
           renderStyledComponent(~loc, ~htmlTag, styles);
-        }
         | `Function((label, defaultValue, param, body)) =>
           renderStyledDynamic(
             ~loc,
