@@ -308,7 +308,6 @@ let makePropList = [
   Attribute({name: "selected", type_: "bool", alias: None }),
   Attribute({name: "shape", type_: "string", alias: None }),
   Attribute({name: "shapeRendering", type_: "string", alias: None }),
-  Attribute({name: "size", type_: "int", alias: None }),
   Attribute({name: "sizes", type_: "string", alias: None }),
   Attribute({name: "slope", type_: "string", alias: None }),
   Attribute({name: "spacing", type_: "string", alias: None }),
