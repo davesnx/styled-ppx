@@ -175,7 +175,7 @@ let renderStyledDynamic = (
 
   let variableList =
     List.map(
-      ((arg, _, _, _, loc, type_)) => {
+      ((arg, optionalArg, _, _, loc, type_)) => {
         let label = getLabel(arg);
         let (kind, type_) =
           switch (type_) {
@@ -183,7 +183,7 @@ let renderStyledDynamic = (
           | None => (`Open, Create.typeVariable(~loc, label))
           };
 
-        (arg, kind, type_);
+        (arg, Option.is_some(optionalArg), kind, type_);
       },
       labeledArguments,
     );
@@ -192,14 +192,14 @@ let renderStyledDynamic = (
     variableList
     |> List.filter_map(
       fun
-      | (_, `Open, type_) => Some(type_)
+      | (_, _, `Open, type_) => Some(type_)
       | _ => None,
     );
 
   let variableMakeProps =
-    List.map(
-      ((arg, _, type_)) => Create.customPropLabel(~loc, getLabel(arg), type_, getIsOptional(label)),
-      variableList,
+    variableList
+    |> List.map(((arg, optional, _, type_)) =>
+        Create.customPropLabel(~loc, getLabel(arg), type_, optional)
     );
 
   let styles = switch (functionExpr.pexp_desc) {
