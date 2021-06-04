@@ -72,8 +72,6 @@ let token_to_string =
     ++ ")"
   | DIMENSION((n, d)) => "DIMENSION(" ++ n ++ ", " ++ d ++ ")"
   | VARIABLE(v) => "VARIABLE(" ++ v ++ ")"
-  | TYPED_VARIABLE((v, type_)) =>
-    "TYPED_VARIABLE(" ++ v ++ " " ++ type_ ++ ")"
   | UNSAFE => "UNSAFE";
 
 let () =
@@ -285,19 +283,6 @@ let rec get_next_token = buf => {
   | '%' => PERCENTAGE
   | unsafe => UNSAFE
   | variable => VARIABLE(Lex_buffer.latin1(~skip=1, buf))
-  | variable_with_type =>
-    let variableAndType = Lex_buffer.latin1(~skip=2, buf); /* cosa)type */
-    let variableAndTypeLength = String.length(variableAndType);
-    let closedParentesisIndex = String.index(variableAndType, ')');
-    let variableName = String.sub(variableAndType, 0, closedParentesisIndex);
-    let variableType =
-      String.sub(
-        variableAndType,
-        closedParentesisIndex + 1,
-        variableAndTypeLength - closedParentesisIndex - 1,
-      );
-
-    TYPED_VARIABLE((variableName, variableType));
   | '&' => SELECTOR("&")
   | operator => OPERATOR(Lex_buffer.latin1(buf))
   | string => STRING(Lex_buffer.latin1(~skip=1, ~drop=1, buf))

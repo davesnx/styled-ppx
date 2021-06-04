@@ -98,3 +98,14 @@ module DynamicComponentWithDefaultValue = [%styled.div (~var="green") => [|
   [%css "font-size: 16px"]
 |]];
 */
+
+let interpolationValue = "23";
+[%css "font-size: $(interpolationValue)"];
+
+module Interpolation = {
+  let fromAModule = "23px";
+};
+[%css "font-size: $(Interpolation.fromAModule)"];
+
+let interpolationAndFunction = 23;
+[%css "font-size: $(string_of_int(interpolationAndFunction))"];

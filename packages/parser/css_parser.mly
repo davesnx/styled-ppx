@@ -30,7 +30,6 @@ open Css_types
 %token <string> UNICODE_RANGE
 %token <string * string * Css_types.dimension> FLOAT_DIMENSION
 %token <string * string> DIMENSION
-%token <string * string> TYPED_VARIABLE
 %token <string> VARIABLE
 %token UNSAFE
 
@@ -189,6 +188,5 @@ component_value:
   | d = FLOAT_DIMENSION { Component_value.Float_dimension d }
   | d = DIMENSION { Component_value.Dimension d }
   | v = VARIABLE { Component_value.Variable v }
-  | x = TYPED_VARIABLE { Component_value.TypedVariable x }
   | s = SELECTOR { Component_value.Selector s }
   ;
