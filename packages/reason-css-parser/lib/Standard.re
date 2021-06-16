@@ -173,6 +173,8 @@ let custom_ident =
   token(
     fun
     | IDENT(string) => Ok(string)
+    | STRING(string) => Ok(string)
+    | BAD_STRING(string) => Ok(string)
     | _ => Error(["expected an identifier"]),
   );
 

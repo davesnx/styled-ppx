@@ -33,7 +33,7 @@ module ArrayStatic = [%styled.section [|
 
 let var = "#333333";
 module StringInterpolation = [%styled.div {j|
-  color: $var;
+  color: $(var);
   __UNSAFE__ color: trust-me;
   display: block;
 |j}];
@@ -47,7 +47,7 @@ let classNameWithCss = [%cx [| cssRule, [%css "background-color: green;"] |]];
 
 module DynamicComponent = [%styled.div
   (~var) => {j|
-     color: $var;
+     color: $(var);
      display: block;
    |j}
 ];
@@ -72,7 +72,7 @@ let keyframe = [%styled.keyframe {|
 
 module ArrayDynamicComponent = [%styled.div (~var) =>
   [|
-    [%css "color: $var;"],
+    [%css "color: $(var);"],
     [%css "display: block;"]
   |]
 ];
@@ -82,14 +82,14 @@ module SequenceDynamicComponent = [%styled.div
     Js.log("Logging when render");
 
   [|
-    [%css "color: $var;"],
+    [%css "color: $(var);"],
     [%css "display: block;"]
   |]
   }
 ];
 
 module DynamicComponentWithDefaultValue = [%styled.div (~var="green") => [|
-  [%css "color: $var;"],
+  [%css "color: $(var);"],
   [%css "display: block;"]
 |]];
 
@@ -101,11 +101,3 @@ module DynamicComponentWithDefaultValue = [%styled.div (~var="green") => [|
 
 let interpolationValue = "23";
 [%css "font-size: $(interpolationValue)"];
-
-module Interpolation = {
-  let fromAModule = "23px";
-};
-[%css "font-size: $(Interpolation.fromAModule)"];
-
-let interpolationAndFunction = 23;
-[%css "font-size: $(string_of_int(interpolationAndFunction))"];

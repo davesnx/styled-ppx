@@ -130,11 +130,7 @@ let ident_char = [%sedlex.regexp?
 
 let ident = [%sedlex.regexp? (Opt('-'), ident_start, Star(ident_char))];
 
-let variable = [%sedlex.regexp? ('$', Opt('('), Star(ident_char), Opt(')'))];
-
-let variable_with_type = [%sedlex.regexp?
-  ('$', '(', Star(ident_char), ')', Star(ident_char))
-];
+let variable = [%sedlex.regexp? ('$', '(', Star(any), ')')];
 
 let string_quote = [%sedlex.regexp?
   (
@@ -281,9 +277,9 @@ let rec get_next_token = buf => {
   | '[' => LEFT_BRACKET
   | ']' => RIGHT_BRACKET
   | '%' => PERCENTAGE
-  | unsafe => UNSAFE
-  | variable => VARIABLE(Lex_buffer.latin1(~skip=1, buf))
   | '&' => SELECTOR("&")
+  | unsafe => UNSAFE
+  | variable => VARIABLE(Lex_buffer.latin1(~skip=2, ~drop=1, buf))
   | operator => OPERATOR(Lex_buffer.latin1(buf))
   | string => STRING(Lex_buffer.latin1(~skip=1, ~drop=1, buf))
   | "url(" => get_url("", buf)
@@ -327,7 +323,7 @@ and get_url = (url, buf) =>
       )),
     )
   | _ => assert(false)
-  };
+};
 
 let get_next_token_with_location = buf => {
   discard_comments_and_white_spaces(buf);

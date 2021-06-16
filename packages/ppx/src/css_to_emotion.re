@@ -127,8 +127,8 @@ and render_declaration =
   switch (Declarations_to_emotion.parse_declarations((name, value_source))) {
   | Ok(exprs) => exprs
   | Error(`Not_found) => grammar_error(name_loc, "unknown property " ++ name)
-  | Error(`Invalid_value(_error)) =>
-    grammar_error(loc, "invalid property value")
+  | Error(`Invalid_value(value)) =>
+    grammar_error(loc, "invalid property value: " ++ value)
   };
 }
 and render_unsafe_declaration =
