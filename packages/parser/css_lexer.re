@@ -2,14 +2,17 @@
   * Reference:
   * https://www.w3.org/TR/css-syntax-3/
   * https://github.com/yahoo/css-js/blob/master/src/l/css.3.l */
+
 module Sedlexing = Lex_buffer;
+module Parser = Css_parser;
+module Types = Css_types;
 
 /** Signals a lexing error at the provided source location.  */
 exception LexingError((Lexing.position, string));
 
 /** Signals a parsing error at the provided token and its start and end
  * locations. */
-exception ParseError((Css_parser.token, Lexing.position, Lexing.position));
+exception ParseError((Parser.token, Lexing.position, Lexing.position));
 
 /** Signals a grammar error at the provided location. */
 exception GrammarError((string, Location.t));
@@ -31,38 +34,38 @@ let location_to_string = loc =>
 
 let dimension_to_string =
   fun
-  | Css_types.Length => "length"
-  | Angle => "angle"
-  | Time => "time"
-  | Frequency => "frequency";
+  | Types.Length => "length"
+  | Types.Angle => "angle"
+  | Types.Time => "time"
+  | Types.Frequency => "frequency";
 
 let token_to_string =
   fun
-  | Css_parser.EOF => "EOF"
-  | LEFT_BRACE => "{"
-  | RIGHT_BRACE => "}"
-  | LEFT_PAREN => "("
-  | RIGHT_PAREN => ")"
-  | LEFT_BRACKET => "["
-  | RIGHT_BRACKET => "]"
-  | COLON => ":"
-  | SEMI_COLON => ";"
-  | PERCENTAGE => "%"
-  | SELECTOR(s) => "SELECTOR(" ++ s ++ ")"
-  | IMPORTANT => "!important"
-  | IDENT(s) => "IDENT(" ++ s ++ ")"
-  | STRING(s) => "STRING(" ++ s ++ ")"
-  | URI(s) => "URI(" ++ s ++ ")"
-  | OPERATOR(s) => "OPERATOR(" ++ s ++ ")"
-  | DELIM(s) => "DELIM(" ++ s ++ ")"
-  | NESTED_AT_RULE(s) => "NESTED_AT_RULE(" ++ s ++ ")"
-  | AT_RULE_WITHOUT_BODY(s) => "AT_RULE_WITHOUT_BODY(" ++ s ++ ")"
-  | AT_RULE(s) => "AT_RULE(" ++ s ++ ")"
-  | FUNCTION(s) => "FUNCTION(" ++ s ++ ")"
-  | HASH(s) => "HASH(" ++ s ++ ")"
-  | NUMBER(s) => "NUMBER(" ++ s ++ ")"
-  | UNICODE_RANGE(s) => "UNICODE_RANGE(" ++ s ++ ")"
-  | FLOAT_DIMENSION((n, s, d)) =>
+  | Parser.EOF => "EOF"
+  | Parser.LEFT_BRACE => "{"
+  | Parser.RIGHT_BRACE => "}"
+  | Parser.LEFT_PAREN => "("
+  | Parser.RIGHT_PAREN => ")"
+  | Parser.LEFT_BRACKET => "["
+  | Parser.RIGHT_BRACKET => "]"
+  | Parser.COLON => ":"
+  | Parser.SEMI_COLON => ";"
+  | Parser.PERCENTAGE => "%"
+  | Parser.SELECTOR(s) => "SELECTOR(" ++ s ++ ")"
+  | Parser.IMPORTANT => "!important"
+  | Parser.IDENT(s) => "IDENT(" ++ s ++ ")"
+  | Parser.STRING(s) => "STRING(" ++ s ++ ")"
+  | Parser.URI(s) => "URI(" ++ s ++ ")"
+  | Parser.OPERATOR(s) => "OPERATOR(" ++ s ++ ")"
+  | Parser.DELIM(s) => "DELIM(" ++ s ++ ")"
+  | Parser.NESTED_AT_RULE(s) => "NESTED_AT_RULE(" ++ s ++ ")"
+  | Parser.AT_RULE_WITHOUT_BODY(s) => "AT_RULE_WITHOUT_BODY(" ++ s ++ ")"
+  | Parser.AT_RULE(s) => "AT_RULE(" ++ s ++ ")"
+  | Parser.FUNCTION(s) => "FUNCTION(" ++ s ++ ")"
+  | Parser.HASH(s) => "HASH(" ++ s ++ ")"
+  | Parser.NUMBER(s) => "NUMBER(" ++ s ++ ")"
+  | Parser.UNICODE_RANGE(s) => "UNICODE_RANGE(" ++ s ++ ")"
+  | Parser.FLOAT_DIMENSION((n, s, d)) =>
     "FLOAT_DIMENSION("
     ++ n
     ++ ", "
@@ -70,21 +73,19 @@ let token_to_string =
     ++ ", "
     ++ dimension_to_string(d)
     ++ ")"
-  | DIMENSION((n, d)) => "DIMENSION(" ++ n ++ ", " ++ d ++ ")"
-  | VARIABLE(v) => "VARIABLE(" ++ v ++ ")"
-  | TYPED_VARIABLE((v, type_)) =>
-    "TYPED_VARIABLE(" ++ v ++ " " ++ type_ ++ ")"
-  | UNSAFE => "UNSAFE";
+  | Parser.DIMENSION((n, d)) => "DIMENSION(" ++ n ++ ", " ++ d ++ ")"
+  | Parser.VARIABLE(v) => "VARIABLE(" ++ v ++ ")"
+  | Parser.UNSAFE => "UNSAFE";
 
 let () =
   Location.register_error_of_exn(
     fun
     | LexingError((pos, msg)) => {
-        let loc = Lex_buffer.make_loc(pos, pos);
+        let loc = Sedlexing.make_loc(pos, pos);
         Some(Location.error(~loc, msg));
       }
     | ParseError((token, start_pos, end_pos)) => {
-        let loc = Lex_buffer.make_loc(start_pos, end_pos);
+        let loc = Sedlexing.make_loc(start_pos, end_pos);
         let msg =
           Printf.sprintf(
             "Parse error while reading token '%s'",
@@ -132,11 +133,7 @@ let ident_char = [%sedlex.regexp?
 
 let ident = [%sedlex.regexp? (Opt('-'), ident_start, Star(ident_char))];
 
-let variable = [%sedlex.regexp? ('$', Opt('('), Star(ident_char), Opt(')'))];
-
-let variable_with_type = [%sedlex.regexp?
-  ('$', '(', Star(ident_char), ')', Star(ident_char))
-];
+let variable = [%sedlex.regexp? ('$', '(', Star(ident_char), ')')];
 
 let string_quote = [%sedlex.regexp?
   (
@@ -260,7 +257,7 @@ let discard_comments_and_white_spaces = buf => {
   and discard_comments = buf =>
     switch%sedlex (buf) {
     | eof =>
-      raise(LexingError((buf.Lex_buffer.pos, "Unterminated comment at EOF")))
+      raise(LexingError((buf.Sedlexing.pos, "Unterminated comment at EOF")))
     | "*/" => discard_white_spaces(buf)
     | any => discard_comments(buf)
     | _ => assert(false)
@@ -283,77 +280,63 @@ let rec get_next_token = buf => {
   | '[' => LEFT_BRACKET
   | ']' => RIGHT_BRACKET
   | '%' => PERCENTAGE
-  | unsafe => UNSAFE
-  | variable => VARIABLE(Lex_buffer.latin1(~skip=1, buf))
-  | variable_with_type =>
-    let variableAndType = Lex_buffer.latin1(~skip=2, buf); /* cosa)type */
-    let variableAndTypeLength = String.length(variableAndType);
-    let closedParentesisIndex = String.index(variableAndType, ')');
-    let variableName = String.sub(variableAndType, 0, closedParentesisIndex);
-    let variableType =
-      String.sub(
-        variableAndType,
-        closedParentesisIndex + 1,
-        variableAndTypeLength - closedParentesisIndex - 1,
-      );
-
-    TYPED_VARIABLE((variableName, variableType));
   | '&' => SELECTOR("&")
-  | operator => OPERATOR(Lex_buffer.latin1(buf))
-  | string => STRING(Lex_buffer.latin1(~skip=1, ~drop=1, buf))
+  | unsafe => UNSAFE
+  | variable => VARIABLE(Sedlexing.latin1(~skip=2, ~drop=1, buf))
+  | operator => OPERATOR(Sedlexing.latin1(buf))
+  | string => STRING(Sedlexing.latin1(~skip=1, ~drop=1, buf))
   | "url(" => get_url("", buf)
   | important => IMPORTANT
-  | nested_at_rule => NESTED_AT_RULE(Lex_buffer.latin1(~skip=1, buf))
+  | nested_at_rule => NESTED_AT_RULE(Sedlexing.latin1(~skip=1, buf))
   | at_rule_without_body =>
-    AT_RULE_WITHOUT_BODY(Lex_buffer.latin1(~skip=1, buf))
-  | at_rule => AT_RULE(Lex_buffer.latin1(~skip=1, buf))
+    AT_RULE_WITHOUT_BODY(Sedlexing.latin1(~skip=1, buf))
+  | at_rule => AT_RULE(Sedlexing.latin1(~skip=1, buf))
   /* NOTE: should be placed above ident, otherwise pattern with
    * '-[0-9a-z]{1,6}' cannot be matched */
-  | (_u, '+', unicode_range) => UNICODE_RANGE(Lex_buffer.latin1(buf))
-  | (ident, '(') => FUNCTION(Lex_buffer.latin1(~drop=1, buf))
-  | ident => IDENT(Lex_buffer.latin1(buf))
-  | ('#', name) => HASH(Lex_buffer.latin1(~skip=1, buf))
-  | number => get_dimension(Lex_buffer.latin1(buf), buf)
-  | any => DELIM(Lex_buffer.latin1(buf))
+  | (_u, '+', unicode_range) => UNICODE_RANGE(Sedlexing.latin1(buf))
+  | (ident, '(') => FUNCTION(Sedlexing.latin1(~drop=1, buf))
+  | ident => IDENT(Sedlexing.latin1(buf))
+  | ('#', name) => HASH(Sedlexing.latin1(~skip=1, buf))
+  | number => get_dimension(Sedlexing.latin1(buf), buf)
+  | any => DELIM(Sedlexing.latin1(buf))
   | _ => assert(false)
   };
 }
 and get_dimension = (n, buf) =>
   switch%sedlex (buf) {
-  | length => FLOAT_DIMENSION((n, Lex_buffer.latin1(buf), Css_types.Length))
-  | angle => FLOAT_DIMENSION((n, Lex_buffer.latin1(buf), Css_types.Angle))
-  | time => FLOAT_DIMENSION((n, Lex_buffer.latin1(buf), Css_types.Time))
-  | frequency =>
-    FLOAT_DIMENSION((n, Lex_buffer.latin1(buf), Css_types.Frequency))
-  | ident => DIMENSION((n, Lex_buffer.latin1(buf)))
+  | length => FLOAT_DIMENSION((n, Sedlexing.latin1(buf), Length))
+  | angle => FLOAT_DIMENSION((n, Sedlexing.latin1(buf), Angle))
+  | time => FLOAT_DIMENSION((n, Sedlexing.latin1(buf), Time))
+  | frequency => FLOAT_DIMENSION((n, Sedlexing.latin1(buf), Frequency))
+  | ident => DIMENSION((n, Sedlexing.latin1(buf)))
   | _ => NUMBER(n)
   }
 and get_url = (url, buf) =>
   switch%sedlex (buf) {
   | white_spaces => get_url(url, buf)
-  | url => get_url(Lex_buffer.latin1(buf), buf)
+  | url => get_url(Sedlexing.latin1(buf), buf)
   | ")" => URI(url)
-  | eof => raise(LexingError((buf.Lex_buffer.pos, "Incomplete URI")))
+  | eof => raise(LexingError((buf.Sedlexing.pos, "Incomplete URI")))
   | any =>
     raise(
       LexingError((
-        buf.Lex_buffer.pos,
-        "Unexpected token: " ++ Lex_buffer.latin1(buf) ++ " parsing an URI",
+        buf.Sedlexing.pos,
+        "Unexpected token: " ++ Sedlexing.latin1(buf) ++ " parsing an URI",
       )),
     )
   | _ => assert(false)
-  };
+};
 
 let get_next_token_with_location = buf => {
   discard_comments_and_white_spaces(buf);
-  let loc_start = Lex_buffer.next_loc(buf);
+  let loc_start = Sedlexing.next_loc(buf);
   let token = get_next_token(buf);
-  let loc_end = Lex_buffer.next_loc(buf);
+  let loc_end = Sedlexing.next_loc(buf);
   (token, loc_start, loc_end);
 };
 
 let parse = (buf, parser) => {
-  let last_token = ref((Css_parser.EOF, Lexing.dummy_pos, Lexing.dummy_pos));
+  let last_token = ref((Parser.EOF, Lexing.dummy_pos, Lexing.dummy_pos));
   let next_token = () => {
     last_token := get_next_token_with_location(buf);
     last_token^;
@@ -368,13 +351,13 @@ let parse = (buf, parser) => {
 let parse_string = (~container_lnum=?, ~pos=?, parser, string) => {
   switch (container_lnum) {
   | None => ()
-  | Some(lnum) => Lex_buffer.container_lnum_ref := lnum
+  | Some(lnum) => Sedlexing.container_lnum_ref := lnum
   };
-  parse(Lex_buffer.of_ascii_string(~pos?, string), parser);
+  parse(Sedlexing.of_ascii_string(~pos?, string), parser);
 };
 
 let parse_declaration_list = (~container_lnum=?, ~pos=?, css) =>
-  parse_string(~container_lnum?, ~pos?, Css_parser.declaration_list, css);
+  parse_string(~container_lnum?, ~pos?, Parser.declaration_list, css);
 
 let parse_declaration = (~container_lnum=?, ~pos=?, css) =>
-  parse_string(~container_lnum?, ~pos?, Css_parser.declaration, css);
+  parse_string(~container_lnum?, ~pos?, Parser.declaration, css);

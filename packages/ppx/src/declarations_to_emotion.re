@@ -45,6 +45,7 @@ let render_percentage = number => [%expr
 
 let render_css_global_values = (name, value) => {
   let.ok value = Parser.parse(Standard.css_wide_keywords, value);
+
   let value =
     switch (value) {
     | `Inherit => [%expr "inherit"]
@@ -132,9 +133,10 @@ let variable_rule = {
   open Let;
 
   let.bind_match () = Pattern.expect(DELIM("$"));
-  let.bind_match _ = Pattern.expect(LEFT_PARENS) |> Modifier.optional;
-  let.bind_match string = Standard.ident;
-  let.bind_match _ = Pattern.expect(RIGHT_PARENS) |> Modifier.optional;
+  let.bind_match _ = Pattern.expect(LEFT_PARENS);
+  let.bind_match string = Standard.custom_ident;
+  let.bind_match _ = Pattern.expect(RIGHT_PARENS);
+
   return_match(string);
 };
 

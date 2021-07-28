@@ -67,7 +67,7 @@ jobs:
         run: esy test_snapshot
 
       - name: Run runtests for Parser, vds & Lexer
-        run: esy dune runtest --force
+        run: esy test
 
       - name: Export dependencies
         if: steps.deps-cache.outputs.cache-hit != 'true'

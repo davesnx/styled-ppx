@@ -1,5 +1,7 @@
 <h1> styled-ppx <a href="https://github.com/davesnx/styled-ppx/actions"></a></h1>
 
+> **Alert**: This documentaiton points to v0.20.0 ⚠️. There are a few things that have changed since then. Since v1.x is tagged as "latest" on npm. Please install v1.x with caution.
+
 **styled-ppx** is the [ppx](https://victor.darvariu.me/jekyll/update/2018/06/19/ppx-tutorial.html) that enables *css-in-reason*.
 Build on top of [emotion](https://emotion.sh), it allows you to style apps safe, quickly, performant and as you always done it.
 
@@ -8,8 +10,6 @@ Build on top of [emotion](https://emotion.sh), it allows you to style apps safe,
 Allows you to create **React Components** with type-safe CSS style definitions that don't rely on a specific [DSL](https://en.wikipedia.org/wiki/Domain-specific_language) and great error messages:
 
 ![](./docs/images/compile-error.png)
-
-> **Alert**: This documentaiton points to v0.20.0 ⚠️. There are a few things that have changed since then. Since v1.x is tagged as "latest" on npm. Please install v1.x with caution and don't update if you aren't completly sure.
 
 ## Usage
 **`styled-ppx`** implements a ppx that transforms `[%styled]` extensions points into `[@react.component]` modules with the additional styles converted to [emotion](https://emotion.sh).
