@@ -1514,8 +1514,6 @@ let parse_declarations = ((name, value)) => {
     Parser.check_property(~name, value)
     |> Result.map_error((`Unknown_value) => `Not_found);
 
-  Printf.printf("\nvalue is: %s -> %b", value, is_valid_string);
-
   switch (render_css_global_values(name, value)) {
   | Ok(value) => Ok(value)
   | Error(_) =>
