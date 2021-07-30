@@ -361,3 +361,6 @@ let parse_declaration_list = (~container_lnum=?, ~pos=?, css) =>
 
 let parse_declaration = (~container_lnum=?, ~pos=?, css) =>
   parse_string(~container_lnum?, ~pos?, Parser.declaration, css);
+
+let parse_stylesheet = (~container_lnum=?, ~pos=?, css) =>
+  parse_string(~container_lnum?, ~pos?, Parser.stylesheet, css);

@@ -8631,7 +8631,11 @@ module ArrayDynamicComponent = {
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
   let styles = (~var) =>
-    CssJs.style(. [|CssJs.display(`block), CssJs.color(var)|]);
+    CssJs.style(. [|
+      CssJs.label("lola"),
+      CssJs.display(`block),
+      CssJs.color(var),
+    |]);
   let make = (props: makeProps('var)) => {
     let stylesObject = {"className": styles(~var=varGet(props))};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
@@ -10546,7 +10550,11 @@ module DynamicComponentWithDefaultValue = {
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
   let styles = (~var="green") =>
-    CssJs.style(. [|CssJs.display(`block), CssJs.color(var)|]);
+    CssJs.style(. [|
+      CssJs.label("lola"),
+      CssJs.display(`block),
+      CssJs.color(var),
+    |]);
   let make = (props: makeProps('var)) => {
     let stylesObject = {"className": styles(~var=?varGet(props))};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));

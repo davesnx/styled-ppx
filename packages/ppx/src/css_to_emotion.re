@@ -29,7 +29,7 @@ module Helper = Ast_helper;
 module Builder = Ast_builder.Default;
 
 module Emotion = {
-  let lident = name => Ldot(Lident("CssJs"), name);
+  let lident = (~loc, name) => {txt: Ldot(Lident("CssJs"), name), loc};
 };
 
 let grammar_error = (loc, message) =>
@@ -115,11 +115,11 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
     };
 
   let media_ident =
-    Builder.pexp_ident(~loc=name_loc, {txt: Emotion.lident("media"), loc});
+    Builder.pexp_ident(~loc=name_loc, Emotion.lident(~loc, "media"));
   Builder.eapply(~loc, media_ident, [Builder.estring(~loc=prelude_loc, query), rules]);
 }
 and render_declaration =
-    (d: Declaration.t, _d_loc: Location.t): list(Parsetree.expression) => {
+    (d: Declaration.t): list(Parsetree.expression) => {
   let (name, name_loc) = d.Declaration.name;
   let (_valueList, loc) = d.Declaration.value;
   let value_source = source_code_of_loc(loc);
@@ -145,13 +145,13 @@ and render_declarations =
     declaration =>
       switch (declaration) {
       | Declaration_list.Declaration(decl) =>
-        render_declaration(decl, decl.loc)
+        render_declaration(decl)
       | Declaration_list.Unsafe(decl) =>
         render_unsafe_declaration(decl, decl.loc)
       | Declaration_list.At_rule(ar) => [render_at_rule(ar)]
       | Declaration_list.Style_rule(ar) =>
         let loc: Location.t = ar.loc;
-        let ident = Exp.ident(~loc, {txt: Emotion.lident("selector"), loc});
+        let ident = Exp.ident(~loc, Emotion.lident(~loc, "selector"));
         [render_style_rule(~isUncurried=false, ident, ar)];
       },
     ds,
@@ -205,7 +205,7 @@ and render_style_rule = (~isUncurried, ident, rule: Style_rule.t): Parsetree.exp
       | "placeholder" => "placeholder"
       | _ => grammar_error(loc, "Unexpected pseudo-class")
       };
-    let ident = Exp.ident(~loc, {txt: Emotion.lident(pseudoclass), loc});
+    let ident = Exp.ident(~loc, Emotion.lident(~loc, pseudoclass));
     Exp.apply(~loc=rule.Style_rule.loc, ident, [(Nolabel, dl_expr)]);
   | /* single-colon pseudoclasses */
     [
@@ -240,7 +240,7 @@ and render_style_rule = (~isUncurried, ident, rule: Style_rule.t): Parsetree.exp
       | "target" => "target"
       | _ => grammar_error(loc, "Unexpected pseudo-class")
       };
-    let ident = Exp.ident(~loc, {txt: Emotion.lident(pseudoclass), loc});
+    let ident = Exp.ident(~loc, Emotion.lident(~loc, pseudoclass));
     Exp.apply(~loc=rule.Style_rule.loc, ident, [(Nolabel, dl_expr)]);
   | /* nth-child & friends */
     [
@@ -249,7 +249,7 @@ and render_style_rule = (~isUncurried, ident, rule: Style_rule.t): Parsetree.exp
       (Function((_pc, loc), (_args, _args_loc)), _f_loc),
     ] =>
     // TODO: parses and use the correct functions instead of just strings selector
-    let ident = Exp.ident(~loc, {txt: Emotion.lident("selector"), loc});
+    let ident = Exp.ident(~loc, Emotion.lident(~loc, "selector"));
     let selector =
       List.fold_left(render_prelude_value, "", List.rev(prelude));
     let selector_expr = string_to_const(~loc=prelude_loc, selector);
@@ -272,20 +272,38 @@ and render_style_rule = (~isUncurried, ident, rule: Style_rule.t): Parsetree.exp
   };
 };
 
-let render_style_call = (declaration_list): Parsetree.expression => {
-  let loc = declaration_list.pexp_loc;
-  let ident = Exp.ident(~loc, {txt: Emotion.lident("style"), loc});
-  Exp.apply(~loc, ~attrs=[Create.uncurried(~loc)], ident, [(Nolabel, declaration_list)]);
+let bsEmotionLabel = (~loc, name) => {
+  Exp.apply(
+    Exp.ident(Emotion.lident(~loc, "label")),
+    [
+      (
+        Nolabel,
+        Exp.constant(Pconst_string(name, loc, None)),
+      ),
+    ],
+  )
 };
 
-let render_rule = (~isGlobalCall, ident, r: Rule.t): Parsetree.expression => {
-  switch (r) {
-  | Rule.Style_rule(sr) => render_style_rule(~isUncurried=isGlobalCall, ident, sr)
-  | Rule.At_rule(ar) => render_at_rule(ar)
+let addLabel = (~loc, name, emotionExprs) => {
+  [bsEmotionLabel(~loc, name), ...emotionExprs]
+};
+
+let render_style_call = (declaration_list): Parsetree.expression => {
+  let loc = declaration_list.pexp_loc;
+  let ident = Exp.ident(~loc, Emotion.lident(~loc, "style"));
+  let arguments = [(Nolabel, declaration_list)];
+
+  Exp.apply(~loc, ~attrs=[Create.uncurried(~loc)], ident, arguments);
+};
+
+let render_rule = (~isGlobalCall, ident, rule: Rule.t): Parsetree.expression => {
+  switch (rule) {
+  | Rule.Style_rule(styleRule) => render_style_rule(~isUncurried=isGlobalCall, ident, styleRule)
+  | Rule.At_rule(atRule) => render_at_rule(atRule)
   };
 };
 
-let render_emotion_keyframe = ((ruleList, loc)): Parsetree.expression => {
+let render_keyframes = ((ruleList, loc)): Parsetree.expression => {
   let invalidSelectorErrorMessage = {|
     keyframe selector can be from | to | <percentage>
 
@@ -329,7 +347,7 @@ let render_emotion_keyframe = ((ruleList, loc)): Parsetree.expression => {
        })
     |> Builder.pexp_array(~loc);
   let emotionKeyframes =
-    Builder.pexp_ident(~loc, {txt: Emotion.lident("keyframes"), loc});
+    Builder.pexp_ident(~loc, Emotion.lident(~loc, "keyframes"));
 
   {
     ...Builder.eapply(~loc, emotionKeyframes, [keyframes]),
@@ -338,7 +356,7 @@ let render_emotion_keyframe = ((ruleList, loc)): Parsetree.expression => {
 };
 
 let render_global = ((ruleList, loc): Stylesheet.t) => {
-  let emotionGlobal = Exp.ident(~loc, {txt: Emotion.lident("global"), loc});
+  let emotionGlobal = Exp.ident(~loc, Emotion.lident(~loc, "global"));
 
     switch (ruleList) {
     /* There's only one rule: */
