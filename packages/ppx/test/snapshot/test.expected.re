@@ -955,7 +955,8 @@ module OneSingleProperty = {
   [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
-  let styles = CssJs.style(. [|CssJs.display(`block)|]);
+  let styles =
+    CssJs.style(. [|CssJs.label("lola"), CssJs.display(`block)|]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
@@ -1911,6 +1912,7 @@ module SingleQuoteStrings = {
     "createElement";
   let styles =
     CssJs.style(. [|
+      CssJs.label("lola"),
       CssJs.display(`flex),
       CssJs.unsafe("justifyContent", "center"),
     |]);
@@ -2869,6 +2871,7 @@ module MultiLineStrings = {
     "createElement";
   let styles =
     CssJs.style(. [|
+      CssJs.label("lola"),
       CssJs.display(`flex),
       CssJs.unsafe("justifyContent", "center"),
     |]);
@@ -3825,7 +3828,7 @@ module SelfClosingElement = {
   [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
-  let styles = CssJs.style(. [||]);
+  let styles = CssJs.style(. [|CssJs.label("lola")|]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
@@ -4781,6 +4784,7 @@ module ArrayStatic = {
     "createElement";
   let styles =
     CssJs.style(. [|
+      CssJs.label("lola"),
       CssJs.display(`flex),
       CssJs.unsafe("justifyContent", "center"),
     |]);
@@ -5740,6 +5744,7 @@ module StringInterpolation = {
     "createElement";
   let styles =
     CssJs.style(. [|
+      CssJs.label("lola"),
       CssJs.color(var),
       CssJs.unsafe("color", "trust-me"),
       CssJs.display(`block),
@@ -6705,7 +6710,11 @@ module DynamicComponent = {
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
   let styles = (~var) =>
-    CssJs.style(. [|CssJs.color(var), CssJs.display(`block)|]);
+    CssJs.style(. [|
+      CssJs.label("lola"),
+      CssJs.color(var),
+      CssJs.display(`block),
+    |]);
   let make = (props: makeProps('var)) => {
     let stylesObject = {"className": styles(~var=varGet(props))};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
@@ -7661,6 +7670,7 @@ module SelectorsMediaQueries = {
     "createElement";
   let styles =
     CssJs.style(. [|
+      CssJs.label("lola"),
       CssJs.media(
         "(min-width: 600px)",
         [|CssJs.unsafe("background", "blue")|],

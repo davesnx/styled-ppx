@@ -1,6 +1,6 @@
 open Ppxlib;
 
-module Build = Ast_builder.Default;
+module Builder = Ast_builder.Default;
 module Helper = Ast_helper;
 
 let raiseError = (~loc, ~description, ~example, ~link) => {
@@ -102,15 +102,11 @@ let parsePayloadStyle = (
   _loc,
 ) => {
   let loc_start = payload.loc.Location.loc_start;
-
-  let parser =
-    Css_lexer.parse_string(
-      ~container_lnum=loc_start.Lexing.pos_lnum,
-      ~pos=loc_start,
-      Css_parser.declaration_list
-    );
-
-  parser(payload.txt);
+  Css_lexer.parse_declaration_list(
+    ~container_lnum=loc_start.Lexing.pos_lnum,
+    ~pos=loc_start,
+    payload.txt
+  );
 };
 
 let getLastSequence = (expr) => {
@@ -135,7 +131,7 @@ let renderStyledDynamic = (
   let (functionExpr, labeledArguments) =
     getLabeledArgs(label, defaultValue, param, body);
 
-  let propExpr = Build.pexp_ident(~loc, {txt: Lident("props"), loc});
+  let propExpr = Builder.pexp_ident(~loc, {txt: Lident("props"), loc});
   let propToGetter = str => str ++ "Get";
 
   /* (~arg1=arg1Get(props), ~arg2=arg2Get(props), ...) */
@@ -144,17 +140,17 @@ let renderStyledDynamic = (
       ((arg, _, _, _, _, _)) => {
         let label = arg |> getLabel |> propToGetter;
         let value =
-          Build.pexp_ident(~loc, {txt: Lident(label), loc});
-        (arg, Build.pexp_apply(~loc, value, [(Nolabel, propExpr)]));
+          Builder.pexp_ident(~loc, {txt: Lident(label), loc});
+        (arg, Builder.pexp_apply(~loc, value, [(Nolabel, propExpr)]));
       },
       labeledArguments,
     );
 
   /* let styles = styled(...) */
   let styledFunctionExpr =
-    Build.pexp_apply(
+    Builder.pexp_apply(
       ~loc,
-      Build.pexp_ident(~loc, {txt: Lident(styleVariableName), loc}),
+      Builder.pexp_ident(~loc, {txt: Lident(styleVariableName), loc}),
       styledFunctionArguments,
     );
 
@@ -191,30 +187,35 @@ let renderStyledDynamic = (
 
   let styles = switch (functionExpr.pexp_desc) {
     | Pexp_constant(Pconst_string(str, delim, label)) =>
-      {
-        let loc = functionExpr.pexp_loc;
-        parsePayloadStyle(
-          ~loc,
-          ~path,
-          {txt: str, loc},
-          delim,
-          label
-        ) |> Css_to_emotion.render_declaration_list |> Css_to_emotion.render_style_call
-      }
+      parsePayloadStyle(
+        ~loc=functionExpr.pexp_loc,
+        ~path,
+        {txt: str, loc: functionExpr.pexp_loc},
+        delim,
+        label
+      )
+        |> Css_to_emotion.render_declarations
+        |> Css_to_emotion.addLabel(~loc, "lola")
+        |> Builder.pexp_array(~loc)
+        |> Css_to_emotion.render_style_call;
     | Pexp_array(arr) =>
-      Build.pexp_array(~loc, List.rev(arr) |> Css_to_emotion.addLabel(~loc, "lola")) |> Css_to_emotion.render_style_call
+        arr
+          |> List.rev
+          |> Css_to_emotion.addLabel(~loc, "lola")
+          |> Builder.pexp_array(~loc)
+          |> Css_to_emotion.render_style_call;
     | Pexp_sequence(expr, sequence) => {
       /* Generate a new sequence where the last expression is
         wrapped in render_style_call and render the other expressions. */
       let styles = sequence |> getLastSequence |> Css_to_emotion.render_style_call;
-      Build.pexp_sequence(~loc, expr, styles);
+      Builder.pexp_sequence(~loc, expr, styles);
     }
     /* TODO: With this default case we support all expressions here.
     Users might find this confusing, we could give some warnings before the type-checker does. */
     | _ => functionExpr
   };
 
-  Build.pmod_structure(~loc, [
+  Builder.pmod_structure(~loc, [
     Create.makeMakeProps(
       ~loc,
       ~customProps=Some((makePropsParameters, variableMakeProps))
@@ -237,9 +238,9 @@ let renderStyledDynamic = (
 
 let renderStyledComponent = (~loc, ~htmlTag, styles) => {
   let styledExpr =
-    Build.pexp_ident(~loc, {txt: Lident(styleVariableName), loc});
+    Builder.pexp_ident(~loc, {txt: Lident(styleVariableName), loc});
 
-  Build.pmod_structure(~loc, [
+  Builder.pmod_structure(~loc, [
     Create.makeMakeProps(~loc, ~customProps=None),
     Create.bindingCreateVariadicElement(~loc),
     Create.styles(
@@ -310,11 +311,16 @@ let styledDotAnyHtmlTagExtensions =
         switch (payload) {
         | `String((str, delim, label)) =>
           let styles = parsePayloadStyle(~loc, ~path, str, Some(delim), label)
-            |> Css_to_emotion.render_declaration_list
+            |> Css_to_emotion.render_declarations
+            |> Css_to_emotion.addLabel(~loc, "lola")
+            |> Builder.pexp_array(~loc)
             |> Css_to_emotion.render_style_call;
           renderStyledComponent(~loc, ~htmlTag, styles);
         | `Array(arr) =>
-          let styles = arr |> Build.pexp_array(~loc) |> Css_to_emotion.render_style_call;
+          let styles = arr
+            |> Css_to_emotion.addLabel(~loc, "lola")
+            |> Builder.pexp_array(~loc)
+            |> Css_to_emotion.render_style_call;
           renderStyledComponent(~loc, ~htmlTag, styles);
         | `Function((label, defaultValue, param, body)) =>
           renderStyledDynamic(
@@ -340,9 +346,10 @@ let extensions = [
       switch (payload) {
         | `String((str, delim, label)) =>
           parsePayloadStyle(~loc, ~path, str, Some(delim), label)
-            |> Css_to_emotion.render_declaration_list
+            |> Css_to_emotion.render_declarations
+            |> Builder.pexp_array(~loc)
             |> Css_to_emotion.render_style_call;
-        | `Array(arr) => arr |> Build.pexp_array(~loc) |> Css_to_emotion.render_style_call;
+        | `Array(arr) => arr |> Builder.pexp_array(~loc) |> Css_to_emotion.render_style_call;
       }
     }
   ),

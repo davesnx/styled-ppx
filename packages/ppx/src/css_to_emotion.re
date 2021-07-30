@@ -111,7 +111,7 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
     switch (ar.At_rule.block) {
     | Empty => invalid_format(loc)
     | Stylesheet(_) => invalid_format(loc)
-    | Declaration_list(declaration) => render_declaration_list(declaration)
+    | Declaration_list(declaration) => render_declarations(declaration) |> Builder.pexp_array(~loc)
     };
 
   let media_ident =
@@ -140,7 +140,7 @@ and render_unsafe_declaration =
   [Declarations_to_emotion.render_when_unsupported_features(name, value_source)];
 }
 and render_declarations =
-    (ds: list(Declaration_list.kind)): list(Parsetree.expression) => {
+    (ds: (list(Declaration_list.kind), loc)): list(Parsetree.expression) => {
   List.concat_map(
     declaration =>
       switch (declaration) {
@@ -154,15 +154,14 @@ and render_declarations =
         let ident = Exp.ident(~loc, Emotion.lident(~loc, "selector"));
         [render_style_rule(~isUncurried=false, ident, ar)];
       },
-    ds,
+    fst(ds),
   )
-}
-and render_declaration_list = ((list, loc): Declaration_list.t): Parsetree.expression => {
-  Builder.pexp_array(~loc, render_declarations(list));
 }
 and render_style_rule = (~isUncurried, ident, rule: Style_rule.t): Parsetree.expression => {
   let (prelude, prelude_loc) = rule.Style_rule.prelude;
-  let dl_expr = render_declaration_list(rule.Style_rule.block);
+  let block = rule.Style_rule.block;
+  let (_, loc) = rule.Style_rule.block;
+  let dl_expr = render_declarations(block) |> Builder.pexp_array(~loc);
 
   let rec render_prelude_value = (s, (value, value_loc)) => {
     switch (value) {
@@ -340,7 +339,7 @@ let render_keyframes = ((ruleList, loc)): Parsetree.expression => {
            }) =>
            let percentage =
              get_percentage_from_prelude(prelude) |> Builder.eint(~loc=prelude_loc);
-           let rules = render_declaration_list(block);
+           let rules = render_declarations(block) |> Builder.pexp_array(~loc);
            Builder.pexp_tuple(~loc=style_loc, [percentage, rules]);
          | Rule.At_rule(_) => grammar_error(loc, invalidSelectorErrorMessage)
          }
