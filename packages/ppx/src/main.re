@@ -98,9 +98,12 @@ let parsePayloadStyle = (
   ~loc as _: location,
   ~path as _: label,
   payload,
-  _delim,
-  _loc,
+  loc,
 ) => {
+  switch (loc) {
+    | Some(d) => print_endline(d) |> ignore
+    | None => ()
+  };
   let loc_start = payload.loc.Location.loc_start;
   Css_lexer.parse_declaration_list(
     ~container_lnum=loc_start.Lexing.pos_lnum,
@@ -186,12 +189,11 @@ let renderStyledDynamic = (
     );
 
   let styles = switch (functionExpr.pexp_desc) {
-    | Pexp_constant(Pconst_string(str, delim, label)) =>
+    | Pexp_constant(Pconst_string(str, _, label)) =>
       parsePayloadStyle(
         ~loc=functionExpr.pexp_loc,
         ~path,
         {txt: str, loc: functionExpr.pexp_loc},
-        delim,
         label
       )
         |> Css_to_emotion.render_declarations
@@ -277,21 +279,21 @@ let static_pattern =
   Ast_pattern.(
     pstr(
       pstr_eval(
-        map(~f=(f, payload, delim, label) =>
-          f(`String((payload, delim, label))), pexp_constant(pconst_string(__', __, __)))
+        map(~f=(f, payload, _, delim) =>
+          f(`String((payload, delim))), pexp_constant(pconst_string(__', __, __)))
         ||| map(~f=(f, payload) =>
           f(`Array((payload))), pexp_array(__)), nil)
         ^:: nil
     )
   );
 
-/* TODO: Throw better errors when this pattern doesn't match */
+/* TODO: is there any way to throw better errors when this pattern doesn't match? */
 let dynamic_pattern =
   Ast_pattern.(
     pstr(
       pstr_eval(
-        map(~f=(f, payload, delim, label) =>
-          f(`String((payload, delim, label))), pexp_constant(pconst_string(__', __, __)))
+        map(~f=(f, payload, _, delim) =>
+          f(`String((payload, delim))), pexp_constant(pconst_string(__', __, __)))
         ||| map(~f=(f, payload) =>
           f(`Array((payload))), pexp_array(__))
         ||| map(~f=(f, lbl, def, param, body) =>
@@ -300,7 +302,7 @@ let dynamic_pattern =
     )
   );
 
-/* Currently there's no way to define extensions like `lola.x` with Pplib.Extension, we generate one ppxlib.extension per html tag. Is possible to achive it with Ppxlib.Driver.register_transformation(~preprocess_impl). */
+/* Currently there's no way to define extensions with regex or globs like `lola.*` with Pplib.Extension, we generate one ppxlib.extension per html tag. Is possible to achive it with Ppxlib.Driver.register_transformation(~preprocess_impl). */
 let styledDotAnyHtmlTagExtensions =
   Html.allTags |> List.map(htmlTag => {
     Ppxlib.Extension.declare(
@@ -309,8 +311,8 @@ let styledDotAnyHtmlTagExtensions =
       dynamic_pattern,
       (~loc, ~path, payload) => {
         switch (payload) {
-        | `String((str, delim, label)) =>
-          let styles = parsePayloadStyle(~loc, ~path, str, Some(delim), label)
+        | `String((str, delim)) =>
+          let styles = parsePayloadStyle(~loc, ~path, str, delim)
             |> Css_to_emotion.render_declarations
             |> Css_to_emotion.addLabel(~loc, "lola")
             |> Builder.pexp_array(~loc)
@@ -344,8 +346,8 @@ let extensions = [
     static_pattern,
     (~loc, ~path, payload) => {
       switch (payload) {
-        | `String((str, delim, label)) =>
-          parsePayloadStyle(~loc, ~path, str, Some(delim), label)
+        | `String((str, delim)) =>
+          parsePayloadStyle(~loc, ~path, str, delim)
             |> Css_to_emotion.render_declarations
             |> Builder.pexp_array(~loc)
             |> Css_to_emotion.render_style_call;
