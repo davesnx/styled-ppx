@@ -95,9 +95,9 @@ let styleVariableName = "styles";
 
 let parsePayloadStyle = (
   payload,
-  _loc,
+  loc,
 ) => {
-  let loc_start = payload.loc.Location.loc_start;
+  let loc_start = loc.Location.loc_start;
   /* TODO: Bring back "delimiter location conditional logic" */
   /* let loc_start =
   switch (delim) {
@@ -112,7 +112,7 @@ let parsePayloadStyle = (
   Css_lexer.parse_declaration_list(
     ~container_lnum=loc_start.Lexing.pos_lnum,
     ~pos=loc_start,
-    payload.txt
+    payload
   );
 };
 
@@ -130,7 +130,7 @@ let renderStyledDynamic = (
   ~loc,
   ~htmlTag,
   ~label,
-  ~modName,
+  ~moduleName,
   ~defaultValue,
   ~param,
   ~body
@@ -193,19 +193,19 @@ let renderStyledDynamic = (
     );
 
   let styles = switch (functionExpr.pexp_desc) {
-    | Pexp_constant(Pconst_string(str, _, label)) =>
+    | Pexp_constant(Pconst_string(str, loc, _label)) =>
       parsePayloadStyle(
-        {txt: str, loc: functionExpr.pexp_loc},
-        label
+        str,
+        loc
       )
         |> Css_to_emotion.render_declarations
-        |> Css_to_emotion.addLabel(~loc, modName)
+        |> Css_to_emotion.addLabel(~loc, moduleName)
         |> Builder.pexp_array(~loc)
         |> Css_to_emotion.render_style_call;
     | Pexp_array(arr) =>
         arr
           |> List.rev
-          |> Css_to_emotion.addLabel(~loc, modName)
+          |> Css_to_emotion.addLabel(~loc, moduleName)
           |> Builder.pexp_array(~loc)
           |> Css_to_emotion.render_style_call;
     | Pexp_sequence(expr, sequence) => {
@@ -295,8 +295,8 @@ let extensions = [
     static_pattern,
     (~loc, ~path as _, payload) => {
       switch (payload) {
-        | `String((str, delim)) =>
-          parsePayloadStyle(str, delim)
+        | `String(({ loc, txt }, _delim)) =>
+          parsePayloadStyle(txt, loc)
             |> Css_to_emotion.render_declarations
             |> Builder.pexp_array(~loc)
             |> Css_to_emotion.render_style_call;
@@ -403,32 +403,166 @@ module StyledDotAny = {
     );
   };
 
+  let getHtmlTag = str => {
+    switch (String.split_on_char('.', str)) {
+    | ["styled", tag] => Some(tag)
+    | _ => None
+    };
+  };
+
+  let getHtmlTagUnsafe = (~loc, str) => {
+    switch (String.split_on_char('.', str)) {
+    | ["styled", tag] when Html.isValidTag(tag) => tag
+    | ["styled", tag] when !Html.isValidTag(tag) =>
+      raiseError(
+        ~loc,
+        ~description="This HTML element isn't valid.",
+        ~example="[%styled.div ...",
+        ~link="https://reasonml.org/docs/manual/latest/function#labeled-arguments",
+      );
+    | _ =>
+      raiseError(
+        ~loc,
+        ~description="This styled components isn't valid. Doesn't have the right format.",
+        ~example="[%styled.div ...",
+        ~link="https://reasonml.org/docs/manual/latest/function#labeled-arguments",
+      );
+    };
+  };
+
+  let isStyled = (name) => {
+    name |> getHtmlTag |> Option.is_some
+  };
+
   let transform = (expr) => {
-    let htmlTag = "div";
-    switch (match(expr)) {
-      | Some(({ loc, txt: label }, `String(str, delim))) =>
-        let styles = parsePayloadStyle(str, delim)
+    switch (expr.pstr_desc) {
+      /* [%styled.div {||}] */
+      | Pstr_module({
+          pmb_name: { loc: moduleLoc, txt: Some(moduleName) },
+          pmb_attributes: _pmb_attributes,
+          pmb_loc: _pmb_loc,
+          pmb_expr: {
+            pmod_desc:
+              Pmod_extension((
+                {txt: extensionName, loc: extensionLoc},
+                PStr([
+                  {
+                    pstr_desc:
+                      Pstr_eval(
+                        {
+                          pexp_loc: loc,
+                          pexp_desc:
+                            Pexp_constant(
+                              Pconst_string(str, stringLoc, _label)
+                            ),
+                          _,
+                        },
+                        _,
+                      ),
+                    pstr_loc: _,
+                  },
+                ]),
+              )),
+            _
+          }
+        }) when isStyled(extensionName) =>
+        let htmlTag = getHtmlTagUnsafe(~loc=extensionLoc, extensionName);
+        let styles = parsePayloadStyle(str, stringLoc)
           |> Css_to_emotion.render_declarations
-          |> Css_to_emotion.addLabel(~loc, label)
+          |> Css_to_emotion.addLabel(~loc, moduleName)
           |> Builder.pexp_array(~loc)
           |> Css_to_emotion.render_style_call;
-        renderStyledComponent(~loc, ~htmlTag, styles);
-      | Some(({ loc, txt: label }, `Array(arr))) =>
+
+        Builder.pstr_module(~loc,
+          Builder.module_binding(~loc,
+            ~name={loc: moduleLoc, txt: Some(moduleName)},
+            ~expr=renderStyledComponent(~loc, ~htmlTag, styles)
+          )
+        );
+      /* [%styled.div [||]] */
+      | Pstr_module({
+          pmb_name: { loc: moduleLoc, txt: Some(moduleName) },
+          pmb_attributes: _pmb_attributes,
+          pmb_loc: _pmb_loc,
+          pmb_expr: {
+            pmod_desc:
+              Pmod_extension((
+                {txt: extensionName, loc: extensionLoc},
+                PStr([
+                  {
+                    pstr_desc:
+                      Pstr_eval(
+                        {
+                          pexp_loc: loc,
+                          pexp_desc:
+                            Pexp_array(arr),
+                          _,
+                        },
+                        _,
+                      ),
+                    pstr_loc: _,
+                  },
+                ]),
+              )),
+            _
+          }
+        }) when isStyled(extensionName) =>
+        let htmlTag = getHtmlTagUnsafe(~loc=extensionLoc, extensionName);
         let styles = arr
-          |> Css_to_emotion.addLabel(~loc, label)
+          |> Css_to_emotion.addLabel(~loc, moduleName)
           |> Builder.pexp_array(~loc)
           |> Css_to_emotion.render_style_call;
-        renderStyledComponent(~loc, ~htmlTag, styles)
-      | Some(({ loc, txt: label }, `Function(fnLabel, defaultValue, param, body))) =>
-        renderStyledDynamic(
-          ~loc,
-          ~htmlTag,
-          ~label=fnLabel,
-          ~modName=label,
-          ~defaultValue,
-          ~param,
-          ~body,
-        )
+
+        Builder.pstr_module(~loc,
+          Builder.module_binding(~loc,
+            ~name={loc: moduleLoc, txt: Some(moduleName)},
+            ~expr=renderStyledComponent(~loc, ~htmlTag, styles)
+          )
+        );
+      /* [%styled.div () => {}] */
+      | Pstr_module({
+          pmb_name: { loc: moduleLoc, txt: Some(moduleName) },
+          pmb_attributes: _pmb_attributes,
+          pmb_loc: _pmb_loc,
+          pmb_expr: {
+            pmod_desc:
+              Pmod_extension((
+                {txt: extensionName, loc: extensionLoc},
+                PStr([
+                  {
+                    pstr_desc:
+                      Pstr_eval(
+                        {
+                          pexp_loc: loc,
+                          pexp_desc:
+                            Pexp_fun(fnLabel, defaultValue, param, expression),
+                          _,
+                        },
+                        _,
+                      ),
+                    pstr_loc: _,
+                  },
+                ]),
+              )),
+            _
+          }
+        }) when isStyled(extensionName) =>
+        let htmlTag = getHtmlTagUnsafe(~loc=extensionLoc, extensionName);
+
+        Builder.pstr_module(~loc,
+          Builder.module_binding(~loc,
+            ~name={loc: moduleLoc, txt: Some(moduleName)},
+            ~expr=renderStyledDynamic(
+              ~loc,
+              ~htmlTag,
+              ~label=fnLabel,
+              ~moduleName=moduleName,
+              ~defaultValue,
+              ~param,
+              ~body=expression,
+            )
+          )
+        );
       | _ => expr
     }
   }
@@ -437,8 +571,8 @@ module StyledDotAny = {
 let styledDotAnyMapper = {
   as _;
   inherit class Ast_traverse.map as super;
-  pub! module_expr = expr => {
-    let expr = super#module_expr(expr);
+  pub! structure_item = expr => {
+    let expr = super#structure_item(expr);
     StyledDotAny.transform(expr);
   }
 };
@@ -446,5 +580,10 @@ let styledDotAnyMapper = {
 /* Instrument is needed to run metaquote before styled-ppx, we rely on this order for the native tests */
 let instrument = Driver.Instrument.make(Fun.id, ~position=Before);
 
-Driver.register_transformation(~impl=styledDotAnyMapper#structure, ~extensions, ~instrument, "styled-ppx");
+Driver.register_transformation(
+  ~preprocess_impl=styledDotAnyMapper#structure,
+  ~extensions,
+  ~instrument,
+  "styled-ppx"
+);
 

@@ -956,7 +956,10 @@ module OneSingleProperty = {
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
   let styles =
-    CssJs.style(. [|CssJs.label("lola"), CssJs.display(`block)|]);
+    CssJs.style(. [|
+      CssJs.label("OneSingleProperty"),
+      CssJs.display(`block),
+    |]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
@@ -1912,7 +1915,7 @@ module SingleQuoteStrings = {
     "createElement";
   let styles =
     CssJs.style(. [|
-      CssJs.label("lola"),
+      CssJs.label("SingleQuoteStrings"),
       CssJs.display(`flex),
       CssJs.unsafe("justifyContent", "center"),
     |]);
@@ -2871,7 +2874,7 @@ module MultiLineStrings = {
     "createElement";
   let styles =
     CssJs.style(. [|
-      CssJs.label("lola"),
+      CssJs.label("MultiLineStrings"),
       CssJs.display(`flex),
       CssJs.unsafe("justifyContent", "center"),
     |]);
@@ -3828,7 +3831,7 @@ module SelfClosingElement = {
   [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
-  let styles = CssJs.style(. [|CssJs.label("lola")|]);
+  let styles = CssJs.style(. [|CssJs.label("SelfClosingElement")|]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
@@ -4784,7 +4787,7 @@ module ArrayStatic = {
     "createElement";
   let styles =
     CssJs.style(. [|
-      CssJs.label("lola"),
+      CssJs.label("ArrayStatic"),
       CssJs.display(`flex),
       CssJs.unsafe("justifyContent", "center"),
     |]);
@@ -5744,7 +5747,7 @@ module StringInterpolation = {
     "createElement";
   let styles =
     CssJs.style(. [|
-      CssJs.label("lola"),
+      CssJs.label("StringInterpolation"),
       CssJs.color(var),
       CssJs.unsafe("color", "trust-me"),
       CssJs.display(`block),
@@ -6711,7 +6714,7 @@ module DynamicComponent = {
     "createElement";
   let styles = (~var) =>
     CssJs.style(. [|
-      CssJs.label("lola"),
+      CssJs.label("DynamicComponent"),
       CssJs.color(var),
       CssJs.display(`block),
     |]);
@@ -7670,7 +7673,7 @@ module SelectorsMediaQueries = {
     "createElement";
   let styles =
     CssJs.style(. [|
-      CssJs.label("lola"),
+      CssJs.label("SelectorsMediaQueries"),
       CssJs.media(
         "(min-width: 600px)",
         [|CssJs.unsafe("background", "blue")|],
@@ -8642,7 +8645,7 @@ module ArrayDynamicComponent = {
     "createElement";
   let styles = (~var) =>
     CssJs.style(. [|
-      CssJs.label("lola"),
+      CssJs.label("ArrayDynamicComponent"),
       CssJs.display(`block),
       CssJs.color(var),
     |]);
@@ -10561,7 +10564,7 @@ module DynamicComponentWithDefaultValue = {
     "createElement";
   let styles = (~var="green") =>
     CssJs.style(. [|
-      CssJs.label("lola"),
+      CssJs.label("DynamicComponentWithDefaultValue"),
       CssJs.display(`block),
       CssJs.color(var),
     |]);
