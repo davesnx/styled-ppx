@@ -271,20 +271,20 @@ and render_style_rule = (~isUncurried, ident, rule: Style_rule.t): Parsetree.exp
   };
 };
 
-let bsEmotionLabel = (~loc, name) => {
+let bsEmotionLabel = (~loc, label) => {
   Exp.apply(
     Exp.ident(Emotion.lident(~loc, "label")),
     [
       (
         Nolabel,
-        Exp.constant(Pconst_string(name, loc, None)),
+        Exp.constant(Pconst_string(label, loc, None)),
       ),
     ],
   )
 };
 
-let addLabel = (~loc, name, emotionExprs) => {
-  [bsEmotionLabel(~loc, name), ...emotionExprs]
+let addLabel = (~loc, label, emotionExprs) => {
+  [bsEmotionLabel(~loc, label), ...emotionExprs]
 };
 
 let render_style_call = (declaration_list): Parsetree.expression => {
