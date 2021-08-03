@@ -5,6 +5,7 @@ type modifier('a, 'b) = Rule.rule('a) => Rule.rule('b);
 
 type range = (int, option(int));
 
+let one = Fun.id;
 let optional = rule => {
   let.bind_data value = rule;
   let value =
