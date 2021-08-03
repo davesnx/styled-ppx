@@ -359,7 +359,9 @@ let render_global = ((ruleList, loc): Stylesheet.t) => {
 
     switch (ruleList) {
     /* There's only one rule: */
-    | [rule] => Create.applyIgnore(~loc, render_rule(~isGlobalCall=true, emotionGlobal, rule))
+    | [rule] =>
+      render_rule(~isGlobalCall=true, emotionGlobal, rule)
+      |> Create.applyIgnore(~loc)
     /* There's more than one */
     | _res =>
       grammar_error(
