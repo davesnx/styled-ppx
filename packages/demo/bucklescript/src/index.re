@@ -57,28 +57,31 @@ module Component = [%styled.div {j|
 |j}
 ];
 
-let stilos = [%cx "box-shadow: 1px 2px 0 0 #ff0000 inset, 1px 2px 0 0 #ff0000"];
+let stilos = [%cx "box-shadow: 10px 10px 0 0 #ff0000 inset, 10px 10px 0 0 #ff0000"];
+let styles = CssJs.style(. [|CssJs.label("ComponentName"), CssJs.display(`block)|]);
 
 switch (ReactDOM.querySelector("#app")) {
   | Some(el) =>
     ReactDOM.render(
       <div className=stilos>
-        <App onClick=Js.log>
-          <Dynamic a="23"/>
-          <Component>
-            {React.string("test..")}
-          </Component>
-          <App2>
+        <div className=styles>
+          <App onClick=Js.log>
+            <Dynamic a="23"/>
             <Component>
-              <p>
-                {React.string("Demo of...")}
-              </p>
+              {"test.." |> React.string}
             </Component>
-          </App2>
-          <Link href="https://github.com/davesnx/styled-ppx">
-            {React.string("styled-ppx")}
-          </Link>
-        </App>
+            <App2>
+              <Component>
+                <p>
+                  {"Demo of..." |> React.string}
+                </p>
+              </Component>
+            </App2>
+            <Link href="https://github.com/davesnx/styled-ppx">
+              {"styled-ppx" |> React.string}
+            </Link>
+          </App>
+        </div>
       </div>,
       el
     )

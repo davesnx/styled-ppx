@@ -26,7 +26,7 @@ type combinator =
   | Static /* a b */
   | And /* a && b */
   | Or /* a || b */
-  | Xor /* a | b */;
+  | Xor; /* a | b */
 
 // TODO: non-terminals https://drafts.csswg.org/css-values-3/#component-types item 4
 [@deriving show({with_path: false})]

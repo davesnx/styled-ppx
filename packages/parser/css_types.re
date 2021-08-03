@@ -67,4 +67,6 @@ and Rule: {
     | Style_rule(Style_rule.t)
     | At_rule(At_rule.t);
 } = Rule
-and Stylesheet: {type t = with_loc(list(Rule.t));} = Stylesheet;
+and Stylesheet: {
+  type t = with_loc(list(Rule.t));
+} = Stylesheet;
