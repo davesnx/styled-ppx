@@ -12,6 +12,7 @@ open Css_types
 %token LEFT_BRACKET
 %token RIGHT_BRACKET
 %token COLON
+%token DOT "."
 %token SEMI_COLON
 %token PERCENTAGE
 %token IMPORTANT
@@ -30,7 +31,7 @@ open Css_types
 %token <string> UNICODE_RANGE
 %token <string * string * Css_types.dimension> FLOAT_DIMENSION
 %token <string * string> DIMENSION
-%token <string> VARIABLE
+%token <string list> VARIABLE
 %token UNSAFE
 
 %start <Css_types.Stylesheet.t> stylesheet
@@ -179,8 +180,10 @@ component_value:
   | d = DELIM { Component_value.Delim d }
   | COLON { Component_value.Delim ":" }
   | f = FUNCTION; xs = list(component_value_with_loc); RIGHT_PAREN {
-      Component_value.Function ((f, Lex_buffer.make_loc $startpos(f) $endpos(f)),
-                                (xs, Lex_buffer.make_loc $startpos(xs) $endpos(xs)))
+      Component_value.Function (
+        (f, Lex_buffer.make_loc $startpos(f) $endpos(f)),
+        (xs, Lex_buffer.make_loc $startpos(xs) $endpos(xs))
+      )
     }
   | h = HASH { Component_value.Hash h }
   | n = NUMBER { Component_value.Number n }

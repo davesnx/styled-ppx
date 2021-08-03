@@ -7,7 +7,6 @@ module Builder = Ppxlib.Ast_builder.Default;
 /* helpers */
 let loc = Location.none;
 let txt = txt => {Location.loc: Location.none, txt};
-let lid = name => txt(Lident(name));
 
 let (let.ok) = Result.bind;
 
@@ -130,23 +129,42 @@ let variable_rule = {
 
   let.bind_match () = Pattern.expect(DELIM("$"));
   let.bind_match _ = Pattern.expect(LEFT_PARENS);
-  let.bind_match string = Standard.custom_ident;
+  let.bind_match variable = Standard.custom_ident;
   let.bind_match _ = Pattern.expect(RIGHT_PARENS);
 
-  return_match(string);
+  return_match([variable]);
+};
+
+let variable_module_rule = {
+  open Rule;
+  open Let;
+
+  let.bind_match _ = Pattern.expect(DELIM("$"));
+  let.bind_match _ = Pattern.expect(LEFT_PARENS);
+  let.bind_match moduleName = Standard.custom_ident;
+  let.bind_match _ = Pattern.expect(DELIM("."));
+  let.bind_match variable = Standard.custom_ident;
+  let.bind_match _ = Pattern.expect(RIGHT_PARENS);
+
+  return_match([moduleName, variable]);
 };
 
 let variable = parser =>
   Combinator.combine_xor([
     Rule.Match.map(variable_rule, data => `Variable(data)),
+    Rule.Match.map(variable_module_rule, data => `Variable(data)),
     Rule.Match.map(parser, data => `Value(data)),
   ]);
+
+let list_to_longident = vars => {
+  vars |> String.concat(".") |> Longident.parse;
+};
 
 let transform_with_variable = (parser, map, value_to_expr) =>
   emit(
     variable(parser),
     fun
-    | `Variable(name) => name |> lid |> Helper.Exp.ident
+    | `Variable(name) => list_to_longident(name) |> txt |> Helper.Exp.ident
     | `Value(ast) => map(ast),
     value_to_expr,
   );

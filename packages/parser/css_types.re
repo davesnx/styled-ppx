@@ -23,7 +23,7 @@ module rec Component_value: {
     | Unicode_range(string)
     | Float_dimension((string, string, dimension))
     | Dimension((string, string))
-    | Variable(string);
+    | Variable(list(string));
 } = Component_value
 and Brace_block: {
   type t =

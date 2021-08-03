@@ -372,7 +372,6 @@ let consume = buf => {
     // TODO: this error should be different
     | _ => Error((DELIM("/"), `Invalid_code_point))
     };
-
   | "]" => Ok(RIGHT_SQUARE)
   | digit =>
     let _ = Sedlexing.backtrack(buf);
