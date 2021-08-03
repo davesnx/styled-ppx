@@ -1,7 +1,5 @@
 open Ppxlib;
 
-let support_property: string => bool;
-
 let parse_declarations:
   ((string, string)) =>
     result(
