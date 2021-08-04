@@ -5756,6 +5756,7 @@ module StringInterpolation = {
       CssJs.label("StringInterpolation"),
       CssJs.color(Theme.var),
       CssJs.backgroundColor(black),
+      CssJs.borderColor(Theme.Border.black),
       CssJs.unsafe("color", "trust-me"),
       CssJs.display(`block),
     |]);
