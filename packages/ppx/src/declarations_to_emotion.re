@@ -1,7 +1,5 @@
 open Ppxlib;
 open Reason_css_parser;
-open Reason_css_lexer;
-open Parser;
 
 module Helper = Ast_helper;
 module Builder = Ppxlib.Ast_builder.Default;
@@ -9,7 +7,6 @@ module Builder = Ppxlib.Ast_builder.Default;
 /* helpers */
 let loc = Location.none;
 let txt = txt => {Location.loc: Location.none, txt};
-let lid = name => txt(Lident(name));
 
 let (let.ok) = Result.bind;
 
@@ -39,9 +36,7 @@ let render_string = string => Helper.Const.string(string) |> Helper.Exp.constant
 let render_integer = integer => Helper.Const.int(integer) |> Helper.Exp.constant;
 let render_number = number =>
   Helper.Const.float(number |> string_of_float) |> Helper.Exp.constant;
-let render_percentage = number => [%expr
-  `percent([%e render_number(number)])
-];
+let render_percentage = number => [%expr `percent([%e render_number(number)])];
 
 let render_css_global_values = (name, value) => {
   let.ok value = Parser.parse(Standard.css_wide_keywords, value);
@@ -53,8 +48,7 @@ let render_css_global_values = (name, value) => {
     | `Unset => [%expr "unset"]
     };
 
-  let name = render_string(name);
-  Ok([[%expr CssJs.unsafe([%e name], [%e value])]]);
+  Ok([[%expr CssJs.unsafe([%e render_string(name)], [%e value])]]);
 };
 
 let render_angle =
@@ -134,23 +128,59 @@ let variable_rule = {
 
   let.bind_match () = Pattern.expect(DELIM("$"));
   let.bind_match _ = Pattern.expect(LEFT_PARENS);
-  let.bind_match string = Standard.custom_ident;
+  let.bind_match variable = Standard.custom_ident;
   let.bind_match _ = Pattern.expect(RIGHT_PARENS);
 
-  return_match(string);
+  return_match([variable]);
+};
+
+let variable_module_rule = {
+  open Rule;
+  open Let;
+
+  let.bind_match _ = Pattern.expect(DELIM("$"));
+  let.bind_match _ = Pattern.expect(LEFT_PARENS);
+  let.bind_match moduleName = Standard.custom_ident;
+  let.bind_match _ = Pattern.expect(DELIM("."));
+  let.bind_match variable = Standard.custom_ident;
+  let.bind_match _ = Pattern.expect(RIGHT_PARENS);
+
+  return_match([moduleName, variable]);
+};
+
+let variable_module_module_rule = {
+  open Rule;
+  open Let;
+
+  let.bind_match _ = Pattern.expect(DELIM("$"));
+  let.bind_match _ = Pattern.expect(LEFT_PARENS);
+  let.bind_match moduleName1 = Standard.custom_ident;
+  let.bind_match _ = Pattern.expect(DELIM("."));
+  let.bind_match moduleName2 = Standard.custom_ident;
+  let.bind_match _ = Pattern.expect(DELIM("."));
+  let.bind_match variable = Standard.custom_ident;
+  let.bind_match _ = Pattern.expect(RIGHT_PARENS);
+
+  return_match([moduleName1, moduleName2, variable]);
 };
 
 let variable = parser =>
   Combinator.combine_xor([
     Rule.Match.map(variable_rule, data => `Variable(data)),
+    Rule.Match.map(variable_module_rule, data => `Variable(data)),
+    Rule.Match.map(variable_module_module_rule, data => `Variable(data)),
     Rule.Match.map(parser, data => `Value(data)),
   ]);
+
+let list_to_longident = vars => {
+  vars |> String.concat(".") |> Longident.parse;
+};
 
 let transform_with_variable = (parser, map, value_to_expr) =>
   emit(
     variable(parser),
     fun
-    | `Variable(name) => name |> lid |> Helper.Exp.ident
+    | `Variable(name) => list_to_longident(name) |> txt |> Helper.Exp.ident
     | `Value(ast) => map(ast),
     value_to_expr,
   );
@@ -215,31 +245,31 @@ let render_width =
 
 let width =
   apply(
-    property_width,
+    Parser.property_width,
     [%expr CssJs.width],
     render_width,
   );
 let height =
   apply(
-    property_height,
+    Parser.property_height,
     [%expr CssJs.height],
     apply_value(width.value_of_ast),
   );
 let min_width =
   apply(
-    property_min_width,
+    Parser.property_min_width,
     [%expr CssJs.minWidth],
     apply_value(width.value_of_ast),
   );
 let min_height =
   apply(
-    property_min_height,
+    Parser.property_min_height,
     [%expr CssJs.minHeight],
     apply_value(width.value_of_ast),
   );
 let max_width =
   apply(
-    property_max_width,
+    Parser.property_max_width,
     [%expr CssJs.maxWidth],
     fun
     | `Auto => raise(Unsupported_feature)
@@ -253,18 +283,18 @@ let max_width =
   );
 let max_height =
   apply(
-    property_max_height,
+    Parser.property_max_height,
     [%expr CssJs.maxHeight],
     data => max_width.value_of_ast(`Value(data)),
   );
 let box_sizing =
-  apply(property_box_sizing, [%expr CssJs.boxSizing], variants_to_expression);
-let column_width = unsupported(property_column_width);
+  apply(Parser.property_box_sizing, [%expr CssJs.boxSizing], variants_to_expression);
+let column_width = unsupported(Parser.property_column_width);
 
 // css-box-3
 let margin_top =
   apply(
-    property_margin_top,
+    Parser.property_margin_top,
     [%expr CssJs.marginTop],
     fun
     | `Auto => variants_to_expression(`Auto)
@@ -273,25 +303,25 @@ let margin_top =
   );
 let margin_right =
   apply(
-    property_margin_right,
+    Parser.property_margin_right,
     [%expr CssJs.marginRight],
     apply_value(margin_top.value_of_ast),
   );
 let margin_bottom =
   apply(
-    property_margin_bottom,
+    Parser.property_margin_bottom,
     [%expr CssJs.marginBottom],
     apply_value(margin_top.value_of_ast),
   );
 let margin_left =
   apply(
-    property_margin_left,
+    Parser.property_margin_left,
     [%expr CssJs.marginLeft],
     apply_value(margin_top.value_of_ast),
   );
 let margin =
   emit(
-    property_margin,
+    Parser.property_margin,
     List.map(apply_value(margin_top.value_of_ast)),
     fun
     | [all] => [[%expr CssJs.margin([%e all])]]
@@ -313,31 +343,31 @@ let margin =
   );
 let padding_top =
   apply(
-    property_padding_top,
+    Parser.property_padding_top,
     [%expr CssJs.paddingTop],
     render_length_percentage,
   );
 let padding_right =
   apply(
-    property_padding_right,
+    Parser.property_padding_right,
     [%expr CssJs.paddingRight],
     apply_value(padding_top.value_of_ast),
   );
 let padding_bottom =
   apply(
-    property_padding_bottom,
+    Parser.property_padding_bottom,
     [%expr CssJs.paddingBottom],
     apply_value(padding_top.value_of_ast),
   );
 let padding_left =
   apply(
-    property_padding_left,
+    Parser.property_padding_left,
     [%expr CssJs.paddingLeft],
     apply_value(padding_top.value_of_ast),
   );
 let padding =
   emit(
-    property_padding,
+    Parser.property_padding,
     List.map(apply_value(padding_top.value_of_ast)),
     fun
     | [all] => [[%expr CssJs.padding([%e all])]]
@@ -590,10 +620,10 @@ let render_color =
   | `Function_device_cmyk(_)
   | `Deprecated_system_color(_) => raise(Unsupported_feature);
 
-let color = apply(property_color, [%expr CssJs.color], render_color);
+let color = apply(Parser.property_color, [%expr CssJs.color], render_color);
 let opacity =
   apply(
-    property_opacity,
+    Parser.property_opacity,
     [%expr CssJs.opacity],
     fun
     | `Number(number) => render_number(number)
@@ -659,16 +689,16 @@ let render_position = position => {
   id([%expr `hv(([%e horizontal], [%e vertical]))]);
 };
 
-let object_fit = variants(property_object_fit, [%expr CssJs.objectFit]);
+let object_fit = variants(Parser.property_object_fit, [%expr CssJs.objectFit]);
 let object_position =
   apply(
-    property_object_position,
+    Parser.property_object_position,
     [%expr CssJs.objectPosition],
     render_position,
   );
-let image_resolution = unsupported(property_image_resolution);
-let image_orientation = unsupported(property_image_orientation);
-let image_rendering = unsupported(property_image_rendering);
+let image_resolution = unsupported(Parser.property_image_resolution);
+let image_orientation = unsupported(Parser.property_image_orientation);
+let image_rendering = unsupported(Parser.property_image_rendering);
 
 // css-backgrounds-3
 let render_shadow = shadow => {
@@ -719,52 +749,52 @@ let render_shadow = shadow => {
   Helper.Exp.apply(id, args);
 };
 let background_color =
-  apply(property_background_color, [%expr CssJs.backgroundColor], render_color);
+  apply(Parser.property_background_color, [%expr CssJs.backgroundColor], render_color);
 let background_image =
-  unsupported(property_background_image, ~call=[%expr CssJs.backgroundImage]);
+  unsupported(Parser.property_background_image, ~call=[%expr CssJs.backgroundImage]);
 let background_repeat =
-  unsupported(property_background_repeat, ~call=[%expr CssJs.backgroundRepeat]);
+  unsupported(Parser.property_background_repeat, ~call=[%expr CssJs.backgroundRepeat]);
 let background_attachment =
   unsupported(
-    property_background_attachment,
+    Parser.property_background_attachment,
     ~call=[%expr CssJs.backgroundAttachment],
   );
 let background_position =
   unsupported(
-    property_background_position,
+    Parser.property_background_position,
     ~call=[%expr CssJs.backgroundPosition],
   );
 let background_clip =
-  unsupported(property_background_clip, ~call=[%expr CssJs.backgroundClip]);
+  unsupported(Parser.property_background_clip, ~call=[%expr CssJs.backgroundClip]);
 let background_origin =
-  unsupported(property_background_origin, ~call=[%expr CssJs.backgroundOrigin]);
+  unsupported(Parser.property_background_origin, ~call=[%expr CssJs.backgroundOrigin]);
 let background_size =
-  unsupported(property_background_size, ~call=[%expr CssJs.backgroundSize]);
+  unsupported(Parser.property_background_size, ~call=[%expr CssJs.backgroundSize]);
 let background =
-  unsupported(property_background, ~call=[%expr CssJs.background]);
+  unsupported(Parser.property_background, ~call=[%expr CssJs.background]);
 let border_top_color =
-  apply(property_border_top_color, [%expr CssJs.borderTopColor], render_color);
+  apply(Parser.property_border_top_color, [%expr CssJs.borderTopColor], render_color);
 let border_right_color =
   apply(
-    property_border_right_color,
+    Parser.property_border_right_color,
     [%expr CssJs.borderRightColor],
     apply_value(border_top_color.value_of_ast),
   );
 let border_bottom_color =
   apply(
-    property_border_bottom_color,
+    Parser.property_border_bottom_color,
     [%expr CssJs.borderBottomColor],
     apply_value(border_top_color.value_of_ast),
   );
 let border_left_color =
   apply(
-    property_border_left_color,
+    Parser.property_border_left_color,
     [%expr CssJs.borderLeftColor],
     apply_value(border_top_color.value_of_ast),
   );
 let border_color =
   apply(
-    property_border_color,
+    Parser.property_border_color,
     [%expr CssJs.borderColor],
     c => switch c {
       | [c] => render_color(c)
@@ -772,15 +802,15 @@ let border_color =
     }
   );
 let border_top_style =
-  variants(property_border_top_style, [%expr CssJs.borderTopStyle]);
+  variants(Parser.property_border_top_style, [%expr CssJs.borderTopStyle]);
 let border_right_style =
-  variants(property_border_right_style, [%expr CssJs.borderRightStyle]);
+  variants(Parser.property_border_right_style, [%expr CssJs.borderRightStyle]);
 let border_bottom_style =
-  variants(property_border_bottom_style, [%expr CssJs.borderBottomStyle]);
+  variants(Parser.property_border_bottom_style, [%expr CssJs.borderBottomStyle]);
 let border_left_style =
-  variants(property_border_left_style, [%expr CssJs.borderLeftStyle]);
+  variants(Parser.property_border_left_style, [%expr CssJs.borderLeftStyle]);
 let border_style =
-  unsupported(property_border_style, ~call=[%expr CssJs.borderStyle]);
+  unsupported(Parser.property_border_style, ~call=[%expr CssJs.borderStyle]);
 
 let render_line_width =
   fun
@@ -788,31 +818,31 @@ let render_line_width =
   | _ => raise(Unsupported_feature);
 let border_top_width =
   apply(
-    property_border_top_width,
+    Parser.property_border_top_width,
     [%expr CssJs.borderTopWidth],
     render_line_width,
   );
 let border_right_width =
   apply(
-    property_border_right_width,
+    Parser.property_border_right_width,
     [%expr CssJs.borderRightWidth],
     render_line_width,
   );
 let border_bottom_width =
   apply(
-    property_border_bottom_width,
+    Parser.property_border_bottom_width,
     [%expr CssJs.borderBottomWidth],
     render_line_width,
   );
 let border_left_width =
   apply(
-    property_border_left_width,
+    Parser.property_border_left_width,
     [%expr CssJs.borderLeftWidth],
     render_line_width,
   );
 let border_width =
   apply(
-    property_border_width,
+    Parser.property_border_width,
     [%expr CssJs.borderWidth],
     (w) =>
       switch (w) {
@@ -821,17 +851,17 @@ let border_width =
       },
     );
 let border_top =
-  unsupported(property_border_top, ~call=[%expr CssJs.borderTop]);
+  unsupported(Parser.property_border_top, ~call=[%expr CssJs.borderTop]);
 let border_right =
-  unsupported(property_border_right, ~call=[%expr CssJs.borderRight]);
+  unsupported(Parser.property_border_right, ~call=[%expr CssJs.borderRight]);
 let border_bottom =
-  unsupported(property_border_bottom, ~call=[%expr CssJs.borderBottom]);
+  unsupported(Parser.property_border_bottom, ~call=[%expr CssJs.borderBottom]);
 let border_left =
-  unsupported(property_border_left, ~call=[%expr CssJs.borderLeft]);
-let border = unsupported(property_border, ~call=[%expr CssJs.border]);
+  unsupported(Parser.property_border_left, ~call=[%expr CssJs.borderLeft]);
+let border = unsupported(Parser.property_border, ~call=[%expr CssJs.border]);
 let border_top_left_radius =
   apply(
-    property_border_top_left_radius,
+    Parser.property_border_top_left_radius,
     [%expr CssJs.borderTopLeftRadius],
     fun
     | [lp] => render_length_percentage(lp)
@@ -839,33 +869,33 @@ let border_top_left_radius =
   );
 let border_top_right_radius =
   apply(
-    property_border_top_right_radius,
+    Parser.property_border_top_right_radius,
     [%expr CssJs.borderTopRightRadius],
     apply_value(border_top_left_radius.value_of_ast),
   );
 let border_bottom_right_radius =
   apply(
-    property_border_bottom_right_radius,
+    Parser.property_border_bottom_right_radius,
     [%expr CssJs.borderBottomRightRadius],
     apply_value(border_top_left_radius.value_of_ast),
   );
 let border_bottom_left_radius =
   apply(
-    property_border_bottom_left_radius,
+    Parser.property_border_bottom_left_radius,
     [%expr CssJs.borderBottomLeftRadius],
     apply_value(border_top_left_radius.value_of_ast),
   );
 let border_radius =
-  unsupported(property_border_radius, ~call=[%expr CssJs.borderRadius]);
-let border_image_source = unsupported(property_border_image_source);
-let border_image_slice = unsupported(property_border_image_slice);
-let border_image_width = unsupported(property_border_image_width);
-let border_image_outset = unsupported(property_border_image_outset);
-let border_image_repeat = unsupported(property_border_image_repeat);
-let border_image = unsupported(property_border_image);
+  unsupported(Parser.property_border_radius, ~call=[%expr CssJs.borderRadius]);
+let border_image_source = unsupported(Parser.property_border_image_source);
+let border_image_slice = unsupported(Parser.property_border_image_slice);
+let border_image_width = unsupported(Parser.property_border_image_width);
+let border_image_outset = unsupported(Parser.property_border_image_outset);
+let border_image_repeat = unsupported(Parser.property_border_image_repeat);
+let border_image = unsupported(Parser.property_border_image);
 let box_shadow =
   apply(
-    property_box_shadow,
+    Parser.property_box_shadow,
     [%expr CssJs.boxShadows],
     fun
     | `None => variants_to_expression(`None)
@@ -882,16 +912,16 @@ let box_shadow =
 // TODO: maybe implement using strings?
 let overflow_x =
   apply(
-    property_overflow_x,
+    Parser.property_overflow_x,
     [%expr CssJs.overflowX],
     fun
     | `Clip => raise(Unsupported_feature)
     | otherwise => variants_to_expression(otherwise),
   );
-let overflow_y = variants(property_overflow_y, [%expr CssJs.overflowY]);
+let overflow_y = variants(Parser.property_overflow_y, [%expr CssJs.overflowY]);
 let overflow =
   emit(
-    property_overflow,
+    Parser.property_overflow,
     fun
     | `Xor(values) =>
       values |> List.map(apply_value(overflow_x.value_of_ast))
@@ -905,32 +935,32 @@ let overflow =
       ])
     | _ => failwith("unreachable"),
   );
-// let overflow_clip_margin = unsupported(property_overflow_clip_margin);
-let overflow_inline = unsupported(property_overflow_inline);
+// let overflow_clip_margin = unsupported(Parser.property_overflow_clip_margin);
+let overflow_inline = unsupported(Parser.property_overflow_inline);
 let text_overflow =
-  unsupported(property_text_overflow, ~call=[%expr CssJs.textOverflow]);
-// let block_ellipsis = unsupported(property_block_ellipsis);
-let max_lines = unsupported(property_max_lines);
-// let continue = unsupported(property_continue);
+  unsupported(Parser.property_text_overflow, ~call=[%expr CssJs.textOverflow]);
+// let block_ellipsis = unsupported(Parser.property_block_ellipsis);
+let max_lines = unsupported(Parser.property_max_lines);
+// let continue = unsupported(Parser.property_continue);
 
 // css-text-3
 let text_transform =
-  variants(property_text_transform, [%expr CssJs.textTransform]);
-let white_space = variants(property_white_space, [%expr CssJs.whiteSpace]);
-let tab_size = unsupported(property_tab_size);
-let word_break = variants(property_word_break, [%expr CssJs.wordBreak]);
-let line_break = unsupported(property_line_break);
-let hyphens = unsupported(property_hyphens);
+  variants(Parser.property_text_transform, [%expr CssJs.textTransform]);
+let white_space = variants(Parser.property_white_space, [%expr CssJs.whiteSpace]);
+let tab_size = unsupported(Parser.property_tab_size);
+let word_break = variants(Parser.property_word_break, [%expr CssJs.wordBreak]);
+let line_break = unsupported(Parser.property_line_break);
+let hyphens = unsupported(Parser.property_hyphens);
 let overflow_wrap =
-  variants(property_overflow_wrap, [%expr CssJs.overflowWrap]);
-let word_wrap = variants(property_word_wrap, [%expr CssJs.wordWrap]);
-let text_align = variants(property_text_align, [%expr CssJs.textAlign]);
-// let text_align_all = unsupported(property_text_align_all);
-let text_align_last = unsupported(property_text_align_last);
-let text_justify = unsupported(property_text_justify);
+  variants(Parser.property_overflow_wrap, [%expr CssJs.overflowWrap]);
+let word_wrap = variants(Parser.property_word_wrap, [%expr CssJs.wordWrap]);
+let text_align = variants(Parser.property_text_align, [%expr CssJs.textAlign]);
+// let text_align_all = unsupported(Parser.property_text_align_all);
+let text_align_last = unsupported(Parser.property_text_align_last);
+let text_justify = unsupported(Parser.property_text_justify);
 let word_spacing =
   apply(
-    property_word_spacing,
+    Parser.property_word_spacing,
     [%expr CssJs.wordSpacing],
     fun
     | `Normal => variants_to_expression(`Normal)
@@ -938,7 +968,7 @@ let word_spacing =
   );
 let letter_spacing =
   apply(
-    property_word_spacing,
+    Parser.property_word_spacing,
     [%expr CssJs.letterSpacing],
     fun
     | `Normal => variants_to_expression(`Normal)
@@ -946,173 +976,173 @@ let letter_spacing =
   );
 let text_indent =
   apply(
-    property_text_indent,
+    Parser.property_text_indent,
     [%expr CssJs.textIndent],
     fun
     | (lp, None, None) => render_length_percentage(lp)
     | _ => raise(Unsupported_feature),
   );
-let hanging_punctuation = unsupported(property_hanging_punctuation);
+let hanging_punctuation = unsupported(Parser.property_hanging_punctuation);
 
 // css-fonts-4
 let font_family =
-  unsupported(property_font_family, ~call=[%expr CssJs.fontFamily]);
+  unsupported(Parser.property_font_family, ~call=[%expr CssJs.fontFamily]);
 let font_weight =
-  unsupported(property_font_weight, ~call=[%expr CssJs.fontWeight]);
-let font_stretch = unsupported(property_font_stretch);
+  unsupported(Parser.property_font_weight, ~call=[%expr CssJs.fontWeight]);
+let font_stretch = unsupported(Parser.property_font_stretch);
 let font_style =
-  unsupported(property_font_style, ~call=[%expr CssJs.fontStyle]);
-let font_size = unsupported(property_font_size, ~call=[%expr CssJs.fontSize]);
-let font_size_adjust = unsupported(property_font_size_adjust);
-let font = unsupported(property_font);
-// let font_synthesis_weight = unsupported(property_font_synthesis_weight);
-// let font_synthesis_style = unsupported(property_font_synthesis_style);
+  unsupported(Parser.property_font_style, ~call=[%expr CssJs.fontStyle]);
+let font_size = unsupported(Parser.property_font_size, ~call=[%expr CssJs.fontSize]);
+let font_size_adjust = unsupported(Parser.property_font_size_adjust);
+let font = unsupported(Parser.property_font);
+// let font_synthesis_weight = unsupported(Parser.property_font_synthesis_weight);
+// let font_synthesis_style = unsupported(Parser.property_font_synthesis_style);
 // let font_synthesis_small_caps =
-// unsupported(property_font_synthesis_small_caps);
-let font_synthesis = unsupported(property_font_synthesis);
-let font_kerning = unsupported(property_font_kerning);
-let font_variant_ligatures = unsupported(property_font_variant_ligatures);
-let font_variant_position = unsupported(property_font_variant_position);
-let font_variant_caps = unsupported(property_font_variant_caps);
-let font_variant_numeric = unsupported(property_font_variant_numeric);
-let font_variant_alternates = unsupported(property_font_variant_alternates);
-let font_variant_east_asian = unsupported(property_font_variant_east_asian);
+// unsupported(Parser.property_font_synthesis_small_caps);
+let font_synthesis = unsupported(Parser.property_font_synthesis);
+let font_kerning = unsupported(Parser.property_font_kerning);
+let font_variant_ligatures = unsupported(Parser.property_font_variant_ligatures);
+let font_variant_position = unsupported(Parser.property_font_variant_position);
+let font_variant_caps = unsupported(Parser.property_font_variant_caps);
+let font_variant_numeric = unsupported(Parser.property_font_variant_numeric);
+let font_variant_alternates = unsupported(Parser.property_font_variant_alternates);
+let font_variant_east_asian = unsupported(Parser.property_font_variant_east_asian);
 let font_variant =
-  unsupported(property_font_variant, ~call=[%expr CssJs.fontVariant]);
-let font_feature_settings = unsupported(property_font_feature_settings);
-let font_optical_sizing = unsupported(property_font_optical_sizing);
-let font_variation_settings = unsupported(property_font_variation_settings);
-// let font_palette = unsupported(property_font_palette);
-// let font_variant_emoji = unsupported(property_font_variant_emoji);
+  unsupported(Parser.property_font_variant, ~call=[%expr CssJs.fontVariant]);
+let font_feature_settings = unsupported(Parser.property_font_feature_settings);
+let font_optical_sizing = unsupported(Parser.property_font_optical_sizing);
+let font_variation_settings = unsupported(Parser.property_font_variation_settings);
+// let font_palette = unsupported(Parser.property_font_palette);
+// let font_variant_emoji = unsupported(Parser.property_font_variant_emoji);
 
 // css-text-decor-3
 let text_decoration_line =
   unsupported(
-    property_text_decoration_line,
+    Parser.property_text_decoration_line,
     ~call=[%expr CssJs.textDecorationLine],
   );
 let text_decoration_style =
   unsupported(
-    property_text_decoration_style,
+    Parser.property_text_decoration_style,
     ~call=[%expr CssJs.textDecorationStyle],
   );
 let text_decoration_color =
   apply(
-    property_text_decoration_color,
+    Parser.property_text_decoration_color,
     [%expr CssJs.textDecorationColor],
     render_color
   );
 let text_decoration_thickness =
-  unsupported(property_text_decoration_thickness);
+  unsupported(Parser.property_text_decoration_thickness);
 let text_decoration =
-  unsupported(property_text_decoration, ~call=[%expr CssJs.textDecoration]);
-let text_underline_position = unsupported(property_text_underline_position);
-let text_underline_offset = unsupported(property_text_underline_offset);
-let text_decoration_skip = unsupported(property_text_decoration_skip);
+  unsupported(Parser.property_text_decoration, ~call=[%expr CssJs.textDecoration]);
+let text_underline_position = unsupported(Parser.property_text_underline_position);
+let text_underline_offset = unsupported(Parser.property_text_underline_offset);
+let text_decoration_skip = unsupported(Parser.property_text_decoration_skip);
 // let text_decoration_skip_self =
-//   unsupported(property_text_decoration_skip_self);
-// let text_decoration_skip_box = unsupported(property_text_decoration_skip_box);
+//   unsupported(Parser.property_text_decoration_skip_self);
+// let text_decoration_skip_box = unsupported(Parser.property_text_decoration_skip_box);
 // let text_decoration_skip_inset =
-//   unsupported(property_text_decoration_skip_inset);
+//   unsupported(Parser.property_text_decoration_skip_inset);
 // let text_decoration_skip_spaces =
-//   unsupported(property_text_decoration_skip_spaces);
-let text_decoration_skip_ink = unsupported(property_text_decoration_skip_ink);
-let text_emphasis_style = unsupported(property_text_emphasis_style);
-let text_emphasis_color = unsupported(property_text_emphasis_color);
-let text_emphasis = unsupported(property_text_emphasis);
-let text_emphasis_position = unsupported(property_text_emphasis_position);
-// let text_emphasis_skip = unsupported(property_text_emphasis_skip);
+//   unsupported(Parser.property_text_decoration_skip_spaces);
+let text_decoration_skip_ink = unsupported(Parser.property_text_decoration_skip_ink);
+let text_emphasis_style = unsupported(Parser.property_text_emphasis_style);
+let text_emphasis_color = unsupported(Parser.property_text_emphasis_color);
+let text_emphasis = unsupported(Parser.property_text_emphasis);
+let text_emphasis_position = unsupported(Parser.property_text_emphasis_position);
+// let text_emphasis_skip = unsupported(Parser.property_text_emphasis_skip);
 let text_shadow =
-  unsupported(property_text_shadow, ~call=[%expr CssJs.textShadow]);
+  unsupported(Parser.property_text_shadow, ~call=[%expr CssJs.textShadow]);
 
 // css-transforms-2
-let transform = unsupported(property_transform, ~call=[%expr CssJs.transform]);
+let transform = unsupported(Parser.property_transform, ~call=[%expr CssJs.transform]);
 let transform_origin =
-  unsupported(property_transform_origin, ~call=[%expr CssJs.transformOrigin]);
+  unsupported(Parser.property_transform_origin, ~call=[%expr CssJs.transformOrigin]);
 let transform_box =
-  unsupported(property_transform_box, ~call=[%expr CssJs.transformOrigin]);
-let translate = unsupported(property_translate, ~call=[%expr CssJs.translate]);
-let rotate = unsupported(property_rotate, ~call=[%expr CssJs.rotate]);
-let scale = unsupported(property_scale, ~call=[%expr CssJs.scale]);
+  unsupported(Parser.property_transform_box, ~call=[%expr CssJs.transformOrigin]);
+let translate = unsupported(Parser.property_translate, ~call=[%expr CssJs.translate]);
+let rotate = unsupported(Parser.property_rotate, ~call=[%expr CssJs.rotate]);
+let scale = unsupported(Parser.property_scale, ~call=[%expr CssJs.scale]);
 let transform_style =
-  unsupported(property_transform_style, ~call=[%expr CssJs.transformStyle]);
-let perspective = unsupported(property_perspective);
+  unsupported(Parser.property_transform_style, ~call=[%expr CssJs.transformStyle]);
+let perspective = unsupported(Parser.property_perspective);
 let perspective_origin =
-  unsupported(property_perspective_origin, ~call=[%expr CssJs.transformStyle]);
+  unsupported(Parser.property_perspective_origin, ~call=[%expr CssJs.transformStyle]);
 let backface_visibility =
   unsupported(
-    property_backface_visibility,
+    Parser.property_backface_visibility,
     ~call=[%expr CssJs.backfaceVisibility],
   );
 
 // css-transition-1
 let transition_property =
   unsupported(
-    property_transition_property,
+    Parser.property_transition_property,
     ~call=[%expr CssJs.transitionProperty],
   );
 let transition_duration =
   unsupported(
-    property_transition_duration,
+    Parser.property_transition_duration,
     ~call=[%expr CssJs.transitionDuration],
   );
 let transition_timing_function =
   unsupported(
-    property_transition_timing_function,
+    Parser.property_transition_timing_function,
     ~call=[%expr CssJs.transitionTimingFunction],
   );
 let transition_delay =
-  unsupported(property_transition_delay, ~call=[%expr CssJs.transitionDelay]);
+  unsupported(Parser.property_transition_delay, ~call=[%expr CssJs.transitionDelay]);
 let transition =
-  unsupported(property_transition, ~call=[%expr CssJs.transition]);
+  unsupported(Parser.property_transition, ~call=[%expr CssJs.transition]);
 
 // css-animation-1
 let animation_name =
-  unsupported(property_animation_name, ~call=[%expr CssJs.animationName]);
+  unsupported(Parser.property_animation_name, ~call=[%expr CssJs.animationName]);
 let animation_duration =
   unsupported(
-    property_animation_duration,
+    Parser.property_animation_duration,
     ~call=[%expr CssJs.animationDuration],
   );
 let animation_timing_function =
   unsupported(
-    property_animation_timing_function,
+    Parser.property_animation_timing_function,
     ~call=[%expr CssJs.CssJs.animationTimingFunction],
   );
 let animation_iteration_count =
   unsupported(
-    property_animation_iteration_count,
+    Parser.property_animation_iteration_count,
     ~call=[%expr CssJs.animationIterationCount],
   );
 let animation_direction =
   unsupported(
-    property_animation_direction,
+    Parser.property_animation_direction,
     ~call=[%expr CssJs.animationDirection],
   );
 let animation_play_state =
   unsupported(
-    property_animation_play_state,
+    Parser.property_animation_play_state,
     ~call=[%expr CssJs.animationPlayState],
   );
 let animation_delay =
-  unsupported(property_animation_delay, ~call=[%expr CssJs.animationDelay]);
+  unsupported(Parser.property_animation_delay, ~call=[%expr CssJs.animationDelay]);
 let animation_fill_mode =
   unsupported(
-    property_animation_fill_mode,
+    Parser.property_animation_fill_mode,
     ~call=[%expr CssJs.animationFillMode],
   );
-let animation = unsupported(property_animation, ~call=[%expr CssJs.animation]);
+let animation = unsupported(Parser.property_animation, ~call=[%expr CssJs.animation]);
 
 // css-flexbox-1
 // using id() because refmt
 let flex_direction =
-  variants(property_flex_direction, [%expr CssJs.flexDirection]);
-let flex_wrap = variants(property_flex_wrap, [%expr CssJs.flexWrap]);
+  variants(Parser.property_flex_direction, [%expr CssJs.flexDirection]);
+let flex_wrap = variants(Parser.property_flex_wrap, [%expr CssJs.flexWrap]);
 
 // shorthand - https://drafts.csswg.org/css-flexbox-1/#flex-flow-property
 let flex_flow =
   emit(
-    property_flex_flow,
+    Parser.property_flex_flow,
     id,
     ((direction_ast, wrap_ast)) => {
       let direction =
@@ -1126,15 +1156,15 @@ let flex_flow =
     },
   );
 // TODO: this is safe?
-let order = apply(property_order, [%expr CssJs.order], render_integer);
+let order = apply(Parser.property_order, [%expr CssJs.order], render_integer);
 let flex_grow =
-  apply(property_flex_grow, [%expr CssJs.flexGrow], render_number);
+  apply(Parser.property_flex_grow, [%expr CssJs.flexGrow], render_number);
 let flex_shrink =
-  apply(property_flex_shrink, [%expr CssJs.flexShrink], render_number);
+  apply(Parser.property_flex_shrink, [%expr CssJs.flexShrink], render_number);
 // TODO: is safe to just return CssJs.width when flex_basis?
 let flex_basis =
   apply(
-    property_flex_basis,
+    Parser.property_flex_basis,
     [%expr CssJs.flexBasis],
     fun
     | `Content => variants_to_expression(`Content)
@@ -1144,7 +1174,7 @@ let flex_basis =
 // TODO: this is incomplete
 let flex =
   emit(
-    property_flex,
+    Parser.property_flex,
     id,
     fun
     | `None => [[%expr CssJs.flex(`none)]]
@@ -1172,52 +1202,52 @@ let flex =
   );
 // TODO: justify_content, align_items, align_self, align_content are only for flex, missing the css-align-3 at parser
 let justify_content =
-  unsupported(property_justify_content, ~call=[%expr CssJs.justifyContent]);
+  unsupported(Parser.property_justify_content, ~call=[%expr CssJs.justifyContent]);
 let align_items =
-  unsupported(property_align_items, ~call=[%expr CssJs.alignItems]);
+  unsupported(Parser.property_align_items, ~call=[%expr CssJs.alignItems]);
 let align_self =
-  unsupported(property_align_self, ~call=[%expr CssJs.alignSelf]);
+  unsupported(Parser.property_align_self, ~call=[%expr CssJs.alignSelf]);
 let align_content =
-  unsupported(property_align_content, ~call=[%expr CssJs.alignContent]);
+  unsupported(Parser.property_align_content, ~call=[%expr CssJs.alignContent]);
 
 // css-grid-1
 let grid_template_columns =
   unsupported(
-    property_grid_template_columns,
+    Parser.property_grid_template_columns,
     ~call=[%expr CssJs.gridTemplateColumns],
   );
 let grid_template_rows =
   unsupported(
-    property_grid_template_rows,
+    Parser.property_grid_template_rows,
     ~call=[%expr CssJs.gridTemplateRows],
   );
 let grid_template_areas =
   unsupported(
-    property_grid_template_areas,
+    Parser.property_grid_template_areas,
     ~call=[%expr CssJs.gridTemplateAreas],
   );
-let grid_template = unsupported(property_grid_template);
+let grid_template = unsupported(Parser.property_grid_template);
 let grid_auto_columns =
-  unsupported(property_grid_auto_columns, ~call=[%expr CssJs.gridAutoColumns]);
+  unsupported(Parser.property_grid_auto_columns, ~call=[%expr CssJs.gridAutoColumns]);
 let grid_auto_rows =
-  unsupported(property_grid_auto_rows, ~call=[%expr CssJs.gridAutoRows]);
+  unsupported(Parser.property_grid_auto_rows, ~call=[%expr CssJs.gridAutoRows]);
 let grid_auto_flow =
-  unsupported(property_grid_auto_flow, ~call=[%expr CssJs.gridAutoFlow]);
-let grid = unsupported(property_grid, ~call=[%expr CssJs.grid]);
+  unsupported(Parser.property_grid_auto_flow, ~call=[%expr CssJs.gridAutoFlow]);
+let grid = unsupported(Parser.property_grid, ~call=[%expr CssJs.grid]);
 let grid_row_start =
-  unsupported(property_grid_row_start, ~call=[%expr CssJs.gridRowStart]);
+  unsupported(Parser.property_grid_row_start, ~call=[%expr CssJs.gridRowStart]);
 let grid_column_start =
-  unsupported(property_grid_column_start, ~call=[%expr CssJs.gridColumnStart]);
+  unsupported(Parser.property_grid_column_start, ~call=[%expr CssJs.gridColumnStart]);
 let grid_row_end =
-  unsupported(property_grid_row_end, ~call=[%expr CssJs.gridRowEnd]);
+  unsupported(Parser.property_grid_row_end, ~call=[%expr CssJs.gridRowEnd]);
 let grid_column_end =
-  unsupported(property_grid_column_end, ~call=[%expr CssJs.gridColumnEnd]);
-let grid_row = unsupported(property_grid_row, ~call=[%expr CssJs.gridRow]);
+  unsupported(Parser.property_grid_column_end, ~call=[%expr CssJs.gridColumnEnd]);
+let grid_row = unsupported(Parser.property_grid_row, ~call=[%expr CssJs.gridRow]);
 let grid_column =
-  unsupported(property_grid_column, ~call=[%expr CssJs.gridColumn]);
-let grid_area = unsupported(property_grid_area, ~call=[%expr CssJs.gridArea]);
+  unsupported(Parser.property_grid_column, ~call=[%expr CssJs.gridColumn]);
+let grid_area = unsupported(Parser.property_grid_area, ~call=[%expr CssJs.gridArea]);
 let display = apply(
-  property_display,
+  Parser.property_display,
   [%expr CssJs.display],
   fun
   | `Block => [%expr `block]
@@ -1473,11 +1503,6 @@ let properties = [
   ("grid-column", found(grid_column)),
   ("grid-area", found(grid_area)),
 ];
-
-let support_property = name =>
-  Parser.check_map
-  |> StringMap.find_opt("property-" ++ name)
-  |> Option.is_some;
 
 let render_when_unsupported_features = (name, value) => {
   let to_camel_case = name =>

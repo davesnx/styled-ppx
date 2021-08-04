@@ -1,34 +1,34 @@
 /*
   This file transform CSS AST to Emotion API calls, a simplified example:
 
-  -- CSS Definition
-  display: block;
+    -- CSS Definition
+    display: block;
 
-  -- CSS AST
-  Declaration: {
-    important: false,
-    property: "display",
-    value: Value {
-      "children": [
-        Identifier {
-          "name": "block"
-        }
-      ]
+    -- CSS AST
+    Declaration: {
+      important: false,
+      property: "display",
+      value: Value {
+        "children": [
+          Identifier {
+            "name": "block"
+          }
+        ]
+      }
     }
-  }
 
-  -- Emotion output
-  Emotion.(css([display(`block)]))
- */
+    -- Emotion output
+    CssJs.(css([display(`block)]))
+*/
+
 open Ppxlib;
 open Css_types;
 open Component_value;
-open Ast_helper;
 
 module Helper = Ast_helper;
 module Builder = Ast_builder.Default;
 
-module Emotion = {
+module CssJs = {
   let lident = (~loc, name) => {txt: Ldot(Lident("CssJs"), name), loc};
 };
 
@@ -37,13 +37,13 @@ let grammar_error = (loc, message) =>
 
 let number_to_const = number =>
   if (String.contains(number, '.')) {
-    Const.float(number);
+    Helper.Const.float(number);
   } else {
-    Const.integer(number);
+    Helper.Const.integer(number);
   };
 
 let string_to_const = (~loc, s) =>
-  Exp.constant(~loc, Const.string(~quotation_delimiter="js", s));
+  Helper.Exp.constant(~loc, Helper.Const.string(~quotation_delimiter="js", s));
 
 let source_code_of_loc = loc => {
   let Location.{loc_start, loc_end, _} = loc;
@@ -115,7 +115,7 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
     };
 
   let media_ident =
-    Builder.pexp_ident(~loc=name_loc, Emotion.lident(~loc, "media"));
+    Builder.pexp_ident(~loc=name_loc, CssJs.lident(~loc, "media"));
   Builder.eapply(~loc, media_ident, [Builder.estring(~loc=prelude_loc, query), rules]);
 }
 and render_declaration =
@@ -139,8 +139,7 @@ and render_unsafe_declaration =
 
   [Declarations_to_emotion.render_when_unsupported_features(name, value_source)];
 }
-and render_declarations =
-    (ds: (list(Declaration_list.kind), loc)): list(Parsetree.expression) => {
+and render_declarations = ds => {
   List.concat_map(
     declaration =>
       switch (declaration) {
@@ -151,7 +150,7 @@ and render_declarations =
       | Declaration_list.At_rule(ar) => [render_at_rule(ar)]
       | Declaration_list.Style_rule(ar) =>
         let loc: Location.t = ar.loc;
-        let ident = Exp.ident(~loc, Emotion.lident(~loc, "selector"));
+        let ident = Helper.Exp.ident(~loc, CssJs.lident(~loc, "selector"));
         [render_style_rule(~isUncurried=false, ident, ar)];
       },
     fst(ds),
@@ -204,8 +203,8 @@ and render_style_rule = (~isUncurried, ident, rule: Style_rule.t): Parsetree.exp
       | "placeholder" => "placeholder"
       | _ => grammar_error(loc, "Unexpected pseudo-class")
       };
-    let ident = Exp.ident(~loc, Emotion.lident(~loc, pseudoclass));
-    Exp.apply(~loc=rule.Style_rule.loc, ident, [(Nolabel, dl_expr)]);
+    let ident = Helper.Exp.ident(~loc, CssJs.lident(~loc, pseudoclass));
+    Helper.Exp.apply(~loc=rule.Style_rule.loc, ident, [(Nolabel, dl_expr)]);
   | /* single-colon pseudoclasses */
     [
       (Selector("&"), _),
@@ -239,8 +238,8 @@ and render_style_rule = (~isUncurried, ident, rule: Style_rule.t): Parsetree.exp
       | "target" => "target"
       | _ => grammar_error(loc, "Unexpected pseudo-class")
       };
-    let ident = Exp.ident(~loc, Emotion.lident(~loc, pseudoclass));
-    Exp.apply(~loc=rule.Style_rule.loc, ident, [(Nolabel, dl_expr)]);
+    let ident = Helper.Exp.ident(~loc, CssJs.lident(~loc, pseudoclass));
+    Helper.Exp.apply(~loc=rule.Style_rule.loc, ident, [(Nolabel, dl_expr)]);
   | /* nth-child & friends */
     [
       (Selector("&"), _),
@@ -248,11 +247,11 @@ and render_style_rule = (~isUncurried, ident, rule: Style_rule.t): Parsetree.exp
       (Function((_pc, loc), (_args, _args_loc)), _f_loc),
     ] =>
     // TODO: parses and use the correct functions instead of just strings selector
-    let ident = Exp.ident(~loc, Emotion.lident(~loc, "selector"));
+    let ident = Helper.Exp.ident(~loc, CssJs.lident(~loc, "selector"));
     let selector =
       List.fold_left(render_prelude_value, "", List.rev(prelude));
     let selector_expr = string_to_const(~loc=prelude_loc, selector);
-    Exp.apply(
+    Helper.Exp.apply(
       ~loc=rule.Style_rule.loc,
       ident,
       [(Nolabel, selector_expr), (Nolabel, dl_expr)],
@@ -262,7 +261,7 @@ and render_style_rule = (~isUncurried, ident, rule: Style_rule.t): Parsetree.exp
       List.fold_left(render_prelude_value, "", List.rev(prelude));
     let selector_expr = string_to_const(~loc=prelude_loc, selector);
 
-    Exp.apply(
+    Helper.Exp.apply(
       ~loc=rule.Style_rule.loc,
       ~attrs=(isUncurried ? [Create.uncurried(~loc=rule.Style_rule.loc)] : []),
       ident,
@@ -272,12 +271,12 @@ and render_style_rule = (~isUncurried, ident, rule: Style_rule.t): Parsetree.exp
 };
 
 let bsEmotionLabel = (~loc, label) => {
-  Exp.apply(
-    Exp.ident(Emotion.lident(~loc, "label")),
+  Helper.Exp.apply(
+    Helper.Exp.ident(CssJs.lident(~loc, "label")),
     [
       (
         Nolabel,
-        Exp.constant(Pconst_string(label, loc, None)),
+        Helper.Exp.constant(Pconst_string(label, loc, None)),
       ),
     ],
   )
@@ -289,10 +288,10 @@ let addLabel = (~loc, label, emotionExprs) => {
 
 let render_style_call = (declaration_list): Parsetree.expression => {
   let loc = declaration_list.pexp_loc;
-  let ident = Exp.ident(~loc, Emotion.lident(~loc, "style"));
+  let ident = Helper.Exp.ident(~loc, CssJs.lident(~loc, "style"));
   let arguments = [(Nolabel, declaration_list)];
 
-  Exp.apply(~loc, ~attrs=[Create.uncurried(~loc)], ident, arguments);
+  Helper.Exp.apply(~loc, ~attrs=[Create.uncurried(~loc)], ident, arguments);
 };
 
 let render_rule = (~isGlobalCall, ident, rule: Rule.t): Parsetree.expression => {
@@ -346,7 +345,7 @@ let render_keyframes = ((ruleList, loc)): Parsetree.expression => {
        })
     |> Builder.pexp_array(~loc);
   let emotionKeyframes =
-    Builder.pexp_ident(~loc, Emotion.lident(~loc, "keyframes"));
+    Builder.pexp_ident(~loc, CssJs.lident(~loc, "keyframes"));
 
   {
     ...Builder.eapply(~loc, emotionKeyframes, [keyframes]),
@@ -355,11 +354,13 @@ let render_keyframes = ((ruleList, loc)): Parsetree.expression => {
 };
 
 let render_global = ((ruleList, loc): Stylesheet.t) => {
-  let emotionGlobal = Exp.ident(~loc, Emotion.lident(~loc, "global"));
+  let emotionGlobal = Helper.Exp.ident(~loc, CssJs.lident(~loc, "global"));
 
     switch (ruleList) {
     /* There's only one rule: */
-    | [rule] => Create.applyIgnore(~loc, render_rule(~isGlobalCall=true, emotionGlobal, rule))
+    | [rule] =>
+      render_rule(~isGlobalCall=true, emotionGlobal, rule)
+      |> Create.applyIgnore(~loc)
     /* There's more than one */
     | _res =>
       grammar_error(

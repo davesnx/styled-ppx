@@ -31,9 +31,20 @@ module ArrayStatic = [%styled.section [|
   [%css "justify-content: center;"]
 |]];
 
-let var = "#333333";
+module Theme = {
+  let var = "#333333";
+
+  module Border = {
+    let black = "#222222";
+  }
+};
+
+let black = "#000";
+
 module StringInterpolation = [%styled.div {j|
-  color: $(var);
+  color: $(Theme.var);
+  background-color: $(black);
+  border-color: $(Theme.Border.black);
   __UNSAFE__ color: trust-me;
   display: block;
 |j}];

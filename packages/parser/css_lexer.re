@@ -45,6 +45,7 @@ let token_to_string =
   | Parser.LEFT_BRACE => "{"
   | Parser.RIGHT_BRACE => "}"
   | Parser.LEFT_PAREN => "("
+  | Parser.DOT => "."
   | Parser.RIGHT_PAREN => ")"
   | Parser.LEFT_BRACKET => "["
   | Parser.RIGHT_BRACKET => "]"
@@ -74,7 +75,7 @@ let token_to_string =
     ++ dimension_to_string(d)
     ++ ")"
   | Parser.DIMENSION((n, d)) => "DIMENSION(" ++ n ++ ", " ++ d ++ ")"
-  | Parser.VARIABLE(v) => "VARIABLE(" ++ v ++ ")"
+  | Parser.VARIABLE(v) => "VARIABLE(" ++ String.concat(".", v) ++ ")"
   | Parser.UNSAFE => "UNSAFE";
 
 let () =
@@ -133,7 +134,9 @@ let ident_char = [%sedlex.regexp?
 
 let ident = [%sedlex.regexp? (Opt('-'), ident_start, Star(ident_char))];
 
-let variable = [%sedlex.regexp? ('$', '(', Star(ident_char), ')')];
+let variable_name = [%sedlex.regexp? (Star(ident_char))];
+let module_variable = [%sedlex.regexp? (variable_name, '.')];
+let variable = [%sedlex.regexp? ('$', '(', Opt(Star(module_variable)), variable_name, ')')];
 
 let string_quote = [%sedlex.regexp?
   (
@@ -282,7 +285,7 @@ let rec get_next_token = buf => {
   | '%' => PERCENTAGE
   | '&' => SELECTOR("&")
   | unsafe => UNSAFE
-  | variable => VARIABLE(Sedlexing.latin1(~skip=2, ~drop=1, buf))
+  | variable => get_variable(buf)
   | operator => OPERATOR(Sedlexing.latin1(buf))
   | string => STRING(Sedlexing.latin1(~skip=1, ~drop=1, buf))
   | "url(" => get_url("", buf)
@@ -310,6 +313,18 @@ and get_dimension = (n, buf) =>
   | frequency => FLOAT_DIMENSION((n, Sedlexing.latin1(buf), Frequency))
   | ident => DIMENSION((n, Sedlexing.latin1(buf)))
   | _ => NUMBER(n)
+  }
+and get_variable = (buf) =>
+  switch%sedlex (buf) {
+  | variable_name => VARIABLE([Sedlexing.latin1(buf)])
+  | eof => raise(LexingError((buf.Sedlexing.pos, "Incomplete variable, missing a ')' at the end")))
+  | _ =>
+    raise(
+      LexingError((
+        buf.Sedlexing.pos,
+        "Variables can't be empty. This shoudn't be reachable since menhir we defined a non_empty_list",
+      )),
+    )
   }
 and get_url = (url, buf) =>
   switch%sedlex (buf) {

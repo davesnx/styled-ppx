@@ -4797,7 +4797,13 @@ module ArrayStatic = {
     createVariadicElement("section", newProps);
   };
 };
-let var = "#333333";
+module Theme = {
+  let var = "#333333";
+  module Border = {
+    let black = "#222222";
+  };
+};
+let black = "#000";
 module StringInterpolation = {
   [@bs.deriving abstract]
   type makeProps = {
@@ -5748,7 +5754,9 @@ module StringInterpolation = {
   let styles =
     CssJs.style(. [|
       CssJs.label("StringInterpolation"),
-      CssJs.color(var),
+      CssJs.color(Theme.var),
+      CssJs.backgroundColor(black),
+      CssJs.borderColor(Theme.Border.black),
       CssJs.unsafe("color", "trust-me"),
       CssJs.display(`block),
     |]);

@@ -25,13 +25,13 @@ let rec fnWithLabeledArgs = (list, args) =>
 
 /* let styles = Emotion.(css(exp)) */
 let styles = (~loc, ~name, ~expr) => {
-  let variableName = Helper.Pat.mk(~loc, Ppat_var({txt: name, loc}));
+  let variableName = Helper.Pat.mk(~loc, Ppat_var(withLoc(name, ~loc)));
   Helper.Str.mk(~loc, Pstr_value(Nonrecursive, [Helper.Vb.mk(~loc, variableName, expr)]));
 };
 
 /* let styles = (~arg1, ~arg2) => Emotion.(css(exp)) */
 let dynamicStyles = (~loc, ~name, ~args, ~expr) => {
-  let variableName = Helper.Pat.mk(~loc, Ppat_var({txt: name, loc}));
+  let variableName = Helper.Pat.mk(~loc, Ppat_var(withLoc(name, ~loc)));
 
   Helper.Str.mk(
     ~loc,
@@ -50,35 +50,32 @@ let dynamicStyles = (~loc, ~name, ~args, ~expr) => {
 let bindingCreateVariadicElement = (~loc) => {
   Helper.Str.primitive({
     pval_loc: loc,
-    pval_name: {
-      txt: "createVariadicElement",
-      loc,
-    },
+    pval_name: withLoc("createVariadicElement", ~loc),
     pval_type:
       Helper.Typ.arrow(
         ~loc,
         Nolabel,
-        Helper.Typ.constr(~loc, {txt: Lident("string"), loc}, []),
+        Helper.Typ.constr(~loc, withLoc(Lident("string"), ~loc), []),
         Helper.Typ.arrow(
           ~loc,
           Nolabel,
           Helper.Typ.constr(
             ~loc,
-            {txt: Ldot(Lident("Js"), "t"), loc},
+            withLoc(Ldot(Lident("Js"), "t"), ~loc),
             [Helper.Typ.object_(~loc, [], Open)],
           ),
           Helper.Typ.constr(
               ~loc,
-              {txt: Ldot(Lident("React"), "element"), loc},
+              withLoc(Ldot(Lident("React"), "element"), ~loc),
               [],
             ),
         ),
       ),
     pval_prim: ["createElement"],
     pval_attributes: [
-      Helper.Attr.mk({txt: "bs.val", loc}, PStr([])),
+      Helper.Attr.mk(withLoc("bs.val", ~loc), PStr([])),
       Helper.Attr.mk(
-        {txt: "bs.module", loc},
+        withLoc("bs.module", ~loc),
         PStr([
           Helper.Str.mk(
             ~loc,
@@ -86,7 +83,7 @@ let bindingCreateVariadicElement = (~loc) => {
               Helper.Exp.constant(
                 ~loc,
                 ~attrs=[
-                  Helper.Attr.mk({txt: "reason.raw_literal", loc}, PStr([])),
+                  Helper.Attr.mk(withLoc("reason.raw_literal", ~loc), PStr([])),
                 ],
                 Pconst_string("react", loc, None),
               ),
@@ -102,7 +99,7 @@ let bindingCreateVariadicElement = (~loc) => {
 let applyIgnore = (~loc, expr) => {
   Helper.Exp.apply(
     ~loc,
-    Helper.Exp.ident(~loc, {txt: Lident("ignore"), loc}),
+    Helper.Exp.ident(~loc, withLoc(Lident("ignore"), ~loc)),
     [(Nolabel, expr)]
   );
 };
@@ -111,7 +108,7 @@ let applyIgnore = (~loc, expr) => {
 let variadicElement = (~loc, ~htmlTag) => {
   Helper.Exp.apply(
     ~loc,
-    Helper.Exp.ident(~loc, {txt: Lident("createVariadicElement"), loc}),
+    Helper.Exp.ident(~loc, withLoc(Lident("createVariadicElement"), ~loc)),
     [
       (
         Nolabel,
@@ -119,7 +116,7 @@ let variadicElement = (~loc, ~htmlTag) => {
           ~loc,
           ~attrs=[
             Helper.Attr.mk(
-              {txt: "reason.raw_literal", loc},
+              withLoc("reason.raw_literal", ~loc),
               PStr([
                 Helper.Str.mk(
                   ~loc,
@@ -134,7 +131,7 @@ let variadicElement = (~loc, ~htmlTag) => {
           Pconst_string(htmlTag, loc, None),
         ),
       ),
-      (Nolabel, Helper.Exp.ident(~loc, {txt: Lident("newProps"), loc})),
+      (Nolabel, Helper.Exp.ident(~loc, withLoc(Lident("newProps"), ~loc))),
     ],
   );
 };
@@ -143,18 +140,18 @@ let variadicElement = (~loc, ~htmlTag) => {
 let stylesObject = (~loc, ~value) =>
   Helper.Vb.mk(
     ~loc,
-    Helper.Pat.mk(~loc, Ppat_var({txt: "stylesObject", loc})),
+    Helper.Pat.mk(~loc, Ppat_var(withLoc("stylesObject", ~loc))),
     Helper.Exp.extension(
       ~loc,
       (
-        {txt: "bs.obj", loc},
+        withLoc("bs.obj", ~loc),
         PStr([
           Helper.Str.mk(
             ~loc,
             Pstr_eval(
               Helper.Exp.record(
                 ~loc,
-                [ ({txt: Lident("className"), loc}, value) ],
+                [ (withLoc(Lident("className"), ~loc), value) ],
                 None,
               ),
               [],
@@ -169,23 +166,23 @@ let stylesObject = (~loc, ~value) =>
 let objMagicProps = (~loc) =>
   Helper.Exp.apply(
     ~loc,
-    Helper.Exp.ident(~loc, {txt: Ldot(Lident("Obj"), "magic"), loc}),
-    [(Nolabel, Helper.Exp.ident(~loc, {txt: Lident("props"), loc}))],
+    Helper.Exp.ident(~loc, withLoc(Ldot(Lident("Obj"), "magic"), ~loc)),
+    [(Nolabel, Helper.Exp.ident(~loc, withLoc(Lident("props"), ~loc)))],
   );
 
 /* let newProps = Js.Obj.assign(stylesObject, Obj.magic(props)); */
 let newProps = (~loc) =>
   Helper.Vb.mk(
     ~loc,
-    Helper.Pat.mk(~loc, Ppat_var({txt: "newProps", loc})),
+    Helper.Pat.mk(~loc, Ppat_var(withLoc("newProps", ~loc))),
     Helper.Exp.apply(
       ~loc,
       Helper.Exp.ident(
         ~loc,
-        {txt: Ldot(Ldot(Lident("Js"), "Obj"), "assign"), loc},
+        withLoc(Ldot(Ldot(Lident("Js"), "Obj"), "assign"), ~loc),
       ),
       [
-        (Nolabel, Helper.Exp.ident(~loc, {txt: Lident("stylesObject"), loc})),
+        (Nolabel, Helper.Exp.ident(~loc, withLoc(Lident("stylesObject"), ~loc))),
         (Nolabel, objMagicProps(~loc)),
       ],
     ),
@@ -199,7 +196,7 @@ let newProps = (~loc) =>
 let makeBody = (~loc, ~htmlTag, ~styledExpr) =>
   Helper.Exp.let_(
     ~loc,
-    ~attrs=[Helper.Attr.mk({txt: "reason.preserve_braces", loc}, PStr([]))],
+    ~attrs=[Helper.Attr.mk(withLoc("reason.preserve_braces", ~loc), PStr([]))],
     Nonrecursive,
     [stylesObject(~loc, ~value=styledExpr)],
     Helper.Exp.let_(
@@ -214,8 +211,8 @@ let makeBody = (~loc, ~htmlTag, ~styledExpr) =>
 let makeArguments = (~loc, ~params) => {
   Helper.Pat.constraint_(
     ~loc,
-    Helper.Pat.mk(~loc, Ppat_var({txt: "props", loc})),
-    Helper.Typ.constr(~loc, {txt: Lident("makeProps"), loc}, params),
+    Helper.Pat.mk(~loc, Ppat_var(withLoc("props", ~loc))),
+    Helper.Typ.constr(~loc, withLoc(Lident("makeProps"), ~loc), params),
   );
 };
 
@@ -238,7 +235,7 @@ let component = (~loc, ~htmlTag, ~styledExpr, ~params) => {
       [
         Helper.Vb.mk(
           ~loc,
-          Helper.Pat.mk(~loc, Ppat_var({txt: "make", loc})),
+          Helper.Pat.mk(~loc, Ppat_var(withLoc("make", ~loc))),
           makeFn(~loc, ~htmlTag, ~styledExpr, ~params),
         ),
       ],
@@ -247,19 +244,19 @@ let component = (~loc, ~htmlTag, ~styledExpr, ~params) => {
 };
 
 /* [@bs.optional] */
-let bsOptional = (~loc) => Helper.Attr.mk({txt: "bs.optional", loc}, PStr([]));
+let bsOptional = (~loc) => Helper.Attr.mk(withLoc("bs.optional", ~loc), PStr([]));
 
 /* [@bs.optional] color: string */
 let customPropLabel = (~loc, name, type_, isOptional) => {
-  Helper.Type.field(~loc, ~attrs=(isOptional ? [bsOptional(~loc)] : []), {txt: name, loc}, type_);
-}
+  Helper.Type.field(~loc, ~attrs=(isOptional ? [bsOptional(~loc)] : []), withLoc(name, ~loc), type_);
+};
 
 let typeVariable = (~loc, name) => Builder.ptyp_var(~loc, name);
 
 /* [@bs.optional] href: string */
 let recordLabel = (~loc, name, kind, alias) =>
   {
-    let bsAlias = (alias) => Helper.Attr.mk({txt: "bs.as", loc}, PStr([
+    let bsAlias = (alias) => Helper.Attr.mk(withLoc("bs.as", ~loc), PStr([
         Helper.Str.mk(
           ~loc,
           Pstr_eval(
@@ -281,8 +278,8 @@ let recordLabel = (~loc, name, kind, alias) =>
     Helper.Type.field(
       ~loc,
       ~attrs,
-      {txt: name, loc},
-      Helper.Typ.constr(~loc, {txt: Lident(kind), loc}, []),
+      withLoc(name, ~loc),
+      Helper.Typ.constr(~loc, withLoc(Lident(kind), ~loc), []),
     )
   };
 
@@ -290,35 +287,35 @@ let recordLabel = (~loc, name, kind, alias) =>
 let domRefLabel = (~loc) =>
   Helper.Type.field(
     ~loc,
-    ~attrs=[Helper.Attr.mk({txt: "bs.optional", loc}, PStr([]))],
-    {txt: "ref", loc},
-    Helper.Typ.constr(~loc, {txt: Ldot(Lident("ReactDOM"), "domRef"), loc}, []),
+    ~attrs=[Helper.Attr.mk(withLoc("bs.optional", ~loc), PStr([]))],
+    withLoc("ref", ~loc),
+    Helper.Typ.constr(~loc, withLoc(Ldot(Lident("ReactDOM"), "domRef"), ~loc), []),
   );
 
 /* [@bs.optional] children: React.element */
 let childrenLabel = (~loc) =>
   Helper.Type.field(
     ~loc,
-    ~attrs=[Helper.Attr.mk({txt: "bs.optional", loc}, PStr([]))],
-    {txt: "children", loc},
-    Helper.Typ.constr(~loc, {txt: Ldot(Lident("React"), "element"), loc}, []),
+    ~attrs=[Helper.Attr.mk(withLoc("bs.optional", ~loc), PStr([]))],
+    withLoc("children", ~loc),
+    Helper.Typ.constr(~loc, withLoc(Ldot(Lident("React"), "element"), ~loc), []),
   );
 
 /* [@bs.optional] onDragOver: ReactEvent.Mouse.t => unit */
 let recordEventLabel = (~loc, name, kind) => {
   Helper.Type.field(
     ~loc,
-    ~attrs=[Helper.Attr.mk({txt: "bs.optional", loc}, PStr([]))],
-    {txt: name, loc},
+    ~attrs=[Helper.Attr.mk(withLoc("bs.optional", ~loc), PStr([]))],
+    withLoc(name, ~loc),
     Helper.Typ.arrow(
       ~loc,
       Nolabel,
       Helper.Typ.constr(
         ~loc,
-        {txt: Ldot(Ldot(Lident("ReactEvent"), kind), "t"), loc},
+        withLoc(Ldot(Ldot(Lident("ReactEvent"), kind), "t"), ~loc),
         [],
       ),
-      Helper.Typ.constr(~loc, {txt: Lident("unit"), loc}, []),
+      Helper.Typ.constr(~loc, withLoc(Lident("unit"), ~loc), []),
     ),
   );
 };
@@ -326,11 +323,11 @@ let recordEventLabel = (~loc, name, kind) => {
 /* [@bs.deriving abstract] */
 let bsDerivingAbstract = (~loc) =>
   Helper.Attr.mk(
-    {txt: "bs.deriving", loc},
+    withLoc("bs.deriving", ~loc),
     PStr([
       Helper.Str.mk(
         ~loc,
-        Pstr_eval(Helper.Exp.ident(~loc, {txt: Lident("abstract"), loc}), []),
+        Pstr_eval(Helper.Exp.ident(~loc, withLoc(Lident("abstract"), ~loc)), []),
       ),
     ]),
   );
@@ -387,7 +384,7 @@ let makeMakeProps = (~loc, ~customProps) => {
           ~attrs=[bsDerivingAbstract(~loc)],
           ~kind=Ptype_record(reactProps),
           ~params,
-          {txt: "makeProps", loc},
+          withLoc("makeProps", ~loc),
         ),
       ],
     ),

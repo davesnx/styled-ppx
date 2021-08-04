@@ -279,8 +279,8 @@ describe("Transform [%css] to bs-css", ({test, _}) => {
 });
 
 let properties_variable_css_tests = [
-  ([%expr [%css "color: $(var)"]], [%expr CssJs.color(var)]),
-  // TODO: ([%css "margin: $var"], [%expr CssJs.margin("margin", var)),
+  ([%expr [%css "color: $(var);"]], [%expr CssJs.color(var)]),
+  // TODO: ([%css "margin: $(var)"], [%expr CssJs.margin("margin", var)),
 ];
 
 describe("Transform [%css] to bs-css with interpolatated variables", ({test, _}) => {
