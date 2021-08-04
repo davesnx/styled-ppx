@@ -48,8 +48,7 @@ let render_css_global_values = (name, value) => {
     | `Unset => [%expr "unset"]
     };
 
-  let name = render_string(name);
-  Ok([[%expr CssJs.unsafe([%e name], [%e value])]]);
+  Ok([[%expr CssJs.unsafe([%e render_string(name)], [%e value])]]);
 };
 
 let render_angle =
@@ -149,10 +148,27 @@ let variable_module_rule = {
   return_match([moduleName, variable]);
 };
 
+let variable_module_module_rule = {
+  open Rule;
+  open Let;
+
+  let.bind_match _ = Pattern.expect(DELIM("$"));
+  let.bind_match _ = Pattern.expect(LEFT_PARENS);
+  let.bind_match moduleName1 = Standard.custom_ident;
+  let.bind_match _ = Pattern.expect(DELIM("."));
+  let.bind_match moduleName2 = Standard.custom_ident;
+  let.bind_match _ = Pattern.expect(DELIM("."));
+  let.bind_match variable = Standard.custom_ident;
+  let.bind_match _ = Pattern.expect(RIGHT_PARENS);
+
+  return_match([moduleName1, moduleName2, variable]);
+};
+
 let variable = parser =>
   Combinator.combine_xor([
     Rule.Match.map(variable_rule, data => `Variable(data)),
     Rule.Match.map(variable_module_rule, data => `Variable(data)),
+    Rule.Match.map(variable_module_module_rule, data => `Variable(data)),
     Rule.Match.map(parser, data => `Value(data)),
   ]);
 
