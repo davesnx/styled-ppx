@@ -5,5 +5,5 @@ of that component or just one case or I particuraly don't like the components AP
 the `css` transform.
 
 ```reason
-<span className=[%css "font-size: 32px"]> {React.string("Hello!")} </span>,
+<span className=[%css_"font-size: 32px"]> {React.string("Hello!")} </span>,
 ```

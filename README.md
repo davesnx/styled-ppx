@@ -48,7 +48,7 @@ module Dynamic = [%styled (~color, ~background) => {j|
 
 ### Inline css function
 ```reason
-<span className=[%css "font-size: 32px"]> {React.string("Hello!")} </span>
+<span className=[%css_"font-size: 32px"]> {React.string("Hello!")} </span>
 ```
 
 For further detail, take a look in [here](./docs/apis.md).
