@@ -73,12 +73,18 @@ jobs:
         if: steps.deps-cache.outputs.cache-hit != 'true'
         run: esy export-dependencies
 
+      - name: Release static
+        run: esy b dune build --root . --ignore-promoted-rules --no-config --profile release-static
+
       - name: Upload artifacts for ${{ matrix.os }}
         uses: actions/upload-artifact@master
         with:
           name: ${{ matrix.os }}
           path: _build/default/bin/ppx.exe
 
+      # Cleanup build cache in case dependencies have changed
+      - name: Cleanup
+        run: esy cleanup .
   e2e:
     needs: build
     name: BuckleScript tests
