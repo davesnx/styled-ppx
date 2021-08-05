@@ -23,7 +23,7 @@
   },
   "esy": {
     "buildsInSource": "_build",
-    "build": [["dune", "build", "-p", "styled-ppx,css-spec-parser,reason-css-parser,reason-css-lexer,styled-ppx-css-parser"]],
+    "build": [["dune", "build", "--root", "."]],
     "buildEnv": {
       "ODOC_SYNTAX": "re"
     },
