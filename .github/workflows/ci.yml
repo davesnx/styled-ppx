@@ -235,6 +235,7 @@ jobs:
 
       - name: Release nightly NPM package
         if: ${{ success() && github.event_name == 'pull_request' && github.event.pull_request.user.login == 'davesnx' }}
+        id: nightly
         working-directory: ./_release
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
@@ -243,7 +244,7 @@ jobs:
           npm config set scope "@davesnx"
           npm version prerelease --preid ${{ steps.sha.outputs.sha_short }} -no-git-tag-version
           npm publish --access public --tag nightly
-          echo "::set-output name=nightly-version::$(npm view @davesnx/styled-ppx@nightly version)"
+          echo "::set-output name=version::$(npm view @davesnx/styled-ppx@nightly version)"
 
       - name: Release NPM package
         if: ${{ success() && github.event_name != 'pull_request' }}
@@ -265,8 +266,8 @@ jobs:
       - uses: mshick/add-pr-comment@v1
         with:
           message: |
-            New **nightly** version has been published to the NPM registry: [@davesnx/styled-ppx@${{ steps.sha.outputs.nightly-version }}](https://www.npmjs.com/package/@davesnx/styled-ppx/v/${{ steps.sha.outputs.nightly-version }}).
-            Install it with `npm install @davesnx/styled-ppx@nightly` or `npm install @davesnx/styled-ppx@${{ steps.sha.outputs.nightly-version }}`.
+            New **nightly** version has been published to the NPM registry: [@davesnx/styled-ppx@${{ steps.nightly.outputs.version }}](https://www.npmjs.com/package/@davesnx/styled-ppx/v/${{ steps.nightly.outputs.version }}).
+            Install it with `npm install @davesnx/styled-ppx@nightly` or `npm install @davesnx/styled-ppx@${{ steps.nightly.outputs.version }}`.
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           repo-token-user-login: 'github-actions[bot]' # The user.login for temporary GitHub tokens
           allow-repeats: false
