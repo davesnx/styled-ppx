@@ -14,7 +14,86 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [macos-latest]
+        # os: [macos-latest, windows-latest, ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      - name: Load global cache (~/.esy/source)
+        uses: actions/cache@v2
+        with:
+          path: ~/.esy/source
+          key: source-${{ matrix.os }}-${{ hashFiles('**/index.json') }}
+
+      - name: Install esy
+        run: npm install -g esy@0.6.11
+
+      - name: Install dependencies
+        run: esy install
+
+      - name: Print esy cache
+        id: print_esy_cache
+        run: node .github/workflows/print-esy-cache.js
+
+      - name: Load dependencies cache
+        id: deps-cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.print_esy_cache.outputs.esy_cache }}
+          key: build-${{ matrix.os }}-${{ hashFiles('**/index.json') }}
+          restore-keys: build-${{ matrix.os }}-
+
+      - name: Import dependencies
+        run: esy import-build
+
+      - name: Build dependencies
+        run: esy build-dependencies
+
+      - name: Build
+        run: esy build
+
+      - name: Run ppx Native tests
+        run: esy test_native
+
+      - name: Run CSS Support tests
+        run: esy test_css_support
+
+      - name: Run ppx Native snapshot tests
+        run: esy test_snapshot
+
+      - name: Run runtests for Parser, vds & Lexer
+        run: esy test
+
+      - name: Export dependencies
+        if: steps.deps-cache.outputs.cache-hit != 'true'
+        run: esy export-dependencies
+
+      - name: Release static
+        run: esy dune build --root . --only-packages 'styled-ppx,css-spec-parser,reason-css-parser,reason-css-lexer,styled-ppx-css-parser' --ignore-promoted-rules --no-config --profile release-static
+
+      - name: Upload artifacts for ${{ matrix.os }}
+        uses: actions/upload-artifact@master
+        with:
+          name: ${{ matrix.os }}
+          path: _build/default/bin/ppx.exe
+
+      # Cleanup build cache in case dependencies have changed
+      - name: Cleanup
+        run: esy cleanup .
+
+  build_linux:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    container:
+      image: alexfedoseev/alpine-node-yarn-esy:0.0.4
 
     steps:
       - uses: actions/checkout@v2
@@ -85,13 +164,14 @@ jobs:
       # Cleanup build cache in case dependencies have changed
       - name: Cleanup
         run: esy cleanup .
+
   e2e:
     needs: build
     name: BuckleScript tests
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-18.04, macos-latest]
+        os: [ubuntu-latest, macos-latest]
 
     steps:
       - uses: actions/checkout@v1
@@ -136,7 +216,9 @@ jobs:
         run: yarn test
 
   publish:
-    needs: build
+    needs:
+      - build
+      - build_linux
     name: Publish
     runs-on: ubuntu-latest
 
@@ -158,7 +240,7 @@ jobs:
       - name: Download linux artifacts
         uses: actions/download-artifact@master
         with:
-          name: ubuntu-18.04
+          name: ubuntu-latest
           path: _release/platform-linux-x64
 
       - name: Download macOS artifacts
