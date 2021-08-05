@@ -266,7 +266,7 @@ jobs:
         with:
           message: |
             New **nightly** version has been published to the NPM registry: [@davesnx/styled-ppx@${{ steps.sha.outputs.nightly-version }}](https://www.npmjs.com/package/@davesnx/styled-ppx/v/${{ steps.sha.outputs.nightly-version }}).
-            Install it with `npm install @davesnx/styled@nightly` or `yarn add @davesnx/styled@nightly`.
+            Install it with `npm install @davesnx/styled-ppx@nightly` or `npm install @davesnx/styled-ppx@${{ steps.sha.outputs.nightly-version }}`.
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           repo-token-user-login: 'github-actions[bot]' # The user.login for temporary GitHub tokens
           allow-repeats: false
