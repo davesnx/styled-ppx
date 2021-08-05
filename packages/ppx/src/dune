@@ -1,10 +1,9 @@
 (library
  (name main)
- (wrapped false)
  (public_name styled-ppx.lib)
  (kind ppx_rewriter)
  (libraries
-  styled_ppx_css_parser
+  styled-ppx-css-parser
   reason-css-parser.lib
   ppxlib
  )

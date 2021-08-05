@@ -10,7 +10,7 @@
 (executable
  (name Runner)
  (modules Runner)
- (libraries StyledPpxTestNativeLib styled_ppx_css_parser)
+ (libraries StyledPpxTestNativeLib styled-ppx-css-parser)
  (preprocess
   (pps ppxlib.metaquot styled-ppx.lib)
  )

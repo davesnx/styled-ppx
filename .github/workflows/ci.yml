@@ -1,4 +1,4 @@
-name: CI
+name: Ppx CI
 
 on:
   push:
@@ -14,8 +14,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
-
+        os: [macos-latest, ubuntu-18.04]
+        # os: [macos-latest, windows-latest, ubuntu-18.04]
     steps:
       - uses: actions/checkout@v2
 
@@ -31,7 +31,7 @@ jobs:
           key: source-${{ matrix.os }}-${{ hashFiles('**/index.json') }}
 
       - name: Install esy
-        run: npm install -g esy@0.6.10
+        run: npm install -g esy@0.6.11
 
       - name: Install dependencies
         run: esy install
@@ -74,7 +74,7 @@ jobs:
         run: esy export-dependencies
 
       - name: Release static
-        run: esy b dune build --root . --ignore-promoted-rules --no-config --profile release-static
+        run: esy release-static
 
       - name: Upload artifacts for ${{ matrix.os }}
         uses: actions/upload-artifact@master
@@ -85,13 +85,14 @@ jobs:
       # Cleanup build cache in case dependencies have changed
       - name: Cleanup
         run: esy cleanup .
+
   e2e:
-    needs: build
     name: BuckleScript tests
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-18.04, macos-latest]
+    needs: build
 
     steps:
       - uses: actions/checkout@v1
@@ -136,9 +137,9 @@ jobs:
         run: yarn test
 
   publish:
-    needs: build
     name: Publish
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
+    needs: build
 
     steps:
       - uses: actions/checkout@v1
@@ -158,7 +159,7 @@ jobs:
       - name: Download linux artifacts
         uses: actions/download-artifact@master
         with:
-          name: ubuntu-latest
+          name: ubuntu-18.04
           path: _release/platform-linux-x64
 
       - name: Download macOS artifacts
@@ -234,6 +235,7 @@ jobs:
 
       - name: Release nightly NPM package
         if: ${{ success() && github.event_name == 'pull_request' && github.event.pull_request.user.login == 'davesnx' }}
+        id: nightly
         working-directory: ./_release
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
@@ -242,6 +244,7 @@ jobs:
           npm config set scope "@davesnx"
           npm version prerelease --preid ${{ steps.sha.outputs.sha_short }} -no-git-tag-version
           npm publish --access public --tag nightly
+          echo "::set-output name=version::$(npm view @davesnx/styled-ppx@nightly version)"
 
       - name: Release NPM package
         if: ${{ success() && github.event_name != 'pull_request' }}
@@ -260,40 +263,11 @@ jobs:
               echo "New verison and remote version are equal, nothing to publish"
           fi
 
-  vscode:
-    name: VSCode extension
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-
-    steps:
-      - uses: actions/checkout@v1
-
-      - name: Use Node.js 12.x
-        uses: actions/setup-node@v1
+      - uses: mshick/add-pr-comment@v1
         with:
-          node-version: 12.x
-
-      - name: Get cache directory path
-        id: yarn-cache-dir-path
-        working-directory: ./packages/editors/vscode
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-
-      - name: Load global cache
-        uses: actions/cache@v1
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: yarn-${{ matrix.os }}-${{ hashFiles('./packages/editors/vscode/yarn.lock') }}
-          restore-keys: yarn-${{ matrix.os }}-
-
-      - name: Install
-        working-directory: ./packages/editors/vscode
-        run: yarn install
-
-      - name: Test
-        uses: GabrielBB/xvfb-action@v1
-        with:
-          working-directory: ./packages/editors/vscode
-          run: npm test
+          message: |
+            New **nightly** version has been published to the NPM registry: [@davesnx/styled-ppx@${{ steps.nightly.outputs.version }}](https://www.npmjs.com/package/@davesnx/styled-ppx/v/${{ steps.nightly.outputs.version }}).
+            Install it with `npm install @davesnx/styled-ppx@nightly` or `npm install @davesnx/styled-ppx@${{ steps.nightly.outputs.version }}`.
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token-user-login: 'github-actions[bot]' # The user.login for temporary GitHub tokens
+          allow-repeats: false

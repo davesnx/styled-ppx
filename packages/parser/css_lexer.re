@@ -45,7 +45,6 @@ let token_to_string =
   | Parser.LEFT_BRACE => "{"
   | Parser.RIGHT_BRACE => "}"
   | Parser.LEFT_PAREN => "("
-  | Parser.DOT => "."
   | Parser.RIGHT_PAREN => ")"
   | Parser.LEFT_BRACKET => "["
   | Parser.RIGHT_BRACKET => "]"

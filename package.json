@@ -23,7 +23,8 @@
   },
   "esy": {
     "buildsInSource": "_build",
-    "build": "dune build",
+    "build": [["dune", "build", "--root", "."]],
+    "buildDev": "refmterr dune build --promote-install-files --root .",
     "buildEnv": {
       "ODOC_SYNTAX": "re"
     },
@@ -34,15 +35,16 @@
     }
   },
   "devDependencies": {
-    "ocaml": "~4.10.0",
-    "@esy-ocaml/reason": "^3.6.2",
-    "@opam/dune": ">=2.8.4",
+    "@opam/reason": "3.7.0",
+    "@opam/dune": "2.8.5",
     "@opam/ppx_deriving": "5.2.1",
     "@opam/menhir": "20201216",
     "@opam/ppxlib": "0.22.0",
     "@opam/sedlex": "2.3",
-    "@reason-native/rely": "^3.2.1",
-    "@opam/ocaml-lsp-server": "1.4.1"
+    "@opam/ocaml-lsp-server": "*",
+    "@reason-native/rely": "jfrolich/reason-native:rely.json#08085a4048974b06aaf3aab918b677b39dea3d18",
+    "ocaml": "4.12.0",
+    "refmterr": "jfrolich/reason-native:refmterr.json#08085a4048974b06aaf3aab918b677b39dea3d18"
   },
   "scripts": {
     "test": "esy dune runtest --force",
@@ -50,6 +52,7 @@
     "test_css_support": "esy dune build @css_support_test",
     "test_snapshot": "esy dune build @snapshot_test",
     "test_bs": "cd packages/ppx/test/bucklescript; yarn test",
-    "watch": "esy dune build --root . --watch"
+    "watch": "esy refmterr dune build --promote-install-files --root . --watch",
+    "release-static": "esy b dune build --root . --ignore-promoted-rules --no-config --profile release-static --only-packages styled-ppx,reason-css-parser,reason-css-lexer,css-spec-parser,styled-ppx-css-parser"
   }
 }

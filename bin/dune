@@ -2,5 +2,6 @@
   (name ppx)
   (public_name styled-ppx)
   (libraries styled-ppx.lib ppxlib)
+  (link_flags -linkall)
   (package styled-ppx)
 )

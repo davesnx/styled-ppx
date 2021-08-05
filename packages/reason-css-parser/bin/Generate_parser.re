@@ -1,4 +1,4 @@
-let to_property = name => "property_" ++ name;
+/* let to_property = name => "property_" ++ name;
 
 module Json = {
   module Yojson = Yojson.Safe;
@@ -180,3 +180,4 @@ let properties =
 emit_code(~values, ~properties)
 |> Pprintast.string_of_structure
 |> print_endline;
+ */
