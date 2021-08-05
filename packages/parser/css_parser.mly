@@ -12,7 +12,6 @@ open Css_types
 %token LEFT_BRACKET
 %token RIGHT_BRACKET
 %token COLON
-%token DOT "."
 %token SEMI_COLON
 %token PERCENTAGE
 %token IMPORTANT
