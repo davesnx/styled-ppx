@@ -1,1 +1,1 @@
-[%css_"word-spacing: 5px"]
+[%css "word-spacing: 5px"]

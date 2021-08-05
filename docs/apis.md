@@ -18,7 +18,7 @@ module Box = [%styled {|
 ### css
 **React component with a className by css**
 ```reason
-<span className=[%css_"display: flex"] />
+<span className=[%css "display: flex"] />
 ```
 
 ### styled.section/span/a/...

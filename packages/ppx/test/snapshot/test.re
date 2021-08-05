@@ -27,8 +27,8 @@ module MultiLineStrings = [%styled.section {|
 module SelfClosingElement = [%styled.input ""];
 
 module ArrayStatic = [%styled.section [|
-  [%css_ "display: flex;"],
-  [%css_ "justify-content: center;"]
+  [%css "display: flex;"],
+  [%css "justify-content: center;"]
 |]];
 
 module Theme = {
@@ -53,8 +53,8 @@ let className = [%cx "display: block;"];
 let classNameWithMultiLine = [%cx {| display: block; |}];
 
 let classNameWithArray = [%cx [| cssProperty |]];
-let cssRule = [%css_ "color: blue;"];
-let classNameWithCss = [%cx [| cssRule, [%css_ "background-color: green;"] |]];
+let cssRule = [%css "color: blue;"];
+let classNameWithCss = [%cx [| cssRule, [%css "background-color: green;"] |]];
 
 module DynamicComponent = [%styled.div
   (~var) => {j|
@@ -83,8 +83,8 @@ let keyframe = [%styled.keyframe {|
 
 module ArrayDynamicComponent = [%styled.div (~var) =>
   [|
-    [%css_ "color: $(var);"],
-    [%css_ "display: block;"]
+    [%css "color: $(var);"],
+    [%css "display: block;"]
   |]
 ];
 
@@ -93,23 +93,23 @@ module SequenceDynamicComponent = [%styled.div
     Js.log("Logging when render");
 
   [|
-    [%css_ "color: $(var);"],
-    [%css_ "display: block;"]
+    [%css "color: $(var);"],
+    [%css "display: block;"]
   |]
   }
 ];
 
 module DynamicComponentWithDefaultValue = [%styled.div (~var="green") => [|
-  [%css_ "color: $(var);"],
-  [%css_ "display: block;"]
+  [%css "color: $(var);"],
+  [%css "display: block;"]
 |]];
 
 /* This test ensures that the warning is being triggered */
 /* module T = [%styled.span () => [|
-  [%css_ "font-size: 16px"]
+  [%css "font-size: 16px"]
 |]];
 */
 
 /* let interpolationValue = "23";
-[%css_ "font-size: $(interpolationValue)"];
+[%css "font-size: $(interpolationValue)"];
  */
