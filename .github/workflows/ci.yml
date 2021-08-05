@@ -14,7 +14,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest]
+        os: [macos-latest, ubuntu-18.04]
         # os: [macos-latest, windows-latest, ubuntu-latest]
     steps:
       - uses: actions/checkout@v2
@@ -159,7 +159,7 @@ jobs:
       - name: Download linux artifacts
         uses: actions/download-artifact@master
         with:
-          name: ubuntu-latest
+          name: ubuntu-18.04
           path: _release/platform-linux-x64
 
       - name: Download macOS artifacts
