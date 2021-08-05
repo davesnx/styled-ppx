@@ -5,17 +5,17 @@ open ReactTestingLibrary;
 EmotionSerializer.load();
 
 module ArrayStatic = [%styled.section [|
-  [%css "display: flex;"],
-  [%css "justify-content: center;"]
+  [%css_ "display: flex;"],
+  [%css_ "justify-content: center;"]
 |]];
 
 module ArrayDynamicComponent = [%styled.div (~var) =>
   [|
     switch (var) {
-      | `Black => [%css "color: #999999"]
-      | `White => [%css "color: #FAFAFA"]
+      | `Black => [%css_ "color: #999999"]
+      | `White => [%css_ "color: #FAFAFA"]
     },
-    [%css "display: block;"]
+    [%css_ "display: block;"]
   |]
 ];
 
@@ -25,10 +25,10 @@ module SequenceDynamicComponent = [%styled.div
 
     [|
       switch (var) {
-        | `Black => [%css "color: #999999"]
-        | `White => [%css "color: #FAFAFA"]
+        | `Black => [%css_ "color: #999999"]
+        | `White => [%css_ "color: #FAFAFA"]
       },
-      [%css "display: block;"]
+      [%css_ "display: block;"]
     |]
   }
 ];
