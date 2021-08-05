@@ -1,6 +1,6 @@
 {
-  "name": "swr-site",
-  "version": "1.0.0",
+  "name": "styled-ppx-website",
+  "version": "0.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "start": "next",
     "build": "next build"
   },
-  "author": "Shu Ding",
+  "author": "David Sancho",
   "license": "MIT",
   "dependencies": {
     "@reach/skip-nav": "^0.10.5",
