@@ -74,7 +74,7 @@ jobs:
         run: esy export-dependencies
 
       - name: Release static
-        run: esy build
+        run: esy release-static
 
       - name: Upload artifacts for ${{ matrix.os }}
         uses: actions/upload-artifact@master
