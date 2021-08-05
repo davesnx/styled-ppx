@@ -2,6 +2,6 @@
   (name ppx)
   (public_name styled-ppx)
   (libraries styled-ppx.lib ppxlib)
-  ; (flags (:standard -ccopt -static -ccopt -Wl,--no-export-dynamic))
+  (link_flags -linkall)
   (package styled-ppx)
 )
