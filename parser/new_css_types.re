@@ -42,7 +42,7 @@ and block_value =
   | Rule(rule)
 and rule_kind =
   | Style
-  | At(string)
+  | At(loc(string))
 and declaration = {
   name: loc(string),
   value: loc(value),

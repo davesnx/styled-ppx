@@ -30,7 +30,9 @@ open Styled_ppx_parser;
 open Css_types;
 open Component_value;
 open Ppxlib.Ast_builder.Default;
+open New_css_types;
 
+let with_loc = (txt, ~loc) => {txt, loc};
 module Emotion = {
   let lident = name => Ldot(Lident("Css"), name);
 };
@@ -45,6 +47,12 @@ let number_to_const = number =>
     Const.integer(number);
   };
 
+let float_to_const = number =>
+  if (Float.is_integer(number)) {
+    Const.float(string_of_float(number));
+  } else {
+    Const.integer(string_of_int(Float.to_int(number)));
+  };
 let string_to_const = (~loc, s) =>
   Exp.constant(~loc, Const.string(~quotation_delimiter="js", s));
 
@@ -75,135 +83,158 @@ let source_code_of_loc = loc => {
   let loc_end = loc_end.Lexing.pos_cnum - pos_offset;
   Sedlexing.Latin1.sub_lexeme(buf, loc_start - 1, loc_end - loc_start);
 };
-let rec render_at_rule = (ar: At_rule.t): expression =>
-  switch (ar.At_rule.name) {
-  | ("keyframes" as n, loc) =>
+let rec render_at_rule = (name: loc(string), rule: loc(rule)): expression =>
+  switch (name.txt) {
+  | "keyframes" as n =>
+    let {txt: rule, loc} = rule;
+    let rules =
+      rule.block.txt
+      |> List.map(
+           fun
+           | {txt: Rule(rule), loc} => with_loc(~loc, rule)
+           | {txt: Declaration(_), loc} =>
+             grammar_error(loc, "Unexpected declaration in @keyframes body"),
+         );
     let ident = Exp.ident(~loc, {txt: Lident(n), loc});
-    switch (ar.At_rule.block) {
-    | Brace_block.Stylesheet((rs, loc)) =>
-      let end_loc =
-        Lex_buffer.make_loc(
-          ~loc_ghost=true,
-          loc.Location.loc_end,
-          loc.Location.loc_end,
-        );
-      let arg =
-        List.fold_left(
-          (e, r) =>
-            switch (r) {
-            | Rule.Style_rule(sr) =>
-              let progress_expr =
-                switch (sr.Style_rule.prelude) {
-                | ([(Percentage(p), loc)], _) =>
-                  Exp.constant(~loc, number_to_const(p))
-                | ([(Ident("from"), loc)], _)
-                | ([(Number("0"), loc)], _) =>
-                  Exp.constant(~loc, Const.int(0))
-                | ([(Ident("to"), loc)], _) =>
-                  Exp.constant(~loc, Const.int(100))
-                | (_, loc) =>
-                  grammar_error(loc, "Unexpected @keyframes prelude")
-                };
-              let block_expr = render_declaration_list(sr.Style_rule.block);
-              let tuple =
-                Exp.tuple(
-                  ~loc=sr.Style_rule.loc,
-                  [progress_expr, block_expr],
-                );
-              let loc =
-                Lex_buffer.make_loc(
-                  ~loc_ghost=true,
-                  sr.Style_rule.loc.Location.loc_start,
-                  loc.Location.loc_end,
-                );
-              Exp.construct(
-                ~loc,
-                {txt: Lident("::"), loc},
-                Some(Exp.tuple(~loc, [tuple, e])),
-              );
-            | Rule.At_rule(ar) =>
-              grammar_error(
-                ar.At_rule.loc,
-                "Unexpected at-rule in @keyframes body",
-              )
-            },
-          Exp.construct(
-            ~loc=end_loc,
-            {txt: Lident("[]"), loc: end_loc},
-            None,
-          ),
-          List.rev(rs),
-        );
-      Exp.apply(~loc=ar.At_rule.loc, ident, [(Nolabel, arg)]);
-    | _ => assert(false)
-    };
-  | ("media", _) => render_media_query(ar)
-  | (n, _) =>
-    grammar_error(ar.At_rule.loc, "At-rule @" ++ n ++ " not supported")
+    let end_loc =
+      Lex_buffer.make_loc(
+        ~loc_ghost=true,
+        loc.Location.loc_end,
+        loc.Location.loc_end,
+      );
+    let arg =
+      List.fold_left(
+        (e, {txt: r, loc}) =>
+          switch (r.kind) {
+          | Style =>
+            let progress_expr =
+              switch (r.prelude.txt) {
+              | [{txt: PERCENTAGE(p), loc}] =>
+                Exp.constant(~loc, float_to_const(p))
+              | [{txt: IDENT("from"), loc}]
+              | [{txt: NUMBER(0.0), loc}] =>
+                Exp.constant(~loc, Const.int(0))
+              | [{txt: IDENT("to"), loc}] =>
+                Exp.constant(~loc, Const.int(100))
+              | _ =>
+                grammar_error(r.prelude.loc, "Unexpected @keyframes prelude")
+              };
+            let block_expr = render_block(r.block);
+            let tuple = Exp.tuple(~loc, [progress_expr, block_expr]);
+            Exp.construct(
+              ~loc,
+              {txt: Lident("::"), loc},
+              Some(Exp.tuple(~loc, [tuple, e])),
+            );
+          | At(_) =>
+            grammar_error(loc, "Unexpected at-rule in @keyframes body")
+          },
+        Exp.construct(
+          ~loc=end_loc,
+          {txt: Lident("[]"), loc: end_loc},
+          None,
+        ),
+        List.rev(rules),
+      );
+    Exp.apply(~loc, ident, [(Nolabel, arg)]);
+  | "media" => render_media_query(name, rule)
+  | n => grammar_error(name.loc, "At-rule @" ++ n ++ " not supported")
   }
-and render_media_query = (ar: At_rule.t): expression => {
+and render_media_query = (name: loc(string), rule: loc(rule)): expression => {
   let invalid_format = loc =>
     grammar_error(loc, "@media value isn't a valid format");
 
-  let loc = ar.At_rule.loc;
-  let (_, name_loc) = ar.At_rule.name;
-  let (prelude, prelude_loc) = ar.At_rule.prelude;
-  let parse_condition =
-    fun
-    | (
-        Paren_block([
-          (Ident(ident), ident_loc),
-          (Delim(":"), _),
-          (_, first_value_loc),
-          ...values,
-        ]),
-        complete_loc,
-      ) => {
-        let values = values |> List.map(((_, loc)) => loc);
-        let values_length = List.length(values);
-        let last_value_loc =
-          values_length == 0
-            ? first_value_loc : List.nth(values, values_length - 1);
-        let loc = {
-          ...first_value_loc,
-          loc_end: last_value_loc.Location.loc_end,
+  let {txt: rule, loc} = rule;
+  let {txt: _, loc: name_loc} = name;
+  let rec match_parens = (acc, {txt: prelude, loc}) =>
+    // TODO: please kill this block
+    switch (acc, prelude) {
+    | ([], [])
+    | ([`Block(_), ..._], []) => invalid_format(loc)
+    // this prevents non finished blocks
+    | ([`Block(_), ..._], [{txt: LEFT_PARENS, loc}, ..._]) =>
+      invalid_format(loc)
+    | (acc, []) => acc
+    | (acc, [{txt: WHITESPACE, _}, ...prelude]) =>
+      match_parens(acc, with_loc(~loc, prelude))
+    | (acc, [{txt: LEFT_PARENS, _}, ...prelude]) =>
+      match_parens([`Block([]), ...acc], with_loc(~loc, prelude))
+    | (acc, [{txt: RIGHT_PARENS, _}, ...prelude]) =>
+      match_parens([`Tokens([]), ...acc], with_loc(~loc, prelude))
+    | ([`Tokens(body), ...acc], [token, ...prelude]) =>
+      match_parens(
+        [`Tokens([token, ...body]), ...acc],
+        with_loc(~loc, prelude),
+      )
+    | ([`Block(body), ...acc], [token, ...prelude]) =>
+      match_parens(
+        [`Block([token, ...body]), ...acc],
+        with_loc(~loc, prelude),
+      )
+    | (_, [{loc, _}, ..._]) => invalid_format(loc)
+    };
+
+  let parse_condition = prelude =>
+    switch (prelude) {
+    | `Block([
+        {txt: IDENT(ident), loc: ident_loc},
+        {txt: DELIM(":"), _},
+        {loc: first_value_loc, _},
+        ...values,
+      ]) =>
+      let values = values |> List.map(({loc, _}) => loc);
+      let values_length = List.length(values);
+      let last_value_loc =
+        values_length == 0
+          ? first_value_loc : List.nth(values, values_length - 1);
+      let loc = {
+        ...first_value_loc,
+        loc_end: last_value_loc.Location.loc_end,
+      };
+      let value = source_code_of_loc(loc);
+      let () =
+        switch (Declarations_to_emotion.parse_declarations((ident, value))) {
+        | Error(`Not_found) =>
+          grammar_error(ident_loc, "unsupported property: " ++ ident)
+        | Error(`Invalid_value(_error)) =>
+          grammar_error(loc, "invalid value")
+        | Ok(_) => ()
         };
-        let value = source_code_of_loc(loc);
-        let () =
-          switch (Declarations_to_emotion.parse_declarations((ident, value))) {
-          | Error(`Not_found) =>
-            grammar_error(ident_loc, "unsupported property: " ++ ident)
-          | Error(`Invalid_value(_error)) =>
-            grammar_error(loc, "invalid value")
-          | Ok(_) => ()
-          };
-        source_code_of_loc(complete_loc);
-      }
-    | (Ident("and"), _) => "and"
-    | (Ident("or"), _) => "or"
-    | (_, loc) => invalid_format(loc);
-  let query = prelude |> List.map(parse_condition) |> String.concat(" ");
-  if (query == "") {
-    invalid_format(prelude_loc);
-  };
+      source_code_of_loc(loc);
+    | `Tokens([{txt: IDENT("and"), _}]) => "and"
+    | `Tokens([{txt: IDENT("or"), _}]) => "or"
+    | _ => invalid_format(loc)
+    };
+  let query =
+    match_parens([], rule.prelude)
+    |> List.map(parse_condition)
+    |> String.concat(" ");
 
   let rules =
-    switch (ar.At_rule.block) {
-    | Brace_block.Empty => invalid_format(loc)
-    | Declaration_list(declaration) => render_declaration_list(declaration)
-    | Stylesheet(_) => invalid_format(loc)
+    switch (rule.block) {
+    | {txt: [], _} => invalid_format(rule.block.loc)
+    | {txt: block, loc} =>
+      let declarations =
+        block
+        |> List.map(
+             fun
+             | {txt: Declaration(declaration), loc} =>
+               with_loc(~loc, declaration)
+             | {txt: Rule(_), loc} => invalid_format(loc),
+           );
+      render_declaration_list(with_loc(~loc, declarations));
     };
 
   let media_ident =
     Emotion.lident("media")
     |> Located.mk(~loc=name_loc)
     |> pexp_ident(~loc=name_loc);
-  eapply(~loc, media_ident, [estring(~loc=prelude_loc, query), rules]);
+  eapply(~loc, media_ident, [estring(~loc=rule.prelude.loc, query), rules]);
 }
 and render_declaration =
-    (d: Declaration.t, _d_loc: Location.t): list(expression) => {
-  let (name, name_loc) = d.Declaration.name;
-  let (_valueList, loc) = d.Declaration.value;
+    ({txt: d, loc: _}: loc(declaration)): list(expression) => {
+  let {txt: name, loc: name_loc} = d.name;
+  let {txt: _valueList, loc} = d.value;
 
   let value_source = source_code_of_loc(loc);
 
@@ -214,29 +245,24 @@ and render_declaration =
     grammar_error(loc, "invalid property value")
   };
 }
-and render_declarations =
-    (ds: list(Declaration_list.kind)): list(expression) =>
-  List.concat_map(
-    declaration =>
-      switch (declaration) {
-      | Declaration_list.Declaration(decl) =>
-        render_declaration(decl, decl.loc)
-      | Declaration_list.At_rule(ar) => [render_at_rule(ar)]
-      | Declaration_list.Style_rule(ar) =>
-        let loc: Location.t = ar.loc;
-        let ident = Exp.ident(~loc, {txt: Emotion.lident("selector"), loc});
-        [render_style_rule(ident, ar)];
-      },
-    ds,
-  )
-  |> List.rev
-and render_declaration_list = ((list, loc): Declaration_list.t): expression => {
-  let expr_with_loc_list = render_declarations(list);
-  list_to_expr(loc, expr_with_loc_list);
-}
-and render_style_rule = (ident, sr: Style_rule.t): expression => {
-  let (prelude, prelude_loc) = sr.Style_rule.prelude;
-  let dl_expr = render_declaration_list(sr.Style_rule.block);
+and render_declaration_list =
+    ({txt: list, loc}: loc(list(loc(declaration)))) =>
+  list |> List.concat_map(render_declaration) |> list_to_expr(loc)
+and render_block_value = ({txt: block_value, loc}) =>
+  switch (block_value) {
+  | Declaration(decl) => render_declaration(with_loc(~loc, decl))
+  | Rule({kind: At(name), _} as rule) => [
+      render_at_rule(name, with_loc(~loc, rule)),
+    ]
+  | Rule(rule) =>
+    let ident = Exp.ident(~loc, {txt: Emotion.lident("selector"), loc});
+    [render_style_rule(ident, with_loc(~loc, rule))];
+  }
+and render_block = ({txt: block, loc}: loc(block)): expression =>
+  List.concat_map(render_block_value, block) |> List.rev |> list_to_expr(loc)
+and render_style_rule = (ident, {txt: sr, loc}: loc(rule)): expression => {
+  let {txt: prelude, loc: prelude_loc} = sr.prelude;
+  let dl_expr = render_block(sr.block);
   let rec render_prelude_value = (s, (value, value_loc)) => {
     switch (value) {
     | Delim(":") => ":" ++ s
@@ -345,12 +371,11 @@ let render_emotion_css = ((list, loc): Declaration_list.t): expression => {
   render_emotion_style(declarationListValues);
 };
 
-let render_rule = (ident, r: Rule.t): expression => {
-  switch (r) {
-  | Rule.Style_rule(sr) => render_style_rule(ident, sr)
-  | Rule.At_rule(ar) => render_at_rule(ar)
+let render_rule = (ident, rule: loc(rule)): expression =>
+  switch (rule.txt.kind) {
+  | Style => render_style_rule(ident, rule)
+  | At(name) => render_at_rule(name, rule)
   };
-};
 
 let render_emotion_keyframe = ((ruleList, loc)): expression => {
   let invalidSelectorErrorMessage = {|
@@ -399,14 +424,15 @@ let render_emotion_keyframe = ((ruleList, loc)): expression => {
     pexp_ident(~loc, {txt: Emotion.lident("keyframes"), loc});
   eapply(~loc, emotionKeyframes, [keyframes]);
 };
-let render_global = ((ruleList, loc): Stylesheet.t): expression => {
+let render_global =
+    ({txt: ruleList, loc}: loc(list(loc(rule)))): expression => {
   let emotionGlobal = Exp.ident(~loc, {txt: Emotion.lident("global"), loc});
 
   switch (ruleList) {
   /* There's only one rule: */
   | [rule] => render_rule(emotionGlobal, rule)
   /* There's more than one */
-  | _res =>
+  | _ =>
     grammar_error(
       loc,
       {|

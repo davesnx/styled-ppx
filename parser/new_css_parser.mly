@@ -33,7 +33,7 @@ open! Helpers
 %start <New_css_types.rule option> parse_rule
 %start <New_css_types.declaration option> parse_declaration
 %start <New_css_types.block option> parse_block
-%start <New_css_types.rule list> parse_stylesheet
+%start <New_css_types.rule Location.loc list Location.loc> parse_stylesheet
 
 %%
 
@@ -95,7 +95,7 @@ let rule :=
 (* https://drafts.csswg.org/css-syntax-3/#consume-a-list-of-rules *)
 (* TODO: top level *)
 let list_of_rules ==
-  | ws; rs = separated_list(ws, qualified_rule); EOF; { rs }
+  | ws; rs = separated_list(ws, with_loc(qualified_rule)); EOF; { loc ($startpos, $endpos) rs }
 
 let parse(x) ==
   | x = x; EOF; { Some(x) }
