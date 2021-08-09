@@ -11537,6 +11537,8 @@ module Hr = {
       CssJs.label("Hr"),
       CssJs.unsafe("border-top", {j|1px solid $(Color.Border.lineAlpha)|j}),
       CssJs.unsafe("margin", {j|0px $(NewSize.px16)|j}),
+      CssJs.unsafe("padding", {j|$(NewSize.px16) 0px|j}),
+      CssJs.unsafe("color", {j|$(var)|j}),
     |]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
