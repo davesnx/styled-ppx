@@ -11532,10 +11532,10 @@ module Hr = {
   let styles =
     CssJs.style(. [|
       CssJs.label("Hr"),
-      CssJs.unsafe("border-top", "1px solid " ++ Color.Border.alpha),
-      CssJs.unsafe("margin", Size.big ++ " " ++ Size.small),
-      CssJs.unsafe("padding", Size.small ++ " 0px"),
-      CssJs.unsafe("color", mono100),
+      CssJs.unsafe("border-top", "1px solid " ++ Color.Border.lineAlpha),
+      CssJs.unsafe("margin", NewSize.px16 ++ " " ++ NewSize.px16),
+      CssJs.unsafe("padding", NewSize.px16 ++ " 0px"),
+      CssJs.unsafe("color", var),
     |]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
