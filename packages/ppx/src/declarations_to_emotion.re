@@ -33,7 +33,6 @@ let emit = (parser, value_of_ast, value_to_expr) => {
 };
 
 let render_string = string => Helper.Const.string(string) |> Helper.Exp.constant;
-let render_j_string = string => Helper.Const.string(~quotation_delimiter="j", string) |> Helper.Exp.constant;
 let render_integer = integer => Helper.Const.int(integer) |> Helper.Exp.constant;
 let render_number = number =>
   Helper.Const.float(number |> string_of_float) |> Helper.Exp.constant;
@@ -163,18 +162,63 @@ let transform_with_variable = (parser, map, value_to_expr) =>
     value_to_expr,
   );
 
-let contains_a_variable = (value) => {
+let parse_variables = (value) => {
   /* Dummy regex trying to work it similarly with css_lexer's regex. In the future both parsers would share the same lexer, for now this is the only case we need to regex against a value. */
-  let has_interpolation = Str.string_match(Str.regexp("^.*\\$(.*).*"), value, 0);
-  has_interpolation ? Ok(value) : Error();
+  open Str;
+  let containsVariable = string_match(regexp("^.*(\\$.*).*"), value, 0);
+  let removeDollar = global_replace(regexp("\\$"), "");
+  let removeParentesis = v =>
+    v |> global_replace(regexp(")"), "") |> global_replace(regexp("("), "");
+  let valueWithoutDollar = value |> removeDollar;
+  let separatedValues = bounded_full_split(regexp("[()]"), valueWithoutDollar, 0)
+   |> List.map(fun
+      | Delim(v) => `Interpolation(v |> removeParentesis)
+      | Text(v) => `String(v)
+    );
+
+  containsVariable ? Ok(separatedValues) : Error();
 };
 
-let render_shorthand_properties_with_variable = (name: string, value: string) => {
-  let.ok _ = contains_a_variable(value);
-  let exprValue = render_j_string(value);
+let renderInterpolationAsString = expressions => {
+  let rec render_interpolated = exprs => {
+    let concat = Helper.Exp.ident(~loc, Create.withLoc(Lident("^"), ~loc));
+    let nextExpr = List.hd(exprs);
+    let restExpr = List.tl(exprs);
+    Helper.Exp.apply(concat, [(Nolabel, nextExpr), (Nolabel, render_interpolated(restExpr))]);
+  };
 
-  /* bs-css doesn't have those */
-  Ok([[%expr CssJs.unsafe([%e render_string(name)], [%e exprValue])]]);
+  render_interpolated(expressions);
+};
+
+let renderVariables = values => {
+  values
+    |> List.map(
+      fun
+        | `String(v) => render_string(v)
+        | `Interpolation(v) => {
+          let longident = v |> Longident.parse;
+          Helper.Exp.ident(Create.withLoc(~loc, longident))
+        }
+      );
+};
+
+let hasVariableValues = (values) => {
+  values
+    |> List.exists(
+      fun
+        | `String(_v) => false
+        | `Interpolation(_v) => true
+      );
+}
+
+let render_shorthand_properties_with_variable = (property: string, value: string) => {
+  let.ok variableValues = parse_variables(value);
+
+  let exprValue = hasVariableValues(variableValues)
+    ? variableValues |> renderVariables |> List.hd
+    : variableValues |> renderVariables |> renderInterpolationAsString;
+
+  Ok([[%expr CssJs.unsafe([%e render_string(property)], [%e exprValue])]]);
 };
 
 let apply = (parser, id, map) =>
@@ -1496,10 +1540,10 @@ let properties = [
   ("grid-area", found(grid_area)),
 ];
 
-let render_when_unsupported_features = (name, value) => {
-  let to_camel_case = name =>
+let render_when_unsupported_features = (property, value) => {
+  let to_camel_case = txt =>
     (
-      switch (String.split_on_char('-', name)) {
+      switch (String.split_on_char('-', txt)) {
       | [first, ...remaining] => [
           first,
           ...List.map(String.capitalize_ascii, remaining),
@@ -1510,19 +1554,19 @@ let render_when_unsupported_features = (name, value) => {
     |> String.concat("");
 
   /* Transform property name to camelCase since we bind emotion to the Object API */
-  let name = name |> to_camel_case |> render_string;
+  let propertyName = property |> to_camel_case |> render_string;
   let value = value |> render_string;
 
-  [%expr CssJs.unsafe([%e name], [%e value])];
+  [%expr CssJs.unsafe([%e propertyName], [%e value])];
 };
 
 let findProperty = (name) => {
   properties |> List.find_opt(((key, _)) => key == name)
 };
 
-let render_to_expr = (name, value) => {
+let render_to_expr = (property, value) => {
   let.ok string_to_expr =
-    switch (findProperty(name)) {
+    switch (findProperty(property)) {
     | Some((_, (_, string_to_expr))) => Ok(string_to_expr)
     | None => Error(`Not_found)
     };
@@ -1530,23 +1574,23 @@ let render_to_expr = (name, value) => {
   string_to_expr(value) |> Result.map_error(str => `Invalid_value(str));
 };
 
-let parse_declarations = ((name: string, value: string)) => {
+let parse_declarations = ((property: string, value: string)) => {
   let.ok is_valid_string =
-    Parser.check_property(~name, value)
+    Parser.check_property(~name=property, value)
     |> Result.map_error((`Unknown_value) => `Not_found);
 
-  switch (render_css_global_values(name, value)) {
+  switch (render_css_global_values(property, value)) {
   | Ok(value) => Ok(value)
   | Error(_) =>
-    switch (render_shorthand_properties_with_variable(name, value)) {
+    switch (render_shorthand_properties_with_variable(property, value)) {
     | Ok(value) => Ok(value)
     | Error(_) =>
-      switch (render_to_expr(name, value)) {
+      switch (render_to_expr(property, value)) {
       | Ok(value) => Ok(value)
       | Error(_)
       | exception Unsupported_feature =>
         let.ok () = is_valid_string ? Ok() : Error(`Invalid_value(value));
-        Ok([render_when_unsupported_features(name, value)]);
+        Ok([render_when_unsupported_features(property, value)]);
       }
     }
   };
