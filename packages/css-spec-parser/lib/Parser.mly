@@ -27,6 +27,7 @@ open Ast
 let value_of_lex :=
   | EOF; { None }
   | v = value; EOF; { Some v }
+
 let multiplier_of_lex :=
   | EOF; { None }
   | m = multiplier; EOF; { Some m }

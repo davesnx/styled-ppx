@@ -8,6 +8,7 @@ let provider = (buf, ()) => {
 
 let multiplier_of_lex =
   MenhirLib.Convert.Simplified.traditional2revised(Parser.multiplier_of_lex);
+
 let rec multiplier_to_string =
   fun
   | One => ""
@@ -28,6 +29,7 @@ let _multiplier_of_string = string =>
 
 let value_of_lex =
   MenhirLib.Convert.Simplified.traditional2revised(Parser.value_of_lex);
+
 let rec value_to_string = value => {
   let child_needs_brackets = (parent, child) => {
     let precedence =

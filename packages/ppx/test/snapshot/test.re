@@ -113,3 +113,8 @@ module DynamicComponentWithDefaultValue = [%styled.div (~var="green") => [|
 /* let interpolationValue = "23";
 [%css "font-size: $(interpolationValue)"];
  */
+
+module Hr = [%styled.hr "
+  border-top: 1px solid $(Color.Border.lineAlpha);
+  margin: 0px $(NewSize.px16);
+"];

@@ -33,6 +33,7 @@ let emit = (parser, value_of_ast, value_to_expr) => {
 };
 
 let render_string = string => Helper.Const.string(string) |> Helper.Exp.constant;
+let render_j_string = string => Helper.Const.string(~quotation_delimiter="j", string) |> Helper.Exp.constant;
 let render_integer = integer => Helper.Const.int(integer) |> Helper.Exp.constant;
 let render_number = number =>
   Helper.Const.float(number |> string_of_float) |> Helper.Exp.constant;
@@ -48,6 +49,7 @@ let render_css_global_values = (name, value) => {
     | `Unset => [%expr "unset"]
     };
 
+  /* bs-css doesn't have those */
   Ok([[%expr CssJs.unsafe([%e render_string(name)], [%e value])]]);
 };
 
@@ -126,49 +128,25 @@ let variable_rule = {
   open Rule;
   open Let;
 
-  let.bind_match () = Pattern.expect(DELIM("$"));
-  let.bind_match _ = Pattern.expect(LEFT_PARENS);
-  let.bind_match variable = Standard.custom_ident;
-  let.bind_match _ = Pattern.expect(RIGHT_PARENS);
-
-  return_match([variable]);
-};
-
-let variable_module_rule = {
-  open Rule;
-  open Let;
-
   let.bind_match _ = Pattern.expect(DELIM("$"));
   let.bind_match _ = Pattern.expect(LEFT_PARENS);
-  let.bind_match moduleName = Standard.custom_ident;
-  let.bind_match _ = Pattern.expect(DELIM("."));
-  let.bind_match variable = Standard.custom_ident;
+  let.bind_match path = {
+    let.bind_match path = Modifier.zero_or_more({
+      let.bind_match ident = Standard.custom_ident;
+      let.bind_match _ = Pattern.expect(DELIM("."));
+      return_match(ident)
+    });
+    let.bind_match ident = Standard.custom_ident;
+    return_match(path @ [ident])
+  };
   let.bind_match _ = Pattern.expect(RIGHT_PARENS);
 
-  return_match([moduleName, variable]);
-};
-
-let variable_module_module_rule = {
-  open Rule;
-  open Let;
-
-  let.bind_match _ = Pattern.expect(DELIM("$"));
-  let.bind_match _ = Pattern.expect(LEFT_PARENS);
-  let.bind_match moduleName1 = Standard.custom_ident;
-  let.bind_match _ = Pattern.expect(DELIM("."));
-  let.bind_match moduleName2 = Standard.custom_ident;
-  let.bind_match _ = Pattern.expect(DELIM("."));
-  let.bind_match variable = Standard.custom_ident;
-  let.bind_match _ = Pattern.expect(RIGHT_PARENS);
-
-  return_match([moduleName1, moduleName2, variable]);
+  return_match(path);
 };
 
 let variable = parser =>
   Combinator.combine_xor([
     Rule.Match.map(variable_rule, data => `Variable(data)),
-    Rule.Match.map(variable_module_rule, data => `Variable(data)),
-    Rule.Match.map(variable_module_module_rule, data => `Variable(data)),
     Rule.Match.map(parser, data => `Value(data)),
   ]);
 
@@ -184,6 +162,20 @@ let transform_with_variable = (parser, map, value_to_expr) =>
     | `Value(ast) => map(ast),
     value_to_expr,
   );
+
+let contains_a_variable = (value) => {
+  /* Dummy regex trying to work it similarly with css_lexer's regex. In the future both parsers would share the same lexer, for now this is the only case we need to regex against a value. */
+  let has_interpolation = Str.string_match(Str.regexp("^.*\\$(.*).*"), value, 0);
+  has_interpolation ? Ok(value) : Error();
+};
+
+let render_shorthand_properties_with_variable = (name: string, value: string) => {
+  let.ok _ = contains_a_variable(value);
+  let exprValue = render_j_string(value);
+
+  /* bs-css doesn't have those */
+  Ok([[%expr CssJs.unsafe([%e render_string(name)], [%e exprValue])]]);
+};
 
 let apply = (parser, id, map) =>
   transform_with_variable(parser, map, arg => [[%expr [%e id]([%e arg])]]);
@@ -232,7 +224,6 @@ let render_length_percentage =
   | `Percentage(percentage) => render_percentage(percentage);
 
 // css-sizing-3
-let render_function_fit_content = _lp => raise(Unsupported_feature);
 let render_width =
   fun
     | `Auto => variants_to_expression(`Auto)
@@ -240,7 +231,7 @@ let render_width =
     | `Percentage(_) as lp => render_length_percentage(lp)
     | `Max_content
     | `Min_content => raise(Unsupported_feature)
-    | `Fit_content(lp) => render_function_fit_content(lp)
+    | `Fit_content(_) => raise(Unsupported_feature)
     | _ => raise(Unsupported_feature);
 
 let width =
@@ -540,6 +531,7 @@ let render_named_color =
   | `Yellow => [%expr CssJs.yellow]
   | `Yellowgreen => [%expr CssJs.yellowgreen]
   | _ => raise(Unsupported_feature);
+
 let render_color_alpha =
   fun
   | `Number(number) => [%expr `num([%e render_number(number)])]
@@ -1524,9 +1516,13 @@ let render_when_unsupported_features = (name, value) => {
   [%expr CssJs.unsafe([%e name], [%e value])];
 };
 
+let findProperty = (name) => {
+  properties |> List.find_opt(((key, _)) => key == name)
+};
+
 let render_to_expr = (name, value) => {
   let.ok string_to_expr =
-    switch (properties |> List.find_opt(((key, _)) => key == name)) {
+    switch (findProperty(name)) {
     | Some((_, (_, string_to_expr))) => Ok(string_to_expr)
     | None => Error(`Not_found)
     };
@@ -1534,7 +1530,7 @@ let render_to_expr = (name, value) => {
   string_to_expr(value) |> Result.map_error(str => `Invalid_value(str));
 };
 
-let parse_declarations = ((name, value)) => {
+let parse_declarations = ((name: string, value: string)) => {
   let.ok is_valid_string =
     Parser.check_property(~name, value)
     |> Result.map_error((`Unknown_value) => `Not_found);
@@ -1542,12 +1538,16 @@ let parse_declarations = ((name, value)) => {
   switch (render_css_global_values(name, value)) {
   | Ok(value) => Ok(value)
   | Error(_) =>
-    switch (render_to_expr(name, value)) {
+    switch (render_shorthand_properties_with_variable(name, value)) {
     | Ok(value) => Ok(value)
-    | Error(_)
-    | exception Unsupported_feature =>
-      let.ok () = is_valid_string ? Ok() : Error(`Invalid_value(value));
-      Ok([render_when_unsupported_features(name, value)]);
+    | Error(_) =>
+      switch (render_to_expr(name, value)) {
+      | Ok(value) => Ok(value)
+      | Error(_)
+      | exception Unsupported_feature =>
+        let.ok () = is_valid_string ? Ok() : Error(`Invalid_value(value));
+        Ok([render_when_unsupported_features(name, value)]);
+      }
     }
   };
 };

@@ -6,6 +6,7 @@
   styled-ppx-css-parser
   reason-css-parser.lib
   ppxlib
+  str
  )
  (preprocess
   (pps ppxlib.metaquot)
