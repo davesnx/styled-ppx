@@ -218,7 +218,7 @@ let hasVariableValues = (values) => {
 let render_shorthand_properties_with_variable = (property: string, value: string) => {
   let.ok variableValues = parseVariables(value);
 
-  let exprValue = hasVariableValues(variableValues)
+  let exprValue = hasVariableValues(variableValues) && List.length(variableValues) === 1
     ? variableValues |> renderVariables |> renderStringConcat
     : variableValues |> renderVariables |> List.hd;
 
