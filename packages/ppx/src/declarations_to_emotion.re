@@ -170,9 +170,9 @@ let parseVariables = (value) => {
   let removeParentesis = v =>
     v |> global_replace(regexp(")"), "") |> global_replace(regexp("("), "");
   let valueWithoutDollar = value |> removeDollar;
-  let separatedValues = bounded_full_split(regexp("(.*)"), valueWithoutDollar, 0)
+  let separatedValues = bounded_full_split(regexp("\\(([^)]+)\\)"), valueWithoutDollar, 0)
    |> List.map(fun
-      | Delim(v) => `Interpolation(v |> removeParentesis)
+      | Delim(v) => `Interpolation(v |> removeDollar |> removeParentesis)
       | Text(v) => `String(v)
     );
 
@@ -205,15 +205,6 @@ let renderVariables = values => {
         }
       );
 };
-
-let _hasVariableValues = (values) => {
-  values
-    |> List.exists(
-      fun
-        | `String(_) => false
-        | `Interpolation(_) => true
-      );
-}
 
 let render_shorthand_properties_with_variable = (property: string, value: string) => {
   let.ok variableValues = parseVariables(value);
