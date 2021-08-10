@@ -7,7 +7,7 @@ Build on top of [emotion](https://emotion.sh), it allows you to style apps safe,
 
 Allows you to create **React Components** with type-safe CSS style definitions that don't rely on a specific [DSL](https://en.wikipedia.org/wiki/Domain-specific_language) and great error messages.
 
-### [Documentation](https://styled-ppx.vercel.app)
+## [Documentation](https://styled-ppx.vercel.app)
 <!-- Add documentation index links -->
 Check our website: [styled-ppx.vercel.app](https://styled-ppx.vercel.app)
 
@@ -24,8 +24,6 @@ npm install @davesnx/styled-ppx
 ```
 
 #### Update `bsconfig.json`
-
-Add the PPX in your `bsconfig.json` file under `"ppx-flags"`
 
 ```diff
 {
