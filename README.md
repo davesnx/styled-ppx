@@ -3,18 +3,19 @@
 **styled-ppx** is the [ppx](https://victor.darvariu.me/jekyll/update/2018/06/19/ppx-tutorial.html) that brings typed styled components to Reason, OCaml and ReScript.
 Build on top of [emotion](https://emotion.sh), it allows you to style apps safe, quickly, performant and as you always done it.
 
-![](./docs/images/demo.png)
+<img src="./docs/images/demo.png" />
 
 Allows you to create **React Components** with type-safe CSS style definitions that don't rely on a specific [DSL](https://en.wikipedia.org/wiki/Domain-specific_language) and great error messages.
 
-## [Documentation](https://styled-ppx.vercel.app)
+### [Documentation](https://styled-ppx.vercel.app)
 <!-- Add documentation index links -->
+Check our website: [styled-ppx.vercel.app](https://styled-ppx.vercel.app)
 
-## Getting started
+### Getting started
 
 Depends on [bs-css with bs-css-emotion](https://github.com/giraud/bs-css), [ReasonReact](https://reasonml.github.io/reason-react/) or [rescript-react](https://github.com/rescript-lang/rescript-react), make sure you have them installed first.
 
-### Install
+#### Install
 
 ```bash
 yarn add @davesnx/styled-ppx
@@ -22,7 +23,7 @@ yarn add @davesnx/styled-ppx
 npm install @davesnx/styled-ppx
 ```
 
-### Update `bsconfig.json`
+#### Update `bsconfig.json`
 
 Add the PPX in your `bsconfig.json` file under `"ppx-flags"`
 
@@ -37,7 +38,7 @@ Add the PPX in your `bsconfig.json` file under `"ppx-flags"`
 }
 ```
 
-### Use it
+#### Use
 
 ```reason
 module Link = [%styled.a (~color="#4299E1") => {|
@@ -73,23 +74,29 @@ module Layout = [%styled.div [|
 #### [Playground](https://github.com/davesnx/try-styled-ppx)
 If you want to try it out, just fork https://github.com/davesnx/try-styled-ppx and follow the instalation process there.
 
-## Editor Support
+### Editor Support
 One of the fears of using a ppx is editor support, we belive that having compiling errors and syntax highlight would be an amazing experience. Install the VSCode extension:
 
 **[VSCode Extension](https://marketplace.visualstudio.com/items?itemName=davesnx.vscode-styled-ppx)**
 
 > If you are interested on another editor, please [fill an issue](https://github.com/davesnx/styled-ppx/issues/new).
 
-## Contributing
+### Contributing
 We would love your help improving **styled-ppx**. Please see our contributing and community guidelines, they'll help you get set up locally and explain the whole process: [./CONTRIBUTING.md].
 
-## Credits
-- [**Javier Chávarri**](https://github.com/jchavarri): to help me understand all the world of OCaml, his knowledge about ppx's and at the start of the project.
-- [**Alessandro Strada**](https://github.com/astrada): the project started inspired by bs-css-ppx and his implementation of its CSS Parser.
+### Credits
+- [**Javier Chávarri**](https://github.com/jchavarri): to introduce me to Reason, teach me all his knowledge about OCaml, AST, ppx rewritters and for the help me boostrapping the project.
+- [**Alessandro Strada**](https://github.com/astrada): this project started with inspiration in bs-css-ppx and forked his implementation of their CSS Parser.
 - [**Eduardo Rafael**](https://github.com/EduardoRFS/): to teach me how to write a compiler and a type-checker and his implementation of the CSS Value definition and the new CSS Parser.
-- [**Rizo**](https://github.com/rizo): to help with the API design, discussions about CSS and great conversations.
-- This project builds on a long line of earlier work by clever folks in the JavaScript community from around the world.
+- [**Rizo**](https://github.com/rizo): to help with the API design, discussions and great conversations about styling and CSS.
+- This project builds on a long line of earlier work by clever folks in the JavaScript community from around the world. People from [styled-components](https://github.com/styled-components/styled-components), [emotion](https://github.com/emotion-js/emotion), [compiledcssinjs](https://github.com/atlassian-labs/compiled), [linaria](https://github.com/callstack/linaria), and many more.
+
+### License
+
+TDB
 
 ---
 
 <a href="https://github.com/davesnx/styled-ppx/actions"><img alt="CI" src="https://github.com/davesnx/styled-ppx/workflows/CI/badge.svg"></a>
+
+<a href="https://badge.fury.io/js/%40davesnx%2Fstyled-ppx"><img src="https://badge.fury.io/js/%40davesnx%2Fstyled-ppx.svg" alt="npm version" height="18"></a>
