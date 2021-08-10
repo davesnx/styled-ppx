@@ -162,15 +162,15 @@ let transform_with_variable = (parser, map, value_to_expr) =>
     value_to_expr,
   );
 
-let parse_variables = (value) => {
+let parseVariables = (value) => {
   /* Dummy regex trying to work it similarly with css_lexer's regex. In the future both parsers would share the same lexer, for now this is the only case we need to regex against a value. */
   open Str;
-  let containsVariable = string_match(regexp("^.*(\\$.*).*"), value, 0);
+  let containsVariable = string_match(regexp("^.*\\$(.*).*"), value, 0);
   let removeDollar = global_replace(regexp("\\$"), "");
   let removeParentesis = v =>
     v |> global_replace(regexp(")"), "") |> global_replace(regexp("("), "");
   let valueWithoutDollar = value |> removeDollar;
-  let separatedValues = bounded_full_split(regexp("[()]"), valueWithoutDollar, 0)
+  let separatedValues = bounded_full_split(regexp("(.*)"), valueWithoutDollar, 0)
    |> List.map(fun
       | Delim(v) => `Interpolation(v |> removeParentesis)
       | Text(v) => `String(v)
@@ -179,15 +179,19 @@ let parse_variables = (value) => {
   containsVariable ? Ok(separatedValues) : Error();
 };
 
-let renderInterpolationAsString = expressions => {
-  let rec render_interpolated = exprs => {
-    let concat = Helper.Exp.ident(~loc, Create.withLoc(Lident("^"), ~loc));
-    let nextExpr = List.hd(exprs);
-    let restExpr = List.tl(exprs);
-    Helper.Exp.apply(concat, [(Nolabel, nextExpr), (Nolabel, render_interpolated(restExpr))]);
+let renderStringConcat = expressions => {
+  let concat = Helper.Exp.ident(~loc, Create.withLoc(Lident("^"), ~loc));
+  let rec renderInterpolated = exprs => {
+    switch (exprs) {
+      | [] => [%expr ""]
+      | [one] => one;
+      | [first, ...rest] => {
+        Helper.Exp.apply(concat, [(Nolabel, first), (Nolabel, renderInterpolated(rest))]);
+      }
+    }
   };
 
-  render_interpolated(expressions);
+  Helper.Exp.apply(concat, [(Nolabel, renderInterpolated(expressions))]);
 };
 
 let renderVariables = values => {
@@ -206,17 +210,17 @@ let hasVariableValues = (values) => {
   values
     |> List.exists(
       fun
-        | `String(_v) => false
-        | `Interpolation(_v) => true
+        | `String(_) => false
+        | `Interpolation(_) => true
       );
 }
 
 let render_shorthand_properties_with_variable = (property: string, value: string) => {
-  let.ok variableValues = parse_variables(value);
+  let.ok variableValues = parseVariables(value);
 
   let exprValue = hasVariableValues(variableValues)
-    ? variableValues |> renderVariables |> List.hd
-    : variableValues |> renderVariables |> renderInterpolationAsString;
+    ? variableValues |> renderVariables |> renderStringConcat
+    : variableValues |> renderVariables |> List.hd;
 
   Ok([[%expr CssJs.unsafe([%e render_string(property)], [%e exprValue])]]);
 };

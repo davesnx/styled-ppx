@@ -5754,9 +5754,9 @@ module StringInterpolation = {
   let styles =
     CssJs.style(. [|
       CssJs.label("StringInterpolation"),
-      CssJs.unsafe("color", {j|$(Theme.var)|j}),
-      CssJs.unsafe("background-color", {j|$(black)|j}),
-      CssJs.unsafe("border-color", {j|$(Theme.Border.black)|j}),
+      CssJs.unsafe("color", (++)(Theme.var)),
+      CssJs.unsafe("background-color", (++)(black)),
+      CssJs.unsafe("border-color", (++)(Theme.Border.black)),
       CssJs.unsafe("color", "trust-me"),
       CssJs.display(`block),
     |]);
@@ -6723,7 +6723,7 @@ module DynamicComponent = {
   let styles = (~var) =>
     CssJs.style(. [|
       CssJs.label("DynamicComponent"),
-      CssJs.unsafe("color", {j|$(var)|j}),
+      CssJs.unsafe("color", (++)(var)),
       CssJs.display(`block),
     |]);
   let make = (props: makeProps('var)) => {
@@ -8655,7 +8655,7 @@ module ArrayDynamicComponent = {
     CssJs.style(. [|
       CssJs.label("ArrayDynamicComponent"),
       CssJs.display(`block),
-      CssJs.unsafe("color", {j|$(var)|j}),
+      CssJs.unsafe("color", (++)(var)),
     |]);
   let make = (props: makeProps('var)) => {
     let stylesObject = {"className": styles(~var=varGet(props))};
@@ -9614,7 +9614,7 @@ module SequenceDynamicComponent = {
   let styles = (~var) => {
     Js.log("Logging when render");
     CssJs.style(. [|
-      CssJs.unsafe("color", {j|$(var)|j}),
+      CssJs.unsafe("color", (++)(var)),
       CssJs.display(`block),
     |]);
   };
@@ -10577,7 +10577,7 @@ module DynamicComponentWithDefaultValue = {
     CssJs.style(. [|
       CssJs.label("DynamicComponentWithDefaultValue"),
       CssJs.display(`block),
-      CssJs.unsafe("color", {j|$(var)|j}),
+      CssJs.unsafe("color", (++)(var)),
     |]);
   let make = (props: makeProps('var)) => {
     let stylesObject = {"className": styles(~var=?varGet(props))};
@@ -11535,10 +11535,13 @@ module Hr = {
   let styles =
     CssJs.style(. [|
       CssJs.label("Hr"),
-      CssJs.unsafe("border-top", {j|1px solid $(Color.Border.lineAlpha)|j}),
-      CssJs.unsafe("margin", {j|0px $(NewSize.px16)|j}),
-      CssJs.unsafe("padding", {j|$(NewSize.px16) 0px|j}),
-      CssJs.unsafe("color", {j|$(var)|j}),
+      CssJs.unsafe(
+        "border-top",
+        (++)("1px solid " ++ Color.Border.lineAlpha),
+      ),
+      CssJs.unsafe("margin", (++)("0px " ++ NewSize.px16)),
+      CssJs.unsafe("padding", (++)(NewSize.px16 ++ " 0px")),
+      CssJs.unsafe("color", (++)(var)),
     |]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};
