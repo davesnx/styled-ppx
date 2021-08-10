@@ -3,10 +3,15 @@ open Expect;
 open ReactTestingLibrary;
 
 EmotionSerializer.load();
+
+/* Since animationName is a string under the hood, casting it to string
+to match it as a string. This should be part of the bs-css binding */
+external toString: CssJs.animationName => string = "%identity";
+
 let fadeIn = [%styled.keyframe {|
   0% { opacity: 0 }
   100% { opacity: 1 }
-|}];
+|}] |> toString;
 
 module Component = [%styled.div {|
   display: flex;
