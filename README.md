@@ -1,4 +1,4 @@
-<h1> styled-ppx <a href="https://github.com/davesnx/styled-ppx/actions"></a></h1>
+<h1>styled-ppx</h1>
 
 **styled-ppx** is the [ppx](https://victor.darvariu.me/jekyll/update/2018/06/19/ppx-tutorial.html) that brings typed styled components to Reason, OCaml and ReScript.
 
