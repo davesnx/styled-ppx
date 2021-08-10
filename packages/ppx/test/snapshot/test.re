@@ -117,8 +117,8 @@ module DynamicComponentWithDefaultValue = [%styled.div (~var="green") => [|
 /* All the combinations of interpolation shoudn't be in the snapshot testing,
 should be on the Test_Native, but since there's a issue with Reason's rawliteral, we ensure that the transform works in here, meanwhile. */
 module Hr = [%styled.hr "
-  border-top: 1px solid $(Color.Border.lineAlpha);
-  margin: 0px $(NewSize.px16);
-  padding: $(NewSize.px16) 0px;
-  color: $(var);
+  border-top: 1px solid $(Color.Border.alpha);
+  margin: $(Size.big) $(Size.small);
+  padding: $(Size.small) 0px;
+  color: $(mono100);
 "];
