@@ -1,13 +1,16 @@
 <h1> styled-ppx <a href="https://github.com/davesnx/styled-ppx/actions"></a></h1>
 
 **styled-ppx** is the [ppx](https://victor.darvariu.me/jekyll/update/2018/06/19/ppx-tutorial.html) that brings typed styled components to Reason, OCaml and ReScript.
+
 Build on top of [emotion](https://emotion.sh), it allows you to style apps safe, quickly, performant and as you always done it.
 
-<img src="./docs/images/demo.png" />
+<p align="left">
+  <img width="560px" src="./docs/images/demo.png" />
+</p>
 
 Allows you to create **React Components** with type-safe CSS style definitions that don't rely on a specific [DSL](https://en.wikipedia.org/wiki/Domain-specific_language) and great error messages.
 
-## [Documentation](https://styled-ppx.vercel.app)
+### [Documentation](https://styled-ppx.vercel.app)
 <!-- Add documentation index links -->
 Check our website: [styled-ppx.vercel.app](https://styled-ppx.vercel.app)
 
@@ -24,6 +27,8 @@ npm install @davesnx/styled-ppx
 ```
 
 #### Update `bsconfig.json`
+
+Add the PPX in your `bsconfig.json` file under `"ppx-flags"`
 
 ```diff
 {
@@ -73,9 +78,9 @@ module Layout = [%styled.div [|
 If you want to try it out, just fork https://github.com/davesnx/try-styled-ppx and follow the instalation process there.
 
 ### Editor Support
-One of the fears of using a ppx is editor support, we belive that having compiling errors and syntax highlight would be an amazing experience. Install the VSCode extension:
+One of the downsites of using a `ppx` is their editor support, we provide a VSCode extension that brings syntax highlight. This can include in the future, CSS autocomplete and other CSS-related extensions.
 
-**[VSCode Extension](https://marketplace.visualstudio.com/items?itemName=davesnx.vscode-styled-ppx)**
+Install the VSCode extension: **[VSCode Extension](https://marketplace.visualstudio.com/items?itemName=davesnx.vscode-styled-ppx)**
 
 > If you are interested on another editor, please [fill an issue](https://github.com/davesnx/styled-ppx/issues/new).
 
@@ -95,6 +100,4 @@ TDB
 
 ---
 
-<a href="https://github.com/davesnx/styled-ppx/actions"><img alt="CI" src="https://github.com/davesnx/styled-ppx/workflows/CI/badge.svg"></a>
-
-<a href="https://badge.fury.io/js/%40davesnx%2Fstyled-ppx"><img src="https://badge.fury.io/js/%40davesnx%2Fstyled-ppx.svg" alt="npm version" height="18"></a>
+<a href="https://github.com/davesnx/styled-ppx/actions"><img alt="CI" src="https://github.com/davesnx/styled-ppx/workflows/CI/badge.svg"></a> <a href="https://badge.fury.io/js/%40davesnx%2Fstyled-ppx"><img src="https://badge.fury.io/js/%40davesnx%2Fstyled-ppx.svg" alt="npm version"></a>
