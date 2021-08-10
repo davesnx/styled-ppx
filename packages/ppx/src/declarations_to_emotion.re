@@ -181,17 +181,17 @@ let parseVariables = (value) => {
 
 let renderStringConcat = expressions => {
   let concat = Helper.Exp.ident(~loc, Create.withLoc(Lident("^"), ~loc));
-  let rec renderInterpolated = exprs => {
+  let rec renderInterpolated = (exprs) => {
     switch (exprs) {
       | [] => [%expr ""]
       | [one] => one;
       | [first, ...rest] => {
-        Helper.Exp.apply(concat, [(Nolabel, first), (Nolabel, renderInterpolated(rest))]);
+        Builder.eapply(~loc, concat, [first, renderInterpolated(rest)]);
       }
     }
   };
 
-  Helper.Exp.apply(concat, [(Nolabel, renderInterpolated(expressions))]);
+  renderInterpolated(expressions);
 };
 
 let renderVariables = values => {
@@ -206,7 +206,7 @@ let renderVariables = values => {
       );
 };
 
-let hasVariableValues = (values) => {
+let _hasVariableValues = (values) => {
   values
     |> List.exists(
       fun
@@ -218,9 +218,9 @@ let hasVariableValues = (values) => {
 let render_shorthand_properties_with_variable = (property: string, value: string) => {
   let.ok variableValues = parseVariables(value);
 
-  let exprValue = hasVariableValues(variableValues) && List.length(variableValues) === 1
-    ? variableValues |> renderVariables |> renderStringConcat
-    : variableValues |> renderVariables |> List.hd;
+  let exprValue = List.length(variableValues) === 1
+    ? variableValues |> renderVariables |> List.hd
+    : variableValues |> renderVariables |> renderStringConcat;
 
   Ok([[%expr CssJs.unsafe([%e render_string(property)], [%e exprValue])]]);
 };
