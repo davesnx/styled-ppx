@@ -1,6 +1,6 @@
 <h1>styled-ppx</h1>
 
-**styled-ppx** is the [ppx](https://victor.darvariu.me/jekyll/update/2018/06/19/ppx-tutorial.html) that brings typed styled components to Reason, OCaml and ReScript.
+**styled-ppx** is the [ppx](https://dev.realworldocaml.org/ppx.html) that brings typed styled components to Reason, OCaml and ReScript.
 
 Build on top of [emotion](https://emotion.sh), it allows you to style apps safe, quickly, performant and as you always done it.
 
@@ -8,7 +8,7 @@ Build on top of [emotion](https://emotion.sh), it allows you to style apps safe,
   <img width="560px" src="./docs/images/demo.png" />
 </p>
 
-Allows you to create **React Components** with type-safe CSS style definitions that don't rely on a different [DSL](https://en.wikipedia.org/wiki/Domain-specific_language) than the browser.
+Allows you to create **React Components** with type-safe style definitions that don't rely on a different [DSL](https://en.wikipedia.org/wiki/Domain-specific_language) than CSS.
 
 ### [Documentation](https://styled-ppx.vercel.app)
 <!-- Add documentation index links -->
@@ -85,7 +85,7 @@ Install the VSCode extension: **[VSCode Extension](https://marketplace.visualstu
 > If you are interested on another editor, please [fill an issue](https://github.com/davesnx/styled-ppx/issues/new).
 
 ### Contributing
-We would love your help improving **styled-ppx**. Please see our contributing and community guidelines, they'll help you get set up locally and explain the whole process: [./CONTRIBUTING.md].
+We would love your help improving **styled-ppx**. Please see our contributing and community guidelines, they'll help you get set up locally and explain the whole process: [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ### Credits
 - [**Javier Chávarri**](https://github.com/jchavarri): to introduce me to Reason, teach me all his knowledge about OCaml, AST, ppx rewritters and for the help me boostrapping the project.
