@@ -306,7 +306,7 @@ let render_keyframes = ((ruleList, loc)): Parsetree.expression => {
     keyframe selector can be from | to | <percentage>
 
     Like following:
-        [%styled.keyframe "
+        [%keyframe "
           0% { opacity: 1; }
           to { opacity: 0; }
         "];

@@ -8,7 +8,7 @@ Build on top of [emotion](https://emotion.sh), it allows you to style apps safe,
   <img width="560px" src="./docs/images/demo.png" />
 </p>
 
-Allows you to create **React Components** with type-safe CSS style definitions that don't rely on a specific [DSL](https://en.wikipedia.org/wiki/Domain-specific_language) and great error messages.
+Allows you to create **React Components** with type-safe CSS style definitions that don't rely on a different [DSL](https://en.wikipedia.org/wiki/Domain-specific_language) than the browser.
 
 ### [Documentation](https://styled-ppx.vercel.app)
 <!-- Add documentation index links -->
@@ -92,6 +92,7 @@ We would love your help improving **styled-ppx**. Please see our contributing an
 - [**Alessandro Strada**](https://github.com/astrada): this project started with inspiration in bs-css-ppx and forked his implementation of their CSS Parser.
 - [**Eduardo Rafael**](https://github.com/EduardoRFS/): to teach me how to write a compiler and a type-checker and his implementation of the CSS Value definition and the new CSS Parser.
 - [**Rizo**](https://github.com/rizo): to help with the API design, discussions and great conversations about styling and CSS.
+- [**Max Lantas**](https://github.com/mnxn): to implement the VSCode extension.
 - This project builds on a long line of earlier work by clever folks in the JavaScript community from around the world. People from [styled-components](https://github.com/styled-components/styled-components), [emotion](https://github.com/emotion-js/emotion), [compiledcssinjs](https://github.com/atlassian-labs/compiled), [linaria](https://github.com/callstack/linaria), and many more.
 
 ### License

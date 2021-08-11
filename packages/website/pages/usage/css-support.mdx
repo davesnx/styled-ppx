@@ -1,0 +1,12 @@
+# CSS Support
+
+The parser now supports CSS Spec 3 almost completely. You can check which properties aren't here: https://github.com/davesnx/styled-ppx/blob/main/packages/ppx/test/css-support/test.re (commented ones aren't supported).
+
+There's a ton of explanations about how the parser and the code-gen work under the hood, but the main idea is that the parser ensures that the properties and values are valid and the code-gen creates bs-emotion calls which the type-check ensures are correct.
+
+Complex media-queries, (pseudo)selectors and CSS functions might not be fully supported, here is a list of non-supported features for now:
+
+- [CSS functions](https://github.com/davesnx/styled-ppx/issues/47)
+- [Complex media queries values](https://github.com/davesnx/styled-ppx/issues/50)
+- Selectors: [attribute](https://github.com/davesnx/styled-ppx/issues/129) [:not](https://github.com/davesnx/styled-ppx/issues/16)
+- [grid-column-template](https://github.com/davesnx/styled-ppx/issues/146)

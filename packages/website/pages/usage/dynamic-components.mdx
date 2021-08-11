@@ -1,0 +1,17 @@
+# Dynamic components
+
+Dynamic components mean components that generate styles based on their props. Similar to the concept of React's view as a function of its state, here the styles are a function of its props.
+
+```reason
+module Dynamic = [%styled.div (~color, ~background) => {j|
+  color: $(color);
+  background-color: $(background);
+|j}];
+
+<Dynamic color="#EB5757" background="#516CF0">
+  {React.string("Hello!")}
+</Dynamic>
+```
+
+Useful to define a React component with their API exposed as props that only affect their styles.
+Here are applied the same rules as [Interpolation](./interpolation.md), so unsafety is expected.

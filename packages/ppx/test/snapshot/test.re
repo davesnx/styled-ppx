@@ -76,7 +76,7 @@ module SelectorsMediaQueries = [%styled.div {j|
 |j}
 ];
 
-let keyframe = [%styled.keyframe {|
+let keyframe = [%keyframe {|
   0% { opacity: 0 }
   100% { opacity: 1 }
 |}];
