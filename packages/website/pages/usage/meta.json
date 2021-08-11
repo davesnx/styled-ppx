@@ -1,10 +1,10 @@
 {
-  "basic": "Basic component",
-  "css": "Inline styles",
-  "dynamic": "Dynamic components",
-  "globals": "Inject global styles",
-  "type-safety": "Type-safe CSS",
-  "how-it-works": "How it works",
-  "keyframes": "keyframes",
-  "migrate": "Migrate"
+  "components": "Components",
+  "interpolation": "Interpolation",
+  "dynamic-components": "Dynamic components",
+  "classname": "Classname: cx",
+  "array": "Array API",
+  "css-support": "CSS Support",
+  "keyframe": "Keyframe",
+  "globals": "Inject global styles"
 }

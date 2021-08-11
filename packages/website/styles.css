@@ -1,9 +1,5 @@
 @tailwind utilities;
 
-.docs-search > span {
-  width: 100%;
-}
-
 .algolia-autocomplete .algolia-docsearch-suggestion--category-header span {
   display: inline-block;
 }

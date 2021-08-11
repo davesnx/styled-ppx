@@ -1,37 +1,29 @@
 import Callout from 'nextra-theme-docs/callout'
-import Features from 'components/features'
 
 # Introduction
 
-<Features />
+**Typed styled components in Reason, OCaml and ReScript**.
 
-**styled-ppx** is the [ppx](https://victor.darvariu.me/jekyll/update/2018/06/19/ppx-tutorial.html) that enables *CSS-in-Reason*.
-Build on top of [emotion](https://emotion.sh), it allows you to style apps quickly, performant and as you always done it.
-Allows you to create **React Components** with Type-safe CSS style definitions that don't rely on a specific [DSL](https://en.wikipedia.org/wiki/Domain-specific_language) and great error messages:
+Write your styles in CSS inside Reason/OCaml/ReScript files and generate components, classnames or composable CSS rules.
 
-## Overview
+- Component-based
+- Type-safe static CSS
+- No abstraction over standard CSS, neither a new [DSL](https://en.wikipedia.org/wiki/Domain-specific_language)
+- Build on top of [emotion](https://emotion.sh)
+- Support entirely the language: pattern-matching, composition, labelled arguments.
 
-**`styled-ppx`** implements a ppx that transforms `[%styled]` extensions points into `[@react.components]` modules with [bs-emotion](https://github.com/ahrefs/bs-emotion) as styles, which does all the CSS-in-JS under the hood thanks to [emotion](https://emotion.sh).
+**styled-ppx** is a ppx you can learn more in the [Real World OCaml: Preprocessing with ppx](https://dev.realworldocaml.org/ppx.html). For now, are similar to [babel-plugins](https://babeljs.io/docs/en/plugins/) which transform your code.
 
-This is how you can write components in ReasonML or OCaml with this ppx:
-
-### Standard styled component
 ```reason
-module StyledComponent = [%styled.div {|
-  align-items: center;
-  display: flex;
+module Center = [%styled.div {|
   height: 100vh;
-  justify-content: center;
   width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 |}];
 
-<StyledComponent> {React.string("Hello from the future!")} </StyledComponent>,
+<Center>
+  {React.string("Hello from the future!")}
+</Center>
 ```
-
-## Features
-
-## Community
-
-Follow [@davesnx](https://twitter.com/davesnx) on Twitter for future project updates.
-
-Feel free to join the [Discord](https://discord.gg/mc9wCYTK)

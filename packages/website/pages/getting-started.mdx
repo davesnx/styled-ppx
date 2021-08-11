@@ -3,66 +3,76 @@ import Link from 'next/link'
 
 # Getting Started
 
-## Installation
+Depends on [bs-css with bs-css-emotion](https://github.com/giraud/bs-css), [ReasonReact](https://reasonml.github.io/reason-react/) or [rescript-react](https://github.com/rescript-lang/rescript-react), make sure you have them installed first.
 
-This package depends on [bs-emotion](https://github.com/ahrefs/bs-emotion), [ReasonReact](https://reasonml.github.io/reason-react/) and [BuckleScript](https://bucklescript.github.io), make sure you follow their installations.
-
-### With `esy` on native projects
+### Install
 
 ```bash
-esy add davesnx/styled-ppx
-```
-
-### With `npm` or `yarn` on BuckleScript projects
-
-```bash
-yarn add @davesnx/styled-ppx @ahrefs/bs-emotion
+yarn add @davesnx/styled-ppx
 # Or
-npm install @davesnx/styled-ppx @ahrefs/bs-emotion
+npm install @davesnx/styled-ppx
 ```
 
-And add the PPX in your `bsconfig.json` file:
+### Update `bsconfig.json`
 
+Add `"@davesnx/styled-ppx/ppx"` under bsconfig's `"ppx-flags"`:
+```json
+{
+  "ppx-flags": ["@davesnx/styled-ppx/ppx"]
+}
+```
+
+The `bsconfig.json` resultant should contain at least
 ```json
 {
   "bs-dependencies": [
     "reason-react",
-    "@ahrefs/bs-emotion"
+    "bs-css",
+    "bs-css-emotion"
   ],
-  "ppx-flags": ["@davesnx/styled-ppx/styled-ppx"]
+  "ppx-flags": ["@davesnx/styled-ppx/ppx"]
 }
 ```
 
-However, if you want to use `esy` in BuckleScript:
-Create an `esy.json` file with the content:
+### Use
 
-```json
-{
-  "dependencies": {
-    "styled-ppx": "*",
-    "ocaml": "~4.6.1000"
-  },
-  "resolutions": {
-    "styled-ppx": "davesnx/styled-ppx"
-  }
-}
+```reason
+module Link = [%styled.a (~color="#4299E1") => {|
+  font-size: 1.875rem;
+  line-height: 1.5;
+  text-decoration: none;
+  margin: 0px;
+  padding: 10px 0px;
+  color: $(color);
+|}];
+
+module Layout = [%styled.div [|
+  [%css "display: flex"],
+  [%css "width: 100%;"],
+  [%css "height: 100%;"],
+  [%css "justify-content: center;"],
+  [%css "align-items: center"],
+|]];
+
+/* Later on a component */
+<Layout>
+  <Link
+    color="#333333"
+    href="https://sancho.dev"
+    rel="noopener noreferrer"
+  />
+  <span className={[%cx "color: black; position: absolute; left: 0px;"]}>
+    {React.string("sancho.dev")}
+  </span>
+</Layout>
 ```
 
-And add the PPX in your `bsconfig.json` file:
-
-```json
-{
-  "ppx-flags": ["esy x styled-ppx.exe"]
-}
-```
-
-If you want to try out of the box a project, just visit https://github.com/davesnx/try-styled-ppx and follow the instalation process there.
+### [Playground](https://github.com/davesnx/try-styled-ppx)
+If you want to try it out, just fork https://github.com/davesnx/try-styled-ppx and follow the instalation process there.
 
 ## Editor Support
+One of the downsites of using a `ppx` is their editor support, we provide a VSCode extension that brings syntax highlight. This can include in the future, CSS autocomplete and other CSS-related extensions.
 
-One of the fears of using a ppx is editor support, we belive that having compiling errors and syntax highlight would be an amazing experience. Install the VSCode extension:
+Install the VSCode extension: **[VSCode Extension](https://marketplace.visualstudio.com/items?itemName=davesnx.vscode-styled-ppx)**
 
-**[VSCode Extension](https://marketplace.visualstudio.com/items?itemName=davesnx.vscode-styled-ppx)**
-
-- If you are interested on another editor, please fill an issue and we would consider.
-
+> If you are interested on another editor, please [fill an issue](https://github.com/davesnx/styled-ppx/issues/new)

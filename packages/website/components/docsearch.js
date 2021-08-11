@@ -25,20 +25,20 @@ const Search = () => {
   useEffect(() => {
     if (window.docsearch) {
       window.docsearch({
-        apiKey: '247dd86c8ddbbbe6d7a2d4adf4f3a68a',
-        indexName: 'vercel_swr',
+        apiKey: '7c7041862e922a61e80b9a7de7f24860',
+        indexName: 'styled-ppx-documentation-content',
         inputSelector: 'input#algolia-doc-search',
       });
     }
   }, []);
 
   return (
-    <div className="relative w-full md:w-64 mr-2 docs-search">
+    <div className="relative lg:w-36 w-full mr-2 docs-search">
       <input
         id="algolia-doc-search"
         className="appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline w-full"
         type="search"
-        placeholder='Search ("/" to focus)'
+        placeholder='Search (Press "/" to focus)'
         ref={input}
       />
     </div>
