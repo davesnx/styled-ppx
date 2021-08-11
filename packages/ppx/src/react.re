@@ -85,7 +85,6 @@ let makePropList = [
   Attribute({name: "charSet", type_: "string", alias: None }),
   Attribute({name: "checked", type_: "bool", alias: None }),
   Attribute({name: "cite", type_: "string", alias: None }),
-  Attribute({name: "className", type_: "string", alias: None }),
   Attribute({name: "clip", type_: "string", alias: None }),
   Attribute({name: "clipPath", type_: "string", alias: None }),
   Attribute({name: "clipPathUnits", type_: "string", alias: None }),

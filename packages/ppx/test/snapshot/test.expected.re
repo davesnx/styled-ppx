@@ -168,8 +168,6 @@ module OneSingleProperty = {
     [@bs.optional]
     cite: string,
     [@bs.optional]
-    className: string,
-    [@bs.optional]
     clip: string,
     [@bs.optional]
     clipPath: string,
@@ -1125,8 +1123,6 @@ module SingleQuoteStrings = {
     checked: bool,
     [@bs.optional]
     cite: string,
-    [@bs.optional]
-    className: string,
     [@bs.optional]
     clip: string,
     [@bs.optional]
@@ -2085,8 +2081,6 @@ module MultiLineStrings = {
     [@bs.optional]
     cite: string,
     [@bs.optional]
-    className: string,
-    [@bs.optional]
     clip: string,
     [@bs.optional]
     clipPath: string,
@@ -3044,8 +3038,6 @@ module SelfClosingElement = {
     [@bs.optional]
     cite: string,
     [@bs.optional]
-    className: string,
-    [@bs.optional]
     clip: string,
     [@bs.optional]
     clipPath: string,
@@ -3997,8 +3989,6 @@ module ArrayStatic = {
     checked: bool,
     [@bs.optional]
     cite: string,
-    [@bs.optional]
-    className: string,
     [@bs.optional]
     clip: string,
     [@bs.optional]
@@ -4963,8 +4953,6 @@ module StringInterpolation = {
     checked: bool,
     [@bs.optional]
     cite: string,
-    [@bs.optional]
-    className: string,
     [@bs.optional]
     clip: string,
     [@bs.optional]
@@ -5932,8 +5920,6 @@ module DynamicComponent = {
     [@bs.optional]
     cite: string,
     [@bs.optional]
-    className: string,
-    [@bs.optional]
     clip: string,
     [@bs.optional]
     clipPath: string,
@@ -6891,8 +6877,6 @@ module SelectorsMediaQueries = {
     checked: bool,
     [@bs.optional]
     cite: string,
-    [@bs.optional]
-    className: string,
     [@bs.optional]
     clip: string,
     [@bs.optional]
@@ -7863,8 +7847,6 @@ module ArrayDynamicComponent = {
     [@bs.optional]
     cite: string,
     [@bs.optional]
-    className: string,
-    [@bs.optional]
     clip: string,
     [@bs.optional]
     clipPath: string,
@@ -8823,8 +8805,6 @@ module SequenceDynamicComponent = {
     [@bs.optional]
     cite: string,
     [@bs.optional]
-    className: string,
-    [@bs.optional]
     clip: string,
     [@bs.optional]
     clipPath: string,
@@ -9780,8 +9760,6 @@ module DynamicComponentWithDefaultValue = {
     checked: bool,
     [@bs.optional]
     cite: string,
-    [@bs.optional]
-    className: string,
     [@bs.optional]
     clip: string,
     [@bs.optional]
@@ -10741,8 +10719,6 @@ module Hr = {
     checked: bool,
     [@bs.optional]
     cite: string,
-    [@bs.optional]
-    className: string,
     [@bs.optional]
     clip: string,
     [@bs.optional]
