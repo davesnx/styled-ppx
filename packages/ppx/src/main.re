@@ -336,7 +336,7 @@ let extensions = [
     }
   ),
   Ppxlib.Extension.declare(
-    "styled.keyframe",
+    "keyframe",
     Ppxlib.Extension.Context.Expression,
     string_payload,
     (~loc as _, ~path as _, payload, _label, _) => {

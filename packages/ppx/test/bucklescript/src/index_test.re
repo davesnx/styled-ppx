@@ -8,7 +8,7 @@ EmotionSerializer.load();
 to match it as a string. This should be part of the bs-css binding */
 external toString: CssJs.animationName => string = "%identity";
 
-let fadeIn = [%styled.keyframe {|
+let fadeIn = [%keyframe {|
   0% { opacity: 0 }
   100% { opacity: 1 }
 |}] |> toString;
