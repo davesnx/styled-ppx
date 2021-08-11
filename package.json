@@ -1,6 +1,6 @@
 {
   "name": "@davesnx/styled-ppx",
-  "version": "0.23.0",
+  "version": "0.24.0",
   "description": "Typed styled components in Reason, OCaml and ReScript",
   "author": "David Sancho <dsnxmoreno@gmail.com>",
   "license": "MIT",
@@ -23,7 +23,14 @@
   },
   "esy": {
     "buildsInSource": "_build",
-    "build": [["dune", "build", "--root", "."]],
+    "build": [
+      [
+        "dune",
+        "build",
+        "--root",
+        "."
+      ]
+    ],
     "buildDev": "refmterr dune build --promote-install-files --root .",
     "buildEnv": {
       "ODOC_SYNTAX": "re"
