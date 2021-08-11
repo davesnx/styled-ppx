@@ -1,4 +1,4 @@
-### keyframe
+# Keyframes
 **Generates keyframes**, method to create animations with CSS
 
 ```reason

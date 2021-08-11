@@ -2,7 +2,7 @@
   "components": "Components",
   "interpolation": "Interpolation",
   "dynamic-components": "Dynamic components",
-  "classname": "Classname: cx",
+  "classname": "className",
   "array": "Array API",
   "css-support": "CSS Support",
   "keyframe": "Keyframe",

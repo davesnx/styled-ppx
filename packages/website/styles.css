@@ -18,26 +18,39 @@
   @apply not-sr-only fixed ml-6 top-0 bg-white text-lg px-6 py-2 mt-2 outline-none shadow-outline z-50;
 }
 
-code {
-  @apply text-sm;
-}
-
 h1, h2, h3, h4, h5, h6, div, span, p {
-  font-family: 'Silka', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-family: 'Archivo', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 code, code div, code span {
-  font-family: 'SF Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family: 'SFMono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  line-height: 1.7;
+}
+
+/* Archivo letter-spacings overrides */
+
+p, a {
+  letter-spacing: 0.02em !important;
 }
 
 h1 {
-  letter-spacing: 0.025em !important;
+  letter-spacing: 0.04em !important;
 }
 
 h2 {
-  letter-spacing: 0.015em !important;
+  letter-spacing: 0.04em !important;
 }
 
 h3 {
-  letter-spacing: 0.010em !important;
+  letter-spacing: 0.03em !important;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.sidebar a {
+  letter-spacing: 0.04rem !important;
 }

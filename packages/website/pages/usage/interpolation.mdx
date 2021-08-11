@@ -1,12 +1,14 @@
+import Callout from 'nextra-theme-docs/callout'
+
 # Interpolation
+
+Interpolation here means using any identifier as a value inside a CSS definition. Useful for reusing variables, handling themes or change CSS during run-time.
 
 ```reason
 module Component = [%styled.div "
   border: 1px solid $(Theme.black);
 "];
 ```
-
-Interpolation here means using any identifier as a value inside a CSS definition. Useful for reusing variables, handling themes or change CSS during run-time.
 
 This interpolation only works inside values, which is slightly different from other JavaScript-based solutions (such as styled-components or emotion), where their interpolation is much more dynamic, you might find styled-ppx more strict, here's an example:
 
@@ -24,11 +26,12 @@ let margin = direction => {
    }
 };
 ```
-
+<Callout>
 Interpolation is treated as unsafe, disables the type-checker which can lead to run-time issues.
 This is the current implementation and the reason for that is because is very hard to implement type-safety with [shorthand properties](https://developer.mozilla.org/en-US/docs/Web/CSS/Shorthand_properties) and the polymorphism of CSS.
+</Callout>
 
-## Polymorphism of CSS
+### Polymorphism of CSS
 
 There are plenty of properties on CSS that accept different types of values, the ones encountered more challenging are `animation`, `box-shadow`, `background`, `transition` and `transform`, to name a few.
 

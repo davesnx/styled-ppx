@@ -1,4 +1,4 @@
-# cx: className
+# className: `cx` extension
 
 Sometimes is hard to give the right name for a styled component or sometimes those styles are only used once, that's why `cx` exists.
 

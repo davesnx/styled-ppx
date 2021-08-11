@@ -1,5 +1,5 @@
-### styled.global
-**Inject global CSS**, method to apply general styles to your website.
+# Inject global styles
+`%styled.global` is the method to apply general styles to your website.
 
 ```reason
 [%styled.global {|
