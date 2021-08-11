@@ -1,7 +1,6 @@
 #!/bin/bash
 
 set -eo pipefail
-set -x
 
 function help() {
   echo "Usage: $(basename "$0") [<newversion> | major | minor | patch | premajor | preminor | prepatch | prerelease]"
