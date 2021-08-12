@@ -5754,12 +5754,22 @@ module StringInterpolation = {
     createVariadicElement("div", newProps);
   };
 };
-let className = CssJs.style(. [|CssJs.display(`block)|]);
-let classNameWithMultiLine = CssJs.style(. [|CssJs.display(`block)|]);
-let classNameWithArray = CssJs.style(. [|cssProperty|]);
+let className =
+  CssJs.style(. [|CssJs.label("className"), CssJs.display(`block)|]);
+let classNameWithMultiLine =
+  CssJs.style(. [|
+    CssJs.label("classNameWithMultiLine"),
+    CssJs.display(`block),
+  |]);
+let classNameWithArray =
+  CssJs.style(. [|CssJs.label("classNameWithArray"), cssProperty|]);
 let cssRule = CssJs.color(CssJs.blue);
 let classNameWithCss =
-  CssJs.style(. [|cssRule, CssJs.backgroundColor(CssJs.green)|]);
+  CssJs.style(. [|
+    CssJs.label("classNameWithCss"),
+    cssRule,
+    CssJs.backgroundColor(CssJs.green),
+  |]);
 module DynamicComponent = {
   [@bs.deriving abstract]
   type makeProps('var) = {
