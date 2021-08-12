@@ -1,6 +1,6 @@
 {
   "name": "@davesnx/styled-ppx",
-  "version": "0.24.0",
+  "version": "0.24.1",
   "description": "Typed styled components in Reason, OCaml and ReScript",
   "author": "David Sancho <dsnxmoreno@gmail.com>",
   "license": "MIT",

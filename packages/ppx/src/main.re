@@ -3,6 +3,28 @@ open Ppxlib;
 module Builder = Ast_builder.Default;
 module Helper = Ast_helper;
 
+module Config = {
+  type t = {
+    compatibleModeWithBsEmotionPpx: bool,
+    production: bool,
+  };
+
+  let default: ref(option(t)) = ref(None);
+
+  let findArg = (name: string, args: array(string)) => {
+    args |> Array.to_list |> List.find_opt(i => i === name) |> Option.is_some;
+  };
+
+  let get = (args) => {
+    let config = {
+      compatibleModeWithBsEmotionPpx: args |> findArg("--compat-bs-emotion-ppx"),
+      production: false
+    };
+
+    config;
+  };
+};
+
 let raiseError = (~loc, ~description, ~example, ~link) => {
   raise(
     Location.raise_errorf(
@@ -288,6 +310,9 @@ let static_pattern =
     )
   );
 
+let config = Config.get(Sys.argv);
+let cssExtensionName = config.compatibleModeWithBsEmotionPpx ? "css_" : "css";
+
 let extensions = [
   Ppxlib.Extension.declare(
     "cx",
@@ -305,7 +330,7 @@ let extensions = [
     }
   ),
   Ppxlib.Extension.declare(
-    "css",
+    cssExtensionName,
     Ppxlib.Extension.Context.Expression,
     string_payload,
     (~loc as _, ~path as _, payload, _label, _) => {
@@ -656,4 +681,3 @@ Driver.register_transformation(
   ~instrument=Driver.Instrument.make(Fun.id, ~position=Before),
   "styled-ppx"
 );
-
