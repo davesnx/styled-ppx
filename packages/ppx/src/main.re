@@ -269,7 +269,41 @@ let string_payload =
 let any_payload =
   Ast_pattern.(single_expr_payload(__));
 
+/* TODO: Throw better errors when this pattern doesn't match */
+let static_pattern =
+  Ast_pattern.(
+    pstr(
+      pstr_eval(
+        map(~f=(catch, payload, _, delim) =>
+          catch(`String((payload, delim))),
+          pexp_constant(pconst_string(__', __, __))
+        )
+        ||| map(~f=(catch, payload) =>
+          catch(`Array((payload))),
+          pexp_array(__)
+        ),
+        nil
+      )
+    ^:: nil
+    )
+  );
+
 let extensions = [
+  Ppxlib.Extension.declare(
+    "cx",
+    Ppxlib.Extension.Context.Expression,
+    static_pattern,
+    (~loc, ~path as _, payload) => {
+      switch (payload) {
+        | `String(({ loc, txt }, _delim)) =>
+          parsePayloadStyle(txt, loc)
+            |> Css_to_emotion.render_declarations
+            |> Builder.pexp_array(~loc)
+            |> Css_to_emotion.render_style_call;
+        | `Array(arr) => arr |> Builder.pexp_array(~loc) |> Css_to_emotion.render_style_call;
+      }
+    }
+  ),
   Ppxlib.Extension.declare(
     "css",
     Ppxlib.Extension.Context.Expression,
