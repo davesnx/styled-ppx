@@ -28,4 +28,7 @@ esy test_snapshot;
 echo "Run runtests for Parser, vds & Lexer";
 esy test;
 
+echo "Run BuckleScript tests";
+yarn test_bs;
+
 exit 0
