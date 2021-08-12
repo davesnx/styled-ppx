@@ -269,41 +269,7 @@ let string_payload =
 let any_payload =
   Ast_pattern.(single_expr_payload(__));
 
-/* TODO: Throw better errors when this pattern doesn't match */
-let static_pattern =
-  Ast_pattern.(
-    pstr(
-      pstr_eval(
-        map(~f=(catch, payload, _, delim) =>
-          catch(`String((payload, delim))),
-          pexp_constant(pconst_string(__', __, __))
-        )
-        ||| map(~f=(catch, payload) =>
-          catch(`Array((payload))),
-          pexp_array(__)
-        ),
-        nil
-      )
-    ^:: nil
-    )
-  );
-
 let extensions = [
-  Ppxlib.Extension.declare(
-    "cx",
-    Ppxlib.Extension.Context.Expression,
-    static_pattern,
-    (~loc, ~path as _, payload) => {
-      switch (payload) {
-        | `String(({ loc, txt }, _delim)) =>
-          parsePayloadStyle(txt, loc)
-            |> Css_to_emotion.render_declarations
-            |> Builder.pexp_array(~loc)
-            |> Css_to_emotion.render_style_call;
-        | `Array(arr) => arr |> Builder.pexp_array(~loc) |> Css_to_emotion.render_style_call;
-      }
-    }
-  ),
   Ppxlib.Extension.declare(
     "css",
     Ppxlib.Extension.Context.Expression,
@@ -572,7 +538,7 @@ module Mapper = {
               _
             } as pat,
             pvb_expr: {
-              pexp_desc: Pexp_extension(({txt: "css", _}, PStr([{
+              pexp_desc: Pexp_extension(({txt: "cx", _}, PStr([{
                   pstr_desc:
                     Pstr_eval(
                       {
@@ -589,16 +555,49 @@ module Mapper = {
             _
           }]
         ) => {
+          let expr = parsePayloadStyle(styles, loc)
+            |> Css_to_emotion.render_declarations
+            |> Css_to_emotion.addLabel(~loc, valueName)
+            |> Builder.pexp_array(~loc=payloadLoc)
+            |> Css_to_emotion.render_style_call;
+
           Builder.pstr_value(~loc, Nonrecursive, [
-            Builder.value_binding(
-              ~loc=patternLoc,
-              ~pat,
-              ~expr=parsePayloadStyle(styles, loc)
-                      |> Css_to_emotion.render_declarations
-                      |> Css_to_emotion.addLabel(~loc, valueName)
-                      |> Builder.pexp_array(~loc=payloadLoc)
-                      |> Css_to_emotion.render_style_call
-              )
+            Builder.value_binding(~loc=patternLoc, ~pat, ~expr)
+          ]);
+        }
+      /* [%cx [||]] */
+      | Pstr_value(
+          Nonrecursive,
+          [{
+            pvb_pat: {
+              ppat_desc: Ppat_var({ loc: patternLoc, txt: valueName }),
+              _
+            } as pat,
+            pvb_expr: {
+              pexp_desc: Pexp_extension(({txt: "cx", _}, PStr([{
+                  pstr_desc:
+                    Pstr_eval(
+                      {
+                        pexp_loc: payloadLoc,
+                        pexp_desc: Pexp_array(arr),
+                        _,
+                      },
+                      _,
+                    ),
+                  _,
+                }]))), _
+            },
+            pvb_loc: loc,
+            _
+          }]
+        ) => {
+          let expr = arr
+            |> Css_to_emotion.addLabel(~loc=payloadLoc, valueName)
+            |> Builder.pexp_array(~loc=payloadLoc)
+            |> Css_to_emotion.render_style_call;
+
+          Builder.pstr_value(~loc, Nonrecursive, [
+            Builder.value_binding(~loc=patternLoc, ~pat, ~expr)
           ]);
         }
       | _ => expr
@@ -615,13 +614,12 @@ let traverser = {
   }
 };
 
-/* Instrument is needed to run metaquote before styled-ppx, we rely on this order for the native tests */
-let instrument = Driver.Instrument.make(Fun.id, ~position=Before);
-
 Driver.register_transformation(
   ~preprocess_impl=traverser#structure,
   ~extensions,
-  ~instrument,
+  /* Instrument is needed to run styled-ppx after metaquote,
+   we rely on this order in native tests */
+  ~instrument=Driver.Instrument.make(Fun.id, ~position=Before),
   "styled-ppx"
 );
 
