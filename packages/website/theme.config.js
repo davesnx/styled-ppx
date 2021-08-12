@@ -1,9 +1,5 @@
 import DocSearch from 'components/docsearch';
 
-const Logo = () => (
-  <span className="font-mono hidden md:inline">styled-ppx</span>
-);
-
 const short = 'CSS-in-Reason, OCaml and ReScript';
 const description =
   'styled-ppx is a ppx that allows you to write typed styled components in Reason, OCaml and ReScript';
@@ -13,7 +9,7 @@ export default {
   siteGithub: 'https://github.com/davesnx/styled-ppx',
   titleSuffix: '- styled-ppx',
   customSearch: <DocSearch />,
-  logo: <Logo />,
+  logo: <span className="font-mono hidden md:inline">styled-ppx</span>,
   head: (
     <>
       {/* Favicons, meta */}
