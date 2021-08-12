@@ -14,7 +14,7 @@ module.exports = {
     },
     fontFamily: {
       sans: ['Archivo', "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica", "Arial", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"],
-      mono: ['SF Mono', ''],
+      mono: ['SF Mono'],
     },
   },
 };
