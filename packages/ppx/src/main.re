@@ -2,28 +2,7 @@ open Ppxlib;
 
 module Builder = Ast_builder.Default;
 module Helper = Ast_helper;
-
-module Config = {
-  type t = {
-    compatibleModeWithBsEmotionPpx: bool,
-    production: bool,
-  };
-
-  let default: ref(option(t)) = ref(None);
-
-  let findArg = (name: string, args: array(string)) => {
-    args |> Array.to_list |> List.find_opt(i => i === name) |> Option.is_some;
-  };
-
-  let get = (args) => {
-    let config = {
-      compatibleModeWithBsEmotionPpx: args |> findArg("--compat-bs-emotion-ppx"),
-      production: false
-    };
-
-    config;
-  };
-};
+module Config = Ppx_config;
 
 let raiseError = (~loc, ~description, ~example, ~link) => {
   raise(
@@ -310,8 +289,7 @@ let static_pattern =
     )
   );
 
-let config = Config.get(Sys.argv);
-let cssExtensionName = config.compatibleModeWithBsEmotionPpx ? "css_" : "css";
+let compatibleModeWithBsEmotionPpx = Config.getArgsBeforeConfigLoaded();
 
 let extensions = [
   Ppxlib.Extension.declare(
@@ -330,7 +308,7 @@ let extensions = [
     }
   ),
   Ppxlib.Extension.declare(
-    cssExtensionName,
+    compatibleModeWithBsEmotionPpx ? "css_" : "css",
     Ppxlib.Extension.Context.Expression,
     string_payload,
     (~loc as _, ~path as _, payload, _label, _) => {
@@ -672,6 +650,14 @@ let traverser = {
     Mapper.transform(expr);
   }
 };
+
+Config.setDefault();
+
+Driver.add_arg(
+  "--compat-with-bs-emotion-ppx",
+  Arg.Bool(Config.updateCompatibleModeWithBsEmotionPpx),
+  ~doc="Changes the extension name from css to css_, avoids breakage with bs-emotion-ppx"
+);
 
 Driver.register_transformation(
   ~preprocess_impl=traverser#structure,
