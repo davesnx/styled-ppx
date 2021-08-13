@@ -1,3 +1,6 @@
 const nextra = require('nextra');
-const withNextra = nextra('nextra-theme-docs', './theme.config.js');
-module.exports = withNextra();
+
+module.exports = nextra({
+  theme: 'nextra-theme-docs',
+  themeConfig: './nextra.config.js'
+});
