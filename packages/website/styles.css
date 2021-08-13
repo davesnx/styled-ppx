@@ -1,4 +1,6 @@
+@tailwind base;
 @tailwind utilities;
+@tailwind components;
 
 .algolia-autocomplete .algolia-docsearch-suggestion--category-header span {
   display: inline-block;
