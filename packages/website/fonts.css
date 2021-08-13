@@ -26,31 +26,5 @@
   font-style: normal;
 }
 
-@font-face {
-  font-family: 'Silka';
-  src: url("./public/fonts/Silka/silka-bold.ttf");
-  font-weight: bold;
-  font-style: normal;
-}
-@font-face {
-  font-family: 'Silka';
-  src: url("./public/fonts/Silka/silka-medium.ttf");
-  font-weight: medium;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Silka';
-  src: url("./public/fonts/Silka/silka-regular.ttf");
-  font-weight: 400;
-  font-style: normal;
-}
-@font-face {
-  font-family: 'Silka';
-  src: url("./public/fonts/Silka/silka-semibold.ttf");
-  font-weight: 500;
-  font-style: normal;
-}
-
 @import url('https://fonts.googleapis.com/css2?family=Archivo&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap');

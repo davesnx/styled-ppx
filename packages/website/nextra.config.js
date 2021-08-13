@@ -9,7 +9,7 @@ export default {
   siteGithub: 'https://github.com/davesnx/styled-ppx',
   docsRepositoryBase: "https://github.com/davesnx/styled-ppx/tree/main/packages/website/pages",
   titleSuffix: '- styled-ppx',
-  customSearch: <DocSearch />,
+  customSearch: () => null,
   logo: <span className="font-mono hidden md:inline">styled-ppx</span>,
   head: (
     <>
