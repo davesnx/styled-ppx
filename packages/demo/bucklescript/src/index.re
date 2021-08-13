@@ -58,7 +58,11 @@ module Component = [%styled.div {j|
 ];
 
 let stilos = [%cx "box-shadow: 10px 10px 0 0 #ff0000 inset, 10px 10px 0 0 #ff0000"];
-let styles = CssJs.style(. [|CssJs.label("ComponentName"), CssJs.display(`block)|]);
+let styles = CssJs.style(. [|
+  CssJs.label("ComponentName"),
+  CssJs.display(`block),
+  [%css_ "flex-direction: row"]
+|]);
 
 switch (ReactDOM.querySelector("#app")) {
   | Some(el) =>
