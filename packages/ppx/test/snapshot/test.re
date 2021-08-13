@@ -93,7 +93,7 @@ module SequenceDynamicComponent = [%styled.div
     Js.log("Logging when render");
 
   [|
-    [%css "color: $(var);"],
+    [%css "color: $(var)"],
     [%css "display: block;"]
   |]
   }

@@ -316,7 +316,6 @@ and get_dimension = (n, buf) =>
 and get_variable = (buf) =>
   switch%sedlex (buf) {
   | variable_name => VARIABLE([Sedlexing.latin1(buf)])
-  | eof => raise(LexingError((buf.Sedlexing.pos, "Incomplete variable, missing a ')' at the end")))
   | _ =>
     raise(
       LexingError((
