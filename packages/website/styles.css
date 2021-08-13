@@ -1,4 +1,10 @@
+@tailwind base;
 @tailwind utilities;
+@tailwind components;
+
+.algolia-autocomplete {
+  width: 100%;
+}
 
 .algolia-autocomplete .algolia-docsearch-suggestion--category-header span {
   display: inline-block;
@@ -23,7 +29,7 @@ h1, h2, h3, h4, h5, h6, div, span, p {
 }
 
 code, code div, code span {
-  font-family: 'SFMono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family: 'SF Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
   line-height: 1.7;
 }

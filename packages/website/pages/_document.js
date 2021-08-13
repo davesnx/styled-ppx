@@ -13,30 +13,6 @@ class Document extends NextDocument {
             as="font"
             crossOrigin=""
           />
-          <link
-            rel="preload"
-            href="/fonts/Silka/Silka-regular.ttf"
-            as="font"
-            crossOrigin=""
-          />
-          <link
-            rel="preload"
-            href="/fonts/Silka/Silka-medium.ttf"
-            as="font"
-            crossOrigin=""
-          />
-          <link
-            rel="preload"
-            href="/fonts/Silka/Silka-bold.ttf"
-            as="font"
-            crossOrigin=""
-          />
-          <link
-            rel="preload"
-            href="/fonts/Silka/Silka-semibold.ttf"
-            as="font"
-            crossOrigin=""
-          />
         </Head>
         <body>
           <SkipNavLink />

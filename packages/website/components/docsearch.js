@@ -25,7 +25,7 @@ const Search = () => {
   useEffect(() => {
     if (window.docsearch) {
       window.docsearch({
-        apiKey: '7c7041862e922a61e80b9a7de7f24860',
+        apiKey: 'f96e25f97c4b8b5d598a4adf03962cd2',
         indexName: 'styled-ppx-documentation-content',
         inputSelector: 'input#algolia-doc-search',
       });
@@ -33,7 +33,7 @@ const Search = () => {
   }, []);
 
   return (
-    <div className="relative w-36 mr-2 docs-search">
+    <div className="relative w-56 docs-search">
       <input
         id="algolia-doc-search"
         className="appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline w-full"
