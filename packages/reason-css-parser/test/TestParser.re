@@ -15,7 +15,6 @@ let test = (parser, input, output) => (
   },
 );
 
-let x = [%value "<rgb()>"];
 let tests = [
   test(
     [%value "<rgb()>"],

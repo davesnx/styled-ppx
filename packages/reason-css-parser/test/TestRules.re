@@ -118,6 +118,7 @@ describe("data monad", ({test, _}) => {
     ();
   });
 });
+
 describe("match monad", ({test, _}) => {
   open! Match;
 
@@ -244,6 +245,7 @@ describe("pattern helpers", ({test, _}) => {
     | _ => failwith({|should be (Ok(), [STRING("TOMATO")]|})
     }
   });
+
   test("token", _ => {
     let rule =
       token(
@@ -262,6 +264,7 @@ describe("pattern helpers", ({test, _}) => {
     | _ => failwith({|should be (Error(_), [STRING("invalid")])|})
     };
   });
+
   test("expect", _ => {
     let rule = {
       let.bind_match () = expect(STRING("auto"));
@@ -279,6 +282,7 @@ describe("pattern helpers", ({test, _}) => {
     };
     ();
   });
+
   test("value", _ => {
     let rule = value(3, expect(STRING("none")));
     switch (rule([STRING("none")])) {

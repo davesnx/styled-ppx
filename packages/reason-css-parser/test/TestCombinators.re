@@ -17,11 +17,13 @@ describe("combine_static", ({test, _}) => {
     let ((), ()) = parse_exn([%value "A B"], "A B");
     ();
   });
+
   test("A B C", _ => {
     // TODO: fix this type
     let ((), (), ()) = parse_exn([%value "A B C"], "A B C");
     ();
   });
+
   test("<number> B", ({expect, _}) => {
     let (number, ()) = parse_exn([%value "<number> B"], "15 B");
     expect.float(number).toBeCloseTo(15.0);
@@ -43,6 +45,7 @@ describe("combine_xor", ({test, _}) => {
       };
     ();
   });
+
   test("A | B | C", _ => {
     let parse = parse_exn([%value "A | B | C"]);
     let () =
@@ -65,6 +68,7 @@ describe("combine_xor", ({test, _}) => {
       };
     ();
   });
+
   test("<number> | B", ({expect, _}) => {
     let parse = parse_exn([%value "<number> | B"]);
     let number =
@@ -90,6 +94,7 @@ describe("combine_and", ({test, _}) => {
     let ((), ()) = parse("B A");
     ();
   });
+
   test("A && B && C", _ => {
     let parse = parse_exn([%value "A && B && C"]);
     let ((), (), ()) = parse("A B C");
@@ -101,6 +106,7 @@ describe("combine_and", ({test, _}) => {
     let ((), (), ()) = parse("C B A");
     ();
   });
+
   test("<number> && B", ({expect, _}) => {
     let parse = parse_exn([%value "<number> && B"]);
     let (number, ()) = parse("17 B");
@@ -109,23 +115,25 @@ describe("combine_and", ({test, _}) => {
     let (number, ()) = parse("B 18");
     expect.float(number).toBeCloseTo(18.0);
   });
+
   test("prefer longest", _ => {
     let parse = parse_exn([%value "A && A B"]);
     let ((), ((), ())) = parse("A A B");
     let ((), ((), ())) = parse("A B A");
     ();
   });
+
   test("prefer longest with optional", _ => {
     let () = {
       let parse = parse_exn([%value "A? && B"]);
       let () =
         switch (parse("A B")) {
-        | (Some (), ()) => ()
+        | (Some(), ()) => ()
         | _ => failwith("should be (Some(), ())")
         };
       let () =
         switch (parse("B A")) {
-        | (Some (), ()) => ()
+        | (Some(), ()) => ()
         | _ => failwith("should be (Some(), ())")
         };
       let () =
@@ -139,12 +147,12 @@ describe("combine_and", ({test, _}) => {
       let parse = parse_exn([%value "A && B?"]);
       let () =
         switch (parse("A B")) {
-        | ((), Some ()) => ()
+        | ((), Some()) => ()
         | _ => failwith("should be (Some(), ())")
         };
       let () =
         switch (parse("B A")) {
-        | ((), Some ()) => ()
+        | ((), Some()) => ()
         | _ => failwith("should be (Some(), ())")
         };
       let () =
@@ -159,31 +167,33 @@ describe("combine_and", ({test, _}) => {
 });
 
 describe("combine_or", ({test, _}) => {
+
   // TODO: check invalid cases
   test("A || B", _ => {
     let parse = parse_exn([%value "A || B"]);
     let () =
       switch (parse("A B")) {
-      | (Some (), Some ()) => ()
+      | (Some(), Some()) => ()
       | (_, _) => failwith("should be (Some(), Some())")
       };
     let () =
       switch (parse("B A")) {
-      | (Some (), Some ()) => ()
+      | (Some(), Some()) => ()
       | (_, _) => failwith("should be (Some(), Some())")
       };
     let () =
       switch (parse("A")) {
-      | (Some (), None) => ()
+      | (Some(), None) => ()
       | (_, _) => failwith("should be (Some(), None)")
       };
     let () =
       switch (parse("B")) {
-      | (None, Some ()) => ()
+      | (None, Some()) => ()
       | (_, _) => failwith("should be (None, Some())")
       };
     ();
   });
+
   test("A || B || C", _ => {
     let parse = parse_exn([%value "A || B || C"]);
     let is = (expect, str) =>
@@ -195,16 +205,17 @@ describe("combine_or", ({test, _}) => {
     is((Some(), Some(), Some()), "C A B");
     is((Some(), Some(), Some()), "C B A");
   });
+
   test("<number> || B", ({expect, _}) => {
     let parse = parse_exn([%value "<number> || B"]);
     let () =
       switch (parse("19 B")) {
-      | (Some(number), Some ()) => expect.float(number).toBeCloseTo(19.0)
+      | (Some(number), Some()) => expect.float(number).toBeCloseTo(19.0)
       | (_, _) => failwith("should be (Some(number), Some())")
       };
     let () =
       switch (parse("B 20")) {
-      | (Some(number), Some ()) => expect.float(number).toBeCloseTo(20.0)
+      | (Some(number), Some()) => expect.float(number).toBeCloseTo(20.0)
       | (_, _) => failwith("should be (Some(number), Some())")
       };
     let () =
@@ -214,7 +225,7 @@ describe("combine_or", ({test, _}) => {
       };
     let () =
       switch (parse("B")) {
-      | (None, Some ()) => ()
+      | (None, Some()) => ()
       | (_, _) => failwith("should be (None, Some())")
       };
     ();

@@ -23,8 +23,8 @@ type transform('ast, 'value) = {
   string_to_expr: string => result(list(Parsetree.expression), string),
 };
 
-let emit = (parser, value_of_ast, value_to_expr) => {
-  let ast_of_string = Parser.parse(parser);
+let emit = (property, value_of_ast, value_to_expr) => {
+  let ast_of_string = Parser.parse(property);
   let ast_to_expr = ast => value_of_ast(ast) |> value_to_expr;
   let string_to_expr = string =>
     ast_of_string(string) |> Result.map(ast_to_expr);
@@ -206,7 +206,7 @@ let renderVariables = values => {
       );
 };
 
-let render_shorthand_properties_with_variable = (property: string, value: string) => {
+let _render_shorthand_properties_with_variable = (property: string, value: string) => {
   let.ok variableValues = parseVariables(value);
 
   let exprValue = List.length(variableValues) === 1
@@ -263,7 +263,7 @@ let render_length_percentage =
   | `Percentage(percentage) => render_percentage(percentage);
 
 // css-sizing-3
-let render_width =
+let render_size =
   fun
     | `Auto => variants_to_expression(`Auto)
     | `Length(_) as lp
@@ -277,33 +277,33 @@ let width =
   apply(
     Parser.property_width,
     [%expr CssJs.width],
-    render_width,
+    render_size,
   );
 let height =
   apply(
     Parser.property_height,
     [%expr CssJs.height],
-    apply_value(width.value_of_ast),
+    render_size,
   );
 let min_width =
   apply(
     Parser.property_min_width,
     [%expr CssJs.minWidth],
-    apply_value(width.value_of_ast),
+    render_size,
   );
 let min_height =
   apply(
     Parser.property_min_height,
     [%expr CssJs.minHeight],
-    apply_value(width.value_of_ast),
+    render_size,
   );
 let max_width =
   apply(
     Parser.property_max_width,
     [%expr CssJs.maxWidth],
     fun
-    | `Auto => raise(Unsupported_feature)
-    | `None => variants_to_expression(`None)
+    | `Auto as e
+    | `None as e => variants_to_expression(e)
     | `Length(_) as ast
     | `Percentage(_) as ast
     | `Max_content as ast
@@ -321,38 +321,48 @@ let box_sizing =
   apply(Parser.property_box_sizing, [%expr CssJs.boxSizing], variants_to_expression);
 let column_width = unsupported(Parser.property_column_width);
 
+let margin_value =
+  fun
+    | `Auto => variants_to_expression(`Auto)
+    | `Length(_) as lp
+    | `Percentage(_) as lp => render_length_percentage(lp);
+
+let padding_value =
+  fun
+    | `Auto => variants_to_expression(`Auto)
+    | `Length(_) as lp
+    | `Percentage(_) as lp => render_length_percentage(lp);
+
 // css-box-3
 let margin_top =
   apply(
     Parser.property_margin_top,
     [%expr CssJs.marginTop],
-    fun
-    | `Auto => variants_to_expression(`Auto)
-    | `Length(_) as lp
-    | `Percentage(_) as lp => render_length_percentage(lp),
+    margin_value,
   );
 let margin_right =
   apply(
     Parser.property_margin_right,
     [%expr CssJs.marginRight],
-    apply_value(margin_top.value_of_ast),
+    margin_value,
   );
 let margin_bottom =
   apply(
     Parser.property_margin_bottom,
     [%expr CssJs.marginBottom],
-    apply_value(margin_top.value_of_ast),
+    margin_value,
   );
 let margin_left =
   apply(
     Parser.property_margin_left,
     [%expr CssJs.marginLeft],
-    apply_value(margin_top.value_of_ast),
+    margin_value,
   );
+
 let margin =
   emit(
     Parser.property_margin,
-    List.map(apply_value(margin_top.value_of_ast)),
+    List.map(margin_value),
     fun
     | [all] => [[%expr CssJs.margin([%e all])]]
     | [v, h] => [[%expr CssJs.margin2(~v=[%e v], ~h=[%e h])]]
@@ -371,34 +381,36 @@ let margin =
       ]
     | _ => failwith("unreachable"),
   );
+
 let padding_top =
   apply(
     Parser.property_padding_top,
     [%expr CssJs.paddingTop],
-    render_length_percentage,
+    padding_value,
   );
 let padding_right =
   apply(
     Parser.property_padding_right,
     [%expr CssJs.paddingRight],
-    apply_value(padding_top.value_of_ast),
+    padding_value,
   );
 let padding_bottom =
   apply(
     Parser.property_padding_bottom,
     [%expr CssJs.paddingBottom],
-    apply_value(padding_top.value_of_ast),
+    padding_value,
   );
 let padding_left =
   apply(
     Parser.property_padding_left,
     [%expr CssJs.paddingLeft],
-    apply_value(padding_top.value_of_ast),
+    padding_value,
   );
+
 let padding =
   emit(
     Parser.property_padding,
-    List.map(apply_value(padding_top.value_of_ast)),
+    List.map(padding_value),
     fun
     | [all] => [[%expr CssJs.padding([%e all])]]
     | [v, h] => [[%expr CssJs.padding2(~v=[%e v], ~h=[%e h])]]
@@ -809,19 +821,19 @@ let border_right_color =
   apply(
     Parser.property_border_right_color,
     [%expr CssJs.borderRightColor],
-    apply_value(border_top_color.value_of_ast),
+    render_color,
   );
 let border_bottom_color =
   apply(
     Parser.property_border_bottom_color,
     [%expr CssJs.borderBottomColor],
-    apply_value(border_top_color.value_of_ast),
+    render_color,
   );
 let border_left_color =
   apply(
     Parser.property_border_left_color,
     [%expr CssJs.borderLeftColor],
-    apply_value(border_top_color.value_of_ast),
+    render_color,
   );
 let border_color =
   apply(
@@ -877,7 +889,7 @@ let border_width =
     [%expr CssJs.borderWidth],
     (w) =>
       switch (w) {
-        | [w] => render_width(w)
+        | [w] => render_size(w)
         | _ => raise(Unsupported_feature)
       },
     );
@@ -1577,16 +1589,12 @@ let parse_declarations = ((property: string, value: string)) => {
   switch (render_css_global_values(property, value)) {
   | Ok(value) => Ok(value)
   | Error(_) =>
-    switch (render_shorthand_properties_with_variable(property, value)) {
+    switch (render_to_expr(property, value)) {
     | Ok(value) => Ok(value)
-    | Error(_) =>
-      switch (render_to_expr(property, value)) {
-      | Ok(value) => Ok(value)
-      | Error(_)
-      | exception Unsupported_feature =>
-        let.ok () = is_valid_string ? Ok() : Error(`Invalid_value(value));
-        Ok([render_when_unsupported_features(property, value)]);
-      }
+    | Error(_)
+    | exception Unsupported_feature =>
+      let.ok () = is_valid_string ? Ok() : Error(`Invalid_value(value));
+      Ok([render_when_unsupported_features(property, value)]);
     }
   };
 };

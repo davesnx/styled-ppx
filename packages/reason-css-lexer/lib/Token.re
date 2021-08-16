@@ -2,6 +2,7 @@
 type token =
   | EOF
   | IDENT(string) // <ident-token>
+  | VARIABLE(list(string)) // Interpolation, not part of Spec 3
   | BAD_IDENT // TODO: this is needed?
   | FUNCTION(string) // <function-token>
   | AT_KEYWORD(string) // <at-keyword-token>

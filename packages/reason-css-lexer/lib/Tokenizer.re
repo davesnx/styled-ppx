@@ -19,6 +19,13 @@ let non_printable_code_point = [%sedlex.regexp?
 ];
 let newline = [%sedlex.regexp? '\n'];
 let whitespace = [%sedlex.regexp? Plus('\n' | '\t' | ' ')];
+let ident_char = [%sedlex.regexp?
+  '_' | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' | non_ascii_code_point | escape
+];
+
+let variable_name = [%sedlex.regexp? (Star(ident_char))];
+let module_variable = [%sedlex.regexp? (variable_name, '.')];
+let variable = [%sedlex.regexp? (Opt(Star(module_variable)), variable_name)];
 
 let (let.ok) = Result.bind;
 
@@ -152,6 +159,7 @@ let handle_consume_identifier =
   fun
   | Error((_, error)) => Error((BAD_IDENT, error))
   | Ok(string) => Ok(string);
+
 // https://drafts.csswg.org/css-syntax-3/#consume-remnants-of-bad-url
 let rec consume_remnants_bad_url = buf =>
   switch%sedlex (buf) {
@@ -292,6 +300,21 @@ let consume_comment = buf => {
   | _ => Ok()
   };
 };
+
+let consume_interpolation = (buf) => {
+  let rec consume_variable = (var, buf) => {
+    let variable = String.split_on_char('.', var);
+    switch%sedlex (buf) {
+      | variable => consume_variable(lexeme(buf), buf)
+      | ')' => Ok(VARIABLE(variable))
+      | eof => Error((VARIABLE(variable), `Eof))
+      | _ => Error((VARIABLE(variable), `Eof))
+    };
+  };
+
+  consume_variable("", buf);
+};
+
 let consume = buf => {
   let consume_hash = () =>
     switch%sedlex (buf) {
@@ -328,6 +351,7 @@ let consume = buf => {
   | "\"" => consume_string("\"", buf)
   | "#" => consume_hash()
   | "'" => consume_string("'", buf)
+  | "$(" => consume_interpolation(buf)
   | "(" => Ok(LEFT_PARENS)
   | ")" => Ok(RIGHT_PARENS)
   | "+" =>

@@ -6,37 +6,39 @@ let single_token_tests = [
   (" \n\t ", WHITESPACE, 4),
   ({|"something"|}, STRING("something"), 11),
   // TODO: is that right?
-  ("#2", HASH("2", `UNRESTRICTED), 2),
-  ("#abc", HASH("abc", `ID), 4),
-  ("#", DELIM("#"), 1),
+  ({|#2|}, HASH("2", `UNRESTRICTED), 2),
+  ({|#abc|}, HASH("abc", `ID), 4),
+  ({|#|}, DELIM("#"), 1),
   ({|'tuturu'|}, STRING("tuturu"), 8),
-  ("(", LEFT_PARENS, 1),
-  (")", RIGHT_PARENS, 1),
-  ("+12.3", NUMBER(12.3), 5),
-  ("+", DELIM("+"), 1),
-  (",", COMMA, 1),
-  ("-45.6", NUMBER(-45.6), 5),
-  ("-->", CDC, 3),
-  ("--potato", IDENT("--potato"), 8),
-  ("-", DELIM("-"), 1),
-  (".7", NUMBER(0.7), 2),
-  (".", DELIM("."), 1),
-  (":", COLON, 1),
-  (";", SEMICOLON, 1),
-  ("<!--", CDO, 4),
-  ("<", DELIM("<"), 1),
-  ("@mayushii", AT_KEYWORD("mayushii"), 9),
-  ("@", DELIM("@"), 1),
-  ("[", LEFT_SQUARE, 1),
+  ({|(|}, LEFT_PARENS, 1),
+  ({|)|}, RIGHT_PARENS, 1),
+  ({|+12.3|}, NUMBER(12.3), 5),
+  ({|+|}, DELIM("+"), 1),
+  ({|,|}, COMMA, 1),
+  ({|-45.6|}, NUMBER(-45.6), 5),
+  ({|-->|}, CDC, 3),
+  ({|--potato|}, IDENT("--potato"), 8),
+  ({|-|}, DELIM("-"), 1),
+  ({|.7|}, NUMBER(0.7), 2),
+  ({|.|}, DELIM("."), 1),
+  ({|:|}, COLON, 1),
+  ({|;|}, SEMICOLON, 1),
+  ({|<!--|}, CDO, 4),
+  ({|<|}, DELIM("<"), 1),
+  ({|@mayushii|}, AT_KEYWORD("mayushii"), 9),
+  ({|@|}, DELIM("@"), 1),
+  ({|[|}, LEFT_SQUARE, 1),
   ("\\@desu", IDENT("@desu"), 6),
-  ("]", RIGHT_SQUARE, 1),
-  ("12345678.9", NUMBER(12345678.9), 10),
-  ("bar", IDENT("bar"), 3),
-  ("", EOF, 0),
-  ("!", DELIM("!"), 1),
+  ({|]|}, RIGHT_SQUARE, 1),
+  ({|12345678.9|}, NUMBER(12345678.9), 10),
+  ({|bar|}, IDENT("bar"), 3),
+  ({||}, EOF, 0),
+  ({|!|}, DELIM("!"), 1),
+  ({|$(value)|}, VARIABLE(["value"]), 8),
+  ({|$(Module.value)|}, VARIABLE(["Module", "value"]), 15),
 ];
 
-describe("single token tests", ({test, _}) => {
+describe("Tokenizer", ({test, _}) => {
   let test = ((input, output, last_position)) =>
     test(
       input,
@@ -44,7 +46,7 @@ describe("single token tests", ({test, _}) => {
         let values =
           switch (from_string(input)) {
           | Ok(values) => values
-          | Error(`Frozen) => failwith("frozen somehow")
+          | Error(`Frozen) => failwith("Parser got frozen")
           };
         let {loc, _} = List.hd(values);
         let values = values |> List.map(({txt, _}) => txt);
@@ -86,5 +88,6 @@ describe("single token tests", ({test, _}) => {
             );
       },
     );
+
   List.iter(test, single_token_tests);
 });

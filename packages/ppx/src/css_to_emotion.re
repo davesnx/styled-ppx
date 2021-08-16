@@ -282,9 +282,8 @@ let bsEmotionLabel = (~loc, label) => {
   )
 };
 
-let addLabel = (~loc, label, emotionExprs) => {
-  [bsEmotionLabel(~loc, label), ...emotionExprs]
-};
+let addLabel = (~loc, label, emotionExprs) =>
+  [bsEmotionLabel(~loc, label), ...emotionExprs];
 
 let render_style_call = (declaration_list): Parsetree.expression => {
   let loc = declaration_list.pexp_loc;
