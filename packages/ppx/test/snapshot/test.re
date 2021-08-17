@@ -42,9 +42,9 @@ module Theme = {
 let black = "#000";
 
 module StringInterpolation = [%styled.div {j|
-  color: $(Theme.var);
+  color: $(var);
   background-color: $(black);
-  border-color: $(Theme.Border.black);
+  border-color: $(black);
   __UNSAFE__ color: trust-me;
   display: block;
 |j}];

@@ -2,7 +2,6 @@
 type token =
   | EOF
   | IDENT(string) // <ident-token>
-  | VARIABLE(list(string)) // Interpolation, not part of Spec 3
   | BAD_IDENT // TODO: this is needed?
   | FUNCTION(string) // <function-token>
   | AT_KEYWORD(string) // <at-keyword-token>
@@ -27,3 +26,13 @@ type token =
   | RIGHT_PARENS // <)-token>
   | LEFT_CURLY // <{-token>
   | RIGHT_CURLY; // <}-token>
+
+type error =
+  | Invalid_code_point
+  | Eof
+  | New_line;
+
+let show_error = fun
+  | Invalid_code_point => "Invalid code point"
+  | Eof => "Unexpected end"
+  | New_line => "New line";

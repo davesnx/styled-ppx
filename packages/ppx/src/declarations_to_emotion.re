@@ -859,6 +859,7 @@ let render_line_width =
   fun
   | `Length(length) => render_length(length)
   | _ => raise(Unsupported_feature);
+
 let border_top_width =
   apply(
     Parser.property_border_top_width,
@@ -902,31 +903,34 @@ let border_bottom =
 let border_left =
   unsupported(Parser.property_border_left, ~call=[%expr CssJs.borderLeft]);
 let border = unsupported(Parser.property_border, ~call=[%expr CssJs.border]);
+
+let border_value = fun
+  | [lp] => render_length_percentage(lp)
+  | _ => raise(Unsupported_feature);
+
 let border_top_left_radius =
   apply(
     Parser.property_border_top_left_radius,
     [%expr CssJs.borderTopLeftRadius],
-    fun
-    | [lp] => render_length_percentage(lp)
-    | _ => raise(Unsupported_feature),
+    border_value
   );
 let border_top_right_radius =
   apply(
     Parser.property_border_top_right_radius,
     [%expr CssJs.borderTopRightRadius],
-    apply_value(border_top_left_radius.value_of_ast),
+    border_value,
   );
 let border_bottom_right_radius =
   apply(
     Parser.property_border_bottom_right_radius,
     [%expr CssJs.borderBottomRightRadius],
-    apply_value(border_top_left_radius.value_of_ast),
+    border_value,
   );
 let border_bottom_left_radius =
   apply(
     Parser.property_border_bottom_left_radius,
     [%expr CssJs.borderBottomLeftRadius],
-    apply_value(border_top_left_radius.value_of_ast),
+    border_value,
   );
 let border_radius =
   unsupported(Parser.property_border_radius, ~call=[%expr CssJs.borderRadius]);
@@ -959,7 +963,7 @@ let overflow_x =
     [%expr CssJs.overflowX],
     fun
     | `Clip => raise(Unsupported_feature)
-    | otherwise => variants_to_expression(otherwise),
+    | rest => variants_to_expression(rest),
   );
 let overflow_y = variants(Parser.property_overflow_y, [%expr CssJs.overflowY]);
 let overflow =
@@ -1572,16 +1576,16 @@ let findProperty = (name) => {
 };
 
 let render_to_expr = (property, value) => {
-  let.ok string_to_expr =
+  let.ok expr_of_string =
     switch (findProperty(property)) {
-    | Some((_, (_, string_to_expr))) => Ok(string_to_expr)
+    | Some((_, (_, expr_of_string))) => Ok(expr_of_string)
     | None => Error(`Not_found)
     };
 
-  string_to_expr(value) |> Result.map_error(str => `Invalid_value(str));
+  expr_of_string(value) |> Result.map_error(str => `Invalid_value(str));
 };
 
-let parse_declarations = ((property: string, value: string)) => {
+let parse_declarations = (property: string, value: string) => {
   let.ok is_valid_string =
     Parser.check_property(~name=property, value)
     |> Result.map_error((`Unknown_value) => `Not_found);

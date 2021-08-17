@@ -34,8 +34,6 @@ let single_token_tests = [
   ({|bar|}, IDENT("bar"), 3),
   ({||}, EOF, 0),
   ({|!|}, DELIM("!"), 1),
-  ({|$(value)|}, VARIABLE(["value"]), 8),
-  ({|$(Module.value)|}, VARIABLE(["Module", "value"]), 15),
 ];
 
 describe("Tokenizer", ({test, _}) => {
@@ -70,7 +68,7 @@ describe("Tokenizer", ({test, _}) => {
               List.map(
                 fun
                 | Ok(token) => show_token(token)
-                | Error((token, _)) => "Error(" ++ show_token(token) ++ ")",
+                | Error((token, err)) => "Error(" ++ show_error(err) ++ ") " ++ show_token(token),
                 xs,
               )
               |> String.concat(" ")

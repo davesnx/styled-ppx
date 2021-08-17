@@ -76,9 +76,6 @@ let check_if_three_code_points_would_start_a_number = buf =>
 let starts_a_number = [%sedlex.regexp?
   ("+" | "-", digit) | ("+" | "-", ".", digit) | ('.', digit)
 ];
-
-let check_if_two_code_points_are_a_valid_escape =
-  check(check_if_two_code_points_are_a_valid_escape);
 let check_if_three_codepoints_would_start_an_identifier =
   check(check_if_three_codepoints_would_start_an_identifier);
 let check_if_three_code_points_would_start_a_number =
@@ -110,8 +107,8 @@ let consume_escaped = buf => {
     let char = uchar_of_int(char_code);
     let _ = consume_whitespace(buf);
     char_code == 0 || is_surrogate(char_code)
-      ? Error((fffd, `Invalid_code_point)) : Ok(char);
-  | eof => Error((fffd, `Eof))
+      ? Error((fffd, Invalid_code_point)) : Ok(char);
+  | eof => Error((fffd, Eof))
   | any => Ok(lexeme(buf))
   | _ => failwith("unrecheable")
   };
@@ -180,7 +177,7 @@ let consume_url = buf => {
       let _ = consume_whitespace(buf);
       switch%sedlex (buf) {
       | ')' => Ok(URL(acc))
-      | eof => Error((URL(acc), `Eof))
+      | eof => Error((URL(acc), Eof))
       | _ =>
         consume_remnants_bad_url(buf);
         Ok(BAD_URL);
@@ -188,7 +185,7 @@ let consume_url = buf => {
     };
     switch%sedlex (buf) {
     | ')' => Ok(URL(acc))
-    | eof => Error((URL(acc), `Eof))
+    | eof => Error((URL(acc), Eof))
     | whitespace => when_whitespace()
     | '"'
     | '\''
@@ -196,7 +193,7 @@ let consume_url = buf => {
     | non_printable_code_point =>
       consume_remnants_bad_url(buf);
       // TODO: location on error
-      Error((BAD_URL, `Invalid_code_point));
+      Error((BAD_URL, Invalid_code_point));
     | escape =>
       switch (consume_escaped(buf)) {
       | Ok(char) => read(acc ++ char)
@@ -217,7 +214,7 @@ let consume_string = (ending_code_point, buf) => {
     // TODO: fix sedlex nested problem
     let read_escaped = () =>
       switch%sedlex (buf) {
-      | eof => Error((acc, `Eof))
+      | eof => Error((acc, Eof))
       | '\n' => read(acc)
       | _ =>
         // TODO: is that tail call recursive? I'm not sure
@@ -229,8 +226,8 @@ let consume_string = (ending_code_point, buf) => {
     | '"' =>
       let code_point = lexeme(buf);
       code_point == ending_code_point ? Ok(acc) : read(acc ++ lexeme(buf));
-    | eof => Error((acc, `Eof))
-    | newline => Error((acc, `New_line))
+    | eof => Error((acc, Eof))
+    | newline => Error((acc, New_line))
     | escape => read_escaped()
     | any => read(acc ++ lexeme(buf))
     | _ => failwith("should be unreachable")
@@ -292,27 +289,13 @@ let consume_comment = buf => {
   let rec read_until_closes = () =>
     switch%sedlex (buf) {
     | "*/" => Ok()
-    | eof => Error(((), `Eof))
+    | eof => Error(((), Eof))
     | _ => read_until_closes()
     };
   switch%sedlex (buf) {
   | "/*" => read_until_closes()
   | _ => Ok()
   };
-};
-
-let consume_interpolation = (buf) => {
-  let rec consume_variable = (var, buf) => {
-    let variable = String.split_on_char('.', var);
-    switch%sedlex (buf) {
-      | variable => consume_variable(lexeme(buf), buf)
-      | ')' => Ok(VARIABLE(variable))
-      | eof => Error((VARIABLE(variable), `Eof))
-      | _ => Error((VARIABLE(variable), `Eof))
-    };
-  };
-
-  consume_variable("", buf);
 };
 
 let consume = buf => {
@@ -351,7 +334,6 @@ let consume = buf => {
   | "\"" => consume_string("\"", buf)
   | "#" => consume_hash()
   | "'" => consume_string("'", buf)
-  | "$(" => consume_interpolation(buf)
   | "(" => Ok(LEFT_PARENS)
   | ")" => Ok(RIGHT_PARENS)
   | "+" =>
@@ -394,7 +376,7 @@ let consume = buf => {
       rollback(buf);
       consume_ident_like(buf);
     // TODO: this error should be different
-    | _ => Error((DELIM("/"), `Invalid_code_point))
+    | _ => Error((DELIM("/"), Invalid_code_point))
     };
   | "]" => Ok(RIGHT_SQUARE)
   | digit =>
@@ -405,6 +387,6 @@ let consume = buf => {
     consume_ident_like(buf);
   | eof => Ok(EOF)
   | any => Ok(DELIM(lexeme(buf)))
-  | _ => failwith("UNREACHABLE 4 EVER")
+  | _ => failwith("This match case is unreachable. sedlex needs a last case as wildcard _. If this error appears, means that there's a bug in the tokenizer or the lexer.")
   };
 };

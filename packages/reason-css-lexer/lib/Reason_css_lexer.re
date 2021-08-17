@@ -1,7 +1,8 @@
-include Token;
 open Location;
+include Token;
 
 // TODO: that's definitly ugly
+/* TODO: Use lex_buffer from parser to keep track of the file */
 let from_string = string => {
   let buf = Sedlexing.Utf8.from_string(string);
   let rec read = acc => {

@@ -249,7 +249,7 @@ describe("correctly print value", ({test, _}) => {
           | Some(result) => result
           | None => failwith("failed to parse")
           };
-        let result = value_to_string(result);
+        let result = string_of_value(result);
         expect.string(result).toEqual(expected);
       },
     );
