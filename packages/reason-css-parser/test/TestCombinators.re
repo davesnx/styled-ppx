@@ -14,7 +14,8 @@ let parse_exn = (prop, str) =>
 describe("combine_static", ({test, _}) => {
   // TODO: check static order
   test("A B", _ => {
-    let ((), ()) = parse_exn([%value "A B"], "A B");
+    let parse = parse_exn([%value "A B"]);
+    let ((), ()) = parse("A B");
     ();
   });
 
@@ -27,6 +28,11 @@ describe("combine_static", ({test, _}) => {
   test("<number> B", ({expect, _}) => {
     let (number, ()) = parse_exn([%value "<number> B"], "15 B");
     expect.float(number).toBeCloseTo(15.0);
+  });
+
+  test("Running '<number> B' with wrong input", ({expect, _}) => {
+    let parse = parse_exn([%value "<number> B"]);
+    expect.fn(() => parse("15 15")).toThrow();
   });
 });
 

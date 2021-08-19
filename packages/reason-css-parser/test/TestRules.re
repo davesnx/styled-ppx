@@ -42,6 +42,17 @@ describe("data monad", ({test, _}) => {
     };
   });
 
+  test("all", _ => {
+    let rule4 = return(Ok(4));
+    let rule5 = return(Ok(5));
+    let rule = Match.all([rule4, rule5]);
+
+    switch (rule([COMMA])) {
+    | (Ok(lst), [COMMA]) when lst == [4, 5] => ()
+    | _ => failwith("should be (Ok(5), [COMMA])")
+    };
+  });
+
   test("bind_shortest", _ => {
     let comma =
       fun

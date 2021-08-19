@@ -14,7 +14,7 @@ let function_call = (name, rule) => {
     token(
       fun
       | FUNCTION(called_name) when name == called_name => Ok()
-      | _ => Error(["expected a function " ++ name]),
+      | token => Error(["expected a function " ++ name ++ ". got an " ++ show_token(token)]),
     );
   let.bind_match value = rule;
   let.bind_match () = expect(RIGHT_PARENS);
@@ -113,9 +113,9 @@ let frequency =
       switch (dimension |> String.lowercase_ascii) {
       | "hz" => Ok(`Hz(number))
       | "khz" => Ok(`KHz(number))
-      | _ => Error(["unknown dimension"])
+      | dim => Error(["unknown dimension " ++ dim])
       }
-    | _ => Error(["expected frequency"])
+    | token => Error(["expected frequency. got" ++ show_token(token)])
     }
   );
 
@@ -216,3 +216,25 @@ let hex_color =
       Ok(str)
     | _ => Error(["expected a hex-color"]),
   );
+
+// interpolation, not part of the spec
+let interpolation = {
+  open Rule;
+  open Let;
+
+  let.bind_match _ = Pattern.expect(DELIM("$"));
+  let.bind_match _ = Pattern.expect(LEFT_PARENS);
+  let.bind_match path = {
+    let.bind_match path = Modifier.zero_or_more({
+      let.bind_match ident = custom_ident;
+      let.bind_match _ = Pattern.expect(DELIM("."));
+      return_match(ident)
+    });
+    let.bind_match ident = custom_ident;
+    return_match(path @ [ident])
+  };
+  let.bind_match _ = Pattern.expect(RIGHT_PARENS);
+
+  return_match(path);
+};
+

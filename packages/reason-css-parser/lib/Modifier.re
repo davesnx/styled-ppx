@@ -6,6 +6,7 @@ type modifier('a, 'b) = Rule.rule('a) => Rule.rule('b);
 type range = (int, option(int));
 
 let one = Fun.id;
+
 let optional = rule => {
   let.bind_data value = rule;
   let value =
@@ -15,6 +16,7 @@ let optional = rule => {
     };
   return_match(value);
 };
+
 let match_n_values = ((min, max), sep, rule) => {
   // TODO: this definitly needs to be cleaned up
 

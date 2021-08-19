@@ -13,7 +13,14 @@ let (let.ok) = Result.bind;
 exception Unsupported_feature;
 
 let id = Fun.id;
-let apply_value = (f, v) => f(`Value(v));
+
+let rec print = (lst) => {
+  switch (lst) {
+    | [] => "[]"
+    | [one, ...rest] => one ++ "\n " ++ print(rest)
+  }
+};
+
 
 type transform('ast, 'value) = {
   ast_of_string: string => result('ast, string),
@@ -143,24 +150,61 @@ let variable_rule = {
   return_match(path);
 };
 
-let variable = parser =>
-  Combinator.combine_xor([
-    Rule.Match.map(variable_rule, data => `Variable(data)),
-    Rule.Match.map(parser, data => `Value(data)),
-  ]);
-
 let list_to_longident = vars => {
   vars |> String.concat(".") |> Longident.parse;
 };
 
-let transform_with_variable = (parser, map, value_to_expr) =>
+let transform_with_variable = (parser, mapper, value_to_expr) =>
   emit(
-    variable(parser),
+    Combinator.combine_xor([
+      Rule.Match.map(variable_rule, data => `Variable(data)),
+      Rule.Match.map(parser, data => `Value(data)),
+    ]),
     fun
     | `Variable(name) => list_to_longident(name) |> txt |> Helper.Exp.ident
-    | `Value(ast) => map(ast),
+    | `Value(ast) => mapper(ast),
     value_to_expr,
   );
+
+/* (
+  Rule.rule('a), 'a => expression,
+  expression => list(expression)) => transform([ `Value('a) | `Variable(list(label)) ],
+  expression
+) */
+
+type length = [ `Cap(float) | `Ch(float)| `Cm(float)| `Em(float)| `Ex(float)| `Ic(float)| `In(float)| `Lh(float)| `Mm(float)| `Pc(float)| `Pt(float)| `Px(float)| `Q(float)| `Rem(float)| `Rlh(float)| `Vb(float)| `Vh(float)| `Vi(float)| `Vmax(float)| `Vmin(float)| `Vw(float) | `Zero];
+
+type margin = [ `Auto | `Length(length) | `Percentage(float) | `Interpolation(list(string)) ];
+
+let transform_shorthand_with_variable = (
+  parser: Rule.rule(list(margin)),
+  mapper: margin => expression,
+  value_to_expr: list(expression) => list(expression)
+) => {
+  /* let property =
+    Rule.Match.bind(parser, data => {
+      let listOfRules = data |> List.map(Rule.Match.return);
+        listOfRules |> List.map(_v => {
+          /* Combinator.combine_xor([
+            Rule.Match.map(v, v => `Value(v)),
+            Rule.Match.map(variable_rule, v => `Variable(v))
+          ]); */
+          Rule.Match.map(variable_rule, v => `Variable(v))
+        }) |> Rule.Match.all;
+    }); */
+
+  let value_of_ast =
+    fun
+    | `Interpolation(name) => list_to_longident(name) |> txt |> Helper.Exp.ident
+    | _ as ast => mapper(ast);
+
+  let ast_of_string = Parser.parse(parser);
+  let ast_to_expr = ast => ast |> List.map(value_of_ast) |> value_to_expr;
+  let string_to_expr = string =>
+    ast_of_string(string) |> Result.map(ast_to_expr);
+
+  {ast_of_string, value_of_ast: List.map(value_of_ast), value_to_expr, ast_to_expr, string_to_expr};
+};
 
 let parseVariables = (value) => {
   /* Dummy regex trying to work it similarly with css_lexer's regex. In the future both parsers would share the same lexer, for now this is the only case we need to regex against a value. */
@@ -308,7 +352,7 @@ let max_width =
     | `Percentage(_) as ast
     | `Max_content as ast
     | `Min_content as ast
-    | `Fit_content(_) as ast => apply_value(width.value_of_ast, ast)
+    | `Fit_content(_) as ast => render_size(ast)
     | _ => raise(Unsupported_feature),
   );
 let max_height =
@@ -321,11 +365,13 @@ let box_sizing =
   apply(Parser.property_box_sizing, [%expr CssJs.boxSizing], variants_to_expression);
 let column_width = unsupported(Parser.property_column_width);
 
-let margin_value =
-  fun
+let margin_value = (m: margin): expression =>
+  switch (m) {
     | `Auto => variants_to_expression(`Auto)
     | `Length(_) as lp
-    | `Percentage(_) as lp => render_length_percentage(lp);
+    | `Percentage(_) as lp => render_length_percentage(lp)
+    | `Interpolation(name) => list_to_longident(name) |> txt |> Helper.Exp.ident
+  };
 
 let padding_value =
   fun
@@ -360,26 +406,27 @@ let margin_left =
   );
 
 let margin =
-  emit(
+  transform_shorthand_with_variable(
     Parser.property_margin,
-    List.map(margin_value),
+    margin_value,
     fun
     | [all] => [[%expr CssJs.margin([%e all])]]
     | [v, h] => [[%expr CssJs.margin2(~v=[%e v], ~h=[%e h])]]
-    | [t, h, b] => [
-        [%expr CssJs.margin3(~top=[%e t], ~h=[%e h], ~bottom=[%e b])],
-      ]
-    | [t, r, b, l] => [
-        [%expr
+    | [t, h, b] =>
+        [[%expr CssJs.margin3(~top=[%e t], ~h=[%e h], ~bottom=[%e b])]]
+    | [t, r, b, l] =>
+        [[%expr
           CssJs.margin4(
             ~top=[%e t],
             ~right=[%e r],
             ~bottom=[%e b],
             ~left=[%e l],
           )
-        ],
-      ]
-    | _ => failwith("unreachable"),
+        ]]
+    | rest => {
+      rest |> List.map(Pprintast.string_of_expression) |> print |> print_endline;
+      failwith("There aren't more margin combinations. got" ++ "")
+    }
   );
 
 let padding_top =
@@ -955,23 +1002,24 @@ let box_shadow =
       },
   );
 
+let overflow_value = fun
+  | `Clip => raise(Unsupported_feature)
+  | rest => variants_to_expression(rest);
+
 // css-overflow-3
 // TODO: maybe implement using strings?
 let overflow_x =
   apply(
     Parser.property_overflow_x,
     [%expr CssJs.overflowX],
-    fun
-    | `Clip => raise(Unsupported_feature)
-    | rest => variants_to_expression(rest),
+    overflow_value,
   );
 let overflow_y = variants(Parser.property_overflow_y, [%expr CssJs.overflowY]);
 let overflow =
   emit(
     Parser.property_overflow,
     fun
-    | `Xor(values) =>
-      values |> List.map(apply_value(overflow_x.value_of_ast))
+    | `Xor(values) => values |> List.map(overflow_value)
     | _ => raise(Unsupported_feature),
     fun
     | [all] => [[%expr CssJs.overflow([%e all])]]
@@ -1342,6 +1390,7 @@ let display = apply(
 
 let found = ({ast_of_string, string_to_expr, _}) => {
   let check_value = string => {
+    print_endline(string);
     let.ok _ = ast_of_string(string);
     Ok();
   };

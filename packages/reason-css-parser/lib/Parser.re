@@ -1158,7 +1158,7 @@ and property_list_style_position = [%value.rec "'inside' | 'outside'"]
 and property_list_style_type = [%value.rec
   "<counter-style> | <string> | 'none'"
 ]
-and property_margin = [%value.rec "[ <length> | <percentage> | 'auto' ]{1,4}"]
+and property_margin = [%value.rec "[ <length> | <percentage> | 'auto' | <interpolation> ]{1,4}"]
 and property_margin_block = [%value.rec "[ <'margin-left'> ]{1,2}"]
 and property_margin_block_end = [%value.rec "<'margin-left'>"]
 and property_margin_block_start = [%value.rec "<'margin-left'>"]

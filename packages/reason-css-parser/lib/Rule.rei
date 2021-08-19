@@ -28,6 +28,7 @@ module Match: {
   let map: map('a, 'a, 'b, 'b);
   let bind_shortest: best('a, 'a, 'b, 'b, 'c);
   let bind_longest: best('a, 'a, 'b, 'b, 'c);
+  let all: list(rule('a)) => rule(list('a))
 };
 
 module Let: {
