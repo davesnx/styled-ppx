@@ -18,7 +18,6 @@ type best('left_in, 'left_v, 'right_in, 'right_v, 'c) =
 module Data = {
   let return = (data, tokens) => (data, tokens);
   let bind = (rule, f, tokens) => {
-    tokens |> List.map(show_token) |> String.concat("\n") |> print_endline |> ignore;
     let (data, remaining_tokens) = rule(tokens);
     // TODO: maybe combinators should guarantee that
     switch (data) {

@@ -528,8 +528,8 @@ and property__moz_border_radius_topleft = [%value.rec
 and property__moz_border_radius_topright = [%value.rec
   "<'border-bottom-right-radius'>"
 ]
-and property__moz_border_right_colors = [%value.rec "[ <color> ]+ | 'none'"]
-and property__moz_border_top_colors = [%value.rec "[ <color> ]+ | 'none'"]
+and property__moz_border_right_colors = [%value.rec "[ <color> ]+ | 'none' | interpolation"]
+and property__moz_border_top_colors = [%value.rec "[ <color> ]+ | 'none' | interpolation"]
 and property__moz_context_properties = [%value.rec
   "'none' | [ 'fill' | 'fill-opacity' | 'stroke' | 'stroke-opacity' ]#"
 ]
@@ -813,7 +813,7 @@ and property_baseline_shift = [%value.rec
 and property_behavior = [%value.rec "[ <url> ]+"]
 and property_block_overflow = [%value.rec "'clip' | 'ellipsis' | <string>"]
 and property_block_size = [%value.rec "<'width'>"]
-and property_border = [%value.rec "<line-width> || <line-style> || <color>"]
+and property_border = [%value.rec "[<line-width> | interpolation ] || [ <line-style> | interpolation ] || [ <color> | interpolation ]"]
 and property_border_block = [%value.rec
   "<'border-top-width'> || <'border-top-style'> || <'color'>"
 ]
@@ -1272,7 +1272,7 @@ and property_overscroll_behavior_inline = [%value.rec
 ]
 and property_overscroll_behavior_x = [%value.rec "'contain' | 'none' | 'auto'"]
 and property_overscroll_behavior_y = [%value.rec "'contain' | 'none' | 'auto'"]
-and property_padding = [%value.rec "[ <length> | <percentage> ]{1,4}"]
+and property_padding = [%value.rec "[ <length> | <percentage> | <interpolation> ]{1,4}"]
 and property_padding_block = [%value.rec "[ <'padding-left'> ]{1,2}"]
 and property_padding_block_end = [%value.rec "<'padding-left'>"]
 and property_padding_block_start = [%value.rec "<'padding-left'>"]

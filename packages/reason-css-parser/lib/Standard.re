@@ -217,7 +217,11 @@ let hex_color =
     | _ => Error(["expected a hex-color"]),
   );
 
-// interpolation, not part of the spec
+/* <interpolation>, It's not part of the spec.
+  It's the implementation/workaround to inject Reason variables into CSS definitions.
+  `$()` only supports variables and Module accessors to variables.
+  In compile-time the bs-css bindings would enforce the types of those variables.
+*/
 let interpolation = {
   open Rule;
   open Let;

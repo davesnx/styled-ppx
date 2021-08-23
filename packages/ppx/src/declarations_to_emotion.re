@@ -14,14 +14,6 @@ exception Unsupported_feature;
 
 let id = Fun.id;
 
-let rec print = (lst) => {
-  switch (lst) {
-    | [] => "[]"
-    | [one, ...rest] => one ++ "\n " ++ print(rest)
-  }
-};
-
-
 type transform('ast, 'value) = {
   ast_of_string: string => result('ast, string),
   value_of_ast: 'ast => 'value,
@@ -37,6 +29,15 @@ let emit = (property, value_of_ast, value_to_expr) => {
     ast_of_string(string) |> Result.map(ast_to_expr);
 
   {ast_of_string, value_of_ast, value_to_expr, ast_to_expr, string_to_expr};
+};
+
+let emit_shorthand = (parser, mapper, value_to_expr) => {
+  let ast_of_string = Parser.parse(parser);
+  let ast_to_expr = ast => ast |> List.map(mapper) |> value_to_expr;
+  let string_to_expr = string =>
+    ast_of_string(string) |> Result.map(ast_to_expr);
+
+  {ast_of_string, value_of_ast: List.map(mapper), value_to_expr, ast_to_expr, string_to_expr};
 };
 
 let render_string = string => Helper.Const.string(string) |> Helper.Exp.constant;
@@ -130,135 +131,25 @@ let variants_to_expression =
   | `Full_width => raise(Unsupported_feature)
   | `Full_size_kana => raise(Unsupported_feature);
 
-let variable_rule = {
-  open Rule;
-  open Let;
-
-  let.bind_match _ = Pattern.expect(DELIM("$"));
-  let.bind_match _ = Pattern.expect(LEFT_PARENS);
-  let.bind_match path = {
-    let.bind_match path = Modifier.zero_or_more({
-      let.bind_match ident = Standard.custom_ident;
-      let.bind_match _ = Pattern.expect(DELIM("."));
-      return_match(ident)
-    });
-    let.bind_match ident = Standard.custom_ident;
-    return_match(path @ [ident])
-  };
-  let.bind_match _ = Pattern.expect(RIGHT_PARENS);
-
-  return_match(path);
-};
-
 let list_to_longident = vars => {
   vars |> String.concat(".") |> Longident.parse;
 };
 
+let render_variable = (name) => list_to_longident(name) |> txt |> Helper.Exp.ident;
+
 let transform_with_variable = (parser, mapper, value_to_expr) =>
   emit(
     Combinator.combine_xor([
-      Rule.Match.map(variable_rule, data => `Variable(data)),
+      /* If the CSS value is an interpolation, we treat as one `Variable */
+      Rule.Match.map(Standard.interpolation, data => `Variable(data)),
+      /* Otherwise it's a regular CSS `Value */
       Rule.Match.map(parser, data => `Value(data)),
     ]),
     fun
-    | `Variable(name) => list_to_longident(name) |> txt |> Helper.Exp.ident
+    | `Variable(name) => render_variable(name)
     | `Value(ast) => mapper(ast),
     value_to_expr,
   );
-
-/* (
-  Rule.rule('a), 'a => expression,
-  expression => list(expression)) => transform([ `Value('a) | `Variable(list(label)) ],
-  expression
-) */
-
-type length = [ `Cap(float) | `Ch(float)| `Cm(float)| `Em(float)| `Ex(float)| `Ic(float)| `In(float)| `Lh(float)| `Mm(float)| `Pc(float)| `Pt(float)| `Px(float)| `Q(float)| `Rem(float)| `Rlh(float)| `Vb(float)| `Vh(float)| `Vi(float)| `Vmax(float)| `Vmin(float)| `Vw(float) | `Zero];
-
-type margin = [ `Auto | `Length(length) | `Percentage(float) | `Interpolation(list(string)) ];
-
-let transform_shorthand_with_variable = (
-  parser: Rule.rule(list(margin)),
-  mapper: margin => expression,
-  value_to_expr: list(expression) => list(expression)
-) => {
-  /* let property =
-    Rule.Match.bind(parser, data => {
-      let listOfRules = data |> List.map(Rule.Match.return);
-        listOfRules |> List.map(_v => {
-          /* Combinator.combine_xor([
-            Rule.Match.map(v, v => `Value(v)),
-            Rule.Match.map(variable_rule, v => `Variable(v))
-          ]); */
-          Rule.Match.map(variable_rule, v => `Variable(v))
-        }) |> Rule.Match.all;
-    }); */
-
-  let value_of_ast =
-    fun
-    | `Interpolation(name) => list_to_longident(name) |> txt |> Helper.Exp.ident
-    | _ as ast => mapper(ast);
-
-  let ast_of_string = Parser.parse(parser);
-  let ast_to_expr = ast => ast |> List.map(value_of_ast) |> value_to_expr;
-  let string_to_expr = string =>
-    ast_of_string(string) |> Result.map(ast_to_expr);
-
-  {ast_of_string, value_of_ast: List.map(value_of_ast), value_to_expr, ast_to_expr, string_to_expr};
-};
-
-let parseVariables = (value) => {
-  /* Dummy regex trying to work it similarly with css_lexer's regex. In the future both parsers would share the same lexer, for now this is the only case we need to regex against a value. */
-  open Str;
-  let containsVariable = string_match(regexp("^.*\\$(.*).*"), value, 0);
-  let removeDollar = global_replace(regexp("\\$"), "");
-  let removeParentesis = v =>
-    v |> global_replace(regexp(")"), "") |> global_replace(regexp("("), "");
-  let valueWithoutDollar = value |> removeDollar;
-  let separatedValues = bounded_full_split(regexp("\\(([^)]+)\\)"), valueWithoutDollar, 0)
-   |> List.map(fun
-      | Delim(v) => `Interpolation(v |> removeDollar |> removeParentesis)
-      | Text(v) => `String(v)
-    );
-
-  containsVariable ? Ok(separatedValues) : Error();
-};
-
-let renderStringConcat = expressions => {
-  let concat = Helper.Exp.ident(~loc, Create.withLoc(Lident("^"), ~loc));
-  let rec renderInterpolated = (exprs) => {
-    switch (exprs) {
-      | [] => [%expr ""]
-      | [one] => one;
-      | [first, ...rest] => {
-        Builder.eapply(~loc, concat, [first, renderInterpolated(rest)]);
-      }
-    }
-  };
-
-  renderInterpolated(expressions);
-};
-
-let renderVariables = values => {
-  values
-    |> List.map(
-      fun
-        | `String(v) => render_string(v)
-        | `Interpolation(v) => {
-          let longident = v |> Longident.parse;
-          Helper.Exp.ident(Create.withLoc(~loc, longident))
-        }
-      );
-};
-
-let _render_shorthand_properties_with_variable = (property: string, value: string) => {
-  let.ok variableValues = parseVariables(value);
-
-  let exprValue = List.length(variableValues) === 1
-    ? variableValues |> renderVariables |> List.hd
-    : variableValues |> renderVariables |> renderStringConcat;
-
-  Ok([[%expr CssJs.unsafe([%e render_string(property)], [%e exprValue])]]);
-};
 
 let apply = (parser, id, map) =>
   transform_with_variable(parser, map, arg => [[%expr [%e id]([%e arg])]]);
@@ -365,13 +256,11 @@ let box_sizing =
   apply(Parser.property_box_sizing, [%expr CssJs.boxSizing], variants_to_expression);
 let column_width = unsupported(Parser.property_column_width);
 
-let margin_value = (m: margin): expression =>
-  switch (m) {
+let margin_value =
+  fun
     | `Auto => variants_to_expression(`Auto)
     | `Length(_) as lp
-    | `Percentage(_) as lp => render_length_percentage(lp)
-    | `Interpolation(name) => list_to_longident(name) |> txt |> Helper.Exp.ident
-  };
+    | `Percentage(_) as lp => render_length_percentage(lp);
 
 let padding_value =
   fun
@@ -406,9 +295,13 @@ let margin_left =
   );
 
 let margin =
-  transform_shorthand_with_variable(
+  emit_shorthand(
     Parser.property_margin,
-    margin_value,
+    fun
+    | `Auto => variants_to_expression(`Auto)
+    | `Length(_) as lp
+    | `Percentage(_) as lp => render_length_percentage(lp)
+    | `Interpolation(name) => render_variable(name),
     fun
     | [all] => [[%expr CssJs.margin([%e all])]]
     | [v, h] => [[%expr CssJs.margin2(~v=[%e v], ~h=[%e h])]]
@@ -423,10 +316,8 @@ let margin =
             ~left=[%e l],
           )
         ]]
-    | rest => {
-      rest |> List.map(Pprintast.string_of_expression) |> print |> print_endline;
-      failwith("There aren't more margin combinations. got" ++ "")
-    }
+    | [] => failwith("Margin value can't be empty")
+    | _ => failwith("There aren't more margin combinations")
   );
 
 let padding_top =
@@ -455,9 +346,12 @@ let padding_left =
   );
 
 let padding =
-  emit(
+  emit_shorthand(
     Parser.property_padding,
-    List.map(padding_value),
+    fun
+    | `Length(_) as lp
+    | `Percentage(_) as lp => render_length_percentage(lp)
+    | `Interpolation(name) => render_variable(name),
     fun
     | [all] => [[%expr CssJs.padding([%e all])]]
     | [v, h] => [[%expr CssJs.padding2(~v=[%e v], ~h=[%e h])]]
@@ -1390,7 +1284,6 @@ let display = apply(
 
 let found = ({ast_of_string, string_to_expr, _}) => {
   let check_value = string => {
-    print_endline(string);
     let.ok _ = ast_of_string(string);
     Ok();
   };
