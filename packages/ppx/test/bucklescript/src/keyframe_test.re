@@ -2,14 +2,10 @@ open Jest;
 open ReactTestingLibrary;
 
 EmotionSerializer.load();
-
-/* Since animationName is a string under the hood, casting it to string
-to match it as a string. This should be part of the bs-css binding */
-external toString: CssJs.animationName => string = "%identity";
 let fadeIn = [%keyframe {|
   0% { opacity: 0 }
   100% { opacity: 1 }
-|}] |> toString;
+|}];
 
 module Animate = [%styled.div {|
   background-color: black;
@@ -59,6 +55,9 @@ let testData = [
   )
 ];
 
+/* Since animationName is a string under the hood, casting it to string
+to match it as a string */
+external toString: CssJs.animationName => string = "%identity";
 
 describe("Keyframes", _ => {
   open Expect;
@@ -73,6 +72,7 @@ describe("Keyframes", _ => {
 
   Belt.List.forEachWithIndex(testData, (index, (name, cssIn, emotionOut)) => {
     test(string_of_int(index) ++ ". Supports " ++ name, () => {
+
       Expect.expect(toString(cssIn)) |> Expect.toMatch(toString(emotionOut));
     });
   });
