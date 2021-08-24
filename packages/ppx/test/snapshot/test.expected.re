@@ -11555,7 +11555,21 @@ module Hr = {
 =======
       CssJs.border(`pxFloat(1.), `solid, Color.Border.alpha),
       CssJs.borderBottom(`pxFloat(0.), `solid, Color.Border.alpha),
+<<<<<<< HEAD
 >>>>>>> eb1990f (feat: Support border with interpolation)
+||||||| parent of 415e329 (feat: Implement missing interp properties)
+=======
+      CssJs.width(width),
+      CssJs.maxWidth(max),
+      CssJs.height(height),
+      CssJs.borderRadius(border),
+      CssJs.fontSize(font),
+      CssJs.fontFamily(mono),
+      CssJs.lineHeight(lh),
+      CssJs.zIndex(zLevel),
+      CssJs.left(left),
+      CssJs.textDecorationColor(decorationColor),
+>>>>>>> 415e329 (feat: Implement missing interp properties)
     |]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};

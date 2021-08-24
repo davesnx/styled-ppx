@@ -998,6 +998,8 @@ let white_space = variants(Parser.property_white_space, [%expr CssJs.whiteSpace]
 let tab_size = unsupported(Parser.property_tab_size);
 let word_break = variants(Parser.property_word_break, [%expr CssJs.wordBreak]);
 let line_break = unsupported(Parser.property_line_break);
+let line_height = unsupported(Parser.property_line_height, ~call=[%expr CssJs.lineHeight]);
+let line_height_step = unsupported(Parser.property_line_height_step);
 let hyphens = unsupported(Parser.property_hyphens);
 let overflow_wrap =
   variants(Parser.property_overflow_wrap, [%expr CssJs.overflowWrap]);
@@ -1294,6 +1296,11 @@ let grid_row = unsupported(Parser.property_grid_row, ~call=[%expr CssJs.gridRow]
 let grid_column =
   unsupported(Parser.property_grid_column, ~call=[%expr CssJs.gridColumn]);
 let grid_area = unsupported(Parser.property_grid_area, ~call=[%expr CssJs.gridArea]);
+let z_index = unsupported(Parser.property_z_index, ~call=[%expr CssJs.zIndex]);
+let left = unsupported(Parser.property_left, ~call=[%expr CssJs.left]);
+let top = unsupported(Parser.property_top, ~call=[%expr CssJs.top]);
+let right = unsupported(Parser.property_right, ~call=[%expr CssJs.right]);
+let bottom = unsupported(Parser.property_bottom, ~call=[%expr CssJs.bottom]);
 let display = apply(
   Parser.property_display,
   [%expr CssJs.display],
@@ -1550,6 +1557,14 @@ let properties = [
   ("grid-row", found(grid_row)),
   ("grid-column", found(grid_column)),
   ("grid-area", found(grid_area)),
+  //
+  ("z-index", found(z_index)),
+  ("line-height", found(line_height)),
+  ("line-height-step", found(line_height_step)),
+  ("left", found(left)),
+  ("top", found(top)),
+  ("right", found(right)),
+  ("bottom", found(bottom)),
 ];
 
 let render_when_unsupported_features = (property, value) => {

@@ -223,14 +223,10 @@ let properties_static_css_tests = [%expr
     ([%css "text-indent: 5%"], CssJs.textIndent(`percent(5.))),
     // css-flexbox-1
     ([%css "flex-wrap: wrap"], CssJs.flexWrap(`wrap)),
-    // TODO: generate tests with variables in the future
-    // ([%css "flex-wrap: $var"], CssJs.flexWrap(var)),
-    // ([%css "flex-wrap: $(var)"], CssJs.flexWrap(var)),
     /* (
       [%css "flex-flow: row nowrap"],
-      CssJs.flexDirection(`row), CssJs.flexWrap(`nowrap)|],
+      [|CssJs.flexDirection(`row), CssJs.flexWrap(`nowrap)|],
     ), */
-    // TODO: flex-flow + variables
     ([%css "order: 5"], CssJs.order(5)),
     ([%css "flex-grow: 2"], CssJs.flexGrow(2.)),
     ([%css "flex-grow: 2.5"], CssJs.flexGrow(2.5)),
@@ -278,24 +274,3 @@ describe("Transform [%css] to bs-css", ({test, _}) => {
   write_tests_to_file(properties_static_css_tests, "static_css_tests.ml");
   List.iteri(test("properties static: "), properties_static_css_tests);
 });
-
-
-/*
-  Commented this tests since they rely on strings, similar to the comment above,
-  reason ast transforms strings to (""[@reason.raw_literal ""]) which isn't easy to do in metaquote, prefer to skip those.
-
-let properties_variable_css_tests = [
-  ([%expr [%css "color: $(var);"]], [%expr CssJs.unsafe("color", var)]),
-  ([%expr [%css "margin: $(var);"]], [%expr CssJs.unsafe("margin", var)]),
-];
-
-describe("Transform [%css] to bs-css with interpolatated variables", ({test, _}) => {
-  let test = (index, (result, expected)) =>
-    test(
-      "simple variable: " ++ string_of_int(index),
-      compare(result, expected),
-    );
-
-  List.iteri(test, properties_variable_css_tests);
-});
- */

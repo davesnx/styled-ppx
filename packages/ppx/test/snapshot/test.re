@@ -122,4 +122,16 @@ module Hr = [%styled.hr "
   padding: $(Size.small) 0px;
   border: 1px solid $(Color.Border.alpha);
   border-bottom: 0px solid $(Color.Border.alpha);
+  width: $(width);
+  max-width: $(max);
+  height: $(height);
+  border-radius: $(border);
+  font-size: $(font);
+  font-family: $(mono);
+  line-height: $(lh);
+  z-index: $(zLevel);
+  left: $(left);
+  text-decoration-color: $(decorationColor);
+  /* grid-row-gap: 10px; */
+  /* grid-column-gap: 10px; */
 "];
