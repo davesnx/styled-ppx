@@ -356,12 +356,12 @@ let makeMakeProps = (~loc, ~customProps) => {
         ...List.map(
              domProp =>
                switch (domProp) {
-               | React.Event({name, type_}) =>
+               | MakeProps.Event({name, type_}) =>
                  recordEventLabel(~loc, name, type_)
-               | React.Attribute({name, type_, alias}) =>
+               | MakeProps.Attribute({name, type_, alias}) =>
                  recordLabel(~loc, name, type_, alias)
                },
-             React.makePropList,
+             MakeProps.list,
            ),
       ],
       dynamicProps,

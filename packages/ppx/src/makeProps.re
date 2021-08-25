@@ -1,14 +1,15 @@
-type alias = option(string);
-type event = { name: string, type_: string };
-type attr = { name: string, type_: string, alias: alias };
-type domProp = | Event(event) | Attribute(attr);
-
 /*
   Contains all React DOM Props aka `makeProps` in ReasonReact.
-    snapshot: https://gist.github.com/davesnx/22f0e81b6d7450e3e0dcc157595426f2
-    taken from: https://github.com/reasonml/reason-react/blob/master/src/ReactDOM.re
+  Taken from: https://github.com/reasonml/reason-react/blob/master/src/ReactDOM.re
+  Snapshot: https://gist.github.com/davesnx/22f0e81b6d7450e3e0dcc157595426f2
 */
-let makePropList = [
+
+type alias = option(string);
+type event = { name: string, type_: string };
+type attr = { name: string, type_: string, alias };
+type domProp = | Event(event) | Attribute(attr);
+
+let list = [
   Attribute({name: "about", type_: "string", alias: None }),
   Attribute({name: "accentHeight", type_: "string", alias: None }),
   Attribute({name: "accept", type_: "string", alias: None }),
@@ -355,7 +356,7 @@ let makePropList = [
   Attribute({name: "title", type_: "string", alias: None }),
   Attribute({name: "to_", type_: "string", alias: None }),
   Attribute({name: "transform", type_: "string", alias: None }),
-  Attribute({name: "type_", type_: "string", alias: None }),
+  Attribute({name: "type_", type_: "string", alias: Some("type") }),
   Attribute({name: "typeof", type_: "string", alias: None }),
   Attribute({name: "u1", type_: "string", alias: None }),
   Attribute({name: "u2", type_: "string", alias: None }),
