@@ -1,4 +1,4 @@
-/*CSS Backgrounds and Borders Module Level 3*/
+/* CSS Backgrounds and Borders Module Level 3 */
 [%css {|background-repeat: space|}];
 [%css {|background-repeat: round|}];
 [%css {|background-repeat: repeat repeat|}];
@@ -161,7 +161,7 @@
 [%css {|box-shadow: 1px 2px 3px 4px black inset|}];
 [%css {|box-shadow: 1px 2px 3px 4px black inset, 1px 2px 3px 4px black|}];
 
-/*CSS Backgrounds and Borders Module Level 4*/
+/* CSS Backgrounds and Borders Module Level 4 */
 [%css {|background-position-x: right|}];
 [%css {|background-position-x: center|}];
 [%css {|background-position-x: 50%|}];
@@ -213,7 +213,7 @@
 [%css {|background-position-y: top -50px|}];
 [%css {|background-position-y: bottom 20px|}];
 
-/*CSS Images Module Level 3*/
+/* CSS Images Module Level 3 */
 /* [%css {|background-image: linear-gradient(white, black);|}]; */
 /* [%css {|background-image: linear-gradient(to right, white, black);|}]; */
 /* [%css {|background-image: linear-gradient(45deg, white, black);|}]; */
@@ -310,7 +310,7 @@
 /* [%css {|content: repeating-linear-gradient(white, black);|}]; */
 /* [%css {|content: repeating-radial-gradient(white, black);|}]; */
 
-/*CSS Basic User Interface Module Level 3 (CSS3 UI)*/
+/* CSS Basic User Interface Module Level 3 (CSS3 UI) */
 [%css {|box-sizing: border-box|}];
 [%css {|box-sizing: content-box|}];
 [%css {|outline-style: auto|}];
@@ -347,7 +347,7 @@
 [%css {|caret-color: auto|}];
 [%css {|caret-color: green|}];
 
-/*CSS Basic User Interface Module Level 4*/
+/* CSS Basic User Interface Module Level 4 */
 [%css {|appearance: auto|}];
 [%css {|appearance: none|}];
 /* [%css {|caret: auto|}]; */
@@ -422,7 +422,7 @@
 /* [%css {|nav-left: #foo current|}]; */
 /* [%css {|nav-left: #foo root|}]; */
 
-/*CSS Transitions*/
+/* CSS Transitions */
 [%css {|transition-property: none|}];
 [%css {|transition-property: all|}];
 [%css {|transition-property: width|}];
@@ -445,13 +445,13 @@
 [%css {|transition-delay: -1s|}];
 [%css {|transition: 1s 2s width linear|}];
 
-/*CSS Easing Functions Level 1*/
+/* CSS Easing Functions Level 1 */
 [%css {|transition-timing-function: steps(2, jump-start)|}];
 [%css {|transition-timing-function: steps(2, jump-end)|}];
 [%css {|transition-timing-function: steps(1, jump-both)|}];
 [%css {|transition-timing-function: steps(2, jump-none)|}];
 
-/*CSS Animations Level 1*/
+/* CSS Animations Level 1 */
 [%css {|animation-name: foo|}];
 [%css {|animation-name: foo, bar|}];
 [%css {|animation-duration: 0s|}];
@@ -485,7 +485,7 @@
 [%css {|animation-fill-mode: both|}];
 [%css {|animation: foo 1s 2s infinite linear alternate both|}];
 
-/*CSS Transforms Module Level 1*/
+/* CSS Transforms Module Level 1 */
 [%css {|transform: none|}];
 /* [%css {|transform: translate(5px)|}]; */
 /* [%css {|transform: translate(5px, 10px)|}]; */
@@ -527,7 +527,7 @@
 [%css {|transform-box: fill-box|}];
 [%css {|transform-box: view-box|}];
 
-/*CSS Transforms Module Level 2*/
+/* CSS Transforms Module Level 2 */
 [%css {|translate: none|}];
 [%css {|translate: 50%|}];
 [%css {|translate: 50% 50%|}];
@@ -652,7 +652,7 @@
 /* [%css {|offset-rotate: reverse 45deg|}]; */
 /* [%css {|offset-rotate: 2turn reverse|}]; */
 
-/*CSS Text Module Level 3*/
+/* CSS Text Module Level 3 */
 [%css {|text-transform: full-width|}];
 [%css {|text-transform: full-size-kana|}];
 /* [%css {|text-transform: capitalize full-width|}]; */
@@ -718,7 +718,7 @@
 [%css {|hanging-punctuation: first force-end last|}];
 [%css {|hanging-punctuation: first allow-end last|}];
 
-/*CSS Text Module Level 4*/
+/* CSS Text Module Level 4 */
 /* [%css {|text-space-collapse: collapse|}]; */
 /* [%css {|text-space-collapse: discard|}]; */
 /* [%css {|text-space-collapse: preserve|}]; */
@@ -762,7 +762,7 @@
 /* [%css {|hyphenate-limit-last: page|}]; */
 /* [%css {|hyphenate-limit-last: spread|}]; */
 
-/*CSS Text Decoration Module Level 3*/
+/* CSS Text Decoration Module Level 3 */
 [%css {|text-decoration: underline dotted green|}];
 [%css {|text-decoration-line: none|}];
 [%css {|text-decoration-line: underline|}];
@@ -802,7 +802,7 @@
 [%css {|text-shadow: 0 0 black|}];
 [%css {|text-shadow: 1px 2px 3px black|}];
 
-/*CSS Text Decoration Module Level 4*/
+/* CSS Text Decoration Module Level 4 */
 [%css {|text-decoration: underline solid blue 1px|}];
 [%css {|text-decoration-skip: none|}];
 [%css {|text-decoration-skip: objects|}];
@@ -834,12 +834,12 @@
 [%css {|text-decoration-thickness: 3px|}];
 [%css {|text-decoration-thickness: 10%|}];
 
-/*CSS Generated Content Module Level 3*/
+/* CSS Generated Content Module Level 3 */
 [%css {|quotes: auto|}];
 [%css {|content: url(./img/star.png) / "New!"|}];
 [%css {|content: "\25BA" / ""|}];
 
-/*CSS Line Grid Module Level 1*/
+/* CSS Line Grid Module Level 1 */
 /* [%css {|box-snap: none|}]; */
 /* [%css {|box-snap: block-start|}]; */
 /* [%css {|box-snap: block-end|}]; */
@@ -852,7 +852,7 @@
 /* [%css {|line-snap: baseline|}]; */
 /* [%css {|line-snap: contain|}]; */
 
-/*CSS Fonts Module Level 3*/
+/* CSS Fonts Module Level 3 */
 [%css {|font-stretch: normal|}];
 [%css {|font-stretch: ultra-condensed|}];
 [%css {|font-stretch: extra-condensed|}];
@@ -922,7 +922,7 @@
 [%css {|font-feature-settings: 'liga' off|}];
 [%css {|font-feature-settings: 'smcp', 'swsh' 2|}];
 
-/*CSS Fonts Module Level 4*/
+/* CSS Fonts Module Level 4 */
 [%css {|font-size: xxx-large|}];
 [%css {|font-variant: none|}];
 [%css {|font-variant: normal|}];
@@ -958,7 +958,7 @@
 /* [%css {|font-palette: light|}]; */
 /* [%css {|font-palette: dark|}]; */
 
-/*CSS Writing Modes Level 3*/
+/* CSS Writing Modes Level 3 */
 [%css {|direction: ltr|}];
 [%css {|direction: rtl|}];
 [%css {|unicode-bidi: normal|}];
@@ -976,12 +976,12 @@
 [%css {|text-combine-upright: none|}];
 [%css {|text-combine-upright: all|}];
 
-/*CSS Writing Modes Level 4*/
+/* CSS Writing Modes Level 4 */
 [%css {|writing-mode: sideways-rl|}];
 [%css {|writing-mode: sideways-lr|}];
 [%css {|text-combine-upright: digits 2|}];
 
-/*CSS Color Module Level 3*/
+/* CSS Color Module Level 3 */
 [%css {|color: rgba(0,0,0,.5);|}];
 [%css {|color: #F06;|}];
 [%css {|color: #FF0066;|}];
@@ -1018,7 +1018,7 @@
 [%css {|column-rule-color: transparent;|}];
 [%css {|column-rule-color: currentColor;|}];
 
-/*CSS Color Module Level 4*/
+/* CSS Color Module Level 4 */
 [%css {|color: rgb(0% 20% 70%);|}];
 [%css {|color: rgb(0 64 185);|}];
 [%css {|color: hsl(0 0% 0%);|}];
@@ -1285,7 +1285,7 @@
 /* [%css {|column-rule-color: device-cmyk(.2 .3 .4 .5 / .5);|}]; */
 /* [%css {|column-rule-color: device-cmyk(.2 .3 .4 .5 / 50%);|}]; */
 
-/*CSS Color Module Level 5*/
+/* CSS Color Module Level 5 */
 /* [%css {|color: color-mix(in srgb, teal 65%, olive);|}]; */
 /* [%css {|color: color-mix(in srgb, rgb(255, 0, 0, .2) 65%, olive);|}]; */
 /* [%css {|color: color-mix(in srgb, currentColor, rgba(0, 0, 0, .5) 65%;|}]; */
@@ -1367,7 +1367,7 @@
 /* [%css {|column-rule-color: lab(from orchid l 0 0);|}]; */
 /* [%css {|column-rule-color: lch(from peru calc(l * 0.8) c h);|}]; */
 
-/*CSS Color Adjustment Module Level 1*/
+/* CSS Color Adjustment Module Level 1 */
 /* [%css {|color-adjust: economy|}]; */
 /* [%css {|color-adjust: exact|}]; */
 /* [%css {|forced-color-adjust: auto|}]; */
@@ -1386,7 +1386,7 @@
 /* [%css {|color-scheme: none|}]; */
 /* [%css {|color-scheme: light none|}]; */
 
-/*CSS Multi-column Layout Module Level 1*/
+/* CSS Multi-column Layout Module Level 1 */
 [%css {|column-width: 10em|}];
 [%css {|column-width: auto|}];
 [%css {|column-count: 2|}];
@@ -1413,7 +1413,7 @@
 [%css {|column-fill: balance|}];
 [%css {|column-fill: balance-all|}];
 
-/*CSS Values and Units Module Level 3*/
+/* CSS Values and Units Module Level 3 */
 [%css {|width: 5rem;|}];
 [%css {|width: 5ch;|}];
 [%css {|width: 5vw;|}];
@@ -1451,7 +1451,7 @@
 /* [%css {|padding: calc(1vw - 1px);|}]; */
 /* [%css {|padding: calc(calc(100%));|}]; */
 
-/*CSS Values and Units Module Level 4*/
+/* CSS Values and Units Module Level 4 */
 /* [%css {|width: toggle(1px, 2px);|}]; */
 /* [%css {|width: min(10 * (1vw + 1vh) / 2, 12px);|}]; */
 /* [%css {|width: max(10 * (1vw + 1vh) / 2, 12px);|}]; */
@@ -1479,7 +1479,7 @@
 /* [%css {|padding: env(safe-area-inset-left);|}]; */
 /* [%css {|padding: env(safe-area-inset-left, 12px);|}]; */
 
-/*CSS Regions Module Level 1*/
+/* CSS Regions Module Level 1 */
 /* [%css {|flow-from: none|}]; */
 /* [%css {|flow-from: named-flow|}]; */
 /* [%css {|flow-into: none|}]; */
@@ -1489,7 +1489,7 @@
 /* [%css {|region-fragment: auto|}]; */
 /* [%css {|region-fragment: break|}]; */
 
-/*CSS Flexible Box Layout Module Level 1*/
+/* CSS Flexible Box Layout Module Level 1 */
 [%css {|align-content: flex-start|}];
 [%css {|align-content: flex-end|}];
 [%css {|align-content: space-between|}];
@@ -1531,7 +1531,7 @@
 [%css {|order: 0|}];
 [%css {|order: 1|}];
 
-/*CSS Grid Layout Module Level 1*/
+/* CSS Grid Layout Module Level 1 */
 [%css {|display: grid|}];
 [%css {|display: inline-grid|}];
 /* [%css {|grid-template-columns: none|}]; */
@@ -1640,7 +1640,7 @@
 /* [%css {|grid-gap: 1em|}]; */
 /* [%css {|grid-gap: 1em 1em|}]; */
 
-/*CSS Grid Layout Module Level 2*/
+/* CSS Grid Layout Module Level 2 */
 /* [%css {|grid-template-columns: subgrid|}]; */
 /* [%css {|grid-template-columns: subgrid [sub-a]|}]; */
 /* [%css {|grid-template-columns: subgrid [sub-a] [sub-b]|}]; */
@@ -1656,7 +1656,7 @@
 /* [%css {|grid-template-rows: subgrid repeat(auto-fill, [sub-a] [sub-b])|}]; */
 /* [%css {|grid-template-rows: subgrid [sub-a] repeat(auto-fill, [sub-b] [sub-c] [sub-d]) [sub-e] repeat(1, [sub-g])|}]; */
 
-/*CSS Grid Layout Module Level 3*/
+/* CSS Grid Layout Module Level 3 */
 /* [%css {|grid-template-columns: masonry|}]; */
 /* [%css {|grid-template-rows: masonry |}]; */
 /* [%css {|masonry-auto-flow: pack|}]; */
@@ -1698,7 +1698,7 @@
 /* [%css {|justify-tracks: unsafe center|}]; */
 /* [%css {|justify-tracks: safe start|}]; */
 
-/*CSS Box Alignment Module Level 3*/
+/* CSS Box Alignment Module Level 3 */
 [%css {|align-self: auto|}];
 [%css {|align-self: normal|}];
 [%css {|align-self: stretch|}];
@@ -1868,24 +1868,24 @@
 [%css {|row-gap: 0|}];
 [%css {|row-gap: 1em|}];
 
-/*CSS Box Model Module Level 4*/
+/* CSS Box Model Module Level 4 */
 [%css {|margin-trim: none|}];
 [%css {|margin-trim: in-flow|}];
 [%css {|margin-trim: all|}];
 
-/*CSS Cascading and Inheritance Level 3*/
+/* CSS Cascading and Inheritance Level 3 */
 [%css {|color: unset;|}];
 [%css {|font-weight: unset;|}];
 [%css {|background-image: unset;|}];
 [%css {|width: unset;|}];
 
-/*CSS Cascading and Inheritance Level 4*/
+/* CSS Cascading and Inheritance Level 4 */
 /* [%css {|color: revert;|}]; */
 /* [%css {|font-weight: revert;|}]; */
 /* [%css {|background-image: revert;|}]; */
 /* [%css {|all: revert;|}]; */
 
-/*CSS Masking Module Level 1*/
+/* CSS Masking Module Level 1 */
 [%css {|clip-path: url('#clip')|}];
 [%css {|clip-path: inset(50%)|}];
 [%css {|clip-path: circle()|}];
@@ -2057,7 +2057,7 @@
 [%css {|background-blend-mode: luminosity|}];
 [%css {|background-blend-mode: normal, multiply|}];
 
-/*CSS Display Module Level 3*/
+/* CSS Display Module Level 3 */
 [%css {|display: run-in|}];
 [%css {|display: flow|}];
 [%css {|display: flow-root|}];
@@ -2083,7 +2083,7 @@
 /* [%css {|display: list-item inline flow|}]; */
 /* [%css {|display: list-item block flow|}]; */
 
-/*CSS Shapes Module Level 1*/
+/* CSS Shapes Module Level 1 */
 /* [%css {|shape-outside: none|}]; */
 /* [%css {|shape-outside: inset(10% round 10% 40% 10% 40%)|}]; */
 /* [%css {|shape-outside: ellipse(at top 50% left 20%)|}]; */
@@ -2109,7 +2109,7 @@
 /* [%css {|shape-margin: 10px|}]; */
 /* [%css {|shape-margin: 50%|}]; */
 
-/*CSS Shapes Module Level 2*/
+/* CSS Shapes Module Level 2 */
 /* [%css {|shape-inside: auto|}]; */
 /* [%css {|shape-inside: outside-shape|}]; */
 /* [%css {|shape-inside: shape-box|}]; */
@@ -2124,7 +2124,7 @@
 /* [%css {|shape-padding: 10px|}]; */
 /* [%css {|shape-padding: 50%|}]; */
 
-/*CSS Exclusions Module Level 1*/
+/* CSS Exclusions Module Level 1 */
 /* [%css {|wrap-flow: auto|}]; */
 /* [%css {|wrap-flow: both|}]; */
 /* [%css {|wrap-flow: start|}]; */
@@ -2199,7 +2199,7 @@
 [%css {|touch-action: pan-y pinch-zoom|}];
 [%css {|touch-action: pan-x pan-y pinch-zoom|}];
 
-/*CSS Fragmentation Module Level 3*/
+/* CSS Fragmentation Module Level 3 */
 [%css {|break-before: auto|}];
 [%css {|break-before: avoid|}];
 [%css {|break-before: avoid-page|}];
@@ -2236,7 +2236,7 @@
 [%css {|widows: 1|}];
 [%css {|widows: 2|}];
 
-/*CSS Positioned Layout Module Level 3*/
+/* CSS Positioned Layout Module Level 3 */
 [%css {|position: sticky|}];
 /* [%css {|inset-before: auto|}]; */
 /* [%css {|inset-before: 10px|}]; */
@@ -2251,17 +2251,17 @@
 /* [%css {|inset-end: 10px|}]; */
 /* [%css {|inset-end: 50%|}]; */
 
-/*CSS Will Change Module Level 1*/
+/* CSS Will Change Module Level 1 */
 [%css {|will-change: scroll-position|}];
 [%css {|will-change: contents|}];
 [%css {|will-change: transform|}];
 [%css {|will-change: top, left|}];
 
-/*CSSOM View Module*/
+/* CSSOM View Module */
 [%css {|scroll-behavior: auto|}];
 [%css {|scroll-behavior: smooth |}];
 
-/*CSS Ruby Layout Module Level 1*/
+/* CSS Ruby Layout Module Level 1 */
 [%css {|display: ruby|}];
 [%css {|display: ruby-base|}];
 [%css {|display: ruby-text|}];
@@ -2281,7 +2281,7 @@
 /* [%css {|ruby-align: space-between|}]; */
 /* [%css {|ruby-align: space-around|}]; */
 
-/*CSS Scroll Snap Module Level 1*/
+/* CSS Scroll Snap Module Level 1 */
 [%css {|scroll-margin: 0px|}];
 [%css {|scroll-margin: 6px 5px|}];
 [%css {|scroll-margin: 10px 20px 30px|}];
@@ -2361,11 +2361,11 @@
 [%css {|scroll-snap-type: inline proximity|}];
 [%css {|scroll-snap-type: both proximity|}];
 
-/*CSS Scroll Anchoring Module Level 1*/
+/* CSS Scroll Anchoring Module Level 1 */
 [%css {|overflow-anchor: none|}];
 [%css {|overflow-anchor: auto|}];
 
-/*CSS Logical Properties and Values Level 1*/
+/* CSS Logical Properties and Values Level 1 */
 [%css {|caption-side: inline-start|}];
 [%css {|caption-side: inline-end|}];
 [%css {|float: inline-start|}];
@@ -2464,7 +2464,7 @@
 /* [%css {|border-style: logical solid dotted dashed none|}]; */
 /* [%css {|border-width: logical 5px 10px 15px 20px|}]; */
 
-/*CSS Lists Module Level 3*/
+/* CSS Lists Module Level 3 */
 [%css {|list-style-type: disclosure-closed|}];
 [%css {|list-style-type: disclosure-open|}];
 [%css {|list-style-type: hebrew|}];
@@ -2547,7 +2547,7 @@
 /* [%css {|content: counter(h1, upper-alpha) '.' counter(h2, decimal) ' '|}]; */
 /* [%css {|content: '(' counters(list-item, '.') ') '|}]; */
 
-/*CSS Overflow Module Level 3*/
+/* CSS Overflow Module Level 3 */
 [%css {|line-clamp: none|}];
 [%css {|line-clamp: 1|}];
 /* [%css {|line-clamp: 5 clip|}]; */
@@ -2581,7 +2581,7 @@
 /* [%css {|continue: auto|}]; */
 /* [%css {|continue: discard|}]; */
 
-/*CSS Containment Module Level 1*/
+/* CSS Containment Module Level 1 */
 [%css {|contain: none|}];
 [%css {|contain: strict|}];
 [%css {|contain: content|}];
@@ -2592,7 +2592,7 @@
 [%css {|contain: size paint|}];
 [%css {|contain: size layout paint|}];
 
-/*CSS Containment Module Level 2*/
+/* CSS Containment Module Level 2 */
 [%css {|contain: style|}];
 [%css {|contain: size style|}];
 [%css {|contain: size layout style|}];
@@ -2601,7 +2601,7 @@
 /* [%css {|content-visibility: auto|}]; */
 /* [%css {|content-visibility: hidden|}]; */
 
-/*CSS Box Sizing Module Level 3*/
+/* CSS Box Sizing Module Level 3 */
 [%css {|width: max-content|}];
 [%css {|width: min-content|}];
 [%css {|width: fit-content(10%)|}];
@@ -2624,7 +2624,7 @@
 /* [%css {|column-width: min-content|}]; */
 /* [%css {|column-width: fit-content(10%)|}]; */
 
-/*CSS Box Sizing Module Level 4*/
+/* CSS Box Sizing Module Level 4 */
 [%css {|aspect-ratio: auto|}];
 /* [%css {|aspect-ratio: 2|}];
 [%css {|aspect-ratio: 16 / 9|}];
@@ -2677,7 +2677,7 @@
 /* [%css {|max-block-size: fit-content|}]; */
 /* [%css {|max-block-size: contain|}]; */
 
-/*CSS Overscroll Behavior Module Level 1*/
+/* CSS Overscroll Behavior Module Level 1 */
 [%css {|overscroll-behavior: contain|}];
 [%css {|overscroll-behavior: none|}];
 [%css {|overscroll-behavior: auto|}];
@@ -2703,7 +2703,7 @@
 [%css {|overscroll-behavior-block: none|}];
 [%css {|overscroll-behavior-block: auto|}];
 
-/*CSS Scrollbars Module Level 1*/
+/* CSS Scrollbars Module Level 1 */
 [%css {|scrollbar-color: auto|}];
 [%css {|scrollbar-color: dark|}];
 [%css {|scrollbar-color: light|}];
@@ -2713,7 +2713,7 @@
 [%css {|scrollbar-width: none|}];
 /* [%css {|scrollbar-width: 12px|}]; */
 
-/*CSS Painting API Level 1*/
+/* CSS Painting API Level 1 */
 /* [%css {|background-image: paint(company-logo);|}]; */
 /* [%css {|background-image: paint(chat-bubble, blue);|}]; */
 /* [%css {|background-image: paint(failing-argument-syntax, 1px, 2px);|}]; */
@@ -2735,10 +2735,10 @@
 /* [%css {|content: paint(failing-argument-syntax, 1px, 2px);|}]; */
 /* [%css {|content: paint(arc, purple, 0.4turn, 0.8turn, 40px, 15px);|}]; */
 
-/*CSS Layout API Level 1*/
+/* CSS Layout API Level 1 */
 /* [%css {|display: layout(foo)|}]; */
 
-/*CSS Fill and Stroke Module Level 3*/
+/* CSS Fill and Stroke Module Level 3 */
 /* [%css {|fill: url(foo.png), url(bar.svg)|}]; */
 /* [%css {|fill: top left / 50% 60%|}]; */
 /* [%css {|fill: border-box|}]; */
@@ -3019,7 +3019,7 @@
 [%css {|pointer-events: all|}];
 [%css {|pointer-events: none|}];
 
-/*CSS Rhythmic Sizing*/
+/* CSS Rhythmic Sizing */
 /* [%css {|line-height-step: none|}]; */
 [%css {|line-height-step: 30px|}];
 [%css {|line-height-step: 2em|}];

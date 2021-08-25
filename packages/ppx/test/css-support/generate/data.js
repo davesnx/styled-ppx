@@ -450,7 +450,7 @@ export default {
     },
   },
 
-  /* 	"css-images-4": {
+  /* "css-images-4": {
 		"title": "CSS Images Module Level 4",
 		"links": {
 			"tr": "css-images-4",
@@ -1822,6 +1822,7 @@ export default {
       },
     },
   },
+
   "css-transitions-1": {
     title: "CSS Transitions",
     links: {
