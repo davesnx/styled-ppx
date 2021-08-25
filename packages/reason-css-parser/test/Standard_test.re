@@ -1,10 +1,10 @@
-open TestFramework;
+open Setup;
 open Reason_css_parser;
 open Standard;
 open Parser;
 
 // TODO: case insensitive
-describe("standard values", ({test, _}) => {
+describe("Standard values", ({test, _}) => {
   test("<integer>", ({expect, _}) => {
     let parse = parse([%value "<integer>"]);
     expect.result(parse("54")).toBe(Ok(54));

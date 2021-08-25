@@ -2,7 +2,8 @@
 (name reason-css-lexer)
 
 (source
- (github davesnx/styled-ppx))
+ (github davesnx/styled-ppx)
+)
 
 (license MIT)
 (authors "davesnx")
@@ -10,6 +11,6 @@
 
 (package
  (name reason-css-lexer)
- (synopsis "Reason CSS Lexer handles the lexing for CSS values")
- (description "This lexer implements the CSS Syntax 3 on the values")
+ (synopsis "Reason CSS Lexer")
+ (description "Implements the CSS Syntax 3 tokens")
 )

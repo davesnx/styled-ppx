@@ -1,4 +1,4 @@
-open TestFramework;
+open Setup;
 open Reason_css_parser;
 open Combinator;
 open Standard;
@@ -12,7 +12,7 @@ let parse_exn = (prop, str) =>
   | Error(message) => failwith(message)
   };
 
-describe("optional", ({test, _}) => {
+describe("Modifiers: optional", ({test, _}) => {
   test("<integer>?", ({expect, _}) => {
     let parse = parse_exn([%value "<integer>?"]);
     expect.option(parse("13")).toBe(Some(13));
@@ -26,7 +26,7 @@ describe("optional", ({test, _}) => {
   });
 });
 
-describe("zero_or_more", ({test, _}) => {
+describe("Modifiers: zero_or_more", ({test, _}) => {
   test("<integer>*", ({expect, _}) => {
     let parse = parse_exn([%value "<integer>*"]);
     expect.list(parse("")).toEqual([]);
@@ -42,7 +42,7 @@ describe("zero_or_more", ({test, _}) => {
   });
 });
 
-describe("one_or_more", ({test, _}) => {
+describe("Modifiers: one_or_more", ({test, _}) => {
   test("<integer>+", ({expect, _}) => {
     let parse = parse([%value "<integer>+"]);
     expect.result(parse("")).toBeError();
@@ -58,7 +58,7 @@ describe("one_or_more", ({test, _}) => {
   });
 });
 
-describe("repeat", ({test, _}) => {
+describe("Modifiers: repeat", ({test, _}) => {
   test("<integer>{2}", ({expect, _}) => {
     let parse = parse([%value "<integer>{2}"]);
     expect.result(parse("")).toBeError();

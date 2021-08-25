@@ -1,4 +1,4 @@
-open TestFramework;
+open Setup;
 open Css_spec_parser;
 
 let compare_ast = (expected, result, {expect, _}) => {
@@ -217,20 +217,21 @@ let parse_tests = [
   ),
 ];
 
-describe("correctly parse value", ({test, _}) => {
-  let test = (index, (result, expected)) =>
-    test(
-      "parse: " ++ string_of_int(index),
-      utils => {
-        let result =
-          switch (value_of_string(result)) {
-          | Some(result) => result
-          | None => failwith("failed to parse")
-          };
-        compare_ast(expected, result, utils);
-      },
-    );
-  List.iteri(test, parse_tests);
+describe("Parse value", ({test, _}) => {
+  parse_tests
+    |> List.iteri((index, (result, expected)) =>
+      test(
+        "parse: " ++ string_of_int(index),
+        utils => {
+          let result =
+            switch (value_of_string(result)) {
+            | Some(result) => result
+            | None => failwith("Failed to parse")
+            };
+          compare_ast(expected, result, utils);
+        },
+      )
+  );
 });
 
 let print_tests = [
@@ -239,19 +240,20 @@ let print_tests = [
   ("'[' abc ']'", "'[' 'abc' ']'"),
 ];
 
-describe("correctly print value", ({test, _}) => {
-  let test = (index, (result, expected)) =>
-    test(
-      "print: " ++ string_of_int(index),
-      ({expect, _}) => {
-        let result =
-          switch (value_of_string(result)) {
-          | Some(result) => result
-          | None => failwith("failed to parse")
-          };
-        let result = string_of_value(result);
-        expect.string(result).toEqual(expected);
-      },
+describe("Print value", ({test, _}) => {
+  print_tests
+    |> List.iteri((index, (result, expected)) =>
+      test(
+        "print: " ++ string_of_int(index),
+        ({expect, _}) => {
+          let result =
+            switch (value_of_string(result)) {
+            | Some(result) => result
+            | None => failwith("Failed to parse")
+            };
+          let result = string_of_value(result);
+          expect.string(result).toEqual(expected);
+        },
+      )
     );
-  List.iteri(test, print_tests);
 });

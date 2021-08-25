@@ -1,4 +1,4 @@
-open TestFramework;
+open Setup;
 open Reason_css_parser;
 open Parser;
 
@@ -43,6 +43,6 @@ let tests = [
   ),
 ];
 
-describe("parser tests", ({test, _}) => {
+describe("Parser", ({test, _}) => {
   tests |> List.iter(((input, test_fn)) => test(input, test_fn))
 });

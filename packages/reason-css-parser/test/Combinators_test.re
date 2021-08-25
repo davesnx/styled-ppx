@@ -1,4 +1,4 @@
-open TestFramework;
+open Setup;
 open Reason_css_parser;
 open Rule.Match;
 open Modifier;
@@ -11,7 +11,7 @@ let parse_exn = (prop, str) =>
   | Error(message) => failwith(message)
   };
 
-describe("combine_static", ({test, _}) => {
+describe("Combinators: static", ({test, _}) => {
   // TODO: check static order
   test("A B", _ => {
     let parse = parse_exn([%value "A B"]);
@@ -36,7 +36,7 @@ describe("combine_static", ({test, _}) => {
   });
 });
 
-describe("combine_xor", ({test, _}) => {
+describe("Combinators: xor", ({test, _}) => {
   test("A | B", _ => {
     let parse = parse_exn([%value "A | B"]);
     let () =
@@ -93,7 +93,7 @@ describe("combine_xor", ({test, _}) => {
   });
 });
 
-describe("combine_and", ({test, _}) => {
+describe("Combinators: and", ({test, _}) => {
   test("A && B", _ => {
     let parse = parse_exn([%value "A && B"]);
     let ((), ()) = parse("A B");
@@ -172,7 +172,7 @@ describe("combine_and", ({test, _}) => {
   });
 });
 
-describe("combine_or", ({test, _}) => {
+describe("Combinators: or", ({test, _}) => {
 
   // TODO: check invalid cases
   test("A || B", _ => {

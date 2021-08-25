@@ -1,24 +1,21 @@
 (library
- (name css_spec_parser_test)
- (public_name css-spec-parser-test.lib)
+ (name CSSSpecParserTest)
  (ocamlopt_flags -linkall -g)
  (libraries css-spec-parser.lib rely.lib)
  (modules
-  (:standard \ RunTests)
+  (:standard \ Runner)
  )
 )
 
 (executable
- (package css-spec-parser-test)
- (name RunTests)
- (public_name CssSpecTests.exe)
- (libraries css-spec-parser-test.lib)
- (modules RunTests)
+ (name Runner)
+ (libraries CSSSpecParserTest)
+ (modules Runner)
 )
 
 (rule
  (alias runtest)
- (deps RunTests.exe)
+ (deps Runner.exe)
  (action
   (run %{deps})
  )

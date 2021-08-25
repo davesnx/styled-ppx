@@ -1,9 +1,9 @@
-open TestFramework;
+open Setup;
 open Reason_css_parser;
 open Reason_css_lexer;
 open Rule;
 
-describe("data monad", ({test, _}) => {
+describe("Data monad", ({test, _}) => {
   open! Data;
 
   // TODO: check static order
@@ -130,7 +130,7 @@ describe("data monad", ({test, _}) => {
   });
 });
 
-describe("match monad", ({test, _}) => {
+describe("Match monad", ({test, _}) => {
   open! Match;
 
   // TODO: check static order
@@ -246,7 +246,7 @@ describe("match monad", ({test, _}) => {
   });
 });
 
-describe("pattern helpers", ({test, _}) => {
+describe("Pattern helpers", ({test, _}) => {
   open! Let;
   open! Pattern;
 
