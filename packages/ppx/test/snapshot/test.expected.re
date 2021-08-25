@@ -707,7 +707,7 @@ module OneSingleProperty = {
     to_: string,
     [@bs.optional]
     transform: string,
-    [@bs.optional]
+    [@bs.optional] [@bs.as "type"]
     type_: string,
     [@bs.optional]
     typeof: string,
@@ -1663,7 +1663,7 @@ module SingleQuoteStrings = {
     to_: string,
     [@bs.optional]
     transform: string,
-    [@bs.optional]
+    [@bs.optional] [@bs.as "type"]
     type_: string,
     [@bs.optional]
     typeof: string,
@@ -2620,7 +2620,7 @@ module MultiLineStrings = {
     to_: string,
     [@bs.optional]
     transform: string,
-    [@bs.optional]
+    [@bs.optional] [@bs.as "type"]
     type_: string,
     [@bs.optional]
     typeof: string,
@@ -3577,7 +3577,7 @@ module SelfClosingElement = {
     to_: string,
     [@bs.optional]
     transform: string,
-    [@bs.optional]
+    [@bs.optional] [@bs.as "type"]
     type_: string,
     [@bs.optional]
     typeof: string,
@@ -4529,7 +4529,7 @@ module ArrayStatic = {
     to_: string,
     [@bs.optional]
     transform: string,
-    [@bs.optional]
+    [@bs.optional] [@bs.as "type"]
     type_: string,
     [@bs.optional]
     typeof: string,
@@ -5493,7 +5493,7 @@ module StringInterpolation = {
     to_: string,
     [@bs.optional]
     transform: string,
-    [@bs.optional]
+    [@bs.optional] [@bs.as "type"]
     type_: string,
     [@bs.optional]
     typeof: string,
@@ -6469,7 +6469,7 @@ module DynamicComponent = {
     to_: string,
     [@bs.optional]
     transform: string,
-    [@bs.optional]
+    [@bs.optional] [@bs.as "type"]
     type_: string,
     [@bs.optional]
     typeof: string,
@@ -7427,7 +7427,7 @@ module SelectorsMediaQueries = {
     to_: string,
     [@bs.optional]
     transform: string,
-    [@bs.optional]
+    [@bs.optional] [@bs.as "type"]
     type_: string,
     [@bs.optional]
     typeof: string,
@@ -8396,7 +8396,7 @@ module ArrayDynamicComponent = {
     to_: string,
     [@bs.optional]
     transform: string,
-    [@bs.optional]
+    [@bs.optional] [@bs.as "type"]
     type_: string,
     [@bs.optional]
     typeof: string,
@@ -9354,7 +9354,7 @@ module SequenceDynamicComponent = {
     to_: string,
     [@bs.optional]
     transform: string,
-    [@bs.optional]
+    [@bs.optional] [@bs.as "type"]
     type_: string,
     [@bs.optional]
     typeof: string,
@@ -10310,7 +10310,7 @@ module DynamicComponentWithDefaultValue = {
     to_: string,
     [@bs.optional]
     transform: string,
-    [@bs.optional]
+    [@bs.optional] [@bs.as "type"]
     type_: string,
     [@bs.optional]
     typeof: string,
@@ -11269,7 +11269,7 @@ module Hr = {
     to_: string,
     [@bs.optional]
     transform: string,
-    [@bs.optional]
+    [@bs.optional] [@bs.as "type"]
     type_: string,
     [@bs.optional]
     typeof: string,
