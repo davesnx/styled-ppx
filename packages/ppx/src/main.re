@@ -415,18 +415,11 @@ module Mapper = {
 
   let getHtmlTagUnsafe = (~loc, str) => {
     switch (String.split_on_char('.', str)) {
-    | ["styled", tag] when Html.isValidTag(tag) => tag
-    | ["styled", tag] when !Html.isValidTag(tag) =>
-      raiseError(
-        ~loc,
-        ~description="This HTML element isn't valid.",
-        ~example="[%styled.div ...",
-        ~link="https://reasonml.org/docs/manual/latest/function#labeled-arguments",
-      );
+    | ["styled", tag] => tag
     | _ =>
       raiseError(
         ~loc,
-        ~description="This styled components isn't valid. Doesn't have the right format.",
+        ~description="This styled component is not valid. Doesn't have the right format.",
         ~example="[%styled.div ...",
         ~link="https://reasonml.org/docs/manual/latest/function#labeled-arguments",
       );
