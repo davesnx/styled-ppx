@@ -8675,7 +8675,7 @@ module ArrayDynamicComponent = {
 };
 module SequenceDynamicComponent = {
   [@bs.deriving abstract]
-  type makeProps('var) = {
+  type makeProps('size) = {
     [@bs.optional]
     ref: ReactDOM.domRef,
     [@bs.optional]
@@ -9277,8 +9277,6 @@ module SequenceDynamicComponent = {
     [@bs.optional]
     shapeRendering: string,
     [@bs.optional]
-    size: int,
-    [@bs.optional]
     sizes: string,
     [@bs.optional]
     slope: string,
@@ -9616,17 +9614,17 @@ module SequenceDynamicComponent = {
     onWaiting: ReactEvent.Media.t => unit,
     [@bs.optional]
     onWheel: ReactEvent.Wheel.t => unit,
-    var: 'var,
+    size: 'size,
   };
   [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
-  let styles = (~var) => {
+  let styles = (~size) => {
     Js.log("Logging when render");
-    CssJs.style(. [|CssJs.color(var), CssJs.display(`block)|]);
+    CssJs.style(. [|CssJs.width(width), CssJs.display(`block)|]);
   };
-  let make = (props: makeProps('var)) => {
-    let stylesObject = {"className": styles(~var=varGet(props))};
+  let make = (props: makeProps('size)) => {
+    let stylesObject = {"className": styles(~size=sizeGet(props))};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
     createVariadicElement("div", newProps);
   };

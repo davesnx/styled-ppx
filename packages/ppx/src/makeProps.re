@@ -487,6 +487,14 @@ let hasName = (prop, propName) => {
   }
 };
 
-let get = () => {
-  data |> List.filter((prop) => hasName(prop, "size"))
+let get = (propsToExclude) => {
+  let findInExclude = prop => List.find_opt(hasName(prop), propsToExclude);
+
+  data
+    |> List.filter(prop => {
+      prop
+        |> findInExclude
+        |> Option.is_none
+    }
+  );
 };
