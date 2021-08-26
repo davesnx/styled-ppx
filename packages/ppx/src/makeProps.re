@@ -9,7 +9,7 @@ type event = { name: string, type_: string };
 type attr = { name: string, type_: string, alias };
 type domProp = | Event(event) | Attribute(attr);
 
-let list = [
+let data = [
   Attribute({name: "about", type_: "string", alias: None }),
   Attribute({name: "accentHeight", type_: "string", alias: None }),
   Attribute({name: "accept", type_: "string", alias: None }),
@@ -308,6 +308,7 @@ let list = [
   Attribute({name: "selected", type_: "bool", alias: None }),
   Attribute({name: "shape", type_: "string", alias: None }),
   Attribute({name: "shapeRendering", type_: "string", alias: None }),
+  Attribute({name: "size", type_: "int", alias: None }),
   Attribute({name: "sizes", type_: "string", alias: None }),
   Attribute({name: "slope", type_: "string", alias: None }),
   Attribute({name: "spacing", type_: "string", alias: None }),
@@ -478,3 +479,14 @@ let list = [
   Event({name: "onWaiting", type_: "Media"}),
   Event({name: "onWheel", type_: "Wheel"}),
 ];
+
+let hasName = (prop, propName) => {
+  switch (prop) {
+    | Attribute({ name, _ }) => name == propName
+    | Event({ name, _ }) => name == propName
+  }
+};
+
+let get = () => {
+  data |> List.filter((prop) => hasName(prop, "size"))
+};

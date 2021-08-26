@@ -340,29 +340,29 @@ let makeMakeProps = (~loc, ~customProps) => {
     | None => ([], [])
     | Some((params, props)) => (params, props)
     };
+
+  let makeProps = MakeProps.data
+    |> List.map(
+      domProp =>
+        switch (domProp) {
+        | MakeProps.Event({name, type_}) =>
+          recordEventLabel(~loc, name, type_)
+        | MakeProps.Attribute({name, type_, alias}) =>
+          recordLabel(~loc, name, type_, alias)
+        },
+    );
+
   /*
      List of
-         prop: type
-         [@bs.optional]
-
-     ref: domRef
-     [@bs.optional]
+        prop: type
+        [@bs.optional]
    */
   let reactProps =
     List.append(
       [
         domRefLabel(~loc),
         childrenLabel(~loc),
-        ...List.map(
-             domProp =>
-               switch (domProp) {
-               | MakeProps.Event({name, type_}) =>
-                 recordEventLabel(~loc, name, type_)
-               | MakeProps.Attribute({name, type_, alias}) =>
-                 recordLabel(~loc, name, type_, alias)
-               },
-             MakeProps.list,
-           ),
+        ...makeProps,
       ],
       dynamicProps,
     );
