@@ -96,7 +96,7 @@ module SequenceDynamicComponent = [%styled.div
   }
 ];
 
-module DynamicComponentWithDefaultValue = [%styled.div (~var="green") => [|
+module DynamicComponentWithDefaultValue = [%styled.div (~var=hex("#333")) => [|
   [%css "color: $(var);"],
   [%css "display: block;"]
 |]];

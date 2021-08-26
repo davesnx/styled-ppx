@@ -6730,14 +6730,14 @@ module DynamicComponent = {
   [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
-  let styles = (~var) =>
+  let styles = (~var, _) =>
     CssJs.style(. [|
       CssJs.label("DynamicComponent"),
       CssJs.color(var),
       CssJs.display(`block),
     |]);
   let make = (props: makeProps('var)) => {
-    let stylesObject = {"className": styles(~var=varGet(props))};
+    let stylesObject = {"className": styles(~var=varGet(props), ())};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
     createVariadicElement("div", newProps);
   };
@@ -8661,14 +8661,14 @@ module ArrayDynamicComponent = {
   [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
-  let styles = (~var) =>
+  let styles = (~var, _) =>
     CssJs.style(. [|
       CssJs.label("ArrayDynamicComponent"),
       CssJs.display(`block),
       CssJs.color(var),
     |]);
   let make = (props: makeProps('var)) => {
-    let stylesObject = {"className": styles(~var=varGet(props))};
+    let stylesObject = {"className": styles(~var=varGet(props), ())};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
     createVariadicElement("div", newProps);
   };
@@ -9619,12 +9619,12 @@ module SequenceDynamicComponent = {
   [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
-  let styles = (~size) => {
+  let styles = (~size, _) => {
     Js.log("Logging when render");
     CssJs.style(. [|CssJs.width(width), CssJs.display(`block)|]);
   };
   let make = (props: makeProps('size)) => {
-    let stylesObject = {"className": styles(~size=sizeGet(props))};
+    let stylesObject = {"className": styles(~size=sizeGet(props), ())};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
     createVariadicElement("div", newProps);
   };
@@ -10578,14 +10578,14 @@ module DynamicComponentWithDefaultValue = {
   [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
-  let styles = (~var="green") =>
+  let styles = (~var=hex("#333"), _) =>
     CssJs.style(. [|
       CssJs.label("DynamicComponentWithDefaultValue"),
       CssJs.display(`block),
       CssJs.color(var),
     |]);
   let make = (props: makeProps('var)) => {
-    let stylesObject = {"className": styles(~var=?varGet(props))};
+    let stylesObject = {"className": styles(~var=?varGet(props), ())};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
     createVariadicElement("div", newProps);
   };
