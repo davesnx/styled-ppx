@@ -1,8 +1,5 @@
-/* This tests ensure that the ppx transform the right extensions, to the right form.
-There's one case for each of the different methods and doesn't need to type-check.
-
-If you are looking to add some tests for CSS support,
-check packages/ppx/test/native folder. */
+/* This tests ensure the transformation goes right and doesn't need to type-check.
+If you are looking to add some tests for CSS support, check packages/ppx/test/native folder. */
 
 [%styled.global {|
   html, body, #root, .class {
@@ -109,29 +106,3 @@ module DynamicComponentWithDefaultValue = [%styled.div (~var="green") => [|
   [%css "font-size: 16px"]
 |]];
 */
-
-/* let interpolationValue = "23";
-[%css "font-size: $(interpolationValue)"];
- */
-
-/* All the combinations of interpolation shoudn't be in the snapshot testing,
-should be in Test_Native, but since there's a issue with Reason's rawliteral, we ensure that the transform works in here. */
-module Hr = [%styled.hr "
-  margin: $(Size.big) $(Size.small);
-  color: $(mono100);
-  padding: $(Size.small) 0px;
-  border: 1px solid $(Color.Border.alpha);
-  border-bottom: 0px solid $(Color.Border.alpha);
-  width: $(width);
-  max-width: $(max);
-  height: $(height);
-  border-radius: $(border);
-  font-size: $(font);
-  font-family: $(mono);
-  line-height: $(lh);
-  z-index: $(zLevel);
-  left: $(left);
-  text-decoration-color: $(decorationColor);
-  /* grid-row-gap: 10px; */
-  /* grid-column-gap: 10px; */
-"];
