@@ -73,6 +73,27 @@ let properties_variable_css_tests = [
     [%expr [%css "text-decoration-color: $(decorationColor);"]],
     [%expr CssJs.textDecorationColor(decorationColor)]
   ),
+  /* Changed properties */
+  (
+    [%expr [%css "box-shadow: $(h) $(v) $(blur) $(spread) $(color);"]],
+    [%expr CssJs.boxShadows([|
+      CssJs.Shadow.box(~x=h, ~y=v, ~blur=blur, ~spread=spread, color)
+    |])]
+  ),
+  (
+    [%expr [%css "box-shadow: 10px 10px 0px $(spread) $(color);"]],
+    [%expr CssJs.boxShadows([|
+      CssJs.Shadow.box(
+        ~x=`pxFloat(10.),
+        ~y=`pxFloat(10.),
+        ~blur=`pxFloat(0.),
+        ~spread=spread,
+        color
+      )
+    |])]
+  ),
+  /* Add border */
+  /* Add text-shadow */
 ];
 
 describe("Should bind to bs-css with interpolatated variables", ({test, _}) => {
