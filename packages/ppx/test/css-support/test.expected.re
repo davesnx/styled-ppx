@@ -156,32 +156,12 @@ CssJs.unsafe("borderImage", "url(foo.png) 10 / 10% / 10px");
 CssJs.unsafe("borderImage", "url(foo.png) fill 10 / 10% / 10px");
 CssJs.unsafe("borderImage", "url(foo.png) fill 10 / 10% / 10px space");
 CssJs.boxShadows([|
-  CssJs.Shadow.box(~x=`pxFloat(1.), ~y=`pxFloat(1.), `currentColor),
-|]);
-CssJs.boxShadows([|CssJs.Shadow.box(~x=`zero, ~y=`zero, CssJs.black)|]);
-CssJs.boxShadows([|
-  CssJs.Shadow.box(
-    ~x=`pxFloat(1.),
-    ~y=`pxFloat(2.),
-    ~blur=`pxFloat(3.),
-    CssJs.black,
-  ),
-|]);
-CssJs.boxShadows([|
   CssJs.Shadow.box(
     ~x=`pxFloat(1.),
     ~y=`pxFloat(2.),
     ~blur=`pxFloat(3.),
     ~spread=`pxFloat(4.),
     CssJs.black,
-  ),
-|]);
-CssJs.boxShadows([|
-  CssJs.Shadow.box(
-    ~x=`pxFloat(1.),
-    ~y=`pxFloat(1.),
-    ~inset=true,
-    `currentColor,
   ),
 |]);
 CssJs.boxShadows([|
@@ -483,8 +463,6 @@ CssJs.unsafe("textEmphasisPosition", "over right");
 CssJs.unsafe("textEmphasisPosition", "under left");
 CssJs.unsafe("textEmphasisPosition", "under right");
 CssJs.unsafe("textShadow", "none");
-CssJs.unsafe("textShadow", "1px 1px");
-CssJs.unsafe("textShadow", "0 0 black");
 CssJs.unsafe("textShadow", "1px 2px 3px black");
 CssJs.unsafe("textDecoration", "underline solid blue 1px");
 CssJs.unsafe("textDecorationSkip", "none");

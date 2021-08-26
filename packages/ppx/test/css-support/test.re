@@ -153,13 +153,13 @@
 [%css {|border-image: url(foo.png) 10 / 10% / 10px|}];
 [%css {|border-image: url(foo.png) fill 10 / 10% / 10px|}];
 [%css {|border-image: url(foo.png) fill 10 / 10% / 10px space|}];
-/* The following box-shadow declarations are not supported in the CSS Parser */
+/* The following shadow declarations are not supported in the CSS Parser */
 /* [%css {|box-shadow: 1px 1px|}]; */
 /* [%css {|box-shadow: 0 0 black|}]; */
 /* [%css {|box-shadow: 1px 2px 3px black|}]; */
 [%css {|box-shadow: 1px 2px 3px 4px black|}];
-[%css {|box-shadow: 1px 2px 3px 4px black inset|}];
-[%css {|box-shadow: 1px 2px 3px 4px black inset, 1px 2px 3px 4px black|}];
+[%css {|box-shadow: inset 1px 2px 3px 4px black|}];
+[%css {|box-shadow: inset 1px 2px 3px 4px black, 1px 2px 3px 4px black|}];
 
 /* CSS Backgrounds and Borders Module Level 4 */
 [%css {|background-position-x: right|}];
@@ -798,8 +798,9 @@
 [%css {|text-emphasis-position: under left|}];
 [%css {|text-emphasis-position: under right|}];
 [%css {|text-shadow: none|}];
-[%css {|text-shadow: 1px 1px|}];
-[%css {|text-shadow: 0 0 black|}];
+/* The following shadow declarations are not supported in the CSS Parser */
+/* [%css {|text-shadow: 1px 1px|}]; */
+/* [%css {|text-shadow: 0 0 black|}]; */
 [%css {|text-shadow: 1px 2px 3px black|}];
 
 /* CSS Text Decoration Module Level 4 */
@@ -2020,7 +2021,7 @@
 [%css {|mask-type: luminance|}];
 [%css {|mask-type: alpha|}];
 
-/*Compositing and Blending Level 1*/
+/* Compositing and Blending Level 1 */
 [%css {|mix-blend-mode: normal|}];
 [%css {|mix-blend-mode: multiply|}];
 [%css {|mix-blend-mode: screen|}];
@@ -2135,7 +2136,7 @@
 /* [%css {|wrap-through: wrap|}]; */
 /* [%css {|wrap-through: none|}]; */
 
-/*Filter Effects Module Level 1*/
+/* Filter Effects Module Level 1 */
 [%css {|filter: none|}];
 [%css {|filter: url(#id)|}];
 [%css {|filter: url(image.svg#id)|}];
@@ -2162,7 +2163,7 @@
 /* [%css {|lighting-color: white|}]; */
 /* [%css {|lighting-color: #000|}]; */
 
-/*Filter Effects Module Level 2*/
+/* Filter Effects Module Level 2 */
 [%css {|backdrop-filter: none|}];
 [%css {|backdrop-filter: url(#id)|}];
 [%css {|backdrop-filter: url(image.svg#id)|}];
@@ -2178,7 +2179,7 @@
 [%css {|backdrop-filter: saturate(150%)|}];
 [%css {|backdrop-filter: grayscale(100%) sepia(100%)|}];
 
-/*Pointer Events Level 1*/
+/* Pointer Events Level 1 */
 [%css {|touch-action: auto|}];
 [%css {|touch-action: none|}];
 [%css {|touch-action: pan-x|}];
@@ -2186,14 +2187,14 @@
 [%css {|touch-action: pan-x pan-y|}];
 [%css {|touch-action: manipulation|}];
 
-/*Pointer Events Level 3*/
+/* Pointer Events Level 3 */
 [%css {|touch-action: pan-left|}];
 [%css {|touch-action: pan-right|}];
 [%css {|touch-action: pan-up|}];
 [%css {|touch-action: pan-down|}];
 [%css {|touch-action: pan-left pan-up|}];
 
-/*Compatibility*/
+/* Compatibility */
 [%css {|touch-action: pinch-zoom|}];
 [%css {|touch-action: pan-x pinch-zoom|}];
 [%css {|touch-action: pan-y pinch-zoom|}];
@@ -2626,9 +2627,9 @@
 
 /* CSS Box Sizing Module Level 4 */
 [%css {|aspect-ratio: auto|}];
-/* [%css {|aspect-ratio: 2|}];
-[%css {|aspect-ratio: 16 / 9|}];
-[%css {|aspect-ratio: auto 16 / 9|}]; */
+/* [%css {|aspect-ratio: 2|}]; */
+/* [%css {|aspect-ratio: 16 / 9|}]; */
+/* [%css {|aspect-ratio: auto 16 / 9|}]; */
 /* [%css {|contain-intrinsic-size: none|}]; */
 /* [%css {|contain-intrinsic-size: 10px|}]; */
 /* [%css {|contain-intrinsic-size: 10px 15px|}]; */
@@ -2902,7 +2903,7 @@
 /* [%css {|stroke-opacity: 0.5|}]; */
 /* [%css {|stroke-opacity: 45%|}]; */
 
-/*SVG 2 Geometry Properties*/
+/* SVG 2 Geometry Properties */
 /* [%css {|cx: 0|}]; */
 /* [%css {|cx: 1px|}]; */
 /* [%css {|cx: -5px|}]; */
@@ -2931,7 +2932,7 @@
 /* [%css {|y: -5px|}]; */
 /* [%css {|y: 25%|}]; */
 
-/*SVG 2 Coordinate Systems, Transformations and Units*/
+/* SVG 2 Coordinate Systems, Transformations and Units */
 /* [%css {|vector-effect: none|}]; */
 /* [%css {|vector-effect: non-scaling-stroke|}]; */
 /* [%css {|vector-effect: non-scaling-size|}]; */
@@ -2941,11 +2942,11 @@
 /* [%css {|vector-effect: non-scaling-stroke viewport|}]; */
 /* [%css {|vector-effect: non-scaling-stroke screen|}]; */
 
-/*SVG 2 Paths*/
+/* SVG 2 Paths */
 /* [%css {|d: none|}]; */
 /* [%css {|d: 'M 20 20 H 80 V 30'|}]; */
 
-/*SVG 2 Text*/
+/* SVG 2 Text */
 /* [%css {|shape-subtract: none|}]; */
 /* [%css {|shape-subtract: url('#shape')|}]; */
 /* [%css {|shape-subtract: inset(50%)|}]; */
@@ -2972,7 +2973,7 @@
 /* [%css {|text-decoration-stroke: context-fill|}]; */
 /* [%css {|text-decoration-stroke: context-stroke|}]; */
 
-/*SVG 2 Painting: Filling, Stroking and Marker Symbols*/
+/* SVG 2 Painting: Filling, Stroking and Marker Symbols */
 /* [%css {|color-interpolation: auto|}]; */
 /* [%css {|color-interpolation: sRGB|}]; */
 /* [%css {|color-interpolation: linearRGB|}]; */
@@ -3001,12 +3002,12 @@
 /* [%css {|text-rendering: optimizeLegibility|}]; */
 /* [%css {|text-rendering: geometricPrecision|}]; */
 
-/*SVG 2 Paint Servers: Gradients and Patterns*/
+/* SVG 2 Paint Servers: Gradients and Patterns */
 /* [%css {|stop-color: green|}]; */
 /* [%css {|stop-opacity: .5|}]; */
 /* [%css {|stop-opacity: 45%|}]; */
 
-/*SVG 2 Scripting and Interactivity*/
+/* SVG 2 Scripting and Interactivity */
 [%css {|pointer-events: auto|}];
 /* [%css {|pointer-events: bounding-box|}]; */
 [%css {|pointer-events: visiblePainted|}];
@@ -3043,7 +3044,7 @@
 /* [%css {|block-step: 30px padding center|}]; */
 /* [%css {|block-step: 2em padding start nearest|}]; */
 
-/*MathML Core*/
+/* MathML Core */
 /* [%css {|display: math|}]; */
 /* [%css {|display: block math|}]; */
 /* [%css {|display: inline math|}]; */
