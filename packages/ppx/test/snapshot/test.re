@@ -86,11 +86,11 @@ module ArrayDynamicComponent = [%styled.div (~var) =>
 ];
 
 module SequenceDynamicComponent = [%styled.div
-  (~var) => {
+  (~size) => {
     Js.log("Logging when render");
 
   [|
-    [%css "color: $(var)"],
+    [%css "width: $(width)"],
     [%css "display: block;"]
   |]
   }

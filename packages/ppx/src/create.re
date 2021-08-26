@@ -3,9 +3,7 @@ open Ppxlib;
 module Helper = Ast_helper;
 module Builder = Ppxlib.Ast_builder.Default;
 
-let withLoc = (~loc, txt) => {
-  { loc, txt }
-};
+let withLoc = (~loc, txt) => { loc, txt };
 
 /* fn(. ) */
 let uncurried = (~loc) => {
@@ -43,9 +41,9 @@ let dynamicStyles = (~loc, ~name, ~args, ~expr) => {
 };
 
 /*
-   [@bs.val] [@bs.module "react"] external createVariadicElement:
-   (string, Js.t({ .. })) => React.element =
-   "createElement";
+  [@bs.val] [@bs.module "react"] external createVariadicElement:
+  (string, Js.t({ .. })) => React.element =
+  "createElement";
  */
 let bindingCreateVariadicElement = (~loc) => {
   Helper.Str.primitive({
@@ -96,6 +94,7 @@ let bindingCreateVariadicElement = (~loc) => {
   });
 };
 
+/* ignore() */
 let applyIgnore = (~loc, expr) => {
   Helper.Exp.apply(
     ~loc,
@@ -340,29 +339,31 @@ let makeMakeProps = (~loc, ~customProps) => {
     | None => ([], [])
     | Some((params, props)) => (params, props)
     };
+
+  let dynamicPropNames = dynamicProps |> List.map(d => d.pld_name.txt);
+
+  let makeProps = MakeProps.get(dynamicPropNames)
+    |> List.map(
+      domProp =>
+        switch (domProp) {
+        | MakeProps.Event({name, type_}) =>
+          recordEventLabel(~loc, name, type_)
+        | MakeProps.Attribute({name, type_, alias}) =>
+          recordLabel(~loc, name, type_, alias)
+        },
+    );
+
   /*
      List of
-         prop: type
-         [@bs.optional]
-
-     ref: domRef
-     [@bs.optional]
+        prop: type
+        [@bs.optional]
    */
   let reactProps =
     List.append(
       [
         domRefLabel(~loc),
         childrenLabel(~loc),
-        ...List.map(
-             domProp =>
-               switch (domProp) {
-               | MakeProps.Event({name, type_}) =>
-                 recordEventLabel(~loc, name, type_)
-               | MakeProps.Attribute({name, type_, alias}) =>
-                 recordLabel(~loc, name, type_, alias)
-               },
-             MakeProps.list,
-           ),
+        ...makeProps,
       ],
       dynamicProps,
     );
