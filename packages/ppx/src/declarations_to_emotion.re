@@ -684,12 +684,20 @@ let image_resolution = unsupported(Parser.property_image_resolution);
 let image_orientation = unsupported(Parser.property_image_orientation);
 let image_rendering = unsupported(Parser.property_image_rendering);
 
+let render_color_interp = fun
+  | `Interpolation(name) => render_variable(name)
+  | `Color(ls) => render_color(ls);
+
+let render_length_interp =
+  fun
+  | `Length(length) => render_length(length)
+  | `Interpolation(name) => render_variable(name);
+
 // css-backgrounds-3
 let render_shadow = shadow => {
   let (color, x, y, blur, spread, inset) =
     switch (shadow) {
     | `Box(inset, position, color) =>
-      let color = Option.value(~default=`CurrentColor, color);
       let (x, y, blur, spread) = {
         let (x, y, blur, spread) =
           switch (position) {
@@ -703,16 +711,21 @@ let render_shadow = shadow => {
       (color, x, y, blur, spread, inset);
     };
 
-  let color = render_color(color);
-  let x = render_length(x);
-  let y = render_length(y);
-  let blur = Option.map(render_length, blur);
-  let spread = Option.map(render_length, spread);
+  let color = color |> Option.value(~default=`Color(`CurrentColor)) |> render_color_interp;
+  let x = render_length_interp(x);
+  let y = render_length_interp(y);
+  let blur = Option.map(render_length_interp, blur);
+  let spread = Option.map(render_length_interp, spread);
   let inset =
     Option.map(
       () => Helper.Exp.construct({txt: Lident("true"), loc: Location.none}, None),
       inset,
     );
+
+  let id =
+    switch (shadow) {
+    | `Box(_) => id([%expr CssJs.Shadow.box])
+    };
 
   let args =
     [
@@ -724,12 +737,9 @@ let render_shadow = shadow => {
       (Nolabel, Some(color)),
     ]
     |> List.filter_map(((label, value)) =>
-         Option.map(value => (label, value), value)
-       );
-  let id =
-    switch (shadow) {
-    | `Box(_) => id([%expr CssJs.Shadow.box])
-    };
+      Option.map(value => (label, value), value)
+    );
+
   Helper.Exp.apply(id, args);
 };
 let background_color =
@@ -843,10 +853,6 @@ let render_line_width_interp =
 let border_style_interp = fun
   | `Interpolation(name) => render_variable(name)
   | `Line_style(ls) => variants_to_expression(ls);
-
-let render_color_interp = fun
-  | `Interpolation(name) => render_variable(name)
-  | `Color(ls) => render_color(ls);
 
 let border =
   emit(
