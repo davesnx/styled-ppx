@@ -26,3 +26,13 @@ type token =
   | RIGHT_PARENS // <)-token>
   | LEFT_CURLY // <{-token>
   | RIGHT_CURLY; // <}-token>
+
+type error =
+  | Invalid_code_point
+  | Eof
+  | New_line;
+
+let show_error = fun
+  | Invalid_code_point => "Invalid code point"
+  | Eof => "Unexpected end"
+  | New_line => "New line";

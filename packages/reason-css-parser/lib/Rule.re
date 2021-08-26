@@ -21,7 +21,7 @@ module Data = {
     let (data, remaining_tokens) = rule(tokens);
     // TODO: maybe combinators should guarantee that
     switch (data) {
-    | Ok(data) => f(Ok(data), remaining_tokens)
+    | Ok(d) => f(Ok(d), remaining_tokens)
     | Error(message) => f(Error(message), tokens)
     };
   };
@@ -44,7 +44,7 @@ module Data = {
 
 // monad when match is successful
 module Match = {
-  let return = value => Data.return(Ok(value));
+  let return = (value, tokens) => Data.return(Ok(value), tokens);
   let bind = (rule, f) =>
     Data.bind(
       rule,
@@ -75,6 +75,18 @@ module Match = {
     bind_shortest_or_longest(true, (left, right), f);
   let bind_longest = ((left, right), f) =>
     bind_shortest_or_longest(false, (left, right), f);
+
+  let rec all = rules => {
+    switch (rules) {
+    | [] => return([])
+    | [hd_rule, ...tl_rules] =>
+      bind(hd_rule, (hd) => {
+        bind(all(tl_rules), (tl) => {
+          return([hd, ...tl])
+        });
+      });
+    };
+  };
 };
 
 module Let = {
@@ -94,10 +106,12 @@ module Let = {
 module Pattern = {
   // TODO: errors
   let identity = Match.return();
+
   let next =
     fun
     | [token, ...tokens] => Match.return(token, tokens)
     | _ => (Error(["missing the token expected"]), []);
+
   let token = (expected, tokens) =>
     switch (tokens) {
     | [token, ...tokens] =>
@@ -107,11 +121,12 @@ module Pattern = {
       (data, tokens);
     | [] => (Error(["missing the token expected"]), [])
     };
+
   let expect = expected =>
     token(
       fun
       | token when token == expected => Ok()
-      | _ => Error(["expected " ++ show_token(expected)]),
+      | token => Error(["expected " ++ show_token(expected) ++ ". got " ++ show_token(token)]),
     );
   let value = (value, rule) => Match.bind(rule, () => Match.return(value));
 };

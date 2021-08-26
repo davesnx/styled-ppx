@@ -1,8 +1,5 @@
-/* This tests ensure that the ppx transform the right extensions, to the right form.
-There's one case for each of the different methods and doesn't need to type-check.
-
-If you are looking to add some tests for CSS support,
-check packages/ppx/test/native folder. */
+/* This tests ensure the transformation goes right and doesn't need to type-check.
+If you are looking to add some tests for CSS support, check packages/ppx/test/native folder. */
 
 [%styled.global {|
   html, body, #root, .class {
@@ -109,16 +106,3 @@ module DynamicComponentWithDefaultValue = [%styled.div (~var="green") => [|
   [%css "font-size: 16px"]
 |]];
 */
-
-/* let interpolationValue = "23";
-[%css "font-size: $(interpolationValue)"];
- */
-
-/* All the combinations of interpolation shoudn't be in the snapshot testing,
-should be on the Test_Native, but since there's a issue with Reason's rawliteral, we ensure that the transform works in here, meanwhile. */
-module Hr = [%styled.hr "
-  border-top: 1px solid $(Color.Border.alpha);
-  margin: $(Size.big) $(Size.small);
-  padding: $(Size.small) 0px;
-  color: $(mono100);
-"];

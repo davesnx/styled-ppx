@@ -1,10 +1,10 @@
-open TestFramework;
+open Setup;
 open Reason_css_parser;
 open Standard;
 open Parser;
 
 // TODO: case insensitive
-describe("standard values", ({test, _}) => {
+describe("Standard values", ({test, _}) => {
   test("<integer>", ({expect, _}) => {
     let parse = parse([%value "<integer>"]);
     expect.result(parse("54")).toBe(Ok(54));
@@ -116,6 +116,7 @@ describe("standard values", ({test, _}) => {
     expect.result(parse("'mayushii'")).toBeError();
     expect.result(parse("68.9")).toBeError();
   }); */
+
   test("<dashed-ident>", ({expect, _}) => {
     let parse = parse([%value "<dashed-ident>"]);
     expect.result(parse("--random")).toBe(Ok("--random"));
@@ -139,5 +140,4 @@ describe("standard values", ({test, _}) => {
     expect.result(parse("#abcdefgh")).toBe(Ok("abcdefgh"));
     expect.result(parse("#abcdefghi")).toBeError();
   });
-
 });

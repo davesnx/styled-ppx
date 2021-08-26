@@ -102,7 +102,7 @@ module Patch = {
     let values =
       values
       |> List.map(((name, value)) =>
-           (name, Css_spec_parser.value_to_string(value))
+           (name, Css_spec_parser.string_of_value(value))
          );
     (missing, values);
   };

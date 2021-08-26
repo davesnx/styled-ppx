@@ -1,4 +1,4 @@
-open TestFramework;
+open Setup;
 open Reason_css_parser;
 open Combinator;
 open Standard;
@@ -12,12 +12,13 @@ let parse_exn = (prop, str) =>
   | Error(message) => failwith(message)
   };
 
-describe("optional", ({test, _}) => {
+describe("Modifiers: optional", ({test, _}) => {
   test("<integer>?", ({expect, _}) => {
     let parse = parse_exn([%value "<integer>?"]);
     expect.option(parse("13")).toBe(Some(13));
     expect.option(parse("")).toBe(None);
   });
+
   test("[<integer> A]?", ({expect, _}) => {
     let parse = parse_exn([%value "[<integer> A]?"]);
     expect.option(parse("14 A")).toBe(Some((14, ())));
@@ -25,13 +26,14 @@ describe("optional", ({test, _}) => {
   });
 });
 
-describe("zero_or_more", ({test, _}) => {
+describe("Modifiers: zero_or_more", ({test, _}) => {
   test("<integer>*", ({expect, _}) => {
     let parse = parse_exn([%value "<integer>*"]);
     expect.list(parse("")).toEqual([]);
     expect.list(parse("15")).toEqual([15]);
     expect.list(parse("16 17")).toEqual([16, 17]);
   });
+
   test("[<integer> A]*", ({expect, _}) => {
     let parse = parse_exn([%value "[<integer> A]*"]);
     expect.list(parse("")).toEqual([]);
@@ -40,13 +42,14 @@ describe("zero_or_more", ({test, _}) => {
   });
 });
 
-describe("one_or_more", ({test, _}) => {
+describe("Modifiers: one_or_more", ({test, _}) => {
   test("<integer>+", ({expect, _}) => {
     let parse = parse([%value "<integer>+"]);
     expect.result(parse("")).toBeError();
     expect.result(parse("21")).toBe(Ok([21]));
     expect.result(parse("22 23")).toBe(Ok([22, 23]));
   });
+
   test("[<integer> A]+", ({expect, _}) => {
     let parse = parse([%value "[<integer> A]+"]);
     expect.result(parse("")).toBeError();
@@ -55,7 +58,7 @@ describe("one_or_more", ({test, _}) => {
   });
 });
 
-describe("repeat", ({test, _}) => {
+describe("Modifiers: repeat", ({test, _}) => {
   test("<integer>{2}", ({expect, _}) => {
     let parse = parse([%value "<integer>{2}"]);
     expect.result(parse("")).toBeError();
@@ -63,6 +66,7 @@ describe("repeat", ({test, _}) => {
     expect.result(parse("28 29")).toBe(Ok([28, 29]));
     expect.result(parse("30 31 32")).toBeError();
   });
+
   test("<integer>{2} <integer>", ({expect, _}) => {
     let parse = parse([%value "<integer>{2} <integer>"]);
     expect.result(parse("")).toBeError();
@@ -70,6 +74,7 @@ describe("repeat", ({test, _}) => {
     expect.result(parse("28 29 30")).toBe(Ok(([28, 29], 30)));
     expect.result(parse("30 31 32 33")).toBeError();
   });
+
   test("<integer>{2,3}", ({expect, _}) => {
     let parse = parse([%value "<integer>{2,3}"]);
     expect.result(parse("")).toBeError();
@@ -78,6 +83,7 @@ describe("repeat", ({test, _}) => {
     expect.result(parse("36 37 38")).toBe(Ok([36, 37, 38]));
     expect.result(parse("39 40 41 42")).toBeError();
   });
+
   test("<integer>{2,}", ({expect, _}) => {
     let parse = parse([%value "<integer>{2,}"]);
     expect.result(parse("")).toBeError();
@@ -86,6 +92,7 @@ describe("repeat", ({test, _}) => {
     expect.result(parse("46 47 48")).toBe(Ok([46, 47, 48]));
     expect.result(parse("49 50 51 52")).toBe(Ok([49, 50, 51, 52]));
   });
+
   test("<integer>#{2,3}", ({expect, _}) => {
     let parse = parse([%value "<integer>#{2,3}"]);
     expect.result(parse("")).toBeError();
@@ -95,6 +102,7 @@ describe("repeat", ({test, _}) => {
     expect.result(parse("59, 60, 61,")).toBeError();
     expect.result(parse("59, 60, 61, 62")).toBeError();
   });
+
   test("<integer>#{2} , <integer>", ({expect, _}) => {
     let parse = parse([%value "<integer>#{2} , <integer>"]);
     expect.result(parse("")).toBeError();
@@ -104,6 +112,7 @@ describe("repeat", ({test, _}) => {
     expect.result(parse("59, 60, 61,")).toBeError();
     expect.result(parse("59, 60, 61, 62")).toBeError();
   });
+
   test("[<integer> A]{2,3}", ({expect, _}) => {
     let parse = parse([%value "<integer>{2,3}"]);
     expect.result(parse("")).toBeError();

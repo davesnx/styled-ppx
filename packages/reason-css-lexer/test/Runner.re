@@ -1,0 +1,1 @@
+ReasonCSSLexerTest.Setup.cli();

@@ -6,7 +6,7 @@ let wrap = (v) => (Array.isArray(v) ? v : [v]);
 let template = ({ name, tests }) => {
   if (!tests) return "";
   const cxTests = tests.map((t) => `[%cx {|${t}|}];`).join("\n");
-  return "\n" + "/*" + name + "*/" + "\n" + cxTests;
+  return "\n" + "/* " + name + " */" + "\n" + cxTests;
 };
 
 let main = async () => {

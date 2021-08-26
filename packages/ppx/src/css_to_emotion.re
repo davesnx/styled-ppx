@@ -89,7 +89,7 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
         };
         let value = source_code_of_loc(loc);
         let () =
-          switch (Declarations_to_emotion.parse_declarations((ident, value))) {
+          switch (Declarations_to_emotion.parse_declarations(ident, value)) {
           | Error(`Not_found) =>
             grammar_error(ident_loc, "unsupported property: " ++ ident)
           | Error(`Invalid_value(_error)) =>
@@ -124,7 +124,7 @@ and render_declaration =
   let (_valueList, loc) = d.Declaration.value;
   let value_source = source_code_of_loc(loc);
 
-  switch (Declarations_to_emotion.parse_declarations((name, value_source))) {
+  switch (Declarations_to_emotion.parse_declarations(name, value_source)) {
   | Ok(exprs) => exprs
   | Error(`Not_found) => grammar_error(name_loc, "unknown property " ++ name)
   | Error(`Invalid_value(value)) =>
@@ -282,9 +282,8 @@ let bsEmotionLabel = (~loc, label) => {
   )
 };
 
-let addLabel = (~loc, label, emotionExprs) => {
-  [bsEmotionLabel(~loc, label), ...emotionExprs]
-};
+let addLabel = (~loc, label, emotionExprs) =>
+  [bsEmotionLabel(~loc, label), ...emotionExprs];
 
 let render_style_call = (declaration_list): Parsetree.expression => {
   let loc = declaration_list.pexp_loc;

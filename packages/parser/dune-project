@@ -13,5 +13,5 @@
 (package
  (name styled-ppx-css-parser)
  (synopsis "CSS Parser, forked and migrated to Reason from astrada/ocaml-css-parser")
- (description "It's incomplete, supports most of the spec but lacks some. styled-ppx uses this parser to handle stylesheet/declaration/rule/keyframes/media structure. The rest of the property/value parsing/lexing happens in reason-css-lexer and reason-css-parser.")
+ (description "Legacy CSS Parser. Incomplete. styled-ppx uses this parser to handle stylesheet/declaration/rule/keyframes/media structure. The rest of the property/value parsing/lexing happens in reason-css-lexer and reason-css-parser.")
 )

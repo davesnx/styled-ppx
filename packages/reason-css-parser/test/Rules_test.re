@@ -1,9 +1,9 @@
-open TestFramework;
+open Setup;
 open Reason_css_parser;
 open Reason_css_lexer;
 open Rule;
 
-describe("data monad", ({test, _}) => {
+describe("Data monad", ({test, _}) => {
   open! Data;
 
   // TODO: check static order
@@ -38,6 +38,17 @@ describe("data monad", ({test, _}) => {
       );
     switch (rule([COMMA])) {
     | (Ok(5), [COMMA]) => ()
+    | _ => failwith("should be (Ok(5), [COMMA])")
+    };
+  });
+
+  test("all", _ => {
+    let rule4 = return(Ok(4));
+    let rule5 = return(Ok(5));
+    let rule = Match.all([rule4, rule5]);
+
+    switch (rule([COMMA])) {
+    | (Ok(lst), [COMMA]) when lst == [4, 5] => ()
     | _ => failwith("should be (Ok(5), [COMMA])")
     };
   });
@@ -118,7 +129,8 @@ describe("data monad", ({test, _}) => {
     ();
   });
 });
-describe("match monad", ({test, _}) => {
+
+describe("Match monad", ({test, _}) => {
   open! Match;
 
   // TODO: check static order
@@ -234,7 +246,7 @@ describe("match monad", ({test, _}) => {
   });
 });
 
-describe("pattern helpers", ({test, _}) => {
+describe("Pattern helpers", ({test, _}) => {
   open! Let;
   open! Pattern;
 
@@ -244,6 +256,7 @@ describe("pattern helpers", ({test, _}) => {
     | _ => failwith({|should be (Ok(), [STRING("TOMATO")]|})
     }
   });
+
   test("token", _ => {
     let rule =
       token(
@@ -262,6 +275,7 @@ describe("pattern helpers", ({test, _}) => {
     | _ => failwith({|should be (Error(_), [STRING("invalid")])|})
     };
   });
+
   test("expect", _ => {
     let rule = {
       let.bind_match () = expect(STRING("auto"));
@@ -279,6 +293,7 @@ describe("pattern helpers", ({test, _}) => {
     };
     ();
   });
+
   test("value", _ => {
     let rule = value(3, expect(STRING("none")));
     switch (rule([STRING("none")])) {

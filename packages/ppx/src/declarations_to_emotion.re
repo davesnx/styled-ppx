@@ -13,7 +13,6 @@ let (let.ok) = Result.bind;
 exception Unsupported_feature;
 
 let id = Fun.id;
-let apply_value = (f, v) => f(`Value(v));
 
 type transform('ast, 'value) = {
   ast_of_string: string => result('ast, string),
@@ -23,13 +22,22 @@ type transform('ast, 'value) = {
   string_to_expr: string => result(list(Parsetree.expression), string),
 };
 
-let emit = (parser, value_of_ast, value_to_expr) => {
-  let ast_of_string = Parser.parse(parser);
+let emit = (property, value_of_ast, value_to_expr) => {
+  let ast_of_string = Parser.parse(property);
   let ast_to_expr = ast => value_of_ast(ast) |> value_to_expr;
   let string_to_expr = string =>
     ast_of_string(string) |> Result.map(ast_to_expr);
 
   {ast_of_string, value_of_ast, value_to_expr, ast_to_expr, string_to_expr};
+};
+
+let emit_shorthand = (parser, mapper, value_to_expr) => {
+  let ast_of_string = Parser.parse(parser);
+  let ast_to_expr = ast => ast |> List.map(mapper) |> value_to_expr;
+  let string_to_expr = string =>
+    ast_of_string(string) |> Result.map(ast_to_expr);
+
+  {ast_of_string, value_of_ast: List.map(mapper), value_to_expr, ast_to_expr, string_to_expr};
 };
 
 let render_string = string => Helper.Const.string(string) |> Helper.Exp.constant;
@@ -58,6 +66,10 @@ let render_angle =
   | `Rad(number) => id([%expr `rad([%e render_number(number)])])
   | `Grad(number) => id([%expr `grad([%e render_number(number)])])
   | `Turn(number) => id([%expr `turn([%e render_number(number)])]);
+
+let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
+
+let render_variable = (name) => list_to_longident(name) |> txt |> Helper.Exp.ident;
 
 let variants_to_expression =
   fun
@@ -121,100 +133,22 @@ let variants_to_expression =
   | `Scale_down => id([%expr `scaleDown])
   | `Cover => id([%expr `cover])
   | `Full_width => raise(Unsupported_feature)
+  | `Unset => id([%expr `unset])
   | `Full_size_kana => raise(Unsupported_feature);
 
-let variable_rule = {
-  open Rule;
-  open Let;
-
-  let.bind_match _ = Pattern.expect(DELIM("$"));
-  let.bind_match _ = Pattern.expect(LEFT_PARENS);
-  let.bind_match path = {
-    let.bind_match path = Modifier.zero_or_more({
-      let.bind_match ident = Standard.custom_ident;
-      let.bind_match _ = Pattern.expect(DELIM("."));
-      return_match(ident)
-    });
-    let.bind_match ident = Standard.custom_ident;
-    return_match(path @ [ident])
-  };
-  let.bind_match _ = Pattern.expect(RIGHT_PARENS);
-
-  return_match(path);
-};
-
-let variable = parser =>
-  Combinator.combine_xor([
-    Rule.Match.map(variable_rule, data => `Variable(data)),
-    Rule.Match.map(parser, data => `Value(data)),
-  ]);
-
-let list_to_longident = vars => {
-  vars |> String.concat(".") |> Longident.parse;
-};
-
-let transform_with_variable = (parser, map, value_to_expr) =>
+let transform_with_variable = (parser, mapper, value_to_expr) =>
   emit(
-    variable(parser),
+    Combinator.combine_xor([
+      /* If the CSS value is an interpolation, we treat as one `Variable */
+      Rule.Match.map(Standard.interpolation, data => `Variable(data)),
+      /* Otherwise it's a regular CSS `Value */
+      Rule.Match.map(parser, data => `Value(data)),
+    ]),
     fun
-    | `Variable(name) => list_to_longident(name) |> txt |> Helper.Exp.ident
-    | `Value(ast) => map(ast),
+    | `Variable(name) => render_variable(name)
+    | `Value(ast) => mapper(ast),
     value_to_expr,
   );
-
-let parseVariables = (value) => {
-  /* Dummy regex trying to work it similarly with css_lexer's regex. In the future both parsers would share the same lexer, for now this is the only case we need to regex against a value. */
-  open Str;
-  let containsVariable = string_match(regexp("^.*\\$(.*).*"), value, 0);
-  let removeDollar = global_replace(regexp("\\$"), "");
-  let removeParentesis = v =>
-    v |> global_replace(regexp(")"), "") |> global_replace(regexp("("), "");
-  let valueWithoutDollar = value |> removeDollar;
-  let separatedValues = bounded_full_split(regexp("\\(([^)]+)\\)"), valueWithoutDollar, 0)
-   |> List.map(fun
-      | Delim(v) => `Interpolation(v |> removeDollar |> removeParentesis)
-      | Text(v) => `String(v)
-    );
-
-  containsVariable ? Ok(separatedValues) : Error();
-};
-
-let renderStringConcat = expressions => {
-  let concat = Helper.Exp.ident(~loc, Create.withLoc(Lident("^"), ~loc));
-  let rec renderInterpolated = (exprs) => {
-    switch (exprs) {
-      | [] => [%expr ""]
-      | [one] => one;
-      | [first, ...rest] => {
-        Builder.eapply(~loc, concat, [first, renderInterpolated(rest)]);
-      }
-    }
-  };
-
-  renderInterpolated(expressions);
-};
-
-let renderVariables = values => {
-  values
-    |> List.map(
-      fun
-        | `String(v) => render_string(v)
-        | `Interpolation(v) => {
-          let longident = v |> Longident.parse;
-          Helper.Exp.ident(Create.withLoc(~loc, longident))
-        }
-      );
-};
-
-let render_shorthand_properties_with_variable = (property: string, value: string) => {
-  let.ok variableValues = parseVariables(value);
-
-  let exprValue = List.length(variableValues) === 1
-    ? variableValues |> renderVariables |> List.hd
-    : variableValues |> renderVariables |> renderStringConcat;
-
-  Ok([[%expr CssJs.unsafe([%e render_string(property)], [%e exprValue])]]);
-};
 
 let apply = (parser, id, map) =>
   transform_with_variable(parser, map, arg => [[%expr [%e id]([%e arg])]]);
@@ -263,7 +197,7 @@ let render_length_percentage =
   | `Percentage(percentage) => render_percentage(percentage);
 
 // css-sizing-3
-let render_width =
+let render_size =
   fun
     | `Auto => variants_to_expression(`Auto)
     | `Length(_) as lp
@@ -277,38 +211,38 @@ let width =
   apply(
     Parser.property_width,
     [%expr CssJs.width],
-    render_width,
+    render_size,
   );
 let height =
   apply(
     Parser.property_height,
     [%expr CssJs.height],
-    apply_value(width.value_of_ast),
+    render_size,
   );
 let min_width =
   apply(
     Parser.property_min_width,
     [%expr CssJs.minWidth],
-    apply_value(width.value_of_ast),
+    render_size,
   );
 let min_height =
   apply(
     Parser.property_min_height,
     [%expr CssJs.minHeight],
-    apply_value(width.value_of_ast),
+    render_size,
   );
 let max_width =
   apply(
     Parser.property_max_width,
     [%expr CssJs.maxWidth],
     fun
-    | `Auto => raise(Unsupported_feature)
-    | `None => variants_to_expression(`None)
+    | `Auto as e
+    | `None as e => variants_to_expression(e)
     | `Length(_) as ast
     | `Percentage(_) as ast
     | `Max_content as ast
     | `Min_content as ast
-    | `Fit_content(_) as ast => apply_value(width.value_of_ast, ast)
+    | `Fit_content(_) as ast => render_size(ast)
     | _ => raise(Unsupported_feature),
   );
 let max_height =
@@ -321,84 +255,102 @@ let box_sizing =
   apply(Parser.property_box_sizing, [%expr CssJs.boxSizing], variants_to_expression);
 let column_width = unsupported(Parser.property_column_width);
 
+let margin_value =
+  fun
+    | `Auto => variants_to_expression(`Auto)
+    | `Length(_) as lp
+    | `Percentage(_) as lp => render_length_percentage(lp);
+
+let padding_value =
+  fun
+    | `Auto => variants_to_expression(`Auto)
+    | `Length(_) as lp
+    | `Percentage(_) as lp => render_length_percentage(lp);
+
 // css-box-3
 let margin_top =
   apply(
     Parser.property_margin_top,
     [%expr CssJs.marginTop],
-    fun
-    | `Auto => variants_to_expression(`Auto)
-    | `Length(_) as lp
-    | `Percentage(_) as lp => render_length_percentage(lp),
+    margin_value,
   );
 let margin_right =
   apply(
     Parser.property_margin_right,
     [%expr CssJs.marginRight],
-    apply_value(margin_top.value_of_ast),
+    margin_value,
   );
 let margin_bottom =
   apply(
     Parser.property_margin_bottom,
     [%expr CssJs.marginBottom],
-    apply_value(margin_top.value_of_ast),
+    margin_value,
   );
 let margin_left =
   apply(
     Parser.property_margin_left,
     [%expr CssJs.marginLeft],
-    apply_value(margin_top.value_of_ast),
+    margin_value,
   );
+
 let margin =
-  emit(
+  emit_shorthand(
     Parser.property_margin,
-    List.map(apply_value(margin_top.value_of_ast)),
+    fun
+    | `Auto => variants_to_expression(`Auto)
+    | `Length(_) as lp
+    | `Percentage(_) as lp => render_length_percentage(lp)
+    | `Interpolation(name) => render_variable(name),
     fun
     | [all] => [[%expr CssJs.margin([%e all])]]
     | [v, h] => [[%expr CssJs.margin2(~v=[%e v], ~h=[%e h])]]
-    | [t, h, b] => [
-        [%expr CssJs.margin3(~top=[%e t], ~h=[%e h], ~bottom=[%e b])],
-      ]
-    | [t, r, b, l] => [
-        [%expr
+    | [t, h, b] =>
+        [[%expr CssJs.margin3(~top=[%e t], ~h=[%e h], ~bottom=[%e b])]]
+    | [t, r, b, l] =>
+        [[%expr
           CssJs.margin4(
             ~top=[%e t],
             ~right=[%e r],
             ~bottom=[%e b],
             ~left=[%e l],
           )
-        ],
-      ]
-    | _ => failwith("unreachable"),
+        ]]
+    | [] => failwith("Margin value can't be empty")
+    | _ => failwith("There aren't more margin combinations")
   );
+
 let padding_top =
   apply(
     Parser.property_padding_top,
     [%expr CssJs.paddingTop],
-    render_length_percentage,
+    padding_value,
   );
 let padding_right =
   apply(
     Parser.property_padding_right,
     [%expr CssJs.paddingRight],
-    apply_value(padding_top.value_of_ast),
+    padding_value,
   );
 let padding_bottom =
   apply(
     Parser.property_padding_bottom,
     [%expr CssJs.paddingBottom],
-    apply_value(padding_top.value_of_ast),
+    padding_value,
   );
 let padding_left =
   apply(
     Parser.property_padding_left,
     [%expr CssJs.paddingLeft],
-    apply_value(padding_top.value_of_ast),
+    padding_value,
   );
+
 let padding =
-  emit(
+  emit_shorthand(
     Parser.property_padding,
-    List.map(apply_value(padding_top.value_of_ast)),
+    fun
+    | `Length(_) as lp
+    | `Percentage(_) as lp => render_length_percentage(lp)
+    | `Interpolation(name) => render_variable(name),
     fun
     | [all] => [[%expr CssJs.padding([%e all])]]
     | [v, h] => [[%expr CssJs.padding2(~v=[%e v], ~h=[%e h])]]
@@ -415,7 +367,8 @@ let padding =
           )
         ],
       ]
-    | _ => failwith("unreachable"),
+    | [] => failwith("Padding value can't be empty")
+    | _ => failwith("There aren't more padding combinations"),
   );
 
 let render_named_color =
@@ -809,19 +762,19 @@ let border_right_color =
   apply(
     Parser.property_border_right_color,
     [%expr CssJs.borderRightColor],
-    apply_value(border_top_color.value_of_ast),
+    render_color,
   );
 let border_bottom_color =
   apply(
     Parser.property_border_bottom_color,
     [%expr CssJs.borderBottomColor],
-    apply_value(border_top_color.value_of_ast),
+    render_color,
   );
 let border_left_color =
   apply(
     Parser.property_border_left_color,
     [%expr CssJs.borderLeftColor],
-    apply_value(border_top_color.value_of_ast),
+    render_color,
   );
 let border_color =
   apply(
@@ -846,7 +799,9 @@ let border_style =
 let render_line_width =
   fun
   | `Length(length) => render_length(length)
+  /* Missing `Medium, `Thick, `Thin on the bs-css bindings */
   | _ => raise(Unsupported_feature);
+
 let border_top_width =
   apply(
     Parser.property_border_top_width,
@@ -875,46 +830,107 @@ let border_width =
   apply(
     Parser.property_border_width,
     [%expr CssJs.borderWidth],
-    (w) =>
-      switch (w) {
-        | [w] => render_width(w)
-        | _ => raise(Unsupported_feature)
-      },
+    fun
+    | [w] => render_size(w)
+    | _ => raise(Unsupported_feature),
     );
+
+let render_line_width_interp =
+  fun
+  | `Line_width(lw) => render_line_width(lw)
+  | `Interpolation(name) => render_variable(name);
+
+let border_style_interp = fun
+  | `Interpolation(name) => render_variable(name)
+  | `Line_style(ls) => variants_to_expression(ls);
+
+let render_color_interp = fun
+  | `Interpolation(name) => render_variable(name)
+  | `Color(ls) => render_color(ls);
+
+let border =
+  emit(
+    Parser.property_border,
+    id,
+    ((width, style, color)) => {
+      let w = render_line_width_interp(width);
+      let s = border_style_interp(style);
+      let c = render_color_interp(color);
+      [[%expr CssJs.border([%e w], [%e s], [%e c])]];
+    },
+  );
 let border_top =
-  unsupported(Parser.property_border_top, ~call=[%expr CssJs.borderTop]);
+  emit(
+    Parser.property_border,
+    id,
+    ((width, style, color)) => {
+      let w = render_line_width_interp(width);
+      let s = border_style_interp(style);
+      let c = render_color_interp(color);
+      [[%expr CssJs.borderTop([%e w], [%e s], [%e c])]];
+    },
+  );
 let border_right =
-  unsupported(Parser.property_border_right, ~call=[%expr CssJs.borderRight]);
+  emit(
+    Parser.property_border,
+    id,
+    ((width, style, color)) => {
+      let w = render_line_width_interp(width);
+      let s = border_style_interp(style);
+      let c = render_color_interp(color);
+      [[%expr CssJs.borderRight([%e w], [%e s], [%e c])]];
+    },
+  );
 let border_bottom =
-  unsupported(Parser.property_border_bottom, ~call=[%expr CssJs.borderBottom]);
+  emit(
+    Parser.property_border,
+    id,
+    ((width, style, color)) => {
+      let w = render_line_width_interp(width);
+      let s = border_style_interp(style);
+      let c = render_color_interp(color);
+      [[%expr CssJs.borderBottom([%e w], [%e s], [%e c])]];
+    },
+  );
 let border_left =
-  unsupported(Parser.property_border_left, ~call=[%expr CssJs.borderLeft]);
-let border = unsupported(Parser.property_border, ~call=[%expr CssJs.border]);
+  emit(
+    Parser.property_border,
+    id,
+    ((width, style, color)) => {
+      let w = render_line_width_interp(width);
+      let s = border_style_interp(style);
+      let c = render_color_interp(color);
+      [[%expr CssJs.borderLeft([%e w], [%e s], [%e c])]];
+    },
+  );
+
+let border_value = fun
+  | [lp] => render_length_percentage(lp)
+  | _ => raise(Unsupported_feature);
+
 let border_top_left_radius =
   apply(
     Parser.property_border_top_left_radius,
     [%expr CssJs.borderTopLeftRadius],
-    fun
-    | [lp] => render_length_percentage(lp)
-    | _ => raise(Unsupported_feature),
+    border_value
   );
 let border_top_right_radius =
   apply(
     Parser.property_border_top_right_radius,
     [%expr CssJs.borderTopRightRadius],
-    apply_value(border_top_left_radius.value_of_ast),
+    border_value,
   );
 let border_bottom_right_radius =
   apply(
     Parser.property_border_bottom_right_radius,
     [%expr CssJs.borderBottomRightRadius],
-    apply_value(border_top_left_radius.value_of_ast),
+    border_value,
   );
 let border_bottom_left_radius =
   apply(
     Parser.property_border_bottom_left_radius,
     [%expr CssJs.borderBottomLeftRadius],
-    apply_value(border_top_left_radius.value_of_ast),
+    border_value,
   );
 let border_radius =
   unsupported(Parser.property_border_radius, ~call=[%expr CssJs.borderRadius]);
@@ -939,23 +955,24 @@ let box_shadow =
       },
   );
 
+let overflow_value = fun
+  | `Clip => raise(Unsupported_feature)
+  | rest => variants_to_expression(rest);
+
 // css-overflow-3
 // TODO: maybe implement using strings?
 let overflow_x =
   apply(
     Parser.property_overflow_x,
     [%expr CssJs.overflowX],
-    fun
-    | `Clip => raise(Unsupported_feature)
-    | otherwise => variants_to_expression(otherwise),
+    overflow_value,
   );
 let overflow_y = variants(Parser.property_overflow_y, [%expr CssJs.overflowY]);
 let overflow =
   emit(
     Parser.property_overflow,
     fun
-    | `Xor(values) =>
-      values |> List.map(apply_value(overflow_x.value_of_ast))
+    | `Xor(values) => values |> List.map(overflow_value)
     | _ => raise(Unsupported_feature),
     fun
     | [all] => [[%expr CssJs.overflow([%e all])]]
@@ -981,6 +998,8 @@ let white_space = variants(Parser.property_white_space, [%expr CssJs.whiteSpace]
 let tab_size = unsupported(Parser.property_tab_size);
 let word_break = variants(Parser.property_word_break, [%expr CssJs.wordBreak]);
 let line_break = unsupported(Parser.property_line_break);
+let line_height = unsupported(Parser.property_line_height, ~call=[%expr CssJs.lineHeight]);
+let line_height_step = unsupported(Parser.property_line_height_step);
 let hyphens = unsupported(Parser.property_hyphens);
 let overflow_wrap =
   variants(Parser.property_overflow_wrap, [%expr CssJs.overflowWrap]);
@@ -1277,6 +1296,11 @@ let grid_row = unsupported(Parser.property_grid_row, ~call=[%expr CssJs.gridRow]
 let grid_column =
   unsupported(Parser.property_grid_column, ~call=[%expr CssJs.gridColumn]);
 let grid_area = unsupported(Parser.property_grid_area, ~call=[%expr CssJs.gridArea]);
+let z_index = unsupported(Parser.property_z_index, ~call=[%expr CssJs.zIndex]);
+let left = unsupported(Parser.property_left, ~call=[%expr CssJs.left]);
+let top = unsupported(Parser.property_top, ~call=[%expr CssJs.top]);
+let right = unsupported(Parser.property_right, ~call=[%expr CssJs.right]);
+let bottom = unsupported(Parser.property_bottom, ~call=[%expr CssJs.bottom]);
 let display = apply(
   Parser.property_display,
   [%expr CssJs.display],
@@ -1533,6 +1557,14 @@ let properties = [
   ("grid-row", found(grid_row)),
   ("grid-column", found(grid_column)),
   ("grid-area", found(grid_area)),
+  //
+  ("z-index", found(z_index)),
+  ("line-height", found(line_height)),
+  ("line-height-step", found(line_height_step)),
+  ("left", found(left)),
+  ("top", found(top)),
+  ("right", found(right)),
+  ("bottom", found(bottom)),
 ];
 
 let render_when_unsupported_features = (property, value) => {
@@ -1560,16 +1592,16 @@ let findProperty = (name) => {
 };
 
 let render_to_expr = (property, value) => {
-  let.ok string_to_expr =
+  let.ok expr_of_string =
     switch (findProperty(property)) {
-    | Some((_, (_, string_to_expr))) => Ok(string_to_expr)
+    | Some((_, (_, expr_of_string))) => Ok(expr_of_string)
     | None => Error(`Not_found)
     };
 
-  string_to_expr(value) |> Result.map_error(str => `Invalid_value(str));
+  expr_of_string(value) |> Result.map_error(str => `Invalid_value(str));
 };
 
-let parse_declarations = ((property: string, value: string)) => {
+let parse_declarations = (property: string, value: string) => {
   let.ok is_valid_string =
     Parser.check_property(~name=property, value)
     |> Result.map_error((`Unknown_value) => `Not_found);
@@ -1577,16 +1609,12 @@ let parse_declarations = ((property: string, value: string)) => {
   switch (render_css_global_values(property, value)) {
   | Ok(value) => Ok(value)
   | Error(_) =>
-    switch (render_shorthand_properties_with_variable(property, value)) {
+    switch (render_to_expr(property, value)) {
     | Ok(value) => Ok(value)
-    | Error(_) =>
-      switch (render_to_expr(property, value)) {
-      | Ok(value) => Ok(value)
-      | Error(_)
-      | exception Unsupported_feature =>
-        let.ok () = is_valid_string ? Ok() : Error(`Invalid_value(value));
-        Ok([render_when_unsupported_features(property, value)]);
-      }
+    | Error(_)
+    | exception Unsupported_feature =>
+      let.ok () = is_valid_string ? Ok() : Error(`Invalid_value(value));
+      Ok([render_when_unsupported_features(property, value)]);
     }
   };
 };

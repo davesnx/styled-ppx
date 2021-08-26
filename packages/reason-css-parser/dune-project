@@ -3,7 +3,8 @@
 (name reason-css-parser)
 
 (source
- (github davesnx/styled-ppx))
+ (github davesnx/styled-ppx)
+)
 
 (license MIT)
 (authors "davesnx")

@@ -9,7 +9,7 @@ let provider = (buf, ()) => {
 let multiplier_of_lex =
   MenhirLib.Convert.Simplified.traditional2revised(Parser.multiplier_of_lex);
 
-let rec multiplier_to_string =
+let rec string_of_multiplier =
   fun
   | One => ""
   | Zero_or_more => "*"
@@ -22,15 +22,16 @@ let rec multiplier_to_string =
   | Repeat(min, None) => "{" ++ string_of_int(min) ++ ",}"
   | Repeat_by_comma(1, None) => "#"
   | Repeat_by_comma(min, max) =>
-    "#" ++ multiplier_to_string(Repeat(min, max))
+    "#" ++ string_of_multiplier(Repeat(min, max))
   | At_least_one => "!";
+
 let _multiplier_of_string = string =>
   Sedlexing.Utf8.from_string(string) |> provider |> multiplier_of_lex;
 
 let value_of_lex =
   MenhirLib.Convert.Simplified.traditional2revised(Parser.value_of_lex);
 
-let rec value_to_string = value => {
+let rec string_of_value = value => {
   let child_needs_brackets = (parent, child) => {
     let precedence =
       fun
@@ -51,7 +52,7 @@ let rec value_to_string = value => {
   };
   let child = child =>
     child_needs_brackets(value, child)
-      ? "[ " ++ value_to_string(child) ++ " ]" : value_to_string(child);
+      ? "[ " ++ string_of_value(child) ++ " ]" : string_of_value(child);
   let childs = (sep, childs) =>
     childs |> List.map(child) |> String.concat(sep);
   let (string, multiplier) =
@@ -83,12 +84,13 @@ let rec value_to_string = value => {
   switch (value, multiplier) {
   | (Group(_), None) => "[ " ++ string ++ " ]"
   | (Group(_), Some(multiplier)) =>
-    "[ " ++ string ++ " ]" ++ multiplier_to_string(multiplier)
+    "[ " ++ string ++ " ]" ++ string_of_multiplier(multiplier)
   | (_, None)
   | (_, Some(One)) => string
   | (_, Some(multiplier)) =>
-    "[ " ++ string ++ " ]" ++ multiplier_to_string(multiplier)
+    "[ " ++ string ++ " ]" ++ string_of_multiplier(multiplier)
   };
 };
+
 let value_of_string = string =>
   Sedlexing.Utf8.from_string(string) |> provider |> value_of_lex;

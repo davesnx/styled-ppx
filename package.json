@@ -6,40 +6,20 @@
   "license": "MIT",
   "homepage": "https://styled-ppx.vercel.app",
   "keywords": [
-    "reason",
-    "ocaml",
-    "ppx",
-    "bucklescript",
-    "css",
-    "styled-components",
+    "reason", "ocaml", "ppx", "bucklescript", "css", "styled-components",
     "emotion"
   ],
-  "bugs": {
-    "url": "https://github.com/davesnx/styled-ppx/issues"
-  },
+  "bugs": { "url": "https://github.com/davesnx/styled-ppx/issues" },
   "repository": {
     "type": "git",
     "url": "https://github.com/davesnx/styled-ppx.git"
   },
   "esy": {
     "buildsInSource": "_build",
-    "build": [
-      [
-        "dune",
-        "build",
-        "--root",
-        "."
-      ]
-    ],
+    "build": [ [ "dune", "build", "--root", "." ] ],
     "buildDev": "refmterr dune build --promote-install-files --root .",
-    "buildEnv": {
-      "ODOC_SYNTAX": "re"
-    },
-    "release": {
-      "bin": [
-        "ppx"
-      ]
-    }
+    "buildEnv": { "ODOC_SYNTAX": "re" },
+    "release": { "bin": [ "ppx" ] }
   },
   "devDependencies": {
     "@opam/reason": "3.7.0",
@@ -48,10 +28,12 @@
     "@opam/menhir": "20201216",
     "@opam/ppxlib": "0.22.0",
     "@opam/sedlex": "2.3",
-    "@opam/ocaml-lsp-server": "*",
-    "@reason-native/rely": "jfrolich/reason-native:rely.json#08085a4048974b06aaf3aab918b677b39dea3d18",
+    "@opam/ocaml-lsp-server": "1.7.0",
+    "@reason-native/rely":
+      "jfrolich/reason-native:rely.json#08085a4048974b06aaf3aab918b677b39dea3d18",
     "ocaml": "4.12.0",
-    "refmterr": "jfrolich/reason-native:refmterr.json#08085a4048974b06aaf3aab918b677b39dea3d18"
+    "refmterr":
+      "jfrolich/reason-native:refmterr.json#08085a4048974b06aaf3aab918b677b39dea3d18"
   },
   "scripts": {
     "test": "esy dune runtest --force",
@@ -61,6 +43,7 @@
     "build_test_bs": "cd packages/ppx/test/bucklescript; yarn build",
     "test_bs": "cd packages/ppx/test/bucklescript; yarn test",
     "watch": "esy refmterr dune build --root . --watch",
-    "release-static": "esy b dune build --root . --ignore-promoted-rules --no-config --profile release-static --only-packages styled-ppx,reason-css-parser,reason-css-lexer,css-spec-parser,styled-ppx-css-parser"
+    "release-static":
+      "esy b dune build --root . --ignore-promoted-rules --no-config --profile release-static --only-packages styled-ppx,reason-css-parser,reason-css-lexer,css-spec-parser,styled-ppx-css-parser"
   }
 }
