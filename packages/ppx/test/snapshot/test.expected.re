@@ -11549,7 +11549,13 @@ module Hr = {
       CssJs.margin2(~v=Size.big, ~h=Size.small),
       CssJs.color(mono100),
       CssJs.padding2(~v=Size.small, ~h=`pxFloat(0.)),
+<<<<<<< HEAD
 >>>>>>> f1e33b2 (feat: Enable interpolation for padding)
+||||||| parent of eb1990f (feat: Support border with interpolation)
+=======
+      CssJs.border(`pxFloat(1.), `solid, Color.Border.alpha),
+      CssJs.borderBottom(`pxFloat(0.), `solid, Color.Border.alpha),
+>>>>>>> eb1990f (feat: Support border with interpolation)
     |]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles};

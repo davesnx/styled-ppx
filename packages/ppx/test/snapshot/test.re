@@ -120,6 +120,6 @@ module Hr = [%styled.hr "
   margin: $(Size.big) $(Size.small);
   color: $(mono100);
   padding: $(Size.small) 0px;
+  border: 1px solid $(Color.Border.alpha);
+  border-bottom: 0px solid $(Color.Border.alpha);
 "];
-
-  /* border: 1px solid $(Color.Border.alpha); */

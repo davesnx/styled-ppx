@@ -67,6 +67,10 @@ let render_angle =
   | `Grad(number) => id([%expr `grad([%e render_number(number)])])
   | `Turn(number) => id([%expr `turn([%e render_number(number)])]);
 
+let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
+
+let render_variable = (name) => list_to_longident(name) |> txt |> Helper.Exp.ident;
+
 let variants_to_expression =
   fun
   | `Row => id([%expr `row])
@@ -129,13 +133,8 @@ let variants_to_expression =
   | `Scale_down => id([%expr `scaleDown])
   | `Cover => id([%expr `cover])
   | `Full_width => raise(Unsupported_feature)
+  | `Unset => id([%expr `unset])
   | `Full_size_kana => raise(Unsupported_feature);
-
-let list_to_longident = vars => {
-  vars |> String.concat(".") |> Longident.parse;
-};
-
-let render_variable = (name) => list_to_longident(name) |> txt |> Helper.Exp.ident;
 
 let transform_with_variable = (parser, mapper, value_to_expr) =>
   emit(
@@ -368,7 +367,8 @@ let padding =
           )
         ],
       ]
-    | _ => failwith("unreachable"),
+    | [] => failwith("Padding value can't be empty")
+    | _ => failwith("There aren't more padding combinations"),
   );
 
 let render_named_color =
@@ -799,6 +799,7 @@ let border_style =
 let render_line_width =
   fun
   | `Length(length) => render_length(length)
+  /* Missing `Medium, `Thick, `Thin on the bs-css bindings */
   | _ => raise(Unsupported_feature);
 
 let border_top_width =
@@ -829,21 +830,79 @@ let border_width =
   apply(
     Parser.property_border_width,
     [%expr CssJs.borderWidth],
-    (w) =>
-      switch (w) {
-        | [w] => render_size(w)
-        | _ => raise(Unsupported_feature)
-      },
+    fun
+    | [w] => render_size(w)
+    | _ => raise(Unsupported_feature),
     );
+
+let render_line_width_interp =
+  fun
+  | `Line_width(lw) => render_line_width(lw)
+  | `Interpolation(name) => render_variable(name);
+
+let border_style_interp = fun
+  | `Interpolation(name) => render_variable(name)
+  | `Line_style(ls) => variants_to_expression(ls);
+
+let render_color_interp = fun
+  | `Interpolation(name) => render_variable(name)
+  | `Color(ls) => render_color(ls);
+
+let border =
+  emit(
+    Parser.property_border,
+    id,
+    ((width, style, color)) => {
+      let w = render_line_width_interp(width);
+      let s = border_style_interp(style);
+      let c = render_color_interp(color);
+      [[%expr CssJs.border([%e w], [%e s], [%e c])]];
+    },
+  );
 let border_top =
-  unsupported(Parser.property_border_top, ~call=[%expr CssJs.borderTop]);
+  emit(
+    Parser.property_border,
+    id,
+    ((width, style, color)) => {
+      let w = render_line_width_interp(width);
+      let s = border_style_interp(style);
+      let c = render_color_interp(color);
+      [[%expr CssJs.borderTop([%e w], [%e s], [%e c])]];
+    },
+  );
 let border_right =
-  unsupported(Parser.property_border_right, ~call=[%expr CssJs.borderRight]);
+  emit(
+    Parser.property_border,
+    id,
+    ((width, style, color)) => {
+      let w = render_line_width_interp(width);
+      let s = border_style_interp(style);
+      let c = render_color_interp(color);
+      [[%expr CssJs.borderRight([%e w], [%e s], [%e c])]];
+    },
+  );
 let border_bottom =
-  unsupported(Parser.property_border_bottom, ~call=[%expr CssJs.borderBottom]);
+  emit(
+    Parser.property_border,
+    id,
+    ((width, style, color)) => {
+      let w = render_line_width_interp(width);
+      let s = border_style_interp(style);
+      let c = render_color_interp(color);
+      [[%expr CssJs.borderBottom([%e w], [%e s], [%e c])]];
+    },
+  );
 let border_left =
-  unsupported(Parser.property_border_left, ~call=[%expr CssJs.borderLeft]);
-let border = unsupported(Parser.property_border, ~call=[%expr CssJs.border]);
+  emit(
+    Parser.property_border,
+    id,
+    ((width, style, color)) => {
+      let w = render_line_width_interp(width);
+      let s = border_style_interp(style);
+      let c = render_color_interp(color);
+      [[%expr CssJs.borderLeft([%e w], [%e s], [%e c])]];
+    },
+  );
 
 let border_value = fun
   | [lp] => render_length_percentage(lp)
