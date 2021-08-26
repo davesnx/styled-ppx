@@ -26,12 +26,6 @@ let getIsOptional = str =>
   | _ => false
   };
 
-let getIsNotLabelled = str =>
-  switch (str) {
-  | Nolabel => true
-  | _ => false
-  };
-
 let getIsLabelled = str =>
   switch (str) {
   | Labelled(_) => true
