@@ -30,8 +30,8 @@ let styles = (~loc, ~name, ~expr) => {
 /* let styles = (~arg1, ~arg2) => Emotion.(css(exp)) */
 let dynamicStyles = (~loc, ~name, ~args, ~expr) => {
   let variableName = Helper.Pat.mk(~loc, Ppat_var(withLoc(name, ~loc)));
-  let ppatAnyArg = (Nolabel, None, Builder.ppat_any(~loc=Location.none), "", Location.none, None);
-  /* Last argument needs to be ignore, since it's a unit to remove the warning of optional labelled arguments */
+  let ppatAnyArg = (Nolabel, None, Builder.ppat_any(~loc), "_", Location.none, None);
+  /* Last argument needs to be ignored, since it's a unit to remove the warning of optional labelled arguments */
   let argsWithLastAny = [ppatAnyArg, ...args];
 
   Helper.Str.mk(

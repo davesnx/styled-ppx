@@ -8665,7 +8665,10 @@ module ArrayDynamicComponent = {
     CssJs.style(. [|
       CssJs.label("ArrayDynamicComponent"),
       CssJs.display(`block),
-      CssJs.color(var),
+      switch (var) {
+      | `Black => CssJs.color(`hex("999999"))
+      | `White => CssJs.color(`hex("FAFAFA"))
+      },
     |]);
   let make = (props: makeProps('var)) => {
     let stylesObject = {"className": styles(~var=varGet(props), ())};
@@ -9621,7 +9624,7 @@ module SequenceDynamicComponent = {
     "createElement";
   let styles = (~size, _) => {
     Js.log("Logging when render");
-    CssJs.style(. [|CssJs.width(width), CssJs.display(`block)|]);
+    CssJs.style(. [|CssJs.width(size), CssJs.display(`block)|]);
   };
   let make = (props: makeProps('size)) => {
     let stylesObject = {"className": styles(~size=sizeGet(props), ())};
@@ -10578,7 +10581,7 @@ module DynamicComponentWithDefaultValue = {
   [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
-  let styles = (~var=hex("#333"), _) =>
+  let styles = (~var=CssJs.hex("333"), _) =>
     CssJs.style(. [|
       CssJs.label("DynamicComponentWithDefaultValue"),
       CssJs.display(`block),

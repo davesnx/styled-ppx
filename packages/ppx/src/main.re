@@ -178,7 +178,7 @@ let renderStyledDynamic = (
       labeledArguments,
     );
 
-  let unit = (Nolabel, Builder.pexp_ident(~loc, {txt: Lident("()"), loc}));
+  let unit = (Nolabel, Builder.pexp_construct(~loc, {txt: Lident("()"), loc}, None));
 
   /* let styles = styled(...) */
   let styledFunctionExpr =

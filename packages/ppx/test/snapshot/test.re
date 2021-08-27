@@ -80,23 +80,25 @@ let keyframe = [%keyframe {|
 
 module ArrayDynamicComponent = [%styled.div (~var) =>
   [|
-    [%css "color: $(var);"],
+    switch (var) {
+      | `Black => [%css "color: #999999"]
+      | `White => [%css "color: #FAFAFA"]
+    },
     [%css "display: block;"]
   |]
 ];
 
-module SequenceDynamicComponent = [%styled.div
-  (~size) => {
-    Js.log("Logging when render");
+module SequenceDynamicComponent = [%styled.div (~size) => {
+  Js.log("Logging when render");
 
   [|
-    [%css "width: $(width)"],
+    [%css "width: $(size)"],
     [%css "display: block;"]
   |]
   }
 ];
 
-module DynamicComponentWithDefaultValue = [%styled.div (~var=hex("#333")) => [|
+module DynamicComponentWithDefaultValue = [%styled.div (~var=CssJs.hex("333")) => [|
   [%css "color: $(var);"],
   [%css "display: block;"]
 |]];
