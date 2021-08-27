@@ -10,15 +10,15 @@ let uncurried = (~loc) => {
   Builder.attribute(~name=withLoc(~loc, "bs"), ~loc, ~payload=PStr([]))
 };
 
-/* (~a, ~b, ~c, etc...) => args */
+/* (~a, ~b, ~c, _) => args */
 let rec fnWithLabeledArgs = (list, args) =>
   switch (list) {
+  | [] => args
   | [(label, default, pattern, _alias, loc, _inner), ...rest] =>
     fnWithLabeledArgs(
       rest,
       Helper.Exp.fun_(~loc, label, default, pattern, args),
     )
-  | [] => args
   };
 
 /* let styles = Emotion.(css(exp)) */
@@ -30,12 +30,15 @@ let styles = (~loc, ~name, ~expr) => {
 /* let styles = (~arg1, ~arg2) => Emotion.(css(exp)) */
 let dynamicStyles = (~loc, ~name, ~args, ~expr) => {
   let variableName = Helper.Pat.mk(~loc, Ppat_var(withLoc(name, ~loc)));
+  let ppatAnyArg = (Nolabel, None, Builder.ppat_any(~loc), "_", Location.none, None);
+  /* Last argument needs to be ignored, since it's a unit to remove the warning of optional labelled arguments */
+  let argsWithLastAny = [ppatAnyArg, ...args];
 
   Helper.Str.mk(
     ~loc,
     Pstr_value(
       Nonrecursive,
-      [Helper.Vb.mk(~loc, variableName, fnWithLabeledArgs(args, expr))],
+      [Helper.Vb.mk(~loc, variableName, fnWithLabeledArgs(argsWithLastAny, expr))],
     ),
   );
 };

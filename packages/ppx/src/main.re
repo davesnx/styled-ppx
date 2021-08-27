@@ -5,12 +5,19 @@ module Helper = Ast_helper;
 module Config = Ppx_config;
 
 let raiseError = (~loc, ~description, ~example, ~link) => {
-  raise(
-    Location.raise_errorf(
-      ~loc,
-      "%s\n\n%s\n\nMore info: %s", description, example, link
-    )
-  );
+  let error = switch (example) {
+    | Some(e) =>
+      Location.raise_errorf(
+        ~loc,
+        "%s\n\n%s\n\nMore info: %s", description, e, link
+      )
+    | None => Location.raise_errorf(
+        ~loc,
+        "%s\n\nMore info: %s", description, link
+      )
+  };
+
+  raise(error);
 };
 
 let getIsOptional = str =>
@@ -66,25 +73,42 @@ let rec getArgs = (expr, list) => {
     raiseError(
       ~loc=pattern.ppat_loc,
       ~description="Dynamic components are defined with labeled arguments.",
-      ~example="[%styled.div (~a, ~b) => {}]",
+      ~example=Some("[%styled.div (~a, ~b) => {}]"),
       ~link="https://reasonml.org/docs/manual/latest/function#labeled-arguments",
     );
   | _ => (expr, list)
   };
 };
 
+let getIsEmpty = (param) => {
+  switch (param.ppat_desc) {
+    /* Not complely sure if this checks emptyness */
+    | Ppat_construct(_, _) => true
+    | _ => false
+  }
+};
+
 let getLabeledArgs = (label, defaultValue, param, expr) => {
   /* Get the first argument of the Pexp_fun, since it's a recursive type.
-  getArgs gets all the function parameters from the first nested resursive node. */
+  getArgs gets all the function parameters from the next parsetree */
   let alias = getAlias(param, label);
   let type_ = getType(param);
   let firstArg = (label, defaultValue, param, alias, param.ppat_loc, type_);
+
+  if (getIsEmpty(param)) {
+    raiseError(
+      ~loc=param.ppat_loc,
+      ~description="A dynamic component without props doesn't make much sense. Try to translate into static.",
+      ~example=None,
+      ~link="https://styled-ppx.vercel.app/usage/dynamic-components",
+    );
+  }
 
   if (getNotLabelled(label)) {
     raiseError(
       ~loc=param.ppat_loc,
       ~description="Dynamic components are defined with labeled arguments.",
-      ~example="[%styled.div (~a, ~b) => {}]",
+      ~example=Some("[%styled.div (~a, ~b) => {}]"),
       ~link="https://reasonml.org/docs/manual/latest/function#labeled-arguments",
     );
   }
@@ -143,7 +167,7 @@ let renderStyledDynamic = (
   let propToGetter = str => str ++ "Get";
 
   /* (~arg1=arg1Get(props), ~arg2=arg2Get(props), ...) */
-  let styledFunctionArguments =
+  let styledArguments =
     List.map(
       ((arg, _, _, _, _, _)) => {
         let label = arg |> getLabel |> propToGetter;
@@ -154,12 +178,15 @@ let renderStyledDynamic = (
       labeledArguments,
     );
 
+  let unit = (Nolabel, Builder.pexp_construct(~loc, {txt: Lident("()"), loc}, None));
+
   /* let styles = styled(...) */
   let styledFunctionExpr =
     Builder.pexp_apply(
       ~loc,
       Builder.pexp_ident(~loc, {txt: Lident(styleVariableName), loc}),
-      styledFunctionArguments,
+      /* Last argument is a unit to avoid the warning of optinal labeled args */
+      styledArguments @ [unit],
     );
 
   let variableList =
@@ -360,7 +387,7 @@ let extensions = [
     (~loc, ~path as _, payload) => {
       raiseError(~loc,
         ~description="An styled component without a tag is not valid. You must define an HTML tag, like, `styled.div`",
-        ~example="[%styled.div " ++ Pprintast.string_of_expression(payload) ++ "]",
+        ~example=Some("[%styled.div " ++ Pprintast.string_of_expression(payload) ++ "]"),
         ~link="https://developer.mozilla.org/en-US/docs/Learn/Accessibility/HTML"
       )
     }
@@ -420,7 +447,7 @@ module Mapper = {
       raiseError(
         ~loc,
         ~description="This styled component is not valid. Doesn't have the right format.",
-        ~example="[%styled.div ...",
+        ~example=Some("[%styled.div ..."),
         ~link="https://reasonml.org/docs/manual/latest/function#labeled-arguments",
       );
     };

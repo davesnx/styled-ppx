@@ -29,6 +29,7 @@ echo "Run runtests for Parser, vds & Lexer";
 esy test;
 
 echo "Run BuckleScript tests";
+esy build; # Rebuilding latest ppx
 yarn test_bs;
 
 exit 0
