@@ -678,6 +678,8 @@ module OneSingleProperty = {
     [@bs.optional]
     strokeWidth: string,
     [@bs.optional]
+    style: ReactDOM.Style.t,
+    [@bs.optional]
     summary: string,
     [@bs.optional]
     suppressContentEditableWarning: bool,
@@ -1635,6 +1637,8 @@ module SingleQuoteStrings = {
     strokeOpacity: string,
     [@bs.optional]
     strokeWidth: string,
+    [@bs.optional]
+    style: ReactDOM.Style.t,
     [@bs.optional]
     summary: string,
     [@bs.optional]
@@ -2595,6 +2599,8 @@ module MultiLineStrings = {
     [@bs.optional]
     strokeWidth: string,
     [@bs.optional]
+    style: ReactDOM.Style.t,
+    [@bs.optional]
     summary: string,
     [@bs.optional]
     suppressContentEditableWarning: bool,
@@ -3554,6 +3560,8 @@ module SelfClosingElement = {
     [@bs.optional]
     strokeWidth: string,
     [@bs.optional]
+    style: ReactDOM.Style.t,
+    [@bs.optional]
     summary: string,
     [@bs.optional]
     suppressContentEditableWarning: bool,
@@ -4507,6 +4515,8 @@ module ArrayStatic = {
     strokeOpacity: string,
     [@bs.optional]
     strokeWidth: string,
+    [@bs.optional]
+    style: ReactDOM.Style.t,
     [@bs.optional]
     summary: string,
     [@bs.optional]
@@ -5473,6 +5483,8 @@ module StringInterpolation = {
     strokeOpacity: string,
     [@bs.optional]
     strokeWidth: string,
+    [@bs.optional]
+    style: ReactDOM.Style.t,
     [@bs.optional]
     summary: string,
     [@bs.optional]
@@ -6452,6 +6464,8 @@ module DynamicComponent = {
     [@bs.optional]
     strokeWidth: string,
     [@bs.optional]
+    style: ReactDOM.Style.t,
+    [@bs.optional]
     summary: string,
     [@bs.optional]
     suppressContentEditableWarning: bool,
@@ -7411,6 +7425,8 @@ module SelectorsMediaQueries = {
     strokeOpacity: string,
     [@bs.optional]
     strokeWidth: string,
+    [@bs.optional]
+    style: ReactDOM.Style.t,
     [@bs.optional]
     summary: string,
     [@bs.optional]
@@ -8383,6 +8399,8 @@ module ArrayDynamicComponent = {
     [@bs.optional]
     strokeWidth: string,
     [@bs.optional]
+    style: ReactDOM.Style.t,
+    [@bs.optional]
     summary: string,
     [@bs.optional]
     suppressContentEditableWarning: bool,
@@ -9344,6 +9362,8 @@ module SequenceDynamicComponent = {
     [@bs.optional]
     strokeWidth: string,
     [@bs.optional]
+    style: ReactDOM.Style.t,
+    [@bs.optional]
     summary: string,
     [@bs.optional]
     suppressContentEditableWarning: bool,
@@ -10301,6 +10321,8 @@ module DynamicComponentWithDefaultValue = {
     strokeOpacity: string,
     [@bs.optional]
     strokeWidth: string,
+    [@bs.optional]
+    style: ReactDOM.Style.t,
     [@bs.optional]
     summary: string,
     [@bs.optional]

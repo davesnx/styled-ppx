@@ -58,6 +58,7 @@
     "test_native": "esy dune build @native_typecheck_test",
     "test_css_support": "esy dune build @css_support_test",
     "test_snapshot": "esy dune build @snapshot_test",
+    "test_snapshot_promote": "esy dune build @snapshot_test --auto-promote",
     "build_test_bs": "cd packages/ppx/test/bucklescript; yarn build",
     "test_bs": "cd packages/ppx/test/bucklescript; yarn build; yarn test",
     "dev": "esy refmterr dune build --root . --watch",
