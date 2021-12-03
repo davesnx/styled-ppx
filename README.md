@@ -1,4 +1,4 @@
-<h1>styled-ppx</h1>
+# styled-ppx
 
 **styled-ppx** is the [ppx](https://dev.realworldocaml.org/ppx.html) that brings typed styled components to Reason, OCaml and ReScript.
 
@@ -10,7 +10,7 @@ Build on top of [emotion](https://emotion.sh), it allows you to style apps safe,
 
 Allows you to create **React Components** with type-safe style definitions that don't rely on a different [DSL](https://en.wikipedia.org/wiki/Domain-specific_language) than CSS.
 
-### [Documentation](https://styled-ppx.vercel.app)
+## [Documentation](https://styled-ppx.vercel.app)
 <!-- Add documentation index links -->
 Check our website: [styled-ppx.vercel.app](https://styled-ppx.vercel.app)
 
@@ -74,10 +74,12 @@ module Layout = [%styled.div [|
 </Layout>
 ```
 
-#### [Playground](https://github.com/davesnx/try-styled-ppx)
-If you want to try it out, just fork https://github.com/davesnx/try-styled-ppx and follow the instalation process there.
+### [Playground](https://github.com/davesnx/try-styled-ppx)
+
+If you want to try it out, fork [github.com/davesnx/try-styled-ppx](https://github.com/davesnx/try-styled-ppx) and follow the instalation process there.
 
 ### Editor Support
+
 One of the downsites of using a `ppx` is their editor support, we provide a VSCode extension that brings syntax highlight. This can include in the future, CSS autocomplete and other CSS-related extensions.
 
 Install the VSCode extension: **[VSCode Extension](https://marketplace.visualstudio.com/items?itemName=davesnx.vscode-styled-ppx)**
@@ -85,9 +87,11 @@ Install the VSCode extension: **[VSCode Extension](https://marketplace.visualstu
 > If you are interested on another editor, please [fill an issue](https://github.com/davesnx/styled-ppx/issues/new).
 
 ### Contributing
+
 We would love your help improving **styled-ppx**. Please see our contributing and community guidelines, they'll help you get set up locally and explain the whole process: [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ### Credits
+
 - [**Javier Chávarri**](https://github.com/jchavarri): to introduce me to Reason, teach me all his knowledge about OCaml, AST, ppx rewritters and for the help me boostrapping the project.
 - [**Alessandro Strada**](https://github.com/astrada): this project started with inspiration in bs-css-ppx and forked his implementation of their CSS Parser.
 - [**Eduardo Rafael**](https://github.com/EduardoRFS/): to teach me how to write a compiler and a type-checker and his implementation of the CSS Value definition and the new CSS Parser.

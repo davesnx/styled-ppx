@@ -10,7 +10,8 @@ The roadmap lives under the [Projects](https://github.com/davesnx/styled-ppx/pro
 
 [David Sancho](https://github.com/davesnx) have a contact email on the GitHub profile, and happy to talk about any problems via those, via Discord or [Twitter DMs](https://twitter.com/davesnx).
 
-# Code contributions
+## Code contributions
+
 Here is a quick guide to doing code contributions to the repository.
 
 <!-- 1. Find some issue you're interested in, or a feature that you'd like to tackle.
@@ -37,21 +38,22 @@ Here is a quick guide to doing code contributions to the repository.
 
 11. Perform a celebratory dance! :dancer: -->
 
-### Set up the project
+## Set up the project
 
-<!-- Make sure you have installed esy and yarn. -->
+- Make sure you have installed esy and yarn.
+- Run [`esy`](https://esy.sh) and edit code in the `packages/*` folder.
 
-Run [`esy`](https://esy.sh) and edit code in the `packages/*` folder.
+### Editor setup
 
-#### Editor setup
 Now you can run your editor within the environment if you use vim like so: `esy $EDITOR`.
 
 If you use VSCode, make sure you have installed OCaml Platform via [esy](https://esy.sh), and just open the editor on the root of the project.
 
 ## Workflow
+
 After you make some changes to source code, you can re-run project's build again with the same simple `esy build` command.
 
-If you want a faster feedback look, use `esy watch` where runs the build automatically every file changes.
+If you want a faster feedback look, use `esy dev` where runs the build automatically every file changes.
 
 This project uses dune as a build system, if you add a dependency in the package.json, don't forget to add it to dune as well.
 
@@ -118,4 +120,4 @@ TBD
 
 ## Credits
 
-These contribution guidelines are based on https://github.com/styled-components/styled-components.
+These contribution guidelines are based on [styled-components's guideline](https://github.com/styled-components/styled-components).
