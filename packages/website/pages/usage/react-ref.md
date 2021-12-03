@@ -1,4 +1,4 @@
-# React's ref
+# React's Ref
 
 All styled components expose a prop `innerRef` that will be forwarded to its internal element.
 
