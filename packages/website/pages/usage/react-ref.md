@@ -1,7 +1,5 @@
 # React's ref
 
-<!-- A `React.ref` can be passed down like any other prop. The component will take care of forwarding the ref to the right DOM element. -->
-
 All styled components expose a prop `innerRef` that will be forwarded to its internal element.
 
 ```reason
