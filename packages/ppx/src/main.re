@@ -253,6 +253,7 @@ let renderStyledDynamic = (
       ~customProps=Some((makePropsParameters, variableMakeProps))
     ),
     Create.bindingCreateVariadicElement(~loc),
+    Create.defineDeleteInnerRefFn(~loc),
     Create.dynamicStyles(
       ~loc,
       ~name=styleVariableName,
@@ -275,6 +276,7 @@ let renderStyledComponent = (~loc, ~htmlTag, styles) => {
   Builder.pmod_structure(~loc, [
     Create.makeMakeProps(~loc, ~customProps=None),
     Create.bindingCreateVariadicElement(~loc),
+    Create.defineDeleteInnerRefFn(~loc),
     Create.styles(
       ~loc,
       ~name=styleVariableName,
