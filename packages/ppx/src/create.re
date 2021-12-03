@@ -281,7 +281,7 @@ let recordLabel = (~loc, name, kind, alias) =>
       ~loc,
       ~attrs,
       withLoc(name, ~loc),
-      Helper.Typ.constr(~loc, withLoc(Lident(kind), ~loc), []),
+      Helper.Typ.constr(~loc, withLoc(kind, ~loc), []),
     )
   };
 
@@ -314,7 +314,7 @@ let recordEventLabel = (~loc, name, kind) => {
       Nolabel,
       Helper.Typ.constr(
         ~loc,
-        withLoc(Ldot(Ldot(Lident("ReactEvent"), kind), "t"), ~loc),
+        withLoc(kind, ~loc),
         [],
       ),
       Helper.Typ.constr(~loc, withLoc(Lident("unit"), ~loc), []),
@@ -350,9 +350,9 @@ let makeMakeProps = (~loc, ~customProps) => {
       domProp =>
         switch (domProp) {
         | MakeProps.Event({name, type_}) =>
-          recordEventLabel(~loc, name, type_)
+          recordEventLabel(~loc, name, MakeProps.eventTypeToIdent(type_))
         | MakeProps.Attribute({name, type_, alias}) =>
-          recordLabel(~loc, name, type_, alias)
+          recordLabel(~loc, name, MakeProps.attributeTypeToIdent(type_), alias)
         },
     );
 

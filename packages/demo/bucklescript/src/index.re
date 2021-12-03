@@ -57,19 +57,21 @@ module Component = [%styled.div {j|
 |j}
 ];
 
-let stilos = [%cx "box-shadow: 10px 10px 0 0 #ff0000 inset, 10px 10px 0 0 #ff0000"];
+let stilos = [%cx "box-shadow: inset 10px 10px 0 0 #ff0000, 10px 10px 0 0 #ff0000"];
 let styles = CssJs.style(. [|
   CssJs.label("ComponentName"),
   CssJs.display(`block),
   [%css_ "flex-direction: row"]
 |]);
 
+let inlineStyles: ReactDOM.Style.t = ReactDOM.Style.make(~color="#444444", ~fontSize="68px", ());
+
 switch (ReactDOM.querySelector("#app")) {
   | Some(el) =>
     ReactDOM.render(
       <div className=stilos>
         <div className=styles>
-          <App onClick=Js.log>
+          <App onClick=Js.log style=inlineStyles>
             <Dynamic a="23"/>
             <Component>
               {"test.." |> React.string}
