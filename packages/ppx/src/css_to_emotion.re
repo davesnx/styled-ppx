@@ -64,9 +64,9 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
   let invalid_format = loc =>
     grammar_error(loc, "@media value isn't a valid format");
 
-  let loc = ar.At_rule.loc;
-  let (_, name_loc) = ar.At_rule.name;
-  let (prelude, prelude_loc) = ar.At_rule.prelude;
+  let loc = ar.loc;
+  let (_, name_loc) = ar.name;
+  let (prelude, prelude_loc) = ar.prelude;
   let parse_condition =
     fun
     | (
@@ -98,8 +98,7 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
           };
         source_code_of_loc(complete_loc);
       }
-    | (Ident("and"), _) => "and"
-    | (Ident("or"), _) => "or"
+    | (Ident(id), _) => id
     | (_, loc) => invalid_format(loc);
 
   let query = prelude |> List.map(parse_condition) |> String.concat(" ");
@@ -118,8 +117,7 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
     Builder.pexp_ident(~loc=name_loc, CssJs.lident(~loc, "media"));
   Builder.eapply(~loc, media_ident, [Builder.estring(~loc=prelude_loc, query), rules]);
 }
-and render_declaration =
-    (d: Declaration.t): list(Parsetree.expression) => {
+and render_declaration = (d: Declaration.t): list(Parsetree.expression) => {
   let (name, name_loc) = d.Declaration.name;
   let (_valueList, loc) = d.Declaration.value;
   let value_source = source_code_of_loc(loc);
@@ -131,8 +129,7 @@ and render_declaration =
     grammar_error(loc, "invalid property value: " ++ value)
   };
 }
-and render_unsafe_declaration =
-    (d: Declaration.t, _d_loc: Location.t): list(Parsetree.expression) => {
+and render_unsafe_declaration = (d: Declaration.t, _d_loc: Location.t): list(Parsetree.expression) => {
   let (name, _name_loc) = d.Declaration.name;
   let (_valueList, loc) = d.Declaration.value;
   let value_source = source_code_of_loc(loc);
