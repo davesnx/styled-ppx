@@ -15,20 +15,6 @@
   }
 |}];
 
-module App = [%styled.div {j|
-  cursor: pointer;
-|j}
-];
-
-module App2 = {
-  [@react.component]
-  let make = (~children) => {
-    <div>
-      children
-    </div>
-  }
-}
-
 module Link = [%styled.a
   {|
   font-size: 36px;
@@ -36,9 +22,34 @@ module Link = [%styled.a
 |}
 ];
 
-module Dynamic = [%styled.input (~a as _) => "
-  display: inline;
-"];
+module Input = [%styled.input "padding: 30px"];
+
+[@send] external focus: Dom.element => unit = "focus";
+
+module TextInput = {
+  [@react.component]
+  let make = () => {
+    let textInput = React.useRef(Js.Nullable.null);
+    let buttonInput = React.useRef(Js.Nullable.null);
+
+    let focusInput = () =>
+      switch (textInput.current->Js.Nullable.toOption) {
+      | Some(dom) => dom->focus;
+      | None => ()
+      };
+
+    let onClick = _ => {
+      Js.log(textInput);
+      Js.log(buttonInput);
+      focusInput();
+    };
+
+    <div>
+      <Input type_="text" innerRef={ReactDOM.Ref.domRef(textInput)} />
+      <input type_="button" ref={ReactDOM.Ref.domRef(buttonInput)} value="Focus the text input" onClick />
+    </div>
+  }
+};
 
 module Component = [%styled.div {j|
   background-color: red;
@@ -66,30 +77,31 @@ let styles = CssJs.style(. [|
 
 let inlineStyles: ReactDOM.Style.t = ReactDOM.Style.make(~color="#444444", ~fontSize="68px", ());
 
-switch (ReactDOM.querySelector("#app")) {
-  | Some(el) =>
-    ReactDOM.render(
-      <div className=stilos>
+module App = {
+  [@react.component]
+  let make = () => {
+    <div className=stilos>
         <div className=styles>
-          <App onClick=Js.log style=inlineStyles>
-            <Dynamic a="23"/>
+          <div onClick=Js.log style=inlineStyles>
+            <TextInput />
             <Component>
               {"test.." |> React.string}
             </Component>
-            <App2>
-              <Component>
-                <p>
-                  {"Demo of..." |> React.string}
-                </p>
-              </Component>
-            </App2>
+            <Component>
+              <p>
+                {"Demo of..." |> React.string}
+              </p>
+            </Component>
             <Link href="https://github.com/davesnx/styled-ppx">
               {"styled-ppx" |> React.string}
             </Link>
-          </App>
+          </div>
         </div>
-      </div>,
-      el
-    )
+      </div>
+  }
+};
+
+switch (ReactDOM.querySelector("#app")) {
+  | Some(el) => ReactDOM.render(<App />, el)
   | None => ()
 };

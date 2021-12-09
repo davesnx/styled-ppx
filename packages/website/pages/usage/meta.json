@@ -6,5 +6,6 @@
   "array": "Array API",
   "css-support": "CSS Support",
   "keyframe": "Keyframe",
-  "globals": "Inject global styles"
+  "globals": "Inject global styles",
+  "react-ref": "React's Ref"
 }
