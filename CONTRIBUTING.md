@@ -40,7 +40,7 @@ Here is a quick guide to doing code contributions to the repository.
 
 ## Set up the project
 
-- Make sure you have installed esy and yarn.
+- Make sure you have installed esy and yarn (1.x).
 - Run [`esy`](https://esy.sh) and edit code in the `packages/*` folder.
 
 ### Editor setup
