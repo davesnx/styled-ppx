@@ -661,35 +661,30 @@ and property_min_height = [%value.rec "'auto' | <length> | <percentage> | 'min-c
 and property_min_inline_size = [%value.rec "<'min-width'>"]
 and property_min_width = [%value.rec "<length> | <percentage> | 'auto' | 'max-content' | 'min-content' | fit-content( <length-percentage> ) | 'fill-available' | <-non-standard-width>"]
 and property_mix_blend_mode = [%value.rec "<blend-mode>"]
-and property_media_orientation = [%value.rec "'portrait' | 'landscape'"]
 and property_media_any_hover = [%value.rec "none | hover"]
 and property_media_any_pointer = [%value.rec "none | coarse | fine"]
 and property_media_pointer = [%value.rec "none | coarse | fine"]
-and property_media_aspect_ratio = [%value.rec "<ratio>"]
 and property_media_max_aspect_ratio = [%value.rec "<ratio>"]
 and property_media_min_aspect_ratio = [%value.rec "<ratio>"]
-and property_media_color = [%value.rec "<integer>"]
 and property_media_min_color = [%value.rec "<integer>"]
-and property_media_color_gamut = [%value.rec "srgb | p3 | rec2020"]
+and property_media_color_gamut = [%value.rec "'srgb' | 'p3' | 'rec2020'"]
 and property_media_color_index = [%value.rec "<integer>"]
 and property_media_min_color_index = [%value.rec "<integer>"]
-and property_media_display_mode = [%value.rec "fullscreen | standalone | minimal-ui | browser"]
-and property_media_forced_colors = [%value.rec "none | active"]
+and property_media_display_mode = [%value.rec "'fullscreen' | 'standalone' | 'minimal-ui' | 'browser'"]
+and property_media_forced_colors = [%value.rec "'none' | 'active'"]
 and property_media_grid = [%value.rec "<integer>"]
-and property_media_hover = [%value.rec "hover | none"]
-and property_media_inverted_colors = [%value.rec "inverted | none"]
+and property_media_hover = [%value.rec "'hover' | 'none'"]
+and property_media_inverted_colors = [%value.rec "'inverted' | 'none'"]
 and property_media_monochrome = [%value.rec "<integer>"]
-and property_media_overflow_block = [%value.rec "none | scroll | optional-paged | paged"]
-and property_media_overflow_inline = [%value.rec "none | scroll"]
-and property_media_prefers_color_scheme = [%value.rec "dark | light"]
-and property_media_prefers_contrast = [%value.rec "no-preference | more | less"]
-and property_media_prefers_reduced_motion = [%value.rec "no-preference | reduce"]
+and property_media_prefers_color_scheme = [%value.rec "'dark' | 'light'"]
+and property_media_prefers_contrast = [%value.rec "'no-preference' | 'more' | 'less'"]
+and property_media_prefers_reduced_motion = [%value.rec "'no-preference' | 'reduce'"]
 and property_media_resolution = [%value.rec "<resolution>"]
 and property_media_min_resolution = [%value.rec "<resolution>"]
 and property_media_max_resolution = [%value.rec "<resolution>"]
-and property_media_scripting = [%value.rec "none | initial-only | enabled"]
-and property_media_update = [%value.rec "none | slow | fast"]
-and property_orientation = [%value.rec "'portrait' | 'landscape'"]
+and property_media_scripting = [%value.rec "'none' | 'initial-only' | 'enabled'"]
+and property_media_update = [%value.rec "'none' | 'slow' | 'fast'"]
+and property_media_orientation = [%value.rec "'portrait' | 'landscape'"]
 and property_object_fit = [%value.rec "'fill' | 'contain' | 'cover' | 'none' | 'scale-down'"]
 and property_object_position = [%value.rec "<position>"]
 and property_offset = [%value.rec "[ [ <'offset-position'> ]? <'offset-path'> [ <'offset-distance'> || <'offset-rotate'> ]? ]? [ '/' <'offset-anchor'> ]?"]
@@ -710,7 +705,7 @@ and property_overflow = [%value.rec "[ 'visible' | 'hidden' | 'clip' | 'scroll' 
 and property_overflow_anchor = [%value.rec "'auto' | 'none'"]
 and property_overflow_block = [%value.rec "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto'"]
 and property_overflow_clip_box = [%value.rec "'padding-box' | 'content-box'"]
-and property_overflow_inline = [%value.rec "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto'"]
+and property_overflow_inline = [%value.rec "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | 'none | 'optional-paged' | 'paged'"]
 and property_overflow_wrap = [%value.rec "'normal' | 'break-word' | 'anywhere'"]
 and property_overflow_x = [%value.rec "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto'"]
 and property_overflow_y = [%value.rec "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto'"]
@@ -1989,34 +1984,30 @@ let check_map =
         "property-overscroll-behavior-y",
         check(property_overscroll_behavior_y),
       ),
-      ("property-media-any-hover", check(property_media_any_hover)),
-      ("property-media-any-pointer", check(property_media_any_pointer)),
-      ("property-media-pointer", check(property_media_pointer)),
-      ("property-media-aspect-ratio", check(property_media_aspect_ratio)),
-      ("property-media-max-aspect-ratio", check(property_media_max_aspect_ratio)),
-      ("property-media-min-aspect-ratio", check(property_media_min_aspect_ratio)),
-      ("property-media-color", check(property_media_color)),
-      ("property-media-min-color", check(property_media_min_color)),
-      ("property-media-color-gamut", check(property_media_color_gamut)),
-      ("property-media-color-index", check(property_media_color_index)),
-      ("property-media-min-color-index", check(property_media_min_color_index)),
-      ("property-media-display-mode", check(property_media_display_mode)),
-      ("property-media-forced-colors", check(property_media_forced_colors)),
-      ("property-media-grid", check(property_media_grid)),
-      ("property-media-hover", check(property_media_hover)),
-      ("property-media-inverted-colors", check(property_media_inverted_colors)),
-      ("property-media-monochrome", check(property_media_monochrome)),
-      ("property-media-overflow-block", check(property_media_overflow_block)),
-      ("property-media-overflow-inline", check(property_media_overflow_inline)),
-      ("property-media-prefers-color-scheme", check(property_media_prefers_color_scheme)),
-      ("property-media-prefers-contrast", check(property_media_prefers_contrast)),
-      ("property-media-prefers-reduced-motion", check(property_media_prefers_reduced_motion)),
-      ("property-media-resolution", check(property_media_resolution)),
-      ("property-media-min-resolution", check(property_media_min_resolution)),
-      ("property-media-max-resolution", check(property_media_max_resolution)),
-      ("property-media-scripting", check(property_media_scripting)),
-      ("property-media-update", check(property_media_update)),
-      ("property-media-orientation", check(property_media_orientation)),
+      ("property-any-hover", check(property_media_any_hover)),
+      ("property-any-pointer", check(property_media_any_pointer)),
+      ("property-pointer", check(property_media_pointer)),
+      ("property-max-aspect-ratio", check(property_media_max_aspect_ratio)),
+      ("property-min-aspect-ratio", check(property_media_min_aspect_ratio)),
+      ("property-min-color", check(property_media_min_color)),
+      ("property-color-gamut", check(property_media_color_gamut)),
+      ("property-color-index", check(property_media_color_index)),
+      ("property-min-color-index", check(property_media_min_color_index)),
+      ("property-display-mode", check(property_media_display_mode)),
+      ("property-forced-colors", check(property_media_forced_colors)),
+      ("property-grid", check(property_media_grid)),
+      ("property-hover", check(property_media_hover)),
+      ("property-inverted-colors", check(property_media_inverted_colors)),
+      ("property-monochrome", check(property_media_monochrome)),
+      ("property-prefers-color-scheme", check(property_media_prefers_color_scheme)),
+      ("property-prefers-contrast", check(property_media_prefers_contrast)),
+      ("property-prefers-reduced-motion", check(property_media_prefers_reduced_motion)),
+      ("property-resolution", check(property_media_resolution)),
+      ("property-min-resolution", check(property_media_min_resolution)),
+      ("property-max-resolution", check(property_media_max_resolution)),
+      ("property-scripting", check(property_media_scripting)),
+      ("property-update", check(property_media_update)),
+      ("property-orientation", check(property_media_orientation)),
       ("property-padding", check(property_padding)),
       ("property-padding-block", check(property_padding_block)),
       ("property-padding-block-end", check(property_padding_block_end)),
