@@ -16,16 +16,16 @@
 
 set -e -u
 
-echo "Run ppx Native tests";
+echo "Run native tests";
 esy test_native;
 
-echo "Run CSS Support tests";
+echo "Run CSS support tests";
 esy test_css_support;
 
-echo "Run ppx Native snapshot tests";
+echo "Run native snapshot tests";
 esy test_snapshot;
 
-echo "Run runtests for Parser, vds & Lexer";
+echo "Run parser, vds & lexer tests";
 esy test;
 
 echo "Run BuckleScript tests";
