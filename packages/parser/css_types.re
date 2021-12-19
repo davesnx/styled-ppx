@@ -7,6 +7,7 @@ type dimension =
   | Frequency;
 
 module rec Component_value: {
+  [@deriving show({with_path: false})]
   type t =
     | Paren_block(list(with_loc(t)))
     | Bracket_block(list(with_loc(t)))
@@ -26,12 +27,14 @@ module rec Component_value: {
     | Variable(list(string));
 } = Component_value
 and Brace_block: {
+  [@deriving show({with_path: false})]
   type t =
     | Empty
     | Declaration_list(Declaration_list.t)
     | Stylesheet(Stylesheet.t);
 } = Brace_block
 and At_rule: {
+  [@deriving show({with_path: false})]
   type t = {
     name: with_loc(string),
     prelude: with_loc(list(with_loc(Component_value.t))),
@@ -40,6 +43,7 @@ and At_rule: {
   };
 } = At_rule
 and Declaration: {
+  [@deriving show({with_path: false})]
   type t = {
     name: with_loc(string),
     value: with_loc(list(with_loc(Component_value.t))),
@@ -48,14 +52,17 @@ and Declaration: {
   };
 } = Declaration
 and Declaration_list: {
+  [@deriving show({with_path: false})]
   type kind =
     | Declaration(Declaration.t)
     | Unsafe(Declaration.t)
     | At_rule(At_rule.t)
     | Style_rule(Style_rule.t);
+  [@deriving show({with_path: false})]
   type t = with_loc(list(kind));
 } = Declaration_list
 and Style_rule: {
+  [@deriving show({with_path: false})]
   type t = {
     prelude: with_loc(list(with_loc(Component_value.t))),
     block: Declaration_list.t,
@@ -63,10 +70,12 @@ and Style_rule: {
   };
 } = Style_rule
 and Rule: {
+  [@deriving show({with_path: false})]
   type t =
     | Style_rule(Style_rule.t)
     | At_rule(At_rule.t);
 } = Rule
 and Stylesheet: {
+  [@deriving show({with_path: false})]
   type t = with_loc(list(Rule.t));
 } = Stylesheet;

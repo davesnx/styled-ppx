@@ -1,0 +1,5 @@
+(executable
+ (name ast_renderer)
+ (public_name renderer)
+ (libraries styled-ppx-css-parser)
+ (link_flags -linkall))
