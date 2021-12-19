@@ -1,8 +1,7 @@
 open Css_types;
-
 let container_lnum = 0;
 let pos = Lexing.dummy_pos;
-let ast = Css_lexer.parse_declaration_list(~container_lnum, ~pos, "display: flex");
+let ast = Css_lexer.parse_stylesheet(~container_lnum, ~pos, "html, body {display: flex}");
 
 let render_record = zippedRecord => {
   let inner = zippedRecord |> List.map(((key, value)) =>
@@ -12,24 +11,45 @@ let render_record = zippedRecord => {
   Printf.sprintf("{\n%s\n}", inner);
 }
 
-let rec render_declaration_kind = (ast: Declaration_list.kind): string => {
+let rec render_stylesheet = (ast: Stylesheet.t) => {
+  let inner = ast |> fst |> List.map(render_rule) |> String.concat(", ");
+  "Stylesheet([" ++ inner ++ "])";
+} and render_rule = (ast: Rule.t) => {
+  switch (ast) {
+    | Style_rule(style_rule) => render_style_rule(style_rule)
+    | At_rule(at_rule) => render_at_rule(at_rule)
+  }
+} and render_style_rule = (ast:  Style_rule.t) => {
+  render_record([("prelude", ast.prelude |> render_declaration_value), ("block", render_declaration_list(ast.block))])
+}
+ and render_at_rule = (ast: At_rule.t) => {
+   render_record([("prelude", ast.prelude |> render_declaration_value), ("block", render_brace_block(ast.block))])
+ }
+ and render_brace_block = (ast) => {
+   switch (ast: Brace_block.t) {
+     | Empty => "Empty"
+    | Declaration_list(declaration_list) => render_declaration_list(declaration_list)
+    | Stylesheet(stylesheet) => render_stylesheet(stylesheet)
+   }
+ }
+and render_declaration_kind = (ast: Declaration_list.kind) => {
   switch (ast) {
     | Declaration(declaration) => render_declaration(declaration)
     | Unsafe(unsafe) => render_declaration(unsafe)
-    | At_rule(_at_rule) => failwith("TODO")
-    | Style_rule(_style_rule) => failwith("TODO")
+    | Style_rule(style_rule) => render_style_rule(style_rule)
+    | At_rule(at_rule) => render_at_rule(at_rule)
   }
-} and render_declaration_list = (ast: Declaration_list.t): string => {
+} and render_declaration_list = (ast: Declaration_list.t) => {
   let inner = ast |> fst |> List.map(render_declaration_kind) |> String.concat(", ");
-  "Declaration(" ++ inner ++ ")";
+  "Declaration([" ++ inner ++ "])";
 }
-and render_declaration = (ast: Declaration.t): string => {
-  render_record([("name", ast.name |> fst), ("value", ast.value |> fst |> render_declaration_value), ("important", ast.important |> fst |> string_of_bool)])
-} and render_declaration_value = (ast): string => {
-  let inner = ast |> List.map(render_value) |> String.concat(", ");
+and render_declaration = (ast: Declaration.t) => {
+  render_record([("name", ast.name |> fst), ("value", ast.value |> render_declaration_value), ("important", ast.important |> fst |> string_of_bool)])
+} and render_declaration_value = (ast: with_loc(list(with_loc(Component_value.t)))) => {
+  let inner = ast |> fst |> List.map( render_component_value) |> String.concat(", ");
   "[" ++ inner ++ "]"
 }
-and render_value = (ast): string => {
+and render_component_value = (ast: with_loc(Component_value.t)) => {
   let value = ast |> fst;
   switch (value) {
     | Paren_block(_) => "Paren_block(_)"
@@ -51,7 +71,7 @@ and render_value = (ast): string => {
   }
 }
 
-print_endline(render_declaration_list(ast))
+print_endline(render_stylesheet(ast))
 
 /* let parse_declaration = (~container_lnum=?, ~pos=?, css) =>
   parse_string(~container_lnum?, ~pos?, Parser.declaration, css);
