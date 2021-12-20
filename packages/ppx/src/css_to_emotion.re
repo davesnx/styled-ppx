@@ -237,12 +237,21 @@ and render_style_rule = (~isUncurried, ident, rule: Style_rule.t): Parsetree.exp
       };
     let ident = Helper.Exp.ident(~loc, CssJs.lident(~loc, pseudoclass));
     Helper.Exp.apply(~loc=rule.Style_rule.loc, ident, [(Nolabel, dl_expr)]);
-  | /* nth-child & friends */
+  /* :not function & friends */
+  |
+    [
+      (Ident(_), _),
+      (Delim(":"), _),
+      (Function((_pc, loc), (_args, _args_loc)), _f_loc)
+    ]
+   /* nth-child & friends */
+  |
     [
       (Selector("&"), _),
       (Delim(":"), _),
       (Function((_pc, loc), (_args, _args_loc)), _f_loc),
-    ] =>
+    ]
+    =>
     // TODO: parses and use the correct functions instead of just strings selector
     let ident = Helper.Exp.ident(~loc, CssJs.lident(~loc, "selector"));
     let selector =
