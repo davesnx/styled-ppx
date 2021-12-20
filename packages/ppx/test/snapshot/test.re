@@ -7,6 +7,12 @@ If you are looking to add some tests for CSS support, check packages/ppx/test/na
   }
 |}];
 
+[%styled.global {|
+  p:not(.active){
+    display: flex;
+  }
+|}]
+
 module ShoudNotBreakOtherModulesPpxsWithStringAsPayload = [%ppx ""];
 module ShoudNotBreakOtherModulesPpxsWithMultiStringAsPayload = [%ppx {| stuff |}];
 

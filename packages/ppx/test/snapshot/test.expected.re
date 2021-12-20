@@ -4,6 +4,7 @@ ignore(
     [|CssJs.margin(`zero)|],
   ),
 );
+ignore(CssJs.selector({js|p:not(.active)|js}, [|CssJs.display(`flex)|]));
 module ShoudNotBreakOtherModulesPpxsWithStringAsPayload = [%ppx ""];
 module ShoudNotBreakOtherModulesPpxsWithMultiStringAsPayload = [%ppx
   {| stuff |}
