@@ -7,7 +7,7 @@ module Sedlexing = Lex_buffer;
 module Parser = Css_parser;
 module Types = Css_types;
 
-/** Signals a lexing error at the provided source location.  */
+/** Signals a lexing error at the provided source location. */
 exception LexingError((Lexing.position, string));
 
 /** Signals a parsing error at the provided token and its start and end
