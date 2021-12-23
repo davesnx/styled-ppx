@@ -272,4 +272,16 @@ describe("Combinators: list", ({test, _}) => {
       };
     ();
   });
+
+  test("[ A? [B | C] ]+ A?", _ => {
+    let parser = parse_exn([%value "[ A? [B | C] ]+ A?"]);
+    let () = switch(parser("A B A C")) {
+      | ([(Some(), `B), (Some(), `C)], None) => ()
+      | _ => failwith("should be ([(Some(), `B), (Some(), `C)], None)")
+    };
+    let () = switch(parser("B A C A")) {
+      | ([(None, `B), (Some(), `C)], Some()) => ()
+      | _ => failwith("should be ([(None, `B), (Some(), `C)], Some())")
+    };
+  });
 });

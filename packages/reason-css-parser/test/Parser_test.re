@@ -41,6 +41,11 @@ let tests = [
     "rgba(2.5, 3.3, 4.4, 0.5)",
     `Rgba_3(([2.5, 3.3, 4.4], Some(((), `Number(0.5))))),
   ),
+  test(
+    [%value "<track-size>"],
+    "fit-content(50%)",
+    `Fit_content(`Percentage(50.)),
+  ),
 ];
 
 describe("Parser", ({test, _}) => {
