@@ -59,6 +59,17 @@ let testData = [
       )
     |]),
   ),
+  (
+    "& span",
+    [%cx "& span { color: red; }"],
+    CssJs.style(. [|
+      CssJs.selector(
+        {js|& span|js},
+        [|CssJs.color(CssJs.red)|]),
+    |],
+    )
+  ),
+
   /* (
     "*:not(:last-child)",
     [%cx "& > *:not(:last-child) { margin: 10px; }"],
