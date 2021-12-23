@@ -242,3 +242,17 @@ let interpolation = {
   return_match(path);
 };
 
+/* [%value.rec "'[' [ <custom-ident> ]* ']'"] */
+let line_names = {
+  open Rule;
+  open Let;
+
+  let.bind_match _ = Pattern.expect(LEFT_SQUARE);
+  let.bind_match path = Modifier.zero_or_more({
+    let.bind_match ident = custom_ident;
+    return_match(ident)
+  });
+  let.bind_match _ = Pattern.expect(RIGHT_SQUARE);
+
+  return_match(path);
+};
