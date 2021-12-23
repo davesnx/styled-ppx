@@ -11,8 +11,13 @@ If you are looking to add some tests for CSS support, check packages/ppx/test/na
   p:not(.active){
     display: flex;
   }
-|}]
+|}];
 
+[%styled.global {|
+  input[type="password"]{
+    border: 1px solid red;
+  }
+|}];
 
 module NestedPropreties = [%styled.div {|
   & span {
@@ -23,10 +28,26 @@ module NestedPropreties = [%styled.div {|
     cursor: pointer;
   }
 
-  &p:not(.active) {
+  & p:not(.active) {
     display: none;
   }
 
+  & a[target="_blank"]{
+    color: red;
+  }
+
+  & input[type="button"]{
+    background-color: blue;
+  }
+
+|}];
+
+ module Test = [%styled.div {|
+  color: blue;
+
+  & p:not(.active) {
+    color: green;
+  };
 |}]
 
 module ShoudNotBreakOtherModulesPpxsWithStringAsPayload = [%ppx ""];
