@@ -30,7 +30,6 @@ let combine_static = rules => {
   match_everything([], rules);
 };
 
-// TODO: test [A | [A B] ] with A B
 let combine_xor =
   fun
   | [] => failwith("xor doesn't makes sense without a single value")
@@ -41,7 +40,6 @@ let combine_xor =
       value;
     };
 
-// TODO: [ A && [A B] ] with A B A
 let combine_and = rules => {
   // TODO: an array is a better choice
   let rec match_everything = (values, rules) =>
