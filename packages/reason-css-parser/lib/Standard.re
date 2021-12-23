@@ -256,3 +256,15 @@ let line_names = {
 
   return_match(path);
 };
+
+let flex_value =
+  token(token =>
+    switch (token) {
+    | DIMENSION(number, dimension) =>
+      switch (dimension) {
+      | "fr" => Ok(`Fr(number))
+      | _ => Error(["only fr dimension is valid"])
+      }
+    | _ => Error(["expected flex_value"])
+    }
+  );
