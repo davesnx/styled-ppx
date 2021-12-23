@@ -181,6 +181,25 @@ and render_style_rule = (~isUncurried, ident, rule: Style_rule.t): Parsetree.exp
     };
   };
 
+  let render_function_value = (ident, selector) => {
+    let selector_expr = string_to_const(~loc=prelude_loc, selector);
+    Helper.Exp.apply(
+      ~loc=rule.Style_rule.loc,
+      ident,
+      [(Nolabel, selector_expr), (Nolabel, dl_expr)]);
+  }
+
+  let render_rule_value = (ident, selector) => {
+    let selector_expr = string_to_const(~loc=prelude_loc, selector);
+
+    Helper.Exp.apply(
+      ~loc=rule.Style_rule.loc,
+      ~attrs=(isUncurried ? [Create.uncurried(~loc=rule.Style_rule.loc)] : []),
+      ident,
+      [(Nolabel, selector_expr), (Nolabel, dl_expr)],
+    );
+  }
+
   switch (prelude) {
   | /* two-colons pseudoclasses */
     [
@@ -237,33 +256,44 @@ and render_style_rule = (~isUncurried, ident, rule: Style_rule.t): Parsetree.exp
       };
     let ident = Helper.Exp.ident(~loc, CssJs.lident(~loc, pseudoclass));
     Helper.Exp.apply(~loc=rule.Style_rule.loc, ident, [(Nolabel, dl_expr)]);
-  | /* nth-child & friends */
+   /* nth-child & friends */
+  |
     [
       (Selector("&"), _),
       (Delim(":"), _),
       (Function((_pc, loc), (_args, _args_loc)), _f_loc),
-    ] =>
+    ]
+    =>
     // TODO: parses and use the correct functions instead of just strings selector
     let ident = Helper.Exp.ident(~loc, CssJs.lident(~loc, "selector"));
     let selector =
       List.fold_left(render_prelude_value, "", List.rev(prelude));
-    let selector_expr = string_to_const(~loc=prelude_loc, selector);
-    Helper.Exp.apply(
-      ~loc=rule.Style_rule.loc,
-      ident,
-      [(Nolabel, selector_expr), (Nolabel, dl_expr)],
-    );
+      render_function_value(ident, selector);
+  | [
+    (Selector("&"), _),
+    (Ident(_), _),
+    ..._
+    ]  as v =>
+    let prelude = List.tl(v);
+    switch(prelude) {
+    | [
+      (Ident(_), _),
+      (Delim(":"), _),
+      (Function((_pc, loc), (_args, _args_loc)), _f_loc)
+    ]  =>
+    let ident = Helper.Exp.ident(~loc, CssJs.lident(~loc, "selector"));
+    let selector =
+      "& " ++ List.fold_left(render_prelude_value, "", List.rev(prelude));
+    render_function_value(ident, selector);
+     |  _ =>
+     let selector = "& " ++
+      List.fold_left(render_prelude_value, "", List.rev(prelude));
+      render_rule_value(ident, selector);
+    }
   | _ =>
     let selector =
       List.fold_left(render_prelude_value, "", List.rev(prelude));
-    let selector_expr = string_to_const(~loc=prelude_loc, selector);
-
-    Helper.Exp.apply(
-      ~loc=rule.Style_rule.loc,
-      ~attrs=(isUncurried ? [Create.uncurried(~loc=rule.Style_rule.loc)] : []),
-      ident,
-      [(Nolabel, selector_expr), (Nolabel, dl_expr)],
-    );
+      render_rule_value(ident, selector);
   };
 };
 
