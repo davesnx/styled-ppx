@@ -171,8 +171,11 @@ and render_style_rule = (~isUncurried, ident, rule: Style_rule.t): Parsetree.exp
     | Number(v)
     | Selector(v) => v ++ s
     | Hash(v) => "#" ++ v ++ s
+    | String(v) => Format.sprintf("\"%s\"", v) ++ s;
     /*<number><string> is parsed as Dimension */
     | Dimension((number, dimension)) => number ++ dimension ++ " " ++ s
+    | Bracket_block(c) =>
+     "[" ++ List.fold_left(render_prelude_value, "]", List.rev(c)) ++ s
     | Paren_block(c) =>
       List.fold_left(render_prelude_value, "", List.rev(c)) ++ s
     | Function((f, _l), (args, _la)) =>
@@ -285,11 +288,31 @@ and render_style_rule = (~isUncurried, ident, rule: Style_rule.t): Parsetree.exp
     let selector =
       "& " ++ List.fold_left(render_prelude_value, "", List.rev(prelude));
     render_function_value(ident, selector);
-     |  _ =>
+    
+    | [
+      (Ident(_), _),
+      (Bracket_block([ (_, loc), ..._]), _) 
+    ] => 
+    let ident = Helper.Exp.ident(~loc, CssJs.lident(~loc, "selector"));
+    let selector = "& " ++
+      List.fold_left(render_prelude_value, "", List.rev(prelude));
+    render_rule_value(ident, selector);
+
+
+    |  _ =>
      let selector = "& " ++
       List.fold_left(render_prelude_value, "", List.rev(prelude));
       render_rule_value(ident, selector);
     }
+
+  |  [
+      (Ident(_), _),
+      (Bracket_block([ (_, loc), ..._]), _) 
+    ] => 
+    let ident = Helper.Exp.ident(~loc, CssJs.lident(~loc, "selector"));
+    let selector = List.fold_left(render_prelude_value, "", List.rev(prelude));
+    render_rule_value(ident, selector);
+  
   | _ =>
     let selector =
       List.fold_left(render_prelude_value, "", List.rev(prelude));
