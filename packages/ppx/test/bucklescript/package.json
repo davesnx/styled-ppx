@@ -11,7 +11,8 @@
   "dependencies": {
     "@glennsl/bs-jest": "^0.4.10",
     "@testing-library/jest-dom": "^5.15.1",
-    "bs-css-emotion": "^2.5.1",
+    "bs-css": "^15.0.2",
+    "bs-css-emotion": "^4.0.2",
     "bs-platform": "^9.0.2",
     "bs-react-testing-library": "^0.7.0",
     "concurrently": "^5.1.0",

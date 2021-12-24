@@ -404,6 +404,7 @@ CssJs.unsafe("overflowWrap", "break-word");
 CssJs.overflowWrap(`anywhere);
 CssJs.wordWrap(`normal);
 CssJs.unsafe("wordWrap", "break-word");
+CssJs.wordWrap(`anywhere);
 CssJs.textAlign(`start);
 CssJs.unsafe("textAlign", "end");
 CssJs.textAlign(`left);

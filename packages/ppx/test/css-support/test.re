@@ -676,7 +676,7 @@
 [%css {|overflow-wrap: anywhere|}];
 [%css {|word-wrap: normal|}];
 [%css {|word-wrap: break-word|}];
-/* [%css {|word-wrap: anywhere|}]; */
+[%css {|word-wrap: anywhere|}];
 [%css {|text-align: start|}];
 [%css {|text-align: end|}];
 [%css {|text-align: left|}];

@@ -7726,12 +7726,12 @@ module SelectorsMediaQueries = {
   let styles =
     CssJs.style(. [|
       CssJs.label("SelectorsMediaQueries"),
-      CssJs.media(
+      CssJs.media(.
         "(min-width: 600px)",
         [|CssJs.unsafe("background", "blue")|],
       ),
       CssJs.hover([|CssJs.unsafe("background", "green")|]),
-      CssJs.selector(
+      CssJs.selector(.
         {js|& > p|js},
         [|CssJs.color(CssJs.pink), CssJs.unsafe("fontSize", "24px")|],
       ),
