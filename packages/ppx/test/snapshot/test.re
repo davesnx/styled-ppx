@@ -7,28 +7,6 @@ If you are looking to add some tests for CSS support, check packages/ppx/test/na
   }
 |}];
 
-[%styled.global {|
-  p:not(.active){
-    display: flex;
-  }
-|}]
-
-
-module NestedPropreties = [%styled.div {|
-  & span {
-    color: red;
-  }
-
-  & button:hover {
-    cursor: pointer;
-  }
-
-  &p:not(.active) {
-    display: none;
-  }
-
-|}]
-
 module ShoudNotBreakOtherModulesPpxsWithStringAsPayload = [%ppx ""];
 module ShoudNotBreakOtherModulesPpxsWithMultiStringAsPayload = [%ppx {| stuff |}];
 
