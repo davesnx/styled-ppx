@@ -13,7 +13,7 @@ let testData = [
       |]
     ),
   ),
-  /* (
+  (
     "nth-child(even)",
     [%cx "&:nth-child(even) { color: red; }"],
     CssJs.style(.
@@ -24,7 +24,7 @@ let testData = [
         )
       |]
     ),
-  ), */
+  ),
   (
     "nth-child(3n+1)",
     [%cx "& > div:nth-child(3n+1) { color: blue; }"],
@@ -69,7 +69,7 @@ let testData = [
     |],
     )
   ),
-  /* (
+  (
     "& p:not(.active)",
     [%cx "& p:not(.active) { display: none; }"],
     CssJs.style(. [|
@@ -78,7 +78,7 @@ let testData = [
         [|CssJs.display(`none)|]),
     |],
     )
-  ), */
+  ),
   (
     "& input[type=\"password\"]",
     [%cx "& input[type=\"password\"] { border: 1px solid red; } "],

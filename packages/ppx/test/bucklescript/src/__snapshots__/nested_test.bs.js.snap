@@ -13,13 +13,13 @@ exports[`Nested component renders 1`] = `
   color: #FF0000;
   height: 100vh;
   -webkit-box-pack: center;
-  -webkit-justify-content: center;
   -ms-flex-pack: center;
+  -webkit-justify-content: center;
   justify-content: center;
   width: 100vw;
 }
 
-.emotion-0 > p {
+.emotion-0 >p {
   color: #800080;
 }
 
