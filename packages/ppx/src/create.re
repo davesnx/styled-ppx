@@ -205,33 +205,51 @@ let newProps = (~loc) =>
     ),
   );
 
-/* deleteInnerRef(. newProps); */
-let deleteInnerRefProp = (~loc) => {
+/* deleteInnerRef(. newProps, "innerRef"); */
+let deleteProp = (~loc, key) => {
   Helper.Exp.apply(
     ~loc,
-    Helper.Exp.ident(~loc, withLoc(Lident("deleteInnerRef"), ~loc)),
-    [(Nolabel, Helper.Exp.ident(~loc, withLoc(Lident("newProps"), ~loc)))]
-  );
+    Helper.Exp.ident(~loc, withLoc(Lident("deleteProp"), ~loc)),
+    [
+      (Nolabel, Helper.Exp.ident(~loc, withLoc(Lident("newProps"), ~loc))),
+      (Nolabel, Helper.Exp.constant(~loc, Pconst_string(key, loc, None)),)
+    ]
+  ) |> applyIgnore(~loc);
 }
+let generateSequence = (~loc, fns) => {
+  let rec generate = (~loc, fns) => {
+    switch (fns) {
+      | [] => failwith("sequence needs to contain at least one function")
+      | [return] => return
+      | [fn, return] => Helper.Exp.sequence(~loc, fn, return)
+      | [fn, ...rest] => Helper.Exp.sequence(~loc, fn, generate(~loc, rest))
+    }
+  };
+  generate(~loc, fns);
+};
 
 /*
   let stylesObject = {"className": styles};
   let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
   createVariadicElement("div", newProps);
  */
-let makeBody = (~loc, ~htmlTag, ~styledExpr) =>
+let makeBody = (~loc, ~htmlTag, ~styledExpr, ~variables) => {
+  let sequence = [deleteProp(~loc, "innerRef"), variadicElement(~loc, ~htmlTag)]
+    |> List.append(List.map(deleteProp(~loc), variables));
+
   Helper.Exp.let_(
     ~loc,
     ~attrs=[Helper.Attr.mk(withLoc("reason.preserve_braces", ~loc), PStr([]))],
     Nonrecursive,
     [stylesAndRefObject(~loc, ~value=styledExpr)],
     Helper.Exp.let_(
-        ~loc,
-        Nonrecursive,
-        [newProps(~loc)],
-        Helper.Exp.sequence(~loc, applyIgnore(~loc, deleteInnerRefProp(~loc)), variadicElement(~loc, ~htmlTag))
-      ),
+      ~loc,
+      Nonrecursive,
+      [newProps(~loc)],
+      generateSequence(~loc, sequence)
+    ),
   );
+};
 
 /* props: makeProps */
 let makeArguments = (~loc, ~params) => {
@@ -242,18 +260,27 @@ let makeArguments = (~loc, ~params) => {
   );
 };
 
+let getLabel = str =>
+  switch (str) {
+  | Optional(str)
+  | Labelled(str) => str
+  | Nolabel => ""
+  };
+
 /* let make = (props: makeProps) => + makeBody */
-let makeFn = (~loc, ~htmlTag, ~styledExpr, ~params) =>
+let makeFn = (~loc, ~htmlTag, ~styledExpr, ~params, ~variables) => {
+  let paramsNames = List.map(((arg_label, _, _, _)) => getLabel(arg_label), variables);
   Helper.Exp.fun_(
     ~loc,
     Nolabel,
     None,
     makeArguments(~loc, ~params),
-    makeBody(~loc, ~htmlTag, ~styledExpr),
+    makeBody(~loc, ~htmlTag, ~styledExpr, ~variables=paramsNames),
   );
+};
 
 /* [@react.component] + makeFn */
-let component = (~loc, ~htmlTag, ~styledExpr, ~params) => {
+let component = (~loc, ~htmlTag, ~styledExpr, ~params, ~variables) => {
   Helper.Str.mk(
     ~loc,
     Pstr_value(
@@ -262,7 +289,7 @@ let component = (~loc, ~htmlTag, ~styledExpr, ~params) => {
         Helper.Vb.mk(
           ~loc,
           Helper.Pat.mk(~loc, Ppat_var(withLoc("make", ~loc))),
-          makeFn(~loc, ~htmlTag, ~styledExpr, ~params),
+          makeFn(~loc, ~htmlTag, ~styledExpr, ~params, ~variables),
         ),
       ],
     ),
@@ -419,9 +446,9 @@ let makeMakeProps = (~loc, ~customProps) => {
   );
 };
 
-/* let deleteInnerRef = [%raw "(newProps) => delete newProps.innerRef"] */
-let defineDeleteInnerRefFn = (~loc) => {
-  let fnName = Helper.Pat.mk(~loc, Ppat_var(withLoc("deleteInnerRef", ~loc)));
+/* let deleteProp = [%raw "(newProps, key) => delete newProps[key]"] */
+let defineDeletePropFn = (~loc) => {
+  let fnName = Helper.Pat.mk(~loc, Ppat_var(withLoc("deleteProp", ~loc)));
   let rawDeleteKeyword = Helper.Exp.extension(
       ~loc,
       (
@@ -430,7 +457,7 @@ let defineDeleteInnerRefFn = (~loc) => {
           Helper.Str.mk(
             ~loc,
             Pstr_eval(
-              Helper.Exp.constant(~loc, Pconst_string("(newProps) => delete newProps.innerRef", loc, None)),
+              Helper.Exp.constant(~loc, Pconst_string("(newProps, key) => delete newProps[key]", loc, None)),
               [],
             ),
           ),
