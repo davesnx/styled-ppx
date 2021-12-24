@@ -6,31 +6,31 @@ let testData = [
     [%cx "& > a { color: green; }"],
     CssJs.style(.
       [|
-        CssJs.selector(
+        CssJs.selector(.
           {js|& > a|js},
           [| CssJs.color(CssJs.green) |]
         )
       |]
     ),
   ),
-  (
+  /* (
     "nth-child(even)",
     [%cx "&:nth-child(even) { color: red; }"],
     CssJs.style(.
       [|
-        CssJs.selector(
+        CssJs.selector(.
           {js|&:nth-child(even)|js},
           [|CssJs.color(CssJs.red)|]
         )
       |]
     ),
-  ),
+  ), */
   (
     "nth-child(3n+1)",
     [%cx "& > div:nth-child(3n+1) { color: blue; }"],
     CssJs.style(.
       [|
-        CssJs.selector(
+        CssJs.selector(.
           {js|& > div:nth-child(3n  + 1)|js},
           [|CssJs.color(CssJs.blue)|],
         ),
@@ -53,7 +53,7 @@ let testData = [
     "& + &",
     [%cx "& + & { margin: 10px; }"],
     CssJs.style(. [|
-      CssJs.selector(
+      CssJs.selector(.
         {js|& + &|js},
         [|CssJs.margin(CssJs.px(10))|]
       )
@@ -63,27 +63,27 @@ let testData = [
     "& span",
     [%cx "& span { color: red; }"],
     CssJs.style(. [|
-      CssJs.selector(
+      CssJs.selector(.
         {js|& span|js},
         [|CssJs.color(CssJs.red)|]),
     |],
     )
   ),
-  (
+  /* (
     "& p:not(.active)",
     [%cx "& p:not(.active) { display: none; }"],
     CssJs.style(. [|
-      CssJs.selector(
+      CssJs.selector(.
         {js|& p:not(.active)|js},
         [|CssJs.display(`none)|]),
     |],
     )
-  ),
+  ), */
   (
     "& input[type=\"password\"]",
     [%cx "& input[type=\"password\"] { border: 1px solid red; } "],
     CssJs.style(. [|
-      CssJs.selector(
+      CssJs.selector(.
         {js|& input[type = "password"]|js},
         [|CssJs.border(`pxFloat(1.), `solid, CssJs.red)|],
         ),
@@ -93,7 +93,7 @@ let testData = [
     "& button:hover",
     [%cx "& button:hover{ cursor: pointer; } "],
     CssJs.style(. [|
-      CssJs.selector(
+      CssJs.selector(.
         {js|& button:hover|js},
         [|CssJs.unsafe("cursor", "pointer")|],
         ),
@@ -104,7 +104,7 @@ let testData = [
     "*:not(:last-child)",
     [%cx "& > *:not(:last-child) { margin: 10px; }"],
     CssJs.style(. [|
-      CssJs.selector(
+      CssJs.selector(.
         {js|& > *:not(:last-child)|js},
         [|CssJs.margin(CssJs.px(10))|]
       )
