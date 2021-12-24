@@ -30,6 +30,8 @@ module Builder = Ast_builder.Default;
 
 module CssJs = {
   let lident = (~loc, name) => {txt: Ldot(Lident("CssJs"), name), loc};
+  let selector = (~loc) => lident(~loc, "selector")
+  let media = (~loc) => lident(~loc, "media")
 };
 
 let grammar_error = (loc, message) =>
@@ -114,8 +116,14 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
     };
 
   let media_ident =
-    Builder.pexp_ident(~loc=name_loc, CssJs.lident(~loc, "media"));
-  Builder.eapply(~loc, media_ident, [Builder.estring(~loc=prelude_loc, query), rules]);
+    Builder.pexp_ident(~loc=name_loc, CssJs.media(~loc));
+
+  Helper.Exp.apply(
+    ~loc,
+    ~attrs=[Create.uncurried(~loc)],
+    media_ident,
+    [(Nolabel, Builder.estring(~loc=prelude_loc, query)), (Nolabel, rules)],
+  );
 }
 and render_declaration = (d: Declaration.t): list(Parsetree.expression) => {
   let (name, name_loc) = d.Declaration.name;
@@ -147,13 +155,13 @@ and render_declarations = ds => {
       | Declaration_list.At_rule(ar) => [render_at_rule(ar)]
       | Declaration_list.Style_rule(ar) =>
         let loc: Location.t = ar.loc;
-        let ident = Helper.Exp.ident(~loc, CssJs.lident(~loc, "selector"));
-        [render_style_rule(~isUncurried=false, ident, ar)];
+        let ident = Helper.Exp.ident(~loc, CssJs.selector(~loc));
+        [render_style_rule(ident, ar)];
       },
     fst(ds),
   )
 }
-and render_style_rule = (~isUncurried, ident, rule: Style_rule.t): Parsetree.expression => {
+and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
   let (prelude, prelude_loc) = rule.Style_rule.prelude;
   let block = rule.Style_rule.block;
   let (_, loc) = rule.Style_rule.block;
@@ -197,7 +205,7 @@ and render_style_rule = (~isUncurried, ident, rule: Style_rule.t): Parsetree.exp
 
     Helper.Exp.apply(
       ~loc=rule.Style_rule.loc,
-      ~attrs=(isUncurried ? [Create.uncurried(~loc=rule.Style_rule.loc)] : []),
+      ~attrs=[Create.uncurried(~loc=rule.Style_rule.loc)],
       ident,
       [(Nolabel, selector_expr), (Nolabel, dl_expr)],
     );
@@ -268,7 +276,7 @@ and render_style_rule = (~isUncurried, ident, rule: Style_rule.t): Parsetree.exp
     ]
     =>
     // TODO: parses and use the correct functions instead of just strings selector
-    let ident = Helper.Exp.ident(~loc, CssJs.lident(~loc, "selector"));
+    let ident = Helper.Exp.ident(~loc, CssJs.selector(~loc));
     let selector =
       List.fold_left(render_prelude_value, "", List.rev(prelude));
       render_function_value(ident, selector);
@@ -284,16 +292,16 @@ and render_style_rule = (~isUncurried, ident, rule: Style_rule.t): Parsetree.exp
       (Delim(":"), _),
       (Function((_pc, loc), (_args, _args_loc)), _f_loc)
     ]  =>
-    let ident = Helper.Exp.ident(~loc, CssJs.lident(~loc, "selector"));
+    let ident = Helper.Exp.ident(~loc, CssJs.selector(~loc));
     let selector =
       "& " ++ List.fold_left(render_prelude_value, "", List.rev(prelude));
     render_function_value(ident, selector);
-    
+
     | [
       (Ident(_), _),
-      (Bracket_block([ (_, loc), ..._]), _) 
-    ] => 
-    let ident = Helper.Exp.ident(~loc, CssJs.lident(~loc, "selector"));
+      (Bracket_block([ (_, loc), ..._]), _)
+    ] =>
+    let ident = Helper.Exp.ident(~loc, CssJs.selector(~loc));
     let selector = "& " ++
       List.fold_left(render_prelude_value, "", List.rev(prelude));
     render_rule_value(ident, selector);
@@ -307,12 +315,12 @@ and render_style_rule = (~isUncurried, ident, rule: Style_rule.t): Parsetree.exp
 
   |  [
       (Ident(_), _),
-      (Bracket_block([ (_, loc), ..._]), _) 
-    ] => 
-    let ident = Helper.Exp.ident(~loc, CssJs.lident(~loc, "selector"));
+      (Bracket_block([ (_, loc), ..._]), _)
+    ] =>
+    let ident = Helper.Exp.ident(~loc, CssJs.selector(~loc));
     let selector = List.fold_left(render_prelude_value, "", List.rev(prelude));
     render_rule_value(ident, selector);
-  
+
   | _ =>
     let selector =
       List.fold_left(render_prelude_value, "", List.rev(prelude));
@@ -343,9 +351,9 @@ let render_style_call = (declaration_list): Parsetree.expression => {
   Helper.Exp.apply(~loc, ~attrs=[Create.uncurried(~loc)], ident, arguments);
 };
 
-let render_rule = (~isGlobalCall, ident, rule: Rule.t): Parsetree.expression => {
+let render_rule = (ident, rule: Rule.t): Parsetree.expression => {
   switch (rule) {
-  | Rule.Style_rule(styleRule) => render_style_rule(~isUncurried=isGlobalCall, ident, styleRule)
+  | Rule.Style_rule(styleRule) => render_style_rule(ident, styleRule)
   | Rule.At_rule(atRule) => render_at_rule(atRule)
   };
 };
@@ -407,7 +415,7 @@ let render_global = ((ruleList, loc): Stylesheet.t) => {
 
     switch (ruleList) {
     /* There's only one rule: */
-    | [rule] => render_rule(~isGlobalCall=true, emotionGlobal, rule)
+    | [rule] => render_rule(emotionGlobal, rule)
       |> Create.applyIgnore(~loc)
     /* There's more than one */
     | _res =>
