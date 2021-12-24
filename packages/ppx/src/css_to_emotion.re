@@ -196,6 +196,7 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
     let selector_expr = string_to_const(~loc=prelude_loc, selector);
     Helper.Exp.apply(
       ~loc=rule.Style_rule.loc,
+      ~attrs=[Create.uncurried(~loc=rule.Style_rule.loc)],
       ident,
       [(Nolabel, selector_expr), (Nolabel, dl_expr)]);
   }
