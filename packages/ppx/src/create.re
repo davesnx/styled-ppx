@@ -138,28 +138,19 @@ let variadicElement = (~loc, ~htmlTag) => {
   );
 };
 
-/* let stylesObject = {"className": styled}; */
-let stylesAndRefObject = (~loc, ~value) =>
-  {
-    let className = (withLoc(~loc, Lident("className")), value);
-    let refProp = (
-      withLoc(~loc, Lident("ref")),
-      Helper.Exp.apply(
-        ~loc,
-        Helper.Exp.ident(~loc, withLoc(Lident("innerRefGet"), ~loc)),
-        [(Nolabel, Helper.Exp.ident(~loc, withLoc(Lident("props"), ~loc)))],
-      )
-      /* Helper.Exp.field(~loc,
-        Helper.Exp.ident(~loc, withLoc(~loc, Lident("props"))),
-        withLoc(~loc, Lident("innerRef"))
-      ) */
-    );
-    let record = Helper.Exp.record(
+/* let stylesObject = {"className": styled, "ref": props->innerRefGet}; */
+let stylesAndRefObject = (~loc, ~value) => {
+  let className = (withLoc(~loc, Lident("className")), value);
+  let refProp = (
+    withLoc(~loc, Lident("ref")),
+    Helper.Exp.apply(
       ~loc,
-      [ className, refProp],
-      None,
-    );
-    Helper.Vb.mk(
+      Helper.Exp.ident(~loc, withLoc(Lident("innerRefGet"), ~loc)),
+      [(Nolabel, Helper.Exp.ident(~loc, withLoc(Lident("props"), ~loc)))],
+    )
+  );
+  let record = Helper.Exp.record(~loc, [className, refProp], None);
+  Helper.Vb.mk(
     ~loc,
     Helper.Pat.mk(~loc, Ppat_var(withLoc("stylesObject", ~loc))),
     Helper.Exp.extension(
@@ -177,7 +168,8 @@ let stylesAndRefObject = (~loc, ~value) =>
         ]),
       ),
     ),
-  )};
+  );
+};
 
 /* Obj.magic(props) */
 let objMagicProps = (~loc) =>
@@ -205,7 +197,7 @@ let newProps = (~loc) =>
     ),
   );
 
-/* deleteInnerRef(. newProps, "innerRef"); */
+/* deleteInnerRef(. newProps, "innerRef") |> ignore; */
 let deleteProp = (~loc, key) => {
   Helper.Exp.apply(
     ~loc,
@@ -251,15 +243,6 @@ let makeBody = (~loc, ~htmlTag, ~styledExpr, ~variables) => {
   );
 };
 
-/* props: makeProps */
-let makeArguments = (~loc, ~params) => {
-  Helper.Pat.constraint_(
-    ~loc,
-    Helper.Pat.mk(~loc, Ppat_var(withLoc("props", ~loc))),
-    Helper.Typ.constr(~loc, withLoc(Lident("makeProps"), ~loc), params),
-  );
-};
-
 let getLabel = str =>
   switch (str) {
   | Optional(str)
@@ -268,19 +251,25 @@ let getLabel = str =>
   };
 
 /* let make = (props: makeProps) => + makeBody */
-let makeFn = (~loc, ~htmlTag, ~styledExpr, ~params, ~variables) => {
-  let paramsNames = List.map(((arg_label, _, _, _)) => getLabel(arg_label), variables);
+let makeFn = (~loc, ~htmlTag, ~styledExpr, ~makePropTypes, ~variableNames) => {
   Helper.Exp.fun_(
     ~loc,
     Nolabel,
     None,
-    makeArguments(~loc, ~params),
-    makeBody(~loc, ~htmlTag, ~styledExpr, ~variables=paramsNames),
+    /* props: makeProps */
+    Helper.Pat.constraint_(
+      ~loc,
+      Helper.Pat.mk(~loc, Ppat_var(withLoc("props", ~loc))),
+      Helper.Typ.constr(~loc, withLoc(Lident("makeProps"), ~loc), makePropTypes),
+    ),
+    makeBody(~loc, ~htmlTag, ~styledExpr, ~variables=variableNames),
   );
 };
 
 /* [@react.component] + makeFn */
-let component = (~loc, ~htmlTag, ~styledExpr, ~params, ~variables) => {
+let component = (~loc, ~htmlTag, ~styledExpr, ~makePropTypes, ~labeledArguments) => {
+  let variableNames = List.map(((arg, _, _, _, _, _)) => getLabel(arg), labeledArguments);
+
   Helper.Str.mk(
     ~loc,
     Pstr_value(
@@ -289,7 +278,7 @@ let component = (~loc, ~htmlTag, ~styledExpr, ~params, ~variables) => {
         Helper.Vb.mk(
           ~loc,
           Helper.Pat.mk(~loc, Ppat_var(withLoc("make", ~loc))),
-          makeFn(~loc, ~htmlTag, ~styledExpr, ~params, ~variables),
+          makeFn(~loc, ~htmlTag, ~styledExpr, ~makePropTypes, ~variableNames),
         ),
       ],
     ),
