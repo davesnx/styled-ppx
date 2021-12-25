@@ -9,7 +9,6 @@ exports[`ArrayDynamicComponent renders 1`] = `
 <div>
   <div
     class="emotion-0"
-    var="Black"
   />
 </div>
 `;
@@ -42,7 +41,6 @@ exports[`SequenceDynamicComponent renders 1`] = `
 <div>
   <div
     class="emotion-0"
-    var="White"
   />
 </div>
 `;
