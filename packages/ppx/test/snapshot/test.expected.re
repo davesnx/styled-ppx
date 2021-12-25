@@ -957,7 +957,7 @@ module OneSingleProperty = {
   [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
-  let deleteInnerRef = [%raw "(newProps) => delete newProps.innerRef"];
+  let deleteProp = [%raw "(newProps, key) => delete newProps[key]"];
   let styles =
     CssJs.style(. [|
       CssJs.label("OneSingleProperty"),
@@ -966,7 +966,7 @@ module OneSingleProperty = {
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles, "ref": innerRefGet(props)};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
-    ignore(deleteInnerRef(newProps));
+    ignore(deleteProp(newProps, "innerRef"));
     createVariadicElement("div", newProps);
   };
 };
@@ -1919,7 +1919,7 @@ module SingleQuoteStrings = {
   [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
-  let deleteInnerRef = [%raw "(newProps) => delete newProps.innerRef"];
+  let deleteProp = [%raw "(newProps, key) => delete newProps[key]"];
   let styles =
     CssJs.style(. [|
       CssJs.label("SingleQuoteStrings"),
@@ -1929,7 +1929,7 @@ module SingleQuoteStrings = {
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles, "ref": innerRefGet(props)};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
-    ignore(deleteInnerRef(newProps));
+    ignore(deleteProp(newProps, "innerRef"));
     createVariadicElement("section", newProps);
   };
 };
@@ -2882,7 +2882,7 @@ module MultiLineStrings = {
   [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
-  let deleteInnerRef = [%raw "(newProps) => delete newProps.innerRef"];
+  let deleteProp = [%raw "(newProps, key) => delete newProps[key]"];
   let styles =
     CssJs.style(. [|
       CssJs.label("MultiLineStrings"),
@@ -2892,7 +2892,7 @@ module MultiLineStrings = {
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles, "ref": innerRefGet(props)};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
-    ignore(deleteInnerRef(newProps));
+    ignore(deleteProp(newProps, "innerRef"));
     createVariadicElement("section", newProps);
   };
 };
@@ -3845,12 +3845,12 @@ module SelfClosingElement = {
   [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
-  let deleteInnerRef = [%raw "(newProps) => delete newProps.innerRef"];
+  let deleteProp = [%raw "(newProps, key) => delete newProps[key]"];
   let styles = CssJs.style(. [|CssJs.label("SelfClosingElement")|]);
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles, "ref": innerRefGet(props)};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
-    ignore(deleteInnerRef(newProps));
+    ignore(deleteProp(newProps, "innerRef"));
     createVariadicElement("input", newProps);
   };
 };
@@ -4803,7 +4803,7 @@ module ArrayStatic = {
   [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
-  let deleteInnerRef = [%raw "(newProps) => delete newProps.innerRef"];
+  let deleteProp = [%raw "(newProps, key) => delete newProps[key]"];
   let styles =
     CssJs.style(. [|
       CssJs.label("ArrayStatic"),
@@ -4813,7 +4813,7 @@ module ArrayStatic = {
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles, "ref": innerRefGet(props)};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
-    ignore(deleteInnerRef(newProps));
+    ignore(deleteProp(newProps, "innerRef"));
     createVariadicElement("section", newProps);
   };
 };
@@ -5773,7 +5773,7 @@ module StringInterpolation = {
   [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
-  let deleteInnerRef = [%raw "(newProps) => delete newProps.innerRef"];
+  let deleteProp = [%raw "(newProps, key) => delete newProps[key]"];
   let styles =
     CssJs.style(. [|
       CssJs.label("StringInterpolation"),
@@ -5786,7 +5786,7 @@ module StringInterpolation = {
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles, "ref": innerRefGet(props)};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
-    ignore(deleteInnerRef(newProps));
+    ignore(deleteProp(newProps, "innerRef"));
     createVariadicElement("div", newProps);
   };
 };
@@ -6756,7 +6756,7 @@ module DynamicComponent = {
   [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
-  let deleteInnerRef = [%raw "(newProps) => delete newProps.innerRef"];
+  let deleteProp = [%raw "(newProps, key) => delete newProps[key]"];
   let styles = (~var, _) =>
     CssJs.style(. [|
       CssJs.label("DynamicComponent"),
@@ -6769,7 +6769,8 @@ module DynamicComponent = {
       "ref": innerRefGet(props),
     };
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
-    ignore(deleteInnerRef(newProps));
+    ignore(deleteProp(newProps, "var"));
+    ignore(deleteProp(newProps, "innerRef"));
     createVariadicElement("div", newProps);
   };
 };
@@ -7722,7 +7723,7 @@ module SelectorsMediaQueries = {
   [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
-  let deleteInnerRef = [%raw "(newProps) => delete newProps.innerRef"];
+  let deleteProp = [%raw "(newProps, key) => delete newProps[key]"];
   let styles =
     CssJs.style(. [|
       CssJs.label("SelectorsMediaQueries"),
@@ -7739,7 +7740,7 @@ module SelectorsMediaQueries = {
   let make = (props: makeProps) => {
     let stylesObject = {"className": styles, "ref": innerRefGet(props)};
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
-    ignore(deleteInnerRef(newProps));
+    ignore(deleteProp(newProps, "innerRef"));
     createVariadicElement("div", newProps);
   };
 };
@@ -8698,7 +8699,7 @@ module ArrayDynamicComponent = {
   [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
-  let deleteInnerRef = [%raw "(newProps) => delete newProps.innerRef"];
+  let deleteProp = [%raw "(newProps, key) => delete newProps[key]"];
   let styles = (~var, _) =>
     CssJs.style(. [|
       CssJs.label("ArrayDynamicComponent"),
@@ -8714,7 +8715,8 @@ module ArrayDynamicComponent = {
       "ref": innerRefGet(props),
     };
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
-    ignore(deleteInnerRef(newProps));
+    ignore(deleteProp(newProps, "var"));
+    ignore(deleteProp(newProps, "innerRef"));
     createVariadicElement("div", newProps);
   };
 };
@@ -9666,7 +9668,7 @@ module SequenceDynamicComponent = {
   [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
-  let deleteInnerRef = [%raw "(newProps) => delete newProps.innerRef"];
+  let deleteProp = [%raw "(newProps, key) => delete newProps[key]"];
   let styles = (~size, _) => {
     Js.log("Logging when render");
     CssJs.style(. [|CssJs.width(size), CssJs.display(`block)|]);
@@ -9677,7 +9679,8 @@ module SequenceDynamicComponent = {
       "ref": innerRefGet(props),
     };
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
-    ignore(deleteInnerRef(newProps));
+    ignore(deleteProp(newProps, "size"));
+    ignore(deleteProp(newProps, "innerRef"));
     createVariadicElement("div", newProps);
   };
 };
@@ -10632,7 +10635,7 @@ module DynamicComponentWithDefaultValue = {
   [@bs.val] [@bs.module "react"]
   external createVariadicElement: (string, Js.t({..})) => React.element =
     "createElement";
-  let deleteInnerRef = [%raw "(newProps) => delete newProps.innerRef"];
+  let deleteProp = [%raw "(newProps, key) => delete newProps[key]"];
   let styles = (~var=CssJs.hex("333"), _) =>
     CssJs.style(. [|
       CssJs.label("DynamicComponentWithDefaultValue"),
@@ -10645,7 +10648,8 @@ module DynamicComponentWithDefaultValue = {
       "ref": innerRefGet(props),
     };
     let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
-    ignore(deleteInnerRef(newProps));
+    ignore(deleteProp(newProps, "var"));
+    ignore(deleteProp(newProps, "innerRef"));
     createVariadicElement("div", newProps);
   };
 };
