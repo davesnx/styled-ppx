@@ -1,5 +1,4 @@
 type with_loc('a) = ('a, Location.t);
-
 type dimension =
   | Length
   | Angle
@@ -13,17 +12,21 @@ module rec Component_value: {
     | Percentage(string)
     | Ident(string)
     | String(string)
-    | Selector(string)
+    | Selector(list(with_loc(t)))
     | Uri(string)
     | Operator(string)
     | Delim(string)
     | Function(with_loc(string), with_loc(list(with_loc(t))))
+    | Pseudoclass(with_loc(string))
+    | Pseudoelement(with_loc(string))
     | Hash(string)
     | Number(string)
     | Unicode_range(string)
     | Float_dimension((string, string, dimension))
     | Dimension((string, string))
-    | Variable(list(string));
+    | Variable(list(string))
+    | Ampersand
+
 } = Component_value
 and Brace_block: {
   type t =

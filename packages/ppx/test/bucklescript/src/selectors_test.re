@@ -19,7 +19,7 @@ let testData = [
     CssJs.style(.
       [|
         CssJs.selector(.
-          {js|&:nth-child(even)|js},
+          {js|& :nth-child(even)|js},
           [|CssJs.color(CssJs.red)|]
         )
       |]
@@ -27,19 +27,19 @@ let testData = [
   ),
   (
     "nth-child(3n+1)",
-    [%cx "& > div:nth-child(3n+1) { color: blue; }"],
+    [%cx "& > div:nth-child(3n + 1) { color: blue; }"],
     CssJs.style(.
       [|
         CssJs.selector(.
-          {js|& > div:nth-child(3n  + 1)|js},
+          {js|& > div:nth-child(3n + 1)|js},
           [|CssJs.color(CssJs.blue)|],
         ),
       |]
     ),
   ),
   (
-    "::active",
-    [%cx "&::active { color: brown; }"],
+    ":active",
+    [%cx "&:active { color: brown; }"],
     CssJs.style(.
       [|CssJs.active([|CssJs.color(CssJs.brown)|])|],
     )
@@ -54,7 +54,7 @@ let testData = [
     [%cx "& + & { margin: 10px; }"],
     CssJs.style(. [|
       CssJs.selector(.
-        {js|& + &|js},
+        {js|& + & |js},
         [|CssJs.margin(CssJs.px(10))|]
       )
     |]),
@@ -84,7 +84,7 @@ let testData = [
     [%cx "& input[type=\"password\"] { border: 1px solid red; } "],
     CssJs.style(. [|
       CssJs.selector(.
-        {js|& input[type = "password"]|js},
+        {js|& input[type= "password"]|js},
         [|CssJs.border(`pxFloat(1.), `solid, CssJs.red)|],
         ),
     |],)
