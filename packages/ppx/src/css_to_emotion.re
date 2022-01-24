@@ -233,7 +233,7 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
                   | "first-child" => "firstChild"
                   | "first-letter" => "firstLetter"
                   | "spelling-error" =>  "spellingError"
-                  | "grammerError" => "grammarError"
+                  | "grammar-error" => "grammarError"
                   | e => e
     }
     | _ => failwith("Expected a Pseudoelement or a Pseudoclass");
