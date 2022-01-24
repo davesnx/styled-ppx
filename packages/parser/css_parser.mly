@@ -237,5 +237,6 @@ component_value:
   | v = VARIABLE { Component_value.Variable v }
   | p = PSEUDOCLASS { Component_value.Pseudoclass (p, Lex_buffer.make_loc $startpos(p) $endpos(p)) }
   | p = PSEUDOELEMENT { Component_value.Pseudoelement (p, Lex_buffer.make_loc $startpos(p) $endpos(p)) }
+  | AMPERSAND { Component_value.Ampersand }
   | s = selector_with_ampersand { s }
   ;
