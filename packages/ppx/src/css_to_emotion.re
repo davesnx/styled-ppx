@@ -244,21 +244,21 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
         | Pseudoelement((_, _)) as p
         | Pseudoclass((_, _)) as p =>
 
-                let i = Helper.Exp.ident(~loc, CssJs.lident(~loc, pseudoToFn(p)));
+                let selector_ident = Helper.Exp.ident(~loc, CssJs.lident(~loc, pseudoToFn(p)));
 
-                let expr = [Helper.Exp.apply(~attrs=[Create.uncurried(~loc)],i, [(Nolabel, dl_expr)])] |> Builder.pexp_array(~loc);
+                let selector_expr = [Helper.Exp.apply(~attrs=[Create.uncurried(~loc)], selector_ident, [(Nolabel, dl_expr)])] |> Builder.pexp_array(~loc);
 
                 let selector_name = string_to_const(~loc, value);
 
                 Helper.Exp.apply(~loc=rule.Style_rule.loc,
                     ~attrs=([Create.uncurried(~loc=rule.Style_rule.loc)]),
-                    ident, [(Nolabel, selector_name), (Nolabel, expr)]);
+                    ident, [(Nolabel, selector_name), (Nolabel, selector_expr)]);
 
         | Bracket_block(c) =>
-                  let x = List.fold_left(render_prelude_value, "", List.rev(c));
-                  render_rule_value(ident, x);
+                  let selector = value ++ "[" ++ List.fold_left(render_prelude_value, "]", List.rev(c)) |> String.trim;
+                  render_rule_value(ident, selector);
 
-        | _ => assert false;
+        | _ => failwith("Invalid selector");
       }
     }
 
@@ -276,7 +276,7 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
   | [(Selector([(Ampersand, _), (Pseudoelement(_) as p, _)]), _)] => render_self(p);
   | _ =>
     let selector =
-      List.fold_left(render_prelude_value, "", List.rev(prelude));
+      List.fold_left(render_prelude_value, "", List.rev(prelude)) |> String.trim;
       render_rule_value(ident, selector);
   };
 };

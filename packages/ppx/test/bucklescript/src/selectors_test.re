@@ -27,7 +27,7 @@ let testData = [
   ),
   (
     "nth-child(3n+1)",
-    [%cx "& > div:nth-child(3n + 1) { color: blue; }"],
+    [%cx "& > div:nth-child(3n+1) { color: blue; }"],
     CssJs.style(.
       [|
         CssJs.selector(.
@@ -54,7 +54,7 @@ let testData = [
     [%cx "& + & { margin: 10px; }"],
     CssJs.style(. [|
       CssJs.selector(.
-        {js|& + & |js},
+        {js|& + &|js},
         [|CssJs.margin(CssJs.px(10))|]
       )
     |]),
