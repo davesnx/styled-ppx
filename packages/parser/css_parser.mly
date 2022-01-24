@@ -180,71 +180,9 @@ selector:
   ;
 
 selector_with_ampersand:
-  | AMPERSAND; d = DELIM; i = IDENT; p = PSEUDOCLASS; xs = paren_block{
+  | AMPERSAND; tl = nonempty_list(component_value_with_loc) {
     Component_value.(
-      Selector([
-        (Ampersand, Lex_buffer.make_loc $startpos $endpos);
-        (Delim(d), Lex_buffer.make_loc $startpos(d) $endpos(d));
-        (Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i));
-        (Pseudoclass((p, Lex_buffer.make_loc $startpos(p) $endpos(p) )), Lex_buffer.make_loc $startpos(p) $endpos(p));
-        (Paren_block(xs), Lex_buffer.make_loc $startpos(xs) $endpos(xs));
-      ])
-    )
-  }
-  | AMPERSAND; p = PSEUDOCLASS; xs = paren_block{
-    Component_value.(
-      Selector([
-        (Ampersand, Lex_buffer.make_loc $startpos $endpos);
-        (Pseudoclass((p, Lex_buffer.make_loc $startpos(p) $endpos(p) )), Lex_buffer.make_loc $startpos(p) $endpos(p));
-        (Paren_block(xs), Lex_buffer.make_loc $startpos(xs) $endpos(xs));
-      ])
-    )
-  }
-  | AMPERSAND; d = DELIM; AMPERSAND {
-    Component_value.(
-      Selector([
-        (Ampersand, Lex_buffer.make_loc $startpos $endpos);
-        (Delim(d), Lex_buffer.make_loc $startpos(d) $endpos(d));
-        (Ampersand, Lex_buffer.make_loc $startpos $endpos);
-      ])
-    )
-  }
-  | AMPERSAND; d = DELIM; i = IDENT{
-    Component_value.(
-      Selector([
-        (Ampersand, Lex_buffer.make_loc $startpos $endpos);
-        (Delim(d), Lex_buffer.make_loc $startpos(d) $endpos(d));
-        (Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i))
-        ])
-    )
-  }
-  | AMPERSAND; i = IDENT{
-    Component_value.(
-      Selector([
-        (Ampersand, Lex_buffer.make_loc $startpos $endpos);
-        (Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i))
-        ])
-    )
-  }
-  | AMPERSAND; p = PSEUDOCLASS {
-    Component_value.(
-      Selector([
-        (Ampersand, Lex_buffer.make_loc $startpos $endpos);
-        (Pseudoclass((p, Lex_buffer.make_loc $startpos(p) $endpos(p) )), Lex_buffer.make_loc $startpos(p) $endpos(p))
-        ])
-    )
-  }
-  | AMPERSAND; p = PSEUDOELEMENT{
-    Component_value.(
-      Selector([
-        (Ampersand, Lex_buffer.make_loc $startpos $endpos);
-        (Pseudoelement((p, Lex_buffer.make_loc $startpos(p) $endpos(p) )), Lex_buffer.make_loc $startpos(p) $endpos(p))
-        ])
-    )
-  }
-  | AMPERSAND; s = selector {
-    Component_value.(
-      Selector((Ampersand, Lex_buffer.make_loc $startpos $endpos)::s )
+      Selector((Ampersand, Lex_buffer.make_loc $startpos $endpos) :: tl )
     )
   }
   | s = selector {
@@ -297,5 +235,7 @@ component_value:
   | d = FLOAT_DIMENSION { Component_value.Float_dimension d }
   | d = DIMENSION { Component_value.Dimension d }
   | v = VARIABLE { Component_value.Variable v }
+  | p = PSEUDOCLASS { Component_value.Pseudoclass (p, Lex_buffer.make_loc $startpos(p) $endpos(p)) }
+  | p = PSEUDOELEMENT { Component_value.Pseudoelement (p, Lex_buffer.make_loc $startpos(p) $endpos(p)) }
   | s = selector_with_ampersand { s }
   ;
