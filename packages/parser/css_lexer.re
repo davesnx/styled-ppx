@@ -51,7 +51,7 @@ let token_to_string =
   | Parser.COLON => ":"
   | Parser.SEMI_COLON => ";"
   | Parser.PERCENTAGE => "%"
-  | Parser.SELECTOR(s) => "SELECTOR(" ++ s ++ ")"
+  | Parser.AMPERSAND => "&"
   | Parser.IMPORTANT => "!important"
   | Parser.IDENT(s) => "IDENT(" ++ s ++ ")"
   | Parser.STRING(s) => "STRING(" ++ s ++ ")"
@@ -62,6 +62,8 @@ let token_to_string =
   | Parser.AT_RULE_WITHOUT_BODY(s) => "AT_RULE_WITHOUT_BODY(" ++ s ++ ")"
   | Parser.AT_RULE(s) => "AT_RULE(" ++ s ++ ")"
   | Parser.FUNCTION(s) => "FUNCTION(" ++ s ++ ")"
+  | Parser.PSEUDOCLASS(s) => "PSEUDOCLASS(" ++ s ++ ")"
+  | Parser.PSEUDOELEMENT(s) => "PSEUDOELEMENT(" ++ s ++ ")"
   | Parser.HASH(s) => "HASH(" ++ s ++ ")"
   | Parser.NUMBER(s) => "NUMBER(" ++ s ++ ")"
   | Parser.UNICODE_RANGE(s) => "UNICODE_RANGE(" ++ s ++ ")"
@@ -195,7 +197,7 @@ let _a = [%sedlex.regexp? 'A' | 'a'];
 let _b = [%sedlex.regexp? 'B' | 'b'];
 let _c = [%sedlex.regexp? 'C' | 'c'];
 let _d = [%sedlex.regexp? 'D' | 'd'];
-let _e = [%sedlex.regexp? 'e' | 'E'];
+let _e = [%sedlex.regexp? 'E' | 'e'];
 let _f = [%sedlex.regexp? 'F' | 'f'];
 let _g = [%sedlex.regexp? 'G' | 'g'];
 let _h = [%sedlex.regexp? 'H' | 'h'];
@@ -268,6 +270,22 @@ let discard_comments_and_white_spaces = buf => {
   discard_white_spaces(buf);
 };
 
+let get_pseudoclass = (~pos, value) => {
+  open Css_parser;
+  switch (value) {
+    | "active" | "checked" | "default" | "dir" | "disabled" | "empty" | "enabled" | "first" | "first-child" | "first-of-type" | "fullscreen" | "focus" | "hover" | "indeterminate" | "in-range" | "invalid" | "lang" | "last-child" | "last-of-type" | "left" | "link" | "not" | "nth-child" | "nth-last-child" | "nth-last-of-type" | "nth-of-type" | "only-child" | "only-of-type" | "optional" | "out-of-range" | "read-only" | "read-write" | "required" | "right" | "root" | "scope" | "target" | "valid" | "visited" => PSEUDOCLASS(value)
+    | _ => raise(LexingError((pos, "Invalid pseudoclass: '" ++ value ++ "'")));
+  }
+}
+
+let get_pseudoelement = (~pos, value) => {
+  open Css_parser;
+  switch (value) {
+  | "after" | "before" | "cue" | "first-letter" | "first-line" | "selection" | "slotted" | "backdrop" | "placeholder" | "marker" | "spelling-error" | "grammar-error" => PSEUDOELEMENT(value)
+  | _ => raise(LexingError((pos, "Invalid pseudoelement: '" ++ value ++ "'")));
+  }
+}
+
 let rec get_next_token = buf => {
   discard_comments_and_white_spaces(buf);
   open Css_parser;
@@ -282,7 +300,9 @@ let rec get_next_token = buf => {
   | '[' => LEFT_BRACKET
   | ']' => RIGHT_BRACKET
   | '%' => PERCENTAGE
-  | '&' => SELECTOR("&")
+  | '&' => AMPERSAND
+  | (':', ident) => get_pseudoclass(~pos=buf.pos, Sedlexing.latin1(~skip=1, buf))
+  | (':', ':', ident) => get_pseudoelement(~pos=buf.pos, Sedlexing.latin1(~skip=2, buf))
   | unsafe => UNSAFE
   | variable => get_variable(buf)
   | operator => OPERATOR(Sedlexing.latin1(buf))
@@ -329,7 +349,7 @@ and get_url = (url, buf) =>
   | white_spaces => get_url(url, buf)
   | url => get_url(Sedlexing.latin1(buf), buf)
   | ")" => URI(url)
-  | eof => raise(LexingError((buf.Sedlexing.pos, "Incomplete URI")))
+  | eof => raise(LexingError((buf.pos, "Incomplete URI")))
   | any =>
     raise(
       LexingError((

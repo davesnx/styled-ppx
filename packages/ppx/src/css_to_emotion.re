@@ -168,38 +168,33 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
   let dl_expr = render_declarations(block) |> Builder.pexp_array(~loc);
 
   let rec render_prelude_value = (s, (value, value_loc)) => {
+
     switch (value) {
     | Delim(":") => ":" ++ s
     | Delim(".") => "." ++ s
     | Delim(",") => ", " ++ s
     /* v can be ">", so we need an empty space between */
-    | Delim(v) => " " ++ v ++ " " ++ s
+    | Delim(v) => v ++ " " ++ s
     | Ident(v)
     | Operator(v)
-    | Number(v)
-    | Selector(v) => v ++ s
+    | Number(v) => v ++ s
     | Hash(v) => "#" ++ v ++ s
-    | String(v) => Format.sprintf("\"%s\"", v) ++ s;
+    | String(v) => Format.sprintf("\"%s\"", v);
     /*<number><string> is parsed as Dimension */
     | Dimension((number, dimension)) => number ++ dimension ++ " " ++ s
-    | Bracket_block(c) =>
-     "[" ++ List.fold_left(render_prelude_value, "]", List.rev(c)) ++ s
-    | Paren_block(c) =>
-      List.fold_left(render_prelude_value, "", List.rev(c)) ++ s
     | Function((f, _l), (args, _la)) =>
       f ++ "(" ++ List.fold_left(render_prelude_value, ")", List.rev(args))
+    | Bracket_block(c) =>
+      "[" ++ List.fold_left(render_prelude_value, "", List.rev(c)) ++ "]" ++ s
+    | Paren_block(c) =>
+     "(" ++ List.fold_left(render_prelude_value, ")", List.rev(c)) ++ s
+    | Ampersand => "& " ++ s
+    | Pseudoelement((v, _)) =>  "::" ++ v ++ s
+    | Pseudoclass((v, _)) => ":" ++ v ++ s
+    | Selector(v) => List.fold_left(render_prelude_value, "", List.rev(v));
     | _ => grammar_error(value_loc, "Unexpected selector")
     };
   };
-
-  let render_function_value = (ident, selector) => {
-    let selector_expr = string_to_const(~loc=prelude_loc, selector);
-    Helper.Exp.apply(
-      ~loc=rule.Style_rule.loc,
-      ~attrs=[Create.uncurried(~loc=rule.Style_rule.loc)],
-      ident,
-      [(Nolabel, selector_expr), (Nolabel, dl_expr)]);
-  }
 
   let render_rule_value = (ident, selector) => {
     let selector_expr = string_to_const(~loc=prelude_loc, selector);
@@ -212,119 +207,76 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
     );
   }
 
-  switch (prelude) {
-  | /* two-colons pseudoclasses */
-    [
-      (Selector("&"), _),
-      (Delim(":"), _),
-      (Delim(":"), _),
-      (Ident(pseudoclasses), loc),
-    ] =>
-    let pseudoclass =
-      switch (pseudoclasses) {
-      | "active" => "active"
-      | "after" => "after"
-      | "before" => "before"
-      | "first-line" => "firstLine"
-      | "first-letter" => "firstLetter"
-      | "selection" => "selection"
-      | "placeholder" => "placeholder"
-      | _ => grammar_error(loc, "Unexpected pseudo-class")
-      };
-    let ident = Helper.Exp.ident(~loc, CssJs.lident(~loc, pseudoclass));
-    Helper.Exp.apply(~loc=rule.Style_rule.loc, ident, [(Nolabel, dl_expr)]);
-  | /* single-colon pseudoclasses */
-    [
-      (Selector("&"), _),
-      (Delim(":"), _),
-      (Ident(pseudoclasses), loc)
-    ] =>
-    let pseudoclass =
-      switch (pseudoclasses) {
-      | "checked" => "checked"
-      | "disabled" => "disabled"
-      | "first-child" => "firstChild"
-      | "first-of-type" => "firstOfType"
-      | "focus" => "focus"
-      | "hover" => "hover"
-      | "last-child" => "lastChild"
-      | "not" => "not"
-      | "last-of-type" => "lastOfType"
-      | "link" => "link"
-      | "read-only" => "readOnly"
-      | "required" => "required"
-      | "visited" => "visited"
-      | "enabled" => "enabled"
-      | "empty" => "noContent"
-      | "default" => "default"
-      | "any-link" => "anyLink"
-      | "only-child" => "onlyChild"
-      | "only-of-type" => "onlyOfType"
-      | "optional" => "optional"
-      | "invalid" => "invalid"
-      | "out-of-range" => "outOfRange"
-      | "target" => "target"
-      | _ => grammar_error(loc, "Unexpected pseudo-class")
-      };
-    let ident = Helper.Exp.ident(~loc, CssJs.lident(~loc, pseudoclass));
-    Helper.Exp.apply(~loc=rule.Style_rule.loc, ident, [(Nolabel, dl_expr)]);
-   /* nth-child & friends */
-  |
-    [
-      (Selector("&"), _),
-      (Delim(":"), _),
-      (Function((_pc, loc), (_args, _args_loc)), _f_loc),
-    ]
-    =>
-    // TODO: parses and use the correct functions instead of just strings selector
-    let ident = Helper.Exp.ident(~loc, CssJs.selector(~loc));
-    let selector =
-      List.fold_left(render_prelude_value, "", List.rev(prelude));
-      render_function_value(ident, selector);
-  | [
-    (Selector("&"), _),
-    (Ident(_), _),
-    ..._
-    ]  as v =>
-    let prelude = List.tl(v);
-    switch(prelude) {
-    | [
-      (Ident(_), _),
-      (Delim(":"), _),
-      (Function((_pc, loc), (_args, _args_loc)), _f_loc)
-    ]  =>
-    let ident = Helper.Exp.ident(~loc, CssJs.selector(~loc));
-    let selector =
-      "& " ++ List.fold_left(render_prelude_value, "", List.rev(prelude));
-    render_function_value(ident, selector);
+  let pseudoToFn = fun
+    | Pseudoclass((c, _)) => switch(c) {
+                  | "first-line" => "firstLine"
+                  | "first-child" => "firstChild"
+                  | "first-letter" => "firstLetter"
+                  | "first-of-type" => "firstOfType"
+                  | "in-range" => "inRange"
+                  | "last-child" => "lastChild"
+                  | "last-of-type" => "lastOfType"
+                  | "nth-child" => "nthChild"
+                  | "nth-last-child" => "nthLastChild"
+                  | "nth-last-of-type" => "nthLastOfType"
+                  | "nth-of-type" => "nthOfType"
+                  | "only-child" => "onlyChild"
+                  | "only-of-type" => "onlyOfType"
+                  | "out-of-range" => "outOfRange"
+                  | "read-only" => "readOnly"
+                  | "read-write" => "readWrite"
+                  | c => c
 
-    | [
-      (Ident(_), _),
-      (Bracket_block([ (_, loc), ..._]), _)
-    ] =>
-    let ident = Helper.Exp.ident(~loc, CssJs.selector(~loc));
-    let selector = "& " ++
-      List.fold_left(render_prelude_value, "", List.rev(prelude));
-    render_rule_value(ident, selector);
+    }
+    | Pseudoelement((e, _)) => switch(e) {
+                  | "first-line" => "firstLine"
+                  | "first-child" => "firstChild"
+                  | "first-letter" => "firstLetter"
+                  | "spelling-error" =>  "spellingError"
+                  | "grammar-error" => "grammarError"
+                  | e => e
+    }
+    | _ => failwith("Expected a Pseudoelement or a Pseudoclass");
 
+   let render_selector_value = (value, s) => {
 
-    |  _ =>
-     let selector = "& " ++
-      List.fold_left(render_prelude_value, "", List.rev(prelude));
-      render_rule_value(ident, selector);
+      switch(s) {
+        | Pseudoelement((_, _)) as p
+        | Pseudoclass((_, _)) as p =>
+
+                let selector_ident = Helper.Exp.ident(~loc, CssJs.lident(~loc, pseudoToFn(p)));
+
+                let selector_expr = [Helper.Exp.apply(~attrs=[Create.uncurried(~loc)], selector_ident, [(Nolabel, dl_expr)])] |> Builder.pexp_array(~loc);
+
+                let selector_name = string_to_const(~loc, value);
+
+                Helper.Exp.apply(~loc=rule.Style_rule.loc,
+                    ~attrs=([Create.uncurried(~loc=rule.Style_rule.loc)]),
+                    ident, [(Nolabel, selector_name), (Nolabel, selector_expr)]);
+
+        | Bracket_block(c) =>
+                  let selector = value ++ "[" ++ List.fold_left(render_prelude_value, "]", List.rev(c)) |> String.trim;
+                  render_rule_value(ident, selector);
+
+        | _ => failwith("Invalid selector");
+      }
     }
 
-  |  [
-      (Ident(_), _),
-      (Bracket_block([ (_, loc), ..._]), _)
-    ] =>
-    let ident = Helper.Exp.ident(~loc, CssJs.selector(~loc));
-    let selector = List.fold_left(render_prelude_value, "", List.rev(prelude));
-    render_rule_value(ident, selector);
 
+  let render_self = (v) => {
+
+    let ident = pseudoToFn(v) |> CssJs.lident(~loc) |> Helper.Exp.ident(~loc);
+
+    Helper.Exp.apply(~loc=rule.Style_rule.loc, ident, [(Nolabel, dl_expr)]);
+  }
+
+  switch (prelude) {
+  | [(Selector([(Ident(i),_), (v,_)]), _)] => render_selector_value(i, v);
+  | [(Selector([(Ampersand, _), (Pseudoclass(_) as p , _)]), _)]
+  | [(Selector([(Ampersand, _), (Pseudoelement(_) as p, _)]), _)] => render_self(p);
   | _ =>
     let selector =
-      List.fold_left(render_prelude_value, "", List.rev(prelude));
+      List.fold_left(render_prelude_value, "", List.rev(prelude)) |> String.trim;
       render_rule_value(ident, selector);
   };
 };

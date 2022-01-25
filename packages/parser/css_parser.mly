@@ -15,7 +15,7 @@ open Css_types
 %token SEMI_COLON
 %token PERCENTAGE
 %token IMPORTANT
-%token <string> SELECTOR
+%token AMPERSAND
 %token <string> IDENT
 %token <string> STRING
 %token <string> URI
@@ -25,6 +25,8 @@ open Css_types
 %token <string> AT_RULE_WITHOUT_BODY
 %token <string> AT_RULE
 %token <string> FUNCTION
+%token <string> PSEUDOCLASS
+%token <string> PSEUDOELEMENT
 %token <string> HASH
 %token <string> NUMBER
 %token <string> UNICODE_RANGE
@@ -147,6 +149,43 @@ declaration_without_eof:
   }
   ;
 
+selector:
+  | i = IDENT; p = PSEUDOCLASS; xs = paren_block?{
+      [
+        (Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i));
+        (Component_value.Pseudoclass((p, Lex_buffer.make_loc $startpos(p) $endpos(p) )), Lex_buffer.make_loc $startpos(p) $endpos(p));
+      ] @ match xs with
+        | Some xs -> [(Component_value.Paren_block(xs), Lex_buffer.make_loc $startpos(xs) $endpos(xs))]
+        | None -> []
+  }
+  | i = IDENT; p = PSEUDOELEMENT
+    {
+          [
+          (Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i));
+          (Component_value.Pseudoelement((p, Lex_buffer.make_loc $startpos(p) $endpos(p))), Lex_buffer.make_loc $startpos(p) $endpos(p))
+          ]
+    }
+  | i = IDENT; b = bracket_block {
+          [
+          (Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i));
+          (Component_value.Bracket_block b, Lex_buffer.make_loc $startpos(b) $endpos(b))
+          ]
+      }
+  ;
+
+selector_with_ampersand:
+  | AMPERSAND; tl = nonempty_list(component_value_with_loc) {
+    Component_value.(
+      Selector((Ampersand, Lex_buffer.make_loc $startpos $endpos) :: tl )
+    )
+  }
+  | s = selector {
+    Component_value.(
+      Selector(s)
+    )
+  }
+  ;
+
 unsafe:
   UNSAFE; n = IDENT; COLON; v = list(component_value_with_loc); i = boption(IMPORTANT) {
     { Declaration.name = (n, Lex_buffer.make_loc $startpos(n) $endpos(n));
@@ -190,5 +229,8 @@ component_value:
   | d = FLOAT_DIMENSION { Component_value.Float_dimension d }
   | d = DIMENSION { Component_value.Dimension d }
   | v = VARIABLE { Component_value.Variable v }
-  | s = SELECTOR { Component_value.Selector s }
+  | p = PSEUDOCLASS { Component_value.Pseudoclass (p, Lex_buffer.make_loc $startpos(p) $endpos(p)) }
+  | p = PSEUDOELEMENT { Component_value.Pseudoelement (p, Lex_buffer.make_loc $startpos(p) $endpos(p)) }
+  | AMPERSAND { Component_value.Ampersand }
+  | s = selector_with_ampersand { s }
   ;
