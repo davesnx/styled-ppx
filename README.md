@@ -41,8 +41,8 @@ Add the PPX in your `bsconfig.json` file under `"ppx-flags"`
 }
 ```
 
-#### Use
-
+#### Use 
+##### with Reason
 ```reason
 module Link = [%styled.a (~color="#4299E1") => {|
   font-size: 1.875rem;
@@ -72,6 +72,17 @@ module Layout = [%styled.div [|
     {React.string("sancho.dev")}
   </span>
 </Layout>
+```
+
+##### with Rescript
+```rescript
+module Link = %styled.a(`
+  font-size: 1.875rem;
+  line-height: 1.5;
+  text-decoration: none;
+  margin: 0px;
+  padding: 10px 0px;
+`)
 ```
 
 ### [Playground](https://github.com/davesnx/try-styled-ppx)
