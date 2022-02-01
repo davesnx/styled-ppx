@@ -3,20 +3,15 @@
  (ocamlopt_flags -linkall -g)
  (libraries reason-css-lexer.lib rely.lib)
  (modules
-  (:standard \ Runner)
- )
-)
+  (:standard \ Runner)))
 
 (executable
  (name Runner)
  (libraries ReasonCSSLexerTest)
- (modules Runner)
-)
+ (modules Runner))
 
 (rule
- (alias runtest)
+ (alias css_lexer_test)
  (deps Runner.exe)
  (action
-  (run %{deps})
- )
-)
+  (run %{deps})))

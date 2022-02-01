@@ -5,23 +5,17 @@
  (modules
   (:standard \ Runner))
  (preprocess
-  (pps reason_css_parser_ppx sedlex.ppx)
- )
-)
+  (pps reason_css_parser_ppx sedlex.ppx)))
 
 (executable
  (name Runner)
  (libraries ReasonCSSParserTest)
  (modules Runner)
  (preprocess
-  (pps reason_css_parser_ppx sedlex.ppx)
- )
-)
+  (pps reason_css_parser_ppx sedlex.ppx)))
 
 (rule
- (alias runtest)
+ (alias css_parser_test)
  (deps Runner.exe)
  (action
-  (run %{deps})
- )
-)
+  (run %{deps})))
