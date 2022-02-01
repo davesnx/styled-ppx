@@ -1,27 +1,25 @@
 (executables
  (names pp)
  (modules pp)
- (libraries styled-ppx.lib ppxlib)
-)
+ (libraries styled-ppx.lib ppxlib))
 
 (rule
  (targets test.actual.re)
- (deps (:pp pp.exe) (:input test.re))
+ (deps
+  (:pp pp.exe)
+  (:input test.re))
  (action
   (progn
-   (with-stdout-to %{targets}
-    (run refmt --parse re --print ml %{input})
-   )
+   (with-stdout-to
+    %{targets}
+    (run refmt --parse re --print ml %{input}))
    (run ./%{pp} --impl %{targets} -o %{targets})
-   (run refmt --parse ml --print re --in-place %{targets})
-  )
- )
-)
+   (run refmt --parse ml --print re --in-place %{targets}))))
 
 (rule
- (alias snapshot_test)
- (deps (file test.expected.re) (file test.actual.re))
+ (alias ppx_snapshot_test)
+ (deps
+  (file test.expected.re)
+  (file test.actual.re))
  (action
-  (diff test.expected.re test.actual.re)
- )
-)
+  (diff test.expected.re test.actual.re)))
