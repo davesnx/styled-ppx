@@ -54,8 +54,7 @@
     "refmterr": "jfrolich/reason-native:refmterr.json#08085a4048974b06aaf3aab918b677b39dea3d18"
   },
   "scripts": {
-    "test": "esy dune runtest --force",
-    "test_native": "esy dune build @native_typecheck_test",
+    "test_typecheck": "esy dune build @native_typecheck_test",
     "test_css_support": "esy dune build @css_support_test",
     "test_ppx_snapshot": "esy dune build @ppx_snapshot_test",
     "test_ppx_snapshot_promote": "esy dune build @ppx_snapshot_test --auto-promote",
