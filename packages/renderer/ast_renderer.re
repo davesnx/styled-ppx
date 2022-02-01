@@ -145,6 +145,11 @@ switch (input, help) {
 | (Some(_), true)
 | (None, _) => render_help()
 | (Some(css), _) =>
+  /* TODO: parse any css:
+    - check if it's valid stylesheet and render it
+    - check if it's a valid declaration list and render it.
+    - in any other case, print both errors.
+    */
   let ast = Css_lexer.parse_stylesheet(~container_lnum, ~pos, css);
   print_endline(render_stylesheet(ast));
 };
