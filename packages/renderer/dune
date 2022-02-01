@@ -1,5 +1,13 @@
 (executable
  (name ast_renderer)
  (public_name renderer)
+ (modules ast_renderer)
  (libraries styled-ppx-css-parser)
+ (link_flags -linkall))
+
+(executable
+ (name spec_renderer)
+ (public_name spec-renderer)
+ (modules spec_renderer)
+ (libraries css-spec-parser.lib)
  (link_flags -linkall))
