@@ -104,25 +104,47 @@ and render_component_value = (ast: with_loc(Component_value.t)) => {
     ++ ", "
     ++ dimension_of_string(dimension)
     ++ ")"
-  | Ampersand => "Ampersand";
+  | Ampersand => "Ampersand"
   | Dimension((a, b)) => "Dimension(" ++ a ++ ", " ++ b ++ ")"
   | Variable(variables) =>
     "Variable(" ++ String.concat(", ", variables) ++ ")"
-  | Pseudoelement((v,_)) => "Pseudoelement(" ++ v ++ ")";
-  | Pseudoclass((v, _)) => "Pseudoclass(" ++ v ++ ")";
-  | Selector(v) => let value = List.map(render_component_value, v) |> String.concat(", ");
-    "Selector(" ++ value  ++")";
+  | Pseudoelement((v, _)) => "Pseudoelement(" ++ v ++ ")"
+  | Pseudoclass((v, _)) => "Pseudoclass(" ++ v ++ ")"
+  | Selector(v) =>
+    let value = List.map(render_component_value, v) |> String.concat(", ");
+    "Selector(" ++ value ++ ")";
   };
+};
+
+let render_help = () => {
+  print_endline("");
+  print_endline(
+    {|  ast-renderer pretty-prints the CSS AST of parser/css_lexer.re|},
+  );
+  print_endline("");
+  print_endline({|    EXAMPLE: esy x ast-renderer ".a { color: red }"|});
+  print_endline("");
 };
 
 let container_lnum = 0;
 let pos = Lexing.dummy_pos;
-let css = read_line();
-let ast =
-  Css_lexer.parse_stylesheet(
-    ~container_lnum,
-    ~pos,
-    css,
+let args = Sys.argv |> Array.to_list;
+let input = List.nth_opt(args, 1);
+let help =
+  List.exists(
+    arg =>
+      arg == "--help"
+      || arg == "-help"
+      || arg == "help"
+      || arg == "--h"
+      || arg == "-h",
+    args,
   );
 
-print_endline(render_stylesheet(ast));
+switch (input, help) {
+| (Some(_), true)
+| (None, _) => render_help()
+| (Some(css), _) =>
+  let ast = Css_lexer.parse_stylesheet(~container_lnum, ~pos, css);
+  print_endline(render_stylesheet(ast));
+};
