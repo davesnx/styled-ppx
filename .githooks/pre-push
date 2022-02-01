@@ -16,20 +16,27 @@
 
 set -e -u
 
-echo "Run native tests";
-esy test_native;
+esy build
 
-echo "Run CSS support tests";
-esy test_css_support;
+echo "Run ppx snapshot tests"
+esy test_ppx_snapshot
 
-echo "Run native snapshot tests";
-esy test_snapshot;
+echo "Run Typecheck tests"
+esy test_typecheck
 
-echo "Run parser, vds & lexer tests";
-esy test;
+echo "Run CSS Support tests"
+esy test_css_support
 
-echo "Run BuckleScript tests";
-esy build; # Rebuilding latest ppx
-yarn test_bs;
+echo "Run CSS Lexer tests"
+esy test_css_lexer
+
+echo "Run CSS Parser tests"
+esy test_css_parser
+
+echo "Run CSS Spec Parser tests"
+esy test_css_spec_parser
+
+echo "Run BuckleScript tests"
+yarn test_bs
 
 exit 0
