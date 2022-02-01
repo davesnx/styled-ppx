@@ -5,7 +5,7 @@
     "build": "bsb -make-world",
     "watch": "bsb -make-world -w",
     "clean": "bsb -clean-world",
-    "test": "jest",
+    "test": "jest --ci --silent",
     "start": "yarn test"
   },
   "dependencies": {
