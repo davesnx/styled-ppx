@@ -143,8 +143,8 @@ describe("Standard values", ({test, _}) => {
 
   test("line_names", ({expect, _}) => {
     let parse = parse([%value "<line-names>"]);
-    expect.result(parse("[abc]")).toBe(Ok(["abc"]));
-    expect.result(parse("[a-b]")).toBe(Ok(["a-b"]));
+    expect.result(parse("[abc]")).toBe(Ok(((), ["abc"], ())));
+    expect.result(parse("[a-b]")).toBe(Ok(((), ["a-b"], ())));
     expect.result(parse("asd")).toBeError();
   });
 });
