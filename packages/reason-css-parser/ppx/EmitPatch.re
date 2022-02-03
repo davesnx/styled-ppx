@@ -131,6 +131,10 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
           | "," => evar("comma")
           | "/" => eapply(evar("delim"), [estring("/")])
           | "+" => eapply(evar("delim"), [estring("+")])
+          | "*" => eapply(evar("delim"), [estring("*")])
+          | "-" => eapply(evar("delim"), [estring("-")])
+          | "[" => eapply(evar("delim"), [estring("[")])
+          | "]" => eapply(evar("delim"), [estring("]")])
           | _ =>
             let name = estring(name);
             eapply(evar("keyword"), [name]);

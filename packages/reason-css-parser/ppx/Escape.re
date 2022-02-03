@@ -4,9 +4,14 @@ let replace = (before, after, name) =>
 let name = name => name |> replace('-', "_");
 
 let variant = name =>
-  name
-  |> replace('+', "cross")
-  |> replace('-', "dash")
-  |> replace('*', "asterisk")
-  |> replace('/', "bar")
-  |> replace('@', "at");
+  /* TODO: Discover why we are receivng `_` instead of `-` */
+  switch (name) {
+  | "_" => "dash"
+  | _ =>
+    name
+    |> replace('+', "cross")
+    |> replace('-', "dash")
+    |> replace('*', "asterisk")
+    |> replace('/', "bar")
+    |> replace('@', "at")
+  };
