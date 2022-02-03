@@ -66,6 +66,7 @@ describe("Tokenizer", ({test, _}) => {
     ({|bar|}, [IDENT("bar")], 3),
     ({||}, [EOF], 0),
     ({|!|}, [DELIM("!")], 1),
+    ("1 / 1", [NUMBER(1.), WHITESPACE, DELIM("/"), WHITESPACE, NUMBER(1.)], 5),
     (
       {|calc(10px + 10px)|},
       [

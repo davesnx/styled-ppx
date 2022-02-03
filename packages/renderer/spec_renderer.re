@@ -25,6 +25,7 @@ let render_multiplier =
 
 let render_terminal =
   fun
+  | Delim(d) => Format.sprintf("Delim(%c)", d)
   | Keyword(v) => Format.sprintf("Keyword(%s)", v)
   | Data_type(v) => Format.sprintf("Data_type(%s)", v)
   | Property_type(v) => Format.sprintf("Property_type(%s)", v);

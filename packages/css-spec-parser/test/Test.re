@@ -1,12 +1,6 @@
 open Setup;
 open Css_spec_parser;
 
-let compare_ast = (expected, result, {expect, _}) => {
-  let expected = show_value(expected);
-  let result = show_value(result);
-  expect.string(result).toEqual(expected);
-};
-
 let parse_tests = [
   (
     "A? B? C?",
@@ -163,9 +157,20 @@ let parse_tests = [
     Combinator(
       Static,
       [
-        Terminal(Keyword("["), One),
+        Terminal(Delim("["), One),
         Terminal(Data_type("custom-ident"), Zero_or_more),
-        Terminal(Keyword("]"), One),
+        Terminal(Delim("]"), One),
+      ],
+    ),
+  ),
+  (
+    // special characters
+    "'[' <a>*",
+    Combinator(
+      Static,
+      [
+        Terminal(Delim("["), One),
+        Terminal(Data_type("a"), Zero_or_more),
       ],
     ),
   ),
@@ -219,16 +224,18 @@ let parse_tests = [
 
 describe("Parse value", ({test, _}) => {
   parse_tests
-    |> List.iteri((index, (result, expected)) =>
+    |> List.iteri((_, (result, expected)) =>
       test(
-        "parse: " ++ string_of_int(index),
-        utils => {
+        "\"" ++ result ++ "\"",
+        ({ expect, _ }) => {
           let result =
             switch (value_of_string(result)) {
             | Some(result) => result
             | None => failwith("Failed to parse")
             };
-          compare_ast(expected, result, utils);
+          let expected = show_value(expected);
+          let result = show_value(result);
+          expect.string(result).toEqual(expected);
         },
       )
   );

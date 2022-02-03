@@ -10,9 +10,10 @@ let range_restriction = [%sedlex.regexp? ('[', number, ',', number, ']')];
 let stop_literal = [%sedlex.regexp?
   ' ' | '\t' | '\n' | '?' | '!' | '*' | '+' | '#' | '{' | ']' | '(' | ')' | ','
 ];
-let single_token_literal = [%sedlex.regexp? ',' | '{'];
+let delimiters = [%sedlex.regexp? '-' | ',' | ';' | ':' | '.' | '(' | ')' | '[' | ']' | '{' | '}' | '*' | '/' | '^' | '+' | '<' | '=' | '>' | '|' | '~' | '$' ];
 let literal = [%sedlex.regexp? Star(Sub(any, stop_literal))];
 let string = [%sedlex.regexp? ('\'', Plus(Sub(any, '\'')), '\'')];
+let quoted_delim = [%sedlex.regexp? ({|'|}, delimiters, {|'|})];
 
 let data = [%sedlex.regexp?
   ("<", Plus(Sub(any, '>')), Opt(range_restriction), ">")
@@ -46,8 +47,8 @@ let range = str => {
 
 let literal = buf =>
   switch%sedlex (buf) {
+  | delimiters => CHAR(lexeme(buf))
   | literal => LITERAL(lexeme(buf))
-  | single_token_literal => LITERAL(lexeme(buf))
   | _ => failwith("something is wrong here")
   };
 
@@ -75,6 +76,7 @@ let rec tokenizer = buf =>
   // functions
   | '(' => LEFT_PARENS
   | ')' => RIGHT_PARENS
+  | quoted_delim => CHAR(lexeme(buf) |> slice(1, -1))
   | string => LITERAL(lexeme(buf) |> slice(1, -1))
   | eof => EOF
   | _ => literal(buf)

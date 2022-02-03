@@ -33,6 +33,15 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
   let property_value_name = property_name =>
     is_function(property_name)
       ? function_value_name(property_name) : "property-" ++ property_name;
+
+  let value_of_delimiter = fun
+    | '+' => "cross"
+    | '-' => "dash"
+    | '*' => "asterisk"
+    | '/' => "bar"
+    | '@' => "at"
+    | _char => "UnknownDelimiter";
+
   let value_name_of_css = str =>
     String.(
       {
@@ -52,6 +61,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
   let rec variant_name = value => {
     let value_name =
       switch (value) {
+      | Terminal(Delim(name), _) => value_of_delimiter(name)
       | Terminal(Keyword(name), _)
       | Terminal(Data_type(name), _) => value_name_of_css(name)
       | Terminal(Property_type(name), _) =>
@@ -125,6 +135,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       // as everyrule is in the same namespace
       let rule =
         switch (kind) {
+        | Delim(delim) => eapply(evar("delim"), [estring(delim)])
         | Keyword(name) =>
           // TODO: find a better way to separate keywords of delimiters
           switch (name) {
@@ -240,6 +251,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
         eapply(evar("map"), [combinator, map_fn]);
       };
     };
+
     let function_call = (name, value) => {
       let name = estring(name);
       let value = create_value_parser(value);
