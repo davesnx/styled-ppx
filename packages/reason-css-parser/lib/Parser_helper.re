@@ -19,24 +19,21 @@ let parse_tokens = (prop, tokens_with_loc) => {
        )
     |> List.rev;
 
-  print_endline(tokens |> List.map(show_token) |> String.concat("  "));
-
   let tokens_without_ws = tokens |> List.filter((!=)(WHITESPACE));
-  /* print_endline(tokens_without_ws |> List.map(show_token) |> String.concat("  ")); */
 
-  let (output, tokens) = prop(tokens_without_ws);
+  let (output, remaining_tokens) = prop(tokens_without_ws);
   let.ok output =
     switch (output) {
     | Ok(data) => Ok(data)
-    | Error([message, ..._]) => Error(message)
+    | Error([message, ..._]) => Error(message);
     | Error([]) => Error("weird")
     };
   let.ok () =
-    switch (tokens) {
+    switch (remaining_tokens) {
     | []
     | [EOF] => Ok()
     | tokens =>
-      let tokens = List.map(show_token, tokens) |> String.concat(" * ");
+      let tokens = tokens |> List.map(show_token) |> String.concat(", ");
       Error("tokens remaining: " ++ tokens);
     };
   Ok(output);
