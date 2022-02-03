@@ -9,6 +9,7 @@ let parse_tokens = (prop, tokens_with_loc) => {
   open Standard;
   open Reason_css_lexer;
 
+
   let tokens =
     tokens_with_loc
     |> List.map(({Location.txt, _}) =>
@@ -17,9 +18,14 @@ let parse_tokens = (prop, tokens_with_loc) => {
          | Error((token, _)) => token
          }
        )
-    |> List.filter((!=)(WHITESPACE))
     |> List.rev;
-  let (output, tokens) = prop(tokens);
+
+  print_endline(tokens |> List.map(show_token) |> String.concat("  "));
+
+  let tokens_without_ws = tokens |> List.filter((!=)(WHITESPACE));
+  /* print_endline(tokens_without_ws |> List.map(show_token) |> String.concat("  ")); */
+
+  let (output, tokens) = prop(tokens_without_ws);
   let.ok output =
     switch (output) {
     | Ok(data) => Ok(data)

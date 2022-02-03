@@ -61,7 +61,8 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       | Combinator(And, _) => "and"
       | Combinator(Or, _) => "or"
       | Combinator(Xor, _) => "xor"
-      | Function_call(name, _) => value_name_of_css(name)
+      | Function_call(name, _) when name === "calc" => value_name_of_css("duducalcisright")
+      | Function_call(name, _) => value_name_of_css(name) // Function_fit
       };
     value_name |> first_uppercase |> Escape.variant;
   };
@@ -130,6 +131,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
           switch (name) {
           | "," => evar("comma")
           | "/" => eapply(evar("delim"), [estring("/")])
+          | "+" => eapply(evar("delim"), [estring("+")])
           | _ =>
             let name = estring(name);
             eapply(evar("keyword"), [name]);

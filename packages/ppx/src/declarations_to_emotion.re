@@ -218,16 +218,7 @@ let render_calc = value => {
   | `Dimension(_) => raise(Unsupported_feature)
   | `Number(n) => render_number(n)
   | `Percentage(pct) => render_percentage(pct)
-  | `Static(
-      _,
-      (
-        _,
-        list,
-        /* [> | `Static_0(unit, 'e) | `Static_1(unit, float)] as 'f, */
-      ),
-      list2,
-      /* list(([> | `cross] as 'g, ('e, list('f)))), */
-    ) =>
+  | `Static(_, _, _) =>
     raise(Unsupported_feature)
   };
 };
@@ -1235,6 +1226,7 @@ let transition_duration =
     Parser.property_transition_duration,
     ~call=[%expr CssJs.transitionDuration],
   );
+let widow = unsupported(Parser.property_widows);
 let transition_timing_function =
   unsupported(
     Parser.property_transition_timing_function,
@@ -1581,6 +1573,7 @@ let properties = [
   ("white-space", found(white_space)),
   ("tab-size", found(tab_size)),
   ("word-break", found(word_break)),
+  ("widow", found(widow)),
   ("line-break", found(line_break)),
   ("hyphens", found(hyphens)),
   ("overflow-wrap", found(overflow_wrap)),
