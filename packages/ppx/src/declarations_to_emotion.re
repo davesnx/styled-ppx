@@ -88,6 +88,27 @@ let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
 let render_variable = name =>
   list_to_longident(name) |> txt |> Helper.Exp.ident;
 
+/* type product_op = [ `Static_0(unit, calc_value) | `Static_1(unit, float) ]
+and calc_product = (calc_value, list(product_op))
+and sum_op = [ `dash | `cross ]
+and calc_sum = (calc_product, list((sum_op, calc_product)))
+and calc_value = [ `Number(float) | `Dimension(unit) | `Percentage(float) | `Static(unit, calc_sum, unit) ]; */
+
+let render_calc_sum = (_sum/* : calc_sum */) => {
+  /* TODO: render into CssJs */
+  render_integer(1);
+};
+
+let render_calc = fun
+  | `Dimension(_) => render_integer(1)
+  | `Number(n) => render_number(n)
+  | `Percertage(pct) => render_percentage(pct)
+  | `Static((), sum, ()) => render_calc_sum(sum);
+
+let _render_widows = fun
+  | `Integer(i) => render_integer(i)
+  | `Function_calc((c, _)) => render_calc(c);
+
 let variants_to_expression =
   fun
   | `Row => id([%expr `row])
@@ -170,7 +191,14 @@ let transform_with_variable = (parser, mapper, value_to_expr) =>
 let apply = (parser, id, map) =>
   transform_with_variable(parser, map, arg => [[%expr [%e id]([%e arg])]]);
 
-let unsupported = (~call=?, parser) =>
+let unsupportedValue = (parser, call: expression) =>
+  transform_with_variable(
+    parser,
+    _ => raise(Unsupported_feature),
+    arg => [[%expr [%e call]([%e arg])]],
+  );
+
+let unsupportedProperty = (~call=?, parser) =>
   transform_with_variable(
     parser,
     _ => raise(Unsupported_feature),
@@ -265,7 +293,7 @@ let box_sizing =
     [%expr CssJs.boxSizing],
     variants_to_expression,
   );
-let column_width = unsupported(Parser.property_column_width);
+let column_width = unsupportedProperty(Parser.property_column_width);
 
 let margin_value =
   fun
@@ -691,9 +719,9 @@ let object_position =
     [%expr CssJs.objectPosition],
     render_position,
   );
-let image_resolution = unsupported(Parser.property_image_resolution);
-let image_orientation = unsupported(Parser.property_image_orientation);
-let image_rendering = unsupported(Parser.property_image_rendering);
+let image_resolution = unsupportedProperty(Parser.property_image_resolution);
+let image_orientation = unsupportedProperty(Parser.property_image_orientation);
+let image_rendering = unsupportedProperty(Parser.property_image_rendering);
 
 let render_color_interp =
   fun
@@ -768,42 +796,42 @@ let background_color =
     render_color,
   );
 let background_image =
-  unsupported(
+  unsupportedValue(
     Parser.property_background_image,
-    ~call=[%expr CssJs.backgroundImage],
+    [%expr CssJs.backgroundImage],
   );
 let background_repeat =
-  unsupported(
+  unsupportedValue(
     Parser.property_background_repeat,
-    ~call=[%expr CssJs.backgroundRepeat],
+    [%expr CssJs.backgroundRepeat],
   );
 let background_attachment =
-  unsupported(
+  unsupportedValue(
     Parser.property_background_attachment,
-    ~call=[%expr CssJs.backgroundAttachment],
+    [%expr CssJs.backgroundAttachment],
   );
 let background_position =
-  unsupported(
+  unsupportedValue(
     Parser.property_background_position,
-    ~call=[%expr CssJs.backgroundPosition],
+    [%expr CssJs.backgroundPosition],
   );
 let background_clip =
-  unsupported(
+  unsupportedValue(
     Parser.property_background_clip,
-    ~call=[%expr CssJs.backgroundClip],
+    [%expr CssJs.backgroundClip],
   );
 let background_origin =
-  unsupported(
+  unsupportedValue(
     Parser.property_background_origin,
-    ~call=[%expr CssJs.backgroundOrigin],
+    [%expr CssJs.backgroundOrigin],
   );
 let background_size =
-  unsupported(
+  unsupportedValue(
     Parser.property_background_size,
-    ~call=[%expr CssJs.backgroundSize],
+    [%expr CssJs.backgroundSize],
   );
 let background =
-  unsupported(Parser.property_background, ~call=[%expr CssJs.background]);
+  unsupportedValue(Parser.property_background, [%expr CssJs.background]);
 let border_top_color =
   apply(
     Parser.property_border_top_color,
@@ -850,7 +878,7 @@ let border_bottom_style =
 let border_left_style =
   variants(Parser.property_border_left_style, [%expr CssJs.borderLeftStyle]);
 let border_style =
-  unsupported(Parser.property_border_style, ~call=[%expr CssJs.borderStyle]);
+  unsupportedValue(Parser.property_border_style, [%expr CssJs.borderStyle]);
 
 let render_line_width =
   fun
@@ -987,16 +1015,16 @@ let border_bottom_left_radius =
     border_value,
   );
 let border_radius =
-  unsupported(
+  unsupportedValue(
     Parser.property_border_radius,
-    ~call=[%expr CssJs.borderRadius],
+    [%expr CssJs.borderRadius],
   );
-let border_image_source = unsupported(Parser.property_border_image_source);
-let border_image_slice = unsupported(Parser.property_border_image_slice);
-let border_image_width = unsupported(Parser.property_border_image_width);
-let border_image_outset = unsupported(Parser.property_border_image_outset);
-let border_image_repeat = unsupported(Parser.property_border_image_repeat);
-let border_image = unsupported(Parser.property_border_image);
+let border_image_source = unsupportedProperty(Parser.property_border_image_source);
+let border_image_slice = unsupportedProperty(Parser.property_border_image_slice);
+let border_image_width = unsupportedProperty(Parser.property_border_image_width);
+let border_image_outset = unsupportedProperty(Parser.property_border_image_outset);
+let border_image_repeat = unsupportedProperty(Parser.property_border_image_repeat);
+let border_image = unsupportedProperty(Parser.property_border_image);
 let box_shadow =
   apply(
     Parser.property_box_shadow,
@@ -1038,38 +1066,38 @@ let overflow =
       ])
     | _ => failwith("unreachable"),
   );
-// let overflow_clip_margin = unsupported(Parser.property_overflow_clip_margin);
-let overflow_inline = unsupported(Parser.property_overflow_inline);
+// let overflow_clip_margin = unsupportedProperty(Parser.property_overflow_clip_margin);
+let overflow_inline = unsupportedProperty(Parser.property_overflow_inline);
 let text_overflow =
-  unsupported(
+  unsupportedValue(
     Parser.property_text_overflow,
-    ~call=[%expr CssJs.textOverflow],
+    [%expr CssJs.textOverflow],
   );
-// let block_ellipsis = unsupported(Parser.property_block_ellipsis);
-let max_lines = unsupported(Parser.property_max_lines);
-// let continue = unsupported(Parser.property_continue);
+// let block_ellipsis = unsupportedProperty(Parser.property_block_ellipsis);
+let max_lines = unsupportedProperty(Parser.property_max_lines);
+// let continue = unsupportedProperty(Parser.property_continue);
 
 // css-text-3
 let text_transform =
   variants(Parser.property_text_transform, [%expr CssJs.textTransform]);
 let white_space =
   variants(Parser.property_white_space, [%expr CssJs.whiteSpace]);
-let tab_size = unsupported(Parser.property_tab_size);
+let tab_size = unsupportedProperty(Parser.property_tab_size);
 let word_break =
   variants(Parser.property_word_break, [%expr CssJs.wordBreak]);
-let line_break = unsupported(Parser.property_line_break);
+let line_break = unsupportedProperty(Parser.property_line_break);
 let line_height =
-  unsupported(Parser.property_line_height, ~call=[%expr CssJs.lineHeight]);
-let line_height_step = unsupported(Parser.property_line_height_step);
-let hyphens = unsupported(Parser.property_hyphens);
+  unsupportedValue(Parser.property_line_height, [%expr CssJs.lineHeight]);
+let line_height_step = unsupportedProperty(Parser.property_line_height_step);
+let hyphens = unsupportedProperty(Parser.property_hyphens);
 let overflow_wrap =
   variants(Parser.property_overflow_wrap, [%expr CssJs.overflowWrap]);
 let word_wrap = variants(Parser.property_word_wrap, [%expr CssJs.wordWrap]);
 let text_align =
   variants(Parser.property_text_align, [%expr CssJs.textAlign]);
-// let text_align_all = unsupported(Parser.property_text_align_all);
-let text_align_last = unsupported(Parser.property_text_align_last);
-let text_justify = unsupported(Parser.property_text_justify);
+// let text_align_all = unsupportedProperty(Parser.property_text_align_all);
+let text_align_last = unsupportedProperty(Parser.property_text_align_last);
+let text_justify = unsupportedProperty(Parser.property_text_justify);
 let word_spacing =
   apply(
     Parser.property_word_spacing,
@@ -1094,56 +1122,56 @@ let text_indent =
     | (lp, None, None) => render_length_percentage(lp)
     | _ => raise(Unsupported_feature),
   );
-let hanging_punctuation = unsupported(Parser.property_hanging_punctuation);
+let hanging_punctuation = unsupportedProperty(Parser.property_hanging_punctuation);
 
 // css-fonts-4
 let font_family =
-  unsupported(Parser.property_font_family, ~call=[%expr CssJs.fontFamily]);
+  unsupportedValue(Parser.property_font_family, [%expr CssJs.fontFamily]);
 let font_weight =
-  unsupported(Parser.property_font_weight, ~call=[%expr CssJs.fontWeight]);
-let font_stretch = unsupported(Parser.property_font_stretch);
+  unsupportedValue(Parser.property_font_weight, [%expr CssJs.fontWeight]);
+let font_stretch = unsupportedProperty(Parser.property_font_stretch);
 let font_style =
-  unsupported(Parser.property_font_style, ~call=[%expr CssJs.fontStyle]);
+  unsupportedValue(Parser.property_font_style, [%expr CssJs.fontStyle]);
 let font_size =
-  unsupported(Parser.property_font_size, ~call=[%expr CssJs.fontSize]);
-let font_size_adjust = unsupported(Parser.property_font_size_adjust);
-let font = unsupported(Parser.property_font);
-// let font_synthesis_weight = unsupported(Parser.property_font_synthesis_weight);
-// let font_synthesis_style = unsupported(Parser.property_font_synthesis_style);
+  unsupportedValue(Parser.property_font_size, [%expr CssJs.fontSize]);
+let font_size_adjust = unsupportedProperty(Parser.property_font_size_adjust);
+let font = unsupportedProperty(Parser.property_font);
+// let font_synthesis_weight = unsupportedProperty(Parser.property_font_synthesis_weight);
+// let font_synthesis_style = unsupportedProperty(Parser.property_font_synthesis_style);
 // let font_synthesis_small_caps =
-// unsupported(Parser.property_font_synthesis_small_caps);
-let font_synthesis = unsupported(Parser.property_font_synthesis);
-let font_kerning = unsupported(Parser.property_font_kerning);
+// unsupportedProperty(Parser.property_font_synthesis_small_caps);
+let font_synthesis = unsupportedProperty(Parser.property_font_synthesis);
+let font_kerning = unsupportedProperty(Parser.property_font_kerning);
 let font_variant_ligatures =
-  unsupported(Parser.property_font_variant_ligatures);
+  unsupportedProperty(Parser.property_font_variant_ligatures);
 let font_variant_position =
-  unsupported(Parser.property_font_variant_position);
-let font_variant_caps = unsupported(Parser.property_font_variant_caps);
-let font_variant_numeric = unsupported(Parser.property_font_variant_numeric);
+  unsupportedProperty(Parser.property_font_variant_position);
+let font_variant_caps = unsupportedProperty(Parser.property_font_variant_caps);
+let font_variant_numeric = unsupportedProperty(Parser.property_font_variant_numeric);
 let font_variant_alternates =
-  unsupported(Parser.property_font_variant_alternates);
+  unsupportedProperty(Parser.property_font_variant_alternates);
 let font_variant_east_asian =
-  unsupported(Parser.property_font_variant_east_asian);
+  unsupportedProperty(Parser.property_font_variant_east_asian);
 let font_variant =
-  unsupported(Parser.property_font_variant, ~call=[%expr CssJs.fontVariant]);
+  unsupportedValue(Parser.property_font_variant, [%expr CssJs.fontVariant]);
 let font_feature_settings =
-  unsupported(Parser.property_font_feature_settings);
-let font_optical_sizing = unsupported(Parser.property_font_optical_sizing);
+  unsupportedProperty(Parser.property_font_feature_settings);
+let font_optical_sizing = unsupportedProperty(Parser.property_font_optical_sizing);
 let font_variation_settings =
-  unsupported(Parser.property_font_variation_settings);
-// let font_palette = unsupported(Parser.property_font_palette);
-// let font_variant_emoji = unsupported(Parser.property_font_variant_emoji);
+  unsupportedProperty(Parser.property_font_variation_settings);
+// let font_palette = unsupportedProperty(Parser.property_font_palette);
+// let font_variant_emoji = unsupportedProperty(Parser.property_font_variant_emoji);
 
 // css-text-decor-3
 let text_decoration_line =
-  unsupported(
+  unsupportedValue(
     Parser.property_text_decoration_line,
-    ~call=[%expr CssJs.textDecorationLine],
+    [%expr CssJs.textDecorationLine],
   );
 let text_decoration_style =
-  unsupported(
+  unsupportedValue(
     Parser.property_text_decoration_style,
-    ~call=[%expr CssJs.textDecorationStyle],
+    [%expr CssJs.textDecorationStyle],
   );
 let text_decoration_color =
   apply(
@@ -1152,137 +1180,138 @@ let text_decoration_color =
     render_color,
   );
 let text_decoration_thickness =
-  unsupported(Parser.property_text_decoration_thickness);
+  unsupportedProperty(Parser.property_text_decoration_thickness);
 let text_decoration =
-  unsupported(
+  unsupportedValue(
     Parser.property_text_decoration,
-    ~call=[%expr CssJs.textDecoration],
+    [%expr CssJs.textDecoration],
   );
 let text_underline_position =
-  unsupported(Parser.property_text_underline_position);
+  unsupportedProperty(Parser.property_text_underline_position);
 let text_underline_offset =
-  unsupported(Parser.property_text_underline_offset);
-let text_decoration_skip = unsupported(Parser.property_text_decoration_skip);
+  unsupportedProperty(Parser.property_text_underline_offset);
+let text_decoration_skip = unsupportedProperty(Parser.property_text_decoration_skip);
 // let text_decoration_skip_self =
-//   unsupported(Parser.property_text_decoration_skip_self);
-// let text_decoration_skip_box = unsupported(Parser.property_text_decoration_skip_box);
+//   unsupportedProperty(Parser.property_text_decoration_skip_self);
+// let text_decoration_skip_box = unsupportedProperty(Parser.property_text_decoration_skip_box);
 // let text_decoration_skip_inset =
-//   unsupported(Parser.property_text_decoration_skip_inset);
+//   unsupportedProperty(Parser.property_text_decoration_skip_inset);
 // let text_decoration_skip_spaces =
-//   unsupported(Parser.property_text_decoration_skip_spaces);
+//   unsupportedProperty(Parser.property_text_decoration_skip_spaces);
 let text_decoration_skip_ink =
-  unsupported(Parser.property_text_decoration_skip_ink);
-let text_emphasis_style = unsupported(Parser.property_text_emphasis_style);
-let text_emphasis_color = unsupported(Parser.property_text_emphasis_color);
-let text_emphasis = unsupported(Parser.property_text_emphasis);
+  unsupportedProperty(Parser.property_text_decoration_skip_ink);
+let text_emphasis_style = unsupportedProperty(Parser.property_text_emphasis_style);
+let text_emphasis_color = unsupportedProperty(Parser.property_text_emphasis_color);
+let text_emphasis = unsupportedProperty(Parser.property_text_emphasis);
 let text_emphasis_position =
-  unsupported(Parser.property_text_emphasis_position);
-// let text_emphasis_skip = unsupported(Parser.property_text_emphasis_skip);
+  unsupportedProperty(Parser.property_text_emphasis_position);
+// let text_emphasis_skip = unsupportedProperty(Parser.property_text_emphasis_skip);
 let text_shadow =
-  unsupported(Parser.property_text_shadow, ~call=[%expr CssJs.textShadow]);
+  unsupportedValue(Parser.property_text_shadow, [%expr CssJs.textShadow]);
 
 // css-transforms-2
 let transform =
-  unsupported(Parser.property_transform, ~call=[%expr CssJs.transform]);
+  unsupportedValue(Parser.property_transform, [%expr CssJs.transform]);
 let transform_origin =
-  unsupported(
+  unsupportedValue(
     Parser.property_transform_origin,
-    ~call=[%expr CssJs.transformOrigin],
+    [%expr CssJs.transformOrigin],
   );
 let transform_box =
-  unsupported(
+  unsupportedValue(
     Parser.property_transform_box,
-    ~call=[%expr CssJs.transformOrigin],
+    [%expr CssJs.transformOrigin],
   );
 let translate =
-  unsupported(Parser.property_translate, ~call=[%expr CssJs.translate]);
-let rotate = unsupported(Parser.property_rotate, ~call=[%expr CssJs.rotate]);
-let scale = unsupported(Parser.property_scale, ~call=[%expr CssJs.scale]);
+  unsupportedValue(Parser.property_translate, [%expr CssJs.translate]);
+let rotate = unsupportedValue(Parser.property_rotate, [%expr CssJs.rotate]);
+let scale = unsupportedValue(Parser.property_scale, [%expr CssJs.scale]);
 let transform_style =
-  unsupported(
+  unsupportedValue(
     Parser.property_transform_style,
-    ~call=[%expr CssJs.transformStyle],
+    [%expr CssJs.transformStyle],
   );
-let perspective = unsupported(Parser.property_perspective);
+let perspective = unsupportedProperty(Parser.property_perspective);
 let perspective_origin =
-  unsupported(
+  unsupportedValue(
     Parser.property_perspective_origin,
-    ~call=[%expr CssJs.transformStyle],
+    [%expr CssJs.transformStyle],
   );
 let backface_visibility =
-  unsupported(
+  unsupportedValue(
     Parser.property_backface_visibility,
-    ~call=[%expr CssJs.backfaceVisibility],
+    [%expr CssJs.backfaceVisibility],
   );
 
 // css-transition-1
 let transition_property =
-  unsupported(
+  unsupportedValue(
     Parser.property_transition_property,
-    ~call=[%expr CssJs.transitionProperty],
+    [%expr CssJs.transitionProperty],
   );
 let transition_duration =
-  unsupported(
+  unsupportedValue(
     Parser.property_transition_duration,
-    ~call=[%expr CssJs.transitionDuration],
+    [%expr CssJs.transitionDuration],
   );
-let widow = unsupported(Parser.property_widows);
+let widows = unsupportedProperty(Parser.property_widows);
+/* let widows = apply(Parser.property_widows, [%expr CssJs.width], render_widows); */
 let transition_timing_function =
-  unsupported(
+  unsupportedValue(
     Parser.property_transition_timing_function,
-    ~call=[%expr CssJs.transitionTimingFunction],
+    [%expr CssJs.transitionTimingFunction],
   );
 let transition_delay =
-  unsupported(
+  unsupportedValue(
     Parser.property_transition_delay,
-    ~call=[%expr CssJs.transitionDelay],
+    [%expr CssJs.transitionDelay],
   );
 let transition =
-  unsupported(Parser.property_transition, ~call=[%expr CssJs.transition]);
+  unsupportedValue(Parser.property_transition, [%expr CssJs.transition]);
 
 // css-animation-1
 let animation_name =
-  unsupported(
+  unsupportedValue(
     Parser.property_animation_name,
-    ~call=[%expr CssJs.animationName],
+    [%expr CssJs.animationName],
   );
 let animation_duration =
-  unsupported(
+  unsupportedValue(
     Parser.property_animation_duration,
-    ~call=[%expr CssJs.animationDuration],
+    [%expr CssJs.animationDuration],
   );
 let animation_timing_function =
-  unsupported(
+  unsupportedValue(
     Parser.property_animation_timing_function,
-    ~call=[%expr CssJs.CssJs.animationTimingFunction],
+    [%expr CssJs.CssJs.animationTimingFunction],
   );
 let animation_iteration_count =
-  unsupported(
+  unsupportedValue(
     Parser.property_animation_iteration_count,
-    ~call=[%expr CssJs.animationIterationCount],
+    [%expr CssJs.animationIterationCount],
   );
 let animation_direction =
-  unsupported(
+  unsupportedValue(
     Parser.property_animation_direction,
-    ~call=[%expr CssJs.animationDirection],
+    [%expr CssJs.animationDirection],
   );
 let animation_play_state =
-  unsupported(
+  unsupportedValue(
     Parser.property_animation_play_state,
-    ~call=[%expr CssJs.animationPlayState],
+    [%expr CssJs.animationPlayState],
   );
 let animation_delay =
-  unsupported(
+  unsupportedValue(
     Parser.property_animation_delay,
-    ~call=[%expr CssJs.animationDelay],
+    [%expr CssJs.animationDelay],
   );
 let animation_fill_mode =
-  unsupported(
+  unsupportedValue(
     Parser.property_animation_fill_mode,
-    ~call=[%expr CssJs.animationFillMode],
+    [%expr CssJs.animationFillMode],
   );
 let animation =
-  unsupported(Parser.property_animation, ~call=[%expr CssJs.animation]);
+  unsupportedValue(Parser.property_animation, [%expr CssJs.animation]);
 
 // css-flexbox-1
 // using id() because refmt
@@ -1353,82 +1382,82 @@ let flex =
   );
 // TODO: justify_content, align_items, align_self, align_content are only for flex, missing the css-align-3 at parser
 let justify_content =
-  unsupported(
+  unsupportedValue(
     Parser.property_justify_content,
-    ~call=[%expr CssJs.justifyContent],
+    [%expr CssJs.justifyContent],
   );
 let align_items =
-  unsupported(Parser.property_align_items, ~call=[%expr CssJs.alignItems]);
+  unsupportedValue(Parser.property_align_items, [%expr CssJs.alignItems]);
 let align_self =
-  unsupported(Parser.property_align_self, ~call=[%expr CssJs.alignSelf]);
+  unsupportedValue(Parser.property_align_self, [%expr CssJs.alignSelf]);
 let align_content =
-  unsupported(
+  unsupportedValue(
     Parser.property_align_content,
-    ~call=[%expr CssJs.alignContent],
+    [%expr CssJs.alignContent],
   );
 
 // css-grid-1
 let grid_template_columns =
-  unsupported(
+  unsupportedValue(
     Parser.property_grid_template_columns,
-    ~call=[%expr CssJs.gridTemplateColumns],
+    [%expr CssJs.gridTemplateColumns],
   );
 let grid_template_rows =
-  unsupported(
+  unsupportedValue(
     Parser.property_grid_template_rows,
-    ~call=[%expr CssJs.gridTemplateRows],
+    [%expr CssJs.gridTemplateRows],
   );
 let grid_template_areas =
-  unsupported(
+  unsupportedValue(
     Parser.property_grid_template_areas,
-    ~call=[%expr CssJs.gridTemplateAreas],
+    [%expr CssJs.gridTemplateAreas],
   );
-let grid_template = unsupported(Parser.property_grid_template);
+let grid_template = unsupportedProperty(Parser.property_grid_template);
 let grid_auto_columns =
-  unsupported(
+  unsupportedValue(
     Parser.property_grid_auto_columns,
-    ~call=[%expr CssJs.gridAutoColumns],
+    [%expr CssJs.gridAutoColumns],
   );
 let grid_auto_rows =
-  unsupported(
+  unsupportedValue(
     Parser.property_grid_auto_rows,
-    ~call=[%expr CssJs.gridAutoRows],
+    [%expr CssJs.gridAutoRows],
   );
 let grid_auto_flow =
-  unsupported(
+  unsupportedValue(
     Parser.property_grid_auto_flow,
-    ~call=[%expr CssJs.gridAutoFlow],
+    [%expr CssJs.gridAutoFlow],
   );
-let grid = unsupported(Parser.property_grid, ~call=[%expr CssJs.grid]);
+let grid = unsupportedValue(Parser.property_grid, [%expr CssJs.grid]);
 let grid_row_start =
-  unsupported(
+  unsupportedValue(
     Parser.property_grid_row_start,
-    ~call=[%expr CssJs.gridRowStart],
+    [%expr CssJs.gridRowStart],
   );
 let grid_column_start =
-  unsupported(
+  unsupportedValue(
     Parser.property_grid_column_start,
-    ~call=[%expr CssJs.gridColumnStart],
+    [%expr CssJs.gridColumnStart],
   );
 let grid_row_end =
-  unsupported(Parser.property_grid_row_end, ~call=[%expr CssJs.gridRowEnd]);
+  unsupportedValue(Parser.property_grid_row_end, [%expr CssJs.gridRowEnd]);
 let grid_column_end =
-  unsupported(
+  unsupportedValue(
     Parser.property_grid_column_end,
-    ~call=[%expr CssJs.gridColumnEnd],
+    [%expr CssJs.gridColumnEnd],
   );
 let grid_row =
-  unsupported(Parser.property_grid_row, ~call=[%expr CssJs.gridRow]);
+  unsupportedValue(Parser.property_grid_row, [%expr CssJs.gridRow]);
 let grid_column =
-  unsupported(Parser.property_grid_column, ~call=[%expr CssJs.gridColumn]);
+  unsupportedValue(Parser.property_grid_column, [%expr CssJs.gridColumn]);
 let grid_area =
-  unsupported(Parser.property_grid_area, ~call=[%expr CssJs.gridArea]);
+  unsupportedValue(Parser.property_grid_area, [%expr CssJs.gridArea]);
 let z_index =
-  unsupported(Parser.property_z_index, ~call=[%expr CssJs.zIndex]);
-let left = unsupported(Parser.property_left, ~call=[%expr CssJs.left]);
-let top = unsupported(Parser.property_top, ~call=[%expr CssJs.top]);
-let right = unsupported(Parser.property_right, ~call=[%expr CssJs.right]);
-let bottom = unsupported(Parser.property_bottom, ~call=[%expr CssJs.bottom]);
+  unsupportedValue(Parser.property_z_index, [%expr CssJs.zIndex]);
+let left = unsupportedValue(Parser.property_left, [%expr CssJs.left]);
+let top = unsupportedValue(Parser.property_top, [%expr CssJs.top]);
+let right = unsupportedValue(Parser.property_right, [%expr CssJs.right]);
+let bottom = unsupportedValue(Parser.property_bottom, [%expr CssJs.bottom]);
 let display =
   apply(
     Parser.property_display,
@@ -1573,7 +1602,7 @@ let properties = [
   ("white-space", found(white_space)),
   ("tab-size", found(tab_size)),
   ("word-break", found(word_break)),
-  ("widow", found(widow)),
+  ("widows", found(widows)),
   ("line-break", found(line_break)),
   ("hyphens", found(hyphens)),
   ("overflow-wrap", found(overflow_wrap)),
@@ -1749,29 +1778,3 @@ let parse_declarations = (property: string, value: string) => {
     }
   };
 };
-
-/* type c = (
-     (
-       [>
-         | `Dimension(unit)
-         | `Number(float)
-         | `Percentage(float)
-         | `Static(
-             unit,
-             (
-               (
-                 'e,
-                 list(
-                   [> | `Static_0(unit, 'e) | `Static_1(unit, float)] as 'f,
-                 ),
-               ),
-               list(([> | `cross] as 'g, ('e, list('f)))),
-             ),
-             unit,
-           )
-       ] as 'e,
-       list('f),
-     ),
-     list(('g, ('e, list('f)))),
-   );
-    */
