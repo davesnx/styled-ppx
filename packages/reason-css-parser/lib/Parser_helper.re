@@ -9,7 +9,6 @@ let parse_tokens = (prop, tokens_with_loc) => {
   open Standard;
   open Reason_css_lexer;
 
-
   let tokens =
     tokens_with_loc
     |> List.map(({Location.txt, _}) =>
