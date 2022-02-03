@@ -61,8 +61,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       | Combinator(And, _) => "and"
       | Combinator(Or, _) => "or"
       | Combinator(Xor, _) => "xor"
-      | Function_call(name, _) when name === "calc" => value_name_of_css("duducalcisright")
-      | Function_call(name, _) => value_name_of_css(name) // Function_fit
+      | Function_call(name, _) => value_name_of_css(name)
       };
     value_name |> first_uppercase |> Escape.variant;
   };
