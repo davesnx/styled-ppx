@@ -60,7 +60,8 @@ let rec string_of_value = value => {
     | Terminal(kind, multiplier) =>
       let full_name =
         switch (kind) {
-        | Keyword(name) => "'" ++ name ++ "'"
+        | Delim(d) => {|'|} ++ d ++ {|'|}
+        | Keyword(name) => {|'|} ++ name ++ {|'|}
         | Data_type(name) => "<" ++ name ++ ">"
         | Property_type(name) => "<'" ++ name ++ "'>"
         };
@@ -92,5 +93,10 @@ let rec string_of_value = value => {
   };
 };
 
-let value_of_string = string =>
-  Sedlexing.Utf8.from_string(string) |> provider |> value_of_lex;
+exception ParseError(string);
+
+let value_of_string = string => {
+  try(Sedlexing.Utf8.from_string(string) |> provider |> value_of_lex) {
+  | _ => raise(ParseError(string))
+  };
+}

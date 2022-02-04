@@ -57,7 +57,7 @@ and bottom = [%value.rec "<length> | 'auto'"]
 and box = [%value.rec "'border-box' | 'padding-box' | 'content-box'"]
 and calc_product = [%value.rec "<calc-value> [ '*' <calc-value> | '/' <number> ]*"]
 and calc_sum = [%value.rec "<calc-product> [ [ '+' | '-' ] <calc-product> ]*"]
-and calc_value = [%value.rec "<number> | <dimension> | <percentage> | '(' <calc-sum> ')'"]
+and calc_value = [%value.rec "<number> | <dimension> | <percentage> | <calc()>"]
 and cf_final_image = [%value.rec "<image> | <color>"]
 and cf_mixing_image = [%value.rec "[ <percentage> ]? && <image>"]
 and class_selector = [%value.rec "'.' <ident-token>"]
@@ -2309,4 +2309,3 @@ let check_map =
       ("y", check(y)),
     ]),
   );
-

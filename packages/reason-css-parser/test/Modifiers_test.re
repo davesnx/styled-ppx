@@ -104,7 +104,7 @@ describe("Modifiers: repeat", ({test, _}) => {
   });
 
   test("<integer>#{2} , <integer>", ({expect, _}) => {
-    let parse = parse([%value "<integer>#{2} , <integer>"]);
+    let parse = parse([%value "<integer>#{2} ',' <integer>"]);
     expect.result(parse("")).toBeError();
     expect.result(parse("53")).toBeError();
     expect.result(parse("54, 55")).toBeError();

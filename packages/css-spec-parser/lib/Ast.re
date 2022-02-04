@@ -17,6 +17,7 @@ type multiplier =
 
 [@deriving show({with_path: false})]
 type terminal =
+  | Delim(string) /* ',' */
   | Keyword(string) /* auto */
   | Data_type(string) /* <color > */
   | Property_type(string) /* <'color'> */;

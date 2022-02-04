@@ -8,10 +8,9 @@ let test = (parser, input, output) => (
     let parse = parse(parser);
     let received = parse(input);
     switch (received) {
-    | Error(message) => print_endline(message)
-    | _ => ()
+    | Error(message) => failwith(message)
+    | _ => expect.result(received).toBe(Ok(output));
     };
-    expect.result(received).toBe(Ok(output));
   },
 );
 
@@ -46,7 +45,38 @@ let tests = [
     "fit-content(50%)",
     `Fit_content(`Percentage(50.)),
   ),
+  test(
+    [%value "<calc-product>"],
+    "4",
+    (`Number(4.), [])
+  ),
+  test(
+    [%value "<calc-sum>"],
+    "4",
+    ((`Number(4.), []), [])
+  ),
+  test(
+    [%value "<calc-value>"],
+    "4",
+    `Number(4.)
+  ),
+  test(
+    [%value "<calc-sum>"],
+    "4 + 5",
+    ((`Number(4.), []), [(`Cross(()), (`Number(5.), []))])
+  ),
+  test(
+    [%value "<calc()>"],
+    "calc(4 + 5)",
+    (((`Number(4.), []), [(`Cross(()), (`Number(5.), []))]))
+  ),
 ];
+
+type product_op = [ `Static_0(unit, calc_value) | `Static_1(unit, float) ]
+and calc_product = (calc_value, list(product_op))
+and sum_op = [ `minus | `cross ]
+and calc_sum = (calc_product, list((sum_op, calc_product)))
+and calc_value = [ `Number(float) | `Dimension(float) | `Percentatge(float) | `Static(unit, calc_sum, unit) ];
 
 describe("Parser", ({test, _}) => {
   tests |> List.iter(((input, test_fn)) => test(input, test_fn))

@@ -19,4 +19,7 @@ type token =
   // for functions
   | LEFT_PARENS // (
   | RIGHT_PARENS // )
+  // for required chars
+  | CHAR(string) // ','
+  // End
   | EOF;

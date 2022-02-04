@@ -4,6 +4,7 @@ open Ast
 
 %}
 %token <string> LITERAL
+%token <string> CHAR
 %token <string> DATA
 %token <string> PROPERTY
 %token DOUBLE_AMPERSAND
@@ -14,7 +15,7 @@ open Ast
 %token ASTERISK
 %token PLUS
 %token QUESTION_MARK
-%token <[ `Comma  | `Space ] * int * int option> RANGE
+%token <[ `Comma | `Space ] * int * int option> RANGE
 %token EXCLAMATION_POINT
 %token LEFT_PARENS
 %token RIGHT_PARENS
@@ -49,6 +50,7 @@ let multiplier :=
     { At_least_one }
 
 let terminal ==
+  | c = CHAR; { Delim c }
   | l = LITERAL; { Keyword l }
   | d = DATA; { Data_type d }
   | p = PROPERTY; { Property_type p }

@@ -387,6 +387,6 @@ let consume = buf => {
     consume_ident_like(buf);
   | eof => Ok(EOF)
   | any => Ok(DELIM(lexeme(buf)))
-  | _ => failwith("This match case is unreachable. sedlex needs a last case as wildcard _. If this error appears, means that there's a bug in the tokenizer or the lexer.")
+  | _ => failwith("This match case is unreachable. sedlex needs a last case as wildcard _. If this error appears, means that there's a bug in the lexer.")
   };
 };
