@@ -54,17 +54,17 @@ let tests = [
     ((`Number(4.), []), [(`Cross(), (`Number(5.), []))]),
   ),
   test(
-    [%value "<calc>"],
+    [%value "<calc()>"],
     "calc(4 + 5)",
     ((`Number(4.), []), [(`Cross(), (`Number(5.), []))]),
   ),
   test(
-    [%value "<calc>"],
+    [%value "<calc()>"],
     "calc(100%)",
     ((`Percentage(100.), []), []),
   ),
   test(
-    [%value "<calc>"],
+    [%value "<calc()>"],
     "calc(100% - 25px)",
     ((`Percentage(100.), []), [(`Dash(), (`Length(`Px(25.)), []))]),
   ),
