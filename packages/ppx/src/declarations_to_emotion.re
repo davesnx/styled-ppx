@@ -1009,19 +1009,15 @@ let tab_size = unsupported(Parser.property_tab_size);
 let word_break = variants(Parser.property_word_break, [%expr CssJs.wordBreak]);
 let line_break = unsupported(Parser.property_line_break);
 
-let lh_value =
-  fun
-    | `Normal => variants_to_expression(`Auto)
-    | `Number(n) =>  render_number(n)
-    | `Interpolation(v) => render_variable(v)
-    | `Length(v) => render_length(v)
-    | `Percentage(v) => render_percentage(v);
-
 let line_height =
   apply(
     Parser.property_line_height,
     [%expr CssJs.lineHeight],
-    lh_value,
+    fun
+    | `Normal => variants_to_expression(`Normal)
+    | `Number(n) =>  render_number(n)
+    | `Length(_) as lh
+    | `Percentage(_) as lh => render_length_percentage(lh),
   );
 
 let line_height_step = unsupported(Parser.property_line_height_step);
@@ -1336,23 +1332,40 @@ let grid_column =
 let grid_area = unsupported(Parser.property_grid_area, ~call=[%expr CssJs.gridArea]);
 let z_index = unsupported(Parser.property_z_index, ~call=[%expr CssJs.zIndex]);
 
-let pos_value =
+let position_value =
   fun
     | `Auto => variants_to_expression(`Auto)
-    | `Interpolation(v) => render_variable(v)
-    | `Length(v) => render_length(v)
-    | `Percentage(v) => render_percentage(v);
+    | `Length(_) as lh
+    | `Percentage(_) as lh => render_length_percentage(lh);
 
 let left =
   apply(
     Parser.property_left,
     [%expr CssJs.left],
-    pos_value,
+    position_value,
   );
 
-let top = unsupported(Parser.property_top, ~call=[%expr CssJs.top]);
-let right = unsupported(Parser.property_right, ~call=[%expr CssJs.right]);
-let bottom = unsupported(Parser.property_bottom, ~call=[%expr CssJs.bottom]);
+let top =
+  apply(
+    Parser.property_top,
+    [%expr CssJs.top],
+    position_value,
+  );
+
+let right =
+  apply(
+    Parser.property_right,
+    [%expr CssJs.right],
+    position_value,
+  );
+
+let bottom =
+  apply(
+    Parser.property_bottom,
+    [%expr CssJs.bottom],
+    position_value,
+  );
+
 let display = apply(
   Parser.property_display,
   [%expr CssJs.display],
