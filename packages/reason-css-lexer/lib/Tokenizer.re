@@ -369,7 +369,6 @@ let consume = buf => {
       Ok(DELIM("@"));
     }
   | "[" => Ok(LEFT_SQUARE)
-  | "/" => Ok(DELIM("/"))
   | "\\" =>
     rollback(buf);
     switch%sedlex (buf) {
@@ -387,9 +386,7 @@ let consume = buf => {
     let _ = Sedlexing.backtrack(buf);
     consume_ident_like(buf);
   | eof => Ok(EOF)
-  | any => {
-    Ok(DELIM(lexeme(buf)))
-  }
+  | any => Ok(DELIM(lexeme(buf)))
   | _ => failwith("This match case is unreachable. sedlex needs a last case as wildcard _. If this error appears, means that there's a bug in the lexer.")
   };
 };

@@ -34,8 +34,8 @@ let properties_variable_css_tests = [
     [%expr CssJs.borderBottom(`pxFloat(0.), `solid, Color.Border.alpha)]
   ),
   (
-    [%expr [%css "height: $(width);"]],
-    [%expr CssJs.height(width)]
+    [%expr [%css "width: $(width);"]],
+    [%expr CssJs.width(width)]
   ),
   (
     [%expr [%css "max-width: $(max);"]],
