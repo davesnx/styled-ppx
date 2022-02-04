@@ -63,23 +63,13 @@ let tests = [
   test(
     [%value "<calc-sum>"],
     "4 + 5",
-    ((`Number(4.), []), [(`cross, (`Number(5.), []))])
+    ((`Number(4.), []), [(`Cross(()), (`Number(5.), []))])
   ),
   test(
-    [%value "<calc-value>"],
-    "4 + 5",
-    `Static((), ((`Number(4.), []), []), ())
-  ),
-  /* test(
-    [%value "<calc-product>"],
-    "4 / 5",
-    ( `Static((), ((`Number(4.), []), []), ()), [`Static_1((), 5.)])
-  ), */
-  /* test(
     [%value "<calc()>"],
-    "4",
-    `Function_calc(`Static((), ((`Number(4.), []), []), ()))
-  ), */
+    "calc(4 + 5)",
+    (((`Number(4.), []), [(`Cross(()), (`Number(5.), []))]))
+  ),
 ];
 
 type product_op = [ `Static_0(unit, calc_value) | `Static_1(unit, float) ]
