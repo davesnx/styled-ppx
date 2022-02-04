@@ -2,7 +2,7 @@ include Ast;
 
 let provider = (buf, ()) => {
   let token = Lexer.tokenizer(buf);
-  print_endline(Tokens.show_token(token));
+  /* print_endline(Tokens.show_token(token)); */
   let (start, stop) = Sedlexing.lexing_positions(buf);
   (token, start, stop);
 };

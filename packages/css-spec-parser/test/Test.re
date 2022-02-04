@@ -235,7 +235,7 @@ describe("Parse value", ({test, _}) => {
   );
 });
 
-/* let print_tests = [
+let print_tests = [
   ("  a b   |   c ||   d &&   e f", "'a' 'b' | 'c' || 'd' && 'e' 'f'"),
   ("[ a b ] | [ c || [ d && [ e f ]]]", "'a' 'b' | 'c' || 'd' && 'e' 'f'"),
   ("'[' abc ']'", "'[' 'abc' ']'"),
@@ -258,4 +258,3 @@ describe("Print value", ({test, _}) => {
       )
     );
 });
- */

@@ -35,12 +35,29 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       ? function_value_name(property_name) : "property-" ++ property_name;
 
   let value_of_delimiter = fun
-    | '+' => "cross"
-    | '-' => "dash"
-    | '*' => "asterisk"
-    | '/' => "bar"
-    | '@' => "at"
-    | _char => "UnknownDelimiter";
+    | "+" => "cross"
+    | "-" => "dash"
+    | "*" => "asterisk"
+    | "/" => "bar"
+    | "@" => "at"
+    | "," => "comma"
+    | ";" => ""
+    | ":" => "doubledot"
+    | "." => "dot"
+    | "(" => "openparen"
+    | ")" => "closeparen"
+    | "[" => "openbracket"
+    | "]" => "closebracket"
+    | "{" => "opencurly"
+    | "}" => "closecurly"
+    | "^" => "caret"
+    | "<" => "lessthan"
+    | "=" => "equal"
+    | ">" => "biggerthan"
+    | "|" => "vbar"
+    | "~" => "tilde"
+    | "$" => "dollar"
+    | _ => "unknown";
 
   let value_name_of_css = str =>
     String.(
@@ -57,12 +74,24 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       }
     );
 
+  let value_of_keyword = str => {
+    switch (str) {
+    | "," => "comma"
+    | "+" => "cross"
+    | "-" => "dash"
+    | "*" => "asterisk"
+    | "/" => "bar"
+    | "@" => "at"
+    | s => kebab_case_to_snake_case(s)
+    }
+  };
+
   // TODO: multiplier name
   let rec variant_name = value => {
     let value_name =
       switch (value) {
       | Terminal(Delim(name), _) => value_of_delimiter(name)
-      | Terminal(Keyword(name), _)
+      | Terminal(Keyword(name), _) => value_of_keyword(name)
       | Terminal(Data_type(name), _) => value_name_of_css(name)
       | Terminal(Property_type(name), _) =>
         property_value_name(name) |> value_name_of_css
@@ -73,7 +102,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       | Combinator(Xor, _) => "xor"
       | Function_call(name, _) => value_name_of_css(name)
       };
-    value_name |> first_uppercase |> Escape.variant;
+    value_name |> first_uppercase;
   };
   let variant_names = values => {
     // TODO: not exactly a fast algorithm
@@ -135,21 +164,9 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       // as everyrule is in the same namespace
       let rule =
         switch (kind) {
+        | Delim(delim) when delim == "," => evar("comma")
         | Delim(delim) => eapply(evar("delim"), [estring(delim)])
-        | Keyword(name) =>
-          // TODO: find a better way to separate keywords of delimiters
-          switch (name) {
-          | "," => evar("comma")
-          | "/" => eapply(evar("delim"), [estring("/")])
-          | "+" => eapply(evar("delim"), [estring("+")])
-          | "*" => eapply(evar("delim"), [estring("*")])
-          | "-" => eapply(evar("delim"), [estring("-")])
-          | "[" => eapply(evar("delim"), [estring("[")])
-          | "]" => eapply(evar("delim"), [estring("]")])
-          | _ =>
-            let name = estring(name);
-            eapply(evar("keyword"), [name]);
-          }
+        | Keyword(name) => eapply(evar("keyword"), [estring(name)])
         | Data_type(name) => value_name_of_css(name) |> evar
         | Property_type(name) =>
           property_value_name(name) |> value_name_of_css |> evar
