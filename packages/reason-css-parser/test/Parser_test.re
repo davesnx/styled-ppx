@@ -9,7 +9,7 @@ let test = (parser, input, output) => (
     let received = parse(input);
     switch (received) {
     | Error(message) => failwith(message)
-    | _ => expect.result(received).toBe(Ok(output));
+    | _ => expect.result(received).toBe(Ok(output))
     };
   },
 );

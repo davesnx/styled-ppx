@@ -83,32 +83,6 @@ let render_angle =
   | `Grad(number) => id([%expr `grad([%e render_number(number)])])
   | `Turn(number) => id([%expr `turn([%e render_number(number)])]);
 
-let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
-
-let render_variable = name =>
-  list_to_longident(name) |> txt |> Helper.Exp.ident;
-
-/* type product_op = [ `Static_0(unit, calc_value) | `Static_1(unit, float) ]
-and calc_product = (calc_value, list(product_op))
-and sum_op = [ `dash | `cross ]
-and calc_sum = (calc_product, list((sum_op, calc_product)))
-and calc_value = [ `Number(float) | `Dimension(unit) | `Percentage(float) | `Static(unit, calc_sum, unit) ]; */
-
-let render_calc_sum = (_sum/* : calc_sum */) => {
-  /* TODO: render into CssJs */
-  render_integer(1);
-};
-
-let render_calc = fun
-  | `Dimension(_) => render_integer(1)
-  | `Number(n) => render_number(n)
-  | `Percertage(pct) => render_percentage(pct)
-  | `Static((), sum, ()) => render_calc_sum(sum);
-
-let _render_widows = fun
-  | `Integer(i) => render_integer(i)
-  | `Function_calc((c, _)) => render_calc(c);
-
 let variants_to_expression =
   fun
   | `Row => id([%expr `row])
@@ -174,6 +148,134 @@ let variants_to_expression =
   | `Unset => id([%expr `unset])
   | `Full_size_kana => raise(Unsupported_feature);
 
+let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
+
+let render_variable = name =>
+  list_to_longident(name) |> txt |> Helper.Exp.ident;
+
+type length =
+[ `Cap(float)
+| `Ch(float)
+| `Cm(float)
+| `Em(float)
+| `Ex(float)
+| `Ic(float)
+| `In(float)
+| `Lh(float)
+| `Mm(float)
+| `Pc(float)
+| `Pt(float)
+| `Px(float)
+| `Q(float)
+| `Rem(float)
+| `Rlh(float)
+| `Vb(float)
+| `Vh(float)
+| `Vi(float)
+| `Vmax(float)
+| `Vmin(float)
+| `Vw(float)
+| `Zero ];
+
+// TODO: all of them could be float, but bs-css doesn't support it
+let render_length =
+  fun
+  | `Cap(_n) => raise(Unsupported_feature)
+  | `Ch(n) => [%expr `ch([%e render_number(n)])]
+  | `Cm(n) => [%expr `cm([%e render_number(n)])]
+  | `Em(n) => [%expr `em([%e render_number(n)])]
+  | `Ex(n) => [%expr `ex([%e render_number(n)])]
+  | `Ic(_n) => raise(Unsupported_feature)
+  | `In(_n) => raise(Unsupported_feature)
+  | `Lh(_n) => raise(Unsupported_feature)
+  | `Mm(n) => [%expr `mm([%e render_number(n)])]
+  | `Pc(n) => [%expr `pc([%e render_number(n)])]
+  | `Pt(n) => [%expr `pt([%e render_integer(n |> int_of_float)])]
+  | `Px(n) => [%expr `pxFloat([%e render_number(n)])]
+  | `Q(_n) => raise(Unsupported_feature)
+  | `Rem(n) => [%expr `rem([%e render_number(n)])]
+  | `Rlh(_n) => raise(Unsupported_feature)
+  | `Vb(_n) => raise(Unsupported_feature)
+  | `Vh(n) => [%expr `vh([%e render_number(n)])]
+  | `Vi(_n) => raise(Unsupported_feature)
+  | `Vmax(n) => [%expr `vmax([%e render_number(n)])]
+  | `Vmin(n) => [%expr `vmin([%e render_number(n)])]
+  | `Vw(n) => [%expr `vw([%e render_number(n)])]
+  | `Zero => [%expr `zero];
+
+let render_length_percentage =
+  fun
+  | `Length(length) => render_length(length)
+  | `Percentage(percentage) => render_percentage(percentage);
+
+type product_op = [ `Static_0(unit, calc_value) | `Static_1(unit, float) ]
+and calc_product = (calc_value, list(product_op))
+and sum_or_minus = [ `Dash(unit) | `Cross(unit) ]
+and sum_op = (sum_or_minus, calc_product)
+and calc_sum = (calc_product, list(sum_op))
+and calc_value = [ `Number(float) | `Length(length) | `Percentage(float) | `Function_calc(calc_sum) ];
+
+let rec render_function_calc = (calc_sum: calc_sum) => {
+  switch (calc_sum) {
+    | (product, []) => render_product(product)
+    | (product, list_of_sums) => {
+      let first = render_product(product);
+      let second = render_list_of_sums(list_of_sums);
+      [%expr (`add, [%e first], [%e second])];
+    }
+  }
+} and render_list_of_products = (list_of_products: list(product_op)) => {
+  switch (list_of_products) {
+    | [] => failwith("list of sums can't be empty, by the parser")
+    | [one] => render_product_op(one)
+    | list => render_list_of_products(list)
+  }
+} and render_list_of_sums = (list_of_sums: list(sum_op)) => {
+  switch (list_of_sums) {
+    | [] => failwith("list of sums can't be empty, by the parser")
+    | [(_, one)] => render_product(one)
+    | list => render_list_of_sums(list)
+  }
+} and render_product = product => {
+  switch (product) {
+    | (calc_value, []) => render_calc_value(calc_value)
+    | (calc_value, list_of_products) => {
+      let _first = render_calc_value(calc_value);
+      let _second = render_list_of_products(list_of_products);
+      /* [%expr (`mult, [%e first], [%e second])]; */
+      failwith("`mult isn't available in bs-css");
+    }
+  }
+} and render_product_op = (op: product_op) => {
+  switch (op) {
+    | `Static_0((), calc_value) => render_calc_value(calc_value)
+    | `Static_1((), float) => render_number(float)
+  }
+} and render_calc_value = calc_value => {
+  switch (calc_value) {
+    | `Number(float) => render_number(float)
+    | `Length(length) => render_length(length)
+    | `Percentage(float) => render_percentage(float)
+    | `Function_calc(fc) => render_function_calc(fc)
+  }
+};
+
+// css-sizing-3
+let render_size =
+  fun
+  | `Auto => variants_to_expression(`Auto)
+  | `Length(_) as lp
+  | `Percentage(_) as lp => render_length_percentage(lp)
+  | `Max_content
+  | `Min_content => raise(Unsupported_feature)
+  | `Fit_content(_) => raise(Unsupported_feature)
+  | `Function_calc(fc) => render_function_calc(fc)
+  | _ => raise(Unsupported_feature);
+
+let render_widows = fun
+  | `Integer(i) => render_integer(i)
+  | `Function_calc(fc: calc_sum) => render_function_calc(fc);
+
 let transform_with_variable = (parser, mapper, value_to_expr) =>
   emit(
     Combinator.combine_xor([
@@ -209,59 +311,6 @@ let unsupportedProperty = (~call=?, parser) =>
 
 let variants = (parser, identifier) =>
   apply(parser, identifier, variants_to_expression);
-
-// TODO: all of them could be float, but bs-css doesn't support it
-let render_length =
-  fun
-  | `Cap(_n) => raise(Unsupported_feature)
-  | `Ch(n) => [%expr `ch([%e render_number(n)])]
-  | `Cm(n) => [%expr `cm([%e render_number(n)])]
-  | `Em(n) => [%expr `em([%e render_number(n)])]
-  | `Ex(n) => [%expr `ex([%e render_number(n)])]
-  | `Ic(_n) => raise(Unsupported_feature)
-  | `In(_n) => raise(Unsupported_feature)
-  | `Lh(_n) => raise(Unsupported_feature)
-  | `Mm(n) => [%expr `mm([%e render_number(n)])]
-  | `Pc(n) => [%expr `pc([%e render_number(n)])]
-  | `Pt(n) => [%expr `pt([%e render_integer(n |> int_of_float)])]
-  | `Px(n) => [%expr `pxFloat([%e render_number(n)])]
-  | `Q(_n) => raise(Unsupported_feature)
-  | `Rem(n) => [%expr `rem([%e render_number(n)])]
-  | `Rlh(_n) => raise(Unsupported_feature)
-  | `Vb(_n) => raise(Unsupported_feature)
-  | `Vh(n) => [%expr `vh([%e render_number(n)])]
-  | `Vi(_n) => raise(Unsupported_feature)
-  | `Vmax(n) => [%expr `vmax([%e render_number(n)])]
-  | `Vmin(n) => [%expr `vmin([%e render_number(n)])]
-  | `Vw(n) => [%expr `vw([%e render_number(n)])]
-  | `Zero => [%expr `zero];
-
-let render_length_percentage =
-  fun
-  | `Length(length) => render_length(length)
-  | `Percentage(percentage) => render_percentage(percentage);
-
-let render_calc = value => {
-  switch (value) {
-  | `Dimension(_) => raise(Unsupported_feature)
-  | `Number(n) => render_number(n)
-  | `Percentage(pct) => render_percentage(pct)
-  | `Static(_, _, _) =>
-    raise(Unsupported_feature)
-  };
-};
-
-// css-sizing-3
-let render_size =
-  fun
-  | `Auto => variants_to_expression(`Auto)
-  | `Length(_) as lp
-  | `Percentage(_) as lp => render_length_percentage(lp)
-  | `Max_content
-  | `Min_content => raise(Unsupported_feature)
-  | `Fit_content(_) => raise(Unsupported_feature)
-  | `Function_calc(calc) => render_calc(calc)
-  | _ => raise(Unsupported_feature);
 
 let width = apply(Parser.property_width, [%expr CssJs.width], render_size);
 let height = apply(Parser.property_height, [%expr CssJs.height], render_size);
@@ -602,6 +651,7 @@ let render_function_rgb = ast => {
   | None => id([%expr `rgb(([%e red], [%e green], [%e blue]))])
   };
 };
+
 let render_function_hsl = ((hue, saturation, lightness, alpha)) => {
   let hue =
     switch (hue) {
@@ -1254,8 +1304,8 @@ let transition_duration =
     Parser.property_transition_duration,
     [%expr CssJs.transitionDuration],
   );
-let widows = unsupportedProperty(Parser.property_widows);
-/* let widows = apply(Parser.property_widows, [%expr CssJs.width], render_widows); */
+/* let widows = unsupportedProperty(Parser.property_widows); */
+let widows = apply(Parser.property_widows, [%expr CssJs.width], render_widows);
 let transition_timing_function =
   unsupportedValue(
     Parser.property_transition_timing_function,
