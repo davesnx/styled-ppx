@@ -1064,17 +1064,14 @@ let font_stretch = unsupported(Parser.property_font_stretch);
 let font_style =
   unsupported(Parser.property_font_style, ~call=[%expr CssJs.fontStyle]);
 
-let fs_value =
-  fun
-    | `Absolute_size(v) => render_size(v)
-    | `Relative_size(v) => render_size(v)
-    | `Length_percentage(v) => render_length_percentage(v)
-
 let font_size =
   apply(
     Parser.property_font_size,
     [%expr CssJs.fontSize],
-    fs_value,
+    fun
+    | `Absolute_size(v)
+    | `Relative_size(v) => render_size(v)
+    | `Length_percentage(v) => render_length_percentage(v),
   );
 
 let font_size_adjust = unsupported(Parser.property_font_size_adjust);
