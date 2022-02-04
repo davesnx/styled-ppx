@@ -3077,9 +3077,9 @@
 /* [%css {|math-depth: 0|}]; */
 /* [%css {|math-depth: 1|}]; */
 
-[%css {|widows: calc(50% + 4px)|}];
-[%css {|widows: calc(20px - 10px)|}];
-[%css {|widows: calc(100vh - calc(2rem + 120px))|}];
-/* [%css {|widows: calc(100vh * 2)|}]; */
-[%css {|widows: calc(100vh - calc(2rem + calc(2rem + calc(2rem + calc(2rem + 120px)))))|}];
-/* [%css {|widows: calc(100vh * calc(2rem - calc(2rem * calc(2rem * calc(2rem / 4)))))|}]; */
+[%css {|width: calc(50% + 4px)|}];
+[%css {|width: calc(20px - 10px)|}];
+[%css {|width: calc(100vh - calc(2rem + 120px))|}];
+/* [%css {|width: calc(100vh * 2)|}]; */
+[%css {|width: calc(100vh - calc(2rem + calc(2rem + calc(2rem + calc(2rem + 120px)))))|}];
+/* [%css {|width: calc(100vh * calc(2rem - calc(2rem * calc(2rem * calc(2rem / 4)))))|}]; */

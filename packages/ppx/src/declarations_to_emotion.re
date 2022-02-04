@@ -272,7 +272,7 @@ let render_size =
   | `Function_calc(fc) => render_function_calc(fc)
   | _ => raise(Unsupported_feature);
 
-let render_widows = fun
+let _render_widows = fun
   | `Integer(i) => render_integer(i)
   | `Function_calc(fc: calc_sum) => render_function_calc(fc);
 
@@ -1304,8 +1304,7 @@ let transition_duration =
     Parser.property_transition_duration,
     [%expr CssJs.transitionDuration],
   );
-/* let widows = unsupportedProperty(Parser.property_widows); */
-let widows = apply(Parser.property_widows, [%expr CssJs.width], render_widows);
+let widows = apply(Parser.property_widows, [%expr CssJs.widows], render_integer);
 let transition_timing_function =
   unsupportedValue(
     Parser.property_transition_timing_function,
