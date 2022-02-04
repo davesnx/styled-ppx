@@ -1333,8 +1333,8 @@ CssJs.unsafe("boxDecorationBreak", "slice");
 CssJs.unsafe("boxDecorationBreak", "clone");
 CssJs.unsafe("orphans", "1");
 CssJs.unsafe("orphans", "2");
-CssJs.width(1);
-CssJs.width(2);
+CssJs.widows(1);
+CssJs.widows(2);
 CssJs.unsafe("position", "sticky");
 CssJs.unsafe("willChange", "scroll-position");
 CssJs.unsafe("willChange", "contents");
@@ -1677,19 +1677,23 @@ CssJs.unsafe("pointerEvents", "all");
 CssJs.unsafe("pointerEvents", "none");
 CssJs.unsafe("lineHeightStep", "30px");
 CssJs.unsafe("lineHeightStep", "2em");
-CssJs.width((`add, `percent(50.), `pxFloat(4.)));
-CssJs.width((`add, `pxFloat(20.), `pxFloat(10.)));
-CssJs.width((`add, `vh(100.), (`add, `rem(2.), `pxFloat(120.))));
-CssJs.width((
-  `add,
-  `vh(100.),
-  (
-    `add,
-    `rem(2.),
-    (
+CssJs.width(`calc((`add, `percent(50.), `pxFloat(4.))));
+CssJs.width(`calc((`sub, `pxFloat(20.), `pxFloat(10.))));
+CssJs.width(
+  `calc((`sub, `vh(100.), `calc((`add, `rem(2.), `pxFloat(120.))))),
+);
+CssJs.width(
+  `calc((
+    `sub,
+    `vh(100.),
+    `calc((
       `add,
       `rem(2.),
-      (`add, `rem(2.), (`add, `rem(2.), `pxFloat(120.))),
-    ),
-  ),
-));
+      `calc((
+        `add,
+        `rem(2.),
+        `calc((`add, `rem(2.), `calc((`add, `rem(2.), `pxFloat(120.))))),
+      )),
+    )),
+  )),
+);

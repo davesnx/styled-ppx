@@ -452,6 +452,14 @@ let properties_static_css_tests = [%expr
       [%css "flex: none"],
       CssJs.flex(`none)
     ),
+    (
+      [%css "width: calc(100% + 32px)"],
+      CssJs.width(`calc(`add, `percent(100.), `pxFloat(32.)))
+    ),
+    (
+      [%css "width: calc(100vh - 120px)"],
+      CssJs.width(`calc(`sub, `vh(100.), `pxFloat(120.)))
+    ),
     /* (
       [%css "flex: 1 2 content"],
       CssJs.flexGrow(1.), CssJs.flexShrink(2.), CssJs.flexBasis(`content)|],

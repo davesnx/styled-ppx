@@ -14,6 +14,10 @@ let test = (parser, input, output) => (
   },
 );
 
+let ext_pct = x => `Extended_percentage(`Percentage(x));
+let pct = x => `Percentage(x);
+let len = x => `Extended_length(`Length(x));
+
 let tests = [
   test(
     [%value "<rgb()>"],
@@ -26,24 +30,24 @@ let tests = [
     `Rgb_3(([0.6, 0.4, 5.0], None)),
   ),
   test(
-    [%value "<rgba()>"],
-    "rgba(25% 33% 44% / 0.6)",
-    `Rgba_0(([25.0, 33.0, 44.0], Some(((), `Number(0.6))))),
+    [%value "<rgb()>"],
+    "rgb(25% 33% 44% / 0.6)",
+    `Rgb_0(([pct(25.0), pct(33.0), pct(44.0)], Some(((), `Number(0.6))))),
   ),
   test(
-    [%value "<rgba()>"],
-    "rgba(2.5, 3.3, 4.4, 60%)",
-    `Rgba_3(([2.5, 3.3, 4.4], Some(((), `Percentage(60.0))))),
+    [%value "<rgb()>"],
+    "rgb(2.5, 3.3, 4.4, 60%)",
+    `Rgb_3(([2.5, 3.3, 4.4], Some(((), ext_pct(60.0))))),
   ),
   test(
-    [%value "<rgba()>"],
-    "rgba(2.5, 3.3, 4.4, 0.5)",
-    `Rgba_3(([2.5, 3.3, 4.4], Some(((), `Number(0.5))))),
+    [%value "<rgb()>"],
+    "rgb(2.5, 3.3, 4.4, 0.5)",
+    `Rgb_3(([2.5, 3.3, 4.4], Some(((), `Number(0.5))))),
   ),
   test(
     [%value "<track-size>"],
     "fit-content(50%)",
-    `Fit_content(`Percentage(50.)),
+    `Fit_content(ext_pct(50.)),
   ),
   test([%value "<calc-product>"], "4", (`Number(4.), [])),
   test([%value "<calc-sum>"], "4", ((`Number(4.), []), [])),
@@ -61,12 +65,12 @@ let tests = [
   test(
     [%value "<calc()>"],
     "calc(100%)",
-    ((`Percentage(100.), []), []),
+    ((ext_pct(100.), []), []),
   ),
   test(
     [%value "<calc()>"],
     "calc(100% - 25px)",
-    ((`Percentage(100.), []), [(`Dash(), (`Length(`Px(25.)), []))]),
+    ((ext_pct(100.), []), [(`Dash(), (len(`Px(25.)), []))]),
   ),
 ];
 
