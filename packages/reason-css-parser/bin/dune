@@ -1,7 +1,0 @@
-(executable
- (name generate_parser)
- (libraries reason_css_parser reason_css_parser_ppx yojson)
- (preprocess
-  (pps ppxlib.metaquot)
- )
-)
