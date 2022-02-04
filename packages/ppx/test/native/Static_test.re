@@ -237,8 +237,8 @@ let properties_static_css_tests = [%expr
     */
     /* (
       [%css "color: #01234567"],
-      CssJs.color(`hex("01234567"))),
-    */
+      CssJs.color(`hex("01234567"))
+    ), */
     (
       [%css "color: blue"],
       CssJs.color(CssJs.blue)
@@ -387,7 +387,9 @@ let properties_static_css_tests = [%expr
       [%css "word-wrap: normal"],
       CssJs.wordWrap(`normal)
     ),
-    /* (
+    /*
+      not supported by bs-css
+      (
       [%css "text-align: start"],
       CssJs.textAlign(`start)
     ), */
@@ -420,7 +422,9 @@ let properties_static_css_tests = [%expr
       [%css "flex-wrap: wrap"],
       CssJs.flexWrap(`wrap)
     ),
-    /* (
+    /*
+      not supported on bs-css
+      (
       [%css "flex-flow: row nowrap"],
       [|CssJs.flexDirection(`row), CssJs.flexWrap(`nowrap)|],
     ), */
