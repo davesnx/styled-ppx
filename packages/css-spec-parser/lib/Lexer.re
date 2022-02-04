@@ -10,10 +10,12 @@ let range_restriction = [%sedlex.regexp? ('[', number, ',', number, ']')];
 let stop_literal = [%sedlex.regexp?
   ' ' | '\t' | '\n' | '?' | '!' | '*' | '+' | '#' | '{' | ']' | '(' | ')' | ','
 ];
-let delimiters = [%sedlex.regexp? '-' | ',' | ';' | ':' | '.' | '(' | ')' | '[' | ']' | '{' | '}' | '*' | '/' | '^' | '+' | '<' | '=' | '>' | '|' | '~' | '$' ];
 let literal = [%sedlex.regexp? Star(Sub(any, stop_literal))];
 let string = [%sedlex.regexp? ('\'', Plus(Sub(any, '\'')), '\'')];
-let quoted_delim = [%sedlex.regexp? ({|'|}, delimiters, {|'|})];
+let single_token_literal = [%sedlex.regexp? ',' | '{'];
+
+let delimiters = [%sedlex.regexp? '-' | ',' | ';' | ':' | '.' | '(' | ')' | '[' | ']' | '{' | '}' | '*' | '/' | '^' | '+' | '<' | '=' | '>' | '|' | '~' | '$' ];
+let quoted_delimiter = [%sedlex.regexp? ('\'', delimiters, '\'')];
 
 let data = [%sedlex.regexp?
   ("<", Plus(Sub(any, '>')), Opt(range_restriction), ">")
@@ -30,7 +32,15 @@ let slice = (start, end_, string) => {
   String.sub(string, start, end_);
 };
 
-let range = str => {
+let eat_literal = (buf) => {
+  switch%sedlex (buf) {
+  | literal => LITERAL(lexeme(buf))
+  | single_token_literal => LITERAL(lexeme(buf))
+  | _ => failwith("something is wrong here")
+  };
+}
+
+let eat_range = str => {
   let int = int_of_string;
 
   let (kind, starts_at) = str.[0] == '#' ? (`Comma, 2) : (`Space, 1);
@@ -45,13 +55,6 @@ let range = str => {
   RANGE((kind, min, max));
 };
 
-let literal = buf =>
-  switch%sedlex (buf) {
-  | delimiters => CHAR(lexeme(buf))
-  | literal => LITERAL(lexeme(buf))
-  | _ => failwith("something is wrong here")
-  };
-
 let rec tokenizer = buf =>
   switch%sedlex (buf) {
   | whitespace => tokenizer(buf)
@@ -65,7 +68,7 @@ let rec tokenizer = buf =>
   | '+' => PLUS
   | '?' => QUESTION_MARK
   | '#' => RANGE((`Comma, 1, None))
-  | range => range(lexeme(buf))
+  | range => eat_range(lexeme(buf))
   | '!' => EXCLAMATION_POINT
   // combinators
   | "&&" => DOUBLE_AMPERSAND
@@ -76,8 +79,8 @@ let rec tokenizer = buf =>
   // functions
   | '(' => LEFT_PARENS
   | ')' => RIGHT_PARENS
-  | quoted_delim => CHAR(lexeme(buf) |> slice(1, -1))
+  | quoted_delimiter => CHAR(lexeme(buf) |> slice(1, -1))
   | string => LITERAL(lexeme(buf) |> slice(1, -1))
   | eof => EOF
-  | _ => literal(buf)
+  | _ => eat_literal(buf)
   };
