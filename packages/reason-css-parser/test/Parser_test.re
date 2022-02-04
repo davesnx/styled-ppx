@@ -45,39 +45,31 @@ let tests = [
     "fit-content(50%)",
     `Fit_content(`Percentage(50.)),
   ),
-  test(
-    [%value "<calc-product>"],
-    "4",
-    (`Number(4.), [])
-  ),
-  test(
-    [%value "<calc-sum>"],
-    "4",
-    ((`Number(4.), []), [])
-  ),
-  test(
-    [%value "<calc-value>"],
-    "4",
-    `Number(4.)
-  ),
+  test([%value "<calc-product>"], "4", (`Number(4.), [])),
+  test([%value "<calc-sum>"], "4", ((`Number(4.), []), [])),
+  test([%value "<calc-value>"], "4", `Number(4.)),
   test(
     [%value "<calc-sum>"],
     "4 + 5",
-    ((`Number(4.), []), [(`Cross(()), (`Number(5.), []))])
+    ((`Number(4.), []), [(`Cross(), (`Number(5.), []))]),
   ),
   test(
-    [%value "<calc()>"],
+    [%value "<calc>"],
     "calc(4 + 5)",
-    (((`Number(4.), []), [(`Cross(()), (`Number(5.), []))]))
+    ((`Number(4.), []), [(`Cross(), (`Number(5.), []))]),
+  ),
+  test(
+    [%value "<calc>"],
+    "calc(100%)",
+    ((`Percentage(100.), []), []),
+  ),
+  test(
+    [%value "<calc>"],
+    "calc(100% - 25px)",
+    ((`Percentage(100.), []), [(`Dash(), (`Length(`Px(25.)), []))]),
   ),
 ];
 
-type product_op = [ `Static_0(unit, calc_value) | `Static_1(unit, float) ]
-and calc_product = (calc_value, list(product_op))
-and sum_op = [ `minus | `cross ]
-and calc_sum = (calc_product, list((sum_op, calc_product)))
-and calc_value = [ `Number(float) | `Dimension(float) | `Percentatge(float) | `Static(unit, calc_sum, unit) ];
-
-describe("Parser", ({test, _}) => {
+describe("Parser", ({test, _}) =>
   tests |> List.iter(((input, test_fn)) => test(input, test_fn))
-});
+);
