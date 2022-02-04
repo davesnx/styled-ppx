@@ -1022,6 +1022,14 @@ let word_spacing =
     | `Normal => variants_to_expression(`Normal)
     | `Length_percentage(lp) => render_length_percentage(lp),
   );
+let will_change =
+  apply(
+    Parser.property_will_change,
+    [%expr CssJs.willChange],
+    fun
+    | `Length(l) => render_length(l)
+    | `Interpolation(v) => render_variable(v)
+);
 let letter_spacing =
   apply(
     Parser.property_word_spacing,
@@ -1571,6 +1579,8 @@ let properties = [
   ("top", found(top)),
   ("right", found(right)),
   ("bottom", found(bottom)),
+  //
+  ("will-change", found(will_change)),
 ];
 
 let render_when_unsupported_features = (property, value) => {

@@ -2252,11 +2252,13 @@
 /* [%css {|inset-end: 10px|}]; */
 /* [%css {|inset-end: 50%|}]; */
 
+let t = `px(1);
 /* CSS Will Change Module Level 1 */
-[%css {|will-change: scroll-position|}];
+[%css {|will-change: $(t)|}];
+/* [%css {|will-change: scroll-position|}];
 [%css {|will-change: contents|}];
 [%css {|will-change: transform|}];
-[%css {|will-change: top, left|}];
+[%css {|will-change: top, left|}]; */
 
 /* CSSOM View Module */
 [%css {|scroll-behavior: auto|}];

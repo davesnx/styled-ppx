@@ -268,3 +268,9 @@ let flex_value =
     | _ => Error(["expected flex_value"])
     }
   );
+
+let length_interpolation =
+  combine_xor([
+    map(interpolation, i => `Interpolation(i)),
+    map(length, v => `Length(v)),
+  ]);
