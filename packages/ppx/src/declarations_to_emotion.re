@@ -168,33 +168,37 @@ let variants = (parser, identifier) =>
 // TODO: all of them could be float, but bs-css doesn't support it
 let render_length =
   fun
-  | `Cap(_n) => raise(Unsupported_feature)
-  | `Ch(n) => [%expr `ch([%e render_number(n)])]
-  | `Cm(n) => [%expr `cm([%e render_number(n)])]
-  | `Em(n) => [%expr `em([%e render_number(n)])]
-  | `Ex(n) => [%expr `ex([%e render_number(n)])]
-  | `Ic(_n) => raise(Unsupported_feature)
-  | `In(_n) => raise(Unsupported_feature)
-  | `Lh(_n) => raise(Unsupported_feature)
-  | `Mm(n) => [%expr `mm([%e render_number(n)])]
-  | `Pc(n) => [%expr `pc([%e render_number(n)])]
-  | `Pt(n) => [%expr `pt([%e render_integer(n |> int_of_float)])]
-  | `Px(n) => [%expr `pxFloat([%e render_number(n)])]
-  | `Q(_n) => raise(Unsupported_feature)
-  | `Rem(n) => [%expr `rem([%e render_number(n)])]
-  | `Rlh(_n) => raise(Unsupported_feature)
-  | `Vb(_n) => raise(Unsupported_feature)
-  | `Vh(n) => [%expr `vh([%e render_number(n)])]
-  | `Vi(_n) => raise(Unsupported_feature)
-  | `Vmax(n) => [%expr `vmax([%e render_number(n)])]
-  | `Vmin(n) => [%expr `vmin([%e render_number(n)])]
-  | `Vw(n) => [%expr `vw([%e render_number(n)])]
-  | `Zero => [%expr `zero];
+  | `Interpolation(v) => render_variable(v)
+  | `Length(l) => switch(l) {
+    | `Cap(_n) => raise(Unsupported_feature)
+    | `Ch(n) => [%expr `ch([%e render_number(n)])]
+    | `Cm(n) => [%expr `cm([%e render_number(n)])]
+    | `Em(n) => [%expr `em([%e render_number(n)])]
+    | `Ex(n) => [%expr `ex([%e render_number(n)])]
+    | `Ic(_n) => raise(Unsupported_feature)
+    | `In(_n) => raise(Unsupported_feature)
+    | `Lh(_n) => raise(Unsupported_feature)
+    | `Mm(n) => [%expr `mm([%e render_number(n)])]
+    | `Pc(n) => [%expr `pc([%e render_number(n)])]
+    | `Pt(n) => [%expr `pt([%e render_integer(n |> int_of_float)])]
+    | `Px(n) => [%expr `pxFloat([%e render_number(n)])]
+    | `Q(_n) => raise(Unsupported_feature)
+    | `Rem(n) => [%expr `rem([%e render_number(n)])]
+    | `Rlh(_n) => raise(Unsupported_feature)
+    | `Vb(_n) => raise(Unsupported_feature)
+    | `Vh(n) => [%expr `vh([%e render_number(n)])]
+    | `Vi(_n) => raise(Unsupported_feature)
+    | `Vmax(n) => [%expr `vmax([%e render_number(n)])]
+    | `Vmin(n) => [%expr `vmin([%e render_number(n)])]
+    | `Vw(n) => [%expr `vw([%e render_number(n)])]
+    | `Zero => [%expr `zero]
+  };
 
 let render_length_percentage =
   fun
   | `Length(length) => render_length(length)
-  | `Percentage(percentage) => render_percentage(percentage);
+  | `Percentage(percentage) => render_percentage(percentage)
+  | `Interpolation(v) => render_variable(v);
 
 // css-sizing-3
 let render_size =
@@ -1004,7 +1008,22 @@ let white_space = variants(Parser.property_white_space, [%expr CssJs.whiteSpace]
 let tab_size = unsupported(Parser.property_tab_size);
 let word_break = variants(Parser.property_word_break, [%expr CssJs.wordBreak]);
 let line_break = unsupported(Parser.property_line_break);
-let line_height = unsupported(Parser.property_line_height, ~call=[%expr CssJs.lineHeight]);
+
+let lh_value =
+  fun
+    | `Normal => variants_to_expression(`Auto)
+    | `Number(n) =>  render_number(n)
+    | `Interpolation(v) => render_variable(v)
+    | `Length(v) => render_length(v)
+    | `Percentage(v) => render_percentage(v);
+
+let line_height =
+  apply(
+    Parser.property_line_height,
+    [%expr CssJs.lineHeight],
+    lh_value,
+  );
+
 let line_height_step = unsupported(Parser.property_line_height_step);
 let hyphens = unsupported(Parser.property_hyphens);
 let overflow_wrap =
@@ -1022,14 +1041,6 @@ let word_spacing =
     | `Normal => variants_to_expression(`Normal)
     | `Length_percentage(lp) => render_length_percentage(lp),
   );
-let will_change =
-  apply(
-    Parser.property_will_change,
-    [%expr CssJs.willChange],
-    fun
-    | `Length(l) => render_length(l)
-    | `Interpolation(v) => render_variable(v)
-);
 let letter_spacing =
   apply(
     Parser.property_word_spacing,
@@ -1056,7 +1067,20 @@ let font_weight =
 let font_stretch = unsupported(Parser.property_font_stretch);
 let font_style =
   unsupported(Parser.property_font_style, ~call=[%expr CssJs.fontStyle]);
-let font_size = unsupported(Parser.property_font_size, ~call=[%expr CssJs.fontSize]);
+
+let fs_value =
+  fun
+    | `Absolute_size(v) => render_size(v)
+    | `Relative_size(v) => render_size(v)
+    | `Length_percentage(v) => render_length_percentage(v)
+
+let font_size =
+  apply(
+    Parser.property_font_size,
+    [%expr CssJs.fontSize],
+    fs_value,
+  );
+
 let font_size_adjust = unsupported(Parser.property_font_size_adjust);
 let font = unsupported(Parser.property_font);
 // let font_synthesis_weight = unsupported(Parser.property_font_synthesis_weight);
@@ -1311,7 +1335,21 @@ let grid_column =
   unsupported(Parser.property_grid_column, ~call=[%expr CssJs.gridColumn]);
 let grid_area = unsupported(Parser.property_grid_area, ~call=[%expr CssJs.gridArea]);
 let z_index = unsupported(Parser.property_z_index, ~call=[%expr CssJs.zIndex]);
-let left = unsupported(Parser.property_left, ~call=[%expr CssJs.left]);
+
+let pos_value =
+  fun
+    | `Auto => variants_to_expression(`Auto)
+    | `Interpolation(v) => render_variable(v)
+    | `Length(v) => render_length(v)
+    | `Percentage(v) => render_percentage(v);
+
+let left =
+  apply(
+    Parser.property_left,
+    [%expr CssJs.left],
+    pos_value,
+  );
+
 let top = unsupported(Parser.property_top, ~call=[%expr CssJs.top]);
 let right = unsupported(Parser.property_right, ~call=[%expr CssJs.right]);
 let bottom = unsupported(Parser.property_bottom, ~call=[%expr CssJs.bottom]);
@@ -1579,8 +1617,6 @@ let properties = [
   ("top", found(top)),
   ("right", found(right)),
   ("bottom", found(bottom)),
-  //
-  ("will-change", found(will_change)),
 ];
 
 let render_when_unsupported_features = (property, value) => {

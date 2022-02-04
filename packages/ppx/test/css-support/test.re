@@ -1,3 +1,6 @@
+
+let value = `px(1);
+
 /* CSS Backgrounds and Borders Module Level 3 */
 [%css {|background-repeat: space|}];
 [%css {|background-repeat: round|}];
@@ -1421,6 +1424,8 @@
 [%css {|width: 5vh;|}];
 [%css {|width: 5vmin;|}];
 [%css {|width: 5vmax;|}];
+[%css {|width: 5vmax;|}];
+[%css {|width: $(value);|}];
 /* [%css {|width: 5q;|}]; */
 /* [%css {|width: attr(data-px);|}]; */
 /* [%css {|width: attr(data-px px);|}]; */
@@ -2252,13 +2257,11 @@
 /* [%css {|inset-end: 10px|}]; */
 /* [%css {|inset-end: 50%|}]; */
 
-let t = `px(1);
 /* CSS Will Change Module Level 1 */
-[%css {|will-change: $(t)|}];
-/* [%css {|will-change: scroll-position|}];
+[%css {|will-change: scroll-position|}];
 [%css {|will-change: contents|}];
 [%css {|will-change: transform|}];
-[%css {|will-change: top, left|}]; */
+[%css {|will-change: top, left|}];
 
 /* CSSOM View Module */
 [%css {|scroll-behavior: auto|}];

@@ -40,7 +40,7 @@ let number =
     | token => Error(["expected a number, receveid " ++ show_token(token)]),
   );
 
-let length =
+let length_raw =
   token(token =>
     switch (token) {
     | DIMENSION(number, dimension) =>
@@ -142,12 +142,6 @@ let percentage =
     | PERCENTAGE(float) => Ok(float)
     | _ => Error(["expected percentage"]),
   );
-
-let length_percentage =
-  combine_xor([
-    map(length, v => `Length(v)),
-    map(percentage, v => `Percentage(v)),
-  ]);
 
 // https://drafts.csswg.org/css-values-4/#css-identifier
 // TODO: differences between <ident> and keyword
@@ -269,8 +263,10 @@ let flex_value =
     }
   );
 
-let length_interpolation =
+let length =
   combine_xor([
-    map(interpolation, i => `Interpolation(i)),
-    map(length, v => `Length(v)),
+    map(length_raw, v => `Length(v)),
+    map(interpolation, v => `Interpolation(v)),
   ]);
+
+let length_legacy = length_raw
