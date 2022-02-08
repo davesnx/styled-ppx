@@ -596,7 +596,7 @@ let render_function_rgb = ast => {
   let to_number = fun
     // TODO: bs-css rgb(float, float, float)
     | `Percentage(pct) => color_to_float(pct *. 2.55)
-    | _ => render_integer(999);
+    | `Function_calc(fc) => render_function_calc(fc);
 
   let (colors, alpha) =
     switch (ast) {
