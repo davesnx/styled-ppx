@@ -94,8 +94,8 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
           switch (Declarations_to_emotion.parse_declarations(ident, value)) {
           | Error(`Not_found) =>
             grammar_error(ident_loc, "unsupported property: " ++ ident)
-          | Error(`Invalid_value(_error)) =>
-            grammar_error(loc, "invalid value")
+          | Error(`Invalid_value(error)) =>
+            grammar_error(loc, "invalid value: " ++ error)
           | Ok(_) => ()
           };
         source_code_of_loc(complete_loc);
