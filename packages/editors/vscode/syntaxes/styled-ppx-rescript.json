@@ -1,8 +1,6 @@
 {
   "scopeName": "source.styled-ppx-rescript",
-  "fileTypes": [
-    "res"
-  ],
+  "fileTypes": ["res"],
   "injectionSelector": "L:source -comment -string",
   "patterns": [
     {
@@ -10,33 +8,15 @@
       "end": "\\)",
       "beginCaptures": {
         "1": {
-          "name": "keyword.operator.extension.styled-ppx"
+          "name": "keyword.operator.extension.styled-ppx-rescript"
         },
         "2": {
-          "name": "keyword.other.extension.styled-ppx"
+          "name": "keyword.other.extension.styled-ppx-rescript"
         }
       },
       "patterns": [
-        {
-          "begin": "`",
-          "end": "`",
-          "beginCaptures": {
-            "0": {
-              "name": "punctuation.definition.string.begin.styled-ppx"
-            }
-          },
-          "endCaptures": {
-            "0": {
-              "name": "punctuation.definition.string.end.styled-ppx"
-            }
-          },
-          "contentName": "meta.embedded.block.css",
-          "patterns": [
-            {
-              "include": "source.css.styled-ppx"
-            }
-          ]
-        }
+        { "include": "#css-string-quoted" },
+        { "include": "source.styled-ppx-ocaml#css-string" }
       ]
     },
     {
@@ -44,54 +24,50 @@
       "end": "\\)",
       "beginCaptures": {
         "1": {
-          "name": "keyword.operator.extension.styled-ppx"
+          "name": "keyword.operator.extension.styled-ppx-rescript"
         },
         "2": {
-          "name": "keyword.other.extension.styled-ppx"
+          "name": "keyword.other.extension.styled-ppx-rescript"
         }
       },
       "patterns": [
-        {
-          "begin": "`",
-          "end": "`",
-          "beginCaptures": {
-            "0": {
-              "name": "punctuation.definition.string.begin.styled-ppx"
-            }
-          },
-          "endCaptures": {
-            "0": {
-              "name": "punctuation.definition.string.end.styled-ppx"
-            }
-          },
-          "contentName": "meta.embedded.block.css",
-          "patterns": [
-            {
-              "include": "source.css.styled-ppx"
-            }
-          ]
-        },
-        {
-          "begin": "\"",
-          "end": "\"",
-          "beginCaptures": {
-            "0": {
-              "name": "punctuation.definition.string.begin.styled-ppx"
-            }
-          },
-          "endCaptures": {
-            "0": {
-              "name": "punctuation.definition.string.end.styled-ppx"
-            }
-          },
-          "contentName": "meta.embedded.block.css",
-          "patterns": [
-            {
-              "include": "source.css.styled-ppx"
-            }
-          ]
-        }
+        { "include": "#css-string-quoted" },
+        { "include": "source.styled-ppx-ocaml#css-string" },
+        { "include": "#nested-parentheses" },
+        { "include": "source.rescript" }
       ]
     }
-  ]
+  ],
+  "repository": {
+    "css-string-quoted": {
+      "begin": "`",
+      "end": "`",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.begin.styled-ppx-rescript"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.end.styled-ppx-rescript"
+        }
+      },
+      "contentName": "meta.embedded.block.css",
+      "patterns": [
+        {
+          "include": "source.css.styled-ppx"
+        }
+      ]
+    },
+    "nested-parentheses": {
+      "begin": "\\(",
+      "end": "\\)",
+      "patterns": [
+        { "include": "#css-string-quoted" },
+        { "include": "source.styled-ppx-ocaml#css-string" },
+        { "include": "#nested-parentheses" },
+        { "include": "source.rescript" }
+      ]
+    }
+  }
 }
