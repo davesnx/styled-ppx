@@ -48,6 +48,17 @@
           "source.css.scss": "css",
           "meta.embedded.block.css": "css"
         }
+      },
+      {
+        "injectTo": [
+          "source.rescript"
+        ],
+        "scopeName": "source.styled-ppx-rescript",
+        "path": "./syntaxes/styled-ppx-rescript.json",
+        "embeddedLanguages": {
+          "source.css.scss": "css",
+          "meta.embedded.block.css": "css"
+        }
       }
     ]
   },

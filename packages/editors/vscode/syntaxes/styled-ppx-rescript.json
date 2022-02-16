@@ -1,0 +1,97 @@
+{
+  "scopeName": "source.styled-ppx-rescript",
+  "fileTypes": [
+    "res"
+  ],
+  "injectionSelector": "L:source -comment -string",
+  "patterns": [
+    {
+      "begin": "(%)(styled.global)\\(",
+      "end": "\\)",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.operator.extension.styled-ppx"
+        },
+        "2": {
+          "name": "keyword.other.extension.styled-ppx"
+        }
+      },
+      "patterns": [
+        {
+          "begin": "`",
+          "end": "`",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.styled-ppx"
+            }
+          },
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.styled-ppx"
+            }
+          },
+          "contentName": "meta.embedded.block.css",
+          "patterns": [
+            {
+              "include": "source.css.styled-ppx"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "begin": "(%)(styled(\\.[a-zA-Z]*)?|css|cx)\\(",
+      "end": "\\)",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.operator.extension.styled-ppx"
+        },
+        "2": {
+          "name": "keyword.other.extension.styled-ppx"
+        }
+      },
+      "patterns": [
+        {
+          "begin": "`",
+          "end": "`",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.styled-ppx"
+            }
+          },
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.styled-ppx"
+            }
+          },
+          "contentName": "meta.embedded.block.css",
+          "patterns": [
+            {
+              "include": "source.css.styled-ppx"
+            }
+          ]
+        },
+        {
+          "begin": "\"",
+          "end": "\"",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.styled-ppx"
+            }
+          },
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.styled-ppx"
+            }
+          },
+          "contentName": "meta.embedded.block.css",
+          "patterns": [
+            {
+              "include": "source.css.styled-ppx"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

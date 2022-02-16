@@ -716,7 +716,7 @@
               "name": "punctuation.separator.key-value.scss"
             }
           },
-          "end": "\\s*(;|(?=}|\\|}|\\)|\"))",
+          "end": "\\s*(;|(?=}|\\|}|\\)|\"|`))",
           "endCaptures": {
             "1": {
               "name": "punctuation.terminator.rule.scss"
