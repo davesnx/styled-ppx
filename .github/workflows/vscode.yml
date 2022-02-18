@@ -12,7 +12,9 @@ jobs:
   test:
     name: VSCode extension
     runs-on: ${{ matrix.os }}
+    if: github.repository_owner == 'davesnx'
     strategy:
+      fail-fast: true
       matrix:
         os: [ubuntu-latest, macos-latest]
 
