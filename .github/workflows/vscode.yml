@@ -2,11 +2,9 @@ name: VSCode Extension CI
 
 on:
   push:
-    paths: 'packages/editors/vscode'
     branches:
       - main
   pull_request:
-    paths: 'packages/editors/vscode'
     branches:
       - main
 
@@ -21,17 +19,27 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            src:
+              - 'packages/editors/**'
+
       - name: Use Node.js 12.x
         uses: actions/setup-node@v1
+        if: steps.changes.outputs.src == 'true'
         with:
           node-version: 12.x
 
       - name: Get cache directory path
+        if: steps.changes.outputs.src == 'true'
         id: yarn-cache-dir-path
         working-directory: ./packages/editors/vscode
         run: echo "::set-output name=dir::$(yarn cache dir)"
 
       - name: Load global cache
+        if: steps.changes.outputs.src == 'true'
         uses: actions/cache@v1
         id: yarn-cache
         with:
@@ -40,10 +48,12 @@ jobs:
           restore-keys: yarn-${{ matrix.os }}-
 
       - name: Install
+        if: steps.changes.outputs.src == 'true'
         working-directory: ./packages/editors/vscode
         run: yarn install
 
       - name: Test
+        if: steps.changes.outputs.src == 'true'
         uses: GabrielBB/xvfb-action@v1
         with:
           working-directory: ./packages/editors/vscode
