@@ -61,9 +61,25 @@ jobs:
           working-directory: ./packages/editors/vscode
           run: npm test
 
-      - name: Publish to Visual Studio Marketplace
+      - name: Check for publish
         if: steps.changes.outputs.src == 'true'
+        id: should-publish
+        with:
+          working-directory: ./packages/editors/vscode
+        run: |
+          REMOTE=$(vsce show davesnx.vscode-styled-ppx | grep "Version:" | awk '{print $2}')
+          CURRENT=$(jq -r '.version' package.json)
+          if [ "$REMOTE" != "$CURRENT" ]
+          then
+              echo "::set-output name=value::true"
+          else
+              echo "::set-output name=value::false"
+          fi
+
+      - name: Publish to Visual Studio Marketplace
+        if: steps.changes.outputs.src == 'true' && steps.should-publish.outputs.value == 'true'
         uses: HaaLeo/publish-vscode-extension@v1
         with:
           pat: ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
           registryUrl: https://marketplace.visualstudio.com
+          working-directory: ./packages/editors/vscode
