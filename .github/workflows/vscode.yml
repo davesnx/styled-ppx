@@ -27,6 +27,7 @@ jobs:
           filters: |
             src:
               - 'packages/editors/**'
+              - '.github/workflows/vscode.yml'
 
       - name: Use Node.js 12.x
         uses: actions/setup-node@v1
@@ -58,11 +59,12 @@ jobs:
         if: steps.changes.outputs.src == 'true'
         uses: GabrielBB/xvfb-action@v1
         with:
-          working-directory: ./packages/editors/vscode
           run: npm test
 
       - name: Check for publish
         if: steps.changes.outputs.src == 'true'
+        working-directory: ./packages/editors/vscode
+
         id: should-publish
         run: |
           REMOTE=$(vsce show davesnx.vscode-styled-ppx | grep "Version:" | awk '{print $2}')
@@ -73,8 +75,6 @@ jobs:
           else
               echo "::set-output name=value::false"
           fi
-        with:
-          working-directory: ./packages/editors/vscode
 
       - name: Publish to Visual Studio Marketplace
         if: steps.changes.outputs.src == 'true' && steps.should-publish.outputs.value == 'true'
