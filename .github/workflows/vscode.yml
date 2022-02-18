@@ -60,3 +60,10 @@ jobs:
         with:
           working-directory: ./packages/editors/vscode
           run: npm test
+
+      - name: Publish to Visual Studio Marketplace
+        if: steps.changes.outputs.src == 'true'
+        uses: HaaLeo/publish-vscode-extension@v1
+        with:
+          pat: ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
+          registryUrl: https://marketplace.visualstudio.com
