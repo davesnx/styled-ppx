@@ -2,7 +2,7 @@
   "name": "vscode-styled-ppx",
   "displayName": "vscode-styled-ppx",
   "description": "Syntax highlighting for styled-ppx",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "publisher": "davesnx",
   "license": "MIT",
   "repository": {
