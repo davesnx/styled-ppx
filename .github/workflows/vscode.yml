@@ -2,11 +2,11 @@ name: VSCode Extension CI
 
 on:
   push:
-    paths: 'packages/editors/*'
+    paths: 'packages/editors/vscode'
     branches:
       - main
   pull_request:
-    paths: 'packages/editors/*'
+    paths: 'packages/editors/vscode'
     branches:
       - main
 
