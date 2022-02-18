@@ -64,8 +64,6 @@ jobs:
       - name: Check for publish
         if: steps.changes.outputs.src == 'true'
         id: should-publish
-        with:
-          working-directory: ./packages/editors/vscode
         run: |
           REMOTE=$(vsce show davesnx.vscode-styled-ppx | grep "Version:" | awk '{print $2}')
           CURRENT=$(jq -r '.version' package.json)
@@ -75,6 +73,8 @@ jobs:
           else
               echo "::set-output name=value::false"
           fi
+        with:
+          working-directory: ./packages/editors/vscode
 
       - name: Publish to Visual Studio Marketplace
         if: steps.changes.outputs.src == 'true' && steps.should-publish.outputs.value == 'true'
