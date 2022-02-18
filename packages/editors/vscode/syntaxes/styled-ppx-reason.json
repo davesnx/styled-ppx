@@ -1,0 +1,87 @@
+{
+  "scopeName": "source.styled-ppx-reason",
+  "fileTypes": ["re"],
+  "injectionSelector": "L:source -comment -string",
+  "patterns": [
+    {
+      "begin": "\\[(%)(styled.global)\\b",
+      "end": "]",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.operator.extension.styled-ppx-reason"
+        },
+        "2": {
+          "name": "keyword.other.extension.styled-ppx-reason"
+        }
+      },
+      "patterns": [
+        { "include": "source.styled-ppx-ocaml#css-string-quoted" },
+        { "include": "source.styled-ppx-ocaml#css-string" }
+      ]
+    },
+    {
+      "begin": "\\[(%)(styled(\\.[a-zA-Z]*)?|css|cx)\\b",
+      "end": "]",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.operator.extension.styled-ppx-reason"
+        },
+        "2": {
+          "name": "keyword.other.extension.styled-ppx-reason"
+        }
+      },
+      "patterns": [
+        { "include": "source.styled-ppx-ocaml#css-string-quoted" },
+        { "include": "source.styled-ppx-ocaml#css-string" },
+        { "include": "#groups" },
+        { "include": "source.reason" }
+      ]
+    }
+  ],
+  "repository": {
+    "groups": {
+      "patterns": [
+        {
+          "begin": "\\(",
+          "end": "\\)",
+          "patterns": [
+            { "include": "source.styled-ppx-ocaml#css-string-quoted" },
+            { "include": "source.styled-ppx-ocaml#css-string" },
+            { "include": "#groups" },
+            { "include": "source.reason" }
+          ]
+        },
+        {
+          "begin": "\\[\\|",
+          "end": "\\|\\]",
+          "patterns": [
+            { "include": "source.styled-ppx-ocaml#css-string-quoted" },
+            { "include": "source.styled-ppx-ocaml#css-string" },
+            { "include": "#groups" },
+            { "include": "source.reason" }
+          ]
+        },
+        {
+          "begin": "\\[",
+          "end": "\\]",
+          "patterns": [
+            { "include": "source.styled-ppx-ocaml#css-string-quoted" },
+            { "include": "source.styled-ppx-ocaml#css-string" },
+            { "include": "#groups" },
+            { "include": "source.reason" }
+          ]
+        },
+        {
+          "begin": "\\{",
+          "end": "\\}",
+          "patterns": [
+            { "include": "source.styled-ppx-ocaml#css-string-quoted" },
+            { "include": "source.styled-ppx-ocaml#css-string" },
+            { "include": "#groups" },
+            { "include": "source.reason" }
+          ]
+        }
+      ]
+    }
+  }
+}

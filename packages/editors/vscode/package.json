@@ -37,13 +37,32 @@
       },
       {
         "injectTo": [
-          "source.reason",
-          "source.re",
-          "source.ml",
           "source.ocaml"
         ],
-        "scopeName": "source.styled-ppx",
-        "path": "./syntaxes/styled-ppx.json",
+        "scopeName": "source.styled-ppx-ocaml",
+        "path": "./syntaxes/styled-ppx-ocaml.json",
+        "embeddedLanguages": {
+          "source.css.scss": "css",
+          "meta.embedded.block.css": "css"
+        }
+      },
+      {
+        "injectTo": [
+          "source.reason"
+        ],
+        "scopeName": "source.styled-ppx-reason",
+        "path": "./syntaxes/styled-ppx-reason.json",
+        "embeddedLanguages": {
+          "source.css.scss": "css",
+          "meta.embedded.block.css": "css"
+        }
+      },
+      {
+        "injectTo": [
+          "source.rescript"
+        ],
+        "scopeName": "source.styled-ppx-rescript",
+        "path": "./syntaxes/styled-ppx-rescript.json",
         "embeddedLanguages": {
           "source.css.scss": "css",
           "meta.embedded.block.css": "css"
