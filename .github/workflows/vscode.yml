@@ -62,6 +62,7 @@ jobs:
         uses: GabrielBB/xvfb-action@v1
         with:
           run: node ./tests/index.js
+          working-directory: ./packages/editors/vscode
 
       - name: Check for publish
         if: steps.changes.outputs.src == 'true'
