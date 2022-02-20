@@ -83,3 +83,4 @@ jobs:
         with:
           pat: ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
           registryUrl: https://marketplace.visualstudio.com
+          packagePath: packages/editors/vscode
