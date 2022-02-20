@@ -66,11 +66,12 @@ jobs:
 
       - name: Check for publish
         if: steps.changes.outputs.src == 'true'
-
         id: should-publish
         run: |
           REMOTE=$(npx vsce show davesnx.vscode-styled-ppx | grep "Version:" | awk '{print $2}')
           CURRENT=$(jq -r '.version' package.json)
+          echo $REMOTE
+          echo $CURRENT
           if [ "$REMOTE" != "$CURRENT" ]
           then
               echo "::set-output name=value::true"
