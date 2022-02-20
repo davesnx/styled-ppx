@@ -61,7 +61,7 @@ jobs:
         if: steps.changes.outputs.src == 'true'
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: yarn test
+          run: node ./tests/index.js
 
       - name: Check for publish
         if: steps.changes.outputs.src == 'true'
