@@ -16,7 +16,6 @@ jobs:
   test:
     name: VSCode extension
     runs-on: ${{ matrix.os }}
-    working-directory: ./packages/editors/vscode
     if: github.repository_owner == 'davesnx'
     strategy:
       fail-fast: true
