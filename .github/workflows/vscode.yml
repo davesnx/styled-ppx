@@ -33,11 +33,11 @@ jobs:
               - 'packages/editors/**'
               - '.github/workflows/vscode.yml'
 
-      - name: Use Node.js 12.x
+      - name: Use Node.js 16.x
         uses: actions/setup-node@v1
         if: steps.changes.outputs.src == 'true'
         with:
-          node-version: 12.x
+          node-version: 16.x
 
       - name: Get cache directory path
         if: steps.changes.outputs.src == 'true'
