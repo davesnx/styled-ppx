@@ -76,7 +76,7 @@ let token_to_string =
     ++ dimension_to_string(d)
     ++ ")"
   | Parser.DIMENSION((n, d)) => "DIMENSION(" ++ n ++ ", " ++ d ++ ")"
-  | Parser.VARIABLE(v) => "VARIABLE(" ++ String.concat(".", v) ++ ")"
+  | Parser.VARIABLE(v) => "VARIABLE(" ++ v ++ ")"
   | Parser.UNSAFE => "UNSAFE";
 
 let () =
@@ -335,7 +335,7 @@ and get_dimension = (n, buf) =>
   }
 and get_variable = (buf) =>
   switch%sedlex (buf) {
-  | variable_name => VARIABLE([Sedlexing.latin1(buf)])
+  | variable_name => VARIABLE(Sedlexing.latin1(buf))
   | _ =>
     raise(
       LexingError((
