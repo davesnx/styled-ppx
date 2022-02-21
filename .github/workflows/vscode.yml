@@ -77,15 +77,8 @@ jobs:
               echo "::set-output name=value::false"
           fi
 
-      - name: Check for publish value
-        if: steps.changes.outputs.src == 'true'
-        run: |
-          echo ${{ steps.changes.outputs.src }};
-          echo ${{ steps.should-publish.outputs.value }};
-          echo ${{ matrix.os == 'ubuntu-latest' }};
-
       - name: Publish to Visual Studio Marketplace
-        if: ${{ steps.changes.outputs.src == 'true' }} && ${{ steps.should-publish.outputs.value == 'true' }} && ${{ matrix.os == 'ubuntu-latest' }}
+        if: ${{ steps.changes.outputs.src == 'true' && steps.should-publish.outputs.value == 'true' && matrix.os == 'ubuntu-latest' }}
         uses: HaaLeo/publish-vscode-extension@v1
         with:
           pat: ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
