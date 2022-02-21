@@ -68,7 +68,7 @@ module Layout = [%styled.div [|
     href="https://sancho.dev"
     rel="noopener noreferrer"
   />
-  <span className={[%cx "color: black; position: absolute; left: 0px;"]}>
+  <span className={[%cx "position: absolute; left: 0px;"]}>
     {React.string("sancho.dev")}
   </span>
 </Layout>
