@@ -70,12 +70,12 @@ jobs:
         run: |
           REMOTE=$(npx vsce show davesnx.vscode-styled-ppx | grep "Version:" | awk '{print $2}')
           CURRENT=$(jq -r '.version' package.json)
-          echo $REMOTE
-          echo $CURRENT
           if [ "$REMOTE" != "$CURRENT" ]
           then
+              echo "different"
               echo "::set-output name=value::true"
           else
+              echo "equal"
               echo "::set-output name=value::false"
           fi
 
