@@ -144,8 +144,9 @@ jobs:
 
   publish:
     name: Publish
-    runs-on: ubuntu-18.04
     needs: build
+    if: github.repository_owner == 'davesnx'
+    runs-on: ubuntu-18.04
 
     steps:
       - uses: actions/checkout@v1
