@@ -72,15 +72,13 @@ jobs:
           CURRENT=$(jq -r '.version' package.json)
           if [ "$REMOTE" != "$CURRENT" ]
           then
-              echo "different"
               echo "::set-output name=value::true"
           else
-              echo "equal"
               echo "::set-output name=value::false"
           fi
 
       - name: Publish to Visual Studio Marketplace
-        if: steps.changes.outputs.src == 'true' && steps.should-publish.outputs.value == 'true' && ${{ matrix.os == 'ubuntu-latest' }}
+        if: ${{ steps.changes.outputs.src == 'true' }} && ${{ steps.should-publish.outputs.value == 'true' }} && ${{ matrix.os == 'ubuntu-latest' }}
         uses: HaaLeo/publish-vscode-extension@v1
         with:
           pat: ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
