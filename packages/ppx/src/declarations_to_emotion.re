@@ -113,7 +113,7 @@ let variants_to_expression =
   | `Keep_all => id([%expr `keepAll])
   | `Anywhere => id([%expr `anywhere])
   | `BreakWord => id([%expr `breakWord])
-  | `End => raise(Unsupported_feature)
+  | `End => id([%expr `end_])
   | `Justify => id([%expr `justify])
   | `Justify_all => raise(Unsupported_feature)
   | `Left => id([%expr `left])
@@ -665,6 +665,7 @@ let render_function_hsl = ((hue, saturation, lightness, alpha)) => {
 
 let render_color =
   fun
+  | `Interpolation(v) => render_variable(v)
   | `Hex_color(hex) => id([%expr `hex([%e render_string(hex)])])
   | `Named_color(color) => render_named_color(color)
   | `CurrentColor => id([%expr `currentColor])
@@ -1142,7 +1143,12 @@ let line_height =
     [%expr CssJs.lineHeight],
     render_line_height,
   );
-let line_height_step = unsupportedProperty(Parser.property_line_height_step);
+let line_height_step =
+apply(
+  Parser.property_line_height_step,
+  [%expr CssJs.lineHeightStep],
+  render_extended_length,
+);
 let hyphens = unsupportedProperty(Parser.property_hyphens);
 let overflow_wrap =
   variants(Parser.property_overflow_wrap, [%expr CssJs.overflowWrap]);
