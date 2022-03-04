@@ -439,11 +439,7 @@ let render_named_color =
   | `Transparent => variants_to_expression(`Transparent)
   | `Aliceblue => [%expr CssJs.aliceblue]
   | `Antiquewhite => [%expr CssJs.antiquewhite]
-  | `Aqua =>
-    Builder.pexp_ident(
-      ~loc,
-      {loc: Location.none, txt: Ldot(Lident("CssJs"), "aqua")},
-    )
+  | `Aqua => [%expr CssJs.aqua]
   | `Aquamarine => [%expr CssJs.aquamarine]
   | `Azure => [%expr CssJs.azure]
   | `Beige => [%expr CssJs.beige]
@@ -924,7 +920,7 @@ let border_bottom_style =
 let border_left_style =
   variants(Parser.property_border_left_style, [%expr CssJs.borderLeftStyle]);
 let border_style =
-  unsupportedValue(Parser.property_border_style, [%expr CssJs.borderStyle]);
+  apply(Parser.property_border_style, [%expr CssJs.borderStyle], variants_to_expression);
 
 let render_line_width =
   fun
@@ -1569,6 +1565,7 @@ let bottom =
     [%expr CssJs.bottom],
     render_position_value,
   );
+
 let display =
   apply(
     Parser.property_display,
