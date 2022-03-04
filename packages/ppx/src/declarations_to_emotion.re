@@ -226,9 +226,11 @@ and render_list_of_products = (list_of_products) => {
 } and render_extended_length = fun
   | `Length(l) => render_length(l)
   | `Function_calc(fc) => render_function_calc(fc)
+  | `Interpolation(i) => render_variable(i)
 and render_extended_percentage = fun
   | `Percentage(p) => render_percentage(p)
-  | `Function_calc(fc) => render_function_calc(fc);
+  | `Function_calc(fc) => render_function_calc(fc)
+  | `Interpolation(i) => render_variable(i);
 
 // css-sizing-3
 let render_size =
@@ -251,7 +253,8 @@ let render_angle =
 
 let render_extended_angle = fun
   | `Angle(a) => render_angle(a)
-  | `Function_calc(fc) => render_function_calc(fc);
+  | `Function_calc(fc) => render_function_calc(fc)
+  | `Interpolation(i) => render_variable(i);
 
 let transform_with_variable = (parser, mapper, value_to_expr) =>
   emit(
@@ -596,7 +599,9 @@ let render_function_rgb = ast => {
   let to_number = fun
     // TODO: bs-css rgb(float, float, float)
     | `Percentage(pct) => color_to_float(pct *. 2.55)
-    | `Function_calc(fc) => render_function_calc(fc);
+    | `Function_calc(fc) => render_function_calc(fc)
+    | `Interpolation(v) => render_variable(v)
+    | `Extended_percentage(ext) => render_extended_percentage(ext);
 
   let (colors, alpha) =
     switch (ast) {
