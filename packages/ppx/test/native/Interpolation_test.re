@@ -98,9 +98,9 @@ let properties_variable_css_tests = [
 
 describe("Should bind to bs-css with interpolatated variables", ({test, _}) => {
   properties_variable_css_tests |>
-    List.iteri((index, (result, expected)) =>
+    List.iteri((_index, (result, expected)) =>
       test(
-        "simple variable: " ++ string_of_int(index),
+        "simple variable: " ++ Pprintast.string_of_expression(expected),
         compare(result, expected),
       )
     );
