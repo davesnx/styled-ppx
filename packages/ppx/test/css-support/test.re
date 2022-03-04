@@ -563,8 +563,8 @@
 [%css {|offset: auto|}];
 [%css {|offset: center|}];
 [%css {|offset: 200px 100px|}];
-[%css {|offset: inset(10% round 10% 40% 10% 40%)|}];
-[%css {|offset: ellipse(at top 50% left 20%)|}];
+/* [%css {|offset: inset(10% round 10% 40% 10% 40%)|}]; */
+/* [%css {|offset: ellipse(at top 50% left 20%)|}]; */
 /* [%css {|offset: circle(at right 5% top)|}]; */
 [%css {|offset: margin-box|}];
 [%css {|offset: border-box|}];
