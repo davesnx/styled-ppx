@@ -477,7 +477,8 @@ and property_border_left = [%value.rec "<line-width> || <line-style> || <color>"
 and property_border_left_color = [%value.rec "<color>"]
 and property_border_left_style = [%value.rec "<line-style>"]
 and property_border_left_width = [%value.rec "<line-width>"]
-and property_border_radius = [%value.rec "[ <extended-length> | <extended-percentage> ]{1,4} [ '/' [ <extended-length> | <extended-percentage> ]{1,4} ]?"]
+/* border-radius isn't supported with the entire spec in bs-css: `"[ <extended-length> | <extended-percentage> ]{1,4} [ '/' [ <extended-length> | <extended-percentage> ]{1,4} ]?"` */
+and property_border_radius = [%value.rec "<extended-length> | <extended-percentage>"]
 and property_border_right = [%value.rec "<line-width> || <line-style> || <color>"]
 and property_border_right_color = [%value.rec "<color>"]
 and property_border_right_style = [%value.rec "<line-style>"]
