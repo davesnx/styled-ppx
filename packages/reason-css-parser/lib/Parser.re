@@ -273,7 +273,9 @@ and property__moz_border_radius_bottomleft = [%value.rec "<'border-bottom-left-r
 and property__moz_border_radius_bottomright = [%value.rec "<'border-bottom-right-radius'>"]
 and property__moz_border_radius_topleft = [%value.rec "<'border-top-left-radius'>"]
 and property__moz_border_radius_topright = [%value.rec "<'border-bottom-right-radius'>"]
+/* TODO: Remove interpolation without <> */
 and property__moz_border_right_colors = [%value.rec "[ <color> ]+ | 'none' | interpolation"]
+/* TODO: Remove interpolation without <> */
 and property__moz_border_top_colors = [%value.rec "[ <color> ]+ | 'none' | interpolation"]
 and property__moz_context_properties = [%value.rec "'none' | [ 'fill' | 'fill-opacity' | 'stroke' | 'stroke-opacity' ]#"]
 and property__moz_control_character_visibility = [%value.rec "'visible' | 'hidden'"]
