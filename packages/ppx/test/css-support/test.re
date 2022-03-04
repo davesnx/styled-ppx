@@ -54,9 +54,9 @@
 [%css {|border-bottom-left-radius: 250px 100px|}];
 [%css {|border-radius: 10px|}];
 [%css {|border-radius: 50%|}];
-[%css {|border-radius: 10px / 20px|}];
-[%css {|border-radius: 2px 4px 8px 16px|}];
-[%css {|border-radius: 2px 4px 8px 16px / 2px 4px 8px 16px|}];
+/* [%css {|border-radius: 10px / 20px|}]; */
+/* [%css {|border-radius: 2px 4px 8px 16px|}]; */
+/* [%css {|border-radius: 2px 4px 8px 16px / 2px 4px 8px 16px|}]; */
 [%css {|border-image-source: none|}];
 [%css {|border-image-source: url(foo.png)|}];
 [%css {|border-image-slice: 10|}];
