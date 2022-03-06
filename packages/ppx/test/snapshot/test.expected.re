@@ -977,7 +977,7 @@ module OneSingleProperty = {
   let make = (props: makeProps) => {
     let className = styles ++ getOrEmpty(classNameGet(props));
     let stylesObject = {"className": className, "ref": innerRefGet(props)};
-    let newProps = assign2(Js.Obj.empty, Obj.magic(props), stylesObject);
+    let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
     ignore(deleteProp(newProps, "innerRef"));
     createVariadicElement("div", newProps);
   };
@@ -1952,7 +1952,7 @@ module SingleQuoteStrings = {
   let make = (props: makeProps) => {
     let className = styles ++ getOrEmpty(classNameGet(props));
     let stylesObject = {"className": className, "ref": innerRefGet(props)};
-    let newProps = assign2(Js.Obj.empty, Obj.magic(props), stylesObject);
+    let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
     ignore(deleteProp(newProps, "innerRef"));
     createVariadicElement("section", newProps);
   };
@@ -2927,7 +2927,7 @@ module MultiLineStrings = {
   let make = (props: makeProps) => {
     let className = styles ++ getOrEmpty(classNameGet(props));
     let stylesObject = {"className": className, "ref": innerRefGet(props)};
-    let newProps = assign2(Js.Obj.empty, Obj.magic(props), stylesObject);
+    let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
     ignore(deleteProp(newProps, "innerRef"));
     createVariadicElement("section", newProps);
   };
@@ -3897,7 +3897,7 @@ module SelfClosingElement = {
   let make = (props: makeProps) => {
     let className = styles ++ getOrEmpty(classNameGet(props));
     let stylesObject = {"className": className, "ref": innerRefGet(props)};
-    let newProps = assign2(Js.Obj.empty, Obj.magic(props), stylesObject);
+    let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
     ignore(deleteProp(newProps, "innerRef"));
     createVariadicElement("input", newProps);
   };
@@ -4872,7 +4872,7 @@ module ArrayStatic = {
   let make = (props: makeProps) => {
     let className = styles ++ getOrEmpty(classNameGet(props));
     let stylesObject = {"className": className, "ref": innerRefGet(props)};
-    let newProps = assign2(Js.Obj.empty, Obj.magic(props), stylesObject);
+    let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
     ignore(deleteProp(newProps, "innerRef"));
     createVariadicElement("section", newProps);
   };
@@ -5857,7 +5857,7 @@ module StringInterpolation = {
   let make = (props: makeProps) => {
     let className = styles ++ getOrEmpty(classNameGet(props));
     let stylesObject = {"className": className, "ref": innerRefGet(props)};
-    let newProps = assign2(Js.Obj.empty, Obj.magic(props), stylesObject);
+    let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
     ignore(deleteProp(newProps, "innerRef"));
     createVariadicElement("div", newProps);
   };
@@ -6850,7 +6850,7 @@ module DynamicComponent = {
     let className =
       styles(~var=varGet(props), ()) ++ getOrEmpty(classNameGet(props));
     let stylesObject = {"className": className, "ref": innerRefGet(props)};
-    let newProps = assign2(Js.Obj.empty, Obj.magic(props), stylesObject);
+    let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
     ignore(deleteProp(newProps, "var"));
     ignore(deleteProp(newProps, "innerRef"));
     createVariadicElement("div", newProps);
@@ -7833,7 +7833,7 @@ module SelectorsMediaQueries = {
   let make = (props: makeProps) => {
     let className = styles ++ getOrEmpty(classNameGet(props));
     let stylesObject = {"className": className, "ref": innerRefGet(props)};
-    let newProps = assign2(Js.Obj.empty, Obj.magic(props), stylesObject);
+    let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
     ignore(deleteProp(newProps, "innerRef"));
     createVariadicElement("div", newProps);
   };
@@ -8818,7 +8818,7 @@ module ArrayDynamicComponent = {
     let className =
       styles(~var=varGet(props), ()) ++ getOrEmpty(classNameGet(props));
     let stylesObject = {"className": className, "ref": innerRefGet(props)};
-    let newProps = assign2(Js.Obj.empty, Obj.magic(props), stylesObject);
+    let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
     ignore(deleteProp(newProps, "var"));
     ignore(deleteProp(newProps, "innerRef"));
     createVariadicElement("div", newProps);
@@ -9792,7 +9792,7 @@ module SequenceDynamicComponent = {
     let className =
       styles(~size=sizeGet(props), ()) ++ getOrEmpty(classNameGet(props));
     let stylesObject = {"className": className, "ref": innerRefGet(props)};
-    let newProps = assign2(Js.Obj.empty, Obj.magic(props), stylesObject);
+    let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
     ignore(deleteProp(newProps, "size"));
     ignore(deleteProp(newProps, "innerRef"));
     createVariadicElement("div", newProps);
@@ -10771,7 +10771,7 @@ module DynamicComponentWithDefaultValue = {
     let className =
       styles(~var=?varGet(props), ()) ++ getOrEmpty(classNameGet(props));
     let stylesObject = {"className": className, "ref": innerRefGet(props)};
-    let newProps = assign2(Js.Obj.empty, Obj.magic(props), stylesObject);
+    let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
     ignore(deleteProp(newProps, "var"));
     ignore(deleteProp(newProps, "innerRef"));
     createVariadicElement("div", newProps);
