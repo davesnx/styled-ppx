@@ -83,10 +83,10 @@ let properties_static_css_tests = [%expr
       [%css "flex-direction: column"],
       CssJs.flexDirection(`column)
     ),
-    /* (
+    (
       [%css "font-size: 30px"],
-      CssJs.unsafe("fontSize", "30px")),
-    */
+      CssJs.fontSize(`pxFloat(30.))
+    ),
     (
       [%css "height: 100vh"],
       CssJs.height(`vh(100.))

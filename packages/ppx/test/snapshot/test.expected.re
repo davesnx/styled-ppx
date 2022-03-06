@@ -7734,7 +7734,7 @@ module SelectorsMediaQueries = {
       CssJs.hover([|CssJs.unsafe("background", "green")|]),
       CssJs.selector(.
         {js|& > p|js},
-        [|CssJs.color(CssJs.pink), CssJs.unsafe("fontSize", "24px")|],
+        [|CssJs.color(CssJs.pink), CssJs.fontSize(`pxFloat(24.))|],
       ),
     |]);
   let make = (props: makeProps) => {

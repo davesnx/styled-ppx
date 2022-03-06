@@ -113,7 +113,7 @@ let variants_to_expression =
   | `Keep_all => id([%expr `keepAll])
   | `Anywhere => id([%expr `anywhere])
   | `BreakWord => id([%expr `breakWord])
-  | `End => raise(Unsupported_feature)
+  | `End => id([%expr `end_])
   | `Justify => id([%expr `justify])
   | `Justify_all => raise(Unsupported_feature)
   | `Left => id([%expr `left])
@@ -226,9 +226,11 @@ and render_list_of_products = (list_of_products) => {
 } and render_extended_length = fun
   | `Length(l) => render_length(l)
   | `Function_calc(fc) => render_function_calc(fc)
+  | `Interpolation(i) => render_variable(i)
 and render_extended_percentage = fun
   | `Percentage(p) => render_percentage(p)
-  | `Function_calc(fc) => render_function_calc(fc);
+  | `Function_calc(fc) => render_function_calc(fc)
+  | `Interpolation(i) => render_variable(i);
 
 // css-sizing-3
 let render_size =
@@ -251,14 +253,19 @@ let render_angle =
 
 let render_extended_angle = fun
   | `Angle(a) => render_angle(a)
-  | `Function_calc(fc) => render_function_calc(fc);
+  | `Function_calc(fc) => render_function_calc(fc)
+  | `Interpolation(i) => render_variable(i);
+
+let render_length_percentage = fun
+  | `Extended_length(ext) => render_extended_length(ext)
+  | `Extended_percentage(ext) => render_extended_percentage(ext);
 
 let transform_with_variable = (parser, mapper, value_to_expr) =>
   emit(
     Combinator.combine_xor([
-      /* If the CSS value is an interpolation, we treat as one `Variable */
+      /* If the entire CSS value is interpolated, we treat it as a `Variable */
       Rule.Match.map(Standard.interpolation, data => `Variable(data)),
-      /* Otherwise it's a regular CSS `Value */
+      /* Otherwise it's a regular CSS `Value and run the mapper below*/
       Rule.Match.map(parser, data => `Value(data)),
     ]),
     fun
@@ -432,11 +439,7 @@ let render_named_color =
   | `Transparent => variants_to_expression(`Transparent)
   | `Aliceblue => [%expr CssJs.aliceblue]
   | `Antiquewhite => [%expr CssJs.antiquewhite]
-  | `Aqua =>
-    Builder.pexp_ident(
-      ~loc,
-      {loc: Location.none, txt: Ldot(Lident("CssJs"), "aqua")},
-    )
+  | `Aqua => [%expr CssJs.aqua]
   | `Aquamarine => [%expr CssJs.aquamarine]
   | `Azure => [%expr CssJs.azure]
   | `Beige => [%expr CssJs.beige]
@@ -596,7 +599,9 @@ let render_function_rgb = ast => {
   let to_number = fun
     // TODO: bs-css rgb(float, float, float)
     | `Percentage(pct) => color_to_float(pct *. 2.55)
-    | `Function_calc(fc) => render_function_calc(fc);
+    | `Function_calc(fc) => render_function_calc(fc)
+    | `Interpolation(v) => render_variable(v)
+    | `Extended_percentage(ext) => render_extended_percentage(ext);
 
   let (colors, alpha) =
     switch (ast) {
@@ -660,6 +665,7 @@ let render_function_hsl = ((hue, saturation, lightness, alpha)) => {
 
 let render_color =
   fun
+  | `Interpolation(v) => render_variable(v)
   | `Hex_color(hex) => id([%expr `hex([%e render_string(hex)])])
   | `Named_color(color) => render_named_color(color)
   | `CurrentColor => id([%expr `currentColor])
@@ -915,7 +921,7 @@ let border_bottom_style =
 let border_left_style =
   variants(Parser.property_border_left_style, [%expr CssJs.borderLeftStyle]);
 let border_style =
-  unsupportedValue(Parser.property_border_style, [%expr CssJs.borderStyle]);
+  apply(Parser.property_border_style, [%expr CssJs.borderStyle], variants_to_expression);
 
 let render_line_width =
   fun
@@ -1053,9 +1059,10 @@ let border_bottom_left_radius =
     border_value,
   );
 let border_radius =
-  unsupportedValue(
+  apply(
     Parser.property_border_radius,
     [%expr CssJs.borderRadius],
+    render_length_percentage
   );
 let border_image_source = unsupportedProperty(Parser.property_border_image_source);
 let border_image_slice = unsupportedProperty(Parser.property_border_image_slice);
@@ -1124,9 +1131,24 @@ let tab_size = unsupportedProperty(Parser.property_tab_size);
 let word_break =
   variants(Parser.property_word_break, [%expr CssJs.wordBreak]);
 let line_break = unsupportedProperty(Parser.property_line_break);
+let render_line_height = fun
+  | `Extended_length(ext) => render_extended_length(ext)
+  | `Extended_percentage(ext) => render_extended_percentage(ext)
+  | `Normal => variants_to_expression(`Normal)
+  | `Number(float) => [%expr `abs([%e render_number(float) ])];
+
 let line_height =
-  unsupportedValue(Parser.property_line_height, [%expr CssJs.lineHeight]);
-let line_height_step = unsupportedProperty(Parser.property_line_height_step);
+  apply(
+    Parser.property_line_height,
+    [%expr CssJs.lineHeight],
+    render_line_height,
+  );
+let line_height_step =
+apply(
+  Parser.property_line_height_step,
+  [%expr CssJs.lineHeightStep],
+  render_extended_length,
+);
 let hyphens = unsupportedProperty(Parser.property_hyphens);
 let overflow_wrap =
   variants(Parser.property_overflow_wrap, [%expr CssJs.overflowWrap]);
@@ -1173,8 +1195,27 @@ let font_weight =
 let font_stretch = unsupportedProperty(Parser.property_font_stretch);
 let font_style =
   unsupportedValue(Parser.property_font_style, [%expr CssJs.fontStyle]);
+
+/* bs-css does not support these variants */
+let render_size_variants = fun
+  | `Large => id([%expr `large])
+  | `Medium => id([%expr `medium])
+  | `Small => id([%expr `small])
+  | `X_large => id([%expr `x_large])
+  | `X_small => id([%expr `x_small])
+  | `Xx_large => id([%expr `xx_large])
+  | `Xx_small => id([%expr `xx_small])
+  | `Xxx_large => id([%expr `xxx_large])
+  | `Larger => id([%expr `larger])
+  | `Smaller => id([%expr `smaller]);
+
+let render_font_size = fun
+  | `Absolute_size(size)
+  | `Relative_size(size) => render_size_variants(size)
+  | `Extended_length(ext) => render_extended_length(ext)
+  | `Extended_percentage(ext) => render_extended_percentage(ext);
 let font_size =
-  unsupportedValue(Parser.property_font_size, [%expr CssJs.fontSize]);
+  apply(Parser.property_font_size, [%expr CssJs.fontSize], render_font_size);
 let font_size_adjust = unsupportedProperty(Parser.property_font_size_adjust);
 let font = unsupportedProperty(Parser.property_font);
 // let font_synthesis_weight = unsupportedProperty(Parser.property_font_synthesis_weight);
@@ -1496,10 +1537,41 @@ let grid_area =
   unsupportedValue(Parser.property_grid_area, [%expr CssJs.gridArea]);
 let z_index =
   unsupportedValue(Parser.property_z_index, [%expr CssJs.zIndex]);
-let left = unsupportedValue(Parser.property_left, [%expr CssJs.left]);
-let top = unsupportedValue(Parser.property_top, [%expr CssJs.top]);
-let right = unsupportedValue(Parser.property_right, [%expr CssJs.right]);
-let bottom = unsupportedValue(Parser.property_bottom, [%expr CssJs.bottom]);
+
+let render_position_value =
+  fun
+    | `Auto => variants_to_expression(`Auto)
+    | `Extended_length(l) => render_extended_length(l)
+    | `Extended_percentage(pct) => render_extended_percentage(pct);
+
+let left =
+  apply(
+    Parser.property_left,
+    [%expr CssJs.left],
+    render_position_value,
+  );
+
+let top =
+  apply(
+    Parser.property_top,
+    [%expr CssJs.top],
+    render_position_value,
+  );
+
+let right =
+  apply(
+    Parser.property_right,
+    [%expr CssJs.right],
+    render_position_value,
+  );
+
+let bottom =
+  apply(
+    Parser.property_bottom,
+    [%expr CssJs.bottom],
+    render_position_value,
+  );
+
 let display =
   apply(
     Parser.property_display,
