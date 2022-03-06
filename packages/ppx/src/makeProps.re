@@ -112,6 +112,7 @@ let data = [
   Attribute({name: "charSet", type_: String, alias: None }),
   Attribute({name: "checked", type_: Bool, alias: None }),
   Attribute({name: "cite", type_: String, alias: None }),
+  Attribute({name: "className", type_: String, alias: None }),
   Attribute({name: "clip", type_: String, alias: None }),
   Attribute({name: "clipPath", type_: String, alias: None }),
   Attribute({name: "clipPathUnits", type_: String, alias: None }),
