@@ -49,9 +49,6 @@ module StringInterpolation = [%styled.div {j|
 let className = [%cx "display: block;"];
 let classNameWithMultiLine = [%cx {| display: block; |}];
 
-let classNameWithArray = [%cx [| cssProperty |]];
-let cssRule = [%css "color: blue;"];
-let classNameWithCss = [%cx [| cssRule, [%css "background-color: green;"] |]];
 
 module DynamicComponent = [%styled.div
   (~var) => {j|
@@ -102,6 +99,24 @@ module DynamicComponentWithDefaultValue = [%styled.div (~var=CssJs.hex("333")) =
   [%css "color: $(var);"],
   [%css "display: block;"]
 |]];
+
+
+let width = "120px";
+
+let orientation = "landscape"
+
+module SelectorWithInterpolation = [%styled.div {|
+  @media only screen and (min-width: $(width)) {
+    color: blue;
+  };
+
+  @media (min-width: 700px) and (orientation: $(orientation)) {
+    display: none;
+
+  }
+
+|}]
+
 
 /* This test ensures that the warning is being triggered */
 /* module T = [%styled.span () => [|
