@@ -63,13 +63,18 @@ let rec render_at_rule = (ar: At_rule.t): Parsetree.expression =>
     grammar_error(ar.At_rule.loc, "At-rule @" ++ n ++ " not supported")
   }
 and render_media_query = (ar: At_rule.t): Parsetree.expression => {
+  let concat = (~loc, expr, acc) => { 
+    let concat_fn = {txt: Lident("++"), loc}  |> Helper.Exp.ident(~loc); 
+    Helper.Exp.apply(~loc, concat_fn, [(Nolabel, expr), (Nolabel, acc)])
+  }
+
   let invalid_format = loc =>
     grammar_error(loc, "@media value isn't a valid format");
 
   let loc = ar.loc;
   let (_, name_loc) = ar.name;
-  let (prelude, prelude_loc) = ar.prelude;
-  let parse_condition =
+  let (prelude, _) = ar.prelude;
+  let parse_condition = (acc) =>
     fun
     | (
         Paren_block([
@@ -78,7 +83,7 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
           (_, first_value_loc),
           ...values,
         ]),
-        complete_loc,
+        _,
       ) => {
         let values = values |> List.map(((_, loc)) => loc);
         let values_length = List.length(values);
@@ -90,23 +95,24 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
           loc_end: last_value_loc.Location.loc_end,
         };
         let value = source_code_of_loc(loc);
-        let () =
-          switch (Declarations_to_emotion.parse_declarations(ident, value)) {
+        let exprs =
+          switch (Declarations_to_string.parse_declarations(ident, value)) {
           | Error(`Not_found) =>
             grammar_error(ident_loc, "unsupported property: " ++ ident)
           | Error(`Invalid_value(_error)) =>
             grammar_error(loc, "invalid value")
-          | Ok(_) => ()
+          | Ok(exprs) => exprs
           };
-        source_code_of_loc(complete_loc);
+          List.fold_left(concat(~loc), acc, exprs);
       }
-    | (Ident(id), _) => id
+    | (Ident(id), _) =>  { 
+      let id = Helper.Exp.constant(~loc, Helper.Const.string(id));
+      [%expr [%e acc] ++ [%e id] ++ " "] 
+      }
     | (_, loc) => invalid_format(loc);
 
-  let query = prelude |> List.map(parse_condition) |> String.concat(" ");
-  if (query == "") {
-    invalid_format(prelude_loc);
-  };
+
+  let query = prelude |> List.fold_left(parse_condition, [%expr ""])
 
   let rules =
     switch (ar.At_rule.block) {
@@ -122,7 +128,7 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
     ~loc,
     ~attrs=[Create.uncurried(~loc)],
     media_ident,
-    [(Nolabel, Builder.estring(~loc=prelude_loc, query)), (Nolabel, rules)],
+    [(Nolabel, query), (Nolabel, rules)],
   );
 }
 and render_declaration = (d: Declaration.t): list(Parsetree.expression) => {
