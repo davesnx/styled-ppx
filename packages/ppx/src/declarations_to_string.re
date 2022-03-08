@@ -10,8 +10,6 @@ let txt = txt => {Location.loc: Location.none, txt};
 
 let (let.ok) = Result.bind;
 
-exception Unsupported_feature;
-
 let id = Fun.id;
 
 let render_string = string =>
@@ -76,7 +74,7 @@ let variants_to_string =
   | `End => id([%expr "end"])
   | `Justify => id([%expr "justify"])
   | `Left => id([%expr "left"])
-  | `Match_parent => raise(Unsupported_feature)
+  | `Match_parent => id([%expr "match-parent"])
   | `Right => id([%expr "right"])
   | `Start => id([%expr "start"])
   | `Transparent => id([%expr "transparent"])
@@ -94,34 +92,33 @@ let variants_to_string =
   | `Contain => id([%expr "contain"])
   | `Scale_down => id([%expr "scale-down"])
   | `Cover => id([%expr "cover"])
-  | `Full_width => raise(Unsupported_feature)
+  | `Full_width => [%expr "full-width"]
   | `Unset => id([%expr "unset"])
-  | `Full_size_kana => raise(Unsupported_feature);
-
+  | `Full_size_kana => id([%expr "full-size-kana"]);
 let render_number = (number, unit) =>
   string_of_int(Float.to_int(number)) ++ unit |> render_string;
 let render_percentage = percentage =>
-  "%" ++ string_of_float(percentage *. 100.) |> render_string;
+  string_of_float(percentage *. 100.) ++ "%" |> render_string;
 let render_length =
   fun
-  | `Cap(_n) => raise(Unsupported_feature)
+  | `Cap(n) => render_number(n, "cap")
   | `Ch(n) => render_number(n, "cm")
   | `Cm(n) => render_number(n, "cm")
   | `Em(n) => render_number(n, "em")
   | `Ex(n) => render_number(n, "ex")
-  | `Ic(_n) => raise(Unsupported_feature)
-  | `In(_n) => raise(Unsupported_feature)
-  | `Lh(_n) => raise(Unsupported_feature)
+  | `Ic(n) => render_number(n, "ic")
+  | `In(n) => render_number(n, "in")
+  | `Lh(n) => render_number(n, "lh")
   | `Mm(n) => render_number(n, "mm")
   | `Pc(n) => render_number(n, "pc")
   | `Pt(n) => render_number(n, "pt")
   | `Px(n) => render_number(n, "px")
-  | `Q(_n) => raise(Unsupported_feature)
+  | `Q(n) => render_number(n, "q")
   | `Rem(n) => render_number(n, "rem")
-  | `Rlh(_n) => raise(Unsupported_feature)
-  | `Vb(_n) => raise(Unsupported_feature)
+  | `Rlh(n) => render_number(n, "rlh")
+  | `Vb(n) => render_number(n, "vb")
   | `Vh(n) => render_number(n, "vh")
-  | `Vi(_n) => raise(Unsupported_feature)
+  | `Vi(n) => render_number(n, "vi")
   | `Vmax(n) => render_number(n, "vmax")
   | `Vmin(n) => render_number(n, "vmin")
   | `Vw(n) => render_number(n, "vw")
@@ -137,10 +134,9 @@ let render_size =
   | `Auto => variants_to_string(`Auto)
   | `Length(_) as lp
   | `Percentage(_) as lp => render_length_percentage(lp)
-  | `Max_content
-  | `Min_content => raise(Unsupported_feature)
-  | `Fit_content(_) => raise(Unsupported_feature)
-  | _ => raise(Unsupported_feature);
+  | `Max_content => [%expr "max-content"]
+  | `Min_content => [%expr "min-content"]
+  | `Fit_content(_) => [%expr "fit-content"]
 
 let render_css_global_values = (name, value) => {
   let.ok value = Parser.parse(Standard.css_wide_keywords, value);
@@ -206,7 +202,7 @@ let aspect_ratio =
   apply(
     Parser.property_media_max_aspect_ratio,
     [%expr "aspect-ratio"],
-    ((a, (), b)) =>  [%expr [%e string_of_int(a) |> render_string] ++ "/" ++ [%e string_of_int(b) |> render_string]]
+    ((a, (), b)) => [%expr [%e string_of_int(a) |> render_string] ++ "/" ++ [%e string_of_int(b) |> render_string]]
   );
 let orientation =
   apply(
@@ -371,27 +367,6 @@ let properties = [
   ("scripting", found(scripting)),
 ];
 
-let render_when_unsupported_features = (property, value) => {
-  let to_camel_case = txt =>
-    (
-      switch (String.split_on_char('-', txt)) {
-      | [first, ...remaining] => [
-          first,
-          ...List.map(String.capitalize_ascii, remaining),
-        ]
-      | [] => []
-      }
-    )
-    |> String.concat("");
-
-  /* Transform property name to camelCase since we bind emotion to the Object API */
-  let propertyName = property |> to_camel_case |> render_string;
-  let value = value |> render_string;
-
-  %expr
-  "(" ++ [%e propertyName] ++ ": " ++ [%e value] ++ ")";
-};
-
 let findProperty = name => {
   properties |> List.find_opt(((key, _)) => key == name);
 };
@@ -407,19 +382,12 @@ let render_to_expr = (property, value) => {
 };
 
 let parse_declarations = (property: string, value: string) => {
-  let.ok is_valid_string =
+  let.ok _ =
     Parser.check_property(~name=property, value)
     |> Result.map_error((`Unknown_value) => `Not_found);
 
   switch (render_css_global_values(property, value)) {
   | Ok(value) => Ok(value)
-  | Error(_) =>
-    switch (render_to_expr(property, value)) {
-    | Ok(value) => Ok(value)
-    | Error(_)
-    | exception Unsupported_feature =>
-      let.ok () = is_valid_string ? Ok() : Error(`Invalid_value(value));
-      Ok([render_when_unsupported_features(property, value)]);
-    }
+  | Error(_) => render_to_expr(property, value)
   };
 };

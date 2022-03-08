@@ -5797,6 +5797,15 @@ let classNameWithMultiLine =
     CssJs.label("classNameWithMultiLine"),
     CssJs.display(`block),
   |]);
+let classNameWithArray =
+  CssJs.style(. [|CssJs.label("classNameWithArray"), cssProperty|]);
+let cssRule = CssJs.color(CssJs.blue);
+let classNameWithCss =
+  CssJs.style(. [|
+    CssJs.label("classNameWithCss"),
+    cssRule,
+    CssJs.backgroundColor(CssJs.green),
+  |]);
 module DynamicComponent = {
   [@bs.deriving abstract]
   type makeProps('var) = {
