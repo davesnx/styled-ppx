@@ -54,11 +54,8 @@ CssJs.unsafe("borderBottomRightRadius", "250px 100px");
 CssJs.borderBottomLeftRadius(`zero);
 CssJs.borderBottomLeftRadius(`percent(50.));
 CssJs.unsafe("borderBottomLeftRadius", "250px 100px");
-CssJs.unsafe("borderRadius", "10px");
-CssJs.unsafe("borderRadius", "50%");
-CssJs.unsafe("borderRadius", "10px / 20px");
-CssJs.unsafe("borderRadius", "2px 4px 8px 16px");
-CssJs.unsafe("borderRadius", "2px 4px 8px 16px / 2px 4px 8px 16px");
+CssJs.borderRadius(`pxFloat(10.));
+CssJs.borderRadius(`percent(50.));
 CssJs.unsafe("borderImageSource", "none");
 CssJs.unsafe("borderImageSource", "url(foo.png)");
 CssJs.unsafe("borderImageSlice", "10");
@@ -372,8 +369,6 @@ CssJs.unsafe("offset", "none");
 CssJs.unsafe("offset", "auto");
 CssJs.unsafe("offset", "center");
 CssJs.unsafe("offset", "200px 100px");
-CssJs.unsafe("offset", "inset(10% round 10% 40% 10% 40%)");
-CssJs.unsafe("offset", "ellipse(at top 50% left 20%)");
 CssJs.unsafe("offset", "margin-box");
 CssJs.unsafe("offset", "border-box");
 CssJs.unsafe("offset", "padding-box");
@@ -406,7 +401,7 @@ CssJs.wordWrap(`normal);
 CssJs.unsafe("wordWrap", "break-word");
 CssJs.wordWrap(`anywhere);
 CssJs.textAlign(`start);
-CssJs.unsafe("textAlign", "end");
+CssJs.textAlign(`end_);
 CssJs.textAlign(`left);
 CssJs.textAlign(`right);
 CssJs.textAlign(`center);
@@ -587,7 +582,7 @@ CssJs.unsafe("fontFeatureSettings", "'c2sc'");
 CssJs.unsafe("fontFeatureSettings", "'smcp' on");
 CssJs.unsafe("fontFeatureSettings", "'liga' off");
 CssJs.unsafe("fontFeatureSettings", "'smcp', 'swsh' 2");
-CssJs.unsafe("fontSize", "xxx-large");
+CssJs.fontSize(`xxx_large);
 CssJs.unsafe("fontVariant", "none");
 CssJs.unsafe("fontVariant", "normal");
 CssJs.unsafe("fontVariant", "all-petite-caps");
@@ -1333,8 +1328,8 @@ CssJs.unsafe("boxDecorationBreak", "slice");
 CssJs.unsafe("boxDecorationBreak", "clone");
 CssJs.unsafe("orphans", "1");
 CssJs.unsafe("orphans", "2");
-CssJs.unsafe("widows", "1");
-CssJs.unsafe("widows", "2");
+CssJs.widows(1);
+CssJs.widows(2);
 CssJs.unsafe("position", "sticky");
 CssJs.unsafe("willChange", "scroll-position");
 CssJs.unsafe("willChange", "contents");
@@ -1427,7 +1422,7 @@ CssJs.unsafe("float", "inline-end");
 CssJs.unsafe("clear", "inline-start");
 CssJs.unsafe("clear", "inline-end");
 CssJs.textAlign(`start);
-CssJs.unsafe("textAlign", "end");
+CssJs.textAlign(`end_);
 CssJs.unsafe("resize", "block");
 CssJs.unsafe("resize", "inline");
 CssJs.unsafe("blockSize", "100px");
@@ -1675,5 +1670,25 @@ CssJs.unsafe("pointerEvents", "fill");
 CssJs.unsafe("pointerEvents", "stroke");
 CssJs.unsafe("pointerEvents", "all");
 CssJs.unsafe("pointerEvents", "none");
-CssJs.unsafe("lineHeightStep", "30px");
-CssJs.unsafe("lineHeightStep", "2em");
+CssJs.lineHeightStep(`pxFloat(30.));
+CssJs.lineHeightStep(`em(2.));
+CssJs.width(`calc((`add, `percent(50.), `pxFloat(4.))));
+CssJs.width(`calc((`sub, `pxFloat(20.), `pxFloat(10.))));
+CssJs.width(
+  `calc((`sub, `vh(100.), `calc((`add, `rem(2.), `pxFloat(120.))))),
+);
+CssJs.width(
+  `calc((
+    `sub,
+    `vh(100.),
+    `calc((
+      `add,
+      `rem(2.),
+      `calc((
+        `add,
+        `rem(2.),
+        `calc((`add, `rem(2.), `calc((`add, `rem(2.), `pxFloat(120.))))),
+      )),
+    )),
+  )),
+);

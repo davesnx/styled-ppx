@@ -2,7 +2,6 @@ open Reason_css_lexer;
 open Combinator;
 open Rule.Let;
 open Rule.Pattern;
-open Rule.Match;
 
 let (let.ok) = Result.bind;
 
@@ -143,12 +142,6 @@ let percentage =
     | _ => Error(["expected percentage"]),
   );
 
-let length_percentage =
-  combine_xor([
-    map(length, v => `Length(v)),
-    map(percentage, v => `Percentage(v)),
-  ]);
-
 // https://drafts.csswg.org/css-values-4/#css-identifier
 // TODO: differences between <ident> and keyword
 let ident =
@@ -191,8 +184,6 @@ let string =
     | STRING(string) => Ok(string)
     | _ => Error(["expected a string"]),
   );
-
-let dimension_unit = return_data(Error(["not implemented"]));
 
 // TODO: <url-modifier>
 // https://drafts.csswg.org/css-values-4/#urls

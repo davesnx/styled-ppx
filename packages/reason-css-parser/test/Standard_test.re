@@ -75,13 +75,6 @@ describe("Standard values", ({test, _}) => {
     expect.result(parse("63.4:")).toBeError();
   });
 
-  test("<length-percentage>", ({expect, _}) => {
-    let parse = parse([%value "<length-percentage>"]);
-    expect.result(parse("64cm")).toBe(Ok(`Length(`Cm(64.))));
-    expect.result(parse("65%")).toBe(Ok(`Percentage(65.)));
-    expect.result(parse("66dsa")).toBeError();
-  });
-
   test("keyword", ({expect, _}) => {
     let parse = parse([%value "gintoki"]);
     expect.result(parse("gintoki")).toBe(Ok());

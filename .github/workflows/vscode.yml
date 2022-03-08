@@ -2,36 +2,54 @@ name: VSCode Extension CI
 
 on:
   push:
-    paths: 'packages/editors/*'
     branches:
       - main
   pull_request:
-    paths: 'packages/editors/*'
     branches:
       - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: ./packages/editors/vscode
 
 jobs:
   test:
     name: VSCode extension
     runs-on: ${{ matrix.os }}
+    if: github.repository_owner == 'davesnx'
     strategy:
+      fail-fast: true
       matrix:
         os: [ubuntu-latest, macos-latest]
 
     steps:
       - uses: actions/checkout@v1
 
-      - name: Use Node.js 12.x
-        uses: actions/setup-node@v1
+      - uses: dorny/paths-filter@v2
+        id: changes
         with:
-          node-version: 12.x
+          filters: |
+            src:
+              - 'packages/editors/**'
+              - '.github/workflows/vscode.yml'
+
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v1
+        if: steps.changes.outputs.src == 'true'
+        with:
+          node-version: 16.x
 
       - name: Get cache directory path
+        if: steps.changes.outputs.src == 'true'
         id: yarn-cache-dir-path
-        working-directory: ./packages/editors/vscode
         run: echo "::set-output name=dir::$(yarn cache dir)"
 
       - name: Load global cache
+        if: steps.changes.outputs.src == 'true'
         uses: actions/cache@v1
         id: yarn-cache
         with:
@@ -40,11 +58,33 @@ jobs:
           restore-keys: yarn-${{ matrix.os }}-
 
       - name: Install
-        working-directory: ./packages/editors/vscode
+        if: steps.changes.outputs.src == 'true'
         run: yarn install
 
       - name: Test
+        if: steps.changes.outputs.src == 'true'
         uses: GabrielBB/xvfb-action@v1
         with:
+          run: node ./tests/index.js
           working-directory: ./packages/editors/vscode
-          run: npm test
+
+      - name: Check for publish
+        if: steps.changes.outputs.src == 'true'
+        id: should-publish
+        run: |
+          REMOTE=$(npx vsce show davesnx.vscode-styled-ppx | grep "Version:" | awk '{print $2}')
+          CURRENT=$(jq -r '.version' package.json)
+          if [ "$REMOTE" != "$CURRENT" ]
+          then
+              echo "::set-output name=value::true"
+          else
+              echo "::set-output name=value::false"
+          fi
+
+      - name: Publish to Visual Studio Marketplace
+        if: ${{ steps.changes.outputs.src == 'true' && steps.should-publish.outputs.value == 'true' && matrix.os == 'ubuntu-latest' }}
+        uses: HaaLeo/publish-vscode-extension@v1
+        with:
+          pat: ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
+          registryUrl: https://marketplace.visualstudio.com
+          packagePath: packages/editors/vscode

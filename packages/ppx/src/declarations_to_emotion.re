@@ -52,9 +52,7 @@ let render_integer = integer =>
   Helper.Const.int(integer) |> Helper.Exp.constant;
 let render_number = number =>
   Helper.Const.float(number |> string_of_float) |> Helper.Exp.constant;
-let render_percentage = number => [%expr
-  `percent([%e render_number(number)])
-];
+let render_percentage = number => [%expr `percent([%e render_number(number)])];
 
 let render_css_global_values = (name, value) => {
   let.ok value = Parser.parse(Standard.css_wide_keywords, value);
@@ -75,39 +73,6 @@ let render_css_global_values = (name, value) => {
   /* bs-css doesn't have those */
   Ok([[%expr CssJs.unsafe([%e render_string(name)], [%e value])]]);
 };
-
-let render_angle =
-  fun
-  | `Deg(number) => id([%expr `deg([%e render_number(number)])])
-  | `Rad(number) => id([%expr `rad([%e render_number(number)])])
-  | `Grad(number) => id([%expr `grad([%e render_number(number)])])
-  | `Turn(number) => id([%expr `turn([%e render_number(number)])]);
-
-let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
-
-let render_variable = name =>
-  list_to_longident(name) |> txt |> Helper.Exp.ident;
-
-/* type product_op = [ `Static_0(unit, calc_value) | `Static_1(unit, float) ]
-and calc_product = (calc_value, list(product_op))
-and sum_op = [ `dash | `cross ]
-and calc_sum = (calc_product, list((sum_op, calc_product)))
-and calc_value = [ `Number(float) | `Dimension(unit) | `Percentage(float) | `Static(unit, calc_sum, unit) ]; */
-
-let render_calc_sum = (_sum/* : calc_sum */) => {
-  /* TODO: render into CssJs */
-  render_integer(1);
-};
-
-let render_calc = fun
-  | `Dimension(_) => render_integer(1)
-  | `Number(n) => render_number(n)
-  | `Percertage(pct) => render_percentage(pct)
-  | `Static((), sum, ()) => render_calc_sum(sum);
-
-let _render_widows = fun
-  | `Integer(i) => render_integer(i)
-  | `Function_calc((c, _)) => render_calc(c);
 
 let variants_to_expression =
   fun
@@ -148,7 +113,7 @@ let variants_to_expression =
   | `Keep_all => id([%expr `keepAll])
   | `Anywhere => id([%expr `anywhere])
   | `BreakWord => id([%expr `breakWord])
-  | `End => raise(Unsupported_feature)
+  | `End => id([%expr `end_])
   | `Justify => id([%expr `justify])
   | `Justify_all => raise(Unsupported_feature)
   | `Left => id([%expr `left])
@@ -174,12 +139,133 @@ let variants_to_expression =
   | `Unset => id([%expr `unset])
   | `Full_size_kana => raise(Unsupported_feature);
 
+let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
+
+let render_variable = name =>
+  list_to_longident(name) |> txt |> Helper.Exp.ident;
+
+// TODO: all of them could be float, but bs-css doesn't support it
+let render_length =
+  fun
+  | `Cap(_n) => raise(Unsupported_feature)
+  | `Ch(n) => [%expr `ch([%e render_number(n)])]
+  | `Cm(n) => [%expr `cm([%e render_number(n)])]
+  | `Em(n) => [%expr `em([%e render_number(n)])]
+  | `Ex(n) => [%expr `ex([%e render_number(n)])]
+  | `Ic(_n) => raise(Unsupported_feature)
+  | `In(_n) => raise(Unsupported_feature)
+  | `Lh(_n) => raise(Unsupported_feature)
+  | `Mm(n) => [%expr `mm([%e render_number(n)])]
+  | `Pc(n) => [%expr `pc([%e render_number(n)])]
+  | `Pt(n) => [%expr `pt([%e render_integer(n |> int_of_float)])]
+  | `Px(n) => [%expr `pxFloat([%e render_number(n)])]
+  | `Q(_n) => raise(Unsupported_feature)
+  | `Rem(n) => [%expr `rem([%e render_number(n)])]
+  | `Rlh(_n) => raise(Unsupported_feature)
+  | `Vb(_n) => raise(Unsupported_feature)
+  | `Vh(n) => [%expr `vh([%e render_number(n)])]
+  | `Vi(_n) => raise(Unsupported_feature)
+  | `Vmax(n) => [%expr `vmax([%e render_number(n)])]
+  | `Vmin(n) => [%expr `vmin([%e render_number(n)])]
+  | `Vw(n) => [%expr `vw([%e render_number(n)])]
+  | `Zero => [%expr `zero];
+
+let rec render_function_calc = (calc_sum) => {
+  switch (calc_sum) {
+    | (product, []) => render_product(product)
+    | (product, list_of_sums) => {
+      /* This isn't a great design of the types, but we need to know the operation
+      which is in the first position of the array, we ensure that there's one value
+      since we are on this branch of the switch */
+      let op = pick_operation(List.hd(list_of_sums));
+      let first = render_product(product);
+      let second = render_list_of_sums(list_of_sums);
+      [%expr `calc([%e op], [%e first], [%e second])];
+    }
+  }
+}
+and render_sum_op = op => {
+  switch (op) {
+    | `Dash(()) => [%expr `sub]
+    | `Cross(()) => [%expr `add]
+  }
+}
+and pick_operation = ((op, _)) => render_sum_op(op)
+and render_list_of_products = (list_of_products) => {
+  switch (list_of_products) {
+    | [one] => render_product_op(one)
+    | list => render_list_of_products(list)
+  }
+} and render_list_of_sums = (list_of_sums) => {
+  switch (list_of_sums) {
+    | [(_, one)] => render_product(one)
+    | list => render_list_of_sums(list)
+  }
+} and render_product = product => {
+  switch (product) {
+    | (calc_value, []) => render_calc_value(calc_value)
+    | (calc_value, list_of_products) => {
+      let _first = render_calc_value(calc_value);
+      let _second = render_list_of_products(list_of_products);
+      /* [%expr (`mult, [%e first], [%e second])]; */
+      failwith("`mult isn't available in bs-css");
+    }
+  }
+} and render_product_op = (op) => {
+  switch (op) {
+    | `Static_0((), calc_value) => render_calc_value(calc_value)
+    | `Static_1((), float) => render_number(float)
+  }
+} and render_calc_value = calc_value => {
+  switch (calc_value) {
+    | `Number(float) => render_number(float)
+    | `Extended_length(l) => render_extended_length(l)
+    | `Extended_percentage(p) => render_extended_percentage(p)
+    | `Function_calc(fc) => render_function_calc(fc)
+  }
+} and render_extended_length = fun
+  | `Length(l) => render_length(l)
+  | `Function_calc(fc) => render_function_calc(fc)
+  | `Interpolation(i) => render_variable(i)
+and render_extended_percentage = fun
+  | `Percentage(p) => render_percentage(p)
+  | `Function_calc(fc) => render_function_calc(fc)
+  | `Interpolation(i) => render_variable(i);
+
+// css-sizing-3
+let render_size =
+  fun
+  | `Auto => variants_to_expression(`Auto)
+  | `Extended_length(l) => render_extended_length(l)
+  | `Extended_percentage(p) => render_extended_percentage(p)
+  | `Max_content
+  | `Min_content => raise(Unsupported_feature)
+  | `Fit_content(_) => raise(Unsupported_feature)
+  | `Function_calc(fc) => render_function_calc(fc)
+  | _ => raise(Unsupported_feature);
+
+let render_angle =
+  fun
+  | `Deg(number) => id([%expr `deg([%e render_number(number)])])
+  | `Rad(number) => id([%expr `rad([%e render_number(number)])])
+  | `Grad(number) => id([%expr `grad([%e render_number(number)])])
+  | `Turn(number) => id([%expr `turn([%e render_number(number)])]);
+
+let render_extended_angle = fun
+  | `Angle(a) => render_angle(a)
+  | `Function_calc(fc) => render_function_calc(fc)
+  | `Interpolation(i) => render_variable(i);
+
+let render_length_percentage = fun
+  | `Extended_length(ext) => render_extended_length(ext)
+  | `Extended_percentage(ext) => render_extended_percentage(ext);
+
 let transform_with_variable = (parser, mapper, value_to_expr) =>
   emit(
     Combinator.combine_xor([
-      /* If the CSS value is an interpolation, we treat as one `Variable */
+      /* If the entire CSS value is interpolated, we treat it as a `Variable */
       Rule.Match.map(Standard.interpolation, data => `Variable(data)),
-      /* Otherwise it's a regular CSS `Value */
+      /* Otherwise it's a regular CSS `Value and run the mapper below*/
       Rule.Match.map(parser, data => `Value(data)),
     ]),
     fun
@@ -210,59 +296,6 @@ let unsupportedProperty = (~call=?, parser) =>
 let variants = (parser, identifier) =>
   apply(parser, identifier, variants_to_expression);
 
-// TODO: all of them could be float, but bs-css doesn't support it
-let render_length =
-  fun
-  | `Cap(_n) => raise(Unsupported_feature)
-  | `Ch(n) => [%expr `ch([%e render_number(n)])]
-  | `Cm(n) => [%expr `cm([%e render_number(n)])]
-  | `Em(n) => [%expr `em([%e render_number(n)])]
-  | `Ex(n) => [%expr `ex([%e render_number(n)])]
-  | `Ic(_n) => raise(Unsupported_feature)
-  | `In(_n) => raise(Unsupported_feature)
-  | `Lh(_n) => raise(Unsupported_feature)
-  | `Mm(n) => [%expr `mm([%e render_number(n)])]
-  | `Pc(n) => [%expr `pc([%e render_number(n)])]
-  | `Pt(n) => [%expr `pt([%e render_integer(n |> int_of_float)])]
-  | `Px(n) => [%expr `pxFloat([%e render_number(n)])]
-  | `Q(_n) => raise(Unsupported_feature)
-  | `Rem(n) => [%expr `rem([%e render_number(n)])]
-  | `Rlh(_n) => raise(Unsupported_feature)
-  | `Vb(_n) => raise(Unsupported_feature)
-  | `Vh(n) => [%expr `vh([%e render_number(n)])]
-  | `Vi(_n) => raise(Unsupported_feature)
-  | `Vmax(n) => [%expr `vmax([%e render_number(n)])]
-  | `Vmin(n) => [%expr `vmin([%e render_number(n)])]
-  | `Vw(n) => [%expr `vw([%e render_number(n)])]
-  | `Zero => [%expr `zero];
-
-let render_length_percentage =
-  fun
-  | `Length(length) => render_length(length)
-  | `Percentage(percentage) => render_percentage(percentage);
-
-let render_calc = value => {
-  switch (value) {
-  | `Dimension(_) => raise(Unsupported_feature)
-  | `Number(n) => render_number(n)
-  | `Percentage(pct) => render_percentage(pct)
-  | `Static(_, _, _) =>
-    raise(Unsupported_feature)
-  };
-};
-
-// css-sizing-3
-let render_size =
-  fun
-  | `Auto => variants_to_expression(`Auto)
-  | `Length(_) as lp
-  | `Percentage(_) as lp => render_length_percentage(lp)
-  | `Max_content
-  | `Min_content => raise(Unsupported_feature)
-  | `Fit_content(_) => raise(Unsupported_feature)
-  | `Function_calc(calc) => render_calc(calc)
-  | _ => raise(Unsupported_feature);
-
 let width = apply(Parser.property_width, [%expr CssJs.width], render_size);
 let height = apply(Parser.property_height, [%expr CssJs.height], render_size);
 let min_width =
@@ -276,8 +309,8 @@ let max_width =
     fun
     | `Auto as e
     | `None as e => variants_to_expression(e)
-    | `Length(_) as ast
-    | `Percentage(_) as ast
+    | `Extended_length(_) as ast
+    | `Extended_percentage(_) as ast
     | `Max_content as ast
     | `Min_content as ast
     | `Fit_content(_) as ast => render_size(ast)
@@ -298,14 +331,14 @@ let column_width = unsupportedProperty(Parser.property_column_width);
 let margin_value =
   fun
   | `Auto => variants_to_expression(`Auto)
-  | `Length(_) as lp
-  | `Percentage(_) as lp => render_length_percentage(lp);
+  | `Extended_length(l) => render_extended_length(l)
+  | `Extended_percentage(p) => render_extended_percentage(p);
 
 let padding_value =
   fun
   | `Auto => variants_to_expression(`Auto)
-  | `Length(_) as lp
-  | `Percentage(_) as lp => render_length_percentage(lp);
+  | `Extended_length(l) => render_extended_length(l)
+  | `Extended_percentage(p) => render_extended_percentage(p)
 
 // css-box-3
 let margin_top =
@@ -330,8 +363,8 @@ let margin =
     Parser.property_margin,
     fun
     | `Auto => variants_to_expression(`Auto)
-    | `Length(_) as lp
-    | `Percentage(_) as lp => render_length_percentage(lp)
+    | `Extended_length(l) => render_extended_length(l)
+    | `Extended_percentage(p) => render_extended_percentage(p)
     | `Interpolation(name) => render_variable(name),
     fun
     | [all] => [[%expr CssJs.margin([%e all])]]
@@ -378,8 +411,8 @@ let padding =
   emit_shorthand(
     Parser.property_padding,
     fun
-    | `Length(_) as lp
-    | `Percentage(_) as lp => render_length_percentage(lp)
+    | `Extended_length(l) => render_extended_length(l)
+    | `Extended_percentage(p) => render_extended_percentage(p)
     | `Interpolation(name) => render_variable(name),
     fun
     | [all] => [[%expr CssJs.padding([%e all])]]
@@ -406,11 +439,7 @@ let render_named_color =
   | `Transparent => variants_to_expression(`Transparent)
   | `Aliceblue => [%expr CssJs.aliceblue]
   | `Antiquewhite => [%expr CssJs.antiquewhite]
-  | `Aqua =>
-    Builder.pexp_ident(
-      ~loc,
-      {loc: Location.none, txt: Ldot(Lident("CssJs"), "aqua")},
-    )
+  | `Aqua => [%expr CssJs.aqua]
   | `Aquamarine => [%expr CssJs.aquamarine]
   | `Azure => [%expr CssJs.azure]
   | `Beige => [%expr CssJs.beige]
@@ -561,20 +590,27 @@ let render_named_color =
 let render_color_alpha =
   fun
   | `Number(number) => [%expr `num([%e render_number(number)])]
-  | `Percentage(percentage) => [%expr
-      `percent([%e render_number(percentage /. 100.0)])
-    ];
+  | `Extended_percentage(`Percentage(pct)) => render_percentage(pct /. 100.0)
+  | `Extended_percentage(pct) => render_extended_percentage(pct);
 
 let render_function_rgb = ast => {
-  let to_number = percentage => percentage *. 2.55;
+  let color_to_float = v => render_integer(v |> int_of_float);
+
+  let to_number = fun
+    // TODO: bs-css rgb(float, float, float)
+    | `Percentage(pct) => color_to_float(pct *. 2.55)
+    | `Function_calc(fc) => render_function_calc(fc)
+    | `Interpolation(v) => render_variable(v)
+    | `Extended_percentage(ext) => render_extended_percentage(ext);
 
   let (colors, alpha) =
     switch (ast) {
-    /* 1 and 3 = numbers, 0 and 2 = percentage */
+    /* 1 and 3 = numbers */
     | `Rgb_1(colors, alpha)
     | `Rgba_1(colors, alpha)
     | `Rgb_3(colors, alpha)
-    | `Rgba_3(colors, alpha) => (colors, alpha)
+    | `Rgba_3(colors, alpha) => (colors |> List.map(color_to_float), alpha)
+    /* 0 and 2 = extended-percentage */
     | `Rgb_0(colors, alpha)
     | `Rgba_0(colors, alpha)
     | `Rgb_2(colors, alpha)
@@ -585,16 +621,13 @@ let render_function_rgb = ast => {
     | [red, green, blue] => (red, green, blue)
     | _ => failwith("unreachable")
     };
+
   let alpha =
     switch (alpha) {
     | Some(((), alpha)) => Some(alpha)
     | None => None
     };
 
-  // TODO: bs-css rgb(float, float, float)
-  let red = render_integer(red |> int_of_float);
-  let green = render_integer(green |> int_of_float);
-  let blue = render_integer(blue |> int_of_float);
   let alpha = Option.map(render_color_alpha, alpha);
 
   switch (alpha) {
@@ -602,18 +635,24 @@ let render_function_rgb = ast => {
   | None => id([%expr `rgb(([%e red], [%e green], [%e blue]))])
   };
 };
+
 let render_function_hsl = ((hue, saturation, lightness, alpha)) => {
   let hue =
     switch (hue) {
-    | `Angle(angle) => angle
-    | `Number(degs) => `Deg(degs)
+    | `Number(degs) => render_angle(`Deg(degs))
+    | `Extended_angle(angle) => render_extended_angle(angle)
     };
 
-  let hue = render_angle(hue);
-  let saturation = render_percentage(saturation);
-  let lightness = render_percentage(lightness);
+  let saturation = render_extended_percentage(saturation);
+  let lightness = render_extended_percentage(lightness);
+
   let alpha =
-    Option.map((((), alpha)) => render_color_alpha(alpha), alpha);
+    switch (alpha) {
+    | Some(((), alpha)) => Some(alpha)
+    | None => None
+    };
+
+  let alpha = Option.map(render_color_alpha, alpha);
 
   switch (alpha) {
   | Some(alpha) =>
@@ -626,6 +665,7 @@ let render_function_hsl = ((hue, saturation, lightness, alpha)) => {
 
 let render_color =
   fun
+  | `Interpolation(v) => render_variable(v)
   | `Hex_color(hex) => id([%expr `hex([%e render_string(hex)])])
   | `Named_color(color) => render_named_color(color)
   | `CurrentColor => id([%expr `currentColor])
@@ -640,7 +680,8 @@ let render_color =
   | `Function_lch(_)
   | `Function_color(_)
   | `Function_device_cmyk(_)
-  | `Deprecated_system_color(_) => raise(Unsupported_feature);
+  | `Deprecated_system_color(_)
+  | _ => raise(Unsupported_feature);
 
 let color = apply(Parser.property_color, [%expr CssJs.color], render_color);
 let opacity =
@@ -649,7 +690,8 @@ let opacity =
     [%expr CssJs.opacity],
     fun
     | `Number(number) => render_number(number)
-    | `Percentage(number) => render_number(number /. 100.0),
+    | `Extended_percentage(`Percentage(number)) => render_number(number /. 100.0)
+    | `Extended_percentage(pct) => render_extended_percentage(pct)
   );
 
 // css-images-4
@@ -661,28 +703,29 @@ let render_position = position => {
     | `Right
     | `Bottom => 100.
     | `Center => 50.;
+
   let to_value =
     fun
     | `Position(pos) => variants_to_expression(pos)
-    | `Length(length) => render_length(length)
-    | `Percentage(percentage) => render_percentage(percentage);
+    | `Extended_length(l) => render_extended_length(l)
+    | `Extended_percentage(percentage) => render_extended_percentage(percentage);
 
   let horizontal =
     switch (position) {
     | `Or(Some(pos), _) => (pos, `Zero)
     | `Or(None, _) => (`Center, `Zero)
-    | `Static(`Length_percentage(offset), _) => (`Left, offset)
     | `Static((`Center | `Left | `Right) as pos, _) => (pos, `Zero)
+    | `Static(static, _) => (`Left, static)
     | `And((pos, offset), _) => (pos, offset)
     };
 
   let horizontal =
     switch (horizontal) {
-    | (`Left, `Length(length)) => `Length(length)
-    | (_, `Length(_)) => raise(Unsupported_feature)
+    | (`Left, `Extended_length(length)) => `Extended_length(length)
     | (pos, `Zero) => `Position(pos)
-    | (pos, `Percentage(percentage)) =>
-      `Percentage(percentage +. pos_to_percentage_offset(pos))
+    | (pos, `Extended_percentage(`Percentage(percentage))) =>
+      `Extended_percentage(`Percentage(percentage +. pos_to_percentage_offset(pos)))
+    | (_, _) => raise(Unsupported_feature)
     };
 
   let horizontal = to_value(horizontal);
@@ -692,18 +735,18 @@ let render_position = position => {
     | `Or(_, Some(pos)) => (pos, `Zero)
     | `Or(_, None) => (`Center, `Zero)
     | `Static(_, None) => (`Center, `Zero)
-    | `Static(_, Some(`Length_percentage(offset))) => (`Top, offset)
     | `Static(_, Some((`Center | `Bottom | `Top) as pos)) => (pos, `Zero)
+    | `Static(_, Some(offset)) => (`Top, offset)
     | `And(_, (pos, offset)) => (pos, offset)
     };
 
   let vertical =
     switch (vertical) {
-    | (`Top, `Length(length)) => `Length(length)
-    | (_, `Length(_)) => raise(Unsupported_feature)
+    | (`Top, `Extended_length(length)) => `Extended_length(length)
     | (pos, `Zero) => `Position(pos)
-    | (pos, `Percentage(percentage)) =>
-      `Percentage(percentage +. pos_to_percentage_offset(pos))
+    | (pos, `Extended_percentage(`Percentage(percentage))) =>
+      `Extended_percentage(`Percentage(percentage +. pos_to_percentage_offset(pos)))
+    | (_, _) => raise(Unsupported_feature)
     };
 
   let vertical = to_value(vertical);
@@ -730,7 +773,7 @@ let render_color_interp =
 
 let render_length_interp =
   fun
-  | `Length(length) => render_length(length)
+  | `Extended_length(l) => render_extended_length(l)
   | `Interpolation(name) => render_variable(name);
 
 // css-backgrounds-3
@@ -878,11 +921,11 @@ let border_bottom_style =
 let border_left_style =
   variants(Parser.property_border_left_style, [%expr CssJs.borderLeftStyle]);
 let border_style =
-  unsupportedValue(Parser.property_border_style, [%expr CssJs.borderStyle]);
+  apply(Parser.property_border_style, [%expr CssJs.borderStyle], variants_to_expression);
 
 let render_line_width =
   fun
-  | `Length(length) => render_length(length)
+  | `Extended_length(l) => render_extended_length(l)
   /* Missing `Medium, `Thick, `Thin on the bs-css bindings */
   | _ => raise(Unsupported_feature);
 
@@ -987,7 +1030,8 @@ let border_left =
 
 let border_value =
   fun
-  | [lp] => render_length_percentage(lp)
+  | [`Extended_length(l)] => render_extended_length(l)
+  | [`Extended_percentage(p)] => render_extended_percentage(p)
   | _ => raise(Unsupported_feature);
 
 let border_top_left_radius =
@@ -1015,9 +1059,10 @@ let border_bottom_left_radius =
     border_value,
   );
 let border_radius =
-  unsupportedValue(
+  apply(
     Parser.property_border_radius,
     [%expr CssJs.borderRadius],
+    render_length_percentage
   );
 let border_image_source = unsupportedProperty(Parser.property_border_image_source);
 let border_image_slice = unsupportedProperty(Parser.property_border_image_slice);
@@ -1086,9 +1131,24 @@ let tab_size = unsupportedProperty(Parser.property_tab_size);
 let word_break =
   variants(Parser.property_word_break, [%expr CssJs.wordBreak]);
 let line_break = unsupportedProperty(Parser.property_line_break);
+let render_line_height = fun
+  | `Extended_length(ext) => render_extended_length(ext)
+  | `Extended_percentage(ext) => render_extended_percentage(ext)
+  | `Normal => variants_to_expression(`Normal)
+  | `Number(float) => [%expr `abs([%e render_number(float) ])];
+
 let line_height =
-  unsupportedValue(Parser.property_line_height, [%expr CssJs.lineHeight]);
-let line_height_step = unsupportedProperty(Parser.property_line_height_step);
+  apply(
+    Parser.property_line_height,
+    [%expr CssJs.lineHeight],
+    render_line_height,
+  );
+let line_height_step =
+apply(
+  Parser.property_line_height_step,
+  [%expr CssJs.lineHeightStep],
+  render_extended_length,
+);
 let hyphens = unsupportedProperty(Parser.property_hyphens);
 let overflow_wrap =
   variants(Parser.property_overflow_wrap, [%expr CssJs.overflowWrap]);
@@ -1104,7 +1164,8 @@ let word_spacing =
     [%expr CssJs.wordSpacing],
     fun
     | `Normal => variants_to_expression(`Normal)
-    | `Length_percentage(lp) => render_length_percentage(lp),
+    | `Extended_length(l) => render_extended_length(l)
+    | `Extended_percentage(p) => render_extended_percentage(p),
   );
 let letter_spacing =
   apply(
@@ -1112,14 +1173,16 @@ let letter_spacing =
     [%expr CssJs.letterSpacing],
     fun
     | `Normal => variants_to_expression(`Normal)
-    | `Length_percentage(lp) => render_length_percentage(lp),
+    | `Extended_length(l) => render_extended_length(l)
+    | `Extended_percentage(p) => render_extended_percentage(p),
   );
 let text_indent =
   apply(
     Parser.property_text_indent,
     [%expr CssJs.textIndent],
     fun
-    | (lp, None, None) => render_length_percentage(lp)
+    | (`Extended_length(l), None, None) => render_extended_length(l)
+    | (`Extended_percentage(p), None, None) => render_extended_percentage(p)
     | _ => raise(Unsupported_feature),
   );
 let hanging_punctuation = unsupportedProperty(Parser.property_hanging_punctuation);
@@ -1132,8 +1195,27 @@ let font_weight =
 let font_stretch = unsupportedProperty(Parser.property_font_stretch);
 let font_style =
   unsupportedValue(Parser.property_font_style, [%expr CssJs.fontStyle]);
+
+/* bs-css does not support these variants */
+let render_size_variants = fun
+  | `Large => id([%expr `large])
+  | `Medium => id([%expr `medium])
+  | `Small => id([%expr `small])
+  | `X_large => id([%expr `x_large])
+  | `X_small => id([%expr `x_small])
+  | `Xx_large => id([%expr `xx_large])
+  | `Xx_small => id([%expr `xx_small])
+  | `Xxx_large => id([%expr `xxx_large])
+  | `Larger => id([%expr `larger])
+  | `Smaller => id([%expr `smaller]);
+
+let render_font_size = fun
+  | `Absolute_size(size)
+  | `Relative_size(size) => render_size_variants(size)
+  | `Extended_length(ext) => render_extended_length(ext)
+  | `Extended_percentage(ext) => render_extended_percentage(ext);
 let font_size =
-  unsupportedValue(Parser.property_font_size, [%expr CssJs.fontSize]);
+  apply(Parser.property_font_size, [%expr CssJs.fontSize], render_font_size);
 let font_size_adjust = unsupportedProperty(Parser.property_font_size_adjust);
 let font = unsupportedProperty(Parser.property_font);
 // let font_synthesis_weight = unsupportedProperty(Parser.property_font_synthesis_weight);
@@ -1254,8 +1336,7 @@ let transition_duration =
     Parser.property_transition_duration,
     [%expr CssJs.transitionDuration],
   );
-let widows = unsupportedProperty(Parser.property_widows);
-/* let widows = apply(Parser.property_widows, [%expr CssJs.width], render_widows); */
+let widows = apply(Parser.property_widows, [%expr CssJs.widows], render_integer);
 let transition_timing_function =
   unsupportedValue(
     Parser.property_transition_timing_function,
@@ -1341,7 +1422,7 @@ let flex_grow =
   apply(Parser.property_flex_grow, [%expr CssJs.flexGrow], render_number);
 let flex_shrink =
   apply(Parser.property_flex_shrink, [%expr CssJs.flexShrink], render_number);
-// TODO: is safe to just return CssJs.width when flex_basis?
+
 let flex_basis =
   apply(
     Parser.property_flex_basis,
@@ -1351,6 +1432,7 @@ let flex_basis =
     | `Property_width(value_width) =>
       width.value_of_ast(`Value(value_width)),
   );
+
 // TODO: this is incomplete
 let flex =
   emit(
@@ -1380,6 +1462,7 @@ let flex =
         List.concat([grow_shrink, basis]);
       },
   );
+
 // TODO: justify_content, align_items, align_self, align_content are only for flex, missing the css-align-3 at parser
 let justify_content =
   unsupportedValue(
@@ -1454,10 +1537,41 @@ let grid_area =
   unsupportedValue(Parser.property_grid_area, [%expr CssJs.gridArea]);
 let z_index =
   unsupportedValue(Parser.property_z_index, [%expr CssJs.zIndex]);
-let left = unsupportedValue(Parser.property_left, [%expr CssJs.left]);
-let top = unsupportedValue(Parser.property_top, [%expr CssJs.top]);
-let right = unsupportedValue(Parser.property_right, [%expr CssJs.right]);
-let bottom = unsupportedValue(Parser.property_bottom, [%expr CssJs.bottom]);
+
+let render_position_value =
+  fun
+    | `Auto => variants_to_expression(`Auto)
+    | `Extended_length(l) => render_extended_length(l)
+    | `Extended_percentage(pct) => render_extended_percentage(pct);
+
+let left =
+  apply(
+    Parser.property_left,
+    [%expr CssJs.left],
+    render_position_value,
+  );
+
+let top =
+  apply(
+    Parser.property_top,
+    [%expr CssJs.top],
+    render_position_value,
+  );
+
+let right =
+  apply(
+    Parser.property_right,
+    [%expr CssJs.right],
+    render_position_value,
+  );
+
+let bottom =
+  apply(
+    Parser.property_bottom,
+    [%expr CssJs.bottom],
+    render_position_value,
+  );
+
 let display =
   apply(
     Parser.property_display,

@@ -54,9 +54,9 @@
 [%css {|border-bottom-left-radius: 250px 100px|}];
 [%css {|border-radius: 10px|}];
 [%css {|border-radius: 50%|}];
-[%css {|border-radius: 10px / 20px|}];
-[%css {|border-radius: 2px 4px 8px 16px|}];
-[%css {|border-radius: 2px 4px 8px 16px / 2px 4px 8px 16px|}];
+/* [%css {|border-radius: 10px / 20px|}]; */
+/* [%css {|border-radius: 2px 4px 8px 16px|}]; */
+/* [%css {|border-radius: 2px 4px 8px 16px / 2px 4px 8px 16px|}]; */
 [%css {|border-image-source: none|}];
 [%css {|border-image-source: url(foo.png)|}];
 [%css {|border-image-slice: 10|}];
@@ -563,8 +563,8 @@
 [%css {|offset: auto|}];
 [%css {|offset: center|}];
 [%css {|offset: 200px 100px|}];
-[%css {|offset: inset(10% round 10% 40% 10% 40%)|}];
-[%css {|offset: ellipse(at top 50% left 20%)|}];
+/* [%css {|offset: inset(10% round 10% 40% 10% 40%)|}]; */
+/* [%css {|offset: ellipse(at top 50% left 20%)|}]; */
 /* [%css {|offset: circle(at right 5% top)|}]; */
 [%css {|offset: margin-box|}];
 [%css {|offset: border-box|}];
@@ -3076,3 +3076,10 @@
 /* [%css {|math-depth: add(1)|}]; */
 /* [%css {|math-depth: 0|}]; */
 /* [%css {|math-depth: 1|}]; */
+
+[%css {|width: calc(50% + 4px)|}];
+[%css {|width: calc(20px - 10px)|}];
+[%css {|width: calc(100vh - calc(2rem + 120px))|}];
+/* [%css {|width: calc(100vh * 2)|}]; */
+[%css {|width: calc(100vh - calc(2rem + calc(2rem + calc(2rem + calc(2rem + 120px)))))|}];
+/* [%css {|width: calc(100vh * calc(2rem - calc(2rem * calc(2rem * calc(2rem / 4)))))|}]; */

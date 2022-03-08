@@ -73,6 +73,14 @@ let properties_variable_css_tests = [
     [%expr [%css "text-decoration-color: $(decorationColor);"]],
     [%expr CssJs.textDecorationColor(decorationColor)]
   ),
+  /* (
+    [%expr [%css "color: rgba(0, 0, 0, 1%);"]],
+    [%expr CssJs.color(rgba(0, 0, 0, `percent(1)))]
+  ),
+  (
+    [%expr [%css "color: $(Theme.blue);"]],
+    [%expr CssJs.color(Theme.blue)]
+  ), */
   /* Changed properties */
   (
     [%expr [%css "box-shadow: $(h) $(v) $(blur) $(spread) $(color);"]],
@@ -98,9 +106,9 @@ let properties_variable_css_tests = [
 
 describe("Should bind to bs-css with interpolatated variables", ({test, _}) => {
   properties_variable_css_tests |>
-    List.iteri((index, (result, expected)) =>
+    List.iteri((_index, (result, expected)) =>
       test(
-        "simple variable: " ++ string_of_int(index),
+        "simple variable: " ++ Pprintast.string_of_expression(expected),
         compare(result, expected),
       )
     );

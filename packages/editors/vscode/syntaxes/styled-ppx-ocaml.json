@@ -1,0 +1,127 @@
+{
+  "scopeName": "source.styled-ppx-ocaml",
+  "fileTypes": ["ml"],
+  "injectionSelector": "L:source -comment -string",
+  "patterns": [
+    {
+      "begin": "\\[(%)(styled.global)\\b",
+      "end": "]",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.operator.extension.styled-ppx-ocaml"
+        },
+        "2": {
+          "name": "keyword.other.extension.styled-ppx-ocaml"
+        }
+      },
+      "patterns": [
+        { "include": "#css-string-quoted" },
+        { "include": "#css-string" }
+      ]
+    },
+    {
+      "begin": "\\[(%)(styled(\\.[a-zA-Z]*)?|css|cx)\\b",
+      "end": "]",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.operator.extension.styled-ppx-ocaml"
+        },
+        "2": {
+          "name": "keyword.other.extension.styled-ppx-ocaml"
+        }
+      },
+      "patterns": [
+        { "include": "#css-string-quoted" },
+        { "include": "#css-string" },
+        { "include": "#groups" },
+        { "include": "source.ocaml" }
+      ]
+    }
+  ],
+  "repository": {
+    "css-string": {
+      "begin": "\"",
+      "end": "\"",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.begin.styled-ppx-ocaml"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.end.styled-ppx-ocaml"
+        }
+      },
+      "contentName": "meta.embedded.block.css",
+      "patterns": [
+        {
+          "include": "source.css.styled-ppx"
+        }
+      ]
+    },
+    "css-string-quoted": {
+      "begin": "\\{[a-z_]*\\|",
+      "end": "\\|[a-z_]*\\}",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.begin.styled-ppx-ocaml"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.end.styled-ppx-ocaml"
+        }
+      },
+      "contentName": "meta.embedded.block.css",
+      "patterns": [
+        {
+          "include": "source.css.styled-ppx"
+        }
+      ]
+    },
+    "groups": {
+      "patterns": [
+        {
+          "begin": "\\(",
+          "end": "\\)",
+          "patterns": [
+            { "include": "#css-string-quoted" },
+            { "include": "#css-string" },
+            { "include": "#groups" },
+            { "include": "source.ocaml" }
+          ]
+        },
+        {
+          "begin": "\\[\\|",
+          "end": "\\|\\]",
+          "patterns": [
+            { "include": "#css-string-quoted" },
+            { "include": "#css-string" },
+            { "include": "#groups" },
+            { "include": "source.ocaml" }
+          ]
+        },
+        {
+          "begin": "\\[",
+          "end": "\\]",
+          "patterns": [
+            { "include": "#css-string-quoted" },
+            { "include": "#css-string" },
+            { "include": "#groups" },
+            { "include": "source.ocaml" }
+          ]
+        },
+        {
+          "begin": "\\{",
+          "end": "\\}",
+          "patterns": [
+            { "include": "#css-string-quoted" },
+            { "include": "#css-string" },
+            { "include": "#groups" },
+            { "include": "source.ocaml" }
+          ]
+        }
+      ]
+    }
+  }
+}

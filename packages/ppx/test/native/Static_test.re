@@ -83,10 +83,10 @@ let properties_static_css_tests = [%expr
       [%css "flex-direction: column"],
       CssJs.flexDirection(`column)
     ),
-    /* (
+    (
       [%css "font-size: 30px"],
-      CssJs.unsafe("fontSize", "30px")),
-    */
+      CssJs.fontSize(`pxFloat(30.))
+    ),
     (
       [%css "height: 100vh"],
       CssJs.height(`vh(100.))
@@ -237,8 +237,8 @@ let properties_static_css_tests = [%expr
     */
     /* (
       [%css "color: #01234567"],
-      CssJs.color(`hex("01234567"))),
-    */
+      CssJs.color(`hex("01234567"))
+    ), */
     (
       [%css "color: blue"],
       CssJs.color(CssJs.blue)
@@ -387,7 +387,9 @@ let properties_static_css_tests = [%expr
       [%css "word-wrap: normal"],
       CssJs.wordWrap(`normal)
     ),
-    /* (
+    /*
+      not supported by bs-css
+      (
       [%css "text-align: start"],
       CssJs.textAlign(`start)
     ), */
@@ -420,7 +422,9 @@ let properties_static_css_tests = [%expr
       [%css "flex-wrap: wrap"],
       CssJs.flexWrap(`wrap)
     ),
-    /* (
+    /*
+      not supported on bs-css
+      (
       [%css "flex-flow: row nowrap"],
       [|CssJs.flexDirection(`row), CssJs.flexWrap(`nowrap)|],
     ), */
@@ -451,6 +455,14 @@ let properties_static_css_tests = [%expr
     (
       [%css "flex: none"],
       CssJs.flex(`none)
+    ),
+    (
+      [%css "width: calc(100% + 32px)"],
+      CssJs.width(`calc(`add, `percent(100.), `pxFloat(32.)))
+    ),
+    (
+      [%css "width: calc(100vh - 120px)"],
+      CssJs.width(`calc(`sub, `vh(100.), `pxFloat(120.)))
     ),
     /* (
       [%css "flex: 1 2 content"],
