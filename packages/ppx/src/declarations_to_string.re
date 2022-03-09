@@ -127,7 +127,7 @@ let render_length =
   | `Vmax(n) => render_number(n, "vmax")
   | `Vmin(n) => render_number(n, "vmin")
   | `Vw(n) => render_number(n, "vw")
-  | `Zero => render_string("zero");
+  | `Zero => render_string("0");
 
 
 let rec render_function_calc = (calc_sum) => {
@@ -140,14 +140,14 @@ let rec render_function_calc = (calc_sum) => {
       let op = pick_operation(List.hd(list_of_sums));
       let first = render_product(product);
       let second = render_list_of_sums(list_of_sums);
-      [%expr "calc(" + [%e first] ++ " " ++ [%e op] ++ " " ++ [%e second] ++ ")"];
+      [%expr "calc(" + [%e first] ++ [%e op] ++ [%e second] ++ ")"];
     }
   }
 }
 and render_sum_op = op => {
   switch (op) {
-    | `Dash(()) => [%expr "-"]
-    | `Cross(()) => [%expr "+"]
+    | `Dash(()) => [%expr " - "]
+    | `Cross(()) => [%expr " + "]
   }
 }
 and pick_operation = ((op, _)) => render_sum_op(op)

@@ -63,8 +63,8 @@ let rec render_at_rule = (ar: At_rule.t): Parsetree.expression =>
     grammar_error(ar.At_rule.loc, "At-rule @" ++ n ++ " not supported")
   }
 and render_media_query = (ar: At_rule.t): Parsetree.expression => {
-  let concat = (~loc, expr, acc) => { 
-    let concat_fn = {txt: Lident("++"), loc}  |> Helper.Exp.ident(~loc); 
+  let concat = (~loc, expr, acc) => {
+    let concat_fn = {txt: Lident("^"), loc}  |> Helper.Exp.ident(~loc);
     Helper.Exp.apply(~loc, concat_fn, [(Nolabel, expr), (Nolabel, acc)])
   }
 
@@ -105,9 +105,9 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
           };
           List.fold_left(concat(~loc), acc, exprs);
       }
-    | (Ident(id), _) =>  { 
+    | (Ident(id), _) =>  {
       let id = Helper.Exp.constant(~loc, Helper.Const.string(id));
-      [%expr [%e acc] ++ [%e id] ++ " "] 
+      [%expr [%e acc] ++ [%e id] ++ " "]
       }
     | (_, loc) => invalid_format(loc);
 
