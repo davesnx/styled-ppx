@@ -264,10 +264,24 @@ let min_width =
 let max_width =
   apply(Parser.property_width, [%expr "max-width"], render_size);
 let height = apply(Parser.property_height, [%expr "height"], render_size);
+let min_height = apply(Parser.property_height, [%expr "min-height"], render_size);
+let max_height = apply(Parser.property_height, [%expr "max-height"], render_size);
 let aspect_ratio =
   apply(
     Parser.property_media_max_aspect_ratio,
     [%expr "aspect-ratio"],
+    ((a, (), b)) => [%expr [%e string_of_int(a) |> render_string] ++ "/" ++ [%e string_of_int(b) |> render_string]]
+  );
+let min_aspect_ratio =
+  apply(
+    Parser.property_media_max_aspect_ratio,
+    [%expr "min-aspect-ratio"],
+    ((a, (), b)) => [%expr [%e string_of_int(a) |> render_string] ++ "/" ++ [%e string_of_int(b) |> render_string]]
+  );
+let max_aspect_ratio =
+  apply(
+    Parser.property_media_max_aspect_ratio,
+    [%expr "max-aspect-ratio"],
     ((a, (), b)) => [%expr [%e string_of_int(a) |> render_string] ++ "/" ++ [%e string_of_int(b) |> render_string]]
   );
 let orientation =
@@ -313,6 +327,8 @@ let overflow_inline =
     | `Static(_) => [%expr "static"] // Why this branch exists?
   );
 let color = apply(Parser.positive_integer, [%expr "color"], render_integer);
+let min_color = apply(Parser.positive_integer, [%expr "min-color"], render_integer);
+let max_color = apply(Parser.positive_integer, [%expr "max-color"], render_integer);
 
 let color_gamut =
   apply(
@@ -337,6 +353,20 @@ let monochrome =
   apply(
     Parser.property_media_monochrome,
     [%expr "monochrome"],
+    render_integer,
+  );
+
+let min_monochrome =
+  apply(
+    Parser.property_media_monochrome,
+    [%expr "min-monochrome"],
+    render_integer,
+  );
+
+let max_monochrome =
+  apply(
+    Parser.property_media_monochrome,
+    [%expr "max-monochrome"],
     render_integer,
   );
 let inverted_colors =
@@ -394,17 +424,47 @@ let scripting =
 let resolution =
   apply(
     Parser.property_media_resolution,
-    [%expr "scripting"],
+    [%expr "resolution"],
     fun
     | `Dpcm(v) => render_number(v, "dpcm")
     | `Dpi(v) => render_number(v, "dpi")
     | `Dppx(v) => render_number(v, "dppx"),
   );
 
+let max_resolution =
+  apply(
+    Parser.property_media_resolution,
+    [%expr "min-resolution"],
+    fun
+    | `Dpcm(v) => render_number(v, "dpcm")
+    | `Dpi(v) => render_number(v, "dpi")
+    | `Dppx(v) => render_number(v, "dppx"),
+  );
+let min_resolution =
+  apply(
+    Parser.property_media_resolution,
+    [%expr "max-resolution"],
+    fun
+    | `Dpcm(v) => render_number(v, "dpcm")
+    | `Dpi(v) => render_number(v, "dpi")
+    | `Dppx(v) => render_number(v, "dppx"),
+  );
 let color_index =
   apply(
     Parser.property_media_color_index,
     [%expr "color-index"],
+    render_integer,
+  );
+let min_color_index =
+  apply(
+    Parser.property_media_color_index,
+    [%expr "min-color-index"],
+    render_integer,
+  );
+let max_color_index =
+  apply(
+    Parser.property_media_color_index,
+    [%expr "max-color-index"],
     render_integer,
   );
 
@@ -413,18 +473,30 @@ let properties = [
   ("min-width", found(min_width)),
   ("max-width", found(max_width)),
   ("height", found(height)),
+  ("min-height", found(min_height)),
+  ("max-height", found(max_height)),
   ("aspect-ratio", found(aspect_ratio)),
+  ("min-aspect-ratio", found(min_aspect_ratio)),
+  ("max-aspect-ratio", found(max_aspect_ratio)),
   ("orientation", found(orientation)),
   ("resolution", found(resolution)),
+  ("min-resolution", found(min_resolution)),
+  ("max-resolution", found(max_resolution)),
   ("grid", found(grid)),
   ("update", found(update)),
   ("overflow-block", found(overflow_block)),
   ("overflow-inline", found(overflow_inline)),
   ("color", found(color)),
+  ("min_color", found(min_color)),
+  ("max_color", found(max_color)),
   ("color-gamut", found(color_gamut)),
   ("color-index", found(color_index)),
+  ("min_color-index", found(min_color_index)),
+  ("max_color-index", found(max_color_index)),
   ("display-mode", found(display_mode)), // display-mode
   ("monochrome", found(monochrome)),
+  ("min-monochrome", found(min_monochrome)),
+  ("max-monochrome", found(max_monochrome)),
   ("inverted-colors", found(inverted_colors)),
   ("pointer", found(pointer)),
   ("hover", found(hover)),
