@@ -12601,7 +12601,7 @@ module MediaQueryCalc = {
         ++ "("
         ++ "min-width"
         ++ ": "
-        ++ ("calc(" + "1000px" ++ " " ++ "-" ++ " " ++ "2%" ++ ")")
+        ++ ("calc(" + "1000px" ++ " - " ++ "2%" ++ ")")
         ++ ") ",
         [|CssJs.color(CssJs.red)|],
       ),
