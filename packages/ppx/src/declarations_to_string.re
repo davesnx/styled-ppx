@@ -18,6 +18,11 @@ let render_string = string =>
 let render_integer = integer =>
   Helper.Const.int(integer) |> Helper.Exp.constant;
 
+let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
+
+let render_variable = name =>
+  list_to_longident(name) |> txt |> Helper.Exp.ident;
+
 type transform('ast, 'value) = {
   ast_of_string: string => result('ast, string),
   value_of_ast: 'ast => 'value,
@@ -98,7 +103,7 @@ let variants_to_string =
 let render_number = (number, unit) =>
   string_of_int(Float.to_int(number)) ++ unit |> render_string;
 let render_percentage = percentage =>
-  string_of_float(percentage *. 100.) ++ "%" |> render_string;
+  string_of_int(Float.to_int(percentage)) ++ "%" |> render_string;
 let render_length =
   fun
   | `Cap(n) => render_number(n, "cap")
@@ -124,19 +129,85 @@ let render_length =
   | `Vw(n) => render_number(n, "vw")
   | `Zero => render_string("zero");
 
+
+let rec render_function_calc = (calc_sum) => {
+  switch (calc_sum) {
+    | (product, []) => render_product(product)
+    | (product, list_of_sums) => {
+      /* This isn't a great design of the types, but we need to know the operation
+      which is in the first position of the array, we ensure that there's one value
+      since we are on this branch of the switch */
+      let op = pick_operation(List.hd(list_of_sums));
+      let first = render_product(product);
+      let second = render_list_of_sums(list_of_sums);
+      [%expr "calc(" + [%e first] ++ " " ++ [%e op] ++ " " ++ [%e second] ++ ")"];
+    }
+  }
+}
+and render_sum_op = op => {
+  switch (op) {
+    | `Dash(()) => [%expr "-"]
+    | `Cross(()) => [%expr "+"]
+  }
+}
+and pick_operation = ((op, _)) => render_sum_op(op)
+and render_list_of_products = (list_of_products) => {
+  switch (list_of_products) {
+    | [one] => render_product_op(one)
+    | list => render_list_of_products(list)
+  }
+} and render_list_of_sums = (list_of_sums) => {
+  switch (list_of_sums) {
+    | [(_, one)] => render_product(one)
+    | list => render_list_of_sums(list)
+  }
+} and render_product = product => {
+  switch (product) {
+    | (calc_value, []) => render_calc_value(calc_value)
+    | (calc_value, list_of_products) => {
+      let first = render_calc_value(calc_value);
+      let second = render_list_of_products(list_of_products);
+      [%expr "calc(" ++ [%e first] ++ " " ++ "*" ++ " " ++ [%e second] ++ ")"];
+    }
+  }
+} and render_product_op = (op) => {
+  switch (op) {
+    | `Static_0((), calc_value) => render_calc_value(calc_value)
+    | `Static_1((), float) => render_number(float, "")
+  }
+} and render_calc_value = calc_value => {
+  switch (calc_value) {
+    | `Number(float) => render_number(float, "")
+    | `Extended_length(l) => render_extended_length(l)
+    | `Extended_percentage(p) => render_extended_percentage(p)
+    | `Function_calc(fc) => render_function_calc(fc)
+  }
+
+  }  and render_extended_length =
+  fun
+  | `Length(l) => render_length(l)
+  | `Function_calc(fc) => render_function_calc(fc)
+  | `Interpolation(i) => render_variable(i)
+
+  and render_extended_percentage = fun
+  | `Percentage(p) => render_percentage(p)
+  | `Function_calc(fc) => render_function_calc(fc)
+  | `Interpolation(i) => render_variable(i);
+
 let render_length_percentage =
   fun
-  | `Length(length) => render_length(length)
-  | `Percentage(percentage) => render_percentage(percentage);
+  | `Extended_length(length) => render_extended_length(length)
+  | `Extended_percentage(percentage) => render_extended_percentage(percentage);
 
 let render_size =
   fun
   | `Auto => variants_to_string(`Auto)
-  | `Length(_) as lp
-  | `Percentage(_) as lp => render_length_percentage(lp)
+  | `Extended_length(_) as lp
+  | `Extended_percentage(_) as lp => render_length_percentage(lp)
   | `Max_content => [%expr "max-content"]
   | `Min_content => [%expr "min-content"]
   | `Fit_content(_) => [%expr "fit-content"]
+  | `Function_calc(fc) => render_function_calc(fc)
 
 let render_css_global_values = (name, value) => {
   let.ok value = Parser.parse(Standard.css_wide_keywords, value);
@@ -157,11 +228,6 @@ let render_css_global_values = (name, value) => {
   /* bs-css doesn't have those */
   Ok([[%expr CssJs.unsafe([%e render_string(name)], [%e value])]]);
 };
-
-let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
-
-let render_variable = name =>
-  list_to_longident(name) |> txt |> Helper.Exp.ident;
 
 let found = ({ast_of_string, string_to_expr, _}) => {
   let check_value = string => {
