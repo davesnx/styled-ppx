@@ -120,6 +120,9 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
       }
     | (_, loc) => invalid_format(loc);
 
+  if(prelude == []){
+      invalid_format(loc);
+  };
 
   let query = prelude |> List.fold_left(parse_condition, [%expr ""])
 
