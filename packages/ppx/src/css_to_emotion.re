@@ -105,6 +105,15 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
           };
           List.fold_left(concat(~loc), acc, exprs);
       }
+    | (Variable(v), _) => {
+      let ident = switch(v){
+        | [lident] => {txt: Lident(lident), loc}
+        | [longident, lident] => {txt: Ldot(Lident(longident), lident), loc}
+        | _ => failwith("Variable should not be empty, please refer to a variable or module value")
+      } |> Helper.Exp.ident(~loc);
+
+      [%expr [%e acc] ++ [%e ident] ++ " "]
+    }
     | (Ident(id), _) =>  {
       let id = Helper.Exp.constant(~loc, Helper.Const.string(id));
       [%expr [%e acc] ++ [%e id] ++ " "]

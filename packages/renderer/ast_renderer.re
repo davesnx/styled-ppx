@@ -107,7 +107,7 @@ and render_component_value = (ast: with_loc(Component_value.t)) => {
   | Ampersand => "Ampersand"
   | Dimension((a, b)) => "Dimension(" ++ a ++ ", " ++ b ++ ")"
   | Variable(variable) =>
-    "Variable(" ++  variable ++ ")"
+    "Variable(" ++  (variable |> String.concat(".")) ++ ")"
   | Pseudoelement((v, _)) => "Pseudoelement(" ++ v ++ ")"
   | Pseudoclass((v, _)) => "Pseudoclass(" ++ v ++ ")"
   | Selector(v) =>

@@ -76,7 +76,7 @@ let token_to_string =
     ++ dimension_to_string(d)
     ++ ")"
   | Parser.DIMENSION((n, d)) => "DIMENSION(" ++ n ++ ", " ++ d ++ ")"
-  | Parser.VARIABLE(v) => "VARIABLE(" ++ v ++ ")"
+  | Parser.VARIABLE(v) => "VARIABLE(" ++ (String.concat(".", v)) ++ ")"
   | Parser.UNSAFE => "UNSAFE";
 
 let () =
@@ -304,7 +304,7 @@ let rec get_next_token = buf => {
   | (':', ident) => get_pseudoclass(~pos=buf.pos, Sedlexing.latin1(~skip=1, buf))
   | (':', ':', ident) => get_pseudoelement(~pos=buf.pos, Sedlexing.latin1(~skip=2, buf))
   | unsafe => UNSAFE
-  | variable => get_variable(buf)
+  | variable => VARIABLE(Sedlexing.latin1(~skip=2, ~drop=1, buf) |> String.split_on_char('.'))
   | operator => OPERATOR(Sedlexing.latin1(buf))
   | string => STRING(Sedlexing.latin1(~skip=1, ~drop=1, buf))
   | "url(" => get_url("", buf)
@@ -332,17 +332,6 @@ and get_dimension = (n, buf) =>
   | frequency => FLOAT_DIMENSION((n, Sedlexing.latin1(buf), Frequency))
   | ident => DIMENSION((n, Sedlexing.latin1(buf)))
   | _ => NUMBER(n)
-  }
-and get_variable = (buf) =>
-  switch%sedlex (buf) {
-  | variable_name => VARIABLE(Sedlexing.latin1(buf))
-  | _ =>
-    raise(
-      LexingError((
-        buf.Sedlexing.pos,
-        "Variables can't be empty. This shoudn't be reachable since menhir we defined a non_empty_list",
-      )),
-    )
   }
 and get_url = (url, buf) =>
   switch%sedlex (buf) {

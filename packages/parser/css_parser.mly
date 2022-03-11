@@ -32,7 +32,7 @@ open Css_types
 %token <string> UNICODE_RANGE
 %token <string * string * Css_types.dimension> FLOAT_DIMENSION
 %token <string * string> DIMENSION
-%token <string> VARIABLE
+%token <string list> VARIABLE
 %token UNSAFE
 
 %start <Css_types.Stylesheet.t> stylesheet
