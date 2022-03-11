@@ -1,5 +1,13 @@
 open Jest;
 
+
+let width = "218px"
+let media_type = "screen";
+
+module Variables = {
+  let media_type = "screen"
+}
+
 let testData = [
   (
     "(min-width: 30em)",
@@ -50,6 +58,36 @@ let testData = [
       CssJs.media(.
         "all and (max-width: 218px) and (max-height: 281px) and (orientation: portrait) ",
         [|CssJs.color(CssJs.brown)|],
+      ),
+    |])
+  ),
+  (
+    "@media with inteporlation",
+    [%cx "@media (max-width: $(width)) { color: brown }"],
+    CssJs.style(. [|
+      CssJs.media(.
+       "(max-width: 218px) ",
+        [|CssJs.color(CssJs.brown)|],
+      ),
+    |])
+  ),
+  (
+    "@media interpolation with and",
+    [%cx "@media only $(Variables.media_type) and (min-width: $(width)) { color: red }"],
+    CssJs.style(. [|
+      CssJs.media(.
+       "only screen and (min-width: 218px) ",
+        [|CssJs.color(CssJs.red)|],
+      ),
+    |])
+  ),
+  (
+    "@media support calc and interpolation",
+    [%cx "@media (max-width: calc( 20px * $(width))) { color: red }"],
+    CssJs.style(. [|
+      CssJs.media(.
+       "(max-width: calc(20px * 218px)) ",
+        [|CssJs.color(CssJs.red)|],
       ),
     |])
   ),
