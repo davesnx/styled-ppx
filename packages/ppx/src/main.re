@@ -251,6 +251,8 @@ let renderStyledDynamic =
       ),
       Create.bindingCreateVariadicElement(~loc),
       Create.defineDeletePropFn(~loc),
+      Create.defineAssign2(~loc),
+      Create.defineGetOrEmptyFn(~loc),
       Create.dynamicStyles(
         ~loc,
         ~name=styleVariableName,
@@ -278,6 +280,8 @@ let renderStyledComponent = (~loc, ~htmlTag, styles) => {
       Create.makeMakeProps(~loc, ~customProps=None),
       Create.bindingCreateVariadicElement(~loc),
       Create.defineDeletePropFn(~loc),
+      Create.defineAssign2(~loc),
+      Create.defineGetOrEmptyFn(~loc),
       Create.styles(~loc, ~name=styleVariableName, ~expr=styles),
       Create.component(
         ~loc,
@@ -474,7 +478,7 @@ module Mapper = {
 
   let transform = expr => {
     switch (expr.pstr_desc) {
-    /* [%styled.div {||}] */
+    /* module name = [%styled.div {||}] */
     | Pstr_module({
         pmb_name: {loc: _, txt: Some(moduleName)} as name,
         pmb_attributes: _pmb_attributes,
