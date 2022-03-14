@@ -13725,11 +13725,11 @@ module Button = {
   };
   let styles = (~variant, _) => {
     let color = Theme.button(variant);
-    [|
+    CssJs.style(. [|
       CssJs.display(`inlineFlex),
       CssJs.color(color),
       CssJs.width(`percent(100.)),
-    |];
+    |]);
   };
   let make = (props: makeProps('variant)) => {
     let className =
