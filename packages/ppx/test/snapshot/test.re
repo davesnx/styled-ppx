@@ -134,3 +134,22 @@ module MediaQueryCalc = [%styled.div {|
   [%css "font-size: 16px"]
 |]];
 */
+
+module Button = [%styled.button (~variant) => {
+  let color = Theme.button(variant);
+
+  [|
+      [%css "display: inline-flex"],
+      [%css "color: $(color)"],
+      [%css "width: 100%;"],
+  |];
+}];
+
+module Sequence = [%styled.button (~size, ~color) => {
+  [|
+    [%css "width: $(size)"],
+    [%css "color: $(color)"],
+    [%css "display: block;"],
+    [%css "width: 100%;"],
+  |]
+}];

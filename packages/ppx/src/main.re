@@ -154,6 +154,16 @@ let getLastSequence = expr => {
   inner(expr);
 };
 
+let getLastExpression = expr => {
+  let rec inner = expr =>
+    switch (expr.pexp_desc) {
+    | Pexp_let(_, _, expression) => inner(expression)
+    | _ => expr
+    };
+
+  inner(expr);
+};
+
 let renderStyledDynamic =
     (~loc, ~htmlTag, ~label, ~moduleName, ~defaultValue, ~param, ~body) => {
   let (functionExpr, labeledArguments) =
@@ -237,6 +247,12 @@ let renderStyledDynamic =
       let styles =
         sequence |> getLastSequence |> Css_to_emotion.render_style_call;
       Builder.pexp_sequence(~loc, expr, styles);
+    | Pexp_let(Nonrecursive, value_binding, expression) =>
+      /* Generate a new `let in` where the last expression is
+         wrapped in render_style_call */
+      let styles =
+        expression |> getLastExpression |> Css_to_emotion.render_style_call;
+      Builder.pexp_let(~loc, Nonrecursive, value_binding, styles);
     /* TODO: With this default case we support all expressions here.
        Users might find this confusing, we could give some warnings before the type-checker does. */
     | _ => functionExpr
@@ -456,7 +472,6 @@ module Mapper = {
     | _ => None
     };
   };
-
   let getHtmlTagUnsafe = (~loc, str) => {
     switch (String.split_on_char('.', str)) {
     | ["styled", tag] => tag
