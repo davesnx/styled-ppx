@@ -16,8 +16,8 @@ Both `cx` and `styled` extension support the following:
 
 ```reason
 module Component = [%styled.section [|
-    [%css "display: flex;"],
-    [%css "justify-content: center;"]
+  [%css "display: flex;"],
+  [%css "justify-content: center;"]
 |]];
 
 let className = [%cx [|
@@ -33,9 +33,9 @@ Here are some illustrative examples:
 
 ```reason
 module Button = [%styled.button [|
-    buttonStyles, // a variable reference
-    anyRandomFunction(123), // a function call
-    boolean ? [%css "width: 100%;"] : [%css "width: auto"], // conditional
+  buttonStyles, // a variable reference
+  anyRandomFunction(123), // a function call
+  boolean ? [%css "width: 100%;"] : [%css "width: auto"], // conditional
 |];
 ```
 
@@ -69,11 +69,11 @@ module Button = [%styled.button (~variant) => {
   let color = Theme.button(~variant);
 
   [|
-      [%css "color: $(color)"],
-      [%css "width: 100%;"],
-      [%css "display: inline-flex"],
+    [%css "color: $(color)"],
+    [%css "width: 100%;"],
+    [%css "display: inline-flex"],
   |];
-};
+}];
 ```
 
 This is just an example of runtime for styles where the theme calculates the right color for the button.
