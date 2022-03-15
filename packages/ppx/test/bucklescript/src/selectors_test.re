@@ -164,6 +164,26 @@ let testData = [
       )
     |])
   ),
+  (
+    "&:$(Variables.pseudoclass)",
+    [%cx "&:$(Variables.pseudoclass)"],
+    CssJs.style(. [|
+      CssJs.selector(.
+        {js|div > p|js},
+        [| CssJs.color(CssJs.blue) |]
+      )
+    |])
+  ),
+  (
+    "&::$(Variables.pseudoelement)",
+    [%cx "div > $(Variables.element) {color: blue}"],
+    CssJs.style(. [|
+      CssJs.selector(.
+        {js|div > p|js},
+        [| CssJs.color(CssJs.blue) |]
+      )
+    |])
+  ),
 
 
   /* (
