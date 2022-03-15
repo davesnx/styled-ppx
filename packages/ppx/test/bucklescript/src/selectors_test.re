@@ -1,5 +1,20 @@
 open Jest;
 
+
+module Variables {
+
+  let element = "p";
+  let pseudoclass = "active";
+  let pseudoelement = "before";
+  let selector = "button:hover";
+  let selector_query = "button > p";
+  let target = "target";
+
+  let href_target = "\"https\"";
+}
+
+let pseudo = "& + &";
+
 let testData = [
   (
     ">",
@@ -19,7 +34,7 @@ let testData = [
     CssJs.style(.
       [|
         CssJs.selector(.
-          {js|& :nth-child(even)|js},
+          {js|&:nth-child(even)|js},
           [|CssJs.color(CssJs.red)|]
         )
       |]
@@ -84,7 +99,7 @@ let testData = [
     [%cx "& input[type=\"password\"] { border: 1px solid red; } "],
     CssJs.style(. [|
       CssJs.selector(.
-        {js|& input[type= "password"]|js},
+        {js|& input[type = "password"]|js},
         [|CssJs.border(`pxFloat(1.), `solid, CssJs.red)|],
         ),
     |],)
@@ -99,6 +114,57 @@ let testData = [
         ),
     |],)
   ),
+  (
+    "& $(Variables.selector_query)",
+    [%cx "& $(Variables.selector_query) { color: blue }"],
+    CssJs.style(. [|
+      CssJs.selector(.
+        {js|& button > p|js},
+        [| CssJs.color(CssJs.blue) |]
+      )
+    |])
+  ),
+  (
+    "a[$(Variabels.target)]",
+    [%cx "a[$(Variables.target)] { color: blue }"],
+    CssJs.style(. [|
+      CssJs.selector(.
+        {js|a[target]|js},
+        [| CssJs.color(CssJs.blue) |]
+      )
+    |])
+  ),
+  (
+    "a[href^=$(Variables.href_target)]",
+    [%cx "a[href^=$(Variables.href_target)] { color: blue }"],
+    CssJs.style(. [|
+      CssJs.selector(.
+        {js|a[href^="https"]|js},
+        [| CssJs.color(CssJs.blue) |]
+      )
+    |])
+  ),
+  (
+    "$(pseudo)",
+    [%cx "$(pseudo) {color: blue}"],
+    CssJs.style(. [|
+      CssJs.selector(.
+        {js|& + &|js},
+        [| CssJs.color(CssJs.blue) |]
+      )
+    |])
+  ),
+  (
+    "div > $(Variables.element)",
+    [%cx "div > $(Variables.element) {color: blue}"],
+    CssJs.style(. [|
+      CssJs.selector(.
+        {js|div > p|js},
+        [| CssJs.color(CssJs.blue) |]
+      )
+    |])
+  ),
+
 
   /* (
     "*:not(:last-child)",

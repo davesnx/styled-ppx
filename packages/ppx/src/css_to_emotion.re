@@ -46,7 +46,10 @@ let number_to_const = number =>
 
 let string_to_const = (~loc, s) =>
   Helper.Exp.constant(~loc, Helper.Const.string(~quotation_delimiter="js", s));
-
+let render_variable = (v) => {
+  let txt = v |> String.concat(".") |> Longident.parse;
+  Helper.Exp.ident({loc: Location.none, txt})
+};
 let source_code_of_loc = loc => {
   let Location.{loc_start, loc_end, _} = loc;
   let Lex_buffer.{buf, pos, _} = Lex_buffer.last_buffer^;
@@ -180,48 +183,74 @@ and render_declarations = ds => {
   )
 }
 and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
-  let (prelude, prelude_loc) = rule.Style_rule.prelude;
+  let (prelude, _) = rule.Style_rule.prelude;
   let block = rule.Style_rule.block;
   let (_, loc) = rule.Style_rule.block;
   let dl_expr = render_declarations(block) |> Builder.pexp_array(~loc);
 
-  let rec render_prelude_value = (s, (value, value_loc)) => {
 
-    switch (value) {
-    | Delim(":") => ":" ++ s
-    | Delim(".") => "." ++ s
-    | Delim(",") => ", " ++ s
-    /* v can be ">", so we need an empty space between */
-    | Delim(v) => v ++ " " ++ s
-    | Ident(v)
-    | Operator(v)
-    | Number(v) => v ++ s
-    | Hash(v) => "#" ++ v ++ s
-    | String(v) => Format.sprintf("\"%s\"", v);
-    /*<number><string> is parsed as Dimension */
-    | Dimension((number, dimension)) => number ++ dimension ++ " " ++ s
-    | Function((f, _l), (args, _la)) =>
-      f ++ "(" ++ List.fold_left(render_prelude_value, ")", List.rev(args))
-    | Bracket_block(c) =>
-      "[" ++ List.fold_left(render_prelude_value, "", List.rev(c)) ++ "]" ++ s
-    | Paren_block(c) =>
-     "(" ++ List.fold_left(render_prelude_value, ")", List.rev(c)) ++ s
-    | Ampersand => "& " ++ s
-    | Pseudoelement((v, _)) =>  "::" ++ v ++ s
-    | Pseudoclass((v, _)) => ":" ++ v ++ s
-    | Selector(v) => List.fold_left(render_prelude_value, "", List.rev(v));
-    | _ => grammar_error(value_loc, "Unexpected selector")
-    };
+  let concat = (~loc, expr, acc) => {
+    let concat_fn = {txt: Lident("^"), loc}  |> Helper.Exp.ident(~loc);
+    Helper.Exp.apply(~loc, concat_fn, [(Nolabel, expr), (Nolabel, acc)])
+  }
+
+  let rec render_prelude_value = (acc, list) => {
+    switch(list) {
+      | [] => string_to_const(~loc=Location.none, acc);
+      | [ (value, value_loc), ...rest] => {
+        switch(value) {
+          | Delim(":") => render_prelude_value(acc ++ ":", rest)
+          | Delim(".") => render_prelude_value(acc ++ ".", rest)
+          | Delim(",") => render_prelude_value(acc ++ ", ", rest)
+          | Delim(v) => render_prelude_value(acc ++ " " ++ v ++ " ", rest)
+          | Ident(v)
+          | Operator(v)
+          | Number(v) => render_prelude_value(acc ++ v, rest)
+          | Hash(v) => render_prelude_value(acc ++ "#" ++ v, rest)
+          | String(v) => render_prelude_value(acc ++ "\"" ++ v ++ "\"", rest)
+          | Ampersand => {
+            let ampersand = switch(rest) {
+              | [] => "&"
+              | [(next_value, _) , ..._] =>
+                switch(next_value){
+                | Delim(":")
+                | Delim(".")
+                | Delim(",") => "& "
+                | Delim(_)
+                | Pseudoclass(_)
+                | Pseudoelement(_) => "&"
+                | _ => "& "
+              }
+            }
+            render_prelude_value(acc ++ ampersand, rest)
+          }
+          | Dimension((number, dimension)) => render_prelude_value(acc ++ number ++ dimension, rest)
+          | Pseudoclass((v, _)) => render_prelude_value(acc ++ ":" ++ v, rest);
+          | Pseudoelement((v, _)) => render_prelude_value(acc ++ "::" ++ v, rest);
+          | Bracket_block(b) => {
+            concat(~loc, string_to_const(~loc, acc), concat(~loc, string_to_const(~loc, "["), concat(~loc, render_prelude_value("", b), string_to_const(~loc, "]"))))
+          }
+          | Paren_block(b) => {
+            concat(~loc, string_to_const(~loc, acc), concat(~loc, string_to_const(~loc, "("), concat(~loc, render_prelude_value("", b), string_to_const(~loc, ")"))))
+          }
+          | Selector(v) => {
+            render_prelude_value(acc, v)
+          }
+          | Variable(v) => {
+              concat(~loc=Location.none, string_to_const(~loc=Location.none, acc), concat(~loc=Location.none, render_variable(v), render_prelude_value("", rest)))
+          }
+          | _ => grammar_error(value_loc, "Unexpected selector");
+        }
+      }
+    }
   };
 
   let render_rule_value = (ident, selector) => {
-    let selector_expr = string_to_const(~loc=prelude_loc, selector);
-
     Helper.Exp.apply(
       ~loc=rule.Style_rule.loc,
       ~attrs=[Create.uncurried(~loc=rule.Style_rule.loc)],
       ident,
-      [(Nolabel, selector_expr), (Nolabel, dl_expr)],
+      [(Nolabel, selector), (Nolabel, dl_expr)],
     );
   }
 
@@ -273,9 +302,17 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
                     ident, [(Nolabel, selector_name), (Nolabel, selector_expr)]);
 
         | Bracket_block(c) =>
-                  let selector = value ++ "[" ++ List.fold_left(render_prelude_value, "]", List.rev(c)) |> String.trim;
+                  let selector = concat(~loc, string_to_const(~loc, value), concat(~loc, string_to_const(~loc, "["), concat(~loc, render_prelude_value("", c) , string_to_const(~loc, "]"))));
                   render_rule_value(ident, selector);
 
+        | Variable(v) =>
+          let variable = render_variable(v);
+
+          let selector_name = string_to_const(~loc, value);
+
+          Helper.Exp.apply(~loc=rule.Style_rule.loc,
+                    ~attrs=([Create.uncurried(~loc=rule.Style_rule.loc)]),
+                    ident, [(Nolabel, selector_name), (Nolabel, variable)]);
         | _ => failwith("Invalid selector");
       }
     }
@@ -293,9 +330,8 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
   | [(Selector([(Ampersand, _), (Pseudoclass(_) as p , _)]), _)]
   | [(Selector([(Ampersand, _), (Pseudoelement(_) as p, _)]), _)] => render_self(p);
   | _ =>
-    let selector =
-      List.fold_left(render_prelude_value, "", List.rev(prelude)) |> String.trim;
-      render_rule_value(ident, selector);
+    let selector = render_prelude_value("", prelude)
+    render_rule_value(ident, selector);
   };
 };
 
