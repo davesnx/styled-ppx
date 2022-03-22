@@ -1,6 +1,5 @@
 open Jest;
 
-
 module Variables {
 
   let element = "p";
@@ -12,7 +11,6 @@ module Variables {
 
   let href_target = "\"https\"";
 }
-
 let pseudo = "& + &";
 
 let testData = [
@@ -166,20 +164,20 @@ let testData = [
   ),
   (
     "&:$(Variables.pseudoclass)",
-    [%cx "&:$(Variables.pseudoclass)"],
+    [%cx "&:$(Variables.pseudoclass) {color: blue}"],
     CssJs.style(. [|
       CssJs.selector(.
-        {js|div > p|js},
+        {js|&:active|js},
         [| CssJs.color(CssJs.blue) |]
       )
     |])
   ),
   (
     "&::$(Variables.pseudoelement)",
-    [%cx "div > $(Variables.element) {color: blue}"],
+    [%cx "&::$(Variables.pseudoelement) {color: blue}"],
     CssJs.style(. [|
       CssJs.selector(.
-        {js|div > p|js},
+        {js|&::before|js},
         [| CssJs.color(CssJs.blue) |]
       )
     |])

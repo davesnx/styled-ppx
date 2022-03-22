@@ -213,7 +213,6 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
               | [] => "&"
               | [(next_value, _) , ..._] =>
                 switch(next_value){
-                | Delim(":")
                 | Delim(".")
                 | Delim(",") => "& "
                 | Delim(_)
@@ -225,8 +224,8 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
             render_prelude_value(acc ++ ampersand, rest)
           }
           | Dimension((number, dimension)) => render_prelude_value(acc ++ number ++ dimension, rest)
-          | Pseudoclass((v, _)) => render_prelude_value(acc ++ ":" ++ v, rest);
-          | Pseudoelement((v, _)) => render_prelude_value(acc ++ "::" ++ v, rest);
+          | Pseudoclass((v, _)) => render_prelude_value(acc ++ v, rest);
+          | Pseudoelement((v, _)) => render_prelude_value(acc ++ v, rest);
           | Bracket_block(b) => {
             concat(~loc, string_to_const(~loc, acc), concat(~loc, string_to_const(~loc, "["), concat(~loc, render_prelude_value("", b), string_to_const(~loc, "]"))))
           }
@@ -326,9 +325,9 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
   }
 
   switch (prelude) {
-  | [(Selector([(Ident(i),_), (v,_)]), _)] => render_selector_value(i, v);
-  | [(Selector([(Ampersand, _), (Pseudoclass(_) as p , _)]), _)]
-  | [(Selector([(Ampersand, _), (Pseudoelement(_) as p, _)]), _)] => render_self(p);
+  | [(Selector([(Ident(i),_), (v,_)]), _)] => render_selector_value(i, v); 
+  | [(Selector([(Ampersand, _), (Delim(":"), _), (Pseudoclass(_) as p , _)]), _)]
+  | [(Selector([(Ampersand, _), (Delim(":"), _), (Delim(":"), _), (Pseudoelement(_) as p, _)]), _)] => render_self(p);
   | _ =>
     let selector = render_prelude_value("", prelude)
     render_rule_value(ident, selector);
