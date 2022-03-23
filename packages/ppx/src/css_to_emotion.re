@@ -284,7 +284,7 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
     }
     | _ => failwith("Expected a Pseudoelement or a Pseudoclass");
 
-   let render_selector_value = (value, s) => {
+   let render_selector_value = (~value_loc, value, s) => {
 
       switch(s) {
         | Pseudoelement((_, _)) as p
@@ -305,7 +305,7 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
                   render_rule_value(ident, selector);
 
         | Variable(v) =>
-          let variable = render_variable(v);
+          let variable = render_variable(~loc=value_loc, v);
 
           let selector_name = string_to_const(~loc, value);
 
@@ -325,7 +325,7 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
   }
 
   switch (prelude) {
-  | [(Selector([(Ident(i),_), (v,_)]), _)] => render_selector_value(i, v); 
+  | [(Selector([(Ident(i),_), (value, value_loc)]), _)] => render_selector_value(~value_loc, i, value); 
   | [(Selector([(Ampersand, _), (Delim(":"), _), (Pseudoclass(_) as p , _)]), _)]
   | [(Selector([(Ampersand, _), (Delim(":"), _), (Delim(":"), _), (Pseudoelement(_) as p, _)]), _)] => render_self(p);
   | _ =>
