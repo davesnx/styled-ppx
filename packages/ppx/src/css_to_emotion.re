@@ -46,9 +46,9 @@ let number_to_const = number =>
 
 let string_to_const = (~loc, s) =>
   Helper.Exp.constant(~loc, Helper.Const.string(~quotation_delimiter="js", s));
-let render_variable = (v) => {
+let render_variable = (~loc, v) => {
   let txt = v |> String.concat(".") |> Longident.parse;
-  Helper.Exp.ident({loc: Location.none, txt})
+  Helper.Exp.ident({loc, txt})
 };
 let source_code_of_loc = loc => {
   let Location.{loc_start, loc_end, _} = loc;
@@ -196,7 +196,7 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
 
   let rec render_prelude_value = (acc, list) => {
     switch(list) {
-      | [] => string_to_const(~loc=Location.none, acc);
+      | [] => string_to_const(~loc, acc);
       | [ (value, value_loc), ...rest] => {
         switch(value) {
           | Delim(":") => render_prelude_value(acc ++ ":", rest)
@@ -236,7 +236,7 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
             render_prelude_value(acc, v)
           }
           | Variable(v) => {
-              concat(~loc=Location.none, string_to_const(~loc=Location.none, acc), concat(~loc=Location.none, render_variable(v), render_prelude_value("", rest)))
+              concat(~loc=value_loc, string_to_const(~loc=value_loc, acc), concat(~loc=value_loc, render_variable(~loc=value_loc, v), render_prelude_value("", rest)))
           }
           | _ => grammar_error(value_loc, "Unexpected selector");
         }
