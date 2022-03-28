@@ -270,19 +270,13 @@ let discard_comments_and_white_spaces = buf => {
   discard_white_spaces(buf);
 };
 
-let get_pseudoclass = (~pos, value) => {
+let get_ident = (value) => {
   open Css_parser;
-  switch (value) {
-    | "active" | "checked" | "default" | "dir" | "disabled" | "empty" | "enabled" | "first" | "first-child" | "first-of-type" | "fullscreen" | "focus" | "hover" | "indeterminate" | "in-range" | "invalid" | "lang" | "last-child" | "last-of-type" | "left" | "link" | "not" | "nth-child" | "nth-last-child" | "nth-last-of-type" | "nth-of-type" | "only-child" | "only-of-type" | "optional" | "out-of-range" | "read-only" | "read-write" | "required" | "right" | "root" | "scope" | "target" | "valid" | "visited" => PSEUDOCLASS(value)
-    | _ => raise(LexingError((pos, "Invalid pseudoclass: '" ++ value ++ "'")));
-  }
-}
-
-let get_pseudoelement = (~pos, value) => {
-  open Css_parser;
-  switch (value) {
-  | "after" | "before" | "cue" | "first-letter" | "first-line" | "selection" | "slotted" | "backdrop" | "placeholder" | "marker" | "spelling-error" | "grammar-error" => PSEUDOELEMENT(value)
-  | _ => raise(LexingError((pos, "Invalid pseudoelement: '" ++ value ++ "'")));
+  switch(value) {
+    | "attr" | "calc" | "conic-gradient" | "counter" | "cubic-bezier" | "hsl" | "hsla" | "linear-gradient" | "max" | "min" | "radial-gradient" | "repeating-conic-gradient" | "repeating-linear-gradient" | "repeating-radial-gradient" | "rgb" | "rgba" | "var" => FUNCTION(value)
+    | "after" | "before" | "cue" | "first-letter" | "first-line" | "selection" | "slotted" | "backdrop" | "placeholder" | "marker" | "spelling-error" | "grammar-error" => PSEUDOELEMENT(value)
+    | "active" | "checked" | "default" | "dir" | "disabled" | "empty" | "enabled" | "first" | "first-child" | "first-of-type" | "fullscreen" | "focus" | "hover" | "indeterminate" | "in-range" | "invalid" | "lang" | "last-child" | "last-of-type" | "link" | "not" | "nth-child" | "nth-last-child" | "nth-last-of-type" | "nth-of-type" | "only-child" | "only-of-type" | "optional" | "out-of-range" | "read-only" | "read-write" | "required" | "right" | "root" | "scope" | "target" | "valid" | "visited" => PSEUDOCLASS(value)
+    | _ => IDENT(value)
   }
 }
 
@@ -301,8 +295,6 @@ let rec get_next_token = buf => {
   | ']' => RIGHT_BRACKET
   | '%' => PERCENTAGE
   | '&' => AMPERSAND
-  | (':', ident) => get_pseudoclass(~pos=buf.pos, Sedlexing.latin1(~skip=1, buf))
-  | (':', ':', ident) => get_pseudoelement(~pos=buf.pos, Sedlexing.latin1(~skip=2, buf))
   | unsafe => UNSAFE
   | variable => VARIABLE(Sedlexing.latin1(~skip=2, ~drop=1, buf) |> String.split_on_char('.'))
   | operator => OPERATOR(Sedlexing.latin1(buf))
@@ -316,8 +308,7 @@ let rec get_next_token = buf => {
   /* NOTE: should be placed above ident, otherwise pattern with
    * '-[0-9a-z]{1,6}' cannot be matched */
   | (_u, '+', unicode_range) => UNICODE_RANGE(Sedlexing.latin1(buf))
-  | (ident, '(') => FUNCTION(Sedlexing.latin1(~drop=1, buf))
-  | ident => IDENT(Sedlexing.latin1(buf))
+  | ident => get_ident(Sedlexing.latin1(buf))
   | ('#', name) => HASH(Sedlexing.latin1(~skip=1, buf))
   | number => get_dimension(Sedlexing.latin1(buf), buf)
   | any => DELIM(Sedlexing.latin1(buf))

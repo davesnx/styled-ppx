@@ -217,7 +217,7 @@ component_value:
   | o = OPERATOR { Component_value.Operator o }
   | d = DELIM { Component_value.Delim d }
   | COLON { Component_value.Delim ":" }
-  | f = FUNCTION; xs = list(component_value_with_loc); RIGHT_PAREN {
+  | f = FUNCTION; xs = paren_block {
       Component_value.Function (
         (f, Lex_buffer.make_loc $startpos(f) $endpos(f)),
         (xs, Lex_buffer.make_loc $startpos(xs) $endpos(xs))
