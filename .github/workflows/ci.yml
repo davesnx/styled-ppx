@@ -97,7 +97,7 @@ jobs:
         run: esy cleanup .
 
   e2e:
-    name: BuckleScript tests
+    name: Browser tests
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -123,7 +123,7 @@ jobs:
 
       - name: Get cache directory path
         id: yarn-cache-dir-path
-        working-directory: ./packages/ppx/test/bucklescript
+        working-directory: ./packages/ppx/test/browser
         run: echo "::set-output name=dir::$(yarn cache dir)"
 
       - name: Load global cache
@@ -131,19 +131,19 @@ jobs:
         id: yarn-cache
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: yarn-${{ matrix.os }}-${{ hashFiles('./packages/ppx/test/bucklescript/yarn.lock') }}
+          key: yarn-${{ matrix.os }}-${{ hashFiles('./packages/ppx/test/browser/yarn.lock') }}
           restore-keys: yarn-${{ matrix.os }}-
 
       - name: Install dependencies
-        working-directory: ./packages/ppx/test/bucklescript
+        working-directory: ./packages/ppx/test/browser
         run: yarn
 
       - name: Build
-        working-directory: ./packages/ppx/test/bucklescript
+        working-directory: ./packages/ppx/test/browser
         run: yarn build
 
       - name: Test
-        working-directory: ./packages/ppx/test/bucklescript
+        working-directory: ./packages/ppx/test/browser
         run: yarn test
 
   publish:

@@ -6,7 +6,6 @@
     "watch": "rescript build -w",
     "clean": "rescript clean",
     "test": "jest --ci --silent",
-    "prestart": "rescript build",
     "start": "yarn test"
   },
   "dependencies": {
