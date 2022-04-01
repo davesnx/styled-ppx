@@ -4330,6 +4330,11 @@ rescript-webapi@^0.2.0:
   resolved "https://registry.yarnpkg.com/rescript-webapi/-/rescript-webapi-0.2.0.tgz#713cabf41b98b1bfa536ef25e2b333899e3cc570"
   integrity sha512-SzWON5edviVG1mtHvrUR6UZIpDqSY/nYVkl9F92zFxXhZ+VAdmiJtYoHZTRJ9DSgaslcyY4c9ZlymRqyWZ7eEA==
 
+rescript@^9.1.4:
+  version "9.1.4"
+  resolved "https://registry.yarnpkg.com/rescript/-/rescript-9.1.4.tgz#1eb126f98d6c16942c0bf0df67c050198e580515"
+  integrity sha512-aXANK4IqecJzdnDpJUsU6pxMViCR5ogAxzuqS0mOr8TloMnzAjJFu63fjD6LCkWrKAhlMkFFzQvVQYaAaVkFXw==
+
 resolve-cwd@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/resolve-cwd/-/resolve-cwd-2.0.0.tgz#00a9f7387556e27038eae232caa372a6a59b665a"

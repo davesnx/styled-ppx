@@ -1,5 +1,5 @@
 {
-  "name": "bucklescript",
+  "name": "ppx-test-browser",
   "reason": {
     "react-jsx": 3
   },
