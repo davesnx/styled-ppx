@@ -18,6 +18,7 @@
 ; type check
 
 (rule
+ (alias native_typecheck_test)
  (targets static_css_tests.ml)
  (deps ./Runner.exe)
  (action
