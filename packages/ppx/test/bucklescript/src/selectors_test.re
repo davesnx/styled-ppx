@@ -182,8 +182,98 @@ let testData = [
       )
     |])
   ),
+  (
+  "&:is(em, #foo)",
+  [%cx "&:is(em, #foo) {color: blue}"],
+  CssJs.style(. [|
+      CssJs.selector(.
+        {js|&:is(em, #foo)|js},
+        [| CssJs.color(CssJs.blue) |]
+      )
+    |])
+  ),
+  (
+  "&:not(em, strong#foo)",
+  [%cx "&:not(em, strong#foo) {color: blue}"],
+  CssJs.style(. [|
+      CssJs.selector(.
+        {js|&:not(em, strong#foo)|js},
+        [| CssJs.color(CssJs.blue) |]
+      )
+    |])
+  ),
+  (
+    "h1 ~ pre",
+    [%cx "h1 ~ pre {color: blue}"],
+    CssJs.style(. [|
+      CssJs.selector(.
+        {js|h1 ~ pre|js},
+        [|CssJs.color(CssJs.blue)|]
+      )
+    |])
+  ),
+  (
+    ".qux:where(em, #foo#bar#baz)",
+    [%cx ".qux:where(em, #foo#bar#baz) {color: blue}"],
+    CssJs.style(. [|
+      CssJs.selector(.
+        {js|.qux:where(em, #foo#bar#baz)|js},
+        [|CssJs.color(CssJs.blue)|]
+      )
+    |])
+  ),
+  (
+    "&:nth-last-child(-n + 2)",
+    [%cx "&:nth-last-child(-n + 2) {}"],
+    CssJs.style(. [|
+      CssJs.selector(. 
+        {js|&:nth-last-child(-n + 2)|js},
+        [||]
+      )
+    |])
+  ),
+  (
+    "ol > li:last-child",
+    [%cx "ol > li:last-child { margin: 10px; }"],
+    CssJs.style(. [|
+      CssJs.selector(.
+        {js|ol > li:last-child|js},
+        [|CssJs.margin(CssJs.px(10))|]
+      )
+    |]),
+  ),
+  // (
+  // "&:nth-child(even of li, .item)",
+  // [%cx "&:nth-child(even of li, .item) {color: blue}"],
+  // CssJs.style(. [|
+  //     CssJs.selector(.
+  //       {js|&:nth-child(even of li, .item)|js},
+  //       [| CssJs.color(CssJs.blue) |]
+  //     )
+  //   |])
+  // ),
+  // (
+  //   "&:nth-last-child(-n+2)",
+  //   [%cx "&:nth-last-child(-n+2) {}"],
+  //   CssJs.style(. [|
+  //     CssJs.selector(. 
+  //       {js|&:nth-last-child(-n+2)|js},
+  //       [||]
+  //     )
+  //   |])
+  // ),
 
-
+  // (
+  //   "F || E",
+  //   [%cx "F || E {}"],
+  //   CssJs.style(. [|
+  //     CssJs.selector(. 
+  //       {js|F || E|js},
+  //       [||]
+  //     )
+  //   |])
+  // ),
+  
   /* (
     "*:not(:last-child)",
     [%cx "& > *:not(:last-child) { margin: 10px; }"],
@@ -194,6 +284,28 @@ let testData = [
       )
     |]),
   ) */
+
+  // (
+  //   "dl dt:not(:last-child)",
+  //   [%cx "dl dt:not(:last-child) { margin: 10px; }"],
+  //   CssJs.style(. [|
+  //     CssJs.selector(.
+  //       {js|dl dt:not(:last-child)|js},
+  //       [|CssJs.margin(CssJs.px(10))|]
+  //     )
+  //   |]),
+  // ),
+
+  // (
+  // ".foo :is(.bar, #baz)",
+  // [%cx ".foo :is(.bar, #baz) {color: blue}"],
+  // CssJs.style(. [|
+  //     CssJs.selector(.
+  //       {js|.foo :is(.bar, #baz)|js},
+  //       [| CssJs.color(CssJs.blue) |]
+  //     )
+  //   |])
+  // ),
 ];
 
 describe("Selectors", _ => {
