@@ -13,7 +13,6 @@
     "@testing-library/jest-dom": "^5.15.1",
     "bs-css": "^15.0.2",
     "bs-css-emotion": "^4.0.2",
-    "bs-platform": "^9.0.2",
     "bs-react-testing-library": "^0.7.0",
     "concurrently": "^5.1.0",
     "jest": "^25.1.0",
