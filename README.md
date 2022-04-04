@@ -43,7 +43,7 @@ Add the PPX in your `bsconfig.json` file under `"ppx-flags"`
 
 #### Use
 
-```reason
+```rescript
 module Link = [%styled.a (~color="#4299E1") => {|
   font-size: 1.875rem;
   line-height: 1.5;

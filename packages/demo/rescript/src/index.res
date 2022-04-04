@@ -1,11 +1,9 @@
 module App = %styled.div(`
   position: absolute;
-
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-
   cursor: pointer;
 `)
 
