@@ -1,6 +1,6 @@
 # styled-ppx
 
-**styled-ppx** is the [ppx](https://dev.realworldocaml.org/ppx.html) that brings typed styled components to Reason, OCaml and ReScript.
+**styled-ppx** is the [ppx](https://dev.realworldocaml.org/ppx.html) that brings typed styled components to ReScript.
 
 Build on top of [emotion](https://emotion.sh), it allows you to style apps safe, quickly, performant and as you always done it.
 
@@ -16,7 +16,7 @@ Check our website: [styled-ppx.vercel.app](https://styled-ppx.vercel.app)
 
 ### Getting started
 
-Depends on [bs-css with bs-css-emotion](https://github.com/giraud/bs-css), [ReasonReact](https://reasonml.github.io/reason-react/) or [rescript-react](https://github.com/rescript-lang/rescript-react), make sure you have them installed first.
+Depends on [bs-css with bs-css-emotion](https://github.com/giraud/bs-css), [rescript-react](https://github.com/rescript-lang/rescript-react), make sure you have them installed first.
 
 #### Install
 
