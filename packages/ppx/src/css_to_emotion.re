@@ -252,29 +252,21 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
       | Bracket_block(b) =>
         concat(
           ~loc,
-          string_to_const(~loc, acc),
+          string_to_const(~loc, acc ++ "["),
           concat(
             ~loc,
-            string_to_const(~loc, "["),
-            concat(
-              ~loc,
-              render_prelude_value("", b),
-              string_to_const(~loc, "]"),
-            ),
+            render_prelude_value("", b),
+            string_to_const(~loc, "]"),
           ),
         )
       | Paren_block(b) =>
         concat(
           ~loc,
-          string_to_const(~loc, acc),
+          string_to_const(~loc, acc ++ "("),
           concat(
             ~loc,
-            string_to_const(~loc, "("),
-            concat(
-              ~loc,
-              render_prelude_value("", b),
-              string_to_const(~loc, ")"),
-            ),
+            render_prelude_value("", b),
+            string_to_const(~loc, ")"),
           ),
         )
       | Selector(v) => render_prelude_value(acc, v)

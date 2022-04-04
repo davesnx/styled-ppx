@@ -30,7 +30,7 @@ let selector_css_tests = [
     [%expr
       CssJs.style(. [|
         CssJs.selector(.
-          {js|&:nth-child|js} ++ {js|(|js} ++ {js|even|js} ++ {js|)|js},
+          {js|&:nth-child(|js} ++ {js|even|js} ++ {js|)|js},
           [||],
         ),
       |])
@@ -60,7 +60,7 @@ let selector_css_tests = [
     [%expr
       CssJs.style(. [|
         CssJs.selector(.
-          {js|& > div:nth-child|js} ++ {js|(|js} ++ {js|3n + 1|js} ++ {js|)|js},
+          {js|& > div:nth-child(|js} ++ {js|3n + 1|js} ++ {js|)|js},
           [||],
         ),
       |])
@@ -71,7 +71,7 @@ let selector_css_tests = [
     [%expr
       CssJs.style(. [|
         CssJs.selector(.
-          {js|& p:not|js} ++ {js|(|js} ++ {js|.active|js} ++ {js|)|js},
+          {js|& p:not(|js} ++ {js|.active|js} ++ {js|)|js},
           [|CssJs.display(`none)|],
         ),
       |])
@@ -162,7 +162,7 @@ let selector_css_tests = [
     [%expr
       CssJs.style(. [|
         CssJs.selector(.
-          {js|&:is|js} ++ {js|(|js} ++ {js|em, #foo|js} ++ {js|)|js},
+          {js|&:is(|js} ++ {js|em, #foo|js} ++ {js|)|js},
           [||],
         ),
       |])
@@ -173,7 +173,7 @@ let selector_css_tests = [
     [%expr
       CssJs.style(. [|
         CssJs.selector(.
-          {js|&:not|js} ++ {js|(|js} ++ {js|em, strong#foo|js} ++ {js|)|js},
+          {js|&:not(|js} ++ {js|em, strong#foo|js} ++ {js|)|js},
           [||],
         ),
       |])
@@ -188,8 +188,7 @@ let selector_css_tests = [
     [%expr
       CssJs.style(. [|
         CssJs.selector(.
-          {js|.qux:where|js}
-          ++ {js|(|js}
+          {js|.qux:where(|js}
           ++ {js|em, #foo#bar#baz|js}
           ++ {js|)|js},
           [||],
@@ -208,7 +207,7 @@ let selector_css_tests = [
     [%expr
       CssJs.style(. [|
         CssJs.selector(.
-          {js|&:nth-last-child|js} ++ {js|(|js} ++ {js|-n + 2|js} ++ {js|)|js},
+          {js|&:nth-last-child(|js} ++ {js|-n + 2|js} ++ {js|)|js},
           [||],
         ),
       |])
@@ -219,8 +218,7 @@ let selector_css_tests = [
     [%expr
       CssJs.style(. [|
         CssJs.selector(.
-          {js|& input|js}
-          ++ {js|[|js}
+          {js|& input[|js}
           ++ {js|type = "password"|js}
           ++ {js|]|js},
           [||],
@@ -233,15 +231,14 @@ let selector_css_tests = [
     [%expr [%cx "&:nth-child(even of li, .item) {}"]],
     [%expr
       CssJs.style(. [|
-        CssJs.selector(. {js|&:nth-child|js} ++ {js|(|js} ++ {js|evenofli, .item|js} ++ {js|)|js}, [||]),
+        CssJs.selector(. {js|&:nth-child(|js} ++ {js|evenofli, .item|js} ++ {js|)|js}, [||]),
       |])
     ],
   ),
-  /* Not a bug, but annoying we separate operations with spaces */
   (
     [%expr [%cx "&:nth-last-child(-n+2) {}"]],
     [%expr
-      CssJs.style(. [|CssJs.selector(. {js|&:nth-last-child|js} ++ {js|(|js} ++ {js|-n + 2|js} ++ {js|)|js}, [||])|])
+      CssJs.style(. [|CssJs.selector(. {js|&:nth-last-child(|js} ++ {js|-n + 2|js} ++ {js|)|js}, [||])|])
     ],
   ),
   /* BUG F||E */
@@ -253,14 +250,14 @@ let selector_css_tests = [
   (
     [%expr [%cx "& > *:not(:last-child) {}"]],
     [%expr
-      CssJs.style(. [|CssJs.selector(. {js|& >  * :not|js} ++ {js|(|js} ++ {js|:last-child|js} ++ {js|)|js}, [||])|])
+      CssJs.style(. [|CssJs.selector(. {js|& >  * :not(|js} ++ {js|:last-child|js} ++ {js|)|js}, [||])|])
     ],
   ),
   /* BUG dl dt */
   (
     [%expr [%cx "dl dt:not(:last-child) {}"]],
     [%expr
-      CssJs.style(. [|CssJs.selector(. {js|dldt:not|js} ++ {js|(|js} ++ {js|:last-child|js} ++ {js|)|js}, [||])|])
+      CssJs.style(. [|CssJs.selector(. {js|dldt:not(|js} ++ {js|:last-child|js} ++ {js|)|js}, [||])|])
     ],
   ),
   /* BUG `.foo:is` === `.foo :is` */
@@ -269,7 +266,7 @@ let selector_css_tests = [
     [%expr
       CssJs.style(. [|
         CssJs.selector(.
-          {js|.foo:is|js} ++ {js|(|js} ++ {js|.bar, #baz|js} ++ {js|)|js},
+          {js|.foo:is(|js} ++ {js|.bar, #baz|js} ++ {js|)|js},
           [||],
         ),
       |])
