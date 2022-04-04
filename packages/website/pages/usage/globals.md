@@ -1,22 +1,14 @@
 # Inject global styles
+
 `%styled.global` is the method to apply general styles to your website.
 
-```reason
-[%styled.global {|
+```rescript
+%styled.global(`
   html, body {
     margin: 0;
     padding: 0;
   }
-|}];
-```
-
-```reason
-[%styled.global {|
-  html, body {
-    margin: 0;
-    padding: 0;
-  }
-|}];
+`)
 ```
 
 Recommend to not add `@font-face` defintions as globals. Consider adding the font directly to the HTML or in a `style.css` file. [More](https://andydavies.me/blog/2019/02/12/preloading-fonts-and-the-puzzle-of-priorities/).

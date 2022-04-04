@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 # Getting Started
 
-Depends on [bs-css with bs-css-emotion](https://github.com/giraud/bs-css), [ReasonReact](https://reasonml.github.io/reason-react/) or [rescript-react](https://github.com/rescript-lang/rescript-react), make sure you have them installed first.
+Depends on [bs-css-emotion](https://github.com/giraud/bs-css)and [rescript-react](https://github.com/rescript-lang/rescript-react), make sure you have them installed first.
 
 ### Install
 
@@ -26,7 +26,7 @@ The `bsconfig.json` resultant should contain at least
 ```json
 {
   "bs-dependencies": [
-    "reason-react",
+    "@rescript/react",
     "bs-css",
     "bs-css-emotion"
   ],
@@ -36,7 +36,7 @@ The `bsconfig.json` resultant should contain at least
 
 ### Use
 
-```reason
+```rescript
 module Link = [%styled.a (~color="#4299E1") => {|
   font-size: 1.875rem;
   line-height: 1.5;

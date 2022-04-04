@@ -12,14 +12,14 @@ Write your styles in CSS inside Reason/OCaml/ReScript files and generate compone
 
 **styled-ppx** is a ppx you can learn more in the [Real World OCaml: Preprocessing with ppx](https://dev.realworldocaml.org/ppx.html). For now, are similar to [babel-plugins](https://babeljs.io/docs/en/plugins/) which transform your code.
 
-```reason
-module Center = [%styled.div {|
+```rescript
+module Center = %styled.div(`
   height: 100vh;
   width: 100vw;
   display: flex;
   align-items: center;
   justify-content: center;
-|}];
+`)
 
 <Center>
   {React.string("Hello from the future!")}
