@@ -44,31 +44,28 @@ Add the PPX in your `bsconfig.json` file under `"ppx-flags"`
 #### Use
 
 ```rescript
-module Link = [%styled.a (~color="#4299E1") => {|
+module Link = %styled.a(
+  (~color="#4299E1") => `
   font-size: 1.875rem;
   line-height: 1.5;
   text-decoration: none;
   margin: 0px;
   padding: 10px 0px;
   color: $(color);
-|}];
+`)
 
-module Layout = [%styled.div [|
-  [%css "display: flex"],
-  [%css "width: 100%;"],
-  [%css "height: 100%;"],
-  [%css "justify-content: center;"],
-  [%css "align-items: center"],
-|]];
+module Layout = %styled.div([
+  %css("display: flex"),
+  %css("width: 100%;"),
+  %css("height: 100%;"),
+  %css("justify-content: center;"),
+  %css("align-items: center"),
+])
 
 /* Later on a component */
 <Layout>
-  <Link
-    color="#333333"
-    href="https://sancho.dev"
-    rel="noopener noreferrer"
-  />
-  <span className={[%cx "position: absolute; left: 0px;"]}>
+  <Link color="#333333" href="https://sancho.dev" rel="noopener noreferrer" />
+  <span className=%cx("position: absolute; left: 0px;")>
     {React.string("sancho.dev")}
   </span>
 </Layout>
