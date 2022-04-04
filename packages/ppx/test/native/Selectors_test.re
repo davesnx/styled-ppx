@@ -158,96 +158,132 @@ let selector_css_tests = [
     ],
   ),
   (
-     [%expr [%cx "&:is(em, #foo) {}"]],
-     [%expr CssJs.style(. [|
-       CssJs.selector(. {js|&:is|js} ++ {js|(|js} ++ {js|em, #foo|js} ++ {js|)|js}, [||]),
-     |])],
-   ),
-   (
-     [%expr [%cx "&:not(em, strong#foo) {}"]],
-     [%expr CssJs.style(. [|
-       CssJs.selector(.
-         {js|&:not|js} ++ {js|(|js} ++ {js|em, strong#foo|js} ++ {js|)|js},
-         [||],
-       ),
-     |])],
-   ),
-   (
-     [%expr [%cx "h1 ~ pre {}"]],
-     [%expr CssJs.style(. [|
-       CssJs.selector(. {js|h1 ~ pre|js}, [||]),
-     |])],
-   ),
-   (
-     [%expr [%cx ".qux:where(em, #foo#bar#baz) {}"]],
-     [%expr CssJs.style(. [|
-       CssJs.selector(.
-         {js|.qux:where|js} ++ {js|(|js} ++ {js|em, #foo#bar#baz|js} ++ {js|)|js},
-         [||],
-       ),
-     |])],
-   ),
-   (
-     [%expr [%cx "ol > li:last-child {}"]],
-     [%expr CssJs.style(. [|
-       CssJs.selector(.
-         {js|ol > li:last-child|js},
-         [||],
-       ),
-     |])],
-   ),
-   (
-     [%expr [%cx "&:nth-last-child(-n + 2) {}"]],
-     [%expr CssJs.style(. [|
-       CssJs.selector(. {js|&:nth-last-child|js} ++ {js|(|js} ++ {js|-n + 2|js} ++ {js|)|js}, [||]),
-     |])],
-   ),
-  /*
-   (
-     [%expr [%cx "& input[type=\\\"password\\\"] {} "]],
-     [%expr CssJs.style(. [|
-       CssJs.selector(.
-         {js|& input[type = "password"]|js},
-         [||],
-       ),
-     |])],
-   ),
-    */
-  /* (
-       "&:nth-child(even of li, .item)",
-       %cx("&:nth-child(even of li, .item) {]"),
-       [%expr CssJs.style(. [CssJs.selector(. `&:nth-child(even of li, .item)`, [CssJs.color(CssJs.blue)])]),
-     ), */
-  /* (
-       "&:nth-last-child(-n+2)",
-       %cx("&:nth-last-child(-n+2) {}"),
-       [%expr CssJs.style(. [CssJs.selector(. `&:nth-last-child(-n+2)`, [])]),
-     ), */
-  /* ("F || E", %cx("F || E {}"), [%expr CssJs.style(. [CssJs.selector(. `F || E`, [])])), */
-  /* (
-       "*:not(:last-child)",
-       %cx("& > *:not(:last-child) { margin: 10px; }"),
-       [%expr CssJs.style(. [CssJs.selector(. `& > *:not(:last-child)`, [CssJs.margin(CssJs.px(10))])]),
-     ), */
-  /* (
-       "dl dt:not(:last-child)",
-       %cx("dl dt:not(:last-child) { margin: 10px; }"),
-       [%expr CssJs.style(. [CssJs.selector(. `dl dt:not(:last-child)`, [CssJs.margin(CssJs.px(10))])]),
-     ), */
-  /* (
-       ".foo :is(.bar, #baz)",
-       %cx(".foo :is(.bar, #baz) {"),
-       [%expr CssJs.style(. [CssJs.selector(. `.foo :is(.bar, #baz)`, [CssJs.color(CssJs.blue)])]),
-     ), */
+    [%expr [%cx "&:is(em, #foo) {}"]],
+    [%expr
+      CssJs.style(. [|
+        CssJs.selector(.
+          {js|&:is|js} ++ {js|(|js} ++ {js|em, #foo|js} ++ {js|)|js},
+          [||],
+        ),
+      |])
+    ],
+  ),
+  (
+    [%expr [%cx "&:not(em, strong#foo) {}"]],
+    [%expr
+      CssJs.style(. [|
+        CssJs.selector(.
+          {js|&:not|js} ++ {js|(|js} ++ {js|em, strong#foo|js} ++ {js|)|js},
+          [||],
+        ),
+      |])
+    ],
+  ),
+  (
+    [%expr [%cx "h1 ~ pre {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|h1 ~ pre|js}, [||])|])],
+  ),
+  (
+    [%expr [%cx ".qux:where(em, #foo#bar#baz) {}"]],
+    [%expr
+      CssJs.style(. [|
+        CssJs.selector(.
+          {js|.qux:where|js}
+          ++ {js|(|js}
+          ++ {js|em, #foo#bar#baz|js}
+          ++ {js|)|js},
+          [||],
+        ),
+      |])
+    ],
+  ),
+  (
+    [%expr [%cx "ol > li:last-child {}"]],
+    [%expr
+      CssJs.style(. [|CssJs.selector(. {js|ol > li:last-child|js}, [||])|])
+    ],
+  ),
+  (
+    [%expr [%cx "&:nth-last-child(-n + 2) {}"]],
+    [%expr
+      CssJs.style(. [|
+        CssJs.selector(.
+          {js|&:nth-last-child|js} ++ {js|(|js} ++ {js|-n + 2|js} ++ {js|)|js},
+          [||],
+        ),
+      |])
+    ],
+  ),
+  (
+    [%expr [%cx "& input[type=\"password\"] {} "]],
+    [%expr
+      CssJs.style(. [|
+        CssJs.selector(.
+          {js|& input|js}
+          ++ {js|[|js}
+          ++ {js|type = "password"|js}
+          ++ {js|]|js},
+          [||],
+        ),
+      |])
+    ],
+  ),
+  /* BUG evenofli */
+  (
+    [%expr [%cx "&:nth-child(even of li, .item) {}"]],
+    [%expr
+      CssJs.style(. [|
+        CssJs.selector(. {js|&:nth-child|js} ++ {js|(|js} ++ {js|evenofli, .item|js} ++ {js|)|js}, [||]),
+      |])
+    ],
+  ),
+  /* Not a bug, but annoying we separate operations with spaces */
+  (
+    [%expr [%cx "&:nth-last-child(-n+2) {}"]],
+    [%expr
+      CssJs.style(. [|CssJs.selector(. {js|&:nth-last-child|js} ++ {js|(|js} ++ {js|-n + 2|js} ++ {js|)|js}, [||])|])
+    ],
+  ),
+  /* BUG F||E */
+  (
+    [%expr [%cx "F || E {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|F||E|js}, [||])|])],
+  ),
+  /* BUG `& >  * :not` */
+  (
+    [%expr [%cx "& > *:not(:last-child) {}"]],
+    [%expr
+      CssJs.style(. [|CssJs.selector(. {js|& >  * :not|js} ++ {js|(|js} ++ {js|:last-child|js} ++ {js|)|js}, [||])|])
+    ],
+  ),
+  /* BUG dl dt */
+  (
+    [%expr [%cx "dl dt:not(:last-child) {}"]],
+    [%expr
+      CssJs.style(. [|CssJs.selector(. {js|dldt:not|js} ++ {js|(|js} ++ {js|:last-child|js} ++ {js|)|js}, [||])|])
+    ],
+  ),
+  /* BUG `.foo:is` === `.foo :is` */
+  (
+    [%expr [%cx ".foo :is(.bar, #baz) {}"]],
+    [%expr
+      CssJs.style(. [|
+        CssJs.selector(.
+          {js|.foo:is|js} ++ {js|(|js} ++ {js|.bar, #baz|js} ++ {js|)|js},
+          [||],
+        ),
+      |])
+    ],
+  ),
 ];
 
 describe(
   "Should bind to bs-css with selectors/pseudoselectors/pseudoclass",
   ({test, _}) => {
   selector_css_tests
-  |> List.iteri((_index, (result, expected)) =>
+  |> List.iteri((index, (result, expected)) =>
        test(
-         Pprintast.string_of_expression(expected),
+         string_of_int(index),
          compare(result, expected),
        )
      )
