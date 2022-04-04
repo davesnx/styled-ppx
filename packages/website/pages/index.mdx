@@ -1,25 +1,26 @@
 # Introduction to styled-ppx
 
-### Typed styled components in Reason, OCaml and ReScript
+### Typed styled components ReScript
 
-Write your styles in CSS inside Reason/OCaml/ReScript files and generate components, classnames or composable CSS rules.
+Write your styles in CSS inside ReScript files and generate React components, classnames or CSS rules.
 
-- Component-based
-- Type-safe static CSS
+- Type-safe CSS
+- Component-based styling
+- Implements cx/css helpers
 - No abstraction over standard CSS, neither a new [DSL](https://en.wikipedia.org/wiki/Domain-specific_language)
 - Build on top of [emotion](https://emotion.sh)
-- Support entirely the language: pattern-matching, composition, labelled arguments.
+- Support the language: pattern-matching, composition, labelled arguments.
 
-**styled-ppx** is a ppx you can learn more in the [Real World OCaml: Preprocessing with ppx](https://dev.realworldocaml.org/ppx.html). For now, are similar to [babel-plugins](https://babeljs.io/docs/en/plugins/) which transform your code.
+**styled-ppx** is a ppx, you can learn more about ppxs in the [Real World OCaml: Preprocessing with ppx](https://dev.realworldocaml.org/ppx.html). To get a general idea, are similar to [babel-plugins](https://babeljs.io/docs/en/plugins/).
 
-```reason
-module Center = [%styled.div {|
+```rescript
+module Center = %styled.div(`
   height: 100vh;
   width: 100vw;
   display: flex;
   align-items: center;
   justify-content: center;
-|}];
+`)
 
 <Center>
   {React.string("Hello from the future!")}

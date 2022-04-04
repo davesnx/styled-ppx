@@ -1,6 +1,6 @@
 # styled-ppx
 
-**styled-ppx** is the [ppx](https://dev.realworldocaml.org/ppx.html) that brings typed styled components to Reason, OCaml and ReScript.
+**styled-ppx** is the [ppx](https://dev.realworldocaml.org/ppx.html) that brings typed styled components to ReScript.
 
 Build on top of [emotion](https://emotion.sh), it allows you to style apps safe, quickly, performant and as you always done it.
 
@@ -16,7 +16,7 @@ Check our website: [styled-ppx.vercel.app](https://styled-ppx.vercel.app)
 
 ### Getting started
 
-Depends on [bs-css with bs-css-emotion](https://github.com/giraud/bs-css), [ReasonReact](https://reasonml.github.io/reason-react/) or [rescript-react](https://github.com/rescript-lang/rescript-react), make sure you have them installed first.
+Depends on [bs-css with bs-css-emotion](https://github.com/giraud/bs-css), [rescript-react](https://github.com/rescript-lang/rescript-react), make sure you have them installed first.
 
 #### Install
 
@@ -43,32 +43,29 @@ Add the PPX in your `bsconfig.json` file under `"ppx-flags"`
 
 #### Use
 
-```reason
-module Link = [%styled.a (~color="#4299E1") => {|
+```rescript
+module Link = %styled.a(
+  (~color="#4299E1") => `
   font-size: 1.875rem;
   line-height: 1.5;
   text-decoration: none;
   margin: 0px;
   padding: 10px 0px;
   color: $(color);
-|}];
+`)
 
-module Layout = [%styled.div [|
-  [%css "display: flex"],
-  [%css "width: 100%;"],
-  [%css "height: 100%;"],
-  [%css "justify-content: center;"],
-  [%css "align-items: center"],
-|]];
+module Layout = %styled.div([
+  %css("display: flex"),
+  %css("width: 100%;"),
+  %css("height: 100%;"),
+  %css("justify-content: center;"),
+  %css("align-items: center"),
+])
 
 /* Later on a component */
 <Layout>
-  <Link
-    color="#333333"
-    href="https://sancho.dev"
-    rel="noopener noreferrer"
-  />
-  <span className={[%cx "position: absolute; left: 0px;"]}>
+  <Link color="#333333" href="https://sancho.dev" rel="noopener noreferrer" />
+  <span className=%cx("position: absolute; left: 0px;")>
     {React.string("sancho.dev")}
   </span>
 </Layout>

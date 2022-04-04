@@ -1,8 +1,8 @@
 import DocSearch from 'components/docsearch';
 
-const short = 'CSS-in-Reason, OCaml and ReScript';
+const short = 'CSS-in-ReScript';
 const description =
-  'styled-ppx is a ppx that allows you to write typed styled components in Reason, OCaml and ReScript';
+  'styled-ppx is the ppx that brings typed styled components to ReScript.';
 
 export default {
   github: 'https://github.com/davesnx/styled-ppx',

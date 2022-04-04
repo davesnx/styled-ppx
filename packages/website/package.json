@@ -1,10 +1,10 @@
 {
   "name": "styled-ppx.vercel.app",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "next -p 7000",
+    "dev": "next -p 7007",
     "start": "next",
     "build": "next build"
   },

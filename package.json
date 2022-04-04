@@ -1,7 +1,7 @@
 {
   "name": "@davesnx/styled-ppx",
   "version": "0.28.0",
-  "description": "Typed styled components in Reason, OCaml and ReScript",
+  "description": "Typed styled components in ReScript",
   "author": "David Sancho <dsnxmoreno@gmail.com>",
   "license": "MIT",
   "homepage": "https://styled-ppx.vercel.app",
@@ -61,8 +61,8 @@
     "test_css_lexer": "esy dune build @css_lexer_test",
     "test_css_parser": "esy dune build @css_parser_test",
     "test_css_spec_parser": "esy dune build @css_spec_parser_test",
-    "build_test_bs": "cd packages/ppx/test/bucklescript; yarn build",
-    "test_bs": "cd packages/ppx/test/bucklescript; yarn build; yarn test",
+    "build_test_bs": "cd packages/ppx/test/browser; yarn build",
+    "test_bs": "cd packages/ppx/test/browser; yarn build; yarn test",
     "dev": "esy refmterr dune build --root . --watch",
     "release-static": "esy b dune build --root . --ignore-promoted-rules --no-config --profile release-static --only-packages styled-ppx,reason-css-parser,reason-css-lexer,css-spec-parser,styled-ppx-css-parser"
   }
