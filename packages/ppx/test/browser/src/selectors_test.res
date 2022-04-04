@@ -8,9 +8,8 @@ module Variables = {
   let selector_query = "button > p"
   let target = "target"
   let href_target = "\"https\""
+  let pseudo = "& + &"
 }
-
-let pseudo = "& + &"
 
 let testData = [
   (
@@ -65,7 +64,7 @@ let testData = [
   ),
   (
     "& button:hover",
-    %cx("& button:hover{ cursor: pointer; } "),
+    %cx("& button:hover { cursor: pointer; } "),
     CssJs.style(. [CssJs.selector(. `& button:hover`, [CssJs.unsafe("cursor", "pointer")])]),
   ),
   (
@@ -84,8 +83,8 @@ let testData = [
     CssJs.style(. [CssJs.selector(. `a[href^="https"]`, [CssJs.color(CssJs.blue)])]),
   ),
   (
-    "$(pseudo)",
-    %cx("$(pseudo) {color: blue}"),
+    "$(Variables.pseudo)",
+    %cx("$(Variables.pseudo) {color: blue}"),
     CssJs.style(. [CssJs.selector(. `& + &`, [CssJs.color(CssJs.blue)])]),
   ),
   (
@@ -103,17 +102,6 @@ let testData = [
     %cx("&::$(Variables.pseudoelement) {color: blue}"),
     CssJs.style(. [CssJs.selector(. `&::before`, [CssJs.color(CssJs.blue)])]),
   ),
-
-  /* (
-    "*:not(:last-child)",
-    [%cx "& > *:not(:last-child) { margin: 10px; }"],
-    CssJs.style(. [|
-      CssJs.selector(.
-        {js|& > *:not(:last-child)|js},
-        [|CssJs.margin(CssJs.px(10))|]
-      )
-    |]),
-  ) */
 ]
 
 describe("Selectors", _ =>
