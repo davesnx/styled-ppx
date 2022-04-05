@@ -5,28 +5,37 @@ type dimension =
   | Time
   | Frequency;
 
-module rec Component_value: {
+module rec Prelude: {
+  type t =
+    | Pseudoclass(with_loc(string), with_loc(string))
+    | PseudoclassFunction(with_loc(string), with_loc(string), with_loc(list(with_loc(Component_value.t))))
+    | Pseudoelement(with_loc(string), with_loc(string))
+    | Operator(string)
+    | Delim(string)
+    /* &&  */
+    /* || */
+    /* " " */
+    /* "," */
+    /* | Combiators(list(Prelude.t)) */
+    | Ampersand
+} = Prelude
+and Component_value: {
   type t =
     | Paren_block(list(with_loc(t)))
     | Bracket_block(list(with_loc(t)))
     | Percentage(string)
     | Ident(string)
     | String(string)
-    | Selector(list(with_loc(t)))
+    | Selector(with_loc(list(with_loc(Prelude.t))), list(with_loc(t)))
     | Uri(string)
-    | Operator(string)
     | Delim(string)
     | Function(with_loc(string), with_loc(list(with_loc(t))))
-    | Pseudoclass(with_loc(string))
-    | Pseudoelement(with_loc(string))
     | Hash(string)
     | Number(string)
     | Unicode_range(string)
     | Float_dimension((string, string, dimension))
     | Dimension((string, string))
     | Variable(list(string))
-    | Ampersand
-
 } = Component_value
 and Brace_block: {
   type t =
@@ -37,7 +46,7 @@ and Brace_block: {
 and At_rule: {
   type t = {
     name: with_loc(string),
-    prelude: with_loc(list(with_loc(Component_value.t))),
+    prelude: with_loc(list(with_loc(Prelude.t))),
     block: Brace_block.t,
     loc: Location.t,
   };
@@ -61,7 +70,7 @@ and Declaration_list: {
 } = Declaration_list
 and Style_rule: {
   type t = {
-    prelude: with_loc(list(with_loc(Component_value.t))),
+    prelude: with_loc(list(with_loc(Prelude.t))),
     block: Declaration_list.t,
     loc: Location.t,
   };

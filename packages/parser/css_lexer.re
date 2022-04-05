@@ -2,7 +2,6 @@
   * Reference:
   * https://www.w3.org/TR/css-syntax-3/
   * https://github.com/yahoo/css-js/blob/master/src/l/css.3.l */
-
 module Sedlexing = Lex_buffer;
 module Parser = Css_parser;
 module Types = Css_types;
@@ -42,6 +41,7 @@ let dimension_to_string =
 let token_to_string =
   fun
   | Parser.EOF => "EOF"
+  | Parser.WS => " "
   | Parser.LEFT_BRACE => "{"
   | Parser.RIGHT_BRACE => "}"
   | Parser.LEFT_PAREN => "("
@@ -76,8 +76,19 @@ let token_to_string =
     ++ dimension_to_string(d)
     ++ ")"
   | Parser.DIMENSION((n, d)) => "DIMENSION(" ++ n ++ ", " ++ d ++ ")"
-  | Parser.VARIABLE(v) => "VARIABLE(" ++ (String.concat(".", v)) ++ ")"
-  | Parser.UNSAFE => "UNSAFE";
+  | Parser.VARIABLE(v) => "VARIABLE(" ++ String.concat(".", v) ++ ")"
+  | Parser.UNSAFE => "UNSAFE"
+  | Parser.DOT => "."
+  | Parser.COMMA => ","
+  | Parser.PLUS => "+"
+  | Parser.MINUS => "-"
+  | Parser.MULTIPLY => "*"
+  | Parser.LESS_THAN => ">"
+  | Parser.BIGGER_THAN => "<"
+  | Parser.DIVIDE => "/"
+  | Parser.EQUAL => "="
+  | Parser.PIPELINE => "|"
+  | Parser.TILDE => "~";
 
 let () =
   Location.register_error_of_exn(
@@ -135,9 +146,11 @@ let ident_char = [%sedlex.regexp?
 
 let ident = [%sedlex.regexp? (Opt('-'), ident_start, Star(ident_char))];
 
-let variable_name = [%sedlex.regexp? (Star(ident_char))];
+let variable_name = [%sedlex.regexp? Star(ident_char)];
 let module_variable = [%sedlex.regexp? (variable_name, '.')];
-let variable = [%sedlex.regexp? ('$', '(', Opt(Star(module_variable)), variable_name, ')')];
+let variable = [%sedlex.regexp?
+  ('$', '(', Opt(Star(module_variable)), variable_name, ')')
+];
 
 let string_quote = [%sedlex.regexp?
   (
@@ -191,7 +204,7 @@ let nested_at_rule = [%sedlex.regexp?
   ("@", "document" | "keyframes" | "media" | "supports" | "scope")
 ];
 
-let unsafe = [%sedlex.regexp? ("__UNSAFE__")];
+let unsafe = [%sedlex.regexp? "__UNSAFE__"];
 
 let _a = [%sedlex.regexp? 'A' | 'a'];
 let _b = [%sedlex.regexp? 'B' | 'b'];
@@ -254,7 +267,7 @@ let frequency = [%sedlex.regexp? (_h, _z) | (_k, _h, _z)];
 let discard_comments_and_white_spaces = buf => {
   let rec discard_white_spaces = buf =>
     switch%sedlex (buf) {
-    | Plus(white_space) => discard_white_spaces(buf)
+    /* | Plus(white_space) => discard_white_spaces(buf) */
     | "/*" => discard_comments(buf)
     | _ => ()
     }
@@ -271,24 +284,97 @@ let discard_comments_and_white_spaces = buf => {
 };
 
 let get_ident = (value) => {
-  open Css_parser;
-  switch(value) {
-    | "attr" | "calc" | "conic-gradient" | "counter" | "cubic-bezier" | "hsl" | "hsla" | "linear-gradient" | "max" | "min" | "radial-gradient" | "repeating-conic-gradient" | "repeating-linear-gradient" | "repeating-radial-gradient" | "rgb" | "rgba" | "var" => FUNCTION(value)
-    | "after" | "before" | "cue" | "first-letter" | "first-line" | "selection" | "slotted" | "backdrop" | "placeholder" | "marker" | "spelling-error" | "grammar-error" => PSEUDOELEMENT(value)
-    | "active" | "checked" | "default" | "dir" | "disabled" | "empty" | "enabled" | "first" | "first-child" | "first-of-type" | "fullscreen" | "focus" | "hover" | "indeterminate" | "in-range" | "invalid" | "lang" | "last-child" | "last-of-type" | "link" | "not" | "nth-child" | "nth-last-child" | "nth-last-of-type" | "nth-of-type" | "only-child" | "only-of-type" | "optional" | "out-of-range" | "read-only" | "read-write" | "required" | "right" | "root" | "scope" | "target" | "valid" | "visited" => PSEUDOCLASS(value)
-    | _ => IDENT(value)
+  open Parser;
+      switch (value) {
+        | "attr"
+        | "calc"
+        | "conic-gradient"
+        | "counter"
+        | "cubic-bezier"
+        | "hsl"
+        | "hsla"
+        | "linear-gradient"
+        | "max"
+        | "min"
+        | "radial-gradient"
+        | "repeating-conic-gradient"
+        | "repeating-linear-gradient"
+        | "repeating-radial-gradient"
+        | "rgb"
+        | "rgba"
+        | "var" => FUNCTION(value)
+        | "after"
+        | "before"
+        | "cue"
+        | "first-letter"
+        | "first-line"
+        | "selection"
+        | "slotted"
+        | "backdrop"
+        | "placeholder"
+        | "marker"
+        | "spelling-error"
+        | "grammar-error" => PSEUDOELEMENT(value)
+        | "active"
+        | "checked"
+        | "default"
+        | "dir"
+        | "disabled"
+        | "empty"
+        | "enabled"
+        | "first"
+        | "first-child"
+        | "first-of-type"
+        | "fullscreen"
+        | "focus"
+        | "hover"
+        | "indeterminate"
+        | "in-range"
+        | "invalid"
+        | "lang"
+        | "last-child"
+        | "last-of-type"
+        | "link"
+        | "not"
+        | "nth-child"
+        | "nth-last-child"
+        | "nth-last-of-type"
+        | "nth-of-type"
+        | "only-child"
+        | "only-of-type"
+        | "optional"
+        | "out-of-range"
+        | "read-only"
+        | "read-write"
+        | "required"
+        | "right"
+        | "root"
+        | "scope"
+        | "target"
+        | "valid"
+        | "visited" => PSEUDOCLASS(value)
+        | _ => IDENT(value)
   }
-}
+};
 
 let rec get_next_token = buf => {
   discard_comments_and_white_spaces(buf);
-  open Css_parser;
+  open Parser;
   switch%sedlex (buf) {
   | eof => EOF
   | ';' => SEMI_COLON
   | '}' => RIGHT_BRACE
   | '{' => LEFT_BRACE
   | ':' => COLON
+  | ' ' => WS
+  /* | '.' => DOT
+  | ',' => COMMA
+  | '+' => PLUS
+  | '-' => MINUS
+  | '*' => MULTIPLY
+  | '/' => DIVIDE
+  | '<' => BIGGER_THAN */
+  | '>' => DELIM(">")
   | '(' => LEFT_PAREN
   | ')' => RIGHT_PAREN
   | '[' => LEFT_BRACKET
@@ -296,7 +382,10 @@ let rec get_next_token = buf => {
   | '%' => PERCENTAGE
   | '&' => AMPERSAND
   | unsafe => UNSAFE
-  | variable => VARIABLE(Sedlexing.latin1(~skip=2, ~drop=1, buf) |> String.split_on_char('.'))
+  | variable =>
+    VARIABLE(
+      Sedlexing.latin1(~skip=2, ~drop=1, buf) |> String.split_on_char('.'),
+    )
   | operator => OPERATOR(Sedlexing.latin1(buf))
   | string => STRING(Sedlexing.latin1(~skip=1, ~drop=1, buf))
   | "url(" => get_url("", buf)
@@ -308,7 +397,7 @@ let rec get_next_token = buf => {
   /* NOTE: should be placed above ident, otherwise pattern with
    * '-[0-9a-z]{1,6}' cannot be matched */
   | (_u, '+', unicode_range) => UNICODE_RANGE(Sedlexing.latin1(buf))
-  | ident => get_ident(Sedlexing.latin1(buf))
+  | ident => IDENT(Sedlexing.latin1(buf))
   | ('#', name) => HASH(Sedlexing.latin1(~skip=1, buf))
   | number => get_dimension(Sedlexing.latin1(buf), buf)
   | any => DELIM(Sedlexing.latin1(buf))
@@ -338,7 +427,7 @@ and get_url = (url, buf) =>
       )),
     )
   | _ => assert(false)
-};
+  };
 
 let get_next_token_with_location = buf => {
   discard_comments_and_white_spaces(buf);

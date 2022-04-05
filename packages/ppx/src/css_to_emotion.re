@@ -79,8 +79,8 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
 
   let loc = ar.loc;
   let (_, name_loc) = ar.name;
-  let (prelude, _) = ar.prelude;
-  let parse_condition = acc =>
+  let (_prelude, _) = ar.prelude;
+  let _parse_condition = acc =>
     fun
     | (
         Paren_block([
@@ -138,11 +138,12 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
       }
     | (_, loc) => invalid_format(loc);
 
-  if (prelude == []) {
+  /* if (prelude == []) {
     invalid_format(loc);
-  };
+  }; */
 
-  let query = prelude |> List.fold_left(parse_condition, [%expr ""]);
+  /* let query = prelude |> List.fold_left(parse_condition, [%expr ""]); */
+  let query = [%expr ""];
 
   let rules =
     switch (ar.At_rule.block) {
@@ -205,19 +206,20 @@ and render_declarations = ds => {
     fst(ds),
   );
 }
-and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
-  let (prelude, _) = rule.Style_rule.prelude;
+and render_style_rule = (_ident, rule: Style_rule.t): Parsetree.expression => {
+  let (_prelude, _) = rule.Style_rule.prelude;
   let block = rule.Style_rule.block;
   let (_, loc) = rule.Style_rule.block;
   let dl_expr = render_declarations(block) |> Builder.pexp_array(~loc);
 
-  let concat = (~loc, expr, acc) => {
+  let _concat = (~loc, expr, acc) => {
     let concat_fn = {txt: Lident("^"), loc} |> Helper.Exp.ident(~loc);
     Helper.Exp.apply(~loc, concat_fn, [(Nolabel, expr), (Nolabel, acc)]);
   };
 
-  let rec render_prelude_value = (acc, list) => {
-    switch (list) {
+  let _render_prelude_value = (_acc, _list) => {
+    [%expr ""]
+    /* switch (list) {
     | [] => string_to_const(~loc, acc)
     | [(value, value_loc), ...rest] =>
       switch (value) {
@@ -247,8 +249,8 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
         render_prelude_value(acc ++ ampersand, rest);
       | Dimension((number, dimension)) =>
         render_prelude_value(acc ++ number ++ dimension, rest)
-      | Pseudoclass((v, _)) => render_prelude_value(acc ++ v, rest)
-      | Pseudoelement((v, _)) => render_prelude_value(acc ++ v, rest)
+      | Pseudoclass((v, _), _) => render_prelude_value(acc ++ v, rest)
+      | Pseudoelement((v, _), _) => render_prelude_value(acc ++ v, rest)
       | Bracket_block(b) =>
         concat(
           ~loc,
@@ -282,10 +284,10 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
         )
       | _ => grammar_error(value_loc, "Unexpected selector")
       }
-    };
+    }; */
   };
 
-  let render_rule_value = (ident, selector) => {
+  let _render_rule_value = (ident, selector) => {
     Helper.Exp.apply(
       ~loc=rule.Style_rule.loc,
       ~attrs=[Create.uncurried(~loc=rule.Style_rule.loc)],
@@ -294,9 +296,9 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
     );
   };
 
-  let pseudoToFn =
+  /* let pseudoToFn =
     fun
-    | Pseudoclass((c, _)) =>
+    | Pseudoclass((c, _), _) =>
       switch (c) {
       | "first-line" => "firstLine"
       | "first-child" => "firstChild"
@@ -316,7 +318,7 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
       | "read-write" => "readWrite"
       | c => c
       }
-    | Pseudoelement((e, _)) =>
+    | Pseudoelement((e, _), _) =>
       switch (e) {
       | "first-line" => "firstLine"
       | "first-child" => "firstChild"
@@ -325,12 +327,12 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
       | "grammar-error" => "grammarError"
       | e => e
       }
-    | _ => failwith("Expected a Pseudoelement or a Pseudoclass");
+    | _ => failwith("Expected a Pseudoelement or a Pseudoclass"); */
 
-  let render_selector_value = (~value_loc, value, s) => {
+  /* let render_selector_value = (~value_loc, value, s) => {
     switch (s) {
-    | Pseudoelement((_, _)) as p
-    | Pseudoclass((_, _)) as p =>
+    | Pseudoelement((_, _), _) as p
+    | Pseudoclass((_, _), _) as p =>
       let selector_ident =
         Helper.Exp.ident(~loc, CssJs.lident(~loc, pseudoToFn(p)));
 
@@ -383,16 +385,16 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
       );
     | _ => failwith("Invalid selector")
     };
-  };
+  }; */
 
-  let render_self = v => {
+  /* let render_self = v => {
     let ident =
       pseudoToFn(v) |> CssJs.lident(~loc) |> Helper.Exp.ident(~loc);
 
     Helper.Exp.apply(~loc=rule.Style_rule.loc, ident, [(Nolabel, dl_expr)]);
-  };
+  }; */
 
-  switch (prelude) {
+  /* switch (prelude) {
   | [(Selector([(Ident(i), _), (value, value_loc)]), _)] =>
     render_selector_value(~value_loc, i, value)
   | [
@@ -420,7 +422,8 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
   | _ =>
     let selector = render_prelude_value("", prelude);
     render_rule_value(ident, selector);
-  };
+  }; */
+  [%expr ""]
 };
 
 let bsEmotionLabel = (~loc, label) => {
@@ -461,7 +464,7 @@ let render_keyframes = ((ruleList, loc)): Parsetree.expression => {
         "];
   |};
 
-  let get_percentage_from_prelude =
+  let _get_percentage_from_prelude =
     fun
     | ([(Percentage(n), loc)], _) =>
       // TODO: can percentage be a decimal value?
@@ -481,13 +484,13 @@ let render_keyframes = ((ruleList, loc)): Parsetree.expression => {
     |> List.map(rule => {
          switch (rule) {
          | Rule.Style_rule({
-             prelude: (_, prelude_loc) as prelude,
+             prelude: (_, prelude_loc) as _prelude,
              block,
              loc: style_loc,
            }) =>
-           let percentage =
-             get_percentage_from_prelude(prelude)
-             |> Builder.eint(~loc=prelude_loc);
+           let percentage = 10 |> Builder.eint(~loc=prelude_loc);
+             /* get_percentage_from_prelude(prelude)
+             |> Builder.eint(~loc=prelude_loc); */
            let rules =
              render_declarations(block) |> Builder.pexp_array(~loc);
            Builder.pexp_tuple(~loc=style_loc, [percentage, rules]);

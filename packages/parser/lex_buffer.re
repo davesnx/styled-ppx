@@ -42,7 +42,7 @@ let of_ascii_file = file => {
 };
 
 /** The next four functions are used by sedlex internally.
-    See https://www.lexifi.com/sedlex/libdoc/Sedlexing.html */
+    See https://ocaml-community.github.io/sedlex/sedlex/Sedlexing/index.html */
 
 let mark = (lexbuf, p) => {
   lexbuf.pos_mark = lexbuf.pos;
