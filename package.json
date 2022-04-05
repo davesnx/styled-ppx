@@ -43,12 +43,12 @@
   },
   "devDependencies": {
     "@opam/reason": "3.7.0",
-    "@opam/dune": "2.8.5",
+    "@opam/dune": "2.9.0",
     "@opam/ppx_deriving": "5.2.1",
     "@opam/menhir": "20201216",
     "@opam/ppxlib": "0.22.0",
     "@opam/sedlex": "2.3",
-    "@opam/ocaml-lsp-server": "1.7.0",
+    "@opam/ocaml-lsp-server": "1.9.0",
     "@reason-native/rely": "jfrolich/reason-native:rely.json#08085a4048974b06aaf3aab918b677b39dea3d18",
     "ocaml": "4.12.0",
     "refmterr": "jfrolich/reason-native:refmterr.json#08085a4048974b06aaf3aab918b677b39dea3d18"
