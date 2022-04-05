@@ -246,11 +246,22 @@ let selector_css_tests = [
     [%expr [%cx "F || E {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|F||E|js}, [||])|])],
   ),
-  /* BUG `& >  * :not` */
   (
     [%expr [%cx "& > *:not(:last-child) {}"]],
     [%expr
-      CssJs.style(. [|CssJs.selector(. {js|& >  * :not(|js} ++ {js|:last-child|js} ++ {js|)|js}, [||])|])
+      CssJs.style(. [|CssJs.selector(. {js|& > *:not(|js} ++ {js|:last-child|js} ++ {js|)|js}, [||])|])
+    ],
+  ),
+  (
+    [%expr [%cx "* + * {}"]],
+    [%expr
+      CssJs.style(. [|CssJs.selector(. {js|* + *|js}, [||])|])
+    ],
+  ),
+  (
+    [%expr [%cx "*.warning {}"]],
+    [%expr
+      CssJs.style(. [|CssJs.selector(. {js|*.warning|js}, [||])|])
     ],
   ),
   /* BUG dl dt */

@@ -224,6 +224,7 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
       | Delim(":") => render_prelude_value(acc ++ ":", rest)
       | Delim(".") => render_prelude_value(acc ++ ".", rest)
       | Delim(",") => render_prelude_value(acc ++ ", ", rest)
+      | Delim("*") => render_prelude_value(acc ++ "*", rest)
       | Delim(v) => render_prelude_value(acc ++ " " ++ v ++ " ", rest)
       | Ident(v)
       | Operator(v)
