@@ -487,7 +487,7 @@
 
 /* CSS Transforms Module Level 1 */
 [%css {|transform: none|}];
-[%css {|transform: scale(2, 0.5)|}];
+[%css {|transform: translate(5px)|}];
 [%css {|transform: translate(5px, 10px)|}];
 [%css {|transform: translateY(5px)|}];
 [%css {|transform: translateX(5px)|}];

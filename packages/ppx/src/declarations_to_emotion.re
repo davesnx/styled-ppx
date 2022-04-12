@@ -1296,7 +1296,7 @@ let render_transform_functions = fun
   | `Extended_angle(a) => [%expr [%e render_extended_angle(a)]];
 
 let render_transform = fun
-  | `Function_perspective(p) => [%expr `perspective([%e render_extended_length(p)])]
+  | `Function_perspective(_) => raise(Unsupported_feature) 
   | `Function_matrix(_) => raise(Unsupported_feature)
   | `Function_matrix3d(_) => raise(Unsupported_feature)
   | `Function_rotate(v) =>  [%expr CssJs.rotate([%e render_transform_functions(v)])]
@@ -1310,11 +1310,11 @@ let render_transform = fun
    }
   | `Function_skewX(v) => [%expr CssJs.skewX([%e render_transform_functions(v)])]
   | `Function_skewY(v) => [%expr CssJs.skewY([%e render_transform_functions(v)])]
-  | `Function_translate((x, (), y)) => switch(y) {
-     | Some(v) => [%expr CssJs.translate([%e render_size(x)], [%e render_size(v)])]
+  | `Function_translate((x, y)) => switch(y) {
+     | Some(((), v)) => [%expr CssJs.translate([%e render_size(x)], [%e render_size(v)])]
      | None => [%expr CssJs.translate([%e render_size(x)], 0)]
    }
-  | `Function_translate3d((x, (), y, (), z)) => [%expr CssJs.translate3([%e render_size(x)], [%e render_size(y)], [%e render_extended_length(z)])]
+  | `Function_translate3d((x, (), y, (), z)) => [%expr CssJs.translate3d([%e render_size(x)], [%e render_size(y)], [%e render_extended_length(z)])]
   | `Function_translateX(x) => [%expr CssJs.translateX([%e render_size(x)])]
   | `Function_translateY(y) => [%expr CssJs.translateY([%e render_size(y)])]
   | `Function_translateZ(z) => [%expr CssJs.translateZ([%e render_extended_length(z)])]
@@ -1322,10 +1322,10 @@ let render_transform = fun
      | Some(((), v)) => [%expr CssJs.scale([%e render_number(x)], [%e render_number(v)])]
      | None => [%expr CssJs.scale([%e render_number(x)], [%e render_number(x)])]
    }
-  | `Function_scale3d((x, (), y, (), z)) => [%expr CssJs.scale([%e render_number(x)], [%e render_number(y)], [%e render_number(z)])]
+  | `Function_scale3d((x, (), y, (), z)) => [%expr CssJs.scale3d([%e render_number(x)], [%e render_number(y)], [%e render_number(z)])]
   | `Function_scaleX(x) => [%expr CssJs.scaleX([%e render_number(x)])]
   | `Function_scaleY(y) => [%expr CssJs.scaleY([%e render_number(y)])]
-  | `Function_scaleZ(z) => [%expr CssJs.scaleY([%e render_number(z)])];
+  | `Function_scaleZ(z) => [%expr CssJs.scaleZ([%e render_number(z)])];
 
 // css-transforms-2
 let transform =

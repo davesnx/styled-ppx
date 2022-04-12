@@ -327,7 +327,7 @@ CssJs.unsafe("animationFillMode", "backwards");
 CssJs.unsafe("animationFillMode", "both");
 CssJs.unsafe("animation", "foo 1s 2s infinite linear alternate both");
 CssJs.transform(`none);
-CssJs.transform(CssJs.scale(2., 0.5));
+CssJs.transform(CssJs.translate(`pxFloat(5.), 0));
 CssJs.transform(CssJs.translate(`pxFloat(5.), `pxFloat(10.)));
 CssJs.transform(CssJs.translateY(`pxFloat(5.)));
 CssJs.transform(CssJs.translateX(`pxFloat(5.)));
@@ -346,20 +346,20 @@ CssJs.transforms([|
   CssJs.translate(`pxFloat(50.), `pxFloat(-24.)),
   CssJs.skew(`deg(0.), `deg(22.5)),
 |]);
-CssJs.transform(CssJs.translate3(`zero, `zero, `pxFloat(5.)));
+CssJs.transform(CssJs.translate3d(`zero, `zero, `pxFloat(5.)));
 CssJs.transform(CssJs.translateZ(`pxFloat(5.)));
-CssJs.transform(CssJs.scale(1., 0., -1.));
-CssJs.transform(CssJs.scaleY(1.5));
+CssJs.transform(CssJs.scale3d(1., 0., -1.));
+CssJs.transform(CssJs.scaleZ(1.5));
 CssJs.transform(CssJs.rotate3d(1., 1., 1., `deg(45.)));
 CssJs.transform(CssJs.rotateX(`deg(-45.)));
 CssJs.transform(CssJs.rotateY(`deg(-45.)));
 CssJs.transform(CssJs.rotateZ(`deg(-45.)));
 CssJs.transforms([|
-  CssJs.translate3(`pxFloat(50.), `pxFloat(-24.), `pxFloat(5.)),
+  CssJs.translate3d(`pxFloat(50.), `pxFloat(-24.), `pxFloat(5.)),
   CssJs.rotate3d(1., 2., 3., `deg(180.)),
-  CssJs.scale(-1., 0., 0.5),
+  CssJs.scale3d(-1., 0., 0.5),
 |]);
-CssJs.transform(`perspective(`pxFloat(600.)));
+CssJs.unsafe("transform", "perspective(600px)");
 CssJs.unsafe("transformOrigin", "10px");
 CssJs.unsafe("transformOrigin", "top");
 CssJs.unsafe("transformOrigin", "top left");
