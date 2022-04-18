@@ -487,36 +487,36 @@
 
 /* CSS Transforms Module Level 1 */
 [%css {|transform: none|}];
-/* [%css {|transform: translate(5px)|}]; */
-/* [%css {|transform: translate(5px, 10px)|}]; */
-/* [%css {|transform: translateY(5px)|}]; */
-/* [%css {|transform: translateX(5px)|}]; */
-/* [%css {|transform: translateY(5%)|}]; */
-/* [%css {|transform: translateX(5%)|}]; */
-/* [%css {|transform: scale(2)|}]; */
-/* [%css {|transform: scale(2, -1)|}]; */
-/* [%css {|transform: scaleX(2)|}]; */
-/* [%css {|transform: scaleY(2.5)|}]; */
-/* [%css {|transform: rotate(45deg)|}]; */
-/* [%css {|transform: skew(45deg)|}]; */
-/* [%css {|transform: skew(45deg, 15deg)|}]; */
-/* [%css {|transform: skewX(45deg)|}]; */
-/* [%css {|transform: skewY(45deg)|}]; */
-/* [%css {|transform: matrix(1,-.2,0,1,0,0)|}]; */
-/* [%css {|transform: matrix(1,-.2,0,1,10,10)|}]; */
-/* [%css {|transform: translate(50px, -24px) rotate(180deg) scale(.5) skew(0, 22.5deg)|}]; */
-/* [%css {|transform: translate3d(0, 0, 5px)|}]; */
-/* [%css {|transform: translateZ(5px)|}]; */
-/* [%css {|transform: scale3d(1, 0, -1)|}]; */
-/* [%css {|transform: scaleZ(1.5)|}]; */
-/* [%css {|transform: rotate3d(1, 1, 1, 45deg)|}]; */
-/* [%css {|transform: rotateX(-45deg)|}]; */
-/* [%css {|transform: rotateY(-45deg)|}]; */
-/* [%css {|transform: rotateZ(-45deg)|}]; */
-/* [%css {|transform: matrix3d(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)|}]; */
-/* [%css {|transform: matrix3d(0,0,0,0,0,0,0,0,0,0,1,0,10,10,0,1)|}]; */
-/* [%css {|transform: translate3d(50px, -24px, 5px) rotate3d(1, 2, 3, 180deg) scale3d(-1, 0, .5)|}]; */
-/* [%css {|transform: perspective(600px)|}]; */
+[%css {|transform: translate(5px)|}];
+[%css {|transform: translate(5px, 10px)|}];
+[%css {|transform: translateY(5px)|}];
+[%css {|transform: translateX(5px)|}];
+[%css {|transform: translateY(5%)|}];
+[%css {|transform: translateX(5%)|}];
+[%css {|transform: scale(2)|}];
+[%css {|transform: scale(2, -1)|}];
+[%css {|transform: scaleX(2)|}];
+[%css {|transform: scaleY(2.5)|}];
+[%css {|transform: rotate(45deg)|}];
+[%css {|transform: skew(45deg)|}];
+[%css {|transform: skew(45deg, 15deg)|}];
+[%css {|transform: skewX(45deg)|}];
+[%css {|transform: skewY(45deg)|}];
+// [%css {|transform: matrix(1,-.2,0,1,0,0)|}];
+// [%css {|transform: matrix(1,-.2,0,1,10,10)|}];
+[%css {|transform: translate(50px, -24px) skew(0, 22.5deg)|}];
+[%css {|transform: translate3d(0, 0, 5px)|}];
+[%css {|transform: translateZ(5px)|}];
+[%css {|transform: scale3d(1, 0, -1)|}];
+[%css {|transform: scaleZ(1.5)|}];
+[%css {|transform: rotate3d(1, 1, 1, 45deg)|}];
+[%css {|transform: rotateX(-45deg)|}];
+[%css {|transform: rotateY(-45deg)|}];
+[%css {|transform: rotateZ(-45deg)|}];
+// [%css {|transform: matrix3d(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)|}];
+// [%css {|transform: matrix3d(0,0,0,0,0,0,0,0,0,0,1,0,10,10,0,1)|}];
+[%css {|transform: translate3d(50px, -24px, 5px) rotate3d(1, 2, 3, 180deg) scale3d(-1, 0, .5)|}];
+[%css {|transform: perspective(600px)|}];
 [%css {|transform-origin: 10px|}];
 [%css {|transform-origin: top|}];
 [%css {|transform-origin: top left|}];

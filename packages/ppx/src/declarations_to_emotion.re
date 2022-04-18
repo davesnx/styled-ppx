@@ -1291,9 +1291,53 @@ let text_emphasis_position =
 let text_shadow =
   unsupportedValue(Parser.property_text_shadow, [%expr CssJs.textShadow]);
 
+let render_transform_functions = fun
+  | `Zero(_) => [%expr `zero]
+  | `Extended_angle(a) => [%expr [%e render_extended_angle(a)]];
+
+let render_transform = fun
+  | `Function_perspective(_) => raise(Unsupported_feature) 
+  | `Function_matrix(_) => raise(Unsupported_feature)
+  | `Function_matrix3d(_) => raise(Unsupported_feature)
+  | `Function_rotate(v) =>  [%expr CssJs.rotate([%e render_transform_functions(v)])]
+  | `Function_rotate3d((x, (), y, (), z, (), a)) => [%expr CssJs.rotate3d([%e render_number(x)], [%e render_number(y)], [%e render_number(z)], [%e render_transform_functions(a)])]
+  | `Function_rotateX(v) => [%expr CssJs.rotateX([%e render_transform_functions(v)])]
+  | `Function_rotateY(v) => [%expr CssJs.rotateY([%e render_transform_functions(v)])]
+  | `Function_rotateZ(v) => [%expr CssJs.rotateZ([%e render_transform_functions(v)])]
+  | `Function_skew((a1, a2)) => switch(a2) {
+     | Some(((), v)) => [%expr CssJs.skew([%e render_transform_functions(a1)], [%e render_transform_functions(v)])]
+     | None => [%expr CssJs.skew([%e render_transform_functions(a1)], 0)]
+   }
+  | `Function_skewX(v) => [%expr CssJs.skewX([%e render_transform_functions(v)])]
+  | `Function_skewY(v) => [%expr CssJs.skewY([%e render_transform_functions(v)])]
+  | `Function_translate((x, y)) => switch(y) {
+     | Some(((), v)) => [%expr CssJs.translate([%e render_size(x)], [%e render_size(v)])]
+     | None => [%expr CssJs.translate([%e render_size(x)], 0)]
+   }
+  | `Function_translate3d((x, (), y, (), z)) => [%expr CssJs.translate3d([%e render_size(x)], [%e render_size(y)], [%e render_extended_length(z)])]
+  | `Function_translateX(x) => [%expr CssJs.translateX([%e render_size(x)])]
+  | `Function_translateY(y) => [%expr CssJs.translateY([%e render_size(y)])]
+  | `Function_translateZ(z) => [%expr CssJs.translateZ([%e render_extended_length(z)])]
+  | `Function_scale((x, y)) => switch(y) {
+     | Some(((), v)) => [%expr CssJs.scale([%e render_number(x)], [%e render_number(v)])]
+     | None => [%expr CssJs.scale([%e render_number(x)], [%e render_number(x)])]
+   }
+  | `Function_scale3d((x, (), y, (), z)) => [%expr CssJs.scale3d([%e render_number(x)], [%e render_number(y)], [%e render_number(z)])]
+  | `Function_scaleX(x) => [%expr CssJs.scaleX([%e render_number(x)])]
+  | `Function_scaleY(y) => [%expr CssJs.scaleY([%e render_number(y)])]
+  | `Function_scaleZ(z) => [%expr CssJs.scaleZ([%e render_number(z)])];
+
 // css-transforms-2
 let transform =
-  unsupportedValue(Parser.property_transform, [%expr CssJs.transform]);
+  emit(
+    Parser.property_transform,
+    id,
+    fun
+    | `None => [[%expr CssJs.transform(`none)]]
+    | `Transform_list([v]) => [[%expr CssJs.transform([%e render_transform(v)])]]
+    | `Transform_list(l) => [[%expr CssJs.transforms([%e List.map(render_transform, l) |> Builder.pexp_array(~loc=Location.none)])]]
+  )
+
 let transform_origin =
   unsupportedValue(
     Parser.property_transform_origin,
