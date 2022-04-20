@@ -38,6 +38,10 @@
 [%css {|background: url(foo.png), url(bar.svg)|}];
 [%css {|background: top left / 50% 60%|}];
 [%css {|background: border-box|}];
+[%css {|background: blue|}];
+[%css {|background: border-box red|}];
+[%css {|background:fixed;|}];
+[%css {|background: no-repeat center/80% url("../img/image.png")|}];
 [%css {|background: border-box padding-box|}];
 [%css {|background: url(foo.png) bottom right / cover padding-box content-box|}];
 [%css {|border-top-left-radius: 0|}];
