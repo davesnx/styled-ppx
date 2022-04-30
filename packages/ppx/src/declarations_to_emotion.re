@@ -972,7 +972,7 @@ let background_size =
         | `Xor([_])
         | _ => raise(Unsupported_feature)
         }
-    | _ => assert false
+    | _ => raise(Unsupported_feature)
   );
 let render_background = ((layers, final_layer)) => {
 
