@@ -55,7 +55,7 @@ let testData = list{
   (%cx("letter-spacing: normal"), CssJs.style(. [CssJs.letterSpacing(#normal)])),
   (%cx("letter-spacing: 5px"), CssJs.style(. [CssJs.letterSpacing(#pxFloat(5.))])),
   (%cx("text-indent: 5%"), CssJs.style(. [CssJs.textIndent(#percent(5.))])),
-  (%cx("background: blue;"), CssJs.style(. [CssJs.unsafe("background", "blue")])),
+  (%cx("background: blue;"), CssJs.style(. [CssJs.backgroundColor(CssJs.blue)])),
   (%cx("text-transform: uppercase;"), CssJs.style(. [CssJs.textTransform(#uppercase)])),
   (%cx("line-height: 1.4;"), CssJs.style(. [CssJs.unsafe("lineHeight", "1.4")])),
   (%cx("line-height: 100%;"), CssJs.style(. [CssJs.unsafe("lineHeight", "100%")])),
