@@ -233,6 +233,10 @@ and render_extended_percentage = fun
   | `Function_calc(fc) => render_function_calc(fc)
   | `Interpolation(i) => render_variable(i);
 
+let render_length_percentage = fun
+  | `Extended_length(ext) => render_extended_length(ext)
+  | `Extended_percentage(ext) => render_extended_percentage(ext);
+
 // css-sizing-3
 let render_size =
   fun
@@ -241,7 +245,7 @@ let render_size =
   | `Extended_percentage(p) => render_extended_percentage(p)
   | `Function_calc(fc) => render_function_calc(fc)
   | `Fit_content_0 => variants_to_expression(`FitContent)
-  | `Fit_content_1(_)
+  | `Fit_content_1(lp) => render_length_percentage(lp)
   | `Max_content
   | `Min_content
   | _ => raise(Unsupported_feature);
@@ -257,10 +261,6 @@ let render_extended_angle = fun
   | `Angle(a) => render_angle(a)
   | `Function_calc(fc) => render_function_calc(fc)
   | `Interpolation(i) => render_variable(i);
-
-let render_length_percentage = fun
-  | `Extended_length(ext) => render_extended_length(ext)
-  | `Extended_percentage(ext) => render_extended_percentage(ext);
 
 let transform_with_variable = (parser, mapper, value_to_expr) =>
   emit(
