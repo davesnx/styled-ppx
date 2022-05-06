@@ -153,9 +153,9 @@ and render_declaration = (d: Declaration.t): list(Parsetree.expression) => {
 
   switch (Declarations_to_emotion.parse_declarations(name, value_source)) {
   | Ok(exprs) => exprs
-  | Error(`Not_found) => grammar_error(name_loc, "unknown property " ++ name)
+  | Error(`Not_found) => grammar_error(name_loc, "Unknown property " ++ name)
   | Error(`Invalid_value(value)) =>
-    grammar_error(loc, "invalid property value " ++ value ++ ". For property " ++ name)
+    grammar_error(loc, "Property " ++ name ++ "invalid value " ++ value)
   };
 }
 and render_unsafe_declaration = (d: Declaration.t, _d_loc: Location.t): list(Parsetree.expression) => {
@@ -325,7 +325,7 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
   }
 
   switch (prelude) {
-  | [(Selector([(Ident(i),_), (value, value_loc)]), _)] => render_selector_value(~value_loc, i, value); 
+  | [(Selector([(Ident(i),_), (value, value_loc)]), _)] => render_selector_value(~value_loc, i, value);
   | [(Selector([(Ampersand, _), (Delim(":"), _), (Pseudoclass(_) as p , _)]), _)]
   | [(Selector([(Ampersand, _), (Delim(":"), _), (Delim(":"), _), (Pseudoelement(_) as p, _)]), _)] => render_self(p);
   | _ =>
