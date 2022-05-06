@@ -245,7 +245,7 @@ let render_size =
   | `Extended_percentage(p) => render_extended_percentage(p)
   | `Function_calc(fc) => render_function_calc(fc)
   | `Fit_content_0 => variants_to_expression(`FitContent)
-  | `Fit_content_1(lp) => render_length_percentage(lp)
+  | `Fit_content_1(_)
   | `Max_content
   | `Min_content
   | _ => raise(Unsupported_feature);
