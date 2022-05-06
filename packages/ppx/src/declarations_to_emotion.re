@@ -239,10 +239,11 @@ let render_size =
   | `Auto => variants_to_expression(`Auto)
   | `Extended_length(l) => render_extended_length(l)
   | `Extended_percentage(p) => render_extended_percentage(p)
-  | `Max_content
-  | `Min_content => raise(Unsupported_feature)
-  | `Fit_content(_) => raise(Unsupported_feature)
   | `Function_calc(fc) => render_function_calc(fc)
+  | `Fit_content_0 => variants_to_expression(`FitContent)
+  | `Fit_content_1(_)
+  | `Max_content
+  | `Min_content
   | _ => raise(Unsupported_feature);
 
 let render_angle =
@@ -310,8 +311,7 @@ let max_width =
     render_size
   );
 let max_height =
-  apply(Parser.property_max_height, [%expr CssJs.maxHeight], data =>
-    max_width.value_of_ast(`Value(data))
+  apply(Parser.property_max_height, [%expr CssJs.maxHeight], render_size
   );
 let box_sizing =
   apply(
@@ -1289,7 +1289,7 @@ let render_transform_functions = fun
   | `Extended_angle(a) => [%expr [%e render_extended_angle(a)]];
 
 let render_transform = fun
-  | `Function_perspective(_) => raise(Unsupported_feature) 
+  | `Function_perspective(_) => raise(Unsupported_feature)
   | `Function_matrix(_) => raise(Unsupported_feature)
   | `Function_matrix3d(_) => raise(Unsupported_feature)
   | `Function_rotate(v) =>  [%expr CssJs.rotate([%e render_transform_functions(v)])]
