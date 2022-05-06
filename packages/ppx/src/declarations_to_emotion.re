@@ -137,6 +137,7 @@ let variants_to_expression =
   | `Cover => id([%expr `cover])
   | `Full_width => raise(Unsupported_feature)
   | `Unset => id([%expr `unset])
+  | `FitContent => id([%expr `fitContent])
   | `Full_size_kana => raise(Unsupported_feature);
 
 let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
@@ -306,15 +307,7 @@ let max_width =
   apply(
     Parser.property_max_width,
     [%expr CssJs.maxWidth],
-    fun
-    | `Auto as e
-    | `None as e => variants_to_expression(e)
-    | `Extended_length(_) as ast
-    | `Extended_percentage(_) as ast
-    | `Max_content as ast
-    | `Min_content as ast
-    | `Fit_content(_) as ast => render_size(ast)
-    | _ => raise(Unsupported_feature),
+    render_size
   );
 let max_height =
   apply(Parser.property_max_height, [%expr CssJs.maxHeight], data =>
