@@ -155,7 +155,7 @@ and render_declaration = (d: Declaration.t): list(Parsetree.expression) => {
   | Ok(exprs) => exprs
   | Error(`Not_found) => grammar_error(name_loc, "Unknown property " ++ name)
   | Error(`Invalid_value(value)) =>
-    grammar_error(loc, "Property " ++ name ++ "invalid value " ++ value)
+    grammar_error(loc, "Error in property '" ++ name ++ "' invalid value: " ++ value ++ "")
   };
 }
 and render_unsafe_declaration = (d: Declaration.t, _d_loc: Location.t): list(Parsetree.expression) => {
