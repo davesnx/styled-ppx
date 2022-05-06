@@ -138,6 +138,8 @@ let variants_to_expression =
   | `Full_width => raise(Unsupported_feature)
   | `Unset => id([%expr `unset])
   | `FitContent => id([%expr `fitContent])
+  | `MaxContent => id([%expr `maxContent])
+  | `MinContent => id([%expr `minContent])
   | `Full_size_kana => raise(Unsupported_feature);
 
 let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
@@ -245,9 +247,9 @@ let render_size =
   | `Extended_percentage(p) => render_extended_percentage(p)
   | `Function_calc(fc) => render_function_calc(fc)
   | `Fit_content_0 => variants_to_expression(`FitContent)
+  | `Max_content => variants_to_expression(`MaxContent)
+  | `Min_content => variants_to_expression(`MinContent)
   | `Fit_content_1(_)
-  | `Max_content
-  | `Min_content
   | _ => raise(Unsupported_feature);
 
 let render_angle =
