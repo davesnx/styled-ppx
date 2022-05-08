@@ -137,6 +137,9 @@ let variants_to_expression =
   | `Cover => id([%expr `cover])
   | `Full_width => raise(Unsupported_feature)
   | `Unset => id([%expr `unset])
+  | `FitContent => id([%expr `fitContent])
+  | `MaxContent => id([%expr `maxContent])
+  | `MinContent => id([%expr `minContent])
   | `Full_size_kana => raise(Unsupported_feature);
 
 let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
@@ -232,16 +235,21 @@ and render_extended_percentage = fun
   | `Function_calc(fc) => render_function_calc(fc)
   | `Interpolation(i) => render_variable(i);
 
+let render_length_percentage = fun
+  | `Extended_length(ext) => render_extended_length(ext)
+  | `Extended_percentage(ext) => render_extended_percentage(ext);
+
 // css-sizing-3
 let render_size =
   fun
   | `Auto => variants_to_expression(`Auto)
   | `Extended_length(l) => render_extended_length(l)
   | `Extended_percentage(p) => render_extended_percentage(p)
-  | `Max_content
-  | `Min_content => raise(Unsupported_feature)
-  | `Fit_content(_) => raise(Unsupported_feature)
   | `Function_calc(fc) => render_function_calc(fc)
+  | `Fit_content_0 => variants_to_expression(`FitContent)
+  | `Max_content => variants_to_expression(`MaxContent)
+  | `Min_content => variants_to_expression(`MinContent)
+  | `Fit_content_1(_)
   | _ => raise(Unsupported_feature);
 
 let render_angle =
@@ -255,10 +263,6 @@ let render_extended_angle = fun
   | `Angle(a) => render_angle(a)
   | `Function_calc(fc) => render_function_calc(fc)
   | `Interpolation(i) => render_variable(i);
-
-let render_length_percentage = fun
-  | `Extended_length(ext) => render_extended_length(ext)
-  | `Extended_percentage(ext) => render_extended_percentage(ext);
 
 let transform_with_variable = (parser, mapper, value_to_expr) =>
   emit(
@@ -306,19 +310,10 @@ let max_width =
   apply(
     Parser.property_max_width,
     [%expr CssJs.maxWidth],
-    fun
-    | `Auto as e
-    | `None as e => variants_to_expression(e)
-    | `Extended_length(_) as ast
-    | `Extended_percentage(_) as ast
-    | `Max_content as ast
-    | `Min_content as ast
-    | `Fit_content(_) as ast => render_size(ast)
-    | _ => raise(Unsupported_feature),
+    render_size
   );
 let max_height =
-  apply(Parser.property_max_height, [%expr CssJs.maxHeight], data =>
-    max_width.value_of_ast(`Value(data))
+  apply(Parser.property_max_height, [%expr CssJs.maxHeight], render_size
   );
 let box_sizing =
   apply(
@@ -1296,7 +1291,7 @@ let render_transform_functions = fun
   | `Extended_angle(a) => [%expr [%e render_extended_angle(a)]];
 
 let render_transform = fun
-  | `Function_perspective(_) => raise(Unsupported_feature) 
+  | `Function_perspective(_) => raise(Unsupported_feature)
   | `Function_matrix(_) => raise(Unsupported_feature)
   | `Function_matrix3d(_) => raise(Unsupported_feature)
   | `Function_rotate(v) =>  [%expr CssJs.rotate([%e render_transform_functions(v)])]
