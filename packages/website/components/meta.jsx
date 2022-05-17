@@ -3,9 +3,13 @@ import { Head as NextHead } from 'next/document';
 
 const Head = (props) => {
   const title = props.title || "Typed styled components in ReScript";
-  const description = props.description || "Documentation";
-  const logo = "https://raw.githubusercontent.com/davesnx/styled-ppx/main/docs/images/logo.png";
-  const metaImg = `https://api.metaimg.net/render?design=simple&image=${logo}&title=${title}&description=${description}&align=left&backgroundColor=FFFFFF&textColor=000000`;
+  const prefix = "https://styled-ppx.vercel.app  |  Documentation";
+  const description = props.description ? `${prefix} · ${props.description}` : prefix;
+  const logo = "https://styled-ppx-git-improve-meta-image-davesnx.vercel.app/meta-img-logo.png";
+  const background = "F2F2F2";
+  const color = "333333";
+  /* const logo = "https://styled-ppx.vercel.app/meta-img-logo.png"; */
+  const metaImg = `https://api.metaimg.net/render?design=simple&image=${logo}&title=${title}&description=${description}&align=left&backgroundColor=${background}&textColor=${color}`;
 
   return (
     <NextHead>
