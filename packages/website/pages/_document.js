@@ -1,7 +1,7 @@
 import React from 'react';
 import NextDocument, { Html, Main, Head, NextScript } from 'next/document';
 import { SkipNavLink } from '@reach/skip-nav';
-import Meta from './_meta';
+import Meta from '../components/meta';
 
 class Document extends NextDocument {
   render() {
