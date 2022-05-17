@@ -10,7 +10,7 @@ export default {
   docsRepositoryBase: "https://github.com/davesnx/styled-ppx/tree/main/packages/website/pages",
   titleSuffix: '- styled-ppx',
   customSearch: () => null,
-  logo: <span className="font-mono hidden md:inline">styled-ppx</span>,
+  logo: <span className="font-mono hidden md:inline font-semibold">styled-ppx</span>,
   head: (
     <>
       {/* Favicons, meta */}
@@ -41,21 +41,6 @@ export default {
       <meta name="theme-color" content="#ffffff" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <meta httpEquiv="Content-Language" content="en" />
-      <meta name="description" content={description} />
-      <meta name="og:description" content={description} />
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:site" content="@davesnx" />
-      <meta
-        name="twitter:image"
-        content="https://assets.vercel.com/image/upload/v1572282926/swr/twitter-card.jpg"
-      />
-      <meta name="og:title" content={short} />
-      <meta name="og:url" content="https://styled-ppx.vercel.app/" />
-      <meta
-        name="og:image"
-        content="https://assets.vercel.com/image/upload/v1572282926/swr/twitter-card.jpg"
-      />
-      <meta name="apple-mobile-web-app-title" content="SWR" />
       <link
         rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css"

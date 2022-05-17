@@ -1,6 +1,7 @@
 import React from 'react';
-import NextDocument, { Html, Head, Main, NextScript } from 'next/document';
+import NextDocument, { Html, Main, Head, NextScript } from 'next/document';
 import { SkipNavLink } from '@reach/skip-nav';
+import Meta from './_meta';
 
 class Document extends NextDocument {
   render() {
@@ -14,6 +15,7 @@ class Document extends NextDocument {
             crossOrigin=""
           />
         </Head>
+        <Meta />
         <body>
           <SkipNavLink />
           <Main />
