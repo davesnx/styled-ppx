@@ -16,4 +16,5 @@ if exists('s:current_syntax')
 endif
 
 syntax region styledPpxEncl matchgroup=ocamlPpxEncl start=+\[%cx+ end=+\]+ keepend contains=styledBody
-syntax region styledBody start=+{|+ end=+|}+ contains=@CssSyntax,styledPpxInterpolation contained
+syntax region styledPpxEncl matchgroup=ocamlPpxEncl start=+\[%styled+ end=+\]+ keepend contains=styledBody
+syntax region styledBody start=+{|+ end=+|}+ contains=@CssSyntax contained

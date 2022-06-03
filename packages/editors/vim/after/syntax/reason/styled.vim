@@ -1,4 +1,4 @@
-if polyglot#init#is_disabled(expand('<sfile>:p'), 'css', 'after/syntax/ocaml/styled.vim')
+if polyglot#init#is_disabled(expand('<sfile>:p'), 'css', 'after/syntax/reason/styled.vim')
   finish
 endif
 
@@ -16,4 +16,5 @@ if exists('s:current_syntax')
 endif
 
 syntax region styledPpxEncl start=+\[%cx+ end=+\]+ keepend contains=styledBody
-syntax region styledBody start=+{|+ end=+|}+ contains=@CssSyntax,styledPpxInterpolation contained
+syntax region styledPpxEncl start=+\[%styled+ end=+\]+ keepend contains=styledBody
+syntax region styledBody start=+{|+ end=+|}+ contains=@CssSyntax contained
