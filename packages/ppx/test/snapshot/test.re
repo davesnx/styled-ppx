@@ -114,7 +114,6 @@ module SelectorWithInterpolation = [%styled.div {|
 
   @media (min-width: 700px) and (orientation: $(orientation)) {
     display: none;
-
   }
 |}]
 
@@ -135,7 +134,7 @@ module MediaQueryCalc = [%styled.div {|
 |]];
 */
 
-module Button = [%styled.button (~variant) => {
+module DynamicComponentWithSequence = [%styled.button (~variant) => {
   let color = Theme.button(variant);
 
   [|
@@ -145,7 +144,7 @@ module Button = [%styled.button (~variant) => {
   |];
 }];
 
-module Sequence = [%styled.button (~size, ~color) => {
+module DynamicComponentWithArray = [%styled.button (~size, ~color) => {
   [|
     [%css "width: $(size)"],
     [%css "color: $(color)"],
@@ -153,3 +152,18 @@ module Sequence = [%styled.button (~size, ~color) => {
     [%css "width: 100%;"],
   |]
 }];
+
+let sharedStylesBetweenDynamicComponents = (color) => [%css "color: $(color)"];
+
+module DynamicCompnentWithLetIn = [%styled.div
+  (~color) => {
+    let styles = sharedStylesBetweenDynamicComponents(color);
+    styles;
+  }
+];
+
+module DynamicCompnentWithIdent = [%styled.div
+  (~a as _) => {
+    cssRule;
+  }
+];
