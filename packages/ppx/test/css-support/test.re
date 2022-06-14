@@ -2645,22 +2645,22 @@
 /* [%css {|contain-intrinsic-inline-size: none|}]; */
 /* [%css {|contain-intrinsic-inline-size: 10px|}]; */
 /* [%css {|width: stretch|}]; */
-/* [%css {|width: fit-content|}]; */
+[%css {|width: fit-content|}];
 /* [%css {|width: contain|}]; */
 /* [%css {|min-width: stretch|}]; */
-/* [%css {|min-width: fit-content|}]; */
+[%css {|min-width: fit-content|}];
 /* [%css {|min-width: contain|}]; */
 /* [%css {|max-width: stretch|}]; */
-/* [%css {|max-width: fit-content|}]; */
+[%css {|max-width: fit-content|}];
 /* [%css {|max-width: contain|}]; */
 /* [%css {|height: stretch|}]; */
-/* [%css {|height: fit-content|}]; */
+[%css {|height: fit-content|}];
 /* [%css {|height: contain|}]; */
 /* [%css {|min-height: stretch|}]; */
-/* [%css {|min-height: fit-content|}]; */
+[%css {|min-height: fit-content|}];
 /* [%css {|min-height: contain|}]; */
 /* [%css {|max-height: stretch|}]; */
-/* [%css {|max-height: fit-content|}]; */
+[%css {|max-height: fit-content|}];
 /* [%css {|max-height: contain|}]; */
 /* [%css {|inline-size: stretch|}]; */
 /* [%css {|inline-size: fit-content|}]; */

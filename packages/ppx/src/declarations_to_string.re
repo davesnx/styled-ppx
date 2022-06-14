@@ -206,7 +206,8 @@ let render_size =
   | `Extended_percentage(_) as lp => render_length_percentage(lp)
   | `Max_content => [%expr "max-content"]
   | `Min_content => [%expr "min-content"]
-  | `Fit_content(_) => [%expr "fit-content"]
+  | `Fit_content_0 => [%expr "fit-content"]
+  | `Fit_content_1(lp) => render_length_percentage(lp)
   | `Function_calc(fc) => render_function_calc(fc)
 
 let render_css_global_values = (name, value) => {

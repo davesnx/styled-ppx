@@ -137,9 +137,11 @@ let variants_to_expression =
   | `Cover => id([%expr `cover])
   | `Full_width => raise(Unsupported_feature)
   | `Unset => id([%expr `unset])
-  | `Full_size_kana => raise(Unsupported_feature)
   | `Padding_box => id([%expr `padding_box])
-  ;
+  | `FitContent => id([%expr `fitContent])
+  | `MaxContent => id([%expr `maxContent])
+  | `MinContent => id([%expr `minContent])
+  | `Full_size_kana => raise(Unsupported_feature);
 
 let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
 
@@ -234,16 +236,21 @@ and render_extended_percentage = fun
   | `Function_calc(fc) => render_function_calc(fc)
   | `Interpolation(i) => render_variable(i);
 
+let render_length_percentage = fun
+  | `Extended_length(ext) => render_extended_length(ext)
+  | `Extended_percentage(ext) => render_extended_percentage(ext);
+
 // css-sizing-3
 let render_size =
   fun
   | `Auto => variants_to_expression(`Auto)
   | `Extended_length(l) => render_extended_length(l)
   | `Extended_percentage(p) => render_extended_percentage(p)
-  | `Max_content
-  | `Min_content => raise(Unsupported_feature)
-  | `Fit_content(_) => raise(Unsupported_feature)
   | `Function_calc(fc) => render_function_calc(fc)
+  | `Fit_content_0 => variants_to_expression(`FitContent)
+  | `Max_content => variants_to_expression(`MaxContent)
+  | `Min_content => variants_to_expression(`MinContent)
+  | `Fit_content_1(_)
   | _ => raise(Unsupported_feature);
 
 let render_angle =
@@ -257,10 +264,6 @@ let render_extended_angle = fun
   | `Angle(a) => render_angle(a)
   | `Function_calc(fc) => render_function_calc(fc)
   | `Interpolation(i) => render_variable(i);
-
-let render_length_percentage = fun
-  | `Extended_length(ext) => render_extended_length(ext)
-  | `Extended_percentage(ext) => render_extended_percentage(ext);
 
 let transform_with_variable = (parser, mapper, value_to_expr) =>
   emit(
@@ -308,19 +311,10 @@ let max_width =
   apply(
     Parser.property_max_width,
     [%expr CssJs.maxWidth],
-    fun
-    | `Auto as e
-    | `None as e => variants_to_expression(e)
-    | `Extended_length(_) as ast
-    | `Extended_percentage(_) as ast
-    | `Max_content as ast
-    | `Min_content as ast
-    | `Fit_content(_) as ast => render_size(ast)
-    | _ => raise(Unsupported_feature),
+    render_size
   );
 let max_height =
-  apply(Parser.property_max_height, [%expr CssJs.maxHeight], data =>
-    max_width.value_of_ast(`Value(data))
+  apply(Parser.property_max_height, [%expr CssJs.maxHeight], render_size
   );
 let box_sizing =
   apply(
@@ -898,7 +892,7 @@ let background_attachment =
     | [v] => [[%expr CssJs.backgroundAttachment([%e render_attachment(v)])]]
     | _ => raise(Unsupported_feature)
   );
-  
+
 let render_bg_position = (bg_position) => {
 
   let render_static = fun
@@ -909,7 +903,7 @@ let render_bg_position = (bg_position) => {
   | `Top => [%expr `center]
   | `Extended_length(l) => render_extended_length(l)
   | `Extended_percentage(p) => render_extended_percentage(p);
-    
+
   let render_and = fun
     | `Center => [%expr `center]
     | `Static((a, b)) => switch(b){
@@ -919,7 +913,7 @@ let render_bg_position = (bg_position) => {
 
   switch(bg_position){
   | `And(left, right) => [%expr `hv([%e render_and(left)], [%e render_and(right)])]
-  | `Bottom => [%expr `bottom] 
+  | `Bottom => [%expr `bottom]
   | `Center => [%expr `center]
   | `Top => [%expr `top]
   | `Left => [%expr `left]
@@ -928,7 +922,7 @@ let render_bg_position = (bg_position) => {
   | `Extended_percentage(a) => render_extended_percentage(a)
   | `Static((x,y)) => [%expr `hv([%e render_static(x)], [%e render_static(y)])];
   };
-} 
+}
 
 let background_position =
   apply(
@@ -993,7 +987,7 @@ let render_background = ((layers, final_layer)) => {
       | Some((bg_pos, None)) => [
         [[%expr CssJs.backgroundPosition([%e render_bg_position(bg_pos)])]],
       ]
-      | None => [] 
+      | None => []
     };
   }
 
@@ -1013,11 +1007,11 @@ let render_background = ((layers, final_layer)) => {
       | Some((bg_pos, None)) => [
         [[%expr CssJs.backgroundPosition([%e render_bg_position(bg_pos)])]],
       ]
-      | None => [] 
+      | None => []
     };
   }
 
-    let l = layers |> List.concat_map(x => x |> fst |> render_layers) 
+    let l = layers |> List.concat_map(x => x |> fst |> render_layers)
 
     List.concat([
      render_final_layer(final_layer) |> List.flatten,
@@ -1452,7 +1446,7 @@ let render_transform_functions = fun
   | `Extended_angle(a) => [%expr [%e render_extended_angle(a)]];
 
 let render_transform = fun
-  | `Function_perspective(_) => raise(Unsupported_feature) 
+  | `Function_perspective(_) => raise(Unsupported_feature)
   | `Function_matrix(_) => raise(Unsupported_feature)
   | `Function_matrix3d(_) => raise(Unsupported_feature)
   | `Function_rotate(v) =>  [%expr CssJs.rotate([%e render_transform_functions(v)])]

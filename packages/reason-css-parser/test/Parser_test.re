@@ -47,7 +47,7 @@ let tests = [
   test(
     [%value "<track-size>"],
     "fit-content(50%)",
-    `Fit_content(ext_pct(50.)),
+    `Fit_content_1(ext_pct(50.)),
   ),
   test([%value "<calc-product>"], "4", (`Number(4.), [])),
   test([%value "<calc-sum>"], "4", ((`Number(4.), []), [])),
