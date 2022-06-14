@@ -7822,9 +7822,9 @@ module SelectorsMediaQueries = {
       CssJs.label("SelectorsMediaQueries"),
       CssJs.media(.
         "" ++ "(" ++ "min-width" ++ ": " ++ "600px" ++ ") ",
-        [|CssJs.unsafe("background", "blue")|],
+        [|CssJs.backgroundColor(CssJs.blue)|],
       ),
-      CssJs.hover([|CssJs.unsafe("background", "green")|]),
+      CssJs.hover([|CssJs.backgroundColor(CssJs.green)|]),
       CssJs.selector(.
         {js|& > p|js},
         [|CssJs.color(CssJs.pink), CssJs.fontSize(`pxFloat(24.))|],
