@@ -52,7 +52,9 @@ let render_integer = integer =>
   Helper.Const.int(integer) |> Helper.Exp.constant;
 let render_number = number =>
   Helper.Const.float(number |> string_of_float) |> Helper.Exp.constant;
-let render_percentage = number => [%expr `percent([%e render_number(number)])];
+let render_percentage = number => [%expr
+  `percent([%e render_number(number)])
+];
 
 let render_css_global_values = (name, value) => {
   let.ok value = Parser.parse(Standard.css_wide_keywords, value);
@@ -174,69 +176,80 @@ let render_length =
   | `Vw(n) => [%expr `vw([%e render_number(n)])]
   | `Zero => [%expr `zero];
 
-let rec render_function_calc = (calc_sum) => {
+let rec render_function_calc = calc_sum => {
   switch (calc_sum) {
-    | (product, []) => render_product(product)
-    | (product, list_of_sums) => {
-      /* This isn't a great design of the types, but we need to know the operation
-      which is in the first position of the array, we ensure that there's one value
-      since we are on this branch of the switch */
-      let op = pick_operation(List.hd(list_of_sums));
-      let first = render_product(product);
-      let second = render_list_of_sums(list_of_sums);
-      [%expr `calc([%e op], [%e first], [%e second])];
-    }
-  }
+  | (product, []) => render_product(product)
+  | (product, list_of_sums) =>
+    /* This isn't a great design of the types, but we need to know the operation
+       which is in the first position of the array, we ensure that there's one value
+       since we are on this branch of the switch */
+    let op = pick_operation(List.hd(list_of_sums));
+    let first = render_product(product);
+    let second = render_list_of_sums(list_of_sums);
+    %expr
+    `calc(([%e op], [%e first], [%e second]));
+  };
 }
 and render_sum_op = op => {
   switch (op) {
-    | `Dash(()) => [%expr `sub]
-    | `Cross(()) => [%expr `add]
-  }
+  | `Dash () =>
+    %expr
+    `sub
+  | `Cross () =>
+    %expr
+    `add
+  };
 }
 and pick_operation = ((op, _)) => render_sum_op(op)
-and render_list_of_products = (list_of_products) => {
+and render_list_of_products = list_of_products => {
   switch (list_of_products) {
-    | [one] => render_product_op(one)
-    | list => render_list_of_products(list)
-  }
-} and render_list_of_sums = (list_of_sums) => {
+  | [one] => render_product_op(one)
+  | list => render_list_of_products(list)
+  };
+}
+and render_list_of_sums = list_of_sums => {
   switch (list_of_sums) {
-    | [(_, one)] => render_product(one)
-    | list => render_list_of_sums(list)
-  }
-} and render_product = product => {
+  | [(_, one)] => render_product(one)
+  | list => render_list_of_sums(list)
+  };
+}
+and render_product = product => {
   switch (product) {
-    | (calc_value, []) => render_calc_value(calc_value)
-    | (calc_value, list_of_products) => {
-      let _first = render_calc_value(calc_value);
-      let _second = render_list_of_products(list_of_products);
-      /* [%expr (`mult, [%e first], [%e second])]; */
-      failwith("`mult isn't available in bs-css");
-    }
-  }
-} and render_product_op = (op) => {
+  | (calc_value, []) => render_calc_value(calc_value)
+  | (calc_value, list_of_products) =>
+    let _first = render_calc_value(calc_value);
+    let _second = render_list_of_products(list_of_products);
+    /* [%expr (`mult, [%e first], [%e second])]; */
+    failwith("`mult isn't available in bs-css");
+  };
+}
+and render_product_op = op => {
   switch (op) {
-    | `Static_0((), calc_value) => render_calc_value(calc_value)
-    | `Static_1((), float) => render_number(float)
-  }
-} and render_calc_value = calc_value => {
+  | `Static_0((), calc_value) => render_calc_value(calc_value)
+  | `Static_1((), float) => render_number(float)
+  };
+}
+and render_calc_value = calc_value => {
   switch (calc_value) {
-    | `Number(float) => render_number(float)
-    | `Extended_length(l) => render_extended_length(l)
-    | `Extended_percentage(p) => render_extended_percentage(p)
-    | `Function_calc(fc) => render_function_calc(fc)
-  }
-} and render_extended_length = fun
+  | `Number(float) => render_number(float)
+  | `Extended_length(l) => render_extended_length(l)
+  | `Extended_percentage(p) => render_extended_percentage(p)
+  | `Function_calc(fc) => render_function_calc(fc)
+  };
+}
+and render_extended_length =
+  fun
   | `Length(l) => render_length(l)
   | `Function_calc(fc) => render_function_calc(fc)
   | `Interpolation(i) => render_variable(i)
-and render_extended_percentage = fun
+and render_extended_percentage =
+  fun
   | `Percentage(p) => render_percentage(p)
   | `Function_calc(fc) => render_function_calc(fc)
   | `Interpolation(i) => render_variable(i);
 
-let render_length_percentage = fun
+let render_length_percentage =
+  fun
   | `Extended_length(ext) => render_extended_length(ext)
   | `Extended_percentage(ext) => render_extended_percentage(ext);
 
@@ -260,7 +273,8 @@ let render_angle =
   | `Grad(number) => id([%expr `grad([%e render_number(number)])])
   | `Turn(number) => id([%expr `turn([%e render_number(number)])]);
 
-let render_extended_angle = fun
+let render_extended_angle =
+  fun
   | `Angle(a) => render_angle(a)
   | `Function_calc(fc) => render_function_calc(fc)
   | `Interpolation(i) => render_variable(i);
@@ -308,14 +322,9 @@ let min_width =
 let min_height =
   apply(Parser.property_min_height, [%expr CssJs.minHeight], render_size);
 let max_width =
-  apply(
-    Parser.property_max_width,
-    [%expr CssJs.maxWidth],
-    render_size
-  );
+  apply(Parser.property_max_width, [%expr CssJs.maxWidth], render_size);
 let max_height =
-  apply(Parser.property_max_height, [%expr CssJs.maxHeight], render_size
-  );
+  apply(Parser.property_max_height, [%expr CssJs.maxHeight], render_size);
 let box_sizing =
   apply(
     Parser.property_box_sizing,
@@ -334,7 +343,7 @@ let padding_value =
   fun
   | `Auto => variants_to_expression(`Auto)
   | `Extended_length(l) => render_extended_length(l)
-  | `Extended_percentage(p) => render_extended_percentage(p)
+  | `Extended_percentage(p) => render_extended_percentage(p);
 
 // css-box-3
 let margin_top =
@@ -592,7 +601,8 @@ let render_color_alpha =
 let render_function_rgb = ast => {
   let color_to_float = v => render_integer(v |> int_of_float);
 
-  let to_number = fun
+  let to_number =
+    fun
     // TODO: bs-css rgb(float, float, float)
     | `Percentage(pct) => color_to_float(pct *. 2.55)
     | `Function_calc(fc) => render_function_calc(fc)
@@ -686,8 +696,9 @@ let opacity =
     [%expr CssJs.opacity],
     fun
     | `Number(number) => render_number(number)
-    | `Extended_percentage(`Percentage(number)) => render_number(number /. 100.0)
-    | `Extended_percentage(pct) => render_extended_percentage(pct)
+    | `Extended_percentage(`Percentage(number)) =>
+      render_number(number /. 100.0)
+    | `Extended_percentage(pct) => render_extended_percentage(pct),
   );
 
 // css-images-4
@@ -704,7 +715,8 @@ let render_position = position => {
     fun
     | `Position(pos) => variants_to_expression(pos)
     | `Extended_length(l) => render_extended_length(l)
-    | `Extended_percentage(percentage) => render_extended_percentage(percentage);
+    | `Extended_percentage(percentage) =>
+      render_extended_percentage(percentage);
 
   let horizontal =
     switch (position) {
@@ -720,7 +732,9 @@ let render_position = position => {
     | (`Left, `Extended_length(length)) => `Extended_length(length)
     | (pos, `Zero) => `Position(pos)
     | (pos, `Extended_percentage(`Percentage(percentage))) =>
-      `Extended_percentage(`Percentage(percentage +. pos_to_percentage_offset(pos)))
+      `Extended_percentage(
+        `Percentage(percentage +. pos_to_percentage_offset(pos)),
+      )
     | (_, _) => raise(Unsupported_feature)
     };
 
@@ -741,7 +755,9 @@ let render_position = position => {
     | (`Top, `Extended_length(length)) => `Extended_length(length)
     | (pos, `Zero) => `Position(pos)
     | (pos, `Extended_percentage(`Percentage(percentage))) =>
-      `Extended_percentage(`Percentage(percentage +. pos_to_percentage_offset(pos)))
+      `Extended_percentage(
+        `Percentage(percentage +. pos_to_percentage_offset(pos)),
+      )
     | (_, _) => raise(Unsupported_feature)
     };
 
@@ -759,7 +775,8 @@ let object_position =
     render_position,
   );
 let image_resolution = unsupportedProperty(Parser.property_image_resolution);
-let image_orientation = unsupportedProperty(Parser.property_image_orientation);
+let image_orientation =
+  unsupportedProperty(Parser.property_image_orientation);
 let image_rendering = unsupportedProperty(Parser.property_image_rendering);
 
 let render_color_interp =
@@ -835,29 +852,37 @@ let background_color =
     render_color,
   );
 
-let render_background_image = fun
+let render_background_image =
+  fun
   | `None => [%expr `none]
   | _ => raise(Unsupported_feature); // bs-css only accepts none
 
-let render_repeat_style = fun
+let render_repeat_style =
+  fun
   | `Xor(values) => {
-     let render_xor = fun
-      | `Repeat => [%expr `repeat]
-      | `Space => [%expr `space]
-      | `Round => [%expr `round]
-      | `No_repeat => [%expr `noRepeat]
-      switch(values){
-        | [] => failwith("expected at least one value")
-        | [x] => [%expr [%e render_xor(x)]]
-        | [x, y] => [%expr `hv([%e render_xor(x)], [%e render_xor(y)])]
-        | _ => failwith("repeat doesn't accept more then 2 values");
-      }
-  }
+      let render_xor = (
+        fun
+        | `Repeat => [%expr `repeat]
+        | `Space => [%expr `space]
+        | `Round => [%expr `round]
+        | `No_repeat => [%expr `noRepeat]
+      );
+      switch (values) {
+      | [] => failwith("expected at least one value")
+      | [x] =>
+        %expr
+        [%e render_xor(x)]
+      | [x, y] =>
+        %expr
+        `hv(([%e render_xor(x)], [%e render_xor(y)]))
+      | _ => failwith("repeat doesn't accept more then 2 values")
+      };
+    }
   | `Repeat_x => [%expr `repeatX]
   | `Repeat_y => [%expr `repeatY];
 
-
-let render_attachment = fun
+let render_attachment =
+  fun
   | `Fixed => [%expr `fixed]
   | `Local => [%expr `local]
   | `Scroll => [%expr `scroll];
@@ -868,8 +893,10 @@ let background_image =
     id,
     fun
     | [] => failwith("expected at least one value")
-    | [v] => [[%expr CssJs.backgroundImage([%e render_background_image(v)])]]
-    | _ => raise(Unsupported_feature)
+    | [v] => [
+        [%expr CssJs.backgroundImage([%e render_background_image(v)])],
+      ]
+    | _ => raise(Unsupported_feature),
   );
 
 let background_repeat =
@@ -879,9 +906,11 @@ let background_repeat =
     fun
     | [] => failwith("expected at least one value")
     | [`Repeat_x] => [[%expr CssJs.backgroundRepeat([`repeatX])]]
-    | [`Repeat_y] =>[[%expr CssJs.backgroundRepeat(`repeatY)]]
-    | [`Xor(_) as v] => [[%expr CssJs.backgroundRepeat([%e render_repeat_style(v)])]]
-    | _ => raise(Unsupported_feature)
+    | [`Repeat_y] => [[%expr CssJs.backgroundRepeat(`repeatY)]]
+    | [`Xor(_) as v] => [
+        [%expr CssJs.backgroundRepeat([%e render_repeat_style(v)])],
+      ]
+    | _ => raise(Unsupported_feature),
   );
 let background_attachment =
   emit(
@@ -889,40 +918,60 @@ let background_attachment =
     id,
     fun
     | [] => failwith("expected at least one argument")
-    | [v] => [[%expr CssJs.backgroundAttachment([%e render_attachment(v)])]]
-    | _ => raise(Unsupported_feature)
+    | [v] => [
+        [%expr CssJs.backgroundAttachment([%e render_attachment(v)])],
+      ]
+    | _ => raise(Unsupported_feature),
   );
 
-let render_bg_position = (bg_position) => {
-
-  let render_static = fun
-  | `Center => [%expr `center]
-  | `Left => [%expr `center]
-  | `Right => [%expr `center]
-  | `Bottom => [%expr `center]
-  | `Top => [%expr `center]
-  | `Extended_length(l) => render_extended_length(l)
-  | `Extended_percentage(p) => render_extended_percentage(p);
-
-  let render_and = fun
+let render_bg_position = bg_position => {
+  let render_static =
+    fun
     | `Center => [%expr `center]
-    | `Static((a, b)) => switch(b){
-      | Some(b) => [%expr `hv([%e render_static(a)], [%e render_static(b)])]
-      | None => render_static(a)
-    };
+    | `Left => [%expr `center]
+    | `Right => [%expr `center]
+    | `Bottom => [%expr `center]
+    | `Top => [%expr `center]
+    | `Extended_length(l) => render_extended_length(l)
+    | `Extended_percentage(p) => render_extended_percentage(p);
 
-  switch(bg_position){
-  | `And(left, right) => [%expr `hv([%e render_and(left)], [%e render_and(right)])]
-  | `Bottom => [%expr `bottom]
-  | `Center => [%expr `center]
-  | `Top => [%expr `top]
-  | `Left => [%expr `left]
-  | `Right => [%expr `right]
+  let render_and =
+    fun
+    | `Center => [%expr `center]
+    | `Static(a, b) =>
+      switch (b) {
+      | Some(b) =>
+        %expr
+        `hv(([%e render_static(a)], [%e render_static(b)]))
+      | None => render_static(a)
+      };
+
+  switch (bg_position) {
+  | `And(left, right) =>
+    %expr
+    `hv(([%e render_and(left)], [%e render_and(right)]))
+  | `Bottom =>
+    %expr
+    `bottom
+  | `Center =>
+    %expr
+    `center
+  | `Top =>
+    %expr
+    `top
+  | `Left =>
+    %expr
+    `left
+  | `Right =>
+    %expr
+    `right
   | `Extended_length(l) => render_extended_length(l)
   | `Extended_percentage(a) => render_extended_percentage(a)
-  | `Static((x,y)) => [%expr `hv([%e render_static(x)], [%e render_static(y)])];
+  | `Static(x, y) =>
+    %expr
+    `hv(([%e render_static(x)], [%e render_static(y)]))
   };
-}
+};
 
 let background_position =
   apply(
@@ -931,7 +980,7 @@ let background_position =
     fun
     | [] => failwith("expected at least one argument")
     | [l] => render_bg_position(l)
-    | _ => raise(Unsupported_feature)
+    | _ => raise(Unsupported_feature),
   );
 let background_clip =
   apply(
@@ -940,7 +989,7 @@ let background_clip =
     fun
     | [] => failwith("expected at least one argument")
     | [v] => variants_to_expression(v)
-    | _ => raise(Unsupported_feature)
+    | _ => raise(Unsupported_feature),
   );
 let background_origin =
   apply(
@@ -949,7 +998,7 @@ let background_origin =
     fun
     | [] => failwith("expected at least one argument")
     | [v] => variants_to_expression(v)
-    | _ => raise(Unsupported_feature)
+    | _ => raise(Unsupported_feature),
   );
 let background_size =
   apply(
@@ -957,73 +1006,121 @@ let background_size =
     [%expr CssJs.backgroundSize],
     fun
     | [] => failwith("expected at least one argument")
-    | [v] => switch(v){
-        | `Contain => [%expr `contain]
-        | `Cover => [%expr `cover]
-        | `Xor([`Auto]) => [%expr `auto]
-        | `Xor(l) when List.mem(`Auto, l) => raise(Unsupported_feature)
-        | `Xor([x,y]) => [%expr `size([%e render_size(x)], [%e render_size(y)])]
-        | `Xor([_])
-        | _ => raise(Unsupported_feature)
-        }
-    | _ => raise(Unsupported_feature)
+    | [v] =>
+      switch (v) {
+      | `Contain =>
+        %expr
+        `contain
+      | `Cover =>
+        %expr
+        `cover
+      | `Xor([`Auto]) =>
+        %expr
+        `auto
+      | `Xor(l) when List.mem(`Auto, l) => raise(Unsupported_feature)
+      | `Xor([x, y]) =>
+        %expr
+        `size(([%e render_size(x)], [%e render_size(y)]))
+      | `Xor([_])
+      | _ => raise(Unsupported_feature)
+      }
+    | _ => raise(Unsupported_feature),
   );
 let render_background = ((layers, final_layer)) => {
+  let render_layer = (layer, fn_call, render_fn) =>
+    Option.fold(
+      ~none=[],
+      ~some=l => [[%expr [%e fn_call]([%e render_fn(l)])]],
+      layer,
+    );
 
-  let render_layer = (layer, fn_call, render_fn) => Option.fold(~none=[], ~some=(l => [[%expr [%e fn_call]([%e render_fn(l)])]]), layer);
-
-  let render_layers = ((bg_image, bg_position, repeat_style, attachment, b1, b2)) => {
+  let render_layers =
+      ((bg_image, bg_position, repeat_style, attachment, b1, b2)) => {
     [
-      render_layer(bg_image, [%expr CssJs.background_image], render_background_image),
-      render_layer(repeat_style, [%expr CssJs.backgroundRepeat], render_repeat_style),
-      render_layer(attachment, [%expr CssJs.backgroundRepeat], render_attachment),
+      render_layer(
+        bg_image,
+        [%expr CssJs.background_image],
+        render_background_image,
+      ),
+      render_layer(
+        repeat_style,
+        [%expr CssJs.backgroundRepeat],
+        render_repeat_style,
+      ),
+      render_layer(
+        attachment,
+        [%expr CssJs.backgroundRepeat],
+        render_attachment,
+      ),
       render_layer(b1, [%expr CssJs.clip], variants_to_expression),
       render_layer(b2, [%expr CssJs.origin], variants_to_expression),
-    ] @ switch(bg_position){
+    ]
+    @ (
+      switch (bg_position) {
       | Some((bg_pos, Some(((), bg_size)))) => [
-        [[%expr CssJs.backgroundPosition([%e render_bg_position(bg_pos)])]],
-        [[%expr CssJs.backgroundSize([%e render_size(bg_size)])]],
-      ]
+          [
+            [%expr CssJs.backgroundPosition([%e render_bg_position(bg_pos)])],
+          ],
+          [[%expr CssJs.backgroundSize([%e render_size(bg_size)])]],
+        ]
       | Some((bg_pos, None)) => [
-        [[%expr CssJs.backgroundPosition([%e render_bg_position(bg_pos)])]],
-      ]
+          [
+            [%expr CssJs.backgroundPosition([%e render_bg_position(bg_pos)])],
+          ],
+        ]
       | None => []
-    };
-  }
+      }
+    );
+  };
 
-  let render_final_layer = ((bg_color, bg_image, bg_position, repeat_style, attachment, b1, b2)) => {
+  let render_final_layer =
+      ((bg_color, bg_image, bg_position, repeat_style, attachment, b1, b2)) => {
     [
       render_layer(bg_color, [%expr CssJs.backgroundColor], render_color),
-      render_layer(bg_image, [%expr CssJs.background_image], render_background_image),
-      render_layer(repeat_style, [%expr CssJs.backgroundRepeat], render_repeat_style),
-      render_layer(attachment, [%expr CssJs.backgroundRepeat], render_attachment),
+      render_layer(
+        bg_image,
+        [%expr CssJs.background_image],
+        render_background_image,
+      ),
+      render_layer(
+        repeat_style,
+        [%expr CssJs.backgroundRepeat],
+        render_repeat_style,
+      ),
+      render_layer(
+        attachment,
+        [%expr CssJs.backgroundRepeat],
+        render_attachment,
+      ),
       render_layer(b1, [%expr CssJs.clip], variants_to_expression),
       render_layer(b2, [%expr CssJs.origin], variants_to_expression),
-    ] @ switch(bg_position){
+    ]
+    @ (
+      switch (bg_position) {
       | Some((bg_pos, Some(((), bg_size)))) => [
-        [[%expr CssJs.backgroundPosition([%e render_bg_position(bg_pos)])]],
-        [[%expr CssJs.backgroundSize([%e render_size(bg_size)])]],
-      ]
+          [
+            [%expr CssJs.backgroundPosition([%e render_bg_position(bg_pos)])],
+          ],
+          [[%expr CssJs.backgroundSize([%e render_size(bg_size)])]],
+        ]
       | Some((bg_pos, None)) => [
-        [[%expr CssJs.backgroundPosition([%e render_bg_position(bg_pos)])]],
-      ]
+          [
+            [%expr CssJs.backgroundPosition([%e render_bg_position(bg_pos)])],
+          ],
+        ]
       | None => []
-    };
-  }
+      }
+    );
+  };
 
-    let l = layers |> List.concat_map(x => x |> fst |> render_layers)
+  let l = layers |> List.concat_map(x => x |> fst |> render_layers);
 
-    List.concat([
-     render_final_layer(final_layer) |> List.flatten,
-     l |> List.flatten
-    ])
-}
-let background =
-  emit(
-    Parser.property_background,
-    id,
-    render_background
-  );
+  List.concat([
+    render_final_layer(final_layer) |> List.flatten,
+    l |> List.flatten,
+  ]);
+};
+let background = emit(Parser.property_background, id, render_background);
 
 let border_top_color =
   apply(
@@ -1071,7 +1168,11 @@ let border_bottom_style =
 let border_left_style =
   variants(Parser.property_border_left_style, [%expr CssJs.borderLeftStyle]);
 let border_style =
-  apply(Parser.property_border_style, [%expr CssJs.borderStyle], variants_to_expression);
+  apply(
+    Parser.property_border_style,
+    [%expr CssJs.borderStyle],
+    variants_to_expression,
+  );
 
 let render_line_width =
   fun
@@ -1122,60 +1223,57 @@ let border_style_interp =
   | `Interpolation(name) => render_variable(name)
   | `Line_style(ls) => variants_to_expression(ls);
 
-type borderDirection = All | Left | Bottom | Right | Top;
+type borderDirection =
+  | All
+  | Left
+  | Bottom
+  | Right
+  | Top;
 
 let render_border = (~direction: borderDirection, border) => {
-  let borderFn = switch (direction) {
-    | All => [%expr CssJs.border]
-    | Left => [%expr CssJs.borderLeft]
-    | Bottom => [%expr CssJs.borderBottom]
-    | Right => [%expr CssJs.borderRight]
-    | Top => [%expr CssJs.borderTop]
-  };
   switch (border) {
-    | `None => [[%expr CssJs.unsafe("border", "none")]];
-    | `Static((width, style, color)) => {
-      [[%expr [%e borderFn](
-        [%e render_line_width_interp(width)],
-        [%e border_style_interp(style)],
-        [%e render_color_interp(color)])
-      ]];
-    }
-  }
-}
+  | `None =>
+    let borderFn =
+      switch (direction) {
+      | All => [%expr "border"]
+      | Left => [%expr "borderLeft"]
+      | Bottom => [%expr "borderBottom"]
+      | Right => [%expr "borderRight"]
+      | Top => [%expr "borderTop"]
+      };
+    [[%expr CssJs.unsafe([%e borderFn], "none")]];
+  | `Static(width, style, color) =>
+    let borderFn =
+      switch (direction) {
+      | All => [%expr CssJs.border]
+      | Left => [%expr CssJs.borderLeft]
+      | Bottom => [%expr CssJs.borderBottom]
+      | Right => [%expr CssJs.borderRight]
+      | Top => [%expr CssJs.borderTop]
+      };
+    [
+      [%expr
+        [%e borderFn](
+          [%e render_line_width_interp(width)],
+          [%e border_style_interp(style)],
+          [%e render_color_interp(color)],
+        )
+      ],
+    ];
+  };
+};
 
-let border =
-  emit(
-    Parser.property_border,
-    id,
-    render_border(~direction=All),
-  );
+let border = emit(Parser.property_border, id, render_border(~direction=All));
 
 let border_top =
-  emit(
-    Parser.property_border,
-    id,
-    render_border(~direction=Top),
-  );
+  emit(Parser.property_border, id, render_border(~direction=Top));
 
 let border_right =
-  emit(
-    Parser.property_border,
-    id,
-    render_border(~direction=Right),
-  );
+  emit(Parser.property_border, id, render_border(~direction=Right));
 let border_bottom =
-  emit(
-    Parser.property_border,
-    id,
-    render_border(~direction=Bottom)
-  );
+  emit(Parser.property_border, id, render_border(~direction=Bottom));
 let border_left =
-  emit(
-    Parser.property_border,
-    id,
-    render_border(~direction=Left)
-  );
+  emit(Parser.property_border, id, render_border(~direction=Left));
 
 let render_border_radius_value =
   fun
@@ -1211,13 +1309,18 @@ let border_radius =
   apply(
     Parser.property_border_radius,
     [%expr CssJs.borderRadius],
-    render_length_percentage
+    render_length_percentage,
   );
-let border_image_source = unsupportedProperty(Parser.property_border_image_source);
-let border_image_slice = unsupportedProperty(Parser.property_border_image_slice);
-let border_image_width = unsupportedProperty(Parser.property_border_image_width);
-let border_image_outset = unsupportedProperty(Parser.property_border_image_outset);
-let border_image_repeat = unsupportedProperty(Parser.property_border_image_repeat);
+let border_image_source =
+  unsupportedProperty(Parser.property_border_image_source);
+let border_image_slice =
+  unsupportedProperty(Parser.property_border_image_slice);
+let border_image_width =
+  unsupportedProperty(Parser.property_border_image_width);
+let border_image_outset =
+  unsupportedProperty(Parser.property_border_image_outset);
+let border_image_repeat =
+  unsupportedProperty(Parser.property_border_image_repeat);
 let border_image = unsupportedProperty(Parser.property_border_image);
 let box_shadow =
   apply(
@@ -1263,10 +1366,7 @@ let overflow =
 // let overflow_clip_margin = unsupportedProperty(Parser.property_overflow_clip_margin);
 let overflow_inline = unsupportedProperty(Parser.property_overflow_inline);
 let text_overflow =
-  unsupportedValue(
-    Parser.property_text_overflow,
-    [%expr CssJs.textOverflow],
-  );
+  unsupportedValue(Parser.property_text_overflow, [%expr CssJs.textOverflow]);
 // let block_ellipsis = unsupportedProperty(Parser.property_block_ellipsis);
 let max_lines = unsupportedProperty(Parser.property_max_lines);
 // let continue = unsupportedProperty(Parser.property_continue);
@@ -1280,11 +1380,12 @@ let tab_size = unsupportedProperty(Parser.property_tab_size);
 let word_break =
   variants(Parser.property_word_break, [%expr CssJs.wordBreak]);
 let line_break = unsupportedProperty(Parser.property_line_break);
-let render_line_height = fun
+let render_line_height =
+  fun
   | `Extended_length(ext) => render_extended_length(ext)
   | `Extended_percentage(ext) => render_extended_percentage(ext)
   | `Normal => variants_to_expression(`Normal)
-  | `Number(float) => [%expr `abs([%e render_number(float) ])];
+  | `Number(float) => [%expr `abs([%e render_number(float)])];
 
 let line_height =
   apply(
@@ -1293,11 +1394,11 @@ let line_height =
     render_line_height,
   );
 let line_height_step =
-apply(
-  Parser.property_line_height_step,
-  [%expr CssJs.lineHeightStep],
-  render_extended_length,
-);
+  apply(
+    Parser.property_line_height_step,
+    [%expr CssJs.lineHeightStep],
+    render_extended_length,
+  );
 let hyphens = unsupportedProperty(Parser.property_hyphens);
 let overflow_wrap =
   variants(Parser.property_overflow_wrap, [%expr CssJs.overflowWrap]);
@@ -1334,7 +1435,8 @@ let text_indent =
     | (`Extended_percentage(p), None, None) => render_extended_percentage(p)
     | _ => raise(Unsupported_feature),
   );
-let hanging_punctuation = unsupportedProperty(Parser.property_hanging_punctuation);
+let hanging_punctuation =
+  unsupportedProperty(Parser.property_hanging_punctuation);
 
 // css-fonts-4
 let font_family =
@@ -1346,7 +1448,8 @@ let font_style =
   unsupportedValue(Parser.property_font_style, [%expr CssJs.fontStyle]);
 
 /* bs-css does not support these variants */
-let render_size_variants = fun
+let render_size_variants =
+  fun
   | `Large => id([%expr `large])
   | `Medium => id([%expr `medium])
   | `Small => id([%expr `small])
@@ -1358,7 +1461,8 @@ let render_size_variants = fun
   | `Larger => id([%expr `larger])
   | `Smaller => id([%expr `smaller]);
 
-let render_font_size = fun
+let render_font_size =
+  fun
   | `Absolute_size(size)
   | `Relative_size(size) => render_size_variants(size)
   | `Extended_length(ext) => render_extended_length(ext)
@@ -1377,8 +1481,10 @@ let font_variant_ligatures =
   unsupportedProperty(Parser.property_font_variant_ligatures);
 let font_variant_position =
   unsupportedProperty(Parser.property_font_variant_position);
-let font_variant_caps = unsupportedProperty(Parser.property_font_variant_caps);
-let font_variant_numeric = unsupportedProperty(Parser.property_font_variant_numeric);
+let font_variant_caps =
+  unsupportedProperty(Parser.property_font_variant_caps);
+let font_variant_numeric =
+  unsupportedProperty(Parser.property_font_variant_numeric);
 let font_variant_alternates =
   unsupportedProperty(Parser.property_font_variant_alternates);
 let font_variant_east_asian =
@@ -1387,7 +1493,8 @@ let font_variant =
   unsupportedValue(Parser.property_font_variant, [%expr CssJs.fontVariant]);
 let font_feature_settings =
   unsupportedProperty(Parser.property_font_feature_settings);
-let font_optical_sizing = unsupportedProperty(Parser.property_font_optical_sizing);
+let font_optical_sizing =
+  unsupportedProperty(Parser.property_font_optical_sizing);
 let font_variation_settings =
   unsupportedProperty(Parser.property_font_variation_settings);
 // let font_palette = unsupportedProperty(Parser.property_font_palette);
@@ -1421,7 +1528,8 @@ let text_underline_position =
   unsupportedProperty(Parser.property_text_underline_position);
 let text_underline_offset =
   unsupportedProperty(Parser.property_text_underline_offset);
-let text_decoration_skip = unsupportedProperty(Parser.property_text_decoration_skip);
+let text_decoration_skip =
+  unsupportedProperty(Parser.property_text_decoration_skip);
 // let text_decoration_skip_self =
 //   unsupportedProperty(Parser.property_text_decoration_skip_self);
 // let text_decoration_skip_box = unsupportedProperty(Parser.property_text_decoration_skip_box);
@@ -1431,8 +1539,10 @@ let text_decoration_skip = unsupportedProperty(Parser.property_text_decoration_s
 //   unsupportedProperty(Parser.property_text_decoration_skip_spaces);
 let text_decoration_skip_ink =
   unsupportedProperty(Parser.property_text_decoration_skip_ink);
-let text_emphasis_style = unsupportedProperty(Parser.property_text_emphasis_style);
-let text_emphasis_color = unsupportedProperty(Parser.property_text_emphasis_color);
+let text_emphasis_style =
+  unsupportedProperty(Parser.property_text_emphasis_style);
+let text_emphasis_color =
+  unsupportedProperty(Parser.property_text_emphasis_color);
 let text_emphasis = unsupportedProperty(Parser.property_text_emphasis);
 let text_emphasis_position =
   unsupportedProperty(Parser.property_text_emphasis_position);
@@ -1440,38 +1550,91 @@ let text_emphasis_position =
 let text_shadow =
   unsupportedValue(Parser.property_text_shadow, [%expr CssJs.textShadow]);
 
-let render_transform_functions = fun
+let render_transform_functions =
+  fun
   | `Zero(_) => [%expr `zero]
   | `Extended_angle(a) => [%expr [%e render_extended_angle(a)]];
 
-let render_transform = fun
+let render_transform =
+  fun
   | `Function_perspective(_) => raise(Unsupported_feature)
   | `Function_matrix(_) => raise(Unsupported_feature)
   | `Function_matrix3d(_) => raise(Unsupported_feature)
-  | `Function_rotate(v) =>  [%expr CssJs.rotate([%e render_transform_functions(v)])]
-  | `Function_rotate3d((x, (), y, (), z, (), a)) => [%expr CssJs.rotate3d([%e render_number(x)], [%e render_number(y)], [%e render_number(z)], [%e render_transform_functions(a)])]
-  | `Function_rotateX(v) => [%expr CssJs.rotateX([%e render_transform_functions(v)])]
-  | `Function_rotateY(v) => [%expr CssJs.rotateY([%e render_transform_functions(v)])]
-  | `Function_rotateZ(v) => [%expr CssJs.rotateZ([%e render_transform_functions(v)])]
-  | `Function_skew((a1, a2)) => switch(a2) {
-     | Some(((), v)) => [%expr CssJs.skew([%e render_transform_functions(a1)], [%e render_transform_functions(v)])]
-     | None => [%expr CssJs.skew([%e render_transform_functions(a1)], 0)]
-   }
-  | `Function_skewX(v) => [%expr CssJs.skewX([%e render_transform_functions(v)])]
-  | `Function_skewY(v) => [%expr CssJs.skewY([%e render_transform_functions(v)])]
-  | `Function_translate((x, y)) => switch(y) {
-     | Some(((), v)) => [%expr CssJs.translate([%e render_size(x)], [%e render_size(v)])]
-     | None => [%expr CssJs.translate([%e render_size(x)], 0)]
-   }
-  | `Function_translate3d((x, (), y, (), z)) => [%expr CssJs.translate3d([%e render_size(x)], [%e render_size(y)], [%e render_extended_length(z)])]
+  | `Function_rotate(v) => [%expr
+      CssJs.rotate([%e render_transform_functions(v)])
+    ]
+  | `Function_rotate3d(x, (), y, (), z, (), a) => [%expr
+      CssJs.rotate3d(
+        [%e render_number(x)],
+        [%e render_number(y)],
+        [%e render_number(z)],
+        [%e render_transform_functions(a)],
+      )
+    ]
+  | `Function_rotateX(v) => [%expr
+      CssJs.rotateX([%e render_transform_functions(v)])
+    ]
+  | `Function_rotateY(v) => [%expr
+      CssJs.rotateY([%e render_transform_functions(v)])
+    ]
+  | `Function_rotateZ(v) => [%expr
+      CssJs.rotateZ([%e render_transform_functions(v)])
+    ]
+  | `Function_skew(a1, a2) =>
+    switch (a2) {
+    | Some(((), v)) =>
+      %expr
+      CssJs.skew(
+        [%e render_transform_functions(a1)],
+        [%e render_transform_functions(v)],
+      )
+    | None =>
+      %expr
+      CssJs.skew([%e render_transform_functions(a1)], 0)
+    }
+  | `Function_skewX(v) => [%expr
+      CssJs.skewX([%e render_transform_functions(v)])
+    ]
+  | `Function_skewY(v) => [%expr
+      CssJs.skewY([%e render_transform_functions(v)])
+    ]
+  | `Function_translate(x, y) =>
+    switch (y) {
+    | Some(((), v)) =>
+      %expr
+      CssJs.translate([%e render_size(x)], [%e render_size(v)])
+    | None =>
+      %expr
+      CssJs.translate([%e render_size(x)], 0)
+    }
+  | `Function_translate3d(x, (), y, (), z) => [%expr
+      CssJs.translate3d(
+        [%e render_size(x)],
+        [%e render_size(y)],
+        [%e render_extended_length(z)],
+      )
+    ]
   | `Function_translateX(x) => [%expr CssJs.translateX([%e render_size(x)])]
   | `Function_translateY(y) => [%expr CssJs.translateY([%e render_size(y)])]
-  | `Function_translateZ(z) => [%expr CssJs.translateZ([%e render_extended_length(z)])]
-  | `Function_scale((x, y)) => switch(y) {
-     | Some(((), v)) => [%expr CssJs.scale([%e render_number(x)], [%e render_number(v)])]
-     | None => [%expr CssJs.scale([%e render_number(x)], [%e render_number(x)])]
-   }
-  | `Function_scale3d((x, (), y, (), z)) => [%expr CssJs.scale3d([%e render_number(x)], [%e render_number(y)], [%e render_number(z)])]
+  | `Function_translateZ(z) => [%expr
+      CssJs.translateZ([%e render_extended_length(z)])
+    ]
+  | `Function_scale(x, y) =>
+    switch (y) {
+    | Some(((), v)) =>
+      %expr
+      CssJs.scale([%e render_number(x)], [%e render_number(v)])
+    | None =>
+      %expr
+      CssJs.scale([%e render_number(x)], [%e render_number(x)])
+    }
+  | `Function_scale3d(x, (), y, (), z) => [%expr
+      CssJs.scale3d(
+        [%e render_number(x)],
+        [%e render_number(y)],
+        [%e render_number(z)],
+      )
+    ]
   | `Function_scaleX(x) => [%expr CssJs.scaleX([%e render_number(x)])]
   | `Function_scaleY(y) => [%expr CssJs.scaleY([%e render_number(y)])]
   | `Function_scaleZ(z) => [%expr CssJs.scaleZ([%e render_number(z)])];
@@ -1483,9 +1646,20 @@ let transform =
     id,
     fun
     | `None => [[%expr CssJs.transform(`none)]]
-    | `Transform_list([v]) => [[%expr CssJs.transform([%e render_transform(v)])]]
-    | `Transform_list(l) => [[%expr CssJs.transforms([%e List.map(render_transform, l) |> Builder.pexp_array(~loc=Location.none)])]]
-  )
+    | `Transform_list([v]) => [
+        [%expr CssJs.transform([%e render_transform(v)])],
+      ]
+    | `Transform_list(l) => [
+        [%expr
+          CssJs.transforms(
+            [%e
+              List.map(render_transform, l)
+              |> Builder.pexp_array(~loc=Location.none)
+            ],
+          )
+        ],
+      ],
+  );
 
 let transform_origin =
   unsupportedValue(
@@ -1529,7 +1703,8 @@ let transition_duration =
     Parser.property_transition_duration,
     [%expr CssJs.transitionDuration],
   );
-let widows = apply(Parser.property_widows, [%expr CssJs.widows], render_integer);
+let widows =
+  apply(Parser.property_widows, [%expr CssJs.widows], render_integer);
 let transition_timing_function =
   unsupportedValue(
     Parser.property_transition_timing_function,
@@ -1667,10 +1842,7 @@ let align_items =
 let align_self =
   unsupportedValue(Parser.property_align_self, [%expr CssJs.alignSelf]);
 let align_content =
-  unsupportedValue(
-    Parser.property_align_content,
-    [%expr CssJs.alignContent],
-  );
+  unsupportedValue(Parser.property_align_content, [%expr CssJs.alignContent]);
 
 // css-grid-1
 let grid_template_columns =
@@ -1728,42 +1900,25 @@ let grid_column =
   unsupportedValue(Parser.property_grid_column, [%expr CssJs.gridColumn]);
 let grid_area =
   unsupportedValue(Parser.property_grid_area, [%expr CssJs.gridArea]);
-let z_index =
-  unsupportedValue(Parser.property_z_index, [%expr CssJs.zIndex]);
+let z_index = unsupportedValue(Parser.property_z_index, [%expr CssJs.zIndex]);
 
 let render_position_value =
   fun
-    | `Auto => variants_to_expression(`Auto)
-    | `Extended_length(l) => render_extended_length(l)
-    | `Extended_percentage(pct) => render_extended_percentage(pct);
+  | `Auto => variants_to_expression(`Auto)
+  | `Extended_length(l) => render_extended_length(l)
+  | `Extended_percentage(pct) => render_extended_percentage(pct);
 
 let left =
-  apply(
-    Parser.property_left,
-    [%expr CssJs.left],
-    render_position_value,
-  );
+  apply(Parser.property_left, [%expr CssJs.left], render_position_value);
 
 let top =
-  apply(
-    Parser.property_top,
-    [%expr CssJs.top],
-    render_position_value,
-  );
+  apply(Parser.property_top, [%expr CssJs.top], render_position_value);
 
 let right =
-  apply(
-    Parser.property_right,
-    [%expr CssJs.right],
-    render_position_value,
-  );
+  apply(Parser.property_right, [%expr CssJs.right], render_position_value);
 
 let bottom =
-  apply(
-    Parser.property_bottom,
-    [%expr CssJs.bottom],
-    render_position_value,
-  );
+  apply(Parser.property_bottom, [%expr CssJs.bottom], render_position_value);
 
 let display =
   apply(
