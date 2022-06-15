@@ -433,7 +433,7 @@ and property_block_overflow = [%value.rec "'clip' | 'ellipsis' | <string>"]
 and property_block_size = [%value.rec "<'width'>"]
 /* This property is changed from the original spec. This enforces lw, ls and color to be present.
   Missing border values is valid CSS, but bs-css bindings aren't available */
-and property_border = [%value.rec "[<line-width> | <interpolation> ] [<line-style> | <interpolation> ] [ <color> | <interpolation> ]"]
+and property_border = [%value.rec "'none' | [ <line-width> | <interpolation> ] [<line-style> | <interpolation> ] [ <color> | <interpolation> ]"]
 and property_border_block = [%value.rec "<'border-top-width'> || <'border-top-style'> || <'color'>"]
 and property_border_block_color = [%value.rec "[ <'border-top-color'> ]{1,2}"]
 and property_border_block_end = [%value.rec "<'border-top-width'> || <'border-top-style'> || <'color'>"]

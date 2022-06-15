@@ -1122,63 +1122,53 @@ let border_style_interp =
   | `Interpolation(name) => render_variable(name)
   | `Line_style(ls) => variants_to_expression(ls);
 
+let render_border = border => {
+  switch (border) {
+    | `None => [[%expr CssJs.unsafe("border", "none")]];
+    | `Static((width, style, color)) => {
+      [[%expr CssJs.border(
+        [%e render_line_width_interp(width)],
+        [%e border_style_interp(style)],
+        [%e render_color_interp(color)])
+      ]];
+    }
+  }
+}
+
 let border =
   emit(
     Parser.property_border,
     id,
-    ((width, style, color)) => {
-      let w = render_line_width_interp(width);
-      let s = border_style_interp(style);
-      let c = render_color_interp(color);
-      [[%expr CssJs.border([%e w], [%e s], [%e c])]];
-    },
+    render_border,
   );
+
 let border_top =
   emit(
     Parser.property_border,
     id,
-    ((width, style, color)) => {
-      let w = render_line_width_interp(width);
-      let s = border_style_interp(style);
-      let c = render_color_interp(color);
-      [[%expr CssJs.borderTop([%e w], [%e s], [%e c])]];
-    },
+    render_border,
   );
+
 let border_right =
   emit(
     Parser.property_border,
     id,
-    ((width, style, color)) => {
-      let w = render_line_width_interp(width);
-      let s = border_style_interp(style);
-      let c = render_color_interp(color);
-      [[%expr CssJs.borderRight([%e w], [%e s], [%e c])]];
-    },
+    render_border,
   );
 let border_bottom =
   emit(
     Parser.property_border,
     id,
-    ((width, style, color)) => {
-      let w = render_line_width_interp(width);
-      let s = border_style_interp(style);
-      let c = render_color_interp(color);
-      [[%expr CssJs.borderBottom([%e w], [%e s], [%e c])]];
-    },
+    render_border,
   );
 let border_left =
   emit(
     Parser.property_border,
     id,
-    ((width, style, color)) => {
-      let w = render_line_width_interp(width);
-      let s = border_style_interp(style);
-      let c = render_color_interp(color);
-      [[%expr CssJs.borderLeft([%e w], [%e s], [%e c])]];
-    },
+    render_border,
   );
 
-let border_value =
+let render_border_value =
   fun
   | [`Extended_length(l)] => render_extended_length(l)
   | [`Extended_percentage(p)] => render_extended_percentage(p)
@@ -1188,25 +1178,25 @@ let border_top_left_radius =
   apply(
     Parser.property_border_top_left_radius,
     [%expr CssJs.borderTopLeftRadius],
-    border_value,
+    render_border_value,
   );
 let border_top_right_radius =
   apply(
     Parser.property_border_top_right_radius,
     [%expr CssJs.borderTopRightRadius],
-    border_value,
+    render_border_value,
   );
 let border_bottom_right_radius =
   apply(
     Parser.property_border_bottom_right_radius,
     [%expr CssJs.borderBottomRightRadius],
-    border_value,
+    render_border_value,
   );
 let border_bottom_left_radius =
   apply(
     Parser.property_border_bottom_left_radius,
     [%expr CssJs.borderBottomLeftRadius],
-    border_value,
+    render_border_value,
   );
 let border_radius =
   apply(
