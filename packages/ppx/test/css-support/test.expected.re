@@ -1176,6 +1176,7 @@ CssJs.unsafe("maskRepeat", "space no-repeat");
 CssJs.unsafe("maskRepeat", "round no-repeat");
 CssJs.unsafe("maskRepeat", "no-repeat no-repeat");
 CssJs.unsafe("maskPosition", "center");
+CssJs.unsafe("maskPosition", "center center");
 CssJs.unsafe("maskPosition", "left 50%");
 CssJs.unsafe("maskClip", "border-box");
 CssJs.unsafe("maskClip", "padding-box");
@@ -1736,3 +1737,71 @@ CssJs.width(
     )),
   )),
 );
+CssJs.unsafe("MozAppearance", "textfield");
+CssJs.unsafe("WebkitAppearance", "none");
+CssJs.unsafe("WebkitBoxOrient", "vertical");
+CssJs.unsafe(
+  "WebkitBoxShadow",
+  "inset 0 0 0 1000px $(Color.Background.selectedMuted)",
+);
+CssJs.unsafe("WebkitLineClamp", "2");
+CssJs.unsafe("WebkitOverflowScrolling", "touch");
+CssJs.unsafe("WebkitTapHighlightColor", "transparent");
+CssJs.unsafe("WebkitTextFillColor", "$(Color.Text.primary)");
+CssJs.unsafe("animation", "none");
+CssJs.unsafe("appearance", "none");
+CssJs.unsafe("aspectRatio", "21 / 8");
+CssJs.backgroundColor(c);
+CssJs.unsafe("border", "none");
+CssJs.unsafe("bottom", "unset");
+CssJs.boxShadows(`none);
+CssJs.unsafe("breakInside", "avoid");
+CssJs.unsafe("caretColor", "#e15a46");
+CssJs.unsafe("color", "inherit");
+CssJs.unsafe("columnWidth", "125px");
+CssJs.unsafe("columnWidth", "auto");
+CssJs.unsafe("content", "\"\"");
+CssJs.unsafe("content", "unset");
+CssJs.unsafe("counterIncrement", "ol");
+CssJs.unsafe("counterReset", "ol");
+CssJs.unsafe("display", "-webkit-box");
+CssJs.display(`contents);
+CssJs.unsafe("fill", "$(color)");
+CssJs.unsafe("fill", "currentColor");
+CssJs.unsafe("gap", "4px");
+CssJs.unsafe("gridColumnEnd", "span 2");
+CssJs.unsafe("grid-column", "unset");
+CssJs.unsafe("grid-row", "unset");
+CssJs.unsafe("gridTemplateColumns", "max-content max-content");
+CssJs.unsafe(
+  "gridTemplateColumns",
+  "minmax(10px, auto) fit-content(20px) fit-content(20px)",
+);
+CssJs.unsafe(
+  "gridTemplateColumns",
+  "minmax(51px, auto) fit-content(20px) fit-content(20px)",
+);
+CssJs.unsafe("gridTemplateColumns", "repeat(2, auto)");
+CssJs.unsafe("gridTemplateColumns", "repeat(3, auto)");
+CssJs.height(`fitContent);
+CssJs.unsafe("justifyItems", "start");
+CssJs.unsafe("justify-self", "unset");
+CssJs.unsafe("left", "unset");
+CssJs.unsafe("maskPosition", "center center");
+CssJs.unsafe("maskRepeat", "no-repeat");
+CssJs.maxWidth(`maxContent);
+CssJs.unsafe("outline", "none");
+CssJs.unsafe("overflowAnchor", "none");
+CssJs.unsafe("position", "unset");
+CssJs.unsafe("resize", "none");
+CssJs.unsafe("scrollBehavior", "smooth");
+CssJs.unsafe("strokeOpacity", "0");
+CssJs.unsafe("stroke", "$(Color.Text.white)");
+CssJs.top(`calc((`sub, `percent(50.), `pxFloat(1.))));
+CssJs.unsafe("top", "unset");
+CssJs.unsafe("touchAction", "none");
+CssJs.unsafe("touchAction", "pan-x pan-y");
+CssJs.transform(`none);
+CssJs.width(`fitContent);
+CssJs.width(`maxContent);
+CssJs.unsafe("wordBreak", "break-word");

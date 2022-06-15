@@ -1472,6 +1472,8 @@ let check_map =
         check(property__webkit_border_before_width),
       ),
       ("property--webkit-box-reflect", check(property__webkit_box_reflect)),
+      ("property--webkit-box-shadow", check(property_box_shadow)),
+      ("property--webkit-box-orient", check(property_box_orient)),
       (
         "property--webkit-column-break-after",
         check(property__webkit_column_break_after),
