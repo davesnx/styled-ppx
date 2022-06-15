@@ -170,18 +170,17 @@ let renderStyledDynamic =
     getLabeledArgs(label, defaultValue, param, body);
 
   let variableList =
-    labeledArguments |> List.map(
-      ((arg, optionalArg, _, _, loc, type_)) => {
-        let label = getLabel(arg);
-        let (kind, type_) =
-          switch (type_) {
-          | Some(type_) => (`Typed, type_)
-          | None => (`Open, Create.typeVariable(~loc, label))
-          };
+    labeledArguments
+    |> List.map(((arg, optionalArg, _, _, loc, type_)) => {
+         let label = getLabel(arg);
+         let (kind, type_) =
+           switch (type_) {
+           | Some(type_) => (`Typed, type_)
+           | None => (`Open, Create.typeVariable(~loc, label))
+           };
 
-        (arg, Option.is_some(optionalArg), kind, type_);
-      }
-    );
+         (arg, Option.is_some(optionalArg), kind, type_);
+       });
 
   /* ('a, 'b) */
   let makePropsParameters: list(core_type) =
@@ -218,7 +217,7 @@ let renderStyledDynamic =
     Builder.pexp_construct(~loc, {txt: Lident("()"), loc}, None),
   );
 
-    /* let styles = styles(...) */
+  /* let styles = styles(...) */
   let stylesFunctionCall =
     Builder.pexp_apply(
       ~loc,
@@ -229,30 +228,48 @@ let renderStyledDynamic =
 
   let styles =
     switch (functionExpr.pexp_desc) {
+    /* styled.div () => "string" */
     | Pexp_constant(Pconst_string(str, loc, _label)) =>
       parsePayloadStyle(str, loc)
       |> Css_to_emotion.render_declarations
       |> Css_to_emotion.addLabel(~loc, moduleName)
       |> Builder.pexp_array(~loc)
       |> Css_to_emotion.render_style_call
+
+    /* styled.div () => "[||]" */
     | Pexp_array(arr) =>
       arr
       |> List.rev
       |> Css_to_emotion.addLabel(~loc, moduleName)
       |> Builder.pexp_array(~loc)
       |> Css_to_emotion.render_style_call
+
+    /* styled.div () => {
+         ...
+         ...
+         ...
+       } */
     | Pexp_sequence(expr, sequence) =>
       /* Generate a new sequence where the last expression is
          wrapped in render_style_call and render the other expressions. */
       let styles =
         sequence |> getLastSequence |> Css_to_emotion.render_style_call;
       Builder.pexp_sequence(~loc, expr, styles);
+
+    /* styled.div () => {
+         let styles = sharedStyles
+         styles
+       } */
     | Pexp_let(Nonrecursive, value_binding, expression) =>
       /* Generate a new `let in` where the last expression is
          wrapped in render_style_call */
       let styles =
         expression |> getLastExpression |> Css_to_emotion.render_style_call;
       Builder.pexp_let(~loc, Nonrecursive, value_binding, styles);
+
+    /* styled.div () => { styles } */
+    | Pexp_ident(ident) =>
+      Builder.pexp_ident(~loc, ident) |> Css_to_emotion.render_style_call
     /* TODO: With this default case we support all expressions here.
        Users might find this confusing, we could give some warnings before the type-checker does. */
     | _ => functionExpr
@@ -280,7 +297,7 @@ let renderStyledDynamic =
         ~htmlTag,
         ~styledExpr=stylesFunctionCall,
         ~makePropTypes=makePropsParameters,
-        ~labeledArguments
+        ~labeledArguments,
       ),
     ],
   );
@@ -304,7 +321,7 @@ let renderStyledComponent = (~loc, ~htmlTag, styles) => {
         ~htmlTag,
         ~styledExpr=styleReference,
         ~makePropTypes=[],
-        ~labeledArguments=[]
+        ~labeledArguments=[],
       ),
     ],
   );
