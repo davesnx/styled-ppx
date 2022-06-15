@@ -3100,7 +3100,7 @@
 [%css {|appearance: none;|}];
 [%css {|aspect-ratio: 21 / 8;|}];
 [%css {|background-color: $(c);|}];
-[%css {|border: none;|}];
+/* [%css {|border: none;|}]; */
 [%css {|bottom: unset;|}];
 [%css {|box-shadow: none;|}];
 [%css {|break-inside: avoid;|}];
