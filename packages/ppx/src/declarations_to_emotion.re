@@ -1122,11 +1122,20 @@ let border_style_interp =
   | `Interpolation(name) => render_variable(name)
   | `Line_style(ls) => variants_to_expression(ls);
 
-let render_border = border => {
+type borderDirection = All | Left | Bottom | Right | Top;
+
+let render_border = (~direction: borderDirection, border) => {
+  let borderFn = switch (direction) {
+    | All => [%expr CssJs.border]
+    | Left => [%expr CssJs.borderLeft]
+    | Bottom => [%expr CssJs.borderBottom]
+    | Right => [%expr CssJs.borderRight]
+    | Top => [%expr CssJs.borderTop]
+  };
   switch (border) {
     | `None => [[%expr CssJs.unsafe("border", "none")]];
     | `Static((width, style, color)) => {
-      [[%expr CssJs.border(
+      [[%expr [%e borderFn](
         [%e render_line_width_interp(width)],
         [%e border_style_interp(style)],
         [%e render_color_interp(color)])
@@ -1139,36 +1148,36 @@ let border =
   emit(
     Parser.property_border,
     id,
-    render_border,
+    render_border(~direction=All),
   );
 
 let border_top =
   emit(
     Parser.property_border,
     id,
-    render_border,
+    render_border(~direction=Top),
   );
 
 let border_right =
   emit(
     Parser.property_border,
     id,
-    render_border,
+    render_border(~direction=Right),
   );
 let border_bottom =
   emit(
     Parser.property_border,
     id,
-    render_border,
+    render_border(~direction=Bottom)
   );
 let border_left =
   emit(
     Parser.property_border,
     id,
-    render_border,
+    render_border(~direction=Left)
   );
 
-let render_border_value =
+let render_border_radius_value =
   fun
   | [`Extended_length(l)] => render_extended_length(l)
   | [`Extended_percentage(p)] => render_extended_percentage(p)
@@ -1178,25 +1187,25 @@ let border_top_left_radius =
   apply(
     Parser.property_border_top_left_radius,
     [%expr CssJs.borderTopLeftRadius],
-    render_border_value,
+    render_border_radius_value,
   );
 let border_top_right_radius =
   apply(
     Parser.property_border_top_right_radius,
     [%expr CssJs.borderTopRightRadius],
-    render_border_value,
+    render_border_radius_value,
   );
 let border_bottom_right_radius =
   apply(
     Parser.property_border_bottom_right_radius,
     [%expr CssJs.borderBottomRightRadius],
-    render_border_value,
+    render_border_radius_value,
   );
 let border_bottom_left_radius =
   apply(
     Parser.property_border_bottom_left_radius,
     [%expr CssJs.borderBottomLeftRadius],
-    render_border_value,
+    render_border_radius_value,
   );
 let border_radius =
   apply(
