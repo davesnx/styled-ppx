@@ -1752,7 +1752,6 @@ CssJs.unsafe("animation", "none");
 CssJs.unsafe("appearance", "none");
 CssJs.unsafe("aspectRatio", "21 / 8");
 CssJs.backgroundColor(c);
-CssJs.unsafe("border", "none");
 CssJs.unsafe("bottom", "unset");
 CssJs.boxShadows(`none);
 CssJs.unsafe("breakInside", "avoid");
