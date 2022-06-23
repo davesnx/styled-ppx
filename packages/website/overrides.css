@@ -1,0 +1,69 @@
+.algolia-autocomplete {
+  width: 100%;
+}
+
+.algolia-autocomplete .algolia-docsearch-suggestion--category-header span {
+  display: inline-block;
+}
+
+.algolia-autocomplete .ds-dropdown-menu {
+  width: 500px;
+  min-width: 300px;
+  max-width: calc(100vw - 50px);
+}
+
+h1, h2, h3, h4, h5, h6, div, span, p {
+  font-family: 'Archivo', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+code, code div, code span {
+  font-family: 'SF Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  line-height: 1.7;
+}
+
+/* Archivo letter-spacings overrides */
+
+p, a {
+  letter-spacing: 0.02em;
+}
+
+h1 {
+  letter-spacing: 0.04em;
+}
+
+h2 {
+  letter-spacing: 0.04em;
+}
+
+h3 {
+  letter-spacing: 0.03em;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.sidebar a {
+  letter-spacing: 0.04rem;
+}
+
+/* .html.dark .logo {
+  fill: "#fff";
+}
+
+.html.light .logo {
+  fill: "#000";
+}
+*/
+
+.nextra-container nav {
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+
+.sidebar {
+  border: none;
+}
