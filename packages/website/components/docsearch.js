@@ -1,33 +1,33 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect } from "react";
 
 const Search = () => {
   const input = useRef(null);
 
   useEffect(() => {
-    const inputs = ['input', 'select', 'button', 'textarea'];
+    const inputs = ["input", "select", "button", "textarea"];
 
     const down = (e) => {
       if (
         document.activeElement &&
         inputs.indexOf(document.activeElement.tagName.toLowerCase() !== -1)
       ) {
-        if (e.key === '/') {
+        if (e.key === "/") {
           e.preventDefault();
           input.current?.focus();
         }
       }
     };
 
-    window.addEventListener('keydown', down);
-    return () => window.removeEventListener('keydown', down);
+    window.addEventListener("keydown", down);
+    return () => window.removeEventListener("keydown", down);
   }, []);
 
   useEffect(() => {
     if (window.docsearch) {
       window.docsearch({
-        apiKey: 'f96e25f97c4b8b5d598a4adf03962cd2',
-        indexName: 'styled-ppx-documentation-content',
-        inputSelector: 'input#algolia-doc-search',
+        apiKey: "f96e25f97c4b8b5d598a4adf03962cd2",
+        indexName: "styled-ppx-documentation-content",
+        inputSelector: "input#algolia-doc-search",
       });
     }
   }, []);
