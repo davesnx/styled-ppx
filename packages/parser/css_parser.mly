@@ -16,6 +16,7 @@ open Css_types
 %token PERCENTAGE
 %token IMPORTANT
 %token AMPERSAND
+%token WS
 %token <string> IDENT
 %token <string> STRING
 %token <string> URI
@@ -46,12 +47,12 @@ stylesheet:
   ;
 
 stylesheet_without_eof:
-  rs = list(rule) { (rs, Lex_buffer.make_loc $startpos $endpos) }
+  rs = list(with_whitespace(rule)) { (rs, Lex_buffer.make_loc $startpos $endpos) } // with whitespace also add a lot of warnings here
   ;
 
 declaration_list:
   | EOF { ([], Lex_buffer.make_loc $startpos $endpos) }
-  | ds = declarations_with_loc; EOF { ds }
+  | ds = with_loc(declarations); EOF { ds }
   ;
 
 rule:
@@ -59,29 +60,38 @@ rule:
   | r = style_rule { Rule.Style_rule r }
   ;
 
+with_whitespace(X): 
+  | xs = delimited(WS?, X, WS?);  { xs }
+  
+brace_block(X):
+  | xs = delimited(LEFT_BRACE, with_whitespace(X), RIGHT_BRACE); { xs };
+
+with_loc(X):
+  | x = X { (x, Lex_buffer.make_loc $startpos(x) $endpos(x))}
+
 at_rule:
-  | name = AT_RULE_WITHOUT_BODY; xs = prelude_with_loc; SEMI_COLON {
+  | name = AT_RULE_WITHOUT_BODY; WS?; xs = with_loc(prelude); SEMI_COLON; {
       { At_rule.name = (name, Lex_buffer.make_loc $startpos(name) $endpos(name));
         prelude = xs;
         block = Brace_block.Empty;
         loc = Lex_buffer.make_loc $startpos $endpos;
       }
     }
-  | name = NESTED_AT_RULE; xs = prelude_with_loc; LEFT_BRACE; s = stylesheet_without_eof; RIGHT_BRACE {
+  | name = NESTED_AT_RULE; WS?; xs = with_loc(prelude); s=brace_block(stylesheet_without_eof) SEMI_COLON; {
       { At_rule.name = (name, Lex_buffer.make_loc $startpos(name) $endpos(name));
         prelude = xs;
         block = Brace_block.Stylesheet s;
         loc = Lex_buffer.make_loc $startpos $endpos;
       }
     }
-  | name = AT_RULE; xs = prelude_with_loc; LEFT_BRACE; ds = declarations_with_loc; RIGHT_BRACE {
+  | name = AT_RULE; WS?; xs = with_loc(prelude); ds=brace_block(with_loc(declarations)) {
       { At_rule.name = (name, Lex_buffer.make_loc $startpos(name) $endpos(name));
         prelude = xs;
         block = Brace_block.Declaration_list ds;
         loc = Lex_buffer.make_loc $startpos $endpos;
       }
     }
-  | name = NESTED_AT_RULE; xs = prelude_with_loc; LEFT_BRACE; ds = declarations_with_loc; RIGHT_BRACE {
+  | name = NESTED_AT_RULE; WS?; xs = with_loc(prelude); ds=brace_block(with_loc(declarations)) {
       { At_rule.name = (name, Lex_buffer.make_loc $startpos(name) $endpos(name));
         prelude = xs;
         block = Brace_block.Declaration_list ds;
@@ -91,13 +101,13 @@ at_rule:
   ;
 
 style_rule:
-  | xs = prelude_with_loc; LEFT_BRACE; RIGHT_BRACE {
+  | xs = with_loc(prelude); LEFT_BRACE; RIGHT_BRACE {
       { Style_rule.prelude = xs;
         block = [], Location.none;
         loc = Lex_buffer.make_loc $startpos $endpos;
       }
     }
-  | xs = prelude_with_loc; LEFT_BRACE; ds = declarations_with_loc; RIGHT_BRACE {
+  | xs = with_loc(prelude); ds=brace_block(with_loc(declarations)){
       { Style_rule.prelude = xs;
         block = ds;
         loc = Lex_buffer.make_loc $startpos $endpos;
@@ -105,34 +115,20 @@ style_rule:
     }
   ;
 
-prelude_with_loc:
-  xs = prelude { (xs, Lex_buffer.make_loc $startpos $endpos) }
-  ;
 
 prelude:
-  xs = list(component_value_with_loc) { xs }
+  xs = list(with_whitespace(with_loc(component_value))) { xs }
   ;
 
-declarations_with_loc:
-  | ds = declarations { (ds, Lex_buffer.make_loc ~loc_ghost:true $startpos $endpos) }
-  ;
-
-declarations:
-  | ds = declarations_without_ending_semi_colon { List.rev ds }
-  | ds = declarations_without_ending_semi_colon; SEMI_COLON { List.rev ds }
-  ;
-
-declarations_without_ending_semi_colon:
-  | d = declaration_or_at_rule { [d] }
-  | ds = declarations_without_ending_semi_colon; d = declaration_or_at_rule { d :: ds }
-  | ds = declarations_without_ending_semi_colon; SEMI_COLON; d = declaration_or_at_rule { d :: ds }
-  ;
+declarations: 
+  | xs = nonempty_list(with_whitespace(declaration_or_at_rule)); SEMI_COLON?; { xs }
+  | xs = separated_nonempty_list(SEMI_COLON, with_whitespace(declaration_or_at_rule)); SEMI_COLON?; { xs }
 
 declaration_or_at_rule:
-  | d = declaration_without_eof { Declaration_list.Declaration d }
+  | d = declaration_without_eof; SEMI_COLON? { Declaration_list.Declaration d }
   | u = unsafe { Declaration_list.Unsafe u }
   | r = at_rule { Declaration_list.At_rule r }
-  | s = style_rule { Declaration_list.Style_rule s }
+  | s = style_rule { Declaration_list.Style_rule s } // This adds a lot of warnings
   ;
 
 declaration:
@@ -140,7 +136,7 @@ declaration:
   ;
 
 declaration_without_eof:
-  n = IDENT; COLON; v = list(component_value_with_loc); i = boption(IMPORTANT) {
+  n = IDENT; COLON; WS?; v = prelude; i = boption(IMPORTANT) {
     { Declaration.name = (n, Lex_buffer.make_loc $startpos(n) $endpos(n));
       value = (v, Lex_buffer.make_loc $startpos(v) $endpos(v));
       important = (i, Lex_buffer.make_loc $startpos(i) $endpos(i));
@@ -174,7 +170,7 @@ selector:
   ;
 
 selector_with_ampersand:
-  | AMPERSAND; tl = nonempty_list(component_value_with_loc) {
+  | AMPERSAND; tl = nonempty_list(with_loc(component_value)) {
     Component_value.(
       Selector((Ampersand, Lex_buffer.make_loc $startpos $endpos) :: tl )
     )
@@ -187,7 +183,7 @@ selector_with_ampersand:
   ;
 
 unsafe:
-  UNSAFE; n = IDENT; COLON; v = list(component_value_with_loc); i = boption(IMPORTANT) {
+  UNSAFE; WS ;n = IDENT; COLON; WS; v = prelude; i = boption(IMPORTANT); SEMI_COLON? {
     { Declaration.name = (n, Lex_buffer.make_loc $startpos(n) $endpos(n));
       value = (v, Lex_buffer.make_loc $startpos(v) $endpos(v));
       important = (i, Lex_buffer.make_loc $startpos(i) $endpos(i));
@@ -197,15 +193,13 @@ unsafe:
   ;
 
 paren_block:
-  LEFT_PAREN; xs = list(component_value_with_loc); RIGHT_PAREN { xs }
+  LEFT_PAREN; xs = separated_list(WS?, with_loc(component_value)); RIGHT_PAREN { xs }
   ;
 
 bracket_block:
-  LEFT_BRACKET; xs = list(component_value_with_loc); RIGHT_BRACKET { xs }
+  LEFT_BRACKET; xs = separated_list(WS?, with_loc(component_value)); RIGHT_BRACKET { xs }
   ;
 
-component_value_with_loc:
-  | c = component_value { (c, Lex_buffer.make_loc $startpos $endpos) }
 
 component_value:
   | b = paren_block { Component_value.Paren_block b }
@@ -217,20 +211,15 @@ component_value:
   | o = OPERATOR { Component_value.Operator o }
   | d = DELIM { Component_value.Delim d }
   | COLON { Component_value.Delim ":" }
-  | f = FUNCTION; xs = paren_block {
-      Component_value.Function (
-        (f, Lex_buffer.make_loc $startpos(f) $endpos(f)),
-        (xs, Lex_buffer.make_loc $startpos(xs) $endpos(xs))
-      )
-    }
+  | f = with_loc(FUNCTION); xs = with_loc(paren_block) { Component_value.Function (f, xs)}
   | h = HASH { Component_value.Hash h }
   | n = NUMBER { Component_value.Number n }
   | r = UNICODE_RANGE { Component_value.Unicode_range r }
   | d = FLOAT_DIMENSION { Component_value.Float_dimension d }
   | d = DIMENSION { Component_value.Dimension d }
   | v = VARIABLE { Component_value.Variable v }
-  | p = PSEUDOCLASS { Component_value.Pseudoclass (p, Lex_buffer.make_loc $startpos(p) $endpos(p)) }
-  | p = PSEUDOELEMENT { Component_value.Pseudoelement (p, Lex_buffer.make_loc $startpos(p) $endpos(p)) }
+  | p = with_loc(PSEUDOCLASS) { Component_value.Pseudoclass p }
+  | p = with_loc(PSEUDOELEMENT) { Component_value.Pseudoelement p}
   | AMPERSAND { Component_value.Ampersand }
   | s = selector_with_ampersand { s }
   ;

@@ -77,7 +77,8 @@ let token_to_string =
     ++ ")"
   | Parser.DIMENSION((n, d)) => "DIMENSION(" ++ n ++ ", " ++ d ++ ")"
   | Parser.VARIABLE(v) => "VARIABLE(" ++ (String.concat(".", v)) ++ ")"
-  | Parser.UNSAFE => "UNSAFE";
+  | Parser.UNSAFE => "UNSAFE"
+  | Parser.WS => "WS"
 
 let () =
   Location.register_error_of_exn(
@@ -251,24 +252,6 @@ let time = [%sedlex.regexp? _s | (_m, _s)];
 
 let frequency = [%sedlex.regexp? (_h, _z) | (_k, _h, _z)];
 
-let discard_comments_and_white_spaces = buf => {
-  let rec discard_white_spaces = buf =>
-    switch%sedlex (buf) {
-    | Plus(white_space) => discard_white_spaces(buf)
-    | "/*" => discard_comments(buf)
-    | _ => ()
-    }
-  and discard_comments = buf =>
-    switch%sedlex (buf) {
-    | eof =>
-      raise(LexingError((buf.Sedlexing.pos, "Unterminated comment at EOF")))
-    | "*/" => discard_white_spaces(buf)
-    | any => discard_comments(buf)
-    | _ => assert(false)
-    };
-
-  discard_white_spaces(buf);
-};
 
 let get_ident = (value) => {
   open Css_parser;
@@ -281,10 +264,12 @@ let get_ident = (value) => {
 }
 
 let rec get_next_token = buf => {
-  discard_comments_and_white_spaces(buf);
+  // discard_comments_and_white_spaces(buf);
   open Css_parser;
   switch%sedlex (buf) {
   | eof => EOF
+  | white_spaces => WS
+  | "/*" => discard_comments(buf)
   | ';' => SEMI_COLON
   | '}' => RIGHT_BRACE
   | '{' => LEFT_BRACE
@@ -338,10 +323,17 @@ and get_url = (url, buf) =>
       )),
     )
   | _ => assert(false)
+}
+
+and discard_comments = buf => {
+  switch%sedlex (buf) {
+    | eof => raise(LexingError((buf.Sedlexing.pos, "Unterminated comment at EOF")))
+    | "*/" => get_next_token(buf)
+    | _ => discard_comments(buf)
+  };
 };
 
 let get_next_token_with_location = buf => {
-  discard_comments_and_white_spaces(buf);
   let loc_start = Sedlexing.next_loc(buf);
   let token = get_next_token(buf);
   let loc_end = Sedlexing.next_loc(buf);
