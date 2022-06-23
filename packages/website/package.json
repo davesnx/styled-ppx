@@ -11,20 +11,21 @@
   "author": "David Sancho",
   "license": "MIT",
   "dependencies": {
-    "@reach/skip-nav": "^0.10.5",
+    "@reach/skip-nav": "^0.16.0",
+    "cssnano": "^5.1.12",
     "focus-visible": "^5.1.0",
     "intersection-observer": "^0.10.0",
     "markdown-to-jsx": "^6.11.4",
-    "next": "^11.0.1",
-    "nextra": "1.1.0",
-    "nextra-theme-docs": "1.2.1",
+    "next": "^12.1.0",
+    "nextra": "^2.0.0-alpha.50",
+    "nextra-theme-docs": "^2.0.0-alpha.59",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-intersection-observer": "^8.26.2"
   },
   "devDependencies": {
-    "cssnano": "^4.1.10",
-    "postcss-preset-env": "^6.7.0",
-    "tailwindcss": "^1.4.6"
+    "autoprefixer": "^10.4.2",
+    "postcss": "^8.4.5",
+    "tailwindcss": "^3.0.16"
   }
 }

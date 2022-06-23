@@ -1,7 +1,7 @@
-import React from 'react';
-import NextDocument, { Html, Main, Head, NextScript } from 'next/document';
-import { SkipNavLink } from '@reach/skip-nav';
-import Meta from '../components/meta';
+import React from "react";
+import NextDocument, { Html, Main, Head, NextScript } from "next/document";
+import { SkipNavLink } from "@reach/skip-nav";
+import Meta from "../components/meta";
 
 class Document extends NextDocument {
   render() {
@@ -9,10 +9,12 @@ class Document extends NextDocument {
       <Html lang="en">
         <Head>
           <link
-            rel="preload"
-            href="/fonts/SFMono/SFMono-Medium.ttf"
-            as="font"
-            crossOrigin=""
+            href="https://fonts.googleapis.com/css2?family=Archivo&display=swap"
+            rel="stylesheet"
+          />
+          <link
+            href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap"
+            rel="stylesheet"
           />
         </Head>
         <Meta />

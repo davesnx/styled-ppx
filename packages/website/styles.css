@@ -21,7 +21,7 @@
 }
 
 [data-reach-skip-link]:focus {
-  @apply not-sr-only fixed ml-6 top-0 bg-white text-lg px-6 py-2 mt-2 outline-none shadow-outline z-50;
+  @apply not-sr-only fixed ml-6 top-0 bg-white text-lg px-6 py-2 mt-2 outline-none focus:ring z-50;
 }
 
 h1, h2, h3, h4, h5, h6, div, span, p {
@@ -60,3 +60,12 @@ h3 {
 .sidebar a {
   letter-spacing: 0.04rem !important;
 }
+
+/* .html.dark .logo {
+  fill: "#fff";
+}
+
+.html.light .logo {
+  fill: "#000";
+}
+*/
