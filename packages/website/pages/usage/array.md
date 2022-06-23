@@ -20,7 +20,7 @@ module Component = %styled.section([
   %css("justify-content: center;"),
 ])
 
-let className = %cx([%css("display: flex;")])
+let className = %cx(%css("display: flex;"))
 ```
 
 Any expression that is a `Css.Rule.t` is valid inside the array.

@@ -5,9 +5,9 @@ import Callout from 'nextra-theme-docs/callout'
 Interpolation here means using any identifier as a value inside a CSS definition. Useful for reusing variables, handling themes or change styles during run-time.
 
 ```rescript
-module Component = [%styled.div "
+module Component = %styled.div(`
   border: 1px solid $(Theme.black);
-"];
+)
 ```
 
 Interpolation only works inside values, which is slightly different from other JavaScript-based solutions (such as styled-components or emotion), where their interpolation is much more dynamic and can be used everywhere. You might find styled-ppx more strict, here's an example:
@@ -37,7 +37,7 @@ This is the current implementation and the reason for that is because is very ha
 
 There are plenty of properties on CSS that accept different types of values, the ones encountered more challenging are `animation`, `box-shadow`, `background`, `transition` and `transform`, to name a few.
 
-```rescript
+```css
 background: #fff; /* The background is white */
 background: url(img.png); /* The background is an image */
 background: #fff url(img.png); /* The background is white with an image */
