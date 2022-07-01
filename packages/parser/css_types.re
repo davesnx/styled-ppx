@@ -25,8 +25,7 @@ module rec Component_value: {
     | Float_dimension((string, string, dimension))
     | Dimension((string, string))
     | Variable(list(string))
-    | Ampersand
-
+    | Ampersand;
 } = Component_value
 and Brace_block: {
   type t =

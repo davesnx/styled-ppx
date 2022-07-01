@@ -103,9 +103,9 @@ let () =
 /* Regexes */
 let newline = [%sedlex.regexp? '\n' | "\r\n" | '\r' | '\012'];
 
-let white_space = [%sedlex.regexp? " " | '\t' | newline];
+let whitespace = [%sedlex.regexp? " " | '\t' | newline];
 
-let white_spaces = [%sedlex.regexp? Star(white_space)];
+let whitespaces = [%sedlex.regexp? Star(whitespace)];
 
 let hex_digit = [%sedlex.regexp? '0' .. '9' | 'a' .. 'f' | 'A' .. 'F'];
 
@@ -115,7 +115,7 @@ let non_ascii = [%sedlex.regexp? '\160' .. '\255'];
 
 let up_to_6_hex_digits = [%sedlex.regexp? Rep(hex_digit, 1 .. 6)];
 
-let unicode = [%sedlex.regexp? ('\\', up_to_6_hex_digits, Opt(white_space))];
+let unicode = [%sedlex.regexp? ('\\', up_to_6_hex_digits, Opt(whitespace))];
 
 let unicode_range = [%sedlex.regexp?
   Rep(hex_digit | '?', 1 .. 6) |
@@ -222,7 +222,7 @@ let _y = [%sedlex.regexp? 'Y' | 'y'];
 let _z = [%sedlex.regexp? 'Z' | 'z'];
 
 let important = [%sedlex.regexp?
-  ("!", white_spaces, _i, _m, _p, _o, _r, _t, _a, _n, _t)
+  ("!", whitespaces, _i, _m, _p, _o, _r, _t, _a, _n, _t)
 ];
 
 let length = [%sedlex.regexp?
@@ -264,11 +264,10 @@ let get_ident = (value) => {
 }
 
 let rec get_next_token = buf => {
-  // discard_comments_and_white_spaces(buf);
   open Css_parser;
   switch%sedlex (buf) {
   | eof => EOF
-  | white_spaces => WS
+  | whitespaces => WS
   | "/*" => discard_comments(buf)
   | ';' => SEMI_COLON
   | '}' => RIGHT_BRACE
@@ -287,8 +286,7 @@ let rec get_next_token = buf => {
   | "url(" => get_url("", buf)
   | important => IMPORTANT
   | nested_at_rule => NESTED_AT_RULE(Sedlexing.latin1(~skip=1, buf))
-  | at_rule_without_body =>
-    AT_RULE_WITHOUT_BODY(Sedlexing.latin1(~skip=1, buf))
+  | at_rule_without_body => AT_RULE_WITHOUT_BODY(Sedlexing.latin1(~skip=1, buf))
   | at_rule => AT_RULE(Sedlexing.latin1(~skip=1, buf))
   /* NOTE: should be placed above ident, otherwise pattern with
    * '-[0-9a-z]{1,6}' cannot be matched */
@@ -311,7 +309,7 @@ and get_dimension = (n, buf) =>
   }
 and get_url = (url, buf) =>
   switch%sedlex (buf) {
-  | white_spaces => get_url(url, buf)
+  | whitespaces => get_url(url, buf)
   | url => get_url(Sedlexing.latin1(buf), buf)
   | ")" => URI(url)
   | eof => raise(LexingError((buf.pos, "Incomplete URI")))
