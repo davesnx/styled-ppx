@@ -107,14 +107,13 @@ style_rule:
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
-  | xs = with_loc(prelude); ds = brace_block(with_loc(declarations)) {
+  | xs = with_loc(prelude); declarations = brace_block(with_loc(declarations)) {
     { Style_rule.prelude = xs;
-      block = ds;
+      block = declarations;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
 ;
-
 
 prelude:
   xs = list(with_whitespace(with_loc(component_value))) { xs }
@@ -146,18 +145,18 @@ declaration_without_eof:
 ;
 
 selector:
-  | i = IDENT; p = PSEUDOCLASS; xs = paren_block? {
+  | i = IDENT; p = with_loc(PSEUDOCLASS); xs = paren_block? {
     [
       (Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i));
-      (Component_value.Pseudoclass((p, Lex_buffer.make_loc $startpos(p) $endpos(p) )), Lex_buffer.make_loc $startpos(p) $endpos(p));
+      (Component_value.Pseudoclass(p), Lex_buffer.make_loc $startpos(p) $endpos(p));
     ] @ match xs with
       | Some xs -> [(Component_value.Paren_block(xs), Lex_buffer.make_loc $startpos(xs) $endpos(xs))]
       | None -> []
   }
-  | i = IDENT; p = PSEUDOELEMENT {
+  | i = IDENT; p = with_loc(PSEUDOELEMENT) {
     [
       (Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i));
-      (Component_value.Pseudoelement((p, Lex_buffer.make_loc $startpos(p) $endpos(p))), Lex_buffer.make_loc $startpos(p) $endpos(p))
+      (Component_value.Pseudoelement(p), Lex_buffer.make_loc $startpos(p) $endpos(p))
     ]
   }
   | i = IDENT; b = bracket_block {
