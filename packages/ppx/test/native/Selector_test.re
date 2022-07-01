@@ -11,7 +11,7 @@ let compare = (input, expected, {expect, _}) => {
 let selectors_css_tests = [
   (
     ">",
-    [%expr [%cx "& > a {}"]],
+    [%expr [%cx "& > a { }"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& > a|js}, [||])|])],
   ),
   (

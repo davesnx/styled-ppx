@@ -101,7 +101,7 @@ at_rule:
 ;
 
 style_rule:
-  | xs = with_loc(prelude); LEFT_BRACE; RIGHT_BRACE {
+  | xs = with_loc(prelude); LEFT_BRACE; WS?; RIGHT_BRACE {
     { Style_rule.prelude = xs;
       block = [], Location.none;
       loc = Lex_buffer.make_loc $startpos $endpos;
