@@ -18,6 +18,7 @@ module rec Component_value: {
     | Delim(string)
     | Function(with_loc(string), with_loc(list(with_loc(t))))
     | Pseudoclass(with_loc(string))
+    | PseudoclassFunction(with_loc(string), with_loc(list(with_loc(t))))
     | Pseudoelement(with_loc(string))
     | Hash(string)
     | Number(string)

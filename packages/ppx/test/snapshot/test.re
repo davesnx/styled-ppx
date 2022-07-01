@@ -1,4 +1,4 @@
-/* This tests ensure the transformation goes right and doesn't need to type-check.
+/* /* This tests ensure the transformation goes right and doesn't need to type-check.
 If you are looking to add some tests for CSS support, check packages/ppx/test/native folder. */
 
 [%styled.global {|
@@ -59,7 +59,7 @@ module DynamicComponent = [%styled.div
    |j}
 ];
 
-module SelectorsMediaQueries = [%styled.div {j|
+/* module SelectorsMediaQueries = [%styled.div {j|
   @media (min-width: 600px) {
     background: blue;
   }
@@ -70,7 +70,7 @@ module SelectorsMediaQueries = [%styled.div {j|
 
   & > p { color: pink; font-size: 24px; }
 |j}
-];
+]; */
 
 let keyframe = [%keyframe {|
   0% { opacity: 0 }
@@ -87,7 +87,7 @@ module ArrayDynamicComponent = [%styled.div (~var) =>
   |]
 ];
 
-module SequenceDynamicComponent = [%styled.div (~size) => {
+/* module SequenceDynamicComponent = [%styled.div (~size) => {
   Js.log("Logging when render");
 
   [|
@@ -95,7 +95,7 @@ module SequenceDynamicComponent = [%styled.div (~size) => {
     [%css "display: block;"]
   |]
   }
-];
+]; */
 
 module DynamicComponentWithDefaultValue = [%styled.div (~var=CssJs.hex("333")) => [|
   [%css "color: $(var);"],
@@ -153,3 +153,4 @@ module Sequence = [%styled.button (~size, ~color) => {
     [%css "width: 100%;"],
   |]
 }];
+ */

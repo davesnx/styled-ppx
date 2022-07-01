@@ -61,9 +61,6 @@ let token_to_string =
   | Parser.NESTED_AT_RULE(s) => s
   | Parser.AT_RULE_WITHOUT_BODY(_) => "{}"
   | Parser.AT_RULE(s) => "{" ++ s ++ "}"
-  | Parser.FUNCTION(s) => s ++ "("
-  | Parser.PSEUDOCLASS(s) => ":" ++ s
-  | Parser.PSEUDOELEMENT(s) => "::" ++ s
   | Parser.HASH(s) => "#" ++ s
   | Parser.NUMBER(s) => s
   | Parser.UNICODE_RANGE(s) => s
@@ -101,9 +98,6 @@ let token_to_debug =
   | Parser.NESTED_AT_RULE(s) => "NESTED_AT_RULE('" ++ s ++ "')"
   | Parser.AT_RULE_WITHOUT_BODY(s) => "AT_RULE_WITHOUT_BODY('" ++ s ++ "')"
   | Parser.AT_RULE(s) => "AT_RULE('" ++ s ++ "')"
-  | Parser.FUNCTION(s) => "FUNCTION('" ++ s ++ "')"
-  | Parser.PSEUDOCLASS(s) => "PSEUDOCLASS('" ++ s ++ "')"
-  | Parser.PSEUDOELEMENT(s) => "PSEUDOELEMENT('" ++ s ++ "')"
   | Parser.HASH(s) => "HASH('" ++ s ++ "')"
   | Parser.NUMBER(s) => "NUMBER('" ++ s ++ "')"
   | Parser.UNICODE_RANGE(s) => "UNICODE_RANGE('" ++ s ++ "')"
@@ -292,15 +286,15 @@ let time = [%sedlex.regexp? _s | (_m, _s)];
 
 let frequency = [%sedlex.regexp? (_h, _z) | (_k, _h, _z)];
 
-let get_ident = (value) => {
+/* let get_ident = (value) => {
   open Css_parser;
   switch(value) {
-    | "attr" | "calc" | "conic-gradient" | "counter" | "cubic-bezier" | "hsl" | "hsla" | "linear-gradient" | "max" | "min" | "radial-gradient" | "repeating-conic-gradient" | "repeating-linear-gradient" | "repeating-radial-gradient" | "rgb" | "rgba" | "var" => FUNCTION(value)
+    /* | "attr" | "calc" | "conic-gradient" | "counter" | "cubic-bezier" | "hsl" | "hsla" | "linear-gradient" | "max" | "min" | "radial-gradient" | "repeating-conic-gradient" | "repeating-linear-gradient" | "repeating-radial-gradient" | "rgb" | "rgba" | "var" => FUNCTION(value) */
     | "after" | "before" | "cue" | "first-letter" | "first-line" | "selection" | "slotted" | "backdrop" | "placeholder" | "marker" | "spelling-error" | "grammar-error" => PSEUDOELEMENT(value)
     | "active" | "checked" | "default" | "dir" | "disabled" | "empty" | "enabled" | "first" | "first-child" | "first-of-type" | "fullscreen" | "focus" | "hover" | "indeterminate" | "in-range" | "invalid" | "lang" | "last-child" | "last-of-type" | "link" | "not" | "nth-child" | "nth-last-child" | "nth-last-of-type" | "nth-of-type" | "only-child" | "only-of-type" | "optional" | "out-of-range" | "read-only" | "read-write" | "required" | "right" | "root" | "scope" | "target" | "valid" | "visited" => PSEUDOCLASS(value)
     | _ => IDENT(value)
   }
-}
+} */
 
 let rec get_next_token = buf => {
   open Css_parser;
@@ -322,7 +316,6 @@ let rec get_next_token = buf => {
   | variable => VARIABLE(Sedlexing.latin1(~skip=2, ~drop=1, buf) |> String.split_on_char('.'))
   | operator => OPERATOR(Sedlexing.latin1(buf))
   | string => STRING(Sedlexing.latin1(~skip=1, ~drop=1, buf))
-  | "url(" => get_url("", buf)
   | important => IMPORTANT
   | nested_at_rule => NESTED_AT_RULE(Sedlexing.latin1(~skip=1, buf))
   | at_rule_without_body => AT_RULE_WITHOUT_BODY(Sedlexing.latin1(~skip=1, buf))
@@ -330,7 +323,7 @@ let rec get_next_token = buf => {
   /* NOTE: should be placed above ident, otherwise pattern with
    * '-[0-9a-z]{1,6}' cannot be matched */
   | (_u, '+', unicode_range) => UNICODE_RANGE(Sedlexing.latin1(buf))
-  | ident => get_ident(Sedlexing.latin1(buf))
+  | ident => IDENT(Sedlexing.latin1(buf))
   | ('#', name) => HASH(Sedlexing.latin1(~skip=1, buf))
   | number => get_dimension(Sedlexing.latin1(buf), buf)
   | any => DELIM(Sedlexing.latin1(buf))
@@ -345,21 +338,6 @@ and get_dimension = (n, buf) =>
   | frequency => FLOAT_DIMENSION((n, Sedlexing.latin1(buf), Frequency))
   | ident => DIMENSION((n, Sedlexing.latin1(buf)))
   | _ => NUMBER(n)
-  }
-and get_url = (url, buf) =>
-  switch%sedlex (buf) {
-  | whitespaces => get_url(url, buf)
-  | url => get_url(Sedlexing.latin1(buf), buf)
-  | ")" => URI(url)
-  | eof => raise(LexingError((buf.pos, "Incomplete URI")))
-  | any =>
-    raise(
-      LexingError((
-        buf.Sedlexing.pos,
-        "Unexpected token: " ++ Sedlexing.latin1(buf) ++ " parsing an URI",
-      )),
-    )
-  | _ => assert(false)
 }
 
 and discard_comments = buf => {

@@ -23,7 +23,8 @@ let rec render_stylesheet = (ast: Stylesheet.t) => {
 }
 and render_rule = (ast: Rule.t) => {
   switch (ast) {
-  | Style_rule(style_rule) => "Style_rule(" ++ render_style_rule(style_rule) ++ ")"
+  | Style_rule(style_rule) =>
+    "Style_rule(" ++ render_style_rule(style_rule) ++ ")"
   | At_rule(at_rule) => "At_rule(" ++ render_at_rule(at_rule) ++ ")"
   };
 }
@@ -108,9 +109,11 @@ and render_component_value = (ast: with_loc(Component_value.t)) => {
   | Ampersand => "Ampersand"
   | Dimension((a, b)) => "Dimension(" ++ a ++ ", " ++ b ++ ")"
   | Variable(variable) =>
-    "Variable(" ++  (variable |> String.concat(".")) ++ ")"
+    "Variable(" ++ (variable |> String.concat(".")) ++ ")"
   | Pseudoelement((v, _)) => "Pseudoelement(" ++ v ++ ")"
   | Pseudoclass((v, _)) => "Pseudoclass(" ++ v ++ ")"
+  | PseudoclassFunction((v, _), (_, _)) =>
+    "PseudoclassFunction(" ++ v ++ ")"
   | Selector(v) =>
     let value = List.map(render_component_value, v) |> String.concat(", ");
     "Selector(" ++ value ++ ")";
@@ -149,10 +152,10 @@ switch (input, help) {
 | (None, _) => render_help()
 | (Some(css), _) =>
   /* TODO: parse any css:
-    - check if it's valid stylesheet and render it
-    - check if it's a valid declaration list and render it.
-    - in any other case, print both errors.
-    */
+     - check if it's valid stylesheet and render it
+     - check if it's a valid declaration list and render it.
+     - in any other case, print both errors.
+     */
   let ast = Css_lexer.parse_stylesheet(~container_lnum, ~pos, css);
   print_endline(render_stylesheet(ast));
 };

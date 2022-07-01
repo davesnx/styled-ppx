@@ -241,14 +241,22 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
             | Delim(_)
             | Pseudoclass(_)
             | Pseudoelement(_) => "&"
+            | PseudoclassFunction(_) => "&"
             | _ => "& "
             }
           };
         render_prelude_value(acc ++ ampersand, rest);
       | Dimension((number, dimension)) =>
         render_prelude_value(acc ++ number ++ dimension, rest)
-      | Pseudoclass((v, _)) => render_prelude_value(acc ++ v, rest)
-      | Pseudoelement((v, _)) => render_prelude_value(acc ++ v, rest)
+      | Pseudoclass((v, _)) => render_prelude_value(acc ++ ":" ++ v, rest)
+      | PseudoclassFunction((v, _), (_, loc)) => {
+        /* PseudoclassFunction can receive Component_value inside their parens. */
+        /* We don't have the parsing mechanism for supporting: https://www.w3.org/TR/selectors-4/#grammar */
+        /* Meanwhile, we treat it as a string */
+        let body_to_string = source_code_of_loc(loc);
+        render_prelude_value(acc ++ ":" ++ v ++ body_to_string, rest)
+        }
+      | Pseudoelement((v, _)) => render_prelude_value(acc ++ "::" ++ v, rest)
       | Bracket_block(b) =>
         concat(
           ~loc,
@@ -333,6 +341,16 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
       | "grammar-error" => "grammarError"
       | e => e
       }
+    /* TODO */
+    | PseudoclassFunction((e, _), (_, _)) =>
+      switch (e) {
+      | "first-line" => "firstLine"
+      | "first-child" => "firstChild"
+      | "first-letter" => "firstLetter"
+      | "spelling-error" => "spellingError"
+      | "grammar-error" => "grammarError"
+      | e => e
+      }
     | _ => failwith("Expected a Pseudoelement or a Pseudoclass");
 
   let render_selector_value = (~value_loc, value, s) => {
@@ -377,7 +395,6 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
           ),
         );
       render_rule_value(ident, selector);
-
     | Variable(v) =>
       let variable = render_variable(~loc=value_loc, v);
 

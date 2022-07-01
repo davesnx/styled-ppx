@@ -25,9 +25,6 @@ open Css_types
 %token <string> NESTED_AT_RULE
 %token <string> AT_RULE_WITHOUT_BODY
 %token <string> AT_RULE
-%token <string> FUNCTION
-%token <string> PSEUDOCLASS
-%token <string> PSEUDOELEMENT
 %token <string> HASH
 %token <string> NUMBER
 %token <string> UNICODE_RANGE
@@ -72,6 +69,7 @@ empty_brace_block:
 with_loc(X):
   | x = X { (x, Lex_buffer.make_loc $startpos(x) $endpos(x))}
 
+/* @media () {} */
 at_rule:
   | name = AT_RULE_WITHOUT_BODY; WS?; xs = with_loc(prelude); SEMI_COLON; {
       { At_rule.name = (name, Lex_buffer.make_loc $startpos(name) $endpos(name));
@@ -103,6 +101,7 @@ at_rule:
   }
 ;
 
+/* .class {} */
 style_rule:
   | xs = with_loc(prelude); block = empty_brace_block {
     { Style_rule.prelude = xs;
@@ -126,6 +125,7 @@ declarations:
   | xs = nonempty_list(with_whitespace(declaration_or_at_rule)); SEMI_COLON?; { xs }
   | xs = separated_nonempty_list(SEMI_COLON, with_whitespace(declaration_or_at_rule)); SEMI_COLON?; { xs }
 
+/*  */
 declaration_or_at_rule:
   | d = declaration_without_eof; SEMI_COLON? { Declaration_list.Declaration d }
   | u = unsafe { Declaration_list.Unsafe u }
@@ -148,7 +148,13 @@ declaration_without_eof:
 ;
 
 selector:
-  | i = IDENT; p = with_loc(PSEUDOCLASS); xs = paren_block? {
+  /* & */
+  | AMPERSAND; tl = nonempty_list(with_loc(component_value)) {
+      (Component_value.Ampersand, Lex_buffer.make_loc $startpos $endpos) :: tl
+  }
+  /* a:visited */
+  /* li:nth-child(even) */
+  | i = IDENT; p = pseudoclass; xs = paren_block? {
     [
       (Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i));
       (Component_value.Pseudoclass(p), Lex_buffer.make_loc $startpos(p) $endpos(p));
@@ -156,17 +162,21 @@ selector:
       | Some xs -> [(Component_value.Paren_block(xs), Lex_buffer.make_loc $startpos(xs) $endpos(xs))]
       | None -> []
   }
-  | i = IDENT; p = with_loc(PSEUDOELEMENT) {
+  /* a::before */
+  | i = IDENT; p = pseudoelement; {
     [
       (Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i));
       (Component_value.Pseudoelement(p), Lex_buffer.make_loc $startpos(p) $endpos(p))
     ]
   }
-  | i = IDENT; b = bracket_block {
+  /* lola[] */
+  | i = IDENT; b = bracket_block; WS?; xs = paren_block? {
     [
       (Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i));
       (Component_value.Bracket_block b, Lex_buffer.make_loc $startpos(b) $endpos(b))
-    ]
+    ] @ match xs with
+      | Some xs -> [(Component_value.Paren_block(xs), Lex_buffer.make_loc $startpos(xs) $endpos(xs))]
+      | None -> []
   }
 ;
 
@@ -188,6 +198,9 @@ bracket_block:
   LEFT_BRACKET; xs = separated_list(WS?, with_loc(component_value)); RIGHT_BRACKET { xs }
 ;
 
+pseudoelement: COLON; COLON; i = with_loc(IDENT) { i };
+pseudoclass: COLON; i = with_loc(IDENT) { i };
+
 component_value:
   | b = paren_block { Component_value.Paren_block b }
   | b = bracket_block { Component_value.Bracket_block b }
@@ -198,22 +211,22 @@ component_value:
   | o = OPERATOR { Component_value.Operator o }
   | d = DELIM { Component_value.Delim d }
   | COLON { Component_value.Delim ":" }
-  | f = with_loc(FUNCTION); xs = with_loc(paren_block) {
-    Component_value.Function (f, xs)
-  }
+  | AMPERSAND { Component_value.Ampersand }
   | h = HASH { Component_value.Hash h }
   | n = NUMBER { Component_value.Number n }
   | r = UNICODE_RANGE { Component_value.Unicode_range r }
   | d = FLOAT_DIMENSION { Component_value.Float_dimension d }
   | d = DIMENSION { Component_value.Dimension d }
+  /* $(Lola.value) */
   | v = VARIABLE { Component_value.Variable v }
-  | p = with_loc(PSEUDOCLASS) { Component_value.Pseudoclass p }
-  | p = with_loc(PSEUDOELEMENT) { Component_value.Pseudoelement p}
-  | AMPERSAND { Component_value.Ampersand }
-  | AMPERSAND; tl = nonempty_list(with_loc(component_value)) {
-    Component_value.Selector(
-      (Component_value.Ampersand, Lex_buffer.make_loc $startpos $endpos) :: tl
-    )
+  | f = with_loc(IDENT); xs = with_loc(paren_block) {
+    Component_value.Function (f, xs)
+  }
+  | p = pseudoclass { Component_value.Pseudoclass p }
+  | p = pseudoelement { Component_value.Pseudoelement p}
+  /* :nth-child() */
+  | COLON; f = with_loc(IDENT); xs = with_loc(paren_block) {
+    Component_value.PseudoclassFunction (f, xs)
   }
   | s = selector { Component_value.Selector(s) }
 ;

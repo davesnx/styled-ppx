@@ -17,22 +17,23 @@ let selectors_css_tests = [
   (
     "nth-child(even)",
     [%expr [%cx "&:nth-child(even) {}"]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|&:nth-child|js} ++ {js|(|js} ++ {js|even|js} ++ {js|)|js}, [||])|])],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|&:nth-child(even)|js}, [||])|])],
   ),
   (
     "nth-child(3n+1)",
     [%expr [%cx "& > div:nth-child(3n+1) {}"]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|& > div:nth-child|js} ++ {js|(|js} ++ {js|3n + 1|js} ++ {js|)|js}, [||])|])],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& > div:nth-child|js} ++
+                   ({js|(|js} ++ {js|3n + 1|js} ++ {js|)|js}), [||])|])],
   ),
   (
     ":active",
     [%expr [%cx "&:active {}"]],
-    [%expr CssJs.style(. [|CssJs.active([||])|])],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|&:active|js}, [||])|])],
   ),
   (
     ":hover",
     [%expr [%cx "&:hover {}"]],
-    [%expr CssJs.style(. [|CssJs.hover([||])|])],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|&:hover|js}, [||])|])],
   ),
   (
     "& + &",
@@ -70,6 +71,11 @@ let selectors_css_tests = [
     [%expr CssJs.style(. [|CssJs.selector(. {js|& |js} ++ Variables.selector_query ++ {js||js}, [||])|])],
   ),
   /* (
+    "a[target=\"_blank\"]",
+    [%expr [%cx "a[target='_blank'] {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|a[target]|js}, [||])|])],
+  ), */
+  /* (
     "a[$(Variabels.target)]",
     [%expr [%cx "a[$(Variables.target)] {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|a[target]|js}, [||])|])],
@@ -94,16 +100,16 @@ let selectors_css_tests = [
     [%expr [%cx "div > $(Variables.element) {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|div > p|js}, [||])|])],
   ), */
-  (
+  /* (
     "&:$(Variables.pseudoclass)",
     [%expr [%cx "&:$(Variables.pseudoclass) {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|&:|js} ++ Variables.pseudoclass ++ {js||js}, [||])|])],
-  ),
-  (
+  ), */
+  /* (
     "&::$(Variables.pseudoelement)",
     [%expr [%cx "&::$(Variables.pseudoelement) {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|&::|js} ++ Variables.pseudoelement ++ {js||js}, [||])|])],
-  ),
+  ), */
   /* (
     "*:not(:last-child)",
     [%expr [%cx "& > *:not(:last-child) {}"]],
