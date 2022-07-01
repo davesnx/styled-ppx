@@ -64,7 +64,10 @@ with_whitespace(X):
   | xs = delimited(WS?, X, WS?); { xs }
 
 brace_block(X):
-  | xs = delimited(LEFT_BRACE, with_whitespace(X), RIGHT_BRACE); { xs };
+  | xs = delimited(LEFT_BRACE, with_whitespace(X), RIGHT_BRACE); SEMI_COLON? { xs };
+
+empty_brace_block:
+  | LEFT_BRACE; WS?; RIGHT_BRACE; SEMI_COLON?; { [] }
 
 with_loc(X):
   | x = X { (x, Lex_buffer.make_loc $startpos(x) $endpos(x))}
@@ -101,9 +104,9 @@ at_rule:
 ;
 
 style_rule:
-  | xs = with_loc(prelude); LEFT_BRACE; WS?; RIGHT_BRACE {
+  | xs = with_loc(prelude); block = empty_brace_block {
     { Style_rule.prelude = xs;
-      block = [], Location.none;
+      block = block, Location.none;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
