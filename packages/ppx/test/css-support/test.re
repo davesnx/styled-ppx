@@ -1711,7 +1711,7 @@
 [%css {|align-self: end|}];
 [%css {|align-self: self-start|}];
 [%css {|align-self: self-end|}];
-[%css {|align-self: unsafe start |}];
+[%css {|align-self: unsafe start|}];
 [%css {|align-self: safe start|}];
 [%css {|align-items: normal|}];
 [%css {|align-items: stretch|}];
@@ -1723,7 +1723,7 @@
 [%css {|align-items: end|}];
 [%css {|align-items: self-start|}];
 [%css {|align-items: self-end|}];
-[%css {|align-items: unsafe start |}];
+[%css {|align-items: unsafe start|}];
 [%css {|align-items: safe start|}];
 [%css {|align-content: normal|}];
 [%css {|align-content: baseline|}];
@@ -1738,7 +1738,7 @@
 [%css {|align-content: end|}];
 [%css {|align-content: flex-start|}];
 [%css {|align-content: flex-end|}];
-[%css {|align-content: unsafe start |}];
+[%css {|align-content: unsafe start|}];
 [%css {|align-content: safe start|}];
 [%css {|justify-self: auto|}];
 [%css {|justify-self: normal|}];
@@ -1751,7 +1751,7 @@
 [%css {|justify-self: end|}];
 [%css {|justify-self: self-start|}];
 [%css {|justify-self: self-end|}];
-[%css {|justify-self: unsafe start |}];
+[%css {|justify-self: unsafe start|}];
 [%css {|justify-self: safe start|}];
 [%css {|justify-self: left|}];
 [%css {|justify-self: right|}];
@@ -1766,7 +1766,7 @@
 [%css {|justify-items: end|}];
 [%css {|justify-items: self-start|}];
 [%css {|justify-items: self-end|}];
-[%css {|justify-items: unsafe start |}];
+[%css {|justify-items: unsafe start|}];
 [%css {|justify-items: safe start|}];
 [%css {|justify-items: left|}];
 [%css {|justify-items: right|}];
@@ -1785,7 +1785,7 @@
 [%css {|justify-content: end|}];
 [%css {|justify-content: flex-start|}];
 [%css {|justify-content: flex-end|}];
-[%css {|justify-content: unsafe start |}];
+[%css {|justify-content: unsafe start|}];
 [%css {|justify-content: safe start|}];
 [%css {|justify-content: left|}];
 [%css {|justify-content: right|}];
@@ -1803,7 +1803,7 @@
 [%css {|place-content: end|}];
 [%css {|place-content: flex-start|}];
 [%css {|place-content: flex-end|}];
-[%css {|place-content: unsafe start |}];
+[%css {|place-content: unsafe start|}];
 [%css {|place-content: safe start|}];
 [%css {|place-content: normal normal|}];
 [%css {|place-content: baseline normal|}];
@@ -1833,7 +1833,7 @@
 [%css {|place-items: end|}];
 [%css {|place-items: self-start|}];
 [%css {|place-items: self-end|}];
-[%css {|place-items: unsafe start |}];
+[%css {|place-items: unsafe start|}];
 [%css {|place-items: safe start|}];
 [%css {|place-items: normal normal|}];
 [%css {|place-items: stretch normal|}];
@@ -2212,7 +2212,7 @@
 [%css {|break-before: avoid-column|}];
 [%css {|break-before: column|}];
 [%css {|break-before: avoid-region|}];
-[%css {|break-before: region |}];
+[%css {|break-before: region|}];
 [%css {|break-after: auto|}];
 [%css {|break-after: avoid|}];
 [%css {|break-after: avoid-page|}];
@@ -2224,12 +2224,12 @@
 [%css {|break-after: avoid-column|}];
 [%css {|break-after: column|}];
 [%css {|break-after: avoid-region|}];
-[%css {|break-after: region |}];
+[%css {|break-after: region|}];
 [%css {|break-inside: auto|}];
 [%css {|break-inside: avoid|}];
 [%css {|break-inside: avoid-page|}];
 [%css {|break-inside: avoid-column|}];
-[%css {|break-inside: avoid-region |}];
+[%css {|break-inside: avoid-region|}];
 [%css {|box-decoration-break: slice|}];
 [%css {|box-decoration-break: clone|}];
 [%css {|orphans: 1|}];
@@ -2260,7 +2260,7 @@
 
 /* CSSOM View Module */
 [%css {|scroll-behavior: auto|}];
-[%css {|scroll-behavior: smooth |}];
+[%css {|scroll-behavior: smooth|}];
 
 /* CSS Ruby Layout Module Level 1 */
 [%css {|display: ruby|}];
