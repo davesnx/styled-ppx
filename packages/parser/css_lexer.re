@@ -41,7 +41,7 @@ let dimension_to_string =
 
 let token_to_string =
   fun
-  | Parser.EOF => "EOF"
+  | Parser.EOF => ""
   | Parser.LEFT_BRACE => "{"
   | Parser.RIGHT_BRACE => "}"
   | Parser.LEFT_PAREN => "("
@@ -53,32 +53,72 @@ let token_to_string =
   | Parser.PERCENTAGE => "%"
   | Parser.AMPERSAND => "&"
   | Parser.IMPORTANT => "!important"
-  | Parser.IDENT(s) => "IDENT(" ++ s ++ ")"
-  | Parser.STRING(s) => "STRING(" ++ s ++ ")"
-  | Parser.URI(s) => "URI(" ++ s ++ ")"
-  | Parser.OPERATOR(s) => "OPERATOR(" ++ s ++ ")"
-  | Parser.DELIM(s) => "DELIM(" ++ s ++ ")"
-  | Parser.NESTED_AT_RULE(s) => "NESTED_AT_RULE(" ++ s ++ ")"
-  | Parser.AT_RULE_WITHOUT_BODY(s) => "AT_RULE_WITHOUT_BODY(" ++ s ++ ")"
-  | Parser.AT_RULE(s) => "AT_RULE(" ++ s ++ ")"
-  | Parser.FUNCTION(s) => "FUNCTION(" ++ s ++ ")"
-  | Parser.PSEUDOCLASS(s) => "PSEUDOCLASS(" ++ s ++ ")"
-  | Parser.PSEUDOELEMENT(s) => "PSEUDOELEMENT(" ++ s ++ ")"
-  | Parser.HASH(s) => "HASH(" ++ s ++ ")"
-  | Parser.NUMBER(s) => "NUMBER(" ++ s ++ ")"
-  | Parser.UNICODE_RANGE(s) => "UNICODE_RANGE(" ++ s ++ ")"
+  | Parser.IDENT(s) => s
+  | Parser.STRING(s) => "'" ++ s ++ "'"
+  | Parser.URI(s) => s
+  | Parser.OPERATOR(s) => s
+  | Parser.DELIM(s) => s
+  | Parser.NESTED_AT_RULE(s) => s
+  | Parser.AT_RULE_WITHOUT_BODY(_) => "{}"
+  | Parser.AT_RULE(s) => "{" ++ s ++ "}"
+  | Parser.FUNCTION(s) => s ++ "("
+  | Parser.PSEUDOCLASS(s) => ":" ++ s
+  | Parser.PSEUDOELEMENT(s) => "::" ++ s
+  | Parser.HASH(s) => "#" ++ s
+  | Parser.NUMBER(s) => s
+  | Parser.UNICODE_RANGE(s) => s
   | Parser.FLOAT_DIMENSION((n, s, d)) =>
-    "FLOAT_DIMENSION("
-    ++ n
+    n
     ++ ", "
     ++ s
     ++ ", "
     ++ dimension_to_string(d)
-    ++ ")"
-  | Parser.DIMENSION((n, d)) => "DIMENSION(" ++ n ++ ", " ++ d ++ ")"
-  | Parser.VARIABLE(v) => "VARIABLE(" ++ (String.concat(".", v)) ++ ")"
+  | Parser.DIMENSION((n, d)) => n ++ "." ++ d
+  | Parser.VARIABLE(v) => String.concat(".", v)
+  | Parser.UNSAFE => "UNSAFE"
+  | Parser.WS => " "
+;
+
+let token_to_debug =
+  fun
+  | Parser.EOF => "EOF"
+  | Parser.LEFT_BRACE => "LEFT_BRACE"
+  | Parser.RIGHT_BRACE => "RIGHT_BRACE"
+  | Parser.LEFT_PAREN => "LEFT_PAREN"
+  | Parser.RIGHT_PAREN => "RIGHT_PAREN"
+  | Parser.LEFT_BRACKET => "LEFT_BRACKET"
+  | Parser.RIGHT_BRACKET => "RIGHT_BRACKET"
+  | Parser.COLON => "COLON"
+  | Parser.SEMI_COLON => "SEMI_COLON"
+  | Parser.PERCENTAGE => "PERCENTAGE"
+  | Parser.AMPERSAND => "AMPERSAND"
+  | Parser.IMPORTANT => "IMPORTANT"
+  | Parser.IDENT(s) => "IDENT('" ++ s ++ "')"
+  | Parser.STRING(s) => "STRING('" ++ s ++ "')"
+  | Parser.URI(s) => "URI('" ++ s ++ "')"
+  | Parser.OPERATOR(s) => "OPERATOR('" ++ s ++ "')"
+  | Parser.DELIM(s) => "DELIM('" ++ s ++ "')"
+  | Parser.NESTED_AT_RULE(s) => "NESTED_AT_RULE('" ++ s ++ "')"
+  | Parser.AT_RULE_WITHOUT_BODY(s) => "AT_RULE_WITHOUT_BODY('" ++ s ++ "')"
+  | Parser.AT_RULE(s) => "AT_RULE('" ++ s ++ "')"
+  | Parser.FUNCTION(s) => "FUNCTION('" ++ s ++ "')"
+  | Parser.PSEUDOCLASS(s) => "PSEUDOCLASS('" ++ s ++ "')"
+  | Parser.PSEUDOELEMENT(s) => "PSEUDOELEMENT('" ++ s ++ "')"
+  | Parser.HASH(s) => "HASH('" ++ s ++ "')"
+  | Parser.NUMBER(s) => "NUMBER('" ++ s ++ "')"
+  | Parser.UNICODE_RANGE(s) => "UNICODE_RANGE('" ++ s ++ "')"
+  | Parser.FLOAT_DIMENSION((n, s, d)) =>
+    "FLOAT_DIMENSION('" ++ n
+    ++ ", "
+    ++ s
+    ++ ", "
+    ++ dimension_to_string(d)
+    ++ "')"
+  | Parser.DIMENSION((n, d)) => "DIMENSION('" ++ n ++ ", " ++ d ++ "')"
+  | Parser.VARIABLE(v) => "VARIABLE('" ++ (String.concat(".", v)) ++ "')"
   | Parser.UNSAFE => "UNSAFE"
   | Parser.WS => "WS"
+;
 
 let () =
   Location.register_error_of_exn(
