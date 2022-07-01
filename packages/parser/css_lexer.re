@@ -252,7 +252,6 @@ let time = [%sedlex.regexp? _s | (_m, _s)];
 
 let frequency = [%sedlex.regexp? (_h, _z) | (_k, _h, _z)];
 
-
 let get_ident = (value) => {
   open Css_parser;
   switch(value) {
@@ -325,7 +324,7 @@ and get_url = (url, buf) =>
 
 and discard_comments = buf => {
   switch%sedlex (buf) {
-    | eof => raise(LexingError((buf.Sedlexing.pos, "Unterminated comment at EOF")))
+    | eof => raise(LexingError((buf.Sedlexing.pos, "Unterminated comment at the end of the string")))
     | "*/" => get_next_token(buf)
     | _ => discard_comments(buf)
   };

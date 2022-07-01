@@ -1,3 +1,4 @@
+/* esy x ast-renderer */
 open Css_types;
 
 let render_record = zippedRecord => {
@@ -22,8 +23,8 @@ let rec render_stylesheet = (ast: Stylesheet.t) => {
 }
 and render_rule = (ast: Rule.t) => {
   switch (ast) {
-  | Style_rule(style_rule) => render_style_rule(style_rule)
-  | At_rule(at_rule) => render_at_rule(at_rule)
+  | Style_rule(style_rule) => "Style_rule(" ++ render_style_rule(style_rule) ++ ")"
+  | At_rule(at_rule) => "At_rule(" ++ render_at_rule(at_rule) ++ ")"
   };
 }
 and render_style_rule = (ast: Style_rule.t) => {
@@ -118,11 +119,13 @@ and render_component_value = (ast: with_loc(Component_value.t)) => {
 
 let render_help = () => {
   print_endline("");
+  print_endline("");
   print_endline(
     {|  ast-renderer pretty-prints the CSS AST of parser/css_lexer.re|},
   );
   print_endline("");
   print_endline({|    EXAMPLE: esy x ast-renderer ".a { color: red }"|});
+  print_endline("");
   print_endline("");
 };
 
