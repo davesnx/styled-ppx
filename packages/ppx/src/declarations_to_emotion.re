@@ -47,7 +47,7 @@ let emit_shorthand = (parser, mapper, value_to_expr) => {
 };
 
 let render_string = string =>
-  Helper.Const.string(string) |> Helper.Exp.constant;
+  Helper.Const.string(~quotation_delimiter="js", string) |> Helper.Exp.constant;
 let render_integer = integer =>
   Helper.Const.int(integer) |> Helper.Exp.constant;
 let render_number = number =>

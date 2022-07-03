@@ -60,6 +60,10 @@ let compare = (input, expected, {expect, _}) => {
 let properties_static_css_tests = [%expr
   [|
     (
+      [%css "display: block;"],
+      CssJs.display(`block)
+    ),
+    (
       [%css "box-sizing: border-box"],
       CssJs.boxSizing(`borderBox)
     ),
@@ -67,10 +71,10 @@ let properties_static_css_tests = [%expr
       [%css "box-sizing: content-box"],
       CssJs.boxSizing(`contentBox)
     ),
-    /* (
+    (
       [%css "color: #454545"],
-      CssJs.color(`hex("454545"))),
-    */
+      CssJs.color(`hex({js|454545|js}))
+    ),
     (
       [%css "color: red"],
       CssJs.color(CssJs.red)
@@ -223,22 +227,22 @@ let properties_static_css_tests = [%expr
         ~left=`pxFloat(4.),
       ),
     ),
-    /* (
+    (
       [%css "color: #012"],
-      CssJs.color(`hex("012"))),
-    */
-    /* (
+      CssJs.color(`hex({js|012|js}))),
+
+    (
       [%css "color: #0123"],
-      CssJs.color(`hex("0123"))),
-    */
-    /* (
+      CssJs.color(`hex({js|0123|js}))),
+
+    (
       [%css "color: #012345"],
-      CssJs.color(`hex("012345"))),
-    */
-    /* (
+      CssJs.color(`hex({js|012345|js}))
+    ),
+    (
       [%css "color: #01234567"],
-      CssJs.color(`hex("01234567"))
-    ), */
+      CssJs.color(`hex({js|01234567|js}))
+    ),
     (
       [%css "color: blue"],
       CssJs.color(CssJs.blue)
@@ -305,10 +309,10 @@ let properties_static_css_tests = [%expr
       [%css "border-right-color: green"],
       CssJs.borderRightColor(CssJs.green)
     ),
-    /* (
+    (
       [%css "border-left-color: #fff"],
-      CssJs.borderLeftColor(`hex("fff"))),
-    */
+      CssJs.borderLeftColor(`hex({js|fff|js}))),
+
     (
       [%css "border-top-width: 15px"],
       CssJs.borderTopWidth(`pxFloat(15.))

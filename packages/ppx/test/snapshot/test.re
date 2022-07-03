@@ -1,4 +1,4 @@
-/* /* This tests ensure the transformation goes right and doesn't need to type-check.
+/* This tests ensure the transformation goes right and doesn't need to type-check.
 If you are looking to add some tests for CSS support, check packages/ppx/test/native folder. */
 
 [%styled.global {|
@@ -153,4 +153,3 @@ module Sequence = [%styled.button (~size, ~color) => {
     [%css "width: 100%;"],
   |]
 }];
- */
