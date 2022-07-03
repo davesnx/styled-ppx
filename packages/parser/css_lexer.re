@@ -73,7 +73,6 @@ let token_to_string =
     ++ dimension_to_string(d)
   | Parser.DIMENSION((n, d)) => n ++ "." ++ d
   | Parser.VARIABLE(v) => String.concat(".", v)
-  | Parser.UNSAFE => "UNSAFE"
   | Parser.WS => " "
 ;
 
@@ -112,7 +111,6 @@ let token_to_debug =
     ++ "')"
   | Parser.DIMENSION((n, d)) => "DIMENSION('" ++ n ++ ", " ++ d ++ "')"
   | Parser.VARIABLE(v) => "VARIABLE('" ++ (String.concat(".", v)) ++ "')"
-  | Parser.UNSAFE => "UNSAFE"
   | Parser.WS => "WS"
 ;
 
@@ -231,8 +229,6 @@ let nested_at_rule = [%sedlex.regexp?
   ("@", "document" | "keyframes" | "media" | "supports" | "scope")
 ];
 
-let unsafe = [%sedlex.regexp? ("__UNSAFE__")];
-
 let _a = [%sedlex.regexp? 'A' | 'a'];
 let _b = [%sedlex.regexp? 'B' | 'b'];
 let _c = [%sedlex.regexp? 'C' | 'c'];
@@ -318,7 +314,6 @@ let rec get_next_token = buf => {
   | ']' => RIGHT_BRACKET
   | '%' => PERCENTAGE
   | '&' => AMPERSAND
-  | unsafe => UNSAFE
   | variable => VARIABLE(Sedlexing.latin1(~skip=2, ~drop=1, buf) |> String.split_on_char('.'))
   | operator => OPERATOR(Sedlexing.latin1(buf))
   | string => STRING(Sedlexing.latin1(~skip=1, ~drop=1, buf))
