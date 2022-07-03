@@ -1,26 +1,3 @@
-/*
-   This file transform CSS AST to Emotion API calls, a simplified example:
-
-     -- CSS Definition
-     display: block;
-
-     -- CSS AST
-     Declaration: {
-       important: false,
-       property: "display",
-       value: Value {
-         "children": [
-           Identifier {
-             "name": "block"
-           }
-         ]
-       }
-     }
-
-     -- Emotion output
-     CssJs.(css([display(`block)]))
- */
-
 open Ppxlib;
 open Css_types;
 open Component_value;
@@ -85,7 +62,7 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
     | (
         Paren_block([
           (Ident(ident), ident_loc),
-          (Delim(":"), _),
+          (Delim(":"), _) | (Delim("::"), _),
           (_, first_value_loc),
           ...values,
         ]),
@@ -95,7 +72,8 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
         let values_length = List.length(values);
         let last_value_loc =
           values_length == 0
-            ? first_value_loc : List.nth(values, values_length - 1);
+            ? first_value_loc
+            : List.nth(values, values_length - 1);
         let loc = {
           ...first_value_loc,
           loc_end: last_value_loc.Location.loc_end,
@@ -128,13 +106,11 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
           )
           |> Helper.Exp.ident(~loc);
 
-        %expr
-        [%e acc] ++ [%e ident] ++ " ";
+        [%expr [%e acc] ++ [%e ident] ++ " "];
       }
     | (Ident(id), _) => {
         let id = Helper.Exp.constant(~loc, Helper.Const.string(id));
-        %expr
-        [%e acc] ++ [%e id] ++ " ";
+        [%expr [%e acc] ++ [%e id] ++ " "];
       }
     | (_, loc) => invalid_format(loc);
 
@@ -222,7 +198,9 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
     | [(value, value_loc), ...rest] =>
       switch (value) {
       | Delim(":") => render_prelude_value(acc ++ ":", rest)
+      | Delim("::") => render_prelude_value(acc ++ "::", rest)
       | Delim(".") => render_prelude_value(acc ++ ".", rest)
+      | Delim("*") => render_prelude_value(acc ++ "*", rest)
       | Delim(",") => render_prelude_value(acc ++ ", ", rest)
       | Delim(v) => render_prelude_value(acc ++ " " ++ v ++ " ", rest)
       | Ident(v)
@@ -240,7 +218,7 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
             | Delim(",") => "& "
             | Delim(_)
             | Pseudoclass(_)
-            | Pseudoelement(_) => "&"
+            | Pseudoelement(_)
             | PseudoclassFunction(_) => "&"
             | _ => "& "
             }
@@ -342,19 +320,12 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
       | e => e
       }
     /* TODO */
-    | PseudoclassFunction((e, _), (_, _)) =>
-      switch (e) {
-      | "first-line" => "firstLine"
-      | "first-child" => "firstChild"
-      | "first-letter" => "firstLetter"
-      | "spelling-error" => "spellingError"
-      | "grammar-error" => "grammarError"
-      | e => e
-      }
+    | PseudoclassFunction((e, _), (_, _)) => e
     | _ => failwith("Expected a Pseudoelement or a Pseudoclass");
 
   let render_selector_value = (~value_loc, value, s) => {
     switch (s) {
+    | PseudoclassFunction(_, _) as p
     | Pseudoelement((_, _)) as p
     | Pseudoclass((_, _)) as p =>
       let selector_ident =
@@ -410,13 +381,6 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
     };
   };
 
-  let render_self = v => {
-    let ident =
-      pseudoToFn(v) |> CssJs.lident(~loc) |> Helper.Exp.ident(~loc);
-
-    Helper.Exp.apply(~loc=rule.Style_rule.loc, ident, [(Nolabel, dl_expr)]);
-  };
-
   switch (prelude) {
   | [(Selector([(Ident(i), _), (value, value_loc)]), _)] =>
     render_selector_value(~value_loc, i, value)
@@ -424,24 +388,15 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
       (
         Selector([
           (Ampersand, _),
-          (Delim(":"), _),
-          (Pseudoclass(_) as p, _),
-        ]),
-        _,
-      ),
-    ]
-  | [
-      (
-        Selector([
-          (Ampersand, _),
-          (Delim(":"), _),
-          (Delim(":"), _),
-          (Pseudoelement(_) as p, _),
+          (Delim(":"), _) | (Delim("::"), _),
+          (Pseudoclass(_) as p, _) | (Pseudoelement(_) as p, _) | (PseudoclassFunction(_, _) as p, _),
         ]),
         _,
       ),
     ] =>
-    render_self(p)
+    let ident =
+      pseudoToFn(p) |> CssJs.lident(~loc) |> Helper.Exp.ident(~loc);
+    Helper.Exp.apply(~loc=rule.Style_rule.loc, ident, [(Nolabel, dl_expr)]);
   | _ =>
     let selector = render_prelude_value("", prelude);
     render_rule_value(ident, selector);

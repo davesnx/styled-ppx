@@ -70,47 +70,75 @@ let selectors_css_tests = [
     [%expr [%cx "& $(Variables.selector_query) {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& |js} ++ Variables.selector_query ++ {js||js}, [||])|])],
   ),
-  /* (
-    "a[target=\"_blank\"]",
-    [%expr [%cx "a[target='_blank'] {}"]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|a[target]|js}, [||])|])],
-  ), */
-  /* (
-    "a[$(Variabels.target)]",
-    [%expr [%cx "a[$(Variables.target)] {}"]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|a[target]|js}, [||])|])],
-  ), */
-  /* (
+  (
+    "& a[target=\"_blank\"]",
+    [%expr [%cx {|& a[target="_blank"] {}|}]],
+    [%expr CssJs.style(. [|
+      CssJs.selector(.
+        {js|& a|js}
+          ++ {js|[|js}
+          ++ {js|target = "_blank"|js}
+          ++ {js|]|js},
+        [||]
+      )|]
+    )],
+  ),
+  (
+    "& a[$(Variabels.target)]",
+    [%expr [%cx "& a[$(Variables.target)] {}"]],
+    [%expr CssJs.style(. [|
+      CssJs.selector(.
+        ({js|& a|js}
+          ++ ({js|[|js}
+          ++ (({js||js}
+          ++ (Variables.target
+          ++ {js||js}))
+          ++ {js|]|js}))),
+        [||]
+      )|]
+    )],
+  ),
+  (
     "a[href^=$(Variables.href_target)]",
-    [%expr [%cx "a[href^=$(Variables.href_target)] {}"]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|a[href^="https"]|js}, [||])|])],
-  ), */
+    [%expr [%cx "& a[href^=$(Variables.href_target)] {}"]],
+    [%expr CssJs.style(. [|
+      CssJs.selector(.
+        ({js|& a|js}
+          ++ ({js|[|js}
+          ++ (({js|href^=|js}
+          ++ (Variables.href_target
+          ++ {js||js}))
+          ++ {js|]|js}))),
+        [||]
+      )|]
+    )],
+  ),
   (
     "$(pseudo)",
     [%expr [%cx "$(pseudo) {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js||js} ++ pseudo ++ {js||js}, [||])|])],
   ),
-  /* (
+  (
     "div > .class",
-    [%expr [%cx "div > .class {}"]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|div > p|js}, [||])|])],
-  ), */
-  /* (
+    [%expr [%cx "& div > .class {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& div > .class|js}, [||])|])],
+  ),
+  (
     "div > $(Variables.element)",
-    [%expr [%cx "div > $(Variables.element) {}"]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|div > p|js}, [||])|])],
-  ), */
-  /* (
+    [%expr [%cx "& div > $(Variables.element) {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& div > |js} ++ Variables.element ++ {js||js}, [||])|])],
+  ),
+  (
     "&:$(Variables.pseudoclass)",
     [%expr [%cx "&:$(Variables.pseudoclass) {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|&:|js} ++ Variables.pseudoclass ++ {js||js}, [||])|])],
-  ), */
-  /* (
+  ),
+  (
     "&::$(Variables.pseudoelement)",
     [%expr [%cx "&::$(Variables.pseudoelement) {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|&::|js} ++ Variables.pseudoelement ++ {js||js}, [||])|])],
-  ), */
-  /* (
+  ),
+  (
     "*:not(:last-child)",
     [%expr [%cx "& > *:not(:last-child) {}"]],
     [%expr CssJs.style(. [|
@@ -119,7 +147,7 @@ let selectors_css_tests = [
         [||]
       )
     |])],
-  ) */
+  )
 ];
 
 describe("Should transform selectors", ({test, _}) => {

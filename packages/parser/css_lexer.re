@@ -49,6 +49,7 @@ let token_to_string =
   | Parser.LEFT_BRACKET => "["
   | Parser.RIGHT_BRACKET => "]"
   | Parser.COLON => ":"
+  | Parser.DOUBLE_COLON => "::"
   | Parser.SEMI_COLON => ";"
   | Parser.PERCENTAGE => "%"
   | Parser.AMPERSAND => "&"
@@ -86,6 +87,7 @@ let token_to_debug =
   | Parser.LEFT_BRACKET => "LEFT_BRACKET"
   | Parser.RIGHT_BRACKET => "RIGHT_BRACKET"
   | Parser.COLON => "COLON"
+  | Parser.DOUBLE_COLON => "DOUBLE_COLON"
   | Parser.SEMI_COLON => "SEMI_COLON"
   | Parser.PERCENTAGE => "PERCENTAGE"
   | Parser.AMPERSAND => "AMPERSAND"
@@ -131,7 +133,10 @@ let () =
         Some(Location.error(~loc, msg));
       }
     | GrammarError((msg, loc)) => Some(Location.error(~loc, msg))
-    | _ => None,
+    | _exn => {
+      let msg = "Unexpected error";
+      Some(Location.error(msg));
+    }
   );
 
 /* Regexes */
@@ -305,6 +310,7 @@ let rec get_next_token = buf => {
   | ';' => SEMI_COLON
   | '}' => RIGHT_BRACE
   | '{' => LEFT_BRACE
+  | "::" => DOUBLE_COLON
   | ':' => COLON
   | '(' => LEFT_PAREN
   | ')' => RIGHT_PAREN
