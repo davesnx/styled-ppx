@@ -72,3 +72,44 @@ and Rule: {
     | At_rule(At_rule.t);
 } = Rule
 and Stylesheet: {type t = with_loc(list(Rule.t));} = Stylesheet;
+
+/*
+[@deriving show]
+type complex_selector =
+  | Selector(compound_selector)
+  | Combinator({
+      left: complex_selector,
+      combinator,
+      right: compound_selector,
+    })
+and compound_selector = {
+  type_selector: option(string),
+  subclass_selectors: list(subclass_selector),
+  pseudo_selectors: list(pseudo_selector),
+}
+and subclass_selector =
+  | Id(string)
+  | Class(string)
+  | Attribute(attribute_selector)
+and attribute_selector =
+  | Exists(string)
+  | To_equal({
+      name: string,
+      kind: option([ | `Asterisk | `Caret | `Dollar | `Pipe | `Tilde]),
+      value: string,
+      modifier: option([ | `i | `s]),
+    })
+and pseudo_selector =
+  | Pseudo_class(pseudo_selector_kind)
+  | Pseudo_element(pseudo_selector_kind)
+and pseudo_selector_kind =
+  | Ident(string)
+  | Function({
+      name: string,
+      payload: list(token),
+    })
+and combinator =
+  | Juxtaposition
+  | Greater
+  | Plus
+  | Tilde; */
