@@ -59,15 +59,9 @@ let render_css_global_values = (name, value) => {
 
   let value =
     switch (value) {
-    | `Inherit =>
-      %expr
-      "inherit"
-    | `Initial =>
-      %expr
-      "initial"
-    | `Unset =>
-      %expr
-      "unset"
+    | `Inherit => [%expr "inherit"]
+    | `Initial => [%expr "initial"]
+    | `Unset => [%expr "unset"]
     };
 
   /* bs-css doesn't have those */

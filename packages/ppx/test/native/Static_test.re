@@ -50,15 +50,13 @@ let compare = (input, expected, {expect, _}) => {
 };
 
 /* TODO: ideas, selectors . properties, to have a bigger test matrix */
-/* There are a few test that are commented since they use strings,
-  those are interpreted as raw_literal on the metaquote
-  that we use to diff the AST on the assertions and a missmatch
-  with OCaml that makes the comparision fail even if they are correct.
-  TODO: Fix this by removing the raw_literal on the metaquote transformation
-  and uncomment the tests. */
-/* The other tests that are commented, means that we don't support them safely */
+/* The tests that are commented, means that we don't support them safely */
 let properties_static_css_tests = [%expr
   [|
+    /* (
+      [%cx "@media(min-width:3rem) { color: blue; }"],
+      [%cx "@media(min-width: 3rem) { color: blue; }"],
+    ), */
     (
       [%css "display: block;"],
       CssJs.display(`block)
@@ -79,10 +77,10 @@ let properties_static_css_tests = [%expr
       [%css "color: red"],
       CssJs.color(CssJs.red)
     ),
-    /* (
+    (
       [%css "display: flex"],
-      CssJs.unsafe("display", "flex")),
-    */
+      CssJs.display(`flex)
+    ),
     (
       [%css "flex-direction: column"],
       CssJs.flexDirection(`column)

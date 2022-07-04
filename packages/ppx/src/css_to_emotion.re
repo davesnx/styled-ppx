@@ -89,7 +89,7 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
           };
         List.fold_left(concat(~loc), acc, exprs);
       }
-    | (Variable(v), _) => {
+    | (Variable(v), loc) => {
         let ident =
           (
             switch (v) {
@@ -99,18 +99,19 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
                 loc,
               }
             | _ =>
-              failwith(
-                "Variable should not be empty, please refer to a variable or module value",
+              grammar_error(loc,
+                "Variable can not be empty, please refer to a variable or module value",
               )
             }
           )
           |> Helper.Exp.ident(~loc);
-
-        [%expr [%e acc] ++ [%e ident] ++ " "];
+        let space = string_to_const(~loc, " ");
+        [%expr [%e acc] ++ [%e ident] ++ [%e space]];
       }
-    | (Ident(id), _) => {
-        let id = Helper.Exp.constant(~loc, Helper.Const.string(id));
-        [%expr [%e acc] ++ [%e id] ++ " "];
+    | (Ident(id), loc) => {
+        let id = string_to_const(~loc, id);
+        let space = string_to_const(~loc, " ");
+        [%expr [%e acc] ++ [%e id] ++ [%e space]];
       }
     | (_, loc) => invalid_format(loc);
 
@@ -118,12 +119,13 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
     invalid_format(loc);
   };
 
-  let query = prelude |> List.fold_left(parse_condition, [%expr ""]);
+  let empty = string_to_const(~loc, "");
+  let query = prelude |> List.fold_left(parse_condition, [%expr [%e empty]]);
 
   let rules =
     switch (ar.At_rule.block) {
-    | Empty => invalid_format(loc)
     | Stylesheet(_) => invalid_format(loc)
+    | Empty => Builder.pexp_array(~loc, [])
     | Declaration_list(declaration) =>
       render_declarations(declaration) |> Builder.pexp_array(~loc)
     };
