@@ -196,12 +196,6 @@ let non_printable = [%sedlex.regexp?
   '\000' .. '\b' | '\011' | '\014' .. '\031' | '\127'
 ];
 
-let url_unquoted = [%sedlex.regexp?
-  Star(Compl('"' | '\'' | '(' | ')' | '\\' | non_printable) | escape)
-];
-
-let url = [%sedlex.regexp? url_unquoted | string];
-
 let operator = [%sedlex.regexp? "~=" | "|=" | "^=" | "$=" | "*=" | "||"];
 
 let at_rule_without_body = [%sedlex.regexp? ("@", "charset" | "import" | "namespace")];

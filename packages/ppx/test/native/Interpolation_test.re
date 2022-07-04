@@ -74,6 +74,10 @@ let properties_variable_css_tests = [
     [%expr CssJs.textDecorationColor(decorationColor)]
   ),
   /* (
+    [%expr [%css "background-image: $(wat);" ]],
+    [%expr CssJs.backgroundImage(wat)],
+  ), */
+  /* (
     [%expr [%css "color: rgba(0, 0, 0, 1%);"]],
     [%expr CssJs.color(rgba(0, 0, 0, `percent(1)))]
   ),

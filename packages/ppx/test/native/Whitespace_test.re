@@ -36,13 +36,18 @@ let css_tests = [
   ),
   (
     "ignore in at_rule inside declarations",
-    [%expr [%cx "@media screen and (min-width:30px) {}"]],
+    [%expr [%cx "@media screen  and  (min-width: 30px) {}"]],
     [%expr [%cx "@media screen and (min-width: 30px) {}"]],
   ),
   (
-    "wat",
+    "media with declarations",
     [%expr [%cx "@media screen and (min-width: 30px) { color: red; }"]],
     [%expr [%cx "@media screen and (min-width: 30px) { color: red; } "]],
+  ),
+  (
+    "ignore space on declaration url",
+    [%expr [%css " background-image : url('img_tree.gif')" ]],
+    [%expr [%css "background-image: url('img_tree.gif')" ]],
   ),
 ];
 

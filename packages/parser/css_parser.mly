@@ -74,7 +74,7 @@ at_rule:
     }
   }
   /* @media (min-width: 16rem) {} */
-  | name = with_whitespace(with_loc(AT_MEDIA)); xs = prelude; WS?; empty_brace_block {
+  | name = with_whitespace(with_loc(AT_MEDIA)); xs = prelude; with_whitespace(empty_brace_block) {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Empty;
@@ -154,7 +154,7 @@ declaration_or_at_rule:
 declaration: d = declaration_without_eof; EOF { d };
 
 declaration_without_eof:
-  n = IDENT; WS?; COLON; WS?; v = prelude; WS?; i = boption(IMPORTANT); WS?; SEMI_COLON? {
+  WS?; n = IDENT; WS?; COLON; WS?; v = prelude; WS?; i = boption(IMPORTANT); WS?; SEMI_COLON? {
     { Declaration.name = (n, Lex_buffer.make_loc $startpos(n) $endpos(n));
       value = v;
       important = (i, Lex_buffer.make_loc $startpos(i) $endpos(i));
