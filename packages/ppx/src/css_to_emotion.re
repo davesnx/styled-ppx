@@ -42,8 +42,32 @@ let source_code_of_loc = loc => {
 let rec render_at_rule = (ar: At_rule.t): Parsetree.expression =>
   switch (ar.At_rule.name) {
   | ("media", _) => render_media_query(ar)
+  | (
+      "charset" as n
+    | "import" as n
+    | "namespace" as n
+    | "supports" as n
+    | "page" as n
+    | "font-face" as n
+    | "keyframes" as n
+    | "counter-style" as n
+    | "font-feature-values" as n
+    | "swash" as n
+    | "ornaments" as n
+    | "annotation" as n
+    | "stylistic" as n
+    | "styleset" as n
+    | "character-variant" as n
+    | "property" as n /* Experimental */
+    | "color-profile" as n /* Experimental */
+    | "viewport" as n /* Deprecated */
+    | "document" as n /* Deprecated */
+    ,
+    _
+  ) =>
+    grammar_error(ar.At_rule.loc, "At-rule @" ++ n ++ " is not supported in styled-ppx")
   | (n, _) =>
-    grammar_error(ar.At_rule.loc, "At-rule @" ++ n ++ " not supported")
+    grammar_error(ar.At_rule.loc, "Unknown @" ++ n ++ "")
   }
 and render_media_query = (ar: At_rule.t): Parsetree.expression => {
   let concat = (~loc, expr, acc) => {
@@ -108,10 +132,19 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
         let space = string_to_const(~loc, " ");
         [%expr [%e acc] ++ [%e ident] ++ [%e space]];
       }
+    /* and, only, all */
     | (Ident(id), loc) => {
         let id = string_to_const(~loc, id);
         let space = string_to_const(~loc, " ");
         [%expr [%e acc] ++ [%e id] ++ [%e space]];
+      }
+    /* (color) */
+    | (Paren_block([
+        (Ident(_), ident_loc),
+      ]),
+      _) => {
+        let value = source_code_of_loc(ident_loc) |> string_to_const(~loc=ident_loc);
+        [%expr [%e value]];
       }
     | (_, loc) => invalid_format(loc);
 
@@ -124,7 +157,8 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
 
   let rules =
     switch (ar.At_rule.block) {
-    | Stylesheet(_) => invalid_format(loc)
+    | Stylesheet(_) => /* TODO: expected a list of declarations, got an stylesheet. */
+      invalid_format(loc)
     | Empty => Builder.pexp_array(~loc, [])
     | Declaration_list(declaration) =>
       render_declarations(declaration) |> Builder.pexp_array(~loc)

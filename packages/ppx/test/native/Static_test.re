@@ -49,14 +49,9 @@ let compare = (input, expected, {expect, _}) => {
   expect.string(result).toEqual(expected);
 };
 
-/* TODO: ideas, selectors . properties, to have a bigger test matrix */
 /* The tests that are commented, means that we don't support them safely */
 let properties_static_css_tests = [%expr
   [|
-    /* (
-      [%cx "@media(min-width:3rem) { color: blue; }"],
-      [%cx "@media(min-width: 3rem) { color: blue; }"],
-    ), */
     (
       [%css "display: block;"],
       CssJs.display(`block)

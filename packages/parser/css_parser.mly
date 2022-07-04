@@ -64,7 +64,7 @@ with_loc(X): x = X { (x, Lex_buffer.make_loc $startpos(x) $endpos(x))}
 
 at_rule:
   /* @charset */
-  | name = with_loc(AT_RULE_WITHOUT_BODY); WS; xs = prelude; SEMI_COLON?; {
+  | name = with_whitespace(with_loc(AT_RULE_WITHOUT_BODY)); xs = prelude; SEMI_COLON?; {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Empty;
@@ -72,23 +72,31 @@ at_rule:
     }
   }
   /* @keyframes { 100%: {} } */
-  /* | name = with_whitespace(with_loc(NESTED_AT_RULE)); WS; xs = prelude; s = with_whitespace(brace_block(stylesheet_without_eof)); {
+  | name = with_whitespace(with_loc(NESTED_AT_RULE)); xs = prelude; empty_brace_block; {
+    { At_rule.name = name;
+      prelude = xs;
+      block = Brace_block.Empty;
+      loc = Lex_buffer.make_loc $startpos $endpos;
+    }
+  }
+  /* @keyframes { 100%: {} } */
+  | name = with_whitespace(with_loc(NESTED_AT_RULE)); xs = prelude; s = brace_block(with_whitespace(stylesheet_without_eof)); {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Stylesheet s;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
-  } */
-  /* @media (min-width: 16rem) {} */
-  | name = with_whitespace(with_loc(NESTED_AT_RULE)); xs = prelude; ds = with_whitespace(brace_block(with_loc(declarations))) {
+  }
+  /* @whatever */
+  | name = with_whitespace(with_loc(AT_RULE)); xs = prelude; ds = with_whitespace(brace_block(with_loc(declarations))) {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Declaration_list ds;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
-  /* @whatever */
-  | name = with_loc(AT_RULE); WS; xs = prelude; ds = with_whitespace(brace_block(with_loc(declarations))) {
+  /* @media (min-width: 16rem) {} */
+  | name = with_whitespace(with_loc(NESTED_AT_RULE)); xs = prelude; ds = with_whitespace(brace_block(with_loc(declarations))) {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Declaration_list ds;
@@ -99,13 +107,13 @@ at_rule:
 
 /* .class {} */
 style_rule:
-  | xs = prelude; block = empty_brace_block; {
+  | xs = with_whitespace(prelude); block = with_whitespace(empty_brace_block); {
     { Style_rule.prelude = xs;
       block = block, Location.none;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
-  | xs = prelude; declarations = brace_block(with_loc(declarations)); {
+  | xs = with_whitespace(prelude); declarations = with_whitespace(brace_block(with_loc(declarations))); {
     { Style_rule.prelude = xs;
       block = declarations;
       loc = Lex_buffer.make_loc $startpos $endpos;
@@ -113,7 +121,7 @@ style_rule:
   }
 ;
 
-prelude: xs = with_loc(list(with_whitespace(with_loc(component_value)))) { xs };
+prelude: xs = with_loc(nonempty_list(with_whitespace(with_loc(component_value)))) { xs };
 
 declarations:
   | xs = nonempty_list(with_whitespace(declaration_or_at_rule)); SEMI_COLON?; { xs }
@@ -151,33 +159,12 @@ selector:
   | AMPERSAND; tl = nonempty_list(with_loc(component_value)); WS? {
     (Component_value.Ampersand, Lex_buffer.make_loc $startpos $endpos) :: tl
   }
-  /* a:visited */
-  /* li:nth-child(even) */
-  | i = IDENT; p = pseudoclass; xs = paren_block? {
-    [
-      (Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i));
-      (Component_value.Pseudoclass(p), Lex_buffer.make_loc $startpos(p) $endpos(p));
-    ] @ match xs with
-      | None -> []
-      | Some xs -> [
-        (Component_value.Paren_block(xs), Lex_buffer.make_loc $startpos(xs) $endpos(xs))
-      ]
-  }
-  /* a::before */
-  | i = IDENT; p = pseudoelement; {
-    [
-      (Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i));
-      (Component_value.Pseudoelement(p), Lex_buffer.make_loc $startpos(p) $endpos(p))
-    ]
-  }
   /* lola[] */
-  | i = IDENT; b = bracket_block; WS?; xs = paren_block? {
+  | i = IDENT; b = bracket_block; WS?; {
     [
       (Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i));
       (Component_value.Bracket_block b, Lex_buffer.make_loc $startpos(b) $endpos(b))
-    ] @ match xs with
-      | None -> []
-      | Some xs -> [(Component_value.Paren_block(xs), Lex_buffer.make_loc $startpos(xs) $endpos(xs))]
+    ]
   }
 ;
 

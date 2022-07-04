@@ -22,8 +22,7 @@ let selectors_css_tests = [
   (
     "nth-child(3n+1)",
     [%expr [%cx "& > div:nth-child(3n+1) {}"]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|& > div:nth-child|js} ++
-                   ({js|(|js} ++ {js|3n + 1|js} ++ {js|)|js}), [||])|])],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& > div:nth-child(3n+1)|js}, [||])|])],
   ),
   (
     ":active",
@@ -48,7 +47,7 @@ let selectors_css_tests = [
   (
     "& p:not(.active)",
     [%expr [%cx "& p:not(.active) {}"]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|& p:not|js} ++ {js|(|js} ++ {js|.active|js} ++ {js|)|js}, [||])|])],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& p:not(.active)|js}, [||])|])],
   ),
   (
     "& input[type=\"password\"]",

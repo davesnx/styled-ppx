@@ -3083,5 +3083,3 @@
 /* [%css {|width: calc(100vh * 2)|}]; */
 [%css {|width: calc(100vh - calc(2rem + calc(2rem + calc(2rem + calc(2rem + 120px)))))|}];
 /* [%css {|width: calc(100vh * calc(2rem - calc(2rem * calc(2rem * calc(2rem / 4)))))|}]; */
-
-[%cx "@media(min-width:3rem) { color: blue; }"]
