@@ -106,7 +106,7 @@ at_rule:
     }
   }
   /* @{{rule}} {} */
-  | name = with_whitespace(with_loc(AT_RULE)); xs = prelude; s = empty_brace_block {
+  | name = with_whitespace(with_loc(AT_RULE)); xs = prelude; empty_brace_block {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Empty;
