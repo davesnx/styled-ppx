@@ -19,7 +19,7 @@ exports[`Nested component renders 1`] = `
   width: 100vw;
 }
 
-.emotion-0 >p {
+.emotion-0>p {
   color: #800080;
 }
 
