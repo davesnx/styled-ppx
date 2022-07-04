@@ -117,10 +117,7 @@ let () =
         Some(Location.error(~loc, msg));
       }
     | GrammarError((msg, loc)) => Some(Location.error(~loc, msg))
-    | _exn => {
-      let msg = "Unexpected error";
-      Some(Location.error(msg));
-    }
+    | _exn => Some(Location.error("Unexpected error"))
   );
 
 /* Regexes */
@@ -247,7 +244,12 @@ let important = [%sedlex.regexp?
 ];
 
 let length = [%sedlex.regexp?
-  (_c, _a, _p) | (_c, _h) | (_e, _m) | (_e, _x) | (_i, _c) | (_l, _h) |
+  (_c, _a, _p) |
+  (_c, _h) |
+  (_e, _m) |
+  (_e, _x) |
+  (_i, _c) |
+  (_l, _h) |
   (_r, _e, _m) |
   (_r, _l, _h) |
   (_v, _h) |
@@ -262,7 +264,8 @@ let length = [%sedlex.regexp?
   (_i, _n) |
   (_p, _c) |
   (_p, _t) |
-  (_p, _x)
+  (_p, _x) |
+  (_f, _r)
 ];
 
 let angle = [%sedlex.regexp?
@@ -272,16 +275,6 @@ let angle = [%sedlex.regexp?
 let time = [%sedlex.regexp? _s | (_m, _s)];
 
 let frequency = [%sedlex.regexp? (_h, _z) | (_k, _h, _z)];
-
-/* let get_ident = (value) => {
-  open Css_parser;
-  switch(value) {
-    /* | "attr" | "calc" | "conic-gradient" | "counter" | "cubic-bezier" | "hsl" | "hsla" | "linear-gradient" | "max" | "min" | "radial-gradient" | "repeating-conic-gradient" | "repeating-linear-gradient" | "repeating-radial-gradient" | "rgb" | "rgba" | "var" => FUNCTION(value) */
-    | "after" | "before" | "cue" | "first-letter" | "first-line" | "selection" | "slotted" | "backdrop" | "placeholder" | "marker" | "spelling-error" | "grammar-error" => PSEUDOELEMENT(value)
-    | "active" | "checked" | "default" | "dir" | "disabled" | "empty" | "enabled" | "first" | "first-child" | "first-of-type" | "fullscreen" | "focus" | "hover" | "indeterminate" | "in-range" | "invalid" | "lang" | "last-child" | "last-of-type" | "link" | "not" | "nth-child" | "nth-last-child" | "nth-last-of-type" | "nth-of-type" | "only-child" | "only-of-type" | "optional" | "out-of-range" | "read-only" | "read-write" | "required" | "right" | "root" | "scope" | "target" | "valid" | "visited" => PSEUDOCLASS(value)
-    | _ => IDENT(value)
-  }
-} */
 
 let rec get_next_token = buf => {
   open Css_parser;

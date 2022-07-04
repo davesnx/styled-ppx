@@ -54,6 +54,7 @@ rule:
 
 with_whitespace(X): xs = delimited(WS?, X, WS?); { xs }
 
+/* {} */
 brace_block(X):
   xs = delimited(LEFT_BRACE, with_whitespace(X), RIGHT_BRACE);
   SEMI_COLON? { xs };
