@@ -1947,7 +1947,7 @@ module SingleQuoteStrings = {
     CssJs.style(. [|
       CssJs.label("SingleQuoteStrings"),
       CssJs.display(`flex),
-      CssJs.unsafe("justifyContent", "center"),
+      CssJs.unsafe({js|justifyContent|js}, {js|center|js}),
     |]);
   let make = (props: makeProps) => {
     let className = styles ++ getOrEmpty(classNameGet(props));
@@ -2922,7 +2922,7 @@ module MultiLineStrings = {
     CssJs.style(. [|
       CssJs.label("MultiLineStrings"),
       CssJs.display(`flex),
-      CssJs.unsafe("justifyContent", "center"),
+      CssJs.unsafe({js|justifyContent|js}, {js|center|js}),
     |]);
   let make = (props: makeProps) => {
     let className = styles ++ getOrEmpty(classNameGet(props));
@@ -4867,7 +4867,7 @@ module ArrayStatic = {
     CssJs.style(. [|
       CssJs.label("ArrayStatic"),
       CssJs.display(`flex),
-      CssJs.unsafe("justifyContent", "center"),
+      CssJs.unsafe({js|justifyContent|js}, {js|center|js}),
     |]);
   let make = (props: makeProps) => {
     let className = styles ++ getOrEmpty(classNameGet(props));
@@ -5851,7 +5851,6 @@ module StringInterpolation = {
       CssJs.color(Theme.var),
       CssJs.backgroundColor(black),
       CssJs.borderColor(Theme.Border.black),
-      CssJs.unsafe("color", "trust-me"),
       CssJs.display(`block),
     |]);
   let make = (props: makeProps) => {
@@ -7821,10 +7820,13 @@ module SelectorsMediaQueries = {
     CssJs.style(. [|
       CssJs.label("SelectorsMediaQueries"),
       CssJs.media(.
-        "" ++ "(" ++ "min-width" ++ ": " ++ "600px" ++ ") ",
-        [|CssJs.unsafe("background", "blue")|],
+        {js||js} ++ "(" ++ "min-width" ++ ": " ++ "600px" ++ ") ",
+        [|CssJs.unsafe({js|background|js}, {js|blue|js})|],
       ),
-      CssJs.hover([|CssJs.unsafe("background", "green")|]),
+      CssJs.selector(.
+        {js|&:hover|js},
+        [|CssJs.unsafe({js|background|js}, {js|green|js})|],
+      ),
       CssJs.selector(.
         {js|& > p|js},
         [|CssJs.color(CssJs.pink), CssJs.fontSize(`pxFloat(24.))|],
@@ -8810,8 +8812,8 @@ module ArrayDynamicComponent = {
       CssJs.label("ArrayDynamicComponent"),
       CssJs.display(`block),
       switch (var) {
-      | `Black => CssJs.color(`hex("999999"))
-      | `White => CssJs.color(`hex("FAFAFA"))
+      | `Black => CssJs.color(`hex({js|999999|js}))
+      | `White => CssJs.color(`hex({js|FAFAFA|js}))
       },
     |]);
   let make = (props: makeProps('var)) => {
@@ -11744,7 +11746,15 @@ module SelectorWithInterpolation = {
     CssJs.style(. [|
       CssJs.label("SelectorWithInterpolation"),
       CssJs.media(.
-        ((("" ++ "only" ++ " ") ++ "screen" ++ " ") ++ "and" ++ " ")
+        (
+          (
+            ({js||js} ++ {js|only|js} ++ {js| |js})
+            ++ {js|screen|js}
+            ++ {js| |js}
+          )
+          ++ {js|and|js}
+          ++ {js| |js}
+        )
         ++ "("
         ++ "min-width"
         ++ ": "
@@ -11753,7 +11763,11 @@ module SelectorWithInterpolation = {
         [|CssJs.color(CssJs.blue)|],
       ),
       CssJs.media(.
-        (("" ++ "(" ++ "min-width" ++ ": " ++ "700px" ++ ") ") ++ "and" ++ " ")
+        (
+          ({js||js} ++ "(" ++ "min-width" ++ ": " ++ "700px" ++ ") ")
+          ++ {js|and|js}
+          ++ {js| |js}
+        )
         ++ "("
         ++ "orientation"
         ++ ": "
@@ -12735,7 +12749,7 @@ module MediaQueryCalc = {
     CssJs.style(. [|
       CssJs.label("MediaQueryCalc"),
       CssJs.media(.
-        ""
+        {js||js}
         ++ "("
         ++ "min-width"
         ++ ": "
@@ -12744,7 +12758,7 @@ module MediaQueryCalc = {
         [|CssJs.color(CssJs.red)|],
       ),
       CssJs.media(.
-        ""
+        {js||js}
         ++ "("
         ++ "min-width"
         ++ ": "

@@ -58,7 +58,7 @@ module DynamicComponent = [%styled.div
    |j}
 ];
 
-/* module SelectorsMediaQueries = [%styled.div {j|
+module SelectorsMediaQueries = [%styled.div {j|
   @media (min-width: 600px) {
     background: blue;
   }
@@ -69,7 +69,7 @@ module DynamicComponent = [%styled.div
 
   & > p { color: pink; font-size: 24px; }
 |j}
-]; */
+];
 
 let keyframe = [%keyframe {|
   0% { opacity: 0 }
@@ -113,7 +113,6 @@ module SelectorWithInterpolation = [%styled.div {|
 
   @media (min-width: 700px) and (orientation: $(orientation)) {
     display: none;
-
   }
 |}]
 
@@ -152,4 +151,3 @@ module Sequence = [%styled.button (~size, ~color) => {
     [%css "width: 100%;"],
   |]
 }];
- */

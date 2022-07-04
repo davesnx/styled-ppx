@@ -11,7 +11,7 @@ let compare = (input, expected, {expect, _}) => {
 let css_tests = [
   (
     "ignore in declaration list",
-    [%expr [%cx "display: block;box-sizing: border-box ;          "]],
+    [%expr [%cx "display: block; box-sizing: border-box          "]],
     [%expr [%cx "display: block; box-sizing: border-box;"]],
   ),
   (
@@ -38,6 +38,11 @@ let css_tests = [
     "ignore in at_rule inside declarations",
     [%expr [%cx "@media screen and (min-width:30px) {}"]],
     [%expr [%cx "@media screen and (min-width: 30px) {}"]],
+  ),
+  (
+    "wat",
+    [%expr [%cx "@media screen and (min-width: 30px) { color: red; }"]],
+    [%expr [%cx "@media screen and (min-width: 30px) { color: red; } "]],
   ),
 ];
 

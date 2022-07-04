@@ -23,9 +23,10 @@ open Css_types
 %token <string> URI
 %token <string> OPERATOR
 %token <string> DELIM
-%token <string> NESTED_AT_RULE
-%token <string> AT_RULE_WITHOUT_BODY
+%token <string> AT_MEDIA
+%token <string> AT_KEYFRAMES
 %token <string> AT_RULE
+%token <string> AT_RULE_WITHOUT_BODY
 %token <string> HASH
 %token <string> NUMBER
 %token <string> UNICODE_RANGE
@@ -72,35 +73,35 @@ at_rule:
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
-  /* @keyframes { 100%: {} } */
-  | name = with_whitespace(with_loc(NESTED_AT_RULE)); xs = prelude; empty_brace_block; {
+  /* @media (min-width: 16rem) {} */
+  | name = with_whitespace(with_loc(AT_MEDIA)); xs = prelude; WS?; empty_brace_block {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Empty;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
-  /* @keyframes { 100%: {} } */
-  | name = with_whitespace(with_loc(NESTED_AT_RULE)); xs = prelude; s = brace_block(with_whitespace(stylesheet_without_eof)); {
+  /* @media (min-width: 16rem) { ... } */
+  | name = with_whitespace(with_loc(AT_MEDIA)); xs = prelude; ds = with_whitespace(brace_block(with_loc(declarations))) {
     { At_rule.name = name;
       prelude = xs;
+      block = Brace_block.Declaration_list ds;
+      loc = Lex_buffer.make_loc $startpos $endpos;
+    }
+  }
+  /* @keyframes animationName {} */
+  | name = with_whitespace(with_loc(AT_KEYFRAMES)); i = with_whitespace(IDENT); empty_brace_block {
+    { At_rule.name = name;
+      prelude = ([(Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i))], Lex_buffer.make_loc $startpos(i) $endpos(i));
+      block = Brace_block.Empty;
+      loc = Lex_buffer.make_loc $startpos $endpos;
+    }
+  }
+  /* @keyframes animationName { ... } */
+  | name = with_whitespace(with_loc(AT_KEYFRAMES)); i = with_whitespace(IDENT); s = with_whitespace(brace_block(stylesheet_without_eof)) {
+    { At_rule.name = name;
+      prelude = ([(Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i))], Lex_buffer.make_loc $startpos(i) $endpos(i));
       block = Brace_block.Stylesheet s;
-      loc = Lex_buffer.make_loc $startpos $endpos;
-    }
-  }
-  /* @whatever */
-  | name = with_whitespace(with_loc(AT_RULE)); xs = prelude; ds = with_whitespace(brace_block(with_loc(declarations))) {
-    { At_rule.name = name;
-      prelude = xs;
-      block = Brace_block.Declaration_list ds;
-      loc = Lex_buffer.make_loc $startpos $endpos;
-    }
-  }
-  /* @media (min-width: 16rem) {} */
-  | name = with_whitespace(with_loc(NESTED_AT_RULE)); xs = prelude; ds = with_whitespace(brace_block(with_loc(declarations))) {
-    { At_rule.name = name;
-      prelude = xs;
-      block = Brace_block.Declaration_list ds;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
