@@ -32,13 +32,6 @@ let location_to_string = loc =>
     position_to_string(loc.Location.loc_end),
   );
 
-let dimension_to_string =
-  fun
-  | Types.Length => "length"
-  | Types.Angle => "angle"
-  | Types.Time => "time"
-  | Types.Frequency => "frequency";
-
 let token_to_string =
   fun
   | Parser.EOF => ""
@@ -65,12 +58,7 @@ let token_to_string =
   | Parser.HASH(s) => "#" ++ s
   | Parser.NUMBER(s) => s
   | Parser.UNICODE_RANGE(s) => s
-  | Parser.FLOAT_DIMENSION((n, s, d)) =>
-    n
-    ++ ", "
-    ++ s
-    ++ ", "
-    ++ dimension_to_string(d)
+  | Parser.FLOAT_DIMENSION((n, s, _)) => n ++ s
   | Parser.DIMENSION((n, d)) => n ++ "." ++ d
   | Parser.VARIABLE(v) => String.concat(".", v)
   | Parser.WS => " "
@@ -102,12 +90,10 @@ let token_to_debug =
   | Parser.HASH(s) => "HASH('" ++ s ++ "')"
   | Parser.NUMBER(s) => "NUMBER('" ++ s ++ "')"
   | Parser.UNICODE_RANGE(s) => "UNICODE_RANGE('" ++ s ++ "')"
-  | Parser.FLOAT_DIMENSION((n, s, d)) =>
+  | Parser.FLOAT_DIMENSION((n, s, _d)) =>
     "FLOAT_DIMENSION('" ++ n
     ++ ", "
     ++ s
-    ++ ", "
-    ++ dimension_to_string(d)
     ++ "')"
   | Parser.DIMENSION((n, d)) => "DIMENSION('" ++ n ++ ", " ++ d ++ "')"
   | Parser.VARIABLE(v) => "VARIABLE('" ++ (String.concat(".", v)) ++ "')"
