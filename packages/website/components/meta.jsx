@@ -9,7 +9,7 @@ const Head = (props) => {
   const logo = `${url}/meta-img-logo.png`;
   const background = "F2F2F2";
   const color = "333333";
-  const metaImg = `https://api.metaimg.net/render?design=simple&image=${logo}&title=${title}&description=${description}&align=left&backgroundColor=${background}&textColor=${color}`;
+  const metaImg = `https://api.metaimg.net/v1/render?design=simple&image=${logo}&title=${title}&description=${description}&align=left&backgroundColor=${background}&textColor=${color}`;
 
   return (
     <NextHead>

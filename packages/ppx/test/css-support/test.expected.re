@@ -1,43 +1,48 @@
-CssJs.unsafe({js|backgroundRepeat|js}, {js|space|js});
-CssJs.unsafe({js|backgroundRepeat|js}, {js|round|js});
-CssJs.unsafe({js|backgroundRepeat|js}, {js|repeat repeat|js});
-CssJs.unsafe({js|backgroundRepeat|js}, {js|space repeat|js});
-CssJs.unsafe({js|backgroundRepeat|js}, {js|round repeat|js});
-CssJs.unsafe({js|backgroundRepeat|js}, {js|no-repeat repeat|js});
-CssJs.unsafe({js|backgroundRepeat|js}, {js|repeat space|js});
-CssJs.unsafe({js|backgroundRepeat|js}, {js|space space|js});
-CssJs.unsafe({js|backgroundRepeat|js}, {js|round space|js});
-CssJs.unsafe({js|backgroundRepeat|js}, {js|no-repeat space|js});
-CssJs.unsafe({js|backgroundRepeat|js}, {js|repeat round|js});
-CssJs.unsafe({js|backgroundRepeat|js}, {js|space round|js});
-CssJs.unsafe({js|backgroundRepeat|js}, {js|round round|js});
-CssJs.unsafe({js|backgroundRepeat|js}, {js|no-repeat round|js});
-CssJs.unsafe({js|backgroundRepeat|js}, {js|repeat no-repeat|js});
-CssJs.unsafe({js|backgroundRepeat|js}, {js|space no-repeat|js});
-CssJs.unsafe({js|backgroundRepeat|js}, {js|round no-repeat|js});
-CssJs.unsafe({js|backgroundRepeat|js}, {js|no-repeat no-repeat|js});
-CssJs.unsafe({js|backgroundAttachment|js}, {js|local|js});
-CssJs.unsafe({js|backgroundPosition|js}, {js|bottom 10px right 20px|js});
-CssJs.unsafe({js|backgroundPosition|js}, {js|bottom 10px right|js});
-CssJs.unsafe({js|backgroundPosition|js}, {js|top right 10px|js});
-CssJs.unsafe({js|backgroundClip|js}, {js|border-box|js});
-CssJs.unsafe({js|backgroundClip|js}, {js|padding-box|js});
-CssJs.unsafe({js|backgroundClip|js}, {js|content-box|js});
-CssJs.unsafe({js|backgroundOrigin|js}, {js|border-box|js});
-CssJs.unsafe({js|backgroundOrigin|js}, {js|padding-box|js});
-CssJs.unsafe({js|backgroundOrigin|js}, {js|content-box|js});
-CssJs.unsafe({js|backgroundSize|js}, {js|auto|js});
-CssJs.unsafe({js|backgroundSize|js}, {js|cover|js});
-CssJs.unsafe({js|backgroundSize|js}, {js|contain|js});
+CssJs.backgroundRepeat(`space);
+CssJs.backgroundRepeat(`round);
+CssJs.backgroundRepeat(`hv((`repeat, `repeat)));
+CssJs.backgroundRepeat(`hv((`space, `repeat)));
+CssJs.backgroundRepeat(`hv((`round, `repeat)));
+CssJs.backgroundRepeat(`hv((`noRepeat, `repeat)));
+CssJs.backgroundRepeat(`hv((`repeat, `space)));
+CssJs.backgroundRepeat(`hv((`space, `space)));
+CssJs.backgroundRepeat(`hv((`round, `space)));
+CssJs.backgroundRepeat(`hv((`noRepeat, `space)));
+CssJs.backgroundRepeat(`hv((`repeat, `round)));
+CssJs.backgroundRepeat(`hv((`space, `round)));
+CssJs.backgroundRepeat(`hv((`round, `round)));
+CssJs.backgroundRepeat(`hv((`noRepeat, `round)));
+CssJs.backgroundRepeat(`hv((`repeat, `noRepeat)));
+CssJs.backgroundRepeat(`hv((`space, `noRepeat)));
+CssJs.backgroundRepeat(`hv((`round, `noRepeat)));
+CssJs.backgroundRepeat(`hv((`noRepeat, `noRepeat)));
+CssJs.backgroundAttachment(`local);
+CssJs.backgroundPosition(
+  `hv((`hv((`center, `pxFloat(20.))), `hv((`center, `pxFloat(10.))))),
+);
+CssJs.backgroundPosition(`hv((`center, `hv((`center, `pxFloat(10.))))));
+CssJs.backgroundPosition(`hv((`hv((`center, `pxFloat(10.))), `center)));
+CssJs.backgroundClip(`borderBox);
+CssJs.backgroundClip(`padding_box);
+CssJs.backgroundClip(`contentBox);
+CssJs.backgroundOrigin(`borderBox);
+CssJs.backgroundOrigin(`padding_box);
+CssJs.backgroundOrigin(`contentBox);
+CssJs.backgroundSize(`auto);
+CssJs.backgroundSize(`cover);
+CssJs.backgroundSize(`contain);
 CssJs.unsafe({js|backgroundSize|js}, {js|10px|js});
 CssJs.unsafe({js|backgroundSize|js}, {js|50%|js});
 CssJs.unsafe({js|backgroundSize|js}, {js|10px auto|js});
 CssJs.unsafe({js|backgroundSize|js}, {js|auto 10%|js});
-CssJs.unsafe({js|backgroundSize|js}, {js|50em 50%|js});
+CssJs.backgroundSize(`size((`em(50.), `percent(50.))));
 CssJs.unsafe({js|background|js}, {js|url(foo.png), url(bar.svg)|js});
 CssJs.unsafe({js|background|js}, {js|top left / 50% 60%|js});
-CssJs.unsafe({js|background|js}, {js|border-box|js});
-CssJs.unsafe({js|background|js}, {js|border-box padding-box|js});
+CssJs.origin(`borderBox);
+CssJs.backgroundColor(CssJs.blue);
+CssJs.backgroundColor(CssJs.red);
+CssJs.backgroundRepeat(`fixed);
+CssJs.clip(`padding_box);
 CssJs.unsafe(
   {js|background|js},
   {js|url(foo.png) bottom right / cover padding-box content-box|js},
@@ -1219,6 +1224,7 @@ CssJs.unsafe({js|maskRepeat|js}, {js|space no-repeat|js});
 CssJs.unsafe({js|maskRepeat|js}, {js|round no-repeat|js});
 CssJs.unsafe({js|maskRepeat|js}, {js|no-repeat no-repeat|js});
 CssJs.unsafe({js|maskPosition|js}, {js|center|js});
+CssJs.unsafe({js|maskPosition|js}, {js|center center|js});
 CssJs.unsafe({js|maskPosition|js}, {js|left 50%|js});
 CssJs.unsafe({js|maskClip|js}, {js|border-box|js});
 CssJs.unsafe({js|maskClip|js}, {js|padding-box|js});
@@ -1782,3 +1788,70 @@ CssJs.width(
     )),
   )),
 );
+CssJs.unsafe({js|MozAppearance|js}, {js|textfield|js});
+CssJs.unsafe({js|WebkitAppearance|js}, {js|none|js});
+CssJs.unsafe({js|WebkitBoxOrient|js}, {js|vertical|js});
+CssJs.unsafe(
+  {js|WebkitBoxShadow|js},
+  {js|inset 0 0 0 1000px $(Color.Background.selectedMuted)|js},
+);
+CssJs.unsafe({js|WebkitLineClamp|js}, {js|2|js});
+CssJs.unsafe({js|WebkitOverflowScrolling|js}, {js|touch|js});
+CssJs.unsafe({js|WebkitTapHighlightColor|js}, {js|transparent|js});
+CssJs.unsafe({js|WebkitTextFillColor|js}, {js|$(Color.Text.primary)|js});
+CssJs.unsafe({js|animation|js}, {js|none|js});
+CssJs.unsafe({js|appearance|js}, {js|none|js});
+CssJs.unsafe({js|aspectRatio|js}, {js|21 / 8|js});
+CssJs.backgroundColor(c);
+CssJs.unsafe({js|bottom|js}, "unset");
+CssJs.boxShadows(`none);
+CssJs.unsafe({js|breakInside|js}, {js|avoid|js});
+CssJs.unsafe({js|caretColor|js}, {js|#e15a46|js});
+CssJs.unsafe({js|color|js}, "inherit");
+CssJs.unsafe({js|columnWidth|js}, {js|125px|js});
+CssJs.unsafe({js|columnWidth|js}, {js|auto|js});
+CssJs.unsafe({js|content|js}, {js|""|js});
+CssJs.unsafe({js|content|js}, "unset");
+CssJs.unsafe({js|counterIncrement|js}, {js|ol|js});
+CssJs.unsafe({js|counterReset|js}, {js|ol|js});
+CssJs.unsafe({js|display|js}, {js|-webkit-box|js});
+CssJs.display(`contents);
+CssJs.unsafe({js|fill|js}, {js|$(color)|js});
+CssJs.unsafe({js|fill|js}, {js|currentColor|js});
+CssJs.unsafe({js|gap|js}, {js|4px|js});
+CssJs.unsafe({js|gridColumnEnd|js}, {js|span 2|js});
+CssJs.unsafe({js|grid-column|js}, "unset");
+CssJs.unsafe({js|grid-row|js}, "unset");
+CssJs.unsafe({js|gridTemplateColumns|js}, {js|max-content max-content|js});
+CssJs.unsafe(
+  {js|gridTemplateColumns|js},
+  {js|minmax(10px, auto) fit-content(20px) fit-content(20px)|js},
+);
+CssJs.unsafe(
+  {js|gridTemplateColumns|js},
+  {js|minmax(51px, auto) fit-content(20px) fit-content(20px)|js},
+);
+CssJs.unsafe({js|gridTemplateColumns|js}, {js|repeat(2, auto)|js});
+CssJs.unsafe({js|gridTemplateColumns|js}, {js|repeat(3, auto)|js});
+CssJs.height(`fitContent);
+CssJs.unsafe({js|justifyItems|js}, {js|start|js});
+CssJs.unsafe({js|justify-self|js}, "unset");
+CssJs.unsafe({js|left|js}, "unset");
+CssJs.unsafe({js|maskPosition|js}, {js|center center|js});
+CssJs.unsafe({js|maskRepeat|js}, {js|no-repeat|js});
+CssJs.maxWidth(`maxContent);
+CssJs.unsafe({js|outline|js}, {js|none|js});
+CssJs.unsafe({js|overflowAnchor|js}, {js|none|js});
+CssJs.unsafe({js|position|js}, "unset");
+CssJs.unsafe({js|resize|js}, {js|none|js});
+CssJs.unsafe({js|scrollBehavior|js}, {js|smooth|js});
+CssJs.unsafe({js|strokeOpacity|js}, {js|0|js});
+CssJs.unsafe({js|stroke|js}, {js|$(Color.Text.white)|js});
+CssJs.top(`calc((`sub, `percent(50.), `pxFloat(1.))));
+CssJs.unsafe({js|top|js}, "unset");
+CssJs.unsafe({js|touchAction|js}, {js|none|js});
+CssJs.unsafe({js|touchAction|js}, {js|pan-x pan-y|js});
+CssJs.transform(`none);
+CssJs.width(`fitContent);
+CssJs.width(`maxContent);
+CssJs.unsafe({js|wordBreak|js}, {js|break-word|js});

@@ -433,7 +433,7 @@ and property_block_overflow = [%value.rec "'clip' | 'ellipsis' | <string>"]
 and property_block_size = [%value.rec "<'width'>"]
 /* This property is changed from the original spec. This enforces lw, ls and color to be present.
   Missing border values is valid CSS, but bs-css bindings aren't available */
-and property_border = [%value.rec "[<line-width> | <interpolation> ] [<line-style> | <interpolation> ] [ <color> | <interpolation> ]"]
+and property_border = [%value.rec "'none' | [ <line-width> | <interpolation> ] [<line-style> | <interpolation> ] [ <color> | <interpolation> ]"]
 and property_border_block = [%value.rec "<'border-top-width'> || <'border-top-style'> || <'color'>"]
 and property_border_block_color = [%value.rec "[ <'border-top-color'> ]{1,2}"]
 and property_border_block_end = [%value.rec "<'border-top-width'> || <'border-top-style'> || <'color'>"]
@@ -1472,6 +1472,8 @@ let check_map =
         check(property__webkit_border_before_width),
       ),
       ("property--webkit-box-reflect", check(property__webkit_box_reflect)),
+      ("property--webkit-box-shadow", check(property_box_shadow)),
+      ("property--webkit-box-orient", check(property_box_orient)),
       (
         "property--webkit-column-break-after",
         check(property__webkit_column_break_after),

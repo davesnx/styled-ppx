@@ -131,6 +131,7 @@ let variants_to_expression =
   | `Cover => id([%expr `cover])
   | `Full_width => raise(Unsupported_feature)
   | `Unset => id([%expr `unset])
+  | `Padding_box => id([%expr `padding_box])
   | `FitContent => id([%expr `fitContent])
   | `MaxContent => id([%expr `maxContent])
   | `MinContent => id([%expr `minContent])
@@ -827,43 +828,197 @@ let background_color =
     [%expr CssJs.backgroundColor],
     render_color,
   );
+
+let render_background_image = fun
+  | `None => [%expr `none]
+  | _ => raise(Unsupported_feature); // bs-css only accepts none
+
+let render_repeat_style = fun
+  | `Xor(values) => {
+     let render_xor = fun
+      | `Repeat => [%expr `repeat]
+      | `Space => [%expr `space]
+      | `Round => [%expr `round]
+      | `No_repeat => [%expr `noRepeat]
+      switch(values){
+        | [] => failwith("expected at least one value")
+        | [x] => [%expr [%e render_xor(x)]]
+        | [x, y] => [%expr `hv([%e render_xor(x)], [%e render_xor(y)])]
+        | _ => failwith("repeat doesn't accept more then 2 values");
+      }
+  }
+  | `Repeat_x => [%expr `repeatX]
+  | `Repeat_y => [%expr `repeatY];
+
+
+let render_attachment = fun
+  | `Fixed => [%expr `fixed]
+  | `Local => [%expr `local]
+  | `Scroll => [%expr `scroll];
+
 let background_image =
-  unsupportedValue(
+  emit(
     Parser.property_background_image,
-    [%expr CssJs.backgroundImage],
+    id,
+    fun
+    | [] => failwith("expected at least one value")
+    | [v] => [[%expr CssJs.backgroundImage([%e render_background_image(v)])]]
+    | _ => raise(Unsupported_feature)
   );
+
 let background_repeat =
-  unsupportedValue(
+  emit(
     Parser.property_background_repeat,
-    [%expr CssJs.backgroundRepeat],
+    id,
+    fun
+    | [] => failwith("expected at least one value")
+    | [`Repeat_x] => [[%expr CssJs.backgroundRepeat([`repeatX])]]
+    | [`Repeat_y] =>[[%expr CssJs.backgroundRepeat(`repeatY)]]
+    | [`Xor(_) as v] => [[%expr CssJs.backgroundRepeat([%e render_repeat_style(v)])]]
+    | _ => raise(Unsupported_feature)
   );
 let background_attachment =
-  unsupportedValue(
+  emit(
     Parser.property_background_attachment,
-    [%expr CssJs.backgroundAttachment],
+    id,
+    fun
+    | [] => failwith("expected at least one argument")
+    | [v] => [[%expr CssJs.backgroundAttachment([%e render_attachment(v)])]]
+    | _ => raise(Unsupported_feature)
   );
+
+let render_bg_position = (bg_position) => {
+
+  let render_static = fun
+  | `Center => [%expr `center]
+  | `Left => [%expr `center]
+  | `Right => [%expr `center]
+  | `Bottom => [%expr `center]
+  | `Top => [%expr `center]
+  | `Extended_length(l) => render_extended_length(l)
+  | `Extended_percentage(p) => render_extended_percentage(p);
+
+  let render_and = fun
+    | `Center => [%expr `center]
+    | `Static((a, b)) => switch(b){
+      | Some(b) => [%expr `hv([%e render_static(a)], [%e render_static(b)])]
+      | None => render_static(a)
+    };
+
+  switch(bg_position){
+  | `And(left, right) => [%expr `hv([%e render_and(left)], [%e render_and(right)])]
+  | `Bottom => [%expr `bottom]
+  | `Center => [%expr `center]
+  | `Top => [%expr `top]
+  | `Left => [%expr `left]
+  | `Right => [%expr `right]
+  | `Extended_length(l) => render_extended_length(l)
+  | `Extended_percentage(a) => render_extended_percentage(a)
+  | `Static((x,y)) => [%expr `hv([%e render_static(x)], [%e render_static(y)])];
+  };
+}
+
 let background_position =
-  unsupportedValue(
+  apply(
     Parser.property_background_position,
     [%expr CssJs.backgroundPosition],
+    fun
+    | [] => failwith("expected at least one argument")
+    | [l] => render_bg_position(l)
+    | _ => raise(Unsupported_feature)
   );
 let background_clip =
-  unsupportedValue(
+  apply(
     Parser.property_background_clip,
     [%expr CssJs.backgroundClip],
+    fun
+    | [] => failwith("expected at least one argument")
+    | [v] => variants_to_expression(v)
+    | _ => raise(Unsupported_feature)
   );
 let background_origin =
-  unsupportedValue(
+  apply(
     Parser.property_background_origin,
     [%expr CssJs.backgroundOrigin],
+    fun
+    | [] => failwith("expected at least one argument")
+    | [v] => variants_to_expression(v)
+    | _ => raise(Unsupported_feature)
   );
 let background_size =
-  unsupportedValue(
+  apply(
     Parser.property_background_size,
     [%expr CssJs.backgroundSize],
+    fun
+    | [] => failwith("expected at least one argument")
+    | [v] => switch(v){
+        | `Contain => [%expr `contain]
+        | `Cover => [%expr `cover]
+        | `Xor([`Auto]) => [%expr `auto]
+        | `Xor(l) when List.mem(`Auto, l) => raise(Unsupported_feature)
+        | `Xor([x,y]) => [%expr `size([%e render_size(x)], [%e render_size(y)])]
+        | `Xor([_])
+        | _ => raise(Unsupported_feature)
+        }
+    | _ => raise(Unsupported_feature)
   );
+let render_background = ((layers, final_layer)) => {
+
+  let render_layer = (layer, fn_call, render_fn) => Option.fold(~none=[], ~some=(l => [[%expr [%e fn_call]([%e render_fn(l)])]]), layer);
+
+  let render_layers = ((bg_image, bg_position, repeat_style, attachment, b1, b2)) => {
+    [
+      render_layer(bg_image, [%expr CssJs.background_image], render_background_image),
+      render_layer(repeat_style, [%expr CssJs.backgroundRepeat], render_repeat_style),
+      render_layer(attachment, [%expr CssJs.backgroundRepeat], render_attachment),
+      render_layer(b1, [%expr CssJs.clip], variants_to_expression),
+      render_layer(b2, [%expr CssJs.origin], variants_to_expression),
+    ] @ switch(bg_position){
+      | Some((bg_pos, Some(((), bg_size)))) => [
+        [[%expr CssJs.backgroundPosition([%e render_bg_position(bg_pos)])]],
+        [[%expr CssJs.backgroundSize([%e render_size(bg_size)])]],
+      ]
+      | Some((bg_pos, None)) => [
+        [[%expr CssJs.backgroundPosition([%e render_bg_position(bg_pos)])]],
+      ]
+      | None => []
+    };
+  }
+
+  let render_final_layer = ((bg_color, bg_image, bg_position, repeat_style, attachment, b1, b2)) => {
+    [
+      render_layer(bg_color, [%expr CssJs.backgroundColor], render_color),
+      render_layer(bg_image, [%expr CssJs.background_image], render_background_image),
+      render_layer(repeat_style, [%expr CssJs.backgroundRepeat], render_repeat_style),
+      render_layer(attachment, [%expr CssJs.backgroundRepeat], render_attachment),
+      render_layer(b1, [%expr CssJs.clip], variants_to_expression),
+      render_layer(b2, [%expr CssJs.origin], variants_to_expression),
+    ] @ switch(bg_position){
+      | Some((bg_pos, Some(((), bg_size)))) => [
+        [[%expr CssJs.backgroundPosition([%e render_bg_position(bg_pos)])]],
+        [[%expr CssJs.backgroundSize([%e render_size(bg_size)])]],
+      ]
+      | Some((bg_pos, None)) => [
+        [[%expr CssJs.backgroundPosition([%e render_bg_position(bg_pos)])]],
+      ]
+      | None => []
+    };
+  }
+
+    let l = layers |> List.concat_map(x => x |> fst |> render_layers)
+
+    List.concat([
+     render_final_layer(final_layer) |> List.flatten,
+     l |> List.flatten
+    ])
+}
 let background =
-  unsupportedValue(Parser.property_background, [%expr CssJs.background]);
+  emit(
+    Parser.property_background,
+    id,
+    render_background
+  );
+
 let border_top_color =
   apply(
     Parser.property_border_top_color,
@@ -961,63 +1116,75 @@ let border_style_interp =
   | `Interpolation(name) => render_variable(name)
   | `Line_style(ls) => variants_to_expression(ls);
 
+type borderDirection = All | Left | Bottom | Right | Top;
+
+let render_border = (~direction: borderDirection, border) => {
+  switch (border) {
+  | `None =>
+    let borderFn =
+      switch (direction) {
+      | All => [%expr "border"]
+      | Left => [%expr "borderLeft"]
+      | Bottom => [%expr "borderBottom"]
+      | Right => [%expr "borderRight"]
+      | Top => [%expr "borderTop"]
+      };
+    [[%expr CssJs.unsafe([%e borderFn], "none")]];
+  | `Static(width, style, color) =>
+    let borderFn =
+      switch (direction) {
+      | All => [%expr CssJs.border]
+      | Left => [%expr CssJs.borderLeft]
+      | Bottom => [%expr CssJs.borderBottom]
+      | Right => [%expr CssJs.borderRight]
+      | Top => [%expr CssJs.borderTop]
+      };
+    [
+      [%expr
+        [%e borderFn](
+          [%e render_line_width_interp(width)],
+          [%e border_style_interp(style)],
+          [%e render_color_interp(color)],
+        )
+      ],
+    ];
+  };
+};
+
 let border =
   emit(
     Parser.property_border,
     id,
-    ((width, style, color)) => {
-      let w = render_line_width_interp(width);
-      let s = border_style_interp(style);
-      let c = render_color_interp(color);
-      [[%expr CssJs.border([%e w], [%e s], [%e c])]];
-    },
+    render_border(~direction=All),
   );
+
 let border_top =
   emit(
     Parser.property_border,
     id,
-    ((width, style, color)) => {
-      let w = render_line_width_interp(width);
-      let s = border_style_interp(style);
-      let c = render_color_interp(color);
-      [[%expr CssJs.borderTop([%e w], [%e s], [%e c])]];
-    },
+    render_border(~direction=Top),
   );
+
 let border_right =
   emit(
     Parser.property_border,
     id,
-    ((width, style, color)) => {
-      let w = render_line_width_interp(width);
-      let s = border_style_interp(style);
-      let c = render_color_interp(color);
-      [[%expr CssJs.borderRight([%e w], [%e s], [%e c])]];
-    },
+    render_border(~direction=Right),
   );
 let border_bottom =
   emit(
     Parser.property_border,
     id,
-    ((width, style, color)) => {
-      let w = render_line_width_interp(width);
-      let s = border_style_interp(style);
-      let c = render_color_interp(color);
-      [[%expr CssJs.borderBottom([%e w], [%e s], [%e c])]];
-    },
+    render_border(~direction=Bottom)
   );
 let border_left =
   emit(
     Parser.property_border,
     id,
-    ((width, style, color)) => {
-      let w = render_line_width_interp(width);
-      let s = border_style_interp(style);
-      let c = render_color_interp(color);
-      [[%expr CssJs.borderLeft([%e w], [%e s], [%e c])]];
-    },
+    render_border(~direction=Left)
   );
 
-let border_value =
+let render_border_radius_value =
   fun
   | [`Extended_length(l)] => render_extended_length(l)
   | [`Extended_percentage(p)] => render_extended_percentage(p)
@@ -1027,25 +1194,25 @@ let border_top_left_radius =
   apply(
     Parser.property_border_top_left_radius,
     [%expr CssJs.borderTopLeftRadius],
-    border_value,
+    render_border_radius_value,
   );
 let border_top_right_radius =
   apply(
     Parser.property_border_top_right_radius,
     [%expr CssJs.borderTopRightRadius],
-    border_value,
+    render_border_radius_value,
   );
 let border_bottom_right_radius =
   apply(
     Parser.property_border_bottom_right_radius,
     [%expr CssJs.borderBottomRightRadius],
-    border_value,
+    render_border_radius_value,
   );
 let border_bottom_left_radius =
   apply(
     Parser.property_border_bottom_left_radius,
     [%expr CssJs.borderBottomLeftRadius],
-    border_value,
+    render_border_radius_value,
   );
 let border_radius =
   apply(
