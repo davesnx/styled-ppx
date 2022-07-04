@@ -204,19 +204,10 @@ let url = [%sedlex.regexp? url_unquoted | string];
 
 let operator = [%sedlex.regexp? "~=" | "|=" | "^=" | "$=" | "*=" | "||"];
 
+let at_rule_without_body = [%sedlex.regexp? ("@", "charset" | "import" | "namespace")];
 let at_rule = [%sedlex.regexp? ("@", ident)];
-
-let at_rule_without_body = [%sedlex.regexp?
-  ("@", "charset" | "import" | "namespace")
-];
-
 let at_media = [%sedlex.regexp? ("@", "media")];
-
 let at_keyframes = [%sedlex.regexp? ("@", "keyframes")];
-
-let at_rule = [%sedlex.regexp?
-  ("@", "document" | "supports" | "scope")
-];
 
 let _a = [%sedlex.regexp? 'A' | 'a'];
 let _b = [%sedlex.regexp? 'B' | 'b'];
