@@ -105,6 +105,22 @@ at_rule:
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
+  /* @{{rule}} {} */
+  | name = with_whitespace(with_loc(AT_RULE)); xs = prelude; s = empty_brace_block {
+    { At_rule.name = name;
+      prelude = xs;
+      block = Brace_block.Empty;
+      loc = Lex_buffer.make_loc $startpos $endpos;
+    }
+  }
+  /* @{{rule}} { ... } */
+  | name = with_whitespace(with_loc(AT_RULE)); xs = prelude; s = with_whitespace(brace_block(stylesheet_without_eof)) {
+    { At_rule.name = name;
+      prelude = xs;
+      block = Brace_block.Stylesheet s;
+      loc = Lex_buffer.make_loc $startpos $endpos;
+    }
+  }
 ;
 
 /* .class {} */
