@@ -52,11 +52,6 @@ let testData = [
     %cx("@media only $(Variables.media_type) and (min-width: $(width)) { color: red }"),
     CssJs.style(. [CssJs.media(. "only screen and (min-width: 218px) ", [CssJs.color(CssJs.red)])]),
   ),
-  (
-    "@media support calc and interpolation",
-    %cx("@media (max-width: calc( 20px * $(width))) { color: red }"),
-    CssJs.style(. [CssJs.media(. "(max-width: calc(20px * 218px)) ", [CssJs.color(CssJs.red)])]),
-  ),
   /* (
     "prefers-color-scheme: dark",
     [%cx "@media (prefers-color-scheme: dark) { color: white; }"],
