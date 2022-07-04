@@ -146,7 +146,21 @@ let selectors_css_tests = [
         [||]
       )
     |])],
-  )
+  ),
+  /* (
+    "&.bar",
+    [%expr [%cx "&.bar {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|&.bar|js}, [||])|])],
+  ),
+  (
+    "& .bar",
+    [%expr [%cx "& .bar {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& .bar|js}, [||])|])],
+  ) */
+  /* p :first-child */
+  /* p:first-child */
+  /* p#first-child */
+  /* p #first-child */
 ];
 
 describe("Should transform selectors", ({test, _}) => {
