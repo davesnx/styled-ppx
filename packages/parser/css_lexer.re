@@ -51,6 +51,7 @@ let token_to_string =
   | Parser.STRING(s) => "'" ++ s ++ "'"
   | Parser.URI(s) => s
   | Parser.OPERATOR(s) => s
+  | Parser.COMBINATOR(s)
   | Parser.DELIM(s) => s
   | Parser.AT_MEDIA(s)
   | Parser.AT_KEYFRAMES(s)
@@ -63,6 +64,8 @@ let token_to_string =
   | Parser.DIMENSION((n, d)) => n ++ "." ++ d
   | Parser.VARIABLE(v) => String.concat(".", v)
   | Parser.WS => " "
+  | Parser.DOT => "."
+  | Parser.COMMA => ","
 ;
 
 let token_to_debug =
@@ -99,6 +102,9 @@ let token_to_debug =
     ++ "')"
   | Parser.DIMENSION((n, d)) => "DIMENSION('" ++ n ++ ", " ++ d ++ "')"
   | Parser.VARIABLE(v) => "VARIABLE('" ++ (String.concat(".", v)) ++ "')"
+  | Parser.COMBINATOR(s) => "COMBINATOR(" ++ s ++ ")"
+  | Parser.DOT => "DOT"
+  | Parser.COMMA => "COMMA"
   | Parser.WS => "WS"
 ;
 
@@ -196,7 +202,9 @@ let non_printable = [%sedlex.regexp?
   '\000' .. '\b' | '\011' | '\014' .. '\031' | '\127'
 ];
 
-let operator = [%sedlex.regexp? "~=" | "|=" | "^=" | "$=" | "*=" | "||"];
+let operator = [%sedlex.regexp? "~=" | "|=" | "^=" | "$=" | "*="];
+
+let combinator = [%sedlex.regexp? '>' | '+' | '~' | "||"];
 
 let at_rule_without_body = [%sedlex.regexp? ("@", "charset" | "import" | "namespace")];
 let at_rule = [%sedlex.regexp? ("@", ident)];
@@ -273,6 +281,7 @@ let rec get_next_token = buf => {
   | eof => EOF
   | whitespaces => WS
   | "/*" => discard_comments(buf)
+  | '.' => DOT
   | ';' => SEMI_COLON
   | '}' => RIGHT_BRACE
   | '{' => LEFT_BRACE
@@ -284,8 +293,10 @@ let rec get_next_token = buf => {
   | ']' => RIGHT_BRACKET
   | '%' => PERCENTAGE
   | '&' => AMPERSAND
+  | ',' => COMMA
   | variable => VARIABLE(Sedlexing.latin1(~skip=2, ~drop=1, buf) |> String.split_on_char('.'))
   | operator => OPERATOR(Sedlexing.latin1(buf))
+  | combinator => COMBINATOR(Sedlexing.latin1(buf))
   | string => STRING(Sedlexing.latin1(~skip=1, ~drop=1, buf))
   | important => IMPORTANT
   | at_media => AT_MEDIA(Sedlexing.latin1(~skip=1, buf))

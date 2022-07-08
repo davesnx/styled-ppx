@@ -238,6 +238,7 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
       | Delim(".") => render_prelude_value(acc ++ ".", rest)
       | Delim("*") => render_prelude_value(acc ++ "*", rest)
       | Delim(",") => render_prelude_value(acc ++ ", ", rest)
+      | Combinator(v)
       | Delim(v) => render_prelude_value(acc ++ " " ++ v ++ " ", rest)
       | Ident(v)
       | Operator(v)
@@ -252,6 +253,7 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
             switch (next_value) {
             | Delim(".")
             | Delim(",") => "& "
+            | Combinator(_)
             | Delim(_)
             | Pseudoclass(_)
             | Pseudoelement(_)

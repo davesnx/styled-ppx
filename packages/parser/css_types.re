@@ -15,6 +15,7 @@ module rec Component_value: {
     | Selector(list(with_loc(t)))
     | Uri(string)
     | Operator(string)
+    | Combinator(string)
     | Delim(string)
     | Function(with_loc(string), with_loc(list(with_loc(t))))
     | Pseudoclass(with_loc(string))
@@ -71,7 +72,43 @@ and Rule: {
     | Style_rule(Style_rule.t)
     | At_rule(At_rule.t);
 } = Rule
-and Stylesheet: {type t = with_loc(list(Rule.t));} = Stylesheet;
+and Stylesheet: {type t = with_loc(list(Rule.t));} = Stylesheet
+
+and Selector: {
+  type complex_selector =
+    | Selector(compound_selector)
+    | Combinator({
+      left: complex_selector,
+      combinator,
+      right: compound_selector
+    })
+    and compound_selector = {
+      type_selector: option(string),
+      subclass_selectors: list(subclass_selector),
+      pseudo_selectors: list(pseudo_selector),
+    }
+    and combinator = string
+    and subclass_selector =
+    | Id(string)
+    | Class(string)
+    | Attribute(attribute_selector)
+    and attribute_selector =
+      | Attr_value(string)
+      | To_equal({
+        name: string,
+        kind: string,
+        value: string,
+      })
+    and pseudo_selector =
+      | Pseudoelement(string)
+      | Pseudoclass(pseudoclass_kind)
+    and pseudoclass_kind =
+      | Ident(string)
+      | Function({
+        name: string,
+        payload: list(with_loc(Component_value.t))
+      })
+} = Selector
 
 /*
 [@deriving show]

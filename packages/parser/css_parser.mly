@@ -12,16 +12,19 @@ open Css_types
 %token LEFT_BRACKET
 %token RIGHT_BRACKET
 %token COLON
+%token DOT
 %token DOUBLE_COLON
 %token SEMI_COLON
 %token PERCENTAGE
 %token IMPORTANT
 %token AMPERSAND
 %token WS
+%token COMMA
 %token <string> IDENT
 %token <string> STRING
 %token <string> URI
 %token <string> OPERATOR
+%token <string> COMBINATOR
 %token <string> DELIM
 %token <string> AT_MEDIA
 %token <string> AT_KEYFRAMES
@@ -163,15 +166,7 @@ declaration_without_eof:
   }
 ;
 
-/* ::after */
-pseudoelement: DOUBLE_COLON; i = with_loc(IDENT) { i };
-/* :visited */
-pseudoclass: COLON; i = with_loc(IDENT) { i };
-/* :nth-child() */
-pseudoclassfunction: COLON; f = with_loc(IDENT); xs = with_loc(paren_block) {
-  Component_value.PseudoclassFunction (f, xs)
-};
-
+// https://www.w3.org/TR/selectors-4/#grammar
 selector:
   /* & + component_value */
   | AMPERSAND; tl = nonempty_list(with_loc(component_value)); WS? {
@@ -185,6 +180,95 @@ selector:
     ]
   }
 ;
+
+
+simple_selector:
+  | HASH; i = IDENT { Selector.Id(i) } // id-selector
+  | DOT; i = IDENT { Selector.Class(i) } // class-selector
+;
+
+
+/* ::after */
+pseudoelement_selector: DOUBLE_COLON; i = IDENT { Selector.Pseudoelement(i) };
+/* :visited */
+pseudoclass_selector: COLON; i = IDENT { Selector.(Pseudoclass(Ident(i))) };
+/* :nth-child() */
+pseudoclassfunction_selector: COLON; f = IDENT; xs = paren_block {
+  Selector.(Pseudoclass(Function({ name = f; payload = xs })))
+};
+
+pseudoclass_selectors:
+  | pseudoclass_selector
+  | pseudoclassfunction_selector { <> }
+
+pseudo_selectors:
+  | pseudoelement_selector; { <> }
+  | pseudoclass_selectors; { <> }
+  ;
+
+
+// <wq-name> = <ns-prefix>? <ident-token> ... do we support namespaces?
+wq_name:
+  | IDENT { <> }
+  ;
+
+attr_matcher:
+  | OPERATOR { <> }
+  ;
+
+attribute_selector:
+  | LEFT_BRACE; i = wq_name; RIGHT_BRACE { Selector.Attr_value(i) } // [ident]
+  | LEFT_BRACE; i = wq_name; m = attr_matcher; v = STRING ; RIGHT_BRACE; //[ident="value"]
+  | LEFT_BRACE; i = wq_name; m = attr_matcher; v = IDENT  ; RIGHT_BRACE {
+    Selector.To_equal({
+      name = i;
+      kind = m;
+      value = v
+    }) 
+  } //[ident=value]
+  ;
+
+subclass_selector:
+   | simple_selector { <> }
+   | attribute_selector { <> }
+   | pseudoclass_selector { <> }
+  ;
+
+// simple_selector_list: 
+//   | xs = separated_nonempty_list(COMMA, simple_selector)  { xs } ;
+// complex_selector_list: 
+//   | xs =  separated_nonempty_list(COMMA, complex_selector) { xs } ;
+// compound_selector_list: 
+//   | xs = separated_nonempty_list(COMMA, compound_selector) { xs } ;
+
+// TODO: better name
+pseudoelement_followed_by_pseudoclasslist:
+  | pseudoelement_selector; { <> }
+  | pseudoelement_selector; list(pseudoclass_selectors); { <> }
+;
+
+compound_selector:
+  type_selector = type_selector?; subclass_selectors = list(subclass_selector); list(pseudoelement_followed_by_pseudoclasslist); {
+    Selector.Selector {
+      type_selector;
+      subclass_selectors;
+      pseudo_selectors;
+    } 
+   }
+
+complex_selector:
+  | compound_selector; { <> }
+  | left = complex_selector; combinator = COMBINATOR?; right = compound_selector; { 
+    Selector.Combinator {
+      left;
+      combinator;
+      right;
+    }
+   }
+
+type_selector:
+  | name = wq_name { <> }
+
 
 /* () */
 paren_block:
@@ -203,10 +287,13 @@ component_value:
   | i = IDENT { Component_value.Ident i }
   | s = STRING { Component_value.String s }
   | u = URI { Component_value.Uri u }
+  | c = COMBINATOR { Component_value.Combinator c}
   | o = OPERATOR { Component_value.Operator o }
   | d = DELIM { Component_value.Delim d }
+  | DOT  { Component_value.Delim "." }
   | COLON { Component_value.Delim ":" }
   | DOUBLE_COLON { Component_value.Delim "::" }
+  | COMMA { Component_value.Delim "," }
   | AMPERSAND { Component_value.Ampersand }
   | h = HASH { Component_value.Hash h }
   | n = NUMBER { Component_value.Number n }
@@ -219,8 +306,8 @@ component_value:
   | f = with_loc(IDENT); xs = with_loc(paren_block) {
     Component_value.Function (f, xs)
   }
-  | p = pseudoelement { Component_value.Pseudoelement p}
-  | p = pseudoclass { Component_value.Pseudoclass p }
-  | ps = pseudoclassfunction { ps }
-  | s = selector { Component_value.Selector(s) }
+  // | p = pseudoelement_selector { Component_value.Pseudoelement p}
+  // | p = pseudoclass_selector { Component_value.Pseudoclass p }
+  // | ps = pseudoclassfunction_selector { ps }
+  // | s = selector { Component_value.Selector(s) }
 ;

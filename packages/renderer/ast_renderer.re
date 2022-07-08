@@ -90,6 +90,7 @@ and render_component_value = (ast: with_loc(Component_value.t)) => {
   | String(string) => "String(" ++ string ++ ")"
   | Uri(string) => "Uri(" ++ string ++ ")"
   | Operator(string) => "Operator(" ++ string ++ ")"
+  | Combinator(string) => "Combinator(" ++ string ++ ")"
   | Delim(string) => "Delim(" ++ string ++ ")"
   | Function(name, body) =>
     let body =
