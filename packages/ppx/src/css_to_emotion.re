@@ -301,7 +301,7 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
             ),
           ),
         )
-      | Selector(v) => render_prelude_value(acc, v)
+      | Selector(v) => render_prelude_value(acc, [v])
       | Variable(v) =>
         concat(
           ~loc=value_loc,

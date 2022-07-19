@@ -67,6 +67,7 @@ empty_brace_block: LEFT_BRACE; WS?; RIGHT_BRACE; SEMI_COLON?; { [] }
 
 with_loc(X): x = X { (x, Lex_buffer.make_loc $startpos(x) $endpos(x))}
 
+// https://www.w3.org/TR/css-syntax-3/#at-keyword-token-diagram
 at_rule:
   /* @charset */
   | name = with_whitespace(with_loc(AT_RULE_WITHOUT_BODY)); xs = prelude; SEMI_COLON?; {
@@ -142,7 +143,10 @@ style_rule:
   }
 ;
 
-prelude: xs=with_loc(selector) { ([(Component_value.Selector(xs), Lex_buffer.make_loc $startpos(xs) $endpos(xs))], Lex_buffer.make_loc $startpos $endpos) };
+prelude:
+  xs = with_loc(selector) {
+    ([(Component_value.Selector(xs), Lex_buffer.make_loc $startpos(xs) $endpos(xs))], Lex_buffer.make_loc $startpos $endpos)
+  };
 
 declarations:
   | xs = nonempty_list(with_whitespace(declaration_or_at_rule)); SEMI_COLON?; { xs }
@@ -181,68 +185,89 @@ declaration_without_eof:
 //   }
 // ;
 
+/* ::after */
+pseudo_element_selector: DOUBLE_COLON; i = IDENT { Selector.Pseudoelement(i) };
 
-simple_selector:
-  | i = HASH { Selector.Id(i) } // id-selector
-  | DOT; i = IDENT { Selector.Class(i) } // class-selector
+// TODO: <function-token> and <any-value>
+// <pseudo-class-selector> = ':' <ident-token> | ':' <function-token> <any-value> ')'
+pseudo_class_selector:
+  /* :visited */
+  | COLON; i = IDENT { Selector.(Pseudoclass(Ident(i))) }
+  /* :nth-child() */
+  | COLON; f = IDENT; xs = paren_block {
+    Selector.(Pseudoclass(Function({ name = f; payload = xs })))
+  }
 ;
 
-
-/* ::after */
-pseudoelement_selector: DOUBLE_COLON; i = IDENT { Selector.Pseudoelement(i) };
-/* :visited */
-pseudoclass_selector: COLON; i = IDENT { Selector.(Pseudoclass(Ident(i))) };
-/* :nth-child() */
-pseudoclassfunction_selector: COLON; f = IDENT; xs = paren_block {
-  Selector.(Pseudoclass(Function({ name = f; payload = xs })))
-};
-
-pseudoclass_selectors:
-  | p = pseudoclass_selector { p }
-  | p = pseudoclassfunction_selector { p }
-
-pseudo_selectors:
-  | p = pseudoelement_selector; { p }
-  | p = pseudoclass_selectors; { p }
-  ;
-
-
-// <wq-name> = <ns-prefix>? <ident-token> ... do we support namespaces?
-wq_name:
-  | i = IDENT { i }
-  ;
+/* pseudo_selectors:
+  | p = pseudo_element_selector; { p }
+  | p = pseudo_class_selector; { p }
+; */
 
 attr_matcher:
   | o = OPERATOR { o }
-  ;
+;
 
+// <attribute-selector> = '[' <wq-name> ']' | '[' <wq-name> <attr-matcher> [ <string-token> | <ident-token> ] <attr-modifier>? ']'
 attribute_selector:
-  | LEFT_BRACKET; i = wq_name; RIGHT_BRACKET { Selector.Attr_value(i) } // [ident]
-  | LEFT_BRACKET; i = wq_name; m = attr_matcher; v = STRING ; RIGHT_BRACKET; //[ident="value"]
-  | LEFT_BRACKET; i = wq_name; m = attr_matcher; v = IDENT  ; RIGHT_BRACKET {
-    Selector.To_equal({
-      name = i;
-      kind = m;
-      value = v
-    })
-  } //[ident=value]
-  ;
+  // https://www.w3.org/TR/selectors-4/#type-nmsp
+  // We don't support namespaces in wq-name (`ns-prefix?`). We treat it like a IDENT
+  // [ <wq-name> ]
+  | LEFT_BRACKET; i = IDENT; RIGHT_BRACKET {
+    Selector.Attribute(Attr_value(i))
+  }
+  // [ wq-name = "value"]
+  | LEFT_BRACKET; i = IDENT; m = attr_matcher; v = STRING; RIGHT_BRACKET;
+  // [ wq-name = value]
+  | LEFT_BRACKET; i = IDENT; m = attr_matcher; v = IDENT; RIGHT_BRACKET {
+    Selector.Attribute(
+      To_equal({
+        name = i;
+        kind = m;
+        value = v
+      })
+    )
+  }
+  // TODO: add attr-modifier
+;
 
+// <simple-selector> = <type-selector> | <subclass-selector>
+simple_selector:
+  /* a {} */
+  | s = type_selector { Selector.Type s }
+  /* #a, .a, a:visited, a[] */
+  | sb = subclass_selector { Selector.Subclass sb }
+;
+
+// <id-selector> = <hash-token>
+id_selector:
+  | h = HASH { Selector.Id(h) }
+;
+
+// <class-selector> = '.' <ident-token>
+class_selector:
+  | DOT; i = IDENT { Selector.Class(i) }
+;
+
+// <subclass-selector> = <id-selector> | <class-selector> | <attribute-selector> | <pseudo-class-selector>
 subclass_selector:
-   | s = simple_selector { s }
-   | a = attribute_selector { Selector.Attribute a }
-  //  | p = pseudoclass_selector { p }
-  ;
+  | id = id_selector { id }
+  | c = class_selector { c }
+  | a = attribute_selector { a }
+  | pcs = pseudo_class_selector { Selector.Pseudo_class pcs }
+;
 
+// <complex-selector-list> = <complex-selector>#
 complex_selector_list:
   | xs = separated_nonempty_list(COMMA, complex_selector) { Selector.ComplexSelectorList(xs)} ;
 
+// <simple-selector-list> = <simple-selector>#
 simple_selector_list:
-  | xs = separated_nonempty_list(COMMA, subclass_selector) { Selector.SimpleSelectorList(xs)} ;
+  | xs = separated_nonempty_list(COMMA, simple_selector) { Selector.SimpleSelectorList(xs)} ;
 
+// <compound-selector-list> = <compound-selector>#
 compound_selector_list:
   | xs = separated_nonempty_list(COMMA, compound_selector) { Selector.CompoundSelectorList(xs)} ;
-
 
 selector:
   | xs = simple_selector_list { xs }
@@ -250,20 +275,27 @@ selector:
   | xs = complex_selector_list { xs }
 
 // TODO: better name
+/* [ <pseudo-element-selector> <pseudo-class-selector>* ] */
 pseudoelement_followed_by_pseudoclasslist:
-  | e = pseudoelement_selector; xs = list(pseudoclass_selectors); { (e, xs) }
+  | e = pseudo_element_selector; xs = list(pseudo_class_selector); { (e, xs) }
 ;
 
+// <compound-selector> = [ <type-selector>? <subclass-selector>* [ <pseudo-element-selector> <pseudo-class-selector>* ]* ]!
+// Got the impression ^ is not correct, and should be
+// <compound-selector> = [ <type-selector> | <subclass-selector>* [ <pseudo-element-selector> <pseudo-class-selector>* ]* ]!
+
 compound_selector:
-  type_selector = option(IDENT); subclass_selectors = list(subclass_selector); pseudo_selectors= list(pseudoelement_followed_by_pseudoclasslist); {
+  simple_selector = simple_selector; subclass_selectors = list(subclass_selector); pseudo_selectors = list(pseudoelement_followed_by_pseudoclasslist); {
     Selector.{
-      type_selector;
+      simple_selector;
       subclass_selectors;
       pseudo_selectors;
     }
    }
 
+// <complex-selector> = <compound-selector> [ <combinator>? <compound-selector> ]*
 complex_selector:
+  /* | one = compound_selector; { Selector.selector one } */
   | left = compound_selector; combinator = COMBINATOR?; right = compound_selector; {
     Selector.Combinator {
       left;
@@ -272,8 +304,9 @@ complex_selector:
     }
    }
 
-/* type_selector:
-  | name = wq_name { name } */
+// <type-selector> = <wq-name> | <ns-prefix>? '*'
+type_selector:
+  | name = IDENT { name }
 
 /* () */
 paren_block:
@@ -295,7 +328,7 @@ component_value:
   | c = COMBINATOR { Component_value.Combinator c}
   | o = OPERATOR { Component_value.Operator o }
   | d = DELIM { Component_value.Delim d }
-  | DOT  { Component_value.Delim "." }
+  | DOT { Component_value.Delim "." }
   | COLON { Component_value.Delim ":" }
   | DOUBLE_COLON { Component_value.Delim "::" }
   | COMMA { Component_value.Delim "," }
@@ -311,8 +344,8 @@ component_value:
   | f = with_loc(IDENT); xs = with_loc(paren_block) {
     Component_value.Function (f, xs)
   }
-  // | p = pseudoelement_selector { Component_value.Pseudoelement p}
-  // | p = pseudoclass_selector { Component_value.Pseudoclass p }
-  // | ps = pseudoclassfunction_selector { ps }
-  // | s = selector { Component_value.Selector(s) }
+  // | p = pseudo_element_selector { Component_value.Pseudoelement p}
+  // | p = pseudo_class_selector { Component_value.Pseudoclass p }
+  // | ps = pseudo_class_function_selector { ps }
+  | s = with_loc(selector) { Component_value.Selector(s) }
 ;

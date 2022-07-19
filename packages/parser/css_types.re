@@ -76,7 +76,7 @@ and Rule: {
 and Stylesheet: {type t = with_loc(list(Rule.t));} = Stylesheet
 and Selector: {
   type t =
-    | SimpleSelectorList(list(subclass_selector))
+    | SimpleSelectorList(list(simple_selector))
     | ComplexSelectorList(list(complex_selector))
     | CompoundSelectorList(list(compound_selector))
   and complex_selector =
@@ -87,17 +87,21 @@ and Selector: {
         right: compound_selector,
       })
   and compound_selector = {
-    type_selector: option(string),
+    simple_selector,
     subclass_selectors: list(subclass_selector),
     pseudo_selectors:
       list(
-        (pseudo_selector(string), list(pseudo_selector(pseudoclass_kind))),
+        (pseudo_selector, list(pseudo_selector)),
       ),
   }
+  and simple_selector =
+    | Type(string)
+    | Subclass(subclass_selector)
   and subclass_selector =
     | Id(string)
     | Class(string)
     | Attribute(attribute_selector)
+    | Pseudo_class(pseudo_selector)
   and attribute_selector =
     | Attr_value(string)
     | To_equal({
@@ -105,9 +109,9 @@ and Selector: {
         kind: string,
         value: string,
       })
-  and pseudo_selector(_) =
-    | Pseudoelement(string): pseudo_selector(string)
-    | Pseudoclass(pseudoclass_kind): pseudo_selector(pseudoclass_kind)
+  and pseudo_selector =
+    | Pseudoelement(string)
+    | Pseudoclass(pseudoclass_kind)
   and pseudoclass_kind =
     | Ident(string)
     | Function({
