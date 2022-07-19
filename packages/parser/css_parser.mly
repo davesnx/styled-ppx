@@ -142,7 +142,7 @@ style_rule:
   }
 ;
 
-prelude: xs = with_loc(nonempty_list(with_whitespace(with_loc(component_value)))) { xs };
+prelude: xs=with_loc(selector) { ([(Component_value.Selector(xs), Lex_buffer.make_loc $startpos(xs) $endpos(xs))], Lex_buffer.make_loc $startpos $endpos) };
 
 declarations:
   | xs = nonempty_list(with_whitespace(declaration_or_at_rule)); SEMI_COLON?; { xs }
@@ -166,24 +166,24 @@ declaration_without_eof:
   }
 ;
 
-// https://www.w3.org/TR/selectors-4/#grammar
-selector:
-  /* & + component_value */
-  | AMPERSAND; tl = nonempty_list(with_loc(component_value)); WS? {
-    (Component_value.Ampersand, Lex_buffer.make_loc $startpos $endpos) :: tl
-  }
-  /* lola[] */
-  | i = IDENT; b = bracket_block; WS?; {
-    [
-      (Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i));
-      (Component_value.Bracket_block b, Lex_buffer.make_loc $startpos(b) $endpos(b))
-    ]
-  }
-;
+// // https://www.w3.org/TR/selectors-4/#grammar
+// selector:
+//   /* & + component_value */
+//   | AMPERSAND; tl = nonempty_list(with_loc(component_value)); WS? {
+//     (Component_value.Ampersand, Lex_buffer.make_loc $startpos $endpos) :: tl
+//   }
+//   /* lola[] */
+//   | i = IDENT; b = bracket_block; WS?; {
+//     [
+//       (Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i));
+//       (Component_value.Bracket_block b, Lex_buffer.make_loc $startpos(b) $endpos(b))
+//     ]
+//   }
+// ;
 
 
 simple_selector:
-  | HASH; i = IDENT { Selector.Id(i) } // id-selector
+  | i = HASH { Selector.Id(i) } // id-selector
   | DOT; i = IDENT { Selector.Class(i) } // class-selector
 ;
 
@@ -198,28 +198,28 @@ pseudoclassfunction_selector: COLON; f = IDENT; xs = paren_block {
 };
 
 pseudoclass_selectors:
-  | pseudoclass_selector
-  | pseudoclassfunction_selector { <> }
+  | p = pseudoclass_selector { p }
+  | p = pseudoclassfunction_selector { p }
 
 pseudo_selectors:
-  | pseudoelement_selector; { <> }
-  | pseudoclass_selectors; { <> }
+  | p = pseudoelement_selector; { p }
+  | p = pseudoclass_selectors; { p }
   ;
 
 
 // <wq-name> = <ns-prefix>? <ident-token> ... do we support namespaces?
 wq_name:
-  | IDENT { <> }
+  | i = IDENT { i }
   ;
 
 attr_matcher:
-  | OPERATOR { <> }
+  | o = OPERATOR { o }
   ;
 
 attribute_selector:
-  | LEFT_BRACE; i = wq_name; RIGHT_BRACE { Selector.Attr_value(i) } // [ident]
-  | LEFT_BRACE; i = wq_name; m = attr_matcher; v = STRING ; RIGHT_BRACE; //[ident="value"]
-  | LEFT_BRACE; i = wq_name; m = attr_matcher; v = IDENT  ; RIGHT_BRACE {
+  | LEFT_BRACKET; i = wq_name; RIGHT_BRACKET { Selector.Attr_value(i) } // [ident]
+  | LEFT_BRACKET; i = wq_name; m = attr_matcher; v = STRING ; RIGHT_BRACKET; //[ident="value"]
+  | LEFT_BRACKET; i = wq_name; m = attr_matcher; v = IDENT  ; RIGHT_BRACKET {
     Selector.To_equal({
       name = i;
       kind = m;
@@ -229,27 +229,34 @@ attribute_selector:
   ;
 
 subclass_selector:
-   | simple_selector { <> }
-   | attribute_selector { <> }
-   | pseudoclass_selector { <> }
+   | s = simple_selector { s }
+   | a = attribute_selector { Selector.Attribute a }
+  //  | p = pseudoclass_selector { p }
   ;
 
-// simple_selector_list: 
-//   | xs = separated_nonempty_list(COMMA, simple_selector)  { xs } ;
-// complex_selector_list: 
-//   | xs =  separated_nonempty_list(COMMA, complex_selector) { xs } ;
-// compound_selector_list: 
-//   | xs = separated_nonempty_list(COMMA, compound_selector) { xs } ;
+complex_selector_list: 
+  | xs =  separated_nonempty_list(COMMA, complex_selector) { Selector.ComplexSelectorList(xs)} ;
+
+simple_selector_list:
+  | xs =  separated_nonempty_list(COMMA, subclass_selector) { Selector.SimpleSelectorList(xs)} ;
+
+compound_selector_list:
+  | xs =  separated_nonempty_list(COMMA, compound_selector) { Selector.CompoundSelectorList(xs)} ;
+
+
+selector:
+  | xs = simple_selector_list { xs }
+  | xs = compound_selector_list { xs }
+  | xs = complex_selector_list { xs }
 
 // TODO: better name
 pseudoelement_followed_by_pseudoclasslist:
-  | pseudoelement_selector; { <> }
-  | pseudoelement_selector; list(pseudoclass_selectors); { <> }
+  | e = pseudoelement_selector; xs = list(pseudoclass_selectors); { (e, xs) }
 ;
 
 compound_selector:
-  type_selector = type_selector?; subclass_selectors = list(subclass_selector); list(pseudoelement_followed_by_pseudoclasslist); {
-    Selector.Selector {
+  type_selector = option(IDENT); subclass_selectors = list(subclass_selector); pseudo_selectors= list(pseudoelement_followed_by_pseudoclasslist); {
+    Selector.{
       type_selector;
       subclass_selectors;
       pseudo_selectors;
@@ -257,7 +264,7 @@ compound_selector:
    }
 
 complex_selector:
-  | compound_selector; { <> }
+  | c = compound_selector; { Selector.Selector c }
   | left = complex_selector; combinator = COMBINATOR?; right = compound_selector; { 
     Selector.Combinator {
       left;
@@ -267,7 +274,7 @@ complex_selector:
    }
 
 type_selector:
-  | name = wq_name { <> }
+  | name = wq_name { name }
 
 
 /* () */

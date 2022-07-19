@@ -12,7 +12,7 @@ module rec Component_value: {
     | Percentage(string)
     | Ident(string)
     | String(string)
-    | Selector(list(with_loc(t)))
+    | Selector((with_loc(Selector.t)))
     | Uri(string)
     | Operator(string)
     | Combinator(string)
@@ -75,7 +75,11 @@ and Rule: {
 and Stylesheet: {type t = with_loc(list(Rule.t));} = Stylesheet
 
 and Selector: {
-  type complex_selector =
+  type t =
+  | SimpleSelectorList(list(subclass_selector))
+  | ComplexSelectorList(list(complex_selector))
+  | CompoundSelectorList(list(compound_selector))
+  and complex_selector =
     | Selector(compound_selector)
     | Combinator({
       left: complex_selector,
@@ -85,9 +89,9 @@ and Selector: {
     and compound_selector = {
       type_selector: option(string),
       subclass_selectors: list(subclass_selector),
-      pseudo_selectors: list(pseudo_selector),
+      pseudo_selectors: list((pseudo_selector(string), list(pseudo_selector(pseudoclass_kind)))),
     }
-    and combinator = string
+    and combinator = option(string)
     and subclass_selector =
     | Id(string)
     | Class(string)
@@ -99,9 +103,9 @@ and Selector: {
         kind: string,
         value: string,
       })
-    and pseudo_selector =
-      | Pseudoelement(string)
-      | Pseudoclass(pseudoclass_kind)
+    and pseudo_selector(_) =
+      | Pseudoelement(string) : pseudo_selector(string)
+      | Pseudoclass(pseudoclass_kind) : pseudo_selector(pseudoclass_kind)
     and pseudoclass_kind =
       | Ident(string)
       | Function({
@@ -109,44 +113,3 @@ and Selector: {
         payload: list(with_loc(Component_value.t))
       })
 } = Selector
-
-/*
-[@deriving show]
-type complex_selector =
-  | Selector(compound_selector)
-  | Combinator({
-      left: complex_selector,
-      combinator,
-      right: compound_selector,
-    })
-and compound_selector = {
-  type_selector: option(string),
-  subclass_selectors: list(subclass_selector),
-  pseudo_selectors: list(pseudo_selector),
-}
-and subclass_selector =
-  | Id(string)
-  | Class(string)
-  | Attribute(attribute_selector)
-and attribute_selector =
-  | Exists(string)
-  | To_equal({
-      name: string,
-      kind: option([ | `Asterisk | `Caret | `Dollar | `Pipe | `Tilde]),
-      value: string,
-      modifier: option([ | `i | `s]),
-    })
-and pseudo_selector =
-  | Pseudo_class(pseudo_selector_kind)
-  | Pseudo_element(pseudo_selector_kind)
-and pseudo_selector_kind =
-  | Ident(string)
-  | Function({
-      name: string,
-      payload: list(token),
-    })
-and combinator =
-  | Juxtaposition
-  | Greater
-  | Plus
-  | Tilde; */

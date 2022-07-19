@@ -74,6 +74,51 @@ and render_declaration_value =
     ast |> fst |> List.map(render_component_value) |> String.concat(", ");
   "[" ++ inner ++ "]";
 }
+
+and render_selector = (ast: Selector.t) => {
+  let render_subclass_selector : Selector.subclass_selector => string = fun
+    | Id(v) => "#" ++ v
+    | Class(v) => "." ++ v
+    | Attribute(Attr_value(v)) => "[" ++ v ++ "]"
+    | Attribute(To_equal({name, kind, value})) => "[" ++ name ++ kind ++ value ++ "]";
+
+  let render_pseudo_selector: type a. Selector.pseudo_selector(a) => string= pseudo_selector => {
+    switch(pseudo_selector){
+      | Pseudoelement(v) => "::" ++ v
+      | Pseudoclass(Ident(i)) => ":" ++ i
+      | Pseudoclass(Function({name, payload})) => ":" ++ name ++ (List.map(render_component_value, payload) |> String.concat(""))
+    }
+  }
+
+
+  let render_compound_selector = (compound_selector : Selector.compound_selector) => {
+
+    let render_selector_list = pseudo_selector => {
+      (fst(pseudo_selector) |> render_pseudo_selector ) ++ (snd(pseudo_selector) |> List.map(render_pseudo_selector) |> String.concat(""))
+    }
+
+    let type_selector = Option.fold(~none="", ~some=Fun.id, compound_selector.type_selector);
+    let subclass_selectors = List.map(render_subclass_selector, compound_selector.subclass_selectors) |> String.concat(" ");
+    let pseudo_selectors = List.map(render_selector_list, compound_selector.pseudo_selectors) |> String.concat("");
+    type_selector ++ subclass_selectors ++ pseudo_selectors
+  }
+
+  let rec render_complex_selector : Selector.complex_selector => string = fun
+    | Combinator({
+      left,
+      combinator,
+      right
+    }) => render_complex_selector(left) ++ Option.fold(~none=" ", ~some=Fun.id, combinator) ++ render_compound_selector(right)
+    | _ => assert false
+
+
+  switch(ast) {
+    | SimpleSelectorList(v) => v |> List.map(render_subclass_selector) |> String.concat(",")
+    | ComplexSelectorList(v) => v |> List.map(render_complex_selector) |> String.concat(",")
+    | CompoundSelectorList(v) => v |> List.map(render_compound_selector) |> String.concat(",")
+  }
+
+}
 and render_component_value = (ast: with_loc(Component_value.t)) => {
   let value = ast |> fst;
   switch (value) {
@@ -116,7 +161,7 @@ and render_component_value = (ast: with_loc(Component_value.t)) => {
   | PseudoclassFunction((v, _), (_, _)) =>
     "PseudoclassFunction(" ++ v ++ ")"
   | Selector(v) =>
-    let value = List.map(render_component_value, v) |> String.concat(", ");
+    let value = v |> fst |> render_selector;
     "Selector(" ++ value ++ ")";
   };
 };
