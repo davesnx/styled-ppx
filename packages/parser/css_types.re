@@ -1,4 +1,5 @@
 type with_loc('a) = ('a, Location.t);
+
 type dimension =
   | Length
   | Angle
@@ -12,7 +13,7 @@ module rec Component_value: {
     | Percentage(string)
     | Ident(string)
     | String(string)
-    | Selector((with_loc(Selector.t)))
+    | Selector(with_loc(Selector.t))
     | Uri(string)
     | Operator(string)
     | Combinator(string)
@@ -73,43 +74,44 @@ and Rule: {
     | At_rule(At_rule.t);
 } = Rule
 and Stylesheet: {type t = with_loc(list(Rule.t));} = Stylesheet
-
 and Selector: {
   type t =
-  | SimpleSelectorList(list(subclass_selector))
-  | ComplexSelectorList(list(complex_selector))
-  | CompoundSelectorList(list(compound_selector))
+    | SimpleSelectorList(list(subclass_selector))
+    | ComplexSelectorList(list(complex_selector))
+    | CompoundSelectorList(list(compound_selector))
   and complex_selector =
     | Selector(compound_selector)
     | Combinator({
-      left: complex_selector,
-      combinator,
-      right: compound_selector
-    })
-    and compound_selector = {
-      type_selector: option(string),
-      subclass_selectors: list(subclass_selector),
-      pseudo_selectors: list((pseudo_selector(string), list(pseudo_selector(pseudoclass_kind)))),
-    }
-    and combinator = option(string)
-    and subclass_selector =
+        left: compound_selector,
+        combinator: option(string),
+        right: compound_selector,
+      })
+  and compound_selector = {
+    type_selector: option(string),
+    subclass_selectors: list(subclass_selector),
+    pseudo_selectors:
+      list(
+        (pseudo_selector(string), list(pseudo_selector(pseudoclass_kind))),
+      ),
+  }
+  and subclass_selector =
     | Id(string)
     | Class(string)
     | Attribute(attribute_selector)
-    and attribute_selector =
-      | Attr_value(string)
-      | To_equal({
+  and attribute_selector =
+    | Attr_value(string)
+    | To_equal({
         name: string,
         kind: string,
         value: string,
       })
-    and pseudo_selector(_) =
-      | Pseudoelement(string) : pseudo_selector(string)
-      | Pseudoclass(pseudoclass_kind) : pseudo_selector(pseudoclass_kind)
-    and pseudoclass_kind =
-      | Ident(string)
-      | Function({
+  and pseudo_selector(_) =
+    | Pseudoelement(string): pseudo_selector(string)
+    | Pseudoclass(pseudoclass_kind): pseudo_selector(pseudoclass_kind)
+  and pseudoclass_kind =
+    | Ident(string)
+    | Function({
         name: string,
-        payload: list(with_loc(Component_value.t))
-      })
-} = Selector
+        payload: list(with_loc(Component_value.t)),
+      });
+} = Selector;

@@ -224,7 +224,7 @@ attribute_selector:
       name = i;
       kind = m;
       value = v
-    }) 
+    })
   } //[ident=value]
   ;
 
@@ -234,14 +234,14 @@ subclass_selector:
   //  | p = pseudoclass_selector { p }
   ;
 
-complex_selector_list: 
-  | xs =  separated_nonempty_list(COMMA, complex_selector) { Selector.ComplexSelectorList(xs)} ;
+complex_selector_list:
+  | xs = separated_nonempty_list(COMMA, complex_selector) { Selector.ComplexSelectorList(xs)} ;
 
 simple_selector_list:
-  | xs =  separated_nonempty_list(COMMA, subclass_selector) { Selector.SimpleSelectorList(xs)} ;
+  | xs = separated_nonempty_list(COMMA, subclass_selector) { Selector.SimpleSelectorList(xs)} ;
 
 compound_selector_list:
-  | xs =  separated_nonempty_list(COMMA, compound_selector) { Selector.CompoundSelectorList(xs)} ;
+  | xs = separated_nonempty_list(COMMA, compound_selector) { Selector.CompoundSelectorList(xs)} ;
 
 
 selector:
@@ -260,12 +260,11 @@ compound_selector:
       type_selector;
       subclass_selectors;
       pseudo_selectors;
-    } 
+    }
    }
 
 complex_selector:
-  | c = compound_selector; { Selector.Selector c }
-  | left = complex_selector; combinator = COMBINATOR?; right = compound_selector; { 
+  | left = compound_selector; combinator = COMBINATOR?; right = compound_selector; {
     Selector.Combinator {
       left;
       combinator;
@@ -273,9 +272,8 @@ complex_selector:
     }
    }
 
-type_selector:
-  | name = wq_name { name }
-
+/* type_selector:
+  | name = wq_name { name } */
 
 /* () */
 paren_block:
