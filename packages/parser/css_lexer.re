@@ -202,7 +202,7 @@ let non_printable = [%sedlex.regexp?
   '\000' .. '\b' | '\011' | '\014' .. '\031' | '\127'
 ];
 
-let operator = [%sedlex.regexp? "~=" | "|=" | "^=" | "$=" | "*="];
+let operator = [%sedlex.regexp? "~=" | "|=" | "^=" | "$=" | "*="| "="];
 
 let combinator = [%sedlex.regexp? '>' | '+' | '~' | "||"];
 

@@ -217,230 +217,76 @@ and render_declarations = ds => {
     fst(ds),
   );
 }
-and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
-  let (prelude, _) = rule.Style_rule.prelude;
-  let block = rule.Style_rule.block;
-  let (_, loc) = rule.Style_rule.block;
-  let dl_expr = render_declarations(block) |> Builder.pexp_array(~loc);
-
-  let concat = (~loc, expr, acc) => {
-    let concat_fn = {txt: Lident("^"), loc} |> Helper.Exp.ident(~loc);
-    Helper.Exp.apply(~loc, concat_fn, [(Nolabel, expr), (Nolabel, acc)]);
-  };
-
-  let rec render_prelude_value = (acc, list) => {
-    switch (list) {
-    | [] => string_to_const(~loc, acc)
-    | [(value, value_loc), ...rest] =>
-      switch (value) {
-      | Delim(":") => render_prelude_value(acc ++ ":", rest)
-      | Delim("::") => render_prelude_value(acc ++ "::", rest)
-      | Delim(".") => render_prelude_value(acc ++ ".", rest)
-      | Delim("*") => render_prelude_value(acc ++ "*", rest)
-      | Delim(",") => render_prelude_value(acc ++ ", ", rest)
-      | Combinator(v)
-      | Delim(v) => render_prelude_value(acc ++ " " ++ v ++ " ", rest)
-      | Ident(v)
-      | Operator(v)
-      | Number(v) => render_prelude_value(acc ++ v, rest)
-      | Hash(v) => render_prelude_value(acc ++ "#" ++ v, rest)
-      | String(v) => render_prelude_value(acc ++ "\"" ++ v ++ "\"", rest)
-      | Ampersand =>
-        let ampersand =
-          switch (rest) {
-          | [] => "&"
-          | [(next_value, _), ..._] =>
-            switch (next_value) {
-            | Delim(".")
-            | Delim(",") => "& "
-            | Combinator(_)
-            | Delim(_)
-            | Pseudoclass(_)
-            | Pseudoelement(_)
-            | PseudoclassFunction(_) => "&"
-            | _ => "& "
-            }
-          };
-        render_prelude_value(acc ++ ampersand, rest);
-      | Dimension((number, dimension)) =>
-        render_prelude_value(acc ++ number ++ dimension, rest)
-      | Pseudoclass((v, _)) => render_prelude_value(acc ++ ":" ++ v, rest)
-      | PseudoclassFunction((v, _), (_, loc)) => {
-        /* PseudoclassFunction can receive Component_value inside their parens. */
-        /* We don't have the parsing mechanism for supporting: https://www.w3.org/TR/selectors-4/#grammar */
-        /* Meanwhile, we treat it as a string */
-        let body_to_string = source_code_of_loc(loc);
-        render_prelude_value(acc ++ ":" ++ v ++ body_to_string, rest)
-        }
-      | Pseudoelement((v, _)) => render_prelude_value(acc ++ "::" ++ v, rest)
-      | Bracket_block(b) =>
-        concat(
-          ~loc,
-          string_to_const(~loc, acc),
-          concat(
-            ~loc,
-            string_to_const(~loc, "["),
-            concat(
-              ~loc,
-              render_prelude_value("", b),
-              string_to_const(~loc, "]"),
-            ),
-          ),
-        )
-      | Paren_block(b) =>
-        concat(
-          ~loc,
-          string_to_const(~loc, acc),
-          concat(
-            ~loc,
-            string_to_const(~loc, "("),
-            concat(
-              ~loc,
-              render_prelude_value("", b),
-              string_to_const(~loc, ")"),
-            ),
-          ),
-        )
-      | Selector((_v, _loc)) => failwith("Selector not supported")
-      /* | Selector((v, loc)) => render_selector_value(~loc, acc, v) */
-      | Variable(v) =>
-        concat(
-          ~loc=value_loc,
-          string_to_const(~loc=value_loc, acc),
-          concat(
-            ~loc=value_loc,
-            render_variable(~loc=value_loc, v),
-            render_prelude_value("", rest),
-          ),
-        )
-      | _ => grammar_error(value_loc, "Unexpected selector")
-      }
-    };
-  };
-
-  let render_rule_value = (ident, selector) => {
-    Helper.Exp.apply(
-      ~loc=rule.Style_rule.loc,
-      ~attrs=[Create.uncurried(~loc=rule.Style_rule.loc)],
-      ident,
-      [(Nolabel, selector), (Nolabel, dl_expr)],
-    );
-  };
-
-  let pseudoToFn =
+and render_selector = (selector: Selector.t) => {
+  open Selector;
+  let rec render_simple_selector = fun
+    | Type(v) => v
+    | Subclass(v) => render_subclass_selector(v)
+  and render_subclass_selector =
     fun
-    | Pseudoclass((c, _)) =>
-      switch (c) {
-      | "first-line" => "firstLine"
-      | "first-child" => "firstChild"
-      | "first-letter" => "firstLetter"
-      | "first-of-type" => "firstOfType"
-      | "in-range" => "inRange"
-      | "last-child" => "lastChild"
-      | "last-of-type" => "lastOfType"
-      | "nth-child" => "nthChild"
-      | "nth-last-child" => "nthLastChild"
-      | "nth-last-of-type" => "nthLastOfType"
-      | "nth-of-type" => "nthOfType"
-      | "only-child" => "onlyChild"
-      | "only-of-type" => "onlyOfType"
-      | "out-of-range" => "outOfRange"
-      | "read-only" => "readOnly"
-      | "read-write" => "readWrite"
-      | c => c
-      }
-    | Pseudoelement((e, _)) =>
-      switch (e) {
-      | "first-line" => "firstLine"
-      | "first-child" => "firstChild"
-      | "first-letter" => "firstLetter"
-      | "spelling-error" => "spellingError"
-      | "grammar-error" => "grammarError"
-      | e => e
-      }
-    /* TODO */
-    | PseudoclassFunction((e, _), (_, _)) => e
-    | _ => failwith("Expected a Pseudoelement or a Pseudoclass");
+    | Id(v) => "#" ++ v
+    | Class(v) => "." ++ v
+    | Attribute(Attr_value(v)) => "[" ++ v ++ "]"
+    | Attribute(To_equal({name, kind, value})) =>
+      "[" ++ name ++ kind ++ value ++ "]"
+    | Pseudo_class(psc) => render_pseudo_selector(psc)
+  and render_pseudo_selector = fun
+    | Pseudoelement(v) => "::" ++ v
+    | Pseudoclass(Ident(i)) => ":" ++ i
+    | Pseudoclass(Function({name, payload: _})) =>
+      ":"
+      ++ name
+      /* ++ (List.map(render_component_value, payload) |> String.concat("")) */
+      ++ "))";
 
-  let _render_selector_value = (~loc, value, s) => {
-    switch (s) {
-    | PseudoclassFunction(_, _) as p
-    | Pseudoelement((_, _)) as p
-    | Pseudoclass((_, _)) as p =>
-      let selector_ident =
-        Helper.Exp.ident(~loc, CssJs.lident(~loc, pseudoToFn(p)));
-
-      let selector_expr =
-        [
-          Helper.Exp.apply(
-            ~attrs=[Create.uncurried(~loc)],
-            selector_ident,
-            [(Nolabel, dl_expr)],
-          ),
-        ]
-        |> Builder.pexp_array(~loc);
-
-      let selector_name = string_to_const(~loc, value);
-
-      Helper.Exp.apply(
-        ~loc=rule.Style_rule.loc,
-        ~attrs=[Create.uncurried(~loc=rule.Style_rule.loc)],
-        ident,
-        [(Nolabel, selector_name), (Nolabel, selector_expr)],
+  let rec render_compound_selector = compound_selector => {
+    let render_selector_list = pseudo_selector => {
+      (fst(pseudo_selector) |> render_pseudo_selector)
+      ++ (
+        snd(pseudo_selector)
+        |> List.map(render_pseudo_selector)
+        |> String.concat("")
       );
-
-    | Bracket_block(c) =>
-      let selector =
-        concat(
-          ~loc,
-          string_to_const(~loc, value),
-          concat(
-            ~loc,
-            string_to_const(~loc, "["),
-            concat(
-              ~loc,
-              render_prelude_value("", c),
-              string_to_const(~loc, "]"),
-            ),
-          ),
-        );
-      render_rule_value(ident, selector);
-    | Variable(v) =>
-      let variable = render_variable(~loc, v);
-
-      let selector_name = string_to_const(~loc, value);
-
-      Helper.Exp.apply(
-        ~loc=rule.Style_rule.loc,
-        ~attrs=[Create.uncurried(~loc=rule.Style_rule.loc)],
-        ident,
-        [(Nolabel, selector_name), (Nolabel, variable)],
-      );
-    | _ => failwith("Invalid selector")
     };
-  };
+    let simple_selector = render_simple_selector(compound_selector.simple_selector);
+    let subclass_selectors =
+      List.map(render_subclass_selector, compound_selector.subclass_selectors)
+      |> String.concat(" ");
+    let pseudo_selectors =
+      List.map(render_selector_list, compound_selector.pseudo_selectors)
+      |> String.concat("");
 
-  switch (prelude) {
-  /* | [(Selector([(Ident(i), _), (value, value_loc)]), _)] =>
-    render_selector_value(~value_loc, i, value)
-  | [
-      (
-        Selector([
-          (Ampersand, _),
-          (Delim(":"), _) | (Delim("::"), _),
-          (Pseudoclass(_) as p, _) | (Pseudoelement(_) as p, _) | (PseudoclassFunction(_, _) as p, _),
-        ]),
-        _,
-      ),
-    ] =>
-    let ident =
-      pseudoToFn(p) |> CssJs.lident(~loc) |> Helper.Exp.ident(~loc);
-    Helper.Exp.apply(~loc=rule.Style_rule.loc, ident, [(Nolabel, dl_expr)]); */
-  | _ =>
-    /* let selector = render_prelude_value("", prelude);
-    render_rule_value(ident, selector); */
-    [%expr "TOIMPLEMENT"]
+    simple_selector ++ subclass_selectors ++ pseudo_selectors;
+  } and render_complex_selector =
+    fun
+    | Combinator({left, combinator, right}) =>
+      render_compound_selector(left)
+      ++ Option.fold(~none=" ", ~some=Fun.id, combinator)
+      ++ render_compound_selector(right)
+    | Selector(compound) => render_compound_selector(compound)
+
+  switch (selector) {
+  | SimpleSelector(v) =>
+    v |> List.map(render_simple_selector) |> String.concat(",")
+  | ComplexSelector(v) =>
+    v |> List.map(render_complex_selector) |> String.concat(",")
+  | CompoundSelector(v) =>
+    v |> List.map(render_compound_selector) |> String.concat(",")
   };
+}
+and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
+  let (prelude, preludeloc) = rule.Style_rule.prelude;
+  let block = rule.Style_rule.block;
+  let loc = block |> snd;
+  let selector_expr = render_declarations(block) |> Builder.pexp_array(~loc);
+  let selector_name = render_selector(prelude) |> string_to_const(~loc=preludeloc);
+
+  Helper.Exp.apply(
+    ~loc=rule.Style_rule.loc,
+    ~attrs=[Create.uncurried(~loc=rule.Style_rule.loc)],
+    ident,
+    [(Nolabel, selector_name), (Nolabel, selector_expr)],
+  );
 };
 
 let bsEmotionLabel = (~loc, label) => {

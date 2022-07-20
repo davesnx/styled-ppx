@@ -9,10 +9,48 @@ let compare = (input, expected, {expect, _}) => {
 };
 
 let selectors_css_tests = [
+  /* Simple */
+  (
+    ".bar",
+    [%expr [%cx ".bar {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|.bar|js}, [||])|])],
+  ),
+  (
+    "#bar",
+    [%expr [%cx "#bar {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|#bar|js}, [||])|])],
+  ),
+  (
+    "div",
+    [%expr [%cx "div {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|div|js}, [||])|])],
+  ),
+  (
+    "[id=baz]",
+    [%expr [%cx {j|[id=baz] {}|j}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|[id=baz]|js}, [||])|])],
+  ),
+  /* (
+    "[id=baz]",
+    [%expr [%cx {j|[id=baz] {}|j}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|[id=baz]|js}, [||])|])],
+  ), */
+  /* (
+    "html, body",
+    [%expr [%cx {j|html, body {}|j}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|html, body|js}, [||])|])],
+  ), */
+  /* (
+    "*",
+    [%expr [%cx {j|* {}|j}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|*|js}, [||])|])],
+  ), */
+
+  /* Complex */
   /* (
     ">",
-    [%expr [%cx "& > a { }; & > b { };"]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|& > a|js}, [||]), CssJs.selector(. {js|& > b|js}, [||])|])],
+    [%expr [%cx "& > a { };"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& > a|js}, [||])|])],
   ),
   (
     "nth-child(even)",
@@ -153,6 +191,8 @@ let selectors_css_tests = [
   /* p:first-child */
   /* p#first-child */
   /* p #first-child */
+  /* div:nth-child(2n+1 of #someId.someClass) */
+  /* #foo > .bar + div.k1.k2 [id='baz']:hello(2):not(:where(#yolo))::before */
 ];
 
 describe("Should transform selectors", ({test, _}) => {

@@ -9,7 +9,7 @@ let compare = (input, expected, {expect, _}) => {
 };
 
 let properties_variable_css_tests = [
-  /* (
+  (
     [%expr [%css "color: $(mono100);"]],
     [%expr CssJs.color(mono100)]
   ),
@@ -103,7 +103,7 @@ let properties_variable_css_tests = [
         color
       )
     |])]
-  ), */
+  ),
   /* Add border */
   /* Add text-shadow */
 ];
