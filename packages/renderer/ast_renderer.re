@@ -221,4 +221,6 @@ switch (input, help) {
      */
   let ast = Css_lexer.parse_stylesheet(~container_lnum, ~pos, css);
   print_endline(render_stylesheet(ast));
+  /* let ast = Css_lexer.parse_stylesheet(~container_lnum, ~pos, css);
+  print_endline(render_stylesheet(ast)); */
 };

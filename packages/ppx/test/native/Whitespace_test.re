@@ -9,14 +9,29 @@ let compare = (input, expected, {expect, _}) => {
 };
 
 let css_tests = [
-  /* (
+  (
+    "ignore in style_rule",
+    [%expr [%cx ".bar{}"]],
+    [%expr [%cx ".bar {}"]],
+  ),
+  (
+    "ignore in style_rule",
+    [%expr [%cx ".bar { } "]],
+    [%expr [%cx ".bar {}"]],
+  ),
+  (
     "ignore in declaration list",
-    [%expr [%cx "display: block; box-sizing: border-box          "]],
+    [%expr [%cx "display: block; box-sizing: border-box          ; "]],
     [%expr [%cx "display: block; box-sizing: border-box;"]],
   ),
   (
     "ignore in declaration",
     [%expr [%cx " display : block; "]],
+    [%expr [%cx "display: block;"]],
+  ),
+  (
+    "ignore in declaration",
+    [%expr [%cx " display : block ; "]],
     [%expr [%cx "display: block;"]],
   ),
   (
@@ -44,11 +59,16 @@ let css_tests = [
     [%expr [%cx "@media screen and (min-width: 30px) { color: red; }"]],
     [%expr [%cx "@media screen and (min-width: 30px) { color: red; } "]],
   ),
+  /* (
+    "media with declarations",
+    [%expr [%cx ".clar {  background-image: url( 'img_tree.gif' ) }"]],
+    [%expr [%cx ".clar { background-image: url( 'img_tree.gif') }"]],
+  ), */
   (
     "ignore space on declaration url",
-    [%expr [%css " background-image : url('img_tree.gif')" ]],
+    [%expr [%css " background-image: url('img_tree.gif')" ]],
     [%expr [%css "background-image: url('img_tree.gif')" ]],
-  ), */
+  ),
 ];
 
 describe("Should treat Whitespace accordingly", ({test, _}) => {
