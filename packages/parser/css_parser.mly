@@ -283,10 +283,10 @@ compound_selector:
 
 // <complex-selector> = <compound-selector> [ <combinator>? <compound-selector> ]*
 complex_selector:
-  | left = compound_selector; right = loption(list(pair(COMBINATOR?, compound_selector))); {
+  | left = compound_selector; /* right = loption(list(pair(COMBINATOR?, compound_selector))); */ {
     Selector.Combinator {
       left;
-      right;
+      right = [];
     }
    }
 
