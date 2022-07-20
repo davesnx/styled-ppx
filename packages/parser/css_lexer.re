@@ -284,6 +284,14 @@ let frequency = [%sedlex.regexp? (_h, _z) | (_k, _h, _z)];
 let ws_colon = [%sedlex.regexp? (whitespaces, ':')];
 let ws_double_colon = [%sedlex.regexp? (whitespaces, "::")];
 let ws_hash = [%sedlex.regexp? (whitespaces, '#', name)];
+let hash = [%sedlex.regexp? ('#', name)];
+
+let replace = (input, output) =>
+  Str.global_replace(Str.regexp_string(input), output);
+
+let eat_ws_hash = h => {
+  h |> String.trim |> replace("#", "");
+};
 
 let rec get_next_token = (buf) => {
   open Css_parser;
@@ -318,9 +326,8 @@ let rec get_next_token = (buf) => {
    * '-[0-9a-z]{1,6}' cannot be matched */
   | (_u, '+', unicode_range) => UNICODE_RANGE(Sedlexing.latin1(buf))
   | ident => IDENT(Sedlexing.latin1(buf))
-  /* TODO: remove hash from payload */
-  | ws_hash => WS_HASH(String.trim(Sedlexing.latin1(buf)))
-  | ('#', name) => HASH(Sedlexing.latin1(~skip=1, buf))
+  | ws_hash => WS_HASH(eat_ws_hash(Sedlexing.latin1(~skip=2, buf)))
+  | hash => HASH(Sedlexing.latin1(~skip=1, buf))
   | whitespaces => WS
   | number => get_dimension(Sedlexing.latin1(buf), buf)
   | any => DELIM(Sedlexing.latin1(buf))
