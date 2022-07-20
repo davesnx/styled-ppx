@@ -1,4 +1,4 @@
-ignore(
+/* ignore(
   CssJs.global(.
     {js|html, body, #root, .class|js},
     [|CssJs.margin(`zero)|],
@@ -16687,3 +16687,4 @@ module DynamicCompnentWithIdent = {
     createVariadicElement("div", newProps);
   };
 };
+ */

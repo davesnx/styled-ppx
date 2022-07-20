@@ -143,6 +143,7 @@ style_rule:
   }
 ;
 
+/* ? */
 prelude:
   xs = with_loc(selector) {
     ([(Component_value.Selector(xs), Lex_buffer.make_loc $startpos(xs) $endpos(xs))], Lex_buffer.make_loc $startpos $endpos)
@@ -170,23 +171,9 @@ declaration_without_eof:
   }
 ;
 
-// // https://www.w3.org/TR/selectors-4/#grammar
-// selector:
-//   /* & + component_value */
-//   | AMPERSAND; tl = nonempty_list(with_loc(component_value)); WS? {
-//     (Component_value.Ampersand, Lex_buffer.make_loc $startpos $endpos) :: tl
-//   }
-//   /* lola[] */
-//   | i = IDENT; b = bracket_block; WS?; {
-//     [
-//       (Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i));
-//       (Component_value.Bracket_block b, Lex_buffer.make_loc $startpos(b) $endpos(b))
-//     ]
-//   }
-// ;
-
 /* ::after */
-pseudo_element_selector: DOUBLE_COLON; i = IDENT { Selector.Pseudoelement(i) };
+pseudo_element_selector:
+  DOUBLE_COLON; i = IDENT { Selector.Pseudoelement(i) };
 
 // TODO: <function-token> and <any-value>
 // <pseudo-class-selector> = ':' <ident-token> | ':' <function-token> <any-value> ')'
@@ -199,14 +186,8 @@ pseudo_class_selector:
   }
 ;
 
-/* pseudo_selectors:
-  | p = pseudo_element_selector; { p }
-  | p = pseudo_class_selector; { p }
-; */
-
-attr_matcher:
-  | o = OPERATOR { o }
-;
+// "~=" | "|=" | "^=" | "$=" | "*=" | "="
+attr_matcher: o = OPERATOR { o };
 
 // <attribute-selector> = '[' <wq-name> ']' | '[' <wq-name> <attr-matcher> [ <string-token> | <ident-token> ] <attr-modifier>? ']'
 attribute_selector:
@@ -234,20 +215,16 @@ attribute_selector:
 // <simple-selector> = <type-selector> | <subclass-selector>
 simple_selector:
   /* a {} */
-  | s = type_selector { Selector.Type s }
+  | type_ = IDENT; WS? { Selector.Type type_ }
   /* #a, .a, a:visited, a[] */
   | sb = subclass_selector { Selector.Subclass sb }
 ;
 
 // <id-selector> = <hash-token>
-id_selector:
-  | h = HASH { Selector.Id(h) }
-;
+id_selector: h = HASH { Selector.Id(h) };
 
 // <class-selector> = '.' <ident-token>
-class_selector:
-  | DOT; i = IDENT { Selector.Class(i) }
-;
+class_selector: DOT; i = IDENT { Selector.Class(i) };
 
 // <subclass-selector> = <id-selector> | <class-selector> | <attribute-selector> | <pseudo-class-selector>
 subclass_selector:
@@ -259,15 +236,24 @@ subclass_selector:
 
 // <complex-selector-list> = <complex-selector>#
 complex_selector_list:
-  | xs = separated_nonempty_list(COMMA, complex_selector) { Selector.ComplexSelectorList(xs)} ;
+  | xs = separated_nonempty_list(COMMA, complex_selector) {
+    Selector.ComplexSelector(xs)
+  }
+;
 
 // <simple-selector-list> = <simple-selector>#
 simple_selector_list:
-  | xs = separated_nonempty_list(COMMA, simple_selector) { Selector.SimpleSelectorList(xs)} ;
+  | xs = separated_nonempty_list(COMMA, simple_selector) {
+    Selector.SimpleSelector(xs)
+  }
+;
 
 // <compound-selector-list> = <compound-selector>#
 compound_selector_list:
-  | xs = separated_nonempty_list(COMMA, compound_selector) { Selector.CompoundSelectorList(xs)} ;
+  | xs = separated_nonempty_list(COMMA, compound_selector) {
+    Selector.CompoundSelector(xs)
+  }
+;
 
 selector:
   | xs = simple_selector_list { xs }
@@ -283,7 +269,6 @@ pseudoelement_followed_by_pseudoclasslist:
 // <compound-selector> = [ <type-selector>? <subclass-selector>* [ <pseudo-element-selector> <pseudo-class-selector>* ]* ]!
 // Got the impression ^ is not correct, and should be
 // <compound-selector> = [ <type-selector> | <subclass-selector>* [ <pseudo-element-selector> <pseudo-class-selector>* ]* ]!
-
 compound_selector:
   simple_selector = simple_selector; subclass_selectors = list(subclass_selector); pseudo_selectors = list(pseudoelement_followed_by_pseudoclasslist); {
     Selector.{
@@ -295,7 +280,6 @@ compound_selector:
 
 // <complex-selector> = <compound-selector> [ <combinator>? <compound-selector> ]*
 complex_selector:
-  /* | one = compound_selector; { Selector.selector one } */
   | left = compound_selector; combinator = COMBINATOR?; right = compound_selector; {
     Selector.Combinator {
       left;
@@ -303,10 +287,6 @@ complex_selector:
       right;
     }
    }
-
-// <type-selector> = <wq-name> | <ns-prefix>? '*'
-type_selector:
-  | name = IDENT { name }
 
 /* () */
 paren_block:
@@ -322,7 +302,7 @@ component_value:
   | b = paren_block { Component_value.Paren_block b }
   | b = bracket_block { Component_value.Bracket_block b }
   | n = NUMBER; PERCENTAGE { Component_value.Percentage n }
-  | i = IDENT { Component_value.Ident i }
+  /* | i = IDENT { Component_value.Ident i } */
   | s = STRING { Component_value.String s }
   | u = URI { Component_value.Uri u }
   | c = COMBINATOR { Component_value.Combinator c}
@@ -333,7 +313,7 @@ component_value:
   | DOUBLE_COLON { Component_value.Delim "::" }
   | COMMA { Component_value.Delim "," }
   | AMPERSAND { Component_value.Ampersand }
-  | h = HASH { Component_value.Hash h }
+  /* | h = HASH { Component_value.Hash h } */
   | n = NUMBER { Component_value.Number n }
   | r = UNICODE_RANGE { Component_value.Unicode_range r }
   | d = FLOAT_DIMENSION { Component_value.Float_dimension d }
@@ -341,11 +321,8 @@ component_value:
   /* $(Lola.value) */
   | v = VARIABLE { Component_value.Variable v }
   /* calc() */
-  | f = with_loc(IDENT); xs = with_loc(paren_block) {
+/* | f = with_loc(IDENT); xs = with_loc(paren_block) {
     Component_value.Function (f, xs)
-  }
-  // | p = pseudo_element_selector { Component_value.Pseudoelement p}
-  // | p = pseudo_class_selector { Component_value.Pseudoclass p }
-  // | ps = pseudo_class_function_selector { ps }
+  } */
   | s = with_loc(selector) { Component_value.Selector(s) }
 ;

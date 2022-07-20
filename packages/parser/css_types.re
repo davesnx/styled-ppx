@@ -76,9 +76,9 @@ and Rule: {
 and Stylesheet: {type t = with_loc(list(Rule.t));} = Stylesheet
 and Selector: {
   type t =
-    | SimpleSelectorList(list(simple_selector))
-    | ComplexSelectorList(list(complex_selector))
-    | CompoundSelectorList(list(compound_selector))
+    | SimpleSelector(list(simple_selector))
+    | ComplexSelector(list(complex_selector))
+    | CompoundSelector(list(compound_selector))
   and complex_selector =
     | Selector(compound_selector)
     | Combinator({

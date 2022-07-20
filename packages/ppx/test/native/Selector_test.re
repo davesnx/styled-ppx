@@ -9,7 +9,7 @@ let compare = (input, expected, {expect, _}) => {
 };
 
 let selectors_css_tests = [
-  (
+  /* (
     ">",
     [%expr [%cx "& > a { }; & > b { };"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& > a|js}, [||]), CssJs.selector(. {js|& > b|js}, [||])|])],
@@ -146,7 +146,7 @@ let selectors_css_tests = [
         [||]
       )
     |])],
-  ),
+  ), */
   /* "&.bar" */
   /* "& .bar", */
   /* p :first-child */

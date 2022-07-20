@@ -301,7 +301,8 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
             ),
           ),
         )
-      | Selector(v) => render_prelude_value(acc, [v])
+      | Selector((_v, _loc)) => failwith("Selector not supported")
+      /* | Selector((v, loc)) => render_selector_value(~loc, acc, v) */
       | Variable(v) =>
         concat(
           ~loc=value_loc,
@@ -361,7 +362,7 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
     | PseudoclassFunction((e, _), (_, _)) => e
     | _ => failwith("Expected a Pseudoelement or a Pseudoclass");
 
-  let render_selector_value = (~value_loc, value, s) => {
+  let _render_selector_value = (~loc, value, s) => {
     switch (s) {
     | PseudoclassFunction(_, _) as p
     | Pseudoelement((_, _)) as p
@@ -405,7 +406,7 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
         );
       render_rule_value(ident, selector);
     | Variable(v) =>
-      let variable = render_variable(~loc=value_loc, v);
+      let variable = render_variable(~loc, v);
 
       let selector_name = string_to_const(~loc, value);
 
@@ -420,7 +421,7 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
   };
 
   switch (prelude) {
-  | [(Selector([(Ident(i), _), (value, value_loc)]), _)] =>
+  /* | [(Selector([(Ident(i), _), (value, value_loc)]), _)] =>
     render_selector_value(~value_loc, i, value)
   | [
       (
@@ -434,7 +435,7 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
     ] =>
     let ident =
       pseudoToFn(p) |> CssJs.lident(~loc) |> Helper.Exp.ident(~loc);
-    Helper.Exp.apply(~loc=rule.Style_rule.loc, ident, [(Nolabel, dl_expr)]);
+    Helper.Exp.apply(~loc=rule.Style_rule.loc, ident, [(Nolabel, dl_expr)]); */
   | _ =>
     let selector = render_prelude_value("", prelude);
     render_rule_value(ident, selector);
