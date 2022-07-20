@@ -123,6 +123,7 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
   let (prelude, _) = ar.prelude;
   let parse_condition = acc =>
     fun
+    | (Component_value.Delim("*"), _) => acc
     | (
         Component_value.Paren_block([
           (Ident(ident), ident_loc),
@@ -182,10 +183,8 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
       }
     /* (color) */
     | (Paren_block([(Ident(_), ident_loc)]), _) => {
-        let value =
-          source_code_of_loc(ident_loc) |> string_to_const(~loc=ident_loc);
-        %expr
-        [%e value];
+        source_code_of_loc(ident_loc)
+        |> string_to_const(~loc=ident_loc);
       }
     | (_, loc) => invalid_format(loc);
 
@@ -194,7 +193,7 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
   };
 
   let empty = string_to_const(~loc, "");
-  let query = prelude |> List.fold_left(parse_condition, [%expr [%e empty]]);
+  let query = prelude |> List.fold_left(parse_condition, empty);
 
   let rules =
     switch (ar.At_rule.block) {

@@ -63,9 +63,6 @@ let token_to_string =
   | Parser.DIMENSION((n, d)) => n ++ "." ++ d
   | Parser.VARIABLE(v) => String.concat(".", v)
   | Parser.WS => " "
-  | Parser.WS_DOUBLE_COLON => " ::"
-  | Parser.WS_COLON => " :"
-  | Parser.WS_HASH(h) => "#" ++ h
   | Parser.DOT => "."
   | Parser.COMMA => ","
 ;
@@ -108,9 +105,6 @@ let token_to_debug =
   | Parser.DOT => "DOT"
   | Parser.COMMA => "COMMA"
   | Parser.WS => "WS"
-  | Parser.WS_DOUBLE_COLON => "WS_DOUBLE_COLON"
-  | Parser.WS_COLON => "WS_COLON"
-  | Parser.WS_HASH(h) => "WS_HASH(" ++ h ++ ")"
 ;
 
 let () =
@@ -216,6 +210,126 @@ let at_rule = [%sedlex.regexp? ("@", ident)];
 let at_media = [%sedlex.regexp? ("@", "media")];
 let at_keyframes = [%sedlex.regexp? ("@", "keyframes")];
 
+let tag = [%sedlex.regexp? 
+  "a"
+  | "abbr"
+  | "address"
+  | "area"
+  | "article"
+  | "aside"
+  | "audio"
+  | "b"
+  | "base"
+  | "bdi"
+  | "bdo"
+  | "blockquote"
+  | "body"
+  | "br"
+  | "button"
+  | "canvas"
+  | "caption"
+  | "cite"
+  | "code"
+  | "col"
+  | "colgroup"
+  | "data"
+  | "datalist"
+  | "dd"
+  | "del"
+  | "details"
+  | "dfn"
+  | "dialog"
+  | "div"
+  | "dl"
+  | "dt"
+  | "em"
+  | "embed"
+  | "fieldset"
+  | "figcaption"
+  | "figure"
+  | "footer"
+  | "form"
+  | "h1"
+  | "h2"
+  | "h3"
+  | "h4"
+  | "h5"
+  | "h6"
+  | "head"
+  | "header"
+  | "hgroup"
+  | "hr"
+  | "html"
+  | "i"
+  | "iframe"
+  | "img"
+  | "input"
+  | "ins"
+  | "kbd"
+  | "label"
+  | "legend"
+  | "li"
+  | "link"
+  | "main"
+  | "map"
+  | "mark"
+  | "math"
+  | "menu"
+  | "menuitem"
+  | "meta"
+  | "meter"
+  | "nav"
+  | "noscript"
+  | "object"
+  | "ol"
+  | "optgroup"
+  | "option"
+  | "output"
+  | "p"
+  | "param"
+  | "picture"
+  | "pre"
+  | "progress"
+  | "q"
+  | "rb"
+  | "rp"
+  | "rt"
+  | "rtc"
+  | "ruby"
+  | "s"
+  | "samp"
+  | "script"
+  | "section"
+  | "select"
+  | "slot"
+  | "small"
+  | "source"
+  | "span"
+  | "strong"
+  | "style"
+  | "sub"
+  | "summary"
+  | "sup"
+  | "svg"
+  | "table"
+  | "tbody"
+  | "td"
+  | "template"
+  | "textarea"
+  | "tfoot"
+  | "th"
+  | "thead"
+  | "time"
+  | "title"
+  | "tr"
+  | "track"
+  | "u"
+  | "ul"
+  | "var"
+  | "video"
+  | "wbr"
+];
+
 let _a = [%sedlex.regexp? 'A' | 'a'];
 let _b = [%sedlex.regexp? 'B' | 'b'];
 let _c = [%sedlex.regexp? 'C' | 'c'];
@@ -280,78 +394,86 @@ let time = [%sedlex.regexp? _s | (_m, _s)];
 
 let frequency = [%sedlex.regexp? (_h, _z) | (_k, _h, _z)];
 
-let ws_colon = [%sedlex.regexp? (whitespaces, ':')];
-let ws_double_colon = [%sedlex.regexp? (whitespaces, "::")];
-let ws_hash = [%sedlex.regexp? (whitespaces, '#', name)];
-let hash = [%sedlex.regexp? ('#', name)];
 
-let replace = (input, output) =>
-  Str.global_replace(Str.regexp_string(input), output);
-
-let eat_ws_hash = h => {
-  h |> String.trim |> replace("#", "");
-};
-
-let rec get_next_token = (buf) => {
-  open Parser;
-  open Sedlexing;
+let rec get_next_token = (buf, whitespace_detected) => {
+  open Css_parser;
   switch%sedlex (buf) {
-  | eof => EOF
-  | "/*" => discard_comments(buf)
-  | '.' => DOT
-  | ';' => SEMI_COLON
-  | '}' => RIGHT_BRACE
-  | '{' => LEFT_BRACE
-  | "::" => DOUBLE_COLON
-  | ws_double_colon => WS_DOUBLE_COLON
-  | ':' => COLON
-  | ws_colon => WS_COLON
-  | '(' => LEFT_PAREN
-  | ')' => RIGHT_PAREN
-  | '[' => LEFT_BRACKET
-  | ']' => RIGHT_BRACKET
-  | '%' => PERCENTAGE
-  | '&' => AMPERSAND
-  | ',' => COMMA
-  | variable => VARIABLE(latin1(~skip=2, ~drop=1, buf) |> String.split_on_char('.'))
-  | operator => OPERATOR(latin1(buf))
-  | combinator => COMBINATOR(latin1(buf))
-  | string => STRING(latin1(~skip=1, ~drop=1, buf))
-  | important => IMPORTANT
-  | at_media => AT_MEDIA(latin1(~skip=1, buf))
-  | at_keyframes => AT_KEYFRAMES(latin1(~skip=1, buf))
-  | at_rule => AT_RULE(latin1(~skip=1, buf))
-  | at_rule_without_body => AT_RULE_STATEMENT(latin1(~skip=1, buf))
+  | eof => [EOF] 
+  | '.' => [DOT]
+  | ';' => [SEMI_COLON]
+  | '}' => [RIGHT_BRACE]
+  | '{' => [LEFT_BRACE]
+  | "::" => if (whitespace_detected) { [WS, DOUBLE_COLON] } else { [DOUBLE_COLON] }
+  | ':' => if (whitespace_detected) { [WS, COLON] } else { [COLON] }
+  | '(' => [LEFT_PAREN]
+  | ')' => [RIGHT_PAREN]
+  | '[' => [LEFT_BRACKET]
+  | ']' => [RIGHT_BRACKET]
+  | '%' => [PERCENTAGE]
+  | '&' => [AMPERSAND]
+  | ',' => [COMMA]
+  | variable => [VARIABLE(Sedlexing.latin1(~skip=2, ~drop=1, buf) |> String.split_on_char('.'))]
+  | operator => [OPERATOR(Sedlexing.latin1(buf))]
+  | combinator => [COMBINATOR(Sedlexing.latin1(buf))]
+  | string => [STRING(Sedlexing.latin1(~skip=1, ~drop=1, buf))]
+  | important => [IMPORTANT]
+  | at_media => [AT_MEDIA(Sedlexing.latin1(~skip=1, buf))]
+  | at_keyframes => [AT_KEYFRAMES(Sedlexing.latin1(~skip=1, buf))]
+  | at_rule => [AT_RULE(Sedlexing.latin1(~skip=1, buf))]
+  | at_rule_without_body => [AT_RULE_STATEMENT(Sedlexing.latin1(~skip=1, buf))]
   /* NOTE: should be placed above ident, otherwise pattern with
    * '-[0-9a-z]{1,6}' cannot be matched */
-  | (_u, '+', unicode_range) => UNICODE_RANGE(latin1(buf))
-  | ident => IDENT(latin1(buf))
-  | hash => HASH(latin1(~skip=1, buf))
-  | ws_hash => WS_HASH(eat_ws_hash(latin1(buf)))
-  | whitespaces => WS
-  | number => get_dimension(latin1(buf), buf)
-  | any => DELIM(latin1(buf))
+  | (_u, '+', unicode_range) => [UNICODE_RANGE(Sedlexing.latin1(buf))]
+  | tag => [TAG(Sedlexing.latin1(buf))]
+  | ident => [IDENT(Sedlexing.latin1(buf))]
+  | ('#', name) => if(whitespace_detected) { [WS, HASH(Sedlexing.latin1(~skip=1, buf))] } else { [HASH(Sedlexing.latin1(~skip=1, buf))] }
+  | number => [get_dimension(Sedlexing.latin1(buf), buf)]
+  | any => [DELIM(Sedlexing.latin1(buf))]
   | _ => assert(false)
   };
 }
 and get_dimension = (n, buf) => {
-  open Sedlexing;
   switch%sedlex (buf) {
-    | length => FLOAT_DIMENSION((n, latin1(buf), Length))
-    | angle => FLOAT_DIMENSION((n, latin1(buf), Angle))
-    | time => FLOAT_DIMENSION((n, latin1(buf), Time))
-    | frequency => FLOAT_DIMENSION((n, latin1(buf), Frequency))
-    | ident => DIMENSION((n, latin1(buf)))
+    | length => FLOAT_DIMENSION((n, Sedlexing.latin1(buf), Length))
+    | angle => FLOAT_DIMENSION((n, Sedlexing.latin1(buf), Angle))
+    | time => FLOAT_DIMENSION((n, Sedlexing.latin1(buf), Time))
+    | frequency => FLOAT_DIMENSION((n, Sedlexing.latin1(buf), Frequency))
+    | ident => DIMENSION((n, Sedlexing.latin1(buf)))
     | _ => NUMBER(n)
-  }
-}
-and discard_comments = buf => {
-  switch%sedlex (buf) {
-    | eof => raise(LexingError((buf.Sedlexing.pos, "Unterminated comment at the end of the string")))
-    | "*/" => get_next_token(buf)
-    | _ => discard_comments(buf)
   };
-};
+}
+
+let discard_comments_and_whitespace = buf => {
+  let rec discard_whitespaces = (buf, space_detected) => {
+      switch%sedlex (buf) {
+      | Plus(white_space) => discard_whitespaces(buf, true)
+      | "/*" => discard_comments(buf, space_detected)
+      | _ => space_detected
+      }
+  }
+  and discard_comments = (buf, space_detected) => {
+    switch%sedlex(buf) {
+    | eof => raise(LexingError((buf.Sedlexing.pos, "Unterminated comment at the end of the string")))
+    | "*/" => discard_whitespaces(buf, space_detected)
+    | any => discard_comments(buf, space_detected)
+    | _ => assert false
+    }
+  };
+
+  discard_whitespaces(buf, false)
+
+}
+
+let token_queue = Queue.create();
+
+
+let queue_next_tokens_with_location = buf => {
+  let spaces_detected = discard_comments_and_whitespace(buf);
+  let loc_start = Sedlexing.next_loc(buf);
+  let tokens = get_next_token(buf, spaces_detected);
+  let loc_end = Sedlexing.next_loc(buf);
+  List.iter (t => Queue.add((t, loc_start, loc_end), token_queue), tokens)
+}
 
 let get_next_token_with_location = buf => {
   let loc_start = Sedlexing.next_loc(buf);
@@ -363,7 +485,8 @@ let get_next_token_with_location = buf => {
 let parse = (buf, parser) => {
   let last_token = ref((Parser.EOF, Lexing.dummy_pos, Lexing.dummy_pos));
   let next_token = () => {
-    last_token := get_next_token_with_location(buf);
+    if(Queue.is_empty(token_queue)) { queue_next_tokens_with_location(buf) }
+    last_token := Queue.take(token_queue);
     last_token^;
   };
 

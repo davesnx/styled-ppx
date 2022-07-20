@@ -28,13 +28,14 @@ let help =
   );
 
 let rec printUnlessIsEof = buffer => {
-  let lexes = Css_lexer.get_next_token(buffer);
+  let lexes = Css_lexer.get_next_token(buffer, false);
   switch (lexes) {
-    | Css_lexer.Parser.EOF => ()
-    | token => {
-      Css_lexer.token_to_debug(token) |> print_endline;
+    | [Css_lexer.Parser.EOF] => ()
+    | [token] => {
+      token |> Css_lexer.token_to_debug |> print_endline;
       printUnlessIsEof(buffer)
     }
+    | _ => assert false
   }
 };
 
