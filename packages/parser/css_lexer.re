@@ -278,7 +278,7 @@ let frequency = [%sedlex.regexp? (_h, _z) | (_k, _h, _z)];
 let rec get_next_token = (buf, whitespace_detected) => {
   open Css_parser;
   switch%sedlex (buf) {
-  | eof => [EOF] 
+  | eof => [EOF]
   // | "/*" => discard_comments(buf)
   | '.' => [DOT]
   | ';' => [SEMI_COLON]
@@ -345,14 +345,13 @@ let discard_comments_and_whitespace = buf => {
 
 let token_queue = Queue.create();
 
-
 let queue_next_tokens_with_location = buf => {
   let spaces_detected = discard_comments_and_whitespace(buf);
   let loc_start = Sedlexing.next_loc(buf);
   let tokens = get_next_token(buf, spaces_detected);
   let loc_end = Sedlexing.next_loc(buf);
   List.iter (t => Queue.add((t, loc_start, loc_end), token_queue), tokens)
-}
+};
 
 let get_next_token_with_location = buf => {
   let loc_start = Sedlexing.next_loc(buf);

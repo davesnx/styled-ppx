@@ -77,24 +77,27 @@ and render_declaration_value =
 and render_selector = (ast: Selector.t) => {
   open Selector;
   let rec render_simple_selector = fun
-    | Type(v) => v
-    | Subclass(v) => render_subclass_selector(v)
+    | Variable(v) => "Variable(" ++ String.concat(".", v) ++ ")"
+    | Ampersand => "Ampersand"
+    | Type(v) => "Type(" ++ v ++ ")"
+    | Subclass(v) => "Subclass(" ++ render_subclass_selector(v) ++ ")"
   and render_subclass_selector: subclass_selector => string =
     fun
     | Id(v) => "Id(" ++ v ++ ")"
     | Class(v) => "Class(" ++ v ++ ")"
     | Attribute(Attr_value(v)) => "Attribute(" ++ v ++ ")"
     | Attribute(To_equal({name, kind, value})) =>
-      "Attribute(" ++ name ++ kind ++ value ++ ")"
+      "Attribute(To_equal(" ++ name ++ ", " ++ kind ++ ", " ++ value ++ "))"
     | Pseudo_class(psc) => render_pseudo_selector(psc)
   and render_pseudo_selector = pseudo_selector => {
     switch (pseudo_selector) {
     | Pseudoelement(v) => "Pseudoelement(" ++ v ++ ")"
     | Pseudoclass(Ident(i)) => "Pseudoclass(Ident(" ++ i ++ "))"
-    | Pseudoclass(Function({name, payload})) =>
+    | Pseudoclass(Function({name, payload: (selector, _)})) =>
       "Pseudoclass(Function("
       ++ name
-      ++ (List.map(render_component_value, payload) |> String.concat(""))
+      ++ ", "
+      ++ render_selector(selector)
       ++ "))"
     };
   };
@@ -105,7 +108,7 @@ and render_selector = (ast: Selector.t) => {
       ++ (
         snd(pseudo_selector)
         |> List.map(render_pseudo_selector)
-        |> String.concat("")
+        |> String.concat(", ")
       );
     };
     let simple_selector = render_simple_selector(compound_selector.simple_selector);
@@ -121,17 +124,17 @@ and render_selector = (ast: Selector.t) => {
     fun
     | Combinator({left, combinator, right}) =>
       render_compound_selector(left)
-      ++ Option.fold(~none=" ", ~some=Fun.id, combinator)
+      ++ Option.fold(~none=" ", ~some=o => "Combinator(" ++ o ++ ")", combinator)
       ++ render_compound_selector(right)
     | Selector(compound) => render_compound_selector(compound)
 
   switch (ast) {
   | SimpleSelector(v) =>
-    "SimpleSelector(" ++ (v |> List.map(render_simple_selector) |> String.concat(",")) ++ ")"
+    "SimpleSelector([" ++ (v |> List.map(render_simple_selector) |> String.concat(", ")) ++ "])"
   | ComplexSelector(v) =>
-    "ComplexSelector(" ++ (v |> List.map(render_complex_selector) |> String.concat(",")) ++ ")"
+    "ComplexSelector([" ++ (v |> List.map(render_complex_selector) |> String.concat(", ")) ++ "])"
   | CompoundSelector(v) =>
-    "CompoundSelector(" ++ (v |> List.map(render_compound_selector) |> String.concat(",")) ++ ")"
+    "CompoundSelector([" ++ (v |> List.map(render_compound_selector) |> String.concat(", ")) ++ "])"
   };
 }
 and render_component_value = (ast: with_loc(Component_value.t)) => {
@@ -167,7 +170,6 @@ and render_component_value = (ast: with_loc(Component_value.t)) => {
     ++ ", "
     ++ dimension_of_string(dimension)
     ++ ")"
-  | Ampersand => "Ampersand"
   | Dimension((a, b)) => "Dimension(" ++ a ++ ", " ++ b ++ ")"
   | Variable(variable) =>
     "Variable(" ++ (variable |> String.concat(".")) ++ ")"

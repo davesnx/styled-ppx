@@ -1,6 +1,5 @@
 open Ppxlib;
 open Css_types;
-open Component_value;
 
 module Helper = Ast_helper;
 module Builder = Ast_builder.Default;
@@ -39,35 +38,74 @@ let source_code_of_loc = loc => {
   Sedlexing.Latin1.sub_lexeme(buf, loc_start - 1, loc_end - loc_start);
 };
 
+type selector_interpolation =
+  | String(string)
+  | Expr(expression);
+
+/* let join_strings_on_selector_interpolation = (si: list(selector_interpolation)): list(selector_interpolation) => {
+     switch (si) {
+       | [String(s), ...rest] => {
+         si |> List.fold_left((acc, item) => {
+
+         }, String(s))
+       }
+       | [Expr(e)] => {
+         si |> List.fold_left((acc, item) => {
+
+         }, Expr(e))
+       | [_] => {
+       }
+     }
+   } */
+
+let concat = (~loc, expr, acc) => {
+  let concat_fn = {txt: Lident("^"), loc} |> Helper.Exp.ident(~loc);
+  Helper.Exp.apply(~loc, concat_fn, [(Nolabel, expr), (Nolabel, acc)]);
+};
+
+let rec concat_selector_interpolation =
+        (si: list(selector_interpolation)): expression => {
+  /* let interp_or_string = join_strings_on_selector_interpolation(si); */
+  let loc = Ast_helper.default_loc^;
+
+  switch (si) {
+  | [Expr(e)] => [%expr [%e e]]
+  | [String(s)] => string_to_const(~loc, s)
+  | [String(s), Expr(e)] =>
+    concat(~loc, string_to_const(~loc, s), [%expr [%e e]])
+  | [Expr(e), String(s)] =>
+    concat(~loc, [%expr [%e e]], string_to_const(~loc, s))
+  | rest => concat_selector_interpolation(rest)
+  };
+};
+
 let rec render_at_rule = (ar: At_rule.t): Parsetree.expression =>
   switch (ar.At_rule.name) {
   | ("media", _) => render_media_query(ar)
   | (
-      "charset" as n
-    | "import" as n
-    | "namespace" as n
-    | "supports" as n
-    | "page" as n
-    | "font-face" as n
-    | "keyframes" as n
-    | "counter-style" as n
-    | "font-feature-values" as n
-    | "swash" as n
-    | "ornaments" as n
-    | "annotation" as n
-    | "stylistic" as n
-    | "styleset" as n
-    | "character-variant" as n
-    | "property" as n /* Experimental */
-    | "color-profile" as n /* Experimental */
-    | "viewport" as n /* Deprecated */
-    | "document" as n /* Deprecated */
-    ,
-    _
-  ) =>
-    grammar_error(ar.At_rule.loc, "At-rule @" ++ n ++ " is not supported in styled-ppx")
-  | (n, _) =>
-    grammar_error(ar.At_rule.loc, "Unknown @" ++ n ++ "")
+      "charset" as n | "import" as n | "namespace" as n | "supports" as n |
+      "page" as n |
+      "font-face" as n |
+      "keyframes" as n |
+      "counter-style" as n |
+      "font-feature-values" as n |
+      "swash" as n |
+      "ornaments" as n |
+      "annotation" as n |
+      "stylistic" as n |
+      "styleset" as n |
+      "character-variant" as n |
+      "property" as n | /* Experimental */
+      "color-profile" as n | /* Experimental */
+      "viewport" as n | /* Deprecated */
+      "document" as n, /* Deprecated */
+      _,
+    ) =>
+    grammar_error(
+      ar.At_rule.loc,
+      "At-rule @" ++ n ++ " is not supported in styled-ppx",
+    )
+  | (n, _) => grammar_error(ar.At_rule.loc, "Unknown @" ++ n ++ "")
   }
 and render_media_query = (ar: At_rule.t): Parsetree.expression => {
   let concat = (~loc, expr, acc) => {
@@ -84,7 +122,7 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
   let parse_condition = acc =>
     fun
     | (
-        Paren_block([
+        Component_value.Paren_block([
           (Ident(ident), ident_loc),
           (Delim(":"), _) | (Delim("::"), _),
           (_, first_value_loc),
@@ -96,8 +134,7 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
         let values_length = List.length(values);
         let last_value_loc =
           values_length == 0
-            ? first_value_loc
-            : List.nth(values, values_length - 1);
+            ? first_value_loc : List.nth(values, values_length - 1);
         let loc = {
           ...first_value_loc,
           loc_end: last_value_loc.Location.loc_end,
@@ -123,28 +160,30 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
                 loc,
               }
             | _ =>
-              grammar_error(loc,
+              grammar_error(
+                loc,
                 "Variable can not be empty, please refer to a variable or module value",
               )
             }
           )
           |> Helper.Exp.ident(~loc);
         let space = string_to_const(~loc, " ");
-        [%expr [%e acc] ++ [%e ident] ++ [%e space]];
+        %expr
+        [%e acc] ++ [%e ident] ++ [%e space];
       }
     /* and, only, all */
     | (Ident(id), loc) => {
         let id = string_to_const(~loc, id);
         let space = string_to_const(~loc, " ");
-        [%expr [%e acc] ++ [%e id] ++ [%e space]];
+        %expr
+        [%e acc] ++ [%e id] ++ [%e space];
       }
     /* (color) */
-    | (Paren_block([
-        (Ident(_), ident_loc),
-      ]),
-      _) => {
-        let value = source_code_of_loc(ident_loc) |> string_to_const(~loc=ident_loc);
-        [%expr [%e value]];
+    | (Paren_block([(Ident(_), ident_loc)]), _) => {
+        let value =
+          source_code_of_loc(ident_loc) |> string_to_const(~loc=ident_loc);
+        %expr
+        [%e value];
       }
     | (_, loc) => invalid_format(loc);
 
@@ -157,7 +196,8 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
 
   let rules =
     switch (ar.At_rule.block) {
-    | Stylesheet(_) => /* TODO: expected a list of declarations, got an stylesheet. */
+    | Stylesheet(_) =>
+      /* TODO: expected a list of declarations, got an stylesheet. */
       invalid_format(loc)
     | Empty => Builder.pexp_array(~loc, [])
     | Declaration_list(declaration) =>
@@ -219,67 +259,79 @@ and render_declarations = ds => {
 }
 and render_selector = (selector: Selector.t) => {
   open Selector;
-  let rec render_simple_selector = fun
-    | Type(v) => v
+  let loc = Ast_helper.default_loc^;
+  let rec render_simple_selector =
+    fun
+    | Variable(v) => Expr(render_variable(~loc, v))
+    | Ampersand => String("&")
+    | Type(v) => String(v)
     | Subclass(v) => render_subclass_selector(v)
   and render_subclass_selector =
     fun
-    | Id(v) => "#" ++ v
-    | Class(v) => "." ++ v
-    | Attribute(Attr_value(v)) => "[" ++ v ++ "]"
+    | Id(v) => String("#" ++ v)
+    | Class(v) => String("." ++ v)
+    | Attribute(Attr_value(v)) => String("[" ++ v ++ "]")
     | Attribute(To_equal({name, kind, value})) =>
-      "[" ++ name ++ kind ++ value ++ "]"
+      String("[" ++ name ++ kind ++ value ++ "]")
     | Pseudo_class(psc) => render_pseudo_selector(psc)
-  and render_pseudo_selector = fun
-    | Pseudoelement(v) => "::" ++ v
-    | Pseudoclass(Ident(i)) => ":" ++ i
+  and render_pseudo_selector =
+    fun
+    | Pseudoelement(v) => String("::" ++ v)
+    | Pseudoclass(Ident(i)) => String(":" ++ i)
     | Pseudoclass(Function({name, payload: _})) =>
-      ":"
-      ++ name
-      /* ++ (List.map(render_component_value, payload) |> String.concat("")) */
-      ++ "))";
+      String(
+        ":"
+        ++ name
+        /* ++ (List.map(render_component_value, payload) |> String.concat("")) */
+        ++ "))",
+      );
 
   let rec render_compound_selector = compound_selector => {
-    let render_selector_list = pseudo_selector => {
-      (fst(pseudo_selector) |> render_pseudo_selector)
-      ++ (
-        snd(pseudo_selector)
-        |> List.map(render_pseudo_selector)
-        |> String.concat("")
-      );
+    let render_selector_list = ((first, rest)): list(selector_interpolation) => {
+      let first = first |> render_pseudo_selector;
+      let rest = rest |> List.map(render_pseudo_selector);
+      [first, ...rest];
     };
-    let simple_selector = render_simple_selector(compound_selector.simple_selector);
+    let simple_selector =
+      render_simple_selector(compound_selector.simple_selector);
     let subclass_selectors =
-      List.map(render_subclass_selector, compound_selector.subclass_selectors)
-      |> String.concat(" ");
+      List.map(
+        render_subclass_selector,
+        compound_selector.subclass_selectors,
+      );
     let pseudo_selectors =
-      List.map(render_selector_list, compound_selector.pseudo_selectors)
-      |> String.concat("");
-
-    simple_selector ++ subclass_selectors ++ pseudo_selectors;
-  } and render_complex_selector =
-    fun
+      List.concat_map(
+        render_selector_list,
+        compound_selector.pseudo_selectors,
+      );
+    List.concat([[simple_selector], subclass_selectors, pseudo_selectors]);
+  }
+  and render_complex_selector = (complex): list(selector_interpolation) => {
+    switch (complex) {
     | Combinator({left, combinator, right}) =>
-      render_compound_selector(left)
-      ++ Option.fold(~none=" ", ~some=Fun.id, combinator)
-      ++ render_compound_selector(right)
+      let left = render_compound_selector(left);
+      let op = String(Option.fold(~none=" ", ~some=Fun.id, combinator));
+      let right = render_compound_selector(right);
+      List.concat([left, [op], right]);
     | Selector(compound) => render_compound_selector(compound)
+    };
+  };
 
   switch (selector) {
   | SimpleSelector(v) =>
-    v |> List.map(render_simple_selector) |> String.concat(",")
+    v |> List.map(render_simple_selector) |> concat_selector_interpolation
   | ComplexSelector(v) =>
-    v |> List.map(render_complex_selector) |> String.concat(",")
+    v |> List.map(render_complex_selector) |> List.flatten |> concat_selector_interpolation;
   | CompoundSelector(v) =>
-    v |> List.map(render_compound_selector) |> String.concat(",")
+    v |> List.map(render_compound_selector) |> List.flatten |> concat_selector_interpolation
   };
 }
 and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
-  let (prelude, preludeloc) = rule.Style_rule.prelude;
+  let (prelude, _preludeloc) = rule.Style_rule.prelude;
   let block = rule.Style_rule.block;
   let loc = block |> snd;
   let selector_expr = render_declarations(block) |> Builder.pexp_array(~loc);
-  let selector_name = render_selector(prelude) |> string_to_const(~loc=preludeloc);
+  let selector_name: expression = render_selector(prelude);
 
   Helper.Exp.apply(
     ~loc=rule.Style_rule.loc,
@@ -327,21 +379,21 @@ let render_keyframes = ((ruleList, loc)): Parsetree.expression => {
         "];
   |};
 
-  let render_select_as_keyframe = (_prelude: Selector.t) => 0
-    /* switch (prelude) {
-    | ([(Percentage(n), loc)], _) =>
-      // TODO: can percentage be a decimal value?
-      switch (int_of_string_opt(n)) {
-      | Some(n) when n >= 0 && n <= 100 => n
-      | _ => grammar_error(loc, invalidSelectorErrorMessage)
-      }
-    // https://drafts.csswg.org/css-animations/#keyframes
-    // The keyword from is equivalent to the value 0%
-    | ([(Ident("from"), _)], _) => 0
-    // The keyword to is equivalent to the value 100%
-    | ([(Ident("to"), _)], _) => 100
-    | _ => grammar_error(loc, invalidSelectorErrorMessage);
-    }; */
+  let render_select_as_keyframe = (_prelude: Selector.t) => 0;
+  /* switch (prelude) {
+     | ([(Percentage(n), loc)], _) =>
+       // TODO: can percentage be a decimal value?
+       switch (int_of_string_opt(n)) {
+       | Some(n) when n >= 0 && n <= 100 => n
+       | _ => grammar_error(loc, invalidSelectorErrorMessage)
+       }
+     // https://drafts.csswg.org/css-animations/#keyframes
+     // The keyword from is equivalent to the value 0%
+     | ([(Ident("from"), _)], _) => 0
+     // The keyword to is equivalent to the value 100%
+     | ([(Ident("to"), _)], _) => 100
+     | _ => grammar_error(loc, invalidSelectorErrorMessage);
+     }; */
 
   let keyframes =
     ruleList

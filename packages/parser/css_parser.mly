@@ -56,8 +56,6 @@ rule:
   | r = style_rule { Rule.Style_rule r }
 ;
 
-// with_whitespace(X): xs = delimited(WS?, X, WS?); { xs }
-
 /* {} */
 brace_block(X):
   xs = delimited(LEFT_BRACE, X, RIGHT_BRACE);
@@ -178,7 +176,7 @@ pseudo_class_selector:
   /* :visited */
   | COLON; i = IDENT { Selector.(Pseudoclass(Ident i)) }
   /* :nth-child() */
-  | COLON; f = IDENT; xs = paren_block {
+  | COLON; f = IDENT; LEFT_PAREN; xs = with_loc(selector); RIGHT_PAREN {
     Selector.(Pseudoclass(Function({ name = f; payload = xs })))
   }
 ;
@@ -229,16 +227,22 @@ selector:
     Selector.SimpleSelector xs
   }
   // <compound-selector-list> = <compound-selector>#
-  /* | xs = separated_nonempty_list(COMMA, compound_selector) {
+  | xs = separated_nonempty_list(COMMA, compound_selector) {
     Selector.CompoundSelector xs
-  } */
+  }
   // <complex-selector-list> = <complex-selector>#
   | xs = separated_nonempty_list(COMMA, complex_selector) {
     Selector.ComplexSelector xs
   }
 
 // <simple-selector> = <type-selector> | <subclass-selector>
+// We change the spec adding the & selector
+// <simple-selector> = <self-selector> | <type-selector> | <subclass-selector>
 simple_selector:
+  /* & {} */
+  | AMPERSAND; { Selector.Ampersand }
+  /* $(Module.value) {} */
+  | v = VARIABLE { Selector.Variable v }
   /* a {} */
   | type_ = IDENT; { Selector.Type type_ }
   /* #a, .a, a:visited, a[] */
@@ -297,7 +301,6 @@ component_value:
   | COLON { Component_value.Delim ":" }
   | DOUBLE_COLON { Component_value.Delim "::" }
   | COMMA { Component_value.Delim "," }
-  | AMPERSAND { Component_value.Ampersand }
   | h = HASH { Component_value.Hash h }
   | n = NUMBER { Component_value.Number n }
   | r = UNICODE_RANGE { Component_value.Unicode_range r }
@@ -309,5 +312,4 @@ component_value:
   | f = with_loc(IDENT); xs = with_loc(paren_block) {
     Component_value.Function (f, xs)
   }
-  /* | s = with_loc(selector) { Component_value.Selector s } */
 ;

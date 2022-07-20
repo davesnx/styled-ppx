@@ -27,8 +27,7 @@ module rec Component_value: {
     | Unicode_range(string)
     | Float_dimension((string, string, dimension))
     | Dimension((string, string))
-    | Variable(list(string))
-    | Ampersand;
+    | Variable(list(string));
 } = Component_value
 and Brace_block: {
   type t =
@@ -95,6 +94,8 @@ and Selector: {
       ),
   }
   and simple_selector =
+    | Variable(list(string))
+    | Ampersand
     | Type(string)
     | Subclass(subclass_selector)
   and subclass_selector =
@@ -116,6 +117,6 @@ and Selector: {
     | Ident(string)
     | Function({
         name: string,
-        payload: list(with_loc(Component_value.t)),
+        payload: with_loc(t),
       });
 } = Selector;
