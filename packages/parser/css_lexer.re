@@ -326,7 +326,7 @@ let rec get_next_token = (buf) => {
    * '-[0-9a-z]{1,6}' cannot be matched */
   | (_u, '+', unicode_range) => UNICODE_RANGE(Sedlexing.latin1(buf))
   | ident => IDENT(Sedlexing.latin1(buf))
-  | ws_hash => WS_HASH(eat_ws_hash(Sedlexing.latin1(~skip=2, buf)))
+  | ws_hash => WS_HASH(eat_ws_hash(Sedlexing.latin1(buf)))
   | hash => HASH(Sedlexing.latin1(~skip=1, buf))
   | whitespaces => WS
   | number => get_dimension(Sedlexing.latin1(buf), buf)
