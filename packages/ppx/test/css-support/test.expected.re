@@ -1,4 +1,4 @@
-/* CssJs.backgroundRepeat(`space);
+CssJs.backgroundRepeat(`space);
 CssJs.backgroundRepeat(`round);
 CssJs.backgroundRepeat(`hv((`repeat, `repeat)));
 CssJs.backgroundRepeat(`hv((`space, `repeat)));
@@ -1855,4 +1855,3 @@ CssJs.transform(`none);
 CssJs.width(`fitContent);
 CssJs.width(`maxContent);
 CssJs.unsafe({js|wordBreak|js}, {js|break-word|js});
- */

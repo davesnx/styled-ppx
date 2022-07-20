@@ -144,6 +144,7 @@ style_rule:
 ;
 
 prelude: xs = with_loc(nonempty_list(with_loc(with_whitespace(component_value_in_prelude)))) { xs };
+component_values: xs = with_loc(nonempty_list(with_loc(with_whitespace(component_value)))) { xs };
 
 declarations:
   | xs = nonempty_list(with_whitespace(declaration_or_at_rule)); with_whitespace(SEMI_COLON?); { xs }
@@ -159,14 +160,14 @@ declaration: d = declaration_without_eof; EOF { d };
 
 /* property: value; */
 declaration_without_eof:
-  | n = with_whitespace(IDENT); with_whitespace(COLON); v = with_whitespace(prelude); i = boption(IMPORTANT); with_whitespace(SEMI_COLON?) {
+  | n = with_whitespace(IDENT); with_whitespace(COLON); v = with_whitespace(component_values); i = boption(IMPORTANT); with_whitespace(SEMI_COLON?) {
     { Declaration.name = (n, Lex_buffer.make_loc $startpos(n) $endpos(n));
       value = v;
       important = (i, Lex_buffer.make_loc $startpos(i) $endpos(i));
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
-  | n = with_whitespace(IDENT); with_whitespace(WS_COLON); v = with_whitespace(prelude); i = boption(IMPORTANT); with_whitespace(SEMI_COLON?) {
+  | n = with_whitespace(IDENT); with_whitespace(WS_COLON); v = with_whitespace(component_values); i = boption(IMPORTANT); with_whitespace(SEMI_COLON?) {
     { Declaration.name = (n, Lex_buffer.make_loc $startpos(n) $endpos(n));
       value = v;
       important = (i, Lex_buffer.make_loc $startpos(i) $endpos(i));

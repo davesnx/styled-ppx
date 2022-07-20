@@ -1,11 +1,11 @@
-/* /* This tests ensure the transformation goes right and doesn't need to type-check.
+/* This tests ensure the transformation goes right and doesn't need to type-check.
 If you are looking to add some tests for CSS support, check packages/ppx/test/native folder. */
 
-[%styled.global {|
+/* [%styled.global {|
   html, body, #root, .class {
     margin: 0;
   }
-|}];
+|}]; */
 
 module ShoudNotBreakOtherModulesPpxsWithStringAsPayload = [%ppx ""];
 module ShoudNotBreakOtherModulesPpxsWithMultiStringAsPayload = [%ppx {| stuff |}];
@@ -63,18 +63,18 @@ module SelectorsMediaQueries = [%styled.div {j|
     background: blue;
   }
 
-  &:hover {
-    background: green;
-  }
 
-  & > p { color: pink; font-size: 24px; }
 |j}
 ];
+/*   &:hover {
+    background: green;
+  }
+ */  /* & > p { color: pink; font-size: 24px; } */
 
-let keyframe = [%keyframe {|
+/* let keyframe = [%keyframe {|
   0% { opacity: 0 }
   100% { opacity: 1 }
-|}];
+|}]; */
 
 module ArrayDynamicComponent = [%styled.div (~var) =>
   [|
@@ -106,7 +106,7 @@ let width = "120px";
 
 let orientation = "landscape"
 
-module SelectorWithInterpolation = [%styled.div {|
+/* module SelectorWithInterpolation = [%styled.div {|
   @media only screen and (min-width: $(width)) {
     color: blue;
   };
@@ -125,7 +125,7 @@ module MediaQueryCalc = [%styled.div {|
   @media (min-width: calc(1000px - 2%)) {
     color: red;
   }
-|}];
+|}]; */
 
 /* This test ensures that the warning is being triggered */
 /* module T = [%styled.span () => [|
@@ -166,4 +166,3 @@ module DynamicCompnentWithIdent = [%styled.div
     cssRule;
   }
 ];
- */
