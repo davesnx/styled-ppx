@@ -1,14 +1,13 @@
 /* esy x ast-renderer */
 open Css_types;
 
-let render_record = zippedRecord => {
-  let inner =
-    zippedRecord
-    |> List.map(((key, value)) => Printf.sprintf("  %s: %s", key, value))
-    |> String.concat(",\n");
+let render_field = ((key, value)) => Printf.sprintf("  %s: %s", key, value);
 
-  Printf.sprintf("{\n%s\n}", inner);
-};
+let render_record = record =>
+  record
+  |> List.map(render_field)
+  |> String.concat(",\n")
+  |> Printf.sprintf("{\n%s\n}");
 
 let dimension_of_string =
   fun
@@ -19,7 +18,7 @@ let dimension_of_string =
 
 let rec render_stylesheet = (ast: Stylesheet.t) => {
   let inner = ast |> fst |> List.map(render_rule) |> String.concat(", ");
-  "Stylesheet([" ++ inner ++ "])";
+  "Stylesheet(" ++ inner ++ ")";
 }
 and render_rule = (ast: Rule.t) => {
   switch (ast) {
