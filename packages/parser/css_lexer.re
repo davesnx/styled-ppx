@@ -275,41 +275,40 @@ let time = [%sedlex.regexp? _s | (_m, _s)];
 
 let frequency = [%sedlex.regexp? (_h, _z) | (_k, _h, _z)];
 
-let rec get_next_token = buf => {
+let rec get_next_token = (buf, whitespace_detected) => {
   open Css_parser;
   switch%sedlex (buf) {
-  | eof => EOF
-  | whitespaces => WS
-  | "/*" => discard_comments(buf)
-  | '.' => DOT
-  | ';' => SEMI_COLON
-  | '}' => RIGHT_BRACE
-  | '{' => LEFT_BRACE
-  | "::" => DOUBLE_COLON
-  | ':' => COLON
-  | '(' => LEFT_PAREN
-  | ')' => RIGHT_PAREN
-  | '[' => LEFT_BRACKET
-  | ']' => RIGHT_BRACKET
-  | '%' => PERCENTAGE
-  | '&' => AMPERSAND
-  | ',' => COMMA
-  | variable => VARIABLE(Sedlexing.latin1(~skip=2, ~drop=1, buf) |> String.split_on_char('.'))
-  | operator => OPERATOR(Sedlexing.latin1(buf))
-  | combinator => COMBINATOR(Sedlexing.latin1(buf))
-  | string => STRING(Sedlexing.latin1(~skip=1, ~drop=1, buf))
-  | important => IMPORTANT
-  | at_media => AT_MEDIA(Sedlexing.latin1(~skip=1, buf))
-  | at_keyframes => AT_KEYFRAMES(Sedlexing.latin1(~skip=1, buf))
-  | at_rule => AT_RULE(Sedlexing.latin1(~skip=1, buf))
-  | at_rule_without_body => AT_RULE_STATEMENT(Sedlexing.latin1(~skip=1, buf))
+  | eof => [EOF] 
+  // | "/*" => discard_comments(buf)
+  | '.' => [DOT]
+  | ';' => [SEMI_COLON]
+  | '}' => [RIGHT_BRACE]
+  | '{' => [LEFT_BRACE]
+  | "::" => if (whitespace_detected) { [WS, DOUBLE_COLON] } else { [DOUBLE_COLON] }
+  | ':' => if (whitespace_detected) { [WS, COLON] } else { [COLON] }
+  | '(' => [LEFT_PAREN]
+  | ')' => [RIGHT_PAREN]
+  | '[' => [LEFT_BRACKET]
+  | ']' => [RIGHT_BRACKET]
+  | '%' => [PERCENTAGE]
+  | '&' => [AMPERSAND]
+  | ',' => [COMMA]
+  | variable => [VARIABLE(Sedlexing.latin1(~skip=2, ~drop=1, buf) |> String.split_on_char('.'))]
+  | operator => [OPERATOR(Sedlexing.latin1(buf))]
+  | combinator => [COMBINATOR(Sedlexing.latin1(buf))]
+  | string => [STRING(Sedlexing.latin1(~skip=1, ~drop=1, buf))]
+  | important => [IMPORTANT]
+  | at_media => [AT_MEDIA(Sedlexing.latin1(~skip=1, buf))]
+  | at_keyframes => [AT_KEYFRAMES(Sedlexing.latin1(~skip=1, buf))]
+  | at_rule => [AT_RULE(Sedlexing.latin1(~skip=1, buf))]
+  | at_rule_without_body => [AT_RULE_STATEMENT(Sedlexing.latin1(~skip=1, buf))]
   /* NOTE: should be placed above ident, otherwise pattern with
    * '-[0-9a-z]{1,6}' cannot be matched */
-  | (_u, '+', unicode_range) => UNICODE_RANGE(Sedlexing.latin1(buf))
-  | ident => IDENT(Sedlexing.latin1(buf))
-  | ('#', name) => HASH(Sedlexing.latin1(~skip=1, buf))
-  | number => get_dimension(Sedlexing.latin1(buf), buf)
-  | any => DELIM(Sedlexing.latin1(buf))
+  | (_u, '+', unicode_range) => [UNICODE_RANGE(Sedlexing.latin1(buf))]
+  | ident => [IDENT(Sedlexing.latin1(buf))]
+  | ('#', name) => if(whitespace_detected) { [HASH(Sedlexing.latin1(~skip=1, buf))] } else { [HASH(Sedlexing.latin1(~skip=1, buf))] }
+  | number => [get_dimension(Sedlexing.latin1(buf), buf)]
+  | any => [DELIM(Sedlexing.latin1(buf))]
   | _ => assert(false)
   };
 }
@@ -321,15 +320,39 @@ and get_dimension = (n, buf) =>
   | frequency => FLOAT_DIMENSION((n, Sedlexing.latin1(buf), Frequency))
   | ident => DIMENSION((n, Sedlexing.latin1(buf)))
   | _ => NUMBER(n)
+};
+
+let discard_comments_and_whitespace = buf => {
+  let rec discard_whitespaces = (buf, space_detected) => {
+      switch%sedlex (buf) {
+      | Plus(white_space) => discard_whitespaces(buf, true)
+      | "/*" => discard_comments(buf, space_detected)
+      | _ => space_detected
+      }
+  }
+  and discard_comments = (buf, space_detected) => {
+    switch%sedlex(buf) {
+    | eof => raise(LexingError((buf.Sedlexing.pos, "Unterminated comment at the end of the string")))
+    | "*/" => discard_whitespaces(buf, space_detected)
+    | any => discard_comments(buf, space_detected)
+    | _ => assert false
+    }
+  };
+
+  discard_whitespaces(buf, false)
+
 }
 
-and discard_comments = buf => {
-  switch%sedlex (buf) {
-    | eof => raise(LexingError((buf.Sedlexing.pos, "Unterminated comment at the end of the string")))
-    | "*/" => get_next_token(buf)
-    | _ => discard_comments(buf)
-  };
-};
+let token_queue = Queue.create();
+
+
+let queue_next_tokens_with_location = buf => {
+  let spaces_detected = discard_comments_and_whitespace(buf);
+  let loc_start = Sedlexing.next_loc(buf);
+  let tokens = get_next_token(buf, spaces_detected);
+  let loc_end = Sedlexing.next_loc(buf);
+  List.iter (t => Queue.add((t, loc_start, loc_end), token_queue), tokens)
+}
 
 let get_next_token_with_location = buf => {
   let loc_start = Sedlexing.next_loc(buf);
@@ -341,7 +364,8 @@ let get_next_token_with_location = buf => {
 let parse = (buf, parser) => {
   let last_token = ref((Parser.EOF, Lexing.dummy_pos, Lexing.dummy_pos));
   let next_token = () => {
-    last_token := get_next_token_with_location(buf);
+    if(Queue.is_empty(token_queue)) { queue_next_tokens_with_location(buf) }
+    last_token := Queue.take(token_queue);
     last_token^;
   };
 

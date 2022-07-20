@@ -56,11 +56,11 @@ rule:
   | r = style_rule { Rule.Style_rule r }
 ;
 
-with_whitespace(X): xs = delimited(WS?, X, WS?); { xs }
+// with_whitespace(X): xs = delimited(WS?, X, WS?); { xs }
 
 /* {} */
 brace_block(X):
-  xs = delimited(LEFT_BRACE, with_whitespace(X), RIGHT_BRACE);
+  xs = delimited(LEFT_BRACE, X, RIGHT_BRACE);
   SEMI_COLON? { xs };
 
 empty_brace_block: LEFT_BRACE; WS?; RIGHT_BRACE; SEMI_COLON?; { [] }
@@ -70,7 +70,7 @@ with_loc(X): x = X { (x, Lex_buffer.make_loc $startpos(x) $endpos(x))}
 // https://www.w3.org/TR/css-syntax-3/#at-rules
 at_rule:
   /* @media (min-width: 16rem) {} */
-  | name = with_whitespace(with_loc(AT_MEDIA)); xs = prelude; with_whitespace(empty_brace_block) {
+  | name = with_loc(AT_MEDIA); xs = prelude; empty_brace_block {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Empty;
@@ -78,7 +78,7 @@ at_rule:
     }
   }
   /* @media (min-width: 16rem) { ... } */
-  | name = with_whitespace(with_loc(AT_MEDIA)); xs = prelude; ds = with_whitespace(brace_block(with_loc(declarations))) {
+  | name = with_loc(AT_MEDIA); xs = prelude; ds = brace_block(with_loc(declarations)) {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Declaration_list ds;
@@ -86,7 +86,7 @@ at_rule:
     }
   }
   /* @keyframes animationName {} */
-  | name = with_whitespace(with_loc(AT_KEYFRAMES)); i = with_whitespace(IDENT); empty_brace_block {
+  | name = with_loc(AT_KEYFRAMES); i = IDENT; empty_brace_block {
     { At_rule.name = name;
       prelude = ([(Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i))], Lex_buffer.make_loc $startpos(i) $endpos(i));
       block = Brace_block.Empty;
@@ -94,7 +94,7 @@ at_rule:
     }
   }
   /* @keyframes animationName { ... } */
-  | name = with_whitespace(with_loc(AT_KEYFRAMES)); i = with_whitespace(IDENT); s = with_whitespace(brace_block(stylesheet_without_eof)) {
+  | name = with_loc(AT_KEYFRAMES); i = IDENT; s = brace_block(stylesheet_without_eof) {
     { At_rule.name = name;
       prelude = ([(Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i))], Lex_buffer.make_loc $startpos(i) $endpos(i));
       block = Brace_block.Stylesheet s;
@@ -102,7 +102,7 @@ at_rule:
     }
   }
   /* @charset */
-  | name = with_whitespace(with_loc(AT_RULE_STATEMENT)); xs = prelude; SEMI_COLON?; {
+  | name = with_loc(AT_RULE_STATEMENT); xs = prelude; SEMI_COLON?; {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Empty;
@@ -110,7 +110,7 @@ at_rule:
     }
   }
   /* @{{rule}} {} */
-  | name = with_whitespace(with_loc(AT_RULE)); xs = prelude; empty_brace_block {
+  | name = with_loc(AT_RULE); xs = prelude; empty_brace_block {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Empty;
@@ -118,7 +118,7 @@ at_rule:
     }
   }
   /* @{{rule}} { ... } */
-  | name = with_whitespace(with_loc(AT_RULE)); xs = prelude; s = with_whitespace(brace_block(stylesheet_without_eof)) {
+  | name = with_loc(AT_RULE); xs = prelude; s = brace_block(stylesheet_without_eof) {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Stylesheet s;
@@ -129,13 +129,13 @@ at_rule:
 
 /* .class {} */
 style_rule:
-  | selector = with_loc(with_whitespace(selector)); block = with_whitespace(empty_brace_block); {
+  | selector = with_loc(selector); block = empty_brace_block; {
     { Style_rule.prelude = selector;
       block = block, Location.none;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
-  | selector = with_loc(with_whitespace(selector)); declarations = with_whitespace(brace_block(with_loc(declarations))); {
+  | selector = with_loc(selector); declarations = brace_block(with_loc(declarations)); {
     { Style_rule.prelude = selector;
       block = declarations;
       loc = Lex_buffer.make_loc $startpos $endpos;
@@ -143,11 +143,11 @@ style_rule:
   }
 ;
 
-prelude: xs = with_loc(nonempty_list(with_whitespace(with_loc(component_value)))) { xs };
+prelude: xs = with_loc(nonempty_list(with_loc(component_value))) { xs };
 
 declarations:
-  | xs = nonempty_list(with_whitespace(declaration_or_at_rule)); SEMI_COLON?; { xs }
-  | xs = separated_nonempty_list(SEMI_COLON, with_whitespace(declaration_or_at_rule)); SEMI_COLON?; { xs }
+  | xs = nonempty_list(declaration_or_at_rule); SEMI_COLON?; { xs }
+  | xs = separated_nonempty_list(SEMI_COLON, declaration_or_at_rule); SEMI_COLON?; { xs }
 
 declaration_or_at_rule:
   | d = declaration_without_eof; { Declaration_list.Declaration d }
@@ -159,7 +159,7 @@ declaration: d = declaration_without_eof; EOF { d };
 
 /* property: value; */
 declaration_without_eof:
-  WS?; n = IDENT; WS?; COLON; WS?; v = prelude; WS?; i = boption(IMPORTANT); WS?; SEMI_COLON? {
+  WS?; n = IDENT; WS?; COLON; v = prelude; i = boption(IMPORTANT); SEMI_COLON? {
     { Declaration.name = (n, Lex_buffer.make_loc $startpos(n) $endpos(n));
       value = v;
       important = (i, Lex_buffer.make_loc $startpos(i) $endpos(i));
@@ -240,7 +240,7 @@ selector:
 // <simple-selector> = <type-selector> | <subclass-selector>
 simple_selector:
   /* a {} */
-  | type_ = IDENT; WS? { Selector.Type type_ }
+  | type_ = IDENT; { Selector.Type type_ }
   /* #a, .a, a:visited, a[] */
   | sb = subclass_selector { Selector.Subclass sb }
 ;
