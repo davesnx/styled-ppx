@@ -59,11 +59,11 @@ let css_tests = [
     [%expr [%cx "@media screen and (min-width: 30px) { color: red; }"]],
     [%expr [%cx "@media screen and (min-width: 30px) { color: red; } "]],
   ),
-  /* (
+  (
     "media with declarations",
-    [%expr [%cx ".clar {  background-image: url( 'img_tree.gif' ) }"]],
+    [%expr [%cx ".clar {  background-image : url( 'img_tree.gif') ; }"]],
     [%expr [%cx ".clar { background-image: url( 'img_tree.gif') }"]],
-  ), */
+  ),
   (
     "ignore space on declaration url",
     [%expr [%css " background-image: url('img_tree.gif')" ]],

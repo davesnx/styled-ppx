@@ -47,7 +47,7 @@ open Css_types
 %%
 
 stylesheet: s = stylesheet_without_eof; EOF { s };
-stylesheet_without_eof: rs = with_loc(list(rule)) { rs };
+stylesheet_without_eof: rs = with_loc(list(with_whitespace(rule))) { rs };
 
 declaration_list:
   | EOF { ([], Lex_buffer.make_loc $startpos $endpos) }
@@ -55,14 +55,14 @@ declaration_list:
 ;
 
 rule:
-  | r = with_whitespace(at_rule) { Rule.At_rule r }
-  | r = with_whitespace(style_rule) { Rule.Style_rule r }
+  | r = at_rule { Rule.At_rule r }
+  | r = style_rule { Rule.Style_rule r }
 ;
 
 /* { ... } */
-brace_block(X): WS?; xs = delimited(LEFT_BRACE, with_whitespace(X), RIGHT_BRACE); { xs };
+brace_block(X): xs = delimited(LEFT_BRACE, with_whitespace(X), RIGHT_BRACE); { xs };
 /* {} */
-empty_brace_block: WS?; LEFT_BRACE; WS?; RIGHT_BRACE; { [] }
+empty_brace_block: LEFT_BRACE; WS?; RIGHT_BRACE; { [] }
 
 with_whitespace(X): xs = delimited(WS?, X, WS?); { xs }
 with_loc(X): x = X { (x, Lex_buffer.make_loc $startpos(x) $endpos(x))}
@@ -288,17 +288,17 @@ complex_selector:
 
 /* () */
 paren_block:
-  LEFT_PAREN; WS?;
+  LEFT_PAREN;
   xs = with_whitespace(separated_list(WS?, with_loc(component_value)));
-  WS?; RIGHT_PAREN;
+  RIGHT_PAREN;
     { xs }
 ;
 
 /* [] */
 bracket_block:
-  LEFT_BRACKET; WS?;
+  LEFT_BRACKET;
   xs = with_whitespace(separated_list(WS?, with_loc(component_value)));
-  WS?; RIGHT_BRACKET;
+  RIGHT_BRACKET;
     { xs }
 ;
 
