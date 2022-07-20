@@ -76,7 +76,8 @@ and render_declaration_value =
 
 and render_selector = (ast: Selector.t) => {
   open Selector;
-  let rec render_simple_selector = fun
+  let rec render_simple_selector =
+    fun
     | Variable(v) => "Variable(" ++ String.concat(".", v) ++ ")"
     | Ampersand => "Ampersand"
     | Type(v) => "Type(" ++ v ++ ")"
@@ -111,7 +112,8 @@ and render_selector = (ast: Selector.t) => {
         |> String.concat(", ")
       );
     };
-    let simple_selector = render_simple_selector(compound_selector.simple_selector);
+    let simple_selector =
+      compound_selector.type_selector |> Option.fold(~none="", ~some=Fun.id);
     let subclass_selectors =
       List.map(render_subclass_selector, compound_selector.subclass_selectors)
       |> String.concat(" ");
@@ -120,21 +122,38 @@ and render_selector = (ast: Selector.t) => {
       |> String.concat("");
 
     simple_selector ++ subclass_selectors ++ pseudo_selectors;
-  } and render_complex_selector: complex_selector => string =
+  }
+  and render_complex_selector: complex_selector => string =
     fun
-    | Combinator({left, combinator, right}) =>
-      render_compound_selector(left)
-      ++ Option.fold(~none=" ", ~some=o => "Combinator(" ++ o ++ ")", combinator)
-      ++ render_compound_selector(right)
     | Selector(compound) => render_compound_selector(compound)
+    | Combinator({left, right}) =>
+      render_compound_selector(left) ++ render_right_combinator(right)
+  and render_right_combinator = right => {
+    right
+    |> List.map(((combinator, compound_selector)) => {
+         Option.fold(
+           ~none=" ",
+           ~some=o => "Combinator(" ++ o ++ ")",
+           combinator,
+         )
+         ++ render_compound_selector(compound_selector)
+       })
+    |> String.concat(", ");
+  };
 
   switch (ast) {
   | SimpleSelector(v) =>
-    "SimpleSelector([" ++ (v |> List.map(render_simple_selector) |> String.concat(", ")) ++ "])"
+    "SimpleSelector(["
+    ++ (v |> List.map(render_simple_selector) |> String.concat(", "))
+    ++ "])"
   | ComplexSelector(v) =>
-    "ComplexSelector([" ++ (v |> List.map(render_complex_selector) |> String.concat(", ")) ++ "])"
+    "ComplexSelector(["
+    ++ (v |> List.map(render_complex_selector) |> String.concat(", "))
+    ++ "])"
   | CompoundSelector(v) =>
-    "CompoundSelector([" ++ (v |> List.map(render_compound_selector) |> String.concat(", ")) ++ "])"
+    "CompoundSelector(["
+    ++ (v |> List.map(render_compound_selector) |> String.concat(", "))
+    ++ "])"
   };
 }
 and render_component_value = (ast: with_loc(Component_value.t)) => {
@@ -219,8 +238,8 @@ switch (input, help) {
      - check if it's a valid declaration list and render it.
      - in any other case, print both errors.
      */
-  let ast = Css_lexer.parse_declaration(~container_lnum, ~pos, css);
-  print_endline(render_declaration(ast));
-  /* let ast = Css_lexer.parse_stylesheet(~container_lnum, ~pos, css);
-  print_endline(render_stylesheet(ast)); */
+  /* let ast = Css_lexer.parse_declaration(~container_lnum, ~pos, css);
+     print_endline(render_declaration(ast)); */
+  let ast = Css_lexer.parse_stylesheet(~container_lnum, ~pos, css);
+  print_endline(render_stylesheet(ast));
 };

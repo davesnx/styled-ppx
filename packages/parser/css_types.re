@@ -82,11 +82,10 @@ and Selector: {
     | Selector(compound_selector)
     | Combinator({
         left: compound_selector,
-        combinator: option(string),
-        right: compound_selector,
+        right: list((option(string), compound_selector)),
       })
   and compound_selector = {
-    simple_selector,
+    type_selector: option(string),
     subclass_selectors: list(subclass_selector),
     pseudo_selectors:
       list(

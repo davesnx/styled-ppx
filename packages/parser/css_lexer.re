@@ -66,7 +66,7 @@ let token_to_string =
   | Parser.WS => " "
   | Parser.WS_DOUBLE_COLON => " ::"
   | Parser.WS_COLON => " :"
-  | Parser.WS_HASH(h) => " #" ++ h
+  | Parser.WS_HASH(h) => "#" ++ h
   | Parser.DOT => "."
   | Parser.COMMA => ","
 ;
@@ -303,8 +303,8 @@ let rec get_next_token = (buf) => {
   | '}' => RIGHT_BRACE
   | '{' => LEFT_BRACE
   | "::" => DOUBLE_COLON
-  | ':' => COLON
   | ws_double_colon => WS_DOUBLE_COLON
+  | ':' => COLON
   | ws_colon => WS_COLON
   | '(' => LEFT_PAREN
   | ')' => RIGHT_PAREN
@@ -326,8 +326,8 @@ let rec get_next_token = (buf) => {
    * '-[0-9a-z]{1,6}' cannot be matched */
   | (_u, '+', unicode_range) => UNICODE_RANGE(Sedlexing.latin1(buf))
   | ident => IDENT(Sedlexing.latin1(buf))
-  | ws_hash => WS_HASH(eat_ws_hash(Sedlexing.latin1(buf)))
   | hash => HASH(Sedlexing.latin1(~skip=1, buf))
+  | ws_hash => WS_HASH(eat_ws_hash(Sedlexing.latin1(buf)))
   | whitespaces => WS
   | number => get_dimension(Sedlexing.latin1(buf), buf)
   | any => DELIM(Sedlexing.latin1(buf))

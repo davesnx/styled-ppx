@@ -11,8 +11,10 @@ open Css_types
 %token RIGHT_PAREN
 %token LEFT_BRACKET
 %token RIGHT_BRACKET
+%token WS_COLON
 %token COLON
 %token DOT
+%token WS_DOUBLE_COLON
 %token DOUBLE_COLON
 %token SEMI_COLON
 %token PERCENTAGE
@@ -30,15 +32,13 @@ open Css_types
 %token <string> AT_KEYFRAMES
 %token <string> AT_RULE
 %token <string> AT_RULE_STATEMENT
+%token <string> WS_HASH
 %token <string> HASH
 %token <string> NUMBER
 %token <string> UNICODE_RANGE
 %token <string * string * Css_types.dimension> FLOAT_DIMENSION
 %token <string * string> DIMENSION
 %token <string list> VARIABLE
-%token WS_COLON
-%token WS_DOUBLE_COLON
-%token <string> WS_HASH
 
 %start <Css_types.Stylesheet.t> stylesheet
 %start <Css_types.Declaration_list.t> declaration_list
@@ -185,8 +185,12 @@ pseudo_element_selector:
 pseudo_class_selector:
   /* :visited */
   | COLON; i = IDENT { Selector.(Pseudoclass(Ident i)) }
+  | WS_COLON; i = IDENT { Selector.(Pseudoclass(Ident i)) }
   /* :nth-child() */
   | COLON; f = IDENT; LEFT_PAREN; xs = with_loc(selector); RIGHT_PAREN {
+    Selector.(Pseudoclass(Function({ name = f; payload = xs })))
+  }
+  | WS_COLON; f = IDENT; LEFT_PAREN; xs = with_loc(selector); RIGHT_PAREN {
     Selector.(Pseudoclass(Function({ name = f; payload = xs })))
   }
 ;
@@ -218,7 +222,9 @@ attribute_selector:
 ;
 
 // <id-selector> = <hash-token>
-id_selector: h = HASH { Selector.Id h };
+id_selector:
+  | h = HASH { Selector.Id h }
+  | h = WS_HASH { Selector.Id h };
 
 // <class-selector> = '.' <ident-token>
 class_selector: DOT; c = IDENT { Selector.Class c };
@@ -266,12 +272,10 @@ pseudoelement_followed_by_pseudoclasslist:
 ;
 
 // <compound-selector> = [ <type-selector>? <subclass-selector>* [ <pseudo-element-selector> <pseudo-class-selector>* ]* ]!
-// Got the impression ^ is not correct, and should be
-// <compound-selector> = [ <type-selector> | <subclass-selector>* [ <pseudo-element-selector> <pseudo-class-selector>* ]* ]!
 compound_selector:
-  simple_selector = simple_selector; subclass_selectors = list(subclass_selector); pseudo_selectors = list(pseudoelement_followed_by_pseudoclasslist); {
+  type_selector = IDENT; subclass_selectors = loption(list(subclass_selector)); pseudo_selectors = list(pseudoelement_followed_by_pseudoclasslist); {
     Selector.{
-      simple_selector;
+      type_selector = Some type_selector;
       subclass_selectors;
       pseudo_selectors;
     }
@@ -279,10 +283,9 @@ compound_selector:
 
 // <complex-selector> = <compound-selector> [ <combinator>? <compound-selector> ]*
 complex_selector:
-  | left = compound_selector; combinator = COMBINATOR?; right = compound_selector; {
+  | left = compound_selector; right = loption(list(pair(COMBINATOR?, compound_selector))); {
     Selector.Combinator {
       left;
-      combinator;
       right;
     }
    }
@@ -319,9 +322,9 @@ component_value_in_prelude:
   | d = DELIM { Component_value.Delim d }
   | DOT { Component_value.Delim "." }
   | COLON { Component_value.Delim ":" }
-  | h = HASH { Component_value.Hash h }
   | WS_DOUBLE_COLON { Component_value.Delim " ::" }
   | WS_COLON { Component_value.Delim " :" }
+  | h = HASH { Component_value.Hash h }
   | h = WS_HASH { Component_value.Hash (" " ^ h) }
   | DOUBLE_COLON { Component_value.Delim "::" }
   | COMMA { Component_value.Delim "," }

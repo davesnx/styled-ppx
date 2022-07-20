@@ -69,7 +69,9 @@ let rec concat_selector_interpolation =
   let loc = Ast_helper.default_loc^;
 
   switch (si) {
-  | [Expr(e)] => [%expr [%e e]]
+  | [Expr(e)] =>
+    %expr
+    [%e e]
   | [String(s)] => string_to_const(~loc, s)
   | [String(s), Expr(e)] =>
     concat(~loc, string_to_const(~loc, s), [%expr [%e e]])
@@ -95,10 +97,10 @@ let rec render_at_rule = (ar: At_rule.t): Parsetree.expression =>
       "stylistic" as n |
       "styleset" as n |
       "character-variant" as n |
-      "property" as n | /* Experimental */
-      "color-profile" as n | /* Experimental */
-      "viewport" as n | /* Deprecated */
-      "document" as n, /* Deprecated */
+      "property" as n |
+      /* Experimental */ "color-profile" as n |
+      /* Experimental */ "viewport" as n |
+      /* Deprecated */ "document" as n, /* Deprecated */
       _,
     ) =>
     grammar_error(
@@ -293,7 +295,11 @@ and render_selector = (selector: Selector.t) => {
       [first, ...rest];
     };
     let simple_selector =
-      render_simple_selector(compound_selector.simple_selector);
+      Option.fold(
+        ~none=String(""),
+        ~some=x => String(x),
+        compound_selector.type_selector,
+      );
     let subclass_selectors =
       List.map(
         render_subclass_selector,
@@ -308,22 +314,35 @@ and render_selector = (selector: Selector.t) => {
   }
   and render_complex_selector = (complex): list(selector_interpolation) => {
     switch (complex) {
-    | Combinator({left, combinator, right}) =>
+    | Combinator({left, right}) =>
       let left = render_compound_selector(left);
-      let op = String(Option.fold(~none=" ", ~some=Fun.id, combinator));
-      let right = render_compound_selector(right);
-      List.concat([left, [op], right]);
+      let right = render_right_combinator(right);
+      List.concat([left, right]);
     | Selector(compound) => render_compound_selector(compound)
     };
+  }
+  and render_right_combinator = right => {
+    right
+    |> List.map(((combinator, compound_selector)) => {
+         List.cons(
+           Option.fold(~none=String(""), ~some=o => String(o), combinator),
+           render_compound_selector(compound_selector),
+         )
+       })
+    |> List.flatten;
   };
 
   switch (selector) {
-  | SimpleSelector(v) =>
-    v |> List.map(render_simple_selector) |> concat_selector_interpolation
-  | ComplexSelector(v) =>
-    v |> List.map(render_complex_selector) |> List.flatten |> concat_selector_interpolation;
-  | CompoundSelector(v) =>
-    v |> List.map(render_compound_selector) |> List.flatten |> concat_selector_interpolation
+  | SimpleSelector(simple) =>
+    List.map(render_simple_selector, simple) |> concat_selector_interpolation
+  | ComplexSelector(complex) =>
+    List.map(render_complex_selector, complex)
+    |> List.flatten
+    |> concat_selector_interpolation
+  | CompoundSelector(compound) =>
+    List.map(render_compound_selector, compound)
+    |> List.flatten
+    |> concat_selector_interpolation
   };
 }
 and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
