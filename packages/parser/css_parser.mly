@@ -29,7 +29,7 @@ open Css_types
 %token <string> AT_MEDIA
 %token <string> AT_KEYFRAMES
 %token <string> AT_RULE
-%token <string> AT_RULE_WITHOUT_BODY
+%token <string> AT_RULE_STATEMENT
 %token <string> HASH
 %token <string> NUMBER
 %token <string> UNICODE_RANGE
@@ -69,14 +69,6 @@ with_loc(X): x = X { (x, Lex_buffer.make_loc $startpos(x) $endpos(x))}
 
 // https://www.w3.org/TR/css-syntax-3/#at-keyword-token-diagram
 at_rule:
-  /* @charset */
-  | name = with_whitespace(with_loc(AT_RULE_WITHOUT_BODY)); xs = prelude; SEMI_COLON?; {
-    { At_rule.name = name;
-      prelude = xs;
-      block = Brace_block.Empty;
-      loc = Lex_buffer.make_loc $startpos $endpos;
-    }
-  }
   /* @media (min-width: 16rem) {} */
   | name = with_whitespace(with_loc(AT_MEDIA)); xs = prelude; with_whitespace(empty_brace_block) {
     { At_rule.name = name;
@@ -106,6 +98,14 @@ at_rule:
     { At_rule.name = name;
       prelude = ([(Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i))], Lex_buffer.make_loc $startpos(i) $endpos(i));
       block = Brace_block.Stylesheet s;
+      loc = Lex_buffer.make_loc $startpos $endpos;
+    }
+  }
+  /* @charset */
+  | name = with_whitespace(with_loc(AT_RULE_STATEMENT)); xs = prelude; SEMI_COLON?; {
+    { At_rule.name = name;
+      prelude = xs;
+      block = Brace_block.Empty;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
@@ -161,6 +161,7 @@ declaration_or_at_rule:
 
 declaration: d = declaration_without_eof; EOF { d };
 
+/* property: value; */
 declaration_without_eof:
   WS?; n = IDENT; WS?; COLON; WS?; v = prelude; WS?; i = boption(IMPORTANT); WS?; SEMI_COLON? {
     { Declaration.name = (n, Lex_buffer.make_loc $startpos(n) $endpos(n));

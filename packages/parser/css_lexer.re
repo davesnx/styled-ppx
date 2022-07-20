@@ -55,7 +55,7 @@ let token_to_string =
   | Parser.DELIM(s) => s
   | Parser.AT_MEDIA(s)
   | Parser.AT_KEYFRAMES(s)
-  | Parser.AT_RULE_WITHOUT_BODY(s)
+  | Parser.AT_RULE_STATEMENT(s)
   | Parser.AT_RULE(s) => "@" ++ s
   | Parser.HASH(s) => "#" ++ s
   | Parser.NUMBER(s) => s
@@ -89,7 +89,7 @@ let token_to_debug =
   | Parser.OPERATOR(s) => "OPERATOR('" ++ s ++ "')"
   | Parser.DELIM(s) => "DELIM('" ++ s ++ "')"
   | Parser.AT_RULE(s) => "AT_RULE('" ++ s ++ "')"
-  | Parser.AT_RULE_WITHOUT_BODY(s) => "AT_RULE_WITHOUT_BODY('" ++ s ++ "')"
+  | Parser.AT_RULE_STATEMENT(s) => "AT_RULE_STATEMENT('" ++ s ++ "')"
   | Parser.AT_MEDIA(s) => "AT_MEDIA('" ++ s ++ "')"
   | Parser.AT_KEYFRAMES(s) => "AT_KEYFRAMES('" ++ s ++ "')"
   | Parser.HASH(s) => "HASH('" ++ s ++ "')"
@@ -302,7 +302,7 @@ let rec get_next_token = buf => {
   | at_media => AT_MEDIA(Sedlexing.latin1(~skip=1, buf))
   | at_keyframes => AT_KEYFRAMES(Sedlexing.latin1(~skip=1, buf))
   | at_rule => AT_RULE(Sedlexing.latin1(~skip=1, buf))
-  | at_rule_without_body => AT_RULE_WITHOUT_BODY(Sedlexing.latin1(~skip=1, buf))
+  | at_rule_without_body => AT_RULE_STATEMENT(Sedlexing.latin1(~skip=1, buf))
   /* NOTE: should be placed above ident, otherwise pattern with
    * '-[0-9a-z]{1,6}' cannot be matched */
   | (_u, '+', unicode_range) => UNICODE_RANGE(Sedlexing.latin1(buf))
