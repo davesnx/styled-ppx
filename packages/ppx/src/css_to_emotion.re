@@ -437,8 +437,9 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
       pseudoToFn(p) |> CssJs.lident(~loc) |> Helper.Exp.ident(~loc);
     Helper.Exp.apply(~loc=rule.Style_rule.loc, ident, [(Nolabel, dl_expr)]); */
   | _ =>
-    let selector = render_prelude_value("", prelude);
-    render_rule_value(ident, selector);
+    /* let selector = render_prelude_value("", prelude);
+    render_rule_value(ident, selector); */
+    [%expr "TOIMPLEMENT"]
   };
 };
 
@@ -480,8 +481,8 @@ let render_keyframes = ((ruleList, loc)): Parsetree.expression => {
         "];
   |};
 
-  let get_percentage_from_prelude =
-    fun
+  let render_select_as_keyframe = (_prelude: Selector.t) => 0
+    /* switch (prelude) {
     | ([(Percentage(n), loc)], _) =>
       // TODO: can percentage be a decimal value?
       switch (int_of_string_opt(n)) {
@@ -494,18 +495,19 @@ let render_keyframes = ((ruleList, loc)): Parsetree.expression => {
     // The keyword to is equivalent to the value 100%
     | ([(Ident("to"), _)], _) => 100
     | _ => grammar_error(loc, invalidSelectorErrorMessage);
+    }; */
 
   let keyframes =
     ruleList
     |> List.map(rule => {
          switch (rule) {
          | Rule.Style_rule({
-             prelude: (_, prelude_loc) as prelude,
+             prelude: (selector, prelude_loc),
              block,
              loc: style_loc,
            }) =>
            let percentage =
-             get_percentage_from_prelude(prelude)
+             render_select_as_keyframe(selector)
              |> Builder.eint(~loc=prelude_loc);
            let rules =
              render_declarations(block) |> Builder.pexp_array(~loc);

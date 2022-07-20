@@ -63,7 +63,7 @@ and Declaration_list: {
 } = Declaration_list
 and Style_rule: {
   type t = {
-    prelude: with_loc(list(with_loc(Component_value.t))),
+    prelude: with_loc(Selector.t),
     block: Declaration_list.t,
     loc: Location.t,
   };

@@ -29,7 +29,7 @@ and render_rule = (ast: Rule.t) => {
 }
 and render_style_rule = (ast: Style_rule.t) => {
   render_record([
-    ("prelude", ast.prelude |> render_declaration_value),
+    ("prelude", ast.prelude |> fst |> render_selector),
     ("block", render_declaration_list(ast.block)),
   ]);
 }

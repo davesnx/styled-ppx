@@ -67,7 +67,7 @@ empty_brace_block: LEFT_BRACE; WS?; RIGHT_BRACE; SEMI_COLON?; { [] }
 
 with_loc(X): x = X { (x, Lex_buffer.make_loc $startpos(x) $endpos(x))}
 
-// https://www.w3.org/TR/css-syntax-3/#at-keyword-token-diagram
+// https://www.w3.org/TR/css-syntax-3/#at-rules
 at_rule:
   /* @media (min-width: 16rem) {} */
   | name = with_whitespace(with_loc(AT_MEDIA)); xs = prelude; with_whitespace(empty_brace_block) {
@@ -129,25 +129,21 @@ at_rule:
 
 /* .class {} */
 style_rule:
-  | xs = with_whitespace(prelude); block = with_whitespace(empty_brace_block); {
-    { Style_rule.prelude = xs;
+  | selector = with_loc(with_whitespace(selector)); block = with_whitespace(empty_brace_block); {
+    { Style_rule.prelude = selector;
       block = block, Location.none;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
-  | xs = with_whitespace(prelude); declarations = with_whitespace(brace_block(with_loc(declarations))); {
-    { Style_rule.prelude = xs;
+  | selector = with_loc(with_whitespace(selector)); declarations = with_whitespace(brace_block(with_loc(declarations))); {
+    { Style_rule.prelude = selector;
       block = declarations;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
 ;
 
-/* ? */
-prelude:
-  xs = with_loc(selector) {
-    ([(Component_value.Selector(xs), Lex_buffer.make_loc $startpos(xs) $endpos(xs))], Lex_buffer.make_loc $startpos $endpos)
-  };
+prelude: xs = with_loc(nonempty_list(with_whitespace(with_loc(component_value)))) { xs };
 
 declarations:
   | xs = nonempty_list(with_whitespace(declaration_or_at_rule)); SEMI_COLON?; { xs }
@@ -174,13 +170,13 @@ declaration_without_eof:
 
 /* ::after */
 pseudo_element_selector:
-  DOUBLE_COLON; i = IDENT { Selector.Pseudoelement(i) };
+  DOUBLE_COLON; pse = IDENT { Selector.Pseudoelement pse };
 
 // TODO: <function-token> and <any-value>
 // <pseudo-class-selector> = ':' <ident-token> | ':' <function-token> <any-value> ')'
 pseudo_class_selector:
   /* :visited */
-  | COLON; i = IDENT { Selector.(Pseudoclass(Ident(i))) }
+  | COLON; i = IDENT { Selector.(Pseudoclass(Ident i)) }
   /* :nth-child() */
   | COLON; f = IDENT; xs = paren_block {
     Selector.(Pseudoclass(Function({ name = f; payload = xs })))
@@ -196,7 +192,7 @@ attribute_selector:
   // We don't support namespaces in wq-name (`ns-prefix?`). We treat it like a IDENT
   // [ <wq-name> ]
   | LEFT_BRACKET; i = IDENT; RIGHT_BRACKET {
-    Selector.Attribute(Attr_value(i))
+    Selector.Attribute(Attr_value i)
   }
   // [ wq-name = "value"]
   | LEFT_BRACKET; i = IDENT; m = attr_matcher; v = STRING; RIGHT_BRACKET;
@@ -213,19 +209,11 @@ attribute_selector:
   // TODO: add attr-modifier
 ;
 
-// <simple-selector> = <type-selector> | <subclass-selector>
-simple_selector:
-  /* a {} */
-  | type_ = IDENT; WS? { Selector.Type type_ }
-  /* #a, .a, a:visited, a[] */
-  | sb = subclass_selector { Selector.Subclass sb }
-;
-
 // <id-selector> = <hash-token>
-id_selector: h = HASH { Selector.Id(h) };
+id_selector: h = HASH { Selector.Id h };
 
 // <class-selector> = '.' <ident-token>
-class_selector: DOT; i = IDENT { Selector.Class(i) };
+class_selector: DOT; c = IDENT { Selector.Class c };
 
 // <subclass-selector> = <id-selector> | <class-selector> | <attribute-selector> | <pseudo-class-selector>
 subclass_selector:
@@ -235,31 +223,27 @@ subclass_selector:
   | pcs = pseudo_class_selector { Selector.Pseudo_class pcs }
 ;
 
-// <complex-selector-list> = <complex-selector>#
-complex_selector_list:
-  | xs = separated_nonempty_list(COMMA, complex_selector) {
-    Selector.ComplexSelector(xs)
-  }
-;
-
-// <simple-selector-list> = <simple-selector>#
-simple_selector_list:
-  | xs = separated_nonempty_list(COMMA, simple_selector) {
-    Selector.SimpleSelector(xs)
-  }
-;
-
-// <compound-selector-list> = <compound-selector>#
-compound_selector_list:
-  | xs = separated_nonempty_list(COMMA, compound_selector) {
-    Selector.CompoundSelector(xs)
-  }
-;
-
 selector:
-  | xs = simple_selector_list { xs }
-  | xs = compound_selector_list { xs }
-  | xs = complex_selector_list { xs }
+  // <simple-selector-list> = <simple-selector>#
+  | xs = separated_nonempty_list(COMMA, simple_selector) {
+    Selector.SimpleSelector xs
+  }
+  // <compound-selector-list> = <compound-selector>#
+  /* | xs = separated_nonempty_list(COMMA, compound_selector) {
+    Selector.CompoundSelector xs
+  } */
+  // <complex-selector-list> = <complex-selector>#
+  | xs = separated_nonempty_list(COMMA, complex_selector) {
+    Selector.ComplexSelector xs
+  }
+
+// <simple-selector> = <type-selector> | <subclass-selector>
+simple_selector:
+  /* a {} */
+  | type_ = IDENT; WS? { Selector.Type type_ }
+  /* #a, .a, a:visited, a[] */
+  | sb = subclass_selector { Selector.Subclass sb }
+;
 
 // TODO: better name
 /* [ <pseudo-element-selector> <pseudo-class-selector>* ] */
@@ -303,7 +287,7 @@ component_value:
   | b = paren_block { Component_value.Paren_block b }
   | b = bracket_block { Component_value.Bracket_block b }
   | n = NUMBER; PERCENTAGE { Component_value.Percentage n }
-  /* | i = IDENT { Component_value.Ident i } */
+  | i = IDENT { Component_value.Ident i }
   | s = STRING { Component_value.String s }
   | u = URI { Component_value.Uri u }
   | c = COMBINATOR { Component_value.Combinator c}
@@ -314,7 +298,7 @@ component_value:
   | DOUBLE_COLON { Component_value.Delim "::" }
   | COMMA { Component_value.Delim "," }
   | AMPERSAND { Component_value.Ampersand }
-  /* | h = HASH { Component_value.Hash h } */
+  | h = HASH { Component_value.Hash h }
   | n = NUMBER { Component_value.Number n }
   | r = UNICODE_RANGE { Component_value.Unicode_range r }
   | d = FLOAT_DIMENSION { Component_value.Float_dimension d }
@@ -322,8 +306,8 @@ component_value:
   /* $(Lola.value) */
   | v = VARIABLE { Component_value.Variable v }
   /* calc() */
-/* | f = with_loc(IDENT); xs = with_loc(paren_block) {
+  | f = with_loc(IDENT); xs = with_loc(paren_block) {
     Component_value.Function (f, xs)
-  } */
-  | s = with_loc(selector) { Component_value.Selector(s) }
+  }
+  /* | s = with_loc(selector) { Component_value.Selector s } */
 ;
