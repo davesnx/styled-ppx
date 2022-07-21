@@ -252,9 +252,9 @@ selector:
     Selector.SimpleSelector xs
   }
   // <compound-selector-list> = <compound-selector>#
-  | xs = separated_nonempty_list(COMMA, with_whitespace(compound_selector)) {
+  /* | xs = separated_nonempty_list(COMMA, with_whitespace(compound_selector)) {
     Selector.CompoundSelector xs
-  }
+  } */
   // <complex-selector-list> = <complex-selector>#
   | xs = separated_nonempty_list(COMMA, with_whitespace(complex_selector)) {
     Selector.ComplexSelector xs
@@ -284,11 +284,11 @@ pseudoelement_followed_by_pseudoclasslist:
 // We differ from the spec on type-selector which is a IDENT,
 // for a simple_selector (adding & and variables)
 compound_selector:
-  | type_selector = simple_selector; subclass_selectors = loption(list(subclass_selector)); /* pseudo_selectors = loption(list(pseudoelement_followed_by_pseudoclasslist)); */ {
+  | type_selector = simple_selector; subclass_selectors = loption(list(subclass_selector)); pseudo_selectors = loption(list(pseudoelement_followed_by_pseudoclasslist)); {
     Selector.{
       type_selector = Some type_selector;
       subclass_selectors;
-      pseudo_selectors = [];
+      pseudo_selectors;
     }
   }
 ;

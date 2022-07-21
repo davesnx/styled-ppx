@@ -1,1 +1,1 @@
-[%cx {j|html, body {}|j}];
+[%cx {j|a, wbr {}|j}];
