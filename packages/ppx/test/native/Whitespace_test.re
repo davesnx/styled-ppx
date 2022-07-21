@@ -12,7 +12,7 @@ let css_tests = [
   (
     "ignore in style_rule",
     [%expr [%cx ".bar{}"]],
-    [%expr [%cx ".bar {}"]],
+    [%expr [%cx ".bar { }"]],
   ),
   (
     "ignore in style_rule",

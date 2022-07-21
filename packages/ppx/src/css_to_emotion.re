@@ -297,7 +297,7 @@ and render_selector = (selector: Selector.t) => {
     let simple_selector =
       Option.fold(
         ~none=String(""),
-        ~some=x => String(x),
+        ~some=render_simple_selector,
         compound_selector.type_selector,
       );
     let subclass_selectors =

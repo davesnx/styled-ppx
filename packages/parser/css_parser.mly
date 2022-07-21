@@ -23,6 +23,7 @@ open Css_types
 %token WS
 %token COMMA
 %token <string> IDENT
+%token <string> TAG
 %token <string> STRING
 %token <string> URI
 %token <string> OPERATOR
@@ -129,13 +130,13 @@ at_rule:
 
 /* .class {} */
 style_rule:
-  | selector = with_loc(with_whitespace(selector)); block = with_whitespace(empty_brace_block); {
+  | selector = with_loc(selector); WS?; block = with_whitespace(empty_brace_block); {
     { Style_rule.prelude = selector;
       block = block, Location.none;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
-  | selector = with_loc(with_whitespace(selector)); declarations = with_whitespace(brace_block(with_loc(declarations))); {
+  | selector = with_loc(selector); WS?; declarations = with_whitespace(brace_block(with_loc(declarations))); {
     { Style_rule.prelude = selector;
       block = declarations;
       loc = Lex_buffer.make_loc $startpos $endpos;
@@ -247,9 +248,9 @@ selector:
     Selector.CompoundSelector xs
   }
   // <complex-selector-list> = <complex-selector>#
-  | xs = separated_nonempty_list(COMMA, with_whitespace(complex_selector)) {
+  /* | xs = separated_nonempty_list(COMMA, with_whitespace(complex_selector)) {
     Selector.ComplexSelector xs
-  }
+  } */
 
 // <simple-selector> = <type-selector> | <subclass-selector>
 // We change the spec adding the & selector
@@ -260,7 +261,7 @@ simple_selector:
   /* $(Module.value) {} */
   | v = VARIABLE { Selector.Variable v }
   /* a {} */
-  | type_ = with_whitespace(IDENT); { Selector.Type type_ }
+  | type_ = TAG; { Selector.Type type_ }
   /* #a, .a, a:visited, a[] */
   | sb = subclass_selector { Selector.Subclass sb }
 ;
@@ -272,23 +273,27 @@ pseudoelement_followed_by_pseudoclasslist:
 ;
 
 // <compound-selector> = [ <type-selector>? <subclass-selector>* [ <pseudo-element-selector> <pseudo-class-selector>* ]* ]!
+// We differ from the spec on type-selector which is a IDENT,
+// for a simple_selector
 compound_selector:
-  type_selector = IDENT; subclass_selectors = loption(list(subclass_selector)); pseudo_selectors = list(pseudoelement_followed_by_pseudoclasslist); {
+  type_selector = simple_selector; subclass_selectors = list(subclass_selector); pseudo_selectors = list(pseudoelement_followed_by_pseudoclasslist); {
     Selector.{
       type_selector = Some type_selector;
       subclass_selectors;
       pseudo_selectors;
     }
-   }
+  }
+;
 
 // <complex-selector> = <compound-selector> [ <combinator>? <compound-selector> ]*
-complex_selector:
-  | left = compound_selector; /* right = loption(list(pair(COMBINATOR?, compound_selector))); */ {
+/* complex_selector:
+  | left = compound_selector; _right = loption(list(pair(COMBINATOR?, compound_selector))); {
     Selector.Combinator {
       left;
       right = [];
     }
-   }
+  }
+; */
 
 /* () */
 paren_block:

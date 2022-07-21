@@ -48,6 +48,7 @@ let token_to_string =
   | Parser.AMPERSAND => "&"
   | Parser.IMPORTANT => "!important"
   | Parser.IDENT(s) => s
+  | Parser.TAG(s) => s
   | Parser.STRING(s) => "'" ++ s ++ "'"
   | Parser.URI(s) => s
   | Parser.OPERATOR(s) => s
@@ -87,6 +88,7 @@ let token_to_debug =
   | Parser.AMPERSAND => "AMPERSAND"
   | Parser.IMPORTANT => "IMPORTANT"
   | Parser.IDENT(s) => "IDENT('" ++ s ++ "')"
+  | Parser.TAG(s) => "TAG('" ++ s ++ "')"
   | Parser.STRING(s) => "STRING('" ++ s ++ "')"
   | Parser.URI(s) => "URI('" ++ s ++ "')"
   | Parser.OPERATOR(s) => "OPERATOR('" ++ s ++ "')"
@@ -293,8 +295,131 @@ let eat_ws_hash = h => {
   h |> String.trim |> replace("#", "");
 };
 
+let eat_ident = ident => {
+  switch (ident) {
+    | "a"
+    | "abbr"
+    | "address"
+    | "area"
+    | "article"
+    | "aside"
+    | "audio"
+    | "b"
+    | "base"
+    | "bdi"
+    | "bdo"
+    | "blockquote"
+    | "body"
+    | "br"
+    | "button"
+    | "canvas"
+    | "caption"
+    | "cite"
+    | "code"
+    | "col"
+    | "colgroup"
+    | "data"
+    | "datalist"
+    | "dd"
+    | "del"
+    | "details"
+    | "dfn"
+    | "dialog"
+    | "div"
+    | "dl"
+    | "dt"
+    | "em"
+    | "embed"
+    | "fieldset"
+    | "figcaption"
+    | "figure"
+    | "footer"
+    | "form"
+    | "h1"
+    | "h2"
+    | "h3"
+    | "h4"
+    | "h5"
+    | "h6"
+    | "head"
+    | "header"
+    | "hgroup"
+    | "hr"
+    | "html"
+    | "i"
+    | "iframe"
+    | "img"
+    | "input"
+    | "ins"
+    | "kbd"
+    | "label"
+    | "legend"
+    | "li"
+    | "link"
+    | "main"
+    | "map"
+    | "mark"
+    | "math"
+    | "menu"
+    | "menuitem"
+    | "meta"
+    | "meter"
+    | "nav"
+    | "noscript"
+    | "object"
+    | "ol"
+    | "optgroup"
+    | "option"
+    | "output"
+    | "p"
+    | "param"
+    | "picture"
+    | "pre"
+    | "progress"
+    | "q"
+    | "rb"
+    | "rp"
+    | "rt"
+    | "rtc"
+    | "ruby"
+    | "s"
+    | "samp"
+    | "script"
+    | "section"
+    | "select"
+    | "slot"
+    | "small"
+    | "source"
+    | "span"
+    | "strong"
+    | "style"
+    | "sub"
+    | "summary"
+    | "sup"
+    | "svg"
+    | "table"
+    | "tbody"
+    | "td"
+    | "template"
+    | "textarea"
+    | "tfoot"
+    | "th"
+    | "thead"
+    | "time"
+    | "title"
+    | "tr"
+    | "track"
+    | "u"
+    | "ul"
+    | "var"
+    | "video"
+    | "wbr" => Parser.TAG(ident)
+    | _ => Parser.IDENT(ident)
+  };
+};
+
 let rec get_next_token = (buf) => {
-  open Css_parser;
+  open Parser;
   switch%sedlex (buf) {
   | eof => EOF
   | "/*" => discard_comments(buf)
@@ -325,7 +450,7 @@ let rec get_next_token = (buf) => {
   /* NOTE: should be placed above ident, otherwise pattern with
    * '-[0-9a-z]{1,6}' cannot be matched */
   | (_u, '+', unicode_range) => UNICODE_RANGE(Sedlexing.latin1(buf))
-  | ident => IDENT(Sedlexing.latin1(buf))
+  | ident => eat_ident(Sedlexing.latin1(buf))
   | hash => HASH(Sedlexing.latin1(~skip=1, buf))
   | ws_hash => WS_HASH(eat_ws_hash(Sedlexing.latin1(buf)))
   | whitespaces => WS

@@ -85,7 +85,7 @@ and Selector: {
         right: list((option(string), compound_selector)),
       })
   and compound_selector = {
-    type_selector: option(string),
+    type_selector: option(simple_selector),
     subclass_selectors: list(subclass_selector),
     pseudo_selectors:
       list(

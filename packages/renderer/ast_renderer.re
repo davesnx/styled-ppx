@@ -113,7 +113,7 @@ and render_selector = (ast: Selector.t) => {
       );
     };
     let simple_selector =
-      compound_selector.type_selector |> Option.fold(~none="", ~some=Fun.id);
+      compound_selector.type_selector |> Option.fold(~none="", ~some=render_simple_selector);
     let subclass_selectors =
       List.map(render_subclass_selector, compound_selector.subclass_selectors)
       |> String.concat(" ");
