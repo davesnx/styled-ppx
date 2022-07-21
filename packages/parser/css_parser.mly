@@ -65,13 +65,20 @@ loc(X): x = X { (x, Lex_buffer.make_loc $startpos(x) $endpos(x))}
 /* { ... } */
 brace_block(X): xs = delimited(LEFT_BRACE, with_whitespace(X), RIGHT_BRACE); { xs };
 
+/* TODO: Remove empty_brace_block */
 /* {} */
 empty_brace_block: LEFT_BRACE; WS?; RIGHT_BRACE; { [] }
+
+/* [] */
+bracket_block (X): xs = delimited(LEFT_BRACKET, X, RIGHT_BRACKET); { xs };
+
+/* () */
+paren_block (X): xs = delimited(LEFT_PAREN, X, RIGHT_PAREN); { xs };
 
 // https://www.w3.org/TR/css-syntax-3/#at-rules
 at_rule:
   /* @media (min-width: 16rem) {} */
-  | name = with_whitespace(loc(AT_MEDIA)); xs = prelude; with_whitespace(empty_brace_block) {
+  | name = with_whitespace(loc(AT_MEDIA)); xs = loc(prelude); with_whitespace(empty_brace_block) {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Empty;
@@ -79,7 +86,7 @@ at_rule:
     }
   }
   /* @media (min-width: 16rem) { ... } */
-  | name = with_whitespace(loc(AT_MEDIA)); xs = prelude; ds = with_whitespace(brace_block(loc(with_whitespace(declarations)))) {
+  | name = with_whitespace(loc(AT_MEDIA)); xs = loc(prelude); ds = with_whitespace(brace_block(loc(with_whitespace(declarations)))) {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Declaration_list ds;
@@ -103,7 +110,7 @@ at_rule:
     }
   }
   /* @charset */
-  | name = with_whitespace(loc(AT_RULE_STATEMENT)); xs = with_whitespace(prelude); with_whitespace(SEMI_COLON?); {
+  | name = with_whitespace(loc(AT_RULE_STATEMENT)); xs = with_whitespace(loc(prelude)); with_whitespace(SEMI_COLON?); {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Empty;
@@ -111,7 +118,7 @@ at_rule:
     }
   }
   /* @{{rule}} {} */
-  | name = with_whitespace(loc(AT_RULE)); xs = with_whitespace(prelude); with_whitespace(empty_brace_block) {
+  | name = with_whitespace(loc(AT_RULE)); xs = with_whitespace(loc(prelude)); with_whitespace(empty_brace_block) {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Empty;
@@ -119,7 +126,7 @@ at_rule:
     }
   }
   /* @{{rule}} { ... } */
-  | name = with_whitespace(loc(AT_RULE)); xs = with_whitespace(prelude); s = with_whitespace(brace_block(stylesheet_without_eof)) {
+  | name = with_whitespace(loc(AT_RULE)); xs = with_whitespace(loc(prelude)); s = with_whitespace(brace_block(stylesheet_without_eof)) {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Stylesheet s;
@@ -130,13 +137,13 @@ at_rule:
 
 /* .class {} */
 style_rule:
-  | selector = loc(selector); WS?; block = with_whitespace(empty_brace_block); {
+  | selector = loc(with_whitespace(selector)); WS?; block = with_whitespace(empty_brace_block); {
     { Style_rule.prelude = selector;
       block = block, Location.none;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
-  | selector = loc(selector); WS?; declarations = with_whitespace(brace_block(loc(declarations))); {
+  | selector = loc(with_whitespace(selector)); WS?; declarations = with_whitespace(brace_block(loc(declarations))); {
     { Style_rule.prelude = selector;
       block = declarations;
       loc = Lex_buffer.make_loc $startpos $endpos;
@@ -144,8 +151,9 @@ style_rule:
   }
 ;
 
-prelude: xs = loc(nonempty_list(loc(with_whitespace(component_value_in_prelude)))) { xs };
-component_values: xs = loc(nonempty_list(loc(with_whitespace(component_value)))) { xs };
+prelude: xs = nonempty_list(loc(with_whitespace(component_value_in_prelude))) { xs };
+
+component_values: xs = nonempty_list(loc(with_whitespace(component_value))) { xs };
 
 declarations:
   | xs = nonempty_list(with_whitespace(declaration_or_at_rule)); with_whitespace(SEMI_COLON?); { xs }
@@ -161,14 +169,14 @@ declaration: d = declaration_without_eof; EOF { d };
 
 /* property: value; */
 declaration_without_eof:
-  | n = with_whitespace(IDENT); with_whitespace(COLON); v = with_whitespace(component_values); i = boption(IMPORTANT); with_whitespace(SEMI_COLON?) {
+  | n = with_whitespace(IDENT); with_whitespace(COLON); v = with_whitespace(loc(component_values)); i = boption(IMPORTANT); with_whitespace(SEMI_COLON?) {
     { Declaration.name = (n, Lex_buffer.make_loc $startpos(n) $endpos(n));
       value = v;
       important = (i, Lex_buffer.make_loc $startpos(i) $endpos(i));
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
-  | n = with_whitespace(IDENT); with_whitespace(WS_COLON); v = with_whitespace(component_values); i = boption(IMPORTANT); with_whitespace(SEMI_COLON?) {
+  | n = with_whitespace(IDENT); with_whitespace(WS_COLON); v = with_whitespace(loc(component_values)); i = boption(IMPORTANT); with_whitespace(SEMI_COLON?) {
     { Declaration.name = (n, Lex_buffer.make_loc $startpos(n) $endpos(n));
       value = v;
       important = (i, Lex_buffer.make_loc $startpos(i) $endpos(i));
@@ -240,7 +248,7 @@ subclass_selector:
 
 selector:
   // <simple-selector-list> = <simple-selector>#
-  | xs = separated_nonempty_list(COMMA, with_whitespace(simple_selector)) {
+  | xs = separated_nonempty_list(COMMA?, with_whitespace(simple_selector)) {
     Selector.SimpleSelector xs
   }
   // <compound-selector-list> = <compound-selector>#
@@ -276,11 +284,11 @@ pseudoelement_followed_by_pseudoclasslist:
 // We differ from the spec on type-selector which is a IDENT,
 // for a simple_selector (adding & and variables)
 compound_selector:
-  | type_selector = simple_selector; subclass_selectors = list(subclass_selector); pseudo_selectors = loption(list(pseudoelement_followed_by_pseudoclasslist)); {
+  | type_selector = simple_selector; subclass_selectors = loption(list(subclass_selector)); /* pseudo_selectors = loption(list(pseudoelement_followed_by_pseudoclasslist)); */ {
     Selector.{
       type_selector = Some type_selector;
       subclass_selectors;
-      pseudo_selectors;
+      pseudo_selectors = [];
     }
   }
 ;
@@ -296,29 +304,16 @@ complex_selector:
   }
 ;
 
-/* () */
-paren_block:
-  LEFT_PAREN;
-  xs = separated_list(WS?, loc(with_whitespace(component_value)));
-  RIGHT_PAREN;
-    { xs }
-;
-
-/* [] */
-bracket_block:
-  LEFT_BRACKET;
-  xs = separated_list(WS?, loc(with_whitespace(component_value)));
-  RIGHT_BRACKET;
-    { xs }
-;
+/* prelude: xs = loc(nonempty_list(loc(with_whitespace(component_value_in_prelude)))) { xs }; */
 
 /* Can't find the component_value W3C Spec */
 /* component_value_in_prelude we transform WS_* into Delim with white spaces inside */
 /* in component_value we transform to regular Delim */
 /* The rest of component_value_in_prelude and component_value should be sync */
+
 component_value_in_prelude:
-  | b = paren_block { Component_value.Paren_block b }
-  | b = bracket_block { Component_value.Bracket_block b }
+  | b = paren_block(prelude) { Component_value.Paren_block b }
+  | b = bracket_block(prelude) { Component_value.Bracket_block b }
   | n = NUMBER; PERCENTAGE { Component_value.Percentage n }
   | i = IDENT { Component_value.Ident i }
   | s = STRING { Component_value.String s }
@@ -341,19 +336,15 @@ component_value_in_prelude:
   | v = VARIABLE { Component_value.Variable v }
   /* calc() */
   | f = loc(IDENT); LEFT_PAREN;
-    xs = loc(
-      with_whitespace(
-        separated_list(WS?, loc(component_value_in_prelude))
-      )
-    );
+    xs = loc(with_whitespace(prelude));
     RIGHT_PAREN; {
     Component_value.Function (f, xs)
   }
 ;
 
 component_value:
-  | b = paren_block { Component_value.Paren_block b }
-  | b = bracket_block { Component_value.Bracket_block b }
+  /* | b = paren_block { Component_value.Paren_block b }
+  | b = bracket_block { Component_value.Bracket_block b } */
   | n = NUMBER; PERCENTAGE { Component_value.Percentage n }
   | i = IDENT { Component_value.Ident i }
   | s = STRING { Component_value.String s }
@@ -376,11 +367,7 @@ component_value:
   | v = VARIABLE { Component_value.Variable v }
   /* calc() */
   | f = loc(IDENT); LEFT_PAREN;
-    xs = loc(
-      with_whitespace(
-        separated_list(WS?, loc(component_value))
-      )
-    );
+    xs = loc(with_whitespace(component_values));
     RIGHT_PAREN; {
     Component_value.Function (f, xs)
   }

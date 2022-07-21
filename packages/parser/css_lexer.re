@@ -485,6 +485,8 @@ let parse = (buf, parser) => {
   let last_token = ref((Parser.EOF, Lexing.dummy_pos, Lexing.dummy_pos));
   let next_token = () => {
     last_token := get_next_token_with_location(buf);
+    let (wat, _, _) = last_token^;
+    print_endline(token_to_debug(wat));
     last_token^;
   };
 
