@@ -9,11 +9,11 @@ let compare = (input, expected, {expect, _}) => {
 };
 
 let selectors_css_tests = [
-  (
+  /* (
     "More than one style rule",
-    [%expr [%cx "& > a { }; & > b { };"]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|& > a|js}, [||]), CssJs.selector(. {js|& > b|js}, [||])|])],
-  ),
+    [%expr [%cx "color: blue; & > a { }; & > b { };"]],
+    [%expr CssJs.style(. [|CssJs.color(CssJs.blue), CssJs.selector(. {js|& > a|js}, [||]), CssJs.selector(. {js|& > b|js}, [||])|])],
+  ), */
 ];
 
 describe("Should parse properly to bs-css style", ({test, _}) => {

@@ -9,11 +9,66 @@ let compare = (input, expected, {expect, _}) => {
 };
 
 let selectors_css_tests = [
-  (
-    ">",
-    [%expr [%cx "& > a { }; & > b { };"]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|& > a|js}, [||]), CssJs.selector(. {js|& > b|js}, [||])|])],
+  /* Simple */
+  /* (
+    ".bar",
+    [%expr [%cx ".bar      { } "]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|.bar|js}, [||])|])],
   ),
+  (
+    "#bar",
+    [%expr [%cx "#bar {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|#bar|js}, [||])|])],
+  ),
+  (
+    "div",
+    [%expr [%cx "div { } "]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|div|js}, [||])|])],
+  ),
+  (
+    "[id=baz]",
+    [%expr [%cx {j|[id=baz] {}|j}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|[id=baz]|js}, [||])|])],
+  ), */
+  /* (
+    "[id=baz]",
+    [%expr [%cx {j|[id='baz'] {}|j}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|[id='baz']|js}, [||])|])],
+  ), */
+  /* (
+    "html, body",
+    [%expr [%cx {j|html,body {}|j}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|html, body|js}, [||])|])],
+  ), */
+  /* (
+    "*",
+    [%expr [%cx {j|* {}|j}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|*|js}, [||])|])],
+  ), */
+
+  /* Compound */
+
+  /* "&.bar" */
+  /* (
+    "&.bar",
+    [%expr [%cx {j|&.bar {}|j}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|&.bar|js}, [||])|])],
+  ), */
+  /* "& .bar", */
+  /* p :first-child */
+  /* p:first-child */
+  /* p#first-child */
+  /* p #first-child */
+  /* div:nth-child(2n+1 of #someId.someClass) */
+  /* #foo > .bar + div.k1.k2 [id='baz']:hello(2):not(:where(#yolo))::before */
+
+  /* Complex */
+  /* (
+    ">",
+    [%expr [%cx "& > a { }"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& > a|js}, [||])|])],
+  ), */
+  /*
   (
     "nth-child(even)",
     [%expr [%cx "&:nth-child(even) {}"]],
@@ -146,16 +201,10 @@ let selectors_css_tests = [
         [||]
       )
     |])],
-  ),
-  /* "&.bar" */
-  /* "& .bar", */
-  /* p :first-child */
-  /* p:first-child */
-  /* p#first-child */
-  /* p #first-child */
+  ), */
 ];
 
-describe("Should transform selectors", ({test, _}) => {
+describeOnly("Should transform selectors", ({test, _}) => {
   selectors_css_tests |>
     List.iteri((_index, (title, result, expected)) =>
       test(

@@ -1,14 +1,13 @@
 /* esy x ast-renderer */
 open Css_types;
 
-let render_record = zippedRecord => {
-  let inner =
-    zippedRecord
-    |> List.map(((key, value)) => Printf.sprintf("  %s: %s", key, value))
-    |> String.concat(",\n");
+let render_field = ((key, value)) => Printf.sprintf("  %s: %s", key, value);
 
-  Printf.sprintf("{\n%s\n}", inner);
-};
+let render_record = record =>
+  record
+  |> List.map(render_field)
+  |> String.concat(",\n")
+  |> Printf.sprintf("{\n%s\n}");
 
 let dimension_of_string =
   fun
@@ -19,7 +18,7 @@ let dimension_of_string =
 
 let rec render_stylesheet = (ast: Stylesheet.t) => {
   let inner = ast |> fst |> List.map(render_rule) |> String.concat(", ");
-  "Stylesheet([" ++ inner ++ "])";
+  "Stylesheet(" ++ inner ++ ")";
 }
 and render_rule = (ast: Rule.t) => {
   switch (ast) {
@@ -30,7 +29,7 @@ and render_rule = (ast: Rule.t) => {
 }
 and render_style_rule = (ast: Style_rule.t) => {
   render_record([
-    ("prelude", ast.prelude |> render_declaration_value),
+    ("prelude", ast.prelude |> fst |> render_selector),
     ("block", render_declaration_list(ast.block)),
   ]);
 }
@@ -74,6 +73,89 @@ and render_declaration_value =
     ast |> fst |> List.map(render_component_value) |> String.concat(", ");
   "[" ++ inner ++ "]";
 }
+
+and render_selector = (ast: Selector.t) => {
+  open Selector;
+  let rec render_simple_selector =
+    fun
+    | Variable(v) => "Variable(" ++ String.concat(".", v) ++ ")"
+    | Ampersand => "Ampersand"
+    | Type(v) => "Type(" ++ v ++ ")"
+    | Subclass(v) => "Subclass(" ++ render_subclass_selector(v) ++ ")"
+  and render_subclass_selector: subclass_selector => string =
+    fun
+    | Id(v) => "Id(" ++ v ++ ")"
+    | Class(v) => "Class(" ++ v ++ ")"
+    | Attribute(Attr_value(v)) => "Attribute(" ++ v ++ ")"
+    | Attribute(To_equal({name, kind, value})) =>
+      "Attribute(To_equal(" ++ name ++ ", " ++ kind ++ ", " ++ value ++ "))"
+    | Pseudo_class(psc) => render_pseudo_selector(psc)
+  and render_pseudo_selector = pseudo_selector => {
+    switch (pseudo_selector) {
+    | Pseudoelement(v) => "Pseudoelement(" ++ v ++ ")"
+    | Pseudoclass(Ident(i)) => "Pseudoclass(Ident(" ++ i ++ "))"
+    | Pseudoclass(Function({name, payload: (selector, _)})) =>
+      "Pseudoclass(Function("
+      ++ name
+      ++ ", "
+      ++ render_selector(selector)
+      ++ "))"
+    };
+  };
+
+  let rec render_compound_selector = (compound_selector: compound_selector) => {
+    let render_selector_list = ((first, second)) => {
+      (first |> render_pseudo_selector)
+      ++ (
+        second
+        |> List.map(render_pseudo_selector)
+        |> String.concat(", ")
+      );
+    };
+    let simple_selector =
+      compound_selector.type_selector |> Option.fold(~none="", ~some=render_simple_selector);
+    let subclass_selectors =
+      List.map(render_subclass_selector, compound_selector.subclass_selectors)
+      |> String.concat(" ");
+    let pseudo_selectors =
+      List.map(render_selector_list, compound_selector.pseudo_selectors)
+      |> String.concat("");
+
+    simple_selector ++ subclass_selectors ++ pseudo_selectors;
+  }
+  and render_complex_selector: complex_selector => string =
+    fun
+    | Selector(compound) => render_compound_selector(compound)
+    | Combinator({left, right}) =>
+      render_compound_selector(left) ++ render_right_combinator(right)
+  and render_right_combinator = right => {
+    right
+    |> List.map(((combinator, compound_selector)) => {
+         Option.fold(
+           ~none=" ",
+           ~some=o => "Combinator(" ++ o ++ ")",
+           combinator,
+         )
+         ++ render_compound_selector(compound_selector)
+       })
+    |> String.concat(", ");
+  };
+
+  switch (ast) {
+  | SimpleSelector(v) =>
+    "SimpleSelector(["
+    ++ (v |> List.map(render_simple_selector) |> String.concat(", "))
+    ++ "])"
+  | ComplexSelector(v) =>
+    "ComplexSelector(["
+    ++ (v |> List.map(render_complex_selector) |> String.concat(", "))
+    ++ "])"
+  | CompoundSelector(v) =>
+    "CompoundSelector(["
+    ++ (v |> List.map(render_compound_selector) |> String.concat(", "))
+    ++ "])"
+  };
+}
 and render_component_value = (ast: with_loc(Component_value.t)) => {
   let value = ast |> fst;
   switch (value) {
@@ -90,6 +172,7 @@ and render_component_value = (ast: with_loc(Component_value.t)) => {
   | String(string) => "String(" ++ string ++ ")"
   | Uri(string) => "Uri(" ++ string ++ ")"
   | Operator(string) => "Operator(" ++ string ++ ")"
+  | Combinator(string) => "Combinator(" ++ string ++ ")"
   | Delim(string) => "Delim(" ++ string ++ ")"
   | Function(name, body) =>
     let body =
@@ -106,7 +189,6 @@ and render_component_value = (ast: with_loc(Component_value.t)) => {
     ++ ", "
     ++ dimension_of_string(dimension)
     ++ ")"
-  | Ampersand => "Ampersand"
   | Dimension((a, b)) => "Dimension(" ++ a ++ ", " ++ b ++ ")"
   | Variable(variable) =>
     "Variable(" ++ (variable |> String.concat(".")) ++ ")"
@@ -115,7 +197,7 @@ and render_component_value = (ast: with_loc(Component_value.t)) => {
   | PseudoclassFunction((v, _), (_, _)) =>
     "PseudoclassFunction(" ++ v ++ ")"
   | Selector(v) =>
-    let value = List.map(render_component_value, v) |> String.concat(", ");
+    let value = v |> fst |> render_selector;
     "Selector(" ++ value ++ ")";
   };
 };
@@ -156,6 +238,10 @@ switch (input, help) {
      - check if it's a valid declaration list and render it.
      - in any other case, print both errors.
      */
-  let ast = Css_lexer.parse_stylesheet(~container_lnum, ~pos, css);
-  print_endline(render_stylesheet(ast));
+  let ast = Css_lexer.parse_declaration_list(~container_lnum, ~pos, css);
+     print_endline(render_declaration_list(ast));
+  /* let ast = Css_lexer.parse_declaration(~container_lnum, ~pos, css);
+     print_endline(render_declaration(ast)); */
+  /* let ast = Css_lexer.parse_stylesheet(~container_lnum, ~pos, css);
+  print_endline(render_stylesheet(ast)); */
 };

@@ -36,7 +36,7 @@ let rec printUnlessIsEof = buffer => {
       printUnlessIsEof(buffer)
     }
   }
-}
+};
 
 switch (input, help) {
 | (Some(_), true)
