@@ -48,7 +48,6 @@ let token_to_string =
   | Parser.AMPERSAND => "&"
   | Parser.IMPORTANT => "!important"
   | Parser.IDENT(s) => s
-  | Parser.FUNCTION(s) => s ++ "("
   | Parser.TAG(s) => s
   | Parser.STRING(s) => "'" ++ s ++ "'"
   | Parser.OPERATOR(s) => s
@@ -107,7 +106,6 @@ let token_to_debug =
   | Parser.DIMENSION((n, d)) => "DIMENSION('" ++ n ++ ", " ++ d ++ "')"
   | Parser.VARIABLE(v) => "VARIABLE('" ++ (String.concat(".", v)) ++ "')"
   | Parser.COMBINATOR(s) => "COMBINATOR(" ++ s ++ ")"
-  | Parser.FUNCTION(s) => "FUNCTION(" ++ s ++ ")"
   | Parser.DOT => "DOT"
   | Parser.COMMA => "COMMA"
   | Parser.WS => "WS"
@@ -450,7 +448,6 @@ let rec get_next_token = (buf) => {
   /* NOTE: should be placed above ident, otherwise pattern with
    * '-[0-9a-z]{1,6}' cannot be matched */
   | (_u, '+', unicode_range) => UNICODE_RANGE(Sedlexing.latin1(buf))
-  | (ident, '(') => FUNCTION(Sedlexing.latin1(~drop=1, buf))
   | ident => eat_ident(Sedlexing.latin1(buf))
   | hash => HASH(Sedlexing.latin1(~skip=1, buf))
   | ws_hash => WS_HASH(eat_ws_hash(Sedlexing.latin1(buf)))
