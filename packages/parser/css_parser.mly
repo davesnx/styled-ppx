@@ -23,9 +23,10 @@ open Css_types
 %token WS
 %token COMMA
 %token <string> IDENT
+%token <string> FUNCTION
 %token <string> TAG
 %token <string> STRING
-%token <string> URI
+// %token <string> URI
 %token <string> OPERATOR
 %token <string> COMBINATOR
 %token <string> DELIM
@@ -62,6 +63,7 @@ rule:
 
 /* { ... } */
 brace_block(X): xs = delimited(LEFT_BRACE, with_whitespace(X), RIGHT_BRACE); { xs };
+
 /* {} */
 empty_brace_block: LEFT_BRACE; WS?; RIGHT_BRACE; { [] }
 
@@ -71,7 +73,7 @@ with_loc(X): x = X { (x, Lex_buffer.make_loc $startpos(x) $endpos(x))}
 /* https://www.w3.org/TR/css-syntax-3/#at-rules */
 at_rule:
   /* @media (min-width: 16rem) {} */
-  | name = with_whitespace(with_loc(AT_MEDIA)); xs = prelude; with_whitespace(empty_brace_block) {
+  | name = with_whitespace(with_loc(AT_MEDIA)); xs = with_loc(prelude); with_whitespace(empty_brace_block) {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Empty;
@@ -79,7 +81,7 @@ at_rule:
     }
   }
   /* @media (min-width: 16rem) { ... } */
-  | name = with_whitespace(with_loc(AT_MEDIA)); xs = prelude; ds = with_whitespace(brace_block(with_loc(with_whitespace(declarations)))) {
+  | name = with_whitespace(with_loc(AT_MEDIA)); xs = with_loc(prelude); ds = with_whitespace(brace_block(with_loc(with_whitespace(declarations)))) {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Declaration_list ds;
@@ -103,7 +105,7 @@ at_rule:
     }
   }
   /* @charset */
-  | name = with_whitespace(with_loc(AT_RULE_STATEMENT)); xs = with_whitespace(prelude); with_whitespace(SEMI_COLON?); {
+  | name = with_whitespace(with_loc(AT_RULE_STATEMENT)); xs = with_whitespace(with_loc(prelude)); with_whitespace(SEMI_COLON?); {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Empty;
@@ -111,7 +113,7 @@ at_rule:
     }
   }
   /* @{{rule}} {} */
-  | name = with_whitespace(with_loc(AT_RULE)); xs = with_whitespace(prelude); with_whitespace(empty_brace_block) {
+  | name = with_whitespace(with_loc(AT_RULE)); xs = with_whitespace(with_loc(prelude)); with_whitespace(empty_brace_block) {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Empty;
@@ -119,7 +121,7 @@ at_rule:
     }
   }
   /* @{{rule}} { ... } */
-  | name = with_whitespace(with_loc(AT_RULE)); xs = with_whitespace(prelude); s = with_whitespace(brace_block(stylesheet_without_eof)) {
+  | name = with_whitespace(with_loc(AT_RULE)); xs = with_whitespace(with_loc(prelude)); s = with_whitespace(brace_block(stylesheet_without_eof)) {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Stylesheet s;
@@ -144,8 +146,9 @@ style_rule:
   }
 ;
 
-prelude: xs = with_loc(nonempty_list(with_loc(with_whitespace(component_value_in_prelude)))) { xs };
-component_values: xs = with_loc(nonempty_list(with_loc(with_whitespace(component_value)))) { xs };
+prelude: xs = nonempty_list(with_loc(with_whitespace(component_value_in_prelude))) { xs };
+
+component_values: xs = nonempty_list(with_loc(with_whitespace(component_value))) { xs };
 
 declarations:
   | xs = nonempty_list(with_whitespace(declaration_or_at_rule)); with_whitespace(SEMI_COLON?); { xs }
@@ -161,14 +164,14 @@ declaration: d = declaration_without_eof; EOF { d };
 
 /* property: value; */
 declaration_without_eof:
-  | n = with_whitespace(IDENT); with_whitespace(COLON); v = with_whitespace(component_values); i = boption(IMPORTANT); with_whitespace(SEMI_COLON?) {
+  | n = with_whitespace(IDENT); with_whitespace(COLON); v = with_whitespace(with_loc(component_values)); i = boption(IMPORTANT); with_whitespace(SEMI_COLON?) {
     { Declaration.name = (n, Lex_buffer.make_loc $startpos(n) $endpos(n));
       value = v;
       important = (i, Lex_buffer.make_loc $startpos(i) $endpos(i));
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
-  | n = with_whitespace(IDENT); with_whitespace(WS_COLON); v = with_whitespace(component_values); i = boption(IMPORTANT); with_whitespace(SEMI_COLON?) {
+  | n = with_whitespace(IDENT); with_whitespace(WS_COLON); v = with_whitespace(with_loc(component_values)); i = boption(IMPORTANT); with_whitespace(SEMI_COLON?) {
     { Declaration.name = (n, Lex_buffer.make_loc $startpos(n) $endpos(n));
       value = v;
       important = (i, Lex_buffer.make_loc $startpos(i) $endpos(i));
@@ -186,13 +189,13 @@ pseudo_element_selector:
 pseudo_class_selector:
   /* :visited */
   | COLON; i = IDENT { Selector.(Pseudoclass(Ident i)) }
-  | WS_COLON; i = IDENT { Selector.(Pseudoclass(Ident i)) }
+  | WS_COLON; i = IDENT { Selector.(Pseudoclass(Ident ("*" ^ i))) }
   /* :nth-child() */
   | COLON; f = IDENT; LEFT_PAREN; xs = with_loc(selector); RIGHT_PAREN {
     Selector.(Pseudoclass(Function({ name = f; payload = xs })))
   }
   | WS_COLON; f = IDENT; LEFT_PAREN; xs = with_loc(selector); RIGHT_PAREN {
-    Selector.(Pseudoclass(Function({ name = f; payload = xs })))
+    Selector.(Pseudoclass(Function({ name = ("*" ^ f); payload = xs })))
   }
 ;
 
@@ -238,19 +241,16 @@ subclass_selector:
   | pcs = pseudo_class_selector { Selector.Pseudo_class pcs }
 ;
 
-
 /* https://www.w3.org/TR/selectors-4/#structure */
-/* A list of simple/compound/complex selectors is a comma-separated list of simple, compound, or complex selectors. This is also called just a selector list when the type is either unimportant or specified in the surrounding prose; if the type is important and unspecified, it defaults to meaning a list of complex selectors. */
 selector:
-  /* Both simple and compound lists become obsolete when complex uses them later */
   /* <simple-selector-list> = <simple-selector># */
-  /* | xs = separated_nonempty_list(COMMA, with_whitespace(simple_selector)) {
+  | xs = separated_nonempty_list(COMMA, with_whitespace(simple_selector)) {
     Selector.SimpleSelector xs
-  } */
+  }
   /* <compound-selector-list> = <compound-selector># */
-  /* | xs = separated_nonempty_list(COMMA, with_whitespace(compound_selector)) {
+  | xs = separated_nonempty_list(COMMA, with_whitespace(compound_selector)) {
     Selector.CompoundSelector xs
-  } */
+  }
   /* <complex-selector-list> = <complex-selector># */
   | xs = separated_nonempty_list(COMMA, with_whitespace(complex_selector)) {
     Selector.ComplexSelector xs
@@ -300,33 +300,23 @@ complex_selector:
   }
 ;
 
-/* () */
-paren_block:
-  LEFT_PAREN;
-  xs = separated_list(WS?, with_loc(with_whitespace(component_value)));
-  RIGHT_PAREN;
-    { xs }
-;
+/* [] */
+bracket_block(X): xs = delimited(LEFT_BRACKET, with_whitespace(X), RIGHT_BRACKET); { xs };
 
 /* [] */
-bracket_block:
-  LEFT_BRACKET;
-  xs = separated_list(WS?, with_loc(with_whitespace(component_value)));
-  RIGHT_BRACKET;
-    { xs }
-;
+paren_block(X): xs = delimited(LEFT_PAREN, with_whitespace(X), RIGHT_PAREN); { xs };
 
 /* Can't find the component_value W3C Spec
   component_value_in_prelude we transform WS_* into Delim with white spaces inside
   in component_value we transform to regular Delim
   The rest of component_value_in_prelude and component_value should be sync */
+
 component_value_in_prelude:
-  | b = paren_block { Component_value.Paren_block b }
-  | b = bracket_block { Component_value.Bracket_block b }
+  | b = paren_block(prelude) { Component_value.Paren_block b }
+  | b = bracket_block(prelude) { Component_value.Bracket_block b }
   | n = NUMBER; PERCENTAGE { Component_value.Percentage n }
   | i = IDENT { Component_value.Ident i }
   | s = STRING { Component_value.String s }
-  | u = URI { Component_value.Uri u }
   | c = COMBINATOR { Component_value.Combinator c}
   | o = OPERATOR { Component_value.Operator o }
   | d = DELIM { Component_value.Delim d }
@@ -345,18 +335,17 @@ component_value_in_prelude:
   /* $(Lola.value) */
   | v = VARIABLE { Component_value.Variable v }
   /* calc() */
-  | f = with_loc(IDENT); xs = with_loc(paren_block); {
+  | f = with_loc(FUNCTION); xs = with_loc(prelude); WS?; RIGHT_PAREN {
     Component_value.Function (f, xs)
   }
 ;
 
 component_value:
-  | b = paren_block { Component_value.Paren_block b }
-  | b = bracket_block { Component_value.Bracket_block b }
+  | b = paren_block(component_values) { Component_value.Paren_block b }
+  | b = bracket_block(component_values) { Component_value.Bracket_block b }
   | n = NUMBER; PERCENTAGE { Component_value.Percentage n }
   | i = IDENT { Component_value.Ident i }
   | s = STRING { Component_value.String s }
-  | u = URI { Component_value.Uri u }
   | c = COMBINATOR { Component_value.Combinator c}
   | o = OPERATOR { Component_value.Operator o }
   | d = DELIM { Component_value.Delim d }
@@ -375,7 +364,7 @@ component_value:
   /* $(Lola.value) */
   | v = VARIABLE { Component_value.Variable v }
   /* calc() */
-  | f = with_loc(IDENT); xs = with_loc(paren_block) {
+  | f = with_loc(FUNCTION); xs = with_loc(component_values); WS?; RIGHT_PAREN {
     Component_value.Function (f, xs)
   }
 ;
