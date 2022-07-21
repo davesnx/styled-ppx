@@ -298,7 +298,7 @@ compound_selector:
 /* () */
 paren_block:
   LEFT_PAREN;
-  xs = with_whitespace(separated_list(WS?, with_loc(component_value)));
+  xs = separated_list(WS?, with_loc(with_whitespace(component_value)));
   RIGHT_PAREN;
     { xs }
 ;
@@ -306,7 +306,7 @@ paren_block:
 /* [] */
 bracket_block:
   LEFT_BRACKET;
-  xs = with_whitespace(separated_list(WS?, with_loc(component_value)));
+  xs = separated_list(WS?, with_loc(with_whitespace(component_value)));
   RIGHT_BRACKET;
     { xs }
 ;

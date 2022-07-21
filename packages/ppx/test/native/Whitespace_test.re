@@ -61,8 +61,8 @@ let css_tests = [
   ),
   (
     "media with declarations",
-    [%expr [%cx ".clar {  background-image : url( 'img_tree.gif') ; }"]],
-    [%expr [%cx ".clar { background-image: url( 'img_tree.gif') }"]],
+    [%expr [%cx ".clar {  background-image : url( 'img_tree.gif' ) ; }"]],
+    [%expr [%cx ".clar { background-image: url( 'img_tree.gif' ) }"]],
   ),
   (
     "ignore space on declaration url",
