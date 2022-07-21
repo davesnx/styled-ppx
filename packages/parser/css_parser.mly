@@ -68,7 +68,7 @@ empty_brace_block: LEFT_BRACE; WS?; RIGHT_BRACE; { [] }
 with_whitespace(X): xs = delimited(WS?, X, WS?); { xs }
 with_loc(X): x = X { (x, Lex_buffer.make_loc $startpos(x) $endpos(x))}
 
-// https://www.w3.org/TR/css-syntax-3/#at-rules
+/* https://www.w3.org/TR/css-syntax-3/#at-rules */
 at_rule:
   /* @media (min-width: 16rem) {} */
   | name = with_whitespace(with_loc(AT_MEDIA)); xs = prelude; with_whitespace(empty_brace_block) {
@@ -181,8 +181,8 @@ declaration_without_eof:
 pseudo_element_selector:
   DOUBLE_COLON; pse = IDENT { Selector.Pseudoelement pse };
 
-// TODO: <function-token> and <any-value>
-// <pseudo-class-selector> = ':' <ident-token> | ':' <function-token> <any-value> ')'
+/* TODO: <function-token> and <any-value> */
+/* <pseudo-class-selector> = ':' <ident-token> | ':' <function-token> <any-value> ')' */
 pseudo_class_selector:
   /* :visited */
   | COLON; i = IDENT { Selector.(Pseudoclass(Ident i)) }
@@ -196,20 +196,20 @@ pseudo_class_selector:
   }
 ;
 
-// "~=" | "|=" | "^=" | "$=" | "*=" | "="
+/* "~=" | "|=" | "^=" | "$=" | "*=" | "=" */
 attr_matcher: o = OPERATOR { o };
 
-// <attribute-selector> = '[' <wq-name> ']' | '[' <wq-name> <attr-matcher> [ <string-token> | <ident-token> ] <attr-modifier>? ']'
+/* <attribute-selector> = '[' <wq-name> ']' | '[' <wq-name> <attr-matcher> [ <string-token> |  <ident-token> ] <attr-modifier>? ']' */
 attribute_selector:
-  // https://www.w3.org/TR/selectors-4/#type-nmsp
-  // We don't support namespaces in wq-name (`ns-prefix?`). We treat it like a IDENT
-  // [ <wq-name> ]
+  /* https://www.w3.org/TR/selectors-4/#type-nmsp
+  We don't support namespaces in wq-name (`ns-prefix?`). We treat it like a IDENT */
+  /* [ <wq-name> ] */
   | LEFT_BRACKET; i = IDENT; RIGHT_BRACKET {
     Selector.Attribute(Attr_value i)
   }
-  // [ wq-name = "value"]
+  /* [ wq-name = "value"] */
   | LEFT_BRACKET; i = IDENT; m = attr_matcher; v = STRING; RIGHT_BRACKET;
-  // [ wq-name = value]
+  /* [ wq-name = value] */
   | LEFT_BRACKET; i = IDENT; m = attr_matcher; v = IDENT; RIGHT_BRACKET {
     Selector.Attribute(
       To_equal({
@@ -219,18 +219,18 @@ attribute_selector:
       })
     )
   }
-  // TODO: add attr-modifier
+  /* TODO: add attr-modifier */
 ;
 
-// <id-selector> = <hash-token>
+/* <id-selector> = <hash-token> */
 id_selector:
   | h = HASH { Selector.Id h }
   | h = WS_HASH { Selector.Id h };
 
-// <class-selector> = '.' <ident-token>
+/* <class-selector> = '.' <ident-token> */
 class_selector: DOT; c = IDENT { Selector.Class c };
 
-// <subclass-selector> = <id-selector> | <class-selector> | <attribute-selector> | <pseudo-class-selector>
+/* <subclass-selector> = <id-selector> | <class-selector> | <attribute-selector> | <pseudo-class-selector> */
 subclass_selector:
   | id = id_selector { id }
   | c = class_selector { c }
@@ -238,23 +238,27 @@ subclass_selector:
   | pcs = pseudo_class_selector { Selector.Pseudo_class pcs }
 ;
 
-selector:
-  // <simple-selector-list> = <simple-selector>#
-  | xs = separated_nonempty_list(COMMA, with_whitespace(simple_selector)) {
-    Selector.SimpleSelector xs
-  }
-  // <compound-selector-list> = <compound-selector>#
-  | xs = separated_nonempty_list(COMMA, with_whitespace(compound_selector)) {
-    Selector.CompoundSelector xs
-  }
-  // <complex-selector-list> = <complex-selector>#
-  /* | xs = separated_nonempty_list(COMMA, with_whitespace(complex_selector)) {
-    Selector.ComplexSelector xs
-  } */
 
-// <simple-selector> = <type-selector> | <subclass-selector>
-// We change the spec adding the & selector
-// <simple-selector> = <self-selector> | <type-selector> | <subclass-selector>
+/* https://www.w3.org/TR/selectors-4/#structure */
+/* A list of simple/compound/complex selectors is a comma-separated list of simple, compound, or complex selectors. This is also called just a selector list when the type is either unimportant or specified in the surrounding prose; if the type is important and unspecified, it defaults to meaning a list of complex selectors. */
+selector:
+  /* Both simple and compound lists become obsolete when complex uses them later */
+  /* <simple-selector-list> = <simple-selector># */
+  /* | xs = separated_nonempty_list(COMMA, with_whitespace(simple_selector)) {
+    Selector.SimpleSelector xs
+  } */
+  /* <compound-selector-list> = <compound-selector># */
+  /* | xs = separated_nonempty_list(COMMA, with_whitespace(compound_selector)) {
+    Selector.CompoundSelector xs
+  } */
+  /* <complex-selector-list> = <complex-selector># */
+  | xs = separated_nonempty_list(COMMA, with_whitespace(complex_selector)) {
+    Selector.ComplexSelector xs
+  }
+
+/*  `<simple-selector> = <type-selector> | <subclass-selector>`
+  We change the spec adding the & selector
+  `<simple-selector> = <self-selector> | <type-selector> | <subclass-selector>` */
 simple_selector:
   /* & {} */
   | AMPERSAND; { Selector.Ampersand }
@@ -266,17 +270,17 @@ simple_selector:
   | sb = subclass_selector { Selector.Subclass sb }
 ;
 
-// TODO: better name
+/* TODO: better name */
 /* [ <pseudo-element-selector> <pseudo-class-selector>* ] */
 pseudoelement_followed_by_pseudoclasslist:
   | e = pseudo_element_selector; xs = list(pseudo_class_selector); { (e, xs) }
 ;
 
-// <compound-selector> = [ <type-selector>? <subclass-selector>* [ <pseudo-element-selector> <pseudo-class-selector>* ]* ]!
-// We differ from the spec on type-selector which is a IDENT,
-// for a simple_selector
+/* <compound-selector> = [ <type-selector>? <subclass-selector>* [ <pseudo-element-selector> <pseudo-class-selector>* ]* ]!
+  We differ from the spec on type-selector which is a IDENT,
+  for a simple_selector (adding & and variables) */
 compound_selector:
-  type_selector = simple_selector; subclass_selectors = list(subclass_selector); pseudo_selectors = list(pseudoelement_followed_by_pseudoclasslist); {
+  | type_selector = simple_selector; subclass_selectors = list(subclass_selector); pseudo_selectors = loption(list(pseudoelement_followed_by_pseudoclasslist)); {
     Selector.{
       type_selector = Some type_selector;
       subclass_selectors;
@@ -285,15 +289,16 @@ compound_selector:
   }
 ;
 
-// <complex-selector> = <compound-selector> [ <combinator>? <compound-selector> ]*
-/* complex_selector:
-  | left = compound_selector; _right = loption(list(pair(COMBINATOR?, compound_selector))); {
+/* <complex-selector> = <compound-selector> [ <combinator>? <compound-selector> ]* */
+complex_selector:
+  | left = with_whitespace(compound_selector);
+    right = loption(list(pair(with_whitespace(COMBINATOR?), with_whitespace(compound_selector)))); {
     Selector.Combinator {
       left;
-      right = [];
+      right;
     }
   }
-; */
+;
 
 /* () */
 paren_block:
@@ -311,10 +316,10 @@ bracket_block:
     { xs }
 ;
 
-/* Can't find the component_value W3C Spec */
-/* component_value_in_prelude we transform WS_* into Delim with white spaces inside */
-/* in component_value we transform to regular Delim */
-/* The rest of component_value_in_prelude and component_value should be sync */
+/* Can't find the component_value W3C Spec
+  component_value_in_prelude we transform WS_* into Delim with white spaces inside
+  in component_value we transform to regular Delim
+  The rest of component_value_in_prelude and component_value should be sync */
 component_value_in_prelude:
   | b = paren_block { Component_value.Paren_block b }
   | b = bracket_block { Component_value.Bracket_block b }

@@ -104,10 +104,10 @@ and render_selector = (ast: Selector.t) => {
   };
 
   let rec render_compound_selector = (compound_selector: compound_selector) => {
-    let render_selector_list = pseudo_selector => {
-      (fst(pseudo_selector) |> render_pseudo_selector)
+    let render_selector_list = ((first, second)) => {
+      (first |> render_pseudo_selector)
       ++ (
-        snd(pseudo_selector)
+        second
         |> List.map(render_pseudo_selector)
         |> String.concat(", ")
       );
