@@ -293,8 +293,68 @@ let eat_ws_hash = h => {
   h |> String.trim |> replace("#", "");
 };
 
-let eat_ident = ident => {
-  switch (ident) {
+let rec get_next_token = (buf) => {
+  open Parser;
+  open Sedlexing;
+  switch%sedlex (buf) {
+  | eof => EOF
+  | "/*" => discard_comments(buf)
+  | '.' => DOT
+  | ';' => SEMI_COLON
+  | '}' => RIGHT_BRACE
+  | '{' => LEFT_BRACE
+  | "::" => DOUBLE_COLON
+  | ws_double_colon => WS_DOUBLE_COLON
+  | ':' => COLON
+  | ws_colon => WS_COLON
+  | '(' => LEFT_PAREN
+  | ')' => RIGHT_PAREN
+  | '[' => LEFT_BRACKET
+  | ']' => RIGHT_BRACKET
+  | '%' => PERCENTAGE
+  | '&' => AMPERSAND
+  | ',' => COMMA
+  | variable => VARIABLE(latin1(~skip=2, ~drop=1, buf) |> String.split_on_char('.'))
+  | operator => OPERATOR(latin1(buf))
+  | combinator => COMBINATOR(latin1(buf))
+  | string => STRING(latin1(~skip=1, ~drop=1, buf))
+  | important => IMPORTANT
+  | at_media => AT_MEDIA(latin1(~skip=1, buf))
+  | at_keyframes => AT_KEYFRAMES(latin1(~skip=1, buf))
+  | at_rule => AT_RULE(latin1(~skip=1, buf))
+  | at_rule_without_body => AT_RULE_STATEMENT(latin1(~skip=1, buf))
+  /* NOTE: should be placed above ident, otherwise pattern with
+   * '-[0-9a-z]{1,6}' cannot be matched */
+  | (_u, '+', unicode_range) => UNICODE_RANGE(latin1(buf))
+  | ident => eat_ident(buf)
+  | hash => HASH(latin1(~skip=1, buf))
+  | ws_hash => WS_HASH(eat_ws_hash(latin1(buf)))
+  | whitespaces => WS
+  | number => get_dimension(latin1(buf), buf)
+  | any => DELIM(latin1(buf))
+  | _ => assert(false)
+  };
+}
+and get_dimension = (n, buf) => {
+  open Sedlexing;
+  switch%sedlex (buf) {
+    | length => FLOAT_DIMENSION((n, latin1(buf), Length))
+    | angle => FLOAT_DIMENSION((n, latin1(buf), Angle))
+    | time => FLOAT_DIMENSION((n, latin1(buf), Time))
+    | frequency => FLOAT_DIMENSION((n, latin1(buf), Frequency))
+    | ident => DIMENSION((n, latin1(buf)))
+    | _ => NUMBER(n)
+  }
+}
+and discard_comments = buf => {
+  switch%sedlex (buf) {
+    | eof => raise(LexingError((buf.Sedlexing.pos, "Unterminated comment at the end of the string")))
+    | "*/" => get_next_token(buf)
+    | _ => discard_comments(buf)
+  };
+} and eat_ident = buff => {
+  open Sedlexing;
+  switch%sedlex (buff) {
     | "a"
     | "abbr"
     | "address"
@@ -411,66 +471,8 @@ let eat_ident = ident => {
     | "ul"
     | "var"
     | "video"
-    | "wbr" => Parser.TAG(ident)
-    | _ => Parser.IDENT(ident)
-  };
-};
-
-let rec get_next_token = (buf) => {
-  open Parser;
-  switch%sedlex (buf) {
-  | eof => EOF
-  | "/*" => discard_comments(buf)
-  | '.' => DOT
-  | ';' => SEMI_COLON
-  | '}' => RIGHT_BRACE
-  | '{' => LEFT_BRACE
-  | "::" => DOUBLE_COLON
-  | ws_double_colon => WS_DOUBLE_COLON
-  | ':' => COLON
-  | ws_colon => WS_COLON
-  | '(' => LEFT_PAREN
-  | ')' => RIGHT_PAREN
-  | '[' => LEFT_BRACKET
-  | ']' => RIGHT_BRACKET
-  | '%' => PERCENTAGE
-  | '&' => AMPERSAND
-  | ',' => COMMA
-  | variable => VARIABLE(Sedlexing.latin1(~skip=2, ~drop=1, buf) |> String.split_on_char('.'))
-  | operator => OPERATOR(Sedlexing.latin1(buf))
-  | combinator => COMBINATOR(Sedlexing.latin1(buf))
-  | string => STRING(Sedlexing.latin1(~skip=1, ~drop=1, buf))
-  | important => IMPORTANT
-  | at_media => AT_MEDIA(Sedlexing.latin1(~skip=1, buf))
-  | at_keyframes => AT_KEYFRAMES(Sedlexing.latin1(~skip=1, buf))
-  | at_rule => AT_RULE(Sedlexing.latin1(~skip=1, buf))
-  | at_rule_without_body => AT_RULE_STATEMENT(Sedlexing.latin1(~skip=1, buf))
-  /* NOTE: should be placed above ident, otherwise pattern with
-   * '-[0-9a-z]{1,6}' cannot be matched */
-  | (_u, '+', unicode_range) => UNICODE_RANGE(Sedlexing.latin1(buf))
-  | ident => eat_ident(Sedlexing.latin1(buf))
-  | hash => HASH(Sedlexing.latin1(~skip=1, buf))
-  | ws_hash => WS_HASH(eat_ws_hash(Sedlexing.latin1(buf)))
-  | whitespaces => WS
-  | number => get_dimension(Sedlexing.latin1(buf), buf)
-  | any => DELIM(Sedlexing.latin1(buf))
-  | _ => assert(false)
-  };
-}
-and get_dimension = (n, buf) =>
-  switch%sedlex (buf) {
-  | length => FLOAT_DIMENSION((n, Sedlexing.latin1(buf), Length))
-  | angle => FLOAT_DIMENSION((n, Sedlexing.latin1(buf), Angle))
-  | time => FLOAT_DIMENSION((n, Sedlexing.latin1(buf), Time))
-  | frequency => FLOAT_DIMENSION((n, Sedlexing.latin1(buf), Frequency))
-  | ident => DIMENSION((n, Sedlexing.latin1(buf)))
-  | _ => NUMBER(n)
-}
-and discard_comments = buf => {
-  switch%sedlex (buf) {
-    | eof => raise(LexingError((buf.Sedlexing.pos, "Unterminated comment at the end of the string")))
-    | "*/" => get_next_token(buf)
-    | _ => discard_comments(buf)
+    | "wbr" => Parser.TAG(latin1(buff))
+    | _ => Parser.IDENT(latin1(buff))
   };
 };
 
