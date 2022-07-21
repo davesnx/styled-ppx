@@ -45,7 +45,7 @@
     "@opam/reason": "3.7.0",
     "@opam/dune": "2.9.0",
     "@opam/ppx_deriving": "5.2.1",
-    "@opam/menhir": "20201216",
+    "@opam/menhir": "20220210",
     "@opam/ppxlib": "0.22.0",
     "@opam/sedlex": "davesnx/sedlex:sedlex.opam#8de2e80611ce6b200baf857d9071099af8daaa5a",
     "@opam/ocaml-lsp-server": "1.9.0",

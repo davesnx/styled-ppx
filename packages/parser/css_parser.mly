@@ -75,7 +75,7 @@ bracket_block (X): xs = delimited(LEFT_BRACKET, X, RIGHT_BRACKET); { xs };
 /* () */
 paren_block (X): xs = delimited(LEFT_PAREN, X, RIGHT_PAREN); { xs };
 
-// https://www.w3.org/TR/css-syntax-3/#at-rules
+/* https://www.w3.org/TR/css-syntax-3/#at-rules */
 at_rule:
   /* @media (min-width: 16rem) {} */
   | name = with_whitespace(loc(AT_MEDIA)); xs = loc(prelude); with_whitespace(empty_brace_block) {
@@ -189,8 +189,7 @@ declaration_without_eof:
 pseudo_element_selector:
   DOUBLE_COLON; pse = IDENT { Selector.Pseudoelement pse };
 
-// TODO: <function-token> and <any-value>
-// <pseudo-class-selector> = ':' <ident-token> | ':' <function-token> <any-value> ')'
+/* <pseudo-class-selector> = ':' <ident-token> | ':' <function-token> <any-value> ')' */
 pseudo_class_selector:
   /* :visited */
   | COLON; i = IDENT { Selector.(Pseudoclass(Ident i)) }
@@ -202,22 +201,23 @@ pseudo_class_selector:
   | WS_COLON; f = IDENT; LEFT_PAREN; xs = loc(selector); RIGHT_PAREN {
     Selector.(Pseudoclass(Function({ name = f; payload = xs })))
   }
+  /* TODO: <function-token> and <any-value> */
 ;
 
-// "~=" | "|=" | "^=" | "$=" | "*=" | "="
+/* "~=" | "|=" | "^=" | "$=" | "*=" | "=" */
 attr_matcher: o = OPERATOR { o };
 
-// <attribute-selector> = '[' <wq-name> ']' | '[' <wq-name> <attr-matcher> [ <string-token> | <ident-token> ] <attr-modifier>? ']'
+/* <attribute-selector> = '[' <wq-name> ']' | '[' <wq-name> <attr-matcher> [  <string-token> | <ident-token> ] <attr-modifier>? ']' */
 attribute_selector:
-  // https://www.w3.org/TR/selectors-4/#type-nmsp
-  // We don't support namespaces in wq-name (`ns-prefix?`). We treat it like a IDENT
-  // [ <wq-name> ]
+  /* https://www.w3.org/TR/selectors-4/#type-nmsp */
+  /* We don't support namespaces in wq-name (`ns-prefix?`). We treat it like a IDENT */
+  /* [ <wq-name> ] */
   | LEFT_BRACKET; i = IDENT; RIGHT_BRACKET {
     Selector.Attribute(Attr_value i)
   }
-  // [ wq-name = "value"]
+  /* [ wq-name = "value"] */
   | LEFT_BRACKET; i = IDENT; m = attr_matcher; v = STRING; RIGHT_BRACKET;
-  // [ wq-name = value]
+  /* [ wq-name = value] */
   | LEFT_BRACKET; i = IDENT; m = attr_matcher; v = IDENT; RIGHT_BRACKET {
     Selector.Attribute(
       To_equal({
@@ -227,18 +227,18 @@ attribute_selector:
       })
     )
   }
-  // TODO: add attr-modifier
+  /* TODO: add attr-modifier */
 ;
 
-// <id-selector> = <hash-token>
+/* <id-selector> = <hash-token> */
 id_selector:
   | h = HASH { Selector.Id h }
   | h = WS_HASH { Selector.Id h };
 
-// <class-selector> = '.' <ident-token>
+/* <class-selector> = '.' <ident-token> */
 class_selector: DOT; c = IDENT { Selector.Class c };
 
-// <subclass-selector> = <id-selector> | <class-selector> | <attribute-selector> | <pseudo-class-selector>
+/* <subclass-selector> = <id-selector> | <class-selector> | <attribute-selector> | <pseudo-class-selector> */
 subclass_selector:
   | id = id_selector { id }
   | c = class_selector { c }
@@ -247,22 +247,23 @@ subclass_selector:
 ;
 
 selector:
-  // <simple-selector-list> = <simple-selector>#
-  | xs = separated_nonempty_list(COMMA?, with_whitespace(simple_selector)) {
+  /* <simple-selector-list> = <simple-selector># */
+  | xs = separated_nonempty_list(COMMA, with_whitespace(simple_selector)) {
     Selector.SimpleSelector xs
   }
-  // <compound-selector-list> = <compound-selector>#
-  /* | xs = separated_nonempty_list(COMMA, with_whitespace(compound_selector)) {
+  /* <compound-selector-list> = <compound-selector># */
+  | xs = separated_nonempty_list(COMMA, with_whitespace(compound_selector)) {
     Selector.CompoundSelector xs
-  } */
-  // <complex-selector-list> = <complex-selector>#
+  }
+  /* <complex-selector-list> = <complex-selector># */
   | xs = separated_nonempty_list(COMMA, with_whitespace(complex_selector)) {
     Selector.ComplexSelector xs
   }
+;
 
-// <simple-selector> = <type-selector> | <subclass-selector>
-// We change the spec adding the & selector
-// <simple-selector> = <self-selector> | <type-selector> | <subclass-selector>
+/* <simple-selector> = <type-selector> | <subclass-selector> */
+/* We change the spec adding the & selector */
+/* <simple-selector> = <self-selector> | <type-selector> | <subclass-selector> */
 simple_selector:
   /* & {} */
   | AMPERSAND; { Selector.Ampersand }
@@ -274,15 +275,15 @@ simple_selector:
   | sb = subclass_selector { Selector.Subclass sb }
 ;
 
-// TODO: better name
+/* TODO: better name */
 /* [ <pseudo-element-selector> <pseudo-class-selector>* ] */
 pseudoelement_followed_by_pseudoclasslist:
   | e = pseudo_element_selector; xs = list(pseudo_class_selector); { (e, xs) }
 ;
 
-// <compound-selector> = [ <type-selector>? <subclass-selector>* [ <pseudo-element-selector> <pseudo-class-selector>* ]* ]!
-// We differ from the spec on type-selector which is a IDENT,
-// for a simple_selector (adding & and variables)
+/* <compound-selector> = [ <type-selector>? <subclass-selector>* [ <pseudo-element-selector> <pseudo-class-selector>* ]* ]!
+  We differ from the spec on type-selector which is a IDENT,
+  for a simple_selector (adding & and variables) */
 compound_selector:
   | type_selector = simple_selector; subclass_selectors = loption(list(subclass_selector)); pseudo_selectors = loption(list(pseudoelement_followed_by_pseudoclasslist)); {
     Selector.{
@@ -293,7 +294,7 @@ compound_selector:
   }
 ;
 
-// <complex-selector> = <compound-selector> [ <combinator>? <compound-selector> ]*
+/* <complex-selector> = <compound-selector> [ <combinator>? <compound-selector> ]* */
 complex_selector:
   | left = with_whitespace(compound_selector);
     right = loption(list(pair(with_whitespace(COMBINATOR?), with_whitespace(compound_selector)))); {
@@ -304,13 +305,9 @@ complex_selector:
   }
 ;
 
-/* prelude: xs = loc(nonempty_list(loc(with_whitespace(component_value_in_prelude)))) { xs }; */
-
-/* Can't find the component_value W3C Spec */
-/* component_value_in_prelude we transform WS_* into Delim with white spaces inside */
-/* in component_value we transform to regular Delim */
-/* The rest of component_value_in_prelude and component_value should be sync */
-
+/* component_value_in_prelude we transform WS_* into Delim with white spaces inside
+in component_value we transform to regular Delim
+The rest of component_value_in_prelude and component_value should be sync */
 component_value_in_prelude:
   | b = paren_block(prelude) { Component_value.Paren_block b }
   | b = bracket_block(prelude) { Component_value.Bracket_block b }
@@ -343,8 +340,8 @@ component_value_in_prelude:
 ;
 
 component_value:
-  /* | b = paren_block { Component_value.Paren_block b }
-  | b = bracket_block { Component_value.Bracket_block b } */
+  | b = paren_block(component_values) { Component_value.Paren_block b }
+  | b = bracket_block(component_values) { Component_value.Bracket_block b }
   | n = NUMBER; PERCENTAGE { Component_value.Percentage n }
   | i = IDENT { Component_value.Ident i }
   | s = STRING { Component_value.String s }
