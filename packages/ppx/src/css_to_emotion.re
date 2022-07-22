@@ -132,15 +132,13 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
           )
           |> Helper.Exp.ident(~loc);
         let space = string_to_const(~loc, " ");
-        %expr
-        [%e acc] ++ [%e ident] ++ [%e space];
+        [%expr [%e acc] ++ [%e ident] ++ [%e space]];
       }
     /* and, only, all */
     | (Ident(id), loc) => {
         let id = string_to_const(~loc, id);
         let space = string_to_const(~loc, " ");
-        %expr
-        [%e acc] ++ [%e id] ++ [%e space];
+        [%expr [%e acc] ++ [%e id] ++ [%e space]];
       }
     /* (color) */
     | (Paren_block([(Ident(_), ident_loc)]), _) => {

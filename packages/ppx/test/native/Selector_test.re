@@ -169,7 +169,7 @@ let selectors_css_tests = [
   ), */
 ];
 
-describeOnly("Should transform selectors", ({test, _}) => {
+describe("Should transform selectors", ({test, _}) => {
   selectors_css_tests |>
     List.iteri((_index, (title, result, expected)) =>
       test(

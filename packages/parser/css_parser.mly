@@ -71,10 +71,9 @@ bracket_block (X): xs = delimited(LEFT_BRACKET, X, RIGHT_BRACKET); { xs };
 /* () */
 paren_block (X): xs = delimited(LEFT_PAREN, X, RIGHT_PAREN); { xs };
 
-
 at_rule_prelude:
   | i = IDENT { Component_value.Ident i }
-  | xs = paren_block(component_values) { Component_value.Paren_block xs }
+  | xs = paren_block(prelude) { Component_value.Paren_block xs }
 
 /* https://www.w3.org/TR/css-syntax-3/#at-rules */
 at_rule:
@@ -326,9 +325,7 @@ component_value_in_prelude:
   /* $(Lola.value) */
   | v = VARIABLE { Component_value.Variable v }
   /* calc() */
-  | f = loc(IDENT); LEFT_PAREN;
-    xs = loc(prelude);
-    RIGHT_PAREN; {
+  | f = loc(IDENT); LEFT_PAREN; xs = loc(prelude); RIGHT_PAREN; {
     Component_value.Function (f, xs)
   }
   | WS { Component_value.Delim "*" }
@@ -355,9 +352,7 @@ component_value:
   /* $(Lola.value) */
   | v = VARIABLE { Component_value.Variable v }
   /* calc() */
-  | f = loc(IDENT); LEFT_PAREN;
-    xs = loc(component_values);
-    RIGHT_PAREN; {
+  | f = loc(IDENT); LEFT_PAREN; xs = loc(component_values); RIGHT_PAREN; {
     Component_value.Function (f, xs)
   }
 ;

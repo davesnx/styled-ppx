@@ -56,7 +56,7 @@ let css_tests = [
   ),
   (
     "media with declarations",
-    [%expr [%cx "@media screen and (min-width: 30px) { color: red; }"]],
+    [%expr [%cx "@media    screen and (min-width: 30px  ) { color: red; }"]],
     [%expr [%cx "@media screen and (min-width: 30px) { color: red; } "]],
   ),
   (
@@ -71,8 +71,8 @@ let css_tests = [
   ),
   (
     "ignore space on declaration url",
-    [%expr [%css " background-image: url('img_tree.gif')" ]],
-    [%expr [%css "background-image: url('img_tree.gif')" ]],
+    [%expr [%css " background-image: url('img_tree.gif' )" ]],
+    [%expr [%css "background-image: url('img_tree.gif' )" ]],
   ),
 ];
 
