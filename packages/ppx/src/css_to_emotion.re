@@ -304,7 +304,7 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
   let block = rule.Style_rule.block;
   let loc = block |> snd;
   let selector_expr = render_declarations(block) |> Builder.pexp_array(~loc);
-  let selector_name: expression = render_selector(prelude) |> String.trim |> string_to_const(~loc);
+  let selector_name: expression = render_selector(prelude) |> String.trim |> String_interpolation.Transform.transform(~loc);
 
   Helper.Exp.apply(
     ~loc=rule.Style_rule.loc,

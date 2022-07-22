@@ -127,7 +127,7 @@ let selectors_css_tests = [
   (
     "& $(Variables.selector_query)",
     [%expr [%cx "& $(Variables.selector_query) {}"]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|& $(Variables.selector_query)|js}, [||])|])],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& |js} ++ Variables.selector_query, [||])|])],
   ),
   /* (
     "& a[target=\"_blank\"]",
@@ -145,7 +145,7 @@ let selectors_css_tests = [
   (
     "$(pseudo)",
     [%expr [%cx "$(pseudo) {}"]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|$(pseudo)|js}, [||])|])],
+    [%expr CssJs.style(. [|CssJs.selector(. pseudo, [||])|])],
   ),
   (
     "div > .class",
@@ -155,7 +155,7 @@ let selectors_css_tests = [
   (
     "div > $(Variables.element)",
     [%expr [%cx "& div > $(Variables.element) {}"]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|& div > $(Variables.element)|js}, [||])|])],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& div > |js} ++ Variables.element, [||])|])],
   ),
   /* (
     "*:not(:last-child)",
