@@ -36,27 +36,27 @@ module Theme = {
 };
 let black = "#000";
 
-module StringInterpolation = [%styled.div {j|
+/* module StringInterpolation = [%styled.div {j|
   color: $(Theme.var);
   background-color: $(black);
   border-color: $(Theme.Border.black);
-  __UNSAFE__ color: trust-me;
   display: block;
-|j}];
+|j}]; */
+
 let className = [%cx "display: block;"];
 let classNameWithMultiLine = [%cx {| display: block; |}];
 let classNameWithArray = [%cx [| cssProperty |]];
 let cssRule = [%css "color: blue;"];
 let classNameWithCss = [%cx [| cssRule, [%css "background-color: green;"] |]];
 
-module DynamicComponent = [%styled.div
+/* module DynamicComponent = [%styled.div
   (~var) => {j|
      color: $(var);
      display: block;
    |j}
-];
+]; */
 
-module SelectorsMediaQueries = [%styled.div {j|
+/* module SelectorsMediaQueries = [%styled.div {j|
   @media (min-width: 600px) {
     background: blue;
   }
@@ -65,12 +65,12 @@ module SelectorsMediaQueries = [%styled.div {j|
   }
   & > p { color: pink; font-size: 24px; }
 |j}
-];
+]; */
 
-let keyframe = [%keyframe {|
+/* let keyframe = [%keyframe {|
   0% { opacity: 0 }
   100% { opacity: 1 }
-|}];
+|}]; */
 
 module ArrayDynamicComponent = [%styled.div (~var) =>
   [|
@@ -96,23 +96,23 @@ module DynamicComponentWithDefaultValue = [%styled.div (~var=CssJs.hex("333")) =
 let width = "120px";
 let orientation = "landscape"
 
-module SelectorWithInterpolation = [%styled.div {|
+/* module SelectorWithInterpolation = [%styled.div {|
   @media only screen and (min-width: $(width)) {
     color: blue;
   };
   @media (min-width: 700px) and (orientation: $(orientation)) {
     display: none;
   }
-|}];
+|}]; */
 
-module MediaQueryCalc = [%styled.div {|
+/* module MediaQueryCalc = [%styled.div {|
   @media (min-width: calc(2px * 1px)) {
     color: red;
   }
   @media (min-width: calc(1000px - 2%)) {
     color: red;
   }
-|}];
+|}]; */
 
 /* This test ensures that the warning is being triggered */
 /* module T = [%styled.span () => [|
