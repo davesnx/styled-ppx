@@ -46,8 +46,12 @@ let concat = (~loc, expr, acc) => {
 let rec render_at_rule = (ar: At_rule.t): Parsetree.expression =>
   switch (ar.At_rule.name) {
   | ("media", _) => render_media_query(ar)
+  | ("keyframe", _) => grammar_error(ar.loc, "@keyframe should be defined outside")
   | (
-      "charset" as n | "import" as n | "namespace" as n | "supports" as n |
+      "charset" as n |
+      "import" as n |
+      "namespace" as n |
+      "supports" as n |
       "page" as n |
       "font-face" as n |
       "keyframes" as n |
@@ -59,10 +63,10 @@ let rec render_at_rule = (ar: At_rule.t): Parsetree.expression =>
       "stylistic" as n |
       "styleset" as n |
       "character-variant" as n |
-      "property" as n |
-      /* Experimental */ "color-profile" as n |
-      /* Experimental */ "viewport" as n |
-      /* Deprecated */ "document" as n, /* Deprecated */
+      "property" as n | /* Experimental */
+      "color-profile" as n | /* Experimental */
+      "viewport" as n | /* Deprecated */
+      "document" as n, /* Deprecated */
       _,
     ) =>
     grammar_error(
