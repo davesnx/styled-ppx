@@ -79,7 +79,6 @@ and render_selector = (ast: Selector.t) => {
 
   let rec render_simple_selector =
     fun
-    | Universal => "Universal"
     | Ampersand => "Ampersand"
     | Type(v) => "Type(" ++ v ++ ")"
     | Variable(v) => "Variable(" ++ String.concat(".", v) ++ ")"

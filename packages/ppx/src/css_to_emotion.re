@@ -262,7 +262,6 @@ and render_selector = (selector: Selector.t) => {
   let loc = Ast_helper.default_loc^;
   let rec render_simple_selector =
     fun
-    | Universal => String("*")
     | Ampersand => String("&")
     | Type(v) => String(v)
     | Subclass(v) => render_subclass_selector(v)

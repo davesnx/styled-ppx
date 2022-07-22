@@ -400,7 +400,6 @@ let rec get_next_token = (buf, whitespace_detected) => {
   switch%sedlex (buf) {
   | eof => [EOF]
   | '.' => [DOT]
-  | '*' => [ASTERISK]
   | ';' => [SEMI_COLON]
   | '}' => [RIGHT_BRACE]
   | '{' => [LEFT_BRACE]
