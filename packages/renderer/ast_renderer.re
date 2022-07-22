@@ -76,22 +76,36 @@ and render_declaration_value =
 
 and render_selector = (ast: Selector.t) => {
   open Selector;
+
   let rec render_simple_selector =
     fun
-    | Variable(v) => "Variable(" ++ String.concat(".", v) ++ ")"
     | Ampersand => "Ampersand"
     | Type(v) => "Type(" ++ v ++ ")"
+    | Variable(v) => "Variable(" ++ String.concat(".", v) ++ ")"
     | Subclass(v) => "Subclass(" ++ render_subclass_selector(v) ++ ")"
   and render_subclass_selector: subclass_selector => string =
     fun
     | Id(v) => "Id(" ++ v ++ ")"
     | Class(v) => "Class(" ++ v ++ ")"
-    | Attribute(Attr_value(v)) => "Attribute(" ++ v ++ ")"
-    | Attribute(To_equal({name, kind, value})) =>
-      "Attribute(To_equal(" ++ name ++ ", " ++ kind ++ ", " ++ value ++ "))"
+    | Attribute(attr) => "Attribute(" ++ render_attribute(attr) ++ ")"
     | Pseudo_class(psc) => render_pseudo_selector(psc)
-  and render_pseudo_selector = pseudo_selector => {
-    switch (pseudo_selector) {
+  and render_attribute =
+    fun
+    | Attr_value(v) => "Attr_value(" ++ v ++ ")"
+    | To_equal({name, kind, value}) =>
+      "To_equal("
+      ++ name
+      ++ ", "
+      ++ kind
+      ++ ", "
+      ++ render_attr_(value)
+      ++ ")"
+  and render_attr_ =
+    fun
+    | Attr_ident(i) => i
+    | Attr_string(str) => "\"" ++ str ++ "\""
+  and render_pseudo_selector =
+    fun
     | Pseudoelement(v) => "Pseudoelement(" ++ v ++ ")"
     | Pseudoclass(Ident(i)) => "Pseudoclass(Ident(" ++ i ++ "))"
     | Pseudoclass(Function({name, payload: (selector, _)})) =>
@@ -99,21 +113,16 @@ and render_selector = (ast: Selector.t) => {
       ++ name
       ++ ", "
       ++ render_selector(selector)
-      ++ "))"
-    };
-  };
+      ++ "))";
 
   let rec render_compound_selector = (compound_selector: compound_selector) => {
     let render_selector_list = ((first, second)) => {
       (first |> render_pseudo_selector)
-      ++ (
-        second
-        |> List.map(render_pseudo_selector)
-        |> String.concat(", ")
-      );
+      ++ (second |> List.map(render_pseudo_selector) |> String.concat(", "));
     };
     let simple_selector =
-      compound_selector.type_selector |> Option.fold(~none="", ~some=render_simple_selector);
+      compound_selector.type_selector
+      |> Option.fold(~none="", ~some=render_simple_selector);
     let subclass_selectors =
       List.map(render_subclass_selector, compound_selector.subclass_selectors)
       |> String.concat(" ");
@@ -238,10 +247,11 @@ switch (input, help) {
      - check if it's a valid declaration list and render it.
      - in any other case, print both errors.
      */
-  let ast = Css_lexer.parse_declaration_list(~container_lnum, ~pos, css);
-     print_endline(render_declaration_list(ast));
-  /* let ast = Css_lexer.parse_declaration(~container_lnum, ~pos, css);
-     print_endline(render_declaration(ast)); */
-  /* let ast = Css_lexer.parse_stylesheet(~container_lnum, ~pos, css);
-  print_endline(render_stylesheet(ast)); */
+  /* let ast = Css_lexer.parse_declaration_list(~container_lnum, ~pos, css);
+  print_endline(render_declaration_list(ast)); */
+
+/* let ast = Css_lexer.parse_declaration(~container_lnum, ~pos, css);
+   print_endline(render_declaration(ast)); */
+let ast = Css_lexer.parse_stylesheet(~container_lnum, ~pos, css);
+   print_endline(render_stylesheet(ast));
 };

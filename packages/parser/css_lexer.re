@@ -210,7 +210,7 @@ let at_rule = [%sedlex.regexp? ("@", ident)];
 let at_media = [%sedlex.regexp? ("@", "media")];
 let at_keyframes = [%sedlex.regexp? ("@", "keyframes")];
 
-let tag = [%sedlex.regexp? 
+let tag = [%sedlex.regexp?
   "a"
   | "abbr"
   | "address"
@@ -398,7 +398,7 @@ let frequency = [%sedlex.regexp? (_h, _z) | (_k, _h, _z)];
 let rec get_next_token = (buf, whitespace_detected) => {
   open Css_parser;
   switch%sedlex (buf) {
-  | eof => [EOF] 
+  | eof => [EOF]
   | '.' => [DOT]
   | ';' => [SEMI_COLON]
   | '}' => [RIGHT_BRACE]
