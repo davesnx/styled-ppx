@@ -71,6 +71,14 @@ bracket_block (X): xs = delimited(LEFT_BRACKET, X, RIGHT_BRACKET); { xs };
 /* () */
 paren_block (X): xs = delimited(LEFT_PAREN, X, RIGHT_PAREN); { xs };
 
+/* https://www.w3.org/TR/mediaqueries-5 */
+/* Parsing with this approach is almost as good the entire spec */
+
+/* Missing grammars: */
+/* (width >= 600px) */
+/* (400px < width < 1000px) */
+/* (not (color)) and (not (hover)) */
+/* Combinator "," */
 at_rule_prelude:
   | i = IDENT { Component_value.Ident i }
   | xs = paren_block(prelude) { Component_value.Paren_block xs }
