@@ -1,5 +1,6 @@
 open Setup;
 open Ppxlib;
+
 let loc = Location.none;
 
 let compare = (input, expected, {expect, _}) => {
