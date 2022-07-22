@@ -10,7 +10,7 @@ let compare = (input, expected, {expect, _}) => {
 
 let selectors_css_tests = [
   /* Simple */
-  /* (
+  (
     ".bar",
     [%expr [%cx ".bar      { } "]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|.bar|js}, [||])|])],
@@ -29,12 +29,12 @@ let selectors_css_tests = [
     "[id=baz]",
     [%expr [%cx {j|[id=baz] {}|j}]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|[id=baz]|js}, [||])|])],
-  ), */
-  /* (
+  ),
+  (
     "[id=baz]",
-    [%expr [%cx {j|[id='baz'] {}|j}]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|[id='baz']|js}, [||])|])],
-  ), */
+    [%expr [%cx {j|[id="baz"] {}|j}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|[id="baz"]|js}, [||])|])],
+  ),
   /* (
     "html, body",
     [%expr [%cx {j|html,body {}|j}]],

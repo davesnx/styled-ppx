@@ -201,14 +201,22 @@ attribute_selector:
     Selector.Attribute(Attr_value i)
   }
   /* [ wq-name = "value"] */
-  | LEFT_BRACKET; i = IDENT; m = attr_matcher; v = STRING; RIGHT_BRACKET;
+  | LEFT_BRACKET; i = IDENT; m = attr_matcher; v = STRING; RIGHT_BRACKET {
+    Selector.Attribute(
+      To_equal({
+        name = i;
+        kind = m;
+        value = Selector.Attr_string v
+      })
+    )
+  }
   /* [ wq-name = value] */
   | LEFT_BRACKET; i = IDENT; m = attr_matcher; v = IDENT; RIGHT_BRACKET {
     Selector.Attribute(
       To_equal({
         name = i;
         kind = m;
-        value = v
+        value = Selector.Attr_ident v
       })
     )
   }

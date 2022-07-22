@@ -272,8 +272,15 @@ and render_selector = (selector: Selector.t) => {
     | Id(v) => String("#" ++ v)
     | Class(v) => String("." ++ v)
     | Attribute(Attr_value(v)) => String("[" ++ v ++ "]")
-    | Attribute(To_equal({name, kind, value})) =>
+    | Attribute(To_equal({name, kind, value})) =>  {
+      let value = Selector.(
+        switch(value) {
+          | Attr_ident(ident) => ident
+          | Attr_string(ident) => "\"" ++ ident ++ "\""
+        }
+      )
       String("[" ++ name ++ kind ++ value ++ "]")
+    }
     | Pseudo_class(psc) => render_pseudo_selector(psc)
   and render_pseudo_selector =
     fun

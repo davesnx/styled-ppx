@@ -109,8 +109,11 @@ and Selector: {
     | To_equal({
         name: string,
         kind: string,
-        value: string,
+        value: attr_value,
       })
+  and attr_value = 
+    | Attr_ident(string)
+    | Attr_string(string)
   and pseudo_selector =
     | Pseudoelement(string)
     | Pseudoclass(pseudoclass_kind)
