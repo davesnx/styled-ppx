@@ -3,10 +3,17 @@ open ReactTestingLibrary
 
 EmotionSerializer.load()
 
-let fadeIn = %keyframe(`
+/* Since animationName is a string under the hood, casting it to string
+ to match it as a string */
+external toString: CssJs.animationName => string = "%identity"
+external fromAnimationName: string => CssJs.animationName = "%identity"
+
+/* let fadeIn = %keyframe(`
   0% { opacity: 0 }
   100% { opacity: 1 }
-`)
+`) */
+
+let fadeIn = fromAnimationName("fade")
 
 module Animate = %styled.div(`
   background-color: black;
@@ -40,20 +47,14 @@ module Animate = %styled.div(`
 ];
  */
 
-let testData = [
-  (
+let testData = [/* (
     "keyframe",
     %keyframe("
         from { opacity: 0 }
         to { opacity: 1 }
       "),
     CssJs.keyframes(. [(0, [CssJs.opacity(0.)]), (100, [CssJs.opacity(1.)])]),
-  ),
-]
-
-/* Since animationName is a string under the hood, casting it to string
- to match it as a string */
-external toString: CssJs.animationName => string = "%identity"
+  ), */]
 
 describe("Keyframes", _ => {
   open Expect
