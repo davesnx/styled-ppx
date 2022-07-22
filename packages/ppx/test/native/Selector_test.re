@@ -35,11 +35,11 @@ let selectors_css_tests = [
     [%expr [%cx {j|[id="baz"] {}|j}]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|[id="baz"]|js}, [||])|])],
   ),
-  /* (
+  (
     "html, body",
     [%expr [%cx {j|html,body {}|j}]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|html, body|js}, [||])|])],
-  ), */
+     [%expr CssJs.style(. [|CssJs.selector(. {js|html, body|js}, [||])|])],
+  ),
   /* (
     "*",
     [%expr [%cx {j|* {}|j}]],
@@ -49,11 +49,11 @@ let selectors_css_tests = [
   /* Compound */
 
   /* "&.bar" */
-  /* (
+  (
     "&.bar",
     [%expr [%cx {j|&.bar {}|j}]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|&.bar|js}, [||])|])],
-  ), */
+  ),
   /* "& .bar", */
   /* p :first-child */
   /* p:first-child */
@@ -63,12 +63,12 @@ let selectors_css_tests = [
   /* #foo > .bar + div.k1.k2 [id='baz']:hello(2):not(:where(#yolo))::before */
 
   /* Complex */
-  /* (
+  (
     ">",
     [%expr [%cx "& > a { }"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& > a|js}, [||])|])],
-  ), */
-  /*
+  ),
+  
   (
     "nth-child(even)",
     [%expr [%cx "&:nth-child(even) {}"]],
@@ -201,7 +201,7 @@ let selectors_css_tests = [
         [||]
       )
     |])],
-  ), */
+  ),
 ];
 
 describeOnly("Should transform selectors", ({test, _}) => {

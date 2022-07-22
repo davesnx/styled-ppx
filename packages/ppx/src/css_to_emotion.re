@@ -69,14 +69,13 @@ let rec concat_selector_interpolation =
   let loc = Ast_helper.default_loc^;
 
   switch (si) {
-  | [Expr(e)] =>
-    %expr
-    [%e e]
+  | [Expr(e)] => e
+  | [String(a), String(b), ...rest] => concat_selector_interpolation([String(a ++ " " ++ b), ...rest])
   | [String(s)] => string_to_const(~loc, s)
   | [String(s), Expr(e)] =>
-    concat(~loc, string_to_const(~loc, s), [%expr [%e e]])
+    concat(~loc, string_to_const(~loc, s), e)
   | [Expr(e), String(s)] =>
-    concat(~loc, [%expr [%e e]], string_to_const(~loc, s))
+    concat(~loc, e, string_to_const(~loc, s))
   | rest => concat_selector_interpolation(rest)
   };
 };
