@@ -79,14 +79,14 @@ paren_block (X): xs = delimited(LEFT_PAREN, X, RIGHT_PAREN); { xs };
 /* (400px < width < 1000px) */
 /* (not (color)) and (not (hover)) */
 /* Combinator "," */
-at_rule_prelude:
+media_query_list:
   | i = IDENT { Component_value.Ident i }
   | xs = paren_block(prelude) { Component_value.Paren_block xs }
 
 /* https://www.w3.org/TR/css-syntax-3/#at-rules */
 at_rule:
   /* @media (min-width: 16rem) {} */
-  | name = loc(AT_MEDIA); xs = loc(nonempty_list(loc(at_rule_prelude))); empty_brace_block {
+  | name = loc(AT_MEDIA); xs = loc(nonempty_list(loc(media_query_list))); empty_brace_block {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Empty;
@@ -94,7 +94,7 @@ at_rule:
     }
   }
   /* @media (min-width: 16rem) { ... } */
-  | name = loc(AT_MEDIA); xs = loc(nonempty_list(loc(at_rule_prelude))); ds = brace_block(loc(declarations)) {
+  | name = loc(AT_MEDIA); xs = loc(nonempty_list(loc(media_query_list))); ds = brace_block(loc(declarations)) {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Declaration_list ds;
