@@ -1,7 +1,7 @@
 open Setup;
 open Ppxlib;
-let loc = Location.none;
 
+let loc = Location.none;
 let compare = (input, expected, {expect, _}) => {
   let result = Pprintast.string_of_expression(input);
   let expected = Pprintast.string_of_expression(expected);

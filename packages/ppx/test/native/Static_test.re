@@ -1,5 +1,6 @@
 open Setup;
 open Ppxlib;
+
 let loc = Location.none;
 
 let extract_tests = array_expr => {
@@ -36,7 +37,7 @@ let write_tests_to_file = (
   let code =
     tests
     |> List.map(((expected, _)) => [%stri let _ = [%e expected]])
-    /* |> List.append([[%stri open MockBsCss]]) */
+    |> List.append([[%stri open MockBsCss]])
     |> Pprintast.string_of_structure;
   let fd = open_out(file);
   output_string(fd, code);
@@ -52,7 +53,7 @@ let compare = (input, expected, {expect, _}) => {
 /* The tests that are commented, means that we don't support them safely */
 let properties_static_css_tests = [%expr
   [|
-    /* (
+    (
       [%css "display: block;"],
       CssJs.display(`block)
     ),
@@ -493,7 +494,7 @@ let properties_static_css_tests = [%expr
     (
       [%css "display: -webkit-inline-box"],
       CssJs.unsafe("display", "-webkit-inline-box")],
-    ), */ */
+    ), */
   |]
 ];
 
