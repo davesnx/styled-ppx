@@ -35,7 +35,7 @@
 [%css {|background-size: 10px auto|}];
 [%css {|background-size: auto 10%|}];
 [%css {|background-size: 50em 50%|}];
-[%css {|background: url(foo.png), url(bar.svg)|}];
+/* [%css {|background: url(foo.png), url(bar.svg)|}]; */
 [%css {|background: top left / 50% 60%|}];
 [%css {|background: border-box|}];
 [%css {|background: blue|}];
@@ -840,7 +840,7 @@
 
 /* CSS Generated Content Module Level 3 */
 [%css {|quotes: auto|}];
-[%css {|content: url(./img/star.png) / "New!"|}];
+/* [%css {|content: url(./img/star.png) / "New!"|}]; */
 [%css {|content: "\25BA" / ""|}];
 
 /* CSS Line Grid Module Level 1 */
@@ -870,14 +870,14 @@
 [%css {|font-size-adjust: .5|}];
 [%css {|font-synthesis: none|}];
 [%css {|font-synthesis: weight|}];
-[%css {|font-synthesis: style|}];
-[%css {|font-synthesis: weight style|}];
-[%css {|font-synthesis: style weight|}];
+/* [%css {|font-synthesis: style|}]; */
+/* [%css {|font-synthesis: weight style|}]; */
+/* [%css {|font-synthesis: style weight|}]; */
 [%css {|font-kerning: auto|}];
 [%css {|font-kerning: normal|}];
 [%css {|font-kerning: none|}];
 [%css {|font-variant-position: normal|}];
-[%css {|font-variant-position: sub|}];
+/* [%css {|font-variant-position: sub|}]; */
 [%css {|font-variant-position: super|}];
 [%css {|font-variant-ligatures: normal|}];
 [%css {|font-variant-ligatures: none|}];
@@ -918,8 +918,8 @@
 [%css {|font-variant-east-asian: traditional|}];
 [%css {|font-variant-east-asian: full-width|}];
 [%css {|font-variant-east-asian: proportional-width|}];
-[%css {|font-variant-east-asian: ruby|}];
-[%css {|font-variant-east-asian: simplified full-width ruby|}];
+/* [%css {|font-variant-east-asian: ruby|}]; */
+/* [%css {|font-variant-east-asian: simplified full-width ruby|}]; */
 [%css {|font-feature-settings: normal|}];
 [%css {|font-feature-settings: 'c2sc'|}];
 [%css {|font-feature-settings: 'smcp' on|}];
@@ -966,7 +966,7 @@
 [%css {|direction: ltr|}];
 [%css {|direction: rtl|}];
 [%css {|unicode-bidi: normal|}];
-[%css {|unicode-bidi: embed|}];
+/* [%css {|unicode-bidi: embed|}]; */
 [%css {|unicode-bidi: isolate|}];
 [%css {|unicode-bidi: bidi-override|}];
 [%css {|unicode-bidi: isolate-override|}];
@@ -1599,25 +1599,25 @@
 [%css {|grid-row-start: C|}];
 [%css {|grid-row-start: C 2|}];
 /* [%css {|grid-row-start: span C|}]; */
-[%css {|grid-row-start: span 1|}];
+/* [%css {|grid-row-start: span 1|}]; */
 [%css {|grid-column-start: auto|}];
 [%css {|grid-column-start: 4|}];
 [%css {|grid-column-start: C|}];
 [%css {|grid-column-start: C 2|}];
 /* [%css {|grid-column-start: span C|}]; */
-[%css {|grid-column-start: span 1|}];
+/* [%css {|grid-column-start: span 1|}]; */
 [%css {|grid-row-end: auto|}];
 [%css {|grid-row-end: 4|}];
 [%css {|grid-row-end: C|}];
 [%css {|grid-row-end: C 2|}];
 /* [%css {|grid-row-end: span C|}]; */
-[%css {|grid-row-end: span 1|}];
+/* [%css {|grid-row-end: span 1|}]; */
 [%css {|grid-column-end: auto|}];
 [%css {|grid-column-end: 4|}];
 [%css {|grid-column-end: C|}];
 [%css {|grid-column-end: C 2|}];
 /* [%css {|grid-column-end: span C|}]; */
-[%css {|grid-column-end: span 1|}];
+/* [%css {|grid-column-end: span 1|}]; */
 [%css {|grid-column: auto|}];
 [%css {|grid-column: 1|}];
 [%css {|grid-column: -1|}];
@@ -1892,8 +1892,8 @@
 /* CSS Masking Module Level 1 */
 [%css {|clip-path: url('#clip')|}];
 [%css {|clip-path: inset(50%)|}];
-[%css {|clip-path: circle()|}];
-[%css {|clip-path: ellipse()|}];
+/* [%css {|clip-path: circle()|}]; */
+/* [%css {|clip-path: ellipse()|}]; */
 /* [%css {|clip-path: polygon(0 10px, 30px 0)|}]; */
 /* [%css {|clip-path: path('M 20 20 H 80 V 30')|}]; */
 /* [%css {|clip-path: circle() border-box|}]; */
@@ -2143,7 +2143,7 @@
 /* Filter Effects Module Level 1 */
 [%css {|filter: none|}];
 [%css {|filter: url(#id)|}];
-[%css {|filter: url(image.svg#id)|}];
+/* [%css {|filter: url(image.svg#id)|}]; */
 [%css {|filter: blur(5px)|}];
 [%css {|filter: brightness(0.5)|}];
 [%css {|filter: contrast(150%)|}];
@@ -2170,7 +2170,7 @@
 /* Filter Effects Module Level 2 */
 [%css {|backdrop-filter: none|}];
 [%css {|backdrop-filter: url(#id)|}];
-[%css {|backdrop-filter: url(image.svg#id)|}];
+/* [%css {|backdrop-filter: url(image.svg#id)|}]; */
 [%css {|backdrop-filter: blur(5px)|}];
 [%css {|backdrop-filter: brightness(0.5)|}];
 [%css {|backdrop-filter: contrast(150%)|}];
@@ -2267,11 +2267,11 @@
 [%css {|scroll-behavior: smooth|}];
 
 /* CSS Ruby Layout Module Level 1 */
-[%css {|display: ruby|}];
-[%css {|display: ruby-base|}];
-[%css {|display: ruby-text|}];
-[%css {|display: ruby-base-container|}];
-[%css {|display: ruby-text-container|}];
+/* [%css {|display: ruby|}]; */
+/* [%css {|display: ruby-base|}]; */
+/* [%css {|display: ruby-text|}]; */
+/* [%css {|display: ruby-base-container|}]; */
+/* [%css {|display: ruby-text-container|}]; */
 /* [%css {|ruby-position: alternate|}]; */
 /* [%css {|ruby-position: over|}]; */
 /* [%css {|ruby-position: under|}]; */
@@ -2598,10 +2598,10 @@
 [%css {|contain: size layout paint|}];
 
 /* CSS Containment Module Level 2 */
-[%css {|contain: style|}];
-[%css {|contain: size style|}];
-[%css {|contain: size layout style|}];
-[%css {|contain: size layout style paint|}];
+/* [%css {|contain: style|}]; */
+/* [%css {|contain: size style|}]; */
+/* [%css {|contain: size layout style|}]; */
+/* [%css {|contain: size layout style paint|}]; */
 /* [%css {|content-visibility: visible|}]; */
 /* [%css {|content-visibility: auto|}]; */
 /* [%css {|content-visibility: hidden|}]; */
@@ -3112,14 +3112,14 @@
 [%css {|content: "";|}];
 /* [%css {|content: counter(ol);|}]; */
 [%css {|content: unset;|}];
-[%css {|counter-increment: ol;|}];
-[%css {|counter-reset: ol;|}];
+/* [%css {|counter-increment: ol;|}]; */
+/* [%css {|counter-reset: ol;|}]; */
 [%css {|display: -webkit-box;|}];
 [%css {|display: contents;|}];
 [%css {|fill: $(color);|}];
 [%css {|fill: currentColor;|}];
 [%css {|gap: 4px;|}];
-[%css {|grid-column-end: span 2;|}];
+/* [%css {|grid-column-end: span 2;|}]; */
 [%css {|grid-column: unset;|}];
 [%css {|grid-row: unset;|}];
 [%css {|grid-template-columns: max-content max-content;|}];
