@@ -38,46 +38,9 @@ let source_code_of_loc = loc => {
   Sedlexing.Latin1.sub_lexeme(buf, loc_start - 1, loc_end - loc_start);
 };
 
-type selector_interpolation =
-  | String(string)
-  | Expr(expression);
-
-/* let join_strings_on_selector_interpolation = (si: list(selector_interpolation)): list(selector_interpolation) => {
-     switch (si) {
-       | [String(s), ...rest] => {
-         si |> List.fold_left((acc, item) => {
-
-         }, String(s))
-       }
-       | [Expr(e)] => {
-         si |> List.fold_left((acc, item) => {
-
-         }, Expr(e))
-       | [_] => {
-       }
-     }
-   } */
-
 let concat = (~loc, expr, acc) => {
   let concat_fn = {txt: Lident("^"), loc} |> Helper.Exp.ident(~loc);
   Helper.Exp.apply(~loc, concat_fn, [(Nolabel, expr), (Nolabel, acc)]);
-};
-
-let rec concat_selector_interpolation =
-        (si: list(selector_interpolation)): expression => {
-  /* let interp_or_string = join_strings_on_selector_interpolation(si); */
-  let loc = Ast_helper.default_loc^;
-
-  switch (si) {
-  | [Expr(e)] => e
-  | [String(a), String(b), ...rest] => concat_selector_interpolation([String(a ++ " " ++ b), ...rest])
-  | [String(s)] => string_to_const(~loc, s)
-  | [String(s), Expr(e)] =>
-    concat(~loc, string_to_const(~loc, s), e)
-  | [Expr(e), String(s)] =>
-    concat(~loc, e, string_to_const(~loc, s))
-  | rest => concat_selector_interpolation(rest)
-  };
 };
 
 let rec render_at_rule = (ar: At_rule.t): Parsetree.expression =>
@@ -257,51 +220,49 @@ and render_declarations = ds => {
     fst(ds),
   );
 }
+and render_variable_as_string = variable => {
+  "$(" ++ String.concat(".", variable) ++ ")";
+}
 and render_selector = (selector: Selector.t) => {
   open Selector;
-  let loc = Ast_helper.default_loc^;
   let rec render_simple_selector =
     fun
-    | Variable(v) => Expr(render_variable(~loc, v))
-    | Ampersand => String("&")
-    | Type(v) => String(v)
+    | Variable(v) => render_variable_as_string(v)
+    | Ampersand => "&"
+    | Type(v) => v
     | Subclass(v) => render_subclass_selector(v)
   and render_subclass_selector =
     fun
-    | Id(v) => String("#" ++ v)
-    | Class(v) => String("." ++ v)
-    | Attribute(Attr_value(v)) => String("[" ++ v ++ "]")
+    | Id(v) => "#" ++ v
+    | Class(v) => "." ++ v
+    | Attribute(Attr_value(v)) => "[" ++ v ++ "]"
     | Attribute(To_equal({name, kind, value})) =>  {
-      let value = Selector.(
-        switch(value) {
-          | Attr_ident(ident) => ident
-          | Attr_string(ident) => "\"" ++ ident ++ "\""
-        }
-      )
-      String("[" ++ name ++ kind ++ value ++ "]")
+      let value = switch (value) {
+        | Attr_ident(ident) => ident
+        | Attr_string(ident) => "\"" ++ ident ++ "\""
+      };
+      "[" ++ name ++ kind ++ value ++ "]"
     }
     | Pseudo_class(psc) => render_pseudo_selector(psc)
   and render_pseudo_selector =
     fun
-    | Pseudoelement(v) => String("::" ++ v)
-    | Pseudoclass(Ident(i)) => String(":" ++ i)
+    | Pseudoelement(v) => "::" ++ v
+    | Pseudoclass(Ident(i)) => ":" ++ i
     | Pseudoclass(Function({name, payload: _})) =>
-      String(
         ":"
         ++ name
         /* ++ (List.map(render_component_value, payload) |> String.concat("")) */
-        ++ "))",
-      );
+        ++ "))";
 
   let rec render_compound_selector = compound_selector => {
-    let render_selector_list = ((first, rest)): list(selector_interpolation) => {
+    let render_selector_list = ((first, rest)) => {
       let first = first |> render_pseudo_selector;
-      let rest = rest |> List.map(render_pseudo_selector);
-      [first, ...rest];
+      let rest = rest |> List.map(render_pseudo_selector) |> String.concat(" ");
+      first ++ rest;
     };
     let simple_selector =
       Option.fold(
-        ~none=String(""),
+        ~none="",
         ~some=render_simple_selector,
         compound_selector.type_selector,
       );
@@ -309,45 +270,38 @@ and render_selector = (selector: Selector.t) => {
       List.map(
         render_subclass_selector,
         compound_selector.subclass_selectors,
-      );
+      ) |> String.concat(" ");
     let pseudo_selectors =
-      List.concat_map(
+      List.map(
         render_selector_list,
         compound_selector.pseudo_selectors,
-      );
-    List.concat([[simple_selector], subclass_selectors, pseudo_selectors]);
+      ) |> String.concat("");
+    simple_selector ++ subclass_selectors ++ pseudo_selectors;
   }
-  and render_complex_selector = (complex): list(selector_interpolation) => {
+  and render_complex_selector = complex => {
     switch (complex) {
     | Combinator({left, right}) =>
       let left = render_compound_selector(left);
       let right = render_right_combinator(right);
-      List.concat([left, right]);
+      left ++ " " ++ right;
     | Selector(compound) => render_compound_selector(compound)
     };
   }
   and render_right_combinator = right => {
     right
     |> List.map(((combinator, compound_selector)) => {
-         List.cons(
-           Option.fold(~none=String(""), ~some=o => String(o), combinator),
-           render_compound_selector(compound_selector),
-         )
-       })
-    |> List.flatten;
+      Option.fold(~none="", ~some=o => o ++ " ", combinator)
+      ++ render_compound_selector(compound_selector)
+    }) |> String.concat(" ")
   };
 
   switch (selector) {
   | SimpleSelector(simple) =>
-    List.map(render_simple_selector, simple) |> concat_selector_interpolation
+    simple |> List.map(render_simple_selector) |> String.concat(" ")
   | ComplexSelector(complex) =>
-    List.map(render_complex_selector, complex)
-    |> List.flatten
-    |> concat_selector_interpolation
+    complex |> List.map(render_complex_selector) |> String.concat(" ")
   | CompoundSelector(compound) =>
-    List.map(render_compound_selector, compound)
-    |> List.flatten
-    |> concat_selector_interpolation
+    compound |> List.map(render_compound_selector) |> String.concat(" ")
   };
 }
 and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
@@ -355,7 +309,7 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
   let block = rule.Style_rule.block;
   let loc = block |> snd;
   let selector_expr = render_declarations(block) |> Builder.pexp_array(~loc);
-  let selector_name: expression = render_selector(prelude);
+  let selector_name: expression = render_selector(prelude) |> String.trim |> string_to_const(~loc);
 
   Helper.Exp.apply(
     ~loc=rule.Style_rule.loc,
