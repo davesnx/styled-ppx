@@ -50,7 +50,7 @@
     "test_bs": "cd packages/ppx/test/browser; yarn build; yarn test",
     "dev": "esy refmterr dune build --root . --watch",
     "release-static":
-      "esy b dune build --root . --ignore-promoted-rules --no-config --profile release-static --only-packages styled-ppx,reason-css-parser,reason-css-lexer,css-spec-parser,styled-ppx-css-parser",
+      "esy b dune build --root . --ignore-promoted-rules --no-config --profile release-static --only-packages styled-ppx,reason-css-parser,reason-css-lexer,css-spec-parser,styled-ppx-css-parser,string-interpolation",
     "ast": "esy dune exec packages/renderer/ast_renderer.exe --",
     "lexer": "esy dune exec packages/renderer/lexer_renderer.exe --"
   }
