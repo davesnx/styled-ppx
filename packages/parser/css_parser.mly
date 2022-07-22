@@ -312,6 +312,7 @@ component_value_in_prelude:
   | DOT { Component_value.Delim "." }
   | COLON { Component_value.Delim ":" }
   | DOUBLE_COLON { Component_value.Delim "::" }
+  | WS { Component_value.Delim "*" }
   | h = HASH { Component_value.Hash h }
   | COMMA { Component_value.Delim "," }
   | n = NUMBER { Component_value.Number n }
@@ -321,12 +322,9 @@ component_value_in_prelude:
   /* $(Lola.value) */
   | v = VARIABLE { Component_value.Variable v }
   /* calc() */
-  | f = loc(IDENT); LEFT_PAREN;
-    xs = loc(prelude);
-    RIGHT_PAREN; {
+  | f = loc(IDENT); LEFT_PAREN; xs = loc(prelude); RIGHT_PAREN; {
     Component_value.Function (f, xs)
   }
-  | WS { Component_value.Delim "*" }
 ;
 
 component_value:
@@ -350,9 +348,7 @@ component_value:
   /* $(Lola.value) */
   | v = VARIABLE { Component_value.Variable v }
   /* calc() */
-  | f = loc(IDENT); LEFT_PAREN;
-    xs = loc(component_values);
-    RIGHT_PAREN; {
+  | f = loc(IDENT); LEFT_PAREN; xs = loc(component_values); RIGHT_PAREN; {
     Component_value.Function (f, xs)
   }
 ;

@@ -262,18 +262,19 @@ and render_selector = (selector: Selector.t) => {
   let loc = Ast_helper.default_loc^;
   let rec render_simple_selector =
     fun
-    | Variable(v) => Expr(render_variable(~loc, v))
+    | Universal => String("*")
     | Ampersand => String("&")
     | Type(v) => String(v)
     | Subclass(v) => render_subclass_selector(v)
+    | Variable(v) => Expr(render_variable(~loc, v))
   and render_subclass_selector =
     fun
     | Id(v) => String("#" ++ v)
     | Class(v) => String("." ++ v)
     | Attribute(Attr_value(v)) => String("[" ++ v ++ "]")
-    | Attribute(To_equal({name, kind, value})) =>  {
+    | Attribute(To_equal({name, kind, value})) => {
       let value = Selector.(
-        switch(value) {
+        switch (value) {
           | Attr_ident(ident) => ident
           | Attr_string(ident) => "\"" ++ ident ++ "\""
         }

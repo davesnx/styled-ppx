@@ -40,7 +40,6 @@ module StringInterpolation = [%styled.div {j|
   color: $(Theme.var);
   background-color: $(black);
   border-color: $(Theme.Border.black);
-  __UNSAFE__ color: trust-me;
   display: block;
 |j}];
 let className = [%cx "display: block;"];
@@ -60,9 +59,11 @@ module SelectorsMediaQueries = [%styled.div {j|
   @media (min-width: 600px) {
     background: blue;
   }
+
   &:hover {
     background: green;
   }
+
   & > p { color: pink; font-size: 24px; }
 |j}
 ];
