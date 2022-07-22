@@ -1,0 +1,5 @@
+(test
+ (name string_interpolation_test)
+ (libraries alcotest string_interpolation)
+ (preprocess
+  (pps ppxlib.metaquot)))

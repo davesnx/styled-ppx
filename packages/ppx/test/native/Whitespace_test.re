@@ -49,11 +49,11 @@ let css_tests = [
     [%expr [%cx "@media(min-width:30px) {}"]],
     [%expr [%cx "@media (min-width: 30px) {}"]],
   ),
-  /* (
+  (
     "ignore in at_rule inside declarations",
     [%expr [%cx "@media screen  and  (min-width: 30px) {}"]],
     [%expr [%cx "@media screen and (min-width: 30px) {}"]],
-  ), */
+  ),
   /* (
     "media with declarations",
     [%expr [%cx "@media screen and (min-width: 30px) { color: red; }"]],

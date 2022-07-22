@@ -1,0 +1,11 @@
+(library
+ (name string_interpolation)
+ (public_name string-interpolation.lib)
+ (libraries ppxlib sedlex)
+ (preprocess
+  (pps sedlex.ppx)))
+
+(env
+ (dev
+  (flags
+   (:standard -warn-error -A-32))))
