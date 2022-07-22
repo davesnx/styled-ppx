@@ -449,7 +449,7 @@ and get_dimension = (n, buf) => {
 let discard_comments_and_whitespace = buf => {
   let rec discard_whitespaces = (buf, space_detected) => {
       switch%sedlex (buf) {
-      | whitespaces => discard_whitespaces(buf, true)
+      | Plus(whitespace) => discard_whitespaces(buf, true)
       | "/*" => discard_comments(buf, space_detected)
       | _ => space_detected
       }
