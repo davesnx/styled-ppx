@@ -111,7 +111,7 @@ and Selector: {
         kind: string,
         value: attr_value,
       })
-  and attr_value = 
+  and attr_value =
     | Attr_ident(string)
     | Attr_string(string)
   and pseudo_selector =

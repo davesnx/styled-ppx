@@ -79,7 +79,7 @@ let selectors_css_tests = [
     [%expr [%cx "& > div:nth-child(3n+1) {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& > div:nth-child(3n+1)|js}, [||])|])],
   ), */
-  (
+  /* (
     ":active",
     [%expr [%cx "&:active {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|&:active|js}, [||])|])],
@@ -166,7 +166,7 @@ let selectors_css_tests = [
     "div > $(Variables.element)",
     [%expr [%cx "& div > $(Variables.element) {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& div > |js} ++ Variables.element ++ {js||js}, [||])|])],
-  ),
+  ), */
   /* (
     "*:not(:last-child)",
     [%expr [%cx "& > *:not(:last-child) {}"]],

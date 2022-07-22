@@ -4,6 +4,7 @@
  (kind ppx_rewriter)
  (libraries
   styled-ppx-css-parser
+  ocaml-migrate-parsetree
   reason-css-parser.lib
   ppxlib
   str
