@@ -6,65 +6,51 @@
   "license": "MIT",
   "homepage": "https://styled-ppx.vercel.app",
   "keywords": [
-    "reason",
-    "ocaml",
-    "ppx",
-    "bucklescript",
-    "css",
-    "styled-components",
+    "reason", "ocaml", "ppx", "bucklescript", "css", "styled-components",
     "emotion"
   ],
-  "bugs": {
-    "url": "https://github.com/davesnx/styled-ppx/issues"
-  },
+  "bugs": { "url": "https://github.com/davesnx/styled-ppx/issues" },
   "repository": {
     "type": "git",
     "url": "https://github.com/davesnx/styled-ppx.git"
   },
   "esy": {
     "buildsInSource": "_build",
-    "build": [
-      [
-        "dune",
-        "build",
-        "--root",
-        "."
-      ]
-    ],
+    "build": [ [ "dune", "build", "--root", "." ] ],
     "buildDev": "refmterr dune build --promote-install-files --root .",
-    "buildEnv": {
-      "ODOC_SYNTAX": "re"
-    },
-    "release": {
-      "bin": [
-        "ppx"
-      ]
-    }
+    "buildEnv": { "ODOC_SYNTAX": "re" },
+    "release": { "bin": [ "ppx" ] }
   },
   "devDependencies": {
+    "@opam/alcotest": "1.6.0",
     "@opam/reason": "3.7.0",
     "@opam/dune": "2.9.0",
     "@opam/ppx_deriving": "5.2.1",
     "@opam/menhir": "20220210",
     "@opam/ppxlib": "0.22.0",
-    "@opam/sedlex": "davesnx/sedlex:sedlex.opam#8de2e80611ce6b200baf857d9071099af8daaa5a",
+    "@opam/sedlex":
+      "davesnx/sedlex:sedlex.opam#8de2e80611ce6b200baf857d9071099af8daaa5a",
     "@opam/ocaml-lsp-server": "1.9.0",
-    "@reason-native/rely": "jfrolich/reason-native:rely.json#08085a4048974b06aaf3aab918b677b39dea3d18",
+    "@reason-native/rely":
+      "jfrolich/reason-native:rely.json#08085a4048974b06aaf3aab918b677b39dea3d18",
     "ocaml": "4.12.0",
-    "refmterr": "jfrolich/reason-native:refmterr.json#08085a4048974b06aaf3aab918b677b39dea3d18"
+    "refmterr":
+      "jfrolich/reason-native:refmterr.json#08085a4048974b06aaf3aab918b677b39dea3d18"
   },
   "scripts": {
     "test_typecheck": "esy dune build @native_typecheck_test",
     "test_css_support": "esy dune build @css_support_test",
     "test_ppx_snapshot": "esy dune build @ppx_snapshot_test",
-    "test_ppx_snapshot_promote": "esy dune build @ppx_snapshot_test --auto-promote",
+    "test_ppx_snapshot_promote":
+      "esy dune build @ppx_snapshot_test --auto-promote",
     "test_css_lexer": "esy dune build @css_lexer_test",
     "test_css_parser": "esy dune build @css_parser_test",
     "test_css_spec_parser": "esy dune build @css_spec_parser_test",
     "build_test_bs": "cd packages/ppx/test/browser; yarn build",
     "test_bs": "cd packages/ppx/test/browser; yarn build; yarn test",
     "dev": "esy refmterr dune build --root . --watch",
-    "release-static": "esy b dune build --root . --ignore-promoted-rules --no-config --profile release-static --only-packages styled-ppx,reason-css-parser,reason-css-lexer,css-spec-parser,styled-ppx-css-parser",
+    "release-static":
+      "esy b dune build --root . --ignore-promoted-rules --no-config --profile release-static --only-packages styled-ppx,reason-css-parser,reason-css-lexer,css-spec-parser,styled-ppx-css-parser",
     "ast": "esy dune exec packages/renderer/ast_renderer.exe --",
     "lexer": "esy dune exec packages/renderer/lexer_renderer.exe --"
   }

@@ -96,10 +96,10 @@ build: [
 ]
 url {
   src:
-    "https://github.com/ahrefs/atd/releases/download/2.9.1/atdts-2.9.1.tbz"
+    "https://github.com/ahrefs/atd/releases/download/2.8.0/atdts-2.8.0.tbz"
   checksum: [
-    "sha256=39dc1a511d08c743b3f0d0e6dfa9c8caf211cc5fabfe92a089e8f57e170e9ae4"
-    "sha512=2149ddc53703a8c4c01c5571125ba66cce7305fac332357acfda36a44a67a7c9df2a0322cb05682fed3656067c26cdbe2e50071db5b2e5233abc1cfcf103e34e"
+    "sha256=d5740e52a6e57f7720640cb8c26e018e59311e1de78a20feb7168a808660aaaa"
+    "sha512=db50c74f3a92078b96c6affbb6fd3a7568741ef2fca6694272c45de84eaf682cd3c22902b1f085db9327a8e77d6765e7d77bc2bb8030422c6c897ff553e69ed7"
   ]
 }
-x-commit-hash: "31799bf3955b11d8d9c12334cb65e7609927e09c"
+x-commit-hash: "07722f973664c27a043e8d9aec66deb960756a6c"

@@ -72,11 +72,6 @@ let rec render_at_rule = (ar: At_rule.t): Parsetree.expression =>
   | (n, _) => grammar_error(ar.At_rule.loc, "Unknown @" ++ n ++ "")
   }
 and render_media_query = (ar: At_rule.t): Parsetree.expression => {
-  let concat = (~loc, expr, acc) => {
-    let concat_fn = {txt: Lident("^"), loc} |> Helper.Exp.ident(~loc);
-    Helper.Exp.apply(~loc, concat_fn, [(Nolabel, expr), (Nolabel, acc)]);
-  };
-
   let invalid_format = loc =>
     grammar_error(loc, "@media value isn't a valid format");
 

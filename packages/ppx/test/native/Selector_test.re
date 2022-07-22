@@ -37,7 +37,7 @@ let selectors_css_tests = [
   ),
   /* (
     "html, body",
-    [%expr [%cx {j|html,body {}|j}]],
+    [%expr [%cx {j|html, body {}|j}]],
      [%expr CssJs.style(. [|CssJs.selector(. {js|html, body|js}, [||])|])],
   ), */
   /* (
