@@ -73,25 +73,37 @@ let selectors_css_tests = [
      [%expr CssJs.style(. [|CssJs.selector(. {js|html body|js}, [||])|])],
   ), */
 
-  /* p :first-child */
-  /* p:first-child */
-  /* p#first-child */
-  /* p #first-child */
+  /*
+  (
+    "p :first-child",
+    [%expr [%cx {js|p :first-child {}|js}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|p :first-child|js}, [||])|])]
+  ), */
+/* (
+    "p:first-child",
+    [%expr [%cx {js|p:first-child {}|js}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|p:first-child|js}, [||])|])]
+  ), */
+/* (
+    "p#first-child",
+    [%expr [%cx {js|p#first-child {}|js}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|p#first-child|js}, [||])|])]
+  ), */
+/* (
+    "p #first-child",
+    [%expr [%cx {js|p #first-child {}|js}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|p #first-child|js}, [||])|])]
+  ), */
+
   /* div:nth-child(2n+1 of #someId.someClass) */
   /* #foo > .bar + div.k1.k2 [id='baz']:hello(2):not(:where(#yolo))::before */
 
   /* Complex */
- (
+  /* (
     ">",
     [%expr [%cx "& > a { }"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& > a|js}, [||])|])],
-  ),
-  // (
-  //   ">",
-  //   [%expr [%cx "& .bar { }"]],
-  //   [%expr CssJs.style(. [|CssJs.selector(. {js|& .bar|js}, [||])|])],
-  // ),
-
+  ), */
   /* (
     "nth-child(even)",
     [%expr [%cx "&:nth-child(even) {}"]],
@@ -112,27 +124,32 @@ let selectors_css_tests = [
     [%expr [%cx "&:hover {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|&:hover|js}, [||])|])],
   ),
-  (
+  /* (
     "& + &",
     [%expr [%cx "& + & {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& + &|js}, [||])|])],
-  ),
-  (
+  ), */
+  /* (
     "& span",
     [%expr [%cx "& span {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& span|js}, [||])|])],
-  ),
-  (
+  ), */
+  /* (
     "& span, & + &",
     [%expr [%cx "& span, & + & {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& span, & + &|js}, [||])|])],
-  ),
-  (
+  ), */
+  /* (
     "& p:not(.active)",
     [%expr [%cx "& p:not(.active) {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& p:not(.active)|js}, [||])|])],
-  ),
+  ), */
   (
+    ".foo:is(.bar, #baz)",
+    [%expr [%cx ".foo:is(.bar, #baz) {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|.foo:is(.bar, #baz)|js}, [||])|])],
+  ),
+  /* (
     "& input[type=\"password\"]",
     [%expr [%cx "& input[type=\"password\"] {} "]],
     [%expr CssJs.style(. [|
@@ -141,38 +158,38 @@ let selectors_css_tests = [
         [||],
       ),
     |])],
-  ),
-  (
+  ), */
+  /* (
     "& button:hover",
     [%expr [%cx "& button:hover {} "]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& button:hover|js}, [||])|])],
-  ),
-  (
+  ), */
+  /* (
     "& $(Variables.selector_query)",
     [%expr [%cx "& $(Variables.selector_query) {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& |js} ++ Variables.selector_query, [||])|])],
-  ),
-  (
+  ), */
+  /* (
     "& a[target=\"_blank\"]",
     [%expr [%cx {|& a[target="_blank"] {}|}]],
     [%expr CssJs.style(. [| CssJs.selector(. {js|& a[target="_blank"]|js}, [||])|])],
-  ),
+  ), */
   (
     "$(pseudo)",
     [%expr [%cx "$(pseudo) {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. pseudo, [||])|])],
   ),
-  (
+  /* (
     "div > .class",
     [%expr [%cx "& div > .class {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& div > .class|js}, [||])|])],
-  ),
-  (
+  ), */
+  /* (
     "div > $(Variables.element)",
     [%expr [%cx "& div > $(Variables.element) {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& div > |js} ++ Variables.element, [||])|])],
-  ),
-  (
+  ), */
+  /* (
     "*:not(:last-child)",
     [%expr [%cx "& > *:not(:last-child) {}"]],
     [%expr CssJs.style(. [|
@@ -181,7 +198,7 @@ let selectors_css_tests = [
         [||]
       )
     |])],
-  ),
+  ), */
 ];
 
 describe("Should transform selectors", ({test, _}) => {

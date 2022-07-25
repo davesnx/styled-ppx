@@ -76,10 +76,9 @@ and Stylesheet: {
 } = Stylesheet
 and Selector: {
   type t =
-    | SimpleSelector(list(simple_selector), separator)
-    | ComplexSelector(list(complex_selector), separator)
-    | CompoundSelector(list(compound_selector), separator)
-  and separator = string
+    | SimpleSelector(list(simple_selector))
+    | ComplexSelector(list(complex_selector))
+    | CompoundSelector(list(compound_selector))
   and complex_selector =
     | Selector(compound_selector)
     | Combinator({
@@ -89,10 +88,7 @@ and Selector: {
   and compound_selector = {
     type_selector: option(simple_selector),
     subclass_selectors: list(subclass_selector),
-    pseudo_selectors:
-      list(
-        (pseudo_selector, list(pseudo_selector)),
-      ),
+    pseudo_selectors: list(pseudo_selector),
   }
   and simple_selector =
     | Universal

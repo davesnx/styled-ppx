@@ -41,6 +41,7 @@ open Css_types
 %start <Css_types.Stylesheet.t> stylesheet
 %start <Css_types.Declaration_list.t> declaration_list
 %start <Css_types.Declaration.t> declaration
+%start <Css_types.Style_rule.t> style_rule
 
 %%
 
@@ -87,7 +88,7 @@ media_query_list:
 /* https://www.w3.org/TR/css-syntax-3/#at-rules */
 at_rule:
   /* @media (min-width: 16rem) {} */
-  | name = loc(AT_MEDIA); xs = loc(nonempty_list(loc(media_query_list))); empty_brace_block {
+  | name = loc(AT_MEDIA); WS?; xs = loc(nonempty_list(loc(media_query_list))); WS?; empty_brace_block; WS?; {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Empty;
@@ -95,7 +96,7 @@ at_rule:
     }
   }
   /* @media (min-width: 16rem) { ... } */
-  | name = loc(AT_MEDIA); xs = loc(nonempty_list(loc(media_query_list))); ds = brace_block(loc(declarations)) {
+  | name = loc(AT_MEDIA); WS?; xs = loc(nonempty_list(loc(media_query_list))); WS?; ds = brace_block(loc(declarations)) {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Declaration_list ds;
@@ -103,7 +104,7 @@ at_rule:
     }
   }
   /* @keyframes animationName {} */
-  | name = loc(AT_KEYFRAMES); i = IDENT; empty_brace_block {
+  | name = loc(AT_KEYFRAMES); WS?; i = IDENT; WS?; empty_brace_block {
     { At_rule.name = name;
       prelude = ([(Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i))], Lex_buffer.make_loc $startpos(i) $endpos(i));
       block = Brace_block.Empty;
@@ -111,7 +112,7 @@ at_rule:
     }
   }
   /* @keyframes animationName { ... } */
-  | name = loc(AT_KEYFRAMES); i = IDENT; s = brace_block(stylesheet_without_eof) {
+  | name = loc(AT_KEYFRAMES); WS?; i = IDENT; WS?; s = brace_block(stylesheet_without_eof) {
     { At_rule.name = name;
       prelude = ([(Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i))], Lex_buffer.make_loc $startpos(i) $endpos(i));
       block = Brace_block.Stylesheet s;
@@ -119,7 +120,7 @@ at_rule:
     }
   }
   /* @charset */
-  | name = loc(AT_RULE_STATEMENT); xs = loc(prelude); SEMI_COLON?; {
+  | name = loc(AT_RULE_STATEMENT); WS?; xs = loc(prelude); WS?; SEMI_COLON?; {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Empty;
@@ -127,7 +128,7 @@ at_rule:
     }
   }
   /* @{{rule}} {} */
-  | name = loc(AT_RULE); xs = loc(prelude); empty_brace_block {
+  | name = loc(AT_RULE); WS?; xs = loc(prelude); WS?; empty_brace_block {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Empty;
@@ -135,7 +136,7 @@ at_rule:
     }
   }
   /* @{{rule}} { ... } */
-  | name = loc(AT_RULE); xs = loc(prelude); s = brace_block(stylesheet_without_eof) {
+  | name = loc(AT_RULE); WS?; xs = loc(prelude); WS?; s = brace_block(stylesheet_without_eof) {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Stylesheet s;
@@ -146,19 +147,23 @@ at_rule:
 
 /* .class {} */
 style_rule:
-  | selector = loc(selector); WS?; block = empty_brace_block; {
+  | selector = loc(selector); WS?; block = empty_brace_block; WS?; {
     { Style_rule.prelude = selector;
       block = block, Location.none;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
-  | selector = loc(selector); WS?; declarations = brace_block(loc(declarations)); {
+  | selector = loc(selector); WS?; declarations = brace_block(loc(declarations)); WS?; {
     { Style_rule.prelude = selector;
       block = declarations;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
 ;
+
+with_ws (X): x = delimited(WS?, X, WS?) { x };
+ws_right (X): x = X; WS?; { x };
+ws_left (X): WS?; x = X; { x };
 
 prelude: xs = nonempty_list(loc(component_value_in_prelude)) { xs };
 
@@ -178,7 +183,7 @@ declaration: d = declaration_without_eof; EOF { d };
 
 /* property: value; */
 declaration_without_eof:
-  | n = IDENT; WS?; COLON; v = loc(component_values); i = boption(IMPORTANT); SEMI_COLON? {
+  | n = IDENT;  COLON; v = loc(component_values); i = boption(IMPORTANT); SEMI_COLON? {
     { Declaration.name = (n, Lex_buffer.make_loc $startpos(n) $endpos(n));
       value = v;
       important = (i, Lex_buffer.make_loc $startpos(i) $endpos(i));
@@ -238,10 +243,10 @@ attribute_selector:
 
 /* <id-selector> = <hash-token> */
 id_selector:
-  | WS?; h = HASH { Selector.Id h }
+  | h = HASH { Selector.Id h }
 
 /* <class-selector> = '.' <ident-token> */
-class_selector: WS?; DOT; c = IDENT { Selector.Class c };
+class_selector: DOT; c = IDENT { Selector.Class c };
 
 /* <subclass-selector> = <id-selector> | <class-selector> | <attribute-selector> | <pseudo-class-selector> */
 subclass_selector:
@@ -253,16 +258,16 @@ subclass_selector:
 
 selector:
   /* <simple-selector-list> = <simple-selector># */
-  | xs = separated_nonempty_list(COMMA, simple_selector) {
-    Selector.SimpleSelector (xs, ", ")
+  | xs = separated_nonempty_list(ws_right(COMMA), simple_selector) {
+    Selector.SimpleSelector xs
   }
   /* <compound-selector-list> = <compound-selector># */
-  | xs = separated_nonempty_list(WS, compound_selector) {
-    Selector.CompoundSelector (xs, " ")
+  | xs = separated_nonempty_list(ws_right(COMMA), compound_selector) {
+    Selector.CompoundSelector xs
   }
   /* <complex-selector-list> = <complex-selector># */
-  | xs = separated_nonempty_list(COMMA, complex_selector) {
-    Selector.ComplexSelector (xs, ", ")
+  | xs = separated_nonempty_list(ws_right(COMMA), complex_selector) {
+    Selector.ComplexSelector xs
   }
 ;
 
@@ -283,17 +288,25 @@ simple_selector:
   | sb = subclass_selector { Selector.Subclass sb }
 ;
 
-/* TODO: better name */
-/* [ <pseudo-element-selector> <pseudo-class-selector>* ] */
-pseudoelement_followed_by_pseudoclasslist:
-  | e = pseudo_element_selector; xs = list(pseudo_class_selector); { (e, xs) }
-;
+/* <compound-selector> = [
+    <type-selector>? <subclass-selector>*
+    [ <pseudo-element-selector> <pseudo-class-selector>* ]*
+  ]!
 
-/* <compound-selector> = [ <type-selector>? <subclass-selector>* [ <pseudo-element-selector> <pseudo-class-selector>* ]* ]!
+  &#id.class
+  &.id::after
+  &.id::after:hover
+  &.id::after:hover:hover
+
   We differ from the spec on type-selector which is a IDENT,
   for a simple_selector (adding & and variables) */
+pseudo:
+  | pe = pseudo_element_selector; { pe }
+  | pc = pseudo_class_selector; { pc }
+;
+
 compound_selector:
-  | type_selector = simple_selector; subclass_selectors = loption(list(subclass_selector)); pseudo_selectors = loption(list(pseudoelement_followed_by_pseudoclasslist)); {
+  | type_selector = simple_selector; subclass_selectors = loption(list(subclass_selector)); pseudo_selectors = loption(list(pseudo)); {
     Selector.{
       type_selector = Some type_selector;
       subclass_selectors;
@@ -305,10 +318,18 @@ compound_selector:
 /* <complex-selector> = <compound-selector> [ <combinator>? <compound-selector> ]* */
 complex_selector:
   | left = compound_selector;
-    right = loption(list(pair(COMBINATOR?, compound_selector))); {
+    WS;
+    right = loption(list(pair(COMBINATOR, ws_left(compound_selector)))); {
     Selector.Combinator {
       left;
-      right;
+      right = List.map (fun (c, right) -> (Some c, right)) right;
+    }
+  }
+  | left = compound_selector;
+    right = loption(list(pair(WS, ws_right(compound_selector)))); {
+    Selector.Combinator {
+      left;
+      right = List.map (fun (_, right) -> (None, right)) right;
     }
   }
 ;
@@ -340,7 +361,7 @@ component_value_in_prelude:
   | f = loc(IDENT); LEFT_PAREN; xs = loc(prelude); RIGHT_PAREN; {
     Component_value.Function (f, xs)
   }
-  | WS { Component_value.Delim "*" }
+  /* | WS { Component_value.Delim "*" } */
 ;
 
 component_value:
@@ -352,10 +373,10 @@ component_value:
   | c = COMBINATOR { Component_value.Combinator c}
   | o = OPERATOR { Component_value.Operator o }
   | d = DELIM { Component_value.Delim d }
-  | WS?; DOT { Component_value.Delim "." }
-  | WS?; COLON { Component_value.Delim ":" }
-  | WS?; h = HASH { Component_value.Hash h }
-  | WS?; DOUBLE_COLON { Component_value.Delim "::" }
+  | DOT { Component_value.Delim "." }
+  | COLON { Component_value.Delim ":" }
+  | h = HASH { Component_value.Hash h }
+  | DOUBLE_COLON { Component_value.Delim "::" }
   | COMMA { Component_value.Delim "," }
   | n = NUMBER { Component_value.Number n }
   | r = UNICODE_RANGE { Component_value.Unicode_range r }

@@ -396,19 +396,44 @@ let time = [%sedlex.regexp? _s | (_m, _s)];
 
 let frequency = [%sedlex.regexp? (_h, _z) | (_k, _h, _z)];
 
+let skip_whitespace = ref(false);
 
-let rec get_next_token = (buf, whitespace_detected) => {
+let discard_whitespace = buf => {
+  let rec inner_discard_whitespaces = (buf) => {
+    switch%sedlex (buf) {
+      | Plus(whitespace) => inner_discard_whitespaces(buf) |> ignore
+      | '{' => {
+        skip_whitespace.contents = true;
+        inner_discard_whitespaces(buf) |> ignore;
+      }
+      | _ => ()
+    }
+  }
+
+  inner_discard_whitespaces(buf)
+};
+
+let rec get_next_token = (buf, default_skip_whitespace) => {
   open Parser;
   open Sedlexing;
 
+  skip_whitespace.contents = default_skip_whitespace;
+
   switch%sedlex (buf) {
   | eof => [EOF]
-  | '.' => if (whitespace_detected) { [WS, DOT] } else { [DOT] }
+  | "/*" => discard_comments(buf, skip_whitespace.contents)
+  | '.' => [DOT]
   | ';' => [SEMI_COLON]
-  | '}' => [RIGHT_BRACE]
-  | '{' => [LEFT_BRACE]
-  | "::" => if (whitespace_detected) { [WS, DOUBLE_COLON] } else { [DOUBLE_COLON] }
-  | ':' => if (whitespace_detected) { [WS, COLON] } else { [COLON] }
+  | '}' => {
+    skip_whitespace.contents = false;
+    [RIGHT_BRACE];
+  }
+  | '{' => {
+    skip_whitespace.contents = true;
+    [LEFT_BRACE];
+  }
+  | "::" => [DOUBLE_COLON]
+  | ':' => [COLON]
   | '(' => [LEFT_PAREN]
   | ')' => [RIGHT_PAREN]
   | '[' => [LEFT_BRACKET]
@@ -422,17 +447,33 @@ let rec get_next_token = (buf, whitespace_detected) => {
   | combinator => [COMBINATOR(latin1(buf))]
   | string => [STRING(latin1(~skip=1, ~drop=1, buf))]
   | important => [IMPORTANT]
-  | at_media => [AT_MEDIA(latin1(~skip=1, buf))]
-  | at_keyframes => [AT_KEYFRAMES(latin1(~skip=1, buf))]
-  | at_rule => [AT_RULE(latin1(~skip=1, buf))]
-  | at_rule_without_body => [AT_RULE_STATEMENT(latin1(~skip=1, buf))]
+  | at_media => {
+    skip_whitespace.contents = false;
+    [AT_MEDIA(latin1(~skip=1, buf))]
+  }
+  | at_keyframes => {
+    skip_whitespace.contents = false;
+    [AT_KEYFRAMES(latin1(~skip=1, buf))]
+  }
+  | at_rule => {
+    skip_whitespace.contents = false;
+    [AT_RULE(latin1(~skip=1, buf))]
+  }
+  | at_rule_without_body => {
+    skip_whitespace.contents = false;
+    [AT_RULE_STATEMENT(latin1(~skip=1, buf))]
+  }
   /* NOTE: should be placed above ident, otherwise pattern with
    * '-[0-9a-z]{1,6}' cannot be matched */
   | (_u, '+', unicode_range) => [UNICODE_RANGE(latin1(buf))]
   | tag => [TAG(latin1(buf))]
   | ident => [IDENT(latin1(buf))]
-  | ('#', name) => if (whitespace_detected) { [WS, HASH(latin1(~skip=1, buf))] } else { [HASH(latin1(~skip=1, buf))] }
+  | ('#', name) => [HASH(latin1(~skip=1, buf))]
   | number => [get_dimension(latin1(buf), buf)]
+  | whitespaces => {
+    if (skip_whitespace^) {
+      get_next_token(buf, skip_whitespace.contents);
+    } else { [WS] } }
   | any => [DELIM(latin1(buf))]
   | _ => assert(false)
   };
@@ -447,42 +488,33 @@ and get_dimension = (n, buf) => {
     | ident => DIMENSION((n, latin1(buf)))
     | _ => NUMBER(n)
   };
+} and discard_comments = (buf, skip_whitespaces) => {
+  switch%sedlex(buf) {
+  | "*/" => get_next_token(buf, skip_whitespaces)
+  | any => discard_comments(buf, skip_whitespaces)
+  | eof => raise(LexingError((buf.pos, "Unterminated comment at the end of the string")))
+  | _ => assert false
+  }
 };
 
-let discard_comments_and_whitespace = buf => {
-  let rec discard_whitespaces = (buf, space_detected) => {
-      switch%sedlex (buf) {
-      | Plus(whitespace) => discard_whitespaces(buf, true)
-      | "/*" => discard_comments(buf, space_detected)
-      | _ => space_detected
-      }
-  }
-  and discard_comments = (buf, space_detected) => {
-    switch%sedlex(buf) {
-    | eof => raise(LexingError((buf.pos, "Unterminated comment at the end of the string")))
-    | "*/" => discard_whitespaces(buf, space_detected)
-    | any => discard_comments(buf, space_detected)
-    | _ => assert false
-    }
-  };
-  discard_whitespaces(buf, false)
-};
+/* .a {} */
+/* display: block */
+/* @media screen {} */
 
 let token_queue = Queue.create();
 
-let queue_next_tokens_with_location = buf => {
-  let spaces_detected = discard_comments_and_whitespace(buf);
+let queue_next_tokens_with_location = (buf, skip_whitespace) => {
   let loc_start = Sedlexing.next_loc(buf);
-  let tokens = get_next_token(buf, spaces_detected);
+  let tokens = get_next_token(buf, skip_whitespace);
   let loc_end = Sedlexing.next_loc(buf);
   List.iter (t => Queue.add((t, loc_start, loc_end), token_queue), tokens)
 }
 
-let parse = (buf, parser) => {
+let parse = (skip_whitespace, buf, parser) => {
   let last_token = ref((Parser.EOF, Lexing.dummy_pos, Lexing.dummy_pos));
   let next_token = () => {
     if (Queue.is_empty(token_queue)) {
-      queue_next_tokens_with_location(buf);
+      queue_next_tokens_with_location(buf, skip_whitespace);
     }
     last_token := Queue.take(token_queue);
     last_token^;
@@ -494,19 +526,19 @@ let parse = (buf, parser) => {
   };
 };
 
-let parse_string = (~container_lnum=?, ~pos=?, parser, string) => {
+let parse_string = (~skip_whitespace, ~container_lnum=?, ~pos=?, parser, string) => {
   switch (container_lnum) {
   | None => ()
   | Some(lnum) => Sedlexing.container_lnum_ref := lnum
   };
-  parse(Sedlexing.of_ascii_string(~pos?, string), parser);
+  parse(skip_whitespace, Sedlexing.of_ascii_string(~pos?, string), parser);
 };
 
 let parse_declaration_list = (~container_lnum=?, ~pos=?, css) =>
-  parse_string(~container_lnum?, ~pos?, Parser.declaration_list, css);
+  parse_string(~skip_whitespace=true, ~container_lnum?, ~pos?, Parser.declaration_list, css);
 
 let parse_declaration = (~container_lnum=?, ~pos=?, css) =>
-  parse_string(~container_lnum?, ~pos?, Parser.declaration, css);
+  parse_string(~skip_whitespace=true, ~container_lnum?, ~pos?, Parser.declaration, css);
 
 let parse_stylesheet = (~container_lnum=?, ~pos=?, css) =>
-  parse_string(~container_lnum?, ~pos?, Parser.stylesheet, css);
+  parse_string(~skip_whitespace=false, ~container_lnum?, ~pos?, Parser.stylesheet, css);

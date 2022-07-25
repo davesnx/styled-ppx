@@ -28,8 +28,7 @@ let help =
   );
 
 let rec printUnlessIsEof = buffer => {
-  let render_ws = Css_lexer.discard_comments_and_whitespace(buffer);
-  let lexes = Css_lexer.get_next_token(buffer, render_ws);
+  let lexes = Css_lexer.get_next_token(buffer, false);
   switch (lexes) {
     | [Css_lexer.Parser.EOF] => ()
     | [token] => {

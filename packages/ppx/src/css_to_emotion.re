@@ -213,11 +213,6 @@ and render_selector = (selector: Selector.t) => {
       }
 
   let rec render_compound_selector = compound_selector => {
-    let render_selector_list = ((first, rest)) => {
-      let first = first |> render_pseudo_selector;
-      let rest = rest |> List.map(render_pseudo_selector) |> String.concat(" ");
-      first ++ rest;
-    };
     let simple_selector =
       Option.fold(
         ~none="",
@@ -231,7 +226,7 @@ and render_selector = (selector: Selector.t) => {
       ) |> String.concat(" ");
     let pseudo_selectors =
       List.map(
-        render_selector_list,
+        render_pseudo_selector,
         compound_selector.pseudo_selectors,
       ) |> String.concat("");
     simple_selector ++ subclass_selectors ++ pseudo_selectors;
@@ -247,19 +242,23 @@ and render_selector = (selector: Selector.t) => {
   }
   and render_right_combinator = right => {
     right
-    |> List.map(((combinator, compound_selector)) => {
-      Option.fold(~none="", ~some=o => o ++ " ", combinator)
+    |> List.map(((combinator: option(string), compound_selector)) => {
+      Option.fold(
+        ~none="",
+        ~some=o => o ++ " ",
+        combinator,
+      )
       ++ render_compound_selector(compound_selector)
     }) |> String.concat(" ")
   };
 
   switch (selector) {
-    | SimpleSelector(simple, separator) =>
-      simple |> List.map(render_simple_selector) |> String.concat(separator)
-    | ComplexSelector(complex, separator) =>
-      complex |> List.map(render_complex_selector) |> String.concat(separator)
-    | CompoundSelector(compound, separator) =>
-      compound |> List.map(render_compound_selector) |> String.concat(separator)
+    | SimpleSelector(simple) =>
+      simple |> List.map(render_simple_selector) |> String.concat(", ")
+    | ComplexSelector(complex) =>
+      complex |> List.map(render_complex_selector) |> String.concat(", ")
+    | CompoundSelector(compound) =>
+      compound |> List.map(render_compound_selector) |> String.concat(", ")
   };
 }
 and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {

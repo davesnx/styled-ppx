@@ -41,12 +41,17 @@ let css_tests = [
   ),
   (
     "ignore in at_rule inside declarations",
-    [%expr [%cx "@media all { }"]],
-    [%expr [%cx "@media all { }"]],
+    [%expr [%cx "@media all {}"]],
+    [%expr [%cx "@media all {}"]],
   ),
   (
     "ignore in at_rule inside declarations",
-    [%expr [%cx "@media(min-width:30px) {}"]],
+    [%expr [%cx "@media all  { } "]],
+    [%expr [%cx "@media all {}"]],
+  ),
+  (
+    "ignore in at_rule inside declarations",
+    [%expr [%cx "@media(min-width: 30px) {}"]],
     [%expr [%cx "@media (min-width: 30px) {}"]],
   ),
   (

@@ -116,21 +116,18 @@ and render_selector = (ast: Selector.t) => {
       ++ "))";
 
   let rec render_compound_selector = (compound_selector: compound_selector) => {
-    let render_selector_list = ((first, second)) => {
-      (first |> render_pseudo_selector)
-      ++ (second |> List.map(render_pseudo_selector) |> String.concat(", "));
-    };
     let simple_selector =
       compound_selector.type_selector
       |> Option.fold(~none="", ~some=render_simple_selector);
     let subclass_selectors =
       List.map(render_subclass_selector, compound_selector.subclass_selectors)
-      |> String.concat(" ");
+      |> String.concat("");
     let pseudo_selectors =
-      List.map(render_selector_list, compound_selector.pseudo_selectors)
+      List.map(render_pseudo_selector, compound_selector.pseudo_selectors)
       |> String.concat("");
 
-    simple_selector ++ subclass_selectors ++ pseudo_selectors;
+    let compound = String.concat(", ", [simple_selector, subclass_selectors, pseudo_selectors]);
+    "Compound(" ++ compound ++ ")"
   }
   and render_complex_selector: complex_selector => string =
     fun
@@ -140,28 +137,27 @@ and render_selector = (ast: Selector.t) => {
   and render_right_combinator = right => {
     right
     |> List.map(((combinator, compound_selector)) => {
-         Option.fold(
-           ~none=" ",
+         String.concat(", ", [Option.fold(
+           ~none="Whitespace",
            ~some=o => "Combinator(" ++ o ++ ")",
            combinator,
-         )
-         ++ render_compound_selector(compound_selector)
+         ), render_compound_selector(compound_selector)])
        })
     |> String.concat(", ");
   };
 
   switch (ast) {
-  | SimpleSelector(v, sep) =>
+  | SimpleSelector(v) =>
     "SimpleSelector(["
-    ++ (v |> List.map(render_simple_selector) |> String.concat(sep))
+    ++ (v |> List.map(render_simple_selector) |> String.concat(", "))
     ++ "])"
-  | ComplexSelector(v, sep) =>
+  | ComplexSelector(v) =>
     "ComplexSelector(["
-    ++ (v |> List.map(render_complex_selector) |> String.concat(sep))
+    ++ (v |> List.map(render_complex_selector) |> String.concat(", "))
     ++ "])"
-  | CompoundSelector(v, sep) =>
+  | CompoundSelector(v) =>
     "CompoundSelector(["
-    ++ (v |> List.map(render_compound_selector) |> String.concat(sep))
+    ++ (v |> List.map(render_compound_selector) |> String.concat(", "))
     ++ "])"
   };
 }
