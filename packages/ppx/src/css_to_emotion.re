@@ -204,11 +204,13 @@ and render_selector = (selector: Selector.t) => {
     fun
     | Pseudoelement(v) => "::" ++ v
     | Pseudoclass(Ident(i)) => ":" ++ i
-    | Pseudoclass(Function({name, payload: _})) =>
+    | Pseudoclass(Function({name, payload: (payload, _loc)})) => {
         ":"
         ++ name
-        /* ++ (List.map(render_component_value, payload) |> String.concat("")) */
-        ++ "))";
+        ++ "("
+        ++ (render_selector(payload) |> String.trim)
+        ++ ")";
+      }
 
   let rec render_compound_selector = compound_selector => {
     let render_selector_list = ((first, rest)) => {
@@ -252,12 +254,12 @@ and render_selector = (selector: Selector.t) => {
   };
 
   switch (selector) {
-    | SimpleSelector(simple) =>
-      simple |> List.map(render_simple_selector) |> String.concat(", ")
-    | ComplexSelector(complex) =>
-      complex |> List.map(render_complex_selector) |> String.concat(" ")
-    | CompoundSelector(compound) =>
-      compound |> List.map(render_compound_selector) |> String.concat(" ")
+    | SimpleSelector(simple, separator) =>
+      simple |> List.map(render_simple_selector) |> String.concat(separator)
+    | ComplexSelector(complex, separator) =>
+      complex |> List.map(render_complex_selector) |> String.concat(separator)
+    | CompoundSelector(compound, separator) =>
+      compound |> List.map(render_compound_selector) |> String.concat(separator)
   };
 }
 and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {

@@ -403,7 +403,7 @@ let rec get_next_token = (buf, whitespace_detected) => {
 
   switch%sedlex (buf) {
   | eof => [EOF]
-  | '.' => [DOT]
+  | '.' => if (whitespace_detected) { [WS, DOT] } else { [DOT] }
   | ';' => [SEMI_COLON]
   | '}' => [RIGHT_BRACE]
   | '{' => [LEFT_BRACE]

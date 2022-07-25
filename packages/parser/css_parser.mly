@@ -238,10 +238,10 @@ attribute_selector:
 
 /* <id-selector> = <hash-token> */
 id_selector:
-  | h = HASH { Selector.Id h }
+  | WS?; h = HASH { Selector.Id h }
 
 /* <class-selector> = '.' <ident-token> */
-class_selector: DOT; c = IDENT { Selector.Class c };
+class_selector: WS?; DOT; c = IDENT { Selector.Class c };
 
 /* <subclass-selector> = <id-selector> | <class-selector> | <attribute-selector> | <pseudo-class-selector> */
 subclass_selector:
@@ -254,15 +254,15 @@ subclass_selector:
 selector:
   /* <simple-selector-list> = <simple-selector># */
   | xs = separated_nonempty_list(COMMA, simple_selector) {
-    Selector.SimpleSelector xs
+    Selector.SimpleSelector (xs, ", ")
   }
   /* <compound-selector-list> = <compound-selector># */
-  | xs = separated_nonempty_list(COMMA, compound_selector) {
-    Selector.CompoundSelector xs
+  | xs = separated_nonempty_list(WS, compound_selector) {
+    Selector.CompoundSelector (xs, " ")
   }
   /* <complex-selector-list> = <complex-selector># */
   | xs = separated_nonempty_list(COMMA, complex_selector) {
-    Selector.ComplexSelector xs
+    Selector.ComplexSelector (xs, ", ")
   }
 ;
 
@@ -271,6 +271,7 @@ selector:
 /* <simple-selector> = <self-selector> | <type-selector> | <subclass-selector> */
 simple_selector:
   /* & {} */
+  /* https://drafts.csswg.org/css-nesting/#nest-selector */
   | AMPERSAND; { Selector.Ampersand }
   /* * {} */
   | ASTERISK; { Selector.Universal }

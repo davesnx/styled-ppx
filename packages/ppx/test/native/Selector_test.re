@@ -41,21 +41,38 @@ let selectors_css_tests = [
     [%expr [%cx {j|html, body {}|j}]],
      [%expr CssJs.style(. [|CssJs.selector(. {js|html, body|js}, [||])|])],
   ),
-  (
-    "*",
-    [%expr [%cx {j|* {}|j}]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|*|js}, [||])|])],
-  ),
+
 
   /* Compound */
 
   /* "&.bar" */
-  /* (
+  (
     "&.bar",
     [%expr [%cx {j|&.bar {}|j}]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|&.bar|js}, [||])|])],
+  ),
+  /* (
+    "& .bar",
+    [%expr [%cx {j|& .bar {}|j}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& .bar|js}, [||])|])],
   ), */
-  /* "& .bar", */
+  /* (
+    "&.bar, &.foo",
+    [%expr [%cx {j|&.bar, &.foo {}|j}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|&.bar, &.foo|js}, [||])|])],
+  ), */
+  /* (
+    "& foo",
+    [%expr [%cx {j|& foo {}|j}]],
+     [%expr CssJs.style(. [|CssJs.selector(. {js|& foo|js}, [||])|])],
+  ), */
+
+  /* (
+    "html body",
+    [%expr [%cx {j|html body {}|j}]],
+     [%expr CssJs.style(. [|CssJs.selector(. {js|html body|js}, [||])|])],
+  ), */
+
   /* p :first-child */
   /* p:first-child */
   /* p#first-child */
@@ -64,16 +81,16 @@ let selectors_css_tests = [
   /* #foo > .bar + div.k1.k2 [id='baz']:hello(2):not(:where(#yolo))::before */
 
   /* Complex */
- /*  (
+ (
     ">",
     [%expr [%cx "& > a { }"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& > a|js}, [||])|])],
   ),
-  (
-    ">",
-    [%expr [%cx "& .bar { }"]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|& .bar|js}, [||])|])],
-  ), */
+  // (
+  //   ">",
+  //   [%expr [%cx "& .bar { }"]],
+  //   [%expr CssJs.style(. [|CssJs.selector(. {js|& .bar|js}, [||])|])],
+  // ),
 
   /* (
     "nth-child(even)",
@@ -105,11 +122,16 @@ let selectors_css_tests = [
     [%expr [%cx "& span {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& span|js}, [||])|])],
   ),
-  /* (
+  (
+    "& span, & + &",
+    [%expr [%cx "& span, & + & {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& span, & + &|js}, [||])|])],
+  ),
+  (
     "& p:not(.active)",
     [%expr [%cx "& p:not(.active) {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& p:not(.active)|js}, [||])|])],
-  ), */
+  ),
   (
     "& input[type=\"password\"]",
     [%expr [%cx "& input[type=\"password\"] {} "]],
@@ -130,19 +152,11 @@ let selectors_css_tests = [
     [%expr [%cx "& $(Variables.selector_query) {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& |js} ++ Variables.selector_query, [||])|])],
   ),
-  /* (
+  (
     "& a[target=\"_blank\"]",
     [%expr [%cx {|& a[target="_blank"] {}|}]],
-    [%expr CssJs.style(. [|
-      CssJs.selector(.
-        {js|& a|js}
-          ++ {js|[|js}
-          ++ {js|target = "_blank"|js}
-          ++ {js|]|js},
-        [||]
-      )|]
-    )],
-  ), */
+    [%expr CssJs.style(. [| CssJs.selector(. {js|& a[target="_blank"]|js}, [||])|])],
+  ),
   (
     "$(pseudo)",
     [%expr [%cx "$(pseudo) {}"]],
@@ -158,7 +172,7 @@ let selectors_css_tests = [
     [%expr [%cx "& div > $(Variables.element) {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& div > |js} ++ Variables.element, [||])|])],
   ),
-  /* (
+  (
     "*:not(:last-child)",
     [%expr [%cx "& > *:not(:last-child) {}"]],
     [%expr CssJs.style(. [|
@@ -167,7 +181,7 @@ let selectors_css_tests = [
         [||]
       )
     |])],
-  ), */
+  ),
 ];
 
 describe("Should transform selectors", ({test, _}) => {
