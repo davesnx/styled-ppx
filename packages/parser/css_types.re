@@ -54,7 +54,6 @@ and Declaration: {
 and Declaration_list: {
   type kind =
     | Declaration(Declaration.t)
-    | Unsafe(Declaration.t)
     | At_rule(At_rule.t)
     | Style_rule(Style_rule.t);
 
@@ -111,7 +110,7 @@ and Selector: {
         kind: string,
         value: attr_value,
       })
-  and attr_value = 
+  and attr_value =
     | Attr_ident(string)
     | Attr_string(string)
   and pseudo_selector =

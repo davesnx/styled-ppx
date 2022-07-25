@@ -50,7 +50,6 @@ and render_brace_block = ast => {
 and render_declaration_kind = (ast: Declaration_list.kind) => {
   switch (ast) {
   | Declaration(declaration) => render_declaration(declaration)
-  | Unsafe(unsafe) => render_declaration(unsafe)
   | Style_rule(style_rule) => render_style_rule(style_rule)
   | At_rule(at_rule) => render_at_rule(at_rule)
   };

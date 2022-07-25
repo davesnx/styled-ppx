@@ -124,7 +124,7 @@ let () =
         Some(Location.error(~loc, msg));
       }
     | GrammarError((msg, loc)) => Some(Location.error(~loc, msg))
-    | _exn => Some(Location.error("Unexpected error"))
+    | exn => Some(Location.error("Unexpected error " ++ Printexc.to_string(exn)))
   );
 
 /* Regexes */

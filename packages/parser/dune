@@ -8,4 +8,4 @@
  (public_name styled-ppx-css-parser)
  (libraries sedlex menhirLib ocaml-migrate-parsetree str)
  (preprocess
-  (pps sedlex.ppx)))
+  (pps sedlex.ppx ppx_deriving.show)))

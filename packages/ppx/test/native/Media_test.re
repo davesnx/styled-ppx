@@ -11,41 +11,46 @@ let compare = (input, expected, {expect, _}) => {
 
 /* https://www.w3.org/TR/mediaqueries-5 */
 let media_query_cases = [
-  /* (
+  (
     "(min-width: 33px)",
-    [%expr "@media (min-width: 33px) {}"],
-    [%expr CssJs.style(. [|CssJs.media(. "(min-width: 33px)", [||])|])]
+    [%expr [%cx "@media (min-width: 33px) {}"]],
+    [%expr CssJs.style(. [|CssJs.media(. {js|(min-width:33px)|js}, [||])|])]
   ),
   (
     "screen and (min-width: 33px) or (max-height: 15rem)",
-    [%expr "@media screen and (min-width: 33px) or (max-height: 15rem) {}"],
-    [%expr CssJs.style(. [|CssJs.media(. "screen and (min-width: 33px) or (max-height: 15rem)", [||])|])]
+    [%expr [%cx "@media screen and (min-width: 33px) or (max-height: 15rem) {}"]],
+    [%expr CssJs.style(. [|CssJs.media(. {js|screen and (min-width:33px) or (max-height:15rem)|js}, [||])|])]
   ),
   (
     "(hover: hover)",
-    [%expr "@media (hover: hover) {}"],
-    [%expr CssJs.style(. [|CssJs.media(. "(hover: hover)", [||])|])]
+    [%expr [%cx "@media (hover: hover) {}"]],
+    [%expr CssJs.style(. [|CssJs.media(. {js|(hover:hover)|js}, [||])|])]
   ),
   (
     "(hover: hover) and (color)",
-    [%expr "@media (hover: hover) and (color)"],
-    [%expr CssJs.style(. [|CssJs.media(. "screen and (min-width: 33px) or (max-height: 15rem) and (hover: hover) and (color)", [||])|])]
+    [%expr [%cx "@media (hover: hover) and (color) {}"]],
+    [%expr CssJs.style(. [|CssJs.media(. {js|(hover:hover) and (color)|js}, [||])|])]
   ),
   (
     "not all and (monochrome)",
-    [%expr "@media not all and (monochrome) {}"],
-    [%expr CssJs.style(. [|CssJs.media(. "not all and (monochrome)", [||])|])]
+    [%expr [%cx "@media not all and (monochrome) {}"]],
+    [%expr CssJs.style(. [|CssJs.media(. {js|not all and (monochrome)|js}, [||])|])]
   ),
   (
     "print and (color)",
-    [%expr "@media print and (color) {}"],
-    [%expr CssJs.style(. [|CssJs.media(. "print and (color)", [||])|])]
+    [%expr [%cx "@media print and (color) {}"]],
+    [%expr CssJs.style(. [|CssJs.media(. {js|print and (color)|js}, [||])|])]
   ),
   (
     "(max-height: $(wat)",
-    [%expr "(max-height: $(wat) {}"],
-    [%expr CssJs.style(. [|CssJs.media(. "screen and (min-width: 33px) or (max-height: $(wat)", [||])|])]
-  ), */
+    [%expr [%cx "@media (max-height: $(wat)) {}"]],
+    [%expr CssJs.style(. [|CssJs.media(. {js|(max-height:|js} ++ (wat ++ {js|)|js}), [||])|])]
+  ),
+  (
+    "$(wat)",
+    [%expr [%cx "@media ($(wat)) {}"]],
+    [%expr CssJs.style(. [|CssJs.media(. {js|(|js} ++ (wat ++ {js|)|js}), [||])|])]
+  ),
  /* Nested is not supported
     https://www.w3.org/TR/mediaqueries-5/#media-conditions */
  /* "@media (not (screen and (color))), print and (color) {}" */
