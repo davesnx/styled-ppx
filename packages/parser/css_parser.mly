@@ -18,6 +18,7 @@ open Css_types
 %token PERCENTAGE
 %token IMPORTANT
 %token AMPERSAND
+%token ASTERISK
 %token COMMA
 %token WS
 %token <string> IDENT
@@ -271,6 +272,8 @@ selector:
 simple_selector:
   /* & {} */
   | AMPERSAND; { Selector.Ampersand }
+  /* * {} */
+  | ASTERISK; { Selector.Universal }
   /* $(Module.value) {} */
   | v = VARIABLE { Selector.Variable v }
   /* a {} */

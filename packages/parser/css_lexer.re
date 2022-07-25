@@ -65,6 +65,7 @@ let token_to_string =
   | Parser.WS => " "
   | Parser.DOT => "."
   | Parser.COMMA => ","
+  | Parser.ASTERISK => "*"
 ;
 
 let token_to_debug =
@@ -105,6 +106,7 @@ let token_to_debug =
   | Parser.DOT => "DOT"
   | Parser.COMMA => "COMMA"
   | Parser.WS => "WS"
+  | Parser.ASTERISK => "ASTERISK"
 ;
 
 let () =
@@ -413,6 +415,7 @@ let rec get_next_token = (buf, whitespace_detected) => {
   | ']' => [RIGHT_BRACKET]
   | '%' => [PERCENTAGE]
   | '&' => [AMPERSAND]
+  | '*' => [ASTERISK]
   | ',' => [COMMA]
   | variable => [VARIABLE(latin1(~skip=2, ~drop=1, buf) |> String.split_on_char('.'))]
   | operator => [OPERATOR(latin1(buf))]

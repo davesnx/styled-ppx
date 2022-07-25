@@ -78,10 +78,11 @@ and render_selector = (ast: Selector.t) => {
 
   let rec render_simple_selector =
     fun
+    | Universal => "Universal"
     | Ampersand => "Ampersand"
     | Type(v) => "Type(" ++ v ++ ")"
-    | Variable(v) => "Variable(" ++ String.concat(".", v) ++ ")"
     | Subclass(v) => "Subclass(" ++ render_subclass_selector(v) ++ ")"
+    | Variable(v) => "Variable(" ++ String.concat(".", v) ++ ")"
   and render_subclass_selector: subclass_selector => string =
     fun
     | Id(v) => "Id(" ++ v ++ ")"

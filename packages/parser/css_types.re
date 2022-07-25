@@ -94,10 +94,11 @@ and Selector: {
       ),
   }
   and simple_selector =
-    | Variable(list(string))
+    | Universal
     | Ampersand
     | Type(string)
     | Subclass(subclass_selector)
+    | Variable(list(string))
   and subclass_selector =
     | Id(string)
     | Class(string)
