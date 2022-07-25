@@ -150,17 +150,17 @@ and render_selector = (ast: Selector.t) => {
   };
 
   switch (ast) {
-  | SimpleSelector(v) =>
+  | SimpleSelector(v, sep) =>
     "SimpleSelector(["
-    ++ (v |> List.map(render_simple_selector) |> String.concat(", "))
+    ++ (v |> List.map(render_simple_selector) |> String.concat(sep))
     ++ "])"
-  | ComplexSelector(v) =>
+  | ComplexSelector(v, sep) =>
     "ComplexSelector(["
-    ++ (v |> List.map(render_complex_selector) |> String.concat(", "))
+    ++ (v |> List.map(render_complex_selector) |> String.concat(sep))
     ++ "])"
-  | CompoundSelector(v) =>
+  | CompoundSelector(v, sep) =>
     "CompoundSelector(["
-    ++ (v |> List.map(render_compound_selector) |> String.concat(", "))
+    ++ (v |> List.map(render_compound_selector) |> String.concat(sep))
     ++ "])"
   };
 }

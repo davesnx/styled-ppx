@@ -188,14 +188,14 @@ declaration_without_eof:
 
 /* ::after */
 pseudo_element_selector:
-  DOUBLE_COLON; pse = IDENT { Selector.Pseudoelement pse };
+  WS?; DOUBLE_COLON; pse = IDENT { Selector.Pseudoelement pse };
 
 /* <pseudo-class-selector> = ':' <ident-token> | ':' <function-token> <any-value> ')' */
 pseudo_class_selector:
   /* :visited */
-  | COLON; i = IDENT { Selector.(Pseudoclass(Ident i)) }
+  | WS?; COLON; i = IDENT { Selector.(Pseudoclass(Ident i)) }
   /* :nth-child() */
-  | COLON; f = IDENT; LEFT_PAREN; xs = loc(selector); RIGHT_PAREN {
+  | WS?; COLON; f = IDENT; LEFT_PAREN; xs = loc(selector); RIGHT_PAREN {
     Selector.(Pseudoclass(Function({ name = f; payload = xs })))
   }
   /* TODO: <function-token> and <any-value> */
@@ -237,10 +237,10 @@ attribute_selector:
 
 /* <id-selector> = <hash-token> */
 id_selector:
-  | h = HASH { Selector.Id h }
+  | WS?; h = HASH { Selector.Id h }
 
 /* <class-selector> = '.' <ident-token> */
-class_selector: DOT; c = IDENT { Selector.Class c };
+class_selector: WS?; DOT; c = IDENT { Selector.Class c };
 
 /* <subclass-selector> = <id-selector> | <class-selector> | <attribute-selector> | <pseudo-class-selector> */
 subclass_selector:
@@ -253,15 +253,15 @@ subclass_selector:
 selector:
   /* <simple-selector-list> = <simple-selector># */
   | xs = separated_nonempty_list(COMMA, simple_selector) {
-    Selector.SimpleSelector xs
+    Selector.SimpleSelector (xs, ", ")
   }
   /* <compound-selector-list> = <compound-selector># */
   | xs = separated_nonempty_list(COMMA, compound_selector) {
-    Selector.CompoundSelector xs
+    Selector.CompoundSelector (xs, ", ")
   }
   /* <complex-selector-list> = <complex-selector># */
   | xs = separated_nonempty_list(COMMA, complex_selector) {
-    Selector.ComplexSelector xs
+    Selector.ComplexSelector (xs, ", ")
   }
 ;
 

@@ -76,9 +76,10 @@ and Stylesheet: {
 } = Stylesheet
 and Selector: {
   type t =
-    | SimpleSelector(list(simple_selector))
-    | ComplexSelector(list(complex_selector))
-    | CompoundSelector(list(compound_selector))
+    | SimpleSelector(list(simple_selector), separator)
+    | ComplexSelector(list(complex_selector), separator)
+    | CompoundSelector(list(compound_selector), separator)
+  and separator = string
   and complex_selector =
     | Selector(compound_selector)
     | Combinator({

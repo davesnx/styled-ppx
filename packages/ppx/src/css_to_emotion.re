@@ -154,17 +154,17 @@ and render_selector = (ast: Selector.t) => {
   };
 
   switch (ast) {
-  | SimpleSelector(v) =>
+  | SimpleSelector(v, sep) =>
     "SimpleSelector(["
-    ++ (v |> List.map(render_simple_selector) |> String.concat(", "))
+    ++ (v |> List.map(render_simple_selector) |> String.concat(sep))
     ++ "])"
-  | ComplexSelector(v) =>
+  | ComplexSelector(v, sep) =>
     "ComplexSelector(["
-    ++ (v |> List.map(render_complex_selector) |> String.concat(", "))
+    ++ (v |> List.map(render_complex_selector) |> String.concat(sep))
     ++ "])"
-  | CompoundSelector(v) =>
+  | CompoundSelector(v, sep) =>
     "CompoundSelector(["
-    ++ (v |> List.map(render_compound_selector) |> String.concat(", "))
+    ++ (v |> List.map(render_compound_selector) |> String.concat(sep))
     ++ "])"
   };
 }
@@ -462,12 +462,12 @@ and render_selector = (selector: Selector.t) => {
   };
 
   switch (selector) {
-    | SimpleSelector(simple) =>
-      simple |> List.map(render_simple_selector) |> String.concat(" ")
-    | ComplexSelector(complex) =>
-      complex |> List.map(render_complex_selector) |> String.concat(" ")
-    | CompoundSelector(compound) =>
-      compound |> List.map(render_compound_selector) |> String.concat(" ")
+    | SimpleSelector(simple, sep) =>
+      simple |> List.map(render_simple_selector) |> String.concat(sep)
+    | ComplexSelector(complex, sep) =>
+      complex |> List.map(render_complex_selector) |> String.concat(sep)
+    | CompoundSelector(compound, sep) =>
+      compound |> List.map(render_compound_selector) |> String.concat(sep)
   };
 }
 and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
