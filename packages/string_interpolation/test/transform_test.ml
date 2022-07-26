@@ -24,7 +24,7 @@ let test3 () =
   check ast "dont transform multiple strings" [%expr {js|Hello world|js}]
     (transform "Hello world")
 
-let test4 () = check ast "inline variable" [%expr name] (transform "$(name)")
+let test4 () = check ast "inline variable" [%expr {js||js} ^ name ^ {js||js}] (transform "$(name)")
 
 let test5 () =
   check ast "concat string before variable" [%expr {js|Hello |js} ^ name]
