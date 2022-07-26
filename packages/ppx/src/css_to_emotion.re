@@ -120,6 +120,7 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
         let conditions = List.map(parse_condition, blocks) |> String.concat("");
         "(" ++ conditions ++ ")";
       | (Ident(i), _) => i
+      | (Variable(v), _) => render_variable_as_string(v)
       | _ =>
         /* This branch is whildcared (_) by design of the parser. It won't allow any other Component_value */
         grammar_error(prelude_loc, "Invalid media query")

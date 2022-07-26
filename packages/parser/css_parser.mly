@@ -98,15 +98,19 @@ paren_block (X): xs = delimited(LEFT_PAREN, X, RIGHT_PAREN); { xs };
 /* (400px < width < 1000px) */
 /* (not (color)) and (not (hover)) */
 /* Combinator "," */
-media_query_list:
+media_query_prelude_item:
   | i = IDENT { Component_value.Ident i }
+  | v = VARIABLE { Component_value.Variable v }
   | xs = paren_block(prelude) { Component_value.Paren_block xs }
+;
+
+media_query_prelude: q = nonempty_list(loc(skip_ws(media_query_prelude_item))) { q };
 
 /* https://www.w3.org/TR/css-syntax-3/#at-rules */
 at_rule:
   /* @media (min-width: 16rem) { ... } */
   | name = loc(AT_MEDIA); WS?;
-    prelude = loc(nonempty_list(loc(skip_ws(media_query_list)))); WS?;
+    prelude = loc(media_query_prelude); WS?;
     ds = brace_block(loc(declarations)); WS? {
     { At_rule.name = name;
       prelude;
@@ -116,7 +120,7 @@ at_rule:
   }
   /* @media (min-width: 16rem) {} */
   | name = loc(AT_MEDIA); WS?;
-    prelude = loc(nonempty_list(loc(skip_ws(media_query_list)))); WS?;
+    prelude = loc(media_query_prelude); WS?;
     b = empty_brace_block; WS?; {
     let empty_block = Brace_block.Declaration_list (b, Lex_buffer.make_loc $startpos $endpos) in
     { At_rule.name = name;

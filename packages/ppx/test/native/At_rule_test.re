@@ -47,9 +47,14 @@ let media_query_cases = [
     [%expr CssJs.style(. [|CssJs.media(. {js|(max-height: |js} ++ (wat ++ {js|)|js}), [||])|])]
   ),
   (
-    "$(wat)",
+    "($(wat))",
     [%expr [%cx "@media ($(wat)) {}"]],
     [%expr CssJs.style(. [|CssJs.media(. {js|(|js} ++ (wat ++ {js|)|js}), [||])|])]
+  ),
+  (
+    "$(wat)",
+    [%expr [%cx "@media $(wat) {}"]],
+    [%expr CssJs.style(. [|CssJs.media(. wat, [||])|])]
   ),
   (
     "(max-height: $(wat)",
