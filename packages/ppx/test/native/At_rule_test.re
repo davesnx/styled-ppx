@@ -41,11 +41,11 @@ let media_query_cases = [
     [%expr [%cx "@media print and (color) {}"]],
     [%expr CssJs.style(. [|CssJs.media(. {js|print and (color)|js}, [||])|])]
   ),
-  (
-    "(max-height: $(wat)",
-    [%expr [%cx "@media (max-height: $(wat)) {}"]],
-    [%expr CssJs.style(. [|CssJs.media(. {js|(max-height:|js} ++ (wat ++ {js|)|js}), [||])|])]
-  ),
+  // (
+  //   "(max-height: $(wat)",
+  //   [%expr [%cx "@media (max-height: $(wat)) {}"]],
+  //   [%expr CssJs.style(. [|CssJs.media(. {js|(max-height:|js} ++ (wat ++ {js|)|js}), [||])|])]
+  // ),
   (
     "$(wat)",
     [%expr [%cx "@media ($(wat)) {}"]],

@@ -59,11 +59,11 @@ let css_tests = [
     [%expr [%cx "@media screen  and  (min-width: 30px) {}"]],
     [%expr [%cx "@media screen and (min-width: 30px) {}"]],
   ),
-  (
-    "media with declarations",
-    [%expr [%cx "@media    screen and (min-width: 30px  ) { color: red; }"]],
-    [%expr [%cx "@media screen and (min-width: 30px) { color: red; } "]],
-  ),
+  // (
+  //   "media with declarations",
+  //   [%expr [%cx "@media    screen and (min-width: 30px  ) { color: red; }"]],
+  //   [%expr [%cx "@media screen and (min-width: 30px) { color: red; } "]],
+  // ),
   (
     "media with multiple preludes",
     [%expr [%cx "@media screen and (min-width: 30px) and (max-height: 16rem) { color: red; }"]],

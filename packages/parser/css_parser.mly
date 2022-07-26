@@ -41,7 +41,6 @@ open Css_types
 %start <Css_types.Stylesheet.t> stylesheet
 %start <Css_types.Declaration_list.t> declaration_list
 %start <Css_types.Declaration.t> declaration
-%start <Css_types.Style_rule.t> style_rule
 
 %%
 
@@ -88,7 +87,7 @@ media_query_list:
 /* https://www.w3.org/TR/css-syntax-3/#at-rules */
 at_rule:
   /* @media (min-width: 16rem) {} */
-  | name = loc(AT_MEDIA); WS?; xs = loc(nonempty_list(loc(media_query_list))); WS?; empty_brace_block; WS?; {
+  | name = loc(AT_MEDIA); WS?; xs = loc(nonempty_list(loc(with_ws(media_query_list)))); WS?; empty_brace_block; WS?; {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Empty;
@@ -96,7 +95,7 @@ at_rule:
     }
   }
   /* @media (min-width: 16rem) { ... } */
-  | name = loc(AT_MEDIA); WS?; xs = loc(nonempty_list(loc(media_query_list))); WS?; ds = brace_block(loc(declarations)) {
+  | name = loc(AT_MEDIA); WS?; xs = loc(nonempty_list(loc(with_ws(media_query_list)))); WS?; ds = brace_block(loc(declarations)); WS? {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Declaration_list ds;
@@ -315,18 +314,19 @@ compound_selector:
   }
 ;
 
+
 /* <complex-selector> = <compound-selector> [ <combinator>? <compound-selector> ]* */
 complex_selector:
   | left = compound_selector;
     WS;
-    right = loption(list(pair(COMBINATOR, ws_left(compound_selector)))); {
+    right = loption(list(pair(with_ws(COMBINATOR), with_ws(compound_selector)))); {
     Selector.Combinator {
       left;
       right = List.map (fun (c, right) -> (Some c, right)) right;
     }
   }
   | left = compound_selector;
-    right = loption(list(pair(WS, ws_right(compound_selector)))); {
+    right = loption(list(pair(WS, with_ws(compound_selector)))); {
     Selector.Combinator {
       left;
       right = List.map (fun (_, right) -> (None, right)) right;
@@ -361,7 +361,7 @@ component_value_in_prelude:
   | f = loc(IDENT); LEFT_PAREN; xs = loc(prelude); RIGHT_PAREN; {
     Component_value.Function (f, xs)
   }
-  /* | WS { Component_value.Delim "*" } */
+  | WS { Component_value.Delim "*" }
 ;
 
 component_value:
