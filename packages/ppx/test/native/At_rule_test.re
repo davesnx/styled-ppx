@@ -57,13 +57,17 @@ let media_query_cases = [
     [%expr CssJs.style(. [|CssJs.media(. wat, [||])|])]
   ),
   (
-    "(max-height: $(wat)",
+    "(max-height: $(wat))",
     [%expr [%cx "@media (max-height: $(wat)) {}"]],
     [%expr CssJs.style(. [|CssJs.media(. {js|(max-height: |js} ++ (wat ++ {js|)|js}), [||])|])]
   ),
- /* Nested is not supported
+ /* Nested is not supported in code-gen
     https://www.w3.org/TR/mediaqueries-5/#media-conditions */
- /* "@media (not (screen and (color))), print and (color) {}" */
+  /* (
+    "(not (color)) and (not (hover))",
+    [%expr [%cx "@media (not (color)) and (not (hover)) {}"]],
+    [%expr CssJs.style(. [|CssJs.media(. {js|((not (color)) and (not (hover))|js}, [||])|])]
+  ), */
  /* "@media screen, print and (color) {}" */
 ];
 
