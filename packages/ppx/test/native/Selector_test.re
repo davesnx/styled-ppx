@@ -47,22 +47,7 @@ let selectors_css_tests = [
     [%expr CssJs.style(. [|CssJs.selector(. {js|&:nth-child(3n+1)|js}, [||])|])],
   ), */
 
-  /* This two might be valid, but it shoudn't. Declarations can't have selectors without starting with &. Or maybe they should?
-  TODO: Make sure it make sense first, and then fix. */
-  /* (
-    "html, body",
-    [%expr [%cx {js|html, body {}|js}]],
-     [%expr CssJs.style(. [|CssJs.selector(. {js|html, body|js}, [||])|])],
-  ), */
-  /* (
-    "html body",
-    [%expr [%cx {js|html body {}|js}]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|html body|js}, [||])|])],
-  ), */
-
   /* Compound */
-
-  /* "&.bar" */
   (
     "&.bar",
     [%expr [%cx {js|&.bar {}|js}]],
@@ -214,6 +199,17 @@ let selectors_css_tests = [
         [||]
       )
     |])],
+  ),
+
+  (
+    "html, body",
+    [%expr [%styled.global {js|html, body {}|js}]],
+    [%expr ignore(CssJs.global(. {js|html, body|js}, [||]))],
+  ),
+  (
+    "html body",
+    [%expr [%styled.global {js|html body {}|js}]],
+    [%expr ignore(CssJs.global(. {js|html body|js}, [||]))],
   ),
 ];
 
