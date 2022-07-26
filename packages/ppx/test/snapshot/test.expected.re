@@ -1941,7 +1941,7 @@ module SingleQuoteStrings = {
     CssJs.style(. [|
       CssJs.label("SingleQuoteStrings"),
       CssJs.display(`flex),
-      CssJs.unsafe({js|justifyContent|js}, {js|center|js}),
+      CssJs.unsafe({js|justifyContent|js}, {js| center|js}),
     |]);
   let make = (props: makeProps) => {
     let className = styles ++ getOrEmpty(classNameGet(props));
@@ -2916,7 +2916,7 @@ module MultiLineStrings = {
     CssJs.style(. [|
       CssJs.label("MultiLineStrings"),
       CssJs.display(`flex),
-      CssJs.unsafe({js|justifyContent|js}, {js|center|js}),
+      CssJs.unsafe({js|justifyContent|js}, {js| center|js}),
     |]);
   let make = (props: makeProps) => {
     let className = styles ++ getOrEmpty(classNameGet(props));
@@ -4861,7 +4861,7 @@ module ArrayStatic = {
     CssJs.style(. [|
       CssJs.label("ArrayStatic"),
       CssJs.display(`flex),
-      CssJs.unsafe({js|justifyContent|js}, {js|center|js}),
+      CssJs.unsafe({js|justifyContent|js}, {js| center|js}),
     |]);
   let make = (props: makeProps) => {
     let className = styles ++ getOrEmpty(classNameGet(props));
