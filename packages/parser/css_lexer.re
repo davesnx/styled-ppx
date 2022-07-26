@@ -1,7 +1,6 @@
-/** CSS lexer.
+/** CSS lexer
   * Reference:
-  * https://www.w3.org/TR/css-syntax-3/
-  * https://github.com/yahoo/css-js/blob/master/src/l/css.3.l */
+  * https://www.w3.org/TR/css-syntax-3/ */
 
 module Sedlexing = Lex_buffer;
 module Parser = Css_parser;
@@ -32,16 +31,9 @@ let location_to_string = loc =>
     position_to_string(loc.Location.loc_end),
   );
 
-let dimension_to_string =
-  fun
-  | Types.Length => "length"
-  | Types.Angle => "angle"
-  | Types.Time => "time"
-  | Types.Frequency => "frequency";
-
 let token_to_string =
   fun
-  | Parser.EOF => "EOF"
+  | Parser.EOF => ""
   | Parser.LEFT_BRACE => "{"
   | Parser.RIGHT_BRACE => "}"
   | Parser.LEFT_PAREN => "("
@@ -49,35 +41,73 @@ let token_to_string =
   | Parser.LEFT_BRACKET => "["
   | Parser.RIGHT_BRACKET => "]"
   | Parser.COLON => ":"
+  | Parser.DOUBLE_COLON => "::"
   | Parser.SEMI_COLON => ";"
   | Parser.PERCENTAGE => "%"
   | Parser.AMPERSAND => "&"
   | Parser.IMPORTANT => "!important"
-  | Parser.IDENT(s) => "IDENT(" ++ s ++ ")"
-  | Parser.STRING(s) => "STRING(" ++ s ++ ")"
-  | Parser.URI(s) => "URI(" ++ s ++ ")"
-  | Parser.OPERATOR(s) => "OPERATOR(" ++ s ++ ")"
-  | Parser.DELIM(s) => "DELIM(" ++ s ++ ")"
-  | Parser.NESTED_AT_RULE(s) => "NESTED_AT_RULE(" ++ s ++ ")"
-  | Parser.AT_RULE_WITHOUT_BODY(s) => "AT_RULE_WITHOUT_BODY(" ++ s ++ ")"
-  | Parser.AT_RULE(s) => "AT_RULE(" ++ s ++ ")"
-  | Parser.FUNCTION(s) => "FUNCTION(" ++ s ++ ")"
-  | Parser.PSEUDOCLASS(s) => "PSEUDOCLASS(" ++ s ++ ")"
-  | Parser.PSEUDOELEMENT(s) => "PSEUDOELEMENT(" ++ s ++ ")"
-  | Parser.HASH(s) => "HASH(" ++ s ++ ")"
-  | Parser.NUMBER(s) => "NUMBER(" ++ s ++ ")"
-  | Parser.UNICODE_RANGE(s) => "UNICODE_RANGE(" ++ s ++ ")"
-  | Parser.FLOAT_DIMENSION((n, s, d)) =>
-    "FLOAT_DIMENSION("
-    ++ n
+  | Parser.IDENT(s) => s
+  | Parser.TAG(s) => s
+  | Parser.STRING(s) => "'" ++ s ++ "'"
+  | Parser.OPERATOR(s) => s
+  | Parser.COMBINATOR(s)
+  | Parser.DELIM(s) => s
+  | Parser.AT_MEDIA(s)
+  | Parser.AT_KEYFRAMES(s)
+  | Parser.AT_RULE_STATEMENT(s)
+  | Parser.AT_RULE(s) => "@" ++ s
+  | Parser.HASH(s) => "#" ++ s
+  | Parser.NUMBER(s) => s
+  | Parser.UNICODE_RANGE(s) => s
+  | Parser.FLOAT_DIMENSION((n, s, _)) => n ++ s
+  | Parser.DIMENSION((n, d)) => n ++ "." ++ d
+  | Parser.VARIABLE(v) => String.concat(".", v)
+  | Parser.WS => " "
+  | Parser.DOT => "."
+  | Parser.COMMA => ","
+  | Parser.ASTERISK => "*"
+;
+
+let token_to_debug =
+  fun
+  | Parser.EOF => "EOF"
+  | Parser.LEFT_BRACE => "LEFT_BRACE"
+  | Parser.RIGHT_BRACE => "RIGHT_BRACE"
+  | Parser.LEFT_PAREN => "LEFT_PAREN"
+  | Parser.RIGHT_PAREN => "RIGHT_PAREN"
+  | Parser.LEFT_BRACKET => "LEFT_BRACKET"
+  | Parser.RIGHT_BRACKET => "RIGHT_BRACKET"
+  | Parser.COLON => "COLON"
+  | Parser.DOUBLE_COLON => "DOUBLE_COLON"
+  | Parser.SEMI_COLON => "SEMI_COLON"
+  | Parser.PERCENTAGE => "PERCENTAGE"
+  | Parser.AMPERSAND => "AMPERSAND"
+  | Parser.IMPORTANT => "IMPORTANT"
+  | Parser.IDENT(s) => "IDENT('" ++ s ++ "')"
+  | Parser.TAG(s) => "TAG('" ++ s ++ "')"
+  | Parser.STRING(s) => "STRING('" ++ s ++ "')"
+  | Parser.OPERATOR(s) => "OPERATOR('" ++ s ++ "')"
+  | Parser.DELIM(s) => "DELIM('" ++ s ++ "')"
+  | Parser.AT_RULE(s) => "AT_RULE('" ++ s ++ "')"
+  | Parser.AT_RULE_STATEMENT(s) => "AT_RULE_STATEMENT('" ++ s ++ "')"
+  | Parser.AT_MEDIA(s) => "AT_MEDIA('" ++ s ++ "')"
+  | Parser.AT_KEYFRAMES(s) => "AT_KEYFRAMES('" ++ s ++ "')"
+  | Parser.HASH(s) => "HASH('" ++ s ++ "')"
+  | Parser.NUMBER(s) => "NUMBER('" ++ s ++ "')"
+  | Parser.UNICODE_RANGE(s) => "UNICODE_RANGE('" ++ s ++ "')"
+  | Parser.FLOAT_DIMENSION((n, s, _d)) =>
+    "FLOAT_DIMENSION('" ++ n
     ++ ", "
     ++ s
-    ++ ", "
-    ++ dimension_to_string(d)
-    ++ ")"
-  | Parser.DIMENSION((n, d)) => "DIMENSION(" ++ n ++ ", " ++ d ++ ")"
-  | Parser.VARIABLE(v) => "VARIABLE(" ++ (String.concat(".", v)) ++ ")"
-  | Parser.UNSAFE => "UNSAFE";
+    ++ "')"
+  | Parser.DIMENSION((n, d)) => "DIMENSION('" ++ n ++ ", " ++ d ++ "')"
+  | Parser.VARIABLE(v) => "VARIABLE('" ++ (String.concat(".", v)) ++ "')"
+  | Parser.COMBINATOR(s) => "COMBINATOR(" ++ s ++ ")"
+  | Parser.DOT => "DOT"
+  | Parser.COMMA => "COMMA"
+  | Parser.WS => "WS"
+  | Parser.ASTERISK => "ASTERISK"
+;
 
 let () =
   Location.register_error_of_exn(
@@ -96,15 +126,15 @@ let () =
         Some(Location.error(~loc, msg));
       }
     | GrammarError((msg, loc)) => Some(Location.error(~loc, msg))
-    | _ => None,
+    | exn => Some(Location.error("Unexpected error " ++ Printexc.to_string(exn)))
   );
 
 /* Regexes */
 let newline = [%sedlex.regexp? '\n' | "\r\n" | '\r' | '\012'];
 
-let white_space = [%sedlex.regexp? " " | '\t' | newline];
+let whitespace = [%sedlex.regexp? " " | '\t' | newline];
 
-let white_spaces = [%sedlex.regexp? Star(white_space)];
+let whitespaces = [%sedlex.regexp? Star(whitespace)];
 
 let hex_digit = [%sedlex.regexp? '0' .. '9' | 'a' .. 'f' | 'A' .. 'F'];
 
@@ -114,7 +144,7 @@ let non_ascii = [%sedlex.regexp? '\160' .. '\255'];
 
 let up_to_6_hex_digits = [%sedlex.regexp? Rep(hex_digit, 1 .. 6)];
 
-let unicode = [%sedlex.regexp? ('\\', up_to_6_hex_digits, Opt(white_space))];
+let unicode = [%sedlex.regexp? ('\\', up_to_6_hex_digits, Opt(whitespace))];
 
 let unicode_range = [%sedlex.regexp?
   Rep(hex_digit | '?', 1 .. 6) |
@@ -173,25 +203,134 @@ let non_printable = [%sedlex.regexp?
   '\000' .. '\b' | '\011' | '\014' .. '\031' | '\127'
 ];
 
-let url_unquoted = [%sedlex.regexp?
-  Star(Compl('"' | '\'' | '(' | ')' | '\\' | non_printable) | escape)
-];
+let operator = [%sedlex.regexp? "~=" | "|=" | "^=" | "$=" | "*="| "="];
 
-let url = [%sedlex.regexp? url_unquoted | string];
+let combinator = [%sedlex.regexp? '>' | '+' | '~' | "||"];
 
-let operator = [%sedlex.regexp? "~=" | "|=" | "^=" | "$=" | "*=" | "||"];
-
+let at_rule_without_body = [%sedlex.regexp? ("@", "charset" | "import" | "namespace")];
 let at_rule = [%sedlex.regexp? ("@", ident)];
+let at_media = [%sedlex.regexp? ("@", "media")];
+let at_keyframes = [%sedlex.regexp? ("@", "keyframes")];
 
-let at_rule_without_body = [%sedlex.regexp?
-  ("@", "charset" | "import" | "namespace")
+let tag = [%sedlex.regexp?
+  "a"
+  | "abbr"
+  | "address"
+  | "area"
+  | "article"
+  | "aside"
+  | "audio"
+  | "b"
+  | "base"
+  | "bdi"
+  | "bdo"
+  | "blockquote"
+  | "body"
+  | "br"
+  | "button"
+  | "canvas"
+  | "caption"
+  | "cite"
+  | "code"
+  | "col"
+  | "colgroup"
+  | "data"
+  | "datalist"
+  | "dd"
+  | "del"
+  | "details"
+  | "dfn"
+  | "dialog"
+  | "div"
+  | "dl"
+  | "dt"
+  | "em"
+  | "embed"
+  | "fieldset"
+  | "figcaption"
+  | "figure"
+  | "footer"
+  | "form"
+  | "h1"
+  | "h2"
+  | "h3"
+  | "h4"
+  | "h5"
+  | "h6"
+  | "head"
+  | "header"
+  | "hgroup"
+  | "hr"
+  | "html"
+  | "i"
+  | "iframe"
+  | "img"
+  | "input"
+  | "ins"
+  | "kbd"
+  | "label"
+  | "legend"
+  | "li"
+  | "link"
+  | "main"
+  | "map"
+  | "mark"
+  | "math"
+  | "menu"
+  | "menuitem"
+  | "meta"
+  | "meter"
+  | "nav"
+  | "noscript"
+  | "object"
+  | "ol"
+  | "optgroup"
+  | "option"
+  | "output"
+  | "p"
+  | "param"
+  | "picture"
+  | "pre"
+  | "progress"
+  | "q"
+  | "rb"
+  | "rp"
+  | "rt"
+  | "rtc"
+  | "ruby"
+  | "s"
+  | "samp"
+  | "script"
+  | "section"
+  | "select"
+  | "slot"
+  | "small"
+  | "source"
+  | "span"
+  | "strong"
+  | "style"
+  | "sub"
+  | "summary"
+  | "sup"
+  | "svg"
+  | "table"
+  | "tbody"
+  | "td"
+  | "template"
+  | "textarea"
+  | "tfoot"
+  | "th"
+  | "thead"
+  | "time"
+  | "title"
+  | "tr"
+  | "track"
+  | "u"
+  | "ul"
+  | "var"
+  | "video"
+  | "wbr"
 ];
-
-let nested_at_rule = [%sedlex.regexp?
-  ("@", "document" | "keyframes" | "media" | "supports" | "scope")
-];
-
-let unsafe = [%sedlex.regexp? ("__UNSAFE__")];
 
 let _a = [%sedlex.regexp? 'A' | 'a'];
 let _b = [%sedlex.regexp? 'B' | 'b'];
@@ -221,11 +360,16 @@ let _y = [%sedlex.regexp? 'Y' | 'y'];
 let _z = [%sedlex.regexp? 'Z' | 'z'];
 
 let important = [%sedlex.regexp?
-  ("!", white_spaces, _i, _m, _p, _o, _r, _t, _a, _n, _t)
+  ("!", whitespaces, _i, _m, _p, _o, _r, _t, _a, _n, _t)
 ];
 
 let length = [%sedlex.regexp?
-  (_c, _a, _p) | (_c, _h) | (_e, _m) | (_e, _x) | (_i, _c) | (_l, _h) |
+  (_c, _a, _p) |
+  (_c, _h) |
+  (_e, _m) |
+  (_e, _x) |
+  (_i, _c) |
+  (_l, _h) |
   (_r, _e, _m) |
   (_r, _l, _h) |
   (_v, _h) |
@@ -240,7 +384,8 @@ let length = [%sedlex.regexp?
   (_i, _n) |
   (_p, _c) |
   (_p, _t) |
-  (_p, _x)
+  (_p, _x) |
+  (_f, _r)
 ];
 
 let angle = [%sedlex.regexp?
@@ -251,107 +396,110 @@ let time = [%sedlex.regexp? _s | (_m, _s)];
 
 let frequency = [%sedlex.regexp? (_h, _z) | (_k, _h, _z)];
 
-let discard_comments_and_white_spaces = buf => {
-  let rec discard_white_spaces = buf =>
-    switch%sedlex (buf) {
-    | Plus(white_space) => discard_white_spaces(buf)
-    | "/*" => discard_comments(buf)
-    | _ => ()
-    }
-  and discard_comments = buf =>
-    switch%sedlex (buf) {
-    | eof =>
-      raise(LexingError((buf.Sedlexing.pos, "Unterminated comment at EOF")))
-    | "*/" => discard_white_spaces(buf)
-    | any => discard_comments(buf)
-    | _ => assert(false)
-    };
+let skip_whitespace = ref(false);
 
-  discard_white_spaces(buf);
-};
-
-let get_ident = (value) => {
-  open Css_parser;
-  switch(value) {
-    | "attr" | "calc" | "conic-gradient" | "counter" | "cubic-bezier" | "hsl" | "hsla" | "linear-gradient" | "max" | "min" | "radial-gradient" | "repeating-conic-gradient" | "repeating-linear-gradient" | "repeating-radial-gradient" | "rgb" | "rgba" | "var" => FUNCTION(value)
-    | "after" | "before" | "cue" | "first-letter" | "first-line" | "selection" | "slotted" | "backdrop" | "placeholder" | "marker" | "spelling-error" | "grammar-error" => PSEUDOELEMENT(value)
-    | "active" | "checked" | "default" | "dir" | "disabled" | "empty" | "enabled" | "first" | "first-child" | "first-of-type" | "fullscreen" | "focus" | "hover" | "indeterminate" | "in-range" | "invalid" | "lang" | "last-child" | "last-of-type" | "link" | "not" | "nth-child" | "nth-last-child" | "nth-last-of-type" | "nth-of-type" | "only-child" | "only-of-type" | "optional" | "out-of-range" | "read-only" | "read-write" | "required" | "right" | "root" | "scope" | "target" | "valid" | "visited" => PSEUDOCLASS(value)
-    | _ => IDENT(value)
-  }
-}
-
-let rec get_next_token = buf => {
-  discard_comments_and_white_spaces(buf);
-  open Css_parser;
+let rec get_next_token = (buf) => {
+  open Parser;
+  open Sedlexing;
   switch%sedlex (buf) {
-  | eof => EOF
-  | ';' => SEMI_COLON
-  | '}' => RIGHT_BRACE
-  | '{' => LEFT_BRACE
-  | ':' => COLON
-  | '(' => LEFT_PAREN
-  | ')' => RIGHT_PAREN
-  | '[' => LEFT_BRACKET
-  | ']' => RIGHT_BRACKET
-  | '%' => PERCENTAGE
-  | '&' => AMPERSAND
-  | unsafe => UNSAFE
-  | variable => VARIABLE(Sedlexing.latin1(~skip=2, ~drop=1, buf) |> String.split_on_char('.'))
-  | operator => OPERATOR(Sedlexing.latin1(buf))
-  | string => STRING(Sedlexing.latin1(~skip=1, ~drop=1, buf))
-  | "url(" => get_url("", buf)
-  | important => IMPORTANT
-  | nested_at_rule => NESTED_AT_RULE(Sedlexing.latin1(~skip=1, buf))
-  | at_rule_without_body =>
-    AT_RULE_WITHOUT_BODY(Sedlexing.latin1(~skip=1, buf))
-  | at_rule => AT_RULE(Sedlexing.latin1(~skip=1, buf))
+  | eof => [EOF]
+  | "/*" => discard_comments(buf)
+  | '.' => [DOT]
+  | ';' => [SEMI_COLON]
+  | '}' => {
+    skip_whitespace.contents = false;
+    [RIGHT_BRACE];
+  }
+  | '{' => {
+    skip_whitespace.contents = true;
+    [LEFT_BRACE];
+  }
+  | "::" => [DOUBLE_COLON]
+  | ':' => [COLON]
+  | '(' => [LEFT_PAREN]
+  | ')' => [RIGHT_PAREN]
+  | '[' => [LEFT_BRACKET]
+  | ']' => [RIGHT_BRACKET]
+  | '%' => [PERCENTAGE]
+  | '&' => {
+    skip_whitespace.contents = false;
+    [AMPERSAND];
+  }
+  | '*' => [ASTERISK]
+  | ',' => [COMMA]
+  | variable => [VARIABLE(latin1(~skip=2, ~drop=1, buf) |> String.split_on_char('.'))]
+  | operator => [OPERATOR(latin1(buf))]
+  | combinator => [COMBINATOR(latin1(buf))]
+  | string => [STRING(latin1(~skip=1, ~drop=1, buf))]
+  | important => [IMPORTANT]
+  | at_media => {
+    skip_whitespace.contents = false;
+    [AT_MEDIA(latin1(~skip=1, buf))]
+  }
+  | at_keyframes => {
+    skip_whitespace.contents = false;
+    [AT_KEYFRAMES(latin1(~skip=1, buf))]
+  }
+  | at_rule => {
+    skip_whitespace.contents = false;
+    [AT_RULE(latin1(~skip=1, buf))]
+  }
+  | at_rule_without_body => {
+    skip_whitespace.contents = false;
+    [AT_RULE_STATEMENT(latin1(~skip=1, buf))]
+  }
   /* NOTE: should be placed above ident, otherwise pattern with
    * '-[0-9a-z]{1,6}' cannot be matched */
-  | (_u, '+', unicode_range) => UNICODE_RANGE(Sedlexing.latin1(buf))
-  | ident => get_ident(Sedlexing.latin1(buf))
-  | ('#', name) => HASH(Sedlexing.latin1(~skip=1, buf))
-  | number => get_dimension(Sedlexing.latin1(buf), buf)
-  | any => DELIM(Sedlexing.latin1(buf))
+  | (_u, '+', unicode_range) => [UNICODE_RANGE(latin1(buf))]
+  | tag => [TAG(latin1(buf))]
+  | ident => [IDENT(latin1(buf))]
+  | ('#', name) => [HASH(latin1(~skip=1, buf))]
+  | number => [get_dimension(latin1(buf), buf)]
+  | whitespaces => {
+    if (skip_whitespace^) {
+      get_next_token(buf);
+    } else { [WS] } }
+  | any => [DELIM(latin1(buf))]
   | _ => assert(false)
   };
 }
-and get_dimension = (n, buf) =>
+and get_dimension = (n, buf) => {
+  open Sedlexing;
   switch%sedlex (buf) {
-  | length => FLOAT_DIMENSION((n, Sedlexing.latin1(buf), Length))
-  | angle => FLOAT_DIMENSION((n, Sedlexing.latin1(buf), Angle))
-  | time => FLOAT_DIMENSION((n, Sedlexing.latin1(buf), Time))
-  | frequency => FLOAT_DIMENSION((n, Sedlexing.latin1(buf), Frequency))
-  | ident => DIMENSION((n, Sedlexing.latin1(buf)))
-  | _ => NUMBER(n)
+    | length => FLOAT_DIMENSION((n, latin1(buf), Length))
+    | angle => FLOAT_DIMENSION((n, latin1(buf), Angle))
+    | time => FLOAT_DIMENSION((n, latin1(buf), Time))
+    | frequency => FLOAT_DIMENSION((n, latin1(buf), Frequency))
+    | ident => DIMENSION((n, latin1(buf)))
+    | _ => NUMBER(n)
+  };
+} and discard_comments = (buf) => {
+  switch%sedlex(buf) {
+  | "*/" => get_next_token(buf)
+  | any => discard_comments(buf)
+  | eof => raise(LexingError((buf.pos, "Unterminated comment at the end of the string")))
+  | _ => assert false
   }
-and get_url = (url, buf) =>
-  switch%sedlex (buf) {
-  | white_spaces => get_url(url, buf)
-  | url => get_url(Sedlexing.latin1(buf), buf)
-  | ")" => URI(url)
-  | eof => raise(LexingError((buf.pos, "Incomplete URI")))
-  | any =>
-    raise(
-      LexingError((
-        buf.Sedlexing.pos,
-        "Unexpected token: " ++ Sedlexing.latin1(buf) ++ " parsing an URI",
-      )),
-    )
-  | _ => assert(false)
 };
 
-let get_next_token_with_location = buf => {
-  discard_comments_and_white_spaces(buf);
+let token_queue = Queue.create();
+
+let queue_next_tokens_with_location = (buf) => {
   let loc_start = Sedlexing.next_loc(buf);
-  let token = get_next_token(buf);
+  let tokens = get_next_token(buf);
   let loc_end = Sedlexing.next_loc(buf);
-  (token, loc_start, loc_end);
-};
+  List.iter (t => Queue.add((t, loc_start, loc_end), token_queue), tokens)
+}
 
-let parse = (buf, parser) => {
+let parse = (ws, buf, parser) => {
+  skip_whitespace.contents = ws;
+
   let last_token = ref((Parser.EOF, Lexing.dummy_pos, Lexing.dummy_pos));
   let next_token = () => {
-    last_token := get_next_token_with_location(buf);
+    if (Queue.is_empty(token_queue)) {
+      queue_next_tokens_with_location(buf);
+    }
+    last_token := Queue.take(token_queue);
     last_token^;
   };
 
@@ -361,19 +509,22 @@ let parse = (buf, parser) => {
   };
 };
 
-let parse_string = (~container_lnum=?, ~pos=?, parser, string) => {
+let parse_string = (~skip_whitespace, ~container_lnum=?, ~pos=?, parser, string) => {
   switch (container_lnum) {
   | None => ()
   | Some(lnum) => Sedlexing.container_lnum_ref := lnum
   };
-  parse(Sedlexing.of_ascii_string(~pos?, string), parser);
+  parse(skip_whitespace, Sedlexing.of_ascii_string(~pos?, string), parser);
 };
 
 let parse_declaration_list = (~container_lnum=?, ~pos=?, css) =>
-  parse_string(~container_lnum?, ~pos?, Parser.declaration_list, css);
+  parse_string(~skip_whitespace=true, ~container_lnum?, ~pos?, Parser.declaration_list, css);
 
 let parse_declaration = (~container_lnum=?, ~pos=?, css) =>
-  parse_string(~container_lnum?, ~pos?, Parser.declaration, css);
+  parse_string(~skip_whitespace=true, ~container_lnum?, ~pos?, Parser.declaration, css);
 
 let parse_stylesheet = (~container_lnum=?, ~pos=?, css) =>
-  parse_string(~container_lnum?, ~pos?, Parser.stylesheet, css);
+  parse_string(~skip_whitespace=false, ~container_lnum?, ~pos?, Parser.stylesheet, css);
+
+let parse_keyframes = (~container_lnum=?, ~pos=?, css) =>
+  parse_string(~skip_whitespace=false, ~container_lnum?, ~pos?, Parser.keyframes, css);

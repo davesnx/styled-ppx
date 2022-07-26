@@ -1,5 +1,6 @@
 open Setup;
 open Ppxlib;
+
 let loc = Location.none;
 
 let extract_tests = array_expr => {
@@ -49,16 +50,13 @@ let compare = (input, expected, {expect, _}) => {
   expect.string(result).toEqual(expected);
 };
 
-/* TODO: ideas, selectors . properties, to have a bigger test matrix */
-/* There are a few test that are commented since they use strings,
-  those are interpreted as raw_literal on the metaquote
-  that we use to diff the AST on the assertions and a missmatch
-  with OCaml that makes the comparision fail even if they are correct.
-  TODO: Fix this by removing the raw_literal on the metaquote transformation
-  and uncomment the tests. */
-/* The other tests that are commented, means that we don't support them safely */
+/* The tests that are commented, means that we don't support them safely */
 let properties_static_css_tests = [%expr
   [|
+    (
+      [%css "display: block;"],
+      CssJs.display(`block)
+    ),
     (
       [%css "box-sizing: border-box"],
       CssJs.boxSizing(`borderBox)
@@ -67,18 +65,18 @@ let properties_static_css_tests = [%expr
       [%css "box-sizing: content-box"],
       CssJs.boxSizing(`contentBox)
     ),
-    /* (
+    (
       [%css "color: #454545"],
-      CssJs.color(`hex("454545"))),
-    */
+      CssJs.color(`hex({js|454545|js}))
+    ),
     (
       [%css "color: red"],
       CssJs.color(CssJs.red)
     ),
-    /* (
+    (
       [%css "display: flex"],
-      CssJs.unsafe("display", "flex")),
-    */
+      CssJs.display(`flex)
+    ),
     (
       [%css "flex-direction: column"],
       CssJs.flexDirection(`column)
@@ -223,22 +221,22 @@ let properties_static_css_tests = [%expr
         ~left=`pxFloat(4.),
       ),
     ),
-    /* (
+    (
       [%css "color: #012"],
-      CssJs.color(`hex("012"))),
-    */
-    /* (
+      CssJs.color(`hex({js|012|js}))),
+
+    (
       [%css "color: #0123"],
-      CssJs.color(`hex("0123"))),
-    */
-    /* (
+      CssJs.color(`hex({js|0123|js}))),
+
+    (
       [%css "color: #012345"],
-      CssJs.color(`hex("012345"))),
-    */
-    /* (
+      CssJs.color(`hex({js|012345|js}))
+    ),
+    (
       [%css "color: #01234567"],
-      CssJs.color(`hex("01234567"))
-    ), */
+      CssJs.color(`hex({js|01234567|js}))
+    ),
     (
       [%css "color: blue"],
       CssJs.color(CssJs.blue)
@@ -305,10 +303,10 @@ let properties_static_css_tests = [%expr
       [%css "border-right-color: green"],
       CssJs.borderRightColor(CssJs.green)
     ),
-    /* (
+    (
       [%css "border-left-color: #fff"],
-      CssJs.borderLeftColor(`hex("fff"))),
-    */
+      CssJs.borderLeftColor(`hex({js|fff|js}))),
+
     (
       [%css "border-top-width: 15px"],
       CssJs.borderTopWidth(`pxFloat(15.))
@@ -464,6 +462,11 @@ let properties_static_css_tests = [%expr
       [%css "width: calc(100vh - 120px)"],
       CssJs.width(`calc(`sub, `vh(100.), `pxFloat(120.)))
     ),
+    /* Mult isn't available in bs-css */
+    /* (
+      [%css "width: calc(100px * 3)"],
+      CssJs.width(`calc(`mult, `px(100.), `number(3.)))
+    ), */
     /* (
       [%css "flex: 1 2 content"],
       CssJs.flexGrow(1.), CssJs.flexShrink(2.), CssJs.flexBasis(`content)|],
@@ -507,8 +510,8 @@ describe("Transform [%css] to bs-css", ({test, _}) => {
   let properties_static_css_tests =
     extract_tests(properties_static_css_tests);
 
-  /* We write the tests to files so the Typecheker runs on them and ensures
-  it's a valid with bs-css interfaces */
-  write_tests_to_file(properties_static_css_tests, "static_css_tests.ml");
+  /* We write the tests to files so the Typecheker runs on them and ensures it's a valid with bs-css interfaces */
+   write_tests_to_file(properties_static_css_tests, "static_css_tests.ml");
+
   List.iteri(test("properties static: "), properties_static_css_tests);
 });

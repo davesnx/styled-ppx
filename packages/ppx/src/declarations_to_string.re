@@ -209,21 +209,16 @@ let render_size =
   | `Fit_content_0 => [%expr "fit-content"]
   | `Fit_content_1(lp) => render_length_percentage(lp)
   | `Function_calc(fc) => render_function_calc(fc)
+;
 
 let render_css_global_values = (name, value) => {
   let.ok value = Parser.parse(Standard.css_wide_keywords, value);
 
   let value =
     switch (value) {
-    | `Inherit =>
-      %expr
-      "inherit"
-    | `Initial =>
-      %expr
-      "initial"
-    | `Unset =>
-      %expr
-      "unset"
+    | `Inherit => [%expr "inherit"]
+    | `Initial => [%expr "initial"]
+    | `Unset => [%expr "unset"]
     };
 
   /* bs-css doesn't have those */

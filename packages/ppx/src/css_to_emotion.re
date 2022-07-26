@@ -1,37 +1,17 @@
-/*
-   This file transform CSS AST to Emotion API calls, a simplified example:
-
-     -- CSS Definition
-     display: block;
-
-     -- CSS AST
-     Declaration: {
-       important: false,
-       property: "display",
-       value: Value {
-         "children": [
-           Identifier {
-             "name": "block"
-           }
-         ]
-       }
-     }
-
-     -- Emotion output
-     CssJs.(css([display(`block)]))
- */
-
 open Ppxlib;
 open Css_types;
-open Component_value;
 
 module Helper = Ast_helper;
 module Builder = Ast_builder.Default;
 
 module CssJs = {
-  let lident = (~loc, name) => {txt: Ldot(Lident("CssJs"), name), loc};
-  let selector = (~loc) => lident(~loc, "selector");
-  let media = (~loc) => lident(~loc, "media");
+  let ident = (~loc, name) => {txt: Ldot(Lident("CssJs"), name), loc} |> Builder.pexp_ident(~loc);
+  let selector = (~loc) => ident(~loc, "selector");
+  let media = (~loc) => ident(~loc, "media");
+  let global = (~loc) => ident(~loc, "global")
+  let label = (~loc) => ident(~loc, "label");
+  let style = (~loc) => ident(~loc, "style");
+  let keyframes = (~loc) => ident(~loc, "keyframes");
 };
 
 let grammar_error = (loc, message) =>
@@ -62,378 +42,249 @@ let source_code_of_loc = loc => {
   Sedlexing.Latin1.sub_lexeme(buf, loc_start - 1, loc_end - loc_start);
 };
 
+let concat = (~loc, expr, acc) => {
+  let concat_fn = {txt: Lident("^"), loc} |> Helper.Exp.ident(~loc);
+  Helper.Exp.apply(~loc, concat_fn, [(Nolabel, expr), (Nolabel, acc)]);
+};
+
 let rec render_at_rule = (ar: At_rule.t): Parsetree.expression =>
   switch (ar.At_rule.name) {
   | ("media", _) => render_media_query(ar)
-  | (n, _) =>
-    grammar_error(ar.At_rule.loc, "At-rule @" ++ n ++ " not supported")
+  | ("keyframes", _) => grammar_error(ar.loc, {|@keyframes should be defined with %keyframe(...).|})
+  | (
+      "charset" as n |
+      "import" as n |
+      "namespace" as n |
+      "supports" as n |
+      "page" as n |
+      "font-face" as n |
+      "counter-style" as n |
+      "font-feature-values" as n |
+      "swash" as n |
+      "ornaments" as n |
+      "annotation" as n |
+      "stylistic" as n |
+      "styleset" as n |
+      "character-variant" as n |
+      "property" as n | /* Experimental */
+      "color-profile" as n | /* Experimental */
+      "viewport" as n | /* Deprecated */
+      "document" as n, /* Deprecated */
+      _,
+    ) =>
+    grammar_error(
+      ar.At_rule.loc,
+      "At-rule @" ++ n ++ " is not supported in styled-ppx",
+    )
+  | (n, _) => grammar_error(ar.At_rule.loc, "Unknown @" ++ n ++ "")
   }
 and render_media_query = (ar: At_rule.t): Parsetree.expression => {
-  let concat = (~loc, expr, acc) => {
-    let concat_fn = {txt: Lident("^"), loc} |> Helper.Exp.ident(~loc);
-    Helper.Exp.apply(~loc, concat_fn, [(Nolabel, expr), (Nolabel, acc)]);
-  };
-
-  let invalid_format = loc =>
-    grammar_error(loc, "@media value isn't a valid format");
-
   let loc = ar.loc;
-  let (_, name_loc) = ar.name;
-  let (prelude, _) = ar.prelude;
-  let parse_condition = acc =>
-    fun
-    | (
-        Paren_block([
-          (Ident(ident), ident_loc),
+  let (prelude, prelude_loc) = ar.prelude;
+  open Component_value;
+
+  let parse_condition = (component_value: with_loc(Component_value.t)) => {
+    let (value, loc) = component_value;
+    switch (value) {
+      | Variable(variable) => render_variable_as_string(variable)
+      /* (color) */
+      | Paren_block([(Ident(_), ident_loc)]) => source_code_of_loc(ident_loc)
+      /* (min-width: 30px) */
+      | Paren_block([
+          (Ident(property), _),
           (Delim(":"), _),
-          (_, first_value_loc),
-          ...values,
-        ]),
-        _,
-      ) => {
-        let values = values |> List.map(((_, loc)) => loc);
-        let values_length = List.length(values);
-        let last_value_loc =
-          values_length == 0
-            ? first_value_loc : List.nth(values, values_length - 1);
-        let loc = {
-          ...first_value_loc,
-          loc_end: last_value_loc.Location.loc_end,
-        };
-        let value = source_code_of_loc(loc);
-        let exprs =
-          switch (Declarations_to_string.parse_declarations(ident, value)) {
+          (_value, value_loc),
+        ]) => {
+          /* We need the value as a string to pipe it to the Property parser */
+          let value = source_code_of_loc(value_loc);
+          switch (Declarations_to_string.parse_declarations(property, value)) {
           | Error(`Not_found) =>
-            grammar_error(ident_loc, "unsupported property: " ++ ident)
+            grammar_error(loc, "unsupported property: " ++ property)
           | Error(`Invalid_value(_error)) =>
             grammar_error(loc, "invalid value")
-          | Ok(exprs) => exprs
-          };
-        List.fold_left(concat(~loc), acc, exprs);
-      }
-    | (Variable(v), _) => {
-        let ident =
-          (
-            switch (v) {
-            | [lident] => {txt: Lident(lident), loc}
-            | [longident, lident] => {
-                txt: Ldot(Lident(longident), lident),
-                loc,
-              }
-            | _ =>
-              failwith(
-                "Variable should not be empty, please refer to a variable or module value",
-              )
+          | Ok(_exprs) => {
+            /* Here we receive the expressions transformed, but we prefer the stringed value */
+              value
             }
-          )
-          |> Helper.Exp.ident(~loc);
+          };
+        }
+        | Paren_block([(Ident(property), _), (Delim(":"), _), ..._value]) =>
+          grammar_error(loc, "There's more than one value assiged to a property: " ++ property)
+        /* In any other case, we believe on the source_code and transform it to string. This is unsafe */
+        | _whatever => source_code_of_loc(loc)
+    }};
 
-        %expr
-        [%e acc] ++ [%e ident] ++ " ";
-      }
-    | (Ident(id), _) => {
-        let id = Helper.Exp.constant(~loc, Helper.Const.string(id));
-        %expr
-        [%e acc] ++ [%e id] ++ " ";
-      }
-    | (_, loc) => invalid_format(loc);
-
-  if (prelude == []) {
-    invalid_format(loc);
+  let parse_conditions = (prelude) => {
+    switch (prelude) {
+      | (Component_value.Paren_block((blocks)), _) =>
+        let conditions = List.map(parse_condition, blocks) |> String.concat("");
+        "(" ++ conditions ++ ")";
+      | (Ident(i), _) => i
+      | (Variable(v), _) => render_variable_as_string(v)
+      | _ =>
+        /* This branch is whildcared (_) by design of the parser. It won't allow any other Component_value */
+        grammar_error(prelude_loc, "Invalid media query")
+    };
   };
 
-  let query = prelude |> List.fold_left(parse_condition, [%expr ""]);
+  if (prelude == []) {
+    grammar_error(prelude_loc, "@media prelude can't be empty")
+  };
+
+  let query = prelude |> List.map(parse_conditions) |> String.concat(" ") |> String_interpolation.Transform.transform(~loc);
 
   let rules =
-    switch (ar.At_rule.block) {
-    | Empty => invalid_format(loc)
-    | Stylesheet(_) => invalid_format(loc)
+    switch (ar.block) {
+    | Empty => Builder.pexp_array(~loc, [])
     | Declaration_list(declaration) =>
       render_declarations(declaration) |> Builder.pexp_array(~loc)
+    | Stylesheet(_) =>
+      grammar_error(ar.loc, "@media content expect to have declarations, not an stylesheets. Selectors aren't allowed in @media.")
     };
-
-  let media_ident = Builder.pexp_ident(~loc=name_loc, CssJs.media(~loc));
 
   Helper.Exp.apply(
     ~loc,
     ~attrs=[Create.uncurried(~loc)],
-    media_ident,
+    CssJs.media(~loc),
     [(Nolabel, query), (Nolabel, rules)],
   );
 }
 and render_declaration = (d: Declaration.t): list(Parsetree.expression) => {
-  let (name, name_loc) = d.Declaration.name;
-  let (_valueList, loc) = d.Declaration.value;
+  let (property, name_loc) = d.name;
+  let (_valueList, loc) = d.value;
   let value_source = source_code_of_loc(loc);
 
-  switch (Declarations_to_emotion.parse_declarations(name, value_source)) {
+  switch (Declarations_to_emotion.parse_declarations(property, value_source)) {
   | Ok(exprs) => exprs
-  | Error(`Not_found) => grammar_error(name_loc, "Unknown property " ++ name)
+  | Error(`Not_found) => grammar_error(name_loc, "Unknown property " ++ property)
   | Error(`Invalid_value(value)) =>
     grammar_error(
       loc,
-      "Error in property '" ++ name ++ "' invalid value: " ++ value ++ "",
+      "Invalid value: '" ++ value ++ "' in property '" ++ property ++ "'",
     )
   };
 }
-and render_unsafe_declaration =
-    (d: Declaration.t, _d_loc: Location.t): list(Parsetree.expression) => {
-  let (name, _name_loc) = d.Declaration.name;
-  let (_valueList, loc) = d.Declaration.value;
-  let value_source = source_code_of_loc(loc);
-
-  [
-    Declarations_to_emotion.render_when_unsupported_features(
-      name,
-      value_source,
-    ),
-  ];
-}
-and render_declarations = ds => {
-  List.concat_map(
+and render_declarations = ((ds, _loc: Location.t)) => {
+  ds |> List.concat_map(
     declaration =>
       switch (declaration) {
       | Declaration_list.Declaration(decl) => render_declaration(decl)
-      | Declaration_list.Unsafe(decl) =>
-        render_unsafe_declaration(decl, decl.loc)
       | Declaration_list.At_rule(ar) => [render_at_rule(ar)]
-      | Declaration_list.Style_rule(ar) =>
-        let loc: Location.t = ar.loc;
-        let ident = Helper.Exp.ident(~loc, CssJs.selector(~loc));
-        [render_style_rule(ident, ar)];
-      },
-    fst(ds),
+      | Declaration_list.Style_rule(style_rules) =>
+        [
+          render_style_rule(
+            CssJs.selector(~loc=style_rules.loc), style_rules
+          )
+        ];
+      }
   );
 }
-and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
-  let (prelude, _) = rule.Style_rule.prelude;
-  let block = rule.Style_rule.block;
-  let (_, loc) = rule.Style_rule.block;
-  let dl_expr = render_declarations(block) |> Builder.pexp_array(~loc);
-
-  let concat = (~loc, expr, acc) => {
-    let concat_fn = {txt: Lident("^"), loc} |> Helper.Exp.ident(~loc);
-    Helper.Exp.apply(~loc, concat_fn, [(Nolabel, expr), (Nolabel, acc)]);
-  };
-
-  let rec render_prelude_value = (acc, list) => {
-    switch (list) {
-    | [] => string_to_const(~loc, acc)
-    | [(value, value_loc), ...rest] =>
-      switch (value) {
-      | Delim(":") => render_prelude_value(acc ++ ":", rest)
-      | Delim(".") => render_prelude_value(acc ++ ".", rest)
-      | Delim(",") => render_prelude_value(acc ++ ", ", rest)
-      | Delim(v) => render_prelude_value(acc ++ " " ++ v ++ " ", rest)
-      | Ident(v)
-      | Operator(v)
-      | Number(v) => render_prelude_value(acc ++ v, rest)
-      | Hash(v) => render_prelude_value(acc ++ "#" ++ v, rest)
-      | String(v) => render_prelude_value(acc ++ "\"" ++ v ++ "\"", rest)
-      | Ampersand =>
-        let ampersand =
-          switch (rest) {
-          | [] => "&"
-          | [(next_value, _), ..._] =>
-            switch (next_value) {
-            | Delim(".")
-            | Delim(",") => "& "
-            | Delim(_)
-            | Pseudoclass(_)
-            | Pseudoelement(_) => "&"
-            | _ => "& "
-            }
-          };
-        render_prelude_value(acc ++ ampersand, rest);
-      | Dimension((number, dimension)) =>
-        render_prelude_value(acc ++ number ++ dimension, rest)
-      | Pseudoclass((v, _)) => render_prelude_value(acc ++ v, rest)
-      | Pseudoelement((v, _)) => render_prelude_value(acc ++ v, rest)
-      | Bracket_block(b) =>
-        concat(
-          ~loc,
-          string_to_const(~loc, acc),
-          concat(
-            ~loc,
-            string_to_const(~loc, "["),
-            concat(
-              ~loc,
-              render_prelude_value("", b),
-              string_to_const(~loc, "]"),
-            ),
-          ),
-        )
-      | Paren_block(b) =>
-        concat(
-          ~loc,
-          string_to_const(~loc, acc),
-          concat(
-            ~loc,
-            string_to_const(~loc, "("),
-            concat(
-              ~loc,
-              render_prelude_value("", b),
-              string_to_const(~loc, ")"),
-            ),
-          ),
-        )
-      | Selector(v) => render_prelude_value(acc, v)
-      | Variable(v) =>
-        concat(
-          ~loc=value_loc,
-          string_to_const(~loc=value_loc, acc),
-          concat(
-            ~loc=value_loc,
-            render_variable(~loc=value_loc, v),
-            render_prelude_value("", rest),
-          ),
-        )
-      | _ => grammar_error(value_loc, "Unexpected selector")
-      }
-    };
-  };
-
-  let render_rule_value = (ident, selector) => {
-    Helper.Exp.apply(
-      ~loc=rule.Style_rule.loc,
-      ~attrs=[Create.uncurried(~loc=rule.Style_rule.loc)],
-      ident,
-      [(Nolabel, selector), (Nolabel, dl_expr)],
-    );
-  };
-
-  let pseudoToFn =
+and render_variable_as_string = variable => {
+  "$(" ++ String.concat(".", variable) ++ ")";
+}
+and render_selector = (selector: Selector.t) => {
+  open Selector;
+  let rec render_simple_selector =
     fun
-    | Pseudoclass((c, _)) =>
-      switch (c) {
-      | "first-line" => "firstLine"
-      | "first-child" => "firstChild"
-      | "first-letter" => "firstLetter"
-      | "first-of-type" => "firstOfType"
-      | "in-range" => "inRange"
-      | "last-child" => "lastChild"
-      | "last-of-type" => "lastOfType"
-      | "nth-child" => "nthChild"
-      | "nth-last-child" => "nthLastChild"
-      | "nth-last-of-type" => "nthLastOfType"
-      | "nth-of-type" => "nthOfType"
-      | "only-child" => "onlyChild"
-      | "only-of-type" => "onlyOfType"
-      | "out-of-range" => "outOfRange"
-      | "read-only" => "readOnly"
-      | "read-write" => "readWrite"
-      | c => c
-      }
-    | Pseudoelement((e, _)) =>
-      switch (e) {
-      | "first-line" => "firstLine"
-      | "first-child" => "firstChild"
-      | "first-letter" => "firstLetter"
-      | "spelling-error" => "spellingError"
-      | "grammar-error" => "grammarError"
-      | e => e
-      }
-    | _ => failwith("Expected a Pseudoelement or a Pseudoclass");
+    | Ampersand => "&"
+    | Universal => "*"
+    | Type(v) => v
+    | Subclass(v) => render_subclass_selector(v)
+    | Variable(v) => render_variable_as_string(v)
+    | Percentage(_v) =>
+      /* TODO: Add locations to Selector.t */
+      grammar_error(Location.none, "Percentage is not a valid selector")
+  and render_subclass_selector =
+    fun
+    | Id(v) => "#" ++ v
+    | Class(v) => "." ++ v
+    | Attribute(Attr_value(v)) => "[" ++ v ++ "]"
+    | Attribute(To_equal({name, kind, value})) =>  {
+      let value = switch (value) {
+        | Attr_ident(ident) => ident
+        | Attr_string(ident) => "\"" ++ ident ++ "\""
+      };
+      "[" ++ name ++ kind ++ value ++ "]"
+    }
+    | Pseudo_class(psc) => render_pseudo_selector(psc)
+  and render_pseudo_selector =
+    fun
+    | Pseudoelement(v) => "::" ++ v
+    | Pseudoclass(Ident(i)) => ":" ++ i
+    | Pseudoclass(Function({name, payload: (payload, _loc)})) => {
+        ":"
+        ++ name
+        ++ "("
+        ++ (render_selector(payload) |> String.trim)
+        ++ ")";
+      };
 
-  let render_selector_value = (~value_loc, value, s) => {
-    switch (s) {
-    | Pseudoelement((_, _)) as p
-    | Pseudoclass((_, _)) as p =>
-      let selector_ident =
-        Helper.Exp.ident(~loc, CssJs.lident(~loc, pseudoToFn(p)));
-
-      let selector_expr =
-        [
-          Helper.Exp.apply(
-            ~attrs=[Create.uncurried(~loc)],
-            selector_ident,
-            [(Nolabel, dl_expr)],
-          ),
-        ]
-        |> Builder.pexp_array(~loc);
-
-      let selector_name = string_to_const(~loc, value);
-
-      Helper.Exp.apply(
-        ~loc=rule.Style_rule.loc,
-        ~attrs=[Create.uncurried(~loc=rule.Style_rule.loc)],
-        ident,
-        [(Nolabel, selector_name), (Nolabel, selector_expr)],
+  let rec render_compound_selector = compound_selector => {
+    let simple_selector =
+      Option.fold(
+        ~none="",
+        ~some=render_simple_selector,
+        compound_selector.type_selector,
       );
-
-    | Bracket_block(c) =>
-      let selector =
-        concat(
-          ~loc,
-          string_to_const(~loc, value),
-          concat(
-            ~loc,
-            string_to_const(~loc, "["),
-            concat(
-              ~loc,
-              render_prelude_value("", c),
-              string_to_const(~loc, "]"),
-            ),
-          ),
-        );
-      render_rule_value(ident, selector);
-
-    | Variable(v) =>
-      let variable = render_variable(~loc=value_loc, v);
-
-      let selector_name = string_to_const(~loc, value);
-
-      Helper.Exp.apply(
-        ~loc=rule.Style_rule.loc,
-        ~attrs=[Create.uncurried(~loc=rule.Style_rule.loc)],
-        ident,
-        [(Nolabel, selector_name), (Nolabel, variable)],
-      );
-    | _ => failwith("Invalid selector")
+    let subclass_selectors =
+      List.map(
+        render_subclass_selector,
+        compound_selector.subclass_selectors,
+      ) |> String.concat("");
+    let pseudo_selectors =
+      List.map(
+        render_pseudo_selector,
+        compound_selector.pseudo_selectors,
+      ) |> String.concat("");
+    simple_selector ++ subclass_selectors ++ pseudo_selectors;
+  }
+  and render_complex_selector = complex => {
+    switch (complex) {
+    | Combinator({left, right}) =>
+      let left = render_compound_selector(left);
+      let right = render_right_combinator(right);
+      left ++ right;
+    | Selector(compound) => render_compound_selector(compound)
     };
+  }
+  and render_right_combinator = right => {
+    right
+    |> List.map(((combinator, compound_selector)) => {
+      Option.fold(
+        ~none=" ",
+        ~some=o => " " ++ o ++ " ",
+        combinator,
+      )
+      ++ render_compound_selector(compound_selector)
+    }) |> String.concat("")
   };
 
-  let render_self = v => {
-    let ident =
-      pseudoToFn(v) |> CssJs.lident(~loc) |> Helper.Exp.ident(~loc);
-
-    Helper.Exp.apply(~loc=rule.Style_rule.loc, ident, [(Nolabel, dl_expr)]);
+  switch (selector) {
+    | SimpleSelector(simple) =>
+      simple |> List.map(render_simple_selector) |> String.concat(", ")
+    | ComplexSelector(complex) =>
+      complex |> List.map(render_complex_selector) |> String.concat(", ")
+    | CompoundSelector(compound) =>
+      compound |> List.map(render_compound_selector) |> String.concat(", ")
   };
+}
+and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
+  let (prelude, _loc) = rule.prelude;
+  let (_block, loc) = rule.block;
+  let selector_expr = render_declarations(rule.block) |> Builder.pexp_array(~loc);
+  let selector_name = render_selector(prelude) |> String.trim |> String_interpolation.Transform.transform(~loc);
 
-  switch (prelude) {
-  | [(Selector([(Ident(i), _), (value, value_loc)]), _)] =>
-    render_selector_value(~value_loc, i, value)
-  | [
-      (
-        Selector([
-          (Ampersand, _),
-          (Delim(":"), _),
-          (Pseudoclass(_) as p, _),
-        ]),
-        _,
-      ),
-    ]
-  | [
-      (
-        Selector([
-          (Ampersand, _),
-          (Delim(":"), _),
-          (Delim(":"), _),
-          (Pseudoelement(_) as p, _),
-        ]),
-        _,
-      ),
-    ] =>
-    render_self(p)
-  | _ =>
-    let selector = render_prelude_value("", prelude);
-    render_rule_value(ident, selector);
-  };
+  Helper.Exp.apply(
+    ~loc=rule.Style_rule.loc,
+    ~attrs=[Create.uncurried(~loc=rule.Style_rule.loc)],
+    ident,
+    [(Nolabel, selector_name), (Nolabel, selector_expr)],
+  );
 };
 
 let bsEmotionLabel = (~loc, label) => {
   Helper.Exp.apply(
-    Helper.Exp.ident(CssJs.lident(~loc, "label")),
+    CssJs.label(~loc),
     [(Nolabel, Helper.Exp.constant(Pconst_string(label, loc, None)))],
   );
 };
@@ -445,10 +296,9 @@ let addLabel = (~loc, label, emotionExprs) => [
 
 let render_style_call = (declaration_list): Parsetree.expression => {
   let loc = declaration_list.pexp_loc;
-  let ident = Helper.Exp.ident(~loc, CssJs.lident(~loc, "style"));
   let arguments = [(Nolabel, declaration_list)];
 
-  Helper.Exp.apply(~loc, ~attrs=[Create.uncurried(~loc)], ident, arguments);
+  Helper.Exp.apply(~loc, ~attrs=[Create.uncurried(~loc)], CssJs.style(~loc), arguments);
 };
 
 let render_rule = (ident, rule: Rule.t): Parsetree.expression => {
@@ -458,66 +308,78 @@ let render_rule = (ident, rule: Rule.t): Parsetree.expression => {
   };
 };
 
-let render_keyframes = ((ruleList, loc)): Parsetree.expression => {
-  let invalidSelectorErrorMessage = {|
+let render_keyframes = (declarations: Declaration_list.t
+): Parsetree.expression => {
+  let (declarations, loc) = declarations;
+  let invalid_selector = {|
     keyframe selector can be from | to | <percentage>
 
     Like following:
         [%keyframe "
-          0% { opacity: 1; }
+          from { opacity: 1; }
           to { opacity: 0; }
         "];
   |};
 
-  let get_percentage_from_prelude =
-    fun
-    | ([(Percentage(n), loc)], _) =>
-      // TODO: can percentage be a decimal value?
-      switch (int_of_string_opt(n)) {
-      | Some(n) when n >= 0 && n <= 100 => n
-      | _ => grammar_error(loc, invalidSelectorErrorMessage)
-      }
-    // https://drafts.csswg.org/css-animations/#keyframes
-    // The keyword from is equivalent to the value 0%
-    | ([(Ident("from"), _)], _) => 0
-    // The keyword to is equivalent to the value 100%
-    | ([(Ident("to"), _)], _) => 100
-    | _ => grammar_error(loc, invalidSelectorErrorMessage);
+  let invalid_percentag_value = (value) => "'" ++ value ++ "' isn't valid. Only accept percentage with integers";
+  let invalid_prelude_value = (value) => "'" ++ value ++ "' isn't a valid keyframe value";
+  let invalid_prelude_value_opaque = "This isn't a valid keyframe value";
+
+  let render_select_as_keyframe = (prelude: Selector.t): int => {
+    open Selector;
+    switch (prelude) {
+     | SimpleSelector([selector]) => {
+       switch (selector) {
+        // https://drafts.csswg.org/css-animations/#keyframes
+        // The keyword from is equivalent to the value 0%
+        | Type(v) when v == "from" => 0
+        // The keyword to is equivalent t"o the value 100%
+        | Type(v) when v == "to" => 100
+        | Type(t) => grammar_error(loc, invalid_prelude_value(t))
+        | Percentage(n) => switch (int_of_string_opt(n)) {
+          | Some(n) when n >= 0 && n <= 100 => n
+          | _ => grammar_error(loc, invalid_percentag_value(n))
+        }
+        | Ampersand => grammar_error(loc, invalid_prelude_value("&"))
+        | Universal => grammar_error(loc, invalid_prelude_value("*"))
+        | Subclass(_) => grammar_error(loc, invalid_prelude_value_opaque)
+        | Variable(_) => grammar_error(loc, invalid_prelude_value_opaque)
+        }
+     }
+     | _ => grammar_error(loc, invalid_selector);
+    }
+  };
 
   let keyframes =
-    ruleList
-    |> List.map(rule => {
-         switch (rule) {
-         | Rule.Style_rule({
-             prelude: (_, prelude_loc) as prelude,
-             block,
-             loc: style_loc,
-           }) =>
-           let percentage =
-             get_percentage_from_prelude(prelude)
-             |> Builder.eint(~loc=prelude_loc);
-           let rules =
-             render_declarations(block) |> Builder.pexp_array(~loc);
-           Builder.pexp_tuple(~loc=style_loc, [percentage, rules]);
-         | Rule.At_rule(_) => grammar_error(loc, invalidSelectorErrorMessage)
-         }
-       })
+    declarations
+    |> List.map(declaration => {
+      switch (declaration) {
+        | Declaration_list.Style_rule({
+          prelude: (selector, prelude_loc),
+          block,
+          loc: style_loc,
+        }) =>
+        let percentage =
+          render_select_as_keyframe(selector)
+          |> Builder.eint(~loc=prelude_loc);
+        let rules =
+          render_declarations(block) |> Builder.pexp_array(~loc);
+        Builder.pexp_tuple(~loc=style_loc, [percentage, rules]);
+      | _ => grammar_error(loc, invalid_selector)
+      }
+    })
     |> Builder.pexp_array(~loc);
-  let emotionKeyframes =
-    Builder.pexp_ident(~loc, CssJs.lident(~loc, "keyframes"));
 
   {
-    ...Builder.eapply(~loc, emotionKeyframes, [keyframes]),
+    ...Builder.eapply(~loc, CssJs.keyframes(~loc), [keyframes]),
     pexp_attributes: [Create.uncurried(~loc)],
   };
 };
 
 let render_global = ((ruleList, loc): Stylesheet.t) => {
-  let emotionGlobal = Helper.Exp.ident(~loc, CssJs.lident(~loc, "global"));
-
   switch (ruleList) {
   /* There's only one rule: */
-  | [rule] => render_rule(emotionGlobal, rule) |> Create.applyIgnore(~loc)
+  | [rule] => render_rule(CssJs.global(~loc), rule) |> Create.applyIgnore(~loc)
   /* There's more than one */
   | _res =>
     grammar_error(
@@ -526,8 +388,8 @@ let render_global = ((ruleList, loc): Stylesheet.t) => {
         `styled.global` only supports one style definition. Transform each definition into a separate styled.global call
 
         Like following:
-          [%styled.global " ... "];
-          [%styled.global " ... "];
+          %styled.global(" ... ")
+          %styled.global(" ... ")
       |},
     )
   /* TODO: Add rule to string to finish this error message */

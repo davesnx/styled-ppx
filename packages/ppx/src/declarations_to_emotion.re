@@ -47,7 +47,7 @@ let emit_shorthand = (parser, mapper, value_to_expr) => {
 };
 
 let render_string = string =>
-  Helper.Const.string(string) |> Helper.Exp.constant;
+  Helper.Const.string(~quotation_delimiter="js", string) |> Helper.Exp.constant;
 let render_integer = integer =>
   Helper.Const.int(integer) |> Helper.Exp.constant;
 let render_number = number =>
@@ -59,15 +59,9 @@ let render_css_global_values = (name, value) => {
 
   let value =
     switch (value) {
-    | `Inherit =>
-      %expr
-      "inherit"
-    | `Initial =>
-      %expr
-      "initial"
-    | `Unset =>
-      %expr
-      "unset"
+    | `Inherit => [%expr "inherit"]
+    | `Initial => [%expr "initial"]
+    | `Unset => [%expr "unset"]
     };
 
   /* bs-css doesn't have those */

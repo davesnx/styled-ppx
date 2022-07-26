@@ -30,15 +30,10 @@ let of_sedlex = (~file="<n/a>", ~pos=?, buf) => {
 };
 
 let last_buffer = ref(of_sedlex(Sedlexing.Latin1.from_string("")));
+
 let of_ascii_string = (~pos=?, s) => {
   last_buffer := of_sedlex(~pos?, Sedlexing.Latin1.from_string(s));
   of_sedlex(~pos?, Sedlexing.Latin1.from_string(s));
-};
-
-let of_ascii_file = file => {
-  let chan = open_in(file);
-  last_buffer := of_sedlex(~file, Sedlexing.Latin1.from_channel(chan));
-  of_sedlex(~file, Sedlexing.Latin1.from_channel(chan));
 };
 
 /** The next four functions are used by sedlex internally.
@@ -63,13 +58,11 @@ let start = lexbuf => {
 };
 
 /** location of next character */
-
 let next_loc = lexbuf => {...lexbuf.pos, pos_cnum: lexbuf.pos.pos_cnum + 1};
 
 let cr = Char.code('\r');
 
 /** next character */
-
 let next = lexbuf => {
   let c = Sedlexing.next(lexbuf.buf);
   let pos = next_loc(lexbuf);
