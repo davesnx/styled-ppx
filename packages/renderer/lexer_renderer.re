@@ -28,7 +28,7 @@ let help =
   );
 
 let rec printUnlessIsEof = buffer => {
-  let lexes = Css_lexer.get_next_token(buffer, false);
+  let lexes = Css_lexer.get_next_token(buffer);
   switch (lexes) {
     | [Css_lexer.Parser.EOF] => ()
     | [token] => {

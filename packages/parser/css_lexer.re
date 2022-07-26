@@ -398,30 +398,12 @@ let frequency = [%sedlex.regexp? (_h, _z) | (_k, _h, _z)];
 
 let skip_whitespace = ref(false);
 
-let discard_whitespace = buf => {
-  let rec inner_discard_whitespaces = (buf) => {
-    switch%sedlex (buf) {
-      | Plus(whitespace) => inner_discard_whitespaces(buf) |> ignore
-      | '{' => {
-        skip_whitespace.contents = true;
-        inner_discard_whitespaces(buf) |> ignore;
-      }
-      | _ => ()
-    }
-  }
-
-  inner_discard_whitespaces(buf)
-};
-
-let rec get_next_token = (buf, default_skip_whitespace) => {
+let rec get_next_token = (buf) => {
   open Parser;
   open Sedlexing;
-
-  skip_whitespace.contents = default_skip_whitespace;
-
   switch%sedlex (buf) {
   | eof => [EOF]
-  | "/*" => discard_comments(buf, skip_whitespace.contents)
+  | "/*" => discard_comments(buf)
   | '.' => [DOT]
   | ';' => [SEMI_COLON]
   | '}' => {
@@ -439,7 +421,10 @@ let rec get_next_token = (buf, default_skip_whitespace) => {
   | '[' => [LEFT_BRACKET]
   | ']' => [RIGHT_BRACKET]
   | '%' => [PERCENTAGE]
-  | '&' => [AMPERSAND]
+  | '&' => {
+    skip_whitespace := false;
+    [AMPERSAND];
+  }
   | '*' => [ASTERISK]
   | ',' => [COMMA]
   | variable => [VARIABLE(latin1(~skip=2, ~drop=1, buf) |> String.split_on_char('.'))]
@@ -472,7 +457,7 @@ let rec get_next_token = (buf, default_skip_whitespace) => {
   | number => [get_dimension(latin1(buf), buf)]
   | whitespaces => {
     if (skip_whitespace^) {
-      get_next_token(buf, skip_whitespace.contents);
+      get_next_token(buf);
     } else { [WS] } }
   | any => [DELIM(latin1(buf))]
   | _ => assert(false)
@@ -488,10 +473,10 @@ and get_dimension = (n, buf) => {
     | ident => DIMENSION((n, latin1(buf)))
     | _ => NUMBER(n)
   };
-} and discard_comments = (buf, skip_whitespaces) => {
+} and discard_comments = (buf) => {
   switch%sedlex(buf) {
-  | "*/" => get_next_token(buf, skip_whitespaces)
-  | any => discard_comments(buf, skip_whitespaces)
+  | "*/" => get_next_token(buf)
+  | any => discard_comments(buf)
   | eof => raise(LexingError((buf.pos, "Unterminated comment at the end of the string")))
   | _ => assert false
   }
@@ -503,18 +488,19 @@ and get_dimension = (n, buf) => {
 
 let token_queue = Queue.create();
 
-let queue_next_tokens_with_location = (buf, skip_whitespace) => {
+let queue_next_tokens_with_location = (buf) => {
   let loc_start = Sedlexing.next_loc(buf);
-  let tokens = get_next_token(buf, skip_whitespace);
+  let tokens = get_next_token(buf);
   let loc_end = Sedlexing.next_loc(buf);
   List.iter (t => Queue.add((t, loc_start, loc_end), token_queue), tokens)
 }
 
-let parse = (skip_whitespace, buf, parser) => {
+let parse = (ws, buf, parser) => {
+  skip_whitespace := ws;
   let last_token = ref((Parser.EOF, Lexing.dummy_pos, Lexing.dummy_pos));
   let next_token = () => {
     if (Queue.is_empty(token_queue)) {
-      queue_next_tokens_with_location(buf, skip_whitespace);
+      queue_next_tokens_with_location(buf);
     }
     last_token := Queue.take(token_queue);
     last_token^;
