@@ -66,23 +66,14 @@ module Emitter = struct
 
   let _print_tokens = List.iter (fun p -> print_string (token_to_string p))
 
+  let loc = Location.none
+
   let with_loc ~loc txt = { loc; txt }
 
-  let string_to_const ~loc s =
+  let js_string_to_const ~loc s =
     Exp.constant ~loc (Const.string ~quotation_delimiter:"js" s)
 
-  let inline_const ~loc s = Exp.ident ~loc (with_loc (Lident s) ~loc)
-
-  let to_arguments tokens =
-    List.rev
-    @@ List.fold_left
-         (fun acc token ->
-           match token with
-           | Variable ((v, loc), _) -> (Nolabel, inline_const ~loc v) :: acc
-           | String (v, loc) -> (Nolabel, string_to_const ~loc v) :: acc)
-         [] tokens
-
-  let loc = Location.none
+  let inline_const ~loc s = Exp.ident ~loc (with_loc s ~loc)
 
   let concat_fn = { txt = Lident "^"; loc = Location.none } |> Exp.ident ~loc
 
@@ -94,6 +85,15 @@ module Emitter = struct
         let rest = apply func args in
         pexp_apply ~loc func [ arg; (Nolabel, rest) ]
 
+  let to_arguments tokens =
+    List.rev
+    @@ List.fold_left
+         (fun acc token ->
+           match token with
+           | Variable ((v, loc), _) -> (Nolabel, v |> Longident.parse |> inline_const ~loc) :: acc
+           | String (v, loc) -> (Nolabel, js_string_to_const ~loc v) :: acc)
+         [] tokens
+
   (* Copied from future version of ppxlib https://github.com/ocaml-ppx/ppxlib/blob/6857ca9ec803f16975e8c2e7984c35cfb50c4a5d/ast/location_error.ml *)
   let error_extension msg =
     let err_extension_name loc = { Location.loc; txt = "ocaml.error" } in
@@ -103,8 +103,7 @@ module Emitter = struct
   let generate tokens =
     match to_arguments tokens with
     | [] ->
-        let loc = Location.none in
-        pexp_extension ~loc @@ error_extension "ppx_yojson: unsupported payload"
+      pexp_extension ~loc: Location.none @@ error_extension "Missing string payload"
     | args -> apply concat_fn args
 end
 

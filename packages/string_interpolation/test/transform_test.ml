@@ -24,7 +24,7 @@ let test3 () =
   check ast "dont transform multiple strings" [%expr {js|Hello world|js}]
     (transform "Hello world")
 
-let test4 () = check ast "inline variable" [%expr {js||js} ^ name ^ {js||js}] (transform "$(name)")
+let test4 () = check ast "inline variable" [%expr name] (transform "$(name)")
 
 let test5 () =
   check ast "concat string before variable" [%expr {js|Hello |js} ^ name]
@@ -53,6 +53,16 @@ let test10 () =
     [%expr name ^ name ^ {js| : |js} ^ name ^ name]
     (transform "$(name)$(name) : $(name)$(name)")
 
+let test11 () =
+  check ast "test"
+    [%expr Module.value]
+    (transform "$(Module.value)")
+
+let test12 () =
+  check ast "test"
+    [%expr Module.value ^ {js| more|js}]
+    (transform "$(Module.value) more")
+
 let cases =
   [
     ("Test 1", `Quick, test1);
@@ -65,6 +75,8 @@ let cases =
     ("Test 8", `Quick, test8);
     ("Test 9", `Quick, test9);
     ("Test 10", `Quick, test10);
+    ("Test 11", `Quick, test11);
+    ("Test 12", `Quick, test12);
   ]
 
 let () = run "String interpolation test suit" [ ("Transform", cases) ]
