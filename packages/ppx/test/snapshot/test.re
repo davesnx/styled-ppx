@@ -1,11 +1,11 @@
 /* This tests ensure the transformation goes right and doesn't need to type-check.
 If you are looking to add some tests for CSS support, check packages/ppx/test/native folder. */
 
-/* [%styled.global {|
+[%styled.global {|
   html, body, #root, .class {
     margin: 0;
   }
-|}]; */
+|}];
 
 module ShoudNotBreakOtherModulesPpxsWithStringAsPayload = [%ppx ""];
 module ShoudNotBreakOtherModulesPpxsWithMultiStringAsPayload = [%ppx {| stuff |}];
@@ -36,12 +36,12 @@ module Theme = {
 };
 let black = "#000";
 
-/* module StringInterpolation = [%styled.div {j|
+module StringInterpolation = [%styled.div {j|
   color: $(Theme.var);
   background-color: $(black);
   border-color: $(Theme.Border.black);
   display: block;
-|j}]; */
+|j}];
 
 let className = [%cx "display: block;"];
 let classNameWithMultiLine = [%cx {| display: block; |}];
@@ -49,23 +49,25 @@ let classNameWithArray = [%cx [| cssProperty |]];
 let cssRule = [%css "color: blue;"];
 let classNameWithCss = [%cx [| cssRule, [%css "background-color: green;"] |]];
 
-/* module DynamicComponent = [%styled.div
+module DynamicComponent = [%styled.div
   (~var) => {j|
-     color: $(var);
-     display: block;
-   |j}
-]; */
+    color: $(var);
+    display: block;
+  |j}
+];
 
-/* module SelectorsMediaQueries = [%styled.div {j|
+module SelectorsMediaQueries = [%styled.div {j|
   @media (min-width: 600px) {
     background: blue;
   }
+
   &:hover {
     background: green;
   }
+
   & > p { color: pink; font-size: 24px; }
 |j}
-]; */
+];
 
 /* let keyframe = [%keyframe {|
   0% { opacity: 0 }
@@ -81,6 +83,7 @@ module ArrayDynamicComponent = [%styled.div (~var) =>
     [%css "display: block;"]
   |]
 ];
+
 module SequenceDynamicComponent = [%styled.div (~size) => {
   Js.log("Logging when render");
   [|
@@ -89,30 +92,34 @@ module SequenceDynamicComponent = [%styled.div (~size) => {
   |]
   }
 ];
+
 module DynamicComponentWithDefaultValue = [%styled.div (~var=CssJs.hex("333")) => [|
   [%css "color: $(var);"],
   [%css "display: block;"]
 |]];
+
 let width = "120px";
 let orientation = "landscape"
 
-/* module SelectorWithInterpolation = [%styled.div {|
+module SelectorWithInterpolation = [%styled.div {|
   @media only screen and (min-width: $(width)) {
     color: blue;
-  };
+  }
+
   @media (min-width: 700px) and (orientation: $(orientation)) {
     display: none;
   }
-|}]; */
+|}];
 
-/* module MediaQueryCalc = [%styled.div {|
-  @media (min-width: calc(2px * 1px)) {
+module MediaQueryCalc = [%styled.div {|
+  @media (min-width: calc(2px + 1px)) {
     color: red;
   }
+
   @media (min-width: calc(1000px - 2%)) {
     color: red;
   }
-|}]; */
+|}];
 
 /* This test ensures that the warning is being triggered */
 /* module T = [%styled.span () => [|

@@ -201,6 +201,7 @@ let selectors_css_tests = [
     |])],
   ),
 
+  /* Stylesheets */
   (
     "html, body",
     [%expr [%styled.global {js|html, body {}|js}]],
@@ -220,6 +221,19 @@ let selectors_css_tests = [
     "html div > span",
     [%expr [%styled.global {js|html div > span {}|js}]],
     [%expr ignore(CssJs.global(. {js|html div > span|js}, [||]))],
+  ),
+  (
+    "html, body, #root, .class",
+    [%expr [%styled.global {js|html, body, #root, .class {}|js}]],
+    [%expr ignore(CssJs.global(. {js|html, body, #root, .class|js}, [||]))],
+  ),
+  (
+    "html, body, #root, .class",
+    [%expr [%styled.global {|
+    html, body, #root, .class {
+      margin: 0;
+    } |}]],
+    [%expr ignore(CssJs.global(. {js|html, body, #root, .class|js}, [| CssJs.margin(`zero) |]))],
   ),
 ];
 

@@ -155,13 +155,13 @@ at_rule:
 
 /* .class {} */
 style_rule:
-  | selector = loc(selector); WS?; block = empty_brace_block; WS?; {
+  | WS?; selector = loc(selector); WS?; block = empty_brace_block; WS?; {
     { Style_rule.prelude = selector;
       block = block, Location.none;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
-  | selector = loc(selector); WS?; declarations = brace_block(loc(declarations)); WS?; {
+  | WS?; selector = loc(selector); WS?; declarations = brace_block(loc(declarations)); WS?; {
     { Style_rule.prelude = selector;
       block = declarations;
       loc = Lex_buffer.make_loc $startpos $endpos;
@@ -376,6 +376,7 @@ component_value:
   | o = OPERATOR { Component_value.Operator o }
   | d = DELIM { Component_value.Delim d }
   | DOT { Component_value.Delim "." }
+  | ASTERISK { Component_value.Delim "*" }
   | COLON { Component_value.Delim ":" }
   | h = HASH { Component_value.Hash h }
   | DOUBLE_COLON { Component_value.Delim "::" }

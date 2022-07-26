@@ -79,6 +79,20 @@ let css_tests = [
     [%expr [%css " background-image: url('img_tree.gif' )" ]],
     [%expr [%css "background-image: url('img_tree.gif' )" ]],
   ),
+  (
+    "html, body, #root, .class",
+    [%expr [%styled.global {|
+    html, body, #root, .class {
+      margin: 0;
+    } |}]],
+    [%expr ignore(CssJs.global(. {js|html, body, #root, .class|js}, [| CssJs.margin(`zero) |]))],
+  ),
+  (
+    "html, body, #root, .class",
+    [%expr [%styled.global {|
+    html,             body, #root, .class   {     margin: 0    } |}]],
+    [%expr ignore(CssJs.global(. {js|html, body, #root, .class|js}, [| CssJs.margin(`zero) |]))],
+  ),
 ];
 
 describe("Should treat Whitespace accordingly", ({test, _}) => {
