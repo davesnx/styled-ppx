@@ -244,11 +244,11 @@ switch (input, help) {
      - check if it's a valid declaration list and render it.
      - in any other case, print both errors.
      */
-  let ast = Css_lexer.parse_declaration_list(~container_lnum, ~pos, css);
-  print_endline(render_declaration_list(ast));
+  /* let ast = Css_lexer.parse_declaration_list(~container_lnum, ~pos, css);
+  print_endline(render_declaration_list(ast)); */
 
 /* let ast = Css_lexer.parse_declaration(~container_lnum, ~pos, css);
    print_endline(render_declaration(ast)); */
-/* let ast = Css_lexer.parse_stylesheet(~container_lnum, ~pos, css);
-   print_endline(render_stylesheet(ast)); */
+  let ast = Css_lexer.parse_stylesheet(~container_lnum, ~pos, css);
+  print_endline(render_stylesheet(ast));
 };

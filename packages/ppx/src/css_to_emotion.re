@@ -5,9 +5,13 @@ module Helper = Ast_helper;
 module Builder = Ast_builder.Default;
 
 module CssJs = {
-  let lident = (~loc, name) => {txt: Ldot(Lident("CssJs"), name), loc};
-  let selector = (~loc) => lident(~loc, "selector");
-  let media = (~loc) => lident(~loc, "media");
+  let ident = (~loc, name) => {txt: Ldot(Lident("CssJs"), name), loc} |> Builder.pexp_ident(~loc);
+  let selector = (~loc) => ident(~loc, "selector");
+  let media = (~loc) => ident(~loc, "media");
+  let global = (~loc) => ident(~loc, "global")
+  let label = (~loc) => ident(~loc, "label");
+  let style = (~loc) => ident(~loc, "style");
+  let keyframes = (~loc) => ident(~loc, "keyframes");
 };
 
 let grammar_error = (loc, message) =>
@@ -77,7 +81,6 @@ let rec render_at_rule = (ar: At_rule.t): Parsetree.expression =>
   }
 and render_media_query = (ar: At_rule.t): Parsetree.expression => {
   let loc = ar.loc;
-  let (_, name_loc) = ar.name;
   let (prelude, prelude_loc) = ar.prelude;
   open Component_value;
 
@@ -119,8 +122,7 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
         "(" ++ conditions ++ ")";
       | (Ident(i), _) => i
       | _ =>
-        /* This branch is whildcared (_) by design of the parser. It won't allow
-        any other Component_value */
+        /* This branch is whildcared (_) by design of the parser. It won't allow any other Component_value */
         grammar_error(prelude_loc, "Invalid media query")
     };
   };
@@ -143,7 +145,7 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
   Helper.Exp.apply(
     ~loc,
     ~attrs=[Create.uncurried(~loc)],
-    Builder.pexp_ident(~loc=name_loc, CssJs.media(~loc)),
+    CssJs.media(~loc),
     [(Nolabel, query), (Nolabel, rules)],
   );
 }
@@ -169,9 +171,11 @@ and render_declarations = ((ds, _loc: Location.t)) => {
       | Declaration_list.Declaration(decl) => render_declaration(decl)
       | Declaration_list.At_rule(ar) => [render_at_rule(ar)]
       | Declaration_list.Style_rule(style_rules) =>
-        let loc = style_rules.loc;
-        let selector = Helper.Exp.ident(~loc, CssJs.selector(~loc));
-        [render_style_rule(selector, style_rules)];
+        [
+          render_style_rule(
+            CssJs.selector(~loc=style_rules.loc), style_rules
+          )
+        ];
       }
   );
 }
@@ -277,7 +281,7 @@ and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
 
 let bsEmotionLabel = (~loc, label) => {
   Helper.Exp.apply(
-    Helper.Exp.ident(CssJs.lident(~loc, "label")),
+    CssJs.label(~loc),
     [(Nolabel, Helper.Exp.constant(Pconst_string(label, loc, None)))],
   );
 };
@@ -289,10 +293,9 @@ let addLabel = (~loc, label, emotionExprs) => [
 
 let render_style_call = (declaration_list): Parsetree.expression => {
   let loc = declaration_list.pexp_loc;
-  let ident = Helper.Exp.ident(~loc, CssJs.lident(~loc, "style"));
   let arguments = [(Nolabel, declaration_list)];
 
-  Helper.Exp.apply(~loc, ~attrs=[Create.uncurried(~loc)], ident, arguments);
+  Helper.Exp.apply(~loc, ~attrs=[Create.uncurried(~loc)], CssJs.style(~loc), arguments);
 };
 
 let render_rule = (ident, rule: Rule.t): Parsetree.expression => {
@@ -348,21 +351,16 @@ let render_keyframes = ((ruleList, loc)): Parsetree.expression => {
          }
        })
     |> Builder.pexp_array(~loc);
-  let emotionKeyframes =
-    Builder.pexp_ident(~loc, CssJs.lident(~loc, "keyframes"));
-
   {
-    ...Builder.eapply(~loc, emotionKeyframes, [keyframes]),
+    ...Builder.eapply(~loc, CssJs.keyframes(~loc), [keyframes]),
     pexp_attributes: [Create.uncurried(~loc)],
   };
 };
 
 let render_global = ((ruleList, loc): Stylesheet.t) => {
-  let emotionGlobal = Helper.Exp.ident(~loc, CssJs.lident(~loc, "global"));
-
   switch (ruleList) {
   /* There's only one rule: */
-  | [rule] => render_rule(emotionGlobal, rule) |> Create.applyIgnore(~loc)
+  | [rule] => render_rule(CssJs.global(~loc), rule) |> Create.applyIgnore(~loc)
   /* There's more than one */
   | _res =>
     grammar_error(
@@ -371,8 +369,8 @@ let render_global = ((ruleList, loc): Stylesheet.t) => {
         `styled.global` only supports one style definition. Transform each definition into a separate styled.global call
 
         Like following:
-          [%styled.global " ... "];
-          [%styled.global " ... "];
+          %styled.global(" ... ")
+          %styled.global(" ... ")
       |},
     )
   /* TODO: Add rule to string to finish this error message */
