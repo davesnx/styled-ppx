@@ -50,7 +50,7 @@ let concat = (~loc, expr, acc) => {
 let rec render_at_rule = (ar: At_rule.t): Parsetree.expression =>
   switch (ar.At_rule.name) {
   | ("media", _) => render_media_query(ar)
-  | ("keyframe", _) => grammar_error(ar.loc, "@keyframe should be defined outside")
+  | ("keyframes", _) => grammar_error(ar.loc, {|@keyframes should be defined with %keyframe(...).|})
   | (
       "charset" as n |
       "import" as n |
@@ -58,7 +58,6 @@ let rec render_at_rule = (ar: At_rule.t): Parsetree.expression =>
       "supports" as n |
       "page" as n |
       "font-face" as n |
-      "keyframes" as n |
       "counter-style" as n |
       "font-feature-values" as n |
       "swash" as n |
@@ -191,6 +190,9 @@ and render_selector = (selector: Selector.t) => {
     | Type(v) => v
     | Subclass(v) => render_subclass_selector(v)
     | Variable(v) => render_variable_as_string(v)
+    | Percentage(_v) =>
+      /* TODO: Add locations to Selector.t */
+      grammar_error(Location.none, "Percentage is not a valid selector")
   and render_subclass_selector =
     fun
     | Id(v) => "#" ++ v
@@ -305,52 +307,68 @@ let render_rule = (ident, rule: Rule.t): Parsetree.expression => {
   };
 };
 
-let render_keyframes = ((ruleList, loc)): Parsetree.expression => {
-  let invalidSelectorErrorMessage = {|
+let render_keyframes = (declarations: Declaration_list.t
+): Parsetree.expression => {
+  let (declarations, loc) = declarations;
+  let invalid_selector = {|
     keyframe selector can be from | to | <percentage>
 
     Like following:
         [%keyframe "
-          0% { opacity: 1; }
+          from { opacity: 1; }
           to { opacity: 0; }
         "];
   |};
 
-  let render_select_as_keyframe = (_prelude: Selector.t) => 0;
-  /* switch (prelude) {
-     | ([(Percentage(n), loc)], _) =>
-       // TODO: can percentage be a decimal value?
-       switch (int_of_string_opt(n)) {
-       | Some(n) when n >= 0 && n <= 100 => n
-       | _ => grammar_error(loc, invalidSelectorErrorMessage)
-       }
-     // https://drafts.csswg.org/css-animations/#keyframes
-     // The keyword from is equivalent to the value 0%
-     | ([(Ident("from"), _)], _) => 0
-     // The keyword to is equivalent to the value 100%
-     | ([(Ident("to"), _)], _) => 100
-     | _ => grammar_error(loc, invalidSelectorErrorMessage);
-     }; */
+  let invalid_percentag_value = (value) => "'" ++ value ++ "' isn't valid. Only accept percentage with integers";
+  let invalid_prelude_value = (value) => "'" ++ value ++ "' isn't a valid keyframe value";
+  let invalid_prelude_value_opaque = "This isn't a valid keyframe value";
+
+  let render_select_as_keyframe = (prelude: Selector.t): int => {
+    open Selector;
+    switch (prelude) {
+     | SimpleSelector([selector]) => {
+       switch (selector) {
+        // https://drafts.csswg.org/css-animations/#keyframes
+        // The keyword from is equivalent to the value 0%
+        | Type(v) when v == "from" => 0
+        // The keyword to is equivalent t"o the value 100%
+        | Type(v) when v == "to" => 100
+        | Type(t) => grammar_error(loc, invalid_prelude_value(t))
+        | Percentage(n) => switch (int_of_string_opt(n)) {
+          | Some(n) when n >= 0 && n <= 100 => n
+          | _ => grammar_error(loc, invalid_percentag_value(n))
+        }
+        | Ampersand => grammar_error(loc, invalid_prelude_value("&"))
+        | Universal => grammar_error(loc, invalid_prelude_value("*"))
+        | Subclass(_) => grammar_error(loc, invalid_prelude_value_opaque)
+        | Variable(_) => grammar_error(loc, invalid_prelude_value_opaque)
+        }
+     }
+     | _ => grammar_error(loc, invalid_selector);
+    }
+  };
 
   let keyframes =
-    ruleList
-    |> List.map(rule => {
-         switch (rule) {
-         | Rule.Style_rule({
-             prelude: (selector, prelude_loc),
-             block,
-             loc: style_loc,
-           }) =>
-           let percentage =
-             render_select_as_keyframe(selector)
-             |> Builder.eint(~loc=prelude_loc);
-           let rules =
-             render_declarations(block) |> Builder.pexp_array(~loc);
-           Builder.pexp_tuple(~loc=style_loc, [percentage, rules]);
-         | Rule.At_rule(_) => grammar_error(loc, invalidSelectorErrorMessage)
-         }
-       })
+    declarations
+    |> List.map(declaration => {
+      switch (declaration) {
+        | Declaration_list.Style_rule({
+          prelude: (selector, prelude_loc),
+          block,
+          loc: style_loc,
+        }) =>
+        let percentage =
+          render_select_as_keyframe(selector)
+          |> Builder.eint(~loc=prelude_loc);
+        let rules =
+          render_declarations(block) |> Builder.pexp_array(~loc);
+        Builder.pexp_tuple(~loc=style_loc, [percentage, rules]);
+      | _ => grammar_error(loc, invalid_selector)
+      }
+    })
     |> Builder.pexp_array(~loc);
+
   {
     ...Builder.eapply(~loc, CssJs.keyframes(~loc), [keyframes]),
     pexp_attributes: [Create.uncurried(~loc)],

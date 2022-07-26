@@ -83,6 +83,7 @@ and render_selector = (ast: Selector.t) => {
     | Type(v) => "Type(" ++ v ++ ")"
     | Subclass(v) => "Subclass(" ++ render_subclass_selector(v) ++ ")"
     | Variable(v) => "Variable(" ++ String.concat(".", v) ++ ")"
+    | Percentage(p) => "Percentage(" ++ p ++ ")"
   and render_subclass_selector: subclass_selector => string =
     fun
     | Id(v) => "Id(" ++ v ++ ")"
@@ -246,9 +247,6 @@ switch (input, help) {
      */
   /* let ast = Css_lexer.parse_declaration_list(~container_lnum, ~pos, css);
   print_endline(render_declaration_list(ast)); */
-
-/* let ast = Css_lexer.parse_declaration(~container_lnum, ~pos, css);
-   print_endline(render_declaration(ast)); */
   let ast = Css_lexer.parse_stylesheet(~container_lnum, ~pos, css);
   print_endline(render_stylesheet(ast));
 };

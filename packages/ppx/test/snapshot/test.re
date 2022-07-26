@@ -69,10 +69,10 @@ module SelectorsMediaQueries = [%styled.div {j|
 |j}
 ];
 
-/* let keyframe = [%keyframe {|
+let keyframe = [%keyframe {|
   0% { opacity: 0 }
   100% { opacity: 1 }
-|}]; */
+|}];
 
 module ArrayDynamicComponent = [%styled.div (~var) =>
   [|

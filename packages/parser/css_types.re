@@ -96,6 +96,7 @@ and Selector: {
     | Type(string)
     | Subclass(subclass_selector)
     | Variable(list(string))
+    | Percentage(string)
   and subclass_selector =
     | Id(string)
     | Class(string)

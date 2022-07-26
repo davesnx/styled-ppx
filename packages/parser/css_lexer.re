@@ -492,7 +492,8 @@ let queue_next_tokens_with_location = (buf) => {
 }
 
 let parse = (ws, buf, parser) => {
-  skip_whitespace := ws;
+  skip_whitespace.contents = ws;
+
   let last_token = ref((Parser.EOF, Lexing.dummy_pos, Lexing.dummy_pos));
   let next_token = () => {
     if (Queue.is_empty(token_queue)) {
@@ -524,3 +525,6 @@ let parse_declaration = (~container_lnum=?, ~pos=?, css) =>
 
 let parse_stylesheet = (~container_lnum=?, ~pos=?, css) =>
   parse_string(~skip_whitespace=false, ~container_lnum?, ~pos?, Parser.stylesheet, css);
+
+let parse_keyframes = (~container_lnum=?, ~pos=?, css) =>
+  parse_string(~skip_whitespace=false, ~container_lnum?, ~pos?, Parser.keyframes, css);

@@ -41,6 +41,7 @@ open Css_types
 %start <Css_types.Stylesheet.t> stylesheet
 %start <Css_types.Declaration_list.t> declaration_list
 %start <Css_types.Declaration.t> declaration
+%start <Css_types.Declaration_list.t> keyframes
 
 %%
 
@@ -50,6 +51,14 @@ stylesheet_without_eof: rs = loc(list(rule)) { rs };
 declaration_list:
   | EOF { ([], Lex_buffer.make_loc $startpos $endpos) }
   | ds = loc(declarations); EOF { ds }
+;
+
+/* keyframe can contain {} or no */
+keyframe: rules = nonempty_list(keyframe_style_rule); { rules };
+
+keyframes:
+  | rules = loc(keyframe); EOF; { rules }
+  | rules = brace_block(loc(keyframe)); EOF; { rules }
 ;
 
 rule:
@@ -95,56 +104,68 @@ media_query_list:
 
 /* https://www.w3.org/TR/css-syntax-3/#at-rules */
 at_rule:
-  /* @media (min-width: 16rem) {} */
-  | name = loc(AT_MEDIA); WS?; xs = loc(nonempty_list(loc(skip_ws(media_query_list)))); WS?; empty_brace_block; WS?; {
-    { At_rule.name = name;
-      prelude = xs;
-      block = Brace_block.Empty;
-      loc = Lex_buffer.make_loc $startpos $endpos;
-    }
-  }
   /* @media (min-width: 16rem) { ... } */
-  | name = loc(AT_MEDIA); WS?; xs = loc(nonempty_list(loc(skip_ws(media_query_list)))); WS?; ds = brace_block(loc(declarations)); WS? {
+  | name = loc(AT_MEDIA); WS?;
+    prelude = loc(nonempty_list(loc(skip_ws(media_query_list)))); WS?;
+    ds = brace_block(loc(declarations)); WS? {
     { At_rule.name = name;
-      prelude = xs;
+      prelude;
       block = Brace_block.Declaration_list ds;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
-  /* @keyframes animationName {} */
-  | name = loc(AT_KEYFRAMES); WS?; i = IDENT; WS?; empty_brace_block {
+  /* @media (min-width: 16rem) {} */
+  | name = loc(AT_MEDIA); WS?;
+    prelude = loc(nonempty_list(loc(skip_ws(media_query_list)))); WS?;
+    b = empty_brace_block; WS?; {
+    let empty_block = Brace_block.Declaration_list (b, Lex_buffer.make_loc $startpos $endpos) in
     { At_rule.name = name;
-      prelude = ([(Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i))], Lex_buffer.make_loc $startpos(i) $endpos(i));
-      block = Brace_block.Empty;
+      prelude;
+      block = empty_block;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
   /* @keyframes animationName { ... } */
-  | name = loc(AT_KEYFRAMES); WS?; i = IDENT; WS?; s = brace_block(stylesheet_without_eof) {
+  | name = loc(AT_KEYFRAMES); WS?;
+    i = IDENT; WS?;
+    block = brace_block(keyframe) {
+    let item = (Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i)) in
+    let prelude = ([item], Lex_buffer.make_loc $startpos(i) $endpos(i)) in
+    let block = Brace_block.Declaration_list (block, Lex_buffer.make_loc $startpos $endpos) in
     { At_rule.name = name;
-      prelude = ([(Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i))], Lex_buffer.make_loc $startpos(i) $endpos(i));
-      block = Brace_block.Stylesheet s;
+      prelude;
+      block;
+      loc = Lex_buffer.make_loc $startpos $endpos;
+    }
+  }
+  /* @keyframes animationName {} */
+  | name = loc(AT_KEYFRAMES); WS?;
+    i = IDENT; WS?;
+    s = loc(empty_brace_block) {
+    let item = (Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i)) in
+    let prelude = ([item], Lex_buffer.make_loc $startpos(i) $endpos(i)) in
+    let empty_block = Brace_block.Declaration_list s in
+    { At_rule.name = name;
+      prelude;
+      block = empty_block;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
   /* @charset */
-  | name = loc(AT_RULE_STATEMENT); WS?; xs = loc(prelude); WS?; SEMI_COLON?; {
+  | name = loc(AT_RULE_STATEMENT); WS?;
+    xs = loc(prelude); WS?; SEMI_COLON?; {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Empty;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
-  /* @{{rule}} {} */
-  | name = loc(AT_RULE); WS?; xs = loc(prelude); WS?; empty_brace_block {
-    { At_rule.name = name;
-      prelude = xs;
-      block = Brace_block.Empty;
-      loc = Lex_buffer.make_loc $startpos $endpos;
-    }
-  }
+  /* @support { ... } */
+  /* @page { ... } */
   /* @{{rule}} { ... } */
-  | name = loc(AT_RULE); WS?; xs = loc(prelude); WS?; s = brace_block(stylesheet_without_eof) {
+  | name = loc(AT_RULE); WS?;
+    xs = loc(prelude); WS?;
+    s = brace_block(stylesheet_without_eof); WS?; {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Stylesheet s;
@@ -153,15 +174,44 @@ at_rule:
   }
 ;
 
+percentage: n = NUMBER; PERCENTAGE; { n }
+
+/* keyframe allows stylesheet by defintion, but we restrict the usage to: */
+keyframe_style_rule:
+  | WS?; id = IDENT; WS?;
+    declarations = brace_block(loc(declarations)); WS?; {
+    let item = Selector.Type id in
+    let prelude = Selector.SimpleSelector [item] in
+    Declaration_list.Style_rule {
+      Style_rule.prelude = (prelude, Lex_buffer.make_loc $startpos(id) $endpos(id));
+      loc = Lex_buffer.make_loc $startpos $endpos;
+      block = declarations;
+    }
+  }
+  | WS?; p = percentage; WS?;
+    declarations = brace_block(loc(declarations)); WS?; {
+    let item = Selector.Percentage p in
+    let prelude = Selector.SimpleSelector [item] in
+    Declaration_list.Style_rule {
+      Style_rule.prelude = (prelude, Lex_buffer.make_loc $startpos(p) $endpos(p));
+      loc = Lex_buffer.make_loc $startpos $endpos;
+      block = declarations;
+    }
+  }
+  /* TODO: Handle separated_list(COMMA, percentage) */
+;
+
 /* .class {} */
 style_rule:
-  | WS?; selector = loc(selector); WS?; block = empty_brace_block; WS?; {
+  | WS?; selector = loc(selector); WS?;
+    block = loc(empty_brace_block); WS?; {
     { Style_rule.prelude = selector;
-      block = block, Location.none;
+      block;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
-  | WS?; selector = loc(selector); WS?; declarations = brace_block(loc(declarations)); WS?; {
+  | WS?; selector = loc(selector); WS?;
+    declarations = brace_block(loc(declarations)); WS?; {
     { Style_rule.prelude = selector;
       block = declarations;
       loc = Lex_buffer.make_loc $startpos $endpos;
@@ -183,18 +233,21 @@ declaration_or_at_rule:
   | s = style_rule { Declaration_list.Style_rule s }
 ;
 
-declaration: d = declaration_without_eof; EOF { d };
-
 /* property: value; */
 declaration_without_eof:
-  | n = IDENT;  COLON; v = loc(component_values); i = boption(IMPORTANT); SEMI_COLON? {
-    { Declaration.name = (n, Lex_buffer.make_loc $startpos(n) $endpos(n));
-      value = v;
-      important = (i, Lex_buffer.make_loc $startpos(i) $endpos(i));
+  | property = loc(IDENT);
+    COLON;
+    value = loc(component_values);
+    important = loc(boption(IMPORTANT)); SEMI_COLON? {
+    { Declaration.name = property;
+      value;
+      important;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
 ;
+
+declaration: d = declaration_without_eof; EOF { d };
 
 /* ::after */
 pseudo_element_selector:
@@ -319,16 +372,14 @@ compound_selector:
 ;
 
 combinator:
-  /* That's a small hack to pretty print the selectors properly.
-  Adding a WS to the combinator will respect this WS on the code-gen. */
+  /* Since we render COMBINATOR always with spaces, we ignore them here */
   | WS?; c = COMBINATOR; WS?; s = compound_selector; WS?; { (Some c, s) }
   | WS; s = compound_selector; WS?; { (None, s) }
 ;
 
 /* <complex-selector> = <compound-selector> [ <combinator>? <compound-selector> ]* */
 complex_selector:
-  | left = compound_selector;
-    right = nonempty_list(combinator); {
+  | left = compound_selector; right = nonempty_list(combinator); {
     Selector.Combinator {
       left;
       right;
@@ -342,7 +393,7 @@ The rest of component_value_in_prelude and component_value should be sync */
 component_value_in_prelude:
   | b = paren_block(prelude) { Component_value.Paren_block b }
   | b = bracket_block(prelude) { Component_value.Bracket_block b }
-  | n = NUMBER; PERCENTAGE { Component_value.Percentage n }
+  | n = percentage { Component_value.Percentage n }
   | i = IDENT { Component_value.Ident i }
   | s = STRING { Component_value.String s }
   | c = COMBINATOR { Component_value.Combinator c}
@@ -363,13 +414,13 @@ component_value_in_prelude:
   | f = loc(IDENT); LEFT_PAREN; xs = loc(prelude); RIGHT_PAREN; {
     Component_value.Function (f, xs)
   }
-  | WS { Component_value.Delim "*" }
+  | WS { Component_value.Delim " " }
 ;
 
 component_value:
   | b = paren_block(component_values) { Component_value.Paren_block b }
   | b = bracket_block(component_values) { Component_value.Bracket_block b }
-  | n = NUMBER; PERCENTAGE { Component_value.Percentage n }
+  | n = percentage { Component_value.Percentage n }
   | i = IDENT { Component_value.Ident i }
   | s = STRING { Component_value.String s }
   | c = COMBINATOR { Component_value.Combinator c}

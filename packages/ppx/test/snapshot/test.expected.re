@@ -7840,6 +7840,11 @@ module SelectorsMediaQueries = {
     createVariadicElement("div", newProps);
   };
 };
+let keyframe =
+  CssJs.keyframes(. [|
+    (0, [|CssJs.opacity(0.)|]),
+    (100, [|CssJs.opacity(1.)|]),
+  |]);
 module ArrayDynamicComponent = {
   [@bs.deriving abstract]
   type makeProps('var) = {

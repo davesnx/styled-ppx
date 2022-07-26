@@ -227,14 +227,6 @@ let selectors_css_tests = [
     [%expr [%styled.global {js|html, body, #root, .class {}|js}]],
     [%expr ignore(CssJs.global(. {js|html, body, #root, .class|js}, [||]))],
   ),
-  (
-    "html, body, #root, .class",
-    [%expr [%styled.global {|
-    html, body, #root, .class {
-      margin: 0;
-    } |}]],
-    [%expr ignore(CssJs.global(. {js|html, body, #root, .class|js}, [| CssJs.margin(`zero) |]))],
-  ),
 ];
 
 describe("Should transform selectors", ({test, _}) => {
