@@ -36,12 +36,29 @@ let selectors_css_tests = [
     [%expr [%cx {js|[id="baz"] {}|js}]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|[id="baz"]|js}, [||])|])],
   ),
-  (
+  /* (
+    "nth-child(even)",
+    [%expr [%cx "&:nth-child(even) {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|&:nth-child(even)|js}, [||])|])],
+  ), */
+  /* (
+    "nth-child(3n+1)",
+    [%expr [%cx "&:nth-child(3n+1) {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|&:nth-child(3n+1)|js}, [||])|])],
+  ), */
+
+  /* This two might be valid, but it shoudn't. Declarations can't have selectors without starting with &. Or maybe they should?
+  TODO: Make sure it make sense first, and then fix. */
+  /* (
     "html, body",
     [%expr [%cx {js|html, body {}|js}]],
      [%expr CssJs.style(. [|CssJs.selector(. {js|html, body|js}, [||])|])],
-  ),
-
+  ), */
+  /* (
+    "html body",
+    [%expr [%cx {js|html body {}|js}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|html body|js}, [||])|])],
+  ), */
 
   /* Compound */
 
@@ -52,33 +69,10 @@ let selectors_css_tests = [
     [%expr CssJs.style(. [|CssJs.selector(. {js|&.bar|js}, [||])|])],
   ),
   (
-    "& .bar",
-    [%expr [%cx {js|& .bar {}|js}]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|& .bar|js}, [||])|])],
-  ),
-  (
     "&.bar, &.foo",
     [%expr [%cx {js|&.bar, &.foo {}|js}]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|&.bar, &.foo|js}, [||])|])],
   ),
-  (
-    "& div",
-    [%expr [%cx {js|& div {}|js}]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|& div|js}, [||])|])],
-  ),
-
-  // (
-  //   "html body",
-  //   [%expr [%cx {js|html body {}|js}]],
-  //    [%expr CssJs.style(. [|CssJs.selector(. {js|html body|js}, [||])|])],
-  // ),
-
-  
-  // (
-  //   "p :first-child",
-  //   [%expr [%cx {js|p :first-child {}|js}]],
-  //   [%expr CssJs.style(. [|CssJs.selector(. {js|p :first-child|js}, [||])|])]
-  // ),
   (
     "p:first-child",
     [%expr [%cx {js|p:first-child {}|js}]],
@@ -89,36 +83,6 @@ let selectors_css_tests = [
     [%expr [%cx {js|p#first-child {}|js}]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|p#first-child|js}, [||])|])]
   ),
-  // (
-  //   "p #first-child",
-  //   [%expr [%cx {js|p #first-child {}|js}]],
-  //   [%expr CssJs.style(. [|CssJs.selector(. {js|p #first-child|js}, [||])|])]
-  // ),
-
-  /* div:nth-child(2n+1 of #someId.someClass) */
-  /* #foo > .bar + div.k1.k2 [id='baz']:hello(2):not(:where(#yolo))::before */
-
-  /* Complex */
-  (
-    ">",
-    [%expr [%cx "& > a { }"]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|& > a|js}, [||])|])],
-  ),
-  (
-    ">",
-    [%expr [%cx "& > div > div > div > div { }"]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|& > div > div > div > div|js}, [||])|])],
-  ),
-  /* (
-    "nth-child(even)",
-    [%expr [%cx "&:nth-child(even) {}"]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|&:nth-child(even)|js}, [||])|])],
-  ), */
-  /* (
-    "nth-child(3n+1)",
-    [%expr [%cx "& > div:nth-child(3n+1) {}"]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|& > div:nth-child(3n+1)|js}, [||])|])],
-  ), */
   (
     ":active",
     [%expr [%cx "&:active {}"]],
@@ -129,6 +93,58 @@ let selectors_css_tests = [
     [%expr [%cx "&:hover {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|&:hover|js}, [||])|])],
   ),
+  /* (
+    "p #first-child::before",
+    [%expr [%cx {js|p #first-child {}|js}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|p #first-child|js}, [||])|])]
+  ), */
+  /* (
+    "p #first-child::before:hover",
+    [%expr [%cx {js|p #first-child {}|js}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|p #first-child::before:hover|js}, [||])|])]
+  ), */
+
+  /* Complex */
+  (
+    "& > a",
+    [%expr [%cx "& > a { }"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& > a|js}, [||])|])],
+  ),
+  (
+    "&>a",
+    [%expr [%cx "&>a { }"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& > a|js}, [||])|])],
+  ),
+  (
+    "& #first-child",
+    [%expr [%cx {js|& #first-child {}|js}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& #first-child|js}, [||])|])]
+  ),(
+    "& .bar",
+    [%expr [%cx {js|& .bar {}|js}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& .bar|js}, [||])|])],
+  ),
+  (
+    "& div",
+    [%expr [%cx {js|& div {}|js}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& div|js}, [||])|])],
+  ),
+  (
+    "& :first-child",
+    [%expr [%cx {js|& :first-child {}|js}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& :first-child|js}, [||])|])]
+  ),
+  (
+    "& > div > div > div > div",
+    [%expr [%cx "& > div > div > div > div { }"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& > div > div > div > div|js}, [||])|])],
+  ),
+  (
+    "& div > .class",
+    [%expr [%cx "& div > .class {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& div > .class|js}, [||])|])],
+  ),
+  /* #foo > .bar + div.k1.k2 [id='baz']:hello(2):not(:where(#yolo))::before */
   (
     "& + &",
     [%expr [%cx "& + & {}"]],
@@ -184,17 +200,12 @@ let selectors_css_tests = [
     [%expr [%cx "$(pseudo) {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. pseudo, [||])|])],
   ),
-  // (
-  //   "div > .class",
-  //   [%expr [%cx "& div > .class {}"]],
-  //   [%expr CssJs.style(. [|CssJs.selector(. {js|& div > .class|js}, [||])|])],
-  // ),
-  // (
-  //   "div > $(Variables.element)",
-  //   [%expr [%cx "& div > $(Variables.element) {}"]],
-  //   [%expr CssJs.style(. [|CssJs.selector(. {js|& div > |js} ++ Variables.element, [||])|])],
-  // ),
-  /* (
+  (
+    "div > $(Variables.element)",
+    [%expr [%cx "& div > $(Variables.element) {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& div > |js} ++ Variables.element, [||])|])],
+  ),
+  (
     "*:not(:last-child)",
     [%expr [%cx "& > *:not(:last-child) {}"]],
     [%expr CssJs.style(. [|
@@ -203,7 +214,7 @@ let selectors_css_tests = [
         [||]
       )
     |])],
-  ), */
+  ),
 ];
 
 describe("Should transform selectors", ({test, _}) => {

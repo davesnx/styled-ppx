@@ -57,11 +57,20 @@ rule:
   | r = style_rule { Rule.Style_rule r }
 ;
 
+/* Adds location as a tuple */
 loc(X): x = X { (x, Lex_buffer.make_loc $startpos(x) $endpos(x))}
+
+/* Handle skipping whitespace */
+skip_ws (X): x = delimited(WS?, X, WS?) { x };
+skip_ws_right (X): x = X; WS?; { x };
+skip_ws_left (X): WS?; x = X; { x };
 
 /* TODO: Remove empty_brace_block */
 /* {} */
 empty_brace_block: LEFT_BRACE; RIGHT_BRACE; { [] }
+
+/* TODO: Remove SEMI_COLON? from brace_block(X) */
+/* { ... } */
 brace_block(X):
   xs = delimited(LEFT_BRACE, X, RIGHT_BRACE);
   SEMI_COLON? { xs };
@@ -87,7 +96,7 @@ media_query_list:
 /* https://www.w3.org/TR/css-syntax-3/#at-rules */
 at_rule:
   /* @media (min-width: 16rem) {} */
-  | name = loc(AT_MEDIA); WS?; xs = loc(nonempty_list(loc(with_ws(media_query_list)))); WS?; empty_brace_block; WS?; {
+  | name = loc(AT_MEDIA); WS?; xs = loc(nonempty_list(loc(skip_ws(media_query_list)))); WS?; empty_brace_block; WS?; {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Empty;
@@ -95,7 +104,7 @@ at_rule:
     }
   }
   /* @media (min-width: 16rem) { ... } */
-  | name = loc(AT_MEDIA); WS?; xs = loc(nonempty_list(loc(with_ws(media_query_list)))); WS?; ds = brace_block(loc(declarations)); WS? {
+  | name = loc(AT_MEDIA); WS?; xs = loc(nonempty_list(loc(skip_ws(media_query_list)))); WS?; ds = brace_block(loc(declarations)); WS? {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Declaration_list ds;
@@ -159,10 +168,6 @@ style_rule:
     }
   }
 ;
-
-with_ws (X): x = delimited(WS?, X, WS?) { x };
-ws_right (X): x = X; WS?; { x };
-ws_left (X): WS?; x = X; { x };
 
 prelude: xs = nonempty_list(loc(component_value_in_prelude)) { xs };
 
@@ -241,8 +246,7 @@ attribute_selector:
 ;
 
 /* <id-selector> = <hash-token> */
-id_selector:
-  | h = HASH { Selector.Id h }
+id_selector: h = HASH { Selector.Id h }
 
 /* <class-selector> = '.' <ident-token> */
 class_selector: DOT; c = IDENT { Selector.Class c };
@@ -257,15 +261,15 @@ subclass_selector:
 
 selector:
   /* <simple-selector-list> = <simple-selector># */
-  | xs = separated_nonempty_list(ws_right(COMMA), simple_selector) {
+  | xs = separated_nonempty_list(skip_ws_right(COMMA), simple_selector) {
     Selector.SimpleSelector xs
   }
   /* <compound-selector-list> = <compound-selector># */
-  | xs = separated_nonempty_list(ws_right(COMMA), compound_selector) {
+  | xs = separated_nonempty_list(skip_ws_right(COMMA), skip_ws_right(compound_selector)) {
     Selector.CompoundSelector xs
   }
   /* <complex-selector-list> = <complex-selector># */
-  | xs = separated_nonempty_list(ws_right(COMMA), complex_selector) {
+  | xs = separated_nonempty_list(skip_ws_right(COMMA), skip_ws_right(complex_selector)) {
     Selector.ComplexSelector xs
   }
 ;
@@ -314,22 +318,20 @@ compound_selector:
   }
 ;
 
+combinator:
+  /* That's a small hack to pretty print the selectors properly.
+  Adding a WS to the combinator will respect this WS on the code-gen. */
+  | WS?; c = COMBINATOR; WS?; s = compound_selector; WS?; { (Some c, s) }
+  | WS; s = compound_selector; WS?; { (None, s) }
+;
 
 /* <complex-selector> = <compound-selector> [ <combinator>? <compound-selector> ]* */
 complex_selector:
   | left = compound_selector;
-    WS;
-    right = loption(list(pair(with_ws(COMBINATOR), with_ws(compound_selector)))); {
+    right = nonempty_list(combinator); {
     Selector.Combinator {
       left;
-      right = List.map (fun (c, right) -> (Some c, right)) right;
-    }
-  }
-  | left = compound_selector;
-    right = loption(list(pair(WS, with_ws(compound_selector)))); {
-    Selector.Combinator {
-      left;
-      right = List.map (fun (_, right) -> (None, right)) right;
+      right;
     }
   }
 ;

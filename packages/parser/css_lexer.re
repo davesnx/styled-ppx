@@ -422,7 +422,7 @@ let rec get_next_token = (buf) => {
   | ']' => [RIGHT_BRACKET]
   | '%' => [PERCENTAGE]
   | '&' => {
-    skip_whitespace := false;
+    skip_whitespace.contents = false;
     [AMPERSAND];
   }
   | '*' => [ASTERISK]
@@ -481,10 +481,6 @@ and get_dimension = (n, buf) => {
   | _ => assert false
   }
 };
-
-/* .a {} */
-/* display: block */
-/* @media screen {} */
 
 let token_queue = Queue.create();
 

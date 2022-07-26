@@ -210,7 +210,7 @@ and render_selector = (selector: Selector.t) => {
         ++ "("
         ++ (render_selector(payload) |> String.trim)
         ++ ")";
-      }
+      };
 
   let rec render_compound_selector = compound_selector => {
     let simple_selector =
@@ -223,7 +223,7 @@ and render_selector = (selector: Selector.t) => {
       List.map(
         render_subclass_selector,
         compound_selector.subclass_selectors,
-      ) |> String.concat(" ");
+      ) |> String.concat("");
     let pseudo_selectors =
       List.map(
         render_pseudo_selector,
@@ -236,20 +236,20 @@ and render_selector = (selector: Selector.t) => {
     | Combinator({left, right}) =>
       let left = render_compound_selector(left);
       let right = render_right_combinator(right);
-      left ++ " " ++ right;
+      left ++ right;
     | Selector(compound) => render_compound_selector(compound)
     };
   }
   and render_right_combinator = right => {
     right
-    |> List.map(((combinator: option(string), compound_selector)) => {
+    |> List.map(((combinator, compound_selector)) => {
       Option.fold(
-        ~none="",
-        ~some=o => o ++ " ",
+        ~none=" ",
+        ~some=o => " " ++ o ++ " ",
         combinator,
       )
       ++ render_compound_selector(compound_selector)
-    }) |> String.concat(" ")
+    }) |> String.concat("")
   };
 
   switch (selector) {

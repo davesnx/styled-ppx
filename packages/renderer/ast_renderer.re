@@ -126,14 +126,15 @@ and render_selector = (ast: Selector.t) => {
       List.map(render_pseudo_selector, compound_selector.pseudo_selectors)
       |> String.concat("");
 
-    let compound = String.concat(", ", [simple_selector, subclass_selectors, pseudo_selectors]);
+    let is_not_empty = s => String.length(s |> String.trim) != 0;
+    let compound = String.concat(", ", [simple_selector, subclass_selectors, pseudo_selectors] |> List.filter(is_not_empty));
     "Compound(" ++ compound ++ ")"
   }
   and render_complex_selector: complex_selector => string =
     fun
     | Selector(compound) => render_compound_selector(compound)
     | Combinator({left, right}) =>
-      render_compound_selector(left) ++ render_right_combinator(right)
+      "Left(" ++ render_compound_selector(left) ++ "), Right(" ++ render_right_combinator(right) ++ ")"
   and render_right_combinator = right => {
     right
     |> List.map(((combinator, compound_selector)) => {
@@ -243,11 +244,11 @@ switch (input, help) {
      - check if it's a valid declaration list and render it.
      - in any other case, print both errors.
      */
-  /* let ast = Css_lexer.parse_declaration_list(~container_lnum, ~pos, css);
-  print_endline(render_declaration_list(ast)); */
+  let ast = Css_lexer.parse_declaration_list(~container_lnum, ~pos, css);
+  print_endline(render_declaration_list(ast));
 
 /* let ast = Css_lexer.parse_declaration(~container_lnum, ~pos, css);
    print_endline(render_declaration(ast)); */
-let ast = Css_lexer.parse_stylesheet(~container_lnum, ~pos, css);
-   print_endline(render_stylesheet(ast));
+/* let ast = Css_lexer.parse_stylesheet(~container_lnum, ~pos, css);
+   print_endline(render_stylesheet(ast)); */
 };
