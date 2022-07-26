@@ -211,6 +211,16 @@ let selectors_css_tests = [
     [%expr [%styled.global {js|html body {}|js}]],
     [%expr ignore(CssJs.global(. {js|html body|js}, [||]))],
   ),
+  (
+    "div > span",
+    [%expr [%styled.global {js|div > span {}|js}]],
+    [%expr ignore(CssJs.global(. {js|div > span|js}, [||]))],
+  ),
+  (
+    "html div > span",
+    [%expr [%styled.global {js|html div > span {}|js}]],
+    [%expr ignore(CssJs.global(. {js|html div > span|js}, [||]))],
+  ),
 ];
 
 describe("Should transform selectors", ({test, _}) => {
