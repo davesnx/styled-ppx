@@ -4,10 +4,14 @@ open ReactTestingLibrary
 
 EmotionSerializer.load()
 
-let fadeIn = %keyframe(`
+external fromAnimationName: string => CssJs.animationName = "%identity"
+
+let fadeIn = fromAnimationName("fade")
+
+/* let fadeIn = %keyframe(`
   0% { opacity: 0 }
   100% { opacity: 1 }
-`)
+`) */
 
 module Component = %styled.div(`
   display: flex;

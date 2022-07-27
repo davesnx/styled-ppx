@@ -411,16 +411,16 @@ let extensions = [
     string_payload,
     (~loc as _, ~path as _, payload, _label, _) => {
       let loc_start = payload.loc.Location.loc_start;
-      let stylesheet =
-        Css_lexer.parse_stylesheet(
+      let declarations =
+        Css_lexer.parse_keyframes(
           ~container_lnum=loc_start.Lexing.pos_lnum,
           ~pos=loc_start,
           payload.txt,
         );
-      Css_to_emotion.render_keyframes(stylesheet);
+      Css_to_emotion.render_keyframes(declarations);
     },
   ),
-  /* This extension just raises an error to educate users, since before 0.20 this was valid */
+  /* This extension just raises an error to educate, since before 0.20 this was valid */
   Ppxlib.Extension.declare(
     "styled",
     Ppxlib.Extension.Context.Module_expr,
@@ -489,6 +489,7 @@ module Mapper = {
     | _ => None
     };
   };
+
   let getHtmlTagUnsafe = (~loc, str) => {
     switch (String.split_on_char('.', str)) {
     | ["styled", tag] => tag

@@ -1,4 +1,5 @@
 type with_loc('a) = ('a, Location.t);
+
 type dimension =
   | Length
   | Angle
@@ -12,21 +13,21 @@ module rec Component_value: {
     | Percentage(string)
     | Ident(string)
     | String(string)
-    | Selector(list(with_loc(t)))
+    | Selector(with_loc(Selector.t))
     | Uri(string)
     | Operator(string)
+    | Combinator(string)
     | Delim(string)
     | Function(with_loc(string), with_loc(list(with_loc(t))))
     | Pseudoclass(with_loc(string))
+    | PseudoclassFunction(with_loc(string), with_loc(list(with_loc(t))))
     | Pseudoelement(with_loc(string))
     | Hash(string)
     | Number(string)
     | Unicode_range(string)
     | Float_dimension((string, string, dimension))
     | Dimension((string, string))
-    | Variable(list(string))
-    | Ampersand
-
+    | Variable(list(string));
 } = Component_value
 and Brace_block: {
   type t =
@@ -53,7 +54,6 @@ and Declaration: {
 and Declaration_list: {
   type kind =
     | Declaration(Declaration.t)
-    | Unsafe(Declaration.t)
     | At_rule(At_rule.t)
     | Style_rule(Style_rule.t);
 
@@ -61,7 +61,7 @@ and Declaration_list: {
 } = Declaration_list
 and Style_rule: {
   type t = {
-    prelude: with_loc(list(with_loc(Component_value.t))),
+    prelude: with_loc(Selector.t),
     block: Declaration_list.t,
     loc: Location.t,
   };
@@ -71,4 +71,54 @@ and Rule: {
     | Style_rule(Style_rule.t)
     | At_rule(At_rule.t);
 } = Rule
-and Stylesheet: {type t = with_loc(list(Rule.t));} = Stylesheet;
+and Stylesheet: {
+  type t = with_loc(list(Rule.t));
+} = Stylesheet
+and Selector: {
+  type t =
+    | SimpleSelector(list(simple_selector))
+    | ComplexSelector(list(complex_selector))
+    | CompoundSelector(list(compound_selector))
+  and complex_selector =
+    | Selector(compound_selector)
+    | Combinator({
+        left: compound_selector,
+        right: list((option(string), compound_selector)),
+      })
+  and compound_selector = {
+    type_selector: option(simple_selector),
+    subclass_selectors: list(subclass_selector),
+    pseudo_selectors: list(pseudo_selector),
+  }
+  and simple_selector =
+    | Universal
+    | Ampersand
+    | Type(string)
+    | Subclass(subclass_selector)
+    | Variable(list(string))
+    | Percentage(string)
+  and subclass_selector =
+    | Id(string)
+    | Class(string)
+    | Attribute(attribute_selector)
+    | Pseudo_class(pseudo_selector)
+  and attribute_selector =
+    | Attr_value(string)
+    | To_equal({
+        name: string,
+        kind: string,
+        value: attr_value,
+      })
+  and attr_value =
+    | Attr_ident(string)
+    | Attr_string(string)
+  and pseudo_selector =
+    | Pseudoelement(string)
+    | Pseudoclass(pseudoclass_kind)
+  and pseudoclass_kind =
+    | Ident(string)
+    | Function({
+        name: string,
+        payload: with_loc(t),
+      });
+} = Selector;

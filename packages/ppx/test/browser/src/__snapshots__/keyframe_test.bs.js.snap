@@ -1,22 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Keyframes should render into a animation-name 1`] = `
-@keyframes animation-0 {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-
 .emotion-0 {
   background-color: #000000;
   height: 100vh;
   width: 100vw;
-  -webkit-animation-name: animation-0;
-  animation-name: animation-0;
+  -webkit-animation-name: fade;
+  animation-name: fade;
 }
 
 <div>

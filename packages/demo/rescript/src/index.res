@@ -12,9 +12,17 @@ module App2 = {
   let make = (~children) => <div> children </div>
 }
 
+let cosas = "external-value"
+
 module Link = %styled.a(`
-  font-size: 36px;
-  margin-top: 16px;
+  & $(cosas) {
+    font-size: 36px;
+    margin-top: 16px;
+  }
+
+  &:hover {
+    font-size: 44px;
+  }
 `)
 
 module Line = %styled.span("display: inline;")

@@ -5,6 +5,7 @@
  (libraries
   styled-ppx-css-parser
   reason-css-parser.lib
+  string-interpolation.lib
   ppxlib
   str
  )
