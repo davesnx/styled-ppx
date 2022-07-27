@@ -25,9 +25,9 @@ export default {
   font: false,
   floatTOC: true,
   customSearch: () => null,
-  /* logo: () => (
+  logo: () => (
     <span className="font-sans hidden md:inline font-semibold">styled-ppx</span>
-  ), */
+  ),
   head: (
     <>
       {/* Favicons, meta */}
@@ -67,5 +67,5 @@ export default {
     </>
   ),
   feedbackLabels: "feedback",
-  footerText: `MIT ${new Date().getFullYear()} © David Sancho`,
+  /* footerText: `MIT ${new Date().getFullYear()} © David Sancho`, */
 };

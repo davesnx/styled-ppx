@@ -1,0 +1,45 @@
+diff --git a/node_modules/nextra/dist/index.js b/node_modules/nextra/dist/index.js
+index 79fbab7..147420d 100644
+--- a/node_modules/nextra/dist/index.js
++++ b/node_modules/nextra/dist/index.js
+@@ -200,18 +200,13 @@ var nextra = (...args) => function withNextra(nextConfig = {}) {
+     themeConfig: args[1]
+   } : args[0];
+   const nextraPlugin = new NextraPlugin(nextraConfig);
+-  const { i18n, pageExtensions = DEFAULT_EXTENSIONS } = nextConfig;
+-  if (i18n == null ? void 0 : i18n.locales) {
+-    console.log("[nextra] You have Next.js i18n enabled, read here https://nextjs.org/docs/advanced-features/i18n-routing for the docs.");
+-  } else if (!(i18n == null ? void 0 : i18n.defaultLocale)) {
+-    nextConfig.i18n = {
+-      ...i18n,
+-      locales: [DEFAULT_LOCALE],
+-      defaultLocale: DEFAULT_LOCALE
+-    };
+-  }
++  const { pageExtensions = DEFAULT_EXTENSIONS } = nextConfig;
+   return {
+     ...nextConfig,
++    i18n: {
++      locales: [DEFAULT_LOCALE],
++      defaultLocale: DEFAULT_LOCALE
++    },
+     pageExtensions: [...pageExtensions, ...MARKDOWN_EXTENSIONS],
+     webpack(config, options) {
+       var _a, _b;
+@@ -225,8 +220,8 @@ var nextra = (...args) => function withNextra(nextConfig = {}) {
+             loader: "nextra/loader",
+             options: {
+               ...nextraConfig,
+-              locales: (_a = nextConfig.i18n) == null ? void 0 : _a.locales,
+-              defaultLocale: (_b = nextConfig.i18n) == null ? void 0 : _b.defaultLocale,
++              locales: [DEFAULT_LOCALE],
++              defaultLocale: DEFAULT_LOCALE,
+               pageMapCache
+             }
+           }
+@@ -239,4 +234,5 @@ var nextra = (...args) => function withNextra(nextConfig = {}) {
+     }
+   };
+ };
++
+ module.exports = nextra;
