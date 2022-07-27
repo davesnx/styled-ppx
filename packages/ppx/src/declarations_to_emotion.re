@@ -23,8 +23,13 @@ type transform('ast, 'value) = {
 };
 
 let emit = (property, value_of_ast, value_to_expr) => {
+  let add_type = (expr) => {
+    let typ = Helper.Typ.constr(~loc=Location.none, {txt: Ldot(Lident("CssJs"), "rule"), loc: Location.none}, []);
+    Helper.Exp.constraint_(~loc=Location.none, expr, typ);
+  }
+
   let ast_of_string = Parser.parse(property);
-  let ast_to_expr = ast => value_of_ast(ast) |> value_to_expr;
+  let ast_to_expr = ast => value_of_ast(ast) |> value_to_expr |> List.map(add_type);
   let string_to_expr = string =>
     ast_of_string(string) |> Result.map(ast_to_expr);
 
@@ -32,8 +37,12 @@ let emit = (property, value_of_ast, value_to_expr) => {
 };
 
 let emit_shorthand = (parser, mapper, value_to_expr) => {
+  let add_type = (expr) => {
+    let typ = Helper.Typ.constr(~loc=Location.none, {txt: Ldot(Lident("CssJs"), "rule"), loc: Location.none}, []);
+    Helper.Exp.constraint_(~loc=Location.none, expr, typ);
+  }
   let ast_of_string = Parser.parse(parser);
-  let ast_to_expr = ast => ast |> List.map(mapper) |> value_to_expr;
+  let ast_to_expr = ast => ast |> List.map(mapper) |> value_to_expr |> List.map(add_type);
   let string_to_expr = string =>
     ast_of_string(string) |> Result.map(ast_to_expr);
 
@@ -65,7 +74,7 @@ let render_css_global_values = (name, value) => {
     };
 
   /* bs-css doesn't have those */
-  Ok([[%expr CssJs.unsafe([%e render_string(name)], [%e value])]]);
+  Ok([[%expr (CssJs.unsafe([%e render_string(name)], [%e value]) : CssJs.rule)]]);
 };
 
 let variants_to_expression =
@@ -280,7 +289,7 @@ let unsupportedValue = (parser, call: expression) =>
   transform_with_variable(
     parser,
     _ => raise(Unsupported_feature),
-    arg => [[%expr [%e call]([%e arg])]],
+    arg => [[%expr ([%e call]([%e arg]) : CssJs.rule)]],
   );
 
 let unsupportedProperty = (~call=?, parser) =>
@@ -288,7 +297,7 @@ let unsupportedProperty = (~call=?, parser) =>
     parser,
     _ => raise(Unsupported_feature),
     call
-    |> Option.map((call, arg) => [[%expr [%e call]([%e arg])]])
+    |> Option.map((call, arg) => [[%expr ([%e call]([%e arg]) : CssJs.rule)]])
     |> Option.value(~default=_ => raise(Unsupported_feature)),
   );
 

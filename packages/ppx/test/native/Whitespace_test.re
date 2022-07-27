@@ -85,13 +85,13 @@ let css_tests = [
     html, body, #root, .class {
       margin: 0;
     } |}]],
-    [%expr ignore(CssJs.global(. {js|html, body, #root, .class|js}, [| CssJs.margin(`zero) |]))],
+    [%expr ignore((CssJs.global(. {js|html, body, #root, .class|js}, [| (CssJs.margin(`zero) : CssJs.rule) |]) : unit))],
   ),
   (
     "html, body, #root, .class",
     [%expr [%styled.global {|
     html,             body, #root, .class   {     margin: 0    } |}]],
-    [%expr ignore(CssJs.global(. {js|html, body, #root, .class|js}, [| CssJs.margin(`zero) |]))],
+    [%expr ignore((CssJs.global(. {js|html, body, #root, .class|js}, [| (CssJs.margin(`zero) : CssJs.rule) |]) : unit))],
   ),
 ];
 

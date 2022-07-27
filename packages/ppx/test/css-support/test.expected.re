@@ -1,65 +1,71 @@
-CssJs.backgroundRepeat(`space);
-CssJs.backgroundRepeat(`round);
-CssJs.backgroundRepeat(`hv((`repeat, `repeat)));
-CssJs.backgroundRepeat(`hv((`space, `repeat)));
-CssJs.backgroundRepeat(`hv((`round, `repeat)));
-CssJs.backgroundRepeat(`hv((`noRepeat, `repeat)));
-CssJs.backgroundRepeat(`hv((`repeat, `space)));
-CssJs.backgroundRepeat(`hv((`space, `space)));
-CssJs.backgroundRepeat(`hv((`round, `space)));
-CssJs.backgroundRepeat(`hv((`noRepeat, `space)));
-CssJs.backgroundRepeat(`hv((`repeat, `round)));
-CssJs.backgroundRepeat(`hv((`space, `round)));
-CssJs.backgroundRepeat(`hv((`round, `round)));
-CssJs.backgroundRepeat(`hv((`noRepeat, `round)));
-CssJs.backgroundRepeat(`hv((`repeat, `noRepeat)));
-CssJs.backgroundRepeat(`hv((`space, `noRepeat)));
-CssJs.backgroundRepeat(`hv((`round, `noRepeat)));
-CssJs.backgroundRepeat(`hv((`noRepeat, `noRepeat)));
-CssJs.backgroundAttachment(`local);
-CssJs.backgroundPosition(
-  `hv((`hv((`center, `pxFloat(20.))), `hv((`center, `pxFloat(10.))))),
+(CssJs.backgroundRepeat(`space): CssJs.rule);
+(CssJs.backgroundRepeat(`round): CssJs.rule);
+(CssJs.backgroundRepeat(`hv((`repeat, `repeat))): CssJs.rule);
+(CssJs.backgroundRepeat(`hv((`space, `repeat))): CssJs.rule);
+(CssJs.backgroundRepeat(`hv((`round, `repeat))): CssJs.rule);
+(CssJs.backgroundRepeat(`hv((`noRepeat, `repeat))): CssJs.rule);
+(CssJs.backgroundRepeat(`hv((`repeat, `space))): CssJs.rule);
+(CssJs.backgroundRepeat(`hv((`space, `space))): CssJs.rule);
+(CssJs.backgroundRepeat(`hv((`round, `space))): CssJs.rule);
+(CssJs.backgroundRepeat(`hv((`noRepeat, `space))): CssJs.rule);
+(CssJs.backgroundRepeat(`hv((`repeat, `round))): CssJs.rule);
+(CssJs.backgroundRepeat(`hv((`space, `round))): CssJs.rule);
+(CssJs.backgroundRepeat(`hv((`round, `round))): CssJs.rule);
+(CssJs.backgroundRepeat(`hv((`noRepeat, `round))): CssJs.rule);
+(CssJs.backgroundRepeat(`hv((`repeat, `noRepeat))): CssJs.rule);
+(CssJs.backgroundRepeat(`hv((`space, `noRepeat))): CssJs.rule);
+(CssJs.backgroundRepeat(`hv((`round, `noRepeat))): CssJs.rule);
+(CssJs.backgroundRepeat(`hv((`noRepeat, `noRepeat))): CssJs.rule);
+(CssJs.backgroundAttachment(`local): CssJs.rule);
+(
+  CssJs.backgroundPosition(
+    `hv((`hv((`center, `pxFloat(20.))), `hv((`center, `pxFloat(10.))))),
+  ): CssJs.rule
 );
-CssJs.backgroundPosition(`hv((`center, `hv((`center, `pxFloat(10.))))));
-CssJs.backgroundPosition(`hv((`hv((`center, `pxFloat(10.))), `center)));
-CssJs.backgroundClip(`borderBox);
-CssJs.backgroundClip(`padding_box);
-CssJs.backgroundClip(`contentBox);
-CssJs.backgroundOrigin(`borderBox);
-CssJs.backgroundOrigin(`padding_box);
-CssJs.backgroundOrigin(`contentBox);
-CssJs.backgroundSize(`auto);
-CssJs.backgroundSize(`cover);
-CssJs.backgroundSize(`contain);
+(
+  CssJs.backgroundPosition(`hv((`center, `hv((`center, `pxFloat(10.)))))): CssJs.rule
+);
+(
+  CssJs.backgroundPosition(`hv((`hv((`center, `pxFloat(10.))), `center))): CssJs.rule
+);
+(CssJs.backgroundClip(`borderBox): CssJs.rule);
+(CssJs.backgroundClip(`padding_box): CssJs.rule);
+(CssJs.backgroundClip(`contentBox): CssJs.rule);
+(CssJs.backgroundOrigin(`borderBox): CssJs.rule);
+(CssJs.backgroundOrigin(`padding_box): CssJs.rule);
+(CssJs.backgroundOrigin(`contentBox): CssJs.rule);
+(CssJs.backgroundSize(`auto): CssJs.rule);
+(CssJs.backgroundSize(`cover): CssJs.rule);
+(CssJs.backgroundSize(`contain): CssJs.rule);
 CssJs.unsafe({js|backgroundSize|js}, {js| 10px|js});
 CssJs.unsafe({js|backgroundSize|js}, {js| 50%|js});
 CssJs.unsafe({js|backgroundSize|js}, {js| 10px auto|js});
 CssJs.unsafe({js|backgroundSize|js}, {js| auto 10%|js});
-CssJs.backgroundSize(`size((`em(50.), `percent(50.))));
+(CssJs.backgroundSize(`size((`em(50.), `percent(50.)))): CssJs.rule);
 CssJs.unsafe({js|background|js}, {js| top left / 50% 60%|js});
-CssJs.origin(`borderBox);
-CssJs.backgroundColor(CssJs.blue);
-CssJs.backgroundColor(CssJs.red);
-CssJs.backgroundRepeat(`fixed);
-CssJs.clip(`padding_box);
+(CssJs.origin(`borderBox): CssJs.rule);
+(CssJs.backgroundColor(CssJs.blue): CssJs.rule);
+(CssJs.backgroundColor(CssJs.red): CssJs.rule);
+(CssJs.backgroundRepeat(`fixed): CssJs.rule);
+(CssJs.clip(`padding_box): CssJs.rule);
 CssJs.unsafe(
   {js|background|js},
   {js| url(foo.png) bottom right / cover padding-box content-box|js},
 );
-CssJs.borderTopLeftRadius(`zero);
-CssJs.borderTopLeftRadius(`percent(50.));
+(CssJs.borderTopLeftRadius(`zero): CssJs.rule);
+(CssJs.borderTopLeftRadius(`percent(50.)): CssJs.rule);
 CssJs.unsafe({js|borderTopLeftRadius|js}, {js| 250px 100px|js});
-CssJs.borderTopRightRadius(`zero);
-CssJs.borderTopRightRadius(`percent(50.));
+(CssJs.borderTopRightRadius(`zero): CssJs.rule);
+(CssJs.borderTopRightRadius(`percent(50.)): CssJs.rule);
 CssJs.unsafe({js|borderTopRightRadius|js}, {js| 250px 100px|js});
-CssJs.borderBottomRightRadius(`zero);
-CssJs.borderBottomRightRadius(`percent(50.));
+(CssJs.borderBottomRightRadius(`zero): CssJs.rule);
+(CssJs.borderBottomRightRadius(`percent(50.)): CssJs.rule);
 CssJs.unsafe({js|borderBottomRightRadius|js}, {js| 250px 100px|js});
-CssJs.borderBottomLeftRadius(`zero);
-CssJs.borderBottomLeftRadius(`percent(50.));
+(CssJs.borderBottomLeftRadius(`zero): CssJs.rule);
+(CssJs.borderBottomLeftRadius(`percent(50.)): CssJs.rule);
 CssJs.unsafe({js|borderBottomLeftRadius|js}, {js| 250px 100px|js});
-CssJs.borderRadius(`pxFloat(10.));
-CssJs.borderRadius(`percent(50.));
+(CssJs.borderRadius(`pxFloat(10.)): CssJs.rule);
+(CssJs.borderRadius(`percent(50.)): CssJs.rule);
 CssJs.unsafe({js|borderImageSource|js}, {js| none|js});
 CssJs.unsafe({js|borderImageSource|js}, {js| url(foo.png)|js});
 CssJs.unsafe({js|borderImageSlice|js}, {js| 10|js});
@@ -159,42 +165,48 @@ CssJs.unsafe(
   {js|borderImage|js},
   {js| url(foo.png) fill 10 / 10% / 10px space|js},
 );
-CssJs.boxShadows([|
-  CssJs.Shadow.box(
-    ~x=`pxFloat(1.),
-    ~y=`pxFloat(2.),
-    ~blur=`pxFloat(3.),
-    ~spread=`pxFloat(4.),
-    CssJs.black,
-  ),
-|]);
-CssJs.boxShadows([|
-  CssJs.Shadow.box(
-    ~x=`pxFloat(1.),
-    ~y=`pxFloat(2.),
-    ~blur=`pxFloat(3.),
-    ~spread=`pxFloat(4.),
-    ~inset=true,
-    CssJs.black,
-  ),
-|]);
-CssJs.boxShadows([|
-  CssJs.Shadow.box(
-    ~x=`pxFloat(1.),
-    ~y=`pxFloat(2.),
-    ~blur=`pxFloat(3.),
-    ~spread=`pxFloat(4.),
-    ~inset=true,
-    CssJs.black,
-  ),
-  CssJs.Shadow.box(
-    ~x=`pxFloat(1.),
-    ~y=`pxFloat(2.),
-    ~blur=`pxFloat(3.),
-    ~spread=`pxFloat(4.),
-    CssJs.black,
-  ),
-|]);
+(
+  CssJs.boxShadows([|
+    CssJs.Shadow.box(
+      ~x=`pxFloat(1.),
+      ~y=`pxFloat(2.),
+      ~blur=`pxFloat(3.),
+      ~spread=`pxFloat(4.),
+      CssJs.black,
+    ),
+  |]): CssJs.rule
+);
+(
+  CssJs.boxShadows([|
+    CssJs.Shadow.box(
+      ~x=`pxFloat(1.),
+      ~y=`pxFloat(2.),
+      ~blur=`pxFloat(3.),
+      ~spread=`pxFloat(4.),
+      ~inset=true,
+      CssJs.black,
+    ),
+  |]): CssJs.rule
+);
+(
+  CssJs.boxShadows([|
+    CssJs.Shadow.box(
+      ~x=`pxFloat(1.),
+      ~y=`pxFloat(2.),
+      ~blur=`pxFloat(3.),
+      ~spread=`pxFloat(4.),
+      ~inset=true,
+      CssJs.black,
+    ),
+    CssJs.Shadow.box(
+      ~x=`pxFloat(1.),
+      ~y=`pxFloat(2.),
+      ~blur=`pxFloat(3.),
+      ~spread=`pxFloat(4.),
+      CssJs.black,
+    ),
+  |]): CssJs.rule
+);
 CssJs.unsafe({js|backgroundPositionX|js}, {js| right|js});
 CssJs.unsafe({js|backgroundPositionX|js}, {js| center|js});
 CssJs.unsafe({js|backgroundPositionX|js}, {js| 50%|js});
@@ -232,8 +244,8 @@ CssJs.unsafe({js|backgroundPositionY|js}, {js| top 20px|js});
 CssJs.unsafe({js|backgroundPositionY|js}, {js| bottom -50px|js});
 CssJs.unsafe({js|backgroundPositionY|js}, {js| top -50px|js});
 CssJs.unsafe({js|backgroundPositionY|js}, {js| bottom 20px|js});
-CssJs.boxSizing(`borderBox);
-CssJs.boxSizing(`contentBox);
+(CssJs.boxSizing(`borderBox): CssJs.rule);
+(CssJs.boxSizing(`contentBox): CssJs.rule);
 CssJs.unsafe({js|outlineStyle|js}, {js| auto|js});
 CssJs.unsafe({js|outlineOffset|js}, {js| -5px|js});
 CssJs.unsafe({js|outlineOffset|js}, {js| 0|js});
@@ -351,39 +363,47 @@ CssJs.unsafe(
   {js|animation|js},
   {js| foo 1s 2s infinite linear alternate both|js},
 );
-CssJs.transform(`none);
-CssJs.transform(CssJs.translate(`pxFloat(5.), 0));
-CssJs.transform(CssJs.translate(`pxFloat(5.), `pxFloat(10.)));
-CssJs.transform(CssJs.translateY(`pxFloat(5.)));
-CssJs.transform(CssJs.translateX(`pxFloat(5.)));
-CssJs.transform(CssJs.translateY(`percent(5.)));
-CssJs.transform(CssJs.translateX(`percent(5.)));
-CssJs.transform(CssJs.scale(2., 2.));
-CssJs.transform(CssJs.scale(2., -1.));
-CssJs.transform(CssJs.scaleX(2.));
-CssJs.transform(CssJs.scaleY(2.5));
-CssJs.transform(CssJs.rotate(`deg(45.)));
-CssJs.transform(CssJs.skew(`deg(45.), 0));
-CssJs.transform(CssJs.skew(`deg(45.), `deg(15.)));
-CssJs.transform(CssJs.skewX(`deg(45.)));
-CssJs.transform(CssJs.skewY(`deg(45.)));
-CssJs.transforms([|
-  CssJs.translate(`pxFloat(50.), `pxFloat(-24.)),
-  CssJs.skew(`deg(0.), `deg(22.5)),
-|]);
-CssJs.transform(CssJs.translate3d(`zero, `zero, `pxFloat(5.)));
-CssJs.transform(CssJs.translateZ(`pxFloat(5.)));
-CssJs.transform(CssJs.scale3d(1., 0., -1.));
-CssJs.transform(CssJs.scaleZ(1.5));
-CssJs.transform(CssJs.rotate3d(1., 1., 1., `deg(45.)));
-CssJs.transform(CssJs.rotateX(`deg(-45.)));
-CssJs.transform(CssJs.rotateY(`deg(-45.)));
-CssJs.transform(CssJs.rotateZ(`deg(-45.)));
-CssJs.transforms([|
-  CssJs.translate3d(`pxFloat(50.), `pxFloat(-24.), `pxFloat(5.)),
-  CssJs.rotate3d(1., 2., 3., `deg(180.)),
-  CssJs.scale3d(-1., 0., 0.5),
-|]);
+(CssJs.transform(`none): CssJs.rule);
+(CssJs.transform(CssJs.translate(`pxFloat(5.), 0)): CssJs.rule);
+(
+  CssJs.transform(CssJs.translate(`pxFloat(5.), `pxFloat(10.))): CssJs.rule
+);
+(CssJs.transform(CssJs.translateY(`pxFloat(5.))): CssJs.rule);
+(CssJs.transform(CssJs.translateX(`pxFloat(5.))): CssJs.rule);
+(CssJs.transform(CssJs.translateY(`percent(5.))): CssJs.rule);
+(CssJs.transform(CssJs.translateX(`percent(5.))): CssJs.rule);
+(CssJs.transform(CssJs.scale(2., 2.)): CssJs.rule);
+(CssJs.transform(CssJs.scale(2., -1.)): CssJs.rule);
+(CssJs.transform(CssJs.scaleX(2.)): CssJs.rule);
+(CssJs.transform(CssJs.scaleY(2.5)): CssJs.rule);
+(CssJs.transform(CssJs.rotate(`deg(45.))): CssJs.rule);
+(CssJs.transform(CssJs.skew(`deg(45.), 0)): CssJs.rule);
+(CssJs.transform(CssJs.skew(`deg(45.), `deg(15.))): CssJs.rule);
+(CssJs.transform(CssJs.skewX(`deg(45.))): CssJs.rule);
+(CssJs.transform(CssJs.skewY(`deg(45.))): CssJs.rule);
+(
+  CssJs.transforms([|
+    CssJs.translate(`pxFloat(50.), `pxFloat(-24.)),
+    CssJs.skew(`deg(0.), `deg(22.5)),
+  |]): CssJs.rule
+);
+(
+  CssJs.transform(CssJs.translate3d(`zero, `zero, `pxFloat(5.))): CssJs.rule
+);
+(CssJs.transform(CssJs.translateZ(`pxFloat(5.))): CssJs.rule);
+(CssJs.transform(CssJs.scale3d(1., 0., -1.)): CssJs.rule);
+(CssJs.transform(CssJs.scaleZ(1.5)): CssJs.rule);
+(CssJs.transform(CssJs.rotate3d(1., 1., 1., `deg(45.))): CssJs.rule);
+(CssJs.transform(CssJs.rotateX(`deg(-45.))): CssJs.rule);
+(CssJs.transform(CssJs.rotateY(`deg(-45.))): CssJs.rule);
+(CssJs.transform(CssJs.rotateZ(`deg(-45.))): CssJs.rule);
+(
+  CssJs.transforms([|
+    CssJs.translate3d(`pxFloat(50.), `pxFloat(-24.), `pxFloat(5.)),
+    CssJs.rotate3d(1., 2., 3., `deg(180.)),
+    CssJs.scale3d(-1., 0., 0.5),
+  |]): CssJs.rule
+);
 CssJs.unsafe({js|transform|js}, {js| perspective(600px)|js});
 CssJs.unsafe({js|transformOrigin|js}, {js| 10px|js});
 CssJs.unsafe({js|transformOrigin|js}, {js| top|js});
@@ -445,31 +465,31 @@ CssJs.unsafe({js|lineBreak|js}, {js| loose|js});
 CssJs.unsafe({js|lineBreak|js}, {js| normal|js});
 CssJs.unsafe({js|lineBreak|js}, {js| strict|js});
 CssJs.unsafe({js|lineBreak|js}, {js| anywhere|js});
-CssJs.wordBreak(`normal);
-CssJs.wordBreak(`keepAll);
-CssJs.wordBreak(`breakAll);
-CssJs.whiteSpace(`breakSpaces);
+(CssJs.wordBreak(`normal): CssJs.rule);
+(CssJs.wordBreak(`keepAll): CssJs.rule);
+(CssJs.wordBreak(`breakAll): CssJs.rule);
+(CssJs.whiteSpace(`breakSpaces): CssJs.rule);
 CssJs.unsafe({js|hyphens|js}, {js| auto|js});
 CssJs.unsafe({js|hyphens|js}, {js| manual|js});
 CssJs.unsafe({js|hyphens|js}, {js| none|js});
-CssJs.overflowWrap(`normal);
+(CssJs.overflowWrap(`normal): CssJs.rule);
 CssJs.unsafe({js|overflowWrap|js}, {js| break-word|js});
-CssJs.overflowWrap(`anywhere);
-CssJs.wordWrap(`normal);
+(CssJs.overflowWrap(`anywhere): CssJs.rule);
+(CssJs.wordWrap(`normal): CssJs.rule);
 CssJs.unsafe({js|wordWrap|js}, {js| break-word|js});
-CssJs.wordWrap(`anywhere);
-CssJs.textAlign(`start);
-CssJs.textAlign(`end_);
-CssJs.textAlign(`left);
-CssJs.textAlign(`right);
-CssJs.textAlign(`center);
-CssJs.textAlign(`justify);
+(CssJs.wordWrap(`anywhere): CssJs.rule);
+(CssJs.textAlign(`start): CssJs.rule);
+(CssJs.textAlign(`end_): CssJs.rule);
+(CssJs.textAlign(`left): CssJs.rule);
+(CssJs.textAlign(`right): CssJs.rule);
+(CssJs.textAlign(`center): CssJs.rule);
+(CssJs.textAlign(`justify): CssJs.rule);
 CssJs.unsafe({js|textAlign|js}, {js| match-parent|js});
 CssJs.unsafe({js|textJustify|js}, {js| auto|js});
 CssJs.unsafe({js|textJustify|js}, {js| none|js});
 CssJs.unsafe({js|textJustify|js}, {js| inter-word|js});
 CssJs.unsafe({js|textJustify|js}, {js| inter-character|js});
-CssJs.wordSpacing(`percent(50.));
+(CssJs.wordSpacing(`percent(50.)): CssJs.rule);
 CssJs.unsafe({js|textIndent|js}, {js| 1em hanging|js});
 CssJs.unsafe({js|textIndent|js}, {js| 1em each-line|js});
 CssJs.unsafe({js|textIndent|js}, {js| 1em hanging each-line|js});
@@ -488,7 +508,7 @@ CssJs.unsafe({js|textDecorationLine|js}, {js| underline|js});
 CssJs.unsafe({js|textDecorationLine|js}, {js| overline|js});
 CssJs.unsafe({js|textDecorationLine|js}, {js| line-through|js});
 CssJs.unsafe({js|textDecorationLine|js}, {js| underline overline|js});
-CssJs.textDecorationColor(CssJs.white);
+(CssJs.textDecorationColor(CssJs.white): CssJs.rule);
 CssJs.unsafe({js|textDecorationStyle|js}, {js| solid|js});
 CssJs.unsafe({js|textDecorationStyle|js}, {js| double|js});
 CssJs.unsafe({js|textDecorationStyle|js}, {js| dotted|js});
@@ -645,7 +665,7 @@ CssJs.unsafe({js|fontFeatureSettings|js}, {js| 'c2sc'|js});
 CssJs.unsafe({js|fontFeatureSettings|js}, {js| 'smcp' on|js});
 CssJs.unsafe({js|fontFeatureSettings|js}, {js| 'liga' off|js});
 CssJs.unsafe({js|fontFeatureSettings|js}, {js| 'smcp', 'swsh' 2|js});
-CssJs.fontSize(`xxx_large);
+(CssJs.fontSize(`xxx_large): CssJs.rule);
 CssJs.unsafe({js|fontVariant|js}, {js| none|js});
 CssJs.unsafe({js|fontVariant|js}, {js| normal|js});
 CssJs.unsafe({js|fontVariant|js}, {js| all-petite-caps|js});
@@ -696,34 +716,34 @@ CssJs.unsafe({js|textCombineUpright|js}, {js| all|js});
 CssJs.unsafe({js|writingMode|js}, {js| sideways-rl|js});
 CssJs.unsafe({js|writingMode|js}, {js| sideways-lr|js});
 CssJs.unsafe({js|textCombineUpright|js}, {js| digits 2|js});
-CssJs.color(`rgba((0, 0, 0, `num(0.5))));
-CssJs.color(`hex({js|F06|js}));
-CssJs.color(`hex({js|FF0066|js}));
+(CssJs.color(`rgba((0, 0, 0, `num(0.5)))): CssJs.rule);
+(CssJs.color(`hex({js|F06|js})): CssJs.rule);
+(CssJs.color(`hex({js|FF0066|js})): CssJs.rule);
 CssJs.unsafe({js|color|js}, {js| hsl(0,0%,0%)|js});
 CssJs.unsafe({js|color|js}, {js| hsl(0,0%,0%,.5)|js});
-CssJs.color(`transparent);
-CssJs.color(`currentColor);
-CssJs.backgroundColor(`rgba((0, 0, 0, `num(0.5))));
-CssJs.backgroundColor(`hex({js|F06|js}));
-CssJs.backgroundColor(`hex({js|FF0066|js}));
+(CssJs.color(`transparent): CssJs.rule);
+(CssJs.color(`currentColor): CssJs.rule);
+(CssJs.backgroundColor(`rgba((0, 0, 0, `num(0.5)))): CssJs.rule);
+(CssJs.backgroundColor(`hex({js|F06|js})): CssJs.rule);
+(CssJs.backgroundColor(`hex({js|FF0066|js})): CssJs.rule);
 CssJs.unsafe({js|backgroundColor|js}, {js| hsl(0,0%,0%)|js});
 CssJs.unsafe({js|backgroundColor|js}, {js| hsl(0,0%,0%,.5)|js});
-CssJs.backgroundColor(`transparent);
-CssJs.backgroundColor(`currentColor);
-CssJs.borderColor(`rgba((0, 0, 0, `num(0.5))));
-CssJs.borderColor(`hex({js|F06|js}));
-CssJs.borderColor(`hex({js|FF0066|js}));
+(CssJs.backgroundColor(`transparent): CssJs.rule);
+(CssJs.backgroundColor(`currentColor): CssJs.rule);
+(CssJs.borderColor(`rgba((0, 0, 0, `num(0.5)))): CssJs.rule);
+(CssJs.borderColor(`hex({js|F06|js})): CssJs.rule);
+(CssJs.borderColor(`hex({js|FF0066|js})): CssJs.rule);
 CssJs.unsafe({js|borderColor|js}, {js| hsl(0,0%,0%)|js});
 CssJs.unsafe({js|borderColor|js}, {js| hsl(0,0%,0%,.5)|js});
-CssJs.borderColor(`transparent);
-CssJs.borderColor(`currentColor);
-CssJs.textDecorationColor(`rgba((0, 0, 0, `num(0.5))));
-CssJs.textDecorationColor(`hex({js|F06|js}));
-CssJs.textDecorationColor(`hex({js|FF0066|js}));
+(CssJs.borderColor(`transparent): CssJs.rule);
+(CssJs.borderColor(`currentColor): CssJs.rule);
+(CssJs.textDecorationColor(`rgba((0, 0, 0, `num(0.5)))): CssJs.rule);
+(CssJs.textDecorationColor(`hex({js|F06|js})): CssJs.rule);
+(CssJs.textDecorationColor(`hex({js|FF0066|js})): CssJs.rule);
 CssJs.unsafe({js|textDecorationColor|js}, {js| hsl(0,0%,0%)|js});
 CssJs.unsafe({js|textDecorationColor|js}, {js| hsl(0,0%,0%,.5)|js});
-CssJs.textDecorationColor(`transparent);
-CssJs.textDecorationColor(`currentColor);
+(CssJs.textDecorationColor(`transparent): CssJs.rule);
+(CssJs.textDecorationColor(`currentColor): CssJs.rule);
 CssJs.unsafe({js|columnRuleColor|js}, {js| rgba(0,0,0,.5)|js});
 CssJs.unsafe({js|columnRuleColor|js}, {js| #F06|js});
 CssJs.unsafe({js|columnRuleColor|js}, {js| #FF0066|js});
@@ -731,76 +751,90 @@ CssJs.unsafe({js|columnRuleColor|js}, {js| hsl(0,0%,0%)|js});
 CssJs.unsafe({js|columnRuleColor|js}, {js| hsl(0,0%,0%,.5)|js});
 CssJs.unsafe({js|columnRuleColor|js}, {js| transparent|js});
 CssJs.unsafe({js|columnRuleColor|js}, {js| currentColor|js});
-CssJs.color(`rgb((0, 51, 178)));
-CssJs.color(`rgb((0, 64, 185)));
-CssJs.color(`hsl((`deg(0.), `percent(0.), `percent(0.))));
-CssJs.color(`rgba((0, 51, 178, `percent(0.5))));
-CssJs.color(`rgba((0, 51, 178, `num(0.5))));
-CssJs.color(`rgba((0, 64, 185, `percent(0.5))));
-CssJs.color(`rgba((0, 64, 185, `num(0.5))));
+(CssJs.color(`rgb((0, 51, 178))): CssJs.rule);
+(CssJs.color(`rgb((0, 64, 185))): CssJs.rule);
+(CssJs.color(`hsl((`deg(0.), `percent(0.), `percent(0.)))): CssJs.rule);
+(CssJs.color(`rgba((0, 51, 178, `percent(0.5)))): CssJs.rule);
+(CssJs.color(`rgba((0, 51, 178, `num(0.5)))): CssJs.rule);
+(CssJs.color(`rgba((0, 64, 185, `percent(0.5)))): CssJs.rule);
+(CssJs.color(`rgba((0, 64, 185, `num(0.5)))): CssJs.rule);
 CssJs.unsafe({js|color|js}, {js| hsla(0 0% 0% /.5)|js});
-CssJs.color(`rgba((0, 51, 178, `percent(0.5))));
-CssJs.color(`rgba((0, 51, 178, `num(0.5))));
-CssJs.color(`rgba((0, 64, 185, `percent(0.5))));
-CssJs.color(`rgba((0, 64, 185, `num(0.5))));
-CssJs.color(`hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))));
-CssJs.color(`hex({js|000F|js}));
-CssJs.color(`hex({js|000000FF|js}));
-CssJs.color(CssJs.rebeccapurple);
-CssJs.backgroundColor(`rgb((0, 51, 178)));
-CssJs.backgroundColor(`rgb((0, 64, 185)));
-CssJs.backgroundColor(`hsl((`deg(0.), `percent(0.), `percent(0.))));
-CssJs.backgroundColor(`rgba((0, 51, 178, `percent(0.5))));
-CssJs.backgroundColor(`rgba((0, 51, 178, `num(0.5))));
-CssJs.backgroundColor(`rgba((0, 64, 185, `percent(0.5))));
-CssJs.backgroundColor(`rgba((0, 64, 185, `num(0.5))));
+(CssJs.color(`rgba((0, 51, 178, `percent(0.5)))): CssJs.rule);
+(CssJs.color(`rgba((0, 51, 178, `num(0.5)))): CssJs.rule);
+(CssJs.color(`rgba((0, 64, 185, `percent(0.5)))): CssJs.rule);
+(CssJs.color(`rgba((0, 64, 185, `num(0.5)))): CssJs.rule);
+(
+  CssJs.color(`hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5)))): CssJs.rule
+);
+(CssJs.color(`hex({js|000F|js})): CssJs.rule);
+(CssJs.color(`hex({js|000000FF|js})): CssJs.rule);
+(CssJs.color(CssJs.rebeccapurple): CssJs.rule);
+(CssJs.backgroundColor(`rgb((0, 51, 178))): CssJs.rule);
+(CssJs.backgroundColor(`rgb((0, 64, 185))): CssJs.rule);
+(
+  CssJs.backgroundColor(`hsl((`deg(0.), `percent(0.), `percent(0.)))): CssJs.rule
+);
+(CssJs.backgroundColor(`rgba((0, 51, 178, `percent(0.5)))): CssJs.rule);
+(CssJs.backgroundColor(`rgba((0, 51, 178, `num(0.5)))): CssJs.rule);
+(CssJs.backgroundColor(`rgba((0, 64, 185, `percent(0.5)))): CssJs.rule);
+(CssJs.backgroundColor(`rgba((0, 64, 185, `num(0.5)))): CssJs.rule);
 CssJs.unsafe({js|backgroundColor|js}, {js| hsla(0 0% 0% /.5)|js});
-CssJs.backgroundColor(`rgba((0, 51, 178, `percent(0.5))));
-CssJs.backgroundColor(`rgba((0, 51, 178, `num(0.5))));
-CssJs.backgroundColor(`rgba((0, 64, 185, `percent(0.5))));
-CssJs.backgroundColor(`rgba((0, 64, 185, `num(0.5))));
-CssJs.backgroundColor(
-  `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
+(CssJs.backgroundColor(`rgba((0, 51, 178, `percent(0.5)))): CssJs.rule);
+(CssJs.backgroundColor(`rgba((0, 51, 178, `num(0.5)))): CssJs.rule);
+(CssJs.backgroundColor(`rgba((0, 64, 185, `percent(0.5)))): CssJs.rule);
+(CssJs.backgroundColor(`rgba((0, 64, 185, `num(0.5)))): CssJs.rule);
+(
+  CssJs.backgroundColor(
+    `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
+  ): CssJs.rule
 );
-CssJs.backgroundColor(`hex({js|000F|js}));
-CssJs.backgroundColor(`hex({js|000000FF|js}));
-CssJs.backgroundColor(CssJs.rebeccapurple);
-CssJs.borderColor(`rgb((0, 51, 178)));
-CssJs.borderColor(`rgb((0, 64, 185)));
-CssJs.borderColor(`hsl((`deg(0.), `percent(0.), `percent(0.))));
-CssJs.borderColor(`rgba((0, 51, 178, `percent(0.5))));
-CssJs.borderColor(`rgba((0, 51, 178, `num(0.5))));
-CssJs.borderColor(`rgba((0, 64, 185, `percent(0.5))));
-CssJs.borderColor(`rgba((0, 64, 185, `num(0.5))));
+(CssJs.backgroundColor(`hex({js|000F|js})): CssJs.rule);
+(CssJs.backgroundColor(`hex({js|000000FF|js})): CssJs.rule);
+(CssJs.backgroundColor(CssJs.rebeccapurple): CssJs.rule);
+(CssJs.borderColor(`rgb((0, 51, 178))): CssJs.rule);
+(CssJs.borderColor(`rgb((0, 64, 185))): CssJs.rule);
+(
+  CssJs.borderColor(`hsl((`deg(0.), `percent(0.), `percent(0.)))): CssJs.rule
+);
+(CssJs.borderColor(`rgba((0, 51, 178, `percent(0.5)))): CssJs.rule);
+(CssJs.borderColor(`rgba((0, 51, 178, `num(0.5)))): CssJs.rule);
+(CssJs.borderColor(`rgba((0, 64, 185, `percent(0.5)))): CssJs.rule);
+(CssJs.borderColor(`rgba((0, 64, 185, `num(0.5)))): CssJs.rule);
 CssJs.unsafe({js|borderColor|js}, {js| hsla(0 0% 0% /.5)|js});
-CssJs.borderColor(`rgba((0, 51, 178, `percent(0.5))));
-CssJs.borderColor(`rgba((0, 51, 178, `num(0.5))));
-CssJs.borderColor(`rgba((0, 64, 185, `percent(0.5))));
-CssJs.borderColor(`rgba((0, 64, 185, `num(0.5))));
-CssJs.borderColor(
-  `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
+(CssJs.borderColor(`rgba((0, 51, 178, `percent(0.5)))): CssJs.rule);
+(CssJs.borderColor(`rgba((0, 51, 178, `num(0.5)))): CssJs.rule);
+(CssJs.borderColor(`rgba((0, 64, 185, `percent(0.5)))): CssJs.rule);
+(CssJs.borderColor(`rgba((0, 64, 185, `num(0.5)))): CssJs.rule);
+(
+  CssJs.borderColor(
+    `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
+  ): CssJs.rule
 );
-CssJs.borderColor(`hex({js|000F|js}));
-CssJs.borderColor(`hex({js|000000FF|js}));
-CssJs.borderColor(CssJs.rebeccapurple);
-CssJs.textDecorationColor(`rgb((0, 51, 178)));
-CssJs.textDecorationColor(`rgb((0, 64, 185)));
-CssJs.textDecorationColor(`hsl((`deg(0.), `percent(0.), `percent(0.))));
-CssJs.textDecorationColor(`rgba((0, 51, 178, `percent(0.5))));
-CssJs.textDecorationColor(`rgba((0, 51, 178, `num(0.5))));
-CssJs.textDecorationColor(`rgba((0, 64, 185, `percent(0.5))));
-CssJs.textDecorationColor(`rgba((0, 64, 185, `num(0.5))));
+(CssJs.borderColor(`hex({js|000F|js})): CssJs.rule);
+(CssJs.borderColor(`hex({js|000000FF|js})): CssJs.rule);
+(CssJs.borderColor(CssJs.rebeccapurple): CssJs.rule);
+(CssJs.textDecorationColor(`rgb((0, 51, 178))): CssJs.rule);
+(CssJs.textDecorationColor(`rgb((0, 64, 185))): CssJs.rule);
+(
+  CssJs.textDecorationColor(`hsl((`deg(0.), `percent(0.), `percent(0.)))): CssJs.rule
+);
+(CssJs.textDecorationColor(`rgba((0, 51, 178, `percent(0.5)))): CssJs.rule);
+(CssJs.textDecorationColor(`rgba((0, 51, 178, `num(0.5)))): CssJs.rule);
+(CssJs.textDecorationColor(`rgba((0, 64, 185, `percent(0.5)))): CssJs.rule);
+(CssJs.textDecorationColor(`rgba((0, 64, 185, `num(0.5)))): CssJs.rule);
 CssJs.unsafe({js|textDecorationColor|js}, {js| hsla(0 0% 0% /.5)|js});
-CssJs.textDecorationColor(`rgba((0, 51, 178, `percent(0.5))));
-CssJs.textDecorationColor(`rgba((0, 51, 178, `num(0.5))));
-CssJs.textDecorationColor(`rgba((0, 64, 185, `percent(0.5))));
-CssJs.textDecorationColor(`rgba((0, 64, 185, `num(0.5))));
-CssJs.textDecorationColor(
-  `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
+(CssJs.textDecorationColor(`rgba((0, 51, 178, `percent(0.5)))): CssJs.rule);
+(CssJs.textDecorationColor(`rgba((0, 51, 178, `num(0.5)))): CssJs.rule);
+(CssJs.textDecorationColor(`rgba((0, 64, 185, `percent(0.5)))): CssJs.rule);
+(CssJs.textDecorationColor(`rgba((0, 64, 185, `num(0.5)))): CssJs.rule);
+(
+  CssJs.textDecorationColor(
+    `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
+  ): CssJs.rule
 );
-CssJs.textDecorationColor(`hex({js|000F|js}));
-CssJs.textDecorationColor(`hex({js|000000FF|js}));
-CssJs.textDecorationColor(CssJs.rebeccapurple);
+(CssJs.textDecorationColor(`hex({js|000F|js})): CssJs.rule);
+(CssJs.textDecorationColor(`hex({js|000000FF|js})): CssJs.rule);
+(CssJs.textDecorationColor(CssJs.rebeccapurple): CssJs.rule);
 CssJs.unsafe({js|columnRuleColor|js}, {js| rgb(0% 20% 70%)|js});
 CssJs.unsafe({js|columnRuleColor|js}, {js| rgb(0 64 185)|js});
 CssJs.unsafe({js|columnRuleColor|js}, {js| hsl(0 0% 0%)|js});
@@ -840,18 +874,18 @@ CssJs.unsafe({js|columnSpan|js}, {js| all|js});
 CssJs.unsafe({js|columnFill|js}, {js| auto|js});
 CssJs.unsafe({js|columnFill|js}, {js| balance|js});
 CssJs.unsafe({js|columnFill|js}, {js| balance-all|js});
-CssJs.width(`rem(5.));
-CssJs.width(`ch(5.));
-CssJs.width(`vw(5.));
-CssJs.width(`vh(5.));
-CssJs.width(`vmin(5.));
-CssJs.width(`vmax(5.));
-CssJs.padding(`rem(5.));
-CssJs.padding(`ch(5.));
-CssJs.padding(`vw(5.));
-CssJs.padding(`vh(5.));
-CssJs.padding(`vmin(5.));
-CssJs.padding(`vmax(5.));
+(CssJs.width(`rem(5.)): CssJs.rule);
+(CssJs.width(`ch(5.)): CssJs.rule);
+(CssJs.width(`vw(5.)): CssJs.rule);
+(CssJs.width(`vh(5.)): CssJs.rule);
+(CssJs.width(`vmin(5.)): CssJs.rule);
+(CssJs.width(`vmax(5.)): CssJs.rule);
+(CssJs.padding(`rem(5.)): CssJs.rule);
+(CssJs.padding(`ch(5.)): CssJs.rule);
+(CssJs.padding(`vw(5.)): CssJs.rule);
+(CssJs.padding(`vh(5.)): CssJs.rule);
+(CssJs.padding(`vmin(5.)): CssJs.rule);
+(CssJs.padding(`vmax(5.)): CssJs.rule);
 CssJs.unsafe({js|alignContent|js}, {js| flex-start|js});
 CssJs.unsafe({js|alignContent|js}, {js| flex-end|js});
 CssJs.unsafe({js|alignContent|js}, {js| space-between|js});
@@ -860,40 +894,40 @@ CssJs.unsafe({js|alignItems|js}, {js| flex-start|js});
 CssJs.unsafe({js|alignItems|js}, {js| flex-end|js});
 CssJs.unsafe({js|alignSelf|js}, {js| flex-start|js});
 CssJs.unsafe({js|alignSelf|js}, {js| flex-end|js});
-CssJs.display(`flex);
-CssJs.display(`inlineFlex);
-CssJs.flex(`none);
-CssJs.flexGrow(5.);
-CssJs.flexBasis(`auto);
-CssJs.flexBasis(`content);
-CssJs.flexBasis(`pxFloat(1.));
-CssJs.flexDirection(`row);
-CssJs.flexDirection(`rowReverse);
-CssJs.flexDirection(`column);
-CssJs.flexDirection(`columnReverse);
-CssJs.flexDirection(`row);
-CssJs.flexDirection(`rowReverse);
-CssJs.flexDirection(`column);
-CssJs.flexDirection(`columnReverse);
-CssJs.flexWrap(`wrap);
-CssJs.flexWrap(`wrapReverse);
-CssJs.flexGrow(0.);
-CssJs.flexGrow(5.);
-CssJs.flexShrink(1.);
-CssJs.flexShrink(10.);
-CssJs.flexWrap(`nowrap);
-CssJs.flexWrap(`wrap);
-CssJs.flexWrap(`wrapReverse);
+(CssJs.display(`flex): CssJs.rule);
+(CssJs.display(`inlineFlex): CssJs.rule);
+(CssJs.flex(`none): CssJs.rule);
+((CssJs.flexGrow(5.): CssJs.rule): CssJs.rule);
+(CssJs.flexBasis(`auto): CssJs.rule);
+(CssJs.flexBasis(`content): CssJs.rule);
+(CssJs.flexBasis(`pxFloat(1.)): CssJs.rule);
+(CssJs.flexDirection(`row): CssJs.rule);
+(CssJs.flexDirection(`rowReverse): CssJs.rule);
+(CssJs.flexDirection(`column): CssJs.rule);
+(CssJs.flexDirection(`columnReverse): CssJs.rule);
+((CssJs.flexDirection(`row): CssJs.rule): CssJs.rule);
+((CssJs.flexDirection(`rowReverse): CssJs.rule): CssJs.rule);
+((CssJs.flexDirection(`column): CssJs.rule): CssJs.rule);
+((CssJs.flexDirection(`columnReverse): CssJs.rule): CssJs.rule);
+((CssJs.flexWrap(`wrap): CssJs.rule): CssJs.rule);
+((CssJs.flexWrap(`wrapReverse): CssJs.rule): CssJs.rule);
+(CssJs.flexGrow(0.): CssJs.rule);
+(CssJs.flexGrow(5.): CssJs.rule);
+(CssJs.flexShrink(1.): CssJs.rule);
+(CssJs.flexShrink(10.): CssJs.rule);
+(CssJs.flexWrap(`nowrap): CssJs.rule);
+(CssJs.flexWrap(`wrap): CssJs.rule);
+(CssJs.flexWrap(`wrapReverse): CssJs.rule);
 CssJs.unsafe({js|justifyContent|js}, {js| flex-start|js});
 CssJs.unsafe({js|justifyContent|js}, {js| flex-end|js});
 CssJs.unsafe({js|justifyContent|js}, {js| space-between|js});
 CssJs.unsafe({js|justifyContent|js}, {js| space-around|js});
-CssJs.minHeight(`auto);
-CssJs.minWidth(`auto);
-CssJs.order(0);
-CssJs.order(1);
-CssJs.display(`grid);
-CssJs.display(`inlineGrid);
+(CssJs.minHeight(`auto): CssJs.rule);
+(CssJs.minWidth(`auto): CssJs.rule);
+(CssJs.order(0): CssJs.rule);
+(CssJs.order(1): CssJs.rule);
+(CssJs.display(`grid): CssJs.rule);
+(CssJs.display(`inlineGrid): CssJs.rule);
 CssJs.unsafe({js|gridTemplateColumns|js}, {js| 100px|js});
 CssJs.unsafe({js|gridTemplateColumns|js}, {js| 1fr|js});
 CssJs.unsafe({js|gridTemplateColumns|js}, {js| 100px 1fr auto|js});
@@ -1165,10 +1199,10 @@ CssJs.unsafe({js|rowGap|js}, {js| 1em|js});
 CssJs.unsafe({js|marginTrim|js}, {js| none|js});
 CssJs.unsafe({js|marginTrim|js}, {js| in-flow|js});
 CssJs.unsafe({js|marginTrim|js}, {js| all|js});
-CssJs.unsafe({js|color|js}, "unset");
-CssJs.unsafe({js|font-weight|js}, "unset");
-CssJs.unsafe({js|background-image|js}, "unset");
-CssJs.unsafe({js|width|js}, "unset");
+(CssJs.unsafe({js|color|js}, "unset"): CssJs.rule);
+(CssJs.unsafe({js|font-weight|js}, "unset"): CssJs.rule);
+(CssJs.unsafe({js|background-image|js}, "unset"): CssJs.rule);
+(CssJs.unsafe({js|width|js}, "unset"): CssJs.rule);
 CssJs.unsafe({js|clipPath|js}, {js| url('#clip')|js});
 CssJs.unsafe({js|clipPath|js}, {js| inset(50%)|js});
 CssJs.unsafe({js|clipPath|js}, {js| border-box|js});
@@ -1401,8 +1435,8 @@ CssJs.unsafe({js|boxDecorationBreak|js}, {js| slice|js});
 CssJs.unsafe({js|boxDecorationBreak|js}, {js| clone|js});
 CssJs.unsafe({js|orphans|js}, {js| 1|js});
 CssJs.unsafe({js|orphans|js}, {js| 2|js});
-CssJs.widows(1);
-CssJs.widows(2);
+(CssJs.widows(1): CssJs.rule);
+(CssJs.widows(2): CssJs.rule);
 CssJs.unsafe({js|position|js}, {js| sticky|js});
 CssJs.unsafe({js|willChange|js}, {js| scroll-position|js});
 CssJs.unsafe({js|willChange|js}, {js| contents|js});
@@ -1489,8 +1523,8 @@ CssJs.unsafe({js|float|js}, {js| inline-start|js});
 CssJs.unsafe({js|float|js}, {js| inline-end|js});
 CssJs.unsafe({js|clear|js}, {js| inline-start|js});
 CssJs.unsafe({js|clear|js}, {js| inline-end|js});
-CssJs.textAlign(`start);
-CssJs.textAlign(`end_);
+(CssJs.textAlign(`start): CssJs.rule);
+(CssJs.textAlign(`end_): CssJs.rule);
 CssJs.unsafe({js|resize|js}, {js| block|js});
 CssJs.unsafe({js|resize|js}, {js| inline|js});
 CssJs.unsafe({js|blockSize|js}, {js| 100px|js});
@@ -1645,16 +1679,16 @@ CssJs.unsafe({js|lineClamp|js}, {js| none|js});
 CssJs.unsafe({js|lineClamp|js}, {js| 1|js});
 CssJs.unsafe({js|maxLines|js}, {js| none|js});
 CssJs.unsafe({js|maxLines|js}, {js| 1|js});
-CssJs.overflowX(`visible);
-CssJs.overflowX(`hidden);
+(CssJs.overflowX(`visible): CssJs.rule);
+(CssJs.overflowX(`hidden): CssJs.rule);
 CssJs.unsafe({js|overflowX|js}, {js| clip|js});
-CssJs.overflowX(`scroll);
-CssJs.overflowX(`auto);
-CssJs.overflowY(`visible);
-CssJs.overflowY(`hidden);
-CssJs.overflowY(`clip);
-CssJs.overflowY(`scroll);
-CssJs.overflowY(`auto);
+(CssJs.overflowX(`scroll): CssJs.rule);
+(CssJs.overflowX(`auto): CssJs.rule);
+(CssJs.overflowY(`visible): CssJs.rule);
+(CssJs.overflowY(`hidden): CssJs.rule);
+(CssJs.overflowY(`clip): CssJs.rule);
+(CssJs.overflowY(`scroll): CssJs.rule);
+(CssJs.overflowY(`auto): CssJs.rule);
 CssJs.unsafe({js|overflowInline|js}, {js| visible|js});
 CssJs.unsafe({js|overflowInline|js}, {js| hidden|js});
 CssJs.unsafe({js|overflowInline|js}, {js| clip|js});
@@ -1674,31 +1708,31 @@ CssJs.unsafe({js|contain|js}, {js| paint|js});
 CssJs.unsafe({js|contain|js}, {js| size layout|js});
 CssJs.unsafe({js|contain|js}, {js| size paint|js});
 CssJs.unsafe({js|contain|js}, {js| size layout paint|js});
-CssJs.width(`maxContent);
-CssJs.width(`minContent);
+(CssJs.width(`maxContent): CssJs.rule);
+(CssJs.width(`minContent): CssJs.rule);
 CssJs.unsafe({js|width|js}, {js| fit-content(10%)|js});
-CssJs.minWidth(`maxContent);
-CssJs.minWidth(`minContent);
+(CssJs.minWidth(`maxContent): CssJs.rule);
+(CssJs.minWidth(`minContent): CssJs.rule);
 CssJs.unsafe({js|minWidth|js}, {js| fit-content(10%)|js});
-CssJs.maxWidth(`maxContent);
-CssJs.maxWidth(`minContent);
+(CssJs.maxWidth(`maxContent): CssJs.rule);
+(CssJs.maxWidth(`minContent): CssJs.rule);
 CssJs.unsafe({js|maxWidth|js}, {js| fit-content(10%)|js});
-CssJs.height(`maxContent);
-CssJs.height(`minContent);
+(CssJs.height(`maxContent): CssJs.rule);
+(CssJs.height(`minContent): CssJs.rule);
 CssJs.unsafe({js|height|js}, {js| fit-content(10%)|js});
-CssJs.minHeight(`maxContent);
-CssJs.minHeight(`minContent);
+(CssJs.minHeight(`maxContent): CssJs.rule);
+(CssJs.minHeight(`minContent): CssJs.rule);
 CssJs.unsafe({js|minHeight|js}, {js| fit-content(10%)|js});
-CssJs.maxHeight(`maxContent);
-CssJs.maxHeight(`minContent);
+(CssJs.maxHeight(`maxContent): CssJs.rule);
+(CssJs.maxHeight(`minContent): CssJs.rule);
 CssJs.unsafe({js|maxHeight|js}, {js| fit-content(10%)|js});
 CssJs.unsafe({js|aspectRatio|js}, {js| auto|js});
-CssJs.width(`fitContent);
-CssJs.minWidth(`fitContent);
-CssJs.maxWidth(`fitContent);
-CssJs.height(`fitContent);
-CssJs.minHeight(`fitContent);
-CssJs.maxHeight(`fitContent);
+(CssJs.width(`fitContent): CssJs.rule);
+(CssJs.minWidth(`fitContent): CssJs.rule);
+(CssJs.maxWidth(`fitContent): CssJs.rule);
+(CssJs.height(`fitContent): CssJs.rule);
+(CssJs.minHeight(`fitContent): CssJs.rule);
+(CssJs.maxHeight(`fitContent): CssJs.rule);
 CssJs.unsafe({js|overscrollBehavior|js}, {js| contain|js});
 CssJs.unsafe({js|overscrollBehavior|js}, {js| none|js});
 CssJs.unsafe({js|overscrollBehavior|js}, {js| auto|js});
@@ -1740,27 +1774,35 @@ CssJs.unsafe({js|pointerEvents|js}, {js| fill|js});
 CssJs.unsafe({js|pointerEvents|js}, {js| stroke|js});
 CssJs.unsafe({js|pointerEvents|js}, {js| all|js});
 CssJs.unsafe({js|pointerEvents|js}, {js| none|js});
-CssJs.lineHeightStep(`pxFloat(30.));
-CssJs.lineHeightStep(`em(2.));
-CssJs.width(`calc((`add, `percent(50.), `pxFloat(4.))));
-CssJs.width(`calc((`sub, `pxFloat(20.), `pxFloat(10.))));
-CssJs.width(
-  `calc((`sub, `vh(100.), `calc((`add, `rem(2.), `pxFloat(120.))))),
+(CssJs.lineHeightStep(`pxFloat(30.)): CssJs.rule);
+(CssJs.lineHeightStep(`em(2.)): CssJs.rule);
+(CssJs.width(`calc((`add, `percent(50.), `pxFloat(4.)))): CssJs.rule);
+(CssJs.width(`calc((`sub, `pxFloat(20.), `pxFloat(10.)))): CssJs.rule);
+(
+  CssJs.width(
+    `calc((`sub, `vh(100.), `calc((`add, `rem(2.), `pxFloat(120.))))),
+  ): CssJs.rule
 );
-CssJs.width(
-  `calc((
-    `sub,
-    `vh(100.),
+(
+  CssJs.width(
     `calc((
-      `add,
-      `rem(2.),
+      `sub,
+      `vh(100.),
       `calc((
         `add,
         `rem(2.),
-        `calc((`add, `rem(2.), `calc((`add, `rem(2.), `pxFloat(120.))))),
+        `calc((
+          `add,
+          `rem(2.),
+          `calc((
+            `add,
+            `rem(2.),
+            `calc((`add, `rem(2.), `pxFloat(120.))),
+          )),
+        )),
       )),
     )),
-  )),
+  ): CssJs.rule
 );
 CssJs.unsafe({js|MozAppearance|js}, {js| textfield|js});
 CssJs.unsafe({js|WebkitAppearance|js}, {js| none|js});
@@ -1776,23 +1818,23 @@ CssJs.unsafe({js|WebkitTextFillColor|js}, {js| $(Color.Text.primary)|js});
 CssJs.unsafe({js|animation|js}, {js| none|js});
 CssJs.unsafe({js|appearance|js}, {js| none|js});
 CssJs.unsafe({js|aspectRatio|js}, {js| 21 / 8|js});
-CssJs.backgroundColor(c);
-CssJs.unsafe({js|bottom|js}, "unset");
-CssJs.boxShadows(`none);
+(CssJs.backgroundColor(c): CssJs.rule);
+(CssJs.unsafe({js|bottom|js}, "unset"): CssJs.rule);
+(CssJs.boxShadows(`none): CssJs.rule);
 CssJs.unsafe({js|breakInside|js}, {js| avoid|js});
 CssJs.unsafe({js|caretColor|js}, {js| #e15a46|js});
-CssJs.unsafe({js|color|js}, "inherit");
+(CssJs.unsafe({js|color|js}, "inherit"): CssJs.rule);
 CssJs.unsafe({js|columnWidth|js}, {js| 125px|js});
 CssJs.unsafe({js|columnWidth|js}, {js| auto|js});
 CssJs.unsafe({js|content|js}, {js| ""|js});
-CssJs.unsafe({js|content|js}, "unset");
+(CssJs.unsafe({js|content|js}, "unset"): CssJs.rule);
 CssJs.unsafe({js|display|js}, {js| -webkit-box|js});
-CssJs.display(`contents);
+(CssJs.display(`contents): CssJs.rule);
 CssJs.unsafe({js|fill|js}, {js| $(color)|js});
 CssJs.unsafe({js|fill|js}, {js| currentColor|js});
 CssJs.unsafe({js|gap|js}, {js| 4px|js});
-CssJs.unsafe({js|grid-column|js}, "unset");
-CssJs.unsafe({js|grid-row|js}, "unset");
+(CssJs.unsafe({js|grid-column|js}, "unset"): CssJs.rule);
+(CssJs.unsafe({js|grid-row|js}, "unset"): CssJs.rule);
 CssJs.unsafe({js|gridTemplateColumns|js}, {js| max-content max-content|js});
 CssJs.unsafe(
   {js|gridTemplateColumns|js},
@@ -1804,25 +1846,25 @@ CssJs.unsafe(
 );
 CssJs.unsafe({js|gridTemplateColumns|js}, {js| repeat(2, auto)|js});
 CssJs.unsafe({js|gridTemplateColumns|js}, {js| repeat(3, auto)|js});
-CssJs.height(`fitContent);
+(CssJs.height(`fitContent): CssJs.rule);
 CssJs.unsafe({js|justifyItems|js}, {js| start|js});
-CssJs.unsafe({js|justify-self|js}, "unset");
-CssJs.unsafe({js|left|js}, "unset");
+(CssJs.unsafe({js|justify-self|js}, "unset"): CssJs.rule);
+(CssJs.unsafe({js|left|js}, "unset"): CssJs.rule);
 CssJs.unsafe({js|maskPosition|js}, {js| center center|js});
 CssJs.unsafe({js|maskRepeat|js}, {js| no-repeat|js});
-CssJs.maxWidth(`maxContent);
+(CssJs.maxWidth(`maxContent): CssJs.rule);
 CssJs.unsafe({js|outline|js}, {js| none|js});
 CssJs.unsafe({js|overflowAnchor|js}, {js| none|js});
-CssJs.unsafe({js|position|js}, "unset");
+(CssJs.unsafe({js|position|js}, "unset"): CssJs.rule);
 CssJs.unsafe({js|resize|js}, {js| none|js});
 CssJs.unsafe({js|scrollBehavior|js}, {js| smooth|js});
 CssJs.unsafe({js|strokeOpacity|js}, {js| 0|js});
 CssJs.unsafe({js|stroke|js}, {js| $(Color.Text.white)|js});
-CssJs.top(`calc((`sub, `percent(50.), `pxFloat(1.))));
-CssJs.unsafe({js|top|js}, "unset");
+(CssJs.top(`calc((`sub, `percent(50.), `pxFloat(1.)))): CssJs.rule);
+(CssJs.unsafe({js|top|js}, "unset"): CssJs.rule);
 CssJs.unsafe({js|touchAction|js}, {js| none|js});
 CssJs.unsafe({js|touchAction|js}, {js| pan-x pan-y|js});
-CssJs.transform(`none);
-CssJs.width(`fitContent);
-CssJs.width(`maxContent);
+(CssJs.transform(`none): CssJs.rule);
+(CssJs.width(`fitContent): CssJs.rule);
+(CssJs.width(`maxContent): CssJs.rule);
 CssJs.unsafe({js|wordBreak|js}, {js| break-word|js});

@@ -5,7 +5,9 @@ module Helper = Ast_helper;
 module Builder = Ast_builder.Default;
 
 module CssJs = {
-  let ident = (~loc, name) => {txt: Ldot(Lident("CssJs"), name), loc} |> Builder.pexp_ident(~loc);
+  let ldot = (~loc, name) => {txt: Ldot(Lident("CssJs"), name), loc};
+  let rule = (~loc) => Helper.Typ.constr(~loc, ldot(~loc, "rule"), []);
+  let ident = (~loc, name) => ldot(~loc, name) |> Builder.pexp_ident(~loc);
   let selector = (~loc) => ident(~loc, "selector");
   let media = (~loc) => ident(~loc, "media");
   let global = (~loc) => ident(~loc, "global")
@@ -141,13 +143,13 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
     | Stylesheet(_) =>
       grammar_error(ar.loc, "@media content expect to have declarations, not an stylesheets. Selectors aren't allowed in @media.")
     };
-
-  Helper.Exp.apply(
+  let exp = Helper.Exp.apply(
     ~loc,
     ~attrs=[Create.uncurried(~loc)],
     CssJs.media(~loc),
     [(Nolabel, query), (Nolabel, rules)],
-  );
+    );
+    Helper.Exp.constraint_(~loc, exp, CssJs.rule(~loc));
 }
 and render_declaration = (d: Declaration.t): list(Parsetree.expression) => {
   let (property, name_loc) = d.name;
@@ -267,19 +269,25 @@ and render_selector = (selector: Selector.t) => {
     | CompoundSelector(compound) =>
       compound |> List.map(render_compound_selector) |> String.concat(", ")
   };
-}
-and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
+} 
+and render_style_rule = (~isGlobal=false, ident, rule: Style_rule.t): Parsetree.expression => {
   let (prelude, _loc) = rule.prelude;
   let (_block, loc) = rule.block;
   let selector_expr = render_declarations(rule.block) |> Builder.pexp_array(~loc);
   let selector_name = render_selector(prelude) |> String.trim |> String_interpolation.Transform.transform(~loc);
+  let typ = if(isGlobal) {
+    Helper.Typ.constr(~loc, {loc, txt: Lident("unit")}, [])
+  } else {
+    CssJs.rule(~loc);
+  };
 
-  Helper.Exp.apply(
+  let exp = Helper.Exp.apply(
     ~loc=rule.Style_rule.loc,
     ~attrs=[Create.uncurried(~loc=rule.Style_rule.loc)],
     ident,
     [(Nolabel, selector_name), (Nolabel, selector_expr)],
   );
+  Helper.Exp.constraint_(~loc, exp, typ);
 };
 
 let bsEmotionLabel = (~loc, label) => {
@@ -297,13 +305,15 @@ let addLabel = (~loc, label, emotionExprs) => [
 let render_style_call = (declaration_list): Parsetree.expression => {
   let loc = declaration_list.pexp_loc;
   let arguments = [(Nolabel, declaration_list)];
-
-  Helper.Exp.apply(~loc, ~attrs=[Create.uncurried(~loc)], CssJs.style(~loc), arguments);
+  let exp = Helper.Exp.apply(~loc, ~attrs=[Create.uncurried(~loc)], CssJs.style(~loc), arguments);
+  let typ = Helper.Typ.constr(~loc, {loc, txt: Lident("string")}, []);
+  Helper.Exp.constraint_(~loc, exp, typ);
+ 
 };
 
-let render_rule = (ident, rule: Rule.t): Parsetree.expression => {
+let render_rule = (~isGlobal=false, ident, rule: Rule.t): Parsetree.expression => {
   switch (rule) {
-  | Rule.Style_rule(styleRule) => render_style_rule(ident, styleRule)
+  | Rule.Style_rule(styleRule) => render_style_rule(ident, styleRule, ~isGlobal)
   | Rule.At_rule(atRule) => render_at_rule(atRule)
   };
 };
@@ -379,7 +389,7 @@ let render_keyframes = (declarations: Declaration_list.t
 let render_global = ((ruleList, loc): Stylesheet.t) => {
   switch (ruleList) {
   /* There's only one rule: */
-  | [rule] => render_rule(CssJs.global(~loc), rule) |> Create.applyIgnore(~loc)
+  | [rule] => render_rule(CssJs.global(~loc), rule, ~isGlobal=true) |> Create.applyIgnore(~loc)
   /* There's more than one */
   | _res =>
     grammar_error(

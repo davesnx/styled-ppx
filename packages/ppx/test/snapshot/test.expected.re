@@ -1,8 +1,8 @@
 ignore(
   CssJs.global(.
     {js|html, body, #root, .class|js},
-    [|CssJs.margin(`zero)|],
-  ),
+    [|(CssJs.margin(`zero): CssJs.rule)|],
+  ): unit,
 );
 module ShoudNotBreakOtherModulesPpxsWithStringAsPayload = [%ppx ""];
 module ShoudNotBreakOtherModulesPpxsWithMultiStringAsPayload = [%ppx
@@ -969,10 +969,10 @@ module OneSingleProperty = {
     | None => ""
     };
   };
-  let styles =
+  let styles: string =
     CssJs.style(. [|
       CssJs.label("OneSingleProperty"),
-      CssJs.display(`block),
+      (CssJs.display(`block): CssJs.rule),
     |]);
   let make = (props: makeProps) => {
     let className = styles ++ getOrEmpty(classNameGet(props));
@@ -1943,10 +1943,10 @@ module SingleQuoteStrings = {
     | None => ""
     };
   };
-  let styles =
+  let styles: string =
     CssJs.style(. [|
       CssJs.label("SingleQuoteStrings"),
-      CssJs.display(`flex),
+      (CssJs.display(`flex): CssJs.rule),
       CssJs.unsafe({js|justifyContent|js}, {js| center|js}),
     |]);
   let make = (props: makeProps) => {
@@ -2918,10 +2918,10 @@ module MultiLineStrings = {
     | None => ""
     };
   };
-  let styles =
+  let styles: string =
     CssJs.style(. [|
       CssJs.label("MultiLineStrings"),
-      CssJs.display(`flex),
+      (CssJs.display(`flex): CssJs.rule),
       CssJs.unsafe({js|justifyContent|js}, {js| center|js}),
     |]);
   let make = (props: makeProps) => {
@@ -3893,7 +3893,7 @@ module SelfClosingElement = {
     | None => ""
     };
   };
-  let styles = CssJs.style(. [|CssJs.label("SelfClosingElement")|]);
+  let styles: string = CssJs.style(. [|CssJs.label("SelfClosingElement")|]);
   let make = (props: makeProps) => {
     let className = styles ++ getOrEmpty(classNameGet(props));
     let stylesObject = {"className": className, "ref": innerRefGet(props)};
@@ -4863,10 +4863,10 @@ module ArrayStatic = {
     | None => ""
     };
   };
-  let styles =
+  let styles: string =
     CssJs.style(. [|
       CssJs.label("ArrayStatic"),
-      CssJs.display(`flex),
+      (CssJs.display(`flex): CssJs.rule),
       CssJs.unsafe({js|justifyContent|js}, {js| center|js}),
     |]);
   let make = (props: makeProps) => {
@@ -5845,13 +5845,13 @@ module StringInterpolation = {
     | None => ""
     };
   };
-  let styles =
+  let styles: string =
     CssJs.style(. [|
       CssJs.label("StringInterpolation"),
-      CssJs.color(Theme.var),
-      CssJs.backgroundColor(black),
-      CssJs.borderColor(Theme.Border.black),
-      CssJs.display(`block),
+      (CssJs.color(Theme.var): CssJs.rule),
+      (CssJs.backgroundColor(black): CssJs.rule),
+      (CssJs.borderColor(Theme.Border.black): CssJs.rule),
+      (CssJs.display(`block): CssJs.rule),
     |]);
   let make = (props: makeProps) => {
     let className = styles ++ getOrEmpty(classNameGet(props));
@@ -5861,21 +5861,24 @@ module StringInterpolation = {
     createVariadicElement("div", newProps);
   };
 };
-let className =
-  CssJs.style(. [|CssJs.label("className"), CssJs.display(`block)|]);
-let classNameWithMultiLine =
+let className: string =
+  CssJs.style(. [|
+    CssJs.label("className"),
+    (CssJs.display(`block): CssJs.rule),
+  |]);
+let classNameWithMultiLine: string =
   CssJs.style(. [|
     CssJs.label("classNameWithMultiLine"),
-    CssJs.display(`block),
+    (CssJs.display(`block): CssJs.rule),
   |]);
-let classNameWithArray =
+let classNameWithArray: string =
   CssJs.style(. [|CssJs.label("classNameWithArray"), cssProperty|]);
-let cssRule = CssJs.color(CssJs.blue);
-let classNameWithCss =
+let cssRule: CssJs.rule = CssJs.color(CssJs.blue);
+let classNameWithCss: string =
   CssJs.style(. [|
     CssJs.label("classNameWithCss"),
     cssRule,
-    CssJs.backgroundColor(CssJs.green),
+    (CssJs.backgroundColor(CssJs.green): CssJs.rule),
   |]);
 module DynamicComponent = {
   [@bs.deriving abstract]
@@ -6839,11 +6842,11 @@ module DynamicComponent = {
     | None => ""
     };
   };
-  let styles = (~var, _) =>
+  let styles = (~var, _): string =>
     CssJs.style(. [|
       CssJs.label("DynamicComponent"),
-      CssJs.color(var),
-      CssJs.display(`block),
+      (CssJs.color(var): CssJs.rule),
+      (CssJs.display(`block): CssJs.rule),
     |]);
   let make = (props: makeProps('var)) => {
     let className =
@@ -7816,20 +7819,29 @@ module SelectorsMediaQueries = {
     | None => ""
     };
   };
-  let styles =
+  let styles: string =
     CssJs.style(. [|
       CssJs.label("SelectorsMediaQueries"),
-      CssJs.media(.
-        {js|(min-width: 600px)|js},
-        [|CssJs.backgroundColor(CssJs.blue)|],
+      (
+        CssJs.media(.
+          {js|(min-width: 600px)|js},
+          [|(CssJs.backgroundColor(CssJs.blue): CssJs.rule)|],
+        ): CssJs.rule
       ),
-      CssJs.selector(.
-        {js|&:hover|js},
-        [|CssJs.backgroundColor(CssJs.green)|],
+      (
+        CssJs.selector(.
+          {js|&:hover|js},
+          [|(CssJs.backgroundColor(CssJs.green): CssJs.rule)|],
+        ): CssJs.rule
       ),
-      CssJs.selector(.
-        {js|& > p|js},
-        [|CssJs.color(CssJs.pink), CssJs.fontSize(`pxFloat(24.))|],
+      (
+        CssJs.selector(.
+          {js|& > p|js},
+          [|
+            (CssJs.color(CssJs.pink): CssJs.rule),
+            (CssJs.fontSize(`pxFloat(24.)): CssJs.rule),
+          |],
+        ): CssJs.rule
       ),
     |]);
   let make = (props: makeProps) => {
@@ -7842,8 +7854,8 @@ module SelectorsMediaQueries = {
 };
 let keyframe =
   CssJs.keyframes(. [|
-    (0, [|CssJs.opacity(0.)|]),
-    (100, [|CssJs.opacity(1.)|]),
+    (0, [|(CssJs.opacity(0.): CssJs.rule)|]),
+    (100, [|(CssJs.opacity(1.): CssJs.rule)|]),
   |]);
 module ArrayDynamicComponent = {
   [@bs.deriving abstract]
@@ -8807,13 +8819,13 @@ module ArrayDynamicComponent = {
     | None => ""
     };
   };
-  let styles = (~var, _) =>
+  let styles = (~var, _): string =>
     CssJs.style(. [|
       CssJs.label("ArrayDynamicComponent"),
-      CssJs.display(`block),
+      (CssJs.display(`block): CssJs.rule),
       switch (var) {
-      | `Black => CssJs.color(`hex({js|999999|js}))
-      | `White => CssJs.color(`hex({js|FAFAFA|js}))
+      | `Black => (CssJs.color(`hex({js|999999|js})): CssJs.rule)
+      | `White => (CssJs.color(`hex({js|FAFAFA|js})): CssJs.rule)
       },
     |]);
   let make = (props: makeProps('var)) => {
@@ -9788,7 +9800,12 @@ module SequenceDynamicComponent = {
   };
   let styles = (~size, _) => {
     Js.log("Logging when render");
-    CssJs.style(. [|CssJs.width(size), CssJs.display(`block)|]);
+    (
+      CssJs.style(. [|
+        (CssJs.width(size): CssJs.rule),
+        (CssJs.display(`block): CssJs.rule),
+      |]): string
+    );
   };
   let make = (props: makeProps('size)) => {
     let className =
@@ -10763,11 +10780,11 @@ module DynamicComponentWithDefaultValue = {
     | None => ""
     };
   };
-  let styles = (~var=CssJs.hex("333"), _) =>
+  let styles = (~var=CssJs.hex("333"), _): string =>
     CssJs.style(. [|
       CssJs.label("DynamicComponentWithDefaultValue"),
-      CssJs.display(`block),
-      CssJs.color(var),
+      (CssJs.display(`block): CssJs.rule),
+      (CssJs.color(var): CssJs.rule),
     |]);
   let make = (props: makeProps('var)) => {
     let className =
@@ -11742,18 +11759,22 @@ module SelectorWithInterpolation = {
     | None => ""
     };
   };
-  let styles =
+  let styles: string =
     CssJs.style(. [|
       CssJs.label("SelectorWithInterpolation"),
-      CssJs.media(.
-        {js|only screen and (min-width: |js} ++ width ++ {js|)|js},
-        [|CssJs.color(CssJs.blue)|],
+      (
+        CssJs.media(.
+          {js|only screen and (min-width: |js} ++ width ++ {js|)|js},
+          [|(CssJs.color(CssJs.blue): CssJs.rule)|],
+        ): CssJs.rule
       ),
-      CssJs.media(.
-        {js|(min-width: 700px) and (orientation: |js}
-        ++ orientation
-        ++ {js|)|js},
-        [|CssJs.display(`none)|],
+      (
+        CssJs.media(.
+          {js|(min-width: 700px) and (orientation: |js}
+          ++ orientation
+          ++ {js|)|js},
+          [|(CssJs.display(`none): CssJs.rule)|],
+        ): CssJs.rule
       ),
     |]);
   let make = (props: makeProps) => {
@@ -12725,16 +12746,20 @@ module MediaQueryCalc = {
     | None => ""
     };
   };
-  let styles =
+  let styles: string =
     CssJs.style(. [|
       CssJs.label("MediaQueryCalc"),
-      CssJs.media(.
-        {js|(min-width: calc(2px + 1px))|js},
-        [|CssJs.color(CssJs.red)|],
+      (
+        CssJs.media(.
+          {js|(min-width: calc(2px + 1px))|js},
+          [|(CssJs.color(CssJs.red): CssJs.rule)|],
+        ): CssJs.rule
       ),
-      CssJs.media(.
-        {js|(min-width: calc(1000px - 2%))|js},
-        [|CssJs.color(CssJs.red)|],
+      (
+        CssJs.media(.
+          {js|(min-width: calc(1000px - 2%))|js},
+          [|(CssJs.color(CssJs.red): CssJs.rule)|],
+        ): CssJs.rule
       ),
     |]);
   let make = (props: makeProps) => {
@@ -13709,11 +13734,13 @@ module DynamicComponentWithSequence = {
   };
   let styles = (~variant, _) => {
     let color = Theme.button(variant);
-    CssJs.style(. [|
-      CssJs.display(`inlineFlex),
-      CssJs.color(color),
-      CssJs.width(`percent(100.)),
-    |]);
+    (
+      CssJs.style(. [|
+        (CssJs.display(`inlineFlex): CssJs.rule),
+        (CssJs.color(color): CssJs.rule),
+        (CssJs.width(`percent(100.)): CssJs.rule),
+      |]): string
+    );
   };
   let make = (props: makeProps('variant)) => {
     let className =
@@ -14687,13 +14714,13 @@ module DynamicComponentWithArray = {
     | None => ""
     };
   };
-  let styles = (~size, ~color, _) =>
+  let styles = (~size, ~color, _): string =>
     CssJs.style(. [|
       CssJs.label("DynamicComponentWithArray"),
-      CssJs.width(`percent(100.)),
-      CssJs.display(`block),
-      CssJs.color(color),
-      CssJs.width(size),
+      (CssJs.width(`percent(100.)): CssJs.rule),
+      (CssJs.display(`block): CssJs.rule),
+      (CssJs.color(color): CssJs.rule),
+      (CssJs.width(size): CssJs.rule),
     |]);
   let make = (props: makeProps('color, 'size)) => {
     let className =
@@ -14707,7 +14734,8 @@ module DynamicComponentWithArray = {
     createVariadicElement("button", newProps);
   };
 };
-let sharedStylesBetweenDynamicComponents = color => CssJs.color(color);
+let sharedStylesBetweenDynamicComponents = (color): CssJs.rule =>
+  CssJs.color(color);
 module DynamicCompnentWithLetIn = {
   [@bs.deriving abstract]
   type makeProps('color) = {
@@ -15672,7 +15700,7 @@ module DynamicCompnentWithLetIn = {
   };
   let styles = (~color, _) => {
     let styles = sharedStylesBetweenDynamicComponents(color);
-    CssJs.style(. styles);
+    (CssJs.style(. styles): string);
   };
   let make = (props: makeProps('color)) => {
     let className =
@@ -16646,7 +16674,7 @@ module DynamicCompnentWithIdent = {
     | None => ""
     };
   };
-  let styles = (~a as _, _) => CssJs.style(. cssRule);
+  let styles = (~a as _, _): string => CssJs.style(. cssRule);
   let make = (props: makeProps('a)) => {
     let className =
       styles(~a=aGet(props), ()) ++ getOrEmpty(classNameGet(props));
