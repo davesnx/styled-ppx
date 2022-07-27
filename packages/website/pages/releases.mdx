@@ -1,15 +1,26 @@
 import Markdown from 'markdown-to-jsx'
 import { useSSG } from 'nextra/ssg'
 
+const releasesUrl = 'https://api.github.com/repos/davesnx/styled-ppx/releases';
+
 export const getStaticProps = ({ params }) => {
-  return fetch('https://api.github.com/repos/davesnx/styled-ppx/releases')
+  return fetch(releasesUrl)
     .then(res => res.json())
     // we keep the most recent 8 releases here
-    .then(releases => ({ props: { ssg: releases.slice(0, 8) } }))
-}
+    .then(releases => ({ props: { ssg: { releases.slice(0, 8) }}}))
+    .catch(err => ({ props: { ssg: { releases: null, err }}}))
+};
 
 export const ReleasesRenderer = () => {
-  const releases = useSSG()
+  const { releases } = useSSG();
+
+  if (!releases) {
+    return <Markdown>{`
+      ### There's a problem fetching the releases.
+      Visit ${releasesUrl}
+    `}</Markdown>
+  }
+
   return <Markdown>{releases.map(release => {
     const body = release.body || "";
     return `## <a href="${release.html_url}" target="_blank" rel="noopener">${release.name}</a>\n
