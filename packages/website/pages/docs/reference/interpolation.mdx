@@ -2,7 +2,7 @@ import Callout from 'nextra-theme-docs/callout'
 
 # Interpolation
 
-Interpolation here means using any identifier as a value inside a CSS definition. Useful for reusing variables, handling themes or change styles during run-time.
+Interpolation means using any identifier as a value inside CSS. "any identifier" means ReScript variables or module accessors (https://rescript-lang.org/try?code=LYewJgrgNgpgBAFQBY2PAvHA3gKDnWAFzgHMAnGATzkwGEBnegKXoDoUAPACgCIAhAKJ8AInwAcPAJQ4AvjiA). Useful for reusing variables, handling themes or conditionally apply styles based on props at run-time.
 
 ```rescript
 module Component = %styled.div(`
@@ -10,32 +10,37 @@ module Component = %styled.div(`
 )
 ```
 
-Interpolation only works inside values, which is slightly different from other JavaScript-based solutions (such as styled-components or emotion), where their interpolation is much more dynamic and can be used everywhere. You might find styled-ppx more strict, here's an example:
+Interpolation works inside values, media-queries and selectors. It doesn't work for entire properties, which is slightly different from other JavaScript-based solutions (such as styled-components or emotion) their interpolation is more dynamic and can be used everywhere. **styled-ppx** forces you to be more rigit, with the promise of being type-safe, the same way as ReScript does ❤️. The dynamism from JavaScript-based solutions comes with the cost of unsafety.
 
-`margin-${whatever}: 10px` is valid in JavaScript, while isn't valid in styled-ppx. As explained above, this interpolation affects on **properties**, not on **values**.
+Here's an example:
 
-As a solution, you can implement similar behaviour with more explicitness, handling all properties, using the `css` extension which is described below.
+`margin-${whatever}: 10px` is valid in JavaScript, while isn't valid in **styled-ppx**. As explained above, this interpolation can't be applied to entire **properties**, neither half-properties.
+
+The solution is simple, you would handle all properties based on the dynamic value:
 
 ```rescript
 let margin = direction =>
   switch direction {
-  | #Left => %css("margin-left: 10px;")
-  | #Right => %css("margin-right: 10px;")
-  | #Top => %css("margin-top: 10px;")
-  | #Bottom => %css("margin-bottom: 10px;")
+  | Left => %css("margin-left: 10px;")
+  | Right => %css("margin-right: 10px;")
+  | Top => %css("margin-top: 10px;")
+  | Bottom => %css("margin-bottom: 10px;")
   }
 ```
 
-styled-ppx forces you to be more rigit, the same way as ReScript does.
+If you aren't familiar with `%css` extension, take a look here: [`%css`](./css.md)
+using the `css` extension which is described below.
 
-<Callout>
-Some interpolation is treated as unsafe, disables the type-checker which can lead to run-time issues.
-This is the current implementation and the reason for that is because is very hard to implement type-safety with [shorthand properties](https://developer.mozilla.org/en-US/docs/Web/CSS/Shorthand_properties) with the polymorphism of CSS.
-</Callout>
+## Interpolation in Media queries
 
-### Polymorphism of CSS
+## Type holes
 
-There are plenty of properties on CSS that accept different types of values, the ones encountered more challenging are `animation`, `box-shadow`, `background`, `transition` and `transform`, to name a few.
+
+## A note about polymorphism of CSS
+
+There are plenty of properties on CSS that accept different types of values, the ones encountered challenging are `animation`, `box-shadow`/`text-shadow`, `background`, `transition` and `transform` to name a few. Not because are shorthand properties, but because they have values that are positional and optional at the same time.
+
+Let's look at `background`.
 
 ```css
 background: #fff; /* The background is white */
@@ -44,4 +49,7 @@ background: #fff url(img.png); /* The background is white with an image */
 background: url(img.png) no-repeat; /* The background is a non-repeating image */
 ```
 
-In this case, to interpolate the background's value like: `background: $(variable)` the type-checker can't know the type of `$(variable)` ahead of time, since there's many definitions of `background` valid. This is called **[Overload functions](https://www.typescriptlang.org/docs/handbook/declaration-files/by-example.html#overloaded-functions)** and it's not available in ReScript to it's nature of a static typed language.
+In this case, to interpolate the background's value like: `background: $(variable1) $(variable2)` the type-checker can't know the type of `$(variable1)` and `(variable2)` ahead of time, since there's a few possibilities of `background` valid. This is called **[overload](https://www.typescriptlang.org/docs/handbook/declaration-files/by-example.html#overloaded-functions)** in other languages and it's not available in ReScript to it's nature of a static typed language.
+
+
+We rely on the position of the interpolation to guess which value you are trying to interpolate. Following the example, ``

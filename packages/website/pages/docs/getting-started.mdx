@@ -34,7 +34,7 @@ The `bsconfig.json` resultant should contain at least
 }
 ```
 
-### Use
+### Example
 
 ```rescript
 module Link = %styled.a((~color="#4299E1") => `
@@ -46,13 +46,13 @@ module Link = %styled.a((~color="#4299E1") => `
   color: $(color);
 `)
 
-module Layout = %styled.div(`
+module Layout = %styled.div([|
   %css("display: flex"),
   %css("width: 100%;"),
   %css("height: 100%;"),
   %css("justify-content: center;"),
   %css("align-items: center"),
-`)
+|])
 
 /* Later on a component */
 <Layout>
@@ -68,10 +68,10 @@ module Layout = %styled.div(`
 ```
 
 ### [Playground](https://github.com/davesnx/try-styled-ppx)
-If you want to try it out, just fork https://github.com/davesnx/try-styled-ppx and follow the instalation process there.
+If you want to try it out, just fork https://github.com/davesnx/try-styled-ppx and follow the instalation there.
 
 ## Editor Support
-One of the downsites of using a `ppx` is their editor support, we provide a VSCode extension that brings syntax highlight. This can include in the future, CSS autocomplete and other CSS-related extensions.
+One of the downsites of using an embedded language (CSS) into another (ReScript) is the limited editor support. Because of that we provide a VSCode extension that brings syntax highlight.
 
 Install the VSCode extension: **[VSCode Extension](https://marketplace.visualstudio.com/items?itemName=davesnx.vscode-styled-ppx)**
 

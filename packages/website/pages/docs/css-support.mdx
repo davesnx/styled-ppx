@@ -1,12 +1,81 @@
 # CSS Support
 
-The parser now supports CSS Spec 3 almost completely. You can check which properties aren't here: https://github.com/davesnx/styled-ppx/blob/main/packages/ppx/test/css-support/test.re (commented ones aren't supported).
+The **styled-ppx** CSS parser supports [CSS Syntax Module Level 3](https://www.w3.org/TR/css-syntax-3/) almost completely. We ensure that most CSS supported is used day to day and available in most major browsers.
 
-There's a ton of explanations about how the parser and the code-gen work under the hood, but the main idea is that the parser ensures that the properties and values are valid and the code-gen creates bs-emotion calls which the type-check ensures are correct.
+There are a few levels of support in **styled-ppx*:
+- **Parser support**: The parser understands CSS3.
+- **Code generation support**: Can transform the CSS into [bs-css](https://github.com/giraud/bs-css) bindings. There are a few properties that [bs-css](https://github.com/giraud/bs-css) doesn't currently support.
+- **Interpolation support**: We can interpolate values from outside of CSS creating type-safe holes.
 
-Complex media-queries, (pseudo)selectors and CSS functions might not be fully supported, here is a list of non-supported features for now:
+## Detailed view of the parsing support
 
-- [CSS functions](https://github.com/davesnx/styled-ppx/issues/47)
-- [Complex media queries values](https://github.com/davesnx/styled-ppx/issues/50)
-- Selectors: [attribute](https://github.com/davesnx/styled-ppx/issues/129) [:not](https://github.com/davesnx/styled-ppx/issues/16)
-- [grid-column-template](https://github.com/davesnx/styled-ppx/issues/146)
+✅: Fully supported
+🟠: Partially supported
+🔴: Not supported
+
+If you want to know which properties are supported, you can check our test here: https://github.com/davesnx/styled-ppx/blob/main/packages/ppx/test/css-support/test.re (commented ones aren't supported).
+
+| **CSS Feature**                                              	| **Link**                                  	| **Supported** 	|
+|--------------------------------------------------------------	|-------------------------------------------	|---------------	|
+| Compositing and Blending Level 1                             	| https://www.w3.org/TR/compositing-1       	| ✅             	|
+| CSS Backgrounds and Borders Module Level 3                   	| https://www.w3.org/TR/css-backgrounds-3   	| 🟠             	|
+| CSS Box Sizing Module Level 3                                	| https://www.w3.org/TR/css-box-3           	| 🟠             	|
+| CSS Cascading and Inheritance Level 3                        	| https://www.w3.org/TR/css-cascade-3       	| ✅             	|
+| CSS Cascading and Inheritance Level 4                        	| https://www.w3.org/TR/css-cascade-4        	| 🔴             	|
+| CSS Color Module Level 3                                     	| https://www.w3.org/TR/css-color-3         	| ✅             	|
+| CSS Color Module Level 4                                     	| https://www.w3.org/TR/css-color-4         	| 🟠             	|
+| CSS Color Adjustment Module Level 1                          	| https://www.w3.org/TR/css-color-adjust-1   	| 🔴             	|
+| CSS Conditional Rules Level 3                                	| https://www.w3.org/TR/css-conditional-3    	| 🔴             	|
+| CSS Containment Module Level 1                               	| https://www.w3.org/TR/css-contain-1       	| ✅             	|
+| CSS Containment Module Level 2                               	| https://www.w3.org/TR/css-contain-2        	| 🔴             	|
+| CSS Counter Styles Level 3                                   	| https://www.w3.org/TR/css-counter-styles-3 	| 🔴             	|
+| CSS Display Module Level 3                                   	| https://www.w3.org/TR/css-display-3       	| 🟠             	|
+| CSS Easing Functions Level 1                                 	| https://www.w3.org/TR/css-easing-1        	| ✅             	|
+| CSS Flexible Box Layout Module Level 1                       	| https://www.w3.org/TR/css-flexbox-1       	| ✅             	|
+| CSS Fonts Module Level 3                                     	| https://www.w3.org/TR/css-fonts-3         	| 🟠             	|
+| CSS Fonts Module Level 4                                     	| https://www.w3.org/TR/css-fonts-4         	| 🟠             	|
+| CSS Grid Layout Module Level 1                               	| https://www.w3.org/TR/css-grid-1          	| 🟠             	|
+| CSS Grid Layout Module Level 2                               	| https://www.w3.org/TR/css-grid-2          	| 🔴             	|
+| CSS Images Module Level 3                                    	| https://www.w3.org/TR/css-images-3         	| 🔴             	|
+| CSS Images Module Level 4                                    	| https://www.w3.org/TR/css-images-4         	| 🔴             	|
+| CSS Lists and Counters Module Level 3                        	| https://www.w3.org/TR/css-lists-3          	| 🔴             	|
+| CSS Logical Properties and Values Level 1                    	| https://www.w3.org/TR/css-logical-1       	| 🟠             	|
+| CSS Multi-column Layout Module Level 1                       	| https://www.w3.org/TR/css-multicol-1      	| 🟠             	|
+| CSS Positioned Layout Module Level 3                         	| https://www.w3.org/TR/css-position-3      	| ✅             	|
+| CSS Box Sizing Module Level 3                                	| https://www.w3.org/TR/css-sizing-3        	| ✅             	|
+| CSS Box Sizing Module Level 4                                	| https://www.w3.org/TR/css-sizing-4        	| 🟠             	|
+| CSS Style Attributes                                         	| https://www.w3.org/TR/css-style-attr      	| ✅             	|
+| CSS Transforms Module Level 1                                	| https://www.w3.org/TR/css-transforms-1    	| 🟠             	|
+| CSS Transforms Module Level 2                                	| https://www.w3.org/TR/css-transforms-2    	| ✅             	|
+| CSS Basic User Interface Module Level 3                      	| https://www.w3.org/TR/css-ui-3            	| ✅             	|
+| CSS Values and Units 3                                       	| https://www.w3.org/TR/css-values-3        	| 🟠             	|
+| CSS Custom Properties for Cascading Variables Module Level 1 	| https://www.w3.org/TR/css-variables-1      	| 🔴             	|
+| CSS Will Change Module Level 1                               	| https://www.w3.org/TR/css-will-change-1   	| ✅             	|
+| CSS Writing Modes Level 3                                    	| https://www.w3.org/TR/css-writing-modes-3 	| ✅             	|
+| Media Queries Level 3                                        	| https://www.w3.org/TR/css3-mediaqueries   	| 🟠             	|
+| CSS Namespaces Module Level 3                                	| https://www.w3.org/TR/css-namespaces-3    	| 🟠             	|
+| Selectors Level 3                                            	| https://www.w3.org/TR/selectors-3         	| ✅             	|
+| Selectors Level 4                                            	| https://www.w3.org/TR/selectors-4         	| 🟠             	|
+| CSS Box Alignment Module Level 3                             	| https://www.w3.org/TR/css-align-3         	| ✅             	|
+| CSS Animations Level 1                                       	| https://www.w3.org/TR/css-animations-1    	| ✅             	|
+| CSS Fragmentation Module Level 3                             	| https://www.w3.org/TR/css-break-3         	| ✅             	|
+| CSS Font Loading Module Level 3                              	| https://www.w3.org/TR/css-font-loading-3   	| 🔴             	|
+| CSS Masking Module Level 1                                   	| https://www.w3.org/TR/css-masking-1       	| 🟠             	|
+| CSS Scroll Snap Module Level 1                               	| https://www.w3.org/TR/css-scroll-snap-1   	| 🟠             	|
+| CSS Scrollbars Styling Module Level 1                        	| https://www.w3.org/TR/css-scrollbars-1     	| 🔴             	|
+| CSS Shapes Module Level 1                                    	| https://www.w3.org/TR/css-shapes-1         	| 🔴             	|
+| CSS Speech Module                                            	| https://www.w3.org/TR/css-speech-1         	| 🔴             	|
+| CSS Text Module Level 3                                      	| https://www.w3.org/TR/css-text-3          	| 🟠             	|
+| CSS Text Decoration Module Level 3                           	| https://www.w3.org/TR/css-text-decor-3    	| ✅             	|
+| CSS Transitions                                              	| https://www.w3.org/TR/css-transitions-1   	| ✅             	|
+| CSS Writing Modes Level 4                                    	| https://www.w3.org/TR/css-writing-modes-4 	| ✅             	|
+| Filter Effects Module Level 1                                	| https://www.w3.org/TR/filter-effects-1    	| 🟠             	|
+| Media Queries Level 4                                        	| https://www.w3.org/TR/mediaqueries-4      	| 🟠             	|
+
+<small>This table has been generated manually, it can be outdated.</small>
+
+All references are found in [w3.org](https://www.w3.org)
+- [(CSS 1.0) Cascading Style Sheets Level 1](https://www.w3.org/TR/CSS1/) ✅
+- [(CSS 2.1) Cascading Style Sheets Level 2 Revision 1 Specification](https://www.w3.org/TR/CSS21/) ✅
+- [(CSS 2.2) Cascading Style Sheets Level 2 Revision 2 Specification](https://www.w3.org/TR/CSS22/) ✅
+- [(CSS 3.0) CSS Syntax Module Level 3](https://www.w3.org/TR/css-syntax-3/) ✅

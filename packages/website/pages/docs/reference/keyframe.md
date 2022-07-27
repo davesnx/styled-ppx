@@ -1,6 +1,6 @@
 # Keyframes
 
-**Generates keyframes**, method to create animations with CSS
+**Generates keyframes**, method to create keyframe animations in CSS
 
 ```rescript
 let fadeIn = %keyframe(`
@@ -19,3 +19,7 @@ module Component = %styled.div(`
   height: 100px;
 `)
 ```
+
+- Braces are optional. `%keyframe({ ... })` and `%keyframe(...)` are the same.
+- The keyframe name is defined outside of the CSS.
+- The type of the keyframe is `string`, but hidden in an [opaque type](https://reasonml.github.io/docs/en/type#opaque-types)

@@ -13,4 +13,4 @@
 
 Recommend to not add `@font-face` defintions as globals. Consider adding the font directly to the HTML or in a `style.css` file. [More](https://andydavies.me/blog/2019/02/12/preloading-fonts-and-the-puzzle-of-priorities/).
 
-Since [emotion](https://emotion.sh) have a small run-time for those global styles to be applied to the DOM, which in regular styles isn't an issue but adding `@fonts-face` will delay a bit their fetching and can cause a [Flash of Unestyled Text](https://css-tricks.com/fout-foit-foft/).
+Since [emotion](https://emotion.sh) have a small run-time for those global styles to be applied to the DOM. In a regular style file this isn't an issue. Keeping `@fonts-face` or other `@imports` inside emotion will delay a bit their fetching and will cause a [Flash of Unestyled Text](https://css-tricks.com/fout-foit-foft/).

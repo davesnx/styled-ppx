@@ -2,8 +2,7 @@ import Callout from 'nextra-theme-docs/callout'
 
 # Components
 
-`styled.{{tag}}` is the extension that allows to create React Components the same way as `@react.component` does. Here, you only define the styles of an element.
-
+`styled.{{tag}}` is the extension that allows to create React Components from the styles of the element.
 All HTML Elements are available under `styled.{{tag}}`. An example of it will be:
 
 ```rescript
@@ -18,9 +17,9 @@ module StyledComponent = %styled.div(`
 <StyledComponent> {React.string("Hello from the style")} </StyledComponent>
 ```
 
-### React props
+### React props (makeProps)
 
-Styled components expose all the react props within their API, except `className`.
+Styled components expose all the React component props within their API.
 
 ```rescript
 module Input = %styled.input("...")
@@ -34,5 +33,5 @@ module Input = %styled.input("...")
 ```
 
 <Callout>
-  If you create a [Dynamic component](./dynamic-components) with a prop that collides with the names of the React props, it will raise an error.
+  You can extend the styles from a component via `className` prop.
 </Callout>
