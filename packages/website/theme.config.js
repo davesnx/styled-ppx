@@ -24,13 +24,11 @@ export default {
   darkMode: true,
   font: false,
   floatTOC: true,
-  customSearch: () => null,
   logo: () => (
     <span className="font-sans hidden md:inline font-semibold">styled-ppx</span>
   ),
   head: (
     <>
-      {/* Favicons, meta */}
       <link
         rel="apple-touch-icon"
         sizes="180x180"
