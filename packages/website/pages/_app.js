@@ -1,18 +1,11 @@
 import "../fonts.css";
-import "../styles.css";
+import "../tailwind.css";
 import "nextra-theme-docs/style.css";
 import "../overrides.css";
 
-import Prism from "prism-react-renderer/prism";
-
-(typeof global !== "undefined" ? global : window).Prism = Prism;
-
-require("prismjs/components/prism-rescript");
+const id = i => i;
 
 export default function Nextra({ Component, pageProps }) {
-  return (
-    <>
-      <Component {...pageProps} />
-    </>
-  );
+  const getLayout = Component.getLayout || id;
+  return getLayout(<Component {...pageProps} />);
 }

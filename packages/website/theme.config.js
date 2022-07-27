@@ -23,10 +23,11 @@ export default {
   titleSuffix: " | styled-ppx",
   darkMode: true,
   font: false,
+  floatTOC: true,
   customSearch: () => null,
-  logo: () => (
-    <span class="font-sans hidden md:inline font-semibold">styled-ppx</span>
-  ),
+  /* logo: () => (
+    <span className="font-sans hidden md:inline font-semibold">styled-ppx</span>
+  ), */
   head: (
     <>
       {/* Favicons, meta */}

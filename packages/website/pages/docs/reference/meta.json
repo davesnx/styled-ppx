@@ -4,7 +4,6 @@
   "dynamic-components": "Dynamic components",
   "classname": "className",
   "array": "Array API",
-  "css-support": "CSS Support",
   "keyframe": "Keyframe",
   "globals": "Inject global styles",
   "react-ref": "React's Ref"

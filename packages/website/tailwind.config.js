@@ -1,9 +1,11 @@
 module.exports = {
-  purge: [
+  content: [
     "./components/**/*.js",
+    "./components/**/*.jsx",
     "./pages/**/*.md",
     "./pages/**/*.mdx",
     "./theme.config.js",
+    "./tailwind.css"
   ],
   theme: {
     screens: {
