@@ -1,5 +1,6 @@
 {
   "scopeName": "source.styled-ppx-ocaml",
+  "name": "styled-ppx-ocaml",
   "fileTypes": ["ml"],
   "injectionSelector": "L:source -comment -string",
   "patterns": [

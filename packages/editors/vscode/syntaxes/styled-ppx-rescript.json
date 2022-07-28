@@ -1,5 +1,6 @@
 {
   "scopeName": "source.styled-ppx-rescript",
+  "name": "styled-ppx-rescript",
   "fileTypes": ["res"],
   "injectionSelector": "L:source -comment -string",
   "patterns": [

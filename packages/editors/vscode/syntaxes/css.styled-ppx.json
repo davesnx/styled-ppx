@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
-  "name": "CSS (styled-ppx)",
+  "name": "styled-ppx-css",
   "scopeName": "source.css.styled-ppx",
   "patterns": [
     {
