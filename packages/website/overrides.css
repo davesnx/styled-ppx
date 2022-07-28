@@ -49,14 +49,7 @@ h3 {
   letter-spacing: 0.04rem;
 }
 
-/* .html.dark .logo {
-  fill: "#fff";
-}
-
-.html.light .logo {
-  fill: "#000";
-}
-*/
+/* Override nextra-theme-docs to minimalist style */
 
 .nextra-container nav {
   background: none;
@@ -66,4 +59,22 @@ h3 {
 
 .sidebar {
   border: none;
+}
+
+/* Override dark/light theme */
+
+html.dark {
+  color-scheme: dark;
+}
+
+html.light {
+  color-scheme: light;
+}
+
+html.dark .logo {
+  fill: "#fff";
+}
+
+html.light .logo {
+  fill: "#000";
 }

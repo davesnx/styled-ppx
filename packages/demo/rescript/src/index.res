@@ -12,7 +12,7 @@ module App2 = {
   let make = (~children) => <div> children </div>
 }
 
-let cosas = "external-value"
+let cosas = "external-selector"
 
 module Link = %styled.a(`
   & $(cosas) {
@@ -30,7 +30,7 @@ module Wrapper = %styled.div("display: inline;")
 
 module Dynamic = %styled.input((~a as _) => "display: inline;")
 
-module Component = %styled.div(j`
+module Component = %styled.div(`
   background-color: red;
   border-radius: 20px;
   box-sizing: border-box;

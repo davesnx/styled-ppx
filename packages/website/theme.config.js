@@ -1,4 +1,4 @@
-/* let _logo = () => {
+let Logo = () => {
   return (
     <svg
       width="100"
@@ -13,7 +13,7 @@
       />
     </svg>
   );
-}; */
+};
 
 export default {
   github: "https://github.com/davesnx/styled-ppx",
@@ -25,7 +25,10 @@ export default {
   font: false,
   floatTOC: true,
   logo: () => (
-    <span className="font-sans hidden md:inline font-semibold">styled-ppx</span>
+    <>
+      <Logo />
+      {/* <span className="font-sans hidden md:inline font-semibold">styled-ppx</span> */}
+    </>
   ),
   head: (
     <>
