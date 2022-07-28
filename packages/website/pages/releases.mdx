@@ -1,3 +1,7 @@
+---
+title: Releases
+---
+
 import Markdown from 'markdown-to-jsx'
 import { useSSG } from 'nextra/ssg'
 
@@ -5,23 +9,24 @@ export const getStaticProps = ({ params }) => {
   return fetch('https://api.github.com/repos/davesnx/styled-ppx/releases')
     .then(res => res.json())
     // we keep the most recent 8 releases here
-    .then(releases => ({ props: { ssg: { releases.slice(0, 8) }}}))
-    .catch(err => ({ props: { ssg: { releases: null, err }}}))
-};
+    .then(releases => ({ props: { ssg: releases.slice(0, 8) } }))
+    .catch(err => ({ props: { ssg: { releases: null } } }))
+}
 
 export const ReleasesRenderer = () => {
-  const { releases } = useSSG();
-
+  const releases = useSSG()
   if (!releases) {
-    return <Markdown>{`
-      ### There's a problem fetching the releases from GitHub.
-      Visit [https://github.com/davesnx/styled-ppx/releases](https://github.com/davesnx/styled-ppx/releases)
-    `}</Markdown>
+    return <>
+      <h3>There's a problem fetching release from GitHub</h3>
+      <br/>
+      <Markdown>
+        Visit [https://github.com/davesnx/styled-ppx/releases](https://github.com/davesnx/styled-ppx/releases)
+      </Markdown>
+    </>
   }
-
   return <Markdown>{releases.map(release => {
     const body = release.body || "";
-    return `## <a href="${release.html_url}" target="_blank" rel="noopener">${release.name}</a>\n
+    return `### <a href="${release.html_url}" target="_blank" rel="noopener">${release.name}</a>
 Published on ${new Date(release.published_at) .toDateString()}
 \n
 ${body}`
@@ -31,4 +36,3 @@ ${body}`
 # Releases
 
 <ReleasesRenderer />
-

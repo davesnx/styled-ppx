@@ -1,8 +1,8 @@
 let Logo = () => {
   return (
     <svg
-      width="100"
-      height="35"
+      width="140"
+      height="40"
       viewBox="0 0 152 35"
       xmlns="http://www.w3.org/2000/svg"
       className="logo"
@@ -30,43 +30,6 @@ export default {
       {/* <span className="font-sans hidden md:inline font-semibold">styled-ppx</span> */}
     </>
   ),
-  head: (
-    <>
-      <link
-        rel="apple-touch-icon"
-        sizes="180x180"
-        href="/favicon/apple-touch-icon.png"
-      />
-      <link
-        rel="icon"
-        type="image/png"
-        sizes="32x32"
-        href="/favicon/favicon-32x32.png"
-      />
-      <link
-        rel="icon"
-        type="image/png"
-        sizes="16x16"
-        href="/favicon/favicon-16x16.png"
-      />
-      <link rel="manifest" href="/favicon/site.webmanifest" />
-      <link
-        rel="mask-icon"
-        href="/favicon/safari-pinned-tab.svg"
-        color="#000000"
-      />
-      <meta name="msapplication-TileColor" content="#ffffff" />
-      <meta name="theme-color" content="#ffffff" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <meta httpEquiv="Content-Language" content="en" />
-      <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css"
-        media="print"
-        onLoad="this.media='all'"
-      />
-    </>
-  ),
   feedbackLabels: "feedback",
-  /* footerText: `MIT ${new Date().getFullYear()} © David Sancho`, */
+  footerText: `MIT ${new Date().getFullYear()} @davesnx`,
 };

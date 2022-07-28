@@ -1,3 +1,7 @@
+---
+title: Getting Started
+---
+
 import Callout from 'nextra-theme-docs/callout'
 import Link from 'next/link'
 
@@ -15,22 +19,17 @@ npm install @davesnx/styled-ppx
 
 ### Update `bsconfig.json`
 
-Add `"@davesnx/styled-ppx/ppx"` under bsconfig's `"ppx-flags"`:
-```json
-{
-  "ppx-flags": ["@davesnx/styled-ppx/ppx"]
-}
-```
+Add `"@davesnx/styled-ppx/ppx"` under bsconfig `"ppx-flags"`.
+The change on `bsconfig.json` should contain the following:
 
-The `bsconfig.json` resultant should contain at least
-```json
+```diff
 {
   "bs-dependencies": [
     "@rescript/react",
     "bs-css",
     "bs-css-emotion"
   ],
-  "ppx-flags": ["@davesnx/styled-ppx/ppx"]
++ "ppx-flags": ["@davesnx/styled-ppx/ppx"]
 }
 ```
 

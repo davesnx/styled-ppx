@@ -18,8 +18,18 @@ h1, h2, h3, h4, h5, h6, div, span, p {
 
 code, code div, code span {
   font-family: 'SF Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
 
-  line-height: 1.7;
+/* inline code snippet */
+p > code {
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+
+/* code block */
+pre > code {
+  font-size: 1rem;
+  line-height: 1.5;
 }
 
 /* Archivo letter-spacings overrides */
@@ -55,10 +65,12 @@ h3 {
   background: none;
   border: none;
   box-shadow: none;
+  padding-top: 10px;
 }
 
 .sidebar {
   border: none;
+  padding-top: 0;
 }
 
 /* Override dark/light theme */
