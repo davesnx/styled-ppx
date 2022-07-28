@@ -16,6 +16,23 @@ let link = %cx(`
 `)
 ```
 
+## Interpolation in selectors
+
+```rescript
+let highlighted = %cx(`
+  padding: 4px;
+  outline: 1px solid red;
+`)
+
+let link = %cx(`
+  color: $(Color.Text.body);
+
+  & .$(highlighted) {
+    padding: 0px;
+  }
+`)
+```
+
 ## Interpolation in Media queries
 
 ```rescript

@@ -83,6 +83,7 @@ and render_selector = (ast: Selector.t) => {
     | Type(v) => "Type(" ++ v ++ ")"
     | Subclass(v) => "Subclass(" ++ render_subclass_selector(v) ++ ")"
     | Variable(v) => "Variable(" ++ String.concat(".", v) ++ ")"
+    | ClassVariable(v) => "ClassVariable(" ++ String.concat(".", v) ++ ")"
     | Percentage(p) => "Percentage(" ++ p ++ ")"
   and render_subclass_selector: subclass_selector => string =
     fun

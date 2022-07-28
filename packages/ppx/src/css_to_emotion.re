@@ -191,6 +191,7 @@ and render_selector = (selector: Selector.t) => {
     | Type(v) => v
     | Subclass(v) => render_subclass_selector(v)
     | Variable(v) => render_variable_as_string(v)
+    | ClassVariable(v) => "." ++ render_variable_as_string(v)
     | Percentage(_v) =>
       /* TODO: Add locations to Selector.t */
       grammar_error(Location.none, "Percentage is not a valid selector")
@@ -344,6 +345,7 @@ let render_keyframes = (declarations: Declaration_list.t
         | Universal => grammar_error(loc, invalid_prelude_value("*"))
         | Subclass(_) => grammar_error(loc, invalid_prelude_value_opaque)
         | Variable(_) => grammar_error(loc, invalid_prelude_value_opaque)
+        | ClassVariable(_) => grammar_error(loc, invalid_prelude_value_opaque)
         }
      }
      | _ => grammar_error(loc, invalid_selector);

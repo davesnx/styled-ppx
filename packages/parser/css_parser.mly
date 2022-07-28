@@ -342,6 +342,8 @@ simple_selector:
   | ASTERISK; { Selector.Universal }
   /* $(Module.value) {} */
   | v = VARIABLE { Selector.Variable v }
+  /* .$(Module.value) {} */
+  | DOT; v = VARIABLE { Selector.ClassVariable v }
   /* a {} */
   | type_ = TAG; { Selector.Type type_ }
   /* #a, .a, a:visited, a[] */
