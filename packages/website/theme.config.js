@@ -15,6 +15,71 @@ let Logo = () => {
   );
 };
 
+const Head = (props) => {
+  const url = "https://styled-ppx.vercel.app";
+  const title = props.title || "Typed styled components in ReScript";
+  const prefix = `${url}  |  Documentation`;
+  const description = props.description
+    ? `${prefix} · ${props.description}`
+    : prefix;
+  const logo = `${url}/meta-img-logo.png`;
+  const background = "F2F2F2";
+  const color = "333333";
+  const metaImg = `https://api.metaimg.net/v1/render?design=simple&image=${logo}&title=${title}&description=${description}&align=left&backgroundColor=${background}&textColor=${color}`;
+
+  return (
+    <>
+      <meta name="description" content={description} />
+      <meta httpEquiv="Content-Language" content="en" />
+      <meta name="msapplication-TileColor" content="#ffffff" />
+      <meta name="theme-color" content="#ffffff" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta name="og:title" content={title} />
+      <meta name="og:description" content={description} />
+      <meta name="og:image" content={metaImg} />
+      <meta name="og:image:height" content="630" />
+      <meta name="og:image:width" content="1200" />
+      <meta name="twitter:card" content={metaImg} />
+      <meta name="twitter:site" content={url} />
+      <meta name="twitter:image" content={metaImg} />
+      <meta name="og:title" content={title} />
+      <meta name="og:url" content={url} />
+      <meta name="apple-mobile-web-app-title" content={title} />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Archivo&display=swap"
+        rel="stylesheet"
+      />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap"
+        rel="stylesheet"
+      />
+      <link
+        rel="apple-touch-icon"
+        sizes="180x180"
+        href="/favicon/apple-touch-icon.png"
+      />
+      <link
+        rel="icon"
+        type="image/png"
+        sizes="32x32"
+        href="/favicon/favicon-32x32.png"
+      />
+      <link
+        rel="icon"
+        type="image/png"
+        sizes="16x16"
+        href="/favicon/favicon-16x16.png"
+      />
+      <link rel="manifest" href="/favicon/site.webmanifest" />
+      <link
+        rel="mask-icon"
+        href="/favicon/safari-pinned-tab.svg"
+        color="#000000"
+      />
+    </>
+  )
+};
+
 export default {
   github: "https://github.com/davesnx/styled-ppx",
   siteGithub: "https://github.com/davesnx/styled-ppx",
@@ -24,12 +89,8 @@ export default {
   darkMode: true,
   font: false,
   floatTOC: true,
-  logo: () => (
-    <>
-      <Logo />
-      {/* <span className="font-sans hidden md:inline font-semibold">styled-ppx</span> */}
-    </>
-  ),
+  logo: Logo,
+  head: Head,
   feedbackLabels: "feedback",
   footerText: `MIT ${new Date().getFullYear()} @davesnx`,
 };
