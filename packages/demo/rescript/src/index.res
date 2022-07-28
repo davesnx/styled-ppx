@@ -14,7 +14,13 @@ module App2 = {
 
 let cosas = "external-selector"
 
+module Size = {
+  let small = CssJs.px(10)
+}
+
 module Link = %styled.a(`
+  margin: $(Size.small);
+
   & $(cosas) {
     font-size: 36px;
     margin-top: 16px;
