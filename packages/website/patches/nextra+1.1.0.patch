@@ -1,0 +1,30 @@
+diff --git a/node_modules/nextra/dist/nextra.js b/node_modules/nextra/dist/nextra.js
+index 50a084a..e78f5d1 100644
+--- a/node_modules/nextra/dist/nextra.js
++++ b/node_modules/nextra/dist/nextra.js
+@@ -101,17 +101,21 @@ var index = ((...args) => (nextConfig = {}) => {
+     };
+   }
+ 
++  const remarkPlugins = (nextraConfig.mdxOptions && nextraConfig.mdxOptions.remarkPlugins ? nextraConfig.mdxOptions.remarkPlugins : []).concat([remarkGfm])
++  const rehypePrettyCodeOptions = (nextraConfig.mdxOptions && nextraConfig.mdxOptions.rehypePrettyCodeOptions ? nextraConfig.mdxOptions.rehypePrettyCodeOptions : []);
++
+   return Object.assign({}, nextConfig, {
+     pageExtensions,
+-
+     webpack(config, options) {
+       config.module.rules.push({
+         test: markdownExtensionTest,
+         use: [options.defaultLoaders.babel, {
+           loader: '@mdx-js/loader',
+-          options: _extends({}, nextraConfig.mdxOptions, {
+-            remarkPlugins: (nextraConfig.mdxOptions && nextraConfig.mdxOptions.remarkPlugins ? nextraConfig.mdxOptions.remarkPlugins : []).concat([remarkGfm])
+-          })
++          options:
++            _extends(
++              {},
++              nextraConfig.mdxOptions, { remarkPlugins, rehypePrettyCodeOptions }
++            )
+         }, {
+           loader: 'nextra/loader',
+           options: _extends({}, nextraConfig, {

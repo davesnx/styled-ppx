@@ -84,9 +84,28 @@ html.light {
 }
 
 html.dark .logo {
-  fill: "#fff";
+  fill: #edf2f7;
 }
 
 html.light .logo {
-  fill: "#000";
+  fill: #111111;
+}
+
+.docs-container a {
+  --text-opacity: 1;
+  --text-opacity-background: 0.1;
+  color: rgba(66, 153, 225, var(--text-opacity));
+  background: rgba(66,153,225, var(--text-opacity-background));
+  padding: 2px 4px;
+  text-decoration: underline;
+  text-underline-position: under;
+  border-radius: 2px;
+}
+
+.docs-container a:hover {
+  --text-opacity-background: 0.2;
+}
+
+.docs-container footer a, .docs-container footer a:hover {
+  --text-opacity-background: 0;
 }
