@@ -1,0 +1,20 @@
+---
+title: Inject global styles
+---
+
+# Inject global styles
+
+`%styled.global{:rescript}` is the method to apply general styles to your website.
+
+```rescript
+%styled.global(`
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+`)
+```
+
+Recommend to not add `@font-face{:css}` defintions as globals. Consider adding the font directly to the HTML or in a `style.css` file. [More](https://andydavies.me/blog/2019/02/12/preloading-fonts-and-the-puzzle-of-priorities/).
+
+Since [emotion](https://emotion.sh) have a small run-time for those global styles to be applied to the DOM. In a regular style file this isn't an issue. Keeping `@fonts-face{:css}` or other `@imports{:css}` inside emotion will delay a bit their fetching and will cause a [Flash of Unestyled Text](https://css-tricks.com/fout-foit-foft/).

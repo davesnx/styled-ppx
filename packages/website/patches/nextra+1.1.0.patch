@@ -1,0 +1,55 @@
+diff --git a/node_modules/nextra/dist/nextra.js b/node_modules/nextra/dist/nextra.js
+index 50a084a..4c6dc81 100644
+--- a/node_modules/nextra/dist/nextra.js
++++ b/node_modules/nextra/dist/nextra.js
+@@ -6,9 +6,27 @@ var gracefulFs = require('graceful-fs');
+ var cp = _interopDefault(require('child_process'));
+ var util = require('util');
+ var download = _interopDefault(require('download'));
++var rehypePrettyCode = _interopDefault(require('rehype-pretty-code'));
+ require('remark');
+ require('strip-markdown');
+ 
++var options = {
++  theme: 'one-dark-pro',
++  onVisitLine(node) {
++    // Prevent lines from collapsing in `display: grid` mode, and
++    // allow empty lines to be copy/pasted
++    if (node.children.length === 0) {
++      node.children = [{ type: 'text', value: ' ' }]
++    }
++  },
++  onVisitHighlightedLine(node) {
++    node.properties.className.push('highlighted')
++  },
++  onVisitHighlightedWord(node) {
++    node.properties.className = ['highlighted']
++  }
++};
++
+ function _extends() {
+   _extends = Object.assign || function (target) {
+     for (var i = 1; i < arguments.length; i++) {
+@@ -101,6 +119,8 @@ var index = ((...args) => (nextConfig = {}) => {
+     };
+   }
+ 
++  const rehypePrettyCodeOptions = Object.assign({}, options, nextraConfig.mdxOptions.rehypePrettyCodeOptions)
++
+   return Object.assign({}, nextConfig, {
+     pageExtensions,
+ 
+@@ -109,9 +129,10 @@ var index = ((...args) => (nextConfig = {}) => {
+         test: markdownExtensionTest,
+         use: [options.defaultLoaders.babel, {
+           loader: '@mdx-js/loader',
+-          options: _extends({}, nextraConfig.mdxOptions, {
+-            remarkPlugins: (nextraConfig.mdxOptions && nextraConfig.mdxOptions.remarkPlugins ? nextraConfig.mdxOptions.remarkPlugins : []).concat([remarkGfm])
+-          })
++          options: {
++            remarkPlugins: [remarkGfm],
++            rehypePlugins: [[rehypePrettyCode, rehypePrettyCodeOptions]],
++          }
+         }, {
+           loader: 'nextra/loader',
+           options: _extends({}, nextraConfig, {

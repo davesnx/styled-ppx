@@ -1,0 +1,80 @@
+---
+title: Interpolation
+---
+
+import Callout from 'nextra-theme-docs/callout'
+
+# Interpolation
+
+Interpolation allows to use any identifier as a value inside CSS. "any identifier" refers to any ReScript variables or [module accessors](https://rescript-lang.org/try?code=LYewJgrgNgpgBAFQBY2PAvHA3gKDnWAFzgHMAnGATzkwGEBnegKXoDoUAPACgCIAhAKJ8AInwAcPAJQ4AvjiA).
+
+Useful for reusing variables, handling themes or conditionally apply styles based on props at run-time.
+
+```rescript
+module Component = %styled.div(`
+  border: 1px solid $(Theme.black);
+)
+```
+
+<Callout>
+  Don't confuse interpolation from [String Interpolation from ReScript](https://rescript-lang.org/docs/manual/latest/primitive-types#string-interpolation).
+</Callout>
+
+Interpolation works inside values, media-queries and selectors. It doesn't work for entire properties, which is slightly different from other JavaScript-based solutions (such as styled-components or emotion) their interpolation is more dynamic and can be used everywhere.
+
+**styled-ppx** forces you to be more rigit, with the promise of being type-safe, the same way as ReScript does ❤️. The dynamism from JavaScript-based solutions comes with the cost of unsafety.
+
+Here's an example: `margin-${whatever}: 10px` is valid in JavaScript, while isn't valid in **styled-ppx**. As explained above, this interpolation can't be applied to entire **properties**, neither half-properties.
+
+The solution is simple, you would handle all properties based on the dynamic value:
+
+```rescript
+let margin = direction =>
+  switch direction {
+  | Left => %css("margin-left: 10px;")
+  | Right => %css("margin-right: 10px;")
+  | Top => %css("margin-top: 10px;")
+  | Bottom => %css("margin-bottom: 10px;")
+  }
+```
+
+If you aren't familiar with `%css{:rescript}` extension, take a look [in the `%css` section](./css.md)
+
+## Example
+
+Any value from any property can be interpolated. It relies on the position of the interpolation to guess which value you are trying to interpolate.
+
+```rescript
+module Size = {
+  let small = CssJs.px(10)
+}
+
+margin: $(Size.small); // -> margin: 10px;
+margin: $(Size.small) 0; // -> margin: 10px 0;
+margin: $(Size.small) $(Size.small); // -> margin: 10px 10px;
+```
+
+## Type-safety
+
+We introduced here the API from [bs-css](https://github.com/giraud/bs-css) to define the value of `margin`. We expect you to use it to make sure the values are interpoilated with the right type. In the example above `margin` expects one of:
+
+```rescript
+auto | ch(float) | em(float) | ex(float) | rem(float) | vh(float) | vw(float) | vmin(float) | vmax(float) | px(int) | pxFloat(float) | cm(float) | mm(float) | inch(float) | pc(float) | pt(int) | zero | calc([ | add | sub], t, t) | percent(float)`
+```
+
+Since `Size.small{:rescript}` is `px(int){:rescript}`, the type-checker would allow it.
+
+## A note about polymorphism of CSS
+
+There are plenty of properties on CSS that accept different types of values, the ones encountered challenging are `animation`, `box-shadow`/`text-shadow`, `background`, `transition` and `transform` to name a few. Not because are shorthand properties, but because they have values that are positional and optional at the same time.
+
+Let's look at `background`.
+
+```css
+background: #fff; /* The background is white */
+background: url(img.png); /* The background is an image */
+background: #fff url(img.png); /* The background is white with an image */
+background: url(img.png) no-repeat; /* The background is a non-repeating image */
+```
+
+In this case, to interpolate the background's value like: `background: $(variable1) $(variable2)` the type-checker can't know the type of `$(variable1)` and `(variable2)` ahead of time, since there's a few possibilities of `background` valid. This is called [overload](https://www.typescriptlang.org/docs/handbook/declaration-files/by-example.html#overloaded-functions) in other languages and it's not available in ReScript to it's nature of a static typed language.

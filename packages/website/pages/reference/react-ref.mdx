@@ -1,9 +1,23 @@
+---
+title: React's Ref
+---
+
 # React's Ref
 
-All styled components expose a prop `innerRef` that will be forwarded to its internal element.
+All styled components expose a prop `innerRef` that will be forwarded to its internal element. This is useful for accessing the underlying DOM node.
 
 ```rescript
-module Input = %styled.input("")
+module Input = %styled.input(`
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 16px;
+  outline: none;
+
+  &:focus {
+    border-color: #aaaaaa;
+  }
+`)
 
 @react.component
 let make = () => {

@@ -1,0 +1,149 @@
+.algolia-autocomplete {
+  width: 100%;
+}
+
+.algolia-autocomplete .algolia-docsearch-suggestion--category-header span {
+  display: inline-block;
+}
+
+.algolia-autocomplete .ds-dropdown-menu {
+  width: 500px;
+  min-width: 300px;
+  max-width: calc(100vw - 50px);
+}
+
+h1, h2, h3, h4, h5, h6, div, span, p {
+  font-family: 'Archivo', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+code, code div, code span {
+  font-family: 'SF Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+/* inline code snippet */
+p > code {
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+
+/* code block */
+pre > code {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+pre > code {
+  display: grid;
+}
+
+code {
+  counter-reset: line;
+}
+
+code > .line::before {
+  counter-increment: line;
+  content: counter(line);
+
+  /* Other styling */
+  color: rgb(128 128 128 / 50%);
+  content: counter(line);
+  counter-increment: line;
+  display: inline-block;
+  margin-right: 1rem;
+  text-align: right;
+  width: 1rem;
+}
+
+span code > .line::before {
+  content: "";
+  width: auto;
+  margin: 0;
+}
+
+/* Archivo letter-spacings overrides */
+
+p, a {
+  letter-spacing: 0.02em;
+}
+
+h1 {
+  letter-spacing: 0.04em;
+}
+
+h2 {
+  letter-spacing: 0.04em;
+}
+
+h3 {
+  letter-spacing: 0.03em;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.sidebar a {
+  letter-spacing: 0.04rem;
+}
+
+/* Override nextra-theme-docs to minimalist style */
+
+.nextra-container nav {
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding-top: 10px;
+}
+
+.sidebar {
+  border: none;
+  padding-top: 0;
+}
+
+/* Override dark/light theme */
+
+/* <pre data-language="rescript" data-theme="light"><code data-language="rescript" data-theme="light"> */
+
+html.dark pre[data-theme="light"], html.dark code[data-theme="light"] {
+  display: none;
+}
+
+html.light pre[data-theme="dark"], html.light code[data-theme="dark"] {
+  display: none;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+html.light {
+  color-scheme: light;
+}
+
+html.dark .logo {
+  fill: #edf2f7;
+}
+
+html.light .logo {
+  fill: #111111;
+}
+
+.docs-container a {
+  --text-opacity: 1;
+  --text-opacity-background: 0.1;
+  color: rgba(66, 153, 225, var(--text-opacity));
+  background: rgba(66,153,225, var(--text-opacity-background));
+  padding: 2px 4px;
+  text-decoration: underline;
+  text-underline-position: under;
+  border-radius: 2px;
+}
+
+.docs-container a:hover {
+  --text-opacity-background: 0.2;
+}
+
+.docs-container footer a, .docs-container footer a:hover {
+  --text-opacity-background: 0;
+}

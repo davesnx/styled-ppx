@@ -1,7 +1,10 @@
 {
   "index": "Introduction",
   "getting-started": "Getting Started",
-  "usage": "Usage",
+  "reference": "API Reference",
+  "guides": "Guides",
   "about": "About",
+  "css-support": "CSS Support",
+  "faq": "FAQ",
   "releases": "Releases"
 }

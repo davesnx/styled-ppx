@@ -1,5 +1,6 @@
 {
   "scopeName": "source.styled-ppx-reason",
+  "name": "styled-ppx-reason",
   "fileTypes": ["re"],
   "injectionSelector": "L:source -comment -string",
   "patterns": [

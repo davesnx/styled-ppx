@@ -1,31 +1,33 @@
+---
+title: Array API
+---
+
 # Array API
 
-Aside from the string API mentioned before, an alternative API use an array instead.
+`%styled.{{tag}}` and `%cx{:rescript}` support an alternative to the string-based API. It's the **Array API**, where the rules can be defined as an array of `Css.Rules` (from [bs-css](https://github.com/giraud/bs-css)).
 
-## css extension
+The `Css.Rules` can be created with [`%css`](./css.md) or [bs-css](https://github.com/giraud/bs-css) calls.
 
-Generates a `Css.Rule` given a single CSS rule, generates the [bs-css](https://github.com/giraud/bs-css) rule.
+## Example
 
-```rescript
-let rule: Css.Rule.t = %css("display: block")
-```
-
-## Compose extensions and styles
-
-Both `cx` and `styled` extension support the following:
+Both `cx` and `styled` extensions support the following:
 
 ```rescript
 module Component = %styled.section([
-  %css("display: flex;"),
-  %css("justify-content: center;"),
+  %css("display: flex"),
+  %css("justify-content: center"),
 ])
 
 let className = %cx([%css("display: flex;")])
 ```
 
-Any expression that is a `Css.Rule.t` is valid inside the array.
+<small>Any expression that is a `Css.Rule.t` is valid inside the array.</small>
 
-Allowing composability and re-usability of CSS. Useful to reference other variables or an inline pattern match. Solves the migration from other systems (such as `bs-css`) and bypass `styled-ppx` parser that might not support a property.
+## Features
+
+- Allowing composability and re-usability of CSS.
+- Useful to reference other variables, a function call or a pattern match.
+- Solves the migration from other systems (such as `bs-css`) and bypass `styled-ppx` parser that might not support a property.
 
 Here are some illustrative examples:
 

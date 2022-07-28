@@ -1,0 +1,19 @@
+---
+title: Rule `css` extension
+---
+
+# Rule: `css` extension
+
+Generates a `Css.Rule{:rescript}` (from [bs-css](https://github.com/giraud/bs-css)) given a single CSS rule. The `%css` extension is useful with combination with the [Array API](./array.md), to compose and re-use rules.
+
+## Example
+
+```rescript
+let rule: Css.Rule.t = %css("display: block")
+```
+
+## Features
+
+- CSS Declarations aren't allowed. Declarations can contain selectors, rules only a pair of property/value. If you need a selector or more than one rule, use `%cx{:rescript}` instead.
+- Semi-colon is optional. `display: block;{:css}` and `display: block{:css}` are the same.
+- Curly braces aren't allowed. `{ display: block }{:css}` isn't valid.
