@@ -276,11 +276,17 @@ attribute_selector:
   /* https://www.w3.org/TR/selectors-4/#type-nmsp */
   /* We don't support namespaces in wq-name (`ns-prefix?`). We treat it like a IDENT */
   /* [ <wq-name> ] */
-  | LEFT_BRACKET; i = IDENT; RIGHT_BRACKET {
+  | LEFT_BRACKET; WS?;
+    i = IDENT; WS?;
+    RIGHT_BRACKET {
     Selector.Attribute(Attr_value i)
   }
   /* [ wq-name = "value"] */
-  | LEFT_BRACKET; i = IDENT; m = attr_matcher; v = STRING; RIGHT_BRACKET {
+  | LEFT_BRACKET; WS?;
+    i = IDENT; WS?;
+    m = attr_matcher; WS?;
+    v = STRING; WS?;
+    RIGHT_BRACKET {
     Selector.Attribute(
       To_equal({
         name = i;
@@ -290,7 +296,11 @@ attribute_selector:
     )
   }
   /* [ wq-name = value] */
-  | LEFT_BRACKET; i = IDENT; m = attr_matcher; v = IDENT; RIGHT_BRACKET {
+  | LEFT_BRACKET; WS?;
+    i = IDENT; WS?;
+    m = attr_matcher; WS?;
+    v = IDENT; WS?;
+    RIGHT_BRACKET {
     Selector.Attribute(
       To_equal({
         name = i;

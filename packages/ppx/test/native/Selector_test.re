@@ -186,6 +186,11 @@ let selectors_css_tests = [
     [%expr CssJs.style(. [| CssJs.selector(. {js|& a[target="_blank"]|js}, [||])|])],
   ),
   (
+    "& a[target=\"_blank\"]",
+    [%expr [%cx {|& a[ target = "_blank" ] {}|}]],
+    [%expr CssJs.style(. [| CssJs.selector(. {js|& a[target="_blank"]|js}, [||])|])],
+  ),
+  (
     "$(pseudo)",
     [%expr [%cx "$(pseudo) {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. pseudo, [||])|])],
