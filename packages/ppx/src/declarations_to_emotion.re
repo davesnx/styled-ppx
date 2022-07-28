@@ -22,12 +22,12 @@ type transform('ast, 'value) = {
   string_to_expr: string => result(list(Parsetree.expression), string),
 };
 
-let emit = (property, value_of_ast, value_to_expr) => {
-  let add_type = (expr) => {
-    let typ = Helper.Typ.constr(~loc=Location.none, {txt: Ldot(Lident("CssJs"), "rule"), loc: Location.none}, []);
-    Helper.Exp.constraint_(~loc=Location.none, expr, typ);
-  }
+let add_type = (expr) => {
+  let typ = Helper.Typ.constr(~loc=Location.none, {txt: Ldot(Lident("CssJs"), "rule"), loc: Location.none}, []);
+  Helper.Exp.constraint_(~loc=Location.none, expr, typ);
+}
 
+let emit = (property, value_of_ast, value_to_expr) => {
   let ast_of_string = Parser.parse(property);
   let ast_to_expr = ast => value_of_ast(ast) |> value_to_expr |> List.map(add_type);
   let string_to_expr = string =>
@@ -37,10 +37,6 @@ let emit = (property, value_of_ast, value_to_expr) => {
 };
 
 let emit_shorthand = (parser, mapper, value_to_expr) => {
-  let add_type = (expr) => {
-    let typ = Helper.Typ.constr(~loc=Location.none, {txt: Ldot(Lident("CssJs"), "rule"), loc: Location.none}, []);
-    Helper.Exp.constraint_(~loc=Location.none, expr, typ);
-  }
   let ast_of_string = Parser.parse(parser);
   let ast_to_expr = ast => ast |> List.map(mapper) |> value_to_expr |> List.map(add_type);
   let string_to_expr = string =>
