@@ -57,7 +57,7 @@ We would love your help improving **styled-ppx**!. Please see our contributing a
 
 ## License
 
-TDB
+This project is licensed under the [Simplified BSD License (BSD 2-Clause License)](./LICENSE).
 
 ## CI
 
