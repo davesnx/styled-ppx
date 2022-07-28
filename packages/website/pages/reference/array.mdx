@@ -1,3 +1,7 @@
+---
+title: Array API
+---
+
 # Array API
 
 `%styled.{{tag}}` and `%cx` support an alternative to the string-based API. It's the **Array API**, where the rules can be defined as an array of `Css.Rules` (from [bs-css](https://github.com/giraud/bs-css)).
@@ -19,7 +23,11 @@ let className = %cx([%css("display: flex;")])
 
 <small>Any expression that is a `Css.Rule.t` is valid inside the array.</small>
 
-Allowing composability and re-usability of CSS. Useful to reference other variables or an inline pattern match. Solves the migration from other systems (such as `bs-css`) and bypass `styled-ppx` parser that might not support a property.
+## Features
+
+- Allowing composability and re-usability of CSS.
+- Useful to reference other variables, a function call or a pattern match.
+- Solves the migration from other systems (such as `bs-css`) and bypass `styled-ppx` parser that might not support a property.
 
 Here are some illustrative examples:
 

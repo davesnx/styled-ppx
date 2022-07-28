@@ -1,9 +1,31 @@
 ---
-title: styled-ppx
-headeronly: true
-searchable: false
+title: Introduction to styled-ppx
 ---
 
-import Home from "../components/homepage";
+### Typed styled components ReScript
 
-<Home/>
+Write your styles in CSS inside ReScript files and generate React components, classnames or CSS rules.
+
+```rescript
+module Center = %styled.div(`
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`)
+
+<Center>
+  {React.string("Hello from the future!")}
+</Center>
+```
+
+- Type-safe CSS
+- Component-based styling
+- Implements classname and css helpers
+- There's no abstraction over standard CSS, neither a new [DSL](https://en.wikipedia.org/wiki/Domain-specific_language)
+- Build on top of [emotion](https://emotion.sh)
+- Support the power of the underliying language: pattern-matching, composition, labelled arguments.
+
+**styled-ppx** is a ppx, can learn more about ppxs in the [Real World OCaml: Preprocessing with ppx](https://dev.realworldocaml.org/ppx.html). To get a general idea, are similar to [babel-plugins](https://babeljs.io/docs/en/plugins/). They run before the compilation of your code, and expands those notations (`%styled.div` or `%cx`) into valid ReScript code.
+
