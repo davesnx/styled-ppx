@@ -1,8 +1,9 @@
 {
-  "components": "Components",
+  "styled-components": "Styled components",
   "interpolation": "Interpolation",
   "dynamic-components": "Dynamic components",
-  "classname": "className",
+  "classname": "className (%cx)",
+  "css": "Rule (%css)",
   "array": "Array API",
   "keyframe": "Keyframe",
   "globals": "Inject global styles",
