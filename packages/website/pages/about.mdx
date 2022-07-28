@@ -11,19 +11,31 @@ Maintainer: [José Eduardo Monteiro](https://github.com/joseemds)
 
 # Motivation
 
-I love CSS. In my opinion writing React with styled-components It's one of the best combos for writing scalable design systems, UI libraries and applications. When I discovered Reason back in the days, it wasn't possible to bind to styled-components. Even people were asking for it ([a](https://reasonml.chat/t/idiomatic-way-to-bind-to-styled-components/886) [f](https://reasonml.chat/t/styled-components-possible/554)[e](https://reasonml.chat/t/styling-solutions-reasonreact-as-of-aug-18/958)[w](https://reasonml.chat/t/options-and-best-practices-for-styling-in-reasonreact/261) [t](https://twitter.com/lyovson/status/1233397294311100417)[i](https://discord.gg/byjdYFH)[m](https://discord.gg/byjdYFH)[e](https://discord.gg/byjdYFH)[s](https://discord.gg/byjdYFH)).
+There are a few reasons why this project exists and why came to live.
 
-Using CSS instead of a tiny abstraction enables integrations
+### There was a need
+In my experience, writing React with a CSS-in-JS library is one of the best combos for writing scalable design systems, UI libraries and applications. When I discovered Reason back in the days (arround 2018), it wasn't possible to bind to styled-components neither emotion. Even people were asking for it ([a](https://reasonml.chat/t/idiomatic-way-to-bind-to-styled-components/886) [f](https://reasonml.chat/t/styled-components-possible/554)[e](https://reasonml.chat/t/styling-solutions-reasonreact-as-of-aug-18/958)[w](https://reasonml.chat/t/options-and-best-practices-for-styling-in-reasonreact/261) [t](https://twitter.com/lyovson/status/1233397294311100417)[i](https://discord.gg/byjdYFH)[m](https://discord.gg/byjdYFH)[e](https://discord.gg/byjdYFH)[s](https://discord.gg/byjdYFH)).
 
-Mostly since styled-components/emotion relied on a JavaScript feature that isn't available in Reason (template literals).
+During that time, there were a few efforts on bringing type-safety on top of CSS with [bs-css](https://github.com/giraud/bs-css) or [bs-emotion](https://github.com/ahrefs/bs-emotion). Even thought I liked that approach, it had a few drawbacks:
+- The need for learning a new DSL on top of CSS was tedious. Very fancy for simple properties, but almost impossible for more complex ones (a classic example `width: calc(100% - 20px)` became `CssJs.width('calc('min, percent(100.), 'px(20)));`). For the real world usage I endup using `CssJs.property("property", "value")` most of the times.
+- The runtime is huge. The bundle-size of bs-css starts with 64kb and goes up considerably with the usage and ReScript death code elimiation.
 
-Aside from all of this, there were a few efforts on bringing type-safety on top of CSS with [bs-css](https://github.com/giraud/bs-css) or [bs-glamour](). Even thought I liked that approach, it had two big drawbacks. The need for learning a new DSL on top of CSS was tedious and the runtime is huge.
+### It's possible
+Embedding CSS inside Reason/OCaml seemed like a bad idea at first, mostly since most CSS-in-JS solutions that use native CSS relied on a JavaScript feature that isn't available in Reason [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals).
 
-After discovering what a ppx was (*"a mechanism to embed other languages inside Reason"*) It was possible to mimic the same API as styled components. That's where this project became a reality.
+After discovering what a ppx was (*"a mechanism to embed other languages inside Reason"*), and it could mimic the template literals, I jumped straight into hacking a prototype that became this project.
+
+Embedding languages inside others, isn't a new concept, has been happening for a long time. In fact, the most common case of an embedded language is usually CSS inside HTML.
+Using CSS enables all sort of integrations: Editors, DevTools, prototyping tools, Github Copilot, etc. Even for designers that don't want to understand neither care about ReScript.
+
+### It can bring more features than the JS
+Enabling type-safety into CSS is more like a nice to have, rather than a hard requirement. Features that aren't implemented but are on the horizon are mostly related in extracting the CSS from the runtime and keep it in a separate file. Forcing to have a zero run-time application. Provide a safe way to access a shared theme without having to worry about the runtime, would be a killer feature, that I wished I had before.
 
 To know more about how it works or what are the benefits I recommend to watch [my talk at ReasonSTHLM Meetup](https://www.youtube.com/watch?v=ekHCBZiCviM).
 
-### Credits
+## Credits
+
+Here's a list of people that helped me and couldn't make it without them:
 
 - [**Javier Chávarri**](https://github.com/jchavarri): for the introduction to Reason. Teaching me all his knowledge about OCaml, AST, ppx rewritters and the help of boostrapping the project.
 - [**Alessandro Strada**](https://github.com/astrada): this project started with inspiration from [bs-css-ppx](https://github.com/astrada/ppx_bs_css)
