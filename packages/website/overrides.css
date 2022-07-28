@@ -90,10 +90,15 @@ h3 {
 /* Override nextra-theme-docs to minimalist style */
 
 .nextra-container nav {
-  background: none;
   border: none;
   box-shadow: none;
   padding-top: 10px;
+}
+html.light .nextra-container nav {
+  background: rgb(255 255 255 / 50%);
+}
+html.dark .nextra-container nav {
+  background: rgb(17 17 17 / 50%);
 }
 
 .sidebar {
