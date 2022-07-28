@@ -32,6 +32,28 @@ pre > code {
   line-height: 1.5;
 }
 
+pre > code {
+  display: grid;
+}
+
+code {
+  counter-reset: line;
+}
+
+code > .line::before {
+  counter-increment: line;
+  content: counter(line);
+
+  /* Other styling */
+  color: rgb(128 128 128 / 50%);
+  content: counter(line);
+  counter-increment: line;
+  display: inline-block;
+  margin-right: 1rem;
+  text-align: right;
+  width: 1rem;
+}
+
 /* Archivo letter-spacings overrides */
 
 p, a {
@@ -74,6 +96,16 @@ h3 {
 }
 
 /* Override dark/light theme */
+
+/* <pre data-language="rescript" data-theme="light"><code data-language="rescript" data-theme="light"> */
+
+html.dark pre[data-theme="light"] {
+  display: none;
+}
+
+html.light pre[data-theme="dark"] {
+  display: none;
+}
 
 html.dark {
   color-scheme: dark;

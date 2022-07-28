@@ -42,7 +42,7 @@ module.exports = withNextra({
   unstable_flexsearch: true, */
   mdxOptions: {
     rehypePrettyCodeOptions: {
-      theme: 'github-dark-dimmed',
+      theme: { dark: 'github-dark-dimmed', light: 'github-light' } ,
       getHighlighter: options => {
         return getHighlighter({
           ...options,
