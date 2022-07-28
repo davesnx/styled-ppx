@@ -39,7 +39,7 @@ let container = %cx(`
 
 There's no way to add unsafe behaviour on CSS definitions. Prefer to keep improving the overall safety via requests/issues than allowing a method for unsafe to all.
 
-If this is bottle-neck, there's a handy way to workaround. The solution is to use the Array API to generate `%cx` calls, like this example:
+If this is bottle-neck, there's a handy way to workaround. The solution is to use the Array API to generate `%cx{:rescript}` calls, like this example:
 
 ```rescript
 let block: Css.Rule.t = %css("display: block")
@@ -47,4 +47,4 @@ let randomProperty = CssJs.unsafe("aspect-ratio", "21 / 9");
 let picture = %cx([block, randomProperty]);
 ```
 
-Here the lack of safety will rely on your usage of `CssJs.unsafe`.
+Here the lack of safety will rely on your usage of `CssJs.unsafe{:rescript}`.

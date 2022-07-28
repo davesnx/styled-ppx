@@ -54,6 +54,12 @@ code > .line::before {
   width: 1rem;
 }
 
+span code > .line::before {
+  content: "";
+  width: auto;
+  margin: 0;
+}
+
 /* Archivo letter-spacings overrides */
 
 p, a {
@@ -99,11 +105,11 @@ h3 {
 
 /* <pre data-language="rescript" data-theme="light"><code data-language="rescript" data-theme="light"> */
 
-html.dark pre[data-theme="light"] {
+html.dark pre[data-theme="light"], html.dark code[data-theme="light"] {
   display: none;
 }
 
-html.light pre[data-theme="dark"] {
+html.light pre[data-theme="dark"], html.light code[data-theme="dark"] {
   display: none;
 }
 
