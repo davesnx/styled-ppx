@@ -7,7 +7,8 @@
     "dev": "next -p 7007",
     "start": "next",
     "build": "next build",
-    "post-install": "patch-package"
+    "post-install": "patch-package",
+    "pre-build": "patch-package"
   },
   "author": "David Sancho",
   "license": "MIT",
