@@ -1,5 +1,6 @@
-const Path = require("path");
-const Nextra = require("nextra");
+/* const Path = require("path"); */
+const withNextra = require("nextra");
+
 /* const { getHighlighter, BUNDLED_LANGUAGES } = require('shiki'); */
 
 /* const langs = [
@@ -18,7 +19,7 @@ const Nextra = require("nextra");
   },
 ]; */
 
-module.exports = Nextra({
+module.exports = withNextra({
   i18n: {
     locales: ["en-US"],
     defaultLocale: "en-US",
@@ -26,8 +27,8 @@ module.exports = Nextra({
   theme: "nextra-theme-docs",
   themeConfig: "./theme.config.js",
   /* unstable_staticImage: true,
-  unstable_flexsearch: true,
-  mdxOptions: {
+  unstable_flexsearch: true, */
+/* mdxOptions: {
     rehypePrettyCodeOptions: {
       getHighlighter: options => {
         return getHighlighter({
