@@ -27,6 +27,9 @@ open Css_types
 %token <string> OPERATOR
 %token <string> COMBINATOR
 %token <string> DELIM
+%token <string> FUNCTION
+%token <string> URL
+%token BAD_URL
 %token <string> AT_MEDIA
 %token <string> AT_KEYFRAMES
 %token <string> AT_RULE
@@ -262,7 +265,7 @@ pseudo_class_selector:
   /* :visited */
   | COLON; i = IDENT { Selector.(Pseudoclass(Ident i)) }
   /* :nth-child() */
-  | COLON; f = IDENT; LEFT_PAREN; xs = loc(selector); RIGHT_PAREN {
+  | COLON; f = FUNCTION; xs = loc(selector); RIGHT_PAREN {
     Selector.(Pseudoclass(Function({ name = f; payload = xs })))
   }
   /* TODO: <function-token> and <any-value> */
@@ -428,7 +431,7 @@ component_value_in_prelude:
   /* $(Lola.value) */
   | v = VARIABLE { Component_value.Variable v }
   /* calc() */
-  | f = loc(IDENT); LEFT_PAREN; xs = loc(prelude); RIGHT_PAREN; {
+  | f = loc(FUNCTION); xs = loc(prelude); RIGHT_PAREN; {
     Component_value.Function (f, xs)
   }
   | WS { Component_value.Delim " " }
@@ -456,7 +459,7 @@ component_value:
   /* $(Lola.value) */
   | v = VARIABLE { Component_value.Variable v }
   /* calc() */
-  | f = loc(IDENT); LEFT_PAREN; xs = loc(component_values); RIGHT_PAREN; {
+  | f = loc(FUNCTION) xs = loc(component_values); RIGHT_PAREN; {
     Component_value.Function (f, xs)
   }
 ;

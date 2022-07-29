@@ -66,6 +66,9 @@ let token_to_string =
   | Parser.DOT => "."
   | Parser.COMMA => ","
   | Parser.ASTERISK => "*"
+  | Parser.FUNCTION(fn) => fn ++ "("
+  | Parser.URL(url) => url
+  | Parser.BAD_URL => "bar url"
 ;
 
 let token_to_debug =
@@ -107,6 +110,9 @@ let token_to_debug =
   | Parser.COMMA => "COMMA"
   | Parser.WS => "WS"
   | Parser.ASTERISK => "ASTERISK"
+  | Parser.FUNCTION(fn) => "FUNCTION(" ++ fn ++ ")"
+  | Parser.URL(u) => "URL(" ++ u ++ ")"
+  | Parser.BAD_URL => "BAD_URL"
 ;
 
 let () =
@@ -215,8 +221,8 @@ let at_rule = [%sedlex.regexp? ("@", ident)];
 let at_media = [%sedlex.regexp? ("@", "media")];
 let at_keyframes = [%sedlex.regexp? ("@", "keyframes")];
 
-let tag = [%sedlex.regexp?
-  "a"
+let is_tag = fun
+  | "a"
   | "abbr"
   | "address"
   | "area"
@@ -332,8 +338,9 @@ let tag = [%sedlex.regexp?
   | "ul"
   | "var"
   | "video"
-  | "wbr"
-];
+  | "wbr" => true
+  | _ => false
+;
 
 let _a = [%sedlex.regexp? 'A' | 'a'];
 let _b = [%sedlex.regexp? 'B' | 'b'];
@@ -399,32 +406,37 @@ let time = [%sedlex.regexp? _s | (_m, _s)];
 
 let frequency = [%sedlex.regexp? (_h, _z) | (_k, _h, _z)];
 
-let skip_whitespace = ref(false);
+let escape = [%sedlex.regexp? '\\'];
+let digit = [%sedlex.regexp? '0' .. '9'];
+let hex_digit = [%sedlex.regexp? digit | 'A' .. 'F' | 'a' .. 'f'];
+let non_ascii_code_point = [%sedlex.regexp? Sub(any, '\000' .. '\128')]; // greater than \u0080
+let identifier_start_code_point = [%sedlex.regexp?
+  'a' .. 'z' | 'A' .. 'Z' | non_ascii_code_point | '_'
+];
+/* Added "'" to identifier to enable Language Variables */
+let identifier_code_point = [%sedlex.regexp?
+  identifier_start_code_point | digit | '-' | "'"
+];
+let non_printable_code_point = [%sedlex.regexp?
+  '\000' .. '\b' | '\011' | '\014' .. '\031' | '\127'
+];
+let newline = [%sedlex.regexp? '\n'];
+let whitespace = [%sedlex.regexp? Plus('\n' | '\t' | ' ')];
+let ident_char = [%sedlex.regexp?
+  '_' | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' | non_ascii_code_point | escape
+];
 
 /* This module is a copy/paste of Reason_css_lexer in favor of moving everything into css_lexer */
-module NewTokenizer = {
+module Tokenizer = {
   open Reason_css_lexer;
-  let lexeme = Sedlexing.utf8;
+  let lexeme = Sedlexing.latin1;
 
   let (let.ok) = Result.bind;
-  let escape = [%sedlex.regexp? '\\'];
-  let non_ascii_code_point = [%sedlex.regexp? Sub(any, '\000' .. '\128')]; // greater than \u0080
-  let digit = [%sedlex.regexp? '0' .. '9'];
-  let identifier_start_code_point = [%sedlex.regexp?
-    'a' .. 'z' | 'A' .. 'Z' | non_ascii_code_point | '_'
-  ];
-  /* Added "'" to identifier to enable Language Variables */
-  let identifier_code_point = [%sedlex.regexp?
-    identifier_start_code_point | digit | '-' | "'"
-  ];
-  let non_printable_code_point = [%sedlex.regexp?
-    '\000' .. '\b' | '\011' | '\014' .. '\031' | '\127'
-  ];
 
   let consume_whitespace = buf =>
     switch%sedlex (buf) {
-    | Star(whitespace) => WHITESPACE
-    | _ => WHITESPACE
+    | Star(whitespace) => Parser.WS
+    | _ => Parser.WS
   };
 
   let string_of_uchar = char => {
@@ -482,15 +494,15 @@ module NewTokenizer = {
       let when_whitespace = () => {
         let _ = consume_whitespace(buf);
         switch%sedlex (buf) {
-        | ')' => Ok(URL(acc))
+        | ')' => Ok(Parser.URL(acc))
         | eof => Error((URL(acc), Eof))
         | _ =>
           consume_remnants_bad_url(buf);
-          Ok(BAD_URL);
+          Ok(Parser.BAD_URL);
         };
       };
       switch%sedlex (buf) {
-      | ')' => Ok(URL(acc))
+      | ')' => Ok(Parser.URL(acc))
       | eof => Error((URL(acc), Eof))
       | whitespace => when_whitespace()
       | '"'
@@ -544,21 +556,33 @@ module NewTokenizer = {
           | _ => false
           }
         );
-      is_function(buf) ? Ok(FUNCTION(string)) : consume_url(buf);
+      is_function(buf) ? Ok(Parser.FUNCTION(string)) : consume_url(buf);
     };
-    // TODO: should it return IDENT() when error?
-    let.ok string = consume_identifier(buf) |> handle_consume_identifier;
 
-    switch%sedlex (buf) {
-    | '(' =>
+  let.ok string = consume_identifier(buf) |> handle_consume_identifier;
+  switch%sedlex (buf) {
+    | "(" =>
       switch (string) {
-      | "url" => read_url(string)
-      | _ => Ok(FUNCTION(string))
+        | "url" => read_url(string)
+        | _ => Ok(Parser.FUNCTION(string))
       }
-    | _ => Ok(IDENT(string))
+    | _ =>
+      is_tag(string) ? Ok(Parser.TAG(string)) : Ok(Parser.IDENT(string))
     };
   };
 };
+
+let handle_tokenizer_error = (buf: Sedlexing.t) =>
+  fun
+  | Ok(value) => value
+  | Error((_, msg)) => {
+    let error: string = Reason_css_lexer.show_error(msg);
+    let position = buf.pos;
+    raise @@ LexingError((position, error));
+  }
+;
+
+let skip_whitespace = ref(false);
 
 let rec get_next_token = (buf) => {
   open Parser;
@@ -613,8 +637,10 @@ let rec get_next_token = (buf) => {
   /* NOTE: should be placed above ident, otherwise pattern with
    * '-[0-9a-z]{1,6}' cannot be matched */
   | (_u, '+', unicode_range) => UNICODE_RANGE(latin1(buf))
-  | tag => TAG(latin1(buf))
-  | ident => IDENT(latin1(buf))
+  | identifier_start_code_point => {
+    let _ = Sedlexing.backtrack(buf);
+    Tokenizer.consume_ident_like(buf) |> handle_tokenizer_error(buf);
+  }
   | ('#', name) => HASH(latin1(~skip=1, buf))
   | number => get_dimension(latin1(buf), buf)
   | whitespaces => {
