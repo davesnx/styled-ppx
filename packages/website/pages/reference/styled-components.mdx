@@ -25,10 +25,18 @@ module StyledComponent = %styled.div(`
 
 ### React props (makeProps)
 
-Styled components expose all the React component props within their API.
+Styled components expose all the React component props within their API. For example, an input will expose all the props of the input element:
 
 ```rescript
-module Input = %styled.input("...")
+module Input = %styled.input(`
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  padding: 8px;
+
+  &:focus {
+    border-color: #aaaaaa;
+  }
+`)
 
 <Input
   placeholder="Enter your name..."
