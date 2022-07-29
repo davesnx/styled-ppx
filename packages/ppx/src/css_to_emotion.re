@@ -160,7 +160,7 @@ and render_declaration = (d: Declaration.t): list(Parsetree.expression) => {
   | Error(`Invalid_value(value)) =>
     grammar_error(
       loc,
-      "Invalid value: '" ++ value ++ "' in property '" ++ property ++ "'",
+      "Invalid value: '" ++ String.trim(value) ++ "' in property '" ++ property ++ "'",
     )
   };
 }
@@ -191,7 +191,6 @@ and render_selector = (selector: Selector.t) => {
     | Type(v) => v
     | Subclass(v) => render_subclass_selector(v)
     | Variable(v) => render_variable_as_string(v)
-    | ClassVariable(v) => "." ++ render_variable_as_string(v)
     | Percentage(_v) =>
       /* TODO: Add locations to Selector.t */
       grammar_error(Location.none, "Percentage is not a valid selector")
@@ -199,6 +198,7 @@ and render_selector = (selector: Selector.t) => {
     fun
     | Id(v) => "#" ++ v
     | Class(v) => "." ++ v
+    | ClassVariable(v) => "." ++ render_variable_as_string(v)
     | Attribute(Attr_value(v)) => "[" ++ v ++ "]"
     | Attribute(To_equal({name, kind, value})) =>  {
       let value = switch (value) {
@@ -345,7 +345,6 @@ let render_keyframes = (declarations: Declaration_list.t
         | Universal => grammar_error(loc, invalid_prelude_value("*"))
         | Subclass(_) => grammar_error(loc, invalid_prelude_value_opaque)
         | Variable(_) => grammar_error(loc, invalid_prelude_value_opaque)
-        | ClassVariable(_) => grammar_error(loc, invalid_prelude_value_opaque)
         }
      }
      | _ => grammar_error(loc, invalid_selector);

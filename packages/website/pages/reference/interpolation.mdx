@@ -16,11 +16,18 @@ module Component = %styled.div(`
 )
 ```
 
+```rescript
+module Component = %styled.div(`
+  max-width: $(maxWidth);
+)
+```
+
+Interpolation works inside values, media-queries and selectors. It doesn't work for entire properties or any interpolation, which is slightly different from SASS/Less and other JavaScript-based solutions (such as styled-components or emotion) their interpolation is more dynamic and can be used everywhere.
+
 <Callout>
   Don't confuse interpolation from [String Interpolation from ReScript](https://rescript-lang.org/docs/manual/latest/primitive-types#string-interpolation).
 </Callout>
 
-Interpolation works inside values, media-queries and selectors. It doesn't work for entire properties, which is slightly different from other JavaScript-based solutions (such as styled-components or emotion) their interpolation is more dynamic and can be used everywhere.
 
 **styled-ppx** forces you to be more rigit, with the promise of being type-safe, the same way as ReScript does ❤️. The dynamism from JavaScript-based solutions comes with the cost of unsafety.
 
@@ -53,6 +60,11 @@ margin: $(Size.small); // -> margin: 10px;
 margin: $(Size.small) 0; // -> margin: 10px 0;
 margin: $(Size.small) $(Size.small); // -> margin: 10px 10px;
 ```
+
+## Features
+
+- Type-safety via type holes
+- Support for shorthand properties and interpolate on a value
 
 ## Type-safety
 

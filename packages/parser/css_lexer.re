@@ -165,7 +165,10 @@ let ident_char = [%sedlex.regexp?
 
 let ident = [%sedlex.regexp? (Opt('-'), ident_start, Star(ident_char))];
 
-let variable_name = [%sedlex.regexp? (Star(ident_char))];
+let variable_ident_char = [%sedlex.regexp?
+  '_' | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | non_ascii | escape | '\''
+];
+let variable_name = [%sedlex.regexp? (Star(variable_ident_char))];
 let module_variable = [%sedlex.regexp? (variable_name, '.')];
 let variable = [%sedlex.regexp? ('$', '(', Opt(Star(module_variable)), variable_name, ')')];
 

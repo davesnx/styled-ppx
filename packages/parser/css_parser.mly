@@ -318,12 +318,15 @@ id_selector: h = HASH { Selector.Id h }
 /* <class-selector> = '.' <ident-token> */
 class_selector: DOT; c = IDENT { Selector.Class c };
 
+
 /* <subclass-selector> = <id-selector> | <class-selector> | <attribute-selector> | <pseudo-class-selector> */
 subclass_selector:
   | id = id_selector { id }
   | c = class_selector { c }
   | a = attribute_selector { a }
   | pcs = pseudo_class_selector { Selector.Pseudo_class pcs }
+  /* .$(Variable) as subclass_selector */
+  | DOT; v = VARIABLE { Selector.ClassVariable v };
 ;
 
 selector:
@@ -352,8 +355,6 @@ simple_selector:
   | ASTERISK; { Selector.Universal }
   /* $(Module.value) {} */
   | v = VARIABLE { Selector.Variable v }
-  /* .$(Module.value) {} */
-  | DOT; v = VARIABLE { Selector.ClassVariable v }
   /* a {} */
   | type_ = TAG; { Selector.Type type_ }
   /* #a, .a, a:visited, a[] */

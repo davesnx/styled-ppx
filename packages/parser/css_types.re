@@ -96,11 +96,11 @@ and Selector: {
     | Type(string)
     | Subclass(subclass_selector)
     | Variable(list(string))
-    | ClassVariable(list(string))
     | Percentage(string)
   and subclass_selector =
     | Id(string)
     | Class(string)
+    | ClassVariable(list(string))
     | Attribute(attribute_selector)
     | Pseudo_class(pseudo_selector)
   and attribute_selector =
