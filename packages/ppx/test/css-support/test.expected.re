@@ -1623,7 +1623,6 @@ CssJs.unsafe({js|listStyleType|js}, {js| ethiopic-halehame-ti-et|js});
 CssJs.unsafe({js|listStyleType|js}, {js| other-style|js});
 CssJs.unsafe({js|listStyleType|js}, {js| inside|js});
 CssJs.unsafe({js|listStyleType|js}, {js| outside|js});
-CssJs.unsafe({js|listStyleType|js}, {js| \32 style|js});
 CssJs.unsafe({js|listStyleType|js}, {js| "-"|js});
 CssJs.unsafe({js|listStyleType|js}, {js| '-'|js});
 CssJs.unsafe({js|counterReset|js}, {js| foo|js});

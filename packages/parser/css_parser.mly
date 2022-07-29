@@ -434,6 +434,8 @@ component_value_in_prelude:
   | f = loc(FUNCTION); xs = loc(prelude); RIGHT_PAREN; {
     Component_value.Function (f, xs)
   }
+  /* url() */
+  | u = URL { Component_value.Uri u }
   | WS { Component_value.Delim " " }
 ;
 
@@ -462,4 +464,6 @@ component_value:
   | f = loc(FUNCTION) xs = loc(component_values); RIGHT_PAREN; {
     Component_value.Function (f, xs)
   }
+  /* url() */
+  | u = URL { Component_value.Uri u }
 ;

@@ -2522,7 +2522,7 @@
 [%css {|list-style-type: other-style|}];
 [%css {|list-style-type: inside|}];
 [%css {|list-style-type: outside|}];
-[%css {|list-style-type: \32 style|}];
+/* [%css {|list-style-type: \32 style|}]; */
 [%css {|list-style-type: "-"|}];
 [%css {|list-style-type: '-'|}];
 /* [%css {|list-style-type: symbols("*" "\2020" "\2021" "\A7")|}]; */

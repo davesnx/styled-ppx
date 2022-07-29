@@ -142,8 +142,6 @@ let whitespace = [%sedlex.regexp? " " | '\t' | newline];
 
 let whitespaces = [%sedlex.regexp? Star(whitespace)];
 
-let hex_digit = [%sedlex.regexp? '0' .. '9' | 'a' .. 'f' | 'A' .. 'F'];
-
 let digit = [%sedlex.regexp? '0' .. '9'];
 
 let non_ascii = [%sedlex.regexp? '\160' .. '\255'];
@@ -406,12 +404,11 @@ let time = [%sedlex.regexp? _s | (_m, _s)];
 
 let frequency = [%sedlex.regexp? (_h, _z) | (_k, _h, _z)];
 
-let escape = [%sedlex.regexp? '\\'];
-let digit = [%sedlex.regexp? '0' .. '9'];
+/* let escape = [%sedlex.regexp? '\\']; */
 let hex_digit = [%sedlex.regexp? digit | 'A' .. 'F' | 'a' .. 'f'];
-let non_ascii_code_point = [%sedlex.regexp? Sub(any, '\000' .. '\128')]; // greater than \u0080
+/* let non_ascii_code_point = [%sedlex.regexp? Sub(any, '\000' .. '\128')]; */ // greater than \u0080
 let identifier_start_code_point = [%sedlex.regexp?
-  'a' .. 'z' | 'A' .. 'Z' | non_ascii_code_point | '_'
+  'a' .. 'z' | 'A' .. 'Z' | non_ascii | '_'
 ];
 let starts_with_a_valid_escape = [%sedlex.regexp? ('\\', Sub(any, '\n'))];
 let starts_an_identifier = [%sedlex.regexp?
@@ -425,16 +422,14 @@ let identifier_code_point = [%sedlex.regexp?
 let non_printable_code_point = [%sedlex.regexp?
   '\000' .. '\b' | '\011' | '\014' .. '\031' | '\127'
 ];
-let newline = [%sedlex.regexp? '\n'];
-let whitespace = [%sedlex.regexp? Plus('\n' | '\t' | ' ')];
-let ident_char = [%sedlex.regexp?
-  '_' | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' | non_ascii_code_point | escape
-];
+/* let ident_char = [%sedlex.regexp?
+  '_' | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' | non_ascii | escape
+]; */
 
 /* This module is a copy/paste of Reason_css_lexer in favor of moving everything into css_lexer */
 module Tokenizer = {
   open Reason_css_lexer;
-  let lexeme = Sedlexing.latin1;
+  let lexeme = Sedlexing.utf8;
 
   let (let.ok) = Result.bind;
 
@@ -452,8 +447,6 @@ module Tokenizer = {
 
   let uchar_of_int = n => Uchar.of_int(n) |> string_of_uchar;
   let is_surrogate = char_code => char_code >= 0xD800 && char_code <= 0xDFFF;
-
-  let fffd = uchar_of_int(0xFFFD);
 
   let check = (f, buf) => {
     // TODO: why this second int?
@@ -473,8 +466,8 @@ module Tokenizer = {
       let char = uchar_of_int(char_code);
       let _ = consume_whitespace(buf);
       char_code == 0 || is_surrogate(char_code)
-        ? Error((fffd, Invalid_code_point)) : Ok(char);
-    | eof => Error((fffd, Eof))
+        ? Error((Uchar.rep, Invalid_code_point)) : Ok(char);
+    | eof => Error((Uchar.rep, Eof))
     | any => Ok(lexeme(buf))
     | _ => failwith("unrecheable")
     };
@@ -526,7 +519,7 @@ module Tokenizer = {
       | _ => failwith("please, unreachable")
       };
     };
-    read("");
+    read(lexeme(buf));
   };
 
   // https://drafts.csswg.org/css-syntax-3/#consume-name
@@ -540,7 +533,7 @@ module Tokenizer = {
         read(acc ++ char);
       | _ => Ok(acc)
       };
-    read("");
+    read(lexeme(buf));
   };
 
   let handle_consume_identifier =
@@ -651,9 +644,11 @@ let rec get_next_token = (buf) => {
       WS
     }
   }
+  /* -moz-* */
+  | ("-", ident) => Parser.IDENT(latin1(buf))
   /* --variable */
   | ("-", "-", ident) => Parser.IDENT(latin1(buf))
-  | starts_an_identifier => {
+  | identifier_start_code_point => {
     let _ = Sedlexing.backtrack(buf);
     Tokenizer.consume_ident_like(buf) |> handle_tokenizer_error(buf);
   }
