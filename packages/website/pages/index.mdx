@@ -4,7 +4,7 @@ title: Introduction to styled-ppx
 
 ### Typed styled components for ReScript
 
-**styled-ppx** is the [ppx](https://dev.realworldocaml.org/ppx.html) that brings typed styled components to ReScript. Allows you to create **React Components** with type-safe style definitions that don't rely on a different language than CSS.
+**styled-ppx** is the [ppx](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem) that brings typed styled components to ReScript. Allows you to create **React Components** with type-safe style definitions that don't rely on a different language than CSS.
 
 Build on top of [emotion](https://emotion.sh), it allows you to style apps safe, quickly, performant and as you always done it.
 
@@ -29,4 +29,4 @@ module Center = %styled.div(`
 - Support the power of the underliying language: pattern-matching, composition, labelled arguments
 - Build on top of [emotion](https://emotion.sh)
 
-**styled-ppx** is a ppx, can learn more about ppxs in the [Real World OCaml: Preprocessing with ppx](https://dev.realworldocaml.org/ppx.html). To get a general idea, are similar to [babel-plugins](https://babeljs.io/docs/en/plugins/). They run before the compilation of your code, and expands those notations (`%styled.div{:rescript}` or `%cx{:rescript}`) into valid ReScript code.
+**styled-ppx** is a ppx, can learn more about ppxs in the [Tarides blog: Introduction to OCaml ppx ecosystem](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem). To get a general idea, are similar to [babel-plugins](https://babeljs.io/docs/en/plugins/). They run before the compilation of your code, and expands those notations (`%styled.div{:rescript}` or `%cx{:rescript}`) into valid ReScript code.

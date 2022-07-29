@@ -4,7 +4,7 @@
   Typed styled components for ReScript
 </h1>
 
-**styled-ppx** is the [ppx](https://dev.realworldocaml.org/ppx.html) that brings typed styled components to ReScript.
+**styled-ppx** is the [ppx](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem) that brings typed styled components to ReScript.
 
 Build on top of [emotion](https://emotion.sh), it allows you to style apps safe, quickly, performant and as you always done it.
 

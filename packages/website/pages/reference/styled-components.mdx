@@ -41,3 +41,23 @@ module Input = %styled.input("...")
 <Callout>
   You can extend the styles from a component via `className` prop.
 </Callout>
+
+#### Extend styles with className
+
+Following the example above, you can extend the styles of the input component by passing the `className` prop.
+It's not recommended to use `className` prop to extend the styles of a component, but it's useful when you need to extend the styles of a component from a third-party library.
+
+```rescript {8}
+<Input
+  placeholder="Enter your name..."
+  maxLength=255
+  onChange={_ => ()}
+  onBlur={_ => ()}
+  className="extra-classname"
+/>
+```
+
+The resultant HTML will be: first the generated className by emotion plus the className passed by props.
+```html
+<input class="css-fl09o-Input extra-classname" maxlength="255" placeholder="Enter your name...">
+```
