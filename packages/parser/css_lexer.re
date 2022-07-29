@@ -67,7 +67,7 @@ let token_to_string =
   | Parser.COMMA => ","
   | Parser.ASTERISK => "*"
   | Parser.FUNCTION(fn) => fn ++ "("
-  | Parser.URL(url) => url
+  | Parser.URL(url) => url ++ "("
   | Parser.BAD_URL => "bar url"
 ;
 
@@ -413,6 +413,11 @@ let non_ascii_code_point = [%sedlex.regexp? Sub(any, '\000' .. '\128')]; // grea
 let identifier_start_code_point = [%sedlex.regexp?
   'a' .. 'z' | 'A' .. 'Z' | non_ascii_code_point | '_'
 ];
+let starts_with_a_valid_escape = [%sedlex.regexp? ('\\', Sub(any, '\n'))];
+let starts_an_identifier = [%sedlex.regexp?
+  ('-', '-' | identifier_start_code_point | starts_with_a_valid_escape) |
+  identifier_start_code_point
+];
 /* Added "'" to identifier to enable Language Variables */
 let identifier_code_point = [%sedlex.regexp?
   identifier_start_code_point | digit | '-' | "'"
@@ -478,7 +483,7 @@ module Tokenizer = {
   // https://drafts.csswg.org/css-syntax-3/#consume-remnants-of-bad-url
   let rec consume_remnants_bad_url = buf =>
     switch%sedlex (buf) {
-    | ')'
+    | ")"
     | eof => ()
     | escape =>
       let _ = consume_escaped(buf);
@@ -637,16 +642,16 @@ let rec get_next_token = (buf) => {
   /* NOTE: should be placed above ident, otherwise pattern with
    * '-[0-9a-z]{1,6}' cannot be matched */
   | (_u, '+', unicode_range) => UNICODE_RANGE(latin1(buf))
-  | identifier_start_code_point => {
-    let _ = Sedlexing.backtrack(buf);
-    Tokenizer.consume_ident_like(buf) |> handle_tokenizer_error(buf);
-  }
   | ('#', name) => HASH(latin1(~skip=1, buf))
   | number => get_dimension(latin1(buf), buf)
   | whitespaces => {
     if (skip_whitespace^) {
       get_next_token(buf);
     } else { WS } }
+  | starts_an_identifier => {
+    let _ = Sedlexing.backtrack(buf);
+    Tokenizer.consume_ident_like(buf) |> handle_tokenizer_error(buf);
+  }
   | any => DELIM(latin1(buf))
   | _ => assert(false)
   };

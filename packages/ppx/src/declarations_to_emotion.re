@@ -264,7 +264,7 @@ let transform_with_variable = (parser, mapper, value_to_expr) =>
     Combinator.combine_xor([
       /* If the entire CSS value is interpolated, we treat it as a `Variable */
       Rule.Match.map(Standard.interpolation, data => `Variable(data)),
-      /* Otherwise it's a regular CSS `Value and run the mapper below*/
+      /* Otherwise it's a regular CSS `Value and run the mapper below */
       Rule.Match.map(parser, data => `Value(data)),
     ]),
     fun
@@ -829,9 +829,37 @@ let background_color =
     render_color,
   );
 
+/* and color_stop_list = [%value.rec "[ <linear-color-stop> [ ',' <linear-color-hint> ]? ]# ',' <linear-color-stop>"] */
+/* TODO: Incomplete */
+let render_stops = s => [%expr [%e s]]
+
+let render_gradient = fun
+  | `Linear_gradient(angle, stops) =>
+    [%expr `linearGradient([%e render_extended_angle(angle)], [%e render_stops(stops)])]
+  | `Repeating_linear_gradient(angle, stops) =>
+    [%expr `repeatingLinearGradient([%e render_extended_angle(angle)], [%e render_stops(stops)])]
+  | `Radial_gradient(stops) =>
+    [%expr `radialGradient([%e render_stops(stops)])]
+  | `Repeating_radial_gradient(stops) =>
+    [%expr `repeatingRadialGradient([%e render_stops(stops)])]
+  | `conicGradient(angle, stops) =>
+    [%expr `conicGradient([%e render_extended_angle(angle)], [%e render_stops(stops)])]
+;
+
 let render_background_image = fun
-  | `None => [%expr `none]
-  | _ => raise(Unsupported_feature); // bs-css only accepts none
+  | `Variable(v) => render_variable(v)
+  | `Value(v) => switch (v) {
+    | `Url(url) => [%expr `url([%e url])]
+    | `Gradient(gradient) => render_gradient(gradient)
+    | `None => [%expr `none]
+    | `Image(_)
+    | `Image_set(_)
+    | `Element(_)
+    | `Paint(_)
+    | `Cross_fade(_)
+    | _ => raise(Unsupported_feature); // bs-css only accepts | BackgroundImage.t | #Url.t | #Gradient.t
+  }
+  | _ => raise(Unsupported_feature);
 
 let render_repeat_style = fun
   | `Xor(values) => {
@@ -857,12 +885,12 @@ let render_attachment = fun
   | `Scroll => [%expr `scroll];
 
 let background_image =
-  emit(
+  apply(
     Parser.property_background_image,
-    id,
+    [%expr CssJs.backgroundImage],
     fun
     | [] => failwith("expected at least one value")
-    | [v] => [[%expr CssJs.backgroundImage([%e render_background_image(v)])]]
+    | [v] => [%expr [%e render_background_image(v)]]
     | _ => raise(Unsupported_feature)
   );
 

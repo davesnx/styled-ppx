@@ -462,6 +462,10 @@ let properties_static_css_tests = [%expr
       [%css "width: calc(100vh - 120px)"],
       CssJs.width(`calc(`sub, `vh(100.), `pxFloat(120.)))
     ),
+    (
+      [%css "background-image: url('img_tree.gif')"],
+      CssJs.unsafe({js|backgroundImage|js}, {js| url('img_tree.gif')|js})
+    ),
     /* Mult isn't available in bs-css */
     /* (
       [%css "width: calc(100px * 3)"],

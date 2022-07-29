@@ -2,8 +2,6 @@ open Sedlexing;
 open Sedlexing.Utf8;
 open Token;
 
-// TODO: why ocaml platform takes so long in this file?
-
 let escape = [%sedlex.regexp? '\\'];
 let digit = [%sedlex.regexp? '0' .. '9'];
 let hex_digit = [%sedlex.regexp? digit | 'A' .. 'F' | 'a' .. 'f'];
