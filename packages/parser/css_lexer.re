@@ -647,7 +647,12 @@ let rec get_next_token = (buf) => {
   | whitespaces => {
     if (skip_whitespace^) {
       get_next_token(buf);
-    } else { WS } }
+    } else {
+      WS
+    }
+  }
+  /* --variable */
+  | ("-", "-", ident) => Parser.IDENT(latin1(buf))
   | starts_an_identifier => {
     let _ = Sedlexing.backtrack(buf);
     Tokenizer.consume_ident_like(buf) |> handle_tokenizer_error(buf);

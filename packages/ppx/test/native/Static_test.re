@@ -463,6 +463,14 @@ let properties_static_css_tests = [%expr
       CssJs.width(`calc(`sub, `vh(100.), `pxFloat(120.)))
     ),
     (
+      [%css "color: var(--main-c)"],
+      CssJs.color(`var({js|--main-c|js}))
+    ),
+    /* (
+      [%css "color: var(--main-c, #fff)"],
+      CssJs.color(`var({js|--main-c|js}, `hex({js|fff|js})))
+    ), */
+    (
       [%css "background-image: url('img_tree.gif')"],
       CssJs.unsafe({js|backgroundImage|js}, {js| url('img_tree.gif')|js})
     ),

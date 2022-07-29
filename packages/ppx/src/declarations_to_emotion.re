@@ -653,6 +653,11 @@ let render_function_hsl = ((hue, saturation, lightness, alpha)) => {
   };
 };
 
+let render_var = ((string, _, _)) => {
+  let string = render_string(string);
+  [%expr CssJs.var([%e string])];
+};
+
 let render_color =
   fun
   | `Interpolation(v) => render_variable(v)
@@ -663,6 +668,7 @@ let render_color =
   | `Function_rgba(rgb) => render_function_rgb(rgb)
   | `Function_hsl(`Hsl_0(hsl))
   | `Function_hsla(`Hsl_0(hsl)) => render_function_hsl(hsl)
+  | `Var(v) => render_var(v)
   | `Function_hsl(_)
   | `Function_hsla(_)
   | `Function_hwb(_)
