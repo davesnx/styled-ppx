@@ -33,7 +33,7 @@ module Parser = struct
         [%sedlex.regexp? (letter | '_'), Star (letter | '0' .. '9' | '_')]
       in
       let case_ident =
-        [%sedlex.regexp? ('a' .. 'z' | '_'), Star (letter | '0' .. '9' | '_')]
+        [%sedlex.regexp? ('a' .. 'z' | '_' | '\''), Star (letter | '0' .. '9' | '_')]
       in
       let variable = [%sedlex.regexp? Star (ident, '.'), case_ident] in
       let interpolation = [%sedlex.regexp? "$(", variable, ")"] in

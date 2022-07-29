@@ -107,6 +107,10 @@ let properties_variable_css_tests = [
   ), */
   /* Add border */
   /* Add text-shadow */
+  /* (
+    [%expr [%css "color: $(color');"]],
+    [%expr CssJs.color(color')]
+  ), */
 ];
 
 describe("Should bind to bs-css with interpolatated variables", ({test, _}) => {

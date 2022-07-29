@@ -93,6 +93,8 @@ describe("Tokenizer", ({test, _}) => {
       16,
     ),
     ({|calc(10%)|}, [FUNCTION("calc"), PERCENTAGE(10.), RIGHT_PARENS], 9),
+    ({|$(Module.variable)|}, [DELIM("$"), LEFT_PARENS, IDENT("Module"), DELIM("."), IDENT("variable"), RIGHT_PARENS], 18),
+    ({|$(Module.variable')|}, [DELIM("$"), LEFT_PARENS, IDENT("Module"), DELIM("."), IDENT("variable'"), RIGHT_PARENS], 19),
   ];
 
   success_tests_data

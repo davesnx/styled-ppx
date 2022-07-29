@@ -221,11 +221,11 @@ let interpolation = {
   let.bind_match _ = Pattern.expect(LEFT_PARENS);
   let.bind_match path = {
     let.bind_match path = Modifier.zero_or_more({
-      let.bind_match ident = custom_ident;
+      let.bind_match ident = ident;
       let.bind_match _ = Pattern.expect(DELIM("."));
       return_match(ident)
     });
-    let.bind_match ident = custom_ident;
+    let.bind_match ident = ident;
     return_match(path @ [ident])
   };
   let.bind_match _ = Pattern.expect(RIGHT_PARENS);
