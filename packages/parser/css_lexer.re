@@ -401,68 +401,227 @@ let frequency = [%sedlex.regexp? (_h, _z) | (_k, _h, _z)];
 
 let skip_whitespace = ref(false);
 
+/* This module is a copy/paste of Reason_css_lexer in favor of moving everything into css_lexer */
+module NewTokenizer = {
+  open Reason_css_lexer;
+  let lexeme = Sedlexing.utf8;
+
+  let (let.ok) = Result.bind;
+  let escape = [%sedlex.regexp? '\\'];
+  let non_ascii_code_point = [%sedlex.regexp? Sub(any, '\000' .. '\128')]; // greater than \u0080
+  let digit = [%sedlex.regexp? '0' .. '9'];
+  let identifier_start_code_point = [%sedlex.regexp?
+    'a' .. 'z' | 'A' .. 'Z' | non_ascii_code_point | '_'
+  ];
+  /* Added "'" to identifier to enable Language Variables */
+  let identifier_code_point = [%sedlex.regexp?
+    identifier_start_code_point | digit | '-' | "'"
+  ];
+  let non_printable_code_point = [%sedlex.regexp?
+    '\000' .. '\b' | '\011' | '\014' .. '\031' | '\127'
+  ];
+
+  let consume_whitespace = buf =>
+    switch%sedlex (buf) {
+    | Star(whitespace) => WHITESPACE
+    | _ => WHITESPACE
+  };
+
+  let string_of_uchar = char => {
+    let buf = Buffer.create(0);
+    Buffer.add_utf_8_uchar(buf, char);
+    Buffer.contents(buf);
+  };
+
+  let uchar_of_int = n => Uchar.of_int(n) |> string_of_uchar;
+  let is_surrogate = char_code => char_code >= 0xD800 && char_code <= 0xDFFF;
+
+  let fffd = uchar_of_int(0xFFFD);
+
+  let check = (f, buf) => {
+    // TODO: why this second int?
+    Sedlexing.mark(buf, 0);
+    let value = f(buf);
+    let _ = Sedlexing.backtrack(buf);
+    value;
+  };
+
+  // https://drafts.csswg.org/css-syntax-3/#consume-an-escaped-code-point
+  let consume_escaped = buf => {
+    switch%sedlex (buf) {
+    // TODO: spec typo? No more than 5?
+    | Rep(hex_digit, 1 .. 6) =>
+      let hex_string = "0x" ++ lexeme(buf);
+      let char_code = int_of_string(hex_string);
+      let char = uchar_of_int(char_code);
+      let _ = consume_whitespace(buf);
+      char_code == 0 || is_surrogate(char_code)
+        ? Error((fffd, Invalid_code_point)) : Ok(char);
+    | eof => Error((fffd, Eof))
+    | any => Ok(lexeme(buf))
+    | _ => failwith("unrecheable")
+    };
+  };
+
+  // https://drafts.csswg.org/css-syntax-3/#consume-remnants-of-bad-url
+  let rec consume_remnants_bad_url = buf =>
+    switch%sedlex (buf) {
+    | ')'
+    | eof => ()
+    | escape =>
+      let _ = consume_escaped(buf);
+      consume_remnants_bad_url(buf);
+    | any => consume_remnants_bad_url(buf)
+    | _ => failwith("grr unreachable")
+  };
+
+  // https://drafts.csswg.org/css-syntax-3/#consume-url-token
+  let consume_url = buf => {
+    let _ = consume_whitespace(buf);
+    let rec read = acc => {
+      let when_whitespace = () => {
+        let _ = consume_whitespace(buf);
+        switch%sedlex (buf) {
+        | ')' => Ok(URL(acc))
+        | eof => Error((URL(acc), Eof))
+        | _ =>
+          consume_remnants_bad_url(buf);
+          Ok(BAD_URL);
+        };
+      };
+      switch%sedlex (buf) {
+      | ')' => Ok(URL(acc))
+      | eof => Error((URL(acc), Eof))
+      | whitespace => when_whitespace()
+      | '"'
+      | '\''
+      | '('
+      | non_printable_code_point =>
+        consume_remnants_bad_url(buf);
+        // TODO: location on error
+        Error((BAD_URL, Invalid_code_point));
+      | escape =>
+        switch (consume_escaped(buf)) {
+        | Ok(char) => read(acc ++ char)
+        | Error((_, error)) => Error((BAD_URL, error))
+        }
+      | any => read(acc ++ lexeme(buf))
+      | _ => failwith("please, unreachable")
+      };
+    };
+    read("");
+  };
+
+  // https://drafts.csswg.org/css-syntax-3/#consume-name
+  let consume_identifier = buf => {
+    let rec read = acc =>
+      switch%sedlex (buf) {
+      | identifier_code_point => read(acc ++ lexeme(buf))
+      | escape =>
+        // TODO: spec, what should happen when fails?
+        let.ok char = consume_escaped(buf);
+        read(acc ++ char);
+      | _ => Ok(acc)
+      };
+    read("");
+  };
+
+  let handle_consume_identifier =
+  fun
+  | Error((_, error)) => Error((BAD_IDENT, error))
+  | Ok(string) => Ok(string);
+
+  // https://drafts.csswg.org/css-syntax-3/#consume-ident-like-token
+  let consume_ident_like = buf => {
+    let read_url = string => {
+      // TODO: the whitespace trickery here?
+      let _ = consume_whitespace(buf);
+      let is_function =
+        check(buf =>
+          switch%sedlex (buf) {
+          | '\''
+          | '"' => true
+          | _ => false
+          }
+        );
+      is_function(buf) ? Ok(FUNCTION(string)) : consume_url(buf);
+    };
+    // TODO: should it return IDENT() when error?
+    let.ok string = consume_identifier(buf) |> handle_consume_identifier;
+
+    switch%sedlex (buf) {
+    | '(' =>
+      switch (string) {
+      | "url" => read_url(string)
+      | _ => Ok(FUNCTION(string))
+      }
+    | _ => Ok(IDENT(string))
+    };
+  };
+};
+
 let rec get_next_token = (buf) => {
   open Parser;
   open Sedlexing;
   switch%sedlex (buf) {
-  | eof => [EOF]
+  | eof => EOF
   | "/*" => discard_comments(buf)
-  | '.' => [DOT]
-  | ';' => [SEMI_COLON]
+  | '.' => DOT
+  | ';' => SEMI_COLON
   | '}' => {
     skip_whitespace.contents = false;
-    [RIGHT_BRACE];
+    RIGHT_BRACE;
   }
   | '{' => {
     skip_whitespace.contents = true;
-    [LEFT_BRACE];
+    LEFT_BRACE;
   }
-  | "::" => [DOUBLE_COLON]
-  | ':' => [COLON]
-  | '(' => [LEFT_PAREN]
-  | ')' => [RIGHT_PAREN]
-  | '[' => [LEFT_BRACKET]
-  | ']' => [RIGHT_BRACKET]
-  | '%' => [PERCENTAGE]
+  | "::" => DOUBLE_COLON
+  | ':' => COLON
+  | '(' => LEFT_PAREN
+  | ')' => RIGHT_PAREN
+  | '[' => LEFT_BRACKET
+  | ']' => RIGHT_BRACKET
+  | '%' => PERCENTAGE
   | '&' => {
     skip_whitespace.contents = false;
-    [AMPERSAND];
+    AMPERSAND;
   }
-  | '*' => [ASTERISK]
-  | ',' => [COMMA]
-  | variable => [VARIABLE(latin1(~skip=2, ~drop=1, buf) |> String.split_on_char('.'))]
-  | operator => [OPERATOR(latin1(buf))]
-  | combinator => [COMBINATOR(latin1(buf))]
-  | string => [STRING(latin1(~skip=1, ~drop=1, buf))]
-  | important => [IMPORTANT]
+  | '*' => ASTERISK
+  | ',' => COMMA
+  | variable => VARIABLE(latin1(~skip=2, ~drop=1, buf) |> String.split_on_char('.'))
+  | operator => OPERATOR(latin1(buf))
+  | combinator => COMBINATOR(latin1(buf))
+  | string => STRING(latin1(~skip=1, ~drop=1, buf))
+  | important => IMPORTANT
   | at_media => {
     skip_whitespace.contents = false;
-    [AT_MEDIA(latin1(~skip=1, buf))]
+    AT_MEDIA(latin1(~skip=1, buf))
   }
   | at_keyframes => {
     skip_whitespace.contents = false;
-    [AT_KEYFRAMES(latin1(~skip=1, buf))]
+    AT_KEYFRAMES(latin1(~skip=1, buf))
   }
   | at_rule => {
     skip_whitespace.contents = false;
-    [AT_RULE(latin1(~skip=1, buf))]
+    AT_RULE(latin1(~skip=1, buf))
   }
   | at_rule_without_body => {
     skip_whitespace.contents = false;
-    [AT_RULE_STATEMENT(latin1(~skip=1, buf))]
+    AT_RULE_STATEMENT(latin1(~skip=1, buf))
   }
   /* NOTE: should be placed above ident, otherwise pattern with
    * '-[0-9a-z]{1,6}' cannot be matched */
-  | (_u, '+', unicode_range) => [UNICODE_RANGE(latin1(buf))]
-  | tag => [TAG(latin1(buf))]
-  | ident => [IDENT(latin1(buf))]
-  | ('#', name) => [HASH(latin1(~skip=1, buf))]
-  | number => [get_dimension(latin1(buf), buf)]
+  | (_u, '+', unicode_range) => UNICODE_RANGE(latin1(buf))
+  | tag => TAG(latin1(buf))
+  | ident => IDENT(latin1(buf))
+  | ('#', name) => HASH(latin1(~skip=1, buf))
+  | number => get_dimension(latin1(buf), buf)
   | whitespaces => {
     if (skip_whitespace^) {
       get_next_token(buf);
-    } else { [WS] } }
-  | any => [DELIM(latin1(buf))]
+    } else { WS } }
+  | any => DELIM(latin1(buf))
   | _ => assert(false)
   };
 }
@@ -485,13 +644,11 @@ and get_dimension = (n, buf) => {
   }
 };
 
-let token_queue = Queue.create();
-
 let queue_next_tokens_with_location = (buf) => {
   let loc_start = Sedlexing.next_loc(buf);
-  let tokens = get_next_token(buf);
+  let token = get_next_token(buf);
   let loc_end = Sedlexing.next_loc(buf);
-  List.iter (t => Queue.add((t, loc_start, loc_end), token_queue), tokens)
+  (token, loc_start, loc_end);
 }
 
 let parse = (ws, buf, parser) => {
@@ -499,10 +656,7 @@ let parse = (ws, buf, parser) => {
 
   let last_token = ref((Parser.EOF, Lexing.dummy_pos, Lexing.dummy_pos));
   let next_token = () => {
-    if (Queue.is_empty(token_queue)) {
-      queue_next_tokens_with_location(buf);
-    }
-    last_token := Queue.take(token_queue);
+    last_token := queue_next_tokens_with_location(buf);
     last_token^;
   };
 
