@@ -82,15 +82,15 @@ and render_selector = (ast: Selector.t) => {
     | Ampersand => "Ampersand"
     | Type(v) => "Type(" ++ v ++ ")"
     | Subclass(v) => "Subclass(" ++ render_subclass_selector(v) ++ ")"
-    | Variable(v) => "Variable(" ++ String.concat(".", v) ++ ")"
-    | ClassVariable(v) => "ClassVariable(" ++ String.concat(".", v) ++ ")"
+    | Variable(v) => "Variable(" ++ render_variable(v) ++ ")"
     | Percentage(p) => "Percentage(" ++ p ++ ")"
   and render_subclass_selector: subclass_selector => string =
     fun
     | Id(v) => "Id(" ++ v ++ ")"
     | Class(v) => "Class(" ++ v ++ ")"
     | Attribute(attr) => "Attribute(" ++ render_attribute(attr) ++ ")"
-    | Pseudo_class(psc) => render_pseudo_selector(psc)
+    | Pseudo_class(psc) => "Pseudo_class(" ++ render_pseudo_selector(psc) ++ ")"
+    | ClassVariable(v) => "ClassVariable(" ++ render_variable(v) ++ ")"
   and render_attribute =
     fun
     | Attr_value(v) => "Attr_value(" ++ v ++ ")"
@@ -115,7 +115,8 @@ and render_selector = (ast: Selector.t) => {
       ++ name
       ++ ", "
       ++ render_selector(selector)
-      ++ "))";
+      ++ "))"
+  and render_variable = v => String.concat(".", v);
 
   let rec render_compound_selector = (compound_selector: compound_selector) => {
     let simple_selector =

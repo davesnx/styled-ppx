@@ -181,6 +181,11 @@ let selectors_css_tests = [
     [%expr CssJs.style(. [|CssJs.selector(. {js|& .|js} ++ Variables.selector_query, [||])|])],
   ),
   (
+    "&.$(Variables.selector_query)",
+    [%expr [%cx "&.$(Variables.selector_query) {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|&.|js} ++ Variables.selector_query, [||])|])],
+  ),
+  (
     "& a[target=\"_blank\"]",
     [%expr [%cx {|& a[target="_blank"] {}|}]],
     [%expr CssJs.style(. [| CssJs.selector(. {js|& a[target="_blank"]|js}, [||])|])],
