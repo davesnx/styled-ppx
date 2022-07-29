@@ -78,3 +78,27 @@ background: url(img.png) no-repeat; /* The background is a non-repeating image *
 ```
 
 In this case, to interpolate the background's value like: `background: $(variable1) $(variable2)` the type-checker can't know the type of `$(variable1)` and `(variable2)` ahead of time, since there's a few possibilities of `background` valid. This is called [overload](https://www.typescriptlang.org/docs/handbook/declaration-files/by-example.html#overloaded-functions) in other languages and it's not available in ReScript to it's nature of a static typed language.
+
+## What if a property isn't supported
+
+First, if you have the time, please [open an issue](https://github.com/davesnx/styled-ppx/issues/new). Most properties are trivial to add support for.
+If time isn't your best friend: There's a workaround for unsupported properties.
+
+There's no way to add unsafe behaviour on CSS definitions. Prefer to keep improving the overall safety via requests/issues than allowing a method for unsafe to all. It will loose the purpose of **styled-ppx**.
+
+The workaround is to use the [Array API](./array.md) to generate `%cx{:rescript}` calls, like this example:
+
+```rescript
+let block: Css.Rule.t = %css("display: block")
+let randomProperty = CssJs.unsafe("aspect-ratio", "21 / 9");
+let picture = %cx([block, randomProperty]);
+```
+
+```rescript
+let randomProperty = CssJs.unsafe("aspect-ratio", "21 / 9");
+let picture = %styled.div([randomProperty]);
+```
+
+Here the lack of safety will rely on your usage of `CssJs.unsafe{:rescript}`.
+
+For a general overview of the list take a look at [support for CSS](https://styled-ppx.vercel.app/css-support).
