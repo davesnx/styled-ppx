@@ -26,10 +26,14 @@ let fullWidth: string = %cx(`
 <div className=fullWidth> {React.string("Hello!")} </div>
 ```
 
-The value `fullWidth` is a string that contains a hash pointing to a style HTML tag in the `<head>`. If you want to concat with other styles, you can use the `+` operator and don't forget to add whitespaces between.
+The value `fullWidth` is a string that contains a hash pointing to a style HTML tag in the `<head>`. If you want to concat with other styles, you can use the string concatenation operator (`++`):
+
+```rescript
+<div className=fullWidth ++ " " ++ "extra-classname"> {React.string("Hello!")} </div>
+```
 
 ## Features
 
-- Selectors, media queries and other nestign is supported in CSS declarations.
+- Selectors, media queries and other nesting is supported in CSS declarations.
 - Interpolation is allowed. `%cx("color: $(Theme.colors.primary)"){:rescript}`
 - Curly braces aren't allowed. `%cx("{ display: block; }"){:rescript}` will break.
