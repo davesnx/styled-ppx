@@ -27,6 +27,9 @@ open Css_types
 %token <string> OPERATOR
 %token <string> COMBINATOR
 %token <string> DELIM
+%token <string> FUNCTION
+%token <string> URL
+%token BAD_URL
 %token <string> AT_MEDIA
 %token <string> AT_KEYFRAMES
 %token <string> AT_RULE
@@ -223,9 +226,9 @@ style_rule:
   }
 ;
 
-prelude: xs = nonempty_list(loc(component_value_in_prelude)) { xs };
+prelude: xs = loption(nonempty_list(loc(component_value_in_prelude))) { xs };
 
-component_values: xs = nonempty_list(loc(component_value)) { xs };
+component_values: xs = loption(nonempty_list(loc(component_value))) { xs };
 
 declarations:
   | xs = nonempty_list(declaration_or_at_rule); SEMI_COLON?; { xs }
@@ -262,7 +265,7 @@ pseudo_class_selector:
   /* :visited */
   | COLON; i = IDENT { Selector.(Pseudoclass(Ident i)) }
   /* :nth-child() */
-  | COLON; f = IDENT; LEFT_PAREN; xs = loc(selector); RIGHT_PAREN {
+  | COLON; f = FUNCTION; xs = loc(selector); RIGHT_PAREN {
     Selector.(Pseudoclass(Function({ name = f; payload = xs })))
   }
   /* TODO: <function-token> and <any-value> */
@@ -316,8 +319,10 @@ attribute_selector:
 id_selector: h = HASH { Selector.Id h }
 
 /* <class-selector> = '.' <ident-token> */
-class_selector: DOT; c = IDENT { Selector.Class c };
-
+class_selector:
+  | DOT; c = IDENT { Selector.Class c }
+  /* Tiny bug where we split idents and tags by it's content */
+  | DOT; t = TAG { Selector.Class t };
 
 /* <subclass-selector> = <id-selector> | <class-selector> | <attribute-selector> | <pseudo-class-selector> */
 subclass_selector:
@@ -428,9 +433,11 @@ component_value_in_prelude:
   /* $(Lola.value) */
   | v = VARIABLE { Component_value.Variable v }
   /* calc() */
-  | f = loc(IDENT); LEFT_PAREN; xs = loc(prelude); RIGHT_PAREN; {
+  | f = loc(FUNCTION); xs = loc(prelude); RIGHT_PAREN; {
     Component_value.Function (f, xs)
   }
+  /* url() */
+  | u = URL { Component_value.Uri u }
   | WS { Component_value.Delim " " }
 ;
 
@@ -456,7 +463,9 @@ component_value:
   /* $(Lola.value) */
   | v = VARIABLE { Component_value.Variable v }
   /* calc() */
-  | f = loc(IDENT); LEFT_PAREN; xs = loc(component_values); RIGHT_PAREN; {
+  | f = loc(FUNCTION) xs = loc(component_values); RIGHT_PAREN; {
     Component_value.Function (f, xs)
   }
+  /* url() */
+  | u = URL { Component_value.Uri u }
 ;

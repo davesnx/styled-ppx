@@ -2,7 +2,7 @@
 title: Guides
 ---
 
-# Examples of common solutions
+# Guides
 
 ## Nested selectors
 
@@ -46,8 +46,26 @@ let container = %cx(`
   grid-template-columns: repeat(2, 1fr);
   width: 100%;
 
-  @media $(Media.mobileDown) {
+  @media screen and $(Media.mobileDown) {
     grid-template-columns: 100%;
   }
 `)
+```
+<small>Note that all interpolation in preludes (*selectors/media queries/etc*) are strings
+and only the structure is being parsed and validated.</small>
+
+## Not valid interpolation
+
+Can't pass a function
+```rescript
+// 🔴
+let fn = (~kind, ~big) => { /* ... */ };
+%styled.div(fn)
+```
+
+Can't pass a variable reference
+```rescript
+// 🔴
+let value = "display: block"
+%styled.div(value)
 ```

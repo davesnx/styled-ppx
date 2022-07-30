@@ -12,6 +12,11 @@ let compare = (input, expected, {expect, _}) => {
 let selectors_css_tests = [
   /* Simple */
   (
+    ".a",
+    [%expr [%cx ".a { }"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|.a|js}, [||])|])],
+  ),
+  (
     ".bar",
     [%expr [%cx ".bar      { } "]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|.bar|js}, [||])|])],

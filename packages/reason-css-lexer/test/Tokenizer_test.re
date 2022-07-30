@@ -22,11 +22,11 @@ let list_parse_tokens_to_string = tokens =>
   tokens
   |> List.rev
   |> List.map(
-       fun
-       | Ok(token) => render_token(token)
-       | Error((token, err)) =>
-         "Error(" ++ show_error(err) ++ ") " ++ show_token(token),
-     )
+    fun
+    | Ok(token) => render_token(token)
+    | Error((token, err)) =>
+      "Error(" ++ show_error(err) ++ ") " ++ show_token(token),
+  )
   |> String.concat(" ")
   |> String.trim;
 
@@ -79,6 +79,18 @@ describe("Tokenizer", ({test, _}) => {
         RIGHT_PARENS,
       ],
       17,
+    ),
+    (
+      {|background-image:url('img_tree.gif' )|},
+      [
+        IDENT("background-image"),
+        COLON,
+        FUNCTION("url"),
+        STRING("img_tree.gif"),
+        WHITESPACE,
+        RIGHT_PARENS,
+      ],
+      37,
     ),
     (
       {|calc(10px+ 10px)|},
