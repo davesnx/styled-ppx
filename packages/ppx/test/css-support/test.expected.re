@@ -1775,7 +1775,7 @@ CssJs.unsafe({js|WebkitTextFillColor|js}, {js| $(Color.Text.primary)|js});
 CssJs.unsafe({js|animation|js}, {js| none|js});
 CssJs.unsafe({js|appearance|js}, {js| none|js});
 CssJs.unsafe({js|aspectRatio|js}, {js| 21 / 8|js});
-CssJs.backgroundColor(c);
+(CssJs.backgroundColor(c): CssJs.rule);
 CssJs.unsafe({js|bottom|js}, "unset");
 CssJs.boxShadows(`none);
 CssJs.unsafe({js|breakInside|js}, {js| avoid|js});

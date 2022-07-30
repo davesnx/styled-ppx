@@ -20,7 +20,7 @@ npm install @davesnx/styled-ppx
 ### Update `bsconfig.json`
 
 Add `"@davesnx/styled-ppx/ppx"{:json}` under bsconfig `"ppx-flags"{:json}`.
-The change on `bsconfig.json` should contain the following:
+The diff on `bsconfig.json` should contain the following:
 
 ```diff
 {
@@ -53,7 +53,7 @@ module Layout = %styled.div([|
   %css("align-items: center"),
 |])
 
-/* Later on a component */
+/* Later in a component */
 <Layout>
   <Link
     color="#333333"
@@ -67,11 +67,11 @@ module Layout = %styled.div([|
 ```
 
 ### Playground
-If you want to try it out, just fork https://github.com/davesnx/try-styled-ppx and follow the instalation there.
+If you want to try it out, just fork https://github.com/davesnx/try-styled-ppx and follow the installation instructions there.
 
 ## Editor Support
-One of the downsites of using an embedded language (CSS) into another (ReScript) is the limited editor support. Because of that we provide a VSCode extension that brings syntax highlight.
+One of the downsides of embedding a language (CSS) into another (ReScript) is the limited editor support. Because of that, we provide a VSCode extension that supports syntax highlighting of the CSS inside your styled-ppx notation.
 
 Install the VSCode extension: **[VSCode Extension](https://marketplace.visualstudio.com/items?itemName=davesnx.vscode-styled-ppx)**
 
-> If you are interested on another editor, please [fill an issue](https://github.com/davesnx/styled-ppx/issues/new)
+> If you are interested in other editors, please [file an issue](https://github.com/davesnx/styled-ppx/issues/new)

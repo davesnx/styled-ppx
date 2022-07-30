@@ -5848,9 +5848,9 @@ module StringInterpolation = {
   let styles =
     CssJs.style(. [|
       CssJs.label("StringInterpolation"),
-      CssJs.color(Theme.var),
-      CssJs.backgroundColor(black),
-      CssJs.borderColor(Theme.Border.black),
+      (CssJs.color(Theme.var): CssJs.rule),
+      (CssJs.backgroundColor(black): CssJs.rule),
+      (CssJs.borderColor(Theme.Border.black): CssJs.rule),
       CssJs.display(`block),
     |]);
   let make = (props: makeProps) => {
@@ -6842,7 +6842,7 @@ module DynamicComponent = {
   let styles = (~var, _) =>
     CssJs.style(. [|
       CssJs.label("DynamicComponent"),
-      CssJs.color(var),
+      (CssJs.color(var): CssJs.rule),
       CssJs.display(`block),
     |]);
   let make = (props: makeProps('var)) => {
@@ -9788,7 +9788,10 @@ module SequenceDynamicComponent = {
   };
   let styles = (~size, _) => {
     Js.log("Logging when render");
-    CssJs.style(. [|CssJs.width(size), CssJs.display(`block)|]);
+    CssJs.style(. [|
+      (CssJs.width(size): CssJs.rule),
+      CssJs.display(`block),
+    |]);
   };
   let make = (props: makeProps('size)) => {
     let className =
@@ -10767,7 +10770,7 @@ module DynamicComponentWithDefaultValue = {
     CssJs.style(. [|
       CssJs.label("DynamicComponentWithDefaultValue"),
       CssJs.display(`block),
-      CssJs.color(var),
+      (CssJs.color(var): CssJs.rule),
     |]);
   let make = (props: makeProps('var)) => {
     let className =
@@ -13711,7 +13714,7 @@ module DynamicComponentWithSequence = {
     let color = Theme.button(variant);
     CssJs.style(. [|
       CssJs.display(`inlineFlex),
-      CssJs.color(color),
+      (CssJs.color(color): CssJs.rule),
       CssJs.width(`percent(100.)),
     |]);
   };
@@ -14692,8 +14695,8 @@ module DynamicComponentWithArray = {
       CssJs.label("DynamicComponentWithArray"),
       CssJs.width(`percent(100.)),
       CssJs.display(`block),
-      CssJs.color(color),
-      CssJs.width(size),
+      (CssJs.color(color): CssJs.rule),
+      (CssJs.width(size): CssJs.rule),
     |]);
   let make = (props: makeProps('color, 'size)) => {
     let className =
@@ -14707,7 +14710,8 @@ module DynamicComponentWithArray = {
     createVariadicElement("button", newProps);
   };
 };
-let sharedStylesBetweenDynamicComponents = color => CssJs.color(color);
+let sharedStylesBetweenDynamicComponents = (color): CssJs.rule =>
+  CssJs.color(color);
 module DynamicCompnentWithLetIn = {
   [@bs.deriving abstract]
   type makeProps('color) = {
