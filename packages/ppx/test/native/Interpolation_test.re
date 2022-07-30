@@ -109,7 +109,7 @@ let properties_variable_css_tests = [
   /* Add text-shadow */
   (
     [%expr [%css "color: $(color');"]],
-    [%expr CssJs.color(color')]
+    [%expr (CssJs.color(color'): CssJs.rule)]
   ),
 ];
 
