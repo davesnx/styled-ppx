@@ -226,9 +226,9 @@ style_rule:
   }
 ;
 
-prelude: xs = nonempty_list(loc(component_value_in_prelude)) { xs };
+prelude: xs = loption(nonempty_list(loc(component_value_in_prelude))) { xs };
 
-component_values: xs = nonempty_list(loc(component_value)) { xs };
+component_values: xs = loption(nonempty_list(loc(component_value))) { xs };
 
 declarations:
   | xs = nonempty_list(declaration_or_at_rule); SEMI_COLON?; { xs }

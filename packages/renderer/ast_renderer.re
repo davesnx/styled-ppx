@@ -186,7 +186,7 @@ and render_component_value = (ast: with_loc(Component_value.t)) => {
   | Function(name, body) =>
     let body =
       body |> fst |> List.map(render_component_value) |> String.concat(", ");
-    "Function(" ++ fst(name) ++ ", " ++ body ++ ")";
+    "Function(" ++ fst(name) ++ ", [" ++ body ++ "])";
   | Hash(string) => "Hash(" ++ string ++ ")"
   | Number(string) => "Number(" ++ string ++ ")"
   | Unicode_range(string) => "Unicode_range(" ++ string ++ ")"
