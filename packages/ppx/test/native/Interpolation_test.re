@@ -10,9 +10,9 @@ let compare = (input, expected, {expect, _}) => {
 };
 
 let properties_variable_css_tests = [
-  /* (
+  (
     [%expr [%css "color: $(mono100);"]],
-    [%expr CssJs.color(mono100)]
+    [%expr (CssJs.color(mono100) : CssJs.rule)]
   ),
   (
     [%expr [%css "margin: $(Size.big) $(Size.small);"]],
@@ -20,7 +20,7 @@ let properties_variable_css_tests = [
   ),
   (
     [%expr [%css "color: $(mono100);"]],
-    [%expr CssJs.color(mono100)]
+    [%expr (CssJs.color(mono100) : CssJs.rule)]
   ),
   (
     [%expr [%css "padding: $(Size.small) 0px;"]],
@@ -36,43 +36,43 @@ let properties_variable_css_tests = [
   ),
   (
     [%expr [%css "width: $(width);"]],
-    [%expr CssJs.width(width)]
+    [%expr (CssJs.width(width) : CssJs.rule)]
   ),
   (
     [%expr [%css "max-width: $(max);"]],
-    [%expr CssJs.maxWidth(max)]
+    [%expr (CssJs.maxWidth(max) : CssJs.rule)]
   ),
   (
     [%expr [%css "height: $(height);"]],
-    [%expr CssJs.height(height)]
+    [%expr (CssJs.height(height) : CssJs.rule)]
   ),
   (
     [%expr [%css "border-radius: $(border);"]],
-    [%expr CssJs.borderRadius(border)]
+    [%expr (CssJs.borderRadius(border) : CssJs.rule)]
   ),
   (
     [%expr [%css "font-size: $(font);"]],
-    [%expr CssJs.fontSize(font)]
+    [%expr (CssJs.fontSize(font) : CssJs.rule)]
   ),
   (
     [%expr [%css "font-family: $(mono);"]],
-    [%expr CssJs.fontFamily(mono)]
+    [%expr (CssJs.fontFamily(mono) : CssJs.rule)]
   ),
   (
     [%expr [%css "line-height: $(lh);"]],
-    [%expr CssJs.lineHeight(lh)]
+    [%expr (CssJs.lineHeight(lh) : CssJs.rule)]
   ),
   (
     [%expr [%css "z-index: $(zLevel);"]],
-    [%expr CssJs.zIndex(zLevel)]
+    [%expr (CssJs.zIndex(zLevel) : CssJs.rule)]
   ),
   (
     [%expr [%css "left: $(left);"]],
-    [%expr CssJs.left(left)]
+    [%expr (CssJs.left(left) : CssJs.rule)]
   ),
   (
     [%expr [%css "text-decoration-color: $(decorationColor);"]],
-    [%expr CssJs.textDecorationColor(decorationColor)]
+    [%expr (CssJs.textDecorationColor(decorationColor) : CssJs.rule)]
   ),
   /* (
     [%expr [%css "background-image: $(wat);" ]],
@@ -104,7 +104,7 @@ let properties_variable_css_tests = [
         color
       )
     |])]
-  ), */
+  ),
   /* Add border */
   /* Add text-shadow */
   (
@@ -113,7 +113,7 @@ let properties_variable_css_tests = [
   ),
 ];
 
-describe("Should bind to bs-css with interpolatated variables", ({test, _}) => {
+describe("Should bind to bs-css with interpolated variables", ({test, _}) => {
   properties_variable_css_tests |>
     List.iteri((_index, (result, expected)) =>
       test(

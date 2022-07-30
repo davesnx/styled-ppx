@@ -22,6 +22,12 @@ type transform('ast, 'value) = {
   string_to_expr: string => result(list(Parsetree.expression), string),
 };
 
+
+let add_type = (expr) => {
+  let typ = Helper.Typ.constr(~loc=Location.none, {txt: Ldot(Lident("CssJs"), "rule"), loc: Location.none}, []);
+  Helper.Exp.constraint_(~loc=Location.none, expr, typ);
+};
+
 let emit = (property, value_of_ast, value_to_expr) => {
   let ast_of_string = Parser.parse(property);
   let ast_to_expr = ast => value_of_ast(ast) |> value_to_expr;
@@ -270,7 +276,10 @@ let transform_with_variable = (parser, mapper, value_to_expr) =>
     fun
     | `Variable(name) => render_variable(name)
     | `Value(ast) => mapper(ast),
-    value_to_expr,
+    fun
+    | {pexp_desc: Pexp_ident({txt: Ldot(Lident("CssJs"), _), _}), _} as exp => value_to_expr(exp) // we dont want to add types on cases with `CssJs.red` for example
+    | {pexp_desc: Pexp_ident(_), _}  as exp => value_to_expr(exp) |> List.map(add_type)
+    | exp => value_to_expr(exp)
   );
 
 let apply = (parser, id, map) =>
