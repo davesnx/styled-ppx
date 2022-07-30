@@ -319,8 +319,10 @@ attribute_selector:
 id_selector: h = HASH { Selector.Id h }
 
 /* <class-selector> = '.' <ident-token> */
-class_selector: DOT; c = IDENT { Selector.Class c };
-
+class_selector:
+  | DOT; c = IDENT { Selector.Class c }
+  /* Tiny bug where we split idents and tags by it's content */
+  | DOT; t = TAG { Selector.Class t };
 
 /* <subclass-selector> = <id-selector> | <class-selector> | <attribute-selector> | <pseudo-class-selector> */
 subclass_selector:
