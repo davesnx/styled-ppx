@@ -32,7 +32,7 @@ let string_of_uchar = char => {
 
 let check = (f, buf) => {
   // TODO: why this second int?
-  Sedlexing.mark(buf, 0);
+  // Sedlexing.mark(buf, 0);
   let value = f(buf);
   let _ = Sedlexing.backtrack(buf);
   value;

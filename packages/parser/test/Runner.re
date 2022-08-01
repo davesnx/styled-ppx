@@ -1,0 +1,1 @@
+LexerTest.Setup.cli();

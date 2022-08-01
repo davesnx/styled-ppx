@@ -30,6 +30,9 @@ esy test_css_support
 echo "Run CSS Lexer tests"
 esy test_css_lexer
 
+echo "Run CSS Lexer 2 tests"
+esy test_css_lexer_2
+
 echo "Run CSS Parser tests"
 esy test_css_parser
 

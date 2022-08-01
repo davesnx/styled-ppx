@@ -43,6 +43,7 @@
     "test_ppx_snapshot_promote":
       "esy dune build @ppx_snapshot_test --auto-promote",
     "test_css_lexer": "esy dune build @css_lexer_test",
+    "test_css_lexer_2": "esy dune build @css_lexer_test_2",
     "test_css_parser": "esy dune build @css_parser_test",
     "test_css_spec_parser": "esy dune build @css_spec_parser_test",
     "build_test_bs": "cd packages/ppx/test/browser; yarn build",

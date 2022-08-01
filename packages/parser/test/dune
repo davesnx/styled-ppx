@@ -1,17 +1,17 @@
 (library
- (name ReasonCSSLexerTest)
+ (name LexerTest)
  (ocamlopt_flags -linkall -g)
- (libraries reason-css-lexer.lib rely.lib)
+ (libraries styled-ppx-css-parser rely.lib)
  (modules
   (:standard \ Runner)))
 
 (executable
  (name Runner)
- (libraries ReasonCSSLexerTest)
+ (libraries LexerTest)
  (modules Runner))
 
 (rule
- (alias css_lexer_test_2)
+ (alias css_lexer_test)
  (deps Runner.exe)
  (action
   (run %{deps})))
