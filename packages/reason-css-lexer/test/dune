@@ -11,7 +11,7 @@
  (modules Runner))
 
 (rule
- (alias css_lexer_test_2)
+ (alias css_lexer_test)
  (deps Runner.exe)
  (action
   (run %{deps})))

@@ -5,10 +5,17 @@ module Parser = Css_lexer.Parser;
 module Types = Css_types;
 module Debug = Css_types.Debug;
 
-let parse = (input): Types.Stylesheet.t => {
+let parse = (input) => {
   let container_lnum = 0;
   let pos = Lexing.dummy_pos;
-  Lexer.parse_stylesheet(~container_lnum, ~pos, input);
+  try(Lexer.parse_stylesheet(~container_lnum, ~pos, input) |> Result.ok) {
+    | Lexer.LexingError((_, str)) => Error(str)
+    | Lexer.ParseError((token, _, _)) => {
+      Error("Parse error while reading token '" ++ Lexer.token_to_string(token) ++ "'")
+    }
+    | Lexer.GrammarError((str, _)) => Error(str)
+    | _exn => Error("Unknown exception")
+  };
 };
 
 describe("CSS Parser", ({test, _}) => {
@@ -56,7 +63,7 @@ describe("CSS Parser", ({test, _}) => {
       test(
         "should succeed lexing: " ++ input,
         ({expect, _}) => {
-          let stylesheet = parse(input);
+          let stylesheet: Types.Stylesheet.t = parse(input) |> Result.get_ok;
           let inputTokens = Debug.render_stylesheet(stylesheet);
           let outputTokens = Debug.render_stylesheet(output);
           expect.string(inputTokens).toEqual(outputTokens);
