@@ -98,7 +98,7 @@ let time =
       switch (dimension) {
       | "s" => Ok(`S(number))
       | "ms" => Ok(`Ms(number))
-      | _ => Error(["unknown dimension"])
+      | _ => Error(["unknown time unit"])
       }
     | _ => Error(["expected time"])
     }

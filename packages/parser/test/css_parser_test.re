@@ -64,11 +64,25 @@ describe("CSS Parser", ({test, _}) => {
       ),
     success_tests_data,
   );
-});
 
-/*
- test("should error", ({expect, _}) => {
-   let errorInput = parse("/*") |> Result.get_error;
-   expect.string(errorInput).toEqual();
- });
- */
+  let error_tests_data = [
+    (
+      "{}", "Parse error while reading token '{'",
+    ),
+    (
+      "div { color: red; _ }", "Parse error while reading token '}'",
+    ),
+  ]
+
+  List.iter(
+    ((input, output)) =>
+      test(
+        "should error lexing: " ++ input,
+        ({expect, _}) => {
+          let errorInput = parse(input) |> Result.get_error;
+          expect.string(errorInput).toEqual(output);
+        },
+      ),
+    error_tests_data,
+  );
+});
