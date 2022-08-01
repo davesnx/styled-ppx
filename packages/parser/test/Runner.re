@@ -1,1 +1,1 @@
-LexerTest.Setup.cli();
+ParserTest.Setup.cli();
