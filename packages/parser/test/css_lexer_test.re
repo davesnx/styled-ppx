@@ -12,7 +12,9 @@ let parse = input => {
     }
   }
 
-  from_string([])
+  try (Ok(from_string([]))) {
+    | exn => Error(Printexc.to_string(exn))
+  }
 };
 
 let render_token =
@@ -121,15 +123,26 @@ describe("CSS Lexer", ({test, _}) => {
     /* ("\\@desu", [IDENT("@desu")]), */
   ]);
 
-  success_tests_data
-  |> List.iter(((input, output)) =>
-       test(
-         "should succed lexing: " ++ input,
-         ({expect, _}) => {
-           let inputTokens = list_parse_tokens_to_string(parse(input));
-           let outputTokens = list_tokens_to_string(output);
-           expect.string(inputTokens).toEqual(outputTokens);
-         },
-       )
-     );
+  List.iter(
+    ((input, output)) =>
+      test(
+        "should succeed lexing: " ++ input,
+        ({expect, _}) => {
+          let okInput = parse(input) |> Result.get_ok;
+          let inputTokens = list_parse_tokens_to_string(okInput);
+          let outputTokens = list_tokens_to_string(output);
+          expect.string(inputTokens).toEqual(outputTokens);
+        },
+      ),
+    success_tests_data
+  );
 });
+
+/*
+TODO: Add error lexing cases when we need it.
+
+test("should error lexing", ({expect, _}) => {
+  let errorInput = parse("/*") |> Result.get_error;
+  expect.string(errorInput).toEqual();
+});
+*/
