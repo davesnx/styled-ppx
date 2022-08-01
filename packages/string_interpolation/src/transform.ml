@@ -33,12 +33,12 @@ module Parser = struct
         [%sedlex.regexp? (letter | '_'), Star (letter | '0' .. '9' | '_')]
       in
       let case_ident =
-        [%sedlex.regexp? ('a' .. 'z' | '_' | '\''), Star (letter | '0' .. '9' | '_')]
+        [%sedlex.regexp?
+          ('a' .. 'z' | '_' | '\''), Star (letter | '0' .. '9' | '_')]
       in
       let variable = [%sedlex.regexp? Star (ident, '.'), case_ident] in
       let interpolation = [%sedlex.regexp? "$(", variable, ")"] in
       let rest = [%sedlex.regexp? Plus (Compl '$')] in
-
       match%sedlex lexbuf with
       | interpolation ->
           parse
@@ -57,7 +57,6 @@ module Emitter = struct
   open Ast_builder.Default
 
   type element = string * Location.t
-
   type token = String of element | Variable of element * element option
 
   let token_to_string = function
@@ -65,16 +64,13 @@ module Emitter = struct
     | Variable ((v, _), _) -> "$(" ^ v ^ ")"
 
   let _print_tokens = List.iter (fun p -> print_string (token_to_string p))
-
   let loc = Location.none
-
   let with_loc ~loc txt = { loc; txt }
 
   let js_string_to_const ~loc s =
     Exp.constant ~loc (Const.string ~quotation_delimiter:"js" s)
 
   let inline_const ~loc s = Exp.ident ~loc (with_loc s ~loc)
-
   let concat_fn = { txt = Lident "^"; loc = Location.none } |> Exp.ident ~loc
 
   let rec apply (func : expression) (args : (arg_label * expression) list) =
@@ -90,7 +86,8 @@ module Emitter = struct
     @@ List.fold_left
          (fun acc token ->
            match token with
-           | Variable ((v, loc), _) -> (Nolabel, v |> Longident.parse |> inline_const ~loc) :: acc
+           | Variable ((v, loc), _) ->
+               (Nolabel, v |> Longident.parse |> inline_const ~loc) :: acc
            | String (v, loc) -> (Nolabel, js_string_to_const ~loc v) :: acc)
          [] tokens
 
@@ -98,12 +95,13 @@ module Emitter = struct
   let error_extension msg =
     let err_extension_name loc = { Location.loc; txt = "ocaml.error" } in
     let constant = Str.eval (Exp.constant (Const.string msg)) in
-    ( err_extension_name loc, PStr [constant])
+    (err_extension_name loc, PStr [ constant ])
 
   let generate tokens =
     match to_arguments tokens with
     | [] ->
-      pexp_extension ~loc: Location.none @@ error_extension "Missing string payload"
+        pexp_extension ~loc:Location.none
+        @@ error_extension "Missing string payload"
     | args -> apply concat_fn args
 end
 
