@@ -22,7 +22,6 @@ let render_token =
 
 let list_parse_tokens_to_string = tokens =>
   tokens
-  |> List.rev
   |> List.map(render_token)
   |> String.concat(" ")
   |> String.trim;
@@ -34,48 +33,69 @@ describe("CSS Lexer", ({test, _}) => {
   let success_tests_data = Parser.([
     (" \n\t ", [WS]),
     ({|"something"|}, [STRING("something")]),
-    // TODO: is that right?
-    /* ({|#2|}, [HASH("2", `UNRESTRICTED)]), */
-    /* ({|#abc|}, [HASH("abc", `ID)]), */
+    /* TODO: Differentiate HASH from ID */
+    ({|#2|}, [HASH("2")]),
+    ({|#abc|}, [HASH("abc")]),
     ({|#|}, [DELIM("#")]),
     ({|'tuturu'|}, [STRING("tuturu")]),
     ({|(|}, [LEFT_PAREN]),
     ({|)|}, [RIGHT_PAREN]),
-    /* ({|+12.3|}, [NUMBER(12.3)]), */
-    /* ({|+|}, [DELIM("+")]), */
+    /* TODO: Treat +1 to NUMBER and not COMBINATOR + NUMBER */
+    /* ({|+12.3|}, [NUMBER("12.3")]), */
+    ({|+ 12.3|}, [COMBINATOR("+"), WS, NUMBER("12.3")]),
+    ({|+|}, [COMBINATOR("+")]),
     ({|,|}, [COMMA]),
-    /* ({|-45.6|}, [NUMBER(-45.6)]), */
+    /* TODO: Store Number as float/int */
+    ({|-45.6|}, [NUMBER("-45.6")]),
+    /* TODO: Store Float_dimension as float/int */
+    /* TODO: Store dimension as a variant */
+    ({|45.6px|}, [FLOAT_DIMENSION(("45.6", "px", Length))]),
     /* ({|-->|}, [CDC]), */
     ({|--potato|}, [IDENT("--potato")]),
     ({|-|}, [DELIM("-")]),
-    /* ({|.7|}, [NUMBER(0.7)]), */
+    ({|.7|}, [NUMBER(".7")]),
     ({|.|}, [DOT]),
     ({|:|}, [COLON]),
     ({|;|}, [SEMI_COLON]),
+    /* TODO: Support comments on the lexer phase */
     /* ({|<!--|}, [CDO]), */
     ({|<|}, [DELIM("<")]),
-    /* ({|@mayushii|}, [AT_KEYWORD("mayushii")]), */
+    ({|@mayushii|}, [AT_RULE("mayushii")]),
     ({|@|}, [DELIM("@")]),
     ({|[|}, [LEFT_BRACKET]),
+    /* TODO: Supported scaped "@" and others */
     /* ("\\@desu", [IDENT("@desu")]), */
     ({|]|}, [RIGHT_BRACKET]),
-    /* ({|12345678.9|}, [NUMBER(12345678.9)]), */
+    ({|12345678.9|}, [NUMBER("12345678.9")]),
     ({|bar|}, [IDENT("bar")]),
     ({||}, [EOF]),
     ({|!|}, [DELIM("!")]),
-    /* ("1 / 1", [NUMBER(1.), WS, DELIM("/"), WS, NUMBER(1.)]), */
-    /* (
+    ("1 / 1", [NUMBER("1"), WS, DELIM("/"), WS, NUMBER("1")]),
+    (
       {|calc(10px + 10px)|},
       [
         FUNCTION("calc"),
         FLOAT_DIMENSION(("10", "px", Length)),
         WS,
-        DELIM("+"),
+        COMBINATOR("+"),
         WS,
         FLOAT_DIMENSION(("10", "px", Length)),
         RIGHT_PAREN,
       ],
     ),
+    (
+      {|calc(10px+ 10px)|},
+      [
+        FUNCTION("calc"),
+        FLOAT_DIMENSION(("10", "px", Length)),
+        COMBINATOR("+"),
+        WS,
+        FLOAT_DIMENSION(("10", "px", Length)),
+        RIGHT_PAREN,
+      ],
+    ),
+    /* TODO: Percentage should have payload? */
+    ({|calc(10%)|}, [FUNCTION("calc"), NUMBER("10"), PERCENTAGE, RIGHT_PAREN]),
     (
       {|background-image:url('img_tree.gif' )|},
       [
@@ -87,20 +107,9 @@ describe("CSS Lexer", ({test, _}) => {
         RIGHT_PAREN,
       ],
     ),
-    (
-      {|calc(10px+ 10px)|},
-      [
-        FUNCTION("calc"),
-        FLOAT_DIMENSION(("10", "px", Length)),
-        DELIM("+"),
-        WS,
-        FLOAT_DIMENSION(("10", "px", Length)),
-        RIGHT_PAREN,
-      ],
-    ),
-  ({|calc(10%)|}, [FUNCTION("calc"), PERCENTAGE, RIGHT_PAREN]),
-    ({|$(Module.variable)|}, [DELIM("$"), LEFT_PAREN, IDENT("Module"), DELIM("."), IDENT("variable"), RIGHT_PAREN]),
-    ({|$(Module.variable')|}, [DELIM("$"), LEFT_PAREN, IDENT("Module"), DELIM("."), IDENT("variable'"), RIGHT_PAREN]), */
+    /* TODO: Transform this as [DELIM("$"), LEFT_PAREN, IDENT("Module"), DELIM("."), IDENT("variable"), RIGHT_PAREN]) */
+    ({|$(Module.variable)|}, [VARIABLE(["Module", "variable"])]),
+    ({|$(Module.variable')|}, [VARIABLE(["Module", "variable'"])]),
   ]);
 
   success_tests_data
