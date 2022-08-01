@@ -33,16 +33,17 @@ describe("CSS Lexer", ({test, _}) => {
   let success_tests_data = Parser.([
     (" \n\t ", [WS]),
     ({|"something"|}, [STRING("something")]),
+    ({|'tuturu'|}, [STRING("tuturu")]),
     /* TODO: Differentiate HASH from ID */
     ({|#2|}, [HASH("2")]),
     ({|#abc|}, [HASH("abc")]),
     ({|#|}, [DELIM("#")]),
-    ({|'tuturu'|}, [STRING("tuturu")]),
     ({|(|}, [LEFT_PAREN]),
     ({|)|}, [RIGHT_PAREN]),
     /* TODO: Treat +1 to NUMBER and not COMBINATOR + NUMBER */
     /* ({|+12.3|}, [NUMBER("12.3")]), */
     ({|+ 12.3|}, [COMBINATOR("+"), WS, NUMBER("12.3")]),
+    /* TODO: COMBINATOR or DELIM(+)? */
     ({|+|}, [COMBINATOR("+")]),
     ({|,|}, [COMMA]),
     /* TODO: Store Number as float/int */
@@ -50,21 +51,22 @@ describe("CSS Lexer", ({test, _}) => {
     /* TODO: Store Float_dimension as float/int */
     /* TODO: Store dimension as a variant */
     ({|45.6px|}, [FLOAT_DIMENSION(("45.6", "px", Length))]),
-    /* ({|-->|}, [CDC]), */
     ({|--potato|}, [IDENT("--potato")]),
     ({|-|}, [DELIM("-")]),
     ({|.7|}, [NUMBER(".7")]),
     ({|.|}, [DOT]),
+    ({|*|}, [ASTERISK]),
+    ({|&|}, [AMPERSAND]),
     ({|:|}, [COLON]),
+    ({|::|}, [DOUBLE_COLON]),
     ({|;|}, [SEMI_COLON]),
-    /* TODO: Support comments on the lexer phase */
+    /* TODO: Support comments on the lexer phase? */
     /* ({|<!--|}, [CDO]), */
+    /* ({|-->|}, [CDC]), */
     ({|<|}, [DELIM("<")]),
     ({|@mayushii|}, [AT_RULE("mayushii")]),
     ({|@|}, [DELIM("@")]),
     ({|[|}, [LEFT_BRACKET]),
-    /* TODO: Supported scaped "@" and others */
-    /* ("\\@desu", [IDENT("@desu")]), */
     ({|]|}, [RIGHT_BRACKET]),
     ({|12345678.9|}, [NUMBER("12345678.9")]),
     ({|bar|}, [IDENT("bar")]),
@@ -110,6 +112,13 @@ describe("CSS Lexer", ({test, _}) => {
     /* TODO: Transform this as [DELIM("$"), LEFT_PAREN, IDENT("Module"), DELIM("."), IDENT("variable"), RIGHT_PAREN]) */
     ({|$(Module.variable)|}, [VARIABLE(["Module", "variable"])]),
     ({|$(Module.variable')|}, [VARIABLE(["Module", "variable'"])]),
+    ({|-moz|}, [IDENT("-moz")]),
+    ({|--color-main|}, [IDENT("--color-main")]),
+    /* TODO: Support for escaped */
+    /* ({|\32|}, [IDENT("--color-main")]), */
+    /* ({|\25BA|}, [IDENT("--color-main")]), */
+    /* TODO: Supported scaped "@" and others */
+    /* ("\\@desu", [IDENT("@desu")]), */
   ]);
 
   success_tests_data
