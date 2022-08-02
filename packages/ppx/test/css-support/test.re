@@ -3135,7 +3135,7 @@
 [%css {|justify-items: start;|}];
 [%css {|justify-self: unset;|}];
 [%css {|left: unset;|}];
-/* [%css {|mask-image: $(eyeCrossedIcon);|}]; */
+[%css {|mask-image: $(eyeCrossedIcon);|}];
 [%css {|mask-position: center center;|}];
 [%css {|mask-repeat: no-repeat;|}];
 [%css {|max-width: max-content;|}];

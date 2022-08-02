@@ -2081,6 +2081,8 @@ let properties = [
   ("top", found(top)),
   ("right", found(right)),
   ("bottom", found(bottom)),
+  // TODO: Missing on bs-css
+  /* ("mask-image", found(maskImage)) */
 ];
 
 let render_when_unsupported_features = (property, value) => {
@@ -2100,8 +2102,7 @@ let render_when_unsupported_features = (property, value) => {
   let propertyName = property |> to_camel_case |> render_string;
   let value = value |> render_string;
 
-  %expr
-  CssJs.unsafe([%e propertyName], [%e value]);
+  [%expr CssJs.unsafe([%e propertyName], [%e value])];
 };
 
 let findProperty = name => {

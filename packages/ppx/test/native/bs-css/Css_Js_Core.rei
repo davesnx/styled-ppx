@@ -33,10 +33,8 @@ include MakeResult;
 
 module Make:
   (C: Css_Core.CssImplementationIntf) =>
-
     MakeResult with
       type styleEncoding := C.styleEncoding and type renderer := C.renderer;
-
 
 let toJson: array(rule) => Js.Json.t;
 

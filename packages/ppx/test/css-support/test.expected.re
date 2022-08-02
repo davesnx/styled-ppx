@@ -1831,6 +1831,7 @@ CssJs.height(`fitContent);
 CssJs.unsafe({js|justifyItems|js}, {js| start|js});
 CssJs.unsafe({js|justify-self|js}, "unset");
 CssJs.unsafe({js|left|js}, "unset");
+CssJs.unsafe({js|maskImage|js}, {js| $(eyeCrossedIcon)|js});
 CssJs.unsafe({js|maskPosition|js}, {js| center center|js});
 CssJs.unsafe({js|maskRepeat|js}, {js| no-repeat|js});
 CssJs.maxWidth(`maxContent);
