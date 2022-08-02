@@ -6,7 +6,8 @@
   "license": "MIT",
   "homepage": "https://styled-ppx.vercel.app",
   "keywords": [
-    "rescript", "reason", "ocaml", "ppx", "bucklescript", "css", "styled-components", "emotion", "styled", "components", "CSS-in-JS"
+    "rescript", "reason", "ocaml", "ppx", "bucklescript", "css",
+    "styled-components", "emotion", "styled", "components", "CSS-in-JS"
   ],
   "bugs": { "url": "https://github.com/davesnx/styled-ppx/issues" },
   "repository": {
@@ -30,6 +31,7 @@
     "@opam/sedlex":
       "davesnx/sedlex:sedlex.opam#8de2e80611ce6b200baf857d9071099af8daaa5a",
     "@opam/ocaml-lsp-server": "1.9.0",
+    "@opam/ocamlformat": "0.24.1",
     "@reason-native/rely":
       "jfrolich/reason-native:rely.json#08085a4048974b06aaf3aab918b677b39dea3d18",
     "ocaml": "4.12.0",
@@ -42,8 +44,9 @@
     "test_ppx_snapshot": "esy dune build @ppx_snapshot_test",
     "test_ppx_snapshot_promote":
       "esy dune build @ppx_snapshot_test --auto-promote",
+    "test_parser": "esy dune build @parser_test",
     "test_css_lexer": "esy dune build @css_lexer_test",
-    "test_css_parser": "esy dune build @css_parser_test",
+    "test_reason_css_parser_test": "esy dune build @reason_css_parser_test",
     "test_css_spec_parser": "esy dune build @css_spec_parser_test",
     "build_test_bs": "cd packages/ppx/test/browser; yarn build",
     "test_bs": "cd packages/ppx/test/browser; yarn build; yarn test",

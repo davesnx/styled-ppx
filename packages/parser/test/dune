@@ -1,0 +1,17 @@
+(library
+ (name ParserTest)
+ (ocamlopt_flags -linkall -g)
+ (libraries styled-ppx-css-parser rely.lib)
+ (modules
+  (:standard \ Runner)))
+
+(executable
+ (name Runner)
+ (libraries ParserTest)
+ (modules Runner))
+
+(rule
+ (alias parser_test)
+ (deps Runner.exe)
+ (action
+  (run %{deps})))

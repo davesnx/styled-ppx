@@ -10,7 +10,7 @@ describe("Data monad", ({test, _}) => {
   test("return", _ => {
     switch (return(Ok(1), [COMMA])) {
     | (Ok(1), [COMMA]) => ()
-    | _ => failwith("should be (Ok(123), [COMMA])")
+    | _ => failwith("should be (Ok(1), [COMMA])")
     }
   });
 

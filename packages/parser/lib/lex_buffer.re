@@ -3,7 +3,7 @@
 
 /** A custom lexbuffer that automatically keeps track of the source location.
     This module is a thin wrapper arounds sedlexing's default buffer, which does
-    not provide this functionality. */;
+    not provide this functionality. */
 
 /** the lex buffer type */
 type t = {
@@ -109,8 +109,6 @@ let next = lexbuf => {
   };
   c;
 };
-
-let raw = lexbuf => Sedlexing.lexeme(lexbuf.buf);
 
 let latin1 = (~skip=0, ~drop=0, lexbuf) => {
   let len = Sedlexing.lexeme_length(lexbuf.buf) - skip - drop;
