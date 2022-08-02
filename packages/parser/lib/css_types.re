@@ -32,7 +32,7 @@ module rec Component_value: {
 and Brace_block: {
   type t =
     | Empty
-    | Declaration_list(Declaration_list.t)
+    | Rule_list(Rule_list.t)
     | Stylesheet(Stylesheet.t);
 } = Brace_block
 and At_rule: {
@@ -51,23 +51,19 @@ and Declaration: {
     loc: Location.t,
   };
 } = Declaration
-and Declaration_list: {
-  type kind =
-    | Declaration(Declaration.t)
-    | At_rule(At_rule.t)
-    | Style_rule(Style_rule.t);
-
-  type t = with_loc(list(kind));
-} = Declaration_list
+and Rule_list: {
+  type t = with_loc(list(Rule.t));
+} = Rule_list
 and Style_rule: {
   type t = {
     prelude: with_loc(Selector.t),
-    block: Declaration_list.t,
+    block: Rule_list.t,
     loc: Location.t,
   };
 } = Style_rule
 and Rule: {
   type t =
+    | Declaration(Declaration.t)
     | Style_rule(Style_rule.t)
     | At_rule(At_rule.t);
 } = Rule
@@ -146,6 +142,7 @@ let rec render_stylesheet = (ast: Stylesheet.t) => {
 }
 and render_rule = (ast: Rule.t) => {
   switch (ast) {
+  | Declaration(declaration) => "Declaration(" ++ render_declaration(declaration) ++ ")"
   | Style_rule(style_rule) =>
     "Style_rule(" ++ render_style_rule(style_rule) ++ ")"
   | At_rule(at_rule) => "At_rule(" ++ render_at_rule(at_rule) ++ ")"
@@ -154,7 +151,7 @@ and render_rule = (ast: Rule.t) => {
 and render_style_rule = (ast: Style_rule.t) => {
   render_record([
     ("prelude", ast.prelude |> fst |> render_selector),
-    ("block", render_declaration_list(ast.block)),
+    ("block", render_rule_list(ast.block)),
   ]);
 }
 and render_at_rule = (ast: At_rule.t) => {
@@ -166,21 +163,13 @@ and render_at_rule = (ast: At_rule.t) => {
 and render_brace_block = ast => {
   switch ((ast: Brace_block.t)) {
   | Empty => "Empty"
-  | Declaration_list(declaration_list) =>
-    render_declaration_list(declaration_list)
+  | Rule_list(rule_list) => render_rule_list(rule_list)
   | Stylesheet(stylesheet) => render_stylesheet(stylesheet)
   };
 }
-and render_declaration_kind = (ast: Declaration_list.kind) => {
-  switch (ast) {
-  | Declaration(declaration) => render_declaration(declaration)
-  | Style_rule(style_rule) => render_style_rule(style_rule)
-  | At_rule(at_rule) => render_at_rule(at_rule)
-  };
-}
-and render_declaration_list = (ast: Declaration_list.t) => {
+and render_rule_list = (ast: Rule_list.t) => {
   let inner =
-    ast |> fst |> List.map(render_declaration_kind) |> String.concat(", ");
+    ast |> fst |> List.map(render_rule) |> String.concat(", ");
   "Declaration([" ++ inner ++ "])";
 }
 and render_declaration = (ast: Declaration.t) => {

@@ -1,9 +1,9 @@
 open Setup;
 
 module Lexer = Css_lexer;
-module Parser = Css_lexer.Parser;
+module Parser = Lexer.Parser;
 module Types = Css_types;
-module Debug = Css_types.Debug;
+module Debug = Types.Debug;
 
 let parse = (input) => {
   let container_lnum = 0;
@@ -42,7 +42,7 @@ describe("CSS Parser", ({test, _}) => {
             ),
             block: (
               [
-                Declaration_list.Declaration({
+                Rule.Declaration({
                   loc,
                   name: ("color", loc),
                   value: ([(Component_value.Ident("red"), loc)], loc),

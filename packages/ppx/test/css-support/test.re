@@ -3135,7 +3135,7 @@
 [%css {|justify-items: start;|}];
 [%css {|justify-self: unset;|}];
 [%css {|left: unset;|}];
-/* [%css {|mask-image: $(eyeCrossedIcon);|}]; */
+[%css {|mask-image: $(eyeCrossedIcon);|}];
 [%css {|mask-position: center center;|}];
 [%css {|mask-repeat: no-repeat;|}];
 [%css {|max-width: max-content;|}];
@@ -3159,4 +3159,3 @@
 /* [%css {|width: -webkit-fill-available;|}]; */
 [%css {|width: fit-content;|}];
 [%css {|width: max-content;|}];
-[%css {|word-break: break-word;|}];

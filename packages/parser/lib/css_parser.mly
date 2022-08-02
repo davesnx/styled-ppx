@@ -42,9 +42,9 @@ open Css_types
 %token <string list> VARIABLE
 
 %start <Css_types.Stylesheet.t> stylesheet
-%start <Css_types.Declaration_list.t> declaration_list
+%start <Css_types.Rule_list.t> declaration_list
 %start <Css_types.Declaration.t> declaration
-%start <Css_types.Declaration_list.t> keyframes
+%start <Css_types.Rule_list.t> keyframes
 
 %%
 
@@ -62,11 +62,6 @@ keyframe: rules = nonempty_list(keyframe_style_rule); { rules };
 keyframes:
   | rules = loc(keyframe); EOF; { rules }
   | rules = brace_block(loc(keyframe)); EOF; { rules }
-;
-
-rule:
-  | r = at_rule { Rule.At_rule r }
-  | r = style_rule { Rule.Style_rule r }
 ;
 
 /* Adds location as a tuple */
@@ -117,7 +112,7 @@ at_rule:
     ds = brace_block(loc(declarations)); WS? {
     { At_rule.name = name;
       prelude;
-      block = Brace_block.Declaration_list ds;
+      block = Brace_block.Rule_list ds;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
@@ -125,7 +120,7 @@ at_rule:
   | name = loc(AT_MEDIA); WS?;
     prelude = loc(media_query_prelude); WS?;
     b = empty_brace_block; WS?; {
-    let empty_block = Brace_block.Declaration_list (b, Lex_buffer.make_loc $startpos $endpos) in
+    let empty_block = Brace_block.Rule_list (b, Lex_buffer.make_loc $startpos $endpos) in
     { At_rule.name = name;
       prelude;
       block = empty_block;
@@ -138,7 +133,7 @@ at_rule:
     block = brace_block(keyframe) {
     let item = (Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i)) in
     let prelude = ([item], Lex_buffer.make_loc $startpos(i) $endpos(i)) in
-    let block = Brace_block.Declaration_list (block, Lex_buffer.make_loc $startpos $endpos) in
+    let block = Brace_block.Rule_list (block, Lex_buffer.make_loc $startpos $endpos) in
     { At_rule.name = name;
       prelude;
       block;
@@ -151,7 +146,7 @@ at_rule:
     s = loc(empty_brace_block) {
     let item = (Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i)) in
     let prelude = ([item], Lex_buffer.make_loc $startpos(i) $endpos(i)) in
-    let empty_block = Brace_block.Declaration_list s in
+    let empty_block = Brace_block.Rule_list s in
     { At_rule.name = name;
       prelude;
       block = empty_block;
@@ -189,7 +184,7 @@ keyframe_style_rule:
     declarations = brace_block(loc(declarations)); WS?; {
     let item = Selector.Type id in
     let prelude = Selector.SimpleSelector [item] in
-    Declaration_list.Style_rule {
+    Rule.Style_rule {
       Style_rule.prelude = (prelude, Lex_buffer.make_loc $startpos(id) $endpos(id));
       loc = Lex_buffer.make_loc $startpos $endpos;
       block = declarations;
@@ -199,7 +194,7 @@ keyframe_style_rule:
     declarations = brace_block(loc(declarations)); WS?; {
     let item = Selector.Percentage p in
     let prelude = Selector.SimpleSelector [item] in
-    Declaration_list.Style_rule {
+    Rule.Style_rule {
       Style_rule.prelude = (prelude, Lex_buffer.make_loc $startpos(p) $endpos(p));
       loc = Lex_buffer.make_loc $startpos $endpos;
       block = declarations;
@@ -231,13 +226,13 @@ prelude: xs = loption(nonempty_list(loc(component_value_in_prelude))) { xs };
 component_values: xs = loption(nonempty_list(loc(component_value))) { xs };
 
 declarations:
-  | xs = nonempty_list(declaration_or_at_rule); SEMI_COLON?; { xs }
-  | xs = separated_nonempty_list(SEMI_COLON, declaration_or_at_rule); SEMI_COLON?; { xs }
+  | xs = nonempty_list(rule); SEMI_COLON?; { xs }
+  | xs = separated_nonempty_list(SEMI_COLON, rule); SEMI_COLON?; { xs }
 
-declaration_or_at_rule:
-  | d = declaration_without_eof; { Declaration_list.Declaration d }
-  | r = at_rule { Declaration_list.At_rule r }
-  | s = style_rule { Declaration_list.Style_rule s }
+rule:
+  | d = declaration_without_eof; { Rule.Declaration d }
+  | r = at_rule { Rule.At_rule r }
+  | s = style_rule { Rule.Style_rule s }
 ;
 
 /* property: value; */
