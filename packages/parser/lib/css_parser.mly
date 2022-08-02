@@ -29,6 +29,7 @@ open Css_types
 %token <string> DELIM
 %token <string> FUNCTION
 %token <string> URL
+%token BAD_URL
 %token <string> AT_MEDIA
 %token <string> AT_KEYFRAMES
 %token <string> AT_RULE
