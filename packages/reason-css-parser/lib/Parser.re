@@ -2320,7 +2320,7 @@ let check_map =
       ("wq-name", check(wq_name)),
       ("x", check(x)),
       ("y", check(y)),
-      /* calc needs to be available in length */
+      /* TODO: calc needs to be available in length */
       ("extended-length", check(extended_length)),
       ("extended-frequency", check(extended_frequency)),
       ("extended-angle", check(extended_angle)),

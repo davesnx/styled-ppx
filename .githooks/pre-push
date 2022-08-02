@@ -27,11 +27,17 @@ esy test_typecheck
 echo "Run CSS Support tests"
 esy test_css_support
 
+echo "Run CSS Parser tests"
+esy test_parser
+
 echo "Run CSS Lexer tests"
 esy test_css_lexer
 
-echo "Run CSS Parser tests"
-esy test_css_parser
+echo "Run Reason CSS Parser tests"
+esy test_reason_css_parser_test
+
+echo "Run string interpolation tests"
+esy dune runtest
 
 echo "Run CSS Spec Parser tests"
 esy test_css_spec_parser

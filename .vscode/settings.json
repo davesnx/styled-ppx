@@ -3,8 +3,7 @@
     "kind": "esy",
     "root": "${workspaceFolder:styled-ppx}"
   },
-
   "[reason]": {
     "editor.formatOnSave": false
-  },
+  }
 }
