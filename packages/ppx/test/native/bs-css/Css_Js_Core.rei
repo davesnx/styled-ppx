@@ -29,10 +29,9 @@ module type MakeResult = {
     (. renderer, array((int, array(rule)))) => animationName;
 };
 
-include MakeResult;
-
 module Make:
   (C: Css_Core.CssImplementationIntf) =>
+
     MakeResult with
       type styleEncoding := C.styleEncoding and type renderer := C.renderer;
 
@@ -198,6 +197,13 @@ let backgroundImage:
   rule;
 
 /**
+ The mask-image CSS property sets the image that is used as mask layer for an element.
+ By default this means the alpha channel of the mask image will be multiplied with the alpha channel of the element.
+ This can be controlled with the mask-mode property. */
+let maskImage:
+  [< Types.MaskImage.t | Types.Url.t | Types.Gradient.t('gradient)] => rule;
+
+/**
  The background-origin CSS property sets the background's origin: from the border start,
  inside the border, or inside the padding.
  */
@@ -242,6 +248,38 @@ let backgroundPosition4:
     ~offsetX: Types.Length.t,
     ~y: Types.BackgroundPosition.Y.t,
     ~offsetY: Types.Length.t
+  ) =>
+  rule;
+
+/**
+ The mask-position CSS property sets the initial position, relative to the mask position layer set by mask-origin,
+ for each defined mask image.
+ */
+let maskPosition:
+  [<
+    Types.MaskPosition.t
+    | `hv(
+        [ Types.MaskPosition.X.t | Types.Length.t],
+        [ Types.MaskPosition.Y.t | Types.Length.t],
+      )
+    | Types.Length.t
+    | Types.Var.t
+    | Types.Cascading.t
+  ] =>
+  rule;
+
+let maskPositions:
+  array(
+    [<
+      Types.MaskPosition.t
+      | `hv(
+          [ Types.MaskPosition.X.t | Types.Length.t],
+          [ Types.MaskPosition.Y.t | Types.Length.t],
+        )
+      | Types.Length.t
+      | Types.Var.t
+      | Types.Cascading.t
+    ],
   ) =>
   rule;
 
@@ -342,6 +380,14 @@ let borderRightStyle:
 let borderRightWidth: Types.Length.t => rule;
 
 let borderRadius: Types.Length.t => rule;
+let borderRadius4:
+  (
+    ~topLeft: Types.Length.t,
+    ~topRight: Types.Length.t,
+    ~bottomLeft: Types.Length.t,
+    ~bottomRight: Types.Length.t
+  ) =>
+  rule;
 
 let borderSpacing: Types.Length.t => rule;
 
@@ -584,6 +630,45 @@ let columnGap:
   rule;
 
 /**
+ The scroll-behavior CSS property sets the behavior for a scrolling box when scrolling is triggered by the navigation
+ or CSSOM scrolling APIs.
+ */
+let scrollBehavior:
+  [< Types.ScrollBehavior.t | Types.Var.t | Types.Cascading.t] => rule;
+
+/**
+ The overscroll-behavior CSS property sets what a browser does when reaching the boundary of a scrolling area.
+ */
+let overscrollBehavior:
+  [< Types.OverscrollBehavior.t | Types.Var.t | Types.Cascading.t] => rule;
+
+/**
+ The overflow-anchor CSS property provides a way to opt out of the browser's scroll anchoring behavior, which adjusts scroll position to minimize content shifts.
+ Scroll anchoring behavior is enabled by default in any browser that supports it. Therefore, changing the value of this property is typically only required if
+ you are experiencing problems with scroll anchoring in a document or part of a document and need to turn the behavior off.
+ */
+let overflowAnchor:
+  [< Types.OverflowAnchor.t | Types.Var.t | Types.Cascading.t] => rule;
+
+/**
+ The column-width CSS property sets the ideal column width in a multi-column layout.
+ The container will have as many columns as can fit without any of them having a width less than the column-width value.
+ If the width of the container is narrower than the specified value, the single column's width will be smaller than the declared column width.
+ */
+let columnWidth:
+  [< Types.ColumnWidth.t | Types.Length.t | Types.Var.t | Types.Cascading.t] =>
+  rule;
+
+/**
+ The caret-color CSS property sets the color of the insertion caret, the visible marker where the next character typed will be inserted.
+ This is sometimes referred to as the text input cursor. The caret appears in elements such as <input> or those with the contenteditable attribute.
+ The caret is typically a thin vertical line that flashes to help make it more noticeable. By default, it is black, but its color can be altered with this property.
+ */
+let caretColor:
+  [< Types.CaretColor.t | Types.Color.t | Types.Var.t | Types.Cascading.t] =>
+  rule;
+
+/**
  This prefixed property is being replaced by column-gap.
  */
 let gridColumnGap:
@@ -606,8 +691,45 @@ let gridColumnStart: int => rule;
 /**
  The gap CSS property sets the gaps (gutters) between rows and columns. It is a shorthand for row-gap and column-gap.
  */
+let gap:
+  [<
+    Types.Gap.t
+    | Types.Percentage.t
+    | Types.Length.t
+    | Types.Var.t
+    | Types.Cascading.t
+  ] =>
+  rule;
+let gap2:
+  (
+    ~rowGap: [<
+               Types.Gap.t
+               | Types.Percentage.t
+               | Types.Length.t
+               | Types.Var.t
+               | Types.Cascading.t
+             ],
+    ~columnGap: [<
+                  Types.Gap.t
+                  | Types.Percentage.t
+                  | Types.Length.t
+                  | Types.Var.t
+                  | Types.Cascading.t
+                ]
+  ) =>
+  rule;
+
+/**
+ deprecated, use gap
+ */
 let gridGap:
-  [< Types.Percentage.t | Types.Length.t | Types.Var.t | Types.Cascading.t] =>
+  [<
+    Types.Gap.t
+    | Types.Percentage.t
+    | Types.Length.t
+    | Types.Var.t
+    | Types.Cascading.t
+  ] =>
   rule;
 
 /**
@@ -964,6 +1086,11 @@ let pointerEvents:
 let position: [< Types.Position.t | Types.Var.t | Types.Cascading.t] => rule;
 
 /**
+ The isolation CSS property determines whether an element must create a new stacking context.
+ */
+let isolation: [< Types.Isolation.t | Types.Cascading.t] => rule;
+
+/**
  The resize CSS property sets whether an element is resizable, and if so,
  in which directions.
  */
@@ -1141,8 +1268,8 @@ let zIndex: int => rule;
  selectors
  ********* */
 
-let selector: (string, array(rule)) => rule;
-let media: (string, array(rule)) => rule;
+let selector: (. string, array(rule)) => rule;
+let media: (. string, array(rule)) => rule;
 
 /** type selector */
 
@@ -1510,6 +1637,8 @@ let static: [> Types.Position.t];
 let fixed: [> | `fixed];
 let sticky: [> Types.Position.t];
 
+let isolate: [> | `isolate];
+
 let horizontal: [> Types.Resize.t];
 let vertical: [> Types.Resize.t];
 
@@ -1652,6 +1781,15 @@ let bevel: [> | `bevel];
 let butt: [> | `butt];
 let square: [> | `square];
 
+let panX: [> | `panX];
+let panY: [> | `panY];
+let panLeft: [> | `panLeft];
+let panRight: [> | `panRight];
+let panUp: [> | `panUp];
+let panDown: [> | `panDown];
+let pinchZoom: [> | `pinchZoom];
+let manipulation: [> | `manipulation];
+
 let thin: [> Types.FontWeight.t];
 let extraLight: [> Types.FontWeight.t];
 let light: [> Types.FontWeight.t];
@@ -1709,20 +1847,26 @@ let skewY: Types.Angle.t => [> Types.Transform.t];
 let linearGradient:
   (
     Types.Angle.t,
-    list((Types.Length.t, [< Types.Color.t | Types.Var.t] as 'colorOrVar))
+    array((Types.Length.t, [< Types.Color.t | Types.Var.t] as 'colorOrVar))
   ) =>
   [> Types.Gradient.t('colorOrVar)];
 let repeatingLinearGradient:
   (
     Types.Angle.t,
-    list((Types.Length.t, [< Types.Color.t | Types.Var.t] as 'colorOrVar))
+    array((Types.Length.t, [< Types.Color.t | Types.Var.t] as 'colorOrVar))
   ) =>
   [> Types.Gradient.t('colorOrVar)];
 let radialGradient:
-  list((Types.Length.t, [< Types.Color.t | Types.Var.t] as 'colorOrVar)) =>
+  array((Types.Length.t, [< Types.Color.t | Types.Var.t] as 'colorOrVar)) =>
   [> Types.Gradient.t('colorOrVar)];
 let repeatingRadialGradient:
-  list((Types.Length.t, [< Types.Color.t | Types.Var.t] as 'colorOrVar)) =>
+  array((Types.Length.t, [< Types.Color.t | Types.Var.t] as 'colorOrVar)) =>
+  [> Types.Gradient.t('colorOrVar)];
+let conicGradient:
+  (
+    Types.Angle.t,
+    array((Types.Length.t, [< Types.Color.t | Types.Var.t] as 'colorOrVar))
+  ) =>
   [> Types.Gradient.t('colorOrVar)];
 
 let areas: list(string) => [> Types.GridTemplateAreas.t];
@@ -1975,3 +2119,5 @@ module SVG: {
   let stopColor: [< Types.Color.t | Types.Var.t] => rule;
   let stopOpacity: float => rule;
 };
+
+let touchAction: Types.TouchAction.t => rule;

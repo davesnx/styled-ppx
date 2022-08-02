@@ -96,7 +96,8 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
           (_value, value_loc),
         ]) => {
           /* We need the value as a string to pipe it to the Property parser */
-          let value = source_code_of_loc(value_loc);
+          let value = source_code_of_loc(value_loc) |> String.trim;
+          /* String.trim is a hack, location should be correct and not contain any whitespace */
           switch (Declarations_to_string.parse_declarations(property, value)) {
           | Error(`Not_found) =>
             grammar_error(loc, "unsupported property: " ++ property)
@@ -152,7 +153,8 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
 and render_declaration = (d: Declaration.t): list(Parsetree.expression) => {
   let (property, name_loc) = d.name;
   let (_valueList, loc) = d.value;
-  let value_source = source_code_of_loc(loc);
+  /* String.trim is a hack, location should be correct and not contain any whitespace */
+  let value_source = source_code_of_loc(loc) |> String.trim;
 
   switch (Declarations_to_emotion.parse_declarations(property, value_source)) {
   | Ok(exprs) => exprs

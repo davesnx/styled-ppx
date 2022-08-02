@@ -3159,4 +3159,3 @@
 /* [%css {|width: -webkit-fill-available;|}]; */
 [%css {|width: fit-content;|}];
 [%css {|width: max-content;|}];
-[%css {|word-break: break-word;|}];

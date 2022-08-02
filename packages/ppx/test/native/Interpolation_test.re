@@ -74,10 +74,14 @@ let properties_variable_css_tests = [
     [%expr [%css "text-decoration-color: $(decorationColor);"]],
     [%expr (CssJs.textDecorationColor(decorationColor) : CssJs.rule)]
   ),
-  /* (
+  (
     [%expr [%css "background-image: $(wat);" ]],
-    [%expr CssJs.backgroundImage(wat)],
-  ), */
+    [%expr (CssJs.backgroundImage(wat) : CssJs.rule)],
+  ),
+  (
+    [%expr [%css "mask-image: $(externalImageUrl);" ]],
+    [%expr (CssJs.maskImage(externalImageUrl) : CssJs.rule)],
+  ),
   /* (
     [%expr [%css "color: rgba(0, 0, 0, 1%);"]],
     [%expr CssJs.color(rgba(0, 0, 0, `percent(1)))]
@@ -104,6 +108,10 @@ let properties_variable_css_tests = [
         color
       )
     |])]
+  ),
+  (
+    [%expr [%css "box-shadow: $(BoxShadow.elevation);"]],
+    [%expr (CssJs.boxShadows(BoxShadow.elevation): CssJs.rule)]
   ),
   /* Add border */
   /* Add text-shadow */

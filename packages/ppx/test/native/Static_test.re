@@ -472,7 +472,7 @@ let properties_static_css_tests = [%expr
     ), */
     (
       [%css "background-image: url('img_tree.gif')"],
-      CssJs.unsafe({js|backgroundImage|js}, {js| url('img_tree.gif')|js})
+      CssJs.backgroundImage(`url({js|img_tree.gif|js}))
     ),
     /* Mult isn't available in bs-css */
     /* (

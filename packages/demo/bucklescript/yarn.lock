@@ -297,19 +297,19 @@ braces@^2.3.1, braces@^2.3.2:
     split-string "^3.0.2"
     to-regex "^3.0.1"
 
-bs-css-emotion@4:
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/bs-css-emotion/-/bs-css-emotion-4.0.2.tgz#9e7a6c3773a5395964858e1f13a66e6c036f33c5"
-  integrity sha512-GljxfpBKNKJB3NjOHMQkJYzxOSDnvs4YtfOqk8ezBGq1NStUNvQOAXbFBTSSo0QP7ByW3IUIQsX2lgK9voeRSg==
+bs-css-emotion@4.3.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/bs-css-emotion/-/bs-css-emotion-4.3.0.tgz#283ca6d4830f5be49b5ba1df7bd314b991a5ca77"
+  integrity sha512-yViPFDOOPDUbhPgMVj4uT1j6HFvJTsjvhNh98Ufc3YmKW4pEH34nWiOwcYad2fWXpL77Jt9tNQB7yQgLSE3TPg==
   dependencies:
     "@emotion/cache" "^11.0.0"
     "@emotion/css" "^11.0.0"
-    bs-css "15.0.2"
+    bs-css "15.3.0"
 
-bs-css@15, bs-css@15.0.2:
-  version "15.0.2"
-  resolved "https://registry.yarnpkg.com/bs-css/-/bs-css-15.0.2.tgz#b5feddabe3e428d7ddd6876f6e6a55e97ff3fe2e"
-  integrity sha512-wjd8kj1zQDdMTnoYbhawVPlt/qdxjp2ZK7n8u2ykVJ9aYeK3i/0EvEX572pbq8RmmG3PAsLERLyQtq43k3dY3g==
+bs-css@15.3.0:
+  version "15.3.0"
+  resolved "https://registry.yarnpkg.com/bs-css/-/bs-css-15.3.0.tgz#c497bf959cc86b8e535addfd6d16f74001f47374"
+  integrity sha512-Y/I2G4a4xLb9aqd1Qhx9Tae9J1DBM2eqSMET7iLwuiSdt8PaT6InnaDgLk9f0hGk/9O/6CCpZ/xlntVf+ZSkLQ==
 
 bs-platform@^8.2.0:
   version "8.4.2"
