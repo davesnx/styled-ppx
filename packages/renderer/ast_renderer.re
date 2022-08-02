@@ -22,6 +22,8 @@ let rec render_stylesheet = (ast: Stylesheet.t) => {
 }
 and render_rule = (ast: Rule.t) => {
   switch (ast) {
+  | Declaration(decl) =>
+    "Declaration(" ++ render_declaration(decl) ++ ")";
   | Style_rule(style_rule) =>
     "Style_rule(" ++ render_style_rule(style_rule) ++ ")"
   | At_rule(at_rule) => "At_rule(" ++ render_at_rule(at_rule) ++ ")"
@@ -42,19 +44,19 @@ and render_at_rule = (ast: At_rule.t) => {
 and render_brace_block = ast => {
   switch ((ast: Brace_block.t)) {
   | Empty => "Empty"
-  | Declaration_list(declaration_list) =>
+  | Rule_list(declaration_list) =>
     render_declaration_list(declaration_list)
   | Stylesheet(stylesheet) => render_stylesheet(stylesheet)
   };
 }
-and render_declaration_kind = (ast: Declaration_list.kind) => {
+and render_declaration_kind = (ast: Rule.t) => {
   switch (ast) {
   | Declaration(declaration) => render_declaration(declaration)
   | Style_rule(style_rule) => render_style_rule(style_rule)
   | At_rule(at_rule) => render_at_rule(at_rule)
   };
 }
-and render_declaration_list = (ast: Declaration_list.t) => {
+and render_declaration_list = (ast: Rule_list.t) => {
   let inner =
     ast |> fst |> List.map(render_declaration_kind) |> String.concat(", ");
   "Declaration([" ++ inner ++ "])";
@@ -247,8 +249,8 @@ switch (input, help) {
      - check if it's a valid declaration list and render it.
      - in any other case, print both errors.
      */
-  /* let ast = Css_lexer.parse_declaration_list(~container_lnum, ~pos, css);
-  print_endline(render_declaration_list(ast)); */
-  let ast = Css_lexer.parse_stylesheet(~container_lnum, ~pos, css);
-  print_endline(render_stylesheet(ast));
+  let ast = Css_lexer.parse_declaration_list(~container_lnum, ~pos, css);
+  print_endline(render_declaration_list(ast));
+  /* let ast = Css_lexer.parse_stylesheet(~container_lnum, ~pos, css);
+  print_endline(render_stylesheet(ast)); */
 };

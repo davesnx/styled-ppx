@@ -32,7 +32,7 @@ module rec Component_value: {
 and Brace_block: {
   type t =
     | Empty
-    | Declaration_list(Declaration_list.t)
+    | Rule_list(Rule_list.t)
     | Stylesheet(Stylesheet.t);
 } = Brace_block
 and At_rule: {
@@ -51,23 +51,19 @@ and Declaration: {
     loc: Location.t,
   };
 } = Declaration
-and Declaration_list: {
-  type kind =
-    | Declaration(Declaration.t)
-    | At_rule(At_rule.t)
-    | Style_rule(Style_rule.t);
-
-  type t = with_loc(list(kind));
-} = Declaration_list
+and Rule_list: {
+  type t = with_loc(list(Rule.t));
+} = Rule_list
 and Style_rule: {
   type t = {
     prelude: with_loc(Selector.t),
-    block: Declaration_list.t,
+    block: Rule_list.t,
     loc: Location.t,
   };
 } = Style_rule
 and Rule: {
   type t =
+    | Declaration(Declaration.t)
     | Style_rule(Style_rule.t)
     | At_rule(At_rule.t);
 } = Rule
