@@ -7,30 +7,46 @@ describe("Data monad", ({test, _}) => {
   open! Data;
 
   // TODO: check static order
-  test("return", _ => {
+  test("return with an int", _ => {
     switch (return(Ok(1), [COMMA])) {
     | (Ok(1), [COMMA]) => ()
     | _ => failwith("should be (Ok(1), [COMMA])")
-    }
+    };
 
-    switch(return(Ok(`Comma), [COMMA])){
+    test("return with a polymorphic variant", _ => {
+      switch (return(Ok(`Comma), [COMMA])) {
       | (Ok(`Comma), [COMMA]) => ()
-      | _ => assert false
-    }
-    switch(return(Ok(","), [COMMA])){
+      | _ => failwith("Should be (Ok(`Comma), [COMMA])")
+      }
+    });
+
+    test("return with a string", _ => {
+      switch (return(Ok(","), [COMMA])) {
       | (Ok(","), [COMMA]) => ()
-      | _ => assert false
-    }
-
-    switch (return(Ok(1), [IDENT("decl"), COLON, IDENT("value")])) {
+      | _ => failwith("Should be (Ok(,), [COMMA])")
+      }
+    });
+    test("return with a string", _ => {
+      switch (return(Ok(","), [COMMA])) {
+      | (Ok(","), [COMMA]) => ()
+      | _ => failwith("Should be (Ok(,), [COMMA])")
+      }
+    });
+    test("return with more then one token as inputs", _ => {
+      switch (return(Ok(1), [IDENT("decl"), COLON, IDENT("value")])) {
       | (Ok(1), [IDENT("decl"), COLON, IDENT("value")]) => ()
-      | _ => failwith("Should be Ok(1), [IDENT(\"decl\"), COLON, IDENT(\"value\")]")
-    }
-
-    switch (return(Error(["error"]), [COLON])){
+      | _ =>
+        failwith(
+          "Should be Ok(1), [IDENT(\"decl\"), COLON, IDENT(\"value\")]",
+        )
+      }
+    });
+    test("return with a error list", _ => {
+      switch (return(Error(["error"]), [COLON])) {
       | (Error(["error"]), [COLON]) => ()
       | _ => failwith("Should be (Error([error], [COLON]))")
-    }
+      }
+    });
   });
 
   test("bind", _ => {
@@ -45,18 +61,21 @@ describe("Data monad", ({test, _}) => {
     | (Ok(3), [COMMA]) => ()
     | _ => failwith("should be (Ok(3), [COMMA])")
     };
+  });
 
+  test("bind error", _ => {
     let rule =
-      bind(return(Error([])),
+      bind(
+        return(Error([])),
         fun
         | Ok(_) => failwith("should not be called")
-        | Error(errs)=> return(Error(["fix this", ...errs]))
-      )
+        | Error(errs) => return(Error(["fix this", ...errs])),
+      );
 
-    switch(rule([COMMA])){
-      | (Error(["fix this"]), [COMMA]) => ()
-      | _ => failwith("expected (Error([fix this]), [COMMA])")
-    }
+    switch (rule([COMMA])) {
+    | (Error(["fix this"]), [COMMA]) => ()
+    | _ => failwith("expected (Error([fix this]), [COMMA])")
+    };
   });
 
   test("map", _ => {
@@ -71,21 +90,21 @@ describe("Data monad", ({test, _}) => {
     | (Ok(5), [COMMA]) => ()
     | _ => failwith("should be (Ok(5), [COMMA])")
     };
+  });
 
+  test("map error", _ => {
     let rule =
       map(
         return(Error([])),
         fun
         | Error(errs) => Error(["new error", ...errs])
-        | Ok(_) => failwith("should be unreachable")
+        | Ok(_) => failwith("should be unreachable"),
       );
 
-
-    switch (rule([COMMA])){
-      | (Error(["new error", ..._]), [COMMA]) => ()
-      | _ => failwith("expected (Error([new error, ...], [COMMA])")
-    }
-
+    switch (rule([COMMA])) {
+    | (Error(["new error", ..._]), [COMMA]) => ()
+    | _ => failwith("expected (Error([new error, ...], [COMMA])")
+    };
   });
 
   test("all", _ => {
@@ -101,10 +120,45 @@ describe("Data monad", ({test, _}) => {
     let rule_err = return(Error(["Missing COMMA"]));
     let rule = Match.all([rule_err, rule4, rule5]);
     switch (rule([COMMA])) {
-      | (Error(["Missing COMMA"]), [COMMA]) => ()
-      | _ => failwith("should be (Error(Missing Comma), [COMMA])")
-    }
+    | (Error(["Missing COMMA"]), [COMMA]) => ()
+    | _ => failwith("should be (Error(Missing Comma), [COMMA])")
+    };
   });
+
+  test("all with error in the beginning", _ => {
+    let rule4 = return(Ok(4));
+    let rule5 = return(Ok(5));
+    let rule_err = return(Error(["Missing COMMA"]));
+    let rule = Match.all([rule_err, rule4, rule5]);
+    switch (rule([COMMA])) {
+    | (Error(["Missing COMMA"]), [COMMA]) => ()
+    | _ => failwith("should be (Error(Missing Comma), [COMMA])")
+    };
+  });
+
+  test("all with error in the end", _ => {
+    let rule4 = return(Ok(4));
+    let rule5 = return(Ok(5));
+    let rule_err = return(Error(["Missing COMMA"]));
+    let rule = Match.all([rule4, rule5, rule_err]);
+    switch (rule([COMMA])) {
+    | (Error(["Missing COMMA"]), [COMMA]) => ()
+    | _ => failwith("should be (Error(Missing Comma), [COMMA])")
+    };
+  });
+
+  // test("all with multiple errors", _ => {
+  //   let rule4 = return(Ok(4));
+  //   let rule5 = return(Ok(5));
+  //   let rule_err = return(Error(["Missing COMMA"]));
+  //   let rule_err2 = return(Error(["Unexpected token"]));
+  //   let rule_err3 = return(Error(["Unclosed string"]));
+  //   let rule = Match.all([rule_err3, rule4,rule_err2, rule5, rule_err3]);
+  //   switch (rule([COMMA])) {
+  //     | (Error(["Missing COMMA"]), [COMMA]) => ()
+  //     | _ => failwith("should be (Error(Missing Comma), [COMMA])")
+  //   }
+  // });
 
   test("bind_shortest", _ => {
     let comma =
@@ -206,17 +260,19 @@ describe("Match monad", ({test, _}) => {
     | (Ok(3), [COMMA]) => ()
     | _ => failwith("should be (Ok(3), [COMMA])")
     };
+  });
 
-  let rule =
-    bind(
-      Data.return(Error(["error message"])),
-      fun
-      | _ => failwith("Should not be reachable")
-    )
+  test("bind Error", _ => {
+    let rule =
+      bind(
+        Data.return(Error(["error message"])),
+        fun
+        | _ => failwith("Should not be reachable"),
+      );
 
-    switch(rule([COMMA])){
-      | ((Error(["error message"])), [COMMA]) => ()
-      | _ => failwith("expected (Error([error message], [COMMA])) ")
+    switch (rule([COMMA])) {
+    | (Error(["error message"]), [COMMA]) => ()
+    | _ => failwith("expected (Error([error message], [COMMA])) ")
     };
   });
 
@@ -368,89 +424,114 @@ describe("Pattern helpers", ({test, _}) => {
   });
 
   test("next", _ => {
-    switch(Pattern.next([COMMA, COLON])) {
-      | (Ok(COMMA), [COLON]) => ()
-      | _ => failwith("should be (Ok(COMMA), [COLON])")
+    switch (Pattern.next([COMMA, COLON])) {
+    | (Ok(COMMA), [COLON]) => ()
+    | _ => failwith("should be (Ok(COMMA), [COLON])")
     }
-   switch(Pattern.next([COLON])) {
-      | (Ok(COLON), []) => ()
-      | _ => failwith("should be (Ok(COLON), [])")
+  });
+  test("next with only token as input", _ => {
+    switch (Pattern.next([COLON])) {
+    | (Ok(COLON), []) => ()
+    | _ => failwith("should be (Ok(COLON), [])")
     }
-    switch(Pattern.next([])) {
-      | (Error(["missing the token expected"]), []) => ()
-      | _ => failwith("should be (Error([missing the token expected]), [])")
+  });
+  test("next with no tokens as input", _ => {
+    switch (Pattern.next([])) {
+    | (Error(["missing the token expected"]), []) => ()
+    | _ => failwith("should be (Error([missing the token expected]), [])")
     }
   });
 });
 
-
 describe("Rule tests", ({test, _}) => {
-  open Let
+  open Let;
   test("Rule using Pattern.expect", _ => {
-    let input = [IDENT("decl"), COLON, IDENT("value")]
+    let input = [IDENT("decl"), COLON, IDENT("value")];
 
     let rule = {
-      let.bind_match decl = Pattern.token(
-        fun
-        | IDENT("decl") => Ok("decl")
-        | _ => Error(["Expected an Ident"])
-      );
-      let.bind_match _ = Pattern.expect(COLON);
+      let.bind_match decl =
+        Pattern.token(
+          fun
+          | IDENT("decl") => Ok("decl")
+          | _ => Error(["Expected an Ident"]),
+        );
+      let.bind_match () = Pattern.expect(COLON);
 
-      let.bind_match value = Pattern.token(
-        fun
-        | IDENT("value") => Ok("value")
-        | _ => Error(["Expected a valid value"])
-      )
-      Match.return(`Declaration(decl, value))
-    }
+      let.bind_match value =
+        Pattern.token(
+          fun
+          | IDENT("value") => Ok("value")
+          | _ => Error(["Expected a valid value"]),
+        );
+      Match.return(`Declaration((decl, value)));
+    };
 
-    switch(rule(input)){
-      | (Ok(`Declaration("decl", "value")), []) => ()
-      | _ => failwith("nah")
-    }
+    switch (rule(input)) {
+    | (Ok(`Declaration("decl", "value")), []) => ()
+    | _ => failwith("nah")
+    };
   });
 
   test("Rule using Pattern.next", _ => {
-    let right_input = [CDO, IDENT("its"), IDENT("a"), IDENT("a comment"), CDC];
+    let right_input = [
+      CDO,
+      IDENT("its"),
+      IDENT("a"),
+      IDENT("a comment"),
+      CDC,
+    ];
     let non_comment = [IDENT("not"), IDENT("a"), IDENT("comment")];
-    let unclosed_comment = [CDO, IDENT("its"), IDENT("a"), IDENT("comment")];
+    let unclosed_comment = [
+      CDO,
+      IDENT("its"),
+      IDENT("a"),
+      IDENT("comment"),
+    ];
 
     let comment_rule = {
-
-      let.bind_match () = Pattern.token(
-        fun
-        | CDO => Ok()
-        | _ => Error(["Comment should start with a CDO token"])
-      );
+      let.bind_match () =
+        Pattern.token(
+          fun
+          | CDO => Ok()
+          | _ => Error(["Comment should start with a CDO token"]),
+        );
 
       let consume_comments = tokens => {
         let rec consume = (tokens, acc) => {
-          switch(Pattern.next(tokens)) {
-            | (Ok(CDC), rest) => Match.return(`Comment(List.rev(acc)), rest)
-            | (Ok(token), rest) => consume(rest, [token, ...acc])
-            | (Error(_), rest) => Data.return(Error(["Unclosed comment"]), rest)
-         };
-        }
+          switch (Pattern.next(tokens)) {
+          | (Ok(CDC), rest) => Match.return(`Comment(List.rev(acc)), rest)
+          | (Ok(token), rest) => consume(rest, [token, ...acc])
+          | (Error(_), rest) =>
+            Data.return(Error(["Unclosed comment"]), rest)
+          };
+        };
         consume(tokens, []);
       };
 
-      consume_comments
+      consume_comments;
     };
 
-    switch(comment_rule(right_input)){
-      | (Ok(`Comment([IDENT("its"), IDENT("a"), IDENT("a comment")])), []) => ()
-      | _ => failwith("`Comment([IDENT(its), IDENT(a), IDENT(comment)])), []")
-    }
+    switch (comment_rule(right_input)) {
+    | (Ok(`Comment([IDENT("its"), IDENT("a"), IDENT("a comment")])), []) =>
+      ()
+    | _ => failwith("`Comment([IDENT(its), IDENT(a), IDENT(comment)])), []")
+    };
 
-    switch(comment_rule(non_comment)){
-      | (Error(["Comment should start with a CDO token"]), [IDENT("not"), IDENT("a"), IDENT("comment")]) => ()
-      | _ => failwith("Expected (Error([Comment should start with a CDO token]), [IDENT(not), IDENT(a), IDENT(comment)])")
-    }
+    switch (comment_rule(non_comment)) {
+    | (
+        Error(["Comment should start with a CDO token"]),
+        [IDENT("not"), IDENT("a"), IDENT("comment")],
+      ) =>
+      ()
+    | _ =>
+      failwith(
+        "Expected (Error([Comment should start with a CDO token]), [IDENT(not), IDENT(a), IDENT(comment)])",
+      )
+    };
 
-    switch(comment_rule(unclosed_comment)){
-      | (Error(["Unclosed comment"]), []) => ()
-      | _ => failwith("Expected (Error([Unclosed comment]), [])")
-    }
-  })
-})
+    switch (comment_rule(unclosed_comment)) {
+    | (Error(["Unclosed comment"]), []) => ()
+    | _ => failwith("Expected (Error([Unclosed comment]), [])")
+    };
+  });
+});
