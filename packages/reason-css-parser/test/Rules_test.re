@@ -10,7 +10,26 @@ describe("Data monad", ({test, _}) => {
   test("return", _ => {
     switch (return(Ok(1), [COMMA])) {
     | (Ok(1), [COMMA]) => ()
-    | _ => failwith("should be (Ok(123), [COMMA])")
+    | _ => failwith("should be (Ok(1), [COMMA])")
+    }
+
+    switch(return(Ok(`Comma), [COMMA])){
+      | (Ok(`Comma), [COMMA]) => ()
+      | _ => assert false
+    }
+    switch(return(Ok(","), [COMMA])){
+      | (Ok(","), [COMMA]) => ()
+      | _ => assert false
+    }
+
+    switch (return(Ok(1), [IDENT("decl"), COLON, IDENT("value")])) {
+      | (Ok(1), [IDENT("decl"), COLON, IDENT("value")]) => ()
+      | _ => failwith("Should be Ok(1), [IDENT(\"decl\"), COLON, IDENT(\"value\")]")
+    }
+
+    switch (return(Error(["error"]), [COLON])){
+      | (Error(["error"]), [COLON]) => ()
+      | _ => failwith("Should be (Error([error], [COLON]))")
     }
   });
 
@@ -26,6 +45,18 @@ describe("Data monad", ({test, _}) => {
     | (Ok(3), [COMMA]) => ()
     | _ => failwith("should be (Ok(3), [COMMA])")
     };
+
+    let rule =
+      bind(return(Error([])),
+        fun
+        | Ok(_) => failwith("should not be called")
+        | Error(errs)=> return(Error(["fix this", ...errs]))
+      )
+
+    switch(rule([COMMA])){
+      | (Error(["fix this"]), [COMMA]) => ()
+      | _ => failwith("expected (Error([fix this]), [COMMA])")
+    }
   });
 
   test("map", _ => {
@@ -40,6 +71,21 @@ describe("Data monad", ({test, _}) => {
     | (Ok(5), [COMMA]) => ()
     | _ => failwith("should be (Ok(5), [COMMA])")
     };
+
+    let rule =
+      map(
+        return(Error([])),
+        fun
+        | Error(errs) => Error(["new error", ...errs])
+        | Ok(_) => failwith("should be unreachable")
+      );
+
+
+    switch (rule([COMMA])){
+      | (Error(["new error", ..._]), [COMMA]) => ()
+      | _ => failwith("expected (Error([new error, ...], [COMMA])")
+    }
+
   });
 
   test("all", _ => {
@@ -51,6 +97,13 @@ describe("Data monad", ({test, _}) => {
     | (Ok(lst), [COMMA]) when lst == [4, 5] => ()
     | _ => failwith("should be (Ok(5), [COMMA])")
     };
+
+    let rule_err = return(Error(["Missing COMMA"]));
+    let rule = Match.all([rule_err, rule4, rule5]);
+    switch (rule([COMMA])) {
+      | (Error(["Missing COMMA"]), [COMMA]) => ()
+      | _ => failwith("should be (Error(Missing Comma), [COMMA])")
+    }
   });
 
   test("bind_shortest", _ => {
@@ -152,6 +205,18 @@ describe("Match monad", ({test, _}) => {
     switch (rule([COMMA])) {
     | (Ok(3), [COMMA]) => ()
     | _ => failwith("should be (Ok(3), [COMMA])")
+    };
+
+  let rule =
+    bind(
+      Data.return(Error(["error message"])),
+      fun
+      | _ => failwith("Should not be reachable")
+    )
+
+    switch(rule([COMMA])){
+      | ((Error(["error message"])), [COMMA]) => ()
+      | _ => failwith("expected (Error([error message], [COMMA])) ")
     };
   });
 
@@ -300,5 +365,20 @@ describe("Pattern helpers", ({test, _}) => {
     | (Ok(3), []) => ()
     | _ => failwith("should be (Ok(3), [])")
     };
+  });
+
+  test("next", _ => {
+    switch(Pattern.next([COMMA, COLON])) {
+      | (Ok(COMMA), [COLON]) => ()
+      | _ => failwith("should be (Ok(COMMA), [COLON])")
+    }
+   switch(Pattern.next([COLON])) {
+      | (Ok(COLON), []) => ()
+      | _ => failwith("should be (Ok(COLON), [])")
+    }
+    switch(Pattern.next([])) {
+      | (Error(["missing the token expected"]), []) => ()
+      | _ => failwith("should be (Error([missing the token expected]), [])")
+    }
   });
 });
