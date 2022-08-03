@@ -14,6 +14,11 @@ module App2 = {
 
 let cosas = "external-selector"
 
+let c = %css(`content: ""`)
+let unsafe = CssJs.unsafe(`content`, ``)
+
+let className = %cx([c, unsafe])
+
 module Size = {
   let small = CssJs.px(10)
 }
@@ -46,6 +51,7 @@ switch ReactDOM.querySelector("#app") {
 | Some(el) =>
   ReactDOM.render(
     <App onClick=Js.log>
+      <div className />
       <Dynamic a="23" />
       <Component> {React.string("test..")} </Component>
       <App2> <Component> {React.string("Demo of...")} </Component> </App2>

@@ -1804,7 +1804,7 @@ CssJs.unsafe({js|caretColor|js}, {js|#e15a46|js});
 CssJs.unsafe({js|color|js}, "inherit");
 CssJs.unsafe({js|columnWidth|js}, {js|125px|js});
 CssJs.unsafe({js|columnWidth|js}, {js|auto|js});
-CssJs.unsafe({js|content|js}, {js|""|js});
+CssJs.unsafe({js|content|js}, {js||js});
 CssJs.unsafe({js|content|js}, "unset");
 CssJs.unsafe({js|display|js}, {js|-webkit-box|js});
 CssJs.display(`contents);
