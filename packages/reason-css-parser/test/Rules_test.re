@@ -382,3 +382,75 @@ describe("Pattern helpers", ({test, _}) => {
     }
   });
 });
+
+
+describe("Rule tests", ({test, _}) => {
+  open Let
+  test("Rule using Pattern.expect", _ => {
+    let input = [IDENT("decl"), COLON, IDENT("value")]
+
+    let rule = {
+      let.bind_match decl = Pattern.token(
+        fun
+        | IDENT("decl") => Ok("decl")
+        | _ => Error(["Expected an Ident"])
+      );
+      let.bind_match _ = Pattern.expect(COLON);
+
+      let.bind_match value = Pattern.token(
+        fun
+        | IDENT("value") => Ok("value")
+        | _ => Error(["Expected a valid value"])
+      )
+      Match.return(`Declaration(decl, value))
+    }
+
+    switch(rule(input)){
+      | (Ok(`Declaration("decl", "value")), []) => ()
+      | _ => failwith("nah")
+    }
+  });
+
+  test("Rule using Pattern.next", _ => {
+    let right_input = [CDO, IDENT("its"), IDENT("a"), IDENT("a comment"), CDC];
+    let non_comment = [IDENT("not"), IDENT("a"), IDENT("comment")];
+    let unclosed_comment = [CDO, IDENT("its"), IDENT("a"), IDENT("comment")];
+
+    let comment_rule = {
+
+      let.bind_match () = Pattern.token(
+        fun
+        | CDO => Ok()
+        | _ => Error(["Comment should start with a CDO token"])
+      );
+
+      let consume_comments = tokens => {
+        let rec consume = (tokens, acc) => {
+          switch(Pattern.next(tokens)) {
+            | (Ok(CDC), rest) => Match.return(`Comment(List.rev(acc)), rest)
+            | (Ok(token), rest) => consume(rest, [token, ...acc])
+            | (Error(_), rest) => Data.return(Error(["Unclosed comment"]), rest)
+         };
+        }
+        consume(tokens, []);
+      };
+
+      consume_comments
+    };
+
+    switch(comment_rule(right_input)){
+      | (Ok(`Comment([IDENT("its"), IDENT("a"), IDENT("a comment")])), []) => ()
+      | _ => failwith("`Comment([IDENT(its), IDENT(a), IDENT(comment)])), []")
+    }
+
+    switch(comment_rule(non_comment)){
+      | (Error(["Comment should start with a CDO token"]), [IDENT("not"), IDENT("a"), IDENT("comment")]) => ()
+      | _ => failwith("Expected (Error([Comment should start with a CDO token]), [IDENT(not), IDENT(a), IDENT(comment)])")
+    }
+
+    switch(comment_rule(unclosed_comment)){
+      | (Error(["Unclosed comment"]), []) => ()
+      | _ => failwith("Expected (Error([Unclosed comment]), [])")
+    }
+  })
+})
