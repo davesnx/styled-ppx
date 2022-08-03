@@ -1,11 +1,5 @@
 type with_loc('a) = ('a, Location.t);
 
-type dimension =
-  | Length
-  | Angle
-  | Time
-  | Frequency;
-
 module rec Component_value: {
   type t =
     | Paren_block(list(with_loc(t)))
@@ -19,13 +13,10 @@ module rec Component_value: {
     | Combinator(string)
     | Delim(string)
     | Function(with_loc(string), with_loc(list(with_loc(t))))
-    | Pseudoclass(with_loc(string))
-    | PseudoclassFunction(with_loc(string), with_loc(list(with_loc(t))))
-    | Pseudoelement(with_loc(string))
     | Hash(string)
     | Number(string)
     | Unicode_range(string)
-    | Float_dimension((string, string, dimension))
+    | Float_dimension((string, string))
     | Dimension((string, string))
     | Variable(list(string));
 } = Component_value
@@ -117,7 +108,19 @@ and Selector: {
     | Function({
         name: string,
         payload: with_loc(t),
-      });
+      })
+    | NthFunction({
+        name: string,
+        payload: with_loc(nth_payload),
+      })
+  and nth_payload =
+    | Nth(nth)
+    | NthSelector(list(complex_selector))
+  and nth =
+    | NthIdent(string)
+    | A(string)
+    | AN(string)
+    | ANB(string, string, string)
 } = Selector;
 
 module Debug = {
@@ -128,13 +131,6 @@ let render_record = record =>
   |> List.map(render_field)
   |> String.concat(",\n")
   |> Printf.sprintf("{\n%s\n}");
-
-let dimension_of_string =
-  fun
-  | Length => "Length"
-  | Angle => "Angle"
-  | Time => "Time"
-  | Frequency => "Frequency";
 
 let rec render_stylesheet = (ast: Stylesheet.t) => {
   let inner = ast |> fst |> List.map(render_rule) |> String.concat(", ");
@@ -219,19 +215,43 @@ and render_selector = (ast: Selector.t) => {
     fun
     | Attr_ident(i) => i
     | Attr_string(str) => "\"" ++ str ++ "\""
+  and render_nth =
+    fun
+      | NthIdent(i) => "NthIdent(" ++ i ++ ")"
+      | A(a) => "A(" ++ a ++ ")"
+      | AN(a) => "AN(" ++ a ++ ")"
+      | ANB(left, op, right) =>
+        "ANB(" ++ left
+          ++ ", " ++ op ++ ", "
+          ++ right
+        ++ ")"
+  and render_nth_payload =
+    fun
+    | Nth(nth) => render_nth(nth)
+    | NthSelector(v) => "NthSelector(ComplexSelector(["
+    ++ (v |> List.map(render_complex_selector) |> String.concat(", "))
+    ++ "]))"
+  and render_pseudo_class =
+    fun
+      | Ident(i) => "Pseudoclass(Ident(" ++ i ++ "))"
+      | Function({name, payload: (selector, _)}) =>
+        "Function("
+        ++ name
+        ++ ", "
+        ++ render_selector(selector)
+        ++ ")"
+      | NthFunction({name, payload: (selector, _)}) =>
+        "Function("
+        ++ name
+        ++ ", "
+        ++ render_nth_payload(selector)
+        ++ ")"
   and render_pseudo_selector =
     fun
     | Pseudoelement(v) => "Pseudoelement(" ++ v ++ ")"
-    | Pseudoclass(Ident(i)) => "Pseudoclass(Ident(" ++ i ++ "))"
-    | Pseudoclass(Function({name, payload: (selector, _)})) =>
-      "Pseudoclass(Function("
-      ++ name
-      ++ ", "
-      ++ render_selector(selector)
-      ++ "))"
-  and render_variable = v => String.concat(".", v);
-
-  let rec render_compound_selector = (compound_selector: compound_selector) => {
+    | Pseudoclass(pc) => "Pseudoclass(" ++ render_pseudo_class(pc) ++ ")"
+  and render_variable = v => String.concat(".", v)
+  and render_compound_selector = (compound_selector: compound_selector) => {
     let simple_selector =
       compound_selector.type_selector
       |> Option.fold(~none="", ~some=render_simple_selector);
@@ -301,23 +321,12 @@ and render_component_value = (ast: with_loc(Component_value.t)) => {
       body |> fst |> List.map(render_component_value) |> String.concat(", ");
     "Function(" ++ fst(name) ++ ", [" ++ body ++ "])";
   | Hash(string) => "Hash(" ++ string ++ ")"
-  | Number(string) => "Number(" ++ string ++ ")"
+  | Number(n) => "Number(" ++ n ++ ")"
   | Unicode_range(string) => "Unicode_range(" ++ string ++ ")"
-  | Float_dimension((a, b, dimension)) =>
-    "Float_dimension("
-    ++ a
-    ++ ", "
-    ++ b
-    ++ ", "
-    ++ dimension_of_string(dimension)
-    ++ ")"
+  | Float_dimension((a, b)) => "Float_dimension(" ++ a ++ ", " ++ b ++ ")"
   | Dimension((a, b)) => "Dimension(" ++ a ++ ", " ++ b ++ ")"
   | Variable(variable) =>
     "Variable(" ++ (variable |> String.concat(".")) ++ ")"
-  | Pseudoelement((v, _)) => "Pseudoelement(" ++ v ++ ")"
-  | Pseudoclass((v, _)) => "Pseudoclass(" ++ v ++ ")"
-  | PseudoclassFunction((v, _), (_, _)) =>
-    "PseudoclassFunction(" ++ v ++ ")"
   | Selector(v) =>
     let value = v |> fst |> render_selector;
     "Selector(" ++ value ++ ")";

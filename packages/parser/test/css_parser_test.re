@@ -61,7 +61,7 @@ describe("CSS Parser", ({test, _}) => {
   List.iter(
     ((input, output)) =>
       test(
-        "should succeed lexing: " ++ input,
+        "should succeed parsing: " ++ input,
         ({expect, _}) => {
           let stylesheet: Types.Stylesheet.t = parse(input) |> Result.get_ok;
           let inputTokens = Debug.render_stylesheet(stylesheet);

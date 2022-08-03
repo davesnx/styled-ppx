@@ -210,19 +210,43 @@ and render_selector = (selector: Selector.t) => {
       "[" ++ name ++ kind ++ value ++ "]"
     }
     | Pseudo_class(psc) => render_pseudo_selector(psc)
-  and render_pseudo_selector =
+  and render_nth =
     fun
-    | Pseudoelement(v) => "::" ++ v
-    | Pseudoclass(Ident(i)) => ":" ++ i
-    | Pseudoclass(Function({name, payload: (payload, _loc)})) => {
+      | NthIdent(i) when i == "even" => i
+      | NthIdent(i) when i == "odd" => i
+      | NthIdent(i) when i == "n" => i
+      /* TODO: Add location in ast, pass it here */
+      | NthIdent(ident) => grammar_error(Location.none, "'" ++ ident ++ "' is invalid")
+      | A(a) => a
+      | AN(an) => an ++ "n"
+      | ANB(a, op, b) => a ++ "n" ++ op ++ b
+  and render_nth_payload =
+    fun
+    | Nth(nth) => render_nth(nth)
+    | NthSelector(v) => "NthSelector(ComplexSelector(["
+    ++ (v |> List.map(render_complex_selector) |> String.concat(", "))
+    ++ "]))"
+  and render_pseudoclass =
+    fun
+    | Ident(i) => ":" ++ i
+    | NthFunction({name, payload: (payload, _loc)}) =>
+      ":"
+        ++ name
+        ++ "("
+        ++ (render_nth_payload(payload) |> String.trim)
+        ++ ")"
+    | Function({name, payload: (payload, _loc)}) => {
         ":"
         ++ name
         ++ "("
         ++ (render_selector(payload) |> String.trim)
         ++ ")";
-      };
-
-  let rec render_compound_selector = compound_selector => {
+      }
+  and render_pseudo_selector =
+    fun
+    | Pseudoelement(v) => "::" ++ v
+    | Pseudoclass(pc) => render_pseudoclass(pc)
+  and render_compound_selector = compound_selector => {
     let simple_selector =
       Option.fold(
         ~none="",
@@ -316,7 +340,7 @@ let render_keyframes = (declarations: Rule_list.t): Parsetree.expression => {
         "];
   |};
 
-  let invalid_percentag_value = (value) => "'" ++ value ++ "' isn't valid. Only accept percentage with integers";
+  let invalid_percentage_value = (value) => "'" ++ value ++ "' isn't valid. Only accept percentage with integers";
   let invalid_prelude_value = (value) => "'" ++ value ++ "' isn't a valid keyframe value";
   let invalid_prelude_value_opaque = "This isn't a valid keyframe value";
 
@@ -326,14 +350,14 @@ let render_keyframes = (declarations: Rule_list.t): Parsetree.expression => {
      | SimpleSelector([selector]) => {
        switch (selector) {
         // https://drafts.csswg.org/css-animations/#keyframes
-        // The keyword from is equivalent to the value 0%
+        // from is equivalent to the value 0%
         | Type(v) when v == "from" => 0
-        // The keyword to is equivalent t"o the value 100%
+        // to is equivalent to the value 100%
         | Type(v) when v == "to" => 100
         | Type(t) => grammar_error(loc, invalid_prelude_value(t))
         | Percentage(n) => switch (int_of_string_opt(n)) {
           | Some(n) when n >= 0 && n <= 100 => n
-          | _ => grammar_error(loc, invalid_percentag_value(n))
+          | _ => grammar_error(loc, invalid_percentage_value(n))
         }
         | Ampersand => grammar_error(loc, invalid_prelude_value("&"))
         | Universal => grammar_error(loc, invalid_prelude_value("*"))
@@ -373,9 +397,9 @@ let render_keyframes = (declarations: Rule_list.t): Parsetree.expression => {
 
 let render_global = ((ruleList, loc): Stylesheet.t) => {
   switch (ruleList) {
-  /* There's only one rule, and parsed as Style_rule */
+  /* There's only one style_rule */
   | [Style_rule(rule)] => render_style_rule(CssJs.global(~loc), rule) |> Create.applyIgnore(~loc)
-  /* There's more than one */
+  /* More than one isn't supported by bs-css */
   | _res =>
     grammar_error(
       loc,

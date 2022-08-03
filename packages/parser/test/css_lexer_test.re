@@ -48,21 +48,22 @@ describe("CSS Lexer", ({test, _}) => {
     /* TODO: COMBINATOR or DELIM(+)? */
     ({|+|}, [COMBINATOR("+")]),
     ({|,|}, [COMMA]),
-    /* TODO: Store Number as float/int */
     ({|-45.6|}, [NUMBER("-45.6")]),
+    ({|45%|}, [NUMBER("45"), PERCENTAGE]),
+    ({|2n|}, [DIMENSION(("2", "n"))]),
     /* TODO: Store Float_dimension as float/int */
     /* TODO: Store dimension as a variant */
-    ({|45.6px|}, [FLOAT_DIMENSION(("45.6", "px", Length))]),
+    ({|45.6px|}, [FLOAT_DIMENSION(("45.6", "px"))]),
+    ({|10px|}, [FLOAT_DIMENSION(("10", "px"))]),
     ({|--potato|}, [IDENT("--potato")]),
     ({|-|}, [DELIM("-")]),
-    ({|.7|}, [NUMBER(".7")]),
     ({|.|}, [DOT]),
     ({|*|}, [ASTERISK]),
     ({|&|}, [AMPERSAND]),
     ({|:|}, [COLON]),
     ({|::|}, [DOUBLE_COLON]),
     ({|;|}, [SEMI_COLON]),
-    /* TODO: Support comments on the lexer phase? */
+    /* TODO: Support comments in the lexer? */
     /* ({|<!--|}, [CDO]), */
     /* ({|-->|}, [CDC]), */
     ({|<|}, [DELIM("<")]),
@@ -70,6 +71,7 @@ describe("CSS Lexer", ({test, _}) => {
     ({|@|}, [DELIM("@")]),
     ({|[|}, [LEFT_BRACKET]),
     ({|]|}, [RIGHT_BRACKET]),
+    ({|0.7|}, [NUMBER("0.7")]),
     ({|12345678.9|}, [NUMBER("12345678.9")]),
     ({|bar|}, [IDENT("bar")]),
     ({||}, [EOF]),
@@ -79,11 +81,11 @@ describe("CSS Lexer", ({test, _}) => {
       {|calc(10px + 10px)|},
       [
         FUNCTION("calc"),
-        FLOAT_DIMENSION(("10", "px", Length)),
+        FLOAT_DIMENSION(("10", "px")),
         WS,
         COMBINATOR("+"),
         WS,
-        FLOAT_DIMENSION(("10", "px", Length)),
+        FLOAT_DIMENSION(("10", "px")),
         RIGHT_PAREN,
       ],
     ),
@@ -91,10 +93,10 @@ describe("CSS Lexer", ({test, _}) => {
       {|calc(10px+ 10px)|},
       [
         FUNCTION("calc"),
-        FLOAT_DIMENSION(("10", "px", Length)),
+        FLOAT_DIMENSION(("10", "px")),
         COMBINATOR("+"),
         WS,
-        FLOAT_DIMENSION(("10", "px", Length)),
+        FLOAT_DIMENSION(("10", "px")),
         RIGHT_PAREN,
       ],
     ),
