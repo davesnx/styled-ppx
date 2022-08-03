@@ -22,6 +22,7 @@ open Css_types
 %token COMMA
 %token WS
 %token <string> IDENT
+%token <string> TAG
 %token <string> STRING
 %token <string> OPERATOR
 %token <string> COMBINATOR
@@ -315,6 +316,9 @@ id_selector: h = HASH { Selector.Id h }
 /* <class-selector> = '.' <ident-token> */
 class_selector:
   | DOT; c = IDENT { Selector.Class c }
+  /* This should be an IDENT. Tiny bug where we split idents and tags by it's content,
+    here we want to treat them equaly */
+  | DOT; t = TAG { Selector.Class t };
 
 /* <subclass-selector> = <id-selector> | <class-selector> | <attribute-selector> | <pseudo-class-selector> */
 subclass_selector:
@@ -353,7 +357,7 @@ simple_selector:
   /* $(Module.value) {} */
   | v = VARIABLE { Selector.Variable v }
   /* a {} */
-  | type_ = IDENT; { Selector.Type type_ }
+  | type_ = TAG; { Selector.Type type_ }
   /* #a, .a, a:visited, a[] */
   | sb = subclass_selector { Selector.Subclass sb }
 ;
@@ -438,6 +442,9 @@ component_value:
   | b = bracket_block(component_values) { Component_value.Bracket_block b }
   | n = percentage { Component_value.Percentage n }
   | i = IDENT { Component_value.Ident i }
+  /* This should be an IDENT. Tiny bug where we split idents and tags by it's content,
+    here we want to treat them equaly */
+  | i = TAG { Component_value.Ident i }
   | s = STRING { Component_value.String s }
   | c = COMBINATOR { Component_value.Combinator c}
   | o = OPERATOR { Component_value.Operator o }

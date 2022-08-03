@@ -50,6 +50,7 @@ let token_to_string =
   | Parser.AMPERSAND => "&"
   | Parser.IMPORTANT => "!important"
   | Parser.IDENT(s) => s
+  | Parser.TAG(s) => s
   | Parser.STRING(s) => "'" ++ s ++ "'"
   | Parser.OPERATOR(s) => s
   | Parser.COMBINATOR(s)
@@ -89,6 +90,7 @@ let token_to_debug =
   | Parser.AMPERSAND => "AMPERSAND"
   | Parser.IMPORTANT => "IMPORTANT"
   | Parser.IDENT(s) => "IDENT('" ++ s ++ "')"
+  | Parser.TAG(s) => "TAG('" ++ s ++ "')"
   | Parser.STRING(s) => "STRING('" ++ s ++ "')"
   | Parser.OPERATOR(s) => "OPERATOR('" ++ s ++ "')"
   | Parser.DELIM(s) => "DELIM('" ++ s ++ "')"
@@ -219,6 +221,127 @@ let at_rule_without_body = [%sedlex.regexp? ("@", "charset" | "import" | "namesp
 let at_rule = [%sedlex.regexp? ("@", ident)];
 let at_media = [%sedlex.regexp? ("@", "media")];
 let at_keyframes = [%sedlex.regexp? ("@", "keyframes")];
+
+let is_tag = fun
+  | "a"
+  | "abbr"
+  | "address"
+  | "area"
+  | "article"
+  | "aside"
+  | "audio"
+  | "b"
+  | "base"
+  | "bdi"
+  | "bdo"
+  | "blockquote"
+  | "body"
+  | "br"
+  | "button"
+  | "canvas"
+  | "caption"
+  | "cite"
+  | "code"
+  | "col"
+  | "colgroup"
+  | "data"
+  | "datalist"
+  | "dd"
+  | "del"
+  | "details"
+  | "dfn"
+  | "dialog"
+  | "div"
+  | "dl"
+  | "dt"
+  | "em"
+  | "embed"
+  | "fieldset"
+  | "figcaption"
+  | "figure"
+  | "footer"
+  | "form"
+  | "h1"
+  | "h2"
+  | "h3"
+  | "h4"
+  | "h5"
+  | "h6"
+  | "head"
+  | "header"
+  | "hgroup"
+  | "hr"
+  | "html"
+  | "i"
+  | "iframe"
+  | "img"
+  | "input"
+  | "ins"
+  | "kbd"
+  | "label"
+  | "legend"
+  | "li"
+  | "link"
+  | "main"
+  | "map"
+  | "mark"
+  | "math"
+  | "menu"
+  | "menuitem"
+  | "meta"
+  | "meter"
+  | "nav"
+  | "noscript"
+  | "object"
+  | "ol"
+  | "optgroup"
+  | "option"
+  | "output"
+  | "p"
+  | "param"
+  | "picture"
+  | "pre"
+  | "progress"
+  | "q"
+  | "rb"
+  | "rp"
+  | "rt"
+  | "rtc"
+  | "ruby"
+  | "s"
+  | "samp"
+  | "script"
+  | "section"
+  | "select"
+  | "slot"
+  | "small"
+  | "source"
+  | "span"
+  | "strong"
+  | "style"
+  | "sub"
+  | "summary"
+  | "sup"
+  | "svg"
+  | "table"
+  | "tbody"
+  | "td"
+  | "template"
+  | "textarea"
+  | "tfoot"
+  | "th"
+  | "thead"
+  | "time"
+  | "title"
+  | "tr"
+  | "track"
+  | "u"
+  | "ul"
+  | "var"
+  | "video"
+  | "wbr" => true
+  | _ => false
+;
 
 let _a = [%sedlex.regexp? 'A' | 'a'];
 let _b = [%sedlex.regexp? 'B' | 'b'];
@@ -444,7 +567,7 @@ module Tokenizer = {
         | "url" => read_url(string)
         | _ => Ok(Parser.FUNCTION(string))
       }
-    | _ => Ok(Parser.IDENT(string))
+    | _ => is_tag(string) ? Ok(Parser.TAG(string)) : Ok(Parser.IDENT(string))
     };
   };
 };
@@ -587,14 +710,14 @@ let parse_string = (~skip_whitespace, ~container_lnum=?, ~pos=?, parser, string)
   parse(skip_whitespace, Sedlexing.of_ascii_string(~pos?, string), parser);
 };
 
-let parse_declaration_list = (~container_lnum=?, ~pos=?, css) =>
-  parse_string(~skip_whitespace=true, ~container_lnum?, ~pos?, Parser.declaration_list, css);
+let parse_declaration_list = (~container_lnum=?, ~pos=?, input: string) =>
+  parse_string(~skip_whitespace=true, ~container_lnum?, ~pos?, Parser.declaration_list, input);
 
-let parse_declaration = (~container_lnum=?, ~pos=?, css) =>
-  parse_string(~skip_whitespace=true, ~container_lnum?, ~pos?, Parser.declaration, css);
+let parse_declaration = (~container_lnum=?, ~pos=?, input: string) =>
+  parse_string(~skip_whitespace=true, ~container_lnum?, ~pos?, Parser.declaration, input);
 
-let parse_stylesheet = (~container_lnum=?, ~pos=?, css) =>
-  parse_string(~skip_whitespace=false, ~container_lnum?, ~pos?, Parser.stylesheet, css);
+let parse_stylesheet = (~container_lnum=?, ~pos=?, input: string) =>
+  parse_string(~skip_whitespace=false, ~container_lnum?, ~pos?, Parser.stylesheet, input);
 
-let parse_keyframes = (~container_lnum=?, ~pos=?, css) =>
-  parse_string(~skip_whitespace=false, ~container_lnum?, ~pos?, Parser.keyframes, css);
+let parse_keyframes = (~container_lnum=?, ~pos=?, input: string) =>
+  parse_string(~skip_whitespace=false, ~container_lnum?, ~pos?, Parser.keyframes, input);
