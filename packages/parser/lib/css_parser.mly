@@ -22,7 +22,6 @@ open Css_types
 %token COMMA
 %token WS
 %token <string> IDENT
-%token <string> TAG
 %token <string> STRING
 %token <string> OPERATOR
 %token <string> COMBINATOR
@@ -316,8 +315,6 @@ id_selector: h = HASH { Selector.Id h }
 /* <class-selector> = '.' <ident-token> */
 class_selector:
   | DOT; c = IDENT { Selector.Class c }
-  /* Tiny bug where we split idents and tags by it's content */
-  | DOT; t = TAG { Selector.Class t };
 
 /* <subclass-selector> = <id-selector> | <class-selector> | <attribute-selector> | <pseudo-class-selector> */
 subclass_selector:
@@ -356,7 +353,7 @@ simple_selector:
   /* $(Module.value) {} */
   | v = VARIABLE { Selector.Variable v }
   /* a {} */
-  | type_ = TAG; { Selector.Type type_ }
+  | type_ = IDENT; { Selector.Type type_ }
   /* #a, .a, a:visited, a[] */
   | sb = subclass_selector { Selector.Subclass sb }
 ;

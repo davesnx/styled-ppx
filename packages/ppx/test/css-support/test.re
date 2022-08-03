@@ -3120,6 +3120,7 @@
 /* [%css {|counter-reset: ol;|}]; */
 [%css {|display: -webkit-box;|}];
 [%css {|display: contents;|}];
+[%css {|display: table;|}];
 [%css {|fill: $(color);|}];
 [%css {|fill: currentColor;|}];
 [%css {|gap: 4px;|}];
