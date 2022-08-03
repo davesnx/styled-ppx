@@ -1,10 +1,9 @@
 open Reason_css_lexer;
 
 /*
-A rule is a function that maps a list of tokens into a tuple of
-the data from the tokens consumed on the left side and the tokens that were not consumed on the right side.
-The data will be a result, where `Ok(v)` represents that the parse succeed. If it is Error(err), err will be 
-a list of strings representing the errors that occurred.
+  A rule is a function that maps a list of tokens into a tuple where
+  the left side will be a output made from some tokens consumed and
+  the right side will be the tokens that were not consumed
 */
 
 type error = list(string);
@@ -21,9 +20,10 @@ type best('left_in, 'left_v, 'right_in, 'right_v, 'c) =
   ) =>
   rule('c);
 
-/* 
-`Data` is a monad that encapsulates the left side of the Rule tuple and provides functions
-to modify the values inside it
+/*
+  `Data` is the representation of the a rule output, where if the transformation was succeed, it will
+  return `Ok(value)` with value being defined by the function (The [%value.rec] ppx generates polymorphic variants based on the CSS Spec)
+  and if it fails it will return `Error(reasons)` where reasons is a list of string. The module also exposes functions to create and use `Data`
 */
 module Data: {
   let return: return('a, data('a));
@@ -34,7 +34,8 @@ module Data: {
 };
 
 /*
-Match operates on `Data`, it deals with cases where Data is valid.
+  Match operates on `Data`, it deals with cases where Data transformation in a rule went successful
+  matching over the results and offering functions to manipulate the result
 */
 module Match: {
   let return: return('a, 'a);
@@ -60,8 +61,8 @@ module Let: {
   let (let.bind_longest_match): best('a, 'a, 'b, 'b, 'c);
 };
 
-/* 
-Pattern is a module for consuming tokens inside data.
+/*
+  Pattern is a helper module with functions to make tokens consumption easier
 */
 module Pattern: {
   let identity: rule(unit);
