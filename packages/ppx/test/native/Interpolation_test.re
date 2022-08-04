@@ -27,6 +27,10 @@ let properties_variable_css_tests = [
     [%expr CssJs.padding2(~v=Size.small, ~h=`pxFloat(0.))]
   ),
   (
+    [%expr [%css "border-left: $(borderazo);"]],
+    [%expr CssJs.borderLeft(borderazo)]
+  ),
+  (
     [%expr [%css "border: 1px solid $(Color.Border.alpha);"]],
     [%expr CssJs.border(`pxFloat(1.), `solid, Color.Border.alpha)]
   ),

@@ -1169,27 +1169,31 @@ let render_border_style_interp =
 
 type borderDirection = All | Left | Bottom | Right | Top;
 
+let direction_to_border = fun
+  | All => [%expr CssJs.border]
+  | Left => [%expr CssJs.borderLeft]
+  | Bottom => [%expr CssJs.borderBottom]
+  | Right => [%expr CssJs.borderRight]
+  | Top => [%expr CssJs.borderTop];
+
+let direction_to_fn_name = fun
+  | All => [%expr "border"]
+  | Left => [%expr "borderLeft"]
+  | Bottom => [%expr "borderBottom"]
+  | Right => [%expr "borderRight"]
+  | Top => [%expr "borderTop"];
+
 let render_border = (~direction: borderDirection, border) => {
   switch (border) {
+  | `Interpolation(name) => {
+    let borderFn = direction_to_border(direction);
+    [[%expr[%e borderFn]([%e render_variable(name)])]]
+  }
   | `None =>
-    let borderFn =
-      switch (direction) {
-      | All => [%expr "border"]
-      | Left => [%expr "borderLeft"]
-      | Bottom => [%expr "borderBottom"]
-      | Right => [%expr "borderRight"]
-      | Top => [%expr "borderTop"]
-      };
+    let borderFn = direction_to_fn_name(direction);
     [[%expr CssJs.unsafe([%e borderFn], "none")]];
   | `Static(width, style, color) =>
-    let borderFn =
-      switch (direction) {
-      | All => [%expr CssJs.border]
-      | Left => [%expr CssJs.borderLeft]
-      | Bottom => [%expr CssJs.borderBottom]
-      | Right => [%expr CssJs.borderRight]
-      | Top => [%expr CssJs.borderTop]
-      };
+    let borderFn = direction_to_border(direction);
     [
       [%expr
         [%e borderFn](
