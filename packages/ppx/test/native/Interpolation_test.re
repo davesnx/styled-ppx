@@ -31,6 +31,10 @@ let properties_variable_css_tests = [
     [%expr CssJs.border(`pxFloat(1.), `solid, Color.Border.alpha)]
   ),
   (
+    [%expr [%css "outline: 1px solid $(Color.Border.alpha);"]],
+    [%expr CssJs.outline(`pxFloat(1.), `solid, Color.Border.alpha)]
+  ),
+  (
     [%expr [%css "border-bottom: 0px solid $(Color.Border.alpha);"]],
     [%expr CssJs.borderBottom(`pxFloat(0.), `solid, Color.Border.alpha)]
   ),

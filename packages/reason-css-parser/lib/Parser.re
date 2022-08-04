@@ -434,7 +434,7 @@ and property_block_overflow = [%value.rec "'clip' | 'ellipsis' | <string>"]
 and property_block_size = [%value.rec "<'width'>"]
 /* This property is changed from the original spec. This enforces lw, ls and color to be present.
   Missing border values is valid CSS, but bs-css bindings aren't available */
-and property_border = [%value.rec "'none' | [ <line-width> | <interpolation> ] [<line-style> | <interpolation> ] [ <color> | <interpolation> ]"]
+and property_border = [%value.rec "'none' | [ <line-width> | <interpolation> ] [ <line-style> | <interpolation> ] [ <color> | <interpolation> ]"]
 and property_border_block = [%value.rec "<'border-top-width'> || <'border-top-style'> || <'color'>"]
 and property_border_block_color = [%value.rec "[ <'border-top-color'> ]{1,2}"]
 and property_border_block_end = [%value.rec "<'border-top-width'> || <'border-top-style'> || <'color'>"]
@@ -707,11 +707,13 @@ and property_offset_rotate = [%value.rec "[ 'auto' | 'reverse' ] || <extended-an
 and property_opacity = [%value.rec "<alpha-value>"]
 and property_order = [%value.rec "<integer>"]
 and property_orphans = [%value.rec "<integer>"]
-and property_outline = [%value.rec "<'outline-color'> || <'outline-style'> || <'outline-width'>"]
-and property_outline_color = [%value.rec "<color> | 'invert'"]
+/* Same change as border from the SPEC */
+/* and property_outline = [%value.rec "'none' | [ <'outline-width'> ] | [ <'outline-width'> <'outline-style'> ] | [ <'outline-width'> <'outline-style'> [ <color> | <interpolation> ] ]"] */
+and property_outline = [%value.rec "'none' | <'outline-width'> <'outline-style'> [ <color> | <interpolation> ]"]
+and property_outline_color = [%value.rec "<color>"]
 and property_outline_offset = [%value.rec "<extended-length>"]
-and property_outline_style = [%value.rec "'auto' | <'border-style'>"]
-and property_outline_width = [%value.rec "<line-width>"]
+and property_outline_style = [%value.rec "'auto' | <line-style> | <interpolation>"]
+and property_outline_width = [%value.rec "<line-width> | <interpolation>"]
 and property_overflow = [%value.rec "[ 'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' ]{1,2} | <-non-standard-overflow>"]
 and property_overflow_anchor = [%value.rec "'auto' | 'none'"]
 and property_overflow_block = [%value.rec "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto'"]

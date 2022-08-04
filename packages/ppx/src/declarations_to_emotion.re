@@ -1162,7 +1162,7 @@ let render_line_width_interp =
   | `Line_width(lw) => render_line_width(lw)
   | `Interpolation(name) => render_variable(name);
 
-let border_style_interp =
+let render_border_style_interp =
   fun
   | `Interpolation(name) => render_variable(name)
   | `Line_style(ls) => variants_to_expression(ls);
@@ -1194,13 +1194,43 @@ let render_border = (~direction: borderDirection, border) => {
       [%expr
         [%e borderFn](
           [%e render_line_width_interp(width)],
-          [%e border_style_interp(style)],
+          [%e render_border_style_interp(style)],
           [%e render_color_interp(color)],
         )
       ],
     ];
   };
 };
+
+let render_outline_style_interp = fun
+  | `Auto => variants_to_expression(`Auto)
+  | `Interpolation(name) => render_variable(name)
+  | `Line_style(ls) => variants_to_expression(ls)
+;
+
+let render_outline = fun
+  | `None => raise(Unsupported_feature)
+  | `Static((line_width, style, color)) => [
+      [%expr
+        CssJs.outline(
+          [%e render_line_width_interp(line_width)],
+          [%e render_outline_style_interp(style)],
+          [%e render_color_interp(color)],
+        )
+      ],
+    ];
+
+let outline =
+  emit(
+    Parser.property_outline,
+    id,
+    render_outline,
+  );
+
+let outline_color = apply(Parser.property_outline_color, [%expr CssJs.outlineColor], render_color);
+let outline_offset = apply(Parser.property_outline_offset, [%expr CssJs.outlineOffset], render_extended_length);
+let outline_style = apply(Parser.property_outline_style, [%expr CssJs.outlineStyle], render_outline_style_interp)
+let outline_width = apply(Parser.property_outline_width, [%expr CssJs.outlineWidth], render_line_width_interp)
 
 let border =
   emit(
@@ -2117,7 +2147,12 @@ let properties = [
   ("top", found(top)),
   ("right", found(right)),
   ("bottom", found(bottom)),
-  ("mask-image", found(mask_image))
+  ("mask-image", found(mask_image)),
+  ("outline", found(outline)),
+  ("outline-color", found(outline_color)),
+  ("outline-offset", found(outline_offset)),
+  ("outline-style", found(outline_style)),
+  ("outline-width", found(outline_width))
 ];
 
 let render_when_unsupported_features = (property, value) => {
