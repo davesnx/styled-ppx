@@ -26,12 +26,6 @@ describe("Data monad", ({test, _}) => {
       | _ => failwith("Should be (Ok(,), [COMMA])")
       }
     });
-    test("return with a string", _ => {
-      switch (return(Ok(","), [COMMA])) {
-      | (Ok(","), [COMMA]) => ()
-      | _ => failwith("Should be (Ok(,), [COMMA])")
-      }
-    });
     test("return with more then one token as inputs", _ => {
       switch (return(Ok(1), [IDENT("decl"), COLON, IDENT("value")])) {
       | (Ok(1), [IDENT("decl"), COLON, IDENT("value")]) => ()
