@@ -30,14 +30,19 @@ let extract_tests = array_expr => {
   );
 };
 
+let openMockBsCss = [[%stri open MockBsCss]];
+let ignoreWarning33 = [[%stri [@warning "-33"]]];
+let mapExpected = ((expected, _)) => [%stri let _ = [%e expected]];
+
 let write_tests_to_file = (
   tests: list((expression, expression)),
   file
 ) => {
   let code =
     tests
-    |> List.map(((expected, _)) => [%stri let _ = [%e expected]])
-    |> List.append([[%stri open MockBsCss]])
+    |> List.map(mapExpected)
+    |> List.append(openMockBsCss)
+    |> List.append(ignoreWarning33)
     |> Pprintast.string_of_structure;
   let fd = open_out(file);
   output_string(fd, code);
@@ -385,12 +390,10 @@ let properties_static_css_tests = [%expr
       [%css "word-wrap: normal"],
       CssJs.wordWrap(`normal)
     ),
-    /*
-      not supported by bs-css
-      (
+    (
       [%css "text-align: start"],
       CssJs.textAlign(`start)
-    ), */
+    ),
     (
       [%css "text-align: left"],
       CssJs.textAlign(`left)
@@ -454,6 +457,11 @@ let properties_static_css_tests = [%expr
       [%css "flex: none"],
       CssJs.flex(`none)
     ),
+    /* bs-css doesn't support it */
+    /* (
+      [%css "width: calc(100px)"],
+      CssJs.width(`calc(`add, `percent(100.), `pxFloat(32.)))
+    ), */
     (
       [%css "width: calc(100% + 32px)"],
       CssJs.width(`calc(`add, `percent(100.), `pxFloat(32.)))

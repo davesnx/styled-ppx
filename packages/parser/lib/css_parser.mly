@@ -28,6 +28,7 @@ open Css_types
 %token <string> COMBINATOR
 %token <string> DELIM
 %token <string> FUNCTION
+%token <string> NTH_FUNCTION
 %token <string> URL
 %token BAD_URL
 %token <string> AT_MEDIA
@@ -37,7 +38,7 @@ open Css_types
 %token <string> HASH
 %token <string> NUMBER
 %token <string> UNICODE_RANGE
-%token <string * string * Css_types.dimension> FLOAT_DIMENSION
+%token <string * string> FLOAT_DIMENSION
 %token <string * string> DIMENSION
 %token <string list> VARIABLE
 
@@ -255,13 +256,43 @@ declaration: d = declaration_without_eof; EOF { d };
 pseudo_element_selector:
   DOUBLE_COLON; pse = IDENT { Selector.Pseudoelement pse };
 
+nth:
+  /* even, odd, n */
+  | i = IDENT { Selector.NthIdent i }
+  /* <An+B> */
+  /* 2 */
+  | a = NUMBER; { Selector.A a }
+  /* 2n */
+  | a = DIMENSION { Selector.AN (fst a) }
+  /* Since our lexing isn't on point with DIMENSIONS/NUMBERS */
+  /* We add a case where operator is missing */
+  /* 2n-1 */
+  | left = DIMENSION; WS?; right = NUMBER; {
+    Selector.ANB ((fst left, "", right))
+  }
+  /* 2n+1 */
+  | left = DIMENSION; WS?; combinator = COMBINATOR; right = NUMBER; {
+    Selector.ANB ((fst left, combinator, right))
+  }
+  /* TODO: Support "An+B of Selector" */
+;
+
+nth_payload:
+  | complex = complex_selector_list; { Selector.NthSelector complex }
+  | n = skip_ws(nth); { Selector.Nth n }
+;
+
 /* <pseudo-class-selector> = ':' <ident-token> | ':' <function-token> <any-value> ')' */
 pseudo_class_selector:
   /* :visited */
   | COLON; i = IDENT { Selector.(Pseudoclass(Ident i)) }
-  /* :nth-child() */
+  /* :not() */
   | COLON; f = FUNCTION; xs = loc(selector); RIGHT_PAREN {
     Selector.(Pseudoclass(Function({ name = f; payload = xs })))
+  }
+  /* :nth-child() */
+  | COLON; f = NTH_FUNCTION; xs = loc(nth_payload); RIGHT_PAREN {
+    Selector.(Pseudoclass(NthFunction({ name = f; payload = xs })))
   }
   /* TODO: <function-token> and <any-value> */
 ;
@@ -330,6 +361,10 @@ subclass_selector:
   | DOT; v = VARIABLE { Selector.ClassVariable v };
 ;
 
+complex_selector_list:
+  | xs = separated_nonempty_list(skip_ws_right(COMMA), skip_ws_right(complex_selector)) { xs }
+;
+
 selector:
   /* <simple-selector-list> = <simple-selector># */
   | xs = separated_nonempty_list(skip_ws_right(COMMA), simple_selector) {
@@ -340,9 +375,7 @@ selector:
     Selector.CompoundSelector xs
   }
   /* <complex-selector-list> = <complex-selector># */
-  | xs = separated_nonempty_list(skip_ws_right(COMMA), skip_ws_right(complex_selector)) {
-    Selector.ComplexSelector xs
-  }
+  | xs = complex_selector_list { Selector.ComplexSelector xs }
 ;
 
 /* <simple-selector> = <type-selector> | <subclass-selector> */

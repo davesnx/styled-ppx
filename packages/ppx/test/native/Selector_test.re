@@ -41,15 +41,51 @@ let selectors_css_tests = [
     [%expr [%cx {js|[id="baz"] {}|js}]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|[id="baz"]|js}, [||])|])],
   ),
-  /* (
+  (
     "nth-child(even)",
     [%expr [%cx "&:nth-child(even) {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|&:nth-child(even)|js}, [||])|])],
-  ), */
-  /* (
+  ),
+  (
+    "nth-child(odd)",
+    [%expr [%cx "&:nth-child(odd) {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|&:nth-child(odd)|js}, [||])|])],
+  ),
+  (
     "nth-child(3n+1)",
     [%expr [%cx "&:nth-child(3n+1) {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|&:nth-child(3n+1)|js}, [||])|])],
+  ),
+  (
+    ":nth-child(2n)",
+    [%expr [%cx "&:nth-child(2n) {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|&:nth-child(2n)|js}, [||])|])],
+  ),
+  (
+    ":nth-child(n)",
+    [%expr [%cx "&:nth-child(n) {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|&:nth-child(n)|js}, [||])|])],
+  ),
+  (
+    ":nth-child(10n-1)",
+    [%expr [%cx "&:nth-child(10n-1) {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|&:nth-child(10n-1)|js}, [||])|])],
+  ),
+  (
+    ":nth-child( 10n -1 )",
+    [%expr [%cx "&:nth-child( 10n -1 ) {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|&:nth-child(10n-1)|js}, [||])|])],
+  ),
+  /* TODO: Support all cases */
+  /* (
+    ":nth-child( 10n - 1 )",
+    [%expr [%cx "&:nth-child( 10n - 1 ) {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|&:nth-child(10n-1)|js}, [||])|])],
+  ), */
+  /* (
+    ":nth-child(-n+2)",
+    [%expr [%cx "&:nth-child(-n+2) {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|&:nth-child(-n+2)|js}, [||])|])],
   ), */
 
   /* Compound */

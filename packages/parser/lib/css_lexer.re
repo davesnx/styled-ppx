@@ -62,14 +62,15 @@ let token_to_string =
   | Parser.HASH(s) => "#" ++ s
   | Parser.NUMBER(s) => s
   | Parser.UNICODE_RANGE(s) => s
-  | Parser.FLOAT_DIMENSION((n, s, _)) => n ++ s
-  | Parser.DIMENSION((n, d)) => n ++ "." ++ d
+  | Parser.FLOAT_DIMENSION((n, s)) => n ++ s
+  | Parser.DIMENSION((n, d)) => n ++ d
   | Parser.VARIABLE(v) => String.concat(".", v)
   | Parser.WS => " "
   | Parser.DOT => "."
   | Parser.COMMA => ","
   | Parser.ASTERISK => "*"
   | Parser.FUNCTION(fn) => fn ++ "("
+  | Parser.NTH_FUNCTION(fn) => fn ++ "("
   | Parser.URL(url) => url ++ "("
   | Parser.BAD_URL => "bar url"
 ;
@@ -101,11 +102,7 @@ let token_to_debug =
   | Parser.HASH(s) => "HASH('" ++ s ++ "')"
   | Parser.NUMBER(s) => "NUMBER('" ++ s ++ "')"
   | Parser.UNICODE_RANGE(s) => "UNICODE_RANGE('" ++ s ++ "')"
-  | Parser.FLOAT_DIMENSION((n, s, _d)) =>
-    "FLOAT_DIMENSION('" ++ n
-    ++ ", "
-    ++ s
-    ++ "')"
+  | Parser.FLOAT_DIMENSION((n, s)) => "FLOAT_DIMENSION('" ++ n ++ ", " ++ s ++ "')"
   | Parser.DIMENSION((n, d)) => "DIMENSION('" ++ n ++ ", " ++ d ++ "')"
   | Parser.VARIABLE(v) => "VARIABLE('" ++ (String.concat(".", v)) ++ "')"
   | Parser.COMBINATOR(s) => "COMBINATOR(" ++ s ++ ")"
@@ -114,6 +111,7 @@ let token_to_debug =
   | Parser.WS => "WS"
   | Parser.ASTERISK => "ASTERISK"
   | Parser.FUNCTION(fn) => "FUNCTION(" ++ fn ++ ")"
+  | Parser.NTH_FUNCTION(fn) => "FUNCTION(" ++ fn ++ ")"
   | Parser.URL(u) => "URL(" ++ u ++ ")"
   | Parser.BAD_URL => "BAD_URL"
 ;
@@ -425,9 +423,6 @@ let identifier_code_point = [%sedlex.regexp?
 let non_printable_code_point = [%sedlex.regexp?
   '\000' .. '\b' | '\011' | '\014' .. '\031' | '\127'
 ];
-/* let ident_char = [%sedlex.regexp?
-  '_' | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' | non_ascii | escape
-]; */
 
 /* This module is a copy/paste of Reason_css_lexer in favor of moving everything into css_lexer */
 module Tokenizer = {
@@ -544,6 +539,13 @@ module Tokenizer = {
   | Error((_, error)) => Error((BAD_IDENT, error))
   | Ok(string) => Ok(string);
 
+  let consume_function = string => {
+    switch (string) {
+      | "nth-child" | "nth-of-type" | "nth-last-of-type" => Parser.NTH_FUNCTION(string)
+      | _ => Parser.FUNCTION(string)
+    }
+  };
+
   // https://drafts.csswg.org/css-syntax-3/#consume-ident-like-token
   let consume_ident_like = buf => {
     let read_url = string => {
@@ -557,7 +559,7 @@ module Tokenizer = {
           | _ => false
           }
         );
-      is_function(buf) ? Ok(Parser.FUNCTION(string)) : consume_url(buf);
+      is_function(buf) ? Ok(consume_function(string)) : consume_url(buf);
     };
 
   let.ok string = consume_identifier(buf) |> handle_consume_identifier;
@@ -565,7 +567,7 @@ module Tokenizer = {
     | "(" =>
       switch (string) {
         | "url" => read_url(string)
-        | _ => Ok(Parser.FUNCTION(string))
+        | _ => Ok(consume_function(string))
       }
     | _ => is_tag(string) ? Ok(Parser.TAG(string)) : Ok(Parser.IDENT(string))
     };
@@ -661,11 +663,11 @@ let rec get_next_token = (buf) => {
 and get_dimension = (n, buf) => {
   open Sedlexing;
   switch%sedlex (buf) {
-    | length => FLOAT_DIMENSION((n, latin1(buf), Length))
-    | angle => FLOAT_DIMENSION((n, latin1(buf), Angle))
-    | time => FLOAT_DIMENSION((n, latin1(buf), Time))
-    | frequency => FLOAT_DIMENSION((n, latin1(buf), Frequency))
-    | ident => DIMENSION((n, latin1(buf)))
+    | length => FLOAT_DIMENSION((n, latin1(buf)))
+    | angle => FLOAT_DIMENSION((n, latin1(buf)))
+    | time => FLOAT_DIMENSION((n, latin1(buf)))
+    | frequency => FLOAT_DIMENSION((n, latin1(buf)))
+    | 'n' => DIMENSION((n, latin1(buf)))
     | _ => NUMBER(n)
   };
 } and discard_comments = (buf) => {
