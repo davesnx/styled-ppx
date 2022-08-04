@@ -103,10 +103,9 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
             grammar_error(loc, "unsupported property: " ++ property)
           | Error(`Invalid_value(_error)) =>
             grammar_error(loc, "invalid value")
-          | Ok(_exprs) => {
+          | Ok(_exprs) =>
             /* Here we receive the expressions transformed, but we prefer the stringed value */
-              value
-            }
+            value
           };
         }
         | Paren_block([(Ident(property), _), (Delim(":"), _), ..._value]) =>
@@ -157,7 +156,7 @@ and render_declaration = (d: Declaration.t): list(Parsetree.expression) => {
   let value_source = source_code_of_loc(loc) |> String.trim;
 
   switch (Declarations_to_emotion.parse_declarations(property, value_source)) {
-  | Ok(exprs) => exprs
+  | Ok(exprs) => [%expr [%e exprs]]
   | Error(`Not_found) => grammar_error(name_loc, "Unknown property '" ++ property ++ "'")
   | Error(`Invalid_value(value)) =>
     grammar_error(

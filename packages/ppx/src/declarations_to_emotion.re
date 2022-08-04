@@ -150,6 +150,9 @@ let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
 let render_variable = name =>
   list_to_longident(name) |> txt |> Helper.Exp.ident;
 
+let render_variable = name =>
+  list_to_longident(name) |> txt |> Helper.Exp.ident;
+
 // TODO: all of them could be float, but bs-css doesn't support it
 let render_length =
   fun
@@ -1872,51 +1875,73 @@ let bottom =
   );
 
 let display =
-  apply(
+  emit(
     Parser.property_display,
-    [%expr CssJs.display],
-    fun
-    | `Block => [%expr `block]
-    | `Contents => [%expr `contents]
-    | `Flex => [%expr `flex]
-    | `Grid => [%expr `grid]
-    | `Inline => [%expr `inline]
-    | `Inline_block => [%expr `inlineBlock]
-    | `Inline_flex => [%expr `inlineFlex]
-    | `Inline_grid => [%expr `inlineGrid]
-    | `Inline_list_item => [%expr `inlineListItem]
-    | `Inline_table => [%expr `inlineTable]
-    | `List_item => [%expr `listItem]
-    | `None => [%expr `none]
-    | `Table => [%expr `table]
-    | `Table_caption => [%expr `tableCaption]
-    | `Table_cell => [%expr `tableCell]
-    | `Table_column => [%expr `tableColumn]
-    | `Table_column_group => [%expr `tableColumnGroup]
-    | `Table_footer_group => [%expr `tableFooterGroup]
-    | `Table_header_group => [%expr `tableHeaderGroup]
-    | `Table_row => [%expr `tableRow]
-    | `Table_row_group => [%expr `tableRowGroup]
-    | `Flow
-    | `Flow_root
-    | `Ruby
-    | `Ruby_base
-    | `Ruby_base_container
-    | `Ruby_text
-    | `Ruby_text_container
-    | `Run_in
-    | `_moz_box
-    | `_moz_inline_box
-    | `_moz_inline_stack
-    | `_ms_flexbox
-    | `_ms_grid
-    | `_ms_inline_flexbox
-    | `_ms_inline_grid
-    | `_webkit_box
-    | `_webkit_flex
-    | `_webkit_inline_box
-    | `_webkit_inline_flex
-    | _ => raise(Unsupported_feature),
+    id,
+    (a) => {
+      let loc_start = {
+        Lexing.pos_fname : "/Users/davesnx/Code/github/davesnx/styled-ppx/packages/demo/rescript/src/index.res",
+        pos_lnum : 50,
+        pos_bol : 0,
+        pos_cnum : 4,
+      };
+      let loc_end = {
+        Lexing.pos_fname : "/Users/davesnx/Code/github/davesnx/styled-ppx/packages/demo/rescript/src/index.res",
+        pos_lnum : 50,
+        pos_bol : 0,
+        pos_cnum : 10,
+      };
+      let loc = { Location.loc_start: loc_start, loc_end: loc_end, loc_ghost: true };
+      let valon = switch (a) {
+        | `Interpolation(name) => {
+          let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
+          let txt = txt => {Location.loc: loc, txt};
+          list_to_longident(name) |> txt |> Helper.Exp.ident;
+        }
+        | `Block => [%expr `block]
+        | `Contents => [%expr `contents]
+        | `Flex => [%expr `flex]
+        | `Grid => [%expr `grid]
+        | `Inline => [%expr `inline]
+        | `Inline_block => [%expr `inlineBlock]
+        | `Inline_flex => [%expr `inlineFlex]
+        | `Inline_grid => [%expr `inlineGrid]
+        | `Inline_list_item => [%expr `inlineListItem]
+        | `Inline_table => [%expr `inlineTable]
+        | `List_item => [%expr `listItem]
+        | `None => [%expr `none]
+        | `Table => [%expr `table]
+        | `Table_caption => [%expr `tableCaption]
+        | `Table_cell => [%expr `tableCell]
+        | `Table_column => [%expr `tableColumn]
+        | `Table_column_group => [%expr `tableColumnGroup]
+        | `Table_footer_group => [%expr `tableFooterGroup]
+        | `Table_header_group => [%expr `tableHeaderGroup]
+        | `Table_row => [%expr `tableRow]
+        | `Table_row_group => [%expr `tableRowGroup]
+        | `Flow
+        | `Flow_root
+        | `Ruby
+        | `Ruby_base
+        | `Ruby_base_container
+        | `Ruby_text
+        | `Ruby_text_container
+        | `Run_in
+        | `_moz_box
+        | `_moz_inline_box
+        | `_moz_inline_stack
+        | `_ms_flexbox
+        | `_ms_grid
+        | `_ms_inline_flexbox
+        | `_ms_inline_grid
+        | `_webkit_box
+        | `_webkit_flex
+        | `_webkit_inline_box
+        | `_webkit_inline_flex
+        | _ => raise(Unsupported_feature)
+      };
+      [[%expr CssJs.display([%e valon])]];
+    }
   );
 
 /* let render_mask_source = fun
@@ -2204,7 +2229,7 @@ let render_to_expr = (property, value) => {
   expr_of_string(value) |> Result.map_error(str => `Invalid_value(str));
 };
 
-let parse_declarations = (property: string, value: string) => {
+let parse_declarations = (property, value) => {
   let.ok is_valid_string =
     Parser.check_property(~name=property, value)
     |> Result.map_error((`Unknown_value) => `Not_found);

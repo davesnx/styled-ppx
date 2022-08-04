@@ -521,7 +521,7 @@ let render_to_expr = (property, value) => {
   expr_of_string(value) |> Result.map_error(str => `Invalid_value(str));
 };
 
-let parse_declarations = (property: string, value: string) => {
+let parse_declarations = (property, value) => {
   let.ok _ =
     Parser.check_property(~name=property, value)
     |> Result.map_error((`Unknown_value) => `Not_found);

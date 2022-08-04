@@ -41,10 +41,13 @@ module Wrapper = %styled.div("display: inline;")
 
 module Dynamic = %styled.input((~a as _) => "display: inline;")
 
+let px1 = CssJs.red
+
 module Component = %styled.div(`
   background-color: red;
   border-radius: 20px;
   box-sizing: border-box;
+  display: $(px1);
 `)
 
 switch ReactDOM.querySelector("#app") {
