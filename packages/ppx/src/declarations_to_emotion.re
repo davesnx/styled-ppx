@@ -933,15 +933,15 @@ let background_attachment =
     | _ => raise(Unsupported_feature)
   );
 
-let render_bg_position = (bg_position) => {
+let render_background_position = (position) => {
   let render_static = fun
-  | `Center => [%expr `center]
-  | `Left => [%expr `center]
-  | `Right => [%expr `center]
-  | `Bottom => [%expr `center]
-  | `Top => [%expr `center]
-  | `Extended_length(l) => render_extended_length(l)
-  | `Extended_percentage(p) => render_extended_percentage(p);
+    | `Center => [%expr `center]
+    | `Left => [%expr `center]
+    | `Right => [%expr `center]
+    | `Bottom => [%expr `center]
+    | `Top => [%expr `center]
+    | `Extended_length(l) => render_extended_length(l)
+    | `Extended_percentage(p) => render_extended_percentage(p);
 
   let render_and = fun
     | `Center => [%expr `center]
@@ -950,18 +950,18 @@ let render_bg_position = (bg_position) => {
       | None => render_static(a)
     };
 
-  switch(bg_position){
-  | `And(left, right) => [%expr `hv([%e render_and(left)], [%e render_and(right)])]
-  | `Bottom => [%expr `bottom]
-  | `Center => [%expr `center]
-  | `Top => [%expr `top]
-  | `Left => [%expr `left]
-  | `Right => [%expr `right]
-  | `Extended_length(l) => render_extended_length(l)
-  | `Extended_percentage(a) => render_extended_percentage(a)
-  | `Static((x, y)) => [%expr `hv([%e render_static(x)], [%e render_static(y)])];
+  switch (position) {
+    | `Bottom => [%expr `bottom]
+    | `Center => [%expr `center]
+    | `Top => [%expr `top]
+    | `Left => [%expr `left]
+    | `Right => [%expr `right]
+    | `Extended_length(l) => render_extended_length(l)
+    | `Extended_percentage(a) => render_extended_percentage(a)
+    | `Static((x, y)) => [%expr `hv([%e render_static(x)], [%e render_static(y)])]
+    | `And(left, right) => [%expr `hv([%e render_and(left)], [%e render_and(right)])]
   };
-}
+};
 
 let background_position =
   apply(
@@ -969,7 +969,7 @@ let background_position =
     [%expr CssJs.backgroundPosition],
     fun
     | [] => failwith("expected at least one argument")
-    | [l] => render_bg_position(l)
+    | [l] => render_background_position(l)
     | _ => raise(Unsupported_feature)
   );
 let background_clip =
@@ -990,21 +990,22 @@ let background_origin =
     | [v] => variants_to_expression(v)
     | _ => raise(Unsupported_feature)
   );
+
 let background_size =
   apply(
     Parser.property_background_size,
     [%expr CssJs.backgroundSize],
     fun
     | [] => failwith("expected at least one argument")
-    | [v] => switch(v){
+    | [v] => switch (v) {
         | `Contain => [%expr `contain]
         | `Cover => [%expr `cover]
         | `Xor([`Auto]) => [%expr `auto]
         | `Xor(l) when List.mem(`Auto, l) => raise(Unsupported_feature)
-        | `Xor([x,y]) => [%expr `size([%e render_size(x)], [%e render_size(y)])]
+        | `Xor([x, y]) => [%expr `size([%e render_size(x)], [%e render_size(y)])]
         | `Xor([_])
         | _ => raise(Unsupported_feature)
-        }
+      }
     | _ => raise(Unsupported_feature)
   );
 
@@ -1021,11 +1022,11 @@ let render_background = ((layers, final_layer)) => {
       render_layer(b2, [%expr CssJs.origin], variants_to_expression),
     ] @ switch (bg_position) {
       | Some((bg_pos, Some(((), bg_size)))) => [
-        [[%expr CssJs.backgroundPosition([%e render_bg_position(bg_pos)])]],
+        [[%expr CssJs.backgroundPosition([%e render_background_position(bg_pos)])]],
         [[%expr CssJs.backgroundSize([%e render_size(bg_size)])]],
       ]
       | Some((bg_pos, None)) => [
-        [[%expr CssJs.backgroundPosition([%e render_bg_position(bg_pos)])]],
+        [[%expr CssJs.backgroundPosition([%e render_background_position(bg_pos)])]],
       ]
       | None => []
     };
@@ -1041,11 +1042,11 @@ let render_background = ((layers, final_layer)) => {
       render_layer(b2, [%expr CssJs.origin], variants_to_expression),
     ] @ switch(bg_position){
       | Some((bg_pos, Some(((), bg_size)))) => [
-        [[%expr CssJs.backgroundPosition([%e render_bg_position(bg_pos)])]],
+        [[%expr CssJs.backgroundPosition([%e render_background_position(bg_pos)])]],
         [[%expr CssJs.backgroundSize([%e render_size(bg_size)])]],
       ]
       | Some((bg_pos, None)) => [
-        [[%expr CssJs.backgroundPosition([%e render_bg_position(bg_pos)])]],
+        [[%expr CssJs.backgroundPosition([%e render_background_position(bg_pos)])]],
       ]
       | None => []
     };
@@ -1185,14 +1186,18 @@ let direction_to_fn_name = fun
 
 let render_border = (~direction: borderDirection, border) => {
   switch (border) {
-  | `Interpolation(name) => {
-    let borderFn = direction_to_border(direction);
-    [[%expr[%e borderFn]([%e render_variable(name)])]]
-  }
   | `None =>
     let borderFn = direction_to_fn_name(direction);
     [[%expr CssJs.unsafe([%e borderFn], "none")]];
-  | `Static(width, style, color) =>
+  | `Xor(`Interpolation(name)) => {
+      let borderFn = direction_to_border(direction);
+      [[%expr [%e borderFn]([%e render_variable(name)])]]
+  }
+  /* bs-css doesn't support border: 1px; */
+  | `Xor(_) => raise(Unsupported_feature)
+  /* bs-css doesn't support border: 1px solid; */
+  | `Static_0(_) => raise(Unsupported_feature)
+  | `Static_1((width, style, color)) =>
     let borderFn = direction_to_border(direction);
     [
       [%expr
@@ -1213,8 +1218,14 @@ let render_outline_style_interp = fun
 ;
 
 let render_outline = fun
-  | `None => raise(Unsupported_feature)
-  | `Static((line_width, style, color)) => [
+  | `None => [[%expr CssJs.unsafe("outline", "none")]]
+  | `Property_outline_width(`Interpolation(name)) =>
+    [[%expr CssJs.outline([%e render_variable(name)])]]
+  /* bs-css doesn't support outline: 1px; */
+  | `Property_outline_width(_) => raise(Unsupported_feature)
+  /* bs-css doesn't support outline: 1px solid; */
+  | `Static_0(_) => raise(Unsupported_feature)
+  | `Static_1((line_width, style, color)) => [
       [%expr
         CssJs.outline(
           [%e render_line_width_interp(line_width)],
