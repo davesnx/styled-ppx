@@ -1,0 +1,1 @@
+ParserTest.Setup.cli();

@@ -207,7 +207,7 @@ and grid_line = [%value.rec "'auto' | <custom-ident> | <integer> && [ <custom-id
 and historical_lig_values = [%value.rec "'historical-ligatures' | 'no-historical-ligatures'"]
 and hue = [%value.rec "<number> | <extended-angle>"]
 and id_selector = [%value.rec "<hash-token>"]
-and image = [%value.rec "<url> | <image()> | <image-set()> | <element()> | <paint()> | <cross-fade()> | <gradient>"]
+and image = [%value.rec "<url> | <image()> | <image-set()> | <element()> | <paint()> | <cross-fade()> | <gradient> | <interpolation>"]
 and image_set_option = [%value.rec "[ <image> | <string> ] <resolution>"]
 and image_src = [%value.rec "<url> | <string>"]
 and image_tags = [%value.rec "'ltr' | 'rtl'"]
@@ -2320,7 +2320,7 @@ let check_map =
       ("wq-name", check(wq_name)),
       ("x", check(x)),
       ("y", check(y)),
-      /* calc needs to be available in length */
+      /* TODO: calc needs to be available in length */
       ("extended-length", check(extended_length)),
       ("extended-frequency", check(extended_frequency)),
       ("extended-angle", check(extended_angle)),

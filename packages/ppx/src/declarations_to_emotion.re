@@ -10,10 +10,13 @@ let txt = txt => {Location.loc: Location.none, txt};
 
 let (let.ok) = Result.bind;
 
+/* TODO: Separate unsupported_feature from bs-css doesn't support or can't interpolate on those */
+/* TODO: Add payload on those exception, maybe move to Result. */
 exception Unsupported_feature;
 
 let id = Fun.id;
 
+/* Why this type contains so much when only `string_to_expr` is used? */
 type transform('ast, 'value) = {
   ast_of_string: string => result('ast, string),
   value_of_ast: 'ast => 'value,
@@ -22,10 +25,9 @@ type transform('ast, 'value) = {
   string_to_expr: string => result(list(Parsetree.expression), string),
 };
 
-
-let add_type = (expr) => {
-  let typ = Helper.Typ.constr(~loc=Location.none, {txt: Ldot(Lident("CssJs"), "rule"), loc: Location.none}, []);
-  Helper.Exp.constraint_(~loc=Location.none, expr, typ);
+let add_type = (~loc, expr) => {
+  let typ = Helper.Typ.constr(~loc, {txt: Ldot(Lident("CssJs"), "rule"), loc}, []);
+  Helper.Exp.constraint_(~loc, expr, typ);
 };
 
 let emit = (property, value_of_ast, value_to_expr) => {
@@ -138,7 +140,7 @@ let variants_to_expression =
   | `Full_width => raise(Unsupported_feature)
   | `Unset => id([%expr `unset])
   | `Padding_box => id([%expr `padding_box])
-  | `FitContent => id([%expr `fitContent])
+  | `FitContent => raise(Unsupported_feature)
   | `MaxContent => id([%expr `maxContent])
   | `MinContent => id([%expr `minContent])
   | `Full_size_kana => raise(Unsupported_feature);
@@ -278,7 +280,7 @@ let transform_with_variable = (parser, mapper, value_to_expr) =>
     | `Value(ast) => mapper(ast),
     fun
     | {pexp_desc: Pexp_ident({txt: Ldot(Lident("CssJs"), _), _}), _} as exp => value_to_expr(exp) // we dont want to add types on cases with `CssJs.red` for example
-    | {pexp_desc: Pexp_ident(_), _}  as exp => value_to_expr(exp) |> List.map(add_type)
+    | {pexp_desc: Pexp_ident(_), pexp_loc: loc, _} as exp => value_to_expr(exp) |> List.map(add_type(~loc))
     | exp => value_to_expr(exp)
   );
 
@@ -327,35 +329,36 @@ let box_sizing =
   );
 let column_width = unsupportedProperty(Parser.property_column_width);
 
-let margin_value =
+let render_margin =
   fun
   | `Auto => variants_to_expression(`Auto)
   | `Extended_length(l) => render_extended_length(l)
   | `Extended_percentage(p) => render_extended_percentage(p);
 
-let padding_value =
+let render_padding =
   fun
   | `Auto => variants_to_expression(`Auto)
   | `Extended_length(l) => render_extended_length(l)
   | `Extended_percentage(p) => render_extended_percentage(p)
+;
 
 // css-box-3
 let margin_top =
-  apply(Parser.property_margin_top, [%expr CssJs.marginTop], margin_value);
+  apply(Parser.property_margin_top, [%expr CssJs.marginTop], render_margin);
 let margin_right =
   apply(
     Parser.property_margin_right,
     [%expr CssJs.marginRight],
-    margin_value,
+    render_margin,
   );
 let margin_bottom =
   apply(
     Parser.property_margin_bottom,
     [%expr CssJs.marginBottom],
-    margin_value,
+    render_margin,
   );
 let margin_left =
-  apply(Parser.property_margin_left, [%expr CssJs.marginLeft], margin_value);
+  apply(Parser.property_margin_left, [%expr CssJs.marginLeft], render_margin);
 
 let margin =
   emit_shorthand(
@@ -386,24 +389,24 @@ let margin =
   );
 
 let padding_top =
-  apply(Parser.property_padding_top, [%expr CssJs.paddingTop], padding_value);
+  apply(Parser.property_padding_top, [%expr CssJs.paddingTop], render_padding);
 let padding_right =
   apply(
     Parser.property_padding_right,
     [%expr CssJs.paddingRight],
-    padding_value,
+    render_padding,
   );
 let padding_bottom =
   apply(
     Parser.property_padding_bottom,
     [%expr CssJs.paddingBottom],
-    padding_value,
+    render_padding,
   );
 let padding_left =
   apply(
     Parser.property_padding_left,
     [%expr CssJs.paddingLeft],
-    padding_value,
+    render_padding,
   );
 
 let padding =
@@ -761,6 +764,7 @@ let render_position = position => {
 
 let object_fit =
   variants(Parser.property_object_fit, [%expr CssJs.objectFit]);
+
 let object_position =
   apply(
     Parser.property_object_position,
@@ -803,6 +807,7 @@ let render_shadow = shadow => {
     color
     |> Option.value(~default=`Color(`CurrentColor))
     |> render_color_interp;
+
   let x = render_length_interp(x);
   let y = render_length_interp(y);
   let blur = Option.map(render_length_interp, blur);
@@ -817,11 +822,6 @@ let render_shadow = shadow => {
       inset,
     );
 
-  let id =
-    switch (shadow) {
-    | `Box(_) => id([%expr CssJs.Shadow.box])
-    };
-
   let args =
     [
       (Labelled("x"), Some(x)),
@@ -831,11 +831,11 @@ let render_shadow = shadow => {
       (Labelled("inset"), inset),
       (Nolabel, Some(color)),
     ]
-    |> List.filter_map(((label, value)) =>
-         Option.map(value => (label, value), value)
-       );
+    |> List.filter_map(
+        ((label, value)) => Option.map(value => (label, value), value)
+      );
 
-  Helper.Exp.apply(id, args);
+  Helper.Exp.apply([%expr CssJs.Shadow.box], args);
 };
 let background_color =
   apply(
@@ -844,11 +844,11 @@ let background_color =
     render_color,
   );
 
-/* and color_stop_list = [%value.rec "[ <linear-color-stop> [ ',' <linear-color-hint> ]? ]# ',' <linear-color-stop>"] */
 /* TODO: Incomplete */
-let render_stops = s => [%expr [%e s]]
+let _render_stops = s => [%expr [%e s]]
 
-let render_gradient = fun
+/* TODO: Support gradients */
+/* let render_gradient = fun
   | `Linear_gradient(angle, stops) =>
     [%expr `linearGradient([%e render_extended_angle(angle)], [%e render_stops(stops)])]
   | `Repeating_linear_gradient(angle, stops) =>
@@ -859,39 +859,42 @@ let render_gradient = fun
     [%expr `repeatingRadialGradient([%e render_stops(stops)])]
   | `conicGradient(angle, stops) =>
     [%expr `conicGradient([%e render_extended_angle(angle)], [%e render_stops(stops)])]
+; */
+
+let render_image = fun
+  /* | `Gradient(gradient) => render_gradient(gradient) */
+  | `Url(url) => [%expr `url([%e render_string(url)])]
+  | `Interpolation(v) => render_variable(v)
+  | `Image(_)
+  | `Image_set(_)
+  | `Element(_)
+  | `Paint(_)
+  | `Cross_fade(_)
+  // bs-css only accepts | BackgroundImage.t | #Url.t | #Gradient.t
+  | _ => raise(Unsupported_feature)
 ;
 
-let render_background_image = fun
-  | `Variable(v) => render_variable(v)
-  | `Value(v) => switch (v) {
-    | `Url(url) => [%expr `url([%e url])]
-    | `Gradient(gradient) => render_gradient(gradient)
-    | `None => [%expr `none]
-    | `Image(_)
-    | `Image_set(_)
-    | `Element(_)
-    | `Paint(_)
-    | `Cross_fade(_)
-    | _ => raise(Unsupported_feature); // bs-css only accepts | BackgroundImage.t | #Url.t | #Gradient.t
-  }
-  | _ => raise(Unsupported_feature);
+let render_image_or_none = fun
+  | `None => [%expr `none]
+  | `Image(i) => render_image(i);
 
 let render_repeat_style = fun
+  | `Repeat_x => [%expr `repeatX]
+  | `Repeat_y => [%expr `repeatY]
   | `Xor(values) => {
-     let render_xor = fun
+    let render_xor = fun
       | `Repeat => [%expr `repeat]
       | `Space => [%expr `space]
       | `Round => [%expr `round]
-      | `No_repeat => [%expr `noRepeat]
-      switch(values){
-        | [] => failwith("expected at least one value")
+      | `No_repeat => [%expr `noRepeat];
+
+      switch (values) {
         | [x] => [%expr [%e render_xor(x)]]
         | [x, y] => [%expr `hv([%e render_xor(x)], [%e render_xor(y)])]
+        | [] => failwith("expected at least one value")
         | _ => failwith("repeat doesn't accept more then 2 values");
       }
-  }
-  | `Repeat_x => [%expr `repeatX]
-  | `Repeat_y => [%expr `repeatY];
+  };
 
 
 let render_attachment = fun
@@ -905,7 +908,7 @@ let background_image =
     [%expr CssJs.backgroundImage],
     fun
     | [] => failwith("expected at least one value")
-    | [v] => [%expr [%e render_background_image(v)]]
+    | [i] => render_image_or_none(i)
     | _ => raise(Unsupported_feature)
   );
 
@@ -931,7 +934,6 @@ let background_attachment =
   );
 
 let render_bg_position = (bg_position) => {
-
   let render_static = fun
   | `Center => [%expr `center]
   | `Left => [%expr `center]
@@ -943,7 +945,7 @@ let render_bg_position = (bg_position) => {
 
   let render_and = fun
     | `Center => [%expr `center]
-    | `Static((a, b)) => switch(b){
+    | `Static((a, b)) => switch (b) {
       | Some(b) => [%expr `hv([%e render_static(a)], [%e render_static(b)])]
       | None => render_static(a)
     };
@@ -957,7 +959,7 @@ let render_bg_position = (bg_position) => {
   | `Right => [%expr `right]
   | `Extended_length(l) => render_extended_length(l)
   | `Extended_percentage(a) => render_extended_percentage(a)
-  | `Static((x,y)) => [%expr `hv([%e render_static(x)], [%e render_static(y)])];
+  | `Static((x, y)) => [%expr `hv([%e render_static(x)], [%e render_static(y)])];
   };
 }
 
@@ -1005,18 +1007,19 @@ let background_size =
         }
     | _ => raise(Unsupported_feature)
   );
-let render_background = ((layers, final_layer)) => {
 
-  let render_layer = (layer, fn_call, render_fn) => Option.fold(~none=[], ~some=(l => [[%expr [%e fn_call]([%e render_fn(l)])]]), layer);
+let render_background = ((layers, final_layer)) => {
+  let render_layer = (layer, fn, render) =>
+    layer |> Option.fold(~none=[], ~some=(l => [[%expr [%e fn]([%e render(l)])]]));
 
   let render_layers = ((bg_image, bg_position, repeat_style, attachment, b1, b2)) => {
     [
-      render_layer(bg_image, [%expr CssJs.background_image], render_background_image),
+      render_layer(bg_image, [%expr CssJs.backgroundImage], render_image),
       render_layer(repeat_style, [%expr CssJs.backgroundRepeat], render_repeat_style),
       render_layer(attachment, [%expr CssJs.backgroundRepeat], render_attachment),
       render_layer(b1, [%expr CssJs.clip], variants_to_expression),
       render_layer(b2, [%expr CssJs.origin], variants_to_expression),
-    ] @ switch(bg_position){
+    ] @ switch (bg_position) {
       | Some((bg_pos, Some(((), bg_size)))) => [
         [[%expr CssJs.backgroundPosition([%e render_bg_position(bg_pos)])]],
         [[%expr CssJs.backgroundSize([%e render_size(bg_size)])]],
@@ -1031,7 +1034,7 @@ let render_background = ((layers, final_layer)) => {
   let render_final_layer = ((bg_color, bg_image, bg_position, repeat_style, attachment, b1, b2)) => {
     [
       render_layer(bg_color, [%expr CssJs.backgroundColor], render_color),
-      render_layer(bg_image, [%expr CssJs.background_image], render_background_image),
+      render_layer(bg_image, [%expr CssJs.backgroundImage], render_image),
       render_layer(repeat_style, [%expr CssJs.backgroundRepeat], render_repeat_style),
       render_layer(attachment, [%expr CssJs.backgroundRepeat], render_attachment),
       render_layer(b1, [%expr CssJs.clip], variants_to_expression),
@@ -1048,13 +1051,12 @@ let render_background = ((layers, final_layer)) => {
     };
   }
 
-    let l = layers |> List.concat_map(x => x |> fst |> render_layers)
+  List.concat([
+    render_final_layer(final_layer) |> List.flatten,
+    layers |> List.concat_map(x => x |> fst |> render_layers) |> List.flatten
+  ])
+};
 
-    List.concat([
-     render_final_layer(final_layer) |> List.flatten,
-     l |> List.flatten
-    ])
-}
 let background =
   emit(
     Parser.property_background,
@@ -1068,24 +1070,28 @@ let border_top_color =
     [%expr CssJs.borderTopColor],
     render_color,
   );
+
 let border_right_color =
   apply(
     Parser.property_border_right_color,
     [%expr CssJs.borderRightColor],
     render_color,
   );
+
 let border_bottom_color =
   apply(
     Parser.property_border_bottom_color,
     [%expr CssJs.borderBottomColor],
     render_color,
   );
+
 let border_left_color =
   apply(
     Parser.property_border_left_color,
     [%expr CssJs.borderLeftColor],
     render_color,
   );
+
 let border_color =
   apply(Parser.property_border_color, [%expr CssJs.borderColor], c =>
     switch (c) {
@@ -1093,8 +1099,10 @@ let border_color =
     | _ => raise(Unsupported_feature)
     }
   );
+
 let border_top_style =
   variants(Parser.property_border_top_style, [%expr CssJs.borderTopStyle]);
+
 let border_right_style =
   variants(
     Parser.property_border_right_style,
@@ -1284,7 +1292,7 @@ let box_shadow =
       },
   );
 
-let overflow_value =
+let render_overflow =
   fun
   | `Clip => raise(Unsupported_feature)
   | rest => variants_to_expression(rest);
@@ -1292,14 +1300,16 @@ let overflow_value =
 // css-overflow-3
 // TODO: maybe implement using strings?
 let overflow_x =
-  apply(Parser.property_overflow_x, [%expr CssJs.overflowX], overflow_value);
+  apply(Parser.property_overflow_x, [%expr CssJs.overflowX], render_overflow);
+
 let overflow_y =
   variants(Parser.property_overflow_y, [%expr CssJs.overflowY]);
+
 let overflow =
   emit(
     Parser.property_overflow,
     fun
-    | `Xor(values) => values |> List.map(overflow_value)
+    | `Xor(values) => values |> List.map(render_overflow)
     | _ => raise(Unsupported_feature),
     fun
     | [all] => [[%expr CssJs.overflow([%e all])]]
@@ -1310,6 +1320,7 @@ let overflow =
       ])
     | _ => failwith("unreachable"),
   );
+
 // let overflow_clip_margin = unsupportedProperty(Parser.property_overflow_clip_margin);
 let overflow_inline = unsupportedProperty(Parser.property_overflow_inline);
 let text_overflow =
@@ -1533,9 +1544,9 @@ let transform =
     id,
     fun
     | `None => [[%expr CssJs.transform(`none)]]
-    | `Transform_list([v]) => [[%expr CssJs.transform([%e render_transform(v)])]]
+    | `Transform_list([one]) => [[%expr CssJs.transform([%e render_transform(one)])]]
     | `Transform_list(l) => [[%expr CssJs.transforms([%e List.map(render_transform, l) |> Builder.pexp_array(~loc=Location.none)])]]
-  )
+  );
 
 let transform_origin =
   unsupportedValue(
@@ -1863,7 +1874,32 @@ let display =
     | _ => raise(Unsupported_feature),
   );
 
+/* let render_mask_source = fun
+  | `Interpolation(v) => render_variable(v)
+  | `Cross_fade()
+  | `Element()
+  | `Image()
+  | `Image_set()
+  | `Paint() => raise(Unsupported_feature)
+; */
+
+let render_mask_image = fun
+  | `None => [%expr `none]
+  | `Image(i) => render_image(i)
+  | `Mask_source(_) => raise(Unsupported_feature);
+
+let mask_image =
+  apply(
+    Parser.property_mask_image,
+    [%expr CssJs.maskImage],
+    fun
+      | [one] => render_mask_image(one)
+      | []
+      | _ => raise(Unsupported_feature)
+  );
+
 let found = ({ast_of_string, string_to_expr, _}) => {
+  /* TODO: Why we have 'check_value' when we don't use it? */
   let check_value = string => {
     let.ok _ = ast_of_string(string);
     Ok();
@@ -2081,6 +2117,7 @@ let properties = [
   ("top", found(top)),
   ("right", found(right)),
   ("bottom", found(bottom)),
+  ("mask-image", found(mask_image))
 ];
 
 let render_when_unsupported_features = (property, value) => {
@@ -2100,8 +2137,7 @@ let render_when_unsupported_features = (property, value) => {
   let propertyName = property |> to_camel_case |> render_string;
   let value = value |> render_string;
 
-  %expr
-  CssJs.unsafe([%e propertyName], [%e value]);
+  [%expr CssJs.unsafe([%e propertyName], [%e value])];
 };
 
 let findProperty = name => {

@@ -141,18 +141,18 @@ describe("Data monad", ({test, _}) => {
     };
   });
 
-  // test("all with multiple errors", _ => {
-  //   let rule4 = return(Ok(4));
-  //   let rule5 = return(Ok(5));
-  //   let rule_err = return(Error(["Missing COMMA"]));
-  //   let rule_err2 = return(Error(["Unexpected token"]));
-  //   let rule_err3 = return(Error(["Unclosed string"]));
-  //   let rule = Match.all([rule_err3, rule4,rule_err2, rule5, rule_err3]);
-  //   switch (rule([COMMA])) {
-  //     | (Error(["Missing COMMA"]), [COMMA]) => ()
-  //     | _ => failwith("should be (Error(Missing Comma), [COMMA])")
-  //   }
-  // });
+  test("all with multiple errors", _ => {
+    let rule4 = return(Ok(4));
+    let rule5 = return(Ok(5));
+    let rule_err = return(Error(["Missing COMMA"]));
+    let rule_err2 = return(Error(["Unexpected token"]));
+    let rule_err3 = return(Error(["Unclosed string"]));
+    let rule = Match.all([rule_err, rule4,rule_err2, rule5, rule_err3]);
+    switch (rule([COMMA])) {
+      | (Error(["Missing COMMA"]), [COMMA]) => ()
+      | _ => failwith("should be (Error(Missing Comma), [COMMA])")
+    }
+  });
 
   test("bind_shortest", _ => {
     let comma =

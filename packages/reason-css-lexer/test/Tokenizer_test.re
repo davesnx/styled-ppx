@@ -107,6 +107,8 @@ describe("Tokenizer", ({test, _}) => {
     ({|calc(10%)|}, [FUNCTION("calc"), PERCENTAGE(10.), RIGHT_PARENS], 9),
     ({|$(Module.variable)|}, [DELIM("$"), LEFT_PARENS, IDENT("Module"), DELIM("."), IDENT("variable"), RIGHT_PARENS], 18),
     ({|$(Module.variable')|}, [DELIM("$"), LEFT_PARENS, IDENT("Module"), DELIM("."), IDENT("variable'"), RIGHT_PARENS], 19),
+    /* ({|\32|}, [IDENT("--color-main")], 3), */
+    /* ({|\25BA|}, [IDENT("--color-main")], 4), */
   ];
 
   success_tests_data

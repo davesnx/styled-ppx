@@ -13,8 +13,8 @@
   },
   "dependencies": {
     "@rescript/react": "^0.10.2",
-    "bs-css": "15",
-    "bs-css-emotion": "4",
+    "bs-css": "15.3.0",
+    "bs-css-emotion": "4.3.0",
     "concurrently": "^5.3.0",
     "esbuild": "^0.9.2",
     "live-server": "^1.2.1",

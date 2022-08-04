@@ -16,6 +16,9 @@ exception ParseError((Parser.token, Lexing.position, Lexing.position));
 /** Signals a grammar error at the provided location. */
 exception GrammarError((string, Location.t));
 
+let unreachable = () =>
+  failwith("This match case is unreachable. sedlex needs a last case as wildcard _. If this error appears, means that there's a bug in the lexer.");
+
 let position_to_string = pos =>
   Printf.sprintf(
     "[%d,%d+%d]",
@@ -469,7 +472,7 @@ module Tokenizer = {
         ? Error((Uchar.rep, Invalid_code_point)) : Ok(char);
     | eof => Error((Uchar.rep, Eof))
     | any => Ok(lexeme(buf))
-    | _ => failwith("unrecheable")
+    | _ => unreachable()
     };
   };
 
@@ -482,7 +485,7 @@ module Tokenizer = {
       let _ = consume_escaped(buf);
       consume_remnants_bad_url(buf);
     | any => consume_remnants_bad_url(buf)
-    | _ => failwith("grr unreachable")
+    | _ => unreachable()
   };
 
   // https://drafts.csswg.org/css-syntax-3/#consume-url-token
@@ -516,7 +519,7 @@ module Tokenizer = {
         | Error((_, error)) => Error((BAD_URL, error))
         }
       | any => read(acc ++ lexeme(buf))
-      | _ => failwith("please, unreachable")
+      | _ => unreachable()
       };
     };
     read(lexeme(buf));
@@ -564,8 +567,7 @@ module Tokenizer = {
         | "url" => read_url(string)
         | _ => Ok(Parser.FUNCTION(string))
       }
-    | _ =>
-      is_tag(string) ? Ok(Parser.TAG(string)) : Ok(Parser.IDENT(string))
+    | _ => is_tag(string) ? Ok(Parser.TAG(string)) : Ok(Parser.IDENT(string))
     };
   };
 };
@@ -682,10 +684,13 @@ let queue_next_tokens_with_location = (buf) => {
   (token, loc_start, loc_end);
 }
 
-let parse = (ws, buf, parser) => {
-  skip_whitespace.contents = ws;
+type parser('token, 'ast) = MenhirLib.Convert.traditional('token, 'ast);
+
+let parse = (skip_whitespaces, buf, parser) => {
+  skip_whitespace.contents = skip_whitespaces;
 
   let last_token = ref((Parser.EOF, Lexing.dummy_pos, Lexing.dummy_pos));
+
   let next_token = () => {
     last_token := queue_next_tokens_with_location(buf);
     last_token^;
@@ -705,14 +710,14 @@ let parse_string = (~skip_whitespace, ~container_lnum=?, ~pos=?, parser, string)
   parse(skip_whitespace, Sedlexing.of_ascii_string(~pos?, string), parser);
 };
 
-let parse_declaration_list = (~container_lnum=?, ~pos=?, css) =>
-  parse_string(~skip_whitespace=true, ~container_lnum?, ~pos?, Parser.declaration_list, css);
+let parse_declaration_list = (~container_lnum=?, ~pos=?, input: string) =>
+  parse_string(~skip_whitespace=true, ~container_lnum?, ~pos?, Parser.declaration_list, input);
 
-let parse_declaration = (~container_lnum=?, ~pos=?, css) =>
-  parse_string(~skip_whitespace=true, ~container_lnum?, ~pos?, Parser.declaration, css);
+let parse_declaration = (~container_lnum=?, ~pos=?, input: string) =>
+  parse_string(~skip_whitespace=true, ~container_lnum?, ~pos?, Parser.declaration, input);
 
-let parse_stylesheet = (~container_lnum=?, ~pos=?, css) =>
-  parse_string(~skip_whitespace=false, ~container_lnum?, ~pos?, Parser.stylesheet, css);
+let parse_stylesheet = (~container_lnum=?, ~pos=?, input: string) =>
+  parse_string(~skip_whitespace=false, ~container_lnum?, ~pos?, Parser.stylesheet, input);
 
-let parse_keyframes = (~container_lnum=?, ~pos=?, css) =>
-  parse_string(~skip_whitespace=false, ~container_lnum?, ~pos?, Parser.keyframes, css);
+let parse_keyframes = (~container_lnum=?, ~pos=?, input: string) =>
+  parse_string(~skip_whitespace=false, ~container_lnum?, ~pos?, Parser.keyframes, input);

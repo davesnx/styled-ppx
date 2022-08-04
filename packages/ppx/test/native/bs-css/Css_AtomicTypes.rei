@@ -155,6 +155,15 @@ module Position: {
   let toString: t => string;
 };
 
+/**
+ https://developer.mozilla.org/docs/Web/CSS/isolation
+ */
+module Isolation: {
+  type t = [ | `auto | `isolate];
+
+  let toString: t => string;
+};
+
 module Resize: {
   type t = [ | `none | `both | `horizontal | `vertical | `block | `inline];
 
@@ -237,14 +246,41 @@ module GridAutoFlow: {
   let toString: t => string;
 };
 
-module RowGap: {
+module Gap: {
   type t = [ | `normal];
 
   let toString: t => string;
 };
 
-module ColumnGap: {
-  type t = [ | `normal];
+module RowGap = Gap;
+module ColumnGap = Gap;
+
+module ScrollBehavior: {
+  type t = [ | `auto | `smooth];
+
+  let toString: t => string;
+};
+
+module OverscrollBehavior: {
+  type t = [ | `auto | `contain | `none];
+
+  let toString: t => string;
+};
+
+module OverflowAnchor: {
+  type t = [ | `auto | `none];
+
+  let toString: t => string;
+};
+
+module ColumnWidth: {
+  type t = [ | `auto];
+
+  let toString: t => string;
+};
+
+module CaretColor: {
+  type t = [ | `auto];
 
   let toString: t => string;
 };
@@ -715,7 +751,7 @@ module OverflowAlignment: {
  https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Alignment#Baseline_alignment
  */
 module BaselineAlignment: {
-  type t = [ | `baseline | `firstBaseline | `lastBaseline ];
+  type t = [ | `baseline | `firstBaseline | `lastBaseline];
 
   let toString: t => string;
 };
@@ -751,7 +787,7 @@ module LegacyAlignment: {
  https://developer.mozilla.org/docs/Web/CSS/text-align
  */
 module TextAlign: {
-  type t = [ | `left | `right | `center | `justify];
+  type t = [ | `start | `left | `right | `center | `justify];
 
   let toString: t => string;
 };
@@ -1002,6 +1038,27 @@ module BackgroundPosition: {
 };
 
 /**
+ https://developer.mozilla.org/en-US/docs/Web/CSS/mask-position
+ */
+module MaskPosition: {
+  module X: {
+    type t = [ | `left | `right | `center];
+
+    let toString: t => string;
+  };
+
+  module Y: {
+    type t = [ | `top | `bottom | `center];
+
+    let toString: t => string;
+  };
+
+  type t = [ X.t | Y.t];
+
+  let toString: t => string;
+};
+
+/**
  https://developer.mozilla.org/docs/Web/CSS/background-origin
  */
 module BackgroundRepeat: {
@@ -1044,7 +1101,7 @@ module TextDecorationStyle: {
  https://developer.mozilla.org/docs/Web/CSS/width
  */
 module Width: {
-  type t = [ | `auto | `fitContent];
+  type t = [ | `auto | `fitContent | `maxContent | `minContent];
 
   let toString: t => string;
 };
@@ -1090,21 +1147,45 @@ module OverflowWrap: {
  */
 module Gradient: {
   type t('colorOrVar) = [
-    | `linearGradient(Angle.t, list((Length.t, [< Color.t | Var.t] as 'colorOrVar)))
-    | `repeatingLinearGradient(Angle.t, list((Length.t, [< Color.t | Var.t] as 'colorOrVar)))
-    | `radialGradient(list((Length.t, [< Color.t | Var.t] as 'colorOrVar)))
-    | `repeatingRadialGradient(list((Length.t, [< Color.t | Var.t] as 'colorOrVar)))
+    | `linearGradient(
+        Angle.t,
+        array((Length.t, [< Color.t | Var.t] as 'colorOrVar)),
+      )
+    | `repeatingLinearGradient(
+        Angle.t,
+        array((Length.t, [< Color.t | Var.t] as 'colorOrVar)),
+      )
+    | `radialGradient(array((Length.t, [< Color.t | Var.t] as 'colorOrVar)))
+    | `repeatingRadialGradient(
+        array((Length.t, [< Color.t | Var.t] as 'colorOrVar)),
+      )
+    | `conicGradient(
+        Angle.t,
+        array((Length.t, [< Color.t | Var.t] as 'colorOrVar)),
+      )
   ];
 
   /** Linear gradients transition colors progressively along an imaginary line. */
-  let linearGradient: (Angle.t, list((Length.t, [< Color.t | Var.t] as 'colorOrVar))) => [> t('colorOrVar)];
+  let linearGradient:
+    (Angle.t, array((Length.t, [< Color.t | Var.t] as 'colorOrVar))) =>
+    [> t('colorOrVar)];
   /** Radial gradients transition colors progressively from a center point (origin). */
-  let radialGradient: list((Length.t, [< Color.t | Var.t] as 'colorOrVar)) => [> t('colorOrVar)];
+  let radialGradient:
+    array((Length.t, [< Color.t | Var.t] as 'colorOrVar)) =>
+    [> t('colorOrVar)];
 
   /** Repeating gradients duplicate a gradient as much as necessary to fill a given area (linearGradient function). */
-  let repeatingLinearGradient: (Angle.t, list((Length.t, [< Color.t | Var.t] as 'colorOrVar))) => [> t('colorOrVar)];
+  let repeatingLinearGradient:
+    (Angle.t, array((Length.t, [< Color.t | Var.t] as 'colorOrVar))) =>
+    [> t('colorOrVar)];
   /** Repeating gradients duplicate a gradient as much as necessary to fill a given area (radialGradient function). */
-  let repeatingRadialGradient: list((Length.t, [< Color.t | Var.t] as 'colorOrVar)) => [> t('colorOrVar)];
+  let repeatingRadialGradient:
+    array((Length.t, [< Color.t | Var.t] as 'colorOrVar)) =>
+    [> t('colorOrVar)];
+  /** Conic gradients transition colors rotated around a center point */
+  let conicGradient:
+    (Angle.t, array((Length.t, [< Color.t | Var.t] as 'colorOrVar))) =>
+    [> t('colorOrVar)];
 
   let toString: t([< Color.t | Var.t]) => string;
 };
@@ -1113,6 +1194,15 @@ module Gradient: {
  https://developer.mozilla.org/docs/Web/CSS/background-image
  */
 module BackgroundImage: {
+  type t = [ | `none];
+
+  let toString: t => string;
+};
+
+/**
+ https://developer.mozilla.org/en-US/docs/Web/CSS/mask-image
+ */
+module MaskImage: {
   type t = [ | `none];
 
   let toString: t => string;
@@ -1322,4 +1412,24 @@ module SVG: {
 
     let toString: t => string;
   };
+};
+
+/**
+ * https://developer.mozilla.org/en-US/docs/Web/CSS/touch-action
+ */
+module TouchAction: {
+  type t = [
+    | `auto
+    | `none
+    | `panX
+    | `panY
+    | `panLeft
+    | `panRight
+    | `panUp
+    | `panDown
+    | `pinchZoom
+    | `manipulation
+  ];
+
+  let toString: t => string;
 };

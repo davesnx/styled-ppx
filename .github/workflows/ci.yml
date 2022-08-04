@@ -74,10 +74,16 @@ jobs:
         run: esy test_css_lexer
 
       - name: Test CSS Parser
-        run: esy test_css_parser
+        run: esy test_parser
+
+      - name: Test CSS Parser
+        run: esy test_reason_css_parser_test
 
       - name: Test CSS Spec Parser
         run: esy test_css_spec_parser
+
+      - name: Test string interpolation
+        run: esy dune runtest
 
       - name: Export dependencies
         if: steps.deps-cache.outputs.cache-hit != 'true'
