@@ -86,7 +86,7 @@ let styles = (~loc, ~name, ~expr) => {
 /* let styles = (~arg1, ~arg2) => Emotion.(css(exp)) */
 let dynamicStyles = (~loc, ~name, ~args, ~expr) => {
   let variableName = Helper.Pat.mk(~loc, Ppat_var(withLoc(name, ~loc)));
-  let ppatAnyArg = (
+  let ppatUnitArg = (
     Nolabel,
     None,
     Builder.ppat_any(~loc),
@@ -95,7 +95,7 @@ let dynamicStyles = (~loc, ~name, ~args, ~expr) => {
     None,
   );
   /* Last argument needs to be ignored, since it's a unit to remove the warning of optional labelled arguments */
-  let argsWithLastAny = [ppatAnyArg, ...args];
+  let argsWithLastUnit = [ppatUnitArg, ...args];
 
   Helper.Str.mk(
     ~loc,
@@ -105,7 +105,7 @@ let dynamicStyles = (~loc, ~name, ~args, ~expr) => {
         Helper.Vb.mk(
           ~loc,
           variableName,
-          fnWithLabeledArgs(argsWithLastAny, expr),
+          fnWithLabeledArgs(argsWithLastUnit, expr),
         ),
       ],
     ),
@@ -258,16 +258,19 @@ let className = (~loc, expr) =>
 
 /* deleteInnerRef(. newProps, "innerRef") |> ignore; */
 let deleteProp = (~loc, key) => {
-  Helper.Exp.apply(
+  applyIgnore(
     ~loc,
-    Helper.Exp.ident(~loc, withLoc(Lident("deleteProp"), ~loc)),
-    [
-      (Nolabel, Helper.Exp.ident(~loc, withLoc(Lident("newProps"), ~loc))),
-      (Nolabel, Helper.Exp.constant(~loc, Pconst_string(key, loc, None))),
-    ],
-  )
-  |> applyIgnore(~loc);
+    Helper.Exp.apply(
+      ~loc,
+      Helper.Exp.ident(~loc, withLoc(Lident("deleteProp"), ~loc)),
+      [
+        (Nolabel, Helper.Exp.ident(~loc, withLoc(Lident("newProps"), ~loc))),
+        (Nolabel, Helper.Exp.constant(~loc, Pconst_string(key, loc, None))),
+      ],
+    )
+  );
 };
+
 let generateSequence = (~loc, fns) => {
   let rec generate = (~loc, fns) => {
     switch (fns) {
@@ -336,7 +339,7 @@ let makeFn = (~loc, ~htmlTag, ~styledExpr, ~makePropTypes, ~variableNames) => {
   );
 };
 
-/* [@react.component] + makeFn */
+/* makeFn */
 let component =
     (~loc, ~htmlTag, ~styledExpr, ~makePropTypes, ~labeledArguments) => {
   let variableNames =
@@ -541,13 +544,12 @@ let defineAssign2 = (~loc) => {
   });
 };
 
-/* let getOrEmpty = str => {
-       switch (str) {
-         | Some(str) => " " ++ str
-         | None => ""
-       }
-     };
-   */
-let defineGetOrEmptyFn = (~loc) => {
-  [%stri let getOrEmpty = str => { switch (str) { | Some(str) => " " ++ str | None => "" } }; ]
-};
+let defineGetOrEmptyFn = (~loc) =>
+  [%stri
+    let getOrEmpty = str => {
+      switch (str) {
+        | Some(str) => " " ++ str
+        | None => ""
+      }
+    };
+  ];
