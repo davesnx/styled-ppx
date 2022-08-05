@@ -155,8 +155,8 @@ and render_declaration = (d: Declaration.t): list(Parsetree.expression) => {
   /* String.trim is a hack, location should be correct and not contain any whitespace */
   let value_source = source_code_of_loc(loc) |> String.trim;
 
-  switch (Declarations_to_emotion.parse_declarations(property, value_source)) {
-  | Ok(exprs) => [%expr [%e exprs]]
+  switch (Declarations_to_emotion.parse_declarations(~loc=name_loc, property, value_source)) {
+  | Ok(exprs) => exprs
   | Error(`Not_found) => grammar_error(name_loc, "Unknown property '" ++ property ++ "'")
   | Error(`Invalid_value(value)) =>
     grammar_error(
