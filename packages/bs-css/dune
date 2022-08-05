@@ -2,8 +2,8 @@
  (name MockBsCss)
  (public_name bs-css)
  (modules_without_implementation
-  js
-  css_AtomicTypes
-  css_Core
-  css_Js_Core
+  Js
+  Css_AtomicTypes
+  Css_Core
+  Css_Js_Core
   Css_Colors))
