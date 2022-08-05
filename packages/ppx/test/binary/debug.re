@@ -1,4 +1,5 @@
+let colorazo = CssJs.red;
+
 let className = [%cx "
-  display: block;
   color: $(colorazo);
 "];

@@ -231,7 +231,7 @@ let renderStyledDynamic =
     /* styled.div () => "string" */
     | Pexp_constant(Pconst_string(str, loc, _label)) =>
       parsePayloadStyle(str, loc)
-      |> Css_to_emotion.render_declarations
+      |> Css_to_emotion.render_declarations(~bigloc=loc)
       |> Css_to_emotion.addLabel(~loc, moduleName)
       |> Builder.pexp_array(~loc)
       |> Css_to_emotion.render_style_call
@@ -364,7 +364,7 @@ let extensions = [
     switch (payload) {
     | `String({loc, txt}, _delim) =>
       parsePayloadStyle(txt, loc)
-      |> Css_to_emotion.render_declarations
+      |> Css_to_emotion.render_declarations(~bigloc=loc)
       |> Builder.pexp_array(~loc)
       |> Css_to_emotion.render_style_call
     | `Array(arr) =>
@@ -383,7 +383,7 @@ let extensions = [
           ~pos=loc_start,
           payload.txt,
         )
-        |> Css_to_emotion.render_declaration;
+        |> Css_to_emotion.render_declaration(~bigloc=payload.loc);
       /* TODO: Instead of getting the first element,
           fail when there's more than one declaration or
          make a mechanism to flatten all the properties */
@@ -543,7 +543,7 @@ module Mapper = {
       let htmlTag = getHtmlTagUnsafe(~loc=extensionLoc, extensionName);
       let styles =
         parsePayloadStyle(str, stringLoc)
-        |> Css_to_emotion.render_declarations
+        |> Css_to_emotion.render_declarations(~bigloc=stringLoc)
         |> Css_to_emotion.addLabel(~loc=stringLoc, moduleName)
         |> Builder.pexp_array(~loc=stringLoc)
         |> Css_to_emotion.render_style_call;
@@ -679,7 +679,7 @@ module Mapper = {
       ) =>
       let expr =
         parsePayloadStyle(styles, loc)
-        |> Css_to_emotion.render_declarations
+        |> Css_to_emotion.render_declarations(~bigloc=loc)
         |> Css_to_emotion.addLabel(~loc, valueName)
         |> Builder.pexp_array(~loc=payloadLoc)
         |> Css_to_emotion.render_style_call;

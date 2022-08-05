@@ -13,7 +13,7 @@
    (with-stdout-to
     %{targets}
     (run refmt --parse re --print ml %{input}))
-   (run ./%{pp} --impl %{targets} -o %{targets})
+   (run ./%{pp} -dparsetree --impl %{targets} -o %{targets})
    (run refmt --parse ml --print re --in-place %{targets}))))
 
 (rule

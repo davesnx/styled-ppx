@@ -72,6 +72,16 @@ let tests = [
     "calc(100% - 25px)",
     ((ext_pct(100.), []), [(`Dash(), (len(`Px(25.)), []))]),
   ),
+  test(
+    Standard.interpolation,
+    "$(cosis)",
+    (["cosis"]),
+  ),
+  test(
+    Standard.interpolation,
+    "$(px1)",
+    (["px1"]),
+  ),
 ];
 
 describe("Parser", ({test, _}) =>

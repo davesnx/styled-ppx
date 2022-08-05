@@ -68,7 +68,8 @@ module Component = [%styled.div {j|
 |j}
 ];
 
-let stilos = [%cx "box-shadow: inset 10px 10px 0 0 #ff0000, 10px 10px 0 0 #ff0000"];
+let px1 = CssJs.pxFloat(1.);
+let stilos = [%cx "color: $(px1)"];
 
 let styles = CssJs.style(. [|
   CssJs.label("ComponentName"),

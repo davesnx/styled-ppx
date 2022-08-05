@@ -6,6 +6,22 @@ module Builder = Ppxlib.Ast_builder.Default;
 
 let txt = (~loc, txt) => {Location.loc: loc, txt};
 
+let position_to_string = pos =>
+  Printf.sprintf(
+    "[%d,%d+%d]",
+    pos.Lexing.pos_lnum,
+    pos.Lexing.pos_bol,
+    pos.Lexing.pos_cnum - pos.Lexing.pos_bol,
+  );
+
+let location_to_string = loc =>
+  Printf.sprintf(
+    "%s..%s",
+    position_to_string(loc.Location.loc_start),
+    position_to_string(loc.Location.loc_end),
+  );
+
+
 let (let.ok) = Result.bind;
 
 /* TODO: Separate unsupported_feature from bs-css doesn't support or can't interpolate on those */
@@ -23,11 +39,12 @@ type transform('ast, 'value) = {
   string_to_expr: (~loc: Location.t, string) => result(list(Parsetree.expression), string),
 };
 
-let add_type = (~loc, expr) => {
+let add_CssJs_rule_constraint = (~loc, expr) => {
   let typ = Helper.Typ.constr(~loc, {txt: Ldot(Lident("CssJs"), "rule"), loc}, []);
   Helper.Exp.constraint_(~loc, expr, typ);
 };
 
+/* TODO: emit is better to keep value_of_ast and value_to_expr in the same fn */
 let emit = (property, value_of_ast, value_to_expr) => {
   let ast_of_string = Parser.parse(property);
   let ast_to_expr = (~loc, ast) => value_of_ast(~loc, ast) |> value_to_expr(~loc);
@@ -66,9 +83,9 @@ let render_css_global_values = (~loc, name, value) => {
 
   let value =
     switch (value) {
-    | `Inherit => [%expr "inherit"]
-    | `Initial => [%expr "initial"]
-    | `Unset => [%expr "unset"]
+    | `Inherit => render_string(~loc, "inherit")
+    | `Initial => render_string(~loc, "initial")
+    | `Unset => render_string(~loc, "unset")
     };
 
   /* bs-css doesn't have those */
@@ -147,7 +164,7 @@ let variants_to_expression =
 let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
 
 let render_variable = (~loc, name) =>
-  list_to_longident(name) |> txt(~loc) |> Helper.Exp.ident;
+  list_to_longident(name) |> txt(~loc) |> Helper.Exp.ident(~loc);
 
 // TODO: all of them could be float, but bs-css doesn't support it
 let render_length =
@@ -265,8 +282,11 @@ let render_extended_angle = (~loc) => fun
   | `Interpolation(i) => render_variable(~loc, i)
 ;
 
+
 let transform_with_variable = (parser, mapper, value_to_expr) =>
   emit(
+    /* This Xor is defined here for those properties that aren't specifically
+      added <interpolation> as a valid variant */
     Combinator.combine_xor([
       /* If the entire CSS value is interpolated, we treat it as a `Variable */
       Rule.Match.map(Standard.interpolation, data => `Variable(data)),
@@ -274,38 +294,49 @@ let transform_with_variable = (parser, mapper, value_to_expr) =>
       Rule.Match.map(parser, data => `Value(data)),
     ]),
     (~loc) => fun
-    | `Variable(name) => render_variable(~loc, name)
-    | `Value(ast) => mapper(~loc, ast),
+    | `Variable(name) => {
+      print_endline("Variable Location " ++ location_to_string(loc));
+      render_variable(~loc, name)
+    }
+    | `Value(ast) => {
+      print_endline("Transform with Value Location " ++ location_to_string(loc));
+      mapper(~loc, ast)
+    },
     (~loc, expression) => {
+      print_endline("Transform with variable Location " ++ location_to_string(loc));
       switch (expression) {
         // Since we are treating with expressions here, we don't have any other way to detect if it's interpolation or not. We want to add type constraints on interpolation only.
         | {pexp_desc: Pexp_ident({txt: Ldot(Lident("CssJs"), _), _}), _} as exp =>
           value_to_expr(~loc, exp)
         | {pexp_desc: Pexp_ident(_), pexp_loc: _, _} as exp =>
-          value_to_expr(~loc, exp) |> List.map(add_type(~loc))
+          value_to_expr(~loc, exp) |> List.map(add_CssJs_rule_constraint(~loc))
         | exp => value_to_expr(~loc, exp)
       }
     }
   );
 
-let apply = (parser, id, map) =>
-  transform_with_variable(parser, map, (~loc, arg) => [[%expr [%e id(~loc)]([%e arg])]]);
-
-let unsupportedValue = (parser, call) =>
+let apply = (parser, property_renderer, value_renderer) =>
   transform_with_variable(
     parser,
-    (~loc as _, _) => raise(Unsupported_feature),
-    (~loc, arg) => [[%expr [%e call(~loc)]([%e arg])]],
+    value_renderer,
+    (~loc, value) => {
+      print_endline("Apply location " ++ location_to_string(loc));
+      [[%expr [%e property_renderer(~loc)]([%e value])]]
+    }
   );
 
-let unsupportedProperty = (~call=?, parser) =>
+let unsupportedValue = (parser, property) =>
   transform_with_variable(
     parser,
     (~loc as _, _) => raise(Unsupported_feature),
-    (~loc) =>
-      call
-      |> Option.map((call, arg) => [[%expr [%e call]([%e arg])]])
-      |> Option.value(~default=_ => raise(Unsupported_feature)),
+    (~loc, arg) => [[%expr [%e property(~loc)]([%e arg])]],
+  );
+
+let unsupportedProperty = (parser) =>
+  transform_with_variable(
+    parser,
+    (~loc as _, _) => raise(Unsupported_feature),
+    (~loc as _) => raise(Unsupported_feature),
   );
 
 let variants = (parser, identifier) =>
@@ -678,7 +709,10 @@ let render_var = (~loc, string) => {
 
 let render_color =
   (~loc) => fun
-  | `Interpolation(v) => render_variable(~loc, v)
+  | `Interpolation(v) => {
+      // print_endline("Location: " ++ location_to_string(loc) ++ ". " ++ String.concat(".", v) ++ "");
+      render_variable(~loc, v)
+    }
   | `Hex_color(hex) => id([%expr `hex([%e render_string(~loc, hex)])])
   | `Named_color(color) => render_named_color(~loc, color)
   | `CurrentColor => id([%expr `currentColor])
@@ -821,7 +855,8 @@ let render_shadow = (~loc, shadow) => {
     Option.map(
       () =>
         Helper.Exp.construct(
-          {txt: Lident("true"), loc: Location.none},
+          ~loc,
+          {txt: Lident("true"), loc},
           None,
         ),
       inset,
@@ -840,7 +875,7 @@ let render_shadow = (~loc, shadow) => {
         ((label, value)) => Option.map(value => (label, value), value)
       );
 
-  Helper.Exp.apply([%expr CssJs.Shadow.box], args);
+  Helper.Exp.apply(~loc, [%expr CssJs.Shadow.box], args);
 };
 let background_color =
   apply(
@@ -918,23 +953,23 @@ let background_image =
   );
 
 let background_repeat =
-  emit(
+  apply(
     Parser.property_background_repeat,
-    (~loc as _) => id,
+    (~loc) => [%expr CssJs.backgroundRepeat],
     (~loc) => fun
     | [] => failwith("expected at least one value")
-    | [`Repeat_x] => [[%expr CssJs.backgroundRepeat([`repeatX])]]
-    | [`Repeat_y] =>[[%expr CssJs.backgroundRepeat(`repeatY)]]
-    | [`Xor(_) as v] => [[%expr CssJs.backgroundRepeat([%e render_repeat_style(~loc, v)])]]
+    | [`Repeat_x] => [%expr `repeatX]
+    | [`Repeat_y] => [%expr `repeatY]
+    | [`Xor(_) as v] => render_repeat_style(~loc, v)
     | _ => raise(Unsupported_feature)
   );
 let background_attachment =
-  emit(
+  apply(
     Parser.property_background_attachment,
-    (~loc as _) => id,
+    (~loc) => [%expr CssJs.backgroundAttachment],
     (~loc) => fun
     | [] => failwith("expected at least one argument")
-    | [v] => [[%expr CssJs.backgroundAttachment([%e render_attachment(~loc, v)])]]
+    | [v] => render_attachment(~loc, v)
     | _ => raise(Unsupported_feature)
   );
 
@@ -1184,21 +1219,20 @@ let direction_to_border = (~loc) => fun
   | Top => [%expr CssJs.borderTop];
 
 let direction_to_fn_name = (~loc) => fun
-  | All => [%expr "border"]
-  | Left => [%expr "borderLeft"]
-  | Bottom => [%expr "borderBottom"]
-  | Right => [%expr "borderRight"]
-  | Top => [%expr "borderTop"];
+  | All => [%expr {js|border|js}]
+  | Left => [%expr {js|borderLeft|js}]
+  | Bottom => [%expr {js|borderBottom|js}]
+  | Right => [%expr {js|borderRight|js}]
+  | Top => [%expr {js|borderTop|js}];
 
 let render_border = (~loc, ~direction: borderDirection, border) => {
   switch (border) {
   | `None =>
     let borderFn = direction_to_fn_name(~loc, direction);
-    [[%expr CssJs.unsafe([%e borderFn], "none")]];
-  | `Xor(`Interpolation(name)) => {
-      let borderFn = direction_to_border(~loc, direction);
-      [[%expr [%e borderFn]([%e render_variable(~loc, name)])]]
-  }
+    [[%expr CssJs.unsafe([%e borderFn], {js|none|js})]];
+  | `Xor(`Interpolation(name)) =>
+    let borderFn = direction_to_border(~loc, direction);
+    [[%expr [%e borderFn]([%e render_variable(~loc, name)])]]
   /* bs-css doesn't support border: 1px; */
   | `Xor(_) => raise(Unsupported_feature)
   /* bs-css doesn't support border: 1px solid; */
@@ -1224,7 +1258,7 @@ let render_outline_style_interp = (~loc) => fun
 ;
 
 let render_outline = (~loc) => fun
-  | `None => [[%expr CssJs.unsafe("outline", "none")]]
+  | `None => [[%expr CssJs.unsafe({js|outline|js}, {js|none|js})]]
   | `Property_outline_width(`Interpolation(name)) =>
     [[%expr CssJs.outline([%e render_variable(~loc, name)])]]
   /* bs-css doesn't support outline: 1px; */
@@ -1364,11 +1398,7 @@ let overflow =
     | _ => raise(Unsupported_feature),
     (~loc) => fun
     | [all] => [[%expr CssJs.overflow([%e all])]]
-    | [x, y] =>
-      List.concat([
-        overflow_x.value_to_expr(~loc, x),
-        overflow_y.value_to_expr(~loc, y),
-      ])
+    | [_x, _y] => raise(Unsupported_feature)
     | _ => failwith("unreachable"),
   );
 
@@ -1601,7 +1631,10 @@ let transform =
     (~loc) => fun
     | `None => [[%expr CssJs.transform(`none)]]
     | `Transform_list([one]) => [[%expr CssJs.transform([%e render_transform(~loc, one)])]]
-    | `Transform_list(l) => [[%expr CssJs.transforms([%e List.map(render_transform(~loc), l) |> Builder.pexp_array(~loc=Location.none)])]]
+    | `Transform_list(list) => {
+      let transforms = List.map(render_transform(~loc), list) |> Builder.pexp_array(~loc=Location.none);
+      [[%expr CssJs.transforms([%e transforms])]];
+    }
   );
 
 let transform_origin =
@@ -1705,7 +1738,6 @@ let animation =
   unsupportedValue(Parser.property_animation, (~loc) => [%expr CssJs.animation]);
 
 // css-flexbox-1
-// using id() because refmt
 let flex_direction =
   variants(Parser.property_flex_direction, (~loc) => [%expr CssJs.flexDirection]);
 let flex_wrap = variants(Parser.property_flex_wrap, (~loc) => [%expr CssJs.flexWrap]);
@@ -1882,63 +1914,55 @@ let bottom =
     render_position_value,
   );
 
+let render_display = (~loc) =>
+  fun
+  | `Block => [%expr `block]
+  | `Contents => [%expr `contents]
+  | `Flex => [%expr `flex]
+  | `Grid => [%expr `grid]
+  | `Inline => [%expr `inline]
+  | `Inline_block => [%expr `inlineBlock]
+  | `Inline_flex => [%expr `inlineFlex]
+  | `Inline_grid => [%expr `inlineGrid]
+  | `Inline_list_item => [%expr `inlineListItem]
+  | `Inline_table => [%expr `inlineTable]
+  | `List_item => [%expr `listItem]
+  | `None => [%expr `none]
+  | `Table => [%expr `table]
+  | `Table_caption => [%expr `tableCaption]
+  | `Table_cell => [%expr `tableCell]
+  | `Table_column => [%expr `tableColumn]
+  | `Table_column_group => [%expr `tableColumnGroup]
+  | `Table_footer_group => [%expr `tableFooterGroup]
+  | `Table_header_group => [%expr `tableHeaderGroup]
+  | `Table_row => [%expr `tableRow]
+  | `Table_row_group => [%expr `tableRowGroup]
+  | `Flow
+  | `Flow_root
+  | `Ruby
+  | `Ruby_base
+  | `Ruby_base_container
+  | `Ruby_text
+  | `Ruby_text_container
+  | `Run_in
+  | `_moz_box
+  | `_moz_inline_box
+  | `_moz_inline_stack
+  | `_ms_flexbox
+  | `_ms_grid
+  | `_ms_inline_flexbox
+  | `_ms_inline_grid
+  | `_webkit_box
+  | `_webkit_flex
+  | `_webkit_inline_box
+  | `_webkit_inline_flex
+  | _ => raise(Unsupported_feature);
+
 let display =
-  emit(
+  apply(
     Parser.property_display,
-    (~loc as _) => id,
-    (~loc, value) => {
-      let valon = switch (value) {
-        | `Interpolation(name) => {
-          let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
-          let txt = txt => {Location.loc: loc, txt};
-          list_to_longident(name) |> txt |> Helper.Exp.ident;
-        }
-        | `Block => [%expr `block]
-        | `Contents => [%expr `contents]
-        | `Flex => [%expr `flex]
-        | `Grid => [%expr `grid]
-        | `Inline => [%expr `inline]
-        | `Inline_block => [%expr `inlineBlock]
-        | `Inline_flex => [%expr `inlineFlex]
-        | `Inline_grid => [%expr `inlineGrid]
-        | `Inline_list_item => [%expr `inlineListItem]
-        | `Inline_table => [%expr `inlineTable]
-        | `List_item => [%expr `listItem]
-        | `None => [%expr `none]
-        | `Table => [%expr `table]
-        | `Table_caption => [%expr `tableCaption]
-        | `Table_cell => [%expr `tableCell]
-        | `Table_column => [%expr `tableColumn]
-        | `Table_column_group => [%expr `tableColumnGroup]
-        | `Table_footer_group => [%expr `tableFooterGroup]
-        | `Table_header_group => [%expr `tableHeaderGroup]
-        | `Table_row => [%expr `tableRow]
-        | `Table_row_group => [%expr `tableRowGroup]
-        | `Flow
-        | `Flow_root
-        | `Ruby
-        | `Ruby_base
-        | `Ruby_base_container
-        | `Ruby_text
-        | `Ruby_text_container
-        | `Run_in
-        | `_moz_box
-        | `_moz_inline_box
-        | `_moz_inline_stack
-        | `_ms_flexbox
-        | `_ms_grid
-        | `_ms_inline_flexbox
-        | `_ms_inline_grid
-        | `_webkit_box
-        | `_webkit_flex
-        | `_webkit_inline_box
-        | `_webkit_inline_flex
-        | _ => raise(Unsupported_feature)
-      };
-      /* [[%expr CssJs.display([%e valon])]]; */
-      let displayFn = Builder.pexp_ident(~loc, {txt: Ldot(Lident("CssJs"), "display"), loc});
-      [Builder.pexp_apply(~loc, displayFn, [(Nolabel, valon)])];
-    }
+    (~loc) => [%expr CssJs.display],
+    render_display
   );
 
 /* let render_mask_source = (~loc) => fun

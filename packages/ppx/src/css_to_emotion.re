@@ -137,7 +137,7 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
     switch (ar.block) {
     | Empty => Builder.pexp_array(~loc, [])
     | Rule_list(declaration) =>
-      render_declarations(declaration) |> Builder.pexp_array(~loc)
+      render_declarations(~bigloc=loc, declaration) |> Builder.pexp_array(~loc)
     | Stylesheet(_) =>
       grammar_error(ar.loc, "@media content expect to have declarations, not an stylesheets. Selectors aren't allowed in @media.")
     };
@@ -149,13 +149,13 @@ and render_media_query = (ar: At_rule.t): Parsetree.expression => {
     [(Nolabel, query), (Nolabel, rules)],
   );
 }
-and render_declaration = (d: Declaration.t): list(Parsetree.expression) => {
+and render_declaration = (~bigloc, d: Declaration.t) => {
   let (property, name_loc) = d.name;
   let (_valueList, loc) = d.value;
   /* String.trim is a hack, location should be correct and not contain any whitespace */
   let value_source = source_code_of_loc(loc) |> String.trim;
-
-  switch (Declarations_to_emotion.parse_declarations(~loc=name_loc, property, value_source)) {
+  let loc = bigloc;
+  switch (Declarations_to_emotion.parse_declarations(~loc, property, value_source)) {
   | Ok(exprs) => exprs
   | Error(`Not_found) => grammar_error(name_loc, "Unknown property '" ++ property ++ "'")
   | Error(`Invalid_value(value)) =>
@@ -165,11 +165,11 @@ and render_declaration = (d: Declaration.t): list(Parsetree.expression) => {
     )
   };
 }
-and render_declarations = ((ds, _loc: Location.t)) => {
+and render_declarations = (~bigloc, (ds, _loc: Location.t)) => {
   ds |> List.concat_map(
     declaration =>
       switch (declaration) {
-      | Rule.Declaration(decl) => render_declaration(decl)
+      | Rule.Declaration(decl) => render_declaration(~bigloc, decl)
       | Rule.At_rule(ar) => [render_at_rule(ar)]
       | Rule.Style_rule(style_rules) =>
         [
@@ -297,7 +297,7 @@ and render_selector = (selector: Selector.t) => {
 and render_style_rule = (ident, rule: Style_rule.t): Parsetree.expression => {
   let (prelude, _loc) = rule.prelude;
   let (_block, loc) = rule.block;
-  let selector_expr = render_declarations(rule.block) |> Builder.pexp_array(~loc);
+  let selector_expr = render_declarations(~bigloc=loc, rule.block) |> Builder.pexp_array(~loc);
   let selector_name = render_selector(prelude) |> String.trim |> String_interpolation.Transform.transform(~loc);
 
   Helper.Exp.apply(
@@ -381,7 +381,7 @@ let render_keyframes = (declarations: Rule_list.t): Parsetree.expression => {
           render_select_as_keyframe(selector)
           |> Builder.eint(~loc=prelude_loc);
         let rules =
-          render_declarations(block) |> Builder.pexp_array(~loc);
+          render_declarations(~bigloc=loc, block) |> Builder.pexp_array(~loc);
         Builder.pexp_tuple(~loc=style_loc, [percentage, rules]);
       | _ => grammar_error(loc, invalid_selector)
       }
