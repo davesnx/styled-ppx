@@ -1,0 +1,9 @@
+(library
+ (name CssJs)
+ (public_name mock-bs-css)
+ (modules_without_implementation
+  js
+  Css_AtomicTypes
+  Css_Core
+  Css_Js_Core
+  Css_Colors))
