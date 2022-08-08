@@ -189,3 +189,6 @@ Sessionx.vim
 .*.swp
 # Auto-generated tag files
 tags
+
+# Ignore broken implementation
+packages/bs-css/*

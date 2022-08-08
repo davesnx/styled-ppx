@@ -1,9 +1,0 @@
-(library
- (name MockBsCss)
- (public_name bs-css)
- (modules_without_implementation
-  Js
-  Css_AtomicTypes
-  Css_Core
-  Css_Js_Core
-  Css_Colors))
