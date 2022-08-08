@@ -1,6 +1,0 @@
-(executables
- (names debug)
- (modules debug)
- (libraries bs-css)
- (preprocess
-  (pps styled-ppx.lib)))
