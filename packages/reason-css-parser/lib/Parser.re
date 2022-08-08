@@ -432,11 +432,7 @@ and property_baseline_shift = [%value.rec "'baseline' | 'sub' | 'super' | <svg-l
 and property_behavior = [%value.rec "[ <url> ]+"]
 and property_block_overflow = [%value.rec "'clip' | 'ellipsis' | <string>"]
 and property_block_size = [%value.rec "<'width'>"]
-and property_border = [%value.rec "
-  'none'
-  | [ <line-width> | <interpolation> ]
-  | [ <line-width> | <interpolation> ] [ <line-style> | <interpolation> ]
-  | [ <line-width> | <interpolation> ] [ <line-style> | <interpolation> ] [ <color> | <interpolation> ]"]
+and property_border = [%value.rec "'none' | [ <line-width> | <interpolation> ] | [ <line-width> | <interpolation> ] [ <line-style> | <interpolation> ] | [ <line-width> | <interpolation> ] [ <line-style> | <interpolation> ] [ <color> | <interpolation> ]"]
 and property_border_block = [%value.rec "<'border'>"]
 and property_border_block_color = [%value.rec "[ <'border-top-color'> ]{1,2}"]
 and property_border_block_end = [%value.rec "<'border'>"]
@@ -709,12 +705,7 @@ and property_offset_rotate = [%value.rec "[ 'auto' | 'reverse' ] || <extended-an
 and property_opacity = [%value.rec "<alpha-value>"]
 and property_order = [%value.rec "<integer>"]
 and property_orphans = [%value.rec "<integer>"]
-and property_outline = [%value.rec "
-  'none'
-  | <'outline-width'>
-  | [ <'outline-width'> <'outline-style'> ]
-  | [ <'outline-width'> <'outline-style'> [ <color> | <interpolation> ]]
-"]
+and property_outline = [%value.rec "'none' | <'outline-width'> | [ <'outline-width'> <'outline-style'> ] | [ <'outline-width'> <'outline-style'> [ <color> | <interpolation> ]]"]
 and property_outline_color = [%value.rec "<color>"]
 and property_outline_offset = [%value.rec "<extended-length>"]
 and property_outline_style = [%value.rec "'auto' | <line-style> | <interpolation>"]

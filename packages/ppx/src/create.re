@@ -258,18 +258,16 @@ let className = (~loc, expr) =>
 
 /* deleteInnerRef(. newProps, "innerRef") |> ignore; */
 let deleteProp = (~loc, key) => {
-  applyIgnore(
+  Helper.Exp.apply(
     ~loc,
-    Helper.Exp.apply(
-      ~loc,
-      Helper.Exp.ident(~loc, withLoc(Lident("deleteProp"), ~loc)),
-      [
-        (Nolabel, Helper.Exp.ident(~loc, withLoc(Lident("newProps"), ~loc))),
-        (Nolabel, Helper.Exp.constant(~loc, Pconst_string(key, loc, None))),
-      ],
-    )
-  );
-};
+    Helper.Exp.ident(~loc, withLoc(Lident("deleteProp"), ~loc)),
+    [
+      (Nolabel, Helper.Exp.ident(~loc, withLoc(Lident("newProps"), ~loc))),
+      (Nolabel, Helper.Exp.constant(~loc, Pconst_string(key, loc, None))),
+    ],
+  )
+  |> applyIgnore(~loc);
+}
 
 let generateSequence = (~loc, fns) => {
   let rec generate = (~loc, fns) => {

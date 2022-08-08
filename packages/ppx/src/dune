@@ -7,9 +7,6 @@
   reason-css-parser.lib
   string-interpolation.lib
   ppxlib
-  str
- )
+  str)
  (preprocess
-  (pps ppxlib.metaquot)
- )
-)
+  (pps ppxlib.metaquot)))
