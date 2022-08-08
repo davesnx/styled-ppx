@@ -6,22 +6,6 @@ module Builder = Ppxlib.Ast_builder.Default;
 
 let txt = (~loc, txt) => {Location.loc: loc, txt};
 
-let position_to_string = pos =>
-  Printf.sprintf(
-    "[%d,%d+%d]",
-    pos.Lexing.pos_lnum,
-    pos.Lexing.pos_bol,
-    pos.Lexing.pos_cnum - pos.Lexing.pos_bol,
-  );
-
-let location_to_string = loc =>
-  Printf.sprintf(
-    "%s..%s",
-    position_to_string(loc.Location.loc_start),
-    position_to_string(loc.Location.loc_end),
-  );
-
-
 let (let.ok) = Result.bind;
 
 /* TODO: Separate unsupported_feature from bs-css doesn't support or can't interpolate on those */
@@ -294,16 +278,9 @@ let transform_with_variable = (parser, mapper, value_to_expr) =>
       Rule.Match.map(parser, data => `Value(data)),
     ]),
     (~loc) => fun
-    | `Variable(name) => {
-      print_endline("Variable Location " ++ location_to_string(loc));
-      render_variable(~loc, name)
-    }
-    | `Value(ast) => {
-      print_endline("Transform with Value Location " ++ location_to_string(loc));
-      mapper(~loc, ast)
-    },
+    | `Variable(name) => render_variable(~loc, name)
+    | `Value(ast) => mapper(~loc, ast),
     (~loc, expression) => {
-      print_endline("Transform with variable Location " ++ location_to_string(loc));
       switch (expression) {
         // Since we are treating with expressions here, we don't have any other way to detect if it's interpolation or not. We want to add type constraints on interpolation only.
         | {pexp_desc: Pexp_ident({txt: Ldot(Lident("CssJs"), _), _}), _} as exp =>
@@ -319,10 +296,7 @@ let apply = (parser, property_renderer, value_renderer) =>
   transform_with_variable(
     parser,
     value_renderer,
-    (~loc, value) => {
-      print_endline("Apply location " ++ location_to_string(loc));
-      [[%expr [%e property_renderer(~loc)]([%e value])]]
-    }
+    (~loc, value) => [[%expr [%e property_renderer(~loc)]([%e value])]]
   );
 
 let unsupportedValue = (parser, property) =>
@@ -709,10 +683,7 @@ let render_var = (~loc, string) => {
 
 let render_color =
   (~loc) => fun
-  | `Interpolation(v) => {
-      // print_endline("Location: " ++ location_to_string(loc) ++ ". " ++ String.concat(".", v) ++ "");
-      render_variable(~loc, v)
-    }
+  | `Interpolation(v) => render_variable(~loc, v)
   | `Hex_color(hex) => id([%expr `hex([%e render_string(~loc, hex)])])
   | `Named_color(color) => render_named_color(~loc, color)
   | `CurrentColor => id([%expr `currentColor])

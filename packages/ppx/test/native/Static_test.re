@@ -30,7 +30,7 @@ let extract_tests = array_expr => {
   );
 };
 
-let openMockBsCss = [[%stri open MockBsCss]];
+let openMockBsCss = [[%stri open CssJs]];
 let ignoreWarning33 = [[%stri [@warning "-33"]]];
 let mapExpected = ((expected, _)) => [%stri let _ = [%e expected]];
 
