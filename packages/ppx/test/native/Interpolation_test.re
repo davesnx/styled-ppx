@@ -90,10 +90,11 @@ let properties_variable_css_tests = [
     [%expr [%css "color: rgba(0, 0, 0, 1%);"]],
     [%expr CssJs.color(rgba(0, 0, 0, `percent(1)))]
   ),
+  */
   (
     [%expr [%css "color: $(Theme.blue);"]],
-    [%expr CssJs.color(Theme.blue)]
-  ), */
+    [%expr (CssJs.color(Theme.blue) : CssJs.rule)]
+  ),
   /* Changed properties */
   (
     [%expr [%css "box-shadow: $(h) $(v) $(blur) $(spread) $(color);"]],
@@ -119,10 +120,6 @@ let properties_variable_css_tests = [
   ),
   /* Add border */
   /* Add text-shadow */
-  (
-    [%expr [%css "color: $(color');"]],
-    [%expr (CssJs.color(color'): CssJs.rule)]
-  ),
 ];
 
 describe("Should bind to bs-css with interpolated variables", ({test, _}) => {

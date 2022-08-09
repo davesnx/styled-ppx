@@ -1790,7 +1790,7 @@ let animation_duration =
 let animation_timing_function =
   apply(
     Parser.property_animation_timing_function,
-    (~loc) => [%expr CssJs.CssJs.animationTimingFunction],
+    (~loc) => [%expr CssJs.animationTimingFunction],
     (~loc) => fun
       | [t] => render_timing(~loc, t)
       | _ => raise(Unsupported_feature)
@@ -2365,7 +2365,6 @@ let properties = [
   ("grid-row", found(grid_row)),
   ("grid-column", found(grid_column)),
   ("grid-area", found(grid_area)),
-  //
   ("z-index", found(z_index)),
   ("line-height", found(line_height)),
   ("line-height-step", found(line_height_step)),
