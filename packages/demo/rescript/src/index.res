@@ -35,14 +35,10 @@ module Link = %styled.a(`
     font-size: 44px;
   }
 `)
-
-let doscientos = CssJs.px(200)
-
 module Line = %styled.span("display: inline;")
+
 module Wrapper = %styled.div(`
   display: grid;
-  filter: blur(3px);
-  grid-template-columns: minmax(min-content, $(doscientos)) 1fr 1fr;
 `)
 
 module Dynamic = %styled.input((~a as _) => "display: inline;")
