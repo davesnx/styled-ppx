@@ -77,9 +77,11 @@ If you want to try it out, fork [github.com/davesnx/try-styled-ppx](https://gith
 
 ### Editor Support
 
-One of the downsites of using a `ppx` is their editor support, we provide a VSCode extension that brings syntax highlight. This can include in the future, CSS autocomplete and other CSS-related extensions.
+One of the downsites of using a `ppx` is their editor support, we provide a VSCode and Vim extensions that bring syntax highlight. This can include in the future, CSS autocomplete and other CSS-related extensions.
 
 Install the VSCode extension: **[VSCode Extension](https://marketplace.visualstudio.com/items?itemName=davesnx.vscode-styled-ppx)**
+
+Install the Vim plugin: **[vim-styled-ppx plugin](https://github.com/ahrefs/vim-styled-ppx/blob/main/README.md#installation)**
 
 > If you are interested on another editor, please [fill an issue](https://github.com/davesnx/styled-ppx/issues/new).
 
