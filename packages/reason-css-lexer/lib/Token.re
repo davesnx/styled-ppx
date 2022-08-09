@@ -25,7 +25,66 @@ type token =
   | LEFT_PARENS // <(-token>
   | RIGHT_PARENS // <)-token>
   | LEFT_CURLY // <{-token>
-  | RIGHT_CURLY; // <}-token>
+  | RIGHT_CURLY // <}-token>
+;
+
+let string_of_char = c => String.make(1, c);
+
+let humanize = fun
+  | EOF => "the end"
+  | IDENT(str) => "ident " ++ str
+  | BAD_IDENT => "bad ident"
+  | FUNCTION(f) => "function " ++ f
+  | AT_KEYWORD(at) => "@ " ++ at
+  | HASH(h, _) => "hash: #" ++ h
+  | STRING(s) => {|string "|} ++ s ++ {|"|}
+  | BAD_STRING(_) => "bad string"
+  | URL(u) => "url " ++ u
+  | BAD_URL => "bad url"
+  | DELIM(d) => "delimiter " ++ d
+  | NUMBER(f) => "number: " ++ string_of_float(f)
+  | PERCENTAGE(f) => "percentage: " ++ string_of_float(f) ++ string_of_char('%')
+  | DIMENSION(f, s) => "dimension: " ++ string_of_float(f) ++ s
+  | WHITESPACE => "whitespace"
+  | CDO => "<!--"
+  | CDC => "-->"
+  | COLON => ":"
+  | SEMICOLON => ";"
+  | COMMA => ","
+  | LEFT_SQUARE => "["
+  | RIGHT_SQUARE => "]"
+  | LEFT_PARENS => "("
+  | RIGHT_PARENS => ")"
+  | LEFT_CURLY => "{"
+  | RIGHT_CURLY => "}";
+
+let humanize_without_payload = fun
+  | EOF => "the end"
+  | IDENT(_) => "ident"
+  | BAD_IDENT => "bad ident"
+  | FUNCTION(_) => "function"
+  | AT_KEYWORD(_) => "@"
+  | HASH(_, _) => "hash: #"
+  | STRING(_) => "string"
+  | BAD_STRING(_) => "bad string"
+  | URL(_) => "url"
+  | BAD_URL => "bad url"
+  | DELIM(_) => "delimiter "
+  | NUMBER(_) => "number"
+  | PERCENTAGE(_) => "percentage"
+  | DIMENSION(_, _) => "dimension: (e.g. 10px)"
+  | WHITESPACE => "whitespace: ' '"
+  | CDO => "<!--"
+  | CDC => "-->"
+  | COLON => ":"
+  | SEMICOLON => ";"
+  | COMMA => ","
+  | LEFT_SQUARE => "["
+  | RIGHT_SQUARE => "]"
+  | LEFT_PARENS => "("
+  | RIGHT_PARENS => ")"
+  | LEFT_CURLY => "{"
+  | RIGHT_CURLY => "}";
 
 type error =
   | Invalid_code_point

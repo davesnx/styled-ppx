@@ -102,7 +102,7 @@ module Sequence = [%styled.button (~size, ~color) => {
 module App = {
   [@react.component]
   let make = () => {
-    <div className=stilos>
+    <div className=Camel.stilos>
         <div className=styles>
           <div onClick=Js.log style=inlineStyles>
             <TextInput />

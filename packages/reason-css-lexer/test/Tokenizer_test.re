@@ -22,11 +22,11 @@ let list_parse_tokens_to_string = tokens =>
   tokens
   |> List.rev
   |> List.map(
-       fun
-       | Ok(token) => render_token(token)
-       | Error((token, err)) =>
-         "Error(" ++ show_error(err) ++ ") " ++ show_token(token),
-     )
+    fun
+    | Ok(token) => render_token(token)
+    | Error((token, err)) =>
+      "Error(" ++ show_error(err) ++ ") " ++ show_token(token),
+  )
   |> String.concat(" ")
   |> String.trim;
 
@@ -81,6 +81,18 @@ describe("Tokenizer", ({test, _}) => {
       17,
     ),
     (
+      {|background-image:url('img_tree.gif' )|},
+      [
+        IDENT("background-image"),
+        COLON,
+        FUNCTION("url"),
+        STRING("img_tree.gif"),
+        WHITESPACE,
+        RIGHT_PARENS,
+      ],
+      37,
+    ),
+    (
       {|calc(10px+ 10px)|},
       [
         FUNCTION("calc"),
@@ -93,6 +105,10 @@ describe("Tokenizer", ({test, _}) => {
       16,
     ),
     ({|calc(10%)|}, [FUNCTION("calc"), PERCENTAGE(10.), RIGHT_PARENS], 9),
+    ({|$(Module.variable)|}, [DELIM("$"), LEFT_PARENS, IDENT("Module"), DELIM("."), IDENT("variable"), RIGHT_PARENS], 18),
+    ({|$(Module.variable')|}, [DELIM("$"), LEFT_PARENS, IDENT("Module"), DELIM("."), IDENT("variable'"), RIGHT_PARENS], 19),
+    /* ({|\32|}, [IDENT("--color-main")], 3), */
+    /* ({|\25BA|}, [IDENT("--color-main")], 4), */
   ];
 
   success_tests_data

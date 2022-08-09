@@ -1,16 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Component renders 1`] = `
-@keyframes animation-0 {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-
 .emotion-0 {
   display: -webkit-box;
   display: -webkit-flex;
@@ -30,8 +20,8 @@ exports[`Component renders 1`] = `
   height: 100vh;
   width: unset;
   font-size: 30px;
-  -webkit-animation-name: animation-0;
-  animation-name: animation-0;
+  -webkit-animation-name: fade;
+  animation-name: fade;
 }
 
 <div>

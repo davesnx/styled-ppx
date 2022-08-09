@@ -15,3 +15,4 @@ let check_value = (~name, value) => {
 };
 
 let check_property = (~name) => check_value(~name="property-" ++ name);
+/* let check_media_query = (~name) => check_value(~name="media-" ++ name); */

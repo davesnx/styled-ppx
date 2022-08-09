@@ -13,7 +13,7 @@ module Nested = %styled.div(`
   justify-content: center;
   width: 100vw;
 
-  > p {
+  & > p {
     color: purple;
   }
 `)

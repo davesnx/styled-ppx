@@ -190,5 +190,4 @@ Sessionx.vim
 # Auto-generated tag files
 tags
 
-## Custom
-# .vscode
+packages/bs-css

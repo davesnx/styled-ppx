@@ -140,4 +140,12 @@ describe("Standard values", ({test, _}) => {
     expect.result(parse("[a-b]")).toBe(Ok(((), ["a-b"], ())));
     expect.result(parse("asd")).toBeError();
   });
+
+  /* variable */
+  test("variable", ({expect, _}) => {
+    let parse = parse([%value "<interpolation>"]);
+    expect.result(parse("$(Module.value)")).toBe(Ok(["Module", "value"]));
+    expect.result(parse("$(Module'.value')")).toBe(Ok(["Module'", "value'"]));
+    expect.result(parse("asd")).toBeError();
+  });
 });

@@ -126,7 +126,11 @@ module Pattern = {
     token(
       fun
       | token when token == expected => Ok()
-      | token => Error(["expected " ++ show_token(expected) ++ ". got " ++ show_token(token)]),
+      | token => {
+        let expected = humanize(expected);
+        let got = humanize(token);
+        Error(["Expected '" ++ expected ++ "' but instead got " ++ got])
+      }
     );
   let value = (value, rule) => Match.bind(rule, () => Match.return(value));
 };

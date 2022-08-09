@@ -63,7 +63,7 @@ and cf_final_image = [%value.rec "<image> | <color>"]
 and cf_mixing_image = [%value.rec "[ <extended-percentage> ]? && <image>"]
 and class_selector = [%value.rec "'.' <ident-token>"]
 and clip_source = [%value.rec "<url>"]
-and color = [%value.rec "<rgb()> | <rgba()> | <hsl()> | <hsla()> | <hex-color> | <named-color> | 'currentColor' | <deprecated-system-color> | <interpolation>"]
+and color = [%value.rec "<rgb()> | <rgba()> | <hsl()> | <hsla()> | <hex-color> | <named-color> | 'currentColor' | <deprecated-system-color> | <interpolation> | <var()>"]
 and color_stop = [%value.rec "<color-stop-length> | <color-stop-angle>"]
 and color_stop_angle = [%value.rec "[ <extended-angle> ]{1,2}"]
 and color_stop_length = [%value.rec "[ <extended-length> | <extended-percentage> ]{1,2}"]
@@ -194,7 +194,8 @@ and function_translate3d = [%value.rec "translate3d( [<extended-length> | <exten
 and function_translateX = [%value.rec "translateX( [<extended-length> | <extended-percentage>] )"]
 and function_translateY = [%value.rec "translateY( [<extended-length> | <extended-percentage>] )"]
 and function_translateZ = [%value.rec "translateZ( <extended-length> )"]
-and function_var = [%value.rec "var( <custom-property-name> ',' [ <declaration-value> ]? )"]
+/* and function_var = [%value.rec "var( <ident> ',' [ <declaration-value> ]? )"] */
+and function_var = [%value.rec "var( <ident> )"]
 and gender = [%value.rec "'male' | 'female' | 'neutral'"]
 and general_enclosed = [%value.rec "<function-token> <any-value> ')' | '(' <ident> <any-value> ')'"]
 and generic_family = [%value.rec "'serif' | 'sans-serif' | 'cursive' | 'fantasy' | 'monospace' | '-apple-system'"]
@@ -206,7 +207,7 @@ and grid_line = [%value.rec "'auto' | <custom-ident> | <integer> && [ <custom-id
 and historical_lig_values = [%value.rec "'historical-ligatures' | 'no-historical-ligatures'"]
 and hue = [%value.rec "<number> | <extended-angle>"]
 and id_selector = [%value.rec "<hash-token>"]
-and image = [%value.rec "<url> | <image()> | <image-set()> | <element()> | <paint()> | <cross-fade()> | <gradient>"]
+and image = [%value.rec "<url> | <image()> | <image-set()> | <element()> | <paint()> | <cross-fade()> | <gradient> | <interpolation>"]
 and image_set_option = [%value.rec "[ <image> | <string> ] <resolution>"]
 and image_src = [%value.rec "<url> | <string>"]
 and image_tags = [%value.rec "'ltr' | 'rtl'"]
@@ -431,22 +432,20 @@ and property_baseline_shift = [%value.rec "'baseline' | 'sub' | 'super' | <svg-l
 and property_behavior = [%value.rec "[ <url> ]+"]
 and property_block_overflow = [%value.rec "'clip' | 'ellipsis' | <string>"]
 and property_block_size = [%value.rec "<'width'>"]
-/* This property is changed from the original spec. This enforces lw, ls and color to be present.
-  Missing border values is valid CSS, but bs-css bindings aren't available */
-and property_border = [%value.rec "[<line-width> | <interpolation> ] [<line-style> | <interpolation> ] [ <color> | <interpolation> ]"]
-and property_border_block = [%value.rec "<'border-top-width'> || <'border-top-style'> || <'color'>"]
+and property_border = [%value.rec "'none' | [ <line-width> | <interpolation> ] | [ <line-width> | <interpolation> ] [ <line-style> | <interpolation> ] | [ <line-width> | <interpolation> ] [ <line-style> | <interpolation> ] [ <color> | <interpolation> ]"]
+and property_border_block = [%value.rec "<'border'>"]
 and property_border_block_color = [%value.rec "[ <'border-top-color'> ]{1,2}"]
-and property_border_block_end = [%value.rec "<'border-top-width'> || <'border-top-style'> || <'color'>"]
+and property_border_block_end = [%value.rec "<'border'>"]
 and property_border_block_end_color = [%value.rec "<'border-top-color'>"]
 and property_border_block_end_style = [%value.rec "<'border-top-style'>"]
 and property_border_block_end_width = [%value.rec "<'border-top-width'>"]
-and property_border_block_start = [%value.rec "<'border-top-width'> || <'border-top-style'> || <'color'>"]
+and property_border_block_start = [%value.rec "<'border'>"]
 and property_border_block_start_color = [%value.rec "<'border-top-color'>"]
 and property_border_block_start_style = [%value.rec "<'border-top-style'>"]
 and property_border_block_start_width = [%value.rec "<'border-top-width'>"]
 and property_border_block_style = [%value.rec "<'border-top-style'>"]
 and property_border_block_width = [%value.rec "<'border-top-width'>"]
-and property_border_bottom = [%value.rec "<line-width> || <line-style> || <color>"]
+and property_border_bottom = [%value.rec "<'border'>"]
 and property_border_bottom_color = [%value.rec "<'border-top-color'>"]
 and property_border_bottom_left_radius = [%value.rec "[ <extended-length> | <extended-percentage> ]{1,2}"]
 and property_border_bottom_right_radius = [%value.rec "[ <extended-length> | <extended-percentage> ]{1,2}"]
@@ -462,25 +461,25 @@ and property_border_image_repeat = [%value.rec "[ 'stretch' | 'repeat' | 'round'
 and property_border_image_slice = [%value.rec "[ <number-percentage> ]{1,4} && [ 'fill' ]?"]
 and property_border_image_source = [%value.rec "'none' | <image>"]
 and property_border_image_width = [%value.rec "[ <extended-length> | <extended-percentage> | <number> | 'auto' ]{1,4}"]
-and property_border_inline = [%value.rec "<'border-top-width'> || <'border-top-style'> || <'color'>"]
+and property_border_inline = [%value.rec "<'border'>"]
 and property_border_inline_color = [%value.rec "[ <'border-top-color'> ]{1,2}"]
-and property_border_inline_end = [%value.rec "<'border-top-width'> || <'border-top-style'> || <'color'>"]
+and property_border_inline_end = [%value.rec "<'border'>"]
 and property_border_inline_end_color = [%value.rec "<'border-top-color'>"]
 and property_border_inline_end_style = [%value.rec "<'border-top-style'>"]
 and property_border_inline_end_width = [%value.rec "<'border-top-width'>"]
-and property_border_inline_start = [%value.rec "<'border-top-width'> || <'border-top-style'> || <'color'>"]
+and property_border_inline_start = [%value.rec "<'border'>"]
 and property_border_inline_start_color = [%value.rec "<'border-top-color'>"]
 and property_border_inline_start_style = [%value.rec "<'border-top-style'>"]
 and property_border_inline_start_width = [%value.rec "<'border-top-width'>"]
 and property_border_inline_style = [%value.rec "<'border-top-style'>"]
 and property_border_inline_width = [%value.rec "<'border-top-width'>"]
-and property_border_left = [%value.rec "<line-width> || <line-style> || <color>"]
+and property_border_left = [%value.rec "<'border'>"]
 and property_border_left_color = [%value.rec "<color>"]
 and property_border_left_style = [%value.rec "<line-style>"]
 and property_border_left_width = [%value.rec "<line-width>"]
 /* border-radius isn't supported with the entire spec in bs-css: `"[ <extended-length> | <extended-percentage> ]{1,4} [ '/' [ <extended-length> | <extended-percentage> ]{1,4} ]?"` */
 and property_border_radius = [%value.rec "<extended-length> | <extended-percentage>"]
-and property_border_right = [%value.rec "<line-width> || <line-style> || <color>"]
+and property_border_right = [%value.rec "<'border'>"]
 and property_border_right_color = [%value.rec "<color>"]
 and property_border_right_style = [%value.rec "<line-style>"]
 and property_border_right_width = [%value.rec "<line-width>"]
@@ -489,7 +488,7 @@ and property_border_start_end_radius = [%value.rec "[ <extended-length> | <exten
 and property_border_start_start_radius = [%value.rec "[ <extended-length> | <extended-percentage> ]{1,2}"]
 /* bs-css doesn't support list of styles, the original spec is: `[ <line-style> ]{1,4}` */
 and property_border_style = [%value.rec "<line-style>"]
-and property_border_top = [%value.rec "<line-width> || <line-style> || <color>"]
+and property_border_top = [%value.rec "<'border'>"]
 and property_border_top_color = [%value.rec "<color>"]
 and property_border_top_left_radius = [%value.rec "[ <extended-length> | <extended-percentage> ]{1,2}"]
 and property_border_top_right_radius = [%value.rec "[ <extended-length> | <extended-percentage> ]{1,2}"]
@@ -706,11 +705,11 @@ and property_offset_rotate = [%value.rec "[ 'auto' | 'reverse' ] || <extended-an
 and property_opacity = [%value.rec "<alpha-value>"]
 and property_order = [%value.rec "<integer>"]
 and property_orphans = [%value.rec "<integer>"]
-and property_outline = [%value.rec "<'outline-color'> || <'outline-style'> || <'outline-width'>"]
-and property_outline_color = [%value.rec "<color> | 'invert'"]
+and property_outline = [%value.rec "'none' | <'outline-width'> | [ <'outline-width'> <'outline-style'> ] | [ <'outline-width'> <'outline-style'> [ <color> | <interpolation> ]]"]
+and property_outline_color = [%value.rec "<color>"]
 and property_outline_offset = [%value.rec "<extended-length>"]
-and property_outline_style = [%value.rec "'auto' | <'border-style'>"]
-and property_outline_width = [%value.rec "<line-width>"]
+and property_outline_style = [%value.rec "'auto' | <line-style> | <interpolation>"]
+and property_outline_width = [%value.rec "<line-width> | <interpolation>"]
 and property_overflow = [%value.rec "[ 'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' ]{1,2} | <-non-standard-overflow>"]
 and property_overflow_anchor = [%value.rec "'auto' | 'none'"]
 and property_overflow_block = [%value.rec "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto'"]
@@ -876,7 +875,7 @@ and pseudo_class_selector = [%value.rec "':' <ident-token> | ':' <function-token
 and pseudo_element_selector = [%value.rec "':' <pseudo-class-selector>"]
 and pseudo_page = [%value.rec "':' [ 'left' | 'right' | 'first' | 'blank' ]"]
 and quote = [%value.rec "'open-quote' | 'close-quote' | 'no-open-quote' | 'no-close-quote'"]
-and ratio = [%value.rec "<integer> '/' <integer>"]
+and ratio = [%value.rec "<integer> '/' <integer> | <integer>"]
 and relative_selector = [%value.rec "[ <combinator> ]? <complex-selector>"]
 and relative_selector_list = [%value.rec "[ <relative-selector> ]#"]
 and relative_size = [%value.rec "'larger' | 'smaller'"]
@@ -1472,6 +1471,8 @@ let check_map =
         check(property__webkit_border_before_width),
       ),
       ("property--webkit-box-reflect", check(property__webkit_box_reflect)),
+      ("property--webkit-box-shadow", check(property_box_shadow)),
+      ("property--webkit-box-orient", check(property_box_orient)),
       (
         "property--webkit-column-break-after",
         check(property__webkit_column_break_after),
@@ -2317,7 +2318,7 @@ let check_map =
       ("wq-name", check(wq_name)),
       ("x", check(x)),
       ("y", check(y)),
-      /* calc needs to be available in length */
+      /* TODO: calc needs to be available in length */
       ("extended-length", check(extended_length)),
       ("extended-frequency", check(extended_frequency)),
       ("extended-angle", check(extended_angle)),

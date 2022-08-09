@@ -209,21 +209,16 @@ let render_size =
   | `Fit_content_0 => [%expr "fit-content"]
   | `Fit_content_1(lp) => render_length_percentage(lp)
   | `Function_calc(fc) => render_function_calc(fc)
+;
 
 let render_css_global_values = (name, value) => {
   let.ok value = Parser.parse(Standard.css_wide_keywords, value);
 
   let value =
     switch (value) {
-    | `Inherit =>
-      %expr
-      "inherit"
-    | `Initial =>
-      %expr
-      "initial"
-    | `Unset =>
-      %expr
-      "unset"
+    | `Inherit => [%expr "inherit"]
+    | `Initial => [%expr "initial"]
+    | `Unset => [%expr "unset"]
     };
 
   /* bs-css doesn't have those */
@@ -267,23 +262,29 @@ let max_width =
 let height = apply(Parser.property_height, [%expr "height"], render_size);
 let min_height = apply(Parser.property_height, [%expr "min-height"], render_size);
 let max_height = apply(Parser.property_height, [%expr "max-height"], render_size);
+
+let render_ratio = fun
+  | `Static((a, (), b)) =>
+    [%expr [%e string_of_int(a) |> render_string] ++ "/" ++ [%e string_of_int(b) |> render_string]]
+  | `Integer(i) => [%expr [%e render_integer(i)]];
+
 let aspect_ratio =
   apply(
     Parser.property_media_max_aspect_ratio,
     [%expr "aspect-ratio"],
-    ((a, (), b)) => [%expr [%e string_of_int(a) |> render_string] ++ "/" ++ [%e string_of_int(b) |> render_string]]
+    render_ratio
   );
 let min_aspect_ratio =
   apply(
     Parser.property_media_max_aspect_ratio,
     [%expr "min-aspect-ratio"],
-    ((a, (), b)) => [%expr [%e string_of_int(a) |> render_string] ++ "/" ++ [%e string_of_int(b) |> render_string]]
+    render_ratio
   );
 let max_aspect_ratio =
   apply(
     Parser.property_media_max_aspect_ratio,
     [%expr "max-aspect-ratio"],
-    ((a, (), b)) => [%expr [%e string_of_int(a) |> render_string] ++ "/" ++ [%e string_of_int(b) |> render_string]]
+    render_ratio
   );
 let orientation =
   apply(

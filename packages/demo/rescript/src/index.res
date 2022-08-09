@@ -12,9 +12,28 @@ module App2 = {
   let make = (~children) => <div> children </div>
 }
 
+let cosas = "external-selector"
+
+let c = %css(`content: ""`)
+let unsafe = CssJs.unsafe(`content`, ``)
+
+let className = %cx([c, unsafe])
+
+module Size = {
+  let small = CssJs.px(10)
+}
+
 module Link = %styled.a(`
-  font-size: 36px;
-  margin-top: 16px;
+  margin: $(Size.small);
+
+  & $(cosas) {
+    font-size: 36px;
+    margin-top: 16px;
+  }
+
+  &:hover {
+    font-size: 44px;
+  }
 `)
 
 module Line = %styled.span("display: inline;")
@@ -22,7 +41,7 @@ module Wrapper = %styled.div("display: inline;")
 
 module Dynamic = %styled.input((~a as _) => "display: inline;")
 
-module Component = %styled.div(j`
+module Component = %styled.div(`
   background-color: red;
   border-radius: 20px;
   box-sizing: border-box;
@@ -32,6 +51,7 @@ switch ReactDOM.querySelector("#app") {
 | Some(el) =>
   ReactDOM.render(
     <App onClick=Js.log>
+      <div className />
       <Dynamic a="23" />
       <Component> {React.string("test..")} </Component>
       <App2> <Component> {React.string("Demo of...")} </Component> </App2>

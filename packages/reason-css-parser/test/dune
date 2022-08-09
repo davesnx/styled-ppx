@@ -15,7 +15,7 @@
   (pps reason_css_parser_ppx sedlex.ppx)))
 
 (rule
- (alias css_parser_test)
+ (alias reason_css_parser_test)
  (deps Runner.exe)
  (action
   (run %{deps})))

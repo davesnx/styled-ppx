@@ -1,3 +1,7 @@
+---
+title: Getting Started
+---
+
 import Callout from 'nextra-theme-docs/callout'
 import Link from 'next/link'
 
@@ -15,64 +19,59 @@ npm install @davesnx/styled-ppx
 
 ### Update `bsconfig.json`
 
-Add `"@davesnx/styled-ppx/ppx"` under bsconfig's `"ppx-flags"`:
-```json
-{
-  "ppx-flags": ["@davesnx/styled-ppx/ppx"]
-}
-```
+Add `"@davesnx/styled-ppx/ppx"{:json}` under bsconfig `"ppx-flags"{:json}`.
+The diff on `bsconfig.json` should contain the following:
 
-The `bsconfig.json` resultant should contain at least
-```json
+```diff
 {
   "bs-dependencies": [
     "@rescript/react",
     "bs-css",
     "bs-css-emotion"
   ],
-  "ppx-flags": ["@davesnx/styled-ppx/ppx"]
++ "ppx-flags": ["@davesnx/styled-ppx/ppx"]
 }
 ```
 
-### Use
+### Example
 
 ```rescript
-module Link = [%styled.a (~color="#4299E1") => {|
+module Link = %styled.a((~color="#4299E1") => `
   font-size: 1.875rem;
   line-height: 1.5;
   text-decoration: none;
   margin: 0px;
   padding: 10px 0px;
   color: $(color);
-|}];
+`)
 
-module Layout = [%styled.div [|
-  [%css "display: flex"],
-  [%css "width: 100%;"],
-  [%css "height: 100%;"],
-  [%css "justify-content: center;"],
-  [%css "align-items: center"],
-|]];
+module Layout = %styled.div([|
+  %css("display: flex"),
+  %css("width: 100%;"),
+  %css("height: 100%;"),
+  %css("justify-content: center;"),
+  %css("align-items: center"),
+|])
 
-/* Later on a component */
+/* Later in a component */
 <Layout>
   <Link
     color="#333333"
     href="https://sancho.dev"
     rel="noopener noreferrer"
   />
-  <span className={[%cx "color: black; position: absolute; left: 0px;"]}>
+  <span className={%cx(`color: black; position: absolute; left: 0px;`)}>
     {React.string("sancho.dev")}
   </span>
 </Layout>
 ```
 
-### [Playground](https://github.com/davesnx/try-styled-ppx)
-If you want to try it out, just fork https://github.com/davesnx/try-styled-ppx and follow the instalation process there.
+### Playground
+If you want to try it out, just fork https://github.com/davesnx/try-styled-ppx and follow the installation instructions there.
 
 ## Editor Support
-One of the downsites of using a `ppx` is their editor support, we provide a VSCode extension that brings syntax highlight. This can include in the future, CSS autocomplete and other CSS-related extensions.
+One of the downsides of embedding a language (CSS) into another (ReScript) is the limited editor support. Because of that, we provide a VSCode extension that supports syntax highlighting of the CSS inside your styled-ppx notation.
 
 Install the VSCode extension: **[VSCode Extension](https://marketplace.visualstudio.com/items?itemName=davesnx.vscode-styled-ppx)**
 
-> If you are interested on another editor, please [fill an issue](https://github.com/davesnx/styled-ppx/issues/new)
+> If you are interested in other editors, please [file an issue](https://github.com/davesnx/styled-ppx/issues/new)

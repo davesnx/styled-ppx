@@ -30,19 +30,16 @@ module ArrayStatic = [%styled.section [|
 
 module Theme = {
   let var = "#333333";
-
   module Border = {
     let black = "#222222";
   }
 };
-
 let black = "#000";
 
 module StringInterpolation = [%styled.div {j|
   color: $(Theme.var);
   background-color: $(black);
   border-color: $(Theme.Border.black);
-  __UNSAFE__ color: trust-me;
   display: block;
 |j}];
 
@@ -54,9 +51,9 @@ let classNameWithCss = [%cx [| cssRule, [%css "background-color: green;"] |]];
 
 module DynamicComponent = [%styled.div
   (~var) => {j|
-     color: $(var);
-     display: block;
-   |j}
+    color: $(var);
+    display: block;
+  |j}
 ];
 
 module SelectorsMediaQueries = [%styled.div {j|
@@ -89,7 +86,6 @@ module ArrayDynamicComponent = [%styled.div (~var) =>
 
 module SequenceDynamicComponent = [%styled.div (~size) => {
   Js.log("Logging when render");
-
   [|
     [%css "width: $(size)"],
     [%css "display: block;"]
@@ -102,25 +98,21 @@ module DynamicComponentWithDefaultValue = [%styled.div (~var=CssJs.hex("333")) =
   [%css "display: block;"]
 |]];
 
-
 let width = "120px";
-
 let orientation = "landscape"
 
 module SelectorWithInterpolation = [%styled.div {|
   @media only screen and (min-width: $(width)) {
     color: blue;
-  };
+  }
 
   @media (min-width: 700px) and (orientation: $(orientation)) {
     display: none;
-
   }
-|}]
-
+|}];
 
 module MediaQueryCalc = [%styled.div {|
-  @media (min-width: calc(2px * 1px)) {
+  @media (min-width: calc(2px + 1px)) {
     color: red;
   }
 
@@ -135,9 +127,8 @@ module MediaQueryCalc = [%styled.div {|
 |]];
 */
 
-module Button = [%styled.button (~variant) => {
+module DynamicComponentWithSequence = [%styled.button (~variant) => {
   let color = Theme.button(variant);
-
   [|
       [%css "display: inline-flex"],
       [%css "color: $(color)"],
@@ -145,7 +136,7 @@ module Button = [%styled.button (~variant) => {
   |];
 }];
 
-module Sequence = [%styled.button (~size, ~color) => {
+module DynamicComponentWithArray = [%styled.button (~size, ~color) => {
   [|
     [%css "width: $(size)"],
     [%css "color: $(color)"],
@@ -153,3 +144,18 @@ module Sequence = [%styled.button (~size, ~color) => {
     [%css "width: 100%;"],
   |]
 }];
+
+let sharedStylesBetweenDynamicComponents = (color) => [%css "color: $(color)"];
+
+module DynamicCompnentWithLetIn = [%styled.div
+  (~color) => {
+    let styles = sharedStylesBetweenDynamicComponents(color);
+    styles;
+  }
+];
+
+module DynamicCompnentWithIdent = [%styled.div
+  (~a as _) => {
+    cssRule;
+  }
+];

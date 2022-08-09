@@ -2,8 +2,6 @@ open Sedlexing;
 open Sedlexing.Utf8;
 open Token;
 
-// TODO: why ocaml platform takes so long in this file?
-
 let escape = [%sedlex.regexp? '\\'];
 let digit = [%sedlex.regexp? '0' .. '9'];
 let hex_digit = [%sedlex.regexp? digit | 'A' .. 'F' | 'a' .. 'f'];
@@ -11,8 +9,9 @@ let non_ascii_code_point = [%sedlex.regexp? Sub(any, '\000' .. '\128')]; // grea
 let identifier_start_code_point = [%sedlex.regexp?
   'a' .. 'z' | 'A' .. 'Z' | non_ascii_code_point | '_'
 ];
+/* Added "'" to identifier to enable Language Variables */
 let identifier_code_point = [%sedlex.regexp?
-  identifier_start_code_point | digit | '-'
+  identifier_start_code_point | digit | '-' | "'"
 ];
 let non_printable_code_point = [%sedlex.regexp?
   '\000' .. '\b' | '\011' | '\014' .. '\031' | '\127'
@@ -22,10 +21,6 @@ let whitespace = [%sedlex.regexp? Plus('\n' | '\t' | ' ')];
 let ident_char = [%sedlex.regexp?
   '_' | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' | non_ascii_code_point | escape
 ];
-
-let variable_name = [%sedlex.regexp? (Star(ident_char))];
-let module_variable = [%sedlex.regexp? (variable_name, '.')];
-let variable = [%sedlex.regexp? (Opt(Star(module_variable)), variable_name)];
 
 let (let.ok) = Result.bind;
 
@@ -152,6 +147,7 @@ let consume_identifier = buf => {
     };
   read("");
 };
+
 let handle_consume_identifier =
   fun
   | Error((_, error)) => Error((BAD_IDENT, error))
@@ -258,6 +254,7 @@ let consume_ident_like = buf => {
 
   // TODO: should it return IDENT() when error?
   let.ok string = consume_identifier(buf) |> handle_consume_identifier;
+
   switch%sedlex (buf) {
   | '(' =>
     switch (string) {
