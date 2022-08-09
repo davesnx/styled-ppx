@@ -49,6 +49,10 @@ We provide a VSCode extension that brings syntax highlight (for now, it can incl
 
 Install the VSCode extension: **[VSCode Extension](https://marketplace.visualstudio.com/items?itemName=davesnx.vscode-styled-ppx)**
 
+Also there is a vim-styled-ppx plugin with highlighting support
+
+Install the Vim plugin: **[vim-styled-ppx plugin](https://github.com/ahrefs/vim-styled-ppx/blob/main/README.md#installation)**
+
 > If you are interested on another editor, please [fill an issue](https://github.com/davesnx/styled-ppx/issues/new).
 
 ## Contributing
