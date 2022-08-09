@@ -45,13 +45,15 @@ For the entire documentation, visit [styled-ppx.vercel.app](https://styled-ppx.v
 
 ### Editor Support
 
-We provide a VSCode extension that brings syntax highlight (for now, it can include IntelliSense or other [CSS-related](https://code.visualstudio.com/docs/languages/css) features).
+We provide editor extensions that brings syntax highlight, for now. (It will include IntelliSense or other [CSS-related](https://code.visualstudio.com/docs/languages/css) features).
 
-Install the VSCode extension: **[VSCode Extension](https://marketplace.visualstudio.com/items?itemName=davesnx.vscode-styled-ppx)**
+#### VSCode Extension
 
-Also there is a vim-styled-ppx plugin with highlighting support
+Install the **[VSCode Extension](https://marketplace.visualstudio.com/items?itemName=davesnx.vscode-styled-ppx)**
 
-Install the Vim plugin: **[vim-styled-ppx plugin](https://github.com/ahrefs/vim-styled-ppx/blob/main/README.md#installation)**
+#### vim plugin
+
+Install the **[vim plugin](https://github.com/ahrefs/vim-styled-ppx/blob/main/README.md#installation)**
 
 > If you are interested on another editor, please [fill an issue](https://github.com/davesnx/styled-ppx/issues/new).
 
