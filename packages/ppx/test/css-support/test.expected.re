@@ -18,10 +18,10 @@ CssJs.backgroundRepeat(`hv((`round, `noRepeat)));
 CssJs.backgroundRepeat(`hv((`noRepeat, `noRepeat)));
 CssJs.backgroundAttachment(`local);
 CssJs.backgroundPosition(
-  `hv((`hv((`center, `pxFloat(20.))), `hv((`center, `pxFloat(10.))))),
+  `hv((`hv((`right, `pxFloat(20.))), `hv((`bottom, `pxFloat(10.))))),
 );
-CssJs.backgroundPosition(`hv((`center, `hv((`center, `pxFloat(10.))))));
-CssJs.backgroundPosition(`hv((`hv((`center, `pxFloat(10.))), `center)));
+CssJs.backgroundPosition(`hv((`right, `hv((`bottom, `pxFloat(10.))))));
+CssJs.backgroundPosition(`hv((`hv((`right, `pxFloat(10.))), `top)));
 CssJs.backgroundClip(`borderBox);
 CssJs.backgroundClip(`padding_box);
 CssJs.backgroundClip(`contentBox);
@@ -242,8 +242,8 @@ CssJs.unsafe({js|resize|js}, {js|none|js});
 CssJs.unsafe({js|resize|js}, {js|both|js});
 CssJs.unsafe({js|resize|js}, {js|horizontal|js});
 CssJs.unsafe({js|resize|js}, {js|vertical|js});
-CssJs.unsafe({js|textOverflow|js}, {js|clip|js});
-CssJs.unsafe({js|textOverflow|js}, {js|ellipsis|js});
+CssJs.textOverflow(`clip);
+CssJs.textOverflow(`ellipsis);
 CssJs.unsafe({js|cursor|js}, {js|url(foo.png) 2 2, auto|js});
 CssJs.unsafe({js|cursor|js}, {js|default|js});
 CssJs.unsafe({js|cursor|js}, {js|none|js});
@@ -269,9 +269,9 @@ CssJs.unsafe({js|caretColor|js}, {js|auto|js});
 CssJs.unsafe({js|caretColor|js}, {js|green|js});
 CssJs.unsafe({js|appearance|js}, {js|auto|js});
 CssJs.unsafe({js|appearance|js}, {js|none|js});
-CssJs.unsafe({js|textOverflow|js}, {js|clip|js});
-CssJs.unsafe({js|textOverflow|js}, {js|ellipsis|js});
-CssJs.unsafe({js|textOverflow|js}, {js|'foo'|js});
+CssJs.textOverflow(`clip);
+CssJs.textOverflow(`ellipsis);
+CssJs.textOverflow(`string({js|foo|js}));
 CssJs.unsafe({js|textOverflow|js}, {js|clip clip|js});
 CssJs.unsafe({js|textOverflow|js}, {js|ellipsis clip|js});
 CssJs.unsafe({js|userSelect|js}, {js|auto|js});
@@ -285,24 +285,18 @@ CssJs.unsafe({js|transitionProperty|js}, {js|width|js});
 CssJs.unsafe({js|transitionProperty|js}, {js|width, height|js});
 CssJs.unsafe({js|transitionDuration|js}, {js|0s|js});
 CssJs.unsafe({js|transitionDuration|js}, {js|1s|js});
-CssJs.unsafe({js|transitionDuration|js}, {js|100ms|js});
-CssJs.unsafe({js|transitionTimingFunction|js}, {js|ease|js});
-CssJs.unsafe({js|transitionTimingFunction|js}, {js|linear|js});
-CssJs.unsafe({js|transitionTimingFunction|js}, {js|ease-in|js});
-CssJs.unsafe({js|transitionTimingFunction|js}, {js|ease-out|js});
-CssJs.unsafe({js|transitionTimingFunction|js}, {js|ease-in-out|js});
-CssJs.unsafe(
-  {js|transitionTimingFunction|js},
-  {js|cubic-bezier(.5, .5, .5, .5)|js},
-);
-CssJs.unsafe(
-  {js|transitionTimingFunction|js},
-  {js|cubic-bezier(.5, 1.5, .5, -2.5)|js},
-);
-CssJs.unsafe({js|transitionTimingFunction|js}, {js|step-start|js});
-CssJs.unsafe({js|transitionTimingFunction|js}, {js|step-end|js});
-CssJs.unsafe({js|transitionTimingFunction|js}, {js|steps(3, start)|js});
-CssJs.unsafe({js|transitionTimingFunction|js}, {js|steps(5, end)|js});
+CssJs.transitionDuration(`ms(100.));
+CssJs.transitionTimingFunction(`ease);
+CssJs.transitionTimingFunction(`linear);
+CssJs.transitionTimingFunction(`easeIn);
+CssJs.transitionTimingFunction(`easeOut);
+CssJs.transitionTimingFunction(`easeInOut);
+CssJs.transitionTimingFunction(`cubicBezier((0.5, 0.5, 0.5, 0.5)));
+CssJs.transitionTimingFunction(`cubicBezier((0.5, 1.5, 0.5, (-2.5))));
+CssJs.transitionTimingFunction(`stepStart);
+CssJs.transitionTimingFunction(`stepEnd);
+CssJs.transitionTimingFunction(`steps((3, `start)));
+CssJs.transitionTimingFunction(`steps((5, `end_)));
 CssJs.unsafe({js|transitionDelay|js}, {js|1s|js});
 CssJs.unsafe({js|transitionDelay|js}, {js|-1s|js});
 CssJs.unsafe({js|transition|js}, {js|1s 2s width linear|js});
@@ -310,43 +304,37 @@ CssJs.unsafe({js|transitionTimingFunction|js}, {js|steps(2, jump-start)|js});
 CssJs.unsafe({js|transitionTimingFunction|js}, {js|steps(2, jump-end)|js});
 CssJs.unsafe({js|transitionTimingFunction|js}, {js|steps(1, jump-both)|js});
 CssJs.unsafe({js|transitionTimingFunction|js}, {js|steps(2, jump-none)|js});
-CssJs.unsafe({js|animationName|js}, {js|foo|js});
+CssJs.animationName({js|foo|js});
 CssJs.unsafe({js|animationName|js}, {js|foo, bar|js});
 CssJs.unsafe({js|animationDuration|js}, {js|0s|js});
 CssJs.unsafe({js|animationDuration|js}, {js|1s|js});
-CssJs.unsafe({js|animationDuration|js}, {js|100ms|js});
-CssJs.unsafe({js|animationTimingFunction|js}, {js|ease|js});
-CssJs.unsafe({js|animationTimingFunction|js}, {js|linear|js});
-CssJs.unsafe({js|animationTimingFunction|js}, {js|ease-in|js});
-CssJs.unsafe({js|animationTimingFunction|js}, {js|ease-out|js});
-CssJs.unsafe({js|animationTimingFunction|js}, {js|ease-in-out|js});
-CssJs.unsafe(
-  {js|animationTimingFunction|js},
-  {js|cubic-bezier(.5, .5, .5, .5)|js},
-);
-CssJs.unsafe(
-  {js|animationTimingFunction|js},
-  {js|cubic-bezier(.5, 1.5, .5, -2.5)|js},
-);
-CssJs.unsafe({js|animationTimingFunction|js}, {js|step-start|js});
-CssJs.unsafe({js|animationTimingFunction|js}, {js|step-end|js});
-CssJs.unsafe({js|animationTimingFunction|js}, {js|steps(3, start)|js});
-CssJs.unsafe({js|animationTimingFunction|js}, {js|steps(5, end)|js});
-CssJs.unsafe({js|animationIterationCount|js}, {js|infinite|js});
-CssJs.unsafe({js|animationIterationCount|js}, {js|8|js});
-CssJs.unsafe({js|animationIterationCount|js}, {js|4.35|js});
-CssJs.unsafe({js|animationDirection|js}, {js|normal|js});
-CssJs.unsafe({js|animationDirection|js}, {js|alternate|js});
-CssJs.unsafe({js|animationDirection|js}, {js|reverse|js});
-CssJs.unsafe({js|animationDirection|js}, {js|alternate-reverse|js});
-CssJs.unsafe({js|animationPlayState|js}, {js|running|js});
-CssJs.unsafe({js|animationPlayState|js}, {js|paused|js});
+CssJs.animationDuration(`ms(100.));
+CssJs.CssJs.animationTimingFunction(`ease);
+CssJs.CssJs.animationTimingFunction(`linear);
+CssJs.CssJs.animationTimingFunction(`easeIn);
+CssJs.CssJs.animationTimingFunction(`easeOut);
+CssJs.CssJs.animationTimingFunction(`easeInOut);
+CssJs.CssJs.animationTimingFunction(`cubicBezier((0.5, 0.5, 0.5, 0.5)));
+CssJs.CssJs.animationTimingFunction(`cubicBezier((0.5, 1.5, 0.5, (-2.5))));
+CssJs.CssJs.animationTimingFunction(`stepStart);
+CssJs.CssJs.animationTimingFunction(`stepEnd);
+CssJs.CssJs.animationTimingFunction(`steps((3, `start)));
+CssJs.CssJs.animationTimingFunction(`steps((5, `end_)));
+CssJs.animationIterationCount(`infinite);
+CssJs.animationIterationCount(`count(8.));
+CssJs.animationIterationCount(`count(4.35));
+CssJs.animationDirection(`normal);
+CssJs.animationDirection(`alternate);
+CssJs.animationDirection(`reverse);
+CssJs.animationDirection(`alternateReverse);
+CssJs.animationPlayState(`running);
+CssJs.animationPlayState(`paused);
 CssJs.unsafe({js|animationDelay|js}, {js|1s|js});
 CssJs.unsafe({js|animationDelay|js}, {js|-1s|js});
-CssJs.unsafe({js|animationFillMode|js}, {js|none|js});
-CssJs.unsafe({js|animationFillMode|js}, {js|forwards|js});
-CssJs.unsafe({js|animationFillMode|js}, {js|backwards|js});
-CssJs.unsafe({js|animationFillMode|js}, {js|both|js});
+CssJs.animationFillMode(`none);
+CssJs.animationFillMode(`forwards);
+CssJs.animationFillMode(`backwards);
+CssJs.animationFillMode(`both);
 CssJs.unsafe(
   {js|animation|js},
   {js|foo 1s 2s infinite linear alternate both|js},
@@ -416,13 +404,13 @@ CssJs.unsafe({js|transformStyle|js}, {js|flat|js});
 CssJs.unsafe({js|transformStyle|js}, {js|preserve-3d|js});
 CssJs.unsafe({js|perspective|js}, {js|none|js});
 CssJs.unsafe({js|perspective|js}, {js|600px|js});
-CssJs.unsafe({js|perspectiveOrigin|js}, {js|10px|js});
-CssJs.unsafe({js|perspectiveOrigin|js}, {js|top|js});
-CssJs.unsafe({js|perspectiveOrigin|js}, {js|top left|js});
-CssJs.unsafe({js|perspectiveOrigin|js}, {js|50% 100%|js});
-CssJs.unsafe({js|perspectiveOrigin|js}, {js|left 0%|js});
-CssJs.unsafe({js|backfaceVisibility|js}, {js|visible|js});
-CssJs.unsafe({js|backfaceVisibility|js}, {js|hidden|js});
+CssJs.perspectiveOrigin(`pxFloat(10.), `center);
+CssJs.perspectiveOrigin(`center, `top);
+CssJs.perspectiveOrigin(`left, `top);
+CssJs.perspectiveOrigin(`percent(50.), `percent(100.));
+CssJs.perspectiveOrigin(`left, `percent(0.));
+CssJs.backfaceVisibility(`visible);
+CssJs.backfaceVisibility(`hidden);
 CssJs.unsafe({js|offset|js}, {js|none|js});
 CssJs.unsafe({js|offset|js}, {js|auto|js});
 CssJs.unsafe({js|offset|js}, {js|center|js});
@@ -483,17 +471,17 @@ CssJs.unsafe({js|hangingPunctuation|js}, {js|first force-end|js});
 CssJs.unsafe({js|hangingPunctuation|js}, {js|first force-end last|js});
 CssJs.unsafe({js|hangingPunctuation|js}, {js|first allow-end last|js});
 CssJs.unsafe({js|textDecoration|js}, {js|underline dotted green|js});
-CssJs.unsafe({js|textDecorationLine|js}, {js|none|js});
+CssJs.textDecorationLine(`none);
 CssJs.unsafe({js|textDecorationLine|js}, {js|underline|js});
 CssJs.unsafe({js|textDecorationLine|js}, {js|overline|js});
 CssJs.unsafe({js|textDecorationLine|js}, {js|line-through|js});
 CssJs.unsafe({js|textDecorationLine|js}, {js|underline overline|js});
 CssJs.textDecorationColor(CssJs.white);
-CssJs.unsafe({js|textDecorationStyle|js}, {js|solid|js});
-CssJs.unsafe({js|textDecorationStyle|js}, {js|double|js});
-CssJs.unsafe({js|textDecorationStyle|js}, {js|dotted|js});
-CssJs.unsafe({js|textDecorationStyle|js}, {js|dashed|js});
-CssJs.unsafe({js|textDecorationStyle|js}, {js|wavy|js});
+CssJs.textDecorationStyle(`solid);
+CssJs.textDecorationStyle(`double);
+CssJs.textDecorationStyle(`dotted);
+CssJs.textDecorationStyle(`dashed);
+CssJs.textDecorationStyle(`wavy);
 CssJs.unsafe({js|textUnderlinePosition|js}, {js|auto|js});
 CssJs.unsafe({js|textUnderlinePosition|js}, {js|under|js});
 CssJs.unsafe({js|textUnderlinePosition|js}, {js|left|js});
@@ -1793,7 +1781,16 @@ CssJs.unsafe({js|WebkitLineClamp|js}, {js|2|js});
 CssJs.unsafe({js|WebkitOverflowScrolling|js}, {js|touch|js});
 CssJs.unsafe({js|WebkitTapHighlightColor|js}, {js|transparent|js});
 CssJs.unsafe({js|WebkitTextFillColor|js}, {js|$(Color.Text.primary)|js});
-CssJs.unsafe({js|animation|js}, {js|none|js});
+CssJs.animation(
+  ~duration=`ms(0),
+  ~delay=`ms(0),
+  ~direction=`normal,
+  ~timingFunction=`ease,
+  ~fillMode=`none,
+  ~playState=`running,
+  ~iterationCount=`count(1),
+  {js|none|js},
+);
 CssJs.unsafe({js|appearance|js}, {js|none|js});
 CssJs.unsafe({js|aspectRatio|js}, {js|21 / 8|js});
 (CssJs.backgroundColor(c): CssJs.rule);

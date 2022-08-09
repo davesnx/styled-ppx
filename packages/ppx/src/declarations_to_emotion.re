@@ -4,6 +4,17 @@ open Reason_css_parser;
 module Helper = Ast_helper;
 module Builder = Ppxlib.Ast_builder.Default;
 
+module Option ={
+  include Option;
+
+  let mapWithDefault = (f, default, opt) => {
+    switch (opt) {
+    | Some(x) => f(x)
+    | None => default
+    };
+  };
+}
+
 let txt = (~loc, txt) => {Location.loc: loc, txt};
 
 let (let.ok) = Result.bind;
@@ -54,6 +65,60 @@ let emit_shorthand = (parser, mapper, value_to_expr) => {
   };
 };
 
+let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
+
+let render_variable = (~loc, name) =>
+  list_to_longident(name) |> txt(~loc) |> Helper.Exp.ident(~loc);
+
+let transform_with_variable = (parser, mapper, value_to_expr) =>
+  emit(
+    /* This Xor is defined here for those properties that aren't specifically
+      added <interpolation> as a valid variant */
+    Combinator.combine_xor([
+      /* If the entire CSS value is interpolated, we treat it as a `Variable */
+      Rule.Match.map(Standard.interpolation, data => `Variable(data)),
+      /* Otherwise it's a regular CSS `Value and run the mapper below */
+      Rule.Match.map(parser, data => `Value(data)),
+    ]),
+    (~loc) => fun
+    | `Variable(name) => render_variable(~loc, name)
+    | `Value(ast) => mapper(~loc, ast),
+    (~loc, expression) => {
+      switch (expression) {
+        // Since we are treating with expressions here, we don't have any other way to detect if it's interpolation or not. We want to add type constraints on interpolation only.
+        | {pexp_desc: Pexp_ident({txt: Ldot(Lident("CssJs"), _), _}), _} as exp =>
+          value_to_expr(~loc, exp)
+        | {pexp_desc: Pexp_ident(_), pexp_loc: _, _} as exp =>
+          value_to_expr(~loc, exp) |> List.map(add_CssJs_rule_constraint(~loc))
+        | exp => value_to_expr(~loc, exp)
+      }
+    }
+  );
+
+/* Applies the renderer to a property where the value is one argument */
+let apply = (parser, property_renderer, value_renderer) =>
+  transform_with_variable(
+    parser,
+    value_renderer,
+    (~loc, value) => [[%expr [%e property_renderer(~loc)]([%e value])]]
+  );
+
+/* Triggers unsupported_feature and it's rendered as a string */
+let unsupportedValue = (parser, property) =>
+  transform_with_variable(
+    parser,
+    (~loc as _, _) => raise(Unsupported_feature),
+    (~loc, arg) => [[%expr [%e property(~loc)]([%e arg])]],
+  );
+
+/* Triggers unsupported_feature and it's rendered as a string */
+let unsupportedProperty = (parser) =>
+  transform_with_variable(
+    parser,
+    (~loc as _, _) => raise(Unsupported_feature),
+    (~loc as _) => raise(Unsupported_feature),
+  );
+
 let render_string = (~loc, string) =>
   Helper.Const.string(~quotation_delimiter="js", string) |> Helper.Exp.constant(~loc);
 let render_integer = (~loc, integer) =>
@@ -78,77 +143,79 @@ let render_css_global_values = (~loc, name, value) => {
 
 let variants_to_expression =
   (~loc) => fun
-  | `Row => id([%expr `row])
-  | `Row_reverse => id([%expr `rowReverse])
+  | `Anywhere => id([%expr `anywhere])
+  | `Auto => id([%expr `auto])
+  | `Baseline => id([%expr `baseline])
+  | `Blink => id([%expr `blink])
+  | `Border_box => id([%expr `borderBox])
+  | `Bottom => id([%expr `bottom])
+  | `Break_all => id([%expr `breakAll])
+  | `Break_spaces => id([%expr `breakSpaces])
+  | `Break_word => raise(Unsupported_feature)
+  | `BreakWord => id([%expr `breakWord])
+  | `Capitalize => id([%expr `capitalize])
+  | `Center => id([%expr `center])
+  | `Clip => id([%expr `clip])
   | `Column => id([%expr `column])
   | `Column_reverse => id([%expr `columnReverse])
-  | `Nowrap => id([%expr `nowrap])
-  | `Wrap => id([%expr `wrap])
-  | `Wrap_reverse => id([%expr `wrapReverse])
+  | `Contain => id([%expr `contain])
   | `Content => id([%expr `content])
-  | `Flex_start => id([%expr `flexStart])
-  | `Flex_end => id([%expr `flexEnd])
-  | `Center => id([%expr `center])
-  | `Space_between => id([%expr `spaceBetween])
-  | `Space_around => id([%expr `spaceAround])
-  | `Baseline => id([%expr `baseline])
-  | `Stretch => id([%expr `stretch])
-  | `Auto => id([%expr `auto])
-  | `None => id([%expr `none])
   | `Content_box => id([%expr `contentBox])
-  | `Border_box => id([%expr `borderBox])
-  | `Clip => id([%expr `clip])
-  | `Hidden => id([%expr `hidden])
-  | `Visible => id([%expr `visible])
-  | `Scroll => id([%expr `scroll])
+  | `Cover => id([%expr `cover])
+  | `Dashed => id([%expr `dashed])
+  | `Dotted => id([%expr `dotted])
+  | `Double => id([%expr `double])
   | `Ellipsis => id([%expr `ellipsis])
-  | `Capitalize => id([%expr `capitalize])
+  | `End => id([%expr `end_])
+  | `Fill => id([%expr `fill])
+  | `FitContent => raise(Unsupported_feature)
+  | `Flex_end => id([%expr `flexEnd])
+  | `Flex_start => id([%expr `flexStart])
+  | `Full_width => raise(Unsupported_feature)
+  | `Groove => id([%expr `groove])
+  | `Hidden => id([%expr `hidden])
+  | `Inset => id([%expr `inset])
+  | `Justify => id([%expr `justify])
+  | `Justify_all => raise(Unsupported_feature)
+  | `Keep_all => id([%expr `keepAll])
+  | `Left => id([%expr `left])
+  | `Line_Through => id([%expr `lineThrough])
   | `Lowercase => id([%expr `lowercase])
-  | `Uppercase => id([%expr `uppercase])
-  | `Break_spaces => id([%expr `breakSpaces])
+  | `Match_parent => raise(Unsupported_feature)
+  | `MaxContent => id([%expr `maxContent])
+  | `MinContent => id([%expr `minContent])
+  | `None => id([%expr `none])
   | `Normal => id([%expr `normal])
+  | `Nowrap => id([%expr `nowrap])
+  | `Outset => id([%expr `outset])
+  | `Overline => id([%expr `overline])
+  | `Padding_box => id([%expr `padding_box])
   | `Pre => id([%expr `pre])
   | `Pre_line => id([%expr `preLine])
   | `Pre_wrap => id([%expr `preWrap])
-  | `Break_all => id([%expr `breakAll])
-  | `Break_word => raise(Unsupported_feature)
-  | `Keep_all => id([%expr `keepAll])
-  | `Anywhere => id([%expr `anywhere])
-  | `BreakWord => id([%expr `breakWord])
-  | `End => id([%expr `end_])
-  | `Justify => id([%expr `justify])
-  | `Justify_all => raise(Unsupported_feature)
-  | `Left => id([%expr `left])
-  | `Match_parent => raise(Unsupported_feature)
-  | `Right => id([%expr `right])
-  | `Start => id([%expr `start])
-  | `Transparent => id([%expr `transparent])
-  | `Bottom => id([%expr `bottom])
-  | `Top => id([%expr `top])
-  | `Fill => id([%expr `fill])
-  | `Dotted => id([%expr `dotted])
-  | `Dashed => id([%expr `dashed])
-  | `Solid => id([%expr `solid])
-  | `Double => id([%expr `double])
-  | `Groove => id([%expr `groove])
   | `Ridge => id([%expr `ridge])
-  | `Inset => id([%expr `inset])
-  | `Outset => id([%expr `outset])
-  | `Contain => id([%expr `contain])
+  | `Right => id([%expr `right])
+  | `Row => id([%expr `row])
+  | `Row_reverse => id([%expr `rowReverse])
+  | `Repeat_x => id([%expr `repeatX])
+  | `Repeat_y => id([%expr `repeatY])
   | `Scale_down => id([%expr `scaleDown])
-  | `Cover => id([%expr `cover])
-  | `Full_width => raise(Unsupported_feature)
+  | `Scroll => id([%expr `scroll])
+  | `Solid => id([%expr `solid])
+  | `Space_around => id([%expr `spaceAround])
+  | `Space_between => id([%expr `spaceBetween])
+  | `Start => id([%expr `start])
+  | `Stretch => id([%expr `stretch])
+  | `Top => id([%expr `top])
+  | `Transparent => id([%expr `transparent])
+  | `Underline => id([%expr `underline])
   | `Unset => id([%expr `unset])
-  | `Padding_box => id([%expr `padding_box])
-  | `FitContent => raise(Unsupported_feature)
-  | `MaxContent => id([%expr `maxContent])
-  | `MinContent => id([%expr `minContent])
+  | `Uppercase => id([%expr `uppercase])
+  | `Visible => id([%expr `visible])
+  | `Wavy => id([%expr `wavy])
+  | `Wrap => id([%expr `wrap])
+  | `Wrap_reverse => id([%expr `wrapReverse])
   | `Full_size_kana => raise(Unsupported_feature);
-
-let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
-
-let render_variable = (~loc, name) =>
-  list_to_longident(name) |> txt(~loc) |> Helper.Exp.ident(~loc);
 
 // TODO: all of them could be float, but bs-css doesn't support it
 let render_length =
@@ -267,52 +334,7 @@ let render_extended_angle = (~loc) => fun
 ;
 
 
-let transform_with_variable = (parser, mapper, value_to_expr) =>
-  emit(
-    /* This Xor is defined here for those properties that aren't specifically
-      added <interpolation> as a valid variant */
-    Combinator.combine_xor([
-      /* If the entire CSS value is interpolated, we treat it as a `Variable */
-      Rule.Match.map(Standard.interpolation, data => `Variable(data)),
-      /* Otherwise it's a regular CSS `Value and run the mapper below */
-      Rule.Match.map(parser, data => `Value(data)),
-    ]),
-    (~loc) => fun
-    | `Variable(name) => render_variable(~loc, name)
-    | `Value(ast) => mapper(~loc, ast),
-    (~loc, expression) => {
-      switch (expression) {
-        // Since we are treating with expressions here, we don't have any other way to detect if it's interpolation or not. We want to add type constraints on interpolation only.
-        | {pexp_desc: Pexp_ident({txt: Ldot(Lident("CssJs"), _), _}), _} as exp =>
-          value_to_expr(~loc, exp)
-        | {pexp_desc: Pexp_ident(_), pexp_loc: _, _} as exp =>
-          value_to_expr(~loc, exp) |> List.map(add_CssJs_rule_constraint(~loc))
-        | exp => value_to_expr(~loc, exp)
-      }
-    }
-  );
-
-let apply = (parser, property_renderer, value_renderer) =>
-  transform_with_variable(
-    parser,
-    value_renderer,
-    (~loc, value) => [[%expr [%e property_renderer(~loc)]([%e value])]]
-  );
-
-let unsupportedValue = (parser, property) =>
-  transform_with_variable(
-    parser,
-    (~loc as _, _) => raise(Unsupported_feature),
-    (~loc, arg) => [[%expr [%e property(~loc)]([%e arg])]],
-  );
-
-let unsupportedProperty = (parser) =>
-  transform_with_variable(
-    parser,
-    (~loc as _, _) => raise(Unsupported_feature),
-    (~loc as _) => raise(Unsupported_feature),
-  );
-
+/* Applies variants to one argument */
 let variants = (parser, identifier) =>
   apply(parser, identifier, variants_to_expression);
 
@@ -746,8 +768,6 @@ let render_position = (~loc, position) => {
     | (_, _) => raise(Unsupported_feature)
     };
 
-  let horizontal = to_value(~loc, horizontal);
-
   let vertical =
     switch (position) {
     | `Or(_, Some(pos)) => (pos, `Zero)
@@ -767,9 +787,7 @@ let render_position = (~loc, position) => {
     | (_, _) => raise(Unsupported_feature)
     };
 
-  let vertical = to_value(~loc, vertical);
-
-  id([%expr `hv(([%e horizontal], [%e vertical]))]);
+  (to_value(~loc, horizontal), to_value(~loc, vertical))
 };
 
 let object_fit =
@@ -779,7 +797,10 @@ let object_position =
   apply(
     Parser.property_object_position,
     (~loc) => [%expr CssJs.objectPosition],
-    render_position,
+    (~loc, position) => {
+      let (x, y) = render_position(~loc, position);
+      [%expr `hv([%e x], [%e y])];
+    },
   );
 let image_resolution = unsupportedProperty(Parser.property_image_resolution);
 let image_orientation = unsupportedProperty(Parser.property_image_orientation);
@@ -800,15 +821,11 @@ let render_shadow = (~loc, shadow) => {
   let (color, x, y, blur, spread, inset) =
     switch (shadow) {
     | `Box(inset, position, color) =>
-      let (x, y, blur, spread) = {
-        let (x, y, blur, spread) =
-          switch (position) {
-          | [x, y] => (x, y, None, None)
-          | [x, y, blur] => (x, y, Some(blur), None)
-          | [x, y, blur, spread] => (x, y, Some(blur), Some(spread))
-          | _ => failwith("unreachable")
-          };
-        (x, y, blur, spread);
+      let (x, y, blur, spread) = switch (position) {
+        | [x, y] => (x, y, None, None)
+        | [x, y, blur] => (x, y, Some(blur), None)
+        | [x, y, blur, spread] => (x, y, Some(blur), Some(spread))
+        | _ => failwith("unreachable")
       };
       (color, x, y, blur, spread, inset);
     };
@@ -843,8 +860,8 @@ let render_shadow = (~loc, shadow) => {
       (Nolabel, Some(color)),
     ]
     |> List.filter_map(
-        ((label, value)) => Option.map(value => (label, value), value)
-      );
+      ((label, value)) => Option.map(value => (label, value), value)
+    );
 
   Helper.Exp.apply(~loc, [%expr CssJs.Shadow.box], args);
 };
@@ -890,8 +907,8 @@ let render_image_or_none = (~loc) => fun
   | `Image(i) => render_image(~loc, i);
 
 let render_repeat_style = (~loc) => fun
-  | `Repeat_x => [%expr `repeatX]
-  | `Repeat_y => [%expr `repeatY]
+  | `Repeat_x => variants_to_expression(~loc, `Repeat_x)
+  | `Repeat_y => variants_to_expression(~loc, `Repeat_y)
   | `Xor(values) => {
     let render_xor = fun
       | `Repeat => [%expr `repeat]
@@ -929,8 +946,8 @@ let background_repeat =
     (~loc) => [%expr CssJs.backgroundRepeat],
     (~loc) => fun
     | [] => failwith("expected at least one value")
-    | [`Repeat_x] => [%expr `repeatX]
-    | [`Repeat_y] => [%expr `repeatY]
+    | [`Repeat_x] => variants_to_expression(~loc, `Repeat_x)
+    | [`Repeat_y] => variants_to_expression(~loc, `Repeat_y)
     | [`Xor(_) as v] => render_repeat_style(~loc, v)
     | _ => raise(Unsupported_feature)
   );
@@ -947,10 +964,10 @@ let background_attachment =
 let render_background_position = (~loc, position) => {
   let render_static = fun
     | `Center => [%expr `center]
-    | `Left => [%expr `center]
-    | `Right => [%expr `center]
-    | `Bottom => [%expr `center]
-    | `Top => [%expr `center]
+    | `Left => [%expr `left]
+    | `Right => [%expr `right]
+    | `Bottom => [%expr `bottom]
+    | `Top => [%expr `top]
     | `Extended_length(l) => render_extended_length(~loc, l)
     | `Extended_percentage(p) => render_extended_percentage(~loc, p);
 
@@ -1009,14 +1026,14 @@ let background_size =
     (~loc) => fun
     | [] => failwith("expected at least one argument")
     | [v] => switch (v) {
-        | `Contain => [%expr `contain]
-        | `Cover => [%expr `cover]
-        | `Xor([`Auto]) => [%expr `auto]
-        | `Xor(l) when List.mem(`Auto, l) => raise(Unsupported_feature)
-        | `Xor([x, y]) => [%expr `size([%e render_size(~loc, x)], [%e render_size(~loc, y)])]
-        | `Xor([_])
-        | _ => raise(Unsupported_feature)
-      }
+      | `Contain => [%expr `contain]
+      | `Cover => [%expr `cover]
+      | `Xor([`Auto]) => [%expr `auto]
+      | `Xor(l) when List.mem(`Auto, l) => raise(Unsupported_feature)
+      | `Xor([x, y]) => [%expr `size([%e render_size(~loc, x)], [%e render_size(~loc, y)])]
+      | `Xor([_])
+      | _ => raise(Unsupported_feature)
+    }
     | _ => raise(Unsupported_feature)
   );
 
@@ -1376,9 +1393,17 @@ let overflow =
 // let overflow_clip_margin = unsupportedProperty(Parser.property_overflow_clip_margin);
 let overflow_inline = unsupportedProperty(Parser.property_overflow_inline);
 let text_overflow =
-  unsupportedValue(
+  apply(
     Parser.property_text_overflow,
     (~loc) => [%expr CssJs.textOverflow],
+    (~loc) => fun
+      | [one] => switch (one) {
+        | `Clip => variants_to_expression(~loc, `Clip)
+        | `Ellipsis => variants_to_expression(~loc, `Ellipsis)
+        | `String(str) => [%expr `string([%e render_string(~loc, str)])]
+      }
+      | []
+      | _ => raise(Unsupported_feature),
   );
 // let block_ellipsis = unsupportedProperty(Parser.property_block_ellipsis);
 let max_lines = unsupportedProperty(Parser.property_max_lines);
@@ -1406,11 +1431,11 @@ let line_height =
     render_line_height,
   );
 let line_height_step =
-apply(
-  Parser.property_line_height_step,
-  (~loc) => [%expr CssJs.lineHeightStep],
-  render_extended_length,
-);
+  apply(
+    Parser.property_line_height_step,
+    (~loc) => [%expr CssJs.lineHeightStep],
+    render_extended_length,
+  );
 let hyphens = unsupportedProperty(Parser.property_hyphens);
 let overflow_wrap =
   variants(Parser.property_overflow_wrap, (~loc) => [%expr CssJs.overflowWrap]);
@@ -1508,14 +1533,27 @@ let font_variation_settings =
 
 // css-text-decor-3
 let text_decoration_line =
-  unsupportedValue(
+  apply(
     Parser.property_text_decoration_line,
     (~loc) => [%expr CssJs.textDecorationLine],
+    (~loc) => fun
+        | `None => variants_to_expression(~loc, `None)
+        | `Underline => variants_to_expression(~loc, `Underline)
+        | `Overline => variants_to_expression(~loc, `Overline)
+        | `Line_Through => variants_to_expression(~loc, `Line_Through)
+        | `Blink => variants_to_expression(~loc, `Blink)
+        | _ => raise(Unsupported_feature),
   );
 let text_decoration_style =
-  unsupportedValue(
+  apply(
     Parser.property_text_decoration_style,
     (~loc) => [%expr CssJs.textDecorationStyle],
+    (~loc) => fun
+      | `Solid => variants_to_expression(~loc, `Solid)
+      | `Double => variants_to_expression(~loc, `Double)
+      | `Dotted => variants_to_expression(~loc, `Dotted)
+      | `Dashed => variants_to_expression(~loc, `Dashed)
+      | `Wavy => variants_to_expression(~loc, `Wavy)
   );
 let text_decoration_color =
   apply(
@@ -1628,13 +1666,19 @@ let transform_style =
     (~loc) => [%expr CssJs.transformStyle],
   );
 let perspective = unsupportedProperty(Parser.property_perspective);
+
 let perspective_origin =
-  unsupportedValue(
+  emit(
     Parser.property_perspective_origin,
-    (~loc) => [%expr CssJs.transformStyle],
+    (~loc as _) => id,
+    (~loc, position) => {
+      let (x, y) = render_position(~loc, position);
+      [[%expr CssJs.perspectiveOrigin([%e x], [%e y])]];
+    }
   );
+
 let backface_visibility =
-  unsupportedValue(
+  variants(
     Parser.property_backface_visibility,
     (~loc) => [%expr CssJs.backfaceVisibility],
   );
@@ -1645,16 +1689,66 @@ let transition_property =
     Parser.property_transition_property,
     (~loc) => [%expr CssJs.transitionProperty],
   );
+
+let render_time = (~loc) => fun
+  | `Ms(f) => [%expr `ms([%e render_number(~loc, f)])]
+  | `S(_) => raise(Unsupported_feature);
+
+let render_duration = (~loc) => fun
+  | `Time(t) => render_time(~loc, t)
+  | `Function_calc(fc) => render_function_calc(~loc, fc)
+  | _ => raise(Unsupported_feature);
+
 let transition_duration =
-  unsupportedValue(
+  apply(
     Parser.property_transition_duration,
     (~loc) => [%expr CssJs.transitionDuration],
+    (~loc) => fun
+      | [] => [%expr `none]
+      | [one] => render_duration(~loc, one)
+      | _ => raise(Unsupported_feature)
   );
 let widows = apply(Parser.property_widows, (~loc) => [%expr CssJs.widows], render_integer);
+
+let render_cubic_bezier_timing_function = (~loc) => fun
+  | `Ease => [%expr `ease]
+  | `Ease_in => [%expr `easeIn]
+  | `Ease_out=> [%expr `easeOut]
+  | `Ease_in_out=> [%expr `easeInOut]
+  | `Cubic_bezier(p0, (), p1, (), p2, (), p3) =>
+    [%expr `cubicBezier(
+      [%e render_number(~loc, p0)],
+      [%e render_number(~loc, p1)],
+      [%e render_number(~loc, p2)],
+      [%e render_number(~loc, p3)]
+    )];
+
+let render_step_position = (~loc) => fun
+  | `Start => [%expr `start]
+  | `End => [%expr `end_]
+  | `Jump_start
+  | `Jump_end
+  | `Jump_none
+  | `Jump_both => raise(Unsupported_feature);
+
+let render_steps_function = (~loc) => fun
+  | `Step_start => [%expr `stepStart]
+  | `Step_end => [%expr `stepEnd]
+  | `Steps(int, Some((_, step_position))) => [%expr `steps([%e render_integer(~loc, int)], [%e render_step_position(~loc, step_position)])]
+  | `Steps(_, None) => raise(Unsupported_feature);
+
+let render_timing = (~loc) => fun
+  | `Linear => [%expr `linear]
+  | `Cubic_bezier_timing_function(v) => render_cubic_bezier_timing_function(~loc, v)
+  | `Step_timing_function(v) => render_steps_function(~loc, v);
+
 let transition_timing_function =
-  unsupportedValue(
+  apply(
     Parser.property_transition_timing_function,
     (~loc) => [%expr CssJs.transitionTimingFunction],
+    (~loc) => fun
+      | [t] => render_timing(~loc, t)
+      | _ => raise(Unsupported_feature),
   );
 let transition_delay =
   unsupportedValue(
@@ -1664,49 +1758,150 @@ let transition_delay =
 let transition =
   unsupportedValue(Parser.property_transition, (~loc) => [%expr CssJs.transition]);
 
+let render_keyframes_name = (~loc) => fun
+  | `Custom_ident(label) => render_string(~loc, label)
+  | `String(label) => render_string(~loc, label);
+
+let render_animation_name = (~loc) => fun
+  | `None => [%expr `none]
+  | `Keyframes_name(name) => render_keyframes_name(~loc, name)
+;
+
 // css-animation-1
 let animation_name =
-  unsupportedValue(
+  apply(
     Parser.property_animation_name,
     (~loc) => [%expr CssJs.animationName],
+    (~loc) => fun
+      | [one] => render_animation_name(~loc, one)
+      | _ => raise(Unsupported_feature),
   );
+
 let animation_duration =
-  unsupportedValue(
+  apply(
     Parser.property_animation_duration,
     (~loc) => [%expr CssJs.animationDuration],
+    (~loc) => fun
+      | [] => [%expr `none]
+      | [one] => render_duration(~loc, one)
+      | _ => raise(Unsupported_feature)
   );
+
 let animation_timing_function =
-  unsupportedValue(
+  apply(
     Parser.property_animation_timing_function,
     (~loc) => [%expr CssJs.CssJs.animationTimingFunction],
+    (~loc) => fun
+      | [t] => render_timing(~loc, t)
+      | _ => raise(Unsupported_feature)
   );
+
+let render_animation_iteration_count = (~loc) => fun
+  | `Infinite => [%expr `infinite]
+  | `Number(n) => [%expr `count([%e render_number(~loc, n)])];
+
 let animation_iteration_count =
-  unsupportedValue(
+  apply(
     Parser.property_animation_iteration_count,
     (~loc) => [%expr CssJs.animationIterationCount],
+    (~loc) => fun
+      | [one] => render_animation_iteration_count(~loc, one)
+      | _ => raise(Unsupported_feature)
   );
+
+let render_animation_direction = (~loc) => fun
+  | `Normal => [%expr `normal]
+  | `Reverse => [%expr `reverse]
+  | `Alternate => [%expr `alternate]
+  | `Alternate_reverse => [%expr `alternateReverse];
+
 let animation_direction =
-  unsupportedValue(
+  apply(
     Parser.property_animation_direction,
     (~loc) => [%expr CssJs.animationDirection],
+    (~loc) => fun
+      | [one] => render_animation_direction(~loc, one)
+      | _ => raise(Unsupported_feature)
   );
+
+let render_animation_play_state = (~loc) => fun
+  | `Paused => [%expr `paused]
+  | `Running => [%expr `running];
+
 let animation_play_state =
-  unsupportedValue(
+  apply(
     Parser.property_animation_play_state,
     (~loc) => [%expr CssJs.animationPlayState],
+    (~loc) => fun
+      | [one] => render_animation_play_state(~loc, one)
+      | _ => raise(Unsupported_feature)
   );
+
 let animation_delay =
-  unsupportedValue(
+  apply(
     Parser.property_animation_delay,
     (~loc) => [%expr CssJs.animationDelay],
+    (~loc) => fun
+      | [one] => render_duration(~loc, one)
+      | _ => raise(Unsupported_feature)
   );
+
+let render_animation_fill_mode = (~loc) => fun
+  | `None => [%expr `none]
+  | `Forwards => [%expr `forwards]
+  | `Backwards => [%expr `backwards]
+  | `Both => [%expr `both];
+
 let animation_fill_mode =
-  unsupportedValue(
+  apply(
     Parser.property_animation_fill_mode,
     (~loc) => [%expr CssJs.animationFillMode],
+    (~loc) => fun
+      | [one] => render_animation_fill_mode(~loc, one)
+      | _ => raise(Unsupported_feature)
   );
+
+let render_single_animation = (~loc,
+  (
+    duration,
+    timing_function,
+    delay,
+    iteration_count,
+    direction,
+    fillMode,
+    playState,
+    name
+  )
+) => {
+  let duration = duration |> Option.mapWithDefault(render_duration(~loc), [%expr `ms(0)]);
+  let delay = delay |> Option.mapWithDefault(render_duration(~loc), [%expr `ms(0)]);
+  let direction = direction |> Option.mapWithDefault(render_animation_direction(~loc), [%expr `normal]);
+  let timingFunction = timing_function |> Option.mapWithDefault(render_timing(~loc), [%expr `ease]);
+  let fillMode = fillMode |> Option.mapWithDefault(render_animation_fill_mode(~loc), [%expr `none]);
+  let playState = playState |> Option.mapWithDefault(render_animation_play_state(~loc), [%expr `running]);
+  let iterationCount = iteration_count |> Option.mapWithDefault(render_animation_iteration_count(~loc), [%expr `count(1)]);
+  let name = name |> Option.mapWithDefault(render_animation_name(~loc), [%expr `none]);
+
+  [%expr CssJs.animation(
+    ~duration=[%e duration],
+    ~delay=[%e delay],
+    ~direction=[%e direction],
+    ~timingFunction=[%e timingFunction],
+    ~fillMode=[%e fillMode],
+    ~playState=[%e playState],
+    ~iterationCount=[%e iterationCount],
+    [%e name],
+  )];
+};
+
 let animation =
-  unsupportedValue(Parser.property_animation, (~loc) => [%expr CssJs.animation]);
+  emit(
+    Parser.property_animation,
+    (~loc as _) => id,
+    (~loc) => fun
+     | [one] => [render_single_animation(~loc, one)]
+     | _ => raise(Unsupported_feature)
+  );
 
 // css-flexbox-1
 let flex_direction =
@@ -1956,7 +2151,6 @@ let mask_image =
     (~loc) => [%expr CssJs.maskImage],
     (~loc) => fun
       | [one] => render_mask_image(~loc, one)
-      | []
       | _ => raise(Unsupported_feature)
   );
 
