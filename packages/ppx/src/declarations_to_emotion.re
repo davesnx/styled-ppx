@@ -1367,15 +1367,9 @@ let box_shadow =
       },
   );
 
-let render_overflow =
-  (~loc) => fun
-  | `Clip => raise(Unsupported_feature)
-  | rest => variants_to_expression(~loc, rest);
-
 // css-overflow-3
-// TODO: maybe implement using strings?
 let overflow_x =
-  apply(Parser.property_overflow_x, (~loc) => [%expr CssJs.overflowX], render_overflow);
+  variants(Parser.property_overflow_x, (~loc) => [%expr CssJs.overflowX]);
 
 let overflow_y =
   variants(Parser.property_overflow_y, (~loc) => [%expr CssJs.overflowY]);
@@ -1383,12 +1377,13 @@ let overflow_y =
 let overflow =
   emit(
     Parser.property_overflow,
+    (~loc as _) => id,
     (~loc) => fun
-    | `Xor(values) => values |> List.map(render_overflow(~loc))
-    | _ => raise(Unsupported_feature),
-    (~loc) => fun
-    | [all] => [[%expr CssJs.overflow([%e all])]]
-    | [_x, _y] => raise(Unsupported_feature)
+    | `Xor([all]) => [[%expr CssJs.overflow([%e variants_to_expression(~loc, all)])]]
+    | `Xor([x, y]) => [
+      [%expr CssJs.overflowX([%e variants_to_expression(~loc, x)])],
+      [%expr CssJs.overflowY([%e variants_to_expression(~loc, y)])]
+    ]
     | _ => failwith("unreachable"),
   );
 

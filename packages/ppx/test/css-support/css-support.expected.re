@@ -1659,7 +1659,7 @@ CssJs.unsafe({js|maxLines|js}, {js|none|js});
 CssJs.unsafe({js|maxLines|js}, {js|1|js});
 CssJs.overflowX(`visible);
 CssJs.overflowX(`hidden);
-CssJs.unsafe({js|overflowX|js}, {js|clip|js});
+CssJs.overflowX(`clip);
 CssJs.overflowX(`scroll);
 CssJs.overflowX(`auto);
 CssJs.overflowY(`visible);
