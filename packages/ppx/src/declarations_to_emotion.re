@@ -215,6 +215,8 @@ let variants_to_expression =
   | `Wavy => id([%expr `wavy])
   | `Wrap => id([%expr `wrap])
   | `Wrap_reverse => id([%expr `wrapReverse])
+  | `Flat => id([%expr `flat])
+  | `Preserve_3d => id([%expr `preserve3d])
   | `Full_size_kana => raise(Unsupported_feature);
 
 // TODO: all of them could be float, but bs-css doesn't support it
@@ -963,11 +965,11 @@ let background_attachment =
 
 let render_background_position = (~loc, position) => {
   let render_static = fun
-    | `Center => [%expr `center]
-    | `Left => [%expr `left]
-    | `Right => [%expr `right]
-    | `Bottom => [%expr `bottom]
-    | `Top => [%expr `top]
+    | `Center => variants_to_expression(~loc, `Center)
+    | `Left => variants_to_expression(~loc, `Left)
+    | `Right => variants_to_expression(~loc, `Right)
+    | `Bottom => variants_to_expression(~loc, `Bottom)
+    | `Top => variants_to_expression(~loc, `Top)
     | `Extended_length(l) => render_extended_length(~loc, l)
     | `Extended_percentage(p) => render_extended_percentage(~loc, p);
 
@@ -979,11 +981,11 @@ let render_background_position = (~loc, position) => {
     };
 
   switch (position) {
-    | `Bottom => [%expr `bottom]
-    | `Center => [%expr `center]
-    | `Top => [%expr `top]
-    | `Left => [%expr `left]
-    | `Right => [%expr `right]
+    | `Center => variants_to_expression(~loc, `Center)
+    | `Left => variants_to_expression(~loc, `Left)
+    | `Right => variants_to_expression(~loc, `Right)
+    | `Bottom => variants_to_expression(~loc, `Bottom)
+    | `Top => variants_to_expression(~loc, `Top)
     | `Extended_length(l) => render_extended_length(~loc, l)
     | `Extended_percentage(a) => render_extended_percentage(~loc, a)
     | `Static((x, y)) => [%expr `hv([%e render_static(x)], [%e render_static(y)])]
@@ -1026,9 +1028,9 @@ let background_size =
     (~loc) => fun
     | [] => failwith("expected at least one argument")
     | [v] => switch (v) {
-      | `Contain => [%expr `contain]
-      | `Cover => [%expr `cover]
-      | `Xor([`Auto]) => [%expr `auto]
+      | `Contain => variants_to_expression(~loc, `Contain)
+      | `Cover => variants_to_expression(~loc, `Cover)
+      | `Xor([`Auto]) => variants_to_expression(~loc, `Auto)
       | `Xor(l) when List.mem(`Auto, l) => raise(Unsupported_feature)
       | `Xor([x, y]) => [%expr `size([%e render_size(~loc, x)], [%e render_size(~loc, y)])]
       | `Xor([_])
@@ -1537,12 +1539,12 @@ let text_decoration_line =
     Parser.property_text_decoration_line,
     (~loc) => [%expr CssJs.textDecorationLine],
     (~loc) => fun
-        | `None => variants_to_expression(~loc, `None)
-        | `Underline => variants_to_expression(~loc, `Underline)
-        | `Overline => variants_to_expression(~loc, `Overline)
-        | `Line_Through => variants_to_expression(~loc, `Line_Through)
-        | `Blink => variants_to_expression(~loc, `Blink)
-        | _ => raise(Unsupported_feature),
+      | `None => variants_to_expression(~loc, `None)
+      | `Underline => variants_to_expression(~loc, `Underline)
+      | `Overline => variants_to_expression(~loc, `Overline)
+      | `Line_Through => variants_to_expression(~loc, `Line_Through)
+      | `Blink => variants_to_expression(~loc, `Blink)
+      | _ => raise(Unsupported_feature),
   );
 let text_decoration_style =
   apply(
@@ -1646,24 +1648,50 @@ let transform =
     }
   );
 
+let render_origin = (~loc) => fun
+  | `Center => variants_to_expression(~loc, `Center)
+  | `Left => variants_to_expression(~loc, `Left)
+  | `Right => variants_to_expression(~loc, `Right)
+  | `Bottom => variants_to_expression(~loc, `Bottom)
+  | `Top => variants_to_expression(~loc, `Top)
+  | `Function_calc(fc) => render_function_calc(~loc, fc)
+  | `Interpolation(v) => render_variable(~loc, v)
+  | `Length(l) => render_length(~loc, l)
+  | `Extended_length(l) => render_extended_length(~loc, l)
+  | `Extended_percentage(p) => render_extended_percentage(~loc, p);
+
 let transform_origin =
-  unsupportedValue(
+  emit(
     Parser.property_transform_origin,
-    (~loc) => [%expr CssJs.transformOrigin],
+    (~loc as _) => id,
+    (~loc) => fun
+      | `Static(((x, y), None)) => {
+        [[%expr CssJs.transformOrigin(
+          [%e render_origin(~loc, x)],
+          [%e render_origin(~loc, y)]
+        )]]
+      }
+      | `Center
+      | `Left
+      | `Right
+      | `Bottom
+      | `Top
+      | `Extended_length(_)
+      | `Extended_percentage(_)
+      | _ => raise(Unsupported_feature)
   );
-let transform_box =
-  unsupportedValue(
-    Parser.property_transform_box,
-    (~loc) => [%expr CssJs.transformOrigin],
-  );
+let transform_box = unsupportedProperty(Parser.property_transform_box);
 let translate =
   unsupportedValue(Parser.property_translate, (~loc) => [%expr CssJs.translate]);
 let rotate = unsupportedValue(Parser.property_rotate, (~loc) => [%expr CssJs.rotate]);
 let scale = unsupportedValue(Parser.property_scale, (~loc) => [%expr CssJs.scale]);
 let transform_style =
-  unsupportedValue(
+  apply(
     Parser.property_transform_style,
     (~loc) => [%expr CssJs.transformStyle],
+    (~loc) => fun
+      | `Flat => variants_to_expression(~loc, `Flat)
+      | `Preserve_3d => variants_to_expression(~loc, `Preserve_3d)
   );
 let perspective = unsupportedProperty(Parser.property_perspective);
 
@@ -1685,9 +1713,15 @@ let backface_visibility =
 
 // css-transition-1
 let transition_property =
-  unsupportedValue(
+  apply(
     Parser.property_transition_property,
     (~loc) => [%expr CssJs.transitionProperty],
+    (~loc) => fun
+      | `None => render_string(~loc, "none")
+      | `All => render_string(~loc, "all")
+      | `Custom_ident(v) => render_string(~loc, v)
+      | `Interpolation(v) => render_variable(~loc, v)
+      | `Single_transition_property(_) => raise(Unsupported_feature)
   );
 
 let render_time = (~loc) => fun
@@ -1751,9 +1785,13 @@ let transition_timing_function =
       | _ => raise(Unsupported_feature),
   );
 let transition_delay =
-  unsupportedValue(
+  apply(
     Parser.property_transition_delay,
     (~loc) => [%expr CssJs.transitionDelay],
+    (~loc) => fun
+      | [`Time(t)] => render_time(~loc, t)
+      | [`Interpolation(v)] => render_variable(~loc, v)
+      | _ => raise(Unsupported_feature),
   );
 let transition =
   unsupportedValue(Parser.property_transition, (~loc) => [%expr CssJs.transition]);
