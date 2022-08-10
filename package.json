@@ -32,6 +32,7 @@
     "@opam/ocaml-lsp-server": "1.13.0",
     "@opam/ocamlformat": "0.24.1",
     "@opam/ocaml-migrate-parsetree": "2.4.0",
+    "@opam/utop": "2.10.0",
     "@reason-native/rely":
       "jfrolich/reason-native:rely.json#08085a4048974b06aaf3aab918b677b39dea3d18",
     "ocaml": "4.14.0",

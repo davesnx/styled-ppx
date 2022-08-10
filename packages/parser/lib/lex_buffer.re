@@ -63,6 +63,12 @@ let rollback = lexbuf => {
   Sedlexing.rollback(lexbuf.buf);
 };
 
+let __private__next_int = lexbuf => {
+  lexbuf.pos_mark = lexbuf.pos;
+  lexbuf.last_char_mark = lexbuf.last_char;
+  Sedlexing.__private__next_int(lexbuf.buf);
+};
+
 /** location of next character */
 let next_loc = lexbuf => {...lexbuf.pos, pos_cnum: lexbuf.pos.pos_cnum + 1};
 
