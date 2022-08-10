@@ -189,7 +189,7 @@ let variants_to_expression =
   | `Nowrap => id([%expr `nowrap])
   | `Outset => id([%expr `outset])
   | `Overline => id([%expr `overline])
-  | `Padding_box => id([%expr `padding_box])
+  | `Padding_box => id([%expr `paddingBox])
   | `Pre => id([%expr `pre])
   | `Pre_line => id([%expr `preLine])
   | `Pre_wrap => id([%expr `preWrap])
@@ -874,11 +874,19 @@ let background_color =
     render_color,
   );
 
-/* TODO: Incomplete */
-/* let render_stops = (~loc as _, s) => [%expr [%e s]] */
+let render_stop = (~loc, stop) => {
+  let (color, length) = stop;
+  let color = render_color_interp(~loc, color);
+  let length = render_length_interp(~loc, length);
+  [%expr ([%e length], [%e color])];
+};
 
-/* TODO: Support gradients */
-/* let render_gradient = (~loc) => fun
+let render_stops = (~loc, stops) => {
+  let stops = List.map(render_stop(~loc), stops);
+  Helper.Exp.array(~loc, stops);
+};
+
+let render_gradient = (~loc) => fun
   | `Linear_gradient(angle, stops) =>
     [%expr `linearGradient([%e render_extended_angle(~loc, angle)], [%e render_stops(~loc, stops)])]
   | `Repeating_linear_gradient(angle, stops) =>
@@ -889,18 +897,24 @@ let background_color =
     [%expr `repeatingRadialGradient([%e render_stops(~loc, stops)])]
   | `conicGradient(angle, stops) =>
     [%expr `conicGradient([%e render_extended_angle(~loc, angle)], [%e render_stops(~loc, stops)])]
-; */
+  | `Function_conic_gradient(_)
+  | `Function_linear_gradient(_)
+  | `Function_radial_gradient(_)
+  | `Function_repeating_linear_gradient(_)
+  | `Function_repeating_radial_gradient(_)
+  | `_legacy_gradient(_) => raise(Unsupported_feature)
+;
 
 let render_image = (~loc) => fun
-  /* | `Gradient(gradient) => render_gradient(gradient) */
+  | `Gradient(gradient) => render_gradient(~loc, gradient)
   | `Url(url) => [%expr `url([%e render_string(~loc, url)])]
   | `Interpolation(v) => render_variable(~loc, v)
+  // bs-css only accepts | BackgroundImage.t | #Url.t | #Gradient.t
   | `Image(_)
   | `Image_set(_)
   | `Element(_)
   | `Paint(_)
   | `Cross_fade(_)
-  // bs-css only accepts | BackgroundImage.t | #Url.t | #Gradient.t
   | _ => raise(Unsupported_feature)
 ;
 
@@ -1048,8 +1062,8 @@ let render_background = (~loc, (layers, final_layer)) => {
       render_layer(bg_image, [%expr CssJs.backgroundImage], render_image(~loc)),
       render_layer(repeat_style, [%expr CssJs.backgroundRepeat], render_repeat_style(~loc)),
       render_layer(attachment, [%expr CssJs.backgroundRepeat], render_attachment(~loc)),
-      render_layer(b1, [%expr CssJs.clip], variants_to_expression(~loc)),
-      render_layer(b2, [%expr CssJs.origin], variants_to_expression(~loc)),
+      render_layer(b1, [%expr CssJs.backgroundClip], variants_to_expression(~loc)),
+      render_layer(b2, [%expr CssJs.backgroundOrigin], variants_to_expression(~loc)),
     ] @ switch (bg_position) {
       | Some((bg_pos, Some(((), bg_size)))) => [
         [[%expr CssJs.backgroundPosition([%e render_background_position(~loc, bg_pos)])]],
@@ -1068,8 +1082,8 @@ let render_background = (~loc, (layers, final_layer)) => {
       render_layer(bg_image, [%expr CssJs.backgroundImage], render_image(~loc)),
       render_layer(repeat_style, [%expr CssJs.backgroundRepeat], render_repeat_style(~loc)),
       render_layer(attachment, [%expr CssJs.backgroundRepeat], render_attachment(~loc)),
-      render_layer(b1, [%expr CssJs.clip], variants_to_expression(~loc)),
-      render_layer(b2, [%expr CssJs.origin], variants_to_expression(~loc)),
+      render_layer(b1, [%expr CssJs.backgroundClip], variants_to_expression(~loc)),
+      render_layer(b2, [%expr CssJs.backgroundOrigin], variants_to_expression(~loc)),
     ] @ switch (bg_position) {
       | Some((bg_pos, Some(((), bg_size)))) => [
         [[%expr CssJs.backgroundPosition([%e render_background_position(~loc, bg_pos)])]],
