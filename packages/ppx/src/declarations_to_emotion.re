@@ -888,15 +888,15 @@ let render_stops = (~loc, stops) => {
 
 let render_gradient = (~loc) => fun
   | `Linear_gradient(angle, stops) =>
-    [%expr `linearGradient([%e render_extended_angle(~loc, angle)], [%e render_stops(~loc, stops)])]
+    [%expr `linearGradient(([%e render_extended_angle(~loc, angle)], [%e render_stops(~loc, stops)]))]
   | `Repeating_linear_gradient(angle, stops) =>
-    [%expr `repeatingLinearGradient([%e render_extended_angle(~loc, angle)], [%e render_stops(~loc, stops)])]
+    [%expr `repeatingLinearGradient(([%e render_extended_angle(~loc, angle)], [%e render_stops(~loc, stops)]))]
   | `Radial_gradient(stops) =>
     [%expr `radialGradient([%e render_stops(~loc, stops)])]
   | `Repeating_radial_gradient(stops) =>
     [%expr `repeatingRadialGradient([%e render_stops(~loc, stops)])]
   | `conicGradient(angle, stops) =>
-    [%expr `conicGradient([%e render_extended_angle(~loc, angle)], [%e render_stops(~loc, stops)])]
+    [%expr `conicGradient(([%e render_extended_angle(~loc, angle)], [%e render_stops(~loc, stops)]))]
   | `Function_conic_gradient(_)
   | `Function_linear_gradient(_)
   | `Function_radial_gradient(_)
@@ -938,8 +938,8 @@ let render_repeat_style = (~loc) => fun
         | [] => failwith("expected at least one value")
         | _ => failwith("repeat doesn't accept more then 2 values");
       }
-  };
-
+  }
+;
 
 let render_attachment = (~loc) => fun
   | `Fixed => [%expr `fixed]

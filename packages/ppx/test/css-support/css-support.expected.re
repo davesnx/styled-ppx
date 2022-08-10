@@ -23,10 +23,10 @@ CssJs.backgroundPosition(
 CssJs.backgroundPosition(`hv((`right, `hv((`bottom, `pxFloat(10.))))));
 CssJs.backgroundPosition(`hv((`hv((`right, `pxFloat(10.))), `top)));
 CssJs.backgroundClip(`borderBox);
-CssJs.backgroundClip(`padding_box);
+CssJs.backgroundClip(`paddingBox);
 CssJs.backgroundClip(`contentBox);
 CssJs.backgroundOrigin(`borderBox);
-CssJs.backgroundOrigin(`padding_box);
+CssJs.backgroundOrigin(`paddingBox);
 CssJs.backgroundOrigin(`contentBox);
 CssJs.backgroundSize(`auto);
 CssJs.backgroundSize(`cover);
@@ -37,11 +37,11 @@ CssJs.unsafe({js|backgroundSize|js}, {js|10px auto|js});
 CssJs.unsafe({js|backgroundSize|js}, {js|auto 10%|js});
 CssJs.backgroundSize(`size((`em(50.), `percent(50.))));
 CssJs.unsafe({js|background|js}, {js|top left / 50% 60%|js});
-CssJs.origin(`borderBox);
+CssJs.backgroundOrigin(`borderBox);
 CssJs.backgroundColor(CssJs.blue);
 CssJs.backgroundColor(CssJs.red);
 CssJs.backgroundRepeat(`fixed);
-CssJs.clip(`padding_box);
+CssJs.backgroundClip(`paddingBox);
 CssJs.unsafe(
   {js|background|js},
   {js|url(foo.png) bottom right / cover padding-box content-box|js},
