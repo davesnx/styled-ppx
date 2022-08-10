@@ -1691,13 +1691,13 @@ let transition_property =
   );
 
 let render_time = (~loc) => fun
-  | `Ms(f) => [%expr `ms([%e render_number(~loc, f)])]
+  | `Ms(f) => [%expr `ms([%e render_integer(~loc, f |> int_of_float)])]
   | `S(_) => raise(Unsupported_feature);
 
 let render_duration = (~loc) => fun
   | `Time(t) => render_time(~loc, t)
   | `Function_calc(fc) => render_function_calc(~loc, fc)
-  | _ => raise(Unsupported_feature);
+  | `Interpolation(v) => render_variable(~loc, v);
 
 let transition_duration =
   apply(
