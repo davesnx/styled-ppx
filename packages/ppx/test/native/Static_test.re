@@ -493,10 +493,6 @@ let properties_static_css_tests = [%expr
     ), */
     // unsupported
     /* (
-      [%css "overflow-x: clip"],
-      CssJs.unsafe("overflowX", "clip")),
-    */
-    /* (
       [%css "align-items: center"],
       CssJs.alignItems(`center)
     ), */

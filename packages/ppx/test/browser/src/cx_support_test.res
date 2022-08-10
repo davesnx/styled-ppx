@@ -5,7 +5,7 @@ EmotionSerializer.load()
 external toString: CssJs.animationName => string = "%identity"
 
 let testData = list{
-  (%cx("overflow-x: clip"), CssJs.style(. [CssJs.unsafe("overflowX", "clip")])),
+  /* (%cx("overflow-x: clip"), CssJs.style(. [CssJs.unsafe("overflowX", "clip")])), */
   (%cx("opacity: 0.9"), CssJs.style(. [CssJs.opacity(0.9)])),
   (
     %cx("@media (min-width: 30em) { color: brown; }"),
