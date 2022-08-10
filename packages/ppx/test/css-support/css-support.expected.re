@@ -227,6 +227,14 @@ CssJs.unsafe({js|backgroundPositionY|js}, {js|0px|js});
 CssJs.unsafe({js|backgroundPositionY|js}, {js|30px|js});
 CssJs.unsafe({js|backgroundPositionY|js}, {js|0%, 10%, 20%, 30%|js});
 CssJs.unsafe({js|backgroundPositionY|js}, {js|top, top, top, top, top|js});
+CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(20px)|js});
+CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(20px + 1em)|js});
+CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(20px / 2)|js});
+CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(20px + 50%)|js});
+CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(50% - 10px)|js});
+CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(-20px)|js});
+CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(-50%)|js});
+CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(-20%)|js});
 CssJs.unsafe({js|backgroundPositionY|js}, {js|bottom 20px|js});
 CssJs.unsafe({js|backgroundPositionY|js}, {js|top 20px|js});
 CssJs.unsafe({js|backgroundPositionY|js}, {js|bottom -50px|js});
@@ -380,10 +388,10 @@ CssJs.transforms([|
 |]);
 CssJs.unsafe({js|transform|js}, {js|perspective(600px)|js});
 CssJs.unsafe({js|transformOrigin|js}, {js|10px|js});
-CssJs.unsafe({js|transformOrigin|js}, {js|top|js});
-CssJs.transformOrigin(`left, `top);
-CssJs.transformOrigin(`percent(100.), `percent(50.));
-CssJs.transformOrigin(`left, `percent(0.));
+CssJs.transformOrigin(`Top, `Center);
+CssJs.transformOrigin(`top, `left);
+CssJs.transformOrigin(`percent(50.), `percent(100.));
+CssJs.transformOrigin(`percent(0.), `left);
 CssJs.unsafe({js|transformOrigin|js}, {js|left 50% 0|js});
 CssJs.unsafe({js|transformBox|js}, {js|border-box|js});
 CssJs.unsafe({js|transformBox|js}, {js|fill-box|js});
@@ -885,10 +893,16 @@ CssJs.order(0);
 CssJs.order(1);
 CssJs.display(`grid);
 CssJs.display(`inlineGrid);
+CssJs.unsafe({js|gridTemplateColumns|js}, {js|none|js});
+CssJs.unsafe({js|gridTemplateColumns|js}, {js|auto|js});
 CssJs.unsafe({js|gridTemplateColumns|js}, {js|100px|js});
 CssJs.unsafe({js|gridTemplateColumns|js}, {js|1fr|js});
 CssJs.unsafe({js|gridTemplateColumns|js}, {js|100px 1fr auto|js});
 CssJs.unsafe({js|gridTemplateColumns|js}, {js|repeat(2, 100px 1fr)|js});
+CssJs.unsafe(
+  {js|gridTemplateColumns|js},
+  {js|repeat(4, 10px [col-start] 250px [col-end]) 10px|js},
+);
 CssJs.unsafe(
   {js|gridTemplateColumns|js},
   {js|100px 1fr max-content minmax(min-content, 1fr)|js},
@@ -896,6 +910,22 @@ CssJs.unsafe(
 CssJs.unsafe(
   {js|gridTemplateColumns|js},
   {js|repeat(auto-fill, minmax(25ch, 1fr))|js},
+);
+CssJs.unsafe(
+  {js|gridTemplateColumns|js},
+  {js|10px [col-start] 250px [col-end]|js},
+);
+CssJs.unsafe(
+  {js|gridTemplateColumns|js},
+  {js|[first nav-start] 150px [main-start] 1fr [last]|js},
+);
+CssJs.unsafe(
+  {js|gridTemplateColumns|js},
+  {js|10px [col-start] 250px [col-end] 10px [col-start] 250px [col-end] 10px|js},
+);
+CssJs.unsafe(
+  {js|gridTemplateColumns|js},
+  {js|[a] auto [b] minmax(min-content, 1fr) [b c d] repeat(2, [e] 40px) repeat(5, auto)|js},
 );
 CssJs.unsafe({js|gridTemplateRows|js}, {js|none|js});
 CssJs.unsafe({js|gridTemplateRows|js}, {js|auto|js});
@@ -1800,11 +1830,13 @@ CssJs.animation(
 CssJs.unsafe({js|appearance|js}, {js|none|js});
 CssJs.unsafe({js|aspectRatio|js}, {js|21 / 8|js});
 (CssJs.backgroundColor(c): CssJs.rule);
+CssJs.unsafe({js|border|js}, {js|none|js});
 CssJs.unsafe({js|bottom|js}, {js|unset|js});
 CssJs.boxShadows(`none);
 CssJs.unsafe({js|breakInside|js}, {js|avoid|js});
 CssJs.unsafe({js|caretColor|js}, {js|#e15a46|js});
 CssJs.unsafe({js|color|js}, {js|inherit|js});
+CssJs.color(`var({js|--color-link|js}));
 CssJs.unsafe({js|columnWidth|js}, {js|125px|js});
 CssJs.unsafe({js|columnWidth|js}, {js|auto|js});
 CssJs.unsafe({js|content|js}, {js|""|js});
@@ -1840,6 +1872,7 @@ CssJs.unsafe({js|outline|js}, {js|none|js});
 CssJs.unsafe({js|overflowAnchor|js}, {js|none|js});
 CssJs.unsafe({js|position|js}, {js|unset|js});
 CssJs.unsafe({js|resize|js}, {js|none|js});
+CssJs.right(`calc((`sub, `percent(50.), `pxFloat(4.))));
 CssJs.unsafe({js|scrollBehavior|js}, {js|smooth|js});
 CssJs.unsafe({js|strokeOpacity|js}, {js|0|js});
 CssJs.unsafe({js|stroke|js}, {js|$(Color.Text.white)|js});
@@ -1847,6 +1880,12 @@ CssJs.top(`calc((`sub, `percent(50.), `pxFloat(1.))));
 CssJs.unsafe({js|top|js}, {js|unset|js});
 CssJs.unsafe({js|touchAction|js}, {js|none|js});
 CssJs.unsafe({js|touchAction|js}, {js|pan-x pan-y|js});
+CssJs.transformOrigin(`center, `left);
+CssJs.transformOrigin(`center, `right);
+CssJs.unsafe({js|transformOrigin|js}, {js|2px|js});
+CssJs.transformOrigin(`Bottom, `Center);
+CssJs.transformOrigin(`cm(3.), `pxFloat(2.));
+CssJs.transformOrigin(`pxFloat(2.), `left);
 CssJs.transform(`none);
 CssJs.unsafe({js|width|js}, {js|fit-content|js});
 CssJs.width(`maxContent);

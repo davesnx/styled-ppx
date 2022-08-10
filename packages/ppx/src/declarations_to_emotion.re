@@ -1660,20 +1660,21 @@ let transform_origin =
     Parser.property_transform_origin,
     (~loc as _) => id,
     (~loc) => fun
-      | `Static(((x, y), None)) => {
+      /* x, y are swapped on purpose */
+      | `Static(((y, x), None)) => {
         [[%expr CssJs.transformOrigin(
           [%e render_origin(~loc, x)],
           [%e render_origin(~loc, y)]
         )]]
       }
-      | `Center
-      | `Left
-      | `Right
-      | `Bottom
-      | `Top
+      | `Center => [[%expr CssJs.transformOrigin(`Center, `Center)]]
+      | `Left => [[%expr CssJs.transformOrigin(`Left, `Center)]]
+      | `Right => [[%expr CssJs.transformOrigin(`Right, `Center)]]
+      | `Bottom => [[%expr CssJs.transformOrigin(`Bottom, `Center)]]
+      | `Top => [[%expr CssJs.transformOrigin(`Top, `Center)]]
+      | `Static((_, Some(_)))
       | `Extended_length(_)
-      | `Extended_percentage(_)
-      | _ => raise(Unsupported_feature)
+      | `Extended_percentage(_) => raise(Unsupported_feature)
   );
 let transform_box = unsupportedProperty(Parser.property_transform_box);
 let translate =

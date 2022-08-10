@@ -202,14 +202,14 @@
 [%css {|background-position-y: 30px|}];
 [%css {|background-position-y: 0%, 10%, 20%, 30%|}];
 [%css {|background-position-y: top, top, top, top, top|}];
-/* [%css {|background-position-y: calc(20px)|}]; */
-/* [%css {|background-position-y: calc(20px + 1em)|}]; */
-/* [%css {|background-position-y: calc(20px / 2)|}]; */
-/* [%css {|background-position-y: calc(20px + 50%)|}]; */
-/* [%css {|background-position-y: calc(50% - 10px)|}]; */
-/* [%css {|background-position-y: calc(-20px)|}]; */
-/* [%css {|background-position-y: calc(-50%)|}]; */
-/* [%css {|background-position-y: calc(-20%)|}]; */
+[%css {|background-position-y: calc(20px)|}];
+[%css {|background-position-y: calc(20px + 1em)|}];
+[%css {|background-position-y: calc(20px / 2)|}];
+[%css {|background-position-y: calc(20px + 50%)|}];
+[%css {|background-position-y: calc(50% - 10px)|}];
+[%css {|background-position-y: calc(-20px)|}];
+[%css {|background-position-y: calc(-50%)|}];
+[%css {|background-position-y: calc(-20%)|}];
 [%css {|background-position-y: bottom 20px|}];
 [%css {|background-position-y: top 20px|}];
 [%css {|background-position-y: bottom -50px|}];
@@ -1538,19 +1538,19 @@
 /* CSS Grid Layout Module Level 1 */
 [%css {|display: grid|}];
 [%css {|display: inline-grid|}];
-/* [%css {|grid-template-columns: none|}]; */
-/* [%css {|grid-template-columns: auto|}]; */
+[%css {|grid-template-columns: none|}];
+[%css {|grid-template-columns: auto|}];
 [%css {|grid-template-columns: 100px|}];
 [%css {|grid-template-columns: 1fr|}];
 [%css {|grid-template-columns: 100px 1fr auto|}];
 [%css {|grid-template-columns: repeat(2, 100px 1fr)|}];
-/* [%css {|grid-template-columns: repeat(4, 10px [col-start] 250px [col-end]) 10px|}]; */
+[%css {|grid-template-columns: repeat(4, 10px [col-start] 250px [col-end]) 10px|}];
 [%css {|grid-template-columns: 100px 1fr max-content minmax(min-content, 1fr)|}];
 [%css {|grid-template-columns: repeat(auto-fill, minmax(25ch, 1fr))|}];
-/* [%css {|grid-template-columns: 10px [col-start] 250px [col-end]|}]; */
-/* [%css {|grid-template-columns: [first nav-start] 150px [main-start] 1fr [last]|}]; */
-/* [%css {|grid-template-columns: 10px [col-start] 250px [col-end] 10px [col-start] 250px [col-end] 10px|}]; */
-/* [%css {|grid-template-columns: [a] auto [b] minmax(min-content, 1fr) [b c d] repeat(2, [e] 40px) repeat(5, auto)|}]; */
+[%css {|grid-template-columns: 10px [col-start] 250px [col-end]|}];
+[%css {|grid-template-columns: [first nav-start] 150px [main-start] 1fr [last]|}];
+[%css {|grid-template-columns: 10px [col-start] 250px [col-end] 10px [col-start] 250px [col-end] 10px|}];
+[%css {|grid-template-columns: [a] auto [b] minmax(min-content, 1fr) [b c d] repeat(2, [e] 40px) repeat(5, auto)|}];
 [%css {|grid-template-rows: none|}];
 [%css {|grid-template-rows: auto|}];
 [%css {|grid-template-rows: 100px|}];
@@ -2525,7 +2525,7 @@
 [%css {|list-style-type: other-style|}];
 [%css {|list-style-type: inside|}];
 [%css {|list-style-type: outside|}];
-/* TODO: escape chars lexing is half broken */
+/* TODO: escape chars lexing is broken */
 /* [%css {|list-style-type: \32 style|}]; */
 [%css {|list-style-type: "-"|}];
 [%css {|list-style-type: '-'|}];
@@ -3104,13 +3104,13 @@
 [%css {|appearance: none;|}];
 [%css {|aspect-ratio: 21 / 8;|}];
 [%css {|background-color: $(c);|}];
-/* [%css {|border: none;|}]; */
+[%css {|border: none;|}];
 [%css {|bottom: unset;|}];
 [%css {|box-shadow: none;|}];
 [%css {|break-inside: avoid;|}];
 [%css {|caret-color: #e15a46;|}];
 [%css {|color: inherit;|}];
-/* [%css {|color: var(--color-link);|}]; */
+[%css {|color: var(--color-link);|}];
 [%css {|column-width: 125px;|}];
 [%css {|column-width: auto;|}];
 [%css {|content: "";|}];
@@ -3144,7 +3144,7 @@
 [%css {|overflow-anchor: none;|}];
 [%css {|position: unset;|}];
 [%css {|resize: none;|}];
-/* [%css {|right: calc(50% - 4px);|}]; */
+[%css {|right: calc(50% - 4px);|}];
 [%css {|scroll-behavior: smooth;|}];
 [%css {|stroke-opacity: 0;|}];
 [%css {|stroke: $(Color.Text.white);|}];
@@ -3153,8 +3153,12 @@
 [%css {|touch-action: none;|}];
 [%css {|touch-action: pan-x pan-y;|}];
 /* [%css {|transform-origin: center bottom;|}]; */
-/* [%css {|transform-origin: center left;|}]; */
-/* [%css {|transform-origin: center right;|}]; */
+[%css {|transform-origin: center left;|}];
+[%css {|transform-origin: center right;|}];
+[%css {|transform-origin: 2px;|}];
+[%css {|transform-origin: bottom;|}];
+[%css {|transform-origin: 3cm 2px;|}];
+[%css {|transform-origin: left 2px;|}];
 /* [%css {|transform-origin: center top;|}]; */
 [%css {|transform: none;|}];
 /* [%css {|width: -webkit-fill-available;|}]; */
