@@ -90,10 +90,11 @@ let properties_variable_css_tests = [
     [%expr [%css "color: rgba(0, 0, 0, 1%);"]],
     [%expr CssJs.color(rgba(0, 0, 0, `percent(1)))]
   ),
+  */
   (
     [%expr [%css "color: $(Theme.blue);"]],
-    [%expr CssJs.color(Theme.blue)]
-  ), */
+    [%expr (CssJs.color(Theme.blue) : CssJs.rule)]
+  ),
   /* Changed properties */
   (
     [%expr [%css "box-shadow: $(h) $(v) $(blur) $(spread) $(color);"]],
@@ -117,11 +118,25 @@ let properties_variable_css_tests = [
     [%expr [%css "box-shadow: $(BoxShadow.elevation);"]],
     [%expr (CssJs.boxShadows(BoxShadow.elevation): CssJs.rule)]
   ),
-  /* Add border */
-  /* Add text-shadow */
   (
-    [%expr [%css "color: $(color');"]],
-    [%expr (CssJs.color(color'): CssJs.rule)]
+    [%expr [%css "text-overflow: $(clip);"]],
+    [%expr (CssJs.textOverflow(clip): CssJs.rule)]
+  ),
+  (
+    [%expr [%css "transition-duration: 500ms;"]],
+    [%expr CssJs.transitionDuration(`ms(500))]
+  ),
+  (
+    [%expr [%css "transition-duration: $(duration);"]],
+    [%expr (CssJs.transitionDuration(duration): CssJs.rule)]
+  ),
+  (
+    [%expr [%css "animation-play-state: $(state);"]],
+    [%expr (CssJs.animationPlayState(state): CssJs.rule)]
+  ),
+  (
+    [%expr [%css "animation-play-state: paused;"]],
+    [%expr CssJs.animationPlayState(`paused)]
   ),
 ];
 
