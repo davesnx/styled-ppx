@@ -1692,7 +1692,7 @@ let transition_property =
 
 let render_time = (~loc) => fun
   | `Ms(f) => [%expr `ms([%e render_integer(~loc, f |> int_of_float)])]
-  | `S(_) => raise(Unsupported_feature);
+  | `S(f) => [%expr `s([%e render_integer(~loc, f |> int_of_float)])];
 
 let render_duration = (~loc) => fun
   | `Time(t) => render_time(~loc, t)
