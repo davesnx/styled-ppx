@@ -147,6 +147,8 @@ let variants_to_expression =
   | `Auto => id([%expr `auto])
   | `Baseline => id([%expr `baseline])
   | `Blink => id([%expr `blink])
+  | `Bold => id([%expr `bold])
+  | `Bolder => id([%expr `bolder])
   | `Border_box => id([%expr `borderBox])
   | `Bottom => id([%expr `bottom])
   | `Break_all => id([%expr `breakAll])
@@ -169,16 +171,19 @@ let variants_to_expression =
   | `End => id([%expr `end_])
   | `Fill => id([%expr `fill])
   | `FitContent => raise(Unsupported_feature)
+  | `Flat => id([%expr `flat])
   | `Flex_end => id([%expr `flexEnd])
   | `Flex_start => id([%expr `flexStart])
   | `Full_width => raise(Unsupported_feature)
   | `Groove => id([%expr `groove])
   | `Hidden => id([%expr `hidden])
   | `Inset => id([%expr `inset])
+  | `Italic => id([%expr `italic])
   | `Justify => id([%expr `justify])
   | `Justify_all => raise(Unsupported_feature)
   | `Keep_all => id([%expr `keepAll])
   | `Left => id([%expr `left])
+  | `Lighter => id([%expr `lighter])
   | `Line_Through => id([%expr `lineThrough])
   | `Lowercase => id([%expr `lowercase])
   | `Match_parent => raise(Unsupported_feature)
@@ -187,20 +192,23 @@ let variants_to_expression =
   | `None => id([%expr `none])
   | `Normal => id([%expr `normal])
   | `Nowrap => id([%expr `nowrap])
+  | `Oblique => id([%expr `oblique])
   | `Outset => id([%expr `outset])
   | `Overline => id([%expr `overline])
   | `Padding_box => id([%expr `paddingBox])
   | `Pre => id([%expr `pre])
   | `Pre_line => id([%expr `preLine])
   | `Pre_wrap => id([%expr `preWrap])
+  | `Preserve_3d => id([%expr `preserve3d])
+  | `Repeat_x => id([%expr `repeatX])
+  | `Repeat_y => id([%expr `repeatY])
   | `Ridge => id([%expr `ridge])
   | `Right => id([%expr `right])
   | `Row => id([%expr `row])
   | `Row_reverse => id([%expr `rowReverse])
-  | `Repeat_x => id([%expr `repeatX])
-  | `Repeat_y => id([%expr `repeatY])
   | `Scale_down => id([%expr `scaleDown])
   | `Scroll => id([%expr `scroll])
+  | `Small_caps => id([%expr `smallCaps])
   | `Solid => id([%expr `solid])
   | `Space_around => id([%expr `spaceAround])
   | `Space_between => id([%expr `spaceBetween])
@@ -215,8 +223,6 @@ let variants_to_expression =
   | `Wavy => id([%expr `wavy])
   | `Wrap => id([%expr `wrap])
   | `Wrap_reverse => id([%expr `wrapReverse])
-  | `Flat => id([%expr `flat])
-  | `Preserve_3d => id([%expr `preserve3d])
   | `Full_size_kana => raise(Unsupported_feature);
 
 // TODO: all of them could be float, but bs-css doesn't support it
@@ -819,10 +825,10 @@ let render_length_interp =
   | `Interpolation(name) => render_variable(~loc, name);
 
 // css-backgrounds-3
-let render_shadow = (~loc, shadow) => {
+let render_box_shadow = (~loc, shadow) => {
   let (color, x, y, blur, spread, inset) =
     switch (shadow) {
-    | `Box(inset, position, color) =>
+    | (inset, position, color) =>
       let (x, y, blur, spread) = switch (position) {
         | [x, y] => (x, y, None, None)
         | [x, y, blur] => (x, y, Some(blur), None)
@@ -1374,9 +1380,7 @@ let box_shadow =
     | `None => variants_to_expression(~loc, `None)
     | `Shadow(shadows) => {
         let shadows =
-          shadows
-          |> List.map(shadow => `Box(shadow))
-          |> List.map(render_shadow(~loc));
+          shadows |> List.map(render_box_shadow(~loc));
         Builder.pexp_array(~loc, shadows);
       },
   );
@@ -1485,14 +1489,63 @@ let text_indent =
   );
 let hanging_punctuation = unsupportedProperty(Parser.property_hanging_punctuation);
 
+let render_generic_family = (~loc) => fun
+  | `Cursive => [%expr `cursive]
+  | `Fantasy => [%expr `fantasy]
+  | `Monospace => [%expr `monospace]
+  | `Sans_serif => [%expr `sansSerif]
+  | `Serif => [%expr `serif]
+  | `_apple_system => [%expr `custom("-apple-system")];
+
+let render_fony_family = (~loc) => fun
+  | `Interpolation(v) => render_variable(~loc, v)
+  | `Generic_family(v) => render_generic_family(~loc, v)
+  | `Family_name(`String(str)) => [%expr `custom([%e render_string(~loc, str)])]
+  | `Family_name(`Custom_ident(_list)) => raise(Unsupported_feature);
+
+let render_fony_families = (~loc, v) =>
+  List.map(render_fony_family(~loc), v) |> Builder.pexp_array(~loc);
+
 // css-fonts-4
 let font_family =
-  unsupportedValue(Parser.property_font_family, (~loc) => [%expr CssJs.fontFamily]);
+  emit(
+    Parser.property_font_family,
+    (~loc as _) => id,
+    (~loc) => fun
+      | [v] => [[%expr CssJs.fontFamily([%e render_fony_family(~loc, v)])]]
+      | rest => [[%expr CssJs.fontFamilies([%e render_fony_families(~loc, rest)])]]
+  );
+
+let render_font_weight = (~loc) => fun
+  | `Interpolation(v) => render_variable(~loc, v)
+  | `Bolder => variants_to_expression(~loc, `Bolder)
+  | `Lighter => variants_to_expression(~loc, `Lighter)
+  | `Font_weight_absolute(`Normal) => variants_to_expression(~loc, `Normal)
+  | `Font_weight_absolute(`Bold) => variants_to_expression(~loc, `Bold)
+  | `Font_weight_absolute(`Number(num)) => [%expr `num([%e render_number(~loc, num)])];
+
 let font_weight =
-  unsupportedValue(Parser.property_font_weight, (~loc) => [%expr CssJs.fontWeight]);
+  apply(
+    Parser.property_font_weight,
+    (~loc) => [%expr CssJs.fontWeight],
+    render_font_weight
+  );
+
 let font_stretch = unsupportedProperty(Parser.property_font_stretch);
+
+let render_font_style = (~loc) => fun
+  | `Normal => variants_to_expression(~loc, `Normal)
+  | `Italic => variants_to_expression(~loc, `Italic)
+  | `Oblique => variants_to_expression(~loc, `Oblique)
+  | `Interpolation(v) => render_variable(~loc, v)
+  | `Static(_) => raise(Unsupported_feature);
+
 let font_style =
-  unsupportedValue(Parser.property_font_style, (~loc) => [%expr CssJs.fontStyle]);
+  apply(
+    Parser.property_font_style,
+    (~loc) => [%expr CssJs.fontStyle],
+    render_font_style
+  );
 
 /* bs-css does not support these variants */
 let render_size_variants = (~loc) => fun
@@ -1514,6 +1567,7 @@ let render_font_size = (~loc) => fun
   | `Extended_percentage(ext) => render_extended_percentage(~loc, ext);
 let font_size =
   apply(Parser.property_font_size, (~loc) => [%expr CssJs.fontSize], render_font_size);
+
 let font_size_adjust = unsupportedProperty(Parser.property_font_size_adjust);
 let font = unsupportedProperty(Parser.property_font);
 // let font_synthesis_weight = unsupportedProperty(Parser.property_font_synthesis_weight);
@@ -1532,8 +1586,17 @@ let font_variant_alternates =
   unsupportedProperty(Parser.property_font_variant_alternates);
 let font_variant_east_asian =
   unsupportedProperty(Parser.property_font_variant_east_asian);
+
 let font_variant =
-  unsupportedValue(Parser.property_font_variant, (~loc) => [%expr CssJs.fontVariant]);
+  emit(
+    Parser.property_font_variant,
+    (~loc as _) => id,
+    (~loc) => fun
+      | `None => [[%expr CssJs.unsafe({|fontVariant|}, {|none|})]]
+      | `Normal => [[%expr CssJs.fontVariant(`normal)]]
+      | `Small_caps => [[%expr CssJs.fontVariant(`smallCaps)]]
+      | _ => raise(Unsupported_feature)
+  );
 let font_feature_settings =
   unsupportedProperty(Parser.property_font_feature_settings);
 let font_optical_sizing = unsupportedProperty(Parser.property_font_optical_sizing);
@@ -1599,8 +1662,42 @@ let text_emphasis = unsupportedProperty(Parser.property_text_emphasis);
 let text_emphasis_position =
   unsupportedProperty(Parser.property_text_emphasis_position);
 // let text_emphasis_skip = unsupportedProperty(Parser.property_text_emphasis_skip);
+
+let render_text_shadow = (~loc, shadow) => {
+  let (x, y, blur, color) =
+    switch (shadow) {
+    | ([x, y], None) => (x, y, None, None)
+    | ([x, y, blur], None) => (x, y, Some(blur), None)
+    | ([x, y, blur], color) => (x, y, Some(blur), color)
+    | _ => failwith("unreachable")
+    };
+
+  let args =
+    [
+      (Labelled("x"), Some(render_length_interp(~loc, x))),
+      (Labelled("y"), Some(render_length_interp(~loc, y))),
+      (Labelled("blur"), Option.map(render_length_interp(~loc), blur)),
+      (Nolabel, Some(color |> Option.mapWithDefault(render_color_interp(~loc), [%expr `Color(`CurrentColor)]))),
+    ]
+    |> List.filter_map(
+      ((label, value)) => Option.map(value => (label, value), value)
+    );
+
+  Helper.Exp.apply(~loc, [%expr CssJs.Shadow.text], args);
+};
+
 let text_shadow =
-  unsupportedValue(Parser.property_text_shadow, (~loc) => [%expr CssJs.textShadow]);
+  emit(
+    Parser.property_text_shadow,
+    (~loc as _) => id,
+    (~loc) => fun
+    | `None => [[%expr CssJs.textShadow([%e variants_to_expression(~loc, `None)])]]
+    | `Shadow_t([shadow]) => [[%expr CssJs.textShadow([%e render_text_shadow(~loc, shadow)])]]
+    | `Shadow_t(shadows) => {
+        let shadows = shadows |> List.map(render_text_shadow(~loc));
+        [[%expr CssJs.textShadows([%e Builder.pexp_array(~loc, shadows)])]];
+      }
+  );
 
 let render_transform_functions = (~loc) => fun
   | `Zero(_) => [%expr `zero]
@@ -1652,7 +1749,7 @@ let transform =
     | `None => [[%expr CssJs.transform(`none)]]
     | `Transform_list([one]) => [[%expr CssJs.transform([%e render_transform(~loc, one)])]]
     | `Transform_list(list) => {
-      let transforms = List.map(render_transform(~loc), list) |> Builder.pexp_array(~loc=Location.none);
+      let transforms = List.map(render_transform(~loc), list) |> Builder.pexp_array(~loc);
       [[%expr CssJs.transforms([%e transforms])]];
     }
   );

@@ -60,7 +60,7 @@ let properties_variable_css_tests = [
   ),
   (
     [%expr [%css "font-family: $(mono);"]],
-    [%expr (CssJs.fontFamily(mono) : CssJs.rule)]
+    [%expr CssJs.fontFamily(mono)]
   ),
   (
     [%expr [%css "line-height: $(lh);"]],
@@ -91,6 +91,12 @@ let properties_variable_css_tests = [
     [%expr CssJs.color(rgba(0, 0, 0, `percent(1)))]
   ),
   */
+  (
+    [%expr [%css "text-shadow: $(h) $(v) $(blur) $(color);"]],
+    [%expr CssJs.textShadow(
+      CssJs.Shadow.text(~x=h, ~y=v, ~blur=blur, color)
+    )]
+  ),
   (
     [%expr [%css "color: $(Theme.blue);"]],
     [%expr (CssJs.color(Theme.blue) : CssJs.rule)]
