@@ -21,7 +21,7 @@
       ]
     },
     {
-      "begin": "\\[(%)(styled(\\.[a-zA-Z]*)?|css|cx)\\b",
+      "begin": "\\[(%)(styled(\\.[a-zA-Z]*)?|css|cx|css_)\\b",
       "end": "]",
       "beginCaptures": {
         "1": {
