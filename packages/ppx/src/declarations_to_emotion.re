@@ -132,17 +132,21 @@ let render_css_global_values = (~loc, name, value) => {
 
   let value =
     switch (value) {
-    | `Inherit => render_string(~loc, "inherit")
-    | `Initial => render_string(~loc, "initial")
-    | `Unset => render_string(~loc, "unset")
+    | `Inherit => "inherit"
+    | `Initial => "initial"
+    | `Unset => "unset"
     };
 
   /* bs-css doesn't have those */
-  Ok([[%expr CssJs.unsafe([%e render_string(~loc, name)], [%e value])]]);
+  Ok([
+    [%expr CssJs.unsafe(
+      [%e render_string(~loc, name)],
+      [%e render_string(~loc, value)]
+    )]
+  ]);
 };
 
-let variants_to_expression =
-  (~loc) => fun
+let variant_to_expression = (~loc) => fun
   | `Anywhere => id([%expr `anywhere])
   | `Auto => id([%expr `auto])
   | `Baseline => id([%expr `baseline])
@@ -170,23 +174,20 @@ let variants_to_expression =
   | `Ellipsis => id([%expr `ellipsis])
   | `End => id([%expr `end_])
   | `Fill => id([%expr `fill])
-  | `FitContent => raise(Unsupported_feature)
   | `Flat => id([%expr `flat])
   | `Flex_end => id([%expr `flexEnd])
   | `Flex_start => id([%expr `flexStart])
-  | `Full_width => raise(Unsupported_feature)
+  | `From_font => raise(Unsupported_feature)
   | `Groove => id([%expr `groove])
   | `Hidden => id([%expr `hidden])
   | `Inset => id([%expr `inset])
   | `Italic => id([%expr `italic])
   | `Justify => id([%expr `justify])
-  | `Justify_all => raise(Unsupported_feature)
   | `Keep_all => id([%expr `keepAll])
   | `Left => id([%expr `left])
   | `Lighter => id([%expr `lighter])
   | `Line_Through => id([%expr `lineThrough])
   | `Lowercase => id([%expr `lowercase])
-  | `Match_parent => raise(Unsupported_feature)
   | `MaxContent => id([%expr `maxContent])
   | `MinContent => id([%expr `minContent])
   | `None => id([%expr `none])
@@ -222,7 +223,11 @@ let variants_to_expression =
   | `Visible => id([%expr `visible])
   | `Wavy => id([%expr `wavy])
   | `Wrap => id([%expr `wrap])
+  | `FitContent => raise(Unsupported_feature)
+  | `Justify_all => raise(Unsupported_feature)
+  | `Match_parent => raise(Unsupported_feature)
   | `Wrap_reverse => id([%expr `wrapReverse])
+  | `Full_width => raise(Unsupported_feature)
   | `Full_size_kana => raise(Unsupported_feature);
 
 // TODO: all of them could be float, but bs-css doesn't support it
@@ -319,13 +324,13 @@ let render_length_percentage = (~loc) => fun
 
 // css-sizing-3
 let render_size = (~loc) => fun
-  | `Auto => variants_to_expression(~loc, `Auto)
+  | `Auto => variant_to_expression(~loc, `Auto)
   | `Extended_length(l) => render_extended_length(~loc, l)
   | `Extended_percentage(p) => render_extended_percentage(~loc, p)
   | `Function_calc(fc) => render_function_calc(~loc, fc)
-  | `Fit_content_0 => variants_to_expression(~loc, `FitContent)
-  | `Max_content => variants_to_expression(~loc, `MaxContent)
-  | `Min_content => variants_to_expression(~loc, `MinContent)
+  | `Fit_content_0 => variant_to_expression(~loc, `FitContent)
+  | `Max_content => variant_to_expression(~loc, `MaxContent)
+  | `Min_content => variant_to_expression(~loc, `MinContent)
   | `Fit_content_1(_)
   | _ => raise(Unsupported_feature);
 
@@ -344,7 +349,7 @@ let render_extended_angle = (~loc) => fun
 
 /* Applies variants to one argument */
 let variants = (parser, identifier) =>
-  apply(parser, identifier, variants_to_expression);
+  apply(parser, identifier, variant_to_expression);
 
 let width = apply(Parser.property_width, (~loc) => [%expr CssJs.width], render_size);
 let height = apply(Parser.property_height, (~loc) => [%expr CssJs.height], render_size);
@@ -365,20 +370,20 @@ let box_sizing =
   apply(
     Parser.property_box_sizing,
     (~loc) => [%expr CssJs.boxSizing],
-    variants_to_expression,
+    variant_to_expression,
   );
 let column_width = unsupportedProperty(Parser.property_column_width);
 
 let render_margin =
   (~loc) => fun
-  | `Auto => variants_to_expression(~loc, `Auto)
+  | `Auto => variant_to_expression(~loc, `Auto)
   | `Extended_length(l) => render_extended_length(~loc, l)
   | `Extended_percentage(p) => render_extended_percentage(~loc, p)
 ;
 
 let render_padding =
   (~loc) => fun
-  | `Auto => variants_to_expression(~loc, `Auto)
+  | `Auto => variant_to_expression(~loc, `Auto)
   | `Extended_length(l) => render_extended_length(~loc, l)
   | `Extended_percentage(p) => render_extended_percentage(~loc, p)
 ;
@@ -405,7 +410,7 @@ let margin =
   emit_shorthand(
     Parser.property_margin,
     (~loc) => fun
-    | `Auto => variants_to_expression(~loc, `Auto)
+    | `Auto => variant_to_expression(~loc, `Auto)
     | `Extended_length(l) => render_extended_length(~loc, l)
     | `Extended_percentage(p) => render_extended_percentage(~loc, p)
     | `Interpolation(name) => render_variable(~loc, name),
@@ -479,7 +484,7 @@ let padding =
 
 let render_named_color =
   (~loc) => fun
-  | `Transparent => variants_to_expression(~loc, `Transparent)
+  | `Transparent => variant_to_expression(~loc, `Transparent)
   | `Aliceblue => [%expr CssJs.aliceblue]
   | `Antiquewhite => [%expr CssJs.antiquewhite]
   | `Aqua => [%expr CssJs.aqua]
@@ -754,7 +759,7 @@ let render_position = (~loc, position) => {
     | `Center => 50.;
 
   let to_value = (~loc) => fun
-    | `Position(pos) => variants_to_expression(~loc, pos)
+    | `Position(pos) => variant_to_expression(~loc, pos)
     | `Extended_length(l) => render_extended_length(~loc, l)
     | `Extended_percentage(percentage) => render_extended_percentage(~loc, percentage);
 
@@ -929,8 +934,8 @@ let render_image_or_none = (~loc) => fun
   | `Image(i) => render_image(~loc, i);
 
 let render_repeat_style = (~loc) => fun
-  | `Repeat_x => variants_to_expression(~loc, `Repeat_x)
-  | `Repeat_y => variants_to_expression(~loc, `Repeat_y)
+  | `Repeat_x => variant_to_expression(~loc, `Repeat_x)
+  | `Repeat_y => variant_to_expression(~loc, `Repeat_y)
   | `Xor(values) => {
     let render_xor = fun
       | `Repeat => [%expr `repeat]
@@ -968,8 +973,8 @@ let background_repeat =
     (~loc) => [%expr CssJs.backgroundRepeat],
     (~loc) => fun
     | [] => failwith("expected at least one value")
-    | [`Repeat_x] => variants_to_expression(~loc, `Repeat_x)
-    | [`Repeat_y] => variants_to_expression(~loc, `Repeat_y)
+    | [`Repeat_x] => variant_to_expression(~loc, `Repeat_x)
+    | [`Repeat_y] => variant_to_expression(~loc, `Repeat_y)
     | [`Xor(_) as v] => render_repeat_style(~loc, v)
     | _ => raise(Unsupported_feature)
   );
@@ -985,11 +990,11 @@ let background_attachment =
 
 let render_background_position = (~loc, position) => {
   let render_static = fun
-    | `Center => variants_to_expression(~loc, `Center)
-    | `Left => variants_to_expression(~loc, `Left)
-    | `Right => variants_to_expression(~loc, `Right)
-    | `Bottom => variants_to_expression(~loc, `Bottom)
-    | `Top => variants_to_expression(~loc, `Top)
+    | `Center => variant_to_expression(~loc, `Center)
+    | `Left => variant_to_expression(~loc, `Left)
+    | `Right => variant_to_expression(~loc, `Right)
+    | `Bottom => variant_to_expression(~loc, `Bottom)
+    | `Top => variant_to_expression(~loc, `Top)
     | `Extended_length(l) => render_extended_length(~loc, l)
     | `Extended_percentage(p) => render_extended_percentage(~loc, p);
 
@@ -1001,11 +1006,11 @@ let render_background_position = (~loc, position) => {
     };
 
   switch (position) {
-    | `Center => variants_to_expression(~loc, `Center)
-    | `Left => variants_to_expression(~loc, `Left)
-    | `Right => variants_to_expression(~loc, `Right)
-    | `Bottom => variants_to_expression(~loc, `Bottom)
-    | `Top => variants_to_expression(~loc, `Top)
+    | `Center => variant_to_expression(~loc, `Center)
+    | `Left => variant_to_expression(~loc, `Left)
+    | `Right => variant_to_expression(~loc, `Right)
+    | `Bottom => variant_to_expression(~loc, `Bottom)
+    | `Top => variant_to_expression(~loc, `Top)
     | `Extended_length(l) => render_extended_length(~loc, l)
     | `Extended_percentage(a) => render_extended_percentage(~loc, a)
     | `Static((x, y)) => [%expr `hv([%e render_static(x)], [%e render_static(y)])]
@@ -1028,7 +1033,7 @@ let background_clip =
     (~loc) => [%expr CssJs.backgroundClip],
     (~loc) => fun
     | [] => failwith("expected at least one argument")
-    | [v] => variants_to_expression(~loc, v)
+    | [v] => variant_to_expression(~loc, v)
     | _ => raise(Unsupported_feature)
   );
 let background_origin =
@@ -1037,7 +1042,7 @@ let background_origin =
     (~loc) => [%expr CssJs.backgroundOrigin],
     (~loc) => fun
     | [] => failwith("expected at least one argument")
-    | [v] => variants_to_expression(~loc, v)
+    | [v] => variant_to_expression(~loc, v)
     | _ => raise(Unsupported_feature)
   );
 
@@ -1048,9 +1053,9 @@ let background_size =
     (~loc) => fun
     | [] => failwith("expected at least one argument")
     | [v] => switch (v) {
-      | `Contain => variants_to_expression(~loc, `Contain)
-      | `Cover => variants_to_expression(~loc, `Cover)
-      | `Xor([`Auto]) => variants_to_expression(~loc, `Auto)
+      | `Contain => variant_to_expression(~loc, `Contain)
+      | `Cover => variant_to_expression(~loc, `Cover)
+      | `Xor([`Auto]) => variant_to_expression(~loc, `Auto)
       | `Xor(l) when List.mem(`Auto, l) => raise(Unsupported_feature)
       | `Xor([x, y]) => [%expr `size([%e render_size(~loc, x)], [%e render_size(~loc, y)])]
       | `Xor([_])
@@ -1068,8 +1073,8 @@ let render_background = (~loc, (layers, final_layer)) => {
       render_layer(bg_image, [%expr CssJs.backgroundImage], render_image(~loc)),
       render_layer(repeat_style, [%expr CssJs.backgroundRepeat], render_repeat_style(~loc)),
       render_layer(attachment, [%expr CssJs.backgroundRepeat], render_attachment(~loc)),
-      render_layer(b1, [%expr CssJs.backgroundClip], variants_to_expression(~loc)),
-      render_layer(b2, [%expr CssJs.backgroundOrigin], variants_to_expression(~loc)),
+      render_layer(b1, [%expr CssJs.backgroundClip], variant_to_expression(~loc)),
+      render_layer(b2, [%expr CssJs.backgroundOrigin], variant_to_expression(~loc)),
     ] @ switch (bg_position) {
       | Some((bg_pos, Some(((), bg_size)))) => [
         [[%expr CssJs.backgroundPosition([%e render_background_position(~loc, bg_pos)])]],
@@ -1088,8 +1093,8 @@ let render_background = (~loc, (layers, final_layer)) => {
       render_layer(bg_image, [%expr CssJs.backgroundImage], render_image(~loc)),
       render_layer(repeat_style, [%expr CssJs.backgroundRepeat], render_repeat_style(~loc)),
       render_layer(attachment, [%expr CssJs.backgroundRepeat], render_attachment(~loc)),
-      render_layer(b1, [%expr CssJs.backgroundClip], variants_to_expression(~loc)),
-      render_layer(b2, [%expr CssJs.backgroundOrigin], variants_to_expression(~loc)),
+      render_layer(b1, [%expr CssJs.backgroundClip], variant_to_expression(~loc)),
+      render_layer(b2, [%expr CssJs.backgroundOrigin], variant_to_expression(~loc)),
     ] @ switch (bg_position) {
       | Some((bg_pos, Some(((), bg_size)))) => [
         [[%expr CssJs.backgroundPosition([%e render_background_position(~loc, bg_pos)])]],
@@ -1168,7 +1173,7 @@ let border_bottom_style =
 let border_left_style =
   variants(Parser.property_border_left_style, (~loc) => [%expr CssJs.borderLeftStyle]);
 let border_style =
-  apply(Parser.property_border_style, (~loc) => [%expr CssJs.borderStyle], variants_to_expression);
+  apply(Parser.property_border_style, (~loc) => [%expr CssJs.borderStyle], variant_to_expression);
 
 let render_line_width =
   (~loc) => fun
@@ -1217,7 +1222,7 @@ let render_line_width_interp =
 let render_border_style_interp =
   (~loc) => fun
   | `Interpolation(name) => render_variable(~loc, name)
-  | `Line_style(ls) => variants_to_expression(~loc, ls);
+  | `Line_style(ls) => variant_to_expression(~loc, ls);
 
 type borderDirection = All | Left | Bottom | Right | Top;
 
@@ -1262,9 +1267,9 @@ let render_border = (~loc, ~direction: borderDirection, border) => {
 };
 
 let render_outline_style_interp = (~loc) => fun
-  | `Auto => variants_to_expression(~loc, `Auto)
+  | `Auto => variant_to_expression(~loc, `Auto)
   | `Interpolation(name) => render_variable(~loc, name)
-  | `Line_style(ls) => variants_to_expression(~loc, ls)
+  | `Line_style(ls) => variant_to_expression(~loc, ls)
 ;
 
 let render_outline = (~loc) => fun
@@ -1377,7 +1382,7 @@ let box_shadow =
     Parser.property_box_shadow,
     (~loc) => [%expr CssJs.boxShadows],
     (~loc) => fun
-    | `None => variants_to_expression(~loc, `None)
+    | `None => variant_to_expression(~loc, `None)
     | `Shadow(shadows) => {
         let shadows =
           shadows |> List.map(render_box_shadow(~loc));
@@ -1397,10 +1402,10 @@ let overflow =
     Parser.property_overflow,
     (~loc as _) => id,
     (~loc) => fun
-    | `Xor([all]) => [[%expr CssJs.overflow([%e variants_to_expression(~loc, all)])]]
+    | `Xor([all]) => [[%expr CssJs.overflow([%e variant_to_expression(~loc, all)])]]
     | `Xor([x, y]) => [
-      [%expr CssJs.overflowX([%e variants_to_expression(~loc, x)])],
-      [%expr CssJs.overflowY([%e variants_to_expression(~loc, y)])]
+      [%expr CssJs.overflowX([%e variant_to_expression(~loc, x)])],
+      [%expr CssJs.overflowY([%e variant_to_expression(~loc, y)])]
     ]
     | _ => failwith("unreachable"),
   );
@@ -1413,8 +1418,8 @@ let text_overflow =
     (~loc) => [%expr CssJs.textOverflow],
     (~loc) => fun
       | [one] => switch (one) {
-        | `Clip => variants_to_expression(~loc, `Clip)
-        | `Ellipsis => variants_to_expression(~loc, `Ellipsis)
+        | `Clip => variant_to_expression(~loc, `Clip)
+        | `Ellipsis => variant_to_expression(~loc, `Ellipsis)
         | `String(str) => [%expr `string([%e render_string(~loc, str)])]
       }
       | []
@@ -1436,7 +1441,7 @@ let line_break = unsupportedProperty(Parser.property_line_break);
 let render_line_height = (~loc) => fun
   | `Extended_length(ext) => render_extended_length(~loc, ext)
   | `Extended_percentage(ext) => render_extended_percentage(~loc, ext)
-  | `Normal => variants_to_expression(~loc, `Normal)
+  | `Normal => variant_to_expression(~loc, `Normal)
   | `Number(float) => [%expr `abs([%e render_number(~loc, float) ])];
 
 let line_height =
@@ -1465,7 +1470,7 @@ let word_spacing =
     Parser.property_word_spacing,
     (~loc) => [%expr CssJs.wordSpacing],
     (~loc) => fun
-    | `Normal => variants_to_expression(~loc, `Normal)
+    | `Normal => variant_to_expression(~loc, `Normal)
     | `Extended_length(l) => render_extended_length(~loc, l)
     | `Extended_percentage(p) => render_extended_percentage(~loc, p),
   );
@@ -1474,7 +1479,7 @@ let letter_spacing =
     Parser.property_word_spacing,
     (~loc) => [%expr CssJs.letterSpacing],
     (~loc) => fun
-    | `Normal => variants_to_expression(~loc, `Normal)
+    | `Normal => variant_to_expression(~loc, `Normal)
     | `Extended_length(l) => render_extended_length(~loc, l)
     | `Extended_percentage(p) => render_extended_percentage(~loc, p),
   );
@@ -1518,10 +1523,10 @@ let font_family =
 
 let render_font_weight = (~loc) => fun
   | `Interpolation(v) => render_variable(~loc, v)
-  | `Bolder => variants_to_expression(~loc, `Bolder)
-  | `Lighter => variants_to_expression(~loc, `Lighter)
-  | `Font_weight_absolute(`Normal) => variants_to_expression(~loc, `Normal)
-  | `Font_weight_absolute(`Bold) => variants_to_expression(~loc, `Bold)
+  | `Bolder => variant_to_expression(~loc, `Bolder)
+  | `Lighter => variant_to_expression(~loc, `Lighter)
+  | `Font_weight_absolute(`Normal) => variant_to_expression(~loc, `Normal)
+  | `Font_weight_absolute(`Bold) => variant_to_expression(~loc, `Bold)
   | `Font_weight_absolute(`Number(num)) => [%expr `num([%e render_number(~loc, num)])];
 
 let font_weight =
@@ -1534,9 +1539,9 @@ let font_weight =
 let font_stretch = unsupportedProperty(Parser.property_font_stretch);
 
 let render_font_style = (~loc) => fun
-  | `Normal => variants_to_expression(~loc, `Normal)
-  | `Italic => variants_to_expression(~loc, `Italic)
-  | `Oblique => variants_to_expression(~loc, `Oblique)
+  | `Normal => variant_to_expression(~loc, `Normal)
+  | `Italic => variant_to_expression(~loc, `Italic)
+  | `Oblique => variant_to_expression(~loc, `Oblique)
   | `Interpolation(v) => render_variable(~loc, v)
   | `Static(_) => raise(Unsupported_feature);
 
@@ -1606,29 +1611,35 @@ let font_variation_settings =
 // let font_variant_emoji = unsupportedProperty(Parser.property_font_variant_emoji);
 
 // css-text-decor-3
+let render_text_decoration_line = (~loc) => fun
+  | `None => variant_to_expression(~loc, `None)
+  | `Underline => variant_to_expression(~loc, `Underline)
+  | `Overline => variant_to_expression(~loc, `Overline)
+  | `Line_Through => variant_to_expression(~loc, `Line_Through)
+  | `Blink => variant_to_expression(~loc, `Blink)
+  | _ => raise(Unsupported_feature);
+
 let text_decoration_line =
   apply(
     Parser.property_text_decoration_line,
     (~loc) => [%expr CssJs.textDecorationLine],
-    (~loc) => fun
-      | `None => variants_to_expression(~loc, `None)
-      | `Underline => variants_to_expression(~loc, `Underline)
-      | `Overline => variants_to_expression(~loc, `Overline)
-      | `Line_Through => variants_to_expression(~loc, `Line_Through)
-      | `Blink => variants_to_expression(~loc, `Blink)
-      | _ => raise(Unsupported_feature),
+    render_text_decoration_line
   );
+
+let render_text_decoration_style = (~loc) => fun
+  | `Solid => variant_to_expression(~loc, `Solid)
+  | `Double => variant_to_expression(~loc, `Double)
+  | `Dotted => variant_to_expression(~loc, `Dotted)
+  | `Dashed => variant_to_expression(~loc, `Dashed)
+  | `Wavy => variant_to_expression(~loc, `Wavy);
+
 let text_decoration_style =
   apply(
     Parser.property_text_decoration_style,
     (~loc) => [%expr CssJs.textDecorationStyle],
-    (~loc) => fun
-      | `Solid => variants_to_expression(~loc, `Solid)
-      | `Double => variants_to_expression(~loc, `Double)
-      | `Dotted => variants_to_expression(~loc, `Dotted)
-      | `Dashed => variants_to_expression(~loc, `Dashed)
-      | `Wavy => variants_to_expression(~loc, `Wavy)
+    render_text_decoration_style
   );
+
 let text_decoration_color =
   apply(
     Parser.property_text_decoration_color,
@@ -1637,11 +1648,55 @@ let text_decoration_color =
   );
 let text_decoration_thickness =
   unsupportedProperty(Parser.property_text_decoration_thickness);
+
+let render_text_decoration_thickness = (~loc) => fun
+  | `Auto => variant_to_expression(~loc, `Auto)
+  | `From_font => variant_to_expression(~loc, `From_font)
+  | `Extended_length(l) => render_extended_length(~loc, l)
+  | `Extended_percentage(p) => render_extended_percentage(~loc, p);
+
+let _text_decoration_thickness =
+  apply(
+    Parser.property_text_decoration_thickness,
+    (~loc) => [%expr CssJs.textDecorationThickness],
+    render_text_decoration_thickness
+  );
+
+/* let render_text_decoration_with_thickness = (~loc, (line, style, color, thickness)) => {
+  let _line = line |> Option.map(render_text_decoration_line(~loc));
+  let _style = style |> Option.map(render_text_decoration_style(~loc));
+  let _color = color |> Option.map(render_color(~loc));
+  let _thickness = thickness |> Option.map(render_text_decoration_thickness(~loc));
+  // let properties = [line, style, color, thickness];
+  // let properties = List.filter((_, v) => v != [], properties);
+  // let properties = List.map((_, v) => v, properties);
+  // let properties = List.flatten(properties);
+  // properties;
+}; */
+
+/* let render_text_decoration = (~loc, (line, style, color)) => {
+  let _line = line |> Option.map(render_text_decoration_line(~loc));
+  let _style = style |> Option.map(render_text_decoration_style(~loc));
+  let _color = color |> Option.map(render_color(~loc));
+  // let properties = [line, style, color, thickness];
+  // let properties = List.filter((_, v) => v != [], properties);
+  // let properties = List.map((_, v) => v, properties);
+  // let properties = List.flatten(properties);
+  // properties;
+  [%expr `none];
+}; */
+
 let text_decoration =
-  unsupportedValue(
+  apply(
     Parser.property_text_decoration,
     (~loc) => [%expr CssJs.textDecoration],
+    (~loc, v) => switch (v) {
+      | (Some(l), _, _, _) => render_text_decoration_line(~loc, l)
+      | (_l, _s, _c, Some(_)) /* render_text_decoration_with_thickness(~loc, v) */
+      | (_l, _s, _c, None) => raise(Unsupported_feature)
+    }
   );
+
 let text_underline_position =
   unsupportedProperty(Parser.property_text_underline_position);
 let text_underline_offset =
@@ -1691,7 +1746,7 @@ let text_shadow =
     Parser.property_text_shadow,
     (~loc as _) => id,
     (~loc) => fun
-    | `None => [[%expr CssJs.textShadow([%e variants_to_expression(~loc, `None)])]]
+    | `None => [[%expr CssJs.textShadow([%e variant_to_expression(~loc, `None)])]]
     | `Shadow_t([shadow]) => [[%expr CssJs.textShadow([%e render_text_shadow(~loc, shadow)])]]
     | `Shadow_t(shadows) => {
         let shadows = shadows |> List.map(render_text_shadow(~loc));
@@ -1755,11 +1810,11 @@ let transform =
   );
 
 let render_origin = (~loc) => fun
-  | `Center => variants_to_expression(~loc, `Center)
-  | `Left => variants_to_expression(~loc, `Left)
-  | `Right => variants_to_expression(~loc, `Right)
-  | `Bottom => variants_to_expression(~loc, `Bottom)
-  | `Top => variants_to_expression(~loc, `Top)
+  | `Center => variant_to_expression(~loc, `Center)
+  | `Left => variant_to_expression(~loc, `Left)
+  | `Right => variant_to_expression(~loc, `Right)
+  | `Bottom => variant_to_expression(~loc, `Bottom)
+  | `Top => variant_to_expression(~loc, `Top)
   | `Function_calc(fc) => render_function_calc(~loc, fc)
   | `Interpolation(v) => render_variable(~loc, v)
   | `Length(l) => render_length(~loc, l)
@@ -1797,8 +1852,8 @@ let transform_style =
     Parser.property_transform_style,
     (~loc) => [%expr CssJs.transformStyle],
     (~loc) => fun
-      | `Flat => variants_to_expression(~loc, `Flat)
-      | `Preserve_3d => variants_to_expression(~loc, `Preserve_3d)
+      | `Flat => variant_to_expression(~loc, `Flat)
+      | `Preserve_3d => variant_to_expression(~loc, `Preserve_3d)
   );
 let perspective = unsupportedProperty(Parser.property_perspective);
 
@@ -2082,7 +2137,7 @@ let flex_basis =
     Parser.property_flex_basis,
     (~loc) => [%expr CssJs.flexBasis],
     (~loc) => fun
-    | `Content => variants_to_expression(~loc, `Content)
+    | `Content => variant_to_expression(~loc, `Content)
     | `Property_width(value_width) =>
       width.value_of_ast(~loc, `Value(value_width)),
   );
@@ -2193,7 +2248,7 @@ let z_index =
   unsupportedValue(Parser.property_z_index, (~loc) => [%expr CssJs.zIndex]);
 
 let render_position_value = (~loc) => fun
-  | `Auto => variants_to_expression(~loc, `Auto)
+  | `Auto => variant_to_expression(~loc, `Auto)
   | `Extended_length(l) => render_extended_length(~loc, l)
   | `Extended_percentage(pct) => render_extended_percentage(~loc, pct);
 
