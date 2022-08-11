@@ -29,13 +29,20 @@ type property_width = [
 
 type xor('a, 'b) = [ | `A('a) | `B('b) ];
 type xor3('a, 'b, 'c) = [ | `A('a) | `B('b) | `C('c)];
+type xor7('a, 'b, 'c, 'd, 'e, 'f, 'g) = [ | `A('a) | `B('b) | `C('c) | `D('d) | `E('e) | `F('f) | `G('g) ];
 
 type background_color;
 /* and bg_image = [%value.rec "'none' | <image>"] */
 type img; /* it should be image, but there's conflicts with type names */
 type bg_image = [ | `None | `Image(img) ];
+type bg_position;
+type bg_size;
+type repeat_style;
+type attachment;
+type box;
 
-type final_bg_layer = xor(background_color, bg_image);
+type final_bg_layer = xor7(background_color, bg_image, (bg_position, (option(bg_size))), repeat_style, attachment, box, box);
+
 
 type url; /* from Standard.re */
 type string; /* from Standard.re */
@@ -64,5 +71,29 @@ type color_stop_angle = (angle, option(angle));
 type calc_sum;
 type function_clamp = (calc_sum, calc_sum, calc_sum);
 
-/* and function_clamp = [%value.rec "clamp( [ <calc-sum> ]# )"] */
-type function_clamp = list(calc_sum);
+/* and function_clamp_without_restriction_3 = [%value.rec "clamp( [ <calc-sum> ]# )"] */
+type function_clamp_without_restriction_3 = list(calc_sum);
+
+/* and property__moz_border_radius_bottomleft = [%value.rec "<'border-bottom-left-radius'>"] */
+
+type border_bottom_left_radius;
+type property__moz_border_radius_bottomleft = border_bottom_left_radius;
+
+/* and family_name = [%value.rec "<string> | [ <custom-ident> ]+"] */
+
+type custom_ident;
+type family_name = [ | `string(string) | `list(list(custom_ident)) ];
+
+/* and display_listitem = [%value.rec "[ <display-outside> ]? && [ 'flow' | 'flow-root' ]? && 'list-item'"] */
+type list_item;
+type display_outside;
+type display_listitem = (option(display_outside), option([ | `flow | `flow_root ]), list_item);
+
+/* and feature_type = [%value.rec "'@stylistic' | '@historical-forms' | '@styleset' | '@character-variant' | '@swash' | '@ornaments' | '@annotation'"] */
+
+type feature_type = [ `at_stylistic | `at_historical_forms | `at_styleset | `at_character_variant | `at_swash | `at_ornaments | `at_annotation ];
+
+/* and feature_value_declaration = [%value.rec "<custom-ident> ':' [ <integer> ]+ ';'"]
+ */
+
+type feature_value_declaration = (custom_ident, list(int));
