@@ -6,6 +6,8 @@ module Sedlexing = Lex_buffer;
 module Parser = Css_parser;
 module Types = Css_types;
 
+let lexeme = Sedlexing.utf8;
+
 /** Signals a lexing error at the provided source location. */
 exception LexingError((Lexing.position, string));
 
@@ -427,7 +429,6 @@ let non_printable_code_point = [%sedlex.regexp?
 /* This module is a copy/paste of Reason_css_lexer in favor of moving everything into css_lexer */
 module Tokenizer = {
   open Reason_css_lexer;
-  let lexeme = Sedlexing.utf8;
 
   let (let.ok) = Result.bind;
 
@@ -588,7 +589,6 @@ let skip_whitespace = ref(false);
 
 let rec get_next_token = (buf) => {
   open Parser;
-  open Sedlexing;
   switch%sedlex (buf) {
   | eof => EOF
   | "/*" => discard_comments(buf)
@@ -615,32 +615,32 @@ let rec get_next_token = (buf) => {
   }
   | '*' => ASTERISK
   | ',' => COMMA
-  | variable => VARIABLE(latin1(~skip=2, ~drop=1, buf) |> String.split_on_char('.'))
-  | operator => OPERATOR(latin1(buf))
-  | combinator => COMBINATOR(latin1(buf))
-  | string => STRING(latin1(~skip=1, ~drop=1, buf))
+  | variable => VARIABLE(lexeme(~skip=2, ~drop=1, buf) |> String.split_on_char('.'))
+  | operator => OPERATOR(lexeme(buf))
+  | combinator => COMBINATOR(lexeme(buf))
+  | string => STRING(lexeme(~skip=1, ~drop=1, buf))
   | important => IMPORTANT
   | at_media => {
     skip_whitespace.contents = false;
-    AT_MEDIA(latin1(~skip=1, buf))
+    AT_MEDIA(lexeme(~skip=1, buf))
   }
   | at_keyframes => {
     skip_whitespace.contents = false;
-    AT_KEYFRAMES(latin1(~skip=1, buf))
+    AT_KEYFRAMES(lexeme(~skip=1, buf))
   }
   | at_rule => {
     skip_whitespace.contents = false;
-    AT_RULE(latin1(~skip=1, buf))
+    AT_RULE(lexeme(~skip=1, buf))
   }
   | at_rule_without_body => {
     skip_whitespace.contents = false;
-    AT_RULE_STATEMENT(latin1(~skip=1, buf))
+    AT_RULE_STATEMENT(lexeme(~skip=1, buf))
   }
   /* NOTE: should be placed above ident, otherwise pattern with
    * '-[0-9a-z]{1,6}' cannot be matched */
-  | (_u, '+', unicode_range) => UNICODE_RANGE(latin1(buf))
-  | ('#', name) => HASH(latin1(~skip=1, buf))
-  | number => get_dimension(latin1(buf), buf)
+  | (_u, '+', unicode_range) => UNICODE_RANGE(lexeme(buf))
+  | ('#', name) => HASH(lexeme(~skip=1, buf))
+  | number => get_dimension(lexeme(buf), buf)
   | whitespaces => {
     if (skip_whitespace^) {
       get_next_token(buf);
@@ -649,26 +649,25 @@ let rec get_next_token = (buf) => {
     }
   }
   /* -moz-* */
-  | ("-", ident) => Parser.IDENT(latin1(buf))
+  | ("-", ident) => Parser.IDENT(lexeme(buf))
   /* --variable */
-  | ("-", "-", ident) => Parser.IDENT(latin1(buf))
+  | ("-", "-", ident) => Parser.IDENT(lexeme(buf))
   | identifier_start_code_point => {
     let _ = Sedlexing.backtrack(buf);
     Tokenizer.consume_ident_like(buf) |> handle_tokenizer_error(buf);
   }
-  | any => DELIM(latin1(buf))
+  | any => DELIM(lexeme(buf))
   | _ => assert(false)
   };
 }
 and get_dimension = (n, buf) => {
-  open Sedlexing;
   switch%sedlex (buf) {
-    | length => FLOAT_DIMENSION((n, latin1(buf)))
-    | angle => FLOAT_DIMENSION((n, latin1(buf)))
-    | time => FLOAT_DIMENSION((n, latin1(buf)))
-    | frequency => FLOAT_DIMENSION((n, latin1(buf)))
-    | 'n' => DIMENSION((n, latin1(buf)))
-    | _ => NUMBER(n)
+  | length => FLOAT_DIMENSION((n, lexeme(buf)))
+  | angle => FLOAT_DIMENSION((n, lexeme(buf)))
+  | time => FLOAT_DIMENSION((n, lexeme(buf)))
+  | frequency => FLOAT_DIMENSION((n, lexeme(buf)))
+  | 'n' => DIMENSION((n, lexeme(buf)))
+  | _ => NUMBER(n)
   };
 } and discard_comments = (buf) => {
   switch%sedlex(buf) {

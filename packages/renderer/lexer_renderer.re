@@ -42,7 +42,6 @@ switch (input, help) {
 | (Some(_), true)
 | (None, _) => render_help()
 | (Some(css), _) =>
-  let sedlexBuffer = Sedlexing.Utf8.from_string(css);
-  let buffer = Lex_buffer.of_sedlex(sedlexBuffer);
-  printUnlessIsEof(buffer);
+  let buf = Lex_buffer.of_ascii_string(css);
+  printUnlessIsEof(buf);
 };

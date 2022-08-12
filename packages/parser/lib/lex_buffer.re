@@ -110,11 +110,6 @@ let next = lexbuf => {
   c;
 };
 
-let latin1 = (~skip=0, ~drop=0, lexbuf) => {
-  let len = Sedlexing.lexeme_length(lexbuf.buf) - skip - drop;
-  Sedlexing.Latin1.sub_lexeme(lexbuf.buf, skip, len);
-};
-
 let utf8 = (~skip=0, ~drop=0, lexbuf) => {
   let len = Sedlexing.lexeme_length(lexbuf.buf) - skip - drop;
   Sedlexing.Utf8.sub_lexeme(lexbuf.buf, skip, len);
