@@ -1,7 +1,6 @@
 open Alcotest
 
 let loc = Location.none
-
 let transform = String_interpolation.Transform.transform ~loc
 
 let ast =
@@ -54,9 +53,7 @@ let test10 () =
     (transform "$(name)$(name) : $(name)$(name)")
 
 let test11 () =
-  check ast "test"
-    [%expr Module.value]
-    (transform "$(Module.value)")
+  check ast "test" [%expr Module.value] (transform "$(Module.value)")
 
 let test12 () =
   check ast "test"

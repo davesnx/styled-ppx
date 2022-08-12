@@ -5,9 +5,6 @@ module Parser = struct
     | String s -> "String(" ^ s ^ ")"
     | Variable v -> "Variable(" ^ v ^ ")"
 
-  let _print_tokens tokens =
-    List.iter (fun (p, _) -> print_endline (token_to_string p)) tokens
-
   let lexeme ?(skip = 0) ?(drop = 0) lexbuf =
     let len = Sedlexing.lexeme_length lexbuf - skip - drop in
     Sedlexing.Utf8.sub_lexeme lexbuf skip len
@@ -63,22 +60,23 @@ module Emitter = struct
     | String (s, _) -> s
     | Variable ((v, _), _) -> "$(" ^ v ^ ")"
 
-  let _print_tokens = List.iter (fun p -> print_string (token_to_string p))
-  let loc = Location.none
   let with_loc ~loc txt = { loc; txt }
 
   let js_string_to_const ~loc s =
     Exp.constant ~loc (Const.string ~quotation_delimiter:"js" s)
 
   let inline_const ~loc s = Exp.ident ~loc (with_loc s ~loc)
-  let concat_fn = { txt = Lident "^"; loc = Location.none } |> Exp.ident ~loc
 
-  let rec apply (func : expression) (args : (arg_label * expression) list) =
+  let concat_fn ~loc =
+    { txt = Lident "^"; loc = Location.none } |> Exp.ident ~loc
+
+  let rec apply ~loc (func : expression) (args : (arg_label * expression) list)
+      =
     match args with
     | [] -> assert false
     | [ (_, arg) ] -> arg
     | arg :: args ->
-        let rest = apply func args in
+        let rest = apply ~loc func args in
         pexp_apply ~loc func [ arg; (Nolabel, rest) ]
 
   let to_arguments tokens =
@@ -92,21 +90,18 @@ module Emitter = struct
          [] tokens
 
   (* Copied from future version of ppxlib https://github.com/ocaml-ppx/ppxlib/blob/6857ca9ec803f16975e8c2e7984c35cfb50c4a5d/ast/location_error.ml *)
-  let error_extension msg =
+  let error_extension ~loc msg =
     let err_extension_name loc = { Location.loc; txt = "ocaml.error" } in
     let constant = Str.eval (Exp.constant (Const.string msg)) in
     (err_extension_name loc, PStr [ constant ])
 
-  let generate tokens =
+  let generate ~loc tokens =
     match to_arguments tokens with
-    | [] ->
-        pexp_extension ~loc:Location.none
-        @@ error_extension "Missing string payload"
-    | args -> apply concat_fn args
+    | [] -> pexp_extension ~loc @@ error_extension ~loc "Missing string payload"
+    | args -> apply ~loc (concat_fn ~loc) args
 end
 
-let parser_to_emitter (tokens : (Parser.token * Location.t) list) :
-    Emitter.token list =
+let parser_to_emitter tokens =
   List.rev @@ snd
   @@ List.fold_left
        (fun (cur_fmt, acc) (token, loc) ->
@@ -120,4 +115,4 @@ let parser_to_emitter (tokens : (Parser.token * Location.t) list) :
        (None, []) tokens
 
 let transform ~loc str =
-  str |> Parser.from_string ~loc |> parser_to_emitter |> Emitter.generate
+  str |> Parser.from_string ~loc |> parser_to_emitter |> Emitter.generate ~loc
