@@ -6,6 +6,11 @@
  (name styled_ppx_css_parser)
  (wrapped false)
  (public_name styled-ppx-css-parser)
- (libraries sedlex menhirLib ocaml-migrate-parsetree str reason-css-lexer.lib)
+ (libraries
+  sedlex
+  menhirLib
+  ocaml-migrate-parsetree
+  str
+  reason-css-lexer.lib)
  (preprocess
   (pps sedlex.ppx)))

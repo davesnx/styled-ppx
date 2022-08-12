@@ -1,7 +1,7 @@
 module Parser = struct
   type token = String of string | Variable of string
 
-  let token_to_string = function
+  let _token_to_string = function
     | String s -> "String(" ^ s ^ ")"
     | Variable v -> "Variable(" ^ v ^ ")"
 
@@ -56,7 +56,7 @@ module Emitter = struct
   type element = string * Location.t
   type token = String of element | Variable of element * element option
 
-  let token_to_string = function
+  let _token_to_string = function
     | String (s, _) -> s
     | Variable ((v, _), _) -> "$(" ^ v ^ ")"
 

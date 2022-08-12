@@ -22,19 +22,19 @@
     "release": { "bin": [ "ppx" ] }
   },
   "devDependencies": {
-    "@opam/alcotest": "1.6.0",
-    "@opam/reason": "3.7.0",
-    "@opam/dune": "2.9.0",
+      "@opam/alcotest": "1.6.0",
+    "@opam/reason": "3.8.1",
+    "@opam/dune": "3.4.1",
     "@opam/ppx_deriving": "5.2.1",
     "@opam/menhir": "20220210",
-    "@opam/ppxlib": "0.22.0",
-    "@opam/sedlex":
-      "davesnx/sedlex:sedlex.opam#8de2e80611ce6b200baf857d9071099af8daaa5a",
-    "@opam/ocaml-lsp-server": "1.9.0",
+    "@opam/ppxlib": "0.27.0",
+    "@opam/sedlex": "3.0",
+    "@opam/ocaml-lsp-server": "1.13.0",
     "@opam/ocamlformat": "0.24.1",
+    "@opam/ocaml-migrate-parsetree": "2.4.0",
     "@reason-native/rely":
       "jfrolich/reason-native:rely.json#08085a4048974b06aaf3aab918b677b39dea3d18",
-    "ocaml": "4.12.0",
+    "ocaml": "4.14.0",
     "refmterr":
       "jfrolich/reason-native:refmterr.json#08085a4048974b06aaf3aab918b677b39dea3d18"
   },

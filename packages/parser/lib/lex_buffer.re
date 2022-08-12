@@ -78,6 +78,10 @@ let rollback = lexbuf => {
   Sedlexing.rollback(lexbuf.buf);
 };
 
+let __private__next_int = lexbuf => {
+  Sedlexing.__private__next_int(lexbuf.buf);
+};
+
 /** location of next character */
 let next_loc = lexbuf => {
   {...lexbuf.pos, pos_cnum: lexbuf.pos.pos_cnum + 1}
@@ -88,7 +92,7 @@ let cr = Char.code('\r');
 /** next character */
 let next = lexbuf => {
   let c = Sedlexing.next(lexbuf.buf);
-  let pos = next_loc(lexbuf);
+  /* let pos = next_loc(lexbuf);
   let ch =
     switch (c) {
     | None => None
@@ -123,7 +127,7 @@ let next = lexbuf => {
   switch (c) {
   | None => lexbuf.last_char = None
   | Some(c) => lexbuf.last_char = Some(Uchar.to_int(c))
-  };
+  }; */
   c;
 };
 
