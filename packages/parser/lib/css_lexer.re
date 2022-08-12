@@ -1,12 +1,12 @@
 /** CSS lexer
-  * Reference:
+  * Reference: CSS Syntax Module Level 3
   * https://www.w3.org/TR/css-syntax-3/ */
 
 module Sedlexing = Lex_buffer;
 module Parser = Css_parser;
 module Types = Css_types;
 
-let lexeme = Sedlexing.utf8;
+let lexeme = Sedlexing.lexeme;
 
 /** Signals a lexing error at the provided source location. */
 exception LexingError((Lexing.position, string));
@@ -449,9 +449,9 @@ module Tokenizer = {
 
   let check = (f, buf) => {
     // TODO: why this second int?
-    Sedlexing.mark(buf, 0);
+    Lex_buffer.mark(buf, 0);
     let value = f(buf);
-    let _ = Sedlexing.backtrack(buf);
+    let _ = Lex_buffer.backtrack(buf);
     value;
   };
 
@@ -575,7 +575,7 @@ module Tokenizer = {
   };
 };
 
-let handle_tokenizer_error = (buf: Sedlexing.t) =>
+let handle_tokenizer_error = (buf: Lex_buffer.t) =>
   fun
   | Ok(value) => value
   | Error((_, msg)) => {
@@ -653,7 +653,7 @@ let rec get_next_token = (buf) => {
   /* --variable */
   | ("-", "-", ident) => Parser.IDENT(lexeme(buf))
   | identifier_start_code_point => {
-    let _ = Sedlexing.backtrack(buf);
+    let _ = Lex_buffer.backtrack(buf);
     Tokenizer.consume_ident_like(buf) |> handle_tokenizer_error(buf);
   }
   | any => DELIM(lexeme(buf))
@@ -678,22 +678,22 @@ and get_dimension = (n, buf) => {
   }
 };
 
-let queue_next_tokens_with_location = (buf) => {
-  let loc_start = Sedlexing.next_loc(buf);
+let get_next_tokens_with_location = (buf) => {
+  let loc_start = Lex_buffer.next_loc(buf);
   let token = get_next_token(buf);
-  let loc_end = Sedlexing.next_loc(buf);
+  let loc_end = Lex_buffer.next_loc(buf);
   (token, loc_start, loc_end);
 }
 
 type parser('token, 'ast) = MenhirLib.Convert.traditional('token, 'ast);
 
-let parse = (skip_whitespaces, buf, parser) => {
+let parse = (skip_whitespaces, buf: Lex_buffer.t, parser) => {
   skip_whitespace.contents = skip_whitespaces;
 
   let last_token = ref((Parser.EOF, Lexing.dummy_pos, Lexing.dummy_pos));
 
   let next_token = () => {
-    last_token := queue_next_tokens_with_location(buf);
+    last_token := get_next_tokens_with_location(buf);
     last_token^;
   };
 
@@ -704,11 +704,7 @@ let parse = (skip_whitespaces, buf, parser) => {
 };
 
 let parse_string = (~skip_whitespace, ~container_lnum=?, ~pos=?, parser, string) => {
-  switch (container_lnum) {
-  | None => ()
-  | Some(lnum) => Sedlexing.container_lnum_ref := lnum
-  };
-  parse(skip_whitespace, Sedlexing.of_ascii_string(~pos?, string), parser);
+  parse(skip_whitespace, Lex_buffer.from_string(~container_lnum?, ~pos?, string), parser);
 };
 
 let parse_declaration_list = (~container_lnum=?, ~pos=?, input: string) =>

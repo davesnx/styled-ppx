@@ -14,6 +14,8 @@ type t = {
   mutable last_char_mark: option(int),
 };
 
+let container_lnum_ref = ref(0);
+
 let of_sedlex = (~file="<n/a>", ~pos=?, buf) => {
   let pos =
     switch (pos) {
@@ -29,11 +31,19 @@ let of_sedlex = (~file="<n/a>", ~pos=?, buf) => {
   {buf, pos, pos_mark: pos, last_char: None, last_char_mark: None};
 };
 
-let last_buffer = ref(of_sedlex(Sedlexing.Latin1.from_string("")));
+let from_string_of_sedlex = (~pos=?, string) => {
+  of_sedlex(~pos?, Sedlexing.Latin1.from_string(string))
+};
 
-let of_ascii_string = (~pos=?, s) => {
-  last_buffer := of_sedlex(~pos?, Sedlexing.Latin1.from_string(s));
-  of_sedlex(~pos?, Sedlexing.Latin1.from_string(s));
+let last_buffer = ref(from_string_of_sedlex(""));
+
+let from_string = (~container_lnum=?, ~pos=?, s) => {
+  switch (container_lnum) {
+  | None => ()
+  | Some(lnum) => container_lnum_ref := lnum
+  };
+  last_buffer := from_string_of_sedlex(~pos?, s);
+  from_string_of_sedlex(~pos?, s)
 };
 
 /** The next four functions are used by sedlex internally.
@@ -41,25 +51,25 @@ let of_ascii_string = (~pos=?, s) => {
 
 let mark = (lexbuf, p) => {
   lexbuf.pos_mark = lexbuf.pos;
-  lexbuf.last_char_mark = lexbuf.last_char;
+  /* lexbuf.last_char_mark = lexbuf.last_char; */
   Sedlexing.mark(lexbuf.buf, p);
 };
 
 let backtrack = lexbuf => {
   lexbuf.pos = lexbuf.pos_mark;
-  lexbuf.last_char = lexbuf.last_char_mark;
+  /* lexbuf.last_char = lexbuf.last_char_mark; */
   Sedlexing.backtrack(lexbuf.buf);
 };
 
 let start = lexbuf => {
   lexbuf.pos_mark = lexbuf.pos;
-  lexbuf.last_char_mark = lexbuf.last_char;
+  /* lexbuf.last_char_mark = lexbuf.last_char; */
   Sedlexing.start(lexbuf.buf);
 };
 
 let rollback = lexbuf => {
   lexbuf.pos_mark = lexbuf.pos;
-  lexbuf.last_char_mark = lexbuf.last_char;
+  /* lexbuf.last_char_mark = lexbuf.last_char; */
   Sedlexing.rollback(lexbuf.buf);
 };
 
@@ -110,12 +120,10 @@ let next = lexbuf => {
   c;
 };
 
-let utf8 = (~skip=0, ~drop=0, lexbuf) => {
+let lexeme = (~skip=0, ~drop=0, lexbuf) => {
   let len = Sedlexing.lexeme_length(lexbuf.buf) - skip - drop;
   Sedlexing.Utf8.sub_lexeme(lexbuf.buf, skip, len);
 };
-
-let container_lnum_ref = ref(0);
 
 let make_loc = (~loc_ghost=false, start_pos, end_pos): Location.t => {
   Location.loc_start: start_pos,

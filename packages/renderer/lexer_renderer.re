@@ -41,7 +41,5 @@ let rec printUnlessIsEof = buffer => {
 switch (input, help) {
 | (Some(_), true)
 | (None, _) => render_help()
-| (Some(css), _) =>
-  let buf = Lex_buffer.of_ascii_string(css);
-  printUnlessIsEof(buf);
+| (Some(css), _) => css |> Lexing.from_string |> printUnlessIsEof
 };
