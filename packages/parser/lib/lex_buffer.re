@@ -32,7 +32,12 @@ let of_sedlex = (~file="<n/a>", ~pos=?, buf) => {
 };
 
 let from_string_of_sedlex = (~pos=?, string) => {
-  of_sedlex(~pos?, Sedlexing.Latin1.from_string(string))
+  let buf = Sedlexing.Latin1.from_string(string);
+  switch (pos) {
+    | Some(p) => Sedlexing.set_position(buf, p)
+    | None => ()
+  }
+  of_sedlex(~pos?, buf)
 };
 
 let last_buffer = ref(from_string_of_sedlex(""));
@@ -74,7 +79,9 @@ let rollback = lexbuf => {
 };
 
 /** location of next character */
-let next_loc = lexbuf => {...lexbuf.pos, pos_cnum: lexbuf.pos.pos_cnum + 1};
+let next_loc = lexbuf => {
+  {...lexbuf.pos, pos_cnum: lexbuf.pos.pos_cnum + 1}
+};
 
 let cr = Char.code('\r');
 
@@ -130,3 +137,5 @@ let make_loc = (~loc_ghost=false, start_pos, end_pos): Location.t => {
   loc_end: end_pos,
   loc_ghost,
 };
+
+let lexing_positions = Sedlexing.lexing_positions;

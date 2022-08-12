@@ -28,7 +28,7 @@ let help =
   );
 
 let rec printUnlessIsEof = buffer => {
-  let lexes = Css_lexer.get_next_token(buffer);
+  let (lexes, _, _) = Css_lexer.get_next_tokens_with_location(buffer);
   switch (lexes) {
     | Css_lexer.Parser.EOF => ()
     | token => {
@@ -41,5 +41,13 @@ let rec printUnlessIsEof = buffer => {
 switch (input, help) {
 | (Some(_), true)
 | (None, _) => render_help()
-| (Some(css), _) => css |> Lexing.from_string |> printUnlessIsEof
+| (Some(css), _) => {
+    let pos: Lexing.position = {
+      pos_fname: "stdin",
+      pos_lnum: 0,
+      pos_bol : 0,
+      pos_cnum : 0
+    };
+    css |> Lex_buffer.from_string(~pos) |> printUnlessIsEof
+  }
 };

@@ -39,7 +39,7 @@ let source_code_of_loc = loc => {
   let pos_offset = pos.Lexing.pos_cnum;
   let loc_start = loc_start.Lexing.pos_cnum - pos_offset;
   let loc_end = loc_end.Lexing.pos_cnum - pos_offset;
-  Sedlexing.Latin1.sub_lexeme(buf, loc_start - 1, loc_end - loc_start);
+  Sedlexing.Utf8.sub_lexeme(buf, loc_start - 1, loc_end - loc_start);
 };
 
 let concat = (~loc, expr, acc) => {
@@ -155,6 +155,7 @@ and render_declaration = (d: Declaration.t): list(Parsetree.expression) => {
   let (_valueList, loc) = d.value;
   /* String.trim is a hack, location should be correct and not contain any whitespace */
   let value_source = source_code_of_loc(loc) |> String.trim;
+  print_endline("value_source: '" ++ value_source ++ "'");
 
   switch (Declarations_to_emotion.parse_declarations(~loc=name_loc, property, value_source)) {
   | Ok(exprs) => exprs

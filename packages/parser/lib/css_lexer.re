@@ -2,6 +2,7 @@
   * Reference: CSS Syntax Module Level 3
   * https://www.w3.org/TR/css-syntax-3/ */
 
+module Sed = Sedlexing;
 module Sedlexing = Lex_buffer;
 module Parser = Css_parser;
 module Types = Css_types;
@@ -21,19 +22,11 @@ exception GrammarError((string, Location.t));
 let unreachable = () =>
   failwith("This match case is unreachable. sedlex needs a last case as wildcard _. If this error appears, means that there's a bug in the lexer.");
 
-let position_to_string = pos =>
+let positions_to_string = (posa: Lexing.position, posb: Lexing.position) =>
   Printf.sprintf(
-    "[%d,%d+%d]",
-    pos.Lexing.pos_lnum,
-    pos.Lexing.pos_bol,
-    pos.Lexing.pos_cnum - pos.Lexing.pos_bol,
-  );
-
-let location_to_string = loc =>
-  Printf.sprintf(
-    "%s..%s",
-    position_to_string(loc.Location.loc_start),
-    position_to_string(loc.Location.loc_end),
+    "[%d..%d]",
+    posa.pos_cnum - posa.pos_bol,
+    posb.pos_cnum - posb.pos_bol,
   );
 
 let token_to_string =
@@ -678,10 +671,18 @@ and get_dimension = (n, buf) => {
   }
 };
 
-let get_next_tokens_with_location = (buf) => {
+let get_next_tokens_with_location = (buf: Sedlexing.t) => {
   let loc_start = Lex_buffer.next_loc(buf);
+  let (position_start, _) = Lex_buffer.lexing_positions(buf.buf);
   let token = get_next_token(buf);
+  let (_, position_end) = Lex_buffer.lexing_positions(buf.buf);
   let loc_end = Lex_buffer.next_loc(buf);
+  let loc = positions_to_string(loc_start, loc_end);
+  let position = positions_to_string(position_start, position_end);
+  print_endline({|
+token:  '|} ++ token_to_string(token) ++ {|'
+loc  : |} ++ loc ++ {|
+pos  : |} ++ position);
   (token, loc_start, loc_end);
 }
 
@@ -718,3 +719,5 @@ let parse_stylesheet = (~container_lnum=?, ~pos=?, input: string) =>
 
 let parse_keyframes = (~container_lnum=?, ~pos=?, input: string) =>
   parse_string(~skip_whitespace=false, ~container_lnum?, ~pos?, Parser.keyframes, input);
+
+"display: block"

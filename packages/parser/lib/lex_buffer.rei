@@ -20,3 +20,5 @@ let next: t => option(Uchar.t);
 
 let lexeme: (~skip: int = ?, ~drop: int = ?, t) => string;
 let make_loc: (~loc_ghost: bool = ?, Lexing.position, Lexing.position) => Location.t;
+
+let lexing_positions: Sedlexing.lexbuf => (Lexing.position, Lexing.position)
