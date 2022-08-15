@@ -19,21 +19,6 @@ exception GrammarError((string, Location.t));
 let unreachable = () =>
   failwith("This match case is unreachable. sedlex needs a last case as wildcard _. If this error appears, means that there's a bug in the lexer.");
 
-let position_to_string = pos =>
-  Printf.sprintf(
-    "[%d,%d+%d]",
-    pos.Lexing.pos_lnum,
-    pos.Lexing.pos_bol,
-    pos.Lexing.pos_cnum - pos.Lexing.pos_bol,
-  );
-
-let location_to_string = loc =>
-  Printf.sprintf(
-    "%s..%s",
-    position_to_string(loc.Location.loc_start),
-    position_to_string(loc.Location.loc_end),
-  );
-
 let token_to_string =
   fun
   | Parser.EOF => ""
@@ -679,11 +664,12 @@ and get_dimension = (n, buf) => {
   }
 };
 
-let queue_next_tokens_with_location = (buf) => {
-  let loc_start = Sedlexing.next_loc(buf);
+let get_next_tokens_with_location = (buf) => {
+  let (_, position_end) = Lex_buffer.lexing_positions(buf);
   let token = get_next_token(buf);
-  let loc_end = Sedlexing.next_loc(buf);
-  (token, loc_start, loc_end);
+  let (_, position_end_after) = Lex_buffer.lexing_positions(buf);
+
+  (token, position_end, position_end_after);
 }
 
 type parser('token, 'ast) = MenhirLib.Convert.traditional('token, 'ast);
@@ -694,7 +680,7 @@ let parse = (skip_whitespaces, buf, parser) => {
   let last_token = ref((Parser.EOF, Lexing.dummy_pos, Lexing.dummy_pos));
 
   let next_token = () => {
-    last_token := queue_next_tokens_with_location(buf);
+    last_token := get_next_tokens_with_location(buf);
     last_token^;
   };
 
@@ -705,11 +691,7 @@ let parse = (skip_whitespaces, buf, parser) => {
 };
 
 let parse_string = (~skip_whitespace, ~container_lnum=?, ~pos=?, parser, string) => {
-  switch (container_lnum) {
-  | None => ()
-  | Some(lnum) => Sedlexing.container_lnum_ref := lnum
-  };
-  parse(skip_whitespace, Sedlexing.of_ascii_string(~pos?, string), parser);
+  parse(skip_whitespace, Lex_buffer.from_string(~container_lnum?, ~pos?, string), parser);
 };
 
 let parse_declaration_list = (~container_lnum=?, ~pos=?, input: string) =>

@@ -31,6 +31,8 @@ switch (input, help) {
 | (Some(_), true)
 | (None, _) => render_help()
 | (Some(css), _) =>
-  let ast = Css_lexer.parse_stylesheet(~container_lnum, ~pos, css);
-  print_endline(Css_types.Debug.render_stylesheet(ast));
+  /* let ast = Css_lexer.parse_stylesheet(~container_lnum, ~pos, css); */
+  /* print_endline(Css_types.DebugWithLoc.render_stylesheet(ast)); */
+  let ast = Css_lexer.parse_declaration(~container_lnum, ~pos, css);
+  print_endline(Css_types.DebugWithLoc.render_declaration(ast));
 };

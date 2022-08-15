@@ -33,13 +33,14 @@ let render_variable = (~loc, v) => {
   let txt = v |> String.concat(".") |> Longident.parse;
   Helper.Exp.ident({loc, txt});
 };
+
 let source_code_of_loc = loc => {
   let Location.{loc_start, loc_end, _} = loc;
   let Lex_buffer.{buf, pos, _} = Lex_buffer.last_buffer^;
-  let pos_offset = pos.Lexing.pos_cnum;
-  let loc_start = loc_start.Lexing.pos_cnum - pos_offset;
-  let loc_end = loc_end.Lexing.pos_cnum - pos_offset;
-  Sedlexing.Latin1.sub_lexeme(buf, loc_start - 1, loc_end - loc_start);
+  let pos_offset = pos.pos_cnum;
+  let loc_start = loc_start.pos_cnum - pos_offset;
+  let loc_end = loc_end.pos_cnum - pos_offset;
+  Sedlexing.Latin1.sub_lexeme(buf, loc_start, loc_end - loc_start);
 };
 
 let concat = (~loc, expr, acc) => {
