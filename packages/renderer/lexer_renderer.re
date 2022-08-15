@@ -43,13 +43,15 @@ let location_to_string = loc =>
   );
 
 let rec printUnlessIsEof = buffer => {
-  let (lexes, _loc_start, _loc_end) = Css_lexer.get_next_tokens_with_location(buffer);
-  lexes |> Css_lexer.token_to_debug |> print_endline;
-  /* let position = position_to_string(position_end);
-  let position_at = position_to_string(position_end_at);
-  print_endline(token_to_debug(token) ++ {| [|} ++ position ++ {|..|} ++ position_at ++ {|]|}); */
+  let (token, loc_start, loc_end) = Css_lexer.get_next_tokens_with_location(buffer);
+  let pos_start = position_to_string(loc_start);
+  let pos_end = position_to_string(loc_end);
+  print_endline(
+    Css_lexer.token_to_debug(token)
+    ++ {| [|} ++ pos_start ++ {|..|} ++ pos_end ++ {|]|}
+  );
 
-  switch (lexes) {
+  switch (token) {
     | Css_lexer.Parser.EOF => ()
     | _token => printUnlessIsEof(buffer)
   }

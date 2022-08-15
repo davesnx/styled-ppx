@@ -58,7 +58,7 @@ let compare = (input, expected, {expect, _}) => {
 /* The tests that are commented, means that we don't support them safely */
 let properties_static_css_tests = [%expr
   [|
-    (
+/*     (
       [%css "display: block;"],
       CssJs.display(`block)
     ),
@@ -155,12 +155,12 @@ let properties_static_css_tests = [%expr
     (
       [%css "margin-bottom: 2px"],
       CssJs.marginBottom(`pxFloat(2.))
-    ),
+    ), */
     (
       [%css "margin-left: 3px"],
       CssJs.marginLeft(`pxFloat(3.))
     ),
-    (
+    /* (
       [%css "margin: 1px"],
       CssJs.margin(`pxFloat(1.))
     ),
@@ -356,7 +356,7 @@ let properties_static_css_tests = [%expr
     (
       [%css "overflow: scroll"],
       CssJs.overflow(`scroll)
-    ),
+    ), */
     /* (
       [%css "overflow: scroll visible"],
       CssJs.overflowX(`scroll), CssJs.overflowY(`visible),
@@ -370,7 +370,7 @@ let properties_static_css_tests = [%expr
       CssJs.textOverflow(`ellipsis)
     ), */
     // css-text-3
-    (
+    /* (
       [%css "text-transform: capitalize"],
       CssJs.textTransform(`capitalize)
     ),
@@ -417,19 +417,19 @@ let properties_static_css_tests = [%expr
     (
       [%css "text-indent: 5%"],
       CssJs.textIndent(`percent(5.))
-    ),
+    ), */
     // css-flexbox-1
-    (
+    /* (
       [%css "flex-wrap: wrap"],
       CssJs.flexWrap(`wrap)
-    ),
+    ), */
     /*
       not supported on bs-css
       (
       [%css "flex-flow: row nowrap"],
       [|CssJs.flexDirection(`row), CssJs.flexWrap(`nowrap)|],
     ), */
-    (
+    /* (
       [%css "order: 5"],
       CssJs.order(5)
     ),
@@ -456,32 +456,32 @@ let properties_static_css_tests = [%expr
     (
       [%css "flex: none"],
       CssJs.flex(`none)
-    ),
+    ), */
     /* bs-css doesn't support it */
     /* (
       [%css "width: calc(100px)"],
       CssJs.width(`calc(`add, `percent(100.), `pxFloat(32.)))
     ), */
-    (
+    /* (
       [%css "width: calc(100% + 32px)"],
       CssJs.width(`calc(`add, `percent(100.), `pxFloat(32.)))
     ),
     (
       [%css "width: calc(100vh - 120px)"],
       CssJs.width(`calc(`sub, `vh(100.), `pxFloat(120.)))
-    ),
-    (
+    ), */
+    /* (
       [%css "color: var(--main-c)"],
       CssJs.color(`var({js|--main-c|js}))
-    ),
+    ), */
     /* (
       [%css "color: var(--main-c, #fff)"],
       CssJs.color(`var({js|--main-c|js}, `hex({js|fff|js})))
     ), */
-    (
+    /* (
       [%css "background-image: url('img_tree.gif')"],
       CssJs.backgroundImage(`url({js|img_tree.gif|js}))
-    ),
+    ), */
     /* Mult isn't available in bs-css */
     /* (
       [%css "width: calc(100px * 3)"],

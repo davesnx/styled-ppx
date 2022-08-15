@@ -10,7 +10,7 @@ let compare = (input, expected, {expect, _}) => {
 };
 
 let properties_variable_css_tests = [
-  (
+  /* (
     [%expr [%css "color: $(mono100);"]],
     [%expr (CssJs.color(mono100) : CssJs.rule)]
   ),
@@ -86,11 +86,6 @@ let properties_variable_css_tests = [
     [%expr [%css "mask-image: $(externalImageUrl);" ]],
     [%expr (CssJs.maskImage(externalImageUrl) : CssJs.rule)],
   ),
-  /* (
-    [%expr [%css "color: rgba(0, 0, 0, 1%);"]],
-    [%expr CssJs.color(rgba(0, 0, 0, `percent(1)))]
-  ),
-  */
   (
     [%expr [%css "color: $(Theme.blue);"]],
     [%expr (CssJs.color(Theme.blue) : CssJs.rule)]
@@ -137,7 +132,7 @@ let properties_variable_css_tests = [
   (
     [%expr [%css "animation-play-state: paused;"]],
     [%expr CssJs.animationPlayState(`paused)]
-  ),
+  ), */
 ];
 
 describe("Should bind to bs-css with interpolated variables", ({test, _}) => {

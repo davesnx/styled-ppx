@@ -9,7 +9,7 @@ let compare = (input, expected, {expect, _}) => {
 };
 
 let css_tests = [
-  (
+  /* (
     "ignore in style_rule",
     [%expr [%cx ".bar{}"]],
     [%expr [%cx ".bar {}"]],
@@ -92,7 +92,7 @@ let css_tests = [
     [%expr [%styled.global {|
     html,             body, #root, .class   {     margin: 0    } |}]],
     [%expr ignore(CssJs.global(. {js|html, body, #root, .class|js}, [| CssJs.margin(`zero) |]))],
-  ),
+  ), */
 ];
 
 describe("Should treat Whitespace accordingly", ({test, _}) => {

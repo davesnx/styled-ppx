@@ -51,7 +51,7 @@ let concat = (~loc, expr, acc) => {
 let rec render_at_rule = (ar: At_rule.t): Parsetree.expression =>
   switch (ar.At_rule.name) {
   | ("media", _) => render_media_query(ar)
-  | ("keyframes", _) => grammar_error(ar.loc, {|@keyframes should be defined with %keyframe(...).|})
+  | ("keyframes", _) => grammar_error(ar.loc, {|@keyframes should be defined with %keyframe(...)|})
   | (
       "charset" as n |
       "import" as n |
