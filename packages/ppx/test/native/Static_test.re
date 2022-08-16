@@ -295,7 +295,6 @@ let properties_static_css_tests = [%expr
       [%css "object-position: right bottom"],
       CssJs.objectPosition(`hv((`right, `bottom))),
     ),
-    // css-backgrounds-3
     (
       [%css "background-color: red"],
       CssJs.backgroundColor(CssJs.red)
@@ -344,7 +343,6 @@ let properties_static_css_tests = [%expr
       [%css "border-bottom-right-radius: 13%"],
       CssJs.borderBottomRightRadius(`percent(13.)),
     ),
-    // css-overflow-3
     (
       [%css "overflow-x: auto"],
       CssJs.overflowX(`auto)
@@ -369,7 +367,6 @@ let properties_static_css_tests = [%expr
       [%css "text-overflow: ellipsis"],
       CssJs.textOverflow(`ellipsis)
     ), */
-    // css-text-3
     (
       [%css "text-transform: capitalize"],
       CssJs.textTransform(`capitalize)
@@ -418,7 +415,6 @@ let properties_static_css_tests = [%expr
       [%css "text-indent: 5%"],
       CssJs.textIndent(`percent(5.))
     ),
-    // css-flexbox-1
     (
       [%css "flex-wrap: wrap"],
       CssJs.flexWrap(`wrap)
@@ -510,11 +506,11 @@ let properties_static_css_tests = [%expr
      ), */
     (
       [%css "-moz-text-blink: blink"],
-      CssJs.unsafe("MozTextBlink", "blink")],
+      CssJs.unsafe("MozTextBlink", "blink"),
     ),
     (
       [%css "display: -webkit-inline-box"],
-      CssJs.unsafe("display", "-webkit-inline-box")],
+      CssJs.unsafe("display", "-webkit-inline-box"),
     ),
   |]
 ];
