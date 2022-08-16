@@ -25,9 +25,6 @@ let render_variable = name =>
 
 type transform('ast, 'value) = {
   ast_of_string: string => result('ast, string),
-  value_of_ast: 'ast => 'value,
-  value_to_expr: 'value => list(Parsetree.expression),
-  ast_to_expr: 'ast => list(Parsetree.expression),
   string_to_expr: string => result(list(Parsetree.expression), string),
 };
 
@@ -37,7 +34,7 @@ let emit = (property, value_of_ast, value_to_expr) => {
   let string_to_expr = string =>
     ast_of_string(string) |> Result.map(ast_to_expr);
 
-  {ast_of_string, value_of_ast, value_to_expr, ast_to_expr, string_to_expr};
+  {ast_of_string, string_to_expr};
 };
 
 let variants_to_string =

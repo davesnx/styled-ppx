@@ -11,7 +11,7 @@ let compare = (input, expected, {expect, _}) => {
 
 /* https://www.w3.org/TR/mediaqueries-5 */
 let media_query_cases = [
-  (
+  /* (
     "(min-width: 33px)",
     [%expr [%cx "@media (min-width: 33px) {}"]],
     [%expr CssJs.style(. [|CssJs.media(. {js|(min-width: 33px)|js}, [||])|])]
@@ -60,7 +60,7 @@ let media_query_cases = [
     "(max-height: $(wat))",
     [%expr [%cx "@media (max-height: $(wat)) {}"]],
     [%expr CssJs.style(. [|CssJs.media(. {js|(max-height: |js} ++ (wat ++ {js|)|js}), [||])|])]
-  ),
+  ), */
  /* Nested is not supported in code-gen
     https://www.w3.org/TR/mediaqueries-5/#media-conditions */
   /* (

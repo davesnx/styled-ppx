@@ -9,8 +9,7 @@ let compare = (input, expected, {expect, _}) => {
   expect.string(result).toEqual(expected);
 };
 
-let selectors_css_tests = [
-  /* Simple */
+let simple_tests = [
   (
     ".a",
     [%expr [%cx ".a { }"]],
@@ -87,8 +86,19 @@ let selectors_css_tests = [
     [%expr [%cx "&:nth-child(-n+2) {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|&:nth-child(-n+2)|js}, [||])|])],
   ), */
+];
 
-  /* Compound */
+describe("Should transform simple selectors", ({ test, _ }) => {
+  List.iteri((_index, (title, result, expected)) =>
+    test(
+      title,
+      compare(result, expected),
+    ),
+    simple_tests
+  );
+});
+
+let compound_test = [
   (
     "&.bar",
     [%expr [%cx {js|&.bar {}|js}]],
@@ -129,8 +139,19 @@ let selectors_css_tests = [
     [%expr [%cx {js|p #first-child {}|js}]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|p #first-child::before:hover|js}, [||])|])]
   ), */
+];
 
-  /* Complex */
+describe("Should transform compound selectors", ({ test, _ }) => {
+  List.iteri((_index, (title, result, expected)) =>
+    test(
+      title,
+      compare(result, expected),
+    ),
+    compound_test
+  );
+});
+
+let complex_tests = [
   (
     "& > a",
     [%expr [%cx "& > a { }"]],
@@ -256,8 +277,19 @@ let selectors_css_tests = [
       )
     |])],
   ),
+];
 
-  /* Stylesheets */
+describe("Should transform complex selectors", ({ test, _ }) => {
+  List.iteri((_index, (title, result, expected)) =>
+    test(
+      title,
+      compare(result, expected),
+    ),
+    complex_tests
+  );
+});
+
+let stylesheet_tests = [
   (
     "html, body",
     [%expr [%styled.global {js|html, body {}|js}]],
@@ -285,12 +317,12 @@ let selectors_css_tests = [
   ),
 ];
 
-describe("Should transform selectors", ({test, _}) => {
-  selectors_css_tests |>
-    List.iteri((_index, (title, result, expected)) =>
-      test(
-        title,
-        compare(result, expected),
-      )
-    );
+describe("Should transform stylesheet selectors", ({ test, _ }) => {
+  List.iteri((_index, (title, result, expected)) =>
+    test(
+      title,
+      compare(result, expected),
+    ),
+    stylesheet_tests
+  );
 });

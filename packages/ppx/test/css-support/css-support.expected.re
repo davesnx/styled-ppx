@@ -23,10 +23,10 @@ CssJs.backgroundPosition(
 CssJs.backgroundPosition(`hv((`right, `hv((`bottom, `pxFloat(10.))))));
 CssJs.backgroundPosition(`hv((`hv((`right, `pxFloat(10.))), `top)));
 CssJs.backgroundClip(`borderBox);
-CssJs.backgroundClip(`padding_box);
+CssJs.backgroundClip(`paddingBox);
 CssJs.backgroundClip(`contentBox);
 CssJs.backgroundOrigin(`borderBox);
-CssJs.backgroundOrigin(`padding_box);
+CssJs.backgroundOrigin(`paddingBox);
 CssJs.backgroundOrigin(`contentBox);
 CssJs.backgroundSize(`auto);
 CssJs.backgroundSize(`cover);
@@ -37,11 +37,11 @@ CssJs.unsafe({js|backgroundSize|js}, {js|10px auto|js});
 CssJs.unsafe({js|backgroundSize|js}, {js|auto 10%|js});
 CssJs.backgroundSize(`size((`em(50.), `percent(50.))));
 CssJs.unsafe({js|background|js}, {js|top left / 50% 60%|js});
-CssJs.origin(`borderBox);
+CssJs.backgroundOrigin(`borderBox);
 CssJs.backgroundColor(CssJs.blue);
 CssJs.backgroundColor(CssJs.red);
 CssJs.backgroundRepeat(`fixed);
-CssJs.clip(`padding_box);
+CssJs.backgroundClip(`paddingBox);
 CssJs.unsafe(
   {js|background|js},
   {js|url(foo.png) bottom right / cover padding-box content-box|js},
@@ -518,8 +518,15 @@ CssJs.unsafe({js|textEmphasisPosition|js}, {js|over left|js});
 CssJs.unsafe({js|textEmphasisPosition|js}, {js|over right|js});
 CssJs.unsafe({js|textEmphasisPosition|js}, {js|under left|js});
 CssJs.unsafe({js|textEmphasisPosition|js}, {js|under right|js});
-CssJs.unsafe({js|textShadow|js}, {js|none|js});
-CssJs.unsafe({js|textShadow|js}, {js|1px 2px 3px black|js});
+CssJs.textShadow(`none);
+CssJs.textShadow(
+  CssJs.Shadow.text(
+    ~x=`pxFloat(1.),
+    ~y=`pxFloat(2.),
+    ~blur=`pxFloat(3.),
+    CssJs.black,
+  ),
+);
 CssJs.unsafe({js|textDecoration|js}, {js|underline solid blue 1px|js});
 CssJs.unsafe({js|textDecorationSkip|js}, {js|none|js});
 CssJs.unsafe({js|textDecorationSkip|js}, {js|objects|js});
@@ -645,8 +652,8 @@ CssJs.unsafe({js|fontFeatureSettings|js}, {js|'smcp' on|js});
 CssJs.unsafe({js|fontFeatureSettings|js}, {js|'liga' off|js});
 CssJs.unsafe({js|fontFeatureSettings|js}, {js|'smcp', 'swsh' 2|js});
 CssJs.fontSize(`xxx_large);
-CssJs.unsafe({js|fontVariant|js}, {js|none|js});
-CssJs.unsafe({js|fontVariant|js}, {js|normal|js});
+CssJs.unsafe({|fontVariant|}, {|none|});
+CssJs.fontVariant(`normal);
 CssJs.unsafe({js|fontVariant|js}, {js|all-petite-caps|js});
 CssJs.unsafe({js|fontVariant|js}, {js|historical-forms|js});
 CssJs.unsafe({js|fontVariantAlternates|js}, {js|normal|js});
@@ -668,10 +675,10 @@ CssJs.unsafe({js|fontFeatureSettings|js}, {js|normal|js});
 CssJs.unsafe({js|fontFeatureSettings|js}, {js|'swsh' 2|js});
 CssJs.unsafe({js|fontLanguageOverride|js}, {js|normal|js});
 CssJs.unsafe({js|fontLanguageOverride|js}, {js|'SRB'|js});
-CssJs.unsafe({js|fontWeight|js}, {js|1|js});
-CssJs.unsafe({js|fontWeight|js}, {js|90|js});
-CssJs.unsafe({js|fontWeight|js}, {js|750|js});
-CssJs.unsafe({js|fontWeight|js}, {js|1000|js});
+CssJs.fontWeight(`num(1.));
+CssJs.fontWeight(`num(90.));
+CssJs.fontWeight(`num(750.));
+CssJs.fontWeight(`num(1000.));
 CssJs.unsafe({js|fontStyle|js}, {js|oblique 15deg|js});
 CssJs.unsafe({js|fontStyle|js}, {js|oblique -15deg|js});
 CssJs.unsafe({js|fontStyle|js}, {js|oblique 0deg|js});
