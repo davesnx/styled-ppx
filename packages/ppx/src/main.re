@@ -671,8 +671,48 @@ Driver.add_arg(
     "Changes the extension name from css to css_ to avoid breakage with bs-emotion-ppx",
 );
 
+  /*
+  let delimLength =
+    match delim with Some s -> 2 + String.length s | None -> 1
+  in
+  */
+
+  /*
+  let add_loc delimLength base span =
+  let _, _, col = Ocaml_common.Location.get_pos_info base.loc_start in
+  let pos_bol_start =
+    base.loc_start.pos_bol + col + delimLength + (fst span).index
+    - (fst span).col
+  in
+  let pos_bol_end =
+    base.loc_start.pos_bol + col + delimLength + (snd span).index
+    - (snd span).col
+  in
+  let start = pos_bol_start + (fst span).col in
+  let end_ = pos_bol_end + (snd span).col in
+  {
+    loc_start =
+      {
+        pos_fname = base.loc_start.pos_fname;
+        pos_lnum = base.loc_start.pos_lnum + (fst span).line;
+        pos_bol = pos_bol_start;
+        pos_cnum = start;
+      };
+    loc_end =
+      {
+        pos_fname = base.loc_start.pos_fname;
+        pos_lnum = base.loc_start.pos_lnum + (snd span).line;
+        pos_bol = pos_bol_end;
+        pos_cnum = end_;
+      };
+    loc_ghost = false;
+  }
+   */
+
 Driver.register_transformation(
-  ~preprocess_impl=traverser#structure,
+  /* Instrument is needed to run styled-ppx after metaquote,
+     we rely on this order in native tests */
+  ~instrument=Driver.Instrument.make(~position=Before, traverser#structure),
   ~rules=[
     /* %cx without let binding */
     /* which doesn't have CssJs.label */
@@ -774,8 +814,5 @@ Driver.register_transformation(
       }),
     ),
   ],
-  /* Instrument is needed to run styled-ppx after metaquote,
-     we rely on this order in native tests */
-  ~instrument=Driver.Instrument.make(Fun.id, ~position=Before),
   "styled-ppx",
 );

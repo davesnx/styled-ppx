@@ -11,7 +11,7 @@ let compare = (input, expected, {expect, _}) => {
 
 let selectors_css_tests = [
   /* Simple */
-/*   (
+  (
     ".a",
     [%expr [%cx ".a { }"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|.a|js}, [||])|])],
@@ -75,7 +75,7 @@ let selectors_css_tests = [
     ":nth-child( 10n -1 )",
     [%expr [%cx "&:nth-child( 10n -1 ) {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|&:nth-child(10n-1)|js}, [||])|])],
-  ), */
+  ),
   /* TODO: Support all cases */
   /* (
     ":nth-child( 10n - 1 )",
@@ -89,7 +89,7 @@ let selectors_css_tests = [
   ), */
 
   /* Compound */
-  /* (
+  (
     "&.bar",
     [%expr [%cx {js|&.bar {}|js}]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|&.bar|js}, [||])|])],
@@ -118,7 +118,7 @@ let selectors_css_tests = [
     ":hover",
     [%expr [%cx "&:hover {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|&:hover|js}, [||])|])],
-  ), */
+  ),
   /* (
     "p #first-child::before",
     [%expr [%cx {js|p #first-child {}|js}]],
@@ -131,7 +131,7 @@ let selectors_css_tests = [
   ), */
 
   /* Complex */
-  /* (
+  (
     "& > a",
     [%expr [%cx "& > a { }"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& > a|js}, [||])|])],
@@ -255,10 +255,10 @@ let selectors_css_tests = [
         [||]
       )
     |])],
-  ), */
+  ),
 
   /* Stylesheets */
-  /* (
+  (
     "html, body",
     [%expr [%styled.global {js|html, body {}|js}]],
     [%expr ignore(CssJs.global(. {js|html, body|js}, [||]))],
@@ -282,7 +282,7 @@ let selectors_css_tests = [
     "html, body, #root, .class",
     [%expr [%styled.global {js|html, body, #root, .class {}|js}]],
     [%expr ignore(CssJs.global(. {js|html, body, #root, .class|js}, [||]))],
-  ), */
+  ),
 ];
 
 describe("Should transform selectors", ({test, _}) => {

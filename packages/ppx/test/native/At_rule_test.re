@@ -82,7 +82,7 @@ describe("Should transform @media", ({test, _}) => {
 });
 
 let keyframe_cases = [
-  /* (
+  (
     {|%keyframe "0% { color: red } 100% { color: green }"|},
     [%expr [%keyframe "0% { color: red } 100% { color: green }"]],
     [%expr CssJs.keyframes(. [|(0, [|CssJs.color(CssJs.red)|]), (100, [|CssJs.color(CssJs.green)|]) |])]
@@ -96,7 +96,7 @@ let keyframe_cases = [
     {|%keyframe "from { color: red } to { color: green }"|},
     [%expr [%keyframe "{ from { color: red } to { color: green }}"]],
     [%expr CssJs.keyframes(. [|(0, [|CssJs.color(CssJs.red)|]), (100, [|CssJs.color(CssJs.green)|]) |])]
-  ), */
+  ),
 ];
 
 describe("Should transform @keyframes", ({test, _}) => {
