@@ -504,14 +504,14 @@ let properties_static_css_tests = [%expr
        [%css "justify-content: center"],
        CssJs.unsafe("justifyContent", "center"),
      ), */
-    (
+    /* (
       [%css "-moz-text-blink: blink"],
       CssJs.unsafe("MozTextBlink", "blink"),
-    ),
-    (
+    ), */
+    /* (
       [%css "display: -webkit-inline-box"],
       CssJs.unsafe("display", "-webkit-inline-box"),
-    ),
+    ), */
   |]
 ];
 

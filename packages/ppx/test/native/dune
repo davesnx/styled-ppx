@@ -6,7 +6,7 @@
   (-linkall -g))
  (libraries MockBsCss rely.lib styled-ppx.lib ppxlib)
  (preprocess
-  (pps styled-ppx.lib ppxlib.metaquot)))
+  (pps ppxlib.metaquot styled-ppx.lib -- -no-merge)))
 
 (executable
  (name runner)
@@ -27,7 +27,7 @@
  (libraries MockBsCss)
  (modules static_css_tests)
  (preprocess
-  (pps styled-ppx.lib ppxlib.metaquot)))
+  (pps ppxlib.metaquot styled-ppx.lib -- -no-merge)))
 
 (rule
  (alias native_typecheck_test)
