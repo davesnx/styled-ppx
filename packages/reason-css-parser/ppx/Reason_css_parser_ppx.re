@@ -59,4 +59,43 @@ let valueRecExtension =
     expander(~recursive=true),
   );
 
-Driver.register_transformation(~extensions=[valueExtension, valueRecExtension], "css-value-parser-ppx");
+let gen_type = (str) => {
+  let bindings = List.find_opt(fun
+    | {pstr_desc: Pstr_value(Recursive, _), pstr_loc: loc} => {
+      let filename = loc.loc_start.Lexing.pos_fname;
+      filename == "packages/reason-css-parser/lib/Parser.re";
+    }
+    | _ => false
+  , str);
+
+  let value_bindings = switch(bindings){
+    | Some({pstr_desc: Pstr_value(Recursive, value_bindings), _}) => value_bindings
+    | _ => []
+  }
+
+  if(value_bindings == []){
+    str
+  } else {
+    let first = List.hd(value_bindings);
+    let name = EmitType.extract_variable_name(first.pvb_pat) ++ "_type";
+    Format.eprintf("name is : %s @.", name);
+    let payload = EmitType.extract_ppx_content(first.pvb_expr);
+    switch(Css_spec_parser.value_of_string(payload)){
+      | Some(ast) => {
+        let _ = ast;
+        module Loc: {let loc: Location.t;} = {
+          let loc = Location.none;
+        };
+        module Ast_builder = Ppxlib.Ast_builder.Make(Loc);
+        module Emit = EmitType.Make(Ast_builder);
+        // open Ast_builder;
+        let typ = Emit.create_value_parser(name, ast);
+        Pprintast.structure_item(Format.err_formatter, typ);
+        [typ, ...str] ;
+      };
+      | _ => failwith("oh oh");
+    }
+  }
+}
+
+Driver.register_transformation(~preprocess_impl=gen_type, ~extensions=[valueExtension, valueRecExtension], "css-value-parser-ppx");
