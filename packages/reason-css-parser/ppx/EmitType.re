@@ -127,10 +127,10 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
   }
   
   let apply_modifier = {
-    (type_name, modifier, rule) =>
+    (modifier, rule) =>
       switch (modifier) {
       | One => { 
-        mk_typ(type_name, [mk_branch(rule, false, [])])
+        [mk_branch(rule, false, [])]
       }
       | _ => failwith("todo")
       };
@@ -142,18 +142,30 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
         | Keyword(name) => name
         | _ => assert false;
       }
-      apply_modifier(type_name, multiplier, rule);
+      apply_modifier(multiplier, rule);
     };
-    
-    switch (value) {
+
+    let combinator_op = (kind, values) => {
+      switch(kind) {
+        | Xor => List.map(fun
+          | Terminal(kind, multiplier) => terminal_op(kind, multiplier) 
+          | _ => failwith("todo")
+          , values
+        ) |> List.flatten
+        | _ => assert false
+      }
+    }
+
+    let apply = fun
     | Terminal(kind, multiplier) => terminal_op(kind, multiplier)
     // | Group(value, multiplier) => group_op(value, multiplier)
-    // | Combinator(kind, values) => combinator_op(kind, values)
+    | Combinator(kind, values) => combinator_op(kind, values)
     // | Function_call(name, value) => function_call(name, value)
-    | _ => failwith("todo")
-    };
+    | _ => failwith("todo");
+  
+    let rows = apply(value);
+    mk_typ(type_name, rows);
   };
-
 };
 
 let extract_ppx_content = (exp : Parsetree.expression ) => {

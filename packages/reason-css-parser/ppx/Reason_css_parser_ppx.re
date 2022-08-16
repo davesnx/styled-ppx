@@ -77,7 +77,7 @@ let gen_type = (str) => {
     str
   } else {
     let first = List.hd(value_bindings);
-    let name = EmitType.extract_variable_name(first.pvb_pat) ++ "_type";
+    let name = EmitType.extract_variable_name(first.pvb_pat);
     Format.eprintf("name is : %s @.", name);
     let payload = EmitType.extract_ppx_content(first.pvb_expr);
     switch(Css_spec_parser.value_of_string(payload)){
