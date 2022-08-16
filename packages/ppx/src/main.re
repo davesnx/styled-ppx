@@ -711,6 +711,9 @@ Driver.add_arg(
 
 Driver.register_transformation(
   ~impl=traverser#structure,
+  /* Instrument is needed to run styled-ppx after metaquote,
+     we rely on this order in native tests */
+  ~instrument=Driver.Instrument.make(~position=Before, traverser#structure),
   ~rules=[
     /* %cx without let binding */
     /* which doesn't have CssJs.label */
