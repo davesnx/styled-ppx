@@ -57,7 +57,7 @@ declaration_list:
   | ds = loc(declarations); EOF { ds }
 ;
 
-/* keyframe can contain {} or no */
+/* keyframe may contain {} */
 keyframe: rules = nonempty_list(keyframe_style_rule); { rules };
 
 keyframes:
@@ -120,11 +120,10 @@ at_rule:
   /* @media (min-width: 16rem) {} */
   | name = loc(AT_MEDIA); WS?;
     prelude = loc(media_query_prelude); WS?;
-    b = empty_brace_block; WS?; {
-    let empty_block = Brace_block.Rule_list (b, Lex_buffer.make_loc $startpos $endpos) in
+    b = loc(empty_brace_block); WS?; {
     { At_rule.name = name;
       prelude;
-      block = empty_block;
+      block = Brace_block.Rule_list b;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
@@ -132,7 +131,7 @@ at_rule:
   | name = loc(AT_KEYFRAMES); WS?;
     i = IDENT; WS?;
     block = brace_block(keyframe) {
-    let item = (Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i)) in
+    let item = (Component_value.Ident i, Lex_buffer.make_loc $startpos(i) $endpos(i)) in
     let prelude = ([item], Lex_buffer.make_loc $startpos(i) $endpos(i)) in
     let block = Brace_block.Rule_list (block, Lex_buffer.make_loc $startpos $endpos) in
     { At_rule.name = name;

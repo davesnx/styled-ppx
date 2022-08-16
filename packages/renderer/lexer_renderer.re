@@ -1,5 +1,13 @@
 /* esy x lexer-renderer */
 
+let position_to_string = pos =>
+  Printf.sprintf(
+    "[%d,%d+%d]",
+    pos.Lexing.pos_lnum,
+    pos.Lexing.pos_bol,
+    pos.Lexing.pos_cnum - pos.Lexing.pos_bol,
+  );
+
 let render_help = () => {
   print_endline("");
   print_endline("");
@@ -12,8 +20,6 @@ let render_help = () => {
   print_endline("");
 };
 
-let container_lnum = 0;
-let pos = Lexing.dummy_pos;
 let args = Sys.argv |> Array.to_list;
 let input = List.nth_opt(args, 1);
 let help =
@@ -28,21 +34,22 @@ let help =
   );
 
 let rec printUnlessIsEof = buffer => {
-  let lexes = Css_lexer.get_next_token(buffer);
-  switch (lexes) {
+  let (token, loc_start, loc_end) = Css_lexer.get_next_tokens_with_location(buffer);
+  let pos_start = position_to_string(loc_start);
+  let pos_end = position_to_string(loc_end);
+  print_endline(
+    Css_lexer.token_to_debug(token)
+    ++ {| [|} ++ pos_start ++ {|..|} ++ pos_end ++ {|]|}
+  );
+
+  switch (token) {
     | Css_lexer.Parser.EOF => ()
-    | token => {
-      token |> Css_lexer.token_to_debug |> print_endline;
-      printUnlessIsEof(buffer)
-    }
+    | _token => printUnlessIsEof(buffer)
   }
 };
 
 switch (input, help) {
 | (Some(_), true)
 | (None, _) => render_help()
-| (Some(css), _) =>
-  let sedlexBuffer = Sedlexing.Utf8.from_string(css);
-  let buffer = Lex_buffer.of_sedlex(sedlexBuffer);
-  printUnlessIsEof(buffer);
+| (Some(css), _) => css |> Lex_buffer.from_string |> printUnlessIsEof;
 };

@@ -1,26 +1,24 @@
 (library
  (name StyledPpxTestNativeLib)
  (modules
-  (:standard \ Runner static_css_tests))
+  (:standard \ runner static_css_tests))
  (library_flags
   (-linkall -g))
  (libraries MockBsCss rely.lib styled-ppx.lib ppxlib)
  (preprocess
-  (pps ppxlib.metaquot styled-ppx.lib)))
+  (pps ppxlib.metaquot styled-ppx.lib -- -no-merge)))
 
 (executable
- (name Runner)
- (modules Runner)
- (libraries StyledPpxTestNativeLib styled-ppx-css-parser)
- (preprocess
-  (pps ppxlib.metaquot styled-ppx.lib)))
+ (name runner)
+ (modules runner)
+ (libraries StyledPpxTestNativeLib styled-ppx-css-parser))
 
 ; type check
 
 (rule
  (alias native_typecheck_test)
  (targets static_css_tests.ml)
- (deps ./Runner.exe)
+ (deps ./runner.exe)
  (action
   (run %{deps})))
 
@@ -29,7 +27,7 @@
  (libraries MockBsCss)
  (modules static_css_tests)
  (preprocess
-  (pps styled-ppx.lib ppxlib.metaquot)))
+  (pps ppxlib.metaquot styled-ppx.lib -- -no-merge)))
 
 (rule
  (alias native_typecheck_test)

@@ -29,11 +29,26 @@ let of_sedlex = (~file="<n/a>", ~pos=?, buf) => {
   {buf, pos, pos_mark: pos, last_char: None, last_char_mark: None};
 };
 
-let last_buffer = ref(of_sedlex(Sedlexing.Latin1.from_string("")));
+let container_lnum_ref = ref(0);
 
-let of_ascii_string = (~pos=?, s) => {
-  last_buffer := of_sedlex(~pos?, Sedlexing.Latin1.from_string(s));
-  of_sedlex(~pos?, Sedlexing.Latin1.from_string(s));
+let from_string_of_sedlex = (~pos=?, string) => {
+  let buf = Sedlexing.Latin1.from_string(string);
+  switch (pos) {
+    | Some(p) => Sedlexing.set_position(buf, p)
+    | None => ()
+  }
+  of_sedlex(~pos?, buf)
+};
+
+let last_buffer = ref(from_string_of_sedlex(""));
+
+let from_string = (~container_lnum=?, ~pos=?, s) => {
+  switch (container_lnum) {
+  | None => ()
+  | Some(lnum) => container_lnum_ref := lnum
+  };
+  last_buffer := from_string_of_sedlex(~pos?, s);
+  from_string_of_sedlex(~pos?, s)
 };
 
 /** The next four functions are used by sedlex internally.
@@ -61,6 +76,12 @@ let rollback = lexbuf => {
   lexbuf.pos_mark = lexbuf.pos;
   lexbuf.last_char_mark = lexbuf.last_char;
   Sedlexing.rollback(lexbuf.buf);
+};
+
+let __private__next_int = lexbuf => {
+  lexbuf.pos_mark = lexbuf.pos;
+  lexbuf.last_char_mark = lexbuf.last_char;
+  Sedlexing.__private__next_int(lexbuf.buf);
 };
 
 /** location of next character */
@@ -127,3 +148,5 @@ let make_loc = (~loc_ghost=false, start_pos, end_pos): Location.t => {
   loc_end: end_pos,
   loc_ghost,
 };
+
+let lexing_positions = (buf) => Sedlexing.lexing_positions(buf.buf);
