@@ -79,12 +79,12 @@ let gen_type = (str) => {
     let first = List.hd(value_bindings);
     let name = EmitType.extract_variable_name(first.pvb_pat);
     Format.eprintf("name is : %s @.", name);
-    let payload = EmitType.extract_ppx_content(first.pvb_expr);
+    let (payload, loc) = EmitType.extract_ppx_content(first.pvb_expr);
     switch(Css_spec_parser.value_of_string(payload)){
       | Some(ast) => {
         let _ = ast;
         module Loc: {let loc: Location.t;} = {
-          let loc = Location.none;
+          let loc = loc;
         };
         module Ast_builder = Ppxlib.Ast_builder.Make(Loc);
         module Emit = EmitType.Make(Ast_builder);

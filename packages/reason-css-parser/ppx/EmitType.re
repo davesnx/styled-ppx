@@ -130,7 +130,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     (modifier, rule) =>
       switch (modifier) {
       | One => { 
-        [mk_branch(rule, false, [])]
+        mk_branch(rule, false, [])
       }
       | _ => failwith("todo")
       };
@@ -151,13 +151,13 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
           | Terminal(kind, multiplier) => terminal_op(kind, multiplier) 
           | _ => failwith("todo")
           , values
-        ) |> List.flatten
+        )
         | _ => assert false
       }
     }
 
     let apply = fun
-    | Terminal(kind, multiplier) => terminal_op(kind, multiplier)
+    | Terminal(kind, multiplier) => [terminal_op(kind, multiplier)]
     // | Group(value, multiplier) => group_op(value, multiplier)
     | Combinator(kind, values) => combinator_op(kind, values)
     // | Function_call(name, value) => function_call(name, value)
@@ -170,7 +170,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
 
 let extract_ppx_content = (exp : Parsetree.expression ) => {
   switch(exp.pexp_desc){
-    | Pexp_extension((_, PStr([{pstr_desc: Pstr_eval({pexp_desc: Pexp_constant(Pconst_string(value, _loc, _delim)), _}, _attrs) , _}]))) => value
+    | Pexp_extension((_, PStr([{pstr_desc: Pstr_eval({pexp_desc: Pexp_constant(Pconst_string(value, loc, _delim)), _}, _attrs) , _}]))) => (value, loc)
     | _ => assert false
   }
 }
