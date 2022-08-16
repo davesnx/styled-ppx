@@ -156,10 +156,10 @@ let properties_static_css_tests = [%expr
       [%css "margin-bottom: 2px"],
       CssJs.marginBottom(`pxFloat(2.))
     ), */
-    (
+    /* (
       [%css "margin-left: 3px"],
       CssJs.marginLeft(`pxFloat(3.))
-    ),
+    ), */
     /* (
       [%css "margin: 1px"],
       CssJs.margin(`pxFloat(1.))
@@ -527,7 +527,7 @@ describe("Transform [%css] to bs-css", ({test, _}) => {
     extract_tests(properties_static_css_tests);
 
   /* We write the tests to files so the Typecheker runs on them and ensures it's a valid with bs-css interfaces */
-   write_tests_to_file(properties_static_css_tests, "static_css_tests.ml");
+  write_tests_to_file(properties_static_css_tests, "static_css_tests.ml");
 
   List.iteri(test("properties static: "), properties_static_css_tests);
 });

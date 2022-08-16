@@ -10,10 +10,11 @@ let compare = (input, expected, {expect, _}) => {
 };
 
 let properties_variable_css_tests = [
-  /* (
+  (
     [%expr [%css "color: $(mono100);"]],
     [%expr (CssJs.color(mono100) : CssJs.rule)]
   ),
+  /*
   (
     [%expr [%css "margin: $(Size.big) $(Size.small);"]],
     [%expr CssJs.margin2(~v=Size.big, ~h=Size.small)]
