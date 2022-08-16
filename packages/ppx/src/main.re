@@ -699,11 +699,12 @@ Driver.register_transformation(
         Extension.Context.Expression,
         string_payload,
         (~loc as _, ~path as _, payload, _label, _) => {
-          let loc_start = payload.loc.loc_start;
+          let pos = payload.loc.loc_start;
+          let container_lnum = pos.pos_lnum;
           let declarationListValues =
             Css_lexer.parse_declaration(
-              ~container_lnum=loc_start.pos_lnum,
-              ~pos=loc_start,
+              ~container_lnum,
+              ~pos,
               payload.txt,
             )
             |> Css_to_emotion.render_declaration;
@@ -720,11 +721,12 @@ Driver.register_transformation(
         Extension.Context.Expression,
         string_payload,
         (~loc as _, ~path as _, payload, _label, _) => {
-          let loc_start = payload.loc.loc_start;
+          let pos = payload.loc.loc_start;
+          let container_lnum = pos.pos_lnum;
           let stylesheet =
             Css_lexer.parse_stylesheet(
-              ~container_lnum=loc_start.pos_lnum,
-              ~pos=loc_start,
+              ~container_lnum,
+              ~pos,
               payload.txt,
             );
           Css_to_emotion.render_global(stylesheet);
@@ -737,11 +739,12 @@ Driver.register_transformation(
         Extension.Context.Expression,
         string_payload,
         (~loc as _, ~path as _, payload, _label, _) => {
-          let loc_start = payload.loc.loc_start;
+          let pos = payload.loc.loc_start;
+          let container_lnum = pos.pos_lnum;
           let declarations =
             Css_lexer.parse_keyframes(
-              ~container_lnum=loc_start.pos_lnum,
-              ~pos=loc_start,
+              ~container_lnum,
+              ~pos,
               payload.txt,
             );
           Css_to_emotion.render_keyframes(declarations);
