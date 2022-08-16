@@ -668,7 +668,7 @@ Driver.add_arg(
   "--compat-with-bs-emotion-ppx",
   Arg.Bool(Config.updateCompatibleModeWithBsEmotionPpx),
   ~doc=
-    "Changes the extension name from css to css_, avoids breakage with bs-emotion-ppx",
+    "Changes the extension name from css to css_ to avoid breakage with bs-emotion-ppx",
 );
 
 Driver.register_transformation(
