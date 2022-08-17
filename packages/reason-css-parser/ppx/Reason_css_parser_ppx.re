@@ -63,7 +63,7 @@ let gen_type = (str) => {
   let bindings = List.find_opt(fun
     | {pstr_desc: Pstr_value(Recursive, _), pstr_loc: loc} => {
       let filename = loc.loc_start.Lexing.pos_fname;
-      filename == "packages/reason-css-parser/lib/Parser.re";
+      filename == "packages/reason-css-parser/lib/Spec.re";
     }
     | _ => false
   , str);

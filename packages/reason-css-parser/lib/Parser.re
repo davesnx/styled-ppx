@@ -4,9 +4,7 @@ open Modifier;
 open Rule.Match;
 open Parser_helper;
 
-let rec property_test = [%value.rec "'static' | 'absolute'"]
-
-and _legacy_gradient = [%value.rec "<-webkit-gradient()> | <-legacy-linear-gradient> | <-legacy-repeating-linear-gradient> | <-legacy-radial-gradient> | <-legacy-repeating-radial-gradient>"]
+let rec _legacy_gradient = [%value.rec "<-webkit-gradient()> | <-legacy-linear-gradient> | <-legacy-repeating-linear-gradient> | <-legacy-radial-gradient> | <-legacy-repeating-radial-gradient>"]
 and _legacy_linear_gradient = [%value.rec "-moz-linear-gradient( <-legacy-linear-gradient-arguments> ) | -webkit-linear-gradient( <-legacy-linear-gradient-arguments> ) | -o-linear-gradient( <-legacy-linear-gradient-arguments> )"]
 and _legacy_linear_gradient_arguments = [%value.rec "[ <extended-angle> | <side-or-corner> ]? ',' <color-stop-list>"]
 and _legacy_radial_gradient = [%value.rec "-moz-radial-gradient( <-legacy-radial-gradient-arguments> ) | -webkit-radial-gradient( <-legacy-radial-gradient-arguments> ) | -o-radial-gradient( <-legacy-radial-gradient-arguments> )"]
@@ -936,7 +934,6 @@ and y = [%value.rec "<number>"];
 let check_map =
   StringMap.of_seq(
     List.to_seq([
-      ("test", check(property_test)),
       ("-legacy-gradient", check(_legacy_gradient)),
       ("-legacy-linear-gradient", check(_legacy_linear_gradient)),
       (

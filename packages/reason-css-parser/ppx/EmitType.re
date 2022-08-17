@@ -127,10 +127,10 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
   }
   
   let apply_modifier = {
-    (modifier, rule) =>
+    (modifier, type_, is_constructor, params) =>
       switch (modifier) {
       | One => { 
-        mk_branch(rule, false, [])
+        mk_branch(type_, is_constructor, params)
       }
       | _ => failwith("todo")
       };
@@ -138,11 +138,16 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
 
   let create_value_parser = (type_name, value) => {
     let terminal_op = (kind, multiplier) => {
-      let rule = switch(kind){
-        | Keyword(name) => name
+      let (type_, is_constructor, params) = switch(kind){
+        | Keyword(name) => (first_uppercase(name), false, [])
+        | Property_type(name) => {
+          let name = property_value_name(name) |> value_name_of_css;
+          let params = [ptyp_constr(txt @@ Lident(name), [])];
+          (first_uppercase(name), true, params)
+        }
         | _ => assert false;
       }
-      apply_modifier(multiplier, rule);
+      apply_modifier(multiplier, type_, is_constructor, params);
     };
 
     let combinator_op = (kind, values) => {
