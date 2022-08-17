@@ -151,6 +151,11 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     let terminal_op = (kind, multiplier) => {
       let (type_, is_constructor, params) = switch(kind){
         | Keyword(name) => (first_uppercase(name), false, [])
+        | Data_type(name) => {
+          let name = value_name_of_css(name);
+          let params = [ptyp_constr(txt @@ Lident(name), [])];
+          (first_uppercase(name), true, params)
+        }
         | Property_type(name) => {
           let name = property_value_name(name) |> value_name_of_css;
           let params = [ptyp_constr(txt @@ Lident(name), [])];
