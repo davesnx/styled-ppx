@@ -132,7 +132,18 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       | One => { 
         mk_branch(type_, is_constructor, params)
       }
-      | _ => failwith("todo")
+      | Optional => {
+        let params = [ptyp_constr(txt @@ Lident("option"), params)]
+        mk_branch(type_, is_constructor, params)
+      }
+      | Repeat(_)
+      | Repeat_by_comma(_, _)
+      | Zero_or_more
+      | One_or_more
+      | At_least_one => {
+        let params = [ptyp_constr(txt @@ Lident("list"), params)]
+        mk_branch(type_, is_constructor, params)
+      }
       };
   };
 
