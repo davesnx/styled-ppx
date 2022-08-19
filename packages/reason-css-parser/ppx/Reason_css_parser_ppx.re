@@ -63,7 +63,7 @@ let gen_type = (str) => {
   let bindings = List.find_opt(fun
     | {pstr_desc: Pstr_value(Recursive, _), pstr_loc: loc} => {
       let filename = loc.loc_start.Lexing.pos_fname;
-      filename == "packages/reason-css-parser/lib/Spec.re";
+      filename == "packages/reason-css-parser/test/spec.re";
     }
     | _ => false
   , str);
@@ -88,12 +88,14 @@ let gen_type = (str) => {
         };
         module Ast_builder = Ppxlib.Ast_builder.Make(Loc);
         module Emit = EmitType.Make(Ast_builder);
-        // open Ast_builder;
+        open Ast_builder;
         let typ = Emit.create_value_parser(name, ast);
         Pprintast.structure_item(Format.err_formatter, typ);
-        [typ, ...str] ;
+        let salve = pmod_structure([typ]);
+        let types_module = [%stri module Types = [%m salve]];
+        str @ [types_module]
       };
-      | _ => failwith("oh oh");
+      | _ => failwith("Invalid CSS spec");
     }
   }
 }

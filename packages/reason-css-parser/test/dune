@@ -3,7 +3,7 @@
  (ocamlopt_flags -linkall -g)
  (libraries reason-css-parser.lib rely.lib)
  (modules
-  (:standard \ Runner))
+  (:standard \ Runner printer spec))
  (preprocess
   (pps reason_css_parser_ppx sedlex.ppx)))
 
@@ -13,6 +13,32 @@
  (modules Runner)
  (preprocess
   (pps reason_css_parser_ppx sedlex.ppx)))
+
+(executable
+ (name printer)
+ (modules printer spec)
+ (libraries reason_css_parser_ppx ppxlib))
+
+(rule
+ (targets spec.actual.re)
+ (deps
+  (:printer printer.exe)
+  (:input spec.re))
+ (action
+  (progn
+   (with-stdout-to
+    %{targets}
+    (run refmt --parse re --print ml %{input}))
+   (run ./%{printer} --impl %{targets} -o %{targets})
+   (run refmt --parse ml --print re --in-place %{targets}))))
+
+(rule
+ (alias spec_test)
+ (deps
+  (file spec.expected.re)
+  (file spec.actual.re))
+ (action
+  (diff spec.expected.re spec.actual.re)))
 
 (rule
  (alias reason_css_parser_test)
