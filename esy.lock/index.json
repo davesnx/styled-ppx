@@ -1,5 +1,5 @@
 {
-  "checksum": "7165c8ea6e7d4ed0710cb3bdbac8c43f",
+  "checksum": "441bde68903264936e2c5c3416bf8f56",
   "root": "@davesnx/styled-ppx@link-dev:./package.json",
   "node": {
     "refmterr@github:jfrolich/reason-native:refmterr.json#08085a4048974b06aaf3aab918b677b39dea3d18@d41d8cd9": {
@@ -1502,6 +1502,33 @@
         "@opam/lwt@opam:5.6.1@2a9902ab", "@opam/dune@opam:3.4.1@84d54aea"
       ]
     },
+    "@opam/lwt_ppx@opam:2.1.0@f0dd3e73": {
+      "id": "@opam/lwt_ppx@opam:2.1.0@f0dd3e73",
+      "name": "@opam/lwt_ppx",
+      "version": "opam:2.1.0",
+      "source": {
+        "type": "install",
+        "source": [
+          "archive:https://opam.ocaml.org/cache/md5/e6/e63979ee40a80d5b9e9e5545f33323b4#md5:e63979ee40a80d5b9e9e5545f33323b4",
+          "archive:https://github.com/ocsigen/lwt/archive/5.6.0.tar.gz#md5:e63979ee40a80d5b9e9e5545f33323b4"
+        ],
+        "opam": {
+          "name": "lwt_ppx",
+          "version": "2.1.0",
+          "path": "esy.lock/opam/lwt_ppx.2.1.0"
+        }
+      },
+      "overrides": [],
+      "dependencies": [
+        "ocaml@4.14.0@d41d8cd9", "@opam/ppxlib@opam:0.27.0@08d8f65d",
+        "@opam/lwt@opam:5.6.1@2a9902ab", "@opam/dune@opam:3.4.1@84d54aea",
+        "@esy-ocaml/substs@0.0.1@d41d8cd9"
+      ],
+      "devDependencies": [
+        "ocaml@4.14.0@d41d8cd9", "@opam/ppxlib@opam:0.27.0@08d8f65d",
+        "@opam/lwt@opam:5.6.1@2a9902ab", "@opam/dune@opam:3.4.1@84d54aea"
+      ]
+    },
     "@opam/lwt@opam:5.6.1@2a9902ab": {
       "id": "@opam/lwt@opam:5.6.1@2a9902ab",
       "name": "@opam/lwt",
@@ -2350,7 +2377,10 @@
         "manifest": "package.json"
       },
       "overrides": [],
-      "dependencies": [],
+      "dependencies": [
+        "@opam/lwt_ppx@opam:2.1.0@f0dd3e73",
+        "@opam/astring@opam:0.8.5@1300cee8"
+      ],
       "devDependencies": [
         "refmterr@github:jfrolich/reason-native:refmterr.json#08085a4048974b06aaf3aab918b677b39dea3d18@d41d8cd9",
         "ocaml@4.14.0@d41d8cd9",
