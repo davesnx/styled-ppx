@@ -1,5 +1,5 @@
 {
-  "checksum": "441bde68903264936e2c5c3416bf8f56",
+  "checksum": "336d32cc73c77264c44c16e3e777e58a",
   "root": "@davesnx/styled-ppx@link-dev:./package.json",
   "node": {
     "refmterr@github:jfrolich/reason-native:refmterr.json#08085a4048974b06aaf3aab918b677b39dea3d18@d41d8cd9": {
@@ -2316,6 +2316,37 @@
       ],
       "devDependencies": [ "ocaml@4.14.0@d41d8cd9" ]
     },
+    "@opam/alcotest-lwt@opam:1.6.0@990f59a4": {
+      "id": "@opam/alcotest-lwt@opam:1.6.0@990f59a4",
+      "name": "@opam/alcotest-lwt",
+      "version": "opam:1.6.0",
+      "source": {
+        "type": "install",
+        "source": [
+          "archive:https://opam.ocaml.org/cache/sha256/fd/fd00f9668395874ff3b1d7ef566d14efc02fa7dd34123eb25d59355be94b2329#sha256:fd00f9668395874ff3b1d7ef566d14efc02fa7dd34123eb25d59355be94b2329",
+          "archive:https://github.com/mirage/alcotest/releases/download/1.6.0/alcotest-1.6.0.tbz#sha256:fd00f9668395874ff3b1d7ef566d14efc02fa7dd34123eb25d59355be94b2329"
+        ],
+        "opam": {
+          "name": "alcotest-lwt",
+          "version": "1.6.0",
+          "path": "esy.lock/opam/alcotest-lwt.1.6.0"
+        }
+      },
+      "overrides": [],
+      "dependencies": [
+        "ocaml@4.14.0@d41d8cd9", "@opam/lwt@opam:5.6.1@2a9902ab",
+        "@opam/logs@opam:0.7.0@46a3dffc", "@opam/fmt@opam:0.9.0@87213963",
+        "@opam/dune@opam:3.4.1@84d54aea",
+        "@opam/alcotest@opam:1.6.0@89577431",
+        "@esy-ocaml/substs@0.0.1@d41d8cd9"
+      ],
+      "devDependencies": [
+        "ocaml@4.14.0@d41d8cd9", "@opam/lwt@opam:5.6.1@2a9902ab",
+        "@opam/logs@opam:0.7.0@46a3dffc", "@opam/fmt@opam:0.9.0@87213963",
+        "@opam/dune@opam:3.4.1@84d54aea",
+        "@opam/alcotest@opam:1.6.0@89577431"
+      ]
+    },
     "@opam/alcotest@opam:1.6.0@89577431": {
       "id": "@opam/alcotest@opam:1.6.0@89577431",
       "name": "@opam/alcotest",
@@ -2377,10 +2408,7 @@
         "manifest": "package.json"
       },
       "overrides": [],
-      "dependencies": [
-        "@opam/lwt_ppx@opam:2.1.0@f0dd3e73",
-        "@opam/astring@opam:0.8.5@1300cee8"
-      ],
+      "dependencies": [ "@opam/alcotest-lwt@opam:1.6.0@990f59a4" ],
       "devDependencies": [
         "refmterr@github:jfrolich/reason-native:refmterr.json#08085a4048974b06aaf3aab918b677b39dea3d18@d41d8cd9",
         "ocaml@4.14.0@d41d8cd9",
@@ -2393,6 +2421,7 @@
         "@opam/ocaml-migrate-parsetree@opam:2.4.0@5109deb9",
         "@opam/ocaml-lsp-server@opam:1.13.0@063b7808",
         "@opam/menhir@opam:20220210@ff87a93b",
+        "@opam/lwt_ppx@opam:2.1.0@f0dd3e73",
         "@opam/dune@opam:3.4.1@84d54aea",
         "@opam/alcotest@opam:1.6.0@89577431"
       ]

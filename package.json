@@ -57,5 +57,6 @@
       "esy b dune build --root . --ignore-promoted-rules --no-config --profile release-static --only-packages styled-ppx,reason-css-parser,reason-css-lexer,css-spec-parser,styled-ppx-css-parser,string-interpolation",
     "ast": "esy dune exec packages/renderer/ast_renderer.exe --",
     "lexer": "esy dune exec packages/renderer/lexer_renderer.exe --"
-  }
+  },
+  "dependencies": { "@opam/alcotest-lwt": "1.6.0" }
 }

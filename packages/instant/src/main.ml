@@ -1,36 +1,21 @@
+open Alcotest
+
 (*
   ├── __tests__
-  │   ├── test_name_number_1.snap
-  │   ├── test_name_number_2.snap
-  │   └── test_name_number_3.snap
+  │   ├── command
+  │   ├── stdin
+  │   └── expected
 
-  Given the following file structure and a desired cli command or to transform input to input.
-  This program will run the command on each file and compare the input to the input file.
-  If this succeeds, the test is successful. If it fails, report the error.
+  Given the following file structure.
+  This program will run the command with the optional stdin and compare the result with the expected file.
+  If this succeeds or fail, the test is reported by alcotest.
 *)
 
-(* .snap file consist of
-     - utf8 file
-     - utf8 valid name
-     - structure:
-        - a command to run
-        - input
-        - input
-*)
-
-(* TODO: Parse .snap file *)
-(* cmd: `ls`
-
-   ```
-   ```
-   ---
-   ```
-   ```
-*)
-
-(* TODO: Run each case *)
-(* TODO: Diff output and expected *)
-(* TODO: Print errors nicely (alcotest uwu) *)
+(* TODO: Read folder content *)
+(* TODO: Create alcotest Testable *)
+(* TODO: Create testing API (Snapshot folder options) *)
+(* TODO: Create mode to update snapshot files *)
+(* TODO: Read folder nested commands *)
 
 type case = {
   title : string;
@@ -39,7 +24,110 @@ type case = {
   expected : string;
 }
 
-(* open Lwt.Syntax *)
+type completed = {
+  stdout : string;
+  stderr : string;
+  status : Unix.process_status;
+}
+
+let create_from_process_and_consumers ~consume_stdout ~consume_stderr process =
+  let open Lwt.Infix in
+  Lwt.both process#status
+    (Lwt.both (consume_stdout process#stdout) (consume_stderr process#stderr))
+  >>= fun (status, (stdout, stderr)) -> Lwt.return { stdout; stderr; status }
+
+let spawn ?(consume_stdout = fun input_channel -> Lwt_io.read input_channel)
+    ?(consume_stderr = fun input_channel -> Lwt_io.read input_channel)
+    ?(arguments = []) exec =
+  let lwt_command = (exec, Array.of_list (exec :: arguments)) in
+  Lwt_process.with_process_full lwt_command
+    (create_from_process_and_consumers ~consume_stdout ~consume_stderr)
+
+type tag = [ `Ok | `Fail | `Skip | `Todo | `Assert ]
+
+let colour_of_tag = function
+  | `Ok -> `Green
+  | `Fail -> `Red
+  | `Skip | `Todo | `Assert -> `Yellow
+
+let string_of_tag = function
+  | `Ok -> "OK"
+  | `Fail -> "FAIL"
+  | `Skip -> "SKIP"
+  | `Todo -> "TODO"
+  | `Assert -> "ASSERT"
+
+let pp_tag ~wrapped ppf typ =
+  let colour = colour_of_tag typ in
+  let tag = string_of_tag typ in
+  let tag = if wrapped then "[" ^ tag ^ "]" else tag in
+  Fmt.(styled colour string) ppf tag
+
+let tag = pp_tag ~wrapped:false
+
+let pp_location =
+  let pp =
+    Fmt.styled `Bold (fun ppf (f, l, c) ->
+        Fmt.pf ppf "File \"%s\", line %d, character %d:@," f l c)
+  in
+  fun ?here ?pos ppf ->
+    match (here, pos) with
+    | Some (here : Source_code_position.here), _ ->
+        pp ppf (here.pos_fname, here.pos_lnum, here.pos_cnum - here.pos_bol)
+    | _, Some (fname, lnum, cnum, _) -> pp ppf (fname, lnum, cnum)
+    | None, None -> ()
+
+exception Check_error of unit Fmt.t
+
+let check_err fmt = raise (Check_error fmt)
+
+let custom_check (type a) ?here ?pos (t : a testable) msg (expected : a)
+    (actual : a) =
+  if not (equal t expected actual) then
+    let open Fmt in
+    let s = const string in
+    let pp_error =
+      match msg with "" -> nop | _ -> const tag `Fail ++ s (" " ^ msg) ++ cut
+    and pp_expected ppf () =
+      Fmt.pf ppf "   Expected: `%a'" (styled `Green (pp t)) expected;
+      Format.pp_print_if_newline ppf ();
+      Fmt.cut ppf ();
+      ()
+    and pp_actual ppf () =
+      Fmt.pf ppf "   Received: `%a'" (styled `Red (pp t)) actual
+    in
+    let open Fmt in
+    raise
+    @@ check_err
+         (vbox
+            ((fun ppf () -> pp_location ?here ?pos ppf)
+            ++ pp_error ++ cut ++ pp_expected ++ cut ++ pp_actual)
+         ++ cut)
+
+let transform_snap_to_alco ({ command; flags; expected; title } : case) switch =
+  Lwt_switch.add_hook (Some switch) (fun () -> Lwt.return ());
+  match%lwt spawn ~arguments:flags command with
+  | { stderr; stdout; status = WEXITED 0 } ->
+      let output =
+        match (stderr, stdout) with
+        | "", output -> output
+        | output, "" -> output
+        | _, _ -> fail "command got stderr and stdout"
+      in
+      let left = expected |> String.trim in
+      let right = output |> String.trim in
+      Lwt.return (check string title left right)
+  | {
+   stdout = "";
+   stderr = "";
+   status = WEXITED status_code | WSIGNALED status_code | WSTOPPED status_code;
+  } ->
+      let msg =
+        "No output (stderr empty and stdout empty) Status code: "
+        ^ string_of_int status_code
+      in
+      fail msg
+  | _ -> fail "Unknown error - this should not happen"
 
 let mock =
   [
@@ -77,95 +165,12 @@ styled-ppx.opam|};
     };
   ]
 
-type completed = {
-  stdout : string;
-  stderr : string;
-  status : Unix.process_status;
-}
-
-let create_from_process_and_consumers ~consume_stdout ~consume_stderr process =
-  let open Lwt.Infix in
-  Lwt.both process#status
-    (Lwt.both (consume_stdout process#stdout) (consume_stderr process#stderr))
-  >>= fun (status, (stdout, stderr)) -> Lwt.return { stdout; stderr; status }
-
-let spawn ?(consume_stdout = fun input_channel -> Lwt_io.read input_channel)
-    ?(consume_stderr = fun input_channel -> Lwt_io.read input_channel)
-    ?(arguments = []) exec =
-  let lwt_command = (exec, Array.of_list (exec :: arguments)) in
-  Lwt_process.with_process_full lwt_command
-    (create_from_process_and_consumers ~consume_stdout ~consume_stderr)
-
-type err =
-  | Unknown of string
-  | NoMatch of string
-  | Invalid
-  | Invalid_command
-  | Invalid_input
-  | Invalid_expected
-
-let err_to_string = function
-  | NoMatch msg -> msg
-  | Unknown err -> "Error Unknown: " ^ err
-  | Invalid -> "Error Invalid"
-  | Invalid_command -> "Error Invalid_command"
-  | Invalid_input -> "Error Invalid_input"
-  | Invalid_expected -> "Error Invalid_expected"
-
-type final = (unit, err) Lwt_result.t
-
-let compare left right =
-  String.equal (left |> String.trim) (right |> String.trim)
-
-let print_diff left right =
-  let left_lines = left |> String.split_on_char ' ' |> Array.of_list in
-  let right_lines = right |> String.split_on_char ' ' |> Array.of_list in
-  let diff = Diff.get_diff left_lines right_lines in
-  Diff.print diff
-
-let run_test { command; flags; expected; _ } =
-  match%lwt spawn ~arguments:flags command with
-  | { stderr; stdout; status = WEXITED 0 } ->
-      let output =
-        match (stderr, stdout) with
-        | "", output -> output
-        | output, "" -> output
-        (* TODO: Handle this as an error *)
-        | _, _ -> failwith "command got stderr and stdout"
-      in
-      if compare output expected then Lwt.return @@ Ok ()
-      else Lwt.return @@ Error (NoMatch (print_diff output expected))
-  | {
-   stdout = "";
-   stderr = "";
-   status = WEXITED status_code | WSIGNALED status_code | WSTOPPED status_code;
-  } ->
-      let msg =
-        "No output (stderr empty and stdout empty) Status code: "
-        ^ string_of_int status_code
-      in
-      Lwt_result.error @@ Lwt.return (Unknown msg)
-  | _ ->
-      Lwt_result.error
-      @@ Lwt.return (Unknown "Unknown error - this should not happen")
-
-let ident num = String.make num ' '
-let newline = "\n"
-
-let format_err err =
-  String.split_on_char '\n' (err_to_string err)
-  |> List.map (fun line -> ident 4 ^ " " ^ line)
-  |> String.concat "\n"
-
-let run_tests suitName cases =
-  Lwt_io.printl (newline ^ "Running " ^ suitName) |> ignore;
-  Lwt_list.iter_p
+let cases =
+  List.map
     (fun case ->
-      match%lwt run_test case with
-      | Ok _ -> Lwt_io.printl (ident 2 ^ case.title ^ "  🟩")
-      | Error err ->
-          Lwt_io.printl
-            (newline ^ ident 2 ^ case.title ^ "  🟥" ^ newline ^ format_err err))
-    cases
+      Alcotest_lwt.test_case "one" `Quick (fun switch () ->
+          transform_snap_to_alco case switch))
+    mock
 
-let () = Lwt_main.run (run_tests "Mock tests" mock)
+let () =
+  Lwt_main.run @@ Alcotest_lwt.run "Snapshot_tests" [ ("Mock_tests", cases) ]
