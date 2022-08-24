@@ -15,6 +15,7 @@ open Alcotest
 (* TODO: Create testing API (Snapshot folder options) *)
 (* TODO: Create mode to update snapshot files *)
 (* TODO: Read folder nested commands *)
+(* TODO: Add option to ignore ws *)
 
 type case = {
   title : string;
@@ -45,16 +46,16 @@ let spawn ?(consume_stdout = fun input_channel -> Lwt_io.read input_channel)
 type tag = Ok | Fail | Skip | Todo | Assert
 
 let colour_of_tag = function
-  | `Ok -> `Green
-  | `Fail -> `Red
-  | `Skip | `Todo | `Assert -> `Yellow
+  | Ok -> `Green
+  | Fail -> `Red
+  | Skip | Todo | Assert -> `Yellow
 
 let string_of_tag = function
-  | `Ok -> "OK"
-  | `Fail -> "FAIL"
-  | `Skip -> "SKIP"
-  | `Todo -> "TODO"
-  | `Assert -> "ASSERT"
+  | Ok -> "OK"
+  | Fail -> "FAIL"
+  | Skip -> "SKIP"
+  | Todo -> "TODO"
+  | Assert -> "ASSERT"
 
 let tag ppf typ =
   let colour = colour_of_tag typ in
@@ -63,54 +64,70 @@ let tag ppf typ =
 
 exception Check_error of unit Fmt.t
 
+let diff left right =
+  Patdiff.Patdiff_core.Without_unix.patdiff
+    ~location_style:None
+      (* without color, cannot produce the "!|" lines that mix add/keep/remove *)
+    ~produce_unified_lines:false
+      (* line splitting produces confusing output in ASCII format *)
+    ~split_long_lines:false ~keep_ws:false
+    ~prev:{ name = "expected"; text = left }
+    ~next:{ name = "actual"; text = right }
+    ()
+
 let () =
   let print_error =
     (* We instantiate the error print buffer lazily, so as to be sensitive to
        [Fmt_tty.setup_std_outputs]. *)
     lazy
-      (let buf = Buffer.create 0 in
-       let ppf = Format.formatter_of_buffer buf in
-       Fmt.set_style_renderer ppf Fmt.(style_renderer stderr);
-       fun error ->
-         Fmt.pf ppf "Alcotest assertion failure@.%a@." error ();
-         let contents = Buffer.contents buf in
-         Buffer.clear buf;
-         contents)
+      (fun error ->
+        let buf = Buffer.create 0 in
+        let ppf = Format.formatter_of_buffer buf in
+        Fmt.set_style_renderer ppf Fmt.(style_renderer stderr);
+        Fmt.pf ppf "@.%a@." error ();
+        let contents = Buffer.contents buf in
+        Buffer.clear buf;
+        contents)
   in
   Printexc.register_printer (function
     | Check_error err -> Some (Lazy.force print_error err)
     | _ -> None)
 
-let pp_none ppf x = Fmt.pf ppf " %s" x
-let pp_green = Fmt.styled `Green (fun ppf v -> Fmt.pf ppf "+%s" v)
-let pp_red = Fmt.styled `Red (fun ppf v -> Fmt.pf ppf "-%s" v)
+(* let pp_none ppf = Fmt.pf ppf " %s"
 
-let fmt_diff ppf v =
-  match v with
-  | Diff.Deleted items -> Fmt.array pp_green ppf items
-  | Added items -> Fmt.array pp_red ppf items
-  | Equal items -> Fmt.array pp_none ppf items
+   let pp_green =
+     (fun ppf -> Fmt.pf ppf "+%s") |> Fmt.styled `Bold |> Fmt.styled (`Fg `Green)
 
-let pp_diff_list = Fmt.vbox (Fmt.list fmt_diff)
+   let pp_red =
+     (fun ppf -> Fmt.pf ppf "-%s") |> Fmt.styled `Bold |> Fmt.styled (`Fg `Red)
 
-(* Custom alcotest's check function. To override printing behaviour. *)
-let check_diff msg (expected : string) (actual : string) =
+   let iter ?sep:(pp_sep = Fmt.cut) iter pp_elt ppf v =
+     let pp_elt v =
+       pp_sep ppf ();
+       pp_elt ppf v
+     in
+     iter pp_elt v
+
+   let array pp_elt = iter ~sep:(Fmt.const Fmt.string "\n") Array.iter pp_elt
+   let list pp_elt = iter ~sep:Fmt.nop List.iter pp_elt *)
+
+let equal left right = equal string left right
+let not_equal l r = not (equal l r)
+
+(* Custom alcotest's check function. To override output with diffing. *)
+let check (expected : string) (actual : string) =
   let ( ++ ) = Fmt.( ++ ) in
-  if not (equal string expected actual) then
-    let difference = Diff.get expected actual in
-    let pp_error =
-      match msg with
-      | "" -> Fmt.nop
-      | _ -> Fmt.const tag `Fail ++ Fmt.const Fmt.string (" " ^ msg) ++ Fmt.cut
-    and pp_diff ppf () =
-      Fmt.pf ppf "  %a" pp_diff_list difference;
+  if not_equal expected actual then
+    let difference = diff expected actual in
+    let pp_diff ppf () =
+      Fmt.pf ppf "%s" difference;
       Fmt.cut ppf ();
       ()
     in
-    let msg = Fmt.vbox pp_error ++ Fmt.cut ++ pp_diff ++ Fmt.cut in
+    let msg = Fmt.vbox (pp_diff ++ Fmt.cut) in
     raise_notrace (Check_error msg)
 
-let transform_snap_to_alco ({ command; flags; expected; title } : case) switch =
+let transform_snap_to_alco ({ command; flags; expected; _ } : case) switch =
   Lwt_switch.add_hook (Some switch) (fun () -> Lwt.return ());
   match%lwt spawn ~arguments:flags command with
   | { stderr; stdout; status = WEXITED 0 } ->
@@ -120,9 +137,9 @@ let transform_snap_to_alco ({ command; flags; expected; title } : case) switch =
         | output, "" -> output
         | _, _ -> fail "command got stderr and stdout"
       in
-      let left = expected |> String.trim in
-      let right = output |> String.trim in
-      Lwt.return (check_diff title left right)
+      let left = expected in
+      let right = output in
+      Lwt.return (check left right)
   | {
    stdout = "";
    stderr = "";
@@ -141,13 +158,19 @@ let mock =
       title = "first-case";
       command = "echo";
       flags = [ "cosis" ];
-      expected = "cosis";
+      expected = "cosis\n";
     };
     {
       title = "one line command";
       command = "pwd";
       flags = [];
-      expected = "/Users/davesnx/Code/github/davesnx/styled-ppx";
+      expected = "/Users/davesnx/Code/github/davesnx/styled-ppx\n";
+    };
+    {
+      title = "multiple lines command";
+      command = "echo";
+      flags = [ "cosis\nasd\nasdfadsf" ];
+      expected = "cosis\nasd\nasdfadsf\n";
     };
     {
       title = "multi line command";
@@ -155,27 +178,31 @@ let mock =
       flags = [];
       expected =
         {|CONTRIBUTING.md
-LICENSE
-_build
-_esy
-bin
-dune-project
-dune-workspace
-esy.lock
-node_modules
-package.json
-packages
-scripts
-styled-ppx.install
-styled-ppx.opam|};
+       LICENSE
+       README.md
+       _build
+       _esy
+       bin
+       dune-project
+       dune-workspace
+       esy.lock
+       node_modules
+       packages
+       scripts
+       styled-ppx.install
+       styled-ppx.opam
+       |};
     };
   ]
 
 let cases =
   List.map
     (fun case ->
-      Alcotest_lwt.test_case case.title `Quick (fun switch () ->
-          transform_snap_to_alco case switch))
+      ( case.title,
+        [
+          Alcotest_lwt.test_case "" `Quick (fun switch () ->
+              transform_snap_to_alco case switch);
+        ] ))
     mock
 
-let () = Lwt_main.run @@ Alcotest_lwt.run "Mock" [ ("Snapshot_tests", cases) ]
+let () = Lwt_main.run @@ Alcotest_lwt.run "Snapshot_tests" cases
