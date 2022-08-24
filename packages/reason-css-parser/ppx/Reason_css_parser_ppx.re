@@ -76,27 +76,8 @@ let gen_type = (str) => {
   if(value_bindings == []){
     str
   } else {
-    let first = List.hd(value_bindings);
-    let name = EmitType.extract_variable_name(first.pvb_pat);
-    Format.eprintf("name is : %s @.", name);
-    let (payload, loc) = EmitType.extract_ppx_content(first.pvb_expr);
-    switch(Css_spec_parser.value_of_string(payload)){
-      | Some(ast) => {
-        let _ = ast;
-        module Loc: {let loc: Location.t;} = {
-          let loc = loc;
-        };
-        module Ast_builder = Ppxlib.Ast_builder.Make(Loc);
-        module Emit = EmitType.Make(Ast_builder);
-        open Ast_builder;
-        let typ = Emit.create_value_parser(name, ast);
-        Pprintast.structure_item(Format.err_formatter, typ);
-        let salve = pmod_structure([typ]);
-        let types_module = [%stri module Types = [%m salve]];
-        str @ [types_module]
-      };
-      | _ => failwith("Invalid CSS spec");
-    }
+    let types_modules = EmitType.gen_types(value_bindings);
+    str @ [types_modules]
   }
 }
 

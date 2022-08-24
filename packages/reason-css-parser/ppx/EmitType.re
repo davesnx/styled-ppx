@@ -1,5 +1,5 @@
 open Longident;
-
+exception Unsupported;
 module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
   open Ast_builder;
   open Css_spec_parser;
@@ -34,7 +34,8 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     is_function(property_name)
       ? function_value_name(property_name) : "property-" ++ property_name;
 
-  let value_of_delimiter = fun
+  let value_of_delimiter =
+    fun
     | "+" => "cross"
     | "-" => "dash"
     | "*" => "asterisk"
@@ -74,6 +75,18 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       }
     );
 
+  let empty_type = name => {
+    let type_ =
+      type_declaration(
+        ~name=txt(name),
+        ~params=[],
+        ~cstrs=[],
+        ~private_=Private,
+        ~manifest=None,
+        ~kind=Ptype_variant([]),
+      );
+    pstr_type(Recursive, [type_]);
+  };
   // TODO: multiplier name
   let rec variant_name = value => {
     let value_name =
@@ -118,86 +131,139 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
 
   let mk_typ = (name, types) => {
     let core_type = ptyp_variant(types, Closed, None);
-    let declarations = type_declaration(~name=txt(name), ~params=[], ~cstrs=[], ~kind=Ptype_abstract, ~private_=Public, ~manifest=Some(core_type));
-    pstr_type(Recursive, [declarations])
-  }
+    let declarations =
+      type_declaration(
+        ~name=txt(name),
+        ~params=[],
+        ~cstrs=[],
+        ~kind=Ptype_abstract,
+        ~private_=Public,
+        ~manifest=Some(core_type),
+      );
+    pstr_type(Recursive, [declarations]);
+  };
 
   let mk_branch = (name, constructor, types) => {
-    rtag(txt(name), constructor, types)
-  }
-  
-  let apply_modifier = {
-    (modifier, type_, is_constructor, params) =>
-      switch (modifier) {
-      | One => { 
-        mk_branch(type_, is_constructor, params)
-      }
-      | Optional => {
-        let params = [ptyp_constr(txt @@ Lident("option"), params)]
-        mk_branch(type_, is_constructor, params)
-      }
-      | Repeat(_)
-      | Repeat_by_comma(_, _)
-      | Zero_or_more
-      | One_or_more
-      | At_least_one => {
-        let params = [ptyp_constr(txt @@ Lident("list"), params)]
-        mk_branch(type_, is_constructor, params)
-      }
-      };
+    rtag(txt(name), constructor, types);
   };
+
+  let apply_modifier = (modifier, type_, is_constructor, params) =>
+    switch (modifier) {
+    | One => mk_branch(type_, is_constructor, params)
+    | Optional =>
+      let params = [ptyp_constr(txt @@ Lident("option"), params)];
+      mk_branch(type_, is_constructor, params);
+    | Repeat(_)
+    | Repeat_by_comma(_, _)
+    | Zero_or_more
+    | One_or_more
+    | At_least_one =>
+      let params = [ptyp_constr(txt @@ Lident("list"), params)];
+      mk_branch(type_, is_constructor, params);
+    };
 
   let create_value_parser = (type_name, value) => {
     let terminal_op = (kind, multiplier) => {
-      let (type_, is_constructor, params) = switch(kind){
+      let (type_, is_constructor, params) =
+        switch (kind) {
         | Keyword(name) => (first_uppercase(name), false, [])
-        | Data_type(name) => {
+        | Data_type(name) =>
           let name = value_name_of_css(name);
           let params = [ptyp_constr(txt @@ Lident(name), [])];
-          (first_uppercase(name), true, params)
-        }
-        | Property_type(name) => {
+          (first_uppercase(name), true, params);
+        | Property_type(name) =>
           let name = property_value_name(name) |> value_name_of_css;
           let params = [ptyp_constr(txt @@ Lident(name), [])];
-          (first_uppercase(name), true, params)
-        }
-        | _ => assert false;
-      }
+          (first_uppercase(name), true, params);
+        | _ => raise(Unsupported)
+        };
       apply_modifier(multiplier, type_, is_constructor, params);
     };
 
     let combinator_op = (kind, values) => {
-      switch(kind) {
-        | Xor => List.map(fun
-          | Terminal(kind, multiplier) => terminal_op(kind, multiplier) 
-          | _ => failwith("todo")
-          , values
+      switch (kind) {
+      | Xor =>
+        List.map(
+          fun
+          | Terminal(kind, multiplier) => terminal_op(kind, multiplier)
+          | _ => raise(Unsupported),
+          values,
         )
-        | _ => assert false
-      }
-    }
+      | _ => raise(Unsupported)
+      };
+    };
 
-    let apply = fun
-    | Terminal(kind, multiplier) => [terminal_op(kind, multiplier)]
+    switch (value) {
+    | Terminal(kind, multiplier) =>
+      mk_typ(type_name) @@ [terminal_op(kind, multiplier)]
+    | Combinator(kind, values) =>
+      mk_typ(type_name) @@ combinator_op(kind, values)
     // | Group(value, multiplier) => group_op(value, multiplier)
-    | Combinator(kind, values) => combinator_op(kind, values)
     // | Function_call(name, value) => function_call(name, value)
-    | _ => failwith("todo");
-  
-    let rows = apply(value);
-    mk_typ(type_name, rows);
+    | _ => empty_type(type_name)
+    };
   };
 };
 
-let extract_ppx_content = (exp : Parsetree.expression ) => {
-  switch(exp.pexp_desc){
-    | Pexp_extension((_, PStr([{pstr_desc: Pstr_eval({pexp_desc: Pexp_constant(Pconst_string(value, loc, _delim)), _}, _attrs) , _}]))) => (value, loc)
-    | _ => assert false
-  }
-}
-let extract_variable_name = (pat : Parsetree.pattern) => {
-    switch(pat.ppat_desc){
-      | Ppat_var({txt, _}) => txt
-      | _ => failwith("expected variable name")
-    }
+let extract_ppx_content = (exp: Parsetree.expression) => {
+  switch (exp.pexp_desc) {
+  | Pexp_extension((
+      _,
+      PStr([
+        {
+          pstr_desc:
+            Pstr_eval(
+              {
+                pexp_desc: Pexp_constant(Pconst_string(value, loc, _delim)),
+                _,
+              },
+              _attrs,
+            ),
+          _,
+        },
+      ]),
+    )) => (
+      value,
+      loc,
+    )
+  | _ => failwith("expected a ppx extension")
   };
+};
+
+let extract_variable_name = (pat: Parsetree.pattern) => {
+  switch (pat.ppat_desc) {
+  | Ppat_var({txt, _}) => txt
+  | _ => failwith("expected variable name")
+  };
+};
+
+let gen_types = bindings => {
+  let rec inner = (bindings: list(Parsetree.value_binding), acc) => {
+    switch (bindings) {
+    | [] => acc
+    | [head, ...rest] =>
+      let name = extract_variable_name(head.pvb_pat);
+      let (payload, loc) = extract_ppx_content(head.pvb_expr);
+      let type_ =
+        switch (Css_spec_parser.value_of_string(payload)) {
+        | Some(ast) =>
+          module Loc: {let loc: Location.t;} = {
+            let loc = loc;
+          };
+          module Ast_builder = Ppxlib.Ast_builder.Make(Loc);
+          module Emit = Make(Ast_builder);
+          try(Emit.create_value_parser(name, ast)) {
+          | Unsupported => Emit.empty_type(name)
+          };
+        | None => failwith("Error while parsing CSS spec")
+        };
+      inner(rest, [type_, ...acc]);
+    };
+  };
+
+  let types = inner(bindings, []);
+  let loc = List.hd(types).pstr_loc;
+  let types = Ast_helper.Mod.structure(~loc, types);
+  //   let typ = Emit.create_value_parser(name, ast);
+  [%stri module Types = [%m types]];
+};
