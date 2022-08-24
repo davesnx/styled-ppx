@@ -75,7 +75,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       }
     );
 
-  let empty_type = name => {
+  let abstract_type = name => {
     let type_ =
       type_declaration(
         ~name=txt(name),
@@ -83,7 +83,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
         ~cstrs=[],
         ~private_=Private,
         ~manifest=None,
-        ~kind=Ptype_variant([]),
+        ~kind=Ptype_abstract,
       );
     pstr_type(Recursive, [type_]);
   };
@@ -200,7 +200,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       mk_typ(type_name) @@ combinator_op(kind, values)
     // | Group(value, multiplier) => group_op(value, multiplier)
     // | Function_call(name, value) => function_call(name, value)
-    | _ => empty_type(type_name)
+    | _ => abstract_type(type_name)
     };
   };
 };
@@ -253,7 +253,7 @@ let gen_types = bindings => {
           module Ast_builder = Ppxlib.Ast_builder.Make(Loc);
           module Emit = Make(Ast_builder);
           try(Emit.create_value_parser(name, ast)) {
-          | Unsupported => Emit.empty_type(name)
+          | Unsupported => Emit.abstract_type(name)
           };
         | None => failwith("Error while parsing CSS spec")
         };
