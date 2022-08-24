@@ -52,10 +52,10 @@ let get_longest_subsequence (old_lines : string array)
           let new_subsequence = prev_subsequence + 1 in
           Hashtbl.add overlap old_index new_subsequence;
 
-          if new_subsequence > !longest_subsequence then
+          if new_subsequence > !longest_subsequence then (
             sub_start_old := old_index - new_subsequence + 1;
-          sub_start_new := new_index - new_subsequence + 1;
-          longest_subsequence := new_subsequence)
+            sub_start_new := new_index - new_subsequence + 1;
+            longest_subsequence := new_subsequence))
         indices)
     new_lines;
 
