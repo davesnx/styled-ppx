@@ -12,7 +12,6 @@ open Alcotest
 *)
 
 (* TODO: Read folder content *)
-(* TODO: Create alcotest Testable *)
 (* TODO: Create testing API (Snapshot folder options) *)
 (* TODO: Create mode to update snapshot files *)
 (* TODO: Read folder nested commands *)
@@ -43,7 +42,7 @@ let spawn ?(consume_stdout = fun input_channel -> Lwt_io.read input_channel)
   Lwt_process.with_process_full lwt_command
     (create_from_process_and_consumers ~consume_stdout ~consume_stderr)
 
-type tag = [ `Ok | `Fail | `Skip | `Todo | `Assert ]
+type tag = Ok | Fail | Skip | Todo | Assert
 
 let colour_of_tag = function
   | `Ok -> `Green
@@ -57,52 +56,59 @@ let string_of_tag = function
   | `Todo -> "TODO"
   | `Assert -> "ASSERT"
 
-let pp_tag ~wrapped ppf typ =
+let tag ppf typ =
   let colour = colour_of_tag typ in
   let tag = string_of_tag typ in
-  let tag = if wrapped then "[" ^ tag ^ "]" else tag in
   Fmt.(styled colour string) ppf tag
-
-let tag = pp_tag ~wrapped:false
-
-let pp_location =
-  let pp =
-    Fmt.styled `Bold (fun ppf (f, l, c) ->
-        Fmt.pf ppf "File \"%s\", line %d, character %d:@," f l c)
-  in
-  fun ?here ?pos ppf ->
-    match (here, pos) with
-    | Some (here : Source_code_position.here), _ ->
-        pp ppf (here.pos_fname, here.pos_lnum, here.pos_cnum - here.pos_bol)
-    | _, Some (fname, lnum, cnum, _) -> pp ppf (fname, lnum, cnum)
-    | None, None -> ()
 
 exception Check_error of unit Fmt.t
 
-let check_err fmt = raise (Check_error fmt)
+let () =
+  let print_error =
+    (* We instantiate the error print buffer lazily, so as to be sensitive to
+       [Fmt_tty.setup_std_outputs]. *)
+    lazy
+      (let buf = Buffer.create 0 in
+       let ppf = Format.formatter_of_buffer buf in
+       Fmt.set_style_renderer ppf Fmt.(style_renderer stderr);
+       fun error ->
+         Fmt.pf ppf "Alcotest assertion failure@.%a@." error ();
+         let contents = Buffer.contents buf in
+         Buffer.clear buf;
+         contents)
+  in
+  Printexc.register_printer (function
+    | Check_error err -> Some (Lazy.force print_error err)
+    | _ -> None)
 
-let custom_check (type a) ?here ?pos (t : a testable) msg (expected : a)
-    (actual : a) =
-  if not (equal t expected actual) then
-    let open Fmt in
-    let s = const string in
+let pp_none ppf x = Fmt.pf ppf " %s" x
+let pp_green = Fmt.styled `Green (fun ppf v -> Fmt.pf ppf "+%s" v)
+let pp_red = Fmt.styled `Red (fun ppf v -> Fmt.pf ppf "-%s" v)
+
+let fmt_diff ppf v =
+  match v with
+  | Diff.Deleted items -> Fmt.array pp_green ppf items
+  | Added items -> Fmt.array pp_red ppf items
+  | Equal items -> Fmt.array pp_none ppf items
+
+let pp_diff_list = Fmt.vbox (Fmt.list fmt_diff)
+
+(* Custom alcotest's check function. To override printing behaviour. *)
+let check_diff msg (expected : string) (actual : string) =
+  let ( ++ ) = Fmt.( ++ ) in
+  if not (equal string expected actual) then
+    let difference = Diff.get expected actual in
     let pp_error =
-      match msg with "" -> nop | _ -> const tag `Fail ++ s (" " ^ msg) ++ cut
-    and pp_expected ppf () =
-      Fmt.pf ppf "   Expected: `%a'" (styled `Green (pp t)) expected;
-      Format.pp_print_if_newline ppf ();
+      match msg with
+      | "" -> Fmt.nop
+      | _ -> Fmt.const tag `Fail ++ Fmt.const Fmt.string (" " ^ msg) ++ Fmt.cut
+    and pp_diff ppf () =
+      Fmt.pf ppf "  %a" pp_diff_list difference;
       Fmt.cut ppf ();
       ()
-    and pp_actual ppf () =
-      Fmt.pf ppf "   Received: `%a'" (styled `Red (pp t)) actual
     in
-    let open Fmt in
-    raise
-    @@ check_err
-         (vbox
-            ((fun ppf () -> pp_location ?here ?pos ppf)
-            ++ pp_error ++ cut ++ pp_expected ++ cut ++ pp_actual)
-         ++ cut)
+    let msg = Fmt.vbox pp_error ++ Fmt.cut ++ pp_diff ++ Fmt.cut in
+    raise_notrace (Check_error msg)
 
 let transform_snap_to_alco ({ command; flags; expected; title } : case) switch =
   Lwt_switch.add_hook (Some switch) (fun () -> Lwt.return ());
@@ -116,7 +122,7 @@ let transform_snap_to_alco ({ command; flags; expected; title } : case) switch =
       in
       let left = expected |> String.trim in
       let right = output |> String.trim in
-      Lwt.return (check string title left right)
+      Lwt.return (check_diff title left right)
   | {
    stdout = "";
    stderr = "";
@@ -168,9 +174,8 @@ styled-ppx.opam|};
 let cases =
   List.map
     (fun case ->
-      Alcotest_lwt.test_case "one" `Quick (fun switch () ->
+      Alcotest_lwt.test_case case.title `Quick (fun switch () ->
           transform_snap_to_alco case switch))
     mock
 
-let () =
-  Lwt_main.run @@ Alcotest_lwt.run "Snapshot_tests" [ ("Mock_tests", cases) ]
+let () = Lwt_main.run @@ Alcotest_lwt.run "Mock" [ ("Snapshot_tests", cases) ]

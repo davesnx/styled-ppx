@@ -1,3 +1,5 @@
+(* https://v2.ocaml.org/api/compilerlibref/Diffing.html *)
+
 type diff =
   | Deleted of string array
   | Added of string array
@@ -29,7 +31,8 @@ let map_counter keys =
 (* Computes longest subsequence and returns data on the length of longest
    subsequence and the starting index for the longest subsequence in the old
    and new versions. *)
-let get_longest_subsequence old_lines new_lines =
+let get_longest_subsequence (old_lines : string array)
+    (new_lines : string array) =
   let old_values_counter = map_counter old_lines in
   let overlap = Hashtbl.create 5000 in
   let sub_start_old = ref 0 in
@@ -62,7 +65,7 @@ let get_longest_subsequence old_lines new_lines =
     longest_subsequence = !longest_subsequence;
   }
 
-let rec get_diff old_lines new_lines =
+let rec get_diff (old_lines : string array) (new_lines : string array) =
   match (old_lines, new_lines) with
   | [||], [||] -> []
   | _, _ ->
@@ -91,9 +94,10 @@ let rec get_diff old_lines new_lines =
         @ [ Equal unchanged_lines ]
         @ get_diff old_lines_postsubseq new_lines_postsubseq
 
-let print_diff = function
-  | Deleted items -> "-" ^ String.concat " " (Array.to_list items)
-  | Added items -> "+" ^ String.concat " " (Array.to_list items)
-  | Equal _ -> ""
+let is_empty s = s <> ""
 
-let print (result : t) = String.concat "\n" (List.map print_diff result)
+let split v =
+  Str.split (Str.regexp "[ \n\r\x0c\t]+") v
+  |> List.filter is_empty |> Array.of_list
+
+let get old_ new_ = get_diff (split old_) (split new_)

@@ -1,7 +1,7 @@
 (executable ; will be a library
  (name main)
  (public_name instant)
- (libraries lwt lwt.unix alcotest alcotest-lwt)
+ (libraries lwt lwt.unix alcotest alcotest-lwt str)
  (preprocess
   (pps lwt_ppx)))
 
