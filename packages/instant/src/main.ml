@@ -11,12 +11,6 @@ open Alcotest
   If this succeeds or fail, the test is reported by alcotest.
 *)
 
-(* TODO: Read folder content *)
-(* TODO: Create testing API (Snapshot folder options) *)
-(* TODO: Create mode to update snapshot files *)
-(* TODO: Read folder nested commands *)
-(* TODO: Add option to ignore ws *)
-
 type case = {
   title : string;
   command : string;
