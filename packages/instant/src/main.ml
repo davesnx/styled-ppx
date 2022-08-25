@@ -9,6 +9,8 @@ open Alcotest
   Given the following file structure.
   This program will run the command with the optional stdin and compare the result with the expected file.
   If this succeeds or fail, the test is reported by alcotest.
+
+  Running the dummy script: `esy dune exec packages/instant/src/main.exe`
 *)
 
 type case = {
@@ -74,24 +76,6 @@ let () =
   Printexc.register_printer (function
     | Check_error err -> Some (Lazy.force print_error err)
     | _ -> None)
-
-(* let pp_none ppf = Fmt.pf ppf " %s"
-
-   let pp_green =
-     (fun ppf -> Fmt.pf ppf "+%s") |> Fmt.styled `Bold |> Fmt.styled (`Fg `Green)
-
-   let pp_red =
-     (fun ppf -> Fmt.pf ppf "-%s") |> Fmt.styled `Bold |> Fmt.styled (`Fg `Red)
-
-   let iter ?sep:(pp_sep = Fmt.cut) iter pp_elt ppf v =
-     let pp_elt v =
-       pp_sep ppf ();
-       pp_elt ppf v
-     in
-     iter pp_elt v
-
-   let array pp_elt = iter ~sep:(Fmt.const Fmt.string "\n") Array.iter pp_elt
-   let list pp_elt = iter ~sep:Fmt.nop List.iter pp_elt *)
 
 let equal left right = equal string left right
 let not_equal l r = not (equal l r)
@@ -160,7 +144,7 @@ let check (expected : string) (actual : string) =
         raise_notrace (Check_error msg)
     | None -> ()
 
-let transform_snap_to_alco ({ command; flags; expected; _ } : case) switch =
+let transform_to_alco ({ command; flags; expected; _ } : case) switch =
   Lwt_switch.add_hook (Some switch) (fun () -> Lwt.return ());
   match%lwt spawn ~arguments:flags command with
   | { stderr; stdout; status = WEXITED 0 } ->
@@ -179,8 +163,9 @@ let transform_snap_to_alco ({ command; flags; expected; _ } : case) switch =
    status = WEXITED status_code | WSIGNALED status_code | WSTOPPED status_code;
   } ->
       let msg =
-        "No output (stderr empty and stdout empty) Status code: "
-        ^ string_of_int status_code
+        Format.sprintf
+          "No output (stderr empty and stdout empty) Status code: %i"
+          status_code
       in
       fail msg
   | _ -> fail "Unknown error - this should not happen"
@@ -197,13 +182,13 @@ let mock =
       title = "one line command";
       command = "pwd";
       flags = [];
-      expected = "/Users/davesnx/Code/github/davesnx/styled-ppx\n";
+      expected = "/Users/davesnx/Code/github/davesnx/styled-ppx";
     };
     {
       title = "multiple lines command";
       command = "echo";
       flags = [ "cosis\nasd\nasdfadsf" ];
-      expected = "cosis\nasd\nasdfadsf\n";
+      expected = "cosis\nasd\nasdfadsf";
     };
     {
       title = "multi line command";
@@ -215,7 +200,7 @@ LICENSE
 README.md
 _build
 _esy
-cosas
+bin
 dune-project
 dune-workspace
 esy.lock
@@ -235,7 +220,7 @@ let cases =
       ( case.title,
         [
           Alcotest_lwt.test_case "" `Quick (fun switch () ->
-              transform_snap_to_alco case switch);
+              transform_to_alco case switch);
         ] ))
     mock
 
