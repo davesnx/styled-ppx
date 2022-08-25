@@ -59,5 +59,8 @@
     "ast": "esy dune exec packages/renderer/ast_renderer.exe --",
     "lexer": "esy dune exec packages/renderer/lexer_renderer.exe --"
   },
-  "dependencies": { "@opam/patdiff": "v0.15.0" }
+  "dependencies": {
+    "@opam/patdiff": "v0.15.0",
+    "@opam/patience_diff": "v0.15.0"
+  }
 }

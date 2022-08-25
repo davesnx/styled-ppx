@@ -1,5 +1,5 @@
 {
-  "checksum": "67a3a61132155e30fc8f41c4c66246dd",
+  "checksum": "8a0bd1eb108c01103476a792fc412fbc",
   "root": "@davesnx/styled-ppx@link-dev:./package.json",
   "node": {
     "yarn-pkg-config@github:esy-ocaml/yarn-pkg-config#db3a0b63883606dd57c54a7158d560d6cba8cd79@d41d8cd9": {
@@ -4213,7 +4213,10 @@
         "manifest": "package.json"
       },
       "overrides": [],
-      "dependencies": [ "@opam/patdiff@opam:v0.15.0@ed4b0443" ],
+      "dependencies": [
+        "@opam/patience_diff@opam:v0.15.0@999ae7aa",
+        "@opam/patdiff@opam:v0.15.0@ed4b0443"
+      ],
       "devDependencies": [
         "refmterr@github:jfrolich/reason-native:refmterr.json#08085a4048974b06aaf3aab918b677b39dea3d18@d41d8cd9",
         "ocaml@4.14.0@d41d8cd9",

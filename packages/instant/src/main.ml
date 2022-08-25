@@ -36,8 +36,7 @@ let create_from_process_and_consumers ~consume_stdout ~consume_stderr process =
     (Lwt.both (consume_stdout process#stdout) (consume_stderr process#stderr))
   >>= fun (status, (stdout, stderr)) -> Lwt.return { stdout; stderr; status }
 
-let spawn ?(consume_stdout = fun input_channel -> Lwt_io.read input_channel)
-    ?(consume_stderr = fun input_channel -> Lwt_io.read input_channel)
+let spawn ?(consume_stdout = Lwt_io.read) ?(consume_stderr = Lwt_io.read)
     ?(arguments = []) exec =
   let lwt_command = (exec, Array.of_list (exec :: arguments)) in
   Lwt_process.with_process_full lwt_command
@@ -63,17 +62,6 @@ let tag ppf typ =
   Fmt.(styled colour string) ppf tag
 
 exception Check_error of unit Fmt.t
-
-let diff left right =
-  Patdiff.Patdiff_core.Without_unix.patdiff
-    ~location_style:None
-      (* without color, cannot produce the "!|" lines that mix add/keep/remove *)
-    ~produce_unified_lines:false
-      (* line splitting produces confusing output in ASCII format *)
-    ~split_long_lines:false ~keep_ws:false
-    ~prev:{ name = "expected"; text = left }
-    ~next:{ name = "actual"; text = right }
-    ()
 
 let () =
   let print_error =
@@ -114,18 +102,69 @@ let () =
 let equal left right = equal string left right
 let not_equal l r = not (equal l r)
 
+module Rule = Patdiff_kernel.Format.Rule
+module Rules = Patdiff_kernel.Format.Rules
+module Style = Patdiff_kernel.Format.Style
+module Color = Patdiff_kernel.Format.Color
+
+let output_rules : Rules.t =
+  let red =
+    let color = Color.Red in
+    let background = Color.RGB6 (Color.RGB6.create_exn ~r:2 ~g:0 ~b:0) in
+    let style = Style.[ Fg color; Background background; Bold ] in
+    Rule.create style
+  in
+
+  let green =
+    let color = Color.Green in
+    let background = Color.RGB6 (Color.RGB6.create_exn ~r:0 ~g:2 ~b:0) in
+    let style = Style.[ Fg color; Background background; Bold ] in
+    Rule.create style
+  in
+
+  {
+    line_prev = red;
+    line_next = green;
+    word_prev = red;
+    word_next = green;
+    line_same = Rule.blank;
+    line_unified = Rule.blank;
+    word_same_prev = Rule.blank;
+    word_same_next = Rule.blank;
+    word_same_unified = Rule.blank;
+    hunk = Rule.blank;
+    header_prev = Rule.blank;
+    header_next = Rule.blank;
+  }
+
+let diff left right =
+  match
+    Patdiff.Patdiff_core.Without_unix.patdiff ~location_style:None
+      ~rules:output_rules
+        (* without color, cannot produce the "!|" lines that mix add/keep/remove *)
+      ~produce_unified_lines:false
+        (* line splitting produces confusing output in ASCII format *)
+      ~split_long_lines:false ~keep_ws:true
+      ~prev:{ name = "expected"; text = left }
+      ~next:{ name = "actual"; text = right }
+      ()
+  with
+  | "" -> None
+  | otherwise -> Some otherwise
+
 (* Custom alcotest's check function. To override output with diffing. *)
 let check (expected : string) (actual : string) =
-  let ( ++ ) = Fmt.( ++ ) in
   if not_equal expected actual then
-    let difference = diff expected actual in
-    let pp_diff ppf () =
-      Fmt.pf ppf "%s" difference;
-      Fmt.cut ppf ();
-      ()
-    in
-    let msg = Fmt.vbox (pp_diff ++ Fmt.cut) in
-    raise_notrace (Check_error msg)
+    match diff actual expected with
+    | Some diff ->
+        let pp_diff ppf () =
+          Fmt.pf ppf "%s" diff;
+          Fmt.cut ppf ();
+          ()
+        in
+        let msg = Fmt.vbox pp_diff in
+        raise_notrace (Check_error msg)
+    | None -> ()
 
 let transform_snap_to_alco ({ command; flags; expected; _ } : case) switch =
   Lwt_switch.add_hook (Some switch) (fun () -> Lwt.return ());
@@ -178,20 +217,21 @@ let mock =
       flags = [];
       expected =
         {|CONTRIBUTING.md
-       LICENSE
-       README.md
-       _build
-       _esy
-       bin
-       dune-project
-       dune-workspace
-       esy.lock
-       node_modules
-       packages
-       scripts
-       styled-ppx.install
-       styled-ppx.opam
-       |};
+LICENSE
+README.md
+_build
+_esy
+cosas
+dune-project
+dune-workspace
+esy.lock
+node_modules
+package.json
+packages
+scripts
+styled-ppx.install
+styled-ppx.opam
+|};
     };
   ]
 
