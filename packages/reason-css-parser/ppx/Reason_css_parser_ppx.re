@@ -61,23 +61,13 @@ let valueRecExtension =
 
 let gen_type = (str) => {
   let bindings = List.find_opt(fun
-    | {pstr_desc: Pstr_value(Recursive, _), pstr_loc: loc} => {
-      let filename = loc.loc_start.Lexing.pos_fname;
-      filename == "packages/reason-css-parser/test/spec.re";
-    }
+    | {pstr_desc: Pstr_value(Recursive, _), pstr_loc: _loc} => true
     | _ => false
   , str);
 
-  let value_bindings = switch(bindings){
-    | Some({pstr_desc: Pstr_value(Recursive, value_bindings), _}) => value_bindings
-    | _ => []
-  }
-
-  if(value_bindings == []){
-    str
-  } else {
-    let types_modules = EmitType.gen_types(value_bindings);
-    str @ [types_modules]
+  switch(bindings){
+    | Some({pstr_desc: Pstr_value(Recursive, value_bindings), _}) => str @ [EmitType.gen_types(value_bindings)]
+    | _ => str
   }
 }
 

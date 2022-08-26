@@ -12,3 +12,6 @@ let rec property_test = tokens =>
     ],
     tokens,
   );
+module Types = {
+  type property_test = [ | `Static | `Absolute | `Color(color)];
+};

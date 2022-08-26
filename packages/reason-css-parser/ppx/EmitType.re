@@ -76,7 +76,6 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     );
 
   let abstract_type = name => {
-    let type_ =
       type_declaration(
         ~name=txt(name),
         ~params=[],
@@ -85,7 +84,6 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
         ~manifest=None,
         ~kind=Ptype_abstract,
       );
-    pstr_type(Recursive, [type_]);
   };
   // TODO: multiplier name
   let rec variant_name = value => {
@@ -131,7 +129,6 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
 
   let mk_typ = (name, types) => {
     let core_type = ptyp_variant(types, Closed, None);
-    let declarations =
       type_declaration(
         ~name=txt(name),
         ~params=[],
@@ -140,7 +137,6 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
         ~private_=Public,
         ~manifest=Some(core_type),
       );
-    pstr_type(Recursive, [declarations]);
   };
 
   let mk_branch = (name, constructor, types) => {
@@ -237,33 +233,27 @@ let extract_variable_name = (pat: Parsetree.pattern) => {
   };
 };
 
-let gen_types = bindings => {
-  let rec inner = (bindings: list(Parsetree.value_binding), acc) => {
-    switch (bindings) {
-    | [] => acc
-    | [head, ...rest] =>
-      let name = extract_variable_name(head.pvb_pat);
-      let (payload, loc) = extract_ppx_content(head.pvb_expr);
-      let type_ =
-        switch (Css_spec_parser.value_of_string(payload)) {
-        | Some(ast) =>
-          module Loc: {let loc: Location.t;} = {
-            let loc = loc;
-          };
-          module Ast_builder = Ppxlib.Ast_builder.Make(Loc);
-          module Emit = Make(Ast_builder);
-          try(Emit.create_value_parser(name, ast)) {
-          | Unsupported => Emit.abstract_type(name)
-          };
-        | None => failwith("Error while parsing CSS spec")
-        };
-      inner(rest, [type_, ...acc]);
+let gen_type = (binding: Parsetree.value_binding) => {
+  let name = extract_variable_name(binding.pvb_pat);
+  let (payload, loc) = extract_ppx_content(binding.pvb_expr);
+  switch (Css_spec_parser.value_of_string(payload)) {
+  | Some(ast) =>
+    module Loc: {let loc: Location.t;} = {
+      let loc = loc;
     };
+    module Ast_builder = Ppxlib.Ast_builder.Make(Loc);
+    module Emit = Make(Ast_builder);
+    try(Emit.create_value_parser(name, ast)) {
+    | Unsupported => Emit.abstract_type(name)
+    };
+  | None => failwith("Error while parsing CSS spec")
   };
+};
 
-  let types = inner(bindings, []);
-  let loc = List.hd(types).pstr_loc;
-  let types = Ast_helper.Mod.structure(~loc, types);
-  //   let typ = Emit.create_value_parser(name, ast);
-  [%stri module Types = [%m types]];
+let gen_types = bindings => {
+  let type_declarations = List.map(gen_type, bindings);
+  let loc = List.hd(type_declarations).ptype_loc;
+  let types = Ast_helper.Str.type_(~loc, Recursive, type_declarations)
+  let types_structure = Ast_helper.Mod.structure(~loc, [types]);
+  [%stri module Types = [%m types_structure]];
 };
