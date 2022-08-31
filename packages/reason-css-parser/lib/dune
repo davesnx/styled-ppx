@@ -6,9 +6,8 @@
   ocaml-migrate-parsetree
   css-spec-parser.lib
   reason-css-lexer.lib
-  compiler-libs
- )
+  compiler-libs)
  (preprocess
-  (pps reason_css_parser_ppx sedlex.ppx)
- )
-)
+  (per_module
+   ((pps reason_css_parser_ppx sedlex.ppx)
+    Parser))))
