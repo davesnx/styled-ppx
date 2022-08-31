@@ -66,7 +66,7 @@ let gen_type = (str) => {
   , str);
 
   switch(bindings){
-    | Some({pstr_desc: Pstr_value(Recursive, value_bindings), _}) => str @ [EmitType.gen_types(value_bindings)]
+    | Some({pstr_desc: Pstr_value(_, value_bindings), _}) => str @ [EmitType.gen_types(value_bindings)]
     | _ => str
   }
 }

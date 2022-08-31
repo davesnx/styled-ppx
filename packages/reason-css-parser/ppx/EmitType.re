@@ -80,7 +80,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
         ~name=txt(name),
         ~params=[],
         ~cstrs=[],
-        ~private_=Private,
+        ~private_=Public,
         ~manifest=None,
         ~kind=Ptype_abstract,
       );
@@ -166,11 +166,11 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
         | Data_type(name) =>
           let name = value_name_of_css(name);
           let params = [ptyp_constr(txt @@ Lident(name), [])];
-          (first_uppercase(name), true, params);
+          (first_uppercase(name), false, params);
         | Property_type(name) =>
           let name = property_value_name(name) |> value_name_of_css;
           let params = [ptyp_constr(txt @@ Lident(name), [])];
-          (first_uppercase(name), true, params);
+          (first_uppercase(name), false, params);
         | _ => raise(Unsupported)
         };
       apply_modifier(multiplier, type_, is_constructor, params);
