@@ -226,6 +226,48 @@ let extract_ppx_content = (exp: Parsetree.expression) => {
   };
 };
 
+
+let standard_types = {
+
+  open Ppxlib.Ast_builder.Default;
+
+  let abstract_type = name => {
+      type_declaration(
+        ~loc=Location.none,
+        ~name={txt: name, loc: Location.none},
+        ~params=[],
+        ~cstrs=[],
+        ~private_=Public,
+        ~manifest=None,
+        ~kind=Ptype_abstract,
+      );
+  };
+
+  [
+    abstract_type("integer"),
+    abstract_type("number"),
+    abstract_type("length"),
+    abstract_type("angle"),
+    abstract_type("time"),
+    abstract_type("frequency"),
+    abstract_type("resolution"),
+    abstract_type("percentage"),
+    abstract_type("ident"),
+    abstract_type("custom_ident"),
+    abstract_type("any_value"),
+    // abstract_type("string"), already represented by OCaml string type
+    abstract_type("url"),
+    abstract_type("hex_color"),
+    abstract_type("interpolation"),
+    abstract_type("flex_value"),
+
+  // Not at Standard.re but required by genereted code, should they live here?
+    abstract_type("hash_token"),
+    abstract_type("dimension"),
+    abstract_type("an_plus_b"),
+  ]
+}
+
 let extract_variable_name = (pat: Parsetree.pattern) => {
   switch (pat.ppat_desc) {
   | Ppat_var({txt, _}) => txt
@@ -253,7 +295,7 @@ let gen_type = (binding: Parsetree.value_binding) => {
 let gen_types = bindings => {
   let type_declarations = List.map(gen_type, bindings);
   let loc = List.hd(type_declarations).ptype_loc;
-  let types = Ast_helper.Str.type_(~loc, Recursive, type_declarations)
+  let types = Ast_helper.Str.type_(~loc, Recursive, type_declarations @ standard_types)
   let types_structure = Ast_helper.Mod.structure(~loc, [types]);
   [%stri module Types = [%m types_structure]];
 };
