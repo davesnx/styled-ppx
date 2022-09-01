@@ -33,7 +33,7 @@
    (run refmt --parse ml --print re --in-place %{targets}))))
 
 (rule
- (alias spec_test)
+ (alias css_spec_types_test)
  (deps
   (file spec.expected.re)
   (file spec.actual.re))
