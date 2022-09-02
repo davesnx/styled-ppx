@@ -185,12 +185,6 @@ let mock =
       expected = "/Users/davesnx/Code/github/davesnx/styled-ppx";
     };
     {
-      title = "multiple lines command";
-      command = "echo";
-      flags = [ "cosis\nasd\nasdfadsf" ];
-      expected = "cosis\nasd\nasdfadsf";
-    };
-    {
       title = "multi line command";
       command = "ls";
       flags = [];
@@ -214,7 +208,7 @@ styled-ppx.opam
     };
   ]
 
-let cases =
+let run_cases data =
   List.map
     (fun case ->
       ( case.title,
@@ -222,6 +216,39 @@ let cases =
           Alcotest_lwt.test_case "" `Quick (fun switch () ->
               transform_to_alco case switch);
         ] ))
-    mock
+    data
 
-let () = Lwt_main.run @@ Alcotest_lwt.run "Snapshot_tests" cases
+(** [dir_is_empty dir] is true, if [dir] contains no files except
+ * "." and ".."
+ *)
+let dir_is_empty dir =
+  Array.length (Sys.readdir dir) = 0
+
+(** [dir_contents] returns the paths of all regular files that are
+ * contained in [dir]. Each file is a path starting with [dir].
+  *)
+let dir_contents dir =
+  let rec loop result = function
+    | f::fs when Sys.is_directory f ->
+          Sys.readdir f
+          |> Array.to_list
+          |> List.map (Filename.concat f)
+          |> List.append fs
+          |> loop result
+    | f::fs -> loop (f::result) fs
+    | []   -> result
+  in
+    loop [] [dir]
+
+let obtain_cases folder =
+  let path = Path.join folder in
+  let _dir = dir_contents folder in
+  []
+  (* Lwt_io.read_lines  *)
+
+let main =
+  let folder = "../_tests" in
+  let cases = obtain_cases folder in
+  Alcotest_lwt.run "Snapshot_tests" (run_cases cases)
+
+let () = Lwt_main.run @@ main

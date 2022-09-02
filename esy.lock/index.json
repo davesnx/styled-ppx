@@ -1,5 +1,5 @@
 {
-  "checksum": "8a0bd1eb108c01103476a792fc412fbc",
+  "checksum": "67a3a61132155e30fc8f41c4c66246dd",
   "root": "@davesnx/styled-ppx@link-dev:./package.json",
   "node": {
     "yarn-pkg-config@github:esy-ocaml/yarn-pkg-config#db3a0b63883606dd57c54a7158d560d6cba8cd79@d41d8cd9": {
@@ -4213,10 +4213,7 @@
         "manifest": "package.json"
       },
       "overrides": [],
-      "dependencies": [
-        "@opam/patience_diff@opam:v0.15.0@999ae7aa",
-        "@opam/patdiff@opam:v0.15.0@ed4b0443"
-      ],
+      "dependencies": [],
       "devDependencies": [
         "refmterr@github:jfrolich/reason-native:refmterr.json#08085a4048974b06aaf3aab918b677b39dea3d18@d41d8cd9",
         "ocaml@4.14.0@d41d8cd9",
@@ -4225,6 +4222,7 @@
         "@opam/reason@opam:3.8.1@189445c6",
         "@opam/ppxlib@opam:0.27.0@08d8f65d",
         "@opam/ppx_deriving@opam:5.2.1@089e5dd3",
+        "@opam/patdiff@opam:v0.15.0@ed4b0443",
         "@opam/ocamlformat@opam:0.24.1@80ba1b34",
         "@opam/ocaml-migrate-parsetree@opam:2.4.0@5109deb9",
         "@opam/ocaml-lsp-server@opam:1.13.0@063b7808",

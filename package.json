@@ -34,6 +34,7 @@
     "@opam/ppxlib": "0.27.0",
     "@opam/reason": "3.8.1",
     "@opam/sedlex": "3.0",
+    "@opam/patdiff": "v0.15.0",
     "@opam/utop": "2.10.0",
     "@reason-native/rely":
       "jfrolich/reason-native:rely.json#08085a4048974b06aaf3aab918b677b39dea3d18",
@@ -58,9 +59,5 @@
       "esy b dune build --root . --ignore-promoted-rules --no-config --profile release-static --only-packages styled-ppx,reason-css-parser,reason-css-lexer,css-spec-parser,styled-ppx-css-parser,string-interpolation",
     "ast": "esy dune exec packages/renderer/ast_renderer.exe --",
     "lexer": "esy dune exec packages/renderer/lexer_renderer.exe --"
-  },
-  "dependencies": {
-    "@opam/patdiff": "v0.15.0",
-    "@opam/patience_diff": "v0.15.0"
   }
 }
