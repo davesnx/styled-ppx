@@ -36,38 +36,38 @@ let types = [
     [%stri type size = [ | `Relative | `Static | `Absolute]],
   ),
   // And
-  (
-    gen_type(
-      "text_emphasis_position",
-      [%expr [%value "[ 'over' | 'under' ] && [ 'right' | 'left' ]"]],
-    ),
-    [%stri type text_emphasis_position],
-  ),
+  // (
+  //   gen_type(
+  //     "text_emphasis_position",
+  //     [%expr [%value "[ 'over' | 'under' ] && [ 'right' | 'left' ]"]],
+  //   ),
+  //   [%stri type text_emphasis_position],
+  // ),
   // Or
-  (
-    gen_type(
-      "property_clip_path",
-      [%expr
-        [%value "<clip-source> | <basic-shape> || <geometry-box> | 'none'"]
-      ],
-    ),
-    [%stri type property_clip_path],
-  ),
+  // (
+  //   gen_type(
+  //     "property_clip_path",
+  //     [%expr
+  //       [%value "<clip-source> | <basic-shape> || <geometry-box> | 'none'"]
+  //     ],
+  //   ),
+  //   [%stri type property_clip_path],
+  // ),
   // Static
-  (
-    gen_type("contradiction", [%expr [%value "'not' <string>"]]),
-    [%stri type contradiction],
-  ),
+  // (
+  //   gen_type("contradiction", [%expr [%value "'not' <string>"]]),
+  //   [%stri type contradiction],
+  // ),
   // Group
-  (
-    gen_type("unsupported", [%expr [%value "test | [not 'supported']"]]),
-    [%stri type unsupported],
-  ),
+  // (
+  //   gen_type("unsupported", [%expr [%value "test | [not 'supported']"]]),
+  //   [%stri type unsupported],
+  // ),
   // Function_call
-  (
-    gen_type("calc", [%expr [%value "calc( <calc-sum> )"]]),
-    [%stri type calc],
-  ),
+  // (
+  //   gen_type("calc", [%expr [%value "calc( <calc-sum> )"]]),
+  //   [%stri type calc],
+  // ),
 ];
 
 describe("Should generate valid types based on CSS spec", ({test, _}) => {
