@@ -127,7 +127,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     |> List.rev;
   };
 
-  let mk_typ = (name, types) => {
+  let make_type = (name, types) => {
     let core_type = ptyp_variant(types, Closed, None);
       type_declaration(
         ~name=txt(name),
@@ -139,23 +139,23 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       );
   };
 
-  let mk_branch = (name, constructor, types) => {
+  let make_variant_branch = (name, constructor, types) => {
     rtag(txt(name), constructor, types);
   };
 
   let apply_modifier = (modifier, type_, is_constructor, params) =>
     switch (modifier) {
-    | One => mk_branch(type_, is_constructor, params)
+    | One => make_variant_branch(type_, is_constructor, params)
     | Optional =>
       let params = [ptyp_constr(txt @@ Lident("option"), params)];
-      mk_branch(type_, is_constructor, params);
+      make_variant_branch(type_, is_constructor, params);
     | Repeat(_)
     | Repeat_by_comma(_, _)
     | Zero_or_more
     | One_or_more
     | At_least_one =>
       let params = [ptyp_constr(txt @@ Lident("list"), params)];
-      mk_branch(type_, is_constructor, params);
+      make_variant_branch(type_, is_constructor, params);
     };
 
   let create_value_parser = (type_name, value) => {
@@ -191,9 +191,9 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
 
     switch (value) {
     | Terminal(kind, multiplier) =>
-      mk_typ(type_name) @@ [terminal_op(kind, multiplier)]
+      make_type(type_name) @@ [terminal_op(kind, multiplier)]
     | Combinator(kind, values) =>
-      mk_typ(type_name) @@ combinator_op(kind, values)
+      make_type(type_name) @@ combinator_op(kind, values)
     // | Group(value, multiplier) => group_op(value, multiplier)
     // | Function_call(name, value) => function_call(name, value)
     | _ => abstract_type(type_name)
