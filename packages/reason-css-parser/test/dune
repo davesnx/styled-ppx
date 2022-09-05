@@ -1,11 +1,11 @@
 (library
  (name ReasonCSSParserTest)
  (ocamlopt_flags -linkall -g)
- (libraries reason-css-parser.lib rely.lib)
+ (libraries reason-css-parser.lib rely.lib reason_css_parser_lib)
  (modules
   (:standard \ Runner printer spec))
  (preprocess
-  (pps reason_css_parser_ppx sedlex.ppx)))
+  (pps reason_css_parser_ppx sedlex.ppx ppxlib.metaquot)))
 
 (executable
  (name Runner)
