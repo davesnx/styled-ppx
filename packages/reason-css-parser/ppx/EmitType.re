@@ -76,14 +76,14 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     );
 
   let abstract_type = name => {
-      type_declaration(
-        ~name=txt(name),
-        ~params=[],
-        ~cstrs=[],
-        ~private_=Public,
-        ~manifest=None,
-        ~kind=Ptype_abstract,
-      );
+    type_declaration(
+      ~name=txt(name),
+      ~params=[],
+      ~cstrs=[],
+      ~private_=Public,
+      ~manifest=None,
+      ~kind=Ptype_abstract,
+    );
   };
   // TODO: multiplier name
   let rec variant_name = value => {
@@ -129,14 +129,14 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
 
   let make_type = (name, types) => {
     let core_type = ptyp_variant(types, Closed, None);
-      type_declaration(
-        ~name=txt(name),
-        ~params=[],
-        ~cstrs=[],
-        ~kind=Ptype_abstract,
-        ~private_=Public,
-        ~manifest=Some(core_type),
-      );
+    type_declaration(
+      ~name=txt(name),
+      ~params=[],
+      ~cstrs=[],
+      ~kind=Ptype_abstract,
+      ~private_=Public,
+      ~manifest=Some(core_type),
+    );
   };
 
   let make_variant_branch = (name, constructor, types) => {
@@ -202,45 +202,97 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
 };
 
 let standard_types = {
-
   open Ppxlib.Ast_builder.Default;
 
-  let abstract_type = name => {
-      type_declaration(
-        ~loc=Location.none,
-        ~name={txt: name, loc: Location.none},
-        ~params=[],
-        ~cstrs=[],
-        ~private_=Public,
-        ~manifest=None,
-        ~kind=Ptype_abstract,
-      );
+  let type_ = (~kind=Parsetree.Ptype_abstract, name, core_type) => {
+    type_declaration(
+      ~loc=Location.none,
+      ~name={txt: name, loc: Location.none},
+      ~params=[],
+      ~cstrs=[],
+      ~private_=Public,
+      ~manifest=Some(core_type),
+      ~kind,
+    );
   };
 
-  [
-    abstract_type("integer"),
-    abstract_type("number"),
-    abstract_type("length"),
-    abstract_type("angle"),
-    abstract_type("time"),
-    abstract_type("frequency"),
-    abstract_type("resolution"),
-    abstract_type("percentage"),
-    abstract_type("ident"),
-    abstract_type("custom_ident"),
-    abstract_type("any_value"),
-    // abstract_type("string"), already represented by OCaml string type
-    abstract_type("url"),
-    abstract_type("hex_color"),
-    abstract_type("interpolation"),
-    abstract_type("flex_value"),
+  let abstract_type = name => {
+    type_declaration(
+      ~loc=Location.none,
+      ~name={txt: name, loc: Location.none},
+      ~params=[],
+      ~cstrs=[],
+      ~private_=Public,
+      ~manifest=None,
+      ~kind=Ptype_abstract,
+    );
+  };
 
-  // Not at Standard.re but required by genereted code, should they live here?
+  let loc = Location.none;
+
+  [
+    type_("integer", [%type: int]),
+    type_("number", [%type: float]),
+    type_(
+      "length",
+      [%type:
+        [
+          | `Lenght(
+              [
+                | `Em(number)
+                | `Ex(number)
+                | `Cap(number)
+                | `Ch(number)
+                | `Ic(number)
+                | `Rem(number)
+                | `Lh(number)
+                | `Rlh(number)
+                | `Vw(number)
+                | `Vh(number)
+                | `Vi(number)
+                | `Vb(number)
+                | `Vmin(number)
+                | `Vmax(number)
+                | `Cm(number)
+                | `Mm(number)
+                | `Q(number)
+                | `In(number)
+                | `Pt(number)
+                | `Pc(number)
+                | `Px(number)
+                | `Zero
+              ],
+            )
+        ]
+      ],
+    ),
+    type_(
+      "angle",
+      [%type:
+        [ | `Deg(number) | `Grad(number) | `Rad(number) | `Turn(number)]
+      ],
+    ),
+    type_("time", [%type: [ | `Ms(float) | `S(float)]]),
+    type_("frequency", [%type: [ | `Hz(float) | `KHz(float)]]),
+    type_(
+      "resolution",
+      [%type: [ | `Dpi(float) | `Dpcm(float) | `Dppx(float)]],
+    ),
+    type_("percentage", [%type: float]),
+    type_("ident", [%type: string]),
+    type_("custom_ident", [%type: string]),
+    type_("any_value", [%type: unit]),
+    // abstract_type("string"), already represented by OCaml string type
+    type_("url", [%type: string]),
+    type_("hex_color", [%type: string]),
+    type_("interpolation", [%type: list(string)]),
+    type_("flex_value", [%type: [ | `Fr(float)]]),
+    // Not at Standard.re but required by genereted code, should they live here?
     abstract_type("hash_token"),
     abstract_type("dimension"),
     abstract_type("an_plus_b"),
-  ]
-}
+  ];
+};
 
 let gen_type = (binding: Parsetree.value_binding) => {
   let (name, payload, loc) =
@@ -275,7 +327,7 @@ let gen_type = (binding: Parsetree.value_binding) => {
         loc,
       )
     | _ => failwith("Error when extracting CSS spec content")
-    }
+    };
   switch (Css_spec_parser.value_of_string(payload)) {
   | Some(ast) =>
     module Loc: {let loc: Location.t;} = {
@@ -293,7 +345,8 @@ let gen_type = (binding: Parsetree.value_binding) => {
 let gen_types = bindings => {
   let type_declarations = List.map(gen_type, bindings);
   let loc = List.hd(type_declarations).ptype_loc;
-  let types = Ast_helper.Str.type_(~loc, Recursive, type_declarations @ standard_types)
+  let types =
+    Ast_helper.Str.type_(~loc, Recursive, type_declarations @ standard_types);
   let types_structure = Ast_helper.Mod.structure(~loc, [types]);
   [%stri module Types = [%m types_structure]];
 };
