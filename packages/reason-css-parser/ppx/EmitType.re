@@ -201,32 +201,6 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
   };
 };
 
-let extract_ppx_content = (exp: Parsetree.expression) => {
-  switch (exp.pexp_desc) {
-  | Pexp_extension((
-      _,
-      PStr([
-        {
-          pstr_desc:
-            Pstr_eval(
-              {
-                pexp_desc: Pexp_constant(Pconst_string(value, loc, _delim)),
-                _,
-              },
-              _attrs,
-            ),
-          _,
-        },
-      ]),
-    )) => (
-      value,
-      loc,
-    )
-  | _ => failwith("expected a ppx extension")
-  };
-};
-
-
 let standard_types = {
 
   open Ppxlib.Ast_builder.Default;
@@ -268,16 +242,40 @@ let standard_types = {
   ]
 }
 
-let extract_variable_name = (pat: Parsetree.pattern) => {
-  switch (pat.ppat_desc) {
-  | Ppat_var({txt, _}) => txt
-  | _ => failwith("expected variable name")
-  };
-};
-
 let gen_type = (binding: Parsetree.value_binding) => {
-  let name = extract_variable_name(binding.pvb_pat);
-  let (payload, loc) = extract_ppx_content(binding.pvb_expr);
+  let (name, payload, loc) =
+    switch (binding) {
+    | {
+        pvb_pat: {ppat_desc: Ppat_var({txt, _}), _},
+        pvb_expr: {
+          pexp_desc:
+            Pexp_extension((
+              _,
+              PStr([
+                {
+                  pstr_desc:
+                    Pstr_eval(
+                      {
+                        pexp_desc:
+                          Pexp_constant(Pconst_string(value, loc, _delim)),
+                        _,
+                      },
+                      _attrs,
+                    ),
+                  _,
+                },
+              ]),
+            )),
+          _,
+        },
+        _,
+      } => (
+        txt,
+        value,
+        loc,
+      )
+    | _ => failwith("Error when extracting CSS spec content")
+    }
   switch (Css_spec_parser.value_of_string(payload)) {
   | Some(ast) =>
     module Loc: {let loc: Location.t;} = {
