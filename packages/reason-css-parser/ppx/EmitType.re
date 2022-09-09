@@ -237,7 +237,7 @@ let standard_types = {
       "length",
       [%type:
         [
-          | `Lenght(
+          | `Length(
               [
                 | `Em(number)
                 | `Ex(number)

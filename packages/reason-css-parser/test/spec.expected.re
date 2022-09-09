@@ -26,7 +26,7 @@ module Types = {
   and integer = int
   and number = float
   and length = [
-    | `Lenght(
+    | `Length(
         [
           | `Em(number)
           | `Ex(number)
