@@ -36,7 +36,7 @@ The diff on `bsconfig.json` should contain the following:
 ### Example
 
 ```rescript
-module Link = %styled.a((~color="#4299E1") => `
+module Link = %styled.a((~color=CssJs.hex("4299E1")) => `
   font-size: 1.875rem;
   line-height: 1.5;
   text-decoration: none;
@@ -56,7 +56,7 @@ module Layout = %styled.div([|
 /* Later in a component */
 <Layout>
   <Link
-    color="#333333"
+    color=CssJs.hex("333333")
     href="https://sancho.dev"
     rel="noopener noreferrer"
   />
