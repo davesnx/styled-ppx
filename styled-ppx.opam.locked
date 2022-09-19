@@ -1,0 +1,63 @@
+opam-version: "2.0"
+name: "styled-ppx"
+version: "~dev"
+synopsis: "Typed styled components in ReScript"
+description: """\
+styled-ppx is the ppx that brings typed styled components to ReScript.
+
+Built on top of emotion, it allows you to style apps safe, quickly, performant and as you always done it."""
+maintainer: "David Sancho <dsnxmoreno@gmail.com>"
+authors: "David Sancho <dsnxmoreno@gmail.com>"
+license: "MIT"
+homepage: "https://styled-ppx.vercel.app"
+bug-reports: "https://github.com/davesnx/styled-ppx/issues"
+depends: [
+  "base-bigarray" {= "base"}
+  "base-bytes" {= "base"}
+  "base-threads" {= "base"}
+  "base-unix" {= "base"}
+  "cppo" {= "1.6.9"}
+  "csexp" {= "1.5.1"}
+  "dune" {= "3.4.1"}
+  "dune-configurator" {= "3.4.1"}
+  "fix" {= "20220121"}
+  "gen" {= "1.0"}
+  "menhir" {= "20220210"}
+  "menhirLib" {= "20220210"}
+  "menhirSdk" {= "20220210"}
+  "merlin-extend" {= "0.6.1"}
+  "ocaml" {= "4.14.0"}
+  "ocaml-base-compiler" {= "4.14.0"}
+  "ocaml-compiler-libs" {= "v0.12.4"}
+  "ocaml-config" {= "2"}
+  "ocaml-options-vanilla" {= "1"}
+  "ocamlbuild" {= "0.14.1"}
+  "ocamlfind" {= "1.9.5"}
+  "ppx_derivers" {= "1.2.1"}
+  "ppx_deriving" {= "5.2.1"}
+  "ppxlib" {= "0.27.0"}
+  "reason" {= "3.8.1"}
+  "result" {= "1.5"}
+  "sedlex" {= "3.0"}
+  "seq" {= "base"}
+  "sexplib0" {= "v0.15.1"}
+  "stdlib-shims" {= "0.3.0"}
+  "uchar" {= "0.0.2"}
+]
+build: [
+  ["dune" "subst"] {dev}
+  [
+    "dune"
+    "build"
+    "-p"
+    name
+    "-j"
+    jobs
+    "--promote-install-files=false"
+    "@install"
+    "@runtest" {with-test}
+    "@doc" {with-doc}
+  ]
+  ["dune" "install" "-p" name "--create-install-files" name]
+]
+dev-repo: "git+https://github.com/davesnx/styled-ppx.git"

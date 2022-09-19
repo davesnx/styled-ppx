@@ -1,7 +1,7 @@
 (library
  (name CSSSpecParserTest)
  (ocamlopt_flags -linkall -g)
- (libraries css-spec-parser.lib rely.lib)
+ (libraries css_spec_parser rely.lib)
  (modules
   (:standard \ Runner)))
 

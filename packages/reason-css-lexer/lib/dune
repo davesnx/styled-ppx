@@ -1,6 +1,6 @@
 (library
  (name reason_css_lexer)
- (public_name reason-css-lexer.lib)
+ (public_name styled-ppx.reason-css-lexer)
  (libraries compiler-libs sedlex)
  (preprocess
   (pps sedlex.ppx ppx_deriving.show)

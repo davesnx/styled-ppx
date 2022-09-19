@@ -1,11 +1,11 @@
 (library
  (name reason_css_parser)
- (public_name reason-css-parser.lib)
+ (public_name styled-ppx.reason-css-parser)
  (libraries
   sedlex
   ocaml-migrate-parsetree
-  css-spec-parser.lib
-  reason-css-lexer.lib
+  css_spec_parser
+  reason_css_lexer
   compiler-libs
  )
  (preprocess
