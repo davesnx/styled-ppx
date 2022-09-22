@@ -1,5 +1,4 @@
 open Longident;
-exception Unsupported;
 module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
   open Ast_builder;
   open Css_spec_parser;
@@ -75,16 +74,6 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       }
     );
 
-  let abstract_type = name => {
-    type_declaration(
-      ~name=txt(name),
-      ~params=[],
-      ~cstrs=[],
-      ~private_=Public,
-      ~manifest=None,
-      ~kind=Ptype_abstract,
-    );
-  };
   // TODO: multiplier name
   let rec variant_name = value => {
     let value_name =
@@ -127,8 +116,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     |> List.rev;
   };
 
-  let make_type = (name, types) => {
-    let core_type = ptyp_variant(types, Closed, None);
+  let make_type = (name, core_type) => {
     type_declaration(
       ~name=txt(name),
       ~params=[],
@@ -143,7 +131,18 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     rtag(txt(name), constructor, types);
   };
 
-  let apply_modifier = (modifier, type_, is_constructor, params) =>
+  let apply_modifier = (modifier, type_) => {
+    switch (modifier) {
+    | One => type_
+    | Optional => ptyp_constr(txt @@ Lident("option"), [type_])
+    | Repeat(_)
+    | Repeat_by_comma(_, _)
+    | Zero_or_more
+    | One_or_more
+    | At_least_one => ptyp_constr(txt @@ Lident("list"), [type_])
+    };
+  };
+  let apply_xor_modifier = (modifier, type_, is_constructor, params) =>
     switch (modifier) {
     | One => make_variant_branch(type_, is_constructor, params)
     | Optional =>
@@ -159,10 +158,21 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     };
 
   let create_value_parser = (type_name, value) => {
-    let terminal_op = (kind, multiplier) => {
+    let rec create_type =
+      fun
+      | Terminal(kind, multiplier) => terminal_op(kind, multiplier)
+      | Combinator(kind, values) => combinator_op(kind, values)
+      | Function_call(name, value) => function_call(name, value)
+      | Group(value, multiplier) => group_op(value, multiplier)
+
+    and terminal_xor_op = (kind, multiplier) => {
       let (type_, is_constructor, params) =
         switch (kind) {
-        | Keyword(name) => (first_uppercase(name) |> kebab_case_to_snake_case , false, [])
+        | Keyword(name) => (
+            first_uppercase(name) |> kebab_case_to_snake_case,
+            false,
+            [],
+          )
         | Data_type(name) =>
           let name = value_name_of_css(name);
           let params = [ptyp_constr(txt @@ Lident(name), [])];
@@ -171,32 +181,85 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
           let name = property_value_name(name) |> value_name_of_css;
           let params = [ptyp_constr(txt @@ Lident(name), [])];
           (first_uppercase(name), false, params);
-        | _ => raise(Unsupported)
-        };
-      apply_modifier(multiplier, type_, is_constructor, params);
-    };
 
-    let combinator_op = (kind, values) => {
-      switch (kind) {
-      | Xor =>
-        List.map(
-          fun
-          | Terminal(kind, multiplier) => terminal_op(kind, multiplier)
-          | _ => raise(Unsupported),
-          values,
-        )
-      | _ => raise(Unsupported)
-      };
-    };
+        | Delim(string) =>
+          let name = value_of_delimiter(string) |> first_uppercase;
+          let params = [ptyp_constr(txt @@ Lident("unit"), [])];
+          (name, false, params);
+        };
+      apply_xor_modifier(multiplier, type_, is_constructor, params);
+    }
+
+    and terminal_op = (kind, multiplier) => {
+      let type_ =
+        switch (kind) {
+        | Delim(_)
+        | Keyword(_) => ptyp_constr(txt @@ Lident("unit"), [])
+        | Data_type(name) =>
+          let name = value_name_of_css(name);
+          ptyp_constr(txt @@ Lident(name), []);
+        | Property_type(name) =>
+          let name = property_value_name(name) |> value_name_of_css;
+          ptyp_constr(txt @@ Lident(name), []);
+        };
+      apply_modifier(multiplier, type_);
+    }
+
+    and combinator_op: (combinator, list(value)) => Parsetree.core_type =
+      (kind, values) => {
+        switch (kind) {
+        | Xor =>
+          let names = variant_names(values);
+          let pairs = List.combine(names, values);
+          let types =
+            List.map(
+              ((type_name, value)) =>
+                switch (value) {
+                | Terminal(kind, multiplier) =>
+                  terminal_xor_op(kind, multiplier)
+                | Function_call(name, value) =>
+                  let name =
+                    first_uppercase(name) |> kebab_case_to_snake_case;
+                  let type_ = function_call(name, value);
+                  make_variant_branch(type_name, false, [type_]);
+                | Combinator(kind, values) =>
+                  let type_ = combinator_op(kind, values);
+                  make_variant_branch(type_name, false, [type_]);
+                | Group(value, multiplier) =>
+                  let type_ = group_op(value, multiplier);
+                  make_variant_branch(type_name, false, [type_]);
+                },
+              pairs,
+            );
+          ptyp_variant(types, Closed, None);
+
+        | Static
+        | And =>
+          let types = List.map(create_type, values);
+          ptyp_tuple(types);
+
+        | Or =>
+          let types =
+            List.map(create_type, values)
+            |> List.map(apply_modifier(Optional));
+          ptyp_tuple(types);
+        };
+      }
+
+    and function_call = (_name, value) => create_type(value)
+
+    and group_op = (value, multiplier) =>
+      create_type(value) |> apply_modifier(multiplier);
 
     switch (value) {
     | Terminal(kind, multiplier) =>
-      make_type(type_name) @@ [terminal_op(kind, multiplier)]
+      make_type(type_name) @@ terminal_op(kind, multiplier)
     | Combinator(kind, values) =>
       make_type(type_name) @@ combinator_op(kind, values)
-    // | Group(value, multiplier) => group_op(value, multiplier)
-    // | Function_call(name, value) => function_call(name, value)
-    | _ => abstract_type(type_name)
+    | Function_call(name, value) =>
+      make_type(type_name) @@ function_call(name, value)
+    | Group(value, multiplier) =>
+      make_type(type_name) @@ group_op(value, multiplier)
     };
   };
 };
@@ -216,18 +279,6 @@ let standard_types = {
     );
   };
 
-  let abstract_type = name => {
-    type_declaration(
-      ~loc=Location.none,
-      ~name={txt: name, loc: Location.none},
-      ~params=[],
-      ~cstrs=[],
-      ~private_=Public,
-      ~manifest=None,
-      ~kind=Ptype_abstract,
-    );
-  };
-
   let loc = Location.none;
 
   [
@@ -237,32 +288,28 @@ let standard_types = {
       "length",
       [%type:
         [
-          | `Length(
-              [
-                | `Em(number)
-                | `Ex(number)
-                | `Cap(number)
-                | `Ch(number)
-                | `Ic(number)
-                | `Rem(number)
-                | `Lh(number)
-                | `Rlh(number)
-                | `Vw(number)
-                | `Vh(number)
-                | `Vi(number)
-                | `Vb(number)
-                | `Vmin(number)
-                | `Vmax(number)
-                | `Cm(number)
-                | `Mm(number)
-                | `Q(number)
-                | `In(number)
-                | `Pt(number)
-                | `Pc(number)
-                | `Px(number)
-                | `Zero
-              ],
-            )
+          | `Em(number)
+          | `Ex(number)
+          | `Cap(number)
+          | `Ch(number)
+          | `Ic(number)
+          | `Rem(number)
+          | `Lh(number)
+          | `Rlh(number)
+          | `Vw(number)
+          | `Vh(number)
+          | `Vi(number)
+          | `Vb(number)
+          | `Vmin(number)
+          | `Vmax(number)
+          | `Cm(number)
+          | `Mm(number)
+          | `Q(number)
+          | `In(number)
+          | `Pt(number)
+          | `Pc(number)
+          | `Px(number)
+          | `Zero
         ]
       ],
     ),
@@ -281,16 +328,27 @@ let standard_types = {
     type_("percentage", [%type: float]),
     type_("ident", [%type: string]),
     type_("custom_ident", [%type: string]),
-    type_("any_value", [%type: unit]),
     // abstract_type("string"), already represented by OCaml string type
     type_("url", [%type: string]),
     type_("hex_color", [%type: string]),
     type_("interpolation", [%type: list(string)]),
     type_("flex_value", [%type: [ | `Fr(float)]]),
-    // Not at Standard.re but required by genereted code, should they live here?
-    abstract_type("hash_token"),
-    abstract_type("dimension"),
-    abstract_type("an_plus_b"),
+    type_("line_names", [%type: (unit, list(string), unit)]),
+
+
+    // From Parser_helper, those are implemented as `invalid`, thats why they have type unit
+    type_("ident_token", [%type: unit]),
+    type_("function_token", [%type: unit]),
+    type_("string_token", [%type: unit]),
+    type_("hash_token", [%type: unit]),
+    type_("dimension", [%type: unit]),
+    type_("any_value", [%type: unit]),
+    type_("declaration_value", [%type: unit]),
+    type_("zero", [%type: unit]),
+    type_("decibel", [%type: unit]),
+    type_("urange", [%type: unit]),
+    type_("semitones", [%type: unit]),
+    type_("an_plus_b", [%type: unit]),
   ];
 };
 
@@ -335,9 +393,7 @@ let gen_type = (binding: Parsetree.value_binding) => {
     };
     module Ast_builder = Ppxlib.Ast_builder.Make(Loc);
     module Emit = Make(Ast_builder);
-    try(Emit.create_value_parser(name, ast)) {
-    | Unsupported => Emit.abstract_type(name)
-    };
+    Emit.create_value_parser(name, ast)
   | None => failwith("Error while parsing CSS spec")
   };
 };
