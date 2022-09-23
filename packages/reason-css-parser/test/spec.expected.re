@@ -26,32 +26,28 @@ module Types = {
   and integer = int
   and number = float
   and length = [
-    | `Length(
-        [
-          | `Em(number)
-          | `Ex(number)
-          | `Cap(number)
-          | `Ch(number)
-          | `Ic(number)
-          | `Rem(number)
-          | `Lh(number)
-          | `Rlh(number)
-          | `Vw(number)
-          | `Vh(number)
-          | `Vi(number)
-          | `Vb(number)
-          | `Vmin(number)
-          | `Vmax(number)
-          | `Cm(number)
-          | `Mm(number)
-          | `Q(number)
-          | `In(number)
-          | `Pt(number)
-          | `Pc(number)
-          | `Px(number)
-          | `Zero
-        ],
-      )
+    | `Em(number)
+    | `Ex(number)
+    | `Cap(number)
+    | `Ch(number)
+    | `Ic(number)
+    | `Rem(number)
+    | `Lh(number)
+    | `Rlh(number)
+    | `Vw(number)
+    | `Vh(number)
+    | `Vi(number)
+    | `Vb(number)
+    | `Vmin(number)
+    | `Vmax(number)
+    | `Cm(number)
+    | `Mm(number)
+    | `Q(number)
+    | `In(number)
+    | `Pt(number)
+    | `Pc(number)
+    | `Px(number)
+    | `Zero
   ]
   and angle = [
     | `Deg(number)
@@ -65,12 +61,21 @@ module Types = {
   and percentage = float
   and ident = string
   and custom_ident = string
-  and any_value = unit
   and url = string
   and hex_color = string
   and interpolation = list(string)
   and flex_value = [ | `Fr(float)]
-  and hash_token
-  and dimension
-  and an_plus_b;
+  and line_names = (unit, list(string), unit)
+  and ident_token = unit
+  and function_token = unit
+  and string_token = unit
+  and hash_token = unit
+  and dimension = unit
+  and any_value = unit
+  and declaration_value = unit
+  and zero = unit
+  and decibel = unit
+  and urange = unit
+  and semitones = unit
+  and an_plus_b = unit;
 };

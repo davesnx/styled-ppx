@@ -18,17 +18,22 @@ let types = [
   // Keyword
   (
     gen_type("terminal", [%expr [%value "terminal"]]),
-    [%stri type terminal = [ | `Terminal]],
+    [%stri type terminal = unit],
   ),
   // Data_type
   (
     gen_type("ident", [%expr [%value "<string>"]]),
-    [%stri type ident = [ | `String(string)]],
+    [%stri type ident = string],
   ),
   // Property_type
   (
     gen_type("color", [%expr [%value "<'color'>"]]),
-    [%stri type color = [ | `Property_color(property_color)]],
+    [%stri type color = property_color],
+  ),
+  // Delim
+  (
+    gen_type("calc_sum", [%expr [%value "<calc-product> [ [ '+' | '-' ] <calc-product> ]*"]]),
+    [%stri type calc_sum = (calc_product,  list(([ `Cross(unit)  | `Dash(unit) ], calc_product)))],
   ),
   // Xor
   (
@@ -36,38 +41,71 @@ let types = [
     [%stri type size = [ | `Relative | `Static | `Absolute]],
   ),
   // And
-  // (
-  //   gen_type(
-  //     "text_emphasis_position",
-  //     [%expr [%value "[ 'over' | 'under' ] && [ 'right' | 'left' ]"]],
-  //   ),
-  //   [%stri type text_emphasis_position],
-  // ),
+  (
+    gen_type(
+      "text_emphasis_position",
+      [%expr [%value "[ 'over' | 'under' ] && [ 'right' | 'left' ]"]],
+    ),
+    [%stri
+      type text_emphasis_position = ([ | `Over | `Under], [ | `Right | `Left])
+    ],
+  ),
   // Or
-  // (
-  //   gen_type(
-  //     "property_clip_path",
-  //     [%expr
-  //       [%value "<clip-source> | <basic-shape> || <geometry-box> | 'none'"]
-  //     ],
-  //   ),
-  //   [%stri type property_clip_path],
-  // ),
+  (
+    gen_type(
+      "property_clip_path",
+      [%expr
+        [%value "<clip-source> | <basic-shape> || <geometry-box> | 'none'"]
+      ],
+    ),
+    [%stri
+      type property_clip_path = [
+        | `Clip_source(clip_source)
+        | `Or(option(basic_shape), option(geometry_box))
+        | `None
+      ]
+    ],
+  ),
   // Static
-  // (
-  //   gen_type("contradiction", [%expr [%value "'not' <string>"]]),
-  //   [%stri type contradiction],
-  // ),
+  (
+    gen_type("contradiction", [%expr [%value "'not' <string>"]]),
+    [%stri type contradiction = (unit, string)],
+  ),
   // Group
-  // (
-  //   gen_type("unsupported", [%expr [%value "test | [not 'supported']"]]),
-  //   [%stri type unsupported],
-  // ),
+  (
+    gen_type("supported", [%expr [%value "supported | [not 'supported']"]]),
+    [%stri type supported = [ | `Supported | `Static(unit, unit)]],
+  ),
   // Function_call
-  // (
-  //   gen_type("calc", [%expr [%value "calc( <calc-sum> )"]]),
-  //   [%stri type calc],
-  // ),
+  (
+    gen_type("calc", [%expr [%value "calc( <calc-sum> )"]]),
+    [%stri type calc = calc_sum],
+  ),
+
+  // Polymorphism
+  (
+    gen_type(
+      "function_color",
+      [%expr
+        [%value
+          "
+    rgb( [ <extended-percentage> ]{3} [ '/' <alpha-value> ]? )
+  | rgb( [ <number> ]{3} [ '/' <alpha-value> ]? )
+  | rgb( [ <extended-percentage> ]#{3} [ ',' <alpha-value> ]? )
+  | rgb( [ <number> ]#{3} [ ',' <alpha-value> ]? )
+"
+        ]
+      ],
+    ),
+    [%stri
+      type function_color = [
+        | `Rgb_0(list(extended_percentage), option((unit, alpha_value)))
+        | `Rgb_1(list(number), option((unit, alpha_value)))
+        | `Rgb_2(list(extended_percentage), option((unit, alpha_value)))
+        | `Rgb_3(list(number), option((unit, alpha_value)))
+      ]
+    ],
+  ),
 ];
 
 describe("Should generate valid types based on CSS spec", ({test, _}) => {
