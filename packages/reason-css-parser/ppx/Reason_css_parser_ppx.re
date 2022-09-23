@@ -59,4 +59,16 @@ let valueRecExtension =
     expander(~recursive=true),
   );
 
-Driver.register_transformation(~extensions=[valueExtension, valueRecExtension], "css-value-parser-ppx");
+let gen_type = (str) => {
+  let bindings = List.find_opt(fun
+    | {pstr_desc: Pstr_value(Recursive, _), pstr_loc: _loc} => true
+    | _ => false
+  , str);
+
+  switch(bindings){
+    | Some({pstr_desc: Pstr_value(_, value_bindings), _}) => str @ [EmitType.gen_types(value_bindings)]
+    | _ => str
+  }
+}
+
+Driver.register_transformation(~preprocess_impl=gen_type, ~extensions=[valueExtension, valueRecExtension], "css-value-parser-ppx");

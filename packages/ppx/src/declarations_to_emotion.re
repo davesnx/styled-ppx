@@ -715,7 +715,7 @@ let render_var = (~loc, string) => {
 };
 
 let render_color =
-  (~loc) => fun
+  (~loc, arg) => switch(arg){
   | `Interpolation(v) => render_variable(~loc, v)
   | `Hex_color(hex) => id([%expr `hex([%e render_string(~loc, hex)])])
   | `Named_color(color) => render_named_color(~loc, color)
@@ -733,7 +733,7 @@ let render_color =
   | `Function_color(_)
   | `Function_device_cmyk(_)
   | `Deprecated_system_color(_)
-  | _ => raise(Unsupported_feature);
+  | _ => raise(Unsupported_feature) } ;
 
 let color = apply(Parser.property_color, (~loc) => [%expr CssJs.color], render_color);
 let opacity =

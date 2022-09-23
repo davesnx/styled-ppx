@@ -34,52 +34,52 @@ let multiplier_of_lex :=
   | m = multiplier; EOF; { Some m }
 
 let multiplier :=
-  | ASTERISK;
+  | ASTERISK; // *
     { Zero_or_more }
-  | PLUS;
+  | PLUS; // +
     { One_or_more }
-  | QUESTION_MARK;
+  | QUESTION_MARK; // ?
     { Optional }
-  | r = RANGE;
+  | r = RANGE; // 1..4
     {
       match r with
       | (`Space, min, max) -> Repeat (min, max)
       | (`Comma, min, max) -> Repeat_by_comma (min, max)
     }
-  | EXCLAMATION_POINT;
+  | EXCLAMATION_POINT; // !
     { At_least_one }
 
 let terminal ==
-  | c = CHAR; { Delim c }
-  | l = LITERAL; { Keyword l }
-  | d = DATA; { Data_type d }
-  | p = PROPERTY; { Property_type p }
+  | c = CHAR; { Delim c } // 'a'
+  | l = LITERAL; { Keyword l } // "absolute"
+  | d = DATA; { Data_type d } // <color>
+  | p = PROPERTY; { Property_type p } // <'border'>
 
 let terminal_multiplier(terminal) ==
-  | t = terminal; { Terminal(t, One) }
-  | t = terminal; m = multiplier; { Terminal(t, m) }
+  | t = terminal; { Terminal(t, One) } // "important"
+  | t = terminal; m = multiplier; { Terminal(t, m) } // "important?"
 
 let function_call :=
   | terminal_multiplier(terminal)
-  | l = LITERAL; LEFT_PARENS; v = value; RIGHT_PARENS; { Function_call(l, v) }
+  | l = LITERAL; LEFT_PARENS; v = value; RIGHT_PARENS; { Function_call(l, v) } // rgb(1,2,3)
 
 let group :=
   | function_call
-  | LEFT_BRACKET; v = value; RIGHT_BRACKET; { v }
-  | LEFT_BRACKET; v = value; RIGHT_BRACKET; m = multiplier; { Group(v, m) }
+  | LEFT_BRACKET; v = value; RIGHT_BRACKET; { v } // [ v ]
+  | LEFT_BRACKET; v = value; RIGHT_BRACKET; m = multiplier; { Group(v, m) } // [ v ]!
 
 let combinator(sep, sub, kind) ==
   | vs = separated_nonempty_list(sep, sub); ~ = kind;
     { match vs with | v::[] -> v | vs -> Combinator(kind, vs) }
 
 let static_expr ==
-  | combinator(| {}, group, | { Static })
+  | combinator(| {}, group, | { Static }) // A B
 let and_expr ==
-  | combinator(DOUBLE_AMPERSAND, static_expr, | { And })
+  | combinator(DOUBLE_AMPERSAND, static_expr, | { And }) // A && B
 let or_expr ==
-  | combinator(DOUBLE_BAR, and_expr, | { Or })
+  | combinator(DOUBLE_BAR, and_expr, | { Or }) // A || B
 let xor_expr ==
-  | combinator(BAR, or_expr, | { Xor })
+  | combinator(BAR, or_expr, | { Xor }) // A | B
 
 let value :=
   | xor_expr
