@@ -1,8 +1,9 @@
 ![styled-ppx-header-light](./.github/header-light.png#gh-dark-mode-only)![styled-ppx-header-dark](./.github/header-dark.png#gh-light-mode-only)
 
-### Typed styled components for ReScript
 
 ![demo](./.github/demo-black.png#gh-dark-mode-only)![styled-ppx-demo-dark](./.github/demo-white.png#gh-light-mode-only)
+
+### Typed styled components for ReScript
 
 **styled-ppx** is the [ppx](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem) that brings typed styled components to ReScript. Build on top of [emotion](https://emotion.sh), it allows you to style apps safe, quickly, performant and as you always done it. Allows you to create **React Components** with type-safe style definitions that don't rely on a different language ([DSL](https://en.wikipedia.org/wiki/Domain-specific_language)) than CSS
 
