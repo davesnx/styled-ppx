@@ -1,7 +1,6 @@
 ![styled-ppx-header-light](./.github/header-light.png#gh-dark-mode-only)![styled-ppx-header-dark](./.github/header-dark.png#gh-light-mode-only)
 
-
-![demo](./.github/demo-black.png#gh-dark-mode-only)![styled-ppx-demo-dark](./.github/demo-white.png#gh-light-mode-only)
+![demo](./.github/demo-dark.png#gh-dark-mode-only)![styled-ppx-demo-dark](./.github/demo-light.png#gh-light-mode-only)
 
 ### Typed styled components for ReScript
 
