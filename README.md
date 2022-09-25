@@ -1,8 +1,6 @@
 ![styled-ppx-header-light](./.github/header-dark.png#gh-dark-mode-only)![styled-ppx-header-dark](./.github/header-light.png#gh-light-mode-only)
 
-<h3 align="center">
-  Typed styled components for ReScript
-</h3>
+### Typed styled components for ReScript
 
 ![demo](./.github/demo-black.png#gh-dark-mode-only)![styled-ppx-demo-dark](./.github/demo-white.png#gh-light-mode-only)
 
