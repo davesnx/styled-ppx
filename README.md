@@ -1,4 +1,4 @@
-![styled-ppx-header-light](./.github/header-ligth.png#gh-dark-mode-only)![styled-ppx-header-dark](./.github/header-dark.png#gh-light-mode-only)
+![styled-ppx-header-light](./.github/header-light.png#gh-dark-mode-only)![styled-ppx-header-dark](./.github/header-dark.png#gh-light-mode-only)
 
 ### Typed styled components for ReScript
 
