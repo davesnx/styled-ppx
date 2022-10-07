@@ -526,7 +526,7 @@ module Tokenizer = {
 
   let consume_function = string => {
     switch (string) {
-      | "nth-child" | "nth-of-type" | "nth-last-of-type" => Parser.NTH_FUNCTION(string)
+      | "nth-last-child" | "nth-child" | "nth-of-type" | "nth-last-of-type" => Parser.NTH_FUNCTION(string)
       | _ => Parser.FUNCTION(string)
     }
   };
