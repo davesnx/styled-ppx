@@ -2242,6 +2242,18 @@ let grid_column =
   unsupportedValue(Parser.property_grid_column, (~loc) => [%expr CssJs.gridColumn]);
 let grid_area =
   unsupportedValue(Parser.property_grid_area, (~loc) => [%expr CssJs.gridArea]);
+
+let grid_gap =
+  apply(
+    Parser.property_grid_gap,
+    (~loc) => [%expr CssJs.gridGap],
+    (~loc) => fun
+    | (`Extended_length(el), None) => render_extended_length(~loc, el)
+    | (`Extended_percentage(ep), None) => render_extended_percentage(~loc, ep)
+    /* gridGrap2 isn't available on bs-css */
+    | _ => raise(Unsupported_feature)
+  );
+
 let z_index =
   unsupportedValue(Parser.property_z_index, (~loc) => [%expr CssJs.zIndex]);
 
@@ -2563,6 +2575,7 @@ let properties = [
   ("grid-row", found(grid_row)),
   ("grid-column", found(grid_column)),
   ("grid-area", found(grid_area)),
+  ("grid-gap", found(grid_gap)),
   ("z-index", found(z_index)),
   ("line-height", found(line_height)),
   ("line-height-step", found(line_height_step)),
