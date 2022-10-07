@@ -1020,7 +1020,7 @@ CssJs.unsafe({js|gridRowGap|js}, {js|0|js});
 CssJs.unsafe({js|gridRowGap|js}, {js|1em|js});
 CssJs.unsafe({js|gridGap|js}, {js|0 0|js});
 CssJs.unsafe({js|gridGap|js}, {js|0 1em|js});
-CssJs.unsafe({js|gridGap|js}, {js|1em|js});
+CssJs.gridGap(`em(1.));
 CssJs.unsafe({js|gridGap|js}, {js|1em 1em|js});
 CssJs.unsafe({js|alignSelf|js}, {js|auto|js});
 CssJs.unsafe({js|alignSelf|js}, {js|normal|js});
