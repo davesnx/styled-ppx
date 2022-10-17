@@ -13,12 +13,7 @@ open Alcotest
   Running the dummy script: `esy dune exec packages/instant/src/main.exe`
 *)
 
-type case = {
-  title : string;
-  command : string;
-  flags : string list;
-  expected : string;
-}
+type case = { title : string; command : string; expected : string }
 
 type completed = {
   stdout : string;
@@ -130,6 +125,18 @@ let diff left right =
   | "" -> None
   | otherwise -> Some otherwise
 
+let print_list f lst =
+  let rec print_elements = function
+    | [] -> ()
+    | h :: t ->
+        f h;
+        print_string ";";
+        print_elements t
+  in
+  print_string "[";
+  print_elements lst;
+  print_string "]"
+
 (* Custom alcotest's check function. To override output with diffing. *)
 let check (expected : string) (actual : string) =
   if not_equal expected actual then
@@ -144,9 +151,11 @@ let check (expected : string) (actual : string) =
         raise_notrace (Check_error msg)
     | None -> ()
 
-let transform_to_alco ({ command; flags; expected; _ } : case) switch =
+let transform_to_alco ({ command; expected; _ } : case) switch =
   Lwt_switch.add_hook (Some switch) (fun () -> Lwt.return ());
-  match%lwt spawn ~arguments:flags command with
+  let exec = List.hd (String.split_on_char ' ' command) in
+  let arguments = List.tl (String.split_on_char ' ' command) in
+  match%lwt spawn ~arguments exec with
   | { stderr; stdout; status = WEXITED 0 } ->
       let output =
         match (stderr, stdout) with
@@ -172,22 +181,15 @@ let transform_to_alco ({ command; flags; expected; _ } : case) switch =
 
 let mock =
   [
-    {
-      title = "first-case";
-      command = "echo";
-      flags = [ "cosis" ];
-      expected = "cosis\n";
-    };
+    { title = "first-case"; command = "echo cosis"; expected = "cosis\n" };
     {
       title = "one line command";
       command = "pwd";
-      flags = [];
       expected = "/Users/davesnx/Code/github/davesnx/styled-ppx";
     };
     {
       title = "multi line command";
       command = "ls";
-      flags = [];
       expected =
         {|CONTRIBUTING.md
 LICENSE
@@ -251,11 +253,7 @@ let make_case folder title =
   let command = Fs.readTextExn (Path.join folder_path command_path) in
   let expected_path = Path.drive "expected" in
   let expected = Fs.readTextExn (Path.join folder_path expected_path) in
-  print_endline title;
-  print_endline command;
-  print_endline expected;
-  print_endline "----";
-  { title; command; flags = []; expected }
+  { title; command; expected }
 
 let main =
   let folder = "packages/instant/_tests/" in

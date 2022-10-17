@@ -4,6 +4,7 @@ README.md
 _build
 _esy
 bin
+dune
 dune-project
 dune-workspace
 esy.lock
