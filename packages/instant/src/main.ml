@@ -221,34 +221,47 @@ let run_cases data =
 (** [dir_is_empty dir] is true, if [dir] contains no files except
  * "." and ".."
  *)
-let dir_is_empty dir =
-  Array.length (Sys.readdir dir) = 0
+let dir_is_empty dir = Array.length (Sys.readdir dir) = 0
 
 (** [dir_contents] returns the paths of all regular files that are
  * contained in [dir]. Each file is a path starting with [dir].
   *)
-let dir_contents dir =
+let dir_contents_deep dir =
   let rec loop result = function
-    | f::fs when Sys.is_directory f ->
-          Sys.readdir f
-          |> Array.to_list
-          |> List.map (Filename.concat f)
-          |> List.append fs
-          |> loop result
-    | f::fs -> loop (f::result) fs
-    | []   -> result
+    | f :: fs when Sys.is_directory f ->
+        Sys.readdir f |> Array.to_list
+        |> List.map (Filename.concat f)
+        |> List.append fs |> loop result
+    | f :: fs -> loop (f :: result) fs
+    | [] -> result
   in
-    loop [] [dir]
+  loop [] [ dir ]
 
-let obtain_cases folder =
-  let path = Path.join folder in
-  let _dir = dir_contents folder in
-  []
-  (* Lwt_io.read_lines  *)
+let dir_contents dir = dir |> Sys.readdir |> Array.to_list
+
+let obtain_title_cases folder =
+  let cwd = Path.drive (Sys.getcwd ()) in
+  let current_folder = Path.join cwd folder in
+  let stringPath = Path.toString current_folder in
+  dir_contents stringPath
+
+let make_case folder title =
+  let folder_path = Path.join folder (title |> Path.drive) in
+  let command_path = Path.drive "command" in
+  let command = Fs.readTextExn (Path.join folder_path command_path) in
+  let expected_path = Path.drive "expected" in
+  let expected = Fs.readTextExn (Path.join folder_path expected_path) in
+  print_endline title;
+  print_endline command;
+  print_endline expected;
+  print_endline "----";
+  { title; command; flags = []; expected }
 
 let main =
-  let folder = "../_tests" in
-  let cases = obtain_cases folder in
+  let folder = "packages/instant/_tests/" in
+  let folder_path = Path.drive folder in
+  let title_cases = obtain_title_cases folder_path in
+  let cases = List.map (make_case folder_path) title_cases in
   Alcotest_lwt.run "Snapshot_tests" (run_cases cases)
 
 let () = Lwt_main.run @@ main

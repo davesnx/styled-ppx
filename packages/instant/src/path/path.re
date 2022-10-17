@@ -1,4 +1,4 @@
-/* Vendored from https://github.com/reasonml/reason-native/blob/master/src/fp/Fp.re */
+/* Vendored from https://github.com/reasonml/reason-native/blob/master/src/fp/Path.re */
 
 let sep = "/";
 let homeChar = "~";
@@ -31,7 +31,6 @@ type firstClass =
   | Relative(t(relative));
 type opaqueBase =
   | Base(base('exists)): opaqueBase;
-type opaqueT = (opaqueBase, list(string));
 
 let drive = name => (Abs(Some(name)), []);
 let root = (Abs(None), []);
@@ -324,7 +323,7 @@ let rec repeat = (soFar, i, s) =>
  *  relativize(a/rest1..., ../b/rest2...) == [...len(1)]../b/rest2
  *
  *  "upDirs" is the number of ../ the path is assumed to have. The segments
- *  `s1`/`s2`, are in the path order from left to right, unlike `Fp.t` which
+ *  `s1`/`s2`, are in the path order from left to right, unlike `Path.t` which
  *  usually stores them in reverse order. Relativizing paths is one place where
  *  it's more convenient to have them in the left to right segment order.
  */
@@ -337,8 +336,8 @@ let rec relativizeDepth = ((upDirs1, s1), (upDirs2, s2)) =>
       (List.length(s1), s2);
     }
   | (Zeros, [], []) => (0, [])
-  | (Zeros, [], [hd2, ...tl2] as s2) => (upDirs2, s2)
-  | (Zeros, [hd1, ...tl1] as s1, []) => (List.length(s1), [])
+  | (Zeros, [], [_hd2, ..._tl2] as s2) => (upDirs2, s2)
+  | (Zeros, [_hd1, ..._tl1] as s1, []) => (List.length(s1), [])
   | (Positives, _, _) =>
     relativizeDepth((upDirs1 - 1, s1), (upDirs2 - 1, s2))
   | (ZeroPositive, _, _) => (List.length(s1) + upDirs2, s2)
@@ -407,8 +406,8 @@ let rec segEq = (l1, l2) =>
 let eq: type k1 k2. (t(k1), t(k2)) => bool =
   (p1, p2) =>
     switch (p1, p2) {
-    | ((Abs(_), s1), (Rel(_), s2)) => false
-    | ((Rel(_), s1), (Abs(_), s2)) => false
+    | ((Abs(_), _s1), (Rel(_), _s2)) => false
+    | ((Rel(_), _s1), (Abs(_), _s2)) => false
     | ((Abs(d1), s1), (Abs(d2), s2)) =>
       switch (d1, d2) {
       | (Some(_), None)
@@ -454,7 +453,7 @@ let rec join: type k1 k2. (t(k1), t(k2)) => t(k1) =
   (p1, p2) =>
     switch (p1, p2) {
     | ((Rel(w, r1), []), (Rel(Any, r2), s2)) => (Rel(w, r1 + r2), s2)
-    | ((Rel(w, r1), [s1hd, ...s1tl] as s1), (Rel(Any, r2), s2)) =>
+    | ((Rel(w, r1), [_s1hd, ...s1tl] as s1), (Rel(Any, r2), s2)) =>
       r2 > 0 ?
         join((Rel(w, r1), s1tl), (Rel(Any, r2 - 1), s2)) :
         (Rel(w, r1), List.append(s2, s1))
@@ -465,8 +464,8 @@ let rec join: type k1 k2. (t(k1), t(k2)) => t(k1) =
         [ll, ...List.append(s2, s1)],
       )
     | ((b1, s1), (Abs(None), s2)) => (b1, List.append(s2, s1))
-    | ((Abs(_) as d, []), (Rel(Any, r2), s2)) => (d, s2)
-    | ((Abs(_) as d, [s1hd, ...s1tl] as s1), (Rel(Any, r2), s2)) =>
+    | ((Abs(_) as d, []), (Rel(Any, _r2), s2)) => (d, s2)
+    | ((Abs(_) as d, [_s1hd, ...s1tl] as s1), (Rel(Any, r2), s2)) =>
       r2 > 0 ?
         join((d, s1tl), (Rel(Any, r2 - 1), s2)) :
         (d, List.append(s2, s1))
@@ -476,18 +475,18 @@ let rec dirName: type k1. t(k1) => t(k1) =
   p1 =>
     switch (p1) {
     | (Rel(w, r1), []) => (Rel(w, r1 + 1), [])
-    | (Rel(w, r1), [s1hd, ...s1tl]) => (Rel(w, r1), s1tl)
+    | (Rel(w, r1), [_s1hd, ...s1tl]) => (Rel(w, r1), s1tl)
     | (Abs(_) as d, []) => (d, [])
-    | (Abs(_) as d, [s1hd, ...s1tl]) => (d, s1tl)
+    | (Abs(_) as d, [_s1hd, ...s1tl]) => (d, s1tl)
     };
 
 let rec baseName: type k1. t(k1) => option(string) =
   p1 =>
     switch (p1) {
-    | (Rel(w, r1), []) => None
-    | (Rel(w, r1), [s1hd, ...s1tl]) => Some(s1hd)
+    | (Rel(_w, _r1), []) => None
+    | (Rel(_w, _r1), [s1hd, ..._s1tl]) => Some(s1hd)
     | (Abs(_), []) => None
-    | (Abs(_), [s1hd, ...s1tl]) => Some(s1hd)
+    | (Abs(_), [s1hd, ..._s1tl]) => Some(s1hd)
     };
 
 let sub: type k1. (string, t(k1)) => t(k1) =
@@ -499,17 +498,17 @@ let sub: type k1. (string, t(k1)) => t(k1) =
  *
  * The following pairs are equivalent but note that `append` is always safe.
  *
- *     Fp.append(Fp.root, "foo");
- *     Option.getUnsafe(Fp.absolute("/foo"));
+ *     Path.append(Path.root, "foo");
+ *     Option.getUnsafe(Path.absolute("/foo"));
  *
- *     Fp.append(Fp.root, "foo/bar");
- *     Option.getUnsafe(Fp.absolute("/foo/bar"));
+ *     Path.append(Path.root, "foo/bar");
+ *     Option.getUnsafe(Path.absolute("/foo/bar"));
  *
- *     Fp.append(Fp.drive("C"), "foo/bar");
- *     Option.getUnsafe(Fp.absolute("C:/foo/bar"));
+ *     Path.append(Path.drive("C"), "foo/bar");
+ *     Option.getUnsafe(Path.absolute("C:/foo/bar"));
  *
- *     Fp.append(Fp.dot, "foo");
- *     Option.getUnsafe(Fp.relative("./foo"));
+ *     Path.append(Path.dot, "foo");
+ *     Option.getUnsafe(Path.relative("./foo"));
  */
 let append: type k1. (t(k1), string) => t(k1) =
   (path, name) => continue(name, path);

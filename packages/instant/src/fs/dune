@@ -1,0 +1,4 @@
+(library
+ (name fs)
+ (libraries path unix)
+ (flags :standard -w -39 -w -27))
