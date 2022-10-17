@@ -1,0 +1,16 @@
+(lang dune 2.9)
+(name instant)
+
+(source
+ (github davesnx/styled-ppx)
+)
+
+(license MIT)
+(authors "davesnx")
+(maintainers "davesnx")
+
+(package
+ (name instant)
+ (synopsis "Snapshot system")
+ (description "TODO")
+)

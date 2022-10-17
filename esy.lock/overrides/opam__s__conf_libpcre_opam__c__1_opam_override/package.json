@@ -1,0 +1,6 @@
+{
+  "build": "true",
+  "dependencies": {
+    "esy-pcre": "esy-packages/esy-pcre" 
+  }
+}

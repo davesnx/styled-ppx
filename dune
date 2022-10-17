@@ -1,0 +1,11 @@
+(subdir
+ packages
+ (dirs
+  instant
+  parser
+  css-spec-parser
+  ppx
+  reason-css-lexer
+  reason-css-parser
+  renderer
+  string_interpolation))
