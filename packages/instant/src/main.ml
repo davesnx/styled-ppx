@@ -165,21 +165,14 @@ let transform_to_alco switch ({ command; expected; stdin; _ } : case) =
           | "", output -> Lwt.return output
           | output, "" -> Lwt.return output
           | err, out ->
-              let msg =
-                Printf.sprintf
-                  "command got stderr and stdout output, stderr: %s, stdout: %s"
-                  err out
-              in
-              Lwt.fail_with msg
+              Alcotest.failf "stderr: %s" err |> ignore;
+              Lwt.return out
         in
         Lwt.return (check expected output)
     | { stdout = ""; stderr = ""; status } ->
-        let msg =
-          Printf.sprintf
-            "Status code: %i. No output (stderr empty and stdout empty)"
-            (code_of_status status)
-        in
-        Lwt.fail_with msg
+        Alcotest.failf
+          "Status code: %i. No output (stderr empty and stdout empty)"
+          (code_of_status status)
     | { stdout = ""; stderr; status } ->
         let msg =
           Printf.sprintf "Status code: %i. stderr %s" (code_of_status status)
