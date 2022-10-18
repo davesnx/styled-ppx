@@ -3,7 +3,7 @@ open Alcotest
 (*
   ├── __tests__
   │   ├── command
-  │   ├── stdin
+  │   ├── input (or whatever you want)
   │   └── expected
 
   Given the following file structure.
@@ -13,12 +13,7 @@ open Alcotest
   Running the dummy script: `esy dune exec packages/instant/src/main.exe`
 *)
 
-type case = {
-  title : string;
-  command : string;
-  stdin : string option;
-  expected : string;
-}
+type case = { title : string; command : string; expected : string }
 
 type completed = {
   stdout : string;
@@ -155,10 +150,10 @@ let check (expected : string) (actual : string) =
 
 let code_of_status = function Unix.WEXITED c | WSIGNALED c | WSTOPPED c -> c
 
-let transform_to_alco switch ({ command; expected; stdin; _ } : case) =
+let transform_to_alco switch ({ command; expected; _ } : case) =
   try%lwt
     Lwt_switch.add_hook (Some switch) (fun () -> Lwt.return ());
-    match%lwt spawn ?stdin command with
+    match%lwt spawn command with
     | { stderr; stdout; status = WEXITED 0 } ->
         let%lwt output =
           match (stderr, stdout) with
@@ -229,11 +224,9 @@ let make_case folder title =
     let folder_path = Path.join folder (title |> Path.drive) in
     let command_path = Path.drive "command" in
     let command = read_text (Path.join folder_path command_path) in
-    let stdin_path = Path.drive "stdin" in
-    let stdin = read_text_optional (Path.join folder_path stdin_path) in
     let expected_path = Path.drive "expected" in
     let expected = read_text (Path.join folder_path expected_path) in
-    { title; command; stdin; expected }
+    { title; command; expected }
   with e -> Alcotest.fail (Printf.sprintf "Error: %s" (Printexc.to_string e))
 
 let main =
