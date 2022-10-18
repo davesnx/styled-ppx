@@ -13,7 +13,12 @@ open Alcotest
   Running the dummy script: `esy dune exec packages/instant/src/main.exe`
 *)
 
-type case = { title : string; command : string; expected : string }
+type case = {
+  title : string;
+  command : string;
+  stdin : string option;
+  expected : string;
+}
 
 type completed = {
   stdout : string;
@@ -21,17 +26,24 @@ type completed = {
   status : Unix.process_status;
 }
 
-let create_from_process_and_consumers ~consume_stdout ~consume_stderr process =
-  let open Lwt.Infix in
-  Lwt.both process#status
-    (Lwt.both (consume_stdout process#stdout) (consume_stderr process#stderr))
-  >>= fun (status, (stdout, stderr)) -> Lwt.return { stdout; stderr; status }
+let write_to_stdin process stdin =
+  match stdin with
+  | Some stdin ->
+      let%lwt () = Lwt_io.write process#stdin stdin in
+      let%lwt () = Lwt_io.close process#stdin in
+      Lwt.return_unit
+  | None -> Lwt.return ()
 
-let spawn ?(consume_stdout = Lwt_io.read) ?(consume_stderr = Lwt_io.read)
-    ?(arguments = []) exec =
-  let lwt_command = (exec, Array.of_list (exec :: arguments)) in
-  Lwt_process.with_process_full lwt_command
-    (create_from_process_and_consumers ~consume_stdout ~consume_stderr)
+let spawn ?stdin exec =
+  let callback process =
+    let%lwt _ = write_to_stdin process stdin in
+    let%lwt status, (stdout, stderr) =
+      Lwt.both process#status
+        (Lwt.both (Lwt_io.read process#stdout) (Lwt_io.read process#stderr))
+    in
+    Lwt.return { stdout; stderr; status }
+  in
+  Lwt_process.with_process_full (Lwt_process.shell exec) callback
 
 type tag = Ok | Fail | Skip | Todo | Assert
 
@@ -70,7 +82,7 @@ let () =
   in
   Printexc.register_printer (function
     | Check_error err -> Some (Lazy.force print_error err)
-    | _ -> None)
+    | _exn -> None)
 
 let equal left right = equal string left right
 let not_equal l r = not (equal l r)
@@ -125,100 +137,57 @@ let diff left right =
   | "" -> None
   | otherwise -> Some otherwise
 
-let print_list f lst =
-  let rec print_elements = function
-    | [] -> ()
-    | h :: t ->
-        f h;
-        print_string ";";
-        print_elements t
-  in
-  print_string "[";
-  print_elements lst;
-  print_string "]"
-
 (* Custom alcotest's check function. To override output with diffing. *)
 let check (expected : string) (actual : string) =
+  (* unit makes the test pass, have a small variable to express it better *)
+  let pass = () in
   if not_equal expected actual then
-    match diff actual expected with
+    match diff expected actual with
     | Some diff ->
-        let pp_diff ppf () =
-          Fmt.pf ppf "%s" diff;
-          Fmt.cut ppf ();
-          ()
+        let msg =
+          Fmt.vbox (fun ppf () ->
+              Fmt.pf ppf "%s" diff;
+              Fmt.cut ppf ())
         in
-        let msg = Fmt.vbox pp_diff in
-        raise_notrace (Check_error msg)
-    | None -> ()
+        raise (Check_error msg)
+    | None -> pass
+  else pass
 
-let transform_to_alco ({ command; expected; _ } : case) switch =
-  Lwt_switch.add_hook (Some switch) (fun () -> Lwt.return ());
-  let exec = List.hd (String.split_on_char ' ' command) in
-  let arguments = List.tl (String.split_on_char ' ' command) in
-  match%lwt spawn ~arguments exec with
-  | { stderr; stdout; status = WEXITED 0 } ->
-      let output =
-        match (stderr, stdout) with
-        | "", output -> output
-        | output, "" -> output
-        | _, _ -> fail "command got stderr and stdout"
-      in
-      let left = expected in
-      let right = output in
-      Lwt.return (check left right)
-  | {
-   stdout = "";
-   stderr = "";
-   status = WEXITED status_code | WSIGNALED status_code | WSTOPPED status_code;
-  } ->
-      let msg =
-        Format.sprintf
-          "No output (stderr empty and stdout empty) Status code: %i"
-          status_code
-      in
-      fail msg
-  | _ -> fail "Unknown error - this should not happen"
+let code_of_status = function Unix.WEXITED c | WSIGNALED c | WSTOPPED c -> c
 
-let mock =
-  [
-    { title = "first-case"; command = "echo cosis"; expected = "cosis\n" };
-    {
-      title = "one line command";
-      command = "pwd";
-      expected = "/Users/davesnx/Code/github/davesnx/styled-ppx";
-    };
-    {
-      title = "multi line command";
-      command = "ls";
-      expected =
-        {|CONTRIBUTING.md
-LICENSE
-README.md
-_build
-_esy
-bin
-dune-project
-dune-workspace
-esy.lock
-node_modules
-package.json
-packages
-scripts
-styled-ppx.install
-styled-ppx.opam
-|};
-    };
-  ]
-
-let run_cases data =
-  List.map
-    (fun case ->
-      ( case.title,
-        [
-          Alcotest_lwt.test_case "" `Quick (fun switch () ->
-              transform_to_alco case switch);
-        ] ))
-    data
+let transform_to_alco switch ({ command; expected; stdin; _ } : case) =
+  try%lwt
+    Lwt_switch.add_hook (Some switch) (fun () -> Lwt.return ());
+    match%lwt spawn ?stdin command with
+    | { stderr; stdout; status = WEXITED 0 } ->
+        let%lwt output =
+          match (stderr, stdout) with
+          | "", output -> Lwt.return output
+          | output, "" -> Lwt.return output
+          | err, out ->
+              let msg =
+                Printf.sprintf
+                  "command got stderr and stdout output, stderr: %s, stdout: %s"
+                  err out
+              in
+              Lwt.fail_with msg
+        in
+        Lwt.return (check expected output)
+    | { stdout = ""; stderr = ""; status } ->
+        let msg =
+          Printf.sprintf
+            "Status code: %i. No output (stderr empty and stdout empty)"
+            (code_of_status status)
+        in
+        Lwt.fail_with msg
+    | { stdout = ""; stderr; status } ->
+        let msg =
+          Printf.sprintf "Status code: %i. stderr %s" (code_of_status status)
+            stderr
+        in
+        Lwt.fail_with msg
+    | _ -> Lwt.fail_with "Unknown error - this should not happen"
+  with exn -> Alcotest.failf "%s" (Printexc.to_string exn)
 
 (** [dir_is_empty dir] is true, if [dir] contains no files except
  * "." and ".."
@@ -247,19 +216,46 @@ let obtain_title_cases folder =
   let stringPath = Path.toString current_folder in
   dir_contents stringPath
 
+let read_text path =
+  match Fs.readText path with
+  | Ok c -> c
+  | Error _e ->
+      fail
+        (Printf.sprintf "can't read command file from %s" (Path.toString path))
+
+let is_empty str = String.equal "" (String.trim str)
+
+let read_text_optional path =
+  match Fs.readText path with
+  | Ok c when is_empty c -> None
+  | Error _ -> None
+  | Ok c -> Some c
+
 let make_case folder title =
-  let folder_path = Path.join folder (title |> Path.drive) in
-  let command_path = Path.drive "command" in
-  let command = Fs.readTextExn (Path.join folder_path command_path) in
-  let expected_path = Path.drive "expected" in
-  let expected = Fs.readTextExn (Path.join folder_path expected_path) in
-  { title; command; expected }
+  try
+    let folder_path = Path.join folder (title |> Path.drive) in
+    let command_path = Path.drive "command" in
+    let command = read_text (Path.join folder_path command_path) in
+    let stdin_path = Path.drive "stdin" in
+    let stdin = read_text_optional (Path.join folder_path stdin_path) in
+    let expected_path = Path.drive "expected" in
+    let expected = read_text (Path.join folder_path expected_path) in
+    { title; command; stdin; expected }
+  with e -> Alcotest.fail (Printf.sprintf "Error: %s" (Printexc.to_string e))
 
 let main =
-  let folder = "packages/instant/_tests/" in
+  let folder = "packages/ppx/test/instant/" in
   let folder_path = Path.drive folder in
   let title_cases = obtain_title_cases folder_path in
   let cases = List.map (make_case folder_path) title_cases in
-  Alcotest_lwt.run "Snapshot_tests" (run_cases cases)
+  Alcotest_lwt.run "Snapshot_tests"
+    (List.map
+       (fun case ->
+         ( case.title,
+           [
+             Alcotest_lwt.test_case "" `Quick (fun switch () ->
+                 transform_to_alco switch case);
+           ] ))
+       cases)
 
 let () = Lwt_main.run @@ main
