@@ -1,5 +1,5 @@
 [%styled.global {|
   html, body, #root, .class {
-    margin: 10px;
+    margin: 0;
   }
 |}];
