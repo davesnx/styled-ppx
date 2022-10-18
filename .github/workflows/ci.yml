@@ -88,6 +88,9 @@ jobs:
       - name: Test string interpolation
         run: esy dune runtest
 
+      - name: Test snapshots with instant
+        run: esy dune exec instant
+
       - name: Export dependencies
         if: steps.deps-cache.outputs.cache-hit != 'true'
         run: esy export-dependencies

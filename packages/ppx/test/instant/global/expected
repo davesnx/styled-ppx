@@ -1,0 +1,6 @@
+ignore(
+  CssJs.global(.
+    {js|html, body, #root, .class|js},
+    [|CssJs.margin(`zero)|],
+  ),
+);

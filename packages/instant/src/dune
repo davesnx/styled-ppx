@@ -1,7 +1,7 @@
 (executable
  (name main)
  (public_name instant)
- (libraries lwt lwt.unix alcotest alcotest-lwt patdiff fs path)
+ (libraries str lwt lwt.unix alcotest alcotest-lwt patdiff fs path)
  (preprocess
   (pps lwt_ppx)))
 
