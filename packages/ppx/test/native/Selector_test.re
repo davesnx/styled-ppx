@@ -326,3 +326,37 @@ describe("Should transform stylesheet selectors", ({ test, _ }) => {
     stylesheet_tests
   );
 });
+
+let nested_tests = [
+  (
+    ".a",
+    [%expr [%cx ".a { .b {} }"]],
+    [%expr CssJs.style(.
+      [|
+        CssJs.selector(. {js|.a|js}, [|
+          CssJs.selector(. {js|.b|js}, [||])
+        |])
+      |])],
+  ),
+  (
+    ".$(aaa) { .$(bbb) { } }",
+    [%expr [%cx ".$(aaa) { .$(bbb) {} }"]],
+    [%expr CssJs.style(.
+      [|
+        CssJs.selector(. {js|.|js} ++ aaa, [|
+          CssJs.selector(. {js|.|js} ++ bbb, [||])
+        |])
+      |]
+    )],
+  ),
+];
+
+describe("Should nested selectors", ({ test, _ }) => {
+  List.iteri((_index, (title, result, expected)) =>
+    test(
+      title,
+      compare(result, expected),
+    ),
+    nested_tests
+  );
+});
