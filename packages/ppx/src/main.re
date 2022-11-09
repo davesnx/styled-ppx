@@ -353,7 +353,7 @@ let static_pattern =
     )
   );
 
-let compatibleModeWithBsEmotionPpx = Config.getArgsBeforeConfigLoaded();
+let compatibleModeWithBsEmotionPpx = true; /* fixme: Config.getArgsBeforeConfigLoaded() */
 
 module Mapper = {
   let match = module_expr => {
