@@ -3,6 +3,7 @@
 open Ast
 
 %}
+
 %token <string> LITERAL
 %token <string> CHAR
 %token <string> DATA
