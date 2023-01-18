@@ -4,18 +4,17 @@ open Asttypes;
 let expander = (
   ~recursive,
   ~loc as exprLoc,
-  ~path as _: label,
+  ~path as _: string,
   ~arg as _: option(loc(Ppxlib.Longident.t)),
-  value,
+  value: string,
   _,
   _
 ) => {
   switch (Css_spec_parser.value_of_string(value)) {
-  | Some(value_ast) =>
+  | Some(value: Css_spec_parser.value) =>
     module Ast_builder = Ppxlib.Ast_builder.Make({ let loc = exprLoc });
-    module Emit = EmitPatch.Make(Ast_builder);
-
-    let expr = Emit.create_value_parser(value_ast);
+    module Emit = Generate.Make(Ast_builder);
+    let expr = Emit.make_value(value);
 
     recursive
       ? Ast_builder.pexp_fun(
@@ -56,17 +55,23 @@ let valueRecExtension =
     expander(~recursive=true),
   );
 
-let gen_type = (structure_item) => {
-  let bindings = List.find_opt(fun
-    | {pstr_desc: Pstr_value(Recursive, _), pstr_loc: _loc} => true
-    | _ => false
-  , structure_item);
+let is_structure_item_recursive = fun
+  | {pstr_desc: Pstr_value(Recursive, _), pstr_loc: _loc} => true
+  | _ => false;
+
+let gen_type = (structure_items) => {
+  let bindings = List.find_opt(is_structure_item_recursive, structure_items);
 
   switch (bindings) {
-    | Some({pstr_desc: Pstr_value(_, value_bindings), _}) =>
-      [EmitType.gen_types(value_bindings)] @ structure_item
-    | _ => structure_item
+  | Some({pstr_desc: Pstr_value(_, value_bindings), pstr_loc, _}) => {
+    module Ast_builder = Ppxlib.Ast_builder.Make({ let loc = pstr_loc });
+    module Emit = Generate.Make(Ast_builder);
+    let generated_types = Emit.make_types(value_bindings);
+
+    List.cons(generated_types, structure_items)
   }
-}
+  | _ => structure_items
+  }
+};
 
 Driver.register_transformation(~preprocess_impl=gen_type, ~extensions=[valueExtension, valueRecExtension], "css-value-parser-ppx");

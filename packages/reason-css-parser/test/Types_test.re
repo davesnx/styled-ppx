@@ -11,7 +11,9 @@ let compare = (input, expected, {expect, _}) => {
 
 let gen_type = (name, expr) => {
   let vb = Vb.mk(~loc, ~attrs=[], Pat.var(~loc, {txt: name, loc}), expr);
-  EmitType.gen_type(vb);
+  module Ast_builder = Ppxlib.Ast_builder.Make({ let loc = loc });
+  module Emit = Generate.Make(Ast_builder);
+  Emit.make_type(vb);
 };
 
 let types = [
@@ -87,13 +89,10 @@ let types = [
     gen_type(
       "function_color",
       [%expr
-        [%value
-          "
-    rgb( [ <extended-percentage> ]{3} [ '/' <alpha-value> ]? )
-  | rgb( [ <number> ]{3} [ '/' <alpha-value> ]? )
-  | rgb( [ <extended-percentage> ]#{3} [ ',' <alpha-value> ]? )
-  | rgb( [ <number> ]#{3} [ ',' <alpha-value> ]? )
-"
+        [%value "rgb( [ <extended-percentage> ]{3} [ '/' <alpha-value> ]? )
+          | rgb( [ <number> ]{3} [ '/' <alpha-value> ]? )
+          | rgb( [ <extended-percentage> ]#{3} [ ',' <alpha-value> ]? )
+          | rgb( [ <number> ]#{3} [ ',' <alpha-value> ]? )"
         ]
       ],
     ),
