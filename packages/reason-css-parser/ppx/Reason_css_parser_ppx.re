@@ -18,11 +18,11 @@ let expander = (
 
     recursive
       ? Ast_builder.pexp_fun(
-          Nolabel,
-          None,
-          Ast_builder.pvar("tokens"),
-          Ast_builder.eapply(expr, [Ast_builder.evar("tokens")]),
-        )
+        Nolabel,
+        None,
+        Ast_builder.pvar("tokens"),
+        Ast_builder.eapply(expr, [Ast_builder.evar("tokens")]),
+      )
       : expr;
   | exception _
   | None =>
@@ -59,7 +59,7 @@ let is_structure_item_recursive = fun
   | {pstr_desc: Pstr_value(Recursive, _), pstr_loc: _loc} => true
   | _ => false;
 
-let gen_type = (structure_items) => {
+let preprocess_impl = (structure_items) => {
   let bindings = List.find_opt(is_structure_item_recursive, structure_items);
 
   switch (bindings) {
@@ -67,11 +67,11 @@ let gen_type = (structure_items) => {
     module Ast_builder = Ppxlib.Ast_builder.Make({ let loc = pstr_loc });
     module Emit = Generate.Make(Ast_builder);
     let generated_types = Emit.make_types(value_bindings);
-
-    List.cons(generated_types, structure_items)
+    /* let modified_bindings = Emit.add_types(value_bindings); */
+    List.cons(generated_types, structure_items);
   }
   | _ => structure_items
   }
 };
 
-Driver.register_transformation(~preprocess_impl=gen_type, ~extensions=[valueExtension, valueRecExtension], "css-value-parser-ppx");
+Driver.register_transformation(~preprocess_impl, ~extensions=[valueExtension, valueRecExtension], "css-value-parser-ppx");

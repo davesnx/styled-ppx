@@ -151,7 +151,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       make_variant_branch(type_, is_constructor, params);
     };
 
-  let create_type_parser = (type_name, value) => {
+  let create_type_parser = (value) => {
     let rec create_type =
       fun
       | Terminal(kind, multiplier) => terminal_op(kind, multiplier)
@@ -239,10 +239,10 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       create_type(value) |> apply_modifier(multiplier);
 
     switch (value) {
-    | Terminal(kind, multiplier) => make_type_declaration(type_name, terminal_op(kind, multiplier))
-    | Combinator(kind, values)   => make_type_declaration(type_name, combinator_op(kind, values))
-    | Function_call(name, value) => make_type_declaration(type_name, function_call(name, value))
-    | Group(value, multiplier)   => make_type_declaration(type_name, group_op(value, multiplier))
+    | Terminal(kind, multiplier) => terminal_op(kind, multiplier)
+    | Combinator(kind, values)   => combinator_op(kind, values)
+    | Function_call(name, value) => function_call(name, value)
+    | Group(value, multiplier)   => group_op(value, multiplier)
     };
   };
 
@@ -367,18 +367,37 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       | _ => failwith("Error when extracting CSS spec content")
       };
     switch (Css_spec_parser.value_of_string(payload)) {
-    | Some(ast) => create_type_parser(name, ast)
+    | Some(ast) => (name, create_type_parser(ast))
     | None => failwith("Error while parsing CSS spec")
     };
   };
 
   let make_types = bindings => {
-    let type_declarations = List.map(make_type, bindings);
+    let type_declarations = List.map((binding) => {
+      let (name, core_type) = make_type(binding);
+      make_type_declaration(name, core_type);
+    }, bindings);
+
     let loc = List.hd(type_declarations).ptype_loc;
     let types =
       Ast_helper.Str.type_(~loc, Recursive, type_declarations @ standard_types);
     let types_structure = Ast_helper.Mod.structure(~loc, [types]);
     [%stri module Types = [%m types_structure]];
+  };
+
+  let add_types = (bindings) => {
+    open Ppxlib;
+    let new_bindings = bindings |> List.map((value_binding) => {
+      let previous_expression = value_binding.pvb_expr;
+      let (_, core_type) = make_type(value_binding);
+      let type_anotation = [%type: list(Reason_css_lexer.token) => (Reason_css_parser__Rule.data([%t core_type]), list(Reason_css_lexer.token))];
+      let new_expression = [%expr ([%e previous_expression]: [%t type_anotation])];
+      { ...value_binding, pvb_expr: new_expression}
+    });
+
+    new_bindings |> List.map((value_binding) => {
+      Ast_helper.Str.value(~loc=value_binding.pvb_loc, Recursive, [value_binding]);
+    });
   };
 
   let create_variant_name = (type_name, name) =>
@@ -566,7 +585,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       };
 
       switch (kind) {
-      | Xor =>
+      | Xor => {
         let names = variant_names(values);
         let args =
           List.combine(names, values)
@@ -579,7 +598,9 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
               map_value(has_content, pair);
             });
         apply(op_ident(kind), args);
-      | _ =>
+      }
+      | _ => {
+
         let combinator_args =
           values
           |> List.mapi((index, v) => ("V" ++ string_of_int(index), v))
@@ -624,6 +645,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
               };
             })
           |> List.split;
+
         let disable_warning =
           attribute(
             ~name=txt("ocaml.warning"),
@@ -635,12 +657,10 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
           ...pexp_fun(Nolabel, None, args, body),
           pexp_attributes: [disable_warning],
         };
-        let expression = eapply(evar("map"), [combinator, map_fn]);
-        [%expr [%e expression]]
-        /* [%expr ([%e expression]: list(Reason_css_lexer.token) => (Reason_css_parser__Rule.data('a), list(Reason_css_lexer.token)))] */
+        eapply(evar("map"), [combinator, map_fn]);
+      };
       };
     };
-
     let function_call = (name, value) => {
       let name = estring(name);
       let value = make_value(value);

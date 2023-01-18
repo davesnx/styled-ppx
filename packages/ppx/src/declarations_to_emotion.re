@@ -633,11 +633,12 @@ let render_named_color =
   | `Yellowgreen => [%expr CssJs.yellowgreen]
   | _ => raise(Unsupported_feature);
 
-let render_color_alpha =
-  (~loc) => fun
+let render_color_alpha = (~loc, color_alpha) =>
+  switch (color_alpha) {
   | `Number(number) => [%expr `num([%e render_number(~loc, number)])]
   | `Extended_percentage(`Percentage(pct)) => render_percentage(~loc, pct /. 100.0)
-  | `Extended_percentage(pct) => render_extended_percentage(~loc, pct);
+  | `Extended_percentage(pct) => render_extended_percentage(~loc, pct)
+  };
 
 let render_function_rgb = (~loc, ast) => {
   let color_to_float = v => render_integer(~loc, v |> int_of_float);

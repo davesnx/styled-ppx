@@ -4,7 +4,6 @@ open Reason_css_parser;
 module Helper = Ast_helper;
 module Builder = Ppxlib.Ast_builder.Default;
 
-/* helpers */
 let loc = Location.none;
 let txt = txt => {Location.loc: Location.none, txt};
 
