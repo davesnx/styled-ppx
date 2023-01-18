@@ -1,4 +1,5 @@
 open Longident;
+
 module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
   open Ast_builder;
   open Css_spec_parser;

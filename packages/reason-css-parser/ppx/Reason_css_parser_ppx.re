@@ -12,20 +12,17 @@ let expander = (
 ) => {
   switch (Css_spec_parser.value_of_string(value)) {
   | Some(value_ast) =>
-    module Loc: {let loc: Location.t;} = {
-      let loc = exprLoc;
-    };
-    module Ast_builder = Ppxlib.Ast_builder.Make(Loc);
+    module Ast_builder = Ppxlib.Ast_builder.Make({ let loc = exprLoc });
     module Emit = EmitPatch.Make(Ast_builder);
-    open Ast_builder;
 
     let expr = Emit.create_value_parser(value_ast);
+
     recursive
-      ? pexp_fun(
+      ? Ast_builder.pexp_fun(
           Nolabel,
           None,
-          pvar("tokens"),
-          eapply(expr, [evar("tokens")]),
+          Ast_builder.pvar("tokens"),
+          Ast_builder.eapply(expr, [Ast_builder.evar("tokens")]),
         )
       : expr;
   | exception _
@@ -59,15 +56,16 @@ let valueRecExtension =
     expander(~recursive=true),
   );
 
-let gen_type = (str) => {
+let gen_type = (structure_item) => {
   let bindings = List.find_opt(fun
     | {pstr_desc: Pstr_value(Recursive, _), pstr_loc: _loc} => true
     | _ => false
-  , str);
+  , structure_item);
 
-  switch(bindings){
-    | Some({pstr_desc: Pstr_value(_, value_bindings), _}) => str @ [EmitType.gen_types(value_bindings)]
-    | _ => str
+  switch (bindings) {
+    | Some({pstr_desc: Pstr_value(_, value_bindings), _}) =>
+      [EmitType.gen_types(value_bindings)] @ structure_item
+    | _ => structure_item
   }
 }
 
