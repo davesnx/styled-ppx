@@ -73,8 +73,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       | Terminal(Delim(name), _) => value_of_delimiter(name)
       | Terminal(Keyword(name), _) => kebab_case_to_snake_case(name)
       | Terminal(Data_type(name), _) => value_name_of_css(name)
-      | Terminal(Property_type(name), _) =>
-        property_value_name(name) |> value_name_of_css
+      | Terminal(Property_type(name), _) => property_value_name(name) |> value_name_of_css
       | Group(value, _) => variant_name(value)
       | Combinator(Static, _) => "static"
       | Combinator(And, _) => "and"
@@ -85,11 +84,12 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     value_name |> first_uppercase;
   };
 
-  let variant_names = values => {
+  let variant_names = (values) => {
     // TODO: not exactly a fast algorithm
     let values = values |> List.map(variant_name);
     let occurrences = (values, value) =>
       values |> List.filter((==)(value)) |> List.length;
+
     values
     |> List.fold_left(
         (acc, value) => {
@@ -155,30 +155,25 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     let rec create_type =
       fun
       | Terminal(kind, multiplier) => terminal_op(kind, multiplier)
-      | Combinator(kind, values) => combinator_op(kind, values)
+      | Combinator(kind, values)   => combinator_op(kind, values)
       | Function_call(name, value) => function_call(name, value)
-      | Group(value, multiplier) => group_op(value, multiplier)
+      | Group(value, multiplier)   => group_op(value, multiplier)
 
-    and terminal_xor_op = (kind, multiplier) => {
+    and terminal_xor_op = (type_name, kind, multiplier) => {
       let (type_, is_constructor, params) =
         switch (kind) {
-        | Keyword(name) => (
-            first_uppercase(name) |> kebab_case_to_snake_case,
-            false,
-            [],
-          )
+        | Keyword(_name) => (type_name, false, [])
         | Data_type(name) =>
           let name = value_name_of_css(name);
           let params = [ptyp_constr(txt @@ Lident(name), [])];
-          (first_uppercase(name), false, params);
+          (type_name, false, params);
         | Property_type(name) =>
           let name = property_value_name(name) |> value_name_of_css;
           let params = [ptyp_constr(txt @@ Lident(name), [])];
-          (first_uppercase(name), false, params);
-        | Delim(string) =>
-          let name = value_of_delimiter(string) |> first_uppercase;
+          (type_name, false, params);
+        | Delim(_string) =>
           let params = [ptyp_constr(txt @@ Lident("unit"), [])];
-          (name, false, params);
+          (type_name, false, params);
         };
       apply_xor_modifier(multiplier, type_, is_constructor, params);
     }
@@ -208,7 +203,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
             List.map(
               ((type_name, value)) =>
                 switch (value) {
-                | Terminal(kind, multiplier) => terminal_xor_op(kind, multiplier)
+                | Terminal(kind, multiplier) => terminal_xor_op(type_name, kind, multiplier)
                 | Function_call(name, value) =>
                   let name =
                     first_uppercase(name) |> kebab_case_to_snake_case;
@@ -246,92 +241,91 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     };
   };
 
+  /* TODO: Move this to Standard and use as ppx_runtime */
   let standard_types = {
-  open Ppxlib.Ast_builder.Default;
+    open Ppxlib.Ast_builder.Default;
 
-  let type_ = (~kind=Parsetree.Ptype_abstract, name, core_type) => {
-    type_declaration(
-      ~loc=Location.none,
-      ~name={txt: name, loc: Location.none},
-      ~params=[],
-      ~cstrs=[],
-      ~private_=Public,
-      ~manifest=Some(core_type),
-      ~kind,
-    );
+    let type_ = (~kind=Parsetree.Ptype_abstract, name, core_type) => {
+      type_declaration(
+        ~loc=Location.none,
+        ~name={txt: name, loc: Location.none},
+        ~params=[],
+        ~cstrs=[],
+        ~private_=Public,
+        ~manifest=Some(core_type),
+        ~kind,
+      );
+    };
+
+    [
+      type_("integer", [%type: int]),
+      type_("number", [%type: float]),
+      type_(
+        "length",
+        [%type:
+          [
+            | `Em(number)
+            | `Ex(number)
+            | `Cap(number)
+            | `Ch(number)
+            | `Ic(number)
+            | `Rem(number)
+            | `Lh(number)
+            | `Rlh(number)
+            | `Vw(number)
+            | `Vh(number)
+            | `Vi(number)
+            | `Vb(number)
+            | `Vmin(number)
+            | `Vmax(number)
+            | `Cm(number)
+            | `Mm(number)
+            | `Q(number)
+            | `In(number)
+            | `Pt(number)
+            | `Pc(number)
+            | `Px(number)
+            | `Zero
+          ]
+        ],
+      ),
+      type_(
+        "angle",
+        [%type:
+          [ | `Deg(number) | `Grad(number) | `Rad(number) | `Turn(number)]
+        ],
+      ),
+      type_("time", [%type: [ | `Ms(float) | `S(float)]]),
+      type_("frequency", [%type: [ | `Hz(float) | `KHz(float)]]),
+      type_(
+        "resolution",
+        [%type: [ | `Dpi(float) | `Dpcm(float) | `Dppx(float)]],
+      ),
+      type_("percentage", [%type: float]),
+      type_("ident", [%type: string]),
+      type_("custom_ident", [%type: string]),
+      // abstract_type("string"), already represented by OCaml string type
+      type_("url", [%type: string]),
+      type_("hex_color", [%type: string]),
+      type_("interpolation", [%type: list(string)]),
+      type_("flex_value", [%type: [ | `Fr(float)]]),
+      type_("line_names", [%type: (unit, list(string), unit)]),
+
+      // From Parser_helper, those are `invalid` represented here as unit
+      type_("ident_token", [%type: unit]),
+      type_("function_token", [%type: unit]),
+      type_("string_token", [%type: unit]),
+      type_("hash_token", [%type: unit]),
+      type_("dimension", [%type: unit]),
+      type_("any_value", [%type: unit]),
+      type_("declaration_value", [%type: unit]),
+      type_("zero", [%type: unit]),
+      type_("decibel", [%type: unit]),
+      type_("urange", [%type: unit]),
+      type_("semitones", [%type: unit]),
+      type_("an_plus_b", [%type: unit]),
+    ];
   };
-
-  let loc = Location.none;
-
-  [
-    type_("integer", [%type: int]),
-    type_("number", [%type: float]),
-    type_(
-      "length",
-      [%type:
-        [
-          | `Em(number)
-          | `Ex(number)
-          | `Cap(number)
-          | `Ch(number)
-          | `Ic(number)
-          | `Rem(number)
-          | `Lh(number)
-          | `Rlh(number)
-          | `Vw(number)
-          | `Vh(number)
-          | `Vi(number)
-          | `Vb(number)
-          | `Vmin(number)
-          | `Vmax(number)
-          | `Cm(number)
-          | `Mm(number)
-          | `Q(number)
-          | `In(number)
-          | `Pt(number)
-          | `Pc(number)
-          | `Px(number)
-          | `Zero
-        ]
-      ],
-    ),
-    type_(
-      "angle",
-      [%type:
-        [ | `Deg(number) | `Grad(number) | `Rad(number) | `Turn(number)]
-      ],
-    ),
-    type_("time", [%type: [ | `Ms(float) | `S(float)]]),
-    type_("frequency", [%type: [ | `Hz(float) | `KHz(float)]]),
-    type_(
-      "resolution",
-      [%type: [ | `Dpi(float) | `Dpcm(float) | `Dppx(float)]],
-    ),
-    type_("percentage", [%type: float]),
-    type_("ident", [%type: string]),
-    type_("custom_ident", [%type: string]),
-    // abstract_type("string"), already represented by OCaml string type
-    type_("url", [%type: string]),
-    type_("hex_color", [%type: string]),
-    type_("interpolation", [%type: list(string)]),
-    type_("flex_value", [%type: [ | `Fr(float)]]),
-    type_("line_names", [%type: (unit, list(string), unit)]),
-
-    // From Parser_helper, those are implemented as `invalid`, thats why they have type unit
-    type_("ident_token", [%type: unit]),
-    type_("function_token", [%type: unit]),
-    type_("string_token", [%type: unit]),
-    type_("hash_token", [%type: unit]),
-    type_("dimension", [%type: unit]),
-    type_("any_value", [%type: unit]),
-    type_("declaration_value", [%type: unit]),
-    type_("zero", [%type: unit]),
-    type_("decibel", [%type: unit]),
-    type_("urange", [%type: unit]),
-    type_("semitones", [%type: unit]),
-    type_("an_plus_b", [%type: unit]),
-  ];
-};
 
   let make_type = (binding: Parsetree.value_binding) => {
     let (name, payload) =
@@ -385,19 +379,33 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     [%stri module Types = [%m types_structure]];
   };
 
-  let add_types = (bindings) => {
+  let add_type_to_expr = (name: string, expression) => {
+    let core_type = Ast_helper.Typ.constr(~loc, { loc: Location.none, txt: Ldot(Lident("Types"), name) }, []);
+    let type_anotation = [%type: list(Reason_css_lexer.token) => (Reason_css_parser__Rule.data([%t core_type]), list(Reason_css_lexer.token))];
+    [%expr ([%e expression]: [%t type_anotation])];
+  };
+
+  let get_name_from_binding = (binding: Parsetree.value_binding) => {
+    switch (binding) {
+    | { pvb_pat: {ppat_desc: Ppat_var({txt, _}), _}, _ } => Some(txt)
+    | _ => None
+    };
+  };
+
+  let add_types = (~loc, bindings) => {
     open Ppxlib;
     let new_bindings = bindings |> List.map((value_binding) => {
-      let previous_expression = value_binding.pvb_expr;
-      let (_, core_type) = make_type(value_binding);
-      let type_anotation = [%type: list(Reason_css_lexer.token) => (Reason_css_parser__Rule.data([%t core_type]), list(Reason_css_lexer.token))];
-      let new_expression = [%expr ([%e previous_expression]: [%t type_anotation])];
-      { ...value_binding, pvb_expr: new_expression}
+      let name = value_binding |> get_name_from_binding;
+      switch (name) {
+      | Some(type_name) => {
+        let new_expression = add_type_to_expr(type_name, value_binding.pvb_expr);
+        { ...value_binding, pvb_expr: new_expression}
+      }
+      | None => value_binding
+      }
     });
 
-    new_bindings |> List.map((value_binding) => {
-      Ast_helper.Str.value(~loc=value_binding.pvb_loc, Recursive, [value_binding]);
-    });
+    [Ast_helper.Str.value(~loc, Recursive, new_bindings)];
   };
 
   let create_variant_name = (type_name, name) =>
@@ -476,47 +484,6 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     }
   };
 
-  // TODO: multiplier name
-  let rec variant_name = value => {
-    let value_name =
-      switch (value) {
-      | Terminal(Delim(name), _) => value_of_delimiter(name)
-      | Terminal(Keyword(name), _) => value_of_keyword(name)
-      | Terminal(Data_type(name), _) => value_name_of_css(name)
-      | Terminal(Property_type(name), _) => property_value_name(name) |> value_name_of_css
-      | Group(value, _) => variant_name(value)
-      | Combinator(Static, _) => "static"
-      | Combinator(And, _) => "and"
-      | Combinator(Or, _) => "or"
-      | Combinator(Xor, _) => "xor"
-      | Function_call(name, _) => value_name_of_css(name)
-      };
-    value_name |> first_uppercase;
-  };
-  let variant_names = values => {
-    // TODO: not exactly a fast algorithm
-    let values = values |> List.map(variant_name);
-    let occurrences = (values, value) =>
-      values |> List.filter((==)(value)) |> List.length;
-    values
-    |> List.fold_left(
-        (acc, value) => {
-          let total = occurrences(values, value);
-          let current_values = acc |> List.map(((name, _)) => name);
-          let current = occurrences(current_values, value);
-          let value = total == 1 ? (value, None) : (value, Some(current));
-          [value, ...acc];
-        },
-        [],
-      )
-    |> List.map(
-        fun
-        | (value, None) => value
-        | (value, Some(int)) => value ++ "_" ++ string_of_int(int),
-      )
-    |> List.rev;
-  };
-
   let apply_modifier = {
     let option_int_to_expr =
       fun
@@ -539,6 +506,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
           [pexp_tuple([eint(min), option_int_to_expr(max)])],
         )
       | At_least_one => evar("at_least_one");
+
     (modifier, rule) =>
       switch (modifier) {
       | One => rule
@@ -557,8 +525,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
         | Delim(delim) => eapply(evar("delim"), [estring(delim)])
         | Keyword(name) => eapply(evar("keyword"), [estring(name)])
         | Data_type(name) => value_name_of_css(name) |> evar
-        | Property_type(name) =>
-          property_value_name(name) |> value_name_of_css |> evar
+        | Property_type(name) => property_value_name(name) |> value_name_of_css |> evar
         };
       apply_modifier(modifier, rule);
     };
@@ -577,11 +544,10 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
         | Or => evar("combine_or");
 
       let map_value = (content, (name, value)) => {
-        let value = make_value(value);
         let variant = pexp_variant(name, content ? Some(evar("v")) : None);
         let map_fn =
           pexp_fun(Nolabel, None, pvar(content ? "v" : "_v"), variant);
-        eapply(evar("map"), [value, map_fn]);
+        eapply(evar("map"), [make_value(value), map_fn]);
       };
 
       switch (kind) {
@@ -600,7 +566,6 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
         apply(op_ident(kind), args);
       }
       | _ => {
-
         let combinator_args =
           values
           |> List.mapi((index, v) => ("V" ++ string_of_int(index), v))
@@ -662,9 +627,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       };
     };
     let function_call = (name, value) => {
-      let name = estring(name);
-      let value = make_value(value);
-      eapply(evar("function_call"), [name, value]);
+      eapply(evar("function_call"), [estring(name), make_value(value)]);
     };
 
     switch (value) {
