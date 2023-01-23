@@ -6,7 +6,7 @@ module StringMap = Map.Make(String);
 
 let (let.ok) = Result.bind;
 
-let parse_tokens = (prop, tokens_with_loc) => {
+let apply_parser = (parser, tokens_with_loc) => {
   open Standard;
   open Reason_css_lexer;
 
@@ -22,7 +22,7 @@ let parse_tokens = (prop, tokens_with_loc) => {
 
   let tokens_without_ws = tokens |> List.filter((!=)(WHITESPACE));
 
-  let (output, remaining_tokens) = prop(tokens_without_ws);
+  let (output, remaining_tokens) = parser(tokens_without_ws);
   let.ok output =
     switch (output) {
     | Ok(data) => Ok(data)
@@ -40,11 +40,11 @@ let parse_tokens = (prop, tokens_with_loc) => {
   Ok(output);
 };
 
-let parse = (prop: Rule.rule('a), str) => {
+let parse = (rule_parser: Rule.rule('a), str) => {
   let.ok tokens_with_loc =
     Reason_css_lexer.from_string(str) |> Result.map_error(_ => "frozen");
 
-  parse_tokens(prop, tokens_with_loc);
+  apply_parser(rule_parser, tokens_with_loc);
 };
 
 let check = (prop: Rule.rule('a), value) =>

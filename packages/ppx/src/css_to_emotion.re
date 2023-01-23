@@ -163,7 +163,7 @@ and render_declaration = (d: Declaration.t): list(Parsetree.expression) => {
   | Error(`Invalid_value(value)) =>
     grammar_error(
       loc,
-      "Invalid value: '" ++ String.trim(value) ++ "' in property '" ++ property ++ "'",
+      "Property '" ++ property ++ "' has an invalid value: '" ++ String.trim(value) ++ "'",
     )
   };
 }

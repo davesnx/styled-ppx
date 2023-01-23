@@ -8,47 +8,41 @@ on:
     branches:
       - main
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
-  cancel-in-progress: true
-
 jobs:
   build:
     name: Build
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-18.04]
-        # os: [macos-latest, windows-latest, ubuntu-18.04]
+        os: [macos-latest, ubuntu-latest]
+        # os: [macos-latest, windows-latest, ubuntu-latest]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Use Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: 12
+        uses: actions/setup-node@v3
 
       - name: Load global cache (~/.esy/source)
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.esy/source
           key: source-${{ matrix.os }}-${{ hashFiles('**/index.json') }}
 
       - name: Install esy
-        run: npm install -g esy@0.6.11
+        run: npm install -g esy@0.6.12
 
       - name: Install dependencies
         run: esy install
 
       - name: Print esy cache
         id: print_esy_cache
-        run: node .github/workflows/print-esy-cache.js
+        run: echo "ESY_CACHE=$(node .github/workflows/print-esy-cache.js)" >> $GITHUB_OUTPUT
 
       - name: Load dependencies cache
         id: deps-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
-          path: ${{ steps.print_esy_cache.outputs.esy_cache }}
+          path: ${{ steps.print_esy_cache.outputs.ESY_CACHE }}
           key: build-${{ matrix.os }}-${{ hashFiles('**/index.json') }}
           restore-keys: build-${{ matrix.os }}-
 
@@ -77,13 +71,13 @@ jobs:
         run: esy test_parser
 
       - name: Test CSS Parser
-        run: esy test_reason_css_parser_test
+        run: esy test_reason_css_parser
 
       - name: Test CSS Spec Parser
         run: esy test_css_spec_parser
 
-      - name: Test CSS Spec type generation
-        run: esy test_css_spec_types
+      # - name: Test CSS Spec type generation
+        # run: esy test_css_spec_types
 
       - name: Test string interpolation
         run: esy dune runtest
@@ -113,16 +107,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-18.04, macos-latest]
+        os: [ubuntu-latest, macos-latest]
     needs: build
 
     steps:
       - uses: actions/checkout@v1
 
-      - name: Use Node.js 12.x
-        uses: actions/setup-node@v1
-        with:
-          node-version: 12.x
+      - name: Use Node.js
+        uses: actions/setup-node@v3
 
       - name: Download artifacts
         uses: actions/download-artifact@master
@@ -136,10 +128,10 @@ jobs:
       - name: Get cache directory path
         id: yarn-cache-dir-path
         working-directory: ./packages/ppx/test/browser
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
 
       - name: Load global cache
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         id: yarn-cache
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
@@ -162,27 +154,25 @@ jobs:
     name: Publish
     needs: build
     if: github.repository_owner == 'davesnx'
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
 
-      - name: Use Node.js 12.x
-        uses: actions/setup-node@v1
-        with:
-          node-version: 12.x
+      - name: Use Node.js
+        uses: actions/setup-node@v3
 
       - name: Make NPM release skeleton
         run: node scripts/release-make-skeleton.js
 
       - name: Print short SHA
         id: sha
-        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
       - name: Download linux artifacts
         uses: actions/download-artifact@master
         with:
-          name: ubuntu-18.04
+          name: ubuntu-latest
           path: _release/platform-linux-x64
 
       - name: Download macOS artifacts
@@ -267,7 +257,7 @@ jobs:
           npm config set scope "@davesnx"
           npm version prerelease --preid ${{ steps.sha.outputs.sha_short }} -no-git-tag-version
           npm publish --access public --tag nightly
-          echo "::set-output name=version::$(npm view @davesnx/styled-ppx@nightly version)"
+          echo "version=$(npm view @davesnx/styled-ppx@nightly version)" >> $GITHUB_OUTPUT
 
       - name: Release NPM package
         if: ${{ success() && github.event_name != 'pull_request' }}

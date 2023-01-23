@@ -3,26 +3,33 @@ open Combinator;
 open Modifier;
 open Rule.Match;
 open Parser_helper;
-let rec property_test = tokens =>
-  combine_xor(
-    [
-      map(keyword("static"), _v => `Static),
-      map(keyword("absolute"), _v => `Absolute),
-      map(text, v => `Text(v)),
-    ],
-    tokens,
-  )
-and text = tokens =>
-  combine_xor(
-    [
-      map(string, v => `String(v)),
-      map(property_test, v => `Property_test(v)),
-    ],
-    tokens,
-  );
 module Types = {
-  type property_test = [ | `Static | `Absolute | `Text(text)]
-  and text = [ | `String(string) | `Property_test(property_test)]
+  type _legacy_gradient = [
+    | `Function__webkit_gradient(function__webkit_gradient)
+    | `_legacy_linear_gradient(_legacy_linear_gradient)
+    | `_legacy_repeating_linear_gradient(_legacy_repeating_linear_gradient)
+    | `_legacy_radial_gradient(_legacy_radial_gradient)
+    | `_legacy_repeating_radial_gradient(_legacy_repeating_radial_gradient)
+  ]
+  and _legacy_linear_gradient = [
+    | `_moz_linear_gradient(_legacy_linear_gradient_arguments)
+    | `_webkit_linear_gradient(_legacy_linear_gradient_arguments)
+    | `_o_linear_gradient(_legacy_linear_gradient_arguments)
+  ]
+  and property_height = [
+    | `Auto
+    | `Extended_length(extended_length)
+    | `Extended_percentage(extended_percentage)
+    | `Min_content
+    | `Max_content
+    | `Fit_content_0
+    | `Fit_content_1(
+        [
+          | `Extended_length(extended_length)
+          | `Extended_percentage(extended_percentage)
+        ],
+      )
+  ]
   and integer = int
   and number = float
   and length = [
@@ -79,3 +86,96 @@ module Types = {
   and semitones = unit
   and an_plus_b = unit;
 };
+let rec _legacy_gradient:
+  list(Reason_css_lexer.token) =>
+  (
+    Reason_css_parser__Rule.data(Types._legacy_gradient),
+    list(Reason_css_lexer.token),
+  ) =
+  tokens =>
+    combine_xor(
+      [
+        map(function__webkit_gradient, v => `Function__webkit_gradient(v)),
+        map(_legacy_linear_gradient, v => `_legacy_linear_gradient(v)),
+        map(_legacy_repeating_linear_gradient, v =>
+          `_legacy_repeating_linear_gradient(v)
+        ),
+        map(_legacy_radial_gradient, v => `_legacy_radial_gradient(v)),
+        map(_legacy_repeating_radial_gradient, v =>
+          `_legacy_repeating_radial_gradient(v)
+        ),
+      ],
+      tokens,
+    )
+and _legacy_linear_gradient:
+  list(Reason_css_lexer.token) =>
+  (
+    Reason_css_parser__Rule.data(Types._legacy_linear_gradient),
+    list(Reason_css_lexer.token),
+  ) =
+  tokens =>
+    combine_xor(
+      [
+        map(
+          function_call(
+            "-moz-linear-gradient",
+            _legacy_linear_gradient_arguments,
+          ),
+          v =>
+          `_moz_linear_gradient(v)
+        ),
+        map(
+          function_call(
+            "-webkit-linear-gradient",
+            _legacy_linear_gradient_arguments,
+          ),
+          v =>
+          `_webkit_linear_gradient(v)
+        ),
+        map(
+          function_call(
+            "-o-linear-gradient",
+            _legacy_linear_gradient_arguments,
+          ),
+          v =>
+          `_o_linear_gradient(v)
+        ),
+      ],
+      tokens,
+    )
+and property_height:
+  list(Reason_css_lexer.token) =>
+  (
+    Reason_css_parser__Rule.data(Types.property_height),
+    list(Reason_css_lexer.token),
+  ) =
+  tokens =>
+    combine_xor(
+      [
+        map(keyword("auto"), _v => `Auto),
+        map(extended_length, v => `Extended_length(v)),
+        map(extended_percentage, v => `Extended_percentage(v)),
+        map(keyword("min-content"), _v => `Min_content),
+        map(keyword("max-content"), _v => `Max_content),
+        map(keyword("fit-content"), _v => `Fit_content_0),
+        map(
+          function_call(
+            "fit-content",
+            combine_xor([
+              map(extended_length, v => `Extended_length(v)),
+              map(extended_percentage, v => `Extended_percentage(v)),
+            ]),
+          ),
+          v =>
+          `Fit_content_1(v)
+        ),
+      ],
+      tokens,
+    );
+let check_map =
+  StringMap.of_seq(
+    List.to_seq([
+      ("linear-gradient", _legacy_gradient),
+      ("radial-gradient", _legacy_linear_gradient),
+    ]),
+  );

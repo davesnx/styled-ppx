@@ -71,7 +71,7 @@ let tests = [
     [%value "<calc()>"],
     "calc(100% - 25px)",
     ((ext_pct(100.), []), [(`Dash(), (len(`Px(25.)), []))]),
-  ),
+  )
 ];
 
 describe("Parser", ({test, _}) =>

@@ -58,34 +58,6 @@ let humanize = fun
   | LEFT_CURLY => "{"
   | RIGHT_CURLY => "}";
 
-let humanize_without_payload = fun
-  | EOF => "the end"
-  | IDENT(_) => "ident"
-  | BAD_IDENT => "bad ident"
-  | FUNCTION(_) => "function"
-  | AT_KEYWORD(_) => "@"
-  | HASH(_, _) => "hash: #"
-  | STRING(_) => "string"
-  | BAD_STRING(_) => "bad string"
-  | URL(_) => "url"
-  | BAD_URL => "bad url"
-  | DELIM(_) => "delimiter "
-  | NUMBER(_) => "number"
-  | PERCENTAGE(_) => "percentage"
-  | DIMENSION(_, _) => "dimension: (e.g. 10px)"
-  | WHITESPACE => "whitespace: ' '"
-  | CDO => "<!--"
-  | CDC => "-->"
-  | COLON => ":"
-  | SEMICOLON => ";"
-  | COMMA => ","
-  | LEFT_SQUARE => "["
-  | RIGHT_SQUARE => "]"
-  | LEFT_PARENS => "("
-  | RIGHT_PARENS => ")"
-  | LEFT_CURLY => "{"
-  | RIGHT_CURLY => "}";
-
 type error =
   | Invalid_code_point
   | Eof

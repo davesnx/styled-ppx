@@ -217,13 +217,14 @@
 [%css {|background-position-y: bottom 20px|}];
 
 /* CSS Images Module Level 3 */
+[%css {|background-image: linear-gradient(45deg, blue, red);|}];
+[%css {|background-image: linear-gradient(90deg, blue 10%, red 20%);|}];
+[%css {|background-image: linear-gradient(90deg, blue 10%, red);|}];
 /* [%css {|background-image: linear-gradient(white, black);|}]; */
 /* [%css {|background-image: linear-gradient(to right, white, black);|}]; */
-/* [%css {|background-image: linear-gradient(45deg, white, black);|}]; */
+[%css {|background-image: linear-gradient(45deg, white, black);|}];
 /* [%css {|background-image: linear-gradient(white 50%, black);|}]; */
-/* [%css {|background-image: linear-gradient(white 5px, black);|}]; */
-/* [%css {|background-image: linear-gradient(white, #f06, black);|}]; */
-/* [%css {|background-image: linear-gradient(currentColor, black);|}]; */
+[%css {|background-image: linear-gradient(white, #f06, black);|}];
 /* [%css {|background-image: linear-gradient(red -50px, white calc(-25px + 50%), blue 100%);|}]; */
 /* [%css {|background-image: radial-gradient(white, black);|}]; */
 /* [%css {|background-image: radial-gradient(circle, white, black);|}]; */
@@ -274,6 +275,7 @@
 /* [%css {|border-image: radial-gradient(60% 60%, white, black);|}]; */
 /* [%css {|border-image: repeating-linear-gradient(white, black);|}]; */
 /* [%css {|border-image: repeating-radial-gradient(white, black);|}]; */
+/* [%css {|cursor: linear-gradient(45deg, 25% black, 25% transparent);|}]; */
 /* [%css {|cursor: linear-gradient(white, black);|}]; */
 /* [%css {|cursor: linear-gradient(to right, white, black);|}]; */
 /* [%css {|cursor: linear-gradient(45deg, white, black);|}]; */

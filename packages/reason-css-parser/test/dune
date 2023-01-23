@@ -1,9 +1,9 @@
 (library
  (name ReasonCSSParserTest)
  (ocamlopt_flags -linkall -g)
- (libraries reason-css-parser.lib rely.lib reason_css_parser_lib)
+ (libraries reason-css-parser.lib rely.lib reason_css_parser_ppx_lib)
  (modules
-  (:standard \ Runner printer spec))
+  (:standard \ Runner Standalone Spec))
  (preprocess
   (pps reason_css_parser_ppx sedlex.ppx ppxlib.metaquot)))
 
@@ -15,30 +15,30 @@
   (pps reason_css_parser_ppx sedlex.ppx)))
 
 (executable
- (name printer)
- (modules printer spec)
+ (name Standalone)
+ (modules Standalone Spec)
  (libraries reason_css_parser_ppx ppxlib))
 
 (rule
- (targets spec.actual.re)
+ (targets Spec.actual.re)
  (deps
-  (:printer printer.exe)
-  (:input spec.re))
+  (:pp Standalone.exe)
+  (:input Spec.re))
  (action
   (progn
    (with-stdout-to
     %{targets}
     (run refmt --parse re --print ml %{input}))
-   (run ./%{printer} --impl %{targets} -o %{targets})
+   (run ./%{pp} --impl %{targets} -o %{targets})
    (run refmt --parse ml --print re --in-place %{targets}))))
 
 (rule
  (alias css_spec_types_test)
  (deps
-  (file spec.expected.re)
-  (file spec.actual.re))
+  (file Spec.expected.re)
+  (file Spec.actual.re))
  (action
-  (diff spec.expected.re spec.actual.re)))
+  (diff Spec.expected.re Spec.actual.re)))
 
 (rule
  (alias reason_css_parser_test)

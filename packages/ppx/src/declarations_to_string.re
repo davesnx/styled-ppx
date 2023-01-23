@@ -4,7 +4,6 @@ open Reason_css_parser;
 module Helper = Ast_helper;
 module Builder = Ppxlib.Ast_builder.Default;
 
-/* helpers */
 let loc = Location.none;
 let txt = txt => {Location.loc: Location.none, txt};
 
@@ -164,7 +163,7 @@ and render_list_of_products = (list_of_products) => {
     | (calc_value, list_of_products) => {
       let first = render_calc_value(calc_value);
       let second = render_list_of_products(list_of_products);
-      [%expr "calc(" ++ [%e first] ++ " " ++ "*" ++ " " ++ [%e second] ++ ")"];
+      [%expr "calc(" ++ [%e first] ++ " * " ++ [%e second] ++ ")"];
     }
   }
 } and render_product_op = (op) => {
@@ -323,8 +322,10 @@ let overflow_inline =
     | `Paged => [%expr "paged"]
     | `Scroll => [%expr "scroll"]
     | `Visible => [%expr "visible"]
-    | `Static(_) => [%expr "static"] // Why this branch exists?
+    | `None => [%expr "none"]
+    | `Optional_paged => [%expr "optional-paged"]
   );
+
 let color = apply(Parser.positive_integer, [%expr "color"], render_integer);
 let min_color = apply(Parser.positive_integer, [%expr "min-color"], render_integer);
 let max_color = apply(Parser.positive_integer, [%expr "max-color"], render_integer);
