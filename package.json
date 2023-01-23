@@ -54,7 +54,7 @@
     "test_css_spec_parser": "esy dune build @css_spec_parser_test",
     "test_css_spec_types": "esy dune build @css_spec_types_test",
     "build_test_bs": "cd packages/ppx/test/browser; yarn build",
-    "test_bs": "cd packages/ppx/test/browser; yarn build; yarn test",
+    "test_bs": "cd packages/ppx/test/browser; yarn; yarn build; yarn test",
     "dev": "esy refmterr dune build --root . --watch",
     "release-static":
       "esy b dune build --root . --ignore-promoted-rules --no-config --profile release-static --only-packages styled-ppx,reason-css-parser,reason-css-lexer,css-spec-parser,styled-ppx-css-parser,string-interpolation",
