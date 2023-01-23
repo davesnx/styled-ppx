@@ -28,7 +28,7 @@ CssJs.backgroundClip(`contentBox);
 CssJs.backgroundOrigin(`borderBox);
 CssJs.backgroundOrigin(`paddingBox);
 CssJs.backgroundOrigin(`contentBox);
-CssJs.backgroundSize(`auto);
+CssJs.unsafe({js|backgroundSize|js}, {js|auto|js});
 CssJs.backgroundSize(`cover);
 CssJs.backgroundSize(`contain);
 CssJs.unsafe({js|backgroundSize|js}, {js|10px|js});
@@ -36,16 +36,13 @@ CssJs.unsafe({js|backgroundSize|js}, {js|50%|js});
 CssJs.unsafe({js|backgroundSize|js}, {js|10px auto|js});
 CssJs.unsafe({js|backgroundSize|js}, {js|auto 10%|js});
 CssJs.backgroundSize(`size((`em(50.), `percent(50.))));
-CssJs.unsafe({js|background|js}, {js|top left / 50% 60%|js});
+CssJs.backgroundPosition(`hv((`left, `top)));
 CssJs.backgroundOrigin(`borderBox);
 CssJs.backgroundColor(CssJs.blue);
 CssJs.backgroundColor(CssJs.red);
 CssJs.backgroundRepeat(`fixed);
 CssJs.backgroundClip(`paddingBox);
-CssJs.unsafe(
-  {js|background|js},
-  {js|url(foo.png) bottom right / cover padding-box content-box|js},
-);
+CssJs.backgroundImage(`url({js|foo.png|js}));
 CssJs.borderTopLeftRadius(`zero);
 CssJs.borderTopLeftRadius(`percent(50.));
 CssJs.unsafe({js|borderTopLeftRadius|js}, {js|250px 100px|js});
@@ -240,6 +237,34 @@ CssJs.unsafe({js|backgroundPositionY|js}, {js|top 20px|js});
 CssJs.unsafe({js|backgroundPositionY|js}, {js|bottom -50px|js});
 CssJs.unsafe({js|backgroundPositionY|js}, {js|top -50px|js});
 CssJs.unsafe({js|backgroundPositionY|js}, {js|bottom 20px|js});
+CssJs.backgroundImage(
+  `linearGradient((`deg(45.), [|CssJs.red, CssJs.red, CssJs.blue|])),
+);
+CssJs.backgroundImage(
+  `linearGradient((
+    `deg(90.),
+    [|
+      (CssJs.red, `percent(20.)),
+      (CssJs.red, `percent(20.)),
+      (CssJs.blue, `percent(10.)),
+    |],
+  )),
+);
+CssJs.backgroundImage(
+  `linearGradient((
+    `deg(90.),
+    [|CssJs.red, CssJs.red, (CssJs.blue, `percent(10.))|],
+  )),
+);
+CssJs.backgroundImage(
+  `linearGradient((`deg(45.), [|CssJs.black, CssJs.black, CssJs.white|])),
+);
+CssJs.backgroundImage(
+  `linearGradient((
+    `deg(180.),
+    [|CssJs.black, CssJs.black, `hex({js|f06|js}), CssJs.white|],
+  )),
+);
 CssJs.boxSizing(`borderBox);
 CssJs.boxSizing(`contentBox);
 CssJs.outlineStyle(`auto);
@@ -287,9 +312,9 @@ CssJs.unsafe({js|userSelect|js}, {js|text|js});
 CssJs.unsafe({js|userSelect|js}, {js|none|js});
 CssJs.unsafe({js|userSelect|js}, {js|contain|js});
 CssJs.unsafe({js|userSelect|js}, {js|all|js});
-CssJs.unsafe({js|transitionProperty|js}, {js|none|js});
-CssJs.unsafe({js|transitionProperty|js}, {js|all|js});
-CssJs.unsafe({js|transitionProperty|js}, {js|width|js});
+CssJs.transitionProperty({js|none|js});
+CssJs.transitionProperty({js|all|js});
+CssJs.transitionProperty({js|width|js});
 CssJs.unsafe({js|transitionProperty|js}, {js|width, height|js});
 CssJs.transitionDuration(`s(0));
 CssJs.transitionDuration(`s(1));
@@ -421,8 +446,8 @@ CssJs.unsafe({js|perspective|js}, {js|600px|js});
 CssJs.perspectiveOrigin(`pxFloat(10.), `center);
 CssJs.perspectiveOrigin(`center, `top);
 CssJs.perspectiveOrigin(`left, `top);
-CssJs.perspectiveOrigin(`percent(50.), `percent(100.));
-CssJs.perspectiveOrigin(`left, `percent(0.));
+CssJs.unsafe({js|perspectiveOrigin|js}, {js|50% 100%|js});
+CssJs.unsafe({js|perspectiveOrigin|js}, {js|left 0%|js});
 CssJs.backfaceVisibility(`visible);
 CssJs.backfaceVisibility(`hidden);
 CssJs.unsafe({js|offset|js}, {js|none|js});
@@ -484,11 +509,11 @@ CssJs.unsafe({js|hangingPunctuation|js}, {js|first last|js});
 CssJs.unsafe({js|hangingPunctuation|js}, {js|first force-end|js});
 CssJs.unsafe({js|hangingPunctuation|js}, {js|first force-end last|js});
 CssJs.unsafe({js|hangingPunctuation|js}, {js|first allow-end last|js});
-CssJs.unsafe({js|textDecoration|js}, {js|underline dotted green|js});
+CssJs.textDecoration(`underline);
 CssJs.textDecorationLine(`none);
-CssJs.unsafe({js|textDecorationLine|js}, {js|underline|js});
-CssJs.unsafe({js|textDecorationLine|js}, {js|overline|js});
-CssJs.unsafe({js|textDecorationLine|js}, {js|line-through|js});
+CssJs.textDecorationLine(`underline);
+CssJs.textDecorationLine(`overline);
+CssJs.textDecorationLine(`lineThrough);
 CssJs.unsafe({js|textDecorationLine|js}, {js|underline overline|js});
 CssJs.textDecorationColor(CssJs.white);
 CssJs.textDecorationStyle(`solid);
@@ -527,7 +552,7 @@ CssJs.textShadow(
     CssJs.black,
   ),
 );
-CssJs.unsafe({js|textDecoration|js}, {js|underline solid blue 1px|js});
+CssJs.textDecoration(`underline);
 CssJs.unsafe({js|textDecorationSkip|js}, {js|none|js});
 CssJs.unsafe({js|textDecorationSkip|js}, {js|objects|js});
 CssJs.unsafe({js|textDecorationSkip|js}, {js|objects spaces|js});
@@ -744,7 +769,7 @@ CssJs.color(`rgba((0, 51, 178, `percent(0.5))));
 CssJs.color(`rgba((0, 51, 178, `num(0.5))));
 CssJs.color(`rgba((0, 64, 185, `percent(0.5))));
 CssJs.color(`rgba((0, 64, 185, `num(0.5))));
-CssJs.unsafe({js|color|js}, {js|hsla(0 0% 0% /.5)|js});
+CssJs.color(`hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))));
 CssJs.color(`rgba((0, 51, 178, `percent(0.5))));
 CssJs.color(`rgba((0, 51, 178, `num(0.5))));
 CssJs.color(`rgba((0, 64, 185, `percent(0.5))));
@@ -760,7 +785,9 @@ CssJs.backgroundColor(`rgba((0, 51, 178, `percent(0.5))));
 CssJs.backgroundColor(`rgba((0, 51, 178, `num(0.5))));
 CssJs.backgroundColor(`rgba((0, 64, 185, `percent(0.5))));
 CssJs.backgroundColor(`rgba((0, 64, 185, `num(0.5))));
-CssJs.unsafe({js|backgroundColor|js}, {js|hsla(0 0% 0% /.5)|js});
+CssJs.backgroundColor(
+  `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
+);
 CssJs.backgroundColor(`rgba((0, 51, 178, `percent(0.5))));
 CssJs.backgroundColor(`rgba((0, 51, 178, `num(0.5))));
 CssJs.backgroundColor(`rgba((0, 64, 185, `percent(0.5))));
@@ -778,7 +805,9 @@ CssJs.borderColor(`rgba((0, 51, 178, `percent(0.5))));
 CssJs.borderColor(`rgba((0, 51, 178, `num(0.5))));
 CssJs.borderColor(`rgba((0, 64, 185, `percent(0.5))));
 CssJs.borderColor(`rgba((0, 64, 185, `num(0.5))));
-CssJs.unsafe({js|borderColor|js}, {js|hsla(0 0% 0% /.5)|js});
+CssJs.borderColor(
+  `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
+);
 CssJs.borderColor(`rgba((0, 51, 178, `percent(0.5))));
 CssJs.borderColor(`rgba((0, 51, 178, `num(0.5))));
 CssJs.borderColor(`rgba((0, 64, 185, `percent(0.5))));
@@ -796,7 +825,9 @@ CssJs.textDecorationColor(`rgba((0, 51, 178, `percent(0.5))));
 CssJs.textDecorationColor(`rgba((0, 51, 178, `num(0.5))));
 CssJs.textDecorationColor(`rgba((0, 64, 185, `percent(0.5))));
 CssJs.textDecorationColor(`rgba((0, 64, 185, `num(0.5))));
-CssJs.unsafe({js|textDecorationColor|js}, {js|hsla(0 0% 0% /.5)|js});
+CssJs.textDecorationColor(
+  `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
+);
 CssJs.textDecorationColor(`rgba((0, 51, 178, `percent(0.5))));
 CssJs.textDecorationColor(`rgba((0, 51, 178, `num(0.5))));
 CssJs.textDecorationColor(`rgba((0, 64, 185, `percent(0.5))));
@@ -894,8 +925,8 @@ CssJs.unsafe({js|justifyContent|js}, {js|flex-start|js});
 CssJs.unsafe({js|justifyContent|js}, {js|flex-end|js});
 CssJs.unsafe({js|justifyContent|js}, {js|space-between|js});
 CssJs.unsafe({js|justifyContent|js}, {js|space-around|js});
-CssJs.minHeight(`auto);
-CssJs.minWidth(`auto);
+CssJs.unsafe({js|minHeight|js}, {js|auto|js});
+CssJs.unsafe({js|minWidth|js}, {js|auto|js});
 CssJs.order(0);
 CssJs.order(1);
 CssJs.display(`grid);

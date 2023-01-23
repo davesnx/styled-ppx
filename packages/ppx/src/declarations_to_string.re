@@ -325,6 +325,7 @@ let overflow_inline =
     | `None => [%expr "none"]
     | `Optional_paged => [%expr "optional-paged"]
   );
+
 let color = apply(Parser.positive_integer, [%expr "color"], render_integer);
 let min_color = apply(Parser.positive_integer, [%expr "min-color"], render_integer);
 let max_color = apply(Parser.positive_integer, [%expr "max-color"], render_integer);
