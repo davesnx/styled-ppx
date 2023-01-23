@@ -70,8 +70,10 @@ and clip_source = [%value.rec "<url>"]
 and color = [%value.rec "<rgb()> | <rgba()> | <hsl()> | <hsla()> | <hex-color> | <named-color> | 'currentColor' | <deprecated-system-color> | <interpolation> | <var()>"]
 and color_stop = [%value.rec "<color-stop-length> | <color-stop-angle>"]
 and color_stop_angle = [%value.rec "[ <extended-angle> ]{1,2}"]
-and color_stop_length = [%value.rec "[ <extended-length> | <extended-percentage> ]{1,2}"]
-and color_stop_list = [%value.rec "[ <linear-color-stop> [ ',' <linear-color-hint> ]? ]# ',' <linear-color-stop>"]
+/* and color_stop_length = [%value.rec "[ <extended-length> | <extended-percentage> ]{1,2}"] */
+and color_stop_length = [%value.rec "<extended-length> | <extended-percentage>"]
+/* and color_stop_list = [%value.rec "[ <linear-color-stop> [ ',' <linear-color-hint> ]? ]# ',' <linear-color-stop>"] */
+and color_stop_list = [%value.rec "[<linear-color-stop> ]? [ ',' <linear-color-stop> ]# ',' <linear-color-stop>"]
 and combinator = [%value.rec "'>' | '+' | '~' | '||'"]
 and common_lig_values = [%value.rec "'common-ligatures' | 'no-common-ligatures'"]
 and compat_auto = [%value.rec "'searchfield' | 'textarea' | 'push-button' | 'slider-horizontal' | 'checkbox' | 'radio' | 'square-button' | 'menulist' | 'listbox' | 'meter' | 'progress-bar'"]
@@ -149,7 +151,10 @@ and function_image_set = [%value.rec "image-set( [ <image-set-option> ]# )"]
 and function_inset = [%value.rec "inset( [ <extended-length> | <extended-percentage> ]{1,4} [ 'round' <'border-radius'> ]? )"]
 and function_invert = [%value.rec "invert( <number-percentage> )"]
 and function_leader = [%value.rec "leader( <leader-type> )"]
-and function_linear_gradient = [%value.rec "linear-gradient( [ <extended-angle> | 'to' <side-or-corner> ]? ',' <color-stop-list> )"]
+and function_linear_gradient = [%value.rec "linear-gradient( [ <extended-angle> ]? <color-stop-list> )"]
+/* Simplified the spec to match with bs-css
+   #linearGradient(Angle.t, array<(Length.t, [< Color.t | Var.t] as 'colorOrVar)>) */
+/* and function_linear_gradient = [%value.rec "linear-gradient( [ <extended-angle> | 'to' <side-or-corner> ]? ',' <color-stop-list> )"] */
 and function_matrix = [%value.rec "matrix( [ <number> ]#{6} )"]
 and function_matrix3d = [%value.rec "matrix3d( [ <number> ]#{16} )"]
 and function_max = [%value.rec "max( [ <calc-sum> ]# )"]
@@ -718,7 +723,7 @@ and property_overflow = [%value.rec "[ 'visible' | 'hidden' | 'clip' | 'scroll' 
 and property_overflow_anchor = [%value.rec "'auto' | 'none'"]
 and property_overflow_block = [%value.rec "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto'"]
 and property_overflow_clip_box = [%value.rec "'padding-box' | 'content-box'"]
-and property_overflow_inline = [%value.rec "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | 'none | 'optional-paged' | 'paged'"]
+and property_overflow_inline = [%value.rec "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | 'none' | 'optional-paged' | 'paged'"]
 and property_overflow_wrap = [%value.rec "'normal' | 'break-word' | 'anywhere'"]
 and property_overflow_x = [%value.rec "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto'"]
 and property_overflow_y = [%value.rec "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto'"]
@@ -824,7 +829,7 @@ and property_text_decoration_color = [%value.rec "<color>"]
 /* Spec doesn't contain spelling-error and grammar-error: https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-line but this list used to have them | 'spelling-error' | 'grammar-error'. Leaving this comment here for reference */
 /* and this definition has changed from the origianl, it might be a bug on the spec or our Generator,
 but simplifying to "|" simplifies it and solves the bug */
-and property_text_decoration_line = [%value.rec "'none' | 'underline' | 'overline' | 'line-through' | 'blink'"]
+and property_text_decoration_line = [%value.rec "'none' | [ 'underline' | 'overline' | 'line-through' | 'blink' ]{1,2}"]
 and property_text_decoration_skip = [%value.rec "'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' ] || 'edges' || 'box-decoration'"]
 and property_text_decoration_skip_ink = [%value.rec "'auto' | 'all' | 'none'"]
 and property_text_decoration_style = [%value.rec "'solid' | 'double' | 'dotted' | 'dashed' | 'wavy'"]

@@ -1,6 +1,10 @@
 open Setup;
 open Reason_css_parser;
 open Parser;
+open Standard;
+open Combinator;
+open Modifier;
+open Rule.Match;
 
 let test = (parser, input, output) => (
   input,
@@ -71,6 +75,45 @@ let tests = [
     [%value "<calc()>"],
     "calc(100% - 25px)",
     ((ext_pct(100.), []), [(`Dash(), (len(`Px(25.)), []))]),
+  ),
+  test(
+    [%value "rare-function( [ <angle> ] ? ',' <color-stop-list> )"],
+    "rare-function(90deg, blue 10%, red 20%)",
+    (
+      Some(`Deg(90.)),
+      (),
+      (Some((`Named_color(`Blue), Some(ext_pct(10.)))), [
+        ((),
+          (`Named_color(`Blue), Some(ext_pct(10.))),
+        ),
+      ], (), (`Named_color(`Red), Some(ext_pct(20.))))
+    ),
+  ),
+  test(
+    [%value "rare-function( [ <angle> ] ? ',' <color-stop-list> )"],
+    "rare-function(blue 10%, red 20%)",
+    (
+      None,
+      (),
+      (Some((`Named_color(`Blue), Some(ext_pct(10.)))), [
+        ((),
+          (`Named_color(`Blue), Some(ext_pct(10.))),
+        ),
+      ], (), (`Named_color(`Red), Some(ext_pct(20.))))
+    ),
+  ),
+  test(
+    [%value "rare-function( [ <angle> ] ? ',' <color-stop-list> )"],
+    "rare-function(blue, red 20%)",
+    (
+      None,
+      (),
+      (Some((`Named_color(`Blue), Some(ext_pct(10.)))), [
+        ((),
+          (`Named_color(`Blue), Some(ext_pct(10.))),
+        ),
+      ], (), (`Named_color(`Red), Some(ext_pct(20.))))
+    ),
   ),
 ];
 

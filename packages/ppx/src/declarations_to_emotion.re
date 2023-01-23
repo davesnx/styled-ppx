@@ -971,43 +971,158 @@ let background_color =
     render_color,
   );
 
-let render_stop = (~loc, stop) => {
-  let (color, length) = stop;
-  let color = render_color_interp(~loc, color);
-  let length = render_length_interp(~loc, length);
-  [%expr ([%e length], [%e color])];
+let render_color_stop_length = (~loc, value: Types.color_stop_length) => {
+  switch (value) {
+  | `Extended_length(l) => render_extended_length(~loc, l)
+  | `Extended_percentage(p) => render_extended_percentage(~loc, p)
+  };
 };
 
-let render_stops = (~loc, stops) => {
-  let stops = List.map(render_stop(~loc), stops);
+let render_color_stop_angle = (~loc, value: Types.color_stop_angle) => {
+  switch (value) {
+  | [`Angle(a), _] => render_angle(~loc, a)
+  | [_, `Angle(a)] => render_angle(~loc, a)
+  | _ => raise(Unsupported_feature)
+  };
+};
+
+let render_linear_color_stop = (~loc, value: Types.linear_color_stop) => {
+  switch (value) {
+  | (color, None) => render_color(~loc, color)
+  | (color, Some(length)) => {
+      let color = render_color(~loc, color);
+      let length = render_color_stop_length(~loc, length);
+      [%expr ([%e color], [%e length])]
+    }
+  }
+};
+
+let render_angular_color_stop = (~loc, value: Types.angular_color_stop) => {
+  switch (value) {
+  | (color, None) => render_color(~loc, color)
+  | (color, Some(angle)) => {
+      let color = render_color(~loc, color);
+      let angle = render_color_stop_angle(~loc, angle);
+      [%expr ([%e color], [%e angle])]
+    }
+  }
+};
+
+/* and color_stop_list = [%value.rec "[ ',' <linear-color-stop> ]# ',' <linear-color-stop>"] */
+let render_color_stop_list = (~loc, value: Types.color_stop_list) => {
+  let (first, middle_stops, (), last_stop) = value;
+  let first_stop = Option.to_list(first);
+  let stops = first_stop |> List.append(middle_stops |> List.map((((_, stop))) => stop)) |> List.append([last_stop]);
+
+  stops
+    |> List.map((stop) => render_linear_color_stop(~loc, stop))
+    |> List.append([render_linear_color_stop(~loc, last_stop)])
+    |> Helper.Exp.array(~loc)
+};
+
+let render_angular_color_hint = (~loc, value: Types.angular_color_hint) => {
+  switch (value) {
+  | `Extended_percentage(pct) => render_extended_percentage(~loc, pct)
+  | `Extended_angle(a) => render_extended_angle(~loc, a)
+  };
+};
+
+let render_angular_color_stop_list = (~loc, value: Types.angular_color_stop_list) => {
+  let (rest_of_stops, _, last_stops) = value;
+  let stops = rest_of_stops |> List.map(((stop)) => {
+    switch (stop) {
+      | (stop, None) => render_angular_color_stop(~loc, stop)
+      | (stop, Some(((), color_hint: Types.angular_color_hint))) => {
+          let stop = render_angular_color_stop(~loc, stop);
+          let color_hint = render_angular_color_hint(~loc, color_hint);
+          [%expr ([%e stop], [%e color_hint])]
+        }
+    }
+  }) |> List.append([render_angular_color_stop(~loc, last_stops)]);
   Helper.Exp.array(~loc, stops);
 };
 
-let render_gradient = (~loc) => fun
-  | `Linear_gradient(angle, stops) =>
-    [%expr `linearGradient(([%e render_extended_angle(~loc, angle)], [%e render_stops(~loc, stops)]))]
-  | `Repeating_linear_gradient(angle, stops) =>
-    [%expr `repeatingLinearGradient(([%e render_extended_angle(~loc, angle)], [%e render_stops(~loc, stops)]))]
-  | `Radial_gradient(stops) =>
-    [%expr `radialGradient([%e render_stops(~loc, stops)])]
-  | `Repeating_radial_gradient(stops) =>
-    [%expr `repeatingRadialGradient([%e render_stops(~loc, stops)])]
-  | `conicGradient(angle, stops) =>
-    [%expr `conicGradient(([%e render_extended_angle(~loc, angle)], [%e render_stops(~loc, stops)]))]
-  | `Function_conic_gradient(_)
-  | `Function_linear_gradient(_)
-  | `Function_radial_gradient(_)
-  | `Function_repeating_linear_gradient(_)
-  | `Function_repeating_radial_gradient(_)
-  | `_legacy_gradient(_) => raise(Unsupported_feature)
-;
+let render_function_linear_gradient = (~loc, value: Types.function_linear_gradient) => {
+  switch (value) {
+    | (None, stops) =>
+      /* bs-css doesn't support non-angle. Default to 180deg */
+      [%expr `linearGradient((
+        [%e render_extended_angle(~loc, `Angle(`Deg(180.)))],
+        [%e render_color_stop_list(~loc, stops)]
+      ))]
+    | (Some(angle), stops) =>
+      [%expr `linearGradient((
+        [%e render_extended_angle(~loc, angle)],
+        [%e render_color_stop_list(~loc, stops)]
+      ))]
+  }
+};
+
+let render_function_repeating_linear_gradient = (~loc, value: Types.function_repeating_linear_gradient) => {
+  switch (value) {
+    | (Some(`Extended_angle(angle)), (), stops) =>
+      [%expr `repeatingLinearGradient((
+        [%e render_extended_angle(~loc, angle)],
+        [%e render_color_stop_list(~loc, stops)]
+      ))]
+    /* Other ways aren't supported in bs-css
+     | #repeatingLinearGradient(Angle.t, array<(Length.t, [< Color.t | Var.t] as 'colorOrVar)>) */
+    /* | (Some(`Static(_, side)), (), stops) =>
+      [%expr `repeatingLinearGradient((
+        [%e render_side_or_corner(~loc, side)],
+        [%e render_color_stop_list(~loc, stops)]
+      ))] */
+    | _=> raise(Unsupported_feature)
+  }
+};
+
+/* | #radialGradient(array<(Length.t, [< Color.t | Var.t] as 'colorOrVar)>) */
+let render_function_radial_gradient = (~loc, value: Types.function_radial_gradient) => {
+  switch (value) {
+    | (None, None, (), stops) =>
+      [%expr `radialGradient([%e render_color_stop_list(~loc, stops)])]
+    | _ => raise(Unsupported_feature)
+  }
+};
+
+/* | #repeatingRadialGradient(array<(Length.t, [< Color.t | Var.t] as 'colorOrVar)>) */
+let render_function_repeating_radial_gradient = (~loc, value: Types.function_repeating_radial_gradient) => {
+  switch (value) {
+    | (None, None, (), stops) =>
+      [%expr `radialGradient([%e render_color_stop_list(~loc, stops)])]
+    | _ => raise(Unsupported_feature)
+  }
+};
+
+/* | #conicGradient(Angle.t, array<(Length.t, [< Color.t | Var.t] as 'colorOrVar)>) */
+let render_function_conic_gradient = (~loc, value: Types.function_conic_gradient) => {
+  switch (value) {
+    | (None, None, (), stops) =>
+      [%expr `conicGradient([%e render_angular_color_stop_list(~loc, stops)])]
+    | _ => raise(Unsupported_feature)
+  }
+};
+
+let render_gradient = (~loc, value: Types.gradient) =>
+  switch (value) {
+    | `Function_linear_gradient(lg) => render_function_linear_gradient(~loc, lg)
+    | `Function_repeating_linear_gradient(rlg) => render_function_repeating_linear_gradient(~loc, rlg)
+    | `Function_radial_gradient(rg) => render_function_radial_gradient(~loc, rg)
+    | `Function_repeating_radial_gradient(rrg) => render_function_repeating_radial_gradient(~loc, rrg)
+    | `Function_conic_gradient(angle) => render_function_conic_gradient(~loc, angle)
+    | `_legacy_gradient(_) => raise(Unsupported_feature)
+  };
 
 let render_image = (~loc, value: Types.image) =>
   switch (value) {
-  | `Gradient(gradient) => render_gradient(~loc, gradient)
-  | `Url(url) => [%expr `url([%e render_string(~loc, url)])]
-  | `Interpolation(v) => render_variable(~loc, v)
-  | _ => raise(Unsupported_feature)
+    | `Gradient(gradient) => render_gradient(~loc, gradient);
+    | `Url(url) => [%expr `url([%e render_string(~loc, url)])]
+    | `Interpolation(v) => render_variable(~loc, v)
+    | `Function_element(_) => raise(Unsupported_feature)
+    | `Function_paint(_) => raise(Unsupported_feature)
+    | `Function_image(_) => raise(Unsupported_feature)
+    | `Function_image_set(_) => raise(Unsupported_feature)
+    | `Function_cross_fade(_) => raise(Unsupported_feature)
 };
 
 let render_bg_image = (~loc, value: Types.bg_image) =>
@@ -1297,8 +1412,7 @@ let render_line_width_interp =
   | `Line_width(lw) => render_line_width(~loc, lw)
   | `Interpolation(name) => render_variable(~loc, name);
 
-let render_border_style_interp =
-  (~loc) => fun
+let render_border_style_interp = (~loc) => fun
   | `Interpolation(name) => render_variable(~loc, name)
   | `Line_style(ls) => variant_to_expression(~loc, ls);
 
@@ -1489,7 +1603,22 @@ let overflow =
   );
 
 // let overflow_clip_margin = unsupportedProperty(Parser.property_overflow_clip_margin);
-let overflow_inline = unsupportedProperty(Parser.property_overflow_inline);
+let overflow_inline =
+  apply(
+    Parser.property_overflow_inline,
+    (~loc) => [%expr "overflow-inline"],
+    (~loc, value) => switch (value: Types.property_overflow_inline) {
+      | `Auto => [%expr "auto"]
+      | `Clip => [%expr "clip"]
+      | `Hidden => [%expr "hidden"]
+      | `Paged => [%expr "paged"]
+      | `Scroll => [%expr "scroll"]
+      | `Visible => [%expr "visible"]
+      | `None => [%expr "none"]
+      | `Optional_paged => [%expr "optional-paged"]
+    }
+  );
+
 let text_overflow =
   apply(
     Parser.property_text_overflow,
@@ -1701,10 +1830,12 @@ let font_variation_settings =
 let render_text_decoration_line = (~loc, value: Types.property_text_decoration_line) =>
   switch (value) {
   | `None => variant_to_expression(~loc, `None)
-  | `Underline => variant_to_expression(~loc, `Underline)
-  | `Overline => variant_to_expression(~loc, `Overline)
-  | `Line_through => variant_to_expression(~loc, `Line_Through)
-  | `Blink => variant_to_expression(~loc, `Blink)
+  | `Xor([`Underline]) => variant_to_expression(~loc, `Underline)
+  | `Xor([`Overline]) => variant_to_expression(~loc, `Overline)
+  | `Xor([`Line_through]) => variant_to_expression(~loc, `Line_Through)
+  | `Xor([`Blink]) => variant_to_expression(~loc, `Blink)
+  /* bs-css doesn't support multiple text decoration line */
+  | `Xor(_) => raise(Unsupported_feature)
   };
 
 let text_decoration_line =
