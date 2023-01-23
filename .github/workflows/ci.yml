@@ -172,7 +172,7 @@ jobs:
       - name: Download linux artifacts
         uses: actions/download-artifact@master
         with:
-          name: ubuntu-18.04
+          name: ubuntu-latest
           path: _release/platform-linux-x64
 
       - name: Download macOS artifacts
