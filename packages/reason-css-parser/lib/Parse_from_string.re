@@ -1,4 +1,3 @@
-let parse_tokens = Parser_helper.parse_tokens;
 let parse = Parser_helper.parse;
 
 module StringMap = Map.Make(String);

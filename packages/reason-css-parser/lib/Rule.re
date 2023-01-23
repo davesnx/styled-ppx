@@ -114,11 +114,12 @@ module Pattern = {
 
   let token = (expected, tokens) =>
     switch (tokens) {
-    | [token, ...tokens] =>
+    | [token, ...tokens] => {
       let data = expected(token);
       // if failed then keep the tokens intact
       let tokens = Result.is_ok(data) ? tokens : [token, ...tokens];
       (data, tokens);
+    }
     | [] => (Error(["missing the token expected"]), [])
     };
 
