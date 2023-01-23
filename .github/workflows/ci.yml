@@ -42,13 +42,13 @@ jobs:
 
       - name: Print esy cache
         id: print_esy_cache
-        run: node .github/workflows/print-esy-cache.js
+        run: echo "ESY_CACHE=$(node .github/workflows/print-esy-cache.js)" >> $GITHUB_OUTPUT
 
       - name: Load dependencies cache
         id: deps-cache
         uses: actions/cache@v3
         with:
-          path: ${{ steps.print_esy_cache.outputs.esy_cache }}
+          path: ${{ steps.print_esy_cache.outputs.ESY_CACHE }}
           key: build-${{ matrix.os }}-${{ hashFiles('**/index.json') }}
           restore-keys: build-${{ matrix.os }}-
 
@@ -136,7 +136,7 @@ jobs:
       - name: Get cache directory path
         id: yarn-cache-dir-path
         working-directory: ./packages/ppx/test/browser
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
 
       - name: Load global cache
         uses: actions/cache@v3
@@ -175,7 +175,7 @@ jobs:
 
       - name: Print short SHA
         id: sha
-        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
       - name: Download linux artifacts
         uses: actions/download-artifact@master
@@ -265,7 +265,7 @@ jobs:
           npm config set scope "@davesnx"
           npm version prerelease --preid ${{ steps.sha.outputs.sha_short }} -no-git-tag-version
           npm publish --access public --tag nightly
-          echo "::set-output name=version::$(npm view @davesnx/styled-ppx@nightly version)"
+          echo "version=$(npm view @davesnx/styled-ppx@nightly version)" >> $GITHUB_OUTPUT
 
       - name: Release NPM package
         if: ${{ success() && github.event_name != 'pull_request' }}
