@@ -1603,7 +1603,9 @@ let overflow =
   );
 
 // let overflow_clip_margin = unsupportedProperty(Parser.property_overflow_clip_margin);
-let overflow_inline =
+let overflow_inline = unsupportedProperty(Parser.property_overflow_inline);
+
+/* let overflow_inline =
   apply(
     Parser.property_overflow_inline,
     (~loc) => [%expr "overflow-inline"],
@@ -1617,7 +1619,7 @@ let overflow_inline =
       | `None => [%expr "none"]
       | `Optional_paged => [%expr "optional-paged"]
     }
-  );
+  ); */
 
 let text_overflow =
   apply(
