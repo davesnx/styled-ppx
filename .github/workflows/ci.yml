@@ -35,7 +35,7 @@ jobs:
           key: source-${{ matrix.os }}-${{ hashFiles('**/index.json') }}
 
       - name: Install esy
-        run: npm install -g esy@0.6.11
+        run: npm install -g esy@0.6.12
 
       - name: Install dependencies
         run: esy install
