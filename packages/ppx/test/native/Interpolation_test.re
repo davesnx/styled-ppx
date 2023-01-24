@@ -125,7 +125,7 @@ let properties_variable_css_tests = [
   ),
   (
     [%expr [%css "transition-duration: 500ms;"]],
-    [%expr CssJs.transitionDuration(`ms(500))]
+    [%expr CssJs.transitionDuration(500)]
   ),
   (
     [%expr [%css "transition-duration: $(duration);"]],
