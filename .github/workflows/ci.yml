@@ -97,7 +97,7 @@ jobs:
         run: esy release-static
 
       - name: Upload artifacts for ${{ matrix.os }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Release ${{ matrix.os }}
           path: _build/default/bin/ppx.exe
@@ -121,7 +121,7 @@ jobs:
         uses: actions/setup-node@v3
 
       - name: Download artifacts
-        uses: actions/download-artifact@master
+        uses: actions/download-artifact@v3
         with:
           name: ${{ matrix.os }}
           path: _build/default/bin
@@ -174,19 +174,19 @@ jobs:
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
       - name: Download linux artifacts
-        uses: actions/download-artifact@master
+        uses: actions/download-artifact@v3
         with:
           name: ubuntu-latest
           path: _release/platform-linux
 
       - name: Download macOS artifacts
-        uses: actions/download-artifact@master
+        uses: actions/download-artifact@v3
         with:
           name: macos-latest
           path: _release/platform-darwin
 
       # - name: Download windows artifacts
-      #   uses: actions/download-artifact@master
+      #   uses: actions/download-artifact@v3
       #   with:
       #     name: windows-latest
       #     path: _release/platform-windows
