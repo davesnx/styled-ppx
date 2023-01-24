@@ -99,7 +99,7 @@ jobs:
       - name: Upload artifacts for ${{ matrix.os }}
         uses: actions/upload-artifact@v3
         with:
-          name: Release ${{ matrix.os }}
+          name: ${{ matrix.os }}
           path: _build/default/bin/ppx.exe
 
       # Cleanup build cache in case dependencies have changed
