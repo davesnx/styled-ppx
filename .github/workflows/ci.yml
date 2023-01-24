@@ -8,14 +8,18 @@ on:
     branches:
       - main
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   build:
     name: Build
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest]
-        # os: [macos-latest, windows-latest, ubuntu-latest]
+        os: [ubuntu-latest, macos-latest] # Missing windows-latest
+
     steps:
       - uses: actions/checkout@v3
 
@@ -93,9 +97,9 @@ jobs:
         run: esy release-static
 
       - name: Upload artifacts for ${{ matrix.os }}
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@v2
         with:
-          name: ${{ matrix.os }}
+          name: Release ${{ matrix.os }}
           path: _build/default/bin/ppx.exe
 
       # Cleanup build cache in case dependencies have changed
@@ -105,13 +109,13 @@ jobs:
   e2e:
     name: Browser tests
     runs-on: ${{ matrix.os }}
+    needs: build
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-    needs: build
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
 
       - name: Use Node.js
         uses: actions/setup-node@v3
@@ -173,32 +177,32 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: ubuntu-latest
-          path: _release/platform-linux-x64
+          path: _release/platform-linux
 
       - name: Download macOS artifacts
         uses: actions/download-artifact@master
         with:
           name: macos-latest
-          path: _release/platform-darwin-x64
+          path: _release/platform-darwin
 
       # - name: Download windows artifacts
       #   uses: actions/download-artifact@master
       #   with:
       #     name: windows-latest
-      #     path: _release/platform-windows-x64
+      #     path: _release/platform-windows
 
       - name: Create archives for Github release
         run: |
-          cd _release/platform-darwin-x64
-          zip -r ../../styled-ppx-darwin-x64.zip .
+          cd _release/platform-darwin
+          zip -r ../../styled-ppx-darwin.zip .
           cd ../..
 
-          cd _release/platform-linux-x64
-          zip -r ../../styled-ppx-linux-x64.zip .
+          cd _release/platform-linux
+          zip -r ../../styled-ppx-linux.zip .
           cd ../..
 
-          # cd _release/platform-windows-x64
-          # zip -r ../../styled-ppx-windows-x64.zip .
+          # cd _release/platform-windows
+          # zip -r ../../styled-ppx-windows.zip .
           # cd ../..
 
       - name: Create Github release
@@ -213,37 +217,37 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload styled-ppx-darwin-x64.zip to Github release
+      - name: Upload styled-ppx-darwin.zip to Github release
         if: "startsWith(github.ref, 'refs/tags/v')"
         uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: styled-ppx-darwin-x64.zip
-          asset_name: styled-ppx-darwin-x64.zip
+          asset_path: styled-ppx-darwin.zip
+          asset_name: styled-ppx-darwin.zip
           asset_content_type: application/gzip
 
-      - name: Upload styled-ppx-linux-x64.zip to Github release
+      - name: Upload styled-ppx-linux.zip to Github release
         if: "startsWith(github.ref, 'refs/tags/v')"
         uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: styled-ppx-linux-x64.zip
-          asset_name: styled-ppx-linux-x64.zip
+          asset_path: styled-ppx-linux.zip
+          asset_name: styled-ppx-linux.zip
           asset_content_type: application/gzip
 
-      # - name: Upload styled-ppx-windows-x64.zip to Github release
+      # - name: Upload styled-ppx-windows.zip to Github release
       #   if: github.ref != 'refs/heads/master'
       #   uses: actions/upload-release-asset@v1.0.1
       #   env:
       #     GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       #   with:
       #     upload_url: ${{ steps.create_release.outputs.upload_url }}
-      #     asset_path: styled-ppx-windows-x64.zip
-      #     asset_name: styled-ppx-windows-x64.zip
+      #     asset_path: styled-ppx-windows.zip
+      #     asset_name: styled-ppx-windows.zip
       #     asset_content_type: application/gzip
 
       - name: Release nightly NPM package
