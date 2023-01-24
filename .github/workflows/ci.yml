@@ -177,13 +177,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ubuntu-18.04
-          path: _release/platform-linux
+          path: _release/platform-linux-x64
 
       - name: Download macOS artifacts
         uses: actions/download-artifact@v3
         with:
           name: macos-latest
-          path: _release/platform-darwin
+          path: _release/platform-darwin-x64
 
       # - name: Download windows artifacts
       #   uses: actions/download-artifact@v3
@@ -193,16 +193,16 @@ jobs:
 
       - name: Create archives for Github release
         run: |
-          cd _release/platform-darwin
-          zip -r ../../styled-ppx-darwin.zip .
+          cd _release/platform-linux-x64
+          zip -r ../../styled-ppx-linux-x64.zip .
           cd ../..
 
-          cd _release/platform-linux
-          zip -r ../../styled-ppx-linux.zip .
+          cd _release/platform-darwin-x64
+          zip -r ../../styled-ppx-darwin-x64.zip .
           cd ../..
 
-          # cd _release/platform-windows
-          # zip -r ../../styled-ppx-windows.zip .
+          # cd _release/platform-windows-x64
+          # zip -r ../../styled-ppx-windows-x64.zip .
           # cd ../..
 
       - name: Create Github release
@@ -217,26 +217,26 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload styled-ppx-darwin.zip to Github release
+      - name: Upload styled-ppx-darwin-x64.zip to Github release
         if: "startsWith(github.ref, 'refs/tags/v')"
         uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: styled-ppx-darwin.zip
-          asset_name: styled-ppx-darwin.zip
+          asset_path: styled-ppx-darwin-x64.zip
+          asset_name: styled-ppx-darwin-x64.zip
           asset_content_type: application/gzip
 
-      - name: Upload styled-ppx-linux.zip to Github release
+      - name: Upload styled-ppx-linux-x64.zip to Github release
         if: "startsWith(github.ref, 'refs/tags/v')"
         uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: styled-ppx-linux.zip
-          asset_name: styled-ppx-linux.zip
+          asset_path: styled-ppx-linux-x64.zip
+          asset_name: styled-ppx-linux-x64.zip
           asset_content_type: application/gzip
 
       # - name: Upload styled-ppx-windows.zip to Github release
