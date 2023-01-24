@@ -12,4 +12,4 @@ const esy3 = fs
   .sort()
   .pop();
 
-console.log(`::set-output name=esy_cache::${path.join(ESY_FOLDER, esy3, "i")}`);
+console.log(path.join(ESY_FOLDER, esy3, "i"));
