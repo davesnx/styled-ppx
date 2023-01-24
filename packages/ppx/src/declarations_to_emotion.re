@@ -2133,12 +2133,29 @@ let transition_property =
       | `Single_transition_property(_) => raise(Unsupported_feature)
   );
 
-let render_time = (~loc) => fun
-  | `Ms(f) => [%expr `ms([%e render_integer(~loc, f |> int_of_float)])]
-  | `S(f) => [%expr `s([%e render_integer(~loc, f |> int_of_float)])];
+/* bs-css doesn't support `S. PR: https://github.com/giraud/bs-css/pull/264 */
+/* let render_time = (~loc) => fun
+  | `Ms(f) => {
+    let value = int_of_float(f);
+    [%expr `ms([%e render_integer(~loc, value)])]
+  }
+  | `S(f) => {
+    let value = int_of_float(f);
+    [%expr `s([%e render_integer(~loc, value)])]
+  }; */
+
+let render_time_as_int = (~loc) => fun
+  | `Ms(f) => {
+    let value = int_of_float(f);
+    [%expr [%e render_integer(~loc, value)]]
+  }
+  | `S(f) => {
+    let value = f *. 1000.0 |> int_of_float;
+    [%expr [%e render_integer(~loc, value)]]
+  };
 
 let render_duration = (~loc) => fun
-  | `Time(t) => render_time(~loc, t)
+  | `Time(t) => render_time_as_int(~loc, t)
   | `Function_calc(fc) => render_function_calc(~loc, fc)
   | `Interpolation(v) => render_variable(~loc, v);
 
@@ -2198,7 +2215,7 @@ let transition_delay =
     Parser.property_transition_delay,
     (~loc) => [%expr CssJs.transitionDelay],
     (~loc) => fun
-      | [`Time(t)] => render_time(~loc, t)
+      | [`Time(t)] => render_time_as_int(~loc, t)
       | [`Interpolation(v)] => render_variable(~loc, v)
       | _ => raise(Unsupported_feature),
   );

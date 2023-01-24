@@ -3,8 +3,6 @@ open Combinator;
 open Rule.Let;
 open Rule.Pattern;
 
-let (let.ok) = Result.bind;
-
 let keyword = string => expect(IDENT(string));
 let comma = expect(COMMA);
 let delim = string => expect(DELIM(string));

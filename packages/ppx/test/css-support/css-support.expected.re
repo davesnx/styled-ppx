@@ -316,9 +316,9 @@ CssJs.transitionProperty({js|none|js});
 CssJs.transitionProperty({js|all|js});
 CssJs.transitionProperty({js|width|js});
 CssJs.unsafe({js|transitionProperty|js}, {js|width, height|js});
-CssJs.transitionDuration(`s(0));
-CssJs.transitionDuration(`s(1));
-CssJs.transitionDuration(`ms(100));
+CssJs.transitionDuration(0);
+CssJs.transitionDuration(1000);
+CssJs.transitionDuration(100);
 CssJs.transitionTimingFunction(`ease);
 CssJs.transitionTimingFunction(`linear);
 CssJs.transitionTimingFunction(`easeIn);
@@ -330,8 +330,8 @@ CssJs.transitionTimingFunction(`stepStart);
 CssJs.transitionTimingFunction(`stepEnd);
 CssJs.transitionTimingFunction(`steps((3, `start)));
 CssJs.transitionTimingFunction(`steps((5, `end_)));
-CssJs.transitionDelay(`s(1));
-CssJs.transitionDelay(`s(-1));
+CssJs.transitionDelay(1000);
+CssJs.transitionDelay(-1000);
 CssJs.unsafe({js|transition|js}, {js|1s 2s width linear|js});
 CssJs.unsafe({js|transitionTimingFunction|js}, {js|steps(2, jump-start)|js});
 CssJs.unsafe({js|transitionTimingFunction|js}, {js|steps(2, jump-end)|js});
@@ -339,9 +339,9 @@ CssJs.unsafe({js|transitionTimingFunction|js}, {js|steps(1, jump-both)|js});
 CssJs.unsafe({js|transitionTimingFunction|js}, {js|steps(2, jump-none)|js});
 CssJs.animationName({js|foo|js});
 CssJs.unsafe({js|animationName|js}, {js|foo, bar|js});
-CssJs.animationDuration(`s(0));
-CssJs.animationDuration(`s(1));
-CssJs.animationDuration(`ms(100));
+CssJs.animationDuration(0);
+CssJs.animationDuration(1000);
+CssJs.animationDuration(100);
 CssJs.animationTimingFunction(`ease);
 CssJs.animationTimingFunction(`linear);
 CssJs.animationTimingFunction(`easeIn);
@@ -362,15 +362,15 @@ CssJs.animationDirection(`reverse);
 CssJs.animationDirection(`alternateReverse);
 CssJs.animationPlayState(`running);
 CssJs.animationPlayState(`paused);
-CssJs.animationDelay(`s(1));
-CssJs.animationDelay(`s(-1));
+CssJs.animationDelay(1000);
+CssJs.animationDelay(-1000);
 CssJs.animationFillMode(`none);
 CssJs.animationFillMode(`forwards);
 CssJs.animationFillMode(`backwards);
 CssJs.animationFillMode(`both);
 CssJs.animation(
-  ~duration=`s(2),
-  ~delay=`s(1),
+  ~duration=2000,
+  ~delay=1000,
   ~direction=`alternate,
   ~timingFunction=`linear,
   ~fillMode=`both,
@@ -1927,3 +1927,5 @@ CssJs.transformOrigin(`pxFloat(2.), `left);
 CssJs.transform(`none);
 CssJs.unsafe({js|width|js}, {js|fit-content|js});
 CssJs.width(`maxContent);
+CssJs.transitionDelay(240);
+CssJs.animationDuration(150);

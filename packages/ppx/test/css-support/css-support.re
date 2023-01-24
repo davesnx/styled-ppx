@@ -3087,6 +3087,8 @@
 /* [%css {|math-depth: 0|}]; */
 /* [%css {|math-depth: 1|}]; */
 
+/* Random fixtures */
+
 [%css {|width: calc(50% + 4px)|}];
 [%css {|width: calc(20px - 10px)|}];
 [%css {|width: calc(100vh - calc(2rem + 120px))|}];
@@ -3166,3 +3168,8 @@
 /* [%css {|width: -webkit-fill-available;|}]; */
 [%css {|width: fit-content;|}];
 [%css {|width: max-content;|}];
+
+[%css {|transition-delay: 240ms|}];
+[%css {|animation-duration: 150ms|}];
+
+

@@ -311,6 +311,7 @@ let overflow_block =
     | `Scroll => [%expr "scroll"]
     | `Visible => [%expr "visible"],
   );
+
 let overflow_inline =
   apply(
     Parser.property_overflow_inline,

@@ -7,7 +7,6 @@ module StringMap = Map.Make(String);
 let (let.ok) = Result.bind;
 
 let apply_parser = (parser, tokens_with_loc) => {
-  open Standard;
   open Reason_css_lexer;
 
   let tokens =
