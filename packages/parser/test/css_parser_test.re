@@ -1,9 +1,11 @@
-open Setup;
+open Alcotest;
 
 module Lexer = Css_lexer;
 module Parser = Lexer.Parser;
 module Types = Css_types;
 module Debug = Types.Debug;
+
+open Types;
 
 let parse = (input) => {
   let container_lnum = 0;
@@ -18,8 +20,6 @@ let parse = (input) => {
   };
 };
 
-describe("CSS Parser", ({test, _}) => {
-  open Types;
 
   let loc = Location.none;
 
@@ -56,40 +56,37 @@ describe("CSS Parser", ({test, _}) => {
         loc,
       ),
     ),
-  ];
+  ] |> List.mapi((_index, (input, output)) => {
+    let stylesheet: Types.Stylesheet.t = parse(input) |> Result.get_ok;
+    let inputTokens = Debug.render_stylesheet(stylesheet);
+    let outputTokens = Debug.render_stylesheet(output);
 
-  List.iter(
-    ((input, output)) =>
-      test(
-        "should succeed parsing: " ++ input,
-        ({expect, _}) => {
-          let stylesheet: Types.Stylesheet.t = parse(input) |> Result.get_ok;
-          let inputTokens = Debug.render_stylesheet(stylesheet);
-          let outputTokens = Debug.render_stylesheet(output);
-          expect.string(inputTokens).toEqual(outputTokens);
-        },
-      ),
-    success_tests_data,
-  );
+    let assertion = () =>
+      check(
+        string,
+        "should match" ++ input,
+        inputTokens, outputTokens
+    );
 
-  let error_tests_data = [
-    (
-      "{}", "Parse error while reading token '{'",
-    ),
-    (
-      "div { color: red; _ }", "Parse error while reading token '}'",
-    ),
-  ]
-
-  List.iter(
-    ((input, output)) =>
-      test(
-        "should error lexing: " ++ input,
-        ({expect, _}) => {
-          let errorInput = parse(input) |> Result.get_error;
-          expect.string(errorInput).toEqual(output);
-        },
-      ),
-    error_tests_data,
-  );
+    (input, `Quick, assertion);
 });
+
+let error_tests_data = [
+  (
+    "{}", "Parse error while reading token '{'",
+  ),
+  (
+    "div { color: red; _ }", "Parse error while reading token '}'",
+  ),
+] |> List.mapi((_index, (input, output)) => {
+    let assertion = () =>
+      check(
+        string,
+        "should error" ++ input,
+        parse(input) |> Result.get_error, output
+    );
+
+    (input, `Quick, assertion);
+});
+
+let tests = List.append(success_tests_data, error_tests_data);
