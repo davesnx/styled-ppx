@@ -1,17 +1,11 @@
-(library
- (name ReasonCSSLexerTest)
- (ocamlopt_flags -linkall -g)
- (libraries reason-css-lexer.lib rely.lib)
- (modules
-  (:standard \ Runner)))
+(test
+ (name Tokenizer_test)
+ (libraries reason-css-lexer.lib alcotest))
 
-(executable
- (name Runner)
- (libraries ReasonCSSLexerTest)
- (modules Runner))
+; This creates an alias "css_lexer_test" that can be run with `dune build @css_lexer_test`
 
 (rule
  (alias css_lexer_test)
- (deps Runner.exe)
+ (deps Tokenizer_test.exe)
  (action
   (run %{deps})))
