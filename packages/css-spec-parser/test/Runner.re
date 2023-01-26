@@ -1,1 +1,0 @@
-CSSSpecParserTest.Setup.cli();

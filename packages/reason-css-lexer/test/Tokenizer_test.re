@@ -130,5 +130,4 @@ let tests = [
     (input, `Quick, assertion);
 });
 
-
 Alcotest.run("CSS Lexer", [("Tokenizer", tests)])

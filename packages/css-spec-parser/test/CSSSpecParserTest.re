@@ -1,4 +1,4 @@
-open Setup;
+open Alcotest;
 open Css_spec_parser;
 
 let parse_tests = [
@@ -214,47 +214,44 @@ let parse_tests = [
     "','",
     Terminal(Delim(","), One),
   ),
-];
+] |> List.mapi((_, (result, expected)) => {
+  let result =
+  switch (value_of_string(result)) {
+  | Some(result) => result
+  | None => failwith("Failed to parse")
+  };
 
-describe("Parse value", ({test, _}) => {
-  parse_tests
-    |> List.iteri((_, (result, expected)) =>
-      test(
-        "\"" ++ result ++ "\"",
-        ({ expect, _ }) => {
-          let result =
-            switch (value_of_string(result)) {
-            | Some(result) => result
-            | None => failwith("Failed to parse")
-            };
-          let expected = show_value(expected);
-          let result = show_value(result);
-          expect.string(result).toEqual(expected);
-        },
-      )
-  );
+  let assertion = () =>
+    check(
+      string,
+      "Should match",
+      show_value(expected), show_value(result)
+    );
+
+  (show_value(result), `Quick, assertion);
 });
 
 let print_tests = [
   ("  a b   |   c ||   d &&   e f", "'a' 'b' | 'c' || 'd' && 'e' 'f'"),
   ("[ a b ] | [ c || [ d && [ e f ]]]", "'a' 'b' | 'c' || 'd' && 'e' 'f'"),
   ("'[' abc ']'", "'[' 'abc' ']'"),
-];
+] |> List.mapi((_index, (input, expected)) => {
 
-describe("Print value", ({test, _}) => {
-  print_tests
-    |> List.iteri((index, (result, expected)) =>
-      test(
-        "print: " ++ string_of_int(index),
-        ({expect, _}) => {
-          let result =
-            switch (value_of_string(result)) {
-            | Some(result) => result
-            | None => failwith("Failed to parse")
-            };
-          let result = string_of_value(result);
-          expect.string(result).toEqual(expected);
-        },
-      )
-    );
-});
+    let result =
+      switch (value_of_string(input)) {
+      | Some(res) => res
+      | None => fail("Failed to parse")
+      };
+
+    let assertion = () =>
+      check(
+        string,
+        "Should match",
+        string_of_value(result), expected
+      );
+
+    (show_value(result), `Quick, assertion);
+  }
+);
+
+Alcotest.run("CSS Spec Parser", [("Parser", parse_tests), ("Printer", print_tests)])
