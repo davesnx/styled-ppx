@@ -1,7 +1,7 @@
 (library
  (name reason_css_parser_ppx_lib)
  (wrapped false)
- (libraries ocaml-migrate-parsetree css-spec-parser.lib ppxlib)
+ (libraries ocaml-migrate-parsetree styled-ppx.css-spec-parser ppxlib)
  (modules Generate)
  (preprocess
   (pps ppxlib.metaquot)))
@@ -12,7 +12,7 @@
  (wrapped false)
  (libraries
   ocaml-migrate-parsetree
-  css-spec-parser.lib
+  styled-ppx.css-spec-parser
   ppxlib
   reason_css_parser_ppx_lib)
  (modules Reason_css_parser_ppx)

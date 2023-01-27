@@ -1,6 +1,6 @@
 (test
  (name CSSSpecParserTest)
- (libraries css-spec-parser.lib alcotest))
+ (libraries styled-ppx.css-spec-parser alcotest))
 
 (rule
  (alias css_spec_parser_test)

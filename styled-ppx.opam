@@ -1,0 +1,44 @@
+opam-version: "2.0"
+synopsis: "Type-safe styled components for ReScript with type-safe CSS"
+description: """
+styled-ppx is the ppx that brings typed styled components to ReScript, allowing you to create React Components with type-safe style definitions with CSS.
+"""
+maintainer: "David Sancho <dsnxmoreno@gmail.com>"
+authors: "David Sancho <dsnxmoreno@gmail.com>"
+license: "MIT"
+homepage: "https://styled-ppx.vercel.app"
+bug-reports: "https://github.com/davesnx/styled-ppx/issues"
+depends: [
+  "alcotest-lwt" {= "1.6.0"}
+  "alcotest" {= "1.6.0"}
+  "dune" {>= "3.0"}
+  "lwt_ppx" {= "2.1.0"}
+  "menhir" {= "20220210"}
+  "ocaml-migrate-parsetree" {= "2.4.0"}
+  "ocaml" {= "4.14.0"}
+  "patdiff" {= "v0.15.0"}
+  "ppx_deriving" {= "5.2.1"}
+  "ppxlib" {= "0.27.0"}
+  "reason" {= "3.8.1"}
+  "sedlex" {= "3.0"}
+  "ocaml-lsp-server" {dev}
+  "ocamlformat" {dev}
+  "utop" {dev}
+]
+build: [
+  ["dune" "subst"] {dev}
+  [
+    "dune"
+    "build"
+    "-p"
+    name
+    "-j"
+    jobs
+    "--promote-install-files=false"
+    "@install"
+    "@runtest" {with-test}
+    "@doc" {with-doc}
+  ]
+  ["dune" "install" "-p" name "--create-install-files" name]
+]
+dev-repo: "git+https://github.com/davesnx/styled-ppx.git"
