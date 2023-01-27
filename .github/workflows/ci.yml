@@ -18,7 +18,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-18.04, macos-latest] # Missing windows-latest
+        os: [ubuntu-18.04, macos-latest, windows-latest]
 
     steps:
       - uses: actions/checkout@v3
@@ -185,11 +185,11 @@ jobs:
           name: macos-latest
           path: _release/platform-darwin-x64
 
-      # - name: Download windows artifacts
-      #   uses: actions/download-artifact@v3
-      #   with:
-      #     name: windows-latest
-      #     path: _release/platform-windows-x64
+      - name: Download windows artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: windows-latest
+          path: _release/platform-windows-x64
 
       - name: Create archives for Github release
         run: |
@@ -239,16 +239,16 @@ jobs:
           asset_name: styled-ppx-linux-x64.zip
           asset_content_type: application/gzip
 
-      # - name: Upload styled-ppx-windows-x64.zip to Github release
-      #   if: github.ref != 'refs/heads/master'
-      #   uses: actions/upload-release-asset@v1.0.1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-      #   with:
-      #     upload_url: ${{ steps.create_release.outputs.upload_url }}
-      #     asset_path: styled-ppx-windows-x64.zip
-      #     asset_name: styled-ppx-windows-x64.zip
-      #     asset_content_type: application/gzip
+      - name: Upload styled-ppx-windows-x64.zip to Github release
+        if: github.ref != 'refs/heads/master'
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: styled-ppx-windows-x64.zip
+          asset_name: styled-ppx-windows-x64.zip
+          asset_content_type: application/gzip
 
       - name: Release nightly NPM package
         if: ${{ success() && github.event_name == 'pull_request' && github.event.pull_request.user.login == 'davesnx' }}
