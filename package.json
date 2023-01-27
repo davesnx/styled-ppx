@@ -36,8 +36,6 @@
     "@opam/sedlex": "3.0",
     "@opam/patdiff": "v0.15.0",
     "@opam/utop": "2.10.0",
-    "@reason-native/rely":
-      "jfrolich/reason-native:rely.json#08085a4048974b06aaf3aab918b677b39dea3d18",
     "ocaml": "4.14.0",
     "refmterr":
       "jfrolich/reason-native:refmterr.json#08085a4048974b06aaf3aab918b677b39dea3d18"
@@ -56,7 +54,7 @@
     "test_css_spec_types": "esy dune build @css_spec_types_test",
     "build_test_bs": "cd packages/ppx/test/browser; yarn build",
     "test_bs": "cd packages/ppx/test/browser; yarn; yarn build; yarn test",
-    "dev": "esy refmterr dune build --root . --watch",
+    "dev": "esy dune build --root . --watch",
     "release-static":
       "esy b dune build --root . --ignore-promoted-rules --no-config --profile release-static --only-packages styled-ppx,reason-css-parser,reason-css-lexer,css-spec-parser,styled-ppx-css-parser,string-interpolation",
     "ast": "esy dune exec packages/renderer/ast_renderer.exe --",
