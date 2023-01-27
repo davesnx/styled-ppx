@@ -1,26 +1,22 @@
-(library
- (name StyledPpxTestNativeLib)
+(test
+ (name Runner)
  (modules
-  (:standard \ runner static_css_tests))
- (library_flags
-  (-linkall -g))
- (libraries MockBsCss rely.lib styled-ppx.lib ppxlib)
+  (:standard \ static_css_tests))
+ ; stadanlone
+ (libraries MockBsCss alcotest styled-ppx.lib ppxlib)
  (preprocess
   (pps ppxlib.metaquot styled-ppx.lib -- -no-merge)))
-
-(executable
- (name runner)
- (modules runner)
- (libraries StyledPpxTestNativeLib styled-ppx-css-parser))
-
-; type check
 
 (rule
  (alias native_typecheck_test)
  (targets static_css_tests.ml)
- (deps ./runner.exe)
+ (deps Runner.exe)
  (action
   (run %{deps})))
+
+; Here is a method to ensure our tests type-check against
+; bs-css's types. We use a mock (`MockBsCss`) of those since bs-css isn't available in dune
+; The trick is to create a library `StyledPpxTestNativeTypeCheck` that includes the mock so the compiler does the type-check for us
 
 (library
  (name StyledPpxTestNativeTypeCheck)

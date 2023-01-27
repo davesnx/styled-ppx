@@ -2,13 +2,8 @@ open Alcotest;
 open Ppxlib;
 
 let loc = Location.none;
-let compare = (input, expected, {expect, _}) => {
-  let result = Pprintast.string_of_expression(input);
-  let expected = Pprintast.string_of_expression(expected);
-  expect.string(result).toEqual(expected);
-};
 
-let css_tests = [
+let tests = [
   (
     "ignore in style_rule",
     [%expr [%cx ".bar{}"]],
@@ -93,14 +88,15 @@ let css_tests = [
     html,             body, #root, .class   {     margin: 0    } |}]],
     [%expr ignore(CssJs.global(. {js|html, body, #root, .class|js}, [| CssJs.margin(`zero) |]))],
   ),
-];
-
-describe("Should treat Whitespace accordingly", ({test, _}) => {
-  css_tests |>
-    List.iteri((_index, (title, result, expected)) =>
-      test(
-        title,
-        compare(result, expected),
-      )
-    );
-});
+] |> List.map((item) => {
+    let (title, input, expected) = item;
+    test_case(
+      title,
+      `Quick,
+      () => {
+        let pp_expr = (ppf, x) => Fmt.pf(ppf, "%S", Pprintast.string_of_expression(x));
+        let check_expr = testable(pp_expr, ( == ));
+        check(check_expr, "", expected, input)
+      }
+    )
+  });

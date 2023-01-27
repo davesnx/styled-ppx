@@ -3,14 +3,8 @@ open Ppxlib;
 
 let loc = Location.none;
 
-let compare = (input, expected, {expect, _}) => {
-  let result = Pprintast.string_of_expression(input);
-  let expected = Pprintast.string_of_expression(expected);
-  expect.string(result).toEqual(expected);
-};
-
 /* https://www.w3.org/TR/mediaqueries-5 */
-let media_query_cases = [
+let media_query_tests = [
   /* (
     "(min-width: 33px)",
     [%expr [%cx "@media (min-width: 33px) {}"]],
@@ -71,17 +65,7 @@ let media_query_cases = [
  /* "@media screen, print and (color) {}" */
 ];
 
-describe("Should transform @media", ({test, _}) => {
-  media_query_cases |>
-    List.iteri((_index, (title, result, expected)) =>
-      test(
-        title,
-        compare(result, expected),
-      )
-    );
-});
-
-let keyframe_cases = [
+let keyframe_tests = [
   (
     {|%keyframe "0% { color: red } 100% { color: green }"|},
     [%expr [%keyframe "0% { color: red } 100% { color: green }"]],
@@ -99,12 +83,18 @@ let keyframe_cases = [
   ),
 ];
 
-describe("Should transform @keyframes", ({test, _}) => {
-  keyframe_cases |>
-    List.iteri((_index, (title, result, expected)) =>
-      test(
-        title,
-        compare(result, expected),
-      )
+let runner = tests =>
+  List.map((item) => {
+    let (title, input, expected) = item;
+    test_case(
+      title,
+      `Quick,
+      () => {
+        let pp_expr = (ppf, x) => Fmt.pf(ppf, "%S", Pprintast.string_of_expression(x));
+        let check_expr = testable(pp_expr, ( == ));
+        check(check_expr, "", expected, input)
+      }
     );
-});
+  }, tests);
+
+let tests = List.append(runner(media_query_tests), runner(keyframe_tests));

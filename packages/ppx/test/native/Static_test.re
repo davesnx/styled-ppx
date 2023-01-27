@@ -4,8 +4,9 @@ open Ppxlib;
 let loc = Location.none;
 
 let extract_tests = array_expr => {
-  let fail = () =>
-    failwith("Extracting the expression from the test cases failed. The expected type is `array((result, expected))`.");
+  let fail = () => {
+    Alcotest.fail("Extracting the expression from the test cases failed.\nThe expected type is `array((result, expected))`. Where `result` and `expected` are `Ppxlib.expresson`.");
+  };
 
   let payload = Ast_pattern.(
     pexp_array(
@@ -47,12 +48,6 @@ let write_tests_to_file = (
   let fd = open_out(file);
   output_string(fd, code);
   close_out(fd);
-};
-
-let compare = (input, expected, {expect, _}) => {
-  let result = Pprintast.string_of_expression(input);
-  let expected = Pprintast.string_of_expression(expected);
-  expect.string(result).toEqual(expected);
 };
 
 /* The tests that are commented, means that we don't support them safely */
@@ -515,15 +510,23 @@ let properties_static_css_tests = [%expr
   |]
 ];
 
-describe("Transform [%css] to bs-css", ({test, _}) => {
-  let test = (prefix, index, (input, expected)) =>
-    test(prefix ++ string_of_int(index), compare(input, expected));
+let runner = tests =>
+  List.map((item) => {
+    let (input, expected) = item;
+    test_case(
+      Pprintast.string_of_expression(input),
+      `Quick,
+      () => {
+        let pp_expr = (ppf, x) => Fmt.pf(ppf, "%S", Pprintast.string_of_expression(x));
+        let check_expr = testable(pp_expr, ( == ));
+        check(check_expr, "", expected, input)
+      }
+    )
+  }, tests);
 
-  let properties_static_css_tests =
-    extract_tests(properties_static_css_tests);
+let properties_static_css_tests =
+  extract_tests(properties_static_css_tests);
 
-  /* We write the tests to files so the Typecheker runs on them and ensures it's a valid with bs-css interfaces */
-  write_tests_to_file(properties_static_css_tests, "static_css_tests.ml");
+let tests = runner(properties_static_css_tests);
 
-  List.iteri(test("properties static: "), properties_static_css_tests);
-});
+write_tests_to_file(properties_static_css_tests, "static_css_tests.ml");

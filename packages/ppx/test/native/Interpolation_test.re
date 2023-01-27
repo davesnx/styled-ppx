@@ -3,108 +3,125 @@ open Ppxlib;
 
 let loc = Location.none;
 
-let compare = (input, expected, {expect, _}) => {
-  let result = Pprintast.string_of_expression(input);
-  let expected = Pprintast.string_of_expression(expected);
-  expect.string(result).toEqual(expected);
-};
-
-let properties_variable_css_tests = [
+let tests = [
   (
-    [%expr [%css "color: $(mono100);"]],
+    "color: $(mono100)",
+    [%expr [%css "color: $(mono100)"]],
     [%expr (CssJs.color(mono100) : CssJs.rule)]
   ),
   (
-    [%expr [%css "margin: $(Size.big) $(Size.small);"]],
+    "margin: $(Size.big) $(Size.small)",
+    [%expr [%css "margin: $(Size.big) $(Size.small)"]],
     [%expr CssJs.margin2(~v=Size.big, ~h=Size.small)]
   ),
   (
-    [%expr [%css "color: $(mono100);"]],
+    "color: $(mono100)",
+    [%expr [%css "color: $(mono100)"]],
     [%expr (CssJs.color(mono100) : CssJs.rule)]
   ),
   (
-    [%expr [%css "padding: $(Size.small) 0px;"]],
+    "padding: $(Size.small) 0px;",
+    [%expr [%css "padding: $(Size.small) 0px"]],
     [%expr CssJs.padding2(~v=Size.small, ~h=`pxFloat(0.))]
   ),
   (
-    [%expr [%css "border: 1px solid $(Color.Border.alpha);"]],
+    "border: 1px solid $(Color.Border.alpha)",
+    [%expr [%css "border: 1px solid $(Color.Border.alpha)"]],
     [%expr CssJs.border(`pxFloat(1.), `solid, Color.Border.alpha)]
   ),
   (
-    [%expr [%css "outline: 1px solid $(Color.Border.alpha);"]],
+    "outline: 1px solid $(Color.Border.alpha)",
+    [%expr [%css "outline: 1px solid $(Color.Border.alpha)"]],
     [%expr CssJs.outline(`pxFloat(1.), `solid, Color.Border.alpha)]
   ),
   (
-    [%expr [%css "border-bottom: 0px solid $(Color.Border.alpha);"]],
+    "border-bottom: 0px solid $(Color.Border.alpha)",
+    [%expr [%css "border-bottom: 0px solid $(Color.Border.alpha)"]],
     [%expr CssJs.borderBottom(`pxFloat(0.), `solid, Color.Border.alpha)]
   ),
   (
-    [%expr [%css "width: $(width);"]],
+    "width: $(width)",
+    [%expr [%css "width: $(width)"]],
     [%expr (CssJs.width(width) : CssJs.rule)]
   ),
   (
-    [%expr [%css "max-width: $(max);"]],
+    "max-width: $(max)",
+    [%expr [%css "max-width: $(max)"]],
     [%expr (CssJs.maxWidth(max) : CssJs.rule)]
   ),
   (
-    [%expr [%css "height: $(height);"]],
+    "height: $(height)",
+    [%expr [%css "height: $(height)"]],
     [%expr (CssJs.height(height) : CssJs.rule)]
   ),
   (
-    [%expr [%css "border-radius: $(border);"]],
+    "border-radius: $(border)",
+    [%expr [%css "border-radius: $(border)"]],
     [%expr (CssJs.borderRadius(border) : CssJs.rule)]
   ),
   (
-    [%expr [%css "font-size: $(font);"]],
+    "font-size: $(font)",
+    [%expr [%css "font-size: $(font)"]],
     [%expr (CssJs.fontSize(font) : CssJs.rule)]
   ),
   (
-    [%expr [%css "font-family: $(mono);"]],
+    "font-family: $(mono)",
+    [%expr [%css "font-family: $(mono)"]],
     [%expr CssJs.fontFamily(mono)]
   ),
   (
-    [%expr [%css "line-height: $(lh);"]],
+    "line-height: $(lh)",
+    [%expr [%css "line-height: $(lh)"]],
     [%expr (CssJs.lineHeight(lh) : CssJs.rule)]
   ),
   (
-    [%expr [%css "z-index: $(zLevel);"]],
+    "z-index: $(zLevel)",
+    [%expr [%css "z-index: $(zLevel)"]],
     [%expr (CssJs.zIndex(zLevel) : CssJs.rule)]
   ),
   (
-    [%expr [%css "left: $(left);"]],
+    "left: $(left)",
+    [%expr [%css "left: $(left)"]],
     [%expr (CssJs.left(left) : CssJs.rule)]
   ),
   (
-    [%expr [%css "text-decoration-color: $(decorationColor);"]],
+    "text-decoration-color: $(decorationColor)",
+    [%expr [%css "text-decoration-color: $(decorationColor)"]],
     [%expr (CssJs.textDecorationColor(decorationColor) : CssJs.rule)]
   ),
   (
+    "background-image: $(wat);",
     [%expr [%css "background-image: $(wat);" ]],
     [%expr (CssJs.backgroundImage(wat) : CssJs.rule)],
   ),
   (
+    "mask-image: $(externalImageUrl);",
     [%expr [%css "mask-image: $(externalImageUrl);" ]],
     [%expr (CssJs.maskImage(externalImageUrl) : CssJs.rule)],
   ),
   (
-    [%expr [%css "text-shadow: $(h) $(v) $(blur) $(color);"]],
+    "text-shadow: $(h) $(v) $(blur) $(color)",
+    [%expr [%css "text-shadow: $(h) $(v) $(blur) $(color)"]],
     [%expr CssJs.textShadow(
       CssJs.Shadow.text(~x=h, ~y=v, ~blur=blur, color)
     )]
   ),
   (
-    [%expr [%css "color: $(Theme.blue);"]],
+    "color: $(Theme.blue)",
+    [%expr [%css "color: $(Theme.blue)"]],
     [%expr (CssJs.color(Theme.blue) : CssJs.rule)]
   ),
   /* Changed properties */
   (
-    [%expr [%css "box-shadow: $(h) $(v) $(blur) $(spread) $(color);"]],
+    "box-shadow: $(h) $(v) $(blur) $(spread) $(color)",
+    [%expr [%css "box-shadow: $(h) $(v) $(blur) $(spread) $(color)"]],
     [%expr CssJs.boxShadows([|
       CssJs.Shadow.box(~x=h, ~y=v, ~blur=blur, ~spread=spread, color)
     |])]
   ),
   (
-    [%expr [%css "box-shadow: 10px 10px 0px $(spread) $(color);"]],
+    "box-shadow: 10px 10px 0px $(spread) $(color)",
+    [%expr [%css "box-shadow: 10px 10px 0px $(spread) $(color)"]],
     [%expr CssJs.boxShadows([|
       CssJs.Shadow.box(
         ~x=`pxFloat(10.),
@@ -116,37 +133,44 @@ let properties_variable_css_tests = [
     |])]
   ),
   (
-    [%expr [%css "box-shadow: $(BoxShadow.elevation);"]],
+    "box-shadow: $(BoxShadow.elevation)",
+    [%expr [%css "box-shadow: $(BoxShadow.elevation)"]],
     [%expr (CssJs.boxShadows(BoxShadow.elevation): CssJs.rule)]
   ),
   (
-    [%expr [%css "text-overflow: $(clip);"]],
+    "text-overflow: $(clip)",
+    [%expr [%css "text-overflow: $(clip)"]],
     [%expr (CssJs.textOverflow(clip): CssJs.rule)]
   ),
   (
-    [%expr [%css "transition-duration: 500ms;"]],
+    "transition-duration: 500ms;",
+    [%expr [%css "transition-duration: 500ms"]],
     [%expr CssJs.transitionDuration(500)]
   ),
   (
-    [%expr [%css "transition-duration: $(duration);"]],
+    "transition-duration: $(duration)",
+    [%expr [%css "transition-duration: $(duration)"]],
     [%expr (CssJs.transitionDuration(duration): CssJs.rule)]
   ),
   (
-    [%expr [%css "animation-play-state: $(state);"]],
+    "animation-play-state: $(state)",
+    [%expr [%css "animation-play-state: $(state)"]],
     [%expr (CssJs.animationPlayState(state): CssJs.rule)]
   ),
   (
-    [%expr [%css "animation-play-state: paused;"]],
+    "animation-play-state: paused;",
+    [%expr [%css "animation-play-state: paused"]],
     [%expr CssJs.animationPlayState(`paused)]
   ),
-];
-
-describe("Should bind to bs-css with interpolated variables", ({test, _}) => {
-  properties_variable_css_tests |>
-    List.iteri((_index, (result, expected)) =>
-      test(
-        "simple variable: " ++ Pprintast.string_of_expression(expected),
-        compare(result, expected),
-      )
-    );
+] |> List.map((item) => {
+  let (title, input, expected) = item;
+  test_case(
+    title,
+    `Quick,
+    () => {
+      let pp_expr = (ppf, x) => Fmt.pf(ppf, "%S", Pprintast.string_of_expression(x));
+      let check_expr = testable(pp_expr, ( == ));
+      check(check_expr, "", expected, input)
+    }
+  );
 });

@@ -3,12 +3,6 @@ open Ppxlib;
 
 let loc = Location.none;
 
-let compare = (input, expected, {expect, _}) => {
-  let result = Pprintast.string_of_expression(input);
-  let expected = Pprintast.string_of_expression(expected);
-  expect.string(result).toEqual(expected);
-};
-
 let simple_tests = [
   (
     ".a",
@@ -88,17 +82,7 @@ let simple_tests = [
   ), */
 ];
 
-describe("Should transform simple selectors", ({ test, _ }) => {
-  List.iteri((_index, (title, result, expected)) =>
-    test(
-      title,
-      compare(result, expected),
-    ),
-    simple_tests
-  );
-});
-
-let compound_test = [
+let compound_tests = [
   (
     "&.bar",
     [%expr [%cx {js|&.bar {}|js}]],
@@ -140,16 +124,6 @@ let compound_test = [
     [%expr CssJs.style(. [|CssJs.selector(. {js|p #first-child::before:hover|js}, [||])|])]
   ), */
 ];
-
-describe("Should transform compound selectors", ({ test, _ }) => {
-  List.iteri((_index, (title, result, expected)) =>
-    test(
-      title,
-      compare(result, expected),
-    ),
-    compound_test
-  );
-});
 
 let complex_tests = [
   (
@@ -279,16 +253,6 @@ let complex_tests = [
   ),
 ];
 
-describe("Should transform complex selectors", ({ test, _ }) => {
-  List.iteri((_index, (title, result, expected)) =>
-    test(
-      title,
-      compare(result, expected),
-    ),
-    complex_tests
-  );
-});
-
 let stylesheet_tests = [
   (
     "html, body",
@@ -317,16 +281,6 @@ let stylesheet_tests = [
   ),
 ];
 
-describe("Should transform stylesheet selectors", ({ test, _ }) => {
-  List.iteri((_index, (title, result, expected)) =>
-    test(
-      title,
-      compare(result, expected),
-    ),
-    stylesheet_tests
-  );
-});
-
 let nested_tests = [
   (
     ".a",
@@ -349,14 +303,26 @@ let nested_tests = [
       |]
     )],
   ),
-];
+]
 
-describe("Should nested selectors", ({ test, _ }) => {
-  List.iteri((_index, (title, result, expected)) =>
-    test(
+let runner = tests =>
+  List.map((item) => {
+    let (title, input, expected) = item;
+    test_case(
       title,
-      compare(result, expected),
-    ),
-    nested_tests
-  );
-});
+      `Quick,
+      () => {
+        let pp_expr = (ppf, x) => Fmt.pf(ppf, "%S", Pprintast.string_of_expression(x));
+        let check_expr = testable(pp_expr, ( == ));
+        check(check_expr, "", expected, input)
+      }
+    )
+  }, tests);
+
+let tests = List.flatten([
+  runner(simple_tests),
+  runner(compound_tests),
+  runner(complex_tests),
+  runner(stylesheet_tests),
+  runner(nested_tests),
+]);
