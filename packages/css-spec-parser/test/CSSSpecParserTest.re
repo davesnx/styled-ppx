@@ -245,6 +245,7 @@ let print_tests = [
 
     let assertion = () =>
       check(
+        ~pos=__POS__,
         string,
         "Should match",
         string_of_value(result), expected

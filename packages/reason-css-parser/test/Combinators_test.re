@@ -5,10 +5,12 @@ open Modifier;
 open Combinator;
 open Standard;
 
+let check = (pos, a, b, c, d) => Alcotest.check(~pos, a, b, d, c);
+
 let parse_exn = (prop, str) =>
   switch (Parser.parse(prop, str)) {
   | Ok(data) => data
-  | Error(message) => failwith(message)
+  | Error(message) => fail(message)
   };
 
   // TODO: check static order
@@ -28,7 +30,7 @@ let tests = [
 
   test_case("<number> B", `Quick, () => {
     let (number, ()) = parse_exn([%value "<number> B"], "15 B");
-    check(Alcotest.float(1.), "", number, 15.0)
+    check(__POS__, Alcotest.float(1.), "", number, 15.0)
   }),
 
   /* test_case("Running '<number> B' with wrong input", `Quick, () => {
@@ -98,7 +100,7 @@ let tests = [
       | `B => fail("should be <number>")
       };
 
-    check(float(1.), "", number, 16.0);
+    check(__POS__, float(1.), "", number, 16.0);
 
     let () =
       switch (parser("B")) {
@@ -130,10 +132,10 @@ let tests = [
   test_case("<number> && B", `Quick, () => {
     let parser = parse_exn([%value "<number> && B"]);
     let (number, ()) = parser("17 B");
-    check(float(1.), "", number, 17.0);
+    check(__POS__, float(1.), "", number, 17.0);
 
     let (number, ()) = parser("B 18");
-    check(float(1.), "", number, 18.0);
+    check(__POS__, float(1.), "", number, 18.0);
   }),
 
   test_case("[ A && [A B] ]", `Quick, _ => {
@@ -233,17 +235,17 @@ let tests = [
     let parser = parse_exn([%value "<number> || B"]);
     let () =
       switch (parser("19 B")) {
-      | (Some(number), Some()) => check(float(1.), "", number, 19.0)
+      | (Some(number), Some()) => check(__POS__, float(1.), "", number, 19.0)
       | (_, _) => fail("should be (Some(number), Some())")
       };
     let () =
       switch (parser("B 20")) {
-      | (Some(number), Some()) => check(float(1.), "", number, 20.0)
+      | (Some(number), Some()) => check(__POS__, float(1.), "", number, 20.0)
       | (_, _) => fail("should be (Some(number), Some())")
       };
     let () =
       switch (parser("21")) {
-      | (Some(number), None) => check(float(1.), "", number, 21.0)
+      | (Some(number), None) => check(__POS__, float(1.), "", number, 21.0)
       | (_, _) => fail("should be (Some(number), None)")
       };
     let () =
