@@ -134,7 +134,7 @@ let success_tests_data = Parser.([
         inputTokens, outputTokens
     );
 
-    (input, `Quick, assertion);
+    test_case(input, `Quick, assertion);
 });
 
 let tests = success_tests_data;

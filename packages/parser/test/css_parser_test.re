@@ -68,7 +68,7 @@ let parse = (input) => {
         inputTokens, outputTokens
     );
 
-    (input, `Quick, assertion);
+    test_case(input, `Quick, assertion);
 });
 
 let error_tests_data = [
@@ -86,7 +86,7 @@ let error_tests_data = [
         parse(input) |> Result.get_error, output
     );
 
-    (input, `Quick, assertion);
+    test_case(input, `Quick, assertion);
 });
 
 let tests = List.append(success_tests_data, error_tests_data);

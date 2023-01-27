@@ -228,7 +228,7 @@ let parse_tests = [
       show_value(expected), show_value(result)
     );
 
-  (show_value(result), `Quick, assertion);
+  test_case(show_value(result), `Quick, assertion);
 });
 
 let print_tests = [
@@ -250,7 +250,7 @@ let print_tests = [
         string_of_value(result), expected
       );
 
-    (show_value(result), `Quick, assertion);
+    test_case(show_value(result), `Quick, assertion);
   }
 );
 

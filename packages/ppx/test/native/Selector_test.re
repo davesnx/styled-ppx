@@ -1,4 +1,4 @@
-open Setup;
+open Alcotest;
 open Ppxlib;
 
 let loc = Location.none;

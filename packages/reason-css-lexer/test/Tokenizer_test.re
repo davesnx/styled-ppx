@@ -127,7 +127,7 @@ let tests = [
         list_parse_tokens_to_string(values), list_tokens_to_string(output)
     );
 
-    (input, `Quick, assertion);
+    test_case(input, `Quick, assertion);
 });
 
 Alcotest.run("CSS Lexer", [("Tokenizer", tests)])
