@@ -1,19 +1,19 @@
 (executables
- (names runner)
- (modules runner)
+ (names standalone)
+ (modules standalone)
  (libraries styled-ppx.lib ppxlib))
 
 (rule
  (targets css-support.actual.re)
  (deps
-  (:runner runner.exe)
+  (:standalone standalone.exe)
   (:input css-support.re))
  (action
   (progn
    (with-stdout-to
     %{targets}
     (run refmt --parse re --print ml %{input}))
-   (run ./%{runner} --impl %{targets} -o %{targets})
+   (run ./%{standalone} --impl %{targets} -o %{targets})
    (run refmt --parse ml --print re --in-place %{targets}))))
 
 (rule
