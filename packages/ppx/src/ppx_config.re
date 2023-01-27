@@ -1,5 +1,3 @@
-exception ConfigNotFound;
-
 type t = {
   compatibleModeWithBsEmotionPpx: bool,
   production: bool,
@@ -14,24 +12,18 @@ let value = ref(None);
 let set = config => value := Some(config);
 let setDefault = () => set(default);
 
-let getUnsafe = () => {
-  switch (value^) {
-    | Some(v) => v
-    | None => raise(ConfigNotFound)
-  }
-};
+let get = () => value^
 
 let update = fn => value := value^ |> Option.map(fn);
 
 let updateCompatibleModeWithBsEmotionPpx = bool => {
-  let config = getUnsafe();
-  set({ ...config, compatibleModeWithBsEmotionPpx: bool })
+  get()
+    |> Option.map(config => set({ ...config, compatibleModeWithBsEmotionPpx: bool }))
+    |> Option.value(~default=())
 };
 
-let compatibleModeWithBsEmotionPpx = () =>
-  getUnsafe().compatibleModeWithBsEmotionPpx;
-
-let find = (name, args) => args |> Array.to_list |> List.find_opt(a => a == name);
-let getArgsBeforeConfigLoaded = () => {
-  Sys.argv |> find("--compat-with-bs-emotion-ppx") |> Option.is_some;
-};
+let compatibleModeWithBsEmotionPpx = () => {
+  get()
+    |> Option.map(c => c.compatibleModeWithBsEmotionPpx)
+    |> Option.value(~default=default.compatibleModeWithBsEmotionPpx)
+}

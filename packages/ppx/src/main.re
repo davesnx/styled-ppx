@@ -353,8 +353,6 @@ let static_pattern =
     )
   );
 
-let compatibleModeWithBsEmotionPpx = Config.getArgsBeforeConfigLoaded();
-
 module Mapper = {
   let match = module_expr => {
     open Ast_pattern;
@@ -736,7 +734,7 @@ Driver.register_transformation(
     ),
     Context_free.Rule.extension(
       Extension.declare(
-        compatibleModeWithBsEmotionPpx ? "css_" : "css",
+        Config.compatibleModeWithBsEmotionPpx() ? "css_" : "css",
         Extension.Context.Expression,
         string_payload,
         (~loc as _, ~path as _, payload, _label, _) => {
