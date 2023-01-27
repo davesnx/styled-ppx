@@ -1,44 +1,8 @@
-(library
- (name ReasonCSSParserTest)
- (ocamlopt_flags -linkall -g)
- (libraries reason-css-parser.lib rely.lib reason_css_parser_ppx_lib)
- (modules
-  (:standard \ Runner Standalone Spec))
+(test
+ (name Runner)
+ (libraries reason-css-parser.lib alcotest reason_css_parser_ppx_lib)
  (preprocess
   (pps reason_css_parser_ppx sedlex.ppx ppxlib.metaquot)))
-
-(executable
- (name Runner)
- (libraries ReasonCSSParserTest)
- (modules Runner)
- (preprocess
-  (pps reason_css_parser_ppx sedlex.ppx)))
-
-(executable
- (name Standalone)
- (modules Standalone Spec)
- (libraries reason_css_parser_ppx ppxlib))
-
-(rule
- (targets Spec.actual.re)
- (deps
-  (:pp Standalone.exe)
-  (:input Spec.re))
- (action
-  (progn
-   (with-stdout-to
-    %{targets}
-    (run refmt --parse re --print ml %{input}))
-   (run ./%{pp} --impl %{targets} -o %{targets})
-   (run refmt --parse ml --print re --in-place %{targets}))))
-
-(rule
- (alias css_spec_types_test)
- (deps
-  (file Spec.expected.re)
-  (file Spec.actual.re))
- (action
-  (diff Spec.expected.re Spec.actual.re)))
 
 (rule
  (alias reason_css_parser_test)

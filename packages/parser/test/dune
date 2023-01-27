@@ -1,14 +1,6 @@
-(library
- (name ParserTest)
- (ocamlopt_flags -linkall -g)
- (libraries styled-ppx-css-parser rely.lib)
- (modules
-  (:standard \ Runner)))
-
-(executable
+(test
  (name Runner)
- (libraries ParserTest)
- (modules Runner))
+ (libraries styled-ppx-css-parser alcotest))
 
 (rule
  (alias parser_test)

@@ -15,7 +15,7 @@ let function_call = (name, rule) => {
     );
   let.bind_match value = rule;
   let.bind_match () = expect(RIGHT_PARENS);
-  return_match(value);
+  Rule.Match.return(value);
 };
 
 let integer =
@@ -213,7 +213,7 @@ let hex_color =
 */
 let interpolation = {
   open Rule;
-  open Let;
+  open Rule.Let;
 
   let.bind_match _ = Pattern.expect(DELIM("$"));
   let.bind_match _ = Pattern.expect(LEFT_PARENS);
@@ -221,25 +221,25 @@ let interpolation = {
     let.bind_match path = Modifier.zero_or_more({
       let.bind_match ident = ident;
       let.bind_match _ = Pattern.expect(DELIM("."));
-      return_match(ident)
+      Match.return(ident)
     });
     let.bind_match ident = ident;
-    return_match(path @ [ident])
+    Match.return(path @ [ident])
   };
   let.bind_match _ = Pattern.expect(RIGHT_PARENS);
 
-  return_match(path);
+  Match.return(path);
 };
 
 /* [%value.rec "'[' [ <custom-ident> ]* ']'"] */
 let line_names = {
   open Rule;
-  open Let;
+  open Rule.Let;
 
   let.bind_match left = Pattern.expect(LEFT_SQUARE);
   let.bind_match path = Modifier.zero_or_more({
     let.bind_match ident = custom_ident;
-    return_match(ident)
+    Match.return(ident)
   });
   let.bind_match right = Pattern.expect(RIGHT_SQUARE);
 
@@ -247,13 +247,11 @@ let line_names = {
 };
 
 let flex_value =
-  token(token =>
-    switch (token) {
+  token(fun
     | DIMENSION(number, dimension) =>
       switch (dimension) {
       | "fr" => Ok(`Fr(number))
       | _ => Error(["only fr dimension is valid"])
       }
     | _ => Error(["expected flex_value"])
-    }
   );

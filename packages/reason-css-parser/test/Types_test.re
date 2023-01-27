@@ -1,4 +1,4 @@
-open Setup;
+open Alcotest;
 open Ast_helper;
 let loc = Location.none;
 
