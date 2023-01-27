@@ -3,8 +3,6 @@ open Reason_css_parser;
 open Reason_css_lexer;
 open Rule;
 
-let check = (a, b, c, d) => Alcotest.check(a, b, d, c);
-
 open! Data;
 let data_monad_tests: list(Alcotest.test_case(unit)) = [
   // TODO: check static order
