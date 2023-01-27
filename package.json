@@ -17,7 +17,7 @@
   "esy": {
     "buildsInSource": "_build",
     "build": [ [ "dune", "build", "--root", "." ] ],
-    "buildDev": "refmterr dune build --promote-install-files --root .",
+    "buildDev": "dune build --promote-install-files --root .",
     "buildEnv": { "ODOC_SYNTAX": "re" },
     "release": { "bin": [ "ppx" ] }
   },
@@ -36,9 +36,7 @@
     "@opam/sedlex": "3.0",
     "@opam/patdiff": "v0.15.0",
     "@opam/utop": "2.10.0",
-    "ocaml": "4.14.0",
-    "refmterr":
-      "jfrolich/reason-native:refmterr.json#08085a4048974b06aaf3aab918b677b39dea3d18"
+    "ocaml": "4.14.0"
   },
   "scripts": {
     "scripts": "jq .scripts package.json",
