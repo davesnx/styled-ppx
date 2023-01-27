@@ -1,4 +1,4 @@
-open Setup;
+open Alcotest;
 open Reason_css_parser;
 open Combinator;
 open Standard;
@@ -6,128 +6,134 @@ open Modifier;
 open Parser;
 open Rule.Match;
 
+let check = (pos, a, b, c, d) => Alcotest.check(~pos, a, b, d, c);
+
 let parse_exn = (prop, str) =>
   switch (parse(prop, str)) {
   | Ok(data) => data
-  | Error(message) => failwith(message)
+  | Error(message) => fail(message)
   };
 
-describe("Modifiers: optional", ({test, _}) => {
-  test("<integer>?", ({expect, _}) => {
+let tests = [
+  test_case("<integer>?", `Quick, () => {
     let parse = parse_exn([%value "<integer>?"]);
-    expect.option(parse("13")).toBe(Some(13));
-    expect.option(parse("")).toBe(None);
-  });
+    check(__POS__, option(Alcotest.int), "", parse("13"), Some(13));
+    check(__POS__, option(Alcotest.int), "", parse(""), None);
+  }),
 
-  test("[<integer> A]?", ({expect, _}) => {
+  test_case("[<integer> A]?", `Quick, () => {
     let parse = parse_exn([%value "[<integer> A]?"]);
-    expect.option(parse("14 A")).toBe(Some((14, ())));
-    expect.option(parse("")).toBe(None);
-  });
-});
+    check(__POS__, option(pair(Alcotest.int, unit)), "", parse("14 A"), Some((14, ())));
+    check(__POS__, option(pair(Alcotest.int, unit)), "", parse("14 A"), Some((14, ())));
+    check(__POS__, option(pair(Alcotest.int, unit)), "", parse(""), None);
+  }),
 
-describe("Modifiers: zero_or_more", ({test, _}) => {
-  test("<integer>*", ({expect, _}) => {
+  test_case("<integer>*", `Quick, () => {
     let parse = parse_exn([%value "<integer>*"]);
-    expect.list(parse("")).toEqual([]);
-    expect.list(parse("15")).toEqual([15]);
-    expect.list(parse("16 17")).toEqual([16, 17]);
-  });
+    check(__POS__, list(int), "", parse(""), []);
+    check(__POS__, list(int), "", parse("15"), [15]);
+    check(__POS__, list(int), "", parse("16 17"), [16, 17]);
+  }),
 
-  test("[<integer> A]*", ({expect, _}) => {
+  test_case("[<integer> A]*", `Quick, () => {
     let parse = parse_exn([%value "[<integer> A]*"]);
-    expect.list(parse("")).toEqual([]);
-    expect.list(parse("18 A")).toEqual([(18, ())]);
-    expect.list(parse("19 A 20 A")).toEqual([(19, ()), (20, ())]);
-  });
-});
+    check(__POS__, list(pair(int, unit)), "", parse(""), []);
+    check(__POS__, list(pair(int, unit)), "", parse("18 A"), [(18, ())]);
+    check(__POS__, list(pair(int, unit)), "", parse("19 A 20 A"), [(19, ()), (20, ())]);
+  }),
 
-describe("Modifiers: one_or_more", ({test, _}) => {
-  test("<integer>+", ({expect, _}) => {
+  test_case("<integer>+", `Quick, () => {
     let parse = parse([%value "<integer>+"]);
-    expect.result(parse("")).toBeError();
-    expect.result(parse("21")).toBe(Ok([21]));
-    expect.result(parse("22 23")).toBe(Ok([22, 23]));
-  });
+    check(__POS__, result(list(int), Alcotest.string), "", parse(""), Error("expected an integer"));
+    check(__POS__, result(list(int), Alcotest.string), "", parse("21"), Ok([21]));
+    check(__POS__, result(list(int), Alcotest.string), "", parse("22 23"), Ok([22, 23]));
+  }),
 
-  test("[<integer> A]+", ({expect, _}) => {
+  test_case("[<integer> A]+", `Quick, () => {
     let parse = parse([%value "[<integer> A]+"]);
-    expect.result(parse("")).toBeError();
-    expect.result(parse("24 A")).toBe(Ok([(24, ())]));
-    expect.result(parse("25 A 26 A")).toBe(Ok([(25, ()), (26, ())]));
-  });
-});
+    let to_check = result(list(pair(int, unit)), Alcotest.string);
+    check(__POS__, to_check, "", parse(""), Error("expected an integer"));
+    check(__POS__, to_check, "", parse("24 A"), Ok([(24, ())]));
+    check(__POS__, to_check, "", parse("25 A 26 A"), Ok([(25, ()), (26, ())]));
+  }),
 
-describe("Modifiers: repeat", ({test, _}) => {
-  test("<integer>{2}", ({expect, _}) => {
+  test_case("<integer>{2}", `Quick, () => {
     let parse = parse([%value "<integer>{2}"]);
-    expect.result(parse("")).toBeError();
-    expect.result(parse("27")).toBeError();
-    expect.result(parse("28 29")).toBe(Ok([28, 29]));
-    expect.result(parse("30 31 32")).toBeError();
-  });
+    let to_check = result(list(int), Alcotest.string);
+    check(__POS__, to_check, "", parse(""), Error("expected an integer"));
+    check(__POS__, to_check, "", parse("27"), Error("expected an integer"));
+    check(__POS__, to_check, "", parse("28 29"), Ok([28, 29]));
+    check(__POS__, to_check, "", parse("30 31 32"), Error("tokens remaining: (NUMBER 32.), EOF"));
+  }),
 
-  test("<integer>{2} <integer>", ({expect, _}) => {
+  test_case("<integer>{2} <integer>", `Quick, () => {
     let parse = parse([%value "<integer>{2} <integer>"]);
-    expect.result(parse("")).toBeError();
-    expect.result(parse("27")).toBeError();
-    expect.result(parse("28 29 30")).toBe(Ok(([28, 29], 30)));
-    expect.result(parse("30 31 32 33")).toBeError();
-  });
+    let to_check = result(pair(list(int), int), Alcotest.string);
+    check(__POS__, to_check, "", parse(""), Error("expected an integer"));
+    check(__POS__, to_check, "", parse("27"), Error("expected an integer"));
+    check(__POS__, to_check, "", parse("28 29 30"), Ok(([28, 29], 30)));
+    check(__POS__, to_check, "", parse("30 31 32 33"), Error("tokens remaining: (NUMBER 33.), EOF"));
+  }),
 
-  test("<integer>{2,3}", ({expect, _}) => {
+  test_case("<integer>{2,3}", `Quick, () => {
     let parse = parse([%value "<integer>{2,3}"]);
-    expect.result(parse("")).toBeError();
-    expect.result(parse("33")).toBeError();
-    expect.result(parse("34 35")).toBe(Ok([34, 35]));
-    expect.result(parse("36 37 38")).toBe(Ok([36, 37, 38]));
-    expect.result(parse("39 40 41 42")).toBeError();
-  });
+    let to_check = result(list(int), Alcotest.string);
+    check(__POS__, to_check, "", parse(""), Error("expected an integer"));
+    check(__POS__, to_check, "", parse("33"), Error("expected an integer"));
+    check(__POS__, to_check, "", parse("34 35"), Ok([34, 35]));
+    check(__POS__, to_check, "", parse("36 37 38"), Ok([36, 37, 38]));
+    check(__POS__, to_check, "", parse("39 40 41 42"), Error("tokens remaining: (NUMBER 42.), EOF"));
+  }),
 
-  test("<integer>{2,}", ({expect, _}) => {
+  test_case("<integer>{2,}", `Quick, () => {
     let parse = parse([%value "<integer>{2,}"]);
-    expect.result(parse("")).toBeError();
-    expect.result(parse("43")).toBeError();
-    expect.result(parse("44 45")).toBe(Ok([44, 45]));
-    expect.result(parse("46 47 48")).toBe(Ok([46, 47, 48]));
-    expect.result(parse("49 50 51 52")).toBe(Ok([49, 50, 51, 52]));
-  });
+    let to_check = result(list(int), Alcotest.string);
+    check(__POS__, to_check, "", parse(""), Error("expected an integer"));
+    check(__POS__, to_check, "", parse("43"), Error("expected an integer"));
+    check(__POS__, to_check, "", parse("44 45"), Ok([44, 45]));
+    check(__POS__, to_check, "", parse("46 47 48"), Ok([46, 47, 48]));
+    check(__POS__, to_check, "", parse("49 50 51 52"), Ok([49, 50, 51, 52]));
+  }),
 
-  test("<integer>#{2,3}", ({expect, _}) => {
+  test_case("<integer>#{2,3}", `Quick, () => {
     let parse = parse([%value "<integer>#{2,3}"]);
-    expect.result(parse("")).toBeError();
-    expect.result(parse("53")).toBeError();
-    expect.result(parse("54, 55")).toBe(Ok([54, 55]));
-    expect.result(parse("56, 57, 58")).toBe(Ok([56, 57, 58]));
-    expect.result(parse("59, 60, 61,")).toBeError();
-    expect.result(parse("59, 60, 61, 62")).toBeError();
-  });
+    let to_check = result(list(int), Alcotest.string);
+    check(__POS__, to_check, "", parse(""), Error("expected an integer"));
+    check(__POS__, to_check, "", parse("53"), Error("Expected ',' but instead got the end"));
+    check(__POS__, to_check, "", parse("54, 55"), Ok([54, 55]));
+    check(__POS__, to_check, "", parse("56, 57, 58"), Ok([56, 57, 58]));
+    check(__POS__, to_check, "", parse("59, 60, 61,"), Error("tokens remaining: COMMA, EOF"));
+    check(__POS__, to_check, "", parse("59, 60, 61, 62"), Error("tokens remaining: COMMA, (NUMBER 62.), EOF"));
+  }),
 
-  test("<integer>#{2} , <integer>", ({expect, _}) => {
+  test_case("<integer>#{2} , <integer>", `Quick, () => {
     let parse = parse([%value "<integer>#{2} ',' <integer>"]);
-    expect.result(parse("")).toBeError();
-    expect.result(parse("53")).toBeError();
-    expect.result(parse("54, 55")).toBeError();
-    expect.result(parse("56, 57, 58")).toBe(Ok(([56, 57], (), 58)));
-    expect.result(parse("59, 60, 61,")).toBeError();
-    expect.result(parse("59, 60, 61, 62")).toBeError();
-  });
+    let to_check = result(triple(list(int), unit, int), Alcotest.string);
+    check(__POS__, to_check, "", parse(""), Error("expected an integer"));
+    check(__POS__, to_check, "", parse("53"), Error("Expected ',' but instead got the end"));
+    check(__POS__, to_check, "", parse("54, 55"), Error("Expected ',' but instead got the end"));
+    check(__POS__, to_check, "", parse("56, 57, 58"), Ok(([56, 57], (), 58)));
+    check(__POS__, to_check, "", parse("59, 60, 61,"), Error("tokens remaining: COMMA, EOF"));
+    check(__POS__, to_check, "", parse("59, 60, 61, 62"), Error("tokens remaining: COMMA, (NUMBER 62.), EOF"));
+  }),
 
-  test("[<integer> A]{2,3}", ({expect, _}) => {
+  test_case("[<integer> A]{2,3}", `Quick, () => {
     let parse = parse([%value "<integer>{2,3}"]);
-    expect.result(parse("")).toBeError();
-    expect.result(parse("63")).toBeError();
-    expect.result(parse("64 65")).toBe(Ok([64, 65]));
-    expect.result(parse("66 67 68")).toBe(Ok([66, 67, 68]));
-    expect.result(parse("69 70 71 72")).toBeError();
-  });
-});
+    let to_check = result(list(int), Alcotest.string);
+    check(__POS__, to_check, "", parse(""), Error("expected an integer"));
+    check(__POS__, to_check, "", parse("63"), Error("expected an integer"));
+    check(__POS__, to_check, "", parse("64 65"), Ok([64, 65]));
+    check(__POS__, to_check, "", parse("66 67 68"), Ok([66, 67, 68]));
+    /* TODO: Remove "tokens remaining" message */
+    check(__POS__, to_check, "", parse("69 70 71 72"), Error("tokens remaining: (NUMBER 72.), EOF"));
+  })
+];
 
 // TODO: at_least_one
 // describe("at_least_one", ({test, _}) => {
-//   test("[A? B?]!", ({expect, _}) => {
+//   test_case("[A? B?]!", `Quick, () => {
 //     let parse = parse([%value "[A? B?]!"]);
 //     let x = parse("A");
 //     ();
 //   })
-// });
+// }),
