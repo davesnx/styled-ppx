@@ -1,6 +1,6 @@
 (test
  (name Runner)
- (libraries reason-css-parser.lib alcotest reason_css_parser_ppx_lib)
+ (libraries alcotest styled-ppx.reason-css-parser reason_css_parser_ppx_lib)
  (preprocess
   (pps reason_css_parser_ppx sedlex.ppx ppxlib.metaquot)))
 
