@@ -3171,5 +3171,3 @@
 
 [%css {|transition-delay: 240ms|}];
 [%css {|animation-duration: 150ms|}];
-
-

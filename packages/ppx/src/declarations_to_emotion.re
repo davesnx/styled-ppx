@@ -2389,6 +2389,7 @@ let flex_flow =
       [direction, wrap] |> List.concat_map(Option.value(~default=[]));
     },
   );
+
 // TODO: this is safe?
 let order = apply(Parser.property_order, (~loc) => [%expr CssJs.order], render_integer);
 let flex_grow =
@@ -2518,6 +2519,29 @@ let grid_gap =
     | (`Extended_percentage(ep), None) => render_extended_percentage(~loc, ep)
     /* gridGrap2 isn't available on bs-css */
     | _ => raise(Unsupported_feature)
+  );
+
+let render_gap = (~loc, value: [> Types.property_column_gap | Types.property_row_gap ]) => {
+  switch (value) {
+  | `Extended_length(el) => render_extended_length(~loc, el)
+  | `Extended_percentage(ep) => render_extended_percentage(~loc, ep)
+  | `Normal => [%expr `normal]
+  }
+};
+
+let render_property_gap = (~loc, value: Types.property_gap) => {
+  switch (value) {
+  | (row, None) => [[%expr CssJs.gap([%e render_gap(~loc, row)])]]
+  | (row, Some(column)) =>
+    [[%expr CssJs.gap2([%e render_gap(~loc, row)], [%e render_gap(~loc, column)])]]
+  }
+};
+
+let gap =
+  emit(
+    Parser.property_gap,
+    (~loc as _) => id,
+    render_property_gap,
   );
 
 let z_index =
@@ -2842,6 +2866,7 @@ let properties = [
   ("grid-column", found(grid_column)),
   ("grid-area", found(grid_area)),
   ("grid-gap", found(grid_gap)),
+  ("gap", found(gap)),
   ("z-index", found(z_index)),
   ("line-height", found(line_height)),
   ("line-height-step", found(line_height_step)),
