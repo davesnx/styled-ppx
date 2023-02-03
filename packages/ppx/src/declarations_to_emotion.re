@@ -71,12 +71,12 @@ let render_variable = (~loc, name) =>
 
 let transform_with_variable = (parser, mapper, value_to_expr) =>
   emit(
-    /* This Xor is defined here for those properties that aren't specifically
-      added <interpolation> as a valid variant */
+    /* This Xor is defined here for those properties that aren't defined with
+      <interpolation> as a valid definition */
     Combinator.combine_xor([
       /* If the entire CSS value is interpolated, we treat it as a `Variable */
       Rule.Match.map(Standard.interpolation, data => `Variable(data)),
-      /* Otherwise it's a regular CSS `Value and run the mapper below */
+      /* Otherwise it's a regular CSS `Value and match the parser */
       Rule.Match.map(parser, data => `Value(data)),
     ]),
     (~loc) => fun
@@ -102,7 +102,7 @@ let apply = (parser, property_renderer, value_renderer) =>
     (~loc, value) => [[%expr [%e property_renderer(~loc)]([%e value])]]
   );
 
-/* Triggers unsupported_feature and it's rendered as a string */
+/* Triggers Unsupported_feature and it's rendered as a string */
 let unsupportedValue = (parser, property) =>
   transform_with_variable(
     parser,
@@ -110,7 +110,7 @@ let unsupportedValue = (parser, property) =>
     (~loc, arg) => [[%expr [%e property(~loc)]([%e arg])]],
   );
 
-/* Triggers unsupported_feature and it's rendered as a string */
+/* Triggers Unsupported_feature and it's rendered as a string */
 let unsupportedProperty = (parser) =>
   transform_with_variable(
     parser,
@@ -1569,17 +1569,29 @@ let border_image_width = unsupportedProperty(Parser.property_border_image_width)
 let border_image_outset = unsupportedProperty(Parser.property_border_image_outset);
 let border_image_repeat = unsupportedProperty(Parser.property_border_image_repeat);
 let border_image = unsupportedProperty(Parser.property_border_image);
+
 let box_shadow =
-  apply(
+  emit(
     Parser.property_box_shadow,
-    (~loc) => [%expr CssJs.boxShadows],
-    (~loc) => fun
-    | `None => variant_to_expression(~loc, `None)
-    | `Shadow(shadows) => {
-        let shadows =
-          shadows |> List.map(render_box_shadow(~loc));
-        Builder.pexp_array(~loc, shadows);
-      },
+    (~loc as _, id) => id,
+    (~loc, value: Types.property_box_shadow) =>
+      switch (value) {
+      | `Interpolation(variable) => {
+        /* Here we rely on boxShadow*s* which makes the value be an array */
+        let var = render_variable(~loc, variable);
+        [[%expr CssJs.boxShadows([%e var])]];
+      }
+      | `None => {
+        let none = variant_to_expression(~loc, `None);
+        [[%expr CssJs.boxShadow([%e none])]];
+      }
+      | `Shadow(shadows) => {
+          let shadows =
+            shadows |> List.map(render_box_shadow(~loc));
+          let shadows = Builder.pexp_array(~loc, shadows);
+          [[%expr CssJs.boxShadows([%e shadows])]];
+        }
+      }
   );
 
 // css-overflow-3
@@ -1967,6 +1979,7 @@ let text_shadow =
     Parser.property_text_shadow,
     (~loc as _) => id,
     (~loc) => fun
+    | `Interpolation(variable) => [[%expr CssJs.textShadows([%e render_variable(~loc, variable)])]]
     | `None => [[%expr CssJs.textShadow([%e variant_to_expression(~loc, `None)])]]
     | `Shadow_t([shadow]) => [[%expr CssJs.textShadow([%e render_text_shadow(~loc, shadow)])]]
     | `Shadow_t(shadows) => {

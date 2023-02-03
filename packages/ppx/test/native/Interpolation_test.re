@@ -135,7 +135,12 @@ let tests = [
   (
     "box-shadow: $(BoxShadow.elevation)",
     [%expr [%css "box-shadow: $(BoxShadow.elevation)"]],
-    [%expr (CssJs.boxShadows(BoxShadow.elevation): CssJs.rule)]
+    [%expr CssJs.boxShadows(BoxShadow.elevation)]
+  ),
+  (
+    "box-shadow: none",
+    [%expr [%css "box-shadow: none"]],
+    [%expr CssJs.boxShadow(`none)]
   ),
   (
     "text-overflow: $(clip)",
