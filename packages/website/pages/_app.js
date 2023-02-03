@@ -40,6 +40,7 @@ export default function Nextra({ Component, pageProps }) {
           href={`/favicon/safari-pinned-tab.svg`}
           color="#000000"
         />
+        <script async src="https://cdn.splitbee.io/sb.js"></script>
       </Head>
       <Component {...pageProps} />
     </>
