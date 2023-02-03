@@ -1870,7 +1870,7 @@ CssJs.unsafe({js|aspectRatio|js}, {js|21 / 8|js});
 (CssJs.backgroundColor(c): CssJs.rule);
 CssJs.unsafe({js|border|js}, {js|none|js});
 CssJs.unsafe({js|bottom|js}, {js|unset|js});
-CssJs.boxShadows(`none);
+CssJs.boxShadow(`none);
 CssJs.unsafe({js|breakInside|js}, {js|avoid|js});
 CssJs.unsafe({js|caretColor|js}, {js|#e15a46|js});
 CssJs.unsafe({js|color|js}, {js|inherit|js});
