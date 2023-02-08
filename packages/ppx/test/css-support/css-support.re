@@ -3171,3 +3171,6 @@
 
 [%css {|transition-delay: 240ms|}];
 [%css {|animation-duration: 150ms|}];
+
+[%css {|grid-row-gap: $(NewSize.px16)|}];
+[%css {|grid-column-gap: $(NewSize.px32)|}];

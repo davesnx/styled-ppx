@@ -2504,6 +2504,25 @@ let grid_row_start =
     Parser.property_grid_row_start,
     (~loc) => [%expr CssJs.gridRowStart],
   );
+
+let grid_row_gap =
+  apply(
+    Parser.property_grid_row_gap,
+    (~loc) => [%expr CssJs.gridRowGap],
+    (~loc) => fun
+    | `Extended_length(el) => render_extended_length(~loc, el)
+    | `Extended_percentage(ep) => render_extended_percentage(~loc, ep)
+  );
+
+let grid_column_gap =
+  apply(
+    Parser.property_grid_column_gap,
+    (~loc) => [%expr CssJs.gridColumnGap],
+    (~loc) => fun
+    | `Extended_length(el) => render_extended_length(~loc, el)
+    | `Extended_percentage(ep) => render_extended_percentage(~loc, ep)
+  );
+
 let grid_column_start =
   unsupportedValue(
     Parser.property_grid_column_start,
@@ -2872,7 +2891,9 @@ let properties = [
   ("grid-auto-flow", found(grid_auto_flow)),
   ("grid", found(grid)),
   ("grid-row-start", found(grid_row_start)),
+  ("grid-row-gap", found(grid_row_gap)),
   ("grid-column-start", found(grid_column_start)),
+  ("grid-column-gap", found(grid_column_gap)),
   ("grid-row-end", found(grid_row_end)),
   ("grid-column-end", found(grid_column_end)),
   ("grid-row", found(grid_row)),
