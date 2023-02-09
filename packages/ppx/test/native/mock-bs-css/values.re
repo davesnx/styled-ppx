@@ -24,6 +24,26 @@ module Js = {
         string_of_float(f);
       };
   };
+
+  module Option = {
+    let getWithDefault = (default, opt) =>
+      switch (opt) {
+      | Some(x) => x
+      | None => default
+      };
+
+    let mapWithDefault = (opt, default, fn) =>
+      switch (opt) {
+      | Some(x) => fn(x)
+      | None => default
+      };
+
+    let map = (f, opt) =>
+      switch (opt) {
+      | Some(x) => Some(f(x))
+      | None => None
+      };
+  }
 };
 
 let join = (strings, separator) => {
@@ -1541,6 +1561,16 @@ module TextDecorationLine = {
     | `blink => "blink";
 };
 
+module TextDecorationThickness = {
+  type t = [`fromFont | `auto];
+
+  let toString = x =>
+    switch x {
+    | `fromFont => "from-font"
+    | `auto => "auto"
+    }
+};
+
 module TextDecorationStyle = {
   type t = [ | `solid | `double | `dotted | `dashed | `wavy];
 
@@ -1564,28 +1594,35 @@ module Width = {
     | `minContent => "min-content";
 };
 
-module MaxWidth = {
-  type t = [ | `none];
+module None = {
+  type t = [`none];
 
-  let toString =
-    fun
-    | `none => "none";
+  let toString = x =>
+    switch x {
+    | `none => "none"
+    }
 };
+
+/* min-height and max-height can be set to 'none' and all Height values.
+ Here we only define are the 'none' since the external API ensures the composability of all cases */
+module MaxHeight = None
+module MinHeight = None
+
+/* min-width and max-width can be set to 'none' and all Width values.
+ Here we only define are the 'none' since the external API ensures the composability of all cases */
+module MinWidth = None
+module MaxWidth = None
 
 module Height = {
-  type t = [ | `auto];
+  type t = [`auto | `fitContent | `maxContent | `minContent];
 
-  let toString =
-    fun
-    | `auto => "auto";
-};
-
-module MaxHeight = {
-  type t = [ | `none];
-
-  let toString =
-    fun
-    | `none => "none";
+  let toString = x =>
+    switch (x) {
+    | `auto => "auto"
+    | `fitContent => "fit-content"
+    | `maxContent => "max-content"
+    | `minContent => "min-content"
+    }
 };
 
 module OverflowWrap = {
@@ -1708,6 +1745,37 @@ module GeometyBox = {
     | `viewBox => "view-box";
 };
 
+module GeometryBox = {
+  type t = [
+    | `marginBox
+    | `borderBox
+    | `paddingBox
+    | `contentBox
+    | `fillBox
+    | `strokeBox
+    | `viewBox
+  ];
+
+  let marginBox = `marginBox;
+  let borderBox = `borderBox;
+  let paddingBox = `paddingBox;
+  let contentBox = `contentBox;
+  let fillBox = `fillBox;
+  let strokeBox = `strokeBox;
+  let viewBox = `viewBox;
+
+  let toString = x =>
+    switch (x) {
+    | `marginBox => "margin-box"
+    | `borderBox => "border-box"
+    | `paddingBox => "padding-box"
+    | `contentBox => "content-box"
+    | `fillBox => "fill-box"
+    | `strokeBox => "stroke-box"
+    | `viewBox => "view-box"
+    }
+};
+
 module ClipPath = {
   type t = [ | `none];
 
@@ -1742,6 +1810,19 @@ module TransformStyle = {
     fun
     | `preserve3d => "preserve-3d"
     | `flat => "flat";
+};
+
+module TransformBox = {
+  type t = [`contentBox | `borderBox | `fillBox | `strokeBox | `viewBox];
+
+  let toString = x =>
+    switch x {
+    | `contentBox => "content-box"
+    | `borderBox => "border-box"
+    | `fillBox => "fill-box"
+    | `strokeBox => "stroke-box"
+    | `viewBox => "view-box"
+    }
 };
 
 module ListStyleImage = {
