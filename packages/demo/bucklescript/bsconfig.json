@@ -18,7 +18,7 @@
     }
   ],
   "ppx-flags": [
-    ["../../../_build/default/bin/ppx.exe", "--compat-with-bs-emotion-ppx=true"]
+    ["../../../_build/default/bin/ppx.exe", "--compat-with-bs-emotion-ppx true"]
   ],
   "suffix": ".bs.js",
   "namespace": true,

@@ -2,13 +2,14 @@
  (name main)
  (public_name styled-ppx.lib)
  (kind ppx_rewriter)
+ (wrapped false)
+ (flags
+  (:standard -w -9))
  (libraries
   styled-ppx.css-parser
   styled-ppx.reason-css-parser
   styled-ppx.string-interpolation
   ppxlib
   str)
- ; (flags
- ; (:standard -w -9))
  (preprocess
   (pps ppxlib.metaquot)))

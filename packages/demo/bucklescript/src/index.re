@@ -73,7 +73,7 @@ let stilos = [%cx "box-shadow: inset 10px 10px 0 0 #ff0000, 10px 10px 0 0 #ff000
 let styles = CssJs.style(. [|
   CssJs.label("ComponentName"),
   CssJs.display(`block),
-  [%css "flex-direction: row"]
+  [%css_ "flex-direction: row"]
 |]);
 
 let inlineStyles: ReactDOM.Style.t = ReactDOM.Style.make(~color="#444444", ~fontSize="68px", ());
@@ -92,10 +92,10 @@ module Sequence = [%styled.button (~size, ~color) => {
   let buttonColor = Theme.button(color);
 
   [|
-    [%css "width: $(size)"],
-    [%css "color: $(buttonColor)"],
-    [%css "display: block;"],
-    [%css "width: 100%;"],
+    [%css_ "width: $(size)"],
+    [%css_ "color: $(buttonColor)"],
+    [%css_ "display: block;"],
+    [%css_ "width: 100%;"],
   |]
 }];
 
