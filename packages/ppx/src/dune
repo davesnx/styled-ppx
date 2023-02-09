@@ -8,5 +8,7 @@
   styled-ppx.string-interpolation
   ppxlib
   str)
+ ; (flags
+ ; (:standard -w -9))
  (preprocess
   (pps ppxlib.metaquot)))

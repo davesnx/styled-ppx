@@ -16,14 +16,17 @@ let get = () => value^
 
 let update = fn => value := value^ |> Option.map(fn);
 
-let updateCompatibleModeWithBsEmotionPpx = bool => {
+let updateCompatibleModeWithBsEmotionPpx = value => {
+  Printf.printf("updateCompatibleModeWithBsEmotionPpx: %b\n", value);
   get()
-    |> Option.map(config => set({ ...config, compatibleModeWithBsEmotionPpx: bool }))
+    |> Option.map(config => set({ ...config, compatibleModeWithBsEmotionPpx: value }))
     |> Option.value(~default=())
 };
 
 let compatibleModeWithBsEmotionPpx = () => {
-  get()
+  let value = get()
     |> Option.map(c => c.compatibleModeWithBsEmotionPpx)
     |> Option.value(~default=default.compatibleModeWithBsEmotionPpx)
-}
+  Printf.printf("compatibleModeWithBsEmotionPpx: %b\n", value);
+  value;
+};
