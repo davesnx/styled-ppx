@@ -1,7 +1,5 @@
 (executable
-  (name ppx)
-  (public_name styled-ppx)
-  (libraries styled-ppx.lib ppxlib)
-  (link_flags -linkall)
-  (package styled-ppx)
-)
+ (name ppx)
+ (public_name styled-ppx)
+ (libraries styled-ppx.lib)
+ (link_flags -linkall))

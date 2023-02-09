@@ -660,15 +660,6 @@ let traverser = {
   }
 };
 
-Config.setDefault();
-
-Driver.add_arg(
-  "--compat-with-bs-emotion-ppx",
-  Arg.Bool(Config.updateCompatibleModeWithBsEmotionPpx),
-  ~doc=
-    "Changes the extension name from css to css_ to avoid breakage with bs-emotion-ppx",
-);
-
   /*
   let delimLength =
     match delim with Some s -> 2 + String.length s | None -> 1
@@ -707,6 +698,15 @@ Driver.add_arg(
   }
    */
 
+let compatibleWithBsEmotionPpx = Ppx_config.find(Ppx_config.compatibleModeWithBsEmotionPpxKey, Sys.argv);
+
+Driver.add_arg(
+  Ppx_config.compatibleModeWithBsEmotionPpxKey,
+  Arg.Bool(_ => Config.updateCompatibleModeWithBsEmotionPpx(true)),
+  ~doc=
+    "Changes the extension name from `css` to `css_` to avoid breakage with bs-emotion-ppx",
+);
+
 Driver.register_transformation(
   ~impl=traverser#structure,
   /* Instrument is needed to run styled-ppx after metaquote,
@@ -734,7 +734,7 @@ Driver.register_transformation(
     ),
     Context_free.Rule.extension(
       Extension.declare(
-        Config.compatibleModeWithBsEmotionPpx() ? "css_" : "css",
+        compatibleWithBsEmotionPpx ? "css_" : "css",
         Extension.Context.Expression,
         string_payload,
         (~loc as _, ~path as _, payload, _label, _) => {
@@ -749,7 +749,7 @@ Driver.register_transformation(
             |> Css_to_emotion.render_declaration;
           /* TODO: Instead of getting the first element,
               fail when there's more than one declaration or
-             make a mechanism to flatten all the properties */
+            make a mechanism to flatten all the properties */
           List.nth(declarationListValues, 0);
         },
       ),

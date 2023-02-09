@@ -2565,7 +2565,11 @@ let render_property_gap = (~loc, value: Types.property_gap) => {
   switch (value) {
   | (row, None) => [[%expr CssJs.gap([%e render_gap(~loc, row)])]]
   | (row, Some(column)) =>
-    [[%expr CssJs.gap2([%e render_gap(~loc, row)], [%e render_gap(~loc, column)])]]
+    [[%expr
+      CssJs.gap2(
+        ~rowGap=[%e render_gap(~loc, row)],
+        ~columnGap=[%e render_gap(~loc, column)]
+      )]]
   }
 };
 
