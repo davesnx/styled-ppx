@@ -100,7 +100,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.os }}
-          path: _build/default/bin/ppx.exe
+          path: _build/default/packages/bin/ppx.exe
 
       # Cleanup build cache in case dependencies have changed
       - name: Cleanup
@@ -124,10 +124,10 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ${{ matrix.os }}
-          path: _build/default/bin
+          path: _build/default/packages/bin
 
       - name: Grant permission to run ppx
-        run: chmod +x _build/default/bin/ppx.exe
+        run: chmod +x _build/default/packages/bin/ppx.exe
 
       - name: Get cache directory path
         id: yarn-cache-dir-path
