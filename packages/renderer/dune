@@ -2,8 +2,7 @@
  (name ast_renderer)
  (public_name ast-renderer)
  (modules ast_renderer)
- (libraries styled-ppx.css-parser)
- (link_flags -linkall))
+ (libraries styled-ppx.css-parser))
 
 (executable
  (name lexer_renderer)
@@ -11,12 +10,10 @@
  (modules lexer_renderer)
  (libraries styled-ppx.css-parser sedlex)
  (preprocess
-  (pps sedlex.ppx))
- (link_flags -linkall))
+  (pps sedlex.ppx)))
 
 (executable
  (name spec_renderer)
  (public_name spec-renderer)
  (modules spec_renderer)
- (libraries styled-ppx.css-spec-parser)
- (link_flags -linkall))
+ (libraries styled-ppx.css-spec-parser))
