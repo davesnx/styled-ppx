@@ -1,5 +1,4 @@
 (executable
  (name ppx)
  (public_name styled-ppx)
- (libraries styled-ppx.lib)
-)
+ (libraries styled-ppx.lib))
