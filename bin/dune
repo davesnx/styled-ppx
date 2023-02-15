@@ -1,5 +1,4 @@
 (executable
  (name ppx)
  (public_name styled-ppx)
- (libraries styled-ppx.lib)
- (link_flags -linkall))
+ (libraries styled-ppx.lib))
