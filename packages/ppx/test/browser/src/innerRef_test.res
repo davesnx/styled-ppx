@@ -1,8 +1,5 @@
-open Jest
-open Expect
+open Vitest
 open ReactTestingLibrary
-
-EmotionSerializer.load()
 
 let hasFocus: Dom.element => bool = %raw("(el) => document.activeElement === el")
 
@@ -30,10 +27,12 @@ module TextInput = {
   }
 }
 
-test("TextInput renders and passes innerRef", () => {
-  let component = render(<TextInput />)
+describe("innerRef", () => {
+  test("TextInput renders and passes innerRef", _t => {
+    let component = render(<TextInput />)
 
-  component |> getByRole(~matcher=#Str("button")) |> FireEvent.click |> ignore
-  let inputHasFocus = component |> getByRole(~matcher=#Str("input")) |> hasFocus
-  expect(inputHasFocus) |> toBe(true)
+    component |> getByRole(~matcher=#Str("button")) |> FireEvent.click |> ignore
+    let inputHasFocus = component |> getByRole(~matcher=#Str("input")) |> hasFocus
+    expect(inputHasFocus)->Expect.toBe(true)
+  })
 })

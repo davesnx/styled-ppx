@@ -1,8 +1,5 @@
-open Jest
-open Expect
+open Vitest
 open ReactTestingLibrary
-
-EmotionSerializer.load()
 
 module Nested = %styled.div(`
   align-items: center;
@@ -18,6 +15,8 @@ module Nested = %styled.div(`
   }
 `)
 
-test("Nested component renders", () =>
-  <Nested /> |> render |> container |> expect |> toMatchSnapshot
-)
+describe("Nested", () => {
+  test("Nested component renders", _t =>
+    <Nested /> |> render |> container |> expect |> Expect.toMatchSnapshot
+  )
+})

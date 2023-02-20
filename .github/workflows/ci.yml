@@ -146,10 +146,6 @@ jobs:
         working-directory: ./packages/ppx/test/browser
         run: yarn
 
-      - name: Build
-        working-directory: ./packages/ppx/test/browser
-        run: yarn build
-
       - name: Test
         working-directory: ./packages/ppx/test/browser
         run: yarn test

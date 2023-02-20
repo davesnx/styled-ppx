@@ -1,8 +1,5 @@
-open Jest
-open Expect
+open Vitest
 open ReactTestingLibrary
-
-EmotionSerializer.load()
 
 module ArrayStatic = %styled.section([%css("display: flex;"), %css("justify-content: center;")])
 
@@ -30,14 +27,20 @@ module SequenceDynamicComponent = %styled.div(
   }
 )
 
-test("ArrayStatic renders", () =>
-  <ArrayStatic /> |> render |> container |> expect |> toMatchSnapshot
-)
+describe("Array", () => {
+  test("ArrayStatic renders", _t =>
+    <ArrayStatic /> |> render |> container |> expect |> Expect.toMatchSnapshot
+  )
 
-test("ArrayDynamicComponent renders", () =>
-  <ArrayDynamicComponent var=#Black /> |> render |> container |> expect |> toMatchSnapshot
-)
+  test("ArrayDynamicComponent renders", _t =>
+    <ArrayDynamicComponent var=#Black /> |> render |> container |> expect |> Expect.toMatchSnapshot
+  )
 
-test("SequenceDynamicComponent renders", () =>
-  <SequenceDynamicComponent var=#White /> |> render |> container |> expect |> toMatchSnapshot
-)
+  test("SequenceDynamicComponent renders", _t =>
+    <SequenceDynamicComponent var=#White />
+    |> render
+    |> container
+    |> expect
+    |> Expect.toMatchSnapshot
+  )
+})

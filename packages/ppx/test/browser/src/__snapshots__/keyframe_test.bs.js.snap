@@ -1,17 +1,9 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`Keyframes should render into a animation-name 1`] = `
-.emotion-0 {
-  background-color: #000000;
-  height: 100vh;
-  width: 100vw;
-  -webkit-animation-name: fade;
-  animation-name: fade;
-}
-
+exports[`Keyframes > should render into a animation-name 1`] = `
 <div>
   <div
-    class="emotion-0"
+    class="css-gpivgv-Animate"
   />
 </div>
 `;

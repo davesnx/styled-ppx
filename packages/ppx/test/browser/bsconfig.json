@@ -16,7 +16,7 @@
   },
   "package-specs": [
     {
-      "module": "commonjs",
+      "module": "es6",
       "in-source": true
     }
   ],
@@ -33,6 +33,7 @@
   "bs-dev-dependencies": [
     "@glennsl/bs-jest",
     "bs-react-testing-library",
+    "rescript-vitest",
     "rescript-webapi"
   ]
 }

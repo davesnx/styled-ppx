@@ -1,31 +1,9 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`Nested component renders 1`] = `
-.emotion-0 {
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  color: #FF0000;
-  height: 100vh;
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  -webkit-justify-content: center;
-  justify-content: center;
-  width: 100vw;
-}
-
-.emotion-0>p {
-  color: #800080;
-}
-
+exports[`Nested > Nested component renders 1`] = `
 <div>
   <div
-    class="emotion-0"
+    class="css-xtnv8v-Nested"
   />
 </div>
 `;

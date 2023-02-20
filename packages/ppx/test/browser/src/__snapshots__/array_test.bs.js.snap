@@ -1,46 +1,25 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`ArrayDynamicComponent renders 1`] = `
-.emotion-0 {
-  display: block;
-  color: #999999;
-}
-
+exports[`Array > ArrayDynamicComponent renders 1`] = `
 <div>
   <div
-    class="emotion-0"
+    class="css-wng87c-ArrayDynamicComponent"
   />
 </div>
 `;
 
-exports[`ArrayStatic renders 1`] = `
-.emotion-0 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  -webkit-justify-content: center;
-  justify-content: center;
-}
-
+exports[`Array > ArrayStatic renders 1`] = `
 <div>
   <section
-    class="emotion-0"
+    class="css-1q3many-ArrayStatic"
   />
 </div>
 `;
 
-exports[`SequenceDynamicComponent renders 1`] = `
-.emotion-0 {
-  color: #FAFAFA;
-  display: block;
-}
-
+exports[`Array > SequenceDynamicComponent renders 1`] = `
 <div>
   <div
-    class="emotion-0"
+    class="css-1sseztl"
   />
 </div>
 `;
