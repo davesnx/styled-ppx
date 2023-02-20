@@ -31,15 +31,17 @@
     "@opam/ocaml-migrate-parsetree": "2.4.0",
     "@opam/ocamlformat": "0.24.1",
     "@opam/ppx_deriving": "5.2.1",
-    "@opam/ppxlib": "0.27.0",
+    "@opam/ppxlib": "*",
     "@opam/reason": "3.8.1",
     "@opam/sedlex": "3.0",
     "@opam/patdiff": "v0.15.0",
     "@opam/utop": "2.10.0",
     "ocaml": "4.14.0"
   },
+  "resolutions": {
+    "@opam/ppxlib": "zth/ppxlib:ppxlib.opam#32f83395fb89693a873541298b6367449f23bc4a"
+  },
   "scripts": {
-    "scripts": "jq .scripts package.json",
     "test_typecheck": "esy dune build @native_typecheck_test",
     "test_css_support": "esy dune build @css_support_test",
     "test_ppx_snapshot": "esy dune build @ppx_snapshot_test",
