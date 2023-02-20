@@ -58,7 +58,9 @@ switch ReactDOM.querySelector("#app") {
         <div className />
         <Dynamic a="23" />
         <Component> {React.string("test..")} </Component>
-        <App2> <Component> {React.string("Demo of...")} </Component> </App2>
+        <App2>
+          <Component> {React.string("Demo of...")} </Component>
+        </App2>
         <Link href="https://github.com/davesnx/styled-ppx"> {React.string("styled-ppx")} </Link>
         <Link href="https://github.com/davesnx/styled-ppx"> {React.string("styled-ppx")} </Link>
         <Link href="https://github.com/davesnx/styled-ppx"> {React.string("styled-ppx")} </Link>

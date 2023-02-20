@@ -5,7 +5,7 @@ module Helper = Ast_helper;
 module Builder = Ppxlib.Ast_builder.Default;
 module Types = Parser.Types;
 
-module Option ={
+module Option = {
   include Option;
 
   let mapWithDefault = (f, default, opt) => {
@@ -14,7 +14,7 @@ module Option ={
     | None => default
     };
   };
-}
+};
 
 let txt = (~loc, txt) => {Location.loc: loc, txt};
 
@@ -834,8 +834,6 @@ let render_color = (~loc, value) => switch (value: Types.color) {
   | `Function_hsla(_)
   | `Deprecated_system_color(_) => raise(Unsupported_feature)
   };
-
-/* and color = [%value.rec "<rgb()> | <rgba()> | <hsl()> | <hsla()> | <hex-color> | <named-color> | 'currentColor' | <deprecated-system-color> | <interpolation> | <var()>"] */
 
 let color = apply(Parser.property_color, (~loc) => [%expr CssJs.color], render_color);
 let opacity =

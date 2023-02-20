@@ -713,8 +713,8 @@ Driver.register_transformation(
      we rely on this order in native tests */
   ~instrument=Driver.Instrument.make(~position=Before, traverser#structure),
   ~rules=[
-    /* %cx without let binding */
-    /* which doesn't have CssJs.label */
+    /* %cx without let binding, it doesn't have CssJs.label
+      %cx is defined in traverser#structure */
     Context_free.Rule.extension(
       Extension.declare(
         "cx",
