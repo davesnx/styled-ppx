@@ -737,8 +737,7 @@ Driver.register_transformation(
         compatibleWithBsEmotionPpx ? "css_" : "css",
         Extension.Context.Expression,
         string_payload,
-        (~loc as _, ~path, payload, _label, _) => {
-          let suffix = File.detectExtension(path);
+        (~loc as _, ~path as _, payload, _label, _) => {
           let pos = payload.loc.loc_start;
           let container_lnum = pos.pos_lnum;
           let declarationListValues =
