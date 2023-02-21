@@ -1,17 +1,17 @@
 {
   "name": "ppx-test-browser",
   "version": "0.0.0",
+  "license": "MIT",
   "scripts": {
     "build": "rescript build",
     "watch": "rescript build -w",
     "clean": "rescript clean",
-    "test_watch": "vitest",
+    "test_watch": "concurrently 'yarn watch' 'vitest'",
     "test": "vitest --run --silent",
     "start": "yarn test"
   },
   "dependencies": {
     "@glennsl/bs-jest": "^0.4.10",
-    "@jihchi/vite-plugin-rescript": "^5.1.0",
     "bs-css": "^15.3.0",
     "bs-css-emotion": "5.0.0",
     "bs-react-testing-library": "^0.7.0",

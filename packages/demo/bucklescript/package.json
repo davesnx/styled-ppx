@@ -1,6 +1,7 @@
 {
   "name": "demo-bucklescript",
   "version": "0.0.0",
+  "license": "MIT",
   "scripts": {
     "start": "concurrently --names re,js,www --kill-others yarn:re:watch yarn:bundle:watch yarn:dev-server",
     "bundle": "esbuild ./src/index.bs.js --outfile=src/bundle.js --bundle --sourcemap --target=chrome58,firefox57,safari11,edge16 --define:process.env.NODE_ENV='\"development\"'",

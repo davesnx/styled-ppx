@@ -1,5 +1,6 @@
 {
   "type": "module",
+  "license": "MIT",
   "scripts": {
     "start": "node generate/index.mjs",
     "generate": "node generate/index.mjs"

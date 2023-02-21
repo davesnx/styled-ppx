@@ -2,6 +2,9 @@
   "name": "styled-ppx.vercel.app",
   "version": "0.3.0",
   "description": "",
+  "author": "David Sancho <dsnxmoreno@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://styled-ppx.vercel.app",
   "main": "index.js",
   "scripts": {
     "dev": "next -p 7007",
@@ -9,8 +12,6 @@
     "build": "next build",
     "post-install": "patch-package"
   },
-  "author": "David Sancho",
-  "license": "MIT",
   "dependencies": {
     "@mdx-js/loader": "2.1.2",
     "@reach/skip-nav": "^0.16.0",
