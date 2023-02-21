@@ -1,8 +1,4 @@
-open Jest
-
-EmotionSerializer.load()
-
-external toString: CssJs.animationName => string = "%identity"
+open Vitest
 
 let testData = list{
   /* (%cx("overflow-x: clip"), CssJs.style(. [CssJs.unsafe("overflowX", "clip")])), */
@@ -13,10 +9,10 @@ let testData = list{
   ),
   (
     %cx(`
-    box-shadow:
-      12px 12px 2px 1px rgba(0, 0, 255, .2),
-      13px 14px 5px 6px rgba(2, 1, 255, 50%);
-    `),
+      box-shadow:
+        12px 12px 2px 1px rgba(0, 0, 255, .2),
+        13px 14px 5px 6px rgba(2, 1, 255, 50%);
+      `),
     CssJs.style(. [
       CssJs.boxShadows([
         CssJs.Shadow.box(
@@ -52,6 +48,8 @@ let testData = list{
   ),
 }
 
-Belt.List.forEachWithIndex(testData, (index, (cssIn, emotionOut)) =>
-  test(string_of_int(index), () => Expect.expect(cssIn) |> Expect.toEqual(emotionOut))
-)
+describe("cx", () => {
+  Belt.List.forEachWithIndex(testData, (index, (cssIn, emotionOut)) =>
+    test(string_of_int(index), _t => expect(cssIn)->Expect.toEqual(emotionOut))
+  )
+})

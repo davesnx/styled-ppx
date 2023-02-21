@@ -1,81 +1,42 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`Component renders 1`] = `
-.emotion-0 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  -webkit-justify-content: center;
-  justify-content: center;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  height: 100vh;
-  width: unset;
-  font-size: 30px;
-  -webkit-animation-name: fade;
-  animation-name: fade;
-}
-
+exports[`styled > Component renders 1`] = `
 <div>
   <div
-    class="emotion-0"
+    class="css-1dxdtbo-Component"
   />
 </div>
 `;
 
-exports[`ComponentInline renders and defaults to a div 1`] = `
-.emotion-0 {
-  color: #454545;
-}
-
+exports[`styled > ComponentInline renders and defaults to a div 1`] = `
 <div>
   <div
-    class="emotion-0"
+    class="css-d8cghp-ComponentInline"
   />
 </div>
 `;
 
-exports[`ComponentLink should receive href props 1`] = `
-.emotion-0 {
-  color: #454545;
-}
-
+exports[`styled > ComponentLink > should receive href props 1`] = `
 <div>
   <a
-    class="emotion-0"
+    class="css-pnp20i-ComponentLink"
     href="https://sancho.dev"
   />
 </div>
 `;
 
-exports[`ComponentLink should render an <a /> tag 1`] = `
-.emotion-0 {
-  color: #454545;
-}
-
+exports[`styled > ComponentLink > should render an <a /> tag 1`] = `
 <div>
   <a
-    class="emotion-0"
+    class="css-pnp20i-ComponentLink"
   />
 </div>
 `;
 
-exports[`StyledInput renders and self-closing element (whithout children) 1`] = `
-.emotion-0 {
-  color: #454545;
-}
-
+exports[`styled > StyledInput renders and self-closing element (whithout children) 1`] = `
 <div>
   <input
-    class="emotion-0"
+    class="css-mvqyji-StyledInput"
   />
 </div>
 `;

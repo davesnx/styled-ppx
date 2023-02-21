@@ -53,7 +53,7 @@
     "test_css_spec_parser": "esy dune build @css_spec_parser_test",
     "test_css_spec_types": "esy dune build @css_spec_types_test",
     "build_test_bs": "cd packages/ppx/test/browser; yarn build",
-    "test_bs": "cd packages/ppx/test/browser; yarn; yarn build; yarn test",
+    "test_bs": "yarn --cwd 'packages/ppx/test/browser' test",
     "dev": "esy dune build --root . --watch",
     "release-static":
       "esy b dune build --root . --ignore-promoted-rules --no-config --profile release-static --only-packages styled-ppx",
