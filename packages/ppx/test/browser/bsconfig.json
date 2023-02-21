@@ -27,11 +27,11 @@
   "namespace": true,
   "bs-dependencies": [
     "reason-react",
+    "@rescript/react",
     "bs-css",
     "bs-css-emotion"
   ],
   "bs-dev-dependencies": [
-    "@glennsl/bs-jest",
     "bs-react-testing-library",
     "rescript-vitest",
     "rescript-webapi"
