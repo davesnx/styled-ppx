@@ -4,7 +4,7 @@ title: Dynamic components
 
 # Dynamic components
 
-Dynamic components mean components that generate styles based on their props. You can derive styles from props, apply conditionally a variant or any other logic.
+Dynamic components mean components that generate styles based on their props. You can derive styles from props, apply conditionally a variant or any logic.
 
 `styled.{{tag}}` allows to be defined by a function, where it should return a string. This function is going to be available as props API for that component, including all props from the element. Like following:
 
@@ -20,6 +20,8 @@ module Dynamic = %styled.div(
   {React.string("Hello!")}
 </Dynamic>
 ```
+
+Note: The returned expression (the last expression of the function) need to be an string (it can't be a reference or a function call). This is a limitation of ppxes where it needs to check the current AST to know which type is.
 
 All rules from [Interpolation](./interpolation.md) are applied here. In the example, `color` and `background` are `CssJs.Color.t{:rescript}` since it gets inferred from the CSS property. It's called type holes https://twitter.com/davesnx/status/1552305210558742528
 
