@@ -64,7 +64,7 @@ module Align = %styled.div(
 
 ### Usage with Dynamic components
 
-There's a nice trick where dynamic components with the Array API provides: running any code before the styles and treat the module as an inlined function. It will be called each time the component renders. Such as:
+There's a nice composability where dynamic components and the Array API provides. You can create a component that can run any code before the styles. It will be called each time the component renders. Such as this example of runtime styles where it derives the color's background button based on a `variant` prop passed to a Theme module.
 
 ```rescript
 module Button = %styled.button(
@@ -72,7 +72,7 @@ module Button = %styled.button(
     let color = Theme.button(~variant)
 
     [
-      %css("color: $(color)"),
+      %css("background-color: $(color)"),
       %css("width: 100%;"),
       %css("display: inline-flex"),
     ]
@@ -80,4 +80,4 @@ module Button = %styled.button(
 )
 ```
 
-This is just an example of runtime for styles where the theme calculates the right color for the button.
+Note: The returned expression (the last expression of the function) need to be an array of `Css.rules` (it can't be a reference or a function call). This is a limitation of ppxes where it needs to check the current AST to know which type is.
