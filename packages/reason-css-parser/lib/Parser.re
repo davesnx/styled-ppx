@@ -5,6 +5,7 @@ open Rule.Match;
 open Parser_helper;
 
 module Lexer = Reason_css_lexer;
+module Helper = Ast_helper;
 
 let rec _legacy_gradient = [%value.rec "<-webkit-gradient()> | <-legacy-linear-gradient> | <-legacy-repeating-linear-gradient> | <-legacy-radial-gradient> | <-legacy-repeating-radial-gradient>"]
 and _legacy_linear_gradient = [%value.rec "-moz-linear-gradient( <-legacy-linear-gradient-arguments> ) | -webkit-linear-gradient( <-legacy-linear-gradient-arguments> ) | -o-linear-gradient( <-legacy-linear-gradient-arguments> )"]

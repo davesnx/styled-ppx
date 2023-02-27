@@ -118,13 +118,10 @@ let unsupportedProperty = (parser) =>
     (~loc as _) => raise(Unsupported_feature),
   );
 
-let render_string = (~loc, string) =>
-  Helper.Const.string(~quotation_delimiter="js", string) |> Helper.Exp.constant(~loc);
-let render_integer = (~loc, integer) =>
-  Helper.Const.int(integer) |> Helper.Exp.constant(~loc);
-let render_number = (~loc, number) =>
-  Helper.Const.float(number |> string_of_float) |> Helper.Exp.constant(~loc);
-let render_percentage = (~loc, number) => [%expr `percent([%e render_number(~loc, number)])];
+let render_string = Parser.Printers.render_string;
+let render_integer = Parser.Printers.render_integer;
+let render_number = Parser.Printers.render_number;
+let render_percentage = Parser.Printers.render_percentage
 
 let render_css_global_values = (~loc, name, value) => {
   let.ok value = Parser.parse(Standard.css_wide_keywords, value);
@@ -230,30 +227,7 @@ let variant_to_expression = (~loc) => fun
   | `Full_size_kana => raise(Unsupported_feature);
 
 // TODO: all of them could be float, but bs-css doesn't support it
-let render_length =
-  (~loc) => fun
-  | `Cap(_n) => raise(Unsupported_feature)
-  | `Ch(n) => [%expr `ch([%e render_number(~loc, n)])]
-  | `Cm(n) => [%expr `cm([%e render_number(~loc, n)])]
-  | `Em(n) => [%expr `em([%e render_number(~loc, n)])]
-  | `Ex(n) => [%expr `ex([%e render_number(~loc, n)])]
-  | `Ic(_n) => raise(Unsupported_feature)
-  | `In(_n) => raise(Unsupported_feature)
-  | `Lh(_n) => raise(Unsupported_feature)
-  | `Mm(n) => [%expr `mm([%e render_number(~loc, n)])]
-  | `Pc(n) => [%expr `pc([%e render_number(~loc, n)])]
-  | `Pt(n) => [%expr `pt([%e render_integer(~loc, n |> int_of_float)])]
-  | `Px(n) => [%expr `pxFloat([%e render_number(~loc, n)])]
-  | `Q(_n) => raise(Unsupported_feature)
-  | `Rem(n) => [%expr `rem([%e render_number(~loc, n)])]
-  | `Rlh(_n) => raise(Unsupported_feature)
-  | `Vb(_n) => raise(Unsupported_feature)
-  | `Vh(n) => [%expr `vh([%e render_number(~loc, n)])]
-  | `Vi(_n) => raise(Unsupported_feature)
-  | `Vmax(n) => [%expr `vmax([%e render_number(~loc, n)])]
-  | `Vmin(n) => [%expr `vmin([%e render_number(~loc, n)])]
-  | `Vw(n) => [%expr `vw([%e render_number(~loc, n)])]
-  | `Zero => [%expr `zero];
+let render_length = Parser.Printers.render_length;
 
 let rec render_function_calc = (~loc, calc_sum) => {
   switch (calc_sum) {
@@ -374,11 +348,7 @@ let render_min_size = (~loc) => fun
   | `Fit_content_1(_)
   | _ => raise(Unsupported_feature);
 
-let render_angle = (~loc) => fun
-  | `Deg(number) => id([%expr `deg([%e render_number(~loc, number)])])
-  | `Rad(number) => id([%expr `rad([%e render_number(~loc, number)])])
-  | `Grad(number) => id([%expr `grad([%e render_number(~loc, number)])])
-  | `Turn(number) => id([%expr `turn([%e render_number(~loc, number)])]);
+let render_angle = Parser.Printers.render_angle;
 
 let render_extended_angle = (~loc) => fun
   | `Angle(a) => render_angle(~loc, a)

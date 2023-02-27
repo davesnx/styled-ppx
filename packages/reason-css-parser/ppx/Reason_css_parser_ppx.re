@@ -72,9 +72,10 @@ let preprocess_impl = (structure_items) => {
     module Emit = Generate.Make(Ast_builder);
     let generated_types = Emit.make_types(value_binding);
     let modified_bindings = Emit.add_types(~loc=pstr_loc, value_binding);
+		let printers = Emit.make_printer;
     /* This is clearly a nasty one, I asume the content of the file and re-organise it */
     let (open_bindings, rest) = List.partition(is_open, rest);
-    open_bindings @ [generated_types] @ modified_bindings @ rest;
+    open_bindings @ [generated_types] @ modified_bindings @ rest @ [printers] ;
   }
   | [_more_than_one_rec_binding] => failwith("expected a single recursive value binding")
   | _ => structure_items

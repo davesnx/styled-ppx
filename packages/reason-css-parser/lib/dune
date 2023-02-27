@@ -8,5 +8,5 @@
   compiler-libs)
  (preprocess
   (per_module
-   ((pps reason_css_parser_ppx sedlex.ppx)
+   ((pps reason_css_parser_ppx sedlex.ppx ppxlib.metaquot) 
     Parser))))

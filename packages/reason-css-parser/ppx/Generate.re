@@ -636,5 +636,54 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     | Combinator(kind, values) => combinator_op(kind, values)
     | Function_call(name, value) => function_call(name, value)
     };
-  };
+  };  
+
+	let make_printer = {
+			let standard_printers = [
+        [%stri let build_variant = (~loc, name, args) => Ast_helper.Exp.variant(~loc, name, args) ],
+        [%stri let txt = (~loc, txt) => {Location.loc: loc, txt}],
+        [%stri let list_to_longident = vars => vars |> String.concat(".") |> Lexing.from_string |> Parse.longident],
+        [%stri let render_variable = (~loc, name) => list_to_longident(name) |> txt(~loc) |> Ast_helper.Exp.ident],
+				[%stri let render_string = (~loc, string) => Helper.Const.string(~quotation_delimiter="js", string) |> Ast_helper.Exp.constant(~loc)],
+				[%stri let render_integer = (~loc, int) => Helper.Const.int(int) |> Helper.Exp.constant(~loc)],
+				[%stri let render_number  = (~loc, number) => Helper.Const.float(number |> string_of_float) |> Helper.Exp.constant(~loc)],
+        [%stri let render_length  = {
+              (~loc) => fun
+              | `Cap(n) => build_variant(~loc, "cap", Some(render_number(~loc, n)))
+              | `Ch(n) => build_variant(~loc, "ch", Some(render_number(~loc, n)))
+              | `Cm(n) => build_variant(~loc, "cm", Some(render_number(~loc, n)))
+              | `Em(n) => build_variant(~loc, "em", Some(render_number(~loc, n)))
+              | `Ex(n) => build_variant(~loc, "ex", Some(render_number(~loc, n)))
+              | `Ic(n) => build_variant(~loc, "ic", Some(render_number(~loc, n)))
+              | `In(n) => build_variant(~loc, "In", Some(render_number(~loc, n)))
+              | `Lh(n) => build_variant(~loc, "lh", Some(render_number(~loc, n)))
+              | `Mm(n) => build_variant(~loc, "mm", Some(render_number(~loc, n)))
+              | `Pc(n) => build_variant(~loc, "pc", Some(render_number(~loc, n)))
+              | `Pt(n) => build_variant(~loc, "pt", Some(render_integer(~loc, n |> int_of_float)))
+              | `Px(n) => build_variant(~loc, "pxFloat", Some(render_number(~loc, n)))
+              | `Q(n) => build_variant(~loc, "Q", Some(render_number(~loc, n)))
+              | `Rem(n) => build_variant(~loc, "em", Some(render_number(~loc, n)))
+              | `Rlh(n) => build_variant(~loc, "rlh", Some(render_number(~loc, n)))
+              | `Vb(n) => build_variant(~loc, "vb", Some(render_number(~loc, n)))
+              | `Vh(n) => build_variant(~loc, "vh", Some(render_number(~loc, n)))
+              | `Vi(n) => build_variant(~loc, "vi", Some(render_number(~loc, n)))
+              | `Vmax(n) => build_variant(~loc, "vmax", Some(render_number(~loc, n)))
+              | `Vmin(n) => build_variant(~loc, "vmin", Some(render_number(~loc, n)))
+              | `Vw(n) => build_variant(~loc, "vw", Some(render_number(~loc, n)))
+              | `Zero => build_variant(~loc, "zero", None);
+
+        }
+            ],
+        [%stri let render_angle = (~loc) => fun
+              | `Deg(number) =>  build_variant(~loc, "deg", Some(render_number(~loc, number)))
+              | `Rad(number) =>  build_variant(~loc, "rad", Some(render_number(~loc, number)))
+              | `Grad(number) => build_variant(~loc, "grad", Some(render_number(~loc, number)))
+              | `Turn(number) => build_variant(~loc, "turn", Some(render_number(~loc, number)))
+            ],
+        [%stri let render_percentage = (~loc, number) => build_variant(~loc, "percent", Some(render_number(~loc, number)))]
+      ];
+
+    let printers_module = Ast_helper.Mod.structure(~loc, standard_printers);
+    [%stri module Printers = [%m printers_module]];
+	};
 };
