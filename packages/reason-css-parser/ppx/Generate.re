@@ -638,16 +638,16 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     };
   };  
 
-	let make_printer = {
+let make_printer = {
 			let standard_printers = [
         [%stri let build_variant = (~loc, name, args) => Ast_helper.Exp.variant(~loc, name, args) ],
         [%stri let txt = (~loc, txt) => {Location.loc: loc, txt}],
         [%stri let list_to_longident = vars => vars |> String.concat(".") |> Lexing.from_string |> Parse.longident],
-        [%stri let render_variable = (~loc, name) => list_to_longident(name) |> txt(~loc) |> Ast_helper.Exp.ident],
-				[%stri let render_string = (~loc, string) => Helper.Const.string(~quotation_delimiter="js", string) |> Ast_helper.Exp.constant(~loc)],
-				[%stri let render_integer = (~loc, int) => Helper.Const.int(int) |> Helper.Exp.constant(~loc)],
-				[%stri let render_number  = (~loc, number) => Helper.Const.float(number |> string_of_float) |> Helper.Exp.constant(~loc)],
-        [%stri let render_length  = {
+        [%stri let render_variable : (~loc: Location.t, Types.interpolation) => Parsetree.expression = (~loc, name) => list_to_longident(name) |> txt(~loc) |> Ast_helper.Exp.ident],
+				[%stri let render_string : (~loc: Location.t, string) => Parsetree.expression  = (~loc, string) => Helper.Const.string(~quotation_delimiter="js", string) |> Ast_helper.Exp.constant(~loc)],
+				[%stri let render_integer : (~loc: Location.t, Types.integer) => Parsetree.expression  = (~loc, int) => Helper.Const.int(int) |> Helper.Exp.constant(~loc)],
+				[%stri let render_number : (~loc: Location.t, Types.number) => Parsetree.expression = (~loc, number) => Helper.Const.float(number |> string_of_float) |> Helper.Exp.constant(~loc)],
+        [%stri let render_length : (~loc: Location.t, Types.length) => Parsetree.expression  = {
               (~loc) => fun
               | `Cap(n) => build_variant(~loc, "cap", Some(render_number(~loc, n)))
               | `Ch(n) => build_variant(~loc, "ch", Some(render_number(~loc, n)))
@@ -671,16 +671,14 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
               | `Vmin(n) => build_variant(~loc, "vmin", Some(render_number(~loc, n)))
               | `Vw(n) => build_variant(~loc, "vw", Some(render_number(~loc, n)))
               | `Zero => build_variant(~loc, "zero", None);
-
-        }
-            ],
-        [%stri let render_angle = (~loc) => fun
+            }],
+        [%stri let render_angle : (~loc: Location.t, Types.angle) => Parsetree.expression = (~loc) => fun
               | `Deg(number) =>  build_variant(~loc, "deg", Some(render_number(~loc, number)))
               | `Rad(number) =>  build_variant(~loc, "rad", Some(render_number(~loc, number)))
               | `Grad(number) => build_variant(~loc, "grad", Some(render_number(~loc, number)))
               | `Turn(number) => build_variant(~loc, "turn", Some(render_number(~loc, number)))
             ],
-        [%stri let render_percentage = (~loc, number) => build_variant(~loc, "percent", Some(render_number(~loc, number)))]
+        [%stri let render_percentage : (~loc: Location.t, Types.percentage) => Parsetree.expression = (~loc, number) => build_variant(~loc, "percent", Some(render_number(~loc, number)))]
       ];
 
     let printers_module = Ast_helper.Mod.structure(~loc, standard_printers);
