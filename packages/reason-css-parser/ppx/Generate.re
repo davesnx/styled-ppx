@@ -376,48 +376,6 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     };
   };
 
-let rec create_renderer = (value) => {
-	let apply_modifier = (modifier, value) => switch(modifier){
-		| One => value
-		| _ => raise(Unsupported_feature)
-		};
-
-	let terminal_op = (kind, _multiplier) => {
-			let variant_name = variant_name(value);
-			switch (kind) {
-			| Delim(_) => raise(Unsupported_feature)
-			| Keyword(name) =>
-				let lhs = ppat_variant(variant_name, None);
-				let rhs = name |> pconst_string |> pexp_constant;
-				case(~lhs, ~rhs, ~guard=None);
-			| Data_type(name) =>
-				let formatted_name = value_name_of_css(name);
-				let lhs = ppat_variant(variant_name, Some(ppat_var(txt("arg"))));
-				let name = Lident("render_" ++ formatted_name);
-				let rhs = pexp_apply(pexp_ident @@ txt(name), [(Nolabel, pexp_ident(txt(Lident("arg"))))]);
-				case(~lhs, ~rhs, ~guard=None)
-			| Property_type(_) => raise(Unsupported_feature)
-			};
-		}
-	and combinator_op = (kind, values) => {
-		switch(kind) {
-			| Xor =>
-				let cases = List.map(create_renderer, values)
-				List.flatten(cases)
-			| _ => raise(Unsupported_feature);
-		}
-	}
-	and group_op = (value, modifier) => {
-		create_renderer(value) |> apply_modifier(modifier);
-	}
-	switch (value) {
-		| Terminal(kind, multiplier) => [terminal_op(kind, multiplier)]
-		| Combinator(kind, values)  => combinator_op(kind, values)
-		| Function_call(_, _) => raise(Unsupported_feature)
-		| Group(value, multiplier) => group_op(value, multiplier);
-	};
-};
-
   let make_types = bindings => {
     let type_declarations = List.map((binding) => {
 			let (name, value) = extract_spec_value(binding);
@@ -685,21 +643,93 @@ let rec create_renderer = (value) => {
     };
   };  
 
+let rec (create_renderer : value => Parsetree.expression) = (value) => {
+	let apply_modifier = (modifier, value) => switch(modifier){
+		| _ => value
+		};
+
+	let rec terminal_op = (kind, _multiplier) => {
+		let variant_name = variant_name(value);
+			switch (kind) {
+			| Delim(_) => raise(Unsupported_feature)
+			| Keyword(name) =>
+				let lhs = ppat_variant(variant_name, None);
+				let rhs = name |> pconst_string |> pexp_constant;
+				let cases = case(~lhs, ~rhs, ~guard=None);
+				pexp_function([cases]);
+			| Data_type(name) =>
+				let formatted_name = value_name_of_css(name);
+				let name = Lident("render_" ++ formatted_name);
+				pexp_apply(pexp_ident @@ txt(name), []);
+			| Property_type(_) => raise(Unsupported_feature)
+			};
+		}
+
+	and terminal_xor_op = (kind, _multiplier, value) => {
+			/* let variant_name = variant_name(value); */
+			switch (kind) {
+			| Delim(_) => raise(Unsupported_feature)
+			| Keyword(name) =>
+				let formatted_name = variant_name(value);
+				(ppat_variant(formatted_name, None), name |> pconst_string |> pexp_constant);
+			| Data_type(name) =>
+				let formatted_name = value_name_of_css(name);
+				let name = Lident("render_" ++ formatted_name);
+				(ppat_variant(variant_name(value), Some([%pat? arg])) ,pexp_apply(pexp_ident @@ txt(name), [(Nolabel, pexp_ident(txt(Lident("arg"))))]))
+			| Property_type(_) => raise(Unsupported_feature)
+			};
+	}
+
+	and xor_op = ((name, value)) => {
+		let (lhs, rhs) = switch(value){
+			| Terminal(kind, multiplier) => terminal_xor_op(kind, multiplier, value)
+			| _ => (ppat_variant(name, None), create_renderer(value))
+		};
+		
+		case(~lhs, ~rhs, ~guard=None)
+
+	}
+	and combinator_op = (kind, values) => {
+		switch(kind) {
+			| Xor => 
+				let names = variant_names(values);
+				let args = List.combine(names, values)
+				List.map(xor_op, args) |> pexp_function
+
+			| _ => raise(Unsupported_feature);
+		}
+	}
+	and function_call = (_name, value) => {
+		create_renderer(value);
+	}
+	and group_op = (value, modifier) => {
+		create_renderer(value) |> apply_modifier(modifier);
+	}
+	switch (value) {
+		| Terminal(kind, multiplier) => terminal_op(kind, multiplier)
+		| Combinator(kind, values)  => combinator_op(kind, values)
+		| Function_call(name, value) => function_call(name, value)
+		| Group(value, multiplier) => group_op(value, multiplier);
+	};
+};
+
 let make_printer = bindings => {
 			let f = binding => {
 				let (name, value) = extract_spec_value(binding);
-				let cases = create_renderer(value);
+				let expr = create_renderer(value);
 				let pat = ppat_var(txt("render_" ++ value_name_of_css(name)));
-				let expr = pexp_function(cases) |> add_type_to_expr(name);
-				let vb = value_binding(~pat, ~expr);
-				pstr_value(Nonrecursive, [vb])
+				value_binding(~pat, ~expr);
 			}  
 
 			let renderers = List.map((binding) => {
 				try(f(binding)) {
-					| Unsupported_feature => [%stri let render_any = "hi"]
+					| Unsupported_feature => 
+					let expr = [%expr "todo"];
+					value_binding(~pat=[%pat? render__], ~expr) 
 				}
 			}, bindings)
+
+			let generated = pstr_value(Nonrecursive, renderers)
 
 			let standard_printers = [
         [%stri let build_variant = (~loc, name, args) => Ast_helper.Exp.variant(~loc, name, args) ],
@@ -743,7 +773,7 @@ let make_printer = bindings => {
         [%stri let render_percentage : (~loc: Location.t, Types.percentage) => Parsetree.expression = (~loc, number) => build_variant(~loc, "percent", Some(render_number(~loc, number)))]
       ];
 
-    let printers_module = Ast_helper.Mod.structure(~loc, standard_printers @ renderers);
+    let printers_module = Ast_helper.Mod.structure(~loc, standard_printers @ [generated]);
     [%stri module Printers = [%m printers_module]];
 	};
 };
