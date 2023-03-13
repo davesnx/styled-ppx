@@ -387,7 +387,10 @@ let create_renderer = (value) => {
 			let variant_name = variant_name(value);
 			switch (kind) {
 			| Delim(_) => raise(Unsupported_feature)
-			| Keyword(_) => raise(Unsupported_feature)
+			| Keyword(name) =>
+				let lhs = ppat_variant(variant_name, None);
+				let rhs = name |> pconst_string |> pexp_constant;
+				case(~lhs, ~rhs, ~guard=None);
 			| Data_type(name) =>
 				let formatted_name = value_name_of_css(name);
 				let lhs = ppat_variant(variant_name, Some(ppat_var(txt("arg"))));
