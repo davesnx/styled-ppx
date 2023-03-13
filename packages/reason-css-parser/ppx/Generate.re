@@ -3,8 +3,11 @@ open Longident;
 module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
   open Ast_builder;
   open Css_spec_parser;
+	exception Unsupported_feature;
 
   let txt = txt => {Location.loc: Ast_builder.loc, txt};
+
+	let pconst_string = s => Parsetree.Pconst_string(s, Ast_builder.loc, None);
 
   let kebab_case_to_snake_case = name =>
     name |> String.split_on_char('-') |> String.concat("_");
@@ -108,6 +111,13 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       )
     |> List.rev;
   };
+
+	let add_type_to_expr = (name: string, expression) => {
+    let core_type = Ast_helper.Typ.constr(~loc, { loc: Location.none, txt: Ldot(Lident("Types"), name) }, []);
+    let type_anotation = [%type: list(Reason_css_lexer.token) => (Reason_css_parser__Rule.data([%t core_type]), list(Reason_css_lexer.token))];
+    [%expr ([%e expression]: [%t type_anotation])];
+  };
+
 
   let make_type_declaration = (name, core_type) => {
     type_declaration(
@@ -327,7 +337,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     ];
   };
 
-  let make_type = (binding: Parsetree.value_binding) => {
+  let extract_spec_value = (binding: Parsetree.value_binding) => {
     let (name, payload) =
       switch (binding) {
       | {
@@ -361,14 +371,44 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       | _ => failwith("Error when extracting CSS spec content")
       };
     switch (Css_spec_parser.value_of_string(payload)) {
-    | Some(ast) => (name, create_type_parser(ast))
+    | Some(ast) => (name, ast)
     | None => failwith("Error while parsing CSS spec")
     };
   };
 
+let create_renderer = (value) => {
+	let rec _create_render =
+		fun
+		| Terminal(kind, multiplier) => terminal_op(kind, multiplier)
+		| Combinator(_, _) 
+		| Function_call(_, _)
+		| Group(_, _) => raise(Unsupported_feature)
+	and terminal_op = (kind, _multiplier) => {
+			let variant_name = variant_name(value);
+			switch (kind) {
+			| Delim(_) => raise(Unsupported_feature)
+			| Keyword(_) => raise(Unsupported_feature)
+			| Data_type(name) =>
+				let formatted_name = value_name_of_css(name);
+				let lhs = ppat_variant(variant_name, Some(ppat_var(txt("arg"))));
+				let name = Lident("render_" ++ formatted_name);
+				let rhs = pexp_apply(pexp_ident @@ txt(name), [(Nolabel, pexp_ident(txt(Lident("arg"))))]);
+				case(~lhs, ~rhs, ~guard=None)
+			| Property_type(_) => raise(Unsupported_feature)
+			};
+		}
+	switch (value) {
+		| Terminal(kind, multiplier) => terminal_op(kind, multiplier)
+		| Combinator(_, _)   
+		| Function_call(_, _)
+		| Group(_, _) => raise(Unsupported_feature) 
+	};
+};
+
   let make_types = bindings => {
     let type_declarations = List.map((binding) => {
-      let (name, core_type) = make_type(binding);
+			let (name, value) = extract_spec_value(binding);
+			let core_type = create_type_parser(value);
       make_type_declaration(name, core_type);
     }, bindings);
 
@@ -377,12 +417,6 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       Ast_helper.Str.type_(~loc, Recursive, type_declarations @ standard_types);
     let types_structure = Ast_helper.Mod.structure(~loc, [types]);
     [%stri module Types = [%m types_structure]];
-  };
-
-  let add_type_to_expr = (name: string, expression) => {
-    let core_type = Ast_helper.Typ.constr(~loc, { loc: Location.none, txt: Ldot(Lident("Types"), name) }, []);
-    let type_anotation = [%type: list(Reason_css_lexer.token) => (Reason_css_parser__Rule.data([%t core_type]), list(Reason_css_lexer.token))];
-    [%expr ([%e expression]: [%t type_anotation])];
   };
 
   let get_name_from_binding = (binding: Parsetree.value_binding) => {
@@ -638,7 +672,22 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     };
   };  
 
-let make_printer = {
+let make_printer = bindings => {
+			let f = binding => {
+				let (name, value) = extract_spec_value(binding);
+				let cases = create_renderer(value);
+				let pat = ppat_var(txt("render_" ++ value_name_of_css(name)));
+				let expr = pexp_function([cases]) |> add_type_to_expr(name);
+				let vb = value_binding(~pat, ~expr);
+				pstr_value(Nonrecursive, [vb])
+			}  
+
+			let renderers = List.map((binding) => {
+				try(f(binding)) {
+					| Unsupported_feature => [%stri let render_any = "hi"]
+				}
+			}, bindings)
+
 			let standard_printers = [
         [%stri let build_variant = (~loc, name, args) => Ast_helper.Exp.variant(~loc, name, args) ],
         [%stri let txt = (~loc, txt) => {Location.loc: loc, txt}],
@@ -681,7 +730,7 @@ let make_printer = {
         [%stri let render_percentage : (~loc: Location.t, Types.percentage) => Parsetree.expression = (~loc, number) => build_variant(~loc, "percent", Some(render_number(~loc, number)))]
       ];
 
-    let printers_module = Ast_helper.Mod.structure(~loc, standard_printers);
+    let printers_module = Ast_helper.Mod.structure(~loc, standard_printers @ renderers);
     [%stri module Printers = [%m printers_module]];
 	};
 };
