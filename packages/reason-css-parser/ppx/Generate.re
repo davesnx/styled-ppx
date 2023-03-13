@@ -376,14 +376,13 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     };
   };
 
-let create_renderer = (value) => {
-	let rec _create_render =
-		fun
-		| Terminal(kind, multiplier) => terminal_op(kind, multiplier)
-		| Combinator(_, _) 
-		| Function_call(_, _)
-		| Group(_, _) => raise(Unsupported_feature)
-	and terminal_op = (kind, _multiplier) => {
+let rec create_renderer = (value) => {
+	let apply_modifier = (modifier, value) => switch(modifier){
+		| One => value
+		| _ => raise(Unsupported_feature)
+		};
+
+	let terminal_op = (kind, _multiplier) => {
 			let variant_name = variant_name(value);
 			switch (kind) {
 			| Delim(_) => raise(Unsupported_feature)
@@ -400,11 +399,22 @@ let create_renderer = (value) => {
 			| Property_type(_) => raise(Unsupported_feature)
 			};
 		}
+	and combinator_op = (kind, values) => {
+		switch(kind) {
+			| Xor =>
+				let cases = List.map(create_renderer, values)
+				List.flatten(cases)
+			| _ => raise(Unsupported_feature);
+		}
+	}
+	and group_op = (value, modifier) => {
+		create_renderer(value) |> apply_modifier(modifier);
+	}
 	switch (value) {
-		| Terminal(kind, multiplier) => terminal_op(kind, multiplier)
-		| Combinator(_, _)   
-		| Function_call(_, _)
-		| Group(_, _) => raise(Unsupported_feature) 
+		| Terminal(kind, multiplier) => [terminal_op(kind, multiplier)]
+		| Combinator(kind, values)  => combinator_op(kind, values)
+		| Function_call(_, _) => raise(Unsupported_feature)
+		| Group(value, multiplier) => group_op(value, multiplier);
 	};
 };
 
@@ -680,7 +690,7 @@ let make_printer = bindings => {
 				let (name, value) = extract_spec_value(binding);
 				let cases = create_renderer(value);
 				let pat = ppat_var(txt("render_" ++ value_name_of_css(name)));
-				let expr = pexp_function([cases]) |> add_type_to_expr(name);
+				let expr = pexp_function(cases) |> add_type_to_expr(name);
 				let vb = value_binding(~pat, ~expr);
 				pstr_value(Nonrecursive, [vb])
 			}  
@@ -695,7 +705,7 @@ let make_printer = bindings => {
         [%stri let build_variant = (~loc, name, args) => Ast_helper.Exp.variant(~loc, name, args) ],
         [%stri let txt = (~loc, txt) => {Location.loc: loc, txt}],
         [%stri let list_to_longident = vars => vars |> String.concat(".") |> Lexing.from_string |> Parse.longident],
-        [%stri let render_variable : (~loc: Location.t, Types.interpolation) => Parsetree.expression = (~loc, name) => list_to_longident(name) |> txt(~loc) |> Ast_helper.Exp.ident],
+        [%stri let render_interpolation : (~loc: Location.t, Types.interpolation) => Parsetree.expression = (~loc, name) => list_to_longident(name) |> txt(~loc) |> Ast_helper.Exp.ident],
 				[%stri let render_string : (~loc: Location.t, string) => Parsetree.expression  = (~loc, string) => Helper.Const.string(~quotation_delimiter="js", string) |> Ast_helper.Exp.constant(~loc)],
 				[%stri let render_integer : (~loc: Location.t, Types.integer) => Parsetree.expression  = (~loc, int) => Helper.Const.int(int) |> Helper.Exp.constant(~loc)],
 				[%stri let render_number : (~loc: Location.t, Types.number) => Parsetree.expression = (~loc, number) => Helper.Const.float(number |> string_of_float) |> Helper.Exp.constant(~loc)],
