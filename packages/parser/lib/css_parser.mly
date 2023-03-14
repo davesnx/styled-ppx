@@ -409,7 +409,9 @@ pseudo:
 ;
 
 compound_selector:
-  | type_selector = simple_selector; subclass_selectors = loption(list(subclass_selector)); pseudo_selectors = loption(list(pseudo)); {
+  | type_selector = simple_selector;
+    subclass_selectors = list(subclass_selector);
+    pseudo_selectors = list(pseudo); {
     Selector.{
       type_selector = Some type_selector;
       subclass_selectors;
