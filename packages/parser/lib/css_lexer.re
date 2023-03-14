@@ -101,25 +101,24 @@ let token_to_debug =
   | Parser.BAD_URL => "BAD_URL"
 ;
 
-let () =
-  Location.register_error_of_exn(
-    fun
-    | LexingError((pos, msg)) => {
-        let loc = Sedlexing.make_loc(pos, pos);
-        Some(Location.error(~loc, msg));
-      }
-    | ParseError((token, start_pos, end_pos)) => {
-        let loc = Sedlexing.make_loc(start_pos, end_pos);
-        let msg =
-          Printf.sprintf(
-            "Parse error while reading token '%s'",
-            token_to_string(token),
-          );
-        Some(Location.error(~loc, msg));
-      }
-    | GrammarError((msg, loc)) => Some(Location.error(~loc, msg))
-    | exn => Some(Location.error("Unexpected error " ++ Printexc.to_string(exn)))
-  );
+let render_error = fun
+  | LexingError((pos, msg)) => {
+    let loc = Sedlexing.make_loc(pos, pos);
+    Location.error(~loc, msg);
+  }
+  | ParseError((token, start_pos, end_pos)) => {
+    let loc = Sedlexing.make_loc(start_pos, end_pos);
+    let msg =
+      Printf.sprintf(
+        "Parse error while reading token '%s'",
+        token_to_string(token),
+      );
+    Location.error(~loc, msg);
+  }
+  | GrammarError((msg, loc)) => Location.error(~loc, msg)
+  | exn => Location.error("Unexpected error " ++ Printexc.to_string(exn));
+
+let () = Location.register_error_of_exn(exn => Some(render_error(exn)));
 
 /* Regexes */
 let newline = [%sedlex.regexp? '\n' | "\r\n" | '\r' | '\012'];
