@@ -77,11 +77,9 @@ skip_ws_left (X): WS?; x = X; { x };
 /* {} */
 empty_brace_block: LEFT_BRACE; RIGHT_BRACE; { [] }
 
-/* TODO: Remove SEMI_COLON? from brace_block(X) */
 /* { ... } */
 brace_block(X):
-  xs = delimited(LEFT_BRACE, X, RIGHT_BRACE);
-  SEMI_COLON? { xs };
+  xs = delimited(LEFT_BRACE, X, RIGHT_BRACE); { xs };
 
 /* [] */
 bracket_block (X): xs = delimited(LEFT_BRACKET, X, RIGHT_BRACKET); { xs };
@@ -155,7 +153,7 @@ at_rule:
   }
   /* @charset */
   | name = loc(AT_RULE_STATEMENT); WS?;
-    xs = loc(prelude); WS?; SEMI_COLON?; {
+    xs = loc(prelude); WS?; {
     { At_rule.name = name;
       prelude = xs;
       block = Brace_block.Empty;
@@ -226,8 +224,7 @@ prelude: xs = loption(nonempty_list(loc(component_value_in_prelude))) { xs };
 component_values: xs = loption(nonempty_list(loc(component_value))) { xs };
 
 declarations:
-  | xs = nonempty_list(rule); SEMI_COLON?; { xs }
-  | xs = separated_nonempty_list(SEMI_COLON, rule); SEMI_COLON?; { xs }
+  | xs = nonempty_list(rule); { xs }
 
 rule:
   | d = declaration_without_eof; { Rule.Declaration d }
@@ -240,7 +237,7 @@ declaration_without_eof:
   | property = loc(IDENT);
     COLON;
     value = loc(component_values);
-    important = loc(boption(IMPORTANT)); SEMI_COLON? {
+    important = loc(boption(IMPORTANT)); SEMI_COLON?; {
     { Declaration.name = property;
       value;
       important;
