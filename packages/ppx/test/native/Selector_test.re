@@ -140,7 +140,8 @@ let complex_tests = [
     "& #first-child",
     [%expr [%cx {js|& #first-child {}|js}]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& #first-child|js}, [||])|])]
-  ),(
+  ),
+  (
     "& .bar",
     [%expr [%cx {js|& .bar {}|js}]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& .bar|js}, [||])|])],
