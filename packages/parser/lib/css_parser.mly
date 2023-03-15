@@ -66,7 +66,9 @@ keyframes:
 ;
 
 /* Adds location as a tuple */
-loc(X): x = X { (x, Lex_buffer.make_loc $startpos(x) $endpos(x))}
+%public %inline loc(X): x = X {
+  (x, Lex_buffer.make_loc $startpos(x) $endpos(x))
+}
 
 /* Handle skipping whitespace */
 skip_ws (X): x = delimited(WS?, X, WS?) { x };
@@ -204,14 +206,14 @@ keyframe_style_rule:
 
 /* .class {} */
 style_rule:
-  | WS?; prelude = loc(separated_nonempty_list(skip_ws_right(COMMA), loc(selector))); WS?;
+  | WS?; prelude = loc(separated_nonempty_list(skip_ws(COMMA), loc(selector))); WS?;
     block = loc(empty_brace_block); WS?; {
     { prelude;
       block;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
-  | WS?; prelude = loc(separated_nonempty_list(skip_ws_right(COMMA), loc(selector))) WS?;
+  | WS?; prelude = loc(separated_nonempty_list(skip_ws(COMMA), loc(selector))) WS?;
     declarations = brace_block(loc(declarations)); WS?; {
     { prelude;
       block = declarations;
@@ -360,12 +362,12 @@ subclass_selector:
 ;
 
 complex_selector_list:
-  | xs = separated_nonempty_list(skip_ws_right(COMMA), skip_ws_right(complex_selector)) { xs }
+  | xs = separated_nonempty_list(skip_ws_right(COMMA), complex_selector) { xs }
 ;
 
 selector:
   /* <simple-selector-list> = <simple-selector># */
-  /* | xs = simple_selector; {
+  /* | xs = skip_ws_right(simple_selector); {
     SimpleSelector xs
   } */
   /* <compound-selector-list> = <compound-selector># */
@@ -411,21 +413,43 @@ pseudo:
 ;
 
 compound_selector:
-  | type_selector = simple_selector;
-    subclass_selectors = list(subclass_selector);
-    pseudo_selectors = list(pseudo); {
+  | type_selector = simple_selector?;
+    subclass_selectors = nonempty_list(subclass_selector);
+    pseudo_selectors = nonempty_list(pseudo); {
     {
-      type_selector = Some type_selector;
+      type_selector;
       subclass_selectors;
       pseudo_selectors;
+    }
+  }
+  | type_selector = simple_selector?;
+    subclass_selectors = nonempty_list(subclass_selector); {
+    {
+      type_selector;
+      subclass_selectors;
+      pseudo_selectors = [];
+    }
+  }
+  | type_selector = simple_selector?;
+    pseudo_selectors = nonempty_list(pseudo); {
+    {
+      type_selector;
+      subclass_selectors = [];
+      pseudo_selectors;
+    }
+  }
+  | type_selector = simple_selector; {
+    {
+      type_selector = Some type_selector;
+      subclass_selectors = [];
+      pseudo_selectors = [];
     }
   }
 ;
 
 combinator:
-  /* Since we render COMBINATOR always with spaces, we ignore them here */
-  | WS?; c = COMBINATOR; WS?; s = compound_selector; WS?; { (Some c, s) }
-  | WS; s = compound_selector; WS?; { (None, s) }
+  | WS?; c = skip_ws_right(COMBINATOR); s = skip_ws_right(compound_selector); { (Some c, s) }
+  | WS; s = skip_ws_right(compound_selector); { (None, s) }
 ;
 
 /* <complex-selector> = <compound-selector> [ <combinator>? <compound-selector> ]* */
