@@ -254,12 +254,12 @@ and render_selector = (selector: selector) => {
         render_subclass_selector,
         compound_selector.subclass_selectors,
       ) |> String.concat("");
-    let pseudo_selectors =
+    /* let _pseudo_selectors =
       List.map(
         render_pseudo_selector,
         compound_selector.pseudo_selectors,
-      ) |> String.concat("");
-    simple_selector ++ subclass_selectors ++ pseudo_selectors;
+      ) |> String.concat(""); */
+    simple_selector ++ subclass_selectors /* ++ pseudo_selectors */;
   }
   and render_complex_selector = complex => {
     switch (complex) {

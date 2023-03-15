@@ -98,7 +98,7 @@ and complex_selector =
 and compound_selector = {
   type_selector: option(simple_selector),
   subclass_selectors: list(subclass_selector),
-  pseudo_selectors: list(pseudo_selector),
+  pseudo_selectors: list(pseudo_selector), /* TODO: (string, pseudoclass_kind) */
 }
 [@deriving show({with_path: false})]
 and simple_selector =

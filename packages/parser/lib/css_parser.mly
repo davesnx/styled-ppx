@@ -46,24 +46,23 @@ open Css_types
 %start <rule_list> declaration_list
 %start <declaration> declaration
 %start <rule_list> keyframes
+%start <compound_selector> compound_selector
 
 %%
 
-stylesheet: s = stylesheet_without_eof; EOF { s };
-stylesheet_without_eof: rs = loc(list(rule)) { rs };
+stylesheet: s = stylesheet_without_eof; EOF { s }
+stylesheet_without_eof: rs = loc(list(rule)) { rs }
 
 declaration_list:
   | EOF { ([], Lex_buffer.make_loc $startpos $endpos) }
-  | ds = loc(declarations); EOF { ds }
-;
+  | ds = loc(declarations) EOF { ds }
 
 /* keyframe may contain {} */
-keyframe: rules = nonempty_list(keyframe_style_rule); { rules };
+keyframe: rules = nonempty_list(keyframe_style_rule) { rules }
 
 keyframes:
-  | rules = loc(keyframe); EOF; { rules }
-  | rules = brace_block(loc(keyframe)); EOF; { rules }
-;
+  | rules = loc(keyframe) EOF { rules }
+  | rules = brace_block(loc(keyframe)) EOF { rules }
 
 /* Adds location as a tuple */
 %public %inline loc(X): x = X {
@@ -71,9 +70,9 @@ keyframes:
 }
 
 /* Handle skipping whitespace */
-skip_ws (X): x = delimited(WS?, X, WS?) { x };
-skip_ws_right (X): x = X; WS?; { x };
-skip_ws_left (X): WS?; x = X; { x };
+skip_ws (X): x = delimited(WS?, X, WS?) { x }
+skip_ws_right (X): x = X; WS? { x }
+skip_ws_left (X): WS? x = X; { x }
 
 /* TODO: Remove empty_brace_block */
 /* {} */
@@ -83,13 +82,13 @@ empty_brace_block: LEFT_BRACE; RIGHT_BRACE; { [] }
 /* { ... } */
 brace_block(X):
   xs = delimited(LEFT_BRACE, X, RIGHT_BRACE);
-  SEMI_COLON? { xs };
+  SEMI_COLON? { xs }
 
 /* [] */
-bracket_block (X): xs = delimited(LEFT_BRACKET, X, RIGHT_BRACKET); { xs };
+bracket_block (X): xs = delimited(LEFT_BRACKET, X, RIGHT_BRACKET) { xs }
 
 /* () */
-paren_block (X): xs = delimited(LEFT_PAREN, X, RIGHT_PAREN); { xs };
+paren_block (X): xs = delimited(LEFT_PAREN, X, RIGHT_PAREN) { xs }
 
 /* https://www.w3.org/TR/mediaqueries-5 */
 /* Parsing with this approach is almost as good the entire spec */
@@ -103,16 +102,15 @@ media_query_prelude_item:
   | i = IDENT { Ident i }
   | v = VARIABLE { Variable v }
   | xs = paren_block(prelude) { Paren_block xs }
-;
 
-media_query_prelude: q = nonempty_list(loc(skip_ws(media_query_prelude_item))) { q };
+media_query_prelude: q = nonempty_list(loc(skip_ws(media_query_prelude_item))) { q }
 
 /* https://www.w3.org/TR/css-syntax-3/#at-rules */
 at_rule:
   /* @media (min-width: 16rem) { ... } */
-  | name = loc(AT_MEDIA); WS?;
-    prelude = loc(media_query_prelude); WS?;
-    ds = brace_block(loc(declarations)); WS? {
+  | name = loc(AT_MEDIA) WS?
+    prelude = loc(media_query_prelude) WS?
+    ds = brace_block(loc(declarations)) WS? {
     { name = name;
       prelude;
       block = Rule_list ds;
@@ -120,9 +118,9 @@ at_rule:
     }
   }
   /* @media (min-width: 16rem) {} */
-  | name = loc(AT_MEDIA); WS?;
-    prelude = loc(media_query_prelude); WS?;
-    b = loc(empty_brace_block); WS?; {
+  | name = loc(AT_MEDIA) WS?
+    prelude = loc(media_query_prelude) WS?
+    b = loc(empty_brace_block) WS? {
     { name = name;
       prelude;
       block = Rule_list b;
@@ -130,8 +128,8 @@ at_rule:
     }
   }
   /* @keyframes animationName { ... } */
-  | name = loc(AT_KEYFRAMES); WS?;
-    i = IDENT; WS?;
+  | name = loc(AT_KEYFRAMES) WS?
+    i = IDENT WS?
     block = brace_block(keyframe) {
     let _item = (Ident i, Lex_buffer.make_loc $startpos(i) $endpos(i)) in
     let prelude = ([], Lex_buffer.make_loc $startpos $endpos) in
@@ -143,8 +141,8 @@ at_rule:
     }
   }
   /* @keyframes animationName {} */
-  | name = loc(AT_KEYFRAMES); WS?;
-    i = IDENT; WS?;
+  | name = loc(AT_KEYFRAMES) WS?
+    i = IDENT WS?
     s = loc(empty_brace_block) {
     let _item = (Ident i, Lex_buffer.make_loc $startpos(i) $endpos(i)) in
     let prelude = ([], Lex_buffer.make_loc $startpos $endpos) in
@@ -156,8 +154,8 @@ at_rule:
     }): at_rule
   }
   /* @charset */
-  | name = loc(AT_RULE_STATEMENT); WS?;
-    xs = loc(prelude); WS?; SEMI_COLON?; {
+  | name = loc(AT_RULE_STATEMENT) WS?
+    xs = loc(prelude) WS? SEMI_COLON? {
     { name = name;
       prelude = xs;
       block = Empty;
@@ -167,23 +165,22 @@ at_rule:
   /* @support { ... } */
   /* @page { ... } */
   /* @{{rule}} { ... } */
-  | name = loc(AT_RULE); WS?;
-    xs = loc(prelude); WS?;
-    s = brace_block(stylesheet_without_eof); WS?; {
+  | name = loc(AT_RULE) WS?
+    xs = loc(prelude) WS?
+    s = brace_block(stylesheet_without_eof) WS? {
     { name = name;
       prelude = xs;
       block = Stylesheet s;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
-;
 
-percentage: n = NUMBER; PERCENTAGE; { n }
+percentage: n = NUMBER PERCENTAGE { n }
 
 /* keyframe allows stylesheet by defintion, but we restrict the usage to: */
 keyframe_style_rule:
-  | WS?; id = IDENT; WS?;
-    declarations = brace_block(loc(declarations)); WS?; {
+  | WS? id = IDENT WS?
+    declarations = brace_block(loc(declarations)) WS? {
     let prelude = [(SimpleSelector (Type id), Lex_buffer.make_loc $startpos(id) $endpos(id))] in
     Style_rule {
       prelude = (prelude, Lex_buffer.make_loc $startpos(id) $endpos(id));
@@ -191,8 +188,9 @@ keyframe_style_rule:
       block = declarations;
     }
   }
-  | WS?; p = percentage; WS?;
-    declarations = brace_block(loc(declarations)); WS?; {
+  /* TODO: Support percentage in simple_selector and have selector parsing here */
+  | WS? p = percentage; WS?
+    declarations = brace_block(loc(declarations)) WS? {
     let item = Percentage p in
     let prelude = [(SimpleSelector item, Lex_buffer.make_loc $startpos(p) $endpos(p))] in
     Style_rule {
@@ -204,74 +202,79 @@ keyframe_style_rule:
   /* TODO: Handle separated_list(COMMA, percentage) */
 ;
 
+selector_list:
+  | selector = loc(selector) {
+    [selector]
+  }
+  | selector = loc(selector) skip_ws(COMMA) seq = selector_list {
+    selector :: seq
+  }
+
 /* .class {} */
 style_rule:
-  | WS?; prelude = loc(separated_nonempty_list(skip_ws(COMMA), loc(selector))); WS?;
-    block = loc(empty_brace_block); WS?; {
+  | prelude = loc(selector_list)
+    block = loc(empty_brace_block) {
     { prelude;
       block;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
-  | WS?; prelude = loc(separated_nonempty_list(skip_ws(COMMA), loc(selector))) WS?;
-    declarations = brace_block(loc(declarations)); WS?; {
+  | prelude = loc(selector_list)
+    declarations = brace_block(loc(declarations)) {
     { prelude;
       block = declarations;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
-;
 
-prelude: xs = loption(nonempty_list(loc(component_value_in_prelude))) { xs };
+prelude: xs = loption(nonempty_list(loc(component_value_in_prelude))) { xs }
 
-component_values: xs = loption(nonempty_list(loc(component_value))) { xs };
+component_values: xs = loption(nonempty_list(loc(component_value))) { xs }
 
 declarations:
-  | xs = nonempty_list(rule); SEMI_COLON?; { xs }
-  | xs = separated_nonempty_list(SEMI_COLON, rule); SEMI_COLON?; { xs }
+  | xs = nonempty_list(rule) SEMI_COLON? { xs }
+  | xs = separated_nonempty_list(SEMI_COLON, rule) SEMI_COLON? { xs }
 
 rule:
   | d = declaration_without_eof; { Declaration d }
   | r = at_rule { At_rule r }
   | s = style_rule { Style_rule s }
-;
 
 /* property: value; */
 declaration_without_eof:
-  | property = loc(IDENT);
-    COLON;
-    value = loc(component_values);
-    important = loc(boption(IMPORTANT)); SEMI_COLON? {
+  | property = loc(IDENT)
+    COLON
+    value = loc(component_values)
+    important = loc(boption(IMPORTANT)) SEMI_COLON? {
     { name = property;
       value;
       important;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
-;
 
-declaration: d = declaration_without_eof; EOF { d };
+declaration: d = declaration_without_eof; EOF { d }
 
 /* ::after */
 pseudo_element_selector:
-  DOUBLE_COLON; pse = IDENT { Pseudoelement pse };
+  DOUBLE_COLON; pse = IDENT { Pseudoelement pse }
 
 nth:
   /* even, odd, n */
   | i = IDENT { NthIdent i }
   /* <An+B> */
   /* 2 */
-  | a = NUMBER; { A a }
+  | a = NUMBER { A a }
   /* 2n */
   | a = DIMENSION { AN (fst a) }
   /* Since our lexing isn't on point with DIMENSIONS/NUMBERS */
   /* We add a case where operator is missing */
   /* 2n-1 */
-  | left = DIMENSION; WS?; right = NUMBER; {
+  | left = DIMENSION WS? right = NUMBER {
     ANB ((fst left, "", right))
   }
   /* 2n+1 */
-  | left = DIMENSION; WS?; combinator = COMBINATOR; right = NUMBER; {
+  | left = DIMENSION WS? combinator = COMBINATOR right = NUMBER {
     ANB ((fst left, combinator, right))
   }
   /* TODO: Support "An+B of Selector" */
@@ -279,42 +282,38 @@ nth:
 
 nth_payload:
   | complex = complex_selector_list; { NthSelector complex }
-  | n = skip_ws(nth); { Nth n }
-;
+  | n = skip_ws(nth) { Nth n }
 
 /* <pseudo-class-selector> = ':' <ident-token> | ':' <function-token> <any-value> ')' */
 pseudo_class_selector:
-  /* :visited */
-  | COLON; i = IDENT { (Pseudoclass(Ident i)) }
-  /* :not() */
-  | COLON; f = FUNCTION; xs = loc(selector); RIGHT_PAREN {
+  | COLON i = IDENT { (Pseudoclass(Ident i)) } /* :visited */
+  | COLON f = FUNCTION xs = loc(selector) RIGHT_PAREN /* :not() */ {
     (Pseudoclass(Function({ name = f; payload = xs })))
   }
-  /* :nth-child() */
-  | COLON; f = NTH_FUNCTION; xs = loc(nth_payload); RIGHT_PAREN {
+  | COLON f = NTH_FUNCTION xs = loc(nth_payload) RIGHT_PAREN /* :nth() */ {
     (Pseudoclass(NthFunction({ name = f; payload = xs })))
   }
   /* TODO: <function-token> and <any-value> */
 ;
 
 /* "~=" | "|=" | "^=" | "$=" | "*=" | "=" */
-attr_matcher: o = OPERATOR { o };
+attr_matcher: o = OPERATOR { o }
 
 /* <attribute-selector> = '[' <wq-name> ']' | '[' <wq-name> <attr-matcher> [  <string-token> | <ident-token> ] <attr-modifier>? ']' */
 attribute_selector:
   /* https://www.w3.org/TR/selectors-4/#type-nmsp */
   /* We don't support namespaces in wq-name (`ns-prefix?`). We treat it like a IDENT */
   /* [ <wq-name> ] */
-  | LEFT_BRACKET; WS?;
-    i = IDENT; WS?;
+  | LEFT_BRACKET; WS?
+    i = IDENT WS?
     RIGHT_BRACKET {
     Attribute(Attr_value i)
   }
   /* [ wq-name = "value"] */
-  | LEFT_BRACKET; WS?;
-    i = IDENT; WS?;
-    m = attr_matcher; WS?;
-    v = STRING; WS?;
+  | LEFT_BRACKET; WS?
+    i = IDENT WS?
+    m = attr_matcher; WS?
+    v = STRING; WS?
     RIGHT_BRACKET {
     Attribute(
       To_equal({
@@ -325,10 +324,10 @@ attribute_selector:
     )
   }
   /* [ wq-name = value] */
-  | LEFT_BRACKET; WS?;
-    i = IDENT; WS?;
-    m = attr_matcher; WS?;
-    v = IDENT; WS?;
+  | LEFT_BRACKET; WS?
+    i = IDENT WS?
+    m = attr_matcher; WS?
+    v = IDENT WS?
     RIGHT_BRACKET {
     Attribute(
       To_equal({
@@ -346,54 +345,43 @@ id_selector: h = HASH { Id h }
 
 /* <class-selector> = '.' <ident-token> */
 class_selector:
-  | DOT; c = IDENT { Class c }
-  /* This should be an IDENT. Tiny bug where we split idents and tags by it's content,
-    here we want to treat them equaly */
-  | DOT; t = TAG { Class t };
+  | DOT IDENT { Class $2 }
+  /* TODO: Fix this: Here we need to add TAG in case some ident is an actual tag :( */
+  | DOT TAG { Class $2 }
 
 /* <subclass-selector> = <id-selector> | <class-selector> | <attribute-selector> | <pseudo-class-selector> */
 subclass_selector:
-  | id = id_selector { id }
-  | c = class_selector { c }
-  | a = attribute_selector { a }
-  | pcs = pseudo_class_selector { Pseudo_class pcs }
-  /* .$(Variable) as subclass_selector */
-  | DOT; v = VARIABLE { ClassVariable v };
-;
+  | id = id_selector { id } /* #id */
+  | c = class_selector { c } /* .class */
+  | a = attribute_selector { a } /* [attr] */
+  | pcs = pseudo_class_selector { Pseudo_class pcs } /* :pseudo-class */
+  | DOT v = VARIABLE { ClassVariable v } /* .$(Variable) as subclass_selector */
 
 complex_selector_list:
   | xs = separated_nonempty_list(skip_ws_right(COMMA), complex_selector) { xs }
-;
 
 selector:
-  /* <simple-selector-list> = <simple-selector># */
-  /* | xs = skip_ws_right(simple_selector); {
-    SimpleSelector xs
-  } */
-  /* <compound-selector-list> = <compound-selector># */
-  | xs = skip_ws_right(compound_selector); {
-    CompoundSelector xs
-  }
-  /* <complex-selector-list> = <complex-selector># */
-  | xs = skip_ws_right(complex_selector); { ComplexSelector xs }
-;
+  | xs = skip_ws_right(simple_selector) { SimpleSelector xs }
+  | xs = skip_ws_right(compound_selector) { CompoundSelector xs }
+  /* | xs = skip_ws_right(complex_selector) { ComplexSelector xs } */
+
+type_selector:
+  | AMPERSAND; { Ampersand } /* & {} https://drafts.csswg.org/css-nesting/#nest-selector */
+  | ASTERISK; { Universal } /* * {} */
+  | v = VARIABLE { Variable v } /* $(Module.value) {} */
+  /* TODO: type_selector should work with IDENTs, but there's a bunch of grammar
+    conflicts with IDENT on component_value and others, we replaced with TAG, a
+    list of valid HTML tags that does the job done, but this should be fixed. */
+  | type_ = IDENT; { Type type_ } /* a {} */
+  | type_ = TAG; { Type type_ } /* a {} */
 
 /* <simple-selector> = <type-selector> | <subclass-selector> */
 /* We change the spec adding the & selector */
 /* <simple-selector> = <self-selector> | <type-selector> | <subclass-selector> */
 simple_selector:
-  /* & {} */
-  /* https://drafts.csswg.org/css-nesting/#nest-selector */
-  | AMPERSAND; { Ampersand }
-  /* * {} */
-  | ASTERISK; { Universal }
-  /* $(Module.value) {} */
-  | v = VARIABLE { Variable v }
-  /* a {} */
-  | type_ = TAG; { Type type_ }
-  /* #a, .a, a:visited, a[] */
-  | sb = subclass_selector { Subclass sb }
-;
+  | t = type_selector { t }
+  /* With <coumpound-selector> subclass_selector becomes irrelevant */
+  /* | sb = subclass_selector { Subclass sb } */ /* #a, .a, a:visited, a[] */
 
 /* <compound-selector> = [
     <type-selector>? <subclass-selector>*
@@ -407,60 +395,101 @@ simple_selector:
 
   We differ from the spec on type-selector which is a IDENT,
   for a simple_selector (adding & and variables) */
-pseudo:
+/* pseudo_selector:
   | pe = pseudo_element_selector; { pe }
-  | pc = pseudo_class_selector; { pc }
-;
+  | pc = pseudo_class_selector; { pc } */
 
-compound_selector:
-  | type_selector = simple_selector?;
+/* compound_selector:
+  | type_selector = type_selector?
     subclass_selectors = nonempty_list(subclass_selector);
-    pseudo_selectors = nonempty_list(pseudo); {
+    pseudo_selectors = nonempty_list(pseudo_selector) {
     {
       type_selector;
       subclass_selectors;
       pseudo_selectors;
     }
   }
-  | type_selector = simple_selector?;
-    subclass_selectors = nonempty_list(subclass_selector); {
+  | type_selector = type_selector?
+    subclass_selectors = nonempty_list(subclass_selector) {
     {
       type_selector;
       subclass_selectors;
       pseudo_selectors = [];
     }
   }
-  | type_selector = simple_selector?;
-    pseudo_selectors = nonempty_list(pseudo); {
+  | type_selector = type_selector?
+    pseudo_selectors = nonempty_list(pseudo_selector) {
     {
       type_selector;
       subclass_selectors = [];
       pseudo_selectors;
     }
   }
-  | type_selector = simple_selector; {
+  | type_selector = type_selector; {
     {
       type_selector = Some type_selector;
       subclass_selectors = [];
       pseudo_selectors = [];
     }
+  } */
+
+
+pseudo_list:
+  | pseudo_element_selector list(pseudo_class_selector) { $1 :: $2 } /* ::after:visited */
+
+/* <compound-selector> = [
+    <type-selector>? <subclass-selector>*
+    [ <pseudo-element-selector> <pseudo-class-selector>* ]*
+  ]!
+
+  compound_selector expects first to be a <type-selector>, since we support
+  nesting and that can be a few more things look at <simple-selector> */
+compound_selector:
+  /* a#id */
+  | t = type_selector sub = subclass_selector {
+     {
+      type_selector = Some t;
+      subclass_selectors = [sub];
+      pseudo_selectors = [];
+    }
   }
-;
+  /* #hover */
+  | sub = list(subclass_selector) {
+     {
+      type_selector = None;
+      subclass_selectors = sub;
+      pseudo_selectors = [];
+    }
+  }
+  /* a::after:hover */
+  | t = type_selector ps = pseudo_list {
+     {
+      type_selector = Some t;
+      subclass_selectors = [];
+      pseudo_selectors = ps;
+    }
+  }
+  /* ::after:hover */
+  | ps = pseudo_list {
+     {
+      type_selector = None;
+      subclass_selectors = [];
+      pseudo_selectors = ps;
+    }
+  }
 
 combinator:
-  | WS?; c = skip_ws_right(COMBINATOR); s = skip_ws_right(compound_selector); { (Some c, s) }
-  | WS; s = skip_ws_right(compound_selector); { (None, s) }
-;
+  | WS? c = skip_ws_right(COMBINATOR) s = skip_ws_right(compound_selector) { (Some c, s) }
+  | WS s = skip_ws_right(compound_selector) { (None, s) }
 
 /* <complex-selector> = <compound-selector> [ <combinator>? <compound-selector> ]* */
 complex_selector:
-  | left = compound_selector; right = nonempty_list(combinator); {
+  | left = compound_selector; right = nonempty_list(combinator) {
     Combinator {
       left;
       right;
     }
   }
-;
 
 /* component_value_in_prelude we transform WS_* into Delim with white spaces inside
 in component_value we transform to regular Delim
@@ -483,25 +512,16 @@ component_value_in_prelude:
   | r = UNICODE_RANGE { Unicode_range r }
   | d = FLOAT_DIMENSION { Float_dimension d }
   | d = DIMENSION { Dimension d }
-  /* $(Lola.value) */
-  | v = VARIABLE { Variable v }
-  /* calc() */
-  | f = loc(FUNCTION); xs = loc(prelude); RIGHT_PAREN; {
-    Function (f, xs)
-  }
-  /* url() */
-  | u = URL { Uri u }
+  | v = VARIABLE { Variable v } /* $(Lola.value) */
+  | f = loc(FUNCTION) xs = loc(prelude) RIGHT_PAREN; { Function (f, xs) } /* calc() */
+  | u = URL { Uri u } /* url() */
   | WS { Delim " " }
-;
 
 component_value:
   | b = paren_block(component_values) { Paren_block b }
   | b = bracket_block(component_values) { Bracket_block b }
   | n = percentage { Percentage n }
   | i = IDENT { Ident i }
-  /* This should be an IDENT. Tiny bug where we split idents and tags by it's content,
-    here we want to treat them equaly */
-  | i = TAG { Ident i }
   | s = STRING { String s }
   | c = COMBINATOR { Combinator c}
   | o = OPERATOR { Operator o }
@@ -516,12 +536,6 @@ component_value:
   | r = UNICODE_RANGE { Unicode_range r }
   | d = FLOAT_DIMENSION { Float_dimension d }
   | d = DIMENSION { Dimension d }
-  /* $(Lola.value) */
-  | v = VARIABLE { Variable v }
-  /* calc() */
-  | f = loc(FUNCTION) xs = loc(component_values); RIGHT_PAREN; {
-    Function (f, xs)
-  }
-  /* url() */
-  | u = URL { Uri u }
-;
+  | v = VARIABLE { Variable v } /* $(Lola.value) */
+  | f = loc(FUNCTION) v = loc(component_values) RIGHT_PAREN; { Function (f, v) } /* calc() */
+  | u = URL { Uri u } /* url() */
