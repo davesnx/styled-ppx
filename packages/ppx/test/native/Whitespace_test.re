@@ -36,22 +36,22 @@ let tests = [
   ),
   (
     "ignore in at_rule inside declarations",
-    [%expr [%cx "@media all {}"]],
+    [%expr [%cx "@media all {  }"]],
     [%expr [%cx "@media all {}"]],
   ),
   (
     "ignore in at_rule inside declarations",
-    [%expr [%cx "@media all  { } "]],
+    [%expr [%cx "@media all  {  } "]],
     [%expr [%cx "@media all {}"]],
   ),
   (
     "ignore in at_rule inside declarations",
     [%expr [%cx "@media(min-width: 30px) {}"]],
-    [%expr [%cx "@media (min-width: 30px) {}"]],
+    [%expr [%cx "@media     (min-width: 30px) {}"]],
   ),
   (
     "ignore in at_rule inside declarations",
-    [%expr [%cx "@media screen  and  (min-width: 30px) {}"]],
+    [%expr [%cx "@media screen    and    (min-width: 30px) {}"]],
     [%expr [%cx "@media screen and (min-width: 30px) {}"]],
   ),
   (
@@ -74,20 +74,20 @@ let tests = [
     [%expr [%css " background-image: url('img_tree.gif' )" ]],
     [%expr [%css "background-image: url('img_tree.gif' )" ]],
   ),
-  /* (
+  (
     "html, body, #root, .class",
     [%expr [%styled.global {|
     html, body, #root, .class {
       margin: 0;
     } |}]],
     [%expr ignore(CssJs.global(. {js|html, body, #root, .class|js}, [| CssJs.margin(`zero) |]))],
-  ), */
-  /* (
+  ),
+  (
     "html, body, #root, .class",
     [%expr [%styled.global {|
     html,             body, #root, .class   {     margin: 0    } |}]],
     [%expr ignore(CssJs.global(. {js|html, body, #root, .class|js}, [| CssJs.margin(`zero) |]))],
-  ), */
+  ),
 ] |> List.map((item) => {
     let (title, input, expected) = item;
     test_case(

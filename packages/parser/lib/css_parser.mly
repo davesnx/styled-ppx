@@ -204,14 +204,14 @@ keyframe_style_rule:
 
 /* .class {} */
 style_rule:
-  | WS?; prelude = loc(separated_nonempty_list(COMMA, loc(selector))); WS?;
+  | WS?; prelude = loc(separated_nonempty_list(skip_ws_right(COMMA), loc(selector))); WS?;
     block = loc(empty_brace_block); WS?; {
     { prelude;
       block;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
-  | WS?; prelude = loc(separated_nonempty_list(COMMA, loc(selector))) WS?;
+  | WS?; prelude = loc(separated_nonempty_list(skip_ws_right(COMMA), loc(selector))) WS?;
     declarations = brace_block(loc(declarations)); WS?; {
     { prelude;
       block = declarations;
@@ -285,9 +285,9 @@ pseudo_class_selector:
   /* :visited */
   | COLON; i = IDENT { (Pseudoclass(Ident i)) }
   /* :not() */
-  /* | COLON; f = FUNCTION; xs = loc(selector); RIGHT_PAREN {
+  | COLON; f = FUNCTION; xs = loc(selector); RIGHT_PAREN {
     (Pseudoclass(Function({ name = f; payload = xs })))
-  } */
+  }
   /* :nth-child() */
   | COLON; f = NTH_FUNCTION; xs = loc(nth_payload); RIGHT_PAREN {
     (Pseudoclass(NthFunction({ name = f; payload = xs })))

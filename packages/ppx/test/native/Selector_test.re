@@ -88,11 +88,11 @@ let compound_tests = [
     [%expr [%cx {js|&.bar {}|js}]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|&.bar|js}, [||])|])],
   ),
-  /* (
+  (
     "&.bar, &.foo",
     [%expr [%cx {js|&.bar, &.foo {}|js}]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|&.bar, &.foo|js}, [||])|])],
-  ), */
+  ),
   (
     "p:first-child",
     [%expr [%cx {js|p:first-child {}|js}]],
@@ -113,16 +113,16 @@ let compound_tests = [
     [%expr [%cx "&:hover {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|&:hover|js}, [||])|])],
   ),
-  /* (
+  (
     "p #first-child::before",
     [%expr [%cx {js|p #first-child {}|js}]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|p #first-child|js}, [||])|])]
-  ), */
-  /* (
+  ),
+  (
     "p #first-child::before:hover",
     [%expr [%cx {js|p #first-child {}|js}]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|p #first-child::before:hover|js}, [||])|])]
-  ), */
+  ),
 ];
 
 let complex_tests = [
@@ -176,16 +176,16 @@ let complex_tests = [
     [%expr [%cx "& span {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& span|js}, [||])|])],
   ),
-  /* (
+  (
     "& span, & + &",
     [%expr [%cx "& span, & + & {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& span, & + &|js}, [||])|])],
-  ), */
-  /* (
+  ),
+  (
     "& p:not(.active)",
     [%expr [%cx "& p:not(.active) {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& p:not(.active)|js}, [||])|])],
-  ), */
+  ),
   /* (
     ".foo:is(.bar, #baz)",
     [%expr [%cx ".foo:is(.bar, #baz) {}"]],
@@ -254,11 +254,11 @@ let complex_tests = [
 ];
 
 let stylesheet_tests = [
-  /* (
+  (
     "html, body",
     [%expr [%styled.global {js|html, body {}|js}]],
     [%expr ignore(CssJs.global(. {js|html, body|js}, [||]))],
-  ), */
+  ),
   (
     "html body",
     [%expr [%styled.global {js|html body {}|js}]],
@@ -274,11 +274,11 @@ let stylesheet_tests = [
     [%expr [%styled.global {js|html div > span {}|js}]],
     [%expr ignore(CssJs.global(. {js|html div > span|js}, [||]))],
   ),
-  /* (
+  (
     "html, body, #root, .class",
     [%expr [%styled.global {js|html, body, #root, .class {}|js}]],
     [%expr ignore(CssJs.global(. {js|html, body, #root, .class|js}, [||]))],
-  ), */
+  ),
 ];
 
 let nested_tests = [
