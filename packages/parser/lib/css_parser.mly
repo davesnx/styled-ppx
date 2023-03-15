@@ -42,10 +42,10 @@ open Css_types
 %token <string * string> DIMENSION
 %token <string list> VARIABLE
 
-%start <Css_types.Stylesheet.t> stylesheet
-%start <Css_types.Rule_list.t> declaration_list
-%start <Css_types.Declaration.t> declaration
-%start <Css_types.Rule_list.t> keyframes
+%start <stylesheet> stylesheet
+%start <rule_list> declaration_list
+%start <declaration> declaration
+%start <rule_list> keyframes
 
 %%
 
@@ -98,9 +98,9 @@ paren_block (X): xs = delimited(LEFT_PAREN, X, RIGHT_PAREN); { xs };
 /* (not (color)) and (not (hover)) */
 /* Combinator "," */
 media_query_prelude_item:
-  | i = IDENT { Component_value.Ident i }
-  | v = VARIABLE { Component_value.Variable v }
-  | xs = paren_block(prelude) { Component_value.Paren_block xs }
+  | i = IDENT { Ident i }
+  | v = VARIABLE { Variable v }
+  | xs = paren_block(prelude) { Paren_block xs }
 ;
 
 media_query_prelude: q = nonempty_list(loc(skip_ws(media_query_prelude_item))) { q };
@@ -111,9 +111,9 @@ at_rule:
   | name = loc(AT_MEDIA); WS?;
     prelude = loc(media_query_prelude); WS?;
     ds = brace_block(loc(declarations)); WS? {
-    { At_rule.name = name;
+    { name = name;
       prelude;
-      block = Brace_block.Rule_list ds;
+      block = Rule_list ds;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
@@ -121,9 +121,9 @@ at_rule:
   | name = loc(AT_MEDIA); WS?;
     prelude = loc(media_query_prelude); WS?;
     b = loc(empty_brace_block); WS?; {
-    { At_rule.name = name;
+    { name = name;
       prelude;
-      block = Brace_block.Rule_list b;
+      block = Rule_list b;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
@@ -131,10 +131,10 @@ at_rule:
   | name = loc(AT_KEYFRAMES); WS?;
     i = IDENT; WS?;
     block = brace_block(keyframe) {
-    let item = (Component_value.Ident i, Lex_buffer.make_loc $startpos(i) $endpos(i)) in
-    let prelude = ([item], Lex_buffer.make_loc $startpos(i) $endpos(i)) in
-    let block = Brace_block.Rule_list (block, Lex_buffer.make_loc $startpos $endpos) in
-    { At_rule.name = name;
+    let _item = (Ident i, Lex_buffer.make_loc $startpos(i) $endpos(i)) in
+    let prelude = ([], Lex_buffer.make_loc $startpos $endpos) in
+    let block = Rule_list (block, Lex_buffer.make_loc $startpos $endpos) in
+    { name = name;
       prelude;
       block;
       loc = Lex_buffer.make_loc $startpos $endpos;
@@ -144,21 +144,21 @@ at_rule:
   | name = loc(AT_KEYFRAMES); WS?;
     i = IDENT; WS?;
     s = loc(empty_brace_block) {
-    let item = (Component_value.Ident(i), Lex_buffer.make_loc $startpos(i) $endpos(i)) in
-    let prelude = ([item], Lex_buffer.make_loc $startpos(i) $endpos(i)) in
-    let empty_block = Brace_block.Rule_list s in
-    { At_rule.name = name;
-      prelude;
+    let _item = (Ident i, Lex_buffer.make_loc $startpos(i) $endpos(i)) in
+    let prelude = ([], Lex_buffer.make_loc $startpos $endpos) in
+    let empty_block = Rule_list s in
+    ({ name = name;
+      prelude = prelude;
       block = empty_block;
       loc = Lex_buffer.make_loc $startpos $endpos;
-    }
+    }): at_rule
   }
   /* @charset */
   | name = loc(AT_RULE_STATEMENT); WS?;
     xs = loc(prelude); WS?; SEMI_COLON?; {
-    { At_rule.name = name;
+    { name = name;
       prelude = xs;
-      block = Brace_block.Empty;
+      block = Empty;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
@@ -168,9 +168,9 @@ at_rule:
   | name = loc(AT_RULE); WS?;
     xs = loc(prelude); WS?;
     s = brace_block(stylesheet_without_eof); WS?; {
-    { At_rule.name = name;
+    { name = name;
       prelude = xs;
-      block = Brace_block.Stylesheet s;
+      block = Stylesheet s;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
@@ -182,20 +182,19 @@ percentage: n = NUMBER; PERCENTAGE; { n }
 keyframe_style_rule:
   | WS?; id = IDENT; WS?;
     declarations = brace_block(loc(declarations)); WS?; {
-    let item = Selector.Type id in
-    let prelude = Selector.SimpleSelector [item] in
-    Rule.Style_rule {
-      Style_rule.prelude = (prelude, Lex_buffer.make_loc $startpos(id) $endpos(id));
+    let prelude = [(SimpleSelector (Type id), Lex_buffer.make_loc $startpos(id) $endpos(id))] in
+    Style_rule {
+      prelude = (prelude, Lex_buffer.make_loc $startpos(id) $endpos(id));
       loc = Lex_buffer.make_loc $startpos $endpos;
       block = declarations;
     }
   }
   | WS?; p = percentage; WS?;
     declarations = brace_block(loc(declarations)); WS?; {
-    let item = Selector.Percentage p in
-    let prelude = Selector.SimpleSelector [item] in
-    Rule.Style_rule {
-      Style_rule.prelude = (prelude, Lex_buffer.make_loc $startpos(p) $endpos(p));
+    let item = Percentage p in
+    let prelude = [(SimpleSelector item, Lex_buffer.make_loc $startpos(p) $endpos(p))] in
+    Style_rule {
+      prelude = (prelude, Lex_buffer.make_loc $startpos(p) $endpos(p));
       loc = Lex_buffer.make_loc $startpos $endpos;
       block = declarations;
     }
@@ -205,16 +204,16 @@ keyframe_style_rule:
 
 /* .class {} */
 style_rule:
-  | WS?; selector = loc(selector); WS?;
+  | WS?; prelude = loc(separated_nonempty_list(COMMA, loc(selector))); WS?;
     block = loc(empty_brace_block); WS?; {
-    { Style_rule.prelude = selector;
+    { prelude;
       block;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
-  | WS?; selector = loc(selector); WS?;
+  | WS?; prelude = loc(separated_nonempty_list(COMMA, loc(selector))) WS?;
     declarations = brace_block(loc(declarations)); WS?; {
-    { Style_rule.prelude = selector;
+    { prelude;
       block = declarations;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
@@ -230,9 +229,9 @@ declarations:
   | xs = separated_nonempty_list(SEMI_COLON, rule); SEMI_COLON?; { xs }
 
 rule:
-  | d = declaration_without_eof; { Rule.Declaration d }
-  | r = at_rule { Rule.At_rule r }
-  | s = style_rule { Rule.Style_rule s }
+  | d = declaration_without_eof; { Declaration d }
+  | r = at_rule { At_rule r }
+  | s = style_rule { Style_rule s }
 ;
 
 /* property: value; */
@@ -241,7 +240,7 @@ declaration_without_eof:
     COLON;
     value = loc(component_values);
     important = loc(boption(IMPORTANT)); SEMI_COLON? {
-    { Declaration.name = property;
+    { name = property;
       value;
       important;
       loc = Lex_buffer.make_loc $startpos $endpos;
@@ -253,45 +252,45 @@ declaration: d = declaration_without_eof; EOF { d };
 
 /* ::after */
 pseudo_element_selector:
-  DOUBLE_COLON; pse = IDENT { Selector.Pseudoelement pse };
+  DOUBLE_COLON; pse = IDENT { Pseudoelement pse };
 
 nth:
   /* even, odd, n */
-  | i = IDENT { Selector.NthIdent i }
+  | i = IDENT { NthIdent i }
   /* <An+B> */
   /* 2 */
-  | a = NUMBER; { Selector.A a }
+  | a = NUMBER; { A a }
   /* 2n */
-  | a = DIMENSION { Selector.AN (fst a) }
+  | a = DIMENSION { AN (fst a) }
   /* Since our lexing isn't on point with DIMENSIONS/NUMBERS */
   /* We add a case where operator is missing */
   /* 2n-1 */
   | left = DIMENSION; WS?; right = NUMBER; {
-    Selector.ANB ((fst left, "", right))
+    ANB ((fst left, "", right))
   }
   /* 2n+1 */
   | left = DIMENSION; WS?; combinator = COMBINATOR; right = NUMBER; {
-    Selector.ANB ((fst left, combinator, right))
+    ANB ((fst left, combinator, right))
   }
   /* TODO: Support "An+B of Selector" */
 ;
 
 nth_payload:
-  | complex = complex_selector_list; { Selector.NthSelector complex }
-  | n = skip_ws(nth); { Selector.Nth n }
+  | complex = complex_selector_list; { NthSelector complex }
+  | n = skip_ws(nth); { Nth n }
 ;
 
 /* <pseudo-class-selector> = ':' <ident-token> | ':' <function-token> <any-value> ')' */
 pseudo_class_selector:
   /* :visited */
-  | COLON; i = IDENT { Selector.(Pseudoclass(Ident i)) }
+  | COLON; i = IDENT { (Pseudoclass(Ident i)) }
   /* :not() */
-  | COLON; f = FUNCTION; xs = loc(selector); RIGHT_PAREN {
-    Selector.(Pseudoclass(Function({ name = f; payload = xs })))
-  }
+  /* | COLON; f = FUNCTION; xs = loc(selector); RIGHT_PAREN {
+    (Pseudoclass(Function({ name = f; payload = xs })))
+  } */
   /* :nth-child() */
   | COLON; f = NTH_FUNCTION; xs = loc(nth_payload); RIGHT_PAREN {
-    Selector.(Pseudoclass(NthFunction({ name = f; payload = xs })))
+    (Pseudoclass(NthFunction({ name = f; payload = xs })))
   }
   /* TODO: <function-token> and <any-value> */
 ;
@@ -307,7 +306,7 @@ attribute_selector:
   | LEFT_BRACKET; WS?;
     i = IDENT; WS?;
     RIGHT_BRACKET {
-    Selector.Attribute(Attr_value i)
+    Attribute(Attr_value i)
   }
   /* [ wq-name = "value"] */
   | LEFT_BRACKET; WS?;
@@ -315,11 +314,11 @@ attribute_selector:
     m = attr_matcher; WS?;
     v = STRING; WS?;
     RIGHT_BRACKET {
-    Selector.Attribute(
+    Attribute(
       To_equal({
         name = i;
         kind = m;
-        value = Selector.Attr_string v
+        value = Attr_string v
       })
     )
   }
@@ -329,11 +328,11 @@ attribute_selector:
     m = attr_matcher; WS?;
     v = IDENT; WS?;
     RIGHT_BRACKET {
-    Selector.Attribute(
+    Attribute(
       To_equal({
         name = i;
         kind = m;
-        value = Selector.Attr_ident v
+        value = Attr_ident v
       })
     )
   }
@@ -341,23 +340,23 @@ attribute_selector:
 ;
 
 /* <id-selector> = <hash-token> */
-id_selector: h = HASH { Selector.Id h }
+id_selector: h = HASH { Id h }
 
 /* <class-selector> = '.' <ident-token> */
 class_selector:
-  | DOT; c = IDENT { Selector.Class c }
+  | DOT; c = IDENT { Class c }
   /* This should be an IDENT. Tiny bug where we split idents and tags by it's content,
     here we want to treat them equaly */
-  | DOT; t = TAG { Selector.Class t };
+  | DOT; t = TAG { Class t };
 
 /* <subclass-selector> = <id-selector> | <class-selector> | <attribute-selector> | <pseudo-class-selector> */
 subclass_selector:
   | id = id_selector { id }
   | c = class_selector { c }
   | a = attribute_selector { a }
-  | pcs = pseudo_class_selector { Selector.Pseudo_class pcs }
+  | pcs = pseudo_class_selector { Pseudo_class pcs }
   /* .$(Variable) as subclass_selector */
-  | DOT; v = VARIABLE { Selector.ClassVariable v };
+  | DOT; v = VARIABLE { ClassVariable v };
 ;
 
 complex_selector_list:
@@ -366,15 +365,15 @@ complex_selector_list:
 
 selector:
   /* <simple-selector-list> = <simple-selector># */
-  | xs = separated_nonempty_list(skip_ws_right(COMMA), simple_selector) {
-    Selector.SimpleSelector xs
-  }
+  /* | xs = simple_selector; {
+    SimpleSelector xs
+  } */
   /* <compound-selector-list> = <compound-selector># */
-  | xs = separated_nonempty_list(skip_ws_right(COMMA), skip_ws_right(compound_selector)) {
-    Selector.CompoundSelector xs
+  | xs = skip_ws_right(compound_selector); {
+    CompoundSelector xs
   }
   /* <complex-selector-list> = <complex-selector># */
-  | xs = complex_selector_list { Selector.ComplexSelector xs }
+  | xs = skip_ws_right(complex_selector); { ComplexSelector xs }
 ;
 
 /* <simple-selector> = <type-selector> | <subclass-selector> */
@@ -383,15 +382,15 @@ selector:
 simple_selector:
   /* & {} */
   /* https://drafts.csswg.org/css-nesting/#nest-selector */
-  | AMPERSAND; { Selector.Ampersand }
+  | AMPERSAND; { Ampersand }
   /* * {} */
-  | ASTERISK; { Selector.Universal }
+  | ASTERISK; { Universal }
   /* $(Module.value) {} */
-  | v = VARIABLE { Selector.Variable v }
+  | v = VARIABLE { Variable v }
   /* a {} */
-  | type_ = TAG; { Selector.Type type_ }
+  | type_ = TAG; { Type type_ }
   /* #a, .a, a:visited, a[] */
-  | sb = subclass_selector { Selector.Subclass sb }
+  | sb = subclass_selector { Subclass sb }
 ;
 
 /* <compound-selector> = [
@@ -415,7 +414,7 @@ compound_selector:
   | type_selector = simple_selector;
     subclass_selectors = list(subclass_selector);
     pseudo_selectors = list(pseudo); {
-    Selector.{
+    {
       type_selector = Some type_selector;
       subclass_selectors;
       pseudo_selectors;
@@ -432,7 +431,7 @@ combinator:
 /* <complex-selector> = <compound-selector> [ <combinator>? <compound-selector> ]* */
 complex_selector:
   | left = compound_selector; right = nonempty_list(combinator); {
-    Selector.Combinator {
+    Combinator {
       left;
       right;
     }
@@ -443,62 +442,62 @@ complex_selector:
 in component_value we transform to regular Delim
 The rest of component_value_in_prelude and component_value should be sync */
 component_value_in_prelude:
-  | b = paren_block(prelude) { Component_value.Paren_block b }
-  | b = bracket_block(prelude) { Component_value.Bracket_block b }
-  | n = percentage { Component_value.Percentage n }
-  | i = IDENT { Component_value.Ident i }
-  | s = STRING { Component_value.String s }
-  | c = COMBINATOR { Component_value.Combinator c}
-  | o = OPERATOR { Component_value.Operator o }
-  | d = DELIM { Component_value.Delim d }
-  | DOT { Component_value.Delim "." }
-  | COLON { Component_value.Delim ":" }
-  | DOUBLE_COLON { Component_value.Delim "::" }
-  | h = HASH { Component_value.Hash h }
-  | COMMA { Component_value.Delim "," }
-  | n = NUMBER { Component_value.Number n }
-  | r = UNICODE_RANGE { Component_value.Unicode_range r }
-  | d = FLOAT_DIMENSION { Component_value.Float_dimension d }
-  | d = DIMENSION { Component_value.Dimension d }
+  | b = paren_block(prelude) { Paren_block b }
+  | b = bracket_block(prelude) { Bracket_block b }
+  | n = percentage { Percentage n }
+  | i = IDENT { Ident i }
+  | s = STRING { String s }
+  | c = COMBINATOR { Combinator c}
+  | o = OPERATOR { Operator o }
+  | d = DELIM { Delim d }
+  | DOT { Delim "." }
+  | COLON { Delim ":" }
+  | DOUBLE_COLON { Delim "::" }
+  | h = HASH { Hash h }
+  | COMMA { Delim "," }
+  | n = NUMBER { Number n }
+  | r = UNICODE_RANGE { Unicode_range r }
+  | d = FLOAT_DIMENSION { Float_dimension d }
+  | d = DIMENSION { Dimension d }
   /* $(Lola.value) */
-  | v = VARIABLE { Component_value.Variable v }
+  | v = VARIABLE { Variable v }
   /* calc() */
   | f = loc(FUNCTION); xs = loc(prelude); RIGHT_PAREN; {
-    Component_value.Function (f, xs)
+    Function (f, xs)
   }
   /* url() */
-  | u = URL { Component_value.Uri u }
-  | WS { Component_value.Delim " " }
+  | u = URL { Uri u }
+  | WS { Delim " " }
 ;
 
 component_value:
-  | b = paren_block(component_values) { Component_value.Paren_block b }
-  | b = bracket_block(component_values) { Component_value.Bracket_block b }
-  | n = percentage { Component_value.Percentage n }
-  | i = IDENT { Component_value.Ident i }
+  | b = paren_block(component_values) { Paren_block b }
+  | b = bracket_block(component_values) { Bracket_block b }
+  | n = percentage { Percentage n }
+  | i = IDENT { Ident i }
   /* This should be an IDENT. Tiny bug where we split idents and tags by it's content,
     here we want to treat them equaly */
-  | i = TAG { Component_value.Ident i }
-  | s = STRING { Component_value.String s }
-  | c = COMBINATOR { Component_value.Combinator c}
-  | o = OPERATOR { Component_value.Operator o }
-  | d = DELIM { Component_value.Delim d }
-  | DOT { Component_value.Delim "." }
-  | ASTERISK { Component_value.Delim "*" }
-  | COLON { Component_value.Delim ":" }
-  | h = HASH { Component_value.Hash h }
-  | DOUBLE_COLON { Component_value.Delim "::" }
-  | COMMA { Component_value.Delim "," }
-  | n = NUMBER { Component_value.Number n }
-  | r = UNICODE_RANGE { Component_value.Unicode_range r }
-  | d = FLOAT_DIMENSION { Component_value.Float_dimension d }
-  | d = DIMENSION { Component_value.Dimension d }
+  | i = TAG { Ident i }
+  | s = STRING { String s }
+  | c = COMBINATOR { Combinator c}
+  | o = OPERATOR { Operator o }
+  | d = DELIM { Delim d }
+  | DOT { Delim "." }
+  | ASTERISK { Delim "*" }
+  | COLON { Delim ":" }
+  | h = HASH { Hash h }
+  | DOUBLE_COLON { Delim "::" }
+  | COMMA { Delim "," }
+  | n = NUMBER { Number n }
+  | r = UNICODE_RANGE { Unicode_range r }
+  | d = FLOAT_DIMENSION { Float_dimension d }
+  | d = DIMENSION { Dimension d }
   /* $(Lola.value) */
-  | v = VARIABLE { Component_value.Variable v }
+  | v = VARIABLE { Variable v }
   /* calc() */
   | f = loc(FUNCTION) xs = loc(component_values); RIGHT_PAREN; {
-    Component_value.Function (f, xs)
+    Function (f, xs)
   }
   /* url() */
-  | u = URL { Component_value.Uri u }
+  | u = URL { Uri u }
 ;

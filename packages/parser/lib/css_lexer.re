@@ -16,6 +16,10 @@ exception ParseError((Parser.token, Lexing.position, Lexing.position));
 /** Signals a grammar error at the provided location. */
 exception GrammarError((string, Location.t));
 
+let grammar_error = (loc: Location.t, message) => {
+  raise(GrammarError((message, loc)));
+}
+
 let unreachable = () =>
   failwith("This match case is unreachable. sedlex needs a last case as wildcard _. If this error appears, means that there's a bug in the lexer.");
 
@@ -103,11 +107,11 @@ let token_to_debug =
 
 let render_error = fun
   | LexingError((pos, msg)) => {
-    let loc = Sedlexing.make_loc(pos, pos);
+    let loc = Sedlexing.make_location(pos, pos);
     Location.error(~loc, msg);
   }
   | ParseError((token, start_pos, end_pos)) => {
-    let loc = Sedlexing.make_loc(start_pos, end_pos);
+    let loc = Sedlexing.make_location(start_pos, end_pos);
     let msg =
       Printf.sprintf(
         "Parse error while reading token '%s'",

@@ -2952,7 +2952,7 @@ let render_to_expr = (~loc, property, value) => {
   expr_of_string(~loc, value) |> Result.map_error(str => `Invalid_value(str));
 };
 
-let parse_declarations = (~loc, property, value) => {
+let parse_declarations = (~loc: Location.t, property, value) => {
   let.ok is_valid_string =
     Parser.check_property(~name=property, value)
     |> Result.map_error((`Unknown_value) => `Not_found);

@@ -33,8 +33,7 @@ switch (input, help) {
 | (Some(css), _) =>
   try(
     Css_lexer.parse_stylesheet(~container_lnum, ~pos, css)
-    |> Css_types.DebugWithLoc.render_stylesheet
-    |> print_endline
+    |> Css_types.pp_stylesheet(Format.std_formatter)
   ) {
   | exn =>
     Css_lexer.render_error(exn)

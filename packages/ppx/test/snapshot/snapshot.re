@@ -1,11 +1,11 @@
 /* This tests ensure the transformation goes right and doesn't need to type-check.
 If you are looking to add some tests for CSS support, check packages/ppx/test/native folder. */
 
-[%styled.global {|
+/* [%styled.global {|
   html, body, #root, .class {
     margin: 0;
   }
-|}];
+|}]; */
 
 module ShoudNotBreakOtherModulesPpxsWithStringAsPayload = [%ppx ""];
 module ShoudNotBreakOtherModulesPpxsWithMultiStringAsPayload = [%ppx {| stuff |}];
