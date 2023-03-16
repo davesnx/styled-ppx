@@ -450,7 +450,7 @@ combinator_sequence:
 
 /* <complex-selector> = <compound-selector> [ <combinator>? <compound-selector> ]* */
 complex_selector:
-  | left = skip_ws_right(non_complex_selector) WS? { Selector left }
+  | left = skip_ws_right(non_complex_selector) { Selector left }
   | left = non_complex_selector WS? seq = nonempty_list(combinator_sequence) {
     Combinator {
       left = left;
