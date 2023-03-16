@@ -107,11 +107,11 @@ let token_to_debug =
 
 let render_error = fun
   | LexingError((pos, msg)) => {
-    let loc = Sedlexing.make_location(pos, pos);
+    let loc = Sedlexing.make_loc(pos, pos);
     Location.error(~loc, msg);
   }
   | ParseError((token, start_pos, end_pos)) => {
-    let loc = Sedlexing.make_location(start_pos, end_pos);
+    let loc = Sedlexing.make_loc(start_pos, end_pos);
     let msg =
       Printf.sprintf(
         "Parse error while reading token '%s'",

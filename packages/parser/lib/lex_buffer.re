@@ -149,10 +149,4 @@ let make_loc = (~loc_ghost=false, start_pos: Lexing.position, end_pos: Lexing.po
   loc_ghost,
 };
 
-let make_location = (~loc_ghost=false, start_pos: Lexing.position, end_pos: Lexing.position): Location.t => {
-  loc_start: start_pos,
-  loc_end: end_pos,
-  loc_ghost,
-};
-
 let lexing_positions = (buf) => Sedlexing.lexing_positions(buf.buf);
