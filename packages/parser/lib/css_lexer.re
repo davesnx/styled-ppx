@@ -16,6 +16,10 @@ exception ParseError((Parser.token, Lexing.position, Lexing.position));
 /** Signals a grammar error at the provided location. */
 exception GrammarError((string, Location.t));
 
+let grammar_error = (loc: Location.t, message) => {
+  raise(GrammarError((message, loc)));
+}
+
 let unreachable = () =>
   failwith("This match case is unreachable. sedlex needs a last case as wildcard _. If this error appears, means that there's a bug in the lexer.");
 
@@ -693,8 +697,9 @@ let parse_string = (~skip_whitespace, ~container_lnum=?, ~pos=?, parser, string)
   parse(skip_whitespace, Lex_buffer.from_string(~container_lnum?, ~pos?, string), parser);
 };
 
-let parse_declaration_list = (~container_lnum=?, ~pos=?, input: string) =>
+let parse_declaration_list = (~container_lnum=?, ~pos=?, input: string) => {
   parse_string(~skip_whitespace=true, ~container_lnum?, ~pos?, Parser.declaration_list, input);
+}
 
 let parse_declaration = (~container_lnum=?, ~pos=?, input: string) =>
   parse_string(~skip_whitespace=true, ~container_lnum?, ~pos?, Parser.declaration, input);

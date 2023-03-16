@@ -14,7 +14,7 @@ type t = {
   mutable last_char_mark: option(int),
 };
 
-let of_sedlex = (~file="<n/a>", ~pos=?, buf) => {
+let of_sedlex = (~file="<n/a>", ~pos: option(Lexing.position)=?, buf) => {
   let pos =
     switch (pos) {
     | None => {
@@ -31,7 +31,7 @@ let of_sedlex = (~file="<n/a>", ~pos=?, buf) => {
 
 let container_lnum_ref = ref(0);
 
-let from_string_of_sedlex = (~pos=?, string) => {
+let from_string_of_sedlex = (~pos: option(Lexing.position)=?, string) => {
   let buf = Sedlexing.Latin1.from_string(string);
   switch (pos) {
     | Some(p) => Sedlexing.set_position(buf, p)
@@ -42,7 +42,7 @@ let from_string_of_sedlex = (~pos=?, string) => {
 
 let last_buffer = ref(from_string_of_sedlex(""));
 
-let from_string = (~container_lnum=?, ~pos=?, s) => {
+let from_string = (~container_lnum=?, ~pos: option(Lexing.position)=?, s) => {
   switch (container_lnum) {
   | None => ()
   | Some(lnum) => container_lnum_ref := lnum
@@ -143,8 +143,8 @@ let utf8 = (~skip=0, ~drop=0, lexbuf) => {
 
 let container_lnum_ref = ref(0);
 
-let make_loc = (~loc_ghost=false, start_pos, end_pos): Location.t => {
-  Location.loc_start: start_pos,
+let make_loc = (~loc_ghost=false, start_pos: Lexing.position, end_pos: Lexing.position): Location.t => {
+  loc_start: start_pos,
   loc_end: end_pos,
   loc_ghost,
 };

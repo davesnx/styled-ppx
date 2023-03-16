@@ -1,6 +1,6 @@
 (menhir
  (modules css_parser)
- (flags --explain))
+ (flags --explain --unused-tokens))
 
 (library
  (name styled_ppx_css_parser)
@@ -13,4 +13,4 @@
   str
   styled-ppx.reason-css-lexer)
  (preprocess
-  (pps sedlex.ppx)))
+  (pps sedlex.ppx ppx_deriving.show)))

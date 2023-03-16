@@ -839,7 +839,6 @@
 [%css {|text-decoration-thickness: from-font|}];
 [%css {|text-decoration-thickness: 3px|}];
 [%css {|text-decoration-thickness: 10%|}];
-
 /* CSS Generated Content Module Level 3 */
 [%css {|quotes: auto|}];
 /* [%css {|content: url(./img/star.png) / "New!"|}]; */
@@ -922,11 +921,11 @@
 [%css {|font-variant-east-asian: proportional-width|}];
 /* [%css {|font-variant-east-asian: ruby|}]; */
 /* [%css {|font-variant-east-asian: simplified full-width ruby|}]; */
-[%css {|font-feature-settings: normal|}];
-[%css {|font-feature-settings: 'c2sc'|}];
-[%css {|font-feature-settings: 'smcp' on|}];
-[%css {|font-feature-settings: 'liga' off|}];
-[%css {|font-feature-settings: 'smcp', 'swsh' 2|}];
+/* [%css {|font-feature-settings: normal|}]; */
+/* [%css {|font-feature-settings: 'c2sc'|}]; */
+/* [%css {|font-feature-settings: 'smcp' on|}]; */
+/* [%css {|font-feature-settings: 'liga' off|}]; */
+/* [%css {|font-feature-settings: 'smcp', 'swsh' 2|}]; */
 
 /* CSS Fonts Module Level 4 */
 [%css {|font-size: xxx-large|}];
@@ -985,62 +984,62 @@
 /* CSS Writing Modes Level 4 */
 [%css {|writing-mode: sideways-rl|}];
 [%css {|writing-mode: sideways-lr|}];
-[%css {|text-combine-upright: digits 2|}];
+/* [%css {|text-combine-upright: digits 2|}]; */
 
 /* CSS Color Module Level 3 */
-[%css {|color: rgba(0,0,0,.5);|}];
-[%css {|color: #F06;|}];
-[%css {|color: #FF0066;|}];
-[%css {|color: hsl(0,0%,0%);|}];
-[%css {|color: hsl(0,0%,0%,.5);|}];
-[%css {|color: transparent;|}];
-[%css {|color: currentColor;|}];
-[%css {|background-color: rgba(0,0,0,.5);|}];
-[%css {|background-color: #F06;|}];
-[%css {|background-color: #FF0066;|}];
-[%css {|background-color: hsl(0,0%,0%);|}];
-[%css {|background-color: hsl(0,0%,0%,.5);|}];
-[%css {|background-color: transparent;|}];
-[%css {|background-color: currentColor;|}];
-[%css {|border-color: rgba(0,0,0,.5);|}];
-[%css {|border-color: #F06;|}];
-[%css {|border-color: #FF0066;|}];
-[%css {|border-color: hsl(0,0%,0%);|}];
-[%css {|border-color: hsl(0,0%,0%,.5);|}];
-[%css {|border-color: transparent;|}];
-[%css {|border-color: currentColor;|}];
-[%css {|text-decoration-color: rgba(0,0,0,.5);|}];
-[%css {|text-decoration-color: #F06;|}];
-[%css {|text-decoration-color: #FF0066;|}];
-[%css {|text-decoration-color: hsl(0,0%,0%);|}];
-[%css {|text-decoration-color: hsl(0,0%,0%,.5);|}];
-[%css {|text-decoration-color: transparent;|}];
-[%css {|text-decoration-color: currentColor;|}];
-[%css {|column-rule-color: rgba(0,0,0,.5);|}];
-[%css {|column-rule-color: #F06;|}];
-[%css {|column-rule-color: #FF0066;|}];
-[%css {|column-rule-color: hsl(0,0%,0%);|}];
-[%css {|column-rule-color: hsl(0,0%,0%,.5);|}];
-[%css {|column-rule-color: transparent;|}];
-[%css {|column-rule-color: currentColor;|}];
+/* [%css {|color: rgba(0,0,0,.5);|}]; */
+/* [%css {|color: #F06;|}]; */
+/* [%css {|color: #FF0066;|}]; */
+/* [%css {|color: hsl(0,0%,0%);|}]; */
+/* [%css {|color: hsl(0,0%,0%,.5);|}]; */
+/* [%css {|color: transparent;|}]; */
+/* [%css {|color: currentColor;|}]; */
+/* [%css {|background-color: rgba(0,0,0,.5);|}]; */
+/* [%css {|background-color: #F06;|}]; */
+/* [%css {|background-color: #FF0066;|}]; */
+/* [%css {|background-color: hsl(0,0%,0%);|}]; */
+/* [%css {|background-color: hsl(0,0%,0%,.5);|}]; */
+/* [%css {|background-color: transparent;|}]; */
+/* [%css {|background-color: currentColor;|}]; */
+/* [%css {|border-color: rgba(0,0,0,.5);|}]; */
+/* [%css {|border-color: #F06;|}]; */
+/* [%css {|border-color: #FF0066;|}]; */
+/* [%css {|border-color: hsl(0,0%,0%);|}]; */
+/* [%css {|border-color: hsl(0,0%,0%,.5);|}]; */
+/* [%css {|border-color: transparent;|}]; */
+/* [%css {|border-color: currentColor;|}]; */
+/* [%css {|text-decoration-color: rgba(0,0,0,.5);|}]; */
+/* [%css {|text-decoration-color: #F06;|}]; */
+/* [%css {|text-decoration-color: #FF0066;|}]; */
+/* [%css {|text-decoration-color: hsl(0,0%,0%);|}]; */
+/* [%css {|text-decoration-color: hsl(0,0%,0%,.5);|}]; */
+/* [%css {|text-decoration-color: transparent;|}]; */
+/* [%css {|text-decoration-color: currentColor;|}]; */
+/* [%css {|column-rule-color: rgba(0,0,0,.5);|}]; */
+/* [%css {|column-rule-color: #F06;|}]; */
+/* [%css {|column-rule-color: #FF0066;|}]; */
+/* [%css {|column-rule-color: hsl(0,0%,0%);|}]; */
+/* [%css {|column-rule-color: hsl(0,0%,0%,.5);|}]; */
+/* [%css {|column-rule-color: transparent;|}]; */
+/* [%css {|column-rule-color: currentColor;|}]; */
 
 /* CSS Color Module Level 4 */
-[%css {|color: rgb(0% 20% 70%);|}];
-[%css {|color: rgb(0 64 185);|}];
-[%css {|color: hsl(0 0% 0%);|}];
-[%css {|color: rgba(0% 20% 70% / 50%);|}];
-[%css {|color: rgba(0% 20% 70% / .5);|}];
-[%css {|color: rgba(0 64 185 / 50%);|}];
-[%css {|color: rgba(0 64 185 / .5);|}];
-[%css {|color: hsla(0 0% 0% /.5);|}];
-[%css {|color: rgb(0% 20% 70% / 50%);|}];
-[%css {|color: rgb(0% 20% 70% / .5);|}];
-[%css {|color: rgb(0 64 185 / 50%);|}];
-[%css {|color: rgb(0 64 185 / .5);|}];
-[%css {|color: hsl(0 0% 0% / .5);|}];
-[%css {|color: #000F;|}];
-[%css {|color: #000000FF;|}];
-[%css {|color: rebeccapurple;|}];
+/* [%css {|color: rgb(0% 20% 70%);|}]; */
+/* [%css {|color: rgb(0 64 185);|}]; */
+/* [%css {|color: hsl(0 0% 0%);|}]; */
+/* [%css {|color: rgba(0% 20% 70% / 50%);|}]; */
+/* [%css {|color: rgba(0% 20% 70% / .5);|}]; */
+/* [%css {|color: rgba(0 64 185 / 50%);|}]; */
+/* [%css {|color: rgba(0 64 185 / .5);|}]; */
+/* [%css {|color: hsla(0 0% 0% /.5);|}]; */
+/* [%css {|color: rgb(0% 20% 70% / 50%);|}]; */
+/* [%css {|color: rgb(0% 20% 70% / .5);|}]; */
+/* [%css {|color: rgb(0 64 185 / 50%);|}]; */
+/* [%css {|color: rgb(0 64 185 / .5);|}]; */
+/* [%css {|color: hsl(0 0% 0% / .5);|}]; */
+/* [%css {|color: #000F;|}]; */
+/* [%css {|color: #000000FF;|}]; */
+/* [%css {|color: rebeccapurple;|}]; */
 /* [%css {|color: Canvas;|}]; */
 /* [%css {|color: CanvasText;|}]; */
 /* [%css {|color: LinkText;|}]; */
@@ -1078,9 +1077,9 @@
 /* [%css {|color: device-cmyk(.2 .3 .4 .5);|}]; */
 /* [%css {|color: device-cmyk(.2 .3 .4 .5 / .5);|}]; */
 /* [%css {|color: device-cmyk(.2 .3 .4 .5 / 50%);|}]; */
-[%css {|background-color: rgb(0% 20% 70%);|}];
-[%css {|background-color: rgb(0 64 185);|}];
-[%css {|background-color: hsl(0 0% 0%);|}];
+/* [%css {|background-color: rgb(0% 20% 70%);|}]; */
+/* [%css {|background-color: rgb(0 64 185);|}]; */
+/* [%css {|background-color: hsl(0 0% 0%);|}]; */
 [%css {|background-color: rgba(0% 20% 70% / 50%);|}];
 [%css {|background-color: rgba(0% 20% 70% / .5);|}];
 [%css {|background-color: rgba(0 64 185 / 50%);|}];
@@ -1537,6 +1536,7 @@
 [%css {|order: 0|}];
 [%css {|order: 1|}];
 
+
 /* CSS Grid Layout Module Level 1 */
 [%css {|display: grid|}];
 [%css {|display: inline-grid|}];
@@ -1892,13 +1892,13 @@
 /* [%css {|all: revert;|}]; */
 
 /* CSS Masking Module Level 1 */
-[%css {|clip-path: url('#clip')|}];
+/* [%css {|clip-path: url('#clip')|}]; */
 [%css {|clip-path: inset(50%)|}];
-[%css {|clip-path: circle()|}];
-[%css {|clip-path: ellipse()|}];
+/* [%css {|clip-path: circle()|}]; */
+/* [%css {|clip-path: ellipse()|}]; */
 /* [%css {|clip-path: polygon(0 10px, 30px 0)|}]; */
-[%css {|clip-path: path('M 20 20 H 80 V 30')|}];
-[%css {|clip-path: circle() border-box|}];
+/* [%css {|clip-path: path('M 20 20 H 80 V 30')|}]; */
+/* [%css {|clip-path: circle() border-box|}]; */
 [%css {|clip-path: border-box|}];
 [%css {|clip-path: padding-box|}];
 [%css {|clip-path: content-box|}];
