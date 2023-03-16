@@ -69,6 +69,11 @@ let simple_tests = [
     [%expr [%cx "&:nth-child(10n-1) {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|&:nth-child(10n-1)|js}, [||])|])],
   ),
+  (
+    ".a, .b {}",
+    [%expr [%cx ".a, .b {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|.a, .b|js}, [||])|])],
+  ),
   /* TODO: Support all cases */
   /* (
     ":nth-child( 10n - 1 )",
@@ -121,17 +126,17 @@ let compound_tests = [
   (
     "#first-child",
     [%expr [%cx {js|#first-child {}|js}]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|p #first-child|js}, [||])|])]
+    [%expr CssJs.style(. [|CssJs.selector(. {js|#first-child|js}, [||])|])]
   ),
   (
     "#first-child::before",
     [%expr [%cx {js|#first-child::before {}|js}]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|p #first-child::before|js}, [||])|])]
+    [%expr CssJs.style(. [|CssJs.selector(. {js|#first-child::before|js}, [||])|])]
   ),
   (
     "#first-child::before:hover",
     [%expr [%cx {js|#first-child::before:hover {}|js}]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|p #first-child::before:hover|js}, [||])|])]
+    [%expr CssJs.style(. [|CssJs.selector(. {js|#first-child::before:hover|js}, [||])|])]
   ),
 ];
 

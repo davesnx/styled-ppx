@@ -398,6 +398,14 @@ pseudo_list:
   compound_selector expects first to be a <type-selector>, since we support
   nesting and that can be a few more things look at <simple-selector> */
 compound_selector:
+  /* #id::hover:visited */
+  | sub = subclass_selector ps = pseudo_list {
+     {
+      type_selector = None;
+      subclass_selectors = [sub];
+      pseudo_selectors = ps;
+    }
+  }
   /* a#id */
   | t = type_selector sub = subclass_selector {
      {
@@ -436,13 +444,13 @@ combinator_sequence:
   | s = non_complex_selector WS? { (None, s) }
   | c = COMBINATOR WS? s = non_complex_selector WS? { (Some c, s) }
 
-non_complex_selector:
+%inline non_complex_selector:
   | s = simple_selector { SimpleSelector s }
   | s = compound_selector { CompoundSelector s }
 
 /* <complex-selector> = <compound-selector> [ <combinator>? <compound-selector> ]* */
 complex_selector:
-  | left = skip_ws_right(non_complex_selector) { Selector left }
+  | left = skip_ws_right(non_complex_selector) WS? { Selector left }
   | left = non_complex_selector WS? seq = nonempty_list(combinator_sequence) {
     Combinator {
       left = left;

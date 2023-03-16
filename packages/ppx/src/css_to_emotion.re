@@ -198,7 +198,7 @@ and render_selector = (selector: selector) => {
     | Class(v) => "." ++ v
     | ClassVariable(v) => "." ++ render_variable_as_string(v)
     | Attribute(Attr_value(v)) => "[" ++ v ++ "]"
-    | Attribute(To_equal({name, kind, value})) =>  {
+    | Attribute(To_equal({name, kind, value})) => {
       let value = switch (value) {
         | Attr_ident(ident) => ident
         | Attr_string(ident) => "\"" ++ ident ++ "\""
@@ -219,9 +219,7 @@ and render_selector = (selector: selector) => {
   and render_nth_payload =
     fun
     | Nth(nth) => render_nth(nth)
-    | NthSelector(v) => "NthSelector(ComplexSelector(["
-    ++ (v |> List.map(render_complex_selector) |> String.concat(", "))
-    ++ "]))"
+    | NthSelector(v) => (v |> List.map(render_complex_selector) |> String.concat(", "))
   and render_pseudoclass =
     fun
     | Ident(i) => ":" ++ i
@@ -254,17 +252,16 @@ and render_selector = (selector: selector) => {
         render_subclass_selector,
         compound_selector.subclass_selectors,
       ) |> String.concat("");
-    /* let _pseudo_selectors =
+    let pseudo_selectors =
       List.map(
         render_pseudo_selector,
         compound_selector.pseudo_selectors,
-      ) |> String.concat(""); */
-    simple_selector ++ subclass_selectors /* ++ pseudo_selectors */;
+      ) |> String.concat("");
+    simple_selector ++ subclass_selectors ++ pseudo_selectors;
   }
   and render_complex_selector = complex => {
     switch (complex) {
     | Combinator({left, right}) =>
-      /* let left = render_compound_selector(left); */
       let left = render_selector(left);
       let right = render_right_combinator(right);
       left ++ right;
@@ -289,12 +286,14 @@ and render_selector = (selector: selector) => {
     | CompoundSelector(compound) => compound |> render_compound_selector
   };
 }
+and render_selectors = (selectors) => {
+  selectors |> List.map(((selector, _loc)) => render_selector(selector)) |> String.concat(", ")
+}
 and render_style_rule = (ident, rule: style_rule): Parsetree.expression => {
-  let (_prelude, _loc) = rule.prelude;
+  let (prelude, _loc) = rule.prelude;
   let (_block, loc) = rule.block;
   let selector_expr = render_declarations(rule.block) |> Builder.pexp_array(~loc);
-  let selector_name = "wat" |> String.trim |> String_interpolation.Transform.transform(~loc);
-  /* let selector_name = render_selector(prelude |> List.hd) |> String.trim |> String_interpolation.Transform.transform(~loc); */
+  let selector_name = prelude |> render_selectors |> String.trim |> String_interpolation.Transform.transform(~loc);
 
   Helper.Exp.apply(
     ~loc=rule.loc,
