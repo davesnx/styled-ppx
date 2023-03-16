@@ -64,7 +64,7 @@ keyframes:
   | rules = brace_block(loc(keyframe)) EOF { rules }
 
 /* Adds location as a tuple */
-%public %inline loc(X): x = X {
+loc(X): x = X {
   (x, Lex_buffer.make_loc $startpos(x) $endpos(x))
 }
 
@@ -130,8 +130,8 @@ at_rule:
   | name = loc(AT_KEYFRAMES) WS?
     i = IDENT WS?
     block = brace_block(keyframe) {
-    let _item = (Ident i, Lex_buffer.make_loc $startpos(i) $endpos(i)) in
-    let prelude = ([], Lex_buffer.make_loc $startpos $endpos) in
+    let item = (Ident i, Lex_buffer.make_loc $startpos(i) $endpos(i)) in
+    let prelude = ([item], Lex_buffer.make_loc $startpos $endpos) in
     let block = Rule_list (block, Lex_buffer.make_loc $startpos $endpos) in
     { name = name;
       prelude;
@@ -143,8 +143,8 @@ at_rule:
   | name = loc(AT_KEYFRAMES) WS?
     i = IDENT WS?
     s = loc(empty_brace_block) {
-    let _item = (Ident i, Lex_buffer.make_loc $startpos(i) $endpos(i)) in
-    let prelude = ([], Lex_buffer.make_loc $startpos $endpos) in
+    let item = ((Ident i), Lex_buffer.make_loc $startpos(i) $endpos(i)) in
+    let prelude = ([item], Lex_buffer.make_loc $startpos $endpos) in
     let empty_block = Rule_list s in
     ({ name = name;
       prelude = prelude;
@@ -276,7 +276,7 @@ nth_payload:
 
 /* <pseudo-class-selector> = ':' <ident-token> | ':' <function-token> <any-value> ')' */
 pseudo_class_selector:
-  | COLON i = IDENT { (Pseudoclass(Ident i)) } /* :visited */
+  | COLON i = IDENT { (Pseudoclass(PseudoIdent i)) } /* :visited */
   | COLON f = FUNCTION xs = loc(selector) RIGHT_PAREN /* :not() */ {
     (Pseudoclass(Function({ name = f; payload = xs })))
   }

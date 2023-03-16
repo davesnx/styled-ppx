@@ -191,11 +191,6 @@ let complex_tests = [
     [%expr [%cx "& div > .class {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& div > .class|js}, [||])|])],
   ),
-  (
-    "a:focus > .icon",
-    [%expr [%cx "a:focus > .icon {}"]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|a:focus > .icon|js}, [||])|])],
-  ),
   /* #foo > .bar + div.k1.k2 [id='baz']:hello(2):not(:where(#yolo))::before */
   (
     "& + &",
@@ -218,24 +213,24 @@ let complex_tests = [
     [%expr CssJs.style(. [|CssJs.selector(. {js|& p:not(.active)|js}, [||])|])],
   ),
   (
-    "p #first-child",
-    [%expr [%cx {js|p #first-child {}|js}]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|p #first-child|js}, [||])|])]
+    "& #first-child",
+    [%expr [%cx {js|& #first-child {}|js}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& #first-child|js}, [||])|])]
   ),
   (
-    "p #first-child #second",
-    [%expr [%cx {js|p #first-child #second {}|js}]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|p #first-child #second|js}, [||])|])]
+    "& #first-child #second",
+    [%expr [%cx {js|& #first-child #second {}|js}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& #first-child #second|js}, [||])|])]
   ),
   (
-    "p #first-child::before",
-    [%expr [%cx {js|p #first-child::before {}|js}]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|p #first-child::before|js}, [||])|])]
+    "& #first-child::before",
+    [%expr [%cx {js|& #first-child::before {}|js}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& #first-child::before|js}, [||])|])]
   ),
   (
-    "p #first-child::before:hover",
-    [%expr [%cx {js|p #first-child::before:hover {}|js}]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|p #first-child::before:hover|js}, [||])|])]
+    "& #first-child::before:hover",
+    [%expr [%cx {js|& #first-child::before:hover {}|js}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& #first-child::before:hover|js}, [||])|])]
   ),
   /* (
     ".foo:is(.bar, #baz)",

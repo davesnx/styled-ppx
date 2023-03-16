@@ -222,7 +222,7 @@ and render_selector = (selector: selector) => {
     | NthSelector(v) => (v |> List.map(render_complex_selector) |> String.concat(", "))
   and render_pseudoclass =
     fun
-    | Ident(i) => ":" ++ i
+    | PseudoIdent(i) => ":" ++ i
     | NthFunction({name, payload: (payload, _loc)}) =>
       ":"
         ++ name

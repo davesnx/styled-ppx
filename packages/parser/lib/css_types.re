@@ -133,7 +133,7 @@ and pseudo_selector =
   | Pseudoclass(pseudoclass_kind)
 [@deriving show({with_path: false})]
 and pseudoclass_kind =
-  | Ident(string)
+  | PseudoIdent(string)
   | Function({
       name: string,
       payload: with_loc(selector),

@@ -697,8 +697,11 @@ let parse_string = (~skip_whitespace, ~container_lnum=?, ~pos=?, parser, string)
   parse(skip_whitespace, Lex_buffer.from_string(~container_lnum?, ~pos?, string), parser);
 };
 
-let parse_declaration_list = (~container_lnum=?, ~pos=?, input: string) =>
-  parse_string(~skip_whitespace=false, ~container_lnum?, ~pos?, Parser.declaration_list, input);
+let parse_declaration_list = (~container_lnum=?, ~pos=?, input: string) => {
+  /* TODO: Remove this trim and fix parser */
+  let trimmed = String.trim(input);
+  parse_string(~skip_whitespace=false, ~container_lnum?, ~pos?, Parser.declaration_list, trimmed);
+}
 
 let parse_declaration = (~container_lnum=?, ~pos=?, input: string) =>
   parse_string(~skip_whitespace=true, ~container_lnum?, ~pos?, Parser.declaration, input);
