@@ -91,8 +91,8 @@ and selector_list = list(with_loc(selector))
 and complex_selector =
   | Selector(compound_selector)
   | Combinator({
-      left: compound_selector,
-      right: list((option(string), compound_selector)),
+      left: selector,
+      right: list((option(string), selector)),
     })
 [@deriving show({with_path: false})]
 and compound_selector = {

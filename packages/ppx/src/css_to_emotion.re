@@ -264,7 +264,8 @@ and render_selector = (selector: selector) => {
   and render_complex_selector = complex => {
     switch (complex) {
     | Combinator({left, right}) =>
-      let left = render_compound_selector(left);
+      /* let left = render_compound_selector(left); */
+      let left = render_selector(left);
       let right = render_right_combinator(right);
       left ++ right;
     | Selector(compound) => render_compound_selector(compound)
@@ -272,13 +273,13 @@ and render_selector = (selector: selector) => {
   }
   and render_right_combinator = right => {
     right
-    |> List.map(((combinator, compound_selector)) => {
+    |> List.map(((combinator, selector)) => {
       Option.fold(
         ~none=" ",
         ~some=o => " " ++ o ++ " ",
         combinator,
       )
-      ++ render_compound_selector(compound_selector)
+      ++ render_selector(selector)
     }) |> String.concat("")
   };
 

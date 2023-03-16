@@ -46,7 +46,6 @@ open Css_types
 %start <rule_list> declaration_list
 %start <declaration> declaration
 %start <rule_list> keyframes
-%start <compound_selector> compound_selector
 
 %%
 
@@ -363,7 +362,7 @@ complex_selector_list:
 selector:
   | xs = skip_ws_right(simple_selector) { SimpleSelector xs }
   | xs = skip_ws_right(compound_selector) { CompoundSelector xs }
-  /* | xs = skip_ws_right(complex_selector) { ComplexSelector xs } */
+  | xs = skip_ws_right(complex_selector) { ComplexSelector xs }
 
 type_selector:
   | AMPERSAND; { Ampersand } /* & {} https://drafts.csswg.org/css-nesting/#nest-selector */
@@ -376,66 +375,17 @@ type_selector:
   | type_ = TAG; { Type type_ } /* a {} */
 
 /* <simple-selector> = <type-selector> | <subclass-selector> */
-/* We change the spec adding the & selector */
 /* <simple-selector> = <self-selector> | <type-selector> | <subclass-selector> */
 simple_selector:
   | t = type_selector { t }
   /* With <coumpound-selector> subclass_selector becomes irrelevant */
   /* | sb = subclass_selector { Subclass sb } */ /* #a, .a, a:visited, a[] */
 
-/* <compound-selector> = [
-    <type-selector>? <subclass-selector>*
-    [ <pseudo-element-selector> <pseudo-class-selector>* ]*
-  ]!
-
-  &#id.class
-  &.id::after
-  &.id::after:hover
-  &.id::after:hover:hover
-
-  We differ from the spec on type-selector which is a IDENT,
-  for a simple_selector (adding & and variables) */
-/* pseudo_selector:
-  | pe = pseudo_element_selector; { pe }
-  | pc = pseudo_class_selector; { pc } */
-
-/* compound_selector:
-  | type_selector = type_selector?
-    subclass_selectors = nonempty_list(subclass_selector);
-    pseudo_selectors = nonempty_list(pseudo_selector) {
-    {
-      type_selector;
-      subclass_selectors;
-      pseudo_selectors;
-    }
-  }
-  | type_selector = type_selector?
-    subclass_selectors = nonempty_list(subclass_selector) {
-    {
-      type_selector;
-      subclass_selectors;
-      pseudo_selectors = [];
-    }
-  }
-  | type_selector = type_selector?
-    pseudo_selectors = nonempty_list(pseudo_selector) {
-    {
-      type_selector;
-      subclass_selectors = [];
-      pseudo_selectors;
-    }
-  }
-  | type_selector = type_selector; {
-    {
-      type_selector = Some type_selector;
-      subclass_selectors = [];
-      pseudo_selectors = [];
-    }
-  } */
-
-
 pseudo_list:
-  | pseudo_element_selector list(pseudo_class_selector) { $1 :: $2 } /* ::after:visited */
+  /* ::after */
+  /* ::after:hover */
+  /* ::after:hover:hover */
+  | pseudo_element_selector list(pseudo_class_selector) { $1 :: $2 }
 
 /* <compound-selector> = [
     <type-selector>? <subclass-selector>*
@@ -482,14 +432,39 @@ combinator:
   | WS? c = skip_ws_right(COMBINATOR) s = skip_ws_right(compound_selector) { (Some c, s) }
   | WS s = skip_ws_right(compound_selector) { (None, s) }
 
+/* TODO: Describe the change to the spec */
+%inline non_complex_selector:
+  | s = simple_selector { SimpleSelector s }
+  | s = compound_selector { CompoundSelector s }
+
+%inline combinator_or_ws:
+  | WS { None }
+  | c = COMBINATOR { Some c }
+
+combinator_sequence:
+  | c = combinator_or_ws s = non_complex_selector { [(c, s)] }
+  | c = combinator_or_ws s = non_complex_selector req = combinator_sequence {
+    (c, s) :: req
+  }
+
 /* <complex-selector> = <compound-selector> [ <combinator>? <compound-selector> ]* */
 complex_selector:
-  | left = compound_selector; right = nonempty_list(combinator) {
+  /* | left = compound_selector {
+    Selector left
+  } */
+  | left = non_complex_selector seq = combinator_sequence {
     Combinator {
-      left;
-      right;
+      left = left;
+      right = seq;
     }
   }
+
+  /* | left = non_complex_selector; c = combinator_or_ws; right = non_complex_selector {
+    Combinator {
+      left = left;
+      right = [(c, right)];
+    }
+  } */
 
 /* component_value_in_prelude we transform WS_* into Delim with white spaces inside
 in component_value we transform to regular Delim
