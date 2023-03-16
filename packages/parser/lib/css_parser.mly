@@ -352,6 +352,13 @@ complex_selector_list:
   | xs = separated_nonempty_list(skip_ws_right(COMMA), complex_selector) { xs }
 
 selector:
+  /* By definition a selector can be one of those kinds, since inside
+  complex_selector we arrive to simple and compound, we discard those branches here.
+  The reason is because are in a LR(1) parser which makes those structures hard
+  to accomplish by following the CSS spec.
+
+  Check <non_complex_selector>
+  */
   /* | xs = skip_ws_right(simple_selector) { SimpleSelector xs } */
   /* | xs = skip_ws_right(compound_selector) { CompoundSelector xs } */
   | xs = skip_ws_right(complex_selector) { ComplexSelector xs }
@@ -428,11 +435,7 @@ combinator_sequence:
   | WS s = non_complex_selector { (None, s) }
   | s = non_complex_selector WS? { (None, s) }
   | c = COMBINATOR WS? s = non_complex_selector WS? { (Some c, s) }
-  /* | WS s = non_complex_selector req = combinator_sequence { (None, s) :: req } */
-  /*
-  | c = COMBINATOR s = non_complex_selector req = combinator_sequence { (Some c, s) :: req } */
 
-/* TODO: Explain the change to the spec */
 non_complex_selector:
   | s = simple_selector { SimpleSelector s }
   | s = compound_selector { CompoundSelector s }
