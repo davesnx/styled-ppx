@@ -698,7 +698,7 @@ let parse_string = (~skip_whitespace, ~container_lnum=?, ~pos=?, parser, string)
 };
 
 let parse_declaration_list = (~container_lnum=?, ~pos=?, input: string) =>
-  parse_string(~skip_whitespace=true, ~container_lnum?, ~pos?, Parser.declaration_list, input);
+  parse_string(~skip_whitespace=false, ~container_lnum?, ~pos?, Parser.declaration_list, input);
 
 let parse_declaration = (~container_lnum=?, ~pos=?, input: string) =>
   parse_string(~skip_whitespace=true, ~container_lnum?, ~pos?, Parser.declaration, input);

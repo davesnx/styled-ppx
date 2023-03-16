@@ -32,8 +32,8 @@ switch (input, help) {
 | (None, _) => render_help()
 | (Some(css), _) =>
   try(
-    Css_lexer.parse_stylesheet(~container_lnum, ~pos, css)
-    |> Css_types.pp_stylesheet(Format.std_formatter)
+    Css_lexer.parse_declaration_list(~container_lnum, ~pos, css)
+    |> Css_types.pp_rule_list(Format.std_formatter)
   ) {
   | exn =>
     Css_lexer.render_error(exn)

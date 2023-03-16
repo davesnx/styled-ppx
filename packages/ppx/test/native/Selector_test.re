@@ -223,13 +223,18 @@ let complex_tests = [
     [%expr CssJs.style(. [|CssJs.selector(. {js|p #first-child|js}, [||])|])]
   ),
   (
+    "p #first-child #second",
+    [%expr [%cx {js|p #first-child #second {}|js}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|p #first-child #second|js}, [||])|])]
+  ),
+  (
     "p #first-child::before",
     [%expr [%cx {js|p #first-child::before {}|js}]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|p #first-child::before|js}, [||])|])]
   ),
   (
     "p #first-child::before:hover",
-    [%expr [%cx {js|p #first-child {}|js}]],
+    [%expr [%cx {js|p #first-child::before:hover {}|js}]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|p #first-child::before:hover|js}, [||])|])]
   ),
   /* (
