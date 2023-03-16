@@ -1,7 +1,6 @@
 (subdir
  packages
  (dirs
-  instant
   parser
   css-spec-parser
   ppx
