@@ -1993,13 +1993,17 @@ let fontFace =
       "font-display: " ++ FontDisplay.toString(f) ++ ";"
     );
 
-  "@font-face {" ++
-    "font-family: " ++ fontFamily ++ ";" ++
-    "src: " ++ src ++ ";" ++
-     fontStyle ++
-     fontWeight ++
-     fontDisplay ++
-   "}";
+  "@font-face {"
+  ++ "font-family: "
+  ++ fontFamily
+  ++ ";"
+  ++ "src: "
+  ++ src
+  ++ ";"
+  ++ fontStyle
+  ++ fontWeight
+  ++ fontDisplay
+  ++ "}";
 };
 
 let textDecoration = x =>
@@ -2071,12 +2075,7 @@ let transitions = transitionList;
 
 let transition = (~duration=?, ~delay=?, ~timingFunction=?, property) =>
   transitionValue(
-    Transition.shorthand(
-      ~duration?,
-      ~delay?,
-      ~timingFunction?,
-      property,
-    ),
+    Transition.shorthand(~duration?, ~delay?, ~timingFunction?, property),
   );
 
 let transitionDelay = i => Declaration("transitionDelay", string_of_time(i));

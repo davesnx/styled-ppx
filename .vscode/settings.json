@@ -4,6 +4,9 @@
     "root": "${workspaceFolder:styled-ppx}"
   },
   "[reason]": {
-    "editor.formatOnSave": false
+    "editor.formatOnSave": true
+  },
+  "[ocaml]": {
+    "editor.formatOnSave": true
   }
 }

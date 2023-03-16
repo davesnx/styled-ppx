@@ -660,45 +660,46 @@ let traverser = {
   }
 };
 
-  /*
-  let delimLength =
-    match delim with Some s -> 2 + String.length s | None -> 1
-  in
+/*
+ let delimLength =
+   match delim with Some s -> 2 + String.length s | None -> 1
+ in
+ */
+
+/*
+ let add_loc delimLength base span =
+ let _, _, col = Ocaml_common.Location.get_pos_info base.loc_start in
+ let pos_bol_start =
+   base.loc_start.pos_bol + col + delimLength + (fst span).index
+   - (fst span).col
+ in
+ let pos_bol_end =
+   base.loc_start.pos_bol + col + delimLength + (snd span).index
+   - (snd span).col
+ in
+ let start = pos_bol_start + (fst span).col in
+ let end_ = pos_bol_end + (snd span).col in
+ {
+   loc_start =
+     {
+       pos_fname = base.loc_start.pos_fname;
+       pos_lnum = base.loc_start.pos_lnum + (fst span).line;
+       pos_bol = pos_bol_start;
+       pos_cnum = start;
+     };
+   loc_end =
+     {
+       pos_fname = base.loc_start.pos_fname;
+       pos_lnum = base.loc_start.pos_lnum + (snd span).line;
+       pos_bol = pos_bol_end;
+       pos_cnum = end_;
+     };
+   loc_ghost = false;
+ }
   */
 
-  /*
-  let add_loc delimLength base span =
-  let _, _, col = Ocaml_common.Location.get_pos_info base.loc_start in
-  let pos_bol_start =
-    base.loc_start.pos_bol + col + delimLength + (fst span).index
-    - (fst span).col
-  in
-  let pos_bol_end =
-    base.loc_start.pos_bol + col + delimLength + (snd span).index
-    - (snd span).col
-  in
-  let start = pos_bol_start + (fst span).col in
-  let end_ = pos_bol_end + (snd span).col in
-  {
-    loc_start =
-      {
-        pos_fname = base.loc_start.pos_fname;
-        pos_lnum = base.loc_start.pos_lnum + (fst span).line;
-        pos_bol = pos_bol_start;
-        pos_cnum = start;
-      };
-    loc_end =
-      {
-        pos_fname = base.loc_start.pos_fname;
-        pos_lnum = base.loc_start.pos_lnum + (snd span).line;
-        pos_bol = pos_bol_end;
-        pos_cnum = end_;
-      };
-    loc_ghost = false;
-  }
-   */
-
-let compatibleWithBsEmotionPpx = Ppx_config.find(Ppx_config.compatibleModeWithBsEmotionPpxKey, Sys.argv);
+let compatibleWithBsEmotionPpx =
+  Ppx_config.find(Ppx_config.compatibleModeWithBsEmotionPpxKey, Sys.argv);
 
 Driver.add_arg(
   Ppx_config.compatibleModeWithBsEmotionPpxKey,
@@ -714,7 +715,7 @@ Driver.register_transformation(
   ~instrument=Driver.Instrument.make(~position=Before, traverser#structure),
   ~rules=[
     /* %cx without let binding, it doesn't have CssJs.label
-      %cx is defined in traverser#structure */
+       %cx is defined in traverser#structure */
     Context_free.Rule.extension(
       Extension.declare(
         "cx",
@@ -741,15 +742,11 @@ Driver.register_transformation(
           let pos = payload.loc.loc_start;
           let container_lnum = pos.pos_lnum;
           let declarationListValues =
-            Css_lexer.parse_declaration(
-              ~container_lnum,
-              ~pos,
-              payload.txt,
-            )
+            Css_lexer.parse_declaration(~container_lnum, ~pos, payload.txt)
             |> Css_to_emotion.render_declaration;
           /* TODO: Instead of getting the first element,
-              fail when there's more than one declaration or
-            make a mechanism to flatten all the properties */
+               fail when there's more than one declaration or
+             make a mechanism to flatten all the properties */
           List.nth(declarationListValues, 0);
         },
       ),
@@ -763,11 +760,7 @@ Driver.register_transformation(
           let pos = payload.loc.loc_start;
           let container_lnum = pos.pos_lnum;
           let stylesheet =
-            Css_lexer.parse_stylesheet(
-              ~container_lnum,
-              ~pos,
-              payload.txt,
-            );
+            Css_lexer.parse_stylesheet(~container_lnum, ~pos, payload.txt);
           Css_to_emotion.render_global(stylesheet);
         },
       ),
@@ -781,11 +774,7 @@ Driver.register_transformation(
           let pos = payload.loc.loc_start;
           let container_lnum = pos.pos_lnum;
           let declarations =
-            Css_lexer.parse_keyframes(
-              ~container_lnum,
-              ~pos,
-              payload.txt,
-            );
+            Css_lexer.parse_keyframes(~container_lnum, ~pos, payload.txt);
           Css_to_emotion.render_keyframes(declarations);
         },
       ),

@@ -129,7 +129,6 @@ Like `writeBinary` but raises exception instead of returning `result`.
 */
 let writeBinaryExn: (Path.t(Path.absolute), string) => unit;
 
-
 /**
 Reads raw bytes from a file from disk. Newlines are not modified from their
 exact form on disk.
@@ -304,7 +303,6 @@ the paths may be returned after being processed by `realPath`.
 let resolveLink:
   Path.t(Path.absolute) => result(Path.t(Path.absolute), exn);
 
-
 /**
 Same as `resolveLink` but raises exception instead of returning `Error`.
 */
@@ -360,7 +358,6 @@ Does not return directories in any guaranteed ordering.
 Same as `readDir` but raises exception instead of returning `Error`.
 */
 let readDirExn: Path.t(Path.absolute) => list(Path.t(Path.absolute));
-
 
 /**
 Returns the `perm` for the file at the `Fp` path.

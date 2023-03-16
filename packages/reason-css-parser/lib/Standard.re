@@ -11,7 +11,10 @@ let function_call = (name, rule) => {
     token(
       fun
       | FUNCTION(called_name) when name == called_name => Ok()
-      | token => Error(["expected a function " ++ name ++ ". got an " ++ show_token(token)]),
+      | token =>
+        Error([
+          "expected a function " ++ name ++ ". got an " ++ show_token(token),
+        ]),
     );
   let.bind_match value = rule;
   let.bind_match () = expect(RIGHT_PARENS);
@@ -207,10 +210,10 @@ let hex_color =
   );
 
 /* <interpolation>, It's not part of the spec.
-  It's the implementation/workaround to inject Reason variables into CSS definitions.
-  `$()` only supports variables and Module accessors to variables.
-  In compile-time the bs-css bindings would enforce the types of those variables.
-*/
+     It's the implementation/workaround to inject Reason variables into CSS definitions.
+     `$()` only supports variables and Module accessors to variables.
+     In compile-time the bs-css bindings would enforce the types of those variables.
+   */
 let interpolation = {
   open Rule;
   open Rule.Let;
@@ -218,13 +221,16 @@ let interpolation = {
   let.bind_match _ = Pattern.expect(DELIM("$"));
   let.bind_match _ = Pattern.expect(LEFT_PARENS);
   let.bind_match path = {
-    let.bind_match path = Modifier.zero_or_more({
-      let.bind_match ident = ident;
-      let.bind_match _ = Pattern.expect(DELIM("."));
-      Match.return(ident)
-    });
+    let.bind_match path =
+      Modifier.zero_or_more(
+        {
+          let.bind_match ident = ident;
+          let.bind_match _ = Pattern.expect(DELIM("."));
+          Match.return(ident);
+        },
+      );
     let.bind_match ident = ident;
-    Match.return(path @ [ident])
+    Match.return(path @ [ident]);
   };
   let.bind_match _ = Pattern.expect(RIGHT_PARENS);
 
@@ -237,21 +243,25 @@ let line_names = {
   open Rule.Let;
 
   let.bind_match left = Pattern.expect(LEFT_SQUARE);
-  let.bind_match path = Modifier.zero_or_more({
-    let.bind_match ident = custom_ident;
-    Match.return(ident)
-  });
+  let.bind_match path =
+    Modifier.zero_or_more(
+      {
+        let.bind_match ident = custom_ident;
+        Match.return(ident);
+      },
+    );
   let.bind_match right = Pattern.expect(RIGHT_SQUARE);
 
   return_match((left, path, right));
 };
 
 let flex_value =
-  token(fun
+  token(
+    fun
     | DIMENSION(number, dimension) =>
       switch (dimension) {
       | "fr" => Ok(`Fr(number))
       | _ => Error(["only fr dimension is valid"])
       }
-    | _ => Error(["expected flex_value"])
+    | _ => Error(["expected flex_value"]),
   );

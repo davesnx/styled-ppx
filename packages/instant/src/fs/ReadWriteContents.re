@@ -19,33 +19,29 @@ let readText = path => {
     let continue = {contents: true};
     /* TODO: Better Unix usage and robust error handling */
     while (continue.contents) {
-      try (
-        {
-          let line = input_line(inChan);
-          let len = String.length(line);
-          /* Opened the channel in binary mode so we could manually do
-           * the same line normalization in linux/osx. */
-          let line =
-            if (len > 0 && line.[len - 1] === '\r') {
-              String.sub(line, 0, len - 1);
-            } else {
-              line;
-            };
-          lines.contents = [line, ...lines.contents];
-        }
-      ) {
+      try({
+        let line = input_line(inChan);
+        let len = String.length(line);
+        /* Opened the channel in binary mode so we could manually do
+         * the same line normalization in linux/osx. */
+        let line =
+          if (len > 0 && line.[len - 1] === '\r') {
+            String.sub(line, 0, len - 1);
+          } else {
+            line;
+          };
+        lines.contents = [line, ...lines.contents];
+      }) {
       | End_of_file => continue.contents = false
       };
     };
     close_in(inChan);
     Ok(String.concat("\n", List.rev(lines.contents)));
   };
-  try (
-    {
-      let inChan = open_in_bin(stringPath);
-      Util.withInChannel(inChan, impl);
-    }
-  ) {
+  try({
+    let inChan = open_in_bin(stringPath);
+    Util.withInChannel(inChan, impl);
+  }) {
   | Sys_error(msg) as e => Error(e)
   };
 };
@@ -71,12 +67,10 @@ let writeText = (~lineEnds=PlatformDefault, path, lines) => {
     );
     Ok();
   };
-  try (
-    {
-      let outChan = open_out_bin(stringPath);
-      Util.withOutChannel(outChan, impl);
-    }
-  ) {
+  try({
+    let outChan = open_out_bin(stringPath);
+    Util.withOutChannel(outChan, impl);
+  }) {
   /* Containing directory likely doesn't exist */
   | Sys_error(_) as e => Error(e)
   };
@@ -91,12 +85,10 @@ let readBinary = path => {
     let n = in_channel_length(inChan);
     Ok(really_input_string(inChan, n));
   };
-  try (
-    {
-      let inChan = open_in_bin(stringPath);
-      Util.withInChannel(inChan, impl);
-    }
-  ) {
+  try({
+    let inChan = open_in_bin(stringPath);
+    Util.withInChannel(inChan, impl);
+  }) {
   /* TODO: Add End_of_file handling here like Bos */
   | Sys_error(msg) as e => Error(e)
   };
@@ -112,12 +104,10 @@ let writeBinary = (path, str) => {
     output_string(outChan, str);
     Ok();
   };
-  try (
-    {
-      let outChan = open_out_bin(stringPath);
-      Util.withOutChannel(outChan, impl);
-    }
-  ) {
+  try({
+    let outChan = open_out_bin(stringPath);
+    Util.withOutChannel(outChan, impl);
+  }) {
   /* Containing directory likely doesn't exist */
   | Sys_error(_) as e => Error(e)
   };

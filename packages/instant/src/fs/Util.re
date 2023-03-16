@@ -15,9 +15,9 @@ let throwErrorResult = v =>
 
 let withInChannel = (resource, doThis) => {
   let res =
-    try (doThis(resource)) {
+    try(doThis(resource)) {
     | e =>
-      try (
+      try(
         {
           close_in(resource);
           reraise(e);
@@ -37,9 +37,9 @@ let withInChannel = (resource, doThis) => {
  */
 let withOutChannel = (resource, doThis) => {
   let res =
-    try (doThis(resource)) {
+    try(doThis(resource)) {
     | e =>
-      try (
+      try(
         {
           close_out(resource);
           reraise(e);
@@ -54,9 +54,9 @@ let withOutChannel = (resource, doThis) => {
 
 let withDirHandle = (resource, doThis) => {
   let res =
-    try (doThis(resource)) {
+    try(doThis(resource)) {
     | e =>
-      try (
+      try(
         {
           Unix.closedir(resource);
           reraise(e);

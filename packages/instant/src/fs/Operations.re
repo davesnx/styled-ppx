@@ -21,12 +21,12 @@ let rec changeMode = (perm, path) =>
     Error(Invalid_argument("Cannot changeMode for " ++ Path.toString(path)))
   };
 
-let rec changeModeExn =
-  (perm, path) => Util.throwErrorResult(changeMode(perm, path));
+let rec changeModeExn = (perm, path) =>
+  Util.throwErrorResult(changeMode(perm, path));
 
 let rec readLink = path => {
   let stringPath = Path.toString(path);
-  try (Ok(Path.testForPathExn(Unix.readlink(stringPath)))) {
+  try(Ok(Path.testForPathExn(Unix.readlink(stringPath)))) {
   /* Invalid argument - not a symlink */
   | Unix.Unix_error(Unix.EINVAL, _, _) =>
     Error(Invalid_argument("Path is not a symlink " ++ stringPath))
@@ -95,56 +95,56 @@ let rec links = path =>
 let rec linksExn = path => Util.throwErrorResult(links(path));
 
 let rec rm = path =>
-  try (Ok(Unix.unlink(Path.toString(path)))) {
+  try(Ok(Unix.unlink(Path.toString(path)))) {
   | Unix.Unix_error(Unix.EINTR, _, _) => rm(path)
   /* Will raise Unix.Unix_error(Unix.ENOENT, _, _) if not exists */
   | Unix.Unix_error(_) as e => Error(e)
   };
 
 let rec rmExn = path =>
-  try (Unix.unlink(Path.toString(path))) {
+  try(Unix.unlink(Path.toString(path))) {
   | Unix.Unix_error(Unix.EINTR, _, _) => rmExn(path)
   /* Will raise Unix.Unix_error(Unix.ENOENT, _, _) if not exists */
   | Unix.Unix_error(_) as e => Util.reraise(e)
   };
 
 let rec rmEmptyDir = path =>
-  try (Ok(Unix.rmdir(Path.toString(path)))) {
+  try(Ok(Unix.rmdir(Path.toString(path)))) {
   | Unix.Unix_error(Unix.EINTR, _, _) => rmEmptyDir(path)
   /* Will raise Unix.Unix_error(Unix.ENOENT, _, _) if not exists */
   | Unix.Unix_error(_) as e => Error(e)
   };
 
 let rec rmEmptyDirExn = path =>
-  try (Unix.rmdir(Path.toString(path))) {
+  try(Unix.rmdir(Path.toString(path))) {
   | Unix.Unix_error(Unix.EINTR, _, _) => rmEmptyDirExn(path)
   /* Will raise Unix.Unix_error(Unix.ENOENT, _, _) if not exists */
   | Unix.Unix_error(_) as e => Util.reraise(e)
   };
 
 let rec rmIfExists = path =>
-  try (Ok(Unix.unlink(Path.toString(path)))) {
+  try(Ok(Unix.unlink(Path.toString(path)))) {
   | Unix.Unix_error(Unix.ENOENT, _, _) => Ok()
   | Unix.Unix_error(Unix.EINTR, _, _) => rmIfExists(path)
   | Unix.Unix_error(_) as e => Error(e)
   };
 
 let rec rmIfExistsExn = path =>
-  try (Unix.unlink(Path.toString(path))) {
+  try(Unix.unlink(Path.toString(path))) {
   | Unix.Unix_error(Unix.ENOENT, _, _) => ()
   | Unix.Unix_error(Unix.EINTR, _, _) => rmIfExistsExn(path)
   | Unix.Unix_error(_) as e => Util.reraise(e)
   };
 
 let rec mkDir = (~perm=Perm.defaultPerm, path) =>
-  try (Ok(Unix.mkdir(Path.toString(path), Perm.toInt(perm)))) {
+  try(Ok(Unix.mkdir(Path.toString(path), Perm.toInt(perm)))) {
   | Unix.Unix_error(Unix.EEXIST, _, _) as e => Error(e)
   | Unix.Unix_error(Unix.EINTR, _, _) => mkDir(~perm, path)
   | Unix.Unix_error(_) as e => Error(e)
   };
 
 let rec mkDirExn = (~perm=Perm.defaultPerm, path) =>
-  try (Unix.mkdir(Path.toString(path), Perm.toInt(perm))) {
+  try(Unix.mkdir(Path.toString(path), Perm.toInt(perm))) {
   | Unix.Unix_error(Unix.EEXIST, _, _) as e => Util.reraise(e)
   | Unix.Unix_error(Unix.EINTR, _, _) => mkDirExn(~perm, path)
   | Unix.Unix_error(_) as e => Util.reraise(e)
@@ -194,7 +194,7 @@ let rmDirExn = path => Util.throwErrorResult(rmDir(path));
  * Make one directory for the sake of mkdir -p style behavior.
  */
 let rec mkDirPOneExn = (~perm=Perm.defaultPerm, path) =>
-  try (Unix.mkdir(Path.toString(path), Perm.toInt(perm))) {
+  try(Unix.mkdir(Path.toString(path), Perm.toInt(perm))) {
   | Unix.Unix_error(Unix.EEXIST, _, _) as e =>
     switch (Query.queryExn(path)) {
     | Link(_)
@@ -254,7 +254,7 @@ let mkDirPExn = (~perm=Perm.defaultPerm, path) =>
   Util.throwErrorResult(mkDirP(~perm, path));
 
 let rec linkImpl = (~isDir, ~from, ~toTarget) =>
-  try (
+  try(
     Ok(
       Unix.symlink(
         ~to_dir=isDir,

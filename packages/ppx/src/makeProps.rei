@@ -16,7 +16,10 @@ type eventType =
   | UI
   | Wheel;
 
-type event = { name: string, type_: eventType };
+type event = {
+  name: string,
+  type_: eventType,
+};
 
 type attributeType =
   | Bool
@@ -25,9 +28,15 @@ type attributeType =
   | String
   | Style;
 
-type attr = { name: string, type_: attributeType, alias };
-type domProp = | Event(event) | Attribute(attr);
+type attr = {
+  name: string,
+  type_: attributeType,
+  alias,
+};
+type domProp =
+  | Event(event)
+  | Attribute(attr);
 
-let get: (list(string)) => list(domProp);
+let get: list(string) => list(domProp);
 let attributeTypeToIdent: attributeType => longident;
 let eventTypeToIdent: eventType => longident;

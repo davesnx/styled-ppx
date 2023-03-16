@@ -25,7 +25,7 @@ let apply_parser = (parser, tokens_with_loc) => {
   let.ok output =
     switch (output) {
     | Ok(data) => Ok(data)
-    | Error([message, ..._]) => Error(message);
+    | Error([message, ..._]) => Error(message)
     | Error([]) => Error("weird")
     };
   let.ok () =

@@ -29,7 +29,7 @@ let compareBaseName = (p1, p2) =>
  * TODO: Don't traverse symlinks by default.
  */
 let rec traverseFileSystemFromQueryResult = (~onNode, queryResult) =>
-  try (
+  try(
     onNode(queryResult, () =>
       switch (queryResult) {
       | Other(_)

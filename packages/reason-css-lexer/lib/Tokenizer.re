@@ -19,7 +19,8 @@ let non_printable_code_point = [%sedlex.regexp?
 let newline = [%sedlex.regexp? '\n'];
 let whitespace = [%sedlex.regexp? Plus('\n' | '\t' | ' ')];
 let ident_char = [%sedlex.regexp?
-  '_' | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' | non_ascii_code_point | escape
+  '_' | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' | non_ascii_code_point |
+  escape
 ];
 
 let (let.ok) = Result.bind;
@@ -384,6 +385,9 @@ let consume = buf => {
     consume_ident_like(buf);
   | eof => Ok(EOF)
   | any => Ok(DELIM(lexeme(buf)))
-  | _ => failwith("This match case is unreachable. sedlex needs a last case as wildcard _. If this error appears, means that there's a bug in the lexer.")
+  | _ =>
+    failwith(
+      "This match case is unreachable. sedlex needs a last case as wildcard _. If this error appears, means that there's a bug in the lexer.",
+    )
   };
 };

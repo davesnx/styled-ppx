@@ -12,7 +12,7 @@ open Types;
  * overhead of path conversion - uses string).
  */
 let rec readLink__ = str =>
-  try (Path.testForPathExn(Unix.readlink(str))) {
+  try(Path.testForPathExn(Unix.readlink(str))) {
   /* Invalid argument - not a symlink */
   | Unix.Unix_error(Unix.EINVAL, _, _) =>
     raise(Invalid_argument("Path is not a symlink " ++ str))
@@ -26,7 +26,7 @@ let rec readLink__ = str =>
  * to handle that in various circumstances.
  */
 let rec stat = path =>
-  try (Some(Unix.lstat(Path.toString(path)))) {
+  try(Some(Unix.lstat(Path.toString(path)))) {
   | Unix.Unix_error(Unix.ENOTDIR, _, _) => None
   | Unix.Unix_error(Unix.ENOENT, _, _) => None
   | Unix.Unix_error(Unix.EINTR, _, _) => stat(path)
@@ -65,7 +65,7 @@ let query = p =>
 let queryExn = p => makeResult(p, statExn(p));
 
 let readDirByHandle = handle =>
-  try (Some(Unix.readdir(handle))) {
+  try(Some(Unix.readdir(handle))) {
   | End_of_file => None
   };
 
@@ -87,7 +87,7 @@ let rec readDir = path => {
     };
     Util.withDirHandle(dirHandle, scan([]));
   };
-  try (Ok(impl())) {
+  try(Ok(impl())) {
   | Unix.Unix_error(Unix.ENOENT, _, _) =>
     Error(
       Invalid_argument("Dir " ++ Path.toString(path) ++ " does not exist"),

@@ -95,8 +95,7 @@ let rec string_of_value = value => {
 
 exception ParseError(string);
 
-let value_of_string = string => {
+let value_of_string = string =>
   try(Sedlexing.Utf8.from_string(string) |> provider |> value_of_lex) {
   | _ => raise(ParseError(string))
   };
-}

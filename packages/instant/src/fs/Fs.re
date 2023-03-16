@@ -3,8 +3,8 @@
  */;
 
 /*
-Fs: Reason native filesystem utilities.
-*/
+ Fs: Reason native filesystem utilities.
+ */
 include Types;
 include Traverse;
 include ReadWriteContents;
