@@ -5,7 +5,7 @@ let loc = Location.none;
 
 /* https://www.w3.org/TR/mediaqueries-5 */
 let media_query_tests = [
-  /* (
+  (
     "(min-width: 33px)",
     [%expr [%cx "@media (min-width: 33px) {}"]],
     [%expr CssJs.style(. [|CssJs.media(. {js|(min-width: 33px)|js}, [||])|])]
@@ -54,7 +54,7 @@ let media_query_tests = [
     "(max-height: $(wat))",
     [%expr [%cx "@media (max-height: $(wat)) {}"]],
     [%expr CssJs.style(. [|CssJs.media(. {js|(max-height: |js} ++ (wat ++ {js|)|js}), [||])|])]
-  ), */
+  ),
  /* Nested is not supported in code-gen
     https://www.w3.org/TR/mediaqueries-5/#media-conditions */
   /* (
@@ -66,7 +66,7 @@ let media_query_tests = [
 ];
 
 let keyframe_tests = [
-  /* (
+  (
     {|%keyframe "0% { color: red } 100% { color: green }"|},
     [%expr [%keyframe "0% { color: red } 100% { color: green }"]],
     [%expr CssJs.keyframes(. [|(0, [|CssJs.color(CssJs.red)|]), (100, [|CssJs.color(CssJs.green)|]) |])]
@@ -80,7 +80,7 @@ let keyframe_tests = [
     {|%keyframe "from { color: red } to { color: green }"|},
     [%expr [%keyframe "{ from { color: red } to { color: green }}"]],
     [%expr CssJs.keyframes(. [|(0, [|CssJs.color(CssJs.red)|]), (100, [|CssJs.color(CssJs.green)|]) |])]
-  ), */
+  ),
 ];
 
 let runner = tests =>
