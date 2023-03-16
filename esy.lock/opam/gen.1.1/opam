@@ -9,8 +9,6 @@ build: [
 ]
 depends: [
   "dune" {>= "1.1"}
-  "dune-configurator"
-  "base-bytes"
   "seq"
   "odoc" {with-doc}
   "qcheck" {with-test}
@@ -25,9 +23,9 @@ bug-reports: "https://github.com/c-cube/gen/issues"
 dev-repo: "git+https://github.com/c-cube/gen.git"
 authors: ["Simon Cruanes" "ELLIOTTCABLE"]
 url {
-  src: "https://github.com/c-cube/gen/archive/v1.0.tar.gz"
+  src: "https://github.com/c-cube/gen/archive/v1.1.tar.gz"
   checksum: [
-    "md5=4386c7e64963619d660417175b84288d"
-    "sha512=fb4ec2ab35a1aba0dcc8439b11f14a0a785d939f661f505aec88a6f2ca6ca87e14ddfda860d9c180b215190b76690de87040c144582f069224f7e58d37ef48a0"
+    "md5=fa8066511b693815fe659fd022f4c6bc"
+    "sha512=71a4b5c3666a7c11935398a78feea7383f61d2c549dfb96e324d40783ffa87b5ec492c5ec468803aabfb9b48e7d0ebaa30b24d2b974540afc7cca5feea3121c1"
   ]
 }

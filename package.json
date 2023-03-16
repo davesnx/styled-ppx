@@ -32,32 +32,34 @@
     "@opam/ocamlformat": "0.24.1",
     "@opam/ppx_deriving": "5.2.1",
     "@opam/ppxlib": "*",
-    "@opam/reason": "3.8.1",
+    "@opam/reason": "*",
     "@opam/sedlex": "3.0",
     "@opam/patdiff": "v0.15.0",
     "@opam/utop": "2.10.0",
     "ocaml": "4.14.0"
   },
   "resolutions": {
-    "@opam/ppxlib": "zth/ppxlib:ppxlib.opam#32f83395fb89693a873541298b6367449f23bc4a"
+    "@opam/ppxlib": "zth/ppxlib:ppxlib.opam#32f83395fb89693a873541298b6367449f23bc4a",
+    "@opam/reason": "reasonml/reason:reason.opam#b283f335f90e3aaa398bff8e82761038ee42a99d",
+    "@opam/ocamlfind": "1.9.5"
   },
   "scripts": {
-    "test_typecheck": "esy dune build @native_typecheck_test",
-    "test_css_support": "esy dune build @css_support_test",
-    "test_ppx_snapshot": "esy dune build @ppx_snapshot_test",
+    "test_typecheck": "dune build @native_typecheck_test",
+    "test_css_support": "dune build @css_support_test",
+    "test_ppx_snapshot": "dune build @ppx_snapshot_test",
     "test_ppx_snapshot_promote":
-      "esy dune build @ppx_snapshot_test --auto-promote",
-    "test_parser": "esy dune build @parser_test",
-    "test_css_lexer": "esy dune build @css_lexer_test",
-    "test_reason_css_parser": "esy dune build @reason_css_parser_test",
-    "test_css_spec_parser": "esy dune build @css_spec_parser_test",
-    "test_css_spec_types": "esy dune build @css_spec_types_test",
+      "dune build @ppx_snapshot_test --auto-promote",
+    "test_parser": "dune build @parser_test",
+    "test_css_lexer": "dune build @css_lexer_test",
+    "test_reason_css_parser": "dune build @reason_css_parser_test",
+    "test_css_spec_parser": "dune build @css_spec_parser_test",
+    "test_css_spec_types": "dune build @css_spec_types_test",
     "test_bs": "yarn --cwd 'packages/ppx/test/browser' build; yarn --cwd 'packages/ppx/test/browser' test",
-    "dev": "esy dune build --root . --watch",
+    "dev": "dune build --root . --watch",
     "release-static":
       "esy b dune build --root . --ignore-promoted-rules --no-config --profile release-static --only-packages styled-ppx",
-    "ast": "esy dune exec packages/renderer/ast_renderer.exe --",
-    "lexer": "esy dune exec packages/renderer/lexer_renderer.exe --",
+    "ast": "dune exec packages/renderer/ast_renderer.exe --",
+    "lexer": "dune exec packages/renderer/lexer_renderer.exe --",
     "interpreter": "esy menhir --interpret --interpret-show-cst packages/parser/lib/css_parser.mly"
   }
 }
