@@ -159,6 +159,3 @@ module DynamicCompnentWithIdent = [%styled.div
     cssRule;
   }
 ];
-
-
-module OneSingleProperty = [%styled.div "display: block"];
