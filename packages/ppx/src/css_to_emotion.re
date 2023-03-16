@@ -338,7 +338,7 @@ let render_keyframes = (declarations: rule_list): Parsetree.expression => {
   let invalid_prelude_value = (value) => "'" ++ value ++ "' isn't a valid keyframe value";
   let invalid_prelude_value_opaque = "This isn't a valid keyframe value";
 
-  let _render_select_as_keyframe = (prelude: selector): int => {
+  let render_select_as_keyframe = (prelude: selector): int => {
     switch (prelude) {
      | SimpleSelector(selector) => {
        switch (selector) {
@@ -367,13 +367,12 @@ let render_keyframes = (declarations: rule_list): Parsetree.expression => {
     |> List.map(declaration => {
       switch (declaration) {
         | Style_rule({
-          prelude: (_selector, prelude_loc),
+          prelude: (selector, prelude_loc),
           block,
           loc: style_loc,
         }) =>
         let percentage =
-          33
-          /* render_select_as_keyframe(selector |> List.hd) */
+          render_select_as_keyframe(selector |> List.hd |> fst)
           |> Builder.eint(~loc=prelude_loc);
         let rules =
           render_declarations(block) |> Builder.pexp_array(~loc);
