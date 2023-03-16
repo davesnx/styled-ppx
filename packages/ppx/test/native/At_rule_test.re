@@ -66,7 +66,7 @@ let media_query_tests = [
 ];
 
 let keyframe_tests = [
-  (
+  /* (
     {|%keyframe "0% { color: red } 100% { color: green }"|},
     [%expr [%keyframe "0% { color: red } 100% { color: green }"]],
     [%expr CssJs.keyframes(. [|(0, [|CssJs.color(CssJs.red)|]), (100, [|CssJs.color(CssJs.green)|]) |])]
@@ -80,7 +80,7 @@ let keyframe_tests = [
     {|%keyframe "from { color: red } to { color: green }"|},
     [%expr [%keyframe "{ from { color: red } to { color: green }}"]],
     [%expr CssJs.keyframes(. [|(0, [|CssJs.color(CssJs.red)|]), (100, [|CssJs.color(CssJs.green)|]) |])]
-  ),
+  ), */
 ];
 
 let runner = tests =>

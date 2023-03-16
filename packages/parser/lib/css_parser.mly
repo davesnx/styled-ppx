@@ -75,13 +75,11 @@ skip_ws_left (X): WS? x = X; { x }
 
 /* TODO: Remove empty_brace_block */
 /* {} */
-empty_brace_block: LEFT_BRACE; RIGHT_BRACE; { [] }
+empty_brace_block: pair(LEFT_BRACE, RIGHT_BRACE) { [] }
 
 /* TODO: Remove SEMI_COLON? from brace_block(X) */
 /* { ... } */
-brace_block(X):
-  xs = delimited(LEFT_BRACE, X, RIGHT_BRACE);
-  SEMI_COLON? { xs }
+brace_block(X): xs = delimited(LEFT_BRACE, X, RIGHT_BRACE) SEMI_COLON? { xs }
 
 /* [] */
 bracket_block (X): xs = delimited(LEFT_BRACKET, X, RIGHT_BRACKET) { xs }
@@ -91,6 +89,8 @@ paren_block (X): xs = delimited(LEFT_PAREN, X, RIGHT_PAREN) { xs }
 
 /* https://www.w3.org/TR/mediaqueries-5 */
 /* Parsing with this approach is almost as good the entire spec */
+
+prelude: xs = loption(nonempty_list(loc(value_in_prelude))) { xs }
 
 /* Missing grammars: */
 /* (width >= 600px) */
@@ -202,23 +202,19 @@ keyframe_style_rule:
 ;
 
 selector_list:
-  | selector = loc(selector) {
-    [selector]
-  }
-  | selector = loc(selector) skip_ws(COMMA) seq = selector_list {
-    selector :: seq
-  }
+  | selector = loc(selector) WS? { [selector] }
+  | selector = loc(selector) WS? COMMA WS? seq = selector_list WS? { selector :: seq }
 
 /* .class {} */
 style_rule:
-  | prelude = loc(selector_list)
+  | prelude = loc(selector_list) WS?
     block = loc(empty_brace_block) {
     { prelude;
       block;
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
-  | prelude = loc(selector_list)
+  | prelude = loc(selector_list) WS?
     declarations = brace_block(loc(declarations)) {
     { prelude;
       block = declarations;
@@ -226,24 +222,26 @@ style_rule:
     }
   }
 
-prelude: xs = loption(nonempty_list(loc(component_value_in_prelude))) { xs }
-
-component_values: xs = loption(nonempty_list(loc(component_value))) { xs }
+values: xs = nonempty_list(loc(value)) { xs }
 
 declarations:
   | xs = nonempty_list(rule) SEMI_COLON? { xs }
   | xs = separated_nonempty_list(SEMI_COLON, rule) SEMI_COLON? { xs }
 
-rule:
+%inline rule:
+  /* Rule can have declarations, since we have nesting, so both style_rules and
+  declarations can live side by side. */
   | d = declaration_without_eof; { Declaration d }
-  | r = at_rule { At_rule r }
-  | s = style_rule { Style_rule s }
+  | r = skip_ws(at_rule) { At_rule r }
+  | s = skip_ws(style_rule) { Style_rule s }
 
-/* property: value; */
+declaration: d = declaration_without_eof; EOF { d }
+
 declaration_without_eof:
+  /* property: value; */
   | property = loc(IDENT)
     COLON
-    value = loc(component_values)
+    value = loc(values)
     important = loc(boption(IMPORTANT)) SEMI_COLON? {
     { name = property;
       value;
@@ -251,12 +249,6 @@ declaration_without_eof:
       loc = Lex_buffer.make_loc $startpos $endpos;
     }
   }
-
-declaration: d = declaration_without_eof; EOF { d }
-
-/* ::after */
-pseudo_element_selector:
-  DOUBLE_COLON; pse = IDENT { Pseudoelement pse }
 
 nth:
   /* even, odd, n */
@@ -344,9 +336,9 @@ id_selector: h = HASH { Id h }
 
 /* <class-selector> = '.' <ident-token> */
 class_selector:
-  | DOT IDENT { Class $2 }
+  | DOT id = IDENT { Class id }
   /* TODO: Fix this: Here we need to add TAG in case some ident is an actual tag :( */
-  | DOT TAG { Class $2 }
+  | DOT tag = TAG { Class tag }
 
 /* <subclass-selector> = <id-selector> | <class-selector> | <attribute-selector> | <pseudo-class-selector> */
 subclass_selector:
@@ -360,8 +352,8 @@ complex_selector_list:
   | xs = separated_nonempty_list(skip_ws_right(COMMA), complex_selector) { xs }
 
 selector:
-  | xs = skip_ws_right(simple_selector) { SimpleSelector xs }
-  | xs = skip_ws_right(compound_selector) { CompoundSelector xs }
+  /* | xs = skip_ws_right(simple_selector) { SimpleSelector xs } */
+  /* | xs = skip_ws_right(compound_selector) { CompoundSelector xs } */
   | xs = skip_ws_right(complex_selector) { ComplexSelector xs }
 
 type_selector:
@@ -369,7 +361,7 @@ type_selector:
   | ASTERISK; { Universal } /* * {} */
   | v = VARIABLE { Variable v } /* $(Module.value) {} */
   /* TODO: type_selector should work with IDENTs, but there's a bunch of grammar
-    conflicts with IDENT on component_value and others, we replaced with TAG, a
+    conflicts with IDENT on value and others, we replaced with TAG, a
     list of valid HTML tags that does the job done, but this should be fixed. */
   | type_ = IDENT; { Type type_ } /* a {} */
   | type_ = TAG; { Type type_ } /* a {} */
@@ -378,14 +370,18 @@ type_selector:
 /* <simple-selector> = <self-selector> | <type-selector> | <subclass-selector> */
 simple_selector:
   | t = type_selector { t }
-  /* With <coumpound-selector> subclass_selector becomes irrelevant */
+  /* With <coumpound-selector> that subclass_selector becomes irrelevant */
   /* | sb = subclass_selector { Subclass sb } */ /* #a, .a, a:visited, a[] */
 
+pseudo_element_selector:
+  DOUBLE_COLON; pse = IDENT { Pseudoelement pse } /* ::after */
+
 pseudo_list:
-  /* ::after */
   /* ::after:hover */
-  /* ::after:hover:hover */
-  | pseudo_element_selector list(pseudo_class_selector) { $1 :: $2 }
+  /* ::after:hover:visited */
+  | element = pseudo_element_selector class_list = list(pseudo_class_selector) {
+    element :: class_list
+  }
 
 /* <compound-selector> = [
     <type-selector>? <subclass-selector>*
@@ -404,7 +400,7 @@ compound_selector:
     }
   }
   /* #hover */
-  | sub = list(subclass_selector) {
+  | sub = nonempty_list(subclass_selector) {
      {
       type_selector = None;
       subclass_selectors = sub;
@@ -428,48 +424,33 @@ compound_selector:
     }
   }
 
-combinator:
-  | WS? c = skip_ws_right(COMBINATOR) s = skip_ws_right(compound_selector) { (Some c, s) }
-  | WS s = skip_ws_right(compound_selector) { (None, s) }
+combinator_sequence:
+  | WS s = non_complex_selector { (None, s) }
+  | s = non_complex_selector WS? { (None, s) }
+  | c = COMBINATOR WS? s = non_complex_selector WS? { (Some c, s) }
+  /* | WS s = non_complex_selector req = combinator_sequence { (None, s) :: req } */
+  /*
+  | c = COMBINATOR s = non_complex_selector req = combinator_sequence { (Some c, s) :: req } */
 
-/* TODO: Describe the change to the spec */
-%inline non_complex_selector:
+/* TODO: Explain the change to the spec */
+non_complex_selector:
   | s = simple_selector { SimpleSelector s }
   | s = compound_selector { CompoundSelector s }
 
-%inline combinator_or_ws:
-  | WS { None }
-  | c = COMBINATOR { Some c }
-
-combinator_sequence:
-  | c = combinator_or_ws s = non_complex_selector { [(c, s)] }
-  | c = combinator_or_ws s = non_complex_selector req = combinator_sequence {
-    (c, s) :: req
-  }
-
 /* <complex-selector> = <compound-selector> [ <combinator>? <compound-selector> ]* */
 complex_selector:
-  /* | left = compound_selector {
-    Selector left
-  } */
-  | left = non_complex_selector seq = combinator_sequence {
+  | left = skip_ws_right(non_complex_selector) { Selector left }
+  | left = non_complex_selector WS? seq = nonempty_list(combinator_sequence) {
     Combinator {
       left = left;
       right = seq;
     }
   }
 
-  /* | left = non_complex_selector; c = combinator_or_ws; right = non_complex_selector {
-    Combinator {
-      left = left;
-      right = [(c, right)];
-    }
-  } */
-
-/* component_value_in_prelude we transform WS_* into Delim with white spaces inside
-in component_value we transform to regular Delim
-The rest of component_value_in_prelude and component_value should be sync */
-component_value_in_prelude:
+/* value_in_prelude we transform WS_* into Delim with white spaces inside
+in value we transform to regular Delim
+The rest of value_in_prelude and value should be sync */
+value_in_prelude:
   | b = paren_block(prelude) { Paren_block b }
   | b = bracket_block(prelude) { Bracket_block b }
   | n = percentage { Percentage n }
@@ -492,9 +473,9 @@ component_value_in_prelude:
   | u = URL { Uri u } /* url() */
   | WS { Delim " " }
 
-component_value:
-  | b = paren_block(component_values) { Paren_block b }
-  | b = bracket_block(component_values) { Bracket_block b }
+value:
+  | b = paren_block(values) { Paren_block b }
+  | b = bracket_block(values) { Bracket_block b }
   | n = percentage { Percentage n }
   | i = IDENT { Ident i }
   | s = STRING { String s }
@@ -512,5 +493,5 @@ component_value:
   | d = FLOAT_DIMENSION { Float_dimension d }
   | d = DIMENSION { Dimension d }
   | v = VARIABLE { Variable v } /* $(Lola.value) */
-  | f = loc(FUNCTION) v = loc(component_values) RIGHT_PAREN; { Function (f, v) } /* calc() */
+  | f = loc(FUNCTION) v = loc(values) RIGHT_PAREN; { Function (f, v) } /* calc() */
   | u = URL { Uri u } /* url() */

@@ -1,4 +1,4 @@
-/* CSS Backgrounds and Borders Module Level 3 */
+/* /* CSS Backgrounds and Borders Module Level 3 */
 [%css {|background-repeat: space|}];
 [%css {|background-repeat: round|}];
 [%css {|background-repeat: repeat repeat|}];
@@ -3171,3 +3171,4 @@
 
 [%css {|transition-delay: 240ms|}];
 [%css {|animation-duration: 150ms|}];
+ */

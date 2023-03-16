@@ -268,7 +268,7 @@ and render_selector = (selector: selector) => {
       let left = render_selector(left);
       let right = render_right_combinator(right);
       left ++ right;
-    | Selector(compound) => render_compound_selector(compound)
+    | Selector(selector) => render_selector(selector)
     };
   }
   and render_right_combinator = right => {

@@ -89,7 +89,7 @@ and selector =
 and selector_list = list(with_loc(selector))
 [@deriving show({with_path: false})]
 and complex_selector =
-  | Selector(compound_selector)
+  | Selector(selector)
   | Combinator({
       left: selector,
       right: list((option(string), selector)),

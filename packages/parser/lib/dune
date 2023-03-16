@@ -1,8 +1,6 @@
 (menhir
  (modules css_parser)
- (flags --explain)
- ; (flags --explain --unused-tokens --strict)
- )
+ (flags --explain --unused-tokens))
 
 (library
  (name styled_ppx_css_parser)

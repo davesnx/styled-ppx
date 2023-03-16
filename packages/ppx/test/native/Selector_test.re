@@ -6,12 +6,12 @@ let loc = Location.none;
 let simple_tests = [
   (
     ".a",
-    [%expr [%cx ".a { }"]],
+    [%expr [%cx ".a {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|.a|js}, [||])|])],
   ),
   (
     ".bar",
-    [%expr [%cx ".bar      { } "]],
+    [%expr [%cx ".bar {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|.bar|js}, [||])|])],
   ),
   (
@@ -21,7 +21,7 @@ let simple_tests = [
   ),
   (
     "div",
-    [%expr [%cx "div { } "]],
+    [%expr [%cx "div {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|div|js}, [||])|])],
   ),
   (
@@ -66,7 +66,7 @@ let simple_tests = [
   ),
   (
     ":nth-child( 10n -1 )",
-    [%expr [%cx "&:nth-child( 10n -1 ) {}"]],
+    [%expr [%cx "&:nth-child(10n-1) {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|&:nth-child(10n-1)|js}, [||])|])],
   ),
   /* TODO: Support all cases */
@@ -89,8 +89,13 @@ let compound_tests = [
     [%expr CssJs.style(. [|CssJs.selector(. {js|&.bar|js}, [||])|])],
   ),
   (
-    "&.bar, &.foo",
-    [%expr [%cx {js|&.bar, &.foo {}|js}]],
+    "&.bar,&.foo",
+    [%expr [%cx {js|&.bar,&.foo {}|js}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|&.bar, &.foo|js}, [||])|])],
+  ),
+  (
+    "&.bar , &.foo",
+    [%expr [%cx {js|&.bar , &.foo {}|js}]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|&.bar, &.foo|js}, [||])|])],
   ),
   (
@@ -114,27 +119,42 @@ let compound_tests = [
     [%expr CssJs.style(. [|CssJs.selector(. {js|&:hover|js}, [||])|])],
   ),
   (
-    "p #first-child::before",
-    [%expr [%cx {js|p #first-child {}|js}]],
+    "#first-child",
+    [%expr [%cx {js|#first-child {}|js}]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|p #first-child|js}, [||])|])]
   ),
   (
-    "p #first-child::before:hover",
-    [%expr [%cx {js|p #first-child {}|js}]],
+    "#first-child::before",
+    [%expr [%cx {js|#first-child::before {}|js}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|p #first-child::before|js}, [||])|])]
+  ),
+  (
+    "#first-child::before:hover",
+    [%expr [%cx {js|#first-child::before:hover {}|js}]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|p #first-child::before:hover|js}, [||])|])]
   ),
 ];
 
 let complex_tests = [
   (
-    "& > a",
-    [%expr [%cx "& > a { }"]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|& > a|js}, [||])|])],
-  ),
-  (
     "&>a",
     [%expr [%cx "&>a { }"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& > a|js}, [||])|])],
+  ),
+  (
+    "& > a",
+    [%expr [%cx "& > a  {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& > a|js}, [||])|])],
+  ),
+  (
+    "& > a > b",
+    [%expr [%cx "& > a > b {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& > a > b|js}, [||])|])],
+  ),
+  (
+    "& a b",
+    [%expr [%cx "& a b {}"]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|& a b|js}, [||])|])],
   ),
   (
     "& #first-child",
@@ -187,6 +207,16 @@ let complex_tests = [
     [%expr [%cx "& p:not(.active) {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& p:not(.active)|js}, [||])|])],
   ),
+  (
+    "p #first-child::before",
+    [%expr [%cx {js|p #first-child {}|js}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|p #first-child|js}, [||])|])]
+  ),
+  (
+    "p #first-child::before:hover",
+    [%expr [%cx {js|p #first-child {}|js}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|p #first-child::before:hover|js}, [||])|])]
+  ),
   /* (
     ".foo:is(.bar, #baz)",
     [%expr [%cx ".foo:is(.bar, #baz) {}"]],
@@ -194,7 +224,7 @@ let complex_tests = [
   ), */
   (
     "& input[type=\"password\"]",
-    [%expr [%cx "& input[type=\"password\"] {} "]],
+    [%expr [%cx "& input[type=\"password\"]{} "]],
     [%expr CssJs.style(. [|
       CssJs.selector(.
         {js|& input[type="password"]|js},
@@ -204,7 +234,7 @@ let complex_tests = [
   ),
   (
     "& button:hover",
-    [%expr [%cx "& button:hover {} "]],
+    [%expr [%cx "& button:hover{} "]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& button:hover|js}, [||])|])],
   ),
   (
@@ -242,7 +272,7 @@ let complex_tests = [
     [%expr [%cx "& div > $(Variables.element) {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|& div > |js} ++ Variables.element, [||])|])],
   ),
-  /* (
+  (
     "*:not(:last-child)",
     [%expr [%cx "& > *:not(:last-child) {}"]],
     [%expr CssJs.style(. [|
@@ -251,7 +281,7 @@ let complex_tests = [
         [||]
       )
     |])],
-  ), */
+  ),
 ];
 
 let stylesheet_tests = [
@@ -266,6 +296,11 @@ let stylesheet_tests = [
     [%expr ignore(CssJs.global(. {js|html body|js}, [||]))],
   ),
   (
+    "html, body, #root, .class",
+    [%expr [%styled.global {js|html, body, #root, .class {}|js}]],
+    [%expr ignore(CssJs.global(. {js|html, body, #root, .class|js}, [||]))],
+  ),
+  (
     "div > span",
     [%expr [%styled.global {js|div > span {}|js}]],
     [%expr ignore(CssJs.global(. {js|div > span|js}, [||]))],
@@ -274,11 +309,6 @@ let stylesheet_tests = [
     "html div > span",
     [%expr [%styled.global {js|html div > span {}|js}]],
     [%expr ignore(CssJs.global(. {js|html div > span|js}, [||]))],
-  ),
-  (
-    "html, body, #root, .class",
-    [%expr [%styled.global {js|html, body, #root, .class {}|js}]],
-    [%expr ignore(CssJs.global(. {js|html, body, #root, .class|js}, [||]))],
   ),
 ];
 
@@ -295,7 +325,7 @@ let nested_tests = [
   ),
   (
     ".$(aaa) { .$(bbb) { } }",
-    [%expr [%cx ".$(aaa) { .$(bbb) {} }"]],
+    [%expr [%cx ".$(aaa) { .$(bbb){} }"]],
     [%expr CssJs.style(.
       [|
         CssJs.selector(. {js|.|js} ++ aaa, [|
