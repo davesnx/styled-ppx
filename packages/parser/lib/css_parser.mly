@@ -465,6 +465,7 @@ value_in_prelude:
   | b = bracket_block(prelude) { Bracket_block b }
   | n = percentage { Percentage n }
   | i = IDENT { Ident i }
+  | i = TAG { Ident i }
   | s = STRING { String s }
   | c = COMBINATOR { Combinator c}
   | o = OPERATOR { Operator o }
@@ -488,6 +489,7 @@ value:
   | b = bracket_block(values) { Bracket_block b }
   | n = percentage { Percentage n }
   | i = IDENT { Ident i }
+  | i = TAG { Ident i }
   | s = STRING { String s }
   | c = COMBINATOR { Combinator c}
   | o = OPERATOR { Operator o }
