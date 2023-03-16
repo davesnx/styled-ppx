@@ -9,7 +9,6 @@
  (libraries
   sedlex
   menhirLib
-  ppxlib
   ocaml-migrate-parsetree
   str
   styled-ppx.reason-css-lexer)
