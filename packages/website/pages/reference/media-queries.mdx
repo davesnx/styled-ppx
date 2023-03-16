@@ -1,0 +1,39 @@
+---
+title: Media Queries
+---
+
+# Media queries
+
+The extensions `cx` and `styled` support media-queries (and any [`at_rule`](https://developer.mozilla.org/en-US/docs/Web/CSS/At-rule)), on the other hand `css` it doesn't, since it only generates one Rule.
+
+```rescript
+let container = %cx(`
+  display: grid;
+  grid-column-gap: 48px;
+  grid-template-columns: repeat(2, 1fr);
+  width: 100%;
+
+  @media screen and (max-width: 767px) {
+    grid-template-columns: 100%;
+  }
+`)
+```
+
+## Interpolation in Media queries
+
+```rescript
+module Media = {
+  let mobileDown = "(max-width: 767px)"
+}
+
+let container = %cx(`
+  display: grid;
+  grid-column-gap: 48px;
+  grid-template-columns: repeat(2, 1fr);
+  width: 100%;
+
+  @media screen and $(Media.mobileDown) {
+    grid-template-columns: 100%;
+  }
+`)
+```
