@@ -703,14 +703,12 @@ let parse_string =
 };
 
 let parse_declaration_list = (~container_lnum=?, ~pos=?, input: string) => {
-  /* TODO: Remove this trim and fix parser */
-  let trimmed = String.trim(input);
   parse_string(
-    ~skip_whitespace=false,
+    ~skip_whitespace=true,
     ~container_lnum?,
     ~pos?,
     Parser.declaration_list,
-    trimmed,
+    input,
   );
 };
 

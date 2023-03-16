@@ -31,7 +31,7 @@ type declaration = {
   loc,
 }
 [@deriving show({with_path: false})]
-and component_value_list = list((component_value, loc))
+and component_value_list = list(with_loc(component_value))
 [@deriving show({with_path: false})]
 and component_value =
   | Paren_block(component_value_list)

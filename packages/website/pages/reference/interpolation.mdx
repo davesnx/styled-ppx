@@ -115,3 +115,19 @@ let picture = %styled.div([randomProperty]);
 Here the lack of safety will rely on your usage of `CssJs.unsafe{:rescript}`.
 
 For a general overview of the list take a look at [support for CSS](https://styled-ppx.vercel.app/css-support).
+
+## Not valid interpolation
+
+Interpolation in ppxes is a little limited, which makes a few "use-cases" not possible, for example: abstract a function or a variable reference.
+
+```rescript
+// 🔴 Can't pass a function
+let fn = (~kind, ~big) => { /* ... */ };
+%styled.div(fn)
+```
+
+```rescript
+// 🔴 Can't pass a variable reference
+let value = "display: block"
+%styled.div(value)
+```
