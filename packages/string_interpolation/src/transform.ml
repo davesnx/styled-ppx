@@ -1,5 +1,7 @@
 module Parser = struct
-  type token = String of string | Variable of string
+  type token =
+    | String of string
+    | Variable of string
 
   let token_to_string = function
     | String s -> "String(" ^ s ^ ")"
@@ -41,9 +43,9 @@ module Parser = struct
       let rest = [%sedlex.regexp? Plus (Compl '$')] in
       match%sedlex lexbuf with
       | interpolation ->
-          parse
-            ((Variable (lexeme ~skip:2 ~drop:1 lexbuf), loc lexbuf) :: acc)
-            lexbuf
+        parse
+          ((Variable (lexeme ~skip:2 ~drop:1 lexbuf), loc lexbuf) :: acc)
+          lexbuf
       | rest -> parse ((String (lexeme lexbuf), loc lexbuf) :: acc) lexbuf
       | eof -> acc
       | _ -> raise_error lexbuf "Internal error in 'string_to_tokens'"
@@ -57,7 +59,10 @@ module Emitter = struct
   open Ast_builder.Default
 
   type element = string * Location.t
-  type token = String of element | Variable of element * element option
+
+  type token =
+    | String of element
+    | Variable of element * element option
 
   let token_to_string = function
     | String (s, _) -> s
@@ -78,8 +83,8 @@ module Emitter = struct
     | [] -> assert false
     | [ (_, arg) ] -> arg
     | arg :: args ->
-        let rest = apply func args in
-        pexp_apply ~loc func [ arg; (Nolabel, rest) ]
+      let rest = apply func args in
+      pexp_apply ~loc func [ arg; Nolabel, rest ]
 
   let to_arguments tokens =
     List.rev
@@ -87,7 +92,7 @@ module Emitter = struct
          (fun acc token ->
            match token with
            | Variable ((v, loc), _) ->
-               (Nolabel, v |> Longident.parse |> inline_const ~loc) :: acc
+             (Nolabel, v |> Longident.parse |> inline_const ~loc) :: acc
            | String (v, loc) -> (Nolabel, js_string_to_const ~loc v) :: acc)
          [] tokens
 
@@ -95,28 +100,29 @@ module Emitter = struct
   let error_extension msg =
     let err_extension_name loc = { Location.loc; txt = "ocaml.error" } in
     let constant = Str.eval (Exp.constant (Const.string msg)) in
-    (err_extension_name loc, PStr [ constant ])
+    err_extension_name loc, PStr [ constant ]
 
   let generate tokens =
     match to_arguments tokens with
     | [] ->
-        pexp_extension ~loc:Location.none
-        @@ error_extension "Missing string payload"
+      pexp_extension ~loc:Location.none
+      @@ error_extension "Missing string payload"
     | args -> apply concat_fn args
 end
 
 let parser_to_emitter (tokens : (Parser.token * Location.t) list) :
-    Emitter.token list =
-  List.rev @@ snd
+  Emitter.token list =
+  List.rev
+  @@ snd
   @@ List.fold_left
        (fun (cur_fmt, acc) (token, loc) ->
-         match (token, cur_fmt) with
+         match token, cur_fmt with
          | Parser.Variable v, curr_fmt ->
-             (None, Emitter.Variable ((v, loc), curr_fmt) :: acc)
+           None, Emitter.Variable ((v, loc), curr_fmt) :: acc
          | _, Some (_, loc) ->
-             Location.raise_errorf ~loc
-               "Format is not followed by variable/expression. Missing %%?"
-         | Parser.String s, None -> (None, Emitter.String (s, loc) :: acc))
+           Location.raise_errorf ~loc
+             "Format is not followed by variable/expression. Missing %%?"
+         | Parser.String s, None -> None, Emitter.String (s, loc) :: acc)
        (None, []) tokens
 
 let transform ~loc str =
