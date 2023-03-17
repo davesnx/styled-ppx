@@ -42,7 +42,10 @@ esy dune runtest
 echo "Run CSS Spec Parser tests"
 esy test_css_spec_parser
 
-echo "Run BuckleScript tests"
-yarn test_bs
+echo "Run CSS Spec Types tests"
+esy test_css_spec_types
+
+echo "Run End-to-end tests"
+yarn --cwd e2e test
 
 exit 0

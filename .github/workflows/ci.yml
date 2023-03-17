@@ -26,17 +26,15 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
 
-      - name: Load global cache (~/.esy/source)
-        uses: actions/cache@v3
-        with:
-          path: ~/.esy/source
-          key: source-${{ matrix.os }}-${{ hashFiles('**/index.json') }}
-
       - name: Install esy
         run: npm install -g esy@0.6.12
 
-      - name: Install dependencies
-        run: esy install
+      - name: Restore global cache (~/.esy/source)
+        id: global-cache
+        uses: actions/cache/restore@v3
+        with:
+          path: ~/.esy/source
+          key: esy-source-${{ matrix.os }}-${{ hashFiles('esy.lock/index.json') }}
 
       - name: Print esy cache
         id: print_esy_cache
@@ -44,14 +42,23 @@ jobs:
 
       - name: Load dependencies cache
         id: deps-cache
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         with:
-          path: ${{ steps.print_esy_cache.outputs.ESY_CACHE }}
-          key: build-${{ matrix.os }}-${{ hashFiles('**/index.json') }}
-          restore-keys: build-${{ matrix.os }}-
+          path: |
+            ${{ steps.print_esy_cache.outputs.ESY_CACHE }}
+            _export
+          key: esy-deps-${{ matrix.os }}-${{ hashFiles('esy.lock/index.json') }}
+          restore-keys: esy-${{ matrix.os }}-
+
+      - name: Install dependencies
+        run: esy install
 
       - name: Import dependencies
-        run: esy import-build
+        if: steps.deps-cache.outputs.cache-hit == 'true'
+        run: |
+          esy import-dependencies _export
+          rm -rf _export
+
 
       - name: Build dependencies
         run: esy build-dependencies
@@ -80,18 +87,31 @@ jobs:
       - name: Test CSS Spec Parser
         run: esy test_css_spec_parser
 
-      # - name: Test CSS Spec type generation
-        # run: esy test_css_spec_types
+      - name: Test CSS Spec type generation
+        run: esy test_css_spec_types
 
       - name: Test string interpolation
         run: esy dune runtest
 
-      - name: Test snapshots with instant
-        run: esy dune exec instant
-
       - name: Export dependencies
         if: steps.deps-cache.outputs.cache-hit != 'true'
         run: esy export-dependencies
+
+      - name: Save global cache
+        uses: actions/cache/save@v3
+        if: steps.global-cache.outputs.cache-hit != 'true'
+        with:
+          path: ~/.esy/source
+          key: esy-source-${{ matrix.os }}-${{ hashFiles('esy.lock/index.json') }}
+
+      - name: Save dependencies cache
+        if: steps.deps-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v3
+        with:
+          path: |
+            ${{ steps.print_esy_cache.outputs.ESY_CACHE }}
+            _export
+          key: esy-deps-${{ matrix.os }}-${{ hashFiles('esy.lock/index.json') }}
 
       - name: Release static
         run: esy release-static
@@ -131,7 +151,7 @@ jobs:
 
       - name: Get cache directory path
         id: yarn-cache-dir-path
-        working-directory: ./packages/ppx/test/browser
+        working-directory: ./e2e
         run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
 
       - name: Load global cache
@@ -139,18 +159,16 @@ jobs:
         id: yarn-cache
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: yarn-${{ matrix.os }}-${{ hashFiles('./packages/ppx/test/browser/yarn.lock') }}
+          key: yarn-${{ matrix.os }}-${{ hashFiles('./e2e/yarn.lock') }}
           restore-keys: yarn-${{ matrix.os }}-
 
       - name: Install dependencies
-        working-directory: ./packages/ppx/test/browser
+        working-directory: ./e2e
         run: yarn
 
       - name: Test
-        working-directory: ./packages/ppx/test/browser
-        run: |
-          yarn build
-          yarn test
+        working-directory: ./e2e
+        run: yarn test
 
   publish:
     name: Publish

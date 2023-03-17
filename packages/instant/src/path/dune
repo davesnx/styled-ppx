@@ -1,4 +1,0 @@
-(library
- (name path)
- (libraries unix)
- (flags :standard -w -39 -w -32 -w -27))

@@ -43,7 +43,7 @@ module Js = {
       | Some(x) => Some(f(x))
       | None => None
       };
-  }
+  };
 };
 
 let join = (strings, separator) => {
@@ -1562,13 +1562,13 @@ module TextDecorationLine = {
 };
 
 module TextDecorationThickness = {
-  type t = [`fromFont | `auto];
+  type t = [ | `fromFont | `auto];
 
   let toString = x =>
-    switch x {
+    switch (x) {
     | `fromFont => "from-font"
     | `auto => "auto"
-    }
+    };
 };
 
 module TextDecorationStyle = {
@@ -1595,26 +1595,26 @@ module Width = {
 };
 
 module None = {
-  type t = [`none];
+  type t = [ | `none];
 
   let toString = x =>
-    switch x {
+    switch (x) {
     | `none => "none"
-    }
+    };
 };
 
 /* min-height and max-height can be set to 'none' and all Height values.
- Here we only define are the 'none' since the external API ensures the composability of all cases */
-module MaxHeight = None
-module MinHeight = None
+   Here we only define are the 'none' since the external API ensures the composability of all cases */
+module MaxHeight = None;
+module MinHeight = None;
 
 /* min-width and max-width can be set to 'none' and all Width values.
- Here we only define are the 'none' since the external API ensures the composability of all cases */
-module MinWidth = None
-module MaxWidth = None
+   Here we only define are the 'none' since the external API ensures the composability of all cases */
+module MinWidth = None;
+module MaxWidth = None;
 
 module Height = {
-  type t = [`auto | `fitContent | `maxContent | `minContent];
+  type t = [ | `auto | `fitContent | `maxContent | `minContent];
 
   let toString = x =>
     switch (x) {
@@ -1622,7 +1622,7 @@ module Height = {
     | `fitContent => "fit-content"
     | `maxContent => "max-content"
     | `minContent => "min-content"
-    }
+    };
 };
 
 module OverflowWrap = {
@@ -1773,7 +1773,7 @@ module GeometryBox = {
     | `fillBox => "fill-box"
     | `strokeBox => "stroke-box"
     | `viewBox => "view-box"
-    }
+    };
 };
 
 module ClipPath = {
@@ -1813,16 +1813,16 @@ module TransformStyle = {
 };
 
 module TransformBox = {
-  type t = [`contentBox | `borderBox | `fillBox | `strokeBox | `viewBox];
+  type t = [ | `contentBox | `borderBox | `fillBox | `strokeBox | `viewBox];
 
   let toString = x =>
-    switch x {
+    switch (x) {
     | `contentBox => "content-box"
     | `borderBox => "border-box"
     | `fillBox => "fill-box"
     | `strokeBox => "stroke-box"
     | `viewBox => "view-box"
-    }
+    };
 };
 
 module ListStyleImage = {

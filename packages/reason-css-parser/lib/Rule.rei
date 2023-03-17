@@ -1,10 +1,10 @@
 open Reason_css_lexer;
 
 /*
-  A rule is a function that maps a list of tokens into a tuple where
-  the left side will be a output made from some tokens consumed and
-  the right side will be the tokens that were not consumed
-*/
+   A rule is a function that maps a list of tokens into a tuple where
+   the left side will be a output made from some tokens consumed and
+   the right side will be the tokens that were not consumed
+ */
 
 type error = list(string);
 type data('a) = result('a, error);
@@ -21,10 +21,10 @@ type best('left_in, 'left_v, 'right_in, 'right_v, 'c) =
   rule('c);
 
 /*
-  `Data` is the representation of the a rule output, where if the transformation was succeed, it will
-  return `Ok(value)` with value being defined by the function (The [%value.rec] ppx generates polymorphic variants based on the CSS Spec)
-  and if it fails it will return `Error(reasons)` where reasons is a list of string. The module also exposes functions to create and use `Data`
-*/
+   `Data` is the representation of the a rule output, where if the transformation was succeed, it will
+   return `Ok(value)` with value being defined by the function (The [%value.rec] ppx generates polymorphic variants based on the CSS Spec)
+   and if it fails it will return `Error(reasons)` where reasons is a list of string. The module also exposes functions to create and use `Data`
+ */
 module Data: {
   let return: return('a, data('a));
   let bind: bind('a, data('a), 'b);
@@ -34,16 +34,16 @@ module Data: {
 };
 
 /*
-  Match operates on `Data`, it deals with cases where Data transformation in a rule went successful
-  matching over the results and offering functions to manipulate the result
-*/
+   Match operates on `Data`, it deals with cases where Data transformation in a rule went successful
+   matching over the results and offering functions to manipulate the result
+ */
 module Match: {
   let return: return('a, 'a);
   let bind: bind('a, 'a, 'b);
   let map: map('a, 'a, 'b, 'b);
   let bind_shortest: best('a, 'a, 'b, 'b, 'c);
   let bind_longest: best('a, 'a, 'b, 'b, 'c);
-  let all: list(rule('a)) => rule(list('a))
+  let all: list(rule('a)) => rule(list('a));
 };
 
 // Module to expose monadic let operators
@@ -62,8 +62,8 @@ module Let: {
 };
 
 /*
-  Pattern is a helper module with functions to make tokens consumption easier
-*/
+   Pattern is a helper module with functions to make tokens consumption easier
+ */
 module Pattern: {
   let identity: rule(unit);
   let next: rule(token);

@@ -25,12 +25,12 @@ type token =
   | LEFT_PARENS // <(-token>
   | RIGHT_PARENS // <)-token>
   | LEFT_CURLY // <{-token>
-  | RIGHT_CURLY // <}-token>
-;
+  | RIGHT_CURLY; // <}-token>
 
 let string_of_char = c => String.make(1, c);
 
-let humanize = fun
+let humanize =
+  fun
   | EOF => "the end"
   | IDENT(str) => "ident " ++ str
   | BAD_IDENT => "bad ident"
@@ -43,7 +43,8 @@ let humanize = fun
   | BAD_URL => "bad url"
   | DELIM(d) => "delimiter " ++ d
   | NUMBER(f) => "number: " ++ string_of_float(f)
-  | PERCENTAGE(f) => "percentage: " ++ string_of_float(f) ++ string_of_char('%')
+  | PERCENTAGE(f) =>
+    "percentage: " ++ string_of_float(f) ++ string_of_char('%')
   | DIMENSION(f, s) => "dimension: " ++ string_of_float(f) ++ s
   | WHITESPACE => "whitespace"
   | CDO => "<!--"
@@ -63,7 +64,8 @@ type error =
   | Eof
   | New_line;
 
-let show_error = fun
+let show_error =
+  fun
   | Invalid_code_point => "Invalid code point"
   | Eof => "Unexpected end"
   | New_line => "New line";

@@ -1,6 +1,6 @@
 {
   "name": "@davesnx/styled-ppx",
-  "version": "0.34.1",
+  "version": "0.35.0",
   "description": "Typed styled components in ReScript",
   "author": "David Sancho <dsnxmoreno@gmail.com>",
   "license": "BSD-2",
@@ -22,24 +22,24 @@
     "release": { "bin": [ "ppx" ] }
   },
   "devDependencies": {
-    "@opam/alcotest": "1.6.0",
-    "@opam/alcotest-lwt": "1.6.0",
+    "@opam/alcotest": "1.7.0",
     "@opam/dune": "3.4.1",
-    "@opam/lwt_ppx": "2.1.0",
     "@opam/menhir": "20220210",
-    "@opam/ocaml-lsp-server": "1.13.0",
+    "@opam/ocaml-lsp-server": "1.15.1-4.14",
     "@opam/ocaml-migrate-parsetree": "2.4.0",
     "@opam/ocamlformat": "0.24.1",
     "@opam/ppx_deriving": "5.2.1",
     "@opam/ppxlib": "*",
-    "@opam/reason": "3.8.1",
+    "@opam/reason": "*",
     "@opam/sedlex": "3.0",
-    "@opam/patdiff": "v0.15.0",
-    "@opam/utop": "2.10.0",
     "ocaml": "4.14.0"
   },
   "resolutions": {
-    "@opam/ppxlib": "zth/ppxlib:ppxlib.opam#32f83395fb89693a873541298b6367449f23bc4a"
+    "@opam/ppxlib":
+      "ocaml-ppx/ppxlib:ppxlib.opam#8b8987c5690ad839348d96bf52471b03b88f06ed",
+    "@opam/reason":
+      "reasonml/reason:reason.opam#b283f335f90e3aaa398bff8e82761038ee42a99d",
+    "@opam/ocamlfind": "1.9.5"
   },
   "scripts": {
     "test_typecheck": "esy dune build @native_typecheck_test",
@@ -52,7 +52,7 @@
     "test_reason_css_parser": "esy dune build @reason_css_parser_test",
     "test_css_spec_parser": "esy dune build @css_spec_parser_test",
     "test_css_spec_types": "esy dune build @css_spec_types_test",
-    "test_bs": "yarn --cwd 'packages/ppx/test/browser' build; yarn --cwd 'packages/ppx/test/browser' test",
+    "test_e2e": "echo 'This can not be run with esy, only yarn like `yarn --cwd e2e test`",
     "dev": "esy dune build --root . --watch",
     "release-static":
       "esy b dune build --root . --ignore-promoted-rules --no-config --profile release-static --only-packages styled-ppx",

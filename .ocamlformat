@@ -1,0 +1,17 @@
+version=0.24.1
+quiet=true
+profile=default
+ocaml-version=4.14.0
+
+m=80
+break-infix-before-func=false
+break-infix=fit-or-vertical
+cases-exp-indent=2
+doc-comments=before
+exp-grouping=preserve
+leading-nested-match-parens=true
+let-and=sparse
+max-indent=2
+parens-ite=true
+parens-tuple=multi-line-only
+type-decl=sparse

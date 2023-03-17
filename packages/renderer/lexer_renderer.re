@@ -11,9 +11,7 @@ let position_to_string = pos =>
 let render_help = () => {
   print_endline("");
   print_endline("");
-  print_endline(
-    {|  lexer-renderer pretty-prints the lexer of CSS|},
-  );
+  print_endline({|  lexer-renderer pretty-prints the lexer of CSS|});
   print_endline("");
   print_endline({|    EXAMPLE: esy x lexer-renderer ".a { color: red }"|});
   print_endline("");
@@ -34,22 +32,27 @@ let help =
   );
 
 let rec printUnlessIsEof = buffer => {
-  let (token, loc_start, loc_end) = Css_lexer.get_next_tokens_with_location(buffer);
+  let (token, loc_start, loc_end) =
+    Css_lexer.get_next_tokens_with_location(buffer);
   let pos_start = position_to_string(loc_start);
   let pos_end = position_to_string(loc_end);
   print_endline(
     Css_lexer.token_to_debug(token)
-    ++ {| [|} ++ pos_start ++ {|..|} ++ pos_end ++ {|]|}
+    ++ {| [|}
+    ++ pos_start
+    ++ {|..|}
+    ++ pos_end
+    ++ {|]|},
   );
 
   switch (token) {
-    | Css_lexer.Parser.EOF => ()
-    | _token => printUnlessIsEof(buffer)
-  }
+  | Css_lexer.Parser.EOF => ()
+  | _token => printUnlessIsEof(buffer)
+  };
 };
 
 switch (input, help) {
 | (Some(_), true)
 | (None, _) => render_help()
-| (Some(css), _) => css |> Lex_buffer.from_string |> printUnlessIsEof;
+| (Some(css), _) => css |> Lex_buffer.from_string |> printUnlessIsEof
 };

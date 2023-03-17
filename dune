@@ -1,9 +1,10 @@
+(subdir bin)
+
 (subdir
  packages
  (dirs
-  instant
-  parser
   css-spec-parser
+  parser
   ppx
   reason-css-lexer
   reason-css-parser

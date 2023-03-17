@@ -80,11 +80,7 @@ module Match = {
     switch (rules) {
     | [] => return([])
     | [hd_rule, ...tl_rules] =>
-      bind(hd_rule, (hd) => {
-        bind(all(tl_rules), (tl) => {
-          return([hd, ...tl])
-        });
-      });
+      bind(hd_rule, hd => {bind(all(tl_rules), tl => {return([hd, ...tl])})})
     };
   };
 };
@@ -114,12 +110,11 @@ module Pattern = {
 
   let token = (expected, tokens) =>
     switch (tokens) {
-    | [token, ...tokens] => {
+    | [token, ...tokens] =>
       let data = expected(token);
       // if failed then keep the tokens intact
       let tokens = Result.is_ok(data) ? tokens : [token, ...tokens];
       (data, tokens);
-    }
     | [] => (Error(["missing the token expected"]), [])
     };
 
@@ -128,10 +123,10 @@ module Pattern = {
       fun
       | token when token == expected => Ok()
       | token => {
-        let expected = humanize(expected);
-        let got = humanize(token);
-        Error(["Expected '" ++ expected ++ "' but instead got " ++ got])
-      }
+          let expected = humanize(expected);
+          let got = humanize(token);
+          Error(["Expected '" ++ expected ++ "' but instead got " ++ got]);
+        },
     );
   let value = (value, rule) => Match.bind(rule, () => Match.return(value));
 };

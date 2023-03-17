@@ -34,10 +34,10 @@ let container_lnum_ref = ref(0);
 let from_string_of_sedlex = (~pos: option(Lexing.position)=?, string) => {
   let buf = Sedlexing.Latin1.from_string(string);
   switch (pos) {
-    | Some(p) => Sedlexing.set_position(buf, p)
-    | None => ()
-  }
-  of_sedlex(~pos?, buf)
+  | Some(p) => Sedlexing.set_position(buf, p)
+  | None => ()
+  };
+  of_sedlex(~pos?, buf);
 };
 
 let last_buffer = ref(from_string_of_sedlex(""));
@@ -48,7 +48,7 @@ let from_string = (~container_lnum=?, ~pos: option(Lexing.position)=?, s) => {
   | Some(lnum) => container_lnum_ref := lnum
   };
   last_buffer := from_string_of_sedlex(~pos?, s);
-  from_string_of_sedlex(~pos?, s)
+  from_string_of_sedlex(~pos?, s);
 };
 
 /** The next four functions are used by sedlex internally.
@@ -143,10 +143,12 @@ let utf8 = (~skip=0, ~drop=0, lexbuf) => {
 
 let container_lnum_ref = ref(0);
 
-let make_loc = (~loc_ghost=false, start_pos: Lexing.position, end_pos: Lexing.position): Location.t => {
+let make_loc =
+    (~loc_ghost=false, start_pos: Lexing.position, end_pos: Lexing.position)
+    : Location.t => {
   loc_start: start_pos,
   loc_end: end_pos,
   loc_ghost,
 };
 
-let lexing_positions = (buf) => Sedlexing.lexing_positions(buf.buf);
+let lexing_positions = buf => Sedlexing.lexing_positions(buf.buf);

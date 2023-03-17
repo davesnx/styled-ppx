@@ -1,4 +1,5 @@
-[%styled.global {|
+[%styled.global
+  {|
   body {
     font-size: 1em;
     -webkit-font-smoothing: antialiased;
@@ -7,20 +8,21 @@
     color: white;
     background-color: hsla(165, 80%, 15%, 0.03);
   }
-|}];
+|}
+];
 
-[%styled.global {|
+[%styled.global
+  {|
   html, body, #root, .class {
     box-sizing: border-box;
   }
-|}];
-
-module Link = [%styled.a
-  {|
-  font-size: 36px;
-  margin-top: 16px;
 |}
 ];
+
+module Link = [%styled.a {|
+  font-size: 36px;
+  margin-top: 16px;
+|}];
 
 module Input = [%styled.input "padding: 30px"];
 
@@ -34,7 +36,7 @@ module TextInput = {
 
     let focusInput = () =>
       switch (textInput.current->Js.Nullable.toOption) {
-      | Some(dom) => dom->focus;
+      | Some(dom) => dom->focus
       | None => ()
       };
 
@@ -46,12 +48,18 @@ module TextInput = {
 
     <div>
       <Input type_="text" innerRef={ReactDOM.Ref.domRef(textInput)} />
-      <input type_="button" ref={ReactDOM.Ref.domRef(buttonInput)} value="Focus the text input" onClick />
-    </div>
-  }
+      <input
+        type_="button"
+        ref={ReactDOM.Ref.domRef(buttonInput)}
+        value="Focus the text input"
+        onClick
+      />
+    </div>;
+  };
 };
 
-module Component = [%styled.div {j|
+module Component = [%styled.div
+  {j|
   background-color: red;
   border-radius: 20px;
   box-sizing: border-box;
@@ -68,62 +76,64 @@ module Component = [%styled.div {j|
 |j}
 ];
 
-let stilos = [%cx "box-shadow: inset 10px 10px 0 0 #ff0000, 10px 10px 0 0 #ff0000"];
+let stilos = [%cx
+  "box-shadow: inset 10px 10px 0 0 #ff0000, 10px 10px 0 0 #ff0000"
+];
 
-let styles = CssJs.style(. [|
-  CssJs.label("ComponentName"),
-  CssJs.display(`block),
-  [%css_ "flex-direction: row"]
-|]);
+let styles =
+  CssJs.style(. [|
+    CssJs.label("ComponentName"),
+    CssJs.display(`block),
+    [%css_ "flex-direction: row"],
+  |]);
 
-let inlineStyles: ReactDOM.Style.t = ReactDOM.Style.make(~color="#444444", ~fontSize="68px", ());
+let inlineStyles: ReactDOM.Style.t =
+  ReactDOM.Style.make(~color="#444444", ~fontSize="68px", ());
 
 module Theme = {
-  type kind = | Main | Ghost;
-  let button = (variant) => {
+  type kind =
+    | Main
+    | Ghost;
+  let button = variant => {
     switch (variant) {
-      | Main => `hex("333")
-      | Ghost => `hex("000")
-    }
+    | Main => `hex("333")
+    | Ghost => `hex("000")
+    };
   };
 };
 
-module Sequence = [%styled.button (~size, ~color) => {
-  let buttonColor = Theme.button(color);
+module Sequence = [%styled.button
+  (~size, ~color) => {
+    let buttonColor = Theme.button(color);
 
-  [|
-    [%css_ "width: $(size)"],
-    [%css_ "color: $(buttonColor)"],
-    [%css_ "display: block;"],
-    [%css_ "width: 100%;"],
-  |]
-}];
+    [|
+      [%css_ "width: $(size)"],
+      [%css_ "color: $(buttonColor)"],
+      [%css_ "display: block;"],
+      [%css_ "width: 100%;"],
+    |];
+  }
+];
 
 module App = {
   [@react.component]
   let make = () => {
     <div className=Camel.stilos>
-        <div className=styles>
-          <div onClick=Js.log style=inlineStyles>
-            <TextInput />
-            <Component>
-              {"test.." |> React.string}
-            </Component>
-            <Component>
-              <p>
-                {"Demo of..." |> React.string}
-              </p>
-            </Component>
-            <Link href="https://github.com/davesnx/styled-ppx">
-              {"styled-ppx" |> React.string}
-            </Link>
-          </div>
+      <div className=styles>
+        <div onClick=Js.log style=inlineStyles>
+          <TextInput />
+          <Component> {"test.." |> React.string} </Component>
+          <Component> <p> {"Demo of..." |> React.string} </p> </Component>
+          <Link href="https://github.com/davesnx/styled-ppx">
+            {"styled-ppx" |> React.string}
+          </Link>
         </div>
       </div>
-  }
+    </div>;
+  };
 };
 
 switch (ReactDOM.querySelector("#app")) {
-  | Some(el) => ReactDOM.render(<App />, el)
-  | None => ()
+| Some(el) => ReactDOM.render(<App />, el)
+| None => ()
 };
