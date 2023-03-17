@@ -131,7 +131,7 @@ jobs:
 
       - name: Get cache directory path
         id: yarn-cache-dir-path
-        working-directory: ./packages/ppx/test/browser
+        working-directory: ./e2e
         run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
 
       - name: Load global cache
@@ -139,18 +139,16 @@ jobs:
         id: yarn-cache
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: yarn-${{ matrix.os }}-${{ hashFiles('./packages/ppx/test/browser/yarn.lock') }}
+          key: yarn-${{ matrix.os }}-${{ hashFiles('./e2e/yarn.lock') }}
           restore-keys: yarn-${{ matrix.os }}-
 
       - name: Install dependencies
-        working-directory: ./packages/ppx/test/browser
+        working-directory: ./e2e
         run: yarn
 
       - name: Test
-        working-directory: ./packages/ppx/test/browser
-        run: |
-          yarn build
-          yarn test
+        working-directory: ./e2e
+        run: yarn test
 
   publish:
     name: Publish
