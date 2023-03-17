@@ -1,7 +1,6 @@
 /** CSS lexer
   * Reference:
   * https://www.w3.org/TR/css-syntax-3/ */
-
 module Sedlexing = Lex_buffer;
 module Parser = Css_parser;
 module Types = Css_types;
@@ -18,10 +17,12 @@ exception GrammarError((string, Location.t));
 
 let grammar_error = (loc: Location.t, message) => {
   raise(GrammarError((message, loc)));
-}
+};
 
 let unreachable = () =>
-  failwith("This match case is unreachable. sedlex needs a last case as wildcard _. If this error appears, means that there's a bug in the lexer.");
+  failwith(
+    "This match case is unreachable. sedlex needs a last case as wildcard _. If this error appears, means that there's a bug in the lexer.",
+  );
 
 let token_to_string =
   fun
@@ -61,8 +62,7 @@ let token_to_string =
   | Parser.FUNCTION(fn) => fn ++ "("
   | Parser.NTH_FUNCTION(fn) => fn ++ "("
   | Parser.URL(url) => url ++ "("
-  | Parser.BAD_URL => "bar url"
-;
+  | Parser.BAD_URL => "bar url";
 
 let token_to_debug =
   fun
@@ -91,9 +91,10 @@ let token_to_debug =
   | Parser.HASH(s) => "HASH('" ++ s ++ "')"
   | Parser.NUMBER(s) => "NUMBER('" ++ s ++ "')"
   | Parser.UNICODE_RANGE(s) => "UNICODE_RANGE('" ++ s ++ "')"
-  | Parser.FLOAT_DIMENSION((n, s)) => "FLOAT_DIMENSION('" ++ n ++ ", " ++ s ++ "')"
+  | Parser.FLOAT_DIMENSION((n, s)) =>
+    "FLOAT_DIMENSION('" ++ n ++ ", " ++ s ++ "')"
   | Parser.DIMENSION((n, d)) => "DIMENSION('" ++ n ++ ", " ++ d ++ "')"
-  | Parser.VARIABLE(v) => "VARIABLE('" ++ (String.concat(".", v)) ++ "')"
+  | Parser.VARIABLE(v) => "VARIABLE('" ++ String.concat(".", v) ++ "')"
   | Parser.COMBINATOR(s) => "COMBINATOR(" ++ s ++ ")"
   | Parser.DOT => "DOT"
   | Parser.COMMA => "COMMA"
@@ -102,23 +103,23 @@ let token_to_debug =
   | Parser.FUNCTION(fn) => "FUNCTION(" ++ fn ++ ")"
   | Parser.NTH_FUNCTION(fn) => "FUNCTION(" ++ fn ++ ")"
   | Parser.URL(u) => "URL(" ++ u ++ ")"
-  | Parser.BAD_URL => "BAD_URL"
-;
+  | Parser.BAD_URL => "BAD_URL";
 
-let render_error = fun
+let render_error =
+  fun
   | LexingError((pos, msg)) => {
-    let loc = Sedlexing.make_loc(pos, pos);
-    Location.error(~loc, msg);
-  }
+      let loc = Sedlexing.make_loc(pos, pos);
+      Location.error(~loc, msg);
+    }
   | ParseError((token, start_pos, end_pos)) => {
-    let loc = Sedlexing.make_loc(start_pos, end_pos);
-    let msg =
-      Printf.sprintf(
-        "Parse error while reading token '%s'",
-        token_to_string(token),
-      );
-    Location.error(~loc, msg);
-  }
+      let loc = Sedlexing.make_loc(start_pos, end_pos);
+      let msg =
+        Printf.sprintf(
+          "Parse error while reading token '%s'",
+          token_to_string(token),
+        );
+      Location.error(~loc, msg);
+    }
   | GrammarError((msg, loc)) => Location.error(~loc, msg)
   | exn => Location.error("Unexpected error " ++ Printexc.to_string(exn));
 
@@ -156,14 +157,18 @@ let ident_char = [%sedlex.regexp?
   '_' | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' | non_ascii | escape
 ];
 
-let ident = [%sedlex.regexp? (Opt('-'), Opt('-'), ident_start, Star(ident_char))];
+let ident = [%sedlex.regexp?
+  (Opt('-'), Opt('-'), ident_start, Star(ident_char))
+];
 
 let variable_ident_char = [%sedlex.regexp?
   '_' | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | non_ascii | escape | '\''
 ];
-let variable_name = [%sedlex.regexp? (Star(variable_ident_char))];
+let variable_name = [%sedlex.regexp? Star(variable_ident_char)];
 let module_variable = [%sedlex.regexp? (variable_name, '.')];
-let variable = [%sedlex.regexp? ('$', '(', Opt(Star(module_variable)), variable_name, ')')];
+let variable = [%sedlex.regexp?
+  ('$', '(', Opt(Star(module_variable)), variable_name, ')')
+];
 
 let string_quote = [%sedlex.regexp?
   (
@@ -199,16 +204,19 @@ let non_printable = [%sedlex.regexp?
   '\000' .. '\b' | '\011' | '\014' .. '\031' | '\127'
 ];
 
-let operator = [%sedlex.regexp? "~=" | "|=" | "^=" | "$=" | "*="| "="];
+let operator = [%sedlex.regexp? "~=" | "|=" | "^=" | "$=" | "*=" | "="];
 
 let combinator = [%sedlex.regexp? '>' | '+' | '~' | "||"];
 
-let at_rule_without_body = [%sedlex.regexp? ("@", "charset" | "import" | "namespace")];
+let at_rule_without_body = [%sedlex.regexp?
+  ("@", "charset" | "import" | "namespace")
+];
 let at_rule = [%sedlex.regexp? ("@", ident)];
 let at_media = [%sedlex.regexp? ("@", "media")];
 let at_keyframes = [%sedlex.regexp? ("@", "keyframes")];
 
-let is_tag = fun
+let is_tag =
+  fun
   | "a"
   | "abbr"
   | "address"
@@ -326,8 +334,7 @@ let is_tag = fun
   | "var"
   | "video"
   | "wbr" => true
-  | _ => false
-;
+  | _ => false;
 
 let _a = [%sedlex.regexp? 'A' | 'a'];
 let _b = [%sedlex.regexp? 'B' | 'b'];
@@ -361,12 +368,7 @@ let important = [%sedlex.regexp?
 ];
 
 let length = [%sedlex.regexp?
-  (_c, _a, _p) |
-  (_c, _h) |
-  (_e, _m) |
-  (_e, _x) |
-  (_i, _c) |
-  (_l, _h) |
+  (_c, _a, _p) | (_c, _h) | (_e, _m) | (_e, _x) | (_i, _c) | (_l, _h) |
   (_r, _e, _m) |
   (_r, _l, _h) |
   (_v, _h) |
@@ -394,8 +396,7 @@ let time = [%sedlex.regexp? _s | (_m, _s)];
 let frequency = [%sedlex.regexp? (_h, _z) | (_k, _h, _z)];
 
 /* let escape = [%sedlex.regexp? '\\']; */
-let hex_digit = [%sedlex.regexp? digit | 'A' .. 'F' | 'a' .. 'f'];
-/* let non_ascii_code_point = [%sedlex.regexp? Sub(any, '\000' .. '\128')]; */ // greater than \u0080
+let hex_digit = [%sedlex.regexp? digit | 'A' .. 'F' | 'a' .. 'f'] /* let non_ascii_code_point = [%sedlex.regexp? Sub(any, '\000' .. '\128')]; */; // greater than \u0080
 let identifier_start_code_point = [%sedlex.regexp?
   'a' .. 'z' | 'A' .. 'Z' | non_ascii | '_'
 ];
@@ -423,7 +424,7 @@ module Tokenizer = {
     switch%sedlex (buf) {
     | Star(whitespace) => Parser.WS
     | _ => Parser.WS
-  };
+    };
 
   let string_of_uchar = char => {
     let buf = Buffer.create(0);
@@ -469,7 +470,7 @@ module Tokenizer = {
       consume_remnants_bad_url(buf);
     | any => consume_remnants_bad_url(buf)
     | _ => unreachable()
-  };
+    };
 
   // https://drafts.csswg.org/css-syntax-3/#consume-url-token
   let consume_url = buf => {
@@ -523,15 +524,18 @@ module Tokenizer = {
   };
 
   let handle_consume_identifier =
-  fun
-  | Error((_, error)) => Error((BAD_IDENT, error))
-  | Ok(string) => Ok(string);
+    fun
+    | Error((_, error)) => Error((BAD_IDENT, error))
+    | Ok(string) => Ok(string);
 
   let consume_function = string => {
     switch (string) {
-      | "nth-last-child" | "nth-child" | "nth-of-type" | "nth-last-of-type" => Parser.NTH_FUNCTION(string)
-      | _ => Parser.FUNCTION(string)
-    }
+    | "nth-last-child"
+    | "nth-child"
+    | "nth-of-type"
+    | "nth-last-of-type" => Parser.NTH_FUNCTION(string)
+    | _ => Parser.FUNCTION(string)
+    };
   };
 
   // https://drafts.csswg.org/css-syntax-3/#consume-ident-like-token
@@ -550,14 +554,15 @@ module Tokenizer = {
       is_function(buf) ? Ok(consume_function(string)) : consume_url(buf);
     };
 
-  let.ok string = consume_identifier(buf) |> handle_consume_identifier;
-  switch%sedlex (buf) {
+    let.ok string = consume_identifier(buf) |> handle_consume_identifier;
+    switch%sedlex (buf) {
     | "(" =>
       switch (string) {
-        | "url" => read_url(string)
-        | _ => Ok(consume_function(string))
+      | "url" => read_url(string)
+      | _ => Ok(consume_function(string))
       }
-    | _ => is_tag(string) ? Ok(Parser.TAG(string)) : Ok(Parser.IDENT(string))
+    | _ =>
+      is_tag(string) ? Ok(Parser.TAG(string)) : Ok(Parser.IDENT(string))
     };
   };
 };
@@ -566,15 +571,14 @@ let handle_tokenizer_error = (buf: Sedlexing.t) =>
   fun
   | Ok(value) => value
   | Error((_, msg)) => {
-    let error: string = Reason_css_lexer.show_error(msg);
-    let position = buf.pos;
-    raise @@ LexingError((position, error));
-  }
-;
+      let error: string = Reason_css_lexer.show_error(msg);
+      let position = buf.pos;
+      raise @@ LexingError((position, error));
+    };
 
 let skip_whitespace = ref(false);
 
-let rec get_next_token = (buf) => {
+let rec get_next_token = buf => {
   open Parser;
   open Sedlexing;
   switch%sedlex (buf) {
@@ -582,14 +586,12 @@ let rec get_next_token = (buf) => {
   | "/*" => discard_comments(buf)
   | '.' => DOT
   | ';' => SEMI_COLON
-  | '}' => {
+  | '}' =>
     skip_whitespace.contents = false;
     RIGHT_BRACE;
-  }
-  | '{' => {
+  | '{' =>
     skip_whitespace.contents = true;
     LEFT_BRACE;
-  }
   | "::" => DOUBLE_COLON
   | ':' => COLON
   | '(' => LEFT_PAREN
@@ -597,53 +599,47 @@ let rec get_next_token = (buf) => {
   | '[' => LEFT_BRACKET
   | ']' => RIGHT_BRACKET
   | '%' => PERCENTAGE
-  | '&' => {
+  | '&' =>
     skip_whitespace.contents = false;
     AMPERSAND;
-  }
   | '*' => ASTERISK
   | ',' => COMMA
-  | variable => VARIABLE(latin1(~skip=2, ~drop=1, buf) |> String.split_on_char('.'))
+  | variable =>
+    VARIABLE(latin1(~skip=2, ~drop=1, buf) |> String.split_on_char('.'))
   | operator => OPERATOR(latin1(buf))
   | combinator => COMBINATOR(latin1(buf))
   | string => STRING(latin1(~skip=1, ~drop=1, buf))
   | important => IMPORTANT
-  | at_media => {
+  | at_media =>
     skip_whitespace.contents = false;
-    AT_MEDIA(latin1(~skip=1, buf))
-  }
-  | at_keyframes => {
+    AT_MEDIA(latin1(~skip=1, buf));
+  | at_keyframes =>
     skip_whitespace.contents = false;
-    AT_KEYFRAMES(latin1(~skip=1, buf))
-  }
-  | at_rule => {
+    AT_KEYFRAMES(latin1(~skip=1, buf));
+  | at_rule =>
     skip_whitespace.contents = false;
-    AT_RULE(latin1(~skip=1, buf))
-  }
-  | at_rule_without_body => {
+    AT_RULE(latin1(~skip=1, buf));
+  | at_rule_without_body =>
     skip_whitespace.contents = false;
-    AT_RULE_STATEMENT(latin1(~skip=1, buf))
-  }
+    AT_RULE_STATEMENT(latin1(~skip=1, buf));
   /* NOTE: should be placed above ident, otherwise pattern with
    * '-[0-9a-z]{1,6}' cannot be matched */
   | (_u, '+', unicode_range) => UNICODE_RANGE(latin1(buf))
   | ('#', name) => HASH(latin1(~skip=1, buf))
   | number => get_dimension(latin1(buf), buf)
-  | whitespaces => {
+  | whitespaces =>
     if (skip_whitespace^) {
       get_next_token(buf);
     } else {
-      WS
+      WS;
     }
-  }
   /* -moz-* */
   | ("-", ident) => Parser.IDENT(latin1(buf))
   /* --variable */
   | ("-", "-", ident) => Parser.IDENT(latin1(buf))
-  | identifier_start_code_point => {
+  | identifier_start_code_point =>
     let _ = Sedlexing.backtrack(buf);
     Tokenizer.consume_ident_like(buf) |> handle_tokenizer_error(buf);
-  }
   | any => DELIM(latin1(buf))
   | _ => assert(false)
   };
@@ -651,29 +647,33 @@ let rec get_next_token = (buf) => {
 and get_dimension = (n, buf) => {
   open Sedlexing;
   switch%sedlex (buf) {
-    | length => FLOAT_DIMENSION((n, latin1(buf)))
-    | angle => FLOAT_DIMENSION((n, latin1(buf)))
-    | time => FLOAT_DIMENSION((n, latin1(buf)))
-    | frequency => FLOAT_DIMENSION((n, latin1(buf)))
-    | 'n' => DIMENSION((n, latin1(buf)))
-    | _ => NUMBER(n)
+  | length => FLOAT_DIMENSION((n, latin1(buf)))
+  | angle => FLOAT_DIMENSION((n, latin1(buf)))
+  | time => FLOAT_DIMENSION((n, latin1(buf)))
+  | frequency => FLOAT_DIMENSION((n, latin1(buf)))
+  | 'n' => DIMENSION((n, latin1(buf)))
+  | _ => NUMBER(n)
   };
-} and discard_comments = (buf) => {
-  switch%sedlex(buf) {
+}
+and discard_comments = buf => {
+  switch%sedlex (buf) {
   | "*/" => get_next_token(buf)
   | any => discard_comments(buf)
-  | eof => raise(LexingError((buf.pos, "Unterminated comment at the end of the string")))
-  | _ => assert false
-  }
+  | eof =>
+    raise(
+      LexingError((buf.pos, "Unterminated comment at the end of the string")),
+    )
+  | _ => assert(false)
+  };
 };
 
-let get_next_tokens_with_location = (buf) => {
+let get_next_tokens_with_location = buf => {
   let (_, position_end) = Lex_buffer.lexing_positions(buf);
   let token = get_next_token(buf);
   let (_, position_end_after) = Lex_buffer.lexing_positions(buf);
 
   (token, position_end, position_end_after);
-}
+};
 
 type parser('token, 'ast) = MenhirLib.Convert.traditional('token, 'ast);
 
@@ -693,19 +693,48 @@ let parse = (skip_whitespaces, buf, parser) => {
   };
 };
 
-let parse_string = (~skip_whitespace, ~container_lnum=?, ~pos=?, parser, string) => {
-  parse(skip_whitespace, Lex_buffer.from_string(~container_lnum?, ~pos?, string), parser);
+let parse_string =
+    (~skip_whitespace, ~container_lnum=?, ~pos=?, parser, string) => {
+  parse(
+    skip_whitespace,
+    Lex_buffer.from_string(~container_lnum?, ~pos?, string),
+    parser,
+  );
 };
 
 let parse_declaration_list = (~container_lnum=?, ~pos=?, input: string) => {
-  parse_string(~skip_whitespace=true, ~container_lnum?, ~pos?, Parser.declaration_list, input);
-}
+  parse_string(
+    ~skip_whitespace=true,
+    ~container_lnum?,
+    ~pos?,
+    Parser.declaration_list,
+    input,
+  );
+};
 
 let parse_declaration = (~container_lnum=?, ~pos=?, input: string) =>
-  parse_string(~skip_whitespace=true, ~container_lnum?, ~pos?, Parser.declaration, input);
+  parse_string(
+    ~skip_whitespace=true,
+    ~container_lnum?,
+    ~pos?,
+    Parser.declaration,
+    input,
+  );
 
 let parse_stylesheet = (~container_lnum=?, ~pos=?, input: string) =>
-  parse_string(~skip_whitespace=false, ~container_lnum?, ~pos?, Parser.stylesheet, input);
+  parse_string(
+    ~skip_whitespace=false,
+    ~container_lnum?,
+    ~pos?,
+    Parser.stylesheet,
+    input,
+  );
 
 let parse_keyframes = (~container_lnum=?, ~pos=?, input: string) =>
-  parse_string(~skip_whitespace=false, ~container_lnum?, ~pos?, Parser.keyframes, input);
+  parse_string(
+    ~skip_whitespace=false,
+    ~container_lnum?,
+    ~pos?,
+    Parser.keyframes,
+    input,
+  );
