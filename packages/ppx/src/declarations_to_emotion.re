@@ -442,7 +442,16 @@ let box_sizing =
     (~loc) => [%expr CssJs.boxSizing],
     variant_to_expression,
   );
-let column_width = unsupportedProperty(Parser.property_column_width);
+let column_width =
+  apply(
+    Parser.property_column_width,
+    (~loc) => [%expr CssJs.columnWidth],
+    (~loc, value: Types.property_column_width) =>
+      switch (value) {
+      | `Auto => variant_to_expression(~loc, `Auto)
+      | `Extended_length(l) => render_extended_length(~loc, l)
+      },
+  );
 
 let render_margin = (~loc) =>
   fun
