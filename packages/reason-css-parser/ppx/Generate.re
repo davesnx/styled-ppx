@@ -73,7 +73,8 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       | Terminal(Delim(name), _) => value_of_delimiter(name)
       | Terminal(Keyword(name), _) => kebab_case_to_snake_case(name)
       | Terminal(Data_type(name), _) => value_name_of_css(name)
-      | Terminal(Property_type(name), _) => property_value_name(name) |> value_name_of_css
+      | Terminal(Property_type(name), _) =>
+        property_value_name(name) |> value_name_of_css
       | Group(value, _) => variant_name(value)
       | Combinator(Static, _) => "static"
       | Combinator(And, _) => "and"
@@ -84,7 +85,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     value_name |> first_uppercase;
   };
 
-  let variant_names = (values) => {
+  let variant_names = values => {
     // TODO: not exactly a fast algorithm
     let values = values |> List.map(variant_name);
     let occurrences = (values, value) =>
@@ -92,20 +93,20 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
 
     values
     |> List.fold_left(
-        (acc, value) => {
-          let total = occurrences(values, value);
-          let current_values = acc |> List.map(((name, _)) => name);
-          let current = occurrences(current_values, value);
-          let value = total == 1 ? (value, None) : (value, Some(current));
-          [value, ...acc];
-        },
-        [],
-      )
+         (acc, value) => {
+           let total = occurrences(values, value);
+           let current_values = acc |> List.map(((name, _)) => name);
+           let current = occurrences(current_values, value);
+           let value = total == 1 ? (value, None) : (value, Some(current));
+           [value, ...acc];
+         },
+         [],
+       )
     |> List.map(
-        fun
-        | (value, None) => value
-        | (value, Some(int)) => value ++ "_" ++ string_of_int(int),
-      )
+         fun
+         | (value, None) => value
+         | (value, Some(int)) => value ++ "_" ++ string_of_int(int),
+       )
     |> List.rev;
   };
 
@@ -151,13 +152,13 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       make_variant_branch(type_, is_constructor, params);
     };
 
-  let create_type_parser = (value) => {
+  let create_type_parser = value => {
     let rec create_type =
       fun
       | Terminal(kind, multiplier) => terminal_op(kind, multiplier)
-      | Combinator(kind, values)   => combinator_op(kind, values)
+      | Combinator(kind, values) => combinator_op(kind, values)
       | Function_call(name, value) => function_call(name, value)
-      | Group(value, multiplier)   => group_op(value, multiplier)
+      | Group(value, multiplier) => group_op(value, multiplier)
 
     and terminal_xor_op = (type_name, kind, multiplier) => {
       let (type_, is_constructor, params) =
@@ -203,7 +204,8 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
             List.map(
               ((type_name, value)) =>
                 switch (value) {
-                | Terminal(kind, multiplier) => terminal_xor_op(type_name, kind, multiplier)
+                | Terminal(kind, multiplier) =>
+                  terminal_xor_op(type_name, kind, multiplier)
                 | Function_call(name, value) =>
                   let name =
                     first_uppercase(name) |> kebab_case_to_snake_case;
@@ -220,10 +222,11 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
             );
           ptyp_variant(types, Closed, None);
         | Static
-        | And => ptyp_tuple(List.map(create_type, values));
+        | And => ptyp_tuple(List.map(create_type, values))
         | Or =>
           let types =
-            List.map(create_type, values) |> List.map(apply_modifier(Optional));
+            List.map(create_type, values)
+            |> List.map(apply_modifier(Optional));
           ptyp_tuple(types);
         };
       }
@@ -235,9 +238,9 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
 
     switch (value) {
     | Terminal(kind, multiplier) => terminal_op(kind, multiplier)
-    | Combinator(kind, values)   => combinator_op(kind, values)
+    | Combinator(kind, values) => combinator_op(kind, values)
     | Function_call(name, value) => function_call(name, value)
-    | Group(value, multiplier)   => group_op(value, multiplier)
+    | Group(value, multiplier) => group_op(value, multiplier)
     };
   };
 
@@ -310,7 +313,6 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       type_("interpolation", [%type: list(string)]),
       type_("flex_value", [%type: [ | `Fr(float)]]),
       type_("line_names", [%type: (unit, list(string), unit)]),
-
       // From Parser_helper, those are `invalid` represented here as unit
       type_("ident_token", [%type: unit]),
       type_("function_token", [%type: unit]),
@@ -342,7 +344,9 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
                       Pstr_eval(
                         {
                           pexp_desc:
-                            Pexp_constant(Pconst_string(value, _loc, _delim)),
+                            Pexp_constant(
+                              Pconst_string(value, _loc, _delim),
+                            ),
                           _,
                         },
                         _attrs,
@@ -367,43 +371,64 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
   };
 
   let make_types = bindings => {
-    let type_declarations = List.map((binding) => {
-      let (name, core_type) = make_type(binding);
-      make_type_declaration(name, core_type);
-    }, bindings);
+    let type_declarations =
+      List.map(
+        binding => {
+          let (name, core_type) = make_type(binding);
+          make_type_declaration(name, core_type);
+        },
+        bindings,
+      );
 
     let loc = List.hd(type_declarations).ptype_loc;
     let types =
-      Ast_helper.Str.type_(~loc, Recursive, type_declarations @ standard_types);
+      Ast_helper.Str.type_(
+        ~loc,
+        Recursive,
+        type_declarations @ standard_types,
+      );
     let types_structure = Ast_helper.Mod.structure(~loc, [types]);
     [%stri module Types = [%m types_structure]];
   };
 
   let add_type_to_expr = (name: string, expression) => {
-    let core_type = Ast_helper.Typ.constr(~loc, { loc: Location.none, txt: Ldot(Lident("Types"), name) }, []);
-    let type_anotation = [%type: list(Reason_css_lexer.token) => (Reason_css_parser__Rule.data([%t core_type]), list(Reason_css_lexer.token))];
+    let core_type =
+      Ast_helper.Typ.constr(
+        ~loc,
+        {loc: Location.none, txt: Ldot(Lident("Types"), name)},
+        [],
+      );
+    let type_anotation = [%type:
+      list(Reason_css_lexer.token) =>
+      (
+        Reason_css_parser__Rule.data([%t core_type]),
+        list(Reason_css_lexer.token),
+      )
+    ];
     [%expr ([%e expression]: [%t type_anotation])];
   };
 
   let get_name_from_binding = (binding: Parsetree.value_binding) => {
     switch (binding) {
-    | { pvb_pat: {ppat_desc: Ppat_var({txt, _}), _}, _ } => Some(txt)
+    | {pvb_pat: {ppat_desc: Ppat_var({txt, _}), _}, _} => Some(txt)
     | _ => None
     };
   };
 
   let add_types = (~loc, bindings) => {
     open Ppxlib;
-    let new_bindings = bindings |> List.map((value_binding) => {
-      let name = value_binding |> get_name_from_binding;
-      switch (name) {
-      | Some(type_name) => {
-        let new_expression = add_type_to_expr(type_name, value_binding.pvb_expr);
-        { ...value_binding, pvb_expr: new_expression}
-      }
-      | None => value_binding
-      }
-    });
+    let new_bindings =
+      bindings
+      |> List.map(value_binding => {
+           let name = value_binding |> get_name_from_binding;
+           switch (name) {
+           | Some(type_name) =>
+             let new_expression =
+               add_type_to_expr(type_name, value_binding.pvb_expr);
+             {...value_binding, pvb_expr: new_expression};
+           | None => value_binding
+           };
+         });
 
     [Ast_helper.Str.value(~loc, Recursive, new_bindings)];
   };
@@ -435,7 +460,8 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     is_function(property_name)
       ? function_value_name(property_name) : "property-" ++ property_name;
 
-  let value_of_delimiter = fun
+  let value_of_delimiter =
+    fun
     | "+" => "cross"
     | "-" => "dash"
     | "*" => "asterisk"
@@ -481,7 +507,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     | "/" => "bar"
     | "@" => "at"
     | s => kebab_case_to_snake_case(s)
-    }
+    };
   };
 
   let apply_modifier = {
@@ -525,7 +551,8 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
         | Delim(delim) => eapply(evar("delim"), [estring(delim)])
         | Keyword(name) => eapply(evar("keyword"), [estring(name)])
         | Data_type(name) => value_name_of_css(name) |> evar
-        | Property_type(name) => property_value_name(name) |> value_name_of_css |> evar
+        | Property_type(name) =>
+          property_value_name(name) |> value_name_of_css |> evar
         };
       apply_modifier(modifier, rule);
     };
@@ -551,21 +578,20 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       };
 
       switch (kind) {
-      | Xor => {
+      | Xor =>
         let names = variant_names(values);
         let args =
           List.combine(names, values)
           |> List.map(((_, value) as pair) => {
-              let has_content =
-                switch (value) {
-                | Terminal(Keyword(_), _) => false
-                | _ => true
-                };
-              map_value(has_content, pair);
-            });
+               let has_content =
+                 switch (value) {
+                 | Terminal(Keyword(_), _) => false
+                 | _ => true
+                 };
+               map_value(has_content, pair);
+             });
         apply(op_ident(kind), args);
-      }
-      | _ => {
+      | _ =>
         let combinator_args =
           values
           |> List.mapi((index, v) => ("V" ++ string_of_int(index), v))
@@ -574,41 +600,41 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
         let (args, body) =
           values
           |> List.mapi((index, _) => {
-              let id_name = "v" ++ string_of_int(index);
-              let id_expr = pexp_ident(txt(Lident(id_name)));
-              let id_pat = ppat_var(txt(id_name));
-              let extract_variant =
-                ppat_variant("V" ++ string_of_int(index), Some(id_pat));
-              switch (kind) {
-              | Or =>
-                let expr =
-                  pexp_match(
-                    id_expr,
-                    [
-                      case(
-                        ~lhs=ppat_construct(txt(Lident("None")), None),
-                        ~rhs=pexp_construct(txt(Lident("None")), None),
-                        ~guard=None,
-                      ),
-                      case(
-                        ~lhs=
-                          ppat_construct(
-                            txt(Lident("Some")),
-                            Some(extract_variant),
-                          ),
-                        ~rhs=
-                          pexp_construct(
-                            txt(Lident("Some")),
-                            Some(id_expr),
-                          ),
-                        ~guard=None,
-                      ),
-                    ],
-                  );
-                (id_pat, expr);
-              | _ => (extract_variant, id_expr)
-              };
-            })
+               let id_name = "v" ++ string_of_int(index);
+               let id_expr = pexp_ident(txt(Lident(id_name)));
+               let id_pat = ppat_var(txt(id_name));
+               let extract_variant =
+                 ppat_variant("V" ++ string_of_int(index), Some(id_pat));
+               switch (kind) {
+               | Or =>
+                 let expr =
+                   pexp_match(
+                     id_expr,
+                     [
+                       case(
+                         ~lhs=ppat_construct(txt(Lident("None")), None),
+                         ~rhs=pexp_construct(txt(Lident("None")), None),
+                         ~guard=None,
+                       ),
+                       case(
+                         ~lhs=
+                           ppat_construct(
+                             txt(Lident("Some")),
+                             Some(extract_variant),
+                           ),
+                         ~rhs=
+                           pexp_construct(
+                             txt(Lident("Some")),
+                             Some(id_expr),
+                           ),
+                         ~guard=None,
+                       ),
+                     ],
+                   );
+                 (id_pat, expr);
+               | _ => (extract_variant, id_expr)
+               };
+             })
           |> List.split;
 
         let disable_warning =
@@ -623,7 +649,6 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
           pexp_attributes: [disable_warning],
         };
         eapply(evar("map"), [combinator, map_fn]);
-      };
       };
     };
     let function_call = (name, value) => {

@@ -3,7 +3,7 @@ open Tokens;
 
 // TODO: is rgb(255 255 255/0) valid?
 let whitespace = [%sedlex.regexp? Plus(' ' | '\t' | '\n')];
-let digit = [%sedlex.regexp? '0'..'9'];
+let digit = [%sedlex.regexp? '0' .. '9'];
 let number = [%sedlex.regexp? (Opt('+' | '-'), digit | "∞")];
 let range_restriction = [%sedlex.regexp? ('[', number, ',', number, ']')];
 
@@ -14,7 +14,17 @@ let literal = [%sedlex.regexp? Star(Sub(any, stop_literal))];
 let string = [%sedlex.regexp? ('\'', Plus(Sub(any, '\'')), '\'')];
 let single_token_literal = [%sedlex.regexp? ',' | '{'];
 
-let delimiters = [%sedlex.regexp? '-' | ',' | ';' | ':' | '.' | '(' | ')' | '[' | ']' | '{' | '}' | '*' | '/' | '^' | '+' | '<' | '=' | '>' | '|' | '~' | '$' ];
+let delimiters = [%sedlex.regexp?
+  '-' | ',' | ';' | ':' | '.' | '(' | ')' | '[' | ']' | '{' | '}' | '*' | '/' |
+  '^' |
+  '+' |
+  '<' |
+  '=' |
+  '>' |
+  '|' |
+  '~' |
+  '$'
+];
 let quoted_delimiter = [%sedlex.regexp? ('\'', delimiters, '\'')];
 
 let data = [%sedlex.regexp?
@@ -32,13 +42,13 @@ let slice = (start, end_, string) => {
   String.sub(string, start, end_);
 };
 
-let eat_literal = (buf) => {
+let eat_literal = buf => {
   switch%sedlex (buf) {
   | literal => LITERAL(lexeme(buf))
   | single_token_literal => LITERAL(lexeme(buf))
   | _ => failwith("something is wrong here")
   };
-}
+};
 
 let eat_range = str => {
   let int = int_of_string;

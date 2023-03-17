@@ -42,7 +42,9 @@
 [%css {|background: border-box red|}];
 [%css {|background: fixed;|}];
 [%css {|background: border-box padding-box|}];
-[%css {|background: url(foo.png) bottom right / cover padding-box content-box|}];
+[%css
+  {|background: url(foo.png) bottom right / cover padding-box content-box|}
+];
 [%css {|border-top-left-radius: 0|}];
 [%css {|border-top-left-radius: 50%|}];
 [%css {|border-top-left-radius: 250px 100px|}];
@@ -520,7 +522,9 @@
 [%css {|transform: rotateZ(-45deg)|}];
 // [%css {|transform: matrix3d(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)|}];
 // [%css {|transform: matrix3d(0,0,0,0,0,0,0,0,0,0,1,0,10,10,0,1)|}];
-[%css {|transform: translate3d(50px, -24px, 5px) rotate3d(1, 2, 3, 180deg) scale3d(-1, 0, .5)|}];
+[%css
+  {|transform: translate3d(50px, -24px, 5px) rotate3d(1, 2, 3, 180deg) scale3d(-1, 0, .5)|}
+];
 [%css {|transform: perspective(600px)|}];
 [%css {|transform-origin: 10px|}];
 [%css {|transform-origin: top|}];
@@ -817,7 +821,9 @@
 [%css {|text-decoration-skip: objects trailing-spaces|}];
 [%css {|text-decoration-skip: objects leading-spaces trailing-spaces|}];
 [%css {|text-decoration-skip: objects leading-spaces trailing-spaces edges|}];
-[%css {|text-decoration-skip: objects leading-spaces trailing-spaces edges box-decoration|}];
+[%css
+  {|text-decoration-skip: objects leading-spaces trailing-spaces edges box-decoration|}
+];
 [%css {|text-decoration-skip: objects edges|}];
 [%css {|text-decoration-skip: objects box-decoration|}];
 [%css {|text-decoration-skip: spaces|}];
@@ -826,7 +832,9 @@
 [%css {|text-decoration-skip: spaces box-decoration|}];
 [%css {|text-decoration-skip: leading-spaces|}];
 [%css {|text-decoration-skip: leading-spaces trailing-spaces edges|}];
-[%css {|text-decoration-skip: leading-spaces trailing-spaces edges box-decoration|}];
+[%css
+  {|text-decoration-skip: leading-spaces trailing-spaces edges box-decoration|}
+];
 [%css {|text-decoration-skip: edges|}];
 [%css {|text-decoration-skip: edges box-decoration|}];
 [%css {|text-decoration-skip: box-decoration|}];
@@ -890,7 +898,9 @@
 [%css {|font-variant-ligatures: no-historical-ligatures|}];
 [%css {|font-variant-ligatures: contextual|}];
 [%css {|font-variant-ligatures: no-contextual|}];
-[%css {|font-variant-ligatures: common-ligatures discretionary-ligatures historical-ligatures contextual|}];
+[%css
+  {|font-variant-ligatures: common-ligatures discretionary-ligatures historical-ligatures contextual|}
+];
 [%css {|font-variant-caps: normal|}];
 [%css {|font-variant-caps: small-caps|}];
 [%css {|font-variant-caps: all-small-caps|}];
@@ -907,9 +917,15 @@
 [%css {|font-variant-numeric: stacked-fractions|}];
 [%css {|font-variant-numeric: ordinal|}];
 [%css {|font-variant-numeric: slashed-zero|}];
-[%css {|font-variant-numeric: lining-nums proportional-nums diagonal-fractions|}];
-[%css {|font-variant-numeric: oldstyle-nums tabular-nums stacked-fractions ordinal slashed-zero|}];
-[%css {|font-variant-numeric: slashed-zero ordinal tabular-nums stacked-fractions oldstyle-nums|}];
+[%css
+  {|font-variant-numeric: lining-nums proportional-nums diagonal-fractions|}
+];
+[%css
+  {|font-variant-numeric: oldstyle-nums tabular-nums stacked-fractions ordinal slashed-zero|}
+];
+[%css
+  {|font-variant-numeric: slashed-zero ordinal tabular-nums stacked-fractions oldstyle-nums|}
+];
 [%css {|font-variant-east-asian: normal|}];
 [%css {|font-variant-east-asian: jis78|}];
 [%css {|font-variant-east-asian: jis83|}];
@@ -1536,7 +1552,6 @@
 [%css {|order: 0|}];
 [%css {|order: 1|}];
 
-
 /* CSS Grid Layout Module Level 1 */
 [%css {|display: grid|}];
 [%css {|display: inline-grid|}];
@@ -1546,13 +1561,23 @@
 [%css {|grid-template-columns: 1fr|}];
 [%css {|grid-template-columns: 100px 1fr auto|}];
 [%css {|grid-template-columns: repeat(2, 100px 1fr)|}];
-[%css {|grid-template-columns: repeat(4, 10px [col-start] 250px [col-end]) 10px|}];
-[%css {|grid-template-columns: 100px 1fr max-content minmax(min-content, 1fr)|}];
+[%css
+  {|grid-template-columns: repeat(4, 10px [col-start] 250px [col-end]) 10px|}
+];
+[%css
+  {|grid-template-columns: 100px 1fr max-content minmax(min-content, 1fr)|}
+];
 [%css {|grid-template-columns: repeat(auto-fill, minmax(25ch, 1fr))|}];
 [%css {|grid-template-columns: 10px [col-start] 250px [col-end]|}];
-[%css {|grid-template-columns: [first nav-start] 150px [main-start] 1fr [last]|}];
-[%css {|grid-template-columns: 10px [col-start] 250px [col-end] 10px [col-start] 250px [col-end] 10px|}];
-[%css {|grid-template-columns: [a] auto [b] minmax(min-content, 1fr) [b c d] repeat(2, [e] 40px) repeat(5, auto)|}];
+[%css
+  {|grid-template-columns: [first nav-start] 150px [main-start] 1fr [last]|}
+];
+[%css
+  {|grid-template-columns: 10px [col-start] 250px [col-end] 10px [col-start] 250px [col-end] 10px|}
+];
+[%css
+  {|grid-template-columns: [a] auto [b] minmax(min-content, 1fr) [b c d] repeat(2, [e] 40px) repeat(5, auto)|}
+];
 [%css {|grid-template-rows: none|}];
 [%css {|grid-template-rows: auto|}];
 [%css {|grid-template-rows: 100px|}];
@@ -1561,14 +1586,18 @@
 [%css {|grid-template-rows: repeat(2, 100px 1fr)|}];
 [%css {|grid-template-rows: 100px 1fr max-content minmax(min-content, 1fr)|}];
 [%css {|grid-template-rows: 10px [row-start] 250px [row-end]|}];
-[%css {|grid-template-rows: [first header-start] 50px [main-start] 1fr [footer-start] 50px [last]|}];
+[%css
+  {|grid-template-rows: [first header-start] 50px [main-start] 1fr [footer-start] 50px [last]|}
+];
 [%css {|grid-template-areas: none|}];
 [%css {|grid-template-areas: 'articles'|}];
 [%css {|grid-template-areas: 'head head'|}];
 [%css {|grid-template-areas: 'head head' 'nav main' 'foot ....'|}];
 [%css {|grid-template: none|}];
 [%css {|grid-template: auto 1fr auto / auto 1fr|}];
-[%css {|grid-template: [header-top] 'a   a   a' [header-bottom] [main-top] 'b   b   b' 1fr [main-bottom] / auto 1fr auto|}];
+[%css
+  {|grid-template: [header-top] 'a   a   a' [header-bottom] [main-top] 'b   b   b' 1fr [main-bottom] / auto 1fr auto|}
+];
 [%css {|grid-auto-columns: auto|}];
 [%css {|grid-auto-columns: 1fr|}];
 [%css {|grid-auto-columns: 100px|}];
@@ -1576,7 +1605,9 @@
 [%css {|grid-auto-columns: minmax(min-content, 1fr)|}];
 [%css {|grid-auto-columns: min-content max-content auto|}];
 [%css {|grid-auto-columns: 100px 150px 390px|}];
-[%css {|grid-auto-columns: 100px minmax(100px, auto) 10% 0.5fr fit-content(400px)|}];
+[%css
+  {|grid-auto-columns: 100px minmax(100px, auto) 10% 0.5fr fit-content(400px)|}
+];
 [%css {|grid-auto-rows: auto|}];
 [%css {|grid-auto-rows: 1fr|}];
 [%css {|grid-auto-rows: 100px|}];
@@ -1585,7 +1616,9 @@
 [%css {|grid-auto-rows: min-content|}];
 [%css {|grid-auto-rows: minmax(min-content, 1fr)|}];
 [%css {|grid-auto-rows: min-content max-content auto|}];
-[%css {|grid-auto-rows: 100px minmax(100px, auto) 10% 0.5fr fit-content(400px)|}];
+[%css
+  {|grid-auto-rows: 100px minmax(100px, auto) 10% 0.5fr fit-content(400px)|}
+];
 [%css {|grid-auto-flow: row|}];
 [%css {|grid-auto-flow: column|}];
 [%css {|grid-auto-flow: row dense|}];
@@ -3093,13 +3126,17 @@
 [%css {|width: calc(20px - 10px)|}];
 [%css {|width: calc(100vh - calc(2rem + 120px))|}];
 /* [%css {|width: calc(100vh * 2)|}]; */
-[%css {|width: calc(100vh - calc(2rem + calc(2rem + calc(2rem + calc(2rem + 120px)))))|}];
+[%css
+  {|width: calc(100vh - calc(2rem + calc(2rem + calc(2rem + calc(2rem + 120px)))))|}
+];
 /* [%css {|width: calc(100vh * calc(2rem - calc(2rem * calc(2rem * calc(2rem / 4)))))|}]; */
 
 [%css {|-moz-appearance: textfield;|}];
 [%css {|-webkit-appearance: none;|}];
 [%css {|-webkit-box-orient: vertical;|}];
-[%css {|-webkit-box-shadow: inset 0 0 0 1000px $(Color.Background.selectedMuted);|}];
+[%css
+  {|-webkit-box-shadow: inset 0 0 0 1000px $(Color.Background.selectedMuted);|}
+];
 [%css {|-webkit-line-clamp: 2;|}];
 [%css {|-webkit-overflow-scrolling: touch;|}];
 [%css {|-webkit-tap-highlight-color: transparent;|}];
@@ -3132,8 +3169,12 @@
 [%css {|grid-column: unset;|}];
 [%css {|grid-row: unset;|}];
 [%css {|grid-template-columns: max-content max-content;|}];
-[%css {|grid-template-columns: minmax(10px, auto) fit-content(20px) fit-content(20px);|}];
-[%css {|grid-template-columns: minmax(51px, auto) fit-content(20px) fit-content(20px);|}];
+[%css
+  {|grid-template-columns: minmax(10px, auto) fit-content(20px) fit-content(20px);|}
+];
+[%css
+  {|grid-template-columns: minmax(51px, auto) fit-content(20px) fit-content(20px);|}
+];
 [%css {|grid-template-columns: repeat(2, auto);|}];
 [%css {|grid-template-columns: repeat(3, auto);|}];
 [%css {|height: fit-content;|}];

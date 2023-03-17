@@ -10,8 +10,12 @@ let compare = (input, expected, {expect, _}) => {
 };
 
 let gen_type = (name, expr) => {
-  let value_binding = Vb.mk(~loc, ~attrs=[], Pat.var(~loc, {txt: name, loc}), expr);
-  module Ast_builder = Ppxlib.Ast_builder.Make({ let loc = loc });
+  let value_binding =
+    Vb.mk(~loc, ~attrs=[], Pat.var(~loc, {txt: name, loc}), expr);
+  module Ast_builder =
+    Ppxlib.Ast_builder.Make({
+      let loc = loc;
+    });
   module Emit = Generate.Make(Ast_builder);
   let (name, core_type) = Emit.make_type(value_binding);
   Emit.make_type_declaration(name, core_type);
@@ -35,8 +39,16 @@ let types = [
   ),
   // Delim
   (
-    gen_type("calc_sum", [%expr [%value "<calc-product> [ [ '+' | '-' ] <calc-product> ]*"]]),
-    [%stri type calc_sum = (calc_product, list(([ `Cross(unit) | `Dash(unit) ], calc_product)))],
+    gen_type(
+      "calc_sum",
+      [%expr [%value "<calc-product> [ [ '+' | '-' ] <calc-product> ]*"]],
+    ),
+    [%stri
+      type calc_sum = (
+        calc_product,
+        list(([ | `Cross(unit) | `Dash(unit)], calc_product)),
+      )
+    ],
   ),
   // Xor
   (
@@ -84,13 +96,13 @@ let types = [
     gen_type("calc", [%expr [%value "calc( <calc-sum> )"]]),
     [%stri type calc = calc_sum],
   ),
-
   // Polymorphism
   (
     gen_type(
       "function_color",
       [%expr
-        [%value "rgb( [ <extended-percentage> ]{3} [ '/' <alpha-value> ]? )
+        [%value
+          "rgb( [ <extended-percentage> ]{3} [ '/' <alpha-value> ]? )
           | rgb( [ <number> ]{3} [ '/' <alpha-value> ]? )
           | rgb( [ <extended-percentage> ]#{3} [ ',' <alpha-value> ]? )
           | rgb( [ <number> ]#{3} [ ',' <alpha-value> ]? )"
@@ -110,7 +122,7 @@ let types = [
 
 describe("Should generate valid types based on CSS spec", ({test, _}) => {
   types
-  |> List.iteri((_index, ((result), expected)) =>
+  |> List.iteri((_index, (result, expected)) =>
        test(
          "Type: " ++ Pprintast.string_of_structure([expected]),
          compare(result, expected),

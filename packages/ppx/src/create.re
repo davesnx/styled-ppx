@@ -239,13 +239,11 @@ let stylesAndRefObject = (~loc) => {
 /* let newProps = Js.Obj.assign(Obj.magic(props), stylesObject); */
 let newProps = (~loc) => {
   let valueName = Helper.Pat.mk(~loc, Ppat_var(withLoc("newProps", ~loc)));
-  let value = [%expr assign2(Js.Obj.empty(), Obj.magic(props), stylesObject)];
+  let value = [%expr
+    assign2(Js.Obj.empty(), Obj.magic(props), stylesObject)
+  ];
 
-  Helper.Vb.mk(
-    ~loc,
-    valueName,
-    value
-  );
+  Helper.Vb.mk(~loc, valueName, value);
 };
 
 /* let className = styles ++ classNameGet(props); */
@@ -507,11 +505,12 @@ let defineDeletePropFn = (~loc) => {
   );
 };
 
-let jsT = (~loc) => Helper.Typ.constr(
-  ~loc,
-  withLoc(Ldot(Lident("Js"), "t"), ~loc),
-  [Helper.Typ.object_(~loc, [], Open)],
-);
+let jsT = (~loc) =>
+  Helper.Typ.constr(
+    ~loc,
+    withLoc(Ldot(Lident("Js"), "t"), ~loc),
+    [Helper.Typ.object_(~loc, [], Open)],
+  );
 
 /* [%stri external assign2 : Js.t({ .. }) => Js.t({ .. }) => Js.t({ .. }) => Js.t({ .. }) = "Object.assign"] */
 let defineAssign2 = (~loc) => {
@@ -527,17 +526,11 @@ let defineAssign2 = (~loc) => {
           ~loc,
           Nolabel,
           jsT(~loc),
-          Helper.Typ.arrow(
-          ~loc,
-          Nolabel,
-          jsT(~loc),
-          jsT(~loc),
+          Helper.Typ.arrow(~loc, Nolabel, jsT(~loc), jsT(~loc)),
         ),
-      )),
+      ),
     pval_prim: ["Object.assign"],
-    pval_attributes: [
-      BuckleScriptAttributes.val_(~loc),
-    ],
+    pval_attributes: [BuckleScriptAttributes.val_(~loc)],
   });
 };
 
@@ -549,5 +542,12 @@ let defineAssign2 = (~loc) => {
      };
    */
 let defineGetOrEmptyFn = (~loc) => {
-  [%stri let getOrEmpty = str => { switch (str) { | Some(str) => " " ++ str | None => "" } }; ]
+  [%stri
+    let getOrEmpty = str => {
+      switch (str) {
+      | Some(str) => " " ++ str
+      | None => ""
+      };
+    }
+  ];
 };
