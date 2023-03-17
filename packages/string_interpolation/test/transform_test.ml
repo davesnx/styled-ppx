@@ -62,18 +62,18 @@ let test12 () =
 
 let cases =
   [
-    ("Test 1", `Quick, test1);
-    ("Test 2", `Quick, test2);
-    ("Test 3", `Quick, test3);
-    ("Test 4", `Quick, test4);
-    ("Test 5", `Quick, test5);
-    ("Test 6", `Quick, test6);
-    ("Test 7", `Quick, test7);
-    ("Test 8", `Quick, test8);
-    ("Test 9", `Quick, test9);
-    ("Test 10", `Quick, test10);
-    ("Test 11", `Quick, test11);
-    ("Test 12", `Quick, test12);
+    "Test 1", `Quick, test1;
+    "Test 2", `Quick, test2;
+    "Test 3", `Quick, test3;
+    "Test 4", `Quick, test4;
+    "Test 5", `Quick, test5;
+    "Test 6", `Quick, test6;
+    "Test 7", `Quick, test7;
+    "Test 8", `Quick, test8;
+    "Test 9", `Quick, test9;
+    "Test 10", `Quick, test10;
+    "Test 11", `Quick, test11;
+    "Test 12", `Quick, test12;
   ]
 
-let () = run "String interpolation test suit" [ ("Transform", cases) ]
+let () = run "String interpolation test suit" [ "Transform", cases ]
