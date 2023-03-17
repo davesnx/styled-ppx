@@ -18,7 +18,7 @@ homepage: "https://github.com/mirage/alcotest"
 doc: "https://mirage.github.io/alcotest"
 bug-reports: "https://github.com/mirage/alcotest/issues"
 depends: [
-  "dune" {>= "2.8"}
+  "dune" {>= "3.0"}
   "ocaml" {>= "4.05.0"}
   "fmt" {>= "0.8.7"}
   "astring"
@@ -42,17 +42,18 @@ build: [
     "-j"
     jobs
     "@install"
-    "@runtest" {with-test}
+    "@runtest" {with-test & arch != "arm32" & arch != "x86_32"
+                          & arch != "s390x" & arch != "ppc64"}
     "@doc" {with-doc}
   ]
 ]
 dev-repo: "git+https://github.com/mirage/alcotest.git"
 url {
   src:
-    "https://github.com/mirage/alcotest/releases/download/1.6.0/alcotest-1.6.0.tbz"
+    "https://github.com/mirage/alcotest/releases/download/1.7.0/alcotest-1.7.0.tbz"
   checksum: [
-    "sha256=fd00f9668395874ff3b1d7ef566d14efc02fa7dd34123eb25d59355be94b2329"
-    "sha512=69a7ef300ba10a9ccb1e25b1cfdb0a0abf9ca976864a52a22f0e1fae1e5d1cbeb99498c086230b839ee9da4d0fd71e63686e126ca42221537f3fdb6f6c5aae95"
+    "sha256=812bacdb34b45e88995e07d7306bdab2f72479ef1996637f1d5d1f41667902df"
+    "sha512=4ae1ba318949ec9db8b87bc8072632a02f0e4003a95ab21e474f5c34c3b5bde867b0194a2d0ea7d9fc4580c70a30ca39287d33a8c134acc7611902f79c7b7ce8"
   ]
 }
-x-commit-hash: "6be328d73513db7f32173f86a997a59904fb1ee6"
+x-commit-hash: "927088ffadce153306a36cef4d0fed52609208f6"
