@@ -2,8 +2,18 @@
   "ocaml.sandbox": {
     "kind": "esy",
     "root": "${workspaceFolder:styled-ppx}"
+<<<<<<< HEAD
   },
   "[reason]": {
     "editor.formatOnSave": false
+||||||| parent of ecb3f15 (Remove bs from vscode settings)
+  },
+  "[reason]": {
+    "editor.formatOnSave": true
+  },
+  "[ocaml]": {
+    "editor.formatOnSave": true
+=======
+>>>>>>> ecb3f15 (Remove bs from vscode settings)
   }
 }
