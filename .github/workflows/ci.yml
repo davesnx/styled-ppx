@@ -80,8 +80,8 @@ jobs:
       - name: Test CSS Spec Parser
         run: esy test_css_spec_parser
 
-      # - name: Test CSS Spec type generation
-        # run: esy test_css_spec_types
+      - name: Test CSS Spec type generation
+        run: esy test_css_spec_types
 
       - name: Test string interpolation
         run: esy dune runtest
