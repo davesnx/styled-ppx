@@ -50,14 +50,15 @@ jobs:
           key: esy-deps-${{ matrix.os }}-${{ hashFiles('esy.lock/index.json') }}
           restore-keys: esy-${{ matrix.os }}-
 
+      - name: Install dependencies
+        run: esy install
+
       - name: Import dependencies
         if: steps.deps-cache.outputs.cache-hit == 'true'
         run: |
           esy import-dependencies _export
           rm -rf _export
 
-      - name: Install dependencies
-        run: esy install
 
       - name: Build dependencies
         run: esy build-dependencies
