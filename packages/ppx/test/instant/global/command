@@ -1,1 +1,0 @@
-refmt --parse re --print ml packages/ppx/test/instant/global/input | esy dune exec packages/ppx/test/snapshot/standalone.exe -- -impl - | refmt --parse ml --print re
