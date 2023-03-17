@@ -1,5 +1,5 @@
 {
-  "name": "ppx-test-browser",
+  "name": "e2e-test",
   "reason": {
     "react-jsx": 3
   },
@@ -21,7 +21,7 @@
     }
   ],
   "ppx-flags": [
-    "../../../../_build/default/bin/ppx.exe"
+    "../_build/default/bin/ppx.exe"
   ],
   "suffix": ".bs.js",
   "namespace": true,
