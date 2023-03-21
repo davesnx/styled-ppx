@@ -157,16 +157,12 @@ let styledDynamic =
          customPropLabel(~loc, getLabel(arg), type_, optional)
        );
 
-  let propsExpr = Builder.pexp_ident(~loc, {txt: Lident("props"), loc});
-  let propToGetter = str => str ++ "Get";
-
-  /* (~arg1=arg1Get(props), ~arg2=arg2Get(props), ...) */
+  /* (~arg1=props.arg1, ~arg2=props.arg2, ...) */
   let styledArguments =
     List.map(
-      ((arg, _, _, _, _, _)) => {
-        let label = arg |> getLabel |> propToGetter;
-        let value = Builder.pexp_ident(~loc, {txt: Lident(label), loc});
-        (arg, Builder.pexp_apply(~loc, value, [(Nolabel, propsExpr)]));
+      ((argumentName, _, _, _, loc, _)) => {
+        let value = Generate_lib.propItem(~loc, getLabel(argumentName));
+        (argumentName, value);
       },
       labeledArguments,
     );

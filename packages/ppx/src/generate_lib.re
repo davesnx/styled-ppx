@@ -19,9 +19,8 @@ module BuckleScriptAttributes = {
     Builder.attribute(~name=withLoc(~loc, "bs"), ~loc, ~payload=PStr([]));
   };
 
-  /* [@bs.optional] */
   let optional = (~loc) =>
-    Helper.Attr.mk(withLoc("bs.optional", ~loc), PStr([]));
+    Helper.Attr.mk(withLoc("optional", ~loc), PStr([]));
 
   /* [@bs.deriving abstract] */
   let derivingAbstract = (~loc) =>
@@ -208,7 +207,14 @@ let variadicElement = (~loc, ~htmlTag) => {
   );
 };
 
-/* let stylesObject = {"className": className, "ref": props->innerRefGet}; */
+let propItem = (~loc, name) =>
+  Helper.Exp.field(
+    ~loc,
+    Helper.Exp.ident(~loc, withLoc(Lident("props"), ~loc)),
+    withLoc(Lident(name), ~loc),
+  );
+
+/* let stylesObject = { "className": className, "ref": props.ref }; */
 let stylesAndRefObject = (~loc) => {
   let className = (
     withLoc(~loc, Lident("className")),
@@ -216,11 +222,7 @@ let stylesAndRefObject = (~loc) => {
   );
   let refProp = (
     withLoc(~loc, Lident("ref")),
-    Helper.Exp.apply(
-      ~loc,
-      Helper.Exp.ident(~loc, withLoc(Lident("innerRefGet"), ~loc)),
-      [(Nolabel, Helper.Exp.ident(~loc, withLoc(Lident("props"), ~loc)))],
-    ),
+    propItem(~loc, "ref"),
   );
   let record = Helper.Exp.record(~loc, [className, refProp], None);
   Helper.Vb.mk(
@@ -246,12 +248,12 @@ let newProps = (~loc) => {
   Helper.Vb.mk(~loc, valueName, value);
 };
 
-/* let className = styles ++ classNameGet(props); */
+/* let className = styles ++ props.className; */
 let className = (~loc, expr) =>
   Helper.Vb.mk(
     ~loc,
     Helper.Pat.mk(~loc, Ppat_var(withLoc("className", ~loc))),
-    [%expr [%e expr] ++ getOrEmpty(classNameGet(props))],
+    [%expr [%e expr] ++ getOrEmpty(props.className)],
   );
 
 /* deleteInnerRef(. newProps, "innerRef") |> ignore; */
@@ -285,7 +287,7 @@ let generateSequence = (~loc, fns) => {
  */
 let makeBody = (~loc, ~htmlTag, ~styledExpr, ~variables) => {
   let sequence =
-    [deleteProp(~loc, "innerRef"), variadicElement(~loc, ~htmlTag)]
+    [variadicElement(~loc, ~htmlTag)]
     |> List.append(List.map(deleteProp(~loc), variables));
 
   Helper.Exp.let_(
@@ -320,13 +322,13 @@ let makeFn = (~loc, ~htmlTag, ~styledExpr, ~makePropTypes, ~variableNames) => {
     ~loc,
     Nolabel,
     None,
-    /* props: makeProps */
+    /* props: props */
     Helper.Pat.constraint_(
       ~loc,
       Helper.Pat.mk(~loc, Ppat_var(withLoc("props", ~loc))),
       Helper.Typ.constr(
         ~loc,
-        withLoc(Lident("makeProps"), ~loc),
+        withLoc(Lident("props"), ~loc),
         makePropTypes,
       ),
     ),
@@ -355,11 +357,10 @@ let component =
   );
 };
 
-/* [@bs.optional] color: string */
-let customPropLabel = (~loc, name, type_, isOptional) => {
+/* color: string */
+let customPropLabel = (~loc, name, type_, _isOptional) => {
   Helper.Type.field(
     ~loc,
-    ~attrs=isOptional ? [BuckleScriptAttributes.optional(~loc)] : [],
     withLoc(name, ~loc),
     type_,
   );
@@ -367,7 +368,7 @@ let customPropLabel = (~loc, name, type_, isOptional) => {
 
 let typeVariable = (~loc, name) => Builder.ptyp_var(~loc, name);
 
-/* [@bs.optional] href: string */
+/* href: string */
 let recordLabel = (~loc, name, kind, alias) => {
   let attrs =
     switch (alias) {
@@ -386,11 +387,11 @@ let recordLabel = (~loc, name, kind, alias) => {
   );
 };
 
-/* [@bs.optional] innerRef: domRef */
+/* innerRef: domRef */
 let domRefLabel = (~loc) =>
   Helper.Type.field(
     ~loc,
-    withLoc("innerRef", ~loc),
+    withLoc("ref", ~loc),
     Helper.Typ.constr(
       ~loc,
       withLoc(Ldot(Lident("ReactDOM"), "domRef"), ~loc),
@@ -398,7 +399,7 @@ let domRefLabel = (~loc) =>
     ),
   );
 
-/* [@bs.optional] children: React.element */
+/* children: React.element */
 let childrenLabel = (~loc) =>
   Helper.Type.field(
     ~loc,
@@ -410,7 +411,7 @@ let childrenLabel = (~loc) =>
     ),
   );
 
-/* [@bs.optional] onDragOver: ReactEvent.Mouse.t => unit */
+/* onDragOver: ReactEvent.Mouse.t => unit */
 let recordEventLabel = (~loc, name, kind) => {
   Helper.Type.field(
     ~loc,
@@ -487,19 +488,29 @@ let makeMakeProps = (~loc, ~customProps) => {
   );
 };
 
-/* type props = { ... } */
-/* type props('a, 'b) = { ... } */
-let makeProps = (~loc, customProps) => {
-  let (params, dynamicProps) =
-    switch (customProps) {
-    | None => ([], [])
-    | Some((params, props)) => (params, props)
-    };
+let makePropsWithParams= (~loc, params, dynamicProps) => {
+  let dynamicPropNames = dynamicProps |> List.map(d => d.pld_name.txt);
+
+  let makeProps =
+    MakeProps.get(dynamicPropNames)
+    |> List.map(domProp =>
+         switch (domProp) {
+         | MakeProps.Event({name, type_}) =>
+           recordEventLabel(~loc, name, MakeProps.eventTypeToIdent(type_))
+         | MakeProps.Attribute({name, type_, alias}) =>
+           recordLabel(
+             ~loc,
+             name,
+             MakeProps.attributeTypeToIdent(type_),
+             alias,
+           )
+         }
+       );
 
   /* List of `prop: type` */
   let reactProps =
     List.append(
-      [domRefLabel(~loc), childrenLabel(~loc)],
+      [domRefLabel(~loc), childrenLabel(~loc), ...makeProps],
       dynamicProps,
     );
 
@@ -524,6 +535,15 @@ let makeProps = (~loc, customProps) => {
       ],
     ),
   );
+};
+
+/* type props = { ... } */
+/* type props('a, 'b) = { ... } */
+let makeProps = (~loc, customProps) => {
+  switch (customProps) {
+    | Some((params, dynamicProps)) => makePropsWithParams(~loc, params, dynamicProps);
+    | None => [%stri type props = JsxDOM.domProps];
+  }
 };
 
 /* let deleteProp = [%raw "(newProps, key) => delete newProps[key]"] */
