@@ -551,3 +551,21 @@ let defineGetOrEmptyFn = (~loc) => {
     }
   ];
 };
+
+let raiseError = (~loc, ~description, ~example, ~link) => {
+  let error =
+    switch (example) {
+    | Some(e) =>
+      Location.raise_errorf(
+        ~loc,
+        "%s\n\n%s\n\nMore info: %s",
+        description,
+        e,
+        link,
+      )
+    | None =>
+      Location.raise_errorf(~loc, "%s\n\nMore info: %s", description, link)
+    };
+
+  raise(error);
+};

@@ -158,7 +158,7 @@ and render_media_query = (at_rule: at_rule): Parsetree.expression => {
 
   Helper.Exp.apply(
     ~loc=at_rule.loc,
-    ~attrs=[Create.uncurried(~loc=at_rule.loc)],
+    ~attrs=[Generate_lib.uncurried(~loc=at_rule.loc)],
     CssJs.media(~loc=at_rule.loc),
     [(Nolabel, query), (Nolabel, rules)],
   );
@@ -323,7 +323,7 @@ and render_style_rule = (ident, rule: style_rule): Parsetree.expression => {
 
   Helper.Exp.apply(
     ~loc=rule.loc,
-    ~attrs=[Create.uncurried(~loc=rule.loc)],
+    ~attrs=[Generate_lib.uncurried(~loc=rule.loc)],
     ident,
     [(Nolabel, selector_name), (Nolabel, selector_expr)],
   );
@@ -347,7 +347,7 @@ let render_style_call = (declaration_list): Parsetree.expression => {
 
   Helper.Exp.apply(
     ~loc,
-    ~attrs=[Create.uncurried(~loc)],
+    ~attrs=[Generate_lib.uncurried(~loc)],
     CssJs.style(~loc),
     arguments,
   );
@@ -417,7 +417,7 @@ let render_keyframes = (declarations: rule_list): Parsetree.expression => {
 
   {
     ...Builder.eapply(~loc, CssJs.keyframes(~loc), [keyframes]),
-    pexp_attributes: [Create.uncurried(~loc)],
+    pexp_attributes: [Generate_lib.uncurried(~loc)],
   };
 };
 
@@ -425,7 +425,7 @@ let render_global = ((ruleList, loc): stylesheet) => {
   switch (ruleList) {
   /* There's only one style_rule */
   | [Style_rule(rule)] =>
-    render_style_rule(CssJs.global(~loc), rule) |> Create.applyIgnore(~loc)
+    render_style_rule(CssJs.global(~loc), rule) |> Generate_lib.applyIgnore(~loc)
   /* More than one isn't supported by bs-css */
   | _res =>
     Lexer.grammar_error(
