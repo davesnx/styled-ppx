@@ -20,7 +20,7 @@ module BuckleScriptAttributes = {
   };
 
   let optional = (~loc) =>
-    Helper.Attr.mk(withLoc("optional", ~loc), PStr([]));
+    Helper.Attr.mk(withLoc("res.optional", ~loc), PStr([]));
 
   /* [@bs.deriving abstract] */
   let derivingAbstract = (~loc) =>
@@ -207,12 +207,13 @@ let variadicElement = (~loc, ~htmlTag) => {
   );
 };
 
-let propItem = (~loc, name) =>
+let propItem = (~loc, name) => {
   Helper.Exp.field(
     ~loc,
     Helper.Exp.ident(~loc, withLoc(Lident("props"), ~loc)),
     withLoc(Lident(name), ~loc),
   );
+  };
 
 /* let stylesObject = { "className": className, "ref": props.ref }; */
 let stylesAndRefObject = (~loc) => {
@@ -358,9 +359,10 @@ let component =
 };
 
 /* color: string */
-let customPropLabel = (~loc, name, type_, _isOptional) => {
+let customPropLabel = (~loc, ~optional, name, type_) => {
   Helper.Type.field(
     ~loc,
+    ~attrs=optional ? [BuckleScriptAttributes.optional(~loc)] : [],
     withLoc(name, ~loc),
     type_,
   );
@@ -391,6 +393,7 @@ let recordLabel = (~loc, name, kind, alias) => {
 let domRefLabel = (~loc) =>
   Helper.Type.field(
     ~loc,
+    ~attrs=[BuckleScriptAttributes.optional(~loc)],
     withLoc("ref", ~loc),
     Helper.Typ.constr(
       ~loc,
@@ -403,6 +406,7 @@ let domRefLabel = (~loc) =>
 let childrenLabel = (~loc) =>
   Helper.Type.field(
     ~loc,
+    ~attrs=[BuckleScriptAttributes.optional(~loc)],
     withLoc("children", ~loc),
     Helper.Typ.constr(
       ~loc,

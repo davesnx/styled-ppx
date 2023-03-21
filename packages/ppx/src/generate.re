@@ -154,7 +154,7 @@ let styledDynamic =
   let variableMakeProps =
     variableList
     |> List.map(((arg, optional, _, type_)) =>
-         customPropLabel(~loc, getLabel(arg), type_, optional)
+         customPropLabel(~loc, ~optional, getLabel(arg), type_)
        );
 
   /* (~arg1=props.arg1, ~arg2=props.arg2, ...) */
