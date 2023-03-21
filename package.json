@@ -18,8 +18,7 @@
     "buildsInSource": "_build",
     "build": [ [ "dune", "build", "--root", "." ] ],
     "buildDev": "dune build --promote-install-files --root .",
-    "buildEnv": { "ODOC_SYNTAX": "re" },
-    "release": { "bin": [ "ppx" ] }
+    "buildEnv": { "ODOC_SYNTAX": "re" }
   },
   "devDependencies": {
     "@opam/alcotest": "1.7.0",

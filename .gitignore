@@ -30,6 +30,8 @@ Temporary Items
 *.cmo
 *.cma
 *.cmi
+*.cmt
+*.cmj
 *.a
 *.o
 *.cmx
