@@ -57,7 +57,7 @@ function copyFileSync(sourcePath, destPath) {
 
 const copyPlatformBinaries = (platformPath) => {
   const platformBuildPath = path.join(__dirname, platformPath);
-  const sourcePath = path.join(platformBuildPath, "ppx.exe");
+  const sourcePath = path.join(platformBuildPath, "bin.exe");
   const destPath = path.join(__dirname, "ppx");
   if (fs.existsSync(destPath)) {
     fs.unlinkSync(destPath);

@@ -147,7 +147,7 @@ jobs:
           path: _build/default/bin
 
       - name: Grant permission to run ppx
-        run: chmod +x _build/default/bin/ppx.exe
+        run: chmod +x _build/default/bin/bin.exe
 
       - name: Get cache directory path
         id: yarn-cache-dir-path
