@@ -1,0 +1,28 @@
+{
+  "name": "demo-rescript",
+  "jsx": { "version": 4 },
+  "bsc-flags": [
+    "-bs-super-errors"
+  ],
+  "sources": {
+    "dir": "src",
+    "subdirs": true,
+    "type": "dev"
+  },
+  "package-specs": [
+    {
+      "module": "commonjs",
+      "in-source": true
+    }
+  ],
+  "ppx-flags": [
+    "../../../_build/default/bin/bin.exe"
+  ],
+  "suffix": ".bs.js",
+  "namespace": true,
+  "bs-dependencies": [
+    "bs-css",
+    "bs-css-emotion",
+    "@rescript/react"
+  ]
+}

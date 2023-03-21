@@ -237,10 +237,7 @@ let styledDynamic =
   Builder.pmod_structure(
     ~loc,
     [
-      makeMakeProps(
-        ~loc,
-        ~customProps=Some((makePropsParameters, variableMakeProps)),
-      ),
+      makeProps(~loc, Some((makePropsParameters, variableMakeProps))),
       bindingCreateVariadicElement(~loc),
       defineDeletePropFn(~loc),
       defineAssign2(~loc),
@@ -269,7 +266,7 @@ let styledComponent = (~loc, ~htmlTag, styles) => {
   Builder.pmod_structure(
     ~loc,
     [
-      makeMakeProps(~loc, ~customProps=None),
+      makeProps(~loc, None),
       bindingCreateVariadicElement(~loc),
       defineDeletePropFn(~loc),
       defineAssign2(~loc),

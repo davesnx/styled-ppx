@@ -390,7 +390,6 @@ let recordLabel = (~loc, name, kind, alias) => {
 let domRefLabel = (~loc) =>
   Helper.Type.field(
     ~loc,
-    ~attrs=[BuckleScriptAttributes.optional(~loc)],
     withLoc("innerRef", ~loc),
     Helper.Typ.constr(
       ~loc,
@@ -403,7 +402,6 @@ let domRefLabel = (~loc) =>
 let childrenLabel = (~loc) =>
   Helper.Type.field(
     ~loc,
-    ~attrs=[BuckleScriptAttributes.optional(~loc)],
     withLoc("children", ~loc),
     Helper.Typ.constr(
       ~loc,
@@ -483,6 +481,45 @@ let makeMakeProps = (~loc, ~customProps) => {
           ~kind=Ptype_record(reactProps),
           ~params,
           withLoc("makeProps", ~loc),
+        ),
+      ],
+    ),
+  );
+};
+
+/* type props = { ... } */
+/* type props('a, 'b) = { ... } */
+let makeProps = (~loc, customProps) => {
+  let (params, dynamicProps) =
+    switch (customProps) {
+    | None => ([], [])
+    | Some((params, props)) => (params, props)
+    };
+
+  /* List of `prop: type` */
+  let reactProps =
+    List.append(
+      [domRefLabel(~loc), childrenLabel(~loc)],
+      dynamicProps,
+    );
+
+  let params =
+    List.map(
+      type_ => (type_, (Asttypes.NoVariance, Asttypes.NoInjectivity)),
+      params,
+    ); /* TODO: Made correct ast, not sure if it matter */
+
+  Helper.Str.mk(
+    ~loc,
+    Pstr_type(
+      Recursive,
+      [
+        Helper.Type.mk(
+          ~loc,
+          ~priv=Public,
+          ~kind=Ptype_record(reactProps),
+          ~params,
+          withLoc("props", ~loc),
         ),
       ],
     ),
