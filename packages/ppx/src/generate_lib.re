@@ -430,68 +430,6 @@ let recordEventLabel = (~loc, name, kind) => {
   );
 };
 
-/* type makeProps = { ... } */
-/* type makeProps('a, 'b) = { ... } */
-let makeMakeProps = (~loc, ~customProps) => {
-  let (params, dynamicProps) =
-    switch (customProps) {
-    | None => ([], [])
-    | Some((params, props)) => (params, props)
-    };
-
-  let dynamicPropNames = dynamicProps |> List.map(d => d.pld_name.txt);
-
-  let makeProps =
-    MakeProps.get(dynamicPropNames)
-    |> List.map(domProp =>
-         switch (domProp) {
-         | MakeProps.Event({name, type_}) =>
-           recordEventLabel(~loc, name, MakeProps.eventTypeToIdent(type_))
-         | MakeProps.Attribute({name, type_, alias}) =>
-           recordLabel(
-             ~loc,
-             name,
-             MakeProps.attributeTypeToIdent(type_),
-             alias,
-           )
-         }
-       );
-
-  /*
-     List of
-        prop: type
-        [@bs.optional]
-   */
-  let reactProps =
-    List.append(
-      [domRefLabel(~loc), childrenLabel(~loc), ...makeProps],
-      dynamicProps,
-    );
-
-  let params =
-    List.map(
-      type_ => (type_, (Asttypes.NoVariance, Asttypes.NoInjectivity)),
-      params,
-    ) /* TODO: Made correct ast, not sure if it matter */;
-
-  Helper.Str.mk(
-    ~loc,
-    Pstr_type(
-      Recursive,
-      [
-        Helper.Type.mk(
-          ~loc,
-          ~priv=Public,
-          ~attrs=[BuckleScriptAttributes.derivingAbstract(~loc)],
-          ~kind=Ptype_record(reactProps),
-          ~params,
-          withLoc("makeProps", ~loc),
-        ),
-      ],
-    ),
-  );
-};
-
 let makePropsWithParams= (~loc, params, dynamicProps) => {
   let dynamicPropNames = dynamicProps |> List.map(d => d.pld_name.txt);
 

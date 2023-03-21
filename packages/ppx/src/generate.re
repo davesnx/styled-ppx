@@ -131,14 +131,13 @@ let styledDynamic =
   let variableList =
     labeledArguments
     |> List.map(((arg, optionalArg, _, _, loc, type_)) => {
-         let label = getLabel(arg);
          let (kind, type_) =
            switch (type_) {
            | Some(type_) => (`Typed, type_)
-           | None => (`Open, typeVariable(~loc, label))
+           | None => (`Open, typeVariable(~loc, getLabel(arg)))
            };
 
-         (arg, Option.is_some(optionalArg), kind, type_);
+         (arg, optionalArg, kind, type_);
        });
 
   /* ('a, 'b) */
@@ -153,8 +152,8 @@ let styledDynamic =
   /* type makeProps('a) = { a: 'a } */
   let variableMakeProps =
     variableList
-    |> List.map(((arg, optional, _, type_)) =>
-         customPropLabel(~loc, ~optional, getLabel(arg), type_)
+    |> List.map(((arg, optionalArg, _, type_)) =>
+         customPropLabel(~loc, ~optional=Option.is_none(optionalArg), getLabel(arg), type_)
        );
 
   /* (~arg1=props.arg1, ~arg2=props.arg2, ...) */

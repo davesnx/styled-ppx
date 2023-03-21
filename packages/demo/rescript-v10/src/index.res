@@ -13,10 +13,18 @@ let getOrEmpty = str => {
 
 module OneSingleProperty = %styled.div("display: block")
 
-module DynamicComponent = {
+module DynamicComponent = %styled.div(
+  (~var) =>
+    `
+    color: $(var);
+    display: block;
+`
+)
+
+/* module DynamicComponent = {
   type props<'var> = {
-    ref: ReactDOM.domRef,
-    children: React.element,
+    ref?: ReactDOM.domRef,
+    children?: React.element,
     about?: string,
     accentHeight?: string,
     accept?: string,
@@ -32,83 +40,44 @@ module DynamicComponent = {
     alt?: string,
     amplitude?: string,
     arabicForm?: string,
-    /* [@bs.as "aria-activedescendant"] */
     ariaActivedescendant?: string,
-    /* [@bs.as "aria-atomic"] */
     ariaAtomic?: bool,
-    /* [@bs.as "aria-busy"] */
     ariaBusy?: bool,
-    /* [@bs.as "aria-colcount"] */
     ariaColcount?: int,
-    /* [@bs.as "aria-colindex"] */
     ariaColindex?: int,
-    /* [@bs.as "aria-colspan"] */
     ariaColspan?: int,
-    /* [@bs.as "aria-controls"] */
     ariaControls?: string,
-    /* [@bs.as "aria-describedby"] */
     ariaDescribedby?: string,
-    /* [@bs.as "aria-details"] */
     ariaDetails?: string,
-    /* [@bs.as "aria-disabled"] */
     ariaDisabled?: bool,
-    /* [@bs.as "aria-errormessage"] */
     ariaErrormessage?: string,
-    /* [@bs.as "aria-expanded"] */
     ariaExpanded?: bool,
-    /* [@bs.as "aria-flowto"] */
     ariaFlowto?: string,
-    /* [@bs.as "aria-grabbed"] */
     ariaGrabbed?: bool,
-    /* [@bs.as "aria-hidden"] */
     ariaHidden?: bool,
-    /* [@bs.as "aria-keyshortcuts"] */
     ariaKeyshortcuts?: string,
-    /* [@bs.as "aria-label"] */
     ariaLabel?: string,
-    /* [@bs.as "aria-labelledby"] */
     ariaLabelledby?: string,
-    /* [@bs.as "aria-level"] */
     ariaLevel?: int,
-    /* [@bs.as "aria-modal"] */
     ariaModal?: bool,
-    /* [@bs.as "aria-multiline"] */
     ariaMultiline?: bool,
-    /* [@bs.as "aria-multiselectable"] */
     ariaMultiselectable?: bool,
-    /* [@bs.as "aria-owns"] */
     ariaOwns?: string,
-    /* [@bs.as "aria-placeholder"] */
     ariaPlaceholder?: string,
-    /* [@bs.as "aria-posinset"] */
     ariaPosinset?: int,
-    /* [@bs.as "aria-readonly"] */
     ariaReadonly?: bool,
-    /* [@bs.as "aria-relevant"] */
     ariaRelevant?: string,
-    /* [@bs.as "aria-required"] */
     ariaRequired?: bool,
-    /* [@bs.as "aria-roledescription"] */
     ariaRoledescription?: string,
-    /* [@bs.as "aria-rowcount"] */
     ariaRowcount?: int,
-    /* [@bs.as "aria-rowindex"] */
     ariaRowindex?: int,
-    /* [@bs.as "aria-rowspan"] */
     ariaRowspan?: int,
-    /* [@bs.as "aria-selected"] */
     ariaSelected?: bool,
-    /* [@bs.as "aria-setsize"] */
     ariaSetsize?: int,
-    /* [@bs.as "aria-sort"] */
     ariaSort?: string,
-    /* [@bs.as "aria-valuemax"] */
     ariaValuemax?: float,
-    /* [@bs.as "aria-valuemin"] */
     ariaValuemin?: float,
-    /* [@bs.as "aria-valuenow"] */
     ariaValuenow?: float,
-    /* [@bs.as "aria-valuetext"] */
     ariaValuetext?: string,
     ascent?: string,
     async?: bool,
@@ -405,7 +374,6 @@ module DynamicComponent = {
     title?: string,
     to_?: string,
     transform?: string,
-    /* [@bs.as "type"] */
     type_?: string,
     typeof?: string,
     u1?: string,
@@ -542,14 +510,16 @@ module DynamicComponent = {
     ignore(deleteProp(newProps, "var"))
     createVariadicElement("div", newProps)
   }
-}
+} */
 
 module App = {
   @react.component
   let make = () => {
     <>
       <OneSingleProperty> {React.string("Demo of...")} </OneSingleProperty>
-      /* <DynamicComponent onClick=Js.log> {React.string("Demo of...")} </DynamicComponent> */
+      <DynamicComponent onClick=Js.log var=#hex("333")>
+        {React.string("Demo of...")}
+      </DynamicComponent>
     </>
   }
 }
