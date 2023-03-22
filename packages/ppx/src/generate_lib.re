@@ -11,6 +11,9 @@ module ReasonAttributes = {
 
   let rawLiteral = (~loc) =>
     Helper.Attr.mk(withLoc("reason.raw_literal", ~loc), PStr([]));
+
+  let reactComponent = (~loc) =>
+    Helper.Attr.mk(withLoc("react.component", ~loc), PStr([]));
 };
 
 module BuckleScriptAttributes = {
@@ -213,7 +216,7 @@ let propItem = (~loc, name) => {
     Helper.Exp.ident(~loc, withLoc(Lident("props"), ~loc)),
     withLoc(Lident(name), ~loc),
   );
-  };
+};
 
 /* let stylesObject = { "className": className, "ref": props.ref }; */
 let stylesAndRefObject = (~loc) => {
@@ -254,7 +257,8 @@ let className = (~loc, expr) =>
   Helper.Vb.mk(
     ~loc,
     Helper.Pat.mk(~loc, Ppat_var(withLoc("className", ~loc))),
-    [%expr [%e expr] ++ getOrEmpty(props.className)],
+    [%expr [%e expr]],
+    /* [%expr [%e expr] ++ getOrEmpty(props.className)], */
   );
 
 /* deleteInnerRef(. newProps, "innerRef") |> ignore; */
@@ -321,6 +325,7 @@ let getLabel = str =>
 let makeFn = (~loc, ~htmlTag, ~styledExpr, ~makePropTypes, ~variableNames) => {
   Helper.Exp.fun_(
     ~loc,
+    ~attrs=[ReasonAttributes.preserveBraces(~loc)],
     Nolabel,
     None,
     /* props: props */
@@ -364,7 +369,7 @@ let customPropLabel = (~loc, ~optional, name, type_) => {
     ~loc,
     ~attrs=optional ? [BuckleScriptAttributes.optional(~loc)] : [],
     withLoc(name, ~loc),
-    type_,
+    optional ? [%type: option([%t type_])] : type_
   );
 };
 
@@ -381,11 +386,13 @@ let recordLabel = (~loc, name, kind, alias) => {
     | None => [BuckleScriptAttributes.optional(~loc)]
     };
 
+  let type_ = Helper.Typ.constr(~loc, withLoc(kind, ~loc), []);
+
   Helper.Type.field(
     ~loc,
     ~attrs,
     withLoc(name, ~loc),
-    Helper.Typ.constr(~loc, withLoc(kind, ~loc), []),
+    [%type: option([%t type_])]
   );
 };
 
@@ -417,20 +424,21 @@ let childrenLabel = (~loc) =>
 
 /* onDragOver: ReactEvent.Mouse.t => unit */
 let recordEventLabel = (~loc, name, kind) => {
+  let type_ = Helper.Typ.arrow(
+    ~loc,
+    Nolabel,
+    Helper.Typ.constr(~loc, withLoc(kind, ~loc), []),
+    Helper.Typ.constr(~loc, withLoc(Lident("unit"), ~loc), []),
+  );
   Helper.Type.field(
     ~loc,
     ~attrs=[BuckleScriptAttributes.optional(~loc)],
     withLoc(name, ~loc),
-    Helper.Typ.arrow(
-      ~loc,
-      Nolabel,
-      Helper.Typ.constr(~loc, withLoc(kind, ~loc), []),
-      Helper.Typ.constr(~loc, withLoc(Lident("unit"), ~loc), []),
-    ),
+    type_
   );
 };
 
-let makePropsWithParams= (~loc, params, dynamicProps) => {
+let makePropsWithParams = (~loc, params, dynamicProps) => {
   let dynamicPropNames = dynamicProps |> List.map(d => d.pld_name.txt);
 
   let makeProps =

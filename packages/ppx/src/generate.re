@@ -130,18 +130,18 @@ let styledDynamic =
 
   let variableList =
     labeledArguments
-    |> List.map(((arg, optionalArg, _, _, loc, type_)) => {
+    |> List.map(((arg, defaultExpr, _, _, loc, type_)) => {
          let (kind, type_) =
            switch (type_) {
            | Some(type_) => (`Typed, type_)
            | None => (`Open, typeVariable(~loc, getLabel(arg)))
            };
 
-         (arg, optionalArg, kind, type_);
+         (arg, defaultExpr, kind, type_);
        });
 
   /* ('a, 'b) */
-  let makePropsParameters: list(core_type) =
+  let propsGenericParams: list(core_type) =
     variableList
     |> List.filter_map(
          fun
@@ -150,16 +150,16 @@ let styledDynamic =
        );
 
   /* type makeProps('a) = { a: 'a } */
-  let variableMakeProps =
+  let propGenericFields =
     variableList
-    |> List.map(((arg, optionalArg, _, type_)) =>
-         customPropLabel(~loc, ~optional=Option.is_none(optionalArg), getLabel(arg), type_)
+    |> List.map(((arg, defaultValue, _, type_)) =>
+         customPropLabel(~loc, ~optional=Option.is_some(defaultValue), getLabel(arg), type_)
        );
 
   /* (~arg1=props.arg1, ~arg2=props.arg2, ...) */
   let styledArguments =
     List.map(
-      ((argumentName, _, _, _, loc, _)) => {
+      ((argumentName, _defaultValue, _, _, loc, _)) => {
         let value = Generate_lib.propItem(~loc, getLabel(argumentName));
         (argumentName, value);
       },
@@ -232,7 +232,7 @@ let styledDynamic =
   Builder.pmod_structure(
     ~loc,
     [
-      makeProps(~loc, Some((makePropsParameters, variableMakeProps))),
+      makeProps(~loc, Some((propsGenericParams, propGenericFields))),
       bindingCreateVariadicElement(~loc),
       defineDeletePropFn(~loc),
       defineAssign2(~loc),
@@ -247,7 +247,7 @@ let styledDynamic =
         ~loc,
         ~htmlTag,
         ~styledExpr=stylesFunctionCall,
-        ~makePropTypes=makePropsParameters,
+        ~makePropTypes=propsGenericParams,
         ~labeledArguments,
       ),
     ],

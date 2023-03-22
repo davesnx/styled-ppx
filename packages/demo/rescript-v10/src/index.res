@@ -16,8 +16,8 @@ module OneSingleProperty = %styled.div("display: block")
 module DynamicComponent = %styled.div(
   (~var) =>
     `
-    color: $(var);
-    display: block;
+  color: $(var);
+  display: block;
 `
 )
 
