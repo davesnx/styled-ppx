@@ -316,7 +316,6 @@ let traverser = {
   }
 };
 
-
 /* TODO: Throw better errors when this pattern doesn't match */
 let static_pattern =
   Ast_pattern.(

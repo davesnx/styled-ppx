@@ -153,7 +153,12 @@ let styledDynamic =
   let propGenericFields =
     variableList
     |> List.map(((arg, defaultValue, _, type_)) =>
-         customPropLabel(~loc, ~optional=Option.is_some(defaultValue), getLabel(arg), type_)
+         customPropLabel(
+           ~loc,
+           ~optional=Option.is_some(defaultValue),
+           getLabel(arg),
+           type_,
+         )
        );
 
   /* (~arg1=props.arg1, ~arg2=props.arg2, ...) */

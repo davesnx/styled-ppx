@@ -224,10 +224,7 @@ let stylesAndRefObject = (~loc) => {
     withLoc(~loc, Lident("className")),
     Helper.Exp.ident(~loc, withLoc(Lident("className"), ~loc)),
   );
-  let refProp = (
-    withLoc(~loc, Lident("ref")),
-    propItem(~loc, "ref"),
-  );
+  let refProp = (withLoc(~loc, Lident("ref")), propItem(~loc, "ref"));
   let record = Helper.Exp.record(~loc, [className, refProp], None);
   Helper.Vb.mk(
     ~loc,
@@ -369,7 +366,7 @@ let customPropLabel = (~loc, ~optional, name, type_) => {
     ~loc,
     ~attrs=optional ? [BuckleScriptAttributes.optional(~loc)] : [],
     withLoc(name, ~loc),
-    optional ? [%type: option([%t type_])] : type_
+    type_,
   );
 };
 
@@ -386,13 +383,11 @@ let recordLabel = (~loc, name, kind, alias) => {
     | None => [BuckleScriptAttributes.optional(~loc)]
     };
 
-  let type_ = Helper.Typ.constr(~loc, withLoc(kind, ~loc), []);
-
   Helper.Type.field(
     ~loc,
     ~attrs,
     withLoc(name, ~loc),
-    [%type: option([%t type_])]
+    Helper.Typ.constr(~loc, withLoc(kind, ~loc), []),
   );
 };
 
@@ -424,17 +419,18 @@ let childrenLabel = (~loc) =>
 
 /* onDragOver: ReactEvent.Mouse.t => unit */
 let recordEventLabel = (~loc, name, kind) => {
-  let type_ = Helper.Typ.arrow(
-    ~loc,
-    Nolabel,
-    Helper.Typ.constr(~loc, withLoc(kind, ~loc), []),
-    Helper.Typ.constr(~loc, withLoc(Lident("unit"), ~loc), []),
-  );
+  let type_ =
+    Helper.Typ.arrow(
+      ~loc,
+      Nolabel,
+      Helper.Typ.constr(~loc, withLoc(kind, ~loc), []),
+      Helper.Typ.constr(~loc, withLoc(Lident("unit"), ~loc), []),
+    );
   Helper.Type.field(
     ~loc,
     ~attrs=[BuckleScriptAttributes.optional(~loc)],
     withLoc(name, ~loc),
-    type_
+    type_,
   );
 };
 
@@ -478,6 +474,7 @@ let makePropsWithParams = (~loc, params, dynamicProps) => {
         Helper.Type.mk(
           ~loc,
           ~priv=Public,
+          ~attrs=[BuckleScriptAttributes.optional(~loc)],
           ~kind=Ptype_record(reactProps),
           ~params,
           withLoc("props", ~loc),
@@ -491,9 +488,10 @@ let makePropsWithParams = (~loc, params, dynamicProps) => {
 /* type props('a, 'b) = { ... } */
 let makeProps = (~loc, customProps) => {
   switch (customProps) {
-    | Some((params, dynamicProps)) => makePropsWithParams(~loc, params, dynamicProps);
-    | None => [%stri type props = JsxDOM.domProps];
-  }
+  | Some((params, dynamicProps)) =>
+    makePropsWithParams(~loc, params, dynamicProps)
+  | None => [%stri type props = JsxDOM.domProps]
+  };
 };
 
 /* let deleteProp = [%raw "(newProps, key) => delete newProps[key]"] */
