@@ -23,7 +23,7 @@ module BuckleScriptAttributes = {
   };
 
   let optional = (~loc) =>
-    Helper.Attr.mk(withLoc("res.optional", ~loc), PStr([]));
+    Helper.Attr.mk(withLoc("ns.optional", ~loc), PStr([]));
 
   /* [@bs.deriving abstract] */
   let derivingAbstract = (~loc) =>

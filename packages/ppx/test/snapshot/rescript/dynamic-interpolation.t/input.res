@@ -1,7 +1,7 @@
 module DynamicComponent = %styled.div(
   (~var) =>
-    `
-  color: $(var);
-  display: flex;
-`
+    j`
+    color: $(var);
+    display: block;
+  `
 )
