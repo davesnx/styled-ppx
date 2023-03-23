@@ -495,12 +495,6 @@
         < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t =
           "Object.assign"
           "\132\149\166\190\000\000\000\022\000\000\000\004\000\000\000\016\000\000\000\014\176\145C@\196-Object.assign@@@"
-      let getOrEmpty str =
-        ((match str with
-          | ((Some (str))[@explicit_arity ]) ->
-              ((" ")[@reason.raw_literal " "]) ^ str
-          | None -> (("")[@reason.raw_literal ""]))
-        [@reason.preserve_braces ])
       let styles ~var:((var)[@ns.namedArgLoc ])  _ =
         (Js.Internal.opaqueFullApply
            ((Js.Internal.opaque (CssJs.style : _ Js.Fn.arity1).I1)
@@ -533,7 +527,7 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
 
   $ rescript convert fixed.ml
   Error when converting fixed.ml
-  File "", line 506, characters 46-47:
+  File "", line 500, characters 46-47:
   Error: Syntax error: operator expected.
   
 

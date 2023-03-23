@@ -955,12 +955,6 @@
     [@bs.val]
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
-    let getOrEmpty = str => {
-      switch (str) {
-      | Some(str) => " " ++ str
-      | None => ""
-      };
-    };
     let styles = (~size, _) => {
       Js.log("Logging when render");
       CssJs.style(. [|
@@ -1932,12 +1926,6 @@
     [@bs.val]
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
-    let getOrEmpty = str => {
-      switch (str) {
-      | Some(str) => " " ++ str
-      | None => ""
-      };
-    };
     let styles = (~variant, _) => {
       let color = Theme.button(variant);
       CssJs.style(. [|

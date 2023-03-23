@@ -10,12 +10,6 @@
     [@bs.val]
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
-    let getOrEmpty = str => {
-      switch (str) {
-      | Some(str) => " " ++ str
-      | None => ""
-      };
-    };
     let styles = CssJs.style(. [|CssJs.label("SelfClosingElement")|]);
     let make = (props: props) => {
       let className = styles;

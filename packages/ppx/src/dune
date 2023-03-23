@@ -9,8 +9,7 @@
   styled-ppx.css-parser
   styled-ppx.reason-css-parser
   styled-ppx.string-interpolation
-  ppxlib
-  str)
+  ppxlib)
  (ppx_runtime_libraries styled-ppx.runtime)
  (preprocess
   (pps ppxlib.metaquot)))

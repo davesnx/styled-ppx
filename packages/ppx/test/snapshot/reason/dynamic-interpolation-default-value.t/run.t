@@ -958,12 +958,6 @@
     [@bs.val]
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
-    let getOrEmpty = str => {
-      switch (str) {
-      | Some(str) => " " ++ str
-      | None => ""
-      };
-    };
     let styles = (~var=CssJs.hex("333"), _) =>
       CssJs.style(. [|
         CssJs.label("DynamicComponentWithDefaultValue"),

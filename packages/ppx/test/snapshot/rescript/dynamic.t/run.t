@@ -500,11 +500,6 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
     external assign2: ({..}, {..}, {..}) => {..} =
       "Object.assign"
       "„•¦¾            °‘C@Ä-Object.assign@@@"
-    let getOrEmpty = str =>
-      switch str {
-      | Some(str) => (@reason.raw_literal(" ") " ") ++ str
-      | None => @reason.raw_literal("") ""
-      }
     let styles = (~var, _): _ =>
       Js.Internal.opaqueFullApply(
         Js.Internal.opaque((CssJs.style: Js.Fn.arity1<_>))([

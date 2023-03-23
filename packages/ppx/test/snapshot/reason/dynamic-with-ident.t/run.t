@@ -957,12 +957,6 @@
     [@bs.val]
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
-    let getOrEmpty = str => {
-      switch (str) {
-      | Some(str) => " " ++ str
-      | None => ""
-      };
-    };
     let styles = (~a as _, _) => CssJs.style(. cssRule);
     let make = (props: props('a)) => {
       let className = styles(~a=props.a, ());
