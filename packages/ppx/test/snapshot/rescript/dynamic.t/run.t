@@ -1,4 +1,4 @@
-  $ bsc -ppx styled-ppx -only-parse -bs-ast -bs-jsx 4 -bs-loc -bs-diagnose -bs-no-version-header -bs-ml-out -bs-super-errors -color never -dsource input.res 2> output.ml
+  $ bsc -ppx "rewriter --jsx-version 4" -only-parse -bs-ast -bs-jsx 4 -bs-loc -bs-diagnose -bs-no-version-header -bs-ml-out -bs-no-builtin-ppx -bs-super-errors -color never -dsource input.res 2> output.ml
 
 No clue why bsc generates a invalid syntax, but it does. This removes this particual bit.
   $ sed -e 's/.I1//g' output.ml > fixed.ml
@@ -482,47 +482,27 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
       onWheel?: ReactEvent.Wheel.t => unit,
       var: 'var,
     }
-    external createVariadicElement: (string, {..}) => React.element =
-      "createElement"
-      "Ñï¶æ            ∞ëB@ƒ-createElementê†%react@@@"
-    let deleteProp =
-      @internal.expansive @reason.raw_literal("(newProps, key) => delete newProps[key]")
-      {
-        module J = {
-          external unsafe_expr: _ => _ = "#raw_expr"
-        }
-  
-        J.unsafe_expr(
-          @reason.raw_literal("(newProps, key) => delete newProps[key]")
-          "(newProps, key) => delete newProps[key]",
-        )
-      }
+    @val @module(@reason.raw_literal "react")
+    external createVariadicElement: (string, {..}) => React.element = "createElement"
+    let deleteProp = %raw(
+      @reason.raw_literal("(newProps, key) => delete newProps[key]")
+      "(newProps, key) => delete newProps[key]"
+    )
     let getOrEmpty = str =>
       switch str {
       | Some(str) => (@reason.raw_literal(" ") " ") ++ str
       | None => @reason.raw_literal("") ""
       }
-    external assign2: ({..}, {..}, {..}) => {..} =
-      "Object.assign"
-      "Ñï¶æ            ∞ëC@ƒ-Object.assign@@@"
-    let styles = (~var, _): _ =>
-      Js.Internal.opaqueFullApply(
-        Js.Internal.opaque((CssJs.style: Js.Fn.arity1<_>))([
-          CssJs.label("DynamicComponent"),
-          (CssJs.color(var): CssJs.rule),
-          CssJs.display(#flex),
-        ]),
-      )
+    @val external assign2: ({..}, {..}, {..}) => {..} = "Object.assign"
+    let styles = (~var, _) =>
+      CssJs.style(. [
+        CssJs.label("DynamicComponent"),
+        (CssJs.color(var): CssJs.rule),
+        CssJs.display(#flex),
+      ])
     let make = (props: props<'var>) => {
       let className = styles(~var=props.var, ()) ++ getOrEmpty(props.className)
-      let stylesObject = {
-        module J = {
-          external unsafe_expr: (~className: 'a0, ~ref: 'a1) => {"className": 'a0, "ref": 'a1} =
-            ""
-            "Ñï¶æ      	      ë††Aê)className††Aê#ref@"
-        }
-        J.unsafe_expr(~className, ~ref=props.ref)
-      }
+      let stylesObject = {"className": className, "ref": props.ref}
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject)
       ignore(deleteProp(newProps, "var"))
       createVariadicElement(@reason.raw_literal("div") "div", newProps)

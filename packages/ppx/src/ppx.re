@@ -343,12 +343,31 @@ let _ =
     ~doc=Settings.compatibleWithBsEmotionPpx.doc,
   );
 
+let _ =
+  Driver.add_arg(
+    Settings.jsxVersion.flag,
+    Arg.Int(Settings.Update.jsxVersion),
+    ~doc=Settings.jsxVersion.doc,
+  );
+
+let _ =
+  Driver.add_arg(
+    Settings.jsxMode.flag,
+    Arg.String(value => Settings.Update.jsxMode(Some(value))),
+    ~doc=Settings.jsxMode.doc,
+  );
+
 let compatibleWithBsEmotionPpx =
   Settings.find(Settings.compatibleWithBsEmotionPpx.flag, Sys.argv);
 
 let (version, mode) = Bs_config.getJSX();
-Settings.Update.jsxVersion(version);
-Settings.Update.jsxMode(mode);
+
+switch (version) {
+| Some(version) =>
+  Settings.Update.jsxVersion(version);
+  Settings.Update.jsxMode(mode);
+| None => ()
+};
 
 let _ =
   Driver.register_transformation(

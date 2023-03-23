@@ -2,8 +2,8 @@
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   module DynamicCompnentWithIdent = {
-    [@ns.optional]
-    type props('a) = {
+    [@bs.deriving abstract]
+    type makeProps('a) = {
       [@ns.optional]
       ref: ReactDOM.domRef,
       [@ns.optional]
@@ -964,9 +964,10 @@
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles = (~a as _, _) => CssJs.style(. cssRule);
-    let make = (props: props('a)) => {
-      let className = styles(~a=props.a, ()) ++ getOrEmpty(props.className);
-      let stylesObject = {"className": className, "ref": props.ref};
+    let make = (props: makeProps('a)) => {
+      let className =
+        styles(~a=aGet(props), ()) ++ getOrEmpty(classNameGet(props));
+      let stylesObject = {"className": className, "ref": refGet(props)};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(newProps, "a"));
       createVariadicElement("div", newProps);

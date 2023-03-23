@@ -2,8 +2,8 @@
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   module ArrayDynamicComponent = {
-    [@ns.optional]
-    type props('var) = {
+    [@bs.deriving abstract]
+    type makeProps('var) = {
       [@ns.optional]
       ref: ReactDOM.domRef,
       [@ns.optional]
@@ -972,10 +972,10 @@
         | `White => CssJs.color(`hex({js|FAFAFA|js}))
         },
       |]);
-    let make = (props: props('var)) => {
+    let make = (props: makeProps('var)) => {
       let className =
-        styles(~var=props.var, ()) ++ getOrEmpty(props.className);
-      let stylesObject = {"className": className, "ref": props.ref};
+        styles(~var=varGet(props), ()) ++ getOrEmpty(classNameGet(props));
+      let stylesObject = {"className": className, "ref": refGet(props)};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(newProps, "var"));
       createVariadicElement("div", newProps);

@@ -1,4 +1,4 @@
-  $ bsc -ppx styled-ppx -only-parse -bs-ast -bs-jsx 4 -bs-loc -bs-diagnose -bs-no-version-header -bs-ml-out -bs-no-builtin-ppx -bs-super-errors -color never -dsource input.res 2> output.ml
+  $ bsc -ppx "rewriter --jsx-version 4" -only-parse -bs-ast -bs-jsx 4 -bs-loc -bs-diagnose -bs-no-version-header -bs-ml-out -bs-no-builtin-ppx -bs-super-errors -color never -dsource input.res 2> output.ml
 
   $ cat output.ml
   module ArrayDynamicComponent =
@@ -504,18 +504,13 @@
               | `Black -> CssJs.color (`hex {js|999999|js})
               | `White -> CssJs.color (`hex {js|FAFAFA|js})))|])
         [@bs ])
-      let make =
-        ((fun (props : 'var props) ->
-            let className =
-              (styles ~var:(props.var) ()) ^ (getOrEmpty props.className) in
-            ((let stylesObject = [%bs.obj { className; ref = (props.ref) }] in
-              let newProps =
-                assign2 (Js.Obj.empty ()) (Obj.magic props) stylesObject in
-              ignore (deleteProp newProps "var");
-              createVariadicElement (("div")[@reason.raw_literal "div"])
-                newProps)
-              [@reason.preserve_braces ]))
-        [@reason.preserve_braces ])
+      let make (props : 'var props) =
+        let className =
+          (styles ~var:(props.var) ()) ^ (getOrEmpty props.className) in
+        let stylesObject = [%bs.obj { className; ref = (props.ref) }] in
+        let newProps = assign2 (Js.Obj.empty ()) (Obj.magic props) stylesObject in
+        ignore (deleteProp newProps "var");
+        createVariadicElement (("div")[@reason.raw_literal "div"]) newProps
     end
 
 No clue why bsc generates a invalid syntax, but it does. This removes this particual bit.

@@ -222,12 +222,29 @@ let variadicElement = (~loc, ~htmlTag) => {
   );
 };
 
-let propItem = (~loc, name) => {
+let propRecordAccess = (~loc, name) => {
   Helper.Exp.field(
     ~loc,
     Helper.Exp.ident(~loc, withLoc(Lident("props"), ~loc)),
     withLoc(Lident(name), ~loc),
   );
+};
+
+/* propNameGet(props) */
+let abstractGetProp = (~loc, name) => {
+  Helper.Exp.apply(
+    ~loc,
+    Helper.Exp.ident(~loc, withLoc(Lident(name ++ "Get"), ~loc)),
+    [(Nolabel, Helper.Exp.ident(~loc, withLoc(Lident("props"), ~loc)))],
+  );
+};
+
+let propItem = (~loc, name) => {
+  switch (File.get()) {
+  | Some(ReScript) when Settings.Get.jsxVersion() === 4 =>
+    propRecordAccess(~loc, name)
+  | _ => abstractGetProp(~loc, name)
+  };
 };
 
 /* let stylesObject = { "className": className, "ref": props.ref }; */
@@ -262,12 +279,14 @@ let newProps = (~loc) => {
 };
 
 /* let className = styles ++ props.className; */
-let className = (~loc, expr) =>
+let className = (~loc, expr) => {
+  let classNameProp = propItem(~loc, "className");
   Helper.Vb.mk(
     ~loc,
     Helper.Pat.mk(~loc, Ppat_var(withLoc("className", ~loc))),
-    [%expr [%e expr] ++ getOrEmpty(props.className)],
+    [%expr [%e expr] ++ getOrEmpty([%e classNameProp])],
   );
+};
 
 /* deleteInnerRef(. newProps, "innerRef") |> ignore; */
 let deleteProp = (~loc, key) => {
@@ -299,6 +318,12 @@ let generateSequence = (~loc, fns) => {
   createVariadicElement("div", newProps);
  */
 let makeBody = (~loc, ~htmlTag, ~styledExpr, ~variables) => {
+  let attrs =
+    switch (File.get()) {
+    | Some(ReScript) => []
+    | Some(Reason)
+    | _ => [ReasonAttributes.preserveBraces(~loc)]
+    };
   let sequence =
     [variadicElement(~loc, ~htmlTag)]
     |> List.append(List.map(deleteProp(~loc), variables));
@@ -309,7 +334,7 @@ let makeBody = (~loc, ~htmlTag, ~styledExpr, ~variables) => {
     [className(~loc, styledExpr)],
     Helper.Exp.let_(
       ~loc,
-      ~attrs=[ReasonAttributes.preserveBraces(~loc)],
+      ~attrs,
       Nonrecursive,
       [stylesAndRefObject(~loc)],
       Helper.Exp.let_(
@@ -330,10 +355,29 @@ let getLabel = str =>
   };
 
 /* let make = (props: makeProps) => + makeBody */
-let makeFn = (~loc, ~htmlTag, ~styledExpr, ~makePropTypes, ~variableNames) => {
+let makeFnJSX3 = (~loc, ~htmlTag, ~styledExpr, ~makePropTypes, ~variableNames) => {
   Helper.Exp.fun_(
     ~loc,
-    ~attrs=[ReasonAttributes.preserveBraces(~loc)],
+    Nolabel,
+    None,
+    /* props: makeProps */
+    Helper.Pat.constraint_(
+      ~loc,
+      Helper.Pat.mk(~loc, Ppat_var(withLoc("props", ~loc))),
+      Helper.Typ.constr(
+        ~loc,
+        withLoc(Lident("makeProps"), ~loc),
+        makePropTypes,
+      ),
+    ),
+    makeBody(~loc, ~htmlTag, ~styledExpr, ~variables=variableNames),
+  );
+};
+
+/* let make = (props: props) => + makeBody */
+let makeFnJSX4 = (~loc, ~htmlTag, ~styledExpr, ~makePropTypes, ~variableNames) => {
+  Helper.Exp.fun_(
+    ~loc,
     Nolabel,
     None,
     /* props: props */
@@ -356,19 +400,15 @@ let component =
   let variableNames =
     List.map(((arg, _, _, _, _, _)) => getLabel(arg), labeledArguments);
 
-  Helper.Str.mk(
-    ~loc,
-    Pstr_value(
-      Nonrecursive,
-      [
-        Helper.Vb.mk(
-          ~loc,
-          Helper.Pat.mk(~loc, Ppat_var(withLoc("make", ~loc))),
-          makeFn(~loc, ~htmlTag, ~styledExpr, ~makePropTypes, ~variableNames),
-        ),
-      ],
-    ),
-  );
+  let makeFn =
+    switch (File.get()) {
+    | Some(ReScript) when Settings.Get.jsxVersion() === 4 =>
+      makeFnJSX4(~loc, ~htmlTag, ~styledExpr, ~makePropTypes, ~variableNames)
+    | _ =>
+      makeFnJSX3(~loc, ~htmlTag, ~styledExpr, ~makePropTypes, ~variableNames)
+    };
+
+  [%stri let make = [%e makeFn]];
 };
 
 /* color: string */
@@ -495,9 +535,7 @@ let makePropsWithParams = (~loc, params, dynamicProps) => {
   );
 };
 
-/* type props = { ... } */
-/* type props('a, 'b) = { ... } */
-let makeProps = (~loc, customProps) => {
+let makePropsJSX4 = (~loc, customProps) => {
   switch (customProps) {
   | Some((params, dynamicProps)) =>
     makePropsWithParams(~loc, params, dynamicProps)
@@ -505,28 +543,78 @@ let makeProps = (~loc, customProps) => {
   };
 };
 
-/* let deleteProp = [%raw "(newProps, key) => delete newProps[key]"] */
-let defineDeletePropFn = (~loc) => {
-  let fnName = Helper.Pat.mk(~loc, Ppat_var(withLoc("deleteProp", ~loc)));
-  let rawDeleteKeyword = [%expr
-    [%raw "(newProps, key) => delete newProps[key]"]
-  ];
+/* type makeProps = { ... } */
+/* type makeProps('a, 'b) = { ... } */
+let makeMakeProps = (~loc, customProps) => {
+  let (params, dynamicProps) =
+    switch (customProps) {
+    | None => ([], [])
+    | Some((params, props)) => (params, props)
+    };
+
+  let dynamicPropNames = dynamicProps |> List.map(d => d.pld_name.txt);
+
+  let makeProps =
+    MakeProps.get(dynamicPropNames)
+    |> List.map(domProp =>
+         switch (domProp) {
+         | MakeProps.Event({name, type_}) =>
+           recordEventLabel(~loc, name, MakeProps.eventTypeToIdent(type_))
+         | MakeProps.Attribute({name, type_, alias}) =>
+           recordLabel(
+             ~loc,
+             name,
+             MakeProps.attributeTypeToIdent(type_),
+             alias,
+           )
+         }
+       );
+
+  /* List of [@bs.optional] prop: type */
+  let reactProps =
+    List.append(
+      [domRefLabel(~loc), childrenLabel(~loc), ...makeProps],
+      dynamicProps,
+    );
+
+  let params =
+    List.map(
+      type_ => (type_, (Asttypes.NoVariance, Asttypes.NoInjectivity)),
+      params,
+    ) /* TODO: Made correct ast, not sure if it matter */;
 
   Helper.Str.mk(
     ~loc,
-    Pstr_value(
-      Nonrecursive,
-      [Helper.Vb.mk(~loc, fnName, rawDeleteKeyword)],
+    Pstr_type(
+      Recursive,
+      [
+        Helper.Type.mk(
+          ~loc,
+          ~priv=Public,
+          ~attrs=[BuckleScriptAttributes.derivingAbstract(~loc)],
+          ~kind=Ptype_record(reactProps),
+          ~params,
+          withLoc("makeProps", ~loc),
+        ),
+      ],
     ),
   );
 };
 
-let jsT = (~loc) =>
-  Helper.Typ.constr(
-    ~loc,
-    withLoc(Ldot(Lident("Js"), "t"), ~loc),
-    [Helper.Typ.object_(~loc, [], Open)],
-  );
+/* type props = { ... } */
+/* type props('a, 'b) = { ... } */
+let makeProps = (~loc, customProps) => {
+  switch (File.get()) {
+  | Some(ReScript) when Settings.Get.jsxVersion() === 4 =>
+    makePropsJSX4(~loc, customProps)
+  | Some(Reason)
+  | _ => makeMakeProps(~loc, customProps)
+  };
+};
+
+let defineDeletePropFn = (~loc) => {
+  [%stri let deleteProp = [%raw "(newProps, key) => delete newProps[key]"]];
+};
 
 /* [%stri external assign2 : Js.t({ .. }) => Js.t({ .. }) => Js.t({ .. }) => Js.t({ .. }) = "Object.assign"] */
 let defineAssign2 = (~loc) => {
@@ -537,12 +625,17 @@ let defineAssign2 = (~loc) => {
       Helper.Typ.arrow(
         ~loc,
         Nolabel,
-        jsT(~loc),
+        [%type: Js.t({..})],
         Helper.Typ.arrow(
           ~loc,
           Nolabel,
-          jsT(~loc),
-          Helper.Typ.arrow(~loc, Nolabel, jsT(~loc), jsT(~loc)),
+          [%type: Js.t({..})],
+          Helper.Typ.arrow(
+            ~loc,
+            Nolabel,
+            [%type: Js.t({..})],
+            [%type: Js.t({..})],
+          ),
         ),
       ),
     pval_prim: ["Object.assign"],

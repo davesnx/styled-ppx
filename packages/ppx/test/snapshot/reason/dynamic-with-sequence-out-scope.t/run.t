@@ -4,8 +4,8 @@
   let sharedStylesBetweenDynamicComponents = (color): CssJs.rule =>
     CssJs.color(color);
   module DynamicCompnentWithLetIn = {
-    [@ns.optional]
-    type props('color) = {
+    [@bs.deriving abstract]
+    type makeProps('color) = {
       [@ns.optional]
       ref: ReactDOM.domRef,
       [@ns.optional]
@@ -969,10 +969,10 @@
       let styles = sharedStylesBetweenDynamicComponents(color);
       CssJs.style(. styles);
     };
-    let make = (props: props('color)) => {
+    let make = (props: makeProps('color)) => {
       let className =
-        styles(~color=props.color, ()) ++ getOrEmpty(props.className);
-      let stylesObject = {"className": className, "ref": props.ref};
+        styles(~color=colorGet(props), ()) ++ getOrEmpty(classNameGet(props));
+      let stylesObject = {"className": className, "ref": refGet(props)};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(newProps, "color"));
       createVariadicElement("div", newProps);

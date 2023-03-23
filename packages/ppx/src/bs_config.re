@@ -85,9 +85,9 @@ let getJSX = () => {
       switch (readJsxVersion(field)) {
       | Ok(version) when version === 4 =>
         switch (readJsxMode(field)) {
-        | Error(_e) => (4, None)
-        | Ok(mode) when mode == "classic" => (4, Some(mode))
-        | Ok(mode) when mode == "automatic" => (4, Some(mode))
+        | Error(_e) => (Some(4), None)
+        | Ok(mode) when mode == "classic" => (Some(4), Some(mode))
+        | Ok(mode) when mode == "automatic" => (Some(4), Some(mode))
         | Ok(mode) =>
           failwith(
             "Error parsing bsconfig.json. Invalid `mode` field under `jsx`. Expected `classic` or `automatic` but got `"
@@ -95,11 +95,11 @@ let getJSX = () => {
             ++ "`.",
           )
         }
-      | Ok(version) when version === 3 => (3, None)
-      | Error(_e) => (3, None)
-      | _ => (3, None)
+      | Ok(version) when version === 3 => (Some(3), None)
+      | Error(_e) => (None, None)
+      | _ => (None, None)
       }
     }
-  | None => (3, None)
+  | None => (None, None)
   };
 };

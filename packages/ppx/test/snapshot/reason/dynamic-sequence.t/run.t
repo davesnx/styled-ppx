@@ -2,8 +2,8 @@
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   module SequenceDynamicComponent = {
-    [@ns.optional]
-    type props('size) = {
+    [@bs.deriving abstract]
+    type makeProps('size) = {
       [@ns.optional]
       ref: ReactDOM.domRef,
       [@ns.optional]
@@ -968,18 +968,18 @@
         CssJs.display(`block),
       |]);
     };
-    let make = (props: props('size)) => {
+    let make = (props: makeProps('size)) => {
       let className =
-        styles(~size=props.size, ()) ++ getOrEmpty(props.className);
-      let stylesObject = {"className": className, "ref": props.ref};
+        styles(~size=sizeGet(props), ()) ++ getOrEmpty(classNameGet(props));
+      let stylesObject = {"className": className, "ref": refGet(props)};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(newProps, "size"));
       createVariadicElement("div", newProps);
     };
   };
   module DynamicComponentWithSequence = {
-    [@ns.optional]
-    type props('variant) = {
+    [@bs.deriving abstract]
+    type makeProps('variant) = {
       [@ns.optional]
       ref: ReactDOM.domRef,
       [@ns.optional]
@@ -1947,10 +1947,11 @@
         CssJs.width(`percent(100.)),
       |]);
     };
-    let make = (props: props('variant)) => {
+    let make = (props: makeProps('variant)) => {
       let className =
-        styles(~variant=props.variant, ()) ++ getOrEmpty(props.className);
-      let stylesObject = {"className": className, "ref": props.ref};
+        styles(~variant=variantGet(props), ())
+        ++ getOrEmpty(classNameGet(props));
+      let stylesObject = {"className": className, "ref": refGet(props)};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(newProps, "variant"));
       createVariadicElement("button", newProps);

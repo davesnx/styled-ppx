@@ -2,8 +2,8 @@
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   module DynamicComponentWithArray = {
-    [@ns.optional]
-    type props('color, 'size) = {
+    [@bs.deriving abstract]
+    type makeProps('color, 'size) = {
       [@ns.optional]
       ref: ReactDOM.domRef,
       [@ns.optional]
@@ -970,11 +970,11 @@
         (CssJs.color(color): CssJs.rule),
         (CssJs.width(size): CssJs.rule),
       |]);
-    let make = (props: props('color, 'size)) => {
+    let make = (props: makeProps('color, 'size)) => {
       let className =
-        styles(~color=props.color, ~size=props.size, ())
-        ++ getOrEmpty(props.className);
-      let stylesObject = {"className": className, "ref": props.ref};
+        styles(~color=colorGet(props), ~size=sizeGet(props), ())
+        ++ getOrEmpty(classNameGet(props));
+      let stylesObject = {"className": className, "ref": refGet(props)};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(newProps, "color"));
       ignore(deleteProp(newProps, "size"));
