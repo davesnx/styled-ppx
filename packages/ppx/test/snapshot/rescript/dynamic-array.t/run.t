@@ -1,4 +1,4 @@
-  $ bsc -ppx styled-ppx -only-parse -bs-ast -bs-jsx 4 -bs-loc -bs-diagnose -bs-no-version-header -bs-ml-out -bs-super-errors -color never -dsource input.res 2> output.ml
+  $ bsc -ppx styled-ppx -only-parse -bs-ast -bs-jsx 4 -bs-loc -bs-diagnose -bs-no-version-header -bs-ml-out -bs-no-builtin-ppx -bs-super-errors -color never -dsource input.res 2> output.ml
 
   $ cat output.ml
   module ArrayDynamicComponent =
@@ -482,15 +482,12 @@
         onWheel: ReactEvent.Wheel.t -> unit [@ns.optional ];
         var: 'var }[@@ns.optional ]
       external createVariadicElement :
-        string -> < .. >  Js.t -> React.element = "createElement"
-          "\132\149\166\190\000\000\000\030\000\000\000\007\000\000\000\024\000\000\000\021\176\145B@\196-createElement\144\160%react@@@"
+        string -> < .. >  Js.t -> React.element = "createElement"[@@bs.val ]
+      [@@bs.module (("react")[@reason.raw_literal ])]
       let deleteProp =
-        ((let module J = struct external unsafe_expr : _ -> _ = "#raw_expr" end
-            in
-            J.unsafe_expr (("(newProps, key) => delete newProps[key]")
-              [@reason.raw_literal "(newProps, key) => delete newProps[key]"]))
-        [@internal.expansive ][@reason.raw_literal
-                                "(newProps, key) => delete newProps[key]"])
+        [%raw
+          (("(newProps, key) => delete newProps[key]")
+            [@reason.raw_literal "(newProps, key) => delete newProps[key]"])]
       let getOrEmpty str =
         ((match str with
           | ((Some (str))[@explicit_arity ]) ->
@@ -499,27 +496,19 @@
         [@reason.preserve_braces ])
       external assign2 :
         < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t =
-          "Object.assign"
-          "\132\149\166\190\000\000\000\022\000\000\000\004\000\000\000\016\000\000\000\014\176\145C@\196-Object.assign@@@"
+          "Object.assign"[@@bs.val ]
       let styles ~var:((var)[@ns.namedArgLoc ])  _ =
-        (Js.Internal.opaqueFullApply
-           ((Js.Internal.opaque (CssJs.style : _ Js.Fn.arity1).I1)
-              [|(CssJs.label "ArrayDynamicComponent");(CssJs.display `block);((
-                match var with
-                | `Black -> CssJs.color (`hex {*j|999999|*j})
-                | `White -> CssJs.color (`hex {*j|FAFAFA|*j})))|]) : _)
+        ((CssJs.style
+            [|(CssJs.label "ArrayDynamicComponent");(CssJs.display `block);((
+              match var with
+              | `Black -> CssJs.color (`hex {js|999999|js})
+              | `White -> CssJs.color (`hex {js|FAFAFA|js})))|])
+        [@bs ])
       let make =
         ((fun (props : 'var props) ->
             let className =
               (styles ~var:(props.var) ()) ^ (getOrEmpty props.className) in
-            ((let stylesObject =
-                let module J =
-                  struct
-                    external unsafe_expr :
-                      className:'a0 ->
-                        ref:'a1 -> < className: 'a0  ;ref: 'a1   >  = ""
-                        "\132\149\166\190\000\000\000\024\000\000\000\t\000\000\000\024\000\000\000\023\145\160\160A\144)className\160\160A\144#ref@"
-                  end in J.unsafe_expr ~className ~ref:(props.ref) in
+            ((let stylesObject = [%bs.obj { className; ref = (props.ref) }] in
               let newProps =
                 assign2 (Js.Obj.empty ()) (Obj.magic props) stylesObject in
               ignore (deleteProp newProps "var");
@@ -533,8 +522,5 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
   $ sed -e 's/.I1//g' output.ml > fixed.ml
 
   $ rescript convert fixed.ml
-  Error when converting fixed.ml
-  File "", line 506, characters 46-47:
-  Error: Syntax error: operator expected.
-  
+
 

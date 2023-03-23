@@ -16,14 +16,18 @@ module ReasonAttributes = {
     Helper.Attr.mk(withLoc("react.component", ~loc), PStr([]));
 };
 
+module ReScriptAttributes = {
+  let optional = (~loc) =>
+    Helper.Attr.mk(withLoc("ns.optional", ~loc), PStr([]));
+  let template = (~loc) =>
+    Helper.Attr.mk(withLoc("res.template", ~loc), PStr([]));
+};
+
 module BuckleScriptAttributes = {
   /* fn(. ) */
   let uncurried = (~loc) => {
     Builder.attribute(~name=withLoc(~loc, "bs"), ~loc, ~payload=PStr([]));
   };
-
-  let optional = (~loc) =>
-    Helper.Attr.mk(withLoc("ns.optional", ~loc), PStr([]));
 
   /* [@bs.deriving abstract] */
   let derivingAbstract = (~loc) =>
@@ -61,9 +65,6 @@ module BuckleScriptAttributes = {
 
   let val_ = (~loc) => Helper.Attr.mk(withLoc("bs.val", ~loc), PStr([]));
 };
-
-/* Alias to not expose BuckleScriptAttributes outside */
-let uncurried = BuckleScriptAttributes.uncurried;
 
 /* (~a, ~b, ~c, _) => args */
 let rec fnWithLabeledArgs = (list, args) =>
@@ -374,7 +375,7 @@ let component =
 let customPropLabel = (~loc, ~optional, name, type_) => {
   Helper.Type.field(
     ~loc,
-    ~attrs=optional ? [BuckleScriptAttributes.optional(~loc)] : [],
+    ~attrs=optional ? [ReScriptAttributes.optional(~loc)] : [],
     withLoc(name, ~loc),
     type_,
   );
@@ -387,10 +388,10 @@ let recordLabel = (~loc, name, kind, alias) => {
   let attrs =
     switch (alias) {
     | Some(alias) => [
-        BuckleScriptAttributes.optional(~loc),
+        ReScriptAttributes.optional(~loc),
         BuckleScriptAttributes.alias(~loc, alias),
       ]
-    | None => [BuckleScriptAttributes.optional(~loc)]
+    | None => [ReScriptAttributes.optional(~loc)]
     };
 
   Helper.Type.field(
@@ -405,7 +406,7 @@ let recordLabel = (~loc, name, kind, alias) => {
 let domRefLabel = (~loc) =>
   Helper.Type.field(
     ~loc,
-    ~attrs=[BuckleScriptAttributes.optional(~loc)],
+    ~attrs=[ReScriptAttributes.optional(~loc)],
     withLoc("ref", ~loc),
     Helper.Typ.constr(
       ~loc,
@@ -418,7 +419,7 @@ let domRefLabel = (~loc) =>
 let childrenLabel = (~loc) =>
   Helper.Type.field(
     ~loc,
-    ~attrs=[BuckleScriptAttributes.optional(~loc)],
+    ~attrs=[ReScriptAttributes.optional(~loc)],
     withLoc("children", ~loc),
     Helper.Typ.constr(
       ~loc,
@@ -438,7 +439,7 @@ let recordEventLabel = (~loc, name, kind) => {
     );
   Helper.Type.field(
     ~loc,
-    ~attrs=[BuckleScriptAttributes.optional(~loc)],
+    ~attrs=[ReScriptAttributes.optional(~loc)],
     withLoc(name, ~loc),
     type_,
   );
@@ -484,7 +485,7 @@ let makePropsWithParams = (~loc, params, dynamicProps) => {
         Helper.Type.mk(
           ~loc,
           ~priv=Public,
-          ~attrs=[BuckleScriptAttributes.optional(~loc)],
+          ~attrs=[ReScriptAttributes.optional(~loc)],
           ~kind=Ptype_record(reactProps),
           ~params,
           withLoc("props", ~loc),

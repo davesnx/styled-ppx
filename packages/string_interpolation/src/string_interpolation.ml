@@ -72,8 +72,8 @@ module Emitter = struct
   let loc = Location.none
   let with_loc ~loc txt = { loc; txt }
 
-  let js_string_to_const ~loc s =
-    Exp.constant ~loc (Const.string ~quotation_delimiter:"js" s)
+  let js_string_to_const ~attrs ~delimiter ~loc s =
+    Exp.constant ~attrs ~loc (Const.string ~quotation_delimiter:delimiter s)
 
   let inline_const ~loc s = Exp.ident ~loc (with_loc s ~loc)
   let concat_fn = { txt = Lident "^"; loc = Location.none } |> Exp.ident ~loc
@@ -86,14 +86,15 @@ module Emitter = struct
       let rest = apply func args in
       pexp_apply ~loc func [ arg; Nolabel, rest ]
 
-  let to_arguments tokens =
+  let to_arguments ~attrs ~delimiter tokens =
     List.rev
     @@ List.fold_left
          (fun acc token ->
            match token with
            | Variable ((v, loc), _) ->
              (Nolabel, v |> Longident.parse |> inline_const ~loc) :: acc
-           | String (v, loc) -> (Nolabel, js_string_to_const ~loc v) :: acc)
+           | String (v, loc) ->
+             (Nolabel, js_string_to_const ~attrs ~delimiter ~loc v) :: acc)
          [] tokens
 
   (* Copied from future version of ppxlib https://github.com/ocaml-ppx/ppxlib/blob/6857ca9ec803f16975e8c2e7984c35cfb50c4a5d/ast/location_error.ml *)
@@ -102,8 +103,8 @@ module Emitter = struct
     let constant = Str.eval (Exp.constant (Const.string msg)) in
     err_extension_name loc, PStr [ constant ]
 
-  let generate tokens =
-    match to_arguments tokens with
+  let generate ~attrs ~delimiter tokens =
+    match to_arguments ~attrs ~delimiter tokens with
     | [] ->
       pexp_extension ~loc:Location.none
       @@ error_extension "Missing string payload"
@@ -125,5 +126,8 @@ let parser_to_emitter (tokens : (Parser.token * Location.t) list) :
          | Parser.String s, None -> None, Emitter.String (s, loc) :: acc)
        (None, []) tokens
 
-let transform ~loc str =
-  str |> Parser.from_string ~loc |> parser_to_emitter |> Emitter.generate
+let transform ?(attrs = []) ~delimiter ~loc str =
+  str
+  |> Parser.from_string ~loc
+  |> parser_to_emitter
+  |> Emitter.generate ~delimiter ~attrs

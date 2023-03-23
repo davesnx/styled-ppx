@@ -31,6 +31,7 @@
     "@opam/ppxlib": "*",
     "@opam/reason": "*",
     "@opam/sedlex": "3.0",
+    "@opam/yojson": "2.0.2",
     "ocaml": "4.14.0",
     "rescript": "10.1.3"
   },

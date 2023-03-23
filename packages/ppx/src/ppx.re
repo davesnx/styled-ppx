@@ -311,6 +311,7 @@ let traverser = {
   as _;
   inherit class Ast_traverse.map as super;
   pub! structure_item = expr => {
+    File.set(expr.pstr_loc.loc_start.pos_fname);
     let expr = super#structure_item(expr);
     Mapper.transform(expr);
   }
@@ -342,19 +343,12 @@ let _ =
     ~doc=Settings.compatibleWithBsEmotionPpx.doc,
   );
 
-let _ =
-  Driver.add_arg(
-    Settings.jsxVersion.flag,
-    Arg.Int(Settings.Update.jsxVersion),
-    ~doc=Settings.jsxVersion.doc,
-  );
+let compatibleWithBsEmotionPpx =
+  Settings.find(Settings.compatibleWithBsEmotionPpx.flag, Sys.argv);
 
-let _ =
-  Driver.add_arg(
-    Settings.jsxMode.flag,
-    Arg.String(Settings.Update.jsxMode),
-    ~doc=Settings.jsxMode.doc,
-  );
+let (version, mode) = Bs_config.getJSX();
+Settings.Update.jsxVersion(version);
+Settings.Update.jsxMode(mode);
 
 let _ =
   Driver.register_transformation(
@@ -370,26 +364,29 @@ let _ =
           "cx",
           Extension.Context.Expression,
           static_pattern,
-          (~loc, ~path as _, payload) => {
-          switch (payload) {
-          | `String({loc, txt}, _delim) =>
-            Payload.parse(txt, loc)
-            |> Css_to_emotion.render_declarations
-            |> Builder.pexp_array(~loc)
-            |> Css_to_emotion.render_style_call
-          | `Array(arr) =>
-            arr
-            |> Builder.pexp_array(~loc)
-            |> Css_to_emotion.render_style_call
-          }
-        }),
+          (~loc, ~path, payload) => {
+            File.set(path);
+            switch (payload) {
+            | `String({loc, txt}, _delim) =>
+              Payload.parse(txt, loc)
+              |> Css_to_emotion.render_declarations
+              |> Builder.pexp_array(~loc)
+              |> Css_to_emotion.render_style_call
+            | `Array(arr) =>
+              arr
+              |> Builder.pexp_array(~loc)
+              |> Css_to_emotion.render_style_call
+            };
+          },
+        ),
       ),
       Context_free.Rule.extension(
         Extension.declare(
-          Settings.Get.compatibleWithBsEmotionPpx() ? "css_" : "css",
+          compatibleWithBsEmotionPpx ? "css_" : "css",
           Extension.Context.Expression,
           string_payload,
-          (~loc as _, ~path as _, payload, _label, _) => {
+          (~loc as _, ~path, payload, _label, _) => {
+            File.set(path);
             let pos = payload.loc.loc_start;
             let container_lnum = pos.pos_lnum;
             let declarationListValues =
@@ -407,7 +404,8 @@ let _ =
           "styled.global",
           Extension.Context.Expression,
           string_payload,
-          (~loc as _, ~path as _, payload, _label, _) => {
+          (~loc as _, ~path, payload, _label, _) => {
+            File.set(path);
             let pos = payload.loc.loc_start;
             let container_lnum = pos.pos_lnum;
             let stylesheet =
@@ -421,7 +419,8 @@ let _ =
           "keyframe",
           Extension.Context.Expression,
           string_payload,
-          (~loc as _, ~path as _, payload, _label, _) => {
+          (~loc as _, ~path, payload, _label, _) => {
+            File.set(path);
             let pos = payload.loc.loc_start;
             let container_lnum = pos.pos_lnum;
             let declarations =

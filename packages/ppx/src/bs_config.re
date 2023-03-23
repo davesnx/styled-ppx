@@ -46,14 +46,60 @@ let getBsConfigFile = () => {
      let handleVerboseLogging verbose_logging =
        Ppx_config.update_config  */
 
-/* let getJSXVersion = () => {
-     switch (getBsConfigFile()) {
-     | Some(bsConfigFile) =>
-       try(bsConfigFile |> Json.Read.from_file |> parseConfig) {
-       | Config_error(_) as e => raise(e)
-       | _ => ()
-       }
-     | None => ()
-     };
-   };
-    */
+module Json = Yojson.Safe;
+
+let memeber_safe = (key, json, msg) =>
+  try(Ok(Json.Util.member(key, json))) {
+  | exn => Error(Printf.sprintf("%s %s", msg, Printexc.to_string(exn)))
+  };
+
+let parseJsxConfig = json =>
+  memeber_safe(
+    "jsx",
+    json,
+    "Error parsing bsconfig.json. Can't find `jsx` field.",
+  );
+
+let readJsxVersion = json =>
+  memeber_safe(
+    "version",
+    json,
+    "Error parsing bsconfig.json. Can't find `version` field under `jsx`.",
+  )
+  |> Result.map(Json.Util.to_int);
+
+let readJsxMode = json =>
+  memeber_safe(
+    "mode",
+    json,
+    "Error parsing bsconfig.json. Can't find `mode` field under `jsx`.",
+  )
+  |> Result.map(Json.Util.to_string);
+
+let getJSX = () => {
+  switch (getBsConfigFile()) {
+  | Some(bsConfigFile) =>
+    switch (bsConfigFile |> Json.from_file |> parseJsxConfig) {
+    | Error(e) => failwith(e)
+    | Ok(field) =>
+      switch (readJsxVersion(field)) {
+      | Ok(version) when version === 4 =>
+        switch (readJsxMode(field)) {
+        | Error(_e) => (4, None)
+        | Ok(mode) when mode == "classic" => (4, Some(mode))
+        | Ok(mode) when mode == "automatic" => (4, Some(mode))
+        | Ok(mode) =>
+          failwith(
+            "Error parsing bsconfig.json. Invalid `mode` field under `jsx`. Expected `classic` or `automatic` but got `"
+            ++ mode
+            ++ "`.",
+          )
+        }
+      | Ok(version) when version === 3 => (3, None)
+      | Error(_e) => (3, None)
+      | _ => (3, None)
+      }
+    }
+  | None => (3, None)
+  };
+};

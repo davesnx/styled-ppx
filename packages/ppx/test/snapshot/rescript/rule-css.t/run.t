@@ -4,8 +4,7 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
   $ sed -e 's/.I1//g' output.ml > fixed.ml
 
   $ rescript convert fixed.ml
-  Error when converting fixed.ml
-  File "", line 23, characters 71-74:
-  Error: Invalid literal 2px
-  
 
+  $ cat fixed.res
+  let className = CssJs.display(#block)
+  let classNameWithMultiLine = CssJs.display(#block)

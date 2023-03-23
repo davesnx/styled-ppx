@@ -1,5 +1,5 @@
 {
-  "checksum": "e07b6231b29f98c54187366adc6fba35",
+  "checksum": "0fdf967326f95f31bd263787a4f7a776",
   "root": "@davesnx/styled-ppx@link-dev:./package.json",
   "node": {
     "rescript@10.1.3@d41d8cd9": {
@@ -1785,7 +1785,7 @@
       "dependencies": [],
       "devDependencies": [
         "rescript@10.1.3@d41d8cd9", "ocaml@4.14.0@d41d8cd9",
-        "@opam/sedlex@opam:3.0@6e37d05e",
+        "@opam/yojson@opam:2.0.2@eb65f292", "@opam/sedlex@opam:3.0@6e37d05e",
         "@opam/reason@github:reasonml/reason:reason.opam#b283f335f90e3aaa398bff8e82761038ee42a99d@d41d8cd9",
         "@opam/ppxlib@github:ocaml-ppx/ppxlib:ppxlib.opam#8b8987c5690ad839348d96bf52471b03b88f06ed@d41d8cd9",
         "@opam/ppx_deriving@opam:5.2.1@2315fdd0",

@@ -34,24 +34,23 @@ let jsxMode = {
 };
 
 type settings = {
-  jsxMode: flag(string),
   jsxVersion: flag(int),
+  jsxMode: flag(string),
   compatibleWithBsEmotionPpx: flag(bool),
   production: flag(bool),
 };
-let settings = {jsxMode, jsxVersion, compatibleWithBsEmotionPpx, production};
+let settings = {jsxVersion, jsxMode, compatibleWithBsEmotionPpx, production};
 
 let currentSettings = ref(settings);
+let updateSettings = newSettings => currentSettings := newSettings;
 
 module Get = {
-  let jsxMode = () =>
-    currentSettings.contents.jsxMode.value
-    |> Option.value(~default=currentSettings.contents.jsxMode.defaultValue);
-
   let jsxVersion = () =>
     currentSettings.contents.jsxVersion.value
     |> Option.value(~default=currentSettings.contents.jsxVersion.defaultValue);
-
+  let jsxMode = () =>
+    currentSettings.contents.jsxMode.value
+    |> Option.value(~default=currentSettings.contents.jsxMode.defaultValue);
   let compatibleWithBsEmotionPpx = () =>
     currentSettings.contents.compatibleWithBsEmotionPpx.value
     |> Option.value(
@@ -64,25 +63,24 @@ module Get = {
 };
 
 module Update = {
-  let set = newSettings => currentSettings := newSettings;
-  let jsxMode = value =>
-    set({
-      ...currentSettings.contents,
-      jsxMode: {
-        ...currentSettings.contents.jsxMode,
-        value: Some(value),
-      },
-    });
   let jsxVersion = value =>
-    set({
+    updateSettings({
       ...currentSettings.contents,
       jsxVersion: {
         ...currentSettings.contents.jsxVersion,
         value: Some(value),
       },
     });
+  let jsxMode = value =>
+    updateSettings({
+      ...currentSettings.contents,
+      jsxMode: {
+        ...currentSettings.contents.jsxMode,
+        value,
+      },
+    });
   let compatibleWithBsEmotionPpx = value =>
-    set({
+    updateSettings({
       ...currentSettings.contents,
       compatibleWithBsEmotionPpx: {
         ...currentSettings.contents.compatibleWithBsEmotionPpx,
@@ -90,11 +88,15 @@ module Update = {
       },
     });
   let production = value =>
-    set({
+    updateSettings({
       ...currentSettings.contents,
       production: {
         ...currentSettings.contents.production,
         value: Some(value),
       },
     });
+};
+
+let find = (key, args) => {
+  args |> Array.to_list |> List.find_opt(a => a == key) |> Option.is_some;
 };

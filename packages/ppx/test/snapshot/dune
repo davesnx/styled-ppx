@@ -5,18 +5,28 @@
  reason
  (cram
   (alias ppx_snapshot_test)
-  (deps %{bin:standalone} %{bin:refmt})
-  (package styled-ppx)))
+  (deps
+   %{bin:standalone}
+   %{bin:refmt}
+   (package styled-ppx))))
 
 (subdir
  rescript
  (cram
   (alias ppx_snapshot_test)
-  (deps %{bin:standalone} %{bin:bsc})
-  (package styled-ppx)))
+  (deps
+   %{bin:standalone}
+   %{bin:bsc}
+   (package styled-ppx))))
 
 (executables
  (names standalone)
  (public_names standalone)
  (modules standalone)
+ (libraries styled-ppx.lib ppxlib))
+
+(executables
+ (names rewriter)
+ (public_names rewriter)
+ (modules rewriter)
  (libraries styled-ppx.lib ppxlib))
