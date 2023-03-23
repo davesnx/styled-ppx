@@ -7,6 +7,7 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
   Error when converting fixed.ml
   File "", line 2, characters 23-24:
   Error: Syntax error: operator expected.
+  
 
 
 
