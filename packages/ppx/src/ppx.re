@@ -122,7 +122,7 @@ module Mapper = {
         Builder.module_binding(
           ~loc=moduleLoc,
           ~name,
-          ~expr=Generate.styledComponent(~loc=stringLoc, ~htmlTag, styles),
+          ~expr=Generate.staticComponent(~loc=stringLoc, ~htmlTag, styles),
         ),
       );
     /* [%styled.div [||]] */
@@ -161,7 +161,7 @@ module Mapper = {
         Builder.module_binding(
           ~loc=moduleLoc,
           ~name,
-          ~expr=Generate.styledComponent(~loc=arrayLoc, ~htmlTag, styles),
+          ~expr=Generate.staticComponent(~loc=arrayLoc, ~htmlTag, styles),
         ),
       );
     /* [%styled.div () => {}] */
@@ -201,7 +201,7 @@ module Mapper = {
           ~loc=moduleLoc,
           ~name,
           ~expr=
-            Generate.styledDynamic(
+            Generate.dynamicComponent(
               ~loc=functionLoc,
               ~htmlTag,
               ~label=fnLabel,
@@ -335,109 +335,123 @@ let static_pattern =
     )
   );
 
-let compatibleWithBsEmotionPpx =
-  Ppx_config.find(Ppx_config.compatibleModeWithBsEmotionPpxKey, Sys.argv);
+let _ =
+  Driver.add_arg(
+    Settings.compatibleWithBsEmotionPpx.flag,
+    Arg.Bool(Settings.Update.compatibleWithBsEmotionPpx),
+    ~doc=Settings.compatibleWithBsEmotionPpx.doc,
+  );
 
-Driver.add_arg(
-  Ppx_config.compatibleModeWithBsEmotionPpxKey,
-  Arg.Bool(_ => Ppx_config.updateCompatibleModeWithBsEmotionPpx(true)),
-  ~doc=
-    "Changes the extension name from `css` to `css_` to avoid breakage with bs-emotion-ppx",
-);
+let _ =
+  Driver.add_arg(
+    Settings.jsxVersion.flag,
+    Arg.Int(Settings.Update.jsxVersion),
+    ~doc=Settings.jsxVersion.doc,
+  );
 
-Driver.register_transformation(
-  ~impl=traverser#structure,
-  /* Instrument is needed to run styled-ppx after metaquote,
-     we rely on this order in native tests */
-  ~instrument=Driver.Instrument.make(~position=Before, traverser#structure),
-  ~rules=[
-    /* %cx without let binding, it doesn't have CssJs.label
-       %cx is defined in traverser#structure */
-    Context_free.Rule.extension(
-      Extension.declare(
-        "cx",
-        Extension.Context.Expression,
-        static_pattern,
-        (~loc, ~path as _, payload) => {
-        switch (payload) {
-        | `String({loc, txt}, _delim) =>
-          Payload.parse(txt, loc)
-          |> Css_to_emotion.render_declarations
-          |> Builder.pexp_array(~loc)
-          |> Css_to_emotion.render_style_call
-        | `Array(arr) =>
-          arr |> Builder.pexp_array(~loc) |> Css_to_emotion.render_style_call
-        }
-      }),
-    ),
-    Context_free.Rule.extension(
-      Extension.declare(
-        compatibleWithBsEmotionPpx ? "css_" : "css",
-        Extension.Context.Expression,
-        string_payload,
-        (~loc as _, ~path as _, payload, _label, _) => {
-          let pos = payload.loc.loc_start;
-          let container_lnum = pos.pos_lnum;
-          let declarationListValues =
-            Css_lexer.parse_declaration(~container_lnum, ~pos, payload.txt)
-            |> Css_to_emotion.render_declaration;
-          /* TODO: Instead of getting the first element,
-               fail when there's more than one declaration or
-             make a mechanism to flatten all the properties */
-          List.nth(declarationListValues, 0);
-        },
+let _ =
+  Driver.add_arg(
+    Settings.jsxMode.flag,
+    Arg.String(Settings.Update.jsxMode),
+    ~doc=Settings.jsxMode.doc,
+  );
+
+let _ =
+  Driver.register_transformation(
+    ~impl=traverser#structure,
+    /* Instrument is needed to run styled-ppx after metaquote,
+       we rely on this order in native tests */
+    ~instrument=Driver.Instrument.make(~position=Before, traverser#structure),
+    ~rules=[
+      /* %cx without let binding, it doesn't have CssJs.label
+         %cx is defined in traverser#structure */
+      Context_free.Rule.extension(
+        Extension.declare(
+          "cx",
+          Extension.Context.Expression,
+          static_pattern,
+          (~loc, ~path as _, payload) => {
+          switch (payload) {
+          | `String({loc, txt}, _delim) =>
+            Payload.parse(txt, loc)
+            |> Css_to_emotion.render_declarations
+            |> Builder.pexp_array(~loc)
+            |> Css_to_emotion.render_style_call
+          | `Array(arr) =>
+            arr
+            |> Builder.pexp_array(~loc)
+            |> Css_to_emotion.render_style_call
+          }
+        }),
       ),
-    ),
-    Context_free.Rule.extension(
-      Extension.declare(
-        "styled.global",
-        Extension.Context.Expression,
-        string_payload,
-        (~loc as _, ~path as _, payload, _label, _) => {
-          let pos = payload.loc.loc_start;
-          let container_lnum = pos.pos_lnum;
-          let stylesheet =
-            Css_lexer.parse_stylesheet(~container_lnum, ~pos, payload.txt);
-          Css_to_emotion.render_global(stylesheet);
-        },
+      Context_free.Rule.extension(
+        Extension.declare(
+          Settings.Get.compatibleWithBsEmotionPpx() ? "css_" : "css",
+          Extension.Context.Expression,
+          string_payload,
+          (~loc as _, ~path as _, payload, _label, _) => {
+            let pos = payload.loc.loc_start;
+            let container_lnum = pos.pos_lnum;
+            let declarationListValues =
+              Css_lexer.parse_declaration(~container_lnum, ~pos, payload.txt)
+              |> Css_to_emotion.render_declaration;
+            /* TODO: Instead of getting the first element,
+                 fail when there's more than one declaration or
+               make a mechanism to flatten all the properties */
+            List.nth(declarationListValues, 0);
+          },
+        ),
       ),
-    ),
-    Context_free.Rule.extension(
-      Extension.declare(
-        "keyframe",
-        Extension.Context.Expression,
-        string_payload,
-        (~loc as _, ~path as _, payload, _label, _) => {
-          let pos = payload.loc.loc_start;
-          let container_lnum = pos.pos_lnum;
-          let declarations =
-            Css_lexer.parse_keyframes(~container_lnum, ~pos, payload.txt);
-          Css_to_emotion.render_keyframes(declarations);
-        },
+      Context_free.Rule.extension(
+        Extension.declare(
+          "styled.global",
+          Extension.Context.Expression,
+          string_payload,
+          (~loc as _, ~path as _, payload, _label, _) => {
+            let pos = payload.loc.loc_start;
+            let container_lnum = pos.pos_lnum;
+            let stylesheet =
+              Css_lexer.parse_stylesheet(~container_lnum, ~pos, payload.txt);
+            Css_to_emotion.render_global(stylesheet);
+          },
+        ),
       ),
-    ),
-    /* This extension just raises an error to educate, since before 0.20 this was valid */
-    Context_free.Rule.extension(
-      Extension.declare(
-        "styled",
-        Extension.Context.Module_expr,
-        any_payload,
-        (~loc, ~path as _, payload) => {
-        Generate_lib.raiseError(
-          ~loc,
-          ~description=
-            "An styled component without a tag is not valid. You must define an HTML tag, like, `styled.div`",
-          ~example=
-            Some(
-              "[%styled.div "
-              ++ Pprintast.string_of_expression(payload)
-              ++ "]",
-            ),
-          ~link=
-            "https://developer.mozilla.org/en-US/docs/Learn/Accessibility/HTML",
-        )
-      }),
-    ),
-  ],
-  "styled-ppx",
-);
+      Context_free.Rule.extension(
+        Extension.declare(
+          "keyframe",
+          Extension.Context.Expression,
+          string_payload,
+          (~loc as _, ~path as _, payload, _label, _) => {
+            let pos = payload.loc.loc_start;
+            let container_lnum = pos.pos_lnum;
+            let declarations =
+              Css_lexer.parse_keyframes(~container_lnum, ~pos, payload.txt);
+            Css_to_emotion.render_keyframes(declarations);
+          },
+        ),
+      ),
+      /* This extension just raises an error to educate, since before 0.20 this was valid */
+      Context_free.Rule.extension(
+        Extension.declare(
+          "styled",
+          Extension.Context.Module_expr,
+          any_payload,
+          (~loc, ~path as _, payload) => {
+          Generate_lib.raiseError(
+            ~loc,
+            ~description=
+              "An styled component without a tag is not valid. You must define an HTML tag, like, `styled.div`",
+            ~example=
+              Some(
+                "[%styled.div "
+                ++ Pprintast.string_of_expression(payload)
+                ++ "]",
+              ),
+            ~link=
+              "https://developer.mozilla.org/en-US/docs/Learn/Accessibility/HTML",
+          )
+        }),
+      ),
+    ],
+    "styled-ppx",
+  );

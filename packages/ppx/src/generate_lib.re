@@ -574,3 +574,123 @@ let raiseError = (~loc, ~description, ~example, ~link) => {
 
   raise(error);
 };
+
+let getIsOptional = str =>
+  switch (str) {
+  | Optional(_) => true
+  | _ => false
+  };
+
+let getIsLabelled = str =>
+  switch (str) {
+  | Labelled(_) => true
+  | _ => false
+  };
+
+let getNotLabelled = str =>
+  switch (str) {
+  | Nolabel => true
+  | _ => false
+  };
+
+let getLabel = str =>
+  switch (str) {
+  | Optional(str)
+  | Labelled(str) => str
+  | Nolabel => ""
+  };
+
+let getType = pattern =>
+  switch (pattern.ppat_desc) {
+  | Ppat_constraint(_, type_) => Some(type_)
+  | _ => None
+  };
+
+let getAlias = (pattern, label) =>
+  switch (pattern.ppat_desc) {
+  | Ppat_alias(_, {txt, _})
+  | Ppat_var({txt, _}) => txt
+  | Ppat_any => "_"
+  | _ => getLabel(label)
+  };
+
+let rec getArgs = (expr, list) => {
+  switch (expr.pexp_desc) {
+  | Pexp_fun(arg, default, pattern, expression)
+      when getIsOptional(arg) || getIsLabelled(arg) =>
+    let alias = getAlias(pattern, arg);
+    let type_ = getType(pattern);
+
+    getArgs(
+      expression,
+      [(arg, default, pattern, alias, pattern.ppat_loc, type_), ...list],
+    );
+  | Pexp_fun(arg, _, pattern, _) when !getIsLabelled(arg) =>
+    raiseError(
+      ~loc=pattern.ppat_loc,
+      ~description="Dynamic components are defined with labeled arguments.",
+      ~example=Some("[%styled.div (~a, ~b) => {}]"),
+      ~link=
+        "https://reasonml.org/docs/manual/latest/function#labeled-arguments",
+    )
+  | _ => (expr, list)
+  };
+};
+
+let getIsEmpty = param => {
+  switch (param.ppat_desc) {
+  /* Not completly sure if this checks emptyness */
+  | Ppat_construct(_, _) => true
+  | _ => false
+  };
+};
+
+let getLabeledArgs = (label, defaultValue, param, expr) => {
+  /* Get the first argument of the Pexp_fun, since it's a recursive type.
+     getArgs gets all the function parameters from the next parsetree */
+  let alias = getAlias(param, label);
+  let type_ = getType(param);
+  let firstArg = (label, defaultValue, param, alias, param.ppat_loc, type_);
+
+  if (getIsEmpty(param)) {
+    raiseError(
+      ~loc=param.ppat_loc,
+      ~description=
+        "A dynamic component without props doesn't make much sense. Try to translate into static.",
+      ~example=None,
+      ~link="https://styled-ppx.vercel.app/usage/dynamic-components",
+    );
+  };
+
+  if (getNotLabelled(label)) {
+    raiseError(
+      ~loc=param.ppat_loc,
+      ~description="Dynamic components are defined with labeled arguments.",
+      ~example=Some("[%styled.div (~a, ~b) => {}]"),
+      ~link=
+        "https://reasonml.org/docs/manual/latest/function#labeled-arguments",
+    );
+  };
+
+  getArgs(expr, [firstArg]);
+};
+
+let getLastSequence = expr => {
+  let rec inner = expr =>
+    switch (expr.pexp_desc) {
+    | Pexp_sequence(_, sequence) => inner(sequence)
+    | _ => expr
+    };
+
+  inner(expr);
+};
+
+let getLastExpression = expr => {
+  let rec inner = expr =>
+    switch (expr.pexp_desc) {
+    | Pexp_let(_, _, expression) => inner(expression)
+    | _ => expr
+    };
+
+  inner(expr);
+};

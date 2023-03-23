@@ -1,0 +1,3 @@
+(library
+ (name runtime)
+ (public_name styled-ppx.runtime))

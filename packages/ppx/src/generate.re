@@ -1,132 +1,13 @@
 open Ppxlib;
-open Generate_lib;
 
-let getIsOptional = str =>
-  switch (str) {
-  | Optional(_) => true
-  | _ => false
-  };
-
-let getIsLabelled = str =>
-  switch (str) {
-  | Labelled(_) => true
-  | _ => false
-  };
-
-let getNotLabelled = str =>
-  switch (str) {
-  | Nolabel => true
-  | _ => false
-  };
-
-let getLabel = str =>
-  switch (str) {
-  | Optional(str)
-  | Labelled(str) => str
-  | Nolabel => ""
-  };
-
-let getType = pattern =>
-  switch (pattern.ppat_desc) {
-  | Ppat_constraint(_, type_) => Some(type_)
-  | _ => None
-  };
-
-let getAlias = (pattern, label) =>
-  switch (pattern.ppat_desc) {
-  | Ppat_alias(_, {txt, _})
-  | Ppat_var({txt, _}) => txt
-  | Ppat_any => "_"
-  | _ => getLabel(label)
-  };
-
-let rec getArgs = (expr, list) => {
-  switch (expr.pexp_desc) {
-  | Pexp_fun(arg, default, pattern, expression)
-      when getIsOptional(arg) || getIsLabelled(arg) =>
-    let alias = getAlias(pattern, arg);
-    let type_ = getType(pattern);
-
-    getArgs(
-      expression,
-      [(arg, default, pattern, alias, pattern.ppat_loc, type_), ...list],
-    );
-  | Pexp_fun(arg, _, pattern, _) when !getIsLabelled(arg) =>
-    Generate_lib.raiseError(
-      ~loc=pattern.ppat_loc,
-      ~description="Dynamic components are defined with labeled arguments.",
-      ~example=Some("[%styled.div (~a, ~b) => {}]"),
-      ~link=
-        "https://reasonml.org/docs/manual/latest/function#labeled-arguments",
-    )
-  | _ => (expr, list)
-  };
-};
-
-let getIsEmpty = param => {
-  switch (param.ppat_desc) {
-  /* Not completly sure if this checks emptyness */
-  | Ppat_construct(_, _) => true
-  | _ => false
-  };
-};
-
-let getLabeledArgs = (label, defaultValue, param, expr) => {
-  /* Get the first argument of the Pexp_fun, since it's a recursive type.
-     getArgs gets all the function parameters from the next parsetree */
-  let alias = getAlias(param, label);
-  let type_ = getType(param);
-  let firstArg = (label, defaultValue, param, alias, param.ppat_loc, type_);
-
-  if (getIsEmpty(param)) {
-    Generate_lib.raiseError(
-      ~loc=param.ppat_loc,
-      ~description=
-        "A dynamic component without props doesn't make much sense. Try to translate into static.",
-      ~example=None,
-      ~link="https://styled-ppx.vercel.app/usage/dynamic-components",
-    );
-  };
-
-  if (getNotLabelled(label)) {
-    Generate_lib.raiseError(
-      ~loc=param.ppat_loc,
-      ~description="Dynamic components are defined with labeled arguments.",
-      ~example=Some("[%styled.div (~a, ~b) => {}]"),
-      ~link=
-        "https://reasonml.org/docs/manual/latest/function#labeled-arguments",
-    );
-  };
-
-  getArgs(expr, [firstArg]);
-};
+module Builder = Generate_lib.Builder;
 
 let styleVariableName = "styles";
 
-let getLastSequence = expr => {
-  let rec inner = expr =>
-    switch (expr.pexp_desc) {
-    | Pexp_sequence(_, sequence) => inner(sequence)
-    | _ => expr
-    };
-
-  inner(expr);
-};
-
-let getLastExpression = expr => {
-  let rec inner = expr =>
-    switch (expr.pexp_desc) {
-    | Pexp_let(_, _, expression) => inner(expression)
-    | _ => expr
-    };
-
-  inner(expr);
-};
-
-let styledDynamic =
+let dynamicComponent =
     (~loc, ~htmlTag, ~label, ~moduleName, ~defaultValue, ~param, ~body) => {
   let (functionExpr, labeledArguments) =
-    getLabeledArgs(label, defaultValue, param, body);
+    Generate_lib.getLabeledArgs(label, defaultValue, param, body);
 
   let variableList =
     labeledArguments
@@ -134,7 +15,10 @@ let styledDynamic =
          let (kind, type_) =
            switch (type_) {
            | Some(type_) => (`Typed, type_)
-           | None => (`Open, typeVariable(~loc, getLabel(arg)))
+           | None => (
+               `Open,
+               Generate_lib.typeVariable(~loc, Generate_lib.getLabel(arg)),
+             )
            };
 
          (arg, defaultExpr, kind, type_);
@@ -153,10 +37,10 @@ let styledDynamic =
   let propGenericFields =
     variableList
     |> List.map(((arg, defaultValue, _, type_)) =>
-         customPropLabel(
+         Generate_lib.customPropLabel(
            ~loc,
            ~optional=Option.is_some(defaultValue),
-           getLabel(arg),
+           Generate_lib.getLabel(arg),
            type_,
          )
        );
@@ -165,7 +49,8 @@ let styledDynamic =
   let styledArguments =
     List.map(
       ((argumentName, _defaultValue, _, _, loc, _)) => {
-        let value = Generate_lib.propItem(~loc, getLabel(argumentName));
+        let value =
+          Generate_lib.propItem(~loc, Generate_lib.getLabel(argumentName));
         (argumentName, value);
       },
       labeledArguments,
@@ -212,7 +97,9 @@ let styledDynamic =
       /* Generate a new sequence where the last expression is
          wrapped in render_style_call and render the other expressions. */
       let styles =
-        sequence |> getLastSequence |> Css_to_emotion.render_style_call;
+        sequence
+        |> Generate_lib.getLastSequence
+        |> Css_to_emotion.render_style_call;
       Builder.pexp_sequence(~loc, expr, styles);
 
     /* styled.div () => {
@@ -223,7 +110,9 @@ let styledDynamic =
       /* Generate a new `let in` where the last expression is
          wrapped in render_style_call */
       let styles =
-        expression |> getLastExpression |> Css_to_emotion.render_style_call;
+        expression
+        |> Generate_lib.getLastExpression
+        |> Css_to_emotion.render_style_call;
       Builder.pexp_let(~loc, Nonrecursive, value_binding, styles);
 
     /* styled.div () => { styles } */
@@ -237,18 +126,20 @@ let styledDynamic =
   Builder.pmod_structure(
     ~loc,
     [
-      makeProps(~loc, Some((propsGenericParams, propGenericFields))),
-      bindingCreateVariadicElement(~loc),
-      defineDeletePropFn(~loc),
-      defineAssign2(~loc),
-      defineGetOrEmptyFn(~loc),
-      dynamicStyles(
+      Generate_lib.makeProps(
+        ~loc,
+        Some((propsGenericParams, propGenericFields)),
+      ),
+      Generate_lib.bindingCreateVariadicElement(~loc),
+      Generate_lib.defineDeletePropFn(~loc),
+      Generate_lib.defineAssign2(~loc),
+      Generate_lib.dynamicStyles(
         ~loc,
         ~name=styleVariableName,
         ~args=labeledArguments,
         ~expr=styles,
       ),
-      component(
+      Generate_lib.component(
         ~loc,
         ~htmlTag,
         ~styledExpr=stylesFunctionCall,
@@ -259,20 +150,19 @@ let styledDynamic =
   );
 };
 
-let styledComponent = (~loc, ~htmlTag, styles) => {
+let staticComponent = (~loc, ~htmlTag, styles) => {
   let styleReference =
     Builder.pexp_ident(~loc, {txt: Lident(styleVariableName), loc});
 
   Builder.pmod_structure(
     ~loc,
     [
-      makeProps(~loc, None),
-      bindingCreateVariadicElement(~loc),
-      defineDeletePropFn(~loc),
-      defineAssign2(~loc),
-      defineGetOrEmptyFn(~loc),
+      Generate_lib.makeProps(~loc, None),
+      Generate_lib.bindingCreateVariadicElement(~loc),
+      Generate_lib.defineDeletePropFn(~loc),
+      Generate_lib.defineAssign2(~loc),
       Generate_lib.styles(~loc, ~name=styleVariableName, ~expr=styles),
-      component(
+      Generate_lib.component(
         ~loc,
         ~htmlTag,
         ~styledExpr=styleReference,

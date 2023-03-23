@@ -11,5 +11,6 @@
   styled-ppx.string-interpolation
   ppxlib
   str)
+ (ppx_runtime_libraries styled-ppx.runtime)
  (preprocess
   (pps ppxlib.metaquot)))
