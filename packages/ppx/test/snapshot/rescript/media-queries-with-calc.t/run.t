@@ -5,6 +5,6 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
 
   $ rescript convert fixed.ml
   Error when converting fixed.ml
-  File "", line 25, characters 73-76:
+  File "", line 31, characters 73-76:
   Error: Invalid literal 2px
   

@@ -952,6 +952,12 @@
     external createVariadicElement: (string, Js.t({..})) => React.element =
       "createElement";
     let deleteProp = [%raw "(newProps, key) => delete newProps[key]"];
+    let getOrEmpty = str => {
+      switch (str) {
+      | Some(str) => " " ++ str
+      | None => ""
+      };
+    };
     [@bs.val]
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
@@ -963,7 +969,8 @@
       |]);
     };
     let make = (props: props('size)) => {
-      let className = styles(~size=props.size, ());
+      let className =
+        styles(~size=props.size, ()) ++ getOrEmpty(props.className);
       let stylesObject = {"className": className, "ref": props.ref};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(newProps, "size"));
@@ -1923,6 +1930,12 @@
     external createVariadicElement: (string, Js.t({..})) => React.element =
       "createElement";
     let deleteProp = [%raw "(newProps, key) => delete newProps[key]"];
+    let getOrEmpty = str => {
+      switch (str) {
+      | Some(str) => " " ++ str
+      | None => ""
+      };
+    };
     [@bs.val]
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
@@ -1935,7 +1948,8 @@
       |]);
     };
     let make = (props: props('variant)) => {
-      let className = styles(~variant=props.variant, ());
+      let className =
+        styles(~variant=props.variant, ()) ++ getOrEmpty(props.className);
       let stylesObject = {"className": className, "ref": props.ref};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(newProps, "variant"));

@@ -5,6 +5,6 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
 
   $ rescript convert fixed.ml
   Error when converting fixed.ml
-  File "", line 495, characters 15-16:
+  File "", line 501, characters 15-16:
   Error: Syntax error
   

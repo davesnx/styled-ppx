@@ -166,6 +166,17 @@ let bindingCreateVariadicElement = (~loc) => {
   });
 };
 
+let defineGetOrEmptyFn = (~loc) => {
+  [%stri
+    let getOrEmpty = str => {
+      switch (str) {
+      | Some(str) => " " ++ str
+      | None => ""
+      };
+    }
+  ];
+};
+
 /* ignore() */
 let applyIgnore = (~loc, expr) => {
   Helper.Exp.apply(
@@ -254,8 +265,7 @@ let className = (~loc, expr) =>
   Helper.Vb.mk(
     ~loc,
     Helper.Pat.mk(~loc, Ppat_var(withLoc("className", ~loc))),
-    [%expr [%e expr]],
-    /* [%expr [%e expr] ++ getOrEmpty(props.className)], */
+    [%expr [%e expr] ++ getOrEmpty(props.className)],
   );
 
 /* deleteInnerRef(. newProps, "innerRef") |> ignore; */
@@ -537,24 +547,6 @@ let defineAssign2 = (~loc) => {
     pval_prim: ["Object.assign"],
     pval_attributes: [BuckleScriptAttributes.val_(~loc)],
   });
-};
-
-/* let getOrEmpty = str => {
-       switch (str) {
-         | Some(str) => " " ++ str
-         | None => ""
-       }
-     };
-   */
-let defineGetOrEmptyFn = (~loc) => {
-  [%stri
-    let getOrEmpty = str => {
-      switch (str) {
-      | Some(str) => " " ++ str
-      | None => ""
-      };
-    }
-  ];
 };
 
 let raiseError = (~loc, ~description, ~example, ~link) => {

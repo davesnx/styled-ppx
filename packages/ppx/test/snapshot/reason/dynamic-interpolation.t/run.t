@@ -954,6 +954,12 @@
     external createVariadicElement: (string, Js.t({..})) => React.element =
       "createElement";
     let deleteProp = [%raw "(newProps, key) => delete newProps[key]"];
+    let getOrEmpty = str => {
+      switch (str) {
+      | Some(str) => " " ++ str
+      | None => ""
+      };
+    };
     [@bs.val]
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
@@ -964,7 +970,8 @@
         CssJs.display(`block),
       |]);
     let make = (props: props('var)) => {
-      let className = styles(~var=props.var, ());
+      let className =
+        styles(~var=props.var, ()) ++ getOrEmpty(props.className);
       let stylesObject = {"className": className, "ref": props.ref};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(newProps, "var"));

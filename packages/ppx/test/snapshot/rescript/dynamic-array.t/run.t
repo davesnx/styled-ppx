@@ -491,6 +491,12 @@
               [@reason.raw_literal "(newProps, key) => delete newProps[key]"]))
         [@internal.expansive ][@reason.raw_literal
                                 "(newProps, key) => delete newProps[key]"])
+      let getOrEmpty str =
+        ((match str with
+          | ((Some (str))[@explicit_arity ]) ->
+              ((" ")[@reason.raw_literal " "]) ^ str
+          | None -> (("")[@reason.raw_literal ""]))
+        [@reason.preserve_braces ])
       external assign2 :
         < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t =
           "Object.assign"
@@ -504,7 +510,8 @@
                 | `White -> CssJs.color (`hex {*j|FAFAFA|*j})))|]) : _)
       let make =
         ((fun (props : 'var props) ->
-            let className = styles ~var:(props.var) () in
+            let className =
+              (styles ~var:(props.var) ()) ^ (getOrEmpty props.className) in
             ((let stylesObject =
                 let module J =
                   struct
@@ -527,7 +534,7 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
 
   $ rescript convert fixed.ml
   Error when converting fixed.ml
-  File "", line 500, characters 46-47:
+  File "", line 506, characters 46-47:
   Error: Syntax error: operator expected.
   
 

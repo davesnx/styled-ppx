@@ -6,6 +6,12 @@
     [@bs.val] [@bs.module "react"]
     external createVariadicElement: (string, Js.t({..})) => React.element =
       "createElement";
+    let getOrEmpty = str => {
+      switch (str) {
+      | Some(str) => " " ++ str
+      | None => ""
+      };
+    };
     let deleteProp = [%raw "(newProps, key) => delete newProps[key]"];
     [@bs.val]
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
@@ -16,7 +22,7 @@
         CssJs.display(`block),
       |]);
     let make = (props: props) => {
-      let className = styles;
+      let className = styles ++ getOrEmpty(props.className);
       let stylesObject = {"className": className, "ref": props.ref};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       createVariadicElement("div", newProps);

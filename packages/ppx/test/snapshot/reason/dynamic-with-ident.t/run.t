@@ -954,12 +954,18 @@
     external createVariadicElement: (string, Js.t({..})) => React.element =
       "createElement";
     let deleteProp = [%raw "(newProps, key) => delete newProps[key]"];
+    let getOrEmpty = str => {
+      switch (str) {
+      | Some(str) => " " ++ str
+      | None => ""
+      };
+    };
     [@bs.val]
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles = (~a as _, _) => CssJs.style(. cssRule);
     let make = (props: props('a)) => {
-      let className = styles(~a=props.a, ());
+      let className = styles(~a=props.a, ()) ++ getOrEmpty(props.className);
       let stylesObject = {"className": className, "ref": props.ref};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(newProps, "a"));

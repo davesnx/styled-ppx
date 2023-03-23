@@ -132,6 +132,7 @@ let dynamicComponent =
       ),
       Generate_lib.bindingCreateVariadicElement(~loc),
       Generate_lib.defineDeletePropFn(~loc),
+      Generate_lib.defineGetOrEmptyFn(~loc),
       Generate_lib.defineAssign2(~loc),
       Generate_lib.dynamicStyles(
         ~loc,
@@ -159,6 +160,7 @@ let staticComponent = (~loc, ~htmlTag, styles) => {
     [
       Generate_lib.makeProps(~loc, None),
       Generate_lib.bindingCreateVariadicElement(~loc),
+      Generate_lib.defineGetOrEmptyFn(~loc),
       Generate_lib.defineDeletePropFn(~loc),
       Generate_lib.defineAssign2(~loc),
       Generate_lib.styles(~loc, ~name=styleVariableName, ~expr=styles),

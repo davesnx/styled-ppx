@@ -497,6 +497,11 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
           "(newProps, key) => delete newProps[key]",
         )
       }
+    let getOrEmpty = str =>
+      switch str {
+      | Some(str) => (@reason.raw_literal(" ") " ") ++ str
+      | None => @reason.raw_literal("") ""
+      }
     external assign2: ({..}, {..}, {..}) => {..} =
       "Object.assign"
       "„•¦¾            °‘C@Ä-Object.assign@@@"
@@ -509,7 +514,7 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
         ]),
       )
     let make = (props: props<'var>) => {
-      let className = styles(~var=props.var, ())
+      let className = styles(~var=props.var, ()) ++ getOrEmpty(props.className)
       let stylesObject = {
         module J = {
           external unsafe_expr: (~className: 'a0, ~ref: 'a1) => {"className": 'a0, "ref": 'a1} =
