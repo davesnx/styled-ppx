@@ -148,7 +148,7 @@ jobs:
 
       - name: Get cache directory path
         id: yarn-cache-dir-path
-        working-directory: ./e2e
+        working-directory: ./e2e/rescript-v10-JSX3
         run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
 
       - name: Load global cache
@@ -160,11 +160,11 @@ jobs:
           restore-keys: yarn-${{ matrix.os }}-
 
       - name: Install dependencies
-        working-directory: ./e2e
+        working-directory: ./e2e/rescript-v10-JSX3
         run: yarn
 
       - name: Test
-        working-directory: ./e2e
+        working-directory: ./e2e/rescript-v10-JSX3
         run: yarn test
 
   publish:

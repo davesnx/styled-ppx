@@ -52,7 +52,7 @@
     "test_reason_css_parser": "esy dune build @reason_css_parser_test",
     "test_css_spec_parser": "esy dune build @css_spec_parser_test",
     "test_css_spec_types": "esy dune build @css_spec_types_test",
-    "test_e2e": "echo 'This can not be run with esy, only yarn like `yarn --cwd e2e test`",
+    "test_e2e": "echo 'This can not be run with esy, only yarn like `yarn --cwd 'e2e/rescript-v10-JSX3' test`",
     "dev": "esy dune build --root . --watch",
     "release-static":
       "esy b dune build --root . --ignore-promoted-rules --no-config --profile release-static --only-packages styled-ppx",
