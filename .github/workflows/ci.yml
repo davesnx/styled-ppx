@@ -63,29 +63,29 @@ jobs:
       - name: Build
         run: esy build
 
-      # - name: Test ppx snapshot
-        # run: esy test_ppx_snapshot
+      - name: Test ppx snapshot
+        run: esy test_ppx_snapshot
 
-      # - name: Test Typecheck
-        # run: esy test_typecheck
+      - name: Test Typecheck
+        run: esy test_typecheck
 
-      # - name: Test CSS Support
-        # run: esy test_css_support
+      - name: Test CSS Support
+        run: esy test_css_support
 
-      # - name: Test CSS Lexer
-        # run: esy test_css_lexer
+      - name: Test CSS Lexer
+        run: esy test_css_lexer
 
-      # - name: Test CSS Parser
-        # run: esy test_parser
+      - name: Test CSS Parser
+        run: esy test_parser
 
-      # - name: Test CSS Parser
-        # run: esy test_reason_css_parser
+      - name: Test CSS Parser
+        run: esy test_reason_css_parser
 
-      # - name: Test CSS Spec Parser
-        # run: esy test_css_spec_parser
+      - name: Test CSS Spec Parser
+        run: esy test_css_spec_parser
 
-      # - name: Test CSS Spec type generation
-        # run: esy test_css_spec_types
+      - name: Test CSS Spec type generation
+        run: esy test_css_spec_types
 
       - name: Test string interpolation
         run: esy dune runtest
