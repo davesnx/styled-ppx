@@ -1,52 +1,36 @@
-let bsconfig = "bsconfig.json";
-let bsbProjectRoot = ref("");
-let projectRoot = ref("");
+module Json = Yojson.Safe;
 
-let rec findProjectRoot = dir =>
-  if (Sys.file_exists(Filename.concat(dir, bsconfig))) {
-    dir;
-  } else {
-    let parent = dir |> Filename.dirname;
-    if (parent == dir) {
+let bsconfig = "bsconfig.json";
+let projectRoot = ref(None);
+
+let findProjectRoot = dir => {
+  let rec traverseProject = dir =>
+    if (Sys.file_exists(Filename.concat(dir, bsconfig))) {
       dir;
     } else {
-      findProjectRoot(parent);
+      let parent = dir |> Filename.dirname;
+      if (parent == dir) {
+        dir;
+      } else {
+        traverseProject(parent);
+      };
     };
-  };
+
+  traverseProject(dir);
+};
 
 let setProjectRoot = () => {
-  projectRoot := findProjectRoot(Sys.getcwd());
-  bsbProjectRoot :=
-    (
-      switch (Sys.getenv_opt("BSB_PROJECT_ROOT")) {
-      | None => projectRoot^
-      | Some(s) => s
-      }
-    );
+  projectRoot := Some(findProjectRoot(Sys.getcwd()));
 };
 
 let getBsConfigFile = () => {
-  let bsconfig = Filename.concat(projectRoot^, bsconfig);
-  bsconfig |> Sys.file_exists ? Some(bsconfig) : None;
+  switch (projectRoot^) {
+  | Some(projectRoot) =>
+    let bsconfig = Filename.concat(projectRoot, bsconfig);
+    bsconfig |> Sys.file_exists ? Some(bsconfig) : None;
+  | None => failwith("Project root not set.")
+  };
 };
-
-/* switch(Paths.getBsConfigFile()) with
-   | Some bsConfigFile => (
-     try bsConfigFile |> Json.Read.from_file |> parseConfig with
-     | Config_error _ as e => raise e
-     | _ => ())
-   | None => () */
-
-/* let read_config () =
-   Ppx_config.set_config defaultConfig;
-   Paths.setProjectRoot ();
-   let open Json.Util in
-   let parseConfig (json : Json.t) =
-     let ppxConfig = json |> member "graphql" in
-     let handleVerboseLogging verbose_logging =
-       Ppx_config.update_config  */
-
-module Json = Yojson.Safe;
 
 let memeber_safe = (key, json, msg) =>
   try(Ok(Json.Util.member(key, json))) {
@@ -76,6 +60,8 @@ let readJsxMode = json =>
   )
   |> Result.map(Json.Util.to_string);
 
+let _ = setProjectRoot();
+
 let getJSX = () => {
   switch (getBsConfigFile()) {
   | Some(bsConfigFile) =>
@@ -87,7 +73,7 @@ let getJSX = () => {
         switch (readJsxMode(field)) {
         | Error(_e) => (Some(4), None)
         | Ok(mode) when mode == "classic" => (Some(4), Some(mode))
-        | Ok(mode) when mode == "automatic" => (Some(4), Some(mode))
+        /* | Ok(mode) when mode == "automatic" => (Some(4), Some(mode)) */
         | Ok(mode) =>
           failwith(
             "Error parsing bsconfig.json. Invalid `mode` field under `jsx`. Expected `classic` or `automatic` but got `"

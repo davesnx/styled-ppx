@@ -24,6 +24,10 @@ module ReScriptAttributes = {
 };
 
 module BuckleScriptAttributes = {
+  /* [@bs.optional] */
+  let optional = (~loc) =>
+    Helper.Attr.mk(withLoc("bs.optional", ~loc), PStr([]));
+
   /* fn(. ) */
   let uncurried = (~loc) => {
     Builder.attribute(~name=withLoc(~loc, "bs"), ~loc, ~payload=PStr([]));
@@ -64,6 +68,15 @@ module BuckleScriptAttributes = {
     );
 
   let val_ = (~loc) => Helper.Attr.mk(withLoc("bs.val", ~loc), PStr([]));
+};
+
+let optionalAttribute = (~loc) => {
+  switch (File.get()) {
+  | Some(ReScript) when Settings.Get.jsxVersion() === 4 =>
+    ReScriptAttributes.optional(~loc)
+  | Some(Reason)
+  | _ => BuckleScriptAttributes.optional(~loc)
+  };
 };
 
 /* (~a, ~b, ~c, _) => args */
@@ -253,7 +266,10 @@ let stylesAndRefObject = (~loc) => {
     withLoc(~loc, Lident("className")),
     Helper.Exp.ident(~loc, withLoc(Lident("className"), ~loc)),
   );
-  let refProp = (withLoc(~loc, Lident("ref")), propItem(~loc, "ref"));
+  let refProp = (
+    withLoc(~loc, Lident("innerRef")),
+    propItem(~loc, "innerRef"),
+  );
   let record = Helper.Exp.record(~loc, [className, refProp], None);
   Helper.Vb.mk(
     ~loc,
@@ -280,11 +296,12 @@ let newProps = (~loc) => {
 
 /* let className = styles ++ props.className; */
 let className = (~loc, expr) => {
-  let classNameProp = propItem(~loc, "className");
+  let _classNameProp = propItem(~loc, "className");
   Helper.Vb.mk(
     ~loc,
     Helper.Pat.mk(~loc, Ppat_var(withLoc("className", ~loc))),
-    [%expr [%e expr] ++ getOrEmpty([%e classNameProp])],
+    [%expr [%e expr]],
+    /* [%expr [%e expr] ++ getOrEmpty([%e classNameProp])], */
   );
 };
 
@@ -325,7 +342,7 @@ let makeBody = (~loc, ~htmlTag, ~styledExpr, ~variables) => {
     | _ => [ReasonAttributes.preserveBraces(~loc)]
     };
   let sequence =
-    [variadicElement(~loc, ~htmlTag)]
+    [deleteProp(~loc, "innerRef"), variadicElement(~loc, ~htmlTag)]
     |> List.append(List.map(deleteProp(~loc), variables));
 
   Helper.Exp.let_(
@@ -415,7 +432,7 @@ let component =
 let customPropLabel = (~loc, ~optional, name, type_) => {
   Helper.Type.field(
     ~loc,
-    ~attrs=optional ? [ReScriptAttributes.optional(~loc)] : [],
+    ~attrs=optional ? [optionalAttribute(~loc)] : [],
     withLoc(name, ~loc),
     type_,
   );
@@ -428,10 +445,10 @@ let recordLabel = (~loc, name, kind, alias) => {
   let attrs =
     switch (alias) {
     | Some(alias) => [
-        ReScriptAttributes.optional(~loc),
+        optionalAttribute(~loc),
         BuckleScriptAttributes.alias(~loc, alias),
       ]
-    | None => [ReScriptAttributes.optional(~loc)]
+    | None => [optionalAttribute(~loc)]
     };
 
   Helper.Type.field(
@@ -443,23 +460,25 @@ let recordLabel = (~loc, name, kind, alias) => {
 };
 
 /* innerRef: domRef */
-let domRefLabel = (~loc) =>
+let domRefLabel = (~loc) => {
+  /* TODO: is innerRef in JSX4? */
   Helper.Type.field(
     ~loc,
-    ~attrs=[ReScriptAttributes.optional(~loc)],
-    withLoc("ref", ~loc),
+    ~attrs=[optionalAttribute(~loc)],
+    withLoc("innerRef", ~loc),
     Helper.Typ.constr(
       ~loc,
       withLoc(Ldot(Lident("ReactDOM"), "domRef"), ~loc),
       [],
     ),
   );
+};
 
 /* children: React.element */
 let childrenLabel = (~loc) =>
   Helper.Type.field(
     ~loc,
-    ~attrs=[ReScriptAttributes.optional(~loc)],
+    ~attrs=[optionalAttribute(~loc)],
     withLoc("children", ~loc),
     Helper.Typ.constr(
       ~loc,
@@ -479,7 +498,7 @@ let recordEventLabel = (~loc, name, kind) => {
     );
   Helper.Type.field(
     ~loc,
-    ~attrs=[ReScriptAttributes.optional(~loc)],
+    ~attrs=[optionalAttribute(~loc)],
     withLoc(name, ~loc),
     type_,
   );

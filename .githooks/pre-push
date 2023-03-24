@@ -45,7 +45,10 @@ esy test_css_spec_parser
 echo "Run CSS Spec Types tests"
 esy test_css_spec_types
 
-echo "Run End-to-end tests"
-yarn --cwd 'e2e/rescript-v10-JSX3' test
+echo "Run End-to-end tests for JSX3"
+yarn --cwd 'e2e/rescript-v9-JSX3' test
+
+# echo "Run End-to-end tests for JSX4"
+# yarn --cwd 'e2e/rescript-v10-JSX4' test
 
 exit 0

@@ -8,7 +8,7 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
   $ cat fixed.res
   module DynamicComponent = {
     type props<'var> = {
-      ref?: ReactDOM.domRef,
+      innerRef?: ReactDOM.domRef,
       children?: React.element,
       about?: string,
       accentHeight?: string,
@@ -501,10 +501,11 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
         CssJs.display(#flex),
       ])
     let make = (props: props<'var>) => {
-      let className = styles(~var=props.var, ()) ++ getOrEmpty(props.className)
-      let stylesObject = {"className": className, "ref": props.ref}
+      let className = styles(~var=props.var, ())
+      let stylesObject = {"className": className, "innerRef": props.innerRef}
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject)
       ignore(deleteProp(newProps, "var"))
+      ignore(deleteProp(newProps, "innerRef"))
       createVariadicElement(@reason.raw_literal("div") "div", newProps)
     }
   }

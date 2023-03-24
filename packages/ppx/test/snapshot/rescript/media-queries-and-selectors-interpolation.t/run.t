@@ -42,9 +42,10 @@
               [@bs ])|])
         [@bs ])
       let make (props : props) =
-        let className = styles ^ (getOrEmpty props.className) in
-        let stylesObject = [%bs.obj { className; ref = (props.ref) }] in
+        let className = styles in
+        let stylesObject = [%bs.obj { className; innerRef = (props.innerRef) }] in
         let newProps = assign2 (Js.Obj.empty ()) (Obj.magic props) stylesObject in
+        ignore (deleteProp newProps "innerRef");
         createVariadicElement (("div")[@reason.raw_literal "div"]) newProps
     end
 

@@ -5,7 +5,7 @@
     struct
       type 'var props =
         {
-        ref: ReactDOM.domRef [@ns.optional ];
+        innerRef: ReactDOM.domRef [@ns.optional ];
         children: React.element [@ns.optional ];
         about: string [@ns.optional ];
         accentHeight: string [@ns.optional ];
@@ -505,11 +505,11 @@
               | `White -> CssJs.color (`hex {js|FAFAFA|js})))|])
         [@bs ])
       let make (props : 'var props) =
-        let className =
-          (styles ~var:(props.var) ()) ^ (getOrEmpty props.className) in
-        let stylesObject = [%bs.obj { className; ref = (props.ref) }] in
+        let className = styles ~var:(props.var) () in
+        let stylesObject = [%bs.obj { className; innerRef = (props.innerRef) }] in
         let newProps = assign2 (Js.Obj.empty ()) (Obj.magic props) stylesObject in
         ignore (deleteProp newProps "var");
+        ignore (deleteProp newProps "innerRef");
         createVariadicElement (("div")[@reason.raw_literal "div"]) newProps
     end
 

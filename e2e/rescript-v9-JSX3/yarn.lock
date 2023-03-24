@@ -71,7 +71,7 @@
     core-js-pure "^3.0.0"
     regenerator-runtime "^0.13.4"
 
-"@babel/runtime@^7.10.2", "@babel/runtime@^7.10.3", "@babel/runtime@^7.12.5":
+"@babel/runtime@^7.10.2", "@babel/runtime@^7.12.5":
   version "7.13.17"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.13.17.tgz#8966d1fc9593bf848602f0662d6b4d0069e3a7ec"
   integrity sha512-NCdgJEelPTSh+FEFylhnP1ylq848l1z9t9N0j1Lfbcw0+KXGjsTvUmkxy+voLLXB5SOKMbLLx4jxYliGrYQseA==
@@ -307,27 +307,35 @@
   resolved "https://registry.yarnpkg.com/@rescript/react/-/react-0.11.0.tgz#d2545546d823bdb8e6b59daa1790098d1666f79e"
   integrity sha512-RzoAO+3cJwXE2D7yodMo4tBO2EkeDYCN/I/Sj/yRweI3S1CY1ZBOF/GMcVtjeIurJJt7KMveqQXTaRrqoGZBBg==
 
-"@testing-library/dom@^7.1.3", "@testing-library/dom@^7.22.3":
-  version "7.30.4"
-  resolved "https://registry.yarnpkg.com/@testing-library/dom/-/dom-7.30.4.tgz#c6a4a91557e92035fd565246bbbfb8107aa4634d"
-  integrity sha512-GObDVMaI4ARrZEXaRy4moolNAxWPKvEYNV/fa6Uc2eAzR/t4otS6A7EhrntPBIQLeehL9DbVhscvvv7gd6hWqA==
+"@rescriptbr/react-testing-library@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@rescriptbr/react-testing-library/-/react-testing-library-1.0.1.tgz#23815a778dc4834fa73799f47851b52cb2fd7f92"
+  integrity sha512-9hajpAGvdQZSGqnrVwNI3KhIiP5ewkWf1ff1/nLupOkH+Vg3eEG3grviPM/IjEh8h227hV8UDuDphdLDYuoajw==
+  dependencies:
+    "@testing-library/react" "^11.1.0"
+    bs-dom-testing-library "^0.7.0"
+
+"@testing-library/dom@^7.26.3", "@testing-library/dom@^7.28.1":
+  version "7.31.2"
+  resolved "https://registry.yarnpkg.com/@testing-library/dom/-/dom-7.31.2.tgz#df361db38f5212b88555068ab8119f5d841a8c4a"
+  integrity sha512-3UqjCpey6HiTZT92vODYLPxTBWlM8ZOOjr3LX5F37/VRipW2M1kX6I/Cm4VXzteZqfGfagg8yXywpcOgQBlNsQ==
   dependencies:
     "@babel/code-frame" "^7.10.4"
     "@babel/runtime" "^7.12.5"
     "@types/aria-query" "^4.2.0"
     aria-query "^4.2.2"
     chalk "^4.1.0"
-    dom-accessibility-api "^0.5.4"
+    dom-accessibility-api "^0.5.6"
     lz-string "^1.4.4"
     pretty-format "^26.6.2"
 
-"@testing-library/react@^10.0.2":
-  version "10.4.9"
-  resolved "https://registry.yarnpkg.com/@testing-library/react/-/react-10.4.9.tgz#9faa29c6a1a217bf8bbb96a28bd29d7a847ca150"
-  integrity sha512-pHZKkqUy0tmiD81afs8xfiuseXfU/N7rAX3iKjeZYje86t9VaB0LrxYVa+OOsvkrveX5jCK3IjajVn2MbePvqA==
+"@testing-library/react@^11.1.0":
+  version "11.2.7"
+  resolved "https://registry.yarnpkg.com/@testing-library/react/-/react-11.2.7.tgz#b29e2e95c6765c815786c0bc1d5aed9cb2bf7818"
+  integrity sha512-tzRNp7pzd5QmbtXNG/mhdcl7Awfu/Iz1RaVHY75zTdOkmHCuzMhRL83gWHSgOAcjS3CCbyfwUHMZgRJb4kAfpA==
   dependencies:
-    "@babel/runtime" "^7.10.3"
-    "@testing-library/dom" "^7.22.3"
+    "@babel/runtime" "^7.12.5"
+    "@testing-library/dom" "^7.28.1"
 
 "@tootallnate/once@2":
   version "2.0.0"
@@ -554,20 +562,12 @@ bs-css@^15.3.0:
   resolved "https://registry.yarnpkg.com/bs-css/-/bs-css-15.3.1.tgz#1749e1ea77a5d8d465c6fddde2c34525d70599c8"
   integrity sha512-TV+Qzuj7O/EovX7EOp1xzvexXZ4oRpF/9qIXilenIkWYnAN61pn5gJ0E4OJxlRdj6iV2I7Tb81dq205VSW3Mdw==
 
-bs-dom-testing-library@^0.6.2:
-  version "0.6.2"
-  resolved "https://registry.yarnpkg.com/bs-dom-testing-library/-/bs-dom-testing-library-0.6.2.tgz#ddc347d2390502eb4803ba44efe23dcb3c7e3f47"
-  integrity sha512-2B7VL5z/26MATtifzLGpoIA5bnCKrWXouvJ8dd9gmavxi2sWg0Kwt61Id5WhJbBsulRjTWB6u4NU7amDJMfS9g==
+bs-dom-testing-library@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/bs-dom-testing-library/-/bs-dom-testing-library-0.7.0.tgz#6656561d471e99be8caa452d757c074c377f10df"
+  integrity sha512-bYbegL2TZ55DGWwdoeB3KugrJUIhIyZvMQablQ09hx9QD1Pzm2Sd6Rn17K2uHdoWj7kBVoSy5muTQOydzNmfWA==
   dependencies:
-    "@testing-library/dom" "^7.1.3"
-
-bs-react-testing-library@^0.7.0:
-  version "0.7.3"
-  resolved "https://registry.yarnpkg.com/bs-react-testing-library/-/bs-react-testing-library-0.7.3.tgz#826faf3b736fab643772cfc00edf5fc43240860a"
-  integrity sha512-M/G8kHKPOtEy4kFJyQb8NyFdFd5/89YautlIABpXd59ugIjyHc40St/HZHqrZoDxqsxsZrtmioXAor8E7oTlTA==
-  dependencies:
-    "@testing-library/react" "^10.0.2"
-    bs-dom-testing-library "^0.6.2"
+    "@testing-library/dom" "^7.26.3"
 
 buffer-from@^1.0.0:
   version "1.1.1"
@@ -785,10 +785,10 @@ diff@^5.1.0:
   resolved "https://registry.yarnpkg.com/diff/-/diff-5.1.0.tgz#bc52d298c5ea8df9194800224445ed43ffc87e40"
   integrity sha512-D+mk+qE8VC/PAUrlAU34N+VfXev0ghe5ywmpqrawphmVZc1bEfn56uo9qpyGp1p4xpzOHkSW4ztBd6L7Xx4ACw==
 
-dom-accessibility-api@^0.5.4:
-  version "0.5.4"
-  resolved "https://registry.yarnpkg.com/dom-accessibility-api/-/dom-accessibility-api-0.5.4.tgz#b06d059cdd4a4ad9a79275f9d414a5c126241166"
-  integrity sha512-TvrjBckDy2c6v6RLxPv5QXOnU+SmF9nBII5621Ve5fu6Z/BDrENurBEvlC1f44lKEUVqOpK4w9E5Idc5/EgkLQ==
+dom-accessibility-api@^0.5.6:
+  version "0.5.16"
+  resolved "https://registry.yarnpkg.com/dom-accessibility-api/-/dom-accessibility-api-0.5.16.tgz#5a7429e6066eb3664d911e33fb0e45de8eb08453"
+  integrity sha512-X7BJ2yElsnOJ30pZF4uIIDfBEVgF4XEBxL9Bxhy6dnrm5hkzqmsWHGTiHqRiITNhMyFLyAiWndIJP7Z1NTteDg==
 
 domexception@^4.0.0:
   version "4.0.0"
@@ -1386,11 +1386,6 @@ read-pkg@^4.0.1:
     parse-json "^4.0.0"
     pify "^3.0.0"
 
-reason-react@^0.10.0:
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/reason-react/-/reason-react-0.10.0.tgz#2449c1817192c4a18b4cfc1681694e9d586f31b3"
-  integrity sha512-NFet0/IC4wXmDR+OdCq/eh6AgceMRlPUXfBSrobewZlJAGLBNEUgRQ80lIJADAUgkUlWFVzpZ7Y6KESA+n714A==
-
 regenerator-runtime@^0.13.4:
   version "0.13.5"
   resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.13.5.tgz#d878a1d094b4306d10b9096484b33ebd55e26697"
@@ -1424,9 +1419,9 @@ rescript-webapi@^0.2.0:
   integrity sha512-SzWON5edviVG1mtHvrUR6UZIpDqSY/nYVkl9F92zFxXhZ+VAdmiJtYoHZTRJ9DSgaslcyY4c9ZlymRqyWZ7eEA==
 
 rescript@10:
-  version "10.1.2"
-  resolved "https://registry.yarnpkg.com/rescript/-/rescript-10.1.2.tgz#ed3b8c762d6e22139803c16e765356685693e38c"
-  integrity sha512-PPdhOiN+lwqxQ0qvzHc1KW0TL12LDy2X+qo/JIMIP3bMfiH0vxQH2e/lXuoutWWm04fGQGTv3hWH+gKW3/UyfA==
+  version "10.1.3"
+  resolved "https://registry.yarnpkg.com/rescript/-/rescript-10.1.3.tgz#0ff208cef09ea1f8ad38efc171c4942eca72d444"
+  integrity sha512-5qaf63As6nkbrMRJ85kZ0ifLzKAGPOGLuoJ4zFVGZIp4oMePRt6bCKWAIX7zgbRDfRPa3jSu+EnoY2873gxaIA==
 
 resolve-from@^4.0.0:
   version "4.0.0"

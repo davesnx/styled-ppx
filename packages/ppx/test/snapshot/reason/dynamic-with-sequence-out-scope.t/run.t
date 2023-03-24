@@ -6,949 +6,949 @@
   module DynamicCompnentWithLetIn = {
     [@bs.deriving abstract]
     type makeProps('color) = {
-      [@ns.optional]
-      ref: ReactDOM.domRef,
-      [@ns.optional]
+      [@bs.optional]
+      innerRef: ReactDOM.domRef,
+      [@bs.optional]
       children: React.element,
-      [@ns.optional]
+      [@bs.optional]
       about: string,
-      [@ns.optional]
+      [@bs.optional]
       accentHeight: string,
-      [@ns.optional]
+      [@bs.optional]
       accept: string,
-      [@ns.optional]
+      [@bs.optional]
       acceptCharset: string,
-      [@ns.optional]
+      [@bs.optional]
       accessKey: string,
-      [@ns.optional]
+      [@bs.optional]
       accumulate: string,
-      [@ns.optional]
+      [@bs.optional]
       action: string,
-      [@ns.optional]
+      [@bs.optional]
       additive: string,
-      [@ns.optional]
+      [@bs.optional]
       alignmentBaseline: string,
-      [@ns.optional]
+      [@bs.optional]
       allowFullScreen: bool,
-      [@ns.optional]
+      [@bs.optional]
       allowReorder: string,
-      [@ns.optional]
+      [@bs.optional]
       alphabetic: string,
-      [@ns.optional]
+      [@bs.optional]
       alt: string,
-      [@ns.optional]
+      [@bs.optional]
       amplitude: string,
-      [@ns.optional]
+      [@bs.optional]
       arabicForm: string,
-      [@ns.optional] [@bs.as "aria-activedescendant"]
+      [@bs.optional] [@bs.as "aria-activedescendant"]
       ariaActivedescendant: string,
-      [@ns.optional] [@bs.as "aria-atomic"]
+      [@bs.optional] [@bs.as "aria-atomic"]
       ariaAtomic: bool,
-      [@ns.optional] [@bs.as "aria-busy"]
+      [@bs.optional] [@bs.as "aria-busy"]
       ariaBusy: bool,
-      [@ns.optional] [@bs.as "aria-colcount"]
+      [@bs.optional] [@bs.as "aria-colcount"]
       ariaColcount: int,
-      [@ns.optional] [@bs.as "aria-colindex"]
+      [@bs.optional] [@bs.as "aria-colindex"]
       ariaColindex: int,
-      [@ns.optional] [@bs.as "aria-colspan"]
+      [@bs.optional] [@bs.as "aria-colspan"]
       ariaColspan: int,
-      [@ns.optional] [@bs.as "aria-controls"]
+      [@bs.optional] [@bs.as "aria-controls"]
       ariaControls: string,
-      [@ns.optional] [@bs.as "aria-describedby"]
+      [@bs.optional] [@bs.as "aria-describedby"]
       ariaDescribedby: string,
-      [@ns.optional] [@bs.as "aria-details"]
+      [@bs.optional] [@bs.as "aria-details"]
       ariaDetails: string,
-      [@ns.optional] [@bs.as "aria-disabled"]
+      [@bs.optional] [@bs.as "aria-disabled"]
       ariaDisabled: bool,
-      [@ns.optional] [@bs.as "aria-errormessage"]
+      [@bs.optional] [@bs.as "aria-errormessage"]
       ariaErrormessage: string,
-      [@ns.optional] [@bs.as "aria-expanded"]
+      [@bs.optional] [@bs.as "aria-expanded"]
       ariaExpanded: bool,
-      [@ns.optional] [@bs.as "aria-flowto"]
+      [@bs.optional] [@bs.as "aria-flowto"]
       ariaFlowto: string,
-      [@ns.optional] [@bs.as "aria-grabbed"]
+      [@bs.optional] [@bs.as "aria-grabbed"]
       ariaGrabbed: bool,
-      [@ns.optional] [@bs.as "aria-hidden"]
+      [@bs.optional] [@bs.as "aria-hidden"]
       ariaHidden: bool,
-      [@ns.optional] [@bs.as "aria-keyshortcuts"]
+      [@bs.optional] [@bs.as "aria-keyshortcuts"]
       ariaKeyshortcuts: string,
-      [@ns.optional] [@bs.as "aria-label"]
+      [@bs.optional] [@bs.as "aria-label"]
       ariaLabel: string,
-      [@ns.optional] [@bs.as "aria-labelledby"]
+      [@bs.optional] [@bs.as "aria-labelledby"]
       ariaLabelledby: string,
-      [@ns.optional] [@bs.as "aria-level"]
+      [@bs.optional] [@bs.as "aria-level"]
       ariaLevel: int,
-      [@ns.optional] [@bs.as "aria-modal"]
+      [@bs.optional] [@bs.as "aria-modal"]
       ariaModal: bool,
-      [@ns.optional] [@bs.as "aria-multiline"]
+      [@bs.optional] [@bs.as "aria-multiline"]
       ariaMultiline: bool,
-      [@ns.optional] [@bs.as "aria-multiselectable"]
+      [@bs.optional] [@bs.as "aria-multiselectable"]
       ariaMultiselectable: bool,
-      [@ns.optional] [@bs.as "aria-owns"]
+      [@bs.optional] [@bs.as "aria-owns"]
       ariaOwns: string,
-      [@ns.optional] [@bs.as "aria-placeholder"]
+      [@bs.optional] [@bs.as "aria-placeholder"]
       ariaPlaceholder: string,
-      [@ns.optional] [@bs.as "aria-posinset"]
+      [@bs.optional] [@bs.as "aria-posinset"]
       ariaPosinset: int,
-      [@ns.optional] [@bs.as "aria-readonly"]
+      [@bs.optional] [@bs.as "aria-readonly"]
       ariaReadonly: bool,
-      [@ns.optional] [@bs.as "aria-relevant"]
+      [@bs.optional] [@bs.as "aria-relevant"]
       ariaRelevant: string,
-      [@ns.optional] [@bs.as "aria-required"]
+      [@bs.optional] [@bs.as "aria-required"]
       ariaRequired: bool,
-      [@ns.optional] [@bs.as "aria-roledescription"]
+      [@bs.optional] [@bs.as "aria-roledescription"]
       ariaRoledescription: string,
-      [@ns.optional] [@bs.as "aria-rowcount"]
+      [@bs.optional] [@bs.as "aria-rowcount"]
       ariaRowcount: int,
-      [@ns.optional] [@bs.as "aria-rowindex"]
+      [@bs.optional] [@bs.as "aria-rowindex"]
       ariaRowindex: int,
-      [@ns.optional] [@bs.as "aria-rowspan"]
+      [@bs.optional] [@bs.as "aria-rowspan"]
       ariaRowspan: int,
-      [@ns.optional] [@bs.as "aria-selected"]
+      [@bs.optional] [@bs.as "aria-selected"]
       ariaSelected: bool,
-      [@ns.optional] [@bs.as "aria-setsize"]
+      [@bs.optional] [@bs.as "aria-setsize"]
       ariaSetsize: int,
-      [@ns.optional] [@bs.as "aria-sort"]
+      [@bs.optional] [@bs.as "aria-sort"]
       ariaSort: string,
-      [@ns.optional] [@bs.as "aria-valuemax"]
+      [@bs.optional] [@bs.as "aria-valuemax"]
       ariaValuemax: float,
-      [@ns.optional] [@bs.as "aria-valuemin"]
+      [@bs.optional] [@bs.as "aria-valuemin"]
       ariaValuemin: float,
-      [@ns.optional] [@bs.as "aria-valuenow"]
+      [@bs.optional] [@bs.as "aria-valuenow"]
       ariaValuenow: float,
-      [@ns.optional] [@bs.as "aria-valuetext"]
+      [@bs.optional] [@bs.as "aria-valuetext"]
       ariaValuetext: string,
-      [@ns.optional]
+      [@bs.optional]
       ascent: string,
-      [@ns.optional]
+      [@bs.optional]
       async: bool,
-      [@ns.optional]
+      [@bs.optional]
       attributeName: string,
-      [@ns.optional]
+      [@bs.optional]
       attributeType: string,
-      [@ns.optional]
+      [@bs.optional]
       autoComplete: string,
-      [@ns.optional]
+      [@bs.optional]
       autoFocus: bool,
-      [@ns.optional]
+      [@bs.optional]
       autoPlay: bool,
-      [@ns.optional]
+      [@bs.optional]
       autoReverse: string,
-      [@ns.optional]
+      [@bs.optional]
       azimuth: string,
-      [@ns.optional]
+      [@bs.optional]
       baseFrequency: string,
-      [@ns.optional]
+      [@bs.optional]
       baselineShift: string,
-      [@ns.optional]
+      [@bs.optional]
       baseProfile: string,
-      [@ns.optional]
+      [@bs.optional]
       bbox: string,
-      [@ns.optional]
+      [@bs.optional]
       begin_: string,
-      [@ns.optional]
+      [@bs.optional]
       bias: string,
-      [@ns.optional]
+      [@bs.optional]
       by: string,
-      [@ns.optional]
+      [@bs.optional]
       calcMode: string,
-      [@ns.optional]
+      [@bs.optional]
       capHeight: string,
-      [@ns.optional]
+      [@bs.optional]
       challenge: string,
-      [@ns.optional]
+      [@bs.optional]
       charSet: string,
-      [@ns.optional]
+      [@bs.optional]
       checked: bool,
-      [@ns.optional]
+      [@bs.optional]
       cite: string,
-      [@ns.optional]
+      [@bs.optional]
       className: string,
-      [@ns.optional]
+      [@bs.optional]
       clip: string,
-      [@ns.optional]
+      [@bs.optional]
       clipPath: string,
-      [@ns.optional]
+      [@bs.optional]
       clipPathUnits: string,
-      [@ns.optional]
+      [@bs.optional]
       clipRule: string,
-      [@ns.optional]
+      [@bs.optional]
       colorInterpolation: string,
-      [@ns.optional]
+      [@bs.optional]
       colorInterpolationFilters: string,
-      [@ns.optional]
+      [@bs.optional]
       colorProfile: string,
-      [@ns.optional]
+      [@bs.optional]
       colorRendering: string,
-      [@ns.optional]
+      [@bs.optional]
       cols: int,
-      [@ns.optional]
+      [@bs.optional]
       colSpan: int,
-      [@ns.optional]
+      [@bs.optional]
       content: string,
-      [@ns.optional]
+      [@bs.optional]
       contentEditable: bool,
-      [@ns.optional]
+      [@bs.optional]
       contentScriptType: string,
-      [@ns.optional]
+      [@bs.optional]
       contentStyleType: string,
-      [@ns.optional]
+      [@bs.optional]
       contextMenu: string,
-      [@ns.optional]
+      [@bs.optional]
       controls: bool,
-      [@ns.optional]
+      [@bs.optional]
       coords: string,
-      [@ns.optional]
+      [@bs.optional]
       crossorigin: bool,
-      [@ns.optional]
+      [@bs.optional]
       cursor: string,
-      [@ns.optional]
+      [@bs.optional]
       cx: string,
-      [@ns.optional]
+      [@bs.optional]
       cy: string,
-      [@ns.optional]
+      [@bs.optional]
       d: string,
-      [@ns.optional]
+      [@bs.optional]
       data: string,
-      [@ns.optional]
+      [@bs.optional]
       datatype: string,
-      [@ns.optional]
+      [@bs.optional]
       dateTime: string,
-      [@ns.optional]
+      [@bs.optional]
       decelerate: string,
-      [@ns.optional]
+      [@bs.optional]
       default: bool,
-      [@ns.optional]
+      [@bs.optional]
       defaultChecked: bool,
-      [@ns.optional]
+      [@bs.optional]
       defaultValue: string,
-      [@ns.optional]
+      [@bs.optional]
       defer: bool,
-      [@ns.optional]
+      [@bs.optional]
       descent: string,
-      [@ns.optional]
+      [@bs.optional]
       diffuseConstant: string,
-      [@ns.optional]
+      [@bs.optional]
       dir: string,
-      [@ns.optional]
+      [@bs.optional]
       direction: string,
-      [@ns.optional]
+      [@bs.optional]
       disabled: bool,
-      [@ns.optional]
+      [@bs.optional]
       display: string,
-      [@ns.optional]
+      [@bs.optional]
       divisor: string,
-      [@ns.optional]
+      [@bs.optional]
       dominantBaseline: string,
-      [@ns.optional]
+      [@bs.optional]
       download: string,
-      [@ns.optional]
+      [@bs.optional]
       draggable: bool,
-      [@ns.optional]
+      [@bs.optional]
       dur: string,
-      [@ns.optional]
+      [@bs.optional]
       dx: string,
-      [@ns.optional]
+      [@bs.optional]
       dy: string,
-      [@ns.optional]
+      [@bs.optional]
       edgeMode: string,
-      [@ns.optional]
+      [@bs.optional]
       elevation: string,
-      [@ns.optional]
+      [@bs.optional]
       enableBackground: string,
-      [@ns.optional]
+      [@bs.optional]
       encType: string,
-      [@ns.optional]
+      [@bs.optional]
       end_: string,
-      [@ns.optional]
+      [@bs.optional]
       exponent: string,
-      [@ns.optional]
+      [@bs.optional]
       externalResourcesRequired: string,
-      [@ns.optional]
+      [@bs.optional]
       fill: string,
-      [@ns.optional]
+      [@bs.optional]
       fillOpacity: string,
-      [@ns.optional]
+      [@bs.optional]
       fillRule: string,
-      [@ns.optional]
+      [@bs.optional]
       filter: string,
-      [@ns.optional]
+      [@bs.optional]
       filterRes: string,
-      [@ns.optional]
+      [@bs.optional]
       filterUnits: string,
-      [@ns.optional]
+      [@bs.optional]
       floodColor: string,
-      [@ns.optional]
+      [@bs.optional]
       floodOpacity: string,
-      [@ns.optional]
+      [@bs.optional]
       focusable: string,
-      [@ns.optional]
+      [@bs.optional]
       fomat: string,
-      [@ns.optional]
+      [@bs.optional]
       fontFamily: string,
-      [@ns.optional]
+      [@bs.optional]
       fontSize: string,
-      [@ns.optional]
+      [@bs.optional]
       fontSizeAdjust: string,
-      [@ns.optional]
+      [@bs.optional]
       fontStretch: string,
-      [@ns.optional]
+      [@bs.optional]
       fontStyle: string,
-      [@ns.optional]
+      [@bs.optional]
       fontVariant: string,
-      [@ns.optional]
+      [@bs.optional]
       fontWeight: string,
-      [@ns.optional]
+      [@bs.optional]
       form: string,
-      [@ns.optional]
+      [@bs.optional]
       formAction: string,
-      [@ns.optional]
+      [@bs.optional]
       formMethod: string,
-      [@ns.optional]
+      [@bs.optional]
       formTarget: string,
-      [@ns.optional]
+      [@bs.optional]
       from: string,
-      [@ns.optional]
+      [@bs.optional]
       fx: string,
-      [@ns.optional]
+      [@bs.optional]
       fy: string,
-      [@ns.optional]
+      [@bs.optional]
       g1: string,
-      [@ns.optional]
+      [@bs.optional]
       g2: string,
-      [@ns.optional]
+      [@bs.optional]
       glyphName: string,
-      [@ns.optional]
+      [@bs.optional]
       glyphOrientationHorizontal: string,
-      [@ns.optional]
+      [@bs.optional]
       glyphOrientationVertical: string,
-      [@ns.optional]
+      [@bs.optional]
       glyphRef: string,
-      [@ns.optional]
+      [@bs.optional]
       gradientTransform: string,
-      [@ns.optional]
+      [@bs.optional]
       gradientUnits: string,
-      [@ns.optional]
+      [@bs.optional]
       hanging: string,
-      [@ns.optional]
+      [@bs.optional]
       headers: string,
-      [@ns.optional]
+      [@bs.optional]
       height: string,
-      [@ns.optional]
+      [@bs.optional]
       hidden: bool,
-      [@ns.optional]
+      [@bs.optional]
       high: int,
-      [@ns.optional]
+      [@bs.optional]
       horizAdvX: string,
-      [@ns.optional]
+      [@bs.optional]
       horizOriginX: string,
-      [@ns.optional]
+      [@bs.optional]
       href: string,
-      [@ns.optional]
+      [@bs.optional]
       hrefLang: string,
-      [@ns.optional]
+      [@bs.optional]
       htmlFor: string,
-      [@ns.optional]
+      [@bs.optional]
       httpEquiv: string,
-      [@ns.optional]
+      [@bs.optional]
       icon: string,
-      [@ns.optional]
+      [@bs.optional]
       id: string,
-      [@ns.optional]
+      [@bs.optional]
       ideographic: string,
-      [@ns.optional]
+      [@bs.optional]
       imageRendering: string,
-      [@ns.optional]
+      [@bs.optional]
       in_: string,
-      [@ns.optional]
+      [@bs.optional]
       in2: string,
-      [@ns.optional]
+      [@bs.optional]
       inlist: string,
-      [@ns.optional]
+      [@bs.optional]
       inputMode: string,
-      [@ns.optional]
+      [@bs.optional]
       integrity: string,
-      [@ns.optional]
+      [@bs.optional]
       intercept: string,
-      [@ns.optional]
+      [@bs.optional]
       itemID: string,
-      [@ns.optional]
+      [@bs.optional]
       itemProp: string,
-      [@ns.optional]
+      [@bs.optional]
       itemRef: string,
-      [@ns.optional]
+      [@bs.optional]
       itemScope: bool,
-      [@ns.optional]
+      [@bs.optional]
       itemType: string,
-      [@ns.optional]
+      [@bs.optional]
       k: string,
-      [@ns.optional]
+      [@bs.optional]
       k1: string,
-      [@ns.optional]
+      [@bs.optional]
       k2: string,
-      [@ns.optional]
+      [@bs.optional]
       k3: string,
-      [@ns.optional]
+      [@bs.optional]
       k4: string,
-      [@ns.optional]
+      [@bs.optional]
       kernelMatrix: string,
-      [@ns.optional]
+      [@bs.optional]
       kernelUnitLength: string,
-      [@ns.optional]
+      [@bs.optional]
       kerning: string,
-      [@ns.optional]
+      [@bs.optional]
       key: string,
-      [@ns.optional]
+      [@bs.optional]
       keyPoints: string,
-      [@ns.optional]
+      [@bs.optional]
       keySplines: string,
-      [@ns.optional]
+      [@bs.optional]
       keyTimes: string,
-      [@ns.optional]
+      [@bs.optional]
       keyType: string,
-      [@ns.optional]
+      [@bs.optional]
       kind: string,
-      [@ns.optional]
+      [@bs.optional]
       label: string,
-      [@ns.optional]
+      [@bs.optional]
       lang: string,
-      [@ns.optional]
+      [@bs.optional]
       lengthAdjust: string,
-      [@ns.optional]
+      [@bs.optional]
       letterSpacing: string,
-      [@ns.optional]
+      [@bs.optional]
       lightingColor: string,
-      [@ns.optional]
+      [@bs.optional]
       limitingConeAngle: string,
-      [@ns.optional]
+      [@bs.optional]
       list: string,
-      [@ns.optional]
+      [@bs.optional]
       local: string,
-      [@ns.optional]
+      [@bs.optional]
       loop: bool,
-      [@ns.optional]
+      [@bs.optional]
       low: int,
-      [@ns.optional]
+      [@bs.optional]
       manifest: string,
-      [@ns.optional]
+      [@bs.optional]
       markerEnd: string,
-      [@ns.optional]
+      [@bs.optional]
       markerHeight: string,
-      [@ns.optional]
+      [@bs.optional]
       markerMid: string,
-      [@ns.optional]
+      [@bs.optional]
       markerStart: string,
-      [@ns.optional]
+      [@bs.optional]
       markerUnits: string,
-      [@ns.optional]
+      [@bs.optional]
       markerWidth: string,
-      [@ns.optional]
+      [@bs.optional]
       mask: string,
-      [@ns.optional]
+      [@bs.optional]
       maskContentUnits: string,
-      [@ns.optional]
+      [@bs.optional]
       maskUnits: string,
-      [@ns.optional]
+      [@bs.optional]
       mathematical: string,
-      [@ns.optional]
+      [@bs.optional]
       max: string,
-      [@ns.optional]
+      [@bs.optional]
       maxLength: int,
-      [@ns.optional]
+      [@bs.optional]
       media: string,
-      [@ns.optional]
+      [@bs.optional]
       mediaGroup: string,
-      [@ns.optional]
+      [@bs.optional]
       min: int,
-      [@ns.optional]
+      [@bs.optional]
       minLength: int,
-      [@ns.optional]
+      [@bs.optional]
       mode: string,
-      [@ns.optional]
+      [@bs.optional]
       multiple: bool,
-      [@ns.optional]
+      [@bs.optional]
       muted: bool,
-      [@ns.optional]
+      [@bs.optional]
       name: string,
-      [@ns.optional]
+      [@bs.optional]
       nonce: string,
-      [@ns.optional]
+      [@bs.optional]
       noValidate: bool,
-      [@ns.optional]
+      [@bs.optional]
       numOctaves: string,
-      [@ns.optional]
+      [@bs.optional]
       offset: string,
-      [@ns.optional]
+      [@bs.optional]
       opacity: string,
-      [@ns.optional]
+      [@bs.optional]
       open_: bool,
-      [@ns.optional]
+      [@bs.optional]
       operator: string,
-      [@ns.optional]
+      [@bs.optional]
       optimum: int,
-      [@ns.optional]
+      [@bs.optional]
       order: string,
-      [@ns.optional]
+      [@bs.optional]
       orient: string,
-      [@ns.optional]
+      [@bs.optional]
       orientation: string,
-      [@ns.optional]
+      [@bs.optional]
       origin: string,
-      [@ns.optional]
+      [@bs.optional]
       overflow: string,
-      [@ns.optional]
+      [@bs.optional]
       overflowX: string,
-      [@ns.optional]
+      [@bs.optional]
       overflowY: string,
-      [@ns.optional]
+      [@bs.optional]
       overlinePosition: string,
-      [@ns.optional]
+      [@bs.optional]
       overlineThickness: string,
-      [@ns.optional]
+      [@bs.optional]
       paintOrder: string,
-      [@ns.optional]
+      [@bs.optional]
       panose1: string,
-      [@ns.optional]
+      [@bs.optional]
       pathLength: string,
-      [@ns.optional]
+      [@bs.optional]
       pattern: string,
-      [@ns.optional]
+      [@bs.optional]
       patternContentUnits: string,
-      [@ns.optional]
+      [@bs.optional]
       patternTransform: string,
-      [@ns.optional]
+      [@bs.optional]
       patternUnits: string,
-      [@ns.optional]
+      [@bs.optional]
       placeholder: string,
-      [@ns.optional]
+      [@bs.optional]
       pointerEvents: string,
-      [@ns.optional]
+      [@bs.optional]
       points: string,
-      [@ns.optional]
+      [@bs.optional]
       pointsAtX: string,
-      [@ns.optional]
+      [@bs.optional]
       pointsAtY: string,
-      [@ns.optional]
+      [@bs.optional]
       pointsAtZ: string,
-      [@ns.optional]
+      [@bs.optional]
       poster: string,
-      [@ns.optional]
+      [@bs.optional]
       prefix: string,
-      [@ns.optional]
+      [@bs.optional]
       preload: string,
-      [@ns.optional]
+      [@bs.optional]
       preserveAlpha: string,
-      [@ns.optional]
+      [@bs.optional]
       preserveAspectRatio: string,
-      [@ns.optional]
+      [@bs.optional]
       primitiveUnits: string,
-      [@ns.optional]
+      [@bs.optional]
       property: string,
-      [@ns.optional]
+      [@bs.optional]
       r: string,
-      [@ns.optional]
+      [@bs.optional]
       radioGroup: string,
-      [@ns.optional]
+      [@bs.optional]
       radius: string,
-      [@ns.optional]
+      [@bs.optional]
       readOnly: bool,
-      [@ns.optional]
+      [@bs.optional]
       refX: string,
-      [@ns.optional]
+      [@bs.optional]
       refY: string,
-      [@ns.optional]
+      [@bs.optional]
       rel: string,
-      [@ns.optional]
+      [@bs.optional]
       renderingIntent: string,
-      [@ns.optional]
+      [@bs.optional]
       repeatCount: string,
-      [@ns.optional]
+      [@bs.optional]
       repeatDur: string,
-      [@ns.optional]
+      [@bs.optional]
       required: bool,
-      [@ns.optional]
+      [@bs.optional]
       requiredExtensions: string,
-      [@ns.optional]
+      [@bs.optional]
       requiredFeatures: string,
-      [@ns.optional]
+      [@bs.optional]
       resource: string,
-      [@ns.optional]
+      [@bs.optional]
       restart: string,
-      [@ns.optional]
+      [@bs.optional]
       result: string,
-      [@ns.optional]
+      [@bs.optional]
       reversed: bool,
-      [@ns.optional]
+      [@bs.optional]
       role: string,
-      [@ns.optional]
+      [@bs.optional]
       rotate: string,
-      [@ns.optional]
+      [@bs.optional]
       rows: int,
-      [@ns.optional]
+      [@bs.optional]
       rowSpan: int,
-      [@ns.optional]
+      [@bs.optional]
       rx: string,
-      [@ns.optional]
+      [@bs.optional]
       ry: string,
-      [@ns.optional]
+      [@bs.optional]
       sandbox: string,
-      [@ns.optional]
+      [@bs.optional]
       scale: string,
-      [@ns.optional]
+      [@bs.optional]
       scope: string,
-      [@ns.optional]
+      [@bs.optional]
       scoped: bool,
-      [@ns.optional]
+      [@bs.optional]
       scrolling: string,
-      [@ns.optional]
+      [@bs.optional]
       seed: string,
-      [@ns.optional]
+      [@bs.optional]
       selected: bool,
-      [@ns.optional]
+      [@bs.optional]
       shape: string,
-      [@ns.optional]
+      [@bs.optional]
       shapeRendering: string,
-      [@ns.optional]
+      [@bs.optional]
       size: int,
-      [@ns.optional]
+      [@bs.optional]
       sizes: string,
-      [@ns.optional]
+      [@bs.optional]
       slope: string,
-      [@ns.optional]
+      [@bs.optional]
       spacing: string,
-      [@ns.optional]
+      [@bs.optional]
       span: int,
-      [@ns.optional]
+      [@bs.optional]
       specularConstant: string,
-      [@ns.optional]
+      [@bs.optional]
       specularExponent: string,
-      [@ns.optional]
+      [@bs.optional]
       speed: string,
-      [@ns.optional]
+      [@bs.optional]
       spellCheck: bool,
-      [@ns.optional]
+      [@bs.optional]
       spreadMethod: string,
-      [@ns.optional]
+      [@bs.optional]
       src: string,
-      [@ns.optional]
+      [@bs.optional]
       srcDoc: string,
-      [@ns.optional]
+      [@bs.optional]
       srcLang: string,
-      [@ns.optional]
+      [@bs.optional]
       srcSet: string,
-      [@ns.optional]
+      [@bs.optional]
       start: int,
-      [@ns.optional]
+      [@bs.optional]
       startOffset: string,
-      [@ns.optional]
+      [@bs.optional]
       stdDeviation: string,
-      [@ns.optional]
+      [@bs.optional]
       stemh: string,
-      [@ns.optional]
+      [@bs.optional]
       stemv: string,
-      [@ns.optional]
+      [@bs.optional]
       step: float,
-      [@ns.optional]
+      [@bs.optional]
       stitchTiles: string,
-      [@ns.optional]
+      [@bs.optional]
       stopColor: string,
-      [@ns.optional]
+      [@bs.optional]
       stopOpacity: string,
-      [@ns.optional]
+      [@bs.optional]
       strikethroughPosition: string,
-      [@ns.optional]
+      [@bs.optional]
       strikethroughThickness: string,
-      [@ns.optional]
+      [@bs.optional]
       stroke: string,
-      [@ns.optional]
+      [@bs.optional]
       strokeDasharray: string,
-      [@ns.optional]
+      [@bs.optional]
       strokeDashoffset: string,
-      [@ns.optional]
+      [@bs.optional]
       strokeLinecap: string,
-      [@ns.optional]
+      [@bs.optional]
       strokeLinejoin: string,
-      [@ns.optional]
+      [@bs.optional]
       strokeMiterlimit: string,
-      [@ns.optional]
+      [@bs.optional]
       strokeOpacity: string,
-      [@ns.optional]
+      [@bs.optional]
       strokeWidth: string,
-      [@ns.optional]
+      [@bs.optional]
       style: ReactDOM.Style.t,
-      [@ns.optional]
+      [@bs.optional]
       summary: string,
-      [@ns.optional]
+      [@bs.optional]
       suppressContentEditableWarning: bool,
-      [@ns.optional]
+      [@bs.optional]
       surfaceScale: string,
-      [@ns.optional]
+      [@bs.optional]
       systemLanguage: string,
-      [@ns.optional]
+      [@bs.optional]
       tabIndex: int,
-      [@ns.optional]
+      [@bs.optional]
       tableValues: string,
-      [@ns.optional]
+      [@bs.optional]
       target: string,
-      [@ns.optional]
+      [@bs.optional]
       targetX: string,
-      [@ns.optional]
+      [@bs.optional]
       targetY: string,
-      [@ns.optional]
+      [@bs.optional]
       textAnchor: string,
-      [@ns.optional]
+      [@bs.optional]
       textDecoration: string,
-      [@ns.optional]
+      [@bs.optional]
       textLength: string,
-      [@ns.optional]
+      [@bs.optional]
       textRendering: string,
-      [@ns.optional]
+      [@bs.optional]
       title: string,
-      [@ns.optional]
+      [@bs.optional]
       to_: string,
-      [@ns.optional]
+      [@bs.optional]
       transform: string,
-      [@ns.optional] [@bs.as "type"]
+      [@bs.optional] [@bs.as "type"]
       type_: string,
-      [@ns.optional]
+      [@bs.optional]
       typeof: string,
-      [@ns.optional]
+      [@bs.optional]
       u1: string,
-      [@ns.optional]
+      [@bs.optional]
       u2: string,
-      [@ns.optional]
+      [@bs.optional]
       underlinePosition: string,
-      [@ns.optional]
+      [@bs.optional]
       underlineThickness: string,
-      [@ns.optional]
+      [@bs.optional]
       unicode: string,
-      [@ns.optional]
+      [@bs.optional]
       unicodeBidi: string,
-      [@ns.optional]
+      [@bs.optional]
       unicodeRange: string,
-      [@ns.optional]
+      [@bs.optional]
       unitsPerEm: string,
-      [@ns.optional]
+      [@bs.optional]
       useMap: string,
-      [@ns.optional]
+      [@bs.optional]
       vAlphabetic: string,
-      [@ns.optional]
+      [@bs.optional]
       value: string,
-      [@ns.optional]
+      [@bs.optional]
       values: string,
-      [@ns.optional]
+      [@bs.optional]
       vectorEffect: string,
-      [@ns.optional]
+      [@bs.optional]
       version: string,
-      [@ns.optional]
+      [@bs.optional]
       vertAdvX: string,
-      [@ns.optional]
+      [@bs.optional]
       vertAdvY: string,
-      [@ns.optional]
+      [@bs.optional]
       vertOriginX: string,
-      [@ns.optional]
+      [@bs.optional]
       vertOriginY: string,
-      [@ns.optional]
+      [@bs.optional]
       vHanging: string,
-      [@ns.optional]
+      [@bs.optional]
       vIdeographic: string,
-      [@ns.optional]
+      [@bs.optional]
       viewBox: string,
-      [@ns.optional]
+      [@bs.optional]
       viewTarget: string,
-      [@ns.optional]
+      [@bs.optional]
       visibility: string,
-      [@ns.optional]
+      [@bs.optional]
       vMathematical: string,
-      [@ns.optional]
+      [@bs.optional]
       vocab: string,
-      [@ns.optional]
+      [@bs.optional]
       width: string,
-      [@ns.optional]
+      [@bs.optional]
       widths: string,
-      [@ns.optional]
+      [@bs.optional]
       wordSpacing: string,
-      [@ns.optional]
+      [@bs.optional]
       wrap: string,
-      [@ns.optional]
+      [@bs.optional]
       writingMode: string,
-      [@ns.optional]
+      [@bs.optional]
       x: string,
-      [@ns.optional]
+      [@bs.optional]
       x1: string,
-      [@ns.optional]
+      [@bs.optional]
       x2: string,
-      [@ns.optional]
+      [@bs.optional]
       xChannelSelector: string,
-      [@ns.optional]
+      [@bs.optional]
       xHeight: string,
-      [@ns.optional]
+      [@bs.optional]
       xlinkActuate: string,
-      [@ns.optional]
+      [@bs.optional]
       xlinkArcrole: string,
-      [@ns.optional]
+      [@bs.optional]
       xlinkHref: string,
-      [@ns.optional]
+      [@bs.optional]
       xlinkRole: string,
-      [@ns.optional]
+      [@bs.optional]
       xlinkShow: string,
-      [@ns.optional]
+      [@bs.optional]
       xlinkTitle: string,
-      [@ns.optional]
+      [@bs.optional]
       xlinkType: string,
-      [@ns.optional]
+      [@bs.optional]
       xmlBase: string,
-      [@ns.optional]
+      [@bs.optional]
       xmlLang: string,
-      [@ns.optional]
+      [@bs.optional]
       xmlns: string,
-      [@ns.optional]
+      [@bs.optional]
       xmlnsXlink: string,
-      [@ns.optional]
+      [@bs.optional]
       xmlSpace: string,
-      [@ns.optional]
+      [@bs.optional]
       y: string,
-      [@ns.optional]
+      [@bs.optional]
       y1: string,
-      [@ns.optional]
+      [@bs.optional]
       y2: string,
-      [@ns.optional]
+      [@bs.optional]
       yChannelSelector: string,
-      [@ns.optional]
+      [@bs.optional]
       z: string,
-      [@ns.optional]
+      [@bs.optional]
       zoomAndPan: string,
-      [@ns.optional]
+      [@bs.optional]
       onAbort: ReactEvent.Media.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onAnimationEnd: ReactEvent.Animation.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onAnimationIteration: ReactEvent.Animation.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onAnimationStart: ReactEvent.Animation.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onBlur: ReactEvent.Focus.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onCanPlay: ReactEvent.Media.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onCanPlayThrough: ReactEvent.Media.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onChange: ReactEvent.Form.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onClick: ReactEvent.Mouse.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onCompositionEnd: ReactEvent.Composition.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onCompositionStart: ReactEvent.Composition.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onCompositionUpdate: ReactEvent.Composition.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onContextMenu: ReactEvent.Mouse.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onCopy: ReactEvent.Clipboard.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onCut: ReactEvent.Clipboard.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onDoubleClick: ReactEvent.Mouse.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onDrag: ReactEvent.Mouse.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onDragEnd: ReactEvent.Mouse.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onDragEnter: ReactEvent.Mouse.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onDragExit: ReactEvent.Mouse.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onDragLeave: ReactEvent.Mouse.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onDragOver: ReactEvent.Mouse.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onDragStart: ReactEvent.Mouse.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onDrop: ReactEvent.Mouse.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onDurationChange: ReactEvent.Media.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onEmptied: ReactEvent.Media.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onEncrypetd: ReactEvent.Media.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onEnded: ReactEvent.Media.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onError: ReactEvent.Media.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onFocus: ReactEvent.Focus.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onInput: ReactEvent.Form.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onKeyDown: ReactEvent.Keyboard.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onKeyPress: ReactEvent.Keyboard.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onKeyUp: ReactEvent.Keyboard.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onLoadedData: ReactEvent.Media.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onLoadedMetadata: ReactEvent.Media.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onLoadStart: ReactEvent.Media.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onMouseDown: ReactEvent.Mouse.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onMouseEnter: ReactEvent.Mouse.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onMouseLeave: ReactEvent.Mouse.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onMouseMove: ReactEvent.Mouse.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onMouseOut: ReactEvent.Mouse.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onMouseOver: ReactEvent.Mouse.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onMouseUp: ReactEvent.Mouse.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onPaste: ReactEvent.Clipboard.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onPause: ReactEvent.Media.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onPlay: ReactEvent.Media.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onPlaying: ReactEvent.Media.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onProgress: ReactEvent.Media.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onRateChange: ReactEvent.Media.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onScroll: ReactEvent.UI.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onSeeked: ReactEvent.Media.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onSeeking: ReactEvent.Media.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onSelect: ReactEvent.Selection.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onStalled: ReactEvent.Media.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onSubmit: ReactEvent.Form.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onSuspend: ReactEvent.Media.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onTimeUpdate: ReactEvent.Media.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onTouchCancel: ReactEvent.Touch.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onTouchEnd: ReactEvent.Touch.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onTouchMove: ReactEvent.Touch.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onTouchStart: ReactEvent.Touch.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onTransitionEnd: ReactEvent.Transition.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onVolumeChange: ReactEvent.Media.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onWaiting: ReactEvent.Media.t => unit,
-      [@ns.optional]
+      [@bs.optional]
       onWheel: ReactEvent.Wheel.t => unit,
       color: 'color,
     };
@@ -970,11 +970,14 @@
       CssJs.style(. styles);
     };
     let make = (props: makeProps('color)) => {
-      let className =
-        styles(~color=colorGet(props), ()) ++ getOrEmpty(classNameGet(props));
-      let stylesObject = {"className": className, "ref": refGet(props)};
+      let className = styles(~color=colorGet(props), ());
+      let stylesObject = {
+        "className": className,
+        "innerRef": innerRefGet(props),
+      };
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(newProps, "color"));
+      ignore(deleteProp(newProps, "innerRef"));
       createVariadicElement("div", newProps);
     };
   };
