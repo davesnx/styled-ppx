@@ -1,4 +1,4 @@
-  $ bsc -ppx "rewriter --jsx-version 4" -only-parse -bs-ast -bs-jsx 4 -bs-diagnose -bs-no-version-header -bs-no-builtin-ppx -bs-super-errors -color never -dsource input.res 2> output.ml
+  $ bsc -ppx "rewriter" -only-parse -bs-ast -bs-jsx 4 -bs-diagnose -bs-no-version-header -bs-no-builtin-ppx -bs-super-errors -color never -dsource input.res 2> output.ml
 
   $ cat output.ml
   module DynamicComponentWithDefaultValue =

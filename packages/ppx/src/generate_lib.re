@@ -11,9 +11,6 @@ module ReasonAttributes = {
 
   let rawLiteral = (~loc) =>
     Helper.Attr.mk(withLoc("reason.raw_literal", ~loc), PStr([]));
-
-  let reactComponent = (~loc) =>
-    Helper.Attr.mk(withLoc("react.component", ~loc), PStr([]));
 };
 
 module ReScriptAttributes = {

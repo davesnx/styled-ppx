@@ -1,14 +1,18 @@
 {
   "name": "styled-ppx-demo-rescript-v10-jsx4",
-  "jsx": { "version": 4 },
+  "jsx": { "version": 4, "mode": "classic" },
   "bsc-flags": [
     "-bs-super-errors"
   ],
-  "sources": {
+  "sources": [{
     "dir": "src",
-    "subdirs": true,
+    "subdirs": false,
     "type": "dev"
-  },
+  }, {
+    "dir": "demo",
+    "subdirs": false,
+    "type": "dev"
+  }],
   "package-specs": [
     {
       "module": "commonjs",

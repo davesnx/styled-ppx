@@ -8,6 +8,7 @@
   styled-ppx.reason-css-parser
   styled-ppx.string-interpolation
   ppxlib
-  yojson)
+  yojson
+  ppx_deriving_yojson.runtime)
  (preprocess
-  (pps ppxlib.metaquot)))
+  (pps ppxlib.metaquot ppx_deriving_yojson)))

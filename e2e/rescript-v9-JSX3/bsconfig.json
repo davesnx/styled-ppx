@@ -1,8 +1,5 @@
 {
   "name": "styled-ppx-demo-rescript-v9-jsx3",
-  "jsx": {
-    "version": 3
-  },
   "reason": {
     "react-jsx": 3
   },
