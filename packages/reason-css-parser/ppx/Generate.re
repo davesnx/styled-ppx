@@ -645,8 +645,11 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
 
 let rec (create_renderer : value => Parsetree.expression) = (value) => {
 	let apply_modifier = (modifier, value) => switch(modifier){
-			| One
-			| Optional
+			| One => value
+			| Optional => {
+				let expr = pexp_apply(value, [(Nolabel, [%expr arg])]);
+				[%expr fun | Some(arg) => Some([%e expr]) | None => None]
+			}
 			| Repeat(_)
 			| Repeat_by_comma(_, _)
 			| Zero_or_more
@@ -682,7 +685,6 @@ let rec (create_renderer : value => Parsetree.expression) = (value) => {
 			| Delim(name) => 
 				{
 				let formatted_name = variant_name(value);
-				Format.eprintf("%s @.", formatted_name);	
 				(ppat_variant(formatted_name, None), name |> value_of_delimiter |> pconst_string |> pexp_constant);
 				}
 
