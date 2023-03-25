@@ -1,3 +1,11 @@
+  $ cat >bsconfig.json <<EOF
+  > {
+  >   "dependencies": [
+  >     "@rescript/react"
+  >   ]
+  > }
+  > EOF
+
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
@@ -974,10 +982,7 @@
       |]);
     let make = (props: makeProps('var)) => {
       let className = styles(~var=varGet(props), ());
-      let stylesObject = {
-        "className": className,
-        "innerRef": innerRefGet(props),
-      };
+      let stylesObject = {"className": className, "ref": innerRefGet(props)};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(newProps, "var"));
       ignore(deleteProp(newProps, "innerRef"));

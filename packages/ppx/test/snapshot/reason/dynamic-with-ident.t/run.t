@@ -966,10 +966,7 @@
     let styles = (~a as _, _) => CssJs.style(. cssRule);
     let make = (props: makeProps('a)) => {
       let className = styles(~a=aGet(props), ());
-      let stylesObject = {
-        "className": className,
-        "innerRef": innerRefGet(props),
-      };
+      let stylesObject = {"className": className, "ref": innerRefGet(props)};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(newProps, "a"));
       ignore(deleteProp(newProps, "innerRef"));

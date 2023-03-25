@@ -970,10 +970,7 @@
     };
     let make = (props: makeProps('size)) => {
       let className = styles(~size=sizeGet(props), ());
-      let stylesObject = {
-        "className": className,
-        "innerRef": innerRefGet(props),
-      };
+      let stylesObject = {"className": className, "ref": innerRefGet(props)};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(newProps, "size"));
       ignore(deleteProp(newProps, "innerRef"));
@@ -1952,10 +1949,7 @@
     };
     let make = (props: makeProps('variant)) => {
       let className = styles(~variant=variantGet(props), ());
-      let stylesObject = {
-        "className": className,
-        "innerRef": innerRefGet(props),
-      };
+      let stylesObject = {"className": className, "ref": innerRefGet(props)};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(newProps, "variant"));
       ignore(deleteProp(newProps, "innerRef"));

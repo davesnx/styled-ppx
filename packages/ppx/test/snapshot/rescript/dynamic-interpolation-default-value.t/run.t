@@ -505,7 +505,7 @@
         [@bs ])
       let make (props : 'var props) =
         let className = styles ?var:(props.var) () in
-        let stylesObject = [%bs.obj { className; innerRef = (props.innerRef) }] in
+        let stylesObject = [%bs.obj { className; ref = (props.innerRef) }] in
         let newProps = assign2 (Js.Obj.empty ()) (Obj.magic props) stylesObject in
         ignore (deleteProp newProps "var");
         ignore (deleteProp newProps "innerRef");

@@ -9,13 +9,11 @@ module Result = {
   };
 };
 
-[@deriving yojson({strict: false})]
+[@deriving of_yojson({strict: false})]
 type jsx = {
   version: int,
   mode: option(string),
 };
-[@deriving yojson({strict: false})]
-type bsconfig = {jsx: option(jsx)};
 
 let findProjectRoot = dir => {
   let rec traverseProject = dir =>
@@ -48,24 +46,42 @@ let getBsConfigFile = () => {
 
 let _ = setProjectRoot();
 
+let from_file = filename =>
+  try(Ok(Yojson.Safe.from_file(filename))) {
+  | exn => Error(Printexc.to_string(exn))
+  };
+
+exception Parse_config_error(string);
+/* This is unlikely to happen since ReScript
+   ensures each run their config is correct */
+exception Malformed_jsx(string);
+
+let parse = json => {
+  let yojson = json |> Yojson.Safe.from_file;
+  switch (yojson |> Yojson.Safe.Util.member("jsx") |> jsx_of_yojson) {
+  | Ok(jsx) =>
+    switch (jsx) {
+    | {version, mode: _} when version === 3 => (Some(version), None)
+    | {version, mode: Some("classic") as mode} when version === 4 => (
+        Some(version),
+        mode,
+      )
+    | {version, mode: Some("automatic") as mode} when version === 4 => (
+        Some(version),
+        mode,
+      )
+    | _ => raise(Malformed_jsx("Malformed jsx"))
+    }
+  | Error(e) => raise(Parse_config_error(e))
+  };
+};
+
 let getJSX = () => {
   switch (getBsConfigFile()) {
   | Some(bsConfigFile) =>
-    switch (bsConfigFile |> Yojson.Safe.from_file |> bsconfig_of_yojson) {
-    | Error(_e) => (None, None)
-    | Ok(bsconfig) =>
-      switch (bsconfig.jsx) {
-      | Some({version, mode: _}) when version === 3 => (Some(version), None)
-      | Some({version, mode: Some("classic") as mode}) when version === 4 => (
-          Some(version),
-          mode,
-        )
-      | Some({version, mode: Some("automatic") as mode}) when version === 4 => (
-          Some(version),
-          mode,
-        )
-      | _ => (None, None)
-      }
+    try(parse(bsConfigFile)) {
+    | Parse_config_error(_e) => (None, None)
+    | Malformed_jsx(_e) => (None, None)
     }
   | None => (None, None)
   };

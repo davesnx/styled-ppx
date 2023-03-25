@@ -360,7 +360,7 @@ let _ =
 let compatibleWithBsEmotionPpx =
   Settings.find(Settings.compatibleWithBsEmotionPpx.flag, Sys.argv);
 
-let (version, mode) = Bs_config.getJSX();
+let (version, mode) = Bsconfig.getJSX();
 
 switch (version) {
 | Some(version) =>

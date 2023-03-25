@@ -263,10 +263,7 @@ let stylesAndRefObject = (~loc) => {
     withLoc(~loc, Lident("className")),
     Helper.Exp.ident(~loc, withLoc(Lident("className"), ~loc)),
   );
-  let refProp = (
-    withLoc(~loc, Lident("innerRef")),
-    propItem(~loc, "innerRef"),
-  );
+  let refProp = (withLoc(~loc, Lident("ref")), propItem(~loc, "innerRef"));
   let record = Helper.Exp.record(~loc, [className, refProp], None);
   Helper.Vb.mk(
     ~loc,
