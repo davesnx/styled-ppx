@@ -4,18 +4,19 @@
   "bsc-flags": [
     "-bs-super-errors"
   ],
+  "warnings": {
+    "number": "-48"
+  },
   "sources": [{
     "dir": "src",
-    "subdirs": false,
-    "type": "dev"
+    "subdirs": false
   }, {
     "dir": "demo",
-    "subdirs": false,
-    "type": "dev"
+    "subdirs": false
   }],
   "package-specs": [
     {
-      "module": "commonjs",
+      "module": "es6",
       "in-source": true
     }
   ],
@@ -27,6 +28,9 @@
   "bs-dependencies": [
     "@rescript/react",
     "bs-css",
-    "bs-css-emotion"
+    "bs-css-emotion",
+    "@rescriptbr/react-testing-library",
+    "rescript-vitest",
+    "rescript-webapi"
   ]
 }

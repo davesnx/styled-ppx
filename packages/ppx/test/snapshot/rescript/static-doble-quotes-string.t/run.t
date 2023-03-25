@@ -2,7 +2,7 @@
 
   $ rescript convert output.ml
   Error when converting output.ml
-  File "", line 23, characters 29-30:
+  File "", line 499, characters 29-30:
   Error: Syntax error: operator expected.
   
 

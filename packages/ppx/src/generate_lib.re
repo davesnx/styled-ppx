@@ -552,7 +552,9 @@ let makePropsJSX4 = (~loc, customProps) => {
   switch (customProps) {
   | Some((params, dynamicProps)) =>
     makePropsWithParams(~loc, params, dynamicProps)
-  | None => [%stri type props = JsxDOM.domProps]
+  /* We would like to use [%stri type props = JsxDOM.domProps], but since
+     we use innerRef wrapper, we can't. */
+  | None => makePropsWithParams(~loc, [], [])
   };
 };
 

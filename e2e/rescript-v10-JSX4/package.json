@@ -4,27 +4,30 @@
   "license": "MIT",
   "scripts": {
     "start": "concurrently --names re,js,www --kill-others yarn:re:watch yarn:bundle:watch yarn:dev-server",
-    "bundle": "esbuild ./src/index.bs.js --outfile=src/bundle.js --bundle --sourcemap --target=chrome58,firefox57,safari11,edge16 --define:process.env.NODE_ENV='\"development\"'",
-    "dev-server": "PORT=5000 live-server src --host=0.0.0.0",
+    "bundle": "esbuild ./demo/index.bs.js --outfile=demo/bundle.js --bundle --sourcemap --target=chrome58,firefox57,safari11,edge16 --define:process.env.NODE_ENV='\"development\"'",
+    "dev-server": "PORT=5000 live-server demo --host=0.0.0.0",
     "bundle:watch": "yarn bundle --watch --color=true",
-    "re:build": "rescript build",
-    "re:watch": "rescript build -w",
+    "build": "rescript build",
+    "watch": "rescript build -w",
     "re:clean": "rescript clean",
-    "clean": "rm -rf src/bundle.js; yarn run re:clean"
+    "clean": "rm -rf src/bundle.js; yarn run re:clean",
+    "test_watch": "concurrently 'yarn watch' 'vitest'",
+    "pretest": "yarn build",
+    "test": "vitest --run --silent"
   },
   "dependencies": {
-    "@rescript/react": "^0.10.0",
-    "@rescriptbr/react-testing-library": "^1.0.1",
-    "bs-css": "^15.3.0",
+    "@rescript/react": "0.11.0",
+    "@rescriptbr/react-testing-library": "1.0.1",
+    "bs-css": "16.0.0",
     "bs-css-emotion": "5.0.0",
     "concurrently": "^5.1.0",
     "jsdom": "^21.1.0",
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0",
-    "rescript": "10",
-    "rescript-vitest": "^1.1.0",
-    "rescript-webapi": "^0.2.0",
-    "vite": "^4.1.3",
-    "vitest": "^0.28.5"
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "rescript": "10.1.3",
+    "rescript-vitest": "1.1.0",
+    "rescript-webapi": "0.7.0",
+    "vite": "4.2.1",
+    "vitest": "0.29.7"
   }
 }
