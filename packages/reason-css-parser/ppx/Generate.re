@@ -3,7 +3,6 @@ open Longident;
 module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
   open Ast_builder;
   open Css_spec_parser;
-	exception Unsupported_feature;
 
   let txt = txt => {Location.loc: Ast_builder.loc, txt};
 
@@ -735,20 +734,14 @@ let rec (create_renderer : value => Parsetree.expression) = (value) => {
 };
 
 let make_printer = bindings => {
-			let f = binding => {
+			let generate_render = binding => {
 				let (name, value) = extract_spec_value(binding);
 				let expr = create_renderer(value);
 				let pat = ppat_var(txt("render_" ++ value_name_of_css(name)));
 				value_binding(~pat, ~expr);
 			}  
 
-			let renderers = List.map((binding) => {
-				try(f(binding)) {
-					| Unsupported_feature => 
-					let expr = [%expr "todo"];
-					value_binding(~pat=[%pat? render__], ~expr) 
-				}
-			}, bindings)
+			let renderers = List.map(generate_render, bindings)
 
 			let generated = pstr_value(Recursive, renderers)
 
