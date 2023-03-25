@@ -645,38 +645,55 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
 
 let rec (create_renderer : value => Parsetree.expression) = (value) => {
 	let apply_modifier = (modifier, value) => switch(modifier){
-		| _ => value
+			| One
+			| Optional
+			| Repeat(_)
+			| Repeat_by_comma(_, _)
+			| Zero_or_more
+			| One_or_more
+			| At_least_one => value
 		};
 
 	let rec terminal_op = (kind, _multiplier) => {
-		let variant_name = variant_name(value);
 			switch (kind) {
-			| Delim(_) => raise(Unsupported_feature)
+			| Delim(name) =>
+				let variant_name = value_of_delimiter(name);
+				let lhs = ppat_variant(variant_name, None);
+				let rhs = name |> value_of_delimiter |> pconst_string |> pexp_constant;
+				let cases = case(~lhs, ~rhs, ~guard=None);
+				pexp_function([cases]);
+
 			| Keyword(name) =>
+				let variant_name = variant_name(value);
 				let lhs = ppat_variant(variant_name, None);
 				let rhs = name |> pconst_string |> pexp_constant;
 				let cases = case(~lhs, ~rhs, ~guard=None);
 				pexp_function([cases]);
+			| Property_type(name) 
 			| Data_type(name) =>
 				let formatted_name = value_name_of_css(name);
 				let name = Lident("render_" ++ formatted_name);
 				pexp_apply(pexp_ident @@ txt(name), []);
-			| Property_type(_) => raise(Unsupported_feature)
 			};
 		}
 
 	and terminal_xor_op = (kind, _multiplier, value) => {
-			/* let variant_name = variant_name(value); */
 			switch (kind) {
-			| Delim(_) => raise(Unsupported_feature)
+			| Delim(name) => 
+				{
+				let formatted_name = variant_name(value);
+				Format.eprintf("%s @.", formatted_name);	
+				(ppat_variant(formatted_name, None), name |> value_of_delimiter |> pconst_string |> pexp_constant);
+				}
+
 			| Keyword(name) =>
 				let formatted_name = variant_name(value);
 				(ppat_variant(formatted_name, None), name |> pconst_string |> pexp_constant);
+			| Property_type(name) 
 			| Data_type(name) =>
 				let formatted_name = value_name_of_css(name);
 				let name = Lident("render_" ++ formatted_name);
-				(ppat_variant(variant_name(value), Some([%pat? arg])) ,pexp_apply(pexp_ident @@ txt(name), [(Nolabel, pexp_ident(txt(Lident("arg"))))]))
-			| Property_type(_) => raise(Unsupported_feature)
+				(ppat_variant(variant_name(value), Some([%pat? arg])), pexp_apply(pexp_ident @@ txt(name), [(Nolabel, pexp_ident(txt(Lident("arg"))))]))
 			};
 	}
 
@@ -693,10 +710,12 @@ let rec (create_renderer : value => Parsetree.expression) = (value) => {
 		switch(kind) {
 			| Xor => 
 				let names = variant_names(values);
-				let args = List.combine(names, values)
-				List.map(xor_op, args) |> pexp_function
-
-			| _ => raise(Unsupported_feature);
+				let args = List.combine(names, values);
+				pexp_function @@ List.map(xor_op, args);
+				
+			| Or
+			| Static
+			| And => pexp_tuple @@ List.map(create_renderer, values);
 		}
 	}
 	and function_call = (_name, value) => {
