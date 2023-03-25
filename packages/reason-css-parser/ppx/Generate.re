@@ -750,7 +750,7 @@ let make_printer = bindings => {
 				}
 			}, bindings)
 
-			let generated = pstr_value(Nonrecursive, renderers)
+			let generated = pstr_value(Recursive, renderers)
 
 			let standard_printers = [
         [%stri let build_variant = (~loc, name, args) => Ast_helper.Exp.variant(~loc, name, args) ],
