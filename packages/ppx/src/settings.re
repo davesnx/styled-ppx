@@ -23,7 +23,7 @@ let jsxVersion = {
   flag: "--jsx-version",
   doc: "Configure the version of JSX to use (3 or 4)",
   value: None,
-  defaultValue: 4,
+  defaultValue: 3,
 };
 
 let jsxMode = {
