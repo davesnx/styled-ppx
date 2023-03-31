@@ -1,15 +1,14 @@
 (library
- (name main)
+ (name ppx)
  (public_name styled-ppx.lib)
  (kind ppx_rewriter)
  (wrapped false)
- (flags
-  (:standard -w -9))
  (libraries
   styled-ppx.css-parser
   styled-ppx.reason-css-parser
   styled-ppx.string-interpolation
   ppxlib
-  str)
+  yojson
+  ppx_deriving_yojson.runtime)
  (preprocess
-  (pps ppxlib.metaquot)))
+  (pps ppxlib.metaquot ppx_deriving_yojson)))

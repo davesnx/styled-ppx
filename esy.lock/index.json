@@ -1,7 +1,21 @@
 {
-  "checksum": "8d1fc67736145c418aa0e113299b77d3",
+  "checksum": "90debc3110494ce04e6b6afc7655a73f",
   "root": "@davesnx/styled-ppx@link-dev:./package.json",
   "node": {
+    "rescript@10.1.3@d41d8cd9": {
+      "id": "rescript@10.1.3@d41d8cd9",
+      "name": "rescript",
+      "version": "10.1.3",
+      "source": {
+        "type": "install",
+        "source": [
+          "archive:https://registry.npmjs.org/rescript/-/rescript-10.1.3.tgz#sha1:0ff208cef09ea1f8ad38efc171c4942eca72d444"
+        ]
+      },
+      "overrides": [],
+      "dependencies": [],
+      "devDependencies": []
+    },
     "ocaml@4.14.0@d41d8cd9": {
       "id": "ocaml@4.14.0@d41d8cd9",
       "name": "ocaml",
@@ -519,6 +533,38 @@
       ],
       "devDependencies": [
         "ocaml@4.14.0@d41d8cd9", "@opam/yojson@opam:2.0.2@eb65f292",
+        "@opam/dune@opam:3.4.1@84d54aea"
+      ]
+    },
+    "@opam/ppx_deriving_yojson@opam:3.7.0@167442d6": {
+      "id": "@opam/ppx_deriving_yojson@opam:3.7.0@167442d6",
+      "name": "@opam/ppx_deriving_yojson",
+      "version": "opam:3.7.0",
+      "source": {
+        "type": "install",
+        "source": [
+          "archive:https://opam.ocaml.org/cache/md5/45/456be82acb16bbf6be12ab01f9dfaa94#md5:456be82acb16bbf6be12ab01f9dfaa94",
+          "archive:https://github.com/ocaml-ppx/ppx_deriving_yojson/releases/download/v3.7.0/ppx_deriving_yojson-3.7.0.tar.gz#md5:456be82acb16bbf6be12ab01f9dfaa94"
+        ],
+        "opam": {
+          "name": "ppx_deriving_yojson",
+          "version": "3.7.0",
+          "path": "esy.lock/opam/ppx_deriving_yojson.3.7.0"
+        }
+      },
+      "overrides": [],
+      "dependencies": [
+        "ocaml@4.14.0@d41d8cd9", "@opam/yojson@opam:2.0.2@eb65f292",
+        "@opam/result@opam:1.5@1c6a6533",
+        "@opam/ppxlib@github:ocaml-ppx/ppxlib:ppxlib.opam#8b8987c5690ad839348d96bf52471b03b88f06ed@d41d8cd9",
+        "@opam/ppx_deriving@opam:5.2.1@2315fdd0",
+        "@opam/dune@opam:3.4.1@84d54aea", "@esy-ocaml/substs@0.0.1@d41d8cd9"
+      ],
+      "devDependencies": [
+        "ocaml@4.14.0@d41d8cd9", "@opam/yojson@opam:2.0.2@eb65f292",
+        "@opam/result@opam:1.5@1c6a6533",
+        "@opam/ppxlib@github:ocaml-ppx/ppxlib:ppxlib.opam#8b8987c5690ad839348d96bf52471b03b88f06ed@d41d8cd9",
+        "@opam/ppx_deriving@opam:5.2.1@2315fdd0",
         "@opam/dune@opam:3.4.1@84d54aea"
       ]
     },
@@ -1768,9 +1814,10 @@
         "manifest": "package.json"
       },
       "overrides": [],
-      "dependencies": [],
+      "dependencies": [ "@opam/ppx_deriving_yojson@opam:3.7.0@167442d6" ],
       "devDependencies": [
-        "ocaml@4.14.0@d41d8cd9", "@opam/sedlex@opam:3.0@6e37d05e",
+        "rescript@10.1.3@d41d8cd9", "ocaml@4.14.0@d41d8cd9",
+        "@opam/yojson@opam:2.0.2@eb65f292", "@opam/sedlex@opam:3.0@6e37d05e",
         "@opam/reason@github:reasonml/reason:reason.opam#b283f335f90e3aaa398bff8e82761038ee42a99d@d41d8cd9",
         "@opam/ppxlib@github:ocaml-ppx/ppxlib:ppxlib.opam#8b8987c5690ad839348d96bf52471b03b88f06ed@d41d8cd9",
         "@opam/ppx_deriving@opam:5.2.1@2315fdd0",

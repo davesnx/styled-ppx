@@ -117,9 +117,22 @@ let unsupportedProperty = parser =>
     (~loc as _) => raise(Unsupported_feature),
   );
 
-let render_string = (~loc, string) =>
-  Helper.Const.string(~quotation_delimiter="js", string)
-  |> Helper.Exp.constant(~loc);
+let render_string = (~loc, s) => {
+  switch (File.get()) {
+  | Some(ReScript) =>
+    Helper.Exp.constant(
+      ~loc,
+      ~attrs=[Generate_lib.BuckleScriptAttributes.uncurried(~loc)],
+      Helper.Const.string(~quotation_delimiter="*j", s),
+    )
+  | Some(Reason)
+  | _ =>
+    Helper.Exp.constant(
+      ~loc,
+      Helper.Const.string(~quotation_delimiter="js", s),
+    )
+  };
+};
 let render_integer = (~loc, integer) =>
   Helper.Const.int(integer) |> Helper.Exp.constant(~loc);
 let render_number = (~loc, number) =>

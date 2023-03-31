@@ -1,0 +1,29 @@
+{
+  "name": "styled-ppx-demo-rescript-v9-jsx3",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {
+    "build": "rescript build",
+    "watch": "rescript build -w",
+    "clean": "rescript clean",
+    "test_watch": "concurrently 'yarn watch' 'vitest'",
+    "pretest": "yarn build",
+    "test": "vitest --run --silent",
+    "start": "yarn test"
+  },
+  "dependencies": {
+    "@rescript/react": "^0.10.0",
+    "@rescriptbr/react-testing-library": "^1.0.1",
+    "bs-css": "^15.3.0",
+    "bs-css-emotion": "5.0.0",
+    "concurrently": "^5.1.0",
+    "jsdom": "^21.1.0",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "rescript": "10",
+    "rescript-vitest": "^1.1.0",
+    "rescript-webapi": "^0.2.0",
+    "vite": "^4.1.3",
+    "vitest": "^0.28.5"
+  }
+}

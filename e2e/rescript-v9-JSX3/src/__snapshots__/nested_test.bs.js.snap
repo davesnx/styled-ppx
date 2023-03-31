@@ -1,0 +1,9 @@
+// Vitest Snapshot v1
+
+exports[`Nested > Nested component renders 1`] = `
+<div>
+  <div
+    class="css-xtnv8v-Nested"
+  />
+</div>
+`;

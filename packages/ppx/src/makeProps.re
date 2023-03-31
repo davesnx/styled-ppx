@@ -632,8 +632,8 @@ let hasName = (prop, propName) => {
   };
 };
 
-/* If a name from props collide with an attribute, we exclude it from the search
-   since we add the props separately */
+/* If a name from props collide with an attribute, we exclude it from the list
+   of available makeProps */
 let get = propsToExclude => {
   let findInExclude = prop => List.find_opt(hasName(prop), propsToExclude);
 

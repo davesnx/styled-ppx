@@ -23,11 +23,22 @@ let number_to_const = number =>
     Helper.Const.integer(number);
   };
 
-let string_to_const = (~loc, s) =>
-  Helper.Exp.constant(
-    ~loc,
-    Helper.Const.string(~quotation_delimiter="js", s),
-  );
+let string_to_const = (~loc, s) => {
+  switch (File.get()) {
+  | Some(ReScript) =>
+    Helper.Exp.constant(
+      ~loc,
+      ~attrs=[Generate_lib.ReScriptAttributes.template(~loc)],
+      Helper.Const.string(~quotation_delimiter="*j", s),
+    )
+  | Some(Reason)
+  | _ =>
+    Helper.Exp.constant(
+      ~loc,
+      Helper.Const.string(~quotation_delimiter="js", s),
+    )
+  };
+};
 let render_variable = (~loc, v) => {
   let txt = v |> String.concat(".") |> Longident.parse;
   Helper.Exp.ident({loc, txt});
@@ -137,11 +148,20 @@ and render_media_query = (at_rule: at_rule): Parsetree.expression => {
     Lexer.grammar_error(prelude_loc, "@media prelude can't be empty");
   };
 
+  let (delimiter, attrs) =
+    switch (File.get()) {
+    | Some(ReScript) => (
+        "*j",
+        [Generate_lib.ReScriptAttributes.template(~loc=prelude_loc)],
+      )
+    | _ => ("js", [])
+    };
+
   let query =
     prelude
     |> List.map(parse_conditions)
     |> String.concat(" ")
-    |> String_interpolation.Transform.transform(~loc=at_rule.loc);
+    |> String_interpolation.transform(~attrs, ~delimiter, ~loc=at_rule.loc);
 
   let rules =
     switch (at_rule.block) {
@@ -158,7 +178,7 @@ and render_media_query = (at_rule: at_rule): Parsetree.expression => {
 
   Helper.Exp.apply(
     ~loc=at_rule.loc,
-    ~attrs=[Create.uncurried(~loc=at_rule.loc)],
+    ~attrs=[Generate_lib.BuckleScriptAttributes.uncurried(~loc=at_rule.loc)],
     CssJs.media(~loc=at_rule.loc),
     [(Nolabel, query), (Nolabel, rules)],
   );
@@ -315,15 +335,24 @@ and render_style_rule = (ident, rule: style_rule): Parsetree.expression => {
   let (_block, loc) = rule.block;
   let selector_expr =
     render_declarations(rule.block) |> Builder.pexp_array(~loc);
+  let (delimiter, attrs) =
+    switch (File.get()) {
+    | Some(ReScript) => (
+        "*j",
+        [Generate_lib.ReScriptAttributes.template(~loc)],
+      )
+    | _ => ("js", [])
+    };
+
   let selector_name =
     prelude
     |> render_selectors
     |> String.trim
-    |> String_interpolation.Transform.transform(~loc);
+    |> String_interpolation.transform(~attrs, ~delimiter, ~loc);
 
   Helper.Exp.apply(
     ~loc=rule.loc,
-    ~attrs=[Create.uncurried(~loc=rule.loc)],
+    ~attrs=[Generate_lib.BuckleScriptAttributes.uncurried(~loc=rule.loc)],
     ident,
     [(Nolabel, selector_name), (Nolabel, selector_expr)],
   );
@@ -347,7 +376,7 @@ let render_style_call = (declaration_list): Parsetree.expression => {
 
   Helper.Exp.apply(
     ~loc,
-    ~attrs=[Create.uncurried(~loc)],
+    ~attrs=[Generate_lib.BuckleScriptAttributes.uncurried(~loc)],
     CssJs.style(~loc),
     arguments,
   );
@@ -417,7 +446,7 @@ let render_keyframes = (declarations: rule_list): Parsetree.expression => {
 
   {
     ...Builder.eapply(~loc, CssJs.keyframes(~loc), [keyframes]),
-    pexp_attributes: [Create.uncurried(~loc)],
+    pexp_attributes: [Generate_lib.BuckleScriptAttributes.uncurried(~loc)],
   };
 };
 
@@ -425,7 +454,8 @@ let render_global = ((ruleList, loc): stylesheet) => {
   switch (ruleList) {
   /* There's only one style_rule */
   | [Style_rule(rule)] =>
-    render_style_rule(CssJs.global(~loc), rule) |> Create.applyIgnore(~loc)
+    render_style_rule(CssJs.global(~loc), rule)
+    |> Generate_lib.applyIgnore(~loc)
   /* More than one isn't supported by bs-css */
   | _res =>
     Lexer.grammar_error(

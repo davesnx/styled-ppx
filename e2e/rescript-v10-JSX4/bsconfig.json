@@ -1,0 +1,36 @@
+{
+  "name": "styled-ppx-demo-rescript-v10-jsx4",
+  "jsx": { "version": 4, "mode": "classic" },
+  "bsc-flags": [
+    "-bs-super-errors"
+  ],
+  "warnings": {
+    "number": "-48"
+  },
+  "sources": [{
+    "dir": "src",
+    "subdirs": false
+  }, {
+    "dir": "demo",
+    "subdirs": false
+  }],
+  "package-specs": [
+    {
+      "module": "es6",
+      "in-source": true
+    }
+  ],
+  "ppx-flags": [
+    "../../_build/default/bin/bin.exe"
+  ],
+  "suffix": ".bs.js",
+  "namespace": true,
+  "bs-dependencies": [
+    "@rescript/react",
+    "bs-css",
+    "bs-css-emotion",
+    "@rescriptbr/react-testing-library",
+    "rescript-vitest",
+    "rescript-webapi"
+  ]
+}

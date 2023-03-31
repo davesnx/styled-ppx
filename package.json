@@ -18,8 +18,7 @@
     "buildsInSource": "_build",
     "build": [ [ "dune", "build", "--root", "." ] ],
     "buildDev": "dune build --promote-install-files --root .",
-    "buildEnv": { "ODOC_SYNTAX": "re" },
-    "release": { "bin": [ "ppx" ] }
+    "buildEnv": { "ODOC_SYNTAX": "re" }
   },
   "devDependencies": {
     "@opam/alcotest": "1.7.0",
@@ -32,7 +31,9 @@
     "@opam/ppxlib": "*",
     "@opam/reason": "*",
     "@opam/sedlex": "3.0",
-    "ocaml": "4.14.0"
+    "@opam/yojson": "2.0.2",
+    "ocaml": "4.14.0",
+    "rescript": "10.1.3"
   },
   "resolutions": {
     "@opam/ppxlib":
@@ -52,12 +53,15 @@
     "test_reason_css_parser": "esy dune build @reason_css_parser_test",
     "test_css_spec_parser": "esy dune build @css_spec_parser_test",
     "test_css_spec_types": "esy dune build @css_spec_types_test",
-    "test_e2e": "echo 'This can not be run with esy, only yarn like `yarn --cwd e2e test`",
+    "test_e2e":
+      "echo 'This can not be run with esy, only yarn like `yarn --cwd 'e2e/rescript-v9-JSX3' test`",
     "dev": "esy dune build --root . --watch",
     "release-static":
       "esy b dune build --root . --ignore-promoted-rules --no-config --profile release-static --only-packages styled-ppx",
     "ast": "esy dune exec packages/renderer/ast_renderer.exe --",
     "lexer": "esy dune exec packages/renderer/lexer_renderer.exe --",
-    "interpreter": "esy menhir --interpret --interpret-show-cst packages/parser/lib/css_parser.mly"
-  }
+    "interpreter":
+      "esy menhir --interpret --interpret-show-cst packages/parser/lib/css_parser.mly"
+  },
+  "dependencies": { "@opam/ppx_deriving_yojson": "3.7.0" }
 }

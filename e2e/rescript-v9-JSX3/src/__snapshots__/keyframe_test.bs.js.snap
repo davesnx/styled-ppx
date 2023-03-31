@@ -1,0 +1,9 @@
+// Vitest Snapshot v1
+
+exports[`Keyframes > should render into a animation-name 1`] = `
+<div>
+  <div
+    class="css-gpivgv-Animate"
+  />
+</div>
+`;

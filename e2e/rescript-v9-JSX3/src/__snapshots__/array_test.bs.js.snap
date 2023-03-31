@@ -1,0 +1,25 @@
+// Vitest Snapshot v1
+
+exports[`Array > ArrayDynamicComponent renders 1`] = `
+<div>
+  <div
+    class="css-wng87c-ArrayDynamicComponent"
+  />
+</div>
+`;
+
+exports[`Array > ArrayStatic renders 1`] = `
+<div>
+  <section
+    class="css-1q3many-ArrayStatic"
+  />
+</div>
+`;
+
+exports[`Array > SequenceDynamicComponent renders 1`] = `
+<div>
+  <div
+    class="css-1sseztl"
+  />
+</div>
+`;

@@ -2,8 +2,6 @@ name: Ppx CI
 
 on:
   push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
@@ -58,7 +56,6 @@ jobs:
         run: |
           esy import-dependencies _export
           rm -rf _export
-
 
       - name: Build dependencies
         run: esy build-dependencies
@@ -120,7 +117,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.os }}
-          path: _build/default/bin/ppx.exe
+          path: _build/default/bin/bin.exe
 
       # Cleanup build cache in case dependencies have changed
       - name: Cleanup
@@ -147,11 +144,11 @@ jobs:
           path: _build/default/bin
 
       - name: Grant permission to run ppx
-        run: chmod +x _build/default/bin/ppx.exe
+        run: chmod +x _build/default/bin/bin.exe
 
       - name: Get cache directory path
         id: yarn-cache-dir-path
-        working-directory: ./e2e
+        working-directory: ./e2e/rescript-v9-JSX3
         run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
 
       - name: Load global cache
@@ -163,11 +160,11 @@ jobs:
           restore-keys: yarn-${{ matrix.os }}-
 
       - name: Install dependencies
-        working-directory: ./e2e
+        working-directory: ./e2e/rescript-v9-JSX3
         run: yarn
 
       - name: Test
-        working-directory: ./e2e
+        working-directory: ./e2e/rescript-v9-JSX3
         run: yarn test
 
   publish:

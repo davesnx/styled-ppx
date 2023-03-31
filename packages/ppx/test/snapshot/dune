@@ -1,25 +1,32 @@
+; This tests ensure the transformation goes right and doesn't need to type-check.
+; If you are looking for CSS Support tests check packages/ppx/test/native folder.
+
+(subdir
+ reason
+ (cram
+  (alias ppx_snapshot_test)
+  (deps
+   %{bin:standalone}
+   %{bin:refmt}
+   (package styled-ppx))))
+
+(subdir
+ rescript
+ (cram
+  (alias ppx_snapshot_test)
+  (deps
+   %{bin:standalone}
+   %{bin:bsc}
+   (package styled-ppx))))
+
 (executables
  (names standalone)
+ (public_names standalone)
  (modules standalone)
  (libraries styled-ppx.lib ppxlib))
 
-(rule
- (targets snapshot.actual.re)
- (deps
-  (:standalone standalone.exe)
-  (:input snapshot.re))
- (action
-  (progn
-   (with-stdout-to
-    %{targets}
-    (run refmt --parse re --print ml %{input}))
-   (run ./%{standalone} --impl %{targets} -o %{targets})
-   (run refmt --parse ml --print re --in-place %{targets}))))
-
-(rule
- (alias ppx_snapshot_test)
- (deps
-  (file snapshot.expected.re)
-  (file snapshot.actual.re))
- (action
-  (diff snapshot.expected.re snapshot.actual.re)))
+(executables
+ (names rewriter)
+ (public_names rewriter)
+ (modules rewriter)
+ (libraries styled-ppx.lib ppxlib))

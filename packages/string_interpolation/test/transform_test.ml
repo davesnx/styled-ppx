@@ -1,7 +1,7 @@
 open Alcotest
 
 let loc = Location.none
-let transform = String_interpolation.Transform.transform ~loc
+let transform = String_interpolation.transform ~delimiter:"js" ~loc
 
 let ast =
   let pp_ast fmt v =

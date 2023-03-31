@@ -1,0 +1,30 @@
+{
+  "name": "styled-ppx-demo-bucklescript-v8",
+  "reason": {
+    "react-jsx": 3
+  },
+  "bsc-flags": [
+    "-bs-super-errors"
+  ],
+  "sources": {
+    "dir": "src",
+    "subdirs": true,
+    "type": "dev"
+  },
+  "package-specs": [
+    {
+      "module": "commonjs",
+      "in-source": true
+    }
+  ],
+  "ppx-flags": [
+    ["../../_build/default/bin/bin.exe", "--compat-with-bs-emotion-ppx true"]
+  ],
+  "suffix": ".bs.js",
+  "namespace": true,
+  "bs-dependencies": [
+    "bs-css",
+    "bs-css-emotion",
+    "reason-react"
+  ]
+}
