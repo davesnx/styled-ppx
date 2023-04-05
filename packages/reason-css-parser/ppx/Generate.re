@@ -27,6 +27,12 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     is_function(property_name)
       ? function_value_name(property_name) : "property-" ++ property_name;
 
+	let rec pexp_fun_chain = (args, expr) => switch(args) {
+		| [] => failwith("should return when there is a single element")
+		| [arg] => pexp_fun(Nolabel, None, arg, expr)
+		| [hd, ...rest] => pexp_fun(Nolabel, None, hd, pexp_fun_chain(rest, expr))
+	}
+
   let value_of_delimiter =
     fun
     | "+" => "cross"
@@ -645,11 +651,11 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
 let rec (create_renderer : value => Parsetree.expression) = (value) => {
 	let apply_modifier = (modifier, value) => switch(modifier){
 			| One => value
-			| Optional => pexp_apply([%expr Option.map], [(Nolabel, [%expr arg]), (Nolabel, value)])
+			| Optional => pexp_fun(Nolabel, None, [%pat? arg], pexp_apply([%expr Option.bind], [(Nolabel, [%expr arg]), (Nolabel, value)]))
 			| Repeat(_)
 			| Repeat_by_comma(_, _)
 			| Zero_or_more
-			| One_or_more
+			| One_or_more => pexp_apply([%expr List.map], [(Nolabel, value)])
 			| At_least_one => value
 		};
 
@@ -710,10 +716,14 @@ let rec (create_renderer : value => Parsetree.expression) = (value) => {
 				let names = variant_names(values);
 				let args = List.combine(names, values);
 				pexp_function @@ List.map(xor_op, args);
-				
 			| Or
 			| Static
-			| And => pexp_tuple @@ List.map(create_renderer, values);
+			| And => {
+				let args = List.mapi((i, _) => ppat_var @@ txt @@ Format.sprintf("arg_%d",i), values);
+				let renderers = List.map(create_renderer, values) |> List.mapi((i, expr) => pexp_apply(expr, [(Nolabel, pexp_ident @@ txt @@ Lident(Format.sprintf("arg_%d", i)))]));
+				let expr = pexp_tuple @@ renderers;
+				pexp_fun_chain(args, expr)
+			}
 		}
 	}
 	and function_call = (_name, value) => {
@@ -733,7 +743,7 @@ let rec (create_renderer : value => Parsetree.expression) = (value) => {
 let make_printer = bindings => {
 			let generate_render = binding => {
 				let (name, value) = extract_spec_value(binding);
-				let expr = create_renderer(value);
+				let expr = create_renderer(value) |> add_type_to_expr(name);
 				let pat = ppat_var(txt("render_" ++ value_name_of_css(name)));
 				value_binding(~pat, ~expr);
 			}  
