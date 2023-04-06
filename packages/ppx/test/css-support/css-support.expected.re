@@ -1848,7 +1848,7 @@ CssJs.unsafe({js|resize|js}, {js|none|js});
 CssJs.right(`calc((`sub, `percent(50.), `pxFloat(4.))));
 CssJs.unsafe({js|scrollBehavior|js}, {js|smooth|js});
 CssJs.unsafe({js|strokeOpacity|js}, {js|0|js});
-CssJs.unsafe({js|stroke|js}, {js|$(Color.Text.white)|js});
+(CssJs.SVG.stroke(Color.Text.white): CssJs.rule);
 CssJs.top(`calc((`sub, `percent(50.), `pxFloat(1.))));
 CssJs.unsafe({js|top|js}, {js|unset|js});
 CssJs.unsafe({js|touchAction|js}, {js|none|js});
