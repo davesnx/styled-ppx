@@ -529,7 +529,7 @@ and page_selector = [%value.rec
 ]
 and page_selector_list = [%value.rec "[ [ <page-selector> ]# ]?"]
 and paint = [%value.rec
-  "'none' | <color> | <url> [ 'none' | <color> ]? | 'context-fill' | 'context-stroke'"
+  "'none' | <color> | <url> [ 'none' | <color> ]? | 'context-fill' | 'context-stroke' | <interpolation>"
 ]
 and position = [%value.rec
   "[ 'left' | 'center' | 'right' ] || [ 'top' | 'center' | 'bottom' ] | [ 'left' | 'center' | 'right' | <extended-length> | <extended-percentage> ] [ 'top' | 'center' | 'bottom' | <extended-length> | <extended-percentage> ]? | [ 'left' | 'right' ] [<extended-length> | <extended-percentage>] && [ 'top' | 'bottom' ] [<extended-length> | <extended-percentage>]"
