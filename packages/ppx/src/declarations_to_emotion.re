@@ -3087,6 +3087,31 @@ let mask_image =
       | _ => raise(Unsupported_feature),
   );
 
+let render_paint = (~loc, value: Types.paint) => {
+  switch (value) {
+  | `Color(c) => render_color(~loc, c)
+  | `Interpolation(variable) => render_variable(~loc, variable)
+  | `Context_stroke => [%expr `contextStroke]
+  | `Context_fill => [%expr `contextFill]
+  | `Static(_, _)
+  | _ => raise(Unsupported_feature)
+  };
+};
+
+let fill =
+  apply(
+    Parser.property_fill,
+    (~loc) => [%expr CssJs.SVG.fill],
+    (~loc) => render_paint(~loc),
+  );
+
+let stroke =
+  apply(
+    Parser.property_stroke,
+    (~loc) => [%expr CssJs.SVG.stroke],
+    (~loc) => render_paint(~loc),
+  );
+
 let found = ({ast_of_string, string_to_expr, _}) => {
   /* TODO: Why we have 'check_value' when we don't use it? */
   let check_value = string => {
@@ -3315,6 +3340,9 @@ let properties = [
   ("outline-offset", found(outline_offset)),
   ("outline-style", found(outline_style)),
   ("outline-width", found(outline_width)),
+  /* SVG */
+  ("fill", found(fill)),
+  ("stroke", found(stroke)),
 ];
 
 let render_when_unsupported_features = (~loc, property, value) => {

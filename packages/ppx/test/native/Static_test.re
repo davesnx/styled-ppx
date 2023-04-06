@@ -1,6 +1,6 @@
 open Alcotest;
 open Ppxlib;
-open Bs_css;
+open Css;
 
 let loc = Location.none;
 
@@ -618,8 +618,8 @@ let properties_static_css_tests = [
   /* (
        [%css "width: calc(100px)"],
        [%expr [%css "width: calc(100px)"]],
-       CssJs.width(`calc(`add, `percent(100.), `pxFloat(32.))),
-       [%expr CssJs.width(`calc(`add, `percent(100.), `pxFloat(32.)))]
+       CssJs.width(`calc(`pxFloat(100.))),
+       [%expr CssJs.width(`calc(`pxFloat(100.)))],
      ), */
   (
     [%css "width: calc(100% + 32px)"],
