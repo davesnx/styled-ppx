@@ -1,6 +1,7 @@
 opam-version: "2.0"
-synopsis: "Element ordering"
-description: "Element ordering"
+synopsis: "XDG Base Directory Specification"
+description:
+  "https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html"
 maintainer: ["Jane Street Group, LLC <opensource@janestreet.com>"]
 authors: ["Jane Street Group, LLC <opensource@janestreet.com>"]
 license: "MIT"
@@ -8,8 +9,8 @@ homepage: "https://github.com/ocaml/dune"
 doc: "https://dune.readthedocs.io/"
 bug-reports: "https://github.com/ocaml/dune/issues"
 depends: [
-  "dune" {>= "3.3"}
-  "ocaml" {>= "4.08.0"}
+  "dune" {>= "3.5"}
+  "ocaml" {>= "4.08"}
   "odoc" {with-doc}
 ]
 dev-repo: "git+https://github.com/ocaml/dune.git"
@@ -29,10 +30,10 @@ build: [
   ]
 ]
 url {
-  src: "https://github.com/ocaml/dune/releases/download/3.5.0/dune-3.5.0.tbz"
+  src: "https://github.com/ocaml/dune/releases/download/3.7.1/dune-3.7.1.tbz"
   checksum: [
-    "sha256=77bd4c6704359fae1969636cfc3cd7a517ba3604819ef89c919c0762b5093610"
-    "sha512=acaed76ab8618977118579641a1f6734ed4a225ab46494c6c5fd8e1bf9a0889e62db9adc7bd11770da602f4dd4785cef5ece4ad26512d08b64b8f3bd8954c80d"
+    "sha256=adfc38f14c0188a2ad80d61451d011d27ab8839b717492d7ad42f7cb911c54c3"
+    "sha512=a74cd77ac7714f9434b5991c6dc02c6e6a2f46071d993a8985a9c9f0105182bb9e310ae2bcf7cf1d411c848d1a665e0fc0111b3597e5b1c6b634c1d398bea432"
   ]
 }
-x-commit-hash: "77c1e6f8f27f57fe0c04ec1624a85069b02437cf"
+x-commit-hash: "e2b2d6aa984e3a5ddffa5ea00dd4f042dbf529a1"

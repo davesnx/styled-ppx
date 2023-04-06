@@ -1,7 +1,8 @@
-(lang dune 2.9)
+(lang dune 3.7)
 (cram enable)
 
 (using menhir 2.0)
+(using melange 0.1)
 
 (name styled-ppx)
 

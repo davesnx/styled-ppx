@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@opam/alcotest": "1.7.0",
-    "@opam/dune": "3.4.1",
+    "@opam/dune": "3.7.1",
     "@opam/menhir": "20220210",
     "@opam/ocaml-lsp-server": "1.15.1-4.14",
     "@opam/ocaml-migrate-parsetree": "2.4.0",
