@@ -398,18 +398,18 @@ pseudo_list:
   nesting and that can be a few more things look at <simple-selector> */
 compound_selector:
   /* #id::hover:visited */
-  | sub = subclass_selector ps = pseudo_list {
+  | sub = nonempty_list(subclass_selector) ps = pseudo_list {
      {
       type_selector = None;
-      subclass_selectors = [sub];
+      subclass_selectors = sub;
       pseudo_selectors = ps;
     }
   }
   /* a#id */
-  | t = type_selector sub = subclass_selector {
+  | t = type_selector sub = nonempty_list(subclass_selector) {
      {
       type_selector = Some t;
-      subclass_selectors = [sub];
+      subclass_selectors = sub;
       pseudo_selectors = [];
     }
   }

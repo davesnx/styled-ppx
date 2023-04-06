@@ -123,9 +123,35 @@ let compound_tests = [
     [%expr CssJs.style(. [|CssJs.selector(. {js|p:first-child|js}, [||])|])],
   ),
   (
+    ".p.p.p.p {}",
+    [%expr [%cx {js|&.p.p.p.p {}|js}]],
+    [%expr CssJs.style(. [|CssJs.selector(. {js|&.p.p.p.p|js}, [||])|])],
+  ),
+  (
+    "&.$(canvasWithTwoColumns):first-child",
+    [%expr [%cx {js|&.$(canvasWithTwoColumns):first-child {}|js}]],
+    [%expr
+      CssJs.style(. [|
+        CssJs.selector(.
+          {js|&.|js} ++ canvasWithTwoColumns ++ {js|:first-child|js},
+          [||],
+        ),
+      |])
+    ],
+  ),
+  (
     "p#first-child",
-    [%expr [%cx {js|p#first-child {}|js}]],
-    [%expr CssJs.style(. [|CssJs.selector(. {js|p#first-child|js}, [||])|])],
+    [%expr [%cx {js|& p#first-child {}|js}]],
+    [%expr
+      CssJs.style(. [|CssJs.selector(. {js|& p#first-child|js}, [||])|])
+    ],
+  ),
+  (
+    "#first-child",
+    [%expr [%cx {js|& #first-child {}|js}]],
+    [%expr
+      CssJs.style(. [|CssJs.selector(. {js|& #first-child|js}, [||])|])
+    ],
   ),
   (
     ":active",
