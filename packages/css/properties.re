@@ -1,6 +1,5 @@
 open Rule;
 open Values;
-open Converter;
 
 let concatArr = (f, separator, arr) =>
   arr |> Array.map(f) |> Array.to_list |> String.concat(separator);
@@ -2184,6 +2183,7 @@ module SVG = {
       | `nonzero => "nonzero"
       },
     );
+  /* stroke supports Paint (SVG.Fill stuff) */
   let stroke = x => Declaration("stroke", string_of_color(x));
   let strokeDasharray = x =>
     Declaration(

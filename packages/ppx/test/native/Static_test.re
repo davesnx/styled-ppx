@@ -1,6 +1,6 @@
 open Alcotest;
 open Ppxlib;
-open Bs_css;
+open Css;
 
 let loc = Location.none;
 

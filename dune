@@ -4,6 +4,7 @@
  packages
  (dirs
   css-spec-parser
+  css
   parser
   ppx
   reason-css-lexer
