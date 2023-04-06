@@ -70,9 +70,14 @@ let parse = json => {
         Some(version),
         mode,
       )
-    | _ => raise(Malformed_jsx("Malformed jsx"))
+    | _ => raise(Malformed_jsx("Malformed jsx field"))
     }
-  | Error(e) => raise(Parse_config_error(e))
+  | Error(e) =>
+    raise(
+      Parse_config_error(
+        Printf.sprintf("There was an error parsing the config file: %s", e),
+      ),
+    )
   };
 };
 

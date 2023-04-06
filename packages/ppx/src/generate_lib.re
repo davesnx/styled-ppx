@@ -328,7 +328,7 @@ let generateSequence = (~loc, fns) => {
   let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
   createVariadicElement("div", newProps);
  */
-let makeBody = (~loc, ~htmlTag, ~styledExpr, ~variables) => {
+let makeBody = (~loc, ~htmlTag, ~className as classNameValue, ~variables) => {
   let attrs =
     switch (File.get()) {
     | Some(ReScript) => []
@@ -342,7 +342,7 @@ let makeBody = (~loc, ~htmlTag, ~styledExpr, ~variables) => {
   Helper.Exp.let_(
     ~loc,
     Nonrecursive,
-    [className(~loc, styledExpr)],
+    [className(~loc, classNameValue)],
     Helper.Exp.let_(
       ~loc,
       ~attrs,
@@ -366,7 +366,7 @@ let getLabel = str =>
   };
 
 /* let make = (props: makeProps) => + makeBody */
-let makeFnJSX3 = (~loc, ~htmlTag, ~styledExpr, ~makePropTypes, ~variableNames) => {
+let makeFnJSX3 = (~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames) => {
   Helper.Exp.fun_(
     ~loc,
     Nolabel,
@@ -381,12 +381,12 @@ let makeFnJSX3 = (~loc, ~htmlTag, ~styledExpr, ~makePropTypes, ~variableNames) =
         makePropTypes,
       ),
     ),
-    makeBody(~loc, ~htmlTag, ~styledExpr, ~variables=variableNames),
+    makeBody(~loc, ~htmlTag, ~className, ~variables=variableNames),
   );
 };
 
 /* let make = (props: props) => + makeBody */
-let makeFnJSX4 = (~loc, ~htmlTag, ~styledExpr, ~makePropTypes, ~variableNames) => {
+let makeFnJSX4 = (~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames) => {
   Helper.Exp.fun_(
     ~loc,
     Nolabel,
@@ -401,22 +401,22 @@ let makeFnJSX4 = (~loc, ~htmlTag, ~styledExpr, ~makePropTypes, ~variableNames) =
         makePropTypes,
       ),
     ),
-    makeBody(~loc, ~htmlTag, ~styledExpr, ~variables=variableNames),
+    makeBody(~loc, ~htmlTag, ~className, ~variables=variableNames),
   );
 };
 
 /* [@react.component] + makeFn */
 let component =
-    (~loc, ~htmlTag, ~styledExpr, ~makePropTypes, ~labeledArguments) => {
+    (~loc, ~htmlTag, ~className, ~makePropTypes, ~labeledArguments) => {
   let variableNames =
     List.map(((arg, _, _, _, _, _)) => getLabel(arg), labeledArguments);
 
   let makeFn =
     switch (File.get()) {
     | Some(ReScript) when Settings.Get.jsxVersion() === 4 =>
-      makeFnJSX4(~loc, ~htmlTag, ~styledExpr, ~makePropTypes, ~variableNames)
+      makeFnJSX4(~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames)
     | _ =>
-      makeFnJSX3(~loc, ~htmlTag, ~styledExpr, ~makePropTypes, ~variableNames)
+      makeFnJSX3(~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames)
     };
 
   [%stri let make = [%e makeFn]];

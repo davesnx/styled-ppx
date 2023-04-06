@@ -4,6 +4,29 @@ module Builder = Generate_lib.Builder;
 
 let styleVariableName = "styles";
 
+let staticComponent = (~loc, ~htmlTag, styles) => {
+  let styleReference = [%expr styles];
+
+  Builder.pmod_structure(
+    ~loc,
+    [
+      Generate_lib.makeProps(~loc, None),
+      Generate_lib.bindingCreateVariadicElement(~loc),
+      Generate_lib.defineGetOrEmptyFn(~loc),
+      Generate_lib.defineDeletePropFn(~loc),
+      Generate_lib.defineAssign2(~loc),
+      Generate_lib.styles(~loc, ~name=styleVariableName, ~expr=styles),
+      Generate_lib.component(
+        ~loc,
+        ~htmlTag,
+        ~className=styleReference,
+        ~makePropTypes=[],
+        ~labeledArguments=[],
+      ),
+    ],
+  );
+};
+
 let dynamicComponent =
     (~loc, ~htmlTag, ~label, ~moduleName, ~defaultValue, ~param, ~body) => {
   let (functionExpr, labeledArguments) =
@@ -56,18 +79,13 @@ let dynamicComponent =
       labeledArguments,
     );
 
-  let unit = (
-    Nolabel,
-    Builder.pexp_construct(~loc, {txt: Lident("()"), loc}, None),
-  );
-
   /* let styles = styles(...) */
   let stylesFunctionCall =
     Builder.pexp_apply(
       ~loc,
       Builder.pexp_ident(~loc, {txt: Lident(styleVariableName), loc}),
       /* Last argument is a unit to avoid the warning of optinal labeled args */
-      styledArguments @ [unit],
+      styledArguments @ [(Nolabel, [%expr ()])],
     );
 
   let styles =
@@ -143,33 +161,9 @@ let dynamicComponent =
       Generate_lib.component(
         ~loc,
         ~htmlTag,
-        ~styledExpr=stylesFunctionCall,
+        ~className=stylesFunctionCall,
         ~makePropTypes=propsGenericParams,
         ~labeledArguments,
-      ),
-    ],
-  );
-};
-
-let staticComponent = (~loc, ~htmlTag, styles) => {
-  let styleReference =
-    Builder.pexp_ident(~loc, {txt: Lident(styleVariableName), loc});
-
-  Builder.pmod_structure(
-    ~loc,
-    [
-      Generate_lib.makeProps(~loc, None),
-      Generate_lib.bindingCreateVariadicElement(~loc),
-      Generate_lib.defineGetOrEmptyFn(~loc),
-      Generate_lib.defineDeletePropFn(~loc),
-      Generate_lib.defineAssign2(~loc),
-      Generate_lib.styles(~loc, ~name=styleVariableName, ~expr=styles),
-      Generate_lib.component(
-        ~loc,
-        ~htmlTag,
-        ~styledExpr=styleReference,
-        ~makePropTypes=[],
-        ~labeledArguments=[],
       ),
     ],
   );
