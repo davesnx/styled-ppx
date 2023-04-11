@@ -26,6 +26,7 @@
     "@opam/menhir": "20220210",
     "@opam/ocaml-lsp-server": "1.15.1-4.14",
     "@opam/ocaml-migrate-parsetree": "2.4.0",
+    "@opam/ppx_deriving_yojson": "3.7.0",
     "@opam/ocamlformat": "0.24.1",
     "@opam/ppx_deriving": "5.2.1",
     "@opam/ppxlib": "*",
@@ -62,6 +63,5 @@
     "lexer": "esy dune exec packages/renderer/lexer_renderer.exe --",
     "interpreter":
       "esy menhir --interpret --interpret-show-cst packages/parser/lib/css_parser.mly"
-  },
-  "dependencies": { "@opam/ppx_deriving_yojson": "3.7.0" }
+  }
 }
