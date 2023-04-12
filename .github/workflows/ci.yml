@@ -220,8 +220,8 @@ jobs:
 
       - name: Create Github release
         id: create_release
-        if: "startsWith(github.ref, 'refs/tags/v')"
-        uses: actions/create-release@v1.0.0
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
@@ -231,7 +231,7 @@ jobs:
           prerelease: false
 
       - name: Upload styled-ppx-darwin-x64.zip to Github release
-        if: "startsWith(github.ref, 'refs/tags/v')"
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -242,7 +242,7 @@ jobs:
           asset_content_type: application/gzip
 
       - name: Upload styled-ppx-linux-x64.zip to Github release
-        if: "startsWith(github.ref, 'refs/tags/v')"
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
