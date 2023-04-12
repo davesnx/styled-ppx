@@ -1,6 +1,6 @@
 {
   "name": "@davesnx/styled-ppx",
-  "version": "0.37.5",
+  "version": "0.37.6",
   "description": "Typed styled components in ReScript",
   "author": "David Sancho <dsnxmoreno@gmail.com>",
   "license": "BSD-2",
