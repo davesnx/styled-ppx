@@ -2,10 +2,9 @@ open Ppxlib;
 
 module Builder = Ast_builder.Default;
 
-let string_payload =
-  Ast_pattern.(
-    pstr(pstr_eval(pexp_constant(pconst_string(__', __, __)), nil) ^:: nil)
-  );
+let string_payload = Ast_pattern.(single_expr_payload(estring(__)));
+
+/* let list_payload = Ast_pattern.(single_expr_payload(elist(__))); */
 
 let any_payload = Ast_pattern.(single_expr_payload(__));
 
@@ -399,17 +398,36 @@ let _ =
           },
         ),
       ),
+      /* Context_free.Rule.extension(
+           Extension.declare(
+             "label",
+             Extension.Context.Expression,
+             list_payload,
+             (~loc as _, ~path, payload, _label, _) => {
+               File.set(path);
+               let pos = payload.loc.loc_start;
+               let container_lnum = pos.pos_lnum;
+               let declarationListValues =
+                 Css_lexer.parse_declaration(~container_lnum, ~pos, payload.txt)
+                 |> Css_to_emotion.render_declaration;
+               /* TODO: Instead of getting the first element,
+                    fail when there's more than one declaration or
+                  make a mechanism to flatten all the properties */
+               List.nth(declarationListValues, 0);
+             },
+           ),
+         ), */
       Context_free.Rule.extension(
         Extension.declare(
           compatibleWithBsEmotionPpx ? "css_" : "css",
           Extension.Context.Expression,
           string_payload,
-          (~loc as _, ~path, payload, _label, _) => {
+          (~loc, ~path, payload) => {
             File.set(path);
-            let pos = payload.loc.loc_start;
+            let pos = loc.loc_start;
             let container_lnum = pos.pos_lnum;
             let declarationListValues =
-              Css_lexer.parse_declaration(~container_lnum, ~pos, payload.txt)
+              Css_lexer.parse_declaration(~container_lnum, ~pos, payload)
               |> Css_to_emotion.render_declaration;
             /* TODO: Instead of getting the first element,
                  fail when there's more than one declaration or
@@ -423,12 +441,12 @@ let _ =
           "styled.global",
           Extension.Context.Expression,
           string_payload,
-          (~loc as _, ~path, payload, _label, _) => {
+          (~loc, ~path, payload) => {
             File.set(path);
-            let pos = payload.loc.loc_start;
+            let pos = loc.loc_start;
             let container_lnum = pos.pos_lnum;
             let stylesheet =
-              Css_lexer.parse_stylesheet(~container_lnum, ~pos, payload.txt);
+              Css_lexer.parse_stylesheet(~container_lnum, ~pos, payload);
             Css_to_emotion.render_global(stylesheet);
           },
         ),
@@ -438,12 +456,12 @@ let _ =
           "keyframe",
           Extension.Context.Expression,
           string_payload,
-          (~loc as _, ~path, payload, _label, _) => {
+          (~loc, ~path, payload) => {
             File.set(path);
-            let pos = payload.loc.loc_start;
+            let pos = loc.loc_start;
             let container_lnum = pos.pos_lnum;
             let declarations =
-              Css_lexer.parse_keyframes(~container_lnum, ~pos, payload.txt);
+              Css_lexer.parse_keyframes(~container_lnum, ~pos, payload);
             Css_to_emotion.render_keyframes(declarations);
           },
         ),
