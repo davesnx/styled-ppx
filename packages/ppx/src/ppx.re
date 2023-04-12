@@ -4,8 +4,6 @@ module Builder = Ast_builder.Default;
 
 let string_payload = Ast_pattern.(single_expr_payload(estring(__)));
 
-/* let list_payload = Ast_pattern.(single_expr_payload(elist(__))); */
-
 let any_payload = Ast_pattern.(single_expr_payload(__));
 
 module Mapper = {
@@ -76,6 +74,58 @@ module Mapper = {
   let isStyled = name => {
     name |> getHtmlTag |> Option.is_some;
   };
+
+  type contents =
+    | Match(expression, list(case))
+    | ListOf(expression)
+    | EmptyList;
+
+  let lid = name => {txt: Lident(name), loc: Location.none};
+
+  let css = (~loc, className, contents) =>
+    Builder.pexp_apply(
+      ~loc,
+      Builder.pexp_ident(~loc, lid("css")),
+      [
+        (
+          Nolabel,
+          Builder.pexp_construct(
+            ~loc,
+            lid("::"),
+            Some(
+              Builder.pexp_tuple(
+                ~loc,
+                [
+                  Builder.pexp_apply(
+                    ~loc,
+                    Builder.pexp_ident(~loc, lid("label")),
+                    [
+                      (
+                        Nolabel,
+                        Builder.pexp_constant(
+                          ~loc,
+                          Pconst_string(className.txt, Location.none, None),
+                        ),
+                      ),
+                    ],
+                  ),
+                  switch (contents) {
+                  | Match(exp, cases) => Builder.pexp_match(~loc, exp, cases)
+                  | ListOf(decls) =>
+                    Ast_helper.Exp.construct(lid("::"), Some(decls))
+                  | EmptyList =>
+                    Builder.pexp_construct(~loc, lid("[]"), None)
+                  },
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+
+  /* TODO: Remove Ast_helper usages into Builder */
+  open Ast_helper;
 
   let transform = expr => {
     switch (expr.pstr_desc) {
@@ -301,6 +351,275 @@ module Mapper = {
         Nonrecursive,
         [Builder.value_binding(~loc=patternLoc, ~pat, ~expr)],
       );
+    | Pstr_value(
+        Nonrecursive,
+        [
+          {
+            pvb_pat: {ppat_desc: Ppat_var(className), _},
+            pvb_expr: {
+              pexp_desc:
+                Pexp_extension((
+                  {txt: "css", loc},
+                  PStr([
+                    {
+                      pstr_desc:
+                        Pstr_eval(
+                          {
+                            pexp_desc:
+                              Pexp_construct({txt: Lident("[]")}, None),
+                            _,
+                          },
+                          [],
+                        ),
+                    },
+                  ]),
+                )),
+              _,
+            },
+            _,
+          },
+        ],
+      ) =>
+      Str.value(
+        Nonrecursive,
+        [Vb.mk(Pat.var(className), css(~loc, className, EmptyList))],
+      )
+
+    | Pstr_value(
+        Nonrecursive,
+        [
+          {
+            pvb_pat: {ppat_desc: Ppat_var(className)},
+            pvb_expr: {
+              pexp_desc:
+                Pexp_extension((
+                  {txt: "css", loc},
+                  PStr([
+                    {
+                      pstr_desc:
+                        Pstr_eval(
+                          {pexp_desc: Pexp_construct(_, Some(exp))},
+                          [],
+                        ),
+                    },
+                  ]),
+                )),
+            },
+          },
+        ],
+      ) =>
+      Str.value(
+        Nonrecursive,
+        [Vb.mk(Pat.var(className), css(~loc, className, ListOf(exp)))],
+      )
+
+    | Pstr_value(
+        Nonrecursive,
+        [
+          {
+            pvb_pat: {ppat_desc: Ppat_var(className)},
+            pvb_expr: {
+              pexp_desc:
+                Pexp_fun(
+                  label,
+                  optExp,
+                  pat,
+                  {
+                    pexp_desc:
+                      Pexp_extension((
+                        {txt: "css", loc},
+                        PStr([
+                          {
+                            pstr_desc:
+                              Pstr_eval(
+                                {pexp_desc: Pexp_construct(_, Some(exp))},
+                                [],
+                              ),
+                          },
+                        ]),
+                      )),
+                  },
+                ),
+            },
+          },
+        ],
+      ) =>
+      Str.value(
+        Nonrecursive,
+        [
+          Vb.mk(
+            Pat.var(className),
+            Exp.fun_(label, optExp, pat, css(~loc, className, ListOf(exp))),
+          ),
+        ],
+      )
+
+    | Pstr_value(
+        Nonrecursive,
+        [
+          {
+            pvb_pat: {ppat_desc: Ppat_var(className)},
+            pvb_expr: {
+              pexp_desc:
+                Pexp_fun(
+                  label1,
+                  optExp1,
+                  pat1,
+                  {
+                    pexp_desc:
+                      Pexp_fun(
+                        label2,
+                        optExp2,
+                        pat2,
+                        {
+                          pexp_desc:
+                            Pexp_extension((
+                              {txt: "css", loc},
+                              PStr([
+                                {
+                                  pstr_desc:
+                                    Pstr_eval(
+                                      {
+                                        pexp_desc:
+                                          Pexp_construct(_, Some(exp)),
+                                      },
+                                      [],
+                                    ),
+                                },
+                              ]),
+                            )),
+                        },
+                      ),
+                  },
+                ),
+            },
+          },
+        ],
+      ) =>
+      Str.value(
+        Nonrecursive,
+        [
+          Vb.mk(
+            Pat.var(className),
+            Exp.fun_(
+              label1,
+              optExp1,
+              pat1,
+              Exp.fun_(
+                label2,
+                optExp2,
+                pat2,
+                css(~loc, className, ListOf(exp)),
+              ),
+            ),
+          ),
+        ],
+      )
+
+    | Pstr_value(
+        Nonrecursive,
+        [
+          {
+            pvb_pat: {ppat_desc: Ppat_var(className)},
+            pvb_expr: {
+              pexp_desc:
+                Pexp_fun(
+                  label,
+                  optExp,
+                  pat,
+                  {
+                    pexp_desc:
+                      Pexp_extension((
+                        {txt: "css", loc},
+                        PStr([
+                          {
+                            pstr_desc:
+                              Pstr_eval(
+                                {pexp_desc: Pexp_match(exp, cases)},
+                                [],
+                              ),
+                          },
+                        ]),
+                      )),
+                  },
+                ),
+            },
+          },
+        ],
+      ) =>
+      Str.value(
+        Nonrecursive,
+        [
+          Vb.mk(
+            Pat.var(className),
+            Exp.fun_(
+              label,
+              optExp,
+              pat,
+              css(~loc, className, Match(exp, cases)),
+            ),
+          ),
+        ],
+      )
+
+    | Pstr_value(
+        Nonrecursive,
+        [
+          {
+            pvb_pat: {ppat_desc: Ppat_var(className)},
+            pvb_expr: {
+              pexp_desc:
+                Pexp_fun(
+                  label1,
+                  optExp1,
+                  pat1,
+                  {
+                    pexp_desc:
+                      Pexp_fun(
+                        label2,
+                        optExp2,
+                        pat2,
+                        {
+                          pexp_desc:
+                            Pexp_extension((
+                              {txt: "css", loc},
+                              PStr([
+                                {
+                                  pstr_desc:
+                                    Pstr_eval(
+                                      {pexp_desc: Pexp_match(exp, cases)},
+                                      [],
+                                    ),
+                                },
+                              ]),
+                            )),
+                        },
+                      ),
+                  },
+                ),
+            },
+          },
+        ],
+      ) =>
+      Str.value(
+        Nonrecursive,
+        [
+          Vb.mk(
+            Pat.var(className),
+            Exp.fun_(
+              label1,
+              optExp1,
+              pat1,
+              Exp.fun_(
+                label2,
+                optExp2,
+                pat2,
+                css(~loc, className, Match(exp, cases)),
+              ),
+            ),
+          ),
+        ],
+      )
     | _ => expr
     };
   };
@@ -398,25 +717,6 @@ let _ =
           },
         ),
       ),
-      /* Context_free.Rule.extension(
-           Extension.declare(
-             "label",
-             Extension.Context.Expression,
-             list_payload,
-             (~loc as _, ~path, payload, _label, _) => {
-               File.set(path);
-               let pos = payload.loc.loc_start;
-               let container_lnum = pos.pos_lnum;
-               let declarationListValues =
-                 Css_lexer.parse_declaration(~container_lnum, ~pos, payload.txt)
-                 |> Css_to_emotion.render_declaration;
-               /* TODO: Instead of getting the first element,
-                    fail when there's more than one declaration or
-                  make a mechanism to flatten all the properties */
-               List.nth(declarationListValues, 0);
-             },
-           ),
-         ), */
       Context_free.Rule.extension(
         Extension.declare(
           compatibleWithBsEmotionPpx ? "css_" : "css",
