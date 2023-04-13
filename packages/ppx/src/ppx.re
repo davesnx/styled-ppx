@@ -81,6 +81,7 @@ module Mapper = {
     | EmptyList;
 
   let lid = name => {txt: Lident(name), loc: Location.none};
+  let label = (~loc) => {txt: Ldot(Lident("CssJs"), "label"), loc};
 
   let css = (~loc, className, contents) =>
     Builder.pexp_apply(
@@ -98,13 +99,13 @@ module Mapper = {
                 [
                   Builder.pexp_apply(
                     ~loc,
-                    Builder.pexp_ident(~loc, lid("label")),
+                    Builder.pexp_ident(~loc, label(~loc)),
                     [
                       (
                         Nolabel,
                         Builder.pexp_constant(
                           ~loc,
-                          Pconst_string(className.txt, Location.none, None),
+                          Pconst_string(className.txt, loc, None),
                         ),
                       ),
                     ],
