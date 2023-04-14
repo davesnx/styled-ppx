@@ -485,7 +485,7 @@ let _ =
               let pattern = Builder.ppat_var(~loc, {txt: label, loc});
               let label_value =
                 Builder.pexp_constant(~loc, Pconst_string(label, loc, None));
-              let label = [%expr CssJs.label([%e label_value])];
+              let label = [%expr label([%e label_value])];
               let expr = [%expr [[%e label], ...[%e expression]]];
               [%stri let [%p pattern] = [%e ident]([%e expr])];
             };

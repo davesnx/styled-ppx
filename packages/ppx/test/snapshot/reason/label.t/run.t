@@ -2,21 +2,17 @@
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [%%ocaml.error "apply expected"];
-  let css_apply = css([CssJs.label("css_apply"), CssJs.block(`blue)]);
-  let css_apply_with_empty = css([CssJs.label("css_apply_with_empty")]);
+  let css_apply = css([label("css_apply"), CssJs.block(`blue)]);
+  let css_apply_with_empty = css([label("css_apply_with_empty")]);
   let css_apply_multiple =
-    css([CssJs.label("css_apply_multiple"), prop("1"), prop("2")]);
+    css([label("css_apply_multiple"), prop("1"), prop("2")]);
   let%label should_complain = [prop("1"), prop("2")];
   let should_render_custom_ident =
-    Css.style([
-      CssJs.label("should_render_custom_ident"),
-      prop("1"),
-      prop("2"),
-    ]);
+    Css.style([label("should_render_custom_ident"), prop("1"), prop("2")]);
   let should_not_touch_this = css([prop("1"), prop("2")]);
   let function_should_append_to_apply =
     style([
-      CssJs.label("function_should_append_to_apply"),
+      label("function_should_append_to_apply"),
       justifyContent(
         switch (argument) {
         | Left => `flexStart
