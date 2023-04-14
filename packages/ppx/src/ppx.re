@@ -24,8 +24,8 @@ module Mapper = {
                   )
               ||| map(
                     ~f=
-                      (catch, lbl, def, param, body) =>
-                        catch(`Function((lbl, def, param, body))),
+                      (catch, label, def, param, body) =>
+                        catch(`Function((label, def, param, body))),
                     pexp_fun(__, __, __, __),
                   ),
               nil,
@@ -311,14 +311,36 @@ let traverser = {
   }
 };
 
-let css_apply = Ast_pattern.(pexp_apply(__, pair(nolabel, __) ^:: nil));
+let apply_pattern = Ast_pattern.(pexp_apply(__, pair(nolabel, __) ^:: nil));
+let fun_pattern = Ast_pattern.(pexp_fun(drop, drop, drop, apply_pattern));
+let seq_pattern = Ast_pattern.(pexp_sequence(drop, apply_pattern));
 
 let vb_payload =
   Ast_pattern.(
     pstr(
       pstr_value(
         nonrecursive,
-        value_binding(~pat=ppat_var(__), ~expr=css_apply) ^:: nil,
+        value_binding(
+          ~pat=ppat_var(__),
+          ~expr=
+            map(
+              ~f=(capture, ident, expr) => capture(`Apply((ident, expr))),
+              apply_pattern,
+            )
+            ||| map(
+                  ~f=
+                    (capture, ident, expr) =>
+                      capture(`Apply((ident, expr))),
+                  fun_pattern,
+                )
+            ||| map(
+                  ~f=
+                    (capture, ident, expr) =>
+                      capture(`Apply((ident, expr))),
+                  seq_pattern,
+                ),
+        )
+        ^:: nil,
       )
       ^:: nil,
     )
@@ -330,11 +352,13 @@ let static_pattern =
     pstr(
       pstr_eval(
         map(
-          ~f=(catch, payload, _, delim) => catch(`String((payload, delim))),
+          ~f=
+            (capture, payload, _, delim) =>
+              capture(`String((payload, delim))),
           pexp_constant(pconst_string(__', __, __)),
         )
         ||| map(
-              ~f=(catch, payload) => catch(`Array(payload)),
+              ~f=(capture, payload) => capture(`Array(payload)),
               pexp_array(__),
             ),
         nil,
@@ -454,14 +478,17 @@ let _ =
           "label",
           Extension.Context.Structure_item,
           vb_payload,
-          (~loc, ~path, label, ident, expression) => {
+          (~loc, ~path, label, payload) => {
             File.set(path);
-            let pattern = Builder.ppat_var(~loc, {txt: label, loc});
-            let label_value =
-              Builder.pexp_constant(~loc, Pconst_string(label, loc, None));
-            let label = [%expr CssJs.label([%e label_value])];
-            let expr = [%expr [[%e label], ...[%e expression]]];
-            [%stri let [%p pattern] = [%e ident]([%e expr])];
+            switch (payload) {
+            | `Apply(ident, expression) =>
+              let pattern = Builder.ppat_var(~loc, {txt: label, loc});
+              let label_value =
+                Builder.pexp_constant(~loc, Pconst_string(label, loc, None));
+              let label = [%expr CssJs.label([%e label_value])];
+              let expr = [%expr [[%e label], ...[%e expression]]];
+              [%stri let [%p pattern] = [%e ident]([%e expr])];
+            };
           },
         ),
       ),

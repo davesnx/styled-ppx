@@ -14,3 +14,14 @@
       prop("2"),
     ]);
   let should_not_touch_this = css([prop("1"), prop("2")]);
+  let function_should_append_to_apply =
+    style([
+      CssJs.label("function_should_append_to_apply"),
+      justifyContent(
+        switch (argument) {
+        | Left => `flexStart
+        | Center => `center
+        | Right => `flexEnd
+        },
+      ),
+    ]);
