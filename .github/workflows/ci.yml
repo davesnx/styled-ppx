@@ -19,7 +19,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest] # Missing windows-latest
+        os: [ubuntu-20.04, macos-latest] # Missing windows-latest
 
     steps:
       - uses: actions/checkout@v3
@@ -132,7 +132,7 @@ jobs:
     needs: build
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-20.04, macos-latest]
 
     steps:
       - uses: actions/checkout@v3
@@ -174,7 +174,7 @@ jobs:
     name: Publish
     needs: build
     if: github.repository_owner == 'davesnx'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v3
@@ -192,7 +192,7 @@ jobs:
       - name: Download linux artifacts
         uses: actions/download-artifact@v3
         with:
-          name: ubuntu-latest
+          name: ubuntu-20.04
           path: _release/platform-linux-x64
 
       - name: Download macOS artifacts
