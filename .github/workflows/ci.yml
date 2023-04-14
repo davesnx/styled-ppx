@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 defaults:
   run:
@@ -237,7 +238,7 @@ jobs:
               echo "New verison and remote version are equal, nothing to publish"
           fi
 
-      - uses: mshick/add-pr-comment@v1
+      - uses: mshick/add-pr-comment@v2
         if: ${{ steps.nightly.outputs.version }}
         with:
           message: |
