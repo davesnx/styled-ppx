@@ -1,4 +1,6 @@
-let stilos = [%cx {|
+let stilos =
+  [%cx
+    {|
   box-shadow: inset 10px 10px 0 0 #ff0000, 10px 10px 0 0 #ff0000;
 
   &:before {
@@ -10,4 +12,3 @@ let stilos = [%cx {|
     background: blue;
   }
 |}]
-
