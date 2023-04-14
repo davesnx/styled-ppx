@@ -2,19 +2,6 @@ open Ppxlib;
 
 module Builder = Ast_builder.Default;
 
-let (version, mode) = Bsconfig.getJSX();
-
-switch (version) {
-| Some(version) =>
-  Settings.Update.jsxVersion(version);
-  Settings.Update.jsxMode(mode);
-| None => ()
-};
-
-let string_payload = Ast_pattern.(single_expr_payload(estring(__)));
-
-let any_payload = Ast_pattern.(single_expr_payload(__));
-
 module Mapper = {
   let match = module_expr => {
     open Ast_pattern;
@@ -83,42 +70,6 @@ module Mapper = {
   let isStyled = name => {
     name |> getHtmlTag |> Option.is_some;
   };
-
-  /*   type contents =
-       | ListOf(expression)
-       | EmptyList; */
-
-  /* Builder.pexp_construct(
-       ~loc,
-       lid("::"),
-       Some(
-         Builder.pexp_tuple(
-           ~loc,
-           [
-             Builder.pexp_apply(
-               ~loc,
-               Builder.pexp_ident(~loc, label(~loc)),
-               [
-                 (
-                   Nolabel,
-                   Builder.pexp_constant(
-                     ~loc,
-                     Pconst_string(className, loc, None),
-                   ),
-                 ),
-               ],
-             ),
-             Builder.pexp_construct(~loc, lid("[]"), None),
-           ],
-         ),
-       ),
-     ); */
-
-  /* switch (contents) {
-     | ListOf(decls) =>
-       Builder.pexp_construct(~loc, lid("::"), Some(decls))
-     | EmptyList => Builder.pexp_construct(~loc, lid("[]"), None)
-     }, */
 
   let transform = expr => {
     switch (expr.pstr_desc) {
@@ -360,10 +311,7 @@ let traverser = {
   }
 };
 
-let css_apply =
-  Ast_pattern.(
-    pexp_apply(pexp_ident(lident(__)), pair(nolabel, __) ^:: nil)
-  );
+let css_apply = Ast_pattern.(pexp_apply(__, pair(nolabel, __) ^:: nil));
 
 let vb_payload =
   Ast_pattern.(
@@ -409,6 +357,19 @@ let static_pattern =
      ~doc=Settings.jsxMode.doc,
    ); */
 
+let (version, mode) = Bsconfig.getJSX();
+
+switch (version) {
+| Some(version) =>
+  Settings.Update.jsxVersion(version);
+  Settings.Update.jsxMode(mode);
+| None => ()
+};
+
+let string_payload_pattern = Ast_pattern.(single_expr_payload(estring(__)));
+
+let any_payload_pattern = Ast_pattern.(single_expr_payload(__));
+
 let _ =
   Driver.register_transformation(
     ~impl=traverser#structure,
@@ -443,7 +404,7 @@ let _ =
         Extension.declare(
           "css",
           Extension.Context.Expression,
-          string_payload,
+          string_payload_pattern,
           (~loc, ~path, payload) => {
             File.set(path);
             let pos = loc.loc_start;
@@ -462,7 +423,7 @@ let _ =
         Extension.declare(
           "styled.global",
           Extension.Context.Expression,
-          string_payload,
+          string_payload_pattern,
           (~loc, ~path, payload) => {
             File.set(path);
             let pos = loc.loc_start;
@@ -477,7 +438,7 @@ let _ =
         Extension.declare(
           "keyframe",
           Extension.Context.Expression,
-          string_payload,
+          string_payload_pattern,
           (~loc, ~path, payload) => {
             File.set(path);
             let pos = loc.loc_start;
@@ -493,24 +454,14 @@ let _ =
           "label",
           Extension.Context.Structure_item,
           vb_payload,
-          (~loc, ~path, label, css_ident, expression) => {
+          (~loc, ~path, label, ident, expression) => {
             File.set(path);
-            if (!String.equal(css_ident, "css")) {
-              [%stri
-               [%expr
-                 [%ocaml.error
-                   "The 'label' extension expects a css call with a list of \
-                  declarations, e.g. `let%%label foo = css([])`"
-                 ]
-               ]];
-            } else {
-              let pattern = Builder.ppat_var(~loc, {txt: label, loc});
-              let label_value =
-                Builder.pexp_constant(~loc, Pconst_string(label, loc, None));
-              let label = [%expr CssJs.label([%e label_value])];
-              let expr = [%expr [[%e label], ...[%e expression]]];
-              [%stri let [%p pattern] = css([%e expr])];
-            };
+            let pattern = Builder.ppat_var(~loc, {txt: label, loc});
+            let label_value =
+              Builder.pexp_constant(~loc, Pconst_string(label, loc, None));
+            let label = [%expr CssJs.label([%e label_value])];
+            let expr = [%expr [[%e label], ...[%e expression]]];
+            [%stri let [%p pattern] = [%e ident]([%e expr])];
           },
         ),
       ),
@@ -519,7 +470,7 @@ let _ =
         Extension.declare(
           "styled",
           Extension.Context.Module_expr,
-          any_payload,
+          any_payload_pattern,
           (~loc, ~path as _, payload) => {
           Generate_lib.raiseError(
             ~loc,

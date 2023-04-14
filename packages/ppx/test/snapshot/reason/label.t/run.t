@@ -7,10 +7,10 @@
   let css_apply_multiple =
     css([CssJs.label("css_apply_multiple"), prop("1"), prop("2")]);
   let%label should_complain = [prop("1"), prop("2")];
-  [%expr
-    [%ocaml.error
-      "The 'label' extension expects a css call with a list of \
-                    declarations, e.g. `let%%label foo = css([])`"
-    ]
-  ];
+  let should_render_custom_ident =
+    Css.style([
+      CssJs.label("should_render_custom_ident"),
+      prop("1"),
+      prop("2"),
+    ]);
   let should_not_touch_this = css([prop("1"), prop("2")]);
