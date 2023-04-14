@@ -1,29 +1,16 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  let className = css([CssJs.label("className"), CssJs.block(`blue)]);
-  let foo = css([CssJs.label("foo"), prop("1"), prop("2")]);
-  let bar = (~x) => css([CssJs.label("bar"), prop(x)]);
-  let baz = (~x, ~y) => css([CssJs.label("baz"), prop(x), prop(y)]);
-  let empty = css([CssJs.label("empty")]);
-  type t =
-    | A
-    | B;
-  let fn1 = x =>
-    css([
-      CssJs.label("fn1"),
-      ...switch (x) {
-         | A => [prop("a")]
-         | B => [prop("b")]
-         },
-    ]);
-  let fn2 = (x, y) =>
-    css([
-      CssJs.label("fn2"),
-      ...switch (x) {
-         | A when y => [prop("ay")]
-         | A => [prop("a")]
-         | B when y => [prop("by")]
-         | B => [prop("b")]
-         },
-    ]);
+  [%%ocaml.error "apply expected"];
+  let css_apply = css([CssJs.label("css_apply"), CssJs.block(`blue)]);
+  let css_apply_with_empty = css([CssJs.label("css_apply_with_empty")]);
+  let css_apply_multiple =
+    css([CssJs.label("css_apply_multiple"), prop("1"), prop("2")]);
+  let%label should_complain = [prop("1"), prop("2")];
+  [%expr
+    [%ocaml.error
+      "The 'label' extension expects a css call with a list of \
+                    declarations, e.g. `let%%label foo = css([])`"
+    ]
+  ];
+  let should_not_touch_this = css([prop("1"), prop("2")]);

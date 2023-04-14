@@ -1,23 +1,6 @@
-let className = [%css_label [CssJs.block(`blue)]];
-let foo = [%css_label [prop("1"), prop("2")]];
-let bar = (~x) => [%css_label [prop(x)]];
-let baz = (~x, ~y) => [%css_label [prop(x), prop(y)]];
-let empty = [%css_label []];
-
-type t =
-  | A
-  | B;
-
-let fn1 = x =>
-  switch%css_label (x) {
-  | A => [prop("a")]
-  | B => [prop("b")]
-  };
-
-let fn2 = (x, y) =>
-  switch%css_label (x) {
-  | A when y => [prop("ay")]
-  | A => [prop("a")]
-  | B when y => [prop("by")]
-  | B => [prop("b")]
-  };
+let%label css_apply = css([CssJs.block(`blue)]);
+let%label css_apply_with_empty = css([]);
+let%label css_apply_multiple = css([prop("1"), prop("2")]);
+let%label should_complain = [prop("1"), prop("2")];
+let%label should_complain_custom_error = cxx([prop("1"), prop("2")]);
+let should_not_touch_this = css([prop("1"), prop("2")]);
