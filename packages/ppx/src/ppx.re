@@ -312,8 +312,8 @@ let traverser = {
 };
 
 let apply_pattern = Ast_pattern.(pexp_apply(__, pair(nolabel, __) ^:: nil));
-let fun_pattern = Ast_pattern.(pexp_fun(drop, drop, drop, apply_pattern));
-let seq_pattern = Ast_pattern.(pexp_sequence(drop, apply_pattern));
+let fun_pattern = Ast_pattern.(pexp_fun(__, __, __, apply_pattern));
+let seq_pattern = Ast_pattern.(pexp_sequence(__, apply_pattern));
 
 let vb_payload =
   Ast_pattern.(
@@ -329,14 +329,22 @@ let vb_payload =
             )
             ||| map(
                   ~f=
-                    (capture, ident, expr) =>
-                      capture(`Apply((ident, expr))),
+                    (capture, arg_label, optExpr, pattern, ident, expr) =>
+                      capture(
+                        `Fun_apply((
+                          arg_label,
+                          optExpr,
+                          pattern,
+                          ident,
+                          expr,
+                        )),
+                      ),
                   fun_pattern,
                 )
             ||| map(
                   ~f=
-                    (capture, ident, expr) =>
-                      capture(`Apply((ident, expr))),
+                    (capture, first, ident, expr) =>
+                      capture(`Seq_apply((first, ident, expr))),
                   seq_pattern,
                 ),
         )
@@ -488,6 +496,22 @@ let _ =
               let label = [%expr label([%e label_value])];
               let expr = [%expr [[%e label], ...[%e expression]]];
               [%stri let [%p pattern] = [%e ident]([%e expr])];
+            | `Fun_apply(ident, optExpr, fn_pattern, wat, expression) =>
+              let pattern = Builder.ppat_var(~loc, {txt: label, loc});
+              let label_value =
+                Builder.pexp_constant(~loc, Pconst_string(label, loc, None));
+              let label = [%expr label([%e label_value])];
+              let rules = [%expr [[%e label], ...[%e expression]]];
+              let fn =
+                Builder.pexp_fun(
+                  ~loc,
+                  ident,
+                  optExpr,
+                  fn_pattern,
+                  [%expr [%e wat]([%e rules])],
+                );
+              [%stri let [%p pattern] = [%e fn]];
+            | `Seq_apply(_, _, _) => failwith("Not implemented")
             };
           },
         ),

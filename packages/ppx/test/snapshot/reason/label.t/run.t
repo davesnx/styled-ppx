@@ -10,7 +10,7 @@
   let should_render_custom_ident =
     Css.style([label("should_render_custom_ident"), prop("1"), prop("2")]);
   let should_not_touch_this = css([prop("1"), prop("2")]);
-  let function_should_append_to_apply =
+  let function_should_append_to_apply = argument =>
     style([
       label("function_should_append_to_apply"),
       justifyContent(
