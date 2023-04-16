@@ -15,3 +15,14 @@ let%label function_should_append_to_apply = argument =>
       },
     ),
   ]);
+
+let%label function_should_append_to_apply = (argument1, argument2) =>
+  style([
+    justifyContent(
+      switch (argument1, argument2) {
+      | Left => `flexStart
+      | Center => `center
+      | Right => `flexEnd
+      },
+    ),
+  ]);
