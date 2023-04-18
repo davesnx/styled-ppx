@@ -311,65 +311,70 @@ let traverser = {
   }
 };
 
-let apply_pattern = Ast_pattern.(pexp_apply(__, pair(nolabel, __) ^:: nil));
-let fun_pattern = Ast_pattern.(pexp_fun(__, __, __, apply_pattern));
-let fun_2_pattern =
-  Ast_pattern.(pexp_fun(__, __, __, pexp_fun(__, __, __, apply_pattern)));
-let vb_payload =
+let kind_expr = expr =>
+  switch (expr.pexp_desc) {
+  | Pexp_ident(_) => "Pexp_ident(_)"
+  | Pexp_constant(_) => "Pexp_constant(_)"
+  | Pexp_let(_) => "Pexp_let(_)"
+  | Pexp_function(_) => "Pexp_function(_)"
+  | Pexp_fun(_) => "Pexp_fun(_)"
+  | Pexp_apply(_) => "Pexp_apply(_)"
+  | Pexp_match(_) => "Pexp_match(_)"
+  | Pexp_try(_) => "Pexp_try(_)"
+  | Pexp_tuple(_) => "Pexp_tuple(_)"
+  | Pexp_construct(_) => "Pexp_construct(_)"
+  | Pexp_variant(_) => "Pexp_variant(_)"
+  | Pexp_record(_) => "Pexp_record(_)"
+  | Pexp_field(_) => "Pexp_field(_)"
+  | Pexp_setfield(_) => "Pexp_setfield(_)"
+  | Pexp_array(_) => "Pexp_array(_)"
+  | Pexp_ifthenelse(_) => "Pexp_ifthenelse(_)"
+  | Pexp_sequence(_) => "Pexp_sequence(_)"
+  | Pexp_while(_) => "Pexp_while(_)"
+  | Pexp_for(_) => "Pexp_for(_)"
+  | Pexp_constraint(_) => "Pexp_constraint(_)"
+  | Pexp_coerce(_) => "Pexp_coerce(_)"
+  | Pexp_send(_) => "Pexp_send(_)"
+  | Pexp_new(_) => "Pexp_new(_)"
+  | Pexp_setinstvar(_) => "Pexp_setinstvar(_)"
+  | Pexp_override(_) => "Pexp_override(_)"
+  | Pexp_letmodule(_) => "Pexp_letmodule(_)"
+  | Pexp_letexception(_) => "Pexp_letexception(_)"
+  | Pexp_assert(_) => "Pexp_assert(_)"
+  | Pexp_lazy(_) => "Pexp_lazy(_)"
+  | Pexp_poly(_) => "Pexp_poly(_)"
+  | Pexp_object(_) => "Pexp_object(_)"
+  | Pexp_newtype(_) => "Pexp_newtype(_)"
+  | Pexp_pack(_) => "Pexp_pack(_)"
+  | Pexp_open(_) => "Pexp_open(_)"
+  | Pexp_letop(_) => "Pexp_letop(_)"
+  | Pexp_extension(_) => "Pexp_extension(_)"
+  | Pexp_unreachable => "Pexp_unreachable"
+  };
+
+let make_label_traverser = label => {
+  as _;
+  inherit class Ast_traverse.map as super;
+  pub! expression = expr => {
+    switch (expr.pexp_desc) {
+    /* Append at last position the label */
+    | Pexp_construct({txt: Lident("[]"), _}, _) =>
+      let loc = expr.pexp_loc;
+      let label_value =
+        Builder.pexp_constant(~loc, Pconst_string(label, loc, None));
+      let label = [%expr label([%e label_value])];
+      [%expr [[%e label]]];
+    | _ => super#expression(expr)
+    };
+  }
+};
+
+let vb_pattern =
   Ast_pattern.(
     pstr(
       pstr_value(
         nonrecursive,
-        value_binding(
-          ~pat=ppat_var(__),
-          ~expr=
-            map(
-              ~f=(capture, ident, expr) => capture(`Apply((ident, expr))),
-              apply_pattern,
-            )
-            ||| map(
-                  ~f=
-                    (capture, arg_label, optExpr, pattern, ident, expr) =>
-                      capture(
-                        `Fun_apply((
-                          arg_label,
-                          optExpr,
-                          pattern,
-                          ident,
-                          expr,
-                        )),
-                      ),
-                  fun_pattern,
-                )
-            ||| map(
-                  ~f=
-                    (
-                      capture,
-                      arg_label_1,
-                      optExpr_1,
-                      pattern_1,
-                      arg_label_2,
-                      optExpr_2,
-                      pattern_2,
-                      ident_2,
-                      expr_2,
-                    ) =>
-                      capture(
-                        `Fun_2_apply((
-                          arg_label_1,
-                          optExpr_1,
-                          pattern_1,
-                          arg_label_2,
-                          optExpr_2,
-                          pattern_2,
-                          ident_2,
-                          expr_2,
-                        )),
-                      ),
-                  fun_2_pattern,
-                ),
-        )
-        ^:: nil,
+        value_binding(~pat=ppat_var(__), ~expr=__) ^:: nil,
       )
       ^:: nil,
     )
@@ -506,63 +511,12 @@ let _ =
         Extension.declare(
           "label",
           Extension.Context.Structure_item,
-          vb_payload,
+          vb_pattern,
           (~loc, ~path, label, payload) => {
             File.set(path);
-            switch (payload) {
-            | `Apply(ident, expression) =>
-              let pattern = Builder.ppat_var(~loc, {txt: label, loc});
-              let label_value =
-                Builder.pexp_constant(~loc, Pconst_string(label, loc, None));
-              let label = [%expr label([%e label_value])];
-              let expr = [%expr [[%e label], ...[%e expression]]];
-              [%stri let [%p pattern] = [%e ident]([%e expr])];
-            | `Fun_apply(arg_label, optExpr, fn_pattern, callee, expression) =>
-              let pattern = Builder.ppat_var(~loc, {txt: label, loc});
-              let label_value =
-                Builder.pexp_constant(~loc, Pconst_string(label, loc, None));
-              let label = [%expr label([%e label_value])];
-              let rules = [%expr [[%e label], ...[%e expression]]];
-              let fn =
-                Builder.pexp_fun(
-                  ~loc,
-                  arg_label,
-                  optExpr,
-                  fn_pattern,
-                  [%expr [%e callee]([%e rules])],
-                );
-              [%stri let [%p pattern] = [%e fn]];
-            | `Fun_2_apply(
-                arg_label_1,
-                optExpr_1,
-                fn_pattern_1,
-                arg_label_2,
-                optExpr_2,
-                fn_pattern_2,
-                callee_2,
-                expression,
-              ) =>
-              let pattern = Builder.ppat_var(~loc, {txt: label, loc});
-              let label_value =
-                Builder.pexp_constant(~loc, Pconst_string(label, loc, None));
-              let label = [%expr label([%e label_value])];
-              let rules = [%expr [[%e label], ...[%e expression]]];
-              let fn =
-                Builder.pexp_fun(
-                  ~loc,
-                  arg_label_1,
-                  optExpr_1,
-                  fn_pattern_1,
-                  Builder.pexp_fun(
-                    ~loc,
-                    arg_label_2,
-                    optExpr_2,
-                    fn_pattern_2,
-                    [%expr [%e callee_2]([%e rules])],
-                  ),
-                );
-              [%stri let [%p pattern] = [%e fn]];
-            };
+            let pattern = Builder.ppat_var(~loc, {txt: label, loc});
+            let expression = make_label_traverser(label)#expression(payload);
+            [%stri let [%p pattern] = [%e expression]];
           },
         ),
       ),

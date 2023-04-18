@@ -1,18 +1,19 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [%%ocaml.error "apply expected"];
-  let css_apply = css([label("css_apply"), CssJs.block(`blue)]);
-  let css_apply_with_empty = css([label("css_apply_with_empty")]);
+  let append_to_list = [label("append_to_list")];
+  let append_to_apply_list = any([label("append_to_apply_list")]);
+  let ignore_array = [||];
+  let ignore_array = any([||]);
+  let append_to_css_apply =
+    css([CssJs.block(`blue), label("append_to_css_apply")]);
   let css_apply_multiple =
-    css([label("css_apply_multiple"), prop("1"), prop("2")]);
-  let%label should_complain = [prop("1"), prop("2")];
+    css([prop("1"), prop("2"), label("css_apply_multiple")]);
   let should_render_custom_ident =
-    Css.style([label("should_render_custom_ident"), prop("1"), prop("2")]);
+    Css.style([prop("1"), prop("2"), label("should_render_custom_ident")]);
   let should_not_touch_this = css([prop("1"), prop("2")]);
   let function_should_append_to_apply = argument =>
     style([
-      label("function_should_append_to_apply"),
       justifyContent(
         switch (argument) {
         | Left => `flexStart
@@ -20,10 +21,10 @@
         | Right => `flexEnd
         },
       ),
+      label("function_should_append_to_apply"),
     ]);
   let function_should_append_to_apply = (argument1, argument2) =>
     style([
-      label("function_should_append_to_apply"),
       justifyContent(
         switch (argument1, argument2) {
         | Left => `flexStart
@@ -31,4 +32,17 @@
         | Right => `flexEnd
         },
       ),
+      label("function_should_append_to_apply"),
     ]);
+  let cosis =
+    switch (whatever) {
+    | True => style([label("cosis")])
+    | False => style([label("cosis")])
+    };
+  let cosis =
+    style(
+      switch (whatever) {
+      | True => [Css.color(Css.blue), label("cosis")]
+      | False => [label("cosis")]
+      },
+    );
