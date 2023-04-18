@@ -53,14 +53,14 @@ module Mapper = {
   };
 
   let getHtmlTagUnsafe = (~loc, str) => {
-    switch (String.split_on_char('.', str)) {
-    | ["styled", tag] => tag
-    | _ =>
+    switch (getHtmlTag(str)) {
+    | Some(tag) => tag
+    | None =>
       Generate_lib.raiseError(
         ~loc,
         ~description=
           "This styled component is not valid. Doesn't have the right format.",
-        ~example=Some("[%styled.div ..."),
+        ~example=Some("[%styled.div ...]"),
         ~link=
           "https://reasonml.org/docs/manual/latest/function#labeled-arguments",
       )
