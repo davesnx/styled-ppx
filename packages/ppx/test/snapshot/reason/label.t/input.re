@@ -31,3 +31,22 @@ let cosis =
   | True => [Css.color(Css.blue)]
   | False => []
   };
+let empty = [%style_label []];
+
+type t =
+  | A
+  | B;
+
+let fn1 = x =>
+  switch%style_label (x) {
+  | A => [prop("a")]
+  | B => [prop("b")]
+  };
+
+let fn2 = (x, y) =>
+  switch%style_label (x) {
+  | A when y => [prop("ay")]
+  | A => [prop("a")]
+  | B when y => [prop("by")]
+  | B => [prop("b")]
+  };

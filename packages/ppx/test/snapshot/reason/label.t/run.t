@@ -34,3 +34,25 @@
     | True => [Css.color(Css.blue)]
     | False => []
     };
+  let empty = style([label("empty")]);
+  type t =
+    | A
+    | B;
+  let fn1 = x =>
+    style([
+      label("fn1"),
+      ...switch (x) {
+         | A => [prop("a")]
+         | B => [prop("b")]
+         },
+    ]);
+  let fn2 = (x, y) =>
+    style([
+      label("fn2"),
+      ...switch (x) {
+         | A when y => [prop("ay")]
+         | A => [prop("a")]
+         | B when y => [prop("by")]
+         | B => [prop("b")]
+         },
+    ]);
