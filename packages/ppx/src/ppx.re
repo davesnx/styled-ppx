@@ -71,6 +71,49 @@ module Mapper = {
     name |> getHtmlTag |> Option.is_some;
   };
 
+  type contents =
+    | Match(expression, list(case))
+    | ListOf(expression)
+    | EmptyList;
+
+  let lid = name => {txt: Lident(name), loc: Location.none};
+
+  let css = (className, contents) => {
+    Ast_helper.(
+      Exp.apply(
+        Exp.ident(lid("style")),
+        [
+          (
+            Nolabel,
+            Exp.construct(
+              lid("::"),
+              Some(
+                Exp.tuple([
+                  Exp.apply(
+                    Exp.ident(lid("label")),
+                    [
+                      (
+                        Nolabel,
+                        Exp.constant(
+                          Pconst_string(className.txt, Location.none, None),
+                        ),
+                      ),
+                    ],
+                  ),
+                  switch (contents) {
+                  | Match(exp, cases) => Exp.match(exp, cases)
+                  | ListOf(decls) => Exp.construct(lid("::"), Some(decls))
+                  | EmptyList => Exp.construct(lid("[]"), None)
+                  },
+                ]),
+              ),
+            ),
+          ),
+        ],
+      )
+    );
+  };
+
   let transform = expr => {
     switch (expr.pstr_desc) {
     /* module name = [%styled.div {||}] */
@@ -295,6 +338,284 @@ module Mapper = {
         Nonrecursive,
         [Builder.value_binding(~loc=patternLoc, ~pat, ~expr)],
       );
+    | Pstr_value(
+        Nonrecursive,
+        [
+          {
+            pvb_pat: {ppat_desc: Ppat_var(className)},
+            pvb_expr: {
+              pexp_desc:
+                Pexp_extension((
+                  {txt: "style_label"},
+                  PStr([
+                    {
+                      pstr_desc:
+                        Pstr_eval(
+                          {
+                            pexp_desc:
+                              Pexp_construct({txt: Lident("[]")}, None),
+                          },
+                          [],
+                        ),
+                    },
+                  ]),
+                )),
+            },
+          },
+        ],
+      ) =>
+      Ast_helper.(
+        Str.value(
+          Nonrecursive,
+          [Vb.mk(Pat.var(className), css(className, EmptyList))],
+        )
+      )
+
+    | Pstr_value(
+        Nonrecursive,
+        [
+          {
+            pvb_pat: {ppat_desc: Ppat_var(className)},
+            pvb_expr: {
+              pexp_desc:
+                Pexp_extension((
+                  {txt: "style_label"},
+                  PStr([
+                    {
+                      pstr_desc:
+                        Pstr_eval(
+                          {pexp_desc: Pexp_construct(_, Some(exp))},
+                          [],
+                        ),
+                    },
+                  ]),
+                )),
+            },
+          },
+        ],
+      ) =>
+      Ast_helper.(
+        Str.value(
+          Nonrecursive,
+          [Vb.mk(Pat.var(className), css(className, ListOf(exp)))],
+        )
+      )
+
+    | Pstr_value(
+        Nonrecursive,
+        [
+          {
+            pvb_pat: {ppat_desc: Ppat_var(className)},
+            pvb_expr: {
+              pexp_desc:
+                Pexp_fun(
+                  label,
+                  optExp,
+                  pat,
+                  {
+                    pexp_desc:
+                      Pexp_extension((
+                        {txt: "style_label"},
+                        PStr([
+                          {
+                            pstr_desc:
+                              Pstr_eval(
+                                {pexp_desc: Pexp_construct(_, Some(exp))},
+                                [],
+                              ),
+                          },
+                        ]),
+                      )),
+                  },
+                ),
+            },
+          },
+        ],
+      ) =>
+      Ast_helper.(
+        Str.value(
+          Nonrecursive,
+          [
+            Vb.mk(
+              Pat.var(className),
+              Exp.fun_(label, optExp, pat, css(className, ListOf(exp))),
+            ),
+          ],
+        )
+      )
+
+    | Pstr_value(
+        Nonrecursive,
+        [
+          {
+            pvb_pat: {ppat_desc: Ppat_var(className)},
+            pvb_expr: {
+              pexp_desc:
+                Pexp_fun(
+                  label1,
+                  optExp1,
+                  pat1,
+                  {
+                    pexp_desc:
+                      Pexp_fun(
+                        label2,
+                        optExp2,
+                        pat2,
+                        {
+                          pexp_desc:
+                            Pexp_extension((
+                              {txt: "style_label"},
+                              PStr([
+                                {
+                                  pstr_desc:
+                                    Pstr_eval(
+                                      {
+                                        pexp_desc:
+                                          Pexp_construct(_, Some(exp)),
+                                      },
+                                      [],
+                                    ),
+                                },
+                              ]),
+                            )),
+                        },
+                      ),
+                  },
+                ),
+            },
+          },
+        ],
+      ) =>
+      Ast_helper.(
+        Str.value(
+          Nonrecursive,
+          [
+            Vb.mk(
+              Pat.var(className),
+              Exp.fun_(
+                label1,
+                optExp1,
+                pat1,
+                Exp.fun_(
+                  label2,
+                  optExp2,
+                  pat2,
+                  css(className, ListOf(exp)),
+                ),
+              ),
+            ),
+          ],
+        )
+      )
+
+    | Pstr_value(
+        Nonrecursive,
+        [
+          {
+            pvb_pat: {ppat_desc: Ppat_var(className)},
+            pvb_expr: {
+              pexp_desc:
+                Pexp_fun(
+                  label,
+                  optExp,
+                  pat,
+                  {
+                    pexp_desc:
+                      Pexp_extension((
+                        {txt: "style_label"},
+                        PStr([
+                          {
+                            pstr_desc:
+                              Pstr_eval(
+                                {pexp_desc: Pexp_match(exp, cases)},
+                                [],
+                              ),
+                          },
+                        ]),
+                      )),
+                  },
+                ),
+            },
+          },
+        ],
+      ) =>
+      Ast_helper.(
+        Str.value(
+          Nonrecursive,
+          [
+            Vb.mk(
+              Pat.var(className),
+              Exp.fun_(
+                label,
+                optExp,
+                pat,
+                css(className, Match(exp, cases)),
+              ),
+            ),
+          ],
+        )
+      )
+
+    | Pstr_value(
+        Nonrecursive,
+        [
+          {
+            pvb_pat: {ppat_desc: Ppat_var(className)},
+            pvb_expr: {
+              pexp_desc:
+                Pexp_fun(
+                  label1,
+                  optExp1,
+                  pat1,
+                  {
+                    pexp_desc:
+                      Pexp_fun(
+                        label2,
+                        optExp2,
+                        pat2,
+                        {
+                          pexp_desc:
+                            Pexp_extension((
+                              {txt: "style_label"},
+                              PStr([
+                                {
+                                  pstr_desc:
+                                    Pstr_eval(
+                                      {pexp_desc: Pexp_match(exp, cases)},
+                                      [],
+                                    ),
+                                },
+                              ]),
+                            )),
+                        },
+                      ),
+                  },
+                ),
+            },
+          },
+        ],
+      ) =>
+      Ast_helper.(
+        Str.value(
+          Nonrecursive,
+          [
+            Vb.mk(
+              Pat.var(className),
+              Exp.fun_(
+                label1,
+                optExp1,
+                pat1,
+                Exp.fun_(
+                  label2,
+                  optExp2,
+                  pat2,
+                  css(className, Match(exp, cases)),
+                ),
+              ),
+            ),
+          ],
+        )
+      )
 
     | _ => expr
     };
@@ -310,75 +631,6 @@ let traverser = {
     Mapper.transform(expr);
   }
 };
-
-let kind_expr = expr =>
-  switch (expr.pexp_desc) {
-  | Pexp_ident(_) => "Pexp_ident(_)"
-  | Pexp_constant(_) => "Pexp_constant(_)"
-  | Pexp_let(_) => "Pexp_let(_)"
-  | Pexp_function(_) => "Pexp_function(_)"
-  | Pexp_fun(_) => "Pexp_fun(_)"
-  | Pexp_apply(_) => "Pexp_apply(_)"
-  | Pexp_match(_) => "Pexp_match(_)"
-  | Pexp_try(_) => "Pexp_try(_)"
-  | Pexp_tuple(_) => "Pexp_tuple(_)"
-  | Pexp_construct(_) => "Pexp_construct(_)"
-  | Pexp_variant(_) => "Pexp_variant(_)"
-  | Pexp_record(_) => "Pexp_record(_)"
-  | Pexp_field(_) => "Pexp_field(_)"
-  | Pexp_setfield(_) => "Pexp_setfield(_)"
-  | Pexp_array(_) => "Pexp_array(_)"
-  | Pexp_ifthenelse(_) => "Pexp_ifthenelse(_)"
-  | Pexp_sequence(_) => "Pexp_sequence(_)"
-  | Pexp_while(_) => "Pexp_while(_)"
-  | Pexp_for(_) => "Pexp_for(_)"
-  | Pexp_constraint(_) => "Pexp_constraint(_)"
-  | Pexp_coerce(_) => "Pexp_coerce(_)"
-  | Pexp_send(_) => "Pexp_send(_)"
-  | Pexp_new(_) => "Pexp_new(_)"
-  | Pexp_setinstvar(_) => "Pexp_setinstvar(_)"
-  | Pexp_override(_) => "Pexp_override(_)"
-  | Pexp_letmodule(_) => "Pexp_letmodule(_)"
-  | Pexp_letexception(_) => "Pexp_letexception(_)"
-  | Pexp_assert(_) => "Pexp_assert(_)"
-  | Pexp_lazy(_) => "Pexp_lazy(_)"
-  | Pexp_poly(_) => "Pexp_poly(_)"
-  | Pexp_object(_) => "Pexp_object(_)"
-  | Pexp_newtype(_) => "Pexp_newtype(_)"
-  | Pexp_pack(_) => "Pexp_pack(_)"
-  | Pexp_open(_) => "Pexp_open(_)"
-  | Pexp_letop(_) => "Pexp_letop(_)"
-  | Pexp_extension(_) => "Pexp_extension(_)"
-  | Pexp_unreachable => "Pexp_unreachable"
-  };
-
-let make_label_traverser = label => {
-  as _;
-  inherit class Ast_traverse.map as super;
-  pub! expression = expr => {
-    switch (expr.pexp_desc) {
-    /* Append at last position the label */
-    | Pexp_construct({txt: Lident("[]"), _}, _) =>
-      let loc = expr.pexp_loc;
-      let label_value =
-        Builder.pexp_constant(~loc, Pconst_string(label, loc, None));
-      let label = [%expr label([%e label_value])];
-      [%expr [[%e label]]];
-    | _ => super#expression(expr)
-    };
-  }
-};
-
-let vb_pattern =
-  Ast_pattern.(
-    pstr(
-      pstr_value(
-        nonrecursive,
-        value_binding(~pat=ppat_var(__), ~expr=__) ^:: nil,
-      )
-      ^:: nil,
-    )
-  );
 
 /* TODO: Throw better errors when this pattern doesn't match */
 let static_pattern =
@@ -504,19 +756,6 @@ let _ =
             let declarations =
               Css_lexer.parse_keyframes(~container_lnum, ~pos, payload);
             Css_to_emotion.render_keyframes(declarations);
-          },
-        ),
-      ),
-      Context_free.Rule.extension(
-        Extension.declare(
-          "label",
-          Extension.Context.Structure_item,
-          vb_pattern,
-          (~loc, ~path, label, payload) => {
-            File.set(path);
-            let pattern = Builder.ppat_var(~loc, {txt: label, loc});
-            let expression = make_label_traverser(label)#expression(payload);
-            [%stri let [%p pattern] = [%e expression]];
           },
         ),
       ),

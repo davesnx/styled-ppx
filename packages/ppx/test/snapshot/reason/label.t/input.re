@@ -1,14 +1,9 @@
-let%label append_to_list = [];
-let%label append_to_apply_list = any([]);
-let%label ignore_array = [||];
-let%label ignore_array = any([||]);
-
-let%label append_to_css_apply = css([CssJs.block(`blue)]);
-let%label css_apply_multiple = css([prop("1"), prop("2")]);
-let%label should_render_custom_ident = Css.style([prop("1"), prop("2")]);
-let should_not_touch_this = css([prop("1"), prop("2")]);
-let%label function_should_append_to_apply = argument =>
-  style([
+let append_to_list = [%style_label []];
+let append_to_css_apply = [%style_label [CssJs.block(`blue)]];
+let css_apply_multiple = [%style_label [prop("1"), prop("2")]];
+let should_not_touch_this = style([prop("1"), prop("2")]);
+let function_should_append_to_apply = argument => [%style_label
+  [
     justifyContent(
       switch (argument) {
       | Left => `flexStart
@@ -16,10 +11,11 @@ let%label function_should_append_to_apply = argument =>
       | Right => `flexEnd
       },
     ),
-  ]);
+  ]
+];
 
-let%label function_should_append_to_apply = (argument1, argument2) =>
-  style([
+let function_should_append_to_apply = (argument1, argument2) => [%style_label
+  [
     justifyContent(
       switch (argument1, argument2) {
       | Left => `flexStart
@@ -27,18 +23,11 @@ let%label function_should_append_to_apply = (argument1, argument2) =>
       | Right => `flexEnd
       },
     ),
-  ]);
+  ]
+];
 
-let%label cosis =
-  switch (whatever) {
-  | True => style([])
-  | False => style([])
+let cosis =
+  switch%style_label (whatever) {
+  | True => [Css.color(Css.blue)]
+  | False => []
   };
-
-let%label cosis =
-  style(
-    switch (whatever) {
-    | True => [Css.color(Css.blue)]
-    | False => []
-    },
-  );
