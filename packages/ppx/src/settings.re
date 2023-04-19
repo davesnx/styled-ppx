@@ -5,13 +5,6 @@ type flag('a) = {
   defaultValue: 'a,
 };
 
-let compatibleWithBsEmotionPpx = {
-  flag: "--compat-with-bs-emotion-ppx",
-  doc: "Changes the extension name from `css` to `css_` to avoid the conflict with bs-emotion-ppx",
-  value: None,
-  defaultValue: false,
-};
-
 let production = {
   flag: "--production",
   doc: "*doesn't do anything*",
@@ -36,10 +29,9 @@ let jsxMode = {
 type settings = {
   jsxVersion: flag(int),
   jsxMode: flag(string),
-  compatibleWithBsEmotionPpx: flag(bool),
   production: flag(bool),
 };
-let settings = {jsxVersion, jsxMode, compatibleWithBsEmotionPpx, production};
+let settings = {jsxVersion, jsxMode, production};
 
 let currentSettings = ref(settings);
 let updateSettings = newSettings => currentSettings := newSettings;
@@ -51,12 +43,6 @@ module Get = {
   let jsxMode = () =>
     currentSettings.contents.jsxMode.value
     |> Option.value(~default=currentSettings.contents.jsxMode.defaultValue);
-  let compatibleWithBsEmotionPpx = () =>
-    currentSettings.contents.compatibleWithBsEmotionPpx.value
-    |> Option.value(
-         ~default=
-           currentSettings.contents.compatibleWithBsEmotionPpx.defaultValue,
-       );
   let production = () =>
     currentSettings.contents.production.value
     |> Option.value(~default=currentSettings.contents.production.defaultValue);
@@ -77,14 +63,6 @@ module Update = {
       jsxMode: {
         ...currentSettings.contents.jsxMode,
         value,
-      },
-    });
-  let compatibleWithBsEmotionPpx = value =>
-    updateSettings({
-      ...currentSettings.contents,
-      compatibleWithBsEmotionPpx: {
-        ...currentSettings.contents.compatibleWithBsEmotionPpx,
-        value: Some(value),
       },
     });
   let production = value =>

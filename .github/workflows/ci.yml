@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 defaults:
   run:
@@ -19,7 +20,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest] # Missing windows-latest
+        os: [ubuntu-20.04, macos-latest] # Missing windows-latest
 
     steps:
       - uses: actions/checkout@v3
@@ -132,7 +133,7 @@ jobs:
     needs: build
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-20.04, macos-latest]
 
     steps:
       - uses: actions/checkout@v3
@@ -174,7 +175,7 @@ jobs:
     name: Publish
     needs: build
     if: github.repository_owner == 'davesnx'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v3
@@ -192,7 +193,7 @@ jobs:
       - name: Download linux artifacts
         uses: actions/download-artifact@v3
         with:
-          name: ubuntu-latest
+          name: ubuntu-20.04
           path: _release/platform-linux-x64
 
       - name: Download macOS artifacts
@@ -237,12 +238,11 @@ jobs:
               echo "New verison and remote version are equal, nothing to publish"
           fi
 
-      - uses: mshick/add-pr-comment@v1
+      - uses: mshick/add-pr-comment@v2
         if: ${{ steps.nightly.outputs.version }}
         with:
           message: |
             New **nightly** version has been published to the NPM registry: [@davesnx/styled-ppx@${{ steps.nightly.outputs.version }}](https://www.npmjs.com/package/@davesnx/styled-ppx/v/${{ steps.nightly.outputs.version }}).
             Install it with `npm install @davesnx/styled-ppx@nightly` or `npm install @davesnx/styled-ppx@${{ steps.nightly.outputs.version }}`.
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          repo-token-user-login: 'github-actions[bot]' # The user.login for temporary GitHub tokens
           allow-repeats: false

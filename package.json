@@ -31,8 +31,8 @@
       [
         "dune",
         "build",
-        "--root",
-        "."
+        "-p",
+        "styled-ppx"
       ]
     ],
     "buildDev": "dune build --promote-install-files --root .",
@@ -72,8 +72,9 @@
     "test_css_spec_parser": "esy dune build @css_spec_parser_test",
     "test_css_spec_types": "esy dune build @css_spec_types_test",
     "test_e2e": "echo 'This can not be run with esy, only yarn like `yarn --cwd 'e2e/rescript-v9-JSX3' test`",
-    "dev": "esy dune build --root . --watch",
+    "dev": "esy dune build --promote-install-files --root . --watch",
     "release-static": "esy b dune build --root . --ignore-promoted-rules --no-config --profile release-static --only-packages styled-ppx",
+    "format": "esy dune build @fmt --auto-promote",
     "ast": "esy dune exec packages/renderer/ast_renderer.exe --",
     "lexer": "esy dune exec packages/renderer/lexer_renderer.exe --",
     "interpreter": "esy menhir --interpret --interpret-show-cst packages/parser/lib/css_parser.mly"

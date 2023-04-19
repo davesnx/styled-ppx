@@ -84,7 +84,7 @@ let styles =
   CssJs.style(. [|
     CssJs.label("ComponentName"),
     CssJs.display(`block),
-    [%css_ "flex-direction: row"],
+    [%css "flex-direction: row"],
   |]);
 
 let inlineStyles: ReactDOM.Style.t =
@@ -107,10 +107,10 @@ module Sequence = [%styled.button
     let buttonColor = Theme.button(color);
 
     [|
-      [%css_ "width: $(size)"],
-      [%css_ "color: $(buttonColor)"],
-      [%css_ "display: block;"],
-      [%css_ "width: 100%;"],
+      [%css "width: $(size)"],
+      [%css "color: $(buttonColor)"],
+      [%css "display: block;"],
+      [%css "width: 100%;"],
     |];
   }
 ];
