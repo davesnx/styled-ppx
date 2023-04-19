@@ -627,8 +627,7 @@ let traverser = {
   inherit class Ast_traverse.map as super;
   pub! structure_item = expr => {
     File.set(expr.pstr_loc.loc_start.pos_fname);
-    let expr = super#structure_item(expr);
-    Mapper.transform(expr);
+    expr |> Mapper.transform |> super#structure_item;
   }
 };
 
