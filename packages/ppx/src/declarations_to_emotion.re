@@ -66,6 +66,7 @@ let emit_shorthand = (parser, mapper, value_to_expr) => {
 
 let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
 
+
 let render_variable = (~loc, name) =>
   list_to_longident(name) |> txt(~loc) |> Helper.Exp.ident(~loc);
 
@@ -756,6 +757,9 @@ let render_function_hsl = (~loc, (hue, saturation, lightness, alpha)) => {
   | None => id([%expr `hsl(([%e hue], [%e saturation], [%e lightness]))])
   };
 };
+
+
+module P = Parser.Printers;
 
 let render_function_hsla = (~loc, (hue, saturation, lightness, alpha)) => {
   let hue =
@@ -1918,6 +1922,7 @@ let text_emphasis = unsupportedProperty(Parser.property_text_emphasis);
 let text_emphasis_position =
   unsupportedProperty(Parser.property_text_emphasis_position);
 // let text_emphasis_skip = unsupportedProperty(Parser.property_text_emphasis_skip);
+
 
 let render_text_shadow = (~loc, shadow) => {
   let (x, y, blur, color) =

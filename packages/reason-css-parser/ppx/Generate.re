@@ -4,6 +4,9 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
   open Ast_builder;
   open Css_spec_parser;
 
+
+	let loc = Ast_builder.loc;
+
   let txt = txt => {Location.loc: Ast_builder.loc, txt};
 
 	let pconst_string = s => Parsetree.Pconst_string(s, Ast_builder.loc, None);
@@ -117,11 +120,20 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     |> List.rev;
   };
 
-	let add_type_to_expr = (name: string, expression) => {
-    let core_type = Ast_helper.Typ.constr(~loc, { loc: Location.none, txt: Ldot(Lident("Types"), name) }, []);
-    let type_anotation = [%type: list(Reason_css_lexer.token) => (Reason_css_parser__Rule.data([%t core_type]), list(Reason_css_lexer.token))];
-    [%expr ([%e expression]: [%t type_anotation])];
+	let add_type_to_expr = (expression, type_) => {
+    [%expr ([%e expression]: [%t type_])];
   };
+
+	let add_parser_type_to_expr = (name: string, expression) => {
+    let core_type = Ast_helper.Typ.constr(~loc, { loc: loc, txt: Ldot(Lident("Types"), name) }, []);
+		add_type_to_expr(expression, [%type: list(Reason_css_lexer.token) => (Reason_css_parser__Rule.data([%t core_type]), list(Reason_css_lexer.token))])
+	}
+
+
+	let add_printer_type_to_expr = (name: string, expression) => {
+    let core_type = Ast_helper.Typ.constr(~loc, { loc: loc, txt: Ldot(Lident("Types"), name) }, []);
+		add_type_to_expr(expression, core_type)
+	}
 
 
   let make_type_declaration = (name, core_type) => {
@@ -262,8 +274,8 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
 
     let type_ = (~kind=Parsetree.Ptype_abstract, name, core_type) => {
       type_declaration(
-        ~loc=Location.none,
-        ~name={txt: name, loc: Location.none},
+        ~loc,
+        ~name={txt: name, loc},
         ~params=[],
         ~cstrs=[],
         ~private_=Public,
@@ -408,7 +420,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
       let name = value_binding |> get_name_from_binding;
       switch (name) {
       | Some(type_name) => {
-        let new_expression = add_type_to_expr(type_name, value_binding.pvb_expr);
+        let new_expression = add_parser_type_to_expr(type_name, value_binding.pvb_expr);
         { ...value_binding, pvb_expr: new_expression}
       }
       | None => value_binding
@@ -682,7 +694,7 @@ let rec (create_renderer : value => Parsetree.expression) = (value) => {
 			};
 		}
 
-	and terminal_xor_op = (kind, _multiplier, value) => {
+	and terminal_xor_op = (kind, value) => {
 			switch (kind) {
 			| Delim(name) => 
 				{
@@ -701,23 +713,44 @@ let rec (create_renderer : value => Parsetree.expression) = (value) => {
 			};
 	}
 
+	and variant_of_values = (kind, values) => {
+		let string_of_kind = fun
+		| Xor => "Xor"
+		| Static => "Static"
+		| Or => "Or"
+		| And => "And"
+		
+		let args = List.mapi((i, _) => Format.sprintf("arg_%d", i) |> txt |> ppat_var, values); 
+
+		let name = string_of_kind(kind);
+
+		ppat_variant(name, Some(ppat_tuple(args)))
+	}
+
 	and xor_op = ((name, value)) => {
 		let (lhs, rhs) = switch(value){
-			| Terminal(kind, multiplier) => terminal_xor_op(kind, multiplier, value)
-			| _ => (ppat_variant(name, None), create_renderer(value))
+			| Terminal(kind, _multiplier) => terminal_xor_op(kind, value)
+			| Combinator(kind, values) => (variant_of_values(kind, values), combinator_op(kind, values))
+			| Group(_, _) 
+ 			| Function_call(_, _) => (ppat_variant(name, None), create_renderer(value))
 		};
 		
 		case(~lhs, ~rhs, ~guard=None)
 
 	}
-	and combinator_op = (kind, values) => {
+	and (combinator_op : (combinator, list(value)) =>  Parsetree.expression) = (kind, values) => {
 		switch(kind) {
 			| Xor => 
 				let names = variant_names(values);
 				let args = List.combine(names, values);
 				pexp_function @@ List.map(xor_op, args);
+			| Static => {
+				let args = List.mapi((i, _) => ppat_var @@ txt @@ Format.sprintf("arg_%d",i), values);
+				let renderers = List.map(create_renderer, values) |> List.mapi((i, expr) => pexp_apply(expr, [(Nolabel, pexp_ident @@ txt @@ Lident(Format.sprintf("arg_%d", i)))]));
+				let expr = pexp_tuple @@ renderers;
+				pexp_fun_chain(args, expr)
+			}
 			| Or
-			| Static
 			| And => {
 				let args = List.mapi((i, _) => ppat_var @@ txt @@ Format.sprintf("arg_%d",i), values);
 				let renderers = List.map(create_renderer, values) |> List.mapi((i, expr) => pexp_apply(expr, [(Nolabel, pexp_ident @@ txt @@ Lident(Format.sprintf("arg_%d", i)))]));
@@ -734,8 +767,7 @@ let rec (create_renderer : value => Parsetree.expression) = (value) => {
 	}
 	switch (value) {
 		| Terminal(kind, multiplier) => terminal_op(kind, multiplier)
-		| Combinator(kind, values)  => combinator_op(kind, values)
-		| Function_call(name, value) => function_call(name, value)
+		| Combinator(kind, values)  => combinator_op(kind, values) | Function_call(name, value) => function_call(name, value)
 		| Group(value, multiplier) => group_op(value, multiplier);
 	};
 };
@@ -743,7 +775,7 @@ let rec (create_renderer : value => Parsetree.expression) = (value) => {
 let make_printer = bindings => {
 			let generate_render = binding => {
 				let (name, value) = extract_spec_value(binding);
-				let expr = create_renderer(value) |> add_type_to_expr(name);
+				let expr = create_renderer(value) /* |> add_printer_type_to_expr(name) */;
 				let pat = ppat_var(txt("render_" ++ value_name_of_css(name)));
 				value_binding(~pat, ~expr);
 			}  
