@@ -26804,8 +26804,9 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
     display2("flex")
   ]);
   function make$1(props) {
+    var className = styles$1 + getOrEmpty$1(props.className);
     var stylesObject = {
-      className: styles$1,
+      className,
       ref: props.innerRef
     };
     var newProps = Object.assign({}, props, stylesObject);
