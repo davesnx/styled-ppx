@@ -367,6 +367,8 @@ let getLabel = str =>
 
 /* let make = (props: makeProps) => + makeBody */
 let makeFnJSX3 = (~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames) => {
+  let className = [%expr [%e className] ++ getOrEmpty(classNameGet(props))];
+
   Helper.Exp.fun_(
     ~loc,
     Nolabel,
@@ -387,6 +389,7 @@ let makeFnJSX3 = (~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames) =>
 
 /* let make = (props: props) => + makeBody */
 let makeFnJSX4 = (~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames) => {
+  let className = [%expr [%e className] ++ getOrEmpty(props.className)];
   Helper.Exp.fun_(
     ~loc,
     Nolabel,

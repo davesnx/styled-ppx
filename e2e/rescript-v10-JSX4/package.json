@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "start": "concurrently --names re,js,www --kill-others yarn:re:watch yarn:bundle:watch yarn:dev-server",
+    "start": "concurrently --names re,js,www --kill-others yarn:watch yarn:bundle:watch yarn:dev-server",
     "bundle": "esbuild ./demo/index.bs.js --outfile=demo/bundle.js --bundle --sourcemap --target=chrome58,firefox57,safari11,edge16 --define:process.env.NODE_ENV='\"development\"'",
     "dev-server": "PORT=5000 live-server demo --host=0.0.0.0",
     "bundle:watch": "yarn bundle --watch --color=true",
@@ -22,6 +22,7 @@
     "bs-css-emotion": "5.0.0",
     "concurrently": "^5.1.0",
     "jsdom": "^21.1.0",
+    "live-server": "1.2.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "rescript": "10.1.3",

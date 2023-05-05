@@ -1,9 +1,12 @@
-  $ bsc -ppx "rewriter" -only-parse -bs-ast -bs-jsx 4 -bs-diagnose -bs-no-version-header -bs-no-builtin-ppx -bs-super-errors -color never -dsource input.res 2> output.ml
+  $ bsc -ppx "rewriter" -only-parse -bs-ast -bs-jsx 4 -bs-loc -bs-diagnose -bs-no-version-header -bs-ml-out -bs-no-builtin-ppx -bs-super-errors -color never -dsource input.res 2> output.ml
 
-  $ cat output.ml
-  module DynamicComponentWithDefaultValue =
+No clue why bsc generates a invalid syntax, but it does. This removes this particual bit.
+  $ sed -e 's/.I1//g' output.ml > fixed.ml
+
+  $ cat fixed.ml
+  module RedBox =
     struct
-      type 'var props =
+      type props =
         {
         innerRef: ReactDOM.domRef [@ns.optional ];
         children: React.element [@ns.optional ];
@@ -479,43 +482,37 @@
         onTransitionEnd: ReactEvent.Transition.t -> unit [@ns.optional ];
         onVolumeChange: ReactEvent.Media.t -> unit [@ns.optional ];
         onWaiting: ReactEvent.Media.t -> unit [@ns.optional ];
-        onWheel: ReactEvent.Wheel.t -> unit [@ns.optional ];
-        var: 'var [@ns.optional ]}[@@ns.optional ]
+        onWheel: ReactEvent.Wheel.t -> unit [@ns.optional ]}[@@ns.optional ]
       external createVariadicElement :
         string -> < .. >  Js.t -> React.element = "createElement"[@@bs.val ]
       [@@bs.module (("react")[@reason.raw_literal ])]
-      let deleteProp =
-        [%raw
-          (("(newProps, key) => delete newProps[key]")
-            [@reason.raw_literal "(newProps, key) => delete newProps[key]"])]
       let getOrEmpty str =
         ((match str with
           | ((Some (str))[@explicit_arity ]) ->
               ((" ")[@reason.raw_literal " "]) ^ str
           | None -> (("")[@reason.raw_literal ""]))
         [@reason.preserve_braces ])
+      let deleteProp =
+        [%raw
+          (("(newProps, key) => delete newProps[key]")
+            [@reason.raw_literal "(newProps, key) => delete newProps[key]"])]
       external assign2 :
         < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t =
           "Object.assign"[@@bs.val ]
-      let styles ?var:(((var)[@ns.namedArgLoc ])= CssJs.hex {js|333|js})  _ =
+      let styles =
         ((CssJs.style
-            [|(CssJs.label "DynamicComponentWithDefaultValue");(CssJs.display
-                                                                  `block);(
-              CssJs.color var : CssJs.rule)|])
+            [|(CssJs.label "RedBox");(CssJs.width (`pxFloat 100.));(CssJs.height
+                                                                      (
+                                                                      `pxFloat
+                                                                      100.));(
+              CssJs.backgroundColor CssJs.red)|])
         [@bs ])
-      let make (props : 'var props) =
-        let className =
-          (styles ?var:(props.var) ()) ^ (getOrEmpty props.className) in
+      let make (props : props) =
+        let className = styles ^ (getOrEmpty props.className) in
         let stylesObject = [%bs.obj { className; ref = (props.innerRef) }] in
         let newProps = assign2 (Js.Obj.empty ()) (Obj.magic props) stylesObject in
-        ignore (deleteProp newProps "var");
         ignore (deleteProp newProps "innerRef");
         createVariadicElement (("div")[@reason.raw_literal "div"]) newProps
     end
 
-No clue why bsc generates a invalid syntax, but it does. This removes this particual bit.
-  $ sed -e 's/.I1//g' output.ml > fixed.ml
-
   $ rescript convert fixed.ml
-
-
