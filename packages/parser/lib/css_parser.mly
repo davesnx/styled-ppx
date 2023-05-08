@@ -250,10 +250,8 @@ declaration_without_eof:
   }
 
 nth_payload:
+  /* TODO implement [of <complex-selector-list>]? */
   /* | complex = complex_selector_list; { NthSelector complex } */
-  /* even, odd */
-  /* | EVEN { Nth Even } */
-  /* | ODD { Nth Odd } */
   /* <An+B> */
   /* 2 */
   | a = NUMBER { Nth (A (int_of_string a)) }
