@@ -222,7 +222,7 @@ style_rule:
     }
   }
 
-values: xs = nonempty_list(loc(value)) { xs }
+values: xs = nonempty_list(loc(skip_ws(value))) { xs }
 
 declarations:
   | xs = nonempty_list(rule) SEMI_COLON? { xs }

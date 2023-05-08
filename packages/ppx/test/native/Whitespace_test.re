@@ -80,6 +80,11 @@ let tests =
       [%expr [%css "background-image: url('img_tree.gif' )"]],
     ),
     (
+      "ignore space on values, such as box-shadow",
+      [%expr [%cx "box-shadow:    12px 12px 2px 1px rgba(0, 0, 255, 0.2)"]],
+      [%expr [%cx "box-shadow: 12px 12px 2px 1px rgba(0, 0, 255, 0.2)"]],
+    ),
+    (
       "html, body, #root, .class",
       [%expr
         [%styled.global
