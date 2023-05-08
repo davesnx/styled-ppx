@@ -95,17 +95,13 @@ let simple_tests = [
     [%expr [%cx ".a, .b {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|.a, .b|js}, [||])|])],
   ),
-  /* TODO: Support all cases */
-  /* (
-       ":nth-child( 10n - 1 )",
-       [%expr [%cx "&:nth-child( 10n - 1 ) {}"]],
-       [%expr CssJs.style(. [|CssJs.selector(. {js|&:nth-child(10n-1)|js}, [||])|])],
-     ), */
-  /* (
-       ":nth-child(-n+2)",
-       [%expr [%cx "&:nth-child(-n+2) {}"]],
-       [%expr CssJs.style(. [|CssJs.selector(. {js|&:nth-child(-n+2)|js}, [||])|])],
-     ), */
+  (
+    ":nth-child(-n+2)",
+    [%expr [%cx "&:nth-child(-n+2) {}"]],
+    [%expr
+      CssJs.style(. [|CssJs.selector(. {js|&:nth-child(-n+2)|js}, [||])|])
+    ],
+  ),
 ];
 
 let compound_tests = [
