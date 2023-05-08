@@ -704,7 +704,7 @@ let parse_string =
 
 let parse_declaration_list = (~container_lnum=?, ~pos=?, input: string) => {
   parse_string(
-    ~skip_whitespace=true,
+    ~skip_whitespace=false,
     ~container_lnum?,
     ~pos?,
     Parser.declaration_list,

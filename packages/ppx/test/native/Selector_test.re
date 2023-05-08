@@ -436,8 +436,28 @@ let nested_tests = [
     ],
   ),
   (
+    ".a .b",
+    [%expr [%cx "display: block; .a .b {}"]],
+    [%expr
+      CssJs.style(. [|
+        CssJs.display(`block),
+        CssJs.selector(. {js|.a .b|js}, [||]),
+      |])
+    ],
+  ),
+  (
+    "& .a .b",
+    [%expr [%cx "display: block; & .a .b {}"]],
+    [%expr
+      CssJs.style(. [|
+        CssJs.display(`block),
+        CssJs.selector(. {js|& .a .b|js}, [||]),
+      |])
+    ],
+  ),
+  (
     ".$(aaa) { .$(bbb) { } }",
-    [%expr [%cx ".$(aaa) { .$(bbb){} }"]],
+    [%expr [%cx ".$(aaa) { .$(bbb) {} }"]],
     [%expr
       CssJs.style(. [|
         CssJs.selector(.
