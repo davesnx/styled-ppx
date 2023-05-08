@@ -249,30 +249,47 @@ declaration_without_eof:
     }
   }
 
-nth:
-  /* even, odd, n */
-  | i = IDENT { NthIdent i }
+nth_payload:
+  /* | complex = complex_selector_list; { NthSelector complex } */
+  /* even, odd */
+  /* | EVEN { Nth Even } */
+  /* | ODD { Nth Odd } */
   /* <An+B> */
   /* 2 */
-  | a = NUMBER { A a }
+  | a = NUMBER { Nth (A (int_of_string a)) }
   /* 2n */
-  | a = DIMENSION { AN (fst a) }
-  /* Since our lexing isn't on point with DIMENSIONS/NUMBERS */
-  /* We add a case where operator is missing */
+  | a = DIMENSION { Nth (AN (int_of_string (fst a))) }
   /* 2n-1 */
-  | left = DIMENSION WS? right = NUMBER {
-    ANB ((fst left, "", right))
+  | a = DIMENSION WS? combinator = COMBINATOR b = NUMBER {
+    let b = int_of_string b in
+    Nth (ANB (((int_of_string (fst a)), combinator, b)))
   }
-  /* 2n+1 */
-  | left = DIMENSION WS? combinator = COMBINATOR right = NUMBER {
-    ANB ((fst left, combinator, right))
+  /* This is a hackish solution where combinator isn't cached because the lexer
+  assignes the `-` to NUMBER. This could be solved by leftassoc */
+  | a = DIMENSION WS? b = NUMBER {
+    let b = Int.abs (int_of_string (b)) in
+    Nth (ANB (((int_of_string (fst a)), "-", b)))
+  }
+  | n = IDENT WS? {
+    match n with
+      | "even" -> Nth (Even)
+      | "odd" -> Nth (Odd)
+      | "n" -> Nth (AN 1)
+      | _ -> (
+        let first_char = String.get n 0 in
+        let a = if first_char = '-' then -1 else 1 in
+        Nth (AN a)
+      )
+  }
+  /* n-1 */
+  /* n */
+  /* -n */
+  | n = IDENT WS? combinator = COMBINATOR b = NUMBER {
+    let first_char = String.get n 0 in
+    let a = if first_char = '-' then -1 else 1 in
+    Nth (ANB ((a, combinator, int_of_string b)))
   }
   /* TODO: Support "An+B of Selector" */
-;
-
-nth_payload:
-  | complex = complex_selector_list; { NthSelector complex }
-  | n = skip_ws(nth) { Nth n }
 
 /* <pseudo-class-selector> = ':' <ident-token> | ':' <function-token> <any-value> ')' */
 pseudo_class_selector:

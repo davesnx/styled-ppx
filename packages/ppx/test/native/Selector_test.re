@@ -77,6 +77,13 @@ let simple_tests = [
     ],
   ),
   (
+    ":nth-child(-n+3)",
+    [%expr [%cx "&:nth-child(-n+3) {}"]],
+    [%expr
+      CssJs.style(. [|CssJs.selector(. {js|&:nth-child(-n+3)|js}, [||])|])
+    ],
+  ),
+  (
     ":nth-child( 10n -1 )",
     [%expr [%cx "&:nth-child(10n-1) {}"]],
     [%expr

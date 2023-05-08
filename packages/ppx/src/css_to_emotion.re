@@ -255,16 +255,17 @@ and render_selector = (selector: selector) => {
       }
     | Pseudo_class(psc) => render_pseudo_selector(psc)
   and render_nth =
-    fun
-    | NthIdent(i) when i == "even" => i
-    | NthIdent(i) when i == "odd" => i
-    | NthIdent(i) when i == "n" => i
     /* TODO: Add location in ast, pass it here */
-    | NthIdent(ident) =>
-      Lexer.grammar_error(Location.none, "'" ++ ident ++ "' is invalid")
-    | A(a) => a
-    | AN(an) => an ++ "n"
-    | ANB(a, op, b) => a ++ "n" ++ op ++ b
+    fun
+    | Even => "even"
+    | Odd => "odd"
+    | A(a) => Int.to_string(a)
+    | AN(an) when an == 1 => "n"
+    | AN(an) when an == (-1) => "-n"
+    | AN(an) => Int.to_string(an) ++ "n"
+    | ANB(a, op, b) when a == 1 => "n" ++ op ++ Int.to_string(b)
+    | ANB(a, op, b) when a == (-1) => "-n" ++ op ++ Int.to_string(b)
+    | ANB(a, op, b) => Int.to_string(a) ++ "n" ++ op ++ Int.to_string(b)
   and render_nth_payload =
     fun
     | Nth(nth) => render_nth(nth)

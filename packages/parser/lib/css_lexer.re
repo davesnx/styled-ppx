@@ -633,7 +633,7 @@ let rec get_next_token = buf => {
     } else {
       WS;
     }
-  /* -moz-* */
+  /* | "n" => Parser.N */
   | ("-", ident) => Parser.IDENT(latin1(buf))
   /* --variable */
   | ("-", "-", ident) => Parser.IDENT(latin1(buf))
