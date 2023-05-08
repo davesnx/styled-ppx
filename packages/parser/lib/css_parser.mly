@@ -178,6 +178,7 @@ percentage: n = NUMBER PERCENTAGE { n }
 
 /* keyframe allows stylesheet by defintion, but we restrict the usage to: */
 keyframe_style_rule:
+  /* from {} to {} */
   | WS? id = IDENT WS?
     declarations = brace_block(loc(declarations)) WS? {
     let prelude = [(SimpleSelector (Type id), Lex_buffer.make_loc $startpos(id) $endpos(id))] in
@@ -194,6 +195,19 @@ keyframe_style_rule:
     let prelude = [(SimpleSelector item, Lex_buffer.make_loc $startpos(p) $endpos(p))] in
     Style_rule {
       prelude = (prelude, Lex_buffer.make_loc $startpos(p) $endpos(p));
+      loc = Lex_buffer.make_loc $startpos $endpos;
+      block = declarations;
+    }
+  }
+  | percentages = separated_list(COMMA, skip_ws(percentage));
+    declarations = brace_block(loc(declarations)) WS? {
+    let prelude = percentages
+      |> List.map (fun percent -> Percentage percent)
+      |> List.map (fun p ->
+        (SimpleSelector p, Lex_buffer.make_loc $startpos(percentages) $endpos(percentages))
+      ) in
+    Style_rule {
+      prelude = (prelude, Lex_buffer.make_loc $startpos(percentages) $endpos(percentages));
       loc = Lex_buffer.make_loc $startpos $endpos;
       block = declarations;
     }
@@ -361,9 +375,6 @@ subclass_selector:
   | a = attribute_selector { a } /* [attr] */
   | pcs = pseudo_class_selector { Pseudo_class pcs } /* :pseudo-class */
   | DOT v = VARIABLE { ClassVariable v } /* .$(Variable) as subclass_selector */
-
-complex_selector_list:
-  | xs = separated_nonempty_list(skip_ws_right(COMMA), complex_selector) { xs }
 
 selector:
   /* By definition a selector can be one of those kinds, since inside

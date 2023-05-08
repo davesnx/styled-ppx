@@ -401,14 +401,14 @@ let render_keyframes = (declarations: rule_list): Parsetree.expression => {
     "'" ++ value ++ "' isn't a valid keyframe value";
   let invalid_prelude_value_opaque = "This isn't a valid keyframe value";
 
-  let render_select_as_keyframe = (prelude: selector): int => {
-    switch (prelude) {
+  let render_select_as_keyframe = (prelude): int => {
+    switch (prelude |> fst) {
     | SimpleSelector(selector) =>
       switch (selector) {
       // https://drafts.csswg.org/css-animations/#keyframes
-      // from is equivalent to the value 0%
+      // `from` is equivalent to the value 0%
       | Type(v) when v == "from" => 0
-      // to is equivalent to the value 100%
+      // `to` is equivalent to the value 100%
       | Type(v) when v == "to" => 100
       | Type(t) => Lexer.grammar_error(loc, invalid_prelude_value(t))
       | Percentage(n) =>
@@ -430,19 +430,22 @@ let render_keyframes = (declarations: rule_list): Parsetree.expression => {
     |> List.map(declaration => {
          switch (declaration) {
          | Style_rule({
-             prelude: (selector, prelude_loc),
+             prelude: (prelude, prelude_loc),
              block,
              loc: style_loc,
            }) =>
-           let percentage =
-             render_select_as_keyframe(selector |> List.hd |> fst)
-             |> Builder.eint(~loc=prelude_loc);
+           let percentages =
+             prelude
+             |> List.map(render_select_as_keyframe)
+             |> List.map(p => Builder.eint(~loc=prelude_loc, p));
            let rules =
              render_declarations(block) |> Builder.pexp_array(~loc);
-           Builder.pexp_tuple(~loc=style_loc, [percentage, rules]);
+           percentages
+           |> List.map(p => Builder.pexp_tuple(~loc=style_loc, [p, rules]));
          | _ => Lexer.grammar_error(loc, invalid_selector)
          }
        })
+    |> List.flatten
     |> Builder.pexp_array(~loc);
 
   {
