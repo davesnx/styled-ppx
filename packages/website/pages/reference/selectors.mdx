@@ -19,6 +19,8 @@ let link = %cx(`
 ```
 > Note: Selectors can be nested within your CSS which will be attached to the classname generated (in this case by `cx`)
 
+More than one level of selectors is not supported. It might compile but will generate the wrong result.
+
 The support for selectors is CSS Selectors Level 3 and the more stable part of level 4 (currently in draft).
 
 ## Interpolation in selectors
