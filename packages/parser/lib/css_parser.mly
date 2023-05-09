@@ -53,7 +53,7 @@ stylesheet: s = stylesheet_without_eof; EOF { s }
 stylesheet_without_eof: rs = loc(list(rule)) { rs }
 
 declaration_list:
-  | EOF { ([], Lex_buffer.make_loc $startpos $endpos) }
+  | WS? EOF { ([], Lex_buffer.make_loc $startpos $endpos) }
   | ds = loc(declarations) EOF { ds }
 
 /* keyframe may contain {} */

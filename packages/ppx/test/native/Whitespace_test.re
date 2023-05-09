@@ -5,6 +5,7 @@ let loc = Location.none;
 
 let tests =
   [
+    ("ignore in empty", [%expr [%cx " "]], [%expr [%cx ""]]),
     ("ignore in style_rule", [%expr [%cx ".bar{}"]], [%expr [%cx ".bar {}"]]),
     (
       "ignore in style_rule",
@@ -83,6 +84,18 @@ let tests =
       "ignore space on values, such as box-shadow",
       [%expr [%cx "box-shadow:    12px 12px 2px 1px rgba(0, 0, 255, 0.2)"]],
       [%expr [%cx "box-shadow: 12px 12px 2px 1px rgba(0, 0, 255, 0.2)"]],
+    ),
+    (
+      "ignore space on values, such as box-shadow",
+      [%expr
+        [%cx
+          {|
+  /* standard width 240px - standard padding 8px * 2 */
+  width: 214px;
+|}
+        ]
+      ],
+      [%expr [%cx {| width: 214px;|}]],
     ),
     (
       "html, body, #root, .class",
