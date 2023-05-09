@@ -86,7 +86,7 @@ let tests =
       [%expr [%cx "box-shadow: 12px 12px 2px 1px rgba(0, 0, 255, 0.2)"]],
     ),
     (
-      "ignore space on values, such as box-shadow",
+      "ignore space before/after comments values",
       [%expr
         [%cx
           {|
@@ -96,6 +96,15 @@ let tests =
         ]
       ],
       [%expr [%cx {| width: 214px;|}]],
+    ),
+    (
+      "ignore space after comments after rules",
+      [%expr
+        [%cx {|
+  width: 100%; /* otherwise will overflow container */
+|}]
+      ],
+      [%expr [%cx {| width: 100%; |}]],
     ),
     (
       "html, body, #root, .class",

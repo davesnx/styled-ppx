@@ -253,9 +253,12 @@ declaration: d = declaration_without_eof; EOF { d }
 
 declaration_without_eof:
   /* property: value; */
-  | WS? property = loc(IDENT) WS? COLON WS?
-    value = loc(values) WS?
-    important = loc(boption(IMPORTANT)) WS? SEMI_COLON? {
+  | WS? property = loc(IDENT)
+    WS? COLON
+    WS? value = loc(values)
+    WS? important = loc(boption(IMPORTANT))
+    WS? SEMI_COLON?
+    WS? {
     { name = property;
       value;
       important;
