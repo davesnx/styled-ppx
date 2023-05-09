@@ -239,8 +239,8 @@ style_rule:
 values: xs = nonempty_list(loc(skip_ws(value))) { xs }
 
 declarations:
-  | xs = nonempty_list(rule) SEMI_COLON? { xs }
-  | xs = separated_nonempty_list(SEMI_COLON, rule) SEMI_COLON? { xs }
+  | WS? xs = nonempty_list(rule) SEMI_COLON? { xs }
+  | WS? xs = separated_nonempty_list(SEMI_COLON, rule) SEMI_COLON? { xs }
 
 %inline rule:
   /* Rule can have declarations, since we have nesting, so both style_rules and
