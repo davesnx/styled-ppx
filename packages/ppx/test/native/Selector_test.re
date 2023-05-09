@@ -77,6 +77,13 @@ let simple_tests = [
     ],
   ),
   (
+    ":nth-child(-n+3)",
+    [%expr [%cx "&:nth-child(-n+3) {}"]],
+    [%expr
+      CssJs.style(. [|CssJs.selector(. {js|&:nth-child(-n+3)|js}, [||])|])
+    ],
+  ),
+  (
     ":nth-child( 10n -1 )",
     [%expr [%cx "&:nth-child(10n-1) {}"]],
     [%expr
@@ -88,17 +95,13 @@ let simple_tests = [
     [%expr [%cx ".a, .b {}"]],
     [%expr CssJs.style(. [|CssJs.selector(. {js|.a, .b|js}, [||])|])],
   ),
-  /* TODO: Support all cases */
-  /* (
-       ":nth-child( 10n - 1 )",
-       [%expr [%cx "&:nth-child( 10n - 1 ) {}"]],
-       [%expr CssJs.style(. [|CssJs.selector(. {js|&:nth-child(10n-1)|js}, [||])|])],
-     ), */
-  /* (
-       ":nth-child(-n+2)",
-       [%expr [%cx "&:nth-child(-n+2) {}"]],
-       [%expr CssJs.style(. [|CssJs.selector(. {js|&:nth-child(-n+2)|js}, [||])|])],
-     ), */
+  (
+    ":nth-child(-n+2)",
+    [%expr [%cx "&:nth-child(-n+2) {}"]],
+    [%expr
+      CssJs.style(. [|CssJs.selector(. {js|&:nth-child(-n+2)|js}, [||])|])
+    ],
+  ),
 ];
 
 let compound_tests = [
@@ -433,8 +436,28 @@ let nested_tests = [
     ],
   ),
   (
+    ".a .b",
+    [%expr [%cx "display: block; .a .b {}"]],
+    [%expr
+      CssJs.style(. [|
+        CssJs.display(`block),
+        CssJs.selector(. {js|.a .b|js}, [||]),
+      |])
+    ],
+  ),
+  (
+    "& .a .b",
+    [%expr [%cx "display: block; & .a .b {}"]],
+    [%expr
+      CssJs.style(. [|
+        CssJs.display(`block),
+        CssJs.selector(. {js|& .a .b|js}, [||]),
+      |])
+    ],
+  ),
+  (
     ".$(aaa) { .$(bbb) { } }",
-    [%expr [%cx ".$(aaa) { .$(bbb){} }"]],
+    [%expr [%cx ".$(aaa) { .$(bbb) {} }"]],
     [%expr
       CssJs.style(. [|
         CssJs.selector(.

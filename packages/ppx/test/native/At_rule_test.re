@@ -108,6 +108,18 @@ let keyframe_tests = [
     ],
   ),
   (
+    {|%keyframe "0%, 50%, 3% { color: red } 100% { color: green }"|},
+    [%expr [%keyframe "0%, 50%, 3% { color: red } 100% { color: green }"]],
+    [%expr
+      CssJs.keyframes(. [|
+        (0, [|CssJs.color(CssJs.red)|]),
+        (50, [|CssJs.color(CssJs.red)|]),
+        (3, [|CssJs.color(CssJs.red)|]),
+        (100, [|CssJs.color(CssJs.green)|]),
+      |])
+    ],
+  ),
+  (
     {|%keyframe "0% { color: red } 100% { color: green }"|},
     [%expr [%keyframe "{ 0% { color: red } 100% { color: green }}"]],
     [%expr

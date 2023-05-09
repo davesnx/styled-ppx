@@ -255,16 +255,17 @@ and render_selector = (selector: selector) => {
       }
     | Pseudo_class(psc) => render_pseudo_selector(psc)
   and render_nth =
-    fun
-    | NthIdent(i) when i == "even" => i
-    | NthIdent(i) when i == "odd" => i
-    | NthIdent(i) when i == "n" => i
     /* TODO: Add location in ast, pass it here */
-    | NthIdent(ident) =>
-      Lexer.grammar_error(Location.none, "'" ++ ident ++ "' is invalid")
-    | A(a) => a
-    | AN(an) => an ++ "n"
-    | ANB(a, op, b) => a ++ "n" ++ op ++ b
+    fun
+    | Even => "even"
+    | Odd => "odd"
+    | A(a) => Int.to_string(a)
+    | AN(an) when an == 1 => "n"
+    | AN(an) when an == (-1) => "-n"
+    | AN(an) => Int.to_string(an) ++ "n"
+    | ANB(a, op, b) when a == 1 => "n" ++ op ++ Int.to_string(b)
+    | ANB(a, op, b) when a == (-1) => "-n" ++ op ++ Int.to_string(b)
+    | ANB(a, op, b) => Int.to_string(a) ++ "n" ++ op ++ Int.to_string(b)
   and render_nth_payload =
     fun
     | Nth(nth) => render_nth(nth)
@@ -400,14 +401,14 @@ let render_keyframes = (declarations: rule_list): Parsetree.expression => {
     "'" ++ value ++ "' isn't a valid keyframe value";
   let invalid_prelude_value_opaque = "This isn't a valid keyframe value";
 
-  let render_select_as_keyframe = (prelude: selector): int => {
-    switch (prelude) {
+  let render_select_as_keyframe = (prelude): int => {
+    switch (prelude |> fst) {
     | SimpleSelector(selector) =>
       switch (selector) {
       // https://drafts.csswg.org/css-animations/#keyframes
-      // from is equivalent to the value 0%
+      // `from` is equivalent to the value 0%
       | Type(v) when v == "from" => 0
-      // to is equivalent to the value 100%
+      // `to` is equivalent to the value 100%
       | Type(v) when v == "to" => 100
       | Type(t) => Lexer.grammar_error(loc, invalid_prelude_value(t))
       | Percentage(n) =>
@@ -429,19 +430,22 @@ let render_keyframes = (declarations: rule_list): Parsetree.expression => {
     |> List.map(declaration => {
          switch (declaration) {
          | Style_rule({
-             prelude: (selector, prelude_loc),
+             prelude: (prelude, prelude_loc),
              block,
              loc: style_loc,
            }) =>
-           let percentage =
-             render_select_as_keyframe(selector |> List.hd |> fst)
-             |> Builder.eint(~loc=prelude_loc);
+           let percentages =
+             prelude
+             |> List.map(render_select_as_keyframe)
+             |> List.map(p => Builder.eint(~loc=prelude_loc, p));
            let rules =
              render_declarations(block) |> Builder.pexp_array(~loc);
-           Builder.pexp_tuple(~loc=style_loc, [percentage, rules]);
+           percentages
+           |> List.map(p => Builder.pexp_tuple(~loc=style_loc, [p, rules]));
          | _ => Lexer.grammar_error(loc, invalid_selector)
          }
        })
+    |> List.flatten
     |> Builder.pexp_array(~loc);
 
   {
