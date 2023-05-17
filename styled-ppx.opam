@@ -9,18 +9,18 @@ license: "MIT"
 homepage: "https://styled-ppx.vercel.app"
 bug-reports: "https://github.com/davesnx/styled-ppx/issues"
 depends: [
-  "alcotest" {= "1.6.0"}
+  "alcotest" {= "1.6.0" with-test}
   "dune" {>= "3.0"}
   "menhir" {= "20220210"}
   "ocaml-migrate-parsetree" {= "2.4.0"}
   "ocaml" {= "4.14.0"}
-  "ppx_deriving" {= "5.2.1"}
+  "ppx_deriving" {>= "5.0"}
   "ppxlib" {>= "0.27.0"}
-  "reason" {= "3.8.2"}
-  "sedlex" {= "3.0"}
-  "ocaml-lsp-server" {dev}
-  "ocamlformat" {dev}
-  "utop" {dev}
+  "reason" {>= "3.6.2"}
+  "sedlex" {>= "2.0" <= "3.0"}
+  "ocaml-lsp-server" {with-dev-setup}
+  "ocamlformat" {with-dev-setup}
+  "utop" {with-dev-setup}
 ]
 build: [
   ["dune" "subst"] {dev}
