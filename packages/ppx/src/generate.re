@@ -92,11 +92,15 @@ let dynamicComponent =
     switch (functionExpr.pexp_desc) {
     /* styled.div () => "string" */
     | Pexp_constant(Pconst_string(str, loc, _label)) =>
-      Payload.parse(str, loc)
-      |> Css_to_emotion.render_declarations
-      |> Css_to_emotion.addLabel(~loc, moduleName)
-      |> Builder.pexp_array(~loc)
-      |> Css_to_emotion.render_style_call
+      switch (Payload.parse(str, loc)) {
+      | Ok(declarations) =>
+        declarations
+        |> Css_to_emotion.render_declarations
+        |> Css_to_emotion.addLabel(~loc, moduleName)
+        |> Builder.pexp_array(~loc)
+        |> Css_to_emotion.render_style_call
+      | Error((loc, msg)) => Generate_lib.error(~loc, msg)
+      }
 
     /* styled.div () => "[||]" */
     | Pexp_array(arr) =>

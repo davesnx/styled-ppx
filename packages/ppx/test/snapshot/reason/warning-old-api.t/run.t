@@ -1,7 +1,9 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
-  File "_none_", line 1:
-  Error: Unexpected error A dynamic component without props doesn't make much sense. Try to translate into static.
+  File "output.ml", line 3, characters 8-10:
+  3 |     fun () ->
+              ^^
+  Error: A dynamic component without props doesn't make much sense. This component should be static.
   
   More info: https://styled-ppx.vercel.app/usage/dynamic-components
   [1]

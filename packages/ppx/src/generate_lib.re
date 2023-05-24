@@ -661,6 +661,12 @@ let defineAssign2 = (~loc) => {
   });
 };
 
+let error = (~loc, str) => {
+  Builder.pexp_extension(~loc) @@
+  Location.Error.to_extension @@
+  Location.Error.make(~loc, str, ~sub=[]);
+};
+
 let raiseError = (~loc, ~description, ~example, ~link) => {
   let error =
     switch (example) {
@@ -760,7 +766,7 @@ let getLabeledArgs = (label, defaultValue, param, expr) => {
     raiseError(
       ~loc=param.ppat_loc,
       ~description=
-        "A dynamic component without props doesn't make much sense. Try to translate into static.",
+        "A dynamic component without props doesn't make much sense. This component should be static.",
       ~example=None,
       ~link="https://styled-ppx.vercel.app/usage/dynamic-components",
     );
