@@ -12,13 +12,6 @@ exception LexingError((Lexing.position, string));
  * locations. */
 exception ParseError((Parser.token, Lexing.position, Lexing.position));
 
-/** Signals a grammar error at the provided location. */
-exception GrammarError((string, Location.t));
-
-let grammar_error = (loc: Location.t, message) => {
-  raise(GrammarError((message, loc)));
-};
-
 let unreachable = () =>
   failwith(
     "This match case is unreachable. sedlex needs a last case as wildcard _. If this error appears, means that there's a bug in the lexer.",
@@ -104,26 +97,6 @@ let token_to_debug =
   | Parser.NTH_FUNCTION(fn) => "FUNCTION(" ++ fn ++ ")"
   | Parser.URL(u) => "URL(" ++ u ++ ")"
   | Parser.BAD_URL => "BAD_URL";
-
-let render_error =
-  fun
-  | LexingError((pos, msg)) => {
-      let loc = Sedlexing.make_loc(pos, pos);
-      Location.error(~loc, msg);
-    }
-  | ParseError((token, start_pos, end_pos)) => {
-      let loc = Sedlexing.make_loc(start_pos, end_pos);
-      let msg =
-        Printf.sprintf(
-          "Parse error while reading token '%s'",
-          token_to_string(token),
-        );
-      Location.error(~loc, msg);
-    }
-  | GrammarError((msg, loc)) => Location.error(~loc, msg)
-  | exn => Location.error("Unexpected error " ++ Printexc.to_string(exn));
-
-let () = Location.register_error_of_exn(exn => Some(render_error(exn)));
 
 /* Regexes */
 let newline = [%sedlex.regexp? '\n' | "\r\n" | '\r' | '\012'];
@@ -677,6 +650,8 @@ let get_next_tokens_with_location = buf => {
 
 type parser('token, 'ast) = MenhirLib.Convert.traditional('token, 'ast);
 
+let menhir = MenhirLib.Convert.Simplified.traditional2revised;
+
 let parse = (skip_whitespaces, buf, parser) => {
   skip_whitespace.contents = skip_whitespaces;
 
@@ -687,9 +662,19 @@ let parse = (skip_whitespaces, buf, parser) => {
     last_token^;
   };
 
-  try(MenhirLib.Convert.Simplified.traditional2revised(parser, next_token)) {
-  | LexingError(_) as e => raise(e)
-  | _ => raise(ParseError(last_token^))
+  try(Ok(menhir(parser, next_token))) {
+  | LexingError((pos, msg)) =>
+    let loc = Sedlexing.make_loc(pos, pos);
+    Error((loc, msg));
+  | _ =>
+    let (token, start_pos, end_pos) = last_token^;
+    let loc = Sedlexing.make_loc(start_pos, end_pos);
+    let msg =
+      Printf.sprintf(
+        "Parse error while reading token '%s'",
+        token_to_string(token),
+      );
+    Error((loc, msg));
   };
 };
 

@@ -31,12 +31,10 @@ switch (input, help) {
 | (Some(_), true)
 | (None, _) => render_help()
 | (Some(css), _) =>
-  try(
-    Css_lexer.parse_declaration_list(~container_lnum, ~pos, css)
-    |> Css_types.pp_rule_list(Format.std_formatter)
-  ) {
-  | exn =>
-    Css_lexer.render_error(exn)
-    |> Location.print_report(Format.std_formatter)
+  switch (Css_lexer.parse_declaration_list(~container_lnum, ~pos, css)) {
+  | Ok(declarations) =>
+    Css_types.pp_rule_list(Format.std_formatter, declarations)
+  | Error((loc, msg)) =>
+    Location.raise_errorf(~loc, "Error parsing CSS: %s", msg)
   }
 };

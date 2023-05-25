@@ -3,7 +3,22 @@ open Css_types;
 
 module Helper = Ast_helper;
 module Builder = Ast_builder.Default;
-module Lexer = Css_lexer;
+
+let reduce_result = (~empty, fn, list) => {
+  let rec sequence_result =
+    fun
+    | [] => empty
+    | [x, ...xs] =>
+      switch (fn(x)) {
+      | Error(_) as error => error
+      | Ok(value) =>
+        switch (sequence_result(xs)) {
+        | Error(_) as error => error
+        | Ok(values) => Ok([value, ...values])
+        }
+      };
+  sequence_result(list);
+};
 
 module CssJs = {
   let ident = (~loc, name) =>
@@ -58,13 +73,13 @@ let concat = (~loc, expr, acc) => {
   Helper.Exp.apply(~loc, concat_fn, [(Nolabel, expr), (Nolabel, acc)]);
 };
 
-let rec render_at_rule = (ar: at_rule): Parsetree.expression =>
-  switch (ar.name) {
-  | ("media", _) => render_media_query(ar)
-  | ("keyframes", _) =>
-    Lexer.grammar_error(
-      ar.loc,
-      {|@keyframes should be defined with %keyframe(...)|},
+let rec render_at_rule = (at_rule: at_rule): Parsetree.expression => {
+  switch (at_rule.name) {
+  | ("media", _) => render_media_query(at_rule)
+  | ("keyframes", loc) =>
+    Generate_lib.error(
+      ~loc,
+      "@keyframes should be defined with %%keyframe(...)",
     )
   | (
       "charset" as n | "import" as n | "namespace" as n | "supports" as n |
@@ -82,23 +97,27 @@ let rec render_at_rule = (ar: at_rule): Parsetree.expression =>
       /* Experimental */ "color-profile" as n |
       /* Experimental */ "viewport" as n |
       /* Deprecated */ "document" as n, /* Deprecated */
-      _,
+      loc,
     ) =>
-    Lexer.grammar_error(
-      ar.loc,
-      "At-rule @" ++ n ++ " is not supported in styled-ppx",
+    Generate_lib.error(
+      ~loc,
+      Printf.sprintf("At-rule @%s is not supported in styled-ppx", n),
     )
-  | (n, _) => Lexer.grammar_error(ar.loc, "Unknown @" ++ n ++ "")
-  }
+  | (n, loc) => Generate_lib.error(~loc, Printf.sprintf("Unknown @%s ", n))
+  };
+}
 and render_media_query = (at_rule: at_rule): Parsetree.expression => {
   let (prelude, prelude_loc) = at_rule.prelude;
-  let parse_condition = (component_value: (component_value, location)) => {
+  let parse_condition =
+      (component_value: (component_value, location))
+      : result(string, Parsetree.expression) => {
     let (value, loc) = component_value;
     let component_value_location = loc;
     switch (value) {
-    | Variable(variable) => render_variable_as_string(variable)
+    | Variable(variable) => Ok(render_variable_as_string(variable))
     /* (color) */
-    | Paren_block([(Ident(_), ident_loc)]) => source_code_of_loc(ident_loc)
+    | Paren_block([(Ident(_), ident_loc)]) =>
+      Ok(source_code_of_loc(ident_loc))
     /* (min-width: 30px) */
     | Paren_block([
         (Ident(property), _),
@@ -110,42 +129,53 @@ and render_media_query = (at_rule: at_rule): Parsetree.expression => {
       /* String.trim is a hack, location should be correct and not contain any whitespace */
       switch (Declarations_to_string.parse_declarations(property, value)) {
       | Error(`Not_found) =>
-        Lexer.grammar_error(
-          component_value_location,
-          "unsupported property: " ++ property,
+        Error(
+          Generate_lib.error(
+            ~loc=component_value_location,
+            Printf.sprintf("unsupported property: %s", property),
+          ),
         )
       | Error(`Invalid_value(_error)) =>
-        Lexer.grammar_error(component_value_location, "invalid value")
+        Error(
+          Generate_lib.error(~loc=component_value_location, "invalid value"),
+        )
       | Ok(_exprs) =>
         /* Here we receive the expressions transformed, but we prefer the stringed value */
-        value
+        Ok(value)
       };
     | Paren_block([(Ident(property), _), (Delim(":"), _), ..._value]) =>
-      Lexer.grammar_error(
-        component_value_location,
-        "There's more than one value assiged to a property: " ++ property,
+      Error(
+        Generate_lib.error(
+          ~loc=component_value_location,
+          Printf.sprintf(
+            "There's more than one value assiged to a property: %s",
+            property,
+          ),
+        ),
       )
     /* In any other case, we believe on the source_code and transform it to string. This is unsafe */
-    | _whatever => source_code_of_loc(component_value_location)
+    | _whatever => Ok(source_code_of_loc(component_value_location))
     };
   };
 
   let parse_conditions = prelude => {
     switch (prelude) {
     | (Paren_block(blocks), _) =>
-      let conditions =
-        List.map(parse_condition, blocks) |> String.concat("");
-      "(" ++ conditions ++ ")";
-    | (Ident(i), _) => i
-    | (Variable(v), _) => render_variable_as_string(v)
+      let conditions = reduce_result(~empty=Ok([]), parse_condition, blocks);
+      switch (conditions) {
+      | Error(error_expr) => Error(error_expr)
+      | Ok(conditions) => Ok("(" ++ String.concat("", conditions) ++ ")")
+      };
+    | (Ident(i), _) => Ok(i)
+    | (Variable(v), _) => Ok(render_variable_as_string(v))
     | _ =>
       /* This branch is whildcared (_) by design of the parser. It won't allow any other component_value */
-      Lexer.grammar_error(prelude_loc, "Invalid media query")
+      Error(Generate_lib.error(~loc=prelude_loc, "Invalid media query"))
     };
   };
 
-  if (prelude == []) {
-    Lexer.grammar_error(prelude_loc, "@media prelude can't be empty");
+  let accumulate_parsed_conditions = condition => {
+    reduce_result(~empty=Ok([]), parse_conditions, condition);
   };
 
   let (delimiter, attrs) =
@@ -157,31 +187,38 @@ and render_media_query = (at_rule: at_rule): Parsetree.expression => {
     | _ => ("js", [])
     };
 
-  let query =
-    prelude
-    |> List.map(parse_conditions)
-    |> String.concat(" ")
-    |> String_interpolation.transform(~attrs, ~delimiter, ~loc=at_rule.loc);
+  switch (accumulate_parsed_conditions(prelude)) {
+  | Error(error_expr) => error_expr
+  | Ok([]) =>
+    Generate_lib.error(~loc=prelude_loc, "@media prelude can't be empty")
+  | Ok(conditions) =>
+    let query =
+      conditions
+      |> String.concat(" ")
+      |> String_interpolation.transform(~attrs, ~delimiter, ~loc=at_rule.loc);
 
-  let rules =
-    switch (at_rule.block) {
-    | Empty => Builder.pexp_array(~loc=at_rule.loc, [])
-    | Rule_list(declaration) =>
-      render_declarations(declaration)
-      |> Builder.pexp_array(~loc=at_rule.loc)
-    | Stylesheet(_) =>
-      Lexer.grammar_error(
-        at_rule.loc,
-        "@media content expect to have declarations, not an stylesheets. Selectors aren't allowed in @media.",
-      )
-    };
+    let rules =
+      switch (at_rule.block) {
+      | Empty => Builder.pexp_array(~loc=at_rule.loc, [])
+      | Rule_list(declaration) =>
+        render_declarations(declaration)
+        |> Builder.pexp_array(~loc=at_rule.loc)
+      | Stylesheet(_) =>
+        Generate_lib.error(
+          ~loc=at_rule.loc,
+          "@media content expect to have declarations, not an stylesheets. Selectors aren't allowed in @media.",
+        )
+      };
 
-  Helper.Exp.apply(
-    ~loc=at_rule.loc,
-    ~attrs=[Generate_lib.BuckleScriptAttributes.uncurried(~loc=at_rule.loc)],
-    CssJs.media(~loc=at_rule.loc),
-    [(Nolabel, query), (Nolabel, rules)],
-  );
+    Helper.Exp.apply(
+      ~loc=at_rule.loc,
+      ~attrs=[
+        Generate_lib.BuckleScriptAttributes.uncurried(~loc=at_rule.loc),
+      ],
+      CssJs.media(~loc=at_rule.loc),
+      [(Nolabel, query), (Nolabel, rules)],
+    );
+  };
 }
 and render_declaration = (d: declaration): list(Parsetree.expression) => {
   let (property, name_loc) = d.name;
@@ -197,17 +234,22 @@ and render_declaration = (d: declaration): list(Parsetree.expression) => {
     )
   ) {
   | Ok(exprs) => exprs
-  | Error(`Not_found) =>
-    Lexer.grammar_error(name_loc, "Unknown property '" ++ property ++ "'")
-  | Error(`Invalid_value(value)) =>
-    Lexer.grammar_error(
-      loc,
-      "Property '"
-      ++ property
-      ++ "' has an invalid value: '"
-      ++ String.trim(value)
-      ++ "'",
-    )
+  | Error(`Not_found) => [
+      Generate_lib.error(
+        ~loc=name_loc,
+        "Unknown property '" ++ property ++ "'",
+      ),
+    ]
+  | Error(`Invalid_value(value)) => [
+      Generate_lib.error(
+        ~loc,
+        "Property '"
+        ++ property
+        ++ "' has an invalid value: '"
+        ++ String.trim(value)
+        ++ "'",
+      ),
+    ]
   };
 }
 and render_declarations = ((ds, _loc: location)) => {
@@ -236,9 +278,13 @@ and render_selector = (selector: selector) => {
     | Type(v) => v
     | Subclass(v) => render_subclass_selector(v)
     | Variable(v) => render_variable_as_string(v)
-    | Percentage(_v) =>
-      /* TODO: Add locations to selector */
-      Lexer.grammar_error(Location.none, "Percentage is not a valid selector")
+    | Percentage(v) => Printf.sprintf("%s%%", v)
+  /* TODO: Add locations to selector */
+  /* TODO: Generate an error here */
+  /* Generate_lib.error(
+       ~loc=Location.none,
+       "Percentage is not a valid selector",
+     ) */
   and render_subclass_selector =
     fun
     | Id(v) => "#" ++ v
@@ -396,32 +442,35 @@ let render_keyframes = (declarations: rule_list): Parsetree.expression => {
   |};
 
   let invalid_percentage_value = value =>
-    "'" ++ value ++ "' isn't valid. Only accept percentage with integers";
+    Printf.sprintf(
+      "'%s' isn't valid. Only accept percentage with integers",
+      value,
+    );
   let invalid_prelude_value = value =>
-    "'" ++ value ++ "' isn't a valid keyframe value";
+    Printf.sprintf("'%s' isn't a valid keyframe value", value);
   let invalid_prelude_value_opaque = "This isn't a valid keyframe value";
 
-  let render_select_as_keyframe = (prelude): int => {
+  let render_select_as_keyframe = prelude => {
     switch (prelude |> fst) {
     | SimpleSelector(selector) =>
       switch (selector) {
       // https://drafts.csswg.org/css-animations/#keyframes
       // `from` is equivalent to the value 0%
-      | Type(v) when v == "from" => 0
+      | Type(v) when v == "from" => Builder.eint(~loc, 0)
       // `to` is equivalent to the value 100%
-      | Type(v) when v == "to" => 100
-      | Type(t) => Lexer.grammar_error(loc, invalid_prelude_value(t))
+      | Type(v) when v == "to" => Builder.eint(~loc, 100)
+      | Type(t) => Generate_lib.error(~loc, invalid_prelude_value(t))
       | Percentage(n) =>
         switch (int_of_string_opt(n)) {
-        | Some(n) when n >= 0 && n <= 100 => n
-        | _ => Lexer.grammar_error(loc, invalid_percentage_value(n))
+        | Some(n) when n >= 0 && n <= 100 => Builder.eint(~loc, n)
+        | _ => Generate_lib.error(~loc, invalid_percentage_value(n))
         }
-      | Ampersand => Lexer.grammar_error(loc, invalid_prelude_value("&"))
-      | Universal => Lexer.grammar_error(loc, invalid_prelude_value("*"))
-      | Subclass(_) => Lexer.grammar_error(loc, invalid_prelude_value_opaque)
-      | Variable(_) => Lexer.grammar_error(loc, invalid_prelude_value_opaque)
+      | Ampersand => Generate_lib.error(~loc, invalid_prelude_value("&"))
+      | Universal => Generate_lib.error(~loc, invalid_prelude_value("*"))
+      | Subclass(_) => Generate_lib.error(~loc, invalid_prelude_value_opaque)
+      | Variable(_) => Generate_lib.error(~loc, invalid_prelude_value_opaque)
       }
-    | _ => Lexer.grammar_error(loc, invalid_selector)
+    | _ => Generate_lib.error(~loc, invalid_selector)
     };
   };
 
@@ -429,20 +478,13 @@ let render_keyframes = (declarations: rule_list): Parsetree.expression => {
     declarations
     |> List.map(declaration => {
          switch (declaration) {
-         | Style_rule({
-             prelude: (prelude, prelude_loc),
-             block,
-             loc: style_loc,
-           }) =>
-           let percentages =
-             prelude
-             |> List.map(render_select_as_keyframe)
-             |> List.map(p => Builder.eint(~loc=prelude_loc, p));
+         | Style_rule({prelude: (prelude, _), block, loc: style_loc}) =>
+           let percentages = prelude |> List.map(render_select_as_keyframe);
            let rules =
              render_declarations(block) |> Builder.pexp_array(~loc);
            percentages
            |> List.map(p => Builder.pexp_tuple(~loc=style_loc, [p, rules]));
-         | _ => Lexer.grammar_error(loc, invalid_selector)
+         | _ => [Generate_lib.error(~loc, invalid_selector)]
          }
        })
     |> List.flatten
@@ -462,8 +504,8 @@ let render_global = ((ruleList, loc): stylesheet) => {
     |> Generate_lib.applyIgnore(~loc)
   /* More than one isn't supported by bs-css */
   | _res =>
-    Lexer.grammar_error(
-      loc,
+    Generate_lib.error(
+      ~loc,
       {|
         `styled.global` only supports one style definition. Transform each definition into a separate styled.global call
 
