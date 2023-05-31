@@ -690,7 +690,6 @@ let any_payload_pattern = Ast_pattern.(single_expr_payload(__));
 
 let _ =
   Driver.register_transformation(
-    ~impl=traverser#structure,
     /* Instrument is needed to run styled-ppx after metaquote,
        we rely on this order in native tests */
     ~instrument=Driver.Instrument.make(~position=Before, traverser#structure),
