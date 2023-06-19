@@ -148,7 +148,8 @@ and nth_payload =
   | NthSelector(list(complex_selector))
 [@deriving show({with_path: false})]
 and nth =
-  | NthIdent(string)
-  | A(string)
-  | AN(string)
-  | ANB(string, string, string);
+  | Even
+  | Odd
+  | A(int)
+  | AN(int)
+  | ANB(int, string, int);

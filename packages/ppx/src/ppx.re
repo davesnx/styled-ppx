@@ -147,11 +147,15 @@ module Mapper = {
         when isStyled(extensionName) =>
       let htmlTag = getHtmlTagUnsafe(~loc=extensionLoc, extensionName);
       let styles =
-        Payload.parse(str, stringLoc)
-        |> Css_to_emotion.render_declarations
-        |> Css_to_emotion.addLabel(~loc=stringLoc, moduleName)
-        |> Builder.pexp_array(~loc=stringLoc)
-        |> Css_to_emotion.render_style_call;
+        switch (Payload.parse(str, stringLoc)) {
+        | Ok(declarations) =>
+          declarations
+          |> Css_to_emotion.render_declarations
+          |> Css_to_emotion.addLabel(~loc=stringLoc, moduleName)
+          |> Builder.pexp_array(~loc=stringLoc)
+          |> Css_to_emotion.render_style_call
+        | Error((loc, msg)) => Generate_lib.error(~loc, msg)
+        };
 
       Builder.pstr_module(
         ~loc=moduleLoc,
@@ -283,11 +287,15 @@ module Mapper = {
         ],
       ) =>
       let expr =
-        Payload.parse(styles, loc)
-        |> Css_to_emotion.render_declarations
-        |> Css_to_emotion.addLabel(~loc, valueName)
-        |> Builder.pexp_array(~loc=payloadLoc)
-        |> Css_to_emotion.render_style_call;
+        switch (Payload.parse(styles, loc)) {
+        | Ok(declarations) =>
+          declarations
+          |> Css_to_emotion.render_declarations
+          |> Css_to_emotion.addLabel(~loc, valueName)
+          |> Builder.pexp_array(~loc=payloadLoc)
+          |> Css_to_emotion.render_style_call
+        | Error((loc, msg)) => Generate_lib.error(~loc, msg)
+        };
 
       Builder.pstr_value(
         ~loc,
@@ -682,7 +690,6 @@ let any_payload_pattern = Ast_pattern.(single_expr_payload(__));
 
 let _ =
   Driver.register_transformation(
-    ~impl=traverser#structure,
     /* Instrument is needed to run styled-ppx after metaquote,
        we rely on this order in native tests */
     ~instrument=Driver.Instrument.make(~position=Before, traverser#structure),
@@ -698,10 +705,14 @@ let _ =
             File.set(path);
             switch (payload) {
             | `String({loc, txt}, _delim) =>
-              Payload.parse(txt, loc)
-              |> Css_to_emotion.render_declarations
-              |> Builder.pexp_array(~loc)
-              |> Css_to_emotion.render_style_call
+              switch (Payload.parse(txt, loc)) {
+              | Ok(declarations) =>
+                declarations
+                |> Css_to_emotion.render_declarations
+                |> Builder.pexp_array(~loc)
+                |> Css_to_emotion.render_style_call
+              | Error((loc, msg)) => Generate_lib.error(~loc, msg)
+              }
             | `Array(arr) =>
               arr
               |> Builder.pexp_array(~loc)
@@ -719,13 +730,18 @@ let _ =
             File.set(path);
             let pos = loc.loc_start;
             let container_lnum = pos.pos_lnum;
-            let declarationListValues =
+            switch (
               Css_lexer.parse_declaration(~container_lnum, ~pos, payload)
-              |> Css_to_emotion.render_declaration;
+            ) {
+            | Ok(declarations) =>
+              let declarationListValues =
+                Css_to_emotion.render_declaration(declarations);
+              List.nth(declarationListValues, 0);
+            | Error((loc, msg)) => Generate_lib.error(~loc, msg)
+            };
             /* TODO: Instead of getting the first element,
                  fail when there's more than one declaration or
                make a mechanism to flatten all the properties */
-            List.nth(declarationListValues, 0);
           },
         ),
       ),
@@ -738,9 +754,12 @@ let _ =
             File.set(path);
             let pos = loc.loc_start;
             let container_lnum = pos.pos_lnum;
-            let stylesheet =
-              Css_lexer.parse_stylesheet(~container_lnum, ~pos, payload);
-            Css_to_emotion.render_global(stylesheet);
+            switch (
+              Css_lexer.parse_stylesheet(~container_lnum, ~pos, payload)
+            ) {
+            | Ok(stylesheets) => Css_to_emotion.render_global(stylesheets)
+            | Error((loc, msg)) => Generate_lib.error(~loc, msg)
+            };
           },
         ),
       ),
@@ -753,9 +772,11 @@ let _ =
             File.set(path);
             let pos = loc.loc_start;
             let container_lnum = pos.pos_lnum;
-            let declarations =
-              Css_lexer.parse_keyframes(~container_lnum, ~pos, payload);
-            Css_to_emotion.render_keyframes(declarations);
+            switch (Css_lexer.parse_keyframes(~container_lnum, ~pos, payload)) {
+            | Ok(declarations) =>
+              Css_to_emotion.render_keyframes(declarations)
+            | Error((loc, msg)) => Generate_lib.error(~loc, msg)
+            };
           },
         ),
       ),

@@ -53,7 +53,7 @@ stylesheet: s = stylesheet_without_eof; EOF { s }
 stylesheet_without_eof: rs = loc(list(rule)) { rs }
 
 declaration_list:
-  | EOF { ([], Lex_buffer.make_loc $startpos $endpos) }
+  | WS? EOF { ([], Lex_buffer.make_loc $startpos $endpos) }
   | ds = loc(declarations) EOF { ds }
 
 /* keyframe may contain {} */
@@ -178,6 +178,7 @@ percentage: n = NUMBER PERCENTAGE { n }
 
 /* keyframe allows stylesheet by defintion, but we restrict the usage to: */
 keyframe_style_rule:
+  /* from {} to {} */
   | WS? id = IDENT WS?
     declarations = brace_block(loc(declarations)) WS? {
     let prelude = [(SimpleSelector (Type id), Lex_buffer.make_loc $startpos(id) $endpos(id))] in
@@ -194,6 +195,19 @@ keyframe_style_rule:
     let prelude = [(SimpleSelector item, Lex_buffer.make_loc $startpos(p) $endpos(p))] in
     Style_rule {
       prelude = (prelude, Lex_buffer.make_loc $startpos(p) $endpos(p));
+      loc = Lex_buffer.make_loc $startpos $endpos;
+      block = declarations;
+    }
+  }
+  | percentages = separated_list(COMMA, skip_ws(percentage));
+    declarations = brace_block(loc(declarations)) WS? {
+    let prelude = percentages
+      |> List.map (fun percent -> Percentage percent)
+      |> List.map (fun p ->
+        (SimpleSelector p, Lex_buffer.make_loc $startpos(percentages) $endpos(percentages))
+      ) in
+    Style_rule {
+      prelude = (prelude, Lex_buffer.make_loc $startpos(percentages) $endpos(percentages));
       loc = Lex_buffer.make_loc $startpos $endpos;
       block = declarations;
     }
@@ -222,11 +236,11 @@ style_rule:
     }
   }
 
-values: xs = nonempty_list(loc(value)) { xs }
+values: xs = nonempty_list(loc(skip_ws(value))) { xs }
 
 declarations:
-  | xs = nonempty_list(rule) SEMI_COLON? { xs }
-  | xs = separated_nonempty_list(SEMI_COLON, rule) SEMI_COLON? { xs }
+  | WS? xs = nonempty_list(rule) SEMI_COLON? { xs }
+  | WS? xs = separated_nonempty_list(SEMI_COLON, rule) SEMI_COLON? { xs }
 
 %inline rule:
   /* Rule can have declarations, since we have nesting, so both style_rules and
@@ -239,9 +253,12 @@ declaration: d = declaration_without_eof; EOF { d }
 
 declaration_without_eof:
   /* property: value; */
-  | property = loc(IDENT) WS? COLON WS?
-    value = loc(values) WS?
-    important = loc(boption(IMPORTANT)) WS? SEMI_COLON? {
+  | WS? property = loc(IDENT)
+    WS? COLON
+    WS? value = loc(values)
+    WS? important = loc(boption(IMPORTANT))
+    WS? SEMI_COLON?
+    WS? {
     { name = property;
       value;
       important;
@@ -249,30 +266,45 @@ declaration_without_eof:
     }
   }
 
-nth:
-  /* even, odd, n */
-  | i = IDENT { NthIdent i }
+nth_payload:
+  /* TODO implement [of <complex-selector-list>]? */
+  /* | complex = complex_selector_list; { NthSelector complex } */
   /* <An+B> */
   /* 2 */
-  | a = NUMBER { A a }
+  | a = NUMBER { Nth (A (int_of_string a)) }
   /* 2n */
-  | a = DIMENSION { AN (fst a) }
-  /* Since our lexing isn't on point with DIMENSIONS/NUMBERS */
-  /* We add a case where operator is missing */
+  | a = DIMENSION { Nth (AN (int_of_string (fst a))) }
   /* 2n-1 */
-  | left = DIMENSION WS? right = NUMBER {
-    ANB ((fst left, "", right))
+  | a = DIMENSION WS? combinator = COMBINATOR b = NUMBER {
+    let b = int_of_string b in
+    Nth (ANB (((int_of_string (fst a)), combinator, b)))
   }
-  /* 2n+1 */
-  | left = DIMENSION WS? combinator = COMBINATOR right = NUMBER {
-    ANB ((fst left, combinator, right))
+  /* This is a hackish solution where combinator isn't cached because the lexer
+  assignes the `-` to NUMBER. This could be solved by leftassoc */
+  | a = DIMENSION WS? b = NUMBER {
+    let b = Int.abs (int_of_string (b)) in
+    Nth (ANB (((int_of_string (fst a)), "-", b)))
+  }
+  | n = IDENT WS? {
+    match n with
+      | "even" -> Nth (Even)
+      | "odd" -> Nth (Odd)
+      | "n" -> Nth (AN 1)
+      | _ -> (
+        let first_char = String.get n 0 in
+        let a = if first_char = '-' then -1 else 1 in
+        Nth (AN a)
+      )
+  }
+  /* n-1 */
+  /* n */
+  /* -n */
+  | n = IDENT WS? combinator = COMBINATOR b = NUMBER {
+    let first_char = String.get n 0 in
+    let a = if first_char = '-' then -1 else 1 in
+    Nth (ANB ((a, combinator, int_of_string b)))
   }
   /* TODO: Support "An+B of Selector" */
-;
-
-nth_payload:
-  | complex = complex_selector_list; { NthSelector complex }
-  | n = skip_ws(nth) { Nth n }
 
 /* <pseudo-class-selector> = ':' <ident-token> | ':' <function-token> <any-value> ')' */
 pseudo_class_selector:
@@ -346,9 +378,6 @@ subclass_selector:
   | a = attribute_selector { a } /* [attr] */
   | pcs = pseudo_class_selector { Pseudo_class pcs } /* :pseudo-class */
   | DOT v = VARIABLE { ClassVariable v } /* .$(Variable) as subclass_selector */
-
-complex_selector_list:
-  | xs = separated_nonempty_list(skip_ws_right(COMMA), complex_selector) { xs }
 
 selector:
   /* By definition a selector can be one of those kinds, since inside

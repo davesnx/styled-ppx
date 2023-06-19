@@ -969,7 +969,7 @@
         CssJs.unsafe({js|justifyContent|js}, {js|center|js}),
       |]);
     let make = (props: makeProps) => {
-      let className = styles;
+      let className = styles ++ getOrEmpty(classNameGet(props));
       let stylesObject = {"className": className, "ref": innerRefGet(props)};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(newProps, "innerRef"));

@@ -631,6 +631,30 @@ let properties_static_css_tests = [
     Css.color(`var({js|--main-c|js})),
     [%expr CssJs.color(`var({js|--main-c|js}))],
   ),
+  (
+    [%css "box-shadow: 12px 12px 2px 1px rgba(0, 0, 255, 0.2)"],
+    [%expr [%css "box-shadow: 12px 12px 2px 1px rgba(0, 0, 255, 0.2)"]],
+    Css.boxShadows([|
+      Shadow.box(
+        ~x=`pxFloat(12.),
+        ~y=`pxFloat(12.),
+        ~blur=`pxFloat(2.),
+        ~spread=`pxFloat(1.),
+        `rgba((0, 0, 255, `num(0.2))),
+      ),
+    |]),
+    [%expr
+      CssJs.boxShadows([|
+        CssJs.Shadow.box(
+          ~x=`pxFloat(12.),
+          ~y=`pxFloat(12.),
+          ~blur=`pxFloat(2.),
+          ~spread=`pxFloat(1.),
+          `rgba((0, 0, 255, `num(0.2))),
+        ),
+      |])
+    ],
+  ),
   /* (
        [%css "color: var(--main-c, #fff)"],
        [%expr [%css "color: var(--main-c, #fff)"]],
@@ -706,7 +730,7 @@ let runner = tests =>
           let pp_expr = (ppf, x) =>
             Fmt.pf(ppf, "%S", Pprintast.string_of_expression(x));
           let check_expr = testable(pp_expr, (==));
-          check(check_expr, "", input, expected);
+          check(check_expr, "", expected, input);
         },
       );
     },

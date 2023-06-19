@@ -972,7 +972,8 @@
       |]);
     let make = (props: makeProps('color, 'size)) => {
       let className =
-        styles(~color=colorGet(props), ~size=sizeGet(props), ());
+        styles(~color=colorGet(props), ~size=sizeGet(props), ())
+        ++ getOrEmpty(classNameGet(props));
       let stylesObject = {"className": className, "ref": innerRefGet(props)};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(newProps, "color"));
