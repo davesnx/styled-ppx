@@ -42,13 +42,14 @@
   },
   "devDependencies": {
     "@opam/alcotest": "1.7.0",
-    "@opam/dune": "3.7.1",
+    "@opam/dune": "*",
     "@opam/menhir": "20220210",
     "@opam/ocaml-lsp-server": "1.15.1-4.14",
     "@opam/ocaml-migrate-parsetree": "2.4.0",
     "@opam/ppx_deriving_yojson": "3.7.0",
     "@opam/ocamlformat": "0.24.1",
     "@opam/ppx_deriving": "5.2.1",
+    "@opam/melange": "*",
     "@opam/ppxlib": "*",
     "@opam/reason": "*",
     "@opam/sedlex": "3.0",
@@ -59,7 +60,9 @@
   "resolutions": {
     "@opam/ppxlib": "ocaml-ppx/ppxlib:ppxlib.opam#8b8987c5690ad839348d96bf52471b03b88f06ed",
     "@opam/reason": "reasonml/reason:reason.opam#b283f335f90e3aaa398bff8e82761038ee42a99d",
-    "@opam/ocamlfind": "1.9.5"
+    "@opam/ocamlfind": "1.9.5",
+    "@opam/melange": "melange-re/melange:melange.opam#2ee0ef23bbc44933f92cd9c4b223e9ef915ff0df",
+    "@opam/dune": "ocaml/dune:dune.opam#7fdf0ca379f773deb21f97c7a66c1b9b0bbd4f98"
   },
   "scripts": {
     "test_typecheck": "esy dune build @native_typecheck_test",

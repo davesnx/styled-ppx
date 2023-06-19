@@ -1,4 +1,6 @@
 (library
  (name css)
  (public_name styled-ppx.css)
- (modes best))
+ (modes native melange)
+ (preprocess
+  (pps melange.ppx)))

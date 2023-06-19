@@ -1154,8 +1154,8 @@ let zIndex = x => Declaration("zIndex", Js.Int.toString(x));
 
 /* Selectors */
 
-let media = (. query, rules) => Selector("@media " ++ query, rules);
-let selector = (. selector, rules) => Selector(selector, rules);
+let media = (query, rules) => Selector("@media " ++ query, rules);
+let selector = (selector, rules) => Selector(selector, rules);
 let pseudoClass = (selector, rules) => Pseudoclass(selector, rules);
 
 let active = pseudoClass("active");
