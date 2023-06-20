@@ -2,6 +2,7 @@
  (name bs_css_emotion)
  (public_name styled-ppx.bs-css-emotion)
  (modes melange)
+ (wrapped false)
  (libraries bs_css)
  (preprocess
   (pps melange.ppx)))
