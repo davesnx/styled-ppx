@@ -5,6 +5,8 @@
  (dirs
   css-spec-parser
   css
+  bs-css
+  bs-css-emotion
   parser
   ppx
   reason-css-lexer
