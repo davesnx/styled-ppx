@@ -1,4 +1,4 @@
-(lang dune 3.7)
+(lang dune 3.8)
 (cram enable)
 
 (using menhir 2.0)
