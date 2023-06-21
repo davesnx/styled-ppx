@@ -32,7 +32,7 @@ format-check: ## Checks if format is correct
 	@$(DUNE) build @fmt
 
 .PHONY: format
-format: ## Formats code
+fmt format: ## Formats code
 	$(DUNE) build @fmt --auto-promote
 
 .PHONY: init

@@ -6,17 +6,34 @@
 
 (name styled-ppx)
 
-(source
- (github davesnx/styled-ppx))
+(generate_opam_files true)
+
+(source (github davesnx/styled-ppx))
+(homepage "https://styled-ppx.vercel.app")
+(documentation "https://styled-ppx.vercel.app")
+(bug_reports "https://github.com/davesnx/styled-ppx/issues")
 
 (license MIT)
 
-(authors "davesnx")
+(authors "David Sancho <dsnxmoreno@gmail.com>")
 
-(maintainers "davesnx")
+(maintainers "David Sancho <dsnxmoreno@gmail.com>")
 
 (package
  (name styled-ppx)
- (synopsis "Typed styled components in Reason, OCaml and ReScript")
+ (synopsis "Type-safe styled components for ReScript and Melange")
  (description
-  "ppx that parses the CSS and turn it into ReasonReact components"))
+  "styled-ppx is the ppx that brings typed styled components to ReScript and Melange, allowing you to create React Components with type-safe style definitions in CSS.")
+  (depends
+   (ocaml (>= 4.14.1))
+   (menhir (= 20220210))
+   (ocaml-migrate-parsetree (= 2.4.0))
+   (ppx_deriving (>= 5.0))
+   (ppx_deriving_yojson (>= 3.7.0))
+   (ppxlib (>= 0.27.0))
+   (sedlex (>= 2.0))
+   (reason :with-dev-setup)
+   (alcotest :with-test)
+   (ocaml-lsp-server :with-dev-setup)
+   (ocamlformat :with-dev-setup)
+   (utop :with-dev-setup)))
