@@ -1,3 +1,5 @@
 (library
  (name css)
- (public_name styled-ppx.css))
+ (public_name styled-ppx.css)
+ (flags :standard -w -108)
+ (modes native melange))
