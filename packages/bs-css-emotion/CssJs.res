@@ -1,7 +1,7 @@
-include Bs_css.Css_Js_Core
-include Bs_css.Css_Colors
+include Css_Js_Core
+include Css_Colors
 
-include Bs_css.Css_Js_Core.Make({
+include Css_Js_Core.Make({
   type styleEncoding = string
   type renderer = Js.Json.t
 
@@ -43,7 +43,7 @@ let fontFace = (
   (),
 ) => {
   insertRule(.
-    Bs_css.Css_Js_Core.fontFace(~fontFamily, ~src, ~fontStyle?, ~fontWeight?, ~fontDisplay?, ~sizeAdjust?, ()),
+    Css_Js_Core.fontFace(~fontFamily, ~src, ~fontStyle?, ~fontWeight?, ~fontDisplay?, ~sizeAdjust?, ()),
   )
   fontFamily
 }

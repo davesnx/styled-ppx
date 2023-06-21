@@ -1,7 +1,7 @@
-include Bs_css.Css_Legacy_Core
-include Bs_css.Css_Colors
+include Css_Legacy_Core
+include Css_Colors
 
-include Bs_css.Css_Legacy_Core.Make({
+include Css_Legacy_Core.Make({
   type styleEncoding = string
   type renderer = Js.Json.t
 
@@ -42,7 +42,7 @@ let fontFace = (
   ~sizeAdjust=?,
   (),
 ) => {
-  let asString = Bs_css.Css_Legacy_Core.fontFace(
+  let asString = Css_Legacy_Core.fontFace(
     ~fontFamily,
     ~src,
     ~fontStyle?,
