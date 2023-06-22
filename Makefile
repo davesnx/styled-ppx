@@ -52,10 +52,12 @@ create-switch: ## Create opam switch
 	@opam switch create . 4.14.0 --deps-only --with-test
 
 .PHONY: install
-install: create-switch pin ## Install dependencies
+install: ## Update the package dependencies when new deps are added to dune-project
+	@opam install . --deps-only --with-test
+	@yarn install
 
 .PHONY: init
-init: setup-githooks install ## Create a local dev enviroment
+init: setup-githooks create-switch pin install ## Create a local dev enviroment
 
 .PHONY: subst
 subst: ## Run dune substitute
