@@ -53,6 +53,7 @@ create-switch: ## Create opam switch
 
 .PHONY: install
 install: ## Update the package dependencies when new deps are added to dune-project
+	@$(DUNE) build @install
 	@opam install . --deps-only --with-test
 	@yarn install
 
@@ -62,10 +63,6 @@ init: setup-githooks create-switch pin install ## Create a local dev enviroment
 .PHONY: subst
 subst: ## Run dune substitute
 	@$(DUNE) subst
-
-$(opam_file): dune-project ## Update the package dependencies when new deps are added to dune-project
-	@$(DUNE) build @install
-	@opam install . --deps-only --with-test # Install the new dependencies
 
 .PHONY: dev
 dev: ## Run the project in dev mode
