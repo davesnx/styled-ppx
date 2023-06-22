@@ -53,7 +53,6 @@ create-switch: ## Create opam switch
 
 .PHONY: install
 install: ## Update the package dependencies when new deps are added to dune-project
-	@$(DUNE) build @install
 	@opam install . --deps-only --with-test
 	@yarn install
 
