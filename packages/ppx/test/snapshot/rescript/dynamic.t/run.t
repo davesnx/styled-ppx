@@ -3,7 +3,7 @@
 No clue why bsc generates a invalid syntax, but it does. This removes this particual bit.
   $ sed -e 's/.I1//g' output.ml > fixed.ml
 
-  $ rescript convert fixed.ml
+  $ npx rescript convert fixed.ml
 
   $ cat fixed.res
   module DynamicComponent = {
@@ -484,17 +484,14 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
     }
     @val @module(@reason.raw_literal "react")
     external createVariadicElement: (string, {..}) => React.element = "createElement"
-    let deleteProp = %raw(
-      @reason.raw_literal("(newProps, key) => delete newProps[key]")
-      "(newProps, key) => delete newProps[key]"
-    )
+    let deleteProp = %raw("(newProps, key) => delete newProps[key]")
     let getOrEmpty = str =>
       switch str {
-      | Some(str) => (@reason.raw_literal(" ") " ") ++ str
-      | None => @reason.raw_literal("") ""
+      | Some(str) => " " ++ str
+      | None => ""
       }
     @val external assign2: ({..}, {..}, {..}) => {..} = "Object.assign"
-    let styles = (~var, _) =>
+    let styles = (@res.namedArgLoc ~var, _) =>
       CssJs.style(. [
         CssJs.label("DynamicComponent"),
         (CssJs.color(var): CssJs.rule),

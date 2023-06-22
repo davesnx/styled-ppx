@@ -3,11 +3,12 @@
 No clue why bsc generates a invalid syntax, but it does. This removes this particual bit.
   $ sed -e 's/.I1//g' output.ml > fixed.ml
 
-  $ rescript convert fixed.ml
+  $ npx rescript convert fixed.ml
   Error when converting fixed.ml
-  File "", line 499, characters 71-74:
+  File "", line 494, characters 71-74:
   Error: Invalid literal 2px
   
+
 
 
 

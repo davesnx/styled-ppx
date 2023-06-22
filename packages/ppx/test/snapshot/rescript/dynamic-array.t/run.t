@@ -484,20 +484,15 @@
       external createVariadicElement :
         string -> < .. >  Js.t -> React.element = "createElement"[@@bs.val ]
       [@@bs.module (("react")[@reason.raw_literal ])]
-      let deleteProp =
-        [%raw
-          (("(newProps, key) => delete newProps[key]")
-            [@reason.raw_literal "(newProps, key) => delete newProps[key]"])]
+      let deleteProp = [%raw "(newProps, key) => delete newProps[key]"]
       let getOrEmpty str =
-        ((match str with
-          | ((Some (str))[@explicit_arity ]) ->
-              ((" ")[@reason.raw_literal " "]) ^ str
-          | None -> (("")[@reason.raw_literal ""]))
-        [@reason.preserve_braces ])
+        match str with
+        | ((Some (str))[@explicit_arity ]) -> " " ^ str
+        | None -> ""
       external assign2 :
         < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t =
           "Object.assign"[@@bs.val ]
-      let styles ~var:((var)[@ns.namedArgLoc ])  _ =
+      let styles ~var:((var)[@res.namedArgLoc ])  _ =
         ((CssJs.style
             [|(CssJs.label "ArrayDynamicComponent");(CssJs.display `block);((
               match var with
@@ -517,6 +512,6 @@
 No clue why bsc generates a invalid syntax, but it does. This removes this particual bit.
   $ sed -e 's/.I1//g' output.ml > fixed.ml
 
-  $ rescript convert fixed.ml
+  $ npx rescript convert fixed.ml
 
 

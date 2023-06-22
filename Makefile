@@ -115,8 +115,12 @@ test_css_spec_types: ## Run CSS Spec Types tests
 test_e2e: ## Run End-to-end tests for JSX3
 	@yarn --cwd 'e2e/rescript-v9-JSX3' test
 
+.PHONY: test_string_interpolation
+test_string_interpolation: ## Run string_interpolation tests
+	$(DUNE) build @string_interpolation_test
+
 .PHONY: test_all
-test_all: build test_typecheck test_css_support test_ppx_snapshot test_parser test_css_lexer test_reason_css_parser test_css_spec_parser test_css_spec_types test_e2e
+test_all: build test_typecheck test_css_support test_ppx_snapshot test_parser test_css_lexer test_reason_css_parser test_css_spec_parser test_css_spec_types test_string_interpolation test_e2e
 
 # Debug commands
 

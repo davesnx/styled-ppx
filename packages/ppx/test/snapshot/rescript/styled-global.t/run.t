@@ -5,11 +5,12 @@
       ((CssJs.global (({*j|html, body, #root, .class|*j})[@res.template ])
           [|(CssJs.margin `zero)|])[@bs ])
 
-  $ rescript convert output.ml
+  $ npx rescript convert output.ml
   Error when converting output.ml
   File "", line 2, characters 23-24:
   Error: Syntax error: operator expected.
   
+
 
 
 

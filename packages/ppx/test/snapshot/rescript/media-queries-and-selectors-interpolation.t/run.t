@@ -486,15 +486,10 @@
         string -> < .. >  Js.t -> React.element = "createElement"[@@bs.val ]
       [@@bs.module (("react")[@reason.raw_literal ])]
       let getOrEmpty str =
-        ((match str with
-          | ((Some (str))[@explicit_arity ]) ->
-              ((" ")[@reason.raw_literal " "]) ^ str
-          | None -> (("")[@reason.raw_literal ""]))
-        [@reason.preserve_braces ])
-      let deleteProp =
-        [%raw
-          (("(newProps, key) => delete newProps[key]")
-            [@reason.raw_literal "(newProps, key) => delete newProps[key]"])]
+        match str with
+        | ((Some (str))[@explicit_arity ]) -> " " ^ str
+        | None -> ""
+      let deleteProp = [%raw "(newProps, key) => delete newProps[key]"]
       external assign2 :
         < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t =
           "Object.assign"[@@bs.val ]
@@ -528,11 +523,12 @@
 No clue why bsc generates a invalid syntax, but it does. This removes this particual bit.
   $ sed -e 's/.I1//g' output.ml > fixed.ml
 
-  $ rescript convert fixed.ml
+  $ npx rescript convert fixed.ml
   Error when converting fixed.ml
-  File "", line 511, characters 44-49:
+  File "", line 506, characters 44-49:
   Error: Invalid literal 700px
   
+
 
 
 

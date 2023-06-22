@@ -3,4 +3,4 @@
 No clue why bsc generates a invalid syntax, but it does. This removes this particual bit.
   $ sed -e 's/.I1//g' output.ml > fixed.ml
 
-  $ rescript convert fixed.ml
+  $ npx rescript convert fixed.ml
