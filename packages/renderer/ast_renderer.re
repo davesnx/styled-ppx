@@ -1,5 +1,3 @@
-/* esy x ast-renderer */
-
 let render_help = () => {
   print_endline("");
   print_endline("");

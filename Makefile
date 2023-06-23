@@ -69,7 +69,7 @@ dev: ## Run the project in dev mode
 
 .PHONY: release-static
 release-static:
-	$(DUNE) build --root . --ignore-promoted-rules --no-config --profile release-static --only-packages styled-ppx
+	$(DUNE) build --root . --ignore-promoted-rules --profile release-static --only-packages styled-ppx
 
 # Testing commands
 

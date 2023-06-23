@@ -54,11 +54,6 @@ _build/
 # Local OPAM switch
 _opam/
 
-# Esy generated files
-_esy/
-_release/
-_export/
-
 ## BuckleScript
 /lib/*
 !/lib/js/*

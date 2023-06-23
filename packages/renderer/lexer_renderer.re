@@ -1,5 +1,3 @@
-/* esy x lexer-renderer */
-
 let position_to_string = pos =>
   Printf.sprintf(
     "[%d,%d+%d]",
