@@ -16,39 +16,6 @@
 
 set -e -u
 
-esy build
-
-echo "Run ppx snapshot tests"
-esy test_ppx_snapshot
-
-echo "Run Typecheck tests"
-esy test_typecheck
-
-echo "Run CSS Support tests"
-esy test_css_support
-
-echo "Run CSS Parser tests"
-esy test_parser
-
-echo "Run CSS Lexer tests"
-esy test_css_lexer
-
-echo "Run Reason CSS Parser tests"
-esy test_reason_css_parser
-
-echo "Run string interpolation tests"
-esy dune runtest
-
-echo "Run CSS Spec Parser tests"
-esy test_css_spec_parser
-
-echo "Run CSS Spec Types tests"
-esy test_css_spec_types
-
-echo "Run End-to-end tests for JSX3"
-yarn --cwd 'e2e/rescript-v9-JSX3' test
-
-# echo "Run End-to-end tests for JSX4"
-# yarn --cwd 'e2e/rescript-v10-JSX4' test
+make test_all
 
 exit 0

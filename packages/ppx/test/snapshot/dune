@@ -16,7 +16,6 @@
   (alias ppx_snapshot_test)
   (deps
    %{bin:standalone}
-   %{bin:bsc}
    (package styled-ppx))))
 
 (executables

@@ -3,3 +3,9 @@
  (libraries alcotest string_interpolation)
  (preprocess
   (pps ppxlib.metaquot)))
+
+(rule
+ (alias string_interpolation_test)
+ (deps transform_test.exe)
+ (action
+  (run %{deps})))
