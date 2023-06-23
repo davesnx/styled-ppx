@@ -2,6 +2,8 @@ name: Ppx CI
 
 on:
   push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
@@ -17,10 +19,13 @@ defaults:
 jobs:
   build:
     name: Build
-    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-20.04, macos-latest] # Missing windows-latest
+        ocaml-compiler:
+          - 4.14.x
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v3
@@ -28,94 +33,65 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
 
-      - name: Install esy
-        run: npm install -g esy@0.6.12
+      - name: Use OCaml ${{ matrix.ocaml-compiler }}
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: ${{ matrix.ocaml-compiler }}
 
-      - name: Restore global cache (~/.esy/source)
-        id: global-cache
+      - name: Load opam cache when not Windows
+        if: runner.os != 'Windows'
+        id: opam-cache
         uses: actions/cache/restore@v3
         with:
-          path: ~/.esy/source
-          key: esy-source-${{ matrix.os }}-${{ hashFiles('esy.lock/index.json') }}
+          path: ~/.opam
+          key: opam-${{ matrix.os }}-${{ hashFiles('**.opam') }}
 
-      - name: Print esy cache
-        id: print_esy_cache
-        run: echo "ESY_CACHE=$(node .github/workflows/print-esy-cache.js)" >> $GITHUB_OUTPUT
-
-      - name: Load dependencies cache
-        id: deps-cache
+      - name: Load opam cache when Windows
+        if: runner.os == 'Windows'
+        id: opam-cache-windows
         uses: actions/cache/restore@v3
         with:
-          path: |
-            ${{ steps.print_esy_cache.outputs.ESY_CACHE }}
-            _export
-          key: esy-deps-${{ matrix.os }}-${{ hashFiles('esy.lock/index.json') }}
-          restore-keys: esy-${{ matrix.os }}-
+          path: _opam
+          key: opam-${{ matrix.os }}-${{ hashFiles('**.opam') }}
+
+      - name: Install pins
+        run: make pin
 
       - name: Install dependencies
-        run: esy install
-
-      - name: Import dependencies
-        if: steps.deps-cache.outputs.cache-hit == 'true'
-        run: |
-          esy import-dependencies _export
-          rm -rf _export
-
-      - name: Build dependencies
-        run: esy build-dependencies
+        run: make install
 
       - name: Build
-        run: esy build
+        run: make build
 
       - name: Test ppx snapshot
-        run: esy test_ppx_snapshot
+        run: make test_ppx_snapshot
 
       - name: Test Typecheck
-        run: esy test_typecheck
+        run: make test_typecheck
 
       - name: Test CSS Support
-        run: esy test_css_support
+        run: make test_css_support
 
       - name: Test CSS Lexer
-        run: esy test_css_lexer
+        run: make test_css_lexer
 
       - name: Test CSS Parser
-        run: esy test_parser
+        run: make test_parser
 
       - name: Test CSS Parser
-        run: esy test_reason_css_parser
+        run: make test_reason_css_parser
 
       - name: Test CSS Spec Parser
-        run: esy test_css_spec_parser
+        run: make test_css_spec_parser
 
       - name: Test CSS Spec type generation
-        run: esy test_css_spec_types
+        run: make test_css_spec_types
 
       - name: Test string interpolation
-        run: esy dune runtest
-
-      - name: Export dependencies
-        if: steps.deps-cache.outputs.cache-hit != 'true'
-        run: esy export-dependencies
-
-      - name: Save global cache
-        uses: actions/cache/save@v3
-        if: steps.global-cache.outputs.cache-hit != 'true'
-        with:
-          path: ~/.esy/source
-          key: esy-source-${{ matrix.os }}-${{ hashFiles('esy.lock/index.json') }}
-
-      - name: Save dependencies cache
-        if: steps.deps-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v3
-        with:
-          path: |
-            ${{ steps.print_esy_cache.outputs.ESY_CACHE }}
-            _export
-          key: esy-deps-${{ matrix.os }}-${{ hashFiles('esy.lock/index.json') }}
+        run: make test_string_interpolation
 
       - name: Release static
-        run: esy release-static
+        run: make release-static
 
       - name: Upload artifacts for ${{ matrix.os }}
         uses: actions/upload-artifact@v3
@@ -123,9 +99,19 @@ jobs:
           name: ${{ matrix.os }}
           path: _build/default/bin/bin.exe
 
-      # Cleanup build cache in case dependencies have changed
-      - name: Cleanup
-        run: esy cleanup .
+      - name: Save cache when not Windows
+        uses: actions/cache/save@v3
+        if: steps.opam-cache.outputs.cache-hit != 'true' && runner.os != 'Windows'
+        with:
+          path: ~/.opam
+          key: opam-${{ matrix.os }}-${{ hashFiles('**.opam') }}
+
+      - name: Save cache when Windows
+        uses: actions/cache/save@v3
+        if: steps.opam-cache-windows.outputs.cache-hit != 'true' && runner.os == 'Windows'
+        with:
+          path: _opam
+          key: opam-${{ matrix.os }}-${{ hashFiles('**.opam') }}
 
   e2e:
     name: Browser tests
