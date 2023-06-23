@@ -952,11 +952,12 @@
     external createVariadicElement: (string, Js.t({..})) => React.element =
       "createElement";
     let deleteProp = [%raw "(newProps, key) => delete newProps[key]"];
-    let getOrEmpty = str =>
+    let getOrEmpty = str => {
       switch (str) {
       | Some(str) => " " ++ str
       | None => ""
       };
+    };
     [@bs.val]
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
@@ -1930,11 +1931,12 @@
     external createVariadicElement: (string, Js.t({..})) => React.element =
       "createElement";
     let deleteProp = [%raw "(newProps, key) => delete newProps[key]"];
-    let getOrEmpty = str =>
+    let getOrEmpty = str => {
       switch (str) {
       | Some(str) => " " ++ str
       | None => ""
       };
+    };
     [@bs.val]
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";

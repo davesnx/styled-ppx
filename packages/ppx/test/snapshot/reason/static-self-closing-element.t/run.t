@@ -952,11 +952,12 @@
     [@bs.val] [@bs.module "react"]
     external createVariadicElement: (string, Js.t({..})) => React.element =
       "createElement";
-    let getOrEmpty = str =>
+    let getOrEmpty = str => {
       switch (str) {
       | Some(str) => " " ++ str
       | None => ""
       };
+    };
     let deleteProp = [%raw "(newProps, key) => delete newProps[key]"];
     [@bs.val]
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =

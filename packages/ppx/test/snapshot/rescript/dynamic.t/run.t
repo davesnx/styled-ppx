@@ -484,11 +484,14 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
     }
     @val @module(@reason.raw_literal "react")
     external createVariadicElement: (string, {..}) => React.element = "createElement"
-    let deleteProp = %raw("(newProps, key) => delete newProps[key]")
+    let deleteProp = %raw(
+      @reason.raw_literal("(newProps, key) => delete newProps[key]")
+      "(newProps, key) => delete newProps[key]"
+    )
     let getOrEmpty = str =>
       switch str {
-      | Some(str) => " " ++ str
-      | None => ""
+      | Some(str) => (@reason.raw_literal(" ") " ") ++ str
+      | None => @reason.raw_literal("") ""
       }
     @val external assign2: ({..}, {..}, {..}) => {..} = "Object.assign"
     let styles = (@res.namedArgLoc ~var, _) =>

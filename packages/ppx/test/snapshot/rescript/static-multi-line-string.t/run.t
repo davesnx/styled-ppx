@@ -5,7 +5,7 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
 
   $ npx rescript convert fixed.ml
   Error when converting fixed.ml
-  File "", line 494, characters 72-73:
+  File "", line 499, characters 72-73:
   Error: Syntax error: operator expected.
   
 
