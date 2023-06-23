@@ -1,4 +1,4 @@
-  $ bsc -ppx "rewriter" -only-parse -bs-ast -bs-jsx 4 -bs-diagnose -bs-no-version-header -bs-no-builtin-ppx -bs-super-errors -color never -dsource input.res 2> output.ml
+  $ npx bsc -ppx "rewriter" -only-parse -bs-ast -bs-jsx 4 -bs-diagnose -bs-no-version-header -bs-no-builtin-ppx -bs-super-errors -color never -dsource input.res 2> output.ml
 
   $ cat output.ml
   module DynamicComponentWithDefaultValue =
@@ -497,7 +497,7 @@
       external assign2 :
         < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t =
           "Object.assign"[@@bs.val ]
-      let styles ?var:(((var)[@res.namedArgLoc ])= CssJs.hex {js|333|js})  _ =
+      let styles ?var:(((var)[@ns.namedArgLoc ])= CssJs.hex {js|333|js})  _ =
         ((CssJs.style
             [|(CssJs.label "DynamicComponentWithDefaultValue");(CssJs.display
                                                                   `block);(

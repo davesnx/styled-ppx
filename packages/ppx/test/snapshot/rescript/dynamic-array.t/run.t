@@ -1,4 +1,4 @@
-  $ bsc -ppx "rewriter" -only-parse -bs-ast -bs-jsx 4 -bs-loc -bs-diagnose -bs-no-version-header -bs-ml-out -bs-no-builtin-ppx -bs-super-errors -color never -dsource input.res 2> output.ml
+  $ npx bsc -ppx "rewriter" -only-parse -bs-ast -bs-jsx 4 -bs-loc -bs-diagnose -bs-no-version-header -bs-ml-out -bs-no-builtin-ppx -bs-super-errors -color never -dsource input.res 2> output.ml
 
   $ cat output.ml
   module ArrayDynamicComponent =
@@ -497,7 +497,7 @@
       external assign2 :
         < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t =
           "Object.assign"[@@bs.val ]
-      let styles ~var:((var)[@res.namedArgLoc ])  _ =
+      let styles ~var:((var)[@ns.namedArgLoc ])  _ =
         ((CssJs.style
             [|(CssJs.label "ArrayDynamicComponent");(CssJs.display `block);((
               match var with
