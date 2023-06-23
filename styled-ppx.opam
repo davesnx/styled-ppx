@@ -18,12 +18,13 @@ depends: [
   "ppx_deriving_yojson" {>= "3.7.0"}
   "ppxlib" {>= "0.27.0"}
   "sedlex" {>= "2.0"}
-  "reason" {with-dev-setup}
+  "melange" {>= "1.0.0"}
+  "odoc" {with-doc}
   "alcotest" {with-test}
+  "reason" {with-dev-setup}
   "ocaml-lsp-server" {with-dev-setup}
   "ocamlformat" {with-dev-setup}
   "utop" {with-dev-setup}
-  "odoc" {with-doc}
 ]
 build: [
   ["dune" "subst"] {dev}
