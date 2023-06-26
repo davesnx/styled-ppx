@@ -120,11 +120,11 @@ test_all: build test_typecheck test_css_support test_ppx_snapshot test_parser te
 
 .PHONY: ast
 ast:
-	$(DUNE) exec packages/renderer/ast_renderer.exe --
+	$(DUNE) exec ast-renderer -- $@
 
 .PHONY: lexer
 lexer:
-	$(DUNE) exec packages/renderer/lexer_renderer.exe --
+	$(DUNE) exec lexer-renderer -- $@
 
 .PHONY: interpreter
 interpreter:

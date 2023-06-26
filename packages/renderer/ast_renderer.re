@@ -5,7 +5,7 @@ let render_help = () => {
     {|  ast-renderer pretty-prints the CSS AST of parser/css_lexer.re|},
   );
   print_endline("");
-  print_endline({|    EXAMPLE: esy x ast-renderer ".a { color: red }"|});
+  print_endline({|    EXAMPLE: dune exec ast-renderer ".a { color: red }"|});
   print_endline("");
   print_endline("");
 };

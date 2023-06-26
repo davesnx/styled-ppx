@@ -8,9 +8,7 @@
  (name lexer_renderer)
  (public_name lexer-renderer)
  (modules lexer_renderer)
- (libraries styled-ppx.css-parser sedlex)
- (preprocess
-  (pps sedlex.ppx)))
+ (libraries styled-ppx.css-parser sedlex))
 
 (executable
  (name spec_renderer)
