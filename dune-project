@@ -32,6 +32,7 @@
    (ppx_deriving_yojson (>= 3.7.0))
    (ppxlib (>= 0.27.0))
    (sedlex (>= 2.0))
+   (melange (>= 1.0.0))
    (reason :with-dev-setup)
    (alcotest :with-test)
    (ocaml-lsp-server :with-dev-setup)

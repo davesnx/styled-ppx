@@ -19,8 +19,17 @@ module Js = {
   };
 
   module Float = {
+    let round = x => {
+      let floor_val = floor(x);
+      if (x -. floor_val < 0.5) {
+        floor_val;
+      } else {
+        ceil(x);
+      };
+    };
+
     let toString = f =>
-      if (Float.round(f) == f) {
+      if (round(f) == f) {
         f |> int_of_float |> string_of_int;
       } else {
         string_of_float(f);

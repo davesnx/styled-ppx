@@ -3,8 +3,10 @@
 (subdir
  packages
  (dirs
-  css-spec-parser
+  bs-css
+  bs-css-emotion
   css
+  css-spec-parser
   parser
   ppx
   reason-css-lexer

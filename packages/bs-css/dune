@@ -1,0 +1,8 @@
+(library
+ (name bs_css)
+ (public_name styled-ppx.bs-css)
+ (modes melange)
+ (wrapped false)
+ (flags :standard -w -32-34)
+ (preprocess
+  (pps melange.ppx)))

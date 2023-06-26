@@ -54,11 +54,6 @@ _build/
 # Local OPAM switch
 _opam/
 
-# Esy generated files
-_esy/
-_release/
-_export/
-
 ## BuckleScript
 /lib/*
 !/lib/js/*
@@ -192,5 +187,3 @@ Sessionx.vim
 .*.swp
 # Auto-generated tag files
 tags
-
-packages/bs-css
