@@ -1,3 +1,11 @@
+CssJs.verticalAlign(`baseline);
+CssJs.verticalAlign(`sub);
+CssJs.verticalAlign(`super);
+CssJs.verticalAlign(`top);
+CssJs.verticalAlign(`textTop);
+CssJs.verticalAlign(`middle);
+CssJs.verticalAlign(`bottom);
+CssJs.verticalAlign(`textBottom);
 CssJs.backgroundRepeat(`space);
 CssJs.backgroundRepeat(`round);
 CssJs.backgroundRepeat(`hv((`repeat, `repeat)));
