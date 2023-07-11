@@ -3212,3 +3212,6 @@
 
 [%css {|transition-delay: 240ms|}];
 [%css {|animation-duration: 150ms|}];
+
+/* [%css {|top: calc(50% + var(--value-from-var));|}]; */
+[%css {|top: var(--lol);|}];

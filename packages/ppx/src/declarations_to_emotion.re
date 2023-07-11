@@ -1704,6 +1704,26 @@ let outline_width =
     render_line_width_interp,
   );
 
+let vertical_align =
+  apply(
+    Parser.property_vertical_align,
+    (~loc) => [%expr CssJs.verticalAlign],
+    (~loc, value) => {
+      switch (value) {
+      | `Baseline => [%expr `baseline]
+      | `Sub => [%expr `sub]
+      | `Super => [%expr `super]
+      | `Text_top => [%expr `textTop]
+      | `Text_bottom => [%expr `textBottom]
+      | `Middle => [%expr `middle]
+      | `Top => [%expr `top]
+      | `Bottom => [%expr `bottom]
+      | `Extended_length(l) => render_extended_length(~loc, l)
+      | `Extended_percentage(p) => render_extended_percentage(~loc, p)
+      }
+    },
+  );
+
 let border =
   emit(
     Parser.property_border,
@@ -3340,6 +3360,7 @@ let properties = [
   ("outline-offset", found(outline_offset)),
   ("outline-style", found(outline_style)),
   ("outline-width", found(outline_width)),
+  ("vertical-align", found(vertical_align)),
   /* SVG */
   ("fill", found(fill)),
   ("stroke", found(stroke)),
