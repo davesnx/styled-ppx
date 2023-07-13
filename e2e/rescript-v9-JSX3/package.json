@@ -14,8 +14,8 @@
   "dependencies": {
     "@rescript/react": "^0.10.0",
     "@rescriptbr/react-testing-library": "^1.0.1",
-    "bs-css": "^15.3.0",
-    "bs-css-emotion": "5.0.0",
+    "bs-css": "file:../../packages/bs-css",
+    "bs-css-emotion": "file:../../packages/bs-css-emotion",
     "concurrently": "^5.1.0",
     "jsdom": "^21.1.0",
     "react": "^16.12.0",
