@@ -309,10 +309,9 @@ and render_product = (~loc, product) => {
   switch (product) {
   | (calc_value, []) => render_calc_value(~loc, calc_value)
   | (calc_value, list_of_products) =>
-    let _first = render_calc_value(calc_value);
-    let _second = render_list_of_products(list_of_products);
-    /* [%expr (`mult, [%e first], [%e second])]; */
-    failwith("`mult isn't available in bs-css");
+    let first = render_calc_value(~loc, calc_value);
+    let second = render_list_of_products(~loc, list_of_products);
+    [%expr (`mult, [%e first], [%e second])];
   };
 }
 and render_product_op = (~loc, op) => {
