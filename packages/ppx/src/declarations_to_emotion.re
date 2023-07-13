@@ -280,23 +280,24 @@ let rec render_function_calc = (~loc, calc_sum) => {
     /* This isn't a great design of the types, but we need to know the operation
        which is in the first position of the array, we ensure that there's one value
        since we are on this branch of the switch */
-    let op = pick_operation(~loc, List.hd(list_of_sums));
-    let first = render_product(~loc, product);
-    let second = render_list_of_sums(~loc, list_of_sums);
-    [%expr `calc(([%e op], [%e first], [%e second]))];
+    let op = pick_operation(List.hd(list_of_sums));
+    switch (op) {
+    | `Dash () =>
+      let first = render_product(~loc, product);
+      let second = render_list_of_sums(~loc, list_of_sums);
+      [%expr `calc(`sub(([%e first], [%e second])))];
+    | `Cross () =>
+      let first = render_product(~loc, product);
+      let second = render_list_of_sums(~loc, list_of_sums);
+      [%expr `calc(`add(([%e first], [%e second])))];
+    };
   };
 }
-and render_sum_op = (~loc, op) => {
-  switch (op) {
-  | `Dash () => [%expr `sub]
-  | `Cross () => [%expr `add]
-  };
-}
-and pick_operation = (~loc, (op, _)) => render_sum_op(~loc, op)
-and render_list_of_products = list_of_products => {
+and pick_operation = ((op, _)) => op
+and render_list_of_products = (~loc, list_of_products) => {
   switch (list_of_products) {
-  | [one] => render_product_op(one)
-  | list => render_list_of_products(list)
+  | [one] => [%expr `one([%e render_product_op(~loc, one)])]
+  | list => render_list_of_products(~loc, list)
   };
 }
 and render_list_of_sums = (~loc, list_of_sums) => {
@@ -311,7 +312,7 @@ and render_product = (~loc, product) => {
   | (calc_value, list_of_products) =>
     let first = render_calc_value(~loc, calc_value);
     let second = render_list_of_products(~loc, list_of_products);
-    [%expr (`mult, [%e first], [%e second])];
+    [%expr `calc(`mult(([%e first], [%e second])))];
   };
 }
 and render_product_op = (~loc, op) => {

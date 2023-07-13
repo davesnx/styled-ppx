@@ -1353,9 +1353,9 @@ let vw x = `vw x
 let fr x = `fr x
 
 module Calc = struct
-  let ( - ) a b = `calc (`sub, a, b)
-  let ( + ) a b = `calc (`add, a, b)
-  let ( * ) a b = `calc (`mult, a, b)
+  let ( - ) a b = `calc (`sub (a, b))
+  let ( + ) a b = `calc (`add (a, b))
+  let ( * ) a b = `calc (`mult (a, b))
 end
 
 let size x y = `size (x, y)
@@ -1485,24 +1485,17 @@ let flexBasis x =
 
 let order x = D ({js|order|js}, Js.Int.toString x)
 
+let string_of_calc x fn =
+  match x with
+  | `one a -> {js|calc(|js} ^ fn a ^ {js|)|js}
+  | `add (a, b) -> {js|calc(|js} ^ fn a ^ {js| + |js} ^ fn b ^ {js|)|js}
+  | `sub (a, b) -> {js|calc(|js} ^ fn a ^ {js| - |js} ^ fn b ^ {js|)|js}
+  | `mult (a, b) -> ((({js|calc(|js} ^ fn a) ^ {js| * |js}) ^ fn b) ^ {js|)|js}
+
 let string_of_minmax x =
   match x with
   | `auto -> {js|auto|js}
-  | `calc (`add, a, b) ->
-    {js|calc(|js}
-    ^ Length.toString a
-    ^ {js| + |js}
-    ^ Length.toString b
-    ^ {js|)|js}
-  | `calc (`sub, a, b) ->
-    {js|calc(|js}
-    ^ Length.toString a
-    ^ {js| - |js}
-    ^ Length.toString b
-    ^ {js|)|js}
-  | `calc (`mult, a, b) ->
-    ((({js|calc(|js} ^ Length.toString a) ^ {js| * |js}) ^ Length.toString b)
-    ^ {js|)|js}
+  | `calc c -> string_of_calc c Length.toString
   | `ch x -> Js.Float.toString x ^ {js|ch|js}
   | `cm x -> Js.Float.toString x ^ {js|cm|js}
   | `em x -> Js.Float.toString x ^ {js|em|js}
@@ -1528,15 +1521,7 @@ let string_of_dimension x =
   match x with
   | `auto -> {js|auto|js}
   | `none -> {js|none|js}
-  | `calc (`add, a, b) ->
-    ((({js|calc(|js} ^ Length.toString a) ^ {js| + |js}) ^ Length.toString b)
-    ^ {js|)|js}
-  | `calc (`sub, a, b) ->
-    ((({js|calc(|js} ^ Length.toString a) ^ {js| - |js}) ^ Length.toString b)
-    ^ {js|)|js}
-  | `calc (`mult, a, b) ->
-    ((({js|calc(|js} ^ Length.toString a) ^ {js| * |js}) ^ Length.toString b)
-    ^ {js|)|js}
+  | `calc c -> string_of_calc c Length.toString
   | `ch x -> Js.Float.toString x ^ {js|ch|js}
   | `cm x -> Js.Float.toString x ^ {js|cm|js}
   | `em x -> Js.Float.toString x ^ {js|em|js}
@@ -1587,15 +1572,7 @@ type nonrec gridLength =
 let gridLengthToJs x =
   match x with
   | `auto -> {js|auto|js}
-  | `calc (`add, a, b) ->
-    ((({js|calc(|js} ^ Length.toString a) ^ {js| + |js}) ^ Length.toString b)
-    ^ {js|)|js}
-  | `calc (`sub, a, b) ->
-    ((({js|calc(|js} ^ Length.toString a) ^ {js| - |js}) ^ Length.toString b)
-    ^ {js|)|js}
-  | `calc (`mult, a, b) ->
-    ((({js|calc(|js} ^ Length.toString a) ^ {js| * |js}) ^ Length.toString b)
-    ^ {js|)|js}
+  | `calc c -> string_of_calc c Length.toString
   | `ch x -> Js.Float.toString x ^ {js|ch|js}
   | `cm x -> Js.Float.toString x ^ {js|cm|js}
   | `em x -> Js.Float.toString x ^ {js|em|js}

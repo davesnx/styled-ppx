@@ -88,7 +88,7 @@ module Length = struct
     | `pc of float
     | `pt of int
     | `zero
-    | `calc of [ `add | `sub | `mult ] * t * t
+    | `calc of [ `add of t * t | `sub of t * t | `mult of t * t | `one of t ]
     | `percent of float
     ]
 
@@ -127,11 +127,12 @@ module Length = struct
     | `pc x -> Js.Float.toString x ^ {js|pc|js}
     | `pt x -> Js.Int.toString x ^ {js|pt|js}
     | `zero -> {js|0|js}
-    | `calc (`add, a, b) ->
+    | `calc (`one a) -> ({js|calc(|js} ^ toString a) ^ {js|)|js}
+    | `calc (`add (a, b)) ->
       ((({js|calc(|js} ^ toString a) ^ {js| + |js}) ^ toString b) ^ {js|)|js}
-    | `calc (`sub, a, b) ->
+    | `calc (`sub (a, b)) ->
       ((({js|calc(|js} ^ toString a) ^ {js| - |js}) ^ toString b) ^ {js|)|js}
-    | `calc (`mult, a, b) ->
+    | `calc (`mult (a, b)) ->
       ((({js|calc(|js} ^ toString a) ^ {js| * |js}) ^ toString b) ^ {js|)|js}
     | `percent x -> Js.Float.toString x ^ {js|%|js}
 end

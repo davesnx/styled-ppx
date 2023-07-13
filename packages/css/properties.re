@@ -1423,9 +1423,9 @@ let vw = x => `vw(x);
 let fr = x => `fr(x);
 
 module Calc = {
-  let (-) = (a, b) => `calc((`sub, a, b));
-  let (+) = (a, b) => `calc((`add, a, b));
-  let ( * ) = (a, b) => `calc((`mult, a, b));
+  let (-) = (a, b) => `calc(`sub((a, b)));
+  let (+) = (a, b) => `calc(`add((a, b)));
+  let ( * ) = (a, b) => `calc(`mult((a, b)));
 };
 let size = (x, y) => `size((x, y));
 
@@ -1572,15 +1572,20 @@ let flexBasis = x =>
 
 let order = x => Declaration("order", Js.Int.toString(x));
 
+let string_of_calc = x =>
+  switch (x) {
+  | `add(a, b) =>
+    "calc(" ++ Length.toString(a) ++ " + " ++ Length.toString(b) ++ ")"
+  | `sub(a, b) =>
+    "calc(" ++ Length.toString(a) ++ " - " ++ Length.toString(b) ++ ")"
+  | `mult(a, b) =>
+    "calc(" ++ Length.toString(a) ++ " * " ++ Length.toString(b) ++ ")"
+  };
+
 let string_of_minmax = x =>
   switch (x) {
   | `auto => "auto"
-  | `calc(`add, a, b) =>
-    "calc(" ++ Length.toString(a) ++ " + " ++ Length.toString(b) ++ ")"
-  | `calc(`sub, a, b) =>
-    "calc(" ++ Length.toString(a) ++ " - " ++ Length.toString(b) ++ ")"
-  | `calc(`mult, a, b) =>
-    "calc(" ++ Length.toString(a) ++ " * " ++ Length.toString(b) ++ ")"
+  | `calc(c) => string_of_calc(c)
   | `ch(x) => Js.Float.toString(x) ++ "ch"
   | `cm(x) => Js.Float.toString(x) ++ "cm"
   | `em(x) => Js.Float.toString(x) ++ "em"
@@ -1607,12 +1612,7 @@ let string_of_dimension = x =>
   switch (x) {
   | `auto => "auto"
   | `none => "none"
-  | `calc(`add, a, b) =>
-    "calc(" ++ Length.toString(a) ++ " + " ++ Length.toString(b) ++ ")"
-  | `calc(`sub, a, b) =>
-    "calc(" ++ Length.toString(a) ++ " - " ++ Length.toString(b) ++ ")"
-  | `calc(`mult, a, b) =>
-    "calc(" ++ Length.toString(a) ++ " * " ++ Length.toString(b) ++ ")"
+  | `calc(c) => string_of_calc(c)
   | `ch(x) => Js.Float.toString(x) ++ "ch"
   | `cm(x) => Js.Float.toString(x) ++ "cm"
   | `em(x) => Js.Float.toString(x) ++ "em"
@@ -1653,12 +1653,7 @@ type gridLength = [ trackLength | `repeat(RepeatValue.t, trackLength)];
 let gridLengthToJs = x =>
   switch (x) {
   | `auto => "auto"
-  | `calc(`add, a, b) =>
-    "calc(" ++ Length.toString(a) ++ " + " ++ Length.toString(b) ++ ")"
-  | `calc(`sub, a, b) =>
-    "calc(" ++ Length.toString(a) ++ " - " ++ Length.toString(b) ++ ")"
-  | `calc(`mult, a, b) =>
-    "calc(" ++ Length.toString(a) ++ " * " ++ Length.toString(b) ++ ")"
+  | `calc(c) => string_of_calc(c)
   | `ch(x) => Js.Float.toString(x) ++ "ch"
   | `cm(x) => Js.Float.toString(x) ++ "cm"
   | `em(x) => Js.Float.toString(x) ++ "em"

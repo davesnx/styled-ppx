@@ -83,7 +83,7 @@ test_css_support: ## Run CSS Support tests
 
 .PHONY: test_css_support_promote
 test_css_support_promote: ## Promote CSS Support snapshots
-	$(DUNE) build @css_support_test
+	$(DUNE) build @css_support_test --auto-promote
 
 .PHONY: test_ppx_snapshot
 test_ppx_snapshot: ## Run ppx snapshot tests
@@ -91,7 +91,7 @@ test_ppx_snapshot: ## Run ppx snapshot tests
 
 .PHONY: test_ppx_snapshot_promote
 test_ppx_snapshot_promote: ## Promote ppx snapshot snapshots
-	$(DUNE) build @ppx_snapshot_test
+	$(DUNE) build @ppx_snapshot_test --auto-promote
 
 .PHONY: test_parser
 test_parser: ## Run CSS Parser tests

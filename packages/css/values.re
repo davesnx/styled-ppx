@@ -133,7 +133,7 @@ module Length = {
     | `pc(float)
     | `pt(int)
     | `zero
-    | `calc([ | `add | `sub], t, t)
+    | `calc([ | `add(t, t) | `sub(t, t) | `mult(t, t)])
     | `percent(float)
   ];
 
@@ -172,11 +172,12 @@ module Length = {
     | `pc(x) => Js.Float.toString(x) ++ "pc"
     | `pt(x) => Js.Int.toString(x) ++ "pt"
     | `zero => "0"
-
-    | `calc(`add, a, b) =>
+    | `calc(`add(a, b)) =>
       "calc(" ++ toString(a) ++ " + " ++ toString(b) ++ ")"
-    | `calc(`sub, a, b) =>
+    | `calc(`sub(a, b)) =>
       "calc(" ++ toString(a) ++ " - " ++ toString(b) ++ ")"
+    | `calc(`mult(a, b)) =>
+      "calc(" ++ toString(a) ++ " * " ++ toString(b) ++ ")"
     | `percent(x) => Js.Float.toString(x) ++ "%";
 };
 

@@ -1452,7 +1452,7 @@
 /* [%css {|width: calc(attr(data-px)*2);|}]; */
 [%css {|width: calc(5px - 10px);|}];
 [%css {|width: calc(1vw - 1px);|}];
-/* [%css {|width: calc(calc(100%));|}]; */
+/* [%css {|width: calc(100%);|}]; */
 [%css {|padding: 5rem;|}];
 [%css {|padding: 5ch;|}];
 [%css {|padding: 5vw;|}];
