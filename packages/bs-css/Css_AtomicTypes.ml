@@ -982,6 +982,51 @@ module WordSpacing = struct
   let toString x = match x with `normal -> {js|normal|js}
 end
 
+module DisplayOld = struct
+  type t =
+    [ `flow
+    | `flowRoot
+    | `ruby
+    | `rubyBase
+    | `rubyBaseContainer
+    | `rubyText
+    | `rubyTextContainer
+    | `runIn
+    | `mozBox
+    | `mozInlineBox
+    | `mozInlineStack
+    | `msFlexbox
+    | `msGrid
+    | `msInlineFlexbox
+    | `msInlineGrid
+    | `webkitBox
+    | `webkitFlex
+    | `webkitInlineBox
+    | `webkitInlineFlex
+    ]
+
+  let toString = function
+    | `flow -> "flow"
+    | `flowRoot -> "flow-root"
+    | `ruby -> "ruby"
+    | `rubyBase -> "ruby-base"
+    | `rubyBaseContainer -> "ruby-base-container"
+    | `rubyText -> "ruby-text"
+    | `rubyTextContainer -> "ruby-text-container"
+    | `runIn -> "run-in"
+    | `mozBox -> "-moz-box"
+    | `mozInlineBox -> "-moz-inline-box"
+    | `mozInlineStack -> "-moz-inline-stack"
+    | `msFlexbox -> "-ms-flexbox"
+    | `msGrid -> "-ms-grid"
+    | `msInlineFlexbox -> "-ms-inline-flexbox"
+    | `msInlineGrid -> "-ms-inline-grid"
+    | `webkitBox -> "-webkit-box"
+    | `webkitFlex -> "-webkit-flex"
+    | `webkitInlineBox -> "-webkit-inline-box"
+    | `webkitInlineFlex -> "-webkit-inline-flex"
+end
+
 module DisplayOutside = struct
   type nonrec t =
     [ `block

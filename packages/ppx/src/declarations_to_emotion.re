@@ -3054,26 +3054,25 @@ let render_display = (~loc) =>
   | `Table_header_group => [%expr `tableHeaderGroup]
   | `Table_row => [%expr `tableRow]
   | `Table_row_group => [%expr `tableRowGroup]
-  | `Flow
-  | `Flow_root
-  | `Ruby
-  | `Ruby_base
-  | `Ruby_base_container
-  | `Ruby_text
-  | `Ruby_text_container
-  | `Run_in
-  | `_moz_box
-  | `_moz_inline_box
-  | `_moz_inline_stack
-  | `_ms_flexbox
-  | `_ms_grid
-  | `_ms_inline_flexbox
-  | `_ms_inline_grid
-  | `_webkit_box
-  | `_webkit_flex
-  | `_webkit_inline_box
-  | `_webkit_inline_flex
-  | _ => raise(Unsupported_feature);
+  | `Flow => [%expr `flow]
+  | `Flow_root => [%expr `flowRoot]
+  | `Ruby => [%expr `ruby]
+  | `Ruby_base => [%expr `rubyBase]
+  | `Ruby_base_container => [%expr `rubyBaseContainer]
+  | `Ruby_text => [%expr `rubyText]
+  | `Ruby_text_container => [%expr `rubyTextContainer]
+  | `Run_in => [%expr `runIn]
+  | `_moz_box => [%expr `mozBox]
+  | `_moz_inline_box => [%expr `mozInlineBox]
+  | `_moz_inline_stack => [%expr `mozInlineStack]
+  | `_ms_flexbox => [%expr `msFlexbox]
+  | `_ms_grid => [%expr `msGrid]
+  | `_ms_inline_flexbox => [%expr `msInlineFlexbox]
+  | `_ms_inline_grid => [%expr `msInlineGrid]
+  | `_webkit_box => [%expr `webkitBox]
+  | `_webkit_flex => [%expr `webkitFlex]
+  | `_webkit_inline_box => [%expr `webkitInlineBox]
+  | `_webkit_inline_flex => [%expr `webkitInlineFlex];
 
 let display =
   apply(

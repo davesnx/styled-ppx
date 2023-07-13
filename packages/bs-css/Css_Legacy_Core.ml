@@ -479,6 +479,7 @@ let display x =
     ( {js|display|js},
       match x with
       | #DisplayOutside.t as o -> DisplayOutside.toString o
+      | #DisplayOld.t as o -> DisplayOld.toString o
       | #DisplayInside.t as i -> DisplayInside.toString i
       | #DisplayListItem.t as l -> DisplayListItem.toString l
       | #DisplayInternal.t as i' -> DisplayInternal.toString i'

@@ -377,6 +377,7 @@ let display = x =>
     "display",
     switch (x) {
     | #DisplayOutside.t as o => DisplayOutside.toString(o)
+    | #DisplayOld.t as d => DisplayOld.toString(d)
     | #DisplayInside.t as i => DisplayInside.toString(i)
     | #DisplayListItem.t as l => DisplayListItem.toString(l)
     | #DisplayInternal.t as i' => DisplayInternal.toString(i')

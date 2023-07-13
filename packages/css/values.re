@@ -988,6 +988,52 @@ module WordSpacing = {
     | `normal => "normal";
 };
 
+module DisplayOld = {
+  type t = [
+    | `flow
+    | `flowRoot
+    | `ruby
+    | `rubyBase
+    | `rubyBaseContainer
+    | `rubyText
+    | `rubyTextContainer
+    | `runIn
+    | `mozBox
+    | `mozInlineBox
+    | `mozInlineStack
+    | `msFlexbox
+    | `msGrid
+    | `msInlineFlexbox
+    | `msInlineGrid
+    | `webkitBox
+    | `webkitFlex
+    | `webkitInlineBox
+    | `webkitInlineFlex
+  ];
+
+  let toString =
+    fun
+    | `flow => "flow"
+    | `flowRoot => "flow-root"
+    | `ruby => "ruby"
+    | `rubyBase => "ruby-base"
+    | `rubyBaseContainer => "ruby-base-container"
+    | `rubyText => "ruby-text"
+    | `rubyTextContainer => "ruby-text-container"
+    | `runIn => "run-in"
+    | `mozBox => "-moz-box"
+    | `mozInlineBox => "-moz-inline-box"
+    | `mozInlineStack => "-moz-inline-stack"
+    | `msFlexbox => "-ms-flexbox"
+    | `msGrid => "-ms-grid"
+    | `msInlineFlexbox => "-ms-inline-flexbox"
+    | `msInlineGrid => "-ms-inline-grid"
+    | `webkitBox => "-webkit-box"
+    | `webkitFlex => "-webkit-flex"
+    | `webkitInlineBox => "-webkit-inline-box"
+    | `webkitInlineFlex => "-webkit-inline-flex";
+};
+
 module DisplayOutside = {
   type t = [ | `block | `inline | `runIn];
 
@@ -1637,14 +1683,37 @@ module OverflowWrap = {
     | `anywhere => "anywhere";
 };
 
+module SideOrCorner = {
+  type left_right = [ | `Left | `Right];
+  type top_bottom = [ | `Top | `Bottom];
+  type t = (option(left_right), option(top_bottom));
+
+  let toString =
+    fun
+    | (Some(`Left), Some(`Top)) => "to top left"
+    | (Some(`Left), Some(`Bottom)) => "to bottom left"
+    | (Some(`Right), Some(`Top)) => "to top right"
+    | (Some(`Right), Some(`Bottom)) => "to bottom right"
+    | (Some(`Left), None) => "to left"
+    | (Some(`Right), None) => "to right"
+    | (None, Some(`Top)) => "to top"
+    | (None, Some(`Bottom)) => "to bottom"
+    | (None, None) => "";
+};
+
+let axis_to_string =
+  fun
+  | `Angle(a) => Angle.toString(a)
+  | `SideOrCorner(s) => SideOrCorner.toString(s);
+
 module Gradient = {
   type t('colorOrVar) = [
     | `linearGradient(
-        Angle.t,
+        option([ | `Angle(Angle.t) | `SideOrCorner(SideOrCorner.t)]),
         list((Length.t, [< Color.t | Var.t] as 'colorOrVar)),
       )
     | `repeatingLinearGradient(
-        Angle.t,
+        option([ | `Angle(Angle.t) | `SideOrCorner(SideOrCorner.t)]),
         list((Length.t, [< Color.t | Var.t] as 'colorOrVar)),
       )
     | `radialGradient(list((Length.t, [< Color.t | Var.t] as 'colorOrVar)))
