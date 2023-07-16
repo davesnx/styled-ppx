@@ -1132,16 +1132,11 @@ let render_function_linear_gradient =
     (~loc, value: Types.function_linear_gradient) => {
   switch (value) {
   | (None, stops) =>
-    /* bs-css doesn't support non-angle. Default to 180deg */
-    [%expr
-     `linearGradient((
-       [%e render_extended_angle(~loc, `Angle(`Deg(180.)))],
-       [%e render_color_stop_list(~loc, stops)],
-     ))]
+    [%expr `linearGradient((None, [%e render_color_stop_list(~loc, stops)]))]
   | (Some(angle), stops) =>
     [%expr
      `linearGradient((
-       [%e render_extended_angle(~loc, angle)],
+       Some([%e render_extended_angle(~loc, angle)]),
        [%e render_color_stop_list(~loc, stops)],
      ))]
   };
@@ -1153,17 +1148,16 @@ let render_function_repeating_linear_gradient =
   | (Some(`Extended_angle(angle)), (), stops) =>
     [%expr
      `repeatingLinearGradient((
-       [%e render_extended_angle(~loc, angle)],
+       Some([%e render_extended_angle(~loc, angle)]),
        [%e render_color_stop_list(~loc, stops)],
      ))]
-  /* Other ways aren't supported in bs-css
-     | #repeatingLinearGradient(Angle.t, array<(Length.t, [< Color.t | Var.t] as 'colorOrVar)>) */
-  /* | (Some(`Static(_, side)), (), stops) =>
-     [%expr `repeatingLinearGradient((
-       [%e render_side_or_corner(~loc, side)],
-       [%e render_color_stop_list(~loc, stops)]
-     ))] */
-  | _ => raise(Unsupported_feature)
+  | (None, (), stops) =>
+    [%expr
+     `repeatingLinearGradient((
+       None,
+       [%e render_color_stop_list(~loc, stops)],
+     ))]
+  | (Some(_), (), _stops) => raise(Unsupported_feature)
   };
 };
 

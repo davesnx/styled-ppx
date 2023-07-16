@@ -238,11 +238,14 @@ CssJs.unsafe({js|backgroundPositionY|js}, {js|bottom -50px|js});
 CssJs.unsafe({js|backgroundPositionY|js}, {js|top -50px|js});
 CssJs.unsafe({js|backgroundPositionY|js}, {js|bottom 20px|js});
 CssJs.backgroundImage(
-  `linearGradient((`deg(45.), [|(CssJs.blue, None), (CssJs.red, None)|])),
+  `linearGradient((
+    Some(`deg(45.)),
+    [|(CssJs.blue, None), (CssJs.red, None)|],
+  )),
 );
 CssJs.backgroundImage(
   `linearGradient((
-    `deg(90.),
+    Some(`deg(90.)),
     [|
       (CssJs.blue, Some(`percent(10.))),
       (CssJs.red, Some(`percent(20.))),
@@ -251,19 +254,19 @@ CssJs.backgroundImage(
 );
 CssJs.backgroundImage(
   `linearGradient((
-    `deg(90.),
+    Some(`deg(90.)),
     [|(CssJs.blue, Some(`percent(10.))), (CssJs.red, None)|],
   )),
 );
 CssJs.backgroundImage(
   `linearGradient((
-    `deg(45.),
+    Some(`deg(45.)),
     [|(CssJs.white, None), (CssJs.black, None)|],
   )),
 );
 CssJs.backgroundImage(
   `linearGradient((
-    `deg(180.),
+    None,
     [|
       (CssJs.white, None),
       (`hex({js|f06|js}), None),
