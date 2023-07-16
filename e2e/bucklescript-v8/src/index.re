@@ -1,3 +1,9 @@
+let tableRowProgress = [%cx
+  {|
+  background-image: linear-gradient(180deg, black 50%, white 50%);
+|}
+];
+
 [%styled.global
   {|
   body {
