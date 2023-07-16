@@ -239,13 +239,13 @@ CssJs.unsafe({js|backgroundPositionY|js}, {js|top -50px|js});
 CssJs.unsafe({js|backgroundPositionY|js}, {js|bottom 20px|js});
 CssJs.backgroundImage(
   `linearGradient((
-    Some(`deg(45.)),
+    Some(`Angle(`deg(45.))),
     [|(CssJs.blue, None), (CssJs.red, None)|],
   )),
 );
 CssJs.backgroundImage(
   `linearGradient((
-    Some(`deg(90.)),
+    Some(`Angle(`deg(90.))),
     [|
       (CssJs.blue, Some(`percent(10.))),
       (CssJs.red, Some(`percent(20.))),
@@ -254,13 +254,16 @@ CssJs.backgroundImage(
 );
 CssJs.backgroundImage(
   `linearGradient((
-    Some(`deg(90.)),
+    Some(`Angle(`deg(90.))),
     [|(CssJs.blue, Some(`percent(10.))), (CssJs.red, None)|],
   )),
 );
+[%ocaml.error
+  "Property 'background-image' has an invalid value: 'linear-gradient(white, black)'"
+];
 CssJs.backgroundImage(
   `linearGradient((
-    Some(`deg(45.)),
+    Some(`Angle(`deg(45.))),
     [|(CssJs.white, None), (CssJs.black, None)|],
   )),
 );
@@ -271,6 +274,16 @@ CssJs.backgroundImage(
       (CssJs.white, None),
       (`hex({js|f06|js}), None),
       (CssJs.black, None),
+    |],
+  )),
+);
+CssJs.backgroundImage(
+  `linearGradient((
+    None,
+    [|
+      (CssJs.red, Some(`pxFloat(-50.))),
+      (CssJs.white, Some(`calc(`add((`pxFloat(-25.), `percent(50.)))))),
+      (CssJs.blue, Some(`percent(100.))),
     |],
   )),
 );

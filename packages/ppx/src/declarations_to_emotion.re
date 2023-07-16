@@ -417,6 +417,12 @@ let render_extended_angle = (~loc) =>
   | `Function_calc(fc) => render_function_calc(~loc, fc)
   | `Interpolation(i) => render_variable(~loc, i);
 
+let render_side_or_corner = (~loc, side_or_corner: Types.side_or_corner) => {
+  switch (side_or_corner) {
+  | _ => [%expr "wat"]
+  };
+};
+
 /* Applies variants to one argument */
 let variants = (parser, identifier) =>
   apply(parser, identifier, variant_to_expression);
@@ -1133,10 +1139,18 @@ let render_function_linear_gradient =
   switch (value) {
   | (None, stops) =>
     [%expr `linearGradient((None, [%e render_color_stop_list(~loc, stops)]))]
-  | (Some(angle), stops) =>
+  | (Some(`Extended_angle(angle)), stops) =>
     [%expr
      `linearGradient((
-       Some([%e render_extended_angle(~loc, angle)]),
+       Some(`Angle([%e render_extended_angle(~loc, angle)])),
+       [%e render_color_stop_list(~loc, stops)],
+     ))]
+  | (Some(`Static((), side_or_corner)), stops) =>
+    [%expr
+     `linearGradient((
+       Some(
+         `SideOrCorner([%e render_side_or_corner(~loc, side_or_corner)]),
+       ),
        [%e render_color_stop_list(~loc, stops)],
      ))]
   };

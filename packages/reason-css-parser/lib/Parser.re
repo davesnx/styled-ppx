@@ -314,10 +314,8 @@ and function_inset = [%value.rec
 and function_invert = [%value.rec "invert( <number-percentage> )"]
 and function_leader = [%value.rec "leader( <leader-type> )"]
 and function_linear_gradient = [%value.rec
-  "linear-gradient( [ <extended-angle> ]? <color-stop-list> )"
+  "linear-gradient( [ <extended-angle> | 'to' <side-or-corner> ]? <color-stop-list> )"
 ]
-/* Simplified the spec to match with bs-css
-   #linearGradient(Angle.t, array<(Length.t, [< Color.t | Var.t] as 'colorOrVar)>) */
 /* and function_linear_gradient = [%value.rec "linear-gradient( [ <extended-angle> | 'to' <side-or-corner> ]? ',' <color-stop-list> )"] */
 and function_matrix = [%value.rec "matrix( [ <number> ]#{6} )"]
 and function_matrix3d = [%value.rec "matrix3d( [ <number> ]#{16} )"]

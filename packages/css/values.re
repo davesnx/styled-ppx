@@ -1707,67 +1707,91 @@ let axis_to_string =
   | `SideOrCorner(s) => SideOrCorner.toString(s);
 
 module Gradient = {
-  type t('colorOrVar) = [
+  type nonrec t('colorOrVar) = [
     | `linearGradient(
-        Angle.t,
-        list((Length.t, [< Color.t | Var.t] as 'colorOrVar)),
+        option(Angle.t),
+        array(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
       )
     | `repeatingLinearGradient(
-        Angle.t,
-        list((Length.t, [< Color.t | Var.t] as 'colorOrVar)),
+        option(Angle.t),
+        array(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
       )
-    | `radialGradient(list((Length.t, [< Color.t | Var.t] as 'colorOrVar)))
+    | `radialGradient(
+        array(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
+      )
     | `repeatingRadialGradient(
-        list((Length.t, [< Color.t | Var.t] as 'colorOrVar)),
+        array(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
       )
     | `conicGradient(
-        Angle.t,
-        list((Length.t, [< Color.t | Var.t] as 'colorOrVar)),
+        option(Angle.t),
+        array(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
       )
   ];
 
   let linearGradient = (angle, stops) => `linearGradient((angle, stops));
+
   let repeatingLinearGradient = (angle, stops) =>
     `repeatingLinearGradient((angle, stops));
+
   let radialGradient = stops => `radialGradient(stops);
   let repeatingRadialGradient = stops => `repeatingRadialGradient(stops);
   let conicGradient = (angle, stops) => `conicGradient((angle, stops));
 
-  let string_of_color =
-    fun
+  let string_of_color = x =>
+    switch (x) {
     | #Color.t as co => Color.toString(co)
-    | #Var.t as va => Var.toString(va);
+    | #Var.t as va => Var.toString(va)
+    };
+
   let string_of_stops = stops =>
     stops
-    |> List.map(((l, c)) =>
-         string_of_color(c) ++ " " ++ Length.toString(l)
-       )
-    |> String.concat(", ");
+    ->(
+        Belt.Array.map(((c, l)) =>
+          switch (l) {
+          | None => string_of_color(c)
+          | Some(l) =>
+            (string_of_color(c) ++ {js| |js}) ++ Length.toString(l)
+          }
+        )
+      )
+    ->(Js.Array2.joinWith({js|, |js}));
 
-  let toString =
-    fun
-    | `linearGradient(angle, stops) =>
-      "linear-gradient("
-      ++ Angle.toString(angle)
-      ++ ", "
-      ++ string_of_stops(stops)
-      ++ ")"
-    | `repeatingLinearGradient(angle, stops) =>
-      "repeating-linear-gradient("
-      ++ Angle.toString(angle)
-      ++ ", "
-      ++ string_of_stops(stops)
-      ++ ")"
+  let toString = x =>
+    switch (x) {
+    | `linearGradient(None, stops) =>
+      ({js|linear-gradient(|js} ++ string_of_stops(stops)) ++ {js|)|js}
+    | `linearGradient(Some(angle), stops) =>
+      (
+        (({js|linear-gradient(|js} ++ Angle.toString(angle)) ++ {js|, |js})
+        ++ string_of_stops(stops)
+      )
+      ++ {js|)|js}
+    | `repeatingLinearGradient(None, stops) =>
+      ({js|repeating-linear-gradient(|js} ++ string_of_stops(stops))
+      ++ {js|)|js}
+    | `repeatingLinearGradient(Some(angle), stops) =>
+      (
+        (
+          ({js|repeating-linear-gradient(|js} ++ Angle.toString(angle))
+          ++ {js|, |js}
+        )
+        ++ string_of_stops(stops)
+      )
+      ++ {js|)|js}
     | `radialGradient(stops) =>
-      "radial-gradient(" ++ string_of_stops(stops) ++ ")"
+      ({js|radial-gradient(|js} ++ string_of_stops(stops)) ++ {js|)|js}
     | `repeatingRadialGradient(stops) =>
-      "repeating-radial-gradient(" ++ string_of_stops(stops) ++ ")"
-    | `conicGradient(angle, stops) =>
-      "conic-gradient(from "
-      ++ Angle.toString(angle)
-      ++ ", "
-      ++ string_of_stops(stops)
-      ++ ")";
+      ({js|repeating-radial-gradient(|js} ++ string_of_stops(stops))
+      ++ {js|)|js}
+    | `conicGradient(None, stops) =>
+      ({js|conic-gradient(from |js} ++ string_of_stops(stops)) ++ {js|)|js}
+    | `conicGradient(Some(angle), stops) =>
+      (
+        (({js|conic-gradient(from |js} ++ Angle.toString(angle)) ++ {js|, |js})
+        ++ string_of_stops(stops)
+      )
+      ++ {js|)|js}
+    };
 };
 
 module BackgroundImage = {

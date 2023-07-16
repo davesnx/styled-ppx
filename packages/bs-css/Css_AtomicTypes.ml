@@ -1854,7 +1854,7 @@ end
 module Gradient = struct
   type nonrec 'colorOrVar t =
     [ `linearGradient of
-      Angle.t option
+      [> `Angle of Angle.t | > `SideOrCorner of SideOrCorner.t ] option
       * (([< Color.t | Var.t ] as 'colorOrVar) * Length.t option) array
     | `repeatingLinearGradient of
       Angle.t option
