@@ -1066,7 +1066,8 @@ let render_color_stop_angle = (~loc, value: Types.color_stop_angle) => {
 
 let render_linear_color_stop = (~loc, value: Types.linear_color_stop) => {
   switch (value) {
-  | (color, None) => render_color(~loc, color)
+  /* bs-css don't have color-stop without length */
+  | (_color, None) => raise(Unsupported_feature)
   | (color, Some(length)) =>
     let color = render_color(~loc, color);
     let length = render_color_stop_length(~loc, length);
