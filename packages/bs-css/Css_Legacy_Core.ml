@@ -8,23 +8,21 @@ type rule =
   | PseudoClassParam of string * string * rule list
 
 let rec ruleToDict dict rule =
-  (((match rule with
-    | D (name, value) when name = {js|content|js} ->
-      dict
-      |. Js.Dict.set name
-           (Js.Json.string
-              (if [@ns.ternary] value = {js||js} then {js|\"\"|js} else value))
-    | D (name, value) -> dict |. Js.Dict.set name (Js.Json.string value)
-    | S (name, ruleset) -> dict |. Js.Dict.set name (toJson ruleset)
-    | PseudoClass (name, ruleset) ->
-      dict |. Js.Dict.set ({js|:|js} ^ name) (toJson ruleset)
-    | PseudoClassParam (name, param, ruleset) ->
-      dict
-      |. Js.Dict.set
-           ({js|:|js} ^ name ^ {js|(|js} ^ param ^ {js|)|js})
-           (toJson ruleset));
-    dict)
-  [@ns.braces])
+  (match rule with
+  | D (name, value) when name = "content" ->
+    dict
+    |. Js.Dict.set name
+         (Js.Json.string (if value = {js||js} then {js|""|js} else value))
+  | D (name, value) -> dict |. Js.Dict.set name (Js.Json.string value)
+  | S (name, ruleset) -> dict |. Js.Dict.set name (toJson ruleset)
+  | PseudoClass (name, ruleset) ->
+    dict |. Js.Dict.set ({js|:|js} ^ name) (toJson ruleset)
+  | PseudoClassParam (name, param, ruleset) ->
+    dict
+    |. Js.Dict.set
+         ({js|:|js} ^ name ^ {js|(|js} ^ param ^ {js|)|js})
+         (toJson ruleset));
+  dict
 
 and toJson rules =
   rules |. Belt.List.reduce (Js.Dict.empty ()) ruleToDict |. Js.Json.object_
@@ -105,7 +103,7 @@ let join strings separator =
 module Converter = struct
   let string_of_stops stops =
     stops
-    |. Belt.List.map (fun (l, c) ->
+    |. Belt.List.map (fun (c, l) ->
          Color.toString c ^ {js| |js} ^ Length.toString l)
     |. join {js|, |js}
 

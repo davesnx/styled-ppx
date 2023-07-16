@@ -14,7 +14,7 @@ let rec ruleToDict =
       dict
       |. Js.Dict.set name
            (Js.Json.string
-              (if [@ns.ternary] value = {js||js} then {js|\"\"|js} else value))
+              (if [@ns.ternary] value = {js||js} then {js|""|js} else value))
     | D (name, value) -> dict |. Js.Dict.set name (Js.Json.string value)
     | S (name, ruleset) -> dict |. Js.Dict.set name (toJson ruleset)
     | PseudoClass (name, ruleset) ->

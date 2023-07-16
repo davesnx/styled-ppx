@@ -417,9 +417,18 @@ let render_extended_angle = (~loc) =>
   | `Function_calc(fc) => render_function_calc(~loc, fc)
   | `Interpolation(i) => render_variable(~loc, i);
 
-let render_side_or_corner = (~loc, side_or_corner: Types.side_or_corner) => {
-  switch (side_or_corner) {
-  | _ => [%expr "wat"]
+let render_side_or_corner = (~loc, value: Types.side_or_corner) => {
+  switch (value) {
+  | (None, Some(`Top)) => [%expr `Top]
+  | (Some(`Left), None) => [%expr `Left]
+  | (None, Some(`Bottom)) => [%expr `Bottom]
+  | (Some(`Right), None) => [%expr `Right]
+  | (Some(`Left), Some(`Top)) => [%expr `TopLeft]
+  | (Some(`Right), Some(`Top)) => [%expr `TopRight]
+  | (Some(`Left), Some(`Bottom)) => [%expr `BottomLeft]
+  | (Some(`Right), Some(`Bottom)) => [%expr `BottomRight]
+  /* by ast, that can't be possible */
+  | (None, None) => assert(false)
   };
 };
 

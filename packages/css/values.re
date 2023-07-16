@@ -1684,47 +1684,73 @@ module OverflowWrap = {
 };
 
 module SideOrCorner = {
-  type left_right = [ | `Left | `Right];
-  type top_bottom = [ | `Top | `Bottom];
-  type t = (option(left_right), option(top_bottom));
+  type t = [
+    | `Top
+    | `Left
+    | `Bottom
+    | `Right
+    | `TopLeft
+    | `TopRight
+    | `BottomLeft
+    | `BottomRight
+  ];
 
   let toString =
     fun
-    | (Some(`Left), Some(`Top)) => "to top left"
-    | (Some(`Left), Some(`Bottom)) => "to bottom left"
-    | (Some(`Right), Some(`Top)) => "to top right"
-    | (Some(`Right), Some(`Bottom)) => "to bottom right"
-    | (Some(`Left), None) => "to left"
-    | (Some(`Right), None) => "to right"
-    | (None, Some(`Top)) => "to top"
-    | (None, Some(`Bottom)) => "to bottom"
-    | (None, None) => "";
+    | `Top => "to top"
+    | `Left => "to left"
+    | `Bottom => "to bottom"
+    | `Right => "to right"
+    | `TopLeft => "to top left"
+    | `TopRight => "to top right"
+    | `BottomLeft => "to bottom left"
+    | `BottomRight => "to bottom right";
 };
 
-let axis_to_string =
+let direction_to_string =
   fun
   | `Angle(a) => Angle.toString(a)
   | `SideOrCorner(s) => SideOrCorner.toString(s);
 
 module Gradient = {
+  /* type nonrec t('colorOrVar) = [
+       | `linearGradient(
+           option([ | `Angle(Angle.t) | `SideOrCorner(SideOrCorner.t)]),
+           array(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
+         )
+       | `repeatingLinearGradient(
+           option([ | `Angle(Angle.t) | `SideOrCorner(SideOrCorner.t)]),
+           array(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
+         )
+       | `radialGradient(
+           array(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
+         )
+       | `repeatingRadialGradient(
+           array(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
+         )
+       | `conicGradient(
+           option([ | `Angle(Angle.t) | `SideOrCorner(SideOrCorner.t)]),
+           array(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
+         )
+     ]; */
   type nonrec t('colorOrVar) = [
     | `linearGradient(
-        option(Angle.t),
-        array(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
+        option([ | `Angle(Angle.t) | `SideOrCorner(SideOrCorner.t)]),
+        list(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
       )
     | `repeatingLinearGradient(
-        option(Angle.t),
-        array(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
+        option([ | `Angle(Angle.t) | `SideOrCorner(SideOrCorner.t)]),
+        list(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
       )
     | `radialGradient(
-        array(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
+        list(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
       )
     | `repeatingRadialGradient(
-        array(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
+        list(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
       )
     | `conicGradient(
-        option(Angle.t),
-        array(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
+        option([ | `Angle(Angle.t) | `SideOrCorner(SideOrCorner.t)]),
+        list(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
       )
   ];
 
@@ -1743,53 +1769,48 @@ module Gradient = {
     | #Var.t as va => Var.toString(va)
     };
 
-  let string_of_stops = stops =>
+  let string_of_stops =
+      (stops: list(([< Color.t | Var.t] as 'colorOrVar, option(Length.t)))) =>
     stops
-    ->(
-        Belt.Array.map(((c, l)) =>
-          switch (l) {
-          | None => string_of_color(c)
-          | Some(l) =>
-            (string_of_color(c) ++ {js| |js}) ++ Length.toString(l)
-          }
-        )
-      )
-    ->(Js.Array2.joinWith({js|, |js}));
+    |> List.map(((color, length)) =>
+         switch (length) {
+         | None => string_of_color(color)
+         | Some(length) =>
+           string_of_color(color) ++ " " ++ Length.toString(length)
+         }
+       )
+    |> String.concat(", ");
 
   let toString = x =>
     switch (x) {
     | `linearGradient(None, stops) =>
       ({js|linear-gradient(|js} ++ string_of_stops(stops)) ++ {js|)|js}
-    | `linearGradient(Some(angle), stops) =>
-      (
-        (({js|linear-gradient(|js} ++ Angle.toString(angle)) ++ {js|, |js})
-        ++ string_of_stops(stops)
-      )
+    | `linearGradient(Some(direction), stops) =>
+      ({js|linear-gradient(|js} ++ direction_to_string(direction))
+      ++ {js|, |js}
+      ++ string_of_stops(stops)
       ++ {js|)|js}
     | `repeatingLinearGradient(None, stops) =>
       ({js|repeating-linear-gradient(|js} ++ string_of_stops(stops))
       ++ {js|)|js}
-    | `repeatingLinearGradient(Some(angle), stops) =>
-      (
-        (
-          ({js|repeating-linear-gradient(|js} ++ Angle.toString(angle))
-          ++ {js|, |js}
-        )
-        ++ string_of_stops(stops)
-      )
+    | `repeatingLinearGradient(Some(direction), stops) =>
+      {js|repeating-linear-gradient(|js}
+      ++ direction_to_string(direction)
+      ++ {js|, |js}
+      ++ string_of_stops(stops)
       ++ {js|)|js}
     | `radialGradient(stops) =>
-      ({js|radial-gradient(|js} ++ string_of_stops(stops)) ++ {js|)|js}
+      {js|radial-gradient(|js} ++ string_of_stops(stops) ++ {js|)|js}
     | `repeatingRadialGradient(stops) =>
-      ({js|repeating-radial-gradient(|js} ++ string_of_stops(stops))
+      {js|repeating-radial-gradient(|js}
+      ++ string_of_stops(stops)
       ++ {js|)|js}
     | `conicGradient(None, stops) =>
       ({js|conic-gradient(from |js} ++ string_of_stops(stops)) ++ {js|)|js}
-    | `conicGradient(Some(angle), stops) =>
-      (
-        (({js|conic-gradient(from |js} ++ Angle.toString(angle)) ++ {js|, |js})
-        ++ string_of_stops(stops)
-      )
+    | `conicGradient(Some(direction), stops) =>
+      ({js|conic-gradient(from |js} ++ direction_to_string(direction))
+      ++ {js|, |js}
+      ++ string_of_stops(stops)
       ++ {js|)|js}
     };
 };

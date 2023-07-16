@@ -1851,20 +1851,43 @@ module OverflowWrap = struct
     | `anywhere -> {js|anywhere|js}
 end
 
+module SideOrCorner = struct
+  type t =
+    [ `Top
+    | `Left
+    | `Bottom
+    | `Right
+    | `TopLeft
+    | `TopRight
+    | `BottomLeft
+    | `BottomRight
+    ]
+
+  let toString = function
+    | `Top -> "to top"
+    | `Left -> "to left"
+    | `Bottom -> "to bottom"
+    | `Right -> "to right"
+    | `TopLeft -> "to top left"
+    | `TopRight -> "to top right"
+    | `BottomLeft -> "to bottom left"
+    | `BottomRight -> "to bottom right"
+end
+
 module Gradient = struct
   type nonrec 'colorOrVar t =
     [ `linearGradient of
-      [> `Angle of Angle.t | > `SideOrCorner of SideOrCorner.t ] option
+      [ `Angle of Angle.t | `SideOrCorner of SideOrCorner.t ] option
       * (([< Color.t | Var.t ] as 'colorOrVar) * Length.t option) array
     | `repeatingLinearGradient of
-      Angle.t option
+      [ `Angle of Angle.t | `SideOrCorner of SideOrCorner.t ] option
       * (([< Color.t | Var.t ] as 'colorOrVar) * Length.t option) array
     | `radialGradient of
       (([< Color.t | Var.t ] as 'colorOrVar) * Length.t option) array
     | `repeatingRadialGradient of
       (([< Color.t | Var.t ] as 'colorOrVar) * Length.t option) array
     | `conicGradient of
-      Angle.t option
+      [ `Angle of Angle.t | `SideOrCorner of SideOrCorner.t ] option
       * (([< Color.t | Var.t ] as 'colorOrVar) * Length.t option) array
     ]
 
@@ -1887,21 +1910,26 @@ module Gradient = struct
     |. Belt.Array.map (fun (c, l) ->
          match l with
          | None -> string_of_color c
-         | Some l -> (string_of_color c ^ {js| |js}) ^ Length.toString l)
+         | Some l -> string_of_color c ^ {js| |js} ^ Length.toString l)
     |. Js.Array2.joinWith {js|, |js}
+
+  let direction_to_string = function
+    | `Angle a -> Angle.toString a
+    | `SideOrCorner s -> SideOrCorner.toString s
 
   let toString x =
     match x with
     | `linearGradient (None, stops) ->
       ({js|linear-gradient(|js} ^ string_of_stops stops) ^ {js|)|js}
-    | `linearGradient (Some angle, stops) ->
-      ((({js|linear-gradient(|js} ^ Angle.toString angle) ^ {js|, |js})
+    | `linearGradient (Some direction, stops) ->
+      ((({js|linear-gradient(|js} ^ direction_to_string direction) ^ {js|, |js})
       ^ string_of_stops stops)
       ^ {js|)|js}
     | `repeatingLinearGradient (None, stops) ->
       ({js|repeating-linear-gradient(|js} ^ string_of_stops stops) ^ {js|)|js}
-    | `repeatingLinearGradient (Some angle, stops) ->
-      ((({js|repeating-linear-gradient(|js} ^ Angle.toString angle) ^ {js|, |js})
+    | `repeatingLinearGradient (Some direction, stops) ->
+      ((({js|repeating-linear-gradient(|js} ^ direction_to_string direction)
+       ^ {js|, |js})
       ^ string_of_stops stops)
       ^ {js|)|js}
     | `radialGradient stops ->
@@ -1910,8 +1938,9 @@ module Gradient = struct
       ({js|repeating-radial-gradient(|js} ^ string_of_stops stops) ^ {js|)|js}
     | `conicGradient (None, stops) ->
       ({js|conic-gradient(from |js} ^ string_of_stops stops) ^ {js|)|js}
-    | `conicGradient (Some angle, stops) ->
-      ((({js|conic-gradient(from |js} ^ Angle.toString angle) ^ {js|, |js})
+    | `conicGradient (Some direction, stops) ->
+      ((({js|conic-gradient(from |js} ^ direction_to_string direction)
+       ^ {js|, |js})
       ^ string_of_stops stops)
       ^ {js|)|js}
 end
@@ -2129,9 +2158,9 @@ module Counters = struct
     | `counters (name, separator, style) ->
       (match style with
       | `unset ->
-        ((({js|counters(|js} ^ name) ^ {js|,\"|js}) ^ separator) ^ {js|\")|js}
+        ((({js|counters(|js} ^ name) ^ {js|,"|js}) ^ separator) ^ {js|")|js}
       | #CounterStyleType.t as s ->
-        ((((({js|counters(|js} ^ name) ^ {js|,\"|js}) ^ separator) ^ {js|\",|js})
+        ((((({js|counters(|js} ^ name) ^ {js|,"|js}) ^ separator) ^ {js|",|js})
         ^ CounterStyleType.toString s)
         ^ {js|)|js})
 end
