@@ -1854,15 +1854,15 @@ end
 module Gradient = struct
   type nonrec 'colorOrVar t =
     [ `linearGradient of
-      Angle.t * (Length.t * ([< Color.t | Var.t ] as 'colorOrVar)) array
+      Angle.t * (([< Color.t | Var.t ] as 'colorOrVar) * Length.t option) array
     | `repeatingLinearGradient of
-      Angle.t * (Length.t * ([< Color.t | Var.t ] as 'colorOrVar)) array
+      Angle.t * (([< Color.t | Var.t ] as 'colorOrVar) * Length.t option) array
     | `radialGradient of
-      (Length.t * ([< Color.t | Var.t ] as 'colorOrVar)) array
+      (([< Color.t | Var.t ] as 'colorOrVar) * Length.t option) array
     | `repeatingRadialGradient of
-      (Length.t * ([< Color.t | Var.t ] as 'colorOrVar)) array
+      (([< Color.t | Var.t ] as 'colorOrVar) * Length.t option) array
     | `conicGradient of
-      Angle.t * (Length.t * ([< Color.t | Var.t ] as 'colorOrVar)) array
+      Angle.t * (([< Color.t | Var.t ] as 'colorOrVar) * Length.t option) array
     ]
 
   let linearGradient angle stops = `linearGradient (angle, stops)
@@ -1881,8 +1881,10 @@ module Gradient = struct
 
   let string_of_stops stops =
     stops
-    |. Belt.Array.map (fun (l, c) ->
-         (string_of_color c ^ {js| |js}) ^ Length.toString l)
+    |. Belt.Array.map (fun (c, l) ->
+         match l with
+         | None -> string_of_color c
+         | Some l -> (string_of_color c ^ {js| |js}) ^ Length.toString l)
     |. Js.Array2.joinWith {js|, |js}
 
   let toString x =

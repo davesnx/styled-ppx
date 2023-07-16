@@ -1066,22 +1066,25 @@ let render_color_stop_angle = (~loc, value: Types.color_stop_angle) => {
 
 let render_linear_color_stop = (~loc, value: Types.linear_color_stop) => {
   switch (value) {
-  /* bs-css don't have color-stop without length */
-  | (_color, None) => raise(Unsupported_feature)
+  | (color, None) =>
+    let color = render_color(~loc, color);
+    [%expr ([%e color], None)];
   | (color, Some(length)) =>
     let color = render_color(~loc, color);
     let length = render_color_stop_length(~loc, length);
-    [%expr ([%e color], [%e length])];
+    [%expr ([%e color], Some([%e length]))];
   };
 };
 
 let render_angular_color_stop = (~loc, value: Types.angular_color_stop) => {
   switch (value) {
-  | (color, None) => render_color(~loc, color)
+  | (color, None) =>
+    let color = render_color(~loc, color);
+    [%expr ([%e color], None)];
   | (color, Some(angle)) =>
     let color = render_color(~loc, color);
     let angle = render_color_stop_angle(~loc, angle);
-    [%expr ([%e color], [%e angle])];
+    [%expr ([%e color], Some([%e angle]))];
   };
 };
 
@@ -1092,11 +1095,11 @@ let render_color_stop_list = (~loc, value: Types.color_stop_list) => {
   let stops =
     first_stop
     |> List.append(middle_stops |> List.map(((_, stop)) => stop))
-    |> List.append([last_stop]);
+    |> List.append([last_stop])
+    |> List.rev;
 
   stops
   |> List.map(stop => render_linear_color_stop(~loc, stop))
-  |> List.append([render_linear_color_stop(~loc, last_stop)])
   |> Helper.Exp.array(~loc);
 };
 
