@@ -237,8 +237,9 @@ CssJs.unsafe({js|backgroundPositionY|js}, {js|top 20px|js});
 CssJs.unsafe({js|backgroundPositionY|js}, {js|bottom -50px|js});
 CssJs.unsafe({js|backgroundPositionY|js}, {js|top -50px|js});
 CssJs.unsafe({js|backgroundPositionY|js}, {js|bottom 20px|js});
-CssJs.backgroundImage(
-  `linearGradient((`deg(45.), [|CssJs.red, CssJs.red, CssJs.blue|])),
+CssJs.unsafe(
+  {js|backgroundImage|js},
+  {js|linear-gradient(45deg, blue, red)|js},
 );
 CssJs.backgroundImage(
   `linearGradient((
@@ -250,20 +251,17 @@ CssJs.backgroundImage(
     |],
   )),
 );
-CssJs.backgroundImage(
-  `linearGradient((
-    `deg(90.),
-    [|CssJs.red, CssJs.red, (CssJs.blue, `percent(10.))|],
-  )),
+CssJs.unsafe(
+  {js|backgroundImage|js},
+  {js|linear-gradient(90deg, blue 10%, red)|js},
 );
-CssJs.backgroundImage(
-  `linearGradient((`deg(45.), [|CssJs.black, CssJs.black, CssJs.white|])),
+CssJs.unsafe(
+  {js|backgroundImage|js},
+  {js|linear-gradient(45deg, white, black)|js},
 );
-CssJs.backgroundImage(
-  `linearGradient((
-    `deg(180.),
-    [|CssJs.black, CssJs.black, `hex({js|f06|js}), CssJs.white|],
-  )),
+CssJs.unsafe(
+  {js|backgroundImage|js},
+  {js|linear-gradient(white, #f06, black)|js},
 );
 CssJs.boxSizing(`borderBox);
 CssJs.boxSizing(`contentBox);

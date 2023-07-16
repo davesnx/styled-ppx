@@ -1709,11 +1709,11 @@ let axis_to_string =
 module Gradient = {
   type t('colorOrVar) = [
     | `linearGradient(
-        option([ | `Angle(Angle.t) | `SideOrCorner(SideOrCorner.t)]),
+        Angle.t,
         list((Length.t, [< Color.t | Var.t] as 'colorOrVar)),
       )
     | `repeatingLinearGradient(
-        option([ | `Angle(Angle.t) | `SideOrCorner(SideOrCorner.t)]),
+        Angle.t,
         list((Length.t, [< Color.t | Var.t] as 'colorOrVar)),
       )
     | `radialGradient(list((Length.t, [< Color.t | Var.t] as 'colorOrVar)))
