@@ -1937,10 +1937,9 @@ module Gradient = struct
     | `repeatingRadialGradient stops ->
       ({js|repeating-radial-gradient(|js} ^ string_of_stops stops) ^ {js|)|js}
     | `conicGradient (None, stops) ->
-      ({js|conic-gradient(from |js} ^ string_of_stops stops) ^ {js|)|js}
+      ({js|conic-gradient(|js} ^ string_of_stops stops) ^ {js|)|js}
     | `conicGradient (Some direction, stops) ->
-      ((({js|conic-gradient(from |js} ^ direction_to_string direction)
-       ^ {js|, |js})
+      ((({js|conic-gradient(|js} ^ direction_to_string direction) ^ {js|, |js})
       ^ string_of_stops stops)
       ^ {js|)|js}
 end
