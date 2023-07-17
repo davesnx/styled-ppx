@@ -1132,11 +1132,13 @@ let render_angular_color_stop_list =
     rest_of_stops
     |> List.map(stop => {
          switch (stop) {
-         | (stop, None) => render_angular_color_stop(~loc, stop)
+         | (stop, None) =>
+           let stop = render_angular_color_stop(~loc, stop);
+           [%expr ([%e stop], None)];
          | (stop, Some(((), color_hint: Types.angular_color_hint))) =>
            let stop = render_angular_color_stop(~loc, stop);
            let color_hint = render_angular_color_hint(~loc, color_hint);
-           [%expr ([%e stop], [%e color_hint])];
+           [%expr ([%e stop], Some([%e color_hint]))];
          }
        })
     |> List.append([render_angular_color_stop(~loc, last_stops)]);

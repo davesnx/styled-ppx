@@ -1713,26 +1713,6 @@ let direction_to_string =
   | `SideOrCorner(s) => SideOrCorner.toString(s);
 
 module Gradient = {
-  /* type nonrec t('colorOrVar) = [
-       | `linearGradient(
-           option([ | `Angle(Angle.t) | `SideOrCorner(SideOrCorner.t)]),
-           array(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
-         )
-       | `repeatingLinearGradient(
-           option([ | `Angle(Angle.t) | `SideOrCorner(SideOrCorner.t)]),
-           array(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
-         )
-       | `radialGradient(
-           array(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
-         )
-       | `repeatingRadialGradient(
-           array(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
-         )
-       | `conicGradient(
-           option([ | `Angle(Angle.t) | `SideOrCorner(SideOrCorner.t)]),
-           array(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
-         )
-     ]; */
   type nonrec t('colorOrVar) = [
     | `linearGradient(
         option([ | `Angle(Angle.t) | `SideOrCorner(SideOrCorner.t)]),
