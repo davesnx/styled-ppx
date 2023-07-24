@@ -976,6 +976,22 @@ module LineHeight = struct
     match x with `normal -> {js|normal|js} | `abs x -> Js.Float.toString x
 end
 
+module LineWidth = struct
+  type nonrec t =
+    [ Length.t
+    | `thin
+    | `medium
+    | `thick
+    ]
+
+  let toString x =
+    match x with
+    | `thin -> {js|thin|js}
+    | `medium -> {js|medium|js}
+    | `thick -> {js|thick|js}
+    | #Length.t as l -> Length.toString l
+end
+
 module WordSpacing = struct
   type nonrec t = [ `normal ]
 

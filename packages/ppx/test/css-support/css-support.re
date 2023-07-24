@@ -174,6 +174,11 @@
 [%css {|box-shadow: 1px 2px 3px 4px black|}];
 [%css {|box-shadow: inset 1px 2px 3px 4px black|}];
 [%css {|box-shadow: inset 1px 2px 3px 4px black, 1px 2px 3px 4px black|}];
+[%css
+  {|box-shadow: -1px 1px 0px 0px $(Color.Shadow.elevation1),
+            1px 1px 0px 0px $(Color.Shadow.elevation1),
+            0px -1px 0px 0px $(Color.Shadow.elevation1);|}
+];
 
 /* CSS Backgrounds and Borders Module Level 4 */
 [%css {|background-position-x: right|}];
@@ -3225,3 +3230,7 @@
 [%css {|animation-duration: 150ms|}];
 
 /* [%css {|top: calc(50% + var(--value-from-var));|}]; */
+
+[%css {|border-width: thin|}];
+[%css {|outline-width: medium|}];
+[%css {|outline: medium solid red|}];

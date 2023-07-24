@@ -372,7 +372,7 @@ let borderBottomLeftRadius x =
 let borderBottomRightRadius x =
   D ({js|borderBottomRightRadius|js}, Length.toString x)
 
-let borderBottomWidth x = D ({js|borderBottomWidth|js}, Length.toString x)
+let borderBottomWidth x = D ({js|borderBottomWidth|js}, LineWidth.toString x)
 
 let borderCollapse x =
   D
@@ -384,7 +384,7 @@ let borderCollapse x =
 
 let borderColor x = D ({js|borderColor|js}, string_of_color x)
 let borderLeftColor x = D ({js|borderLeftColor|js}, string_of_color x)
-let borderLeftWidth x = D ({js|borderLeftWidth|js}, Length.toString x)
+let borderLeftWidth x = D ({js|borderLeftWidth|js}, LineWidth.toString x)
 let borderSpacing x = D ({js|borderSpacing|js}, Length.toString x)
 let borderRadius x = D ({js|borderRadius|js}, Length.toString x)
 
@@ -400,12 +400,12 @@ let borderRadius4 ~topLeft ~topRight ~bottomLeft ~bottomRight =
       ^ Length.toString bottomRight )
 
 let borderRightColor x = D ({js|borderRightColor|js}, string_of_color x)
-let borderRightWidth x = D ({js|borderRightWidth|js}, Length.toString x)
+let borderRightWidth x = D ({js|borderRightWidth|js}, LineWidth.toString x)
 let borderTopColor x = D ({js|borderTopColor|js}, string_of_color x)
 let borderTopLeftRadius x = D ({js|borderTopLeftRadius|js}, Length.toString x)
 let borderTopRightRadius x = D ({js|borderTopRightRadius|js}, Length.toString x)
-let borderTopWidth x = D ({js|borderTopWidth|js}, Length.toString x)
-let borderWidth x = D ({js|borderWidth|js}, Length.toString x)
+let borderTopWidth x = D ({js|borderTopWidth|js}, LineWidth.toString x)
+let borderWidth x = D ({js|borderWidth|js}, LineWidth.toString x)
 let bottom x = D ({js|bottom|js}, string_of_position x)
 
 let boxSizing x =
@@ -800,7 +800,7 @@ let opacity x = D ({js|opacity|js}, Js.Float.toString x)
 let outline size style color =
   D
     ( {js|outline|js},
-      Length.toString size
+      LineWidth.toString size
       ^ {js| |js}
       ^ OutlineStyle.toString style
       ^ {js| |js}
@@ -809,7 +809,7 @@ let outline size style color =
 let outlineColor x = D ({js|outlineColor|js}, string_of_color x)
 let outlineOffset x = D ({js|outlineOffset|js}, Length.toString x)
 let outlineStyle x = D ({js|outlineStyle|js}, OutlineStyle.toString x)
-let outlineWidth x = D ({js|outlineWidth|js}, Length.toString x)
+let outlineWidth x = D ({js|outlineWidth|js}, LineWidth.toString x)
 let overflow x = D ({js|overflow|js}, Overflow.toString x)
 let overflowX x = D ({js|overflowX|js}, Overflow.toString x)
 let overflowY x = D ({js|overflowY|js}, Overflow.toString x)
@@ -1750,7 +1750,7 @@ let string_of_borderstyle x =
 let border px style color =
   D
     ( {js|border|js},
-      (((Length.toString px ^ {js| |js}) ^ string_of_borderstyle style)
+      (((LineWidth.toString px ^ {js| |js}) ^ string_of_borderstyle style)
       ^ {js| |js})
       ^ string_of_color color )
 
@@ -1759,7 +1759,7 @@ let borderStyle x = D ({js|borderStyle|js}, string_of_borderstyle x)
 let borderLeft px style color =
   D
     ( {js|borderLeft|js},
-      (((Length.toString px ^ {js| |js}) ^ string_of_borderstyle style)
+      (((LineWidth.toString px ^ {js| |js}) ^ string_of_borderstyle style)
       ^ {js| |js})
       ^ string_of_color color )
 
@@ -1768,7 +1768,7 @@ let borderLeftStyle x = D ({js|borderLeftStyle|js}, string_of_borderstyle x)
 let borderRight px style color =
   D
     ( {js|borderRight|js},
-      (((Length.toString px ^ {js| |js}) ^ string_of_borderstyle style)
+      (((LineWidth.toString px ^ {js| |js}) ^ string_of_borderstyle style)
       ^ {js| |js})
       ^ string_of_color color )
 
@@ -1777,7 +1777,7 @@ let borderRightStyle x = D ({js|borderRightStyle|js}, string_of_borderstyle x)
 let borderTop px style color =
   D
     ( {js|borderTop|js},
-      (((Length.toString px ^ {js| |js}) ^ string_of_borderstyle style)
+      (((LineWidth.toString px ^ {js| |js}) ^ string_of_borderstyle style)
       ^ {js| |js})
       ^ string_of_color color )
 
@@ -1786,7 +1786,7 @@ let borderTopStyle x = D ({js|borderTopStyle|js}, string_of_borderstyle x)
 let borderBottom px style color =
   D
     ( {js|borderBottom|js},
-      (((Length.toString px ^ {js| |js}) ^ string_of_borderstyle style)
+      (((LineWidth.toString px ^ {js| |js}) ^ string_of_borderstyle style)
       ^ {js| |js})
       ^ string_of_color color )
 

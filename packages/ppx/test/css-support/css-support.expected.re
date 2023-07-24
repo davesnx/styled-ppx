@@ -200,6 +200,29 @@ CssJs.boxShadows([|
     CssJs.black,
   ),
 |]);
+CssJs.boxShadows([|
+  CssJs.Shadow.box(
+    ~x=`pxFloat(-1.),
+    ~y=`pxFloat(1.),
+    ~blur=`pxFloat(0.),
+    ~spread=`pxFloat(0.),
+    Color.Shadow.elevation1,
+  ),
+  CssJs.Shadow.box(
+    ~x=`pxFloat(1.),
+    ~y=`pxFloat(1.),
+    ~blur=`pxFloat(0.),
+    ~spread=`pxFloat(0.),
+    Color.Shadow.elevation1,
+  ),
+  CssJs.Shadow.box(
+    ~x=`pxFloat(0.),
+    ~y=`pxFloat(-1.),
+    ~blur=`pxFloat(0.),
+    ~spread=`pxFloat(0.),
+    Color.Shadow.elevation1,
+  ),
+|]);
 CssJs.unsafe({js|backgroundPositionX|js}, {js|right|js});
 CssJs.unsafe({js|backgroundPositionX|js}, {js|center|js});
 CssJs.unsafe({js|backgroundPositionX|js}, {js|50%|js});
@@ -1907,3 +1930,6 @@ CssJs.unsafe({js|width|js}, {js|fit-content|js});
 CssJs.width(`maxContent);
 CssJs.transitionDelay(240);
 CssJs.animationDuration(150);
+CssJs.borderWidth(`thin);
+CssJs.outlineWidth(`medium);
+CssJs.outline(`medium, `solid, CssJs.red);

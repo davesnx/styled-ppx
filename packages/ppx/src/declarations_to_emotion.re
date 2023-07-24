@@ -21,7 +21,7 @@ let txt = (~loc, txt) => {Location.loc, txt};
 let (let.ok) = Result.bind;
 
 /* TODO: Separate unsupported_feature from bs-css doesn't support or can't interpolate on those */
-/* TODO: Add payload on those exception, maybe move to Result. */
+/* TODO: Add payload on those exceptions */
 exception Unsupported_feature;
 
 let id = Fun.id;
@@ -1574,11 +1574,13 @@ let border_style =
     variant_to_expression,
   );
 
-let render_line_width = (~loc) =>
-  fun
+let render_line_width = (~loc, value: Types.line_width) =>
+  switch (value) {
   | `Extended_length(l) => render_extended_length(~loc, l)
-  /* Missing `Medium, `Thick, `Thin on the bs-css bindings */
-  | _ => raise(Unsupported_feature);
+  | `Thick => [%expr `thick]
+  | `Medium => [%expr `medium]
+  | `Thin => [%expr `thin]
+  };
 
 let border_top_width =
   apply(
