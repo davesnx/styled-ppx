@@ -3,13 +3,13 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "build": "rescript build",
-    "watch": "rescript build -w",
+    "build": "rescript build -with-deps",
+    "watch": "rescript build -with-deps -w",
     "clean": "rescript clean",
-    "test_watch": "concurrently 'yarn watch' 'vitest'",
-    "pretest": "yarn build",
+    "test_watch": "concurrently 'npm run watch' 'vitest'",
+    "pretest": "npm run build",
     "test": "vitest --run --silent",
-    "start": "yarn test"
+    "start": "npm run test"
   },
   "dependencies": {
     "@rescript/react": "^0.10.0",
