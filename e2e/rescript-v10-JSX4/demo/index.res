@@ -1,3 +1,9 @@
+let a = [
+  %css(`border-width: thin`),
+  %css(`outline-width: medium`),
+  %css(`outline: medium solid red`),
+]
+
 module DynamicComponent = {
   type props<'var> = {
     innerRef?: ReactDOM.domRef,
