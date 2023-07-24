@@ -667,13 +667,6 @@ let properties_static_css_tests = [
     Css.backgroundImage(`url({js|img_tree.gif|js})),
     [%expr CssJs.backgroundImage(`url({js|img_tree.gif|js}))],
   ),
-  /* Mult isn't available in bs-css */
-  /* (
-       [%css "width: calc(100px * 3)"],
-       [%expr [%css "width: calc(100px * 3)"]],
-       Css.width(`calc(`mult, `px(100.), `number(3.))),
-       [%expr CssJs.width(`calc(`mult, `px(100.), `number(3.)))]
-     ), */
   /* (
        [%css "flex: 1 2 content"],
        [%expr [%css "flex: 1 2 content"]],
