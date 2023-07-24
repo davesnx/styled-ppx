@@ -1,3 +1,7 @@
 {
-  "name": "bs-css"
+  "name": "bs-css",
+  "dependencies": {
+    "bs-css": "file:../packages/bs-css",
+    "bs-platform": "^9.0.2"
+  }
 }

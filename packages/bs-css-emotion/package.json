@@ -1,3 +1,7 @@
 {
-  "name": "bs-css-emotion"
+  "name": "bs-css-emotion",
+  "dependencies": {
+    "@emotion/css": "^11.11.2",
+    "bs-platform": "^9.0.2"
+  }
 }
