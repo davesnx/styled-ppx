@@ -1569,24 +1569,7 @@ type nonrec gridLength =
 let gridLengthToJs x =
   match x with
   | `auto -> {js|auto|js}
-  | `calc (`add, a, b) ->
-    {js|calc(|js}
-    ^ Length.toString a
-    ^ {js| + |js}
-    ^ Length.toString b
-    ^ {js|)|js}
-  | `calc (`sub, a, b) ->
-    {js|calc(|js}
-    ^ Length.toString a
-    ^ {js| - |js}
-    ^ Length.toString b
-    ^ {js|)|js}
-  | `calc (`mult, a, b) ->
-    {js|calc(|js}
-    ^ Length.toString a
-    ^ {js| * |js}
-    ^ Length.toString b
-    ^ {js|)|js}
+  | `calc c -> string_of_calc c Length.toString
   | `ch x -> Js.Float.toString x ^ {js|ch|js}
   | `cm x -> Js.Float.toString x ^ {js|cm|js}
   | `em x -> Js.Float.toString x ^ {js|em|js}
