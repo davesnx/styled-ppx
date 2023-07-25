@@ -2903,9 +2903,29 @@ let render_content_position = (~loc, value: Types.content_position) => {
   };
 };
 
+let render_self_position = (~loc, value: Types.self_position) => {
+  switch (value) {
+  | `Center => [%expr `center]
+  | `Start => [%expr `start]
+  | `End => [%expr `end_]
+  | `Flex_start => [%expr `flexStart]
+  | `Flex_end => [%expr `flexEnd]
+  | `Self_start => [%expr `selfStart]
+  | `Self_end => [%expr `selfEnd]
+  };
+};
+
 let render_content_position_left_right = (~loc, value) => {
   switch (value) {
   | `Content_position(position) => render_content_position(~loc, position)
+  | `Left => [%expr `left]
+  | `Right => [%expr `right]
+  };
+};
+
+let render_self_position_left_right = (~loc, value) => {
+  switch (value) {
+  | `Self_position(position) => render_self_position(~loc, position)
   | `Left => [%expr `left]
   | `Right => [%expr `right]
   };
@@ -2938,9 +2958,14 @@ let justify_content =
     },
   );
 
-/* and property_justify_items = [%value.rec
-     "'normal' | 'stretch' | <baseline-position> | [ <overflow-position> ]? [ <self-position> | 'left' | 'right' ] | 'legacy' | 'legacy' && [ 'left' | 'right' | 'center' ]"
-   ] */
+let render_legacy_alignment = (~loc, value) => {
+  switch (value) {
+  | `Left => [%expr `legacyLeft]
+  | `Right => [%expr `legacyRight]
+  | `Center => [%expr `legacyCenter]
+  };
+};
+
 let justify_items =
   apply(
     Parser.property_justify_items,
@@ -2949,10 +2974,17 @@ let justify_items =
       switch (value) {
       | `Normal => [%expr `normal]
       | `Stretch => [%expr `stretch]
-      | `Static(_, _)
-      | `Legacy
-      | `Baseline_position(_, ())
-      | `And(_) => raise(Unsupported_feature)
+      | `Legacy => [%expr `legacy]
+      | `And(_, alignment) => render_legacy_alignment(~loc, alignment)
+      | `Static(None, position) =>
+        [%expr [%e render_self_position_left_right(~loc, position)]]
+      | `Static(Some(`Safe), position) =>
+        [%expr `safe([%e render_self_position_left_right(~loc, position)])]
+      | `Static(Some(`Unsafe), position) =>
+        [%expr `unsafe([%e render_self_position_left_right(~loc, position)])]
+      | `Baseline_position(None, ()) => [%expr `baseline]
+      | `Baseline_position(Some(`First), ()) => [%expr `firstBaseline]
+      | `Baseline_position(Some(`Last), ()) => [%expr `lastBaseline]
       }
     },
   );
