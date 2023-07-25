@@ -2888,10 +2888,75 @@ let flex =
   );
 
 // TODO: justify_content, align_items, align_self, align_content are only for flex, missing the css-align-3 at parser
+/* let justify_content =
+   unsupportedValue(Parser.property_justify_content, (~loc) =>
+     [%expr CssJs.justifyContent]
+   ); */
+
+let render_content_position = (~loc, value: Types.content_position) => {
+  switch (value) {
+  | `Center => [%expr `center]
+  | `Start => [%expr `start]
+  | `End => [%expr `end_]
+  | `Flex_start => [%expr `flexStart]
+  | `Flex_end => [%expr `flexEnd]
+  };
+};
+
+let render_content_position_left_right = (~loc, value) => {
+  switch (value) {
+  | `Content_position(position) => render_content_position(~loc, position)
+  | `Left => [%expr `left]
+  | `Right => [%expr `right]
+  };
+};
+
+let render_content_distribution = (~loc) =>
+  fun
+  | `Space_between => [%expr `spaceBetween]
+  | `Space_around => [%expr `spaceAround]
+  | `Space_evenly => [%expr `spaceEvenly]
+  | `Stretch => [%expr `stretch];
+
 let justify_content =
-  unsupportedValue(Parser.property_justify_content, (~loc) =>
-    [%expr CssJs.justifyContent]
+  apply(
+    Parser.property_justify_content,
+    (~loc) => [%expr CssJs.justifyContent],
+    (~loc, value) => {
+      switch (value) {
+      | `Normal => [%expr `normal]
+      | `Content_distribution(distribution) =>
+        render_content_distribution(~loc, distribution)
+      | `Static(None, position) =>
+        [%expr [%e render_content_position_left_right(~loc, position)]]
+      | `Static(Some(`Safe), position) =>
+        [%expr `safe([%e render_content_position_left_right(~loc, position)])]
+      | `Static(Some(`Unsafe), position) =>
+        [%expr
+         `unsafe([%e render_content_position_left_right(~loc, position)])]
+      }
+    },
   );
+
+/* and property_justify_items = [%value.rec
+     "'normal' | 'stretch' | <baseline-position> | [ <overflow-position> ]? [ <self-position> | 'left' | 'right' ] | 'legacy' | 'legacy' && [ 'left' | 'right' | 'center' ]"
+   ] */
+let justify_items =
+  apply(
+    Parser.property_justify_items,
+    (~loc) => [%expr CssJs.justifyItems],
+    (~loc, value) => {
+      switch (value) {
+      | `Normal => [%expr `normal]
+      | `Stretch => [%expr `stretch]
+      | `Static(_, _)
+      | `Legacy
+      | `Baseline_position(_, ())
+      | `And(_) => raise(Unsupported_feature)
+      }
+    },
+  );
+
 let align_items =
   unsupportedValue(Parser.property_align_items, (~loc) =>
     [%expr CssJs.alignItems]
@@ -3348,6 +3413,7 @@ let properties = [
   ("flex-basis", found(flex_basis)),
   ("flex", found(flex)),
   ("justify-content", found(justify_content)),
+  ("justify-items", found(justify_items)),
   ("align-items", found(align_items)),
   ("align-self", found(align_self)),
   ("align-content", found(align_content)),

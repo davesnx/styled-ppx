@@ -633,6 +633,7 @@ let justifyContent x =
       | #PositionalAlignment.t as pa -> PositionalAlignment.toString pa
       | #NormalAlignment.t as na -> NormalAlignment.toString na
       | #DistributedAlignment.t as da -> DistributedAlignment.toString da
+      | #OverflowAlignment.t as oa -> OverflowAlignment.toString oa
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
