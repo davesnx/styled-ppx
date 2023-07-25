@@ -388,13 +388,47 @@ let display = x =>
     },
   );
 
-let flex = x =>
+let flex = (grow, shrink, basis) =>
   Declaration(
-    "flex",
+    {js|flex|js},
+    Js.Float.toString(grow)
+    ++ {js| |js}
+    ++ Js.Float.toString(shrink)
+    ++ {js| |js}
+    ++ (
+      switch (basis) {
+      | #FlexBasis.t as b => FlexBasis.toString(b)
+      | #Length.t as l => Length.toString(l)
+      }
+    ),
+  );
+
+let flex1 = x =>
+  Declaration(
+    {js|flex|js},
     switch (x) {
     | #Flex.t as f => Flex.toString(f)
     | `num(n) => Js.Float.toString(n)
     },
+  );
+
+let flex2 = (~basis=?, ~shrink=?, grow) =>
+  Declaration(
+    {js|flex|js},
+    Js.Float.toString(grow)
+    ++ (
+      switch (shrink) {
+      | Some(s) => {js| |js} ++ Js.Float.toString(s)
+      | None => {js||js}
+      }
+    )
+    ++ (
+      switch (basis) {
+      | Some(#FlexBasis.t as b) => {js| |js} ++ FlexBasis.toString(b)
+      | Some(#Length.t as l) => {js| |js} ++ Length.toString(l)
+      | None => {js||js}
+      }
+    ),
   );
 
 let flexDirection = x =>

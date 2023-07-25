@@ -603,8 +603,8 @@ let properties_static_css_tests = [
   (
     [%css "flex: none"],
     [%expr [%css "flex: none"]],
-    Css.flex(`none),
-    [%expr CssJs.flex(`none)],
+    Css.flex1(`none),
+    [%expr CssJs.flex1(`none)],
   ),
   /* Since calc(x) -> x */
   (
@@ -667,12 +667,12 @@ let properties_static_css_tests = [
     Css.backgroundImage(`url({js|img_tree.gif|js})),
     [%expr CssJs.backgroundImage(`url({js|img_tree.gif|js}))],
   ),
-  /* (
-       [%css "flex: 1 2 content"],
-       [%expr [%css "flex: 1 2 content"]],
-       Css.flexGrow(1.), Css.flexShrink(2.), Css.flexBasis(`content)|],,
-       [%expr CssJs.flexGrow(1.), Css.flexShrink(2.), Css.flexBasis(`content)|],],
-     ), */
+  (
+    [%css "flex: 1 2 content"],
+    [%expr [%css "flex: 1 2 content"]],
+    Css.flex(1., 2., `content),
+    [%expr Css.flex3(1., 2., `content)],
+  ),
   // unsupported
   /* (
        [%css "align-items: center"],
