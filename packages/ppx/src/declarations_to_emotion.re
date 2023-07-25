@@ -2830,23 +2830,31 @@ let order =
     (~loc) => [%expr CssJs.order],
     render_integer,
   );
+let render_number_interp = (~loc, value) => {
+  switch (value) {
+  | `Number(n) => [%expr [%e render_number(~loc, n)]]
+  | `Interpolation(v) => render_variable(~loc, v)
+  };
+};
+
 let flex_grow =
   apply(
     Parser.property_flex_grow,
     (~loc) => [%expr CssJs.flexGrow],
-    render_number,
+    render_number_interp,
   );
 let flex_shrink =
   apply(
     Parser.property_flex_shrink,
     (~loc) => [%expr CssJs.flexShrink],
-    render_number,
+    render_number_interp,
   );
 
 let render_flex_basis = (~loc) =>
   fun
   | `Content => variant_to_expression(~loc, `Content)
-  | `Property_width(value_width) => render_size(~loc, value_width);
+  | `Property_width(value_width) => render_size(~loc, value_width)
+  | `Interpolation(v) => render_variable(~loc, v);
 
 let flex_basis =
   apply(
@@ -2855,36 +2863,6 @@ let flex_basis =
     render_flex_basis,
   );
 
-// TODO: this is incomplete
-/* let flex =
-   emit(
-     Parser.property_flex,
-     (~loc as _) => id,
-     (~loc) =>
-       fun
-       | `None => [[%expr CssJs.flex(`none)]]
-       | `Or(grow_shrink, basis) => {
-           let grow_shrink =
-             switch (grow_shrink) {
-             | None => []
-             | Some((grow, shrink)) =>
-               List.concat([
-                 flex_grow.ast_to_expr(~loc, `Value(grow)),
-                 Option.map(
-                   ast => flex_shrink.ast_to_expr(~loc, `Value(ast)),
-                   shrink,
-                 )
-                 |> Option.value(~default=[]),
-               ])
-             };
-           let basis =
-             switch (basis) {
-             | None => []
-             | Some(basis) => flex_basis.ast_to_expr(~loc, `Value(basis))
-             };
-           List.concat([grow_shrink, basis]);
-         },
-   ); */
 let flex =
   emit(
     Parser.property_flex,
@@ -2892,15 +2870,18 @@ let flex =
     (~loc, value) =>
       switch (value) {
       | `None => [[%expr CssJs.flex1(`none)]]
+      | `Interpolation(interp) => [
+          [%expr CssJs.flex1([%e render_variable(~loc, interp)])],
+        ]
       | `Or(None, None) => [[%expr CssJs.flex1(`none)]]
       | `Or(Some((grow, None)), None) => [
-          [%expr CssJs.flex1(`num([%e render_number(~loc, grow)]))],
+          [%expr CssJs.flex1([%e render_number_interp(~loc, grow)])],
         ]
       | `Or(Some((grow, Some(shrink))), None) => [
           [%expr
             CssJs.flex2(
-              ~shrink=[%e render_number(~loc, shrink)],
-              [%e render_number(~loc, grow)],
+              ~shrink=[%e render_number_interp(~loc, shrink)],
+              [%e render_number_interp(~loc, grow)],
             )
           ],
         ]
@@ -2908,21 +2889,21 @@ let flex =
           [%expr
             CssJs.flex2(
               ~basis=[%e render_flex_basis(~loc, basis)],
-              [%e render_number(~loc, grow)],
+              [%e render_number_interp(~loc, grow)],
             )
           ],
-        ]
-      | `Or(None, Some(basis)) => [
-          [%expr CssJs.flexBasis([%e render_flex_basis(~loc, basis)])],
         ]
       | `Or(Some((grow, Some(shrink))), Some(basis)) => [
           [%expr
             CssJs.flex(
-              [%e render_number(~loc, grow)],
-              [%e render_number(~loc, shrink)],
+              [%e render_number_interp(~loc, grow)],
+              [%e render_number_interp(~loc, shrink)],
               [%e render_flex_basis(~loc, basis)],
             )
           ],
+        ]
+      | `Or(None, Some(basis)) => [
+          [%expr CssJs.flexBasics([%e render_flex_basis(~loc, basis)])],
         ]
       },
   );

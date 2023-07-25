@@ -1542,6 +1542,7 @@
 [%css {|flex: 2;|}];
 [%css {|flex: 10em;|}];
 [%css {|flex: 30%;|}];
+[%css {|flex: $(X.value);|}];
 [%css {|flex: min-content;|}];
 [%css {|flex: 1 30px;|}];
 [%css {|flex: 2 2;|}];

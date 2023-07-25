@@ -1033,15 +1033,17 @@ and property_filter = [%value.rec
   "'none' | <filter-function-list> | <-ms-filter-function-list>"
 ]
 and property_flex = [%value.rec
-  "'none' | <'flex-grow'> [ <'flex-shrink'> ]? || <'flex-basis'>"
+  "'none' | [<'flex-grow'> [ <'flex-shrink'> ]? || <'flex-basis'>] | <interpolation>"
 ]
-and property_flex_basis = [%value.rec "'content' | <'width'>"]
+and property_flex_basis = [%value.rec
+  "'content' | <'width'> | <interpolation>"
+]
 and property_flex_direction = [%value.rec
   "'row' | 'row-reverse' | 'column' | 'column-reverse'"
 ]
 and property_flex_flow = [%value.rec "<'flex-direction'> || <'flex-wrap'>"]
-and property_flex_grow = [%value.rec "<number>"]
-and property_flex_shrink = [%value.rec "<number>"]
+and property_flex_grow = [%value.rec "<number> | <interpolation>"]
+and property_flex_shrink = [%value.rec "<number> | <interpolation>"]
 and property_flex_wrap = [%value.rec "'nowrap' | 'wrap' | 'wrap-reverse'"]
 and property_float = [%value.rec
   "'left' | 'right' | 'none' | 'inline-start' | 'inline-end'"
