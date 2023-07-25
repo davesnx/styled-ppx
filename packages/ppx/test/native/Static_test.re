@@ -671,7 +671,7 @@ let properties_static_css_tests = [
     [%css "flex: 1 2 content"],
     [%expr [%css "flex: 1 2 content"]],
     Css.flex(1., 2., `content),
-    [%expr Css.flex3(1., 2., `content)],
+    [%expr CssJs.flex(1., 2., `content)],
   ),
   // unsupported
   /* (

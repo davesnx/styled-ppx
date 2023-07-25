@@ -1542,11 +1542,13 @@
 [%css {|flex: 2;|}];
 [%css {|flex: 10em;|}];
 [%css {|flex: 30%;|}];
-[%css {|flex: $(X.value);|}];
 [%css {|flex: min-content;|}];
 [%css {|flex: 1 30px;|}];
 [%css {|flex: 2 2;|}];
 [%css {|flex: 2 2 10%;|}];
+[%css {|flex: $(X.value);|}];
+[%css {|flex: $(X.value) $(X.value);|}];
+[%css {|flex: $(X.value) $(X.value) $(X.value);|}];
 [%css {|flex-basis: auto|}];
 [%css {|flex-basis: content|}];
 [%css {|flex-basis: 1px|}];
