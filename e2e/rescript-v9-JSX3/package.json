@@ -12,6 +12,7 @@
     "start": "npm run test"
   },
   "dependencies": {
+    "@emotion/css": "^11.11.2",
     "@rescript/react": "^0.10.0",
     "@rescriptbr/react-testing-library": "^1.0.1",
     "bs-css": "file:../../packages/bs-css",
