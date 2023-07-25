@@ -966,7 +966,7 @@
       CssJs.style(. [|
         CssJs.label("ArrayStatic"),
         CssJs.display(`flex),
-        CssJs.unsafe({js|justifyContent|js}, {js|center|js}),
+        CssJs.justifyContent(`center),
       |]);
     let make = (props: makeProps) => {
       let className = styles ++ getOrEmpty(classNameGet(props));
