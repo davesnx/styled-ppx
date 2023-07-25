@@ -1281,11 +1281,18 @@ and property_media_display_mode = [%value.rec
   "'fullscreen' | 'standalone' | 'minimal-ui' | 'browser'"
 ]
 and property_media_forced_colors = [%value.rec "'none' | 'active'"]
+and property_forced_color_adjust = [%value.rec
+  "'auto' | 'none' | 'preserve-parent-color'"
+]
 and property_media_grid = [%value.rec "<integer>"]
 and property_media_hover = [%value.rec "'hover' | 'none'"]
 and property_media_inverted_colors = [%value.rec "'inverted' | 'none'"]
 and property_media_monochrome = [%value.rec "<integer>"]
 and property_media_prefers_color_scheme = [%value.rec "'dark' | 'light'"]
+and property_color_scheme = [%value.rec
+  "'normal' |
+  [ 'dark' | 'light' | <custom-ident> ]+ && 'only'?"
+]
 and property_media_prefers_contrast = [%value.rec
   "'no-preference' | 'more' | 'less'"
 ]
@@ -2656,6 +2663,7 @@ let check_map =
       ("property-clip-rule", check(property_clip_rule)),
       ("property-color", check(property_color)),
       ("property-color-adjust", check(property_color_adjust)),
+      ("property-color-scheme", check(property_color_scheme)),
       ("property-column-count", check(property_column_count)),
       ("property-column-fill", check(property_column_fill)),
       ("property-column-gap", check(property_column_gap)),
@@ -2897,6 +2905,7 @@ let check_map =
       ("property-min-color-index", check(property_media_min_color_index)),
       ("property-display-mode", check(property_media_display_mode)),
       ("property-forced-colors", check(property_media_forced_colors)),
+      ("property-forced-color-adjust", check(property_forced_color_adjust)),
       ("property-grid", check(property_media_grid)),
       ("property-hover", check(property_media_hover)),
       ("property-inverted-colors", check(property_media_inverted_colors)),

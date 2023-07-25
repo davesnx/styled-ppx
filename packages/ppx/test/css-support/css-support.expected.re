@@ -366,6 +366,13 @@ CssJs.textOverflow(`ellipsis);
 CssJs.textOverflow(`string({js|foo|js}));
 CssJs.unsafe({js|textOverflow|js}, {js|clip clip|js});
 CssJs.unsafe({js|textOverflow|js}, {js|ellipsis clip|js});
+CssJs.unsafe({js|textOverflow|js}, {js|'foo' clip|js});
+CssJs.unsafe({js|textOverflow|js}, {js|clip ellipsis|js});
+CssJs.unsafe({js|textOverflow|js}, {js|ellipsis ellipsis|js});
+CssJs.unsafe({js|textOverflow|js}, {js|'foo' ellipsis|js});
+CssJs.unsafe({js|textOverflow|js}, {js|clip 'foo'|js});
+CssJs.unsafe({js|textOverflow|js}, {js|ellipsis 'foo'|js});
+CssJs.unsafe({js|textOverflow|js}, {js|'foo' 'foo'|js});
 CssJs.unsafe({js|userSelect|js}, {js|auto|js});
 CssJs.unsafe({js|userSelect|js}, {js|text|js});
 CssJs.unsafe({js|userSelect|js}, {js|none|js});
@@ -522,6 +529,43 @@ CssJs.unsafe({js|offset|js}, {js|stroke-box|js});
 CssJs.unsafe({js|offset|js}, {js|view-box|js});
 CssJs.unsafe({js|offset|js}, {js|path('M 20 20 H 80 V 30')|js});
 CssJs.unsafe({js|offset|js}, {js|url(image.png)|js});
+CssJs.unsafe({js|offset|js}, {js|ray(45deg closest-side)|js});
+CssJs.unsafe({js|offset|js}, {js|ray(45deg closest-side) 10%|js});
+CssJs.unsafe({js|offset|js}, {js|ray(45deg closest-side) 10% reverse|js});
+CssJs.unsafe({js|offset|js}, {js|ray(45deg closest-side) reverse 10%|js});
+CssJs.unsafe({js|offset|js}, {js|auto / center|js});
+CssJs.unsafe({js|offset|js}, {js|center / 200px 100px|js});
+CssJs.unsafe({js|offset|js}, {js|ray(45deg closest-side) / 200px 100px|js});
+CssJs.unsafe({js|offsetPath|js}, {js|none|js});
+CssJs.unsafe({js|offsetPath|js}, {js|ray(45deg closest-side)|js});
+CssJs.unsafe({js|offsetPath|js}, {js|ray(45deg farthest-side)|js});
+CssJs.unsafe({js|offsetPath|js}, {js|ray(45deg closest-corner)|js});
+CssJs.unsafe({js|offsetPath|js}, {js|ray(45deg farthest-corner)|js});
+CssJs.unsafe({js|offsetPath|js}, {js|ray(100grad closest-side contain)|js});
+CssJs.unsafe({js|offsetPath|js}, {js|margin-box|js});
+CssJs.unsafe({js|offsetPath|js}, {js|border-box|js});
+CssJs.unsafe({js|offsetPath|js}, {js|padding-box|js});
+CssJs.unsafe({js|offsetPath|js}, {js|content-box|js});
+CssJs.unsafe({js|offsetPath|js}, {js|fill-box|js});
+CssJs.unsafe({js|offsetPath|js}, {js|stroke-box|js});
+CssJs.unsafe({js|offsetPath|js}, {js|view-box|js});
+CssJs.unsafe({js|offsetPath|js}, {js|circle(60%) margin-box|js});
+CssJs.unsafe({js|offsetDistance|js}, {js|10%|js});
+CssJs.unsafe({js|offsetPosition|js}, {js|auto|js});
+CssJs.unsafe({js|offsetPosition|js}, {js|200px|js});
+CssJs.unsafe({js|offsetPosition|js}, {js|200px 100px|js});
+CssJs.unsafe({js|offsetPosition|js}, {js|center|js});
+CssJs.unsafe({js|offsetAnchor|js}, {js|auto|js});
+CssJs.unsafe({js|offsetAnchor|js}, {js|200px|js});
+CssJs.unsafe({js|offsetAnchor|js}, {js|200px 100px|js});
+CssJs.unsafe({js|offsetAnchor|js}, {js|center|js});
+CssJs.unsafe({js|offsetRotate|js}, {js|auto|js});
+CssJs.unsafe({js|offsetRotate|js}, {js|0deg|js});
+CssJs.unsafe({js|offsetRotate|js}, {js|reverse|js});
+CssJs.unsafe({js|offsetRotate|js}, {js|-45deg|js});
+CssJs.unsafe({js|offsetRotate|js}, {js|auto 180deg|js});
+CssJs.unsafe({js|offsetRotate|js}, {js|reverse 45deg|js});
+CssJs.unsafe({js|offsetRotate|js}, {js|2turn reverse|js});
 CssJs.unsafe({js|textTransform|js}, {js|full-width|js});
 CssJs.unsafe({js|textTransform|js}, {js|full-size-kana|js});
 CssJs.unsafe({js|tabSize|js}, {js|4|js});
@@ -857,6 +901,9 @@ CssJs.color(`hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))));
 CssJs.color(`hex({js|000F|js}));
 CssJs.color(`hex({js|000000FF|js}));
 CssJs.color(CssJs.rebeccapurple);
+CssJs.backgroundColor(`rgb((0, 51, 178)));
+CssJs.backgroundColor(`rgb((0, 64, 185)));
+CssJs.backgroundColor(`hsl((`deg(0.), `percent(0.), `percent(0.))));
 CssJs.backgroundColor(`rgba((0, 51, 178, `percent(0.5))));
 CssJs.backgroundColor(`rgba((0, 51, 178, `num(0.5))));
 CssJs.backgroundColor(`rgba((0, 64, 185, `percent(0.5))));
@@ -930,6 +977,24 @@ CssJs.unsafe({js|columnRuleColor|js}, {js|hsl(0 0% 0% / .5)|js});
 CssJs.unsafe({js|columnRuleColor|js}, {js|#000F|js});
 CssJs.unsafe({js|columnRuleColor|js}, {js|#000000FF|js});
 CssJs.unsafe({js|columnRuleColor|js}, {js|rebeccapurple|js});
+CssJs.unsafe({js|colorAdjust|js}, {js|economy|js});
+CssJs.unsafe({js|colorAdjust|js}, {js|exact|js});
+CssJs.unsafe({js|forcedColorAdjust|js}, {js|auto|js});
+CssJs.unsafe({js|forcedColorAdjust|js}, {js|none|js});
+CssJs.unsafe({js|forcedColorAdjust|js}, {js|preserve-parent-color|js});
+CssJs.unsafe({js|colorScheme|js}, {js|normal|js});
+CssJs.unsafe({js|colorScheme|js}, {js|light|js});
+CssJs.unsafe({js|colorScheme|js}, {js|dark|js});
+CssJs.unsafe({js|colorScheme|js}, {js|light dark|js});
+CssJs.unsafe({js|colorScheme|js}, {js|dark light|js});
+CssJs.unsafe({js|colorScheme|js}, {js|only light|js});
+CssJs.unsafe({js|colorScheme|js}, {js|light only|js});
+CssJs.unsafe({js|colorScheme|js}, {js|light light|js});
+CssJs.unsafe({js|colorScheme|js}, {js|dark dark|js});
+CssJs.unsafe({js|colorScheme|js}, {js|light purple|js});
+CssJs.unsafe({js|colorScheme|js}, {js|purple dark interesting|js});
+CssJs.unsafe({js|colorScheme|js}, {js|none|js});
+CssJs.unsafe({js|colorScheme|js}, {js|light none|js});
 CssJs.columnWidth(`em(10.));
 CssJs.columnWidth(`auto);
 CssJs.unsafe({js|columnCount|js}, {js|2|js});
@@ -964,6 +1029,7 @@ CssJs.width(`calc(`mult((`pxFloat(5.), `one(2.)))));
 CssJs.width(`calc(`mult((`pxFloat(5.), `one(2.)))));
 CssJs.width(`calc(`sub((`pxFloat(5.), `pxFloat(10.)))));
 CssJs.width(`calc(`sub((`vw(1.), `pxFloat(1.)))));
+CssJs.width(`percent(100.));
 CssJs.padding(`rem(5.));
 CssJs.padding(`ch(5.));
 CssJs.padding(`vw(5.));
@@ -1144,6 +1210,38 @@ CssJs.unsafe({js|gridGap|js}, {js|0 0|js});
 CssJs.unsafe({js|gridGap|js}, {js|0 1em|js});
 CssJs.gridGap(`em(1.));
 CssJs.unsafe({js|gridGap|js}, {js|1em 1em|js});
+CssJs.unsafe({js|gridTemplateColumns|js}, {js|subgrid|js});
+CssJs.unsafe({js|gridTemplateColumns|js}, {js|subgrid [sub-a]|js});
+CssJs.unsafe({js|gridTemplateColumns|js}, {js|subgrid [sub-a] [sub-b]|js});
+CssJs.unsafe({js|gridTemplateColumns|js}, {js|subgrid repeat(1, [sub-a])|js});
+CssJs.unsafe(
+  {js|gridTemplateColumns|js},
+  {js|subgrid repeat(2, [sub-a] [sub-b]) [sub-c]|js},
+);
+CssJs.unsafe(
+  {js|gridTemplateColumns|js},
+  {js|subgrid repeat(auto-fill, [sub-a] [sub-b])|js},
+);
+CssJs.unsafe(
+  {js|gridTemplateColumns|js},
+  {js|subgrid [sub-a] repeat(auto-fill, [sub-b] [sub-c] [sub-d]) [sub-e] repeat(1, [sub-g])|js},
+);
+CssJs.unsafe({js|gridTemplateRows|js}, {js|subgrid|js});
+CssJs.unsafe({js|gridTemplateRows|js}, {js|subgrid [sub-a]|js});
+CssJs.unsafe({js|gridTemplateRows|js}, {js|subgrid [sub-a] [sub-b]|js});
+CssJs.unsafe({js|gridTemplateRows|js}, {js|subgrid repeat(1, [sub-a])|js});
+CssJs.unsafe(
+  {js|gridTemplateRows|js},
+  {js|subgrid repeat(2, [sub-a] [sub-b]) [sub-c]|js},
+);
+CssJs.unsafe(
+  {js|gridTemplateRows|js},
+  {js|subgrid repeat(auto-fill, [sub-a] [sub-b])|js},
+);
+CssJs.unsafe(
+  {js|gridTemplateRows|js},
+  {js|subgrid [sub-a] repeat(auto-fill, [sub-b] [sub-c] [sub-d]) [sub-e] repeat(1, [sub-g])|js},
+);
 CssJs.alignSelf(`auto);
 CssJs.alignSelf(`normal);
 CssJs.alignSelf(`stretch);
@@ -1319,7 +1417,9 @@ CssJs.unsafe({js|color|js}, {js|unset|js});
 CssJs.unsafe({js|font-weight|js}, {js|unset|js});
 CssJs.unsafe({js|background-image|js}, {js|unset|js});
 CssJs.unsafe({js|width|js}, {js|unset|js});
+CssJs.unsafe({js|clipPath|js}, {js|url('#clip')|js});
 CssJs.unsafe({js|clipPath|js}, {js|inset(50%)|js});
+CssJs.unsafe({js|clipPath|js}, {js|path('M 20 20 H 80 V 30')|js});
 CssJs.unsafe({js|clipPath|js}, {js|border-box|js});
 CssJs.unsafe({js|clipPath|js}, {js|padding-box|js});
 CssJs.unsafe({js|clipPath|js}, {js|content-box|js});
@@ -1331,6 +1431,12 @@ CssJs.unsafe({js|clipPath|js}, {js|none|js});
 CssJs.unsafe({js|clipRule|js}, {js|nonzero|js});
 CssJs.unsafe({js|clipRule|js}, {js|evenodd|js});
 CssJs.maskImage(`none);
+CssJs.maskImage(
+  `linearGradient((
+    Some(`Angle(`deg(45.))),
+    [|(CssJs.blue, None), (CssJs.red, None)|],
+  )),
+);
 CssJs.unsafe({js|maskImage|js}, {js|url(image.png)|js});
 CssJs.unsafe({js|maskMode|js}, {js|alpha|js});
 CssJs.unsafe({js|maskMode|js}, {js|luminance|js});
@@ -1564,6 +1670,11 @@ CssJs.unsafe({js|willChange|js}, {js|transform|js});
 CssJs.unsafe({js|willChange|js}, {js|top, left|js});
 CssJs.unsafe({js|scrollBehavior|js}, {js|auto|js});
 CssJs.unsafe({js|scrollBehavior|js}, {js|smooth|js});
+CssJs.display(`ruby);
+CssJs.display(`rubyBase);
+CssJs.display(`rubyText);
+CssJs.display(`rubyBaseContainer);
+CssJs.display(`rubyTextContainer);
 CssJs.unsafe({js|scrollMargin|js}, {js|0px|js});
 CssJs.unsafe({js|scrollMargin|js}, {js|6px 5px|js});
 CssJs.unsafe({js|scrollMargin|js}, {js|10px 20px 30px|js});
@@ -1790,6 +1901,7 @@ CssJs.unsafe({js|listStyleType|js}, {js|ethiopic-halehame-ti-et|js});
 CssJs.unsafe({js|listStyleType|js}, {js|other-style|js});
 CssJs.unsafe({js|listStyleType|js}, {js|inside|js});
 CssJs.unsafe({js|listStyleType|js}, {js|outside|js});
+CssJs.unsafe({js|listStyleType|js}, {js|\32 style|js});
 CssJs.unsafe({js|listStyleType|js}, {js|"-"|js});
 CssJs.unsafe({js|listStyleType|js}, {js|'-'|js});
 CssJs.unsafe({js|counterReset|js}, {js|foo|js});
