@@ -3035,8 +3035,23 @@ let align_self =
   );
 
 let align_content =
-  unsupportedValue(Parser.property_align_content, (~loc) =>
-    [%expr CssJs.alignContent]
+  apply(
+    Parser.property_align_content,
+    (~loc) => [%expr CssJs.alignContent],
+    (~loc, value) => {
+      switch (value) {
+      | `Baseline_position(pos, ()) => render_baseline_position(~loc, pos)
+      | `Normal => [%expr `normal]
+      | `Content_distribution(distribution) =>
+        render_content_distribution(~loc, distribution)
+      | `Static(None, position) =>
+        [%expr [%e render_content_position(~loc, position)]]
+      | `Static(Some(`Safe), position) =>
+        [%expr `safe([%e render_content_position(~loc, position)])]
+      | `Static(Some(`Unsafe), position) =>
+        [%expr `unsafe([%e render_content_position(~loc, position)])]
+      }
+    },
   );
 
 // css-grid-1
