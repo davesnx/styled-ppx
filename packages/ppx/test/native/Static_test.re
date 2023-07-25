@@ -673,31 +673,31 @@ let properties_static_css_tests = [
     Css.flex(1., 2., `content),
     [%expr CssJs.flex(1., 2., `content)],
   ),
+  (
+    [%css "align-items: center"],
+    [%expr [%css "align-items: center"]],
+    Css.alignItems(`center),
+    [%expr CssJs.alignItems(`center)],
+  ),
+  (
+    [%css "align-self: stretch"],
+    [%expr [%css "align-self: stretch"]],
+    Css.alignSelf(`stretch),
+    [%expr CssJs.alignSelf(`stretch)],
+  ),
+  (
+    [%css "align-content: space-around"],
+    [%expr [%css "align-content: space-around"]],
+    Css.alignContent(`spaceAround),
+    [%expr CssJs.alignContent(`spaceAround)],
+  ),
+  (
+    [%css "justify-content: center"],
+    [%expr [%css "justify-content: center"]],
+    Css.justifyContent(`center),
+    [%expr CssJs.justifyContent(`center)],
+  ),
   // unsupported
-  /* (
-       [%css "align-items: center"],
-       [%expr [%css "align-items: center"]],
-       Css.alignItems(`center),
-       [%expr CssJs.alignItems(`center)],
-     ), */
-  /* (
-       [%css "align-self: stretch"],
-       [%expr [%css "align-self: stretch"]],
-       Css.alignSelf(`stretch),
-       [%expr CssJs.alignSelf(`stretch)],
-     ), */
-  /* (
-       [%css "align-content: space-around"],
-       [%expr [%css "align-content: space-around"]],
-       Css.alignContent(`spaceAround),
-       [%expr CssJs.alignContent(`spaceAround)],
-     ), */
-  /* (
-       [%css "justify-content: center"],
-       [%expr [%css "justify-content: center"]],
-       Css.unsafe("justifyContent", "center"),
-       [%expr CssJs.unsafe("justifyContent", "center")],
-     ), */
   /* (
        [%css "-moz-text-blink: blink"],
        [%expr [%css "-moz-text-blink: blink"]],
