@@ -207,6 +207,7 @@ let alignItems x =
       | #AlignItems.t as ai -> AlignItems.toString ai
       | #PositionalAlignment.t as pa -> PositionalAlignment.toString pa
       | #BaselineAlignment.t as ba -> BaselineAlignment.toString ba
+      | #OverflowAlignment.t as oa -> OverflowAlignment.toString oa
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 

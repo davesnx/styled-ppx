@@ -2966,6 +2966,14 @@ let render_legacy_alignment = (~loc, value) => {
   };
 };
 
+let render_baseline_position = (~loc, value) => {
+  switch (value) {
+  | None => [%expr `baseline]
+  | Some(`First) => [%expr `firstBaseline]
+  | Some(`Last) => [%expr `lastBaseline]
+  };
+};
+
 let justify_items =
   apply(
     Parser.property_justify_items,
@@ -2982,21 +2990,50 @@ let justify_items =
         [%expr `safe([%e render_self_position_left_right(~loc, position)])]
       | `Static(Some(`Unsafe), position) =>
         [%expr `unsafe([%e render_self_position_left_right(~loc, position)])]
-      | `Baseline_position(None, ()) => [%expr `baseline]
-      | `Baseline_position(Some(`First), ()) => [%expr `firstBaseline]
-      | `Baseline_position(Some(`Last), ()) => [%expr `lastBaseline]
+      | `Baseline_position(pos, ()) => render_baseline_position(~loc, pos)
       }
     },
   );
 
 let align_items =
-  unsupportedValue(Parser.property_align_items, (~loc) =>
-    [%expr CssJs.alignItems]
+  apply(
+    Parser.property_align_items,
+    (~loc) => [%expr CssJs.alignItems],
+    (~loc, value) => {
+      switch (value) {
+      | `Normal => [%expr `normal]
+      | `Stretch => [%expr `stretch]
+      | `Baseline_position(pos, ()) => render_baseline_position(~loc, pos)
+      | `Static(None, position) =>
+        [%expr [%e render_self_position(~loc, position)]]
+      | `Static(Some(`Safe), position) =>
+        [%expr `safe([%e render_self_position(~loc, position)])]
+      | `Static(Some(`Unsafe), position) =>
+        [%expr `unsafe([%e render_self_position(~loc, position)])]
+      }
+    },
   );
+
 let align_self =
-  unsupportedValue(Parser.property_align_self, (~loc) =>
-    [%expr CssJs.alignSelf]
+  apply(
+    Parser.property_align_self,
+    (~loc) => [%expr CssJs.alignSelf],
+    (~loc, value) => {
+      switch (value) {
+      | `Auto => [%expr `auto]
+      | `Normal => [%expr `normal]
+      | `Stretch => [%expr `stretch]
+      | `Baseline_position(pos, ()) => render_baseline_position(~loc, pos)
+      | `Static(None, position) =>
+        [%expr [%e render_self_position(~loc, position)]]
+      | `Static(Some(`Safe), position) =>
+        [%expr `safe([%e render_self_position(~loc, position)])]
+      | `Static(Some(`Unsafe), position) =>
+        [%expr `unsafe([%e render_self_position(~loc, position)])]
+      }
+    },
   );
+
 let align_content =
   unsupportedValue(Parser.property_align_content, (~loc) =>
     [%expr CssJs.alignContent]
