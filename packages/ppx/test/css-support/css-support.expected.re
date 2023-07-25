@@ -294,6 +294,12 @@ CssJs.backgroundImage(
 ];
 CssJs.backgroundImage(
   `linearGradient((
+    Some(`SideOrCorner(`Right)),
+    [|(CssJs.white, None), (CssJs.black, None)|],
+  )),
+);
+CssJs.backgroundImage(
+  `linearGradient((
     Some(`Angle(`deg(45.))),
     [|(CssJs.white, None), (CssJs.black, None)|],
   )),
@@ -665,10 +671,14 @@ CssJs.unsafe({js|fontSizeAdjust|js}, {js|none|js});
 CssJs.unsafe({js|fontSizeAdjust|js}, {js|.5|js});
 CssJs.unsafe({js|fontSynthesis|js}, {js|none|js});
 CssJs.unsafe({js|fontSynthesis|js}, {js|weight|js});
+CssJs.unsafe({js|fontSynthesis|js}, {js|style|js});
+CssJs.unsafe({js|fontSynthesis|js}, {js|weight style|js});
+CssJs.unsafe({js|fontSynthesis|js}, {js|style weight|js});
 CssJs.unsafe({js|fontKerning|js}, {js|auto|js});
 CssJs.unsafe({js|fontKerning|js}, {js|normal|js});
 CssJs.unsafe({js|fontKerning|js}, {js|none|js});
 CssJs.unsafe({js|fontVariantPosition|js}, {js|normal|js});
+CssJs.unsafe({js|fontVariantPosition|js}, {js|sub|js});
 CssJs.unsafe({js|fontVariantPosition|js}, {js|super|js});
 CssJs.unsafe({js|fontVariantLigatures|js}, {js|normal|js});
 CssJs.unsafe({js|fontVariantLigatures|js}, {js|none|js});
@@ -724,11 +734,28 @@ CssJs.unsafe({js|fontVariantEastAsian|js}, {js|simplified|js});
 CssJs.unsafe({js|fontVariantEastAsian|js}, {js|traditional|js});
 CssJs.unsafe({js|fontVariantEastAsian|js}, {js|full-width|js});
 CssJs.unsafe({js|fontVariantEastAsian|js}, {js|proportional-width|js});
+CssJs.unsafe({js|fontVariantEastAsian|js}, {js|ruby|js});
+CssJs.unsafe(
+  {js|fontVariantEastAsian|js},
+  {js|simplified full-width ruby|js},
+);
+CssJs.unsafe({js|fontFeatureSettings|js}, {js|normal|js});
+CssJs.unsafe({js|fontFeatureSettings|js}, {js|'c2sc'|js});
+CssJs.unsafe({js|fontFeatureSettings|js}, {js|'smcp' on|js});
+CssJs.unsafe({js|fontFeatureSettings|js}, {js|'liga' off|js});
+CssJs.unsafe({js|fontFeatureSettings|js}, {js|'smcp', 'swsh' 2|js});
 CssJs.fontSize(`xxx_large);
 CssJs.unsafe({|fontVariant|}, {|none|});
 CssJs.fontVariant(`normal);
 CssJs.unsafe({js|fontVariant|js}, {js|all-petite-caps|js});
 CssJs.unsafe({js|fontVariant|js}, {js|historical-forms|js});
+CssJs.unsafe({js|fontVariant|js}, {js|super|js});
+CssJs.unsafe({js|fontVariant|js}, {js|sub lining-nums contextual ruby|js});
+CssJs.unsafe({js|fontVariant|js}, {js|annotation(circled)|js});
+CssJs.unsafe(
+  {js|fontVariant|js},
+  {js|discretionary-ligatures character-variant(leo-B, leo-M, leo-N, leo-T, leo-U)|js},
+);
 CssJs.unsafe({js|fontVariantAlternates|js}, {js|normal|js});
 CssJs.unsafe({js|fontVariantAlternates|js}, {js|historical-forms|js});
 CssJs.unsafe({js|fontVariantAlternates|js}, {js|styleset(ss01)|js});
@@ -757,9 +784,13 @@ CssJs.unsafe({js|fontStyle|js}, {js|oblique -15deg|js});
 CssJs.unsafe({js|fontStyle|js}, {js|oblique 0deg|js});
 CssJs.unsafe({js|fontOpticalSizing|js}, {js|none|js});
 CssJs.unsafe({js|fontOpticalSizing|js}, {js|auto|js});
+CssJs.unsafe({js|fontPalette|js}, {js|normal|js});
+CssJs.unsafe({js|fontPalette|js}, {js|light|js});
+CssJs.unsafe({js|fontPalette|js}, {js|dark|js});
 CssJs.unsafe({js|direction|js}, {js|ltr|js});
 CssJs.unsafe({js|direction|js}, {js|rtl|js});
 CssJs.unsafe({js|unicodeBidi|js}, {js|normal|js});
+CssJs.unsafe({js|unicodeBidi|js}, {js|embed|js});
 CssJs.unsafe({js|unicodeBidi|js}, {js|isolate|js});
 CssJs.unsafe({js|unicodeBidi|js}, {js|bidi-override|js});
 CssJs.unsafe({js|unicodeBidi|js}, {js|isolate-override|js});
@@ -774,6 +805,58 @@ CssJs.unsafe({js|textCombineUpright|js}, {js|none|js});
 CssJs.unsafe({js|textCombineUpright|js}, {js|all|js});
 CssJs.unsafe({js|writingMode|js}, {js|sideways-rl|js});
 CssJs.unsafe({js|writingMode|js}, {js|sideways-lr|js});
+CssJs.unsafe({js|textCombineUpright|js}, {js|digits 2|js});
+CssJs.color(`rgba((0, 0, 0, `num(0.5))));
+CssJs.color(`hex({js|F06|js}));
+CssJs.color(`hex({js|FF0066|js}));
+CssJs.unsafe({js|color|js}, {js|hsl(0,0%,0%)|js});
+CssJs.unsafe({js|color|js}, {js|hsl(0,0%,0%,.5)|js});
+CssJs.color(`transparent);
+CssJs.color(`currentColor);
+CssJs.backgroundColor(`rgba((0, 0, 0, `num(0.5))));
+CssJs.backgroundColor(`hex({js|F06|js}));
+CssJs.backgroundColor(`hex({js|FF0066|js}));
+CssJs.unsafe({js|backgroundColor|js}, {js|hsl(0,0%,0%)|js});
+CssJs.unsafe({js|backgroundColor|js}, {js|hsl(0,0%,0%,.5)|js});
+CssJs.backgroundColor(`transparent);
+CssJs.backgroundColor(`currentColor);
+CssJs.borderColor(`rgba((0, 0, 0, `num(0.5))));
+CssJs.borderColor(`hex({js|F06|js}));
+CssJs.borderColor(`hex({js|FF0066|js}));
+CssJs.unsafe({js|borderColor|js}, {js|hsl(0,0%,0%)|js});
+CssJs.unsafe({js|borderColor|js}, {js|hsl(0,0%,0%,.5)|js});
+CssJs.borderColor(`transparent);
+CssJs.borderColor(`currentColor);
+CssJs.textDecorationColor(`rgba((0, 0, 0, `num(0.5))));
+CssJs.textDecorationColor(`hex({js|F06|js}));
+CssJs.textDecorationColor(`hex({js|FF0066|js}));
+CssJs.unsafe({js|textDecorationColor|js}, {js|hsl(0,0%,0%)|js});
+CssJs.unsafe({js|textDecorationColor|js}, {js|hsl(0,0%,0%,.5)|js});
+CssJs.textDecorationColor(`transparent);
+CssJs.textDecorationColor(`currentColor);
+CssJs.unsafe({js|columnRuleColor|js}, {js|rgba(0,0,0,.5)|js});
+CssJs.unsafe({js|columnRuleColor|js}, {js|#F06|js});
+CssJs.unsafe({js|columnRuleColor|js}, {js|#FF0066|js});
+CssJs.unsafe({js|columnRuleColor|js}, {js|hsl(0,0%,0%)|js});
+CssJs.unsafe({js|columnRuleColor|js}, {js|hsl(0,0%,0%,.5)|js});
+CssJs.unsafe({js|columnRuleColor|js}, {js|transparent|js});
+CssJs.unsafe({js|columnRuleColor|js}, {js|currentColor|js});
+CssJs.color(`rgb((0, 51, 178)));
+CssJs.color(`rgb((0, 64, 185)));
+CssJs.color(`hsl((`deg(0.), `percent(0.), `percent(0.))));
+CssJs.color(`rgba((0, 51, 178, `percent(0.5))));
+CssJs.color(`rgba((0, 51, 178, `num(0.5))));
+CssJs.color(`rgba((0, 64, 185, `percent(0.5))));
+CssJs.color(`rgba((0, 64, 185, `num(0.5))));
+CssJs.color(`hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))));
+CssJs.color(`rgba((0, 51, 178, `percent(0.5))));
+CssJs.color(`rgba((0, 51, 178, `num(0.5))));
+CssJs.color(`rgba((0, 64, 185, `percent(0.5))));
+CssJs.color(`rgba((0, 64, 185, `num(0.5))));
+CssJs.color(`hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))));
+CssJs.color(`hex({js|000F|js}));
+CssJs.color(`hex({js|000000FF|js}));
+CssJs.color(CssJs.rebeccapurple);
 CssJs.backgroundColor(`rgba((0, 51, 178, `percent(0.5))));
 CssJs.backgroundColor(`rgba((0, 51, 178, `num(0.5))));
 CssJs.backgroundColor(`rgba((0, 64, 185, `percent(0.5))));
@@ -1815,6 +1898,7 @@ CssJs.unsafe({js|scrollbarColor|js}, {js|red blue|js});
 CssJs.unsafe({js|scrollbarWidth|js}, {js|auto|js});
 CssJs.unsafe({js|scrollbarWidth|js}, {js|thin|js});
 CssJs.unsafe({js|scrollbarWidth|js}, {js|none|js});
+CssJs.unsafe({js|scrollbarWidth|js}, {js|12px|js});
 CssJs.unsafe({js|pointerEvents|js}, {js|auto|js});
 CssJs.unsafe({js|pointerEvents|js}, {js|visiblePainted|js});
 CssJs.unsafe({js|pointerEvents|js}, {js|visibleFill|js});

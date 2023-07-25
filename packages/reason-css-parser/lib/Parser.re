@@ -1060,6 +1060,7 @@ and property_font_feature_settings = [%value.rec
 and property_font_kerning = [%value.rec "'auto' | 'normal' | 'none'"]
 and property_font_language_override = [%value.rec "'normal' | <string>"]
 and property_font_optical_sizing = [%value.rec "'auto' | 'none'"]
+and property_font_palette = [%value.rec "'normal' | 'light' | 'dark'"]
 and property_font_size = [%value.rec
   "<absolute-size> | <relative-size> | <extended-length> | <extended-percentage>"
 ]
@@ -1073,7 +1074,7 @@ and property_font_style = [%value.rec
 ]
 and property_font_synthesis = [%value.rec "'none' | 'weight' || 'style'"]
 and property_font_variant = [%value.rec
-  "'normal' | 'none' | 'small-caps' | <common-lig-values> || <discretionary-lig-values> || <historical-lig-values> || <contextual-alt-values> || stylistic( <feature-value-name> ) || 'historical-forms' || styleset( [ <feature-value-name> ]# ) || character-variant( [ <feature-value-name> ]# ) || swash( <feature-value-name> ) || ornaments( <feature-value-name> ) || annotation( <feature-value-name> ) || [ 'small-caps' | 'all-small-caps' | 'petite-caps' | 'all-petite-caps' | 'unicase' | 'titling-caps' ] || <numeric-figure-values> || <numeric-spacing-values> || <numeric-fraction-values> || 'ordinal' || 'slashed-zero' || <east-asian-variant-values> || <east-asian-width-values> || 'ruby'"
+  "'normal' | 'none' | 'small-caps' | <common-lig-values> || <discretionary-lig-values> || <historical-lig-values> || <contextual-alt-values> || stylistic( <feature-value-name> ) || 'historical-forms' || styleset( [ <feature-value-name> ]# ) || character-variant( [ <feature-value-name> ]# ) || swash( <feature-value-name> ) || ornaments( <feature-value-name> ) || annotation( <feature-value-name> ) || [ 'small-caps' | 'all-small-caps' | 'petite-caps' | 'all-petite-caps' | 'unicase' | 'titling-caps' ] || <numeric-figure-values> || <numeric-spacing-values> || <numeric-fraction-values> || 'ordinal' || 'slashed-zero' || <east-asian-variant-values> || <east-asian-width-values> || 'ruby' || 'sub' || 'super' || 'text' || 'emoji' || 'unicode'"
 ]
 and property_font_variant_alternates = [%value.rec
   "'normal' | stylistic( <feature-value-name> ) || 'historical-forms' || styleset( [ <feature-value-name> ]# ) || character-variant( [ <feature-value-name> ]# ) || swash( <feature-value-name> ) || ornaments( <feature-value-name> ) || annotation( <feature-value-name> )"
@@ -1510,7 +1511,9 @@ and property_scroll_snap_type_y = [%value.rec
 and property_scrollbar_color = [%value.rec
   "'auto' | 'dark' | 'light' | [ <color> ]{2}"
 ]
-and property_scrollbar_width = [%value.rec "'auto' | 'thin' | 'none'"]
+and property_scrollbar_width = [%value.rec
+  "'auto' | 'thin' | 'none' | <extended-length>"
+]
 and property_shape_image_threshold = [%value.rec "<alpha-value>"]
 and property_shape_margin = [%value.rec
   "<extended-length> | <extended-percentage>"
@@ -2700,6 +2703,7 @@ let check_map =
         check(property_font_language_override),
       ),
       ("property-font-optical-sizing", check(property_font_optical_sizing)),
+      ("property-font-palette", check(property_font_palette)),
       ("property-font-size", check(property_font_size)),
       ("property-font-size-adjust", check(property_font_size_adjust)),
       ("property-font-smooth", check(property_font_smooth)),

@@ -237,7 +237,7 @@
 [%css {|background-image: linear-gradient(90deg, blue 10%, red 20%);|}];
 [%css {|background-image: linear-gradient(90deg, blue 10%, red);|}];
 [%css {|background-image: linear-gradient(white, black);|}];
-/* [%css {|background-image: linear-gradient(to right, white, black);|}]; */
+[%css {|background-image: linear-gradient(to right, white, black);|}];
 [%css {|background-image: linear-gradient(45deg, white, black);|}];
 /* [%css {|background-image: linear-gradient(white 50%, black);|}]; */
 [%css {|background-image: linear-gradient(white, #f06, black);|}];
@@ -895,14 +895,14 @@
 [%css {|font-size-adjust: .5|}];
 [%css {|font-synthesis: none|}];
 [%css {|font-synthesis: weight|}];
-/* [%css {|font-synthesis: style|}]; */
-/* [%css {|font-synthesis: weight style|}]; */
-/* [%css {|font-synthesis: style weight|}]; */
+[%css {|font-synthesis: style|}];
+[%css {|font-synthesis: weight style|}];
+[%css {|font-synthesis: style weight|}];
 [%css {|font-kerning: auto|}];
 [%css {|font-kerning: normal|}];
 [%css {|font-kerning: none|}];
 [%css {|font-variant-position: normal|}];
-/* [%css {|font-variant-position: sub|}]; */
+[%css {|font-variant-position: sub|}];
 [%css {|font-variant-position: super|}];
 [%css {|font-variant-ligatures: normal|}];
 [%css {|font-variant-ligatures: none|}];
@@ -951,13 +951,13 @@
 [%css {|font-variant-east-asian: traditional|}];
 [%css {|font-variant-east-asian: full-width|}];
 [%css {|font-variant-east-asian: proportional-width|}];
-/* [%css {|font-variant-east-asian: ruby|}]; */
-/* [%css {|font-variant-east-asian: simplified full-width ruby|}]; */
-/* [%css {|font-feature-settings: normal|}]; */
-/* [%css {|font-feature-settings: 'c2sc'|}]; */
-/* [%css {|font-feature-settings: 'smcp' on|}]; */
-/* [%css {|font-feature-settings: 'liga' off|}]; */
-/* [%css {|font-feature-settings: 'smcp', 'swsh' 2|}]; */
+[%css {|font-variant-east-asian: ruby|}];
+[%css {|font-variant-east-asian: simplified full-width ruby|}];
+[%css {|font-feature-settings: normal|}];
+[%css {|font-feature-settings: 'c2sc'|}];
+[%css {|font-feature-settings: 'smcp' on|}];
+[%css {|font-feature-settings: 'liga' off|}];
+[%css {|font-feature-settings: 'smcp', 'swsh' 2|}];
 
 /* CSS Fonts Module Level 4 */
 [%css {|font-size: xxx-large|}];
@@ -965,10 +965,12 @@
 [%css {|font-variant: normal|}];
 [%css {|font-variant: all-petite-caps|}];
 [%css {|font-variant: historical-forms|}];
-/* [%css {|font-variant: super|}]; */
-/* [%css {|font-variant: sub lining-nums contextual ruby|}]; */
-/* [%css {|font-variant: annotation(circled)|}]; */
-/* [%css {|font-variant: discretionary-ligatures character-variant(leo-B, leo-M, leo-N, leo-T, leo-U)|}]; */
+[%css {|font-variant: super|}];
+[%css {|font-variant: sub lining-nums contextual ruby|}];
+[%css {|font-variant: annotation(circled)|}];
+[%css
+  {|font-variant: discretionary-ligatures character-variant(leo-B, leo-M, leo-N, leo-T, leo-U)|}
+];
 [%css {|font-variant-alternates: normal|}];
 [%css {|font-variant-alternates: historical-forms|}];
 [%css {|font-variant-alternates: styleset(ss01)|}];
@@ -991,15 +993,15 @@
 [%css {|font-style: oblique 0deg|}];
 [%css {|font-optical-sizing: none|}];
 [%css {|font-optical-sizing: auto|}];
-/* [%css {|font-palette: normal|}]; */
-/* [%css {|font-palette: light|}]; */
-/* [%css {|font-palette: dark|}]; */
+[%css {|font-palette: normal|}];
+[%css {|font-palette: light|}];
+[%css {|font-palette: dark|}];
 
 /* CSS Writing Modes Level 3 */
 [%css {|direction: ltr|}];
 [%css {|direction: rtl|}];
 [%css {|unicode-bidi: normal|}];
-/* [%css {|unicode-bidi: embed|}]; */
+[%css {|unicode-bidi: embed|}];
 [%css {|unicode-bidi: isolate|}];
 [%css {|unicode-bidi: bidi-override|}];
 [%css {|unicode-bidi: isolate-override|}];
@@ -1016,62 +1018,62 @@
 /* CSS Writing Modes Level 4 */
 [%css {|writing-mode: sideways-rl|}];
 [%css {|writing-mode: sideways-lr|}];
-/* [%css {|text-combine-upright: digits 2|}]; */
+[%css {|text-combine-upright: digits 2|}];
 
 /* CSS Color Module Level 3 */
-/* [%css {|color: rgba(0,0,0,.5);|}]; */
-/* [%css {|color: #F06;|}]; */
-/* [%css {|color: #FF0066;|}]; */
-/* [%css {|color: hsl(0,0%,0%);|}]; */
-/* [%css {|color: hsl(0,0%,0%,.5);|}]; */
-/* [%css {|color: transparent;|}]; */
-/* [%css {|color: currentColor;|}]; */
-/* [%css {|background-color: rgba(0,0,0,.5);|}]; */
-/* [%css {|background-color: #F06;|}]; */
-/* [%css {|background-color: #FF0066;|}]; */
-/* [%css {|background-color: hsl(0,0%,0%);|}]; */
-/* [%css {|background-color: hsl(0,0%,0%,.5);|}]; */
-/* [%css {|background-color: transparent;|}]; */
-/* [%css {|background-color: currentColor;|}]; */
-/* [%css {|border-color: rgba(0,0,0,.5);|}]; */
-/* [%css {|border-color: #F06;|}]; */
-/* [%css {|border-color: #FF0066;|}]; */
-/* [%css {|border-color: hsl(0,0%,0%);|}]; */
-/* [%css {|border-color: hsl(0,0%,0%,.5);|}]; */
-/* [%css {|border-color: transparent;|}]; */
-/* [%css {|border-color: currentColor;|}]; */
-/* [%css {|text-decoration-color: rgba(0,0,0,.5);|}]; */
-/* [%css {|text-decoration-color: #F06;|}]; */
-/* [%css {|text-decoration-color: #FF0066;|}]; */
-/* [%css {|text-decoration-color: hsl(0,0%,0%);|}]; */
-/* [%css {|text-decoration-color: hsl(0,0%,0%,.5);|}]; */
-/* [%css {|text-decoration-color: transparent;|}]; */
-/* [%css {|text-decoration-color: currentColor;|}]; */
-/* [%css {|column-rule-color: rgba(0,0,0,.5);|}]; */
-/* [%css {|column-rule-color: #F06;|}]; */
-/* [%css {|column-rule-color: #FF0066;|}]; */
-/* [%css {|column-rule-color: hsl(0,0%,0%);|}]; */
-/* [%css {|column-rule-color: hsl(0,0%,0%,.5);|}]; */
-/* [%css {|column-rule-color: transparent;|}]; */
-/* [%css {|column-rule-color: currentColor;|}]; */
+[%css {|color: rgba(0,0,0,.5);|}];
+[%css {|color: #F06;|}];
+[%css {|color: #FF0066;|}];
+[%css {|color: hsl(0,0%,0%);|}];
+[%css {|color: hsl(0,0%,0%,.5);|}];
+[%css {|color: transparent;|}];
+[%css {|color: currentColor;|}];
+[%css {|background-color: rgba(0,0,0,.5);|}];
+[%css {|background-color: #F06;|}];
+[%css {|background-color: #FF0066;|}];
+[%css {|background-color: hsl(0,0%,0%);|}];
+[%css {|background-color: hsl(0,0%,0%,.5);|}];
+[%css {|background-color: transparent;|}];
+[%css {|background-color: currentColor;|}];
+[%css {|border-color: rgba(0,0,0,.5);|}];
+[%css {|border-color: #F06;|}];
+[%css {|border-color: #FF0066;|}];
+[%css {|border-color: hsl(0,0%,0%);|}];
+[%css {|border-color: hsl(0,0%,0%,.5);|}];
+[%css {|border-color: transparent;|}];
+[%css {|border-color: currentColor;|}];
+[%css {|text-decoration-color: rgba(0,0,0,.5);|}];
+[%css {|text-decoration-color: #F06;|}];
+[%css {|text-decoration-color: #FF0066;|}];
+[%css {|text-decoration-color: hsl(0,0%,0%);|}];
+[%css {|text-decoration-color: hsl(0,0%,0%,.5);|}];
+[%css {|text-decoration-color: transparent;|}];
+[%css {|text-decoration-color: currentColor;|}];
+[%css {|column-rule-color: rgba(0,0,0,.5);|}];
+[%css {|column-rule-color: #F06;|}];
+[%css {|column-rule-color: #FF0066;|}];
+[%css {|column-rule-color: hsl(0,0%,0%);|}];
+[%css {|column-rule-color: hsl(0,0%,0%,.5);|}];
+[%css {|column-rule-color: transparent;|}];
+[%css {|column-rule-color: currentColor;|}];
 
 /* CSS Color Module Level 4 */
-/* [%css {|color: rgb(0% 20% 70%);|}]; */
-/* [%css {|color: rgb(0 64 185);|}]; */
-/* [%css {|color: hsl(0 0% 0%);|}]; */
-/* [%css {|color: rgba(0% 20% 70% / 50%);|}]; */
-/* [%css {|color: rgba(0% 20% 70% / .5);|}]; */
-/* [%css {|color: rgba(0 64 185 / 50%);|}]; */
-/* [%css {|color: rgba(0 64 185 / .5);|}]; */
-/* [%css {|color: hsla(0 0% 0% /.5);|}]; */
-/* [%css {|color: rgb(0% 20% 70% / 50%);|}]; */
-/* [%css {|color: rgb(0% 20% 70% / .5);|}]; */
-/* [%css {|color: rgb(0 64 185 / 50%);|}]; */
-/* [%css {|color: rgb(0 64 185 / .5);|}]; */
-/* [%css {|color: hsl(0 0% 0% / .5);|}]; */
-/* [%css {|color: #000F;|}]; */
-/* [%css {|color: #000000FF;|}]; */
-/* [%css {|color: rebeccapurple;|}]; */
+[%css {|color: rgb(0% 20% 70%);|}];
+[%css {|color: rgb(0 64 185);|}];
+[%css {|color: hsl(0 0% 0%);|}];
+[%css {|color: rgba(0% 20% 70% / 50%);|}];
+[%css {|color: rgba(0% 20% 70% / .5);|}];
+[%css {|color: rgba(0 64 185 / 50%);|}];
+[%css {|color: rgba(0 64 185 / .5);|}];
+[%css {|color: hsla(0 0% 0% /.5);|}];
+[%css {|color: rgb(0% 20% 70% / 50%);|}];
+[%css {|color: rgb(0% 20% 70% / .5);|}];
+[%css {|color: rgb(0 64 185 / 50%);|}];
+[%css {|color: rgb(0 64 185 / .5);|}];
+[%css {|color: hsl(0 0% 0% / .5);|}];
+[%css {|color: #000F;|}];
+[%css {|color: #000000FF;|}];
+[%css {|color: rebeccapurple;|}];
 /* [%css {|color: Canvas;|}]; */
 /* [%css {|color: CanvasText;|}]; */
 /* [%css {|color: LinkText;|}]; */
@@ -2781,7 +2783,7 @@
 [%css {|scrollbar-width: auto|}];
 [%css {|scrollbar-width: thin|}];
 [%css {|scrollbar-width: none|}];
-/* [%css {|scrollbar-width: 12px|}]; */
+[%css {|scrollbar-width: 12px|}];
 
 /* CSS Painting API Level 1 */
 /* [%css {|background-image: paint(company-logo);|}]; */

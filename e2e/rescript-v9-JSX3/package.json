@@ -7,7 +7,6 @@
     "watch": "rescript build -with-deps -w",
     "clean": "rescript clean",
     "test_watch": "concurrently 'npm run watch' 'vitest'",
-    "pretest": "npm run build",
     "test": "vitest --run --silent",
     "start": "npm run test"
   },
