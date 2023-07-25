@@ -21,7 +21,7 @@ let txt = (~loc, txt) => {Location.loc, txt};
 let (let.ok) = Result.bind;
 
 /* TODO: Separate unsupported_feature from bs-css doesn't support or can't interpolate on those */
-/* TODO: Add payload on those exception, maybe move to Result. */
+/* TODO: Add payload on those exceptions */
 exception Unsupported_feature;
 
 let id = Fun.id;
@@ -29,7 +29,6 @@ let id = Fun.id;
 /* Why this type contains so much when only `string_to_expr` is used? */
 type transform('ast, 'value) = {
   ast_of_string: string => result('ast, string),
-  value_of_ast: (~loc: Location.t, 'ast) => 'value,
   ast_to_expr: (~loc: Location.t, 'ast) => list(Parsetree.expression),
   string_to_expr:
     (~loc: Location.t, string) => result(list(Parsetree.expression), string),
@@ -49,7 +48,7 @@ let emit = (property, value_of_ast, value_to_expr) => {
   let string_to_expr = (~loc, string) =>
     ast_of_string(string) |> Result.map(ast_to_expr(~loc));
 
-  {ast_of_string, value_of_ast, ast_to_expr, string_to_expr};
+  {ast_of_string, ast_to_expr, string_to_expr};
 };
 
 let emit_shorthand = (parser, mapper, value_to_expr) => {
@@ -58,9 +57,8 @@ let emit_shorthand = (parser, mapper, value_to_expr) => {
     ast |> List.map(mapper(~loc)) |> value_to_expr(~loc);
   let string_to_expr = (~loc, string) =>
     ast_of_string(string) |> Result.map(ast_to_expr(~loc));
-  let value_of_ast = (~loc) => List.map(mapper(~loc));
 
-  {ast_of_string, value_of_ast, ast_to_expr, string_to_expr};
+  {ast_of_string, ast_to_expr, string_to_expr};
 };
 
 let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
@@ -280,23 +278,24 @@ let rec render_function_calc = (~loc, calc_sum) => {
     /* This isn't a great design of the types, but we need to know the operation
        which is in the first position of the array, we ensure that there's one value
        since we are on this branch of the switch */
-    let op = pick_operation(~loc, List.hd(list_of_sums));
-    let first = render_product(~loc, product);
-    let second = render_list_of_sums(~loc, list_of_sums);
-    [%expr `calc(([%e op], [%e first], [%e second]))];
+    let op = pick_operation(List.hd(list_of_sums));
+    switch (op) {
+    | `Dash () =>
+      let first = render_product(~loc, product);
+      let second = render_list_of_sums(~loc, list_of_sums);
+      [%expr `calc(`sub(([%e first], [%e second])))];
+    | `Cross () =>
+      let first = render_product(~loc, product);
+      let second = render_list_of_sums(~loc, list_of_sums);
+      [%expr `calc(`add(([%e first], [%e second])))];
+    };
   };
 }
-and render_sum_op = (~loc, op) => {
-  switch (op) {
-  | `Dash () => [%expr `sub]
-  | `Cross () => [%expr `add]
-  };
-}
-and pick_operation = (~loc, (op, _)) => render_sum_op(~loc, op)
-and render_list_of_products = list_of_products => {
+and pick_operation = ((op, _)) => op
+and render_list_of_products = (~loc, list_of_products) => {
   switch (list_of_products) {
-  | [one] => render_product_op(one)
-  | list => render_list_of_products(list)
+  | [one] => [%expr `one([%e render_product_op(~loc, one)])]
+  | list => render_list_of_products(~loc, list)
   };
 }
 and render_list_of_sums = (~loc, list_of_sums) => {
@@ -309,10 +308,9 @@ and render_product = (~loc, product) => {
   switch (product) {
   | (calc_value, []) => render_calc_value(~loc, calc_value)
   | (calc_value, list_of_products) =>
-    let _first = render_calc_value(calc_value);
-    let _second = render_list_of_products(list_of_products);
-    /* [%expr (`mult, [%e first], [%e second])]; */
-    failwith("`mult isn't available in bs-css");
+    let first = render_calc_value(~loc, calc_value);
+    let second = render_list_of_products(~loc, list_of_products);
+    [%expr `calc(`mult(([%e first], [%e second])))];
   };
 }
 and render_product_op = (~loc, op) => {
@@ -416,6 +414,21 @@ let render_extended_angle = (~loc) =>
   | `Angle(a) => render_angle(~loc, a)
   | `Function_calc(fc) => render_function_calc(~loc, fc)
   | `Interpolation(i) => render_variable(~loc, i);
+
+let render_side_or_corner = (~loc, value: Types.side_or_corner) => {
+  switch (value) {
+  | (None, Some(`Top)) => [%expr `Top]
+  | (Some(`Left), None) => [%expr `Left]
+  | (None, Some(`Bottom)) => [%expr `Bottom]
+  | (Some(`Right), None) => [%expr `Right]
+  | (Some(`Left), Some(`Top)) => [%expr `TopLeft]
+  | (Some(`Right), Some(`Top)) => [%expr `TopRight]
+  | (Some(`Left), Some(`Bottom)) => [%expr `BottomLeft]
+  | (Some(`Right), Some(`Bottom)) => [%expr `BottomRight]
+  /* by ast, that can't be possible */
+  | (None, None) => assert(false)
+  };
+};
 
 /* Applies variants to one argument */
 let variants = (parser, identifier) =>
@@ -1066,21 +1079,25 @@ let render_color_stop_angle = (~loc, value: Types.color_stop_angle) => {
 
 let render_linear_color_stop = (~loc, value: Types.linear_color_stop) => {
   switch (value) {
-  | (color, None) => render_color(~loc, color)
+  | (color, None) =>
+    let color = render_color(~loc, color);
+    [%expr ([%e color], None)];
   | (color, Some(length)) =>
     let color = render_color(~loc, color);
     let length = render_color_stop_length(~loc, length);
-    [%expr ([%e color], [%e length])];
+    [%expr ([%e color], Some([%e length]))];
   };
 };
 
 let render_angular_color_stop = (~loc, value: Types.angular_color_stop) => {
   switch (value) {
-  | (color, None) => render_color(~loc, color)
+  | (color, None) =>
+    let color = render_color(~loc, color);
+    [%expr ([%e color], None)];
   | (color, Some(angle)) =>
     let color = render_color(~loc, color);
     let angle = render_color_stop_angle(~loc, angle);
-    [%expr ([%e color], [%e angle])];
+    [%expr ([%e color], Some([%e angle]))];
   };
 };
 
@@ -1091,11 +1108,11 @@ let render_color_stop_list = (~loc, value: Types.color_stop_list) => {
   let stops =
     first_stop
     |> List.append(middle_stops |> List.map(((_, stop)) => stop))
-    |> List.append([last_stop]);
+    |> List.append([last_stop])
+    |> List.rev;
 
   stops
   |> List.map(stop => render_linear_color_stop(~loc, stop))
-  |> List.append([render_linear_color_stop(~loc, last_stop)])
   |> Helper.Exp.array(~loc);
 };
 
@@ -1113,11 +1130,13 @@ let render_angular_color_stop_list =
     rest_of_stops
     |> List.map(stop => {
          switch (stop) {
-         | (stop, None) => render_angular_color_stop(~loc, stop)
+         | (stop, None) =>
+           let stop = render_angular_color_stop(~loc, stop);
+           [%expr ([%e stop], None)];
          | (stop, Some(((), color_hint: Types.angular_color_hint))) =>
            let stop = render_angular_color_stop(~loc, stop);
            let color_hint = render_angular_color_hint(~loc, color_hint);
-           [%expr ([%e stop], [%e color_hint])];
+           [%expr ([%e stop], Some([%e color_hint]))];
          }
        })
     |> List.append([render_angular_color_stop(~loc, last_stops)]);
@@ -1128,16 +1147,19 @@ let render_function_linear_gradient =
     (~loc, value: Types.function_linear_gradient) => {
   switch (value) {
   | (None, stops) =>
-    /* bs-css doesn't support non-angle. Default to 180deg */
+    [%expr `linearGradient((None, [%e render_color_stop_list(~loc, stops)]))]
+  | (Some(`Extended_angle(angle)), stops) =>
     [%expr
      `linearGradient((
-       [%e render_extended_angle(~loc, `Angle(`Deg(180.)))],
+       Some(`Angle([%e render_extended_angle(~loc, angle)])),
        [%e render_color_stop_list(~loc, stops)],
      ))]
-  | (Some(angle), stops) =>
+  | (Some(`Static((), side_or_corner)), stops) =>
     [%expr
      `linearGradient((
-       [%e render_extended_angle(~loc, angle)],
+       Some(
+         `SideOrCorner([%e render_side_or_corner(~loc, side_or_corner)]),
+       ),
        [%e render_color_stop_list(~loc, stops)],
      ))]
   };
@@ -1149,17 +1171,16 @@ let render_function_repeating_linear_gradient =
   | (Some(`Extended_angle(angle)), (), stops) =>
     [%expr
      `repeatingLinearGradient((
-       [%e render_extended_angle(~loc, angle)],
+       Some([%e render_extended_angle(~loc, angle)]),
        [%e render_color_stop_list(~loc, stops)],
      ))]
-  /* Other ways aren't supported in bs-css
-     | #repeatingLinearGradient(Angle.t, array<(Length.t, [< Color.t | Var.t] as 'colorOrVar)>) */
-  /* | (Some(`Static(_, side)), (), stops) =>
-     [%expr `repeatingLinearGradient((
-       [%e render_side_or_corner(~loc, side)],
-       [%e render_color_stop_list(~loc, stops)]
-     ))] */
-  | _ => raise(Unsupported_feature)
+  | (None, (), stops) =>
+    [%expr
+     `repeatingLinearGradient((
+       None,
+       [%e render_color_stop_list(~loc, stops)],
+     ))]
+  | (Some(_), (), _stops) => raise(Unsupported_feature)
   };
 };
 
@@ -1551,11 +1572,13 @@ let border_style =
     variant_to_expression,
   );
 
-let render_line_width = (~loc) =>
-  fun
+let render_line_width = (~loc, value: Types.line_width) =>
+  switch (value) {
   | `Extended_length(l) => render_extended_length(~loc, l)
-  /* Missing `Medium, `Thick, `Thin on the bs-css bindings */
-  | _ => raise(Unsupported_feature);
+  | `Thick => [%expr `thick]
+  | `Medium => [%expr `medium]
+  | `Thin => [%expr `thin]
+  };
 
 let border_top_width =
   apply(
@@ -1721,7 +1744,7 @@ let vertical_align =
       | `Extended_length(l) => render_extended_length(~loc, l)
       | `Extended_percentage(p) => render_extended_percentage(~loc, p)
       }
-    }
+    },
   );
 
 let border =
@@ -2807,77 +2830,243 @@ let order =
     (~loc) => [%expr CssJs.order],
     render_integer,
   );
+let render_number_interp = (~loc, value) => {
+  switch (value) {
+  | `Number(n) => [%expr [%e render_number(~loc, n)]]
+  | `Interpolation(v) => render_variable(~loc, v)
+  };
+};
+
 let flex_grow =
   apply(
     Parser.property_flex_grow,
     (~loc) => [%expr CssJs.flexGrow],
-    render_number,
+    render_number_interp,
   );
 let flex_shrink =
   apply(
     Parser.property_flex_shrink,
     (~loc) => [%expr CssJs.flexShrink],
-    render_number,
+    render_number_interp,
   );
+
+let render_flex_basis = (~loc) =>
+  fun
+  | `Content => variant_to_expression(~loc, `Content)
+  | `Property_width(value_width) => render_size(~loc, value_width)
+  | `Interpolation(v) => render_variable(~loc, v);
 
 let flex_basis =
   apply(
     Parser.property_flex_basis,
     (~loc) => [%expr CssJs.flexBasis],
-    (~loc) =>
-      fun
-      | `Content => variant_to_expression(~loc, `Content)
-      | `Property_width(value_width) =>
-        width.value_of_ast(~loc, `Value(value_width)),
+    render_flex_basis,
   );
 
-// TODO: this is incomplete
 let flex =
   emit(
     Parser.property_flex,
     (~loc as _) => id,
-    (~loc) =>
-      fun
-      | `None => [[%expr CssJs.flex(`none)]]
-      | `Or(grow_shrink, basis) => {
-          let grow_shrink =
-            switch (grow_shrink) {
-            | None => []
-            | Some((grow, shrink)) =>
-              List.concat([
-                flex_grow.ast_to_expr(~loc, `Value(grow)),
-                Option.map(
-                  ast => flex_shrink.ast_to_expr(~loc, `Value(ast)),
-                  shrink,
-                )
-                |> Option.value(~default=[]),
-              ])
-            };
-          let basis =
-            switch (basis) {
-            | None => []
-            | Some(basis) => flex_basis.ast_to_expr(~loc, `Value(basis))
-            };
-          List.concat([grow_shrink, basis]);
-        },
+    (~loc, value) =>
+      switch (value) {
+      | `None => [[%expr CssJs.flex1(`none)]]
+      | `Interpolation(interp) => [
+          [%expr CssJs.flex1([%e render_variable(~loc, interp)])],
+        ]
+      | `Or(None, None) => [[%expr CssJs.flex1(`none)]]
+      | `Or(Some((grow, None)), None) => [
+          [%expr CssJs.flex1([%e render_number_interp(~loc, grow)])],
+        ]
+      | `Or(Some((grow, Some(shrink))), None) => [
+          [%expr
+            CssJs.flex2(
+              ~shrink=[%e render_number_interp(~loc, shrink)],
+              [%e render_number_interp(~loc, grow)],
+            )
+          ],
+        ]
+      | `Or(Some((grow, None)), Some(basis)) => [
+          [%expr
+            CssJs.flex2(
+              ~basis=[%e render_flex_basis(~loc, basis)],
+              [%e render_number_interp(~loc, grow)],
+            )
+          ],
+        ]
+      | `Or(Some((grow, Some(shrink))), Some(basis)) => [
+          [%expr
+            CssJs.flex(
+              [%e render_number_interp(~loc, grow)],
+              [%e render_number_interp(~loc, shrink)],
+              [%e render_flex_basis(~loc, basis)],
+            )
+          ],
+        ]
+      | `Or(None, Some(basis)) => [
+          [%expr CssJs.flexBasics([%e render_flex_basis(~loc, basis)])],
+        ]
+      },
   );
 
-// TODO: justify_content, align_items, align_self, align_content are only for flex, missing the css-align-3 at parser
+let render_content_position = (~loc, value: Types.content_position) => {
+  switch (value) {
+  | `Center => [%expr `center]
+  | `Start => [%expr `start]
+  | `End => [%expr `end_]
+  | `Flex_start => [%expr `flexStart]
+  | `Flex_end => [%expr `flexEnd]
+  };
+};
+
+let render_self_position = (~loc, value: Types.self_position) => {
+  switch (value) {
+  | `Center => [%expr `center]
+  | `Start => [%expr `start]
+  | `End => [%expr `end_]
+  | `Flex_start => [%expr `flexStart]
+  | `Flex_end => [%expr `flexEnd]
+  | `Self_start => [%expr `selfStart]
+  | `Self_end => [%expr `selfEnd]
+  };
+};
+
+let render_content_position_left_right = (~loc, value) => {
+  switch (value) {
+  | `Content_position(position) => render_content_position(~loc, position)
+  | `Left => [%expr `left]
+  | `Right => [%expr `right]
+  };
+};
+
+let render_self_position_left_right = (~loc, value) => {
+  switch (value) {
+  | `Self_position(position) => render_self_position(~loc, position)
+  | `Left => [%expr `left]
+  | `Right => [%expr `right]
+  };
+};
+
+let render_content_distribution = (~loc) =>
+  fun
+  | `Space_between => [%expr `spaceBetween]
+  | `Space_around => [%expr `spaceAround]
+  | `Space_evenly => [%expr `spaceEvenly]
+  | `Stretch => [%expr `stretch];
+
 let justify_content =
-  unsupportedValue(Parser.property_justify_content, (~loc) =>
-    [%expr CssJs.justifyContent]
+  apply(
+    Parser.property_justify_content,
+    (~loc) => [%expr CssJs.justifyContent],
+    (~loc, value) => {
+      switch (value) {
+      | `Normal => [%expr `normal]
+      | `Content_distribution(distribution) =>
+        render_content_distribution(~loc, distribution)
+      | `Static(None, position) =>
+        [%expr [%e render_content_position_left_right(~loc, position)]]
+      | `Static(Some(`Safe), position) =>
+        [%expr `safe([%e render_content_position_left_right(~loc, position)])]
+      | `Static(Some(`Unsafe), position) =>
+        [%expr
+         `unsafe([%e render_content_position_left_right(~loc, position)])]
+      }
+    },
   );
+
+let render_legacy_alignment = (~loc, value) => {
+  switch (value) {
+  | `Left => [%expr `legacyLeft]
+  | `Right => [%expr `legacyRight]
+  | `Center => [%expr `legacyCenter]
+  };
+};
+
+let render_baseline_position = (~loc, value) => {
+  switch (value) {
+  | None => [%expr `baseline]
+  | Some(`First) => [%expr `firstBaseline]
+  | Some(`Last) => [%expr `lastBaseline]
+  };
+};
+
+let justify_items =
+  apply(
+    Parser.property_justify_items,
+    (~loc) => [%expr CssJs.justifyItems],
+    (~loc, value) => {
+      switch (value) {
+      | `Normal => [%expr `normal]
+      | `Stretch => [%expr `stretch]
+      | `Legacy => [%expr `legacy]
+      | `And(_, alignment) => render_legacy_alignment(~loc, alignment)
+      | `Static(None, position) =>
+        [%expr [%e render_self_position_left_right(~loc, position)]]
+      | `Static(Some(`Safe), position) =>
+        [%expr `safe([%e render_self_position_left_right(~loc, position)])]
+      | `Static(Some(`Unsafe), position) =>
+        [%expr `unsafe([%e render_self_position_left_right(~loc, position)])]
+      | `Baseline_position(pos, ()) => render_baseline_position(~loc, pos)
+      }
+    },
+  );
+
 let align_items =
-  unsupportedValue(Parser.property_align_items, (~loc) =>
-    [%expr CssJs.alignItems]
+  apply(
+    Parser.property_align_items,
+    (~loc) => [%expr CssJs.alignItems],
+    (~loc, value) => {
+      switch (value) {
+      | `Normal => [%expr `normal]
+      | `Stretch => [%expr `stretch]
+      | `Baseline_position(pos, ()) => render_baseline_position(~loc, pos)
+      | `Static(None, position) =>
+        [%expr [%e render_self_position(~loc, position)]]
+      | `Static(Some(`Safe), position) =>
+        [%expr `safe([%e render_self_position(~loc, position)])]
+      | `Static(Some(`Unsafe), position) =>
+        [%expr `unsafe([%e render_self_position(~loc, position)])]
+      }
+    },
   );
+
 let align_self =
-  unsupportedValue(Parser.property_align_self, (~loc) =>
-    [%expr CssJs.alignSelf]
+  apply(
+    Parser.property_align_self,
+    (~loc) => [%expr CssJs.alignSelf],
+    (~loc, value) => {
+      switch (value) {
+      | `Auto => [%expr `auto]
+      | `Normal => [%expr `normal]
+      | `Stretch => [%expr `stretch]
+      | `Baseline_position(pos, ()) => render_baseline_position(~loc, pos)
+      | `Static(None, position) =>
+        [%expr [%e render_self_position(~loc, position)]]
+      | `Static(Some(`Safe), position) =>
+        [%expr `safe([%e render_self_position(~loc, position)])]
+      | `Static(Some(`Unsafe), position) =>
+        [%expr `unsafe([%e render_self_position(~loc, position)])]
+      }
+    },
   );
+
 let align_content =
-  unsupportedValue(Parser.property_align_content, (~loc) =>
-    [%expr CssJs.alignContent]
+  apply(
+    Parser.property_align_content,
+    (~loc) => [%expr CssJs.alignContent],
+    (~loc, value) => {
+      switch (value) {
+      | `Baseline_position(pos, ()) => render_baseline_position(~loc, pos)
+      | `Normal => [%expr `normal]
+      | `Content_distribution(distribution) =>
+        render_content_distribution(~loc, distribution)
+      | `Static(None, position) =>
+        [%expr [%e render_content_position(~loc, position)]]
+      | `Static(Some(`Safe), position) =>
+        [%expr `safe([%e render_content_position(~loc, position)])]
+      | `Static(Some(`Unsafe), position) =>
+        [%expr `unsafe([%e render_content_position(~loc, position)])]
+      }
+    },
   );
 
 // css-grid-1
@@ -2995,7 +3184,16 @@ let render_property_gap = (~loc, value: Types.property_gap) => {
 let gap = emit(Parser.property_gap, (~loc as _) => id, render_property_gap);
 
 let z_index =
-  unsupportedValue(Parser.property_z_index, (~loc) => [%expr CssJs.zIndex]);
+  apply(
+    Parser.property_z_index,
+    (~loc) => [%expr CssJs.zIndex],
+    (~loc, value) => {
+      switch (value) {
+      | `Auto => [%expr `auto]
+      | `Integer(i) => render_integer(~loc, i)
+      }
+    },
+  );
 
 let render_position_value = (~loc) =>
   fun
@@ -3054,26 +3252,25 @@ let render_display = (~loc) =>
   | `Table_header_group => [%expr `tableHeaderGroup]
   | `Table_row => [%expr `tableRow]
   | `Table_row_group => [%expr `tableRowGroup]
-  | `Flow
-  | `Flow_root
-  | `Ruby
-  | `Ruby_base
-  | `Ruby_base_container
-  | `Ruby_text
-  | `Ruby_text_container
-  | `Run_in
-  | `_moz_box
-  | `_moz_inline_box
-  | `_moz_inline_stack
-  | `_ms_flexbox
-  | `_ms_grid
-  | `_ms_inline_flexbox
-  | `_ms_inline_grid
-  | `_webkit_box
-  | `_webkit_flex
-  | `_webkit_inline_box
-  | `_webkit_inline_flex
-  | _ => raise(Unsupported_feature);
+  | `Flow => [%expr `flow]
+  | `Flow_root => [%expr `flowRoot]
+  | `Ruby => [%expr `ruby]
+  | `Ruby_base => [%expr `rubyBase]
+  | `Ruby_base_container => [%expr `rubyBaseContainer]
+  | `Ruby_text => [%expr `rubyText]
+  | `Ruby_text_container => [%expr `rubyTextContainer]
+  | `Run_in => [%expr `runIn]
+  | `_moz_box => [%expr `mozBox]
+  | `_moz_inline_box => [%expr `mozInlineBox]
+  | `_moz_inline_stack => [%expr `mozInlineStack]
+  | `_ms_flexbox => [%expr `msFlexbox]
+  | `_ms_grid => [%expr `msGrid]
+  | `_ms_inline_flexbox => [%expr `msInlineFlexbox]
+  | `_ms_inline_grid => [%expr `msInlineGrid]
+  | `_webkit_box => [%expr `webkitBox]
+  | `_webkit_flex => [%expr `webkitFlex]
+  | `_webkit_inline_box => [%expr `webkitInlineBox]
+  | `_webkit_inline_flex => [%expr `webkitInlineFlex];
 
 let display =
   apply(
@@ -3324,6 +3521,7 @@ let properties = [
   ("flex-basis", found(flex_basis)),
   ("flex", found(flex)),
   ("justify-content", found(justify_content)),
+  ("justify-items", found(justify_items)),
   ("align-items", found(align_items)),
   ("align-self", found(align_self)),
   ("align-content", found(align_content)),

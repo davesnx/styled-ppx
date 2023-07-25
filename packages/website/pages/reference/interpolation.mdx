@@ -13,13 +13,13 @@ Useful for reusing variables, handling themes or conditionally apply styles base
 ```rescript
 module Component = %styled.div(`
   border: 1px solid $(Theme.black);
-)
+`)
 ```
 
 ```rescript
 module Component = %styled.div(`
   max-width: $(maxWidth);
-)
+`)
 ```
 
 Interpolation works inside values, media-queries and selectors. It doesn't work for entire properties or any interpolation, which is slightly different from SASS/Less and other JavaScript-based solutions (such as styled-components or emotion) their interpolation is more dynamic and can be used everywhere.

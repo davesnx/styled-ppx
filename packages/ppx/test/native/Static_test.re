@@ -603,27 +603,27 @@ let properties_static_css_tests = [
   (
     [%css "flex: none"],
     [%expr [%css "flex: none"]],
-    Css.flex(`none),
-    [%expr CssJs.flex(`none)],
+    Css.flex1(`none),
+    [%expr CssJs.flex1(`none)],
   ),
-  /* bs-css doesn't support it */
-  /* (
-       [%css "width: calc(100px)"],
-       [%expr [%css "width: calc(100px)"]],
-       Css.width(`calc(`pxFloat(100.))),
-       [%expr CssJs.width(`calc(`pxFloat(100.)))],
-     ), */
+  /* Since calc(x) -> x */
+  (
+    [%css "width: calc(100px)"],
+    [%expr [%css "width: calc(100px)"]],
+    Css.width(`pxFloat(100.)),
+    [%expr CssJs.width(`pxFloat(100.))],
+  ),
   (
     [%css "width: calc(100% + 32px)"],
     [%expr [%css "width: calc(100% + 32px)"]],
-    Css.width(`calc((`add, `percent(100.), `pxFloat(32.)))),
-    [%expr CssJs.width(`calc((`add, `percent(100.), `pxFloat(32.))))],
+    Css.width(`calc(`add((`percent(100.), `pxFloat(32.))))),
+    [%expr CssJs.width(`calc(`add((`percent(100.), `pxFloat(32.)))))],
   ),
   (
     [%css "width: calc(100vh - 120px)"],
     [%expr [%css "width: calc(100vh - 120px)"]],
-    Css.width(`calc((`sub, `vh(100.), `pxFloat(120.)))),
-    [%expr CssJs.width(`calc((`sub, `vh(100.), `pxFloat(120.))))],
+    Css.width(`calc(`sub((`vh(100.), `pxFloat(120.))))),
+    [%expr CssJs.width(`calc(`sub((`vh(100.), `pxFloat(120.)))))],
   ),
   (
     [%css "color: var(--main-c)"],
@@ -667,44 +667,37 @@ let properties_static_css_tests = [
     Css.backgroundImage(`url({js|img_tree.gif|js})),
     [%expr CssJs.backgroundImage(`url({js|img_tree.gif|js}))],
   ),
-  /* Mult isn't available in bs-css */
-  /* (
-       [%css "width: calc(100px * 3)"],
-       [%expr [%css "width: calc(100px * 3)"]],
-       Css.width(`calc(`mult, `px(100.), `number(3.))),
-       [%expr CssJs.width(`calc(`mult, `px(100.), `number(3.)))]
-     ), */
-  /* (
-       [%css "flex: 1 2 content"],
-       [%expr [%css "flex: 1 2 content"]],
-       Css.flexGrow(1.), Css.flexShrink(2.), Css.flexBasis(`content)|],,
-       [%expr CssJs.flexGrow(1.), Css.flexShrink(2.), Css.flexBasis(`content)|],],
-     ), */
+  (
+    [%css "flex: 1 2 content"],
+    [%expr [%css "flex: 1 2 content"]],
+    Css.flex(1., 2., `content),
+    [%expr CssJs.flex(1., 2., `content)],
+  ),
+  (
+    [%css "align-items: center"],
+    [%expr [%css "align-items: center"]],
+    Css.alignItems(`center),
+    [%expr CssJs.alignItems(`center)],
+  ),
+  (
+    [%css "align-self: stretch"],
+    [%expr [%css "align-self: stretch"]],
+    Css.alignSelf(`stretch),
+    [%expr CssJs.alignSelf(`stretch)],
+  ),
+  (
+    [%css "align-content: space-around"],
+    [%expr [%css "align-content: space-around"]],
+    Css.alignContent(`spaceAround),
+    [%expr CssJs.alignContent(`spaceAround)],
+  ),
+  (
+    [%css "justify-content: center"],
+    [%expr [%css "justify-content: center"]],
+    Css.justifyContent(`center),
+    [%expr CssJs.justifyContent(`center)],
+  ),
   // unsupported
-  /* (
-       [%css "align-items: center"],
-       [%expr [%css "align-items: center"]],
-       Css.alignItems(`center),
-       [%expr CssJs.alignItems(`center)],
-     ), */
-  /* (
-       [%css "align-self: stretch"],
-       [%expr [%css "align-self: stretch"]],
-       Css.alignSelf(`stretch),
-       [%expr CssJs.alignSelf(`stretch)],
-     ), */
-  /* (
-       [%css "align-content: space-around"],
-       [%expr [%css "align-content: space-around"]],
-       Css.alignContent(`spaceAround),
-       [%expr CssJs.alignContent(`spaceAround)],
-     ), */
-  /* (
-       [%css "justify-content: center"],
-       [%expr [%css "justify-content: center"]],
-       Css.unsafe("justifyContent", "center"),
-       [%expr CssJs.unsafe("justifyContent", "center")],
-     ), */
   /* (
        [%css "-moz-text-blink: blink"],
        [%expr [%css "-moz-text-blink: blink"]],

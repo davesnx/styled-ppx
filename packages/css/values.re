@@ -133,7 +133,7 @@ module Length = {
     | `pc(float)
     | `pt(int)
     | `zero
-    | `calc([ | `add | `sub], t, t)
+    | `calc([ | `add(t, t) | `sub(t, t) | `mult(t, t)])
     | `percent(float)
   ];
 
@@ -172,11 +172,12 @@ module Length = {
     | `pc(x) => Js.Float.toString(x) ++ "pc"
     | `pt(x) => Js.Int.toString(x) ++ "pt"
     | `zero => "0"
-
-    | `calc(`add, a, b) =>
+    | `calc(`add(a, b)) =>
       "calc(" ++ toString(a) ++ " + " ++ toString(b) ++ ")"
-    | `calc(`sub, a, b) =>
+    | `calc(`sub(a, b)) =>
       "calc(" ++ toString(a) ++ " - " ++ toString(b) ++ ")"
+    | `calc(`mult(a, b)) =>
+      "calc(" ++ toString(a) ++ " * " ++ toString(b) ++ ")"
     | `percent(x) => Js.Float.toString(x) ++ "%";
 };
 
@@ -987,6 +988,52 @@ module WordSpacing = {
     | `normal => "normal";
 };
 
+module DisplayOld = {
+  type t = [
+    | `flow
+    | `flowRoot
+    | `ruby
+    | `rubyBase
+    | `rubyBaseContainer
+    | `rubyText
+    | `rubyTextContainer
+    | `runIn
+    | `mozBox
+    | `mozInlineBox
+    | `mozInlineStack
+    | `msFlexbox
+    | `msGrid
+    | `msInlineFlexbox
+    | `msInlineGrid
+    | `webkitBox
+    | `webkitFlex
+    | `webkitInlineBox
+    | `webkitInlineFlex
+  ];
+
+  let toString =
+    fun
+    | `flow => "flow"
+    | `flowRoot => "flow-root"
+    | `ruby => "ruby"
+    | `rubyBase => "ruby-base"
+    | `rubyBaseContainer => "ruby-base-container"
+    | `rubyText => "ruby-text"
+    | `rubyTextContainer => "ruby-text-container"
+    | `runIn => "run-in"
+    | `mozBox => "-moz-box"
+    | `mozInlineBox => "-moz-inline-box"
+    | `mozInlineStack => "-moz-inline-stack"
+    | `msFlexbox => "-ms-flexbox"
+    | `msGrid => "-ms-grid"
+    | `msInlineFlexbox => "-ms-inline-flexbox"
+    | `msInlineGrid => "-ms-inline-grid"
+    | `webkitBox => "-webkit-box"
+    | `webkitFlex => "-webkit-flex"
+    | `webkitInlineBox => "-webkit-inline-box"
+    | `webkitInlineFlex => "-webkit-inline-flex";
+};
+
 module DisplayOutside = {
   type t = [ | `block | `inline | `runIn];
 
@@ -1636,68 +1683,116 @@ module OverflowWrap = {
     | `anywhere => "anywhere";
 };
 
+module SideOrCorner = {
+  type t = [
+    | `Top
+    | `Left
+    | `Bottom
+    | `Right
+    | `TopLeft
+    | `TopRight
+    | `BottomLeft
+    | `BottomRight
+  ];
+
+  let toString =
+    fun
+    | `Top => "to top"
+    | `Left => "to left"
+    | `Bottom => "to bottom"
+    | `Right => "to right"
+    | `TopLeft => "to top left"
+    | `TopRight => "to top right"
+    | `BottomLeft => "to bottom left"
+    | `BottomRight => "to bottom right";
+};
+
+let direction_to_string =
+  fun
+  | `Angle(a) => Angle.toString(a)
+  | `SideOrCorner(s) => SideOrCorner.toString(s);
+
 module Gradient = {
-  type t('colorOrVar) = [
+  type nonrec t('colorOrVar) = [
     | `linearGradient(
-        Angle.t,
-        list((Length.t, [< Color.t | Var.t] as 'colorOrVar)),
+        option([ | `Angle(Angle.t) | `SideOrCorner(SideOrCorner.t)]),
+        list(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
       )
     | `repeatingLinearGradient(
-        Angle.t,
-        list((Length.t, [< Color.t | Var.t] as 'colorOrVar)),
+        option([ | `Angle(Angle.t) | `SideOrCorner(SideOrCorner.t)]),
+        list(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
       )
-    | `radialGradient(list((Length.t, [< Color.t | Var.t] as 'colorOrVar)))
+    | `radialGradient(
+        list(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
+      )
     | `repeatingRadialGradient(
-        list((Length.t, [< Color.t | Var.t] as 'colorOrVar)),
+        list(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
       )
     | `conicGradient(
-        Angle.t,
-        list((Length.t, [< Color.t | Var.t] as 'colorOrVar)),
+        option([ | `Angle(Angle.t) | `SideOrCorner(SideOrCorner.t)]),
+        list(([< Color.t | Var.t] as 'colorOrVar, option(Length.t))),
       )
   ];
 
   let linearGradient = (angle, stops) => `linearGradient((angle, stops));
+
   let repeatingLinearGradient = (angle, stops) =>
     `repeatingLinearGradient((angle, stops));
+
   let radialGradient = stops => `radialGradient(stops);
   let repeatingRadialGradient = stops => `repeatingRadialGradient(stops);
   let conicGradient = (angle, stops) => `conicGradient((angle, stops));
 
-  let string_of_color =
-    fun
+  let string_of_color = x =>
+    switch (x) {
     | #Color.t as co => Color.toString(co)
-    | #Var.t as va => Var.toString(va);
-  let string_of_stops = stops =>
+    | #Var.t as va => Var.toString(va)
+    };
+
+  let string_of_stops =
+      (stops: list(([< Color.t | Var.t] as 'colorOrVar, option(Length.t)))) =>
     stops
-    |> List.map(((l, c)) =>
-         string_of_color(c) ++ " " ++ Length.toString(l)
+    |> List.map(((color, length)) =>
+         switch (length) {
+         | None => string_of_color(color)
+         | Some(length) =>
+           string_of_color(color) ++ " " ++ Length.toString(length)
+         }
        )
     |> String.concat(", ");
 
-  let toString =
-    fun
-    | `linearGradient(angle, stops) =>
-      "linear-gradient("
-      ++ Angle.toString(angle)
-      ++ ", "
+  let toString = x =>
+    switch (x) {
+    | `linearGradient(None, stops) =>
+      ({js|linear-gradient(|js} ++ string_of_stops(stops)) ++ {js|)|js}
+    | `linearGradient(Some(direction), stops) =>
+      ({js|linear-gradient(|js} ++ direction_to_string(direction))
+      ++ {js|, |js}
       ++ string_of_stops(stops)
-      ++ ")"
-    | `repeatingLinearGradient(angle, stops) =>
-      "repeating-linear-gradient("
-      ++ Angle.toString(angle)
-      ++ ", "
+      ++ {js|)|js}
+    | `repeatingLinearGradient(None, stops) =>
+      ({js|repeating-linear-gradient(|js} ++ string_of_stops(stops))
+      ++ {js|)|js}
+    | `repeatingLinearGradient(Some(direction), stops) =>
+      {js|repeating-linear-gradient(|js}
+      ++ direction_to_string(direction)
+      ++ {js|, |js}
       ++ string_of_stops(stops)
-      ++ ")"
+      ++ {js|)|js}
     | `radialGradient(stops) =>
-      "radial-gradient(" ++ string_of_stops(stops) ++ ")"
+      {js|radial-gradient(|js} ++ string_of_stops(stops) ++ {js|)|js}
     | `repeatingRadialGradient(stops) =>
-      "repeating-radial-gradient(" ++ string_of_stops(stops) ++ ")"
-    | `conicGradient(angle, stops) =>
-      "conic-gradient(from "
-      ++ Angle.toString(angle)
-      ++ ", "
+      {js|repeating-radial-gradient(|js}
       ++ string_of_stops(stops)
-      ++ ")";
+      ++ {js|)|js}
+    | `conicGradient(None, stops) =>
+      ({js|conic-gradient(from |js} ++ string_of_stops(stops)) ++ {js|)|js}
+    | `conicGradient(Some(direction), stops) =>
+      ({js|conic-gradient(from |js} ++ direction_to_string(direction))
+      ++ {js|, |js}
+      ++ string_of_stops(stops)
+      ++ {js|)|js}
+    };
 };
 
 module BackgroundImage = {

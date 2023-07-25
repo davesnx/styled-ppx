@@ -174,6 +174,11 @@
 [%css {|box-shadow: 1px 2px 3px 4px black|}];
 [%css {|box-shadow: inset 1px 2px 3px 4px black|}];
 [%css {|box-shadow: inset 1px 2px 3px 4px black, 1px 2px 3px 4px black|}];
+[%css
+  {|box-shadow: -1px 1px 0px 0px $(Color.Shadow.elevation1),
+            1px 1px 0px 0px $(Color.Shadow.elevation1),
+            0px -1px 0px 0px $(Color.Shadow.elevation1);|}
+];
 
 /* CSS Backgrounds and Borders Module Level 4 */
 [%css {|background-position-x: right|}];
@@ -231,12 +236,14 @@
 [%css {|background-image: linear-gradient(45deg, blue, red);|}];
 [%css {|background-image: linear-gradient(90deg, blue 10%, red 20%);|}];
 [%css {|background-image: linear-gradient(90deg, blue 10%, red);|}];
-/* [%css {|background-image: linear-gradient(white, black);|}]; */
-/* [%css {|background-image: linear-gradient(to right, white, black);|}]; */
+[%css {|background-image: linear-gradient(white, black);|}];
+[%css {|background-image: linear-gradient(to right, white, black);|}];
 [%css {|background-image: linear-gradient(45deg, white, black);|}];
 /* [%css {|background-image: linear-gradient(white 50%, black);|}]; */
 [%css {|background-image: linear-gradient(white, #f06, black);|}];
-/* [%css {|background-image: linear-gradient(red -50px, white calc(-25px + 50%), blue 100%);|}]; */
+[%css
+  {|background-image: linear-gradient(red -50px, white calc(-25px + 50%), blue 100%);|}
+];
 /* [%css {|background-image: radial-gradient(white, black);|}]; */
 /* [%css {|background-image: radial-gradient(circle, white, black);|}]; */
 /* [%css {|background-image: radial-gradient(ellipse, white, black);|}]; */
@@ -385,13 +392,13 @@
 /* [%css {|text-overflow: fade clip|}]; */
 /* [%css {|text-overflow: fade(10px) clip|}]; */
 /* [%css {|text-overflow: fade(10%) clip|}]; */
-/* [%css {|text-overflow: 'foo' clip|}]; */
-/* [%css {|text-overflow: clip ellipsis|}]; */
-/* [%css {|text-overflow: ellipsis ellipsis|}]; */
+[%css {|text-overflow: 'foo' clip|}];
+[%css {|text-overflow: clip ellipsis|}];
+[%css {|text-overflow: ellipsis ellipsis|}];
 /* [%css {|text-overflow: fade ellipsis|}]; */
 /* [%css {|text-overflow: fade(10px) ellipsis|}]; */
 /* [%css {|text-overflow: fade(10%) ellipsis|}]; */
-/* [%css {|text-overflow: 'foo' ellipsis|}]; */
+[%css {|text-overflow: 'foo' ellipsis|}];
 /* [%css {|text-overflow: clip fade|}]; */
 /* [%css {|text-overflow: ellipsis fade|}]; */
 /* [%css {|text-overflow: fade fade|}]; */
@@ -410,12 +417,12 @@
 /* [%css {|text-overflow: fade(10px) fade(10%)|}]; */
 /* [%css {|text-overflow: fade(10%) fade(10%)|}]; */
 /* [%css {|text-overflow: 'foo' fade(10%)|}]; */
-/* [%css {|text-overflow: clip 'foo'|}]; */
-/* [%css {|text-overflow: ellipsis 'foo'|}]; */
+[%css {|text-overflow: clip 'foo'|}];
+[%css {|text-overflow: ellipsis 'foo'|}];
 /* [%css {|text-overflow: fade 'foo'|}]; */
 /* [%css {|text-overflow: fade(10px) 'foo'|}]; */
 /* [%css {|text-overflow: fade(10%) 'foo'|}]; */
-/* [%css {|text-overflow: 'foo' 'foo'|}]; */
+[%css {|text-overflow: 'foo' 'foo'|}];
 [%css {|user-select: auto|}];
 [%css {|user-select: text|}];
 [%css {|user-select: none|}];
@@ -594,15 +601,14 @@
 /* [%css {|offset: polygon(100% 0, 100% 100%, 0 100%)|}]; */
 [%css {|offset: path('M 20 20 H 80 V 30')|}];
 [%css {|offset: url(image.png)|}];
-/* [%css {|offset: ray(45deg closest-side)|}]; */
-/* [%css {|offset: ray(45deg closest-side)|}]; */
-/* [%css {|offset: ray(45deg closest-side) 10%|}]; */
-/* [%css {|offset: ray(45deg closest-side) 10% reverse|}]; */
+[%css {|offset: ray(45deg closest-side)|}];
+[%css {|offset: ray(45deg closest-side) 10%|}];
+[%css {|offset: ray(45deg closest-side) 10% reverse|}];
 /* [%css {|offset: ray(45deg closest-side) 10% reverse 45deg|}]; */
 /* [%css {|offset: ray(45deg closest-side) 10% 45deg reverse|}]; */
 /* [%css {|offset: ray(45deg closest-side) 45deg 10%|}]; */
 /* [%css {|offset: ray(45deg closest-side) 45deg reverse 10%|}]; */
-/* [%css {|offset: ray(45deg closest-side) reverse 10%|}]; */
+[%css {|offset: ray(45deg closest-side) reverse 10%|}];
 /* [%css {|offset: 200px 100px ray(45deg closest-side)|}]; */
 /* [%css {|offset: 200px 100px ray(45deg closest-side) 10%|}]; */
 /* [%css {|offset: 200px 100px ray(45deg closest-side) 10% reverse|}]; */
@@ -611,9 +617,9 @@
 /* [%css {|offset: 200px 100px ray(45deg closest-side) 45deg 10%|}]; */
 /* [%css {|offset: 200px 100px ray(45deg closest-side) 45deg reverse 10%|}]; */
 /* [%css {|offset: 200px 100px ray(45deg closest-side) reverse 10%|}]; */
-/* [%css {|offset: auto / center|}]; */
-/* [%css {|offset: center / 200px 100px|}]; */
-/* [%css {|offset: ray(45deg closest-side) / 200px 100px|}]; */
+[%css {|offset: auto / center|}];
+[%css {|offset: center / 200px 100px|}];
+[%css {|offset: ray(45deg closest-side) / 200px 100px|}];
 /* [%css {|offset: ray(45deg closest-side) 10% / 200px 100px|}]; */
 /* [%css {|offset: ray(45deg closest-side) 10% reverse / 200px 100px|}]; */
 /* [%css {|offset: ray(45deg closest-side) 10% reverse 45deg / 200px 100px|}]; */
@@ -629,46 +635,46 @@
 /* [%css {|offset: 200px 100px ray(45deg closest-side) 45deg 10% / 200px 100px|}]; */
 /* [%css {|offset: 200px 100px ray(45deg closest-side) 45deg reverse 10% / 200px 100px|}]; */
 /* [%css {|offset: 200px 100px ray(45deg closest-side) reverse 10% / 200px 100px|}]; */
-/* [%css {|offset-path: none|}]; */
-/* [%css {|offset-path: ray(45deg closest-side)|}]; */
-/* [%css {|offset-path: ray(45deg farthest-side)|}]; */
-/* [%css {|offset-path: ray(45deg closest-corner)|}]; */
-/* [%css {|offset-path: ray(45deg farthest-corner)|}]; */
+[%css {|offset-path: none|}];
+[%css {|offset-path: ray(45deg closest-side)|}];
+[%css {|offset-path: ray(45deg farthest-side)|}];
+[%css {|offset-path: ray(45deg closest-corner)|}];
+[%css {|offset-path: ray(45deg farthest-corner)|}];
 /* [%css {|offset-path: ray(45deg sides)|}]; */
 /* [%css {|offset-path: ray(0.25turn sides contain)|}]; */
-/* [%css {|offset-path: ray(100grad closest-side contain)|}]; */
+[%css {|offset-path: ray(100grad closest-side contain)|}];
 /* [%css {|offset-path: ray(calc(180deg - 0.25turn) closest-side)|}]; */
 /* [%css {|offset-path: inset(10% round 10% 40% 10% 40%)|}]; */
 /* [%css {|offset-path: ellipse(at top 50% left 20%)|}]; */
 /* [%css {|offset-path: circle(at right 5% top)|}]; */
-/* [%css {|offset-path: margin-box|}]; */
-/* [%css {|offset-path: border-box|}]; */
-/* [%css {|offset-path: padding-box|}]; */
-/* [%css {|offset-path: content-box|}]; */
-/* [%css {|offset-path: fill-box|}]; */
-/* [%css {|offset-path: stroke-box|}]; */
-/* [%css {|offset-path: view-box|}]; */
-/* [%css {|offset-path: circle(60%) margin-box|}]; */
+[%css {|offset-path: margin-box|}];
+[%css {|offset-path: border-box|}];
+[%css {|offset-path: padding-box|}];
+[%css {|offset-path: content-box|}];
+[%css {|offset-path: fill-box|}];
+[%css {|offset-path: stroke-box|}];
+[%css {|offset-path: view-box|}];
+[%css {|offset-path: circle(60%) margin-box|}];
 /* [%css {|offset-path: polygon(100% 0, 100% 100%, 0 100%)|}]; */
 /* [%css {|offset-path: path('M 20 20 H 80 V 30')|}]; */
 /* [%css {|offset-path: url(image.png)|}]; */
 /* [%css {|offset-path: url(#id)|}]; */
-/* [%css {|offset-distance: 10%|}]; */
-/* [%css {|offset-position: auto|}]; */
-/* [%css {|offset-position: 200px|}]; */
-/* [%css {|offset-position: 200px 100px|}]; */
-/* [%css {|offset-position: center|}]; */
-/* [%css {|offset-anchor: auto|}]; */
-/* [%css {|offset-anchor: 200px|}]; */
-/* [%css {|offset-anchor: 200px 100px|}]; */
-/* [%css {|offset-anchor: center|}]; */
-/* [%css {|offset-rotate: auto|}]; */
-/* [%css {|offset-rotate: 0deg|}]; */
-/* [%css {|offset-rotate: reverse|}]; */
-/* [%css {|offset-rotate: -45deg|}]; */
-/* [%css {|offset-rotate: auto 180deg|}]; */
-/* [%css {|offset-rotate: reverse 45deg|}]; */
-/* [%css {|offset-rotate: 2turn reverse|}]; */
+[%css {|offset-distance: 10%|}];
+[%css {|offset-position: auto|}];
+[%css {|offset-position: 200px|}];
+[%css {|offset-position: 200px 100px|}];
+[%css {|offset-position: center|}];
+[%css {|offset-anchor: auto|}];
+[%css {|offset-anchor: 200px|}];
+[%css {|offset-anchor: 200px 100px|}];
+[%css {|offset-anchor: center|}];
+[%css {|offset-rotate: auto|}];
+[%css {|offset-rotate: 0deg|}];
+[%css {|offset-rotate: reverse|}];
+[%css {|offset-rotate: -45deg|}];
+[%css {|offset-rotate: auto 180deg|}];
+[%css {|offset-rotate: reverse 45deg|}];
+[%css {|offset-rotate: 2turn reverse|}];
 
 /* CSS Text Module Level 3 */
 [%css {|text-transform: full-width|}];
@@ -888,14 +894,14 @@
 [%css {|font-size-adjust: .5|}];
 [%css {|font-synthesis: none|}];
 [%css {|font-synthesis: weight|}];
-/* [%css {|font-synthesis: style|}]; */
-/* [%css {|font-synthesis: weight style|}]; */
-/* [%css {|font-synthesis: style weight|}]; */
+[%css {|font-synthesis: style|}];
+[%css {|font-synthesis: weight style|}];
+[%css {|font-synthesis: style weight|}];
 [%css {|font-kerning: auto|}];
 [%css {|font-kerning: normal|}];
 [%css {|font-kerning: none|}];
 [%css {|font-variant-position: normal|}];
-/* [%css {|font-variant-position: sub|}]; */
+[%css {|font-variant-position: sub|}];
 [%css {|font-variant-position: super|}];
 [%css {|font-variant-ligatures: normal|}];
 [%css {|font-variant-ligatures: none|}];
@@ -944,13 +950,13 @@
 [%css {|font-variant-east-asian: traditional|}];
 [%css {|font-variant-east-asian: full-width|}];
 [%css {|font-variant-east-asian: proportional-width|}];
-/* [%css {|font-variant-east-asian: ruby|}]; */
-/* [%css {|font-variant-east-asian: simplified full-width ruby|}]; */
-/* [%css {|font-feature-settings: normal|}]; */
-/* [%css {|font-feature-settings: 'c2sc'|}]; */
-/* [%css {|font-feature-settings: 'smcp' on|}]; */
-/* [%css {|font-feature-settings: 'liga' off|}]; */
-/* [%css {|font-feature-settings: 'smcp', 'swsh' 2|}]; */
+[%css {|font-variant-east-asian: ruby|}];
+[%css {|font-variant-east-asian: simplified full-width ruby|}];
+[%css {|font-feature-settings: normal|}];
+[%css {|font-feature-settings: 'c2sc'|}];
+[%css {|font-feature-settings: 'smcp' on|}];
+[%css {|font-feature-settings: 'liga' off|}];
+[%css {|font-feature-settings: 'smcp', 'swsh' 2|}];
 
 /* CSS Fonts Module Level 4 */
 [%css {|font-size: xxx-large|}];
@@ -958,10 +964,12 @@
 [%css {|font-variant: normal|}];
 [%css {|font-variant: all-petite-caps|}];
 [%css {|font-variant: historical-forms|}];
-/* [%css {|font-variant: super|}]; */
-/* [%css {|font-variant: sub lining-nums contextual ruby|}]; */
-/* [%css {|font-variant: annotation(circled)|}]; */
-/* [%css {|font-variant: discretionary-ligatures character-variant(leo-B, leo-M, leo-N, leo-T, leo-U)|}]; */
+[%css {|font-variant: super|}];
+[%css {|font-variant: sub lining-nums contextual ruby|}];
+[%css {|font-variant: annotation(circled)|}];
+[%css
+  {|font-variant: discretionary-ligatures character-variant(leo-B, leo-M, leo-N, leo-T, leo-U)|}
+];
 [%css {|font-variant-alternates: normal|}];
 [%css {|font-variant-alternates: historical-forms|}];
 [%css {|font-variant-alternates: styleset(ss01)|}];
@@ -984,15 +992,15 @@
 [%css {|font-style: oblique 0deg|}];
 [%css {|font-optical-sizing: none|}];
 [%css {|font-optical-sizing: auto|}];
-/* [%css {|font-palette: normal|}]; */
-/* [%css {|font-palette: light|}]; */
-/* [%css {|font-palette: dark|}]; */
+[%css {|font-palette: normal|}];
+[%css {|font-palette: light|}];
+[%css {|font-palette: dark|}];
 
 /* CSS Writing Modes Level 3 */
 [%css {|direction: ltr|}];
 [%css {|direction: rtl|}];
 [%css {|unicode-bidi: normal|}];
-/* [%css {|unicode-bidi: embed|}]; */
+[%css {|unicode-bidi: embed|}];
 [%css {|unicode-bidi: isolate|}];
 [%css {|unicode-bidi: bidi-override|}];
 [%css {|unicode-bidi: isolate-override|}];
@@ -1009,62 +1017,62 @@
 /* CSS Writing Modes Level 4 */
 [%css {|writing-mode: sideways-rl|}];
 [%css {|writing-mode: sideways-lr|}];
-/* [%css {|text-combine-upright: digits 2|}]; */
+[%css {|text-combine-upright: digits 2|}];
 
 /* CSS Color Module Level 3 */
-/* [%css {|color: rgba(0,0,0,.5);|}]; */
-/* [%css {|color: #F06;|}]; */
-/* [%css {|color: #FF0066;|}]; */
-/* [%css {|color: hsl(0,0%,0%);|}]; */
-/* [%css {|color: hsl(0,0%,0%,.5);|}]; */
-/* [%css {|color: transparent;|}]; */
-/* [%css {|color: currentColor;|}]; */
-/* [%css {|background-color: rgba(0,0,0,.5);|}]; */
-/* [%css {|background-color: #F06;|}]; */
-/* [%css {|background-color: #FF0066;|}]; */
-/* [%css {|background-color: hsl(0,0%,0%);|}]; */
-/* [%css {|background-color: hsl(0,0%,0%,.5);|}]; */
-/* [%css {|background-color: transparent;|}]; */
-/* [%css {|background-color: currentColor;|}]; */
-/* [%css {|border-color: rgba(0,0,0,.5);|}]; */
-/* [%css {|border-color: #F06;|}]; */
-/* [%css {|border-color: #FF0066;|}]; */
-/* [%css {|border-color: hsl(0,0%,0%);|}]; */
-/* [%css {|border-color: hsl(0,0%,0%,.5);|}]; */
-/* [%css {|border-color: transparent;|}]; */
-/* [%css {|border-color: currentColor;|}]; */
-/* [%css {|text-decoration-color: rgba(0,0,0,.5);|}]; */
-/* [%css {|text-decoration-color: #F06;|}]; */
-/* [%css {|text-decoration-color: #FF0066;|}]; */
-/* [%css {|text-decoration-color: hsl(0,0%,0%);|}]; */
-/* [%css {|text-decoration-color: hsl(0,0%,0%,.5);|}]; */
-/* [%css {|text-decoration-color: transparent;|}]; */
-/* [%css {|text-decoration-color: currentColor;|}]; */
-/* [%css {|column-rule-color: rgba(0,0,0,.5);|}]; */
-/* [%css {|column-rule-color: #F06;|}]; */
-/* [%css {|column-rule-color: #FF0066;|}]; */
-/* [%css {|column-rule-color: hsl(0,0%,0%);|}]; */
-/* [%css {|column-rule-color: hsl(0,0%,0%,.5);|}]; */
-/* [%css {|column-rule-color: transparent;|}]; */
-/* [%css {|column-rule-color: currentColor;|}]; */
+[%css {|color: rgba(0,0,0,.5);|}];
+[%css {|color: #F06;|}];
+[%css {|color: #FF0066;|}];
+[%css {|color: hsl(0,0%,0%);|}];
+[%css {|color: hsl(0,0%,0%,.5);|}];
+[%css {|color: transparent;|}];
+[%css {|color: currentColor;|}];
+[%css {|background-color: rgba(0,0,0,.5);|}];
+[%css {|background-color: #F06;|}];
+[%css {|background-color: #FF0066;|}];
+[%css {|background-color: hsl(0,0%,0%);|}];
+[%css {|background-color: hsl(0,0%,0%,.5);|}];
+[%css {|background-color: transparent;|}];
+[%css {|background-color: currentColor;|}];
+[%css {|border-color: rgba(0,0,0,.5);|}];
+[%css {|border-color: #F06;|}];
+[%css {|border-color: #FF0066;|}];
+[%css {|border-color: hsl(0,0%,0%);|}];
+[%css {|border-color: hsl(0,0%,0%,.5);|}];
+[%css {|border-color: transparent;|}];
+[%css {|border-color: currentColor;|}];
+[%css {|text-decoration-color: rgba(0,0,0,.5);|}];
+[%css {|text-decoration-color: #F06;|}];
+[%css {|text-decoration-color: #FF0066;|}];
+[%css {|text-decoration-color: hsl(0,0%,0%);|}];
+[%css {|text-decoration-color: hsl(0,0%,0%,.5);|}];
+[%css {|text-decoration-color: transparent;|}];
+[%css {|text-decoration-color: currentColor;|}];
+[%css {|column-rule-color: rgba(0,0,0,.5);|}];
+[%css {|column-rule-color: #F06;|}];
+[%css {|column-rule-color: #FF0066;|}];
+[%css {|column-rule-color: hsl(0,0%,0%);|}];
+[%css {|column-rule-color: hsl(0,0%,0%,.5);|}];
+[%css {|column-rule-color: transparent;|}];
+[%css {|column-rule-color: currentColor;|}];
 
 /* CSS Color Module Level 4 */
-/* [%css {|color: rgb(0% 20% 70%);|}]; */
-/* [%css {|color: rgb(0 64 185);|}]; */
-/* [%css {|color: hsl(0 0% 0%);|}]; */
-/* [%css {|color: rgba(0% 20% 70% / 50%);|}]; */
-/* [%css {|color: rgba(0% 20% 70% / .5);|}]; */
-/* [%css {|color: rgba(0 64 185 / 50%);|}]; */
-/* [%css {|color: rgba(0 64 185 / .5);|}]; */
-/* [%css {|color: hsla(0 0% 0% /.5);|}]; */
-/* [%css {|color: rgb(0% 20% 70% / 50%);|}]; */
-/* [%css {|color: rgb(0% 20% 70% / .5);|}]; */
-/* [%css {|color: rgb(0 64 185 / 50%);|}]; */
-/* [%css {|color: rgb(0 64 185 / .5);|}]; */
-/* [%css {|color: hsl(0 0% 0% / .5);|}]; */
-/* [%css {|color: #000F;|}]; */
-/* [%css {|color: #000000FF;|}]; */
-/* [%css {|color: rebeccapurple;|}]; */
+[%css {|color: rgb(0% 20% 70%);|}];
+[%css {|color: rgb(0 64 185);|}];
+[%css {|color: hsl(0 0% 0%);|}];
+[%css {|color: rgba(0% 20% 70% / 50%);|}];
+[%css {|color: rgba(0% 20% 70% / .5);|}];
+[%css {|color: rgba(0 64 185 / 50%);|}];
+[%css {|color: rgba(0 64 185 / .5);|}];
+[%css {|color: hsla(0 0% 0% /.5);|}];
+[%css {|color: rgb(0% 20% 70% / 50%);|}];
+[%css {|color: rgb(0% 20% 70% / .5);|}];
+[%css {|color: rgb(0 64 185 / 50%);|}];
+[%css {|color: rgb(0 64 185 / .5);|}];
+[%css {|color: hsl(0 0% 0% / .5);|}];
+[%css {|color: #000F;|}];
+[%css {|color: #000000FF;|}];
+[%css {|color: rebeccapurple;|}];
 /* [%css {|color: Canvas;|}]; */
 /* [%css {|color: CanvasText;|}]; */
 /* [%css {|color: LinkText;|}]; */
@@ -1102,9 +1110,9 @@
 /* [%css {|color: device-cmyk(.2 .3 .4 .5);|}]; */
 /* [%css {|color: device-cmyk(.2 .3 .4 .5 / .5);|}]; */
 /* [%css {|color: device-cmyk(.2 .3 .4 .5 / 50%);|}]; */
-/* [%css {|background-color: rgb(0% 20% 70%);|}]; */
-/* [%css {|background-color: rgb(0 64 185);|}]; */
-/* [%css {|background-color: hsl(0 0% 0%);|}]; */
+[%css {|background-color: rgb(0% 20% 70%);|}];
+[%css {|background-color: rgb(0 64 185);|}];
+[%css {|background-color: hsl(0 0% 0%);|}];
 [%css {|background-color: rgba(0% 20% 70% / 50%);|}];
 [%css {|background-color: rgba(0% 20% 70% / .5);|}];
 [%css {|background-color: rgba(0 64 185 / 50%);|}];
@@ -1118,43 +1126,6 @@
 [%css {|background-color: #000F;|}];
 [%css {|background-color: #000000FF;|}];
 [%css {|background-color: rebeccapurple;|}];
-/* [%css {|background-color: Canvas;|}]; */
-/* [%css {|background-color: CanvasText;|}]; */
-/* [%css {|background-color: LinkText;|}]; */
-/* [%css {|background-color: VisitedText;|}]; */
-/* [%css {|background-color: ActiveText;|}]; */
-/* [%css {|background-color: ButtonFace;|}]; */
-/* [%css {|background-color: Field;|}]; */
-/* [%css {|background-color: FieldText;|}]; */
-/* [%css {|background-color: Highlight;|}]; */
-/* [%css {|background-color: HighlightText;|}]; */
-/* [%css {|background-color: GrayText;|}]; */
-/* [%css {|background-color: hwb(0 0% 0%);|}]; */
-/* [%css {|background-color: hwb(0 0% 0% / .5);|}]; */
-/* [%css {|background-color: lab(0% 0 0);|}]; */
-/* [%css {|background-color: lab(0% 0 0 /.5);|}]; */
-/* [%css {|background-color: lch(0% 0 0);|}]; */
-/* [%css {|background-color: lch(0% 0 0 / .5);|}]; */
-/* [%css {|background-color: color(.2 .4 .6);|}]; */
-/* [%css {|background-color: color(display-p3 .2. 4 .6);|}]; */
-/* [%css {|background-color: color(foo .2 .4 .6);|}]; */
-/* [%css {|background-color: color(.2 .4 .6 / .5);|}]; */
-/* [%css {|background-color: color(display-p3 .2 .4 .6  / .5);|}]; */
-/* [%css {|background-color: color(--foo .2 .4 .6 / .5);|}]; */
-/* [%css {|background-color: color(.2 .4 .6, #123456);|}]; */
-/* [%css {|background-color: color(display-p3 .2. 4 .6, #654321);|}]; */
-/* [%css {|background-color: color(20% 40% 60%);|}]; */
-/* [%css {|background-color: color(display-p3 20% 40% 60%);|}]; */
-/* [%css {|background-color: color(foo 20% 40% 60%);|}]; */
-/* [%css {|background-color: color(20% 40% 60% / .5);|}]; */
-/* [%css {|background-color: color(image-p3 20% 40% 60%  / .5);|}]; */
-/* [%css {|background-color: color(--foo 20% 40% 60% / .5);|}]; */
-/* [%css {|background-color: color(20% 40% 60%, #123456);|}]; */
-/* [%css {|background-color: color(display-p3 20% 40% 60%, #654321);|}]; */
-/* [%css {|background-color: color(--mycmyk 0% 20% 30% 5%);|}]; */
-/* [%css {|background-color: device-cmyk(.2 .3 .4 .5);|}]; */
-/* [%css {|background-color: device-cmyk(.2 .3 .4 .5 / .5);|}]; */
-/* [%css {|background-color: device-cmyk(.2 .3 .4 .5 / 50%);|}]; */
 [%css {|border-color: rgb(0% 20% 70%);|}];
 [%css {|border-color: rgb(0 64 185);|}];
 [%css {|border-color: hsl(0 0% 0%);|}];
@@ -1171,43 +1142,6 @@
 [%css {|border-color: #000F;|}];
 [%css {|border-color: #000000FF;|}];
 [%css {|border-color: rebeccapurple;|}];
-/* [%css {|border-color: Canvas;|}]; */
-/* [%css {|border-color: CanvasText;|}]; */
-/* [%css {|border-color: LinkText;|}]; */
-/* [%css {|border-color: VisitedText;|}]; */
-/* [%css {|border-color: ActiveText;|}]; */
-/* [%css {|border-color: ButtonFace;|}]; */
-/* [%css {|border-color: Field;|}]; */
-/* [%css {|border-color: FieldText;|}]; */
-/* [%css {|border-color: Highlight;|}]; */
-/* [%css {|border-color: HighlightText;|}]; */
-/* [%css {|border-color: GrayText;|}]; */
-/* [%css {|border-color: hwb(0 0% 0%);|}]; */
-/* [%css {|border-color: hwb(0 0% 0% / .5);|}]; */
-/* [%css {|border-color: lab(0% 0 0);|}]; */
-/* [%css {|border-color: lab(0% 0 0 /.5);|}]; */
-/* [%css {|border-color: lch(0% 0 0);|}]; */
-/* [%css {|border-color: lch(0% 0 0 / .5);|}]; */
-/* [%css {|border-color: color(.2 .4 .6);|}]; */
-/* [%css {|border-color: color(display-p3 .2. 4 .6);|}]; */
-/* [%css {|border-color: color(foo .2 .4 .6);|}]; */
-/* [%css {|border-color: color(.2 .4 .6 / .5);|}]; */
-/* [%css {|border-color: color(display-p3 .2 .4 .6  / .5);|}]; */
-/* [%css {|border-color: color(--foo .2 .4 .6 / .5);|}]; */
-/* [%css {|border-color: color(.2 .4 .6, #123456);|}]; */
-/* [%css {|border-color: color(display-p3 .2. 4 .6, #654321);|}]; */
-/* [%css {|border-color: color(20% 40% 60%);|}]; */
-/* [%css {|border-color: color(display-p3 20% 40% 60%);|}]; */
-/* [%css {|border-color: color(foo 20% 40% 60%);|}]; */
-/* [%css {|border-color: color(20% 40% 60% / .5);|}]; */
-/* [%css {|border-color: color(image-p3 20% 40% 60%  / .5);|}]; */
-/* [%css {|border-color: color(--foo 20% 40% 60% / .5);|}]; */
-/* [%css {|border-color: color(20% 40% 60%, #123456);|}]; */
-/* [%css {|border-color: color(display-p3 20% 40% 60%, #654321);|}]; */
-/* [%css {|border-color: color(--mycmyk 0% 20% 30% 5%);|}]; */
-/* [%css {|border-color: device-cmyk(.2 .3 .4 .5);|}]; */
-/* [%css {|border-color: device-cmyk(.2 .3 .4 .5 / .5);|}]; */
-/* [%css {|border-color: device-cmyk(.2 .3 .4 .5 / 50%);|}]; */
 [%css {|text-decoration-color: rgb(0% 20% 70%);|}];
 [%css {|text-decoration-color: rgb(0 64 185);|}];
 [%css {|text-decoration-color: hsl(0 0% 0%);|}];
@@ -1224,43 +1158,6 @@
 [%css {|text-decoration-color: #000F;|}];
 [%css {|text-decoration-color: #000000FF;|}];
 [%css {|text-decoration-color: rebeccapurple;|}];
-/* [%css {|text-decoration-color: Canvas;|}]; */
-/* [%css {|text-decoration-color: CanvasText;|}]; */
-/* [%css {|text-decoration-color: LinkText;|}]; */
-/* [%css {|text-decoration-color: VisitedText;|}]; */
-/* [%css {|text-decoration-color: ActiveText;|}]; */
-/* [%css {|text-decoration-color: ButtonFace;|}]; */
-/* [%css {|text-decoration-color: Field;|}]; */
-/* [%css {|text-decoration-color: FieldText;|}]; */
-/* [%css {|text-decoration-color: Highlight;|}]; */
-/* [%css {|text-decoration-color: HighlightText;|}]; */
-/* [%css {|text-decoration-color: GrayText;|}]; */
-/* [%css {|text-decoration-color: hwb(0 0% 0%);|}]; */
-/* [%css {|text-decoration-color: hwb(0 0% 0% / .5);|}]; */
-/* [%css {|text-decoration-color: lab(0% 0 0);|}]; */
-/* [%css {|text-decoration-color: lab(0% 0 0 /.5);|}]; */
-/* [%css {|text-decoration-color: lch(0% 0 0);|}]; */
-/* [%css {|text-decoration-color: lch(0% 0 0 / .5);|}]; */
-/* [%css {|text-decoration-color: color(.2 .4 .6);|}]; */
-/* [%css {|text-decoration-color: color(display-p3 .2. 4 .6);|}]; */
-/* [%css {|text-decoration-color: color(foo .2 .4 .6);|}]; */
-/* [%css {|text-decoration-color: color(.2 .4 .6 / .5);|}]; */
-/* [%css {|text-decoration-color: color(display-p3 .2 .4 .6  / .5);|}]; */
-/* [%css {|text-decoration-color: color(--foo .2 .4 .6 / .5);|}]; */
-/* [%css {|text-decoration-color: color(.2 .4 .6, #123456);|}]; */
-/* [%css {|text-decoration-color: color(display-p3 .2. 4 .6, #654321);|}]; */
-/* [%css {|text-decoration-color: color(20% 40% 60%);|}]; */
-/* [%css {|text-decoration-color: color(display-p3 20% 40% 60%);|}]; */
-/* [%css {|text-decoration-color: color(foo 20% 40% 60%);|}]; */
-/* [%css {|text-decoration-color: color(20% 40% 60% / .5);|}]; */
-/* [%css {|text-decoration-color: color(image-p3 20% 40% 60%  / .5);|}]; */
-/* [%css {|text-decoration-color: color(--foo 20% 40% 60% / .5);|}]; */
-/* [%css {|text-decoration-color: color(20% 40% 60%, #123456);|}]; */
-/* [%css {|text-decoration-color: color(display-p3 20% 40% 60%, #654321);|}]; */
-/* [%css {|text-decoration-color: color(--mycmyk 0% 20% 30% 5%);|}]; */
-/* [%css {|text-decoration-color: device-cmyk(.2 .3 .4 .5);|}]; */
-/* [%css {|text-decoration-color: device-cmyk(.2 .3 .4 .5 / .5);|}]; */
-/* [%css {|text-decoration-color: device-cmyk(.2 .3 .4 .5 / 50%);|}]; */
 [%css {|column-rule-color: rgb(0% 20% 70%);|}];
 [%css {|column-rule-color: rgb(0 64 185);|}];
 [%css {|column-rule-color: hsl(0 0% 0%);|}];
@@ -1277,43 +1174,6 @@
 [%css {|column-rule-color: #000F;|}];
 [%css {|column-rule-color: #000000FF;|}];
 [%css {|column-rule-color: rebeccapurple;|}];
-/* [%css {|column-rule-color: Canvas;|}]; */
-/* [%css {|column-rule-color: CanvasText;|}]; */
-/* [%css {|column-rule-color: LinkText;|}]; */
-/* [%css {|column-rule-color: VisitedText;|}]; */
-/* [%css {|column-rule-color: ActiveText;|}]; */
-/* [%css {|column-rule-color: ButtonFace;|}]; */
-/* [%css {|column-rule-color: Field;|}]; */
-/* [%css {|column-rule-color: FieldText;|}]; */
-/* [%css {|column-rule-color: Highlight;|}]; */
-/* [%css {|column-rule-color: HighlightText;|}]; */
-/* [%css {|column-rule-color: GrayText;|}]; */
-/* [%css {|column-rule-color: hwb(0 0% 0%);|}]; */
-/* [%css {|column-rule-color: hwb(0 0% 0% / .5);|}]; */
-/* [%css {|column-rule-color: lab(0% 0 0);|}]; */
-/* [%css {|column-rule-color: lab(0% 0 0 /.5);|}]; */
-/* [%css {|column-rule-color: lch(0% 0 0);|}]; */
-/* [%css {|column-rule-color: lch(0% 0 0 / .5);|}]; */
-/* [%css {|column-rule-color: color(.2 .4 .6);|}]; */
-/* [%css {|column-rule-color: color(display-p3 .2. 4 .6);|}]; */
-/* [%css {|column-rule-color: color(foo .2 .4 .6);|}]; */
-/* [%css {|column-rule-color: color(.2 .4 .6 / .5);|}]; */
-/* [%css {|column-rule-color: color(display-p3 .2 .4 .6  / .5);|}]; */
-/* [%css {|column-rule-color: color(--foo .2 .4 .6 / .5);|}]; */
-/* [%css {|column-rule-color: color(.2 .4 .6, #123456);|}]; */
-/* [%css {|column-rule-color: color(display-p3 .2. 4 .6, #654321);|}]; */
-/* [%css {|column-rule-color: color(20% 40% 60%);|}]; */
-/* [%css {|column-rule-color: color(display-p3 20% 40% 60%);|}]; */
-/* [%css {|column-rule-color: color(foo 20% 40% 60%);|}]; */
-/* [%css {|column-rule-color: color(20% 40% 60% / .5);|}]; */
-/* [%css {|column-rule-color: color(image-p3 20% 40% 60%  / .5);|}]; */
-/* [%css {|column-rule-color: color(--foo 20% 40% 60% / .5);|}]; */
-/* [%css {|column-rule-color: color(20% 40% 60%, #123456);|}]; */
-/* [%css {|column-rule-color: color(display-p3 20% 40% 60%, #654321);|}]; */
-/* [%css {|column-rule-color: color(--mycmyk 0% 20% 30% 5%);|}]; */
-/* [%css {|column-rule-color: device-cmyk(.2 .3 .4 .5);|}]; */
-/* [%css {|column-rule-color: device-cmyk(.2 .3 .4 .5 / .5);|}]; */
-/* [%css {|column-rule-color: device-cmyk(.2 .3 .4 .5 / 50%);|}]; */
 
 /* CSS Color Module Level 5 */
 /* [%css {|color: color-mix(in srgb, teal 65%, olive);|}]; */
@@ -1398,23 +1258,24 @@
 /* [%css {|column-rule-color: lch(from peru calc(l * 0.8) c h);|}]; */
 
 /* CSS Color Adjustment Module Level 1 */
-/* [%css {|color-adjust: economy|}]; */
-/* [%css {|color-adjust: exact|}]; */
-/* [%css {|forced-color-adjust: auto|}]; */
-/* [%css {|forced-color-adjust: none|}]; */
-/* [%css {|color-scheme: normal|}]; */
-/* [%css {|color-scheme: light|}]; */
-/* [%css {|color-scheme: dark|}]; */
-/* [%css {|color-scheme: light dark|}]; */
-/* [%css {|color-scheme: dark light|}]; */
-/* [%css {|color-scheme: only light|}]; */
-/* [%css {|color-scheme: light only|}]; */
-/* [%css {|color-scheme: light light|}]; */
-/* [%css {|color-scheme: dark dark|}]; */
-/* [%css {|color-scheme: light purple|}]; */
-/* [%css {|color-scheme: purple dark interesting|}]; */
-/* [%css {|color-scheme: none|}]; */
-/* [%css {|color-scheme: light none|}]; */
+[%css {|color-adjust: economy|}];
+[%css {|color-adjust: exact|}];
+[%css {|forced-color-adjust: auto|}];
+[%css {|forced-color-adjust: none|}];
+[%css {|forced-color-adjust: preserve-parent-color|}];
+[%css {|color-scheme: normal|}];
+[%css {|color-scheme: light|}];
+[%css {|color-scheme: dark|}];
+[%css {|color-scheme: light dark|}];
+[%css {|color-scheme: dark light|}];
+[%css {|color-scheme: only light|}];
+[%css {|color-scheme: light only|}];
+[%css {|color-scheme: light light|}];
+[%css {|color-scheme: dark dark|}];
+[%css {|color-scheme: light purple|}];
+[%css {|color-scheme: purple dark interesting|}];
+[%css {|color-scheme: none|}];
+[%css {|color-scheme: light none|}];
 
 /* CSS Multi-column Layout Module Level 1 */
 [%css {|column-width: 10em|}];
@@ -1454,14 +1315,14 @@
 /* [%css {|width: attr(data-px);|}]; */
 /* [%css {|width: attr(data-px px);|}]; */
 /* [%css {|width: attr(data-px px, initial);|}]; */
-/* [%css {|width: calc(1px + 2px);|}]; */
-/* [%css {|width: calc(5px*2);|}]; */
-/* [%css {|width: calc(5px/2);|}]; */
+[%css {|width: calc(1px + 2px);|}];
+[%css {|width: calc(5px*2);|}];
+[%css {|width: calc(5px/2);|}];
 /* [%css {|width: calc(100%/3 - 2*1em - 2*1px);|}]; */
 /* [%css {|width: calc(attr(data-px)*2);|}]; */
-/* [%css {|width: calc(5px - 10px);|}]; */
-/* [%css {|width: calc(1vw - 1px);|}]; */
-/* [%css {|width: calc(calc(100%));|}]; */
+[%css {|width: calc(5px - 10px);|}];
+[%css {|width: calc(1vw - 1px);|}];
+[%css {|width: calc(100%);|}];
 [%css {|padding: 5rem;|}];
 [%css {|padding: 5ch;|}];
 [%css {|padding: 5vw;|}];
@@ -1491,7 +1352,7 @@
 /* [%css {|padding: max(10 * (1vw + 1vh) / 2, 12px);|}]; */
 /* [%css {|padding: clamp(12px, 10 * (1vw + 1vh) / 2, 100px);|}]; */
 
-/*Environment Variables Level 1*/
+/* Environment Variables Level 1 */
 /* [%css {|width: env(safe-area-inset-top);|}]; */
 /* [%css {|width: env(safe-area-inset-top, 12px);|}]; */
 /* [%css {|width: env(safe-area-inset-right);|}]; */
@@ -1532,6 +1393,16 @@
 [%css {|display: inline-flex|}];
 [%css {|flex: none|}];
 [%css {|flex: 5 7 10%|}];
+[%css {|flex: 2;|}];
+[%css {|flex: 10em;|}];
+[%css {|flex: 30%;|}];
+[%css {|flex: min-content;|}];
+[%css {|flex: 1 30px;|}];
+[%css {|flex: 2 2;|}];
+[%css {|flex: 2 2 10%;|}];
+[%css {|flex: $(X.value);|}];
+[%css {|flex: $(X.value) $(X.value);|}];
+[%css {|flex: $(X.value) $(X.value) $(X.value);|}];
 [%css {|flex-basis: auto|}];
 [%css {|flex-basis: content|}];
 [%css {|flex-basis: 1px|}];
@@ -1689,20 +1560,24 @@
 [%css {|grid-gap: 1em 1em|}];
 
 /* CSS Grid Layout Module Level 2 */
-/* [%css {|grid-template-columns: subgrid|}]; */
-/* [%css {|grid-template-columns: subgrid [sub-a]|}]; */
-/* [%css {|grid-template-columns: subgrid [sub-a] [sub-b]|}]; */
-/* [%css {|grid-template-columns: subgrid repeat(1, [sub-a])|}]; */
-/* [%css {|grid-template-columns: subgrid repeat(2, [sub-a] [sub-b]) [sub-c]|}]; */
-/* [%css {|grid-template-columns: subgrid repeat(auto-fill, [sub-a] [sub-b])|}]; */
-/* [%css {|grid-template-columns: subgrid [sub-a] repeat(auto-fill, [sub-b] [sub-c] [sub-d]) [sub-e] repeat(1, [sub-g])|}]; */
-/* [%css {|grid-template-rows: subgrid|}]; */
-/* [%css {|grid-template-rows: subgrid [sub-a]|}]; */
-/* [%css {|grid-template-rows: subgrid [sub-a] [sub-b]|}]; */
-/* [%css {|grid-template-rows: subgrid repeat(1, [sub-a])|}]; */
-/* [%css {|grid-template-rows: subgrid repeat(2, [sub-a] [sub-b]) [sub-c]|}]; */
-/* [%css {|grid-template-rows: subgrid repeat(auto-fill, [sub-a] [sub-b])|}]; */
-/* [%css {|grid-template-rows: subgrid [sub-a] repeat(auto-fill, [sub-b] [sub-c] [sub-d]) [sub-e] repeat(1, [sub-g])|}]; */
+[%css {|grid-template-columns: subgrid|}];
+[%css {|grid-template-columns: subgrid [sub-a]|}];
+[%css {|grid-template-columns: subgrid [sub-a] [sub-b]|}];
+[%css {|grid-template-columns: subgrid repeat(1, [sub-a])|}];
+[%css {|grid-template-columns: subgrid repeat(2, [sub-a] [sub-b]) [sub-c]|}];
+[%css {|grid-template-columns: subgrid repeat(auto-fill, [sub-a] [sub-b])|}];
+[%css
+  {|grid-template-columns: subgrid [sub-a] repeat(auto-fill, [sub-b] [sub-c] [sub-d]) [sub-e] repeat(1, [sub-g])|}
+];
+[%css {|grid-template-rows: subgrid|}];
+[%css {|grid-template-rows: subgrid [sub-a]|}];
+[%css {|grid-template-rows: subgrid [sub-a] [sub-b]|}];
+[%css {|grid-template-rows: subgrid repeat(1, [sub-a])|}];
+[%css {|grid-template-rows: subgrid repeat(2, [sub-a] [sub-b]) [sub-c]|}];
+[%css {|grid-template-rows: subgrid repeat(auto-fill, [sub-a] [sub-b])|}];
+[%css
+  {|grid-template-rows: subgrid [sub-a] repeat(auto-fill, [sub-b] [sub-c] [sub-d]) [sub-e] repeat(1, [sub-g])|}
+];
 
 /* CSS Grid Layout Module Level 3 */
 /* [%css {|grid-template-columns: masonry|}]; */
@@ -1934,12 +1809,12 @@
 /* [%css {|all: revert;|}]; */
 
 /* CSS Masking Module Level 1 */
-/* [%css {|clip-path: url('#clip')|}]; */
+[%css {|clip-path: url('#clip')|}];
 [%css {|clip-path: inset(50%)|}];
 /* [%css {|clip-path: circle()|}]; */
 /* [%css {|clip-path: ellipse()|}]; */
 /* [%css {|clip-path: polygon(0 10px, 30px 0)|}]; */
-/* [%css {|clip-path: path('M 20 20 H 80 V 30')|}]; */
+[%css {|clip-path: path('M 20 20 H 80 V 30')|}];
 /* [%css {|clip-path: circle() border-box|}]; */
 [%css {|clip-path: border-box|}];
 [%css {|clip-path: padding-box|}];
@@ -1952,8 +1827,7 @@
 [%css {|clip-rule: nonzero|}];
 [%css {|clip-rule: evenodd|}];
 [%css {|mask-image: none|}];
-/* TODO: Parser.re don't contain linear-gradient as valid mask-image */
-/* [%css {|mask-image: linear-gradient(black 0%, transparent 100%)|}]; */
+[%css {|mask-image: linear-gradient(45deg, blue, red)|}];
 [%css {|mask-image: url(image.png)|}];
 [%css {|mask-mode: alpha|}];
 [%css {|mask-mode: luminance|}];
@@ -2314,11 +2188,11 @@
 [%css {|scroll-behavior: smooth|}];
 
 /* CSS Ruby Layout Module Level 1 */
-/* [%css {|display: ruby|}]; */
-/* [%css {|display: ruby-base|}]; */
-/* [%css {|display: ruby-text|}]; */
-/* [%css {|display: ruby-base-container|}]; */
-/* [%css {|display: ruby-text-container|}]; */
+[%css {|display: ruby|}];
+[%css {|display: ruby-base|}];
+[%css {|display: ruby-text|}];
+[%css {|display: ruby-base-container|}];
+[%css {|display: ruby-text-container|}];
 /* [%css {|ruby-position: alternate|}]; */
 /* [%css {|ruby-position: over|}]; */
 /* [%css {|ruby-position: under|}]; */
@@ -2569,8 +2443,7 @@
 [%css {|list-style-type: other-style|}];
 [%css {|list-style-type: inside|}];
 [%css {|list-style-type: outside|}];
-/* TODO: escape chars lexing is broken */
-/* [%css {|list-style-type: \32 style|}]; */
+[%css {|list-style-type: \32 style|}];
 [%css {|list-style-type: "-"|}];
 [%css {|list-style-type: '-'|}];
 /* [%css {|list-style-type: symbols("*" "\2020" "\2021" "\A7")|}]; */
@@ -2764,7 +2637,7 @@
 [%css {|scrollbar-width: auto|}];
 [%css {|scrollbar-width: thin|}];
 [%css {|scrollbar-width: none|}];
-/* [%css {|scrollbar-width: 12px|}]; */
+[%css {|scrollbar-width: 12px|}];
 
 /* CSS Painting API Level 1 */
 /* [%css {|background-image: paint(company-logo);|}]; */
@@ -3221,3 +3094,9 @@
 
 [%css {|transition-delay: 240ms|}];
 [%css {|animation-duration: 150ms|}];
+
+/* [%css {|top: calc(50% + var(--value-from-var));|}]; */
+
+[%css {|border-width: thin|}];
+[%css {|outline-width: medium|}];
+[%css {|outline: medium solid red|}];

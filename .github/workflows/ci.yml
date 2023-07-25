@@ -136,26 +136,17 @@ jobs:
       - name: Grant permission to run ppx
         run: chmod +x _build/default/bin/bin.exe
 
-      - name: Get cache directory path
-        id: yarn-cache-dir-path
-        working-directory: ./e2e/rescript-v9-JSX3
-        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
-
-      - name: Load global cache
-        uses: actions/cache@v3
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: yarn-${{ matrix.os }}-${{ hashFiles('./e2e/yarn.lock') }}
-          restore-keys: yarn-${{ matrix.os }}-
-
       - name: Install dependencies
         working-directory: ./e2e/rescript-v9-JSX3
-        run: yarn
+        run: npm install --force
+
+      - name: Build
+        working-directory: ./e2e/rescript-v9-JSX3
+        run: npm run build
 
       - name: Test
         working-directory: ./e2e/rescript-v9-JSX3
-        run: yarn test
+        run: npm run test
 
   publish:
     name: Publish

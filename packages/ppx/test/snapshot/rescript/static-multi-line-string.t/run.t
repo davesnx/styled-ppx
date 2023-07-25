@@ -4,10 +4,6 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
   $ sed -e 's/.I1//g' output.ml > fixed.ml
 
   $ npx rescript convert fixed.ml
-  Error when converting fixed.ml
-  File "", line 499, characters 72-73:
-  Error: Syntax error: operator expected.
-  
 
 
 

@@ -314,10 +314,8 @@ and function_inset = [%value.rec
 and function_invert = [%value.rec "invert( <number-percentage> )"]
 and function_leader = [%value.rec "leader( <leader-type> )"]
 and function_linear_gradient = [%value.rec
-  "linear-gradient( [ <extended-angle> ]? <color-stop-list> )"
+  "linear-gradient( [ <extended-angle> | 'to' <side-or-corner> ]? <color-stop-list> )"
 ]
-/* Simplified the spec to match with bs-css
-   #linearGradient(Angle.t, array<(Length.t, [< Color.t | Var.t] as 'colorOrVar)>) */
 /* and function_linear_gradient = [%value.rec "linear-gradient( [ <extended-angle> | 'to' <side-or-corner> ]? ',' <color-stop-list> )"] */
 and function_matrix = [%value.rec "matrix( [ <number> ]#{6} )"]
 and function_matrix3d = [%value.rec "matrix3d( [ <number> ]#{16} )"]
@@ -1035,15 +1033,17 @@ and property_filter = [%value.rec
   "'none' | <filter-function-list> | <-ms-filter-function-list>"
 ]
 and property_flex = [%value.rec
-  "'none' | <'flex-grow'> [ <'flex-shrink'> ]? || <'flex-basis'>"
+  "'none' | [<'flex-grow'> [ <'flex-shrink'> ]? || <'flex-basis'>] | <interpolation>"
 ]
-and property_flex_basis = [%value.rec "'content' | <'width'>"]
+and property_flex_basis = [%value.rec
+  "'content' | <'width'> | <interpolation>"
+]
 and property_flex_direction = [%value.rec
   "'row' | 'row-reverse' | 'column' | 'column-reverse'"
 ]
 and property_flex_flow = [%value.rec "<'flex-direction'> || <'flex-wrap'>"]
-and property_flex_grow = [%value.rec "<number>"]
-and property_flex_shrink = [%value.rec "<number>"]
+and property_flex_grow = [%value.rec "<number> | <interpolation>"]
+and property_flex_shrink = [%value.rec "<number> | <interpolation>"]
 and property_flex_wrap = [%value.rec "'nowrap' | 'wrap' | 'wrap-reverse'"]
 and property_float = [%value.rec
   "'left' | 'right' | 'none' | 'inline-start' | 'inline-end'"
@@ -1060,6 +1060,7 @@ and property_font_feature_settings = [%value.rec
 and property_font_kerning = [%value.rec "'auto' | 'normal' | 'none'"]
 and property_font_language_override = [%value.rec "'normal' | <string>"]
 and property_font_optical_sizing = [%value.rec "'auto' | 'none'"]
+and property_font_palette = [%value.rec "'normal' | 'light' | 'dark'"]
 and property_font_size = [%value.rec
   "<absolute-size> | <relative-size> | <extended-length> | <extended-percentage>"
 ]
@@ -1073,7 +1074,7 @@ and property_font_style = [%value.rec
 ]
 and property_font_synthesis = [%value.rec "'none' | 'weight' || 'style'"]
 and property_font_variant = [%value.rec
-  "'normal' | 'none' | 'small-caps' | <common-lig-values> || <discretionary-lig-values> || <historical-lig-values> || <contextual-alt-values> || stylistic( <feature-value-name> ) || 'historical-forms' || styleset( [ <feature-value-name> ]# ) || character-variant( [ <feature-value-name> ]# ) || swash( <feature-value-name> ) || ornaments( <feature-value-name> ) || annotation( <feature-value-name> ) || [ 'small-caps' | 'all-small-caps' | 'petite-caps' | 'all-petite-caps' | 'unicase' | 'titling-caps' ] || <numeric-figure-values> || <numeric-spacing-values> || <numeric-fraction-values> || 'ordinal' || 'slashed-zero' || <east-asian-variant-values> || <east-asian-width-values> || 'ruby'"
+  "'normal' | 'none' | 'small-caps' | <common-lig-values> || <discretionary-lig-values> || <historical-lig-values> || <contextual-alt-values> || stylistic( <feature-value-name> ) || 'historical-forms' || styleset( [ <feature-value-name> ]# ) || character-variant( [ <feature-value-name> ]# ) || swash( <feature-value-name> ) || ornaments( <feature-value-name> ) || annotation( <feature-value-name> ) || [ 'small-caps' | 'all-small-caps' | 'petite-caps' | 'all-petite-caps' | 'unicase' | 'titling-caps' ] || <numeric-figure-values> || <numeric-spacing-values> || <numeric-fraction-values> || 'ordinal' || 'slashed-zero' || <east-asian-variant-values> || <east-asian-width-values> || 'ruby' || 'sub' || 'super' || 'text' || 'emoji' || 'unicode'"
 ]
 and property_font_variant_alternates = [%value.rec
   "'normal' | stylistic( <feature-value-name> ) || 'historical-forms' || styleset( [ <feature-value-name> ]# ) || character-variant( [ <feature-value-name> ]# ) || swash( <feature-value-name> ) || ornaments( <feature-value-name> ) || annotation( <feature-value-name> )"
@@ -1280,11 +1281,18 @@ and property_media_display_mode = [%value.rec
   "'fullscreen' | 'standalone' | 'minimal-ui' | 'browser'"
 ]
 and property_media_forced_colors = [%value.rec "'none' | 'active'"]
+and property_forced_color_adjust = [%value.rec
+  "'auto' | 'none' | 'preserve-parent-color'"
+]
 and property_media_grid = [%value.rec "<integer>"]
 and property_media_hover = [%value.rec "'hover' | 'none'"]
 and property_media_inverted_colors = [%value.rec "'inverted' | 'none'"]
 and property_media_monochrome = [%value.rec "<integer>"]
 and property_media_prefers_color_scheme = [%value.rec "'dark' | 'light'"]
+and property_color_scheme = [%value.rec
+  "'normal' |
+  [ 'dark' | 'light' | <custom-ident> ]+ && 'only'?"
+]
 and property_media_prefers_contrast = [%value.rec
   "'no-preference' | 'more' | 'less'"
 ]
@@ -1510,7 +1518,9 @@ and property_scroll_snap_type_y = [%value.rec
 and property_scrollbar_color = [%value.rec
   "'auto' | 'dark' | 'light' | [ <color> ]{2}"
 ]
-and property_scrollbar_width = [%value.rec "'auto' | 'thin' | 'none'"]
+and property_scrollbar_width = [%value.rec
+  "'auto' | 'thin' | 'none' | <extended-length>"
+]
 and property_shape_image_threshold = [%value.rec "<alpha-value>"]
 and property_shape_margin = [%value.rec
   "<extended-length> | <extended-percentage>"
@@ -2653,6 +2663,7 @@ let check_map =
       ("property-clip-rule", check(property_clip_rule)),
       ("property-color", check(property_color)),
       ("property-color-adjust", check(property_color_adjust)),
+      ("property-color-scheme", check(property_color_scheme)),
       ("property-column-count", check(property_column_count)),
       ("property-column-fill", check(property_column_fill)),
       ("property-column-gap", check(property_column_gap)),
@@ -2700,6 +2711,7 @@ let check_map =
         check(property_font_language_override),
       ),
       ("property-font-optical-sizing", check(property_font_optical_sizing)),
+      ("property-font-palette", check(property_font_palette)),
       ("property-font-size", check(property_font_size)),
       ("property-font-size-adjust", check(property_font_size_adjust)),
       ("property-font-smooth", check(property_font_smooth)),
@@ -2893,6 +2905,7 @@ let check_map =
       ("property-min-color-index", check(property_media_min_color_index)),
       ("property-display-mode", check(property_media_display_mode)),
       ("property-forced-colors", check(property_media_forced_colors)),
+      ("property-forced-color-adjust", check(property_forced_color_adjust)),
       ("property-grid", check(property_media_grid)),
       ("property-hover", check(property_media_hover)),
       ("property-inverted-colors", check(property_media_inverted_colors)),

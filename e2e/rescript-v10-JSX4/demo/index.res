@@ -1,3 +1,9 @@
+let a = [
+  %css(`border-width: thin`),
+  %css(`outline-width: medium`),
+  %css(`outline: medium solid red`),
+]
+
 module DynamicComponent = {
   type props<'var> = {
     innerRef?: ReactDOM.domRef,
@@ -474,16 +480,13 @@ module DynamicComponent = {
     onWheel?: ReactEvent.Wheel.t => unit,
     var: 'var,
   }
-  @val @module(@reason.raw_literal ("react"))
+  @val @module("react")
   external createVariadicElement: (string, {..}) => React.element = "createElement"
-  let deleteProp = %raw(
-    @reason.raw_literal("(newProps, key) => delete newProps[key]")
-    ("(newProps, key) => delete newProps[key]")
-  )
+  let deleteProp = %raw("(newProps, key) => delete newProps[key]")
   let getOrEmpty = str =>
     switch str {
-    | Some(str) => (@reason.raw_literal(" ") " ") ++ str
-    | None => @reason.raw_literal("") ""
+    | Some(str) => " " ++ str
+    | None => ""
     }
   @val external assign2: ({..}, {..}, {..}) => {..} = "Object.assign"
   let styles = (~var, _) =>
@@ -498,7 +501,7 @@ module DynamicComponent = {
     let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject)
     ignore(deleteProp(newProps, "var"))
     ignore(deleteProp(newProps, "innerRef"))
-    createVariadicElement(@reason.raw_literal("div") "div", newProps)
+    createVariadicElement("div", newProps)
   }
 }
 

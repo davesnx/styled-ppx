@@ -3,19 +3,19 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "build": "rescript build",
-    "watch": "rescript build -w",
+    "build": "rescript build -with-deps",
+    "watch": "rescript build -with-deps -w",
     "clean": "rescript clean",
-    "test_watch": "concurrently 'yarn watch' 'vitest'",
-    "pretest": "yarn build",
+    "test_watch": "concurrently 'npm run watch' 'vitest'",
     "test": "vitest --run --silent",
-    "start": "yarn test"
+    "start": "npm run test"
   },
   "dependencies": {
+    "@emotion/css": "^11.11.2",
     "@rescript/react": "^0.10.0",
     "@rescriptbr/react-testing-library": "^1.0.1",
-    "bs-css": "^15.3.0",
-    "bs-css-emotion": "5.0.0",
+    "bs-css": "file:../../packages/bs-css",
+    "bs-css-emotion": "file:../../packages/bs-css-emotion",
     "concurrently": "^5.1.0",
     "jsdom": "^21.1.0",
     "react": "^16.12.0",

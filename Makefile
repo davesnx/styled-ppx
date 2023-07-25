@@ -81,9 +81,17 @@ test_typecheck: ## Run Typecheck tests
 test_css_support: ## Run CSS Support tests
 	$(DUNE) build @css_support_test
 
+.PHONY: test_css_support_promote
+test_css_support_promote: ## Promote CSS Support snapshots
+	$(DUNE) build @css_support_test --auto-promote
+
 .PHONY: test_ppx_snapshot
 test_ppx_snapshot: ## Run ppx snapshot tests
 	$(DUNE) build @ppx_snapshot_test
+
+.PHONY: test_ppx_snapshot_promote
+test_ppx_snapshot_promote: ## Promote ppx snapshot snapshots
+	$(DUNE) build @ppx_snapshot_test --auto-promote
 
 .PHONY: test_parser
 test_parser: ## Run CSS Parser tests
