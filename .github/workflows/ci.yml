@@ -140,6 +140,10 @@ jobs:
         working-directory: ./e2e/rescript-v9-JSX3
         run: npm install --force
 
+      - name: Build
+        working-directory: ./e2e/rescript-v9-JSX3
+        run: npm run build
+
       - name: Test
         working-directory: ./e2e/rescript-v9-JSX3
         run: npm run test
