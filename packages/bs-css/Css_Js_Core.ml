@@ -498,12 +498,37 @@ let display x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let flex x =
+let flex grow shrink basis =
+  D
+    ( {js|flex|js},
+      Js.Float.toString grow
+      ^ {js| |js}
+      ^ Js.Float.toString shrink
+      ^ {js| |js}
+      ^
+      match basis with
+      | #FlexBasis.t as b -> FlexBasis.toString b
+      | #Length.t as l -> Length.toString l )
+
+let flex1 x =
   D
     ( {js|flex|js},
       match x with
       | #Flex.t as f -> Flex.toString f
       | `num n -> Js.Float.toString n )
+
+let flex2 ?basis ?shrink grow =
+  D
+    ( {js|flex|js},
+      Js.Float.toString grow
+      ^ (match shrink with
+        | Some s -> {js| |js} ^ Js.Float.toString s
+        | None -> {js||js})
+      ^
+      match basis with
+      | Some (#FlexBasis.t as b) -> {js| |js} ^ FlexBasis.toString b
+      | Some (#Length.t as l) -> {js| |js} ^ Length.toString l
+      | None -> {js||js} )
 
 let flexDirection x =
   D

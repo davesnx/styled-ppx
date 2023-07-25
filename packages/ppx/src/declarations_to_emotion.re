@@ -29,7 +29,6 @@ let id = Fun.id;
 /* Why this type contains so much when only `string_to_expr` is used? */
 type transform('ast, 'value) = {
   ast_of_string: string => result('ast, string),
-  value_of_ast: (~loc: Location.t, 'ast) => 'value,
   ast_to_expr: (~loc: Location.t, 'ast) => list(Parsetree.expression),
   string_to_expr:
     (~loc: Location.t, string) => result(list(Parsetree.expression), string),
@@ -49,7 +48,7 @@ let emit = (property, value_of_ast, value_to_expr) => {
   let string_to_expr = (~loc, string) =>
     ast_of_string(string) |> Result.map(ast_to_expr(~loc));
 
-  {ast_of_string, value_of_ast, ast_to_expr, string_to_expr};
+  {ast_of_string, ast_to_expr, string_to_expr};
 };
 
 let emit_shorthand = (parser, mapper, value_to_expr) => {
@@ -58,9 +57,8 @@ let emit_shorthand = (parser, mapper, value_to_expr) => {
     ast |> List.map(mapper(~loc)) |> value_to_expr(~loc);
   let string_to_expr = (~loc, string) =>
     ast_of_string(string) |> Result.map(ast_to_expr(~loc));
-  let value_of_ast = (~loc) => List.map(mapper(~loc));
 
-  {ast_of_string, value_of_ast, ast_to_expr, string_to_expr};
+  {ast_of_string, ast_to_expr, string_to_expr};
 };
 
 let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
@@ -2845,46 +2843,88 @@ let flex_shrink =
     render_number,
   );
 
+let render_flex_basis = (~loc) =>
+  fun
+  | `Content => variant_to_expression(~loc, `Content)
+  | `Property_width(value_width) => render_size(~loc, value_width);
+
 let flex_basis =
   apply(
     Parser.property_flex_basis,
     (~loc) => [%expr CssJs.flexBasis],
-    (~loc) =>
-      fun
-      | `Content => variant_to_expression(~loc, `Content)
-      | `Property_width(value_width) =>
-        width.value_of_ast(~loc, `Value(value_width)),
+    render_flex_basis,
   );
 
 // TODO: this is incomplete
+/* let flex =
+   emit(
+     Parser.property_flex,
+     (~loc as _) => id,
+     (~loc) =>
+       fun
+       | `None => [[%expr CssJs.flex(`none)]]
+       | `Or(grow_shrink, basis) => {
+           let grow_shrink =
+             switch (grow_shrink) {
+             | None => []
+             | Some((grow, shrink)) =>
+               List.concat([
+                 flex_grow.ast_to_expr(~loc, `Value(grow)),
+                 Option.map(
+                   ast => flex_shrink.ast_to_expr(~loc, `Value(ast)),
+                   shrink,
+                 )
+                 |> Option.value(~default=[]),
+               ])
+             };
+           let basis =
+             switch (basis) {
+             | None => []
+             | Some(basis) => flex_basis.ast_to_expr(~loc, `Value(basis))
+             };
+           List.concat([grow_shrink, basis]);
+         },
+   ); */
 let flex =
   emit(
     Parser.property_flex,
     (~loc as _) => id,
-    (~loc) =>
-      fun
-      | `None => [[%expr CssJs.flex(`none)]]
-      | `Or(grow_shrink, basis) => {
-          let grow_shrink =
-            switch (grow_shrink) {
-            | None => []
-            | Some((grow, shrink)) =>
-              List.concat([
-                flex_grow.ast_to_expr(~loc, `Value(grow)),
-                Option.map(
-                  ast => flex_shrink.ast_to_expr(~loc, `Value(ast)),
-                  shrink,
-                )
-                |> Option.value(~default=[]),
-              ])
-            };
-          let basis =
-            switch (basis) {
-            | None => []
-            | Some(basis) => flex_basis.ast_to_expr(~loc, `Value(basis))
-            };
-          List.concat([grow_shrink, basis]);
-        },
+    (~loc, value) =>
+      switch (value) {
+      | `None => [[%expr CssJs.flex1(`none)]]
+      | `Or(None, None) => [[%expr CssJs.flex1(`none)]]
+      | `Or(Some((grow, None)), None) => [
+          [%expr CssJs.flex1(`num([%e render_number(~loc, grow)]))],
+        ]
+      | `Or(Some((grow, Some(shrink))), None) => [
+          [%expr
+            CssJs.flex2(
+              ~shrink=[%e render_number(~loc, shrink)],
+              [%e render_number(~loc, grow)],
+            )
+          ],
+        ]
+      | `Or(Some((grow, None)), Some(basis)) => [
+          [%expr
+            CssJs.flex2(
+              ~basis=[%e render_flex_basis(~loc, basis)],
+              [%e render_number(~loc, grow)],
+            )
+          ],
+        ]
+      | `Or(None, Some(basis)) => [
+          [%expr CssJs.flexBasis([%e render_flex_basis(~loc, basis)])],
+        ]
+      | `Or(Some((grow, Some(shrink))), Some(basis)) => [
+          [%expr
+            CssJs.flex(
+              [%e render_number(~loc, grow)],
+              [%e render_number(~loc, shrink)],
+              [%e render_flex_basis(~loc, basis)],
+            )
+          ],
+        ]
+      },
   );
 
 let render_content_position = (~loc, value: Types.content_position) => {

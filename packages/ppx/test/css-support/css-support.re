@@ -1539,6 +1539,13 @@
 [%css {|display: inline-flex|}];
 [%css {|flex: none|}];
 [%css {|flex: 5 7 10%|}];
+[%css {|flex: 2;|}];
+[%css {|flex: 10em;|}];
+[%css {|flex: 30%;|}];
+[%css {|flex: min-content;|}];
+[%css {|flex: 1 30px;|}];
+[%css {|flex: 2 2;|}];
+[%css {|flex: 2 2 10%;|}];
 [%css {|flex-basis: auto|}];
 [%css {|flex-basis: content|}];
 [%css {|flex-basis: 1px|}];
