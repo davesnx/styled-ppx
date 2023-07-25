@@ -2887,12 +2887,6 @@ let flex =
         },
   );
 
-// TODO: justify_content, align_items, align_self, align_content are only for flex, missing the css-align-3 at parser
-/* let justify_content =
-   unsupportedValue(Parser.property_justify_content, (~loc) =>
-     [%expr CssJs.justifyContent]
-   ); */
-
 let render_content_position = (~loc, value: Types.content_position) => {
   switch (value) {
   | `Center => [%expr `center]
@@ -3169,7 +3163,16 @@ let render_property_gap = (~loc, value: Types.property_gap) => {
 let gap = emit(Parser.property_gap, (~loc as _) => id, render_property_gap);
 
 let z_index =
-  unsupportedValue(Parser.property_z_index, (~loc) => [%expr CssJs.zIndex]);
+  apply(
+    Parser.property_z_index,
+    (~loc) => [%expr CssJs.zIndex],
+    (~loc, value) => {
+      switch (value) {
+      | `Auto => [%expr `auto]
+      | `Integer(i) => render_integer(~loc, i)
+      }
+    },
+  );
 
 let render_position_value = (~loc) =>
   fun

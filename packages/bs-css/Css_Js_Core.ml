@@ -1124,7 +1124,7 @@ let wordSpacing x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let wordWrap = overflowWrap
-let zIndex x = D ({js|zIndex|js}, Js.Int.toString x)
+let zIndex x = D ({js|zIndex|js}, ZIndex.toString x)
 let media = fun [@bs] query rules -> S ({js|@media |js} ^ query, rules)
 let selector = fun [@bs] selector rules -> S (selector, rules)
 let pseudoClass selector rules = PseudoClass (selector, rules)

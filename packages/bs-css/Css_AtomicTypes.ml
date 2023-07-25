@@ -2292,3 +2292,13 @@ module TouchAction = struct
     | `pinchZoom -> {js|pinch-zoom|js}
     | `manipulation -> {js|manipulation|js}
 end
+
+module ZIndex = struct
+  type nonrec t =
+    [ `auto
+    | `num of int
+    ]
+
+  let toString x =
+    match x with `auto -> {js|auto|js} | `num x -> Js.Int.toString x
+end
