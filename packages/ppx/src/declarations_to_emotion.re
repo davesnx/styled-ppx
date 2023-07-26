@@ -2875,7 +2875,7 @@ let flex =
         ]
       | `Or(None, None) => [[%expr CssJs.flex1(`none)]]
       | `Or(Some((grow, None)), None) => [
-          [%expr CssJs.flex1([%e render_number_interp(~loc, grow)])],
+          [%expr CssJs.flex1(`num([%e render_number_interp(~loc, grow)]))],
         ]
       | `Or(Some((grow, Some(shrink))), None) => [
           [%expr

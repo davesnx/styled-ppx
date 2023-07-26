@@ -1048,7 +1048,7 @@ CssJs.display(`flex);
 CssJs.display(`inlineFlex);
 CssJs.flex1(`none);
 CssJs.flex(5., 7., `percent(10.));
-CssJs.flex1(2.);
+CssJs.flex1(`num(2.));
 CssJs.flexBasics(`em(10.));
 CssJs.flexBasics(`percent(30.));
 CssJs.flexBasics(`minContent);
