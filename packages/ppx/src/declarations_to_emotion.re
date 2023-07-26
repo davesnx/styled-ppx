@@ -3190,7 +3190,7 @@ let z_index =
     (~loc, value) => {
       switch (value) {
       | `Auto => [%expr `auto]
-      | `Integer(i) => render_integer(~loc, i)
+      | `Integer(i) => [%expr `num([%e render_integer(~loc, i)])]
       }
     },
   );
