@@ -1,2 +1,3 @@
 *.bs.js
-lib/
+lib/bs
+lib/ocaml
