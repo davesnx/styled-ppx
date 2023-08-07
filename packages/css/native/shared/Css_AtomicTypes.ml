@@ -1517,7 +1517,7 @@ module GridTemplateAreas = struct
     | `none -> {js|none|js}
     | `areas items ->
       String.trim
-        (Runtime.Array.reduceU items {js||js} (fun carry item ->
+        (Runtime.Array.reduceU items {js||js} (fun [@bs] carry item ->
            ((carry ^ {js|'|js}) ^ item) ^ {js|' |js}))
 end
 

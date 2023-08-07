@@ -27,7 +27,6 @@
   "namespace": true,
   "bs-dependencies": [
     "@rescript/react",
-    "bs-css",
     "bs-css-emotion",
     "@rescriptbr/react-testing-library",
     "rescript-vitest",

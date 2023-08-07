@@ -1,8 +1,0 @@
-(library
- (name bs_css_emotion)
- (public_name styled-ppx.bs-emotion) ; TODO: Rename it to styled-ppx.runtime
- (modes melange)
- (wrapped false)
- (libraries styled-ppx.bs-css)
- (preprocess
-  (pps melange.ppx)))

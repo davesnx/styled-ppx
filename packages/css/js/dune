@@ -9,3 +9,5 @@
  (libraries melange.js)
  (preprocess
   (pps melange.ppx)))
+
+(copy_files# "../native/shared/*.[!.pp].ml")

@@ -5,6 +5,5 @@
     "number": "+A-32-34-44",
     "error": "+A-32-34-44"
   },
-  "sources": ["."],
-  "bs-dependencies": ["bs-css"]
+  "sources": ["."]
 }
