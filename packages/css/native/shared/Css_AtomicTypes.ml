@@ -24,7 +24,9 @@ module Var = struct
 
   let var x = `var x
   let varDefault x default = `varDefault (x, default)
-  let prefix x = if Js.String.startsWith {js|--|js} x then x else {js|--|js} ^ x
+
+  let prefix x =
+    if Runtime.String.startsWith {js|--|js} x then x else {js|--|js} ^ x
 
   let toString x =
     match x with
