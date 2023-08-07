@@ -1,4 +1,4 @@
-(include_subdirs qualified)
+(include_subdirs unqualified)
 
 (library
  (name bs_css)

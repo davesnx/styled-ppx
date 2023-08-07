@@ -41,18 +41,16 @@ setup-githooks: ## Setup githooks
 
 .PHONY: pin
 pin: ## Pin dependencies
-# @opam pin add dune.dev "https://github.com/ocaml/dune.git#7fdf0ca379f773deb21f97c7a66c1b9b0bbd4f98" -y
 	@opam pin add reason.dev "https://github.com/reasonml/reason.git#b283f335f90e3aaa398bff8e82761038ee42a99d" -y
 	@opam pin add ppxlib.dev "https://github.com/ocaml-ppx/ppxlib.git#8b8987c5690ad839348d96bf52471b03b88f06ed" -y
-# @opam pin add melange.dev "https://github.com/melange-re/melange.git#da421be55e755096403425ed3c260486deab61f3" -y
-# @opam pin add rescript-syntax.dev "https://github.com/melange-re/melange.git#2ee0ef23bbc44933f92cd9c4b223e9ef915ff0df" -y
+	@opam pin add server-reason-react "https://github.com/ml-in-barcelona/server-reason-react.git#760b59933e49493d1cf33cf5adb26284fc531020" -y
 
 .PHONY: create-switch
 create-switch: ## Create opam switch
 	@opam switch create . 4.14.0 --deps-only --with-test
 
 .PHONY: install
-install: ## Update the package dependencies when new deps are added to dune-project
+install: ## Install project dependencies
 	@opam install . --deps-only --with-test
 	@yarn install
 

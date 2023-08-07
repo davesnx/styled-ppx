@@ -1,7 +1,7 @@
-include Css.Legacy_Core
-include Css.Colors
+include Css_Legacy_Core
+include Css_Colors
 
-include Css.Legacy_Core.Make (struct
+include Css_Legacy_Core.Make (struct
   type styleEncoding = string
   type renderer = Js.Json.t
 
@@ -38,12 +38,13 @@ end)
 
 type cache
 
-external cache : cache = "cache" [@@bs.module "@emotion/cache"]
+(* TODO: Raise *)
+let cache = []
 
 let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
     =
   let asString =
-    Css.Legacy_Core.fontFace ~fontFamily ~src ?fontStyle ?fontWeight
+    Css_Legacy_Core.fontFace ~fontFamily ~src ?fontStyle ?fontWeight
       ?fontDisplay ?sizeAdjust ()
   in
   insertRule asString;

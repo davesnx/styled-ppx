@@ -1,9 +1,9 @@
-(include_subdirs qualified)
+(include_subdirs unqualified)
 
 (library
  (name css)
  (public_name styled-ppx.css)
  (libraries server-reason-react.js server-reason-react.belt)
- (flags :standard -w -108)
+ (wrapped false)
  (preprocess
   (pps server-reason-react.pipe_first_ppx)))
