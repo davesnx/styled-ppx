@@ -1,14 +1,6 @@
 let bsconfig = "bsconfig.json";
 let projectRoot = ref(None);
 
-module Result = {
-  include Result;
-
-  let flatMap = (f, r) => {
-    Result.map(f, r) |> Result.join;
-  };
-};
-
 [@deriving of_yojson({strict: false})]
 type jsx = {
   version: int,
@@ -57,9 +49,11 @@ exception Parse_config_error(string);
 exception Malformed_jsx(string);
 
 let parse = json => {
+  module Result = Ppx_deriving_yojson_runtime.Result;
+
   let yojson = json |> Yojson.Safe.from_file;
   switch (yojson |> Yojson.Safe.Util.member("jsx") |> jsx_of_yojson) {
-  | Ok(jsx) =>
+  | Result.Ok(jsx) =>
     switch (jsx) {
     | {version, mode: _} when version === 3 => (Some(version), None)
     | {version, mode: Some("classic") as mode} when version === 4 => (
@@ -72,7 +66,7 @@ let parse = json => {
       )
     | _ => raise(Malformed_jsx("Malformed jsx field"))
     }
-  | Error(e) =>
+  | Result.Error(e) =>
     raise(
       Parse_config_error(
         Printf.sprintf("There was an error parsing the config file: %s", e),

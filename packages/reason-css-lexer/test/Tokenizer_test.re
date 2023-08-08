@@ -1,6 +1,6 @@
 open Reason_css_lexer;
-open Location;
 open Alcotest;
+/* module Location = Ppxlib.Location; */
 
 let parse = input => {
   let values =

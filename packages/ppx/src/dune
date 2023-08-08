@@ -9,8 +9,10 @@
   styled-ppx.css-parser
   styled-ppx.reason-css-parser
   styled-ppx.string-interpolation
+  sedlex
   ppxlib
-  yojson
-  ppx_deriving_yojson.runtime)
+  ppxlib.astlib
+  ppx_deriving_yojson.runtime
+  yojson)
  (preprocess
   (pps ppxlib.metaquot ppx_deriving_yojson)))

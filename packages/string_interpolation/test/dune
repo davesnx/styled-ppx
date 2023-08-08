@@ -1,6 +1,6 @@
 (test
  (name transform_test)
- (libraries alcotest string_interpolation)
+ (libraries alcotest ppxlib ppxlib.astlib string_interpolation fmt)
  (preprocess
   (pps ppxlib.metaquot)))
 

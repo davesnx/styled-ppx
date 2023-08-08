@@ -1,6 +1,14 @@
 (test
  (name Runner)
- (libraries css alcotest styled-ppx.lib styled-ppx.css ppxlib)
+ (libraries
+  css
+  alcotest
+  styled-ppx.lib
+  styled-ppx.css
+  ppxlib
+  ppxlib.astlib
+  server-reason-react.belt
+  fmt)
  (preprocess
   (pps ppxlib.metaquot styled-ppx.lib -- -no-merge)))
 
