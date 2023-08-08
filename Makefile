@@ -53,7 +53,7 @@ create-switch: ## Create opam switch
 .PHONY: install
 install: ## Install project dependencies
 	@opam install . --deps-only --with-test
-	@yarn install
+# @yarn install
 
 .PHONY: init
 init: setup-githooks create-switch pin install ## Create a local dev enviroment
