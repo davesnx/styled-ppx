@@ -30,6 +30,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+
       - name: Use OCaml ${{ matrix.ocaml-compiler }}
         uses: ocaml/setup-ocaml@v2
         with:
@@ -56,12 +59,6 @@ jobs:
 
       - name: Install pins
         run: make pin
-
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-
-      - name: Install node deps
-        run: yarn install
 
       - name: Build
         run: make build
