@@ -8,6 +8,8 @@
 
 (generate_opam_files true)
 
+(implicit_transitive_deps false)
+
 (source (github davesnx/styled-ppx))
 (homepage "https://styled-ppx.vercel.app")
 (documentation "https://styled-ppx.vercel.app")
