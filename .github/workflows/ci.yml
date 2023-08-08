@@ -54,11 +54,11 @@ jobs:
           path: _opam
           key: opam-${{ matrix.os }}-${{ hashFiles('**.opam') }}
 
-      - name: Install pins
-        run: make pin
-
       - name: Install dependencies
         run: make install
+
+      - name: Install pins
+        run: make pin
 
       - name: Build
         run: make build
