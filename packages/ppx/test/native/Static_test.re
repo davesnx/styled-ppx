@@ -1,7 +1,6 @@
 open Alcotest;
 open Ppxlib;
 
-open CssJs;
 let loc = Location.none;
 
 /* The tests that are commented, means that we don't support them safely */

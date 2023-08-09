@@ -1,4 +1,8 @@
-(dirs bin packages)
+(dirs bin packages e2e)
+
+(subdir
+ e2e
+ (dirs melange-v1))
 
 (subdir
  packages
