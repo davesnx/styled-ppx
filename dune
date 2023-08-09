@@ -3,9 +3,8 @@
 (subdir
  packages
  (dirs
-  bs-css
-  bs-css-emotion
   css
+  emotion
   css-spec-parser
   parser
   ppx

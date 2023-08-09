@@ -1,0 +1,12 @@
+(test
+ (name test)
+ (modules :standard)
+ (libraries
+  alcotest
+  fmt
+  server-reason-react.react
+  server-reason-react.reactDom
+  server-reason-react.css
+  server-reason-react.hash)
+ (preprocess
+  (pps server-reason-react.ppx)))

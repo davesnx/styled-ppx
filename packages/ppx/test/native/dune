@@ -1,10 +1,10 @@
 (test
  (name Runner)
  (libraries
-  css
   alcotest
   styled-ppx.lib
-  styled-ppx.css
+  styled-ppx.css_native
+  styled-ppx.emotion_native
   ppxlib
   ppxlib.astlib
   server-reason-react.belt

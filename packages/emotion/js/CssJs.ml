@@ -1,7 +1,7 @@
-include Css_Js_Core
-include Css_Colors
+include Bs_css.Css_Colors
+include Bs_css.Css_Js_Core
 
-include Css_Js_Core.Make (struct
+include Bs_css.Css_Js_Core.Make (struct
   type styleEncoding = string
   type renderer = Js.Json.t
 
@@ -38,12 +38,13 @@ end)
 
 type cache
 
-(* TODO: Raise *)
-let cache = []
+external cache : cache = "cache" [@@bs.module "@emotion/cache"]
 
 let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
     =
-  insertRule
-    (Css_Js_Core.fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay
-       ?sizeAdjust ()) [@bs];
+  let fontFace =
+    Bs_css.Css_Js_Core.fontFace ~fontFamily ~src ?fontStyle ?fontWeight
+      ?fontDisplay ?sizeAdjust ()
+  in
+  insertRule fontFace [@bs];
   fontFamily

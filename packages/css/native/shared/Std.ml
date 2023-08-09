@@ -57,6 +57,5 @@ module Option = struct
   let mapWithDefault opt default fn =
     match opt with Some x -> fn x | None -> default
 
-  let map f opt =
-    match opt with Some x -> Some (f x) [@explicit_arity] | None -> None
+  let map f opt = match opt with Some x -> Some (f x) | None -> None
 end
