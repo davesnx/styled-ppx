@@ -1,0 +1,4 @@
+{
+  "name": "mocked_hash_js",
+  "main": "./dist/mocked-hash-js/hash_js.js"
+}
