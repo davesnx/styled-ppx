@@ -1,5 +1,6 @@
 include Bs_css.Css_Colors
 include Bs_css.Css_Js_Core
+module Types = Bs_css.Css_AtomicTypes
 
 include Bs_css.Css_Js_Core.Make (struct
   type styleEncoding = string

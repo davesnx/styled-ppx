@@ -1,8 +1,6 @@
 [@@@warning "-20" (* [ignored-extra-argument] *)]
 [@@@warning "-21" (* [nonreturning-statement] *)]
 
-module Types = Css_AtomicTypes
-
 type rule =
   | D of string * string
   | S of string * rule list
@@ -27,7 +25,7 @@ let rec ruleToDict dict rule =
 and toJson rules =
   Std.List.reduce rules (Js.Dict.empty ()) ruleToDict |. Js.Json.object_
 
-open Types
+open Css_AtomicTypes
 
 let addStop dict (stop, rules) =
   Js.Dict.set dict (Std.Int.toString stop ^ {js|%|js}) (toJson rules);
@@ -237,9 +235,8 @@ let backfaceVisibility x =
 let backdropFilter x =
   D
     ( {js|backdrop-filter|js},
-      x
-      |. Std.List.map Types.BackdropFilter.toString
-      |. Std.List.joinWith {js|, |js} )
+      x |. Std.List.map BackdropFilter.toString |. Std.List.joinWith {js|, |js}
+    )
 
 let backgroundAttachment x =
   D
@@ -1251,8 +1248,8 @@ type nonrec 'colorOrVar gradient = 'colorOrVar Gradient.t
 let initial = Cascading.initial
 let inherit_ = Cascading.inherit_
 let unset = Cascading.unset
-let var = Types.Var.var
-let varDefault = Types.Var.varDefault
+let var = Var.var
+let varDefault = Var.varDefault
 let auto = `auto
 let none = `none
 let text = `text
@@ -1925,7 +1922,7 @@ let fontFace ~fontFamily:(fontFamily [@ns.namedArgLoc])
    in
    let sizeAdjust =
      Belt.Option.mapWithDefault sizeAdjust {js||js} (fun s ->
-       ({js|size-adjust: |js} ^ Types.Percentage.toString s) ^ {js|;|js})
+       ({js|size-adjust: |js} ^ Percentage.toString s) ^ {js|;|js})
    in
    ((((((((((((({js|@font-face {
      font-family: |js} [@res.template])
@@ -2098,10 +2095,10 @@ module SVG = struct
     D
       ( {js|fill|js},
         match x with
-        | #Types.SVG.Fill.t as f -> Types.SVG.Fill.toString f
-        | #Types.Color.t as c -> Types.Color.toString c
-        | #Types.Var.t as v -> Types.Var.toString v
-        | #Types.Url.t as u -> Types.Url.toString u )
+        | #SVG.Fill.t as f -> SVG.Fill.toString f
+        | #Color.t as c -> Color.toString c
+        | #Var.t as v -> Var.toString v
+        | #Url.t as u -> Url.toString u )
 
   let fillOpacity opacity = D ({js|fill-opacity|js}, Std.Float.toString opacity)
 
