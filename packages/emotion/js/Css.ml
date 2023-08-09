@@ -1,7 +1,8 @@
-include Css_Js_Core
-include Css_Colors
+include Bs_css.Css_Colors
+include Bs_css.Css_Legacy_Core
+module Types = Bs_css.Css_AtomicTypes
 
-include Css_Js_Core.Make (struct
+include Bs_css.Css_Legacy_Core.Make (struct
   type styleEncoding = string
   type renderer = Js.Json.t
 
@@ -14,7 +15,7 @@ include Css_Js_Core.Make (struct
     [@@bs.module "@emotion/css"]
 
   let injectRules =
-   fun [@bs] selector rules ->
+   fun [@bs] (selector : string) rules ->
     (injectRawRules
        (Js.Dict.fromArray [| selector, rules |] |. Js.Json.object_) [@bs])
 
@@ -38,12 +39,13 @@ end)
 
 type cache
 
-(* TODO: Raise *)
-let cache = []
+external cache : cache = "cache" [@@bs.module "@emotion/cache"]
 
 let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
     =
-  insertRule
-    (Css_Js_Core.fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay
-       ?sizeAdjust ()) [@bs];
+  let asString =
+    Bs_css.Css_Legacy_Core.fontFace ~fontFamily ~src ?fontStyle ?fontWeight
+      ?fontDisplay ?sizeAdjust ()
+  in
+  insertRule asString;
   fontFamily

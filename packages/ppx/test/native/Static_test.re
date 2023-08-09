@@ -1,13 +1,7 @@
 open Alcotest;
 open Ppxlib;
 
-module CssJs = {
-  /* Without instantiation of the CssImpl functor, bring available CssJs  */
-  include Css_AtomicTypes;
-  include Css_Js_Core;
-  include Css_Colors;
-};
-
+open CssJs;
 let loc = Location.none;
 
 /* The tests that are commented, means that we don't support them safely */

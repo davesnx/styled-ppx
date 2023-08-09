@@ -1,0 +1,22 @@
+(cram
+ (alias runtest)
+ (deps
+  %{bin:node}
+  %{bin:test_hasher_ml}
+  (package mocked-hash-js)))
+
+; (rule
+; (target
+; (dir node_modules))
+; (alias runtest)
+; (action
+; (progn
+; (run ln -sfn %{project_root}/../../node_modules %{target})
+; (run cp -R %{project_root}/test/e2e/cjs/test/e2e .)
+; (run ls .))))
+
+(executable
+ (name test_hasher_ml)
+ (modules test_hasher_ml)
+ (public_name test_hasher_ml)
+ (libraries server-reason-react.hash))

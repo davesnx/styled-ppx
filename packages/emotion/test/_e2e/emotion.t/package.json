@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@emotion/css": "11.10.6",
+    "@emotion/hash": "file:../../../mocked-hash-js/",
+    "melange": "file:../../../mocked-hash-js/dist/node_modules/melange",
+    "melange.belt": "file:../../../mocked-hash-js/dist/node_modules/melange.belt",
+    "melange.runtime": "file:../../../mocked-hash-js/dist/node_modules/melange.runtime"
+  }
+}

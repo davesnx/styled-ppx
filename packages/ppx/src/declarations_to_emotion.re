@@ -3329,6 +3329,20 @@ let stroke =
     (~loc) => render_paint(~loc),
   );
 
+let render_alpha_value = (~loc, value: Types.alpha_value) => {
+  switch (value) {
+  | `Number(n) => [%expr `num([%e render_number(~loc, n)])]
+  | `Extended_percentage(pct) => render_extended_percentage(~loc, pct)
+  };
+};
+
+let strokeOpacity =
+  apply(
+    Parser.property_stroke_opacity,
+    (~loc) => [%expr CssJs.SVG.strokeOpacity],
+    render_alpha_value,
+  );
+
 let found = ({ast_of_string, string_to_expr, _}) => {
   /* TODO: Why we have 'check_value' when we don't use it? */
   let check_value = string => {
@@ -3562,6 +3576,14 @@ let properties = [
   /* SVG */
   ("fill", found(fill)),
   ("stroke", found(stroke)),
+  ("strokeOpacity", found(strokeOpacity)),
+  /* strokeDasharray
+     strokeWidth
+     strokeMiterlimit
+     strokeLinecap
+     strokeLinejoin */
+  /* stopColor
+     stopOpacity */
 ];
 
 let render_when_unsupported_features = (~loc, property, value) => {

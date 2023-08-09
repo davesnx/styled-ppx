@@ -1,0 +1,4 @@
+(test
+ (name test)
+ (modules :standard)
+ (libraries alcotest fmt styled-ppx.css_native styled-ppx.emotion_native))
