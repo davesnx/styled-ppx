@@ -9,4 +9,6 @@
  (preprocess
   (pps melange.ppx)))
 
-(copy_files# "../native/shared/*.[!.pp].ml")
+(copy_files#
+ (mode fallback)
+ (files ../native/shared/**[!.pp].ml))
