@@ -10,4 +10,5 @@
   (pps melange.ppx)))
 
 (copy_files#
+ (mode fallback)
  (files ../native/shared/**[!.pp].ml))
