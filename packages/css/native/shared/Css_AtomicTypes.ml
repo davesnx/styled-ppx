@@ -2305,3 +2305,15 @@ module ZIndex = struct
   let toString x =
     match x with `auto -> {js|auto|js} | `num x -> Runtime.Int.toString x
 end
+
+module AlphaValue = struct
+  type nonrec t =
+    [ `num of int
+    | `percent of float
+    ]
+
+  let toString x =
+    match x with
+    | `num x -> Runtime.Int.toString x
+    | `percent x -> Runtime.Float.toString x ^ {js|%|js}
+end

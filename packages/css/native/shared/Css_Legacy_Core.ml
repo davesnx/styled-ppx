@@ -2144,7 +2144,7 @@ module SVG = struct
   let strokeWidth x = D ({js|strokeWidth|js}, Length.toString x)
 
   let strokeOpacity opacity =
-    D ({js|strokeOpacity|js}, Runtime.Float.toString opacity)
+    D ({js|strokeOpacity|js}, AlphaValue.toString opacity)
 
   let strokeMiterlimit x = D ({js|strokeMiterlimit|js}, Runtime.Float.toString x)
 
