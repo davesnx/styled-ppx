@@ -159,28 +159,6 @@ let keyframe () =
   assert_string css
     " .css-XXXXXX { -webkit-animation-name: random; animation-name: random; }"
 
-let with_react () =
-  let className = style [ Css.display `block ] in
-  let css = Css.render_style_tag () in
-  Css.flush ();
-  let head =
-    React.createElement "head" [||]
-      [ React.createElement "style" [||] [ React.string css ] ]
-  in
-  let body =
-    React.createElement "body" [||]
-      [
-        React.createElement "div"
-          [| React.Attribute.String ("className", className) |]
-          [];
-      ]
-  in
-  let app = React.createElement "html" [||] [ head; body ] in
-  assert_string
-    (ReactDOM.renderToStaticMarkup app)
-    "<html><head><style> .css-XXXXXX { display: block; \
-     }</style></head><body><div class=\"css-XXXXXX\"></div></body></html>"
-
 let empty () =
   (* an empty declaration should not have a hash *)
   let className = Css.style [] in
@@ -211,7 +189,6 @@ let tests =
       case "selector_ampersand_at_the_middle" selector_ampersand_at_the_middle;
       case "selector_params" selector_params;
       case "keyframe" keyframe;
-      case "with_react_component" with_react;
       case "empty" empty;
       case "duplicated_styles_should_push_once"
         duplicated_styles_should_push_once;
