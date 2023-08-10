@@ -3,6 +3,11 @@ open Ppxlib;
 
 let loc = Location.none;
 
+
+let label: CssJs.rule = CssJs.label("asdf");
+let block : CssJs.rule = CssJs.display(`block);
+let c = CssJs.style(. [| block, label|]);
+
 /* The tests that are commented, means that we don't support them safely */
 let properties_static_css_tests = [
   (

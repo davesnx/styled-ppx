@@ -15,7 +15,7 @@ include Bs_css.Css_Legacy_Core.Make (struct
     [@@bs.module "@emotion/css"]
 
   let injectRules =
-   fun [@bs] (selector : string) rules ->
+   fun [@bs] selector rules ->
     (injectRawRules
        (Js.Dict.fromArray [| selector, rules |] |. Js.Json.object_) [@bs])
 
