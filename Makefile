@@ -120,8 +120,12 @@ test_e2e: ## Run End-to-end tests for JSX3
 test_string_interpolation: ## Run string_interpolation tests
 	$(DUNE) build @string_interpolation_test
 
+.PHONY: test_emotion
+test_emotion: ## Run emotion tests
+	$(DUNE) build @emotion_test
+
 .PHONY: test_all
-test_all: build test_typecheck test_css_support test_ppx_snapshot test_parser test_css_lexer test_reason_css_parser test_css_spec_parser test_css_spec_types test_string_interpolation test_e2e
+test_all: build test_typecheck test_css_support test_ppx_snapshot test_parser test_css_lexer test_reason_css_parser test_css_spec_parser test_css_spec_types test_string_interpolation test_emotion test_e2e
 
 # Debug commands
 

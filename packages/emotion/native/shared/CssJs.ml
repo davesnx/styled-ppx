@@ -1,5 +1,3 @@
-(* This file should go to the trash *)
-
 include Css_native.Css_Colors
 include Css_native.Css_Js_Core
 module Core = Css_native.Css_Js_Core
