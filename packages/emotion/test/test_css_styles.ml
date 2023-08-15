@@ -16,6 +16,13 @@ let multiple_properties () =
   Css.flush ();
   assert_string css " .css-XXXXXX { display: block; font-size: 10px; }"
 
+let using_ppx () =
+  let _rare_name = style([Css.label("className"); Css.display(`block)]) in
+  (* let _rare_name = [%cx {| display: block |}] in *)
+  let css = Css.render_style_tag () in
+  Css.flush ();
+  assert_string css " .css-XXXXXX { display: block; }"
+
 let float_values () =
   let _className = style [ Css.padding (`rem 10.) ] in
   let css = Css.render_style_tag () in
@@ -181,6 +188,7 @@ let tests =
       case "multiple_properties" multiple_properties;
       case "float_values" float_values;
       case "selector_one_nesting" selector_one_nesting;
+      case "using_ppx" using_ppx;
       case "selector_more_than_one_nesting" selector_more_than_one_nesting;
       case "selector_with_a_lot_of_nesting" selector_with_a_lot_of_nesting;
       case "media_queries" media_queries

@@ -1894,13 +1894,13 @@ let fontFace ~fontFamily:(fontFamily [@ns.namedArgLoc])
      |> List.map (fun x ->
           match x with
           | `localUrl value ->
-            ((({js|local("|js} [@res.template]) ^ value) [@res.template]
-            ^ ({js|")|js} [@res.template]))
-            [@res.template]
+            ((({js|local("|js}) ^ value)
+            ^ ({js|")|js}))
+
           | `url value ->
-            ((({js|url("|js} [@res.template]) ^ value) [@res.template]
-            ^ ({js|")|js} [@res.template]))
-            [@res.template])
+            ((({js|url("|js}) ^ value)
+            ^ ({js|")|js}))
+          )
      |> String.concat {js|, |js}
    in
    let fontStyle =
@@ -1925,37 +1925,37 @@ let fontFace ~fontFamily:(fontFamily [@ns.namedArgLoc])
        ({js|size-adjust: |js} ^ Percentage.toString s) ^ {js|;|js})
    in
    ((((((((((((({js|@font-face {
-     font-family: |js} [@res.template])
+     font-family: |js})
               ^ fontFamily)
-              [@res.template]
+
              ^ ({js|;
-     src: |js} [@res.template]))
-             [@res.template]
+     src: |js}))
+
             ^ src)
-            [@res.template]
+
            ^ ({js|;
-     |js} [@res.template]))
-           [@res.template]
+     |js}))
+
           ^ fontStyle)
-          [@res.template]
+
          ^ ({js|
-     |js} [@res.template]))
-         [@res.template]
+     |js}))
+
         ^ fontWeight)
-        [@res.template]
+
        ^ ({js|
-     |js} [@res.template]))
-       [@res.template]
+     |js}))
+
       ^ fontDisplay)
-      [@res.template]
+
      ^ ({js|
-     |js} [@res.template]))
-     [@res.template]
+     |js}))
+
     ^ sizeAdjust)
-    [@res.template]
+
    ^ ({js|
-   }|js} [@res.template]))
-   [@res.template])
+   }|js}))
+  )
   [@ns.braces]
 
 let textDecoration x =

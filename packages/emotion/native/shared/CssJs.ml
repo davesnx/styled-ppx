@@ -209,7 +209,7 @@ let rec rule_to_debug nesting accumulator rule =
     | D (property, value) ->
       Printf.sprintf "Declaration (\"%s\", \"%s\")" property value
     | S (selector, rules) ->
-      Printf.sprintf "S (\"%s\", %s)" selector (to_debug (nesting + 1) rules)
+      Printf.sprintf "Selector (\"%s\", %s)" selector (to_debug (nesting + 1) rules)
     | PseudoClass (pseduoclass, rules) ->
       Printf.sprintf "PseudoClass (\"%s\", %s)" pseduoclass
         (to_debug (nesting + 1) rules)

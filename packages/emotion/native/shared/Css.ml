@@ -100,6 +100,8 @@ let rec rules_to_string rules =
   let push = Buffer.add_string buff in
   let rule_to_string rule =
     match rule with
+    (* label is https://emotion.sh/docs/labels *)
+    | D ("label", _value) -> ()
     | D (property, value) -> push (Printf.sprintf "%s:%s;" property value)
     | S (selector, rules) ->
       push (Printf.sprintf "%s{%s}" selector (rules_to_string rules))

@@ -303,7 +303,7 @@ let string_of_backgroundposition x =
     (match h with
     | #BackgroundPosition.X.t as h -> BackgroundPosition.X.toString h
     | #Length.t as l -> Length.toString l)
-    ^ {js||js}
+    ^ {js| |js}
     ^
     (match v with
     | #BackgroundPosition.Y.t as v -> BackgroundPosition.Y.toString v
@@ -326,11 +326,11 @@ let backgroundPosition4 ~x ~offsetX ~y ~offsetY =
   D
     ( {js|background-position|js},
       BackgroundPosition.X.toString x
-      ^ {js||js}
+      ^ {js| |js}
       ^ Length.toString offsetX
-      ^ {js||js}
+      ^ {js| |js}
       ^ BackgroundPosition.Y.toString y
-      ^ {js||js}
+      ^ {js| |js}
       ^ Length.toString offsetY )
 
 let backgroundRepeat x =
@@ -341,7 +341,7 @@ let backgroundRepeat x =
       | `hv
           ( (#BackgroundRepeat.horizontal as h),
             (#BackgroundRepeat.vertical as v) ) ->
-        BackgroundRepeat.toString h ^ {js||js} ^ BackgroundRepeat.toString v
+        BackgroundRepeat.toString h ^ {js| |js} ^ BackgroundRepeat.toString v
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
@@ -352,7 +352,7 @@ let string_of_maskposition x =
     (match h with
     | #MaskPosition.X.t as h -> MaskPosition.X.toString h
     | #Length.t as l -> Length.toString l)
-    ^ {js||js}
+    ^ {js| |js}
     ^
     (match v with
     | #MaskPosition.Y.t as v -> MaskPosition.Y.toString v
@@ -398,11 +398,11 @@ let borderRadius4 ~topLeft ~topRight ~bottomLeft ~bottomRight =
   D
     ( {js|border-radius|js},
       Length.toString topLeft
-      ^ {js||js}
+      ^ {js| |js}
       ^ Length.toString topRight
-      ^ {js||js}
+      ^ {js| |js}
       ^ Length.toString bottomLeft
-      ^ {js||js}
+      ^ {js| |js}
       ^ Length.toString bottomRight )
 
 let borderRightColor x = D ({js|border-right-color|js}, string_of_color x)
@@ -457,7 +457,7 @@ let contentRule x = D ({js|content|js}, string_of_content x)
 let contentRules xs =
   D
     ( {js|content|js},
-      xs |. Std.Array.map string_of_content |. Std.Array.joinWith {js||js} )
+      xs |. Std.Array.map string_of_content |. Std.Array.joinWith {js| |js} )
 
 let counterIncrement x =
   D ({js|counter-increment|js}, string_of_counter_increment x)
@@ -467,7 +467,7 @@ let countersIncrement xs =
     ( {js|counter-increment|js},
       xs
       |. Std.Array.map string_of_counter_increment
-      |. Std.Array.joinWith {js||js} )
+      |. Std.Array.joinWith {js| |js} )
 
 let counterReset x = D ({js|counter-reset|js}, string_of_counter_reset x)
 
@@ -476,7 +476,7 @@ let countersReset xs =
     ( {js|counter-reset|js},
       xs
       |. Std.Array.map string_of_counter_reset
-      |. Std.Array.joinWith {js||js} )
+      |. Std.Array.joinWith {js| |js} )
 
 let counterSet x = D ({js|counter-set|js}, string_of_counter_set x)
 
@@ -514,9 +514,9 @@ let flex grow shrink basis =
   D
     ( {js|flex|js},
       Std.Float.toString grow
-      ^ {js||js}
+      ^ {js| |js}
       ^ Std.Float.toString shrink
-      ^ {js||js}
+      ^ {js| |js}
       ^
       match basis with
       | #FlexBasis.t as b -> FlexBasis.toString b
@@ -534,12 +534,12 @@ let flex2 ?basis ?shrink grow =
     ( {js|flex|js},
       Std.Float.toString grow
       ^ (match shrink with
-        | Some s -> {js||js} ^ Std.Float.toString s
+        | Some s -> {js| |js} ^ Std.Float.toString s
         | None -> {js||js})
       ^
       match basis with
-      | Some (#FlexBasis.t as b) -> {js||js} ^ FlexBasis.toString b
-      | Some (#Length.t as l) -> {js||js} ^ Length.toString l
+      | Some (#FlexBasis.t as b) -> {js| |js} ^ FlexBasis.toString b
+      | Some (#Length.t as l) -> {js| |js} ^ Length.toString l
       | None -> {js||js} )
 
 let flexDirection x =
@@ -642,7 +642,7 @@ let gap x = D ({js|gap|js}, string_of_gap x)
 let gridGap x = D ({js|grid-gap|js}, string_of_gap x)
 
 let gap2 ~rowGap ~columnGap =
-  D ({js|gap|js}, string_of_gap rowGap ^ {js||js} ^ string_of_gap columnGap)
+  D ({js|gap|js}, string_of_gap rowGap ^ {js| |js} ^ string_of_gap columnGap)
 
 let gridRowGap x =
   D
@@ -713,9 +713,9 @@ let listStyle style position image =
   D
     ( {js|list-style|js},
       ListStyleType.toString style
-      ^ {js||js}
+      ^ {js| |js}
       ^ ListStylePosition.toString position
-      ^ {js||js}
+      ^ {js| |js}
       ^
       match image with
       | #ListStyleImage.t as lsi -> ListStyleImage.toString lsi
@@ -756,26 +756,26 @@ let marginToString x =
 let margin x = D ({js|margin|js}, marginToString x)
 
 let margin2 ~v ~h =
-  D ({js|margin|js}, marginToString v ^ {js||js} ^ marginToString h)
+  D ({js|margin|js}, marginToString v ^ {js| |js} ^ marginToString h)
 
 let margin3 ~top ~h ~bottom =
   D
     ( {js|margin|js},
       marginToString top
-      ^ {js||js}
+      ^ {js| |js}
       ^ marginToString h
-      ^ {js||js}
+      ^ {js| |js}
       ^ marginToString bottom )
 
 let margin4 ~top ~right ~bottom ~left =
   D
     ( {js|margin|js},
       marginToString top
-      ^ {js||js}
+      ^ {js| |js}
       ^ marginToString right
-      ^ {js||js}
+      ^ {js| |js}
       ^ marginToString bottom
-      ^ {js||js}
+      ^ {js| |js}
       ^ marginToString left )
 
 let marginLeft x = D ({js|margin-left|js}, marginToString x)
@@ -842,9 +842,9 @@ let outline size style color =
   D
     ( {js|outline|js},
       LineWidth.toString size
-      ^ {js||js}
+      ^ {js| |js}
       ^ OutlineStyle.toString style
-      ^ {js||js}
+      ^ {js| |js}
       ^ string_of_color color )
 
 let outlineColor x = D ({js|outline-color|js}, string_of_color x)
@@ -866,26 +866,26 @@ let overflowWrap x =
 let padding x = D ({js|padding|js}, Length.toString x)
 
 let padding2 ~v ~h =
-  D ({js|padding|js}, Length.toString v ^ {js||js} ^ Length.toString h)
+  D ({js|padding|js}, Length.toString v ^ {js| |js} ^ Length.toString h)
 
 let padding3 ~top ~h ~bottom =
   D
     ( {js|padding|js},
       Length.toString top
-      ^ {js||js}
+      ^ {js| |js}
       ^ Length.toString h
-      ^ {js||js}
+      ^ {js| |js}
       ^ Length.toString bottom )
 
 let padding4 ~top ~right ~bottom ~left =
   D
     ( {js|padding|js},
       Length.toString top
-      ^ {js||js}
+      ^ {js| |js}
       ^ Length.toString right
-      ^ {js||js}
+      ^ {js| |js}
       ^ Length.toString bottom
-      ^ {js||js}
+      ^ {js| |js}
       ^ Length.toString left )
 
 let paddingBottom x = D ({js|padding-bottom|js}, Length.toString x)
@@ -908,7 +908,7 @@ let perspectiveOrigin x y =
       (match x with
       | #Perspective.t as p -> Perspective.toString p
       | #Length.t as l -> Length.toString l)
-      ^ {js||js}
+      ^ {js| |js}
       ^
       match y with
       | #Perspective.t as p -> Perspective.toString p
@@ -1043,20 +1043,20 @@ let transform x =
 let transforms x =
   D
     ( {js|transform|js},
-      x |. Std.Array.map Transform.toString |. Std.Array.joinWith {js||js} )
+      x |. Std.Array.map Transform.toString |. Std.Array.joinWith {js| |js} )
 
 let transformOrigin x y =
-  D ({js|transform-origin|js}, Length.toString x ^ {js||js} ^ Length.toString y)
+  D ({js|transform-origin|js}, Length.toString x ^ {js| |js} ^ Length.toString y)
 
 let transformOrigin3d x y z =
   D
     ( {js|transform-origin|js},
       Length.toString x
-      ^ {js||js}
+      ^ {js| |js}
       ^ Length.toString y
-      ^ {js||js}
+      ^ {js| |js}
       ^ Length.toString z
-      ^ {js||js} )
+      ^ {js| |js} )
 
 let transformBox x = D ({js|transform-box|js}, TransformBox.toString x)
 let unsafe property value = D (property, value)
@@ -1512,9 +1512,9 @@ let flex3 ~grow ~shrink ~basis =
   D
     ( {js|flex|js},
       Std.Float.toString grow
-      ^ {js||js}
+      ^ {js| |js}
       ^ Std.Float.toString shrink
-      ^ {js||js}
+      ^ {js| |js}
       ^
       match basis with
       | #FlexBasis.t as b -> FlexBasis.toString b
@@ -1720,11 +1720,11 @@ let string_of_filter x =
   | `brightness v -> ({js|brightness(|js} ^ Std.Float.toString v) ^ {js|%)|js}
   | `contrast v -> ({js|contrast(|js} ^ Std.Float.toString v) ^ {js|%)|js}
   | `dropShadow (a, b, c, d) ->
-    ((((((({js|drop-shadow(|js} ^ Length.toString a) ^ {js||js})
+    ((((((({js|drop-shadow(|js} ^ Length.toString a) ^ {js| |js})
         ^ Length.toString b)
-       ^ {js||js})
+       ^ {js| |js})
       ^ Length.toString c)
-     ^ {js||js})
+     ^ {js| |js})
     ^ Color.toString d)
     ^ {js|)|js}
   | `grayscale v -> ({js|grayscale(|js} ^ Std.Float.toString v) ^ {js|%)|js}
@@ -1741,7 +1741,7 @@ let string_of_filter x =
 let filter x =
   D
     ( {js|filter|js},
-      x |. Std.Array.map string_of_filter |. Std.Array.joinWith {js||js} )
+      x |. Std.Array.map string_of_filter |. Std.Array.joinWith {js| |js} )
 
 module Shadow = struct
   type nonrec 'a value = string
@@ -1756,19 +1756,19 @@ module Shadow = struct
   let box ?(x = zero) ?(y = zero) ?(blur = zero) ?(spread = zero)
     ?(inset = false) color =
     `shadow
-      (((((((((Length.toString x ^ {js||js}) ^ Length.toString y) ^ {js||js})
+      (((((((((Length.toString x ^ {js| |js}) ^ Length.toString y) ^ {js| |js})
            ^ Length.toString blur)
-          ^ {js||js})
+          ^ {js| |js})
          ^ Length.toString spread)
-        ^ {js||js})
+        ^ {js| |js})
        ^ string_of_color color)
       ^ if inset then {js|inset|js} else {js||js})
 
   let text ?(x = zero) ?(y = zero) ?(blur = zero) color =
     `shadow
-      ((((((Length.toString x ^ {js||js}) ^ Length.toString y) ^ {js||js})
+      ((((((Length.toString x ^ {js| |js}) ^ Length.toString y) ^ {js| |js})
         ^ Length.toString blur)
-       ^ {js||js})
+       ^ {js| |js})
       ^ string_of_color color)
 
   let (toString : 'a t -> string) =
@@ -1797,8 +1797,8 @@ let string_of_borderstyle x =
 let border px style color =
   D
     ( {js|border|js},
-      (((LineWidth.toString px ^ {js||js}) ^ string_of_borderstyle style)
-      ^ {js||js})
+      (((LineWidth.toString px ^ {js| |js}) ^ string_of_borderstyle style)
+      ^ {js| |js})
       ^ string_of_color color )
 
 let borderStyle x = D ({js|border-style|js}, string_of_borderstyle x)
@@ -1806,8 +1806,8 @@ let borderStyle x = D ({js|border-style|js}, string_of_borderstyle x)
 let borderLeft px style color =
   D
     ( {js|border-left|js},
-      (((LineWidth.toString px ^ {js||js}) ^ string_of_borderstyle style)
-      ^ {js||js})
+      (((LineWidth.toString px ^ {js| |js}) ^ string_of_borderstyle style)
+      ^ {js| |js})
       ^ string_of_color color )
 
 let borderLeftStyle x = D ({js|border-left-style|js}, string_of_borderstyle x)
@@ -1815,8 +1815,8 @@ let borderLeftStyle x = D ({js|border-left-style|js}, string_of_borderstyle x)
 let borderRight px style color =
   D
     ( {js|border-right|js},
-      (((LineWidth.toString px ^ {js||js}) ^ string_of_borderstyle style)
-      ^ {js||js})
+      (((LineWidth.toString px ^ {js| |js}) ^ string_of_borderstyle style)
+      ^ {js| |js})
       ^ string_of_color color )
 
 let borderRightStyle x = D ({js|border-right-style|js}, string_of_borderstyle x)
@@ -1824,8 +1824,8 @@ let borderRightStyle x = D ({js|border-right-style|js}, string_of_borderstyle x)
 let borderTop px style color =
   D
     ( {js|border-top|js},
-      (((LineWidth.toString px ^ {js||js}) ^ string_of_borderstyle style)
-      ^ {js||js})
+      (((LineWidth.toString px ^ {js| |js}) ^ string_of_borderstyle style)
+      ^ {js| |js})
       ^ string_of_color color )
 
 let borderTopStyle x = D ({js|border-top-style|js}, string_of_borderstyle x)
@@ -1833,8 +1833,8 @@ let borderTopStyle x = D ({js|border-top-style|js}, string_of_borderstyle x)
 let borderBottom px style color =
   D
     ( {js|border-bottom|js},
-      (((LineWidth.toString px ^ {js||js}) ^ string_of_borderstyle style)
-      ^ {js||js})
+      (((LineWidth.toString px ^ {js| |js}) ^ string_of_borderstyle style)
+      ^ {js| |js})
       ^ string_of_color color )
 
 let borderBottomStyle x = D ({js|border-bottom-style|js}, string_of_borderstyle x)
@@ -1864,7 +1864,7 @@ let backgroundSize x =
   D
     ( {js|background-size|js},
       match x with
-      | `size (x, y) -> (Length.toString x ^ {js||js}) ^ Length.toString y
+      | `size (x, y) -> (Length.toString x ^ {js| |js}) ^ Length.toString y
       | `auto -> {js|auto|js}
       | `cover -> {js|cover|js}
       | `contain -> {js|contain|js} )
@@ -1984,11 +1984,11 @@ module Transition = struct
   let shorthand ?(duration = 0) ?(delay = 0) ?(timingFunction = `ease) property
       =
     `value
-      ((((((string_of_time duration ^ {js||js})
+      ((((((string_of_time duration ^ {js| |js})
           ^ TimingFunction.toString timingFunction)
-         ^ {js||js})
+         ^ {js| |js})
         ^ string_of_time delay)
-       ^ {js||js})
+       ^ {js| |js})
       ^ property)
 
   let toString x = match x with `value v -> v
@@ -2023,17 +2023,17 @@ module Animation = struct
     ?(timingFunction = `ease) ?(fillMode = `none) ?(playState = `running)
     ?(iterationCount = `count 1) name =
     `value
-      ((((((((((((((name ^ {js||js}) ^ string_of_time duration) ^ {js||js})
+      ((((((((((((((name ^ {js| |js}) ^ string_of_time duration) ^ {js| |js})
                 ^ TimingFunction.toString timingFunction)
-               ^ {js||js})
+               ^ {js| |js})
               ^ string_of_time delay)
-             ^ {js||js})
+             ^ {js| |js})
             ^ AnimationIterationCount.toString iterationCount)
-           ^ {js||js})
+           ^ {js| |js})
           ^ AnimationDirection.toString direction)
-         ^ {js||js})
+         ^ {js| |js})
         ^ AnimationFillMode.toString fillMode)
-       ^ {js||js})
+       ^ {js| |js})
       ^ AnimationPlayState.toString playState)
 
   let toString x = match x with `value v -> v
