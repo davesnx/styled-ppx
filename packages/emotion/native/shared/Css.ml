@@ -100,7 +100,7 @@ let rec rules_to_string rules =
   let push = Buffer.add_string buff in
   let rule_to_string rule =
     match rule with
-    (* label is https://emotion.sh/docs/labels *)
+    (* https://emotion.sh/docs/labels should be ignored on the rendering *)
     | D ("label", _value) -> ()
     | D (property, value) -> push (Printf.sprintf "%s:%s;" property value)
     | S (selector, rules) ->
@@ -119,6 +119,8 @@ let rec rules_to_string rules =
 
 let render_declaration rule =
   match rule with
+  (* https://emotion.sh/docs/labels should be ignored on the rendering *)
+  | D ("label", _value) -> None
   | D (property, value) -> Some (Printf.sprintf "%s: %s;" property value)
   | _ -> None
 
@@ -256,9 +258,20 @@ let append hash (styles : rule list) =
   if get hash then () else Hashtbl.add cache.contents hash styles
 
 let style (styles : rule list) =
-  let hash = Hash.default (rules_to_string styles) |> String.cat "css-" in
-  append hash styles;
-  hash
+  let is_label = function
+    | D ("label", value) -> Some value
+    | _ -> None in
+  match List.find_map is_label styles with
+    | None ->
+      let prefix = "css" in
+      let hash = Hash.default (rules_to_string styles) in
+      append (Printf.sprintf "%s-%s" prefix hash) styles;
+      hash
+    | Some label ->
+      let prefix = "css" in
+      let hash = Hash.default (rules_to_string styles) in
+      append (Printf.sprintf "%s-%s-%s" prefix hash label) styles;
+      hash
 
 let style_debug (styles : rule list) =
   print_endline (rules_to_string styles);

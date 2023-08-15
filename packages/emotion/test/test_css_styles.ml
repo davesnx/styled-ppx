@@ -167,10 +167,10 @@ let keyframe () =
     " .css-XXXXXX { -webkit-animation-name: random; animation-name: random; }"
 
 let empty () =
-  (* an empty declaration should not have a hash *)
+  (* an empty declaration should not print anything *)
   let className = Css.style [] in
   Css.flush ();
-  assert_string className "css-"
+  assert_string className ""
 
 let duplicated_styles_should_push_once () =
   let _className_1 = style [ Css.flexGrow 1. ] in
