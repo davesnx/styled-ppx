@@ -1,5 +1,4 @@
 [@@@warning "-20" (* [ignored-extra-argument] *)]
-[@@@warning "-21" (* [nonreturning-statement] *)]
 
 type rule =
   | D of string * string
@@ -11,18 +10,24 @@ let rec ruleToDict =
  fun [@bs] dict rule ->
   (match rule with
   | D (name, value) when name = {js|content|js} ->
-    dict
-    |. Js.Dict.set name
-         (Js.Json.string (if value = {js||js} then {js|""|js} else value))
-  | D (name, value) -> dict |. Js.Dict.set name (Js.Json.string value)
-  | S (name, ruleset) -> dict |. Js.Dict.set name (toJson ruleset)
+    let (_: unit) = Js.Dict.set dict name
+      (Js.Json.string (if value = {js||js} then {js|""|js} else value)) in
+      ()
+  | D (name, value) ->
+    let (_: unit) = Js.Dict.set dict name (Js.Json.string value) in
+    ()
+  | S (name, ruleset) ->
+    let (_: unit) = Js.Dict.set dict name (toJson ruleset) in
+    ()
   | PseudoClass (name, ruleset) ->
-    dict |. Js.Dict.set ({js|:|js} ^ name) (toJson ruleset)
+    let (_: unit) = dict |. Js.Dict.set ({js|:|js} ^ name) (toJson ruleset) in
+    ()
   | PseudoClassParam (name, param, ruleset) ->
-    dict
-    |. Js.Dict.set
-         ({js|:|js} ^ name ^ {js|(|js} ^ param ^ {js|)|js})
-         (toJson ruleset));
+    let (_: unit) = Js.Dict.set dict
+      ({js|:|js} ^ name ^ {js|(|js} ^ param ^ {js|)|js})
+      (toJson ruleset) in
+    ()
+  );
   dict
 
 and toJson rules =
@@ -85,10 +90,13 @@ module Make (CssImpl : Css_Core.CssImplementationIntf) :
   let merge4 = fun [@bs] s s2 s3 s4 -> (merge [| s; s2; s3; s4 |] [@bs])
 
   let framesToDict frames =
-    Std.Array.reduceU frames (Js.Dict.empty ()) (fun [@bs] dict (stop, rules) ->
-      ((Js.Dict.set dict (Std.Int.toString stop ^ {js|%|js}) (toJson rules);
-        dict)
-      [@ns.braces]))
+    Std.Array.reduceU
+      frames
+      (Js.Dict.empty ())
+      (fun [@bs] dict (stop, rules) ->
+        let _ = Js.Dict.set dict (Std.Int.toString stop ^ {js|%|js}) (toJson rules) in
+        dict
+      )
 
   let keyframes =
    fun [@bs] frames -> (CssImpl.makeKeyframes (framesToDict frames) [@bs])
