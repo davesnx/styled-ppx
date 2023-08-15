@@ -2026,8 +2026,8 @@ let render_font_weight = (~loc) =>
   | `Lighter => variant_to_expression(~loc, `Lighter)
   | `Font_weight_absolute(`Normal) => variant_to_expression(~loc, `Normal)
   | `Font_weight_absolute(`Bold) => variant_to_expression(~loc, `Bold)
-  | `Font_weight_absolute(`Number(num)) => [%expr
-      `num([%e render_number(~loc, num)])
+  | `Font_weight_absolute(`Integer(num)) => [%expr
+      `num([%e render_integer(~loc, num)])
     ];
 
 let font_weight =
