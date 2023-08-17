@@ -1,9 +1,0 @@
-(melange.emit
- (target dist)
- (alias runtest)
- (modules hash_js)
- (runtime_deps package.json)
- (promote (until-clean))
- (module_systems
-  (commonjs js))
- (libraries hash))
