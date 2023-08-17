@@ -1,9 +1,8 @@
+(include_subdirs unqualified)
+
 (cram
- (alias runtest)
- (deps
-  %{bin:node}
-  %{bin:test_hasher_ml}
-  (package mocked-hash-js)))
+ (alias emotion-hash-tests)
+ (deps %{bin:node} %{bin:mine} original.js))
 
 ; (rule
 ; (target
@@ -16,7 +15,7 @@
 ; (run ls .))))
 
 (executable
- (name test_hasher_ml)
- (modules test_hasher_ml)
- (public_name test_hasher_ml)
- (libraries server-reason-react.hash))
+ (name mine)
+ (modules mine)
+ (public_name mine)
+ (libraries styled-ppx.emotion-hash))

@@ -2,7 +2,7 @@ let assert_string left right =
   Alcotest.check Alcotest.string "should be equal" right left
 
 let prefix_one_declaration declaration output =
-  let hidden (_ : string) = "XXXXXX" in
+  let hidden (_ : string) = "HASH" in
   let _rule = Css.style_with_hash ~hash:hidden [ declaration ] in
   let css = Css.render_style_tag () in
   Css.flush ();
@@ -11,22 +11,22 @@ let prefix_one_declaration declaration output =
 let text_size_adjust () =
   prefix_one_declaration
     (Css.unsafe "text-size-adjust" "none")
-    " .css-XXXXXX { -webkit-text-size-adjust: none; -moz-text-size-adjust: \
+    " .css-HASH { -webkit-text-size-adjust: none; -moz-text-size-adjust: \
      none; -ms-text-size-adjust: none; text-size-adjust: none; }"
 
 let text_decoration () =
   prefix_one_declaration
     (Css.textDecoration `lineThrough)
-    " .css-XXXXXX { -webkit-text-decoration: line-through; text-decoration: \
+    " .css-HASH { -webkit-text-decoration: line-through; text-decoration: \
      line-through; }"
 
 let display_grid () =
-  prefix_one_declaration (Css.display `grid) " .css-XXXXXX { display: grid; }"
+  prefix_one_declaration (Css.display `grid) " .css-HASH { display: grid; }"
 
 let animation_duration () =
   prefix_one_declaration
     (Css.animationIterationCount `infinite)
-    " .css-XXXXXX { -webkit-animation-iteration-count: infinite; \
+    " .css-HASH { -webkit-animation-iteration-count: infinite; \
      animation-iteration-count: infinite; }"
 
 let case title fn = Alcotest.test_case title `Quick fn
