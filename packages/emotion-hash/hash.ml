@@ -128,4 +128,4 @@ let murmur2 (str : string) =
   (* (h ^ (h >>> 15)) >>> 0 *)
   !hash ^ (!hash >>> 15) >>> 0
 
-let make (str : string) = str |> murmur2 |> to_css
+let default (str : string) = str |> murmur2 |> to_css

@@ -1,1 +1,1 @@
-let default = Emotion_hash.Hash.make
+include Emotion_hash.Hash

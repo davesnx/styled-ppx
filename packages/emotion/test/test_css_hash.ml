@@ -6,7 +6,7 @@ let check_equality (input, expected) =
     fun () ->
       (Alcotest.check Alcotest.string)
         (quoted input ^ " should hash")
-        expected (Hash.make input) )
+        expected (Hash.default input) )
 
 let data =
   [

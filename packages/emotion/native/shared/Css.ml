@@ -265,18 +265,18 @@ let style (styles : rule list) =
   match List.find_map is_label styles with
     | None ->
       let prefix = "css" in
-      let hash = Emotion_hash.Hash.make (rules_to_string styles) in
+      let hash = Emotion_hash.Hash.default (rules_to_string styles) in
       append (Printf.sprintf "%s-%s" prefix hash) styles;
       hash
     | Some label ->
       let prefix = "css" in
-      let hash = Emotion_hash.Hash.make (rules_to_string styles) in
+      let hash = Emotion_hash.Hash.default (rules_to_string styles) in
       append (Printf.sprintf "%s-%s-%s" prefix hash label) styles;
       hash
 
 let style_debug (styles : rule list) =
   print_endline (rules_to_string styles);
-  let hash = Emotion_hash.Hash.make (rules_to_string styles) |> String.cat "css-" in
+  let hash = Emotion_hash.Hash.default (rules_to_string styles) |> String.cat "css-" in
   append hash styles;
   hash
 
