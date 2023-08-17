@@ -1,1 +1,1 @@
-let default = Hash.make
+let default = Emotion_hash.Hash.make
