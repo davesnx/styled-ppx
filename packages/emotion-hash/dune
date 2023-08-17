@@ -5,8 +5,3 @@
  (public_name styled-ppx.emotion-hash)
  (modules hash)
  (modes :standard melange))
-
-(melange.emit
- (target emotion-hash-js)
- (libraries emotion_hash)
- (modules js))

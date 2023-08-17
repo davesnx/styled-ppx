@@ -17,3 +17,7 @@
   reason-css-parser
   renderer
   string_interpolation))
+
+(melange.emit
+ (target emotion-hash-js)
+ (libraries emotion_hash))
