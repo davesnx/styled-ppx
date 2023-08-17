@@ -9,6 +9,7 @@
  (dirs
   css
   emotion
+  emotion-hash
   css-spec-parser
   parser
   ppx
