@@ -19,5 +19,9 @@
   string_interpolation))
 
 (melange.emit
- (target emotion-hash-js)
- (libraries emotion_hash))
+ (target hash-dist-js)
+ (libraries emotion_hash)
+ (module_systems
+  (es6 es6.js)
+  (commonjs cjs.js))
+ (runtime_deps packages/emotion-hash/package.json))

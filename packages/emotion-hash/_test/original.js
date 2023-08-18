@@ -56,7 +56,6 @@ function murmur2(str) {
         (h & 0xffff) * 0x5bd1e995 + (((h >>> 16) * 0xe995) << 16)
   }
 
-
   // Do a few final mixes of the hash to ensure the last few
   // bytes are well-incorporated.
 
