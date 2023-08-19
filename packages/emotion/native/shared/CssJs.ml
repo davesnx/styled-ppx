@@ -261,31 +261,33 @@ let flush () = Hashtbl.clear cache.contents
 let append hash (styles : rule array) =
   if get hash then () else Hashtbl.add cache.contents hash styles
 
+let render_hash prefix hash label =
+  match label with
+  | None -> (Printf.sprintf "%s-%s" prefix hash)
+  | Some label -> (Printf.sprintf "%s-%s-%s" prefix hash label)
+
 let style (styles : rule array) =
   let is_label = function
     | D ("label", value) -> Some value
     | _ -> None in
-  match Array.find_map is_label styles with
-    | None ->
-      let prefix = "css" in
-      let hash = Emotion_hash.Hash.default (rules_to_string styles) in
-      append (Printf.sprintf "%s-%s" prefix hash) styles;
-      hash
-    | Some label ->
-      let prefix = "css" in
-      let hash = Emotion_hash.Hash.default (rules_to_string styles) in
-      append (Printf.sprintf "%s-%s-%s" prefix hash label) styles;
-      hash
+  let label = Array.find_map is_label styles in
+  let hash = Emotion_hash.Hash.default (rules_to_string styles) in
+  let className = render_hash "css" hash label in
+  append className styles;
+  hash
 
 let style_debug (styles : rule array) =
   print_endline (rules_to_string styles);
-  let hash = Emotion_hash.Hash.default (rules_to_string styles) |> String.cat "css-" in
-  append hash styles;
-  hash
+  style styles
 
 let style_with_hash ~hash (styles : rule array) =
+    let is_label = function
+    | D ("label", value) -> Some value
+    | _ -> None in
+  let label = Array.find_map is_label styles in
+  let className = render_hash "css" hash label in
   let hash = hash (rules_to_string styles) |> String.cat "css-" in
-  append hash styles;
+  append className styles;
   hash
 
 let render_style_tag () =
