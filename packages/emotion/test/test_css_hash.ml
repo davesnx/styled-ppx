@@ -6,10 +6,11 @@ let check_equality (input, expected) =
     fun () ->
       (Alcotest.check Alcotest.string)
         (quoted input ^ " should hash")
-        expected (Hash.default input) )
+        expected (Emotion_hash.Hash.default input) )
 
 let data =
   [
+    ("", "");
     ("something ", "pcredg");
     ("something", "vcob5v");
     ("padding: 0;", "6gat1f");

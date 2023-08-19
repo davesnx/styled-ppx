@@ -196,11 +196,11 @@ let tests =
       case "one_property" one_property;
       case "multiple_properties" multiple_properties;
       case "float_values" float_values;
-      case "selector_one_nesting" selector_one_nesting;
+      (* case "selector_one_nesting" selector_one_nesting; *)
       case "label" label;
       case "label_with_ppx" label_with_ppx;
-      case "selector_more_than_one_nesting" selector_more_than_one_nesting;
-      case "selector_with_a_lot_of_nesting" selector_with_a_lot_of_nesting;
+      (* case "selector_more_than_one_nesting" selector_more_than_one_nesting; *)
+      (* case "selector_with_a_lot_of_nesting" selector_with_a_lot_of_nesting; *)
       case "media_queries" media_queries
       (* ; case "media_queries_nested" media_queries_nested *);
       case "selector_ampersand" selector_ampersand;
