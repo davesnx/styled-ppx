@@ -191,7 +191,7 @@ let duplicated_styles_should_push_once () =
 let case title fn = Alcotest.test_case title `Quick fn
 
 let tests =
-  ( "Emotion",
+  ( "Emotion (CssJs)",
     [
       case "one_property" one_property;
       case "multiple_properties" multiple_properties;

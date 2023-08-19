@@ -1,8 +1,7 @@
 let assert_string left right =
   Alcotest.check Alcotest.string "should be equal" right left
 
-let hidden (_ : string) = "HASH"
-let style = Css.style_with_hash ~hash:hidden
+let style = Css.style_with_hash ~hash:"HASH"
 
 let one_property () =
   let _className = style [ Css.display `block ] in
@@ -16,12 +15,11 @@ let multiple_properties () =
   Css.flush ();
   assert_string css " .css-HASH { display: block; font-size: 10px; }"
 
-let using_ppx () =
-  let _rare_name = style([Css.label("className"); Css.display(`block)]) in
-  (* let _rare_name = [%cx {| display: block |}] in *)
+let label () =
+  let _with_label = style [Css.label("className"); Css.display(`block)] in
   let css = Css.render_style_tag () in
   Css.flush ();
-  assert_string css " .css-HASH { display: block; }"
+  assert_string css " .css-HASH-className { display: block; }"
 
 let float_values () =
   let _className = style [ Css.padding (`rem 10.) ] in
@@ -188,7 +186,7 @@ let tests =
       case "multiple_properties" multiple_properties;
       case "float_values" float_values;
       case "selector_one_nesting" selector_one_nesting;
-      case "using_ppx" using_ppx;
+      case "label" label;
       case "selector_more_than_one_nesting" selector_more_than_one_nesting;
       case "selector_with_a_lot_of_nesting" selector_with_a_lot_of_nesting;
       case "media_queries" media_queries

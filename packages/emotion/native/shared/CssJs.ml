@@ -286,7 +286,6 @@ let style_with_hash ~hash (styles : rule array) =
     | _ -> None in
   let label = Array.find_map is_label styles in
   let className = render_hash "css" hash label in
-  let hash = hash (rules_to_string styles) |> String.cat "css-" in
   append className styles;
   hash
 
