@@ -3,25 +3,25 @@ let assert_string left right =
 
 module CssJs = struct
   include CssJs
+  (* Override CssJs.style with CssJs.style_with_hash
+     so we can hide the hash from this tests. *)
   let style = CssJs.style_with_hash ~hash:"HASH"
 end
 
-let style = CssJs.style
-
 let one_property () =
-  let _className = style [| CssJs.display `block |] in
+  let cx = CssJs.style [| CssJs.display `block |] in
   let css = CssJs.render_style_tag () in
   CssJs.flush ();
-  assert_string css " .css-HASH { display: block; }"
+  assert_string css (Printf.sprintf " .%s { display: block; }" cx)
 
 let multiple_properties () =
-  let _className = style [| CssJs.display `block; CssJs.fontSize (`px 10) |] in
+  let _className = CssJs.style [| CssJs.display `block; CssJs.fontSize (`px 10) |] in
   let css = CssJs.render_style_tag () in
   CssJs.flush ();
   assert_string css " .css-HASH { display: block; font-size: 10px; }"
 
 let label () =
-  let _rare_name = style [| CssJs.label "className"; CssJs.display `block |] in
+  let _rare_name = CssJs.style [| CssJs.label "className"; CssJs.display `block |] in
   let css = CssJs.render_style_tag () in
   CssJs.flush ();
   assert_string css " .css-HASH-className { display: block; }"
@@ -33,14 +33,14 @@ let label_with_ppx () =
   assert_string css " .css-HASH { display: block; }"
 
 let float_values () =
-  let _className = style [| CssJs.padding (`rem 10.) |] in
+  let _className = CssJs.style [| CssJs.padding (`rem 10.) |] in
   let css = CssJs.render_style_tag () in
   CssJs.flush ();
   assert_string css " .css-HASH { padding: 10rem; }"
 
 let selector_one_nesting () =
   let _className =
-    style
+    CssJs.style
       [|
         CssJs.color CssJs.aliceblue;
         CssJs.selector "a" [| CssJs.color CssJs.rebeccapurple |];
@@ -51,24 +51,29 @@ let selector_one_nesting () =
   assert_string css
     " .css-HASH { color: #F0F8FF; } .css-HASH a { color: #663399; }"
 
-let selector_more_than_one_nesting () =
+let selector_nested () =
   let _className =
-    style
+    CssJs.style
       [|
         CssJs.color CssJs.aliceblue;
         CssJs.selector "a"
           [| CssJs.display `block; CssJs.selector "div" [| CssJs.display `none |] |];
       |]
   in
+  CssJs.print_rules ([|
+        CssJs.color CssJs.aliceblue;
+        CssJs.selector "a"
+          [| CssJs.display `block; CssJs.selector "div" [| CssJs.display `none |] |];
+      |]);
   let css = CssJs.render_style_tag () in
   CssJs.flush ();
   assert_string css
     " .css-HASH { color: #F0F8FF; } .css-HASH a { display: block; } \
      .css-HASH a div { display: none; }"
 
-let selector_with_a_lot_of_nesting () =
+let selector_nested_x10 () =
   let _className =
-    style
+    CssJs.style
       [|
         CssJs.display `flex;
         CssJs.selector "a"
@@ -100,7 +105,7 @@ let selector_with_a_lot_of_nesting () =
 
 let selector_ampersand () =
   let _className =
-    style
+    CssJs.style
       [| CssJs.fontSize (`px 42); CssJs.selector "& .div" [| CssJs.fontSize (`px 24) |] |]
   in
   let css = CssJs.render_style_tag () in
@@ -110,7 +115,7 @@ let selector_ampersand () =
 
 let selector_ampersand_at_the_middle () =
   let _className =
-    style
+    CssJs.style
       [|
         CssJs.fontSize (`px 42); CssJs.selector "& div &" [| CssJs.fontSize (`px 24) |];
       |]
@@ -123,7 +128,7 @@ let selector_ampersand_at_the_middle () =
 
 let media_queries () =
   let _className =
-    style
+    CssJs.style
       [|
         CssJs.maxWidth (`px 800);
         CssJs.media "(max-width: 768px)" [| CssJs.width (`px 300) |];
@@ -137,7 +142,7 @@ let media_queries () =
 
 (* let media_queries_nested () =
    let _className =
-     style
+     CssJs.style
        [ CssJs.maxWidth (`px 800)
        ; CssJs.media "(max-width: 768px)"
            [ CssJs.width (`px 300)
@@ -153,7 +158,7 @@ let media_queries () =
 *)
 let selector_params () =
   let _className =
-    style [| CssJs.maxWidth (`px 800); CssJs.firstChild [| CssJs.width (`px 300) |] |]
+    CssJs.style [| CssJs.maxWidth (`px 800); CssJs.firstChild [| CssJs.width (`px 300) |] |]
   in
   let css = CssJs.render_style_tag () in
   CssJs.flush ();
@@ -169,21 +174,15 @@ let keyframe () =
          ; (100, [ CssJs.transform (`rotate (`deg (-360.))) ])
          ]
      in *)
-  let _className = style [| CssJs.animationName loading |] in
+  let _className = CssJs.style [| CssJs.animationName loading |] in
   let css = CssJs.render_style_tag () in
   CssJs.flush ();
   assert_string css
     " .css-HASH { -webkit-animation-name: random; animation-name: random; }"
 
-let empty () =
-  (* an empty declaration should not print anything *)
-  let className = CssJs.style [||] in
-  CssJs.flush ();
-  assert_string className ""
-
-let duplicated_styles_should_push_once () =
-  let _className_1 = style [| CssJs.flexGrow 1. |] in
-  let _className_2 = style [| CssJs.flexGrow 1. |] in
+let duplicated_styles_unique () =
+  let _className_1 = CssJs.style [| CssJs.flexGrow 1. |] in
+  let _className_2 = CssJs.style [| CssJs.flexGrow 1. |] in
   let css = CssJs.render_style_tag () in
   CssJs.flush ();
   assert_string css " .css-HASH { flex-grow: 1; }"
@@ -196,18 +195,16 @@ let tests =
       case "one_property" one_property;
       case "multiple_properties" multiple_properties;
       case "float_values" float_values;
-      (* case "selector_one_nesting" selector_one_nesting; *)
+      case "selector_one_nesting" selector_one_nesting;
       case "label" label;
       case "label_with_ppx" label_with_ppx;
-      (* case "selector_more_than_one_nesting" selector_more_than_one_nesting; *)
-      (* case "selector_with_a_lot_of_nesting" selector_with_a_lot_of_nesting; *)
-      case "media_queries" media_queries
-      (* ; case "media_queries_nested" media_queries_nested *);
+      case "selector_nested" selector_nested;
+      (* case "selector_nested_x10" selector_nested_x10; *)
+      case "media_queries" media_queries;
+      (* case "media_queries_nested" media_queries_nested; *)
       case "selector_ampersand" selector_ampersand;
       case "selector_ampersand_at_the_middle" selector_ampersand_at_the_middle;
       case "selector_params" selector_params;
       case "keyframe" keyframe;
-      case "empty" empty;
-      case "duplicated_styles_should_push_once"
-        duplicated_styles_should_push_once;
+      case "duplicated_styles_unique" duplicated_styles_unique;
     ] )

@@ -7,13 +7,6 @@ module Array = struct
 
   let filter_map arr fn = Belt.Array.keepMap fn arr
   let iter arr fn = Belt.Array.forEach fn arr
-  let flatten arr = arr |> Array.to_list |> List.flatten |> Array.of_list
-  let cons arr item = Belt.Array.push item arr
-
-  let partition_map (fn: 'a -> ('b, 'c) Either.t) (arr: 'a array): ('b array * 'c array) =
-    let list = Array.to_list arr in
-    let (left, right) = List.partition_map fn list in
-    (Array.of_list (left), Array.of_list (right))
 end
 
 module Autoprefixer = struct
@@ -114,22 +107,25 @@ let rec rules_to_string rules =
   let push = Buffer.add_string buff in
   let rule_to_string rule =
     match rule with
-    (* https://emotion.sh/docs/labels should be ignored on the rendering *)
-    | D ("label", _value) -> ()
+    (* https://emotion.sh/docs/labels should be ignored at rendering,
+       since is not a valid CSS property *)
+    | D ("label", _) -> ()
     | D (property, value) -> push (Printf.sprintf "%s:%s;" property value)
     | S (selector, rules) ->
-      push (Printf.sprintf "%s{%s}" selector (rules_to_string rules))
+      let rules = rules |> Array.to_list |> rules_to_string in
+      push (Printf.sprintf "%s{%s}" selector rules)
     | PseudoClass (pseudoclass, rules) ->
-      push (Printf.sprintf ":%s{%s}" pseudoclass (rules_to_string rules))
+      let rules = rules |> Array.to_list |> rules_to_string in
+      push (Printf.sprintf ":%s{%s}" pseudoclass rules)
     | PseudoClassParam (pseudoclass, param, rules) ->
-      push
-        (Printf.sprintf ":%s (%s) {%s}" pseudoclass param
-           (rules_to_string rules))
+      let rules = rules |> Array.to_list |> rules_to_string in
+      push (Printf.sprintf ":%s (%s) {%s}" pseudoclass param rules)
   in
 
-  rules |> Array.iter rule_to_string;
+  List.iter rule_to_string rules;
 
   Buffer.contents buff
+
 
 let render_declaration rule =
   match rule with
@@ -140,10 +136,10 @@ let render_declaration rule =
 
 let render_declarations (rules : rule array) =
   rules
-  |> Array.map Autoprefixer.prefix
-  |> Array.flatten
-  |> Array.filter_map render_declaration
   |> Array.to_list
+  |> List.map Autoprefixer.prefix
+  |> List.flatten
+  |> List.filter_map render_declaration
   |> String.concat " "
 
 let is_at_rule selector = String.contains selector '@'
@@ -154,7 +150,7 @@ let prefix ~pre s =
   else (
     let rec check i =
       if i = len then true
-      else if Stdlib.( <> ) (String.unsafe_get s i) (String.unsafe_get pre i)
+      else if (String.unsafe_get s i) <> (String.unsafe_get pre i)
       then false
       else check (i + 1)
     in
@@ -227,29 +223,39 @@ let rec rule_to_debug nesting accumulator rule =
 and to_debug nesting rules = rules |> Array.fold_left (rule_to_debug nesting) ""
 
 let print_rules rules =
-  rules |> Array.iter (fun rule -> print_endline (to_debug 0 [| rule |]))
+  rules |> Stdlib.Array.iter (fun rule -> print_endline (to_debug 0 [| rule |]))
 
-let resolve_selectors rules = rules
+let resolve_selectors rules =
+  let rec unnest ~prefix =
+    List.partition_map (function
+      | S (title, selector_rules) ->
+        let new_prelude = prefix ^ title in
+        let content, tail = unnest ~prefix:(new_prelude ^ " ") (Array.to_list selector_rules) in
+        Right (S (new_prelude, Array.of_list content) :: List.flatten tail)
+      | _ as rule -> Left rule)
+  in
+  let resolve_selector rule =
+    let declarations, selectors = unnest ~prefix:"" [ rule ] in
+    List.flatten (declarations :: selectors)
+  in
+  rules |> List.map resolve_selector |> List.flatten
 
-(* `resolved_rule` here means to print valid CSS, selectors are nested
-   and properties aren't autoprefixed. This function transforms into correct CSS. *)
-let resolved_rule_to_css hash rules =
+(* Removes nesting on selectors, run the autoprefixer. *)
+let printing_to_valid_css hash rules =
   (* TODO: Refactor with partition or partition_map. List.filter_map is error prone.
      Ss might need to respect the order of definition, and this breaks the order *)
-  let list_of_rules = rules |> resolve_selectors in
+  let list_of_rules = rules |> Array.to_list |> resolve_selectors in
   let declarations =
     list_of_rules
-    |> Array.map Autoprefixer.prefix
-    |> Array.flatten
-    |> Array.filter_map render_declaration
-    |> Array.to_list
+    |> List.map Autoprefixer.prefix
+    |> List.flatten
+    |> List.filter_map render_declaration
     |> String.concat " "
     |> fun all -> Printf.sprintf ".%s { %s }" hash all
   in
   let selectors =
     list_of_rules
-    |> Array.filter_map (render_selectors hash)
-    |> Array.to_list
+    |> List.filter_map (render_selectors hash)
     |> String.concat " "
   in
   Printf.sprintf "%s %s" declarations selectors
@@ -267,32 +273,35 @@ let render_hash prefix hash label =
   | Some label -> (Printf.sprintf "%s-%s-%s" prefix hash label)
 
 let style (styles : rule array) =
-  let is_label = function
-    | D ("label", value) -> Some value
-    | _ -> None in
-  let label = Array.find_map is_label styles in
-  let hash = Emotion_hash.Hash.default (rules_to_string styles) in
-  let className = render_hash "css" hash label in
-  append className styles;
-  hash
+  match styles with
+  | [||] -> ""
+  | _ ->
+    let is_label = function
+      | D ("label", value) -> Some value
+      | _ -> None in
+    let label = Array.find_map is_label styles in
+    let hash = Emotion_hash.Hash.default (rules_to_string (Array.to_list styles)) in
+    let className = render_hash "css" hash label in
+    append className styles;
+    className
 
 let style_debug (styles : rule array) =
-  print_endline (rules_to_string styles);
+  print_endline (rules_to_string (Array.to_list styles));
   style styles
 
 let style_with_hash ~hash (styles : rule array) =
-    let is_label = function
-    | D ("label", value) -> Some value
-    | _ -> None in
+  let is_label = function
+  | D ("label", value) -> Some value
+  | _ -> None in
   let label = Array.find_map is_label styles in
   let className = render_hash "css" hash label in
   append className styles;
-  hash
+  className
 
 let render_style_tag () =
   Hashtbl.fold
     (fun hash rules accumulator ->
-      let rules = rules |> resolved_rule_to_css hash |> String.trim in
+      let rules = rules |> printing_to_valid_css hash |> String.trim in
       Printf.sprintf "%s %s" accumulator rules)
     cache.contents ""
 

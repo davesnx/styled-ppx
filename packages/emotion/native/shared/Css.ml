@@ -264,27 +264,30 @@ let render_hash prefix hash label =
   | Some label -> (Printf.sprintf "%s-%s-%s" prefix hash label)
 
 let style (styles : rule list) =
-  let is_label = function
-    | D ("label", value) -> Some value
-    | _ -> None in
-  let label = List.find_map is_label styles in
-  let hash = Emotion_hash.Hash.default (rules_to_string styles) in
-  let className = render_hash "css" hash label in
-  append className styles;
-  hash
+  match styles with
+  | [] -> ""
+  | _ ->
+    let is_label = function
+      | D ("label", value) -> Some value
+      | _ -> None in
+    let label = List.find_map is_label styles in
+    let hash = Emotion_hash.Hash.default (rules_to_string styles) in
+    let className = render_hash "css" hash label in
+    append className styles;
+    className
 
 let style_debug (styles : rule list) =
   print_endline (rules_to_string styles);
   style styles
 
 let style_with_hash ~hash (styles : rule list) =
-    let is_label = function
-    | D ("label", value) -> Some value
-    | _ -> None in
+  let is_label = function
+  | D ("label", value) -> Some value
+  | _ -> None in
   let label = List.find_map is_label styles in
   let className = render_hash "css" hash label in
   append className styles;
-  hash
+  className
 
 let render_style_tag () =
   Hashtbl.fold
