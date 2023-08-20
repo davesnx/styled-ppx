@@ -1893,14 +1893,8 @@ let fontFace ~fontFamily:(fontFamily [@ns.namedArgLoc])
      src
      |> List.map (fun x ->
           match x with
-          | `localUrl value ->
-            ((({js|local("|js}) ^ value)
-            ^ ({js|")|js}))
-
-          | `url value ->
-            ((({js|url("|js}) ^ value)
-            ^ ({js|")|js}))
-          )
+          | `localUrl value -> ({js|local("|js} ^ value) ^ {js|")|js}
+          | `url value -> ({js|url("|js} ^ value) ^ {js|")|js})
      |> String.concat {js|, |js}
    in
    let fontStyle =
@@ -1924,38 +1918,25 @@ let fontFace ~fontFamily:(fontFamily [@ns.namedArgLoc])
      Belt.Option.mapWithDefault sizeAdjust {js||js} (fun s ->
        ({js|size-adjust: |js} ^ Percentage.toString s) ^ {js|;|js})
    in
-   ((((((((((((({js|@font-face {
-     font-family: |js})
-              ^ fontFamily)
-
-             ^ ({js|;
-     src: |js}))
-
-            ^ src)
-
-           ^ ({js|;
-     |js}))
-
-          ^ fontStyle)
-
-         ^ ({js|
-     |js}))
-
-        ^ fontWeight)
-
-       ^ ({js|
-     |js}))
-
-      ^ fontDisplay)
-
-     ^ ({js|
-     |js}))
-
-    ^ sizeAdjust)
-
-   ^ ({js|
-   }|js}))
-  )
+   ((((((((((({js|@font-face {
+     font-family: |js} ^ fontFamily)
+            ^ {js|;
+     src: |js})
+           ^ src)
+          ^ {js|;
+     |js})
+         ^ fontStyle)
+        ^ {js|
+     |js})
+       ^ fontWeight)
+      ^ {js|
+     |js})
+     ^ fontDisplay)
+    ^ {js|
+     |js})
+   ^ sizeAdjust)
+   ^ {js|
+   }|js})
   [@ns.braces]
 
 let textDecoration x =

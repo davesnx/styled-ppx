@@ -3,6 +3,7 @@ let assert_string left right =
 
 module CssJs = struct
   include CssJs
+
   (* Override CssJs.style with CssJs.style_with_hash
      so we can hide the hash from this tests. *)
   let style = CssJs.style_with_hash ~hash:"HASH"
@@ -15,13 +16,17 @@ let one_property () =
   assert_string css (Printf.sprintf " .%s { display: block; }" cx)
 
 let multiple_properties () =
-  let _className = CssJs.style [| CssJs.display `block; CssJs.fontSize (`px 10) |] in
+  let _className =
+    CssJs.style [| CssJs.display `block; CssJs.fontSize (`px 10) |]
+  in
   let css = CssJs.render_style_tag () in
   CssJs.flush ();
   assert_string css " .css-HASH { display: block; font-size: 10px; }"
 
 let label () =
-  let _rare_name = CssJs.style [| CssJs.label "className"; CssJs.display `block |] in
+  let _rare_name =
+    CssJs.style [| CssJs.label "className"; CssJs.display `block |]
+  in
   let css = CssJs.render_style_tag () in
   CssJs.flush ();
   assert_string css " .css-HASH-className { display: block; }"
@@ -57,19 +62,24 @@ let selector_nested () =
       [|
         CssJs.color CssJs.aliceblue;
         CssJs.selector "a"
-          [| CssJs.display `block; CssJs.selector "div" [| CssJs.display `none |] |];
+          [|
+            CssJs.display `block; CssJs.selector "div" [| CssJs.display `none |];
+          |];
       |]
   in
-  CssJs.print_rules ([|
-        CssJs.color CssJs.aliceblue;
-        CssJs.selector "a"
-          [| CssJs.display `block; CssJs.selector "div" [| CssJs.display `none |] |];
-      |]);
+  CssJs.print_rules
+    [|
+      CssJs.color CssJs.aliceblue;
+      CssJs.selector "a"
+        [|
+          CssJs.display `block; CssJs.selector "div" [| CssJs.display `none |];
+        |];
+    |];
   let css = CssJs.render_style_tag () in
   CssJs.flush ();
   assert_string css
-    " .css-HASH { color: #F0F8FF; } .css-HASH a { display: block; } \
-     .css-HASH a div { display: none; }"
+    " .css-HASH { color: #F0F8FF; } .css-HASH a { display: block; } .css-HASH \
+     a div { display: none; }"
 
 let selector_nested_x10 () =
   let _className =
@@ -98,15 +108,18 @@ let selector_nested_x10 () =
   let css = CssJs.render_style_tag () in
   CssJs.flush ();
   assert_string css
-    " .css-HASH { display: flex; } .css-HASH a { display: block; } \
-     .css-HASH a div { display: none; } .css-HASH a div span { display: \
-     none; } .css-HASH a div span hr { display: none; } .css-HASH a div \
-     span hr code { display: none; }"
+    " .css-HASH { display: flex; } .css-HASH a { display: block; } .css-HASH a \
+     div { display: none; } .css-HASH a div span { display: none; } .css-HASH \
+     a div span hr { display: none; } .css-HASH a div span hr code { display: \
+     none; }"
 
 let selector_ampersand () =
   let _className =
     CssJs.style
-      [| CssJs.fontSize (`px 42); CssJs.selector "& .div" [| CssJs.fontSize (`px 24) |] |]
+      [|
+        CssJs.fontSize (`px 42);
+        CssJs.selector "& .div" [| CssJs.fontSize (`px 24) |];
+      |]
   in
   let css = CssJs.render_style_tag () in
   CssJs.flush ();
@@ -117,14 +130,15 @@ let selector_ampersand_at_the_middle () =
   let _className =
     CssJs.style
       [|
-        CssJs.fontSize (`px 42); CssJs.selector "& div &" [| CssJs.fontSize (`px 24) |];
+        CssJs.fontSize (`px 42);
+        CssJs.selector "& div &" [| CssJs.fontSize (`px 24) |];
       |]
   in
   let css = CssJs.render_style_tag () in
   CssJs.flush ();
   assert_string css
-    " .css-HASH { font-size: 42px; } .css-HASH  div .css-HASH { \
-     font-size: 24px; }"
+    " .css-HASH { font-size: 42px; } .css-HASH  div .css-HASH { font-size: \
+     24px; }"
 
 let media_queries () =
   let _className =
@@ -137,8 +151,8 @@ let media_queries () =
   let css = CssJs.render_style_tag () in
   CssJs.flush ();
   assert_string css
-    " .css-HASH { max-width: 800px; } @media (max-width: 768px) { \
-     .css-HASH { width: 300px; } }"
+    " .css-HASH { max-width: 800px; } @media (max-width: 768px) { .css-HASH { \
+     width: 300px; } }"
 
 (* let media_queries_nested () =
    let _className =
@@ -158,13 +172,15 @@ let media_queries () =
 *)
 let selector_params () =
   let _className =
-    CssJs.style [| CssJs.maxWidth (`px 800); CssJs.firstChild [| CssJs.width (`px 300) |] |]
+    CssJs.style
+      [|
+        CssJs.maxWidth (`px 800); CssJs.firstChild [| CssJs.width (`px 300) |];
+      |]
   in
   let css = CssJs.render_style_tag () in
   CssJs.flush ();
   assert_string css
-    " .css-HASH { max-width: 800px; } .css-HASH:first-child { width: \
-     300px; }"
+    " .css-HASH { max-width: 800px; } .css-HASH:first-child { width: 300px; }"
 
 let keyframe () =
   let loading = "random" in

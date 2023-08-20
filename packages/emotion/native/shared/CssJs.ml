@@ -84,7 +84,7 @@ module Autoprefixer = struct
         ( (( "width" | "min-width" | "max-width" | "height" | "min-height"
            | "max-height" | "min-block-size" | "max-block-size" ) as property),
           (("fit-content" | "max-content" | "min-content" | "fill-available") as
-          value) ) ->
+           value) ) ->
       prefix_value property value [ webkit; moz ] @ [ rule ]
     | D
         ( (( "width" | "min-width" | "max-width" | "height" | "min-height"
@@ -126,7 +126,6 @@ let rec rules_to_string rules =
 
   Buffer.contents buff
 
-
 let render_declaration rule =
   match rule with
   (* https://emotion.sh/docs/labels should be ignored on the rendering *)
@@ -150,8 +149,7 @@ let prefix ~pre s =
   else (
     let rec check i =
       if i = len then true
-      else if (String.unsafe_get s i) <> (String.unsafe_get pre i)
-      then false
+      else if String.unsafe_get s i <> String.unsafe_get pre i then false
       else check (i + 1)
     in
     check 0)
@@ -209,7 +207,8 @@ let rec rule_to_debug nesting accumulator rule =
     | D (property, value) ->
       Printf.sprintf "Declaration (\"%s\", \"%s\")" property value
     | S (selector, rules) ->
-      Printf.sprintf "Selector (\"%s\", %s)" selector (to_debug (nesting + 1) rules)
+      Printf.sprintf "Selector (\"%s\", %s)" selector
+        (to_debug (nesting + 1) rules)
     | PseudoClass (pseduoclass, rules) ->
       Printf.sprintf "PseudoClass (\"%s\", %s)" pseduoclass
         (to_debug (nesting + 1) rules)
@@ -230,7 +229,9 @@ let resolve_selectors rules =
     List.partition_map (function
       | S (title, selector_rules) ->
         let new_prelude = prefix ^ title in
-        let content, tail = unnest ~prefix:(new_prelude ^ " ") (Array.to_list selector_rules) in
+        let content, tail =
+          unnest ~prefix:(new_prelude ^ " ") (Array.to_list selector_rules)
+        in
         Right (S (new_prelude, Array.of_list content) :: List.flatten tail)
       | _ as rule -> Left rule)
   in
@@ -269,18 +270,18 @@ let append hash (styles : rule array) =
 
 let render_hash prefix hash label =
   match label with
-  | None -> (Printf.sprintf "%s-%s" prefix hash)
-  | Some label -> (Printf.sprintf "%s-%s-%s" prefix hash label)
+  | None -> Printf.sprintf "%s-%s" prefix hash
+  | Some label -> Printf.sprintf "%s-%s-%s" prefix hash label
 
 let style (styles : rule array) =
   match styles with
   | [||] -> ""
   | _ ->
-    let is_label = function
-      | D ("label", value) -> Some value
-      | _ -> None in
+    let is_label = function D ("label", value) -> Some value | _ -> None in
     let label = Array.find_map is_label styles in
-    let hash = Emotion_hash.Hash.default (rules_to_string (Array.to_list styles)) in
+    let hash =
+      Emotion_hash.Hash.default (rules_to_string (Array.to_list styles))
+    in
     let className = render_hash "css" hash label in
     append className styles;
     className
@@ -290,9 +291,7 @@ let style_debug (styles : rule array) =
   style styles
 
 let style_with_hash ~hash (styles : rule array) =
-  let is_label = function
-  | D ("label", value) -> Some value
-  | _ -> None in
+  let is_label = function D ("label", value) -> Some value | _ -> None in
   let label = Array.find_map is_label styles in
   let className = render_hash "css" hash label in
   append className styles;
@@ -304,4 +303,3 @@ let render_style_tag () =
       let rules = rules |> printing_to_valid_css hash |> String.trim in
       Printf.sprintf "%s %s" accumulator rules)
     cache.contents ""
-

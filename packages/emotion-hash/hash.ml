@@ -9,7 +9,7 @@ let ( ^ ) = Int32.logxor
 let to_base36 (num : Int32.t) =
   let rec to_base36' (num : Int32.t) =
     if num = 0l then []
-    else
+    else (
       let quotient = Int32.div num 36l in
       let remainder = Int32.rem num 36l in
       (match remainder with
@@ -40,7 +40,7 @@ let to_base36 (num : Int32.t) =
       | 34l -> "y"
       | 35l -> "z"
       | _ -> string_of_int (Int32.to_int remainder))
-      :: to_base36' quotient
+      :: to_base36' quotient)
   in
   num |> to_base36' |> List.rev |> String.concat ""
 
@@ -74,7 +74,9 @@ let murmur2 (str : string) =
        ((str.charCodeAt(++i) & 0xff) << 16) |
        ((str.charCodeAt(++i) & 0xff) << 24) *)
     k :=
-      char_code_1 ||| (char_code_2 << 8) ||| (char_code_3 << 16)
+      char_code_1
+      ||| (char_code_2 << 8)
+      ||| (char_code_3 << 16)
       ||| (char_code_4 << 24);
     (* k =
        (k & 0xffff) * 0x5bd1e995 + (((k >>> 16) * 0xe995) << 16) *)
@@ -101,20 +103,20 @@ let murmur2 (str : string) =
   (* Handle the last few bytes of the input array *)
   (match !len with
   | 3 ->
-      (* h ^= (str.charCodeAt(i + 2) & 0xff) << 16 *)
-      hash := !hash ^ (Int32.of_int (Char.code str.[!index + 2]) << 16)
+    (* h ^= (str.charCodeAt(i + 2) & 0xff) << 16 *)
+    hash := !hash ^ (Int32.of_int (Char.code str.[!index + 2]) << 16)
   | 2 ->
-      (* h ^= (str.charCodeAt(i + 1) & 0xff) << 8 *)
-      hash := !hash ^ (Int32.of_int (Char.code str.[!index + 1]) << 8)
+    (* h ^= (str.charCodeAt(i + 1) & 0xff) << 8 *)
+    hash := !hash ^ (Int32.of_int (Char.code str.[!index + 1]) << 8)
   | 1 ->
-      (* h ^= str.charCodeAt(i) & 0xff *)
-      hash := !hash ^ Int32.of_int (Char.code str.[!index]);
-      (* h =
-         (h & 0xffff) * 0x5bd1e995 + (((h >>> 16) * 0xe995) << 16) *)
-      hash :=
-        ((!hash & 0xffffl) * 0x5bd1e995l)
-        ++ (((!hash >>> 16) * 0x5bd1e995l) & 0xffffl)
-        << 16
+    (* h ^= str.charCodeAt(i) & 0xff *)
+    hash := !hash ^ Int32.of_int (Char.code str.[!index]);
+    (* h =
+       (h & 0xffff) * 0x5bd1e995 + (((h >>> 16) * 0xe995) << 16) *)
+    hash :=
+      ((!hash & 0xffffl) * 0x5bd1e995l)
+      ++ (((!hash >>> 16) * 0x5bd1e995l) & 0xffffl)
+      << 16
   | _ -> ());
 
   (* Do a few final mixes of the hash to ensure the last few bytes are well-incorporated. *)

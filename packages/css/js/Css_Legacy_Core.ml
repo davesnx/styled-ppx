@@ -235,9 +235,8 @@ let backfaceVisibility x =
 let backdropFilter x =
   D
     ( {js|backdropFilter|js},
-      x
-      |. Std.List.map BackdropFilter.toString
-      |. Std.List.joinWith {js|, |js} )
+      x |. Std.List.map BackdropFilter.toString |. Std.List.joinWith {js|, |js}
+    )
 
 let backgroundAttachment x =
   D

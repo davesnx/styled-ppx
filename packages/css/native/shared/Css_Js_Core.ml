@@ -10,24 +10,27 @@ let rec ruleToDict =
  fun [@bs] dict rule ->
   (match rule with
   | D (name, value) when name = {js|content|js} ->
-    let (_: unit) = Js.Dict.set dict name
-      (Js.Json.string (if value = {js||js} then {js|""|js} else value)) in
-      ()
+    let (_ : unit) =
+      Js.Dict.set dict name
+        (Js.Json.string (if value = {js||js} then {js|""|js} else value))
+    in
+    ()
   | D (name, value) ->
-    let (_: unit) = Js.Dict.set dict name (Js.Json.string value) in
+    let (_ : unit) = Js.Dict.set dict name (Js.Json.string value) in
     ()
   | S (name, ruleset) ->
-    let (_: unit) = Js.Dict.set dict name (toJson ruleset) in
+    let (_ : unit) = Js.Dict.set dict name (toJson ruleset) in
     ()
   | PseudoClass (name, ruleset) ->
-    let (_: unit) = dict |. Js.Dict.set ({js|:|js} ^ name) (toJson ruleset) in
+    let (_ : unit) = dict |. Js.Dict.set ({js|:|js} ^ name) (toJson ruleset) in
     ()
   | PseudoClassParam (name, param, ruleset) ->
-    let (_: unit) = Js.Dict.set dict
-      ({js|:|js} ^ name ^ {js|(|js} ^ param ^ {js|)|js})
-      (toJson ruleset) in
-    ()
-  );
+    let (_ : unit) =
+      Js.Dict.set dict
+        ({js|:|js} ^ name ^ {js|(|js} ^ param ^ {js|)|js})
+        (toJson ruleset)
+    in
+    ());
   dict
 
 and toJson rules =
@@ -90,13 +93,11 @@ module Make (CssImpl : Css_Core.CssImplementationIntf) :
   let merge4 = fun [@bs] s s2 s3 s4 -> (merge [| s; s2; s3; s4 |] [@bs])
 
   let framesToDict frames =
-    Std.Array.reduceU
-      frames
-      (Js.Dict.empty ())
-      (fun [@bs] dict (stop, rules) ->
-        let _ = Js.Dict.set dict (Std.Int.toString stop ^ {js|%|js}) (toJson rules) in
-        dict
-      )
+    Std.Array.reduceU frames (Js.Dict.empty ()) (fun [@bs] dict (stop, rules) ->
+      let _ =
+        Js.Dict.set dict (Std.Int.toString stop ^ {js|%|js}) (toJson rules)
+      in
+      dict)
 
   let keyframes =
    fun [@bs] frames -> (CssImpl.makeKeyframes (framesToDict frames) [@bs])
@@ -417,7 +418,10 @@ let borderRightColor x = D ({js|border-right-color|js}, string_of_color x)
 let borderRightWidth x = D ({js|border-right-width|js}, LineWidth.toString x)
 let borderTopColor x = D ({js|border-top-color|js}, string_of_color x)
 let borderTopLeftRadius x = D ({js|border-top-left-radius|js}, Length.toString x)
-let borderTopRightRadius x = D ({js|border-top-right-radius|js}, Length.toString x)
+
+let borderTopRightRadius x =
+  D ({js|border-top-right-radius|js}, Length.toString x)
+
 let borderTopWidth x = D ({js|border-top-width|js}, LineWidth.toString x)
 let borderWidth x = D ({js|border-width|js}, LineWidth.toString x)
 let bottom x = D ({js|bottom|js}, string_of_position x)
@@ -843,7 +847,9 @@ let objectFit x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let objectPosition x = D ({js|object-position|js}, string_of_backgroundposition x)
+let objectPosition x =
+  D ({js|object-position|js}, string_of_backgroundposition x)
+
 let opacity x = D ({js|opacity|js}, Std.Float.toString x)
 
 let outline size style color =
@@ -1684,8 +1690,7 @@ let gridArea2 s s2 =
 let gridArea3 s s2 s3 =
   D
     ( {js|grid-area|js},
-      (((GridArea.toString s ^ {js|- |js}) ^ GridArea.toString s2)
-      ^ {js|- |js})
+      (((GridArea.toString s ^ {js|- |js}) ^ GridArea.toString s2) ^ {js|- |js})
       ^ GridArea.toString s3 )
 
 let gridArea4 s s2 s3 s4 =
@@ -1845,7 +1850,8 @@ let borderBottom px style color =
       ^ {js| |js})
       ^ string_of_color color )
 
-let borderBottomStyle x = D ({js|border-bottom-style|js}, string_of_borderstyle x)
+let borderBottomStyle x =
+  D ({js|border-bottom-style|js}, string_of_borderstyle x)
 
 let background x =
   D

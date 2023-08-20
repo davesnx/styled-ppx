@@ -11,8 +11,8 @@ let prefix_one_declaration declaration output =
 let text_size_adjust () =
   prefix_one_declaration
     (Css.unsafe "text-size-adjust" "none")
-    " .css-HASH { -webkit-text-size-adjust: none; -moz-text-size-adjust: \
-     none; -ms-text-size-adjust: none; text-size-adjust: none; }"
+    " .css-HASH { -webkit-text-size-adjust: none; -moz-text-size-adjust: none; \
+     -ms-text-size-adjust: none; text-size-adjust: none; }"
 
 let text_decoration () =
   prefix_one_declaration

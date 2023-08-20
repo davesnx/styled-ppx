@@ -2,7 +2,6 @@ include Css_native.Css_Colors
 include Css_native.Css_Legacy_Core
 module Core = Css_native.Css_Legacy_Core
 
-
 module Autoprefixer = struct
   (* Implementation of stylis autoprefixer https://github.com/thysultan/stylis *)
   (* This autoprefix works with ">1%, last 4 versions, Firefox ESR, not ie < 9, not dead" from browserlist and not so precise as stylis implementation *)
@@ -78,7 +77,7 @@ module Autoprefixer = struct
         ( (( "width" | "min-width" | "max-width" | "height" | "min-height"
            | "max-height" | "min-block-size" | "max-block-size" ) as property),
           (("fit-content" | "max-content" | "min-content" | "fill-available") as
-          value) ) ->
+           value) ) ->
       prefix_value property value [ webkit; moz ] @ [ rule ]
     | D
         ( (( "width" | "min-width" | "max-width" | "height" | "min-height"
@@ -260,16 +259,14 @@ let append hash (styles : rule list) =
 
 let render_hash prefix hash label =
   match label with
-  | None -> (Printf.sprintf "%s-%s" prefix hash)
-  | Some label -> (Printf.sprintf "%s-%s-%s" prefix hash label)
+  | None -> Printf.sprintf "%s-%s" prefix hash
+  | Some label -> Printf.sprintf "%s-%s-%s" prefix hash label
 
 let style (styles : rule list) =
   match styles with
   | [] -> ""
   | _ ->
-    let is_label = function
-      | D ("label", value) -> Some value
-      | _ -> None in
+    let is_label = function D ("label", value) -> Some value | _ -> None in
     let label = List.find_map is_label styles in
     let hash = Emotion_hash.Hash.default (rules_to_string styles) in
     let className = render_hash "css" hash label in
@@ -281,9 +278,7 @@ let style_debug (styles : rule list) =
   style styles
 
 let style_with_hash ~hash (styles : rule list) =
-  let is_label = function
-  | D ("label", value) -> Some value
-  | _ -> None in
+  let is_label = function D ("label", value) -> Some value | _ -> None in
   let label = List.find_map is_label styles in
   let className = render_hash "css" hash label in
   append className styles;

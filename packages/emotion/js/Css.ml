@@ -7,12 +7,12 @@ include Bs_css.Css_Legacy_Core.Make (struct
   type renderer = Js.Json.t
 
   external injectRaw : (string -> unit[@bs]) = "injectGlobal"
-    [@@bs.module "@emotion/css"]
+  [@@bs.module "@emotion/css"]
 
   let renderRaw = fun [@bs] _ css -> (injectRaw css [@bs])
 
   external injectRawRules : (Js.Json.t -> unit[@bs]) = "injectGlobal"
-    [@@bs.module "@emotion/css"]
+  [@@bs.module "@emotion/css"]
 
   let injectRules =
    fun [@bs] selector rules ->
@@ -25,13 +25,13 @@ include Bs_css.Css_Legacy_Core.Make (struct
        (Js.Dict.fromArray [| selector, rules |] |. Js.Json.object_) [@bs])
 
   external mergeStyles : (styleEncoding array -> styleEncoding[@bs]) = "cx"
-    [@@bs.module "@emotion/css"]
+  [@@bs.module "@emotion/css"]
 
   external make : (Js.Json.t -> styleEncoding[@bs]) = "css"
-    [@@bs.module "@emotion/css"]
+  [@@bs.module "@emotion/css"]
 
   external makeAnimation : (Js.Json.t Js.Dict.t -> string[@bs]) = "keyframes"
-    [@@bs.module "@emotion/css"]
+  [@@bs.module "@emotion/css"]
 
   let makeKeyframes = fun [@bs] frames -> (makeAnimation frames [@bs])
   let renderKeyframes = fun [@bs] _ frames -> (makeAnimation frames [@bs])
