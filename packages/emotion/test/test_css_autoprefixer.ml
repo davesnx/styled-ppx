@@ -2,7 +2,7 @@ let assert_string left right =
   Alcotest.check Alcotest.string "should be equal" right left
 
 let prefix_one_declaration declaration output =
-  let hidden (_ : string) = "HASH" in
+  let hidden = "HASH" in
   let _rule = Css.style_with_hash ~hash:hidden [ declaration ] in
   let css = Css.render_style_tag () in
   Css.flush ();

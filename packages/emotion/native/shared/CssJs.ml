@@ -121,9 +121,7 @@ let rec rules_to_string rules =
       let rules = rules |> Array.to_list |> rules_to_string in
       push (Printf.sprintf ":%s (%s) {%s}" pseudoclass param rules)
   in
-
   List.iter rule_to_string rules;
-
   Buffer.contents buff
 
 let render_declaration rule =
