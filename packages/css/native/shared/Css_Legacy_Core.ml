@@ -1038,7 +1038,21 @@ let transformOrigin3d x y z =
       ^ {js| |js} )
 
 let transformBox x = D ({js|transform-box|js}, TransformBox.toString x)
-let unsafe property value = D (property, value)
+
+let explode s =
+  let rec exp i l = if i < 0 then l else exp (i - 1) (s.[i] :: l) in
+  exp (String.length s - 1) []
+
+let camelCaseToKebabCase str =
+  let insert_dash acc letter =
+    match letter with
+    | 'A' .. 'Z' as letter ->
+      ("-" ^ String.make 1 (Char.lowercase_ascii letter)) :: acc
+    | _ -> String.make 1 letter :: acc
+  in
+  String.concat "" (List.rev (List.fold_left insert_dash [] (explode str)))
+
+let unsafe property value = D (camelCaseToKebabCase property, value)
 
 let userSelect x =
   D
