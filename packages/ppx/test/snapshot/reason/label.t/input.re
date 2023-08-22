@@ -50,3 +50,18 @@ let fn2 = (x, y) =>
   | B when y => [prop("by")]
   | B => [prop("b")]
   };
+
+let className = [%cx {|
+      font-size: 28px;
+    |}];
+
+let fn = () => {
+  let className = [%cx
+    {|
+        margin-bottom: 4px;
+        font-size: 28px;
+      |}
+  ];
+
+  className;
+};

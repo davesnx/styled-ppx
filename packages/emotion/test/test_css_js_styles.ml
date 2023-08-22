@@ -55,6 +55,22 @@ let selector_with_ppx () =
     (Printf.sprintf ".%s { color: #FF0000; } .%s  > * { color: #0000FF; }"
        className className)
 
+(* let className =
+     [%cx
+       {|
+       margin-bottom: 4px;
+       font-size: 28px;
+       line-height: 32px;
+     |}]
+
+   let random_classname () =
+     let css = Css.render_style_tag () in
+     assert_string className "css-a3lzz9";
+     assert_string css
+       (Printf.sprintf
+          ".%s { margin-bottom: 4px; font-size: 28px; line-height: 32px; }"
+          className) *)
+
 (* let label_ppx_unique () =
    let className_with_unique_label = [%cx {|
       color: red;
@@ -249,6 +265,7 @@ let tests =
       case "keyframe" keyframe;
       case "duplicated_styles_unique" duplicated_styles_unique;
       case "selector_with_ppx" selector_with_ppx;
+      (* case "random_classname" random_classname; *)
       (* case "interpolated_selector_with_ppx" interpolated_selector_with_ppx; *)
       (* case "label_ppx_unique" label_ppx_unique; *)
     ] )
