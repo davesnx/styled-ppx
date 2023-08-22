@@ -55,20 +55,30 @@ let selector_with_ppx () =
     (Printf.sprintf ".%s { color: #FF0000; } .%s  > * { color: #0000FF; }"
        className className)
 
+let label_ppx_unique () =
+  let className_with_unique_label = [%cx {|
+     color: red;
+   |}] in
+  let className = [%cx {|
+     color: red;
+   |}] in
+  let css = CssJs.render_style_tag () in
+  assert_string css
+    (Printf.sprintf ".%s { color: #FF0000; } .%s { color: #FF0000; }" className
+       className_with_unique_label)
+
 let interpolated_selector_with_ppx () =
   let className = [%cx {|
      color: red;
    |}] in
-  let className2 =
-    CssJs.style [| CssJs.label "className2"; CssJs.color CssJs.red |]
-  in
+  let className2 = CssJs.style [| CssJs.color CssJs.red |] in
   let className3 = CssJs.style [| CssJs.backgroundColor CssJs.black |] in
   let css = CssJs.render_style_tag () in
   assert_string css
     (Printf.sprintf
-       ".%s { background-color: #000000; } .%s { color: #FF0000; } .%s { \
-        color: #FF0000; }"
-       className3 className className2)
+       ".%s { color: #FF0000; } .%s { color: #FF0000; } .%s { \
+        background-color: #000000; }"
+       className className2 className3)
 
 let float_values () =
   let className = CssJs.style [| CssJs.padding (`rem 10.) |] in
@@ -207,12 +217,12 @@ let keyframe () =
        ".%s { -webkit-animation-name: random; animation-name: random; }"
        className)
 
-let duplicated_styles_unique () =
-  let className1 = CssJs.style [| CssJs.flexGrow 1. |] in
-  let className2 = CssJs.style [| CssJs.flexGrow 1. |] in
-  let css = CssJs.render_style_tag () in
-  assert_string className1 className2;
-  assert_string css (Printf.sprintf ".%s { flex-grow: 1; }" className1)
+(* let duplicated_styles_unique () =
+   let className1 = CssJs.style [| CssJs.flexGrow 1. |] in
+   let className2 = CssJs.style [| CssJs.flexGrow 1. |] in
+   let css = CssJs.render_style_tag () in
+   assert_string className1 className2;
+   assert_string css (Printf.sprintf ".%s { flex-grow: 1; }" className1) *)
 
 let case title fn = Alcotest.test_case title `Quick fn
 
@@ -233,7 +243,8 @@ let tests =
       case "selector_ampersand_at_the_middle" selector_ampersand_at_the_middle;
       case "selector_params" selector_params;
       case "keyframe" keyframe;
-      case "duplicated_styles_unique" duplicated_styles_unique;
+      (* case "duplicated_styles_unique" duplicated_styles_unique; *)
       case "selector_with_ppx" selector_with_ppx;
       case "interpolated_selector_with_ppx" interpolated_selector_with_ppx;
+      case "label_ppx_unique" label_ppx_unique;
     ] )

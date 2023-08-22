@@ -235,44 +235,40 @@ let render_hash prefix hash label =
   | None -> Printf.sprintf "%s-%s" prefix hash
   | Some label -> Printf.sprintf "%s-%s-%s" prefix hash label
 
-let style_with_static_hash ~hash (styles : rule list) =
+(* rules_to_string renders the rule in a format where the hash matches with `@emotion/serialise`
+   It doesn't render any whitespace. (compared to pp_rules)
+   TODO: Ensure Selector is rendered correctly.
+   TODO: Ensure PsuedoClass is rendered correctly.
+   TODO: Ensure PseudoClassParam is rendered correctly.
+*)
+let rec rules_to_string rules =
+  let buff = Buffer.create 16 in
+  let push = Buffer.add_string buff in
+  let rule_to_string rule =
+    match rule with
+    | D (property, value) -> push (Printf.sprintf "%s:%s;" property value)
+    | S (selector, rules) ->
+      push (Printf.sprintf "%s{%s}" selector (rules_to_string rules))
+    | PseudoClass (pseudoclass, rules) ->
+      push (Printf.sprintf ":%s{%s}" pseudoclass (rules_to_string rules))
+    | PseudoClassParam (pseudoclass, param, rules) ->
+      push
+        (Printf.sprintf ":%s (%s) {%s}" pseudoclass param
+           (rules_to_string rules))
+  in
+  rules |> List.iter rule_to_string;
+  Buffer.contents buff
+
+let style (styles : rule list) =
   match styles with
   | [] -> ""
   | _ ->
     let is_label = function D ("label", value) -> Some value | _ -> None in
     let label = List.find_map is_label styles in
+    let hash = Emotion_hash.Hash.default (rules_to_string styles) in
     let className = render_hash "css" hash label in
     append className styles;
     className
-
-let style (styles : rule list) =
-  (* rules_to_string renders the rule in a format where the hash matches with `@emotion/serialise`
-     It doesn't render any whitespace. (compared to pp_rules)
-     TODO: Ensure Selector is rendered correctly.
-     TODO: Ensure PsuedoClass is rendered correctly.
-     TODO: Ensure PseudoClassParam is rendered correctly.
-  *)
-  let rec rules_to_string rules =
-    let buff = Buffer.create 16 in
-    let push = Buffer.add_string buff in
-    let rule_to_string rule =
-      match rule with
-      | D (property, value) -> push (Printf.sprintf "%s:%s;" property value)
-      | S (selector, rules) ->
-        push (Printf.sprintf "%s{%s}" selector (rules_to_string rules))
-      | PseudoClass (pseudoclass, rules) ->
-        push (Printf.sprintf ":%s{%s}" pseudoclass (rules_to_string rules))
-      | PseudoClassParam (pseudoclass, param, rules) ->
-        push
-          (Printf.sprintf ":%s (%s) {%s}" pseudoclass param
-             (rules_to_string rules))
-    in
-    rules |> List.iter rule_to_string;
-    Buffer.contents buff
-  in
-
-  let hash = Emotion_hash.Hash.default (rules_to_string styles) in
-  style_with_static_hash ~hash styles
 
 let render_style_tag () =
   let style_tag =
@@ -283,4 +279,4 @@ let render_style_tag () =
       cache.contents ""
   in
   flush ();
-  style_tag
+  String.trim style_tag
