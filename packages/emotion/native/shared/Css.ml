@@ -230,11 +230,6 @@ let flush () = Hashtbl.clear cache.contents
 let append hash (styles : rule list) =
   if get hash then () else Hashtbl.add cache.contents hash styles
 
-let render_hash prefix hash label =
-  match label with
-  | None -> Printf.sprintf "%s-%s" prefix hash
-  | Some label -> Printf.sprintf "%s-%s-%s" prefix hash label
-
 (* rules_to_string renders the rule in a format where the hash matches with `@emotion/serialise`
    It doesn't render any whitespace. (compared to pp_rules)
    TODO: Ensure Selector is rendered correctly.
@@ -259,14 +254,18 @@ let rec rules_to_string rules =
   rules |> List.iter rule_to_string;
   Buffer.contents buff
 
+let render_hash prefix hash styles =
+  let is_label = function D ("label", value) -> Some value | _ -> None in
+  match List.find_map is_label styles with
+  | None -> Printf.sprintf "%s-%s" prefix hash
+  | Some label -> Printf.sprintf "%s-%s-%s" prefix hash label
+
 let style (styles : rule list) =
   match styles with
   | [] -> ""
   | _ ->
-    let is_label = function D ("label", value) -> Some value | _ -> None in
-    let label = List.find_map is_label styles in
     let hash = Emotion_hash.Hash.default (rules_to_string styles) in
-    let className = render_hash "css" hash label in
+    let className = render_hash "css" hash styles in
     append className styles;
     className
 

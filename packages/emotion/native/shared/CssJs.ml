@@ -264,8 +264,9 @@ let flush () = Hashtbl.clear instance.contents
 let append hash (styles : rule array) =
   if not (get hash) then Hashtbl.add instance.contents hash styles
 
-let render_hash prefix hash label =
-  match label with
+let render_hash prefix hash styles =
+  let is_label = function D ("label", value) -> Some value | _ -> None in
+  match Array.find_map is_label styles with
   | None -> Printf.sprintf "%s-%s" prefix hash
   | Some label -> Printf.sprintf "%s-%s-%s" prefix hash label
 
@@ -273,12 +274,10 @@ let style (styles : rule array) =
   match styles with
   | [||] -> ""
   | _ ->
-    let is_label = function D ("label", value) -> Some value | _ -> None in
-    let label = Array.find_map is_label styles in
     let hash =
       Emotion_hash.Hash.default (rules_to_string (Array.to_list styles))
     in
-    let className = render_hash "css" hash label in
+    let className = render_hash "css" hash styles in
     append className styles;
     className
 
