@@ -213,7 +213,7 @@ let resolve_selectors rules =
   rules |> List.map resolve_selector |> List.flatten
 
 (* Removes nesting on selectors, run the autoprefixer. *)
-let printing_to_valid_css hash rules =
+let pp_rules hash rules =
   (* TODO: Refactor with partition or partition_map. List.filter_map is error prone.
      Ss might need to respect the order of definition, and this breaks the order *)
   let list_of_rules = rules |> Array.to_list |> resolve_selectors in
@@ -232,60 +232,63 @@ let printing_to_valid_css hash rules =
   in
   Printf.sprintf "%s %s" declarations selectors
 
-let cache = ref (Hashtbl.create 1000)
-let get hash = Hashtbl.mem cache.contents hash
-let flush () = Hashtbl.clear cache.contents
+(* rules_to_string renders the rule in a format where the hash matches with `@emotion/serialise`
+     It doesn't render any whitespace. (compared to pp_rules)
+     TODO: Ensure Selector is rendered correctly.
+     TODO: Ensure PsuedoClass is rendered correctly.
+     TODO: Ensure PseudoClassParam is rendered correctly.
+*)
+let rec rules_to_string rules =
+  let buff = Buffer.create 16 in
+  let push = Buffer.add_string buff in
+  let rule_to_string rule =
+    match rule with
+    | D (property, value) -> push (Printf.sprintf "%s:%s;" property value)
+    | S (selector, rules) ->
+      let rules = rules |> Array.to_list |> rules_to_string in
+      push (Printf.sprintf "%s{%s}" selector rules)
+    | PseudoClass (pseudoclass, rules) ->
+      let rules = rules |> Array.to_list |> rules_to_string in
+      push (Printf.sprintf ":%s{%s}" pseudoclass rules)
+    | PseudoClassParam (pseudoclass, param, rules) ->
+      let rules = rules |> Array.to_list |> rules_to_string in
+      push (Printf.sprintf ":%s (%s) {%s}" pseudoclass param rules)
+  in
+  List.iter rule_to_string rules;
+  Buffer.contents buff
+
+let instance = ref (Hashtbl.create 1000)
+let get (hash : string) : bool = Hashtbl.mem instance.contents hash
+let flush () = Hashtbl.clear instance.contents
 
 let append hash (styles : rule array) =
-  if get hash then () else Hashtbl.add cache.contents hash styles
+  if not (get hash) then Hashtbl.add instance.contents hash styles
 
 let render_hash prefix hash label =
   match label with
   | None -> Printf.sprintf "%s-%s" prefix hash
   | Some label -> Printf.sprintf "%s-%s-%s" prefix hash label
 
-let style_with_static_hash ~hash (styles : rule array) =
+let style (styles : rule array) =
   match styles with
   | [||] -> ""
   | _ ->
     let is_label = function D ("label", value) -> Some value | _ -> None in
     let label = Array.find_map is_label styles in
+    let hash =
+      Emotion_hash.Hash.default (rules_to_string (Array.to_list styles))
+    in
     let className = render_hash "css" hash label in
     append className styles;
     className
 
-let style (styles : rule array) =
-  (* rules_to_string render the rule in a format where the hash matches with `@emotion/serialiseStyles`
-     It doesn't render any whitespace.
-     TODO: Ensure PseudoClassParam is rendered correctly.
-  *)
-  let rec rules_to_string rules =
-    let buff = Buffer.create 16 in
-    let push = Buffer.add_string buff in
-    let rule_to_string rule =
-      match rule with
-      | D (property, value) -> push (Printf.sprintf "%s:%s;" property value)
-      | S (selector, rules) ->
-        let rules = rules |> Array.to_list |> rules_to_string in
-        push (Printf.sprintf "%s{%s}" selector rules)
-      | PseudoClass (pseudoclass, rules) ->
-        let rules = rules |> Array.to_list |> rules_to_string in
-        push (Printf.sprintf ":%s{%s}" pseudoclass rules)
-      | PseudoClassParam (pseudoclass, param, rules) ->
-        let rules = rules |> Array.to_list |> rules_to_string in
-        push (Printf.sprintf ":%s (%s) {%s}" pseudoclass param rules)
-    in
-    List.iter rule_to_string rules;
-    Buffer.contents buff
-  in
-  let hash =
-    Emotion_hash.Hash.default (rules_to_string (Array.to_list styles))
-  in
-  style_with_static_hash ~hash styles
-
 let render_style_tag () =
-  Hashtbl.fold
-    (fun hash rules accumulator ->
-      let rules = rules |> printing_to_valid_css hash |> String.trim in
-      Printf.sprintf "%s %s" accumulator rules)
-    cache.contents ""
+  let style_tag =
+    Hashtbl.fold
+      (fun hash rules accumulator ->
+        let rules = pp_rules hash rules |> String.trim in
+        Printf.sprintf "%s %s" accumulator rules)
+      instance.contents ""
+  in
+  flush ();
+  String.trim style_tag

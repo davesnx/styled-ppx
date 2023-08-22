@@ -6,25 +6,21 @@ let style = Css.style_with_static_hash ~hash:"HASH"
 let one_property () =
   let _className = style [ Css.display `block ] in
   let css = Css.render_style_tag () in
-  Css.flush ();
   assert_string css " .css-HASH { display: block; }"
 
 let multiple_properties () =
   let _className = style [ Css.display `block; Css.fontSize (`px 10) ] in
   let css = Css.render_style_tag () in
-  Css.flush ();
   assert_string css " .css-HASH { display: block; font-size: 10px; }"
 
 let label () =
   let _with_label = style [ Css.label "className"; Css.display `block ] in
   let css = Css.render_style_tag () in
-  Css.flush ();
   assert_string css " .css-HASH-className { display: block; }"
 
 let float_values () =
   let _className = style [ Css.padding (`rem 10.) ] in
   let css = Css.render_style_tag () in
-  Css.flush ();
   assert_string css " .css-HASH { padding: 10rem; }"
 
 let selector_one_nesting () =
@@ -36,7 +32,6 @@ let selector_one_nesting () =
       ]
   in
   let css = Css.render_style_tag () in
-  Css.flush ();
   assert_string css
     " .css-HASH { color: #F0F8FF; } .css-HASH a { color: #663399; }"
 
@@ -50,7 +45,6 @@ let selector_more_than_one_nesting () =
       ]
   in
   let css = Css.render_style_tag () in
-  Css.flush ();
   assert_string css
     " .css-HASH { color: #F0F8FF; } .css-HASH a { display: block; } .css-HASH \
      a div { display: none; }"
@@ -80,7 +74,6 @@ let selector_with_a_lot_of_nesting () =
       ]
   in
   let css = Css.render_style_tag () in
-  Css.flush ();
   assert_string css
     " .css-HASH { display: flex; } .css-HASH a { display: block; } .css-HASH a \
      div { display: none; } .css-HASH a div span { display: none; } .css-HASH \
@@ -93,7 +86,6 @@ let selector_ampersand () =
       [ Css.fontSize (`px 42); Css.selector "& .div" [ Css.fontSize (`px 24) ] ]
   in
   let css = Css.render_style_tag () in
-  Css.flush ();
   assert_string css
     " .css-HASH { font-size: 42px; } .css-HASH  .div { font-size: 24px; }"
 
@@ -105,7 +97,6 @@ let selector_ampersand_at_the_middle () =
       ]
   in
   let css = Css.render_style_tag () in
-  Css.flush ();
   assert_string css
     " .css-HASH { font-size: 42px; } .css-HASH  div .css-HASH { font-size: \
      24px; }"
@@ -119,7 +110,6 @@ let media_queries () =
       ]
   in
   let css = Css.render_style_tag () in
-  Css.flush ();
   assert_string css
     " .css-HASH { max-width: 800px; } @media (max-width: 768px) { .css-HASH { \
      width: 300px; } }"
@@ -145,7 +135,6 @@ let selector_params () =
     style [ Css.maxWidth (`px 800); Css.firstChild [ Css.width (`px 300) ] ]
   in
   let css = Css.render_style_tag () in
-  Css.flush ();
   assert_string css
     " .css-HASH { max-width: 800px; } .css-HASH:first-child { width: 300px; }"
 
@@ -159,21 +148,18 @@ let keyframe () =
      in *)
   let _className = style [ Css.animationName loading ] in
   let css = Css.render_style_tag () in
-  Css.flush ();
   assert_string css
     " .css-HASH { -webkit-animation-name: random; animation-name: random; }"
 
 let empty () =
   (* an empty declaration should not print anything *)
   let className = Css.style [] in
-  Css.flush ();
   assert_string className ""
 
 let duplicated_styles_should_push_once () =
   let _className_1 = style [ Css.flexGrow 1. ] in
   let _className_2 = style [ Css.flexGrow 1. ] in
   let css = Css.render_style_tag () in
-  Css.flush ();
   assert_string css " .css-HASH { flex-grow: 1; }"
 
 let case title fn = Alcotest.test_case title `Quick fn

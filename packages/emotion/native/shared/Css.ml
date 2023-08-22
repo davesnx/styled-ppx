@@ -204,7 +204,7 @@ let resolve_selectors rules =
 
 (* `resolved_rule` here means to print valid CSS, selectors are nested
    and properties aren't autoprefixed. This function transforms into correct CSS. *)
-let resolved_rule_to_css hash rules =
+let pp_rules hash rules =
   (* TODO: Refactor with partition or partition_map. List.filter_map is error prone.
      Ss might need to respect the order of definition, and this breaks the order *)
   let list_of_rules = rules |> resolve_selectors in
@@ -246,9 +246,10 @@ let style_with_static_hash ~hash (styles : rule list) =
     className
 
 let style (styles : rule list) =
-  (* rules_to_string render the rule in a format where the hash matches with `@emotion/serialiseStyles`
-     It doesn't render any whitespace.
-
+  (* rules_to_string renders the rule in a format where the hash matches with `@emotion/serialise`
+     It doesn't render any whitespace. (compared to pp_rules)
+     TODO: Ensure Selector is rendered correctly.
+     TODO: Ensure PsuedoClass is rendered correctly.
      TODO: Ensure PseudoClassParam is rendered correctly.
   *)
   let rec rules_to_string rules =
@@ -274,8 +275,12 @@ let style (styles : rule list) =
   style_with_static_hash ~hash styles
 
 let render_style_tag () =
-  Hashtbl.fold
-    (fun hash rules accumulator ->
-      let rules = rules |> resolved_rule_to_css hash |> String.trim in
-      Printf.sprintf "%s %s" accumulator rules)
-    cache.contents ""
+  let style_tag =
+    Hashtbl.fold
+      (fun hash rules accumulator ->
+        let rules = pp_rules hash rules |> String.trim in
+        Printf.sprintf "%s %s" accumulator rules)
+      cache.contents ""
+  in
+  flush ();
+  style_tag

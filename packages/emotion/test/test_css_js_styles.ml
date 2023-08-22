@@ -1,44 +1,47 @@
 let assert_string left right =
   Alcotest.check Alcotest.string "should be equal" right left
 
-module CssJs = struct
-  include CssJs
-
-  (* Override CssJs.style with CssJs.style_with_static_hash
-     so we can hide the hash from this tests. *)
-  let style = CssJs.style_with_static_hash ~hash:"HASH"
-end
-
 let one_property () =
-  let cx = CssJs.style [| CssJs.display `block |] in
+  let className = CssJs.style [| CssJs.display `block |] in
   let css = CssJs.render_style_tag () in
-  CssJs.flush ();
-  assert_string css (Printf.sprintf " .%s { display: block; }" cx)
+  assert_string css (Printf.sprintf ".%s { display: block; }" className)
 
 let multiple_properties () =
-  let _className =
+  let className =
     CssJs.style [| CssJs.display `block; CssJs.fontSize (`px 10) |]
   in
   let css = CssJs.render_style_tag () in
-  CssJs.flush ();
-  assert_string css " .css-HASH { display: block; font-size: 10px; }"
+  assert_string css
+    (Printf.sprintf ".%s { display: block; font-size: 10px; }" className)
+
+let multiple_declarations () =
+  let className1 =
+    CssJs.style [| CssJs.display `block; CssJs.fontSize (`px 10) |]
+  in
+  let className2 =
+    CssJs.style [| CssJs.display `block; CssJs.fontSize (`px 99) |]
+  in
+  let css = CssJs.render_style_tag () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { display: block; font-size: 10px; } .%s { display: block; \
+        font-size: 99px; }"
+       className1 className2)
 
 let label () =
-  let _rare_name =
+  let className =
     CssJs.style [| CssJs.label "className"; CssJs.display `block |]
   in
   let css = CssJs.render_style_tag () in
-  CssJs.flush ();
-  assert_string css " .css-HASH-className { display: block; }"
+  assert_string css (Printf.sprintf ".%s { display: block; }" className)
 
 let label_with_ppx () =
-  let _rare_name = [%cx {| display: block; |}] in
+  let className = [%cx {| display: block; |}] in
   let css = CssJs.render_style_tag () in
-  CssJs.flush ();
-  assert_string css " .css-HASH { display: block; }"
+  assert_string css (Printf.sprintf ".%s { display: block; }" className)
 
 let selector_with_ppx () =
-  let _red_but_inside_blue =
+  let className =
     [%cx {|
     color: red;
 
@@ -48,18 +51,32 @@ let selector_with_ppx () =
   |}]
   in
   let css = CssJs.render_style_tag () in
-  CssJs.flush ();
   assert_string css
-    " .css-HASH { color: #FF0000; } .css-HASH  > * { color: #0000FF; }"
+    (Printf.sprintf ".%s { color: #FF0000; } .%s  > * { color: #0000FF; }"
+       className className)
+
+let interpolated_selector_with_ppx () =
+  let className = [%cx {|
+     color: red;
+   |}] in
+  let className2 =
+    CssJs.style [| CssJs.label "className2"; CssJs.color CssJs.red |]
+  in
+  let className3 = CssJs.style [| CssJs.backgroundColor CssJs.black |] in
+  let css = CssJs.render_style_tag () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { background-color: #000000; } .%s { color: #FF0000; } .%s { \
+        color: #FF0000; }"
+       className3 className className2)
 
 let float_values () =
-  let _className = CssJs.style [| CssJs.padding (`rem 10.) |] in
+  let className = CssJs.style [| CssJs.padding (`rem 10.) |] in
   let css = CssJs.render_style_tag () in
-  CssJs.flush ();
-  assert_string css " .css-HASH { padding: 10rem; }"
+  assert_string css (Printf.sprintf ".%s { padding: 10rem; }" className)
 
 let selector_one_nesting () =
-  let _className =
+  let className =
     CssJs.style
       [|
         CssJs.color CssJs.aliceblue;
@@ -67,12 +84,12 @@ let selector_one_nesting () =
       |]
   in
   let css = CssJs.render_style_tag () in
-  CssJs.flush ();
   assert_string css
-    " .css-HASH { color: #F0F8FF; } .css-HASH a { color: #663399; }"
+    (Printf.sprintf ".%s { color: #F0F8FF; } .%s a { color: #663399; }"
+       className className)
 
 let selector_nested () =
-  let _className =
+  let className =
     CssJs.style
       [|
         CssJs.color CssJs.aliceblue;
@@ -83,13 +100,14 @@ let selector_nested () =
       |]
   in
   let css = CssJs.render_style_tag () in
-  CssJs.flush ();
   assert_string css
-    " .css-HASH { color: #F0F8FF; } .css-HASH a { display: block; } .css-HASH \
-     a div { display: none; }"
+    (Printf.sprintf
+       ".%s { color: #F0F8FF; } .%s a { display: block; } .%s a div { display: \
+        none; }"
+       className className className)
 
 let selector_nested_x10 () =
-  let _className =
+  let className =
     CssJs.style
       [|
         CssJs.display `flex;
@@ -113,15 +131,15 @@ let selector_nested_x10 () =
       |]
   in
   let css = CssJs.render_style_tag () in
-  CssJs.flush ();
   assert_string css
-    " .css-HASH { display: flex; } .css-HASH a { display: block; } .css-HASH a \
-     div { display: none; } .css-HASH a div span { display: none; } .css-HASH \
-     a div span hr { display: none; } .css-HASH a div span hr code { display: \
-     none; }"
+    (Printf.sprintf
+       ".%s { display: flex; } .%s a { display: block; } .%s a div { display: \
+        none; } .%s a div span { display: none; } .%s a div span hr { display: \
+        none; } .%s a div span hr code { display: none; }"
+       className className className className className className)
 
 let selector_ampersand () =
-  let _className =
+  let className =
     CssJs.style
       [|
         CssJs.fontSize (`px 42);
@@ -129,12 +147,12 @@ let selector_ampersand () =
       |]
   in
   let css = CssJs.render_style_tag () in
-  CssJs.flush ();
   assert_string css
-    " .css-HASH { font-size: 42px; } .css-HASH  .div { font-size: 24px; }"
+    (Printf.sprintf ".%s { font-size: 42px; } .%s  .div { font-size: 24px; }"
+       className className)
 
 let selector_ampersand_at_the_middle () =
-  let _className =
+  let className =
     CssJs.style
       [|
         CssJs.fontSize (`px 42);
@@ -142,13 +160,12 @@ let selector_ampersand_at_the_middle () =
       |]
   in
   let css = CssJs.render_style_tag () in
-  CssJs.flush ();
   assert_string css
-    " .css-HASH { font-size: 42px; } .css-HASH  div .css-HASH { font-size: \
-     24px; }"
+    (Printf.sprintf ".%s { font-size: 42px; } .%s  div .%s { font-size: 24px; }"
+       className className className)
 
 let media_queries () =
-  let _className =
+  let className =
     CssJs.style
       [|
         CssJs.maxWidth (`px 800);
@@ -156,22 +173,24 @@ let media_queries () =
       |]
   in
   let css = CssJs.render_style_tag () in
-  CssJs.flush ();
   assert_string css
-    " .css-HASH { max-width: 800px; } @media (max-width: 768px) { .css-HASH { \
-     width: 300px; } }"
+    (Printf.sprintf
+       ".%s { max-width: 800px; } @media (max-width: 768px) { .%s { width: \
+        300px; } }"
+       className className)
 
 let selector_params () =
-  let _className =
+  let className =
     CssJs.style
       [|
         CssJs.maxWidth (`px 800); CssJs.firstChild [| CssJs.width (`px 300) |];
       |]
   in
   let css = CssJs.render_style_tag () in
-  CssJs.flush ();
   assert_string css
-    " .css-HASH { max-width: 800px; } .css-HASH:first-child { width: 300px; }"
+    (Printf.sprintf
+       ".%s { max-width: 800px; } .%s:first-child { width: 300px; }" className
+       className)
 
 let keyframe () =
   let loading = "random" in
@@ -181,18 +200,19 @@ let keyframe () =
          ; (100, [ CssJs.transform (`rotate (`deg (-360.))) ])
          ]
      in *)
-  let _className = CssJs.style [| CssJs.animationName loading |] in
+  let className = CssJs.style [| CssJs.animationName loading |] in
   let css = CssJs.render_style_tag () in
-  CssJs.flush ();
   assert_string css
-    " .css-HASH { -webkit-animation-name: random; animation-name: random; }"
+    (Printf.sprintf
+       ".%s { -webkit-animation-name: random; animation-name: random; }"
+       className)
 
 let duplicated_styles_unique () =
-  let _className_1 = CssJs.style [| CssJs.flexGrow 1. |] in
-  let _className_2 = CssJs.style [| CssJs.flexGrow 1. |] in
+  let className1 = CssJs.style [| CssJs.flexGrow 1. |] in
+  let className2 = CssJs.style [| CssJs.flexGrow 1. |] in
   let css = CssJs.render_style_tag () in
-  CssJs.flush ();
-  assert_string css " .css-HASH { flex-grow: 1; }"
+  assert_string className1 className2;
+  assert_string css (Printf.sprintf ".%s { flex-grow: 1; }" className1)
 
 let case title fn = Alcotest.test_case title `Quick fn
 
@@ -201,6 +221,7 @@ let tests =
     [
       case "one_property" one_property;
       case "multiple_properties" multiple_properties;
+      case "multiple_declarations" multiple_declarations;
       case "float_values" float_values;
       case "selector_one_nesting" selector_one_nesting;
       case "label" label;
@@ -214,4 +235,5 @@ let tests =
       case "keyframe" keyframe;
       case "duplicated_styles_unique" duplicated_styles_unique;
       case "selector_with_ppx" selector_with_ppx;
+      case "interpolated_selector_with_ppx" interpolated_selector_with_ppx;
     ] )

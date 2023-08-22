@@ -9,6 +9,21 @@ let check_equality (input, expected) =
         expected
         (Emotion_hash.Hash.default input) )
 
+(* let color = CssJs.red
+
+   let counterDigit = [%cx {|
+     color: $(color);
+   |}]
+
+   let lightCounterDigit =
+     [%cx {|
+       & .$(counterDigit) {
+         color: $(CssJs.blue);
+       }
+     |}]
+
+   let css = CssJs.render_style_tag () *)
+
 let data =
   [
     "", "";
@@ -51,6 +66,7 @@ let data =
     "position: relative", "8egqwf";
     "z-index: 9999999", "1ncuwq";
     "z-index: 10", "xei54";
+    (* lightCounterDigit, "asd"; *)
   ]
 
 let tests = "Hash", List.map check_equality data
