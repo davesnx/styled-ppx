@@ -1,7 +1,7 @@
 let assert_string left right =
   Alcotest.check Alcotest.string "should be equal" right left
 
-let style = Css.style_with_hash ~hash:"HASH"
+let style = Css.style_with_static_hash ~hash:"HASH"
 
 let one_property () =
   let _className = style [ Css.display `block ] in

@@ -3,4 +3,4 @@
  (target e2e-melange)
  (libraries ui)
  (module_systems
-  (es6 bs.js)))
+  (commonjs bs.js)))

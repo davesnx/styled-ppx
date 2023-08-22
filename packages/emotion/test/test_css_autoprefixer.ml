@@ -3,7 +3,7 @@ let assert_string left right =
 
 let prefix_one_declaration declaration output =
   let hidden = "HASH" in
-  let _rule = Css.style_with_hash ~hash:hidden [ declaration ] in
+  let _rule = Css.style_with_static_hash ~hash:hidden [ declaration ] in
   let css = Css.render_style_tag () in
   Css.flush ();
   assert_string css output

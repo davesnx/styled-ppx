@@ -4,9 +4,9 @@ let assert_string left right =
 module CssJs = struct
   include CssJs
 
-  (* Override CssJs.style with CssJs.style_with_hash
+  (* Override CssJs.style with CssJs.style_with_static_hash
      so we can hide the hash from this tests. *)
-  let style = CssJs.style_with_hash ~hash:"HASH"
+  let style = CssJs.style_with_static_hash ~hash:"HASH"
 end
 
 let one_property () =
@@ -36,6 +36,21 @@ let label_with_ppx () =
   let css = CssJs.render_style_tag () in
   CssJs.flush ();
   assert_string css " .css-HASH { display: block; }"
+
+let selector_with_ppx () =
+  let _red_but_inside_blue =
+    [%cx {|
+    color: red;
+
+    & > * {
+      color: blue;
+    }
+  |}]
+  in
+  let css = CssJs.render_style_tag () in
+  CssJs.flush ();
+  assert_string css
+    " .css-HASH { color: #FF0000; } .css-HASH  > * { color: #0000FF; }"
 
 let float_values () =
   let _className = CssJs.style [| CssJs.padding (`rem 10.) |] in
@@ -67,14 +82,6 @@ let selector_nested () =
           |];
       |]
   in
-  CssJs.print_rules
-    [|
-      CssJs.color CssJs.aliceblue;
-      CssJs.selector "a"
-        [|
-          CssJs.display `block; CssJs.selector "div" [| CssJs.display `none |];
-        |];
-    |];
   let css = CssJs.render_style_tag () in
   CssJs.flush ();
   assert_string css
@@ -154,22 +161,6 @@ let media_queries () =
     " .css-HASH { max-width: 800px; } @media (max-width: 768px) { .css-HASH { \
      width: 300px; } }"
 
-(* let media_queries_nested () =
-   let _className =
-     CssJs.style
-       [ CssJs.maxWidth (`px 800)
-       ; CssJs.media "(max-width: 768px)"
-           [ CssJs.width (`px 300)
-           ; CssJs.media "(min-width: 400px)"
-               [ CssJs.width (`px 300) ]
-           ]
-       ]
-   in
-   let css = CssJs.render_style_tag () in
-   assert_string css
-     ".s2073633259 { max-width: 800px; } @media (max-width: 768px) { \
-      .s2073633259 { width: 300px; } }"
-*)
 let selector_params () =
   let _className =
     CssJs.style
@@ -215,12 +206,12 @@ let tests =
       case "label" label;
       case "label_with_ppx" label_with_ppx;
       case "selector_nested" selector_nested;
-      (* case "selector_nested_x10" selector_nested_x10; *)
+      case "selector_nested_x10" selector_nested_x10;
       case "media_queries" media_queries;
-      (* case "media_queries_nested" media_queries_nested; *)
       case "selector_ampersand" selector_ampersand;
       case "selector_ampersand_at_the_middle" selector_ampersand_at_the_middle;
       case "selector_params" selector_params;
       case "keyframe" keyframe;
       case "duplicated_styles_unique" duplicated_styles_unique;
+      case "selector_with_ppx" selector_with_ppx;
     ] )
