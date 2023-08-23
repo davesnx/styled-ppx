@@ -8,7 +8,7 @@ type rule =
   | PseudoClassParam of string * string * rule array
 
 let rec ruleToDict =
- fun [@bs] dict rule ->
+ fun [@u] dict rule ->
   (((match rule with
     | D (name, value) when name = {js|content|js} ->
       dict
@@ -36,16 +36,16 @@ module type MakeResult = sig
   type nonrec styleEncoding
   type nonrec renderer
 
-  val insertRule : (string -> unit[@bs])
-  val renderRule : (renderer -> string -> unit[@bs])
-  val global : (string -> rule array -> unit[@bs])
-  val renderGlobal : (renderer -> string -> rule array -> unit[@bs])
-  val style : (rule array -> styleEncoding[@bs])
-  val merge : (styleEncoding array -> styleEncoding[@bs])
-  val merge2 : (styleEncoding -> styleEncoding -> styleEncoding[@bs])
+  val insertRule : (string -> unit[@u])
+  val renderRule : (renderer -> string -> unit[@u])
+  val global : (string -> rule array -> unit[@u])
+  val renderGlobal : (renderer -> string -> rule array -> unit[@u])
+  val style : (rule array -> styleEncoding[@u])
+  val merge : (styleEncoding array -> styleEncoding[@u])
+  val merge2 : (styleEncoding -> styleEncoding -> styleEncoding[@u])
 
   val merge3 :
-    (styleEncoding -> styleEncoding -> styleEncoding -> styleEncoding[@bs])
+    (styleEncoding -> styleEncoding -> styleEncoding -> styleEncoding[@u])
 
   val merge4 :
     (styleEncoding ->
@@ -53,12 +53,12 @@ module type MakeResult = sig
      styleEncoding ->
      styleEncoding ->
      styleEncoding
-    [@bs])
+    [@u])
 
-  val keyframes : ((int * rule array) array -> animationName[@bs])
+  val keyframes : ((int * rule array) array -> animationName[@u])
 
   val renderKeyframes :
-    (renderer -> (int * rule array) array -> animationName[@bs])
+    (renderer -> (int * rule array) array -> animationName[@u])
 end
 
 module Make (CssImpl : Css_Core.CssImplementationIntf) :
@@ -68,43 +68,43 @@ module Make (CssImpl : Css_Core.CssImplementationIntf) :
   type nonrec styleEncoding
   type nonrec renderer
 
-  let insertRule = fun [@bs] css -> (CssImpl.injectRaw css [@bs])
+  let insertRule = fun [@u] css -> (CssImpl.injectRaw css [@u])
 
   let renderRule =
-   fun [@bs] renderer css -> (CssImpl.renderRaw renderer css [@bs])
+   fun [@u] renderer css -> (CssImpl.renderRaw renderer css [@u])
 
   let global =
-   fun [@bs] selector rules ->
-    (CssImpl.injectRules selector (toJson rules) [@bs])
+   fun [@u] selector rules ->
+    (CssImpl.injectRules selector (toJson rules) [@u])
 
   let renderGlobal =
-   fun [@bs] renderer selector rules ->
-    (CssImpl.renderRules renderer selector (toJson rules) [@bs])
+   fun [@u] renderer selector rules ->
+    (CssImpl.renderRules renderer selector (toJson rules) [@u])
 
-  let style = fun [@bs] rules -> (CssImpl.make (toJson rules) [@bs])
-  let merge = fun [@bs] styles -> (CssImpl.mergeStyles styles [@bs])
-  let merge2 = fun [@bs] s s2 -> (merge [| s; s2 |] [@bs])
-  let merge3 = fun [@bs] s s2 s3 -> (merge [| s; s2; s3 |] [@bs])
-  let merge4 = fun [@bs] s s2 s3 s4 -> (merge [| s; s2; s3; s4 |] [@bs])
+  let style = fun [@u] rules -> (CssImpl.make (toJson rules) [@u])
+  let merge = fun [@u] styles -> (CssImpl.mergeStyles styles [@u])
+  let merge2 = fun [@u] s s2 -> (merge [| s; s2 |] [@u])
+  let merge3 = fun [@u] s s2 s3 -> (merge [| s; s2; s3 |] [@u])
+  let merge4 = fun [@u] s s2 s3 s4 -> (merge [| s; s2; s3; s4 |] [@u])
 
   let framesToDict frames =
     frames
-    |. Belt.Array.reduceU (Js.Dict.empty ()) (fun [@bs] dict (stop, rules) ->
+    |. Belt.Array.reduceU (Js.Dict.empty ()) (fun [@u] dict (stop, rules) ->
          ((Js.Dict.set dict (Js.Int.toString stop ^ {js|%|js}) (toJson rules);
            dict)
          [@ns.braces]))
 
   let keyframes =
-   fun [@bs] frames -> (CssImpl.makeKeyframes (framesToDict frames) [@bs])
+   fun [@u] frames -> (CssImpl.makeKeyframes (framesToDict frames) [@u])
 
   let renderKeyframes =
-   fun [@bs] renderer frames ->
-    (CssImpl.renderKeyframes renderer (framesToDict frames) [@bs])
+   fun [@u] renderer frames ->
+    (CssImpl.renderKeyframes renderer (framesToDict frames) [@u])
 end
 
 let join strings separator =
   strings
-  |. Belt.Array.reduceWithIndexU {js||js} (fun [@bs] acc item index ->
+  |. Belt.Array.reduceWithIndexU {js||js} (fun [@u] acc item index ->
        if [@ns.ternary] index = 0 then item else acc ^ separator ^ item)
 
 module Converter = struct
@@ -1150,8 +1150,8 @@ let wordSpacing x =
 
 let wordWrap = overflowWrap
 let zIndex x = D ({js|zIndex|js}, ZIndex.toString x)
-let media = fun [@bs] query rules -> S ({js|@media |js} ^ query, rules)
-let selector = fun [@bs] selector rules -> S (selector, rules)
+let media = fun [@u] query rules -> S ({js|@media |js} ^ query, rules)
+let selector = fun [@u] selector rules -> S (selector, rules)
 let pseudoClass selector rules = PseudoClass (selector, rules)
 let active rules = pseudoClass {js|active|js} rules
 let checked rules = pseudoClass {js|checked|js} rules
@@ -1222,17 +1222,17 @@ let scope rules = pseudoClass {js|scope|js} rules
 let target rules = pseudoClass {js|target|js} rules
 let valid rules = pseudoClass {js|valid|js} rules
 let visited rules = pseudoClass {js|visited|js} rules
-let after rules = (selector {js|::after|js} rules [@bs])
-let before rules = (selector {js|::before|js} rules [@bs])
-let firstLetter rules = (selector {js|::first-letter|js} rules [@bs])
-let firstLine rules = (selector {js|::first-line|js} rules [@bs])
-let selection rules = (selector {js|::selection|js} rules [@bs])
-let child x rules = (selector ({js| > |js} ^ x) rules [@bs])
-let children rules = (selector {js| > *|js} rules [@bs])
-let directSibling rules = (selector {js| + |js} rules [@bs])
-let placeholder rules = (selector {js|::placeholder|js} rules [@bs])
-let siblings rules = (selector {js| ~ |js} rules [@bs])
-let anyLink rules = (selector {js|:any-link|js} rules [@bs])
+let after rules = (selector {js|::after|js} rules [@u])
+let before rules = (selector {js|::before|js} rules [@u])
+let firstLetter rules = (selector {js|::first-letter|js} rules [@u])
+let firstLine rules = (selector {js|::first-line|js} rules [@u])
+let selection rules = (selector {js|::selection|js} rules [@u])
+let child x rules = (selector ({js| > |js} ^ x) rules [@u])
+let children rules = (selector {js| > *|js} rules [@u])
+let directSibling rules = (selector {js| + |js} rules [@u])
+let placeholder rules = (selector {js|::placeholder|js} rules [@u])
+let siblings rules = (selector {js| ~ |js} rules [@u])
+let anyLink rules = (selector {js|:any-link|js} rules [@u])
 
 type nonrec angle = Angle.t
 type nonrec animationDirection = AnimationDirection.t
@@ -1852,7 +1852,7 @@ let backgroundSize x =
 let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
     =
   (let fontStyle =
-     Js.Option.map (fun [@bs] value -> FontStyle.toString value) fontStyle
+     Js.Option.map (fun [@u] value -> FontStyle.toString value) fontStyle
    in
    let src =
      src

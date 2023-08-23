@@ -41,7 +41,7 @@ module type MakeResult = sig
   val insertRule : string -> unit
   val renderRule : renderer -> string -> unit
   val global : string -> rule list -> unit
-  val renderGlobal : (renderer -> string -> rule list -> unit[@bs])
+  val renderGlobal : (renderer -> string -> rule list -> unit[@u])
   val style : rule list -> styleEncoding
   val merge : styleEncoding list -> styleEncoding
   val merge2 : styleEncoding -> styleEncoding -> styleEncoding
@@ -65,29 +65,29 @@ module Make (CssImpl : Css_Core.CssImplementationIntf) :
   type nonrec styleEncoding
   type nonrec renderer
 
-  let insertRule css = (CssImpl.injectRaw css [@bs])
-  let renderRule renderer css = (CssImpl.renderRaw renderer css [@bs])
+  let insertRule css = (CssImpl.injectRaw css [@u])
+  let renderRule renderer css = (CssImpl.renderRaw renderer css [@u])
 
   let global selector rules =
-    (CssImpl.injectRules selector (toJson rules) [@bs])
+    (CssImpl.injectRules selector (toJson rules) [@u])
 
   let renderGlobal =
-   fun [@bs] renderer selector rules ->
-    (CssImpl.renderRules renderer selector (toJson rules) [@bs])
+   fun [@u] renderer selector rules ->
+    (CssImpl.renderRules renderer selector (toJson rules) [@u])
 
-  let style rules = (CssImpl.make (rules |. toJson) [@bs])
-  let merge styles = (CssImpl.mergeStyles (styles |. Belt.List.toArray) [@bs])
+  let style rules = (CssImpl.make (rules |. toJson) [@u])
+  let merge styles = (CssImpl.mergeStyles (styles |. Belt.List.toArray) [@u])
   let merge2 s s2 = merge [ s; s2 ]
   let merge3 s s2 s3 = merge [ s; s2; s3 ]
   let merge4 s s2 s3 s4 = merge [ s; s2; s3; s4 ]
 
   let keyframes frames =
     (CssImpl.makeKeyframes
-       (List.fold_left addStop (Js.Dict.empty ()) frames) [@bs])
+       (List.fold_left addStop (Js.Dict.empty ()) frames) [@u])
 
   let renderKeyframes renderer frames =
     (CssImpl.renderKeyframes renderer
-       (List.fold_left addStop (Js.Dict.empty ()) frames) [@bs])
+       (List.fold_left addStop (Js.Dict.empty ()) frames) [@u])
 end
 
 let join strings separator =
@@ -1877,7 +1877,7 @@ let fontFace ~fontFamily:(fontFamily [@ns.namedArgLoc])
   ?fontDisplay:(fontDisplay [@ns.namedArgLoc])
   ?sizeAdjust:(sizeAdjust [@ns.namedArgLoc]) () =
   (let fontStyle =
-     Js.Option.map (fun [@bs] value -> FontStyle.toString value) fontStyle
+     Js.Option.map (fun [@u] value -> FontStyle.toString value) fontStyle
    in
    let src =
      src
