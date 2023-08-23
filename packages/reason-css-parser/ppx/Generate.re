@@ -1,4 +1,4 @@
-open Longident;
+open Ppxlib;
 
 module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
   open Ast_builder;

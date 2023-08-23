@@ -5,12 +5,12 @@ let transform = String_interpolation.transform ~delimiter:"js" ~loc
 
 let ast =
   let pp_ast fmt v =
-    Format.fprintf fmt "%S" (Pprintast.string_of_expression v)
+    Format.fprintf fmt "%S" (Ppxlib_ast.Pprintast.string_of_expression v)
   in
   let compare expected actual =
     String.equal
-      (Pprintast.string_of_expression expected)
-      (Pprintast.string_of_expression actual)
+      (Ppxlib_ast.Pprintast.string_of_expression expected)
+      (Ppxlib_ast.Pprintast.string_of_expression actual)
   in
   testable pp_ast compare
 
