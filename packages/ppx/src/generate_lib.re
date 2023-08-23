@@ -21,19 +21,19 @@ module ReScriptAttributes = {
 };
 
 module BuckleScriptAttributes = {
-  /* [@bs.optional] */
+  /* [@mel.optional] */
   let optional = (~loc) =>
-    Helper.Attr.mk(withLoc("bs.optional", ~loc), PStr([]));
+    Helper.Attr.mk(withLoc("mel.optional", ~loc), PStr([]));
 
   /* fn(. ) */
   let uncurried = (~loc) => {
-    Builder.attribute(~name=withLoc(~loc, "bs"), ~loc, ~payload=PStr([]));
+    Builder.attribute(~name=withLoc(~loc, "u"), ~loc, ~payload=PStr([]));
   };
 
-  /* [@bs.deriving abstract] */
+  /* [@deriving abstract] */
   let derivingAbstract = (~loc) =>
     Helper.Attr.mk(
-      withLoc("bs.deriving", ~loc),
+      withLoc("deriving", ~loc),
       PStr([
         Helper.Str.mk(
           ~loc,
@@ -45,10 +45,10 @@ module BuckleScriptAttributes = {
       ]),
     );
 
-  /* [bs.as ""] */
+  /* [mel.as ""] */
   let alias = (~loc, alias) =>
     Helper.Attr.mk(
-      withLoc("bs.as", ~loc),
+      withLoc("mel.as", ~loc),
       PStr([
         Helper.Str.mk(
           ~loc,
@@ -64,7 +64,6 @@ module BuckleScriptAttributes = {
       ]),
     );
 
-  let val_ = (~loc) => Helper.Attr.mk(withLoc("bs.val", ~loc), PStr([]));
 };
 
 let optionalAttribute = (~loc) => {
@@ -126,7 +125,7 @@ let dynamicStyles = (~loc, ~name, ~args, ~expr) => {
 };
 
 /*
-  [@bs.val] [@bs.module "react"] external createVariadicElement:
+  [@mel.module "react"] external createVariadicElement:
   (string, Js.t({ .. })) => React.element =
   "createElement";
  */
@@ -156,9 +155,8 @@ let bindingCreateVariadicElement = (~loc) => {
       ),
     pval_prim: ["createElement"],
     pval_attributes: [
-      Helper.Attr.mk(withLoc("bs.val", ~loc), PStr([])),
       Helper.Attr.mk(
-        withLoc("bs.module", ~loc),
+        withLoc("mel.module", ~loc),
         PStr([
           Helper.Str.mk(
             ~loc,
@@ -271,7 +269,7 @@ let stylesAndRefObject = (~loc) => {
     Helper.Exp.extension(
       ~loc,
       (
-        withLoc("bs.obj", ~loc),
+        withLoc("mel.obj", ~loc),
         PStr([Helper.Str.mk(~loc, Pstr_eval(record, []))]),
       ),
     ),
@@ -588,7 +586,7 @@ let makeMakeProps = (~loc, customProps) => {
          }
        );
 
-  /* List of [@bs.optional] prop: type */
+  /* List of [@mel.optional] prop: type */
   let reactProps =
     List.append(
       [domRefLabel(~loc), childrenLabel(~loc), ...makeProps],
@@ -657,7 +655,7 @@ let defineAssign2 = (~loc) => {
         ),
       ),
     pval_prim: ["Object.assign"],
-    pval_attributes: [BuckleScriptAttributes.val_(~loc)],
+    pval_attributes: [],
   });
 };
 
