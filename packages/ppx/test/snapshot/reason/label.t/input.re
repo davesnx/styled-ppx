@@ -51,7 +51,7 @@ let fn2 = (x, y) =>
   | B => [prop("b")]
   };
 
-let className = [%cx {|
+/* let className = [%cx {|
       font-size: 28px;
     |}];
 
@@ -65,3 +65,4 @@ let fn = () => {
 
   className;
 };
+ */
