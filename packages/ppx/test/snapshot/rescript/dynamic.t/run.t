@@ -25,45 +25,45 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
       alt?: string,
       amplitude?: string,
       arabicForm?: string,
-      @as("aria-activedescendant") ariaActivedescendant?: string,
-      @as("aria-atomic") ariaAtomic?: bool,
-      @as("aria-busy") ariaBusy?: bool,
-      @as("aria-colcount") ariaColcount?: int,
-      @as("aria-colindex") ariaColindex?: int,
-      @as("aria-colspan") ariaColspan?: int,
-      @as("aria-controls") ariaControls?: string,
-      @as("aria-describedby") ariaDescribedby?: string,
-      @as("aria-details") ariaDetails?: string,
-      @as("aria-disabled") ariaDisabled?: bool,
-      @as("aria-errormessage") ariaErrormessage?: string,
-      @as("aria-expanded") ariaExpanded?: bool,
-      @as("aria-flowto") ariaFlowto?: string,
-      @as("aria-grabbed") ariaGrabbed?: bool,
-      @as("aria-hidden") ariaHidden?: bool,
-      @as("aria-keyshortcuts") ariaKeyshortcuts?: string,
-      @as("aria-label") ariaLabel?: string,
-      @as("aria-labelledby") ariaLabelledby?: string,
-      @as("aria-level") ariaLevel?: int,
-      @as("aria-modal") ariaModal?: bool,
-      @as("aria-multiline") ariaMultiline?: bool,
-      @as("aria-multiselectable") ariaMultiselectable?: bool,
-      @as("aria-owns") ariaOwns?: string,
-      @as("aria-placeholder") ariaPlaceholder?: string,
-      @as("aria-posinset") ariaPosinset?: int,
-      @as("aria-readonly") ariaReadonly?: bool,
-      @as("aria-relevant") ariaRelevant?: string,
-      @as("aria-required") ariaRequired?: bool,
-      @as("aria-roledescription") ariaRoledescription?: string,
-      @as("aria-rowcount") ariaRowcount?: int,
-      @as("aria-rowindex") ariaRowindex?: int,
-      @as("aria-rowspan") ariaRowspan?: int,
-      @as("aria-selected") ariaSelected?: bool,
-      @as("aria-setsize") ariaSetsize?: int,
-      @as("aria-sort") ariaSort?: string,
-      @as("aria-valuemax") ariaValuemax?: float,
-      @as("aria-valuemin") ariaValuemin?: float,
-      @as("aria-valuenow") ariaValuenow?: float,
-      @as("aria-valuetext") ariaValuetext?: string,
+      @mel.as("aria-activedescendant") ariaActivedescendant?: string,
+      @mel.as("aria-atomic") ariaAtomic?: bool,
+      @mel.as("aria-busy") ariaBusy?: bool,
+      @mel.as("aria-colcount") ariaColcount?: int,
+      @mel.as("aria-colindex") ariaColindex?: int,
+      @mel.as("aria-colspan") ariaColspan?: int,
+      @mel.as("aria-controls") ariaControls?: string,
+      @mel.as("aria-describedby") ariaDescribedby?: string,
+      @mel.as("aria-details") ariaDetails?: string,
+      @mel.as("aria-disabled") ariaDisabled?: bool,
+      @mel.as("aria-errormessage") ariaErrormessage?: string,
+      @mel.as("aria-expanded") ariaExpanded?: bool,
+      @mel.as("aria-flowto") ariaFlowto?: string,
+      @mel.as("aria-grabbed") ariaGrabbed?: bool,
+      @mel.as("aria-hidden") ariaHidden?: bool,
+      @mel.as("aria-keyshortcuts") ariaKeyshortcuts?: string,
+      @mel.as("aria-label") ariaLabel?: string,
+      @mel.as("aria-labelledby") ariaLabelledby?: string,
+      @mel.as("aria-level") ariaLevel?: int,
+      @mel.as("aria-modal") ariaModal?: bool,
+      @mel.as("aria-multiline") ariaMultiline?: bool,
+      @mel.as("aria-multiselectable") ariaMultiselectable?: bool,
+      @mel.as("aria-owns") ariaOwns?: string,
+      @mel.as("aria-placeholder") ariaPlaceholder?: string,
+      @mel.as("aria-posinset") ariaPosinset?: int,
+      @mel.as("aria-readonly") ariaReadonly?: bool,
+      @mel.as("aria-relevant") ariaRelevant?: string,
+      @mel.as("aria-required") ariaRequired?: bool,
+      @mel.as("aria-roledescription") ariaRoledescription?: string,
+      @mel.as("aria-rowcount") ariaRowcount?: int,
+      @mel.as("aria-rowindex") ariaRowindex?: int,
+      @mel.as("aria-rowspan") ariaRowspan?: int,
+      @mel.as("aria-selected") ariaSelected?: bool,
+      @mel.as("aria-setsize") ariaSetsize?: int,
+      @mel.as("aria-sort") ariaSort?: string,
+      @mel.as("aria-valuemax") ariaValuemax?: float,
+      @mel.as("aria-valuemin") ariaValuemin?: float,
+      @mel.as("aria-valuenow") ariaValuenow?: float,
+      @mel.as("aria-valuetext") ariaValuetext?: string,
       ascent?: string,
       async?: bool,
       attributeName?: string,
@@ -359,7 +359,7 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
       title?: string,
       to_?: string,
       transform?: string,
-      @as("type") type_?: string,
+      @mel.as("type") type_?: string,
       typeof?: string,
       u1?: string,
       u2?: string,
@@ -482,27 +482,25 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
       onWheel?: ReactEvent.Wheel.t => unit,
       var: 'var,
     }
-    @val @module(@reason.raw_literal "react")
+    @mel.module(@reason.raw_literal "react")
     external createVariadicElement: (string, {..}) => React.element = "createElement"
-    let deleteProp = %raw(
-      @reason.raw_literal("(newProps, key) => delete newProps[key]")
-      "(newProps, key) => delete newProps[key]"
-    )
+    let deleteProp = %raw("(newProps, key) => delete newProps[key]")
     let getOrEmpty = str =>
       switch str {
-      | Some(str) => (@reason.raw_literal(" ") " ") ++ str
-      | None => @reason.raw_literal("") ""
+      | Some(str) => " " ++ str
+      | None => ""
       }
-    @val external assign2: ({..}, {..}, {..}) => {..} = "Object.assign"
+    external assign2: ({..}, {..}, {..}) => {..} = "Object.assign"
     let styles = (~var, _) =>
-      CssJs.style(. [
+      @u
+      CssJs.style([
         CssJs.label("DynamicComponent"),
         (CssJs.color(var): CssJs.rule),
         CssJs.display(#flex),
       ])
     let make = (props: props<'var>) => {
       let className = styles(~var=props.var, ()) ++ getOrEmpty(props.className)
-      let stylesObject = {"className": className, "ref": props.innerRef}
+      let stylesObject = %mel.obj({className, ref: props.innerRef})
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject)
       ignore(deleteProp(newProps, "var"))
       ignore(deleteProp(newProps, "innerRef"))

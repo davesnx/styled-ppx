@@ -3,7 +3,7 @@
   $ cat output.ml
   ;;ignore
       ((CssJs.global (({*j|html, body, #root, .class|*j})[@res.template ])
-          [|(CssJs.margin `zero)|])[@bs ])
+          [|(CssJs.margin `zero)|])[@u ])
 
   $ npx rescript convert output.ml
   Error when converting output.ml

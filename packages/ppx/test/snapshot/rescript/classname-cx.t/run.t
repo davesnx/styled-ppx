@@ -6,9 +6,8 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
   $ npx rescript convert fixed.ml
 
   $ cat fixed.res
-  let className = CssJs.style(. [CssJs.label("className"), CssJs.display(#block)])
-  let classNameWithMultiLine = CssJs.style(. [
-    CssJs.label("classNameWithMultiLine"),
-    CssJs.display(#block),
-  ])
-  let classNameWithArray = CssJs.style(. [CssJs.label("classNameWithArray"), cssProperty])
+  let className = @u CssJs.style([CssJs.label("className"), CssJs.display(#block)])
+  let classNameWithMultiLine =
+    @u
+    CssJs.style([CssJs.label("classNameWithMultiLine"), CssJs.display(#block)])
+  let classNameWithArray = @u CssJs.style([CssJs.label("classNameWithArray"), cssProperty])

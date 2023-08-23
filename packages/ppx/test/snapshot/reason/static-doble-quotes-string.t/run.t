@@ -2,964 +2,962 @@
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   module SingleQuoteStrings = {
-    [@bs.deriving abstract]
+    [@deriving abstract]
     type makeProps = {
-      [@bs.optional]
+      [@mel.optional]
       innerRef: ReactDOM.domRef,
-      [@bs.optional]
+      [@mel.optional]
       children: React.element,
-      [@bs.optional]
+      [@mel.optional]
       about: string,
-      [@bs.optional]
+      [@mel.optional]
       accentHeight: string,
-      [@bs.optional]
+      [@mel.optional]
       accept: string,
-      [@bs.optional]
+      [@mel.optional]
       acceptCharset: string,
-      [@bs.optional]
+      [@mel.optional]
       accessKey: string,
-      [@bs.optional]
+      [@mel.optional]
       accumulate: string,
-      [@bs.optional]
+      [@mel.optional]
       action: string,
-      [@bs.optional]
+      [@mel.optional]
       additive: string,
-      [@bs.optional]
+      [@mel.optional]
       alignmentBaseline: string,
-      [@bs.optional]
+      [@mel.optional]
       allowFullScreen: bool,
-      [@bs.optional]
+      [@mel.optional]
       allowReorder: string,
-      [@bs.optional]
+      [@mel.optional]
       alphabetic: string,
-      [@bs.optional]
+      [@mel.optional]
       alt: string,
-      [@bs.optional]
+      [@mel.optional]
       amplitude: string,
-      [@bs.optional]
+      [@mel.optional]
       arabicForm: string,
-      [@bs.optional] [@bs.as "aria-activedescendant"]
+      [@mel.optional] [@mel.as "aria-activedescendant"]
       ariaActivedescendant: string,
-      [@bs.optional] [@bs.as "aria-atomic"]
+      [@mel.optional] [@mel.as "aria-atomic"]
       ariaAtomic: bool,
-      [@bs.optional] [@bs.as "aria-busy"]
+      [@mel.optional] [@mel.as "aria-busy"]
       ariaBusy: bool,
-      [@bs.optional] [@bs.as "aria-colcount"]
+      [@mel.optional] [@mel.as "aria-colcount"]
       ariaColcount: int,
-      [@bs.optional] [@bs.as "aria-colindex"]
+      [@mel.optional] [@mel.as "aria-colindex"]
       ariaColindex: int,
-      [@bs.optional] [@bs.as "aria-colspan"]
+      [@mel.optional] [@mel.as "aria-colspan"]
       ariaColspan: int,
-      [@bs.optional] [@bs.as "aria-controls"]
+      [@mel.optional] [@mel.as "aria-controls"]
       ariaControls: string,
-      [@bs.optional] [@bs.as "aria-describedby"]
+      [@mel.optional] [@mel.as "aria-describedby"]
       ariaDescribedby: string,
-      [@bs.optional] [@bs.as "aria-details"]
+      [@mel.optional] [@mel.as "aria-details"]
       ariaDetails: string,
-      [@bs.optional] [@bs.as "aria-disabled"]
+      [@mel.optional] [@mel.as "aria-disabled"]
       ariaDisabled: bool,
-      [@bs.optional] [@bs.as "aria-errormessage"]
+      [@mel.optional] [@mel.as "aria-errormessage"]
       ariaErrormessage: string,
-      [@bs.optional] [@bs.as "aria-expanded"]
+      [@mel.optional] [@mel.as "aria-expanded"]
       ariaExpanded: bool,
-      [@bs.optional] [@bs.as "aria-flowto"]
+      [@mel.optional] [@mel.as "aria-flowto"]
       ariaFlowto: string,
-      [@bs.optional] [@bs.as "aria-grabbed"]
+      [@mel.optional] [@mel.as "aria-grabbed"]
       ariaGrabbed: bool,
-      [@bs.optional] [@bs.as "aria-hidden"]
+      [@mel.optional] [@mel.as "aria-hidden"]
       ariaHidden: bool,
-      [@bs.optional] [@bs.as "aria-keyshortcuts"]
+      [@mel.optional] [@mel.as "aria-keyshortcuts"]
       ariaKeyshortcuts: string,
-      [@bs.optional] [@bs.as "aria-label"]
+      [@mel.optional] [@mel.as "aria-label"]
       ariaLabel: string,
-      [@bs.optional] [@bs.as "aria-labelledby"]
+      [@mel.optional] [@mel.as "aria-labelledby"]
       ariaLabelledby: string,
-      [@bs.optional] [@bs.as "aria-level"]
+      [@mel.optional] [@mel.as "aria-level"]
       ariaLevel: int,
-      [@bs.optional] [@bs.as "aria-modal"]
+      [@mel.optional] [@mel.as "aria-modal"]
       ariaModal: bool,
-      [@bs.optional] [@bs.as "aria-multiline"]
+      [@mel.optional] [@mel.as "aria-multiline"]
       ariaMultiline: bool,
-      [@bs.optional] [@bs.as "aria-multiselectable"]
+      [@mel.optional] [@mel.as "aria-multiselectable"]
       ariaMultiselectable: bool,
-      [@bs.optional] [@bs.as "aria-owns"]
+      [@mel.optional] [@mel.as "aria-owns"]
       ariaOwns: string,
-      [@bs.optional] [@bs.as "aria-placeholder"]
+      [@mel.optional] [@mel.as "aria-placeholder"]
       ariaPlaceholder: string,
-      [@bs.optional] [@bs.as "aria-posinset"]
+      [@mel.optional] [@mel.as "aria-posinset"]
       ariaPosinset: int,
-      [@bs.optional] [@bs.as "aria-readonly"]
+      [@mel.optional] [@mel.as "aria-readonly"]
       ariaReadonly: bool,
-      [@bs.optional] [@bs.as "aria-relevant"]
+      [@mel.optional] [@mel.as "aria-relevant"]
       ariaRelevant: string,
-      [@bs.optional] [@bs.as "aria-required"]
+      [@mel.optional] [@mel.as "aria-required"]
       ariaRequired: bool,
-      [@bs.optional] [@bs.as "aria-roledescription"]
+      [@mel.optional] [@mel.as "aria-roledescription"]
       ariaRoledescription: string,
-      [@bs.optional] [@bs.as "aria-rowcount"]
+      [@mel.optional] [@mel.as "aria-rowcount"]
       ariaRowcount: int,
-      [@bs.optional] [@bs.as "aria-rowindex"]
+      [@mel.optional] [@mel.as "aria-rowindex"]
       ariaRowindex: int,
-      [@bs.optional] [@bs.as "aria-rowspan"]
+      [@mel.optional] [@mel.as "aria-rowspan"]
       ariaRowspan: int,
-      [@bs.optional] [@bs.as "aria-selected"]
+      [@mel.optional] [@mel.as "aria-selected"]
       ariaSelected: bool,
-      [@bs.optional] [@bs.as "aria-setsize"]
+      [@mel.optional] [@mel.as "aria-setsize"]
       ariaSetsize: int,
-      [@bs.optional] [@bs.as "aria-sort"]
+      [@mel.optional] [@mel.as "aria-sort"]
       ariaSort: string,
-      [@bs.optional] [@bs.as "aria-valuemax"]
+      [@mel.optional] [@mel.as "aria-valuemax"]
       ariaValuemax: float,
-      [@bs.optional] [@bs.as "aria-valuemin"]
+      [@mel.optional] [@mel.as "aria-valuemin"]
       ariaValuemin: float,
-      [@bs.optional] [@bs.as "aria-valuenow"]
+      [@mel.optional] [@mel.as "aria-valuenow"]
       ariaValuenow: float,
-      [@bs.optional] [@bs.as "aria-valuetext"]
+      [@mel.optional] [@mel.as "aria-valuetext"]
       ariaValuetext: string,
-      [@bs.optional]
+      [@mel.optional]
       ascent: string,
-      [@bs.optional]
+      [@mel.optional]
       async: bool,
-      [@bs.optional]
+      [@mel.optional]
       attributeName: string,
-      [@bs.optional]
+      [@mel.optional]
       attributeType: string,
-      [@bs.optional]
+      [@mel.optional]
       autoComplete: string,
-      [@bs.optional]
+      [@mel.optional]
       autoFocus: bool,
-      [@bs.optional]
+      [@mel.optional]
       autoPlay: bool,
-      [@bs.optional]
+      [@mel.optional]
       autoReverse: string,
-      [@bs.optional]
+      [@mel.optional]
       azimuth: string,
-      [@bs.optional]
+      [@mel.optional]
       baseFrequency: string,
-      [@bs.optional]
+      [@mel.optional]
       baselineShift: string,
-      [@bs.optional]
+      [@mel.optional]
       baseProfile: string,
-      [@bs.optional]
+      [@mel.optional]
       bbox: string,
-      [@bs.optional]
+      [@mel.optional]
       begin_: string,
-      [@bs.optional]
+      [@mel.optional]
       bias: string,
-      [@bs.optional]
+      [@mel.optional]
       by: string,
-      [@bs.optional]
+      [@mel.optional]
       calcMode: string,
-      [@bs.optional]
+      [@mel.optional]
       capHeight: string,
-      [@bs.optional]
+      [@mel.optional]
       challenge: string,
-      [@bs.optional]
+      [@mel.optional]
       charSet: string,
-      [@bs.optional]
+      [@mel.optional]
       checked: bool,
-      [@bs.optional]
+      [@mel.optional]
       cite: string,
-      [@bs.optional]
+      [@mel.optional]
       className: string,
-      [@bs.optional]
+      [@mel.optional]
       clip: string,
-      [@bs.optional]
+      [@mel.optional]
       clipPath: string,
-      [@bs.optional]
+      [@mel.optional]
       clipPathUnits: string,
-      [@bs.optional]
+      [@mel.optional]
       clipRule: string,
-      [@bs.optional]
+      [@mel.optional]
       colorInterpolation: string,
-      [@bs.optional]
+      [@mel.optional]
       colorInterpolationFilters: string,
-      [@bs.optional]
+      [@mel.optional]
       colorProfile: string,
-      [@bs.optional]
+      [@mel.optional]
       colorRendering: string,
-      [@bs.optional]
+      [@mel.optional]
       cols: int,
-      [@bs.optional]
+      [@mel.optional]
       colSpan: int,
-      [@bs.optional]
+      [@mel.optional]
       content: string,
-      [@bs.optional]
+      [@mel.optional]
       contentEditable: bool,
-      [@bs.optional]
+      [@mel.optional]
       contentScriptType: string,
-      [@bs.optional]
+      [@mel.optional]
       contentStyleType: string,
-      [@bs.optional]
+      [@mel.optional]
       contextMenu: string,
-      [@bs.optional]
+      [@mel.optional]
       controls: bool,
-      [@bs.optional]
+      [@mel.optional]
       coords: string,
-      [@bs.optional]
+      [@mel.optional]
       crossorigin: bool,
-      [@bs.optional]
+      [@mel.optional]
       cursor: string,
-      [@bs.optional]
+      [@mel.optional]
       cx: string,
-      [@bs.optional]
+      [@mel.optional]
       cy: string,
-      [@bs.optional]
+      [@mel.optional]
       d: string,
-      [@bs.optional]
+      [@mel.optional]
       data: string,
-      [@bs.optional]
+      [@mel.optional]
       datatype: string,
-      [@bs.optional]
+      [@mel.optional]
       dateTime: string,
-      [@bs.optional]
+      [@mel.optional]
       decelerate: string,
-      [@bs.optional]
+      [@mel.optional]
       default: bool,
-      [@bs.optional]
+      [@mel.optional]
       defaultChecked: bool,
-      [@bs.optional]
+      [@mel.optional]
       defaultValue: string,
-      [@bs.optional]
+      [@mel.optional]
       defer: bool,
-      [@bs.optional]
+      [@mel.optional]
       descent: string,
-      [@bs.optional]
+      [@mel.optional]
       diffuseConstant: string,
-      [@bs.optional]
+      [@mel.optional]
       dir: string,
-      [@bs.optional]
+      [@mel.optional]
       direction: string,
-      [@bs.optional]
+      [@mel.optional]
       disabled: bool,
-      [@bs.optional]
+      [@mel.optional]
       display: string,
-      [@bs.optional]
+      [@mel.optional]
       divisor: string,
-      [@bs.optional]
+      [@mel.optional]
       dominantBaseline: string,
-      [@bs.optional]
+      [@mel.optional]
       download: string,
-      [@bs.optional]
+      [@mel.optional]
       draggable: bool,
-      [@bs.optional]
+      [@mel.optional]
       dur: string,
-      [@bs.optional]
+      [@mel.optional]
       dx: string,
-      [@bs.optional]
+      [@mel.optional]
       dy: string,
-      [@bs.optional]
+      [@mel.optional]
       edgeMode: string,
-      [@bs.optional]
+      [@mel.optional]
       elevation: string,
-      [@bs.optional]
+      [@mel.optional]
       enableBackground: string,
-      [@bs.optional]
+      [@mel.optional]
       encType: string,
-      [@bs.optional]
+      [@mel.optional]
       end_: string,
-      [@bs.optional]
+      [@mel.optional]
       exponent: string,
-      [@bs.optional]
+      [@mel.optional]
       externalResourcesRequired: string,
-      [@bs.optional]
+      [@mel.optional]
       fill: string,
-      [@bs.optional]
+      [@mel.optional]
       fillOpacity: string,
-      [@bs.optional]
+      [@mel.optional]
       fillRule: string,
-      [@bs.optional]
+      [@mel.optional]
       filter: string,
-      [@bs.optional]
+      [@mel.optional]
       filterRes: string,
-      [@bs.optional]
+      [@mel.optional]
       filterUnits: string,
-      [@bs.optional]
+      [@mel.optional]
       floodColor: string,
-      [@bs.optional]
+      [@mel.optional]
       floodOpacity: string,
-      [@bs.optional]
+      [@mel.optional]
       focusable: string,
-      [@bs.optional]
+      [@mel.optional]
       fomat: string,
-      [@bs.optional]
+      [@mel.optional]
       fontFamily: string,
-      [@bs.optional]
+      [@mel.optional]
       fontSize: string,
-      [@bs.optional]
+      [@mel.optional]
       fontSizeAdjust: string,
-      [@bs.optional]
+      [@mel.optional]
       fontStretch: string,
-      [@bs.optional]
+      [@mel.optional]
       fontStyle: string,
-      [@bs.optional]
+      [@mel.optional]
       fontVariant: string,
-      [@bs.optional]
+      [@mel.optional]
       fontWeight: string,
-      [@bs.optional]
+      [@mel.optional]
       form: string,
-      [@bs.optional]
+      [@mel.optional]
       formAction: string,
-      [@bs.optional]
+      [@mel.optional]
       formMethod: string,
-      [@bs.optional]
+      [@mel.optional]
       formTarget: string,
-      [@bs.optional]
+      [@mel.optional]
       from: string,
-      [@bs.optional]
+      [@mel.optional]
       fx: string,
-      [@bs.optional]
+      [@mel.optional]
       fy: string,
-      [@bs.optional]
+      [@mel.optional]
       g1: string,
-      [@bs.optional]
+      [@mel.optional]
       g2: string,
-      [@bs.optional]
+      [@mel.optional]
       glyphName: string,
-      [@bs.optional]
+      [@mel.optional]
       glyphOrientationHorizontal: string,
-      [@bs.optional]
+      [@mel.optional]
       glyphOrientationVertical: string,
-      [@bs.optional]
+      [@mel.optional]
       glyphRef: string,
-      [@bs.optional]
+      [@mel.optional]
       gradientTransform: string,
-      [@bs.optional]
+      [@mel.optional]
       gradientUnits: string,
-      [@bs.optional]
+      [@mel.optional]
       hanging: string,
-      [@bs.optional]
+      [@mel.optional]
       headers: string,
-      [@bs.optional]
+      [@mel.optional]
       height: string,
-      [@bs.optional]
+      [@mel.optional]
       hidden: bool,
-      [@bs.optional]
+      [@mel.optional]
       high: int,
-      [@bs.optional]
+      [@mel.optional]
       horizAdvX: string,
-      [@bs.optional]
+      [@mel.optional]
       horizOriginX: string,
-      [@bs.optional]
+      [@mel.optional]
       href: string,
-      [@bs.optional]
+      [@mel.optional]
       hrefLang: string,
-      [@bs.optional]
+      [@mel.optional]
       htmlFor: string,
-      [@bs.optional]
+      [@mel.optional]
       httpEquiv: string,
-      [@bs.optional]
+      [@mel.optional]
       icon: string,
-      [@bs.optional]
+      [@mel.optional]
       id: string,
-      [@bs.optional]
+      [@mel.optional]
       ideographic: string,
-      [@bs.optional]
+      [@mel.optional]
       imageRendering: string,
-      [@bs.optional]
+      [@mel.optional]
       in_: string,
-      [@bs.optional]
+      [@mel.optional]
       in2: string,
-      [@bs.optional]
+      [@mel.optional]
       inlist: string,
-      [@bs.optional]
+      [@mel.optional]
       inputMode: string,
-      [@bs.optional]
+      [@mel.optional]
       integrity: string,
-      [@bs.optional]
+      [@mel.optional]
       intercept: string,
-      [@bs.optional]
+      [@mel.optional]
       itemID: string,
-      [@bs.optional]
+      [@mel.optional]
       itemProp: string,
-      [@bs.optional]
+      [@mel.optional]
       itemRef: string,
-      [@bs.optional]
+      [@mel.optional]
       itemScope: bool,
-      [@bs.optional]
+      [@mel.optional]
       itemType: string,
-      [@bs.optional]
+      [@mel.optional]
       k: string,
-      [@bs.optional]
+      [@mel.optional]
       k1: string,
-      [@bs.optional]
+      [@mel.optional]
       k2: string,
-      [@bs.optional]
+      [@mel.optional]
       k3: string,
-      [@bs.optional]
+      [@mel.optional]
       k4: string,
-      [@bs.optional]
+      [@mel.optional]
       kernelMatrix: string,
-      [@bs.optional]
+      [@mel.optional]
       kernelUnitLength: string,
-      [@bs.optional]
+      [@mel.optional]
       kerning: string,
-      [@bs.optional]
+      [@mel.optional]
       key: string,
-      [@bs.optional]
+      [@mel.optional]
       keyPoints: string,
-      [@bs.optional]
+      [@mel.optional]
       keySplines: string,
-      [@bs.optional]
+      [@mel.optional]
       keyTimes: string,
-      [@bs.optional]
+      [@mel.optional]
       keyType: string,
-      [@bs.optional]
+      [@mel.optional]
       kind: string,
-      [@bs.optional]
+      [@mel.optional]
       label: string,
-      [@bs.optional]
+      [@mel.optional]
       lang: string,
-      [@bs.optional]
+      [@mel.optional]
       lengthAdjust: string,
-      [@bs.optional]
+      [@mel.optional]
       letterSpacing: string,
-      [@bs.optional]
+      [@mel.optional]
       lightingColor: string,
-      [@bs.optional]
+      [@mel.optional]
       limitingConeAngle: string,
-      [@bs.optional]
+      [@mel.optional]
       list: string,
-      [@bs.optional]
+      [@mel.optional]
       local: string,
-      [@bs.optional]
+      [@mel.optional]
       loop: bool,
-      [@bs.optional]
+      [@mel.optional]
       low: int,
-      [@bs.optional]
+      [@mel.optional]
       manifest: string,
-      [@bs.optional]
+      [@mel.optional]
       markerEnd: string,
-      [@bs.optional]
+      [@mel.optional]
       markerHeight: string,
-      [@bs.optional]
+      [@mel.optional]
       markerMid: string,
-      [@bs.optional]
+      [@mel.optional]
       markerStart: string,
-      [@bs.optional]
+      [@mel.optional]
       markerUnits: string,
-      [@bs.optional]
+      [@mel.optional]
       markerWidth: string,
-      [@bs.optional]
+      [@mel.optional]
       mask: string,
-      [@bs.optional]
+      [@mel.optional]
       maskContentUnits: string,
-      [@bs.optional]
+      [@mel.optional]
       maskUnits: string,
-      [@bs.optional]
+      [@mel.optional]
       mathematical: string,
-      [@bs.optional]
+      [@mel.optional]
       max: string,
-      [@bs.optional]
+      [@mel.optional]
       maxLength: int,
-      [@bs.optional]
+      [@mel.optional]
       media: string,
-      [@bs.optional]
+      [@mel.optional]
       mediaGroup: string,
-      [@bs.optional]
+      [@mel.optional]
       min: int,
-      [@bs.optional]
+      [@mel.optional]
       minLength: int,
-      [@bs.optional]
+      [@mel.optional]
       mode: string,
-      [@bs.optional]
+      [@mel.optional]
       multiple: bool,
-      [@bs.optional]
+      [@mel.optional]
       muted: bool,
-      [@bs.optional]
+      [@mel.optional]
       name: string,
-      [@bs.optional]
+      [@mel.optional]
       nonce: string,
-      [@bs.optional]
+      [@mel.optional]
       noValidate: bool,
-      [@bs.optional]
+      [@mel.optional]
       numOctaves: string,
-      [@bs.optional]
+      [@mel.optional]
       offset: string,
-      [@bs.optional]
+      [@mel.optional]
       opacity: string,
-      [@bs.optional]
+      [@mel.optional]
       open_: bool,
-      [@bs.optional]
+      [@mel.optional]
       operator: string,
-      [@bs.optional]
+      [@mel.optional]
       optimum: int,
-      [@bs.optional]
+      [@mel.optional]
       order: string,
-      [@bs.optional]
+      [@mel.optional]
       orient: string,
-      [@bs.optional]
+      [@mel.optional]
       orientation: string,
-      [@bs.optional]
+      [@mel.optional]
       origin: string,
-      [@bs.optional]
+      [@mel.optional]
       overflow: string,
-      [@bs.optional]
+      [@mel.optional]
       overflowX: string,
-      [@bs.optional]
+      [@mel.optional]
       overflowY: string,
-      [@bs.optional]
+      [@mel.optional]
       overlinePosition: string,
-      [@bs.optional]
+      [@mel.optional]
       overlineThickness: string,
-      [@bs.optional]
+      [@mel.optional]
       paintOrder: string,
-      [@bs.optional]
+      [@mel.optional]
       panose1: string,
-      [@bs.optional]
+      [@mel.optional]
       pathLength: string,
-      [@bs.optional]
+      [@mel.optional]
       pattern: string,
-      [@bs.optional]
+      [@mel.optional]
       patternContentUnits: string,
-      [@bs.optional]
+      [@mel.optional]
       patternTransform: string,
-      [@bs.optional]
+      [@mel.optional]
       patternUnits: string,
-      [@bs.optional]
+      [@mel.optional]
       placeholder: string,
-      [@bs.optional]
+      [@mel.optional]
       pointerEvents: string,
-      [@bs.optional]
+      [@mel.optional]
       points: string,
-      [@bs.optional]
+      [@mel.optional]
       pointsAtX: string,
-      [@bs.optional]
+      [@mel.optional]
       pointsAtY: string,
-      [@bs.optional]
+      [@mel.optional]
       pointsAtZ: string,
-      [@bs.optional]
+      [@mel.optional]
       poster: string,
-      [@bs.optional]
+      [@mel.optional]
       prefix: string,
-      [@bs.optional]
+      [@mel.optional]
       preload: string,
-      [@bs.optional]
+      [@mel.optional]
       preserveAlpha: string,
-      [@bs.optional]
+      [@mel.optional]
       preserveAspectRatio: string,
-      [@bs.optional]
+      [@mel.optional]
       primitiveUnits: string,
-      [@bs.optional]
+      [@mel.optional]
       property: string,
-      [@bs.optional]
+      [@mel.optional]
       r: string,
-      [@bs.optional]
+      [@mel.optional]
       radioGroup: string,
-      [@bs.optional]
+      [@mel.optional]
       radius: string,
-      [@bs.optional]
+      [@mel.optional]
       readOnly: bool,
-      [@bs.optional]
+      [@mel.optional]
       refX: string,
-      [@bs.optional]
+      [@mel.optional]
       refY: string,
-      [@bs.optional]
+      [@mel.optional]
       rel: string,
-      [@bs.optional]
+      [@mel.optional]
       renderingIntent: string,
-      [@bs.optional]
+      [@mel.optional]
       repeatCount: string,
-      [@bs.optional]
+      [@mel.optional]
       repeatDur: string,
-      [@bs.optional]
+      [@mel.optional]
       required: bool,
-      [@bs.optional]
+      [@mel.optional]
       requiredExtensions: string,
-      [@bs.optional]
+      [@mel.optional]
       requiredFeatures: string,
-      [@bs.optional]
+      [@mel.optional]
       resource: string,
-      [@bs.optional]
+      [@mel.optional]
       restart: string,
-      [@bs.optional]
+      [@mel.optional]
       result: string,
-      [@bs.optional]
+      [@mel.optional]
       reversed: bool,
-      [@bs.optional]
+      [@mel.optional]
       role: string,
-      [@bs.optional]
+      [@mel.optional]
       rotate: string,
-      [@bs.optional]
+      [@mel.optional]
       rows: int,
-      [@bs.optional]
+      [@mel.optional]
       rowSpan: int,
-      [@bs.optional]
+      [@mel.optional]
       rx: string,
-      [@bs.optional]
+      [@mel.optional]
       ry: string,
-      [@bs.optional]
+      [@mel.optional]
       sandbox: string,
-      [@bs.optional]
+      [@mel.optional]
       scale: string,
-      [@bs.optional]
+      [@mel.optional]
       scope: string,
-      [@bs.optional]
+      [@mel.optional]
       scoped: bool,
-      [@bs.optional]
+      [@mel.optional]
       scrolling: string,
-      [@bs.optional]
+      [@mel.optional]
       seed: string,
-      [@bs.optional]
+      [@mel.optional]
       selected: bool,
-      [@bs.optional]
+      [@mel.optional]
       shape: string,
-      [@bs.optional]
+      [@mel.optional]
       shapeRendering: string,
-      [@bs.optional]
+      [@mel.optional]
       size: int,
-      [@bs.optional]
+      [@mel.optional]
       sizes: string,
-      [@bs.optional]
+      [@mel.optional]
       slope: string,
-      [@bs.optional]
+      [@mel.optional]
       spacing: string,
-      [@bs.optional]
+      [@mel.optional]
       span: int,
-      [@bs.optional]
+      [@mel.optional]
       specularConstant: string,
-      [@bs.optional]
+      [@mel.optional]
       specularExponent: string,
-      [@bs.optional]
+      [@mel.optional]
       speed: string,
-      [@bs.optional]
+      [@mel.optional]
       spellCheck: bool,
-      [@bs.optional]
+      [@mel.optional]
       spreadMethod: string,
-      [@bs.optional]
+      [@mel.optional]
       src: string,
-      [@bs.optional]
+      [@mel.optional]
       srcDoc: string,
-      [@bs.optional]
+      [@mel.optional]
       srcLang: string,
-      [@bs.optional]
+      [@mel.optional]
       srcSet: string,
-      [@bs.optional]
+      [@mel.optional]
       start: int,
-      [@bs.optional]
+      [@mel.optional]
       startOffset: string,
-      [@bs.optional]
+      [@mel.optional]
       stdDeviation: string,
-      [@bs.optional]
+      [@mel.optional]
       stemh: string,
-      [@bs.optional]
+      [@mel.optional]
       stemv: string,
-      [@bs.optional]
+      [@mel.optional]
       step: float,
-      [@bs.optional]
+      [@mel.optional]
       stitchTiles: string,
-      [@bs.optional]
+      [@mel.optional]
       stopColor: string,
-      [@bs.optional]
+      [@mel.optional]
       stopOpacity: string,
-      [@bs.optional]
+      [@mel.optional]
       strikethroughPosition: string,
-      [@bs.optional]
+      [@mel.optional]
       strikethroughThickness: string,
-      [@bs.optional]
+      [@mel.optional]
       stroke: string,
-      [@bs.optional]
+      [@mel.optional]
       strokeDasharray: string,
-      [@bs.optional]
+      [@mel.optional]
       strokeDashoffset: string,
-      [@bs.optional]
+      [@mel.optional]
       strokeLinecap: string,
-      [@bs.optional]
+      [@mel.optional]
       strokeLinejoin: string,
-      [@bs.optional]
+      [@mel.optional]
       strokeMiterlimit: string,
-      [@bs.optional]
+      [@mel.optional]
       strokeOpacity: string,
-      [@bs.optional]
+      [@mel.optional]
       strokeWidth: string,
-      [@bs.optional]
+      [@mel.optional]
       style: ReactDOM.Style.t,
-      [@bs.optional]
+      [@mel.optional]
       summary: string,
-      [@bs.optional]
+      [@mel.optional]
       suppressContentEditableWarning: bool,
-      [@bs.optional]
+      [@mel.optional]
       surfaceScale: string,
-      [@bs.optional]
+      [@mel.optional]
       systemLanguage: string,
-      [@bs.optional]
+      [@mel.optional]
       tabIndex: int,
-      [@bs.optional]
+      [@mel.optional]
       tableValues: string,
-      [@bs.optional]
+      [@mel.optional]
       target: string,
-      [@bs.optional]
+      [@mel.optional]
       targetX: string,
-      [@bs.optional]
+      [@mel.optional]
       targetY: string,
-      [@bs.optional]
+      [@mel.optional]
       textAnchor: string,
-      [@bs.optional]
+      [@mel.optional]
       textDecoration: string,
-      [@bs.optional]
+      [@mel.optional]
       textLength: string,
-      [@bs.optional]
+      [@mel.optional]
       textRendering: string,
-      [@bs.optional]
+      [@mel.optional]
       title: string,
-      [@bs.optional]
+      [@mel.optional]
       to_: string,
-      [@bs.optional]
+      [@mel.optional]
       transform: string,
-      [@bs.optional] [@bs.as "type"]
+      [@mel.optional] [@mel.as "type"]
       type_: string,
-      [@bs.optional]
+      [@mel.optional]
       typeof: string,
-      [@bs.optional]
+      [@mel.optional]
       u1: string,
-      [@bs.optional]
+      [@mel.optional]
       u2: string,
-      [@bs.optional]
+      [@mel.optional]
       underlinePosition: string,
-      [@bs.optional]
+      [@mel.optional]
       underlineThickness: string,
-      [@bs.optional]
+      [@mel.optional]
       unicode: string,
-      [@bs.optional]
+      [@mel.optional]
       unicodeBidi: string,
-      [@bs.optional]
+      [@mel.optional]
       unicodeRange: string,
-      [@bs.optional]
+      [@mel.optional]
       unitsPerEm: string,
-      [@bs.optional]
+      [@mel.optional]
       useMap: string,
-      [@bs.optional]
+      [@mel.optional]
       vAlphabetic: string,
-      [@bs.optional]
+      [@mel.optional]
       value: string,
-      [@bs.optional]
+      [@mel.optional]
       values: string,
-      [@bs.optional]
+      [@mel.optional]
       vectorEffect: string,
-      [@bs.optional]
+      [@mel.optional]
       version: string,
-      [@bs.optional]
+      [@mel.optional]
       vertAdvX: string,
-      [@bs.optional]
+      [@mel.optional]
       vertAdvY: string,
-      [@bs.optional]
+      [@mel.optional]
       vertOriginX: string,
-      [@bs.optional]
+      [@mel.optional]
       vertOriginY: string,
-      [@bs.optional]
+      [@mel.optional]
       vHanging: string,
-      [@bs.optional]
+      [@mel.optional]
       vIdeographic: string,
-      [@bs.optional]
+      [@mel.optional]
       viewBox: string,
-      [@bs.optional]
+      [@mel.optional]
       viewTarget: string,
-      [@bs.optional]
+      [@mel.optional]
       visibility: string,
-      [@bs.optional]
+      [@mel.optional]
       vMathematical: string,
-      [@bs.optional]
+      [@mel.optional]
       vocab: string,
-      [@bs.optional]
+      [@mel.optional]
       width: string,
-      [@bs.optional]
+      [@mel.optional]
       widths: string,
-      [@bs.optional]
+      [@mel.optional]
       wordSpacing: string,
-      [@bs.optional]
+      [@mel.optional]
       wrap: string,
-      [@bs.optional]
+      [@mel.optional]
       writingMode: string,
-      [@bs.optional]
+      [@mel.optional]
       x: string,
-      [@bs.optional]
+      [@mel.optional]
       x1: string,
-      [@bs.optional]
+      [@mel.optional]
       x2: string,
-      [@bs.optional]
+      [@mel.optional]
       xChannelSelector: string,
-      [@bs.optional]
+      [@mel.optional]
       xHeight: string,
-      [@bs.optional]
+      [@mel.optional]
       xlinkActuate: string,
-      [@bs.optional]
+      [@mel.optional]
       xlinkArcrole: string,
-      [@bs.optional]
+      [@mel.optional]
       xlinkHref: string,
-      [@bs.optional]
+      [@mel.optional]
       xlinkRole: string,
-      [@bs.optional]
+      [@mel.optional]
       xlinkShow: string,
-      [@bs.optional]
+      [@mel.optional]
       xlinkTitle: string,
-      [@bs.optional]
+      [@mel.optional]
       xlinkType: string,
-      [@bs.optional]
+      [@mel.optional]
       xmlBase: string,
-      [@bs.optional]
+      [@mel.optional]
       xmlLang: string,
-      [@bs.optional]
+      [@mel.optional]
       xmlns: string,
-      [@bs.optional]
+      [@mel.optional]
       xmlnsXlink: string,
-      [@bs.optional]
+      [@mel.optional]
       xmlSpace: string,
-      [@bs.optional]
+      [@mel.optional]
       y: string,
-      [@bs.optional]
+      [@mel.optional]
       y1: string,
-      [@bs.optional]
+      [@mel.optional]
       y2: string,
-      [@bs.optional]
+      [@mel.optional]
       yChannelSelector: string,
-      [@bs.optional]
+      [@mel.optional]
       z: string,
-      [@bs.optional]
+      [@mel.optional]
       zoomAndPan: string,
-      [@bs.optional]
+      [@mel.optional]
       onAbort: ReactEvent.Media.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onAnimationEnd: ReactEvent.Animation.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onAnimationIteration: ReactEvent.Animation.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onAnimationStart: ReactEvent.Animation.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onBlur: ReactEvent.Focus.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onCanPlay: ReactEvent.Media.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onCanPlayThrough: ReactEvent.Media.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onChange: ReactEvent.Form.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onClick: ReactEvent.Mouse.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onCompositionEnd: ReactEvent.Composition.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onCompositionStart: ReactEvent.Composition.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onCompositionUpdate: ReactEvent.Composition.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onContextMenu: ReactEvent.Mouse.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onCopy: ReactEvent.Clipboard.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onCut: ReactEvent.Clipboard.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onDoubleClick: ReactEvent.Mouse.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onDrag: ReactEvent.Mouse.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onDragEnd: ReactEvent.Mouse.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onDragEnter: ReactEvent.Mouse.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onDragExit: ReactEvent.Mouse.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onDragLeave: ReactEvent.Mouse.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onDragOver: ReactEvent.Mouse.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onDragStart: ReactEvent.Mouse.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onDrop: ReactEvent.Mouse.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onDurationChange: ReactEvent.Media.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onEmptied: ReactEvent.Media.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onEncrypetd: ReactEvent.Media.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onEnded: ReactEvent.Media.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onError: ReactEvent.Media.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onFocus: ReactEvent.Focus.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onInput: ReactEvent.Form.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onKeyDown: ReactEvent.Keyboard.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onKeyPress: ReactEvent.Keyboard.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onKeyUp: ReactEvent.Keyboard.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onLoadedData: ReactEvent.Media.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onLoadedMetadata: ReactEvent.Media.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onLoadStart: ReactEvent.Media.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onMouseDown: ReactEvent.Mouse.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onMouseEnter: ReactEvent.Mouse.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onMouseLeave: ReactEvent.Mouse.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onMouseMove: ReactEvent.Mouse.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onMouseOut: ReactEvent.Mouse.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onMouseOver: ReactEvent.Mouse.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onMouseUp: ReactEvent.Mouse.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onPaste: ReactEvent.Clipboard.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onPause: ReactEvent.Media.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onPlay: ReactEvent.Media.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onPlaying: ReactEvent.Media.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onProgress: ReactEvent.Media.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onRateChange: ReactEvent.Media.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onScroll: ReactEvent.UI.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onSeeked: ReactEvent.Media.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onSeeking: ReactEvent.Media.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onSelect: ReactEvent.Selection.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onStalled: ReactEvent.Media.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onSubmit: ReactEvent.Form.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onSuspend: ReactEvent.Media.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onTimeUpdate: ReactEvent.Media.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onTouchCancel: ReactEvent.Touch.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onTouchEnd: ReactEvent.Touch.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onTouchMove: ReactEvent.Touch.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onTouchStart: ReactEvent.Touch.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onTransitionEnd: ReactEvent.Transition.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onVolumeChange: ReactEvent.Media.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onWaiting: ReactEvent.Media.t => unit,
-      [@bs.optional]
+      [@mel.optional]
       onWheel: ReactEvent.Wheel.t => unit,
     };
-    [@bs.val] [@bs.module "react"]
+    [@mel.module "react"]
     external createVariadicElement: (string, Js.t({..})) => React.element =
       "createElement";
-    let getOrEmpty = str => {
+    let getOrEmpty = str =>
       switch (str) {
       | Some(str) => " " ++ str
       | None => ""
       };
-    };
     let deleteProp = [%raw "(newProps, key) => delete newProps[key]"];
-    [@bs.val]
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles =
