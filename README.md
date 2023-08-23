@@ -49,7 +49,7 @@ Install the **[vim plugin](https://github.com/ahrefs/vim-styled-ppx/blob/main/RE
 
 ## Contributing
 
-We would love your help improving **styled-ppx**!. Please see our contributing and community guidelines, they'll help you get set up locally and explain the whole process: [CONTRIBUTING.md](./CONTRIBUTING.md).
+We would love your help improving **styled-ppx**! Please see our contributing and community guidelines, they'll help you get set up locally and explain the whole process: [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## License
 
