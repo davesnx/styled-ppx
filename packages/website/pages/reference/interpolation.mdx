@@ -46,7 +46,7 @@ let margin = direction =>
   }
 ```
 
-If you aren't familiar with `%css{:rescript}` extension, take a look [in the `%css` section](./css.md)
+If you aren't familiar with `%css{:rescript}` extension, take a look [in the `%css` section](./css)
 
 ## Example
 
@@ -99,7 +99,7 @@ If time isn't your best friend: There's a workaround for unsupported properties.
 
 There's no way to add unsafe behaviour on CSS definitions. Prefer to keep improving the overall safety via requests/issues than allowing a method for unsafe to all. It will loose the purpose of **styled-ppx**.
 
-The workaround is to use the [Array API](./array.md) to generate `%cx{:rescript}` calls, like this example:
+The workaround is to use the [Array API](./array) to generate `%cx{:rescript}` calls, like this example:
 
 ```rescript
 let block: Css.Rule.t = %css("display: block")
