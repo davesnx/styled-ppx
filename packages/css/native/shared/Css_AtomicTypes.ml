@@ -945,9 +945,30 @@ module PointerEvents = struct
   type nonrec t =
     [ `auto
     | `none
+    | `visiblePainted
+    | `visibleFill
+    | `visibleStroke
+    | `visible
+    | `painted
+    | `fill
+    | `stroke
+    | `all
+    | `inherit_
     ]
 
-  let toString x = match x with `auto -> {js|auto|js} | `none -> {js|none|js}
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `none -> {js|none|js}
+    | `visiblePainted -> {js|visiblePainted|js}
+    | `visibleFill -> {js|visibleFill|js}
+    | `visibleStroke -> {js|visibleStroke|js}
+    | `visible -> {js|visible|js}
+    | `painted -> {js|painted|js}
+    | `fill -> {js|fill|js}
+    | `stroke -> {js|stroke|js}
+    | `all -> {js|all|js}
+    | `inherit_ -> {js|inherit|js}
 end
 
 module Perspective = struct
