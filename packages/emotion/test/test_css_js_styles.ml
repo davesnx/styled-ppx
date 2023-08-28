@@ -223,19 +223,24 @@ let selector_params () =
        className)
 
 let keyframe () =
-  let loading = "random" in
-  (* let loading =
-       CssJs.keyframes
-         [ (0, [ CssJs.transform (`rotate (`deg 0.)) ])
-         ; (100, [ CssJs.transform (`rotate (`deg (-360.))) ])
-         ]
-     in *)
-  let className = CssJs.style [| CssJs.animationName loading |] in
+  let animationName =
+    CssJs.keyframes
+      [|
+        0, [| CssJs.transform (`rotate (`deg 0.)) |];
+        100, [| CssJs.transform (`rotate (`deg (-360.))) |];
+      |]
+  in
+  let className = CssJs.style [| CssJs.animationName animationName |] in
   let css = CssJs.render_style_tag () in
   assert_string css
     (Printf.sprintf
-       ".%s { -webkit-animation-name: random; animation-name: random; }"
-       className)
+       "@keyframes %s { 0%% { -webkit-transform: rotate(0deg); -moz-transform: \
+        rotate(0deg); -ms-transform: rotate(0deg); transform: rotate(0deg); } \
+        100%% { -webkit-transform: rotate(-360deg); -moz-transform: \
+        rotate(-360deg); -ms-transform: rotate(-360deg); transform: \
+        rotate(-360deg); } } .%s { -webkit-animation-name: %s; animation-name: \
+        %s; }"
+       animationName className animationName animationName)
 
 let duplicated_styles_unique () =
   let className1 = CssJs.style [| CssJs.flexGrow 1. |] in

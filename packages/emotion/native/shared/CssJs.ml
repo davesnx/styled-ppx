@@ -212,6 +212,15 @@ let resolve_selectors rules =
   in
   rules |> List.map resolve_selector |> List.flatten
 
+let pp_keyframes hash keyframes =
+  let pp_keyframe (percentage, rules) =
+    Printf.sprintf "%i%% { %s }" percentage (render_declarations rules)
+  in
+  let definition =
+    keyframes |> Array.map pp_keyframe |> Array.to_list |> String.concat " "
+  in
+  Printf.sprintf "@keyframes %s { %s }" hash definition
+
 (* Removes nesting on selectors, run the autoprefixer. *)
 let pp_rules hash rules =
   (* TODO: Refactor with partition or partition_map. List.filter_map is error prone.
@@ -257,12 +266,25 @@ let rec rules_to_string rules =
   List.iter rule_to_string rules;
   Buffer.contents buff
 
+type declarations =
+  | Classnames of rule array
+  | Keyframes of (int * rule array) array
+
+type instance = (string, declarations) Hashtbl.t ref
+
 let instance = ref (Hashtbl.create 1000)
-let get (hash : string) : bool = Hashtbl.mem instance.contents hash
+let get hash = Hashtbl.mem instance.contents hash
 let flush () = Hashtbl.clear instance.contents
 
-let append hash (styles : rule array) =
-  if not (get hash) then Hashtbl.add instance.contents hash styles
+let append hash (styles : declarations) =
+  if get hash then () else Hashtbl.add instance.contents hash styles
+
+let keyframes_to_string keyframes =
+  let pp_keyframe (percentage, rules) =
+    Printf.sprintf "%d%%{%s}" percentage
+      (rules |> Array.to_list |> rules_to_string)
+  in
+  keyframes |> Array.map pp_keyframe |> Array.to_list |> String.concat ""
 
 let render_hash prefix hash styles =
   let is_label = function D ("label", value) -> Some value | _ -> None in
@@ -278,15 +300,29 @@ let style (styles : rule array) =
       Emotion_hash.Hash.default (rules_to_string (Array.to_list styles))
     in
     let className = render_hash "css" hash styles in
-    append className styles;
+    append className (Classnames styles);
     className
+
+let keyframes (keyframes : (int * rule array) array) =
+  match keyframes with
+  | [||] -> ""
+  | _ ->
+    let hash = Emotion_hash.Hash.default (keyframes_to_string keyframes) in
+    let animationName = Printf.sprintf "%s-%s" "animation" hash in
+    append animationName (Keyframes keyframes);
+    animationName
 
 let render_style_tag () =
   let style_tag =
     Hashtbl.fold
       (fun hash rules accumulator ->
-        let rules = pp_rules hash rules |> String.trim in
-        Printf.sprintf "%s %s" accumulator rules)
+        match rules with
+        | Classnames rules ->
+          let rules = pp_rules hash rules |> String.trim in
+          Printf.sprintf "%s %s" accumulator rules
+        | Keyframes keyframes ->
+          let rules = pp_keyframes hash keyframes |> String.trim in
+          Printf.sprintf "%s %s" accumulator rules)
       instance.contents ""
   in
   flush ();
