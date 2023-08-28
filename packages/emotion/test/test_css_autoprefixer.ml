@@ -4,6 +4,7 @@ let assert_string left right =
 let prefix_one_declaration declaration output =
   let hash = Css.style [ declaration ] in
   let css = Css.render_style_tag () in
+  let _ = Css.flush () in
   assert_string css (Printf.sprintf ".%s { %s }" hash output)
 
 let text_size_adjust () =

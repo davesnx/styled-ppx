@@ -1,16 +1,21 @@
 let assert_string left right =
   Alcotest.check Alcotest.string "should be equal" right left
 
+let render_style_tag () =
+  let content = CssJs.render_style_tag () in
+  let _ = CssJs.flush () in
+  content
+
 let one_property () =
   let className = CssJs.style [| CssJs.display `block |] in
-  let css = CssJs.render_style_tag () in
+  let css = render_style_tag () in
   assert_string css (Printf.sprintf ".%s { display: block; }" className)
 
 let multiple_properties () =
   let className =
     CssJs.style [| CssJs.display `block; CssJs.fontSize (`px 10) |]
   in
-  let css = CssJs.render_style_tag () in
+  let css = render_style_tag () in
   assert_string css
     (Printf.sprintf ".%s { display: block; font-size: 10px; }" className)
 
@@ -21,7 +26,7 @@ let multiple_declarations () =
   let className2 =
     CssJs.style [| CssJs.display `block; CssJs.fontSize (`px 99) |]
   in
-  let css = CssJs.render_style_tag () in
+  let css = render_style_tag () in
   assert_string css
     (Printf.sprintf
        ".%s { display: block; font-size: 10px; } .%s { display: block; \
@@ -32,12 +37,12 @@ let label () =
   let className =
     CssJs.style [| CssJs.label "className"; CssJs.display `block |]
   in
-  let css = CssJs.render_style_tag () in
+  let css = render_style_tag () in
   assert_string css (Printf.sprintf ".%s { display: block; }" className)
 
 let label_with_ppx () =
   let className = [%cx {| display: block; |}] in
-  let css = CssJs.render_style_tag () in
+  let css = render_style_tag () in
   assert_string css (Printf.sprintf ".%s { display: block; }" className)
 
 let selector_with_ppx () =
@@ -50,7 +55,7 @@ let selector_with_ppx () =
     }
   |}]
   in
-  let css = CssJs.render_style_tag () in
+  let css = render_style_tag () in
   assert_string css
     (Printf.sprintf ".%s { color: #FF0000; } .%s  > * { color: #0000FF; }"
        className className)
@@ -78,7 +83,7 @@ let selector_with_ppx () =
    let className = [%cx {|
       color: red;
     |}] in
-   let css = CssJs.render_style_tag () in
+   let css = render_style_tag () in
    assert_string css
      (Printf.sprintf ".%s { color: #FF0000; } .%s { color: #FF0000; }" className
         className_with_unique_label) *)
@@ -93,7 +98,7 @@ let selector_with_ppx () =
    let className3 = [%cx {|
       color: red;
     |}] in
-   let css = CssJs.render_style_tag () in
+   let css = render_style_tag () in
    assert_string css
      (Printf.sprintf
         ".%s { color: #FF0000; } .%s { color: #FF0000; } .%s { \
@@ -102,7 +107,7 @@ let selector_with_ppx () =
 
 let float_values () =
   let className = CssJs.style [| CssJs.padding (`rem 10.) |] in
-  let css = CssJs.render_style_tag () in
+  let css = render_style_tag () in
   assert_string css (Printf.sprintf ".%s { padding: 10rem; }" className)
 
 let selector_one_nesting () =
@@ -113,7 +118,7 @@ let selector_one_nesting () =
         CssJs.selector "a" [| CssJs.color CssJs.rebeccapurple |];
       |]
   in
-  let css = CssJs.render_style_tag () in
+  let css = render_style_tag () in
   assert_string css
     (Printf.sprintf ".%s { color: #F0F8FF; } .%s a { color: #663399; }"
        className className)
@@ -129,7 +134,7 @@ let selector_nested () =
           |];
       |]
   in
-  let css = CssJs.render_style_tag () in
+  let css = render_style_tag () in
   assert_string css
     (Printf.sprintf
        ".%s { color: #F0F8FF; } .%s a { display: block; } .%s a div { display: \
@@ -160,7 +165,7 @@ let selector_nested_x10 () =
           |];
       |]
   in
-  let css = CssJs.render_style_tag () in
+  let css = render_style_tag () in
   assert_string css
     (Printf.sprintf
        ".%s { display: flex; } .%s a { display: block; } .%s a div { display: \
@@ -176,7 +181,7 @@ let selector_ampersand () =
         CssJs.selector "& .div" [| CssJs.fontSize (`px 24) |];
       |]
   in
-  let css = CssJs.render_style_tag () in
+  let css = render_style_tag () in
   assert_string css
     (Printf.sprintf ".%s { font-size: 42px; } .%s  .div { font-size: 24px; }"
        className className)
@@ -189,7 +194,7 @@ let selector_ampersand_at_the_middle () =
         CssJs.selector "& div &" [| CssJs.fontSize (`px 24) |];
       |]
   in
-  let css = CssJs.render_style_tag () in
+  let css = render_style_tag () in
   assert_string css
     (Printf.sprintf ".%s { font-size: 42px; } .%s  div .%s { font-size: 24px; }"
        className className className)
@@ -202,7 +207,7 @@ let media_queries () =
         CssJs.media "(max-width: 768px)" [| CssJs.width (`px 300) |];
       |]
   in
-  let css = CssJs.render_style_tag () in
+  let css = render_style_tag () in
   assert_string css
     (Printf.sprintf
        ".%s { max-width: 800px; } @media (max-width: 768px) { .%s { width: \
@@ -216,7 +221,7 @@ let selector_params () =
         CssJs.maxWidth (`px 800); CssJs.firstChild [| CssJs.width (`px 300) |];
       |]
   in
-  let css = CssJs.render_style_tag () in
+  let css = render_style_tag () in
   assert_string css
     (Printf.sprintf
        ".%s { max-width: 800px; } .%s:first-child { width: 300px; }" className
@@ -231,7 +236,7 @@ let keyframe () =
       |]
   in
   let className = CssJs.style [| CssJs.animationName animationName |] in
-  let css = CssJs.render_style_tag () in
+  let css = render_style_tag () in
   assert_string css
     (Printf.sprintf
        "@keyframes %s { 0%% { -webkit-transform: rotate(0deg); -moz-transform: \
@@ -245,7 +250,7 @@ let keyframe () =
 let duplicated_styles_unique () =
   let className1 = CssJs.style [| CssJs.flexGrow 1. |] in
   let className2 = CssJs.style [| CssJs.flexGrow 1. |] in
-  let css = CssJs.render_style_tag () in
+  let css = render_style_tag () in
   assert_string className1 className2;
   assert_string css (Printf.sprintf ".%s { flex-grow: 1; }" className1)
 

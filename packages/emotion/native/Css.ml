@@ -235,27 +235,32 @@ type declarations =
   | Classnames of rule list
   | Keyframes of (int * rule list) list
 
-class stylesheet =
-  object
-    val mutable rules : (string * declarations) list = []
-    val mutable hashes : string list = []
+module Stylesheet = struct
+  module Hashes = Set.Make (String)
 
-    method push item =
-      let hash = fst item in
-      if List.mem hash hashes then ()
-      else (
-        hashes <- hash :: hashes;
-        rules <- item :: rules)
+  type 'a t = {
+    mutable rules : (string * declarations) list;
+    mutable hashes : Hashes.t;
+  }
 
-    method get_all =
-      let values = List.rev rules in
-      rules <- [];
-      hashes <- [];
-      values
-  end
+  let make () = { rules = []; hashes = Hashes.empty }
 
-let instance = new stylesheet
-let append hash (styles : declarations) = instance#push @@ (hash, styles)
+  let push stylesheet item =
+    let hash = fst item in
+    if Hashes.mem hash stylesheet.hashes then ()
+    else (
+      stylesheet.hashes <- Hashes.add hash stylesheet.hashes;
+      stylesheet.rules <- item :: stylesheet.rules)
+
+  let get_all stylesheet = List.rev stylesheet.rules
+
+  let flush stylesheet =
+    stylesheet.rules <- [];
+    stylesheet.hashes <- Hashes.empty
+end
+
+let instance = Stylesheet.make ()
+let flush () = Stylesheet.flush instance
 
 (* rules_to_string renders the rule in a format where the hash matches with `@emotion/serialise`
    It doesn't render any whitespace. (compared to pp_rules)
@@ -299,7 +304,7 @@ let style (styles : rule list) =
   | _ ->
     let hash = Emotion_hash.Hash.default (rules_to_string styles) in
     let className = render_hash "css" hash styles in
-    append className (Classnames styles);
+    Stylesheet.push instance (className, Classnames styles);
     className
 
 let keyframes (keyframes : (int * rule list) list) =
@@ -308,11 +313,11 @@ let keyframes (keyframes : (int * rule list) list) =
   | _ ->
     let hash = Emotion_hash.Hash.default (keyframes_to_string keyframes) in
     let animationName = Printf.sprintf "%s-%s" "animation" hash in
-    append animationName (Keyframes keyframes);
+    Stylesheet.push instance (animationName, Keyframes keyframes);
     animationName
 
 let render_style_tag () =
-  instance#get_all
+  Stylesheet.get_all instance
   |> List.fold_left
        (fun accumulator (hash, rules) ->
          match rules with

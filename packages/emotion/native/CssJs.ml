@@ -292,57 +292,29 @@ type declarations =
   | Classnames of rule array
   | Keyframes of (int * rule array) array
 
-class stylesheet =
-  object
-    val mutable rules : (string * declarations) list = []
-    val mutable hashes : string list = []
+module Stylesheet = struct
+  module Hashes = Set.Make (String)
 
-    method push item =
-      let hash = fst item in
-      if List.mem hash hashes then ()
-      else (
-        hashes <- hash :: hashes;
-        rules <- item :: rules)
+  type 'a t = {
+    mutable rules : (string * declarations) list;
+    mutable hashes : Hashes.t;
+  }
 
-    method get_all =
-      let values = List.rev rules in
-      rules <- [];
-      hashes <- [];
-      values
-  end
+  let make () = { rules = []; hashes = Hashes.empty }
 
-(* module Stylesheet : sig
-     type 'a t
+  let push stylesheet item =
+    let hash = fst item in
+    if Hashes.mem hash stylesheet.hashes then ()
+    else (
+      stylesheet.hashes <- Hashes.add hash stylesheet.hashes;
+      stylesheet.rules <- item :: stylesheet.rules)
 
-     val create : unit -> 'a t
-     val insert : 'a t -> string -> 'a -> unit
-     val get_all : 'a t -> (string * 'a) list
-     val print_all : 'a t -> unit
-   end = struct
-     type 'a t = {
-       mutable rules : (string * 'a) list;
-       mutable hashes : string list;
-     }
+  let get_all stylesheet = List.rev stylesheet.rules
 
-     let create () = { rules = []; hashes = [] }
-
-     let insert stylesheet hash value =
-       if List.mem hash stylesheet.hashes then ()
-       else stylesheet.hashes <- hash :: stylesheet.hashes;
-       stylesheet.rules <- (hash, value) :: stylesheet.rules
-
-     let get_all stylesheet =
-       let values = List.rev stylesheet.rules in
-       stylesheet.rules <- [];
-       stylesheet.hashes <- [];
-       values
-
-     let print_all stylesheet =
-       stylesheet.rules |> List.iter (fun (hash, _value) -> print_endline hash)
-   end *)
-
-let instance = new stylesheet
-let append hash (styles : declarations) = instance#push @@ (hash, styles)
+  let flush stylesheet =
+    stylesheet.rules <- [];
+    stylesheet.hashes <- Hashes.empty
+end
 
 let keyframes_to_string keyframes =
   let pp_keyframe (percentage, rules) =
@@ -357,6 +329,9 @@ let render_hash prefix hash styles =
   | None -> Printf.sprintf "%s-%s" prefix hash
   | Some label -> Printf.sprintf "%s-%s-%s" prefix hash label
 
+let instance = Stylesheet.make ()
+let flush () = Stylesheet.flush instance
+
 let style (styles : rule array) =
   match styles with
   | [||] -> ""
@@ -365,7 +340,7 @@ let style (styles : rule array) =
       Emotion_hash.Hash.default (rules_to_string (Array.to_list styles))
     in
     let className = render_hash "css" hash styles in
-    append className (Classnames styles);
+    Stylesheet.push instance (className, Classnames styles);
     className
 
 let keyframes (keyframes : (int * rule array) array) =
@@ -374,11 +349,11 @@ let keyframes (keyframes : (int * rule array) array) =
   | _ ->
     let hash = Emotion_hash.Hash.default (keyframes_to_string keyframes) in
     let animationName = Printf.sprintf "%s-%s" "animation" hash in
-    append animationName (Keyframes keyframes);
+    Stylesheet.push instance (animationName, Keyframes keyframes);
     animationName
 
 let render_style_tag () =
-  instance#get_all
+  Stylesheet.get_all instance
   |> List.fold_left
        (fun accumulator (hash, rules) ->
          match rules with
