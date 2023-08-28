@@ -235,14 +235,27 @@ type declarations =
   | Classnames of rule list
   | Keyframes of (int * rule list) list
 
-type instance = (string, declarations) Hashtbl.t ref
+class stylesheet =
+  object
+    val mutable rules : (string * declarations) list = []
+    val mutable hashes : string list = []
 
-let instance = ref (Hashtbl.create 1000)
-let get hash = Hashtbl.mem instance.contents hash
-let flush () = Hashtbl.clear instance.contents
+    method push item =
+      let hash = fst item in
+      if List.mem hash hashes then ()
+      else (
+        hashes <- hash :: hashes;
+        rules <- item :: rules)
 
-let append hash (styles : declarations) =
-  if get hash then () else Hashtbl.add instance.contents hash styles
+    method get_all =
+      let values = List.rev rules in
+      rules <- [];
+      hashes <- [];
+      values
+  end
+
+let instance = new stylesheet
+let append hash (styles : declarations) = instance#push @@ (hash, styles)
 
 (* rules_to_string renders the rule in a format where the hash matches with `@emotion/serialise`
    It doesn't render any whitespace. (compared to pp_rules)
@@ -299,17 +312,15 @@ let keyframes (keyframes : (int * rule list) list) =
     animationName
 
 let render_style_tag () =
-  let style_tag =
-    Hashtbl.fold
-      (fun hash rules accumulator ->
-        match rules with
-        | Classnames rules ->
-          let rules = pp_rules hash rules |> String.trim in
-          Printf.sprintf "%s %s" accumulator rules
-        | Keyframes keyframes ->
-          let rules = pp_keyframes hash keyframes |> String.trim in
-          Printf.sprintf "%s %s" accumulator rules)
-      instance.contents ""
-  in
-  flush ();
-  String.trim style_tag
+  instance#get_all
+  |> List.fold_left
+       (fun accumulator (hash, rules) ->
+         match rules with
+         | Classnames rules ->
+           let rules = pp_rules hash rules |> String.trim in
+           Printf.sprintf "%s %s" accumulator rules
+         | Keyframes keyframes ->
+           let rules = pp_keyframes hash keyframes |> String.trim in
+           Printf.sprintf "%s %s" accumulator rules)
+       ""
+  |> String.trim

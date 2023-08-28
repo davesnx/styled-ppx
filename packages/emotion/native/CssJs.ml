@@ -292,14 +292,57 @@ type declarations =
   | Classnames of rule array
   | Keyframes of (int * rule array) array
 
-type instance = (string, declarations) Hashtbl.t ref
+class stylesheet =
+  object
+    val mutable rules : (string * declarations) list = []
+    val mutable hashes : string list = []
 
-let instance = ref (Hashtbl.create 1000)
-let get hash = Hashtbl.mem instance.contents hash
-let flush () = Hashtbl.clear instance.contents
+    method push item =
+      let hash = fst item in
+      if List.mem hash hashes then ()
+      else (
+        hashes <- hash :: hashes;
+        rules <- item :: rules)
 
-let append hash (styles : declarations) =
-  if get hash then () else Hashtbl.add instance.contents hash styles
+    method get_all =
+      let values = List.rev rules in
+      rules <- [];
+      hashes <- [];
+      values
+  end
+
+(* module Stylesheet : sig
+     type 'a t
+
+     val create : unit -> 'a t
+     val insert : 'a t -> string -> 'a -> unit
+     val get_all : 'a t -> (string * 'a) list
+     val print_all : 'a t -> unit
+   end = struct
+     type 'a t = {
+       mutable rules : (string * 'a) list;
+       mutable hashes : string list;
+     }
+
+     let create () = { rules = []; hashes = [] }
+
+     let insert stylesheet hash value =
+       if List.mem hash stylesheet.hashes then ()
+       else stylesheet.hashes <- hash :: stylesheet.hashes;
+       stylesheet.rules <- (hash, value) :: stylesheet.rules
+
+     let get_all stylesheet =
+       let values = List.rev stylesheet.rules in
+       stylesheet.rules <- [];
+       stylesheet.hashes <- [];
+       values
+
+     let print_all stylesheet =
+       stylesheet.rules |> List.iter (fun (hash, _value) -> print_endline hash)
+   end *)
+
+let instance = new stylesheet
+let append hash (styles : declarations) = instance#push @@ (hash, styles)
 
 let keyframes_to_string keyframes =
   let pp_keyframe (percentage, rules) =
@@ -335,17 +378,15 @@ let keyframes (keyframes : (int * rule array) array) =
     animationName
 
 let render_style_tag () =
-  let style_tag =
-    Hashtbl.fold
-      (fun hash rules accumulator ->
-        match rules with
-        | Classnames rules ->
-          let rules = pp_rules hash rules |> String.trim in
-          Printf.sprintf "%s %s" accumulator rules
-        | Keyframes keyframes ->
-          let rules = pp_keyframes hash keyframes |> String.trim in
-          Printf.sprintf "%s %s" accumulator rules)
-      instance.contents ""
-  in
-  flush ();
-  String.trim style_tag
+  instance#get_all
+  |> List.fold_left
+       (fun accumulator (hash, rules) ->
+         match rules with
+         | Classnames rules ->
+           let rules = pp_rules hash rules |> String.trim in
+           Printf.sprintf "%s %s" accumulator rules
+         | Keyframes keyframes ->
+           let rules = pp_keyframes hash keyframes |> String.trim in
+           Printf.sprintf "%s %s" accumulator rules)
+       ""
+  |> String.trim
