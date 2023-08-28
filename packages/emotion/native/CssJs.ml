@@ -5,8 +5,30 @@ module Core = Css_native.Css_Js_Core
 module Array = struct
   include Stdlib.Array
 
-  let filter_map arr fn = Belt.Array.keepMap fn arr
-  let iter arr fn = Belt.Array.forEach fn arr
+  external getUnsafe : 'a array -> int -> 'a = "%array_unsafe_get"
+  external setUnsafe : 'a array -> int -> 'a -> unit = "%array_unsafe_set"
+
+  let filter_map a f =
+    let l = length a in
+    let r = ref None in
+    let j = ref 0 in
+    for i = 0 to l - 1 do
+      let v = getUnsafe a i in
+      match f v with
+      | None -> ()
+      | Some v ->
+        let r =
+          match !r with
+          | None ->
+            let newr = Array.make l v in
+            r := Some newr;
+            newr
+          | Some r -> r
+        in
+        setUnsafe r !j v;
+        incr j
+    done;
+    match !r with None -> [||] | Some r -> Stdlib.Array.sub r 0 !j
 end
 
 module Autoprefixer = struct

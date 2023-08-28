@@ -45,7 +45,6 @@ pin: ## Pin dependencies
 	@opam pin add melange.dev "https://github.com/melange-re/melange.git#d4868a5300c8c6e9f1b387aedb85ded4a705bc0a" -y
 	@opam pin add reason.dev "https://github.com/reasonml/reason.git#b283f335f90e3aaa398bff8e82761038ee42a99d" -y
 	@opam pin add ppxlib.dev "https://github.com/ocaml-ppx/ppxlib.git#8b8987c5690ad839348d96bf52471b03b88f06ed" -y
-	@opam pin add server-reason-react.dev "https://github.com/ml-in-barcelona/server-reason-react.git#bf99d8dbc1e8c686c5b4c9530e5036ecd350ea42" -y
 
 .PHONY: create-switch
 create-switch: ## Create opam switch

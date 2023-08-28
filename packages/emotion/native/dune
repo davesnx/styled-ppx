@@ -3,11 +3,5 @@
 (library
  (name emotion_native)
  (public_name styled-ppx.emotion_native)
- (libraries
-  server-reason-react.js
-  server-reason-react.belt
-  styled-ppx.css_native
-  styled-ppx.emotion-hash)
- (wrapped false)
- (preprocess
-  (pps server-reason-react.pipe_first_ppx)))
+ (libraries styled-ppx.css_native styled-ppx.emotion-hash)
+ (wrapped false))
