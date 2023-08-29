@@ -1,5 +1,4 @@
 module Make = (Builder: Ppxlib.Ast_builder.S) => {
-  module Ast_helper = Ppxlib_ast.Ast_helper;
   open Ppxlib;
   open Builder;
   open Css_spec_parser;
