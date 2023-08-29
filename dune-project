@@ -29,7 +29,6 @@
   (depends
    (ocaml (and (>= 4.14.0) (< 5.0.0)))
    (menhir (= 20220210))
-   (ocaml-migrate-parsetree (= 2.4.0))
    (ppx_deriving (>= 5.0))
    (ppx_deriving_yojson (>= 3.7.0))
    (ppxlib (>= 0.27.0))
