@@ -35,7 +35,7 @@ format-check: ## Checks if format is correct
 fmt format: ## Formats code
 	$(DUNE) build @fmt --auto-promote
 
-.PHONY: init
+.PHONY: setup-githooks
 setup-githooks: ## Setup githooks
 	@git config core.hooksPath .githooks
 
