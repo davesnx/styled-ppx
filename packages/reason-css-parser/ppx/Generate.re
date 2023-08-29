@@ -1,12 +1,10 @@
-open Ppxlib;
-
-module Ast_helper = Ppxlib.Ast_helper;
-
-module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
-  open Ast_builder;
+module Make = (Builder: Ppxlib.Ast_builder.S) => {
+  module Ast_helper = Ppxlib_ast.Ast_helper;
+  open Ppxlib;
+  open Builder;
   open Css_spec_parser;
 
-  let txt = txt => {Location.loc: Ast_builder.loc, txt};
+  let txt = txt => {Location.loc: Builder.loc, txt};
 
   let kebab_case_to_snake_case = name =>
     name |> String.split_on_char('-') |> String.concat("_");
@@ -248,11 +246,8 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
 
   /* TODO: Move this to Standard and use as ppx_runtime */
   let standard_types = {
-    open Ppxlib.Ast_builder.Default;
-
     let type_ = (~kind=Parsetree.Ptype_abstract, name, core_type) => {
-      type_declaration(
-        ~loc=Location.none,
+      Builder.type_declaration(
         ~name={txt: name, loc: Location.none},
         ~params=[],
         ~cstrs=[],
@@ -417,8 +412,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
     };
   };
 
-  let add_types = (~loc, bindings) => {
-    open Ppxlib;
+  let add_types = (~loc, bindings): list(Ppxlib.structure_item) => {
     let new_bindings =
       bindings
       |> List.map(value_binding => {
@@ -438,7 +432,7 @@ module Make = (Ast_builder: Ppxlib.Ast_builder.S) => {
   let create_variant_name = (type_name, name) =>
     type_name ++ "__make__" ++ name;
 
-  let txt = txt => {Location.loc: Ast_builder.loc, txt};
+  let txt = txt => {Location.loc: Builder.loc, txt};
 
   let construct = (~expr=None, name) =>
     pexp_construct(txt(Lident(name)), expr);
