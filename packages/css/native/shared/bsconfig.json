@@ -1,9 +1,0 @@
-{
-  "name": "bs-css-emotion",
-  "refmt": 3,
-  "warnings": {
-    "number": "+A-32-34-44",
-    "error": "+A-32-34-44"
-  },
-  "sources": ["."]
-}

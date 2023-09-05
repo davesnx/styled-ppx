@@ -1,8 +1,8 @@
-include Bs_css.Css_Colors
-include Bs_css.Css_Js_Core
-module Types = Bs_css.Css_AtomicTypes
+include Css_Colors
+include Css_Js_Core
+module Types = Css_AtomicTypes
 
-include Bs_css.Css_Js_Core.Make (struct
+include Css_Js_Core.Make (struct
   type styleEncoding = string
   type renderer = Js.Json.t
 
@@ -44,8 +44,8 @@ external cache : cache = "cache" [@@bs.module "@emotion/cache"]
 let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
     =
   let fontFace =
-    Bs_css.Css_Js_Core.fontFace ~fontFamily ~src ?fontStyle ?fontWeight
-      ?fontDisplay ?sizeAdjust ()
+    Css_Js_Core.fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay
+      ?sizeAdjust ()
   in
   insertRule fontFace [@bs];
   fontFamily

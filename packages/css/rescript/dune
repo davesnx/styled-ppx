@@ -1,0 +1,13 @@
+(copy_files
+ (files ../js/**[!.pp].ml))
+
+(rule
+ (alias all)
+ (action
+  (progn
+   (with-stdout-to
+    bsconfig.json
+    (run echo "{ \"name\": \"bs-css\", \"sources\": [\".\" ]}"))
+   (with-stdout-to
+    package.json
+    (run echo "{\"name\": \"bs-css\"}")))))

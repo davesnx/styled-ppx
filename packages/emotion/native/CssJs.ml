@@ -1,6 +1,6 @@
-include Css_native.Css_Colors
-include Css_native.Css_Js_Core
-module Core = Css_native.Css_Js_Core
+include Css_Colors
+include Css_Js_Core
+module Core = Css_Js_Core
 
 module Array = struct
   include Stdlib.Array

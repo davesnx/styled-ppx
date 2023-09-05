@@ -1,6 +1,0 @@
-{
-  "name": "bs-css",
-  "dependencies": {
-    "bs-platform": "^9.0.2"
-  }
-}
