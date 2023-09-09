@@ -109,14 +109,14 @@ jobs:
         if: matrix.os == 'ubuntu-20.04'
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.os }}
+          name: runtime/css
           path: _build/default/packages/css/rescript
 
       - name: Upload runtime artifacts for @davesnx/styled-ppx/runtime/emotion
         if: matrix.os == 'ubuntu-20.04'
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.os }}
+          name: runtime/emotion
           path: _build/default/packages/emotion/rescript
 
       - name: Save cache when not Windows
