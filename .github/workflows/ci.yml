@@ -105,14 +105,14 @@ jobs:
           name: ${{ matrix.os }}
           path: _build/default/bin/bin.exe
 
-      - name: Upload runtime artifacts for styled-ppx-css
+      - name: Upload runtime artifacts for @davesnx/styled-ppx/runtime/css
         if: matrix.os == 'ubuntu-20.04'
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.os }}
           path: _build/default/packages/css/rescript
 
-      - name: Upload runtime artifacts for styled-ppx-emotion
+      - name: Upload runtime artifacts for @davesnx/styled-ppx/runtime/emotion
         if: matrix.os == 'ubuntu-20.04'
         uses: actions/upload-artifact@v3
         with:
@@ -214,64 +214,6 @@ jobs:
           else
               echo "New verison and remote version are equal, nothing to publish"
           fi
-
-      - name: Release (@davesnx/styled-ppx-css) package
-        if: ${{ success() && github.event_name != 'pull_request' }}
-        working-directory: ./_release/css
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
-        run: |
-          npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
-          npm config set scope "@davesnx"
-          REMOTE=$(npm view @davesnx/styled-ppx-css version)
-          CURRENT=$(jq -r '.version' package.json)
-          if [ "$REMOTE" != "$CURRENT" ]
-          then
-              npm publish --access public
-          else
-              echo "New verison and remote version are equal, nothing to publish"
-          fi
-
-      - name: Release (@davesnx/styled-ppx-emotion) package
-        if: ${{ success() && github.event_name != 'pull_request' }}
-        working-directory: ./_release/emotion
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
-        run: |
-          npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
-          npm config set scope "@davesnx"
-          REMOTE=$(npm view @davesnx/styled-ppx-emotion version)
-          CURRENT=$(jq -r '.version' package.json)
-          if [ "$REMOTE" != "$CURRENT" ]
-          then
-              npm publish --access public
-          else
-              echo "New verison and remote version are equal, nothing to publish"
-          fi
-
-      - name: Release nightly (@davesnx/styled-ppx-css) package
-        if: ${{ success() && github.event_name == 'pull_request' && github.event.pull_request.user.login == 'davesnx' }}
-        working-directory: ./_release/css
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
-        run: |
-          npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
-          npm config set scope "@davesnx"
-          npm version prerelease --preid ${{ steps.sha.outputs.sha_short }} -no-git-tag-version
-          npm publish --access public --tag nightly
-          echo "version=$(npm view @davesnx/styled-ppx-css@nightly version)" >> $GITHUB_OUTPUT
-
-      - name: Release nightly (@davesnx/styled-ppx-emotion) package
-        if: ${{ success() && github.event_name == 'pull_request' && github.event.pull_request.user.login == 'davesnx' }}
-        working-directory: ./_release/emotion
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
-        run: |
-          npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
-          npm config set scope "@davesnx"
-          npm version prerelease --preid ${{ steps.sha.outputs.sha_short }} -no-git-tag-version
-          npm publish --access public --tag nightly
-          echo "version=$(npm view @davesnx/styled-ppx-emotion@nightly version)" >> $GITHUB_OUTPUT
 
       - uses: mshick/add-pr-comment@v2
         if: ${{ steps.nightly.outputs.version }}
