@@ -185,6 +185,18 @@ jobs:
       #     name: windows-latest
       #     path: _release/platform-windows-x64
 
+      - name: Download runtime-css artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: runtime-css
+          path: _release/runtime/css
+
+      - name: Download runtime-emotion artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: runtime-emotion
+          path: _release/runtime/emotion
+
       - name: Release nightly (@davesnx/styled-ppx) package
         if: ${{ success() && github.event_name == 'pull_request' && github.event.pull_request.user.login == 'davesnx' }}
         id: nightly
