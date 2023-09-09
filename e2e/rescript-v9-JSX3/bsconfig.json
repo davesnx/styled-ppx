@@ -27,7 +27,8 @@
   "namespace": true,
   "bs-dependencies": [
     "@rescript/react",
-    "bs-css-emotion",
+    "@davesnx/styled-ppx-css",
+    "@davesnx/styled-ppx-emotion",
     "@rescriptbr/react-testing-library",
     "rescript-vitest",
     "rescript-webapi"
