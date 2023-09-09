@@ -9,9 +9,9 @@
     bsconfig.json
     (run
      echo
-     "{\"name\": \"bs-css-emotion\", \"sources\": [\".\"], \"bs-dependencies\": [\"bs-css\"]}"))
+     "{\"name\": \"@davesnx/styled-ppx-emotion\", \"sources\": [\".\"], \"bs-dependencies\": [\"@davesnx/styled-ppx-css\"]}"))
    (with-stdout-to
     package.json
     (run
      echo
-     "{\"name\": \"bs-css-emotion\", \"dependencies\": { \"@emotion/css\": \"^11.11.2\" } }")))))
+     "{\"name\": \"@davesnx/styled-ppx-emotion\", \"dependencies\": { \"@emotion/css\": \"^11.11.2\" } }")))))

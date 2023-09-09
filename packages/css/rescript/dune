@@ -7,7 +7,9 @@
   (progn
    (with-stdout-to
     bsconfig.json
-    (run echo "{ \"name\": \"bs-css\", \"sources\": [\".\" ]}"))
+    (run
+     echo
+     "{ \"name\": \"@davesnx/styled-ppx-css\", \"sources\": [\".\"]}"))
    (with-stdout-to
     package.json
-    (run echo "{\"name\": \"bs-css\"}")))))
+    (run echo "{\"name\": \"@davesnx/styled-ppx-css\"}")))))
