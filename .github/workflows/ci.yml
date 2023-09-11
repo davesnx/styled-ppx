@@ -189,13 +189,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: runtime-css
-          path: _release/css
+          path: css
 
       - name: Download runtime-emotion artifacts
         uses: actions/download-artifact@v3
         with:
           name: runtime-emotion
-          path: _release/emotion
+          path: emotion
 
       - name: Release nightly (@davesnx/styled-ppx) package
         if: ${{ success() && github.event_name == 'pull_request' && github.event.pull_request.user.login == 'davesnx' }}
@@ -204,6 +204,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
         run: |
+          ls -lhsa
           npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
           npm config set scope "@davesnx"
           npm version prerelease --preid ${{ steps.sha.outputs.sha_short }} -no-git-tag-version
