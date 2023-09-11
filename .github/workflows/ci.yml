@@ -189,13 +189,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: runtime-css
-          path: css
+          path: _release/css
 
       - name: Download runtime-emotion artifacts
         uses: actions/download-artifact@v3
         with:
           name: runtime-emotion
-          path: emotion
+          path: _release/emotion
 
       - name: Release nightly (@davesnx/styled-ppx) package
         if: ${{ success() && github.event_name == 'pull_request' && github.event.pull_request.user.login == 'davesnx' }}

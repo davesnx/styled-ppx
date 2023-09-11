@@ -41,14 +41,6 @@ fs.copyFileSync(
   path.join(dst, "postinstall.js")
 );
 
-const filesToTouch = ["styled-ppx.exe"];
-
-for (const file of filesToTouch) {
-  const p = path.join(dst, file);
-  mkdirpSync(path.dirname(p));
-  fs.writeFileSync(p, "");
-}
-
 const pkgJson = {
   name: packageJson.name,
   version: packageJson.version,
@@ -58,13 +50,6 @@ const pkgJson = {
   repository: packageJson.repository,
   scripts: {
     postinstall: "node postinstall.js",
-  },
-  bin: {
-    /* This binary is the same as the release-postinstall "ppx" that falls into the root of the project
-      We could remove this when we release 1.0. I'm keeping this as fallback since most 0.20 users might
-      have @davesnx/styled-ppx/styled-ppx in their bsconfig
-     */
-    "styled-ppx": "styled-ppx.exe",
   },
   files: [
     "platform-windows-x64/",
