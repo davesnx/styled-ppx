@@ -9,7 +9,7 @@
     bsconfig.json
     (run
      echo
-     "{ \"name\": \"@davesnx/styled-ppx-css\", \"sources\": [\".\"]}"))
+     "{ \"name\": \"@davesnx/styled-ppx/css\", \"sources\": [\".\"]}"))
    (with-stdout-to
     package.json
-    (run echo "{\"name\": \"@davesnx/styled-ppx-css\"}")))))
+    (run echo "{\"name\": \"@davesnx/styled-ppx/css\"}")))))
