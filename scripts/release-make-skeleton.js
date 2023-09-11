@@ -52,6 +52,8 @@ const pkgJson = {
     postinstall: "node postinstall.js",
   },
   files: [
+    "css/",
+    "emotion/",
     "platform-windows-x64/",
     "platform-linux-x64/",
     "platform-darwin-x64/",
