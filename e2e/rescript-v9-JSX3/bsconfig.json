@@ -9,11 +9,17 @@
   "warnings": {
     "number": "-48"
   },
-  "sources": {
+  "sources": [{
     "dir": "src",
     "subdirs": true,
     "type": "dev"
-  },
+  }, {
+    "dir": "../../_build/default/packages/css/rescript",
+    "subdirs": true
+  }, {
+    "dir": "../../_build/default/packages/emotion/rescript",
+    "subdirs": true
+  }],
   "package-specs": [
     {
       "module": "es6",
@@ -27,8 +33,6 @@
   "namespace": true,
   "bs-dependencies": [
     "@rescript/react",
-    "@davesnx/styled-ppx-css",
-    "@davesnx/styled-ppx-emotion",
     "@rescriptbr/react-testing-library",
     "rescript-vitest",
     "rescript-webapi"
