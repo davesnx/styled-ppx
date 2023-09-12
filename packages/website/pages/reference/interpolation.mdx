@@ -69,7 +69,7 @@ margin: $(Size.small) $(Size.small); // -> margin: 10px 10px;
 
 ## Type-safety
 
-We introduced here the API from [bs-css](https://github.com/giraud/bs-css) to define the value of `margin`. We expect you to use it to make sure the values are interpoilated with the right type. In the example above `margin` expects one of:
+We introduced here the API from [`CssJs`](./runtime) to define the value of `margin`. We expect you to use it to make sure the values are interpoilated with the right type. In the example above `margin` expects one of:
 
 ```rescript
 auto | ch(float) | em(float) | ex(float) | rem(float) | vh(float) | vw(float) | vmin(float) | vmax(float) | px(int) | pxFloat(float) | cm(float) | mm(float) | inch(float) | pc(float) | pt(int) | zero | calc([ | add | sub], t, t) | percent(float)`

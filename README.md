@@ -20,8 +20,8 @@ Add `"@davesnx/styled-ppx/ppx"` under bsconfig `"ppx-flags"`:
 {
   "bs-dependencies": [
     "@rescript/react",
-    "bs-css",
-    "bs-css-emotion"
++   "@davesnx/styled-ppx/css",
++   "@davesnx/styled-ppx/emotion"
   ],
 + "ppx-flags": ["@davesnx/styled-ppx/ppx"]
 }
