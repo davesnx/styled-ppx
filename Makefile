@@ -35,24 +35,23 @@ format-check: ## Checks if format is correct
 fmt format: ## Formats code
 	$(DUNE) build @fmt --auto-promote
 
-.PHONY: init
+.PHONY: setup-githooks
 setup-githooks: ## Setup githooks
 	@git config core.hooksPath .githooks
 
 .PHONY: pin
 pin: ## Pin dependencies
-# @opam pin add dune.dev "https://github.com/ocaml/dune.git#7fdf0ca379f773deb21f97c7a66c1b9b0bbd4f98" -y
+	@opam pin add melange.dev "https://github.com/melange-re/melange.git#d4868a5300c8c6e9f1b387aedb85ded4a705bc0a" -y
 	@opam pin add reason.dev "https://github.com/reasonml/reason.git#b283f335f90e3aaa398bff8e82761038ee42a99d" -y
 	@opam pin add ppxlib.dev "https://github.com/ocaml-ppx/ppxlib.git#8b8987c5690ad839348d96bf52471b03b88f06ed" -y
-# @opam pin add melange.dev "https://github.com/melange-re/melange.git#da421be55e755096403425ed3c260486deab61f3" -y
-# @opam pin add rescript-syntax.dev "https://github.com/melange-re/melange.git#2ee0ef23bbc44933f92cd9c4b223e9ef915ff0df" -y
+	@opam pin add server-reason-react.dev "https://github.com/ml-in-barcelona/server-reason-react.git#f46fa4bd9a5490bd3a6d64e1e77dab66028a6a2f" -y
 
 .PHONY: create-switch
 create-switch: ## Create opam switch
-	@opam switch create . 4.14.0 --deps-only --with-test
+	@opam switch create . 4.14.1 --deps-only --with-test --no-install
 
 .PHONY: install
-install: ## Update the package dependencies when new deps are added to dune-project
+install: ## Install project dependencies
 	@opam install . --deps-only --with-test
 	@yarn install
 
@@ -121,8 +120,12 @@ test_e2e: ## Run End-to-end tests for JSX3
 test_string_interpolation: ## Run string_interpolation tests
 	$(DUNE) build @string_interpolation_test
 
+.PHONY: test_emotion
+test_emotion: ## Run emotion tests
+	$(DUNE) build @emotion_test
+
 .PHONY: test_all
-test_all: build test_typecheck test_css_support test_ppx_snapshot test_parser test_css_lexer test_reason_css_parser test_css_spec_parser test_css_spec_types test_string_interpolation test_e2e
+test_all: build test_typecheck test_css_support test_ppx_snapshot test_parser test_css_lexer test_reason_css_parser test_css_spec_parser test_css_spec_types test_string_interpolation test_emotion test_e2e
 
 # Debug commands
 

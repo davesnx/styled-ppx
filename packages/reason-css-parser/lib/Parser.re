@@ -254,7 +254,7 @@ and font_stretch_absolute = [%value.rec
   "'normal' | 'ultra-condensed' | 'extra-condensed' | 'condensed' | 'semi-condensed' | 'semi-expanded' | 'expanded' | 'extra-expanded' | 'ultra-expanded' | <extended-percentage>"
 ]
 and font_variant_css21 = [%value.rec "'normal' | 'small-caps'"]
-and font_weight_absolute = [%value.rec "'normal' | 'bold' | <number>"]
+and font_weight_absolute = [%value.rec "'normal' | 'bold' | <integer>"]
 and function__webkit_gradient = [%value.rec
   "-webkit-gradient( <-webkit-gradient-type> ',' <-webkit-gradient-point> [ ',' <-webkit-gradient-point> | ',' <-webkit-gradient-radius> ',' <-webkit-gradient-point> ] [ ',' <-webkit-gradient-radius> ]? [ ',' <-webkit-gradient-color-stop> ]* )"
 ]

@@ -11,11 +11,11 @@
     "start": "npm run test"
   },
   "dependencies": {
+    "@davesnx/styled-ppx-css": "file:../../_build/default/packages/css/rescript",
+    "@davesnx/styled-ppx-emotion": "file:../../_build/default/packages/emotion/rescript",
     "@emotion/css": "^11.11.2",
     "@rescript/react": "^0.10.0",
     "@rescriptbr/react-testing-library": "^1.0.1",
-    "bs-css": "file:../../packages/bs-css",
-    "bs-css-emotion": "file:../../packages/bs-css-emotion",
     "concurrently": "^5.1.0",
     "jsdom": "^21.1.0",
     "react": "^16.12.0",

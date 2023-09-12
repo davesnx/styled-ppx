@@ -1,0 +1,7 @@
+(include_subdirs unqualified)
+
+(library
+ (name emotion_native)
+ (public_name styled-ppx.emotion_native)
+ (libraries styled-ppx.css_native styled-ppx.emotion-hash)
+ (wrapped false))

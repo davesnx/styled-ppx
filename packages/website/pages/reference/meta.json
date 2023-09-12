@@ -7,5 +7,8 @@
   "array": "Array API",
   "keyframe": "Keyframe",
   "globals": "Inject global styles",
-  "react-ref": "React's Ref"
+  "react-ref": "React's Ref",
+  "media-queries": "Media queries",
+  "selectors": "Selectors",
+  "runtime": "Runtime: Css/CssJs"
 }

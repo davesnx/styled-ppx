@@ -1,0 +1,1 @@
+val default : string -> string

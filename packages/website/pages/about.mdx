@@ -6,8 +6,6 @@ title: About
 
 Author and maintainer: [David Sancho](https://sancho.dev)
 
-Maintainer: [José Eduardo Monteiro](https://github.com/joseemds)
-
 <br />
 
 # Motivation
@@ -22,7 +20,7 @@ During that time, there were a few efforts on bringing type-safety on top of CSS
 - The runtime is huge. The bundle-size of bs-css starts with 64kb and goes up considerably with the usage even with ReScript death code elimination.
 - The fact about having a runtime involved to only write safe CSS doesn't seem like a nice trade-off.
 
-### It's possible
+### It's possible and a good solution
 Embedding CSS inside Reason/OCaml seemed like a bad idea at first, mostly since most CSS-in-JS solutions that use native CSS relied on a JavaScript feature that isn't available in Reason [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals).
 
 After discovering what a ppx was (*"a mechanism to embed other languages inside Reason"*), and it could mimic the template literals, I jumped straight into hacking a prototype that became this project.
@@ -30,8 +28,9 @@ After discovering what a ppx was (*"a mechanism to embed other languages inside 
 Embedding languages inside others, isn't a new concept, has been happening for a long time. In fact, the most common case of an embedded language is usually CSS inside HTML.
 Using CSS enables all sort of integrations: Editors, DevTools, prototyping tools, Github Copilot, etc. Even for designers that don't want to understand neither care about ReScript.
 
-### It can bring more features than the JS
-Enabling type-safety into CSS is more like a nice to have, rather than a hard requirement. Features that aren't implemented but are on the horizon are mostly related in extracting the CSS from the runtime and keep it in a separate file. Forcing to have a zero run-time application. Provide a safe way to access a shared theme without having to worry about the runtime, would be a killer feature, that I wished I had before.
+### It can be more powerful than the JavaScript equivalents
+Enabling type-safety into CSS is a nice to have, rather than a hard requirement, but nevertheless useful. styled-ppx brings an entire CSS compiler and type-chcker. This enables features from SASS (like supporting future CSS version features) with features from emotion to inline your styles and code together.
+ Features that aren't implemented but are on the horizon are mostly related in extracting the CSS from the runtime and making your styles static at runtime and have zero run-time.
 
 To know more about how it works or what are the benefits I recommend to watch [my talk at ReasonSTHLM Meetup](https://www.youtube.com/watch?v=ekHCBZiCviM).
 

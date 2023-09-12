@@ -6,7 +6,7 @@ let expander =
       ~recursive,
       ~loc as exprLoc,
       ~path as _: string,
-      ~arg as _: option(loc(Ppxlib.Longident.t)),
+      ~arg as _: option(loc(Longident.t)),
       value: string,
       _,
       _,
@@ -14,7 +14,7 @@ let expander =
   switch (Css_spec_parser.value_of_string(value)) {
   | Some(value: Css_spec_parser.value) =>
     module Ast_builder =
-      Ppxlib.Ast_builder.Make({
+      Ast_builder.Make({
         let loc = exprLoc;
       });
     module Emit = Generate.Make(Ast_builder);

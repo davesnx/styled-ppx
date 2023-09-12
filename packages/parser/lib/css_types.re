@@ -1,5 +1,7 @@
 [@warning "-30"];
 
+module Location = Ppxlib.Location;
+
 [@deriving show({with_path: false})]
 type position =
   Lexing.position = {

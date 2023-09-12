@@ -30,6 +30,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      # https://github.com/mmottl/pcre-ocaml/issues/18
+      # https://github.com/actions/runner-images/issues/6634
+      - name: Install pcre (only MacOS)
+        if: matrix.os == 'macos-latest'
+        run: brew install pcre
+
       - name: Use Node.js
         uses: actions/setup-node@v3
 
@@ -54,11 +60,11 @@ jobs:
           path: _opam
           key: opam-${{ matrix.os }}-${{ hashFiles('**.opam') }}
 
-      - name: Install pins
-        run: make pin
-
       - name: Install dependencies
         run: make install
+
+      - name: Install pins
+        run: make pin
 
       - name: Build
         run: make build
@@ -99,6 +105,20 @@ jobs:
           name: ${{ matrix.os }}
           path: _build/default/bin/bin.exe
 
+      - name: Upload runtime artifacts for @davesnx/styled-ppx/runtime/css
+        if: matrix.os == 'ubuntu-20.04'
+        uses: actions/upload-artifact@v3
+        with:
+          name: runtime-css
+          path: _build/default/packages/css/rescript
+
+      - name: Upload runtime artifacts for @davesnx/styled-ppx/runtime/emotion
+        if: matrix.os == 'ubuntu-20.04'
+        uses: actions/upload-artifact@v3
+        with:
+          name: runtime-emotion
+          path: _build/default/packages/emotion/rescript
+
       - name: Save cache when not Windows
         uses: actions/cache/save@v3
         if: steps.opam-cache.outputs.cache-hit != 'true' && runner.os != 'Windows'
@@ -112,26 +132,6 @@ jobs:
         with:
           path: _opam
           key: opam-${{ matrix.os }}-${{ hashFiles('**.opam') }}
-
-  e2e:
-    name: Browser tests
-    runs-on: ${{ matrix.os }}
-    needs: build
-    strategy:
-      matrix:
-        os: [ubuntu-20.04, macos-latest]
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{ matrix.os }}
-          path: _build/default/bin
 
       - name: Grant permission to run ppx
         run: chmod +x _build/default/bin/bin.exe
@@ -185,20 +185,33 @@ jobs:
       #     name: windows-latest
       #     path: _release/platform-windows-x64
 
-      - name: Release nightly NPM package
+      - name: Download runtime-css artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: runtime-css
+          path: _release/css
+
+      - name: Download runtime-emotion artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: runtime-emotion
+          path: _release/emotion
+
+      - name: Release nightly (@davesnx/styled-ppx) package
         if: ${{ success() && github.event_name == 'pull_request' && github.event.pull_request.user.login == 'davesnx' }}
         id: nightly
         working-directory: ./_release
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
         run: |
+          ls -lhsa
           npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
           npm config set scope "@davesnx"
           npm version prerelease --preid ${{ steps.sha.outputs.sha_short }} -no-git-tag-version
           npm publish --access public --tag nightly
           echo "version=$(npm view @davesnx/styled-ppx@nightly version)" >> $GITHUB_OUTPUT
 
-      - name: Release NPM package
+      - name: Release (@davesnx/styled-ppx) package
         if: ${{ success() && github.event_name != 'pull_request' }}
         working-directory: ./_release
         env:

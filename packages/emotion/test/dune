@@ -1,0 +1,17 @@
+(test
+ (name test)
+ (modules :standard)
+ (libraries
+  alcotest
+  fmt
+  styled-ppx.css_native
+  styled-ppx.emotion_native
+  styled-ppx.emotion-hash)
+ (preprocess
+  (pps styled-ppx.lib)))
+
+(rule
+ (alias emotion_test)
+ (deps test.exe)
+ (action
+  (run %{deps})))

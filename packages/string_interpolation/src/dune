@@ -1,7 +1,7 @@
 (library
  (name string_interpolation)
  (public_name styled-ppx.string-interpolation)
- (libraries ppxlib sedlex)
+ (libraries ppxlib ppxlib.astlib sedlex)
  (preprocess
   (pps sedlex.ppx)))
 

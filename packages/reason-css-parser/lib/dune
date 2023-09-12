@@ -5,6 +5,7 @@
   sedlex
   styled-ppx.css-spec-parser
   styled-ppx.reason-css-lexer
+  ppx_deriving.runtime
   compiler-libs)
  (preprocess
   (per_module

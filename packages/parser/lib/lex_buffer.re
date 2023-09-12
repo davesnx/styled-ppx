@@ -1,3 +1,5 @@
+module Location = Ppxlib.Location;
+
 /* Based on
  * https://github.com/smolkaj/ocaml-parsing/blob/master/src/LexBuffer.ml */
 
