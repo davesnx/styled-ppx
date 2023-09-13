@@ -114,6 +114,7 @@ test_css_spec_types: ## Run CSS Spec Types tests
 
 .PHONY: test_e2e
 test_e2e: ## Run End-to-end tests for JSX3
+	@yarn --cwd 'e2e/rescript-v9-JSX3' build
 	@yarn --cwd 'e2e/rescript-v9-JSX3' test
 
 .PHONY: test_string_interpolation
