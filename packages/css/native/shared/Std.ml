@@ -31,9 +31,7 @@ module Array = struct
 end
 
 module String = struct
-  let startsWith affix str =
-    let start = try String.sub str 0 (String.length affix) with _ -> "" in
-    String.equal start str
+  let startsWith affix str = Js.String2.startsWith str affix
 end
 
 module Int = struct
