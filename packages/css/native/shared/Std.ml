@@ -37,17 +37,11 @@ module String = struct
 end
 
 module Int = struct
-  let toString = Belt.Int.toString
+  let toString = Js.Int.toString
 end
 
 module Float = struct
-  let _round x =
-    let floor_val = floor x in
-    if x -. floor_val < 0.5 then floor_val else ceil x
-
-  let toString f =
-    if _round f = f then f |> int_of_float |> string_of_int
-    else string_of_float f
+  let toString = Js.Float.toString
 end
 
 module Option = struct
