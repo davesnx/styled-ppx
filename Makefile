@@ -9,7 +9,8 @@ help: ## Print this help message
 	@echo "";
 	@echo "List of available make commands";
 	@echo "";
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}';
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2}';
+	@echo $(TEST_TARGETS) | tr -s " " "\012" | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36mtest_%-20s\033[0m Run %s test \33[1;97m(or \"test_%s_watch\" to watch them)\033[0m\n", $$1, $$1, $$1}';
 	@echo "";
 
 .PHONY: build
@@ -53,7 +54,7 @@ create-switch: ## Create opam switch
 .PHONY: install
 install: ## Install project dependencies
 	@opam install . --deps-only --with-test
-	@yarn install
+	@npm install
 
 .PHONY: init
 init: setup-githooks create-switch pin install ## Create a local dev enviroment
@@ -72,61 +73,48 @@ release-static:
 
 # Testing commands
 
-.PHONY: test_typecheck
-test_typecheck: ## Run Typecheck tests
-	$(DUNE) build @native_typecheck_test
+TEST_TARGETS := ppx_snapshot parser css_lexer reason_css_parser css_spec_parser css_support css_spec_types string_interpolation emotion native_typecheck
 
-.PHONY: test_css_support
-test_css_support: ## Run CSS Support tests
-	$(DUNE) build @css_support_test
+# Create targets with the format "test_{{target_name}}_{{ "watch" | "promote" }}"
+define create_test
+.PHONY: test_$(1)
+test_$(1): ## Run $(1) tests
+	$$(DUNE) build @$(1)_test
+endef
 
-.PHONY: test_css_support_promote
-test_css_support_promote: ## Promote CSS Support snapshots
-	$(DUNE) build @css_support_test --auto-promote
+define create_test_watch
+.PHONY: test_$(1)_watch
+test_$(1)_watch: ## Run $(1) tests
+	$$(DUNE) build @$(1)_test --watch
+endef
 
-.PHONY: test_ppx_snapshot
-test_ppx_snapshot: ## Run ppx snapshot tests
-	$(DUNE) build @ppx_snapshot_test
+define create_test_promote
+.PHONY: test_$(1)_promote
+test_$(1)_promote: ## Run $(1) tests
+	$$(DUNE) build @$(1)_promote
+endef
 
-.PHONY: test_ppx_snapshot_promote
-test_ppx_snapshot_promote: ## Promote ppx snapshot snapshots
-	$(DUNE) build @ppx_snapshot_test --auto-promote
-
-.PHONY: test_parser
-test_parser: ## Run CSS Parser tests
-	$(DUNE) build @parser_test
-
-.PHONY: test_css_lexer
-test_css_lexer: ## Run CSS Lexer tests
-	$(DUNE) build @css_lexer_test
-
-.PHONY: test_reason_css_parser
-test_reason_css_parser: ## Run Reason CSS Parser tests
-	$(DUNE) build @reason_css_parser_test
-
-.PHONY: test_css_spec_parser
-test_css_spec_parser: ## Run CSS Spec Parser tests
-	$(DUNE) build @css_spec_parser_test
-
-.PHONY: test_css_spec_types
-test_css_spec_types: ## Run CSS Spec Types tests
-	$(DUNE) build @css_spec_types_test
+# Apply the create_watch_target rule for each test target
+$(foreach target,$(TEST_TARGETS), $(eval $(call create_test,$(target))))
+$(foreach target,$(TEST_TARGETS), $(eval $(call create_test_watch,$(target))))
+$(foreach target,$(TEST_TARGETS), $(eval $(call create_test_promote,$(target))))
 
 .PHONY: test_e2e
 test_e2e: ## Run End-to-end tests for JSX3
-	@yarn --cwd 'e2e/rescript-v9-JSX3' build
-	@yarn --cwd 'e2e/rescript-v9-JSX3' test
+	@npm --prefix 'e2e/rescript-v9-JSX3' install --force
+	@npm --prefix 'e2e/rescript-v9-JSX3' run build
+	@npm --prefix 'e2e/rescript-v9-JSX3' run test
 
-.PHONY: test_string_interpolation
-test_string_interpolation: ## Run string_interpolation tests
-	$(DUNE) build @string_interpolation_test
+.PHONY: test_e2e_watch
+test_e2e_watch: ## Run End-to-end tests for JSX3
+	@npm --prefix 'e2e/rescript-v9-JSX3' run test_watch
 
-.PHONY: test_emotion
-test_emotion: ## Run emotion tests
-	$(DUNE) build @emotion_test
+.PHONY: test_e2e_promote
+test_e2e_promote: ## Run End-to-end tests for JSX3
+	@npm --prefix 'e2e/rescript-v9-JSX3' run test_promote
 
-.PHONY: test_all
-test_all: build test_typecheck test_css_support test_ppx_snapshot test_parser test_css_lexer test_reason_css_parser test_css_spec_parser test_css_spec_types test_string_interpolation test_emotion test_e2e
+.PHONY: test
+test: build test_native_typecheck test_css_support test_ppx_snapshot test_parser test_css_lexer test_reason_css_parser test_css_spec_parser test_css_spec_types test_string_interpolation test_emotion test_e2e
 
 # Debug commands
 

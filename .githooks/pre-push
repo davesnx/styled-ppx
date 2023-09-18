@@ -16,6 +16,6 @@
 
 set -e -u
 
-make test_all
+make test
 
 exit 0
