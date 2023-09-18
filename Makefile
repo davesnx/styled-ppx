@@ -101,6 +101,7 @@ $(foreach target,$(TEST_TARGETS), $(eval $(call create_test_promote,$(target))))
 
 .PHONY: test_e2e
 test_e2e: ## Run End-to-end tests for JSX3
+	@yarn --cwd 'e2e/rescript-v9-JSX3'
 	@yarn --cwd 'e2e/rescript-v9-JSX3' build
 	@yarn --cwd 'e2e/rescript-v9-JSX3' test
 
