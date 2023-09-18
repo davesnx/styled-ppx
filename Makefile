@@ -54,7 +54,7 @@ create-switch: ## Create opam switch
 .PHONY: install
 install: ## Install project dependencies
 	@opam install . --deps-only --with-test
-	@yarn install
+	@npm install
 
 .PHONY: init
 init: setup-githooks create-switch pin install ## Create a local dev enviroment
@@ -101,17 +101,17 @@ $(foreach target,$(TEST_TARGETS), $(eval $(call create_test_promote,$(target))))
 
 .PHONY: test_e2e
 test_e2e: ## Run End-to-end tests for JSX3
-	@yarn --cwd 'e2e/rescript-v9-JSX3'
-	@yarn --cwd 'e2e/rescript-v9-JSX3' build
-	@yarn --cwd 'e2e/rescript-v9-JSX3' test
+	@npm --prefix 'e2e/rescript-v9-JSX3' install
+	@npm --prefix 'e2e/rescript-v9-JSX3' run build
+	@npm --prefix 'e2e/rescript-v9-JSX3' run test
 
 .PHONY: test_e2e_watch
 test_e2e_watch: ## Run End-to-end tests for JSX3
-	@yarn --cwd 'e2e/rescript-v9-JSX3' test_watch
+	@npm --prefix 'e2e/rescript-v9-JSX3' run test_watch
 
 .PHONY: test_e2e_promote
 test_e2e_promote: ## Run End-to-end tests for JSX3
-	@yarn --cwd 'e2e/rescript-v9-JSX3' test_promote
+	@npm --prefix 'e2e/rescript-v9-JSX3' run test_promote
 
 .PHONY: test
 test: build test_native_typecheck test_css_support test_ppx_snapshot test_parser test_css_lexer test_reason_css_parser test_css_spec_parser test_css_spec_types test_string_interpolation test_emotion test_e2e
