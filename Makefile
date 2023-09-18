@@ -101,7 +101,7 @@ $(foreach target,$(TEST_TARGETS), $(eval $(call create_test_promote,$(target))))
 
 .PHONY: test_e2e
 test_e2e: ## Run End-to-end tests for JSX3
-	@npm --prefix 'e2e/rescript-v9-JSX3' install
+	@npm --prefix 'e2e/rescript-v9-JSX3' install --force
 	@npm --prefix 'e2e/rescript-v9-JSX3' run build
 	@npm --prefix 'e2e/rescript-v9-JSX3' run test
 
