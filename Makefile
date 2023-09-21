@@ -43,9 +43,10 @@ setup-githooks: ## Setup githooks
 .PHONY: pin
 pin: ## Pin dependencies
 # @opam pin add melange.dev "https://github.com/melange-re/melange.git#d4868a5300c8c6e9f1b387aedb85ded4a705bc0a" -y
-# @opam pin add reason.dev "https://github.com/reasonml/reason.git#b283f335f90e3aaa398bff8e82761038ee42a99d" -y
+  # reason.3.1.0 could be installed from opam-repository, but it has --with-dev-setup for now so opam 2.1 ignores it
+  @opam pin add reason.dev "https://github.com/reasonml/reason.git#f92f7ecc228d19ebf4d9d0214792da7b45472766" -y
 # @opam pin add ppxlib.dev "https://github.com/ocaml-ppx/ppxlib.git#8b8987c5690ad839348d96bf52471b03b88f06ed" -y
-# @opam pin add server-reason-react.dev "https://github.com/ml-in-barcelona/server-reason-react.git#f46fa4bd9a5490bd3a6d64e1e77dab66028a6a2f" -y
+  @opam pin add server-reason-react.dev "https://github.com/ml-in-barcelona/server-reason-react.git#8e9abb4f557ec6eafb7434505bd35a1d2f28b6cc" -y
 
 .PHONY: create-switch
 create-switch: ## Create opam switch
