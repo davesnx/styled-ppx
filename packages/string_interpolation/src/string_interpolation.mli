@@ -1,6 +1,6 @@
 val transform :
   ?attrs:Ppxlib.Ast_helper.attrs ->
   delimiter:string ->
-  loc:Warnings.loc ->
+  loc:Ppxlib.Location.t ->
   string ->
-    Astlib.Ast_414.Parsetree.expression
+  Ppxlib.Parsetree.expression

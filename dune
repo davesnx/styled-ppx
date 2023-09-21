@@ -1,11 +1,15 @@
-(dirs bin packages)
+(dirs bin packages e2e)
+
+(subdir
+ e2e
+ (dirs melange-v1))
 
 (subdir
  packages
  (dirs
-  bs-css
-  bs-css-emotion
   css
+  emotion
+  emotion-hash
   css-spec-parser
   parser
   ppx

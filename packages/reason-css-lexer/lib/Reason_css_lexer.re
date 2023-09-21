@@ -1,5 +1,9 @@
-open Location;
-include Token;
+module Location = Ppxlib.Location;
+
+type token_with_location = {
+  txt: result(Token.token, (Token.token, Token.error)),
+  loc: Location.t,
+};
 
 // TODO: that's definitly ugly
 /* TODO: Use lex_buffer from parser to keep track of the file */
@@ -10,7 +14,7 @@ let from_string = string => {
     let value = Tokenizer.consume(buf);
     let (_, loc_end) = Sedlexing.lexing_positions(buf);
 
-    let token_with_loc = {
+    let token_with_loc: token_with_location = {
       txt: value,
       loc: {
         loc_start,
@@ -29,3 +33,5 @@ let from_string = string => {
 
   read([]);
 };
+
+include Token;

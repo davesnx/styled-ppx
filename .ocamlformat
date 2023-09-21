@@ -1,4 +1,4 @@
-version=0.24.1
+version=0.26.0
 quiet=true
 profile=default
 ocaml-version=4.14.0

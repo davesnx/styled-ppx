@@ -1,3 +1,5 @@
+module Location = Ppxlib.Location
+
 module Parser = struct
   type token =
     | String of string

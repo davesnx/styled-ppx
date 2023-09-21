@@ -1,6 +1,8 @@
 open Alcotest
+module Pprintast = Ppxlib.Pprintast
+module Location = Ppxlib.Location
 
-let loc = Location.none
+let loc = Ppxlib.Location.none
 let transform = String_interpolation.transform ~delimiter:"js" ~loc
 
 let ast =

@@ -1,6 +1,6 @@
 (test
  (name Runner)
- (libraries styled-ppx.css-parser alcotest))
+ (libraries sedlex styled-ppx.css-parser alcotest))
 
 (rule
  (alias parser_test)

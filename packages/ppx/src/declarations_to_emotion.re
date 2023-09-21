@@ -995,6 +995,27 @@ let object_position =
       [%expr `hv(([%e x], [%e y]))];
     },
   );
+
+let pointer_events =
+  apply(
+    Parser.property_pointer_events,
+    (~loc) => [%expr CssJs.pointerEvents],
+    (~loc, value: Types.property_pointer_events) => {
+      switch (value) {
+      | `Auto => [%expr `auto]
+      | `None => [%expr `none]
+      | `VisiblePainted => [%expr `visiblePainted]
+      | `VisibleFill => [%expr `visibleFill]
+      | `VisibleStroke => [%expr `visibleStroke]
+      | `Visible => [%expr `visible]
+      | `Painted => [%expr `painted]
+      | `Fill => [%expr `fill]
+      | `Stroke => [%expr `stroke]
+      | `All => [%expr `all]
+      | `Inherit => [%expr `inherit_]
+      }
+    },
+  );
 let image_resolution = unsupportedProperty(Parser.property_image_resolution);
 let image_orientation =
   unsupportedProperty(Parser.property_image_orientation);
@@ -2026,8 +2047,8 @@ let render_font_weight = (~loc) =>
   | `Lighter => variant_to_expression(~loc, `Lighter)
   | `Font_weight_absolute(`Normal) => variant_to_expression(~loc, `Normal)
   | `Font_weight_absolute(`Bold) => variant_to_expression(~loc, `Bold)
-  | `Font_weight_absolute(`Number(num)) => [%expr
-      `num([%e render_number(~loc, num)])
+  | `Font_weight_absolute(`Integer(num)) => [%expr
+      `num([%e render_integer(~loc, num)])
     ];
 
 let font_weight =
@@ -3329,6 +3350,20 @@ let stroke =
     (~loc) => render_paint(~loc),
   );
 
+let render_alpha_value = (~loc, value: Types.alpha_value) => {
+  switch (value) {
+  | `Number(n) => [%expr `num([%e render_number(~loc, n)])]
+  | `Extended_percentage(pct) => render_extended_percentage(~loc, pct)
+  };
+};
+
+let strokeOpacity =
+  apply(
+    Parser.property_stroke_opacity,
+    (~loc) => [%expr CssJs.SVG.strokeOpacity],
+    render_alpha_value,
+  );
+
 let found = ({ast_of_string, string_to_expr, _}) => {
   /* TODO: Why we have 'check_value' when we don't use it? */
   let check_value = string => {
@@ -3338,230 +3373,389 @@ let found = ({ast_of_string, string_to_expr, _}) => {
   (check_value, string_to_expr);
 };
 
+let caret_color = unsupportedProperty(Parser.property_caret_color);
+let clear = unsupportedProperty(Parser.property_clear);
+let clip = unsupportedProperty(Parser.property_clip);
+let clip_path = unsupportedProperty(Parser.property_clip_path);
+let column_count = unsupportedProperty(Parser.property_column_count);
+let column_fill = unsupportedProperty(Parser.property_column_fill);
+let column_gap = unsupportedProperty(Parser.property_column_gap);
+let column_rule = unsupportedProperty(Parser.property_column_rule);
+let column_rule_color =
+  unsupportedProperty(Parser.property_column_rule_color);
+let column_rule_style =
+  unsupportedProperty(Parser.property_column_rule_style);
+let column_rule_width =
+  unsupportedProperty(Parser.property_column_rule_width);
+let column_span = unsupportedProperty(Parser.property_column_span);
+let columns = unsupportedProperty(Parser.property_columns);
+let counter_increment =
+  unsupportedProperty(Parser.property_counter_increment);
+let counter_reset = unsupportedProperty(Parser.property_counter_reset);
+let cursor = unsupportedProperty(Parser.property_cursor);
+let direction = unsupportedProperty(Parser.property_direction);
+let filter = unsupportedProperty(Parser.property_filter);
+let float = unsupportedProperty(Parser.property_float);
+let font_language_override =
+  unsupportedProperty(Parser.property_font_language_override);
+/* let hyphenate_character =
+   unsupportedProperty(Parser.property_hyphenate_character); */
+/* let hyphenate_limit_chars =
+   unsupportedProperty(Parser.property_hyphenate_limit_chars); */
+/* let hyphenate_limit_lines =
+   unsupportedProperty(Parser.property_hyphenate_limit_lines); */
+/* let hyphenate_limit_zone =
+   unsupportedProperty(Parser.property_hyphenate_limit_zone); */
+let ime_mode = unsupportedProperty(Parser.property_ime_mode);
+let isolation = unsupportedProperty(Parser.property_isolation);
+let justify_self = unsupportedProperty(Parser.property_justify_self);
+/* let layout_grid = unsupportedProperty(Parser.property_layout_grid); */
+/* let layout_grid_char = unsupportedProperty(Parser.property_layout_grid_char); */
+/* let layout_grid_line = unsupportedProperty(Parser.property_layout_grid_line); */
+/* let layout_grid_mode = unsupportedProperty(Parser.property_layout_grid_mode); */
+/* let layout_grid_type = unsupportedProperty(Parser.property_layout_grid_type); */
+let line_clamp = unsupportedProperty(Parser.property_line_clamp);
+let list_style = unsupportedProperty(Parser.property_list_style);
+let list_style_image = unsupportedProperty(Parser.property_list_style_image);
+let list_style_position =
+  unsupportedProperty(Parser.property_list_style_position);
+let list_style_type = unsupportedProperty(Parser.property_list_style_type);
+let mix_blend_mode = unsupportedProperty(Parser.property_mix_blend_mode);
+/* let nav_down = unsupportedProperty(Parser.property_nav_down); */
+/* let nav_left = unsupportedProperty(Parser.property_nav_left); */
+/* let nav_right = unsupportedProperty(Parser.property_nav_right); */
+/* let nav_up = unsupportedProperty(Parser.property_nav_up); */
+let position = unsupportedProperty(Parser.property_position);
+let resize = unsupportedProperty(Parser.property_resize);
+let row_gap = unsupportedProperty(Parser.property_row_gap);
+/* let scrollbar_3dlight_color =
+   unsupportedProperty(Parser.property_scrollbar_3dlight_color); */
+/* let scrollbar_arrow_color =
+   unsupportedProperty(Parser.property_scrollbar_arrow_color); */
+/* let scrollbar_base_color =
+   unsupportedProperty(Parser.property_scrollbar_base_color); */
+let scrollbar_color = unsupportedProperty(Parser.property_scrollbar_color);
+/* let scrollbar_darkshadow_color = */
+/* unsupportedProperty(Parser.property_scrollbar_darkshadow_color); */
+/* let scrollbar_face_color = */
+/* unsupportedProperty(Parser.property_scrollbar_face_color); */
+/* let scrollbar_highlight_color = */
+/* unsupportedProperty(Parser.property_scrollbar_highlight_color); */
+/* let scrollbar_shadow_color = */
+/* unsupportedProperty(Parser.property_scrollbar_shadow_color); */
+/* let scrollbar_track_color = */
+/* unsupportedProperty(Parser.property_scrollbar_track_color); */
+/* let scrollbar_width = unsupportedProperty(Parser.property_scrollbar_width); */
+/* let strokeDasharray = unsupportedProperty(Parser.property_strokeDasharray); */
+/* let strokeLinecap = unsupportedProperty(Parser.property_strokeLinecap); */
+/* let strokeLinejoin = unsupportedProperty(Parser.property_strokeLinejoin); */
+/* let strokeMiterlimit = unsupportedProperty(Parser.property_strokeMiterlimit); */
+/* let strokeWidth = unsupportedProperty(Parser.property_strokeWidth); */
+/* let text_autospace = unsupportedProperty(Parser.property_text_autospace); */
+/* let text_blink = unsupportedProperty(Parser.property_text_blink); */
+let text_combine_upright =
+  unsupportedProperty(Parser.property_text_combine_upright);
+/* let text_justify_trim =
+   unsupportedProperty(Parser.property_text_justify_trim); */
+/* let text_kashida = unsupportedProperty(Parser.property_text_kashida); */
+/* let text_kashida_space =
+   unsupportedProperty(Parser.property_text_kashida_space); */
+let text_orientation = unsupportedProperty(Parser.property_text_orientation);
+let touch_action = unsupportedProperty(Parser.property_touch_action);
+let user_select = unsupportedProperty(Parser.property_user_select);
+let visibility = unsupportedProperty(Parser.property_visibility);
+
 let properties = [
-  ("display", found(display)),
-  // css-sizing-3
-  ("width", found(width)),
-  ("height", found(height)),
-  ("min-width", found(min_width)),
-  ("min-height", found(min_height)),
-  ("max-width", found(max_width)),
-  ("max-height", found(max_height)),
-  ("box-sizing", found(box_sizing)),
-  ("column-width", found(column_width)),
-  // css-box-3
-  ("margin-top", found(margin_top)),
-  ("margin-right", found(margin_right)),
-  ("margin-bottom", found(margin_bottom)),
-  ("margin-left", found(margin_left)),
-  ("margin", found(margin)),
-  ("padding-top", found(padding_top)),
-  ("padding-right", found(padding_right)),
-  ("padding-bottom", found(padding_bottom)),
-  ("padding-left", found(padding_left)),
-  ("padding", found(padding)),
-  // css-color-4
-  ("color", found(color)),
-  ("opacity", found(opacity)),
-  // css-images-4
-  ("object-fit", found(object_fit)),
-  ("object-position", found(object_position)),
-  ("image-resolution", found(image_resolution)),
-  ("image-orientation", found(image_orientation)),
-  ("image-rendering", found(image_rendering)),
-  // css-background-3
-  ("background-color", found(background_color)),
-  ("background-image", found(background_image)),
-  ("background-repeat", found(background_repeat)),
-  ("background-attachment", found(background_attachment)),
-  ("background-position", found(background_position)),
-  ("background-clip", found(background_clip)),
-  ("background-origin", found(background_origin)),
-  ("background-size", found(background_size)),
-  ("background", found(background)),
-  ("border-top-color", found(border_top_color)),
-  ("border-right-color", found(border_right_color)),
-  ("border-bottom-color", found(border_bottom_color)),
-  ("border-left-color", found(border_left_color)),
-  ("border-color", found(border_color)),
-  ("border-top-style", found(border_top_style)),
-  ("border-right-style", found(border_right_style)),
-  ("border-bottom-style", found(border_bottom_style)),
-  ("border-left-style", found(border_left_style)),
-  ("border-style", found(border_style)),
-  ("border-top-width", found(border_top_width)),
-  ("border-right-width", found(border_right_width)),
-  ("border-bottom-width", found(border_bottom_width)),
-  ("border-left-width", found(border_left_width)),
-  ("border-width", found(border_width)),
-  ("border-top", found(border_top)),
-  ("border-right", found(border_right)),
-  ("border-bottom", found(border_bottom)),
-  ("border-left", found(border_left)),
-  ("border", found(border)),
-  ("border-top-left-radius", found(border_top_left_radius)),
-  ("border-top-right-radius", found(border_top_right_radius)),
-  ("border-bottom-right-radius", found(border_bottom_right_radius)),
-  ("border-bottom-left-radius", found(border_bottom_left_radius)),
-  ("border-radius", found(border_radius)),
-  ("border-image-source", found(border_image_source)),
-  ("border-image-slice", found(border_image_slice)),
-  ("border-image-width", found(border_image_width)),
-  ("border-image-outset", found(border_image_outset)),
-  ("border-image-repeat", found(border_image_repeat)),
-  ("border-image", found(border_image)),
-  ("box-shadow", found(box_shadow)),
-  // css-overflow-3
-  ("overflow-x", found(overflow_x)),
-  ("overflow-y", found(overflow_y)),
-  ("overflow", found(overflow)),
-  // ("overflow-clip-margin", found(overflow_clip_margin)),
-  ("overflow-inline", found(overflow_inline)),
-  ("text-overflow", found(text_overflow)),
-  // ("block-ellipsis", found(block_ellipsis)),
-  ("max-lines", found(max_lines)),
-  // ("continue", found(continue)),
-  // css-text-3
-  ("text-transform", found(text_transform)),
-  ("white-space", found(white_space)),
-  ("tab-size", found(tab_size)),
-  ("word-break", found(word_break)),
-  ("widows", found(widows)),
-  ("line-break", found(line_break)),
-  ("hyphens", found(hyphens)),
-  ("overflow-wrap", found(overflow_wrap)),
-  ("word-wrap", found(word_wrap)),
-  ("text-align", found(text_align)),
-  // ("text-align-all", found(text_align_all)),
-  ("text-align-last", found(text_align_last)),
-  ("text-justify", found(text_justify)),
-  ("word-spacing", found(word_spacing)),
-  ("letter-spacing", found(letter_spacing)),
-  ("text-indent", found(text_indent)),
-  ("hanging-punctuation", found(hanging_punctuation)),
-  // css-fonts-4
-  ("font-family", found(font_family)),
-  ("font-weight", found(font_weight)),
-  ("font-stretch", found(font_stretch)),
-  ("font-style", found(font_style)),
-  ("font-size", found(font_size)),
-  ("font-size-adjust", found(font_size_adjust)),
-  ("font", found(font)),
-  // ("font-synthesis-weight", found(font_synthesis_weight)),
-  // ("font-synthesis-style", found(font_synthesis_style)),
-  // ("font-synthesis-small-caps", found(font_synthesis_small_caps)),
-  ("font-synthesis", found(font_synthesis)),
-  ("font-kerning", found(font_kerning)),
-  ("font-variant-ligatures", found(font_variant_ligatures)),
-  ("font-variant-position", found(font_variant_position)),
-  ("font-variant-caps", found(font_variant_caps)),
-  ("font-variant-numeric", found(font_variant_numeric)),
-  ("font-variant-alternates", found(font_variant_alternates)),
-  ("font-variant-east-asian", found(font_variant_east_asian)),
-  ("font-variant", found(font_variant)),
-  ("font-feature-settings", found(font_feature_settings)),
-  ("font-optical-sizing", found(font_optical_sizing)),
-  ("font-variation-settings", found(font_variation_settings)),
-  // ("font-palette", found(font_palette)),
-  // ("font-variant-emoji", found(font_variant_emoji)),
-  // css-text-decor-3
-  ("text-decoration-line", found(text_decoration_line)),
-  ("text-decoration-style", found(text_decoration_style)),
-  ("text-decoration-color", found(text_decoration_color)),
-  ("text-decoration-thickness", found(text_decoration_thickness)),
-  ("text-decoration", found(text_decoration)),
-  ("text-underline-position", found(text_underline_position)),
-  ("text-underline-offset", found(text_underline_offset)),
-  ("text-decoration-skip", found(text_decoration_skip)),
-  // ("text-decoration-skip-self", found(text_decoration_skip_self)),
-  // ("text-decoration-skip-box", found(text_decoration_skip_box)),
-  // ("text-decoration-skip-inset", found(text_decoration_skip_inset)),
-  // ("text-decoration-skip-spaces", found(text_decoration_skip_spaces)),
-  ("text-decoration-skip-ink", found(text_decoration_skip_ink)),
-  ("text-emphasis-style", found(text_emphasis_style)),
-  ("text-emphasis-color", found(text_emphasis_color)),
-  ("text-emphasis", found(text_emphasis)),
-  ("text-emphasis-position", found(text_emphasis_position)),
-  // ("text-emphasis-skip", found(text_emphasis_skip)),
-  ("text-shadow", found(text_shadow)),
-  // css-transforms2
-  ("transform", found(transform)),
-  ("transform-origin", found(transform_origin)),
-  ("transform-box", found(transform_box)),
-  ("translate", found(translate)),
-  ("rotate", found(rotate)),
-  ("scale", found(scale)),
-  ("transform-style", found(transform_style)),
-  ("perspective", found(perspective)),
-  ("perspective-origin", found(perspective_origin)),
-  ("backface-visibility", found(backface_visibility)),
-  // css-transition-1
-  ("transition-property", found(transition_property)),
-  ("transition-duration", found(transition_duration)),
-  ("transition-timing-function", found(transition_timing_function)),
-  ("transition-delay", found(transition_delay)),
-  ("transition", found(transition)),
-  // css-animation-1
-  ("animation-name", found(animation_name)),
-  ("animation-duration", found(animation_duration)),
-  ("animation-timing-function", found(animation_timing_function)),
-  ("animation-iteration-count", found(animation_iteration_count)),
-  ("animation-direction", found(animation_direction)),
-  ("animation-play-state", found(animation_play_state)),
-  ("animation-delay", found(animation_delay)),
-  ("animation-fill-mode", found(animation_fill_mode)),
-  ("animation", found(animation)),
-  // css-flexbox-1
-  ("flex-direction", found(flex_direction)),
-  ("flex-wrap", found(flex_wrap)),
-  ("flex-flow", found(flex_flow)),
-  ("order", found(order)),
-  ("flex-grow", found(flex_grow)),
-  ("flex-shrink", found(flex_shrink)),
-  ("flex-basis", found(flex_basis)),
-  ("flex", found(flex)),
-  ("justify-content", found(justify_content)),
-  ("justify-items", found(justify_items)),
+  ("align-content", found(align_content)),
   ("align-items", found(align_items)),
   ("align-self", found(align_self)),
-  ("align-content", found(align_content)),
-  // css-grid-1
+  ("animation-delay", found(animation_delay)),
+  ("animation-direction", found(animation_direction)),
+  ("animation-duration", found(animation_duration)),
+  ("animation-fill-mode", found(animation_fill_mode)),
+  ("animation-iteration-count", found(animation_iteration_count)),
+  ("animation-name", found(animation_name)),
+  ("animation-play-state", found(animation_play_state)),
+  ("animation-timing-function", found(animation_timing_function)),
+  ("animation", found(animation)),
+  ("backface-visibility", found(backface_visibility)),
+  ("background-attachment", found(background_attachment)),
+  ("background-clip", found(background_clip)),
+  ("background-clip", found(background_clip)),
+  ("background-color", found(background_color)),
+  ("background-image", found(background_image)),
+  ("background-origin", found(background_origin)),
+  ("background-position", found(background_position)),
+  ("background-repeat", found(background_repeat)),
+  ("background-size", found(background_size)),
+  ("background", found(background)),
+  ("border-bottom-color", found(border_bottom_color)),
+  ("border-bottom-left-radius", found(border_bottom_left_radius)),
+  ("border-bottom-right-radius", found(border_bottom_right_radius)),
+  ("border-bottom-style", found(border_bottom_style)),
+  ("border-bottom-width", found(border_bottom_width)),
+  ("border-bottom", found(border_bottom)),
+  ("border-color", found(border_color)),
+  ("border-image-outset", found(border_image_outset)),
+  ("border-image-repeat", found(border_image_repeat)),
+  ("border-image-slice", found(border_image_slice)),
+  ("border-image-source", found(border_image_source)),
+  ("border-image-width", found(border_image_width)),
+  ("border-image", found(border_image)),
+  ("border-left-color", found(border_left_color)),
+  ("border-left-style", found(border_left_style)),
+  ("border-left-width", found(border_left_width)),
+  ("border-left", found(border_left)),
+  ("border-radius", found(border_radius)),
+  ("border-radius", found(border_radius)),
+  ("border-right-color", found(border_right_color)),
+  ("border-right-style", found(border_right_style)),
+  ("border-right-width", found(border_right_width)),
+  ("border-right", found(border_right)),
+  ("border-style", found(border_style)),
+  ("border-top-color", found(border_top_color)),
+  ("border-top-left-radius", found(border_top_left_radius)),
+  ("border-top-right-radius", found(border_top_right_radius)),
+  ("border-top-style", found(border_top_style)),
+  ("border-top-width", found(border_top_width)),
+  ("border-top", found(border_top)),
+  ("border-width", found(border_width)),
+  ("border", found(border)),
+  ("bottom", found(bottom)),
+  ("box-shadow", found(box_shadow)),
+  ("box-sizing", found(box_sizing)),
+  ("caret-color", found(caret_color)),
+  ("clear", found(clear)),
+  ("clip-path", found(clip_path)),
+  ("clip", found(clip)),
+  ("color", found(color)),
+  ("column-count", found(column_count)),
+  ("column-fill", found(column_fill)),
+  ("column-gap", found(column_gap)),
+  ("column-rule-color", found(column_rule_color)),
+  ("column-rule-style", found(column_rule_style)),
+  ("column-rule-width", found(column_rule_width)),
+  ("column-rule", found(column_rule)),
+  ("column-span", found(column_span)),
+  ("column-width", found(column_width)),
+  ("columns", found(columns)),
+  ("counter-increment", found(counter_increment)),
+  ("counter-reset", found(counter_reset)),
+  ("cursor", found(cursor)),
+  ("direction", found(direction)),
+  ("display", found(display)),
+  ("fill", found(fill)),
+  ("filter", found(filter)),
+  ("flex-basis", found(flex_basis)),
+  ("flex-direction", found(flex_direction)),
+  ("flex-flow", found(flex_flow)),
+  ("flex-grow", found(flex_grow)),
+  ("flex-shrink", found(flex_shrink)),
+  ("flex-wrap", found(flex_wrap)),
+  ("flex", found(flex)),
+  ("float", found(float)),
+  ("font-family", found(font_family)),
+  ("font-feature-settings", found(font_feature_settings)),
+  ("font-kerning", found(font_kerning)),
+  ("font-language-override", found(font_language_override)),
+  ("font-optical-sizing", found(font_optical_sizing)),
+  ("font-size-adjust", found(font_size_adjust)),
+  ("font-size", found(font_size)),
+  ("font-stretch", found(font_stretch)),
+  ("font-style", found(font_style)),
+  ("font-synthesis", found(font_synthesis)),
+  ("font-variant-alternates", found(font_variant_alternates)),
+  ("font-variant-caps", found(font_variant_caps)),
+  ("font-variant-east-asian", found(font_variant_east_asian)),
+  ("font-variant-ligatures", found(font_variant_ligatures)),
+  ("font-variant-numeric", found(font_variant_numeric)),
+  ("font-variant-position", found(font_variant_position)),
+  ("font-variant", found(font_variant)),
+  ("font-variation-settings", found(font_variation_settings)),
+  ("font-weight", found(font_weight)),
+  ("font", found(font)),
+  ("gap", found(gap)),
+  ("grid-area", found(grid_area)),
+  ("grid-auto-columns", found(grid_auto_columns)),
+  ("grid-auto-flow", found(grid_auto_flow)),
+  ("grid-auto-rows", found(grid_auto_rows)),
+  ("grid-column-end", found(grid_column_end)),
+  ("grid-column-gap", found(grid_column_gap)),
+  ("grid-column-start", found(grid_column_start)),
+  ("grid-column", found(grid_column)),
+  ("grid-gap", found(grid_gap)),
+  ("grid-row-end", found(grid_row_end)),
+  ("grid-row-gap", found(grid_row_gap)),
+  ("grid-row-start", found(grid_row_start)),
+  ("grid-row", found(grid_row)),
+  ("grid-template-areas", found(grid_template_areas)),
   ("grid-template-columns", found(grid_template_columns)),
   ("grid-template-rows", found(grid_template_rows)),
-  ("grid-template-areas", found(grid_template_areas)),
   ("grid-template", found(grid_template)),
-  ("grid-auto-columns", found(grid_auto_columns)),
-  ("grid-auto-rows", found(grid_auto_rows)),
-  ("grid-auto-flow", found(grid_auto_flow)),
   ("grid", found(grid)),
-  ("grid-row-start", found(grid_row_start)),
-  ("grid-row-gap", found(grid_row_gap)),
-  ("grid-column-start", found(grid_column_start)),
-  ("grid-column-gap", found(grid_column_gap)),
-  ("grid-row-end", found(grid_row_end)),
-  ("grid-column-end", found(grid_column_end)),
-  ("grid-row", found(grid_row)),
-  ("grid-column", found(grid_column)),
-  ("grid-area", found(grid_area)),
-  ("grid-gap", found(grid_gap)),
-  ("gap", found(gap)),
-  ("z-index", found(z_index)),
-  ("line-height", found(line_height)),
-  ("line-height-step", found(line_height_step)),
+  ("hanging-punctuation", found(hanging_punctuation)),
+  ("height", found(height)),
+  /* ("hyphenate-character", found(hyphenate_character)), */
+  /* ("hyphenate-limit-chars", found(hyphenate_limit_chars)), */
+  /* ("hyphenate-limit-lines", found(hyphenate_limit_lines)), */
+  /* ("hyphenate-limit-zone", found(hyphenate_limit_zone)), */
+  ("hyphens", found(hyphens)),
+  ("image-orientation", found(image_orientation)),
+  ("image-rendering", found(image_rendering)),
+  ("image-resolution", found(image_resolution)),
+  ("ime-mode", found(ime_mode)),
+  ("isolation", found(isolation)),
+  ("justify-content", found(justify_content)),
+  ("justify-items", found(justify_items)),
+  ("justify-self", found(justify_self)),
+  /* ("layout-grid-char", found(layout_grid_char)), */
+  /* ("layout-grid-line", found(layout_grid_line)), */
+  /* ("layout-grid-mode", found(layout_grid_mode)), */
+  /* ("layout-grid-type", found(layout_grid_type)), */
+  /* ("layout-grid", found(layout_grid)), */
   ("left", found(left)),
-  ("top", found(top)),
-  ("right", found(right)),
-  ("bottom", found(bottom)),
+  ("letter-spacing", found(letter_spacing)),
+  ("line-break", found(line_break)),
+  ("line-clamp", found(line_clamp)),
+  ("line-height-step", found(line_height_step)),
+  ("line-height", found(line_height)),
+  ("list-style-image", found(list_style_image)),
+  ("list-style-position", found(list_style_position)),
+  ("list-style-type", found(list_style_type)),
+  ("list-style", found(list_style)),
+  ("margin-bottom", found(margin_bottom)),
+  ("margin-left", found(margin_left)),
+  ("margin-right", found(margin_right)),
+  ("margin-top", found(margin_top)),
+  ("margin", found(margin)),
   ("mask-image", found(mask_image)),
-  ("outline", found(outline)),
+  ("mask-image", found(mask_image)),
+  ("max-height", found(max_height)),
+  ("max-lines", found(max_lines)),
+  ("max-width", found(max_width)),
+  ("min-height", found(min_height)),
+  ("min-width", found(min_width)),
+  ("mix-blend-mode", found(mix_blend_mode)),
+  /* ("nav-down", found(nav_down)), */
+  /* ("nav-left", found(nav_left)), */
+  /* ("nav-right", found(nav_right)), */
+  /* ("nav-up", found(nav_up)), */
+  ("object-fit", found(object_fit)),
+  ("object-position", found(object_position)),
+  ("opacity", found(opacity)),
+  ("order", found(order)),
+  ("order", found(order)),
   ("outline-color", found(outline_color)),
   ("outline-offset", found(outline_offset)),
   ("outline-style", found(outline_style)),
   ("outline-width", found(outline_width)),
-  ("vertical-align", found(vertical_align)),
-  /* SVG */
-  ("fill", found(fill)),
+  ("outline", found(outline)),
+  ("overflow-inline", found(overflow_inline)),
+  ("overflow-wrap", found(overflow_wrap)),
+  ("overflow-x", found(overflow_x)),
+  ("overflow-x", found(overflow_x)),
+  ("overflow-y", found(overflow_y)),
+  ("overflow-y", found(overflow_y)),
+  ("overflow", found(overflow)),
+  ("padding-bottom", found(padding_bottom)),
+  ("padding-left", found(padding_left)),
+  ("padding-right", found(padding_right)),
+  ("padding-top", found(padding_top)),
+  ("padding", found(padding)),
+  ("perspective-origin", found(perspective_origin)),
+  ("perspective", found(perspective)),
+  ("pointer-events", found(pointer_events)),
+  ("position", found(position)),
+  ("resize", found(resize)),
+  ("right", found(right)),
+  ("rotate", found(rotate)),
+  ("row-gap", found(row_gap)),
+  ("scale", found(scale)),
+  /* ("scrollbar-3dlight-color", found(scrollbar_3dlight_color)), */
+  /* ("scrollbar-arrow-color", found(scrollbar_arrow_color)), */
+  /* ("scrollbar-base-color", found(scrollbar_base_color)), */
+  ("scrollbar-color", found(scrollbar_color)),
+  /* ("scrollbar-darkshadow-color", found(scrollbar_darkshadow_color)), */
+  /* ("scrollbar-face-color", found(scrollbar_face_color)), */
+  /* ("scrollbar-highlight-color", found(scrollbar_highlight_color)), */
+  /* ("scrollbar-shadow-color", found(scrollbar_shadow_color)), */
+  /* ("scrollbar-track-color", found(scrollbar_track_color)), */
+  /* ("scrollbar-width", found(scrollbar_width)), */
+  /* ("stop-color", found(stopColor)), */
+  /* ("stop-opacity", found(stopOpacity)), */
+  /* ("stroke-dasharray", found(strokeDasharray)), */
+  /* ("stroke-linecap", found(strokeLinecap)), */
+  /* ("stroke-linejoin", found(strokeLinejoin)), */
+  /* ("stroke-miterlimit", found(strokeMiterlimit)), */
+  /* ("stroke-width", found(strokeWidth)), */
   ("stroke", found(stroke)),
+  ("stroke-opacity", found(strokeOpacity)),
+  ("tab-size", found(tab_size)),
+  ("tab-size", found(tab_size)),
+  ("text-align-last", found(text_align_last)),
+  ("text-align", found(text_align)),
+  /* ("text-autospace", found(text_autospace)), */
+  /* ("text-blink", found(text_blink)), */
+  ("text-combine-upright", found(text_combine_upright)),
+  ("text-decoration-color", found(text_decoration_color)),
+  ("text-decoration-line", found(text_decoration_line)),
+  ("text-decoration-skip-ink", found(text_decoration_skip_ink)),
+  ("text-decoration-skip", found(text_decoration_skip)),
+  ("text-decoration-style", found(text_decoration_style)),
+  ("text-decoration-thickness", found(text_decoration_thickness)),
+  ("text-decoration", found(text_decoration)),
+  ("text-emphasis-color", found(text_emphasis_color)),
+  ("text-emphasis-position", found(text_emphasis_position)),
+  ("text-emphasis-style", found(text_emphasis_style)),
+  ("text-emphasis", found(text_emphasis)),
+  ("text-indent", found(text_indent)),
+  ("text-indent", found(text_indent)),
+  /* ("text-justify-trim", found(text_justify_trim)), */
+  ("text-justify", found(text_justify)),
+  /* ("text-kashida-space", found(text_kashida_space)), */
+  /* ("text-kashida", found(text_kashida)), */
+  ("text-orientation", found(text_orientation)),
+  ("text-overflow", found(text_overflow)),
+  ("text-shadow", found(text_shadow)),
+  ("text-transform", found(text_transform)),
+  ("text-underline-offset", found(text_underline_offset)),
+  ("text-underline-position", found(text_underline_position)),
+  ("top", found(top)),
+  ("touch-action", found(touch_action)),
+  ("transform-box", found(transform_box)),
+  ("transform-origin", found(transform_origin)),
+  ("transform-style", found(transform_style)),
+  ("transform", found(transform)),
+  ("transition-delay", found(transition_delay)),
+  ("transition-duration", found(transition_duration)),
+  ("transition-property", found(transition_property)),
+  ("transition-timing-function", found(transition_timing_function)),
+  ("transition", found(transition)),
+  ("translate", found(translate)),
+  ("user-select", found(user_select)),
+  ("vertical-align", found(vertical_align)),
+  ("visibility", found(visibility)),
+  ("white-space", found(white_space)),
+  ("widows", found(widows)),
+  ("width", found(width)),
+  ("word-break", found(word_break)),
+  ("word-spacing", found(word_spacing)),
+  ("word-wrap", found(word_wrap)),
+  ("z-index", found(z_index)),
+  // ("block-ellipsis", found(block_ellipsis)),
+  // ("continue", found(continue)),
+  // ("font-palette", found(font_palette)),
+  // ("font-synthesis-small-caps", found(font_synthesis_small_caps)),
+  // ("font-synthesis-style", found(font_synthesis_style)),
+  // ("font-synthesis-weight", found(font_synthesis_weight)),
+  // ("font-variant-emoji", found(font_variant_emoji)),
+  // ("overflow-clip-margin", found(overflow_clip_margin)),
+  // ("text-align-all", found(text_align_all)),
+  // ("text-decoration-skip-box", found(text_decoration_skip_box)),
+  // ("text-decoration-skip-inset", found(text_decoration_skip_inset)),
+  // ("text-decoration-skip-self", found(text_decoration_skip_self)),
+  // ("text-decoration-skip-spaces", found(text_decoration_skip_spaces)),
+  // ("text-emphasis-skip", found(text_emphasis_skip)),
 ];
 
 let render_when_unsupported_features = (~loc, property, value) => {

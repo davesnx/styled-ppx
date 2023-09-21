@@ -1,4 +1,0 @@
-(library
- (name css)
- (public_name styled-ppx.css)
- (flags :standard -w -108))

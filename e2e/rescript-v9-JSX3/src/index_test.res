@@ -1,11 +1,6 @@
 open Vitest
 open ReactTestingLibrary
 
-let fadeIn = %keyframe(`
-  0% { opacity: 0 }
-  100% { opacity: 1 }
-`)
-
 module Component = %styled.div(`
   display: flex;
   justify-content: center;
@@ -16,8 +11,6 @@ module Component = %styled.div(`
   width: 100vw;
 
   font-size: 30px;
-
-  animation-name: $(fadeIn);
 
   width: unset;
 `)

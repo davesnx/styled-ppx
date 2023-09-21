@@ -31,8 +31,9 @@ switch (input, help) {
 | (Some(css), _) =>
   switch (Css_lexer.parse_declaration_list(~container_lnum, ~pos, css)) {
   | Ok(declarations) =>
-    Css_types.pp_rule_list(Format.std_formatter, declarations)
-  | Error((loc, msg)) =>
-    Location.raise_errorf(~loc, "Error parsing CSS: %s", msg)
+    print_endline(Css_types.show_rule_list(declarations))
+  | Error((_loc, msg)) =>
+    /* TODO: print loc */
+    print_endline(Printf.sprintf("Error parsing CSS: %s", msg))
   }
 };

@@ -1,5 +1,4 @@
 open Reason_css_lexer;
-open Location;
 open Alcotest;
 
 let parse = input => {
