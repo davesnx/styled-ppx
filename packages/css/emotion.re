@@ -5,11 +5,11 @@
        type styleEncoding = string;
        type renderer = Js.Json.t; // not relevant, maybe remove from interface?
 
-       [@bs.module "@emotion/css"]
+       [@mel.module "@emotion/css"]
        external injectRaw: (. string) => unit = "injectGlobal";
        let renderRaw = (. _, css) => injectRaw(. css);
 
-       [@bs.module "@emotion/css"]
+       [@mel.module "@emotion/css"]
        external injectRawRules: (. Js.Json.t) => unit = "injectGlobal";
 
        let injectRules =
@@ -24,13 +24,13 @@
              Js.Dict.fromArray([(selector, rules)])->Js.Json.object_,
            );
 
-       [@bs.module "@emotion/css"]
+       [@mel.module "@emotion/css"]
        external mergeStyles: (. array(styleEncoding)) => styleEncoding = "cx";
 
-       [@bs.module "@emotion/css"]
+       [@mel.module "@emotion/css"]
        external make: (. Js.Json.t) => styleEncoding = "css";
 
-       [@bs.module "@emotion/css"]
+       [@mel.module "@emotion/css"]
        external makeAnimation: (. Js.Dict.t(Js.Json.t)) => string = "keyframes";
 
        let makeKeyframes = (. frames) => makeAnimation(. frames);
@@ -39,7 +39,7 @@
 
    type cache;
 
-   [@bs.module "@emotion/cache"] external cache: cache = "cache";
+   [@mel.module "@emotion/cache"] external cache: cache = "cache";
 
    let fontFace =
        (~fontFamily, ~src, ~fontStyle=?, ~fontWeight=?, ~fontDisplay=?, ()) => {
