@@ -1,6 +1,8 @@
 [@@@warning "-20" (* [ignored-extra-argument] *)]
 [@@@warning "-21" (* [nonreturning-statement] *)]
 
+module Std = Kloth
+
 type rule =
   | D of string * string
   | S of string * rule array
@@ -71,8 +73,7 @@ module Make (CssImpl : Css_Core.CssImplementationIntf) :
    fun [@u] renderer css -> (CssImpl.renderRaw renderer css [@u])
 
   let global =
-   fun [@u] selector rules ->
-    (CssImpl.injectRules selector (toJson rules) [@u])
+   fun [@u] selector rules -> (CssImpl.injectRules selector (toJson rules) [@u])
 
   let renderGlobal =
    fun [@u] renderer selector rules ->

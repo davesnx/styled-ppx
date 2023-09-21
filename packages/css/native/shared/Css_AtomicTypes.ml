@@ -1,3 +1,5 @@
+module Std = Kloth
+
 module Cascading = struct
   type nonrec t =
     [ `initial
