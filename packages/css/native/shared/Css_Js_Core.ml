@@ -1,5 +1,7 @@
 [@@@warning "-20" (* [ignored-extra-argument] *)]
 
+module Std = Kloth
+
 type rule =
   | D of string * string
   | S of string * rule array

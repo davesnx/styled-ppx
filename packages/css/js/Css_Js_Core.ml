@@ -1,6 +1,8 @@
 [@@@warning "-20" (* [ignored-extra-argument] *)]
 [@@@warning "-21" (* [nonreturning-statement] *)]
 
+module Std = Kloth
+
 type rule =
   | D of string * string
   | S of string * rule array
