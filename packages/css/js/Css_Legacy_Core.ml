@@ -1,6 +1,3 @@
-[@@@warning "-20" (* [ignored-extra-argument] *)]
-[@@@warning "-21" (* [nonreturning-statement] *)]
-
 module Std = Kloth
 
 type rule =
