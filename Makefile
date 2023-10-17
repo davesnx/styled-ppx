@@ -15,22 +15,22 @@ help: ## Print this help message
 
 .PHONY: build
 build: ## Build the project, including non installable libraries and executables
-	@$(DUNE) build --promote-install-files --root . @@default
+	$(DUNE) build --promote-install-files --root . @@default
 
 .PHONY: build-prod
 build-prod: ## Build for production (--profile=prod)
-	@$(DUNE) build --profile=prod @@default
+	$(DUNE) build --profile=prod @@default
 
 .PHONY: clean
 clean: ## Clean artifacts
-	@$(DUNE) clean
+	$(DUNE) clean
 
 .PHONY: deps
 deps: $(opam_file) ## Alias to update the opam file and install the needed deps
 
 .PHONY: format-check
 format-check: ## Checks if format is correct
-	@$(DUNE) build @fmt
+	$(DUNE) build @fmt
 
 .PHONY: format
 fmt format: ## Formats code
@@ -49,19 +49,19 @@ pin: ## Pin dependencies
 
 .PHONY: create-switch
 create-switch: ## Create opam switch
-	@opam switch create . 4.14.1 --deps-only --with-test --no-install
+	opam switch create . 4.14.1 --deps-only --with-test --no-install
 
 .PHONY: install
 install: ## Install project dependencies
-	@opam install . --deps-only --with-test
-	@npm install
+	opam install . --deps-only --with-test
+	npm install
 
 .PHONY: init
 init: setup-githooks create-switch pin install ## Create a local dev enviroment
 
 .PHONY: subst
 subst: ## Run dune substitute
-	@$(DUNE) subst
+	$(DUNE) subst
 
 .PHONY: dev
 dev: ## Run the project in dev mode
@@ -101,17 +101,17 @@ $(foreach target,$(TEST_TARGETS), $(eval $(call create_test_promote,$(target))))
 
 .PHONY: test_e2e
 test_e2e: ## Run End-to-end tests for JSX3
-	@npm --prefix 'e2e/rescript-v9-JSX3' install --force
-	@npm --prefix 'e2e/rescript-v9-JSX3' run build
-	@npm --prefix 'e2e/rescript-v9-JSX3' run test
+	npm --prefix 'e2e/rescript-v9-JSX3' install --force
+	npm --prefix 'e2e/rescript-v9-JSX3' run build
+	npm --prefix 'e2e/rescript-v9-JSX3' run test
 
 .PHONY: test_e2e_watch
 test_e2e_watch: ## Run End-to-end tests for JSX3
-	@npm --prefix 'e2e/rescript-v9-JSX3' run test_watch
+	npm --prefix 'e2e/rescript-v9-JSX3' run test_watch
 
 .PHONY: test_e2e_promote
 test_e2e_promote: ## Run End-to-end tests for JSX3
-	@npm --prefix 'e2e/rescript-v9-JSX3' run test_promote
+	npm --prefix 'e2e/rescript-v9-JSX3' run test_promote
 
 .PHONY: test
 test: build test_native_typecheck test_css_support test_ppx_snapshot test_parser test_css_lexer test_reason_css_parser test_css_spec_parser test_css_spec_types test_string_interpolation test_emotion test_e2e
