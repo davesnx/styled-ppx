@@ -1,4 +1,4 @@
-module Std = Kloth
+open Css_AtomicTypes
 
 type rule =
   | D of string * string
@@ -20,8 +20,6 @@ let rec ruleToDict dict rule =
 
 and toJson rules =
   Std.List.reduce rules (Js.Dict.empty ()) ruleToDict |. Js.Json.object_
-
-open Css_AtomicTypes
 
 let addStop dict (stop, rules) =
   Js.Dict.set dict (Std.Int.toString stop ^ {js|%|js}) (toJson rules);

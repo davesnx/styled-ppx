@@ -1,4 +1,4 @@
-module Std = Kloth
+open Css_AtomicTypes
 
 type rule =
   | D of string * string
@@ -22,8 +22,6 @@ let rec ruleToDict =
 
 and toJson rules =
   Std.Array.reduceU rules (Js.Dict.empty ()) ruleToDict |. Js.Json.object_
-
-open Css_AtomicTypes
 
 type nonrec animationName = string
 
