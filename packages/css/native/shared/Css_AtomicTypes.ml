@@ -2263,7 +2263,11 @@ module Content = struct
     | `noOpenQuote -> {js|no-open-quote|js}
     | `noCloseQuote -> {js|no-close-quote|js}
     | `attr name -> ({js|attr(|js} ^ name) ^ {js|)|js}
-    | `text value -> value
+    | `text "" -> {js|""|js}
+    | `text value ->
+      (match Js.String2.get value 0 with
+      | "\"" | "'" -> value
+      | _ -> "\"" ^ value ^ "\"")
 end
 
 module SVG = struct
