@@ -2254,6 +2254,17 @@ module Content = struct
     | `text of string
     ]
 
+  let text_to_string value =
+    match value with
+    | "" -> {|''|}
+    | {|""|} -> {|''|}
+    | value ->
+      (match Js.String2.get value 0, Js.String2.length value with
+      | {|"|}, 1 -> {|'"'|}
+      | {|'|}, 1 -> {|"'"|}
+      | {|"|}, _ | {|'|}, _ -> value
+      | _ -> {|"|} ^ value ^ {|"|})
+
   let toString x =
     match x with
     | `none -> {js|none|js}
@@ -2263,11 +2274,7 @@ module Content = struct
     | `noOpenQuote -> {js|no-open-quote|js}
     | `noCloseQuote -> {js|no-close-quote|js}
     | `attr name -> ({js|attr(|js} ^ name) ^ {js|)|js}
-    | `text "" -> {js|""|js}
-    | `text value ->
-      (match Js.String2.get value 0 with
-      | "\"" | "'" -> value
-      | _ -> "\"" ^ value ^ "\"")
+    | `text v -> text_to_string v
 end
 
 module SVG = struct
