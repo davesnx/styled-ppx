@@ -2022,22 +2022,19 @@ let render_fony_family = (~loc) =>
   | `Family_name(`String(str)) => [%expr
       `custom([%e render_string(~loc, str)])
     ]
-  | `Family_name(`Custom_ident(_list)) => raise(Unsupported_feature);
-
-let render_fony_families = (~loc, v) =>
-  List.map(render_fony_family(~loc), v) |> Builder.pexp_array(~loc);
+  | `Family_name(`Custom_ident(ident)) => [%expr
+      `custom([%e render_string(~loc, ident)])
+    ];
 
 // css-fonts-4
 let font_family =
-  emit(
+  apply(
     Parser.property_font_family,
-    (~loc as _) => id,
-    (~loc) =>
-      fun
-      | [v] => [[%expr CssJs.fontFamily([%e render_fony_family(~loc, v)])]]
-      | rest => [
-          [%expr CssJs.fontFamilies([%e render_fony_families(~loc, rest)])],
-        ],
+    (~loc) => [%expr CssJs.fontFamilies],
+    (~loc, value) =>
+      value
+      |> List.map(render_fony_family(~loc))
+      |> Builder.pexp_array(~loc),
   );
 
 let render_font_weight = (~loc) =>
