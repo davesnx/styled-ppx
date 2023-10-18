@@ -2113,7 +2113,10 @@ module FontFamilyName = struct
 
   let toString x =
     match x with
-    | `custom name -> name
+    | `custom value ->
+      (match Js.String2.get value 0 with
+      | {|"|} | {|'|} -> value
+      | _ -> {|"|} ^ value ^ {|"|})
     | `serif -> {js|serif|js}
     | `sansSerif -> {js|sans-serif|js}
     | `cursive -> {js|cursive|js}
