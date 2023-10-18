@@ -91,7 +91,7 @@ endef
 define create_test_promote
 .PHONY: test_$(1)_promote
 test_$(1)_promote: ## Run $(1) tests
-	$$(DUNE) build @$(1)_promote
+	$$(DUNE) build @$(1)_test --auto-promote
 endef
 
 # Apply the create_watch_target rule for each test target
