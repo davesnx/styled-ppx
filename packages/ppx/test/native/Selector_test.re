@@ -326,10 +326,7 @@ let complex_tests = [
     [%expr [%cx {|& div[id$="thumbnail"] {}|}]],
     [%expr
       CssJs.style(. [|
-        CssJs.selector(.
-          {js|& div[id|js} ++ {js|$|js} ++ {js|="thumbnail"]|js},
-          [||],
-        ),
+        CssJs.selector(. {js|& div[id$="thumbnail"]|js}, [||]),
       |])
     ],
   ),
