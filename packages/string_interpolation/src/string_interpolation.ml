@@ -9,10 +9,11 @@ module Parser = struct
     | String s -> "String(" ^ s ^ ")"
     | Variable v -> "Variable(" ^ v ^ ")"
 
-  let _print_tokens tokens =
+  let print_tokens tokens =
     List.iter (fun (p, _) -> print_endline (token_to_string p)) tokens
+  [@@warning "-32"]
 
-  let lexeme ?(skip = 0) ?(drop = 0) lexbuf =
+  let sub_lexeme ?(skip = 0) ?(drop = 0) lexbuf =
     let len = Sedlexing.lexeme_length lexbuf - skip - drop in
     Sedlexing.Utf8.sub_lexeme lexbuf skip len
 
@@ -31,24 +32,27 @@ module Parser = struct
         }
     in
     let raise_error lexbuf msg = Location.raise_errorf ~loc:(loc lexbuf) msg in
+    let letter = [%sedlex.regexp? 'a' .. 'z' | 'A' .. 'Z'] in
+    let ident =
+      [%sedlex.regexp? (letter | '_'), Star (letter | '0' .. '9' | '_')]
+    in
+    let case_ident =
+      [%sedlex.regexp?
+        ('a' .. 'z' | '_' | '\''), Star (letter | '0' .. '9' | '_')]
+    in
+    let variable = [%sedlex.regexp? Star (ident, '.'), case_ident] in
+    let interpolation = [%sedlex.regexp? "$", "(", variable, ")"] in
+    let rest = [%sedlex.regexp? Plus (Chars "$") | Plus (Compl '$')] in
     let rec parse acc lexbuf =
-      let letter = [%sedlex.regexp? 'a' .. 'z' | 'A' .. 'Z'] in
-      let ident =
-        [%sedlex.regexp? (letter | '_'), Star (letter | '0' .. '9' | '_')]
-      in
-      let case_ident =
-        [%sedlex.regexp?
-          ('a' .. 'z' | '_' | '\''), Star (letter | '0' .. '9' | '_')]
-      in
-      let variable = [%sedlex.regexp? Star (ident, '.'), case_ident] in
-      let interpolation = [%sedlex.regexp? "$(", variable, ")"] in
-      let rest = [%sedlex.regexp? Plus (Compl '$')] in
       match%sedlex lexbuf with
+      | rest ->
+        let str = sub_lexeme lexbuf in
+        let captured = String str, loc lexbuf in
+        parse (captured :: acc) lexbuf
       | interpolation ->
-        parse
-          ((Variable (lexeme ~skip:2 ~drop:1 lexbuf), loc lexbuf) :: acc)
-          lexbuf
-      | rest -> parse ((String (lexeme lexbuf), loc lexbuf) :: acc) lexbuf
+        let variable = sub_lexeme ~skip:2 ~drop:1 lexbuf in
+        let captured = Variable variable, loc lexbuf in
+        parse (captured :: acc) lexbuf
       | eof -> acc
       | _ -> raise_error lexbuf "Internal error in 'string_to_tokens'"
     in
@@ -70,7 +74,9 @@ module Emitter = struct
     | String (s, _) -> s
     | Variable ((v, _), _) -> "$(" ^ v ^ ")"
 
-  let _print_tokens = List.iter (fun p -> print_string (token_to_string p))
+  let print_tokens = List.iter (fun p -> print_string (token_to_string p))
+  [@@warning "-32"]
+
   let loc = Location.none
   let with_loc ~loc txt = { loc; txt }
 

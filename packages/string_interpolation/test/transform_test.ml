@@ -17,21 +17,25 @@ let ast =
   testable pp_ast compare
 
 let assert_equal title actual expected = check ast title expected actual
-let test1 () = assert_equal "one char" (transform "x") [%expr {js|x|js}]
+let test0 () = assert_equal "one char" (transform "x") [%expr {js|x|js}]
 
-let test2 () =
+let test1 () =
   assert_equal "dont transform string" (transform "Hello") [%expr {js|Hello|js}]
 
-let test3 () =
+let test2 () =
   assert_equal "dont transform multiple strings" (transform "Hello world")
     [%expr {js|Hello world|js}]
 
-let test4 () = assert_equal "inline variable" (transform "$(name)") [%expr name]
+let test3 () = assert_equal "inline variable" (transform "$(name)") [%expr name]
 
-let test5 () =
+let test4 () =
   assert_equal "concat string before variable"
     (transform "Hello $(name)")
     [%expr {js|Hello |js} ^ name]
+
+let test5 () =
+  assert_equal "concat string after variable" (transform "H$(name)")
+    [%expr {js|H|js} ^ name]
 
 let test6 () =
   assert_equal "concat string after variable"
@@ -66,8 +70,27 @@ let test12 () =
     (transform "$(Module.value) more")
     [%expr Module.value ^ {js| more|js}]
 
+let test13 () = assert_equal "$" (transform {|$|}) [%expr {js|$|js}]
+
+let test14 () =
+  assert_equal "before" (transform {|before$|})
+    [%expr {js|before|js} ^ {js|$|js}]
+
+let test15 () =
+  assert_equal "before with space" (transform {|before $|})
+    [%expr {js|before |js} ^ {js|$|js}]
+
+let test16 () =
+  assert_equal "after" (transform {|$after|}) [%expr {js|$|js} ^ {js|after|js}]
+
+let test17 () =
+  assert_equal "both"
+    (transform {|before$after|})
+    [%expr {js|before|js} ^ {js|$|js} ^ {js|after|js}]
+
 let cases =
   [
+    "Test 0", `Quick, test0;
     "Test 1", `Quick, test1;
     "Test 2", `Quick, test2;
     "Test 3", `Quick, test3;
@@ -80,6 +103,11 @@ let cases =
     "Test 10", `Quick, test10;
     "Test 11", `Quick, test11;
     "Test 12", `Quick, test12;
+    "Test 13", `Quick, test13;
+    "Test 14", `Quick, test14;
+    "Test 15", `Quick, test15;
+    "Test 16", `Quick, test16;
+    "Test 17", `Quick, test17;
   ]
 
 let () = run "String interpolation test suit" [ "Transform", cases ]
