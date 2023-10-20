@@ -92,6 +92,12 @@ let test18 () =
   assert_equal "double" (transform {|$ a $|})
     [%expr {js|$|js} ^ {js| a |js} ^ {js|$|js}]
 
+let test19 () =
+  assert_equal "$()" (transform {|$()|}) [%expr {js|$|js} ^ {js|()|js}]
+
+let test20 () =
+  assert_equal "$(" (transform {|$(|}) [%expr {js|$|js} ^ {js|(|js}]
+
 let cases =
   [
     "Test 0", `Quick, test0;
@@ -113,6 +119,8 @@ let cases =
     "Test 16", `Quick, test16;
     "Test 17", `Quick, test17;
     "Test 18", `Quick, test18;
+    "Test 19", `Quick, test19;
+    "Test 20", `Quick, test20;
   ]
 
 let () = run "String interpolation test suit" [ "Transform", cases ]
