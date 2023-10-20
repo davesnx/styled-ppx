@@ -1,56 +1,62 @@
 module Location = Ppxlib.Location
 
+type token =
+  | String of string
+  | Variable of string
+
+let token_to_string = function
+  | String s -> "String(" ^ s ^ ")"
+  | Variable v -> "Variable(" ^ v ^ ")"
+
+let print_tokens tokens =
+  List.iter (fun (p, _) -> print_endline (token_to_string p)) tokens
+[@@warning "-32"]
+
 module Parser = struct
-  type token =
-    | String of string
-    | Variable of string
-
-  let token_to_string = function
-    | String s -> "String(" ^ s ^ ")"
-    | Variable v -> "Variable(" ^ v ^ ")"
-
-  let _print_tokens tokens =
-    List.iter (fun (p, _) -> print_endline (token_to_string p)) tokens
-
-  let lexeme ?(skip = 0) ?(drop = 0) lexbuf =
+  let sub_lexeme ?(skip = 0) ?(drop = 0) lexbuf =
     let len = Sedlexing.lexeme_length lexbuf - skip - drop in
     Sedlexing.Utf8.sub_lexeme lexbuf skip len
 
+  let letter = [%sedlex.regexp? 'a' .. 'z' | 'A' .. 'Z']
+
+  let case_ident =
+    [%sedlex.regexp?
+      ('a' .. 'z' | '_' | '\''), Star (letter | '0' .. '9' | '_')]
+
+  let ident = [%sedlex.regexp? (letter | '_'), Star (letter | '0' .. '9' | '_')]
+  let variable = [%sedlex.regexp? Star (ident, '.'), case_ident]
+  let interpolation = [%sedlex.regexp? "$(", variable, ")"]
+  let rest = [%sedlex.regexp? Plus (Compl '$')]
+
   (** Parse string, producing a list of tokens from this module. *)
-  let from_string ~(loc : Location.t) (str : string) =
-    let lexbuf = Sedlexing.Utf8.from_string str in
+  let from_string ~(loc : Location.t) (input : string) =
+    let lexbuf = Sedlexing.Utf8.from_string input in
     Sedlexing.set_position lexbuf loc.loc_start;
-    let loc (lexbuf : Sedlexing.lexbuf) =
-      let adjust base rel = Lexing.{ rel with pos_fname = base.pos_fname } in
-      let loc_start, loc_end = Sedlexing.lexing_positions lexbuf in
-      Location.
-        {
-          loc_start = adjust loc.loc_start loc_start;
-          loc_end = adjust loc.loc_start loc_end;
-          loc_ghost = false;
-        }
-    in
-    let raise_error lexbuf msg = Location.raise_errorf ~loc:(loc lexbuf) msg in
     let rec parse acc lexbuf =
-      let letter = [%sedlex.regexp? 'a' .. 'z' | 'A' .. 'Z'] in
-      let ident =
-        [%sedlex.regexp? (letter | '_'), Star (letter | '0' .. '9' | '_')]
-      in
-      let case_ident =
-        [%sedlex.regexp?
-          ('a' .. 'z' | '_' | '\''), Star (letter | '0' .. '9' | '_')]
-      in
-      let variable = [%sedlex.regexp? Star (ident, '.'), case_ident] in
-      let interpolation = [%sedlex.regexp? "$(", variable, ")"] in
-      let rest = [%sedlex.regexp? Plus (Compl '$')] in
       match%sedlex lexbuf with
+      | rest ->
+        let str = sub_lexeme lexbuf in
+        parse (String str :: acc) lexbuf
+      | any ->
+        let str = sub_lexeme lexbuf in
+        parse (String str :: acc) lexbuf
       | interpolation ->
-        parse
-          ((Variable (lexeme ~skip:2 ~drop:1 lexbuf), loc lexbuf) :: acc)
-          lexbuf
-      | rest -> parse ((String (lexeme lexbuf), loc lexbuf) :: acc) lexbuf
+        let variable = sub_lexeme ~skip:2 ~drop:1 lexbuf in
+        parse (Variable variable :: acc) lexbuf
       | eof -> acc
-      | _ -> raise_error lexbuf "Internal error in 'string_to_tokens'"
+      | _ ->
+        let adjust base rel = Lexing.{ rel with pos_fname = base.pos_fname } in
+        let loc_start, loc_end = Sedlexing.lexing_positions lexbuf in
+        let loc =
+          Location.
+            {
+              loc_start = adjust loc.loc_start loc_start;
+              loc_end = adjust loc.loc_start loc_end;
+              loc_ghost = false;
+            }
+        in
+        Location.raise_errorf ~loc
+          "Internal error in 'String_interpolation.parse'"
     in
     List.rev @@ parse [] lexbuf
 end
@@ -60,17 +66,6 @@ module Emitter = struct
   open Ast_helper
   open Ast_builder.Default
 
-  type element = string * Location.t
-
-  type token =
-    | String of element
-    | Variable of element * element option
-
-  let token_to_string = function
-    | String (s, _) -> s
-    | Variable ((v, _), _) -> "$(" ^ v ^ ")"
-
-  let _print_tokens = List.iter (fun p -> print_string (token_to_string p))
   let loc = Location.none
   let with_loc ~loc txt = { loc; txt }
 
@@ -93,9 +88,9 @@ module Emitter = struct
     @@ List.fold_left
          (fun acc token ->
            match token with
-           | Variable ((v, loc), _) ->
+           | Variable v ->
              (Nolabel, v |> Longident.parse |> inline_const ~loc) :: acc
-           | String (v, loc) ->
+           | String v ->
              (Nolabel, js_string_to_const ~attrs ~delimiter ~loc v) :: acc)
          [] tokens
 
@@ -113,23 +108,24 @@ module Emitter = struct
     | args -> apply concat_fn args
 end
 
-let parser_to_emitter (tokens : (Parser.token * Location.t) list) :
-  Emitter.token list =
-  List.rev
-  @@ snd
-  @@ List.fold_left
-       (fun (cur_fmt, acc) (token, loc) ->
-         match token, cur_fmt with
-         | Parser.Variable v, curr_fmt ->
-           None, Emitter.Variable ((v, loc), curr_fmt) :: acc
-         | _, Some (_, loc) ->
-           Location.raise_errorf ~loc
-             "Format is not followed by variable/expression. Missing %%?"
-         | Parser.String s, None -> None, Emitter.String (s, loc) :: acc)
-       (None, []) tokens
+(* This is currently a hack, since we can't diferentiate between sedlexes' rest
+   and interpolation, it generates different tokens. Here we "join" them back *)
+let optimize_strings tokens =
+  List.fold_left
+    (fun acc token ->
+      match acc with
+      | [] -> [ token ]
+      | String s :: rest -> begin
+        match token with
+        | String s' -> String (s ^ s') :: rest
+        | _ -> token :: acc
+      end
+      | _ -> token :: acc)
+    [] tokens
+  |> List.rev
 
 let transform ?(attrs = []) ~delimiter ~loc str =
   str
   |> Parser.from_string ~loc
-  |> parser_to_emitter
+  |> optimize_strings
   |> Emitter.generate ~delimiter ~attrs

@@ -119,13 +119,15 @@ test: build test_native_typecheck test_css_support test_ppx_snapshot test_parser
 # Debug commands
 
 .PHONY: ast
-ast:
-	$(DUNE) exec ast-renderer -- $@
+ast: ## Print the command to debug the ast
+	@echo "Run the following command to debug the AST"
+	@echo "  $(DUNE) exec ast-renderer"
 
 .PHONY: lexer
-lexer:
-	$(DUNE) exec lexer-renderer -- $@
+lexer: ## Print the command to debug the lexer
+	@echo "Run the following command to debug the AST"
+	@echo "  $(DUNE) exec lexer-renderer"
 
 .PHONY: interpreter
-interpreter:
+interpreter: ## Run menhir as interpret
 	$(OPAM_EXEC) menhir --interpret --interpret-show-cst packages/parser/lib/css_parser.mly

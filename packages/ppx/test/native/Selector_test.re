@@ -322,6 +322,15 @@ let complex_tests = [
     ],
   ),
   (
+    {|& div[id$="thumbnail"] { }|},
+    [%expr [%cx {|& div[id$="thumbnail"] {}|}]],
+    [%expr
+      CssJs.style(. [|
+        CssJs.selector(. {js|& div[id$="thumbnail"]|js}, [||]),
+      |])
+    ],
+  ),
+  (
     "& button:hover",
     [%expr [%cx "& button:hover{} "]],
     [%expr
