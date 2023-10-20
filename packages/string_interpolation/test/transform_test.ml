@@ -88,6 +88,10 @@ let test17 () =
     (transform {|before$after|})
     [%expr {js|before|js} ^ {js|$|js} ^ {js|after|js}]
 
+let test18 () =
+  assert_equal "double" (transform {|$ a $|})
+    [%expr {js|$|js} ^ {js| a |js} ^ {js|$|js}]
+
 let cases =
   [
     "Test 0", `Quick, test0;
@@ -108,6 +112,7 @@ let cases =
     "Test 15", `Quick, test15;
     "Test 16", `Quick, test16;
     "Test 17", `Quick, test17;
+    "Test 18", `Quick, test18;
   ]
 
 let () = run "String interpolation test suit" [ "Transform", cases ]

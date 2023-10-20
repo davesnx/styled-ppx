@@ -1,18 +1,18 @@
 module Location = Ppxlib.Location
 
+type token =
+  | String of string
+  | Variable of string
+
+let token_to_string = function
+  | String s -> "String(" ^ s ^ ")"
+  | Variable v -> "Variable(" ^ v ^ ")"
+
+let print_tokens tokens =
+  List.iter (fun (p, _) -> print_endline (token_to_string p)) tokens
+[@@warning "-32"]
+
 module Parser = struct
-  type token =
-    | String of string
-    | Variable of string
-
-  let token_to_string = function
-    | String s -> "String(" ^ s ^ ")"
-    | Variable v -> "Variable(" ^ v ^ ")"
-
-  let print_tokens tokens =
-    List.iter (fun (p, _) -> print_endline (token_to_string p)) tokens
-  [@@warning "-32"]
-
   let sub_lexeme ?(skip = 0) ?(drop = 0) lexbuf =
     let len = Sedlexing.lexeme_length lexbuf - skip - drop in
     Sedlexing.Utf8.sub_lexeme lexbuf skip len
@@ -41,20 +41,18 @@ module Parser = struct
         ('a' .. 'z' | '_' | '\''), Star (letter | '0' .. '9' | '_')]
     in
     let variable = [%sedlex.regexp? Star (ident, '.'), case_ident] in
-    let interpolation = [%sedlex.regexp? "$", "(", variable, ")"] in
+    let interpolation = [%sedlex.regexp? "$(", variable, ")"] in
     let rest = [%sedlex.regexp? Plus (Chars "$") | Plus (Compl '$')] in
     let rec parse acc lexbuf =
       match%sedlex lexbuf with
       | rest ->
         let str = sub_lexeme lexbuf in
-        let captured = String str, loc lexbuf in
-        parse (captured :: acc) lexbuf
+        parse (String str :: acc) lexbuf
       | interpolation ->
         let variable = sub_lexeme ~skip:2 ~drop:1 lexbuf in
-        let captured = Variable variable, loc lexbuf in
-        parse (captured :: acc) lexbuf
+        parse (Variable variable :: acc) lexbuf
       | eof -> acc
-      | _ -> raise_error lexbuf "Internal error in 'string_to_tokens'"
+      | _ -> raise_error lexbuf "Internal error in 'String_interpolation.parse'"
     in
     List.rev @@ parse [] lexbuf
 end
@@ -63,19 +61,6 @@ module Emitter = struct
   open Ppxlib
   open Ast_helper
   open Ast_builder.Default
-
-  type element = string * Location.t
-
-  type token =
-    | String of element
-    | Variable of element * element option
-
-  let token_to_string = function
-    | String (s, _) -> s
-    | Variable ((v, _), _) -> "$(" ^ v ^ ")"
-
-  let print_tokens = List.iter (fun p -> print_string (token_to_string p))
-  [@@warning "-32"]
 
   let loc = Location.none
   let with_loc ~loc txt = { loc; txt }
@@ -99,9 +84,9 @@ module Emitter = struct
     @@ List.fold_left
          (fun acc token ->
            match token with
-           | Variable ((v, loc), _) ->
+           | Variable v ->
              (Nolabel, v |> Longident.parse |> inline_const ~loc) :: acc
-           | String (v, loc) ->
+           | String v ->
              (Nolabel, js_string_to_const ~attrs ~delimiter ~loc v) :: acc)
          [] tokens
 
@@ -119,23 +104,5 @@ module Emitter = struct
     | args -> apply concat_fn args
 end
 
-let parser_to_emitter (tokens : (Parser.token * Location.t) list) :
-  Emitter.token list =
-  List.rev
-  @@ snd
-  @@ List.fold_left
-       (fun (cur_fmt, acc) (token, loc) ->
-         match token, cur_fmt with
-         | Parser.Variable v, curr_fmt ->
-           None, Emitter.Variable ((v, loc), curr_fmt) :: acc
-         | _, Some (_, loc) ->
-           Location.raise_errorf ~loc
-             "Format is not followed by variable/expression. Missing %%?"
-         | Parser.String s, None -> None, Emitter.String (s, loc) :: acc)
-       (None, []) tokens
-
 let transform ?(attrs = []) ~delimiter ~loc str =
-  str
-  |> Parser.from_string ~loc
-  |> parser_to_emitter
-  |> Emitter.generate ~delimiter ~attrs
+  str |> Parser.from_string ~loc |> Emitter.generate ~delimiter ~attrs
