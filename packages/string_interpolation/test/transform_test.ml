@@ -16,51 +16,55 @@ let ast =
   in
   testable pp_ast compare
 
-let test1 () = check ast "one char" [%expr {js|x|js}] (transform "x")
+let assert_equal title actual expected = check ast title expected actual
+let test1 () = assert_equal "one char" (transform "x") [%expr {js|x|js}]
 
 let test2 () =
-  check ast "dont transform string" [%expr {js|Hello|js}] (transform "Hello")
+  assert_equal "dont transform string" (transform "Hello") [%expr {js|Hello|js}]
 
 let test3 () =
-  check ast "dont transform multiple strings" [%expr {js|Hello world|js}]
-    (transform "Hello world")
+  assert_equal "dont transform multiple strings" (transform "Hello world")
+    [%expr {js|Hello world|js}]
 
-let test4 () = check ast "inline variable" [%expr name] (transform "$(name)")
+let test4 () = assert_equal "inline variable" (transform "$(name)") [%expr name]
 
 let test5 () =
-  check ast "concat string before variable" [%expr {js|Hello |js} ^ name]
+  assert_equal "concat string before variable"
     (transform "Hello $(name)")
+    [%expr {js|Hello |js} ^ name]
 
 let test6 () =
-  check ast "concat string after variable" [%expr name ^ {js| Hello|js}]
+  assert_equal "concat string after variable"
     (transform "$(name) Hello")
+    [%expr name ^ {js| Hello|js}]
 
 let test7 () =
-  check ast "concat more than one variable" [%expr name ^ name]
+  assert_equal "concat more than one variable"
     (transform "$(name)$(name)")
+    [%expr name ^ name]
 
 let test8 () =
-  check ast "concat more than one variable"
-    [%expr name ^ {js| hello |js} ^ name]
+  assert_equal "concat more than one variable"
     (transform "$(name) hello $(name)")
+    [%expr name ^ {js| hello |js} ^ name]
 
 let test9 () =
-  check ast "empty variable"
-    [%expr name ^ {js| hello |js} ^ name ^ {js| world|js}]
+  assert_equal "empty variable"
     (transform "$(name) hello $(name) world")
+    [%expr name ^ {js| hello |js} ^ name ^ {js| world|js}]
 
 let test10 () =
-  check ast "test"
-    [%expr name ^ name ^ {js| : |js} ^ name ^ name]
+  assert_equal "test"
     (transform "$(name)$(name) : $(name)$(name)")
+    [%expr name ^ name ^ {js| : |js} ^ name ^ name]
 
 let test11 () =
-  check ast "test" [%expr Module.value] (transform "$(Module.value)")
+  assert_equal "test" (transform "$(Module.value)") [%expr Module.value]
 
 let test12 () =
-  check ast "test"
-    [%expr Module.value ^ {js| more|js}]
+  assert_equal "test"
     (transform "$(Module.value) more")
+    [%expr Module.value ^ {js| more|js}]
 
 let cases =
   [
