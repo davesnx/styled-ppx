@@ -73,30 +73,23 @@ let test12 () =
 let test13 () = assert_equal "$" (transform {|$|}) [%expr {js|$|js}]
 
 let test14 () =
-  assert_equal "before" (transform {|before$|})
-    [%expr {js|before|js} ^ {js|$|js}]
+  assert_equal "before" (transform {|before$|}) [%expr {js|before$|js}]
 
 let test15 () =
   assert_equal "before with space" (transform {|before $|})
-    [%expr {js|before |js} ^ {js|$|js}]
+    [%expr {js|before $|js}]
 
 let test16 () =
-  assert_equal "after" (transform {|$after|}) [%expr {js|$|js} ^ {js|after|js}]
+  assert_equal "after" (transform {|$after|}) [%expr {js|$after|js}]
 
 let test17 () =
-  assert_equal "both"
-    (transform {|before$after|})
-    [%expr {js|before|js} ^ {js|$|js} ^ {js|after|js}]
+  assert_equal "both" (transform {|before$after|}) [%expr {js|before$after|js}]
 
 let test18 () =
-  assert_equal "double" (transform {|$ a $|})
-    [%expr {js|$|js} ^ {js| a |js} ^ {js|$|js}]
+  assert_equal "double" (transform {|$ a $|}) [%expr {js|$ a $|js}]
 
-let test19 () =
-  assert_equal "$()" (transform {|$()|}) [%expr {js|$|js} ^ {js|()|js}]
-
-let test20 () =
-  assert_equal "$(" (transform {|$(|}) [%expr {js|$|js} ^ {js|(|js}]
+let test19 () = assert_equal "$()" (transform {|$()|}) [%expr {js|$()|js}]
+let test20 () = assert_equal "$(" (transform {|$(|}) [%expr {js|$(|js}]
 
 let cases =
   [

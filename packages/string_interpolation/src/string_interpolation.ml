@@ -18,15 +18,15 @@ module Parser = struct
     Sedlexing.Utf8.sub_lexeme lexbuf skip len
 
   let letter = [%sedlex.regexp? 'a' .. 'z' | 'A' .. 'Z']
-  let ident = [%sedlex.regexp? (letter | '_'), Star (letter | '0' .. '9' | '_')]
 
   let case_ident =
     [%sedlex.regexp?
       ('a' .. 'z' | '_' | '\''), Star (letter | '0' .. '9' | '_')]
 
+  let ident = [%sedlex.regexp? (letter | '_'), Star (letter | '0' .. '9' | '_')]
   let variable = [%sedlex.regexp? Star (ident, '.'), case_ident]
   let interpolation = [%sedlex.regexp? "$(", variable, ")"]
-  let rest = [%sedlex.regexp? Chars "$" | Plus (Compl '$')]
+  let rest = [%sedlex.regexp? Plus (Compl '$')]
 
   (** Parse string, producing a list of tokens from this module. *)
   let from_string ~(loc : Location.t) (input : string) =
@@ -35,6 +35,9 @@ module Parser = struct
     let rec parse acc lexbuf =
       match%sedlex lexbuf with
       | rest ->
+        let str = sub_lexeme lexbuf in
+        parse (String str :: acc) lexbuf
+      | any ->
         let str = sub_lexeme lexbuf in
         parse (String str :: acc) lexbuf
       | interpolation ->
@@ -105,5 +108,24 @@ module Emitter = struct
     | args -> apply concat_fn args
 end
 
+(* This is currently a hack, since we can't diferentiate between sedlexes' rest
+   and interpolation, it generates different tokens. Here we "join" them back *)
+let optimize_strings tokens =
+  List.fold_left
+    (fun acc token ->
+      match acc with
+      | [] -> [ token ]
+      | String s :: rest -> begin
+        match token with
+        | String s' -> String (s ^ s') :: rest
+        | _ -> token :: acc
+      end
+      | _ -> token :: acc)
+    [] tokens
+  |> List.rev
+
 let transform ?(attrs = []) ~delimiter ~loc str =
-  str |> Parser.from_string ~loc |> Emitter.generate ~delimiter ~attrs
+  str
+  |> Parser.from_string ~loc
+  |> optimize_strings
+  |> Emitter.generate ~delimiter ~attrs
