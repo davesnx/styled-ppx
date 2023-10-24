@@ -46,7 +46,7 @@ pin: ## Pin dependencies
   # reason.3.1.0 could be installed from opam-repository, but it has --with-dev-setup for now so opam 2.1 ignores it
   @opam pin add reason.dev "https://github.com/reasonml/reason.git#f92f7ecc228d19ebf4d9d0214792da7b45472766" -y
 # @opam pin add ppxlib.dev "https://github.com/ocaml-ppx/ppxlib.git#8b8987c5690ad839348d96bf52471b03b88f06ed" -y
-  @opam pin add server-reason-react.dev "https://github.com/ml-in-barcelona/server-reason-react.git#8e9abb4f557ec6eafb7434505bd35a1d2f28b6cc" -y
+  @opam pin add server-reason-react.dev "https://github.com/ml-in-barcelona/server-reason-react.git#0e12e234ffbd845917891ecd4a366df86c8b0371" -y
 
 .PHONY: create-switch
 create-switch: ## Create opam switch
