@@ -1,5 +1,4 @@
-[@@@warning "-20" (* [ignored-extra-argument] *)]
-[@@@warning "-21" (* [nonreturning-statement] *)]
+open Css_AtomicTypes
 
 module Std = Kloth
 
@@ -11,9 +10,6 @@ type rule =
 
 let rec ruleToDict dict rule =
   (match rule with
-  | D (name, value) when name = "content" ->
-    Js.Dict.set dict name
-      (Js.Json.string (if value = {js||js} then {js|""|js} else value))
   | D (name, value) -> Js.Dict.set dict name (Js.Json.string value)
   | S (name, ruleset) -> Js.Dict.set dict name (toJson ruleset)
   | PseudoClass (name, ruleset) ->
@@ -26,8 +22,6 @@ let rec ruleToDict dict rule =
 
 and toJson rules =
   Std.List.reduce rules (Js.Dict.empty ()) ruleToDict |. Js.Json.object_
-
-open Css_AtomicTypes
 
 let addStop dict (stop, rules) =
   Js.Dict.set dict (Std.Int.toString stop ^ {js|%|js}) (toJson rules);

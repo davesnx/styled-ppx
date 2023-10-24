@@ -287,17 +287,17 @@ and render_selector = (selector: selector) => {
      ) */
   and render_subclass_selector =
     fun
-    | Id(v) => "#" ++ v
-    | Class(v) => "." ++ v
+    | Id(v) => Printf.sprintf("#%s", v)
+    | Class(v) => Printf.sprintf(".%s", v)
     | ClassVariable(v) => "." ++ render_variable_as_string(v)
-    | Attribute(Attr_value(v)) => "[" ++ v ++ "]"
+    | Attribute(Attr_value(v)) => Printf.sprintf("[%s]", v)
     | Attribute(To_equal({name, kind, value})) => {
         let value =
           switch (value) {
           | Attr_ident(ident) => ident
-          | Attr_string(ident) => "\"" ++ ident ++ "\""
+          | Attr_string(ident) => {|"|} ++ ident ++ {|"|}
           };
-        "[" ++ name ++ kind ++ value ++ "]";
+        Printf.sprintf("[%s%s%s]", name, kind, value);
       }
     | Pseudo_class(psc) => render_pseudo_selector(psc)
   and render_nth =

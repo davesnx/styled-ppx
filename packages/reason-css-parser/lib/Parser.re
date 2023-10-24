@@ -221,7 +221,7 @@ and ending_shape = [%value.rec "'circle' | 'ellipse'"]
 and explicit_track_list = [%value.rec
   "[ [ <line-names> ]? <track-size> ]+ [ <line-names> ]?"
 ]
-and family_name = [%value.rec "<string> | [ <custom-ident> ]+"]
+and family_name = [%value.rec "<string> | <custom-ident>"]
 and feature_tag_value = [%value.rec "<string> [ <integer> | 'on' | 'off' ]?"]
 and feature_type = [%value.rec
   "'@stylistic' | '@historical-forms' | '@styleset' | '@character-variant' | '@swash' | '@ornaments' | '@annotation'"
