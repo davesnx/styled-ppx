@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import { externalizeDeps } from 'vite-plugin-externalize-deps'
 
 export default defineConfig({
   test: {
@@ -6,5 +7,6 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
   },
-  root: "src"
+  root: "test",
+  plugins: [externalizeDeps()],
 })
