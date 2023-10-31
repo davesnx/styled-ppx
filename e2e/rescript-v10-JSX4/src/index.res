@@ -5,7 +5,6 @@
     font-family:
       -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     background-color: hsla(165, 80%, 15%, 0.03);
-    background-image: linear-gradient(90deg, white 10%, grey 90%);
   }
 `)
 
@@ -34,13 +33,12 @@ module Wat = %styled.div(`
   display: flex;
 `)
 
-
 module Link = %styled.a(`
   font-size: 36px;
   margin-top: 16px;
 `)
 
-module Input = %styled.input("padding: 30px")
+module Input = %styled.input("padding: 4px; border-color: green; border-radius: 4px; margin-right: 16px; margin-top: 16px; border-width: 3px;")
 
 @send external focus: Dom.element => unit = "focus"
 
@@ -120,11 +118,21 @@ module Button = %styled.button(
   }
 )
 
+let fonts = [ #custom("Inter") ];
+
+let title = CssJs.style(. [
+  CssJs.label("title"),
+  %css("font-family: $(fonts)"),
+  CssJs.fontSize(#px(24)),
+  CssJs.fontWeight(#bold),
+  CssJs.color(#hex("333")),
+])
+
 module App = {
   @react.component
   let make = () => {
     <>
-      <div> {React.string("Demo of styled-ppx in ReScript v10")} </div>
+      <h1 className=title> {React.string("Demo of styled-ppx in ReScript v10")} </h1>
       <ul>
         <li> {React.string("ReScript + @rescript/react")} </li>
         <li> {React.string("vite")} </li>
