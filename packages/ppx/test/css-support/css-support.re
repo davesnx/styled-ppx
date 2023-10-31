@@ -882,8 +882,11 @@
 
 /* CSS Fonts Module Level 2 */
 [%css {|font-family: "Inter Semi Bold";|}];
+[%css {|font-family: $(fonts);|}];
 [%css {|font-family: Inter;|}];
+[%css {|font-family: $(font);|}];
 [%css {|font-family: Inter, Sans;|}];
+[%css {|font-family: Inter, $(font);|}];
 [%css {|font-family: "Gill Sans Extrabold", sans-serif;|}];
 
 /* CSS Fonts Module Level 3 */
