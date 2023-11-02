@@ -10,7 +10,7 @@
     "number": "-48"
   },
   "sources": [{
-    "dir": "src",
+    "dir": "test",
     "subdirs": true,
     "type": "dev"
   }, {

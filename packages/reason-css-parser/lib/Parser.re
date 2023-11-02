@@ -1051,9 +1051,10 @@ and property_float = [%value.rec
 and property_font = [%value.rec
   "[ <'font-style'> || <font-variant-css21> || <'font-weight'> || <'font-stretch'> ]? <'font-size'> [ '/' <'line-height'> ]? <'font-family'> | 'caption' | 'icon' | 'menu' | 'message-box' | 'small-caption' | 'status-bar'"
 ]
-and property_font_family = [%value.rec
-  "[ <family-name> | <generic-family> | <interpolation>]#"
+and font_families = [%value.rec
+  "[ <family-name> | <generic-family> | <interpolation> ]#"
 ]
+and property_font_family = [%value.rec "<font_families> | <interpolation>"]
 and property_font_feature_settings = [%value.rec
   "'normal' | [ <feature-tag-value> ]#"
 ]
@@ -3184,6 +3185,7 @@ let check_map =
       ("shape-radius", check(shape_radius)),
       ("side-or-corner", check(side_or_corner)),
       ("single-animation", check(single_animation)),
+      ("font-families", check(font_families)),
       ("single-animation-direction", check(single_animation_direction)),
       ("single-animation-fill-mode", check(single_animation_fill_mode)),
       (

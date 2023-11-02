@@ -1,9 +1,0 @@
-(library
- (name ui_native)
- (wrapped false)
- (libraries
-  styled-ppx.css_native
-  styled-ppx.emotion_native
-  server-reason-react.js)
- (preprocess
-  (pps styled-ppx.lib)))
