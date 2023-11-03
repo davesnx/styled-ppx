@@ -1,7 +1,5 @@
 open Alcotest;
 
-module Lexer = Css_lexer;
-
 let parse = input => {
   let pos = Some(Lexing.dummy_pos);
   switch (Driver_.parse_stylesheet(~pos, input)) {
