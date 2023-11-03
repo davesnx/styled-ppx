@@ -19,11 +19,11 @@ let parse = (skip_whitespaces, buf, parser) => {
 
   try(Ok(menhir(parser, next_token))) {
   | LexingError((pos, msg)) =>
-    let loc = Lex_buffer.make_loc(pos, pos);
+    let loc = Util.make_loc(pos, pos);
     Error((loc, msg));
   | _ =>
     let (token, start_pos, end_pos) = last_token^;
-    let loc = Lex_buffer.make_loc(start_pos, end_pos);
+    let loc = Util.make_loc(start_pos, end_pos);
     let msg =
       Printf.sprintf(
         "Parse error while reading token '%s'",
@@ -33,48 +33,34 @@ let parse = (skip_whitespaces, buf, parser) => {
   };
 };
 
-let parse_string =
-    (~skip_whitespace, ~container_lnum=?, ~pos=?, parser, string) => {
-  parse(
-    skip_whitespace,
-    Lex_buffer.from_string(~container_lnum?, ~pos?, string),
-    parser,
-  );
+let from_string = (~pos: option(Lexing.position)=?, string) => {
+  let buffer = Sedlexing.Latin1.from_string(string);
+  switch (pos) {
+  | Some(p) => Sedlexing.set_position(buffer, p)
+  | None => ()
+  };
+  buffer;
 };
 
-let parse_declaration_list = (~container_lnum=?, ~pos=?, input: string) => {
-  parse_string(
-    ~skip_whitespace=false,
-    ~container_lnum?,
-    ~pos?,
-    Parser.declaration_list,
-    input,
-  );
+let last_buffer = ref(Sedlexing.Latin1.from_string(""));
+
+let parse_string = (~skip_whitespace, ~pos, parser, string) => {
+  let buffer = Sedlexing.Utf8.from_string(string);
+
+  last_buffer := from_string(~pos?, string);
+
+  parse(skip_whitespace, buffer, parser);
 };
 
-let parse_declaration = (~container_lnum=?, ~pos=?, input: string) =>
-  parse_string(
-    ~skip_whitespace=true,
-    ~container_lnum?,
-    ~pos?,
-    Parser.declaration,
-    input,
-  );
+let parse_declaration_list = (input: string) => {
+  parse_string(~skip_whitespace=false, Parser.declaration_list, input);
+};
 
-let parse_stylesheet = (~container_lnum=?, ~pos=?, input: string) =>
-  parse_string(
-    ~skip_whitespace=false,
-    ~container_lnum?,
-    ~pos?,
-    Parser.stylesheet,
-    input,
-  );
+let parse_declaration = (input: string) =>
+  parse_string(~skip_whitespace=true, Parser.declaration, input);
 
-let parse_keyframes = (~container_lnum=?, ~pos=?, input: string) =>
-  parse_string(
-    ~skip_whitespace=false,
-    ~container_lnum?,
-    ~pos?,
-    Parser.keyframes,
-    input,
-  );
+let parse_stylesheet = (input: string) =>
+  parse_string(~skip_whitespace=false, Parser.stylesheet, input);
+
+let parse_keyframes = (input: string) =>
+  parse_string(~skip_whitespace=false, Parser.keyframes, input);
