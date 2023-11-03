@@ -1,4 +1,4 @@
-open Reason_css_lexer;
+open Tokens;
 open Combinator;
 open Rule.Let;
 open Rule.Pattern;

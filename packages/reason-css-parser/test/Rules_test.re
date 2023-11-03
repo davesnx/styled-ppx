@@ -1,6 +1,6 @@
 open Alcotest;
 open Reason_css_parser;
-open Reason_css_lexer;
+open Tokens;
 open Rule;
 
 open! Data;
