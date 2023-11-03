@@ -10,8 +10,16 @@
   "sources": [{
     "dir": "src",
     "subdirs": false
+  },
+  {
+    "dir": "../../_build/default/packages/css/rescript",
+    "subdirs": true
   }, {
-    "dir": "demo",
+    "dir": "../../_build/default/packages/emotion/rescript",
+    "subdirs": true
+    },
+  {
+    "dir": "test",
     "subdirs": false
   }],
   "package-specs": [
@@ -27,8 +35,6 @@
   "namespace": true,
   "bs-dependencies": [
     "@rescript/react",
-    "bs-css",
-    "bs-css-emotion",
     "@rescriptbr/react-testing-library",
     "rescript-vitest",
     "rescript-webapi"

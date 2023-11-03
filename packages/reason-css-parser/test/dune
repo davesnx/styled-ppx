@@ -3,8 +3,8 @@
  (libraries
   alcotest
   styled-ppx.reason-css-parser
-  styled-ppx.reason-css-lexer
   reason_css_parser_ppx_lib
+  styled-ppx.css-parser
   fmt)
  (preprocess
   (pps reason_css_parser_ppx sedlex.ppx ppxlib.metaquot)))

@@ -395,11 +395,8 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         [],
       );
     let type_anotation = [%type:
-      list(Reason_css_lexer.token) =>
-      (
-        Reason_css_parser__Rule.data([%t core_type]),
-        list(Reason_css_lexer.token),
-      )
+      list(Tokens.token) =>
+      (Reason_css_parser__Rule.data([%t core_type]), list(Tokens.token))
     ];
     [%expr ([%e expression]: [%t type_anotation])];
   };

@@ -35,7 +35,7 @@ let rec printUnlessIsEof = buffer => {
   let pos_start = position_to_string(loc_start);
   let pos_end = position_to_string(loc_end);
   print_endline(
-    Css_lexer.token_to_debug(token)
+    Tokens.token_to_debug(token)
     ++ {| [|}
     ++ pos_start
     ++ {|..|}
@@ -52,5 +52,5 @@ let rec printUnlessIsEof = buffer => {
 switch (input, help) {
 | (Some(_), true)
 | (None, _) => render_help()
-| (Some(css), _) => css |> Lex_buffer.from_string |> printUnlessIsEof
+| (Some(css), _) => css |> Sedlexing.Latin1.from_string |> printUnlessIsEof
 };

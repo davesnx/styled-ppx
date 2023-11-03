@@ -1,12 +1,10 @@
 open Alcotest;
-
-module Lexer = Css_lexer;
-module Parser = Css_lexer.Parser;
+module Parser = Css_parser;
 
 let parse = input => {
-  let buffer = Sedlexing.Utf8.from_string(input) |> Lex_buffer.of_sedlex;
+  let buffer = Sedlexing.Utf8.from_string(input);
   let rec from_string = acc => {
-    switch (Lexer.get_next_token(buffer)) {
+    switch (Css_lexer.get_next_token(buffer)) {
     | Parser.EOF => []
     | token => [token, ...from_string(acc)]
     };
@@ -20,7 +18,7 @@ let parse = input => {
 let render_token =
   fun
   | Parser.EOF => ""
-  | t => Lexer.token_to_debug(t);
+  | t => Tokens.token_to_debug(t);
 
 let list_parse_tokens_to_string = tokens =>
   tokens |> List.map(render_token) |> String.concat(" ") |> String.trim;
@@ -29,7 +27,7 @@ let list_tokens_to_string = tokens =>
   tokens |> List.map(render_token) |> String.concat(" ") |> String.trim;
 
 let success_tests_data =
-  Parser.[
+  [
     (" \n\t ", [WS]),
     ({|"something"|}, [STRING("something")]),
     ({|'tuturu'|}, [STRING("tuturu")]),
@@ -46,7 +44,7 @@ let success_tests_data =
     ({|+|}, [COMBINATOR("+")]),
     ({|,|}, [COMMA]),
     ({|-45.6|}, [NUMBER("-45.6")]),
-    ({|45%|}, [NUMBER("45"), PERCENTAGE]),
+    ({|45%|}, [NUMBER("45"), PERCENT]),
     ({|2n|}, [DIMENSION(("2", "n"))]),
     /* TODO: Store Float_dimension as float/int */
     /* TODO: Store dimension as a variant */
@@ -100,7 +98,7 @@ let success_tests_data =
     /* TODO: Percentage should have payload? */
     (
       {|calc(10%)|},
-      [FUNCTION("calc"), NUMBER("10"), PERCENTAGE, RIGHT_PAREN],
+      [FUNCTION("calc"), NUMBER("10"), PERCENT, RIGHT_PAREN],
     ),
     (
       {|background-image:url('img_tree.gif' )|},
@@ -114,15 +112,15 @@ let success_tests_data =
       ],
     ),
     /* TODO: Transform this as [DELIM("$"), LEFT_PAREN, IDENT("Module"), DELIM("."), IDENT("variable"), RIGHT_PAREN]) */
-    ({|$(Module.variable)|}, [VARIABLE(["Module", "variable"])]),
-    ({|$(Module.variable')|}, [VARIABLE(["Module", "variable'"])]),
+    ({|$(Module.variable)|}, [INTERPOLATION(["Module", "variable"])]),
+    ({|$(Module.variable')|}, [INTERPOLATION(["Module", "variable'"])]),
     ({|-moz|}, [IDENT("-moz")]),
     ({|--color-main|}, [IDENT("--color-main")]),
   ]
   /* TODO: Support for escaped */
   /* ({|\32|}, [IDENT("--color-main")]), */
   /* ({|\25BA|}, [IDENT("--color-main")]), */
-  /* TODO: Supported scaped "@" and others */
+  /* TODO: Supported escaped "@" and others */
   /* ("\\@desu", [IDENT("@desu")]), */
   |> List.mapi((_index, (input, output)) => {
        let okInput = parse(input) |> Result.get_ok;

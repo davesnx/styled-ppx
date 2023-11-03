@@ -53,6 +53,7 @@ _build/
 
 # Local OPAM switch
 _opam/
+_opam_5/
 
 ## BuckleScript
 /lib/*

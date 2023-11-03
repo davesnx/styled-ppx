@@ -1,5 +1,4 @@
-[@@@warning "-20" (* [ignored-extra-argument] *)]
-[@@@warning "-21" (* [nonreturning-statement] *)]
+open Css_AtomicTypes
 
 type rule =
   | D of string * string
@@ -10,10 +9,6 @@ type rule =
 let rec ruleToDict =
  fun [@bs] dict rule ->
   (match rule with
-  | D (name, value) when name = {js|content|js} ->
-    dict
-    |. Js.Dict.set name
-         (Js.Json.string (if value = {js||js} then {js|""|js} else value))
   | D (name, value) -> dict |. Js.Dict.set name (Js.Json.string value)
   | S (name, ruleset) -> dict |. Js.Dict.set name (toJson ruleset)
   | PseudoClass (name, ruleset) ->
@@ -27,8 +22,6 @@ let rec ruleToDict =
 
 and toJson rules =
   Std.Array.reduceU rules (Js.Dict.empty ()) ruleToDict |. Js.Json.object_
-
-open Css_AtomicTypes
 
 type nonrec animationName = string
 
