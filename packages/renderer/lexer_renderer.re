@@ -35,7 +35,7 @@ let rec printUnlessIsEof = buffer => {
   let pos_start = position_to_string(loc_start);
   let pos_end = position_to_string(loc_end);
   print_endline(
-    Css_lexer.token_to_debug(token)
+    Tokens.token_to_debug(token)
     ++ {| [|}
     ++ pos_start
     ++ {|..|}

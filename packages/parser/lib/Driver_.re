@@ -1,24 +1,21 @@
 module Lexer = Css_lexer;
 module Parser = Css_parser;
 module Location = Ppxlib.Location;
-module Sedlexing = Sedlexing;
-
-exception LexingError((Lexing.position, string));
 
 let menhir = MenhirLib.Convert.Simplified.traditional2revised;
 
-let parse = (skip_whitespaces, buf, parser) => {
+let parse = (skip_whitespaces, lexbuf, parser) => {
   Lexer.skip_whitespace.contents = skip_whitespaces;
 
   let last_token = ref((Parser.EOF, Lexing.dummy_pos, Lexing.dummy_pos));
 
   let next_token = () => {
-    last_token := Lexer.get_next_tokens_with_location(buf);
+    last_token := Lexer.get_next_tokens_with_location(lexbuf);
     last_token^;
   };
 
   try(Ok(menhir(parser, next_token))) {
-  | LexingError((pos, msg)) =>
+  | Lexer.LexingError((pos, msg)) =>
     let loc = Util.make_loc(pos, pos);
     Error((loc, msg));
   | _ =>
@@ -27,7 +24,7 @@ let parse = (skip_whitespaces, buf, parser) => {
     let msg =
       Printf.sprintf(
         "Parse error while reading token '%s'",
-        Lexer.token_to_string(token),
+        Tokens.token_to_string(token),
       );
     Error((loc, msg));
   };

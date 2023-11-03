@@ -20,6 +20,7 @@ open Css_types
 %token AMPERSAND
 %token ASTERISK
 %token COMMA
+%token BAD_IDENT
 %token WS
 %token <string> IDENT
 %token <string> TAG
