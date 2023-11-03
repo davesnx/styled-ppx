@@ -7,7 +7,6 @@ type token =
   | AT_KEYWORD(string) // <at-keyword-token>
   | HASH(string, [ | `ID | `UNRESTRICTED]) // <hash-token>
   | STRING(string) // <string-token>
-  | BAD_STRING(string) // <bad-string-token>
   | URL(string) // <url-token>
   | BAD_URL // <bad-url-token>
   | DELIM(string) // <delim-token>
@@ -15,8 +14,6 @@ type token =
   | PERCENTAGE(float) // <percentage-token>
   | DIMENSION(float, string) // <dimension-token>
   | WHITESPACE // <whitespace-token>
-  | CDO // <CDO-token>
-  | CDC // <CDC-token>
   | COLON // <colon-token>
   | SEMICOLON // <semicolon-token>
   | COMMA // <comma-token>
@@ -38,7 +35,6 @@ let humanize =
   | AT_KEYWORD(at) => "@ " ++ at
   | HASH(h, _) => "hash: #" ++ h
   | STRING(s) => {|string "|} ++ s ++ {|"|}
-  | BAD_STRING(_) => "bad string"
   | URL(u) => "url " ++ u
   | BAD_URL => "bad url"
   | DELIM(d) => "delimiter " ++ d
@@ -47,8 +43,6 @@ let humanize =
     "percentage: " ++ string_of_float(f) ++ string_of_char('%')
   | DIMENSION(f, s) => "dimension: " ++ string_of_float(f) ++ s
   | WHITESPACE => "whitespace"
-  | CDO => "<!--"
-  | CDC => "-->"
   | COLON => ":"
   | SEMICOLON => ";"
   | COMMA => ","

@@ -233,7 +233,7 @@ let consume_string = (ending_code_point, buf) => {
 
   switch (read("")) {
   | Ok(string) => Ok(STRING(string))
-  | Error((string, error)) => Error((BAD_STRING(string), error))
+  | Error((string, error)) => Error((STRING(string), error))
   };
 };
 
@@ -318,7 +318,6 @@ let consume = buf => {
     | starts_a_number =>
       Sedlexing.rollback(buf);
       consume_numeric(buf);
-    | "-->" => Ok(CDC)
     | starts_an_identifier =>
       Sedlexing.rollback(buf);
       consume_ident_like(buf);
@@ -356,7 +355,6 @@ let consume = buf => {
     };
   | ":" => Ok(COLON)
   | ";" => Ok(SEMICOLON)
-  | "<!--" => Ok(CDO)
   | "<" => Ok(DELIM("<"))
   | "@" =>
     if (check_if_three_codepoints_would_start_an_identifier(buf)) {
