@@ -13,16 +13,16 @@ type token =
   | NUMBER(float) // <number-token>
   | PERCENTAGE(float) // <percentage-token>
   | DIMENSION(float, string) // <dimension-token>
-  | WHITESPACE // <whitespace-token>
+  | WS // <whitespace-token>
   | COLON // <colon-token>
-  | SEMICOLON // <semicolon-token>
+  | SEMI_COLON // <semicolon-token>
   | COMMA // <comma-token>
-  | LEFT_SQUARE // <[-token>
-  | RIGHT_SQUARE // <]-token>
-  | LEFT_PARENS // <(-token>
-  | RIGHT_PARENS // <)-token>
-  | LEFT_CURLY // <{-token>
-  | RIGHT_CURLY; // <}-token>
+  | LEFT_BRACKET // <[-token>
+  | RIGHT_BRACKET // <]-token>
+  | LEFT_PAREN // <(-token>
+  | RIGHT_PAREN // <)-token>
+  | LEFT_BRACE // <{-token>
+  | RIGHT_BRACE; // <}-token>
 
 let string_of_char = c => String.make(1, c);
 
@@ -42,16 +42,16 @@ let humanize =
   | PERCENTAGE(f) =>
     "percentage: " ++ string_of_float(f) ++ string_of_char('%')
   | DIMENSION(f, s) => "dimension: " ++ string_of_float(f) ++ s
-  | WHITESPACE => "whitespace"
+  | WS => "whitespace"
   | COLON => ":"
-  | SEMICOLON => ";"
+  | SEMI_COLON => ";"
   | COMMA => ","
-  | LEFT_SQUARE => "["
-  | RIGHT_SQUARE => "]"
-  | LEFT_PARENS => "("
-  | RIGHT_PARENS => ")"
-  | LEFT_CURLY => "{"
-  | RIGHT_CURLY => "}";
+  | LEFT_BRACKET => "["
+  | RIGHT_BRACKET => "]"
+  | LEFT_PAREN => "("
+  | RIGHT_PAREN => ")"
+  | LEFT_BRACE => "{"
+  | RIGHT_BRACE => "}";
 
 type error =
   | Invalid_code_point

@@ -89,8 +89,8 @@ let convert_string_to_number = str => float_of_string(str);
 
 let consume_whitespace = buf =>
   switch%sedlex (buf) {
-  | Star(whitespace) => WHITESPACE
-  | _ => WHITESPACE
+  | Star(whitespace) => WS
+  | _ => WS
   };
 
 // https://drafts.csswg.org/css-syntax-3/#consume-an-escaped-code-point
@@ -331,8 +331,8 @@ let consume = buf => {
   | "\"" => consume_string("\"", buf)
   | "#" => consume_hash()
   | "'" => consume_string("'", buf)
-  | "(" => Ok(LEFT_PARENS)
-  | ")" => Ok(RIGHT_PARENS)
+  | "(" => Ok(LEFT_PAREN)
+  | ")" => Ok(RIGHT_PAREN)
   | "+" =>
     let _ = Sedlexing.backtrack(buf);
     if (check_if_three_code_points_would_start_a_number(buf)) {
@@ -354,7 +354,7 @@ let consume = buf => {
       Ok(DELIM("."));
     };
   | ":" => Ok(COLON)
-  | ";" => Ok(SEMICOLON)
+  | ";" => Ok(SEMI_COLON)
   | "<" => Ok(DELIM("<"))
   | "@" =>
     if (check_if_three_codepoints_would_start_an_identifier(buf)) {
@@ -364,7 +364,7 @@ let consume = buf => {
     } else {
       Ok(DELIM("@"));
     }
-  | "[" => Ok(LEFT_SQUARE)
+  | "[" => Ok(LEFT_BRACKET)
   | "\\" =>
     rollback(buf);
     switch%sedlex (buf) {
@@ -374,7 +374,7 @@ let consume = buf => {
     // TODO: this error should be different
     | _ => Error((DELIM("/"), Invalid_code_point))
     };
-  | "]" => Ok(RIGHT_SQUARE)
+  | "]" => Ok(RIGHT_BRACKET)
   | digit =>
     let _ = Sedlexing.backtrack(buf);
     consume_numeric(buf);

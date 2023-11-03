@@ -46,7 +46,7 @@ let success_tests_data =
     ({|+|}, [COMBINATOR("+")]),
     ({|,|}, [COMMA]),
     ({|-45.6|}, [NUMBER("-45.6")]),
-    ({|45%|}, [NUMBER("45"), PERCENTAGE]),
+    ({|45%|}, [NUMBER("45"), PERCENT]),
     ({|2n|}, [DIMENSION(("2", "n"))]),
     /* TODO: Store Float_dimension as float/int */
     /* TODO: Store dimension as a variant */
@@ -100,7 +100,7 @@ let success_tests_data =
     /* TODO: Percentage should have payload? */
     (
       {|calc(10%)|},
-      [FUNCTION("calc"), NUMBER("10"), PERCENTAGE, RIGHT_PAREN],
+      [FUNCTION("calc"), NUMBER("10"), PERCENT, RIGHT_PAREN],
     ),
     (
       {|background-image:url('img_tree.gif' )|},
@@ -114,8 +114,8 @@ let success_tests_data =
       ],
     ),
     /* TODO: Transform this as [DELIM("$"), LEFT_PAREN, IDENT("Module"), DELIM("."), IDENT("variable"), RIGHT_PAREN]) */
-    ({|$(Module.variable)|}, [VARIABLE(["Module", "variable"])]),
-    ({|$(Module.variable')|}, [VARIABLE(["Module", "variable'"])]),
+    ({|$(Module.variable)|}, [INTERPOLATION(["Module", "variable"])]),
+    ({|$(Module.variable')|}, [INTERPOLATION(["Module", "variable'"])]),
     ({|-moz|}, [IDENT("-moz")]),
     ({|--color-main|}, [IDENT("--color-main")]),
   ]

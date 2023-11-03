@@ -29,7 +29,7 @@ let token_to_string =
   | Parser.COLON => ":"
   | Parser.DOUBLE_COLON => "::"
   | Parser.SEMI_COLON => ";"
-  | Parser.PERCENTAGE => "%"
+  | Parser.PERCENT => "%"
   | Parser.AMPERSAND => "&"
   | Parser.IMPORTANT => "!important"
   | Parser.IDENT(s) => s
@@ -47,7 +47,7 @@ let token_to_string =
   | Parser.UNICODE_RANGE(s) => s
   | Parser.FLOAT_DIMENSION((n, s)) => n ++ s
   | Parser.DIMENSION((n, d)) => n ++ d
-  | Parser.VARIABLE(v) => String.concat(".", v)
+  | Parser.INTERPOLATION(v) => String.concat(".", v)
   | Parser.WS => " "
   | Parser.DOT => "."
   | Parser.COMMA => ","
@@ -69,7 +69,7 @@ let token_to_debug =
   | Parser.COLON => "COLON"
   | Parser.DOUBLE_COLON => "DOUBLE_COLON"
   | Parser.SEMI_COLON => "SEMI_COLON"
-  | Parser.PERCENTAGE => "PERCENTAGE"
+  | Parser.PERCENT => "PERCENT"
   | Parser.AMPERSAND => "AMPERSAND"
   | Parser.IMPORTANT => "IMPORTANT"
   | Parser.IDENT(s) => "IDENT('" ++ s ++ "')"
@@ -87,7 +87,7 @@ let token_to_debug =
   | Parser.FLOAT_DIMENSION((n, s)) =>
     "FLOAT_DIMENSION('" ++ n ++ ", " ++ s ++ "')"
   | Parser.DIMENSION((n, d)) => "DIMENSION('" ++ n ++ ", " ++ d ++ "')"
-  | Parser.VARIABLE(v) => "VARIABLE('" ++ String.concat(".", v) ++ "')"
+  | Parser.INTERPOLATION(v) => "VARIABLE('" ++ String.concat(".", v) ++ "')"
   | Parser.COMBINATOR(s) => "COMBINATOR(" ++ s ++ ")"
   | Parser.DOT => "DOT"
   | Parser.COMMA => "COMMA"
@@ -576,14 +576,16 @@ let rec get_next_token = buf => {
   | ')' => RIGHT_PAREN
   | '[' => LEFT_BRACKET
   | ']' => RIGHT_BRACKET
-  | '%' => PERCENTAGE
+  | '%' => PERCENT
   | '&' =>
     skip_whitespace.contents = false;
     AMPERSAND;
   | '*' => ASTERISK
   | ',' => COMMA
   | variable =>
-    VARIABLE(latin1(~skip=2, ~drop=1, buf) |> String.split_on_char('.'))
+    INTERPOLATION(
+      latin1(~skip=2, ~drop=1, buf) |> String.split_on_char('.'),
+    )
   | operator => OPERATOR(latin1(buf))
   | combinator => COMBINATOR(latin1(buf))
   | string => STRING(latin1(~skip=1, ~drop=1, buf))

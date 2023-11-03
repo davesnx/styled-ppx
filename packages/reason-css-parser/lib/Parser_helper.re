@@ -19,7 +19,7 @@ let apply_parser = (parser, tokens_with_loc) => {
        )
     |> List.rev;
 
-  let tokens_without_ws = tokens |> List.filter((!=)(WHITESPACE));
+  let tokens_without_ws = tokens |> List.filter((!=)(WS));
 
   let (output, remaining_tokens) = parser(tokens_without_ws);
   let.ok output =
