@@ -3,12 +3,6 @@ type extension =
   | OCaml
   | ReScript;
 
-let extension_to_string =
-  fun
-  | Reason => "Reason"
-  | OCaml => "OCaml"
-  | ReScript => "ReScript";
-
 let detectFileSuffix = (path): result(extension, string) => {
   switch (Filename.extension(path)) {
   | ".re" => Ok(Reason)
