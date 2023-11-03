@@ -5,7 +5,7 @@ module Lexer = Css_lexer;
 let parse = input => {
   let container_lnum = 0;
   let pos = Lexing.dummy_pos;
-  switch (Lexer.parse_stylesheet(~container_lnum, ~pos, input)) {
+  switch (Driver_.parse_stylesheet(~container_lnum, ~pos, input)) {
   | Ok(ast) => Ok(ast)
   | Error((_loc, msg)) => Error(msg)
   };

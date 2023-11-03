@@ -730,9 +730,7 @@ let _ =
             File.set(path);
             let pos = loc.loc_start;
             let container_lnum = pos.pos_lnum;
-            switch (
-              Css_lexer.parse_declaration(~container_lnum, ~pos, payload)
-            ) {
+            switch (Driver_.parse_declaration(~container_lnum, ~pos, payload)) {
             | Ok(declarations) =>
               let declarationListValues =
                 Css_to_emotion.render_declaration(declarations);
@@ -754,9 +752,7 @@ let _ =
             File.set(path);
             let pos = loc.loc_start;
             let container_lnum = pos.pos_lnum;
-            switch (
-              Css_lexer.parse_stylesheet(~container_lnum, ~pos, payload)
-            ) {
+            switch (Driver_.parse_stylesheet(~container_lnum, ~pos, payload)) {
             | Ok(stylesheets) => Css_to_emotion.render_global(stylesheets)
             | Error((loc, msg)) => Generate_lib.error(~loc, msg)
             };
@@ -772,7 +768,7 @@ let _ =
             File.set(path);
             let pos = loc.loc_start;
             let container_lnum = pos.pos_lnum;
-            switch (Css_lexer.parse_keyframes(~container_lnum, ~pos, payload)) {
+            switch (Driver_.parse_keyframes(~container_lnum, ~pos, payload)) {
             | Ok(declarations) =>
               Css_to_emotion.render_keyframes(declarations)
             | Error((loc, msg)) => Generate_lib.error(~loc, msg)

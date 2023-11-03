@@ -29,7 +29,7 @@ switch (input, help) {
 | (Some(_), true)
 | (None, _) => render_help()
 | (Some(css), _) =>
-  switch (Css_lexer.parse_declaration_list(~container_lnum, ~pos, css)) {
+  switch (Driver_.parse_declaration_list(~container_lnum, ~pos, css)) {
   | Ok(declarations) =>
     print_endline(Css_types.show_rule_list(declarations))
   | Error((_loc, msg)) =>

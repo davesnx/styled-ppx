@@ -50,7 +50,7 @@ let parse = (payload, loc: Ppxlib.location) => {
      }; */
 
   switch (
-    Css_lexer.parse_declaration_list(
+    Driver_.parse_declaration_list(
       ~container_lnum=loc_start.pos_lnum,
       ~pos=loc_start,
       payload,
