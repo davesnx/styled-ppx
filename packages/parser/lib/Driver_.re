@@ -42,12 +42,12 @@ let from_string = (~pos: option(Lexing.position)=?, string) => {
   buffer;
 };
 
-let last_buffer = ref(Sedlexing.Latin1.from_string(""));
+let last_buffer = ref(None);
 
 let parse_string = (~skip_whitespace, ~pos, parser, string) => {
   let buffer = Sedlexing.Utf8.from_string(string);
 
-  last_buffer := from_string(~pos?, string);
+  last_buffer := Some(from_string(~pos?, string));
 
   parse(skip_whitespace, buffer, parser);
 };
