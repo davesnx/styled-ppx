@@ -52,5 +52,5 @@ let rec printUnlessIsEof = buffer => {
 switch (input, help) {
 | (Some(_), true)
 | (None, _) => render_help()
-| (Some(css), _) => css |> Lex_buffer.from_string |> printUnlessIsEof
+| (Some(css), _) => css |> Sedlexing.Latin1.from_string |> printUnlessIsEof
 };

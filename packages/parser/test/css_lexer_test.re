@@ -4,7 +4,7 @@ module Lexer = Css_lexer;
 module Parser = Css_lexer.Parser;
 
 let parse = input => {
-  let buffer = Sedlexing.Utf8.from_string(input) |> Lex_buffer.of_sedlex;
+  let buffer = Sedlexing.Utf8.from_string(input);
   let rec from_string = acc => {
     switch (Lexer.get_next_token(buffer)) {
     | Parser.EOF => []

@@ -1,9 +1,9 @@
 /** CSS lexer
   * Reference:
   * https://www.w3.org/TR/css-syntax-3/ */
-module Sedlexing = Lex_buffer;
 module Parser = Css_parser;
 module Types = Css_types;
+module Location = Ppxlib.Location;
 
 /** Signals a lexing error at the provided source location. */
 exception LexingError((Lexing.position, string));
@@ -389,7 +389,7 @@ let non_printable_code_point = [%sedlex.regexp?
 /* This module is a copy/paste of Reason_css_lexer in favor of moving everything into css_lexer */
 module Tokenizer = {
   open Reason_css_lexer;
-  let lexeme = Sedlexing.utf8;
+  let lexeme = Sedlexing.Utf8.lexeme;
 
   let (let.ok) = Result.bind;
 
@@ -540,20 +540,25 @@ module Tokenizer = {
   };
 };
 
-let handle_tokenizer_error = (buf: Sedlexing.t) =>
+let handle_tokenizer_error = buf => {
+  let (_, curr_pos) = Sedlexing.lexing_positions(buf);
   fun
   | Ok(value) => value
   | Error((_, msg)) => {
       let error: string = Reason_css_lexer.show_error(msg);
-      let position = buf.pos;
-      raise @@ LexingError((position, error));
+      raise @@ LexingError((curr_pos, error));
     };
+};
 
 let skip_whitespace = ref(false);
 
+let latin1 = (~skip=0, ~drop=0, lexbuf) => {
+  let len = Sedlexing.lexeme_length(lexbuf) - skip - drop;
+  Sedlexing.Latin1.sub_lexeme(lexbuf, skip, len);
+};
+
 let rec get_next_token = buf => {
   open Parser;
-  open Sedlexing;
   switch%sedlex (buf) {
   | eof => EOF
   | "/*" => discard_comments(buf)
@@ -618,7 +623,6 @@ let rec get_next_token = buf => {
   };
 }
 and get_dimension = (n, buf) => {
-  open Sedlexing;
   switch%sedlex (buf) {
   | length => FLOAT_DIMENSION((n, latin1(buf)))
   | angle => FLOAT_DIMENSION((n, latin1(buf)))
@@ -629,21 +633,25 @@ and get_dimension = (n, buf) => {
   };
 }
 and discard_comments = buf => {
+  let (_, curr_pos) = Sedlexing.lexing_positions(buf);
   switch%sedlex (buf) {
   | "*/" => get_next_token(buf)
   | any => discard_comments(buf)
   | eof =>
     raise(
-      LexingError((buf.pos, "Unterminated comment at the end of the string")),
+      LexingError((
+        curr_pos,
+        "Unterminated comment at the end of the string",
+      )),
     )
   | _ => assert(false)
   };
 };
 
 let get_next_tokens_with_location = buf => {
-  let (_, position_end) = Lex_buffer.lexing_positions(buf);
+  let (_, position_end) = Sedlexing.lexing_positions(buf);
   let token = get_next_token(buf);
-  let (_, position_end_after) = Lex_buffer.lexing_positions(buf);
+  let (_, position_end_after) = Sedlexing.lexing_positions(buf);
 
   (token, position_end, position_end_after);
 };
