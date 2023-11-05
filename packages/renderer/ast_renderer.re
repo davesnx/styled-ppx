@@ -28,7 +28,7 @@ switch (input, help) {
 | (Some(_), true)
 | (None, _) => render_help()
 | (Some(css), _) =>
-  switch (Driver_.parse_declaration_list(~pos, css)) {
+  switch (Driver.parse_declaration_list(~pos, css)) {
   | Ok(declarations) =>
     print_endline(Css_types.show_rule_list(declarations))
   | Error((loc, msg)) =>
