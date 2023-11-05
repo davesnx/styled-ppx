@@ -1,8 +1,7 @@
-open Ppxlib;
 open Css_types;
 
-module Helper = Ast_helper;
-module Builder = Ast_builder.Default;
+module Helper = Ppxlib.Ast_helper;
+module Builder = Ppxlib.Ast_builder.Default;
 
 exception Empty_buffer(string);
 
@@ -57,13 +56,14 @@ let string_to_const = (~loc, s) => {
   };
 };
 let render_variable = (~loc, v) => {
+  open Ppxlib;
   let txt = v |> String.concat(".") |> Longident.parse;
   Helper.Exp.ident({loc, txt});
 };
 
 let source_code_of_loc = (loc: Location.t) => {
   let Location.{loc_start, loc_end, _} = loc;
-  switch (Driver_.last_buffer^) {
+  switch (Driver.last_buffer^) {
   | Some(buffer: Sedlexing.lexbuf) =>
     /* TODO: pos_offset is hardcoded to 0, unsure about the effects */
     let pos_offset = 0;
@@ -78,7 +78,7 @@ let concat = (~loc, expr, acc) => {
   Helper.Exp.apply(~loc, concat_fn, [(Nolabel, expr), (Nolabel, acc)]);
 };
 
-let rec render_at_rule = (at_rule: at_rule): Parsetree.expression => {
+let rec render_at_rule = (at_rule: at_rule) => {
   switch (at_rule.name) {
   | ("media", _) => render_media_query(at_rule)
   | ("keyframes", loc) =>
@@ -111,11 +111,11 @@ let rec render_at_rule = (at_rule: at_rule): Parsetree.expression => {
   | (n, loc) => Generate_lib.error(~loc, Printf.sprintf("Unknown @%s ", n))
   };
 }
-and render_media_query = (at_rule: at_rule): Parsetree.expression => {
+and render_media_query = (at_rule: at_rule) => {
   let (prelude, prelude_loc) = at_rule.prelude;
   let parse_condition =
-      (component_value: (component_value, location))
-      : result(string, Parsetree.expression) => {
+      (component_value: (component_value, Ppxlib.location))
+      : result(string, Ppxlib.Parsetree.expression) => {
     let (value, loc) = component_value;
     let component_value_location = loc;
     switch (value) {
@@ -217,7 +217,7 @@ and render_media_query = (at_rule: at_rule): Parsetree.expression => {
     );
   };
 }
-and render_declaration = (d: declaration): list(Parsetree.expression) => {
+and render_declaration = (d: declaration) => {
   let (property, name_loc) = d.name;
   let (_valueList, loc) = d.value;
   /* String.trim is a hack, location should be correct and not contain any whitespace */
@@ -249,7 +249,7 @@ and render_declaration = (d: declaration): list(Parsetree.expression) => {
     ]
   };
 }
-and render_declarations = ((ds, _loc: location)) => {
+and render_declarations = ((ds, _loc: Ppxlib.location)) => {
   ds
   |> List.concat_map(declaration =>
        switch (declaration) {
@@ -374,7 +374,7 @@ and render_selectors = selectors => {
   |> List.map(((selector, _loc)) => render_selector(selector))
   |> String.concat(", ");
 }
-and render_style_rule = (ident, rule: style_rule): Parsetree.expression => {
+and render_style_rule = (ident, rule: style_rule) => {
   let (prelude, _loc) = rule.prelude;
   let (_block, loc) = rule.block;
   let selector_expr =
@@ -407,7 +407,8 @@ let addLabel = (~loc, label, emotionExprs) => [
   ...emotionExprs,
 ];
 
-let render_style_call = (declaration_list): Parsetree.expression => {
+let render_style_call = declaration_list => {
+  open Ppxlib;
   let loc = declaration_list.pexp_loc;
   let arguments = [(Nolabel, declaration_list)];
 
@@ -419,7 +420,7 @@ let render_style_call = (declaration_list): Parsetree.expression => {
   );
 };
 
-let render_keyframes = (declarations: rule_list): Parsetree.expression => {
+let render_keyframes = (declarations: rule_list) => {
   let (declarations, loc) = declarations;
   let invalid_selector = {|
     keyframe selector can be from | to | <percentage>
