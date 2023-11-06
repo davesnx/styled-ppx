@@ -5,52 +5,52 @@ let check_equality (input, expected) =
     `Quick,
     fun () ->
       (Alcotest.check Alcotest.string)
-        (quoted input ^ " should hash")
+        ("hash " ^ quoted input ^ " should be")
         expected
         (Emotion_hash.Hash.default input) )
 
 let data =
   [
-    "", "";
-    "something ", "j3vvm2";
-    (* "something", "vcob5v"; *)
-    (* "padding: 0;", "6gat1f"; *)
-    (* "paddinxg: 1;", "fzg3kw"; *)
-    "padding: 0px;", "ylvxur";
-    "padding: 2px;", "70mej";
-    "color: #323337", "qhkljz";
-    "color: #323335", "6m717h";
-    (* "font-size: 32px;", "gyv1i7"; *)
-    (* "font-size: 33px;", "80ebse"; *)
-    "display: block", "qurtju";
-    "display: blocki", "pewgr0";
-    (* "display: block;", "350rwu"; *)
-    (* "display: flex", "rfni09"; *)
-    (* "display: flex;", "qpdvh3"; *)
-    "color: #333;", "53ry7e";
-    "font-size: 22px;", "rtdks8";
-    "font-size: 40px;", "hrknh4";
-    (* "line-height: 22px;", "r0jscr"; *)
-    "display: flex; font-size: 33px", "pu0dnc";
-    "background-color: red", "7ttg1g";
-    "width: 100%", "rgyazj";
-    "height: 100%", "e6oti9";
-    "min-width: auto", "u3g7pv";
-    (* "min-height: auto", "ua6m7"; *)
-    "max-width: 100vw", "gl5lgb";
-    (* "max-height: 100vh", "oihm23"; *)
-    (* "margin: 3px", "rqx6bn"; *)
-    (* "border: 1px solid red", "hoqo05"; *)
-    "border: none", "ez5u86";
-    "border-color: grey", "3hy7lk";
-    "border-radius: 6px", "6o8xi9";
-    "font-family: Inter", "6f4tzm";
-    "font-style: italic", "v9mzl5";
-    (* "font-weight: 400", "9ry02o"; *)
-    "position: absolute", "we28sg";
-    (* "position: relative", "8egqwf"; *)
-    "z-index: 9999999", "kcc3zd";
-    (* "z-index: 10", "xei54"; *)
+    "", "0";
+    "something ", "qcixcz";
+    "something", "cm8er4";
+    "padding: 0;", "v8dmfq";
+    "paddinxg: 1;", "xmbgw";
+    "padding: 0px;", "ixat1e";
+    "padding: 2px;", "gj3q13";
+    "color: #323337", "quolp2";
+    "color: #323335", "b68ppv";
+    "font-size: 32px;", "jstwi7";
+    "font-size: 33px;", "a5x1gs";
+    "display: block", "mv2c4f";
+    "display: blocki", "1535om";
+    "display: block;", "q4hpu6";
+    "display: flex", "kk1mho";
+    "display: flex;", "ys5gsh";
+    "color: #333;", "6g3ove";
+    "font-size: 22px;", "k3hg6s";
+    "font-size: 40px;", "dg860v";
+    "line-height: 22px;", "g91b7w";
+    "display: flex; font-size: 33px", "z26z7a";
+    "background-color: red", "lzpofl";
+    "width: 100%", "dlqvhl";
+    "height: 100%", "olwsdm";
+    "min-width: auto", "bzacp2";
+    "min-height: auto", "g9nxj8";
+    "max-width: 100vw", "4ffvch";
+    "max-height: 100vh", "t7233b";
+    "margin: 3px", "iytphq";
+    "border: 1px solid red", "7qpmok";
+    "border: none", "ndyqz8";
+    "border-color: grey", "e9xayw";
+    "border-radius: 6px", "hwdvwe";
+    "font-family: Inter", "gbi4cl";
+    "font-style: italic", "gsa6l1";
+    "font-weight: 400", "30lgje";
+    "position: absolute", "780j5w";
+    "position: relative", "4m5soz";
+    "z-index: 9999999", "yi31fc";
+    "z-index: 10", "a5gwpy";
   ]
 
 let tests = "Hash", List.map check_equality data
