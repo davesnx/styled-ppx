@@ -20,11 +20,14 @@ let to_base36 (n : int32) : string =
     let word = List.map (String.make 1) chars in
     String.concat "" word
 
-(* This hash algorithm is based on caml_hash from `Hashtbl.hash`
-   which uses murmur3 and condicentally it's the same algorithm used in emotion,
-   Even thought emotion has changed slightly the implementation.
+(* This hash algorithm is based on caml_hash from
+    `Hashtbl.hash` (https://github.com/ocaml/ocaml/blob/trunk/runtime/hash.c)
+    which uses murmur3 and condicentally it's the same algorithm used in emotion
+    (https://github.com/emotion-js/emotion/blob/f3b268f7c52103979402da919c9c0dd3f9e0e189/packages/hash/src/index.js)
+    even thought emotion has changed slightly the implementation.
 
-   We adapted caml_hash to use Int32
+   One modification has been made to the original algorithm:
+    - We adapted caml_hash to use Int32
 *)
 
 let rotl32 (x : int32) (r : int) =
@@ -45,7 +48,7 @@ let final_mix (h : int32) =
   let h = Int32.mul h 0xc2b2ae35l in
   Int32.logxor h (Int32.shift_right h 16)
 
-let hash s =
+let caml_hash s =
   let len = String.length s in
   let block = (len / 4) - 1 in
   let hash = ref 0l in
@@ -81,4 +84,4 @@ let hash s =
   hash := Int32.logxor !hash (Int32.of_int len);
   final_mix !hash
 
-let default (str : string) = str |> hash |> to_base36
+let default (str : string) = str |> caml_hash |> to_base36
