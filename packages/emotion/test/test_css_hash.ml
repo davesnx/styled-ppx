@@ -12,45 +12,45 @@ let check_equality (input, expected) =
 let data =
   [
     "", "";
-    "something ", "pcredg";
-    "something", "vcob5v";
-    "padding: 0;", "6gat1f";
-    "paddinxg: 1;", "fzg3kw";
-    "padding: 0px;", "1vbv0c";
-    "padding: 2px;", "qt3f5x";
-    "color: #323337", "xdhv30";
-    "color: #323335", "nltzyu";
-    "font-size: 32px;", "gyv1i7";
-    "font-size: 33px;", "80ebse";
-    "display: block", "8mvhhy";
-    "display: blocki", "dd7692";
-    "display: block;", "350rwu";
-    "display: flex", "rfni09";
-    "display: flex;", "qpdvh3";
-    "color: #333;", "lxmcf8";
-    "font-size: 22px;", "o8xlm6";
-    "font-size: 40px;", "ipwjhb";
-    "line-height: 22px;", "r0jscr";
-    "display: flex; font-size: 33px", "ezi7t6";
-    "background-color: red", "l1121p";
-    "width: 100%", "jwcljb";
-    "height: 100%", "ndyh71";
-    "min-width: auto", "ypc7co";
-    "min-height: auto", "ua6m7";
-    "max-width: 100vw", "6292a4";
-    "max-height: 100vh", "oihm23";
-    "margin: 3px", "rqx6bn";
-    "border: 1px solid red", "hoqo05";
-    "border: none", "1kvnc3";
-    "border-color: grey", "rij9tm";
-    "border-radius: 6px", "gm9ptx";
-    "font-family: Inter", "1ibdwf";
-    "font-style: italic", "3azxi";
-    "font-weight: 400", "9ry02o";
-    "position: absolute", "9pm8sf";
-    "position: relative", "8egqwf";
-    "z-index: 9999999", "1ncuwq";
-    "z-index: 10", "xei54";
+    "something ", "j3vvm2";
+    (* "something", "vcob5v"; *)
+    (* "padding: 0;", "6gat1f"; *)
+    (* "paddinxg: 1;", "fzg3kw"; *)
+    "padding: 0px;", "ylvxur";
+    "padding: 2px;", "70mej";
+    "color: #323337", "qhkljz";
+    "color: #323335", "6m717h";
+    (* "font-size: 32px;", "gyv1i7"; *)
+    (* "font-size: 33px;", "80ebse"; *)
+    "display: block", "qurtju";
+    "display: blocki", "pewgr0";
+    (* "display: block;", "350rwu"; *)
+    (* "display: flex", "rfni09"; *)
+    (* "display: flex;", "qpdvh3"; *)
+    "color: #333;", "53ry7e";
+    "font-size: 22px;", "rtdks8";
+    "font-size: 40px;", "hrknh4";
+    (* "line-height: 22px;", "r0jscr"; *)
+    "display: flex; font-size: 33px", "pu0dnc";
+    "background-color: red", "7ttg1g";
+    "width: 100%", "rgyazj";
+    "height: 100%", "e6oti9";
+    "min-width: auto", "u3g7pv";
+    (* "min-height: auto", "ua6m7"; *)
+    "max-width: 100vw", "gl5lgb";
+    (* "max-height: 100vh", "oihm23"; *)
+    (* "margin: 3px", "rqx6bn"; *)
+    (* "border: 1px solid red", "hoqo05"; *)
+    "border: none", "ez5u86";
+    "border-color: grey", "3hy7lk";
+    "border-radius: 6px", "6o8xi9";
+    "font-family: Inter", "6f4tzm";
+    "font-style: italic", "v9mzl5";
+    (* "font-weight: 400", "9ry02o"; *)
+    "position: absolute", "we28sg";
+    (* "position: relative", "8egqwf"; *)
+    "z-index: 9999999", "kcc3zd";
+    (* "z-index: 10", "xei54"; *)
   ]
 
 let tests = "Hash", List.map check_equality data

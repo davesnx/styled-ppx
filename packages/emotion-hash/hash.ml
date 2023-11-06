@@ -1,11 +1,3 @@
-let ( << ) = Int32.shift_left
-let ( & ) = Int32.logand
-let ( ||| ) = Int32.logor
-let ( * ) = Int32.mul
-let ( >>> ) = Int32.shift_right
-let ( ++ ) = Int32.add
-let ( ^ ) = Int32.logxor
-
 let to_base36 (num : Int32.t) =
   let rec to_base36' (num : Int32.t) =
     if num = 0l then []
@@ -44,90 +36,50 @@ let to_base36 (num : Int32.t) =
   in
   num |> to_base36' |> List.rev |> String.concat ""
 
-let to_css (number : Int32.t) = number |> to_base36
+let rotl32 x n = (x lsl n) lor (x lsr (32 - n))
+let ( .![] ) s index = int_of_char s.[index]
 
-(*
-    The murmur2 hashing is based on @emotion/hash, which is based on
-    https://github.com/garycourt/murmurhash-js and ported from
-    https://github.com/aappleby/smhasher/blob/61a0530f28277f2e850bfc39600ce61d02b518de/src/MurmurHash2.cpp#L37-L86.
-    Reference: https://github.com/emotion-js/emotion/blob/main/packages/hash/src/index.js
+let caml_hash_mix_int h d =
+  let d = ref d in
+  d.contents <- d.contents * 0xcc9e2d51;
+  d.contents <- rotl32 d.contents 15;
+  d.contents <- d.contents * 0x1b873593;
+  let h = ref (h lxor d.contents) in
+  h.contents <- rotl32 h.contents 13;
+  h.contents + (h.contents lsl 2) + 0xe6546b64
 
-    It's an ongoing effort to have a hashing function, currently okish. *)
-let murmur2 (str : string) =
-  let length = String.length str in
-  (* var h = 0 *)
-  let hash = ref 0l in
-  (* var k *)
-  let k = ref 0l in
-  (* len = str.length *)
-  let len = ref length in
-  (* i = 0, *)
-  let index = ref 0 in
-  while !index + 4 <= length do
-    let char_code_1 = Int32.of_int (Char.code str.[!index]) in
-    let char_code_2 = Int32.of_int (Char.code str.[!index + 1]) in
-    let char_code_3 = Int32.of_int (Char.code str.[!index + 2]) in
-    let char_code_4 = Int32.of_int (Char.code str.[!index + 3]) in
-    (* k =
-       (str.charCodeAt(i) & 0xff) |
-       ((str.charCodeAt(++i) & 0xff) << 8) |
-       ((str.charCodeAt(++i) & 0xff) << 16) |
-       ((str.charCodeAt(++i) & 0xff) << 24) *)
-    k :=
-      char_code_1
-      ||| (char_code_2 << 8)
-      ||| (char_code_3 << 16)
-      ||| (char_code_4 << 24);
-    (* k =
-       (k & 0xffff) * 0x5bd1e995 + (((k >>> 16) * 0xe995) << 16) *)
-    k :=
-      ((!k & 0xffffl) * 0x5bd1e995l) ++ (((!k >>> 16) * 0x5bd1e995l) & 0xffffl)
-      << 16;
-    (* k ^=  k >>> 24 *)
-    k := !k ^ (!k >>> 24);
-    k :=
-      ((!k & 0xffffl) * 0x5bd1e995l) ++ (((!k >>> 16) * 0x5bd1e995l) & 0xffffl)
-      << 16;
-    (* h =
-       ((k & 0xffff) * 0x5bd1e995 + (((k >>> 16) * 0xe995) << 16)) ^
-       ((h & 0xffff) * 0x5bd1e995 + (((h >>> 16) * 0xe995) << 16)) *)
-    hash :=
-      (((!hash & 0xffffl) * 0x5bd1e995l)
-       ++ (((!hash >>> 16) * 0x5bd1e995l) & 0xffffl)
-      << 16)
-      ^ !k;
-    index := !index + 1;
-    len := !len - 4
+let caml_hash_final_mix h =
+  let h = ref (h lxor (h lsr 16)) in
+  h.contents <- h.contents * 0x85ebca6b;
+  h.contents <- h.contents lxor (h.contents lsr 13);
+  h.contents <- h.contents * 0xc2b2ae35;
+  h.contents lxor (h.contents lsr 16)
+
+let caml_hash s =
+  let len = String.length s in
+  let block = (len / 4) - 1 in
+  let hash = ref 0 in
+  for i = 0 to block do
+    let j = 4 * i in
+    let w =
+      s.![j]
+      lor (s.![j + 1] lsl 8)
+      lor (s.![j + 2] lsl 16)
+      lor (s.![j + 3] lsl 24)
+    in
+    hash.contents <- caml_hash_mix_int hash.contents w
   done;
+  let modulo = len land 0b11 in
+  if modulo <> 0 then (
+    let w =
+      if modulo = 3 then
+        (s.![len - 1] lsl 16) lor (s.![len - 2] lsl 8) lor s.![len - 3]
+      else if modulo = 2 then (s.![len - 1] lsl 8) lor s.![len - 2]
+      else s.![len - 1]
+    in
+    hash.contents <- caml_hash_mix_int hash.contents w);
+  hash.contents <- hash.contents lxor len;
+  hash.contents
 
-  (* Handle the last few bytes of the input array *)
-  (match !len with
-  | 3 ->
-    (* h ^= (str.charCodeAt(i + 2) & 0xff) << 16 *)
-    hash := !hash ^ (Int32.of_int (Char.code str.[!index + 2]) << 16)
-  | 2 ->
-    (* h ^= (str.charCodeAt(i + 1) & 0xff) << 8 *)
-    hash := !hash ^ (Int32.of_int (Char.code str.[!index + 1]) << 8)
-  | 1 ->
-    (* h ^= str.charCodeAt(i) & 0xff *)
-    hash := !hash ^ Int32.of_int (Char.code str.[!index]);
-    (* h =
-       (h & 0xffff) * 0x5bd1e995 + (((h >>> 16) * 0xe995) << 16) *)
-    hash :=
-      ((!hash & 0xffffl) * 0x5bd1e995l)
-      ++ (((!hash >>> 16) * 0x5bd1e995l) & 0xffffl)
-      << 16
-  | _ -> ());
-
-  (* Do a few final mixes of the hash to ensure the last few bytes are well-incorporated. *)
-
-  (* h ^= h >>> 13 *)
-  hash := !hash ^ (!hash >>> 13);
-  (* h =
-     (h & 0xffff) * 0x5bd1e995 + (((h >>> 16) * 0xe995) << 16) *)
-  hash :=
-    ((!hash & 0xffffl) * 0x5bd1e995l) ++ ((!hash >>> 16) * 0x5bd1e995l << 16);
-  (* (h ^ (h >>> 15)) >>> 0 *)
-  !hash ^ (!hash >>> 15) >>> 0
-
-let default (str : string) = str |> murmur2 |> to_css
+let hash str = caml_hash_final_mix (caml_hash str)
+let default (str : string) = str |> hash |> Int32.of_int |> to_base36
