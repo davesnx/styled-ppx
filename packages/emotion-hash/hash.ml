@@ -1,12 +1,13 @@
+let char_map_36 = "0123456789abcdefghijklmnopqrstuvwxyz"
+
 let to_base36 n =
-  let available_chars = "0123456789abcdefghijklmnopqrstuvwxyz" in
   let rec convert_to_base36 acc n =
     if n = 0l then acc
     else (
       let quotient = Int32.unsigned_div n 36l in
       let remainder = Int32.unsigned_rem n 36l in
       let char_at_remainder =
-        String.make 1 (String.get available_chars (Int32.to_int remainder))
+        String.make 1 (String.get char_map_36 (Int32.to_int remainder))
       in
       convert_to_base36 (char_at_remainder :: acc) quotient)
   in
