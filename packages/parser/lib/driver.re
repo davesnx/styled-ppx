@@ -16,11 +16,11 @@ let parse = (skip_whitespaces, lexbuf, parser) => {
 
   try(Ok(menhir(parser, next_token))) {
   | Lexer.LexingError((pos, msg)) =>
-    let loc = Util.make_loc(pos, pos);
+    let loc = Parser_location.make(pos, pos);
     Error((loc, msg));
   | _ =>
     let (token, start_pos, end_pos) = last_token^;
-    let loc = Util.make_loc(start_pos, end_pos);
+    let loc = Parser_location.make(start_pos, end_pos);
     let msg =
       Printf.sprintf(
         "Parse error while reading token '%s'",
