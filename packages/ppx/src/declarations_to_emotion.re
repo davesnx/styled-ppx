@@ -3376,7 +3376,63 @@ let columns = unsupportedProperty(Parser.property_columns);
 let counter_increment =
   unsupportedProperty(Parser.property_counter_increment);
 let counter_reset = unsupportedProperty(Parser.property_counter_reset);
-let cursor = unsupportedProperty(Parser.property_cursor);
+
+let render_cursor = (~loc, value) =>
+  switch (value) {
+  | `Interpolation(variable) => render_variable(~loc, variable)
+  | `Auto => [%expr `auto]
+  | `Default => [%expr `default]
+  | `None => [%expr `none]
+  | `Context_menu => [%expr `contextMenu]
+  | `Help => [%expr `help]
+  | `Pointer => [%expr `pointer]
+  | `Progress => [%expr `progress]
+  | `Wait => [%expr `wait]
+  | `Cell => [%expr `cell]
+  | `Crosshair => [%expr `crosshair]
+  | `Text => [%expr `text]
+  | `Vertical_text => [%expr `verticalText]
+  | `Alias => [%expr `alias]
+  | `Copy => [%expr `copy]
+  | `Move => [%expr `move]
+  | `No_drop => [%expr `noDrop]
+  | `Not_allowed => [%expr `notAllowed]
+  | `Grab => [%expr `grab]
+  | `Grabbing => [%expr `grabbing]
+  | `All_scroll => [%expr `allScroll]
+  | `Col_resize => [%expr `colResize]
+  | `Row_resize => [%expr `rowResize]
+  | `N_resize => [%expr `nResize]
+  | `E_resize => [%expr `eResize]
+  | `S_resize => [%expr `sResize]
+  | `W_resize => [%expr `wResize]
+  | `Ne_resize => [%expr `neResize]
+  | `Nw_resize => [%expr `nwResize]
+  | `Se_resize => [%expr `seResize]
+  | `Sw_resize => [%expr `swResize]
+  | `Ew_resize => [%expr `ewResize]
+  | `Ns_resize => [%expr `nsResize]
+  | `Nesw_resize => [%expr `neswResize]
+  | `Nwse_resize => [%expr `nwseResize]
+  | `Zoom_in => [%expr `zoomIn]
+  | `Zoom_out => [%expr `zoomOut]
+  | `Hand => [%expr `hand]
+  | `_moz_grab => [%expr `_moz_grab]
+  | `_moz_grabbing => [%expr `_moz_grabbing]
+  | `_moz_zoom_in => [%expr `_moz_zoom_in]
+  | `_moz_zoom_out => [%expr `_moz_zoom_out]
+  | `_webkit_grab => [%expr `_webkit_grab]
+  | `_webkit_grabbing => [%expr `_webkit_grabbing]
+  | `_webkit_zoom_in => [%expr `_webkit_zoom_in]
+  | `_webkit_zoom_out => [%expr `_webkit_zoom_out]
+  };
+
+let cursor =
+  monomorphic(
+    Parser.property_cursor,
+    (~loc) => [%expr CssJs.cursor],
+    render_cursor,
+  );
 let direction = unsupportedProperty(Parser.property_direction);
 let filter = unsupportedProperty(Parser.property_filter);
 let float = unsupportedProperty(Parser.property_float);

@@ -818,40 +818,49 @@ module Cursor = struct
 
   let toString x =
     match x with
-    | `auto -> {js|auto|js}
-    | `default -> {js|default|js}
-    | `none -> {js|none|js}
-    | `contextMenu -> {js|context-menu|js}
-    | `help -> {js|help|js}
-    | `pointer -> {js|pointer|js}
-    | `progress -> {js|progress|js}
-    | `wait -> {js|wait|js}
-    | `cell -> {js|cell|js}
-    | `crosshair -> {js|crosshair|js}
-    | `text -> {js|text|js}
-    | `verticalText -> {js|vertical-text|js}
+    | `_moz_grab -> {|-moz-grab|}
+    | `_moz_grabbing -> {|-moz-grabbing|}
+    | `_moz_zoom_in -> {|-moz-zoom-in|}
+    | `_moz_zoom_out -> {|-moz-zoom-out|}
+    | `_webkit_grab -> {|-webkit-grab|}
+    | `_webkit_grabbing -> {|-webkit-grabbing|}
+    | `_webkit_zoom_in -> {|-webkit-zoom-in|}
+    | `_webkit_zoom_out -> {|-webkit-zoom-out|}
     | `alias -> {js|alias|js}
+    | `allScroll -> {js|all-scroll|js}
+    | `auto -> {js|auto|js}
+    | `cell -> {js|cell|js}
+    | `colResize -> {js|col-resize|js}
+    | `contextMenu -> {js|context-menu|js}
     | `copy -> {js|copy|js}
-    | `move -> {js|move|js}
-    | `noDrop -> {js|no-drop|js}
-    | `notAllowed -> {js|not-allowed|js}
+    | `crosshair -> {js|crosshair|js}
+    | `default -> {js|default|js}
+    | `eResize -> {js|e-resize|js}
+    | `ewResize -> {js|ew-resize|js}
     | `grab -> {js|grab|js}
     | `grabbing -> {js|grabbing|js}
-    | `allScroll -> {js|all-scroll|js}
-    | `colResize -> {js|col-resize|js}
-    | `rowResize -> {js|row-resize|js}
-    | `nResize -> {js|n-resize|js}
-    | `eResize -> {js|e-resize|js}
-    | `sResize -> {js|s-resize|js}
-    | `wResize -> {js|w-resize|js}
+    | `hand -> {js|hand|js}
+    | `help -> {js|help|js}
+    | `move -> {js|move|js}
     | `neResize -> {js|ne-resize|js}
-    | `nwResize -> {js|nw-resize|js}
-    | `seResize -> {js|se-resize|js}
-    | `swResize -> {js|sw-resize|js}
-    | `ewResize -> {js|ew-resize|js}
-    | `nsResize -> {js|ns-resize|js}
     | `neswResize -> {js|nesw-resize|js}
+    | `noDrop -> {js|no-drop|js}
+    | `none -> {js|none|js}
+    | `notAllowed -> {js|not-allowed|js}
+    | `nResize -> {js|n-resize|js}
+    | `nsResize -> {js|ns-resize|js}
+    | `nwResize -> {js|nw-resize|js}
     | `nwseResize -> {js|nwse-resize|js}
+    | `pointer -> {js|pointer|js}
+    | `progress -> {js|progress|js}
+    | `rowResize -> {js|row-resize|js}
+    | `seResize -> {js|se-resize|js}
+    | `sResize -> {js|s-resize|js}
+    | `swResize -> {js|sw-resize|js}
+    | `text -> {js|text|js}
+    | `verticalText -> {js|vertical-text|js}
+    | `wait -> {js|wait|js}
+    | `wResize -> {js|w-resize|js}
     | `zoomIn -> {js|zoom-in|js}
     | `zoomOut -> {js|zoom-out|js}
 end
