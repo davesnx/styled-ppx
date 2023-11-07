@@ -20,7 +20,8 @@ let ( lsl ) = Int32.shift_left
 let ( lsr ) = Int32.shift_right_logical
 let ( lxor ) = Int32.logxor
 
-let default str =
+(* The murmur2 hashing algorithm is based on @emotion/hash https://github.com/emotion-js/emotion/blob/main/packages/hash/src/index.js *)
+let murmur2 str =
   let open Int32 in
   (* 'm' and 'r' are mixing constants generated offline.
      They're not really 'magic', they just happen to work well. *)
@@ -70,4 +71,6 @@ let default str =
   h := !h lxor (!h lsr 13);
 
   h := add (mul (!h land 0xffffl) m) (mul (!h lsr 16) 0xe995l lsl 16);
-  to_base36 (!h lxor (!h lsr 15) land 0xffffffffl)
+  !h lxor (!h lsr 15) land 0xffffffffl
+
+let default str = str |> murmur2 |> to_base36
