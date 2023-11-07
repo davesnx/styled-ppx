@@ -1,25 +1,28 @@
-let to_base36_string n =
-  let open Int32 in
-  let base36_chars = "0123456789abcdefghijklmnopqrstuvwxyz" in
+let char_map_36 = "0123456789abcdefghijklmnopqrstuvwxyz"
+
+let to_base36 n =
   let rec convert_to_base36 acc n =
     if n = 0l then acc
     else (
-      let quotient = unsigned_div n 36l in
-      let remainder = unsigned_rem n 36l in
+      let quotient = Int32.unsigned_div n 36l in
+      let remainder = Int32.unsigned_rem n 36l in
       let char_at_remainder =
-        String.make 1 (String.get base36_chars (to_int remainder))
+        String.make 1 (String.get char_map_36 (Int32.to_int remainder))
       in
       convert_to_base36 (char_at_remainder :: acc) quotient)
   in
   if n = 0l then "0" else String.concat "" (convert_to_base36 [] n)
 
-let default str =
+let of_char c = Int32.of_int (int_of_char c)
+let ( lor ) = Int32.logor
+let ( land ) = Int32.logand
+let ( lsl ) = Int32.shift_left
+let ( lsr ) = Int32.shift_right_logical
+let ( lxor ) = Int32.logxor
+
+(* The murmur2 hashing algorithm is based on @emotion/hash https://github.com/emotion-js/emotion/blob/main/packages/hash/src/index.js *)
+let murmur2 str =
   let open Int32 in
-  let ( lor ) = logor in
-  let ( land ) = logand in
-  let ( lsl ) = shift_left in
-  let ( lsr ) = shift_right_logical in
-  let ( lxor ) = logxor in
   (* 'm' and 'r' are mixing constants generated offline.
      They're not really 'magic', they just happen to work well. *)
   let m = 0x5bd1e995l in
@@ -31,7 +34,6 @@ let default str =
   (* Mix 4 bytes at a time into the hash *)
   let i = ref 0 in
   let len = ref (String.length str) in
-  let of_char c = of_int (int_of_char c) in
   while !len >= 4 do
     let k =
       of_char str.[!i]
@@ -69,4 +71,6 @@ let default str =
   h := !h lxor (!h lsr 13);
 
   h := add (mul (!h land 0xffffl) m) (mul (!h lsr 16) 0xe995l lsl 16);
-  to_base36_string (!h lxor (!h lsr 15) land 0xffffffffl)
+  !h lxor (!h lsr 15) land 0xffffffffl
+
+let default str = str |> murmur2 |> to_base36

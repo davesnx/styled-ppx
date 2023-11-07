@@ -5,7 +5,7 @@ let check_equality (input, expected) =
     `Quick,
     fun () ->
       (Alcotest.check Alcotest.string)
-        (quoted input ^ " should hash")
+        ("hash " ^ quoted input ^ " should be")
         expected
         (Emotion_hash.Hash.default input) )
 
