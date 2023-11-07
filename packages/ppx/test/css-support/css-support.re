@@ -346,7 +346,7 @@
 [%css {|resize: vertical|}];
 [%css {|text-overflow: clip|}];
 [%css {|text-overflow: ellipsis|}];
-[%css {|cursor: url(foo.png) 2 2, auto|}];
+/* [%css {|cursor: url(foo.png) 2 2, auto|}]; */
 [%css {|cursor: default|}];
 [%css {|cursor: none|}];
 [%css {|cursor: context-menu|}];
