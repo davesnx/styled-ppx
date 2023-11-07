@@ -78,3 +78,10 @@
   1w4us3o
   $ node ./compare.js "z-index: 10"
   7au0g0
+
+The following two rule sets produced the same hash (see https://github.com/davesnx/styled-ppx/pull/376)
+
+  $ node ./compare.js "color:var(--alt-text--tertiary);:disabled{color:var(--alt-text--tertiary);}:hover{color:var(--alt-text--primary);}"
+  66bc4u
+  $ node ./compare.js "display:flex;:before, :after{content:'';flex:0 0 16px;}"
+  ab0yh7
