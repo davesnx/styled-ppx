@@ -1,87 +1,72 @@
-let to_base36 (n : int32) : string =
-  let rec go n acc =
-    if Int32.equal n 0l then acc
+let to_base36 n =
+  let available_chars = "0123456789abcdefghijklmnopqrstuvwxyz" in
+  let rec convert_to_base36 acc n =
+    if n = 0l then acc
     else (
-      let base36_digit =
-        if Int32.compare n 0l < 0 then 36 - (Int32.to_int (Int32.neg n) mod 36)
-        else Int32.to_int n mod 36
+      let quotient = Int32.unsigned_div n 36l in
+      let remainder = Int32.unsigned_rem n 36l in
+      let char_at_remainder =
+        String.make 1 (String.get available_chars (Int32.to_int remainder))
       in
-      let new_acc =
-        Char.chr
-          (if base36_digit < 10 then 48 + base36_digit else 87 + base36_digit)
-        :: acc
-      in
-      go (Int32.div n 36l) new_acc)
+      convert_to_base36 (char_at_remainder :: acc) quotient)
   in
-  match Int32.compare n 0l with
-  | 0 -> "0"
-  | _ ->
-    let chars = go (Int32.abs n) [] in
-    let word = List.map (String.make 1) chars in
-    String.concat "" word
+  if n = 0l then "0" else String.concat "" (convert_to_base36 [] n)
 
-(* This hash algorithm is based on caml_hash from
-    `Hashtbl.hash` (https://github.com/ocaml/ocaml/blob/trunk/runtime/hash.c)
-    which uses murmur3 and condicentally it's the same algorithm used in emotion
-    (https://github.com/emotion-js/emotion/blob/f3b268f7c52103979402da919c9c0dd3f9e0e189/packages/hash/src/index.js)
-    even thought emotion has changed slightly the implementation.
+let of_char c = Int32.of_int (int_of_char c)
+let ( lor ) = Int32.logor
+let ( land ) = Int32.logand
+let ( lsl ) = Int32.shift_left
+let ( lsr ) = Int32.shift_right_logical
+let ( lxor ) = Int32.logxor
 
-   One modification has been made to the original algorithm:
-    - We adapted caml_hash to use Int32
-*)
+let default str =
+  let open Int32 in
+  (* 'm' and 'r' are mixing constants generated offline.
+     They're not really 'magic', they just happen to work well. *)
+  let m = 0x5bd1e995l in
+  let r = 24 in
 
-let rotl32 (x : int32) (r : int) =
-  Int32.logor (Int32.shift_left x r) (Int32.shift_right_logical x (32 - r))
+  (* Initialize the hash *)
+  let h = ref 0l in
 
-let mix_int (h : int32 ref) (d : int32) =
-  let d = Int32.mul d 0xcc9e2d51l in
-  let d = rotl32 d 15 in
-  let d = Int32.mul d 0x1b873593l in
-  let h = Int32.logxor !h d in
-  let h = rotl32 h 13 in
-  Int32.add h (Int32.add (Int32.shift_left h 2) 0xe6546b64l)
-
-let final_mix (h : int32) =
-  let h = Int32.logxor h (Int32.shift_right h 16) in
-  let h = Int32.mul h 0x85ebca6bl in
-  let h = Int32.logxor h (Int32.shift_right h 13) in
-  let h = Int32.mul h 0xc2b2ae35l in
-  Int32.logxor h (Int32.shift_right h 16)
-
-let caml_hash s =
-  let len = String.length s in
-  let block = (len / 4) - 1 in
-  let hash = ref 0l in
-  for i = 0 to block do
-    let j = 4 * i in
-    let w =
-      Int32.logor
-        (Int32.logor
-           (Int32.logor
-              (Int32.of_int (Char.code s.[j]))
-              (Int32.shift_left (Int32.of_int (Char.code s.[j + 1])) 8))
-           (Int32.shift_left (Int32.of_int (Char.code s.[j + 2])) 16))
-        (Int32.shift_left (Int32.of_int (Char.code s.[j + 3])) 24)
+  (* Mix 4 bytes at a time into the hash *)
+  let i = ref 0 in
+  let len = ref (String.length str) in
+  while !len >= 4 do
+    let k =
+      of_char str.[!i]
+      land 0xffl
+      lor ((of_char str.[!i + 1] land 0xffl) lsl 8)
+      lor ((of_char str.[!i + 2] land 0xffl) lsl 16)
+      lor ((of_char str.[!i + 3] land 0xffl) lsl 24)
     in
-    hash := mix_int hash w
+
+    let k = add (mul (k land 0xffffl) m) (mul (k lsr 16) 0xe995l lsl 16) in
+    let k = k lxor (k lsr r) in
+
+    h :=
+      add (mul (k land 0xffffl) m) (mul (k lsr 16) 0xe995l lsl 16)
+      lxor add (mul (!h land 0xffffl) m) (mul (!h lsr 16) 0xe995l lsl 16);
+
+    i := !i + 4;
+    len := !len - 4
   done;
-  let modulo = len land 0b11 in
-  if modulo <> 0 then (
-    let w =
-      if modulo = 3 then
-        Int32.logor
-          (Int32.logor
-             (Int32.shift_left (Int32.of_int (Char.code s.[len - 1])) 16)
-             (Int32.shift_left (Int32.of_int (Char.code s.[len - 2])) 8))
-          (Int32.of_int (Char.code s.[len - 3]))
-      else if modulo = 2 then
-        Int32.logor
-          (Int32.shift_left (Int32.of_int (Char.code s.[len - 1])) 8)
-          (Int32.of_int (Char.code s.[len - 2]))
-      else Int32.of_int (Char.code s.[len - 1])
-    in
-    hash := mix_int hash w);
-  hash := Int32.logxor !hash (Int32.of_int len);
-  final_mix !hash
 
-let default (str : string) = str |> caml_hash |> to_base36
+  (* Handle the last few bytes of the input array *)
+  let () =
+    if !len = 3 then h := !h lxor ((of_char str.[!i + 2] land 0xffl) lsl 16);
+    if !len >= 2 then begin
+      h := !h lxor ((of_char str.[!i + 1] land 0xffl) lsl 8)
+    end;
+    if !len >= 1 then begin
+      h := !h lxor (of_char str.[!i] land 0xffl);
+      h := add (mul (!h land 0xffffl) m) (mul (!h lsr 16) 0xe995l lsl 16)
+    end
+  in
+
+  (* Do a few final mixes of the hash to ensure the last few
+     bytes are well-incorporated. *)
+  h := !h lxor (!h lsr 13);
+
+  h := add (mul (!h land 0xffffl) m) (mul (!h lsr 16) 0xe995l lsl 16);
+  to_base36 (!h lxor (!h lsr 15) land 0xffffffffl)

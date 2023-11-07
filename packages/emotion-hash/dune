@@ -3,3 +3,12 @@
  (public_name styled-ppx.emotion-hash)
  (modules hash)
  (modes :standard melange))
+
+(executable
+ (name native_hash)
+ (public_name styled-ppx.native_hash)
+ (modules native_hash)
+ (libraries emotion_hash))
+
+(cram
+ (deps %{bin:styled-ppx.native_hash} %{bin:node} ./compare.js ./emotion-murmur.js))
