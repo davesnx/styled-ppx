@@ -1,6 +1,9 @@
 let assert_string left right =
   Alcotest.check Alcotest.string "should be equal" right left
 
+let assert_not_equal_string left right =
+  Alcotest.check (Alcotest.neg Alcotest.string) "should not be equal" right left
+
 let render_style_tag () =
   let content = CssJs.render_style_tag () in
   let _ = CssJs.flush () in
@@ -59,6 +62,55 @@ let selector_with_ppx () =
   assert_string css
     (Printf.sprintf ".%s { color: #FF0000; } .%s  > * { color: #0000FF; }"
        className className)
+
+let avoid_hash_collision () =
+  let className1 =
+    let color = `var "alt-text--tertiary" in
+    let hoverColor = `var "alt-text--primary" in
+    let disabledColor = `var "alt-text--tertiary" in
+    [%cx
+      {|
+      color: $(color);
+
+      :disabled {
+        color: $(disabledColor);
+      }
+
+      :hover {
+        color: $(hoverColor);
+      }
+    |}]
+  in
+  let className2 =
+    let padding = `px 16 in
+    [%cx
+      {|
+      display: flex;
+
+      :before,
+      :after {
+        content: '';
+        flex: 0 0 $(padding);
+      }
+    |}]
+  in
+  let className3 =
+    let padding = `px 16 in
+    [%cx
+      {|
+      display: flex;
+
+      :before,
+      :after {
+        content: '';
+        flex: 0 1 $(padding);
+      }
+    |}]
+  in
+  let _css = render_style_tag () in
+  assert_not_equal_string className1 className2;
+  assert_not_equal_string className2 className3;
+  assert_not_equal_string className1 className3
 
 (* let className =
      [%cx
@@ -275,6 +327,7 @@ let tests =
       case "keyframe" keyframe;
       case "duplicated_styles_unique" duplicated_styles_unique;
       case "selector_with_ppx" selector_with_ppx;
+      case "avoid_hash_collision" avoid_hash_collision;
       (* case "random_classname" random_classname; *)
       (* case "interpolated_selector_with_ppx" interpolated_selector_with_ppx; *)
       (* case "label_ppx_unique" label_ppx_unique; *)

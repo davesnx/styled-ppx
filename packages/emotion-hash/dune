@@ -1,5 +1,3 @@
-(include_subdirs unqualified)
-
 (library
  (name emotion_hash)
  (public_name styled-ppx.emotion-hash)
