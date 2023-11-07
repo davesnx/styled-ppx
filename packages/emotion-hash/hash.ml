@@ -42,34 +42,20 @@ let default str =
     in
 
     let k = add (mul (k land 0xffffl) m) (mul (k lsr 16) 0xe995l lsl 16) in
-    print_endline (Printf.sprintf "K INIT: %lx" k);
     let k = k lxor (k lsr r) in
 
-    print_endline (Printf.sprintf "K FINAL: %lx" k);
     h :=
       add (mul (k land 0xffffl) m) (mul (k lsr 16) 0xe995l lsl 16)
       lxor add (mul (!h land 0xffffl) m) (mul (!h lsr 16) 0xe995l lsl 16);
 
     i := !i + 4;
     len := !len - 4
-    (* print_endline (Printf.sprintf "loop %d" !i);
-       print_endline (Printf.sprintf "len %d" !len);
-       print_endline (Printf.sprintf "H is: %lx" !h) *)
   done;
-
-  (* print_endline (Printf.sprintf "len: %d" !len);
-     print_endline (Printf.sprintf "i: %d" !i);
-     print_endline (Printf.sprintf "H is: %lx" !h); *)
 
   (* Handle the last few bytes of the input array *)
   let () =
     if !len = 3 then h := !h lxor ((of_char str.[!i + 2] land 0xffl) lsl 16);
     if !len >= 2 then begin
-      (* print_endline "here";
-         print_endline str;
-         print_endline (Printf.sprintf "INDXE %d" (!i + 1));
-         print_endline
-           (Printf.sprintf "ofchar %ld" (!h lxor ((0x20l land 0xffl) lsl 8))); *)
       h := !h lxor ((of_char str.[!i + 1] land 0xffl) lsl 8)
     end;
     if !len >= 1 then begin
@@ -81,23 +67,6 @@ let default str =
   (* Do a few final mixes of the hash to ensure the last few
      bytes are well-incorporated. *)
   h := !h lxor (!h lsr 13);
-  let () = print_endline (Printf.sprintf "ONE %ld" (mul (!h land 0xffffl) m)) in
-  let () =
-    print_endline (Printf.sprintf "TWO %ld" (mul (!h lsr 16) 0xe995l lsl 16))
-  in
-  h :=
-      add
-        (mul (!h land 0xffffl) (m))
-        (mul (!h lsr 16) 0xe995l lsl 16);
-  let () = print_endline (Printf.sprintf "H prealmostfinal is: %lx" !h) in
-  let () = print_endline (Printf.sprintf "H shifted is: %lx" (!h lsr 15)) in
-  let () =
-    print_endline
-      (Printf.sprintf "H test is: %s" (to_base36_string 0xf77f8879l))
-  in
 
-  print_endline (Printf.sprintf "H FINAL is: %lx" !h);
-  print_endline
-    (Printf.sprintf "FINAL %s"
-       (to_base36_string (!h lxor (!h lsr 15) land 0xffffffffl)));
+  h := add (mul (!h land 0xffffl) m) (mul (!h lsr 16) 0xe995l lsl 16);
   to_base36_string (!h lxor (!h lsr 15) land 0xffffffffl)
