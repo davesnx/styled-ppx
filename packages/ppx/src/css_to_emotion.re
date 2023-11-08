@@ -206,7 +206,7 @@ and render_media_query = (at_rule: at_rule): Parsetree.expression => {
 
     Helper.Exp.apply(
       ~loc=at_rule.loc,
-      ~attrs=[Platform_attributes.uncurried(~loc=at_rule.loc)],
+      /* ~attrs=[Platform_attributes.uncurried(~loc=at_rule.loc)], */
       CssJs.media(~loc=at_rule.loc),
       [(Nolabel, query), (Nolabel, rules)],
     );
@@ -384,7 +384,7 @@ and render_style_rule = (ident, rule: style_rule): Parsetree.expression => {
 
   Helper.Exp.apply(
     ~loc=rule.loc,
-    ~attrs=[Platform_attributes.uncurried(~loc=rule.loc)],
+    /* ~attrs=[Platform_attributes.uncurried(~loc=rule.loc)], */
     ident,
     [(Nolabel, selector_name), (Nolabel, selector_expr)],
   );
@@ -408,7 +408,7 @@ let render_style_call = (declaration_list): Parsetree.expression => {
 
   Helper.Exp.apply(
     ~loc,
-    ~attrs=[Platform_attributes.uncurried(~loc)],
+    /* ~attrs=[Platform_attributes.uncurried(~loc)], */
     CssJs.style(~loc),
     arguments,
   );
@@ -477,7 +477,7 @@ let render_keyframes = (declarations: rule_list): Parsetree.expression => {
 
   {
     ...Builder.eapply(~loc, CssJs.keyframes(~loc), [keyframes]),
-    pexp_attributes: [Platform_attributes.uncurried(~loc)],
+    pexp_attributes: [] /* Platform_attributes.uncurried(~loc) */,
   };
 };
 

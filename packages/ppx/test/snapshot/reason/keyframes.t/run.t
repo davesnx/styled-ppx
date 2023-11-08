@@ -2,7 +2,7 @@
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   let animation =
-    CssJs.keyframes(. [|
+    CssJs.keyframes([|
       (0, [|CssJs.opacity(0.)|]),
       (100, [|CssJs.opacity(1.)|]),
     |]);
@@ -966,7 +966,7 @@
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles =
-      CssJs.style(. [|
+      CssJs.style([|
         CssJs.label("FadeIn"),
         (CssJs.animationName(animation): CssJs.rule),
       |]);

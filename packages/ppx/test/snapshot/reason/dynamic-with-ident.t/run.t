@@ -961,7 +961,7 @@
       };
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
-    let styles = (~a as _, _) => CssJs.style(. cssRule);
+    let styles = (~a as _, _) => CssJs.style(cssRule);
     let make = (props: makeProps('a)) => {
       let className =
         styles(~a=aGet(props), ()) ++ getOrEmpty(classNameGet(props));

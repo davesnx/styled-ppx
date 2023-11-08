@@ -961,7 +961,7 @@
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles = (~size, ~color, _) =>
-      CssJs.style(. [|
+      CssJs.style([|
         CssJs.label("DynamicComponentWithArray"),
         CssJs.width(`percent(100.)),
         CssJs.display(`block),

@@ -26,47 +26,47 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
         amplitude: string [@ns.optional ];
         arabicForm: string [@ns.optional ];
         ariaActivedescendant: string
-          [@ns.optional ][@mel.as "aria-activedescendant"];
-        ariaAtomic: bool [@ns.optional ][@mel.as "aria-atomic"];
-        ariaBusy: bool [@ns.optional ][@mel.as "aria-busy"];
-        ariaColcount: int [@ns.optional ][@mel.as "aria-colcount"];
-        ariaColindex: int [@ns.optional ][@mel.as "aria-colindex"];
-        ariaColspan: int [@ns.optional ][@mel.as "aria-colspan"];
-        ariaControls: string [@ns.optional ][@mel.as "aria-controls"];
-        ariaDescribedby: string [@ns.optional ][@mel.as "aria-describedby"];
-        ariaDetails: string [@ns.optional ][@mel.as "aria-details"];
-        ariaDisabled: bool [@ns.optional ][@mel.as "aria-disabled"];
-        ariaErrormessage: string [@ns.optional ][@mel.as "aria-errormessage"];
-        ariaExpanded: bool [@ns.optional ][@mel.as "aria-expanded"];
-        ariaFlowto: string [@ns.optional ][@mel.as "aria-flowto"];
-        ariaGrabbed: bool [@ns.optional ][@mel.as "aria-grabbed"];
-        ariaHidden: bool [@ns.optional ][@mel.as "aria-hidden"];
-        ariaKeyshortcuts: string [@ns.optional ][@mel.as "aria-keyshortcuts"];
-        ariaLabel: string [@ns.optional ][@mel.as "aria-label"];
-        ariaLabelledby: string [@ns.optional ][@mel.as "aria-labelledby"];
-        ariaLevel: int [@ns.optional ][@mel.as "aria-level"];
-        ariaModal: bool [@ns.optional ][@mel.as "aria-modal"];
-        ariaMultiline: bool [@ns.optional ][@mel.as "aria-multiline"];
+          [@ns.optional ][@bs.as "aria-activedescendant"];
+        ariaAtomic: bool [@ns.optional ][@bs.as "aria-atomic"];
+        ariaBusy: bool [@ns.optional ][@bs.as "aria-busy"];
+        ariaColcount: int [@ns.optional ][@bs.as "aria-colcount"];
+        ariaColindex: int [@ns.optional ][@bs.as "aria-colindex"];
+        ariaColspan: int [@ns.optional ][@bs.as "aria-colspan"];
+        ariaControls: string [@ns.optional ][@bs.as "aria-controls"];
+        ariaDescribedby: string [@ns.optional ][@bs.as "aria-describedby"];
+        ariaDetails: string [@ns.optional ][@bs.as "aria-details"];
+        ariaDisabled: bool [@ns.optional ][@bs.as "aria-disabled"];
+        ariaErrormessage: string [@ns.optional ][@bs.as "aria-errormessage"];
+        ariaExpanded: bool [@ns.optional ][@bs.as "aria-expanded"];
+        ariaFlowto: string [@ns.optional ][@bs.as "aria-flowto"];
+        ariaGrabbed: bool [@ns.optional ][@bs.as "aria-grabbed"];
+        ariaHidden: bool [@ns.optional ][@bs.as "aria-hidden"];
+        ariaKeyshortcuts: string [@ns.optional ][@bs.as "aria-keyshortcuts"];
+        ariaLabel: string [@ns.optional ][@bs.as "aria-label"];
+        ariaLabelledby: string [@ns.optional ][@bs.as "aria-labelledby"];
+        ariaLevel: int [@ns.optional ][@bs.as "aria-level"];
+        ariaModal: bool [@ns.optional ][@bs.as "aria-modal"];
+        ariaMultiline: bool [@ns.optional ][@bs.as "aria-multiline"];
         ariaMultiselectable: bool
-          [@ns.optional ][@mel.as "aria-multiselectable"];
-        ariaOwns: string [@ns.optional ][@mel.as "aria-owns"];
-        ariaPlaceholder: string [@ns.optional ][@mel.as "aria-placeholder"];
-        ariaPosinset: int [@ns.optional ][@mel.as "aria-posinset"];
-        ariaReadonly: bool [@ns.optional ][@mel.as "aria-readonly"];
-        ariaRelevant: string [@ns.optional ][@mel.as "aria-relevant"];
-        ariaRequired: bool [@ns.optional ][@mel.as "aria-required"];
+          [@ns.optional ][@bs.as "aria-multiselectable"];
+        ariaOwns: string [@ns.optional ][@bs.as "aria-owns"];
+        ariaPlaceholder: string [@ns.optional ][@bs.as "aria-placeholder"];
+        ariaPosinset: int [@ns.optional ][@bs.as "aria-posinset"];
+        ariaReadonly: bool [@ns.optional ][@bs.as "aria-readonly"];
+        ariaRelevant: string [@ns.optional ][@bs.as "aria-relevant"];
+        ariaRequired: bool [@ns.optional ][@bs.as "aria-required"];
         ariaRoledescription: string
-          [@ns.optional ][@mel.as "aria-roledescription"];
-        ariaRowcount: int [@ns.optional ][@mel.as "aria-rowcount"];
-        ariaRowindex: int [@ns.optional ][@mel.as "aria-rowindex"];
-        ariaRowspan: int [@ns.optional ][@mel.as "aria-rowspan"];
-        ariaSelected: bool [@ns.optional ][@mel.as "aria-selected"];
-        ariaSetsize: int [@ns.optional ][@mel.as "aria-setsize"];
-        ariaSort: string [@ns.optional ][@mel.as "aria-sort"];
-        ariaValuemax: float [@ns.optional ][@mel.as "aria-valuemax"];
-        ariaValuemin: float [@ns.optional ][@mel.as "aria-valuemin"];
-        ariaValuenow: float [@ns.optional ][@mel.as "aria-valuenow"];
-        ariaValuetext: string [@ns.optional ][@mel.as "aria-valuetext"];
+          [@ns.optional ][@bs.as "aria-roledescription"];
+        ariaRowcount: int [@ns.optional ][@bs.as "aria-rowcount"];
+        ariaRowindex: int [@ns.optional ][@bs.as "aria-rowindex"];
+        ariaRowspan: int [@ns.optional ][@bs.as "aria-rowspan"];
+        ariaSelected: bool [@ns.optional ][@bs.as "aria-selected"];
+        ariaSetsize: int [@ns.optional ][@bs.as "aria-setsize"];
+        ariaSort: string [@ns.optional ][@bs.as "aria-sort"];
+        ariaValuemax: float [@ns.optional ][@bs.as "aria-valuemax"];
+        ariaValuemin: float [@ns.optional ][@bs.as "aria-valuemin"];
+        ariaValuenow: float [@ns.optional ][@bs.as "aria-valuenow"];
+        ariaValuetext: string [@ns.optional ][@bs.as "aria-valuetext"];
         ascent: string [@ns.optional ];
         async: bool [@ns.optional ];
         attributeName: string [@ns.optional ];
@@ -362,7 +362,7 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
         title: string [@ns.optional ];
         to_: string [@ns.optional ];
         transform: string [@ns.optional ];
-        type_: string [@ns.optional ][@mel.as "type"];
+        type_: string [@ns.optional ][@bs.as "type"];
         typeof: string [@ns.optional ];
         u1: string [@ns.optional ];
         u2: string [@ns.optional ];
@@ -484,10 +484,8 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
         onWaiting: ReactEvent.Media.t -> unit [@ns.optional ];
         onWheel: ReactEvent.Wheel.t -> unit [@ns.optional ]}[@@ns.optional ]
       external createVariadicElement :
-        string -> < .. >  Js.t -> React.element = "createElement"[@@mel.module
-                                                                   (("react")
-                                                                     [@reason.raw_literal
-                                                                      ])]
+        string -> < .. >  Js.t -> React.element = "createElement"[@@bs.module
+                                                                   "react"]
       let getOrEmpty str =
         match str with
         | ((Some (str))[@explicit_arity ]) -> " " ^ str
@@ -495,21 +493,19 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
       let deleteProp = [%raw "(newProps, key) => delete newProps[key]"]
       external assign2 :
         < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t =
-          "Object.assign"
+          "Object.assign"[@@bs.val ]
       let styles =
-        ((CssJs.style
-            [|(CssJs.label "RedBox");(CssJs.width (`pxFloat 100.));(CssJs.height
-                                                                      (
-                                                                      `pxFloat
+        CssJs.style
+          [|(CssJs.label "RedBox");(CssJs.width (`pxFloat 100.));(CssJs.height
+                                                                    (`pxFloat
                                                                       100.));(
-              CssJs.backgroundColor CssJs.red)|])
-        [@u ])
+            CssJs.backgroundColor CssJs.red)|]
       let make (props : props) =
         let className = styles ^ (getOrEmpty props.className) in
-        let stylesObject = [%mel.obj { className; ref = (props.innerRef) }] in
+        let stylesObject = [%bs.obj { className; ref = (props.innerRef) }] in
         let newProps = assign2 (Js.Obj.empty ()) (Obj.magic props) stylesObject in
         ignore (deleteProp newProps "innerRef");
-        createVariadicElement (("div")[@reason.raw_literal "div"]) newProps
+        createVariadicElement "div" newProps
     end
 
   $ npx rescript convert fixed.ml

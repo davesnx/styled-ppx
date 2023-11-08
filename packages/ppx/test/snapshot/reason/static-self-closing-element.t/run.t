@@ -960,7 +960,7 @@
     let deleteProp = [%raw "(newProps, key) => delete newProps[key]"];
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
-    let styles = CssJs.style(. [|CssJs.label("SelfClosingElement")|]);
+    let styles = CssJs.style([|CssJs.label("SelfClosingElement")|]);
     let make = (props: makeProps) => {
       let className = styles ++ getOrEmpty(classNameGet(props));
       let stylesObject = {"className": className, "ref": innerRefGet(props)};

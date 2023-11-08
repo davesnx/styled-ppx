@@ -1,5 +1,4 @@
 open Css_AtomicTypes
-
 module Std = Kloth
 
 type rule =
@@ -36,7 +35,7 @@ module type MakeResult = sig
   val insertRule : string -> unit
   val renderRule : renderer -> string -> unit
   val global : string -> rule list -> unit
-  val renderGlobal : (renderer -> string -> rule list -> unit[@u])
+  val renderGlobal : renderer -> string -> rule list -> unit
   val style : rule list -> styleEncoding
   val merge : styleEncoding list -> styleEncoding
   val merge2 : styleEncoding -> styleEncoding -> styleEncoding
@@ -57,34 +56,32 @@ module Make (CssImpl : Css_Core.CssImplementationIntf) :
   MakeResult
     with type styleEncoding := CssImpl.styleEncoding
      and type renderer := CssImpl.renderer = struct
-  let insertRule css = (CssImpl.injectRaw css [@u])
-  let renderRule renderer css = (CssImpl.renderRaw renderer css [@u])
-  let global selector rules = (CssImpl.injectRules selector (toJson rules) [@u])
+  let insertRule css = CssImpl.injectRaw css
+  let renderRule renderer css = CssImpl.renderRaw renderer css
+  let global selector rules = CssImpl.injectRules selector (toJson rules)
 
-  let renderGlobal =
-   fun [@u] renderer selector rules ->
-    (CssImpl.renderRules renderer selector (toJson rules) [@u])
+  let renderGlobal renderer selector rules =
+    CssImpl.renderRules renderer selector (toJson rules)
 
-  let style rules = (CssImpl.make (rules |. toJson) [@u])
-  let merge styles = (CssImpl.mergeStyles (styles |. Std.List.toArray) [@u])
+  let style rules = CssImpl.make (rules |. toJson)
+  let merge styles = CssImpl.mergeStyles (styles |. Std.List.toArray)
   let merge2 s s2 = merge [ s; s2 ]
   let merge3 s s2 s3 = merge [ s; s2; s3 ]
   let merge4 s s2 s3 s4 = merge [ s; s2; s3; s4 ]
 
   let keyframes frames =
-    (CssImpl.makeKeyframes
-       (List.fold_left addStop (Js.Dict.empty ()) frames) [@u])
+    CssImpl.makeKeyframes (List.fold_left addStop (Js.Dict.empty ()) frames)
 
   let renderKeyframes renderer frames =
-    (CssImpl.renderKeyframes renderer
-       (List.fold_left addStop (Js.Dict.empty ()) frames) [@u])
+    CssImpl.renderKeyframes renderer
+      (List.fold_left addStop (Js.Dict.empty ()) frames)
 end
 
 module Converter = struct
   let string_of_stops stops =
     stops
     |. Std.List.map (fun (c, l) ->
-         Color.toString c ^ {js| |js} ^ Length.toString l)
+           Color.toString c ^ {js| |js} ^ Length.toString l)
     |. Std.List.joinWith {js|, |js}
 
   let string_of_time t = Std.Int.toString t ^ {js|ms|js}
@@ -300,9 +297,7 @@ let backgroundPositions bp =
       |. Std.List.map string_of_backgroundposition
       |. Std.List.joinWith {js|, |js} )
 
-let backgroundPosition4 ~x:(x [@ns.namedArgLoc])
-  ~offsetX:(offsetX [@ns.namedArgLoc]) ~y:(y [@ns.namedArgLoc])
-  ~offsetY:(offsetY [@ns.namedArgLoc]) =
+let backgroundPosition4 ~x ~offsetX ~y ~offsetY =
   D
     ( {js|background-position|js},
       BackgroundPosition.X.toString x
@@ -608,8 +603,7 @@ let gridRow start end' =
 let gap x = D ({js|gap|js}, string_of_gap x)
 let gridGap x = D ({js|grid-gap|js}, string_of_gap x)
 
-let gap2 ~rowGap:(rowGap [@ns.namedArgLoc])
-  ~columnGap:(columnGap [@ns.namedArgLoc]) =
+let gap2 ~rowGap ~columnGap =
   D ({js|gap|js}, string_of_gap rowGap ^ {js| |js} ^ string_of_gap columnGap)
 
 let gridRowGap x =
@@ -722,11 +716,10 @@ let marginToString x =
 
 let margin x = D ({js|margin|js}, marginToString x)
 
-let margin2 ~v:(v [@ns.namedArgLoc]) ~h:(h [@ns.namedArgLoc]) =
+let margin2 ~v ~h =
   D ({js|margin|js}, marginToString v ^ {js| |js} ^ marginToString h)
 
-let margin3 ~top:(top [@ns.namedArgLoc]) ~h:(h [@ns.namedArgLoc])
-  ~bottom:(bottom [@ns.namedArgLoc]) =
+let margin3 ~top ~h ~bottom =
   D
     ( {js|margin|js},
       marginToString top
@@ -735,8 +728,7 @@ let margin3 ~top:(top [@ns.namedArgLoc]) ~h:(h [@ns.namedArgLoc])
       ^ {js| |js}
       ^ marginToString bottom )
 
-let margin4 ~top:(top [@ns.namedArgLoc]) ~right:(right [@ns.namedArgLoc])
-  ~bottom:(bottom [@ns.namedArgLoc]) ~left:(left [@ns.namedArgLoc]) =
+let margin4 ~top ~right ~bottom ~left =
   D
     ( {js|margin|js},
       marginToString top
@@ -836,11 +828,10 @@ let overflowWrap x =
 
 let padding x = D ({js|padding|js}, Length.toString x)
 
-let padding2 ~v:(v [@ns.namedArgLoc]) ~h:(h [@ns.namedArgLoc]) =
+let padding2 ~v ~h =
   D ({js|padding|js}, Length.toString v ^ {js| |js} ^ Length.toString h)
 
-let padding3 ~top:(top [@ns.namedArgLoc]) ~h:(h [@ns.namedArgLoc])
-  ~bottom:(bottom [@ns.namedArgLoc]) =
+let padding3 ~top ~h ~bottom =
   D
     ( {js|padding|js},
       Length.toString top
@@ -849,8 +840,7 @@ let padding3 ~top:(top [@ns.namedArgLoc]) ~h:(h [@ns.namedArgLoc])
       ^ {js| |js}
       ^ Length.toString bottom )
 
-let padding4 ~top:(top [@ns.namedArgLoc]) ~right:(right [@ns.namedArgLoc])
-  ~bottom:(bottom [@ns.namedArgLoc]) ~left:(left [@ns.namedArgLoc]) =
+let padding4 ~top ~right ~bottom ~left =
   D
     ( {js|padding|js},
       Length.toString top
@@ -1170,7 +1160,7 @@ let focus rules = pseudoClass {js|focus|js} rules
 let focusVisible rules = pseudoClass {js|focus-visible|js} rules
 let focusWithin rules = pseudoClass {js|focus-within|js} rules
 
-let host ?selector:(selector [@ns.namedArgLoc]) rules =
+let host ?selector rules =
   match selector with
   | None -> PseudoClass ({js|host|js}, rules)
   | Some s -> PseudoClassParam ({js|host|js}, s, rules)
@@ -1495,8 +1485,7 @@ let panDown = `panDown
 let pinchZoom = `pinchZoom
 let manipulation = `manipulation
 
-let flex3 ~grow:(grow [@ns.namedArgLoc]) ~shrink:(shrink [@ns.namedArgLoc])
-  ~basis:(basis [@ns.namedArgLoc]) =
+let flex3 ~grow ~shrink ~basis =
   D
     ( {js|flex|js},
       Std.Float.toString grow
@@ -1753,10 +1742,8 @@ module Shadow = struct
     | `none
     ]
 
-  let box ?x:((x [@ns.namedArgLoc]) = zero) ?y:((y [@ns.namedArgLoc]) = zero)
-    ?blur:((blur [@ns.namedArgLoc]) = zero)
-    ?spread:((spread [@ns.namedArgLoc]) = zero)
-    ?inset:((inset [@ns.namedArgLoc]) = false) color =
+  let box ?(x = zero) ?(y = zero) ?(blur = zero) ?(spread = zero)
+    ?(inset = false) color =
     `shadow
       (Length.toString x
       ^ {js| |js}
@@ -1769,8 +1756,7 @@ module Shadow = struct
       ^ string_of_color color
       ^ if [@ns.ternary] inset then {js| inset|js} else {js||js})
 
-  let text ?x:((x [@ns.namedArgLoc]) = zero) ?y:((y [@ns.namedArgLoc]) = zero)
-    ?blur:((blur [@ns.namedArgLoc]) = zero) color =
+  let text ?(x = zero) ?(y = zero) ?(blur = zero) color =
     `shadow
       (Length.toString x
       ^ {js| |js}
@@ -1873,11 +1859,11 @@ let backgrounds x =
     ( {js|background|js},
       x
       |. Std.List.map (fun item ->
-           match item with
-           | #Color.t as c -> Color.toString c
-           | #Url.t as u -> Url.toString u
-           | #Gradient.t as g -> Gradient.toString g
-           | `none -> {js|none|js})
+             match item with
+             | #Color.t as c -> Color.toString c
+             | #Url.t as u -> Url.toString u
+             | #Gradient.t as g -> Gradient.toString g
+             | `none -> {js|none|js})
       |. Std.List.joinWith {js|, |js} )
 
 let backgroundSize x =
@@ -1889,63 +1875,59 @@ let backgroundSize x =
       | `cover -> {js|cover|js}
       | `contain -> {js|contain|js} )
 
-let fontFace ~fontFamily:(fontFamily [@ns.namedArgLoc])
-  ~src:(src [@ns.namedArgLoc]) ?fontStyle:(fontStyle [@ns.namedArgLoc])
-  ?fontWeight:(fontWeight [@ns.namedArgLoc])
-  ?fontDisplay:(fontDisplay [@ns.namedArgLoc])
-  ?sizeAdjust:(sizeAdjust [@ns.namedArgLoc]) () =
-  (let fontStyle =
-     Js.Option.map (fun [@u] value -> FontStyle.toString value) fontStyle
-   in
-   let src =
-     src
-     |> List.map (fun x ->
-          match x with
-          | `localUrl value -> ({js|local("|js} ^ value) ^ {js|")|js}
-          | `url value -> ({js|url("|js} ^ value) ^ {js|")|js})
-     |> String.concat {js|, |js}
-   in
-   let fontStyle =
-     Belt.Option.mapWithDefault fontStyle {js||js} (fun s ->
-       {js|font-style: |js} ^ s ^ {js|;|js})
-   in
-   let fontWeight =
-     Belt.Option.mapWithDefault fontWeight {js||js} (fun w ->
-       {js|font-weight: |js}
-       ^ (match w with
-         | #FontWeight.t as f -> FontWeight.toString f
-         | #Var.t as va -> Var.toString va
-         | #Cascading.t as c -> Cascading.toString c)
-       ^ {js|;|js})
-   in
-   let fontDisplay =
-     Belt.Option.mapWithDefault fontDisplay {js||js} (fun f ->
-       {js|font-display: |js} ^ FontDisplay.toString f ^ {js|;|js})
-   in
-   let sizeAdjust =
-     Belt.Option.mapWithDefault sizeAdjust {js||js} (fun s ->
-       ({js|size-adjust: |js} ^ Percentage.toString s) ^ {js|;|js})
-   in
-   ((((((((((({js|@font-face {
+let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
+    =
+  let fontStyle =
+    Js.Option.map (fun value -> FontStyle.toString value) fontStyle
+  in
+  let src =
+    src
+    |> List.map (fun x ->
+           match x with
+           | `localUrl value -> ({js|local("|js} ^ value) ^ {js|")|js}
+           | `url value -> ({js|url("|js} ^ value) ^ {js|")|js})
+    |> String.concat {js|, |js}
+  in
+  let fontStyle =
+    Belt.Option.mapWithDefault fontStyle {js||js} (fun s ->
+        {js|font-style: |js} ^ s ^ {js|;|js})
+  in
+  let fontWeight =
+    Belt.Option.mapWithDefault fontWeight {js||js} (fun w ->
+        {js|font-weight: |js}
+        ^ (match w with
+          | #FontWeight.t as f -> FontWeight.toString f
+          | #Var.t as va -> Var.toString va
+          | #Cascading.t as c -> Cascading.toString c)
+        ^ {js|;|js})
+  in
+  let fontDisplay =
+    Belt.Option.mapWithDefault fontDisplay {js||js} (fun f ->
+        {js|font-display: |js} ^ FontDisplay.toString f ^ {js|;|js})
+  in
+  let sizeAdjust =
+    Belt.Option.mapWithDefault sizeAdjust {js||js} (fun s ->
+        ({js|size-adjust: |js} ^ Percentage.toString s) ^ {js|;|js})
+  in
+  ((((((((((({js|@font-face {
      font-family: |js} ^ fontFamily)
-            ^ {js|;
+           ^ {js|;
      src: |js})
-           ^ src)
-          ^ {js|;
+          ^ src)
+         ^ {js|;
      |js})
-         ^ fontStyle)
-        ^ {js|
+        ^ fontStyle)
+       ^ {js|
      |js})
-       ^ fontWeight)
-      ^ {js|
+      ^ fontWeight)
+     ^ {js|
      |js})
-     ^ fontDisplay)
-    ^ {js|
-     |js})
-   ^ sizeAdjust)
+    ^ fontDisplay)
    ^ {js|
-   }|js})
-  [@ns.braces]
+     |js})
+  ^ sizeAdjust)
+  ^ {js|
+   }|js}
 
 let textDecoration x =
   D
@@ -1981,12 +1963,12 @@ let transformStyle x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
+(** Transition *)
 module Transition = struct
   type nonrec t = [ `value of string ]
 
-  let shorthand ?duration:((duration [@ns.namedArgLoc]) = 0)
-    ?delay:((delay [@ns.namedArgLoc]) = 0)
-    ?timingFunction:((timingFunction [@ns.namedArgLoc]) = `ease) property =
+  let shorthand ?(duration = 0) ?(delay = 0) ?(timingFunction = `ease) property
+      =
     `value
       (string_of_time duration
       ^ {js| |js}
@@ -1998,7 +1980,6 @@ module Transition = struct
 
   let toString x = match x with `value v -> v
 end
-[@@ns.doc "\n * Transition\n "]
 
 let transitionValue x = D ({js|transition|js}, Transition.toString x)
 
@@ -2009,13 +1990,9 @@ let transitionList x =
 
 let transitions = transitionList
 
-let transition ?duration:(duration [@ns.namedArgLoc])
-  ?delay:(delay [@ns.namedArgLoc])
-  ?timingFunction:(timingFunction [@ns.namedArgLoc]) property =
+let transition ?duration ?delay ?timingFunction property =
   transitionValue
-    (Transition.shorthand ?duration:(duration [@ns.namedArgLoc])
-       ?delay:(delay [@ns.namedArgLoc])
-       ?timingFunction:(timingFunction [@ns.namedArgLoc]) property)
+    (Transition.shorthand ?duration ?delay ?timingFunction property)
 
 let transitionDelay i = D ({js|transition-delay|js}, string_of_time i)
 let transitionDuration i = D ({js|transition-duration|js}, string_of_time i)
@@ -2025,16 +2002,13 @@ let transitionTimingFunction x =
 
 let transitionProperty x = D ({js|transition-property|js}, x)
 
+(** Animation *)
 module Animation = struct
   type nonrec t = [ `value of string ]
 
-  let shorthand ?duration:((duration [@ns.namedArgLoc]) = 0)
-    ?delay:((delay [@ns.namedArgLoc]) = 0)
-    ?direction:((direction [@ns.namedArgLoc]) = `normal)
-    ?timingFunction:((timingFunction [@ns.namedArgLoc]) = `ease)
-    ?fillMode:((fillMode [@ns.namedArgLoc]) = `none)
-    ?playState:((playState [@ns.namedArgLoc]) = `running)
-    ?iterationCount:((iterationCount [@ns.namedArgLoc]) = `count 1) name =
+  let shorthand ?(duration = 0) ?(delay = 0) ?(direction = `normal)
+    ?(timingFunction = `ease) ?(fillMode = `none) ?(playState = `running)
+    ?(iterationCount = `count 1) name =
     `value
       (name
       ^ {js| |js}
@@ -2054,23 +2028,14 @@ module Animation = struct
 
   let toString x = match x with `value v -> v
 end
-[@@ns.doc "\n * Animation\n "]
 
 let animationValue x = D ({js|animation|js}, Animation.toString x)
 
-let animation ?duration:(duration [@ns.namedArgLoc])
-  ?delay:(delay [@ns.namedArgLoc]) ?direction:(direction [@ns.namedArgLoc])
-  ?timingFunction:(timingFunction [@ns.namedArgLoc])
-  ?fillMode:(fillMode [@ns.namedArgLoc])
-  ?playState:(playState [@ns.namedArgLoc])
-  ?iterationCount:(iterationCount [@ns.namedArgLoc]) name =
+let animation ?duration ?delay ?direction ?timingFunction ?fillMode ?playState
+  ?iterationCount name =
   animationValue
-    (Animation.shorthand ?duration:(duration [@ns.namedArgLoc])
-       ?delay:(delay [@ns.namedArgLoc]) ?direction:(direction [@ns.namedArgLoc])
-       ?timingFunction:(timingFunction [@ns.namedArgLoc])
-       ?fillMode:(fillMode [@ns.namedArgLoc])
-       ?playState:(playState [@ns.namedArgLoc])
-       ?iterationCount:(iterationCount [@ns.namedArgLoc]) name)
+    (Animation.shorthand ?duration ?delay ?direction ?timingFunction ?fillMode
+       ?playState ?iterationCount name)
 
 let animations x =
   D
@@ -2079,6 +2044,7 @@ let animations x =
 
 let animationName x = D ({js|animation-name|js}, x)
 
+(** SVG *)
 module SVG = struct
   let fill x =
     D
@@ -2134,6 +2100,5 @@ module SVG = struct
   let stopColor x = D ({js|stop-color|js}, string_of_color x)
   let stopOpacity x = D ({js|stop-opacity|js}, Std.Float.toString x)
 end
-[@@ns.doc "\n * SVG\n "]
 
 let touchAction x = D ({js|touch-action|js}, x |. TouchAction.toString)

@@ -962,7 +962,7 @@
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles = (~var, _) =>
-      CssJs.style(. [|
+      CssJs.style([|
         CssJs.label("ArrayDynamicComponent"),
         CssJs.display(`block),
         switch (var) {

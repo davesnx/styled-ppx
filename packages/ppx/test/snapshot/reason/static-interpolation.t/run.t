@@ -968,7 +968,7 @@
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles =
-      CssJs.style(. [|
+      CssJs.style([|
         CssJs.label("StringInterpolation"),
         (CssJs.color(Theme.var): CssJs.rule),
         (CssJs.backgroundColor(black): CssJs.rule),

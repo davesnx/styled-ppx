@@ -42,7 +42,7 @@ let testData = [
   (
     "keyframe",
     %keyframe("from { opacity: 0 } to { opacity: 1 }"),
-    CssJs.keyframes(. [(0, [CssJs.opacity(0.)]), (100, [CssJs.opacity(1.)])]),
+    CssJs.keyframes([(0, [CssJs.opacity(0.)]), (100, [CssJs.opacity(1.)])]),
   ),
 ]
 

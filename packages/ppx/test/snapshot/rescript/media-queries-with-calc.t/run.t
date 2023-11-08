@@ -5,7 +5,7 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
 
   $ npx rescript convert fixed.ml
   Error when converting fixed.ml
-  File "", line 496, characters 71-74:
+  File "", line 494, characters 68-71:
   Error: Invalid literal 2px
   
 

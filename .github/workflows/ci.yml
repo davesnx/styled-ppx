@@ -23,7 +23,7 @@ jobs:
       matrix:
         os: [ubuntu-20.04, macos-latest] # Missing windows-latest
         ocaml-compiler:
-          - 4.14.x
+          - 5.1.0
 
     runs-on: ${{ matrix.os }}
 

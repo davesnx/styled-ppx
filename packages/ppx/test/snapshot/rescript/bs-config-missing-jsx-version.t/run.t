@@ -478,12 +478,10 @@
         onVolumeChange: ReactEvent.Media.t -> unit [@mel.optional ];
         onWaiting: ReactEvent.Media.t -> unit [@mel.optional ];
         onWheel: ReactEvent.Wheel.t -> unit [@mel.optional ];
-        var: 'var }[@@deriving abstract]
+        var: 'var }[@@bs.deriving abstract]
       external createVariadicElement :
-        string -> < .. >  Js.t -> React.element = "createElement"[@@mel.module
-                                                                   (("react")
-                                                                     [@reason.raw_literal
-                                                                      ])]
+        string -> < .. >  Js.t -> React.element = "createElement"[@@bs.module
+                                                                   "react"]
       let deleteProp = [%raw "(newProps, key) => delete newProps[key]"]
       let getOrEmpty str =
         match str with
@@ -491,20 +489,19 @@
         | None -> ""
       external assign2 :
         < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t =
-          "Object.assign"
+          "Object.assign"[@@bs.val ]
       let styles ~var:((var)[@ns.namedArgLoc ])  _ =
-        ((CssJs.style
-            [|(CssJs.label "ArrayDynamicComponent");(CssJs.display `block);((
-              match var with
-              | `Black -> CssJs.color (`hex {js|999999|js})
-              | `White -> CssJs.color (`hex {js|FAFAFA|js})))|])
-        [@u ])
+        CssJs.style
+          [|(CssJs.label "ArrayDynamicComponent");(CssJs.display `block);((
+            match var with
+            | `Black -> CssJs.color (`hex {js|999999|js})
+            | `White -> CssJs.color (`hex {js|FAFAFA|js})))|]
       let make (props : 'var makeProps) =
         let className =
           (styles ~var:(varGet props) ()) ^ (getOrEmpty (classNameGet props)) in
-        let stylesObject = [%mel.obj { className; ref = (innerRefGet props) }] in
+        let stylesObject = [%bs.obj { className; ref = (innerRefGet props) }] in
         let newProps = assign2 (Js.Obj.empty ()) (Obj.magic props) stylesObject in
         ignore (deleteProp newProps "var");
         ignore (deleteProp newProps "innerRef");
-        createVariadicElement (("div")[@reason.raw_literal "div"]) newProps
+        createVariadicElement "div" newProps
     end

@@ -1,3 +1,7 @@
+(copy_files
+ (mode fallback)
+ (files ../js/**[!.pp].ml))
+
 (rule
  (alias all)
  (action

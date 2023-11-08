@@ -961,17 +961,17 @@
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles =
-      CssJs.style(. [|
+      CssJs.style([|
         CssJs.label("SelectorsMediaQueries"),
-        CssJs.media(.
+        CssJs.media(
           {js|(min-width: 600px)|js},
           [|CssJs.backgroundColor(CssJs.blue)|],
         ),
-        CssJs.selector(.
+        CssJs.selector(
           {js|&:hover|js},
           [|CssJs.backgroundColor(CssJs.green)|],
         ),
-        CssJs.selector(.
+        CssJs.selector(
           {js|& > p|js},
           [|CssJs.color(CssJs.pink), CssJs.fontSize(`pxFloat(24.))|],
         ),

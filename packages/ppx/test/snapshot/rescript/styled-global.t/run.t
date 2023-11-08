@@ -2,12 +2,12 @@
 
   $ cat output.ml
   ;;ignore
-      ((CssJs.global (({*j|html, body, #root, .class|*j})[@res.template ])
-          [|(CssJs.margin `zero)|])[@u ])
+      (CssJs.global (({*j|html, body, #root, .class|*j})[@res.template ])
+         [|(CssJs.margin `zero)|])
 
   $ npx rescript convert output.ml
   Error when converting output.ml
-  File "", line 2, characters 23-24:
+  File "", line 2, characters 22-23:
   Error: Syntax error: operator expected.
   
 

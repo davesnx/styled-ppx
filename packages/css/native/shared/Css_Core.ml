@@ -2,12 +2,12 @@ module type CssImplementationIntf = sig
   type nonrec styleEncoding
   type nonrec renderer
 
-  val injectRaw : (string -> unit[@u])
-  val renderRaw : (renderer -> string -> unit[@u])
-  val injectRules : (string -> Js.Json.t -> unit[@u])
-  val renderRules : (renderer -> string -> Js.Json.t -> unit[@u])
-  val make : (Js.Json.t -> styleEncoding[@u])
-  val mergeStyles : (styleEncoding array -> styleEncoding[@u])
-  val makeKeyframes : (Js.Json.t Js.Dict.t -> string[@u])
-  val renderKeyframes : (renderer -> Js.Json.t Js.Dict.t -> string[@u])
+  val injectRaw : string -> unit
+  val renderRaw : renderer -> string -> unit
+  val injectRules : string -> Js.Json.t -> unit
+  val renderRules : renderer -> string -> Js.Json.t -> unit
+  val make : Js.Json.t -> styleEncoding
+  val mergeStyles : styleEncoding array -> styleEncoding
+  val makeKeyframes : Js.Json.t Js.Dict.t -> string
+  val renderKeyframes : renderer -> Js.Json.t Js.Dict.t -> string
 end

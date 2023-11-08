@@ -961,13 +961,13 @@
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles =
-      CssJs.style(. [|
+      CssJs.style([|
         CssJs.label("MediaQueryCalc"),
-        CssJs.media(.
+        CssJs.media(
           {js|(min-width: calc(2px + 1px))|js},
           [|CssJs.color(CssJs.red)|],
         ),
-        CssJs.media(.
+        CssJs.media(
           {js|(min-width: calc(1000px - 2%))|js},
           [|CssJs.color(CssJs.red)|],
         ),

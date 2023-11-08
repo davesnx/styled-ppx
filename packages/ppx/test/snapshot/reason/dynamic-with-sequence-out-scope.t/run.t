@@ -965,7 +965,7 @@
       "Object.assign";
     let styles = (~color, _) => {
       let styles = sharedStylesBetweenDynamicComponents(color);
-      CssJs.style(. styles);
+      CssJs.style(styles);
     };
     let make = (props: makeProps('color)) => {
       let className =

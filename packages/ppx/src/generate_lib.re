@@ -229,7 +229,7 @@ let className = (~loc, expr) => {
   );
 };
 
-/* deleteInnerRef(. newProps, "innerRef") |> ignore; */
+/* deleteInnerRef(newProps, "innerRef") |> ignore; */
 let deleteProp = (~loc, key) => {
   Helper.Exp.apply(
     ~loc,

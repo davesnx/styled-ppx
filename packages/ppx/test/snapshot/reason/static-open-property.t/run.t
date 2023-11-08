@@ -961,7 +961,7 @@
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles =
-      CssJs.style(. [|
+      CssJs.style([|
         CssJs.label("OneSingleProperty"),
         CssJs.display(`block),
       |]);

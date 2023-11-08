@@ -963,13 +963,13 @@
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles =
-      CssJs.style(. [|
+      CssJs.style([|
         CssJs.label("SelectorWithInterpolation"),
-        CssJs.media(.
+        CssJs.media(
           {js|only screen and (min-width: |js} ++ width ++ {js|)|js},
           [|CssJs.color(CssJs.blue)|],
         ),
-        CssJs.media(.
+        CssJs.media(
           {js|(min-width: 700px) and (orientation: |js}
           ++ orientation
           ++ {js|)|js},
