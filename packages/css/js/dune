@@ -1,8 +1,8 @@
 (include_subdirs unqualified)
 
 (library
- (name bs_css)
- (public_name styled-ppx.bs-css)
+ (name css)
+ (public_name styled-ppx.css)
  (modes melange)
  (wrapped false)
  (flags :standard -w -32-34)
