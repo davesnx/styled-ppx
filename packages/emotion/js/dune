@@ -1,9 +1,10 @@
+(include_subdirs unqualified)
+
 (library
  (name emotion)
  (public_name styled-ppx.emotion)
  (modes melange)
  (wrapped false)
- (flags :standard -w -32-34)
- (libraries melange.js css)
+ (libraries melange.js styled-ppx.css)
  (preprocess
   (pps melange.ppx)))

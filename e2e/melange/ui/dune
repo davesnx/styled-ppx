@@ -2,6 +2,6 @@
  (name ui)
  (wrapped false)
  (modes melange)
- (libraries styled-ppx.bs-css styled-ppx.bs-css-emotion)
+ (libraries styled-ppx.css emotion)
  (preprocess
   (pps melange.ppx styled-ppx.lib)))
