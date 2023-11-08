@@ -352,20 +352,27 @@ let component =
   [%stri let make = [%e makeFn]];
 };
 
+let optionalType = (~loc, type_) => {
+  Helper.Typ.constr(~loc, withLoc(Lident("option"), ~loc), [type_]);
+};
+
 /* color: string */
 let customPropLabel = (~loc, ~optional, name, type_) => {
   Helper.Type.field(
     ~loc,
     ~attrs=optional ? [Platform_attributes.optional(~loc)] : [],
     withLoc(name, ~loc),
-    type_,
+    /* when is melange, fields need to be annotated as option() when added [@mel.optional] */
+    optional && File.get() == Some(Reason)
+      ? optionalType(~loc, type_) : type_,
   );
 };
 
 let typeVariable = (~loc, name) => Builder.ptyp_var(~loc, name);
 
 /* href: string */
-let recordLabel = (~loc, name, kind, alias) => {
+/* Melange expects record fields to be optional */
+let recordLabel = (~loc, ~isOptional, name, kind, alias) => {
   let attrs =
     switch (alias) {
     | Some(alias) => [
@@ -375,51 +382,89 @@ let recordLabel = (~loc, name, kind, alias) => {
     | None => [Platform_attributes.optional(~loc)]
     };
 
-  Helper.Type.field(
-    ~loc,
-    ~attrs,
-    withLoc(name, ~loc),
-    Helper.Typ.constr(~loc, withLoc(kind, ~loc), []),
-  );
+  let type_ =
+    isOptional
+      ? optionalType(
+          ~loc,
+          Helper.Typ.constr(~loc, withLoc(kind, ~loc), []),
+        )
+      : Helper.Typ.constr(~loc, withLoc(kind, ~loc), []);
+
+  Helper.Type.field(~loc, ~attrs, withLoc(name, ~loc), type_);
 };
 
 /* innerRef: domRef */
-let domRefLabel = (~loc) => {
+let domRefLabel = (~loc, ~isOptional) => {
   /* TODO: is innerRef in JSX4? */
+  let type_ =
+    isOptional
+      ? optionalType(
+          ~loc,
+          Helper.Typ.constr(
+            ~loc,
+            withLoc(Ldot(Lident("ReactDOM"), "domRef"), ~loc),
+            [],
+          ),
+        )
+      : Helper.Typ.constr(
+          ~loc,
+          withLoc(Ldot(Lident("ReactDOM"), "domRef"), ~loc),
+          [],
+        );
   Helper.Type.field(
     ~loc,
     ~attrs=[Platform_attributes.optional(~loc)],
     withLoc("innerRef", ~loc),
-    Helper.Typ.constr(
-      ~loc,
-      withLoc(Ldot(Lident("ReactDOM"), "domRef"), ~loc),
-      [],
-    ),
+    type_,
   );
 };
 
 /* children: React.element */
-let childrenLabel = (~loc) =>
-  Helper.Type.field(
-    ~loc,
-    ~attrs=[Platform_attributes.optional(~loc)],
-    withLoc("children", ~loc),
-    Helper.Typ.constr(
-      ~loc,
-      withLoc(Ldot(Lident("React"), "element"), ~loc),
-      [],
-    ),
-  );
+let childrenLabel = (~loc, ~isOptional) =>
+  isOptional
+    ? Helper.Type.field(
+        ~loc,
+        ~attrs=[Platform_attributes.optional(~loc)],
+        withLoc("children", ~loc),
+        optionalType(
+          ~loc,
+          Helper.Typ.constr(
+            ~loc,
+            withLoc(Ldot(Lident("React"), "element"), ~loc),
+            [],
+          ),
+        ),
+      )
+    : Helper.Type.field(
+        ~loc,
+        ~attrs=[Platform_attributes.optional(~loc)],
+        withLoc("children", ~loc),
+        Helper.Typ.constr(
+          ~loc,
+          withLoc(Ldot(Lident("React"), "element"), ~loc),
+          [],
+        ),
+      );
 
 /* onDragOver: ReactEvent.Mouse.t => unit */
-let recordEventLabel = (~loc, name, kind) => {
+let recordEventLabel = (~loc, ~isOptional, name, kind) => {
   let type_ =
-    Helper.Typ.arrow(
-      ~loc,
-      Nolabel,
-      Helper.Typ.constr(~loc, withLoc(kind, ~loc), []),
-      Helper.Typ.constr(~loc, withLoc(Lident("unit"), ~loc), []),
-    );
+    isOptional
+      ? optionalType(
+          ~loc,
+          Helper.Typ.arrow(
+            ~loc,
+            Nolabel,
+            Helper.Typ.constr(~loc, withLoc(kind, ~loc), []),
+            Helper.Typ.constr(~loc, withLoc(Lident("unit"), ~loc), []),
+          ),
+        )
+      : Helper.Typ.arrow(
+          ~loc,
+          Nolabel,
+          Helper.Typ.constr(~loc, withLoc(kind, ~loc), []),
+          Helper.Typ.constr(~loc, withLoc(Lident("unit"), ~loc), []),
+        );
   Helper.Type.field(
     ~loc,
     ~attrs=[Platform_attributes.optional(~loc)],
@@ -436,10 +481,16 @@ let makePropsWithParams = (~loc, params, dynamicProps) => {
     |> List.map(domProp =>
          switch (domProp) {
          | MakeProps.Event({name, type_}) =>
-           recordEventLabel(~loc, name, MakeProps.eventTypeToIdent(type_))
+           recordEventLabel(
+             ~loc,
+             ~isOptional=false,
+             name,
+             MakeProps.eventTypeToIdent(type_),
+           )
          | MakeProps.Attribute({name, type_, alias}) =>
            recordLabel(
              ~loc,
+             ~isOptional=false,
              name,
              MakeProps.attributeTypeToIdent(type_),
              alias,
@@ -450,7 +501,11 @@ let makePropsWithParams = (~loc, params, dynamicProps) => {
   /* List of `prop: type` */
   let reactProps =
     List.append(
-      [domRefLabel(~loc), childrenLabel(~loc), ...makeProps],
+      [
+        domRefLabel(~loc, ~isOptional=false),
+        childrenLabel(~loc, ~isOptional=false),
+        ...makeProps,
+      ],
       dynamicProps,
     );
 
@@ -458,7 +513,7 @@ let makePropsWithParams = (~loc, params, dynamicProps) => {
     List.map(
       type_ => (type_, (Asttypes.NoVariance, Asttypes.NoInjectivity)),
       params,
-    ); /* TODO: Made correct ast, not sure if it matter */
+    );
 
   Helper.Str.mk(
     ~loc,
@@ -478,7 +533,7 @@ let makePropsWithParams = (~loc, params, dynamicProps) => {
   );
 };
 
-let makePropsJSX4 = (~loc, customProps) => {
+let makePropsJSX4ReScript = (~loc, customProps) => {
   switch (customProps) {
   | Some((params, dynamicProps)) =>
     makePropsWithParams(~loc, params, dynamicProps)
@@ -490,7 +545,7 @@ let makePropsJSX4 = (~loc, customProps) => {
 
 /* type makeProps = { ... } */
 /* type makeProps('a, 'b) = { ... } */
-let makeMakeProps = (~loc, customProps) => {
+let makeMakePropsReason = (~loc, customProps) => {
   let (params, dynamicProps) =
     switch (customProps) {
     | None => ([], [])
@@ -504,10 +559,16 @@ let makeMakeProps = (~loc, customProps) => {
     |> List.map(domProp =>
          switch (domProp) {
          | MakeProps.Event({name, type_}) =>
-           recordEventLabel(~loc, name, MakeProps.eventTypeToIdent(type_))
+           recordEventLabel(
+             ~loc,
+             ~isOptional=true,
+             name,
+             MakeProps.eventTypeToIdent(type_),
+           )
          | MakeProps.Attribute({name, type_, alias}) =>
            recordLabel(
              ~loc,
+             ~isOptional=true,
              name,
              MakeProps.attributeTypeToIdent(type_),
              alias,
@@ -515,10 +576,14 @@ let makeMakeProps = (~loc, customProps) => {
          }
        );
 
-  /* List of [@mel.optional] prop: type */
+  /* List of prop: type */
   let reactProps =
     List.append(
-      [domRefLabel(~loc), childrenLabel(~loc), ...makeProps],
+      [
+        domRefLabel(~loc, ~isOptional=true),
+        childrenLabel(~loc, ~isOptional=true),
+        ...makeProps,
+      ],
       dynamicProps,
     );
 
@@ -526,7 +591,7 @@ let makeMakeProps = (~loc, customProps) => {
     List.map(
       type_ => (type_, (Asttypes.NoVariance, Asttypes.NoInjectivity)),
       params,
-    ); /* TODO: Made correct ast, not sure if it matter */
+    );
 
   Helper.Str.mk(
     ~loc,
@@ -551,9 +616,9 @@ let makeMakeProps = (~loc, customProps) => {
 let makeProps = (~loc, customProps) => {
   switch (File.get()) {
   | Some(ReScript) when Settings.Get.jsxVersion() === 4 =>
-    makePropsJSX4(~loc, customProps)
+    makePropsJSX4ReScript(~loc, customProps)
   | Some(Reason)
-  | _ => makeMakeProps(~loc, customProps)
+  | _ => makeMakePropsReason(~loc, customProps)
   };
 };
 

@@ -2,6 +2,6 @@
  (name ui)
  (wrapped false)
  (modes melange)
- (libraries styled-ppx.css styled-ppx.emotion)
+ (libraries styled-ppx.css styled-ppx.emotion reason-react)
  (preprocess
-  (pps melange.ppx styled-ppx.lib)))
+  (pps melange.ppx styled-ppx.lib reason-react-ppx)))

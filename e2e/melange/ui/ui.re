@@ -1,6 +1,16 @@
 let stack = [%cx "display: flex; flex-direction: column"];
 let stackGap = gap => [%cx "gap: $(gap)"];
 
+module Cositas = [%styled.div
+  (~lola=CssJs.px(0)) => {|
+  display: flex;
+  flex-direction: column;
+  gap: $(lola);
+|}
+];
+
+let a = <Cositas lola={CssJs.px(10)} />;
+
 let selectors = [%cx {|
   color: red;
 
