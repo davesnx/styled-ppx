@@ -1,6 +1,3 @@
-(copy_files
- (files ../js/**[!.pp].ml))
-
 (rule
  (alias all)
  (action
