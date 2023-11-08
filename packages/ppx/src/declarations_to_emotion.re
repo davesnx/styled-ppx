@@ -116,7 +116,8 @@ let unsupportedValue = (parser, property) =>
     (~loc, arg) => [[%expr [%e property(~loc)]([%e arg])]],
   );
 
-/* Triggers Unsupported_feature and it's rendered as a string */
+/* Triggers Unsupported_feature and it's rendered as a string,
+   supports interpolation as a string, which is unsafe */
 let unsupportedProperty = parser =>
   transform_with_variable(
     parser,
@@ -129,7 +130,6 @@ let render_string = (~loc, s) => {
   | Some(ReScript) =>
     Helper.Exp.constant(
       ~loc,
-      ~attrs=[Generate_lib.BuckleScriptAttributes.uncurried(~loc)],
       Helper.Const.string(~quotation_delimiter="*j", s),
     )
   | Some(Reason)

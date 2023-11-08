@@ -59,8 +59,6 @@ _opam_414/
 ## BuckleScript
 /lib/*
 !/lib/js/*
-/bundledOutputs/
-.bsb.lock
 
 ## Node - https://github.com/github/gitignore/blob/master/Node.gitignore
 

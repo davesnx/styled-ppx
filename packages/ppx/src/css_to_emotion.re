@@ -43,7 +43,7 @@ let string_to_const = (~loc, s) => {
   | Some(ReScript) =>
     Helper.Exp.constant(
       ~loc,
-      ~attrs=[Generate_lib.ReScriptAttributes.template(~loc)],
+      ~attrs=Platform_attributes.template(~loc),
       Helper.Const.string(~quotation_delimiter="*j", s),
     )
   | Some(Reason)
@@ -179,13 +179,7 @@ and render_media_query = (at_rule: at_rule): Parsetree.expression => {
   };
 
   let (delimiter, attrs) =
-    switch (File.get()) {
-    | Some(ReScript) => (
-        "*j",
-        [Generate_lib.ReScriptAttributes.template(~loc=prelude_loc)],
-      )
-    | _ => ("js", [])
-    };
+    Platform_attributes.string_delimiter(~loc=at_rule.loc);
 
   switch (accumulate_parsed_conditions(prelude)) {
   | Error(error_expr) => error_expr
@@ -212,9 +206,7 @@ and render_media_query = (at_rule: at_rule): Parsetree.expression => {
 
     Helper.Exp.apply(
       ~loc=at_rule.loc,
-      ~attrs=[
-        Generate_lib.BuckleScriptAttributes.uncurried(~loc=at_rule.loc),
-      ],
+      ~attrs=[Platform_attributes.uncurried(~loc=at_rule.loc)],
       CssJs.media(~loc=at_rule.loc),
       [(Nolabel, query), (Nolabel, rules)],
     );
@@ -382,14 +374,7 @@ and render_style_rule = (ident, rule: style_rule): Parsetree.expression => {
   let (_block, loc) = rule.block;
   let selector_expr =
     render_declarations(rule.block) |> Builder.pexp_array(~loc);
-  let (delimiter, attrs) =
-    switch (File.get()) {
-    | Some(ReScript) => (
-        "*j",
-        [Generate_lib.ReScriptAttributes.template(~loc)],
-      )
-    | _ => ("js", [])
-    };
+  let (delimiter, attrs) = Platform_attributes.string_delimiter(~loc);
 
   let selector_name =
     prelude
@@ -399,7 +384,7 @@ and render_style_rule = (ident, rule: style_rule): Parsetree.expression => {
 
   Helper.Exp.apply(
     ~loc=rule.loc,
-    ~attrs=[Generate_lib.BuckleScriptAttributes.uncurried(~loc=rule.loc)],
+    ~attrs=[Platform_attributes.uncurried(~loc=rule.loc)],
     ident,
     [(Nolabel, selector_name), (Nolabel, selector_expr)],
   );
@@ -423,7 +408,7 @@ let render_style_call = (declaration_list): Parsetree.expression => {
 
   Helper.Exp.apply(
     ~loc,
-    ~attrs=[Generate_lib.BuckleScriptAttributes.uncurried(~loc)],
+    ~attrs=[Platform_attributes.uncurried(~loc)],
     CssJs.style(~loc),
     arguments,
   );
@@ -492,7 +477,7 @@ let render_keyframes = (declarations: rule_list): Parsetree.expression => {
 
   {
     ...Builder.eapply(~loc, CssJs.keyframes(~loc), [keyframes]),
-    pexp_attributes: [Generate_lib.BuckleScriptAttributes.uncurried(~loc)],
+    pexp_attributes: [Platform_attributes.uncurried(~loc)],
   };
 };
 
