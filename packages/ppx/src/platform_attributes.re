@@ -5,6 +5,8 @@ module Builder = Ppxlib.Ast_builder.Default;
 
 let withLoc = (~loc, txt) => {loc, txt};
 
+/* This file aims at abstracing away the differences between Melange and ReScript attributes. */
+
 module ReasonAttributes = {
   let preserveBraces = (~loc) =>
     Helper.Attr.mk(withLoc("reason.preserve_braces", ~loc), PStr([]));
