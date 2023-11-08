@@ -4,7 +4,7 @@ module RedBox = %styled.div(`
   background-color: red;
 `)
 
-/* open Vitest
+open Vitest
 open ReactTestingLibrary
 
 
@@ -13,4 +13,3 @@ describe("Nested", () => {
     <Nested /> |> render |> container |> expect |> Expect.toMatchSnapshot
   )
 })
- */
