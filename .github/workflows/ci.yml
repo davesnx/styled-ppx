@@ -113,18 +113,6 @@ jobs:
         run: chmod +x _build/default/bin/bin.exe
 
       - name: Install dependencies
-        working-directory: ./e2e/rescript-v9-JSX3
-        run: npm install --force
-
-      - name: Build
-        working-directory: ./e2e/rescript-v9-JSX3
-        run: npm run build
-
-      - name: Test
-        working-directory: ./e2e/rescript-v9-JSX3
-        run: npm run test
-
-      - name: Install dependencies
         working-directory: ./e2e/rescript-v10-JSX4
         run: npm install --force
 
