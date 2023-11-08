@@ -504,7 +504,7 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
         let className = styles ^ (getOrEmpty props.className) in
         let stylesObject = [%bs.obj { className; ref = (props.innerRef) }] in
         let newProps = assign2 (Js.Obj.empty ()) (Obj.magic props) stylesObject in
-        ignore (deleteProp newProps "innerRef");
+        ignore ((deleteProp newProps "innerRef")[@bs ]);
         createVariadicElement "section" newProps
     end
 

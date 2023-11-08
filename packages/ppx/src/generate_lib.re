@@ -230,9 +230,11 @@ let className = (~loc, expr) => {
 };
 
 /* deleteInnerRef(newProps, "innerRef") |> ignore; */
+/* TODO: Replace with Js.Dict.unsafeDeleteKey */
 let deleteProp = (~loc, key) => {
   Helper.Exp.apply(
     ~loc,
+    ~attrs=[Platform_attributes.uncurried(~loc)],
     Helper.Exp.ident(~loc, withLoc(Lident("deleteProp"), ~loc)),
     [
       (Nolabel, Helper.Exp.ident(~loc, withLoc(Lident("newProps"), ~loc))),

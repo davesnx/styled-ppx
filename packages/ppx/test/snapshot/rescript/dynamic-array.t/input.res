@@ -7,3 +7,5 @@ module ArrayDynamicComponent = %styled.div(
     %css("display: block;"),
   ]
 )
+
+module ArrayStatic = %styled.section([%css("display: flex;"), %css("justify-content: center;")])

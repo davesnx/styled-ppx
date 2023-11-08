@@ -1546,7 +1546,7 @@ module GridTemplateAreas = struct
     | `areas items ->
       String.trim
         (Std.Array.reduceU items {js||js} (fun [@bs] [@u] carry item ->
-           ((carry ^ {js|'|js}) ^ item) ^ {js|' |js}))
+             ((carry ^ {js|'|js}) ^ item) ^ {js|' |js}))
 end
 
 module GridArea = struct
@@ -1955,9 +1955,9 @@ module Gradient = struct
   let string_of_stops stops =
     stops
     |> Array.map (fun (c, l) ->
-         match l with
-         | None -> string_of_color c
-         | Some l -> string_of_color c ^ {js| |js} ^ Length.toString l)
+           match l with
+           | None -> string_of_color c
+           | Some l -> string_of_color c ^ {js| |js} ^ Length.toString l)
     |. Js.Array2.joinWith {js|, |js}
 
   let direction_to_string = function
@@ -2127,7 +2127,7 @@ module FontFamilyName = struct
     | `custom value ->
       (match Js.String2.get value 0 with
       | {|"|} | {|'|} -> value
-      | _ -> {|"|} ^ value ^ {|"|})
+      | _ -> ({|"|} ^ value) ^ {|"|})
     | `serif -> {js|serif|js}
     | `sansSerif -> {js|sans-serif|js}
     | `cursive -> {js|cursive|js}

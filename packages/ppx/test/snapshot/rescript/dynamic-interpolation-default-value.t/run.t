@@ -502,8 +502,8 @@
           (styles ?var:(props.var) ()) ^ (getOrEmpty props.className) in
         let stylesObject = [%bs.obj { className; ref = (props.innerRef) }] in
         let newProps = assign2 (Js.Obj.empty ()) (Obj.magic props) stylesObject in
-        ignore (deleteProp newProps "var");
-        ignore (deleteProp newProps "innerRef");
+        ignore ((deleteProp newProps "var")[@bs ]);
+        ignore ((deleteProp newProps "innerRef")[@bs ]);
         createVariadicElement "div" newProps
     end
 

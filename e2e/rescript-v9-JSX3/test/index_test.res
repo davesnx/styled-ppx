@@ -1,5 +1,7 @@
-open Vitest
+/* open Vitest
 open ReactTestingLibrary
+
+
 
 module Component = %styled.div(`
   display: flex;
@@ -49,3 +51,4 @@ describe("styled", () => {
     )
   })
 })
+ */

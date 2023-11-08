@@ -500,8 +500,8 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
       let className = styles(~var=props.var, ()) ++ getOrEmpty(props.className)
       let stylesObject = {"className": className, "ref": props.innerRef}
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject)
-      ignore(deleteProp(newProps, "var"))
-      ignore(deleteProp(newProps, "innerRef"))
+      ignore(deleteProp(. newProps, "var"))
+      ignore(deleteProp(. newProps, "innerRef"))
       createVariadicElement("div", newProps)
     }
   }

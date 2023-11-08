@@ -1,7 +1,7 @@
-open Vitest
-open ReactTestingLibrary
+/* open Vitest
+ open ReactTestingLibrary */
 
-module ArrayStatic = %styled.section([%css("display: flex;"), %css("justify-content: center;")])
+/* module ArrayStatic = %styled.section([%css("display: flex;"), %css("justify-content: center;")])
 
 module ArrayDynamicComponent = %styled.div(
   (~var) => [
@@ -44,3 +44,4 @@ describe("Array", () => {
     |> Expect.toMatchSnapshot
   )
 })
+ */

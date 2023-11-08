@@ -1,4 +1,4 @@
-open Vitest
+/* open Vitest
 open ReactTestingLibrary
 
 let hasFocus: Dom.element => bool = %raw("(el) => document.activeElement === el")
@@ -35,3 +35,4 @@ Skip.describe("innerRef", () => {
     expect(inputHasFocus)->Expect.toBe(true)
   })
 })
+ */

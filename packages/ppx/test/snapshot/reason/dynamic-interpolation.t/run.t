@@ -972,8 +972,8 @@
         styles(~var=varGet(props), ()) ++ getOrEmpty(classNameGet(props));
       let stylesObject = {"className": className, "ref": innerRefGet(props)};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
-      ignore(deleteProp(newProps, "var"));
-      ignore(deleteProp(newProps, "innerRef"));
+      ignore(deleteProp(. newProps, "var"));
+      ignore(deleteProp(. newProps, "innerRef"));
       createVariadicElement("div", newProps);
     };
   };

@@ -974,9 +974,9 @@
         ++ getOrEmpty(classNameGet(props));
       let stylesObject = {"className": className, "ref": innerRefGet(props)};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
-      ignore(deleteProp(newProps, "color"));
-      ignore(deleteProp(newProps, "size"));
-      ignore(deleteProp(newProps, "innerRef"));
+      ignore(deleteProp(. newProps, "color"));
+      ignore(deleteProp(. newProps, "size"));
+      ignore(deleteProp(. newProps, "innerRef"));
       createVariadicElement("button", newProps);
     };
   };
