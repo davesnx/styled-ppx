@@ -15,22 +15,22 @@ help: ## Print this help message
 
 .PHONY: build
 build: ## Build the project, including non installable libraries and executables
-	@$(DUNE) build --promote-install-files --root . @@default
+	$(DUNE) build --promote-install-files --root . @@default
 
 .PHONY: build-prod
 build-prod: ## Build for production (--profile=prod)
-	@$(DUNE) build --profile=prod @@default
+	$(DUNE) build --profile=prod @@default
 
 .PHONY: clean
 clean: ## Clean artifacts
-	@$(DUNE) clean
+	$(DUNE) clean
 
 .PHONY: deps
 deps: $(opam_file) ## Alias to update the opam file and install the needed deps
 
 .PHONY: format-check
 format-check: ## Checks if format is correct
-	@$(DUNE) build @fmt
+	$(DUNE) build @fmt
 
 .PHONY: format
 fmt format: ## Formats code
@@ -50,19 +50,19 @@ pin: ## Pin dependencies
 
 .PHONY: create-switch
 create-switch: ## Create opam switch
-	@opam switch create . 5.1.0 --deps-only --with-test --no-install
+	opam switch create . 5.1.0 --deps-only --with-test --no-install
 
 .PHONY: install
 install: ## Install project dependencies
-	@opam install . --deps-only --with-test
-	@npm install
+	opam install . --deps-only --with-test
+	npm install
 
 .PHONY: init
 init: setup-githooks create-switch pin install ## Create a local dev enviroment
 
 .PHONY: subst
 subst: ## Run dune substitute
-	@$(DUNE) subst
+	$(DUNE) subst
 
 .PHONY: dev
 dev: ## Run the project in dev mode
@@ -74,7 +74,7 @@ release-static:
 
 # Testing commands
 
-TEST_TARGETS := ppx_snapshot parser css_lexer reason_css_parser css_spec_parser css_support css_spec_types string_interpolation emotion native_typecheck
+TEST_TARGETS := ppx_snapshot parser css_lexer reason_css_parser css_spec_parser css_support css_spec_types string_interpolation emotion emotion_hash native_typecheck
 
 # Create targets with the format "test_{{target_name}}_{{ "watch" | "promote" }}"
 define create_test
@@ -92,7 +92,7 @@ endef
 define create_test_promote
 .PHONY: test_$(1)_promote
 test_$(1)_promote: ## Run $(1) tests
-	$$(DUNE) build @$(1)_promote
+	$$(DUNE) build @$(1)_test --auto-promote
 endef
 
 # Apply the create_watch_target rule for each test target
@@ -102,31 +102,33 @@ $(foreach target,$(TEST_TARGETS), $(eval $(call create_test_promote,$(target))))
 
 .PHONY: test_e2e
 test_e2e: ## Run End-to-end tests for JSX3
-	@npm --prefix 'e2e/rescript-v9-JSX3' install --force
-	@npm --prefix 'e2e/rescript-v9-JSX3' run build
-	@npm --prefix 'e2e/rescript-v9-JSX3' run test
+	npm --prefix 'e2e/rescript-v9-JSX3' install --force
+	npm --prefix 'e2e/rescript-v9-JSX3' run build
+	npm --prefix 'e2e/rescript-v9-JSX3' run test
 
 .PHONY: test_e2e_watch
 test_e2e_watch: ## Run End-to-end tests for JSX3
-	@npm --prefix 'e2e/rescript-v9-JSX3' run test_watch
+	npm --prefix 'e2e/rescript-v9-JSX3' run test_watch
 
 .PHONY: test_e2e_promote
 test_e2e_promote: ## Run End-to-end tests for JSX3
-	@npm --prefix 'e2e/rescript-v9-JSX3' run test_promote
+	npm --prefix 'e2e/rescript-v9-JSX3' run test_promote
 
 .PHONY: test
-test: build test_native_typecheck test_css_support test_ppx_snapshot test_parser test_css_lexer test_reason_css_parser test_css_spec_parser test_css_spec_types test_string_interpolation test_emotion test_e2e
+test: build test_native_typecheck test_css_support test_ppx_snapshot test_parser test_css_lexer test_reason_css_parser test_css_spec_parser test_css_spec_types test_string_interpolation test_emotion test_emotion_hash test_e2e
 
 # Debug commands
 
 .PHONY: ast
-ast:
-	$(DUNE) exec ast-renderer -- $@
+ast: ## Print the command to debug the ast
+	@echo "Run the following command to debug the AST"
+	@echo "  $(DUNE) exec ast-renderer"
 
 .PHONY: lexer
-lexer:
-	$(DUNE) exec lexer-renderer -- $@
+lexer: ## Print the command to debug the lexer
+	@echo "Run the following command to debug the AST"
+	@echo "  $(DUNE) exec lexer-renderer"
 
 .PHONY: interpreter
-interpreter:
+interpreter: ## Run menhir as interpret
 	$(OPAM_EXEC) menhir --interpret --interpret-show-cst packages/parser/lib/css_parser.mly

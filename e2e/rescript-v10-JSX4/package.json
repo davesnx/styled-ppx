@@ -2,32 +2,35 @@
   "name": "styled-ppx-demo-rescript-v10-jsx4",
   "version": "0.0.0",
   "license": "MIT",
+  "type": "module",
   "scripts": {
-    "start": "concurrently --names re,js,www --kill-others yarn:watch yarn:bundle:watch yarn:dev-server",
-    "bundle": "esbuild ./demo/index.bs.js --outfile=demo/bundle.js --bundle --sourcemap --target=chrome58,firefox57,safari11,edge16 --define:process.env.NODE_ENV='\"development\"'",
-    "dev-server": "PORT=5000 live-server demo --host=0.0.0.0",
-    "bundle:watch": "yarn bundle --watch --color=true",
+    "start": "concurrently --names rescript,js+www --kill-others yarn:watch yarn:bundle:watch",
+    "bundle": "vite build --mode development",
+    "bundle:watch": "vite serve --mode development --open --host 0.0.0.0",
     "build": "rescript build -with-deps",
     "watch": "rescript build -with-deps -w",
     "clean": "rm -rf src/bundle.js; rescript clean",
     "test_watch": "concurrently 'npm run watch' 'vitest'",
     "pretest": "npm run build",
-    "test": "vitest --run --silent"
+    "test": "vitest --run --silent --root test"
   },
   "dependencies": {
-    "@rescript/react": "0.11.0",
-    "@rescriptbr/react-testing-library": "1.0.1",
     "@davesnx/styled-ppx-css": "file:../../_build/default/packages/css/rescript",
     "@davesnx/styled-ppx-emotion": "file:../../_build/default/packages/emotion/rescript",
+    "@emotion/css": "^11.11.2",
+    "@rescript/react": "0.11.0",
+    "@rescriptbr/react-testing-library": "1.0.1",
     "concurrently": "^5.1.0",
     "jsdom": "^21.1.0",
-    "live-server": "1.2.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "rescript": "10.1.3",
     "rescript-vitest": "1.1.0",
     "rescript-webapi": "0.7.0",
     "vite": "4.2.1",
-    "vitest": "0.29.7"
+    "vite-plugin-cjs-interop": "^1.1.0",
+    "vitest": "0.29.7",
+    "@jihchi/vite-plugin-rescript": "^5.3.1",
+    "vite-plugin-externalize-deps": "^0.7.0"
   }
 }

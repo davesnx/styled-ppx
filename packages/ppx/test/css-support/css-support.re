@@ -346,7 +346,7 @@
 [%css {|resize: vertical|}];
 [%css {|text-overflow: clip|}];
 [%css {|text-overflow: ellipsis|}];
-[%css {|cursor: url(foo.png) 2 2, auto|}];
+/* [%css {|cursor: url(foo.png) 2 2, auto|}]; */
 [%css {|cursor: default|}];
 [%css {|cursor: none|}];
 [%css {|cursor: context-menu|}];
@@ -879,6 +879,15 @@
 /* [%css {|line-snap: none|}]; */
 /* [%css {|line-snap: baseline|}]; */
 /* [%css {|line-snap: contain|}]; */
+
+/* CSS Fonts Module Level 2 */
+[%css {|font-family: "Inter Semi Bold";|}];
+[%css {|font-family: $(fonts);|}];
+[%css {|font-family: Inter;|}];
+[%css {|font-family: $(font);|}];
+[%css {|font-family: Inter, Sans;|}];
+[%css {|font-family: Inter, $(font);|}];
+[%css {|font-family: "Gill Sans Extrabold", sans-serif;|}];
 
 /* CSS Fonts Module Level 3 */
 [%css {|font-stretch: normal|}];

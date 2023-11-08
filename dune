@@ -2,7 +2,7 @@
 
 (subdir
  e2e
- (dirs melange-v1))
+ (dirs melange))
 
 (subdir
  packages

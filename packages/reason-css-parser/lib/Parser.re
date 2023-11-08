@@ -221,7 +221,7 @@ and ending_shape = [%value.rec "'circle' | 'ellipse'"]
 and explicit_track_list = [%value.rec
   "[ [ <line-names> ]? <track-size> ]+ [ <line-names> ]?"
 ]
-and family_name = [%value.rec "<string> | [ <custom-ident> ]+"]
+and family_name = [%value.rec "<string> | <custom-ident>"]
 and feature_tag_value = [%value.rec "<string> [ <integer> | 'on' | 'off' ]?"]
 and feature_type = [%value.rec
   "'@stylistic' | '@historical-forms' | '@styleset' | '@character-variant' | '@swash' | '@ornaments' | '@annotation'"
@@ -1015,8 +1015,12 @@ and property_counter_set = [%value.rec
 and property_cue = [%value.rec "<'cue-before'> [ <'cue-after'> ]?"]
 and property_cue_after = [%value.rec "<url> [ <decibel> ]? | 'none'"]
 and property_cue_before = [%value.rec "<url> [ <decibel> ]? | 'none'"]
+/* and property_cursor = [%value.rec
+     "[ <url> [ <x> <y> ]? ',' ]* [ 'auto' | 'default' | 'none' | 'context-menu' | 'help' | 'pointer' | 'progress' | 'wait' | 'cell' | 'crosshair' | 'text' | 'vertical-text' | 'alias' | 'copy' | 'move' | 'no-drop' | 'not-allowed' | 'e-resize' | 'n-resize' | 'ne-resize' | 'nw-resize' | 's-resize' | 'se-resize' | 'sw-resize' | 'w-resize' | 'ew-resize' | 'ns-resize' | 'nesw-resize' | 'nwse-resize' | 'col-resize' | 'row-resize' | 'all-scroll' | 'zoom-in' | 'zoom-out' | 'grab' | 'grabbing' | 'hand' | '-webkit-grab' | '-webkit-grabbing' | '-webkit-zoom-in' | '-webkit-zoom-out' | '-moz-grab' | '-moz-grabbing' | '-moz-zoom-in' | '-moz-zoom-out' ] | <interpolation>"
+   ] */
+/* Removed [ <url> [ <x> <y> ]? ',' ]* */
 and property_cursor = [%value.rec
-  "[ <url> [ <x> <y> ]? ',' ]* [ 'auto' | 'default' | 'none' | 'context-menu' | 'help' | 'pointer' | 'progress' | 'wait' | 'cell' | 'crosshair' | 'text' | 'vertical-text' | 'alias' | 'copy' | 'move' | 'no-drop' | 'not-allowed' | 'e-resize' | 'n-resize' | 'ne-resize' | 'nw-resize' | 's-resize' | 'se-resize' | 'sw-resize' | 'w-resize' | 'ew-resize' | 'ns-resize' | 'nesw-resize' | 'nwse-resize' | 'col-resize' | 'row-resize' | 'all-scroll' | 'zoom-in' | 'zoom-out' | 'grab' | 'grabbing' | 'hand' | '-webkit-grab' | '-webkit-grabbing' | '-webkit-zoom-in' | '-webkit-zoom-out' | '-moz-grab' | '-moz-grabbing' | '-moz-zoom-in' | '-moz-zoom-out' ]"
+  "'auto' | 'default' | 'none' | 'context-menu' | 'help' | 'pointer' | 'progress' | 'wait' | 'cell' | 'crosshair' | 'text' | 'vertical-text' | 'alias' | 'copy' | 'move' | 'no-drop' | 'not-allowed' | 'e-resize' | 'n-resize' | 'ne-resize' | 'nw-resize' | 's-resize' | 'se-resize' | 'sw-resize' | 'w-resize' | 'ew-resize' | 'ns-resize' | 'nesw-resize' | 'nwse-resize' | 'col-resize' | 'row-resize' | 'all-scroll' | 'zoom-in' | 'zoom-out' | 'grab' | 'grabbing' | 'hand' | '-webkit-grab' | '-webkit-grabbing' | '-webkit-zoom-in' | '-webkit-zoom-out' | '-moz-grab' | '-moz-grabbing' | '-moz-zoom-in' | '-moz-zoom-out' | <interpolation>"
 ]
 and property_direction = [%value.rec "'ltr' | 'rtl'"]
 and property_display = [%value.rec
@@ -1051,9 +1055,10 @@ and property_float = [%value.rec
 and property_font = [%value.rec
   "[ <'font-style'> || <font-variant-css21> || <'font-weight'> || <'font-stretch'> ]? <'font-size'> [ '/' <'line-height'> ]? <'font-family'> | 'caption' | 'icon' | 'menu' | 'message-box' | 'small-caption' | 'status-bar'"
 ]
-and property_font_family = [%value.rec
-  "[ <family-name> | <generic-family> | <interpolation>]#"
+and font_families = [%value.rec
+  "[ <family-name> | <generic-family> | <interpolation> ]#"
 ]
+and property_font_family = [%value.rec "<font_families> | <interpolation>"]
 and property_font_feature_settings = [%value.rec
   "'normal' | [ <feature-tag-value> ]#"
 ]
@@ -3184,6 +3189,7 @@ let check_map =
       ("shape-radius", check(shape_radius)),
       ("side-or-corner", check(side_or_corner)),
       ("single-animation", check(single_animation)),
+      ("font-families", check(font_families)),
       ("single-animation-direction", check(single_animation_direction)),
       ("single-animation-fill-mode", check(single_animation_fill_mode)),
       (

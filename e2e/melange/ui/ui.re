@@ -25,4 +25,13 @@ let bounce = [%keyframe
 |}
 ];
 
-let clx = [%cx "animation-name: $(bounce)"];
+let code = [|`custom("Menlo"), `monospace|];
+let lola = `auto;
+
+let clx = [%cx
+  {|
+  animation-name: $(bounce);
+  font-family: $(code);
+  cursor: $(lola);
+|}
+];

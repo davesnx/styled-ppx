@@ -9,11 +9,29 @@
   },
   "sources": [{
     "dir": "src",
+<<<<<<< HEAD
     "subdirs": true,
     "type": "dev"
   },
   {
     "dir": "demo",
+||||||| a6081350
+    "subdirs": false
+  }, {
+    "dir": "demo",
+=======
+    "subdirs": false
+  },
+  {
+    "dir": "../../_build/default/packages/css/rescript",
+    "subdirs": true
+  }, {
+    "dir": "../../_build/default/packages/emotion/rescript",
+    "subdirs": true
+    },
+  {
+    "dir": "test",
+>>>>>>> 284759a71f276eebd753f3de5535beb106f7e939
     "subdirs": false
   },
   {
