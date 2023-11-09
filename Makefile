@@ -42,8 +42,8 @@ setup-githooks: ## Setup githooks
 
 .PHONY: pin
 pin: ## Pin dependencies
-  @opam pin add reason.dev "https://github.com/reasonml/reason.git\#f92f7ecc228d19ebf4d9d0214792da7b45472766" -y
-  @opam pin add server-reason-react.dev "https://github.com/ml-in-barcelona/server-reason-react.git\#0e12e234ffbd845917891ecd4a366df86c8b0371" -y
+	@opam pin add reason.dev "https://github.com/reasonml/reason.git#f92f7ecc228d19ebf4d9d0214792da7b45472766" -y
+	@opam pin add server-reason-react.dev "https://github.com/ml-in-barcelona/server-reason-react.git#0e12e234ffbd845917891ecd4a366df86c8b0371" -y
 
 .PHONY: create-switch
 create-switch: ## Create opam switch
