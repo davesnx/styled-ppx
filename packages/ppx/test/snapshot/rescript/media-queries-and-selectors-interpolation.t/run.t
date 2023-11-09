@@ -481,7 +481,7 @@
         onTransitionEnd: ReactEvent.Transition.t -> unit [@ns.optional ];
         onVolumeChange: ReactEvent.Media.t -> unit [@ns.optional ];
         onWaiting: ReactEvent.Media.t -> unit [@ns.optional ];
-        onWheel: ReactEvent.Wheel.t -> unit [@ns.optional ]}[@@ns.optional ]
+        onWheel: ReactEvent.Wheel.t -> unit [@ns.optional ]}
       external createVariadicElement :
         string -> < .. >  Js.t -> React.element = "createElement"[@@bs.module
                                                                    "react"]

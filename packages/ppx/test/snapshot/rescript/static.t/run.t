@@ -1,7 +1,9 @@
-  $ npx bsc -ppx "rewriter" -only-parse -bs-ast -bs-jsx 4 -bs-loc -bs-diagnose -bs-no-version-header -bs-ml-out -bs-no-builtin-ppx -bs-super-errors -color never -dsource input.res
-  module ArrayDynamicComponent =
+  $ npx bsc -ppx "rewriter" -only-parse -bs-ast -bs-jsx 4 -bs-loc -bs-diagnose -bs-no-version-header -bs-ml-out -bs-no-builtin-ppx -bs-super-errors -color never -dsource input.res 2> output.ml
+
+  $ cat output.ml
+  module Input =
     struct
-      type 'var makeProps =
+      type makeProps =
         {
         innerRef: ReactDOM.domRef [@bs.optional ];
         children: React.element [@bs.optional ];
@@ -477,31 +479,24 @@
         onTransitionEnd: ReactEvent.Transition.t -> unit [@bs.optional ];
         onVolumeChange: ReactEvent.Media.t -> unit [@bs.optional ];
         onWaiting: ReactEvent.Media.t -> unit [@bs.optional ];
-        onWheel: ReactEvent.Wheel.t -> unit [@bs.optional ];
-        var: 'var }[@@bs.deriving abstract]
+        onWheel: ReactEvent.Wheel.t -> unit [@bs.optional ]}[@@bs.deriving
+                                                              abstract]
       external createVariadicElement :
         string -> < .. >  Js.t -> React.element = "createElement"[@@bs.module
                                                                    "react"]
-      let deleteProp = [%raw "(newProps, key) => delete newProps[key]"]
       let getOrEmpty str =
         match str with
         | ((Some (str))[@explicit_arity ]) -> " " ^ str
         | None -> ""
+      let deleteProp = [%raw "(newProps, key) => delete newProps[key]"]
       external assign2 :
         < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t =
           "Object.assign"[@@bs.val ]
-      let styles ~var:((var)[@ns.namedArgLoc ])  _ =
-        CssJs.style
-          [|(CssJs.label "ArrayDynamicComponent");(CssJs.display `block);((
-            match var with
-            | `Black -> CssJs.color (`hex {js|999999|js})
-            | `White -> CssJs.color (`hex {js|FAFAFA|js})))|]
-      let make (props : 'var makeProps) =
-        let className =
-          (styles ~var:(varGet props) ()) ^ (getOrEmpty (classNameGet props)) in
+      let styles = CssJs.style [|(CssJs.label "Input");(CssJs.display `flex)|]
+      let make (props : makeProps) =
+        let className = styles ^ (getOrEmpty (classNameGet props)) in
         let stylesObject = [%bs.obj { className; ref = (innerRefGet props) }] in
         let newProps = assign2 (Js.Obj.empty ()) (Obj.magic props) stylesObject in
-        ignore ((deleteProp newProps "var")[@bs ]);
         ignore ((deleteProp newProps "innerRef")[@bs ]);
-        createVariadicElement "div" newProps
+        createVariadicElement "input" newProps
     end
