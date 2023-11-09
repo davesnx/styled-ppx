@@ -18,6 +18,11 @@ module ReasonAttributes = {
     );
 };
 
+module BuckleScriptAttributes = {
+  let optional = (~loc) =>
+    Helper.Attr.mk(withLoc("bs.optional", ~loc), PStr([]));
+};
+
 module ReScriptAttributes = {
   let optional = (~loc) =>
     Helper.Attr.mk(withLoc("ns.optional", ~loc), PStr([]));
@@ -134,8 +139,9 @@ module MelangeAttributes = {
 
 let optional = (~loc) => {
   switch (File.get()) {
-  | Some(ReScript) when Settings.Get.jsxVersion() === 4 =>
+  | Some(ReScript) when Settings.Get.jsxVersion() == 4 =>
     ReScriptAttributes.optional(~loc)
+  | Some(ReScript) => BuckleScriptAttributes.optional(~loc)
   | Some(Reason)
   | _ => MelangeAttributes.optional(~loc)
   };
@@ -143,8 +149,7 @@ let optional = (~loc) => {
 
 let alias = (~loc) => {
   switch (File.get()) {
-  | Some(ReScript) when Settings.Get.jsxVersion() === 4 =>
-    ReScriptAttributes.alias(~loc)
+  | Some(ReScript) => ReScriptAttributes.alias(~loc)
   | Some(Reason)
   | _ => MelangeAttributes.alias(~loc)
   };

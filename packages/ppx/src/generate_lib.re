@@ -358,9 +358,10 @@ let optionalType = (~loc, type_) => {
 
 /* color: string */
 let customPropLabel = (~loc, ~optional, name, type_) => {
+  let attrs = optional ? [Platform_attributes.optional(~loc)] : [];
   Helper.Type.field(
     ~loc,
-    ~attrs=optional ? [Platform_attributes.optional(~loc)] : [],
+    ~attrs,
     withLoc(name, ~loc),
     /* when is melange, fields need to be annotated as option() when added [@mel.optional] */
     optional && File.get() == Some(Reason)
@@ -373,6 +374,7 @@ let typeVariable = (~loc, name) => Builder.ptyp_var(~loc, name);
 /* href: string */
 /* Melange expects record fields to be optional */
 let recordLabel = (~loc, ~isOptional, name, kind, alias) => {
+  /* optional attribute is always present (unrelated with isOptional flag), while the option(type_) changes the type and it's based on isOptional */
   let attrs =
     switch (alias) {
     | Some(alias) => [
@@ -396,81 +398,55 @@ let recordLabel = (~loc, ~isOptional, name, kind, alias) => {
 /* innerRef: domRef */
 let domRefLabel = (~loc, ~isOptional) => {
   /* TODO: is innerRef in JSX4? */
+  let reactDOM_domRef =
+    Helper.Typ.constr(
+      ~loc,
+      withLoc(Ldot(Lident("ReactDOM"), "domRef"), ~loc),
+      [],
+    );
   let type_ =
-    isOptional
-      ? optionalType(
-          ~loc,
-          Helper.Typ.constr(
-            ~loc,
-            withLoc(Ldot(Lident("ReactDOM"), "domRef"), ~loc),
-            [],
-          ),
-        )
-      : Helper.Typ.constr(
-          ~loc,
-          withLoc(Ldot(Lident("ReactDOM"), "domRef"), ~loc),
-          [],
-        );
-  Helper.Type.field(
-    ~loc,
-    ~attrs=[Platform_attributes.optional(~loc)],
-    withLoc("innerRef", ~loc),
-    type_,
-  );
+    isOptional ? optionalType(~loc, reactDOM_domRef) : reactDOM_domRef;
+  /* Attribute optional is always present */
+  let attrs = [Platform_attributes.optional(~loc)];
+  Helper.Type.field(~loc, ~attrs, withLoc("innerRef", ~loc), type_);
 };
 
 /* children: React.element */
-let childrenLabel = (~loc, ~isOptional) =>
+let childrenLabel = (~loc, ~isOptional) => {
+  let react_element =
+    Helper.Typ.constr(
+      ~loc,
+      withLoc(Ldot(Lident("React"), "element"), ~loc),
+      [],
+    );
   isOptional
     ? Helper.Type.field(
         ~loc,
         ~attrs=[Platform_attributes.optional(~loc)],
         withLoc("children", ~loc),
-        optionalType(
-          ~loc,
-          Helper.Typ.constr(
-            ~loc,
-            withLoc(Ldot(Lident("React"), "element"), ~loc),
-            [],
-          ),
-        ),
+        optionalType(~loc, react_element),
       )
     : Helper.Type.field(
         ~loc,
         ~attrs=[Platform_attributes.optional(~loc)],
         withLoc("children", ~loc),
-        Helper.Typ.constr(
-          ~loc,
-          withLoc(Ldot(Lident("React"), "element"), ~loc),
-          [],
-        ),
+        react_element,
       );
+};
 
 /* onDragOver: ReactEvent.Mouse.t => unit */
 let recordEventLabel = (~loc, ~isOptional, name, kind) => {
-  let type_ =
-    isOptional
-      ? optionalType(
-          ~loc,
-          Helper.Typ.arrow(
-            ~loc,
-            Nolabel,
-            Helper.Typ.constr(~loc, withLoc(kind, ~loc), []),
-            Helper.Typ.constr(~loc, withLoc(Lident("unit"), ~loc), []),
-          ),
-        )
-      : Helper.Typ.arrow(
-          ~loc,
-          Nolabel,
-          Helper.Typ.constr(~loc, withLoc(kind, ~loc), []),
-          Helper.Typ.constr(~loc, withLoc(Lident("unit"), ~loc), []),
-        );
-  Helper.Type.field(
-    ~loc,
-    ~attrs=[Platform_attributes.optional(~loc)],
-    withLoc(name, ~loc),
-    type_,
-  );
+  let arrow_type =
+    Helper.Typ.arrow(
+      ~loc,
+      Nolabel,
+      Helper.Typ.constr(~loc, withLoc(kind, ~loc), []),
+      Helper.Typ.constr(~loc, withLoc(Lident("unit"), ~loc), []),
+    );
+  let type_ = isOptional ? optionalType(~loc, arrow_type) : arrow_type;
+  /* Attribute optional is always present */
+  let attrs = [Platform_attributes.optional(~loc)];
+  Helper.Type.field(~loc, ~attrs, withLoc(name, ~loc), type_);
 };
 
 let makePropsWithParams = (~loc, params, dynamicProps) => {
@@ -523,7 +499,7 @@ let makePropsWithParams = (~loc, params, dynamicProps) => {
         Helper.Type.mk(
           ~loc,
           ~priv=Public,
-          ~attrs=[Platform_attributes.optional(~loc)],
+          /* ~attrs=[Platform_attributes.optional(~loc)], */
           ~kind=Ptype_record(reactProps),
           ~params,
           withLoc("props", ~loc),
@@ -545,7 +521,7 @@ let makePropsJSX4ReScript = (~loc, customProps) => {
 
 /* type makeProps = { ... } */
 /* type makeProps('a, 'b) = { ... } */
-let makeMakePropsReason = (~loc, customProps) => {
+let makeMakeProps = (~loc, ~areAllFieldsOptional, customProps) => {
   let (params, dynamicProps) =
     switch (customProps) {
     | None => ([], [])
@@ -561,14 +537,14 @@ let makeMakePropsReason = (~loc, customProps) => {
          | MakeProps.Event({name, type_}) =>
            recordEventLabel(
              ~loc,
-             ~isOptional=true,
+             ~isOptional=areAllFieldsOptional,
              name,
              MakeProps.eventTypeToIdent(type_),
            )
          | MakeProps.Attribute({name, type_, alias}) =>
            recordLabel(
              ~loc,
-             ~isOptional=true,
+             ~isOptional=areAllFieldsOptional,
              name,
              MakeProps.attributeTypeToIdent(type_),
              alias,
@@ -580,8 +556,8 @@ let makeMakePropsReason = (~loc, customProps) => {
   let reactProps =
     List.append(
       [
-        domRefLabel(~loc, ~isOptional=true),
-        childrenLabel(~loc, ~isOptional=true),
+        domRefLabel(~loc, ~isOptional=areAllFieldsOptional),
+        childrenLabel(~loc, ~isOptional=areAllFieldsOptional),
         ...makeProps,
       ],
       dynamicProps,
@@ -617,8 +593,10 @@ let makeProps = (~loc, customProps) => {
   switch (File.get()) {
   | Some(ReScript) when Settings.Get.jsxVersion() === 4 =>
     makePropsJSX4ReScript(~loc, customProps)
+  | Some(ReScript) =>
+    makeMakeProps(~loc, ~areAllFieldsOptional=false, customProps)
   | Some(Reason)
-  | _ => makeMakePropsReason(~loc, customProps)
+  | _ => makeMakeProps(~loc, ~areAllFieldsOptional=true, customProps)
   };
 };
 
