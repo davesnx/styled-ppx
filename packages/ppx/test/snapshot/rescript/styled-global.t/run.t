@@ -10,12 +10,3 @@
   File "", line 2, characters 22-23:
   Error: Syntax error: operator expected.
   
-
-
-
-
-
-
-
-
-
