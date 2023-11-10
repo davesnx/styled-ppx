@@ -4,10 +4,6 @@
   (alias default)
   (deps Css.ml CssJs.ml)
   (action
-   (run "true")))
- (rule
-  (alias default)
-  (action
    (progn
     (with-stdout-to
      bsconfig.json
