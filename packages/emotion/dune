@@ -1,0 +1,21 @@
+(subdir
+ rescript
+ (rule
+  (alias default)
+  (deps Css.ml CssJs.ml)
+  (action
+   (run "true")))
+ (rule
+  (alias default)
+  (action
+   (progn
+    (with-stdout-to
+     bsconfig.json
+     (run
+      echo
+      "{\"name\": \"@davesnx/styled-ppx/emotion\", \"sources\": [\".\"], \"bs-dependencies\": [\"@davesnx/styled-ppx/css\"]}"))
+    (with-stdout-to
+     package.json
+     (run
+      echo
+      "{\"name\": \"@davesnx/styled-ppx/emotion\", \"dependencies\": { \"@emotion/css\": \"^11.11.2\" } }"))))))
