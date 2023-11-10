@@ -1,3 +1,5 @@
+[@@@alert "-deprecated"]
+
 include Css_Colors
 include Css_Legacy_Core
 module Types = Css_AtomicTypes
