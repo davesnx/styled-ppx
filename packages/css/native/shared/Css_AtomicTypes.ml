@@ -1,5 +1,3 @@
-[@@@alert "-deprecated"]
-
 module Std = Kloth
 
 module Cascading = struct
@@ -1545,7 +1543,7 @@ module GridTemplateAreas = struct
     | `none -> {js|none|js}
     | `areas items ->
       String.trim
-        (Std.Array.reduceU items {js||js} (fun [@bs] [@u] carry item ->
+        (Std.Array.reduce items {js||js} (fun carry item ->
              ((carry ^ {js|'|js}) ^ item) ^ {js|' |js}))
 end
 
