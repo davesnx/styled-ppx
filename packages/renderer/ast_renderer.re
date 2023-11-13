@@ -31,8 +31,11 @@ switch (input, help) {
   switch (Driver_.parse_declaration_list(~pos, css)) {
   | Ok(declarations) =>
     print_endline(Css_types.show_rule_list(declarations))
-  | Error((_loc, msg)) =>
-    /* TODO: print loc */
-    print_endline(Printf.sprintf("Error parsing CSS: %s", msg))
+  | Error((loc, msg)) =>
+    let position = loc.Css_types.loc_start;
+    let curr_char_pos = position.pos_cnum;
+    print_endline(
+      Printf.sprintf("Error parsing CSS: %s at pos %i", msg, curr_char_pos),
+    );
   }
 };
