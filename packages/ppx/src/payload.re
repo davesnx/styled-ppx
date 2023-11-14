@@ -36,7 +36,7 @@
   }
  */
 
-let parse = (payload, loc: Ppxlib.location) => {
+let parse = (~loc: Ppxlib.location, payload) => {
   let loc_start = loc.loc_start;
   /* TODO: Bring back "delimiter location conditional logic" */
   /* let loc_start =
@@ -49,13 +49,7 @@ let parse = (payload, loc: Ppxlib.location) => {
        }
      }; */
 
-  switch (
-    Css_lexer.parse_declaration_list(
-      ~container_lnum=loc_start.pos_lnum,
-      ~pos=loc_start,
-      payload,
-    )
-  ) {
+  switch (Driver_.parse_declaration_list(~pos=Some(loc_start), payload)) {
   | Ok(declarations) => Ok(declarations)
   | Error((loc, msg)) => Error((loc, msg))
   };

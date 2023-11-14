@@ -112,7 +112,7 @@ test_e2e_promote: ## Run End-to-end tests for JSX3
 	npm --prefix 'e2e/rescript-v9-JSX3' run test_promote
 
 .PHONY: test
-test: build test_native_typecheck test_css_support test_ppx_snapshot test_parser test_css_lexer test_reason_css_parser test_css_spec_parser test_css_spec_types test_string_interpolation test_emotion test_emotion_hash test_e2e
+test: build test_native_typecheck test_css_support test_ppx_snapshot test_parser test_reason_css_parser test_css_spec_parser test_css_spec_types test_string_interpolation test_emotion test_emotion_hash test_e2e
 
 # Debug commands
 

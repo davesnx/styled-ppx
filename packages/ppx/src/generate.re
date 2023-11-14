@@ -92,7 +92,7 @@ let dynamicComponent =
     switch (functionExpr.pexp_desc) {
     /* styled.div () => "string" */
     | Pexp_constant(Pconst_string(str, loc, _label)) =>
-      switch (Payload.parse(str, loc)) {
+      switch (Payload.parse(str, ~loc)) {
       | Ok(declarations) =>
         declarations
         |> Css_to_emotion.render_declarations

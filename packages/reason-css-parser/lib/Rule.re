@@ -1,4 +1,4 @@
-open Reason_css_lexer;
+open Tokens;
 
 type error = list(string);
 type data('a) = result('a, error);

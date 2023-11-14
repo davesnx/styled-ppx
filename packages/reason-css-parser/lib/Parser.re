@@ -4,8 +4,6 @@ open Modifier;
 open Rule.Match;
 open Parser_helper;
 
-module Lexer = Reason_css_lexer;
-
 let rec _legacy_gradient = [%value.rec
   "<-webkit-gradient()> | <-legacy-linear-gradient> | <-legacy-repeating-linear-gradient> | <-legacy-radial-gradient> | <-legacy-repeating-radial-gradient>"
 ]

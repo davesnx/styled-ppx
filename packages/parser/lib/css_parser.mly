@@ -15,11 +15,12 @@ open Css_types
 %token DOT
 %token DOUBLE_COLON
 %token SEMI_COLON
-%token PERCENTAGE
+%token PERCENT
 %token IMPORTANT
 %token AMPERSAND
 %token ASTERISK
 %token COMMA
+%token BAD_IDENT
 %token WS
 %token <string> IDENT
 %token <string> TAG
@@ -40,7 +41,7 @@ open Css_types
 %token <string> UNICODE_RANGE
 %token <string * string> FLOAT_DIMENSION
 %token <string * string> DIMENSION
-%token <string list> VARIABLE
+%token <string list> INTERPOLATION
 
 %start <stylesheet> stylesheet
 %start <rule_list> declaration_list
@@ -53,7 +54,7 @@ stylesheet: s = stylesheet_without_eof; EOF { s }
 stylesheet_without_eof: rs = loc(list(rule)) { rs }
 
 declaration_list:
-  | WS? EOF { ([], Lex_buffer.make_loc $startpos $endpos) }
+  | WS? EOF { ([], Util.make_loc $startpos $endpos) }
   | ds = loc(declarations) EOF { ds }
 
 /* keyframe may contain {} */
@@ -65,7 +66,7 @@ keyframes:
 
 /* Adds location as a tuple */
 loc(X): x = X {
-  (x, Lex_buffer.make_loc $startpos(x) $endpos(x))
+  (x, Util.make_loc $startpos(x) $endpos(x))
 }
 
 /* Handle skipping whitespace */
@@ -99,7 +100,7 @@ prelude: xs = loption(nonempty_list(loc(value_in_prelude))) { xs }
 /* Combinator "," */
 media_query_prelude_item:
   | i = IDENT { Ident i }
-  | v = VARIABLE { Variable v }
+  | v = INTERPOLATION { Variable v }
   | xs = paren_block(prelude) { Paren_block xs }
 
 media_query_prelude: q = nonempty_list(loc(skip_ws(media_query_prelude_item))) { q }
@@ -113,7 +114,7 @@ at_rule:
     { name = name;
       prelude;
       block = Rule_list ds;
-      loc = Lex_buffer.make_loc $startpos $endpos;
+      loc = Util.make_loc $startpos $endpos;
     }
   }
   /* @media (min-width: 16rem) {} */
@@ -123,33 +124,33 @@ at_rule:
     { name = name;
       prelude;
       block = Rule_list b;
-      loc = Lex_buffer.make_loc $startpos $endpos;
+      loc = Util.make_loc $startpos $endpos;
     }
   }
   /* @keyframes animationName { ... } */
   | name = loc(AT_KEYFRAMES) WS?
     i = IDENT WS?
     block = brace_block(keyframe) {
-    let item = (Ident i, Lex_buffer.make_loc $startpos(i) $endpos(i)) in
-    let prelude = ([item], Lex_buffer.make_loc $startpos $endpos) in
-    let block = Rule_list (block, Lex_buffer.make_loc $startpos $endpos) in
+    let item = (Ident i, Util.make_loc $startpos(i) $endpos(i)) in
+    let prelude = ([item], Util.make_loc $startpos $endpos) in
+    let block = Rule_list (block, Util.make_loc $startpos $endpos) in
     { name = name;
       prelude;
       block;
-      loc = Lex_buffer.make_loc $startpos $endpos;
+      loc = Util.make_loc $startpos $endpos;
     }
   }
   /* @keyframes animationName {} */
   | name = loc(AT_KEYFRAMES) WS?
     i = IDENT WS?
     s = loc(empty_brace_block) {
-    let item = ((Ident i), Lex_buffer.make_loc $startpos(i) $endpos(i)) in
-    let prelude = ([item], Lex_buffer.make_loc $startpos $endpos) in
+    let item = ((Ident i), Util.make_loc $startpos(i) $endpos(i)) in
+    let prelude = ([item], Util.make_loc $startpos $endpos) in
     let empty_block = Rule_list s in
     ({ name = name;
       prelude = prelude;
       block = empty_block;
-      loc = Lex_buffer.make_loc $startpos $endpos;
+      loc = Util.make_loc $startpos $endpos;
     }): at_rule
   }
   /* @charset */
@@ -158,7 +159,7 @@ at_rule:
     { name = name;
       prelude = xs;
       block = Empty;
-      loc = Lex_buffer.make_loc $startpos $endpos;
+      loc = Util.make_loc $startpos $endpos;
     }
   }
   /* @support { ... } */
@@ -170,21 +171,21 @@ at_rule:
     { name = name;
       prelude = xs;
       block = Stylesheet s;
-      loc = Lex_buffer.make_loc $startpos $endpos;
+      loc = Util.make_loc $startpos $endpos;
     }
   }
 
-percentage: n = NUMBER PERCENTAGE { n }
+percentage: n = NUMBER PERCENT { n }
 
 /* keyframe allows stylesheet by defintion, but we restrict the usage to: */
 keyframe_style_rule:
   /* from {} to {} */
   | WS? id = IDENT WS?
     declarations = brace_block(loc(declarations)) WS? {
-    let prelude = [(SimpleSelector (Type id), Lex_buffer.make_loc $startpos(id) $endpos(id))] in
+    let prelude = [(SimpleSelector (Type id), Util.make_loc $startpos(id) $endpos(id))] in
     Style_rule {
-      prelude = (prelude, Lex_buffer.make_loc $startpos(id) $endpos(id));
-      loc = Lex_buffer.make_loc $startpos $endpos;
+      prelude = (prelude, Util.make_loc $startpos(id) $endpos(id));
+      loc = Util.make_loc $startpos $endpos;
       block = declarations;
     }
   }
@@ -192,10 +193,10 @@ keyframe_style_rule:
   | WS? p = percentage; WS?
     declarations = brace_block(loc(declarations)) WS? {
     let item = Percentage p in
-    let prelude = [(SimpleSelector item, Lex_buffer.make_loc $startpos(p) $endpos(p))] in
+    let prelude = [(SimpleSelector item, Util.make_loc $startpos(p) $endpos(p))] in
     Style_rule {
-      prelude = (prelude, Lex_buffer.make_loc $startpos(p) $endpos(p));
-      loc = Lex_buffer.make_loc $startpos $endpos;
+      prelude = (prelude, Util.make_loc $startpos(p) $endpos(p));
+      loc = Util.make_loc $startpos $endpos;
       block = declarations;
     }
   }
@@ -204,11 +205,11 @@ keyframe_style_rule:
     let prelude = percentages
       |> List.map (fun percent -> Percentage percent)
       |> List.map (fun p ->
-        (SimpleSelector p, Lex_buffer.make_loc $startpos(percentages) $endpos(percentages))
+        (SimpleSelector p, Util.make_loc $startpos(percentages) $endpos(percentages))
       ) in
     Style_rule {
-      prelude = (prelude, Lex_buffer.make_loc $startpos(percentages) $endpos(percentages));
-      loc = Lex_buffer.make_loc $startpos $endpos;
+      prelude = (prelude, Util.make_loc $startpos(percentages) $endpos(percentages));
+      loc = Util.make_loc $startpos $endpos;
       block = declarations;
     }
   }
@@ -225,14 +226,14 @@ style_rule:
     block = loc(empty_brace_block) {
     { prelude;
       block;
-      loc = Lex_buffer.make_loc $startpos $endpos;
+      loc = Util.make_loc $startpos $endpos;
     }
   }
   | prelude = loc(selector_list) WS?
     declarations = brace_block(loc(declarations)) {
     { prelude;
       block = declarations;
-      loc = Lex_buffer.make_loc $startpos $endpos;
+      loc = Util.make_loc $startpos $endpos;
     }
   }
 
@@ -262,7 +263,7 @@ declaration_without_eof:
     { name = property;
       value;
       important;
-      loc = Lex_buffer.make_loc $startpos $endpos;
+      loc = Util.make_loc $startpos $endpos;
     }
   }
 
@@ -377,7 +378,7 @@ subclass_selector:
   | c = class_selector { c } /* .class */
   | a = attribute_selector { a } /* [attr] */
   | pcs = pseudo_class_selector { Pseudo_class pcs } /* :pseudo-class */
-  | DOT v = VARIABLE { ClassVariable v } /* .$(Variable) as subclass_selector */
+  | DOT v = INTERPOLATION { ClassVariable v } /* .$(Variable) as subclass_selector */
 
 selector:
   /* By definition a selector can be one of those kinds, since inside
@@ -394,7 +395,7 @@ selector:
 type_selector:
   | AMPERSAND; { Ampersand } /* & {} https://drafts.csswg.org/css-nesting/#nest-selector */
   | ASTERISK; { Universal } /* * {} */
-  | v = VARIABLE { Variable v } /* $(Module.value) {} */
+  | v = INTERPOLATION { Variable v } /* $(Module.value) {} */
   /* TODO: type_selector should work with IDENTs, but there's a bunch of grammar
     conflicts with IDENT on value and others, we replaced with TAG, a
     list of valid HTML tags that does the job done, but this should be fixed. */
@@ -508,7 +509,7 @@ value_in_prelude:
   | r = UNICODE_RANGE { Unicode_range r }
   | d = FLOAT_DIMENSION { Float_dimension d }
   | d = DIMENSION { Dimension d }
-  | v = VARIABLE { Variable v } /* $(Lola.value) */
+  | v = INTERPOLATION { Variable v } /* $(Lola.value) */
   | f = loc(FUNCTION) xs = loc(prelude) RIGHT_PAREN; { Function (f, xs) } /* calc() */
   | u = URL { Uri u } /* url() */
   | WS { Delim " " }
@@ -533,6 +534,6 @@ value:
   | r = UNICODE_RANGE { Unicode_range r }
   | d = FLOAT_DIMENSION { Float_dimension d }
   | d = DIMENSION { Dimension d }
-  | v = VARIABLE { Variable v } /* $(Lola.value) */
+  | v = INTERPOLATION { Variable v } /* $(Lola.value) */
   | f = loc(FUNCTION) v = loc(values) RIGHT_PAREN; { Function (f, v) } /* calc() */
   | u = URL { Uri u } /* url() */

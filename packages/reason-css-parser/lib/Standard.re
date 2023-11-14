@@ -1,4 +1,4 @@
-open Reason_css_lexer;
+open Tokens;
 open Combinator;
 open Rule.Let;
 open Rule.Pattern;
@@ -17,7 +17,7 @@ let function_call = (name, rule) => {
         ]),
     );
   let.bind_match value = rule;
-  let.bind_match () = expect(RIGHT_PARENS);
+  let.bind_match () = expect(RIGHT_PAREN);
   Rule.Match.return(value);
 };
 
@@ -219,7 +219,7 @@ let interpolation = {
   open Rule.Let;
 
   let.bind_match _ = Pattern.expect(DELIM("$"));
-  let.bind_match _ = Pattern.expect(LEFT_PARENS);
+  let.bind_match _ = Pattern.expect(LEFT_PAREN);
   let.bind_match path = {
     let.bind_match path =
       Modifier.zero_or_more(
@@ -232,7 +232,7 @@ let interpolation = {
     let.bind_match ident = ident;
     Match.return(path @ [ident]);
   };
-  let.bind_match _ = Pattern.expect(RIGHT_PARENS);
+  let.bind_match _ = Pattern.expect(RIGHT_PAREN);
 
   Match.return(path);
 };
@@ -242,7 +242,7 @@ let line_names = {
   open Rule;
   open Rule.Let;
 
-  let.bind_match left = Pattern.expect(LEFT_SQUARE);
+  let.bind_match left = Pattern.expect(LEFT_BRACKET);
   let.bind_match path =
     Modifier.zero_or_more(
       {
@@ -250,7 +250,7 @@ let line_names = {
         Match.return(ident);
       },
     );
-  let.bind_match right = Pattern.expect(RIGHT_SQUARE);
+  let.bind_match right = Pattern.expect(RIGHT_BRACKET);
 
   return_match((left, path, right));
 };

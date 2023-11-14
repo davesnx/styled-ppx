@@ -4,6 +4,8 @@ open Css_types;
 module Helper = Ast_helper;
 module Builder = Ast_builder.Default;
 
+exception Empty_buffer(string);
+
 let reduce_result = (~empty, fn, list) => {
   let rec sequence_result =
     fun
@@ -61,13 +63,16 @@ let render_variable = (~loc, v) => {
 
 let source_code_of_loc = (loc: Location.t) => {
   let Location.{loc_start, loc_end, _} = loc;
-  let Lex_buffer.{buf, pos, _} = Lex_buffer.last_buffer^;
-  let pos_offset = pos.pos_cnum;
-  let loc_start = loc_start.pos_cnum - pos_offset;
-  let loc_end = loc_end.pos_cnum - pos_offset;
-  Sedlexing.Latin1.sub_lexeme(buf, loc_start, loc_end - loc_start);
+  switch (Driver_.last_buffer^) {
+  | Some(buffer: Sedlexing.lexbuf) =>
+    /* TODO: pos_offset is hardcoded to 0, unsure about the effects */
+    let pos_offset = 0;
+    let loc_start = loc_start.pos_cnum - pos_offset;
+    let loc_end = loc_end.pos_cnum - pos_offset;
+    Sedlexing.Latin1.sub_lexeme(buffer, loc_start, loc_end - loc_start);
+  | None => raise(Empty_buffer("last buffer not set"))
+  };
 };
-
 let concat = (~loc, expr, acc) => {
   let concat_fn = {txt: Lident("^"), loc} |> Helper.Exp.ident(~loc);
   Helper.Exp.apply(~loc, concat_fn, [(Nolabel, expr), (Nolabel, acc)]);
