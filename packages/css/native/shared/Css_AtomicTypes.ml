@@ -818,14 +818,14 @@ module Cursor = struct
 
   let toString x =
     match x with
-    | `_moz_grab -> {|-moz-grab|}
-    | `_moz_grabbing -> {|-moz-grabbing|}
-    | `_moz_zoom_in -> {|-moz-zoom-in|}
-    | `_moz_zoom_out -> {|-moz-zoom-out|}
-    | `_webkit_grab -> {|-webkit-grab|}
-    | `_webkit_grabbing -> {|-webkit-grabbing|}
-    | `_webkit_zoom_in -> {|-webkit-zoom-in|}
-    | `_webkit_zoom_out -> {|-webkit-zoom-out|}
+    | `_moz_grab -> {js|-moz-grab|js}
+    | `_moz_grabbing -> {js|-moz-grabbing|js}
+    | `_moz_zoom_in -> {js|-moz-zoom-in|js}
+    | `_moz_zoom_out -> {js|-moz-zoom-out|js}
+    | `_webkit_grab -> {js|-webkit-grab|js}
+    | `_webkit_grabbing -> {js|-webkit-grabbing|js}
+    | `_webkit_zoom_in -> {js|-webkit-zoom-in|js}
+    | `_webkit_zoom_out -> {js|-webkit-zoom-out|js}
     | `alias -> {js|alias|js}
     | `allScroll -> {js|all-scroll|js}
     | `auto -> {js|auto|js}
@@ -2124,8 +2124,8 @@ module FontFamilyName = struct
     match x with
     | `custom value ->
       (match Js.String2.get value 0 with
-      | {|"|} | {|'|} -> value
-      | _ -> ({|"|} ^ value) ^ {|"|})
+      | {js|"|js} | {js|'|js} -> value
+      | _ -> ({js|"|js} ^ value) ^ {js|"|js})
     | `serif -> {js|serif|js}
     | `sansSerif -> {js|sans-serif|js}
     | `cursive -> {js|cursive|js}
@@ -2268,14 +2268,14 @@ module Content = struct
 
   let text_to_string value =
     match value with
-    | "" -> {|''|}
-    | {|""|} -> {|''|}
+    | "" -> {js|''|js}
+    | {js|""|js} -> {js|''|js}
     | value ->
       (match Js.String2.get value 0, Js.String2.length value with
-      | {|"|}, 1 -> {|'"'|}
-      | {|'|}, 1 -> {|"'"|}
-      | {|"|}, _ | {|'|}, _ -> value
-      | _ -> {|"|} ^ value ^ {|"|})
+      | {js|"|js}, 1 -> {js|'"'|js}
+      | {js|'|js}, 1 -> {js|"'"|js}
+      | {js|"|js}, _ | {js|'|js}, _ -> value
+      | _ -> {js|"|js} ^ value ^ {js|"|js})
 
   let toString x =
     match x with

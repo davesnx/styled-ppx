@@ -1,6 +1,8 @@
 (melange.emit
  (alias e2e-melange)
  (target e2e-melange)
- (libraries ui)
+ (libraries ui styled-ppx.css styled-ppx.emotion reason-react)
+ (preprocess
+  (pps melange.ppx styled-ppx.lib reason-react-ppx))
  (module_systems
   (commonjs bs.js)))

@@ -6,9 +6,9 @@
     "build": "rescript build -with-deps",
     "watch": "rescript build -with-deps -w",
     "clean": "rescript clean",
-    "test": "vitest --run --silent --root test",
+    "test": "vitest --run --silent",
     "test_watch": "concurrently 'npm run watch' 'vitest'",
-    "test_promote": "vitest --run --silent -u --root test",
+    "test_promote": "vitest --run --silent -u",
     "start": "npm run test"
   },
   "dependencies": {
@@ -22,11 +22,10 @@
     "jsdom": "^21.1.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
-    "rescript": "10",
     "rescript-vitest": "^1.1.0",
     "rescript-webapi": "^0.2.0",
     "vite": "^4.1.3",
     "vite-plugin-externalize-deps": "^0.7.0",
-    "vitest": "^0.28.5"
+    "vitest": "0.34.6"
   }
 }

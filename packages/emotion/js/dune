@@ -3,8 +3,6 @@
  (public_name styled-ppx.emotion)
  (modes melange)
  (wrapped false)
- (melange.compile_flags :standard -alert "-deprecated")
- (flags :standard -alert "-deprecated")
- (libraries melange.js styled-ppx.css)
+ (libraries styled-ppx.css melange.js)
  (preprocess
-  (pps melange.ppx)))
+  (pps melange.ppx -alert -deprecated)))

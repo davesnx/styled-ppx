@@ -9,8 +9,6 @@ module Cositas = [%styled.div
 |}
 ];
 
-let a = <Cositas lola={CssJs.px(10)} />;
-
 let selectors = [%cx {|
   color: red;
 
@@ -45,3 +43,12 @@ let clx = [%cx
   cursor: $(lola);
 |}
 ];
+
+module App = {
+  [@react.component]
+  let make = () =>
+    <Cositas lola={CssJs.px(10)}>
+      <div className=clx> {React.string("code everywhere!")} </div>
+      <div className=selectors> {React.string("Red text")} </div>
+    </Cositas>;
+};
