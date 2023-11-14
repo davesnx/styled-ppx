@@ -11,7 +11,8 @@
     "clean": "rm -rf src/bundle.js; rescript clean",
     "test_watch": "concurrently 'npm run watch' 'vitest'",
     "pretest": "npm run build",
-    "test": "vitest --run"
+    "test": "vitest --run",
+    "test_promote": "vitest --run --silent -u"
   },
   "dependencies": {
     "@davesnx/styled-ppx-css": "file:../../_build/default/packages/css/rescript",

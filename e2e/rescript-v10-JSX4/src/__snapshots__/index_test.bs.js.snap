@@ -2,41 +2,8 @@
 
 exports[`styled > Component renders 1`] = `
 <div>
-  <div
-    class="css-3gqp70-Component"
-  />
-</div>
-`;
-
-exports[`styled > ComponentInline renders and defaults to a div 1`] = `
-<div>
-  <div
-    class="css-d8cghp-ComponentInline"
-  />
-</div>
-`;
-
-exports[`styled > ComponentLink > should receive href props 1`] = `
-<div>
   <a
-    class="css-pnp20i-ComponentLink"
-    href="https://sancho.dev"
-  />
-</div>
-`;
-
-exports[`styled > ComponentLink > should render an <a /> tag 1`] = `
-<div>
-  <a
-    class="css-pnp20i-ComponentLink"
-  />
-</div>
-`;
-
-exports[`styled > StyledInput renders and self-closing element (whithout children) 1`] = `
-<div>
-  <input
-    class="css-mvqyji-StyledInput"
+    class="css-1417t4l-Component"
   />
 </div>
 `;
