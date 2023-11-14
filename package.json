@@ -26,7 +26,6 @@
     "url": "https://github.com/davesnx/styled-ppx.git"
   },
   "devDependencies": {
-    "rescript": "10.1.4",
-    "@emotion/css": "^11.11.2"
+    "rescript": "10.1.4"
   }
 }
