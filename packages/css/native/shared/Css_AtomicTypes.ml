@@ -818,14 +818,14 @@ module Cursor = struct
 
   let toString x =
     match x with
-    | `_moz_grab -> {js|-moz-grab|js}
-    | `_moz_grabbing -> {js|-moz-grabbing|js}
-    | `_moz_zoom_in -> {js|-moz-zoom-in|js}
-    | `_moz_zoom_out -> {js|-moz-zoom-out|js}
-    | `_webkit_grab -> {js|-webkit-grab|js}
-    | `_webkit_grabbing -> {js|-webkit-grabbing|js}
-    | `_webkit_zoom_in -> {js|-webkit-zoom-in|js}
-    | `_webkit_zoom_out -> {js|-webkit-zoom-out|js}
+    | `_moz_grab -> {|-moz-grab|}
+    | `_moz_grabbing -> {|-moz-grabbing|}
+    | `_moz_zoom_in -> {|-moz-zoom-in|}
+    | `_moz_zoom_out -> {|-moz-zoom-out|}
+    | `_webkit_grab -> {|-webkit-grab|}
+    | `_webkit_grabbing -> {|-webkit-grabbing|}
+    | `_webkit_zoom_in -> {|-webkit-zoom-in|}
+    | `_webkit_zoom_out -> {|-webkit-zoom-out|}
     | `alias -> {js|alias|js}
     | `allScroll -> {js|all-scroll|js}
     | `auto -> {js|auto|js}
