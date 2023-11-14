@@ -1,11 +1,8 @@
-(include_subdirs unqualified)
-
 (library
- (name bs_css_emotion)
- (public_name styled-ppx.bs-css-emotion)
+ (name emotion)
+ (public_name styled-ppx.emotion)
  (modes melange)
  (wrapped false)
- (flags :standard -w -32-34)
- (libraries melange.js styled-ppx.bs-css)
+ (libraries styled-ppx.css melange.js)
  (preprocess
-  (pps melange.ppx)))
+  (pps melange.ppx -alert -deprecated)))

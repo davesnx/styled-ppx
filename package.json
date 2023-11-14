@@ -6,10 +6,21 @@
   "license": "BSD-2",
   "homepage": "https://styled-ppx.vercel.app",
   "keywords": [
-    "rescript", "reason", "ocaml", "ppx", "bucklescript", "css",
-    "styled-components", "emotion", "styled", "components", "CSS-in-JS"
+    "rescript",
+    "reason",
+    "ocaml",
+    "ppx",
+    "bucklescript",
+    "css",
+    "styled-components",
+    "emotion",
+    "styled",
+    "components",
+    "CSS-in-JS"
   ],
-  "bugs": { "url": "https://github.com/davesnx/styled-ppx/issues" },
+  "bugs": {
+    "url": "https://github.com/davesnx/styled-ppx/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/davesnx/styled-ppx.git"

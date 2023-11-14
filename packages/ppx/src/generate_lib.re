@@ -5,77 +5,6 @@ module Builder = Ppxlib.Ast_builder.Default;
 
 let withLoc = (~loc, txt) => {loc, txt};
 
-module ReasonAttributes = {
-  let preserveBraces = (~loc) =>
-    Helper.Attr.mk(withLoc("reason.preserve_braces", ~loc), PStr([]));
-
-  let rawLiteral = (~loc) =>
-    Helper.Attr.mk(withLoc("reason.raw_literal", ~loc), PStr([]));
-};
-
-module ReScriptAttributes = {
-  let optional = (~loc) =>
-    Helper.Attr.mk(withLoc("ns.optional", ~loc), PStr([]));
-  let template = (~loc) =>
-    Helper.Attr.mk(withLoc("res.template", ~loc), PStr([]));
-};
-
-module BuckleScriptAttributes = {
-  /* [@bs.optional] */
-  let optional = (~loc) =>
-    Helper.Attr.mk(withLoc("bs.optional", ~loc), PStr([]));
-
-  /* fn(. ) */
-  let uncurried = (~loc) => {
-    Builder.attribute(~name=withLoc(~loc, "bs"), ~loc, ~payload=PStr([]));
-  };
-
-  /* [@bs.deriving abstract] */
-  let derivingAbstract = (~loc) =>
-    Helper.Attr.mk(
-      withLoc("bs.deriving", ~loc),
-      PStr([
-        Helper.Str.mk(
-          ~loc,
-          Pstr_eval(
-            Helper.Exp.ident(~loc, withLoc(Lident("abstract"), ~loc)),
-            [],
-          ),
-        ),
-      ]),
-    );
-
-  /* [bs.as ""] */
-  let alias = (~loc, alias) =>
-    Helper.Attr.mk(
-      withLoc("bs.as", ~loc),
-      PStr([
-        Helper.Str.mk(
-          ~loc,
-          Pstr_eval(
-            Helper.Exp.constant(
-              ~loc,
-              ~attrs=[],
-              Pconst_string(alias, loc, None),
-            ),
-            [],
-          ),
-        ),
-      ]),
-    );
-
-  let val_ = (~loc) => Helper.Attr.mk(withLoc("bs.val", ~loc), PStr([]));
-};
-
-let optionalAttribute = (~loc) => {
-  switch (File.get()) {
-  | Some(ReScript) when Settings.Get.jsxVersion() === 4 =>
-    ReScriptAttributes.optional(~loc)
-  | Some(Reason)
-  | _ => BuckleScriptAttributes.optional(~loc)
-  };
-};
-
 /* (~a, ~b, ~c, _) => args */
 let rec fnWithLabeledArgs = (list, args) =>
   switch (list) {
@@ -126,7 +55,7 @@ let dynamicStyles = (~loc, ~name, ~args, ~expr) => {
 };
 
 /*
-  [@bs.val] [@bs.module "react"] external createVariadicElement:
+  [@mel.module "react"] external createVariadicElement:
   (string, Js.t({ .. })) => React.element =
   "createElement";
  */
@@ -156,22 +85,32 @@ let bindingCreateVariadicElement = (~loc) => {
       ),
     pval_prim: ["createElement"],
     pval_attributes: [
-      Helper.Attr.mk(withLoc("bs.val", ~loc), PStr([])),
-      Helper.Attr.mk(
-        withLoc("bs.module", ~loc),
-        PStr([
-          Helper.Str.mk(
-            ~loc,
-            Pstr_eval(
-              Helper.Exp.constant(
-                ~loc,
-                ~attrs=[ReasonAttributes.rawLiteral(~loc)],
-                Pconst_string("react", loc, None),
-              ),
-              [],
+      Platform_attributes.module_(
+        ~loc,
+        Helper.Str.mk(
+          ~loc,
+          Pstr_eval(
+            Helper.Exp.constant(
+              ~loc,
+              ~attrs=
+                Platform_attributes.rawLiteral(
+                  ~loc,
+                  Helper.Str.mk(
+                    ~loc,
+                    Pstr_eval(
+                      Helper.Exp.constant(
+                        ~loc,
+                        Pconst_string("react", loc, None),
+                      ),
+                      [],
+                    ),
+                  ),
+                ),
+              Pconst_string("react", loc, None),
             ),
+            [],
           ),
-        ]),
+        ),
       ),
     ],
   });
@@ -207,23 +146,20 @@ let variadicElement = (~loc, ~htmlTag) => {
         Nolabel,
         Helper.Exp.constant(
           ~loc,
-          ~attrs=[
-            Helper.Attr.mk(
-              withLoc("reason.raw_literal", ~loc),
-              PStr([
-                Helper.Str.mk(
-                  ~loc,
-                  Pstr_eval(
-                    Helper.Exp.constant(
-                      ~loc,
-                      Pconst_string(htmlTag, loc, None),
-                    ),
-                    [],
+          ~attrs=
+            Platform_attributes.rawLiteral(
+              ~loc,
+              Helper.Str.mk(
+                ~loc,
+                Pstr_eval(
+                  Helper.Exp.constant(
+                    ~loc,
+                    Pconst_string(htmlTag, loc, None),
                   ),
+                  [],
                 ),
-              ]),
+              ),
             ),
-          ],
           Pconst_string(htmlTag, loc, None),
         ),
       ),
@@ -268,13 +204,7 @@ let stylesAndRefObject = (~loc) => {
   Helper.Vb.mk(
     ~loc,
     Helper.Pat.mk(~loc, Ppat_var(withLoc("stylesObject", ~loc))),
-    Helper.Exp.extension(
-      ~loc,
-      (
-        withLoc("bs.obj", ~loc),
-        PStr([Helper.Str.mk(~loc, Pstr_eval(record, []))]),
-      ),
-    ),
+    Platform_attributes.obj(~loc, record),
   );
 };
 
@@ -299,10 +229,12 @@ let className = (~loc, expr) => {
   );
 };
 
-/* deleteInnerRef(. newProps, "innerRef") |> ignore; */
+/* deleteInnerRef(newProps, "innerRef") |> ignore; */
+/* TODO: Replace with Js.Dict.unsafeDeleteKey */
 let deleteProp = (~loc, key) => {
   Helper.Exp.apply(
     ~loc,
+    ~attrs=[Platform_attributes.uncurried(~loc)],
     Helper.Exp.ident(~loc, withLoc(Lident("deleteProp"), ~loc)),
     [
       (Nolabel, Helper.Exp.ident(~loc, withLoc(Lident("newProps"), ~loc))),
@@ -329,12 +261,7 @@ let generateSequence = (~loc, fns) => {
   createVariadicElement("div", newProps);
  */
 let makeBody = (~loc, ~htmlTag, ~className as classNameValue, ~variables) => {
-  let attrs =
-    switch (File.get()) {
-    | Some(ReScript) => []
-    | Some(Reason)
-    | _ => [ReasonAttributes.preserveBraces(~loc)]
-    };
+  let attrs = Platform_attributes.preserveBraces(~loc);
   let sequence =
     [deleteProp(~loc, "innerRef"), variadicElement(~loc, ~htmlTag)]
     |> List.append(List.map(deleteProp(~loc), variables));
@@ -425,80 +352,101 @@ let component =
   [%stri let make = [%e makeFn]];
 };
 
+let optionalType = (~loc, type_) => {
+  Helper.Typ.constr(~loc, withLoc(Lident("option"), ~loc), [type_]);
+};
+
 /* color: string */
 let customPropLabel = (~loc, ~optional, name, type_) => {
+  let attrs = optional ? [Platform_attributes.optional(~loc)] : [];
   Helper.Type.field(
     ~loc,
-    ~attrs=optional ? [optionalAttribute(~loc)] : [],
+    ~attrs,
     withLoc(name, ~loc),
-    type_,
+    /* when is melange, fields need to be annotated as option() when added [@mel.optional] */
+    optional && File.get() == Some(Reason)
+      ? optionalType(~loc, type_) : type_,
   );
 };
 
 let typeVariable = (~loc, name) => Builder.ptyp_var(~loc, name);
 
 /* href: string */
-let recordLabel = (~loc, name, kind, alias) => {
+/* Melange expects record fields to be optional */
+let recordLabel = (~loc, ~isOptional, name, kind, alias) => {
+  /* optional attribute is always present (unrelated with isOptional flag), while the option(type_) changes the type and it's based on isOptional */
   let attrs =
     switch (alias) {
     | Some(alias) => [
-        optionalAttribute(~loc),
-        BuckleScriptAttributes.alias(~loc, alias),
+        Platform_attributes.optional(~loc),
+        Platform_attributes.alias(~loc, alias),
       ]
-    | None => [optionalAttribute(~loc)]
+    | None => [Platform_attributes.optional(~loc)]
     };
 
-  Helper.Type.field(
-    ~loc,
-    ~attrs,
-    withLoc(name, ~loc),
-    Helper.Typ.constr(~loc, withLoc(kind, ~loc), []),
-  );
+  let type_ =
+    isOptional
+      ? optionalType(
+          ~loc,
+          Helper.Typ.constr(~loc, withLoc(kind, ~loc), []),
+        )
+      : Helper.Typ.constr(~loc, withLoc(kind, ~loc), []);
+
+  Helper.Type.field(~loc, ~attrs, withLoc(name, ~loc), type_);
 };
 
 /* innerRef: domRef */
-let domRefLabel = (~loc) => {
+let domRefLabel = (~loc, ~isOptional) => {
   /* TODO: is innerRef in JSX4? */
-  Helper.Type.field(
-    ~loc,
-    ~attrs=[optionalAttribute(~loc)],
-    withLoc("innerRef", ~loc),
+  let reactDOM_domRef =
     Helper.Typ.constr(
       ~loc,
       withLoc(Ldot(Lident("ReactDOM"), "domRef"), ~loc),
       [],
-    ),
-  );
+    );
+  let type_ =
+    isOptional ? optionalType(~loc, reactDOM_domRef) : reactDOM_domRef;
+  /* Attribute optional is always present */
+  let attrs = [Platform_attributes.optional(~loc)];
+  Helper.Type.field(~loc, ~attrs, withLoc("innerRef", ~loc), type_);
 };
 
 /* children: React.element */
-let childrenLabel = (~loc) =>
-  Helper.Type.field(
-    ~loc,
-    ~attrs=[optionalAttribute(~loc)],
-    withLoc("children", ~loc),
+let childrenLabel = (~loc, ~isOptional) => {
+  let react_element =
     Helper.Typ.constr(
       ~loc,
       withLoc(Ldot(Lident("React"), "element"), ~loc),
       [],
-    ),
-  );
+    );
+  isOptional
+    ? Helper.Type.field(
+        ~loc,
+        ~attrs=[Platform_attributes.optional(~loc)],
+        withLoc("children", ~loc),
+        optionalType(~loc, react_element),
+      )
+    : Helper.Type.field(
+        ~loc,
+        ~attrs=[Platform_attributes.optional(~loc)],
+        withLoc("children", ~loc),
+        react_element,
+      );
+};
 
 /* onDragOver: ReactEvent.Mouse.t => unit */
-let recordEventLabel = (~loc, name, kind) => {
-  let type_ =
+let recordEventLabel = (~loc, ~isOptional, name, kind) => {
+  let arrow_type =
     Helper.Typ.arrow(
       ~loc,
       Nolabel,
       Helper.Typ.constr(~loc, withLoc(kind, ~loc), []),
       Helper.Typ.constr(~loc, withLoc(Lident("unit"), ~loc), []),
     );
-  Helper.Type.field(
-    ~loc,
-    ~attrs=[optionalAttribute(~loc)],
-    withLoc(name, ~loc),
-    type_,
-  );
+  let type_ = isOptional ? optionalType(~loc, arrow_type) : arrow_type;
+  /* Attribute optional is always present */
+  let attrs = [Platform_attributes.optional(~loc)];
+  Helper.Type.field(~loc, ~attrs, withLoc(name, ~loc), type_);
 };
 
 let makePropsWithParams = (~loc, params, dynamicProps) => {
@@ -509,10 +457,16 @@ let makePropsWithParams = (~loc, params, dynamicProps) => {
     |> List.map(domProp =>
          switch (domProp) {
          | MakeProps.Event({name, type_}) =>
-           recordEventLabel(~loc, name, MakeProps.eventTypeToIdent(type_))
+           recordEventLabel(
+             ~loc,
+             ~isOptional=false,
+             name,
+             MakeProps.eventTypeToIdent(type_),
+           )
          | MakeProps.Attribute({name, type_, alias}) =>
            recordLabel(
              ~loc,
+             ~isOptional=false,
              name,
              MakeProps.attributeTypeToIdent(type_),
              alias,
@@ -523,7 +477,11 @@ let makePropsWithParams = (~loc, params, dynamicProps) => {
   /* List of `prop: type` */
   let reactProps =
     List.append(
-      [domRefLabel(~loc), childrenLabel(~loc), ...makeProps],
+      [
+        domRefLabel(~loc, ~isOptional=false),
+        childrenLabel(~loc, ~isOptional=false),
+        ...makeProps,
+      ],
       dynamicProps,
     );
 
@@ -531,7 +489,7 @@ let makePropsWithParams = (~loc, params, dynamicProps) => {
     List.map(
       type_ => (type_, (Asttypes.NoVariance, Asttypes.NoInjectivity)),
       params,
-    ); /* TODO: Made correct ast, not sure if it matter */
+    );
 
   Helper.Str.mk(
     ~loc,
@@ -541,7 +499,7 @@ let makePropsWithParams = (~loc, params, dynamicProps) => {
         Helper.Type.mk(
           ~loc,
           ~priv=Public,
-          ~attrs=[ReScriptAttributes.optional(~loc)],
+          /* ~attrs=[Platform_attributes.optional(~loc)], */
           ~kind=Ptype_record(reactProps),
           ~params,
           withLoc("props", ~loc),
@@ -551,7 +509,7 @@ let makePropsWithParams = (~loc, params, dynamicProps) => {
   );
 };
 
-let makePropsJSX4 = (~loc, customProps) => {
+let makePropsJSX4ReScript = (~loc, customProps) => {
   switch (customProps) {
   | Some((params, dynamicProps)) =>
     makePropsWithParams(~loc, params, dynamicProps)
@@ -563,7 +521,7 @@ let makePropsJSX4 = (~loc, customProps) => {
 
 /* type makeProps = { ... } */
 /* type makeProps('a, 'b) = { ... } */
-let makeMakeProps = (~loc, customProps) => {
+let makeMakeProps = (~loc, ~areAllFieldsOptional, customProps) => {
   let (params, dynamicProps) =
     switch (customProps) {
     | None => ([], [])
@@ -577,10 +535,16 @@ let makeMakeProps = (~loc, customProps) => {
     |> List.map(domProp =>
          switch (domProp) {
          | MakeProps.Event({name, type_}) =>
-           recordEventLabel(~loc, name, MakeProps.eventTypeToIdent(type_))
+           recordEventLabel(
+             ~loc,
+             ~isOptional=areAllFieldsOptional,
+             name,
+             MakeProps.eventTypeToIdent(type_),
+           )
          | MakeProps.Attribute({name, type_, alias}) =>
            recordLabel(
              ~loc,
+             ~isOptional=areAllFieldsOptional,
              name,
              MakeProps.attributeTypeToIdent(type_),
              alias,
@@ -588,10 +552,14 @@ let makeMakeProps = (~loc, customProps) => {
          }
        );
 
-  /* List of [@bs.optional] prop: type */
+  /* List of prop: type */
   let reactProps =
     List.append(
-      [domRefLabel(~loc), childrenLabel(~loc), ...makeProps],
+      [
+        domRefLabel(~loc, ~isOptional=areAllFieldsOptional),
+        childrenLabel(~loc, ~isOptional=areAllFieldsOptional),
+        ...makeProps,
+      ],
       dynamicProps,
     );
 
@@ -599,7 +567,7 @@ let makeMakeProps = (~loc, customProps) => {
     List.map(
       type_ => (type_, (Asttypes.NoVariance, Asttypes.NoInjectivity)),
       params,
-    ) /* TODO: Made correct ast, not sure if it matter */;
+    );
 
   Helper.Str.mk(
     ~loc,
@@ -609,7 +577,7 @@ let makeMakeProps = (~loc, customProps) => {
         Helper.Type.mk(
           ~loc,
           ~priv=Public,
-          ~attrs=[BuckleScriptAttributes.derivingAbstract(~loc)],
+          ~attrs=[Platform_attributes.derivingAbstract(~loc)],
           ~kind=Ptype_record(reactProps),
           ~params,
           withLoc("makeProps", ~loc),
@@ -624,9 +592,11 @@ let makeMakeProps = (~loc, customProps) => {
 let makeProps = (~loc, customProps) => {
   switch (File.get()) {
   | Some(ReScript) when Settings.Get.jsxVersion() === 4 =>
-    makePropsJSX4(~loc, customProps)
+    makePropsJSX4ReScript(~loc, customProps)
+  | Some(ReScript) =>
+    makeMakeProps(~loc, ~areAllFieldsOptional=false, customProps)
   | Some(Reason)
-  | _ => makeMakeProps(~loc, customProps)
+  | _ => makeMakeProps(~loc, ~areAllFieldsOptional=true, customProps)
   };
 };
 
@@ -657,7 +627,7 @@ let defineAssign2 = (~loc) => {
         ),
       ),
     pval_prim: ["Object.assign"],
-    pval_attributes: [BuckleScriptAttributes.val_(~loc)],
+    pval_attributes: Platform_attributes.val_(~loc),
   });
 };
 

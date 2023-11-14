@@ -38,7 +38,9 @@ module Link = %styled.a(`
   margin-top: 16px;
 `)
 
-module Input = %styled.input("padding: 4px; border-color: green; border-radius: 4px; margin-right: 16px; margin-top: 16px; border-width: 3px;")
+module Input = %styled.input(
+  "padding: 4px; border-color: green; border-radius: 4px; margin-right: 16px; margin-top: 16px; border-width: 3px;"
+)
 
 @send external focus: Dom.element => unit = "focus"
 
@@ -87,7 +89,7 @@ module Component = %styled.div(`
 
 let stilos = %cx("box-shadow: inset 10px 10px 0 0 #ff0000, 10px 10px 0 0 #ff0000")
 
-let styles = CssJs.style(. [
+let styles = CssJs.style([
   CssJs.label("ComponentName"),
   CssJs.display(#block),
   %css("flex-direction: row"),
@@ -110,17 +112,13 @@ module Button = %styled.button(
   (~color) => {
     let buttonColor = Theme.button(color)
 
-    [
-      %css("margin-left: 16px"),
-      %css("display: block;"),
-      %css("color: $(buttonColor)"),
-    ]
+    [%css("margin-left: 16px"), %css("display: block;"), %css("color: $(buttonColor)")]
   }
 )
 
-let fonts = [ #custom("Inter") ];
+let fonts = [#custom("Inter")]
 
-let title = CssJs.style(. [
+let title = CssJs.style([
   CssJs.label("title"),
   %css("font-family: $(fonts)"),
   CssJs.fontSize(#px(24)),

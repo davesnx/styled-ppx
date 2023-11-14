@@ -480,37 +480,31 @@
         onVolumeChange: ReactEvent.Media.t -> unit [@ns.optional ];
         onWaiting: ReactEvent.Media.t -> unit [@ns.optional ];
         onWheel: ReactEvent.Wheel.t -> unit [@ns.optional ];
-        var: 'var [@ns.optional ]}[@@ns.optional ]
+        var: 'var [@ns.optional ]}
       external createVariadicElement :
-        string -> < .. >  Js.t -> React.element = "createElement"[@@bs.val ]
-      [@@bs.module (("react")[@reason.raw_literal ])]
-      let deleteProp =
-        [%raw
-          (("(newProps, key) => delete newProps[key]")
-            [@reason.raw_literal "(newProps, key) => delete newProps[key]"])]
+        string -> < .. >  Js.t -> React.element = "createElement"[@@bs.module
+                                                                   "react"]
+      let deleteProp = [%raw "(newProps, key) => delete newProps[key]"]
       let getOrEmpty str =
-        ((match str with
-          | ((Some (str))[@explicit_arity ]) ->
-              ((" ")[@reason.raw_literal " "]) ^ str
-          | None -> (("")[@reason.raw_literal ""]))
-        [@reason.preserve_braces ])
+        match str with
+        | ((Some (str))[@explicit_arity ]) -> " " ^ str
+        | None -> ""
       external assign2 :
         < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t =
           "Object.assign"[@@bs.val ]
       let styles ?var:(((var)[@ns.namedArgLoc ])= CssJs.hex {js|333|js})  _ =
-        ((CssJs.style
-            [|(CssJs.label "DynamicComponentWithDefaultValue");(CssJs.display
-                                                                  `block);(
-              CssJs.color var : CssJs.rule)|])
-        [@bs ])
+        CssJs.style
+          [|(CssJs.label "DynamicComponentWithDefaultValue");(CssJs.display
+                                                                `block);(
+            CssJs.color var : CssJs.rule)|]
       let make (props : 'var props) =
         let className =
           (styles ?var:(props.var) ()) ^ (getOrEmpty props.className) in
         let stylesObject = [%bs.obj { className; ref = (props.innerRef) }] in
         let newProps = assign2 (Js.Obj.empty ()) (Obj.magic props) stylesObject in
-        ignore (deleteProp newProps "var");
-        ignore (deleteProp newProps "innerRef");
-        createVariadicElement (("div")[@reason.raw_literal "div"]) newProps
+        ignore ((deleteProp newProps "var")[@bs ]);
+        ignore ((deleteProp newProps "innerRef")[@bs ]);
+        createVariadicElement "div" newProps
     end
 
 No clue why bsc generates a invalid syntax, but it does. This removes this particual bit.

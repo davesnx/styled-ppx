@@ -23,7 +23,7 @@ jobs:
       matrix:
         os: [ubuntu-20.04, macos-latest] # Missing windows-latest
         ocaml-compiler:
-          - 4.14.x
+          - 5.1.0
 
     runs-on: ${{ matrix.os }}
 
@@ -113,15 +113,15 @@ jobs:
         run: chmod +x _build/default/bin/bin.exe
 
       - name: Install dependencies
-        working-directory: ./e2e/rescript-v9-JSX3
+        working-directory: ./e2e/rescript-v10-JSX4
         run: npm install --force
 
       - name: Build
-        working-directory: ./e2e/rescript-v9-JSX3
+        working-directory: ./e2e/rescript-v10-JSX4
         run: npm run build
 
       - name: Test
-        working-directory: ./e2e/rescript-v9-JSX3
+        working-directory: ./e2e/rescript-v10-JSX4
         run: npm run test
 
   publish:

@@ -9,18 +9,13 @@
   },
   "sources": [{
     "dir": "src",
-    "subdirs": false
+    "type": "dev"
   },
   {
-    "dir": "../../_build/default/packages/css/rescript",
-    "subdirs": true
-  }, {
-    "dir": "../../_build/default/packages/emotion/rescript",
-    "subdirs": true
-    },
+    "dir": "../../_build/default/packages/css/rescript"
+  },
   {
-    "dir": "test",
-    "subdirs": false
+    "dir": "../../_build/default/packages/emotion/rescript"
   }],
   "package-specs": [
     {

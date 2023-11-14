@@ -5,9 +5,8 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
 
   $ cat fixed.ml
   let animation =
-    ((CssJs.keyframes
-        [|(0, [|(CssJs.opacity 0.)|]);(100, [|(CssJs.opacity 1.)|])|])
-    [@bs ])
+    CssJs.keyframes
+      [|(0, [|(CssJs.opacity 0.)|]);(100, [|(CssJs.opacity 1.)|])|]
   module FadeIn =
     struct
       type props =
@@ -486,34 +485,27 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
         onTransitionEnd: ReactEvent.Transition.t -> unit [@ns.optional ];
         onVolumeChange: ReactEvent.Media.t -> unit [@ns.optional ];
         onWaiting: ReactEvent.Media.t -> unit [@ns.optional ];
-        onWheel: ReactEvent.Wheel.t -> unit [@ns.optional ]}[@@ns.optional ]
+        onWheel: ReactEvent.Wheel.t -> unit [@ns.optional ]}
       external createVariadicElement :
-        string -> < .. >  Js.t -> React.element = "createElement"[@@bs.val ]
-      [@@bs.module (("react")[@reason.raw_literal ])]
+        string -> < .. >  Js.t -> React.element = "createElement"[@@bs.module
+                                                                   "react"]
       let getOrEmpty str =
-        ((match str with
-          | ((Some (str))[@explicit_arity ]) ->
-              ((" ")[@reason.raw_literal " "]) ^ str
-          | None -> (("")[@reason.raw_literal ""]))
-        [@reason.preserve_braces ])
-      let deleteProp =
-        [%raw
-          (("(newProps, key) => delete newProps[key]")
-            [@reason.raw_literal "(newProps, key) => delete newProps[key]"])]
+        match str with
+        | ((Some (str))[@explicit_arity ]) -> " " ^ str
+        | None -> ""
+      let deleteProp = [%raw "(newProps, key) => delete newProps[key]"]
       external assign2 :
         < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t =
           "Object.assign"[@@bs.val ]
       let styles =
-        ((CssJs.style
-            [|(CssJs.label "FadeIn");(CssJs.animationName animation : CssJs.rule)|])
-        [@bs ])
+        CssJs.style
+          [|(CssJs.label "FadeIn");(CssJs.animationName animation : CssJs.rule)|]
       let make (props : props) =
         let className = styles ^ (getOrEmpty props.className) in
         let stylesObject = [%bs.obj { className; ref = (props.innerRef) }] in
         let newProps = assign2 (Js.Obj.empty ()) (Obj.magic props) stylesObject in
-        ignore (deleteProp newProps "innerRef");
-        createVariadicElement (("section")[@reason.raw_literal "section"])
-          newProps
+        ignore ((deleteProp newProps "innerRef")[@bs ]);
+        createVariadicElement "section" newProps
     end
 
   $ npx rescript convert fixed.ml
