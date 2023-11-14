@@ -54,12 +54,11 @@ _build/
 # Local OPAM switch
 _opam/
 _opam_5/
+_opam_414/
 
 ## BuckleScript
 /lib/*
 !/lib/js/*
-/bundledOutputs/
-.bsb.lock
 
 ## Node - https://github.com/github/gitignore/blob/master/Node.gitignore
 

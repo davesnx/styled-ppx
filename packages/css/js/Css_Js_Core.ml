@@ -1,4 +1,5 @@
 open Css_AtomicTypes
+module Std = Kloth
 
 type rule =
   | D of string * string
@@ -6,8 +7,7 @@ type rule =
   | PseudoClass of string * rule array
   | PseudoClassParam of string * string * rule array
 
-let rec ruleToDict =
- fun [@bs] dict rule ->
+let rec ruleToDict dict rule =
   (match rule with
   | D (name, value) -> dict |. Js.Dict.set name (Js.Json.string value)
   | S (name, ruleset) -> dict |. Js.Dict.set name (toJson ruleset)
@@ -21,7 +21,7 @@ let rec ruleToDict =
   dict
 
 and toJson rules =
-  Std.Array.reduceU rules (Js.Dict.empty ()) ruleToDict |. Js.Json.object_
+  Std.Array.reduce rules (Js.Dict.empty ()) ruleToDict |. Js.Json.object_
 
 type nonrec animationName = string
 
@@ -29,71 +29,57 @@ module type MakeResult = sig
   type nonrec styleEncoding
   type nonrec renderer
 
-  val insertRule : (string -> unit[@bs])
-  val renderRule : (renderer -> string -> unit[@bs])
-  val global : (string -> rule array -> unit[@bs])
-  val renderGlobal : (renderer -> string -> rule array -> unit[@bs])
-  val style : (rule array -> styleEncoding[@bs])
-  val merge : (styleEncoding array -> styleEncoding[@bs])
-  val merge2 : (styleEncoding -> styleEncoding -> styleEncoding[@bs])
-
-  val merge3 :
-    (styleEncoding -> styleEncoding -> styleEncoding -> styleEncoding[@bs])
+  val insertRule : string -> unit
+  val renderRule : renderer -> string -> unit
+  val global : string -> rule array -> unit
+  val renderGlobal : renderer -> string -> rule array -> unit
+  val style : rule array -> styleEncoding
+  val merge : styleEncoding array -> styleEncoding
+  val merge2 : styleEncoding -> styleEncoding -> styleEncoding
+  val merge3 : styleEncoding -> styleEncoding -> styleEncoding -> styleEncoding
 
   val merge4 :
-    (styleEncoding ->
-     styleEncoding ->
-     styleEncoding ->
-     styleEncoding ->
-     styleEncoding
-    [@bs])
+    styleEncoding ->
+    styleEncoding ->
+    styleEncoding ->
+    styleEncoding ->
+    styleEncoding
 
-  val keyframes : ((int * rule array) array -> animationName[@bs])
-
-  val renderKeyframes :
-    (renderer -> (int * rule array) array -> animationName[@bs])
+  val keyframes : (int * rule array) array -> animationName
+  val renderKeyframes : renderer -> (int * rule array) array -> animationName
 end
 
 module Make (CssImpl : Css_Core.CssImplementationIntf) :
   MakeResult
     with type styleEncoding := CssImpl.styleEncoding
      and type renderer := CssImpl.renderer = struct
-  let insertRule = fun [@bs] css -> (CssImpl.injectRaw css [@bs])
+  let insertRule css = CssImpl.injectRaw css
+  let renderRule renderer css = CssImpl.renderRaw renderer css
+  let global selector rules = CssImpl.injectRules selector (toJson rules)
 
-  let renderRule =
-   fun [@bs] renderer css -> (CssImpl.renderRaw renderer css [@bs])
+  let renderGlobal renderer selector rules =
+    CssImpl.renderRules renderer selector (toJson rules)
 
-  let global =
-   fun [@bs] selector rules ->
-    (CssImpl.injectRules selector (toJson rules) [@bs])
-
-  let renderGlobal =
-   fun [@bs] renderer selector rules ->
-    (CssImpl.renderRules renderer selector (toJson rules) [@bs])
-
-  let style = fun [@bs] rules -> (CssImpl.make (toJson rules) [@bs])
-  let merge = fun [@bs] styles -> (CssImpl.mergeStyles styles [@bs])
-  let merge2 = fun [@bs] s s2 -> (merge [| s; s2 |] [@bs])
-  let merge3 = fun [@bs] s s2 s3 -> (merge [| s; s2; s3 |] [@bs])
-  let merge4 = fun [@bs] s s2 s3 s4 -> (merge [| s; s2; s3; s4 |] [@bs])
+  let style rules = CssImpl.make (toJson rules)
+  let merge styles = CssImpl.mergeStyles styles
+  let merge2 s s2 = merge [| s; s2 |]
+  let merge3 s s2 s3 = merge [| s; s2; s3 |]
+  let merge4 s s2 s3 s4 = merge [| s; s2; s3; s4 |]
 
   let framesToDict frames =
-    Std.Array.reduceU frames (Js.Dict.empty ()) (fun [@bs] dict (stop, rules) ->
-      ((Js.Dict.set dict (Std.Int.toString stop ^ {js|%|js}) (toJson rules);
+    Std.Array.reduce frames (Js.Dict.empty ()) (fun dict (stop, rules) ->
+        Js.Dict.set dict (Std.Int.toString stop ^ {js|%|js}) (toJson rules);
         dict)
-      [@ns.braces]))
 
-  let keyframes =
-   fun [@bs] frames -> (CssImpl.makeKeyframes (framesToDict frames) [@bs])
+  let keyframes frames = CssImpl.makeKeyframes (framesToDict frames)
 
-  let renderKeyframes =
-   fun [@bs] renderer frames ->
-    (CssImpl.renderKeyframes renderer (framesToDict frames) [@bs])
+  let renderKeyframes renderer frames =
+    CssImpl.renderKeyframes renderer (framesToDict frames)
 end
 
 let join strings separator =
-  Std.Array.reduceWithIndexU strings {js||js} (fun [@bs] acc item index ->
-    if index = 0 then item else acc ^ separator ^ item)
+  Std.Array.reduceWithIndex strings {js||js} (fun acc item index ->
+      if index = 0 then item else acc ^ separator ^ item)
 
 module Converter = struct
   let string_of_time t = Std.Int.toString t ^ {js|ms|js}
@@ -1159,8 +1145,8 @@ let wordSpacing x =
 
 let wordWrap = overflowWrap
 let zIndex x = D ({js|zIndex|js}, ZIndex.toString x)
-let media = fun [@bs] query rules -> S ({js|@media |js} ^ query, rules)
-let selector = fun [@bs] selector rules -> S (selector, rules)
+let media query rules = S ({js|@media |js} ^ query, rules)
+let selector selector rules = S (selector, rules)
 let pseudoClass selector rules = PseudoClass (selector, rules)
 let active rules = pseudoClass {js|active|js} rules
 let checked rules = pseudoClass {js|checked|js} rules
@@ -1231,17 +1217,17 @@ let scope rules = pseudoClass {js|scope|js} rules
 let target rules = pseudoClass {js|target|js} rules
 let valid rules = pseudoClass {js|valid|js} rules
 let visited rules = pseudoClass {js|visited|js} rules
-let after rules = (selector {js|::after|js} rules [@bs])
-let before rules = (selector {js|::before|js} rules [@bs])
-let firstLetter rules = (selector {js|::first-letter|js} rules [@bs])
-let firstLine rules = (selector {js|::first-line|js} rules [@bs])
-let selection rules = (selector {js|::selection|js} rules [@bs])
-let child x rules = (selector ({js| > |js} ^ x) rules [@bs])
-let children rules = (selector {js| > *|js} rules [@bs])
-let directSibling rules = (selector {js| + |js} rules [@bs])
-let placeholder rules = (selector {js|::placeholder|js} rules [@bs])
-let siblings rules = (selector {js| ~ |js} rules [@bs])
-let anyLink rules = (selector {js|:any-link|js} rules [@bs])
+let after rules = selector {js|::after|js} rules
+let before rules = selector {js|::before|js} rules
+let firstLetter rules = selector {js|::first-letter|js} rules
+let firstLine rules = selector {js|::first-line|js} rules
+let selection rules = selector {js|::selection|js} rules
+let child x rules = selector ({js| > |js} ^ x) rules
+let children rules = selector {js| > *|js} rules
+let directSibling rules = selector {js| + |js} rules
+let placeholder rules = selector {js|::placeholder|js} rules
+let siblings rules = selector {js| ~ |js} rules
+let anyLink rules = selector {js|:any-link|js} rules
 
 type nonrec angle = Angle.t
 type nonrec animationDirection = AnimationDirection.t
@@ -1846,11 +1832,11 @@ let backgrounds x =
     ( {js|background|js},
       x
       |. Std.Array.map (fun item ->
-           match item with
-           | #Color.t as c -> Color.toString c
-           | #Url.t as u -> Url.toString u
-           | #Gradient.t as g -> Gradient.toString g
-           | `none -> {js|none|js})
+             match item with
+             | #Color.t as c -> Color.toString c
+             | #Url.t as u -> Url.toString u
+             | #Gradient.t as g -> Gradient.toString g
+             | `none -> {js|none|js})
       |. Std.Array.joinWith {js|, |js} )
 
 let backgroundSize x =
@@ -1864,78 +1850,56 @@ let backgroundSize x =
 
 let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
     =
-  (let fontStyle =
-     Js.Option.map (fun [@bs] value -> FontStyle.toString value) fontStyle
-   in
-   let src =
-     src
-     |. Std.Array.map (fun x ->
-          match x with
-          | `localUrl value ->
-            ((({js|local("|js} [@res.template]) ^ value) [@res.template]
-            ^ ({js|")|js} [@res.template]))
-            [@res.template]
-          | `url value ->
-            ((({js|url("|js} [@res.template]) ^ value) [@res.template]
-            ^ ({js|")|js} [@res.template]))
-            [@res.template])
-     |. Std.Array.joinWith {js|, |js}
-   in
-   let fontStyle =
-     Belt.Option.mapWithDefault fontStyle {js||js} (fun s ->
-       ({js|font-style: |js} ^ s) ^ {js|;|js})
-   in
-   let fontWeight =
-     Belt.Option.mapWithDefault fontWeight {js||js} (fun w ->
-       ({js|font-weight: |js}
-       ^
-       match w with
-       | #FontWeight.t as f -> FontWeight.toString f
-       | #Var.t as va -> Var.toString va
-       | #Cascading.t as c -> Cascading.toString c)
-       ^ {js|;|js})
-   in
-   let fontDisplay =
-     Belt.Option.mapWithDefault fontDisplay {js||js} (fun f ->
-       ({js|font-display: |js} ^ FontDisplay.toString f) ^ {js|;|js})
-   in
-   let sizeAdjust =
-     Belt.Option.mapWithDefault sizeAdjust {js||js} (fun s ->
-       ({js|size-adjust: |js} ^ Percentage.toString s) ^ {js|;|js})
-   in
-   ((((((((((((({js|@font-face {
-     font-family: |js} [@res.template])
-              ^ fontFamily)
-              [@res.template]
-             ^ ({js|;
-     src: |js} [@res.template]))
-             [@res.template]
-            ^ src)
-            [@res.template]
-           ^ ({js|;
-     |js} [@res.template]))
-           [@res.template]
-          ^ fontStyle)
-          [@res.template]
-         ^ ({js|
-     |js} [@res.template]))
-         [@res.template]
-        ^ fontWeight)
-        [@res.template]
-       ^ ({js|
-     |js} [@res.template]))
-       [@res.template]
-      ^ fontDisplay)
-      [@res.template]
-     ^ ({js|
-     |js} [@res.template]))
-     [@res.template]
-    ^ sizeAdjust)
-    [@res.template]
-   ^ ({js|
-   }|js} [@res.template]))
-   [@res.template])
-  [@ns.braces]
+  let fontStyle =
+    match fontStyle with
+    | Some value -> {js|font-style: |js} ^ FontStyle.toString value ^ {js|;|js}
+    | _ -> ""
+  in
+  let src =
+    src
+    |. Std.Array.map (fun x ->
+           match x with
+           | `localUrl value -> ({js|local("|js} ^ value) ^ {js|")|js}
+           | `url value -> ({js|url("|js} ^ value) ^ {js|")|js})
+    |. Std.Array.joinWith {js|, |js}
+  in
+  let fontWeight =
+    Belt.Option.mapWithDefault fontWeight {js||js} (fun w ->
+        ({js|font-weight: |js}
+        ^
+        match w with
+        | #FontWeight.t as f -> FontWeight.toString f
+        | #Var.t as va -> Var.toString va
+        | #Cascading.t as c -> Cascading.toString c)
+        ^ {js|;|js})
+  in
+  let fontDisplay =
+    Belt.Option.mapWithDefault fontDisplay {js||js} (fun f ->
+        ({js|font-display: |js} ^ FontDisplay.toString f) ^ {js|;|js})
+  in
+  let sizeAdjust =
+    Belt.Option.mapWithDefault sizeAdjust {js||js} (fun s ->
+        ({js|size-adjust: |js} ^ Percentage.toString s) ^ {js|;|js})
+  in
+  ((((((((((({js|@font-face {
+     font-family: |js} ^ fontFamily)
+           ^ {js|;
+     src: |js})
+          ^ src)
+         ^ {js|;
+     |js})
+        ^ fontStyle)
+       ^ {js|
+     |js})
+      ^ fontWeight)
+     ^ {js|
+     |js})
+    ^ fontDisplay)
+   ^ {js|
+     |js})
+  ^ sizeAdjust)
+  ^ {js|
+   }|js}
 
 let textDecoration x =
   D

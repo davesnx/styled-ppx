@@ -1,7 +1,6 @@
-version=0.26.0
+version=0.26.1
 quiet=true
 profile=default
-ocaml-version=4.14.0
 
 m=80
 break-infix-before-func=false

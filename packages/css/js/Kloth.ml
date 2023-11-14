@@ -16,6 +16,7 @@ end
 
 module Array = struct
   let reduceU = Belt.Array.reduceU
+  let reduceWithIndex = Belt.Array.reduceWithIndex
   let reduceWithIndexU = Belt.Array.reduceWithIndexU
   let reduce = Belt.Array.reduce
   let map = Belt.Array.map

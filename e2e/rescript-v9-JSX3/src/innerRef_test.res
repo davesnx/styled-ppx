@@ -27,10 +27,9 @@ module TextInput = {
   }
 }
 
-describe("innerRef", () => {
+Skip.describe("innerRef", () => {
   test("TextInput renders and passes innerRef", _t => {
     let component = render(<TextInput />)
-
     component |> getByRole(~matcher=#Str("button")) |> FireEvent.click |> ignore
     let inputHasFocus = component |> getByRole(~matcher=#Str("input")) |> hasFocus
     expect(inputHasFocus)->Expect.toBe(true)

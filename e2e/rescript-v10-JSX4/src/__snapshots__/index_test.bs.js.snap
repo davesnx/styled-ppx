@@ -1,0 +1,9 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`styled > Component renders 1`] = `
+<div>
+  <a
+    class="css-1417t4l-Component"
+  />
+</div>
+`;

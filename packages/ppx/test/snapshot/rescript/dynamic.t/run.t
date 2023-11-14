@@ -482,20 +482,16 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
       onWheel?: ReactEvent.Wheel.t => unit,
       var: 'var,
     }
-    @val @module(@reason.raw_literal "react")
-    external createVariadicElement: (string, {..}) => React.element = "createElement"
-    let deleteProp = %raw(
-      @reason.raw_literal("(newProps, key) => delete newProps[key]")
-      "(newProps, key) => delete newProps[key]"
-    )
+    @module("react") external createVariadicElement: (string, {..}) => React.element = "createElement"
+    let deleteProp = %raw("(newProps, key) => delete newProps[key]")
     let getOrEmpty = str =>
       switch str {
-      | Some(str) => (@reason.raw_literal(" ") " ") ++ str
-      | None => @reason.raw_literal("") ""
+      | Some(str) => " " ++ str
+      | None => ""
       }
     @val external assign2: ({..}, {..}, {..}) => {..} = "Object.assign"
     let styles = (~var, _) =>
-      CssJs.style(. [
+      CssJs.style([
         CssJs.label("DynamicComponent"),
         (CssJs.color(var): CssJs.rule),
         CssJs.display(#flex),
@@ -504,8 +500,8 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
       let className = styles(~var=props.var, ()) ++ getOrEmpty(props.className)
       let stylesObject = {"className": className, "ref": props.innerRef}
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject)
-      ignore(deleteProp(newProps, "var"))
-      ignore(deleteProp(newProps, "innerRef"))
-      createVariadicElement(@reason.raw_literal("div") "div", newProps)
+      ignore(deleteProp(. newProps, "var"))
+      ignore(deleteProp(. newProps, "innerRef"))
+      createVariadicElement("div", newProps)
     }
   }

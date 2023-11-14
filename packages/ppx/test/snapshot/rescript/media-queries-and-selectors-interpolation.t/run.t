@@ -481,48 +481,39 @@
         onTransitionEnd: ReactEvent.Transition.t -> unit [@ns.optional ];
         onVolumeChange: ReactEvent.Media.t -> unit [@ns.optional ];
         onWaiting: ReactEvent.Media.t -> unit [@ns.optional ];
-        onWheel: ReactEvent.Wheel.t -> unit [@ns.optional ]}[@@ns.optional ]
+        onWheel: ReactEvent.Wheel.t -> unit [@ns.optional ]}
       external createVariadicElement :
-        string -> < .. >  Js.t -> React.element = "createElement"[@@bs.val ]
-      [@@bs.module (("react")[@reason.raw_literal ])]
+        string -> < .. >  Js.t -> React.element = "createElement"[@@bs.module
+                                                                   "react"]
       let getOrEmpty str =
-        ((match str with
-          | ((Some (str))[@explicit_arity ]) ->
-              ((" ")[@reason.raw_literal " "]) ^ str
-          | None -> (("")[@reason.raw_literal ""]))
-        [@reason.preserve_braces ])
-      let deleteProp =
-        [%raw
-          (("(newProps, key) => delete newProps[key]")
-            [@reason.raw_literal "(newProps, key) => delete newProps[key]"])]
+        match str with
+        | ((Some (str))[@explicit_arity ]) -> " " ^ str
+        | None -> ""
+      let deleteProp = [%raw "(newProps, key) => delete newProps[key]"]
       external assign2 :
         < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t =
           "Object.assign"[@@bs.val ]
       let styles =
-        ((CssJs.style
-            [|(CssJs.label "SelectorWithInterpolation");((CssJs.media
-                                                            ((({*j|only screen and (min-width: |*j})
-                                                               [@res.template ])
-                                                               ^
-                                                               (width ^
-                                                                  (({*j|)|*j})
-                                                                  [@res.template
-                                                                    ])))
-                                                            [|(CssJs.color
-                                                                 CssJs.blue)|])
-              [@bs ]);((CssJs.media
-                          ((({*j|(min-width: 700px) and (orientation: |*j})
-                             [@res.template ]) ^
-                             (orientation ^ (({*j|)|*j})[@res.template ])))
-                          [|(CssJs.display `none)|])
-              [@bs ])|])
-        [@bs ])
+        CssJs.style
+          [|(CssJs.label "SelectorWithInterpolation");(CssJs.media
+                                                         ((({*j|only screen and (min-width: |*j})
+                                                            [@res.template ]) ^
+                                                            (width ^
+                                                               (({*j|)|*j})
+                                                               [@res.template ])))
+                                                         [|(CssJs.color
+                                                              CssJs.blue)|]);(
+            CssJs.media
+              ((({*j|(min-width: 700px) and (orientation: |*j})
+                 [@res.template ]) ^
+                 (orientation ^ (({*j|)|*j})[@res.template ])))
+              [|(CssJs.display `none)|])|]
       let make (props : props) =
         let className = styles ^ (getOrEmpty props.className) in
         let stylesObject = [%bs.obj { className; ref = (props.innerRef) }] in
         let newProps = assign2 (Js.Obj.empty ()) (Obj.magic props) stylesObject in
-        ignore (deleteProp newProps "innerRef");
-        createVariadicElement (("div")[@reason.raw_literal "div"]) newProps
+        ignore ((deleteProp newProps "innerRef")[@bs ]);
+        createVariadicElement "div" newProps
     end
 
 No clue why bsc generates a invalid syntax, but it does. This removes this particual bit.
@@ -530,7 +521,7 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
 
   $ npx rescript convert fixed.ml
   Error when converting fixed.ml
-  File "", line 511, characters 44-49:
+  File "", line 504, characters 32-37:
   Error: Invalid literal 700px
   
 

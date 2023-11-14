@@ -1,3 +1,6 @@
-let _ = Ui.stackGap(`px(10));
-
-Js.log(Ui.selectors);
+let element = ReactDOM.querySelector("#root");
+switch (element) {
+| Some(root) => ReactDOM.render(<Ui.App />, root)
+| None =>
+  Js.Console.error("Failed to start React: couldn't find the #root element")
+};
