@@ -10,15 +10,14 @@
     "number": "-48"
   },
   "sources": [{
-    "dir": "test",
-    "subdirs": true,
+    "dir": "src",
     "type": "dev"
-  }, {
-    "dir": "../../_build/default/packages/css/rescript",
-    "subdirs": true
-  }, {
-    "dir": "../../_build/default/packages/emotion/rescript",
-    "subdirs": true
+  },
+  {
+    "dir": "../../_build/default/packages/css/rescript"
+  },
+  {
+    "dir": "../../_build/default/packages/emotion/rescript"
   }],
   "package-specs": [
     {

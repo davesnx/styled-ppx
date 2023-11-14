@@ -2,6 +2,7 @@
   "name": "styled-ppx-demo-rescript-v9-jsx3",
   "version": "0.0.0",
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "build": "rescript build -with-deps",
     "watch": "rescript build -with-deps -w",
