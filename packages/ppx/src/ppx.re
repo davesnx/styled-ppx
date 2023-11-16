@@ -1,8 +1,7 @@
-open Ppxlib;
-
-module Builder = Ast_builder.Default;
+module Builder = Ppxlib.Ast_builder.Default;
 
 module Mapper = {
+  open Ppxlib;
   let match = module_expr => {
     open Ast_pattern;
 
@@ -632,7 +631,7 @@ module Mapper = {
 
 let traverser = {
   as _;
-  inherit class Ast_traverse.map as super;
+  inherit class Ppxlib.Ast_traverse.map as super;
   pub! structure_item = expr => {
     File.set(expr.pstr_loc.loc_start.pos_fname);
     let expr = super#structure_item(expr);
@@ -642,7 +641,7 @@ let traverser = {
 
 /* TODO: Throw better errors when this pattern doesn't match */
 let static_pattern =
-  Ast_pattern.(
+  Ppxlib.Ast_pattern.(
     pstr(
       pstr_eval(
         map(
@@ -684,22 +683,24 @@ switch (version) {
 | None => ()
 };
 
-let string_payload_pattern = Ast_pattern.(single_expr_payload(estring(__)));
+let string_payload_pattern =
+  Ppxlib.Ast_pattern.(single_expr_payload(estring(__)));
 
-let any_payload_pattern = Ast_pattern.(single_expr_payload(__));
+let any_payload_pattern = Ppxlib.Ast_pattern.(single_expr_payload(__));
 
 let _ =
-  Driver.register_transformation(
+  Ppxlib.Driver.register_transformation(
     /* Instrument is needed to run styled-ppx after metaquote,
        we rely on this order in native tests */
-    ~instrument=Driver.Instrument.make(~position=Before, traverser#structure),
+    ~instrument=
+      Ppxlib.Driver.Instrument.make(~position=Before, traverser#structure),
     ~rules=[
       /* %cx without let binding, it doesn't have CssJs.label
          %cx is defined in traverser#structure */
-      Context_free.Rule.extension(
-        Extension.declare(
+      Ppxlib.Context_free.Rule.extension(
+        Ppxlib.Extension.declare(
           "cx",
-          Extension.Context.Expression,
+          Ppxlib.Extension.Context.Expression,
           static_pattern,
           (~loc, ~path, payload) => {
             File.set(path);
@@ -721,15 +722,15 @@ let _ =
           },
         ),
       ),
-      Context_free.Rule.extension(
-        Extension.declare(
+      Ppxlib.Context_free.Rule.extension(
+        Ppxlib.Extension.declare(
           "css",
-          Extension.Context.Expression,
+          Ppxlib.Extension.Context.Expression,
           string_payload_pattern,
           (~loc, ~path, payload) => {
             File.set(path);
             let pos = Some(loc.loc_start);
-            switch (Driver_.parse_declaration(~pos, payload)) {
+            switch (Driver.parse_declaration(~pos, payload)) {
             | Ok(declarations) =>
               let declarationListValues =
                 Css_to_emotion.render_declaration(declarations);
@@ -742,30 +743,30 @@ let _ =
           },
         ),
       ),
-      Context_free.Rule.extension(
-        Extension.declare(
+      Ppxlib.Context_free.Rule.extension(
+        Ppxlib.Extension.declare(
           "styled.global",
-          Extension.Context.Expression,
+          Ppxlib.Extension.Context.Expression,
           string_payload_pattern,
           (~loc, ~path, payload) => {
             File.set(path);
             let pos = Some(loc.loc_start);
-            switch (Driver_.parse_stylesheet(~pos, payload)) {
+            switch (Driver.parse_stylesheet(~pos, payload)) {
             | Ok(stylesheets) => Css_to_emotion.render_global(stylesheets)
             | Error((loc, msg)) => Generate_lib.error(~loc, msg)
             };
           },
         ),
       ),
-      Context_free.Rule.extension(
-        Extension.declare(
+      Ppxlib.Context_free.Rule.extension(
+        Ppxlib.Extension.declare(
           "keyframe",
-          Extension.Context.Expression,
+          Ppxlib.Extension.Context.Expression,
           string_payload_pattern,
           (~loc, ~path, payload) => {
             File.set(path);
             let pos = Some(loc.loc_start);
-            switch (Driver_.parse_keyframes(~pos, payload)) {
+            switch (Driver.parse_keyframes(~pos, payload)) {
             | Ok(declarations) =>
               Css_to_emotion.render_keyframes(declarations)
             | Error((loc, msg)) => Generate_lib.error(~loc, msg)
@@ -774,10 +775,10 @@ let _ =
         ),
       ),
       /* This extension just raises an error to educate, since before 0.20 this was valid */
-      Context_free.Rule.extension(
-        Extension.declare(
+      Ppxlib.Context_free.Rule.extension(
+        Ppxlib.Extension.declare(
           "styled",
-          Extension.Context.Module_expr,
+          Ppxlib.Extension.Context.Module_expr,
           any_payload_pattern,
           (~loc, ~path as _, payload) => {
           Generate_lib.raiseError(
@@ -787,7 +788,7 @@ let _ =
             ~example=
               Some(
                 "[%styled.div "
-                ++ Pprintast.string_of_expression(payload)
+                ++ Ppxlib.Pprintast.string_of_expression(payload)
                 ++ "]",
               ),
             ~link=

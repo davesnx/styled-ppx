@@ -49,7 +49,7 @@ let parse = (~loc: Ppxlib.location, payload) => {
        }
      }; */
 
-  switch (Driver_.parse_declaration_list(~pos=Some(loc_start), payload)) {
+  switch (Driver.parse_declaration_list(~pos=Some(loc_start), payload)) {
   | Ok(declarations) => Ok(declarations)
   | Error((loc, msg)) => Error((loc, msg))
   };
