@@ -34,8 +34,15 @@ switch (input, help) {
   | Error((loc, msg)) =>
     let position = loc.Css_types.loc_start;
     let curr_char_pos = position.pos_cnum;
+    let lnum = position.pos_lnum;
+    let pos_bol = position.pos_bol;
     print_endline(
-      Printf.sprintf("Error parsing CSS: %s at pos %i", msg, curr_char_pos),
+      Printf.sprintf(
+        "Error parsing CSS: %s on line %i at position %i",
+        msg,
+        lnum,
+        curr_char_pos - pos_bol,
+      ),
     );
   }
 };

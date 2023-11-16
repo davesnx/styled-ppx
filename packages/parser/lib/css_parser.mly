@@ -54,7 +54,7 @@ stylesheet: s = stylesheet_without_eof; EOF { s }
 stylesheet_without_eof: rs = loc(list(rule)) { rs }
 
 declaration_list:
-  | WS? EOF { ([], Util.make_loc $startpos $endpos) }
+  | WS? EOF { ([], Parser_location.make $startpos $endpos) }
   | ds = loc(declarations) EOF { ds }
 
 /* keyframe may contain {} */
@@ -66,7 +66,7 @@ keyframes:
 
 /* Adds location as a tuple */
 loc(X): x = X {
-  (x, Util.make_loc $startpos(x) $endpos(x))
+  (x, Parser_location.make $startpos(x) $endpos(x))
 }
 
 /* Handle skipping whitespace */
@@ -114,7 +114,7 @@ at_rule:
     { name = name;
       prelude;
       block = Rule_list ds;
-      loc = Util.make_loc $startpos $endpos;
+      loc = Parser_location.make $startpos $endpos;
     }
   }
   /* @media (min-width: 16rem) {} */
@@ -124,33 +124,33 @@ at_rule:
     { name = name;
       prelude;
       block = Rule_list b;
-      loc = Util.make_loc $startpos $endpos;
+      loc = Parser_location.make $startpos $endpos;
     }
   }
   /* @keyframes animationName { ... } */
   | name = loc(AT_KEYFRAMES) WS?
     i = IDENT WS?
     block = brace_block(keyframe) {
-    let item = (Ident i, Util.make_loc $startpos(i) $endpos(i)) in
-    let prelude = ([item], Util.make_loc $startpos $endpos) in
-    let block = Rule_list (block, Util.make_loc $startpos $endpos) in
+    let item = (Ident i, Parser_location.make $startpos(i) $endpos(i)) in
+    let prelude = ([item], Parser_location.make $startpos $endpos) in
+    let block = Rule_list (block, Parser_location.make $startpos $endpos) in
     { name = name;
       prelude;
       block;
-      loc = Util.make_loc $startpos $endpos;
+      loc = Parser_location.make $startpos $endpos;
     }
   }
   /* @keyframes animationName {} */
   | name = loc(AT_KEYFRAMES) WS?
     i = IDENT WS?
     s = loc(empty_brace_block) {
-    let item = ((Ident i), Util.make_loc $startpos(i) $endpos(i)) in
-    let prelude = ([item], Util.make_loc $startpos $endpos) in
+    let item = ((Ident i), Parser_location.make $startpos(i) $endpos(i)) in
+    let prelude = ([item], Parser_location.make $startpos $endpos) in
     let empty_block = Rule_list s in
     ({ name = name;
       prelude = prelude;
       block = empty_block;
-      loc = Util.make_loc $startpos $endpos;
+      loc = Parser_location.make $startpos $endpos;
     }): at_rule
   }
   /* @charset */
@@ -159,7 +159,7 @@ at_rule:
     { name = name;
       prelude = xs;
       block = Empty;
-      loc = Util.make_loc $startpos $endpos;
+      loc = Parser_location.make $startpos $endpos;
     }
   }
   /* @support { ... } */
@@ -171,7 +171,7 @@ at_rule:
     { name = name;
       prelude = xs;
       block = Stylesheet s;
-      loc = Util.make_loc $startpos $endpos;
+      loc = Parser_location.make $startpos $endpos;
     }
   }
 
@@ -182,10 +182,10 @@ keyframe_style_rule:
   /* from {} to {} */
   | WS? id = IDENT WS?
     declarations = brace_block(loc(declarations)) WS? {
-    let prelude = [(SimpleSelector (Type id), Util.make_loc $startpos(id) $endpos(id))] in
+    let prelude = [(SimpleSelector (Type id), Parser_location.make $startpos(id) $endpos(id))] in
     Style_rule {
-      prelude = (prelude, Util.make_loc $startpos(id) $endpos(id));
-      loc = Util.make_loc $startpos $endpos;
+      prelude = (prelude, Parser_location.make $startpos(id) $endpos(id));
+      loc = Parser_location.make $startpos $endpos;
       block = declarations;
     }
   }
@@ -193,10 +193,10 @@ keyframe_style_rule:
   | WS? p = percentage; WS?
     declarations = brace_block(loc(declarations)) WS? {
     let item = Percentage p in
-    let prelude = [(SimpleSelector item, Util.make_loc $startpos(p) $endpos(p))] in
+    let prelude = [(SimpleSelector item, Parser_location.make $startpos(p) $endpos(p))] in
     Style_rule {
-      prelude = (prelude, Util.make_loc $startpos(p) $endpos(p));
-      loc = Util.make_loc $startpos $endpos;
+      prelude = (prelude, Parser_location.make $startpos(p) $endpos(p));
+      loc = Parser_location.make $startpos $endpos;
       block = declarations;
     }
   }
@@ -205,11 +205,11 @@ keyframe_style_rule:
     let prelude = percentages
       |> List.map (fun percent -> Percentage percent)
       |> List.map (fun p ->
-        (SimpleSelector p, Util.make_loc $startpos(percentages) $endpos(percentages))
+        (SimpleSelector p, Parser_location.make $startpos(percentages) $endpos(percentages))
       ) in
     Style_rule {
-      prelude = (prelude, Util.make_loc $startpos(percentages) $endpos(percentages));
-      loc = Util.make_loc $startpos $endpos;
+      prelude = (prelude, Parser_location.make $startpos(percentages) $endpos(percentages));
+      loc = Parser_location.make $startpos $endpos;
       block = declarations;
     }
   }
@@ -226,14 +226,14 @@ style_rule:
     block = loc(empty_brace_block) {
     { prelude;
       block;
-      loc = Util.make_loc $startpos $endpos;
+      loc = Parser_location.make $startpos $endpos;
     }
   }
   | prelude = loc(selector_list) WS?
     declarations = brace_block(loc(declarations)) {
     { prelude;
       block = declarations;
-      loc = Util.make_loc $startpos $endpos;
+      loc = Parser_location.make $startpos $endpos;
     }
   }
 
@@ -263,7 +263,7 @@ declaration_without_eof:
     { name = property;
       value;
       important;
-      loc = Util.make_loc $startpos $endpos;
+      loc = Parser_location.make $startpos $endpos;
     }
   }
 

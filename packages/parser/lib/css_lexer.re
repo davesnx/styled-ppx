@@ -28,9 +28,7 @@ let unicode_range = [%sedlex.regexp?
   (up_to_6_hex_digits, '-', up_to_6_hex_digits)
 ];
 
-let escape = [%sedlex.regexp?
-  unicode | ('\\', Compl('\r' | '\n' | '\012' | hex_digit))
-];
+let escape = [%sedlex.regexp? '\\'];
 
 let alpha = [%sedlex.regexp? 'a' .. 'z' | 'A' .. 'Z'];
 
@@ -352,44 +350,61 @@ let unreachable = () =>
 
 let (~:) = f => f();
 
-module Tokenizer = {
-  let consume_whitespace = buf =>
-    switch%sedlex (buf) {
-    | Star(whitespace) => Parser.WS
-    | _ => Parser.WS
-    };
+let (let.ok) = Result.bind;
 
-  let lexeme = Sedlexing.Utf8.lexeme;
-
-  // https://drafts.csswg.org/css-syntax-3/#consume-an-escaped-code-point
-  let consume_escaped = buf => {
-    switch%sedlex (buf) {
-    // TODO: spec typo? No more than 5?
-    | Rep(hex_digit, 1 .. 6) =>
-      let hex_string = "0x" ++ lexeme(buf);
-      let char_code = int_of_string(hex_string);
-      let char = uchar_of_int(char_code);
-      let _ = consume_whitespace(buf);
-      char_code == 0 || is_surrogate(char_code)
-        ? Error((Uchar.rep, Tokens.Invalid_code_point)) : Ok(char);
-    | eof => Error((Uchar.rep, Tokens.Eof))
-    | any => Ok(lexeme(buf))
-    | _ => ~:unreachable
-    };
+let consume_whitespace = buf =>
+  switch%sedlex (buf) {
+  | Star(whitespace) => Parser.WS
+  | _ => Parser.WS
   };
 
-  // https://drafts.csswg.org/css-syntax-3/#consume-remnants-of-bad-url
-  let rec consume_remnants_bad_url = buf =>
-    switch%sedlex (buf) {
-    | ")"
-    | eof => ()
-    | escape =>
-      let _ = consume_escaped(buf);
-      consume_remnants_bad_url(buf);
-    | any => consume_remnants_bad_url(buf)
-    | _ => ~:unreachable
-    };
+let lexeme = Sedlexing.Utf8.lexeme;
 
+// https://drafts.csswg.org/css-syntax-3/#consume-an-escaped-code-point
+let consume_escaped = buf => {
+  switch%sedlex (buf) {
+  // TODO: spec typo? No more than 5?
+  | Rep(hex_digit, 1 .. 6) =>
+    let hex_string = "0x" ++ lexeme(buf);
+    let char_code = int_of_string(hex_string);
+    let char = uchar_of_int(char_code);
+    let _ = consume_whitespace(buf);
+    char_code == 0 || is_surrogate(char_code)
+      // U+FFFD is a character used as a substitute for an uninterpretable character from another encoding
+      ? Error(("U+FFFD", Tokens.Invalid_code_point)) : Ok(char);
+  | eof => Error(("U+FFFD", Tokens.Eof))
+  | any => Ok(lexeme(buf))
+  | _ => ~:unreachable
+  };
+};
+
+// https://drafts.csswg.org/css-syntax-3/#consume-name
+let consume_identifier = buf => {
+  let rec read = acc =>
+    switch%sedlex (buf) {
+    | identifier_code_point => read(acc ++ lexeme(buf))
+    | escape =>
+      // TODO: spec, what should happen when fails?
+      let.ok char = consume_escaped(buf);
+      read(acc ++ char);
+    | _ => Ok(acc)
+    };
+  read(lexeme(buf));
+};
+
+// https://drafts.csswg.org/css-syntax-3/#consume-remnants-of-bad-url
+let rec consume_remnants_bad_url = buf =>
+  switch%sedlex (buf) {
+  | ")"
+  | eof => ()
+  | escape =>
+    let _ = consume_escaped(buf);
+    consume_remnants_bad_url(buf);
+  | any => consume_remnants_bad_url(buf)
+  | _ => ~:unreachable
+  };
+
+module Tokenizer = {
   // https://drafts.csswg.org/css-syntax-3/#consume-url-token
   let consume_url = buf => {
     let _ = consume_whitespace(buf);
@@ -424,22 +439,6 @@ module Tokenizer = {
       | _ => ~:unreachable
       };
     };
-    read(lexeme(buf));
-  };
-
-  let (let.ok) = Result.bind;
-
-  // https://drafts.csswg.org/css-syntax-3/#consume-name
-  let consume_identifier = buf => {
-    let rec read = acc =>
-      switch%sedlex (buf) {
-      | identifier_code_point => read(acc ++ lexeme(buf))
-      | escape =>
-        // TODO: spec, what should happen when fails?
-        let.ok char = consume_escaped(buf);
-        read(acc ++ char);
-      | _ => Ok(acc)
-      };
     read(lexeme(buf));
   };
 
@@ -608,14 +607,10 @@ module Consume = {
   open Sedlexing.Utf8;
   open Tokens;
 
-  let escape = [%sedlex.regexp? '\\'];
-
   let check_if_three_codepoints_would_start_an_identifier =
     check(check_if_three_codepoints_would_start_an_identifier);
   let check_if_three_code_points_would_start_a_number =
     check(check_if_three_code_points_would_start_a_number);
-
-  let fffd = uchar_of_int(0xFFFD);
 
   // TODO: floats in OCaml are compatible with numbers in CSS?
   let convert_string_to_number = str => float_of_string(str);
@@ -625,24 +620,6 @@ module Consume = {
     | Star(whitespace) => Tokens.WS
     | _ => Tokens.WS
     };
-
-  // https://drafts.csswg.org/css-syntax-3/#consume-an-escaped-code-point
-
-  let consume_escaped_ = lexbuf => {
-    switch%sedlex (lexbuf) {
-    // TODO: spec typo? No more than 5?
-    | Rep(hex_digit, 1 .. 6) =>
-      let hex_string = "0x" ++ lexeme(lexbuf);
-      let char_code = int_of_string(hex_string);
-      let char = uchar_of_int(char_code);
-      let _ = consume_whitespace_(lexbuf);
-      char_code == 0 || is_surrogate(char_code)
-        ? Error((fffd, Tokens.Invalid_code_point)) : Ok(char);
-    | eof => Error((fffd, Eof))
-    | any => Ok(lexeme(lexbuf))
-    | _ => ~:unreachable
-    };
-  };
 
   // TODO: check 5. without the 0
   let consume_number = lexbuf => {
@@ -672,39 +649,6 @@ module Consume = {
     (value, kind); // 7
   };
 
-  let (let.ok) = Result.bind;
-
-  // https://drafts.csswg.org/css-syntax-3/#consume-name
-  let consume_identifier_ = lexbuf => {
-    let rec read = acc =>
-      switch%sedlex (lexbuf) {
-      | identifier_code_point => read(acc ++ lexeme(lexbuf))
-      | escape =>
-        // TODO: spec, what should happen when fails?
-        let.ok char = consume_escaped_(lexbuf);
-        read(acc ++ char);
-      | _ => Ok(acc)
-      };
-    read(lexeme(lexbuf));
-  };
-
-  let handle_consume_identifier_ =
-    fun
-    | Error((_, error)) => Error((Tokens.BAD_IDENT, error))
-    | Ok(string) => Ok(string);
-
-  // https://drafts.csswg.org/css-syntax-3/#consume-remnants-of-bad-url
-  let rec consume_remnants_bad_url_ = lexbuf =>
-    switch%sedlex (lexbuf) {
-    | ")"
-    | eof => ()
-    | escape =>
-      let _ = consume_escaped_(lexbuf);
-      consume_remnants_bad_url_(lexbuf);
-    | any => consume_remnants_bad_url_(lexbuf)
-    | _ => ~:unreachable
-    };
-
   // https://drafts.csswg.org/css-syntax-3/#consume-url-token
   let consume_url_ = lexbuf => {
     let _ = consume_whitespace_(lexbuf);
@@ -715,7 +659,7 @@ module Consume = {
         | ')' => Ok(Tokens.URL(acc))
         | eof => Error((Tokens.URL(acc), Tokens.Eof))
         | _ =>
-          consume_remnants_bad_url_(lexbuf);
+          consume_remnants_bad_url(lexbuf);
           Ok(BAD_URL);
         };
       };
@@ -727,11 +671,11 @@ module Consume = {
       | '\''
       | '('
       | non_printable_code_point =>
-        consume_remnants_bad_url_(lexbuf);
+        consume_remnants_bad_url(lexbuf);
         // TODO: location on error
         Error((BAD_URL, Tokens.Invalid_code_point));
       | escape =>
-        switch (consume_escaped_(lexbuf)) {
+        switch (consume_escaped(lexbuf)) {
         | Ok(char) => read(acc ++ char)
         | Error((_, error)) => Error((BAD_URL, error))
         }
@@ -754,7 +698,7 @@ module Consume = {
         | '\n' => read(acc)
         | _ =>
           // TODO: is that tail call recursive? I'm not sure
-          let.ok char = consume_escaped_(lexbuf);
+          let.ok char = consume_escaped(lexbuf);
           read(acc ++ char);
         };
       switch%sedlex (lexbuf) {
@@ -777,6 +721,11 @@ module Consume = {
     };
   };
 
+  let handle_consume_identifier_ =
+    fun
+    | Error((_, error)) => Error((Tokens.BAD_IDENT, error))
+    | Ok(string) => Ok(string);
+
   // https://drafts.csswg.org/css-syntax-3/#consume-ident-like-token
   let consume_ident_like_ = lexbuf => {
     let read_url = string => {
@@ -795,7 +744,7 @@ module Consume = {
     };
 
     // TODO: should it return IDENT() when error?
-    let.ok string = consume_identifier_(lexbuf) |> handle_consume_identifier_;
+    let.ok string = consume_identifier(lexbuf) |> handle_consume_identifier_;
 
     switch%sedlex (lexbuf) {
     | '(' =>
@@ -814,7 +763,7 @@ module Consume = {
     if (check_if_three_codepoints_would_start_an_identifier(lexbuf)) {
       // TODO: should it be BAD_IDENT?
       let.ok string =
-        consume_identifier_(lexbuf) |> handle_consume_identifier_;
+        consume_identifier(lexbuf) |> handle_consume_identifier_;
       Ok(Tokens.DIMENSION(number, string));
     } else {
       switch%sedlex (lexbuf) {
@@ -834,11 +783,11 @@ module Consume = {
         | identifier_start_code_point =>
           Sedlexing.rollback(lexbuf);
           let.ok string =
-            consume_identifier_(lexbuf) |> handle_consume_identifier_;
+            consume_identifier(lexbuf) |> handle_consume_identifier_;
           Ok(Tokens.HASH(string, `ID));
         | _ =>
           let.ok string =
-            consume_identifier_(lexbuf) |> handle_consume_identifier_;
+            consume_identifier(lexbuf) |> handle_consume_identifier_;
           Ok(Tokens.HASH(string, `UNRESTRICTED));
         };
       | _ => Ok(DELIM("#"))
@@ -889,7 +838,7 @@ module Consume = {
       if (check_if_three_codepoints_would_start_an_identifier(lexbuf)) {
         // TODO: grr BAD_IDENT
         let.ok string =
-          consume_identifier_(lexbuf) |> handle_consume_identifier_;
+          consume_identifier(lexbuf) |> handle_consume_identifier_;
         Ok(Tokens.AT_KEYWORD(string));
       } else {
         Ok(DELIM("@"));
