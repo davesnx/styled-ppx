@@ -2595,3 +2595,17 @@ module FontKerning = struct
     | `none -> {js|none|js}
     | `normal -> {js|normal|js}
 end
+
+module FontVariantPosition = struct
+  type nonrec t =
+    [ `normal
+    | `sub
+    | `super
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `sub -> {js|sub|js}
+    | `super -> {js|super|js}
+end

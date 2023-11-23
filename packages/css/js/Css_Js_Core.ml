@@ -2205,3 +2205,11 @@ let fontKerning x =
       | #FontKerning.t as fk -> FontKerning.toString fk
       | #Var.t as var -> Var.toString var
       | #Cascading.t as c -> Cascading.toString c )
+
+let fontVariantPosition x =
+  D
+    ( {js|fontVariantPosition|js},
+      match x with
+      | #FontVariantPosition.t as fvp -> FontVariantPosition.toString fvp
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )

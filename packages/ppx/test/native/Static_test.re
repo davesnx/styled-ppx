@@ -733,6 +733,16 @@ let properties_static_css_tests = [
     [%expr [%css "font-kerning: normal"]],
     [%expr CssJs.fontKerning(`normal)],
   ),
+  (
+    [%css "font-variant-position: sub"],
+    [%expr [%css "font-variant-position: sub"]],
+    [%expr CssJs.fontVariantPosition(`sub)],
+  ),
+  (
+    [%css "font-variant-position: super"],
+    [%expr [%css "font-variant-position: super"]],
+    [%expr CssJs.fontVariantPosition(`super)],
+  ),
   // unsupported
   /* (
        [%css "-moz-text-blink: blink"],
