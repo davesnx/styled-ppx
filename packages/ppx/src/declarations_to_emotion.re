@@ -1891,24 +1891,10 @@ let overflow =
   );
 
 // let overflow_clip_margin = unsupportedProperty(Parser.property_overflow_clip_margin);
-let overflow_inline = unsupportedProperty(Parser.property_overflow_inline);
-
-/* let overflow_inline =
-   monomorphic(
-     Parser.property_overflow_inline,
-     (~loc) => [%expr "overflow-inline"],
-     (~loc, value) => switch (value: Types.property_overflow_inline) {
-       | `Auto => [%expr "auto"]
-       | `Clip => [%expr "clip"]
-       | `Hidden => [%expr "hidden"]
-       | `Paged => [%expr "paged"]
-       | `Scroll => [%expr "scroll"]
-       | `Visible => [%expr "visible"]
-       | `None => [%expr "none"]
-       | `Optional_paged => [%expr "optional-paged"]
-     }
-   ); */
-
+let overflow_inline =
+  variants(Parser.property_overflow_inline, (~loc) =>
+    [%expr CssJs.overflowInline]
+  );
 let text_overflow =
   monomorphic(
     Parser.property_text_overflow,

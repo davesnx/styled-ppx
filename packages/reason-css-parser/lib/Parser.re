@@ -1349,7 +1349,7 @@ and property_overflow_block = [%value.rec
 ]
 and property_overflow_clip_box = [%value.rec "'padding-box' | 'content-box'"]
 and property_overflow_inline = [%value.rec
-  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | 'none' | 'optional-paged' | 'paged'"
+  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto'"
 ]
 and property_overflow_wrap = [%value.rec
   "'normal' | 'break-word' | 'anywhere'"

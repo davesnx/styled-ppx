@@ -2527,3 +2527,21 @@ module TextJustify = struct
     | `interWord -> {js|inter-word|js}
     | `interCharacter -> {js|inter-character|js}
 end
+
+module OverflowInline = struct
+  type nonrec t =
+    [ `hidden
+    | `visible
+    | `scroll
+    | `auto
+    | `clip
+    ]
+
+  let toString x =
+    match x with
+    | `hidden -> {js|hidden|js}
+    | `visible -> {js|visible|js}
+    | `scroll -> {js|scroll|js}
+    | `auto -> {js|auto|js}
+    | `clip -> {js|clip|js}
+end

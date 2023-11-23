@@ -703,6 +703,11 @@ let properties_static_css_tests = [
     [%expr [%css "text-justify: inter-word"]],
     [%expr CssJs.textJustify(`interWord)],
   ),
+  (
+    [%css "overflow-inline: visible"],
+    [%expr [%css "overflow-inline: visible"]],
+    [%expr CssJs.overflowInline(`visible)],
+  ),
   // unsupported
   /* (
        [%css "-moz-text-blink: blink"],

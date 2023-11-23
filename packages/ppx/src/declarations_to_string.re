@@ -328,11 +328,8 @@ let overflow_inline =
     | `Auto => [%expr "auto"]
     | `Clip => [%expr "clip"]
     | `Hidden => [%expr "hidden"]
-    | `Paged => [%expr "paged"]
     | `Scroll => [%expr "scroll"]
-    | `Visible => [%expr "visible"]
-    | `None => [%expr "none"]
-    | `Optional_paged => [%expr "optional-paged"],
+    | `Visible => [%expr "visible"],
   );
 
 let color = apply(Parser.positive_integer, [%expr "color"], render_integer);
