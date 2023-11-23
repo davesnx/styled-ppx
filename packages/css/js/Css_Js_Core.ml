@@ -2221,3 +2221,11 @@ let fontVariantCaps x =
       | #FontVariantCaps.t as fvc -> FontVariantCaps.toString fvc
       | #Var.t as var -> Var.toString var
       | #Cascading.t as c -> Cascading.toString c )
+
+let fontOpticalSizing x =
+  D
+    ( {js|fontOpticalSizing|js},
+      match x with
+      | #FontOpticalSizing.t as fos -> FontOpticalSizing.toString fos
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )

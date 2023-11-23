@@ -2168,7 +2168,9 @@ let font_variant =
 let font_feature_settings =
   unsupportedProperty(Parser.property_font_feature_settings);
 let font_optical_sizing =
-  unsupportedProperty(Parser.property_font_optical_sizing);
+  variants(Parser.property_font_optical_sizing, (~loc) =>
+    [%expr CssJs.fontOpticalSizing]
+  );
 let font_variation_settings =
   unsupportedProperty(Parser.property_font_variation_settings);
 // let font_palette = unsupportedProperty(Parser.property_font_palette);

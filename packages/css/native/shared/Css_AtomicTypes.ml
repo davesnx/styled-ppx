@@ -2631,3 +2631,12 @@ module FontVariantCaps = struct
     | `unicase -> {js|unicase|js}
     | `titlingCaps -> {js|titling-caps|js}
 end
+
+module FontOpticalSizing = struct
+  type nonrec t =
+    [ `auto
+    | `none
+    ]
+
+  let toString x = match x with `auto -> {js|auto|js} | `none -> {js|none|js}
+end

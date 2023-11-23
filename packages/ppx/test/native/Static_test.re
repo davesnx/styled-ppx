@@ -778,6 +778,16 @@ let properties_static_css_tests = [
     [%expr [%css "font-variant-caps: unicase"]],
     [%expr CssJs.fontVariantCaps(`unicase)],
   ),
+  (
+    [%css "font-optical-sizing: none"],
+    [%expr [%css "font-optical-sizing: none"]],
+    [%expr CssJs.fontOpticalSizing(`none)],
+  ),
+  (
+    [%css "font-optical-sizing: auto"],
+    [%expr [%css "font-optical-sizing: auto"]],
+    [%expr CssJs.fontOpticalSizing(`auto)],
+  ),
   // unsupported
   /* (
        [%css "-moz-text-blink: blink"],
