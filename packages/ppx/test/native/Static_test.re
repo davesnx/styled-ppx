@@ -447,6 +447,16 @@ let properties_static_css_tests = [
     [%expr CssJs.textAlign(`justifyAll)],
   ),
   (
+    [%css "text-align-last: center"],
+    [%expr [%css "text-align-last: center"]],
+    [%expr CssJs.textAlignLast(`center)],
+  ),
+  (
+    [%css "text-align-last: match-parent"],
+    [%expr [%css "text-align-last: match-parent"]],
+    [%expr CssJs.textAlignLast(`matchParent)],
+  ),
+  (
     [%css "word-spacing: normal"],
     [%expr [%css "word-spacing: normal"]],
     [%expr CssJs.wordSpacing(`normal)],

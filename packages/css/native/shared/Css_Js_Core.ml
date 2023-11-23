@@ -971,6 +971,14 @@ let textAlign x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
+let textAlignLast x =
+  D
+    ( {js|textAlignLast|js},
+      match x with
+      | #TextAlignLast.t as tal -> TextAlignLast.toString tal
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c )
+
 let textDecorationColor x =
   D
     ( {js|text-decoration-color|js},

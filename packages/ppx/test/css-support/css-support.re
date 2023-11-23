@@ -716,14 +716,14 @@
 /* [%css {|text-align-all: center|}]; */
 /* [%css {|text-align-all: justify|}]; */
 /* [%css {|text-align-all: match-parent|}]; */
-/* [%css {|text-align-last: auto|}]; */
-/* [%css {|text-align-last: start|}]; */
-/* [%css {|text-align-last: end|}]; */
-/* [%css {|text-align-last: left|}]; */
-/* [%css {|text-align-last: right|}]; */
-/* [%css {|text-align-last: center|}]; */
-/* [%css {|text-align-last: justify|}]; */
-/* [%css {|text-align-last: match-parent|}]; */
+[%css {|text-align-last: auto|}];
+[%css {|text-align-last: start|}];
+[%css {|text-align-last: end|}];
+[%css {|text-align-last: left|}];
+[%css {|text-align-last: right|}];
+[%css {|text-align-last: center|}];
+[%css {|text-align-last: justify|}];
+[%css {|text-align-last: match-parent|}];
 [%css {|text-justify: auto|}];
 [%css {|text-justify: none|}];
 [%css {|text-justify: inter-word|}];

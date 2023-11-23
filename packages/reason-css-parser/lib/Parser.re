@@ -1555,7 +1555,7 @@ and property_text_align = [%value.rec
   "'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | 'match-parent' | 'justify-all'"
 ]
 and property_text_align_last = [%value.rec
-  "'auto' | 'start' | 'end' | 'left' | 'right' | 'center' | 'justify'"
+  "'auto' | 'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | 'match-parent'"
 ]
 and property_text_anchor = [%value.rec "'start' | 'middle' | 'end'"]
 and property_text_combine_upright = [%value.rec

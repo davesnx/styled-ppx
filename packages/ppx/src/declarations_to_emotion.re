@@ -1965,7 +1965,10 @@ let word_wrap =
 let text_align =
   variants(Parser.property_text_align, (~loc) => [%expr CssJs.textAlign]);
 // let text_align_all = unsupportedProperty(Parser.property_text_align_all);
-let text_align_last = unsupportedProperty(Parser.property_text_align_last);
+let text_align_last =
+  variants(Parser.property_text_align_last, (~loc) =>
+    [%expr CssJs.textAlignLast]
+  );
 let text_justify = unsupportedProperty(Parser.property_text_justify);
 let word_spacing =
   monomorphic(
