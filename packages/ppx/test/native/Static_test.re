@@ -708,6 +708,26 @@ let properties_static_css_tests = [
     [%expr [%css "overflow-inline: visible"]],
     [%expr CssJs.overflowInline(`visible)],
   ),
+  (
+    [%css "font-synthesis-weight: none"],
+    [%expr [%css "font-synthesis-weight: none"]],
+    [%expr CssJs.fontSynthesisWeight(`none)],
+  ),
+  (
+    [%css "font-synthesis-style: auto"],
+    [%expr [%css "font-synthesis-style: auto"]],
+    [%expr CssJs.fontSynthesisStyle(`auto)],
+  ),
+  (
+    [%css "font-synthesis-small-caps: none"],
+    [%expr [%css "font-synthesis-small-caps: none"]],
+    [%expr CssJs.fontSynthesisSmallCaps(`none)],
+  ),
+  (
+    [%css "font-synthesis-position: auto"],
+    [%expr [%css "font-synthesis-position: auto"]],
+    [%expr CssJs.fontSynthesisPosition(`auto)],
+  ),
   // unsupported
   /* (
        [%css "-moz-text-blink: blink"],

@@ -2219,3 +2219,36 @@ let overflowInline x =
       | #OverflowInline.t as ov -> OverflowInline.toString ov
       | #Var.t as var -> Var.toString var
       | #Cascading.t as c -> Cascading.toString c )
+
+let fontSynthesisWeight x =
+  D
+    ( {js|fontSynthesisWeight|js},
+      match x with
+      | #FontSynthesisWeight.t as fsw -> FontSynthesisWeight.toString fsw
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let fontSynthesisStyle x =
+  D
+    ( {js|fontSynthesisStyle|js},
+      match x with
+      | #FontSynthesisStyle.t as fss -> FontSynthesisStyle.toString fss
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let fontSynthesisSmallCaps x =
+  D
+    ( {js|fontSynthesisSmallCaps|js},
+      match x with
+      | #FontSynthesisSmallCaps.t as fssc ->
+        FontSynthesisSmallCaps.toString fssc
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let fontSynthesisPosition x =
+  D
+    ( {js|fontSynthesisWeight|js},
+      match x with
+      | #FontSynthesisPosition.t as fsp -> FontSynthesisPosition.toString fsp
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )

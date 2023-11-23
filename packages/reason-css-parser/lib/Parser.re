@@ -1076,6 +1076,10 @@ and property_font_style = [%value.rec
   "'normal' | 'italic' | 'oblique' | <interpolation> | [ 'oblique' <extended-angle> ]?"
 ]
 and property_font_synthesis = [%value.rec "'none' | 'weight' || 'style'"]
+and property_font_synthesis_weight = [%value.rec "'auto' | 'none'"]
+and property_font_synthesis_style = [%value.rec "'auto' | 'none'"]
+and property_font_synthesis_small_caps = [%value.rec "'auto' | 'none'"]
+and property_font_synthesis_position = [%value.rec "'auto' | 'none'"]
 and property_font_variant = [%value.rec
   "'normal' | 'none' | 'small-caps' | <common-lig-values> || <discretionary-lig-values> || <historical-lig-values> || <contextual-alt-values> || stylistic( <feature-value-name> ) || 'historical-forms' || styleset( [ <feature-value-name> ]# ) || character-variant( [ <feature-value-name> ]# ) || swash( <feature-value-name> ) || ornaments( <feature-value-name> ) || annotation( <feature-value-name> ) || [ 'small-caps' | 'all-small-caps' | 'petite-caps' | 'all-petite-caps' | 'unicase' | 'titling-caps' ] || <numeric-figure-values> || <numeric-spacing-values> || <numeric-fraction-values> || 'ordinal' || 'slashed-zero' || <east-asian-variant-values> || <east-asian-width-values> || 'ruby' || 'sub' || 'super' || 'text' || 'emoji' || 'unicode'"
 ]
@@ -2724,6 +2728,22 @@ let check_map =
       ("property-font-stretch", check(property_font_stretch)),
       ("property-font-style", check(property_font_style)),
       ("property-font-synthesis", check(property_font_synthesis)),
+      (
+        "property-font-synthesis-weight",
+        check(property_font_synthesis_weight),
+      ),
+      (
+        "property-font-synthesis-style",
+        check(property_font_synthesis_style),
+      ),
+      (
+        "property-font-synthesis-small-caps",
+        check(property_font_synthesis_small_caps),
+      ),
+      (
+        "property-font-synthesis-position",
+        check(property_font_synthesis_position),
+      ),
       ("property-font-variant", check(property_font_variant)),
       (
         "property-font-variant-alternates",

@@ -2114,10 +2114,22 @@ let font_size =
 
 let font_size_adjust = unsupportedProperty(Parser.property_font_size_adjust);
 let font = unsupportedProperty(Parser.property_font);
-// let font_synthesis_weight = unsupportedProperty(Parser.property_font_synthesis_weight);
-// let font_synthesis_style = unsupportedProperty(Parser.property_font_synthesis_style);
-// let font_synthesis_small_caps =
-// unsupportedProperty(Parser.property_font_synthesis_small_caps);
+let font_synthesis_weight =
+  variants(Parser.property_font_synthesis_weight, (~loc) =>
+    [%expr CssJs.fontSynthesisWeight]
+  );
+let font_synthesis_style =
+  variants(Parser.property_font_synthesis_style, (~loc) =>
+    [%expr CssJs.fontSynthesisStyle]
+  );
+let font_synthesis_small_caps =
+  variants(Parser.property_font_synthesis_small_caps, (~loc) =>
+    [%expr CssJs.fontSynthesisSmallCaps]
+  );
+let font_synthesis_position =
+  variants(Parser.property_font_synthesis_position, (~loc) =>
+    [%expr CssJs.fontSynthesisPosition]
+  );
 let font_synthesis = unsupportedProperty(Parser.property_font_synthesis);
 let font_kerning = unsupportedProperty(Parser.property_font_kerning);
 let font_variant_ligatures =
@@ -3681,6 +3693,10 @@ let properties = [
   ("font-stretch", found(font_stretch)),
   ("font-style", found(font_style)),
   ("font-synthesis", found(font_synthesis)),
+  ("font-synthesis-weight", found(font_synthesis_weight)),
+  ("font-synthesis-style", found(font_synthesis_style)),
+  ("font-synthesis-small-caps", found(font_synthesis_small_caps)),
+  ("font-synthesis-position", found(font_synthesis_position)),
   ("font-variant-alternates", found(font_variant_alternates)),
   ("font-variant-caps", found(font_variant_caps)),
   ("font-variant-east-asian", found(font_variant_east_asian)),

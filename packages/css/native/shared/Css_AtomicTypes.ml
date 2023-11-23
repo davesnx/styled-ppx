@@ -2545,3 +2545,39 @@ module OverflowInline = struct
     | `auto -> {js|auto|js}
     | `clip -> {js|clip|js}
 end
+
+module FontSynthesisWeight = struct
+  type nonrec t =
+    [ `auto
+    | `none
+    ]
+
+  let toString x = match x with `auto -> {js|auto|js} | `none -> {js|none|js}
+end
+
+module FontSynthesisStyle = struct
+  type nonrec t =
+    [ `auto
+    | `none
+    ]
+
+  let toString x = match x with `auto -> {js|auto|js} | `none -> {js|none|js}
+end
+
+module FontSynthesisSmallCaps = struct
+  type nonrec t =
+    [ `auto
+    | `none
+    ]
+
+  let toString x = match x with `auto -> {js|auto|js} | `none -> {js|none|js}
+end
+
+module FontSynthesisPosition = struct
+  type nonrec t =
+    [ `auto
+    | `none
+    ]
+
+  let toString x = match x with `auto -> {js|auto|js} | `none -> {js|none|js}
+end

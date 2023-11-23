@@ -972,6 +972,10 @@
 [%css {|font-feature-settings: 'smcp', 'swsh' 2|}];
 
 /* CSS Fonts Module Level 4 */
+[%css {|font-synthesis-weight: none|}];
+[%css {|font-synthesis-style: auto|}];
+[%css {|font-synthesis-small-caps: none|}];
+[%css {|font-synthesis-position: auto|}];
 [%css {|font-size: xxx-large|}];
 [%css {|font-variant: none|}];
 [%css {|font-variant: normal|}];
