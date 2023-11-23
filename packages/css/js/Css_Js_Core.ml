@@ -2148,3 +2148,11 @@ let hyphens x =
       | #Hyphens.t as h -> Hyphens.toString h
       | #Var.t as var -> Var.toString var
       | #Cascading.t as c -> Cascading.toString c )
+
+let textJustify x =
+  D
+    ( {js|textJustify|js},
+      match x with
+      | #TextJustify.t as tj -> TextJustify.toString tj
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )

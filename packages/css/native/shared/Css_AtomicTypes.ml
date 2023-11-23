@@ -2511,3 +2511,19 @@ module Hyphens = struct
     | `manual -> {js|manual|js}
     | `auto -> {js|auto|js}
 end
+
+module TextJustify = struct
+  type nonrec t =
+    [ `auto
+    | `none
+    | `interWord
+    | `interCharacter
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `none -> {js|none|js}
+    | `interWord -> {js|inter-word|js}
+    | `interCharacter -> {js|inter-character|js}
+end

@@ -693,6 +693,16 @@ let properties_static_css_tests = [
     [%expr [%css "hyphens: none"]],
     [%expr CssJs.hyphens(`none)],
   ),
+  (
+    [%css "text-justify: none"],
+    [%expr [%css "text-justify: none"]],
+    [%expr CssJs.textJustify(`none)],
+  ),
+  (
+    [%css "text-justify: inter-word"],
+    [%expr [%css "text-justify: inter-word"]],
+    [%expr CssJs.textJustify(`interWord)],
+  ),
   // unsupported
   /* (
        [%css "-moz-text-blink: blink"],
