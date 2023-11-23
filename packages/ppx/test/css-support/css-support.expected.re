@@ -769,13 +769,13 @@ CssJs.unsafe(
   {js|fontVariantLigatures|js},
   {js|common-ligatures discretionary-ligatures historical-ligatures contextual|js},
 );
-CssJs.unsafe({js|fontVariantCaps|js}, {js|normal|js});
-CssJs.unsafe({js|fontVariantCaps|js}, {js|small-caps|js});
-CssJs.unsafe({js|fontVariantCaps|js}, {js|all-small-caps|js});
-CssJs.unsafe({js|fontVariantCaps|js}, {js|petite-caps|js});
-CssJs.unsafe({js|fontVariantCaps|js}, {js|all-petite-caps|js});
-CssJs.unsafe({js|fontVariantCaps|js}, {js|titling-caps|js});
-CssJs.unsafe({js|fontVariantCaps|js}, {js|unicase|js});
+CssJs.fontVariantCaps(`normal);
+CssJs.fontVariantCaps(`smallCaps);
+CssJs.fontVariantCaps(`allSmallCaps);
+CssJs.fontVariantCaps(`petiteCaps);
+CssJs.fontVariantCaps(`allPetiteCaps);
+CssJs.fontVariantCaps(`titlingCaps);
+CssJs.fontVariantCaps(`unicase);
 CssJs.unsafe({js|fontVariantNumeric|js}, {js|normal|js});
 CssJs.unsafe({js|fontVariantNumeric|js}, {js|lining-nums|js});
 CssJs.unsafe({js|fontVariantNumeric|js}, {js|oldstyle-nums|js});

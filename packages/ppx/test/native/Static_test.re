@@ -743,6 +743,41 @@ let properties_static_css_tests = [
     [%expr [%css "font-variant-position: super"]],
     [%expr CssJs.fontVariantPosition(`super)],
   ),
+  (
+    [%css "font-variant-caps: normal"],
+    [%expr [%css "font-variant-caps: normal"]],
+    [%expr CssJs.fontVariantCaps(`normal)],
+  ),
+  (
+    [%css "font-variant-caps: small-caps"],
+    [%expr [%css "font-variant-caps: small-caps"]],
+    [%expr CssJs.fontVariantCaps(`smallCaps)],
+  ),
+  (
+    [%css "font-variant-caps: all-small-caps"],
+    [%expr [%css "font-variant-caps: all-small-caps"]],
+    [%expr CssJs.fontVariantCaps(`allSmallCaps)],
+  ),
+  (
+    [%css "font-variant-caps: petite-caps"],
+    [%expr [%css "font-variant-caps: petite-caps"]],
+    [%expr CssJs.fontVariantCaps(`petiteCaps)],
+  ),
+  (
+    [%css "font-variant-caps: all-petite-caps"],
+    [%expr [%css "font-variant-caps: all-petite-caps"]],
+    [%expr CssJs.fontVariantCaps(`allPetiteCaps)],
+  ),
+  (
+    [%css "font-variant-caps: titling-caps"],
+    [%expr [%css "font-variant-caps: titling-caps"]],
+    [%expr CssJs.fontVariantCaps(`titlingCaps)],
+  ),
+  (
+    [%css "font-variant-caps: unicase"],
+    [%expr [%css "font-variant-caps: unicase"]],
+    [%expr CssJs.fontVariantCaps(`unicase)],
+  ),
   // unsupported
   /* (
        [%css "-moz-text-blink: blink"],

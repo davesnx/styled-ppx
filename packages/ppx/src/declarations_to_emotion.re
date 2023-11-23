@@ -255,6 +255,11 @@ let variant_to_expression = (~loc) =>
   | `Inter_character => id([%expr `InterCharacter])
   | `Sub => id([%expr `sub])
   | `Super => id([%expr `super])
+  | `All_small_caps => id([%expr `allSmallCaps])
+  | `Petite_caps => id([%expr `petiteCaps])
+  | `All_petite_caps => id([%expr `allPetiteCaps])
+  | `Unicase => id([%expr `unicase])
+  | `Titling_caps => id([%expr `titlingCaps])
   | `FitContent => raise(Unsupported_feature)
   | `Full_width => raise(Unsupported_feature)
   | `Full_size_kana => raise(Unsupported_feature);
@@ -2142,7 +2147,9 @@ let font_variant_position =
     [%expr CssJs.fontVariantPosition]
   );
 let font_variant_caps =
-  unsupportedProperty(Parser.property_font_variant_caps);
+  variants(Parser.property_font_variant_caps, (~loc) =>
+    [%expr CssJs.fontVariantCaps]
+  );
 let font_variant_numeric =
   unsupportedProperty(Parser.property_font_variant_numeric);
 let font_variant_alternates =

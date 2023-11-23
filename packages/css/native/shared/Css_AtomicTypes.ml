@@ -2609,3 +2609,25 @@ module FontVariantPosition = struct
     | `sub -> {js|sub|js}
     | `super -> {js|super|js}
 end
+
+module FontVariantCaps = struct
+  type nonrec t =
+    [ `normal
+    | `smallCaps
+    | `allSmallCaps
+    | `petiteCaps
+    | `allPetiteCaps
+    | `unicase
+    | `titlingCaps
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `smallCaps -> {js|small-caps|js}
+    | `allSmallCaps -> {js|all-small-caps|js}
+    | `petiteCaps -> {js|petite-caps|js}
+    | `allPetiteCaps -> {js|all-petite-caps|js}
+    | `unicase -> {js|unicase|js}
+    | `titlingCaps -> {js|titling-caps|js}
+end

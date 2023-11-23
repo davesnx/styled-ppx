@@ -2213,3 +2213,11 @@ let fontVariantPosition x =
       | #FontVariantPosition.t as fvp -> FontVariantPosition.toString fvp
       | #Var.t as var -> Var.toString var
       | #Cascading.t as c -> Cascading.toString c )
+
+let fontVariantCaps x =
+  D
+    ( {js|fontVariantCaps|js},
+      match x with
+      | #FontVariantCaps.t as fvc -> FontVariantCaps.toString fvc
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
