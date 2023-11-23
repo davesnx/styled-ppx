@@ -2581,3 +2581,17 @@ module FontSynthesisPosition = struct
 
   let toString x = match x with `auto -> {js|auto|js} | `none -> {js|none|js}
 end
+
+module FontKerning = struct
+  type nonrec t =
+    [ `auto
+    | `none
+    | `normal
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `none -> {js|none|js}
+    | `normal -> {js|normal|js}
+end

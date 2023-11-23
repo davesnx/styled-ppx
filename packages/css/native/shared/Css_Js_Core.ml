@@ -2252,3 +2252,11 @@ let fontSynthesisPosition x =
       | #FontSynthesisPosition.t as fsp -> FontSynthesisPosition.toString fsp
       | #Var.t as var -> Var.toString var
       | #Cascading.t as c -> Cascading.toString c )
+
+let fontKerning x =
+  D
+    ( {js|fontKerning|js},
+      match x with
+      | #FontKerning.t as fk -> FontKerning.toString fk
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )

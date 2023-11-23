@@ -2131,7 +2131,8 @@ let font_synthesis_position =
     [%expr CssJs.fontSynthesisPosition]
   );
 let font_synthesis = unsupportedProperty(Parser.property_font_synthesis);
-let font_kerning = unsupportedProperty(Parser.property_font_kerning);
+let font_kerning =
+  variants(Parser.property_font_kerning, (~loc) => [%expr CssJs.fontKerning]);
 let font_variant_ligatures =
   unsupportedProperty(Parser.property_font_variant_ligatures);
 let font_variant_position =
