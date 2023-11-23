@@ -1012,6 +1012,10 @@
 [%css {|font-palette: normal|}];
 [%css {|font-palette: light|}];
 [%css {|font-palette: dark|}];
+[%css {|font-variant-emoji: normal|}];
+[%css {|font-variant-emoji: text|}];
+[%css {|font-variant-emoji: emoji|}];
+[%css {|font-variant-emoji: unicode|}];
 
 /* CSS Writing Modes Level 3 */
 [%css {|direction: ltr|}];

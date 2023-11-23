@@ -788,6 +788,26 @@ let properties_static_css_tests = [
     [%expr [%css "font-optical-sizing: auto"]],
     [%expr CssJs.fontOpticalSizing(`auto)],
   ),
+  (
+    [%css "font-variant-emoji: normal"],
+    [%expr [%css "font-variant-emoji: normal"]],
+    [%expr CssJs.fontVariantEmoji(`normal)],
+  ),
+  (
+    [%css "font-variant-emoji: text"],
+    [%expr [%css "font-variant-emoji: text"]],
+    [%expr CssJs.fontVariantEmoji(`text)],
+  ),
+  (
+    [%css "font-variant-emoji: emoji"],
+    [%expr [%css "font-variant-emoji: emoji"]],
+    [%expr CssJs.fontVariantEmoji(`emoji)],
+  ),
+  (
+    [%css "font-variant-emoji: unicode"],
+    [%expr [%css "font-variant-emoji: unicode"]],
+    [%expr CssJs.fontVariantEmoji(`unicode)],
+  ),
   // unsupported
   /* (
        [%css "-moz-text-blink: blink"],

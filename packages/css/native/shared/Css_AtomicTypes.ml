@@ -2640,3 +2640,19 @@ module FontOpticalSizing = struct
 
   let toString x = match x with `auto -> {js|auto|js} | `none -> {js|none|js}
 end
+
+module FontVariantEmoji = struct
+  type nonrec t =
+    [ `normal
+    | `text
+    | `emoji
+    | `unicode
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `text -> {js|text|js}
+    | `emoji -> {js|emoji|js}
+    | `unicode -> {js|unicode|js}
+end

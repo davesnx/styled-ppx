@@ -260,6 +260,9 @@ let variant_to_expression = (~loc) =>
   | `All_petite_caps => id([%expr `allPetiteCaps])
   | `Unicase => id([%expr `unicase])
   | `Titling_caps => id([%expr `titlingCaps])
+  | `Text => id([%expr `text])
+  | `Emoji => id([%expr `emoji])
+  | `Unicode => id([%expr `unicode])
   | `FitContent => raise(Unsupported_feature)
   | `Full_width => raise(Unsupported_feature)
   | `Full_size_kana => raise(Unsupported_feature);
@@ -2174,7 +2177,10 @@ let font_optical_sizing =
 let font_variation_settings =
   unsupportedProperty(Parser.property_font_variation_settings);
 // let font_palette = unsupportedProperty(Parser.property_font_palette);
-// let font_variant_emoji = unsupportedProperty(Parser.property_font_variant_emoji);
+let font_variant_emoji =
+  variants(Parser.property_font_variant_emoji, (~loc) =>
+    [%expr CssJs.fontVariantEmoji]
+  );
 
 // css-text-decor-3
 let render_text_decoration_line =
@@ -3897,6 +3903,7 @@ let properties = [
   // ("font-synthesis-style", found(font_synthesis_style)),
   // ("font-synthesis-weight", found(font_synthesis_weight)),
   // ("font-variant-emoji", found(font_variant_emoji)),
+  ("font-variant-emoji", found(font_variant_emoji)),
   // ("overflow-clip-margin", found(overflow_clip_margin)),
   // ("text-align-all", found(text_align_all)),
   // ("text-decoration-skip-box", found(text_decoration_skip_box)),

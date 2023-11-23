@@ -2229,3 +2229,11 @@ let fontOpticalSizing x =
       | #FontOpticalSizing.t as fos -> FontOpticalSizing.toString fos
       | #Var.t as var -> Var.toString var
       | #Cascading.t as c -> Cascading.toString c )
+
+let fontVariantEmoji x =
+  D
+    ( {js|fontVariantEmoji|js},
+      match x with
+      | #FontVariantEmoji.t as fve -> FontVariantEmoji.toString fve
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )

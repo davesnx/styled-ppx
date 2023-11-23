@@ -1102,6 +1102,9 @@ and property_font_variant_position = [%value.rec "'normal' | 'sub' | 'super'"]
 and property_font_variation_settings = [%value.rec
   "'normal' | [ <string> <number> ]#"
 ]
+and property_font_variant_emoji = [%value.rec
+  "'normal' | 'text' | 'emoji' | 'unicode'"
+]
 and property_font_weight = [%value.rec
   "<font-weight-absolute> | 'bolder' | 'lighter' | <interpolation>"
 ]
@@ -2722,6 +2725,7 @@ let check_map =
       ),
       ("property-font-optical-sizing", check(property_font_optical_sizing)),
       ("property-font-palette", check(property_font_palette)),
+      ("property-font-variant-emoji", check(property_font_variant_emoji)),
       ("property-font-size", check(property_font_size)),
       ("property-font-size-adjust", check(property_font_size_adjust)),
       ("property-font-smooth", check(property_font_smooth)),
