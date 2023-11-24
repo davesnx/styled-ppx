@@ -5,17 +5,23 @@ module Cascading = struct
     [ `initial
     | `inherit_
     | `unset
+    | `revert
+    | `revert_layer
     ]
 
   let initial = `initial
   let inherit_ = `inherit_
   let unset = `unset
+  let revert = `revert
+  let revert_layer = `revert_layer
 
   let toString x =
     match x with
     | `initial -> {js|initial|js}
     | `inherit_ -> {js|inherit|js}
     | `unset -> {js|unset|js}
+    | `revert -> {js|revert|js}
+    | `revert_layer -> {js|revert-layer|js}
 end
 
 module Var = struct

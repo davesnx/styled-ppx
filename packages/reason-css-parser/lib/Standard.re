@@ -158,6 +158,8 @@ let css_wide_keywords =
     value(`Initial, keyword("initial")),
     value(`Inherit, keyword("inherit")),
     value(`Unset, keyword("unset")),
+    value(`Revert, keyword("revert")),
+    value(`RevertLayer, keyword("revert-layer")),
   ]);
 
 // TODO: proper implement
