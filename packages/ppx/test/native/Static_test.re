@@ -808,6 +808,31 @@ let properties_static_css_tests = [
     [%expr [%css "font-variant-emoji: unicode"]],
     [%expr CssJs.fontVariantEmoji(`unicode)],
   ),
+  (
+    [%css "text-decoration-skip-ink: auto"],
+    [%expr [%css "text-decoration-skip-ink: auto"]],
+    [%expr CssJs.textDecorationSkipInk(`auto)],
+  ),
+  (
+    [%css "text-decoration-skip-ink: none"],
+    [%expr [%css "text-decoration-skip-ink: none"]],
+    [%expr CssJs.textDecorationSkipInk(`none)],
+  ),
+  (
+    [%css "text-decoration-skip-ink: all"],
+    [%expr [%css "text-decoration-skip-ink: all"]],
+    [%expr CssJs.textDecorationSkipInk(`all)],
+  ),
+  (
+    [%css "text-decoration-skip-box: none"],
+    [%expr [%css "text-decoration-skip-box: none"]],
+    [%expr CssJs.textDecorationSkipBox(`none)],
+  ),
+  (
+    [%css "text-decoration-skip-box: all"],
+    [%expr [%css "text-decoration-skip-box: all"]],
+    [%expr CssJs.textDecorationSkipBox(`all)],
+  ),
   // unsupported
   /* (
        [%css "-moz-text-blink: blink"],

@@ -712,8 +712,11 @@ CssJs.unsafe(
 CssJs.unsafe({js|textDecorationSkip|js}, {js|edges|js});
 CssJs.unsafe({js|textDecorationSkip|js}, {js|edges box-decoration|js});
 CssJs.unsafe({js|textDecorationSkip|js}, {js|box-decoration|js});
-CssJs.unsafe({js|textDecorationSkipInk|js}, {js|none|js});
-CssJs.unsafe({js|textDecorationSkipInk|js}, {js|auto|js});
+CssJs.textDecorationSkipInk(`none);
+CssJs.textDecorationSkipInk(`auto);
+CssJs.textDecorationSkipInk(`all);
+CssJs.textDecorationSkipBox(`none);
+CssJs.textDecorationSkipBox(`all);
 CssJs.unsafe({js|textUnderlineOffset|js}, {js|auto|js});
 CssJs.unsafe({js|textUnderlineOffset|js}, {js|3px|js});
 CssJs.unsafe({js|textUnderlineOffset|js}, {js|10%|js});

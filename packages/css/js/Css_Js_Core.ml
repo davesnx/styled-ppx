@@ -1046,6 +1046,22 @@ let textDecorationThickness x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
+let textDecorationSkipInk x =
+  D
+    ( {js|textDecorationSkipInk|js},
+      match x with
+      | #TextDecorationSkipInk.t as tdsi -> TextDecorationSkipInk.toString tdsi
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c )
+
+let textDecorationSkipBox x =
+  D
+    ( {js|textDecorationSkipBox|js},
+      match x with
+      | #TextDecorationSkipBox.t as tdsb -> TextDecorationSkipBox.toString tdsb
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c )
+
 let textIndent x =
   D
     ( {js|textIndent|js},

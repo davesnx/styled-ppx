@@ -1960,6 +1960,29 @@ module TextDecorationThickness = struct
     match x with `fromFont -> {js|from-font|js} | `auto -> {js|auto|js}
 end
 
+module TextDecorationSkipInk = struct
+  type nonrec t =
+    [ `auto
+    | `none
+    | `all
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `none -> {js|none|js}
+    | `all -> {js|all|js}
+end
+
+module TextDecorationSkipBox = struct
+  type nonrec t =
+    [ `none
+    | `all
+    ]
+
+  let toString x = match x with `none -> {js|none|js} | `all -> {js|all|js}
+end
+
 module Width = struct
   type nonrec t =
     [ `auto

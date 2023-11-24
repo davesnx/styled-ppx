@@ -263,6 +263,7 @@ let variant_to_expression = (~loc) =>
   | `Text => id([%expr `text])
   | `Emoji => id([%expr `emoji])
   | `Unicode => id([%expr `unicode])
+  | `All => id([%expr `all])
   | `FitContent => raise(Unsupported_feature)
   | `Full_width => raise(Unsupported_feature)
   | `Full_size_kana => raise(Unsupported_feature);
@@ -2284,13 +2285,17 @@ let text_decoration_skip =
   unsupportedProperty(Parser.property_text_decoration_skip);
 // let text_decoration_skip_self =
 //   unsupportedProperty(Parser.property_text_decoration_skip_self);
-// let text_decoration_skip_box = unsupportedProperty(Parser.property_text_decoration_skip_box);
-// let text_decoration_skip_inset =
+let text_decoration_skip_box =
+  variants(Parser.property_text_decoration_skip_box, (~loc) =>
+    [%expr CssJs.textDecorationSkipBox]
+  ); // let text_decoration_skip_inset =
 //   unsupportedProperty(Parser.property_text_decoration_skip_inset);
 // let text_decoration_skip_spaces =
 //   unsupportedProperty(Parser.property_text_decoration_skip_spaces);
 let text_decoration_skip_ink =
-  unsupportedProperty(Parser.property_text_decoration_skip_ink);
+  variants(Parser.property_text_decoration_skip_ink, (~loc) =>
+    [%expr CssJs.textDecorationSkipInk]
+  );
 let text_emphasis_style =
   monomorphic(
     Parser.property_text_emphasis_style,
@@ -3907,6 +3912,7 @@ let properties = [
   // ("overflow-clip-margin", found(overflow_clip_margin)),
   // ("text-align-all", found(text_align_all)),
   // ("text-decoration-skip-box", found(text_decoration_skip_box)),
+  ("text-decoration-skip-box", found(text_decoration_skip_box)),
   // ("text-decoration-skip-inset", found(text_decoration_skip_inset)),
   // ("text-decoration-skip-self", found(text_decoration_skip_self)),
   // ("text-decoration-skip-spaces", found(text_decoration_skip_spaces)),
