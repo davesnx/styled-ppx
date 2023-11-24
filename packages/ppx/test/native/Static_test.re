@@ -447,6 +447,26 @@ let properties_static_css_tests = [
     [%expr CssJs.textAlign(`justifyAll)],
   ),
   (
+    [%css "text-align-all: start"],
+    [%expr [%css "text-align-all: start"]],
+    [%expr CssJs.textAlignAll(`start)],
+  ),
+  (
+    [%css "text-align-all: left"],
+    [%expr [%css "text-align-all: left"]],
+    [%expr CssJs.textAlignAll(`left)],
+  ),
+  (
+    [%css "text-align-all: end"],
+    [%expr [%css "text-align-all: end"]],
+    [%expr CssJs.textAlignAll(`end_)],
+  ),
+  (
+    [%css "text-align-all: match-parent"],
+    [%expr [%css "text-align-all: match-parent"]],
+    [%expr CssJs.textAlignAll(`matchParent)],
+  ),
+  (
     [%css "word-spacing: normal"],
     [%expr [%css "word-spacing: normal"]],
     [%expr CssJs.wordSpacing(`normal)],

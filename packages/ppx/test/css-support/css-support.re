@@ -709,13 +709,13 @@
 [%css {|text-align: justify|}];
 [%css {|text-align: match-parent|}];
 [%css {|text-align: justify-all|}];
-/* [%css {|text-align-all: start|}]; */
-/* [%css {|text-align-all: end|}]; */
-/* [%css {|text-align-all: left|}]; */
-/* [%css {|text-align-all: right|}]; */
-/* [%css {|text-align-all: center|}]; */
-/* [%css {|text-align-all: justify|}]; */
-/* [%css {|text-align-all: match-parent|}]; */
+[%css {|text-align-all: start|}];
+[%css {|text-align-all: end|}];
+[%css {|text-align-all: left|}];
+[%css {|text-align-all: right|}];
+[%css {|text-align-all: center|}];
+[%css {|text-align-all: justify|}];
+[%css {|text-align-all: match-parent|}];
 /* [%css {|text-align-last: auto|}]; */
 /* [%css {|text-align-last: start|}]; */
 /* [%css {|text-align-last: end|}]; */
@@ -2307,8 +2307,6 @@
 [%css {|float: inline-end|}];
 [%css {|clear: inline-start|}];
 [%css {|clear: inline-end|}];
-[%css {|text-align: start|}];
-[%css {|text-align: end|}];
 [%css {|resize: block|}];
 [%css {|resize: inline|}];
 [%css {|block-size: 100px|}];
