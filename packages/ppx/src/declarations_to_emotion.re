@@ -2288,8 +2288,11 @@ let text_decoration_skip =
 let text_decoration_skip_box =
   variants(Parser.property_text_decoration_skip_box, (~loc) =>
     [%expr CssJs.textDecorationSkipBox]
-  ); // let text_decoration_skip_inset =
-//   unsupportedProperty(Parser.property_text_decoration_skip_inset);
+  );
+let text_decoration_skip_inset =
+  variants(Parser.property_text_decoration_skip_inset, (~loc) =>
+    [%expr CssJs.textDecorationSkipInset]
+  );
 // let text_decoration_skip_spaces =
 //   unsupportedProperty(Parser.property_text_decoration_skip_spaces);
 let text_decoration_skip_ink =
@@ -3913,7 +3916,7 @@ let properties = [
   // ("text-align-all", found(text_align_all)),
   // ("text-decoration-skip-box", found(text_decoration_skip_box)),
   ("text-decoration-skip-box", found(text_decoration_skip_box)),
-  // ("text-decoration-skip-inset", found(text_decoration_skip_inset)),
+  ("text-decoration-skip-inset", found(text_decoration_skip_inset)),
   // ("text-decoration-skip-self", found(text_decoration_skip_self)),
   // ("text-decoration-skip-spaces", found(text_decoration_skip_spaces)),
   // ("text-emphasis-skip", found(text_emphasis_skip)),

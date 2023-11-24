@@ -833,6 +833,16 @@ let properties_static_css_tests = [
     [%expr [%css "text-decoration-skip-box: all"]],
     [%expr CssJs.textDecorationSkipBox(`all)],
   ),
+  (
+    [%css "text-decoration-skip-inset: none"],
+    [%expr [%css "text-decoration-skip-inset: none"]],
+    [%expr CssJs.textDecorationSkipInset(`none)],
+  ),
+  (
+    [%css "text-decoration-skip-inset: auto"],
+    [%expr [%css "text-decoration-skip-inset: auto"]],
+    [%expr CssJs.textDecorationSkipInset(`auto)],
+  ),
   // unsupported
   /* (
        [%css "-moz-text-blink: blink"],

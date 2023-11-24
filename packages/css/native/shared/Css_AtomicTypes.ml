@@ -1983,6 +1983,15 @@ module TextDecorationSkipBox = struct
   let toString x = match x with `none -> {js|none|js} | `all -> {js|all|js}
 end
 
+module TextDecorationSkipInset = struct
+  type nonrec t =
+    [ `none
+    | `auto
+    ]
+
+  let toString x = match x with `none -> {js|none|js} | `auto -> {js|auto|js}
+end
+
 module Width = struct
   type nonrec t =
     [ `auto

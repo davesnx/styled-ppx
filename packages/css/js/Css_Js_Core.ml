@@ -1062,6 +1062,15 @@ let textDecorationSkipBox x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
+let textDecorationSkipInset x =
+  D
+    ( {js|textDecorationSkipInset|js},
+      match x with
+      | #TextDecorationSkipInset.t as tdsi ->
+        TextDecorationSkipInset.toString tdsi
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c )
+
 let textIndent x =
   D
     ( {js|textIndent|js},

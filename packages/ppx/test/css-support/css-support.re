@@ -862,6 +862,8 @@
 [%css {|text-decoration-skip-ink: all|}];
 [%css {|text-decoration-skip-box: none|}];
 [%css {|text-decoration-skip-box: all|}];
+[%css {|text-decoration-skip-inset: none|}];
+[%css {|text-decoration-skip-inset: auto|}];
 [%css {|text-underline-offset: auto|}];
 [%css {|text-underline-offset: 3px|}];
 [%css {|text-underline-offset: 10%|}];

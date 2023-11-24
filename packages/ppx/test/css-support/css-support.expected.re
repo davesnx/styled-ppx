@@ -717,6 +717,8 @@ CssJs.textDecorationSkipInk(`auto);
 CssJs.textDecorationSkipInk(`all);
 CssJs.textDecorationSkipBox(`none);
 CssJs.textDecorationSkipBox(`all);
+CssJs.textDecorationSkipInset(`none);
+CssJs.textDecorationSkipInset(`auto);
 CssJs.unsafe({js|textUnderlineOffset|js}, {js|auto|js});
 CssJs.unsafe({js|textUnderlineOffset|js}, {js|3px|js});
 CssJs.unsafe({js|textUnderlineOffset|js}, {js|10%|js});
