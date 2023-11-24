@@ -6,6 +6,11 @@ let testData = list{
     %cx("@media (min-width: 30em) { color: brown; }"),
     CssJs.style([CssJs.media("(min-width: 30em)", [CssJs.color(CssJs.brown)])]),
   ),
+  (%cx("text-transform: initial"), CssJs.style([CssJs.textTransform(#initial)])),
+  (%cx("text-transform: unset"), CssJs.style([CssJs.textTransform(#unset)])),
+  (%cx("text-transform: inherit"), CssJs.style([CssJs.textTransform(#inherit_)])),
+  (%cx("text-transform: revert"), CssJs.style([CssJs.textTransform(#revert)])),
+  (%cx("text-transform: revert-layer"), CssJs.style([CssJs.textTransform(#revert_layer)])),
 }
 
 describe("cx", () => {
