@@ -1142,7 +1142,12 @@ let transformOrigin3d x y z =
       ^ Length.toString z
       ^ {js| |js} )
 
-let transformBox x = D ({js|transform-box|js}, TransformBox.toString x)
+let transformBox x =
+  D
+    ( {js|transform-box|js},
+      match x with
+      | #TransformBox.t as tb -> TransformBox.toString tb
+      | #Cascading.t as c -> Cascading.toString c )
 
 let explode s =
   let rec exp i l = if i < 0 then l else exp (i - 1) (s.[i] :: l) in

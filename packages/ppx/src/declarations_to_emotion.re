@@ -264,6 +264,9 @@ let variant_to_expression = (~loc) =>
   | `Emoji => id([%expr `emoji])
   | `Unicode => id([%expr `unicode])
   | `All => id([%expr `all])
+  | `Fill_box => id([%expr `fillBox])
+  | `Stroke_box => id([%expr `strokeBox])
+  | `View_box => id([%expr `viewBox])
   | `FitContent => raise(Unsupported_feature)
   | `Full_width => raise(Unsupported_feature)
   | `Full_size_kana => raise(Unsupported_feature);
@@ -2554,7 +2557,10 @@ let transform_origin =
     | `Extended_length(_)
     | `Extended_percentage(_) => raise(Unsupported_feature)
   );
-let transform_box = unsupportedProperty(Parser.property_transform_box);
+let transform_box =
+  variants(Parser.property_transform_box, (~loc) =>
+    [%expr CssJs.transformBox]
+  );
 let translate =
   unsupportedValue(Parser.property_translate, (~loc) =>
     [%expr CssJs.translate]

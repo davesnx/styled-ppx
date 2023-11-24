@@ -551,6 +551,8 @@
 [%css {|transform-box: border-box|}];
 [%css {|transform-box: fill-box|}];
 [%css {|transform-box: view-box|}];
+[%css {|transform-box: content-box|}];
+[%css {|transform-box: stroke-box|}];
 
 /* CSS Transforms Module Level 2 */
 [%css {|translate: none|}];

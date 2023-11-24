@@ -1123,7 +1123,13 @@ let transformOrigin3d x y z =
       ^ Length.toString z
       ^ {js| |js} )
 
-let transformBox x = D ({js|transformBox|js}, TransformBox.toString x)
+let transformBox x =
+  D
+    ( {js|transform-box|js},
+      match x with
+      | #TransformBox.t as tb -> TransformBox.toString tb
+      | #Cascading.t as c -> Cascading.toString c )
+
 let unsafe property value = D (property, value)
 
 let userSelect x =

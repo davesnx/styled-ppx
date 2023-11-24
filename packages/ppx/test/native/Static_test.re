@@ -843,6 +843,31 @@ let properties_static_css_tests = [
     [%expr [%css "text-decoration-skip-inset: auto"]],
     [%expr CssJs.textDecorationSkipInset(`auto)],
   ),
+  (
+    [%css "transform-box: content-box"],
+    [%expr [%css "transform-box: content-box"]],
+    [%expr CssJs.transformBox(`contentBox)],
+  ),
+  (
+    [%css "transform-box: border-box"],
+    [%expr [%css "transform-box: border-box"]],
+    [%expr CssJs.transformBox(`borderBox)],
+  ),
+  (
+    [%css "transform-box: fill-box"],
+    [%expr [%css "transform-box: fill-box"]],
+    [%expr CssJs.transformBox(`fillBox)],
+  ),
+  (
+    [%css "transform-box: stroke-box"],
+    [%expr [%css "transform-box: stroke-box"]],
+    [%expr CssJs.transformBox(`strokeBox)],
+  ),
+  (
+    [%css "transform-box: view-box"],
+    [%expr [%css "transform-box: view-box"]],
+    [%expr CssJs.transformBox(`viewBox)],
+  ),
   // unsupported
   /* (
        [%css "-moz-text-blink: blink"],
