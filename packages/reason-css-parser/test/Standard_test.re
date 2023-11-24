@@ -389,6 +389,8 @@ let tests = [
         | `Initial => "initial"
         | `Inherit => "inherit"
         | `Unset => "unset"
+        | `Revert => "revert"
+        | `RevertLayer => "revert-layer"
         };
       };
       let pp_css_wide_keywords = (ppf, x) =>
@@ -415,13 +417,27 @@ let tests = [
         parse("unset"),
         Ok(`Unset),
       );
+      check(
+        __POS__,
+        result(css_wide_keywords, Alcotest.string),
+        "",
+        parse("revert"),
+        Ok(`Revert),
+      );
+      check(
+        __POS__,
+        result(css_wide_keywords, Alcotest.string),
+        "",
+        parse("revert-layer"),
+        Ok(`RevertLayer),
+      );
       /* TODO: combine_xor should combine the error messages */
       check(
         __POS__,
         result(css_wide_keywords, Alcotest.string),
         "",
         parse("nope"),
-        Error("Expected 'ident unset' but instead got ident nope"),
+        Error("Expected 'ident revert-layer' but instead got ident nope"),
       );
     },
   ),

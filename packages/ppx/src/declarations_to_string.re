@@ -217,6 +217,8 @@ let render_css_global_values = (name, value) => {
     | `Inherit => [%expr "inherit"]
     | `Initial => [%expr "initial"]
     | `Unset => [%expr "unset"]
+    | `Revert => [%expr "revert"]
+    | `RevertLayer => [%expr "revert-layer"]
     };
 
   /* bs-css doesn't have those */

@@ -156,6 +156,8 @@ let render_css_global_values = (~loc, name, value) => {
     | `Inherit => "inherit"
     | `Initial => "initial"
     | `Unset => "unset"
+    | `Revert => "revert"
+    | `RevertLayer => "revert-layer"
     };
 
   /* bs-css doesn't have those */
