@@ -639,7 +639,7 @@ CssJs.unsafe({js|textEmphasisStyle|js}, {js|triangle|js});
 CssJs.unsafe({js|textEmphasisStyle|js}, {js|sesame|js});
 CssJs.unsafe({js|textEmphasisStyle|js}, {js|open dot|js});
 CssJs.unsafe({js|textEmphasisStyle|js}, {js|'foo'|js});
-CssJs.unsafe({js|textEmphasisColor|js}, {js|green|js});
+CssJs.textEmphasisColor(CssJs.green);
 CssJs.unsafe({js|textEmphasis|js}, {js|open dot green|js});
 CssJs.unsafe({js|textEmphasisPosition|js}, {js|over left|js});
 CssJs.unsafe({js|textEmphasisPosition|js}, {js|over right|js});
