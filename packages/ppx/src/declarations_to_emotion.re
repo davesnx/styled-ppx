@@ -2271,9 +2271,37 @@ let text_emphasis_color =
     (~loc) => [%expr CssJs.textEmphasisColor],
     render_color,
   );
+
 let text_emphasis = unsupportedProperty(Parser.property_text_emphasis);
 let text_emphasis_position =
-  unsupportedProperty(Parser.property_text_emphasis_position);
+  monomorphic(
+    Parser.property_text_emphasis_position,
+    (~loc) => [%expr CssJs.textEmphasisPosition],
+    (~loc, value: Types.property_text_emphasis_position) => {
+      let render_position_left_right = (~loc) => {
+        fun
+        | `Left => [%expr `left]
+        | `Right => [%expr `right];
+      };
+
+      let render_over_or_under = (~loc) => {
+        fun
+        | `Over => [%expr `over]
+        | `Under => [%expr `under];
+      };
+      switch (value) {
+      | (`Over, None) => [%expr `over]
+      | (`Under, None) => [%expr `under]
+      | (y, Some(position)) =>
+        [%expr
+         `yx((
+           [%e render_over_or_under(~loc, y)],
+           [%e render_position_left_right(~loc, position)],
+         ))]
+      };
+    },
+  );
+
 // let text_emphasis_skip = unsupportedProperty(Parser.property_text_emphasis_skip);
 
 let render_text_shadow = (~loc, shadow) => {
