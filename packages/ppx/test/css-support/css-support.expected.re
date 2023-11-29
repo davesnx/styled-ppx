@@ -649,8 +649,14 @@ CssJs.textEmphasisStyle(`textEmphasisStyleXY((`open_, `dot)));
 CssJs.textEmphasisStyle(`string({js|foo|js}));
 CssJs.textEmphasisColor(CssJs.green);
 CssJs.unsafe({js|textEmphasis|js}, {js|open dot green|js});
+[%ocaml.error
+  "Property 'text-emphasis-position' has an invalid value: 'left'"
+];
+CssJs.textEmphasisPosition(`over);
+CssJs.textEmphasisPosition(`under);
 CssJs.textEmphasisPosition(`yx((`over, `left)));
 CssJs.textEmphasisPosition(`yx((`over, `right)));
+CssJs.textEmphasisPosition(`yx((`under, `left)));
 CssJs.textEmphasisPosition(`yx((`under, `left)));
 CssJs.textEmphasisPosition(`yx((`under, `right)));
 CssJs.textShadow(`none);

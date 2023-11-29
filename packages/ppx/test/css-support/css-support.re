@@ -817,9 +817,13 @@
 [%css {|text-emphasis-style: 'foo'|}];
 [%css {|text-emphasis-color: green|}];
 [%css {|text-emphasis: open dot green|}];
+[%css {|text-emphasis-position: left|}];
+[%css {|text-emphasis-position: over|}];
+[%css {|text-emphasis-position: under|}];
 [%css {|text-emphasis-position: over left|}];
 [%css {|text-emphasis-position: over right|}];
 [%css {|text-emphasis-position: under left|}];
+[%css {|text-emphasis-position: left under|}];
 [%css {|text-emphasis-position: under right|}];
 [%css {|text-shadow: none|}];
 /* The following shadow declarations are not supported in the CSS Parser */

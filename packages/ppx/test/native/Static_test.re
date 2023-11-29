@@ -649,6 +649,26 @@ let properties_static_css_tests = [
     [%expr [%css "text-emphasis-style:  sesame open"]],
     [%expr CssJs.textEmphasisStyle(`textEmphasisStyleXY((`open_, `sesame)))],
   ),
+  (
+    [%css "text-emphasis-position: over"],
+    [%expr [%css "text-emphasis-position: over"]],
+    [%expr CssJs.textEmphasisPosition(`over)],
+  ),
+  (
+    [%css "text-emphasis-position: under"],
+    [%expr [%css "text-emphasis-position: under"]],
+    [%expr CssJs.textEmphasisPosition(`under)],
+  ),
+  (
+    [%css "text-emphasis-position: over left"],
+    [%expr [%css "text-emphasis-position: over left"]],
+    [%expr CssJs.textEmphasisPosition(`yx((`over, `left)))],
+  ),
+  (
+    [%css "text-emphasis-position: left over"],
+    [%expr [%css "text-emphasis-position: left over"]],
+    [%expr CssJs.textEmphasisPosition(`yx((`over, `left)))],
+  ),
   // unsupported
   /* (
        [%css "-moz-text-blink: blink"],
