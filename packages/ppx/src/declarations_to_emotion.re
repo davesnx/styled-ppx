@@ -2327,8 +2327,7 @@ let text_emphasis_position =
         | `Under => [%expr `under];
       };
       switch (value) {
-      | (`Over, None) => [%expr `over]
-      | (`Under, None) => [%expr `under]
+      | (y, None) => [%expr [%e render_over_or_under(~loc, y)]]
       | (y, Some(position)) =>
         [%expr
          `yx((
