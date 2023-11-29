@@ -1589,7 +1589,7 @@ and property_text_emphasis = [%value.rec
 ]
 and property_text_emphasis_color = [%value.rec "<color>"]
 and property_text_emphasis_position = [%value.rec
-  "[ 'over' | 'under' ] && [ 'right' | 'left' ]"
+  "[ 'over' | 'under' ] && [ 'right' | 'left' ]?"
 ]
 and property_text_emphasis_style = [%value.rec
   "'none' | [ 'filled' | 'open' ] || [ 'dot' | 'circle' | 'double-circle' | 'triangle' | 'sesame' ] | <string>"

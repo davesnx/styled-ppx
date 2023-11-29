@@ -1218,6 +1218,28 @@ module TextEmphasisStyle = struct
     | `string s -> s
 end
 
+module TextEmphasisPosition = struct
+  module LeftRightAlignment = struct
+    type nonrec t =
+      [ `left
+      | `right
+      ]
+
+    let toString x =
+      match x with `left -> {js|left|js} | `right -> {js|right|js}
+  end
+
+  module OverOrUnder = struct
+    type nonrec t =
+      [ `over
+      | `under
+      ]
+
+    let toString x =
+      match x with `over -> {js|over|js} | `under -> {js|under|js}
+  end
+end
+
 module PositionalAlignment = struct
   type nonrec t =
     [ `center

@@ -667,6 +667,29 @@ let textEmphasisStyle x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
+let textEmphasisPosition x =
+  D
+    ( {js|textEmphasisPosition|js},
+      match x with
+      | #TextEmphasisPosition.OverOrUnder.t as ou ->
+        TextEmphasisPosition.OverOrUnder.toString ou
+      | `yx (y, x) ->
+        (match y with
+        | #TextEmphasisPosition.OverOrUnder.t as ou ->
+          TextEmphasisPosition.OverOrUnder.toString ou
+        | #Var.t as va -> Var.toString va
+        | #Cascading.t as c ->
+          Cascading.toString c
+          ^ {js| |js}
+          ^
+          (match x with
+          | #TextEmphasisPosition.LeftRightAlignment.t as lr ->
+            TextEmphasisPosition.LeftRightAlignment.toString lr
+          | #Var.t as va -> Var.toString va
+          | #Cascading.t as c -> Cascading.toString c))
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c )
+
 let justifyContent x =
   D
     ( {js|justifyContent|js},
