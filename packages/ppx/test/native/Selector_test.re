@@ -17,7 +17,7 @@ let simple_tests = [
     ],
   ),
   (
-    ":before { content: '点'; }",
+    ":before { content: '•'; }",
     [%expr [%cx ":before { content: '•'; }"]],
     [%expr
       CssJs.style([|
