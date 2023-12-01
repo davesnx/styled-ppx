@@ -625,6 +625,26 @@ let properties_static_css_tests = [
     [%expr [%css "text-emphasis-color: transparent"]],
     [%expr CssJs.textEmphasisColor(`transparent)],
   ),
+  (
+    [%css "text-emphasis-style: 'foo'"],
+    [%expr [%css "text-emphasis-style: 'foo'"]],
+    [%expr CssJs.textEmphasisStyle(`string({js|foo|js}))],
+  ),
+  (
+    [%css "text-emphasis-style: open"],
+    [%expr [%css "text-emphasis-style: open"]],
+    [%expr CssJs.textEmphasisStyle(`open_)],
+  ),
+  (
+    [%css "text-emphasis-style: filled double-circle"],
+    [%expr [%css "text-emphasis-style:  filled double-circle"]],
+    [%expr CssJs.textEmphasisStyle(`xy((`filled, `double_circle)))],
+  ),
+  (
+    [%css "text-emphasis-style: sesame open"],
+    [%expr [%css "text-emphasis-style:  sesame open"]],
+    [%expr CssJs.textEmphasisStyle(`xy((`open_, `sesame)))],
+  ),
   // unsupported
   /* (
        [%css "-moz-text-blink: blink"],
