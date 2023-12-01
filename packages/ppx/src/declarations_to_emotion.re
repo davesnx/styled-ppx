@@ -2267,7 +2267,41 @@ let text_decoration_skip =
 let text_decoration_skip_ink =
   unsupportedProperty(Parser.property_text_decoration_skip_ink);
 let text_emphasis_style =
-  unsupportedProperty(Parser.property_text_emphasis_style);
+  monomorphic(
+    Parser.property_text_emphasis_style,
+    (~loc) => [%expr CssJs.textEmphasisStyle],
+    (~loc, value: Types.property_text_emphasis_style) => {
+      let render_filled_or_open = (~loc) => {
+        fun
+        | `Filled => [%expr `filled]
+        | `Open => [%expr `open_];
+      };
+
+      let render_shape = (~loc) => {
+        fun
+        | `Dot => [%expr `dot]
+        | `Circle => [%expr `circle]
+        | `Double_circle => [%expr `double_circle]
+        | `Triangle => [%expr `triangle]
+        | `Sesame => [%expr `sesame];
+      };
+
+      switch (value) {
+      | `Or(Some(x), None) => [%expr [%e render_filled_or_open(~loc, x)]]
+      | `Or(None, Some(y)) => [%expr [%e render_shape(~loc, y)]]
+      | `Or(Some(x), Some(y)) =>
+        [%expr
+         `xy((
+           [%e render_filled_or_open(~loc, x)],
+           [%e render_shape(~loc, y)],
+         ))]
+      | `Or(None, None)
+      | `None => [%expr `none]
+      | `String(str) => [%expr `string([%e render_string(~loc, str)])]
+      };
+    },
+  );
+
 let text_emphasis_color =
   monomorphic(
     Parser.property_text_emphasis_color,

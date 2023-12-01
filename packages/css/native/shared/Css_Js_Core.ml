@@ -662,6 +662,28 @@ let height x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
+let textEmphasisStyle x =
+  D
+    ( {js|textEmphasisStyle|js},
+      match x with
+      | #TextEmphasisStyle.t as tes -> TextEmphasisStyle.toString tes
+      | `xy (x, y) ->
+        (match x with
+        | #TextEmphasisStyle.FilledOrOpen.t as fo ->
+          TextEmphasisStyle.FilledOrOpen.toString fo
+        | #Var.t as va -> Var.toString va
+        | #Cascading.t as c ->
+          Cascading.toString c
+          ^ {js| |js}
+          ^
+          (match y with
+          | #TextEmphasisStyle.Shape.t as shape ->
+            TextEmphasisStyle.Shape.toString shape
+          | #Var.t as va -> Var.toString va
+          | #Cascading.t as c -> Cascading.toString c))
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c )
+
 let justifyContent x =
   D
     ( {js|justify-content|js},

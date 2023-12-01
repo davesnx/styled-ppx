@@ -1170,6 +1170,59 @@ module JustifySelf = struct
     | `stretch -> {js|stretch|js}
 end
 
+module TextEmphasisStyle = struct
+  module FilledOrOpen = struct
+    type nonrec t =
+      [ `filled
+      | `open_
+      ]
+
+    let toString x =
+      match x with `filled -> {js|filled|js} | `open_ -> {js|open|js}
+  end
+
+  module Shape = struct
+    type nonrec t =
+      [ `dot
+      | `circle
+      | `double_circle
+      | `triangle
+      | `sesame
+      ]
+
+    let toString x =
+      match x with
+      | `dot -> {js|dot|js}
+      | `circle -> {js|circle|js}
+      | `double_circle -> {js|double-circle|js}
+      | `triangle -> {js|triangle|js}
+      | `sesame -> {js|sesame|js}
+  end
+
+  type nonrec t =
+    [ `none
+    | `filled
+    | `open_
+    | `dot
+    | `circle
+    | `double_circle
+    | `triangle
+    | `sesame
+    | `string of string
+    ]
+
+  let toString x =
+    match x with
+    | `none | `filled -> {js|filled|js}
+    | `open_ -> {js|open|js}
+    | `dot -> {js|dot|js}
+    | `circle -> {js|circle|js}
+    | `double_circle -> {js|double-circle|js}
+    | `triangle -> {js|triangle|js}
+    | `sesame -> {js|sesame|js}
+    | `string s -> s
+end
+
 module PositionalAlignment = struct
   type nonrec t =
     [ `center
