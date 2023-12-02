@@ -6,4 +6,4 @@
  (wrapped false)
  (libraries server-reason-react.js server-reason-react.belt)
  (preprocess
-  (pps server-reason-react.melange.ppx)))
+  (pps server-reason-react.melange_ppx)))
