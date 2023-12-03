@@ -2125,5 +2125,4 @@ end
 [@@ns.doc "\n * SVG\n "]
 
 let touchAction x = D ({js|touch-action|js}, x |. TouchAction.toString)
-
 let textEmphasisColor x = D ({js|textEmphasisColor|js}, string_of_color x)
