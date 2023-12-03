@@ -5,6 +5,30 @@ let loc = Location.none;
 
 let simple_tests = [
   (
+    ":before { content: '点'; }",
+    [%expr [%cx ":before { content: '点'; }"]],
+    [%expr
+      CssJs.style([|
+        CssJs.selector(
+          {js|:before|js},
+          [|CssJs.unsafe({js|content|js}, {js|'点'|js})|],
+        ),
+      |])
+    ],
+  ),
+  (
+    ":before { content: '•'; }",
+    [%expr [%cx ":before { content: '•'; }"]],
+    [%expr
+      CssJs.style([|
+        CssJs.selector(
+          {js|:before|js},
+          [|CssJs.unsafe({js|content|js}, {js|'•'|js})|],
+        ),
+      |])
+    ],
+  ),
+  (
     ".a",
     [%expr [%cx ".a {}"]],
     [%expr CssJs.style([|CssJs.selector({js|.a|js}, [||])|])],
