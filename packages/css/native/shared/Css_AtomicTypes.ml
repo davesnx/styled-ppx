@@ -2375,3 +2375,17 @@ module LineBreak = struct
     | `strict -> {js|strict|js}
     | `anywhere -> {js|anywhere|js}
 end
+
+module Hyphens = struct
+  type nonrec t =
+    [ `none
+    | `manual
+    | `auto
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `manual -> {js|manual|js}
+    | `auto -> {js|auto|js}
+end
