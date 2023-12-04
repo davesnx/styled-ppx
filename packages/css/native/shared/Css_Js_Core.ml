@@ -2179,3 +2179,11 @@ end
 
 let touchAction x = D ({js|touch-action|js}, x |. TouchAction.toString)
 let textEmphasisColor x = D ({js|textEmphasisColor|js}, string_of_color x)
+
+let lineBreak x =
+  D
+    ( {js|lineBreak|js},
+      match x with
+      | #LineBreak.t as lb -> LineBreak.toString lb
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )

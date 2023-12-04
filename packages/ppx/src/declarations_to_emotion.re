@@ -249,8 +249,11 @@ let variant_to_expression = (~loc) =>
   | `Wrap => id([%expr `wrap])
   | `Match_parent => id([%expr `matchParent])
   | `Justify_all => id([%expr `justifyAll])
-  | `FitContent => raise(Unsupported_feature)
   | `Wrap_reverse => id([%expr `wrapReverse])
+  | `Loose => id([%expr `loose])
+  | `Strict => id([%expr `strict])
+  | `Manual => id([%expr `manual])
+  | `FitContent => raise(Unsupported_feature)
   | `Full_width => raise(Unsupported_feature)
   | `Full_size_kana => raise(Unsupported_feature);
 
@@ -1935,7 +1938,6 @@ let white_space =
 let tab_size = unsupportedProperty(Parser.property_tab_size);
 let word_break =
   variants(Parser.property_word_break, (~loc) => [%expr CssJs.wordBreak]);
-let line_break = unsupportedProperty(Parser.property_line_break);
 let render_line_height = (~loc) =>
   fun
   | `Extended_length(ext) => render_extended_length(~loc, ext)
@@ -3415,6 +3417,9 @@ let strokeOpacity =
     (~loc) => [%expr CssJs.SVG.strokeOpacity],
     render_alpha_value,
   );
+
+let line_break =
+  variants(Parser.property_line_break, (~loc) => [%expr CssJs.lineBreak]);
 
 let found = ({ast_of_string, string_to_expr, _}) => {
   /* TODO: Why we have 'check_value' when we don't use it? */
