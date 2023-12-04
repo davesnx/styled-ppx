@@ -1201,13 +1201,8 @@ module TextEmphasisStyle = struct
 
   type nonrec t =
     [ `none
-    | `filled
-    | `open_
-    | `dot
-    | `circle
-    | `double_circle
-    | `triangle
-    | `sesame
+    | FilledOrOpen.t
+    | Shape.t
     | `string of string
     ]
 
