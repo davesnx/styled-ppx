@@ -570,6 +570,26 @@ let properties_static_css_tests = [
     [%expr [%css "justify-content: center"]],
     [%expr CssJs.justifyContent(`center)],
   ),
+  (
+    [%css "text-emphasis-color: #555;"],
+    [%expr [%css "text-emphasis-color: #555;"]],
+    [%expr CssJs.textEmphasisColor(`hex({js|555|js}))],
+  ),
+  (
+    [%css "text-emphasis-color: blue;"],
+    [%expr [%css "text-emphasis-color: blue;"]],
+    [%expr CssJs.textEmphasisColor(CssJs.blue)],
+  ),
+  (
+    [%css "text-emphasis-color: rgba(90, 200, 160, 0.8);"],
+    [%expr [%css "text-emphasis-color: rgba(90, 200, 160, 0.8);"]],
+    [%expr CssJs.textEmphasisColor(`rgba((90, 200, 160, `num(0.8))))],
+  ),
+  (
+    [%css "text-emphasis-color: transparent"],
+    [%expr [%css "text-emphasis-color: transparent"]],
+    [%expr CssJs.textEmphasisColor(`transparent)],
+  ),
   // unsupported
   /* (
        [%css "-moz-text-blink: blink"],

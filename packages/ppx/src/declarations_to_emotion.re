@@ -2266,7 +2266,11 @@ let text_decoration_skip_ink =
 let text_emphasis_style =
   unsupportedProperty(Parser.property_text_emphasis_style);
 let text_emphasis_color =
-  unsupportedProperty(Parser.property_text_emphasis_color);
+  monomorphic(
+    Parser.property_text_emphasis_color,
+    (~loc) => [%expr CssJs.textEmphasisColor],
+    render_color,
+  );
 let text_emphasis = unsupportedProperty(Parser.property_text_emphasis);
 let text_emphasis_position =
   unsupportedProperty(Parser.property_text_emphasis_position);
