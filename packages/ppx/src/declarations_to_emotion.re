@@ -250,8 +250,6 @@ let variant_to_expression = (~loc) =>
   | `Match_parent => id([%expr `matchParent])
   | `Justify_all => id([%expr `justifyAll])
   | `Wrap_reverse => id([%expr `wrapReverse])
-  | `Loose => id([%expr `loose])
-  | `Strict => id([%expr `strict])
   | `Manual => id([%expr `manual])
   | `FitContent => raise(Unsupported_feature)
   | `Full_width => raise(Unsupported_feature)
@@ -3419,7 +3417,20 @@ let strokeOpacity =
   );
 
 let line_break =
-  variants(Parser.property_line_break, (~loc) => [%expr CssJs.lineBreak]);
+  monomorphic(
+    Parser.property_line_break,
+    (~loc) => [%expr CssJs.lineBreak],
+    (~loc, value) => {
+      switch (value) {
+      | `Auto => [%expr `auto]
+      | `Loose => [%expr `loose]
+      | `Normal => [%expr `normal]
+      | `Strict => [%expr `strict]
+      | `Anywhere => [%expr `anywhere]
+      | `Interpolation(var) => render_variable(~loc, var)
+      }
+    },
+  );
 
 let found = ({ast_of_string, string_to_expr, _}) => {
   /* TODO: Why we have 'check_value' when we don't use it? */
