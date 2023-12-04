@@ -570,6 +570,11 @@ let properties_static_css_tests = [
     [%expr [%css "justify-content: center"]],
     [%expr CssJs.justifyContent(`center)],
   ),
+  (
+    [%css "line-break: auto"],
+    [%expr [%css "line-break: auto"]],
+    [%expr CssJs.lineBreak(`auto)],
+  ),
   // unsupported
   /* (
        [%css "-moz-text-blink: blink"],
