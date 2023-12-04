@@ -575,6 +575,11 @@ let properties_static_css_tests = [
     [%expr [%css "line-break: auto"]],
     [%expr CssJs.lineBreak(`auto)],
   ),
+  (
+    [%css "hyphens: none"],
+    [%expr [%css "hyphens: none"]],
+    [%expr CssJs.hyphens(`none)],
+  ),
   // unsupported
   /* (
        [%css "-moz-text-blink: blink"],
