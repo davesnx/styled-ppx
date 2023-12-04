@@ -673,6 +673,11 @@ let properties_static_css_tests = [
       CssJs.textEmphasisPosition(`textEmphasisPositionYX((`over, `left)))
     ],
   ),
+  (
+    [%css "line-break: auto"],
+    [%expr [%css "line-break: auto"]],
+    [%expr CssJs.lineBreak(`auto)],
+  ),
   // unsupported
   /* (
        [%css "-moz-text-blink: blink"],
