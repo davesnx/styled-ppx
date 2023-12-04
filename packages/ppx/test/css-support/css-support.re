@@ -708,7 +708,7 @@
 [%css {|text-align: center|}];
 [%css {|text-align: justify|}];
 [%css {|text-align: match-parent|}];
-/* [%css {|text-align: justify-all|}]; */
+[%css {|text-align: justify-all|}];
 /* [%css {|text-align-all: start|}]; */
 /* [%css {|text-align-all: end|}]; */
 /* [%css {|text-align-all: left|}]; */
