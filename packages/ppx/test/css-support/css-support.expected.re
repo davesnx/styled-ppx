@@ -654,11 +654,11 @@ CssJs.unsafe({js|textEmphasis|js}, {js|open dot green|js});
 ];
 CssJs.textEmphasisPosition(`over);
 CssJs.textEmphasisPosition(`under);
-CssJs.textEmphasisPosition(`yx((`over, `left)));
-CssJs.textEmphasisPosition(`yx((`over, `right)));
-CssJs.textEmphasisPosition(`yx((`under, `left)));
-CssJs.textEmphasisPosition(`yx((`under, `left)));
-CssJs.textEmphasisPosition(`yx((`under, `right)));
+CssJs.textEmphasisPosition(`textEmphasisPositionYX((`over, `left)));
+CssJs.textEmphasisPosition(`textEmphasisPositionYX((`over, `right)));
+CssJs.textEmphasisPosition(`textEmphasisPositionYX((`under, `left)));
+CssJs.textEmphasisPosition(`textEmphasisPositionYX((`under, `left)));
+CssJs.textEmphasisPosition(`textEmphasisPositionYX((`under, `right)));
 CssJs.textShadow(`none);
 CssJs.textShadow(
   CssJs.Shadow.text(

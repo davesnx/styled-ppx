@@ -673,7 +673,7 @@ let textEmphasisPosition x =
       match x with
       | #TextEmphasisPosition.OverOrUnder.t as ou ->
         TextEmphasisPosition.OverOrUnder.toString ou
-      | `yx (y, x) ->
+      | `textEmphasisPositionYX (y, x) ->
         (match y with
         | #TextEmphasisPosition.OverOrUnder.t as ou ->
           TextEmphasisPosition.OverOrUnder.toString ou
