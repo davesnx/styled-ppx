@@ -2385,3 +2385,21 @@ module AlphaValue = struct
     | `num x -> Std.Int.toString x
     | `percent x -> Std.Float.toString x ^ {js|%|js}
 end
+
+module LineBreak = struct
+  type nonrec t =
+    [ `auto
+    | `loose
+    | `normal
+    | `strict
+    | `anywhere
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `loose -> {js|loose|js}
+    | `normal -> {js|normal|js}
+    | `strict -> {js|strict|js}
+    | `anywhere -> {js|anywhere|js}
+end
