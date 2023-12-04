@@ -638,12 +638,16 @@ let properties_static_css_tests = [
   (
     [%css "text-emphasis-style: filled double-circle"],
     [%expr [%css "text-emphasis-style:  filled double-circle"]],
-    [%expr CssJs.textEmphasisStyle(`xy((`filled, `double_circle)))],
+    [%expr
+      CssJs.textEmphasisStyle(
+        `textEmphasisStyleXY((`filled, `double_circle)),
+      )
+    ],
   ),
   (
     [%css "text-emphasis-style: sesame open"],
     [%expr [%css "text-emphasis-style:  sesame open"]],
-    [%expr CssJs.textEmphasisStyle(`xy((`open_, `sesame)))],
+    [%expr CssJs.textEmphasisStyle(`textEmphasisStyleXY((`open_, `sesame)))],
   ),
   // unsupported
   /* (
