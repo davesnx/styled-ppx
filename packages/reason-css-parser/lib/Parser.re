@@ -1185,7 +1185,7 @@ and property_letter_spacing = [%value.rec
   "'normal' | <extended-length> | <extended-percentage>"
 ]
 and property_line_break = [%value.rec
-  "'auto' | 'loose' | 'normal' | 'strict' | 'anywhere'"
+  "'auto' | 'loose' | 'normal' | 'strict' | 'anywhere' | <interpolation>"
 ]
 and property_line_clamp = [%value.rec "'none' | <integer>"]
 and property_line_height = [%value.rec
