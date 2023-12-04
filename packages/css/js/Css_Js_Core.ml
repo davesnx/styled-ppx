@@ -2070,3 +2070,11 @@ end
 [@@ns.doc "\n * SVG\n "]
 
 let touchAction x = D ({js|touchAction|js}, x |. TouchAction.toString)
+
+let lineBreak x =
+  D
+    ( {js|lineBreak|js},
+      match x with
+      | #LineBreak.t as lb -> LineBreak.toString lb
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
