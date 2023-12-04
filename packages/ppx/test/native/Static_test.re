@@ -625,6 +625,11 @@ let properties_static_css_tests = [
     [%expr [%css "text-emphasis-color: transparent"]],
     [%expr CssJs.textEmphasisColor(`transparent)],
   ),
+  (
+    [%css "line-break: auto"],
+    [%expr [%css "line-break: auto"]],
+    [%expr CssJs.lineBreak(`auto)],
+  ),
   // unsupported
   /* (
        [%css "-moz-text-blink: blink"],
