@@ -667,7 +667,7 @@ let textEmphasisStyle x =
     ( {js|textEmphasisStyle|js},
       match x with
       | #TextEmphasisStyle.t as tes -> TextEmphasisStyle.toString tes
-      | `xy (x, y) ->
+      | `textEmphasisStyleXY (x, y) ->
         (match x with
         | #TextEmphasisStyle.FilledOrOpen.t as fo ->
           TextEmphasisStyle.FilledOrOpen.toString fo

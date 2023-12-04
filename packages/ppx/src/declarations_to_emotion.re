@@ -2291,7 +2291,7 @@ let text_emphasis_style =
       | `Or(None, Some(y)) => [%expr [%e render_shape(~loc, y)]]
       | `Or(Some(x), Some(y)) =>
         [%expr
-         `xy((
+         `textEmphasisStyleXY((
            [%e render_filled_or_open(~loc, x)],
            [%e render_shape(~loc, y)],
          ))]

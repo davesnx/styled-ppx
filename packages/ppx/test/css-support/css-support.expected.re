@@ -645,7 +645,7 @@ CssJs.textEmphasisStyle(`circle);
 CssJs.textEmphasisStyle(`double_circle);
 CssJs.textEmphasisStyle(`triangle);
 CssJs.textEmphasisStyle(`sesame);
-CssJs.textEmphasisStyle(`xy((`open_, `dot)));
+CssJs.textEmphasisStyle(`textEmphasisStyleXY((`open_, `dot)));
 CssJs.textEmphasisStyle(`string({js|foo|js}));
 CssJs.textEmphasisColor(CssJs.green);
 CssJs.unsafe({js|textEmphasis|js}, {js|open dot green|js});
