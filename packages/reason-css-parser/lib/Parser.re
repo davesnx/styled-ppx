@@ -1552,6 +1552,9 @@ and property_stroke_width = [%value.rec "<svg-length>"]
 and property_tab_size = [%value.rec "<integer> | <extended-length>"]
 and property_table_layout = [%value.rec "'auto' | 'fixed'"]
 and property_text_align = [%value.rec
+  "'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | 'match-parent' | 'justify-all'"
+]
+and property_text_align_all = [%value.rec
   "'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | 'match-parent'"
 ]
 and property_text_align_last = [%value.rec
@@ -3077,6 +3080,7 @@ let check_map =
       ("property-tab-size", check(property_tab_size)),
       ("property-table-layout", check(property_table_layout)),
       ("property-text-align", check(property_text_align)),
+      ("property-text-align-all", check(property_text_align_all)),
       ("property-text-align-last", check(property_text_align_last)),
       ("property-text-anchor", check(property_text_anchor)),
       (

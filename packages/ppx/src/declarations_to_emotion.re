@@ -247,9 +247,9 @@ let variant_to_expression = (~loc) =>
   | `Visible => id([%expr `visible])
   | `Wavy => id([%expr `wavy])
   | `Wrap => id([%expr `wrap])
+  | `Match_parent => id([%expr `matchParent])
+  | `Justify_all => id([%expr `justifyAll])
   | `FitContent => raise(Unsupported_feature)
-  | `Justify_all => raise(Unsupported_feature)
-  | `Match_parent => raise(Unsupported_feature)
   | `Wrap_reverse => id([%expr `wrapReverse])
   | `Full_width => raise(Unsupported_feature)
   | `Full_size_kana => raise(Unsupported_feature);
@@ -1964,7 +1964,10 @@ let word_wrap =
   variants(Parser.property_word_wrap, (~loc) => [%expr CssJs.wordWrap]);
 let text_align =
   variants(Parser.property_text_align, (~loc) => [%expr CssJs.textAlign]);
-// let text_align_all = unsupportedProperty(Parser.property_text_align_all);
+let text_align_all =
+  variants(Parser.property_text_align_all, (~loc) =>
+    [%expr CssJs.textAlignAll]
+  );
 let text_align_last = unsupportedProperty(Parser.property_text_align_last);
 let text_justify = unsupportedProperty(Parser.property_text_justify);
 let word_spacing =
@@ -3738,6 +3741,7 @@ let properties = [
   ("tab-size", found(tab_size)),
   ("text-align-last", found(text_align_last)),
   ("text-align", found(text_align)),
+  ("text-align-all", found(text_align_all)),
   /* ("text-autospace", found(text_autospace)), */
   /* ("text-blink", found(text_blink)), */
   ("text-combine-upright", found(text_combine_upright)),

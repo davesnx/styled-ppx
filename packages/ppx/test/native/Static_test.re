@@ -432,6 +432,41 @@ let properties_static_css_tests = [
     [%expr CssJs.textAlign(`left)],
   ),
   (
+    [%css "text-align: end"],
+    [%expr [%css "text-align: end"]],
+    [%expr CssJs.textAlign(`end_)],
+  ),
+  (
+    [%css "text-align: match-parent"],
+    [%expr [%css "text-align: match-parent"]],
+    [%expr CssJs.textAlign(`matchParent)],
+  ),
+  (
+    [%css "text-align: justify-all"],
+    [%expr [%css "text-align: justify-all"]],
+    [%expr CssJs.textAlign(`justifyAll)],
+  ),
+  (
+    [%css "text-align-all: start"],
+    [%expr [%css "text-align-all: start"]],
+    [%expr CssJs.textAlignAll(`start)],
+  ),
+  (
+    [%css "text-align-all: left"],
+    [%expr [%css "text-align-all: left"]],
+    [%expr CssJs.textAlignAll(`left)],
+  ),
+  (
+    [%css "text-align-all: end"],
+    [%expr [%css "text-align-all: end"]],
+    [%expr CssJs.textAlignAll(`end_)],
+  ),
+  (
+    [%css "text-align-all: match-parent"],
+    [%expr [%css "text-align-all: match-parent"]],
+    [%expr CssJs.textAlignAll(`matchParent)],
+  ),
+  (
     [%css "word-spacing: normal"],
     [%expr [%css "word-spacing: normal"]],
     [%expr CssJs.wordSpacing(`normal)],
