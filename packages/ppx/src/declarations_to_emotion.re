@@ -2293,7 +2293,7 @@ let text_emphasis_position =
       | (y, None) => [%expr [%e render_over_or_under(~loc, y)]]
       | (y, Some(position)) =>
         [%expr
-         `yx((
+         `textEmphasisPositionYX((
            [%e render_over_or_under(~loc, y)],
            [%e render_position_left_right(~loc, position)],
          ))]

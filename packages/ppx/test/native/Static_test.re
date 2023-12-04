@@ -603,12 +603,16 @@ let properties_static_css_tests = [
   (
     [%css "text-emphasis-position: over left"],
     [%expr [%css "text-emphasis-position: over left"]],
-    [%expr CssJs.textEmphasisPosition(`yx((`over, `left)))],
+    [%expr
+      CssJs.textEmphasisPosition(`textEmphasisPositionYX((`over, `left)))
+    ],
   ),
   (
     [%css "text-emphasis-position: left over"],
     [%expr [%css "text-emphasis-position: left over"]],
-    [%expr CssJs.textEmphasisPosition(`yx((`over, `left)))],
+    [%expr
+      CssJs.textEmphasisPosition(`textEmphasisPositionYX((`over, `left)))
+    ],
   ),
   // unsupported
   /* (
