@@ -1552,7 +1552,7 @@ and property_stroke_width = [%value.rec "<svg-length>"]
 and property_tab_size = [%value.rec "<integer> | <extended-length>"]
 and property_table_layout = [%value.rec "'auto' | 'fixed'"]
 and property_text_align = [%value.rec
-  "'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | 'match-parent'"
+  "'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | 'match-parent' | 'justify-all'"
 ]
 and property_text_align_last = [%value.rec
   "'auto' | 'start' | 'end' | 'left' | 'right' | 'center' | 'justify'"

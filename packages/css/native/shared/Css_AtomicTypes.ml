@@ -1263,19 +1263,25 @@ end
 module TextAlign = struct
   type nonrec t =
     [ `start
+    | `end_
     | `left
     | `right
     | `center
     | `justify
+    | `matchParent
+    | `justifyAll
     ]
 
   let toString x =
     match x with
     | `start -> {js|start|js}
+    | `end_ -> {js|end|js}
     | `left -> {js|left|js}
     | `right -> {js|right|js}
     | `center -> {js|center|js}
     | `justify -> {js|justify|js}
+    | `matchParent -> {js|match-parent|js}
+    | `justifyAll -> {js|justify-all|js}
 end
 
 module WordBreak = struct

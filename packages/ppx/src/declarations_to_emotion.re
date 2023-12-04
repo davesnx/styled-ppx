@@ -247,9 +247,9 @@ let variant_to_expression = (~loc) =>
   | `Visible => id([%expr `visible])
   | `Wavy => id([%expr `wavy])
   | `Wrap => id([%expr `wrap])
+  | `Match_parent => id([%expr `matchParent])
+  | `Justify_all => id([%expr `justifyAll])
   | `FitContent => raise(Unsupported_feature)
-  | `Justify_all => raise(Unsupported_feature)
-  | `Match_parent => raise(Unsupported_feature)
   | `Wrap_reverse => id([%expr `wrapReverse])
   | `Full_width => raise(Unsupported_feature)
   | `Full_size_kana => raise(Unsupported_feature);
