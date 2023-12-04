@@ -2132,3 +2132,11 @@ let lineBreak x =
       | #LineBreak.t as lb -> LineBreak.toString lb
       | #Var.t as var -> Var.toString var
       | #Cascading.t as c -> Cascading.toString c )
+
+let hyphens x =
+  D
+    ( {js|hyphens|js},
+      match x with
+      | #Hyphens.t as h -> Hyphens.toString h
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )

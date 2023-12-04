@@ -1955,7 +1955,8 @@ let line_height_step =
     (~loc) => [%expr CssJs.lineHeightStep],
     render_extended_length,
   );
-let hyphens = unsupportedProperty(Parser.property_hyphens);
+let hyphens =
+  variants(Parser.property_hyphens, (~loc) => [%expr CssJs.hyphens]);
 let overflow_wrap =
   variants(Parser.property_overflow_wrap, (~loc) =>
     [%expr CssJs.overflowWrap]
