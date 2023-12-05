@@ -281,6 +281,14 @@ let maskPositions mp =
       |. Std.Array.map string_of_maskposition
       |. Std.Array.joinWith ~sep:{js|, |js} )
 
+let borderImageSource x =
+  D
+    ( {js|borderImageSource|js},
+      match x with
+      | #BorderImageSource.t as b -> BorderImageSource.toString b
+      | #Url.t as u -> Url.toString u
+      | #Gradient.t as g -> Gradient.toString g )
+
 let borderBottomColor x = D ({js|border-bottom-color|js}, string_of_color x)
 
 let borderBottomLeftRadius x =

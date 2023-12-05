@@ -860,7 +860,41 @@ let properties_static_css_tests = [
     [%expr [%css "transform-box: view-box"]],
     [%expr CssJs.transformBox(`viewBox)],
   ),
+  (
+    [%css "border-image-source: url('img_tree.gif')"],
+    [%expr [%css "border-image-source: url('img_tree.gif')"]],
+    [%expr CssJs.borderImageSource(`url({js|img_tree.gif|js}))],
+  ),
+  (
+    [%css "border-image-source: none"],
+    [%expr [%css "border-image-source: none"]],
+    [%expr CssJs.borderImageSource(`none)],
+  ),
+  (
+    [%css "border-image-source: linear-gradient(to top, red, yellow)"],
+    [%expr [%css "border-image-source: linear-gradient(to top, red, yellow)"]],
+    [%expr
+      CssJs.borderImageSource(
+        `linearGradient((
+          Some(`SideOrCorner(`Top)),
+          [|(CssJs.red, None), (CssJs.yellow, None)|],
+        )),
+      )
+    ],
+  ),
   // unsupported
+  /*   (
+         [%css
+           "border-image-source: repeating-linear-gradient(45deg, transparent, #4d9f0c 20px);"
+         ],
+         [%expr
+           [%css
+             "border-image-source: repeating-linear-gradient(45deg, transparent, #4d9f0c 20px);"
+           ]
+         ],
+         [%expr CssJs.borderImageSource(`none)],
+       ),
+       */
   /* (
        [%css "-moz-text-blink: blink"],
        [%expr [%css "-moz-text-blink: blink"]],
