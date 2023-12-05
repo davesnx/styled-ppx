@@ -1854,8 +1854,19 @@ let border_radius =
     (~loc) => [%expr CssJs.borderRadius],
     render_length_percentage,
   );
+
 let border_image_source =
-  unsupportedProperty(Parser.property_border_image_source);
+  monomorphic(
+    Parser.property_border_image_source,
+    (~loc) => [%expr CssJs.borderImageSource],
+    (~loc, value) => {
+      switch (value) {
+      | `None => [%expr `none]
+      | `Image(i) => render_image(~loc, i)
+      }
+    },
+  );
+
 let border_image_slice =
   unsupportedProperty(Parser.property_border_image_slice);
 let border_image_width =

@@ -1556,6 +1556,12 @@ module TableLayout = struct
     match x with `auto -> {js|auto|js} | `fixed -> {js|fixed|js}
 end
 
+module BorderImageSource = struct
+  type nonrec t = [ `none ]
+
+  let toString x = match x with `none -> {js|none|js}
+end
+
 module BorderCollapse = struct
   type t =
     [ `collapse
