@@ -882,6 +882,16 @@ let properties_static_css_tests = [
       )
     ],
   ),
+  (
+    [%css "image-rendering: smooth"],
+    [%expr [%css "image-rendering: smooth"]],
+    [%expr CssJs.imageRendering(`smooth)],
+  ),
+  (
+    [%css "image-rendering: high-quality"],
+    [%expr [%css "image-rendering: high-quality"]],
+    [%expr CssJs.imageRendering(`highQuality)],
+  ),
   // unsupported
   /*   (
          [%css

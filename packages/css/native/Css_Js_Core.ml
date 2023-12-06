@@ -199,6 +199,14 @@ let maskImage x =
       | #Url.t as u -> Url.toString u
       | #Gradient.t as g -> Gradient.toString g )
 
+let imageRendering x =
+  D
+    ( {js|imageRendering|js},
+      match x with
+      | #ImageRendering.t as ir -> ImageRendering.toString ir
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c )
+
 let backgroundOrigin x =
   D
     ( {js|background-origin|js},

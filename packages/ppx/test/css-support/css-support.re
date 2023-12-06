@@ -293,6 +293,11 @@
 /* [%css {|border-image: radial-gradient(60% 60%, white, black);|}]; */
 /* [%css {|border-image: repeating-linear-gradient(white, black);|}]; */
 /* [%css {|border-image: repeating-radial-gradient(white, black);|}]; */
+[%css {|image-rendering: auto;|}];
+[%css {|image-rendering: smooth;|}];
+[%css {|image-rendering: high-quality;|}];
+[%css {|image-rendering: pixelated;|}];
+[%css {|image-rendering: crisp-edges;|}];
 /* [%css {|cursor: linear-gradient(45deg, 25% black, 25% transparent);|}]; */
 /* [%css {|cursor: linear-gradient(white, black);|}]; */
 /* [%css {|cursor: linear-gradient(to right, white, black);|}]; */
@@ -331,7 +336,6 @@
 /* [%css {|content: radial-gradient(50%, white, black);|}]; */
 /* [%css {|content: radial-gradient(60% 60%, white, black);|}]; */
 /* [%css {|content: repeating-linear-gradient(white, black);|}]; */
-/* [%css {|content: repeating-radial-gradient(white, black);|}]; */
 
 /* CSS Basic User Interface Module Level 3 (CSS3 UI) */
 [%css {|box-sizing: border-box|}];

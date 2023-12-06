@@ -267,6 +267,10 @@ let variant_to_expression = (~loc) =>
   | `Fill_box => id([%expr `fillBox])
   | `Stroke_box => id([%expr `strokeBox])
   | `View_box => id([%expr `viewBox])
+  | `Smooth => id([%expr `smooth])
+  | `High_quality => id([%expr `highQuality])
+  | `Pixelated => id([%expr `pixelated])
+  | `Crisp_edges => id([%expr `crispEdges])
   | `FitContent => raise(Unsupported_feature)
   | `Full_width => raise(Unsupported_feature)
   | `Full_size_kana => raise(Unsupported_feature);
@@ -1057,7 +1061,11 @@ let pointer_events =
 let image_resolution = unsupportedProperty(Parser.property_image_resolution);
 let image_orientation =
   unsupportedProperty(Parser.property_image_orientation);
-let image_rendering = unsupportedProperty(Parser.property_image_rendering);
+
+let image_rendering =
+  variants(Parser.property_image_rendering, (~loc) =>
+    [%expr CssJs.imageRendering]
+  );
 
 let render_color_interp = (~loc) =>
   fun

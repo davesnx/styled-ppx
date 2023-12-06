@@ -2161,6 +2161,23 @@ module MaskImage = struct
   let toString x = match x with `none -> {js|none|js}
 end
 
+module ImageRendering = struct
+  type nonrec t =
+    [ `auto
+    | `smooth
+    | `highQuality
+    | `pixelated
+    | `crispEdges
+    ]
+
+  let toString = function
+    | `auto -> {js|auto|js}
+    | `smooth -> {js|smooth|js}
+    | `highQuality -> {js|high-quality|js}
+    | `pixelated -> {js|pixelated|js}
+    | `crispEdges -> {js|crisp-edges|js}
+end
+
 module GeometryBox = struct
   type t =
     [ `marginBox
