@@ -1076,6 +1076,10 @@ and property_font_style = [%value.rec
   "'normal' | 'italic' | 'oblique' | <interpolation> | [ 'oblique' <extended-angle> ]?"
 ]
 and property_font_synthesis = [%value.rec "'none' | 'weight' || 'style'"]
+and property_font_synthesis_weight = [%value.rec "'auto' | 'none'"]
+and property_font_synthesis_style = [%value.rec "'auto' | 'none'"]
+and property_font_synthesis_small_caps = [%value.rec "'auto' | 'none'"]
+and property_font_synthesis_position = [%value.rec "'auto' | 'none'"]
 and property_font_variant = [%value.rec
   "'normal' | 'none' | 'small-caps' | <common-lig-values> || <discretionary-lig-values> || <historical-lig-values> || <contextual-alt-values> || stylistic( <feature-value-name> ) || 'historical-forms' || styleset( [ <feature-value-name> ]# ) || character-variant( [ <feature-value-name> ]# ) || swash( <feature-value-name> ) || ornaments( <feature-value-name> ) || annotation( <feature-value-name> ) || [ 'small-caps' | 'all-small-caps' | 'petite-caps' | 'all-petite-caps' | 'unicase' | 'titling-caps' ] || <numeric-figure-values> || <numeric-spacing-values> || <numeric-fraction-values> || 'ordinal' || 'slashed-zero' || <east-asian-variant-values> || <east-asian-width-values> || 'ruby' || 'sub' || 'super' || 'text' || 'emoji' || 'unicode'"
 ]
@@ -1097,6 +1101,9 @@ and property_font_variant_numeric = [%value.rec
 and property_font_variant_position = [%value.rec "'normal' | 'sub' | 'super'"]
 and property_font_variation_settings = [%value.rec
   "'normal' | [ <string> <number> ]#"
+]
+and property_font_variant_emoji = [%value.rec
+  "'normal' | 'text' | 'emoji' | 'unicode'"
 ]
 and property_font_weight = [%value.rec
   "<font-weight-absolute> | 'bolder' | 'lighter' | <interpolation>"
@@ -1185,7 +1192,7 @@ and property_letter_spacing = [%value.rec
   "'normal' | <extended-length> | <extended-percentage>"
 ]
 and property_line_break = [%value.rec
-  "'auto' | 'loose' | 'normal' | 'strict' | 'anywhere'"
+  "'auto' | 'loose' | 'normal' | 'strict' | 'anywhere' | <interpolation>"
 ]
 and property_line_clamp = [%value.rec "'none' | <integer>"]
 and property_line_height = [%value.rec
@@ -1349,7 +1356,7 @@ and property_overflow_block = [%value.rec
 ]
 and property_overflow_clip_box = [%value.rec "'padding-box' | 'content-box'"]
 and property_overflow_inline = [%value.rec
-  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | 'none' | 'optional-paged' | 'paged'"
+  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto'"
 ]
 and property_overflow_wrap = [%value.rec
   "'normal' | 'break-word' | 'anywhere'"
@@ -1558,7 +1565,7 @@ and property_text_align_all = [%value.rec
   "'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | 'match-parent'"
 ]
 and property_text_align_last = [%value.rec
-  "'auto' | 'start' | 'end' | 'left' | 'right' | 'center' | 'justify'"
+  "'auto' | 'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | 'match-parent'"
 ]
 and property_text_anchor = [%value.rec "'start' | 'middle' | 'end'"]
 and property_text_combine_upright = [%value.rec
@@ -1578,6 +1585,9 @@ and property_text_decoration_skip = [%value.rec
   "'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' ] || 'edges' || 'box-decoration'"
 ]
 and property_text_decoration_skip_ink = [%value.rec "'auto' | 'all' | 'none'"]
+and property_text_decoration_skip_box = [%value.rec "'none' | 'all'"]
+and property_text_decoration_skip_inset = [%value.rec "'none' | 'auto'"]
+
 and property_text_decoration_style = [%value.rec
   "'solid' | 'double' | 'dotted' | 'dashed' | 'wavy'"
 ]
@@ -1589,7 +1599,7 @@ and property_text_emphasis = [%value.rec
 ]
 and property_text_emphasis_color = [%value.rec "<color>"]
 and property_text_emphasis_position = [%value.rec
-  "[ 'over' | 'under' ] && [ 'right' | 'left' ]"
+  "[ 'over' | 'under' ] && [ 'right' | 'left' ]?"
 ]
 and property_text_emphasis_style = [%value.rec
   "'none' | [ 'filled' | 'open' ] || [ 'dot' | 'circle' | 'double-circle' | 'triangle' | 'sesame' ] | <string>"
@@ -2718,12 +2728,29 @@ let check_map =
       ),
       ("property-font-optical-sizing", check(property_font_optical_sizing)),
       ("property-font-palette", check(property_font_palette)),
+      ("property-font-variant-emoji", check(property_font_variant_emoji)),
       ("property-font-size", check(property_font_size)),
       ("property-font-size-adjust", check(property_font_size_adjust)),
       ("property-font-smooth", check(property_font_smooth)),
       ("property-font-stretch", check(property_font_stretch)),
       ("property-font-style", check(property_font_style)),
       ("property-font-synthesis", check(property_font_synthesis)),
+      (
+        "property-font-synthesis-weight",
+        check(property_font_synthesis_weight),
+      ),
+      (
+        "property-font-synthesis-style",
+        check(property_font_synthesis_style),
+      ),
+      (
+        "property-font-synthesis-small-caps",
+        check(property_font_synthesis_small_caps),
+      ),
+      (
+        "property-font-synthesis-position",
+        check(property_font_synthesis_position),
+      ),
       ("property-font-variant", check(property_font_variant)),
       (
         "property-font-variant-alternates",
@@ -3103,6 +3130,14 @@ let check_map =
       (
         "property-text-decoration-skip-ink",
         check(property_text_decoration_skip_ink),
+      ),
+      (
+        "property-text-decoration-skip-box",
+        check(property_text_decoration_skip_box),
+      ),
+      (
+        "property-text-decoration-skip-inset",
+        check(property_text_decoration_skip_inset),
       ),
       (
         "property-text-decoration-style",

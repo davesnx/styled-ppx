@@ -551,6 +551,8 @@
 [%css {|transform-box: border-box|}];
 [%css {|transform-box: fill-box|}];
 [%css {|transform-box: view-box|}];
+[%css {|transform-box: content-box|}];
+[%css {|transform-box: stroke-box|}];
 
 /* CSS Transforms Module Level 2 */
 [%css {|translate: none|}];
@@ -716,14 +718,14 @@
 [%css {|text-align-all: center|}];
 [%css {|text-align-all: justify|}];
 [%css {|text-align-all: match-parent|}];
-/* [%css {|text-align-last: auto|}]; */
-/* [%css {|text-align-last: start|}]; */
-/* [%css {|text-align-last: end|}]; */
-/* [%css {|text-align-last: left|}]; */
-/* [%css {|text-align-last: right|}]; */
-/* [%css {|text-align-last: center|}]; */
-/* [%css {|text-align-last: justify|}]; */
-/* [%css {|text-align-last: match-parent|}]; */
+[%css {|text-align-last: auto|}];
+[%css {|text-align-last: start|}];
+[%css {|text-align-last: end|}];
+[%css {|text-align-last: left|}];
+[%css {|text-align-last: right|}];
+[%css {|text-align-last: center|}];
+[%css {|text-align-last: justify|}];
+[%css {|text-align-last: match-parent|}];
 [%css {|text-justify: auto|}];
 [%css {|text-justify: none|}];
 [%css {|text-justify: inter-word|}];
@@ -817,9 +819,13 @@
 [%css {|text-emphasis-style: 'foo'|}];
 [%css {|text-emphasis-color: green|}];
 [%css {|text-emphasis: open dot green|}];
+[%css {|text-emphasis-position: left|}];
+[%css {|text-emphasis-position: over|}];
+[%css {|text-emphasis-position: under|}];
 [%css {|text-emphasis-position: over left|}];
 [%css {|text-emphasis-position: over right|}];
 [%css {|text-emphasis-position: under left|}];
+[%css {|text-emphasis-position: left under|}];
 [%css {|text-emphasis-position: under right|}];
 [%css {|text-shadow: none|}];
 /* The following shadow declarations are not supported in the CSS Parser */
@@ -855,6 +861,11 @@
 [%css {|text-decoration-skip: box-decoration|}];
 [%css {|text-decoration-skip-ink: none|}];
 [%css {|text-decoration-skip-ink: auto|}];
+[%css {|text-decoration-skip-ink: all|}];
+[%css {|text-decoration-skip-box: none|}];
+[%css {|text-decoration-skip-box: all|}];
+[%css {|text-decoration-skip-inset: none|}];
+[%css {|text-decoration-skip-inset: auto|}];
 [%css {|text-underline-offset: auto|}];
 [%css {|text-underline-offset: 3px|}];
 [%css {|text-underline-offset: 10%|}];
@@ -968,6 +979,10 @@
 [%css {|font-feature-settings: 'smcp', 'swsh' 2|}];
 
 /* CSS Fonts Module Level 4 */
+[%css {|font-synthesis-weight: none|}];
+[%css {|font-synthesis-style: auto|}];
+[%css {|font-synthesis-small-caps: none|}];
+[%css {|font-synthesis-position: auto|}];
 [%css {|font-size: xxx-large|}];
 [%css {|font-variant: none|}];
 [%css {|font-variant: normal|}];
@@ -1004,6 +1019,10 @@
 [%css {|font-palette: normal|}];
 [%css {|font-palette: light|}];
 [%css {|font-palette: dark|}];
+[%css {|font-variant-emoji: normal|}];
+[%css {|font-variant-emoji: text|}];
+[%css {|font-variant-emoji: emoji|}];
+[%css {|font-variant-emoji: unicode|}];
 
 /* CSS Writing Modes Level 3 */
 [%css {|direction: ltr|}];

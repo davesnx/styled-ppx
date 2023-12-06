@@ -1170,6 +1170,76 @@ module JustifySelf = struct
     | `stretch -> {js|stretch|js}
 end
 
+module TextEmphasisStyle = struct
+  module FilledOrOpen = struct
+    type nonrec t =
+      [ `filled
+      | `open_
+      ]
+
+    let toString x =
+      match x with `filled -> {js|filled|js} | `open_ -> {js|open|js}
+  end
+
+  module Shape = struct
+    type nonrec t =
+      [ `dot
+      | `circle
+      | `double_circle
+      | `triangle
+      | `sesame
+      ]
+
+    let toString x =
+      match x with
+      | `dot -> {js|dot|js}
+      | `circle -> {js|circle|js}
+      | `double_circle -> {js|double-circle|js}
+      | `triangle -> {js|triangle|js}
+      | `sesame -> {js|sesame|js}
+  end
+
+  type nonrec t =
+    [ `none
+    | FilledOrOpen.t
+    | Shape.t
+    | `string of string
+    ]
+
+  let toString x =
+    match x with
+    | `none | `filled -> {js|filled|js}
+    | `open_ -> {js|open|js}
+    | `dot -> {js|dot|js}
+    | `circle -> {js|circle|js}
+    | `double_circle -> {js|double-circle|js}
+    | `triangle -> {js|triangle|js}
+    | `sesame -> {js|sesame|js}
+    | `string s -> s
+end
+
+module TextEmphasisPosition = struct
+  module LeftRightAlignment = struct
+    type nonrec t =
+      [ `left
+      | `right
+      ]
+
+    let toString x =
+      match x with `left -> {js|left|js} | `right -> {js|right|js}
+  end
+
+  module OverOrUnder = struct
+    type nonrec t =
+      [ `over
+      | `under
+      ]
+
+    let toString x =
+      match x with `over -> {js|over|js} | `under -> {js|under|js}
+  end
+end
+
 module PositionalAlignment = struct
   type nonrec t =
     [ `center
@@ -1297,6 +1367,30 @@ module TextAlignAll = struct
 
   let toString x =
     match x with
+    | `start -> {js|start|js}
+    | `end_ -> {js|end|js}
+    | `left -> {js|left|js}
+    | `right -> {js|right|js}
+    | `center -> {js|center|js}
+    | `justify -> {js|justify|js}
+    | `matchParent -> {js|match-parent|js}
+end
+
+module TextAlignLast = struct
+  type nonrec t =
+    [ `auto
+    | `start
+    | `end_
+    | `left
+    | `right
+    | `center
+    | `justify
+    | `matchParent
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
     | `start -> {js|start|js}
     | `end_ -> {js|end|js}
     | `left -> {js|left|js}
@@ -1866,6 +1960,38 @@ module TextDecorationThickness = struct
     match x with `fromFont -> {js|from-font|js} | `auto -> {js|auto|js}
 end
 
+module TextDecorationSkipInk = struct
+  type nonrec t =
+    [ `auto
+    | `none
+    | `all
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `none -> {js|none|js}
+    | `all -> {js|all|js}
+end
+
+module TextDecorationSkipBox = struct
+  type nonrec t =
+    [ `none
+    | `all
+    ]
+
+  let toString x = match x with `none -> {js|none|js} | `all -> {js|all|js}
+end
+
+module TextDecorationSkipInset = struct
+  type nonrec t =
+    [ `none
+    | `auto
+    ]
+
+  let toString x = match x with `none -> {js|none|js} | `auto -> {js|auto|js}
+end
+
 module Width = struct
   type nonrec t =
     [ `auto
@@ -2384,4 +2510,181 @@ module AlphaValue = struct
     match x with
     | `num x -> Std.Int.toString x
     | `percent x -> Std.Float.toString x ^ {js|%|js}
+end
+
+module LineBreak = struct
+  type nonrec t =
+    [ `auto
+    | `loose
+    | `normal
+    | `strict
+    | `anywhere
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `loose -> {js|loose|js}
+    | `normal -> {js|normal|js}
+    | `strict -> {js|strict|js}
+    | `anywhere -> {js|anywhere|js}
+end
+
+module Hyphens = struct
+  type nonrec t =
+    [ `none
+    | `manual
+    | `auto
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `manual -> {js|manual|js}
+    | `auto -> {js|auto|js}
+end
+
+module TextJustify = struct
+  type nonrec t =
+    [ `auto
+    | `none
+    | `interWord
+    | `interCharacter
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `none -> {js|none|js}
+    | `interWord -> {js|inter-word|js}
+    | `interCharacter -> {js|inter-character|js}
+end
+
+module OverflowInline = struct
+  type nonrec t =
+    [ `hidden
+    | `visible
+    | `scroll
+    | `auto
+    | `clip
+    ]
+
+  let toString x =
+    match x with
+    | `hidden -> {js|hidden|js}
+    | `visible -> {js|visible|js}
+    | `scroll -> {js|scroll|js}
+    | `auto -> {js|auto|js}
+    | `clip -> {js|clip|js}
+end
+
+module FontSynthesisWeight = struct
+  type nonrec t =
+    [ `auto
+    | `none
+    ]
+
+  let toString x = match x with `auto -> {js|auto|js} | `none -> {js|none|js}
+end
+
+module FontSynthesisStyle = struct
+  type nonrec t =
+    [ `auto
+    | `none
+    ]
+
+  let toString x = match x with `auto -> {js|auto|js} | `none -> {js|none|js}
+end
+
+module FontSynthesisSmallCaps = struct
+  type nonrec t =
+    [ `auto
+    | `none
+    ]
+
+  let toString x = match x with `auto -> {js|auto|js} | `none -> {js|none|js}
+end
+
+module FontSynthesisPosition = struct
+  type nonrec t =
+    [ `auto
+    | `none
+    ]
+
+  let toString x = match x with `auto -> {js|auto|js} | `none -> {js|none|js}
+end
+
+module FontKerning = struct
+  type nonrec t =
+    [ `auto
+    | `none
+    | `normal
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `none -> {js|none|js}
+    | `normal -> {js|normal|js}
+end
+
+module FontVariantPosition = struct
+  type nonrec t =
+    [ `normal
+    | `sub
+    | `super
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `sub -> {js|sub|js}
+    | `super -> {js|super|js}
+end
+
+module FontVariantCaps = struct
+  type nonrec t =
+    [ `normal
+    | `smallCaps
+    | `allSmallCaps
+    | `petiteCaps
+    | `allPetiteCaps
+    | `unicase
+    | `titlingCaps
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `smallCaps -> {js|small-caps|js}
+    | `allSmallCaps -> {js|all-small-caps|js}
+    | `petiteCaps -> {js|petite-caps|js}
+    | `allPetiteCaps -> {js|all-petite-caps|js}
+    | `unicase -> {js|unicase|js}
+    | `titlingCaps -> {js|titling-caps|js}
+end
+
+module FontOpticalSizing = struct
+  type nonrec t =
+    [ `auto
+    | `none
+    ]
+
+  let toString x = match x with `auto -> {js|auto|js} | `none -> {js|none|js}
+end
+
+module FontVariantEmoji = struct
+  type nonrec t =
+    [ `normal
+    | `text
+    | `emoji
+    | `unicode
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `text -> {js|text|js}
+    | `emoji -> {js|emoji|js}
+    | `unicode -> {js|unicode|js}
 end

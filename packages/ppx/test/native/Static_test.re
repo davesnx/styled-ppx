@@ -467,6 +467,16 @@ let properties_static_css_tests = [
     [%expr CssJs.textAlignAll(`matchParent)],
   ),
   (
+    [%css "text-align-last: center"],
+    [%expr [%css "text-align-last: center"]],
+    [%expr CssJs.textAlignLast(`center)],
+  ),
+  (
+    [%css "text-align-last: match-parent"],
+    [%expr [%css "text-align-last: match-parent"]],
+    [%expr CssJs.textAlignLast(`matchParent)],
+  ),
+  (
     [%css "word-spacing: normal"],
     [%expr [%css "word-spacing: normal"]],
     [%expr CssJs.wordSpacing(`normal)],
@@ -624,6 +634,231 @@ let properties_static_css_tests = [
     [%css "text-emphasis-color: transparent"],
     [%expr [%css "text-emphasis-color: transparent"]],
     [%expr CssJs.textEmphasisColor(`transparent)],
+  ),
+  (
+    [%css "text-emphasis-style: 'foo'"],
+    [%expr [%css "text-emphasis-style: 'foo'"]],
+    [%expr CssJs.textEmphasisStyle(`string({js|foo|js}))],
+  ),
+  (
+    [%css "text-emphasis-style: open"],
+    [%expr [%css "text-emphasis-style: open"]],
+    [%expr CssJs.textEmphasisStyle(`open_)],
+  ),
+  (
+    [%css "text-emphasis-style: filled double-circle"],
+    [%expr [%css "text-emphasis-style:  filled double-circle"]],
+    [%expr CssJs.textEmphasisStyles(`filled, `double_circle)],
+  ),
+  (
+    [%css "text-emphasis-style: sesame open"],
+    [%expr [%css "text-emphasis-style:  sesame open"]],
+    [%expr CssJs.textEmphasisStyles(`open_, `sesame)],
+  ),
+  (
+    [%css "text-emphasis-position: over"],
+    [%expr [%css "text-emphasis-position: over"]],
+    [%expr CssJs.textEmphasisPosition(`over)],
+  ),
+  (
+    [%css "text-emphasis-position: under"],
+    [%expr [%css "text-emphasis-position: under"]],
+    [%expr CssJs.textEmphasisPosition(`under)],
+  ),
+  (
+    [%css "text-emphasis-position: over left"],
+    [%expr [%css "text-emphasis-position: over left"]],
+    [%expr CssJs.textEmphasisPositions(`over, `left)],
+  ),
+  (
+    [%css "text-emphasis-position: left over"],
+    [%expr [%css "text-emphasis-position: left over"]],
+    [%expr CssJs.textEmphasisPositions(`over, `left)],
+  ),
+  (
+    [%css "line-break: auto"],
+    [%expr [%css "line-break: auto"]],
+    [%expr CssJs.lineBreak(`auto)],
+  ),
+  (
+    [%css "hyphens: none"],
+    [%expr [%css "hyphens: none"]],
+    [%expr CssJs.hyphens(`none)],
+  ),
+  (
+    [%css "text-justify: none"],
+    [%expr [%css "text-justify: none"]],
+    [%expr CssJs.textJustify(`none)],
+  ),
+  (
+    [%css "text-justify: inter-word"],
+    [%expr [%css "text-justify: inter-word"]],
+    [%expr CssJs.textJustify(`interWord)],
+  ),
+  (
+    [%css "overflow-inline: visible"],
+    [%expr [%css "overflow-inline: visible"]],
+    [%expr CssJs.overflowInline(`visible)],
+  ),
+  (
+    [%css "font-synthesis-weight: none"],
+    [%expr [%css "font-synthesis-weight: none"]],
+    [%expr CssJs.fontSynthesisWeight(`none)],
+  ),
+  (
+    [%css "font-synthesis-style: auto"],
+    [%expr [%css "font-synthesis-style: auto"]],
+    [%expr CssJs.fontSynthesisStyle(`auto)],
+  ),
+  (
+    [%css "font-synthesis-small-caps: none"],
+    [%expr [%css "font-synthesis-small-caps: none"]],
+    [%expr CssJs.fontSynthesisSmallCaps(`none)],
+  ),
+  (
+    [%css "font-synthesis-position: auto"],
+    [%expr [%css "font-synthesis-position: auto"]],
+    [%expr CssJs.fontSynthesisPosition(`auto)],
+  ),
+  (
+    [%css "font-kerning: normal"],
+    [%expr [%css "font-kerning: normal"]],
+    [%expr CssJs.fontKerning(`normal)],
+  ),
+  (
+    [%css "font-variant-position: sub"],
+    [%expr [%css "font-variant-position: sub"]],
+    [%expr CssJs.fontVariantPosition(`sub)],
+  ),
+  (
+    [%css "font-variant-position: super"],
+    [%expr [%css "font-variant-position: super"]],
+    [%expr CssJs.fontVariantPosition(`super)],
+  ),
+  (
+    [%css "font-variant-caps: normal"],
+    [%expr [%css "font-variant-caps: normal"]],
+    [%expr CssJs.fontVariantCaps(`normal)],
+  ),
+  (
+    [%css "font-variant-caps: small-caps"],
+    [%expr [%css "font-variant-caps: small-caps"]],
+    [%expr CssJs.fontVariantCaps(`smallCaps)],
+  ),
+  (
+    [%css "font-variant-caps: all-small-caps"],
+    [%expr [%css "font-variant-caps: all-small-caps"]],
+    [%expr CssJs.fontVariantCaps(`allSmallCaps)],
+  ),
+  (
+    [%css "font-variant-caps: petite-caps"],
+    [%expr [%css "font-variant-caps: petite-caps"]],
+    [%expr CssJs.fontVariantCaps(`petiteCaps)],
+  ),
+  (
+    [%css "font-variant-caps: all-petite-caps"],
+    [%expr [%css "font-variant-caps: all-petite-caps"]],
+    [%expr CssJs.fontVariantCaps(`allPetiteCaps)],
+  ),
+  (
+    [%css "font-variant-caps: titling-caps"],
+    [%expr [%css "font-variant-caps: titling-caps"]],
+    [%expr CssJs.fontVariantCaps(`titlingCaps)],
+  ),
+  (
+    [%css "font-variant-caps: unicase"],
+    [%expr [%css "font-variant-caps: unicase"]],
+    [%expr CssJs.fontVariantCaps(`unicase)],
+  ),
+  (
+    [%css "font-optical-sizing: none"],
+    [%expr [%css "font-optical-sizing: none"]],
+    [%expr CssJs.fontOpticalSizing(`none)],
+  ),
+  (
+    [%css "font-optical-sizing: auto"],
+    [%expr [%css "font-optical-sizing: auto"]],
+    [%expr CssJs.fontOpticalSizing(`auto)],
+  ),
+  (
+    [%css "font-variant-emoji: normal"],
+    [%expr [%css "font-variant-emoji: normal"]],
+    [%expr CssJs.fontVariantEmoji(`normal)],
+  ),
+  (
+    [%css "font-variant-emoji: text"],
+    [%expr [%css "font-variant-emoji: text"]],
+    [%expr CssJs.fontVariantEmoji(`text)],
+  ),
+  (
+    [%css "font-variant-emoji: emoji"],
+    [%expr [%css "font-variant-emoji: emoji"]],
+    [%expr CssJs.fontVariantEmoji(`emoji)],
+  ),
+  (
+    [%css "font-variant-emoji: unicode"],
+    [%expr [%css "font-variant-emoji: unicode"]],
+    [%expr CssJs.fontVariantEmoji(`unicode)],
+  ),
+  (
+    [%css "text-decoration-skip-ink: auto"],
+    [%expr [%css "text-decoration-skip-ink: auto"]],
+    [%expr CssJs.textDecorationSkipInk(`auto)],
+  ),
+  (
+    [%css "text-decoration-skip-ink: none"],
+    [%expr [%css "text-decoration-skip-ink: none"]],
+    [%expr CssJs.textDecorationSkipInk(`none)],
+  ),
+  (
+    [%css "text-decoration-skip-ink: all"],
+    [%expr [%css "text-decoration-skip-ink: all"]],
+    [%expr CssJs.textDecorationSkipInk(`all)],
+  ),
+  (
+    [%css "text-decoration-skip-box: none"],
+    [%expr [%css "text-decoration-skip-box: none"]],
+    [%expr CssJs.textDecorationSkipBox(`none)],
+  ),
+  (
+    [%css "text-decoration-skip-box: all"],
+    [%expr [%css "text-decoration-skip-box: all"]],
+    [%expr CssJs.textDecorationSkipBox(`all)],
+  ),
+  (
+    [%css "text-decoration-skip-inset: none"],
+    [%expr [%css "text-decoration-skip-inset: none"]],
+    [%expr CssJs.textDecorationSkipInset(`none)],
+  ),
+  (
+    [%css "text-decoration-skip-inset: auto"],
+    [%expr [%css "text-decoration-skip-inset: auto"]],
+    [%expr CssJs.textDecorationSkipInset(`auto)],
+  ),
+  (
+    [%css "transform-box: content-box"],
+    [%expr [%css "transform-box: content-box"]],
+    [%expr CssJs.transformBox(`contentBox)],
+  ),
+  (
+    [%css "transform-box: border-box"],
+    [%expr [%css "transform-box: border-box"]],
+    [%expr CssJs.transformBox(`borderBox)],
+  ),
+  (
+    [%css "transform-box: fill-box"],
+    [%expr [%css "transform-box: fill-box"]],
+    [%expr CssJs.transformBox(`fillBox)],
+  ),
+  (
+    [%css "transform-box: stroke-box"],
+    [%expr [%css "transform-box: stroke-box"]],
+    [%expr CssJs.transformBox(`strokeBox)],
+  ),
+  (
+    [%css "transform-box: view-box"],
+    [%expr [%css "transform-box: view-box"]],
+    [%expr CssJs.transformBox(`viewBox)],
   ),
   // unsupported
   /* (

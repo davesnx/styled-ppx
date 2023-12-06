@@ -249,8 +249,25 @@ let variant_to_expression = (~loc) =>
   | `Wrap => id([%expr `wrap])
   | `Match_parent => id([%expr `matchParent])
   | `Justify_all => id([%expr `justifyAll])
-  | `FitContent => raise(Unsupported_feature)
   | `Wrap_reverse => id([%expr `wrapReverse])
+  | `Manual => id([%expr `manual])
+  | `Inter_word => id([%expr `interWord])
+  | `Inter_character => id([%expr `InterCharacter])
+  | `Sub => id([%expr `sub])
+  | `Super => id([%expr `super])
+  | `All_small_caps => id([%expr `allSmallCaps])
+  | `Petite_caps => id([%expr `petiteCaps])
+  | `All_petite_caps => id([%expr `allPetiteCaps])
+  | `Unicase => id([%expr `unicase])
+  | `Titling_caps => id([%expr `titlingCaps])
+  | `Text => id([%expr `text])
+  | `Emoji => id([%expr `emoji])
+  | `Unicode => id([%expr `unicode])
+  | `All => id([%expr `all])
+  | `Fill_box => id([%expr `fillBox])
+  | `Stroke_box => id([%expr `strokeBox])
+  | `View_box => id([%expr `viewBox])
+  | `FitContent => raise(Unsupported_feature)
   | `Full_width => raise(Unsupported_feature)
   | `Full_size_kana => raise(Unsupported_feature);
 
@@ -1888,24 +1905,10 @@ let overflow =
   );
 
 // let overflow_clip_margin = unsupportedProperty(Parser.property_overflow_clip_margin);
-let overflow_inline = unsupportedProperty(Parser.property_overflow_inline);
-
-/* let overflow_inline =
-   monomorphic(
-     Parser.property_overflow_inline,
-     (~loc) => [%expr "overflow-inline"],
-     (~loc, value) => switch (value: Types.property_overflow_inline) {
-       | `Auto => [%expr "auto"]
-       | `Clip => [%expr "clip"]
-       | `Hidden => [%expr "hidden"]
-       | `Paged => [%expr "paged"]
-       | `Scroll => [%expr "scroll"]
-       | `Visible => [%expr "visible"]
-       | `None => [%expr "none"]
-       | `Optional_paged => [%expr "optional-paged"]
-     }
-   ); */
-
+let overflow_inline =
+  variants(Parser.property_overflow_inline, (~loc) =>
+    [%expr CssJs.overflowInline]
+  );
 let text_overflow =
   monomorphic(
     Parser.property_text_overflow,
@@ -1935,7 +1938,6 @@ let white_space =
 let tab_size = unsupportedProperty(Parser.property_tab_size);
 let word_break =
   variants(Parser.property_word_break, (~loc) => [%expr CssJs.wordBreak]);
-let line_break = unsupportedProperty(Parser.property_line_break);
 let render_line_height = (~loc) =>
   fun
   | `Extended_length(ext) => render_extended_length(~loc, ext)
@@ -1955,7 +1957,8 @@ let line_height_step =
     (~loc) => [%expr CssJs.lineHeightStep],
     render_extended_length,
   );
-let hyphens = unsupportedProperty(Parser.property_hyphens);
+let hyphens =
+  variants(Parser.property_hyphens, (~loc) => [%expr CssJs.hyphens]);
 let overflow_wrap =
   variants(Parser.property_overflow_wrap, (~loc) =>
     [%expr CssJs.overflowWrap]
@@ -1968,8 +1971,12 @@ let text_align_all =
   variants(Parser.property_text_align_all, (~loc) =>
     [%expr CssJs.textAlignAll]
   );
-let text_align_last = unsupportedProperty(Parser.property_text_align_last);
-let text_justify = unsupportedProperty(Parser.property_text_justify);
+let text_align_last =
+  variants(Parser.property_text_align_last, (~loc) =>
+    [%expr CssJs.textAlignLast]
+  );
+let text_justify =
+  variants(Parser.property_text_justify, (~loc) => [%expr CssJs.textJustify]);
 let word_spacing =
   monomorphic(
     Parser.property_word_spacing,
@@ -2121,18 +2128,35 @@ let font_size =
 
 let font_size_adjust = unsupportedProperty(Parser.property_font_size_adjust);
 let font = unsupportedProperty(Parser.property_font);
-// let font_synthesis_weight = unsupportedProperty(Parser.property_font_synthesis_weight);
-// let font_synthesis_style = unsupportedProperty(Parser.property_font_synthesis_style);
-// let font_synthesis_small_caps =
-// unsupportedProperty(Parser.property_font_synthesis_small_caps);
+let font_synthesis_weight =
+  variants(Parser.property_font_synthesis_weight, (~loc) =>
+    [%expr CssJs.fontSynthesisWeight]
+  );
+let font_synthesis_style =
+  variants(Parser.property_font_synthesis_style, (~loc) =>
+    [%expr CssJs.fontSynthesisStyle]
+  );
+let font_synthesis_small_caps =
+  variants(Parser.property_font_synthesis_small_caps, (~loc) =>
+    [%expr CssJs.fontSynthesisSmallCaps]
+  );
+let font_synthesis_position =
+  variants(Parser.property_font_synthesis_position, (~loc) =>
+    [%expr CssJs.fontSynthesisPosition]
+  );
 let font_synthesis = unsupportedProperty(Parser.property_font_synthesis);
-let font_kerning = unsupportedProperty(Parser.property_font_kerning);
+let font_kerning =
+  variants(Parser.property_font_kerning, (~loc) => [%expr CssJs.fontKerning]);
 let font_variant_ligatures =
   unsupportedProperty(Parser.property_font_variant_ligatures);
 let font_variant_position =
-  unsupportedProperty(Parser.property_font_variant_position);
+  variants(Parser.property_font_variant_position, (~loc) =>
+    [%expr CssJs.fontVariantPosition]
+  );
 let font_variant_caps =
-  unsupportedProperty(Parser.property_font_variant_caps);
+  variants(Parser.property_font_variant_caps, (~loc) =>
+    [%expr CssJs.fontVariantCaps]
+  );
 let font_variant_numeric =
   unsupportedProperty(Parser.property_font_variant_numeric);
 let font_variant_alternates =
@@ -2151,11 +2175,16 @@ let font_variant =
 let font_feature_settings =
   unsupportedProperty(Parser.property_font_feature_settings);
 let font_optical_sizing =
-  unsupportedProperty(Parser.property_font_optical_sizing);
+  variants(Parser.property_font_optical_sizing, (~loc) =>
+    [%expr CssJs.fontOpticalSizing]
+  );
 let font_variation_settings =
   unsupportedProperty(Parser.property_font_variation_settings);
 // let font_palette = unsupportedProperty(Parser.property_font_palette);
-// let font_variant_emoji = unsupportedProperty(Parser.property_font_variant_emoji);
+let font_variant_emoji =
+  variants(Parser.property_font_variant_emoji, (~loc) =>
+    [%expr CssJs.fontVariantEmoji]
+  );
 
 // css-text-decor-3
 let render_text_decoration_line =
@@ -2259,24 +2288,111 @@ let text_decoration_skip =
   unsupportedProperty(Parser.property_text_decoration_skip);
 // let text_decoration_skip_self =
 //   unsupportedProperty(Parser.property_text_decoration_skip_self);
-// let text_decoration_skip_box = unsupportedProperty(Parser.property_text_decoration_skip_box);
-// let text_decoration_skip_inset =
-//   unsupportedProperty(Parser.property_text_decoration_skip_inset);
+let text_decoration_skip_box =
+  variants(Parser.property_text_decoration_skip_box, (~loc) =>
+    [%expr CssJs.textDecorationSkipBox]
+  );
+let text_decoration_skip_inset =
+  variants(Parser.property_text_decoration_skip_inset, (~loc) =>
+    [%expr CssJs.textDecorationSkipInset]
+  );
 // let text_decoration_skip_spaces =
 //   unsupportedProperty(Parser.property_text_decoration_skip_spaces);
 let text_decoration_skip_ink =
-  unsupportedProperty(Parser.property_text_decoration_skip_ink);
+  variants(Parser.property_text_decoration_skip_ink, (~loc) =>
+    [%expr CssJs.textDecorationSkipInk]
+  );
+
 let text_emphasis_style =
-  unsupportedProperty(Parser.property_text_emphasis_style);
+  polymorphic(
+    Parser.property_text_emphasis_style,
+    (~loc, value) => {
+      let render_filled_or_open = (~loc) => {
+        fun
+        | `Filled => [%expr `filled]
+        | `Open => [%expr `open_];
+      };
+
+      let render_shape = (~loc) => {
+        fun
+        | `Dot => [%expr `dot]
+        | `Circle => [%expr `circle]
+        | `Double_circle => [%expr `double_circle]
+        | `Triangle => [%expr `triangle]
+        | `Sesame => [%expr `sesame];
+      };
+
+      switch (value) {
+      | `Or(Some(x), None) => [
+          [%expr
+            CssJs.textEmphasisStyle([%e render_filled_or_open(~loc, x)])
+          ],
+        ]
+      | `Or(None, Some(y)) => [
+          [%expr CssJs.textEmphasisStyle([%e render_shape(~loc, y)])],
+        ]
+      | `Or(Some(x), Some(y)) => [
+          [%expr
+            CssJs.textEmphasisStyles(
+              [%e render_filled_or_open(~loc, x)],
+              [%e render_shape(~loc, y)],
+            )
+          ],
+        ]
+      | `Or(None, None)
+      | `None => [[%expr CssJs.textEmphasisStyle(`none)]]
+      | `String(str) => [
+          [%expr
+            CssJs.textEmphasisStyle(`string([%e render_string(~loc, str)]))
+          ],
+        ]
+      };
+    },
+  );
+
 let text_emphasis_color =
   monomorphic(
     Parser.property_text_emphasis_color,
     (~loc) => [%expr CssJs.textEmphasisColor],
     render_color,
   );
+
 let text_emphasis = unsupportedProperty(Parser.property_text_emphasis);
+
 let text_emphasis_position =
-  unsupportedProperty(Parser.property_text_emphasis_position);
+  polymorphic(
+    Parser.property_text_emphasis_position,
+    (~loc, value) => {
+      let render_position_left_right = (~loc) => {
+        fun
+        | `Left => [%expr `left]
+        | `Right => [%expr `right];
+      };
+
+      let render_over_or_under = (~loc) => {
+        fun
+        | `Over => [%expr `over]
+        | `Under => [%expr `under];
+      };
+
+      switch (value) {
+      | (y, None) => [
+          [%expr
+            CssJs.textEmphasisPosition([%e render_over_or_under(~loc, y)])
+          ],
+        ]
+      | (y, Some(position)) => [
+          [%expr
+            CssJs.textEmphasisPositions(
+              [%e render_over_or_under(~loc, y)],
+              [%e render_position_left_right(~loc, position)],
+            )
+          ],
+        ]
+      };
+    },
+  );
+
 // let text_emphasis_skip = unsupportedProperty(Parser.property_text_emphasis_skip);
 
 let render_text_shadow = (~loc, shadow) => {
@@ -2460,7 +2576,10 @@ let transform_origin =
     | `Extended_length(_)
     | `Extended_percentage(_) => raise(Unsupported_feature)
   );
-let transform_box = unsupportedProperty(Parser.property_transform_box);
+let transform_box =
+  variants(Parser.property_transform_box, (~loc) =>
+    [%expr CssJs.transformBox]
+  );
 let translate =
   unsupportedValue(Parser.property_translate, (~loc) =>
     [%expr CssJs.translate]
@@ -3355,6 +3474,22 @@ let strokeOpacity =
     render_alpha_value,
   );
 
+let line_break =
+  monomorphic(
+    Parser.property_line_break,
+    (~loc) => [%expr CssJs.lineBreak],
+    (~loc, value) => {
+      switch (value) {
+      | `Auto => [%expr `auto]
+      | `Loose => [%expr `loose]
+      | `Normal => [%expr `normal]
+      | `Strict => [%expr `strict]
+      | `Anywhere => [%expr `anywhere]
+      | `Interpolation(var) => render_variable(~loc, var)
+      }
+    },
+  );
+
 let found = ({ast_of_string, string_to_expr, _}) => {
   /* TODO: Why we have 'check_value' when we don't use it? */
   let check_value = string => {
@@ -3611,6 +3746,10 @@ let properties = [
   ("font-stretch", found(font_stretch)),
   ("font-style", found(font_style)),
   ("font-synthesis", found(font_synthesis)),
+  ("font-synthesis-weight", found(font_synthesis_weight)),
+  ("font-synthesis-style", found(font_synthesis_style)),
+  ("font-synthesis-small-caps", found(font_synthesis_small_caps)),
+  ("font-synthesis-position", found(font_synthesis_position)),
   ("font-variant-alternates", found(font_variant_alternates)),
   ("font-variant-caps", found(font_variant_caps)),
   ("font-variant-east-asian", found(font_variant_east_asian)),
@@ -3793,14 +3932,10 @@ let properties = [
   // ("block-ellipsis", found(block_ellipsis)),
   // ("continue", found(continue)),
   // ("font-palette", found(font_palette)),
-  // ("font-synthesis-small-caps", found(font_synthesis_small_caps)),
-  // ("font-synthesis-style", found(font_synthesis_style)),
-  // ("font-synthesis-weight", found(font_synthesis_weight)),
-  // ("font-variant-emoji", found(font_variant_emoji)),
+  ("font-variant-emoji", found(font_variant_emoji)),
   // ("overflow-clip-margin", found(overflow_clip_margin)),
-  // ("text-align-all", found(text_align_all)),
-  // ("text-decoration-skip-box", found(text_decoration_skip_box)),
-  // ("text-decoration-skip-inset", found(text_decoration_skip_inset)),
+  ("text-decoration-skip-box", found(text_decoration_skip_box)),
+  ("text-decoration-skip-inset", found(text_decoration_skip_inset)),
   // ("text-decoration-skip-self", found(text_decoration_skip_self)),
   // ("text-decoration-skip-spaces", found(text_decoration_skip_spaces)),
   // ("text-emphasis-skip", found(text_emphasis_skip)),
