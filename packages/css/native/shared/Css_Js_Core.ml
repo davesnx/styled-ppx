@@ -667,43 +667,43 @@ let textEmphasisStyle x =
     ( {js|textEmphasisStyle|js},
       match x with
       | #TextEmphasisStyle.t as tes -> TextEmphasisStyle.toString tes
-      | `textEmphasisStyleXY (x, y) ->
-        (match x with
-        | #TextEmphasisStyle.FilledOrOpen.t as fo ->
-          TextEmphasisStyle.FilledOrOpen.toString fo
-        | #Var.t as va -> Var.toString va
-        | #Cascading.t as c ->
-          Cascading.toString c
-          ^ {js| |js}
-          ^
-          (match y with
-          | #TextEmphasisStyle.Shape.t as shape ->
-            TextEmphasisStyle.Shape.toString shape
-          | #Var.t as va -> Var.toString va
-          | #Cascading.t as c -> Cascading.toString c))
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let textEmphasisPosition x =
+let textEmphasisStyles x y =
   D
-    ( {js|textEmphasisPosition|js},
+    ( {js|textEmphasisStyles|js},
       match x with
-      | #TextEmphasisPosition.OverOrUnder.t as ou ->
-        TextEmphasisPosition.OverOrUnder.toString ou
-      | `textEmphasisPositionYX (y, x) ->
+      | #TextEmphasisStyle.FilledOrOpen.t as fo ->
+        TextEmphasisStyle.FilledOrOpen.toString fo
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c ->
+        Cascading.toString c
+        ^ {js| |js}
+        ^
         (match y with
-        | #TextEmphasisPosition.OverOrUnder.t as ou ->
-          TextEmphasisPosition.OverOrUnder.toString ou
-        | #Var.t as va -> Var.toString va
-        | #Cascading.t as c ->
-          Cascading.toString c
-          ^ {js| |js}
-          ^
-          (match x with
-          | #TextEmphasisPosition.LeftRightAlignment.t as lr ->
-            TextEmphasisPosition.LeftRightAlignment.toString lr
-          | #Var.t as va -> Var.toString va
-          | #Cascading.t as c -> Cascading.toString c))
+        | #TextEmphasisStyle.Shape.t as shape ->
+          TextEmphasisStyle.Shape.toString shape
+        | #Var.t as va -> Var.toString va) )
+
+let textEmphasisPosition' = function
+  | #TextEmphasisPosition.OverOrUnder.t as ou ->
+    TextEmphasisPosition.OverOrUnder.toString ou
+  | #Var.t as va -> Var.toString va
+  | #Cascading.t as c -> Cascading.toString c
+
+let textEmphasisPosition x =
+  D ({js|textEmphasisPosition|js}, textEmphasisPosition' x)
+
+let textEmphasisPositions x y =
+  D
+    ( {js|textEmphasisPositions|js},
+      textEmphasisPosition' x
+      ^ {js| |js}
+      ^
+      match y with
+      | #TextEmphasisPosition.LeftRightAlignment.t as lr ->
+        TextEmphasisPosition.LeftRightAlignment.toString lr
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
@@ -1144,7 +1144,7 @@ let transformOrigin3d x y z =
 
 let transformBox x =
   D
-    ( {js|transform-box|js},
+    ( {js|transformBox|js},
       match x with
       | #TransformBox.t as tb -> TransformBox.toString tb
       | #Cascading.t as c -> Cascading.toString c )

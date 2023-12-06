@@ -655,7 +655,7 @@ CssJs.textEmphasisStyle(`circle);
 CssJs.textEmphasisStyle(`double_circle);
 CssJs.textEmphasisStyle(`triangle);
 CssJs.textEmphasisStyle(`sesame);
-CssJs.textEmphasisStyle(`textEmphasisStyleXY((`open_, `dot)));
+CssJs.textEmphasisStyles(`open_, `dot);
 CssJs.textEmphasisStyle(`string({js|foo|js}));
 CssJs.textEmphasisColor(CssJs.green);
 CssJs.unsafe({js|textEmphasis|js}, {js|open dot green|js});
@@ -664,11 +664,11 @@ CssJs.unsafe({js|textEmphasis|js}, {js|open dot green|js});
 ];
 CssJs.textEmphasisPosition(`over);
 CssJs.textEmphasisPosition(`under);
-CssJs.textEmphasisPosition(`textEmphasisPositionYX((`over, `left)));
-CssJs.textEmphasisPosition(`textEmphasisPositionYX((`over, `right)));
-CssJs.textEmphasisPosition(`textEmphasisPositionYX((`under, `left)));
-CssJs.textEmphasisPosition(`textEmphasisPositionYX((`under, `left)));
-CssJs.textEmphasisPosition(`textEmphasisPositionYX((`under, `right)));
+CssJs.textEmphasisPositions(`over, `left);
+CssJs.textEmphasisPositions(`over, `right);
+CssJs.textEmphasisPositions(`under, `left);
+CssJs.textEmphasisPositions(`under, `left);
+CssJs.textEmphasisPositions(`under, `right);
 CssJs.textShadow(`none);
 CssJs.textShadow(
   CssJs.Shadow.text(

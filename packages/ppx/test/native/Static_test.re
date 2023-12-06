@@ -648,16 +648,12 @@ let properties_static_css_tests = [
   (
     [%css "text-emphasis-style: filled double-circle"],
     [%expr [%css "text-emphasis-style:  filled double-circle"]],
-    [%expr
-      CssJs.textEmphasisStyle(
-        `textEmphasisStyleXY((`filled, `double_circle)),
-      )
-    ],
+    [%expr CssJs.textEmphasisStyles(`filled, `double_circle)],
   ),
   (
     [%css "text-emphasis-style: sesame open"],
     [%expr [%css "text-emphasis-style:  sesame open"]],
-    [%expr CssJs.textEmphasisStyle(`textEmphasisStyleXY((`open_, `sesame)))],
+    [%expr CssJs.textEmphasisStyles(`open_, `sesame)],
   ),
   (
     [%css "text-emphasis-position: over"],
@@ -672,16 +668,12 @@ let properties_static_css_tests = [
   (
     [%css "text-emphasis-position: over left"],
     [%expr [%css "text-emphasis-position: over left"]],
-    [%expr
-      CssJs.textEmphasisPosition(`textEmphasisPositionYX((`over, `left)))
-    ],
+    [%expr CssJs.textEmphasisPositions(`over, `left)],
   ),
   (
     [%css "text-emphasis-position: left over"],
     [%expr [%css "text-emphasis-position: left over"]],
-    [%expr
-      CssJs.textEmphasisPosition(`textEmphasisPositionYX((`over, `left)))
-    ],
+    [%expr CssJs.textEmphasisPositions(`over, `left)],
   ),
   (
     [%css "line-break: auto"],

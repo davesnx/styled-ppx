@@ -2302,11 +2302,11 @@ let text_decoration_skip_ink =
   variants(Parser.property_text_decoration_skip_ink, (~loc) =>
     [%expr CssJs.textDecorationSkipInk]
   );
+
 let text_emphasis_style =
-  monomorphic(
+  polymorphic(
     Parser.property_text_emphasis_style,
-    (~loc) => [%expr CssJs.textEmphasisStyle],
-    (~loc, value: Types.property_text_emphasis_style) => {
+    (~loc, value) => {
       let render_filled_or_open = (~loc) => {
         fun
         | `Filled => [%expr `filled]
@@ -2323,17 +2323,29 @@ let text_emphasis_style =
       };
 
       switch (value) {
-      | `Or(Some(x), None) => [%expr [%e render_filled_or_open(~loc, x)]]
-      | `Or(None, Some(y)) => [%expr [%e render_shape(~loc, y)]]
-      | `Or(Some(x), Some(y)) =>
-        [%expr
-         `textEmphasisStyleXY((
-           [%e render_filled_or_open(~loc, x)],
-           [%e render_shape(~loc, y)],
-         ))]
+      | `Or(Some(x), None) => [
+          [%expr
+            CssJs.textEmphasisStyle([%e render_filled_or_open(~loc, x)])
+          ],
+        ]
+      | `Or(None, Some(y)) => [
+          [%expr CssJs.textEmphasisStyle([%e render_shape(~loc, y)])],
+        ]
+      | `Or(Some(x), Some(y)) => [
+          [%expr
+            CssJs.textEmphasisStyles(
+              [%e render_filled_or_open(~loc, x)],
+              [%e render_shape(~loc, y)],
+            )
+          ],
+        ]
       | `Or(None, None)
-      | `None => [%expr `none]
-      | `String(str) => [%expr `string([%e render_string(~loc, str)])]
+      | `None => [[%expr CssJs.textEmphasisStyle(`none)]]
+      | `String(str) => [
+          [%expr
+            CssJs.textEmphasisStyle(`string([%e render_string(~loc, str)]))
+          ],
+        ]
       };
     },
   );
@@ -2346,11 +2358,11 @@ let text_emphasis_color =
   );
 
 let text_emphasis = unsupportedProperty(Parser.property_text_emphasis);
+
 let text_emphasis_position =
-  monomorphic(
+  polymorphic(
     Parser.property_text_emphasis_position,
-    (~loc) => [%expr CssJs.textEmphasisPosition],
-    (~loc, value: Types.property_text_emphasis_position) => {
+    (~loc, value) => {
       let render_position_left_right = (~loc) => {
         fun
         | `Left => [%expr `left]
@@ -2362,14 +2374,21 @@ let text_emphasis_position =
         | `Over => [%expr `over]
         | `Under => [%expr `under];
       };
+
       switch (value) {
-      | (y, None) => [%expr [%e render_over_or_under(~loc, y)]]
-      | (y, Some(position)) =>
-        [%expr
-         `textEmphasisPositionYX((
-           [%e render_over_or_under(~loc, y)],
-           [%e render_position_left_right(~loc, position)],
-         ))]
+      | (y, None) => [
+          [%expr
+            CssJs.textEmphasisPosition([%e render_over_or_under(~loc, y)])
+          ],
+        ]
+      | (y, Some(position)) => [
+          [%expr
+            CssJs.textEmphasisPositions(
+              [%e render_over_or_under(~loc, y)],
+              [%e render_position_left_right(~loc, position)],
+            )
+          ],
+        ]
       };
     },
   );
