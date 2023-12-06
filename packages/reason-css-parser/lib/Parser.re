@@ -1154,7 +1154,7 @@ and property_image_orientation = [%value.rec
   "'from-image' | <extended-angle> | [ <extended-angle> ]? 'flip'"
 ]
 and property_image_rendering = [%value.rec
-  "'auto' | 'crisp-edges' | 'pixelated' | 'optimizeSpeed' | 'optimizeQuality' | <-non-standard-image-rendering>"
+  "'auto' |'smooth' | 'high-quality' | 'crisp-edges' | 'pixelated'"
 ]
 and property_image_resolution = [%value.rec
   "[ 'from-image' || <resolution> ] && [ 'snap' ]?"

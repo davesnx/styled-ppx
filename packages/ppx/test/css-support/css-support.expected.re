@@ -324,6 +324,11 @@ CssJs.backgroundImage(
     |],
   )),
 );
+CssJs.imageRendering(`auto);
+CssJs.imageRendering(`smooth);
+CssJs.imageRendering(`highQuality);
+CssJs.imageRendering(`pixelated);
+CssJs.imageRendering(`crispEdges);
 CssJs.boxSizing(`borderBox);
 CssJs.boxSizing(`contentBox);
 CssJs.outlineStyle(`auto);
