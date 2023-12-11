@@ -4,6 +4,7 @@
  (libraries
   alcotest
   fmt
+  server-reason-react.js
   styled-ppx.css_native
   styled-ppx.emotion_native
   styled-ppx.emotion-hash)

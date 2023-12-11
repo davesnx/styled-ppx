@@ -8,6 +8,7 @@
   ppxlib
   ppxlib.astlib
   server-reason-react.belt
+  server-reason-react.js
   fmt)
  (preprocess
   (pps ppxlib.metaquot styled-ppx.lib -- -no-merge)))
