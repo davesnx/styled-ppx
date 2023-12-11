@@ -2110,7 +2110,7 @@ module Gradient = struct
            match l with
            | None -> string_of_color c
            | Some l -> string_of_color c ^ {js| |js} ^ Length.toString l)
-    |. Js.Array2.joinWith {js|, |js}
+    |> Js.Array.join ~sep:{js|, |js}
 
   let direction_to_string = function
     | `Angle a -> Angle.toString a
@@ -2277,7 +2277,7 @@ module FontFamilyName = struct
   let toString x =
     match x with
     | `custom value ->
-      (match Js.String2.get value 0 with
+      (match Js.String.get value 0 with
       | {js|"|js} | {js|'|js} -> value
       | _ -> ({js|"|js} ^ value) ^ {js|"|js})
     | `serif -> {js|serif|js}
@@ -2425,7 +2425,7 @@ module Content = struct
     | "" -> {js|''|js}
     | {js|""|js} -> {js|''|js}
     | value ->
-      (match Js.String2.get value 0, Js.String2.length value with
+      (match Js.String.get value 0, Js.String.length value with
       | {js|"|js}, 1 -> {js|'"'|js}
       | {js|'|js}, 1 -> {js|"'"|js}
       | {js|"|js}, _ | {js|'|js}, _ -> value

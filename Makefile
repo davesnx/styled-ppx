@@ -40,22 +40,17 @@ fmt format: ## Formats code
 setup-githooks: ## Setup githooks
 	@git config core.hooksPath .githooks
 
-.PHONY: pin
-pin: ## Pin dependencies
-	@opam pin add reason.dev "https://github.com/reasonml/reason.git#f92f7ecc228d19ebf4d9d0214792da7b45472766" -y
-	@opam pin add server-reason-react.dev "https://github.com/ml-in-barcelona/server-reason-react.git#f3e286610154f5d3bc32725d315f96872947dc61" -y
-
 .PHONY: create-switch
 create-switch: ## Create opam switch
-	opam switch create . 5.1.0 --deps-only --with-test --no-install
+	opam switch create . 5.1.1 --deps-only --with-test --no-install
 
 .PHONY: install
 install: ## Install project dependencies
-	opam install . --deps-only --with-test
+	opam install . --deps-only --with-test -y
 	npm install
 
 .PHONY: init
-init: setup-githooks create-switch pin install ## Create a local dev enviroment
+init: setup-githooks create-switch install ## Create a local dev enviroment
 
 .PHONY: subst
 subst: ## Run dune substitute
