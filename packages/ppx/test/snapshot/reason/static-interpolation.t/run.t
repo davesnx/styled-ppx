@@ -824,137 +824,137 @@
       [@mel.optional]
       zoomAndPan: option(string),
       [@mel.optional]
-      onAbort: option(ReactEvent.Media.t => unit),
+      onAbort: option(React.Event.Media.t => unit),
       [@mel.optional]
-      onAnimationEnd: option(ReactEvent.Animation.t => unit),
+      onAnimationEnd: option(React.Event.Animation.t => unit),
       [@mel.optional]
-      onAnimationIteration: option(ReactEvent.Animation.t => unit),
+      onAnimationIteration: option(React.Event.Animation.t => unit),
       [@mel.optional]
-      onAnimationStart: option(ReactEvent.Animation.t => unit),
+      onAnimationStart: option(React.Event.Animation.t => unit),
       [@mel.optional]
-      onBlur: option(ReactEvent.Focus.t => unit),
+      onBlur: option(React.Event.Focus.t => unit),
       [@mel.optional]
-      onCanPlay: option(ReactEvent.Media.t => unit),
+      onCanPlay: option(React.Event.Media.t => unit),
       [@mel.optional]
-      onCanPlayThrough: option(ReactEvent.Media.t => unit),
+      onCanPlayThrough: option(React.Event.Media.t => unit),
       [@mel.optional]
-      onChange: option(ReactEvent.Form.t => unit),
+      onChange: option(React.Event.Form.t => unit),
       [@mel.optional]
-      onClick: option(ReactEvent.Mouse.t => unit),
+      onClick: option(React.Event.Mouse.t => unit),
       [@mel.optional]
-      onCompositionEnd: option(ReactEvent.Composition.t => unit),
+      onCompositionEnd: option(React.Event.Composition.t => unit),
       [@mel.optional]
-      onCompositionStart: option(ReactEvent.Composition.t => unit),
+      onCompositionStart: option(React.Event.Composition.t => unit),
       [@mel.optional]
-      onCompositionUpdate: option(ReactEvent.Composition.t => unit),
+      onCompositionUpdate: option(React.Event.Composition.t => unit),
       [@mel.optional]
-      onContextMenu: option(ReactEvent.Mouse.t => unit),
+      onContextMenu: option(React.Event.Mouse.t => unit),
       [@mel.optional]
-      onCopy: option(ReactEvent.Clipboard.t => unit),
+      onCopy: option(React.Event.Clipboard.t => unit),
       [@mel.optional]
-      onCut: option(ReactEvent.Clipboard.t => unit),
+      onCut: option(React.Event.Clipboard.t => unit),
       [@mel.optional]
-      onDoubleClick: option(ReactEvent.Mouse.t => unit),
+      onDoubleClick: option(React.Event.Mouse.t => unit),
       [@mel.optional]
-      onDrag: option(ReactEvent.Mouse.t => unit),
+      onDrag: option(React.Event.Mouse.t => unit),
       [@mel.optional]
-      onDragEnd: option(ReactEvent.Mouse.t => unit),
+      onDragEnd: option(React.Event.Mouse.t => unit),
       [@mel.optional]
-      onDragEnter: option(ReactEvent.Mouse.t => unit),
+      onDragEnter: option(React.Event.Mouse.t => unit),
       [@mel.optional]
-      onDragExit: option(ReactEvent.Mouse.t => unit),
+      onDragExit: option(React.Event.Mouse.t => unit),
       [@mel.optional]
-      onDragLeave: option(ReactEvent.Mouse.t => unit),
+      onDragLeave: option(React.Event.Mouse.t => unit),
       [@mel.optional]
-      onDragOver: option(ReactEvent.Mouse.t => unit),
+      onDragOver: option(React.Event.Mouse.t => unit),
       [@mel.optional]
-      onDragStart: option(ReactEvent.Mouse.t => unit),
+      onDragStart: option(React.Event.Mouse.t => unit),
       [@mel.optional]
-      onDrop: option(ReactEvent.Mouse.t => unit),
+      onDrop: option(React.Event.Mouse.t => unit),
       [@mel.optional]
-      onDurationChange: option(ReactEvent.Media.t => unit),
+      onDurationChange: option(React.Event.Media.t => unit),
       [@mel.optional]
-      onEmptied: option(ReactEvent.Media.t => unit),
+      onEmptied: option(React.Event.Media.t => unit),
       [@mel.optional]
-      onEncrypetd: option(ReactEvent.Media.t => unit),
+      onEncrypetd: option(React.Event.Media.t => unit),
       [@mel.optional]
-      onEnded: option(ReactEvent.Media.t => unit),
+      onEnded: option(React.Event.Media.t => unit),
       [@mel.optional]
-      onError: option(ReactEvent.Media.t => unit),
+      onError: option(React.Event.Media.t => unit),
       [@mel.optional]
-      onFocus: option(ReactEvent.Focus.t => unit),
+      onFocus: option(React.Event.Focus.t => unit),
       [@mel.optional]
-      onInput: option(ReactEvent.Form.t => unit),
+      onInput: option(React.Event.Form.t => unit),
       [@mel.optional]
-      onKeyDown: option(ReactEvent.Keyboard.t => unit),
+      onKeyDown: option(React.Event.Keyboard.t => unit),
       [@mel.optional]
-      onKeyPress: option(ReactEvent.Keyboard.t => unit),
+      onKeyPress: option(React.Event.Keyboard.t => unit),
       [@mel.optional]
-      onKeyUp: option(ReactEvent.Keyboard.t => unit),
+      onKeyUp: option(React.Event.Keyboard.t => unit),
       [@mel.optional]
-      onLoadedData: option(ReactEvent.Media.t => unit),
+      onLoadedData: option(React.Event.Media.t => unit),
       [@mel.optional]
-      onLoadedMetadata: option(ReactEvent.Media.t => unit),
+      onLoadedMetadata: option(React.Event.Media.t => unit),
       [@mel.optional]
-      onLoadStart: option(ReactEvent.Media.t => unit),
+      onLoadStart: option(React.Event.Media.t => unit),
       [@mel.optional]
-      onMouseDown: option(ReactEvent.Mouse.t => unit),
+      onMouseDown: option(React.Event.Mouse.t => unit),
       [@mel.optional]
-      onMouseEnter: option(ReactEvent.Mouse.t => unit),
+      onMouseEnter: option(React.Event.Mouse.t => unit),
       [@mel.optional]
-      onMouseLeave: option(ReactEvent.Mouse.t => unit),
+      onMouseLeave: option(React.Event.Mouse.t => unit),
       [@mel.optional]
-      onMouseMove: option(ReactEvent.Mouse.t => unit),
+      onMouseMove: option(React.Event.Mouse.t => unit),
       [@mel.optional]
-      onMouseOut: option(ReactEvent.Mouse.t => unit),
+      onMouseOut: option(React.Event.Mouse.t => unit),
       [@mel.optional]
-      onMouseOver: option(ReactEvent.Mouse.t => unit),
+      onMouseOver: option(React.Event.Mouse.t => unit),
       [@mel.optional]
-      onMouseUp: option(ReactEvent.Mouse.t => unit),
+      onMouseUp: option(React.Event.Mouse.t => unit),
       [@mel.optional]
-      onPaste: option(ReactEvent.Clipboard.t => unit),
+      onPaste: option(React.Event.Clipboard.t => unit),
       [@mel.optional]
-      onPause: option(ReactEvent.Media.t => unit),
+      onPause: option(React.Event.Media.t => unit),
       [@mel.optional]
-      onPlay: option(ReactEvent.Media.t => unit),
+      onPlay: option(React.Event.Media.t => unit),
       [@mel.optional]
-      onPlaying: option(ReactEvent.Media.t => unit),
+      onPlaying: option(React.Event.Media.t => unit),
       [@mel.optional]
-      onProgress: option(ReactEvent.Media.t => unit),
+      onProgress: option(React.Event.Media.t => unit),
       [@mel.optional]
-      onRateChange: option(ReactEvent.Media.t => unit),
+      onRateChange: option(React.Event.Media.t => unit),
       [@mel.optional]
-      onScroll: option(ReactEvent.UI.t => unit),
+      onScroll: option(React.Event.UI.t => unit),
       [@mel.optional]
-      onSeeked: option(ReactEvent.Media.t => unit),
+      onSeeked: option(React.Event.Media.t => unit),
       [@mel.optional]
-      onSeeking: option(ReactEvent.Media.t => unit),
+      onSeeking: option(React.Event.Media.t => unit),
       [@mel.optional]
-      onSelect: option(ReactEvent.Selection.t => unit),
+      onSelect: option(React.Event.Selection.t => unit),
       [@mel.optional]
-      onStalled: option(ReactEvent.Media.t => unit),
+      onStalled: option(React.Event.Media.t => unit),
       [@mel.optional]
-      onSubmit: option(ReactEvent.Form.t => unit),
+      onSubmit: option(React.Event.Form.t => unit),
       [@mel.optional]
-      onSuspend: option(ReactEvent.Media.t => unit),
+      onSuspend: option(React.Event.Media.t => unit),
       [@mel.optional]
-      onTimeUpdate: option(ReactEvent.Media.t => unit),
+      onTimeUpdate: option(React.Event.Media.t => unit),
       [@mel.optional]
-      onTouchCancel: option(ReactEvent.Touch.t => unit),
+      onTouchCancel: option(React.Event.Touch.t => unit),
       [@mel.optional]
-      onTouchEnd: option(ReactEvent.Touch.t => unit),
+      onTouchEnd: option(React.Event.Touch.t => unit),
       [@mel.optional]
-      onTouchMove: option(ReactEvent.Touch.t => unit),
+      onTouchMove: option(React.Event.Touch.t => unit),
       [@mel.optional]
-      onTouchStart: option(ReactEvent.Touch.t => unit),
+      onTouchStart: option(React.Event.Touch.t => unit),
       [@mel.optional]
-      onTransitionEnd: option(ReactEvent.Transition.t => unit),
+      onTransitionEnd: option(React.Event.Transition.t => unit),
       [@mel.optional]
-      onVolumeChange: option(ReactEvent.Media.t => unit),
+      onVolumeChange: option(React.Event.Media.t => unit),
       [@mel.optional]
-      onWaiting: option(ReactEvent.Media.t => unit),
+      onWaiting: option(React.Event.Media.t => unit),
       [@mel.optional]
-      onWheel: option(ReactEvent.Wheel.t => unit),
+      onWheel: option(React.Event.Wheel.t => unit),
     };
     [@mel.module "react"]
     external createVariadicElement: (string, Js.t({..})) => React.element =
