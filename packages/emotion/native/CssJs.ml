@@ -1,6 +1,7 @@
 include Css_Colors
 include Css_Js_Core
 module Core = Css_Js_Core
+module Types = Css_AtomicTypes
 
 module Array = struct
   include Stdlib.Array

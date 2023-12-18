@@ -7,89 +7,7 @@ type rule =
   | PseudoClass of string * rule array
   | PseudoClassParam of string * string * rule array
 
-let rec ruleToDict =
- fun [@u] dict rule ->
-  (match rule with
-  | D (name, value) -> Js.Dict.set dict name (Js.Json.string value)
-  | S (name, ruleset) -> Js.Dict.set dict name (toJson ruleset)
-  | PseudoClass (name, ruleset) ->
-    dict |. Js.Dict.set ({js|:|js} ^ name) (toJson ruleset)
-  | PseudoClassParam (name, param, ruleset) ->
-    Js.Dict.set dict
-      ({js|:|js} ^ name ^ {js|(|js} ^ param ^ {js|)|js})
-      (toJson ruleset));
-  dict
-
-and toJson rules =
-  Std.Array.reduceU rules (Js.Dict.empty ()) ruleToDict |. Js.Json.object_
-
 type nonrec animationName = string
-
-module type MakeResult = sig
-  type nonrec styleEncoding
-  type nonrec renderer
-
-  val insertRule : (string -> unit[@u])
-  val renderRule : (renderer -> string -> unit[@u])
-  val global : (string -> rule array -> unit[@u])
-  val renderGlobal : (renderer -> string -> rule array -> unit[@u])
-  val style : (rule array -> styleEncoding[@u])
-  val merge : (styleEncoding array -> styleEncoding[@u])
-  val merge2 : (styleEncoding -> styleEncoding -> styleEncoding[@u])
-
-  val merge3 :
-    (styleEncoding -> styleEncoding -> styleEncoding -> styleEncoding[@u])
-
-  val merge4 :
-    (styleEncoding ->
-     styleEncoding ->
-     styleEncoding ->
-     styleEncoding ->
-     styleEncoding
-    [@u])
-
-  val keyframes : ((int * rule array) array -> animationName[@u])
-
-  val renderKeyframes :
-    (renderer -> (int * rule array) array -> animationName[@u])
-end
-
-module Make (CssImpl : Css_Core.CssImplementationIntf) :
-  MakeResult
-    with type styleEncoding := CssImpl.styleEncoding
-     and type renderer := CssImpl.renderer = struct
-  let insertRule = fun [@u] css -> (CssImpl.injectRaw css [@u])
-
-  let renderRule =
-   fun [@u] renderer css -> (CssImpl.renderRaw renderer css [@u])
-
-  let global =
-   fun [@u] selector rules -> (CssImpl.injectRules selector (toJson rules) [@u])
-
-  let renderGlobal =
-   fun [@u] renderer selector rules ->
-    (CssImpl.renderRules renderer selector (toJson rules) [@u])
-
-  let style = fun [@u] rules -> (CssImpl.make (toJson rules) [@u])
-  let merge = fun [@u] styles -> (CssImpl.mergeStyles styles [@u])
-  let merge2 = fun [@u] s s2 -> (merge [| s; s2 |] [@u])
-  let merge3 = fun [@u] s s2 s3 -> (merge [| s; s2; s3 |] [@u])
-  let merge4 = fun [@u] s s2 s3 s4 -> (merge [| s; s2; s3; s4 |] [@u])
-
-  let framesToDict frames =
-    Std.Array.reduceU frames (Js.Dict.empty ()) (fun [@u] dict (stop, rules) ->
-        let _ =
-          Js.Dict.set dict (Std.Int.toString stop ^ {js|%|js}) (toJson rules)
-        in
-        dict)
-
-  let keyframes =
-   fun [@u] frames -> (CssImpl.makeKeyframes (framesToDict frames) [@u])
-
-  let renderKeyframes =
-   fun [@u] renderer frames ->
-    (CssImpl.renderKeyframes renderer (framesToDict frames) [@u])
-end
 
 let join strings separator =
   Std.Array.reduceWithIndexU strings {js||js} (fun [@u] acc item index ->
@@ -1974,9 +1892,7 @@ let backgroundSize x =
 
 let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
     =
-  (let fontStyle =
-     Js.Option.map (fun [@u] value -> FontStyle.toString value) fontStyle
-   in
+  (
    let src =
      src
      |. Std.Array.map (fun x ->
@@ -1993,7 +1909,7 @@ let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
    in
    let fontStyle =
      Belt.Option.mapWithDefault fontStyle {js||js} (fun s ->
-         ({js|font-style: |js} ^ s) ^ {js|;|js})
+         ({js|font-style: |js} ^ FontStyle.toString s) ^ {js|;|js})
    in
    let fontWeight =
      Belt.Option.mapWithDefault fontWeight {js||js} (fun w ->

@@ -1,6 +1,7 @@
 include Css_Colors
-include Css_Legacy_Core
 module Core = Css_Legacy_Core
+include Css_Legacy_Core
+module Types = Css_AtomicTypes
 
 module Autoprefixer = struct
   (* Implementation of stylis autoprefixer https://github.com/thysultan/stylis *)

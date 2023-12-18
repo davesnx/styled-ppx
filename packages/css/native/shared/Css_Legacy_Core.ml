@@ -7,76 +7,6 @@ type rule =
   | PseudoClass of string * rule list
   | PseudoClassParam of string * string * rule list
 
-let rec ruleToDict dict rule =
-  (match rule with
-  | D (name, value) -> Js.Dict.set dict name (Js.Json.string value)
-  | S (name, ruleset) -> Js.Dict.set dict name (toJson ruleset)
-  | PseudoClass (name, ruleset) ->
-    Js.Dict.set dict ({js|:|js} ^ name) (toJson ruleset)
-  | PseudoClassParam (name, param, ruleset) ->
-    Js.Dict.set dict
-      ({js|:|js} ^ name ^ {js|(|js} ^ param ^ {js|)|js})
-      (toJson ruleset));
-  dict
-
-and toJson rules =
-  Std.List.reduce rules (Js.Dict.empty ()) ruleToDict |. Js.Json.object_
-
-let addStop dict (stop, rules) =
-  Js.Dict.set dict (Std.Int.toString stop ^ {js|%|js}) (toJson rules);
-  dict
-
-type nonrec animationName = string
-
-module type MakeResult = sig
-  type nonrec styleEncoding
-  type nonrec renderer
-
-  val insertRule : string -> unit
-  val renderRule : renderer -> string -> unit
-  val global : string -> rule list -> unit
-  val renderGlobal : renderer -> string -> rule list -> unit
-  val style : rule list -> styleEncoding
-  val merge : styleEncoding list -> styleEncoding
-  val merge2 : styleEncoding -> styleEncoding -> styleEncoding
-  val merge3 : styleEncoding -> styleEncoding -> styleEncoding -> styleEncoding
-
-  val merge4 :
-    styleEncoding ->
-    styleEncoding ->
-    styleEncoding ->
-    styleEncoding ->
-    styleEncoding
-
-  val keyframes : (int * rule list) list -> animationName
-  val renderKeyframes : renderer -> (int * rule list) list -> animationName
-end
-
-module Make (CssImpl : Css_Core.CssImplementationIntf) :
-  MakeResult
-    with type styleEncoding := CssImpl.styleEncoding
-     and type renderer := CssImpl.renderer = struct
-  let insertRule css = CssImpl.injectRaw css
-  let renderRule renderer css = CssImpl.renderRaw renderer css
-  let global selector rules = CssImpl.injectRules selector (toJson rules)
-
-  let renderGlobal renderer selector rules =
-    CssImpl.renderRules renderer selector (toJson rules)
-
-  let style rules = CssImpl.make (rules |. toJson)
-  let merge styles = CssImpl.mergeStyles (styles |. Std.List.toArray)
-  let merge2 s s2 = merge [ s; s2 ]
-  let merge3 s s2 s3 = merge [ s; s2; s3 ]
-  let merge4 s s2 s3 s4 = merge [ s; s2; s3; s4 ]
-
-  let keyframes frames =
-    CssImpl.makeKeyframes (List.fold_left addStop (Js.Dict.empty ()) frames)
-
-  let renderKeyframes renderer frames =
-    CssImpl.renderKeyframes renderer
-      (List.fold_left addStop (Js.Dict.empty ()) frames)
-end
-
 module Converter = struct
   let string_of_stops stops =
     stops
@@ -1877,9 +1807,6 @@ let backgroundSize x =
 
 let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
     =
-  let fontStyle =
-    Js.Option.map (fun value -> FontStyle.toString value) fontStyle
-  in
   let src =
     src
     |> List.map (fun x ->
@@ -1890,7 +1817,7 @@ let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
   in
   let fontStyle =
     Belt.Option.mapWithDefault fontStyle {js||js} (fun s ->
-        {js|font-style: |js} ^ s ^ {js|;|js})
+        {js|font-style: |js} ^ FontStyle.toString s ^ {js|;|js})
   in
   let fontWeight =
     Belt.Option.mapWithDefault fontWeight {js||js} (fun w ->
