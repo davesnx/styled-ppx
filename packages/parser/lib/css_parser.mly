@@ -59,7 +59,7 @@ declaration_list:
 
 /* keyframe may contain {} */
 keyframe: rules = nonempty_list(keyframe_style_rule) {
-    let () = nesting_level := !nesting_level + 1 in
+    let () = selector_nesting_level := !selector_nesting_level + 1 in
     rules
   }
 
@@ -186,7 +186,7 @@ keyframe_style_rule:
   | WS? id = IDENT WS?
     declarations = brace_block(loc(declarations)) WS? {
     let prelude = [
-      SimpleSelector (Type id, !nesting_level),
+      SimpleSelector (Type id, !selector_nesting_level),
       Parser_location.make $startpos(id) $endpos(id)
     ] in
     Style_rule {
@@ -200,7 +200,7 @@ keyframe_style_rule:
     declarations = brace_block(loc(declarations)) WS? {
     let item = Percentage p in
     let prelude = [
-      SimpleSelector(item, !nesting_level),
+      SimpleSelector(item, !selector_nesting_level),
       Parser_location.make $startpos(p) $endpos(p)
     ] in
     Style_rule {
@@ -214,7 +214,7 @@ keyframe_style_rule:
     let prelude = percentages
       |> List.map (fun percent -> Percentage percent)
       |> List.map (fun p ->
-        (SimpleSelector (p, !nesting_level),
+        (SimpleSelector (p, !selector_nesting_level),
         Parser_location.make $startpos(percentages) $endpos(percentages))
       ) in
     Style_rule {
@@ -401,8 +401,8 @@ selector:
   /* | xs = skip_ws_right(simple_selector) { SimpleSelector xs } */
   /* | xs = skip_ws_right(compound_selector) { CompoundSelector xs } */
   | xs = skip_ws_right(complex_selector) { 
-      let () = nesting_level := !nesting_level + 1 in
-      ComplexSelector(xs, !nesting_level)
+      let () = selector_nesting_level := !selector_nesting_level + 1 in
+      ComplexSelector(xs, !selector_nesting_level)
     }
 
 type_selector:
@@ -488,11 +488,11 @@ combinator_sequence:
 
 %inline non_complex_selector:
   | s = simple_selector {
-      let () = nesting_level := !nesting_level + 1 in
-      SimpleSelector(s, !nesting_level)
+      let () = selector_nesting_level := !selector_nesting_level + 1 in
+      SimpleSelector(s, !selector_nesting_level)
     }
   | s = compound_selector {
-      CompoundSelector(s, !nesting_level)
+      CompoundSelector(s, !selector_nesting_level)
     }
 
 /* <complex-selector> = <compound-selector> [ <combinator>? <compound-selector> ]* */

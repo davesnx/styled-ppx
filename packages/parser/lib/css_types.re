@@ -2,7 +2,9 @@
 
 module Location = Ppxlib.Location;
 
-let nesting_level = ref(0);
+/* [selector_nesting_level] keeps track of nested selectors so that those
+   deserving preceeding white space are rendered with it. */
+let selector_nesting_level = ref(0);
 
 [@deriving show({with_path: false})]
 type position =

@@ -44,16 +44,10 @@ let last_buffer = ref(None);
 let parse_string = (~skip_whitespace, ~pos, parser, string) => {
   let buffer = Sedlexing.Latin1.from_string(string);
 
+  let () = Css_types.selector_nesting_level := 0;
   last_buffer := Some(from_string(~pos?, string));
 
-  String.contains(string, '}')
-    ? {
-      let () = Css_types.nesting_level := 0;
-      parse(skip_whitespace, buffer, parser);
-    }
-    : {
-      parse(skip_whitespace, buffer, parser);
-    };
+  parse(skip_whitespace, buffer, parser);
 };
 
 let parse_declaration_list = (input: string) => {

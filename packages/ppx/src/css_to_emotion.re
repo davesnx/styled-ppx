@@ -372,8 +372,8 @@ and render_selector = (selector: selector, class_selector) => {
   switch (selector) {
   | SimpleSelector(simple, _) => simple |> render_simple_selector
   | ComplexSelector(complex, _) => complex |> render_complex_selector
-  | CompoundSelector(compound, nesting_level) =>
-    nesting_level > 0
+  | CompoundSelector(compound, selector_nesting_level) =>
+    selector_nesting_level > 0
       ? compound |> render_compound_selector(render_subclass_selector(" ."))
       : compound |> render_compound_selector(render_subclass_selector("."))
   };
