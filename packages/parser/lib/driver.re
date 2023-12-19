@@ -46,7 +46,14 @@ let parse_string = (~skip_whitespace, ~pos, parser, string) => {
 
   last_buffer := Some(from_string(~pos?, string));
 
-  parse(skip_whitespace, buffer, parser);
+  String.contains(string, '}')
+    ? {
+      let () = Css_types.nesting_level := 0;
+      parse(skip_whitespace, buffer, parser);
+    }
+    : {
+      parse(skip_whitespace, buffer, parser);
+    };
 };
 
 let parse_declaration_list = (input: string) => {

@@ -58,7 +58,10 @@ declaration_list:
   | ds = loc(declarations) EOF { ds }
 
 /* keyframe may contain {} */
-keyframe: rules = nonempty_list(keyframe_style_rule) { rules }
+keyframe: rules = nonempty_list(keyframe_style_rule) {
+    let () = nesting_level := !nesting_level + 1 in
+    rules
+  }
 
 keyframes:
   | rules = loc(keyframe) EOF { rules }
@@ -182,7 +185,10 @@ keyframe_style_rule:
   /* from {} to {} */
   | WS? id = IDENT WS?
     declarations = brace_block(loc(declarations)) WS? {
-    let prelude = [(SimpleSelector (Type id), Parser_location.make $startpos(id) $endpos(id))] in
+    let prelude = [
+      SimpleSelector (Type id, !nesting_level),
+      Parser_location.make $startpos(id) $endpos(id)
+    ] in
     Style_rule {
       prelude = (prelude, Parser_location.make $startpos(id) $endpos(id));
       loc = Parser_location.make $startpos $endpos;
@@ -193,7 +199,10 @@ keyframe_style_rule:
   | WS? p = percentage; WS?
     declarations = brace_block(loc(declarations)) WS? {
     let item = Percentage p in
-    let prelude = [(SimpleSelector item, Parser_location.make $startpos(p) $endpos(p))] in
+    let prelude = [
+      SimpleSelector(item, !nesting_level),
+      Parser_location.make $startpos(p) $endpos(p)
+    ] in
     Style_rule {
       prelude = (prelude, Parser_location.make $startpos(p) $endpos(p));
       loc = Parser_location.make $startpos $endpos;
@@ -205,7 +214,8 @@ keyframe_style_rule:
     let prelude = percentages
       |> List.map (fun percent -> Percentage percent)
       |> List.map (fun p ->
-        (SimpleSelector p, Parser_location.make $startpos(percentages) $endpos(percentages))
+        (SimpleSelector (p, !nesting_level),
+        Parser_location.make $startpos(percentages) $endpos(percentages))
       ) in
     Style_rule {
       prelude = (prelude, Parser_location.make $startpos(percentages) $endpos(percentages));
@@ -390,7 +400,10 @@ selector:
   */
   /* | xs = skip_ws_right(simple_selector) { SimpleSelector xs } */
   /* | xs = skip_ws_right(compound_selector) { CompoundSelector xs } */
-  | xs = skip_ws_right(complex_selector) { ComplexSelector xs }
+  | xs = skip_ws_right(complex_selector) { 
+      let () = nesting_level := !nesting_level + 1 in
+      ComplexSelector(xs, !nesting_level)
+    }
 
 type_selector:
   | AMPERSAND; { Ampersand } /* & {} https://drafts.csswg.org/css-nesting/#nest-selector */
@@ -474,8 +487,13 @@ combinator_sequence:
   | c = COMBINATOR WS? s = non_complex_selector WS? { (Some c, s) }
 
 %inline non_complex_selector:
-  | s = simple_selector { SimpleSelector s }
-  | s = compound_selector { CompoundSelector s }
+  | s = simple_selector {
+      let () = nesting_level := !nesting_level + 1 in
+      SimpleSelector(s, !nesting_level)
+    }
+  | s = compound_selector {
+      CompoundSelector(s, !nesting_level)
+    }
 
 /* <complex-selector> = <compound-selector> [ <combinator>? <compound-selector> ]* */
 complex_selector:

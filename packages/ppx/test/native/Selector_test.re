@@ -452,11 +452,46 @@ let nested_tests = [
       CssJs.style([|
         CssJs.selector(
           {js|.|js} ++ aaa,
-          [|CssJs.selector({js|.|js} ++ bbb, [||])|],
+          [|CssJs.selector({js| .|js} ++ bbb, [||])|],
         ),
       |])
     ],
   ),
+  (
+    ".$(aaa) { .$(bbb) { } }",
+    [%expr [%cx ".$(aaa) { .$(bbb) { & .a .b {} } }"]],
+    [%expr
+      CssJs.style([|
+        CssJs.selector(
+          {js|.|js} ++ aaa,
+          [|
+            CssJs.selector(
+              {js| .|js} ++ bbb,
+              [|CssJs.selector({js|& .a .b|js}, [||])|],
+            ),
+          |],
+        ),
+      |])
+    ],
+  ),
+  // FIXME: This reports a bug -> {js|.a.b|j`
+  // (
+  //   ".$(aaa) { .$(bbb) { .a .b {} } }",
+  //   [%expr [%cx ".$(aaa) { .$(bbb) {.a .b {} } }"]],
+  //   [%expr
+  //     CssJs.style([|
+  //       CssJs.selector(
+  //         {js|.|js} ++ aaa,
+  //         [|
+  //           CssJs.selector(
+  //             {js| .|js} ++ bbb,
+  //             [|CssJs.selector({js|.a .b|js}, [||])|],
+  //           ),
+  //         |],
+  //       ),
+  //     |])
+  //   ],
+  // ),
 ];
 
 let runner = tests =>

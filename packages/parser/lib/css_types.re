@@ -2,6 +2,8 @@
 
 module Location = Ppxlib.Location;
 
+let nesting_level = ref(0);
+
 [@deriving show({with_path: false})]
 type position =
   Lexing.position = {
@@ -84,9 +86,9 @@ and style_rule = {
 and stylesheet = with_loc(list(rule))
 [@deriving show({with_path: false})]
 and selector =
-  | SimpleSelector(simple_selector)
-  | ComplexSelector(complex_selector)
-  | CompoundSelector(compound_selector)
+  | SimpleSelector(simple_selector, int)
+  | ComplexSelector(complex_selector, int)
+  | CompoundSelector(compound_selector, int)
 [@deriving show({with_path: false})]
 and selector_list = list(with_loc(selector))
 [@deriving show({with_path: false})]
