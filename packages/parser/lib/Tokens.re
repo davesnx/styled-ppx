@@ -92,7 +92,7 @@ let token_to_string =
   | AT_RULE_STATEMENT(s)
   | AT_RULE(s) => "@" ++ s
   | HASH(s) => "#" ++ s
-  | NUMBER(s) => s
+  | NUMBER(s) => string_of_float(s)
   | UNICODE_RANGE(s) => s
   | FLOAT_DIMENSION((n, s)) => n ++ s
   | DIMENSION((n, d)) => n ++ d
@@ -132,7 +132,7 @@ let token_to_debug =
   | AT_MEDIA(s) => "AT_MEDIA('" ++ s ++ "')"
   | AT_KEYFRAMES(s) => "AT_KEYFRAMES('" ++ s ++ "')"
   | HASH(s) => "HASH('" ++ s ++ "')"
-  | NUMBER(s) => "NUMBER('" ++ s ++ "')"
+  | NUMBER(s) => "NUMBER('" ++ string_of_float(s) ++ "')"
   | UNICODE_RANGE(s) => "UNICODE_RANGE('" ++ s ++ "')"
   | FLOAT_DIMENSION((n, s)) => "FLOAT_DIMENSION('" ++ n ++ ", " ++ s ++ "')"
   | DIMENSION((n, d)) => "DIMENSION('" ++ n ++ ", " ++ d ++ "')"

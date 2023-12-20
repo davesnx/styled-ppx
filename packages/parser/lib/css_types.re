@@ -38,7 +38,7 @@ and component_value_list = list(with_loc(component_value))
 and component_value =
   | Paren_block(component_value_list)
   | Bracket_block(component_value_list)
-  | Percentage(string)
+  | Percentage(float)
   | Ident(string)
   | String(string)
   | Selector(selector_list)
@@ -48,7 +48,7 @@ and component_value =
   | Delim(string)
   | Function(with_loc(string), with_loc(component_value_list))
   | Hash(string)
-  | Number(string)
+  | Number(float)
   | Unicode_range(string)
   | Float_dimension((string, string))
   | Dimension((string, string))
@@ -109,7 +109,7 @@ and simple_selector =
   | Type(string)
   | Subclass(subclass_selector)
   | Variable(list(string))
-  | Percentage(string)
+  | Percentage(float)
 [@deriving show({with_path: false})]
 and subclass_selector =
   | Id(string)

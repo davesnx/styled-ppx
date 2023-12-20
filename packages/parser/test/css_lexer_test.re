@@ -39,12 +39,12 @@ let success_tests_data =
     ({|)|}, [RIGHT_PAREN]),
     /* TODO: Treat +1 to NUMBER and not COMBINATOR + NUMBER */
     /* ({|+12.3|}, [NUMBER("12.3")]), */
-    ({|+ 12.3|}, [COMBINATOR("+"), WS, NUMBER("12.3")]),
+    ({|+ 12.3|}, [COMBINATOR("+"), WS, NUMBER(12.3)]),
     /* TODO: COMBINATOR or DELIM(+)? */
     ({|+|}, [COMBINATOR("+")]),
     ({|,|}, [COMMA]),
-    ({|-45.6|}, [NUMBER("-45.6")]),
-    ({|45%|}, [NUMBER("45"), PERCENT]),
+    ({|-45.6|}, [NUMBER(-45.6)]),
+    ({|45%|}, [NUMBER(45.), PERCENT]),
     ({|2n|}, [DIMENSION(("2", "n"))]),
     /* TODO: Store Float_dimension as float/int */
     /* TODO: Store dimension as a variant */
@@ -66,12 +66,12 @@ let success_tests_data =
     ({|@|}, [DELIM("@")]),
     ({|[|}, [LEFT_BRACKET]),
     ({|]|}, [RIGHT_BRACKET]),
-    ({|0.7|}, [NUMBER("0.7")]),
-    ({|12345678.9|}, [NUMBER("12345678.9")]),
+    ({|0.7|}, [NUMBER(0.7)]),
+    ({|12345678.9|}, [NUMBER(12345678.9)]),
     ({|bar|}, [IDENT("bar")]),
     ({||}, [EOF]),
     ({|!|}, [DELIM("!")]),
-    ("1 / 1", [NUMBER("1"), WS, DELIM("/"), WS, NUMBER("1")]),
+    ("1 / 1", [NUMBER(1.), WS, DELIM("/"), WS, NUMBER(1.)]),
     (
       {|calc(10px + 10px)|},
       [
@@ -96,10 +96,7 @@ let success_tests_data =
       ],
     ),
     /* TODO: Percentage should have payload? */
-    (
-      {|calc(10%)|},
-      [FUNCTION("calc"), NUMBER("10"), PERCENT, RIGHT_PAREN],
-    ),
+    ({|calc(10%)|}, [FUNCTION("calc"), NUMBER(10.), PERCENT, RIGHT_PAREN]),
     (
       {|background-image:url('img_tree.gif' )|},
       [

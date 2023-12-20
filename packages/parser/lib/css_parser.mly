@@ -37,7 +37,7 @@ open Css_types
 %token <string> AT_RULE
 %token <string> AT_RULE_STATEMENT
 %token <string> HASH
-%token <string> NUMBER
+%token <float> NUMBER
 %token <string> UNICODE_RANGE
 %token <string * string> FLOAT_DIMENSION
 %token <string * string> DIMENSION
@@ -272,18 +272,18 @@ nth_payload:
   /* | complex = complex_selector_list; { NthSelector complex } */
   /* <An+B> */
   /* 2 */
-  | a = NUMBER { Nth (A (int_of_string a)) }
+  | a = NUMBER { Nth (A (int_of_float a)) }
   /* 2n */
   | a = DIMENSION { Nth (AN (int_of_string (fst a))) }
   /* 2n-1 */
   | a = DIMENSION WS? combinator = COMBINATOR b = NUMBER {
-    let b = int_of_string b in
+    let b = int_of_float b in
     Nth (ANB (((int_of_string (fst a)), combinator, b)))
   }
   /* This is a hackish solution where combinator isn't cached because the lexer
   assignes the `-` to NUMBER. This could be solved by leftassoc */
   | a = DIMENSION WS? b = NUMBER {
-    let b = Int.abs (int_of_string (b)) in
+    let b = Int.abs (int_of_float (b)) in
     Nth (ANB (((int_of_string (fst a)), "-", b)))
   }
   | n = IDENT WS? {
@@ -303,7 +303,7 @@ nth_payload:
   | n = IDENT WS? combinator = COMBINATOR b = NUMBER {
     let first_char = String.get n 0 in
     let a = if first_char = '-' then -1 else 1 in
-    Nth (ANB ((a, combinator, int_of_string b)))
+    Nth (ANB ((a, combinator, int_of_float b)))
   }
   /* TODO: Support "An+B of Selector" */
 

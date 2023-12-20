@@ -275,7 +275,7 @@ and render_selector = (selector: selector) => {
     | Type(v) => v
     | Subclass(v) => render_subclass_selector(v)
     | Variable(v) => render_variable_as_string(v)
-    | Percentage(v) => Printf.sprintf("%s%%", v)
+    | Percentage(v) => Printf.sprintf("%f%%", v)
   /* TODO: Add locations to selector */
   /* TODO: Generate an error here */
   /* Generate_lib.error(
@@ -434,7 +434,7 @@ let render_keyframes = (declarations: rule_list) => {
 
   let invalid_percentage_value = value =>
     Printf.sprintf(
-      "'%s' isn't valid. Only accept percentage with integers",
+      "'%f' isn't valid. Only accept percentage with integers",
       value,
     );
   let invalid_prelude_value = value =>
@@ -452,8 +452,8 @@ let render_keyframes = (declarations: rule_list) => {
       | Type(v) when v == "to" => Builder.eint(~loc, 100)
       | Type(t) => Generate_lib.error(~loc, invalid_prelude_value(t))
       | Percentage(n) =>
-        switch (int_of_string_opt(n)) {
-        | Some(n) when n >= 0 && n <= 100 => Builder.eint(~loc, n)
+        switch (int_of_float(n)) {
+        | n when n >= 0 && n <= 100 => Builder.eint(~loc, n)
         | _ => Generate_lib.error(~loc, invalid_percentage_value(n))
         }
       | Ampersand => Generate_lib.error(~loc, invalid_prelude_value("&"))

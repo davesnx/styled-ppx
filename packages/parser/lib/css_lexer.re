@@ -576,7 +576,7 @@ and get_dimension = (n, buf) => {
   | time => FLOAT_DIMENSION((n, lexeme(buf)))
   | frequency => FLOAT_DIMENSION((n, lexeme(buf)))
   | 'n' => DIMENSION((n, lexeme(buf)))
-  | _ => NUMBER(n)
+  | _ => NUMBER(float_of_string(n))
   };
 }
 and discard_comments = buf => {
