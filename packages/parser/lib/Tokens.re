@@ -1,31 +1,3 @@
-[@deriving show({with_path: false})]
-type token =
-  | EOF
-  | IDENT(string) // <ident-token>
-  | BAD_IDENT // TODO: this is needed?
-  | FUNCTION(string) // <function-token>
-  | AT_KEYWORD(string) // <at-keyword-token>
-  | HASH(string) // <hash-token>
-  | STRING(string) // <string-token>
-  | URL(string) // <url-token>
-  | BAD_URL // <bad-url-token>
-  | DELIM(string) // <delim-token>
-  | NUMBER(float) // <number-token>
-  | PERCENTAGE(float) // <percentage-token>
-  | DIMENSION(float, string) // <dimension-token>
-  | WS // <whitespace-token>
-  | COLON // <colon-token>
-  | SEMI_COLON // <semicolon-token>
-  | COMMA // <comma-token>
-  | LEFT_BRACKET // <[-token>
-  | RIGHT_BRACKET // <]-token>
-  | LEFT_PAREN // <(-token>
-  | RIGHT_PAREN // <)-token>
-  | LEFT_BRACE // <{-token>
-  | RIGHT_BRACE; // <}-token>
-
-let string_of_char = c => String.make(1, c);
-
 type error =
   | Invalid_code_point
   | Eof
@@ -37,38 +9,11 @@ let show_error =
   | Eof => "Unexpected end"
   | New_line => "New line";
 
-let humanize =
-  fun
-  | EOF => "the end"
-  | IDENT(str) => "ident " ++ str
-  | BAD_IDENT => "bad  ident"
-  | FUNCTION(f) => "function " ++ f
-  | AT_KEYWORD(at) => "@ " ++ at
-  | HASH(h) => "hash: #" ++ h
-  | STRING(s) => {|string "|} ++ s ++ {|"|}
-  | URL(u) => "url " ++ u
-  | BAD_URL => "bad url"
-  | DELIM(d) => "delimiter " ++ d
-  | NUMBER(f) => "number: " ++ string_of_float(f)
-  | PERCENTAGE(f) =>
-    "percentage: " ++ string_of_float(f) ++ string_of_char('%')
-  | DIMENSION(f, s) => "dimension: " ++ string_of_float(f) ++ s
-  | WS => "whitespace"
-  | COLON => ":"
-  | SEMI_COLON => ";"
-  | COMMA => ","
-  | LEFT_BRACKET => "["
-  | RIGHT_BRACKET => "]"
-  | LEFT_PAREN => "("
-  | RIGHT_PAREN => ")"
-  | LEFT_BRACE => "{"
-  | RIGHT_BRACE => "}";
-
-module Parser = Css_parser;
+let string_of_char = c => String.make(1, c);
 
 let token_to_string =
   fun
-  | Parser.EOF => "end of file"
+  | Css_parser.EOF => "end of file"
   | LEFT_BRACE => "{"
   | RIGHT_BRACE => "}"
   | LEFT_PAREN => "("
@@ -114,7 +59,7 @@ let token_to_string =
 
 let token_to_debug =
   fun
-  | Parser.EOF => "EOF"
+  | Css_parser.EOF => "EOF"
   | LEFT_BRACE => "LEFT_BRACE"
   | RIGHT_BRACE => "RIGHT_BRACE"
   | LEFT_PAREN => "LEFT_PAREN"
