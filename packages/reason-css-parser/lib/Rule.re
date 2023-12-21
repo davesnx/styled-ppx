@@ -1,4 +1,4 @@
-open Tokens;
+open Css_parser;
 
 type error = list(string);
 type data('a) = result('a, error);
@@ -50,7 +50,7 @@ module Match = {
       rule,
       fun
       | Ok(value) => f(value)
-      | Error(error) => Data.return(Error(error)),
+      | Error(error) => Data.return(Result.Error(error)),
     );
   let map = (rule, f) => bind(rule, value => return(f(value)));
   let bind_shortest_or_longest = (shortest, (left, right), f, tokens) => {
@@ -59,7 +59,8 @@ module Match = {
     let op = shortest ? (>) : (<);
     let use_left = op(List.length(left_tokens), List.length(right_tokens));
     switch (left_data, right_data) {
-    | (Ok(left_value), Error(_)) => f(`Left(left_value), left_tokens)
+    | (Result.Ok(left_value), Result.Error(_)) =>
+      f(`Left(left_value), left_tokens)
     | (Error(_), Ok(right_value)) => f(`Right(right_value), right_tokens)
     | (Ok(left_value), Ok(right_value)) =>
       use_left
@@ -67,8 +68,8 @@ module Match = {
         : f(`Right(right_value), right_tokens)
     | (Error(left_data), Error(right_data)) =>
       use_left
-        ? Data.return(Error(left_data), left_tokens)
-        : Data.return(Error(right_data), right_tokens)
+        ? Data.return(Result.Error(left_data), left_tokens)
+        : Data.return(Result.Error(right_data), right_tokens)
     };
   };
   let bind_shortest = ((left, right), f) =>
@@ -123,8 +124,8 @@ module Pattern = {
       fun
       | token when token == expected => Ok()
       | token => {
-          let expected = humanize(expected);
-          let got = humanize(token);
+          let expected = Tokens.token_to_string(expected);
+          let got = Tokens.token_to_string(token);
           Error(["Expected '" ++ expected ++ "' but instead got " ++ got]);
         },
     );

@@ -41,6 +41,10 @@ open Css_types
 %token <string> UNICODE_RANGE
 %token <string * string> FLOAT_DIMENSION
 %token <string * string> DIMENSION
+%token <float * string> DIMENSION_CSS
+%token <float> PERCENTAGE
+%token <float> NUMBER_CSS
+%token <string> AT_KEYWORD
 %token <string list> INTERPOLATION
 
 %start <stylesheet> stylesheet

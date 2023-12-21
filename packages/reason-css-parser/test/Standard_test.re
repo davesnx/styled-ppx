@@ -59,7 +59,7 @@ let tests = [
         result(float(1.), Alcotest.string),
         "",
         parse("ident"),
-        Error("expected a number, receveid (IDENT \"ident\")"),
+        Error("expected a number, received (IDENT 'ident')"),
       );
     },
   ),
@@ -252,14 +252,14 @@ let tests = [
         result(frequency, Alcotest.string),
         "",
         parse("0"),
-        Error("expected frequency. got(NUMBER 0.)"),
+        Error("expected frequency. got(NUMBER '0.')"),
       );
       check(
         __POS__,
         result(frequency, Alcotest.string),
         "",
         parse("60"),
-        Error("expected frequency. got(NUMBER 60.)"),
+        Error("expected frequency. got(NUMBER '60.')"),
       );
     },
   ),
@@ -359,7 +359,7 @@ let tests = [
         result(unit, Alcotest.string),
         "",
         parse("nope"),
-        Error("Expected 'ident gintoki' but instead got ident nope"),
+        Error("Expected '(IDENT 'gintoki')' but instead got (IDENT 'nope')"),
       );
     },
   ),
@@ -421,7 +421,7 @@ let tests = [
         result(css_wide_keywords, Alcotest.string),
         "",
         parse("nope"),
-        Error("Expected 'ident unset' but instead got ident nope"),
+        Error("Expected '(IDENT 'unset')' but instead got (IDENT 'nope')"),
       );
     },
   ),
@@ -544,7 +544,7 @@ let tests = [
         to_check,
         "",
         parse("asd"),
-        Error("Expected 'delimiter $' but instead got ident asd"),
+        Error("Expected '$' but instead got (IDENT 'asd')"),
       );
     },
   ),

@@ -149,7 +149,7 @@ let tests = [
         to_check,
         "",
         parse("30 31 32"),
-        Error("tokens remaining: (NUMBER 32.), EOF"),
+        Error("tokens remaining: (NUMBER '32.'), end of file"),
       );
     },
   ),
@@ -173,7 +173,7 @@ let tests = [
         to_check,
         "",
         parse("30 31 32 33"),
-        Error("tokens remaining: (NUMBER 33.), EOF"),
+        Error("tokens remaining: (NUMBER '33.'), end of file"),
       );
     },
   ),
@@ -198,7 +198,7 @@ let tests = [
         to_check,
         "",
         parse("39 40 41 42"),
-        Error("tokens remaining: (NUMBER 42.), EOF"),
+        Error("tokens remaining: (NUMBER '42.'), end of file"),
       );
     },
   ),
@@ -239,7 +239,7 @@ let tests = [
         to_check,
         "",
         parse("53"),
-        Error("Expected ',' but instead got the end"),
+        Error("Expected 'COMMA' but instead got end of file"),
       );
       check(__POS__, to_check, "", parse("54, 55"), Ok([54, 55]));
       check(__POS__, to_check, "", parse("56, 57, 58"), Ok([56, 57, 58]));
@@ -248,14 +248,14 @@ let tests = [
         to_check,
         "",
         parse("59, 60, 61,"),
-        Error("tokens remaining: COMMA, EOF"),
+        Error("tokens remaining: COMMA, end of file"),
       );
       check(
         __POS__,
         to_check,
         "",
         parse("59, 60, 61, 62"),
-        Error("tokens remaining: COMMA, (NUMBER 62.), EOF"),
+        Error("tokens remaining: COMMA, (NUMBER '62.'), end of file"),
       );
     },
   ),
@@ -271,14 +271,14 @@ let tests = [
         to_check,
         "",
         parse("53"),
-        Error("Expected ',' but instead got the end"),
+        Error("Expected 'COMMA' but instead got end of file"),
       );
       check(
         __POS__,
         to_check,
         "",
         parse("54, 55"),
-        Error("Expected ',' but instead got the end"),
+        Error("Expected 'COMMA' but instead got end of file"),
       );
       check(
         __POS__,
@@ -292,14 +292,14 @@ let tests = [
         to_check,
         "",
         parse("59, 60, 61,"),
-        Error("tokens remaining: COMMA, EOF"),
+        Error("tokens remaining: COMMA, end of file"),
       );
       check(
         __POS__,
         to_check,
         "",
         parse("59, 60, 61, 62"),
-        Error("tokens remaining: COMMA, (NUMBER 62.), EOF"),
+        Error("tokens remaining: COMMA, (NUMBER '62.'), end of file"),
       );
     },
   ),
@@ -325,7 +325,7 @@ let tests = [
         to_check,
         "",
         parse("69 70 71 72"),
-        Error("tokens remaining: (NUMBER 72.), EOF"),
+        Error("tokens remaining: (NUMBER '72.'), end of file"),
       );
     },
   ),

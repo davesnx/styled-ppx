@@ -1,7 +1,11 @@
 (library
  (name reason_css_parser_ppx_lib)
  (wrapped false)
- (libraries styled-ppx.css-spec-parser ppxlib ppxlib.astlib)
+ (libraries
+  styled-ppx.css-spec-parser
+  ppxlib
+  ppxlib.astlib
+  styled-ppx.css-parser)
  (modules Generate)
  (preprocess
   (pps ppxlib.metaquot)))
@@ -10,7 +14,11 @@
  (name reason_css_parser_ppx)
  (kind ppx_rewriter)
  (wrapped false)
- (libraries styled-ppx.css-spec-parser ppxlib reason_css_parser_ppx_lib)
+ (libraries
+  styled-ppx.css-spec-parser
+  ppxlib
+  reason_css_parser_ppx_lib
+  styled-ppx.css-parser)
  (modules Reason_css_parser_ppx)
  (preprocess
   (pps ppxlib.metaquot)))

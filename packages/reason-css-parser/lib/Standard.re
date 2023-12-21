@@ -1,4 +1,3 @@
-open Tokens;
 open Combinator;
 open Rule.Let;
 open Rule.Pattern;
@@ -13,7 +12,10 @@ let function_call = (name, rule) => {
       | FUNCTION(called_name) when name == called_name => Ok()
       | token =>
         Error([
-          "expected a function " ++ name ++ ". got an " ++ show_token(token),
+          "expected a function "
+          ++ name
+          ++ ". got an "
+          ++ Tokens.token_to_string(token),
         ]),
     );
   let.bind_match value = rule;
@@ -24,7 +26,7 @@ let function_call = (name, rule) => {
 let integer =
   token(
     fun
-    | NUMBER(float) =>
+    | NUMBER_CSS(float) =>
       Float.(
         is_integer(float)
           ? Ok(float |> to_int)
@@ -36,14 +38,17 @@ let integer =
 let number =
   token(
     fun
-    | NUMBER(float) => Ok(float)
-    | token => Error(["expected a number, receveid " ++ show_token(token)]),
+    | NUMBER_CSS(float) => Ok(float)
+    | token =>
+      Error([
+        "expected a number, received " ++ Tokens.token_to_string(token),
+      ]),
   );
 
 let length =
   token(token =>
     switch (token) {
-    | DIMENSION(number, dimension) =>
+    | DIMENSION_CSS((number, dimension)) =>
       switch (dimension) {
       | "em" => Ok(`Em(number))
       | "ex" => Ok(`Ex(number))
@@ -69,7 +74,7 @@ let length =
       | "px" => Ok(`Px(number))
       | _ => Error(["unknown dimension"])
       }
-    | NUMBER(0.) => Ok(`Zero)
+    | NUMBER_CSS(0.) => Ok(`Zero)
     | _ => Error(["expected length"])
     }
   );
@@ -78,7 +83,7 @@ let length =
 let angle =
   token(token =>
     switch (token) {
-    | DIMENSION(number, dimension) =>
+    | DIMENSION_CSS((number, dimension)) =>
       switch (dimension) {
       | "deg" => Ok(`Deg(number))
       | "grad" => Ok(`Grad(number))
@@ -86,7 +91,7 @@ let angle =
       | "turn" => Ok(`Turn(number))
       | _ => Error(["unknown dimension"])
       }
-    | NUMBER(0.) => Ok(`Deg(0.))
+    | NUMBER_CSS(0.) => Ok(`Deg(0.))
     | _ => Error(["expected angle"])
     }
   );
@@ -95,7 +100,7 @@ let angle =
 let time =
   token(token =>
     switch (token) {
-    | DIMENSION(number, dimension) =>
+    | DIMENSION_CSS((number, dimension)) =>
       switch (dimension) {
       | "s" => Ok(`S(number))
       | "ms" => Ok(`Ms(number))
@@ -109,13 +114,14 @@ let time =
 let frequency =
   token(token =>
     switch (token) {
-    | DIMENSION(number, dimension) =>
+    | DIMENSION_CSS((number, dimension)) =>
       switch (dimension |> String.lowercase_ascii) {
       | "hz" => Ok(`Hz(number))
       | "khz" => Ok(`KHz(number))
       | dim => Error(["unknown dimension " ++ dim])
       }
-    | token => Error(["expected frequency. got" ++ show_token(token)])
+    | token =>
+      Error(["expected frequency. got" ++ Tokens.token_to_string(token)])
     }
   );
 
@@ -123,7 +129,7 @@ let frequency =
 let resolution =
   token(token =>
     switch (token) {
-    | DIMENSION(number, dimension) =>
+    | DIMENSION_CSS((number, dimension)) =>
       switch (dimension |> String.lowercase_ascii) {
       | "dpi" => Ok(`Dpi(number))
       | "dpcm" => Ok(`Dpcm(number))
@@ -204,7 +210,7 @@ let url = {
 let hex_color =
   token(
     fun
-    | HASH(str, _) when String.length(str) >= 3 && String.length(str) <= 8 =>
+    | HASH(str) when String.length(str) >= 3 && String.length(str) <= 8 =>
       Ok(str)
     | _ => Error(["expected a hex-color"]),
   );
@@ -258,7 +264,7 @@ let line_names = {
 let flex_value =
   token(
     fun
-    | DIMENSION(number, dimension) =>
+    | DIMENSION_CSS((number, dimension)) =>
       switch (dimension) {
       | "fr" => Ok(`Fr(number))
       | _ => Error(["only fr dimension is valid"])

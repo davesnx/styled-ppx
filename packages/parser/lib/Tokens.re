@@ -5,7 +5,7 @@ type token =
   | BAD_IDENT // TODO: this is needed?
   | FUNCTION(string) // <function-token>
   | AT_KEYWORD(string) // <at-keyword-token>
-  | HASH(string, [ | `ID | `UNRESTRICTED]) // <hash-token>
+  | HASH(string) // <hash-token>
   | STRING(string) // <string-token>
   | URL(string) // <url-token>
   | BAD_URL // <bad-url-token>
@@ -44,7 +44,7 @@ let humanize =
   | BAD_IDENT => "bad  ident"
   | FUNCTION(f) => "function " ++ f
   | AT_KEYWORD(at) => "@ " ++ at
-  | HASH(h, _) => "hash: #" ++ h
+  | HASH(h) => "hash: #" ++ h
   | STRING(s) => {|string "|} ++ s ++ {|"|}
   | URL(u) => "url " ++ u
   | BAD_URL => "bad url"
@@ -68,7 +68,7 @@ module Parser = Css_parser;
 
 let token_to_string =
   fun
-  | Parser.EOF => ""
+  | Parser.EOF => "end of file"
   | LEFT_BRACE => "{"
   | RIGHT_BRACE => "}"
   | LEFT_PAREN => "("
@@ -81,7 +81,7 @@ let token_to_string =
   | PERCENT => "%"
   | AMPERSAND => "&"
   | IMPORTANT => "!important"
-  | IDENT(s) => s
+  | IDENT(s) => "(IDENT '" ++ s ++ "')"
   | TAG(s) => s
   | STRING(s) => "'" ++ s ++ "'"
   | OPERATOR(s) => s
@@ -99,13 +99,18 @@ let token_to_string =
   | INTERPOLATION(v) => String.concat(".", v)
   | WS => " "
   | DOT => "."
-  | COMMA => ","
+  | COMMA => "COMMA"
   | ASTERISK => "*"
   | FUNCTION(fn) => fn ++ "("
   | NTH_FUNCTION(fn) => fn ++ "("
   | URL(url) => url ++ "("
   | BAD_URL => "bad url"
-  | BAD_IDENT => "bad indent";
+  | BAD_IDENT => "bad indent"
+  | PERCENTAGE(p) =>
+    "percentage: " ++ string_of_float(p) ++ string_of_char('%')
+  | NUMBER_CSS(n) => "(NUMBER '" ++ string_of_float(n) ++ "')"
+  | DIMENSION_CSS((f, s)) => "dimension: " ++ string_of_float(f) ++ s
+  | AT_KEYWORD(at) => "@ " ++ at;
 
 let token_to_debug =
   fun
@@ -146,4 +151,9 @@ let token_to_debug =
   | NTH_FUNCTION(fn) => "FUNCTION(" ++ fn ++ ")"
   | URL(u) => "URL(" ++ u ++ ")"
   | BAD_URL => "BAD_URL"
-  | BAD_IDENT => "BAD_IDENT";
+  | BAD_IDENT => "BAD_IDENT"
+  | PERCENTAGE(p) =>
+    "percentage: " ++ string_of_float(p) ++ string_of_char('%')
+  | NUMBER_CSS(n) => "NUMBER('" ++ string_of_float(n) ++ "')"
+  | DIMENSION_CSS((f, s)) => "dimension: " ++ string_of_float(f) ++ s
+  | AT_KEYWORD(at) => "@ " ++ at;

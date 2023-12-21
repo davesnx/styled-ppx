@@ -1,5 +1,4 @@
 open Rule.Pattern;
-open Tokens;
 open Standard;
 
 module StringMap = Map.Make(String);
@@ -19,7 +18,7 @@ let apply_parser = (parser, tokens_with_loc) => {
        )
     |> List.rev;
 
-  let tokens_without_ws = tokens |> List.filter((!=)(WS));
+  let tokens_without_ws = tokens |> List.filter((!=)(Css_parser.WS));
 
   let (output, remaining_tokens) = parser(tokens_without_ws);
   let.ok output =
@@ -31,9 +30,11 @@ let apply_parser = (parser, tokens_with_loc) => {
   let.ok () =
     switch (remaining_tokens) {
     | []
-    | [EOF] => Ok()
+    | [Css_parser.EOF] => Ok()
     | tokens =>
-      let tokens = tokens |> List.map(show_token) |> String.concat(", ");
+      let tokens =
+        // FIXME: Replace last ',' with '.'
+        tokens |> List.map(Tokens.token_to_string) |> String.concat(", ");
       Error("tokens remaining: " ++ tokens);
     };
   Ok(output);
