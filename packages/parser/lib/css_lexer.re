@@ -726,7 +726,7 @@ let consume = lexbuf => {
       consume_numeric(lexbuf);
     | starts_an_identifier =>
       Sedlexing.rollback(lexbuf);
-      consume_ident_like_(lexbuf);
+      consume_ident_like(lexbuf);
     | _ =>
       let _ = Sedlexing.next(lexbuf);
       Ok(DELIM("-"));
@@ -775,7 +775,7 @@ let consume = lexbuf => {
     switch%sedlex (lexbuf) {
     | starts_with_a_valid_escape =>
       Sedlexing.rollback(lexbuf);
-      consume_ident_like_(lexbuf);
+      consume_ident_like(lexbuf);
     // TODO: this error should be different
     | _ => Error((DELIM("/"), Invalid_code_point))
     };
