@@ -116,12 +116,16 @@ let success_tests_data =
     ({|$(Module.variable')|}, [INTERPOLATION(["Module", "variable'"])]),
     ({|-moz|}, [IDENT("-moz")]),
     ({|--color-main|}, [IDENT("--color-main")]),
+    ("\\-", [IDENT("-")]),
+    ("a\\-", [IDENT("a-")]),
+    // FIXME: ("-\\", [IDENT("-\\")]),
+    ("\\@desu", [IDENT("@desu")]),
+    ("  \t\t\r\n\nRed ", [WS, IDENT("Red"), WS]),
+    ("\\30red \\00030 red", [IDENT("0red"), WS, IDENT("0red")]),
   ]
   /* TODO: Support for escaped */
   /* ({|\32|}, [IDENT("--color-main")]), */
   /* ({|\25BA|}, [IDENT("--color-main")]), */
-  /* TODO: Supported escaped "@" and others */
-  /* ("\\@desu", [IDENT("@desu")]), */
   |> List.mapi((_index, (input, output)) => {
        let okInput = parse(input) |> Result.get_ok;
        let inputTokens = list_parse_tokens_to_string(okInput);

@@ -559,6 +559,15 @@ let rec get_next_token = buf => {
   | ("-", ident) => IDENT(latin1(buf))
   /* --variable */
   | ("-", "-", ident) => IDENT(latin1(buf))
+  | "\\" =>
+    Sedlexing.rollback(buf);
+    switch%sedlex (buf) {
+    | starts_with_a_valid_escape =>
+      Sedlexing.rollback(buf);
+      Result.get_ok(consume_ident_like(buf));
+    // TODO: improve error handling'
+    | _ => Parser.STRING("Invalid code point")
+    };
   | identifier_start_code_point =>
     let _ = Sedlexing.backtrack(buf);
     consume_ident_like(buf) |> handle_tokenizer_error(buf);
