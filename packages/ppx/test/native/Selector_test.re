@@ -452,7 +452,7 @@ let nested_tests = [
       CssJs.style([|
         CssJs.selector(
           {js|.foo|js},
-          [|CssJs.selector({js|&:hover|js}, [||])|] // FIXME: should be ... {js| &:hover|js}
+          [|CssJs.selector({js|&:hover|js}, [||])|],
         ),
       |])
     ],
@@ -466,7 +466,7 @@ let nested_tests = [
           {js|.one_level|js},
           [|
             CssJs.selector(
-              {js|&.amp_without_space|js}, // FIXME: should be ... ({js| &.amp_without_space|js}
+              {js|&.amp_without_space|js},
               [|CssJs.color(CssJs.blue)|],
             ),
           |],
@@ -504,7 +504,7 @@ let nested_tests = [
           {js|.one_level|js},
           [|
             CssJs.selector(
-              {js|&.|js} ++ amp_without_space_with_interpolation, // FIXME: should be ... {js| &.|js} ...
+              {js|&.|js} ++ amp_without_space_with_interpolation,
               [|CssJs.color(CssJs.blue)|],
             ),
           |],
@@ -525,7 +525,7 @@ let nested_tests = [
           {js|.one_level|js},
           [|
             CssJs.selector(
-              {js|& .|js} ++ amp_with_space_with_interpolation, // FIXME: should be ... {js| & .|js} ...
+              {js|& .|js} ++ amp_with_space_with_interpolation,
               [|CssJs.color(CssJs.blue)|],
             ),
           |],
@@ -546,10 +546,10 @@ let nested_tests = [
           {js|.two_levels|js},
           [|
             CssJs.selector(
-              {js|& .first_level|js}, // FIXME: should be ... {js| & .|js} ...
+              {js|& .first_level|js},
               [|
                 CssJs.selector(
-                  {js|& .second_level|js}, // FIXME: should be ... {js| & .|js} ...
+                  {js|& .second_level|js},
                   [|CssJs.color(CssJs.blue)|],
                 ),
               |],
@@ -570,10 +570,10 @@ let nested_tests = [
           {js|.two_levels|js},
           [|
             CssJs.selector(
-              {js|&.first_level|js}, // FIXME: should be ... {js| &.|js} ...
+              {js|&.first_level|js},
               [|
                 CssJs.selector(
-                  {js|& .second_level|js}, // FIXME: should be ... {js| & .|js} ...
+                  {js|& .second_level|js},
                   [|CssJs.color(CssJs.blue)|],
                 ),
               |],
@@ -594,10 +594,10 @@ let nested_tests = [
           {js|.two_levels|js},
           [|
             CssJs.selector(
-              {js|&.first_level|js}, // FIXME: should be ... {js| &.|js} ...
+              {js|&.first_level|js},
               [|
                 CssJs.selector(
-                  {js|&.second_level|js}, // FIXME: should be ... {js| &.|js} ...
+                  {js|&.second_level|js},
                   [|CssJs.color(CssJs.blue)|],
                 ),
               |],
@@ -618,10 +618,10 @@ let nested_tests = [
           {js|.two_levels|js},
           [|
             CssJs.selector(
-              {js|& .first_level|js}, // FIXME: should be ... {js| & .|js} ...
+              {js|& .first_level|js},
               [|
                 CssJs.selector(
-                  {js|&.second_level|js}, // FIXME: should be ... {js| &.|js} ...
+                  {js|&.second_level|js},
                   [|CssJs.color(CssJs.blue)|],
                 ),
               |],
