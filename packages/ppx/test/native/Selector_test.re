@@ -452,7 +452,63 @@ let nested_tests = [
       CssJs.style([|
         CssJs.selector(
           {js|.|js} ++ aaa,
-          [|CssJs.selector({js|.|js} ++ bbb, [||])|],
+          [|CssJs.selector({js|.|js} ++ bbb, [||])|] // FIXME: should be ... ({js| .|js} ++ bbb,
+        ),
+      |])
+    ],
+  ),
+  (
+    ".$(aaa) { .$(bbb) { & .a .b {} } }",
+    [%expr [%cx ".$(aaa) { .$(bbb) { & .a .b {} } }"]],
+    [%expr
+      CssJs.style([|
+        CssJs.selector(
+          {js|.|js} ++ aaa,
+          [|
+            CssJs.selector(
+              {js|.|js} ++ bbb, // FIXME: should be {js| .|js} ++ bbb,
+              [|CssJs.selector({js|& .a .b|js}, [||])|],
+            ),
+          |],
+        ),
+      |])
+    ],
+  ),
+  (
+    ".$(aaa) { .$(bbb) { & .a .b { .c { } } } }",
+    [%expr [%cx ".$(aaa) { .$(bbb) { & .a .b {  .c { } } } }"]],
+    [%expr
+      CssJs.style([|
+        CssJs.selector(
+          {js|.|js} ++ aaa,
+          [|
+            CssJs.selector(
+              {js|.|js} ++ bbb, // FIXME: should be {js| .|js} ++ bbb,
+              [|
+                CssJs.selector(
+                  {js|& .a .b|js},
+                  [|CssJs.selector({js|.c|js}, [||])|],
+                ),
+              |] // FIXME: should be ({js| .c|js}
+            ),
+          |],
+        ),
+      |])
+    ],
+  ),
+  (
+    ".$(aaa) { .$(bbb) { .a .b {} } }",
+    [%expr [%cx ".$(aaa) { .$(bbb) {.a .b {} } }"]],
+    [%expr
+      CssJs.style([|
+        CssJs.selector(
+          {js|.|js} ++ aaa,
+          [|
+            CssJs.selector(
+              {js|.|js} ++ bbb, // FIXME: should be {js| .|js} ++ bbb
+              [|CssJs.selector({js|.a.b|js}, [||])|] // FIXME: should be ({js| .a .b|js}, [||])
+            ),
+          |],
         ),
       |])
     ],
