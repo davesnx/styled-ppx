@@ -131,6 +131,26 @@ let compound_tests = [
     [%expr CssJs.style([|CssJs.selector({js|&.bar, &.foo|js}, [||])|])],
   ),
   (
+    ".a .b",
+    [%expr [%cx "display: block; .a .b {}"]],
+    [%expr
+      CssJs.style([|
+        CssJs.display(`block),
+        CssJs.selector({js|.a .b|js}, [||]),
+      |])
+    ],
+  ),
+  (
+    "& .a .b",
+    [%expr [%cx "display: block; & .a .b {}"]],
+    [%expr
+      CssJs.style([|
+        CssJs.display(`block),
+        CssJs.selector({js|& .a .b|js}, [||]),
+      |])
+    ],
+  ),
+  (
     "p:first-child",
     [%expr [%cx {js|p:first-child {}|js}]],
     [%expr CssJs.style([|CssJs.selector({js|p:first-child|js}, [||])|])],
@@ -422,26 +442,6 @@ let nested_tests = [
     [%expr
       CssJs.style([|
         CssJs.selector({js|.a|js}, [|CssJs.selector({js|.b|js}, [||])|]),
-      |])
-    ],
-  ),
-  (
-    ".a .b",
-    [%expr [%cx "display: block; .a .b {}"]],
-    [%expr
-      CssJs.style([|
-        CssJs.display(`block),
-        CssJs.selector({js|.a .b|js}, [||]),
-      |])
-    ],
-  ),
-  (
-    "& .a .b",
-    [%expr [%cx "display: block; & .a .b {}"]],
-    [%expr
-      CssJs.style([|
-        CssJs.display(`block),
-        CssJs.selector({js|& .a .b|js}, [||]),
       |])
     ],
   ),
