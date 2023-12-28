@@ -437,11 +437,209 @@ let stylesheet_tests = [
 
 let nested_tests = [
   (
-    ".a",
+    ".a { .b {} } ",
     [%expr [%cx ".a { .b {} }"]],
     [%expr
       CssJs.style([|
-        CssJs.selector({js|.a|js}, [|CssJs.selector({js|.b|js}, [||])|]),
+        CssJs.selector({js|.a|js}, [|CssJs.selector({js|.b|js}, [||])|]) // FIXME: should be ... ({js| .b|js}
+      |])
+    ],
+  ),
+  (
+    ".foo { &:hover { } }",
+    [%expr [%cx ".foo { &:hover { } }"]],
+    [%expr
+      CssJs.style([|
+        CssJs.selector(
+          {js|.foo|js},
+          [|CssJs.selector({js|&:hover|js}, [||])|] // FIXME: should be ... {js| &:hover|js}
+        ),
+      |])
+    ],
+  ),
+  (
+    ".one_level { &.amp_without_space { color: blue } }",
+    [%expr [%cx ".one_level { &.amp_without_space { color: blue } }"]],
+    [%expr
+      CssJs.style([|
+        CssJs.selector(
+          {js|.one_level|js},
+          [|
+            CssJs.selector(
+              {js|&.amp_without_space|js}, // FIXME: should be ... ({js| &.amp_without_space|js}
+              [|CssJs.color(CssJs.blue)|],
+            ),
+          |],
+        ),
+      |])
+    ],
+  ),
+  (
+    ".one_level { & .amp_without_space { color: blue } }",
+    [%expr [%cx ".one_level { & .amp_without_space { color: blue } }"]],
+    [%expr
+      CssJs.style([|
+        CssJs.selector(
+          {js|.one_level|js},
+          [|
+            CssJs.selector(
+              {js|& .amp_without_space|js},
+              [|CssJs.color(CssJs.blue)|],
+            ),
+          |],
+        ),
+      |])
+    ],
+  ),
+  (
+    ".one_level { &.$(amp_without_space_with_interpolation) { color: blue } }",
+    [%expr
+      [%cx
+        ".one_level { &.$(amp_without_space_with_interpolation) { color: blue } }"
+      ]
+    ],
+    [%expr
+      CssJs.style([|
+        CssJs.selector(
+          {js|.one_level|js},
+          [|
+            CssJs.selector(
+              {js|&.|js} ++ amp_without_space_with_interpolation, // FIXME: should be ... {js| &.|js} ...
+              [|CssJs.color(CssJs.blue)|],
+            ),
+          |],
+        ),
+      |])
+    ],
+  ),
+  (
+    ".one_level { & .$(amp_with_space_with_interpolation) { color: blue } }",
+    [%expr
+      [%cx
+        ".one_level { & .$(amp_with_space_with_interpolation) { color: blue } }"
+      ]
+    ],
+    [%expr
+      CssJs.style([|
+        CssJs.selector(
+          {js|.one_level|js},
+          [|
+            CssJs.selector(
+              {js|& .|js} ++ amp_with_space_with_interpolation, // FIXME: should be ... {js| & .|js} ...
+              [|CssJs.color(CssJs.blue)|],
+            ),
+          |],
+        ),
+      |])
+    ],
+  ),
+  (
+    ".two_levels { & .first_level { & .second_level { color: blue } } }",
+    [%expr
+      [%cx
+        ".two_levels { & .first_level { & .second_level { color: blue } } }"
+      ]
+    ],
+    [%expr
+      CssJs.style([|
+        CssJs.selector(
+          {js|.two_levels|js},
+          [|
+            CssJs.selector(
+              {js|& .first_level|js}, // FIXME: should be ... {js| & .|js} ...
+              [|
+                CssJs.selector(
+                  {js|& .second_level|js}, // FIXME: should be ... {js| & .|js} ...
+                  [|CssJs.color(CssJs.blue)|],
+                ),
+              |],
+            ),
+          |],
+        ),
+      |])
+    ],
+  ),
+  (
+    ".two_levels { &.first_level { & .second_level { color: blue } } }",
+    [%expr
+      [%cx ".two_levels { &.first_level { & .second_level { color: blue } } }"]
+    ],
+    [%expr
+      CssJs.style([|
+        CssJs.selector(
+          {js|.two_levels|js},
+          [|
+            CssJs.selector(
+              {js|&.first_level|js}, // FIXME: should be ... {js| &.|js} ...
+              [|
+                CssJs.selector(
+                  {js|& .second_level|js}, // FIXME: should be ... {js| & .|js} ...
+                  [|CssJs.color(CssJs.blue)|],
+                ),
+              |],
+            ),
+          |],
+        ),
+      |])
+    ],
+  ),
+  (
+    ".two_levels { &.first_level { &.second_level { color: blue } } }",
+    [%expr
+      [%cx ".two_levels { &.first_level { &.second_level { color: blue } } }"]
+    ],
+    [%expr
+      CssJs.style([|
+        CssJs.selector(
+          {js|.two_levels|js},
+          [|
+            CssJs.selector(
+              {js|&.first_level|js}, // FIXME: should be ... {js| &.|js} ...
+              [|
+                CssJs.selector(
+                  {js|&.second_level|js}, // FIXME: should be ... {js| &.|js} ...
+                  [|CssJs.color(CssJs.blue)|],
+                ),
+              |],
+            ),
+          |],
+        ),
+      |])
+    ],
+  ),
+  (
+    ".two_levels { & .first_level { &.second_level { color: blue } } }",
+    [%expr
+      [%cx ".two_levels { & .first_level { &.second_level { color: blue } } }"]
+    ],
+    [%expr
+      CssJs.style([|
+        CssJs.selector(
+          {js|.two_levels|js},
+          [|
+            CssJs.selector(
+              {js|& .first_level|js}, // FIXME: should be ... {js| & .|js} ...
+              [|
+                CssJs.selector(
+                  {js|&.second_level|js}, // FIXME: should be ... {js| &.|js} ...
+                  [|CssJs.color(CssJs.blue)|],
+                ),
+              |],
+            ),
+          |],
+        ),
+      |])
+    ],
+  ),
+  (
+    ".$(a) { .b { } }",
+    [%expr [%cx ".$(a) { .b {} }"]],
+    [%expr
+      CssJs.style([|
+        CssJs.selector(
+          {js|.|js} ++ a,
+          [|CssJs.selector({js|.b|js}, [||])|] // FIXME: should be ... ({js| .|js} ++ bbb,
+        ),
       |])
     ],
   ),
