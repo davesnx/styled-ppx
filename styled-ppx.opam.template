@@ -1,7 +1,0 @@
-pin-depends: [
-  ["melange.dev" "git+https://github.com/melange-re/melange#982cba971fa662439f0675465ef854424771ca3d"]
-  ["reason.dev" "https://github.com/reasonml/reason/archive/f92f7ecc228d19ebf4d9d0214792da7b45472766.tar.gz"]
-  ["reason-react.dev" "https://github.com/reasonml/reason-react/archive/2a43311df12eb3988fd9729098928e6b03cfaa07.tar.gz"]
-  ["reason-react-ppx.dev" "https://github.com/reasonml/reason-react/archive/2a43311df12eb3988fd9729098928e6b03cfaa07.tar.gz"]
-  ["server-reason-react.dev" "https://github.com/ml-in-barcelona/server-reason-react/archive/8aa3e3b0bbb0c043a2067d47c2f391b2ce55eefd.tar.gz"]
-]

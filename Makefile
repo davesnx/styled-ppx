@@ -40,6 +40,14 @@ fmt format: ## Formats code
 setup-githooks: ## Setup githooks
 	@git config core.hooksPath .githooks
 
+.PHONY: pin
+pin: ## Pin dependencies
+	@opam pin melange.dev "git+https://github.com/melange-re/melange#982cba971fa662439f0675465ef854424771ca3d" -y
+	@opam pin reason.dev "https://github.com/reasonml/reason/archive/f92f7ecc228d19ebf4d9d0214792da7b45472766.tar.gz" -y
+	@opam pin reason-react.dev "https://github.com/reasonml/reason-react/archive/2a43311df12eb3988fd9729098928e6b03cfaa07.tar.gz" -y
+	@opam pin reason-react-ppx.dev "https://github.com/reasonml/reason-react/archive/2a43311df12eb3988fd9729098928e6b03cfaa07.tar.gz" -y
+	@opam pin server-reason-react.dev "https://github.com/ml-in-barcelona/server-reason-react/archive/8aa3e3b0bbb0c043a2067d47c2f391b2ce55eefd.tar.gz" -y
+
 .PHONY: create-switch
 create-switch: ## Create opam switch
 	opam switch create . 5.1.1 --deps-only --with-test --no-install
@@ -50,7 +58,7 @@ install: ## Install project dependencies
 	npm install
 
 .PHONY: init
-init: setup-githooks create-switch install ## Create a local dev enviroment
+init: setup-githooks create-switch pin install ## Create a local dev enviroment
 
 .PHONY: subst
 subst: ## Run dune substitute
