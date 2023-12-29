@@ -63,9 +63,6 @@ jobs:
       - name: Install dependencies
         run: make install
 
-      - name: Install pins
-        run: make pin
-
       - name: Build
         run: make build
 
