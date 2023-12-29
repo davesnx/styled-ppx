@@ -34,6 +34,7 @@
    (ppxlib (>= 0.27.0))
    (sedlex (>= 3.2))
    (melange (>= 1.0.0))
+   server-reason-react
    (reason-react (>= 0.13.0))
    (reason :with-dev-setup)
    (alcotest :with-test)
