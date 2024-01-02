@@ -43,9 +43,9 @@ build: [
 ]
 dev-repo: "git+https://github.com/davesnx/styled-ppx.git"
 pin-depends: [
-  ["melange.dev" "git+https://github.com/melange-re/melange#982cba971fa662439f0675465ef854424771ca3d"]
+  ["melange.dev" "git+https://github.com/melange-re/melange#300e323d3634e6de7c3d65dca9276a6d68410b5e"]
   ["reason.dev" "https://github.com/reasonml/reason/archive/f92f7ecc228d19ebf4d9d0214792da7b45472766.tar.gz"]
   ["reason-react.dev" "https://github.com/reasonml/reason-react/archive/2a43311df12eb3988fd9729098928e6b03cfaa07.tar.gz"]
   ["reason-react-ppx.dev" "https://github.com/reasonml/reason-react/archive/2a43311df12eb3988fd9729098928e6b03cfaa07.tar.gz"]
-  ["server-reason-react.dev" "https://github.com/ml-in-barcelona/server-reason-react/archive/8aa3e3b0bbb0c043a2067d47c2f391b2ce55eefd.tar.gz"]
+  ["server-reason-react.dev" "https://github.com/ml-in-barcelona/server-reason-react/archive/53ba4362cf2d3c7089fa7946ce7a00b1bb7140ac.tar.gz"]
 ]
