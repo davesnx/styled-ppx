@@ -2106,11 +2106,11 @@ module Gradient = struct
 
   let string_of_stops stops =
     stops
-    |> Array.map (fun (c, l) ->
+    |. Std.Array.map (fun (c, l) ->
            match l with
            | None -> string_of_color c
            | Some l -> string_of_color c ^ {js| |js} ^ Length.toString l)
-    |> Js.Array.join ~sep:{js|, |js}
+    |. Std.Array.joinWith ~sep:{js|, |js}
 
   let direction_to_string = function
     | `Angle a -> Angle.toString a
@@ -2277,7 +2277,7 @@ module FontFamilyName = struct
   let toString x =
     match x with
     | `custom value ->
-      (match Js.String.get value 0 with
+      (match Std.String.get value 0 with
       | {js|"|js} | {js|'|js} -> value
       | _ -> ({js|"|js} ^ value) ^ {js|"|js})
     | `serif -> {js|serif|js}
