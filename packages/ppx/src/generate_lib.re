@@ -552,7 +552,7 @@ let makeMakeProps = (~loc, ~areAllFieldsOptional, customProps) => {
          }
        );
 
-  /* List of prop: type */
+  /* List of `prop: type` */
   let reactProps =
     List.append(
       [

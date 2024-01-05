@@ -5,14 +5,14 @@
 ; Copy files into the root of the folder (which collides with Kloth.ml)
 ; but later on the actions, we remove the ml file, using the Kloth.res file
 
-(copy_files
- (files ./lib/*.res))
-
 (rule
  (alias all)
+ (deps ./override/Kloth.ml)
  (action
   (progn
    (run rm -rf ./Kloth.ml)
+   (run cp -R ./override/Kloth.ml ./Kloth.ml)
+   (run ls -la .)
    (with-stdout-to
     bsconfig.json
     (run
