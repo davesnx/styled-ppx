@@ -4,7 +4,7 @@
 
 ### Typed styled components for ReScript
 
-**styled-ppx** is the [ppx](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem) that brings styled components to ReScript. Build on top of [emotion](https://emotion.sh), it allows you to style apps safe, quickly, performant and as you always done it. Allows you to create **React Components** with type-safe style definitions that don't rely on a different language ([DSL](https://en.wikipedia.org/wiki/Domain-specific_language)) than CSS
+**styled-ppx** is a [ppx](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem) that brings styled components to ReScript. Built on top of [emotion](https://emotion.sh), it allows you to style apps safely, quickly, and with zero runtime overhead - just as you have always done it. styled-ppx allows you to create **React Components** with type-safe style definitions that don't rely on a different language ([DSL](https://en.wikipedia.org/wiki/Domain-specific_language)) except CSS.
 
 ## Usage
 
@@ -27,29 +27,29 @@ Add `"@davesnx/styled-ppx/ppx"` under bsconfig `"ppx-flags"`:
 }
 ```
 
-Read more about [getting started](https://styled-ppx.vercel.app/getting-started)
+Read more about [getting started](https://styled-ppx.vercel.app/getting-started).
 
 ## [Documentation](https://styled-ppx.vercel.app)
 
-For the entire documentation, visit [styled-ppx.vercel.app](https://styled-ppx.vercel.app)
+For the entire documentation, visit [styled-ppx.vercel.app](https://styled-ppx.vercel.app).
 
 ### Editor Support
 
-We provide editor extensions that brings syntax highlight, for now. (It will include IntelliSense or other [CSS-related](https://code.visualstudio.com/docs/languages/css) features).
+We provide an editor extension that brings syntax highlighting. (In the future it may include IntelliSense or other [CSS-related](https://code.visualstudio.com/docs/languages/css) features.)
 
 #### VSCode Extension
 
-Install the **[VSCode Extension](https://marketplace.visualstudio.com/items?itemName=davesnx.vscode-styled-ppx)**
+Install the **[VSCode Extension](https://marketplace.visualstudio.com/items?itemName=davesnx.vscode-styled-ppx)**.
 
 #### vim plugin
 
-Install the **[vim plugin](https://github.com/ahrefs/vim-styled-ppx/blob/main/README.md#installation)**
+Install the **[vim plugin](https://github.com/ahrefs/vim-styled-ppx/blob/main/README.md#installation)**.
 
-> If you are interested on another editor, please [fill an issue](https://github.com/davesnx/styled-ppx/issues/new).
+> If you are interested on another editor, please [file an issue](https://github.com/davesnx/styled-ppx/issues/new).
 
 ## Contributing
 
-We would love your help improving **styled-ppx**! Please see our contributing and community guidelines, they'll help you get set up locally and explain the whole process: [CONTRIBUTING.md](./CONTRIBUTING.md).
+We would love your help improving **styled-ppx**! Please see our contributing and community guidelines; they'll help you get set up locally and explain the whole process: [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## License
 
