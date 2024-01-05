@@ -2,10 +2,17 @@
  (mode fallback)
  (files ../js/**[!.pp].ml))
 
+; Copy files into the root of the folder (which collides with Kloth.ml)
+; but later on the actions, we remove the ml file, using the Kloth.res file
+
+(copy_files
+ (files ./lib/*.res))
+
 (rule
  (alias all)
  (action
   (progn
+   (run rm -rf ./Kloth.ml)
    (with-stdout-to
     bsconfig.json
     (run
