@@ -16,6 +16,7 @@ end
 
 module Array = struct
   let reduceU = Belt.Array.reduceU
+  let reduceWithIndex = Belt.Array.reduceWithIndex
   let reduceWithIndexU = Belt.Array.reduceWithIndexU
   let reduce = Belt.Array.reduce
   let map = Belt.Array.map
@@ -40,14 +41,7 @@ module Int = struct
 end
 
 module Float = struct
-  let toString f =
-    (* round x rounds x to the nearest integer with ties (fractional values of 0.5) rounded away from zero, regardless of the current rounding direction. If x is an integer, +0., -0., nan, or infinite, x itself is returned.
-
-       On 64-bit mingw-w64, this function may be emulated owing to a bug in the C runtime library (CRT) on this platform. *)
-    (* if round(f) == f, print the integer (since string_of_float 1.0 => "1.") *)
-    if Stdlib.Float.equal (Stdlib.Float.round f) f then
-      f |> int_of_float |> string_of_int
-    else Printf.sprintf "%g" f
+  let toString = Js.Float.toString
 end
 
 module Option = struct
