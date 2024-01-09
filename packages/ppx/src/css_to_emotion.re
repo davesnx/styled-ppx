@@ -284,9 +284,9 @@ and render_selector = (selector: selector) => {
      ) */
   and render_subclass_selector =
     fun
-    | Id(v) => Printf.sprintf("#%s", v)
-    | Class(v) => Printf.sprintf(".%s", v)
-    | ClassVariable(v) => "." ++ render_variable_as_string(v)
+    | Id(v) => v
+    | Class(v) => v
+    | ClassVariable(v) => render_variable_as_string(v)
     | Attribute(Attr_value(v)) => Printf.sprintf("[%s]", v)
     | Attribute(To_equal({name, kind, value})) => {
         let value =
@@ -348,7 +348,9 @@ and render_selector = (selector: selector) => {
   and render_complex_selector = complex => {
     switch (complex) {
     | Combinator({left, right}) =>
-      let left = render_selector(left);
+      let left = {
+        render_selector(left);
+      };
       let right = render_right_combinator(right);
       left ++ right;
     | Selector(selector) => render_selector(selector)
@@ -371,7 +373,7 @@ and render_selector = (selector: selector) => {
 }
 and render_selectors = selectors => {
   selectors
-  |> List.map(((selector, _loc)) => render_selector(selector))
+  |> List.map(((selector, _loc)) => {render_selector(selector)})
   |> String.concat(", ");
 }
 and render_style_rule = (ident, rule: style_rule) => {
@@ -384,7 +386,7 @@ and render_style_rule = (ident, rule: style_rule) => {
   let selector_name =
     prelude
     |> render_selectors
-    |> String.trim
+    // |> String.trim
     |> String_interpolation.transform(~attrs, ~delimiter, ~loc);
 
   Helper.Exp.apply(
