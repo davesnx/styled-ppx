@@ -15,11 +15,11 @@ help: ## Print this help message
 
 .PHONY: build
 build: ## Build the project, including non installable libraries and executables
-	$(DUNE) build --promote-install-files --root . @@default
+	$(DUNE) build --promote-install-files --root . @@all
 
 .PHONY: build-prod
 build-prod: ## Build for production (--profile=prod)
-	$(DUNE) build --profile=prod @@default
+	$(DUNE) build --profile=prod @@all
 
 .PHONY: clean
 clean: ## Clean artifacts
