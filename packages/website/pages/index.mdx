@@ -6,7 +6,7 @@ title: Introduction to styled-ppx
 
 **styled-ppx** is the [ppx](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem) that brings typed styled components to ReScript, allowing you to create **React Components** with type-safe style definitions that look like good old CSS.
 
-Built on top of [emotion](https://emotion.sh), so you can style your apps in a safe, familiar, and performant way.
+styled-ppx is built on top of [emotion](https://emotion.sh), so you can style your apps in a safe, familiar, and performant way.
 
 ```rescript
 module Center = %styled.div(`
@@ -24,11 +24,11 @@ module Center = %styled.div(`
 
 Highlights:
 
-- Type-safe CSS
-- Component-based styling
-- Implements utility helpers such as classname and css
-- There's no abstraction over standard CSS, it's neither a new language nor a [DSL](https://en.wikipedia.org/wiki/Domain-specific_language)
-- Supports the power of the underlying language: pattern-matching, composition, labelled arguments
-- Built on top of [emotion](https://emotion.sh)
+- Type-safe CSS.
+- Component-based styling.
+- Implements utility helpers such as `classname` and `css`.
+- There's no abstraction over standard CSS - it's neither a new language nor a [DSL](https://en.wikipedia.org/wiki/Domain-specific_language).
+- Supports the power of the underlying language: pattern-matching, composition, labelled arguments, etc.
+- Built on top of [emotion](https://emotion.sh).
 
-**styled-ppx** is a ppx, you can learn more about ppxs in [Tarides blog: Introduction to OCaml ppx ecosystem](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem). Generally speaking, they are similar to [babel plugins](https://babeljs.io/docs/en/plugins/). They run before the compilation of your code, and expands these notations (`%styled.div{:rescript}` or `%cx{:rescript}`) into valid ReScript code.
+**styled-ppx** is a ppx. You can learn more about ppxs in [Tarides blog: Introduction to OCaml ppx ecosystem](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem). Generally speaking, they are similar to [babel plugins](https://babeljs.io/docs/en/plugins/). They run before the compilation of your code, and expands styled-ppx notations (e.g., `%styled.div{:rescript}` or `%cx{:rescript}`) into valid ReScript code.
