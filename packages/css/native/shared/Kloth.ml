@@ -4,12 +4,12 @@ module List = struct
   let reduce = Belt.List.reduce
   let toArray = Array.of_list
 
-  let joinWith strings separator =
+  let joinWith ~sep strings =
     let rec run strings acc =
       match strings with
       | [] -> acc
       | x :: [] -> acc ^ x
-      | x :: xs -> run xs ((acc ^ x) ^ separator)
+      | x :: xs -> run xs ((acc ^ x) ^ sep)
     in
     run strings {js||js}
 end
@@ -20,18 +20,19 @@ module Array = struct
   let reduce = Belt.Array.reduce
   let map = Belt.Array.map
 
-  let joinWith strings separator =
+  let joinWith ~sep strings =
     let len = Array.length strings in
     let rec run i acc =
       if i >= len then acc
       else if i = len - 1 then acc ^ strings.(i)
-      else run (i + 1) (acc ^ strings.(i) ^ separator)
+      else run (i + 1) (acc ^ strings.(i) ^ sep)
     in
     run 0 ""
 end
 
 module String = struct
-  let startsWith affix str = Js.String2.startsWith str affix
+  let get = Js.String.get
+  let startsWith affix str = Js.String.startsWith str ~prefix:affix
 end
 
 module Int = struct

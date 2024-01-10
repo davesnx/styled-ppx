@@ -23,7 +23,7 @@ jobs:
       matrix:
         os: [ubuntu-20.04, macos-latest] # Missing windows-latest
         ocaml-compiler:
-          - 5.1.0
+          - 5.1.1
 
     runs-on: ${{ matrix.os }}
 
@@ -62,9 +62,6 @@ jobs:
 
       - name: Install dependencies
         run: make install
-
-      - name: Install pins
-        run: make pin
 
       - name: Build
         run: make build
@@ -112,17 +109,14 @@ jobs:
       - name: Grant permission to run ppx
         run: chmod +x _build/default/bin/bin.exe
 
-      - name: Install dependencies
-        working-directory: ./e2e/rescript-v10-JSX4
-        run: npm install --force
+      - name: DEBUG
+        run: ls _build/default/packages/css/rescript/Kloth.ml
 
-      - name: Build
-        working-directory: ./e2e/rescript-v10-JSX4
-        run: npm run build
+      - name: Run E2E ReScript v9 tests
+        run: make test_e2e_rescript_v9
 
-      - name: Test
-        working-directory: ./e2e/rescript-v10-JSX4
-        run: npm run test
+      - name: Run E2E ReScript v10 tests
+        run: make test_e2e_rescript_v10
 
   publish:
     name: Publish

@@ -648,18 +648,46 @@ let attributeTypeToIdent =
   | String => Lident("string")
   | Style => Ldot(Ldot(Lident("ReactDOM"), "Style"), "t");
 
-let eventTypeToIdent =
-  fun
-  | Animation => Ldot(Ldot(Lident("ReactEvent"), "Animation"), "t")
-  | Clipboard => Ldot(Ldot(Lident("ReactEvent"), "Clipboard"), "t")
-  | Composition => Ldot(Ldot(Lident("ReactEvent"), "Composition"), "t")
-  | Focus => Ldot(Ldot(Lident("ReactEvent"), "Focus"), "t")
-  | Form => Ldot(Ldot(Lident("ReactEvent"), "Form"), "t")
-  | Keyboard => Ldot(Ldot(Lident("ReactEvent"), "Keyboard"), "t")
-  | Media => Ldot(Ldot(Lident("ReactEvent"), "Media"), "t")
-  | Mouse => Ldot(Ldot(Lident("ReactEvent"), "Mouse"), "t")
-  | Selection => Ldot(Ldot(Lident("ReactEvent"), "Selection"), "t")
-  | Touch => Ldot(Ldot(Lident("ReactEvent"), "Touch"), "t")
-  | Transition => Ldot(Ldot(Lident("ReactEvent"), "Transition"), "t")
-  | UI => Ldot(Ldot(Lident("ReactEvent"), "UI"), "t")
-  | Wheel => Ldot(Ldot(Lident("ReactEvent"), "Wheel"), "t");
+module Reason = {
+  let eventTypeToIdent =
+    fun
+    | Animation => Ldot(Ldot(Ldot(Lident("React"), "Event"), "Animation"), "t")
+    | Clipboard => Ldot(Ldot(Ldot(Lident("React"), "Event"), "Clipboard"), "t")
+    | Composition => Ldot(Ldot(Ldot(Lident("React"), "Event"), "Composition"), "t")
+    | Focus => Ldot(Ldot(Ldot(Lident("React"), "Event"), "Focus"), "t")
+    | Form => Ldot(Ldot(Ldot(Lident("React"), "Event"), "Form"), "t")
+    | Keyboard => Ldot(Ldot(Ldot(Lident("React"), "Event"), "Keyboard"), "t")
+    | Media => Ldot(Ldot(Ldot(Lident("React"), "Event"), "Media"), "t")
+    | Mouse => Ldot(Ldot(Ldot(Lident("React"), "Event"), "Mouse"), "t")
+    | Selection => Ldot(Ldot(Ldot(Lident("React"), "Event"), "Selection"), "t")
+    | Touch => Ldot(Ldot(Ldot(Lident("React"), "Event"), "Touch"), "t")
+    | Transition => Ldot(Ldot(Ldot(Lident("React"), "Event"), "Transition"), "t")
+    | UI => Ldot(Ldot(Ldot(Lident("React"), "Event"), "UI"), "t")
+    | Wheel => Ldot(Ldot(Ldot(Lident("React"), "Event"), "Wheel"), "t");
+};
+
+module ReScript = {
+  let eventTypeToIdent =
+    fun
+    | Animation => Ldot(Ldot(Lident("ReactEvent"), "Animation"), "t")
+    | Clipboard => Ldot(Ldot(Lident("ReactEvent"), "Clipboard"), "t")
+    | Composition => Ldot(Ldot(Lident("ReactEvent"), "Composition"), "t")
+    | Focus => Ldot(Ldot(Lident("ReactEvent"), "Focus"), "t")
+    | Form => Ldot(Ldot(Lident("ReactEvent"), "Form"), "t")
+    | Keyboard => Ldot(Ldot(Lident("ReactEvent"), "Keyboard"), "t")
+    | Media => Ldot(Ldot(Lident("ReactEvent"), "Media"), "t")
+    | Mouse => Ldot(Ldot(Lident("ReactEvent"), "Mouse"), "t")
+    | Selection => Ldot(Ldot(Lident("ReactEvent"), "Selection"), "t")
+    | Touch => Ldot(Ldot(Lident("ReactEvent"), "Touch"), "t")
+    | Transition => Ldot(Ldot(Lident("ReactEvent"), "Transition"), "t")
+    | UI => Ldot(Ldot(Lident("ReactEvent"), "UI"), "t")
+    | Wheel => Ldot(Ldot(Lident("ReactEvent"), "Wheel"), "t");
+};
+
+let eventTypeToIdent = (type_) => {
+    /* reason-react exposes React.Event while rescript/react ReactEvent */
+  switch (File.get()) {
+    | Some(ReScript) => ReScript.eventTypeToIdent(type_)
+    | Some(Reason) | _ => Reason.eventTypeToIdent(type_)
+  }
+};

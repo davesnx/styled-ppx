@@ -82,7 +82,7 @@ module Converter = struct
     stops
     |. Std.List.map (fun (c, l) ->
            Color.toString c ^ {js| |js} ^ Length.toString l)
-    |. Std.List.joinWith {js|, |js}
+    |. Std.List.joinWith ~sep:{js|, |js}
 
   let string_of_time t = Std.Int.toString t ^ {js|ms|js}
 
@@ -226,7 +226,7 @@ let backfaceVisibility x =
 let backdropFilter x =
   D
     ( {js|backdropFilter|js},
-      x |. Std.List.map BackdropFilter.toString |. Std.List.joinWith {js|, |js}
+      x |. Std.List.map BackdropFilter.toString |. Std.List.joinWith ~sep:{js|, |js}
     )
 
 let backgroundAttachment x =
@@ -295,7 +295,7 @@ let backgroundPositions bp =
     ( {js|backgroundPosition|js},
       bp
       |. Std.List.map string_of_backgroundposition
-      |. Std.List.joinWith {js|, |js} )
+      |. Std.List.joinWith ~sep:{js|, |js} )
 
 let backgroundPosition4 ~x ~offsetX ~y ~offsetY =
   D
@@ -341,7 +341,7 @@ let maskPosition x = D ({js|maskPosition|js}, string_of_maskposition x)
 let maskPositions mp =
   D
     ( {js|maskPosition|js},
-      mp |. Std.List.map string_of_maskposition |. Std.List.joinWith {js|, |js}
+      mp |. Std.List.map string_of_maskposition |. Std.List.joinWith ~sep:{js|, |js}
     )
 
 let borderBottomColor x = D ({js|borderBottomColor|js}, string_of_color x)
@@ -419,7 +419,7 @@ let contentRule x = D ({js|content|js}, string_of_content x)
 let contentRules xs =
   D
     ( {js|content|js},
-      xs |. Std.List.map string_of_content |. Std.List.joinWith {js| |js} )
+      xs |. Std.List.map string_of_content |. Std.List.joinWith ~sep:{js| |js} )
 
 let counterIncrement x =
   D ({js|counterIncrement|js}, string_of_counter_increment x)
@@ -429,14 +429,14 @@ let countersIncrement xs =
     ( {js|counterIncrement|js},
       xs
       |. Std.List.map string_of_counter_increment
-      |. Std.List.joinWith {js| |js} )
+      |. Std.List.joinWith ~sep:{js| |js} )
 
 let counterReset x = D ({js|counterReset|js}, string_of_counter_reset x)
 
 let countersReset xs =
   D
     ( {js|counterReset|js},
-      xs |. Std.List.map string_of_counter_reset |. Std.List.joinWith {js| |js}
+      xs |. Std.List.map string_of_counter_reset |. Std.List.joinWith ~sep:{js| |js}
     )
 
 let counterSet x = D ({js|counterSet|js}, string_of_counter_set x)
@@ -444,7 +444,7 @@ let counterSet x = D ({js|counterSet|js}, string_of_counter_set x)
 let countersSet xs =
   D
     ( {js|counterSet|js},
-      xs |. Std.List.map string_of_counter_set |. Std.List.joinWith {js| |js} )
+      xs |. Std.List.map string_of_counter_set |. Std.List.joinWith ~sep:{js| |js} )
 
 let cursor x = D ({js|cursor|js}, Cursor.toString x)
 
@@ -540,7 +540,7 @@ let fontFamily x =
 let fontFamilies xs =
   D
     ( {js|fontFamily|js},
-      xs |. Std.List.map FontFamilyName.toString |. Std.List.joinWith {js|, |js}
+      xs |. Std.List.map FontFamilyName.toString |. Std.List.joinWith ~sep:{js|, |js}
     )
 
 let fontSize x =
@@ -1001,7 +1001,7 @@ let transform x =
 let transforms x =
   D
     ( {js|transform|js},
-      x |. Std.List.map Transform.toString |. Std.List.joinWith {js| |js} )
+      x |. Std.List.map Transform.toString |. Std.List.joinWith ~sep:{js| |js} )
 
 let transformOrigin x y =
   D ({js|transformOrigin|js}, Length.toString x ^ {js| |js} ^ Length.toString y)
@@ -1711,7 +1711,7 @@ let string_of_filter x =
 let filter x =
   D
     ( {js|filter|js},
-      x |. Std.List.map string_of_filter |. Std.List.joinWith {js| |js} )
+      x |. Std.List.map string_of_filter |. Std.List.joinWith ~sep:{js| |js} )
 
 module Shadow = struct
   type nonrec 'a value = string
@@ -1762,7 +1762,7 @@ let boxShadow x =
 let boxShadows x =
   D
     ( {js|boxShadow|js},
-      x |. Std.List.map Shadow.toString |. Std.List.joinWith {js|, |js} )
+      x |. Std.List.map Shadow.toString |. Std.List.joinWith ~sep:{js|, |js} )
 
 let string_of_borderstyle x =
   match x with
@@ -1844,7 +1844,7 @@ let backgrounds x =
              | #Url.t as u -> Url.toString u
              | #Gradient.t as g -> Gradient.toString g
              | `none -> {js|none|js})
-      |. Std.List.joinWith {js|, |js} )
+      |. Std.List.joinWith ~sep:{js|, |js} )
 
 let backgroundSize x =
   D
@@ -1931,7 +1931,7 @@ let textShadow x =
 let textShadows x =
   D
     ( {js|textShadow|js},
-      x |. Std.List.map Shadow.toString |. Std.List.joinWith {js|, |js} )
+      x |. Std.List.map Shadow.toString |. Std.List.joinWith ~sep:{js|, |js} )
 
 let transformStyle x =
   D
@@ -1964,7 +1964,7 @@ let transitionValue x = D ({js|transition|js}, Transition.toString x)
 let transitionList x =
   D
     ( {js|transition|js},
-      x |. Std.List.map Transition.toString |. Std.List.joinWith {js|, |js} )
+      x |. Std.List.map Transition.toString |. Std.List.joinWith ~sep:{js|, |js} )
 
 let transitions = transitionList
 
@@ -2018,7 +2018,7 @@ let animation ?duration ?delay ?direction ?timingFunction ?fillMode ?playState
 let animations x =
   D
     ( {js|animation|js},
-      x |. Std.List.map Animation.toString |. Std.List.joinWith {js|, |js} )
+      x |. Std.List.map Animation.toString |. Std.List.joinWith ~sep:{js|, |js} )
 
 let animationName x = D ({js|animationName|js}, x)
 
@@ -2048,7 +2048,7 @@ module SVG = struct
         match x with
         | `none -> {js|none|js}
         | `dasharray a ->
-          a |. Std.List.map string_of_dasharray |. Std.List.joinWith {js| |js}
+          a |. Std.List.map string_of_dasharray |. Std.List.joinWith ~sep:{js| |js}
       )
 
   let strokeWidth x = D ({js|strokeWidth|js}, Length.toString x)

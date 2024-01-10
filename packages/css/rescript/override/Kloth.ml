@@ -33,7 +33,7 @@ end
 
 module String = struct
   let get = Js.String.get
-  let startsWith affix str = Js.String.startsWith ~prefix:affix str
+  let startsWith affix str = Js.String.startsWith affix str
 end
 
 module Int = struct
