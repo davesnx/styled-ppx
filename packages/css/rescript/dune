@@ -12,7 +12,6 @@
   (progn
    (run rm -rf ./Kloth.ml)
    (run cp -R ./override/Kloth.ml ./Kloth.ml)
-   (run ls -la .)
    (with-stdout-to
     bsconfig.json
     (run

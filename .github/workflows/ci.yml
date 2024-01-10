@@ -109,17 +109,11 @@ jobs:
       - name: Grant permission to run ppx
         run: chmod +x _build/default/bin/bin.exe
 
-      - name: Install dependencies
-        working-directory: ./e2e/rescript-v10-JSX4
-        run: npm install --force
+      - name: Run E2E ReScript v9 tests
+        run: make test_e2e_rescript_v9
 
-      - name: Build
-        working-directory: ./e2e/rescript-v10-JSX4
-        run: npm run build
-
-      - name: Test
-        working-directory: ./e2e/rescript-v10-JSX4
-        run: npm run test
+      - name: Run E2E ReScript v10 tests
+        run: make test_e2e_rescript_v10
 
   publish:
     name: Publish
