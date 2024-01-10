@@ -1,11 +1,9 @@
-let is_nested = ref(false);
-
 let resolve_subclass_selector = (subclass: Css_types.subclass_selector) => {
   Css_types.(
     switch (subclass) {
-    | Id(id) when ! is_nested^ => Id(" #" ++ id)
-    | Class(c) when ! is_nested^ => Class(" ." ++ c)
-    | ClassVariable(vars) when ! is_nested^ =>
+    | Id(id) => Id(" #" ++ id)
+    | Class(c) => Class(" ." ++ c)
+    | ClassVariable(vars) =>
       ClassVariable(vars |> List.map(var => " ." ++ var))
     | _ => subclass
     }
@@ -30,7 +28,6 @@ let resolve_compound_selector = (selector: Css_types.compound_selector) => {
   let subclass_selectors =
     subclass_selectors
     |> List.map(subclass => resolve_subclass_selector(subclass));
-  is_nested := true;
   CompoundSelector({
     type_selector: None,
     subclass_selectors,
@@ -53,8 +50,6 @@ let rec resolve_complex_selector = (selector: Css_types.complex_selector) => {
   );
 }
 and resolve_selector = (selector: Css_types.selector) => {
-  is_nested := false;
-
   switch (selector) {
   | ComplexSelector(selector) => resolve_complex_selector(selector)
   | CompoundSelector(compound_selector) =>
@@ -62,10 +57,20 @@ and resolve_selector = (selector: Css_types.selector) => {
   | SimpleSelector(selector) => resolve_simple_selector(selector)
   };
 };
+let is_nested = ref(false);
 
 let resolve_selectors = (selectors: Css_types.selector_list) => {
   selectors
-  |> List.map(((selector, loc)) => (resolve_selector(selector), loc));
+  |> List.map(((selector, loc)) => {
+       is_nested^
+         ? {
+           (resolve_selector(selector), loc);
+         }
+         : {
+           is_nested := true;
+           (selector, loc);
+         }
+     });
 };
 
 let rec resolve_component_values =
@@ -124,7 +129,7 @@ let rec resolve_style_rule = (style_rule: Css_types.style_rule) => {
 
   Style_rule({
     prelude: (resolve_selectors_with_loc(selectors_with_loc), loc),
-    block: resolve_nested_selector(declarations),
+    block: resolve_css_rules(declarations),
     loc,
   });
 }
@@ -136,9 +141,8 @@ and resolve_at_rule = (at_rule: Css_types.at_rule) => {
   let resolve_brace_block =
     switch (brace_block) {
     | Empty => brace_block
-    | Rule_list(rules) => Rule_list(resolve_nested_selector(rules))
-    | Stylesheet(stylesheet) =>
-      Stylesheet(resolve_nested_selector(stylesheet))
+    | Rule_list(rules) => Rule_list(resolve_css_rules(rules))
+    | Stylesheet(stylesheet) => Stylesheet(resolve_css_rules(stylesheet))
     };
   At_rule({
     name,
@@ -148,7 +152,8 @@ and resolve_at_rule = (at_rule: Css_types.at_rule) => {
   });
 }
 
-and resolve_nested_selector = (declarations: Css_types.rule_list) => {
+// FIXME: change me to resolve_css or ...css_rules
+and resolve_css_rules = (declarations: Css_types.rule_list) => {
   let (rules, loc) = declarations;
   let rules =
     rules

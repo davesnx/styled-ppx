@@ -50,8 +50,7 @@ let parse = (~loc: Ppxlib.location, payload) => {
      }; */
 
   switch (Driver.parse_declaration_list(~pos=Some(loc_start), payload)) {
-  | Ok(declarations) =>
-    Ok(Css_resolver.resolve_nested_selector(declarations))
+  | Ok(declarations) => Ok(Css_resolver.resolve_css_rules(declarations))
   | Error((loc, msg)) => Error((loc, msg))
   };
 };

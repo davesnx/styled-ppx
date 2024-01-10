@@ -446,7 +446,7 @@ let nested_tests = [
           [|
             CssJs.selector(
               {js| .b|js},
-              [|CssJs.selector({js| .c|js}, [||])|],
+              [|CssJs.selector({js|c|js}, [||])|],
             ),
           |],
         ) // FIXME: should be ... ({js| .b .c|js}

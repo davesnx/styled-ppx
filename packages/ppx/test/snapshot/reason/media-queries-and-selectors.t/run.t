@@ -968,7 +968,7 @@
           [|CssJs.backgroundColor(CssJs.blue)|],
         ),
         CssJs.selector(
-          {js|:hover|js},
+          {js|&:hover|js},
           [|CssJs.backgroundColor(CssJs.green)|],
         ),
         CssJs.selector(
