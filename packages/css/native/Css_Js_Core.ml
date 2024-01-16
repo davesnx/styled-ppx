@@ -371,7 +371,8 @@ let contentRule x = D ({js|content|js}, string_of_content x)
 let contentRules xs =
   D
     ( {js|content|js},
-      xs |. Std.Array.map string_of_content |. Std.Array.joinWith ~sep:{js| |js} )
+      xs |. Std.Array.map string_of_content |. Std.Array.joinWith ~sep:{js| |js}
+    )
 
 let counterIncrement x =
   D ({js|counter-increment|js}, string_of_counter_increment x)
@@ -397,8 +398,9 @@ let counterSet x = D ({js|counter-set|js}, string_of_counter_set x)
 let countersSet xs =
   D
     ( {js|counter-set|js},
-      xs |. Std.Array.map string_of_counter_set |. Std.Array.joinWith ~sep:{js||js}
-    )
+      xs
+      |. Std.Array.map string_of_counter_set
+      |. Std.Array.joinWith ~sep:{js||js} )
 
 let cursor x = D ({js|cursor|js}, Cursor.toString x)
 
@@ -1045,7 +1047,8 @@ let transform x =
 let transforms x =
   D
     ( {js|transform|js},
-      x |. Std.Array.map Transform.toString |. Std.Array.joinWith ~sep:{js| |js} )
+      x |. Std.Array.map Transform.toString |. Std.Array.joinWith ~sep:{js| |js}
+    )
 
 let transformOrigin x y =
   D ({js|transform-origin|js}, Length.toString x ^ {js| |js} ^ Length.toString y)
@@ -1761,7 +1764,8 @@ let string_of_filter x =
 let filter x =
   D
     ( {js|filter|js},
-      x |. Std.Array.map string_of_filter |. Std.Array.joinWith ~sep:{js| |js} )
+      x |. Std.Array.map string_of_filter |. Std.Array.joinWith ~sep:{js| |js}
+    )
 
 module Shadow = struct
   type nonrec 'a value = string
@@ -1806,7 +1810,8 @@ let boxShadow x =
 let boxShadows x =
   D
     ( {js|box-shadow|js},
-      x |. Std.Array.map Shadow.toString |. Std.Array.joinWith ~sep:{js|, |js} )
+      x |. Std.Array.map Shadow.toString |. Std.Array.joinWith ~sep:{js|, |js}
+    )
 
 let string_of_borderstyle x =
   match x with
@@ -1892,8 +1897,7 @@ let backgroundSize x =
 
 let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
     =
-  (
-   let src =
+  (let src =
      src
      |. Std.Array.map (fun x ->
             match x with
@@ -1987,7 +1991,8 @@ let textShadow x =
 let textShadows x =
   D
     ( {js|text-shadow|js},
-      x |. Std.Array.map Shadow.toString |. Std.Array.joinWith ~sep:{js|, |js} )
+      x |. Std.Array.map Shadow.toString |. Std.Array.joinWith ~sep:{js|, |js}
+    )
 
 let transformStyle x =
   D
@@ -2019,7 +2024,9 @@ let transitionValue x = D ({js|transition|js}, Transition.toString x)
 let transitionList x =
   D
     ( {js|transition|js},
-      x |. Std.Array.map Transition.toString |. Std.Array.joinWith ~sep:{js|, |js} )
+      x
+      |. Std.Array.map Transition.toString
+      |. Std.Array.joinWith ~sep:{js|, |js} )
 
 let transitions = transitionList
 
@@ -2070,7 +2077,9 @@ let animation ?duration ?delay ?direction ?timingFunction ?fillMode ?playState
 let animations x =
   D
     ( {js|animation|js},
-      x |. Std.Array.map Animation.toString |. Std.Array.joinWith ~sep:{js|, |js} )
+      x
+      |. Std.Array.map Animation.toString
+      |. Std.Array.joinWith ~sep:{js|, |js} )
 
 let animationName x = D ({js|animation-name|js}, x)
 
@@ -2100,8 +2109,9 @@ module SVG = struct
         match x with
         | `none -> {js|none|js}
         | `dasharray a ->
-          a |. Std.Array.map string_of_dasharray |. Std.Array.joinWith ~sep:{js||js}
-      )
+          a
+          |. Std.Array.map string_of_dasharray
+          |. Std.Array.joinWith ~sep:{js||js} )
 
   let strokeWidth x = D ({js|stroke-width|js}, Length.toString x)
 
