@@ -4,7 +4,7 @@ title: Selectors
 
 # Selectors
 
-The extensions `cx` and `styled` support selectors, on the other hand `css` it doesn't, since it only generates one Rule.
+The extensions `cx` and `styled` support selectors; on the other hand `css` does not because it only generates one Rule.
 
 The syntax is similar to SASS but the only difference is that for nesting you need to use `&` in front of each selector.
 
@@ -19,7 +19,7 @@ let link = %cx(`
 ```
 > Note: Selectors can be nested within your CSS which will be attached to the classname generated (in this case by `cx`)
 
-More than one level of selectors is not supported. It might compile but will generate the wrong result.
+More than one level of selectors is not supported. It might compile but it will generate the wrong result.
 
 The support for selectors is CSS Selectors Level 3 and the more stable part of level 4 (currently in draft).
 
