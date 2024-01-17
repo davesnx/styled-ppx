@@ -40,7 +40,7 @@ Here is a quick guide to doing code contributions to the repository.
 - Make sure you have installed opam and yarn (1.x).
 - Run `make init` will setup the opam switch, install dependencies and some pinned packages.
 - Run `make build` will build the project or `make dev` to build and watch for changes.
-- Run `make test_all` to run all test suites.
+- Run `make test` to run all test suites.
 
 ### Editor setup
 
