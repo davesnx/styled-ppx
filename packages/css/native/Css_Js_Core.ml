@@ -7,7 +7,7 @@ type rule =
   | PseudoClass of string * rule array
   | PseudoClassParam of string * string * rule array
 
-type nonrec animationName = string
+type animationName = string
 
 let join strings separator =
   Std.Array.reduceWithIndexU strings {js||js} (fun [@u] acc item index ->
@@ -1223,7 +1223,7 @@ let link rules = pseudoClass {js|link|js} rules
 let not_ selector rules = PseudoClassParam ({js|not|js}, selector, rules)
 
 module Nth = struct
-  type nonrec t =
+  type t =
     [ `odd
     | `even
     | `n of int
@@ -1274,21 +1274,21 @@ let placeholder rules = (selector {js|::placeholder|js} rules [@u])
 let siblings rules = (selector {js|~ |js} rules [@u])
 let anyLink rules = (selector {js|:any-link|js} rules [@u])
 
-type nonrec angle = Angle.t
-type nonrec animationDirection = AnimationDirection.t
-type nonrec animationFillMode = AnimationFillMode.t
-type nonrec animationIterationCount = AnimationIterationCount.t
-type nonrec animationPlayState = AnimationPlayState.t
-type nonrec cascading = Cascading.t
-type nonrec color = Color.t
-type nonrec fontStyle = FontStyle.t
-type nonrec fontWeight = FontWeight.t
-type nonrec length = Length.t
-type nonrec listStyleType = ListStyleType.t
-type nonrec repeatValue = RepeatValue.t
-type nonrec outlineStyle = OutlineStyle.t
-type nonrec transform = Transform.t
-type nonrec 'colorOrVar gradient = 'colorOrVar Gradient.t
+type angle = Angle.t
+type animationDirection = AnimationDirection.t
+type animationFillMode = AnimationFillMode.t
+type animationIterationCount = AnimationIterationCount.t
+type animationPlayState = AnimationPlayState.t
+type cascading = Cascading.t
+type color = Color.t
+type fontStyle = FontStyle.t
+type fontWeight = FontWeight.t
+type length = Length.t
+type listStyleType = ListStyleType.t
+type repeatValue = RepeatValue.t
+type outlineStyle = OutlineStyle.t
+type transform = Transform.t
+type 'colorOrVar gradient = 'colorOrVar Gradient.t
 
 let initial = Cascading.initial
 let inherit_ = Cascading.inherit_
@@ -1615,7 +1615,7 @@ let string_of_dimension x =
     ((({js|minmax(|js} ^ string_of_minmax a) ^ {js|,|js}) ^ string_of_minmax b)
     ^ {js|)|js}
 
-type nonrec minmax =
+type minmax =
   [ `fr of float
   | `minContent
   | `maxContent
@@ -1623,7 +1623,7 @@ type nonrec minmax =
   | Length.t
   ]
 
-type nonrec trackLength =
+type trackLength =
   [ Length.t
   | `auto
   | `fr of float
@@ -1632,7 +1632,7 @@ type nonrec trackLength =
   | `minmax of minmax * minmax
   ]
 
-type nonrec gridLength =
+type gridLength =
   [ trackLength
   | `repeat of RepeatValue.t * trackLength
   ]
@@ -1720,7 +1720,7 @@ let gridTemplateAreas l =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-type nonrec filter =
+type filter =
   [ `blur of Length.t
   | `brightness of float
   | `contrast of float
@@ -1768,11 +1768,11 @@ let filter x =
     )
 
 module Shadow = struct
-  type nonrec 'a value = string
-  type nonrec box
-  type nonrec text
+  type 'a value = string
+  type box
+  type text
 
-  type nonrec 'a t =
+  type 'a t =
     [ `shadow of 'a value
     | `none
     ]
@@ -2003,7 +2003,7 @@ let transformStyle x =
       | #Cascading.t as c -> Cascading.toString c )
 
 module Transition = struct
-  type nonrec t = [ `value of string ]
+  type t = [ `value of string ]
 
   let shorthand ?(duration = 0) ?(delay = 0) ?(timingFunction = `ease) property
       =
@@ -2043,7 +2043,7 @@ let transitionTimingFunction x =
 let transitionProperty x = D ({js|transition-property|js}, x)
 
 module Animation = struct
-  type nonrec t = [ `value of string ]
+  type t = [ `value of string ]
 
   let shorthand ?(duration = 0) ?(delay = 0) ?(direction = `normal)
     ?(timingFunction = `ease) ?(fillMode = `none) ?(playState = `running)

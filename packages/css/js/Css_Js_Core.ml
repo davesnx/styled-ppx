@@ -23,11 +23,11 @@ let rec ruleToDict dict rule =
 and toJson rules =
   Std.Array.reduce rules (Js.Dict.empty ()) ruleToDict |. Js.Json.object_
 
-type nonrec animationName = string
+type animationName = string
 
 module type MakeResult = sig
-  type nonrec styleEncoding
-  type nonrec renderer
+  type styleEncoding
+  type renderer
 
   val insertRule : string -> unit
   val renderRule : renderer -> string -> unit
@@ -432,7 +432,8 @@ let contentRule x = D ({js|content|js}, string_of_content x)
 let contentRules xs =
   D
     ( {js|content|js},
-      xs |. Std.Array.map string_of_content |. Std.Array.joinWith ~sep:{js| |js} )
+      xs |. Std.Array.map string_of_content |. Std.Array.joinWith ~sep:{js| |js}
+    )
 
 let counterIncrement x =
   D ({js|counterIncrement|js}, string_of_counter_increment x)
@@ -458,8 +459,9 @@ let counterSet x = D ({js|counterSet|js}, string_of_counter_set x)
 let countersSet xs =
   D
     ( {js|counterSet|js},
-      xs |. Std.Array.map string_of_counter_set |. Std.Array.joinWith ~sep:{js| |js}
-    )
+      xs
+      |. Std.Array.map string_of_counter_set
+      |. Std.Array.joinWith ~sep:{js| |js} )
 
 let cursor x = D ({js|cursor|js}, Cursor.toString x)
 
@@ -1105,7 +1107,8 @@ let transform x =
 let transforms x =
   D
     ( {js|transform|js},
-      x |. Std.Array.map Transform.toString |. Std.Array.joinWith ~sep:{js| |js} )
+      x |. Std.Array.map Transform.toString |. Std.Array.joinWith ~sep:{js| |js}
+    )
 
 let transformOrigin x y =
   D ({js|transformOrigin|js}, Length.toString x ^ {js| |js} ^ Length.toString y)
@@ -1267,7 +1270,7 @@ let link rules = pseudoClass {js|link|js} rules
 let not_ selector rules = PseudoClassParam ({js|not|js}, selector, rules)
 
 module Nth = struct
-  type nonrec t =
+  type t =
     [ `odd
     | `even
     | `n of int
@@ -1318,21 +1321,21 @@ let placeholder rules = selector {js|::placeholder|js} rules
 let siblings rules = selector {js| ~ |js} rules
 let anyLink rules = selector {js|:any-link|js} rules
 
-type nonrec angle = Angle.t
-type nonrec animationDirection = AnimationDirection.t
-type nonrec animationFillMode = AnimationFillMode.t
-type nonrec animationIterationCount = AnimationIterationCount.t
-type nonrec animationPlayState = AnimationPlayState.t
-type nonrec cascading = Cascading.t
-type nonrec color = Color.t
-type nonrec fontStyle = FontStyle.t
-type nonrec fontWeight = FontWeight.t
-type nonrec length = Length.t
-type nonrec listStyleType = ListStyleType.t
-type nonrec repeatValue = RepeatValue.t
-type nonrec outlineStyle = OutlineStyle.t
-type nonrec transform = Transform.t
-type nonrec 'colorOrVar gradient = 'colorOrVar Gradient.t
+type angle = Angle.t
+type animationDirection = AnimationDirection.t
+type animationFillMode = AnimationFillMode.t
+type animationIterationCount = AnimationIterationCount.t
+type animationPlayState = AnimationPlayState.t
+type cascading = Cascading.t
+type color = Color.t
+type fontStyle = FontStyle.t
+type fontWeight = FontWeight.t
+type length = Length.t
+type listStyleType = ListStyleType.t
+type repeatValue = RepeatValue.t
+type outlineStyle = OutlineStyle.t
+type transform = Transform.t
+type 'colorOrVar gradient = 'colorOrVar Gradient.t
 
 let initial = Cascading.initial
 let inherit_ = Cascading.inherit_
@@ -1659,7 +1662,7 @@ let string_of_dimension x =
     ((({js|minmax(|js} ^ string_of_minmax a) ^ {js|,|js}) ^ string_of_minmax b)
     ^ {js|)|js}
 
-type nonrec minmax =
+type minmax =
   [ `fr of float
   | `minContent
   | `maxContent
@@ -1667,7 +1670,7 @@ type nonrec minmax =
   | Length.t
   ]
 
-type nonrec trackLength =
+type trackLength =
   [ Length.t
   | `auto
   | `fr of float
@@ -1676,7 +1679,7 @@ type nonrec trackLength =
   | `minmax of minmax * minmax
   ]
 
-type nonrec gridLength =
+type gridLength =
   [ trackLength
   | `repeat of RepeatValue.t * trackLength
   ]
@@ -1714,7 +1717,9 @@ let gridLengthToJs x =
     ^ {js|)|js}
 
 let string_of_dimensions dimensions =
-  dimensions |. Std.Array.map gridLengthToJs |. Std.Array.joinWith ~sep:{js| |js}
+  dimensions
+  |. Std.Array.map gridLengthToJs
+  |. Std.Array.joinWith ~sep:{js| |js}
 
 let gridTemplateColumns dimensions =
   D ({js|gridTemplateColumns|js}, string_of_dimensions dimensions)
@@ -1765,7 +1770,7 @@ let gridTemplateAreas l =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-type nonrec filter =
+type filter =
   [ `blur of Length.t
   | `brightness of float
   | `contrast of float
@@ -1809,14 +1814,15 @@ let string_of_filter x =
 let filter x =
   D
     ( {js|filter|js},
-      x |. Std.Array.map string_of_filter |. Std.Array.joinWith ~sep:{js| |js} )
+      x |. Std.Array.map string_of_filter |. Std.Array.joinWith ~sep:{js| |js}
+    )
 
 module Shadow = struct
-  type nonrec 'a value = string
-  type nonrec box
-  type nonrec text
+  type 'a value = string
+  type box
+  type text
 
-  type nonrec 'a t =
+  type 'a t =
     [ `shadow of 'a value
     | `none
     ]
@@ -1854,7 +1860,8 @@ let boxShadow x =
 let boxShadows x =
   D
     ( {js|boxShadow|js},
-      x |. Std.Array.map Shadow.toString |. Std.Array.joinWith ~sep:{js|, |js} )
+      x |. Std.Array.map Shadow.toString |. Std.Array.joinWith ~sep:{js|, |js}
+    )
 
 let string_of_borderstyle x =
   match x with
@@ -2014,7 +2021,8 @@ let textShadow x =
 let textShadows x =
   D
     ( {js|textShadow|js},
-      x |. Std.Array.map Shadow.toString |. Std.Array.joinWith ~sep:{js|, |js} )
+      x |. Std.Array.map Shadow.toString |. Std.Array.joinWith ~sep:{js|, |js}
+    )
 
 let transformStyle x =
   D
@@ -2025,7 +2033,7 @@ let transformStyle x =
       | #Cascading.t as c -> Cascading.toString c )
 
 module Transition = struct
-  type nonrec t = [ `value of string ]
+  type t = [ `value of string ]
 
   let shorthand ?(duration = 0) ?(delay = 0) ?(timingFunction = `ease) property
       =
@@ -2046,7 +2054,9 @@ let transitionValue x = D ({js|transition|js}, Transition.toString x)
 let transitionList x =
   D
     ( {js|transition|js},
-      x |. Std.Array.map Transition.toString |. Std.Array.joinWith ~sep:{js|, |js} )
+      x
+      |. Std.Array.map Transition.toString
+      |. Std.Array.joinWith ~sep:{js|, |js} )
 
 let transitions = transitionList
 
@@ -2063,7 +2073,7 @@ let transitionTimingFunction x =
 let transitionProperty x = D ({js|transitionProperty|js}, x)
 
 module Animation = struct
-  type nonrec t = [ `value of string ]
+  type t = [ `value of string ]
 
   let shorthand ?(duration = 0) ?(delay = 0) ?(direction = `normal)
     ?(timingFunction = `ease) ?(fillMode = `none) ?(playState = `running)
@@ -2097,7 +2107,9 @@ let animation ?duration ?delay ?direction ?timingFunction ?fillMode ?playState
 let animations x =
   D
     ( {js|animation|js},
-      x |. Std.Array.map Animation.toString |. Std.Array.joinWith ~sep:{js|, |js} )
+      x
+      |. Std.Array.map Animation.toString
+      |. Std.Array.joinWith ~sep:{js|, |js} )
 
 let animationName x = D ({js|animationName|js}, x)
 
@@ -2127,8 +2139,9 @@ module SVG = struct
         match x with
         | `none -> {js|none|js}
         | `dasharray a ->
-          a |. Std.Array.map string_of_dasharray |. Std.Array.joinWith ~sep:{js| |js}
-      )
+          a
+          |. Std.Array.map string_of_dasharray
+          |. Std.Array.joinWith ~sep:{js| |js} )
 
   let strokeWidth x = D ({js|strokeWidth|js}, Length.toString x)
 

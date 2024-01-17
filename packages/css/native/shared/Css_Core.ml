@@ -1,6 +1,6 @@
 module type CssImplementationIntf = sig
-  type nonrec styleEncoding
-  type nonrec renderer
+  type styleEncoding
+  type renderer
 
   val injectRaw : string -> unit
   val renderRaw : renderer -> string -> unit

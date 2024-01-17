@@ -1,7 +1,7 @@
 module Std = Kloth
 
 module Cascading = struct
-  type nonrec t =
+  type t =
     [ `initial
     | `inherit_
     | `unset
@@ -19,7 +19,7 @@ module Cascading = struct
 end
 
 module Var = struct
-  type nonrec t =
+  type t =
     [ `var of string
     | `varDefault of string * string
     ]
@@ -38,7 +38,7 @@ module Var = struct
 end
 
 module Time = struct
-  type nonrec t =
+  type t =
     [ `s of float
     | `ms of float
     ]
@@ -53,14 +53,14 @@ module Time = struct
 end
 
 module Percentage = struct
-  type nonrec t = [ `percent of float ]
+  type t = [ `percent of float ]
 
   let pct x = `percent x
   let toString x = match x with `percent x -> Std.Float.toString x ^ {js|%|js}
 end
 
 module Url = struct
-  type nonrec t = [ `url of string ]
+  type t = [ `url of string ]
 
   let toString x = match x with `url s -> ({js|url(|js} ^ s) ^ {js|)|js}
 end
@@ -133,7 +133,7 @@ module Length = struct
 end
 
 module Angle = struct
-  type nonrec t =
+  type t =
     [ `deg of float
     | `rad of float
     | `grad of float
@@ -154,7 +154,7 @@ module Angle = struct
 end
 
 module Direction = struct
-  type nonrec t =
+  type t =
     [ `ltr
     | `rtl
     ]
@@ -165,7 +165,7 @@ module Direction = struct
 end
 
 module Position = struct
-  type nonrec t =
+  type t =
     [ `absolute
     | `relative
     | `static
@@ -189,7 +189,7 @@ module Position = struct
 end
 
 module Isolation = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `isolate
     ]
@@ -199,7 +199,7 @@ module Isolation = struct
 end
 
 module Resize = struct
-  type nonrec t =
+  type t =
     [ `none
     | `both
     | `horizontal
@@ -226,7 +226,7 @@ module Resize = struct
 end
 
 module FontVariant = struct
-  type nonrec t =
+  type t =
     [ `normal
     | `smallCaps
     ]
@@ -239,7 +239,7 @@ module FontVariant = struct
 end
 
 module FontStyle = struct
-  type nonrec t =
+  type t =
     [ `normal
     | `italic
     | `oblique
@@ -257,7 +257,7 @@ module FontStyle = struct
 end
 
 module FlexBasis = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `fill
     | `content
@@ -283,7 +283,7 @@ module FlexBasis = struct
 end
 
 module Overflow = struct
-  type nonrec t =
+  type t =
     [ `hidden
     | `visible
     | `scroll
@@ -307,14 +307,14 @@ module Overflow = struct
 end
 
 module Margin = struct
-  type nonrec t = [ `auto ]
+  type t = [ `auto ]
 
   let auto = `auto
   let toString x = match x with `auto -> {js|auto|js}
 end
 
 module GridAutoFlow = struct
-  type nonrec t =
+  type t =
     [ `column
     | `row
     | `columnDense
@@ -330,7 +330,7 @@ module GridAutoFlow = struct
 end
 
 module Gap = struct
-  type nonrec t = [ `normal ]
+  type t = [ `normal ]
 
   let toString x = match x with `normal -> {js|normal|js}
 end
@@ -339,7 +339,7 @@ module RowGap = Gap
 module ColumnGap = Gap
 
 module ScrollBehavior = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `smooth
     ]
@@ -349,7 +349,7 @@ module ScrollBehavior = struct
 end
 
 module OverscrollBehavior = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `contain
     | `none
@@ -363,7 +363,7 @@ module OverscrollBehavior = struct
 end
 
 module OverflowAnchor = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `none
     ]
@@ -372,19 +372,19 @@ module OverflowAnchor = struct
 end
 
 module ColumnWidth = struct
-  type nonrec t = [ `auto ]
+  type t = [ `auto ]
 
   let toString x = match x with `auto -> {js|auto|js}
 end
 
 module CaretColor = struct
-  type nonrec t = [ `auto ]
+  type t = [ `auto ]
 
   let toString x = match x with `auto -> {js|auto|js}
 end
 
 module VerticalAlign = struct
-  type nonrec t =
+  type t =
     [ `baseline
     | `sub
     | `super
@@ -408,7 +408,7 @@ module VerticalAlign = struct
 end
 
 module TimingFunction = struct
-  type nonrec t =
+  type t =
     [ `linear
     | `ease
     | `easeIn
@@ -466,7 +466,7 @@ module TimingFunction = struct
 end
 
 module RepeatValue = struct
-  type nonrec t =
+  type t =
     [ `autoFill
     | `autoFit
     | `num of int
@@ -480,7 +480,7 @@ module RepeatValue = struct
 end
 
 module ListStyleType = struct
-  type nonrec t =
+  type t =
     [ `disc
     | `circle
     | `square
@@ -512,7 +512,7 @@ module ListStyleType = struct
 end
 
 module ListStylePosition = struct
-  type nonrec t =
+  type t =
     [ `inside
     | `outside
     ]
@@ -522,7 +522,7 @@ module ListStylePosition = struct
 end
 
 module OutlineStyle = struct
-  type nonrec t =
+  type t =
     [ `none
     | `hidden
     | `dotted
@@ -550,7 +550,7 @@ module OutlineStyle = struct
 end
 
 module FontWeight = struct
-  type nonrec t =
+  type t =
     [ `num of int
     | `thin
     | `extraLight
@@ -592,7 +592,7 @@ module FontWeight = struct
 end
 
 module Transform = struct
-  type nonrec t =
+  type t =
     [ `translate of Length.t * Length.t
     | `translate3d of Length.t * Length.t * Length.t
     | `translateX of Length.t
@@ -686,7 +686,7 @@ module Transform = struct
 end
 
 module AnimationDirection = struct
-  type nonrec t =
+  type t =
     [ `normal
     | `reverse
     | `alternate
@@ -702,7 +702,7 @@ module AnimationDirection = struct
 end
 
 module AnimationFillMode = struct
-  type nonrec t =
+  type t =
     [ `none
     | `forwards
     | `backwards
@@ -718,7 +718,7 @@ module AnimationFillMode = struct
 end
 
 module AnimationIterationCount = struct
-  type nonrec t =
+  type t =
     [ `infinite
     | `count of int
     ]
@@ -730,7 +730,7 @@ module AnimationIterationCount = struct
 end
 
 module AnimationPlayState = struct
-  type nonrec t =
+  type t =
     [ `paused
     | `running
     ]
@@ -740,7 +740,7 @@ module AnimationPlayState = struct
 end
 
 module Cursor = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `default
     | `none
@@ -866,7 +866,7 @@ module Cursor = struct
 end
 
 module Color = struct
-  type nonrec t =
+  type t =
     [ `rgb of int * int * int
     | `rgba of int * int * int * [ `num of float | Percentage.t ]
     | `hsl of Angle.t * Percentage.t * Percentage.t
@@ -925,7 +925,7 @@ module Color = struct
 end
 
 module BorderStyle = struct
-  type nonrec t =
+  type t =
     [ `none
     | `hidden
     | `dotted
@@ -953,7 +953,7 @@ module BorderStyle = struct
 end
 
 module PointerEvents = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `none
     | `visiblePainted
@@ -983,20 +983,20 @@ module PointerEvents = struct
 end
 
 module Perspective = struct
-  type nonrec t = [ `none ]
+  type t = [ `none ]
 
   let toString x = match x with `none -> {js|none|js}
 end
 
 module LetterSpacing = struct
-  type nonrec t = [ `normal ]
+  type t = [ `normal ]
 
   let normal = `normal
   let toString x = match x with `normal -> {js|normal|js}
 end
 
 module LineHeight = struct
-  type nonrec t =
+  type t =
     [ `normal
     | `abs of float
     ]
@@ -1006,7 +1006,7 @@ module LineHeight = struct
 end
 
 module LineWidth = struct
-  type nonrec t =
+  type t =
     [ Length.t
     | `thin
     | `medium
@@ -1022,7 +1022,7 @@ module LineWidth = struct
 end
 
 module WordSpacing = struct
-  type nonrec t = [ `normal ]
+  type t = [ `normal ]
 
   let toString x = match x with `normal -> {js|normal|js}
 end
@@ -1073,7 +1073,7 @@ module DisplayOld = struct
 end
 
 module DisplayOutside = struct
-  type nonrec t =
+  type t =
     [ `block
     | `inline
     | `runIn
@@ -1087,7 +1087,7 @@ module DisplayOutside = struct
 end
 
 module DisplayInside = struct
-  type nonrec t =
+  type t =
     [ `table
     | `flex
     | `grid
@@ -1101,13 +1101,13 @@ module DisplayInside = struct
 end
 
 module DisplayListItem = struct
-  type nonrec t = [ `listItem ]
+  type t = [ `listItem ]
 
   let toString x = match x with `listItem -> {js|list-item|js}
 end
 
 module DisplayInternal = struct
-  type nonrec t =
+  type t =
     [ `tableRowGroup
     | `tableHeaderGroup
     | `tableFooterGroup
@@ -1131,7 +1131,7 @@ module DisplayInternal = struct
 end
 
 module DisplayBox = struct
-  type nonrec t =
+  type t =
     [ `contents
     | `none
     ]
@@ -1141,7 +1141,7 @@ module DisplayBox = struct
 end
 
 module DisplayLegacy = struct
-  type nonrec t =
+  type t =
     [ `inlineBlock
     | `inlineFlex
     | `inlineGrid
@@ -1157,7 +1157,7 @@ module DisplayLegacy = struct
 end
 
 module JustifySelf = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `normal
     | `stretch
@@ -1172,7 +1172,7 @@ end
 
 module TextEmphasisStyle = struct
   module FilledOrOpen = struct
-    type nonrec t =
+    type t =
       [ `filled
       | `open_
       ]
@@ -1182,7 +1182,7 @@ module TextEmphasisStyle = struct
   end
 
   module Shape = struct
-    type nonrec t =
+    type t =
       [ `dot
       | `circle
       | `double_circle
@@ -1199,7 +1199,7 @@ module TextEmphasisStyle = struct
       | `sesame -> {js|sesame|js}
   end
 
-  type nonrec t =
+  type t =
     [ `none
     | FilledOrOpen.t
     | Shape.t
@@ -1220,7 +1220,7 @@ end
 
 module TextEmphasisPosition = struct
   module LeftRightAlignment = struct
-    type nonrec t =
+    type t =
       [ `left
       | `right
       ]
@@ -1230,7 +1230,7 @@ module TextEmphasisPosition = struct
   end
 
   module OverOrUnder = struct
-    type nonrec t =
+    type t =
       [ `over
       | `under
       ]
@@ -1241,7 +1241,7 @@ module TextEmphasisPosition = struct
 end
 
 module PositionalAlignment = struct
-  type nonrec t =
+  type t =
     [ `center
     | `start
     | `end_
@@ -1267,7 +1267,7 @@ module PositionalAlignment = struct
 end
 
 module OverflowAlignment = struct
-  type nonrec t =
+  type t =
     [ `safe of PositionalAlignment.t
     | `unsafe of PositionalAlignment.t
     ]
@@ -1279,7 +1279,7 @@ module OverflowAlignment = struct
 end
 
 module BaselineAlignment = struct
-  type nonrec t =
+  type t =
     [ `baseline
     | `firstBaseline
     | `lastBaseline
@@ -1293,13 +1293,13 @@ module BaselineAlignment = struct
 end
 
 module NormalAlignment = struct
-  type nonrec t = [ `normal ]
+  type t = [ `normal ]
 
   let toString x = match x with `normal -> {js|normal|js}
 end
 
 module DistributedAlignment = struct
-  type nonrec t =
+  type t =
     [ `spaceBetween
     | `spaceAround
     | `spaceEvenly
@@ -1315,7 +1315,7 @@ module DistributedAlignment = struct
 end
 
 module LegacyAlignment = struct
-  type nonrec t =
+  type t =
     [ `legacy
     | `legacyRight
     | `legacyLeft
@@ -1331,7 +1331,7 @@ module LegacyAlignment = struct
 end
 
 module TextAlign = struct
-  type nonrec t =
+  type t =
     [ `start
     | `end_
     | `left
@@ -1355,7 +1355,7 @@ module TextAlign = struct
 end
 
 module TextAlignAll = struct
-  type nonrec t =
+  type t =
     [ `start
     | `end_
     | `left
@@ -1377,7 +1377,7 @@ module TextAlignAll = struct
 end
 
 module TextAlignLast = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `start
     | `end_
@@ -1401,7 +1401,7 @@ module TextAlignLast = struct
 end
 
 module WordBreak = struct
-  type nonrec t =
+  type t =
     [ `normal
     | `breakAll
     | `keepAll
@@ -1415,7 +1415,7 @@ module WordBreak = struct
 end
 
 module WhiteSpace = struct
-  type nonrec t =
+  type t =
     [ `normal
     | `nowrap
     | `pre
@@ -1435,7 +1435,7 @@ module WhiteSpace = struct
 end
 
 module AlignItems = struct
-  type nonrec t =
+  type t =
     [ `normal
     | `stretch
     ]
@@ -1445,7 +1445,7 @@ module AlignItems = struct
 end
 
 module AlignSelf = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `normal
     | `stretch
@@ -1459,7 +1459,7 @@ module AlignSelf = struct
 end
 
 module AlignContent = struct
-  type nonrec t =
+  type t =
     [ `center
     | `start
     | `end_
@@ -1477,7 +1477,7 @@ module AlignContent = struct
 end
 
 module ObjectFit = struct
-  type nonrec t =
+  type t =
     [ `fill
     | `contain
     | `cover
@@ -1495,7 +1495,7 @@ module ObjectFit = struct
 end
 
 module Clear = struct
-  type nonrec t =
+  type t =
     [ `none
     | `left
     | `right
@@ -1515,7 +1515,7 @@ module Clear = struct
 end
 
 module Float = struct
-  type nonrec t =
+  type t =
     [ `left
     | `right
     | `none
@@ -1533,7 +1533,7 @@ module Float = struct
 end
 
 module Visibility = struct
-  type nonrec t =
+  type t =
     [ `visible
     | `hidden
     | `collapse
@@ -1547,7 +1547,7 @@ module Visibility = struct
 end
 
 module TableLayout = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `fixed
     ]
@@ -1557,7 +1557,7 @@ module TableLayout = struct
 end
 
 module BorderCollapse = struct
-  type nonrec t =
+  type t =
     [ `collapse
     | `separate
     ]
@@ -1567,7 +1567,7 @@ module BorderCollapse = struct
 end
 
 module FlexWrap = struct
-  type nonrec t =
+  type t =
     [ `nowrap
     | `wrap
     | `wrapReverse
@@ -1581,7 +1581,7 @@ module FlexWrap = struct
 end
 
 module FlexDirection = struct
-  type nonrec t =
+  type t =
     [ `row
     | `rowReverse
     | `column
@@ -1597,7 +1597,7 @@ module FlexDirection = struct
 end
 
 module BoxSizing = struct
-  type nonrec t =
+  type t =
     [ `contentBox
     | `borderBox
     ]
@@ -1609,7 +1609,7 @@ module BoxSizing = struct
 end
 
 module ColumnCount = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `count of int
     ]
@@ -1619,7 +1619,7 @@ module ColumnCount = struct
 end
 
 module UserSelect = struct
-  type nonrec t =
+  type t =
     [ `none
     | `auto
     | `text
@@ -1637,7 +1637,7 @@ module UserSelect = struct
 end
 
 module TextTransform = struct
-  type nonrec t =
+  type t =
     [ `none
     | `capitalize
     | `uppercase
@@ -1653,7 +1653,7 @@ module TextTransform = struct
 end
 
 module GridTemplateAreas = struct
-  type nonrec t =
+  type t =
     [ `none
     | `areas of string array
     ]
@@ -1670,7 +1670,7 @@ module GridTemplateAreas = struct
 end
 
 module GridArea = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `ident of string
     | `num of int
@@ -1695,7 +1695,7 @@ module GridArea = struct
 end
 
 module BackdropFilter = struct
-  type nonrec t =
+  type t =
     [ `blur of Length.t
     | `brightness of [ `num of int | `percent of float ]
     | `contrast of [ `num of int | `percent of float ]
@@ -1746,7 +1746,7 @@ module BackdropFilter = struct
 end
 
 module BackgroundAttachment = struct
-  type nonrec t =
+  type t =
     [ `scroll
     | `fixed
     | `local
@@ -1760,7 +1760,7 @@ module BackgroundAttachment = struct
 end
 
 module BackgroundClip = struct
-  type nonrec t =
+  type t =
     [ `borderBox
     | `paddingBox
     | `contentBox
@@ -1774,7 +1774,7 @@ module BackgroundClip = struct
 end
 
 module BackgroundOrigin = struct
-  type nonrec t =
+  type t =
     [ `borderBox
     | `paddingBox
     | `contentBox
@@ -1789,7 +1789,7 @@ end
 
 module BackgroundPosition = struct
   module X = struct
-    type nonrec t =
+    type t =
       [ `left
       | `right
       | `center
@@ -1803,7 +1803,7 @@ module BackgroundPosition = struct
   end
 
   module Y = struct
-    type nonrec t =
+    type t =
       [ `top
       | `bottom
       | `center
@@ -1816,7 +1816,7 @@ module BackgroundPosition = struct
       | `center -> {js|center|js}
   end
 
-  type nonrec t =
+  type t =
     [ X.t
     | Y.t
     ]
@@ -1832,7 +1832,7 @@ end
 
 module MaskPosition = struct
   module X = struct
-    type nonrec t =
+    type t =
       [ `left
       | `right
       | `center
@@ -1846,7 +1846,7 @@ module MaskPosition = struct
   end
 
   module Y = struct
-    type nonrec t =
+    type t =
       [ `top
       | `bottom
       | `center
@@ -1859,7 +1859,7 @@ module MaskPosition = struct
       | `center -> {js|center|js}
   end
 
-  type nonrec t =
+  type t =
     [ X.t
     | Y.t
     ]
@@ -1874,21 +1874,21 @@ module MaskPosition = struct
 end
 
 module BackgroundRepeat = struct
-  type nonrec twoValue =
+  type twoValue =
     [ `repeat
     | `space
     | `round
     | `noRepeat
     ]
 
-  type nonrec t =
+  type t =
     [ `repeatX
     | `repeatY
     | twoValue
     ]
 
-  type nonrec horizontal = twoValue
-  type nonrec vertical = twoValue
+  type horizontal = twoValue
+  type vertical = twoValue
 
   let toString x =
     match x with
@@ -1901,7 +1901,7 @@ module BackgroundRepeat = struct
 end
 
 module TextOverflow = struct
-  type nonrec t =
+  type t =
     [ `clip
     | `ellipsis
     | `string of string
@@ -1915,7 +1915,7 @@ module TextOverflow = struct
 end
 
 module TextDecorationLine = struct
-  type nonrec t =
+  type t =
     [ `none
     | `underline
     | `overline
@@ -1933,7 +1933,7 @@ module TextDecorationLine = struct
 end
 
 module TextDecorationStyle = struct
-  type nonrec t =
+  type t =
     [ `solid
     | `double
     | `dotted
@@ -1951,7 +1951,7 @@ module TextDecorationStyle = struct
 end
 
 module TextDecorationThickness = struct
-  type nonrec t =
+  type t =
     [ `fromFont
     | `auto
     ]
@@ -1961,7 +1961,7 @@ module TextDecorationThickness = struct
 end
 
 module TextDecorationSkipInk = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `none
     | `all
@@ -1975,7 +1975,7 @@ module TextDecorationSkipInk = struct
 end
 
 module TextDecorationSkipBox = struct
-  type nonrec t =
+  type t =
     [ `none
     | `all
     ]
@@ -1984,7 +1984,7 @@ module TextDecorationSkipBox = struct
 end
 
 module TextDecorationSkipInset = struct
-  type nonrec t =
+  type t =
     [ `none
     | `auto
     ]
@@ -1993,7 +1993,7 @@ module TextDecorationSkipInset = struct
 end
 
 module Width = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `fitContent
     | `maxContent
@@ -2009,7 +2009,7 @@ module Width = struct
 end
 
 module None = struct
-  type nonrec t = [ `none ]
+  type t = [ `none ]
 
   let toString x = match x with `none -> {js|none|js}
 end
@@ -2018,7 +2018,7 @@ module MinWidth = None
 module MaxWidth = None
 
 module Height = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `fitContent
     | `maxContent
@@ -2037,7 +2037,7 @@ module MaxHeight = None
 module MinHeight = None
 
 module OverflowWrap = struct
-  type nonrec t =
+  type t =
     [ `normal
     | `breakWord
     | `anywhere
@@ -2074,7 +2074,7 @@ module SideOrCorner = struct
 end
 
 module Gradient = struct
-  type nonrec 'colorOrVar t =
+  type 'colorOrVar t =
     [ `linearGradient of
       [ `Angle of Angle.t | `SideOrCorner of SideOrCorner.t ] option
       * (([< Color.t | Var.t ] as 'colorOrVar) * Length.t option) array
@@ -2144,19 +2144,19 @@ module Gradient = struct
 end
 
 module BackgroundImage = struct
-  type nonrec t = [ `none ]
+  type t = [ `none ]
 
   let toString x = match x with `none -> {js|none|js}
 end
 
 module MaskImage = struct
-  type nonrec t = [ `none ]
+  type t = [ `none ]
 
   let toString x = match x with `none -> {js|none|js}
 end
 
 module GeometryBox = struct
-  type nonrec t =
+  type t =
     [ `marginBox
     | `borderBox
     | `paddingBox
@@ -2186,13 +2186,13 @@ module GeometryBox = struct
 end
 
 module ClipPath = struct
-  type nonrec t = [ `none ]
+  type t = [ `none ]
 
   let toString x = match x with `none -> {js|none|js}
 end
 
 module BackfaceVisibility = struct
-  type nonrec t =
+  type t =
     [ `visible
     | `hidden
     ]
@@ -2202,7 +2202,7 @@ module BackfaceVisibility = struct
 end
 
 module Flex = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `initial
     | `none
@@ -2216,7 +2216,7 @@ module Flex = struct
 end
 
 module TransformStyle = struct
-  type nonrec t =
+  type t =
     [ `preserve3d
     | `flat
     ]
@@ -2226,7 +2226,7 @@ module TransformStyle = struct
 end
 
 module TransformBox = struct
-  type nonrec t =
+  type t =
     [ `contentBox
     | `borderBox
     | `fillBox
@@ -2244,13 +2244,13 @@ module TransformBox = struct
 end
 
 module ListStyleImage = struct
-  type nonrec t = [ `none ]
+  type t = [ `none ]
 
   let toString x = match x with `none -> {js|none|js}
 end
 
 module FontFamilyName = struct
-  type nonrec t =
+  type t =
     [ `custom of string
     | `serif
     | `sansSerif
@@ -2292,7 +2292,7 @@ module FontFamilyName = struct
 end
 
 module FontDisplay = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `block
     | `swap
@@ -2316,19 +2316,19 @@ module FontDisplay = struct
 end
 
 module CounterStyleType = struct
-  type nonrec t = ListStyleType.t
+  type t = ListStyleType.t
 
   let toString x =
     match x with #ListStyleType.t as c -> ListStyleType.toString c
 end
 
 module Counter = struct
-  type nonrec style =
+  type style =
     [ CounterStyleType.t
     | `unset
     ]
 
-  type nonrec t = [ `counter of string * style ]
+  type t = [ `counter of string * style ]
 
   let counter ?(style = `unset) name = `counter (name, style)
 
@@ -2344,12 +2344,12 @@ module Counter = struct
 end
 
 module Counters = struct
-  type nonrec style =
+  type style =
     [ CounterStyleType.t
     | `unset
     ]
 
-  type nonrec t = [ `counters of string * string * style ]
+  type t = [ `counters of string * string * style ]
 
   let counters ?(style = `unset) ?(separator = {js||js}) name =
     `counters (name, separator, style)
@@ -2367,7 +2367,7 @@ module Counters = struct
 end
 
 module CounterIncrement = struct
-  type nonrec t =
+  type t =
     [ `none
     | `increment of string * int
     ]
@@ -2381,7 +2381,7 @@ module CounterIncrement = struct
 end
 
 module CounterReset = struct
-  type nonrec t =
+  type t =
     [ `none
     | `reset of string * int
     ]
@@ -2395,7 +2395,7 @@ module CounterReset = struct
 end
 
 module CounterSet = struct
-  type nonrec t =
+  type t =
     [ `none
     | `set of string * int
     ]
@@ -2409,7 +2409,7 @@ module CounterSet = struct
 end
 
 module Content = struct
-  type nonrec t =
+  type t =
     [ `none
     | `normal
     | `openQuote
@@ -2445,7 +2445,7 @@ end
 
 module SVG = struct
   module Fill = struct
-    type nonrec t =
+    type t =
       [ `none
       | `contextFill
       | `contextStroke
@@ -2463,7 +2463,7 @@ module SVG = struct
 end
 
 module TouchAction = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `none
     | `panX
@@ -2491,7 +2491,7 @@ module TouchAction = struct
 end
 
 module ZIndex = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `num of int
     ]
@@ -2501,7 +2501,7 @@ module ZIndex = struct
 end
 
 module AlphaValue = struct
-  type nonrec t =
+  type t =
     [ `num of int
     | `percent of float
     ]
@@ -2513,7 +2513,7 @@ module AlphaValue = struct
 end
 
 module LineBreak = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `loose
     | `normal
@@ -2531,7 +2531,7 @@ module LineBreak = struct
 end
 
 module Hyphens = struct
-  type nonrec t =
+  type t =
     [ `none
     | `manual
     | `auto
@@ -2545,7 +2545,7 @@ module Hyphens = struct
 end
 
 module TextJustify = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `none
     | `interWord
@@ -2561,7 +2561,7 @@ module TextJustify = struct
 end
 
 module OverflowInline = struct
-  type nonrec t =
+  type t =
     [ `hidden
     | `visible
     | `scroll
@@ -2579,7 +2579,7 @@ module OverflowInline = struct
 end
 
 module FontSynthesisWeight = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `none
     ]
@@ -2588,7 +2588,7 @@ module FontSynthesisWeight = struct
 end
 
 module FontSynthesisStyle = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `none
     ]
@@ -2597,7 +2597,7 @@ module FontSynthesisStyle = struct
 end
 
 module FontSynthesisSmallCaps = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `none
     ]
@@ -2606,7 +2606,7 @@ module FontSynthesisSmallCaps = struct
 end
 
 module FontSynthesisPosition = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `none
     ]
@@ -2615,7 +2615,7 @@ module FontSynthesisPosition = struct
 end
 
 module FontKerning = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `none
     | `normal
@@ -2629,7 +2629,7 @@ module FontKerning = struct
 end
 
 module FontVariantPosition = struct
-  type nonrec t =
+  type t =
     [ `normal
     | `sub
     | `super
@@ -2643,7 +2643,7 @@ module FontVariantPosition = struct
 end
 
 module FontVariantCaps = struct
-  type nonrec t =
+  type t =
     [ `normal
     | `smallCaps
     | `allSmallCaps
@@ -2665,7 +2665,7 @@ module FontVariantCaps = struct
 end
 
 module FontOpticalSizing = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `none
     ]
@@ -2674,7 +2674,7 @@ module FontOpticalSizing = struct
 end
 
 module FontVariantEmoji = struct
-  type nonrec t =
+  type t =
     [ `normal
     | `text
     | `emoji

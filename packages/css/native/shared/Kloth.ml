@@ -36,7 +36,7 @@ module String = struct
 end
 
 module Int = struct
-  let toString = Js.Int.toString
+  let toString (i : int) : string = Js.Int.toString i
 end
 
 module Float = struct
