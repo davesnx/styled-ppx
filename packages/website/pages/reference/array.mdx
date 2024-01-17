@@ -27,7 +27,7 @@ let className = %cx([%css("display: flex;")])
 
 - Allowing composability and re-usability of CSS.
 - Useful to reference other variables, a function call or a pattern match.
-- Solves the migration from other systems (such as `bs-css`) and bypass `styled-ppx` parser that might not support a property.
+- Solves the migration problem from other systems (such as `bs-css`) and bypasses the `styled-ppx` parser which might not support a property.
 
 Here are some illustrative examples:
 
@@ -64,7 +64,7 @@ module Align = %styled.div(
 
 ### Usage with Dynamic components
 
-There's a nice composability where dynamic components and the Array API provides. You can create a component that can run any code before the styles. It will be called each time the component renders. Such as this example of runtime styles where it derives the color's background button based on a `variant` prop passed to a Theme module.
+There's a nice composability that dynamic components and the Array API provides. You can create a component that can run any code before the styles. It will be called each time the component renders. Such as this example of runtime styles where it derives the color's background button based on a `variant` prop passed to a Theme module.
 
 ```rescript
 module Button = %styled.button(
@@ -80,4 +80,4 @@ module Button = %styled.button(
 )
 ```
 
-Note: The returned expression (the last expression of the function) need to be an array of `Css.rules` (it can't be a reference or a function call). This is a limitation of ppxes where it needs to check the current AST to know which type is.
+Note: The returned expression (the last expression of the function) has to be an array of `Css.rules` (it can't be a reference or a function call). This is a limitation of ppxes where it needs to check the current AST to know which type is.
