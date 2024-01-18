@@ -14,6 +14,6 @@ let rule: Css.rule = %css("display: block")
 
 ## Features
 
-- Only single properties are allowed; declarations are not allowed. Declarations can contain selectors, but rules can only contain a single pairing of property and value. If you need a selector or more than one rule, use `%cx{:rescript}` instead.
+- Only single properties are allowed, e.g., `color: blue`, and multiple declarations, e.g., `:hover { color: blue}` or `color: blue; background-color: red`, are not allowed. If you need to use a selector or use more than one rule, use `%cx{:rescript}` instead.
 - The semi-colon in the last position is optional. `display: block;{:css}` and `display: block{:css}` are the same.
 - Curly braces aren't allowed. `{ display: block }{:css}` isn't valid.
