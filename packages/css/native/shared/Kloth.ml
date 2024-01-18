@@ -36,11 +36,11 @@ module String = struct
 end
 
 module Int = struct
-  let toString = Js.Int.toString
+  let toString v = Js.Int.toString v
 end
 
 module Float = struct
-  let toString = Js.Float.toString
+  let toString v = Js.Float.toString v
 end
 
 module Option = struct
