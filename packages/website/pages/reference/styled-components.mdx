@@ -6,7 +6,7 @@ import Callout from 'nextra-theme-docs/callout'
 
 # Styled components
 
-`styled.{{tag}}` is the extension that allows to create React Components from the styles of the element.
+`styled.{{tag}}` is the extension that allows you to create React Components from the styles of the element.
 All HTML Elements are available under `styled.{{tag}}`. An example of it will be:
 
 ```rescript
@@ -47,10 +47,10 @@ module Input = %styled.input(`
 ```
 
 <Callout>
-  You can extend the styles from a component via `className` prop.
+  You can extend the styles from a component via the `className` prop.
 </Callout>
 
-#### Extend styles with className
+#### Extend styles with `className`
 
 Following the example above, you can extend the styles of the input component by passing the `className` prop.
 It's not recommended to use `className` prop to extend the styles of a component, but it's useful when you need to extend the styles of a component from a third-party library.

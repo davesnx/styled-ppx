@@ -4,7 +4,7 @@ title: Rule `css` extension
 
 # Rule: `css` extension
 
-Generates a `Css.rule{:rescript}` given a single CSS rule as string. The `%css` extension is useful with combination with the [Array API](./array), to compose and re-use rules.
+Generates a `Css.rule{:rescript}` given a single CSS rule as string. The `%css` extension is useful in combination with the [Array API](./array) to compose and re-use rules.
 
 ## Example
 
@@ -14,6 +14,6 @@ let rule: Css.rule = %css("display: block")
 
 ## Features
 
-- Only single properties are allowed. Declaratiosn aren't. Declarations can contain selectors, rules only a pair of property/value. If you need a selector or more than one rule, use `%cx{:rescript}` instead.
+- Only single properties are allowed, e.g., `color: blue`, and multiple declarations, e.g., `:hover { color: blue}` or `color: blue; background-color: red`, are not allowed. If you need to use a selector or use more than one rule, use `%cx{:rescript}` instead.
 - The semi-colon in the last position is optional. `display: block;{:css}` and `display: block{:css}` are the same.
 - Curly braces aren't allowed. `{ display: block }{:css}` isn't valid.

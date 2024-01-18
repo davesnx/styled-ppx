@@ -8,7 +8,7 @@ The **styled-ppx** CSS parser supports [CSS Syntax Module Level 3](https://www.w
 
 There are a few levels of support in **styled-ppx**:
 - **Parser support**: The parser understands CSS3.
-- **Code generation support**: Can transform the CSS into [Css bindings] bindings.
+- **Code generation support**: Can transform the CSS into CSS bindings.
 - **Interpolation support**: We can interpolate values from outside of CSS creating type-safe holes.
 
 ## Detailed view of the parsing support
@@ -17,7 +17,7 @@ There are a few levels of support in **styled-ppx**:
 🟠: Partially supported
 🔴: Not supported
 
-If you want to know which properties are supported, you can check our test here: https://github.com/davesnx/styled-ppx/blob/main/packages/ppx/test/css-support/test.re (commented ones aren't supported).
+If you want to know which properties are supported, you can check our test here: https://github.com/davesnx/styled-ppx/blob/main/packages/ppx/test/css-support/css-support.re (commented out ones are not supported).
 
 ---
 | **CSS Feature**                                              	| **Link**                                  	| **Supported** 	|
@@ -77,7 +77,7 @@ If you want to know which properties are supported, you can check our test here:
 | Filter Effects Module Level 1                                	| https://www.w3.org/TR/filter-effects-1    	| 🟠             	|
 | Media Queries Level 4                                        	| https://www.w3.org/TR/mediaqueries-4      	| 🟠             	|
 
-<small>This table has been generated manually, it can be outdated.</small>
+<small>This table has been generated manually and it might be outdated.</small>
 
 All references are found in [w3.org](https://www.w3.org)
 - [(CSS 1.0) Cascading Style Sheets Level 1](https://www.w3.org/TR/CSS1/) ✅
