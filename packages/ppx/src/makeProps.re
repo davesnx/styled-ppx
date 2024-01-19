@@ -651,17 +651,23 @@ let attributeTypeToIdent =
 module Reason = {
   let eventTypeToIdent =
     fun
-    | Animation => Ldot(Ldot(Ldot(Lident("React"), "Event"), "Animation"), "t")
-    | Clipboard => Ldot(Ldot(Ldot(Lident("React"), "Event"), "Clipboard"), "t")
-    | Composition => Ldot(Ldot(Ldot(Lident("React"), "Event"), "Composition"), "t")
+    | Animation =>
+      Ldot(Ldot(Ldot(Lident("React"), "Event"), "Animation"), "t")
+    | Clipboard =>
+      Ldot(Ldot(Ldot(Lident("React"), "Event"), "Clipboard"), "t")
+    | Composition =>
+      Ldot(Ldot(Ldot(Lident("React"), "Event"), "Composition"), "t")
     | Focus => Ldot(Ldot(Ldot(Lident("React"), "Event"), "Focus"), "t")
     | Form => Ldot(Ldot(Ldot(Lident("React"), "Event"), "Form"), "t")
-    | Keyboard => Ldot(Ldot(Ldot(Lident("React"), "Event"), "Keyboard"), "t")
+    | Keyboard =>
+      Ldot(Ldot(Ldot(Lident("React"), "Event"), "Keyboard"), "t")
     | Media => Ldot(Ldot(Ldot(Lident("React"), "Event"), "Media"), "t")
     | Mouse => Ldot(Ldot(Ldot(Lident("React"), "Event"), "Mouse"), "t")
-    | Selection => Ldot(Ldot(Ldot(Lident("React"), "Event"), "Selection"), "t")
+    | Selection =>
+      Ldot(Ldot(Ldot(Lident("React"), "Event"), "Selection"), "t")
     | Touch => Ldot(Ldot(Ldot(Lident("React"), "Event"), "Touch"), "t")
-    | Transition => Ldot(Ldot(Ldot(Lident("React"), "Event"), "Transition"), "t")
+    | Transition =>
+      Ldot(Ldot(Ldot(Lident("React"), "Event"), "Transition"), "t")
     | UI => Ldot(Ldot(Ldot(Lident("React"), "Event"), "UI"), "t")
     | Wheel => Ldot(Ldot(Ldot(Lident("React"), "Event"), "Wheel"), "t");
 };
@@ -684,10 +690,11 @@ module ReScript = {
     | Wheel => Ldot(Ldot(Lident("ReactEvent"), "Wheel"), "t");
 };
 
-let eventTypeToIdent = (type_) => {
-    /* reason-react exposes React.Event while rescript/react ReactEvent */
+let eventTypeToIdent = type_ => {
+  /* reason-react exposes React.Event while rescript/react ReactEvent */
   switch (File.get()) {
-    | Some(ReScript) => ReScript.eventTypeToIdent(type_)
-    | Some(Reason) | _ => Reason.eventTypeToIdent(type_)
-  }
+  | Some(ReScript) => ReScript.eventTypeToIdent(type_)
+  | Some(Reason)
+  | _ => Reason.eventTypeToIdent(type_)
+  };
 };
