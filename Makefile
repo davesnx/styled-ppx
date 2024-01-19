@@ -107,17 +107,17 @@ test_e2e_rescript_v9_promote: ## Run End-to-end tests for JSX3
 	npm --prefix 'e2e/rescript-v9-JSX3' run test_promote
 
 .PHONY: test_e2e_rescript_v10
-test_e2e_rescript_v10: ## Run End-to-end tests for JSX3
+test_e2e_rescript_v10: ## Run End-to-end tests for JSX4
 	npm --prefix 'e2e/rescript-v10-JSX4' install --force
 	npm --prefix 'e2e/rescript-v10-JSX4' run build
 	npm --prefix 'e2e/rescript-v10-JSX4' run test
 
 .PHONY: test_e2e_rescript_v10_watch
-test_e2e_rescript_v10_watch: ## Run End-to-end tests for JSX3
+test_e2e_rescript_v10_watch: ## Run End-to-end tests for JSX4
 	npm --prefix 'e2e/rescript-v10-JSX4' run test_watch
 
 .PHONY: test_e2e_rescript_v10_promote
-test_e2e_rescript_v10_promote: ## Run End-to-end tests for JSX3
+test_e2e_rescript_v10_promote: ## Run End-to-end tests for JSX4
 	npm --prefix 'e2e/rescript-v10-JSX4' run test_promote
 
 .PHONY: test
