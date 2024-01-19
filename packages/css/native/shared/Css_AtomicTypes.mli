@@ -1701,6 +1701,12 @@ module TableLayout : sig
   val toString : [< `auto | `fixed ] -> string
 end
 
+module BorderImageSource : sig
+  type t = [ `none ]
+
+  val toString : [< `none ] -> string
+end
+
 module BorderCollapse : sig
   type t =
     [ `collapse
@@ -2512,6 +2518,19 @@ module MaskImage : sig
   type t = [ `none ]
 
   val toString : [< `none ] -> string
+end
+
+module ImageRendering : sig
+  type t =
+    [ `auto
+    | `smooth
+    | `highQuality
+    | `pixelated
+    | `crispEdges
+    ]
+
+  val toString :
+    [< `auto | `smooth | `highQuality | `pixelated | `crispEdges ] -> string
 end
 
 module GeometryBox : sig
