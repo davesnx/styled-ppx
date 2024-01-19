@@ -1557,7 +1557,7 @@ module TableLayout = struct
 end
 
 module BorderImageSource = struct
-  type nonrec t = [ `none ]
+  type t = [ `none ]
 
   let toString x = match x with `none -> {js|none|js}
 end
@@ -2162,7 +2162,7 @@ module MaskImage = struct
 end
 
 module ImageRendering = struct
-  type nonrec t =
+  type t =
     [ `auto
     | `smooth
     | `highQuality

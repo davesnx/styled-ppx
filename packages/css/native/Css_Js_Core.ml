@@ -201,7 +201,7 @@ let maskImage x =
 
 let imageRendering x =
   D
-    ( {js|imageRendering|js},
+    ( {js|image-rendering|js},
       match x with
       | #ImageRendering.t as ir -> ImageRendering.toString ir
       | #Var.t as va -> Var.toString va
@@ -291,7 +291,7 @@ let maskPositions mp =
 
 let borderImageSource x =
   D
-    ( {js|borderImageSource|js},
+    ( {js|border-image-source|js},
       match x with
       | #BorderImageSource.t as b -> BorderImageSource.toString b
       | #Url.t as u -> Url.toString u
