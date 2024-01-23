@@ -5,18 +5,15 @@
  reason
  (cram
   (alias ppx_snapshot_test)
-  (deps
-   %{bin:standalone}
-   %{bin:refmt}
-   (package styled-ppx))))
+  (package styled-ppx)
+  (deps %{bin:standalone} %{bin:refmt})))
 
 (subdir
  rescript
  (cram
   (alias ppx_snapshot_test)
-  (deps
-   %{bin:standalone}
-   (package styled-ppx))))
+  (package styled-ppx)
+  (deps %{bin:standalone})))
 
 (executables
  (names standalone)

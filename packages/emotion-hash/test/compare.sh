@@ -4,7 +4,7 @@ set -e
 
 input=$1
 
-native_hash=$(dune exec styled-ppx.native_hash "${input}")
+native_hash=$(dune exec native_hash "${input}")
 js_hash=$(node './emotion-hash' "${input}")
 
 if [ "$native_hash" == "$js_hash" ]; then

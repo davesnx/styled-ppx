@@ -1,5 +1,6 @@
 (test
  (name Runner)
+ (package styled-ppx-native)
  (libraries
   alcotest
   styled-ppx.lib
