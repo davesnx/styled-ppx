@@ -584,7 +584,7 @@ let height x =
 
 let textEmphasisStyle x =
   D
-    ( {js|textEmphasisStyle|js},
+    ( {js|text-emphasis-style|js},
       match x with
       | #TextEmphasisStyle.t as tes -> TextEmphasisStyle.toString tes
       | #Var.t as va -> Var.toString va
@@ -592,7 +592,7 @@ let textEmphasisStyle x =
 
 let textEmphasisStyles x y =
   D
-    ( {js|textEmphasisStyles|js},
+    ( {js|text-emphasis-styles|js},
       match x with
       | #TextEmphasisStyle.FilledOrOpen.t as fo ->
         TextEmphasisStyle.FilledOrOpen.toString fo
@@ -613,11 +613,11 @@ let textEmphasisPosition' = function
   | #Cascading.t as c -> Cascading.toString c
 
 let textEmphasisPosition x =
-  D ({js|textEmphasisPosition|js}, textEmphasisPosition' x)
+  D ({js|text-emphasis-position|js}, textEmphasisPosition' x)
 
 let textEmphasisPositions x y =
   D
-    ( {js|textEmphasisPositions|js},
+    ( {js|text-emphasis-positions|js},
       textEmphasisPosition' x
       ^ {js| |js}
       ^
@@ -629,7 +629,7 @@ let textEmphasisPositions x y =
 
 let justifyContent x =
   D
-    ( {js|justifyContent|js},
+    ( {js|justify-content|js},
       match x with
       | #PositionalAlignment.t as pa -> PositionalAlignment.toString pa
       | #NormalAlignment.t as na -> NormalAlignment.toString na
@@ -938,7 +938,7 @@ let textAlign x =
 
 let textAlignAll x =
   D
-    ( {js|textAlignAll|js},
+    ( {js|text-align-all|js},
       match x with
       | #TextAlignAll.t as taa -> TextAlignAll.toString taa
       | #Var.t as va -> Var.toString va
@@ -946,7 +946,7 @@ let textAlignAll x =
 
 let textAlignLast x =
   D
-    ( {js|textAlignLast|js},
+    ( {js|text-align-last|js},
       match x with
       | #TextAlignLast.t as tal -> TextAlignLast.toString tal
       | #Var.t as va -> Var.toString va
@@ -996,7 +996,7 @@ let textIndent x =
 
 let textDecorationSkipInk x =
   D
-    ( {js|textDecorationSkipInk|js},
+    ( {js|text-decoration-skip-ink|js},
       match x with
       | #TextDecorationSkipInk.t as tdsi -> TextDecorationSkipInk.toString tdsi
       | #Var.t as va -> Var.toString va
@@ -1004,7 +1004,7 @@ let textDecorationSkipInk x =
 
 let textDecorationSkipBox x =
   D
-    ( {js|textDecorationSkipBox|js},
+    ( {js|text-decoration-skip-box|js},
       match x with
       | #TextDecorationSkipBox.t as tdsb -> TextDecorationSkipBox.toString tdsb
       | #Var.t as va -> Var.toString va
@@ -1012,7 +1012,7 @@ let textDecorationSkipBox x =
 
 let textDecorationSkipInset x =
   D
-    ( {js|textDecorationSkipInset|js},
+    ( {js|text-decoration-skip-inset|js},
       match x with
       | #TextDecorationSkipInset.t as tdsi ->
         TextDecorationSkipInset.toString tdsi
@@ -1065,7 +1065,7 @@ let transformOrigin3d x y z =
 
 let transformBox x =
   D
-    ( {js|transformBox|js},
+    ( {js|transform-box|js},
       match x with
       | #TransformBox.t as tb -> TransformBox.toString tb
       | #Cascading.t as c -> Cascading.toString c )
@@ -2146,7 +2146,7 @@ let textEmphasisColor x = D ({js|textEmphasisColor|js}, string_of_color x)
 
 let lineBreak x =
   D
-    ( {js|lineBreak|js},
+    ( {js|line-break|js},
       match x with
       | #LineBreak.t as lb -> LineBreak.toString lb
       | #Var.t as var -> Var.toString var
@@ -2162,7 +2162,7 @@ let hyphens x =
 
 let textJustify x =
   D
-    ( {js|textJustify|js},
+    ( {js|text-justify|js},
       match x with
       | #TextJustify.t as tj -> TextJustify.toString tj
       | #Var.t as var -> Var.toString var
@@ -2170,7 +2170,7 @@ let textJustify x =
 
 let overflowInline x =
   D
-    ( {js|overflowInline|js},
+    ( {js|overflow-inline|js},
       match x with
       | #OverflowInline.t as ov -> OverflowInline.toString ov
       | #Var.t as var -> Var.toString var
@@ -2178,7 +2178,7 @@ let overflowInline x =
 
 let fontSynthesisWeight x =
   D
-    ( {js|fontSynthesisWeight|js},
+    ( {js|font-synthesis-weight|js},
       match x with
       | #FontSynthesisWeight.t as fsw -> FontSynthesisWeight.toString fsw
       | #Var.t as var -> Var.toString var
@@ -2186,7 +2186,7 @@ let fontSynthesisWeight x =
 
 let fontSynthesisStyle x =
   D
-    ( {js|fontSynthesisStyle|js},
+    ( {js|font-synthesis-style|js},
       match x with
       | #FontSynthesisStyle.t as fss -> FontSynthesisStyle.toString fss
       | #Var.t as var -> Var.toString var
@@ -2194,7 +2194,7 @@ let fontSynthesisStyle x =
 
 let fontSynthesisSmallCaps x =
   D
-    ( {js|fontSynthesisSmallCaps|js},
+    ( {js|font-synthesis-small-caps|js},
       match x with
       | #FontSynthesisSmallCaps.t as fssc ->
         FontSynthesisSmallCaps.toString fssc
@@ -2203,7 +2203,7 @@ let fontSynthesisSmallCaps x =
 
 let fontSynthesisPosition x =
   D
-    ( {js|fontSynthesisWeight|js},
+    ( {js|font-synthesis-weight|js},
       match x with
       | #FontSynthesisPosition.t as fsp -> FontSynthesisPosition.toString fsp
       | #Var.t as var -> Var.toString var
@@ -2211,7 +2211,7 @@ let fontSynthesisPosition x =
 
 let fontKerning x =
   D
-    ( {js|fontKerning|js},
+    ( {js|font-kerning|js},
       match x with
       | #FontKerning.t as fk -> FontKerning.toString fk
       | #Var.t as var -> Var.toString var
@@ -2219,7 +2219,7 @@ let fontKerning x =
 
 let fontVariantPosition x =
   D
-    ( {js|fontVariantPosition|js},
+    ( {js|font-variant-position|js},
       match x with
       | #FontVariantPosition.t as fvp -> FontVariantPosition.toString fvp
       | #Var.t as var -> Var.toString var
@@ -2227,7 +2227,7 @@ let fontVariantPosition x =
 
 let fontVariantCaps x =
   D
-    ( {js|fontVariantCaps|js},
+    ( {js|font-variant-caps|js},
       match x with
       | #FontVariantCaps.t as fvc -> FontVariantCaps.toString fvc
       | #Var.t as var -> Var.toString var
@@ -2235,7 +2235,7 @@ let fontVariantCaps x =
 
 let fontOpticalSizing x =
   D
-    ( {js|fontOpticalSizing|js},
+    ( {js|font-optical-sizing|js},
       match x with
       | #FontOpticalSizing.t as fos -> FontOpticalSizing.toString fos
       | #Var.t as var -> Var.toString var
@@ -2243,7 +2243,7 @@ let fontOpticalSizing x =
 
 let fontVariantEmoji x =
   D
-    ( {js|fontVariantEmoji|js},
+    ( {js|font-variant-emoji|js},
       match x with
       | #FontVariantEmoji.t as fve -> FontVariantEmoji.toString fve
       | #Var.t as var -> Var.toString var
