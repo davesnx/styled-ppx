@@ -21,11 +21,13 @@
 (executables
  (names standalone)
  (public_names standalone)
+ (package styled-ppx)
  (modules standalone)
  (libraries styled-ppx.lib ppxlib))
 
 (executables
  (names rewriter)
  (public_names rewriter)
+ (package styled-ppx)
  (modules rewriter)
  (libraries styled-ppx.lib ppxlib))

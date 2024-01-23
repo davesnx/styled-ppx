@@ -1,17 +1,20 @@
 (executable
  (name ast_renderer)
  (public_name ast-renderer)
+ (package styled-ppx)
  (modules ast_renderer)
  (libraries styled-ppx.css-parser ppx_deriving.runtime))
 
 (executable
  (name lexer_renderer)
  (public_name lexer-renderer)
+ (package styled-ppx)
  (modules lexer_renderer)
  (libraries styled-ppx.css-parser sedlex))
 
 (executable
  (name spec_renderer)
  (public_name spec-renderer)
+ (package styled-ppx)
  (modules spec_renderer)
  (libraries styled-ppx.css-spec-parser))

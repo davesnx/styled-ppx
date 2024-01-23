@@ -1,6 +1,7 @@
 (executable
  (name native_hash)
- (public_name styled-ppx.native_hash)
+ (public_name native_hash)
+ (package styled-ppx)
  (libraries emotion_hash))
 
 (cram

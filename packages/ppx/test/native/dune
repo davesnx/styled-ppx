@@ -3,8 +3,8 @@
  (libraries
   alcotest
   styled-ppx.lib
-  styled-ppx.css_native
-  styled-ppx.emotion_native
+  styled-ppx-native.css_native
+  styled-ppx-native.emotion_native
   ppxlib
   ppxlib.astlib
   server-reason-react.belt
