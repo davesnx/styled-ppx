@@ -1,5 +1,5 @@
 (library
- (name native)
+ (name ui_native)
  (libraries
   styled-ppx-native.css_native
   styled-ppx-native.emotion_native
