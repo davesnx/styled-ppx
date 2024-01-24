@@ -11,6 +11,7 @@
 (executable
  (name debug)
  (public_name e2e_melange_debug)
+ (package styled-ppx-native)
  (modules :standard \ index)
- (libraries ui_native styled-ppx.emotion_native styled-ppx.css_native)
+ (libraries ui_native emotion_native css_native)
  (preprocess (pps styled-ppx.lib)))
