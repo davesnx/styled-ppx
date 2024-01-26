@@ -106,6 +106,7 @@ let render_declarations (rules : rule list) =
   |> String.concat " "
 
 let is_at_rule selector = String.contains selector '@'
+let is_a_pseudo_selector selector = String.starts_with ~prefix:":" selector
 
 let prefix ~pre s =
   let len = String.length pre in
@@ -145,7 +146,10 @@ let render_prelude hash selector =
   let new_selector =
     selector |> remove_first_ampersand |> resolve_ampersand hash
   in
-  Printf.sprintf ".%s %s" hash new_selector
+  (* S (aka Selectors) are the only ones used by styled-ppx, we don't use PseudoClass neither PseucodClassParam. TODO: Remove them.
+  Meanwhile we have them, it's a good idea to check if the first character of the selector is a `:` because it's expected to not have a space between the selector and the :pseudoselector. *)
+  if is_a_pseudo_selector new_selector then Printf.sprintf ".%s%s" hash new_selector
+  else Printf.sprintf ".%s %s" hash new_selector
 
 let render_selectors hash rule =
   match rule with

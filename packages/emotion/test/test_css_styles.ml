@@ -180,6 +180,11 @@ let duplicated_styles_unique () =
   assert_string className1 className2;
   assert_string css (Printf.sprintf ".%s { flex-grow: 1; }" className1)
 
+let hover_selector () =
+  let className = Css.style [ Css.color (`rgb (255, 255, 255)); Css.selector "&:hover" [ Css.color (`rgba (255, 255, 255, `num 0.7)) ] ] in
+  let css = render_style_tag () in
+  assert_string css (Printf.sprintf ".%s { color: rgb(255, 255, 255); } .%s:hover { color: rgba(255, 255, 255, 0.7); }" className className)
+
 let case title fn = Alcotest.test_case title `Quick fn
 
 let tests =
@@ -200,6 +205,7 @@ let tests =
       case "selector_params" selector_params;
       case "keyframe" keyframe;
       case "duplicated_styles_unique" duplicated_styles_unique;
+      case "hover_selector" hover_selector;
       (* case "selector_with_ppx" selector_with_ppx; *)
       (* case "interpolated_selector_with_ppx" interpolated_selector_with_ppx; *)
     ] )
