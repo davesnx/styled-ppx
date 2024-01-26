@@ -112,23 +112,6 @@ let avoid_hash_collision () =
   assert_not_equal_string className2 className3;
   assert_not_equal_string className1 className3
 
-(* let interpolated_selector_with_ppx () =
-   let className = [%cx {|
-      color: red;
-    |}] in
-   let className2 = [%cx {|
-      color: red;
-    |}] in
-   let className3 = [%cx {|
-      color: red;
-    |}] in
-   let css = render_style_tag () in
-   assert_string css
-     (Printf.sprintf
-        ".%s { color: #FF0000; } .%s { color: #FF0000; } .%s { \
-         background-color: #000000; }"
-        className className2 className3) *)
-
 let float_values () =
   let className = CssJs.style [| CssJs.padding (`rem 10.) |] in
   let css = render_style_tag () in
@@ -306,7 +289,4 @@ let tests =
       case "selector_with_ppx" selector_with_ppx;
       case "avoid_hash_collision" avoid_hash_collision;
       case "hover_selector" hover_selector;
-      (* case "random_classname" random_classname; *)
-      (* case "interpolated_selector_with_ppx" interpolated_selector_with_ppx; *)
-      (* case "label_ppx_unique" label_ppx_unique; *)
     ] )

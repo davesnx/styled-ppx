@@ -32,14 +32,6 @@ let label () =
   let css = render_style_tag () in
   assert_string css (Printf.sprintf ".%s { display: block; }" className)
 
-(* let interpolated_selector_with_ppx () =
-   let className2 = Css.style [ Css.label "className2"; Css.color Css.red ] in
-   let className3 = Css.style [ Css.backgroundColor Css.black ] in
-   let css = render_style_tag () in
-   assert_string css
-     (Printf.sprintf ".%s { color: #FF0000; } .%s { background-color: #000000; }"
-        className2 className3) *)
-
 let float_values () =
   let className = Css.style [ Css.padding (`rem 10.) ] in
   let css = render_style_tag () in
@@ -196,7 +188,6 @@ let tests =
       case "float_values" float_values;
       case "selector_one_nesting" selector_one_nesting;
       case "label" label;
-      (* case "label_with_ppx" label_with_ppx; *)
       case "selector_nested" selector_nested;
       case "selector_nested_x10" selector_nested_x10;
       case "media_queries" media_queries;
@@ -206,6 +197,4 @@ let tests =
       case "keyframe" keyframe;
       case "duplicated_styles_unique" duplicated_styles_unique;
       case "hover_selector" hover_selector;
-      (* case "selector_with_ppx" selector_with_ppx; *)
-      (* case "interpolated_selector_with_ppx" interpolated_selector_with_ppx; *)
     ] )
