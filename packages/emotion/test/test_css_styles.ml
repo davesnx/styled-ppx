@@ -188,7 +188,7 @@ let hover_selector () =
 let case title fn = Alcotest.test_case title `Quick fn
 
 let tests =
-  ( "Emotion (Css)",
+  ( "Css",
     [
       case "one_property" one_property;
       case "multiple_properties" multiple_properties;

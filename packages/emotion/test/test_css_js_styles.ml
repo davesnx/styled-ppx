@@ -112,34 +112,6 @@ let avoid_hash_collision () =
   assert_not_equal_string className2 className3;
   assert_not_equal_string className1 className3
 
-(* let className =
-     [%cx
-       {|
-       margin-bottom: 4px;
-       font-size: 28px;
-       line-height: 32px;
-     |}]
-
-   let random_classname () =
-     let css = Css.render_style_tag () in
-     assert_string className "css-a3lzz9";
-     assert_string css
-       (Printf.sprintf
-          ".%s { margin-bottom: 4px; font-size: 28px; line-height: 32px; }"
-          className) *)
-
-(* let label_ppx_unique () =
-   let className_with_unique_label = [%cx {|
-      color: red;
-    |}] in
-   let className = [%cx {|
-      color: red;
-    |}] in
-   let css = render_style_tag () in
-   assert_string css
-     (Printf.sprintf ".%s { color: #FF0000; } .%s { color: #FF0000; }" className
-        className_with_unique_label) *)
-
 (* let interpolated_selector_with_ppx () =
    let className = [%cx {|
       color: red;
@@ -306,10 +278,15 @@ let duplicated_styles_unique () =
   assert_string className1 className2;
   assert_string css (Printf.sprintf ".%s { flex-grow: 1; }" className1)
 
+let hover_selector () =
+  let className = CssJs.style [| CssJs.color (`rgb (255, 255, 255)); CssJs.selector "&:hover" [| CssJs.color (`rgba (255, 255, 255, `num 0.7)) |] |] in
+  let css = render_style_tag () in
+  assert_string css (Printf.sprintf ".%s { color: rgb(255, 255, 255); } .%s:hover { color: rgba(255, 255, 255, 0.7); }" className className)
+
 let case title fn = Alcotest.test_case title `Quick fn
 
 let tests =
-  ( "Emotion (CssJs)",
+  ( "CssJs",
     [
       case "one_property" one_property;
       case "multiple_properties" multiple_properties;
@@ -328,6 +305,7 @@ let tests =
       case "duplicated_styles_unique" duplicated_styles_unique;
       case "selector_with_ppx" selector_with_ppx;
       case "avoid_hash_collision" avoid_hash_collision;
+      case "hover_selector" hover_selector;
       (* case "random_classname" random_classname; *)
       (* case "interpolated_selector_with_ppx" interpolated_selector_with_ppx; *)
       (* case "label_ppx_unique" label_ppx_unique; *)
