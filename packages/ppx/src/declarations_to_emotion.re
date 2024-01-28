@@ -1020,7 +1020,7 @@ and render_function_color_mix = (~loc, value: Types.function_color_mix) => {
       - If p1 is omitted, then p1 = 100% - p2.
       - If p2 is omitted, then p2 = 100% - p1 */
 
-    let render_percent = (p1, p2) => {
+    let render_percentage = (p1, p2) => {
       switch (p1, p2) {
       | (Some(p1'), Some(p2')) =>
         p1' == 0. && p2' == 0.
@@ -1040,9 +1040,9 @@ and render_function_color_mix = (~loc, value: Types.function_color_mix) => {
     };
 
     let render_percentage_one =
-      render_percent(percentage_one, percentage_two);
+      render_percentage(percentage_one, percentage_two);
     let render_percentage_two =
-      render_percent(percentage_two, percentage_one);
+      render_percentage(percentage_two, percentage_one);
 
     let render_color_one = render_color(~loc, color_one);
     let render_color_two = render_color(~loc, color_two);
