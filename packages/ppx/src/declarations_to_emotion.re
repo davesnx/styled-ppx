@@ -1064,13 +1064,13 @@ and render_function_color_mix = (~loc, value: Types.function_color_mix) => {
          `color(([%e render_color_x], [%e render_percent_x])),
          `color(([%e render_color_y], [%e render_percent_y])),
        ))]
-    | ((), `Static(pcs, Some(hue))) =>
+    | ((), `Static(pcs, Some(size))) =>
       [%expr
        `colorMix_((
          `method_quad((
            [%e render_in],
            [%e render_polar_color_space(pcs)],
-           [%e render_size_hue(hue)],
+           [%e render_size_hue(size)],
            [%e [%expr `hue]],
          )),
          `color(([%e render_color_x], [%e render_percent_x])),
