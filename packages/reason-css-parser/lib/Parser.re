@@ -134,7 +134,7 @@ and cf_mixing_image = [%value.rec "[ <extended-percentage> ]? && <image>"]
 and class_selector = [%value.rec "'.' <ident-token>"]
 and clip_source = [%value.rec "<url>"]
 and color = [%value.rec
-  "<rgb()> | <rgba()> | <hsl()> | <hsla()> | <hex-color> | <named-color> | 'currentColor' | <deprecated-system-color> | <interpolation> | <var()>"
+  "<rgb()> | <rgba()> | <hsl()> | <hsla()> | <hex-color> | <named-color> | 'currentColor' | <deprecated-system-color> | <interpolation> | <var()> | <color-mix()>"
 ]
 and color_stop = [%value.rec "<color-stop-length> | <color-stop-angle>"]
 and color_stop_angle = [%value.rec "[ <extended-angle> ]{1,2}"]
@@ -145,6 +145,20 @@ and color_stop_length = [%value.rec
 /* and color_stop_list = [%value.rec "[ <linear-color-stop> [ ',' <linear-color-hint> ]? ]# ',' <linear-color-stop>"] */
 and color_stop_list = [%value.rec
   "[<linear-color-stop> ]? [ ',' <linear-color-stop> ]# ',' <linear-color-stop>"
+]
+and hue_interpolation_method = [%value.rec
+  " [ 'shorter' | 'longer' | 'increasing' | 'decreasing' ] && 'hue' "
+]
+and polar_color_space = [%value.rec " 'hsl' | 'hwb' | 'lch' | 'oklch' "]
+and rectangular_color_space = [%value.rec
+  " 'srgb' | 'srgb-linear' | 'display-p3' | 'a98-rgb' | 'prophoto-rgb' | 'rec2020' | 'lab' | 'oklab' | 'xyz' | 'xyz-d50' | 'xyz-d65' "
+]
+and color_interpolation_method = [%value.rec
+  " 'in' && [<rectangular-color-space> | <polar-color-space> <hue-interpolation-method>?] "
+]
+and function_color_mix = [%value.rec
+  // TODO: Use <extended-percentage>
+  "color-mix(<color-interpolation-method> ',' [ <color> && <percentage>? ]#{2})"
 ]
 and combinator = [%value.rec "'>' | '+' | '~' | '||'"]
 and common_lig_values = [%value.rec
@@ -1895,6 +1909,10 @@ let check_map =
       ("angular-color-hint", check(angular_color_hint)),
       ("angular-color-stop", check(angular_color_stop)),
       ("angular-color-stop-list", check(angular_color_stop_list)),
+      ("hue-interpolation-method", check(hue_interpolation_method)),
+      ("polar-color-space", check(polar_color_space)),
+      ("rectangular-color-space", check(rectangular_color_space)),
+      ("color-interpolation-method", check(color_interpolation_method)),
       ("animateable-feature", check(animateable_feature)),
       ("attachment", check(attachment)),
       ("attr-fallback", check(attr_fallback)),

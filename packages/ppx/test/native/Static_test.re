@@ -312,6 +312,118 @@ let properties_static_css_tests = [
     [%expr CssJs.backgroundColor(CssJs.red)],
   ),
   (
+    [%css "background-color: color-mix(in srgb, white 10%, red)"],
+    [%expr [%css "background-color: color-mix(in srgb, white 10%, red)"]],
+    [%expr
+      CssJs.backgroundColor(
+        `colorMix((
+          `method_tup((`in_, `srgb)),
+          `color((CssJs.white, `percent(10.))),
+          `color((CssJs.red, `percent(90.))),
+        )),
+      )
+    ],
+  ),
+  (
+    [%css "background-color: color-mix(in srgb, white 10%, red 10%)"],
+    [%expr [%css "background-color: color-mix(in srgb, white 10%, red 10%)"]],
+    [%expr
+      CssJs.backgroundColor(
+        `colorMix((
+          `method_tup((`in_, `srgb)),
+          `color((CssJs.white, `percent(0.5))),
+          `color((CssJs.red, `percent(0.5))),
+        )),
+      )
+    ],
+  ),
+  (
+    [%css "background-color: color-mix(in srgb, white, red)"],
+    [%expr [%css "background-color: color-mix(in srgb, white, red)"]],
+    [%expr
+      CssJs.backgroundColor(
+        `colorMix((
+          `method_tup((`in_, `srgb)),
+          `color((CssJs.white, `percent(50.))),
+          `color((CssJs.red, `percent(50.))),
+        )),
+      )
+    ],
+  ),
+  (
+    [%css "background-color: color-mix(in srgb, white, red 10%)"],
+    [%expr [%css "background-color: color-mix(in srgb, white, red 10%)"]],
+    [%expr
+      CssJs.backgroundColor(
+        `colorMix((
+          `method_tup((`in_, `srgb)),
+          `color((CssJs.white, `percent(90.))),
+          `color((CssJs.red, `percent(10.))),
+        )),
+      )
+    ],
+  ),
+  (
+    [%css "background-color: color-mix(in srgb, white 0%, red 0%)"],
+    [%expr [%css "background-color: color-mix(in srgb, white 0%, red 0%)"]],
+    [%expr
+      CssJs.unsafe(
+        {js|backgroundColor|js},
+        {js|color-mix(in srgb, white 0%, red 0%)|js},
+      )
+    ] // FIXME: Error should be "Invalid function!" because both percentages can't be 0%
+  ),
+  (
+    [%css "background-color: color-mix(in srgb, white 100%, red 100%)"],
+    [%expr
+      [%css "background-color: color-mix(in srgb, white 100%, red 100%)"]
+    ],
+    [%expr
+      CssJs.backgroundColor(
+        `colorMix((
+          `method_tup((`in_, `srgb)),
+          `color((CssJs.white, `percent(0.5))),
+          `color((CssJs.red, `percent(0.5))),
+        )),
+      )
+    ],
+  ),
+  (
+    [%css "background-color: color-mix(in srgb-linear, white, red)"],
+    [%expr [%css "background-color: color-mix(in srgb-linear, white, red)"]],
+    [%expr
+      CssJs.backgroundColor(
+        `colorMix((
+          `method_tup((`in_, `srgbLinear)),
+          `color((CssJs.white, `percent(50.))),
+          `color((CssJs.red, `percent(50.))),
+        )),
+      )
+    ],
+  ),
+  (
+    [%css
+      "background-color: color-mix(in hsl longer hue, #34c9eb, hsl(120 100% 50%))"
+    ],
+    [%expr
+      [%css
+        "background-color: color-mix(in hsl longer hue, #34c9eb, hsl(120 100% 50%))"
+      ]
+    ],
+    [%expr
+      CssJs.backgroundColor(
+        `colorMix_((
+          `method_quad((`in_, `hsl, `longer, `hue)),
+          `color((`hex({js|34c9eb|js}), `percent(50.))),
+          `color((
+            `hsl((`deg(120.), `percent(100.), `percent(50.))),
+            `percent(50.),
+          )),
+        )),
+      )
+    ],
+  ),
+  (
     [%css "border-top-color: blue"],
     [%expr [%css "border-top-color: blue"]],
     [%expr CssJs.borderTopColor(CssJs.blue)],

@@ -941,12 +941,14 @@ let render_var = (~loc, string) => {
   [%expr `var([%e string])];
 };
 
-let render_color = (~loc, value) =>
+let rec render_color = (~loc, value) =>
   switch ((value: Types.color)) {
   | `Interpolation(v) => render_variable(~loc, v)
   | `Hex_color(hex) => id([%expr `hex([%e render_string(~loc, hex)])])
   | `Named_color(color) => render_named_color(~loc, color)
   | `CurrentColor => id([%expr `currentColor])
+  | `Function_color_mix(color_mix) =>
+    render_function_color_mix(~loc, color_mix)
   | `Function_rgb(rgb) => render_function_rgb(~loc, rgb)
   | `Function_rgba(rgba) => render_function_rgba(~loc, rgba)
   | `Function_var(v) => render_var(~loc, v)
@@ -956,7 +958,127 @@ let render_color = (~loc, value) =>
   | `Function_hsl(_)
   | `Function_hsla(_)
   | `Deprecated_system_color(_) => raise(Unsupported_feature)
+  }
+
+and render_function_color_mix = (~loc, value: Types.function_color_mix) => {
+  let render_rectangular_color_space = (x: Types.rectangular_color_space) => {
+    switch (x) {
+    | `Srgb => [%expr `srgb]
+    | `Srgb_linear => [%expr `srgbLinear]
+    | `Display_p3 => [%expr `displayP3]
+    | `A98_rgb => [%expr `a98Rgb]
+    | `Prophoto_rgb => [%expr `prophotoRgb]
+    | `Rec2020 => [%expr `rec2020]
+    | `Lab => [%expr `lab]
+    | `Oklab => [%expr `oklab]
+    | `Xyz => [%expr `xyz]
+    | `Xyz_d50 => [%expr `xyzD50]
+    | `Xyz_d65 => [%expr `xyzD65]
+    };
   };
+  let render_polar_color_space = (x: Types.polar_color_space) => {
+    switch (x) {
+    | `Hsl => [%expr `hsl]
+    | `Hwb => [%expr `hwb]
+    | `Lch => [%expr `lch]
+    | `Oklch => [%expr `oklch]
+    };
+  };
+
+  let render_size_hue = (x: Types.hue_interpolation_method) => {
+    let render_size =
+      fun
+      | `Shorter => [%expr `shorter]
+      | `Longer => [%expr `longer]
+      | `Increasing => [%expr `increasing]
+      | `Decreasing => [%expr `decreasing];
+
+    switch (x) {
+    // Should it be a unit 🤔?
+    | (x, ()) => render_size(x)
+    };
+  };
+
+  let render_in = [%expr `in_];
+
+  switch (value) {
+  // Should it be a unit 🤔?
+  | (x, (), colors: list((Types.color, option(Types.percentage)))) =>
+    let ((color_x, percent_x), (color_y, percent_y)) =
+      switch (colors) {
+      | [(c_x, p_x), (c_y, p_y)] => ((c_x, p_x), (c_y, p_y))
+      | _ => failwith("unreachable")
+      };
+
+    /*
+     https://drafts.csswg.org/css-color-5/#color-mix-percent-norm
+
+      - If p1 + p2 ≠ 100%, then p1' = p1 / (p1 + p2) and p2' = p2 / (p1 + p2),
+          where p1' and p2' are the normalization results.
+      - If p1 = p2 = 0%, the function is invalid
+      - If both percentage, p1 and p2 are ommited, then p1 = p2 = 50%.
+      - If p1 is omitted, then p1 = 100% - p2.
+      - If p2 is omitted, then p2 = 100% - p1 */
+
+    let render_percent = (p_x, p_y) => {
+      switch (p_x, p_y) {
+      | (Some(p_x'), Some(p_y')) =>
+        p_x' == 0. && p_y' == 0.
+          // TODO: Error should be "Invalid function!"
+          ? raise(Unsupported_feature)
+          : p_x' +. p_y' != 100.
+              ? render_percentage(~loc, p_x' /. (p_x' +. p_y'))
+              : render_percentage(~loc, p_x')
+      | (Some(p_x'), None)
+      | (None, Some(p_x')) =>
+        switch (p_x) {
+        | Some(p) => render_percentage(~loc, p)
+        | None => render_percentage(~loc, 100. -. p_x')
+        }
+      | (None, None) => render_percentage(~loc, 50.)
+      };
+    };
+
+    let render_percent_x = render_percent(percent_x, percent_y);
+    let render_percent_y = render_percent(percent_y, percent_x);
+
+    let render_color_x = render_color(~loc, color_x);
+    let render_color_y = render_color(~loc, color_y);
+
+    switch (x) {
+    | ((), `Rectangular_color_space(x)) =>
+      [%expr
+       `colorMix((
+         `method_tup((
+           [%e render_in],
+           [%e render_rectangular_color_space(x)],
+         )),
+         `color(([%e render_color_x], [%e render_percent_x])),
+         `color(([%e render_color_y], [%e render_percent_y])),
+       ))]
+    // Should it be a unit 🤔?
+    | ((), `Static(pcs, None)) =>
+      [%expr
+       `colorMix((
+         `method_tup(([%e render_in], [%e render_polar_color_space(pcs)])),
+         `color(([%e render_color_x], [%e render_percent_x])),
+         `color(([%e render_color_y], [%e render_percent_y])),
+       ))]
+    | ((), `Static(pcs, Some(hue))) =>
+      [%expr
+       `colorMix_((
+         `method_quad((
+           [%e render_in],
+           [%e render_polar_color_space(pcs)],
+           [%e render_size_hue(hue)],
+           [%e [%expr `hue]],
+         )),
+         `color(([%e render_color_x], [%e render_percent_x])),
+         `color(([%e render_color_y], [%e render_percent_y])),
+       ))]
+    };
+  };
+};
 
 let color =
   monomorphic(
