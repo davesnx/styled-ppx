@@ -1004,9 +1004,9 @@ and render_function_color_mix = (~loc, value: Types.function_color_mix) => {
   switch (value) {
   // Should it be a unit 🤔?
   | (x, (), colors: list((Types.color, option(Types.percentage)))) =>
-    let ((color_x, percent_x), (color_y, percent_y)) =
+    let ((color_one, percentage_one), (color_two, percentage_two)) =
       switch (colors) {
-      | [(c_x, p_x), (c_y, p_y)] => ((c_x, p_x), (c_y, p_y))
+      | [(c1, p1), (c2, p2)] => ((c1, p1), (c2, p2))
       | _ => failwith("unreachable")
       };
 
@@ -1020,30 +1020,32 @@ and render_function_color_mix = (~loc, value: Types.function_color_mix) => {
       - If p1 is omitted, then p1 = 100% - p2.
       - If p2 is omitted, then p2 = 100% - p1 */
 
-    let render_percent = (p_x, p_y) => {
-      switch (p_x, p_y) {
-      | (Some(p_x'), Some(p_y')) =>
-        p_x' == 0. && p_y' == 0.
+    let render_percent = (p1, p2) => {
+      switch (p1, p2) {
+      | (Some(p1'), Some(p2')) =>
+        p1' == 0. && p2' == 0.
           // TODO: Error should be "Invalid function!"
           ? raise(Unsupported_feature)
-          : p_x' +. p_y' != 100.
-              ? render_percentage(~loc, p_x' /. (p_x' +. p_y'))
-              : render_percentage(~loc, p_x')
-      | (Some(p_x'), None)
-      | (None, Some(p_x')) =>
-        switch (p_x) {
+          : p1' +. p2' != 100.
+              ? render_percentage(~loc, p1' /. (p1' +. p2'))
+              : render_percentage(~loc, p1')
+      | (Some(p1'), None)
+      | (None, Some(p1')) =>
+        switch (p1) {
         | Some(p) => render_percentage(~loc, p)
-        | None => render_percentage(~loc, 100. -. p_x')
+        | None => render_percentage(~loc, 100. -. p1')
         }
       | (None, None) => render_percentage(~loc, 50.)
       };
     };
 
-    let render_percent_x = render_percent(percent_x, percent_y);
-    let render_percent_y = render_percent(percent_y, percent_x);
+    let render_percentage_one =
+      render_percent(percentage_one, percentage_two);
+    let render_percentage_two =
+      render_percent(percentage_two, percentage_one);
 
-    let render_color_x = render_color(~loc, color_x);
-    let render_color_y = render_color(~loc, color_y);
+    let render_color_one = render_color(~loc, color_one);
+    let render_color_two = render_color(~loc, color_two);
 
     switch (x) {
     | ((), `Rectangular_color_space(x)) =>
@@ -1053,16 +1055,16 @@ and render_function_color_mix = (~loc, value: Types.function_color_mix) => {
            [%e render_in],
            [%e render_rectangular_color_space(x)],
          )),
-         `color(([%e render_color_x], [%e render_percent_x])),
-         `color(([%e render_color_y], [%e render_percent_y])),
+         `color(([%e render_color_one], [%e render_percentage_one])),
+         `color(([%e render_color_two], [%e render_percentage_two])),
        ))]
     // Should it be a unit 🤔?
     | ((), `Static(pcs, None)) =>
       [%expr
        `colorMix((
          `method_tup(([%e render_in], [%e render_polar_color_space(pcs)])),
-         `color(([%e render_color_x], [%e render_percent_x])),
-         `color(([%e render_color_y], [%e render_percent_y])),
+         `color(([%e render_color_one], [%e render_percentage_one])),
+         `color(([%e render_color_two], [%e render_percentage_two])),
        ))]
     | ((), `Static(pcs, Some(size))) =>
       [%expr
@@ -1073,8 +1075,8 @@ and render_function_color_mix = (~loc, value: Types.function_color_mix) => {
            [%e render_size_hue(size)],
            [%e [%expr `hue]],
          )),
-         `color(([%e render_color_x], [%e render_percent_x])),
-         `color(([%e render_color_y], [%e render_percent_y])),
+         `color(([%e render_color_one], [%e render_percentage_one])),
+         `color(([%e render_color_two], [%e render_percentage_two])),
        ))]
     };
   };
