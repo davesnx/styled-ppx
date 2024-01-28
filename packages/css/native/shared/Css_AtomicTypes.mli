@@ -1032,10 +1032,95 @@ module Cursor : sig
     string
 end
 
+module ColorMixMethod : sig
+  module PolarColorSpace : sig
+    type t =
+      [ `hsl
+      | `hwb
+      | `lch
+      | `oklch
+      ]
+
+    val toString : [< `hsl | `hwb | `lch | `oklch ] -> string
+  end
+
+  module Rectangular_or_Polar_color_space : sig
+    type t =
+      [ `srgb
+      | `srgbLinear
+      | `displayP3
+      | `a98Rgb
+      | `prophotoRgb
+      | `rec2020
+      | `lab
+      | `oklab
+      | `xyz
+      | `xyzD50
+      | `xyzD65
+      | PolarColorSpace.t
+      ]
+
+    val toString :
+      [< `srgb
+      | `srgbLinear
+      | `displayP3
+      | `a98Rgb
+      | `prophotoRgb
+      | `rec2020
+      | `lab
+      | `oklab
+      | `xyz
+      | `xyzD50
+      | `xyzD65
+      | `hsl
+      | `hwb
+      | `lch
+      | `oklch
+      ] ->
+      string
+  end
+
+  module HueInterpolationMethod : sig
+    type t = [ `hue ]
+
+    val toString : [< `hue ] -> string
+  end
+
+  module SizeHue : sig
+    type t =
+      [ `shorter
+      | `longer
+      | `increasing
+      | `decreasing
+      ]
+
+    val toString : [< `shorter | `longer | `increasing | `decreasing ] -> string
+  end
+
+  type t = [ `in_ ]
+
+  val toString : [< `in_ ] -> string
+end
+
 module Color : sig
   type t =
     [ `currentColor
     | `hex of string
+    | `colorMix of
+      [ `method_tup of
+        ColorMixMethod.t * ColorMixMethod.Rectangular_or_Polar_color_space.t
+      ]
+      * [ `color of t * Percentage.t ]
+      * [ `color of t * Percentage.t ]
+    | `colorMix_ of
+      [ `method_quad of
+        ColorMixMethod.t
+        * ColorMixMethod.PolarColorSpace.t
+        * ColorMixMethod.SizeHue.t
+        * ColorMixMethod.HueInterpolationMethod.t
+      ]
+      * [ `color of t * Percentage.t ]
+      * [ `color of t * Percentage.t ]
     | `hsl of Angle.t * Percentage.t * Percentage.t
     | `hsla of
       Angle.t
@@ -1057,19 +1142,34 @@ module Color : sig
   val string_of_alpha : [< `num of float | `percent of float ] -> string
 
   val toString :
-    [< `currentColor
+    [ `currentColor
     | `hex of string
+    | `colorMix of
+      [ `method_tup of
+        ColorMixMethod.t * ColorMixMethod.Rectangular_or_Polar_color_space.t
+      ]
+      * [ `color of t * Percentage.t ]
+      * [ `color of t * Percentage.t ]
+    | `colorMix_ of
+      [ `method_quad of
+        ColorMixMethod.t
+        * ColorMixMethod.PolarColorSpace.t
+        * ColorMixMethod.SizeHue.t
+        * ColorMixMethod.HueInterpolationMethod.t
+      ]
+      * [ `color of t * Percentage.t ]
+      * [ `color of t * Percentage.t ]
     | `hsl of
-      [< `deg of float | `grad of float | `rad of float | `turn of float ]
-      * [< `percent of float ]
-      * [< `percent of float ]
+      [ `deg of float | `grad of float | `rad of float | `turn of float ]
+      * [ `percent of float ]
+      * [ `percent of float ]
     | `hsla of
-      [< `deg of float | `grad of float | `rad of float | `turn of float ]
-      * [< `percent of float ]
-      * [< `percent of float ]
-      * [< `num of float | `percent of float ]
+      [ `deg of float | `grad of float | `rad of float | `turn of float ]
+      * [ `percent of float ]
+      * [ `percent of float ]
+      * [ `num of float | `percent of float ]
     | `rgb of int * int * int
-    | `rgba of int * int * int * [< `num of float | `percent of float ]
+    | `rgba of int * int * int * [ `num of float | `percent of float ]
     | `transparent
     ] ->
     string
@@ -2135,6 +2235,21 @@ module Gradient : sig
       'a =
       [< `currentColor
       | `hex of string
+      | `colorMix of
+        [ `method_tup of
+          ColorMixMethod.t * ColorMixMethod.Rectangular_or_Polar_color_space.t
+        ]
+        * [ `color of Color.t * Percentage.t ]
+        * [ `color of Color.t * Percentage.t ]
+      | `colorMix_ of
+        [ `method_quad of
+          ColorMixMethod.t
+          * ColorMixMethod.PolarColorSpace.t
+          * ColorMixMethod.SizeHue.t
+          * ColorMixMethod.HueInterpolationMethod.t
+        ]
+        * [ `color of Color.t * Percentage.t ]
+        * [ `color of Color.t * Percentage.t ]
       | `hsl of Angle.t * Percentage.t * Percentage.t
       | `hsla of
         Angle.t

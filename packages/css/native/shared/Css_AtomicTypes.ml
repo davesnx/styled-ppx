@@ -871,10 +871,101 @@ module Cursor = struct
     | `zoomOut -> {js|zoom-out|js}
 end
 
+module ColorMixMethod = struct
+  module PolarColorSpace = struct
+    type t =
+      [ `hsl
+      | `hwb
+      | `lch
+      | `oklch
+      ]
+
+    let toString = function
+      | `hsl -> {js|hsl|js}
+      | `hwb -> {js|hwb|js}
+      | `lch -> {js|lch|js}
+      | `oklch -> {js|oklch|js}
+  end
+
+  module Rectangular_or_Polar_color_space = struct
+    type t =
+      [ `srgb
+      | `srgbLinear
+      | `displayP3
+      | `a98Rgb
+      | `prophotoRgb
+      | `rec2020
+      | `lab
+      | `oklab
+      | `xyz
+      | `xyzD50
+      | `xyzD65
+      | PolarColorSpace.t
+      ]
+
+    let toString = function
+      | `srgb -> {js|srgb|js}
+      | `srgbLinear -> {js|srgb-linear|js}
+      | `displayP3 -> {js|display-p3|js}
+      | `a98Rgb -> {js|a98-rgb|js}
+      | `prophotoRgb -> {js|prophoto-rgb|js}
+      | `rec2020 -> {js|rec2020|js}
+      | `lab -> {js|lab|js}
+      | `oklab -> {js|oklab|js}
+      | `xyz -> {js|xyz|js}
+      | `xyzD50 -> {js|xyz-d50|js}
+      | `xyzD65 -> {js|xyz-d65|js}
+      | `hsl -> {js|hsl|js}
+      | `hwb -> {js|hwb|js}
+      | `lch -> {js|lch|js}
+      | `oklch -> {js|oklch|js}
+  end
+
+  module HueInterpolationMethod = struct
+    type t = [ `hue ]
+
+    let toString = function `hue -> {js|hue|js}
+  end
+
+  module SizeHue = struct
+    type t =
+      [ `shorter
+      | `longer
+      | `increasing
+      | `decreasing
+      ]
+
+    let toString = function
+      | `shorter -> {js|shorter|js}
+      | `longer -> {js|longer|js}
+      | `increasing -> {js|increasing|js}
+      | `decreasing -> {js|decreasing|js}
+  end
+
+  type t = [ `in_ ]
+
+  let toString = function `in_ -> {js|in|js}
+end
+
 module Color = struct
   type t =
     [ `rgb of int * int * int
     | `rgba of int * int * int * [ `num of float | Percentage.t ]
+    | `colorMix of
+      [ `method_tup of
+        ColorMixMethod.t * ColorMixMethod.Rectangular_or_Polar_color_space.t
+      ]
+      * [ `color of t * Percentage.t ]
+      * [ `color of t * Percentage.t ]
+    | `colorMix_ of
+      [ `method_quad of
+        ColorMixMethod.t
+        * ColorMixMethod.PolarColorSpace.t
+        * ColorMixMethod.SizeHue.t
+        * ColorMixMethod.HueInterpolationMethod.t
+      ]
+      * [ `color of t * Percentage.t ]
+      * [ `color of t * Percentage.t ]
     | `hsl of Angle.t * Percentage.t * Percentage.t
     | `hsla of
       Angle.t * Percentage.t * Percentage.t * [ `num of float | Percentage.t ]
@@ -896,7 +987,21 @@ module Color = struct
     | `num f -> Std.Float.toString f
     | #Percentage.t as pc -> Percentage.toString pc
 
-  let toString x =
+  let color_mix_method = function
+    | `method_tup (x, y) ->
+      ColorMixMethod.toString x
+      ^ {js| |js}
+      ^ ColorMixMethod.Rectangular_or_Polar_color_space.toString y
+    | `method_quad (w, x, y, z) ->
+      ColorMixMethod.toString w
+      ^ {js| |js}
+      ^ ColorMixMethod.PolarColorSpace.toString x
+      ^ {js| |js}
+      ^ ColorMixMethod.SizeHue.toString y
+      ^ {js| |js}
+      ^ ColorMixMethod.HueInterpolationMethod.toString z
+
+  let rec toString x =
     match x with
     | `rgb (r, g, b) ->
       ((((({js|rgb(|js} ^ Std.Int.toString r) ^ {js|, |js}) ^ Std.Int.toString g)
@@ -910,6 +1015,18 @@ module Color = struct
         ^ Std.Int.toString b)
        ^ {js|, |js})
       ^ string_of_alpha a)
+      ^ {js|)|js}
+    | `colorMix (method', color_x, color_y) ->
+      {js|color-mix(|js}
+      ^ color_mix_method method'
+      ^ {js|, |js}
+      ^ string_of_color color_x color_y
+      ^ {js|)|js}
+    | `colorMix_ (method', color_x, color_y) ->
+      {js|color-mix(|js}
+      ^ color_mix_method method'
+      ^ {js|, |js}
+      ^ string_of_color color_x color_y
       ^ {js|)|js}
     | `hsl (h, s, l) ->
       ((((({js|hsl(|js} ^ Angle.toString h) ^ {js|, |js})
@@ -928,6 +1045,13 @@ module Color = struct
     | `hex s -> {js|#|js} ^ s
     | `transparent -> {js|transparent|js}
     | `currentColor -> {js|currentColor|js}
+
+  and string_of_color x y =
+    string_of_actual_color x ^ {js|, |js} ^ string_of_actual_color y
+
+  and string_of_actual_color = function
+    | `color (color, percent) ->
+      toString color ^ {js| |js} ^ Percentage.toString percent
 end
 
 module BorderStyle = struct
