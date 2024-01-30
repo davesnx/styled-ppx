@@ -109,9 +109,6 @@ jobs:
       - name: Grant permission to run ppx
         run: chmod +x _build/default/bin/bin.exe
 
-      - name: DEBUG
-        run: ls _build/default/packages/css/rescript/Kloth.ml
-
       - name: Run E2E ReScript v9 tests
         run: make test_e2e_rescript_v9
 

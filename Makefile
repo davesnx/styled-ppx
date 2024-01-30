@@ -94,7 +94,7 @@ $(foreach target,$(TEST_TARGETS), $(eval $(call create_test_promote,$(target))))
 
 .PHONY: test_e2e_rescript_v9
 test_e2e_rescript_v9: ## Run End-to-end tests for JSX3
-	npm --prefix 'e2e/rescript-v9-JSX3' install --force
+	npm --prefix 'e2e/rescript-v9-JSX3' install
 	npm --prefix 'e2e/rescript-v9-JSX3' run build
 	npm --prefix 'e2e/rescript-v9-JSX3' run test
 
@@ -108,7 +108,7 @@ test_e2e_rescript_v9_promote: ## Run End-to-end tests for JSX3
 
 .PHONY: test_e2e_rescript_v10
 test_e2e_rescript_v10: ## Run End-to-end tests for JSX4
-	npm --prefix 'e2e/rescript-v10-JSX4' install --force
+	npm --prefix 'e2e/rescript-v10-JSX4' install
 	npm --prefix 'e2e/rescript-v10-JSX4' run build
 	npm --prefix 'e2e/rescript-v10-JSX4' run test
 
@@ -122,6 +122,13 @@ test_e2e_rescript_v10_promote: ## Run End-to-end tests for JSX4
 
 .PHONY: test
 test: build test_native_typecheck test_css_support test_ppx_snapshot test_parser test_reason_css_parser test_css_spec_parser test_css_spec_types test_string_interpolation test_emotion test_emotion_hash
+
+# Demo
+
+.PHONY: demo_e2e_rescript_v10
+demo_e2e_rescript_v10: build ## Run the ReScript v10 demo with JSX4
+	npm --prefix 'e2e/rescript-v10-JSX4' install
+	npm --prefix 'e2e/rescript-v10-JSX4' run start
 
 # Debug commands
 
