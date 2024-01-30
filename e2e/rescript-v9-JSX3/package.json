@@ -13,8 +13,6 @@
     "start": "npm run test"
   },
   "dependencies": {
-    "@davesnx/styled-ppx-css": "file:../../_build/default/packages/css/rescript",
-    "@davesnx/styled-ppx-emotion": "file:../../_build/default/packages/emotion/rescript",
     "@emotion/css": "^11.11.2",
     "@jihchi/vite-plugin-rescript": "^5.3.1",
     "@rescript/react": "^0.10.0",

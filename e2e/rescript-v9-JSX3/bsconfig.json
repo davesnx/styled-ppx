@@ -3,31 +3,23 @@
   "reason": {
     "react-jsx": 3
   },
-  "bsc-flags": [
-    "-bs-super-errors"
-  ],
+  "bsc-flags": ["-bs-super-errors"],
   "warnings": {
     "number": "-48"
   },
-  "sources": [{
-    "dir": "src",
-    "type": "dev"
-  },
-  {
-    "dir": "../../_build/default/packages/css/rescript"
-  },
-  {
-    "dir": "../../_build/default/packages/emotion/rescript"
-  }],
+  "sources": [
+    {
+      "dir": "src",
+      "type": "dev"
+    }
+  ],
   "package-specs": [
     {
       "module": "es6",
       "in-source": true
     }
   ],
-  "ppx-flags": [
-    "../../_build/default/bin/bin.exe"
-  ],
+  "ppx-flags": ["../../_build/default/bin/bin.exe"],
   "suffix": ".bs.js",
   "namespace": true,
   "bs-dependencies": [

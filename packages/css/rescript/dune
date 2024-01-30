@@ -1,17 +1,25 @@
-(copy_files
- (mode fallback)
- (files ../js/**[!.pp].ml))
+(copy_files#
+ (files ../native/shared/Css_AtomicTypes.{ml,mli}))
+
+(copy_files#
+ (files ../native/shared/Css_Colors.ml))
+
+(copy_files#
+ (files ../native/shared/Css_Core.ml))
+
+(copy_files#
+ (files ../js/Css_Legacy_Core.ml))
+
+(copy_files#
+ (files ../js/Css_Js_Core.ml))
 
 ; Copy files into the root of the folder (which collides with Kloth.ml)
 ; but later on the actions, we remove the ml file, using the Kloth.res file
 
 (rule
- (alias all)
- (deps ./override/Kloth.ml)
+ (deps ./Kloth.ml)
  (action
   (progn
-   (run rm -rf ./Kloth.ml)
-   (run cp -R ./override/Kloth.ml ./Kloth.ml)
    (with-stdout-to
     bsconfig.json
     (run
