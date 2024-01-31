@@ -147,8 +147,9 @@ let render_prelude hash selector =
     selector |> remove_first_ampersand |> resolve_ampersand hash
   in
   (* S (aka Selectors) are the only ones used by styled-ppx, we don't use PseudoClass neither PseucodClassParam. TODO: Remove them.
-  Meanwhile we have them, it's a good idea to check if the first character of the selector is a `:` because it's expected to not have a space between the selector and the :pseudoselector. *)
-  if is_a_pseudo_selector new_selector then Printf.sprintf ".%s%s" hash new_selector
+     Meanwhile we have them, it's a good idea to check if the first character of the selector is a `:` because it's expected to not have a space between the selector and the :pseudoselector. *)
+  if is_a_pseudo_selector new_selector then
+    Printf.sprintf ".%s%s" hash new_selector
   else Printf.sprintf ".%s %s" hash new_selector
 
 let render_selectors hash rule =

@@ -262,13 +262,22 @@ let duplicated_styles_unique () =
   assert_string css (Printf.sprintf ".%s { flex-grow: 1; }" className1)
 
 let hover_selector () =
-  let className = CssJs.style [|
-      CssJs.color (`rgb (255, 255, 255));
-      CssJs.selector ":hover" [| CssJs.color (`rgba (255, 255, 255, `num 0.7)) |];
-      CssJs.selector "&:hover" [| CssJs.color (`rgba (255, 255, 255, `num 0.7)) |]
-    |] in
+  let className =
+    CssJs.style
+      [|
+        CssJs.color (`rgb (255, 255, 255));
+        CssJs.selector ":hover"
+          [| CssJs.color (`rgba (255, 255, 255, `num 0.7)) |];
+        CssJs.selector "&:hover"
+          [| CssJs.color (`rgba (255, 255, 255, `num 0.7)) |];
+      |]
+  in
   let css = render_style_tag () in
-  assert_string css (Printf.sprintf ".%s { color: rgb(255, 255, 255); } .%s:hover { color: rgba(255, 255, 255, 0.7); } .%s:hover { color: rgba(255, 255, 255, 0.7); }" className className className)
+  assert_string css
+    (Printf.sprintf
+       ".%s { color: rgb(255, 255, 255); } .%s:hover { color: rgba(255, 255, \
+        255, 0.7); } .%s:hover { color: rgba(255, 255, 255, 0.7); }"
+       className className className)
 
 let case title fn = Alcotest.test_case title `Quick fn
 
