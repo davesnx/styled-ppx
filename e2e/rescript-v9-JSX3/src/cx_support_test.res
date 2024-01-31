@@ -10,7 +10,7 @@ let testData = list{
   (%cx("text-transform: unset"), CssJs.style([CssJs.textTransform(#unset)])),
   (%cx("text-transform: inherit"), CssJs.style([CssJs.textTransform(#inherit_)])),
   (%cx("text-transform: revert"), CssJs.style([CssJs.textTransform(#revert)])),
-  (%cx("text-transform: revert-layer"), CssJs.style([CssJs.textTransform(#revert_layer)])),
+  (%cx("text-transform: revert-layer"), CssJs.style([CssJs.textTransform(#revertLayer)])),
 }
 
 describe("cx", () => {
