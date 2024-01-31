@@ -76,7 +76,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.os }}
-          path: _build/default/bin/bin.exe
+          path: _build/default/packages/bin/bin.exe
 
       - name: Upload runtime artifacts for @davesnx/styled-ppx/runtime/css
         if: matrix.os == 'ubuntu-20.04'
@@ -107,7 +107,7 @@ jobs:
           key: opam-${{ matrix.os }}-${{ hashFiles('**.opam') }}
 
       - name: Grant permission to run ppx
-        run: chmod +x _build/default/bin/bin.exe
+        run: chmod +x _build/default/packages/bin/bin.exe
 
       - name: Run E2E ReScript v9 tests
         run: make test_e2e_rescript_v9
