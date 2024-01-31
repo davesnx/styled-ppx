@@ -25,6 +25,9 @@
     "type": "git",
     "url": "https://github.com/davesnx/styled-ppx.git"
   },
+  "peerDependencies": {
+    "rescript": "9.x || 10.x"
+  },
   "devDependencies": {
     "rescript": "10.1.4"
   }
