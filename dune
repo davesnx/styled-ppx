@@ -1,4 +1,4 @@
-(dirs bin packages e2e)
+(dirs packages e2e)
 
 (subdir
  e2e
