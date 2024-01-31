@@ -194,6 +194,14 @@ let maskImage x =
       | #Url.t as u -> Url.toString u
       | #Gradient.t as g -> Gradient.toString g )
 
+let imageRendering x =
+  D
+    ( {js|image-rendering|js},
+      match x with
+      | #ImageRendering.t as ir -> ImageRendering.toString ir
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c )
+
 let backgroundOrigin x =
   D
     ( {js|background-origin|js},
@@ -275,6 +283,14 @@ let maskPositions mp =
       mp
       |. Std.List.map string_of_maskposition
       |. Std.List.joinWith ~sep:{js|, |js} )
+
+let borderImageSource x =
+  D
+    ( {js|border-image-source|js},
+      match x with
+      | #BorderImageSource.t as b -> BorderImageSource.toString b
+      | #Url.t as u -> Url.toString u
+      | #Gradient.t as g -> Gradient.toString g )
 
 let borderBottomColor x = D ({js|border-bottom-color|js}, string_of_color x)
 
