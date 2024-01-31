@@ -4,13 +4,19 @@ module Cascading : sig
   type t =
     [ `inherit_
     | `initial
+    | `revert
+    | `revertLayer
     | `unset
     ]
 
   val initial : [> `initial ]
   val inherit_ : [> `inherit_ ]
   val unset : [> `unset ]
-  val toString : [< `inherit_ | `initial | `unset ] -> string
+  val revert : [> `revert ]
+  val revertLayer : [> `revertLayer ]
+
+  val toString :
+    [< `inherit_ | `initial | `revert | `revertLayer | `unset ] -> string
 end
 
 module Var : sig
