@@ -6,7 +6,7 @@ If you have questions about a specific PR, want to discuss a new API idea or a b
 
 ## What about if you have problems that cannot be discussed in a public?
 
-[David Sancho](https://github.com/davesnx) has a contact email on the GitHub profile, and is happy to talk about any problems via email or a DM in [Twitter](https://twitter.com/davesnx).
+[David Sancho](https://github.com/davesnx) has a contact email on the GitHub profile, and happy to talk about any problems via email or a DM in [Twitter](https://twitter.com/davesnx).
 
 ## Code contributions
 
@@ -23,7 +23,7 @@ Here is a quick guide to doing code contributions to the repository.
 
 5. Make your changes and commit: `git add` and `git commit`.
 
-6. Make sure that the tests still pass: `make test_all` (if you ran `make init` a pre-psuh githook has been created for you to run each time you push).
+6. Make sure that the tests still pass: `make test` (if you ran `make init` a pre-psuh githook has been created for you to run each time you push).
 
 7. Push your branch: `git push -u origin your-branch-name`.
 
@@ -37,7 +37,7 @@ Here is a quick guide to doing code contributions to the repository.
 
 ## Set up the project
 
-- Make sure you have installed opam and yarn (1.x).
+- Make sure you have installed opam and npm.
 - Run `make init` will setup the opam switch, install dependencies and some pinned packages.
 - Run `make build` will build the project or `make dev` to build and watch for changes.
 - Run `make test` to run all test suites.
@@ -57,17 +57,14 @@ There are some end-to-end tests to ensure all the ppx generation is working as e
 ```bash
 $ tree -L 1 e2e
 e2e
-├── bucklescript-v8
+├── melange
 ├── rescript-v10-JSX4
 └── rescript-v9-JSX3
 ```
 
 ```bash
 make build
-cd e2e/bucklescript-v8
-yarn install
-yarn build
-yarn test
+make test_e2e_rescript_v10
 ```
 
 ## Release process
