@@ -4,7 +4,7 @@
   let width = "120px";
   let orientation = "landscape";
   module SelectorWithInterpolation = {
-    [@deriving abstract]
+    [@deriving (jsProperties, getSet)]
     type makeProps = {
       [@mel.optional]
       innerRef: option(ReactDOM.domRef),

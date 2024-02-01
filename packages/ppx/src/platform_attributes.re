@@ -89,7 +89,7 @@ module MelangeAttributes = {
     Builder.attribute(~name=withLoc(~loc, "u"), ~loc, ~payload=PStr([]));
   };
 
-  /* [@deriving abstract] */
+  /* [@deriving jsProperties, getSet] */
   let derivingAbstract = (~loc) =>
     Helper.Attr.mk(
       withLoc("deriving", ~loc),
@@ -97,7 +97,19 @@ module MelangeAttributes = {
         Helper.Str.mk(
           ~loc,
           Pstr_eval(
-            Helper.Exp.ident(~loc, withLoc(Lident("abstract"), ~loc)),
+            Helper.Exp.tuple(
+              ~loc,
+              [
+                Helper.Exp.ident(
+                  ~loc,
+                  withLoc(Lident("jsProperties"), ~loc),
+                ),
+                Helper.Exp.ident(
+                  ~loc,
+                  withLoc(Lident("getSet"), ~loc),
+                ),
+              ],
+            ),
             [],
           ),
         ),

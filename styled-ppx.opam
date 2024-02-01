@@ -17,7 +17,7 @@ depends: [
   "ppx_deriving_yojson" {>= "3.7.0"}
   "ppxlib" {>= "0.27.0"}
   "sedlex" {>= "3.2"}
-  "melange" {>= "1.0.0"}
+  "melange" {>= "3.0.0"}
   "server-reason-react"
   "reason-react" {>= "0.13.0"}
   "reason" {with-dev-setup}
@@ -43,9 +43,8 @@ build: [
 ]
 dev-repo: "git+https://github.com/davesnx/styled-ppx.git"
 pin-depends: [
-  ["melange.dev" "git+https://github.com/melange-re/melange#300e323d3634e6de7c3d65dca9276a6d68410b5e"]
   ["reason.dev" "https://github.com/reasonml/reason/archive/f92f7ecc228d19ebf4d9d0214792da7b45472766.tar.gz"]
-  ["reason-react.dev" "https://github.com/reasonml/reason-react/archive/2a43311df12eb3988fd9729098928e6b03cfaa07.tar.gz"]
-  ["reason-react-ppx.dev" "https://github.com/reasonml/reason-react/archive/2a43311df12eb3988fd9729098928e6b03cfaa07.tar.gz"]
+  ["reason-react.dev" "https://github.com/reasonml/reason-react/archive/1f084f4ecf380b2144809065e5935a41866eab3f.tar.gz"]
+  ["reason-react-ppx.dev" "https://github.com/reasonml/reason-react/archive/1f084f4ecf380b2144809065e5935a41866eab3f.tar.gz"]
   ["server-reason-react.dev" "https://github.com/ml-in-barcelona/server-reason-react/archive/04374f5fc974b9da47d8d27acd875f20e208377b.tar.gz"]
 ]
