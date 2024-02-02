@@ -24,6 +24,8 @@ let (let.ok) = Result.bind;
 /* TODO: Add payload on those exceptions */
 exception Unsupported_feature;
 
+exception InvalidValue(string);
+
 let id = Fun.id;
 
 /* Why this type contains so much when only `string_to_expr` is used? */
@@ -985,24 +987,16 @@ and render_function_color_mix = (~loc, value: Types.function_color_mix) => {
     };
   };
 
-  let render_size_hue = (x: Types.hue_interpolation_method) => {
-    let render_size =
-      fun
-      | `Shorter => [%expr `shorter]
-      | `Longer => [%expr `longer]
-      | `Increasing => [%expr `increasing]
-      | `Decreasing => [%expr `decreasing];
-
-    switch (x) {
-    // Should it be a unit 🤔?
-    | (x, ()) => render_size(x)
-    };
-  };
+  let render_size_hue = () =>
+    fun
+    | `Shorter => [%expr `shorter]
+    | `Longer => [%expr `longer]
+    | `Increasing => [%expr `increasing]
+    | `Decreasing => [%expr `decreasing];
 
   let render_in = [%expr `in_];
 
   switch (value) {
-  // Should it be a unit 🤔?
   | (x, (), colors: list((Types.color, option(Types.percentage)))) =>
     let ((color_one, percentage_one), (color_two, percentage_two)) =
       switch (colors) {
@@ -1022,19 +1016,13 @@ and render_function_color_mix = (~loc, value: Types.function_color_mix) => {
 
     let render_percentage = (p1, p2) => {
       switch (p1, p2) {
-      | (Some(p1'), Some(p2')) =>
-        p1' == 0. && p2' == 0.
-          // TODO: Error should be "Invalid function!"
-          ? raise(Unsupported_feature)
-          : p1' +. p2' != 100.
-              ? render_percentage(~loc, p1' /. (p1' +. p2'))
-              : render_percentage(~loc, p1')
-      | (Some(p1'), None)
-      | (None, Some(p1')) =>
-        switch (p1) {
-        | Some(p) => render_percentage(~loc, p)
-        | None => render_percentage(~loc, 100. -. p1')
-        }
+      | (Some(p1'), Some(p2')) when p1' == 0. && p2' == 0. =>
+        raise(InvalidValue("Both percentages can not be 0!"))
+      | (Some(p1'), Some(p2')) when p1' +. p2' != 100. =>
+        render_percentage(~loc, p1' /. (p1' +. p2'))
+      | (Some(p1'), Some(_p2')) => render_percentage(~loc, p1')
+      | (Some(p1'), None) => render_percentage(~loc, p1')
+      | (None, Some(p2')) => render_percentage(~loc, 100. -. p2')
       | (None, None) => render_percentage(~loc, 50.)
       };
     };
@@ -1050,33 +1038,29 @@ and render_function_color_mix = (~loc, value: Types.function_color_mix) => {
     switch (x) {
     | ((), `Rectangular_color_space(x)) =>
       [%expr
-       `colorMix((
-         `method_tup((
-           [%e render_in],
-           [%e render_rectangular_color_space(x)],
-         )),
-         `color(([%e render_color_one], [%e render_percentage_one])),
-         `color(([%e render_color_two], [%e render_percentage_two])),
+       `colorMix2((
+         ([%e render_in], [%e render_rectangular_color_space(x)]),
+         ([%e render_color_one], [%e render_percentage_one]),
+         ([%e render_color_two], [%e render_percentage_two]),
        ))]
-    // Should it be a unit 🤔?
     | ((), `Static(pcs, None)) =>
       [%expr
-       `colorMix((
-         `method_tup(([%e render_in], [%e render_polar_color_space(pcs)])),
-         `color(([%e render_color_one], [%e render_percentage_one])),
-         `color(([%e render_color_two], [%e render_percentage_two])),
+       `colorMix2((
+         ([%e render_in], [%e render_polar_color_space(pcs)]),
+         ([%e render_color_one], [%e render_percentage_one]),
+         ([%e render_color_two], [%e render_percentage_two]),
        ))]
-    | ((), `Static(pcs, Some(size))) =>
+    | ((), `Static(pcs, Some((size, ())))) =>
       [%expr
-       `colorMix_((
-         `method_quad((
+       `colorMix4((
+         (
            [%e render_in],
            [%e render_polar_color_space(pcs)],
-           [%e render_size_hue(size)],
+           [%e render_size_hue((), size)],
            [%e [%expr `hue]],
-         )),
-         `color(([%e render_color_one], [%e render_percentage_one])),
-         `color(([%e render_color_two], [%e render_percentage_two])),
+         ),
+         ([%e render_color_one], [%e render_percentage_one]),
+         ([%e render_color_two], [%e render_percentage_two]),
        ))]
     };
   };
@@ -4130,6 +4114,8 @@ let parse_declarations = (~loc: Location.t, property, value) => {
   | Error(_) =>
     switch (render_to_expr(~loc, property, value)) {
     | Ok(value) => Ok(value)
+    | exception (InvalidValue(v)) =>
+      Error(`Invalid_value(value ++ ". " ++ v))
     | Error(_)
     | exception Unsupported_feature =>
       let.ok () = is_valid_string ? Ok() : Error(`Invalid_value(value));

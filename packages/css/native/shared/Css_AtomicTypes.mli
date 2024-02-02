@@ -1106,21 +1106,17 @@ module Color : sig
   type t =
     [ `currentColor
     | `hex of string
-    | `colorMix of
-      [ `method_tup of
-        ColorMixMethod.t * ColorMixMethod.Rectangular_or_Polar_color_space.t
-      ]
-      * [ `color of t * Percentage.t ]
-      * [ `color of t * Percentage.t ]
-    | `colorMix_ of
-      [ `method_quad of
-        ColorMixMethod.t
-        * ColorMixMethod.PolarColorSpace.t
-        * ColorMixMethod.SizeHue.t
-        * ColorMixMethod.HueInterpolationMethod.t
-      ]
-      * [ `color of t * Percentage.t ]
-      * [ `color of t * Percentage.t ]
+    | `colorMix2 of
+      (ColorMixMethod.t * ColorMixMethod.Rectangular_or_Polar_color_space.t)
+      * (t * Percentage.t)
+      * (t * Percentage.t)
+    | `colorMix4 of
+      (ColorMixMethod.t
+      * ColorMixMethod.PolarColorSpace.t
+      * ColorMixMethod.SizeHue.t
+      * ColorMixMethod.HueInterpolationMethod.t)
+      * (t * Percentage.t)
+      * (t * Percentage.t)
     | `hsl of Angle.t * Percentage.t * Percentage.t
     | `hsla of
       Angle.t
@@ -1144,21 +1140,17 @@ module Color : sig
   val toString :
     [ `currentColor
     | `hex of string
-    | `colorMix of
-      [ `method_tup of
-        ColorMixMethod.t * ColorMixMethod.Rectangular_or_Polar_color_space.t
-      ]
-      * [ `color of t * Percentage.t ]
-      * [ `color of t * Percentage.t ]
-    | `colorMix_ of
-      [ `method_quad of
-        ColorMixMethod.t
-        * ColorMixMethod.PolarColorSpace.t
-        * ColorMixMethod.SizeHue.t
-        * ColorMixMethod.HueInterpolationMethod.t
-      ]
-      * [ `color of t * Percentage.t ]
-      * [ `color of t * Percentage.t ]
+    | `colorMix2 of
+      (ColorMixMethod.t * ColorMixMethod.Rectangular_or_Polar_color_space.t)
+      * (t * Percentage.t)
+      * (t * Percentage.t)
+    | `colorMix4 of
+      (ColorMixMethod.t
+      * ColorMixMethod.PolarColorSpace.t
+      * ColorMixMethod.SizeHue.t
+      * ColorMixMethod.HueInterpolationMethod.t)
+      * (t * Percentage.t)
+      * (t * Percentage.t)
     | `hsl of
       [ `deg of float | `grad of float | `rad of float | `turn of float ]
       * [ `percent of float ]
@@ -2235,21 +2227,17 @@ module Gradient : sig
       'a =
       [< `currentColor
       | `hex of string
-      | `colorMix of
-        [ `method_tup of
-          ColorMixMethod.t * ColorMixMethod.Rectangular_or_Polar_color_space.t
-        ]
-        * [ `color of Color.t * Percentage.t ]
-        * [ `color of Color.t * Percentage.t ]
-      | `colorMix_ of
-        [ `method_quad of
-          ColorMixMethod.t
-          * ColorMixMethod.PolarColorSpace.t
-          * ColorMixMethod.SizeHue.t
-          * ColorMixMethod.HueInterpolationMethod.t
-        ]
-        * [ `color of Color.t * Percentage.t ]
-        * [ `color of Color.t * Percentage.t ]
+      | `colorMix2 of
+        (ColorMixMethod.t * ColorMixMethod.Rectangular_or_Polar_color_space.t)
+        * (Color.t * Percentage.t)
+        * (Color.t * Percentage.t)
+      | `colorMix4 of
+        (ColorMixMethod.t
+        * ColorMixMethod.PolarColorSpace.t
+        * ColorMixMethod.SizeHue.t
+        * ColorMixMethod.HueInterpolationMethod.t)
+        * (Color.t * Percentage.t)
+        * (Color.t * Percentage.t)
       | `hsl of Angle.t * Percentage.t * Percentage.t
       | `hsla of
         Angle.t
