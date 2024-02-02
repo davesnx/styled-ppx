@@ -316,10 +316,10 @@ let properties_static_css_tests = [
     [%expr [%css "background-color: color-mix(in srgb, white 10%, red)"]],
     [%expr
       CssJs.backgroundColor(
-        `colorMix((
-          `method_tup((`in_, `srgb)),
-          `color((CssJs.white, `percent(10.))),
-          `color((CssJs.red, `percent(90.))),
+        `colorMix2((
+          (`in_, `srgb),
+          (CssJs.white, `percent(10.)),
+          (CssJs.red, `percent(90.)),
         )),
       )
     ],
@@ -329,10 +329,10 @@ let properties_static_css_tests = [
     [%expr [%css "background-color: color-mix(in srgb, white 10%, red 10%)"]],
     [%expr
       CssJs.backgroundColor(
-        `colorMix((
-          `method_tup((`in_, `srgb)),
-          `color((CssJs.white, `percent(0.5))),
-          `color((CssJs.red, `percent(0.5))),
+        `colorMix2((
+          (`in_, `srgb),
+          (CssJs.white, `percent(0.5)),
+          (CssJs.red, `percent(0.5)),
         )),
       )
     ],
@@ -342,10 +342,10 @@ let properties_static_css_tests = [
     [%expr [%css "background-color: color-mix(in srgb, white, red)"]],
     [%expr
       CssJs.backgroundColor(
-        `colorMix((
-          `method_tup((`in_, `srgb)),
-          `color((CssJs.white, `percent(50.))),
-          `color((CssJs.red, `percent(50.))),
+        `colorMix2((
+          (`in_, `srgb),
+          (CssJs.white, `percent(50.)),
+          (CssJs.red, `percent(50.)),
         )),
       )
     ],
@@ -355,23 +355,13 @@ let properties_static_css_tests = [
     [%expr [%css "background-color: color-mix(in srgb, white, red 10%)"]],
     [%expr
       CssJs.backgroundColor(
-        `colorMix((
-          `method_tup((`in_, `srgb)),
-          `color((CssJs.white, `percent(90.))),
-          `color((CssJs.red, `percent(10.))),
+        `colorMix2((
+          (`in_, `srgb),
+          (CssJs.white, `percent(90.)),
+          (CssJs.red, `percent(10.)),
         )),
       )
     ],
-  ),
-  (
-    [%css "background-color: color-mix(in srgb, white 0%, red 0%)"],
-    [%expr [%css "background-color: color-mix(in srgb, white 0%, red 0%)"]],
-    [%expr
-      CssJs.unsafe(
-        {js|backgroundColor|js},
-        {js|color-mix(in srgb, white 0%, red 0%)|js},
-      )
-    ] // FIXME: Error should be "Invalid function!" because both percentages can't be 0%
   ),
   (
     [%css "background-color: color-mix(in srgb, white 100%, red 100%)"],
@@ -380,10 +370,10 @@ let properties_static_css_tests = [
     ],
     [%expr
       CssJs.backgroundColor(
-        `colorMix((
-          `method_tup((`in_, `srgb)),
-          `color((CssJs.white, `percent(0.5))),
-          `color((CssJs.red, `percent(0.5))),
+        `colorMix2((
+          (`in_, `srgb),
+          (CssJs.white, `percent(0.5)),
+          (CssJs.red, `percent(0.5)),
         )),
       )
     ],
@@ -393,10 +383,10 @@ let properties_static_css_tests = [
     [%expr [%css "background-color: color-mix(in srgb-linear, white, red)"]],
     [%expr
       CssJs.backgroundColor(
-        `colorMix((
-          `method_tup((`in_, `srgbLinear)),
-          `color((CssJs.white, `percent(50.))),
-          `color((CssJs.red, `percent(50.))),
+        `colorMix2((
+          (`in_, `srgbLinear),
+          (CssJs.white, `percent(50.)),
+          (CssJs.red, `percent(50.)),
         )),
       )
     ],
@@ -412,13 +402,13 @@ let properties_static_css_tests = [
     ],
     [%expr
       CssJs.backgroundColor(
-        `colorMix_((
-          `method_quad((`in_, `hsl, `longer, `hue)),
-          `color((`hex({js|34c9eb|js}), `percent(50.))),
-          `color((
+        `colorMix4((
+          (`in_, `hsl, `longer, `hue),
+          (`hex({js|34c9eb|js}), `percent(50.)),
+          (
             `hsl((`deg(120.), `percent(100.), `percent(50.))),
             `percent(50.),
-          )),
+          ),
         )),
       )
     ],

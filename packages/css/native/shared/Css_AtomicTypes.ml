@@ -951,21 +951,17 @@ module Color = struct
   type t =
     [ `rgb of int * int * int
     | `rgba of int * int * int * [ `num of float | Percentage.t ]
-    | `colorMix of
-      [ `method_tup of
-        ColorMixMethod.t * ColorMixMethod.Rectangular_or_Polar_color_space.t
-      ]
-      * [ `color of t * Percentage.t ]
-      * [ `color of t * Percentage.t ]
-    | `colorMix_ of
-      [ `method_quad of
-        ColorMixMethod.t
-        * ColorMixMethod.PolarColorSpace.t
-        * ColorMixMethod.SizeHue.t
-        * ColorMixMethod.HueInterpolationMethod.t
-      ]
-      * [ `color of t * Percentage.t ]
-      * [ `color of t * Percentage.t ]
+    | `colorMix2 of
+      (ColorMixMethod.t * ColorMixMethod.Rectangular_or_Polar_color_space.t)
+      * (t * Percentage.t)
+      * (t * Percentage.t)
+    | `colorMix4 of
+      (ColorMixMethod.t
+      * ColorMixMethod.PolarColorSpace.t
+      * ColorMixMethod.SizeHue.t
+      * ColorMixMethod.HueInterpolationMethod.t)
+      * (t * Percentage.t)
+      * (t * Percentage.t)
     | `hsl of Angle.t * Percentage.t * Percentage.t
     | `hsla of
       Angle.t * Percentage.t * Percentage.t * [ `num of float | Percentage.t ]
@@ -987,20 +983,6 @@ module Color = struct
     | `num f -> Std.Float.toString f
     | #Percentage.t as pc -> Percentage.toString pc
 
-  let color_mix_method = function
-    | `method_tup (x, y) ->
-      ColorMixMethod.toString x
-      ^ {js| |js}
-      ^ ColorMixMethod.Rectangular_or_Polar_color_space.toString y
-    | `method_quad (w, x, y, z) ->
-      ColorMixMethod.toString w
-      ^ {js| |js}
-      ^ ColorMixMethod.PolarColorSpace.toString x
-      ^ {js| |js}
-      ^ ColorMixMethod.SizeHue.toString y
-      ^ {js| |js}
-      ^ ColorMixMethod.HueInterpolationMethod.toString z
-
   let rec toString x =
     match x with
     | `rgb (r, g, b) ->
@@ -1016,15 +998,27 @@ module Color = struct
        ^ {js|, |js})
       ^ string_of_alpha a)
       ^ {js|)|js}
-    | `colorMix (method', color_x, color_y) ->
+    | `colorMix2 (method', color_x, color_y) ->
       {js|color-mix(|js}
-      ^ color_mix_method method'
+      ^ (match method' with
+        | x, y ->
+          ColorMixMethod.toString x
+          ^ {js| |js}
+          ^ ColorMixMethod.Rectangular_or_Polar_color_space.toString y)
       ^ {js|, |js}
       ^ string_of_color color_x color_y
       ^ {js|)|js}
-    | `colorMix_ (method', color_x, color_y) ->
+    | `colorMix4 (method', color_x, color_y) ->
       {js|color-mix(|js}
-      ^ color_mix_method method'
+      ^ (match method' with
+        | w, x, y, z ->
+          ColorMixMethod.toString w
+          ^ {js| |js}
+          ^ ColorMixMethod.PolarColorSpace.toString x
+          ^ {js| |js}
+          ^ ColorMixMethod.SizeHue.toString y
+          ^ {js| |js}
+          ^ ColorMixMethod.HueInterpolationMethod.toString z)
       ^ {js|, |js}
       ^ string_of_color color_x color_y
       ^ {js|)|js}
@@ -1050,8 +1044,7 @@ module Color = struct
     string_of_actual_color x ^ {js|, |js} ^ string_of_actual_color y
 
   and string_of_actual_color = function
-    | `color (color, percent) ->
-      toString color ^ {js| |js} ^ Percentage.toString percent
+    | color, percent -> toString color ^ {js| |js} ^ Percentage.toString percent
 end
 
 module BorderStyle = struct
