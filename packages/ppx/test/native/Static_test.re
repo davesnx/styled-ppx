@@ -316,8 +316,8 @@ let properties_static_css_tests = [
     [%expr [%css "background-color: color-mix(in srgb, white 10%, red)"]],
     [%expr
       CssJs.backgroundColor(
-        `colorMix2((
-          (`in_, `srgb),
+        `colorMix((
+          `in1(`srgb),
           (CssJs.white, `percent(10.)),
           (CssJs.red, `percent(90.)),
         )),
@@ -329,8 +329,8 @@ let properties_static_css_tests = [
     [%expr [%css "background-color: color-mix(in srgb, white 10%, red 10%)"]],
     [%expr
       CssJs.backgroundColor(
-        `colorMix2((
-          (`in_, `srgb),
+        `colorMix((
+          `in1(`srgb),
           (CssJs.white, `percent(0.5)),
           (CssJs.red, `percent(0.5)),
         )),
@@ -342,8 +342,8 @@ let properties_static_css_tests = [
     [%expr [%css "background-color: color-mix(in srgb, white, red)"]],
     [%expr
       CssJs.backgroundColor(
-        `colorMix2((
-          (`in_, `srgb),
+        `colorMix((
+          `in1(`srgb),
           (CssJs.white, `percent(50.)),
           (CssJs.red, `percent(50.)),
         )),
@@ -355,8 +355,8 @@ let properties_static_css_tests = [
     [%expr [%css "background-color: color-mix(in srgb, white, red 10%)"]],
     [%expr
       CssJs.backgroundColor(
-        `colorMix2((
-          (`in_, `srgb),
+        `colorMix((
+          `in1(`srgb),
           (CssJs.white, `percent(90.)),
           (CssJs.red, `percent(10.)),
         )),
@@ -370,8 +370,8 @@ let properties_static_css_tests = [
     ],
     [%expr
       CssJs.backgroundColor(
-        `colorMix2((
-          (`in_, `srgb),
+        `colorMix((
+          `in1(`srgb),
           (CssJs.white, `percent(0.5)),
           (CssJs.red, `percent(0.5)),
         )),
@@ -383,8 +383,8 @@ let properties_static_css_tests = [
     [%expr [%css "background-color: color-mix(in srgb-linear, white, red)"]],
     [%expr
       CssJs.backgroundColor(
-        `colorMix2((
-          (`in_, `srgbLinear),
+        `colorMix((
+          `in1(`srgbLinear),
           (CssJs.white, `percent(50.)),
           (CssJs.red, `percent(50.)),
         )),
@@ -402,8 +402,8 @@ let properties_static_css_tests = [
     ],
     [%expr
       CssJs.backgroundColor(
-        `colorMix4((
-          (`in_, `hsl, `longer, `hue),
+        `colorMix((
+          `in2((`hsl, `longer)),
           (`hex({js|34c9eb|js}), `percent(50.)),
           (
             `hsl((`deg(120.), `percent(100.), `percent(50.))),
