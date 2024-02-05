@@ -987,14 +987,12 @@ and render_function_color_mix = (~loc, value: Types.function_color_mix) => {
     };
   };
 
-  let render_size_hue = () =>
+  let render_hue_size = () =>
     fun
     | `Shorter => [%expr `shorter]
     | `Longer => [%expr `longer]
     | `Increasing => [%expr `increasing]
     | `Decreasing => [%expr `decreasing];
-
-  let render_in = [%expr `in_];
 
   switch (value) {
   | (x, (), colors: list((Types.color, option(Types.percentage)))) =>
@@ -1038,27 +1036,25 @@ and render_function_color_mix = (~loc, value: Types.function_color_mix) => {
     switch (x) {
     | ((), `Rectangular_color_space(x)) =>
       [%expr
-       `colorMix2((
-         ([%e render_in], [%e render_rectangular_color_space(x)]),
+       `colorMix((
+         `in1([%e render_rectangular_color_space(x)]),
          ([%e render_color_one], [%e render_percentage_one]),
          ([%e render_color_two], [%e render_percentage_two]),
        ))]
     | ((), `Static(pcs, None)) =>
       [%expr
-       `colorMix2((
-         ([%e render_in], [%e render_polar_color_space(pcs)]),
+       `colorMix((
+         `in1([%e render_polar_color_space(pcs)]),
          ([%e render_color_one], [%e render_percentage_one]),
          ([%e render_color_two], [%e render_percentage_two]),
        ))]
     | ((), `Static(pcs, Some((size, ())))) =>
       [%expr
-       `colorMix4((
-         (
-           [%e render_in],
+       `colorMix((
+         `in2((
            [%e render_polar_color_space(pcs)],
-           [%e render_size_hue((), size)],
-           [%e [%expr `hue]],
-         ),
+           [%e render_hue_size((), size)],
+         )),
          ([%e render_color_one], [%e render_percentage_one]),
          ([%e render_color_two], [%e render_percentage_two]),
        ))]

@@ -921,13 +921,7 @@ module ColorMixMethod = struct
       | `oklch -> {js|oklch|js}
   end
 
-  module HueInterpolationMethod = struct
-    type t = [ `hue ]
-
-    let toString = function `hue -> {js|hue|js}
-  end
-
-  module SizeHue = struct
+  module HueSize = struct
     type t =
       [ `shorter
       | `longer
@@ -942,26 +936,17 @@ module ColorMixMethod = struct
       | `decreasing -> {js|decreasing|js}
   end
 
-  type t = [ `in_ ]
-
-  let toString = function `in_ -> {js|in|js}
+  type t =
+    [ `in1 of Rectangular_or_Polar_color_space.t
+    | `in2 of PolarColorSpace.t * HueSize.t
+    ]
 end
 
 module Color = struct
   type t =
     [ `rgb of int * int * int
     | `rgba of int * int * int * [ `num of float | Percentage.t ]
-    | `colorMix2 of
-      (ColorMixMethod.t * ColorMixMethod.Rectangular_or_Polar_color_space.t)
-      * (t * Percentage.t)
-      * (t * Percentage.t)
-    | `colorMix4 of
-      (ColorMixMethod.t
-      * ColorMixMethod.PolarColorSpace.t
-      * ColorMixMethod.SizeHue.t
-      * ColorMixMethod.HueInterpolationMethod.t)
-      * (t * Percentage.t)
-      * (t * Percentage.t)
+    | `colorMix of ColorMixMethod.t * (t * Percentage.t) * (t * Percentage.t)
     | `hsl of Angle.t * Percentage.t * Percentage.t
     | `hsla of
       Angle.t * Percentage.t * Percentage.t * [ `num of float | Percentage.t ]
@@ -998,27 +983,14 @@ module Color = struct
        ^ {js|, |js})
       ^ string_of_alpha a)
       ^ {js|)|js}
-    | `colorMix2 (method', color_x, color_y) ->
+    | `colorMix (method', color_x, color_y) ->
       {js|color-mix(|js}
       ^ (match method' with
-        | x, y ->
-          ColorMixMethod.toString x
+        | `in1 x -> ColorMixMethod.Rectangular_or_Polar_color_space.toString x
+        | `in2 (x, y) ->
+          ColorMixMethod.PolarColorSpace.toString x
           ^ {js| |js}
-          ^ ColorMixMethod.Rectangular_or_Polar_color_space.toString y)
-      ^ {js|, |js}
-      ^ string_of_color color_x color_y
-      ^ {js|)|js}
-    | `colorMix4 (method', color_x, color_y) ->
-      {js|color-mix(|js}
-      ^ (match method' with
-        | w, x, y, z ->
-          ColorMixMethod.toString w
-          ^ {js| |js}
-          ^ ColorMixMethod.PolarColorSpace.toString x
-          ^ {js| |js}
-          ^ ColorMixMethod.SizeHue.toString y
-          ^ {js| |js}
-          ^ ColorMixMethod.HueInterpolationMethod.toString z)
+          ^ ColorMixMethod.HueSize.toString y)
       ^ {js|, |js}
       ^ string_of_color color_x color_y
       ^ {js|)|js}
