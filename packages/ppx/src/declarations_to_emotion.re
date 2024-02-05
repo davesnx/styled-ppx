@@ -24,7 +24,7 @@ let (let.ok) = Result.bind;
 /* TODO: Add payload on those exceptions */
 exception Unsupported_feature;
 
-exception InvalidValue(string);
+exception Invalid_value(string);
 
 let id = Fun.id;
 
@@ -1015,7 +1015,7 @@ and render_function_color_mix = (~loc, value: Types.function_color_mix) => {
     let render_percentage = (p1, p2) => {
       switch (p1, p2) {
       | (Some(p1'), Some(p2')) when p1' == 0. && p2' == 0. =>
-        raise(InvalidValue("Both percentages can not be 0!"))
+        raise(Invalid_value("Both percentages can not be 0!"))
       | (Some(p1'), Some(p2')) when p1' +. p2' != 100. =>
         render_percentage(~loc, p1' /. (p1' +. p2'))
       | (Some(p1'), Some(_p2')) => render_percentage(~loc, p1')
@@ -4110,7 +4110,7 @@ let parse_declarations = (~loc: Location.t, property, value) => {
   | Error(_) =>
     switch (render_to_expr(~loc, property, value)) {
     | Ok(value) => Ok(value)
-    | exception (InvalidValue(v)) =>
+    | exception (Invalid_value(v)) =>
       Error(`Invalid_value(value ++ ". " ++ v))
     | Error(_)
     | exception Unsupported_feature =>
