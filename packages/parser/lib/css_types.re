@@ -61,7 +61,7 @@ and brace_block =
 [@deriving show({with_path: false})]
 and at_rule = {
   name: with_loc(string),
-  prelude: with_loc(component_value_list),
+  prelude: with_loc(component_value),
   block: brace_block,
   [@printer empty]
   loc,
