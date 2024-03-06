@@ -201,6 +201,14 @@ let media_query_tests = [
     [%expr [%cx "@media $(wat) {}"]],
     [%expr CssJs.style([|CssJs.media(wat, [||])|])],
   ),
+  (
+    /* TODO: Function values are not valid values in the media query. */
+    "@media (width: calc( 1px + 2px ))",
+    [%expr [%cx "@media (width: calc( 1px + 2px )) {}"]],
+    [%expr
+      CssJs.style([|CssJs.media({js|(width: calc( 1px + 2px ))|js}, [||])|])
+    ],
+  ),
 ];
 
 let keyframe_tests = [
