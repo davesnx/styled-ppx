@@ -31,8 +31,9 @@ module Array = struct
 end
 
 module String = struct
-  let get = Js.String.get
-  let startsWith affix str = Js.String.startsWith str ~prefix:affix
+  let get = String.get
+  let length = Js.String.length
+  let startsWith affix str = Js.String.startsWith ~prefix:affix str
 end
 
 module Int = struct
