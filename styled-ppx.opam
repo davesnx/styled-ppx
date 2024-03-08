@@ -22,6 +22,7 @@ depends: [
   "server-reason-react"
   "reason-react" {>= "0.14.0"}
   "alcotest" {with-test}
+  "reason-react-ppx" {with-dev-setup}
   "ocaml-lsp-server" {with-dev-setup}
   "ocamlformat" {with-dev-setup}
   "utop" {with-dev-setup}
@@ -43,8 +44,5 @@ build: [
 ]
 dev-repo: "git+https://github.com/davesnx/styled-ppx.git"
 pin-depends: [
-  ["reason.dev" "https://github.com/reasonml/reason/archive/f92f7ecc228d19ebf4d9d0214792da7b45472766.tar.gz"]
-  ["reason-react.dev" "https://github.com/reasonml/reason-react/archive/1f084f4ecf380b2144809065e5935a41866eab3f.tar.gz"]
-  ["reason-react-ppx.dev" "https://github.com/reasonml/reason-react/archive/1f084f4ecf380b2144809065e5935a41866eab3f.tar.gz"]
   ["server-reason-react.dev" "https://github.com/ml-in-barcelona/server-reason-react/archive/04374f5fc974b9da47d8d27acd875f20e208377b.tar.gz"]
 ]

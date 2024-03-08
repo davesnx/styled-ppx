@@ -38,6 +38,7 @@
    server-reason-react
    (reason-react (>= 0.14.0))
    (alcotest :with-test)
+   (reason-react-ppx :with-dev-setup)
    (ocaml-lsp-server :with-dev-setup)
    (ocamlformat :with-dev-setup)
    (utop :with-dev-setup)))
