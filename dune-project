@@ -35,7 +35,7 @@
    (sedlex (>= 3.2))
    (melange (>= 3.0.0))
    server-reason-react
-   (reason-react (>= 0.13.0))
+   (reason-react (>= 0.14.0))
    (reason :with-dev-setup)
    (alcotest :with-test)
    (ocaml-lsp-server :with-dev-setup)
