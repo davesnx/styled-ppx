@@ -89,15 +89,24 @@ module MelangeAttributes = {
     Builder.attribute(~name=withLoc(~loc, "u"), ~loc, ~payload=PStr([]));
   };
 
-  /* [@deriving abstract] */
-  let derivingAbstract = (~loc) =>
+  /* [@deriving jsProperties, getSet] */
+  let derivingJsPropertiesGetSet = (~loc) =>
     Helper.Attr.mk(
       withLoc("deriving", ~loc),
       PStr([
         Helper.Str.mk(
           ~loc,
           Pstr_eval(
-            Helper.Exp.ident(~loc, withLoc(Lident("abstract"), ~loc)),
+            Helper.Exp.tuple(
+              ~loc,
+              [
+                Helper.Exp.ident(
+                  ~loc,
+                  withLoc(Lident("jsProperties"), ~loc),
+                ),
+                Helper.Exp.ident(~loc, withLoc(Lident("getSet"), ~loc)),
+              ],
+            ),
             [],
           ),
         ),
@@ -175,7 +184,7 @@ let derivingAbstract = (~loc) => {
   switch (File.get()) {
   | Some(ReScript) => ReScriptAttributes.derivingAbstract(~loc)
   | Some(Reason)
-  | _ => MelangeAttributes.derivingAbstract(~loc)
+  | _ => MelangeAttributes.derivingJsPropertiesGetSet(~loc)
   };
 };
 
