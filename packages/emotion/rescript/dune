@@ -1,4 +1,5 @@
 (rule
+ (deps Css.ml CssJs.ml)
  (action
   (progn
    (with-stdout-to
