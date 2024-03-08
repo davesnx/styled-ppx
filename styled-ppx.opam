@@ -12,6 +12,7 @@ bug-reports: "https://github.com/davesnx/styled-ppx/issues"
 depends: [
   "dune" {>= "3.8"}
   "ocaml" {>= "5.1.0"}
+  "reason" {>= "3.11.0"}
   "menhir" {>= "20220210"}
   "ppx_deriving" {>= "5.0"}
   "ppx_deriving_yojson" {>= "3.7.0"}
@@ -20,7 +21,6 @@ depends: [
   "melange" {>= "3.0.0"}
   "server-reason-react"
   "reason-react" {>= "0.14.0"}
-  "reason" {with-dev-setup}
   "alcotest" {with-test}
   "ocaml-lsp-server" {with-dev-setup}
   "ocamlformat" {with-dev-setup}
