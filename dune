@@ -1,3 +1,8 @@
+(env
+ (dev
+  (flags
+   (:standard -w -32 -w -27 -w -26))))
+
 (dirs packages e2e)
 
 (subdir
