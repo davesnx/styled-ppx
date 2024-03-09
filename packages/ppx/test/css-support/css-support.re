@@ -1464,6 +1464,17 @@
 [%css {|order: 0|}];
 [%css {|order: 1|}];
 
+[%css {|grid-template-columns: 200px repeat(auto-fill, 100px) 300px; |}];
+[%css
+  {|grid-template-columns: minmax(100px, max-content) repeat(auto-fill, 200px) 20%; |}
+];
+[%css
+  {|grid-template-columns: [linename1] 100px [linename2] repeat(auto-fit, [linename3 linename4] 300px) 100px; |}
+];
+[%css
+  {|grid-template-columns: [linename1 linename2] 100px repeat(auto-fit, [linename1] 300px) [linename3]; |}
+];
+
 /* CSS Grid Layout Module Level 1 */
 [%css {|display: grid|}];
 [%css {|display: inline-grid|}];

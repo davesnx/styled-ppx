@@ -1,4 +1,7 @@
+type s = string;
 open Ppxlib;
+type string = s;
+
 open Reason_css_parser;
 
 module Option = {
@@ -3325,11 +3328,215 @@ let align_content =
     },
   );
 
+let render_line_names = (~loc, value: Types.line_names) => {
+  let ((), line_names, ()) = value;
+  line_names
+  |> List.map(v => Printf.sprintf("[%s]", v))
+  |> List.map(name => [%expr `name([%e render_string(~loc, name)])]);
+};
+
+let render_maybe_line_names = (~loc, value) => {
+  switch (value) {
+  | None => []
+  | Some(names) => render_line_names(~loc, names)
+  };
+};
+
+let render_inflexible_breadth = (~loc, value) => {
+  switch (value) {
+  | `Auto => [%expr `auto]
+  | `Min_content => [%expr `minContent]
+  | `Max_content => [%expr `maxContent]
+  | `Extended_length(l) => render_extended_length(~loc, l)
+  | `Extended_percentage(p) => render_extended_percentage(~loc, p)
+  /* TODO: Maybe fit-content is also valid? */
+  };
+};
+
+let render_track_breadth = (~loc, value) => {
+  switch (value) {
+  | `Flex_value(f) => raise(Unsupported_feature)
+  | `Auto => [%expr `auto]
+  | `Min_content => [%expr `minContent]
+  | `Max_content => [%expr `maxContent]
+  | `Extended_length(l) => render_extended_length(~loc, l)
+  | `Extended_percentage(p) => render_extended_percentage(~loc, p)
+  /* TODO: Maybe fit-content is also valid? */
+  };
+};
+
+let rec render_track_repeat = (~loc, repeat: Types.track_repeat) => {
+  let (positiveInteger, (), trackSizes, lineNames) = repeat;
+  let lineNamesExpr = render_maybe_line_names(~loc, lineNames);
+  let trackSizesExpr =
+    trackSizes
+    |> List.concat_map(((lineNames, trackSize)) => {
+         let lineName = render_maybe_line_names(~loc, lineNames);
+         List.append(lineName, [render_track_size(~loc, trackSize)]);
+       });
+  let items =
+    List.append(trackSizesExpr, lineNamesExpr) |> Builder.pexp_array(~loc);
+  [%expr
+   `repeat((`num([%e render_integer(~loc, positiveInteger)]), [%e items]))];
+}
+and render_track_size = (~loc, value: Types.track_size) => {
+  switch (value) {
+  | `Track_breadth(breadth) => render_track_breadth(~loc, breadth)
+  | `Minmax(inflexible, (), breadth) =>
+    [%expr
+     `minmax((
+       [%e render_inflexible_breadth(~loc, inflexible)],
+       [%e render_track_breadth(~loc, breadth)],
+     ))]
+  /* `fitContent can't be the same variant as `fitContent with payload */
+  | `Fit_content_0 => [%expr `fitContent]
+  | `Fit_content_1(`Extended_length(el)) =>
+    [%expr `fitContent([%e render_extended_length(~loc, el)])]
+  | `Fit_content_1(`Extended_percentage(ep)) =>
+    [%expr `fitContent([%e render_extended_percentage(~loc, ep)])]
+  };
+};
+
+let render_track_list = (~loc, track_list, line_names) => {
+  let tracks =
+    track_list
+    |> List.concat_map(((line_name, track)) => {
+         let value =
+           switch (track) {
+           | `Track_repeat(repeat) => render_track_repeat(~loc, repeat)
+           | `Track_size(size) => render_track_size(~loc, size)
+           };
+         let lineNameExpr = render_maybe_line_names(~loc, line_name);
+         List.append(lineNameExpr, [value]);
+       });
+  [%expr [%e Builder.pexp_array(~loc, tracks)]];
+};
+
+let render_fixed_size = (~loc, value: Types.fixed_size) => {
+  switch (value) {
+  | `Fixed_breadth(breadth) => render_track_breadth(~loc, breadth)
+  | `Minmax_0(fixed, (), breadth) =>
+    [%expr
+     `minmax((
+       [%e render_inflexible_breadth(~loc, fixed)],
+       [%e render_track_breadth(~loc, breadth)],
+     ))]
+  | `Minmax_1(inflexible, (), breadth) =>
+    [%expr
+     `minmax((
+       [%e render_inflexible_breadth(~loc, inflexible)],
+       [%e render_track_breadth(~loc, breadth)],
+     ))]
+  };
+};
+
+let render_fixed_repeat = (~loc, value: Types.fixed_repeat) => {
+  let (positiveInteger, (), fixedSizes, lineNames) = value;
+  let number = render_integer(~loc, positiveInteger);
+  let lineNamesExpr =
+    render_maybe_line_names(~loc, lineNames) |> Builder.pexp_array(~loc);
+  let fixedSizesExpr =
+    fixedSizes
+    |> List.concat_map(((lineName, value)) => {
+         let fixed = render_fixed_size(~loc, value);
+         let lineName = render_maybe_line_names(~loc, lineName);
+         List.append(lineName, [fixed]);
+       })
+    |> Builder.pexp_array(~loc);
+  [%expr `repeat(([%e number], [%e fixedSizesExpr], [%e lineNamesExpr]))];
+};
+
+let render_auto_repeat = (~loc, value: Types.auto_repeat) => {
+  let (autos, (), fixedSized, lineNames) = value;
+  let lineNamesExpr = render_maybe_line_names(~loc, lineNames);
+  let autosExpr =
+    switch (autos) {
+    | `Auto_fill => [%expr `autoFill]
+    | `Auto_fit => [%expr `autoFit]
+    };
+  let fixedExpr =
+    fixedSized
+    |> List.concat_map(((lineName, value)) => {
+         let fixed = render_fixed_size(~loc, value);
+         let lineName = render_maybe_line_names(~loc, lineName);
+         List.append(lineName, [fixed]);
+       });
+  let items =
+    List.append(lineNamesExpr, fixedExpr) |> Builder.pexp_array(~loc);
+  [%expr `repeat(([%e autosExpr], [%e items]))];
+};
+
+let render_repeat_fixed = (~loc, value) => {
+  value
+  |> List.concat_map(((lineName, value)) => {
+       let valueExpr =
+         switch (value) {
+         | `Fixed_size(size) => render_fixed_size(~loc, size)
+         | `Fixed_repeat(repeat) => render_fixed_repeat(~loc, repeat)
+         };
+       let lineNamesExpr = render_maybe_line_names(~loc, lineName);
+       List.append(lineNamesExpr, [valueExpr]);
+     });
+};
+
+let render_auto_track_list = (~loc, value: Types.auto_track_list) => {
+  let (fixed, lineNames, autoRepeat, fixed2, lineNames2) = value;
+  let fixed1Expr = render_repeat_fixed(~loc, fixed);
+  let lineNamesExpr = render_maybe_line_names(~loc, lineNames);
+  let fixed1 = List.append(fixed1Expr, lineNamesExpr);
+  let fixed2Expr = render_repeat_fixed(~loc, fixed2);
+  let lineNamesExpr2 = render_maybe_line_names(~loc, lineNames2);
+  let fixed2 = List.append(fixed2Expr, lineNamesExpr2);
+  let autoRepeatExpr = render_auto_repeat(~loc, autoRepeat);
+  List.append(fixed1, [autoRepeatExpr, ...fixed2])
+  |> Builder.pexp_array(~loc);
+};
+
+let render_name_repeat = (~loc, value: Types.name_repeat) => {
+  let (repeatValue, (), listOfLineNames) = value;
+  /* TODO: When this case happen? list of linenames? */
+  let lineNamesExpr =
+    listOfLineNames
+    |> List.concat_map(render_line_names(~loc))
+    |> Builder.pexp_array(~loc);
+  switch (repeatValue) {
+  | `Auto_fill => [%expr `repeat((`autoFill, [%e lineNamesExpr]))]
+  | `Positive_integer(i) =>
+    [%expr `repeat((`num([%e render_integer(~loc, i)]), [%e lineNamesExpr]))]
+  };
+};
+
+let render_subgrid = (~loc, line_name_list: Types.line_name_list) => {
+  line_name_list
+  |> List.concat_map(value => {
+       switch (value) {
+       | `Line_names(line_names) => render_line_names(~loc, line_names)
+       | `Name_repeat(name_repeat) =>
+         /* render_name_repeat(~loc, name_repeat) */ raise(
+           Unsupported_feature,
+         )
+       }
+     })
+  |> Builder.pexp_array(~loc);
+};
+
 // css-grid-1
 let grid_template_columns =
-  unsupportedValue(Parser.property_grid_template_columns, (~loc) =>
-    [%expr CssJs.gridTemplateColumns]
+  monomorphic(
+    Parser.property_grid_template_columns,
+    (~loc) => [%expr CssJs.gridTemplateColumns],
+    (~loc, value: Types.property_grid_template_columns) =>
+      switch (value) {
+      | `None => [%expr [|`none|]]
+      | `Track_list(track_list, line_names) =>
+        render_track_list(~loc, track_list, line_names)
+      | `Auto_track_list(list) => render_auto_track_list(~loc, list)
+      /* | `Static((), None) => [%expr `subgrid] */
+      /* | `Static((), Some(subgrid)) => render_subgrid(~loc, subgrid) */
+      | _ => raise(Unsupported_feature)
+      },
   );
+
 let grid_template_rows =
   unsupportedValue(Parser.property_grid_template_rows, (~loc) =>
     [%expr CssJs.gridTemplateRows]

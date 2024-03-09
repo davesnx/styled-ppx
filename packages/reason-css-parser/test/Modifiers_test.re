@@ -24,6 +24,35 @@ let tests = [
       check(__POS__, option(Alcotest.int), "", parse(""), None);
     },
   ),
+  /* test_case(
+       "'[' <integer> ']'",
+       `Quick,
+       () => {
+         let parse = parse_exn([%value "'[' <integer>? ']'"]);
+         check(
+           __POS__,
+           Alcotest.triple(unit, option(int), unit),
+           "",
+           parse("[ 13 ]"),
+           ((), Some(13), ()),
+         );
+         check(
+           __POS__,
+           Alcotest.triple(unit, option(int), unit),
+           "",
+           parse("["),
+           ((), None, ()),
+         );
+       },
+     ), */
+  test_case(
+    "'['",
+    `Quick,
+    () => {
+      let parse = parse_exn([%value "'['"]);
+      check(__POS__, unit, "", parse("["), ());
+    },
+  ),
   test_case(
     "[<integer> A]?",
     `Quick,
@@ -260,7 +289,7 @@ let tests = [
     },
   ),
   test_case(
-    "<integer>#{2} , <integer>",
+    "<integer>#{2}, <integer>",
     `Quick,
     () => {
       let parse = parse([%value "<integer>#{2} ',' <integer>"]);

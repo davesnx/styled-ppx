@@ -122,11 +122,27 @@ module Pattern = {
     token(
       fun
       | token when token == expected => Ok()
-      | token => {
-          let expected = humanize(expected);
-          let got = humanize(token);
-          Error(["Expected '" ++ expected ++ "' but instead got " ++ got]);
+      | token =>
+        if (token == DELIM("[")
+            && expected == LEFT_BRACKET
+            || token == LEFT_BRACKET
+            && expected == DELIM("[")) {
+          Ok();
+        } else if (token == DELIM("]") && expected == RIGHT_BRACE) {
+          Ok();
+        } else {
+          Error([
+            "Expected '"
+            ++ humanize(expected)
+            ++ "' but instead got "
+            ++ humanize(token),
+          ]);
         },
+      /* | token => {
+           let expected = humanize(expected);
+           let got = humanize(token);
+           Error(["Expected '" ++ expected ++ "' but instead got " ++ got]);
+         }, */
     );
   let value = (value, rule) => Match.bind(rule, () => Match.return(value));
 };
