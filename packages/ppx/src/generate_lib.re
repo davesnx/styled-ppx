@@ -136,32 +136,15 @@ let applyIgnore = (~loc, expr) => {
   );
 };
 
-/* createVariadicElement("div", newProps) */
-let variadicElement = (~loc, ~htmlTag) => {
+/* createVariadicElement(finalHtmlTag, newProps) */
+let variadicElement = (~loc) => {
   Helper.Exp.apply(
     ~loc,
     Helper.Exp.ident(~loc, withLoc(Lident("createVariadicElement"), ~loc)),
     [
       (
         Nolabel,
-        Helper.Exp.constant(
-          ~loc,
-          ~attrs=
-            Platform_attributes.rawLiteral(
-              ~loc,
-              Helper.Str.mk(
-                ~loc,
-                Pstr_eval(
-                  Helper.Exp.constant(
-                    ~loc,
-                    Pconst_string(htmlTag, loc, None),
-                  ),
-                  [],
-                ),
-              ),
-            ),
-          Pconst_string(htmlTag, loc, None),
-        ),
+        Helper.Exp.ident(~loc, withLoc(Lident("finalHtmlTag"), ~loc)),
       ),
       (Nolabel, Helper.Exp.ident(~loc, withLoc(Lident("newProps"), ~loc))),
     ],
@@ -229,6 +212,24 @@ let className = (~loc, expr) => {
   );
 };
 
+/*
+  let finalHtmlTag =
+    switch (props.as_) {
+    | Some(as_) => as_
+    | None => "div"
+    };
+ */
+let finalHtmlTag = (~loc, ~htmlTag) => {
+  Helper.Vb.mk(
+    ~loc,
+    Helper.Pat.mk(~loc, Ppat_var(withLoc("finalHtmlTag", ~loc))),
+    switch%expr ([%e propItem(~loc, "as_")]) {
+    | Some(as_) => as_
+    | None => [%e Builder.estring(~loc, htmlTag)]
+    },
+  );
+};
+
 /* deleteInnerRef(newProps, "innerRef") |> ignore; */
 /* TODO: Replace with Js.Dict.unsafeDeleteKey */
 let deleteProp = (~loc, key) => {
@@ -256,14 +257,24 @@ let generateSequence = (~loc, fns) => {
 };
 
 /*
-  let stylesObject = {"className": styles};
+  let className = styles ++ props.className;
+  let finalHtmlTag =
+    switch (props.as_) {
+    | Some(as_) => as_
+    | None => "div"
+    };
+  let stylesObject = { "className": className, "ref": props.ref };
   let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
-  createVariadicElement("div", newProps);
+  createVariadicElement(finalHtmlTag, newProps);
  */
 let makeBody = (~loc, ~htmlTag, ~className as classNameValue, ~variables) => {
   let attrs = Platform_attributes.preserveBraces(~loc);
   let sequence =
-    [deleteProp(~loc, "innerRef"), variadicElement(~loc, ~htmlTag)]
+    [
+      deleteProp(~loc, "as"),
+      deleteProp(~loc, "innerRef"),
+      variadicElement(~loc),
+    ]
     |> List.append(List.map(deleteProp(~loc), variables));
 
   Helper.Exp.let_(
@@ -272,14 +283,19 @@ let makeBody = (~loc, ~htmlTag, ~className as classNameValue, ~variables) => {
     [className(~loc, classNameValue)],
     Helper.Exp.let_(
       ~loc,
-      ~attrs,
       Nonrecursive,
-      [stylesAndRefObject(~loc)],
+      [finalHtmlTag(~loc, ~htmlTag)],
       Helper.Exp.let_(
         ~loc,
+        ~attrs,
         Nonrecursive,
-        [newProps(~loc)],
-        generateSequence(~loc, sequence),
+        [stylesAndRefObject(~loc)],
+        Helper.Exp.let_(
+          ~loc,
+          Nonrecursive,
+          [newProps(~loc)],
+          generateSequence(~loc, sequence),
+        ),
       ),
     ),
   );
