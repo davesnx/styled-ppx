@@ -116,6 +116,8 @@
       ariaValuenow: option(float),
       [@mel.optional] [@mel.as "aria-valuetext"]
       ariaValuetext: option(string),
+      [@mel.optional] [@mel.as "as"]
+      as_: option(string),
       [@mel.optional]
       ascent: option(string),
       [@mel.optional]
@@ -973,10 +975,16 @@
     let make = (props: makeProps('var)) => {
       let className =
         styles(~var=varGet(props), ()) ++ getOrEmpty(classNameGet(props));
+      let finalHtmlTag =
+        switch (as_Get(props)) {
+        | Some(as_) => as_
+        | None => "div"
+        };
       let stylesObject = {"className": className, "ref": innerRefGet(props)};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(. newProps, "var"));
+      ignore(deleteProp(. newProps, "as"));
       ignore(deleteProp(. newProps, "innerRef"));
-      createVariadicElement("div", newProps);
+      createVariadicElement(finalHtmlTag, newProps);
     };
   };

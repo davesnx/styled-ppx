@@ -66,6 +66,7 @@
         ariaValuemin: float [@ns.optional ][@bs.as "aria-valuemin"];
         ariaValuenow: float [@ns.optional ][@bs.as "aria-valuenow"];
         ariaValuetext: string [@ns.optional ][@bs.as "aria-valuetext"];
+        as_: string [@ns.optional ][@bs.as "as"];
         ascent: string [@ns.optional ];
         async: bool [@ns.optional ];
         attributeName: string [@ns.optional ];
@@ -510,10 +511,15 @@
               [|(CssJs.display `none)|])|]
       let make (props : props) =
         let className = styles ^ (getOrEmpty props.className) in
+        let finalHtmlTag =
+          match props.as_ with
+          | ((Some (as_))[@explicit_arity ]) -> as_
+          | None -> "div" in
         let stylesObject = [%bs.obj { className; ref = (props.innerRef) }] in
         let newProps = assign2 (Js.Obj.empty ()) (Obj.magic props) stylesObject in
+        ignore ((deleteProp newProps "as")[@bs ]);
         ignore ((deleteProp newProps "innerRef")[@bs ]);
-        createVariadicElement "div" newProps
+        createVariadicElement finalHtmlTag newProps
     end
 
 No clue why bsc generates a invalid syntax, but it does. This removes this particual bit.
@@ -521,7 +527,7 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
 
   $ npx rescript convert fixed.ml
   Error when converting fixed.ml
-  File "", line 504, characters 32-37:
+  File "", line 505, characters 32-37:
   Error: Invalid literal 700px
   
 

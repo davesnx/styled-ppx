@@ -62,6 +62,7 @@
         ariaValuemin: float [@bs.optional ][@bs.as "aria-valuemin"];
         ariaValuenow: float [@bs.optional ][@bs.as "aria-valuenow"];
         ariaValuetext: string [@bs.optional ][@bs.as "aria-valuetext"];
+        as_: string [@bs.optional ][@bs.as "as"];
         ascent: string [@bs.optional ];
         async: bool [@bs.optional ];
         attributeName: string [@bs.optional ];
@@ -499,9 +500,14 @@
       let make (props : 'var makeProps) =
         let className =
           (styles ~var:(varGet props) ()) ^ (getOrEmpty (classNameGet props)) in
+        let finalHtmlTag =
+          match as_Get props with
+          | ((Some (as_))[@explicit_arity ]) -> as_
+          | None -> "div" in
         let stylesObject = [%bs.obj { className; ref = (innerRefGet props) }] in
         let newProps = assign2 (Js.Obj.empty ()) (Obj.magic props) stylesObject in
         ignore ((deleteProp newProps "var")[@bs ]);
+        ignore ((deleteProp newProps "as")[@bs ]);
         ignore ((deleteProp newProps "innerRef")[@bs ]);
-        createVariadicElement "div" newProps
+        createVariadicElement finalHtmlTag newProps
     end

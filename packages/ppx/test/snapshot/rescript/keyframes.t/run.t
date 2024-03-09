@@ -70,6 +70,7 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
         ariaValuemin: float [@ns.optional ][@bs.as "aria-valuemin"];
         ariaValuenow: float [@ns.optional ][@bs.as "aria-valuenow"];
         ariaValuetext: string [@ns.optional ][@bs.as "aria-valuetext"];
+        as_: string [@ns.optional ][@bs.as "as"];
         ascent: string [@ns.optional ];
         async: bool [@ns.optional ];
         attributeName: string [@ns.optional ];
@@ -502,10 +503,15 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
           [|(CssJs.label "FadeIn");(CssJs.animationName animation : CssJs.rule)|]
       let make (props : props) =
         let className = styles ^ (getOrEmpty props.className) in
+        let finalHtmlTag =
+          match props.as_ with
+          | ((Some (as_))[@explicit_arity ]) -> as_
+          | None -> "section" in
         let stylesObject = [%bs.obj { className; ref = (props.innerRef) }] in
         let newProps = assign2 (Js.Obj.empty ()) (Obj.magic props) stylesObject in
+        ignore ((deleteProp newProps "as")[@bs ]);
         ignore ((deleteProp newProps "innerRef")[@bs ]);
-        createVariadicElement "section" newProps
+        createVariadicElement finalHtmlTag newProps
     end
 
   $ npx rescript convert fixed.ml
