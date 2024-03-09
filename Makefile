@@ -9,7 +9,7 @@ help: ## Print this help message
 	@echo "";
 	@echo "List of available make commands";
 	@echo "";
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2}';
+	@grep -E '^[a-zA-Z0-9_.-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2}';
 	@echo $(TEST_TARGETS) | tr -s " " "\012" | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36mtest_%-20s\033[0m Run %s test \33[1;97m(or \"test_%s_watch\" to watch them)\033[0m\n", $$1, $$1, $$1}';
 	@echo "";
 
