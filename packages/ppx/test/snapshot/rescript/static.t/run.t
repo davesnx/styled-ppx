@@ -496,13 +496,13 @@
       let styles = CssJs.style [|(CssJs.label "Input");(CssJs.display `flex)|]
       let make (props : makeProps) =
         let className = styles ^ (getOrEmpty (classNameGet props)) in
-        let finalHtmlTag =
-          match as_Get props with
-          | ((Some (as_))[@explicit_arity ]) -> as_
-          | None -> "input" in
         let stylesObject = [%bs.obj { className; ref = (innerRefGet props) }] in
         let newProps = assign2 (Js.Obj.empty ()) (Obj.magic props) stylesObject in
-        ignore ((deleteProp newProps "as")[@bs ]);
         ignore ((deleteProp newProps "innerRef")[@bs ]);
-        createVariadicElement finalHtmlTag newProps
+        (let asTag = as_Get props in
+         ignore ((deleteProp newProps "as")[@bs ]);
+         createVariadicElement
+           (match asTag with
+            | ((Some (as_))[@explicit_arity ]) -> as_
+            | None -> "input") newProps)
     end

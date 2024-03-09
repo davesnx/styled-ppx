@@ -501,16 +501,16 @@
       let make (props : 'var props) =
         let className =
           (styles ?var:(props.var) ()) ^ (getOrEmpty props.className) in
-        let finalHtmlTag =
-          match props.as_ with
-          | ((Some (as_))[@explicit_arity ]) -> as_
-          | None -> "div" in
         let stylesObject = [%bs.obj { className; ref = (props.innerRef) }] in
         let newProps = assign2 (Js.Obj.empty ()) (Obj.magic props) stylesObject in
         ignore ((deleteProp newProps "var")[@bs ]);
-        ignore ((deleteProp newProps "as")[@bs ]);
         ignore ((deleteProp newProps "innerRef")[@bs ]);
-        createVariadicElement finalHtmlTag newProps
+        (let asTag = props.as_ in
+         ignore ((deleteProp newProps "as")[@bs ]);
+         createVariadicElement
+           (match asTag with
+            | ((Some (as_))[@explicit_arity ]) -> as_
+            | None -> "div") newProps)
     end
 
 No clue why bsc generates a invalid syntax, but it does. This removes this particual bit.

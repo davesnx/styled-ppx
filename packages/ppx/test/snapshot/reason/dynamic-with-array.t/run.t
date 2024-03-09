@@ -974,17 +974,19 @@
       let className =
         styles(~color=colorGet(props), ~size=sizeGet(props), ())
         ++ getOrEmpty(classNameGet(props));
-      let finalHtmlTag =
-        switch (as_Get(props)) {
-        | Some(as_) => as_
-        | None => "button"
-        };
       let stylesObject = {"className": className, "ref": innerRefGet(props)};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(. newProps, "color"));
       ignore(deleteProp(. newProps, "size"));
-      ignore(deleteProp(. newProps, "as"));
       ignore(deleteProp(. newProps, "innerRef"));
-      createVariadicElement(finalHtmlTag, newProps);
+      let asTag = as_Get(props);
+      ignore(deleteProp(. newProps, "as"));
+      createVariadicElement(
+        switch (asTag) {
+        | Some(as_) => as_
+        | None => "button"
+        },
+        newProps,
+      );
     };
   };

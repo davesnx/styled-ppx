@@ -499,15 +499,18 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
       ])
     let make = (props: props<'var>) => {
       let className = styles(~var=props.var, ()) ++ getOrEmpty(props.className)
-      let finalHtmlTag = switch props.as_ {
-      | Some(as_) => as_
-      | None => "div"
-      }
       let stylesObject = {"className": className, "ref": props.innerRef}
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject)
       ignore(deleteProp(. newProps, "var"))
-      ignore(deleteProp(. newProps, "as"))
       ignore(deleteProp(. newProps, "innerRef"))
-      createVariadicElement(finalHtmlTag, newProps)
+      let asTag = props.as_
+      ignore(deleteProp(. newProps, "as"))
+      createVariadicElement(
+        switch asTag {
+        | Some(as_) => as_
+        | None => "div"
+        },
+        newProps,
+      )
     }
   }
