@@ -2,7 +2,7 @@
 
 exports[`styled > Component renders 1`] = `
 <div>
-  <div
+  <section
     class="css-3gqp70-Component"
   />
 </div>
