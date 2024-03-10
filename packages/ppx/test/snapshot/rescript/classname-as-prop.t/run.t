@@ -10,6 +10,7 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
         {
         innerRef: ReactDOM.domRef [@ns.optional ];
         children: React.element [@ns.optional ];
+        as: string [@ns.optional ];
         about: string [@ns.optional ];
         accentHeight: string [@ns.optional ];
         accept: string [@ns.optional ];
@@ -67,7 +68,6 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
         ariaValuemin: float [@ns.optional ][@bs.as "aria-valuemin"];
         ariaValuenow: float [@ns.optional ][@bs.as "aria-valuenow"];
         ariaValuetext: string [@ns.optional ][@bs.as "aria-valuetext"];
-        as_: string [@ns.optional ][@bs.as "as"];
         ascent: string [@ns.optional ];
         async: bool [@ns.optional ];
         attributeName: string [@ns.optional ];
@@ -506,7 +506,7 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
         let stylesObject = [%bs.obj { className; ref = (props.innerRef) }] in
         let newProps = assign2 (Js.Obj.empty ()) (Obj.magic props) stylesObject in
         ignore ((deleteProp newProps "innerRef")[@bs ]);
-        (let asTag = props.as_ in
+        (let asTag = props.as in
          ignore ((deleteProp newProps "as")[@bs ]);
          createVariadicElement
            (match asTag with
@@ -515,3 +515,7 @@ No clue why bsc generates a invalid syntax, but it does. This removes this parti
     end
 
   $ npx rescript convert fixed.ml
+  Error when converting fixed.ml
+  File "", line 7, characters 7-9:
+  Error: Syntax error
+  

@@ -8,6 +8,8 @@
       innerRef: option(ReactDOM.domRef),
       [@mel.optional]
       children: option(React.element),
+      [@mel.optional] [@mel.as "as"]
+      as_: option(string),
       [@mel.optional]
       about: option(string),
       [@mel.optional]
@@ -116,8 +118,6 @@
       ariaValuenow: option(float),
       [@mel.optional] [@mel.as "aria-valuetext"]
       ariaValuetext: option(string),
-      [@mel.optional] [@mel.as "as"]
-      as_: option(string),
       [@mel.optional]
       ascent: option(string),
       [@mel.optional]
@@ -990,6 +990,8 @@
       innerRef: option(ReactDOM.domRef),
       [@mel.optional]
       children: option(React.element),
+      [@mel.optional] [@mel.as "as"]
+      as_: option(string),
       [@mel.optional]
       about: option(string),
       [@mel.optional]
@@ -1098,8 +1100,6 @@
       ariaValuenow: option(float),
       [@mel.optional] [@mel.as "aria-valuetext"]
       ariaValuetext: option(string),
-      [@mel.optional] [@mel.as "as"]
-      as_: option(string),
       [@mel.optional]
       ascent: option(string),
       [@mel.optional]

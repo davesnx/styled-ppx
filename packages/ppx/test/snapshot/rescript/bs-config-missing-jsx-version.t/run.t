@@ -5,6 +5,7 @@
         {
         innerRef: ReactDOM.domRef [@bs.optional ];
         children: React.element [@bs.optional ];
+        as: string [@bs.optional ];
         about: string [@bs.optional ];
         accentHeight: string [@bs.optional ];
         accept: string [@bs.optional ];
@@ -62,7 +63,6 @@
         ariaValuemin: float [@bs.optional ][@bs.as "aria-valuemin"];
         ariaValuenow: float [@bs.optional ][@bs.as "aria-valuenow"];
         ariaValuetext: string [@bs.optional ][@bs.as "aria-valuetext"];
-        as_: string [@bs.optional ][@bs.as "as"];
         ascent: string [@bs.optional ];
         async: bool [@bs.optional ];
         attributeName: string [@bs.optional ];
@@ -504,7 +504,7 @@
         let newProps = assign2 (Js.Obj.empty ()) (Obj.magic props) stylesObject in
         ignore ((deleteProp newProps "var")[@bs ]);
         ignore ((deleteProp newProps "innerRef")[@bs ]);
-        (let asTag = as_Get props in
+        (let asTag = asGet props in
          ignore ((deleteProp newProps "as")[@bs ]);
          createVariadicElement
            (match asTag with
