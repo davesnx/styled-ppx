@@ -188,17 +188,30 @@ let deleteProp = (~loc, key) => {
   |> applyIgnore(~loc);
 };
 
+let asAttribute = () =>
+  switch (File.get()) {
+  | Some(ReScript) =>
+    MakeProps.Attribute({name: "as", type_: String, alias: None})
+  | _ => MakeProps.Attribute({name: "as_", type_: String, alias: Some("as")})
+  };
+
 /*
  let asTag = props.as_;
  deleteProp(newProps, "as") |> ignore;
  createVariadicElement(finalHtmlTag, newProps)
  */
 let variadicElement = (~loc, ~htmlTag) => {
+  let asAttributeName =
+    switch (asAttribute()) {
+    | MakeProps.Attribute({name, _}) => name
+    | _ => failwith("unreachable")
+    };
+
   let asTag = {
     Helper.Vb.mk(
       ~loc,
       Helper.Pat.mk(~loc, Ppat_var(withLoc("asTag", ~loc))),
-      propItem(~loc, "as_"),
+      propItem(~loc, asAttributeName),
     );
   };
 
@@ -464,30 +477,36 @@ let recordEventLabel = (~loc, ~isOptional, name, kind) => {
   Helper.Type.field(~loc, ~attrs, withLoc(name, ~loc), type_);
 };
 
+let domPropLabel = (~loc, ~isOptional, domProp) => {
+  switch (domProp) {
+  | MakeProps.Event({name, type_}) =>
+    recordEventLabel(
+      ~loc,
+      ~isOptional,
+      name,
+      MakeProps.eventTypeToIdent(type_),
+    )
+  | MakeProps.Attribute({name, type_, alias}) =>
+    recordLabel(
+      ~loc,
+      ~isOptional,
+      name,
+      MakeProps.attributeTypeToIdent(type_),
+      alias,
+    )
+  };
+};
+
+let asLabel = (~loc, ~isOptional) => {
+  domPropLabel(~loc, ~isOptional, asAttribute());
+};
+
 let makePropsWithParams = (~loc, params, dynamicProps) => {
   let dynamicPropNames = dynamicProps |> List.map(d => d.pld_name.txt);
 
   let makeProps =
     MakeProps.get(dynamicPropNames)
-    |> List.map(domProp =>
-         switch (domProp) {
-         | MakeProps.Event({name, type_}) =>
-           recordEventLabel(
-             ~loc,
-             ~isOptional=false,
-             name,
-             MakeProps.eventTypeToIdent(type_),
-           )
-         | MakeProps.Attribute({name, type_, alias}) =>
-           recordLabel(
-             ~loc,
-             ~isOptional=false,
-             name,
-             MakeProps.attributeTypeToIdent(type_),
-             alias,
-           )
-         }
-       );
+    |> List.map(domPropLabel(~loc, ~isOptional=false));
 
   /* List of `prop: type` */
   let reactProps =
@@ -495,6 +514,7 @@ let makePropsWithParams = (~loc, params, dynamicProps) => {
       [
         domRefLabel(~loc, ~isOptional=false),
         childrenLabel(~loc, ~isOptional=false),
+        asLabel(~loc, ~isOptional=false),
         ...makeProps,
       ],
       dynamicProps,
@@ -547,25 +567,7 @@ let makeMakeProps = (~loc, ~areAllFieldsOptional, customProps) => {
 
   let makeProps =
     MakeProps.get(dynamicPropNames)
-    |> List.map(domProp =>
-         switch (domProp) {
-         | MakeProps.Event({name, type_}) =>
-           recordEventLabel(
-             ~loc,
-             ~isOptional=areAllFieldsOptional,
-             name,
-             MakeProps.eventTypeToIdent(type_),
-           )
-         | MakeProps.Attribute({name, type_, alias}) =>
-           recordLabel(
-             ~loc,
-             ~isOptional=areAllFieldsOptional,
-             name,
-             MakeProps.attributeTypeToIdent(type_),
-             alias,
-           )
-         }
-       );
+    |> List.map(domPropLabel(~loc, ~isOptional=areAllFieldsOptional));
 
   /* List of `prop: type` */
   let reactProps =
@@ -573,6 +575,7 @@ let makeMakeProps = (~loc, ~areAllFieldsOptional, customProps) => {
       [
         domRefLabel(~loc, ~isOptional=areAllFieldsOptional),
         childrenLabel(~loc, ~isOptional=areAllFieldsOptional),
+        asLabel(~loc, ~isOptional=areAllFieldsOptional),
         ...makeProps,
       ],
       dynamicProps,

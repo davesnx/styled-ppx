@@ -203,7 +203,6 @@ let data = [
     type_: String,
     alias: Some("aria-valuetext"),
   }),
-  Attribute({name: "as_", type_: String, alias: Some("as")}),
   Attribute({name: "ascent", type_: String, alias: None}),
   Attribute({name: "async", type_: Bool, alias: None}),
   Attribute({name: "attributeName", type_: String, alias: None}),
