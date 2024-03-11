@@ -374,7 +374,7 @@ and render_selectors = selectors => {
   |> List.map(((selector, _loc)) => render_selector(selector))
   |> String.concat(", ");
 }
-and render_style_rule_parts = (rule: style_rule) => {
+and style_rule = (rule: style_rule) => {
   let (prelude, _loc) = rule.prelude;
   let (_block, loc) = rule.block;
   let selector_expr =
@@ -390,7 +390,7 @@ and render_style_rule_parts = (rule: style_rule) => {
   (rule.loc, selector_name, selector_expr);
 }
 and render_style_rule = (ident, rule: style_rule) => {
-  let (loc, selector_name, selector_expr) = render_style_rule_parts(rule);
+  let (loc, selector_name, selector_expr) = style_rule(rule);
 
   Helper.Exp.apply(
     ~loc,
@@ -402,7 +402,7 @@ and render_style_rule = (ident, rule: style_rule) => {
 and render_style_rules = (~loc, ident, rules: list(style_rule)) => {
   let style_rules =
     rules
-    |> List.map(render_style_rule_parts)
+    |> List.map(style_rule)
     |> List.map(((loc, selector_name, selector_expr)) =>
          Builder.pexp_tuple(~loc, [selector_name, selector_expr])
        )
