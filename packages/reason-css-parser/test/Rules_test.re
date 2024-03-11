@@ -4,7 +4,7 @@ open Tokens;
 open Rule;
 open! Data;
 
-let data_monad_tests = [
+let data_monad_tests: list(Alcotest.test_case(unit)) = [
   // TODO: check static order
   test_case("return with an int", `Quick, _ => {
     switch (return(Ok(1), [COMMA])) {
@@ -254,7 +254,7 @@ let data_monad_tests = [
 
 open! Match;
 
-let match_monad_tests = [
+let match_monad_tests: list(Alcotest.test_case(unit)) = [
   // TODO: check static order
   test_case("return", `Quick, _ => {
     switch (return(1, [COMMA])) {
@@ -400,7 +400,7 @@ let match_monad_tests = [
 open! Let;
 open! Pattern;
 
-let pattern_helpers_test = [
+let pattern_helpers_test: list(Alcotest.test_case(unit)) = [
   test_case("identity", `Quick, _ => {
     switch (identity([STRING("tomato")])) {
     | (Ok (), [STRING("tomato")]) => ()
@@ -483,7 +483,7 @@ let pattern_helpers_test = [
 
 open Let;
 
-let rule_tests = [
+let rule_tests: list(Alcotest.test_case(unit)) = [
   test_case(
     "Rule using Pattern.expect",
     `Quick,

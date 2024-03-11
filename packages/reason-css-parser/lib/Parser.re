@@ -458,9 +458,6 @@ and keyframes_name = [%value.rec "<custom-ident> | <string>"]
 and leader_type = [%value.rec "'dotted' | 'solid' | 'space' | <string>"]
 and left = [%value.rec "<extended-length> | 'auto'"]
 and line_name_list = [%value.rec "[ <line-names> | <name-repeat> ]+"]
-/*
-  line_names is defined under Standard, since '[' ']' are treated as LEFT_BRACKET and RIGHT_BRACKET and there's a bug on the lexer? so we define it there with the LEFT/RIGHT_BRACKET token
-  and line_names = [%value.rec "[ '[' <custom-ident> ']' ]*"] */
 and line_style = [%value.rec
   "'none' | 'hidden' | 'dotted' | 'dashed' | 'solid' | 'double' | 'groove' | 'ridge' | 'inset' | 'outset'"
 ]
