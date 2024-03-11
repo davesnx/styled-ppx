@@ -1298,22 +1298,40 @@ CssJs.unsafe({js|gridGap|js}, {js|0 0|js});
 CssJs.unsafe({js|gridGap|js}, {js|0 1em|js});
 CssJs.gridGap(`em(1.));
 CssJs.unsafe({js|gridGap|js}, {js|1em 1em|js});
-CssJs.unsafe({js|gridTemplateColumns|js}, {js|subgrid|js});
-CssJs.unsafe({js|gridTemplateColumns|js}, {js|subgrid [sub-a]|js});
-CssJs.unsafe({js|gridTemplateColumns|js}, {js|subgrid [sub-a] [sub-b]|js});
-CssJs.unsafe({js|gridTemplateColumns|js}, {js|subgrid repeat(1, [sub-a])|js});
-CssJs.unsafe(
-  {js|gridTemplateColumns|js},
-  {js|subgrid repeat(2, [sub-a] [sub-b]) [sub-c]|js},
-);
-CssJs.unsafe(
-  {js|gridTemplateColumns|js},
-  {js|subgrid repeat(auto-fill, [sub-a] [sub-b])|js},
-);
-CssJs.unsafe(
-  {js|gridTemplateColumns|js},
-  {js|subgrid [sub-a] repeat(auto-fill, [sub-b] [sub-c] [sub-d]) [sub-e] repeat(1, [sub-g])|js},
-);
+CssJs.gridTemplateColumns(`subgrid);
+CssJs.gridTemplateColumns([|`subgrid, `name({js|[sub-a]|js})|]);
+CssJs.gridTemplateColumns([|
+  `subgrid,
+  `name({js|[sub-a]|js}),
+  `name({js|[sub-b]|js}),
+|]);
+CssJs.gridTemplateColumns([|
+  `subgrid,
+  `repeat((`num(1), [|`name({js|[sub-a]|js})|])),
+|]);
+CssJs.gridTemplateColumns([|
+  `subgrid,
+  `repeat((`num(2), [|`name({js|[sub-a]|js}), `name({js|[sub-b]|js})|])),
+  `name({js|[sub-c]|js}),
+|]);
+CssJs.gridTemplateColumns([|
+  `subgrid,
+  `repeat((`autoFill, [|`name({js|[sub-a]|js}), `name({js|[sub-b]|js})|])),
+|]);
+CssJs.gridTemplateColumns([|
+  `subgrid,
+  `name({js|[sub-a]|js}),
+  `repeat((
+    `autoFill,
+    [|
+      `name({js|[sub-b]|js}),
+      `name({js|[sub-c]|js}),
+      `name({js|[sub-d]|js}),
+    |],
+  )),
+  `name({js|[sub-e]|js}),
+  `repeat((`num(1), [|`name({js|[sub-g]|js})|])),
+|]);
 CssJs.unsafe({js|gridTemplateRows|js}, {js|subgrid|js});
 CssJs.unsafe({js|gridTemplateRows|js}, {js|subgrid [sub-a]|js});
 CssJs.unsafe({js|gridTemplateRows|js}, {js|subgrid [sub-a] [sub-b]|js});

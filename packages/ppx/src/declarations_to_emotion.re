@@ -3494,15 +3494,17 @@ let render_auto_track_list = (~loc, value: Types.auto_track_list) => {
 
 let render_name_repeat = (~loc, value: Types.name_repeat) => {
   let (repeatValue, (), listOfLineNames) = value;
-  /* TODO: When this case happen? list of linenames? */
   let lineNamesExpr =
     listOfLineNames
     |> List.concat_map(render_line_names(~loc))
     |> Builder.pexp_array(~loc);
   switch (repeatValue) {
-  | `Auto_fill => [%expr `repeat((`autoFill, [%e lineNamesExpr]))]
-  | `Positive_integer(i) =>
-    [%expr `repeat((`num([%e render_integer(~loc, i)]), [%e lineNamesExpr]))]
+  | `Auto_fill => [[%expr `repeat((`autoFill, [%e lineNamesExpr]))]]
+  | `Positive_integer(i) => [
+      [%expr
+        `repeat((`num([%e render_integer(~loc, i)]), [%e lineNamesExpr]))
+      ],
+    ]
   };
 };
 
@@ -3511,12 +3513,10 @@ let render_subgrid = (~loc, line_name_list: Types.line_name_list) => {
   |> List.concat_map(value => {
        switch (value) {
        | `Line_names(line_names) => render_line_names(~loc, line_names)
-       | `Name_repeat(name_repeat) =>
-         /* render_name_repeat(~loc, name_repeat) */ raise(
-           Unsupported_feature,
-         )
+       | `Name_repeat(name_repeat) => render_name_repeat(~loc, name_repeat)
        }
      })
+  |> List.append([[%expr `subgrid]])
   |> Builder.pexp_array(~loc);
 };
 
@@ -3531,9 +3531,8 @@ let grid_template_columns =
       | `Track_list(track_list, line_names) =>
         render_track_list(~loc, track_list, line_names)
       | `Auto_track_list(list) => render_auto_track_list(~loc, list)
-      /* | `Static((), None) => [%expr `subgrid] */
-      /* | `Static((), Some(subgrid)) => render_subgrid(~loc, subgrid) */
-      | _ => raise(Unsupported_feature)
+      | `Static((), None) => [%expr `subgrid]
+      | `Static((), Some(subgrid)) => render_subgrid(~loc, subgrid)
       },
   );
 
