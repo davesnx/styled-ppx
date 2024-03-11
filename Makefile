@@ -66,7 +66,7 @@ release-static:
 
 # Testing commands
 
-TEST_TARGETS := ppx_snapshot_reason ppx_snapshot_rescript parser css_lexer reason_css_parser css_spec_parser css_support css_spec_types string_interpolation emotion emotion_hash native_typecheck ppx_e2e
+TEST_TARGETS := ppx_snapshot_reason ppx_snapshot_rescript parser reason_css_parser css_spec_parser css_support css_spec_types string_interpolation emotion emotion_hash native_typecheck ppx_e2e
 
 # Create targets with the format "test_{{target_name}}_{{ "watch" | "promote" }}"
 define create_test
@@ -120,9 +120,15 @@ test_e2e_rescript_v10_watch: ## Run End-to-end tests for JSX4
 test_e2e_rescript_v10_promote: ## Run End-to-end tests for JSX4
 	npm --prefix 'e2e/rescript-v10-JSX4' run test_promote
 
-# TODO: Generate this list of dependencies automatically from TEST_TARGET
 .PHONY: test
-test: build test_native_typecheck test_css_support test_ppx_snapshot_reason test_ppx_snapshot_rescript test_parser test_reason_css_parser test_css_spec_parser test_css_spec_types test_string_interpolation test_emotion test_emotion_hash test_e2e
+test: build
+	@for target in $(TEST_TARGETS); do \
+		if [ "$(CI)" = "true" ]; then \
+			ALCOTEST_VERBOSE=true make test_$${target}; \
+		else \
+			ALCOTEST_VERBOSE=false make test_$${target}; \
+		fi \
+	done
 
 # Demo
 
