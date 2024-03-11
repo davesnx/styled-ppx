@@ -7,7 +7,7 @@
       (100, [|CssJs.opacity(1.)|]),
     |]);
   module FadeIn = {
-    [@deriving abstract]
+    [@deriving (jsProperties, getSet)]
     type makeProps = {
       [@mel.optional]
       innerRef: option(ReactDOM.domRef),

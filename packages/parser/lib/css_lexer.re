@@ -83,15 +83,33 @@ let number = [%sedlex.regexp?
   (Opt('-'), '.', Plus(digit), Opt('e' | 'E', '+' | '-', Plus(digit)))
 ];
 
-let operator = [%sedlex.regexp? "~=" | "|=" | "^=" | "$=" | "*=" | "="];
+let equal_sign = [%sedlex.regexp? "="];
+let greater_than = [%sedlex.regexp? ">"];
+/* [less_than], [only_operator], [or_operator], [and_operator],
+   [not_operator] are purposely for media query parsing */
+let less_than = [%sedlex.regexp? "<"];
+let only_operator = [%sedlex.regexp? "only"];
+let or_operator = [%sedlex.regexp? "or"];
+let and_operator = [%sedlex.regexp? "and"];
+let not_operator = [%sedlex.regexp? "not"];
 
-let combinator = [%sedlex.regexp? '>' | '+' | '~' | "||"];
+let operator = [%sedlex.regexp? "~=" | "|=" | "^=" | "$=" | "*="];
+
+let combinator = [%sedlex.regexp? '+' | '~' | "||"];
 
 let at_rule_without_body = [%sedlex.regexp?
   ("@", "charset" | "import" | "namespace")
 ];
+
 let at_rule = [%sedlex.regexp? ("@", ident)];
+
+/* [<screen, print, all>_media_type] is purposely for media query parsing */
+let screen_media_type = [%sedlex.regexp? "screen"];
+let print_media_type = [%sedlex.regexp? "print"];
+let all_media_type = [%sedlex.regexp? "all"];
+
 let at_media = [%sedlex.regexp? ("@", "media")];
+
 let at_keyframes = [%sedlex.regexp? ("@", "keyframes")];
 
 let non_ascii_code_point = [%sedlex.regexp? Sub(any, '\000' .. '\128')]; // greater than \u0080
@@ -534,6 +552,16 @@ let rec get_next_token = buf => {
   | combinator => COMBINATOR(latin1(buf))
   | string => STRING(latin1(~skip=1, ~drop=1, buf))
   | important => IMPORTANT
+  | equal_sign => EQUAL_SIGN(latin1(buf))
+  | (or_operator, whitespace)
+  | (and_operator, whitespace)
+  | (not_operator, whitespace)
+  | (only_operator, whitespace) => MEDIA_QUERY_OPERATOR(latin1(buf))
+  | greater_than
+  | less_than => MEDIA_FEATURE_COMPARISON(latin1(buf))
+  | all_media_type => ALL_MEDIA_TYPE(latin1(buf))
+  | screen_media_type => SCREEN_MEDIA_TYPE(latin1(buf))
+  | print_media_type => PRINT_MEDIA_TYPE(latin1(buf))
   | at_media =>
     skip_whitespace.contents = false;
     AT_MEDIA(latin1(~skip=1, buf));

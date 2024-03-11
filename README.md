@@ -35,15 +35,10 @@ For the entire documentation, visit [styled-ppx.vercel.app](https://styled-ppx.v
 
 ### Editor Support
 
-We provide an editor extension that brings syntax highlighting. (In the future it may include IntelliSense or other [CSS-related](https://code.visualstudio.com/docs/languages/css) features.)
+We provide an editor extension that brings syntax highlighting:
 
-#### VSCode Extension
-
-Install the **[VSCode Extension](https://marketplace.visualstudio.com/items?itemName=davesnx.vscode-styled-ppx)**.
-
-#### vim plugin
-
-Install the **[vim plugin](https://github.com/ahrefs/vim-styled-ppx/blob/main/README.md#installation)**.
+- Install the **[VSCode Extension](https://marketplace.visualstudio.com/items?itemName=davesnx.vscode-styled-ppx)**.
+- Install the **[vim plugin](https://github.com/ahrefs/vim-styled-ppx/blob/main/README.md#installation)**.
 
 > If you are interested on another editor, please [file an issue](https://github.com/davesnx/styled-ppx/issues/new).
 
@@ -54,7 +49,3 @@ We would love your help improving **styled-ppx**! Please see our contributing an
 ## License
 
 This project is licensed under the [Simplified BSD License (BSD 2-Clause License)](./LICENSE).
-
-## CI
-
-<a href="https://github.com/davesnx/styled-ppx/actions"><img alt="CI" src="https://github.com/davesnx/styled-ppx/workflows/CI/badge.svg"></a> <a href="https://badge.fury.io/js/%40davesnx%2Fstyled-ppx"><img src="https://badge.fury.io/js/%40davesnx%2Fstyled-ppx.svg" alt="npm version"></a>

@@ -4,7 +4,7 @@
   let sharedStylesBetweenDynamicComponents = (color): CssJs.rule =>
     CssJs.color(color);
   module DynamicCompnentWithLetIn = {
-    [@deriving abstract]
+    [@deriving (jsProperties, getSet)]
     type makeProps('color) = {
       [@mel.optional]
       innerRef: option(ReactDOM.domRef),

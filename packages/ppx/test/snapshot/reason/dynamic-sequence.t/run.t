@@ -2,7 +2,7 @@
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   module SequenceDynamicComponent = {
-    [@deriving abstract]
+    [@deriving (jsProperties, getSet)]
     type makeProps('size) = {
       [@mel.optional]
       innerRef: option(ReactDOM.domRef),
@@ -984,7 +984,7 @@
     };
   };
   module DynamicComponentWithSequence = {
-    [@deriving abstract]
+    [@deriving (jsProperties, getSet)]
     type makeProps('variant) = {
       [@mel.optional]
       innerRef: option(ReactDOM.domRef),

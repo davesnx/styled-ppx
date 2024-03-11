@@ -301,7 +301,7 @@ type declarations =
 module Stylesheet = struct
   module Hashes = Set.Make (String)
 
-  type 'a t = {
+  type t = {
     mutable rules : (string * declarations) list;
     mutable hashes : Hashes.t;
   }
