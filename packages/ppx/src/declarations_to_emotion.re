@@ -3419,7 +3419,8 @@ let render_track_list = (~loc, track_list, line_names) => {
          let lineNameExpr = render_maybe_line_names(~loc, line_name);
          List.append(lineNameExpr, [value]);
        });
-  [%expr [%e Builder.pexp_array(~loc, tracks)]];
+  let lineNamesExpr = render_maybe_line_names(~loc, line_names);
+  List.append(lineNamesExpr, tracks) |> Builder.pexp_array(~loc);
 };
 
 let render_fixed_size = (~loc, value: Types.fixed_size) => {

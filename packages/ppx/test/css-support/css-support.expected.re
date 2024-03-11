@@ -1166,11 +1166,13 @@ CssJs.gridTemplateColumns([|
   `repeat((`autoFill, [|`minmax((`ch(25.), `fr(1.)))|])),
 |]);
 CssJs.gridTemplateColumns([|
+  `name({js|[col-end]|js}),
   `pxFloat(10.),
   `name({js|[col-start]|js}),
   `pxFloat(250.),
 |]);
 CssJs.gridTemplateColumns([|
+  `name({js|[last]|js}),
   `name({js|[first nav-start]|js}),
   `pxFloat(150.),
   `name({js|[main-start]|js}),
