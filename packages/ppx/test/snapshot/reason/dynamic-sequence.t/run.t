@@ -8,6 +8,8 @@
       innerRef: option(ReactDOM.domRef),
       [@mel.optional]
       children: option(React.element),
+      [@mel.optional] [@mel.as "as"]
+      as_: option(string),
       [@mel.optional]
       about: option(string),
       [@mel.optional]
@@ -970,7 +972,15 @@
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(. newProps, "size"));
       ignore(deleteProp(. newProps, "innerRef"));
-      createVariadicElement("div", newProps);
+      let asTag = as_Get(props);
+      ignore(deleteProp(. newProps, "as"));
+      createVariadicElement(
+        switch (asTag) {
+        | Some(as_) => as_
+        | None => "div"
+        },
+        newProps,
+      );
     };
   };
   module DynamicComponentWithSequence = {
@@ -980,6 +990,8 @@
       innerRef: option(ReactDOM.domRef),
       [@mel.optional]
       children: option(React.element),
+      [@mel.optional] [@mel.as "as"]
+      as_: option(string),
       [@mel.optional]
       about: option(string),
       [@mel.optional]
@@ -1949,6 +1961,14 @@
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(. newProps, "variant"));
       ignore(deleteProp(. newProps, "innerRef"));
-      createVariadicElement("button", newProps);
+      let asTag = as_Get(props);
+      ignore(deleteProp(. newProps, "as"));
+      createVariadicElement(
+        switch (asTag) {
+        | Some(as_) => as_
+        | None => "button"
+        },
+        newProps,
+      );
     };
   };
