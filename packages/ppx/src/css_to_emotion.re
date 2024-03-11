@@ -255,12 +255,7 @@ and render_declarations = ((ds, _loc: Ppxlib.location)) => {
        switch (declaration) {
        | Declaration(decl) => render_declaration(decl)
        | At_rule(ar) => [render_at_rule(ar)]
-       | Style_rule(style_rules) => [
-           render_style_rule(
-             CssJs.selector(~loc=style_rules.loc),
-             style_rules,
-           ),
-         ]
+       | Style_rule(style_rules) => [render_style_rule(style_rules)]
        }
      );
 }
@@ -374,7 +369,7 @@ and render_selectors = selectors => {
   |> List.map(((selector, _loc)) => render_selector(selector))
   |> String.concat(", ");
 }
-and style_rule = (rule: style_rule) => {
+and render_style_rule = (rule: style_rule) => {
   let (prelude, _loc) = rule.prelude;
   let (_block, loc) = rule.block;
   let selector_expr =
@@ -387,32 +382,11 @@ and style_rule = (rule: style_rule) => {
     |> String.trim
     |> String_interpolation.transform(~attrs, ~delimiter, ~loc);
 
-  (rule.loc, selector_name, selector_expr);
-}
-and render_style_rule = (ident, rule: style_rule) => {
-  let (loc, selector_name, selector_expr) = style_rule(rule);
-
   Helper.Exp.apply(
     ~loc,
     /* ~attrs=[Platform_attributes.uncurried(~loc=rule.loc)], */
-    ident,
+    CssJs.selector(~loc=rule.loc),
     [(Nolabel, selector_name), (Nolabel, selector_expr)],
-  );
-}
-and render_style_rules = (~loc, ident, rules: list(style_rule)) => {
-  let style_rules =
-    rules
-    |> List.map(style_rule)
-    |> List.map(((loc, selector_name, selector_expr)) =>
-         Builder.pexp_tuple(~loc, [selector_name, selector_expr])
-       )
-    |> Builder.pexp_array(~loc);
-
-  Helper.Exp.apply(
-    ~loc,
-    /* ~attrs=[Platform_attributes.uncurried(~loc=rule.loc)], */
-    ident,
-    [(Nolabel, style_rules)],
   );
 };
 
@@ -509,13 +483,18 @@ let render_keyframes = (declarations: rule_list) => {
 };
 
 let render_global = ((ruleList, loc): stylesheet) => {
-  ruleList
-  |> List.filter_map(rule => {
-       switch (rule) {
-       | Style_rule(rule) => Some(rule)
-       | _ => None
-       }
-     })
-  |> render_style_rules(~loc, CssJs.global(~loc))
+  let styles =
+    ruleList
+    |> List.map(rule => {
+         switch (rule) {
+         | Style_rule(style_rule) => render_style_rule(style_rule)
+         | At_rule(at_rule) => render_at_rule(at_rule)
+         | _ =>
+           Generate_lib.error(~loc, "only style rule and at rule supported")
+         }
+       })
+    |> Builder.pexp_array(~loc);
+
+  Helper.Exp.apply(~loc, CssJs.global(~loc), [(Nolabel, styles)])
   |> Generate_lib.applyIgnore(~loc);
 };

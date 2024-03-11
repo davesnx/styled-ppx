@@ -4,7 +4,7 @@ module type CssImplementationIntf = sig
 
   val injectRaw : string -> unit
   val renderRaw : renderer -> string -> unit
-  val injectRules : (string * Js.Json.t) array -> unit
+  val injectRules : Js.Json.t -> unit
   val renderRules : renderer -> string -> Js.Json.t -> unit
   val make : Js.Json.t -> styleEncoding
   val mergeStyles : styleEncoding array -> styleEncoding

@@ -14,8 +14,7 @@ include Css_Legacy_Core.Make (struct
   external injectRawRules : Js.Json.t -> unit = "injectGlobal"
   [@@mel.module "@emotion/css"] [@@bs.module "@emotion/css"]
 
-  let injectRules selectorRulesPairs =
-    injectRawRules (Js.Dict.fromArray selectorRulesPairs |. Js.Json.object_)
+  let injectRules = injectRawRules
 
   let renderRules _ selector rules =
     injectRawRules (Js.Dict.fromArray [| selector, rules |] |. Js.Json.object_)
