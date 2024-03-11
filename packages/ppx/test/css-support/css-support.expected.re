@@ -1134,32 +1134,6 @@ CssJs.unsafe({js|minHeight|js}, {js|auto|js});
 CssJs.unsafe({js|minWidth|js}, {js|auto|js});
 CssJs.order(0);
 CssJs.order(1);
-CssJs.gridTemplateColumns([|
-  `pxFloat(200.),
-  `repeat((`autoFill, [|`pxFloat(100.)|])),
-  `pxFloat(300.),
-|]);
-CssJs.gridTemplateColumns([|
-  `minmax((`pxFloat(100.), `maxContent)),
-  `repeat((`autoFill, [|`pxFloat(200.)|])),
-  `percent(20.),
-|]);
-CssJs.gridTemplateColumns([|
-  `name({js|[linename1]|js}),
-  `pxFloat(100.),
-  `name({js|[linename2]|js}),
-  `repeat((
-    `autoFit,
-    [|`name({js|[linename3 linename4]|js}), `pxFloat(300.)|],
-  )),
-  `pxFloat(100.),
-|]);
-CssJs.gridTemplateColumns([|
-  `name({js|[linename1 linename2]|js}),
-  `pxFloat(100.),
-  `repeat((`autoFit, [|`name({js|[linename1]|js}), `pxFloat(300.)|])),
-  `name({js|[linename3]|js}),
-|]);
 CssJs.display(`grid);
 CssJs.display(`inlineGrid);
 CssJs.gridTemplateColumns([|`none|]);
@@ -1221,6 +1195,32 @@ CssJs.gridTemplateColumns([|
   `name({js|[b c d]|js}),
   `repeat((`num(2), [|`name({js|[e]|js}), `pxFloat(40.)|])),
   `repeat((`num(5), [|`auto|])),
+|]);
+CssJs.gridTemplateColumns([|
+  `pxFloat(200.),
+  `repeat((`autoFill, [|`pxFloat(100.)|])),
+  `pxFloat(300.),
+|]);
+CssJs.gridTemplateColumns([|
+  `minmax((`pxFloat(100.), `maxContent)),
+  `repeat((`autoFill, [|`pxFloat(200.)|])),
+  `percent(20.),
+|]);
+CssJs.gridTemplateColumns([|
+  `name({js|[linename1]|js}),
+  `pxFloat(100.),
+  `name({js|[linename2]|js}),
+  `repeat((
+    `autoFit,
+    [|`name({js|[linename3 linename4]|js}), `pxFloat(300.)|],
+  )),
+  `pxFloat(100.),
+|]);
+CssJs.gridTemplateColumns([|
+  `name({js|[linename1 linename2]|js}),
+  `pxFloat(100.),
+  `repeat((`autoFit, [|`name({js|[linename1]|js}), `pxFloat(300.)|])),
+  `name({js|[linename3]|js}),
 |]);
 CssJs.unsafe({js|gridTemplateRows|js}, {js|none|js});
 CssJs.unsafe({js|gridTemplateRows|js}, {js|auto|js});
