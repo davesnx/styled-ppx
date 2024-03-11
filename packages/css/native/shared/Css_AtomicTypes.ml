@@ -732,7 +732,7 @@ module AnimationIterationCount = struct
   let toString x =
     match x with
     | `infinite -> {js|infinite|js}
-    | `count x -> Std.Int.toString x
+    | `count x -> Std.Float.toString x
 end
 
 module AnimationPlayState = struct
@@ -2620,13 +2620,13 @@ end
 
 module AlphaValue = struct
   type t =
-    [ `num of int
+    [ `num of float
     | `percent of float
     ]
 
   let toString x =
     match x with
-    | `num x -> Std.Int.toString x
+    | `num x -> Std.Float.toString x
     | `percent x -> Std.Float.toString x ^ {js|%|js}
 end
 

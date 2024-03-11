@@ -145,7 +145,7 @@ let render_string = (~loc, s) => {
 let render_integer = (~loc, integer) =>
   Helper.Const.int(integer) |> Helper.Exp.constant(~loc);
 let render_number = (~loc, number) =>
-  Helper.Const.float(number |> string_of_float) |> Helper.Exp.constant(~loc);
+  Helper.Const.float(number |> Float.to_string) |> Helper.Exp.constant(~loc);
 let render_percentage = (~loc, number) => [%expr
   `percent([%e render_number(~loc, number)])
 ];
@@ -292,7 +292,7 @@ let render_length = (~loc) =>
   | `Lh(_n) => raise(Unsupported_feature)
   | `Mm(n) => [%expr `mm([%e render_number(~loc, n)])]
   | `Pc(n) => [%expr `pc([%e render_number(~loc, n)])]
-  | `Pt(n) => [%expr `pt([%e render_integer(~loc, n |> int_of_float)])]
+  | `Pt(n) => [%expr `pt([%e render_integer(~loc, n |> Float.to_int)])]
   | `Px(n) => [%expr `pxFloat([%e render_number(~loc, n)])]
   | `Q(_n) => raise(Unsupported_feature)
   | `Rem(n) => [%expr `rem([%e render_number(~loc, n)])]
@@ -805,7 +805,7 @@ let render_color_alpha = (~loc, color_alpha) =>
   };
 
 let render_function_rgb = (~loc, ast: Types.function_rgb) => {
-  let color_to_float = v => render_integer(~loc, v |> int_of_float);
+  let color_to_float = v => render_integer(~loc, v |> Float.to_int);
 
   let to_number =
     fun
@@ -845,7 +845,7 @@ let render_function_rgb = (~loc, ast: Types.function_rgb) => {
 };
 
 let render_function_rgba = (~loc, ast: Types.function_rgba) => {
-  let color_to_float = v => render_integer(~loc, v |> int_of_float);
+  let color_to_float = v => render_integer(~loc, v |> Float.to_int);
 
   let to_number =
     fun
@@ -2764,22 +2764,22 @@ let transition_property =
 /* bs-css doesn't support `S. PR: https://github.com/giraud/bs-css/pull/264 */
 /* let render_time = (~loc) => fun
    | `Ms(f) => {
-     let value = int_of_float(f);
+     let value = Float.to_int(f);
      [%expr `ms([%e render_integer(~loc, value)])]
    }
    | `S(f) => {
-     let value = int_of_float(f);
+     let value = Float.to_int(f);
      [%expr `s([%e render_integer(~loc, value)])]
    }; */
 
 let render_time_as_int = (~loc) =>
   fun
   | `Ms(f) => {
-      let value = int_of_float(f);
+      let value = Float.to_int(f);
       [%expr [%e render_integer(~loc, value)]];
     }
   | `S(f) => {
-      let value = f *. 1000.0 |> int_of_float;
+      let value = f *. 1000.0 |> Float.to_int;
       [%expr [%e render_integer(~loc, value)]];
     };
 
@@ -3792,14 +3792,14 @@ let fill =
   monomorphic(
     Parser.property_fill,
     (~loc) => [%expr CssJs.SVG.fill],
-    (~loc) => render_paint(~loc),
+    render_paint,
   );
 
 let stroke =
   monomorphic(
     Parser.property_stroke,
     (~loc) => [%expr CssJs.SVG.stroke],
-    (~loc) => render_paint(~loc),
+    render_paint,
   );
 
 let render_alpha_value = (~loc, value: Types.alpha_value) => {
