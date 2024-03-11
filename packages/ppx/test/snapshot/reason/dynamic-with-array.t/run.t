@@ -8,6 +8,8 @@
       innerRef: option(ReactDOM.domRef),
       [@mel.optional]
       children: option(React.element),
+      [@mel.optional] [@mel.as "as"]
+      as_: option(string),
       [@mel.optional]
       about: option(string),
       [@mel.optional]
@@ -977,6 +979,14 @@
       ignore(deleteProp(. newProps, "color"));
       ignore(deleteProp(. newProps, "size"));
       ignore(deleteProp(. newProps, "innerRef"));
-      createVariadicElement("button", newProps);
+      let asTag = as_Get(props);
+      ignore(deleteProp(. newProps, "as"));
+      createVariadicElement(
+        switch (asTag) {
+        | Some(as_) => as_
+        | None => "button"
+        },
+        newProps,
+      );
     };
   };
