@@ -391,27 +391,41 @@ let stylesheet_tests = [
   (
     "html, body",
     [%expr [%styled.global {js|html, body {}|js}]],
-    [%expr ignore(CssJs.global({js|html, body|js}, [||]))],
+    [%expr ignore(CssJs.global([|({js|html, body|js}, [||])|]))],
   ),
   (
     "html body",
     [%expr [%styled.global {js|html body {}|js}]],
-    [%expr ignore(CssJs.global({js|html body|js}, [||]))],
+    [%expr ignore(CssJs.global([|({js|html body|js}, [||])|]))],
   ),
   (
     "html, body, #root, .class",
     [%expr [%styled.global {js|html, body, #root, .class {}|js}]],
-    [%expr ignore(CssJs.global({js|html, body, #root, .class|js}, [||]))],
+    [%expr
+      ignore(CssJs.global([|({js|html, body, #root, .class|js}, [||])|]))
+    ],
   ),
   (
     "div > span",
     [%expr [%styled.global {js|div > span {}|js}]],
-    [%expr ignore(CssJs.global({js|div > span|js}, [||]))],
+    [%expr ignore(CssJs.global([|({js|div > span|js}, [||])|]))],
   ),
   (
     "html div > span",
     [%expr [%styled.global {js|html div > span {}|js}]],
-    [%expr ignore(CssJs.global({js|html div > span|js}, [||]))],
+    [%expr ignore(CssJs.global([|({js|html div > span|js}, [||])|]))],
+  ),
+  (
+    "multiple rules",
+    [%expr [%styled.global {js|html div > span {} html, body {}|js}]],
+    [%expr
+      ignore(
+        CssJs.global([|
+          ({js|html div > span|js}, [||]),
+          ({js|html, body|js}, [||]),
+        |]),
+      )
+    ],
   ),
 ];
 
