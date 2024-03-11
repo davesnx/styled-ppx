@@ -2026,7 +2026,11 @@ let overflow =
         [%expr CssJs.overflowX([%e variant_to_expression(~loc, x)])],
         [%expr CssJs.overflowY([%e variant_to_expression(~loc, y)])],
       ]
-    | _ => failwith("unreachable")
+    | `Interpolation(i) => [
+        [%expr CssJs.overflow([%e render_variable(~loc, i)])],
+      ]
+    | `Xor(_) => raise(Unsupported_feature)
+    | _ => raise(Unsupported_feature)
   );
 
 // let overflow_clip_margin = unsupportedProperty(Parser.property_overflow_clip_margin);
@@ -4182,7 +4186,6 @@ let properties = [
   ("overflow-wrap", found(overflow_wrap)),
   ("overflow-x", found(overflow_x)),
   ("overflow-x", found(overflow_x)),
-  ("overflow-y", found(overflow_y)),
   ("overflow-y", found(overflow_y)),
   ("overflow", found(overflow)),
   ("padding-bottom", found(padding_bottom)),

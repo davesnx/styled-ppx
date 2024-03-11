@@ -1361,7 +1361,7 @@ and property_outline_style = [%value.rec
 ]
 and property_outline_width = [%value.rec "<line-width> | <interpolation>"]
 and property_overflow = [%value.rec
-  "[ 'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' ]{1,2} | <-non-standard-overflow>"
+  "[ 'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' ]{1,2} | <-non-standard-overflow> | <interpolation>"
 ]
 and property_overflow_anchor = [%value.rec "'auto' | 'none'"]
 and property_overflow_block = [%value.rec

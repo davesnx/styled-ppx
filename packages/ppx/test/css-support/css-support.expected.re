@@ -2259,3 +2259,7 @@ CssJs.animationDuration(150);
 CssJs.borderWidth(`thin);
 CssJs.outlineWidth(`medium);
 CssJs.outline(`medium, `solid, CssJs.red);
+CssJs.overflow(lola);
+CssJs.overflow(`hidden);
+(CssJs.overflowY(lola): CssJs.rule);
+CssJs.overflowX(`hidden);

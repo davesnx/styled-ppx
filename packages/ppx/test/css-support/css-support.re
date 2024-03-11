@@ -3141,3 +3141,8 @@
 [%css {|border-width: thin|}];
 [%css {|outline-width: medium|}];
 [%css {|outline: medium solid red|}];
+
+[%css {|overflow: $(lola)|}];
+[%css {|overflow: hidden|}];
+[%css {|overflow-y: $(lola)|}];
+[%css {|overflow-x: hidden|}];
