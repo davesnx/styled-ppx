@@ -1163,9 +1163,11 @@ CssJs.display(`inlineGrid);
 CssJs.gridTemplateColumns([|`none|]);
 CssJs.gridTemplateColumns([|`auto|]);
 CssJs.gridTemplateColumns([|`pxFloat(100.)|]);
-CssJs.unsafe({js|gridTemplateColumns|js}, {js|1fr|js});
-CssJs.unsafe({js|gridTemplateColumns|js}, {js|100px 1fr auto|js});
-CssJs.unsafe({js|gridTemplateColumns|js}, {js|repeat(2, 100px 1fr)|js});
+CssJs.gridTemplateColumns([|`fr(1.)|]);
+CssJs.gridTemplateColumns([|`pxFloat(100.), `fr(1.), `auto|]);
+CssJs.gridTemplateColumns([|
+  `repeat((`num(2), [|`pxFloat(100.), `fr(1.)|])),
+|]);
 CssJs.gridTemplateColumns([|
   `repeat((
     `num(4),
@@ -1178,23 +1180,27 @@ CssJs.gridTemplateColumns([|
   )),
   `pxFloat(10.),
 |]);
-CssJs.unsafe(
-  {js|gridTemplateColumns|js},
-  {js|100px 1fr max-content minmax(min-content, 1fr)|js},
-);
-CssJs.unsafe(
-  {js|gridTemplateColumns|js},
-  {js|repeat(auto-fill, minmax(25ch, 1fr))|js},
-);
+CssJs.gridTemplateColumns([|
+  `pxFloat(100.),
+  `fr(1.),
+  `maxContent,
+  `minmax((`minContent, `fr(1.))),
+|]);
+CssJs.gridTemplateColumns([|
+  `repeat((`autoFill, [|`minmax((`ch(25.), `fr(1.)))|])),
+|]);
 CssJs.gridTemplateColumns([|
   `pxFloat(10.),
   `name({js|[col-start]|js}),
   `pxFloat(250.),
 |]);
-CssJs.unsafe(
-  {js|gridTemplateColumns|js},
-  {js|[first nav-start] 150px [main-start] 1fr [last]|js},
-);
+CssJs.gridTemplateColumns([|
+  `name({js|[first]|js}),
+  `name({js|[nav-start]|js}),
+  `pxFloat(150.),
+  `name({js|[main-start]|js}),
+  `fr(1.),
+|]);
 CssJs.gridTemplateColumns([|
   `pxFloat(10.),
   `name({js|[col-start]|js}),
@@ -1206,10 +1212,17 @@ CssJs.gridTemplateColumns([|
   `name({js|[col-end]|js}),
   `pxFloat(10.),
 |]);
-CssJs.unsafe(
-  {js|gridTemplateColumns|js},
-  {js|[a] auto [b] minmax(min-content, 1fr) [b c d] repeat(2, [e] 40px) repeat(5, auto)|js},
-);
+CssJs.gridTemplateColumns([|
+  `name({js|[a]|js}),
+  `auto,
+  `name({js|[b]|js}),
+  `minmax((`minContent, `fr(1.))),
+  `name({js|[b]|js}),
+  `name({js|[c]|js}),
+  `name({js|[d]|js}),
+  `repeat((`num(2), [|`name({js|[e]|js}), `pxFloat(40.)|])),
+  `repeat((`num(5), [|`auto|])),
+|]);
 CssJs.unsafe({js|gridTemplateRows|js}, {js|none|js});
 CssJs.unsafe({js|gridTemplateRows|js}, {js|auto|js});
 CssJs.unsafe({js|gridTemplateRows|js}, {js|100px|js});

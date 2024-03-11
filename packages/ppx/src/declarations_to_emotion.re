@@ -3357,9 +3357,15 @@ let render_fixed_breadth = (~loc, value: Types.fixed_breadth) => {
   };
 };
 
+let render_flex_value = (~loc, value: Types.flex_value) => {
+  switch (value) {
+  | `Fr(f) => [%expr `fr([%e render_number(~loc, f)])]
+  };
+};
+
 let render_track_breadth = (~loc, value: Types.track_breadth) => {
   switch (value) {
-  | `Flex_value(f) => raise(Unsupported_feature)
+  | `Flex_value(f) => render_flex_value(~loc, f)
   | `Auto => [%expr `auto]
   | `Min_content => [%expr `minContent]
   | `Max_content => [%expr `maxContent]
@@ -3392,8 +3398,7 @@ and render_track_size = (~loc, value: Types.track_size) => {
        [%e render_inflexible_breadth(~loc, inflexible)],
        [%e render_track_breadth(~loc, breadth)],
      ))]
-  /* `fitContent can't be the same variant as `fitContent with payload */
-  | `Fit_content_0 => [%expr `fitContent]
+  | `Fit_content_0 => [%expr `fit_content]
   | `Fit_content_1(`Extended_length(el)) =>
     [%expr `fitContent([%e render_extended_length(~loc, el)])]
   | `Fit_content_1(`Extended_percentage(ep)) =>
