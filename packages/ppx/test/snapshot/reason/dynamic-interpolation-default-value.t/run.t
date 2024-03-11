@@ -2,7 +2,7 @@
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   module DynamicComponentWithDefaultValue = {
-    [@deriving abstract]
+    [@deriving (jsProperties, getSet)]
     type makeProps('var) = {
       [@mel.optional]
       innerRef: option(ReactDOM.domRef),

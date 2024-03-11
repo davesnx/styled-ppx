@@ -2395,8 +2395,8 @@ module FontFamilyName = struct
   let toString x =
     match x with
     | `custom value ->
-      (match Std.String.get value 0 with
-      | {js|"|js} | {js|'|js} -> value
+      (match String.get value 0 with
+      | '\'' -> value | '"' -> value
       | _ -> ({js|"|js} ^ value) ^ {js|"|js})
     | `serif -> {js|serif|js}
     | `sansSerif -> {js|sans-serif|js}
@@ -2539,14 +2539,14 @@ module Content = struct
     ]
 
   let text_to_string value =
-    match value with
-    | "" -> {js|''|js}
-    | {js|""|js} -> {js|''|js}
-    | value ->
-      (match Js.String.get value 0, Js.String.length value with
-      | {js|"|js}, 1 -> {js|'"'|js}
-      | {js|'|js}, 1 -> {js|"'"|js}
-      | {js|"|js}, _ | {js|'|js}, _ -> value
+    if Std.String.length value = 0 then {js|''|js}
+    (* value = "" -> '' *)
+    else if Std.String.length value = 2 && Std.String.get value 0 = '"' && Std.String.get value 1 = '"' then {js|''|js}
+    else
+      (match Std.String.get value 0, Std.String.length value with
+      | '\'', 1 -> {js|"'"|js}
+      | '"', 1 -> {js|'"'|js}
+      | '\'', _ | '"', _ -> value
       | _ -> {js|"|js} ^ value ^ {js|"|js})
 
   let toString x =

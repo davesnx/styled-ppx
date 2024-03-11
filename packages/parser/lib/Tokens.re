@@ -87,6 +87,12 @@ let token_to_string =
   | OPERATOR(s) => s
   | COMBINATOR(s)
   | DELIM(s) => s
+  | EQUAL_SIGN(s) => s
+  | MEDIA_QUERY_OPERATOR(s) => s
+  | SCREEN_MEDIA_TYPE(s) => s
+  | PRINT_MEDIA_TYPE(s) => s
+  | ALL_MEDIA_TYPE(s) => s
+  | MEDIA_FEATURE_COMPARISON(s) => s
   | AT_MEDIA(s)
   | AT_KEYFRAMES(s)
   | AT_RULE_STATEMENT(s)
@@ -127,9 +133,15 @@ let token_to_debug =
   | STRING(s) => "STRING('" ++ s ++ "')"
   | OPERATOR(s) => "OPERATOR('" ++ s ++ "')"
   | DELIM(s) => "DELIM('" ++ s ++ "')"
+  | EQUAL_SIGN(s) => "EQUAL_SIGN('" ++ s ++ "')"
+  | MEDIA_QUERY_OPERATOR(s) => "MEDIA_QUERY_OPERATOR('" ++ s ++ "')"
   | AT_RULE(s) => "AT_RULE('" ++ s ++ "')"
   | AT_RULE_STATEMENT(s) => "AT_RULE_STATEMENT('" ++ s ++ "')"
   | AT_MEDIA(s) => "AT_MEDIA('" ++ s ++ "')"
+  | SCREEN_MEDIA_TYPE(s) => "SCREEN('" ++ s ++ "')"
+  | PRINT_MEDIA_TYPE(s) => "PRINT('" ++ s ++ "')"
+  | ALL_MEDIA_TYPE(s) => "ALL('" ++ s ++ "')"
+  | MEDIA_FEATURE_COMPARISON(s) => "MEDIA_FEATURE_COMPARISON('" ++ s ++ "')"
   | AT_KEYFRAMES(s) => "AT_KEYFRAMES('" ++ s ++ "')"
   | HASH(s) => "HASH('" ++ s ++ "')"
   | NUMBER(s) => "NUMBER('" ++ s ++ "')"

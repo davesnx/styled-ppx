@@ -9,7 +9,7 @@
   };
   let black = CssJs.hex("000");
   module StringInterpolation = {
-    [@deriving abstract]
+    [@deriving (jsProperties, getSet)]
     type makeProps = {
       [@mel.optional]
       innerRef: option(ReactDOM.domRef),

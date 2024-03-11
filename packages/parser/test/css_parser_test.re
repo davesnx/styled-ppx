@@ -33,6 +33,26 @@ let error_tests_data =
       "@media $",
       "Parse error while reading token '$' on line 1 at position 7",
     ),
+    (
+      /* whitespace must follow `not` */
+      "@media (not(color)){}",
+      "Parse error while reading token ')' on line 1 at position 18",
+    ),
+    (
+      /* whitespace must follow `or` */
+      "@media (not (color)) or(hover) {}",
+      "Parse error while reading token 'or(' on line 1 at position 21",
+    ),
+    (
+      /* whitespace must follow `and` */
+      "@media (not (color)) and(hover) {}",
+      "Parse error while reading token 'and(' on line 1 at position 21",
+    ),
+    (
+      /* space between < and = is invalid */
+      "@media (width < = 33px) {}",
+      "Parse error while reading token '=' on line 1 at position 16",
+    ),
   ]
   |> List.mapi((_index, (input, output)) => {
        let assertion = () =>
