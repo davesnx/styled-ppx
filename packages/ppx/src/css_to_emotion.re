@@ -374,7 +374,7 @@ and render_selectors = selectors => {
   |> List.map(((selector, _loc)) => render_selector(selector))
   |> String.concat(", ");
 }
-and render_style_rule = (ident, rule: style_rule) => {
+and render_style_rule_parts = (rule: style_rule) => {
   let (prelude, _loc) = rule.prelude;
   let (_block, loc) = rule.block;
   let selector_expr =
@@ -387,11 +387,32 @@ and render_style_rule = (ident, rule: style_rule) => {
     |> String.trim
     |> String_interpolation.transform(~attrs, ~delimiter, ~loc);
 
+  (rule.loc, selector_name, selector_expr);
+}
+and render_style_rule = (ident, rule: style_rule) => {
+  let (loc, selector_name, selector_expr) = render_style_rule_parts(rule);
+
   Helper.Exp.apply(
-    ~loc=rule.loc,
+    ~loc,
     /* ~attrs=[Platform_attributes.uncurried(~loc=rule.loc)], */
     ident,
     [(Nolabel, selector_name), (Nolabel, selector_expr)],
+  );
+}
+and render_style_rules = (~loc, ident, rules: list(style_rule)) => {
+  let style_rules =
+    rules
+    |> List.map(render_style_rule_parts)
+    |> List.map(((loc, selector_name, selector_expr)) =>
+         Builder.pexp_tuple(~loc, [selector_name, selector_expr])
+       )
+    |> Builder.pexp_array(~loc);
+
+  Helper.Exp.apply(
+    ~loc,
+    /* ~attrs=[Platform_attributes.uncurried(~loc=rule.loc)], */
+    ident,
+    [(Nolabel, style_rules)],
   );
 };
 
@@ -488,23 +509,13 @@ let render_keyframes = (declarations: rule_list) => {
 };
 
 let render_global = ((ruleList, loc): stylesheet) => {
-  switch (ruleList) {
-  /* There's only one style_rule */
-  | [Style_rule(rule)] =>
-    render_style_rule(CssJs.global(~loc), rule)
-    |> Generate_lib.applyIgnore(~loc)
-  /* More than one isn't supported by bs-css */
-  | _res =>
-    Generate_lib.error(
-      ~loc,
-      {|
-        `styled.global` only supports one style definition. Transform each definition into a separate styled.global call
-
-        Like following:
-          %styled.global(" ... ")
-          %styled.global(" ... ")
-      |},
-    )
-  /* TODO: Add rule to string to finish this error message */
-  };
+  ruleList
+  |> List.filter_map(rule => {
+       switch (rule) {
+       | Style_rule(rule) => Some(rule)
+       | _ => None
+       }
+     })
+  |> render_style_rules(~loc, CssJs.global(~loc))
+  |> Generate_lib.applyIgnore(~loc);
 };
