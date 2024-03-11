@@ -3443,8 +3443,7 @@ let render_fixed_size = (~loc, value: Types.fixed_size) => {
 let render_fixed_repeat = (~loc, value: Types.fixed_repeat) => {
   let (positiveInteger, (), fixedSizes, lineNames) = value;
   let number = render_integer(~loc, positiveInteger);
-  let lineNamesExpr =
-    render_maybe_line_names(~loc, lineNames) |> Builder.pexp_array(~loc);
+  let lineNamesExpr = render_maybe_line_names(~loc, lineNames);
   let fixedSizesExpr =
     fixedSizes
     |> List.concat_map(((lineName, value)) => {
@@ -3452,8 +3451,9 @@ let render_fixed_repeat = (~loc, value: Types.fixed_repeat) => {
          let lineName = render_maybe_line_names(~loc, lineName);
          List.append(lineName, [fixed]);
        })
+    |> List.append(lineNamesExpr)
     |> Builder.pexp_array(~loc);
-  [%expr `repeat(([%e number], [%e fixedSizesExpr], [%e lineNamesExpr]))];
+  [%expr `repeat((`num([%e number]), [%e fixedSizesExpr]))];
 };
 
 let render_auto_repeat = (~loc, value: Types.auto_repeat) => {
