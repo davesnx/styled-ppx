@@ -725,14 +725,14 @@ end
 
 module AnimationIterationCount = struct
   type t =
-    [ `infinite
-    | `count of int
+    [ `count of float
+    | `infinite
     ]
 
   let toString x =
     match x with
-    | `infinite -> {js|infinite|js}
     | `count x -> Std.Float.toString x
+    | `infinite -> {js|infinite|js}
 end
 
 module AnimationPlayState = struct

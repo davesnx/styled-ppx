@@ -2095,7 +2095,7 @@ module Animation = struct
 
   let shorthand ?(duration = 0) ?(delay = 0) ?(direction = `normal)
     ?(timingFunction = `ease) ?(fillMode = `none) ?(playState = `running)
-    ?(iterationCount = `count 1) name =
+    ?(iterationCount = `count 1.) name =
     `value
       ((((((((((((((name ^ {js| |js}) ^ string_of_time duration) ^ {js| |js})
                 ^ TimingFunction.toString timingFunction)
