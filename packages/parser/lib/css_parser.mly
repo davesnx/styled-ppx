@@ -32,7 +32,13 @@ open Css_types
 %token <string> NTH_FUNCTION
 %token <string> URL
 %token BAD_URL
+%token <string> EQUAL_SIGN
+%token <string> MEDIA_QUERY_OPERATOR
+%token <string> MEDIA_FEATURE_COMPARISON
 %token <string> AT_MEDIA
+%token <string> SCREEN_MEDIA_TYPE
+%token <string> PRINT_MEDIA_TYPE
+%token <string> ALL_MEDIA_TYPE
 %token <string> AT_KEYFRAMES
 %token <string> AT_RULE
 %token <string> AT_RULE_STATEMENT
@@ -89,21 +95,145 @@ bracket_block (X): xs = delimited(LEFT_BRACKET, X, RIGHT_BRACKET) { xs }
 paren_block (X): xs = delimited(LEFT_PAREN, X, RIGHT_PAREN) { xs }
 
 /* https://www.w3.org/TR/mediaqueries-5 */
-/* Parsing with this approach is almost as good the entire spec */
 
-prelude: xs = loption(nonempty_list(loc(value_in_prelude))) { xs }
+/* ">" */
+greater_than: gt = MEDIA_FEATURE_COMPARISON { gt }
+/* "<" */
+less_than: lt = MEDIA_FEATURE_COMPARISON { lt }
+/* "=" */
+equal_sign: eq = EQUAL_SIGN { eq }
+/* "and" */
+and_operator: a = MEDIA_QUERY_OPERATOR { a }
+/* "or" */
+or_operator: o = MEDIA_QUERY_OPERATOR { o }
+/* "only" */
+only_operator: o = MEDIA_QUERY_OPERATOR { o }
+/* "not" */
+not_operator: n = MEDIA_QUERY_OPERATOR { n }
+/* "screen" */
+screen_media_type: smt =  SCREEN_MEDIA_TYPE { smt }
+/* "print" */
+print_media_type: pmt =  PRINT_MEDIA_TYPE { pmt }
+/* "all" */
+all_media_type: amt =  ALL_MEDIA_TYPE { amt }
 
-/* Missing grammars: */
-/* (width >= 600px) */
-/* (400px < width < 1000px) */
-/* (not (color)) and (not (hover)) */
-/* Combinator "," */
-media_query_prelude_item:
-  | i = IDENT { Ident i }
+/* https://www.w3.org/TR/mediaqueries-5/#mq-syntax */
+
+mf_value:
   | v = INTERPOLATION { Variable v }
-  | xs = paren_block(prelude) { Paren_block xs }
+  | v = value { v }
 
-media_query_prelude: q = nonempty_list(loc(skip_ws(media_query_prelude_item))) { q }
+/* <mf-plain> = <mf-name> : <mf-value> */
+mf_plain: mf = IDENT WS? COLON WS? mf_value { mf } 
+
+/* <mf-lt> = '<' '='? */
+mf_lt: mflt = less_than equal_sign? { mflt }
+
+/* <mf-gt> = '>' '='? */
+mf_gt: mglt = greater_than equal_sign? { mglt }
+
+/* <mf-comparison> = <mf-lt> | <mf-gt> | <mf-eq> */
+mf_comparison:
+  | mflt = mf_lt { mflt }
+  | mfgt = mf_gt { mfgt }
+  | mfeq = equal_sign { mfeq }
+
+/* <mf-range> =
+      <mf-name> <mf-comparison> <mf-value>
+      | <mf-value> <mf-comparison> <mf-name>
+      | <mf-value> <mf-lt> <mf-name> <mf-lt> <mf-value>
+      | <mf-value> <mf-gt> <mf-name> <mf-gt> <mf-value> */
+mf_range:
+  | xs = IDENT WS mf_comparison WS mf_value { xs } 
+  | mf_value WS xs = mf_comparison WS IDENT { xs }
+  | mf_value WS xs = mf_lt WS IDENT WS mf_lt WS mf_value { xs } 
+  | mf_value WS xs = mf_gt WS IDENT WS mf_gt WS mf_value { xs }
+
+screen_or_print_media_type:
+  | mt = screen_media_type { mt }
+  | mt = print_media_type { mt }
+
+mf_boolean:
+ // TODO: IDENT is not safely parsed.
+  | i = IDENT WS? { i }
+  | all_mt = all_media_type WS? { all_mt }
+  | mt = screen_or_print_media_type WS? { mt }
+  | mt = screen_or_print_media_type WS and_media_condition_without_or? WS? { mt }
+  | mt = screen_or_print_media_type WS? COMMA WS? screen_or_print_media_type WS? { mt }
+
+/* <media-feature> = ( [ <mf-plain> | <mf-boolean> | <mf-range> ] ) */
+media_feature:
+// TODO: property & value in mf_plain are not safely parsed.
+  | mfp = mf_plain { mfp }
+  | mfb = mf_boolean { mfb }
+  | mfr = mf_range { mfr }
+
+/* TODO: <general-enclosed> = [ <function-token> <any-value> ) ] | ( <ident> <any-value> ) */
+
+/* <media-in-parens> = ( <media-condition> ) | <media-feature> | TODO: <general-enclosed> */
+media_in_parens:
+  | LEFT_PAREN mc = media_condition RIGHT_PAREN { mc }
+  | LEFT_PAREN WS? mf = media_feature WS? RIGHT_PAREN { Ident mf }
+
+media_not: WS? mn = not_operator media_in_parens WS? { Ident mn }
+
+/* <media-and> = and <media-in-parens> */
+media_and: xs = and_operator media_in_parens { xs }
+
+/* <media-and>* */
+media_and_star:
+  | /* Empty case, represents zero occurrences of <media-and> */
+    { [] }
+  | and_rule = media_and
+      rest = media_and_star
+    { and_rule :: rest }
+
+/* <media-or> = or <media-in-parens> */
+media_or: xs = or_operator media_in_parens { xs }
+
+/* <media-or>* */
+media_or_star:
+  | /* Empty case, represents zero occurrences of <media-or> */
+    { [] }
+  | or_rule = media_or
+      rest = media_or_star
+    { or_rule :: rest }
+
+/* [ <media-and>* | <media-or>* ] */
+media_and_or_star:
+  | xs = media_and_star { xs }
+  | xs = media_or_star { xs }
+  
+/* <media-condition> = <media-not> | <media-in-parens> [ <media-and>* | <media-or>* ] */
+media_condition:
+  | mn = media_not { mn }
+  | xs = media_in_parens WS? media_and_or_star { xs }
+
+/* <media-condition-without-or> = <media-not> | <media-in-parens> <media-and>* */
+media_condition_without_or:
+  | mn = media_not { mn }
+  | xs = media_in_parens WS? media_and_star { xs }
+
+/* not | only  */
+not_or_only:
+  | n = not_operator { n }
+  | o = only_operator { o }
+
+/* and <media-condition-without-or>  */
+and_media_condition_without_or: xs = and_operator media_condition_without_or { Ident xs }
+
+/* media_query = <media-condition> | [ not | only ]? <media-type> [ and <media-condition-without-or> ]? */
+media_query:
+  | mc = media_condition WS? COMMA? WS? { mc }
+  | not_or_only? xs = screen_or_print_media_type WS? COMMA?
+    WS? and_media_condition_without_or ?COMMA? WS?  { Ident xs }
+  | not_or_only? xs = all_media_type WS? and_media_condition_without_or? WS?  { Ident xs }
+
+media_query_prelude:
+  | v = INTERPOLATION { Variable v }
+  | mq = nonempty_list(loc(media_query)) { Paren_block mq }
+
+prelude: xs = value { xs }
 
 /* https://www.w3.org/TR/css-syntax-3/#at-rules */
 at_rule:
@@ -111,7 +241,7 @@ at_rule:
   | name = loc(AT_MEDIA) WS?
     prelude = loc(media_query_prelude) WS?
     ds = brace_block(loc(declarations)) WS? {
-    { name = name;
+    { name;
       prelude;
       block = Rule_list ds;
       loc = Parser_location.make $startpos $endpos;
@@ -121,7 +251,7 @@ at_rule:
   | name = loc(AT_MEDIA) WS?
     prelude = loc(media_query_prelude) WS?
     b = loc(empty_brace_block) WS? {
-    { name = name;
+    { name;
       prelude;
       block = Rule_list b;
       loc = Parser_location.make $startpos $endpos;
@@ -131,10 +261,9 @@ at_rule:
   | name = loc(AT_KEYFRAMES) WS?
     i = IDENT WS?
     block = brace_block(keyframe) {
-    let item = (Ident i, Parser_location.make $startpos(i) $endpos(i)) in
-    let prelude = ([item], Parser_location.make $startpos $endpos) in
+    let prelude = (Ident i, Parser_location.make $startpos(i) $endpos(i)) in
     let block = Rule_list (block, Parser_location.make $startpos $endpos) in
-    { name = name;
+    { name;
       prelude;
       block;
       loc = Parser_location.make $startpos $endpos;
@@ -144,11 +273,10 @@ at_rule:
   | name = loc(AT_KEYFRAMES) WS?
     i = IDENT WS?
     s = loc(empty_brace_block) {
-    let item = ((Ident i), Parser_location.make $startpos(i) $endpos(i)) in
-    let prelude = ([item], Parser_location.make $startpos $endpos) in
+    let prelude = ((Ident i), Parser_location.make $startpos(i) $endpos(i)) in
     let empty_block = Rule_list s in
-    ({ name = name;
-      prelude = prelude;
+    ({ name;
+      prelude;
       block = empty_block;
       loc = Parser_location.make $startpos $endpos;
     }): at_rule
@@ -156,7 +284,7 @@ at_rule:
   /* @charset */
   | name = loc(AT_RULE_STATEMENT) WS?
     xs = loc(prelude) WS? SEMI_COLON? {
-    { name = name;
+    { name;
       prelude = xs;
       block = Empty;
       loc = Parser_location.make $startpos $endpos;
@@ -168,7 +296,7 @@ at_rule:
   | name = loc(AT_RULE) WS?
     xs = loc(prelude) WS?
     s = brace_block(stylesheet_without_eof) WS? {
-    { name = name;
+    { name;
       prelude = xs;
       block = Stylesheet s;
       loc = Parser_location.make $startpos $endpos;
@@ -267,6 +395,10 @@ declaration_without_eof:
     }
   }
 
+combinator:
+  | c = COMBINATOR { c }
+  | c = greater_than { c }
+
 nth_payload:
   /* TODO implement [of <complex-selector-list>]? */
   /* | complex = complex_selector_list; { NthSelector complex } */
@@ -320,7 +452,9 @@ pseudo_class_selector:
 ;
 
 /* "~=" | "|=" | "^=" | "$=" | "*=" | "=" */
-attr_matcher: o = OPERATOR { o }
+attr_matcher:
+ | o = OPERATOR { o }
+ | eq = EQUAL_SIGN { eq }
 
 /* <attribute-selector> = '[' <wq-name> ']' | '[' <wq-name> <attr-matcher> [  <string-token> | <ident-token> ] <attr-modifier>? ']' */
 attribute_selector:
@@ -471,7 +605,7 @@ compound_selector:
 combinator_sequence:
   | WS s = non_complex_selector { (None, s) }
   | s = non_complex_selector WS? { (None, s) }
-  | c = COMBINATOR WS? s = non_complex_selector WS? { (Some c, s) }
+  | c = combinator WS? s = non_complex_selector WS? { (Some c, s) }
 
 %inline non_complex_selector:
   | s = simple_selector { SimpleSelector s }
@@ -486,33 +620,6 @@ complex_selector:
       right = seq;
     }
   }
-
-/* value_in_prelude we transform WS_* into Delim with white spaces inside
-in value we transform to regular Delim
-The rest of value_in_prelude and value should be sync */
-value_in_prelude:
-  | b = paren_block(prelude) { Paren_block b }
-  | b = bracket_block(prelude) { Bracket_block b }
-  | n = percentage { Percentage n }
-  | i = IDENT { Ident i }
-  | i = TAG { Ident i }
-  | s = STRING { String s }
-  | c = COMBINATOR { Combinator c}
-  | o = OPERATOR { Operator o }
-  | d = DELIM { Delim d }
-  | DOT { Delim "." }
-  | COLON { Delim ":" }
-  | DOUBLE_COLON { Delim "::" }
-  | h = HASH { Hash h }
-  | COMMA { Delim "," }
-  | n = NUMBER { Number n }
-  | r = UNICODE_RANGE { Unicode_range r }
-  | d = FLOAT_DIMENSION { Float_dimension d }
-  | d = DIMENSION { Dimension d }
-  | v = INTERPOLATION { Variable v } /* $(Lola.value) */
-  | f = loc(FUNCTION) xs = loc(prelude) RIGHT_PAREN; { Function (f, xs) } /* calc() */
-  | u = URL { Uri u } /* url() */
-  | WS { Delim " " }
 
 value:
   | b = paren_block(values) { Paren_block b }
@@ -537,3 +644,6 @@ value:
   | v = INTERPOLATION { Variable v } /* $(Lola.value) */
   | f = loc(FUNCTION) v = loc(values) RIGHT_PAREN; { Function (f, v) } /* calc() */
   | u = URL { Uri u } /* url() */
+  | mq_operator = MEDIA_QUERY_OPERATOR { Operator mq_operator }
+  | all = ALL_MEDIA_TYPE { Operator all }
+  | screen = SCREEN_MEDIA_TYPE { Ident screen}

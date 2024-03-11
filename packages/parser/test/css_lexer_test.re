@@ -61,7 +61,17 @@ let success_tests_data =
     /* TODO: Support comments in the lexer? */
     /* ({|<!--|}, [CDO]), */
     /* ({|-->|}, [CDC]), */
-    ({|<|}, [DELIM("<")]),
+    ({|<|}, [MEDIA_FEATURE_COMPARISON("<")]),
+    ({|not|}, [IDENT("not")]),
+    ({|not |}, [MEDIA_QUERY_OPERATOR("not ")]),
+    ({|only|}, [IDENT("only")]),
+    ({|only |}, [MEDIA_QUERY_OPERATOR("only ")]),
+    ({|and|}, [IDENT("and")]),
+    ({|and |}, [MEDIA_QUERY_OPERATOR("and ")]),
+    ({|or |}, [MEDIA_QUERY_OPERATOR("or ")]),
+    ({|all|}, [ALL_MEDIA_TYPE("all")]),
+    ({|screen|}, [SCREEN_MEDIA_TYPE("screen")]),
+    ({|print|}, [PRINT_MEDIA_TYPE("print")]),
     ({|@mayushii|}, [AT_RULE("mayushii")]),
     ({|@|}, [DELIM("@")]),
     ({|[|}, [LEFT_BRACKET]),

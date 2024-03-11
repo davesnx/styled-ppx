@@ -112,88 +112,26 @@ let rec render_at_rule = (at_rule: at_rule) => {
   };
 }
 and render_media_query = (at_rule: at_rule) => {
-  let (prelude, prelude_loc) = at_rule.prelude;
-  let parse_condition =
-      (component_value: (component_value, Ppxlib.location))
-      : result(string, Ppxlib.Parsetree.expression) => {
-    let (value, loc) = component_value;
-    let component_value_location = loc;
+  let parse_condition = {
+    let (value, loc) = at_rule.prelude;
     switch (value) {
     | Variable(variable) => Ok(render_variable_as_string(variable))
-    /* (color) */
     | Paren_block([(Ident(_), ident_loc)]) =>
-      Ok(source_code_of_loc(ident_loc))
-    /* (min-width: 30px) */
-    | Paren_block([
-        (Ident(property), _),
-        (Delim(":"), _),
-        (_value, value_loc),
-      ]) =>
-      /* We need the value as a string to pipe it to the Property parser */
-      let value = source_code_of_loc(value_loc) |> String.trim;
-      /* String.trim is a hack, location should be correct and not contain any whitespace */
-      switch (Declarations_to_string.parse_declarations(property, value)) {
-      | Error(`Not_found) =>
-        Error(
-          Generate_lib.error(
-            ~loc=component_value_location,
-            Printf.sprintf("unsupported property: %s", property),
-          ),
-        )
-      | Error(`Invalid_value(_error)) =>
-        Error(
-          Generate_lib.error(~loc=component_value_location, "invalid value"),
-        )
-      | Ok(_exprs) =>
-        /* Here we receive the expressions transformed, but we prefer the stringed value */
-        Ok(value)
-      };
-    | Paren_block([(Ident(property), _), (Delim(":"), _), ..._value]) =>
-      Error(
-        Generate_lib.error(
-          ~loc=component_value_location,
-          Printf.sprintf(
-            "There's more than one value assiged to a property: %s",
-            property,
-          ),
-        ),
-      )
+      /* TODO: String.trim is a hack around, but a media query should be all clean. */
+      Ok(source_code_of_loc(ident_loc) |> String.trim)
     /* In any other case, we believe on the source_code and transform it to string. This is unsafe */
-    | _whatever => Ok(source_code_of_loc(component_value_location))
+    | _whatever => Ok(source_code_of_loc(loc) |> String.trim)
     };
-  };
-
-  let parse_conditions = prelude => {
-    switch (prelude) {
-    | (Paren_block(blocks), _) =>
-      let conditions = reduce_result(~empty=Ok([]), parse_condition, blocks);
-      switch (conditions) {
-      | Error(error_expr) => Error(error_expr)
-      | Ok(conditions) => Ok("(" ++ String.concat("", conditions) ++ ")")
-      };
-    | (Ident(i), _) => Ok(i)
-    | (Variable(v), _) => Ok(render_variable_as_string(v))
-    | _ =>
-      /* This branch is whildcared (_) by design of the parser. It won't allow any other component_value */
-      Error(Generate_lib.error(~loc=prelude_loc, "Invalid media query"))
-    };
-  };
-
-  let accumulate_parsed_conditions = condition => {
-    reduce_result(~empty=Ok([]), parse_conditions, condition);
   };
 
   let (delimiter, attrs) =
     Platform_attributes.string_delimiter(~loc=at_rule.loc);
 
-  switch (accumulate_parsed_conditions(prelude)) {
+  switch (parse_condition) {
   | Error(error_expr) => error_expr
-  | Ok([]) =>
-    Generate_lib.error(~loc=prelude_loc, "@media prelude can't be empty")
   | Ok(conditions) =>
     let query =
       conditions
-      |> String.concat(" ")
       |> String_interpolation.transform(~attrs, ~delimiter, ~loc=at_rule.loc);
 
     let rules =

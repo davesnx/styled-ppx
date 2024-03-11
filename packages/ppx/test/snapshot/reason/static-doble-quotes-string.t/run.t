@@ -2,7 +2,7 @@
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   module SingleQuoteStrings = {
-    [@deriving abstract]
+    [@deriving (jsProperties, getSet)]
     type makeProps = {
       [@mel.optional]
       innerRef: option(ReactDOM.domRef),
