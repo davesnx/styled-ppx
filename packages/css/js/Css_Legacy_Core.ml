@@ -1598,8 +1598,10 @@ type gridLength =
   | `repeat of RepeatValue.t * trackLength
   ]
 
-let gridLengthToJs x =
+let rec gridLengthToJs x =
   match x with
+  | `name name -> name
+  | `none -> {js|none|js}
   | `auto -> {js|auto|js}
   | `calc c -> string_of_calc c Length.toString
   | `ch x -> Std.Float.toString x ^ {js|ch|js}
@@ -1626,7 +1628,7 @@ let gridLengthToJs x =
     {js|repeat(|js}
     ^ RepeatValue.toString n
     ^ {js|, |js}
-    ^ string_of_dimension x
+    ^ string_of_dimensions x
     ^ {js|)|js}
   | `minmax (a, b) ->
     {js|minmax(|js}
@@ -1635,7 +1637,7 @@ let gridLengthToJs x =
     ^ string_of_minmax b
     ^ {js|)|js}
 
-let string_of_dimensions dimensions =
+and string_of_dimensions dimensions =
   dimensions |> List.map gridLengthToJs |> String.concat {js| |js}
 
 let gridTemplateColumns dimensions =
