@@ -3,11 +3,8 @@ open Reason_css_parser;
 open Standard;
 open Parser;
 
-/* Parser and Alcotest expose `string` */
-let str = Alcotest.string;
-
 let check = (location, testable, recived, expected) =>
-  Alcotest.check(~pos=location, testable, "", expected, recived);
+  check(~pos=location, testable, "", expected, recived);
 
 let test = (title, body) => test_case(title, `Quick, body);
 
@@ -15,27 +12,37 @@ let tests = [
   // TODO: case insensitive
   test("integer", () => {
     let parse = parse([%value "<integer>"]);
-    check(__POS__, result(int, str), parse("54"), Ok(54));
+    check(__POS__, result(int, Alcotest.string), parse("54"), Ok(54));
     check(
       __POS__,
-      result(int, str),
+      result(int, Alcotest.string),
       parse("54.4"),
       Error("expected an integer, received a float"),
     );
     check(
       __POS__,
-      result(int, str),
+      result(int, Alcotest.string),
       parse("ident"),
       Error("expected an integer"),
     );
   }),
   test("<number>", () => {
     let parse = parse([%value "<number>"]);
-    check(__POS__, result(float(1.), str), parse("55"), Ok(55.));
-    check(__POS__, result(float(1.), str), parse("55.5"), Ok(55.5));
     check(
       __POS__,
-      result(float(1.), str),
+      result(float(1.), Alcotest.string),
+      parse("55"),
+      Ok(55.),
+    );
+    check(
+      __POS__,
+      result(float(1.), Alcotest.string),
+      parse("55.5"),
+      Ok(55.5),
+    );
+    check(
+      __POS__,
+      result(float(1.), Alcotest.string),
       parse("ident"),
       Error("expected a number, receveid (IDENT \"ident\")"),
     );
@@ -70,7 +77,7 @@ let tests = [
     };
     let pp_length = (ppf, x) => Fmt.pf(ppf, "%S", render_length(x));
     let length = testable(pp_length, (==));
-    let to_check = result(length, str);
+    let to_check = result(length, Alcotest.string);
     check(__POS__, to_check, parse("56cm"), Ok(`Cm(56.)));
     check(__POS__, to_check, parse("57px"), Ok(`Px(57.)));
     check(
@@ -94,18 +101,33 @@ let tests = [
     };
     let pp_length = (ppf, x) => Fmt.pf(ppf, "%S", render_angle(x));
     let angle = testable(pp_length, (==));
-    check(__POS__, result(angle, str), parse("1deg"), Ok(`Deg(1.)));
-    check(__POS__, result(angle, str), parse("0.2turn"), Ok(`Turn(0.2)));
     check(
       __POS__,
-      result(angle, str),
+      result(angle, Alcotest.string),
+      parse("1deg"),
+      Ok(`Deg(1.)),
+    );
+    check(
+      __POS__,
+      result(angle, Alcotest.string),
+      parse("0.2turn"),
+      Ok(`Turn(0.2)),
+    );
+    check(
+      __POS__,
+      result(angle, Alcotest.string),
       parse("59px"),
       Error("unknown dimension"),
     );
-    check(__POS__, result(angle, str), parse("0"), Ok(`Deg(0.)));
     check(
       __POS__,
-      result(angle, str),
+      result(angle, Alcotest.string),
+      parse("0"),
+      Ok(`Deg(0.)),
+    );
+    check(
+      __POS__,
+      result(angle, Alcotest.string),
       parse("60"),
       Error("expected angle"),
     );
@@ -120,16 +142,36 @@ let tests = [
     };
     let pp_length = (ppf, x) => Fmt.pf(ppf, "%S", render_time(x));
     let time = testable(pp_length, (==));
-    check(__POS__, result(time, str), parse(".5s"), Ok(`S(0.5)));
-    check(__POS__, result(time, str), parse("50ms"), Ok(`Ms(50.)));
     check(
       __POS__,
-      result(time, str),
+      result(time, Alcotest.string),
+      parse(".5s"),
+      Ok(`S(0.5)),
+    );
+    check(
+      __POS__,
+      result(time, Alcotest.string),
+      parse("50ms"),
+      Ok(`Ms(50.)),
+    );
+    check(
+      __POS__,
+      result(time, Alcotest.string),
       parse("59px"),
       Error("unknown time unit"),
     );
-    check(__POS__, result(time, str), parse("0"), Error("expected time"));
-    check(__POS__, result(time, str), parse("60"), Error("expected time"));
+    check(
+      __POS__,
+      result(time, Alcotest.string),
+      parse("0"),
+      Error("expected time"),
+    );
+    check(
+      __POS__,
+      result(time, Alcotest.string),
+      parse("60"),
+      Error("expected time"),
+    );
   }),
   test("<frequency>", () => {
     let parse = parse([%value "<frequency>"]);
@@ -141,23 +183,33 @@ let tests = [
     };
     let pp_length = (ppf, x) => Fmt.pf(ppf, "%S", render_frequency(x));
     let frequency = testable(pp_length, (==));
-    check(__POS__, result(frequency, str), parse("6hz"), Ok(`Hz(6.)));
-    check(__POS__, result(frequency, str), parse(".6kHz"), Ok(`KHz(0.6)));
     check(
       __POS__,
-      result(frequency, str),
+      result(frequency, Alcotest.string),
+      parse("6hz"),
+      Ok(`Hz(6.)),
+    );
+    check(
+      __POS__,
+      result(frequency, Alcotest.string),
+      parse(".6kHz"),
+      Ok(`KHz(0.6)),
+    );
+    check(
+      __POS__,
+      result(frequency, Alcotest.string),
       parse("59px"),
       Error("unknown dimension px"),
     );
     check(
       __POS__,
-      result(frequency, str),
+      result(frequency, Alcotest.string),
       parse("0"),
       Error("expected frequency. got(NUMBER 0.)"),
     );
     check(
       __POS__,
-      result(frequency, str),
+      result(frequency, Alcotest.string),
       parse("60"),
       Error("expected frequency. got(NUMBER 60.)"),
     );
@@ -173,51 +225,71 @@ let tests = [
     };
     let pp_length = (ppf, x) => Fmt.pf(ppf, "%S", render_resolution(x));
     let resolution = testable(pp_length, (==));
-    check(__POS__, result(resolution, str), parse("6x"), Ok(`Dppx(6.)));
-    check(__POS__, result(resolution, str), parse("3dpi"), Ok(`Dpi(3.)));
     check(
       __POS__,
-      result(resolution, str),
+      result(resolution, Alcotest.string),
+      parse("6x"),
+      Ok(`Dppx(6.)),
+    );
+    check(
+      __POS__,
+      result(resolution, Alcotest.string),
+      parse("3dpi"),
+      Ok(`Dpi(3.)),
+    );
+    check(
+      __POS__,
+      result(resolution, Alcotest.string),
       parse("59px"),
       Error("unknown dimension"),
     );
     check(
       __POS__,
-      result(resolution, str),
+      result(resolution, Alcotest.string),
       parse("0"),
       Error("expected resolution"),
     );
     check(
       __POS__,
-      result(resolution, str),
+      result(resolution, Alcotest.string),
       parse("60"),
       Error("expected resolution"),
     );
   }),
   test("<percentage>", () => {
     let parse = parse([%value "<percentage>"]);
-    check(__POS__, result(float(1.), str), parse("61%"), Ok(61.));
-    check(__POS__, result(float(1.), str), parse("62.3%"), Ok(62.3));
     check(
       __POS__,
-      result(float(1.), str),
+      result(float(1.), Alcotest.string),
+      parse("61%"),
+      Ok(61.),
+    );
+    check(
+      __POS__,
+      result(float(1.), Alcotest.string),
+      parse("62.3%"),
+      Ok(62.3),
+    );
+    check(
+      __POS__,
+      result(float(1.), Alcotest.string),
       parse("63.4:"),
       Error("expected percentage"),
     );
   }),
   test("keyword", () => {
     let parse = parse([%value "gintoki"]);
-    check(__POS__, result(unit, str), parse("gintoki"), Ok());
+    check(__POS__, result(unit, Alcotest.string), parse("gintoki"), Ok());
     check(
       __POS__,
-      result(unit, str),
+      result(unit, Alcotest.string),
       parse("nope"),
       Error("Expected 'ident gintoki' but instead got ident nope"),
     );
   }),
   test("<ident>", () => {
     let parse = parse([%value "<ident>"]);
-    let to_check = result(str, str);
+    let to_check = result(Alcotest.string, Alcotest.string);
     check(__POS__, to_check, parse("test"), Ok("test"));
     check(
       __POS__,
@@ -242,45 +314,45 @@ let tests = [
     let css_wide_keywords = testable(pp_css_wide_keywords, (==));
     check(
       __POS__,
-      result(css_wide_keywords, str),
+      result(css_wide_keywords, Alcotest.string),
       parse("initial"),
       Ok(`Initial),
     );
     check(
       __POS__,
-      result(css_wide_keywords, str),
+      result(css_wide_keywords, Alcotest.string),
       parse("inherit"),
       Ok(`Inherit),
     );
     check(
       __POS__,
-      result(css_wide_keywords, str),
+      result(css_wide_keywords, Alcotest.string),
       parse("unset"),
       Ok(`Unset),
     );
     check(
       __POS__,
-      result(css_wide_keywords, str),
+      result(css_wide_keywords, Alcotest.string),
       parse("revert"),
       Ok(`Revert),
     );
     check(
       __POS__,
-      result(css_wide_keywords, str),
+      result(css_wide_keywords, Alcotest.string),
       parse("revert-layer"),
       Ok(`RevertLayer),
     );
     /* TODO: combine_xor should combine the error messages */
     check(
       __POS__,
-      result(css_wide_keywords, str),
+      result(css_wide_keywords, Alcotest.string),
       parse("nope"),
       Error("Expected 'ident revert-layer' but instead got ident nope"),
     );
   }),
   test("<string>", () => {
     let parse = parse([%value "<string>"]);
-    let to_check = result(str, str);
+    let to_check = result(Alcotest.string, Alcotest.string);
     check(__POS__, to_check, parse("'tuturu'"), Ok("tuturu"));
     check(__POS__, to_check, parse("'67.8'"), Ok("67.8"));
     check(__POS__, to_check, parse("ident"), Error("expected a string"));
@@ -288,7 +360,7 @@ let tests = [
   }),
   test("<dashed-ident>", () => {
     let parse = parse([%value "<dashed-ident>"]);
-    let to_check = result(str, str);
+    let to_check = result(Alcotest.string, Alcotest.string);
     check(__POS__, to_check, parse("--random"), Ok("--random"));
     check(
       __POS__,
@@ -299,7 +371,7 @@ let tests = [
   }),
   test("<url>", () => {
     let parse = parse([%value "<url>"]);
-    let to_check = result(str, str);
+    let to_check = result(Alcotest.string, Alcotest.string);
     check(
       __POS__,
       to_check,
@@ -316,7 +388,7 @@ let tests = [
   // css-color-4
   test("<hex-color>", () => {
     let parse = parse([%value "<hex-color>"]);
-    let to_check = result(str, str);
+    let to_check = result(Alcotest.string, Alcotest.string);
     check(__POS__, to_check, parse("#abc"), Ok("abc"));
     check(__POS__, to_check, parse("#abcdefgh"), Ok("abcdefgh"));
     check(
@@ -328,7 +400,8 @@ let tests = [
   }),
   test("<linenames>", () => {
     let parse = parse([%value "<line_names>"]);
-    let to_check = result(triple(unit, list(str), unit), str);
+    let to_check =
+      result(triple(unit, list(Alcotest.string), unit), Alcotest.string);
     check(__POS__, to_check, parse("[abc]"), Ok(((), ["abc"], ())));
     check(__POS__, to_check, parse("[a b]"), Ok(((), ["a", "b"], ())));
     check(
@@ -340,7 +413,7 @@ let tests = [
   }),
   test("interpolation", () => {
     let parse = parse([%value "<interpolation>"]);
-    let to_check = result(list(str), str);
+    let to_check = result(list(Alcotest.string), Alcotest.string);
     check(
       __POS__,
       to_check,
