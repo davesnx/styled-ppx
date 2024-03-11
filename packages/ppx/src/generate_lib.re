@@ -136,38 +136,6 @@ let applyIgnore = (~loc, expr) => {
   );
 };
 
-/* createVariadicElement("div", newProps) */
-let variadicElement = (~loc, ~htmlTag) => {
-  Helper.Exp.apply(
-    ~loc,
-    Helper.Exp.ident(~loc, withLoc(Lident("createVariadicElement"), ~loc)),
-    [
-      (
-        Nolabel,
-        Helper.Exp.constant(
-          ~loc,
-          ~attrs=
-            Platform_attributes.rawLiteral(
-              ~loc,
-              Helper.Str.mk(
-                ~loc,
-                Pstr_eval(
-                  Helper.Exp.constant(
-                    ~loc,
-                    Pconst_string(htmlTag, loc, None),
-                  ),
-                  [],
-                ),
-              ),
-            ),
-          Pconst_string(htmlTag, loc, None),
-        ),
-      ),
-      (Nolabel, Helper.Exp.ident(~loc, withLoc(Lident("newProps"), ~loc))),
-    ],
-  );
-};
-
 let propRecordAccess = (~loc, name) => {
   Helper.Exp.field(
     ~loc,
@@ -191,6 +159,92 @@ let propItem = (~loc, name) => {
     propRecordAccess(~loc, name)
   | _ => abstractGetProp(~loc, name)
   };
+};
+
+let generateSequence = (~loc, fns) => {
+  let rec generate = (~loc, fns) => {
+    switch (fns) {
+    | [] => failwith("sequence needs to contain at least one function")
+    | [return] => return
+    | [fn, return] => Helper.Exp.sequence(~loc, fn, return)
+    | [fn, ...rest] => Helper.Exp.sequence(~loc, fn, generate(~loc, rest))
+    };
+  };
+  generate(~loc, fns);
+};
+
+/* deleteProp(newProps, key) |> ignore; */
+/* TODO: Replace with Js.Dict.unsafeDeleteKey */
+let deleteProp = (~loc, key) => {
+  Helper.Exp.apply(
+    ~loc,
+    ~attrs=[Platform_attributes.uncurried(~loc)],
+    Helper.Exp.ident(~loc, withLoc(Lident("deleteProp"), ~loc)),
+    [
+      (Nolabel, Helper.Exp.ident(~loc, withLoc(Lident("newProps"), ~loc))),
+      (Nolabel, Helper.Exp.constant(~loc, Pconst_string(key, loc, None))),
+    ],
+  )
+  |> applyIgnore(~loc);
+};
+
+let asAttribute = () =>
+  switch (File.get()) {
+  | Some(ReScript) =>
+    MakeProps.Attribute({name: "as", type_: String, alias: None})
+  | _ => MakeProps.Attribute({name: "as_", type_: String, alias: Some("as")})
+  };
+
+/*
+ let asTag = props.as_;
+ deleteProp(newProps, "as") |> ignore;
+ createVariadicElement(finalHtmlTag, newProps)
+ */
+let variadicElement = (~loc, ~htmlTag) => {
+  let asAttributeName =
+    switch (asAttribute()) {
+    | MakeProps.Attribute({name, _}) => name
+    | _ => failwith("unreachable")
+    };
+
+  let asTag = {
+    Helper.Vb.mk(
+      ~loc,
+      Helper.Pat.mk(~loc, Ppat_var(withLoc("asTag", ~loc))),
+      propItem(~loc, asAttributeName),
+    );
+  };
+
+  let deletePropAs = deleteProp(~loc, "as");
+
+  let finalHtmlTag =
+    switch%expr (asTag) {
+    | Some(as_) => as_
+    | None => [%e Builder.estring(~loc, htmlTag)]
+    };
+
+  let createVariadicElement =
+    Helper.Exp.apply(
+      ~loc,
+      Helper.Exp.ident(
+        ~loc,
+        withLoc(Lident("createVariadicElement"), ~loc),
+      ),
+      [
+        (Nolabel, finalHtmlTag),
+        (
+          Nolabel,
+          Helper.Exp.ident(~loc, withLoc(Lident("newProps"), ~loc)),
+        ),
+      ],
+    );
+
+  Helper.Exp.let_(
+    ~loc,
+    Nonrecursive,
+    [asTag],
+    generateSequence(~loc, [deletePropAs, createVariadicElement]),
+  );
 };
 
 /* let stylesObject = { "className": className, "ref": props.ref }; */
@@ -229,36 +283,10 @@ let className = (~loc, expr) => {
   );
 };
 
-/* deleteInnerRef(newProps, "innerRef") |> ignore; */
-/* TODO: Replace with Js.Dict.unsafeDeleteKey */
-let deleteProp = (~loc, key) => {
-  Helper.Exp.apply(
-    ~loc,
-    ~attrs=[Platform_attributes.uncurried(~loc)],
-    Helper.Exp.ident(~loc, withLoc(Lident("deleteProp"), ~loc)),
-    [
-      (Nolabel, Helper.Exp.ident(~loc, withLoc(Lident("newProps"), ~loc))),
-      (Nolabel, Helper.Exp.constant(~loc, Pconst_string(key, loc, None))),
-    ],
-  )
-  |> applyIgnore(~loc);
-};
-let generateSequence = (~loc, fns) => {
-  let rec generate = (~loc, fns) => {
-    switch (fns) {
-    | [] => failwith("sequence needs to contain at least one function")
-    | [return] => return
-    | [fn, return] => Helper.Exp.sequence(~loc, fn, return)
-    | [fn, ...rest] => Helper.Exp.sequence(~loc, fn, generate(~loc, rest))
-    };
-  };
-  generate(~loc, fns);
-};
-
 /*
-  let stylesObject = {"className": styles};
+  let className = styles ++ props.className;
   let newProps = Js.Obj.assign(stylesObject, Obj.magic(props));
-  createVariadicElement("div", newProps);
+  createVariadicElement(finalHtmlTag, newProps);
  */
 let makeBody = (~loc, ~htmlTag, ~className as classNameValue, ~variables) => {
   let attrs = Platform_attributes.preserveBraces(~loc);
@@ -449,30 +477,36 @@ let recordEventLabel = (~loc, ~isOptional, name, kind) => {
   Helper.Type.field(~loc, ~attrs, withLoc(name, ~loc), type_);
 };
 
+let domPropLabel = (~loc, ~isOptional, domProp) => {
+  switch (domProp) {
+  | MakeProps.Event({name, type_}) =>
+    recordEventLabel(
+      ~loc,
+      ~isOptional,
+      name,
+      MakeProps.eventTypeToIdent(type_),
+    )
+  | MakeProps.Attribute({name, type_, alias}) =>
+    recordLabel(
+      ~loc,
+      ~isOptional,
+      name,
+      MakeProps.attributeTypeToIdent(type_),
+      alias,
+    )
+  };
+};
+
+let asLabel = (~loc, ~isOptional) => {
+  domPropLabel(~loc, ~isOptional, asAttribute());
+};
+
 let makePropsWithParams = (~loc, params, dynamicProps) => {
   let dynamicPropNames = dynamicProps |> List.map(d => d.pld_name.txt);
 
   let makeProps =
     MakeProps.get(dynamicPropNames)
-    |> List.map(domProp =>
-         switch (domProp) {
-         | MakeProps.Event({name, type_}) =>
-           recordEventLabel(
-             ~loc,
-             ~isOptional=false,
-             name,
-             MakeProps.eventTypeToIdent(type_),
-           )
-         | MakeProps.Attribute({name, type_, alias}) =>
-           recordLabel(
-             ~loc,
-             ~isOptional=false,
-             name,
-             MakeProps.attributeTypeToIdent(type_),
-             alias,
-           )
-         }
-       );
+    |> List.map(domPropLabel(~loc, ~isOptional=false));
 
   /* List of `prop: type` */
   let reactProps =
@@ -480,6 +514,7 @@ let makePropsWithParams = (~loc, params, dynamicProps) => {
       [
         domRefLabel(~loc, ~isOptional=false),
         childrenLabel(~loc, ~isOptional=false),
+        asLabel(~loc, ~isOptional=false),
         ...makeProps,
       ],
       dynamicProps,
@@ -532,25 +567,7 @@ let makeMakeProps = (~loc, ~areAllFieldsOptional, customProps) => {
 
   let makeProps =
     MakeProps.get(dynamicPropNames)
-    |> List.map(domProp =>
-         switch (domProp) {
-         | MakeProps.Event({name, type_}) =>
-           recordEventLabel(
-             ~loc,
-             ~isOptional=areAllFieldsOptional,
-             name,
-             MakeProps.eventTypeToIdent(type_),
-           )
-         | MakeProps.Attribute({name, type_, alias}) =>
-           recordLabel(
-             ~loc,
-             ~isOptional=areAllFieldsOptional,
-             name,
-             MakeProps.attributeTypeToIdent(type_),
-             alias,
-           )
-         }
-       );
+    |> List.map(domPropLabel(~loc, ~isOptional=areAllFieldsOptional));
 
   /* List of `prop: type` */
   let reactProps =
@@ -558,6 +575,7 @@ let makeMakeProps = (~loc, ~areAllFieldsOptional, customProps) => {
       [
         domRefLabel(~loc, ~isOptional=areAllFieldsOptional),
         childrenLabel(~loc, ~isOptional=areAllFieldsOptional),
+        asLabel(~loc, ~isOptional=areAllFieldsOptional),
         ...makeProps,
       ],
       dynamicProps,

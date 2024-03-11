@@ -6,8 +6,6 @@
          [|(CssJs.selector (({*j|html, body, #root, .class|*j})
               [@res.template ]) [|(CssJs.margin `zero)|])|])
 
+  $ sed -e 's/\*j//g' output.ml > fixed.ml
+
   $ npx rescript convert output.ml
-  Error when converting output.ml
-  File "", line 3, characters 29-30:
-  Error: Syntax error: operator expected.
-  

@@ -59,7 +59,7 @@ let clx = [%cx
 module App = {
   [@react.component]
   let make = () =>
-    <Cositas lola={CssJs.px(10)}>
+    <Cositas as_="section" lola={CssJs.px(10)}>
       <div className=clx> {React.string("code everywhere!")} </div>
       <div className=selectors> {React.string("Red text")} </div>
     </Cositas>;

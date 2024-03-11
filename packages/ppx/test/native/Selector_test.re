@@ -54,9 +54,19 @@ let simple_tests = [
     [%expr CssJs.style([|CssJs.selector({js|[id=baz]|js}, [||])|])],
   ),
   (
-    "[id=baz]",
+    "[id=\"baz\"]",
     [%expr [%cx {js|[id="baz"] {}|js}]],
     [%expr CssJs.style([|CssJs.selector({js|[id="baz"]|js}, [||])|])],
+  ),
+  (
+    "[title=baz]",
+    [%expr [%cx {js|[title=baz] {}|js}]],
+    [%expr CssJs.style([|CssJs.selector({js|[title=baz]|js}, [||])|])],
+  ),
+  (
+    "[title=\"baz\"]",
+    [%expr [%cx {js|[title="baz"] {}|js}]],
+    [%expr CssJs.style([|CssJs.selector({js|[title="baz"]|js}, [||])|])],
   ),
   (
     "nth-child(even)",

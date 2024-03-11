@@ -137,7 +137,7 @@ module App = {
         <li> {React.string("styled-ppx")} </li>
         <li> {React.string("emotion/css")} </li>
       </ul>
-      <Wat className="more-classes">
+      <Wat \"as"="section" className="more-classes">
         <DynamicComponent var={CssJs.hex("516CF0")}> {React.string("Halo :)")} </DynamicComponent>
         <Button color={Theme.Main}> {React.string("CLICK ME!")} </Button>
       </Wat>

@@ -21,7 +21,7 @@ module ComponentLink = %styled.a("color: #454545")
 
 describe("styled", () => {
   test("Component renders", _t =>
-    <Component /> |> render |> container |> expect |> Expect.toMatchSnapshot
+    <Component \"as"="section" /> |> render |> container |> expect |> Expect.toMatchSnapshot
   )
 
   test("ComponentInline renders and defaults to a div", _t =>

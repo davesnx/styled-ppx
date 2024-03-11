@@ -5,6 +5,7 @@
         {
         innerRef: ReactDOM.domRef [@bs.optional ];
         children: React.element [@bs.optional ];
+        as: string [@bs.optional ];
         about: string [@bs.optional ];
         accentHeight: string [@bs.optional ];
         accept: string [@bs.optional ];
@@ -503,5 +504,10 @@
         let newProps = assign2 (Js.Obj.empty ()) (Obj.magic props) stylesObject in
         ignore ((deleteProp newProps "var")[@bs ]);
         ignore ((deleteProp newProps "innerRef")[@bs ]);
-        createVariadicElement "div" newProps
+        (let asTag = asGet props in
+         ignore ((deleteProp newProps "as")[@bs ]);
+         createVariadicElement
+           (match asTag with
+            | ((Some (as_))[@explicit_arity ]) -> as_
+            | None -> "div") newProps)
     end
