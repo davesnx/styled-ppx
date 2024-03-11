@@ -421,14 +421,20 @@ let render_keyframes = (declarations: rule_list) => {
 };
 
 let render_global = ((ruleList, loc): stylesheet) => {
+  let onlyStyleRulesAndAtRulesSupported = {|Declarations does not make sense in global styles. Global should consists of style rules or at-rules (e.g @media, @print, etc.)
+
+If your intent is to apply the declaration to all elements, use the universal selector
+* {
+  /* Your declarations here */
+}|};
+
   let styles =
     ruleList
     |> List.map(rule => {
          switch (rule) {
          | Style_rule(style_rule) => render_style_rule(style_rule)
          | At_rule(at_rule) => render_at_rule(at_rule)
-         | _ =>
-           Generate_lib.error(~loc, "only style rule and at rule supported")
+         | _ => Generate_lib.error(~loc, onlyStyleRulesAndAtRulesSupported)
          }
        })
     |> Builder.pexp_array(~loc);
