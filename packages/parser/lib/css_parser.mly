@@ -322,19 +322,23 @@ pseudo_class_selector:
 /* "~=" | "|=" | "^=" | "$=" | "*=" | "=" */
 attr_matcher: o = OPERATOR { o }
 
+wq_name:
+  | i = IDENT { i }
+  | t = TAG { t }
+
 /* <attribute-selector> = '[' <wq-name> ']' | '[' <wq-name> <attr-matcher> [  <string-token> | <ident-token> ] <attr-modifier>? ']' */
 attribute_selector:
   /* https://www.w3.org/TR/selectors-4/#type-nmsp */
   /* We don't support namespaces in wq-name (`ns-prefix?`). We treat it like a IDENT */
   /* [ <wq-name> ] */
   | LEFT_BRACKET; WS?
-    i = IDENT WS?
+    i = wq_name WS?
     RIGHT_BRACKET {
     Attribute(Attr_value i)
   }
   /* [ wq-name = "value"] */
   | LEFT_BRACKET; WS?
-    i = IDENT WS?
+    i = wq_name WS?
     m = attr_matcher; WS?
     v = STRING; WS?
     RIGHT_BRACKET {
@@ -348,7 +352,7 @@ attribute_selector:
   }
   /* [ wq-name = value] */
   | LEFT_BRACKET; WS?
-    i = IDENT WS?
+    i = wq_name WS?
     m = attr_matcher; WS?
     v = IDENT WS?
     RIGHT_BRACKET {
