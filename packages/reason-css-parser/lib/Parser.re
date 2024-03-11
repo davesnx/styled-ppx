@@ -458,7 +458,6 @@ and keyframes_name = [%value.rec "<custom-ident> | <string>"]
 and leader_type = [%value.rec "'dotted' | 'solid' | 'space' | <string>"]
 and left = [%value.rec "<extended-length> | 'auto'"]
 and line_name_list = [%value.rec "[ <line-names> | <name-repeat> ]+"]
-/* and line_names = [%value.rec "[ '[' <custom-ident> ']' ]*"] */
 and line_style = [%value.rec
   "'none' | 'hidden' | 'dotted' | 'dashed' | 'solid' | 'double' | 'groove' | 'ridge' | 'inset' | 'outset'"
 ]
@@ -1276,7 +1275,7 @@ and property_mask_size = [%value.rec "[ <bg-size> ]#"]
 and property_mask_type = [%value.rec "'luminance' | 'alpha'"]
 and property_max_block_size = [%value.rec "<'max-width'>"]
 and property_max_height = [%value.rec
-  "'auto' | <extended-length> | <extended-percentage> | 'min-content' | 'max-content' | 'fit-content' | fit-content( <extended-length> | <extended-percentage> ) | <calc()>"
+  "'none' | 'auto' | <extended-length> | <extended-percentage> | 'min-content' | 'max-content' | 'fit-content' | fit-content( <extended-length> | <extended-percentage> ) | <calc()>"
 ]
 and property_max_inline_size = [%value.rec "<'max-width'>"]
 and property_max_lines = [%value.rec "'none' | <integer>"]
@@ -1362,15 +1361,15 @@ and property_outline_style = [%value.rec
 ]
 and property_outline_width = [%value.rec "<line-width> | <interpolation>"]
 and property_overflow = [%value.rec
-  "[ 'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' ]{1,2} | <-non-standard-overflow>"
+  "[ 'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' ]{1,2} | <-non-standard-overflow> | <interpolation>"
 ]
 and property_overflow_anchor = [%value.rec "'auto' | 'none'"]
 and property_overflow_block = [%value.rec
-  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto'"
+  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"
 ]
 and property_overflow_clip_box = [%value.rec "'padding-box' | 'content-box'"]
 and property_overflow_inline = [%value.rec
-  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto'"
+  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"
 ]
 and property_overflow_wrap = [%value.rec
   "'normal' | 'break-word' | 'anywhere'"

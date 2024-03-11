@@ -239,19 +239,13 @@ let interpolation = {
   Match.return(path);
 };
 
-/* [%value.rec "'[' [ <custom-ident> ]* ']'"] */
+/* TODO: LEFT_BRACKET and RIGHT_BRACKET are wrongly lexed as DELIM('[') and DELIM(']'), we use a handmade parser to by-pass it, and use LEFT_BRACKET/RIGHT_BRACKET correctly. The original spec is "'[' [ <custom-ident> ]* ']'" */
 let line_names = {
   open Rule;
   open Rule.Let;
 
   let.bind_match left = Pattern.expect(LEFT_BRACKET);
-  let.bind_match path =
-    Modifier.zero_or_more(
-      {
-        let.bind_match ident = custom_ident;
-        Match.return(ident);
-      },
-    );
+  let.bind_match path = Modifier.one_or_more(custom_ident);
   let.bind_match right = Pattern.expect(RIGHT_BRACKET);
 
   return_match((left, path, right));

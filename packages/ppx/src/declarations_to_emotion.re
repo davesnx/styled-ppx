@@ -145,7 +145,7 @@ let render_string = (~loc, s) => {
 let render_integer = (~loc, integer) =>
   Helper.Const.int(integer) |> Helper.Exp.constant(~loc);
 let render_number = (~loc, number) =>
-  Helper.Const.float(number |> string_of_float) |> Helper.Exp.constant(~loc);
+  Helper.Const.float(number |> Float.to_string) |> Helper.Exp.constant(~loc);
 let render_percentage = (~loc, number) => [%expr
   `percent([%e render_number(~loc, number)])
 ];
@@ -292,7 +292,7 @@ let render_length = (~loc) =>
   | `Lh(_n) => raise(Unsupported_feature)
   | `Mm(n) => [%expr `mm([%e render_number(~loc, n)])]
   | `Pc(n) => [%expr `pc([%e render_number(~loc, n)])]
-  | `Pt(n) => [%expr `pt([%e render_integer(~loc, n |> int_of_float)])]
+  | `Pt(n) => [%expr `pt([%e render_integer(~loc, n |> Float.to_int)])]
   | `Px(n) => [%expr `pxFloat([%e render_number(~loc, n)])]
   | `Q(_n) => raise(Unsupported_feature)
   | `Rem(n) => [%expr `rem([%e render_number(~loc, n)])]
@@ -805,7 +805,7 @@ let render_color_alpha = (~loc, color_alpha) =>
   };
 
 let render_function_rgb = (~loc, ast: Types.function_rgb) => {
-  let color_to_float = v => render_integer(~loc, v |> int_of_float);
+  let color_to_float = v => render_integer(~loc, v |> Float.to_int);
 
   let to_number =
     fun
@@ -845,7 +845,7 @@ let render_function_rgb = (~loc, ast: Types.function_rgb) => {
 };
 
 let render_function_rgba = (~loc, ast: Types.function_rgba) => {
-  let color_to_float = v => render_integer(~loc, v |> int_of_float);
+  let color_to_float = v => render_integer(~loc, v |> Float.to_int);
 
   let to_number =
     fun
@@ -2026,14 +2026,47 @@ let overflow =
         [%expr CssJs.overflowX([%e variant_to_expression(~loc, x)])],
         [%expr CssJs.overflowY([%e variant_to_expression(~loc, y)])],
       ]
-    | _ => failwith("unreachable")
+    | `Interpolation(i) => [
+        [%expr CssJs.overflow([%e render_variable(~loc, i)])],
+      ]
+    | `Xor(_) => raise(Unsupported_feature)
+    | _ => raise(Unsupported_feature)
   );
 
 // let overflow_clip_margin = unsupportedProperty(Parser.property_overflow_clip_margin);
-let overflow_inline =
-  variants(Parser.property_overflow_inline, (~loc) =>
-    [%expr CssJs.overflowInline]
+
+let overflow_block =
+  monomorphic(
+    Parser.property_overflow_block,
+    (~loc) => [%expr CssJs.overflowBlock],
+    (~loc, value) => {
+      switch (value) {
+      | `Interpolation(i) => render_variable(~loc, i)
+      | `Auto => variant_to_expression(~loc, `Auto)
+      | `Clip => variant_to_expression(~loc, `Clip)
+      | `Hidden => variant_to_expression(~loc, `Hidden)
+      | `Scroll => variant_to_expression(~loc, `Scroll)
+      | `Visible => variant_to_expression(~loc, `Visible)
+      }
+    },
   );
+
+let overflow_inline =
+  monomorphic(
+    Parser.property_overflow_inline,
+    (~loc) => [%expr CssJs.overflowInline],
+    (~loc, value) => {
+      switch (value) {
+      | `Interpolation(i) => render_variable(~loc, i)
+      | `Auto => variant_to_expression(~loc, `Auto)
+      | `Clip => variant_to_expression(~loc, `Clip)
+      | `Hidden => variant_to_expression(~loc, `Hidden)
+      | `Scroll => variant_to_expression(~loc, `Scroll)
+      | `Visible => variant_to_expression(~loc, `Visible)
+      }
+    },
+  );
+
 let text_overflow =
   monomorphic(
     Parser.property_text_overflow,
@@ -2764,22 +2797,22 @@ let transition_property =
 /* bs-css doesn't support `S. PR: https://github.com/giraud/bs-css/pull/264 */
 /* let render_time = (~loc) => fun
    | `Ms(f) => {
-     let value = int_of_float(f);
+     let value = Float.to_int(f);
      [%expr `ms([%e render_integer(~loc, value)])]
    }
    | `S(f) => {
-     let value = int_of_float(f);
+     let value = Float.to_int(f);
      [%expr `s([%e render_integer(~loc, value)])]
    }; */
 
 let render_time_as_int = (~loc) =>
   fun
   | `Ms(f) => {
-      let value = int_of_float(f);
+      let value = Float.to_int(f);
       [%expr [%e render_integer(~loc, value)]];
     }
   | `S(f) => {
-      let value = f *. 1000.0 |> int_of_float;
+      let value = f *. 1000.0 |> Float.to_int;
       [%expr [%e render_integer(~loc, value)]];
     };
 
@@ -3325,11 +3358,228 @@ let align_content =
     },
   );
 
+let render_line_names = (~loc, value: Types.line_names) => {
+  let ((), line_names, ()) = value;
+  line_names
+  |> String.concat(" ")
+  |> Printf.sprintf("[%s]")
+  |> (name => [[%expr `name([%e render_string(~loc, name)])]]);
+};
+
+let render_maybe_line_names = (~loc, value) => {
+  switch (value) {
+  | None => []
+  | Some(names) => render_line_names(~loc, names)
+  };
+};
+
+let render_inflexible_breadth = (~loc, value: Types.inflexible_breadth) => {
+  switch (value) {
+  | `Auto => [%expr `auto]
+  | `Min_content => [%expr `minContent]
+  | `Max_content => [%expr `maxContent]
+  | `Extended_length(l) => render_extended_length(~loc, l)
+  | `Extended_percentage(p) => render_extended_percentage(~loc, p)
+  /* TODO: Maybe fit-content is also valid? */
+  };
+};
+
+let render_fixed_breadth = (~loc, value: Types.fixed_breadth) => {
+  switch (value) {
+  | `Extended_length(l) => render_extended_length(~loc, l)
+  | `Extended_percentage(p) => render_extended_percentage(~loc, p)
+  };
+};
+
+let render_flex_value = (~loc, value: Types.flex_value) => {
+  switch (value) {
+  | `Fr(f) => [%expr `fr([%e render_number(~loc, f)])]
+  };
+};
+
+let render_track_breadth = (~loc, value: Types.track_breadth) => {
+  switch (value) {
+  | `Flex_value(f) => render_flex_value(~loc, f)
+  | `Auto => [%expr `auto]
+  | `Min_content => [%expr `minContent]
+  | `Max_content => [%expr `maxContent]
+  | `Extended_length(l) => render_extended_length(~loc, l)
+  | `Extended_percentage(p) => render_extended_percentage(~loc, p)
+  /* TODO: Maybe fit-content is also valid? */
+  };
+};
+
+let rec render_track_repeat = (~loc, repeat: Types.track_repeat) => {
+  let (positiveInteger, (), trackSizes, lineNames) = repeat;
+  let lineNamesExpr = render_maybe_line_names(~loc, lineNames);
+  let trackSizesExpr =
+    trackSizes
+    |> List.concat_map(((lineNames, trackSize)) => {
+         let lineName = render_maybe_line_names(~loc, lineNames);
+         List.append(lineName, [render_track_size(~loc, trackSize)]);
+       });
+  let items =
+    List.append(trackSizesExpr, lineNamesExpr) |> Builder.pexp_array(~loc);
+  [%expr
+   `repeat((`num([%e render_integer(~loc, positiveInteger)]), [%e items]))];
+}
+and render_track_size = (~loc, value: Types.track_size) => {
+  switch (value) {
+  | `Track_breadth(breadth) => render_track_breadth(~loc, breadth)
+  | `Minmax(inflexible, (), breadth) =>
+    [%expr
+     `minmax((
+       [%e render_inflexible_breadth(~loc, inflexible)],
+       [%e render_track_breadth(~loc, breadth)],
+     ))]
+  | `Fit_content_0 => [%expr `fit_content]
+  | `Fit_content_1(`Extended_length(el)) =>
+    [%expr `fitContent([%e render_extended_length(~loc, el)])]
+  | `Fit_content_1(`Extended_percentage(ep)) =>
+    [%expr `fitContent([%e render_extended_percentage(~loc, ep)])]
+  };
+};
+
+let render_track_list = (~loc, track_list, line_names) => {
+  let tracks =
+    track_list
+    |> List.concat_map(((line_name, track)) => {
+         let value =
+           switch (track) {
+           | `Track_repeat(repeat) => render_track_repeat(~loc, repeat)
+           | `Track_size(size) => render_track_size(~loc, size)
+           };
+         let lineNameExpr = render_maybe_line_names(~loc, line_name);
+         List.append(lineNameExpr, [value]);
+       });
+  let lineNamesExpr = render_maybe_line_names(~loc, line_names);
+  List.append(lineNamesExpr, tracks) |> Builder.pexp_array(~loc);
+};
+
+let render_fixed_size = (~loc, value: Types.fixed_size) => {
+  switch (value) {
+  | `Fixed_breadth(breadth) => render_fixed_breadth(~loc, breadth)
+  | `Minmax_0(fixed, (), breadth) =>
+    [%expr
+     `minmax((
+       [%e render_fixed_breadth(~loc, fixed)],
+       [%e render_track_breadth(~loc, breadth)],
+     ))]
+  | `Minmax_1(inflexible, (), breadth) =>
+    [%expr
+     `minmax((
+       [%e render_inflexible_breadth(~loc, inflexible)],
+       [%e render_fixed_breadth(~loc, breadth)],
+     ))]
+  };
+};
+
+let render_fixed_repeat = (~loc, value: Types.fixed_repeat) => {
+  let (positiveInteger, (), fixedSizes, lineNames) = value;
+  let number = render_integer(~loc, positiveInteger);
+  let lineNamesExpr = render_maybe_line_names(~loc, lineNames);
+  let fixedSizesExpr =
+    fixedSizes
+    |> List.concat_map(((lineName, value)) => {
+         let fixed = render_fixed_size(~loc, value);
+         let lineName = render_maybe_line_names(~loc, lineName);
+         List.append(lineName, [fixed]);
+       })
+    |> List.append(lineNamesExpr)
+    |> Builder.pexp_array(~loc);
+  [%expr `repeat((`num([%e number]), [%e fixedSizesExpr]))];
+};
+
+let render_auto_repeat = (~loc, value: Types.auto_repeat) => {
+  let (autos, (), fixedSized, lineNames) = value;
+  let lineNamesExpr = render_maybe_line_names(~loc, lineNames);
+  let autosExpr =
+    switch (autos) {
+    | `Auto_fill => [%expr `autoFill]
+    | `Auto_fit => [%expr `autoFit]
+    };
+  let fixedExpr =
+    fixedSized
+    |> List.concat_map(((lineName, value)) => {
+         let fixed = render_fixed_size(~loc, value);
+         let lineName = render_maybe_line_names(~loc, lineName);
+         List.append(lineName, [fixed]);
+       });
+  let items =
+    List.append(lineNamesExpr, fixedExpr) |> Builder.pexp_array(~loc);
+  [%expr `repeat(([%e autosExpr], [%e items]))];
+};
+
+let render_repeat_fixed = (~loc, value) => {
+  value
+  |> List.concat_map(((lineName, value)) => {
+       let valueExpr =
+         switch (value) {
+         | `Fixed_size(size) => render_fixed_size(~loc, size)
+         | `Fixed_repeat(repeat) => render_fixed_repeat(~loc, repeat)
+         };
+       let lineNamesExpr = render_maybe_line_names(~loc, lineName);
+       List.append(lineNamesExpr, [valueExpr]);
+     });
+};
+
+let render_auto_track_list = (~loc, value: Types.auto_track_list) => {
+  let (fixed, lineNames, autoRepeat, fixed2, lineNames2) = value;
+  let fixed1Expr = render_repeat_fixed(~loc, fixed);
+  let lineNamesExpr = render_maybe_line_names(~loc, lineNames);
+  let fixed1 = List.append(fixed1Expr, lineNamesExpr);
+  let fixed2Expr = render_repeat_fixed(~loc, fixed2);
+  let lineNamesExpr2 = render_maybe_line_names(~loc, lineNames2);
+  let fixed2 = List.append(fixed2Expr, lineNamesExpr2);
+  let autoRepeatExpr = render_auto_repeat(~loc, autoRepeat);
+  List.append(fixed1, [autoRepeatExpr, ...fixed2])
+  |> Builder.pexp_array(~loc);
+};
+
+let render_name_repeat = (~loc, value: Types.name_repeat) => {
+  let (repeatValue, (), listOfLineNames) = value;
+  let lineNamesExpr =
+    listOfLineNames
+    |> List.concat_map(render_line_names(~loc))
+    |> Builder.pexp_array(~loc);
+  switch (repeatValue) {
+  | `Auto_fill => [[%expr `repeat((`autoFill, [%e lineNamesExpr]))]]
+  | `Positive_integer(i) => [
+      [%expr
+        `repeat((`num([%e render_integer(~loc, i)]), [%e lineNamesExpr]))
+      ],
+    ]
+  };
+};
+
+let render_subgrid = (~loc, line_name_list: Types.line_name_list) => {
+  line_name_list
+  |> List.concat_map(value => {
+       switch (value) {
+       | `Line_names(line_names) => render_line_names(~loc, line_names)
+       | `Name_repeat(name_repeat) => render_name_repeat(~loc, name_repeat)
+       }
+     })
+  |> List.append([[%expr `subgrid]])
+  |> Builder.pexp_array(~loc);
+};
+
 // css-grid-1
 let grid_template_columns =
-  unsupportedValue(Parser.property_grid_template_columns, (~loc) =>
-    [%expr CssJs.gridTemplateColumns]
+  monomorphic(
+    Parser.property_grid_template_columns,
+    (~loc) => [%expr CssJs.gridTemplateColumns],
+    (~loc, value: Types.property_grid_template_columns) =>
+      switch (value) {
+      | `None => [%expr [|`none|]]
+      | `Track_list(track_list, line_names) =>
+        render_track_list(~loc, track_list, line_names)
+      | `Auto_track_list(list) => render_auto_track_list(~loc, list)
+      | `Static((), None) => [%expr `subgrid]
+      | `Static((), Some(subgrid)) => render_subgrid(~loc, subgrid)
+      },
   );
+
 let grid_template_rows =
   unsupportedValue(Parser.property_grid_template_rows, (~loc) =>
     [%expr CssJs.gridTemplateRows]
@@ -3575,14 +3825,14 @@ let fill =
   monomorphic(
     Parser.property_fill,
     (~loc) => [%expr CssJs.SVG.fill],
-    (~loc) => render_paint(~loc),
+    render_paint,
   );
 
 let stroke =
   monomorphic(
     Parser.property_stroke,
     (~loc) => [%expr CssJs.SVG.stroke],
-    (~loc) => render_paint(~loc),
+    render_paint,
   );
 
 let render_alpha_value = (~loc, value: Types.alpha_value) => {
@@ -3962,10 +4212,10 @@ let properties = [
   ("outline-width", found(outline_width)),
   ("outline", found(outline)),
   ("overflow-inline", found(overflow_inline)),
+  ("overflow-block", found(overflow_block)),
   ("overflow-wrap", found(overflow_wrap)),
   ("overflow-x", found(overflow_x)),
   ("overflow-x", found(overflow_x)),
-  ("overflow-y", found(overflow_y)),
   ("overflow-y", found(overflow_y)),
   ("overflow", found(overflow)),
   ("padding-bottom", found(padding_bottom)),

@@ -1,0 +1,5 @@
+(cram
+ (alias ppx_e2e_test)
+ (deps
+  input.re
+  (package styled-ppx)))

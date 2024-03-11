@@ -41,7 +41,7 @@ let humanize =
   fun
   | EOF => "the end"
   | IDENT(str) => "ident " ++ str
-  | BAD_IDENT => "bad  ident"
+  | BAD_IDENT => "bad ident"
   | FUNCTION(f) => "function " ++ f
   | AT_KEYWORD(at) => "@ " ++ at
   | HASH(h, _) => "hash: #" ++ h

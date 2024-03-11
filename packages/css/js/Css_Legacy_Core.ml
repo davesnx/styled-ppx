@@ -1518,7 +1518,7 @@ let string_of_calc x fn =
   | `one a -> {js|calc(|js} ^ fn a ^ {js|)|js}
   | `add (a, b) -> {js|calc(|js} ^ fn a ^ {js| + |js} ^ fn b ^ {js|)|js}
   | `sub (a, b) -> {js|calc(|js} ^ fn a ^ {js| - |js} ^ fn b ^ {js|)|js}
-  | `mult (a, b) -> ((({js|calc(|js} ^ fn a) ^ {js| * |js}) ^ fn b) ^ {js|)|js}
+  | `mult (a, b) -> {js|calc(|js} ^ fn a ^ {js| * |js} ^ fn b ^ {js|)|js}
 
 let string_of_minmax x =
   match x with
@@ -1600,8 +1600,10 @@ type gridLength =
   | `repeat of RepeatValue.t * trackLength
   ]
 
-let gridLengthToJs x =
+let rec gridLengthToJs x =
   match x with
+  | `name name -> name
+  | `none -> {js|none|js}
   | `auto -> {js|auto|js}
   | `calc c -> string_of_calc c Length.toString
   | `ch x -> Std.Float.toString x ^ {js|ch|js}
@@ -1628,7 +1630,7 @@ let gridLengthToJs x =
     {js|repeat(|js}
     ^ RepeatValue.toString n
     ^ {js|, |js}
-    ^ string_of_dimension x
+    ^ string_of_dimensions x
     ^ {js|)|js}
   | `minmax (a, b) ->
     {js|minmax(|js}
@@ -1637,7 +1639,7 @@ let gridLengthToJs x =
     ^ string_of_minmax b
     ^ {js|)|js}
 
-let string_of_dimensions dimensions =
+and string_of_dimensions dimensions =
   dimensions |> List.map gridLengthToJs |> String.concat {js| |js}
 
 let gridTemplateColumns dimensions =
@@ -1911,27 +1913,16 @@ let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
   in
   let sizeAdjust =
     Belt.Option.mapWithDefault sizeAdjust {js||js} (fun s ->
-        ({js|size-adjust: |js} ^ Percentage.toString s) ^ {js|;|js})
+        {js|size-adjust: |js} ^ Percentage.toString s ^ {js|;|js})
   in
-  ((((((((((({js|@font-face {
-     font-family: |js} ^ fontFamily)
-           ^ {js|;
-     src: |js})
-          ^ src)
-         ^ {js|;
-     |js})
-        ^ fontStyle)
-       ^ {js|
-     |js})
-      ^ fontWeight)
-     ^ {js|
-     |js})
-    ^ fontDisplay)
-   ^ {js|
-     |js})
-  ^ sizeAdjust)
-  ^ {js|
-   }|js}
+  {js|@font-face {|js}
+  ^ ({js|font-family: |js} ^ fontFamily)
+  ^ ({js|; src: |js} ^ src ^ {js|;|js})
+  ^ fontStyle
+  ^ fontWeight
+  ^ fontDisplay
+  ^ sizeAdjust
+  ^ {js|}|js}
 
 let textDecoration x =
   D
@@ -2012,7 +2003,7 @@ module Animation = struct
 
   let shorthand ?(duration = 0) ?(delay = 0) ?(direction = `normal)
     ?(timingFunction = `ease) ?(fillMode = `none) ?(playState = `running)
-    ?(iterationCount = `count 1) name =
+    ?(iterationCount = `count 1.) name =
     `value
       (name
       ^ {js| |js}

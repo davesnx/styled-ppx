@@ -1623,7 +1623,7 @@ let string_of_calc x fn =
   | `one a -> {js|calc(|js} ^ fn a ^ {js|)|js}
   | `add (a, b) -> {js|calc(|js} ^ fn a ^ {js| + |js} ^ fn b ^ {js|)|js}
   | `sub (a, b) -> {js|calc(|js} ^ fn a ^ {js| - |js} ^ fn b ^ {js|)|js}
-  | `mult (a, b) -> ((({js|calc(|js} ^ fn a) ^ {js| * |js}) ^ fn b) ^ {js|)|js}
+  | `mult (a, b) -> {js|calc(|js} ^ fn a ^ {js| * |js} ^ fn b ^ {js|)|js}
 
 let string_of_minmax x =
   match x with
@@ -1677,7 +1677,10 @@ let string_of_dimension x =
   | `minContent -> {js|min-content|js}
   | `maxContent -> {js|max-content|js}
   | `minmax (a, b) ->
-    ((({js|minmax(|js} ^ string_of_minmax a) ^ {js|,|js}) ^ string_of_minmax b)
+    {js|minmax(|js}
+    ^ string_of_minmax a
+    ^ {js|,|js}
+    ^ string_of_minmax b
     ^ {js|)|js}
 
 type minmax =
@@ -1702,8 +1705,10 @@ type gridLength =
   | `repeat of RepeatValue.t * trackLength
   ]
 
-let gridLengthToJs x =
+let rec gridLengthToJs x =
   match x with
+  | `name name -> name
+  | `none -> {js|none|js}
   | `auto -> {js|auto|js}
   | `calc c -> string_of_calc c Length.toString
   | `ch x -> Std.Float.toString x ^ {js|ch|js}
@@ -1727,14 +1732,19 @@ let gridLengthToJs x =
   | `minContent -> {js|min-content|js}
   | `maxContent -> {js|max-content|js}
   | `repeat (n, x) ->
-    ((({js|repeat(|js} ^ RepeatValue.toString n) ^ {js|, |js})
-    ^ string_of_dimension x)
+    {js|repeat(|js}
+    ^ RepeatValue.toString n
+    ^ {js|, |js}
+    ^ string_of_dimensions x
     ^ {js|)|js}
   | `minmax (a, b) ->
-    ((({js|minmax(|js} ^ string_of_minmax a) ^ {js|,|js}) ^ string_of_minmax b)
+    {js|minmax(|js}
+    ^ string_of_minmax a
+    ^ {js|,|js}
+    ^ string_of_minmax b
     ^ {js|)|js}
 
-let string_of_dimensions dimensions =
+and string_of_dimensions dimensions =
   dimensions
   |. Std.Array.map gridLengthToJs
   |. Std.Array.joinWith ~sep:{js| |js}
@@ -1767,17 +1777,21 @@ let gridArea2 s s2 =
 let gridArea3 s s2 s3 =
   D
     ( {js|gridArea|js},
-      (((GridArea.toString s ^ {js| / |js}) ^ GridArea.toString s2)
-      ^ {js| / |js})
+      GridArea.toString s
+      ^ {js| / |js}
+      ^ GridArea.toString s2
+      ^ {js| / |js}
       ^ GridArea.toString s3 )
 
 let gridArea4 s s2 s3 s4 =
   D
     ( {js|gridArea|js},
-      (((((GridArea.toString s ^ {js| / |js}) ^ GridArea.toString s2)
-        ^ {js| / |js})
-       ^ GridArea.toString s3)
-      ^ {js| / |js})
+      GridArea.toString s
+      ^ {js| / |js}
+      ^ GridArea.toString s2
+      ^ {js| / |js}
+      ^ GridArea.toString s3
+      ^ {js| / |js}
       ^ GridArea.toString s4 )
 
 let gridTemplateAreas l =
@@ -1811,11 +1825,13 @@ let string_of_filter x =
   | `brightness v -> ({js|brightness(|js} ^ Std.Float.toString v) ^ {js|%)|js}
   | `contrast v -> ({js|contrast(|js} ^ Std.Float.toString v) ^ {js|%)|js}
   | `dropShadow (a, b, c, d) ->
-    ((((((({js|drop-shadow(|js} ^ Length.toString a) ^ {js| |js})
-        ^ Length.toString b)
-       ^ {js| |js})
-      ^ Length.toString c)
-     ^ {js| |js})
+    ({js|drop-shadow(|js}
+    ^ Length.toString a
+    ^ {js| |js}
+    ^ Length.toString b
+    ^ {js| |js}
+    ^ Length.toString c
+    ^ {js| |js}
     ^ Color.toString d)
     ^ {js|)|js}
   | `grayscale v -> ({js|grayscale(|js} ^ Std.Float.toString v) ^ {js|%)|js}
@@ -1848,19 +1864,25 @@ module Shadow = struct
   let box ?(x = zero) ?(y = zero) ?(blur = zero) ?(spread = zero)
     ?(inset = false) color =
     `shadow
-      (((((((((Length.toString x ^ {js| |js}) ^ Length.toString y) ^ {js| |js})
-           ^ Length.toString blur)
-          ^ {js| |js})
-         ^ Length.toString spread)
-        ^ {js| |js})
-       ^ string_of_color color)
+      (Length.toString x
+      ^ {js| |js}
+      ^ Length.toString y
+      ^ {js| |js}
+      ^ Length.toString blur
+      ^ {js| |js}
+      ^ Length.toString spread
+      ^ {js| |js}
+      ^ string_of_color color
       ^ if inset then {js| inset|js} else {js||js})
 
   let text ?(x = zero) ?(y = zero) ?(blur = zero) color =
     `shadow
-      ((((((Length.toString x ^ {js| |js}) ^ Length.toString y) ^ {js| |js})
-        ^ Length.toString blur)
-       ^ {js| |js})
+      (Length.toString x
+      ^ {js| |js}
+      ^ Length.toString y
+      ^ {js| |js}
+      ^ Length.toString blur
+      ^ {js| |js}
       ^ string_of_color color)
 
   let (toString : 'a t -> string) =
@@ -1890,8 +1912,10 @@ let string_of_borderstyle x =
 let border px style color =
   D
     ( {js|border|js},
-      (((LineWidth.toString px ^ {js| |js}) ^ string_of_borderstyle style)
-      ^ {js| |js})
+      LineWidth.toString px
+      ^ {js| |js}
+      ^ string_of_borderstyle style
+      ^ {js| |js}
       ^ string_of_color color )
 
 let borderStyle x = D ({js|borderStyle|js}, string_of_borderstyle x)
@@ -1899,8 +1923,10 @@ let borderStyle x = D ({js|borderStyle|js}, string_of_borderstyle x)
 let borderLeft px style color =
   D
     ( {js|borderLeft|js},
-      (((LineWidth.toString px ^ {js| |js}) ^ string_of_borderstyle style)
-      ^ {js| |js})
+      LineWidth.toString px
+      ^ {js| |js}
+      ^ string_of_borderstyle style
+      ^ {js| |js}
       ^ string_of_color color )
 
 let borderLeftStyle x = D ({js|borderLeftStyle|js}, string_of_borderstyle x)
@@ -1908,8 +1934,10 @@ let borderLeftStyle x = D ({js|borderLeftStyle|js}, string_of_borderstyle x)
 let borderRight px style color =
   D
     ( {js|borderRight|js},
-      (((LineWidth.toString px ^ {js| |js}) ^ string_of_borderstyle style)
-      ^ {js| |js})
+      LineWidth.toString px
+      ^ {js| |js}
+      ^ string_of_borderstyle style
+      ^ {js| |js}
       ^ string_of_color color )
 
 let borderRightStyle x = D ({js|borderRightStyle|js}, string_of_borderstyle x)
@@ -1917,8 +1945,10 @@ let borderRightStyle x = D ({js|borderRightStyle|js}, string_of_borderstyle x)
 let borderTop px style color =
   D
     ( {js|borderTop|js},
-      (((LineWidth.toString px ^ {js| |js}) ^ string_of_borderstyle style)
-      ^ {js| |js})
+      LineWidth.toString px
+      ^ {js| |js}
+      ^ string_of_borderstyle style
+      ^ {js| |js}
       ^ string_of_color color )
 
 let borderTopStyle x = D ({js|borderTopStyle|js}, string_of_borderstyle x)
@@ -1926,8 +1956,10 @@ let borderTopStyle x = D ({js|borderTopStyle|js}, string_of_borderstyle x)
 let borderBottom px style color =
   D
     ( {js|borderBottom|js},
-      (((LineWidth.toString px ^ {js| |js}) ^ string_of_borderstyle style)
-      ^ {js| |js})
+      LineWidth.toString px
+      ^ {js| |js}
+      ^ string_of_borderstyle style
+      ^ {js| |js}
       ^ string_of_color color )
 
 let borderBottomStyle x = D ({js|borderBottomStyle|js}, string_of_borderstyle x)
@@ -1989,31 +2021,20 @@ let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
   in
   let fontDisplay =
     Belt.Option.mapWithDefault fontDisplay {js||js} (fun f ->
-        ({js|font-display: |js} ^ FontDisplay.toString f) ^ {js|;|js})
+        {js|font-display: |js} ^ FontDisplay.toString f ^ {js|;|js})
   in
   let sizeAdjust =
     Belt.Option.mapWithDefault sizeAdjust {js||js} (fun s ->
-        ({js|size-adjust: |js} ^ Percentage.toString s) ^ {js|;|js})
+        {js|size-adjust: |js} ^ Percentage.toString s ^ {js|;|js})
   in
-  ((((((((((({js|@font-face {
-     font-family: |js} ^ fontFamily)
-           ^ {js|;
-     src: |js})
-          ^ src)
-         ^ {js|;
-     |js})
-        ^ fontStyle)
-       ^ {js|
-     |js})
-      ^ fontWeight)
-     ^ {js|
-     |js})
-    ^ fontDisplay)
-   ^ {js|
-     |js})
-  ^ sizeAdjust)
-  ^ {js|
-   }|js}
+  {js|@font-face {|js}
+  ^ ({js|font-family: |js} ^ fontFamily)
+  ^ ({js|; src: |js} ^ src ^ {js|;|js})
+  ^ fontStyle
+  ^ fontWeight
+  ^ fontDisplay
+  ^ sizeAdjust
+  ^ {js|}|js}
 
 let textDecoration x =
   D
@@ -2056,11 +2077,12 @@ module Transition = struct
   let shorthand ?(duration = 0) ?(delay = 0) ?(timingFunction = `ease) property
       =
     `value
-      ((((((string_of_time duration ^ {js| |js})
-          ^ TimingFunction.toString timingFunction)
-         ^ {js| |js})
-        ^ string_of_time delay)
-       ^ {js| |js})
+      (string_of_time duration
+      ^ {js| |js}
+      ^ TimingFunction.toString timingFunction
+      ^ {js| |js}
+      ^ string_of_time delay
+      ^ {js| |js}
       ^ property)
 
   let toString x = match x with `value v -> v
@@ -2095,19 +2117,22 @@ module Animation = struct
 
   let shorthand ?(duration = 0) ?(delay = 0) ?(direction = `normal)
     ?(timingFunction = `ease) ?(fillMode = `none) ?(playState = `running)
-    ?(iterationCount = `count 1) name =
+    ?(iterationCount = `count 1.) name =
     `value
-      ((((((((((((((name ^ {js| |js}) ^ string_of_time duration) ^ {js| |js})
-                ^ TimingFunction.toString timingFunction)
-               ^ {js| |js})
-              ^ string_of_time delay)
-             ^ {js| |js})
-            ^ AnimationIterationCount.toString iterationCount)
-           ^ {js| |js})
-          ^ AnimationDirection.toString direction)
-         ^ {js| |js})
-        ^ AnimationFillMode.toString fillMode)
-       ^ {js| |js})
+      (name
+      ^ {js| |js}
+      ^ string_of_time duration
+      ^ {js| |js}
+      ^ TimingFunction.toString timingFunction
+      ^ {js| |js}
+      ^ string_of_time delay
+      ^ {js| |js}
+      ^ AnimationIterationCount.toString iterationCount
+      ^ {js| |js}
+      ^ AnimationDirection.toString direction
+      ^ {js| |js}
+      ^ AnimationFillMode.toString fillMode
+      ^ {js| |js}
       ^ AnimationPlayState.toString playState)
 
   let toString x = match x with `value v -> v
@@ -2219,6 +2244,14 @@ let textJustify x =
 let overflowInline x =
   D
     ( {js|overflowInline|js},
+      match x with
+      | #OverflowInline.t as ov -> OverflowInline.toString ov
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let overflowBlock x =
+  D
+    ( {js|overflowBlock|js},
       match x with
       | #OverflowInline.t as ov -> OverflowInline.toString ov
       | #Var.t as var -> Var.toString var

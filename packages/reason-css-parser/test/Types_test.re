@@ -1,5 +1,6 @@
+/* TODO: Run those tests */
+
 open Alcotest;
-open Ast_helper;
 let loc = Location.none;
 
 let compare = (input, expected, {expect, _}) => {
