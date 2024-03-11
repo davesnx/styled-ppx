@@ -4,4 +4,3 @@ Since OCaml syntax doesn't support escaping reserved keywords (e.g `as`) ], we r
   $ sed -e 's/as:/as_:/g' -e 's/props.as/props.as_/g' output.ml > fixed.ml
 
   $ npx rescript convert fixed.ml
-
