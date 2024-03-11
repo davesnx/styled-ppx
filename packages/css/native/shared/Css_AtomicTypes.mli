@@ -889,11 +889,11 @@ end
 
 module AnimationIterationCount : sig
   type t =
-    [ `count of int
+    [ `count of float
     | `infinite
     ]
 
-  val toString : [< `count of int | `infinite ] -> string
+  val toString : [< `count of float | `infinite ] -> string
 end
 
 module AnimationPlayState : sig
@@ -2969,11 +2969,11 @@ end
 
 module AlphaValue : sig
   type t =
-    [ `num of int
+    [ `num of float
     | `percent of float
     ]
 
-  val toString : [< `num of int | `percent of float ] -> string
+  val toString : [< `num of float | `percent of float ] -> string
 end
 
 module LineBreak : sig

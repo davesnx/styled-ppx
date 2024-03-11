@@ -39,8 +39,7 @@ module Var = struct
   let toString x =
     match x with
     | `var x -> ({js|var(|js} ^ prefix x) ^ {js|)|js}
-    | `varDefault (x, v) ->
-      ((({js|var(|js} ^ prefix x) ^ {js|,|js}) ^ v) ^ {js|)|js}
+    | `varDefault (x, v) -> {js|var(|js} ^ prefix x ^ {js|,|js} ^ v ^ {js|)|js}
 end
 
 module Time = struct
@@ -130,11 +129,11 @@ module Length = struct
     | `zero -> {js|0|js}
     | `calc (`one a) -> ({js|calc(|js} ^ toString a) ^ {js|)|js}
     | `calc (`add (a, b)) ->
-      ((({js|calc(|js} ^ toString a) ^ {js| + |js}) ^ toString b) ^ {js|)|js}
+      {js|calc(|js} ^ toString a ^ {js| + |js} ^ toString b ^ {js|)|js}
     | `calc (`sub (a, b)) ->
-      ((({js|calc(|js} ^ toString a) ^ {js| - |js}) ^ toString b) ^ {js|)|js}
+      {js|calc(|js} ^ toString a ^ {js| - |js} ^ toString b ^ {js|)|js}
     | `calc (`mult (a, b)) ->
-      ((({js|calc(|js} ^ toString a) ^ {js| * |js}) ^ toString b) ^ {js|)|js}
+      {js|calc(|js} ^ toString a ^ {js| * |js} ^ toString b ^ {js|)|js}
     | `percent x -> Std.Float.toString x ^ {js|%|js}
 end
 
@@ -458,12 +457,14 @@ module TimingFunction = struct
     | `steps (i, `end_) ->
       ({js|steps(|js} ^ Std.Int.toString i) ^ {js|, end)|js}
     | `cubicBezier (a, b, c, d) ->
-      ((((((({js|cubic-bezier(|js} ^ Std.Float.toString a) ^ {js|, |js})
-          ^ Std.Float.toString b)
-         ^ {js|, |js})
-        ^ Std.Float.toString c)
-       ^ {js|, |js})
-      ^ Std.Float.toString d)
+      {js|cubic-bezier(|js}
+      ^ Std.Float.toString a
+      ^ {js|, |js}
+      ^ Std.Float.toString b
+      ^ {js|, |js}
+      ^ Std.Float.toString c
+      ^ {js|, |js}
+      ^ Std.Float.toString d
       ^ {js|)|js}
     | `jumpStart -> {js|jump-start|js}
     | `jumpEnd -> {js|jump-end|js}
@@ -640,55 +641,68 @@ module Transform = struct
   let skewY a = `skewY a
 
   let string_of_scale x y =
-    ((({js|scale(|js} ^ Std.Float.toString x) ^ {js|, |js})
-    ^ Std.Float.toString y)
+    {js|scale(|js}
+    ^ Std.Float.toString x
+    ^ {js|, |js}
+    ^ Std.Float.toString y
     ^ {js|)|js}
 
   let string_of_translate3d x y z =
-    ((((({js|translate3d(|js} ^ Length.toString x) ^ {js|, |js})
-      ^ Length.toString y)
-     ^ {js|, |js})
-    ^ Length.toString z)
+    {js|translate3d(|js}
+    ^ Length.toString x
+    ^ {js|, |js}
+    ^ Length.toString y
+    ^ {js|, |js}
+    ^ Length.toString z
     ^ {js|)|js}
 
   let toString x =
     match x with
     | `translate (x, y) ->
-      ((({js|translate(|js} ^ Length.toString x) ^ {js|, |js})
-      ^ Length.toString y)
+      {js|translate(|js}
+      ^ Length.toString x
+      ^ {js|, |js}
+      ^ Length.toString y
       ^ {js|)|js}
     | `translate3d (x, y, z) -> string_of_translate3d x y z
-    | `translateX x -> ({js|translateX(|js} ^ Length.toString x) ^ {js|)|js}
-    | `translateY y -> ({js|translateY(|js} ^ Length.toString y) ^ {js|)|js}
-    | `translateZ z -> ({js|translateZ(|js} ^ Length.toString z) ^ {js|)|js}
+    | `translateX x -> {js|translateX(|js} ^ Length.toString x ^ {js|)|js}
+    | `translateY y -> {js|translateY(|js} ^ Length.toString y ^ {js|)|js}
+    | `translateZ z -> {js|translateZ(|js} ^ Length.toString z ^ {js|)|js}
     | `scale (x, y) -> string_of_scale x y
     | `scale3d (x, y, z) ->
-      ((((({js|scale3d(|js} ^ Std.Float.toString x) ^ {js|, |js})
-        ^ Std.Float.toString y)
-       ^ {js|, |js})
-      ^ Std.Float.toString z)
+      {js|scale3d(|js}
+      ^ Std.Float.toString x
+      ^ {js|, |js}
+      ^ Std.Float.toString y
+      ^ {js|, |js}
+      ^ Std.Float.toString z
       ^ {js|)|js}
-    | `scaleX x -> ({js|scaleX(|js} ^ Std.Float.toString x) ^ {js|)|js}
-    | `scaleY y -> ({js|scaleY(|js} ^ Std.Float.toString y) ^ {js|)|js}
-    | `scaleZ z -> ({js|scaleZ(|js} ^ Std.Float.toString z) ^ {js|)|js}
-    | `rotate a -> ({js|rotate(|js} ^ Angle.toString a) ^ {js|)|js}
+    | `scaleX x -> {js|scaleX(|js} ^ Std.Float.toString x ^ {js|)|js}
+    | `scaleY y -> {js|scaleY(|js} ^ Std.Float.toString y ^ {js|)|js}
+    | `scaleZ z -> {js|scaleZ(|js} ^ Std.Float.toString z ^ {js|)|js}
+    | `rotate a -> {js|rotate(|js} ^ Angle.toString a ^ {js|)|js}
     | `rotate3d (x, y, z, a) ->
-      ((((((({js|rotate3d(|js} ^ Std.Float.toString x) ^ {js|, |js})
-          ^ Std.Float.toString y)
-         ^ {js|, |js})
-        ^ Std.Float.toString z)
-       ^ {js|, |js})
-      ^ Angle.toString a)
+      {js|rotate3d(|js}
+      ^ Std.Float.toString x
+      ^ {js|, |js}
+      ^ Std.Float.toString y
+      ^ {js|, |js}
+      ^ Std.Float.toString z
+      ^ {js|, |js}
+      ^ Angle.toString a
       ^ {js|)|js}
-    | `rotateX a -> ({js|rotateX(|js} ^ Angle.toString a) ^ {js|)|js}
-    | `rotateY a -> ({js|rotateY(|js} ^ Angle.toString a) ^ {js|)|js}
-    | `rotateZ a -> ({js|rotateZ(|js} ^ Angle.toString a) ^ {js|)|js}
+    | `rotateX a -> {js|rotateX(|js} ^ Angle.toString a ^ {js|)|js}
+    | `rotateY a -> {js|rotateY(|js} ^ Angle.toString a ^ {js|)|js}
+    | `rotateZ a -> {js|rotateZ(|js} ^ Angle.toString a ^ {js|)|js}
     | `skew (x, y) ->
-      ((({js|skew(|js} ^ Angle.toString x) ^ {js|, |js}) ^ Angle.toString y)
+      {js|skew(|js}
+      ^ Angle.toString x
+      ^ {js|, |js}
+      ^ Angle.toString y
       ^ {js|)|js}
-    | `skewX a -> ({js|skewX(|js} ^ Angle.toString a) ^ {js|)|js}
-    | `skewY a -> ({js|skewY(|js} ^ Angle.toString a) ^ {js|)|js}
-    | `perspective x -> ({js|perspective(|js} ^ Std.Int.toString x) ^ {js|)|js}
+    | `skewX a -> {js|skewX(|js} ^ Angle.toString a ^ {js|)|js}
+    | `skewY a -> {js|skewY(|js} ^ Angle.toString a ^ {js|)|js}
+    | `perspective x -> {js|perspective(|js} ^ Std.Int.toString x ^ {js|)|js}
 end
 
 module AnimationDirection = struct
@@ -725,14 +739,14 @@ end
 
 module AnimationIterationCount = struct
   type t =
-    [ `infinite
-    | `count of int
+    [ `count of float
+    | `infinite
     ]
 
   let toString x =
     match x with
+    | `count x -> Std.Float.toString x
     | `infinite -> {js|infinite|js}
-    | `count x -> Std.Int.toString x
 end
 
 module AnimationPlayState = struct
@@ -971,17 +985,22 @@ module Color = struct
   let rec toString x =
     match x with
     | `rgb (r, g, b) ->
-      ((((({js|rgb(|js} ^ Std.Int.toString r) ^ {js|, |js}) ^ Std.Int.toString g)
-       ^ {js|, |js})
-      ^ Std.Int.toString b)
+      {js|rgb(|js}
+      ^ Std.Int.toString r
+      ^ {js|, |js}
+      ^ Std.Int.toString g
+      ^ {js|, |js}
+      ^ Std.Int.toString b
       ^ {js|)|js}
     | `rgba (r, g, b, a) ->
-      ((((((({js|rgba(|js} ^ Std.Int.toString r) ^ {js|, |js})
-          ^ Std.Int.toString g)
-         ^ {js|, |js})
-        ^ Std.Int.toString b)
-       ^ {js|, |js})
-      ^ string_of_alpha a)
+      {js|rgba(|js}
+      ^ Std.Int.toString r
+      ^ {js|, |js}
+      ^ Std.Int.toString g
+      ^ {js|, |js}
+      ^ Std.Int.toString b
+      ^ {js|, |js}
+      ^ string_of_alpha a
       ^ {js|)|js}
     | `colorMix (method', color_x, color_y) ->
       {js|color-mix(|js}
@@ -995,18 +1014,22 @@ module Color = struct
       ^ string_of_color color_x color_y
       ^ {js|)|js}
     | `hsl (h, s, l) ->
-      ((((({js|hsl(|js} ^ Angle.toString h) ^ {js|, |js})
-        ^ Percentage.toString s)
-       ^ {js|, |js})
-      ^ Percentage.toString l)
+      {js|hsl(|js}
+      ^ Angle.toString h
+      ^ {js|, |js}
+      ^ Percentage.toString s
+      ^ {js|, |js}
+      ^ Percentage.toString l
       ^ {js|)|js}
     | `hsla (h, s, l, a) ->
-      ((((((({js|hsla(|js} ^ Angle.toString h) ^ {js|, |js})
-          ^ Percentage.toString s)
-         ^ {js|, |js})
-        ^ Percentage.toString l)
-       ^ {js|, |js})
-      ^ string_of_alpha a)
+      {js|hsla(|js}
+      ^ Angle.toString h
+      ^ {js|, |js}
+      ^ Percentage.toString s
+      ^ {js|, |js}
+      ^ Percentage.toString l
+      ^ {js|, |js}
+      ^ string_of_alpha a
       ^ {js|)|js}
     | `hex s -> {js|#|js} ^ s
     | `transparent -> {js|transparent|js}
@@ -1767,7 +1790,7 @@ module GridTemplateAreas = struct
     | `areas items ->
       String.trim
         (Std.Array.reduce items {js||js} (fun carry item ->
-             ((carry ^ {js|'|js}) ^ item) ^ {js|' |js}))
+             carry ^ {js|'|js} ^ item ^ {js|' |js}))
 end
 
 module GridArea = struct
@@ -2222,15 +2245,18 @@ module Gradient = struct
     | `linearGradient (None, stops) ->
       ({js|linear-gradient(|js} ^ string_of_stops stops) ^ {js|)|js}
     | `linearGradient (Some direction, stops) ->
-      ((({js|linear-gradient(|js} ^ direction_to_string direction) ^ {js|, |js})
-      ^ string_of_stops stops)
+      {js|linear-gradient(|js}
+      ^ direction_to_string direction
+      ^ {js|, |js}
+      ^ string_of_stops stops
       ^ {js|)|js}
     | `repeatingLinearGradient (None, stops) ->
-      ({js|repeating-linear-gradient(|js} ^ string_of_stops stops) ^ {js|)|js}
+      {js|repeating-linear-gradient(|js} ^ string_of_stops stops ^ {js|)|js}
     | `repeatingLinearGradient (Some direction, stops) ->
-      ((({js|repeating-linear-gradient(|js} ^ direction_to_string direction)
-       ^ {js|, |js})
-      ^ string_of_stops stops)
+      {js|repeating-linear-gradient(|js}
+      ^ direction_to_string direction
+      ^ {js|, |js}
+      ^ string_of_stops stops
       ^ {js|)|js}
     | `radialGradient stops ->
       ({js|radial-gradient(|js} ^ string_of_stops stops) ^ {js|)|js}
@@ -2239,8 +2265,10 @@ module Gradient = struct
     | `conicGradient (None, stops) ->
       ({js|conic-gradient(|js} ^ string_of_stops stops) ^ {js|)|js}
     | `conicGradient (Some direction, stops) ->
-      ((({js|conic-gradient(|js} ^ direction_to_string direction) ^ {js|, |js})
-      ^ string_of_stops stops)
+      {js|conic-gradient(|js}
+      ^ direction_to_string direction
+      ^ {js|, |js}
+      ^ string_of_stops stops
       ^ {js|)|js}
 end
 
@@ -2396,7 +2424,8 @@ module FontFamilyName = struct
     match x with
     | `custom value ->
       (match String.get value 0 with
-      | '\'' -> value | '"' -> value
+      | '\'' -> value
+      | '"' -> value
       | _ -> ({js|"|js} ^ value) ^ {js|"|js})
     | `serif -> {js|serif|js}
     | `sansSerif -> {js|sans-serif|js}
@@ -2456,8 +2485,10 @@ module Counter = struct
       (match style with
       | `unset -> ({js|counter(|js} ^ counter) ^ {js|)|js}
       | #CounterStyleType.t as t ->
-        ((({js|counter(|js} ^ counter) ^ {js|,|js})
-        ^ CounterStyleType.toString t)
+        {js|counter(|js}
+        ^ counter
+        ^ {js|,|js}
+        ^ CounterStyleType.toString t
         ^ {js|)|js})
 end
 
@@ -2476,11 +2507,14 @@ module Counters = struct
     match x with
     | `counters (name, separator, style) ->
       (match style with
-      | `unset ->
-        ((({js|counters(|js} ^ name) ^ {js|,"|js}) ^ separator) ^ {js|")|js}
+      | `unset -> {js|counters(|js} ^ name ^ {js|,"|js} ^ separator ^ {js|")|js}
       | #CounterStyleType.t as s ->
-        ((((({js|counters(|js} ^ name) ^ {js|,"|js}) ^ separator) ^ {js|",|js})
-        ^ CounterStyleType.toString s)
+        {js|counters(|js}
+        ^ name
+        ^ {js|,"|js}
+        ^ separator
+        ^ {js|",|js}
+        ^ CounterStyleType.toString s
         ^ {js|)|js})
 end
 
@@ -2539,11 +2573,14 @@ module Content = struct
     ]
 
   let text_to_string value =
-    if Std.String.length value = 0 then {js|''|js}
-    (* value = "" -> '' *)
-    else if Std.String.length value = 2 && Std.String.get value 0 = '"' && Std.String.get value 1 = '"' then {js|''|js}
-    else
-      (match Std.String.get value 0, Std.String.length value with
+    if Std.String.length value = 0 then {js|''|js} (* value = "" -> '' *)
+    else if
+      Std.String.length value = 2
+      && Std.String.get value 0 = '"'
+      && Std.String.get value 1 = '"'
+    then {js|''|js}
+    else (
+      match Std.String.get value 0, Std.String.length value with
       | '\'', 1 -> {js|"'"|js}
       | '"', 1 -> {js|'"'|js}
       | '\'', _ | '"', _ -> value
@@ -2620,13 +2657,13 @@ end
 
 module AlphaValue = struct
   type t =
-    [ `num of int
+    [ `num of float
     | `percent of float
     ]
 
   let toString x =
     match x with
-    | `num x -> Std.Int.toString x
+    | `num x -> Std.Float.toString x
     | `percent x -> Std.Float.toString x ^ {js|%|js}
 end
 

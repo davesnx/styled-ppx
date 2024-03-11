@@ -4,7 +4,7 @@
 (subdir
  reason
  (cram
-  (alias ppx_snapshot_test)
+  (alias ppx_snapshot_reason_test)
   (deps
    %{bin:standalone}
    %{bin:refmt}
@@ -13,9 +13,9 @@
 (subdir
  rescript
  (cram
-  (alias ppx_snapshot_test)
+  (alias ppx_snapshot_rescript_test)
   (deps
-   %{bin:standalone}
+   %{bin:rewriter}
    (package styled-ppx))))
 
 (executables

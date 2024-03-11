@@ -2,8 +2,8 @@ open Alcotest;
 open Reason_css_parser;
 open Tokens;
 open Rule;
-
 open! Data;
+
 let data_monad_tests: list(Alcotest.test_case(unit)) = [
   // TODO: check static order
   test_case("return with an int", `Quick, _ => {
