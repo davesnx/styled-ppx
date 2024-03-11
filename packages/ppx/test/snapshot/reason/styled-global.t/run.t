@@ -3,6 +3,9 @@
   $ refmt --parse ml --print re output.ml
   ignore(
     CssJs.global([|
-      ({js|html, body, #root, .class|js}, [|CssJs.margin(`zero)|]),
+      CssJs.selector(
+        {js|html, body, #root, .class|js},
+        [|CssJs.margin(`zero)|],
+      ),
     |]),
   );
