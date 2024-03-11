@@ -319,7 +319,8 @@ let overflow_block =
     | `Clip => [%expr "clip"]
     | `Hidden => [%expr "hidden"]
     | `Scroll => [%expr "scroll"]
-    | `Visible => [%expr "visible"],
+    | `Visible => [%expr "visible"]
+    | `Interpolation(i) => render_variable(i),
   );
 
 let overflow_inline =
@@ -331,7 +332,8 @@ let overflow_inline =
     | `Clip => [%expr "clip"]
     | `Hidden => [%expr "hidden"]
     | `Scroll => [%expr "scroll"]
-    | `Visible => [%expr "visible"],
+    | `Visible => [%expr "visible"]
+    | `Interpolation(i) => render_variable(i),
   );
 
 let color = apply(Parser.positive_integer, [%expr "color"], render_integer);

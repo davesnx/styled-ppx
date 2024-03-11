@@ -2224,6 +2224,14 @@ let overflowInline x =
       | #Var.t as var -> Var.toString var
       | #Cascading.t as c -> Cascading.toString c )
 
+let overflowBlock x =
+  D
+    ( {js|overflowBlock|js},
+      match x with
+      | #OverflowInline.t as ov -> OverflowInline.toString ov
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
 let fontSynthesisWeight x =
   D
     ( {js|fontSynthesisWeight|js},

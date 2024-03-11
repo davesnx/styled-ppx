@@ -1365,11 +1365,11 @@ and property_overflow = [%value.rec
 ]
 and property_overflow_anchor = [%value.rec "'auto' | 'none'"]
 and property_overflow_block = [%value.rec
-  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto'"
+  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"
 ]
 and property_overflow_clip_box = [%value.rec "'padding-box' | 'content-box'"]
 and property_overflow_inline = [%value.rec
-  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto'"
+  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"
 ]
 and property_overflow_wrap = [%value.rec
   "'normal' | 'break-word' | 'anywhere'"

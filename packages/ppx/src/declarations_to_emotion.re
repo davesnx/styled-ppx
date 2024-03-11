@@ -2034,10 +2034,39 @@ let overflow =
   );
 
 // let overflow_clip_margin = unsupportedProperty(Parser.property_overflow_clip_margin);
-let overflow_inline =
-  variants(Parser.property_overflow_inline, (~loc) =>
-    [%expr CssJs.overflowInline]
+
+let overflow_block =
+  monomorphic(
+    Parser.property_overflow_block,
+    (~loc) => [%expr CssJs.overflowBlock],
+    (~loc, value) => {
+      switch (value) {
+      | `Interpolation(i) => render_variable(~loc, i)
+      | `Auto => variant_to_expression(~loc, `Auto)
+      | `Clip => variant_to_expression(~loc, `Clip)
+      | `Hidden => variant_to_expression(~loc, `Hidden)
+      | `Scroll => variant_to_expression(~loc, `Scroll)
+      | `Visible => variant_to_expression(~loc, `Visible)
+      }
+    },
   );
+
+let overflow_inline =
+  monomorphic(
+    Parser.property_overflow_inline,
+    (~loc) => [%expr CssJs.overflowInline],
+    (~loc, value) => {
+      switch (value) {
+      | `Interpolation(i) => render_variable(~loc, i)
+      | `Auto => variant_to_expression(~loc, `Auto)
+      | `Clip => variant_to_expression(~loc, `Clip)
+      | `Hidden => variant_to_expression(~loc, `Hidden)
+      | `Scroll => variant_to_expression(~loc, `Scroll)
+      | `Visible => variant_to_expression(~loc, `Visible)
+      }
+    },
+  );
+
 let text_overflow =
   monomorphic(
     Parser.property_text_overflow,
@@ -4183,6 +4212,7 @@ let properties = [
   ("outline-width", found(outline_width)),
   ("outline", found(outline)),
   ("overflow-inline", found(overflow_inline)),
+  ("overflow-block", found(overflow_block)),
   ("overflow-wrap", found(overflow_wrap)),
   ("overflow-x", found(overflow_x)),
   ("overflow-x", found(overflow_x)),

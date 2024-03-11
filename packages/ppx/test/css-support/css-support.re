@@ -3142,7 +3142,12 @@
 [%css {|outline-width: medium|}];
 [%css {|outline: medium solid red|}];
 
+/* CSS Overflow Module Level 3 */
 [%css {|overflow: $(lola)|}];
 [%css {|overflow: hidden|}];
 [%css {|overflow-y: $(lola)|}];
 [%css {|overflow-x: hidden|}];
+
+[%css {|overflow-block: hidden|}];
+[%css {|overflow-block: $(value)|}];
+[%css {|overflow-inline: $(value)|}];
