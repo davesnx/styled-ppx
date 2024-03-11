@@ -1150,13 +1150,15 @@ CssJs.gridTemplateColumns([|
   `name({js|[linename2]|js}),
   `repeat((
     `autoFit,
-    [|
-      `name({js|[linename3]|js}),
-      `name({js|[linename4]|js}),
-      `pxFloat(300.),
-    |],
+    [|`name({js|[linename3 linename4]|js}), `pxFloat(300.)|],
   )),
   `pxFloat(100.),
+|]);
+CssJs.gridTemplateColumns([|
+  `name({js|[linename1 linename2]|js}),
+  `pxFloat(100.),
+  `repeat((`autoFit, [|`name({js|[linename1]|js}), `pxFloat(300.)|])),
+  `name({js|[linename3]|js}),
 |]);
 CssJs.display(`grid);
 CssJs.display(`inlineGrid);
@@ -1195,8 +1197,7 @@ CssJs.gridTemplateColumns([|
   `pxFloat(250.),
 |]);
 CssJs.gridTemplateColumns([|
-  `name({js|[first]|js}),
-  `name({js|[nav-start]|js}),
+  `name({js|[first nav-start]|js}),
   `pxFloat(150.),
   `name({js|[main-start]|js}),
   `fr(1.),
@@ -1217,9 +1218,7 @@ CssJs.gridTemplateColumns([|
   `auto,
   `name({js|[b]|js}),
   `minmax((`minContent, `fr(1.))),
-  `name({js|[b]|js}),
-  `name({js|[c]|js}),
-  `name({js|[d]|js}),
+  `name({js|[b c d]|js}),
   `repeat((`num(2), [|`name({js|[e]|js}), `pxFloat(40.)|])),
   `repeat((`num(5), [|`auto|])),
 |]);

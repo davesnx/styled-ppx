@@ -527,6 +527,17 @@ let tests = [
       );
     },
   ),
+  test_case(
+    "<linenames>",
+    `Quick,
+    () => {
+      let parse = parse([%value "<linenames>"]);
+      let to_check = result(Alcotest.list(Alcotest.string), Alcotest.string);
+      check(__POS__, to_check, "", parse("[abc]"), Ok(["abc"]));
+      check(__POS__, to_check, "", parse("[a b]"), Ok(["a", "b"]));
+      check(__POS__, to_check, "", parse("[a b c]"), Ok(["a", "b", "c"]));
+    },
+  ),
   /* test_case("line_names", `Quick, () => {
        let parse = parse([%value "<line-names>"]);
        check(__POS__, result(list(string), Alcotest.string), "", parse("[abc]"), Ok(["abc"]));

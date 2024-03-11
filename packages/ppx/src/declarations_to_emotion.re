@@ -3328,8 +3328,9 @@ let align_content =
 let render_line_names = (~loc, value: Types.line_names) => {
   let ((), line_names, ()) = value;
   line_names
-  |> List.map(v => Printf.sprintf("[%s]", v))
-  |> List.map(name => [%expr `name([%e render_string(~loc, name)])]);
+  |> String.concat(" ")
+  |> Printf.sprintf("[%s]")
+  |> (name => [[%expr `name([%e render_string(~loc, name)])]]);
 };
 
 let render_maybe_line_names = (~loc, value) => {

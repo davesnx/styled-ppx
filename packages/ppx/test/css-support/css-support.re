@@ -1471,11 +1471,10 @@
 [%css
   {|grid-template-columns: [linename1] 100px [linename2] repeat(auto-fit, [linename3 linename4] 300px) 100px; |}
 ];
-/*
- linename is defined as custom-indent as (https://drafts.csswg.org/css-values-4/#identifier-value) but it can contain empty spaces (?), TODO: either change the definition of linename and allow WS or raise when this happens
- [%css
-   {|grid-template-columns: [linename1 linename2] 100px repeat(auto-fit, [linename1] 300px) [linename3]; |}
- ]; */
+
+[%css
+  {|grid-template-columns: [linename1 linename2] 100px repeat(auto-fit, [linename1] 300px) [linename3]; |}
+];
 
 /* CSS Grid Layout Module Level 1 */
 [%css {|display: grid|}];
