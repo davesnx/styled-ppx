@@ -1,7 +1,4 @@
-type s = string;
 open Ppxlib;
-type string = s;
-
 open Reason_css_parser;
 
 module Option = {
@@ -3342,7 +3339,7 @@ let render_maybe_line_names = (~loc, value) => {
   };
 };
 
-let render_inflexible_breadth = (~loc, value) => {
+let render_inflexible_breadth = (~loc, value: Types.inflexible_breadth) => {
   switch (value) {
   | `Auto => [%expr `auto]
   | `Min_content => [%expr `minContent]
@@ -3353,7 +3350,14 @@ let render_inflexible_breadth = (~loc, value) => {
   };
 };
 
-let render_track_breadth = (~loc, value) => {
+let render_fixed_breadth = (~loc, value: Types.fixed_breadth) => {
+  switch (value) {
+  | `Extended_length(l) => render_extended_length(~loc, l)
+  | `Extended_percentage(p) => render_extended_percentage(~loc, p)
+  };
+};
+
+let render_track_breadth = (~loc, value: Types.track_breadth) => {
   switch (value) {
   | `Flex_value(f) => raise(Unsupported_feature)
   | `Auto => [%expr `auto]
@@ -3414,18 +3418,18 @@ let render_track_list = (~loc, track_list, line_names) => {
 
 let render_fixed_size = (~loc, value: Types.fixed_size) => {
   switch (value) {
-  | `Fixed_breadth(breadth) => render_track_breadth(~loc, breadth)
+  | `Fixed_breadth(breadth) => render_fixed_breadth(~loc, breadth)
   | `Minmax_0(fixed, (), breadth) =>
     [%expr
      `minmax((
-       [%e render_inflexible_breadth(~loc, fixed)],
+       [%e render_fixed_breadth(~loc, fixed)],
        [%e render_track_breadth(~loc, breadth)],
      ))]
   | `Minmax_1(inflexible, (), breadth) =>
     [%expr
      `minmax((
        [%e render_inflexible_breadth(~loc, inflexible)],
-       [%e render_track_breadth(~loc, breadth)],
+       [%e render_fixed_breadth(~loc, breadth)],
      ))]
   };
 };
