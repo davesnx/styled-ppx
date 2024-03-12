@@ -193,12 +193,7 @@ and render_declarations = ((ds, _loc: Ppxlib.location)) => {
        switch (declaration) {
        | Declaration(decl) => render_declaration(decl)
        | At_rule(ar) => [render_at_rule(ar)]
-       | Style_rule(style_rules) => [
-           render_style_rule(
-             CssJs.selector(~loc=style_rules.loc),
-             style_rules,
-           ),
-         ]
+       | Style_rule(style_rules) => [render_style_rule(style_rules)]
        }
      );
 }
@@ -312,7 +307,7 @@ and render_selectors = selectors => {
   |> List.map(((selector, _loc)) => render_selector(selector))
   |> String.concat(", ");
 }
-and render_style_rule = (ident, rule: style_rule) => {
+and render_style_rule = (rule: style_rule) => {
   let (prelude, _loc) = rule.prelude;
   let (_block, loc) = rule.block;
   let selector_expr =
@@ -326,9 +321,9 @@ and render_style_rule = (ident, rule: style_rule) => {
     |> String_interpolation.transform(~attrs, ~delimiter, ~loc);
 
   Helper.Exp.apply(
-    ~loc=rule.loc,
+    ~loc,
     /* ~attrs=[Platform_attributes.uncurried(~loc=rule.loc)], */
-    ident,
+    CssJs.selector(~loc=rule.loc),
     [(Nolabel, selector_name), (Nolabel, selector_expr)],
   );
 };
@@ -426,23 +421,24 @@ let render_keyframes = (declarations: rule_list) => {
 };
 
 let render_global = ((ruleList, loc): stylesheet) => {
-  switch (ruleList) {
-  /* There's only one style_rule */
-  | [Style_rule(rule)] =>
-    render_style_rule(CssJs.global(~loc), rule)
-    |> Generate_lib.applyIgnore(~loc)
-  /* More than one isn't supported by bs-css */
-  | _res =>
-    Generate_lib.error(
-      ~loc,
-      {|
-        `styled.global` only supports one style definition. Transform each definition into a separate styled.global call
+  let onlyStyleRulesAndAtRulesSupported = {|Declarations does not make sense in global styles. Global should consists of style rules or at-rules (e.g @media, @print, etc.)
 
-        Like following:
-          %styled.global(" ... ")
-          %styled.global(" ... ")
-      |},
-    )
-  /* TODO: Add rule to string to finish this error message */
-  };
+If your intent is to apply the declaration to all elements, use the universal selector
+* {
+  /* Your declarations here */
+}|};
+
+  let styles =
+    ruleList
+    |> List.map(rule => {
+         switch (rule) {
+         | Style_rule(style_rule) => render_style_rule(style_rule)
+         | At_rule(at_rule) => render_at_rule(at_rule)
+         | _ => Generate_lib.error(~loc, onlyStyleRulesAndAtRulesSupported)
+         }
+       })
+    |> Builder.pexp_array(~loc);
+
+  Helper.Exp.apply(~loc, CssJs.global(~loc), [(Nolabel, styles)])
+  |> Generate_lib.applyIgnore(~loc);
 };

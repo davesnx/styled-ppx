@@ -31,7 +31,7 @@ module type MakeResult = sig
 
   val insertRule : string -> unit
   val renderRule : renderer -> string -> unit
-  val global : string -> rule array -> unit
+  val global : rule array -> unit
   val renderGlobal : renderer -> string -> rule array -> unit
   val style : rule array -> styleEncoding
   val merge : styleEncoding array -> styleEncoding
@@ -55,7 +55,9 @@ module Make (CssImpl : Css_Core.CssImplementationIntf) :
      and type renderer := CssImpl.renderer = struct
   let insertRule css = CssImpl.injectRaw css
   let renderRule renderer css = CssImpl.renderRaw renderer css
-  let global selector rules = CssImpl.injectRules selector (toJson rules)
+
+  let global rules =
+    CssImpl.injectRules (toJson rules)
 
   let renderGlobal renderer selector rules =
     CssImpl.renderRules renderer selector (toJson rules)
