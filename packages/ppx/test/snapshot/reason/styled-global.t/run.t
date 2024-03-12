@@ -7,7 +7,7 @@
         {js|html|js},
         [|
           CssJs.lineHeight(`abs(1.15)),
-          [%ocaml.error "Unknown property '-webkit-text-size-adjust'"],
+          CssJs.unsafe({js|textSizeAdjust|js}, {js|100%|js}),
         |],
       ),
       CssJs.selector({js|body|js}, [|CssJs.margin(`zero)|]),
