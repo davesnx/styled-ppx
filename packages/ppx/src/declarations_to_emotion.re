@@ -1419,6 +1419,10 @@ let render_bg_image = (~loc, value: Types.bg_image) =>
   | `Image(i) => render_image(~loc, i)
   };
 
+let render_bg_images = (~loc, value: list(Types.bg_image)) => {
+  value |> List.map(render_bg_image(~loc)) |> Builder.pexp_array(~loc);
+};
+
 let render_repeat_style = (~loc) =>
   fun
   | `Repeat_x => variant_to_expression(~loc, `Repeat_x)
@@ -1447,14 +1451,13 @@ let render_attachment = (~loc) =>
   | `Scroll => [%expr `scroll];
 
 let background_image =
-  monomorphic(
-    Parser.property_background_image,
-    (~loc) => [%expr CssJs.backgroundImage],
-    (~loc) =>
-      fun
-      | [] => failwith("expected at least one value")
-      | [i] => render_bg_image(~loc, i)
-      | _ => raise(Unsupported_feature),
+  polymorphic(Parser.property_background_image, (~loc) =>
+    fun
+    | [] => failwith("expected at least one value")
+    | [i] => [[%expr CssJs.backgroundImage([%e render_bg_image(~loc, i)])]]
+    | more => [
+        [%expr CssJs.backgroundImages([%e render_bg_images(~loc, more)])],
+      ]
   );
 
 let background_repeat =

@@ -30,3 +30,22 @@
 [%css
   {|grid-template-columns: [linename1] 100px [linename2] repeat(auto-fit, [linename3 linename4] 300px) 100px; |}
 ];
+
+module Color = {
+  let dark = CssJs.black;
+};
+
+[%css
+  {|
+  background-image:
+    linear-gradient(45deg, $(Color.dark) 25%, transparent 25%)
+  |}
+];
+
+[%css
+  {|
+background-image:
+  linear-gradient(45deg, $(Color.dark) 25%, transparent 25%),
+  linear-gradient(45deg, $(Color.dark) 25%, transparent 25%)
+|}
+];

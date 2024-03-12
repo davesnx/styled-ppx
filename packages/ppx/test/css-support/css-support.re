@@ -244,6 +244,22 @@
 [%css
   {|background-image: linear-gradient(red -50px, white calc(-25px + 50%), blue 100%);|}
 ];
+[%css
+  {|
+    background-image:
+      linear-gradient(45deg, blue, red),
+      linear-gradient(red -50px, white calc(-25px + 50%), blue 100%),
+      linear-gradient(45deg, blue, red);
+  |}
+];
+[%css
+  {|
+    background-image:
+      linear-gradient(45deg, $(Color.Background.boxDark) 25%, transparent 25%),
+      linear-gradient(red -50px, white calc(-25px + 50%), blue 100%),
+      linear-gradient(45deg, blue, red);
+  |}
+];
 /* [%css {|background-image: radial-gradient(white, black);|}]; */
 /* [%css {|background-image: radial-gradient(circle, white, black);|}]; */
 /* [%css {|background-image: radial-gradient(ellipse, white, black);|}]; */

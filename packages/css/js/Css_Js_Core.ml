@@ -249,13 +249,20 @@ let backgroundClip x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let backgroundImage x =
+let string_of_backgroundImage x =
+  match x with
+  | #BackgroundImage.t as bi -> BackgroundImage.toString bi
+  | #Url.t as u -> Url.toString u
+  | #Gradient.t as g -> Gradient.toString g
+
+let backgroundImage x = D ({js|backgroundImage|js}, string_of_backgroundImage x)
+
+let backgroundImages imgs =
   D
     ( {js|backgroundImage|js},
-      match x with
-      | #BackgroundImage.t as bi -> BackgroundImage.toString bi
-      | #Url.t as u -> Url.toString u
-      | #Gradient.t as g -> Gradient.toString g )
+      imgs
+      |. Std.Array.map string_of_backgroundImage
+      |. Std.Array.joinWith ~sep:{js|, |js} )
 
 let maskImage x =
   D

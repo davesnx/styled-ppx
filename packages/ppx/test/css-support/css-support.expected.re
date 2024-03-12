@@ -324,6 +324,45 @@ CssJs.backgroundImage(
     |],
   )),
 );
+CssJs.backgroundImages([|
+  `linearGradient((
+    Some(`Angle(`deg(45.))),
+    [|(CssJs.blue, None), (CssJs.red, None)|],
+  )),
+  `linearGradient((
+    None,
+    [|
+      (CssJs.red, Some(`pxFloat(-50.))),
+      (CssJs.white, Some(`calc(`add((`pxFloat(-25.), `percent(50.)))))),
+      (CssJs.blue, Some(`percent(100.))),
+    |],
+  )),
+  `linearGradient((
+    Some(`Angle(`deg(45.))),
+    [|(CssJs.blue, None), (CssJs.red, None)|],
+  )),
+|]);
+CssJs.backgroundImages([|
+  `linearGradient((
+    Some(`Angle(`deg(45.))),
+    [|
+      (Color.Background.boxDark, Some(`percent(25.))),
+      (`transparent, Some(`percent(25.))),
+    |],
+  )),
+  `linearGradient((
+    None,
+    [|
+      (CssJs.red, Some(`pxFloat(-50.))),
+      (CssJs.white, Some(`calc(`add((`pxFloat(-25.), `percent(50.)))))),
+      (CssJs.blue, Some(`percent(100.))),
+    |],
+  )),
+  `linearGradient((
+    Some(`Angle(`deg(45.))),
+    [|(CssJs.blue, None), (CssJs.red, None)|],
+  )),
+|]);
 CssJs.imageRendering(`auto);
 CssJs.imageRendering(`smooth);
 CssJs.imageRendering(`highQuality);
