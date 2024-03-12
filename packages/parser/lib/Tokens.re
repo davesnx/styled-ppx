@@ -66,6 +66,7 @@ let humanize =
 
 module Parser = Css_parser;
 
+/* TODO: This should render Token, not Parser.token */
 let token_to_string =
   fun
   | Parser.EOF => ""
@@ -113,6 +114,7 @@ let token_to_string =
   | BAD_URL => "bad url"
   | BAD_IDENT => "bad indent";
 
+/* TODO: This should print Token, not Parser.token */
 let token_to_debug =
   fun
   | Parser.EOF => "EOF"

@@ -111,20 +111,19 @@ only_operator: o = MEDIA_QUERY_OPERATOR { o }
 /* "not" */
 not_operator: n = MEDIA_QUERY_OPERATOR { n }
 /* "screen" */
-screen_media_type: smt =  SCREEN_MEDIA_TYPE { smt }
+screen_media_type: smt = SCREEN_MEDIA_TYPE { smt }
 /* "print" */
-print_media_type: pmt =  PRINT_MEDIA_TYPE { pmt }
+print_media_type: pmt = PRINT_MEDIA_TYPE { pmt }
 /* "all" */
-all_media_type: amt =  ALL_MEDIA_TYPE { amt }
+all_media_type: amt = ALL_MEDIA_TYPE { amt }
 
 /* https://www.w3.org/TR/mediaqueries-5/#mq-syntax */
-
 mf_value:
   | v = INTERPOLATION { Variable v }
   | v = value { v }
 
 /* <mf-plain> = <mf-name> : <mf-value> */
-mf_plain: mf = IDENT WS? COLON WS? mf_value { mf } 
+mf_plain: mf = IDENT WS? COLON WS? mf_value { mf }
 
 /* <mf-lt> = '<' '='? */
 mf_lt: mflt = less_than equal_sign? { mflt }
@@ -144,9 +143,9 @@ mf_comparison:
       | <mf-value> <mf-lt> <mf-name> <mf-lt> <mf-value>
       | <mf-value> <mf-gt> <mf-name> <mf-gt> <mf-value> */
 mf_range:
-  | xs = IDENT WS mf_comparison WS mf_value { xs } 
+  | xs = IDENT WS mf_comparison WS mf_value { xs }
   | mf_value WS xs = mf_comparison WS IDENT { xs }
-  | mf_value WS xs = mf_lt WS IDENT WS mf_lt WS mf_value { xs } 
+  | mf_value WS xs = mf_lt WS IDENT WS mf_lt WS mf_value { xs }
   | mf_value WS xs = mf_gt WS IDENT WS mf_gt WS mf_value { xs }
 
 screen_or_print_media_type:
@@ -154,7 +153,7 @@ screen_or_print_media_type:
   | mt = print_media_type { mt }
 
 mf_boolean:
- // TODO: IDENT is not safely parsed.
+  /* TODO: IDENT is not safely parsed */
   | i = IDENT WS? { i }
   | all_mt = all_media_type WS? { all_mt }
   | mt = screen_or_print_media_type WS? { mt }
@@ -163,7 +162,7 @@ mf_boolean:
 
 /* <media-feature> = ( [ <mf-plain> | <mf-boolean> | <mf-range> ] ) */
 media_feature:
-// TODO: property & value in mf_plain are not safely parsed.
+  /* TODO: property & value in mf_plain are not safely parsed */
   | mfp = mf_plain { mfp }
   | mfb = mf_boolean { mfb }
   | mfr = mf_range { mfr }
@@ -203,7 +202,7 @@ media_or_star:
 media_and_or_star:
   | xs = media_and_star { xs }
   | xs = media_or_star { xs }
-  
+
 /* <media-condition> = <media-not> | <media-in-parens> [ <media-and>* | <media-or>* ] */
 media_condition:
   | mn = media_not { mn }
@@ -340,9 +339,8 @@ keyframe_style_rule:
       loc = Parser_location.make $startpos $endpos;
       block = declarations;
     }
+    (* TODO: Handle separated_list(COMMA, percentage) *)
   }
-  /* TODO: Handle separated_list(COMMA, percentage) */
-;
 
 selector_list:
   | selector = loc(selector) WS? { [selector] }
@@ -412,8 +410,8 @@ nth_payload:
     let b = int_of_string b in
     Nth (ANB (((int_of_string (fst a)), combinator, b)))
   }
-  /* This is a hackish solution where combinator isn't cached because the lexer
-  assignes the `-` to NUMBER. This could be solved by leftassoc */
+  /* This is a hackish solution where combinator isn't catched because the lexer
+  assignes the `-` to NUMBER. This could be solved by leftassoc or the lexer */
   | a = DIMENSION WS? b = NUMBER {
     let b = Int.abs (int_of_string (b)) in
     Nth (ANB (((int_of_string (fst a)), "-", b)))

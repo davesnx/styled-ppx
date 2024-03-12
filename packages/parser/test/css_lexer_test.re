@@ -1,31 +1,6 @@
 open Alcotest;
 module Parser = Css_parser;
 
-let parse = input => {
-  let buffer = Sedlexing.Utf8.from_string(input);
-  let rec from_string = acc => {
-    switch (Css_lexer.get_next_token(buffer)) {
-    | Parser.EOF => []
-    | token => [token, ...from_string(acc)]
-    };
-  };
-
-  try(Ok(from_string([]))) {
-  | exn => Error(Printexc.to_string(exn))
-  };
-};
-
-let render_token =
-  fun
-  | Parser.EOF => ""
-  | t => Tokens.token_to_debug(t);
-
-let list_parse_tokens_to_string = tokens =>
-  tokens |> List.map(render_token) |> String.concat(" ") |> String.trim;
-
-let list_tokens_to_string = tokens =>
-  tokens |> List.map(render_token) |> String.concat(" ") |> String.trim;
-
 let success_tests_data =
   [
     (" \n\t ", [WS]),
@@ -40,9 +15,10 @@ let success_tests_data =
     /* TODO: Treat +1 to NUMBER and not COMBINATOR + NUMBER */
     /* ({|+12.3|}, [NUMBER("12.3")]), */
     ({|+ 12.3|}, [COMBINATOR("+"), WS, NUMBER("12.3")]),
-    /* TODO: COMBINATOR or DELIM(+)? */
+    /* TODO: Deambiguate + sign. Either COMBINATOR(+) or DELIM(+) */
     ({|+|}, [COMBINATOR("+")]),
     ({|,|}, [COMMA]),
+    ({|45.6|}, [NUMBER("45.6")]),
     ({|-45.6|}, [NUMBER("-45.6")]),
     ({|45%|}, [NUMBER("45"), PERCENT]),
     ({|2n|}, [DIMENSION(("2", "n"))]),
@@ -50,6 +26,9 @@ let success_tests_data =
     /* TODO: Store dimension as a variant */
     ({|45.6px|}, [FLOAT_DIMENSION(("45.6", "px"))]),
     ({|10px|}, [FLOAT_DIMENSION(("10", "px"))]),
+    ({|.5|}, [NUMBER(".5")]),
+    /* TODO: Treat 5. as NUMBER("5.0") */
+    ({|5.|}, [NUMBER("5"), DOT]),
     ({|--potato|}, [IDENT("--potato")]),
     ({|-|}, [DELIM("-")]),
     ({|.|}, [DOT]),
@@ -94,6 +73,7 @@ let success_tests_data =
         RIGHT_PAREN,
       ],
     ),
+    ({|+10px|}, [COMBINATOR("+"), FLOAT_DIMENSION(("10", "px"))]),
     (
       {|calc(10px+ 10px)|},
       [
@@ -133,9 +113,13 @@ let success_tests_data =
   /* TODO: Supported escaped "@" and others */
   /* ("\\@desu", [IDENT("@desu")]), */
   |> List.mapi((_index, (input, output)) => {
-       let okInput = parse(input) |> Result.get_ok;
-       let inputTokens = list_parse_tokens_to_string(okInput);
-       let outputTokens = list_tokens_to_string(output);
+       let okInput = Css_lexer.parse(input) |> Result.get_ok;
+       let inputTokens = Css_lexer.to_string(okInput);
+       let outputTokens =
+         output
+         /* assign dummy positions since testing */
+         |> List.map(token => (token, Lexing.dummy_pos, Lexing.dummy_pos))
+         |> Css_lexer.to_string;
 
        let assertion = () =>
          check(string, "should match" ++ input, inputTokens, outputTokens);
