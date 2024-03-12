@@ -57,7 +57,7 @@ let parse_declaration = (input: string) =>
   parse_string(~skip_whitespace=true, Parser.declaration, input);
 
 let parse_stylesheet = (input: string) =>
-  parse_string(~skip_whitespace=false, Parser.stylesheet, input);
+  parse_string(~skip_whitespace=true, Parser.stylesheet, input);
 
 let parse_keyframes = (input: string) =>
   parse_string(~skip_whitespace=false, Parser.keyframes, input);

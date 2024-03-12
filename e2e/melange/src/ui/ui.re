@@ -1,10 +1,22 @@
 [%styled.global {|
+/* comment */
+/** comment
+ multiline 
+*/
   div {
-    background-color: green;
+/** comment
+ multiline 
+*/
+    background-color: green; /* another one */
   }
 
   @media (min-width: 400px) {
+    /* comment 1 */
     div {
+      padding: 10px;
+/** comment
+ multiline 
+*/
       background-color: red;
     }
   }
