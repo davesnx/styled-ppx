@@ -1484,7 +1484,6 @@
 [%css {|display: grid|}];
 [%css {|display: inline-grid|}];
 [%css {|grid-template-columns: none|}];
-[%css {|grid-template-columns: $(externals)|}];
 [%css {|grid-template-columns: auto|}];
 [%css {|grid-template-columns: 100px|}];
 [%css {|grid-template-columns: 1fr|}];
@@ -1518,6 +1517,7 @@
 [%css
   {|grid-template-columns: [linename1 linename2] 100px repeat(auto-fit, [linename1] 300px) [linename3]; |}
 ];
+[%css {|grid-template-columns: $(externals)|}];
 [%css {|grid-template-rows: none|}];
 [%css {|grid-template-rows: auto|}];
 [%css {|grid-template-rows: 100px|}];

@@ -1263,6 +1263,7 @@ CssJs.gridTemplateColumns([|
   `repeat((`autoFit, [|`name({js|[linename1]|js}), `pxFloat(300.)|])),
   `name({js|[linename3]|js}),
 |]);
+(CssJs.gridTemplateColumns(externals): CssJs.rule);
 CssJs.gridTemplateRows([|`none|]);
 CssJs.gridTemplateRows([|`auto|]);
 CssJs.gridTemplateRows([|`pxFloat(100.)|]);

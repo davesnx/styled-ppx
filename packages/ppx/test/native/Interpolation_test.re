@@ -95,7 +95,7 @@ let tests =
     (
       "background-image: $(wat);",
       [%expr [%css "background-image: $(wat);"]],
-      [%expr (CssJs.backgroundImage(wat): CssJs.rule)],
+      [%expr CssJs.backgroundImage(wat)],
     ),
     (
       "mask-image: $(externalImageUrl);",
