@@ -440,13 +440,25 @@ let stylesheet_tests = [
     ],
   ),
   (
-    "multiple rules",
+    "html div > span {} html, body {}",
     [%expr [%styled.global {js|html div > span {} html, body {}|js}]],
     [%expr
       ignore(
         CssJs.global([|
           CssJs.selector({js|html div > span|js}, [||]),
           CssJs.selector({js|html, body|js}, [||]),
+        |]),
+      )
+    ],
+  ),
+  (
+    "a {} b .c {}",
+    [%expr [%styled.global {js|a {} b .c {}|js}]],
+    [%expr
+      ignore(
+        CssJs.global([|
+          CssJs.selector({js|a|js}, [||]),
+          CssJs.selector({js|b .c|js}, [||]),
         |]),
       )
     ],
