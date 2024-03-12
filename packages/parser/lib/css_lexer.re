@@ -527,6 +527,7 @@ let rec get_next_token = buf => {
   | '.' => DOT
   | ';' => SEMI_COLON
   | '}' =>
+    skip_whitespace.contents = false;
     RIGHT_BRACE;
   | '{' =>
     skip_whitespace.contents = true;
