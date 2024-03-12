@@ -60,4 +60,4 @@ let parse_stylesheet = (input: string) =>
   parse_string(~skip_whitespace=true, Parser.stylesheet, input);
 
 let parse_keyframes = (input: string) =>
-  parse_string(~skip_whitespace=false, Parser.keyframes, input);
+  parse_string(~skip_whitespace=true, Parser.keyframes, input);
