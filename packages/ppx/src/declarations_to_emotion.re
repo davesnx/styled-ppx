@@ -3575,6 +3575,7 @@ let grid_template_columns =
     (~loc, value: Types.property_grid_template_columns) =>
       switch (value) {
       | `None => [%expr [|`none|]]
+      | `Interpolation(v) => render_variable(~loc, v)
       | `Track_list(track_list, line_names) =>
         render_track_list(~loc, track_list, line_names)
       | `Auto_track_list(list) => render_auto_track_list(~loc, list)
@@ -3584,8 +3585,19 @@ let grid_template_columns =
   );
 
 let grid_template_rows =
-  unsupportedValue(Parser.property_grid_template_rows, (~loc) =>
-    [%expr CssJs.gridTemplateRows]
+  monomorphic(
+    Parser.property_grid_template_rows,
+    (~loc) => [%expr CssJs.gridTemplateRows],
+    (~loc, value: Types.property_grid_template_rows) =>
+      switch (value) {
+      | `None => [%expr [|`none|]]
+      | `Interpolation(v) => render_variable(~loc, v)
+      | `Track_list(track_list, line_names) =>
+        render_track_list(~loc, track_list, line_names)
+      | `Auto_track_list(list) => render_auto_track_list(~loc, list)
+      | `Static((), None) => [%expr `subgrid]
+      | `Static((), Some(subgrid)) => render_subgrid(~loc, subgrid)
+      },
   );
 let grid_template_areas =
   unsupportedValue(Parser.property_grid_template_areas, (~loc) =>

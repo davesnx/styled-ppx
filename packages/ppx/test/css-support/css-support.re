@@ -1484,6 +1484,7 @@
 [%css {|display: grid|}];
 [%css {|display: inline-grid|}];
 [%css {|grid-template-columns: none|}];
+[%css {|grid-template-columns: $(externals)|}];
 [%css {|grid-template-columns: auto|}];
 [%css {|grid-template-columns: 100px|}];
 [%css {|grid-template-columns: 1fr|}];

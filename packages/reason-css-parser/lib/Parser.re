@@ -1151,10 +1151,10 @@ and property_grid_template = [%value.rec
 ]
 and property_grid_template_areas = [%value.rec "'none' | [ <string> ]+"]
 and property_grid_template_columns = [%value.rec
-  "'none' | <track-list> | <auto-track-list> | 'subgrid' [ <line-name-list> ]?"
+  "'none' | <interpolation> | <track-list> | <auto-track-list> | 'subgrid' [ <line-name-list> ]?"
 ]
 and property_grid_template_rows = [%value.rec
-  "'none' | <track-list> | <auto-track-list> | 'subgrid' [ <line-name-list> ]?"
+  "'none' | <interpolation>| <track-list> | <auto-track-list> | 'subgrid' [ <line-name-list> ]?"
 ]
 and property_hanging_punctuation = [%value.rec
   "'none' | 'first' || [ 'force-end' | 'allow-end' ] || 'last'"
