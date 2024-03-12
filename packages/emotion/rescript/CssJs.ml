@@ -14,8 +14,7 @@ include Css_Js_Core.Make (struct
   external injectRawRules : Js.Json.t -> unit = "injectGlobal"
   [@@bs.module "@emotion/css"]
 
-  let injectRules selector rules =
-    injectRawRules (Js.Dict.fromArray [| selector, rules |] |. Js.Json.object_)
+  let injectRules = injectRawRules
 
   let renderRules _ selector rules =
     injectRawRules (Js.Dict.fromArray [| selector, rules |] |. Js.Json.object_)
@@ -35,8 +34,7 @@ end)
 
 type cache
 
-external cache : cache = "cache"
-[@@bs.module "@emotion/cache"]
+external cache : cache = "cache" [@@bs.module "@emotion/cache"]
 
 let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
     =
