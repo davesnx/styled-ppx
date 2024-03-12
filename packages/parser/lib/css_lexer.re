@@ -934,7 +934,7 @@ let from_string = string => {
   read([]);
 };
 
-let parse = input => {
+let tokenize = input => {
   let buffer = Sedlexing.Utf8.from_string(input);
   let rec from_string = acc => {
     switch (get_next_tokens_with_location(buffer)) {

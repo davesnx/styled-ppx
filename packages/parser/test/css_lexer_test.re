@@ -113,7 +113,7 @@ let success_tests_data =
   /* TODO: Supported escaped "@" and others */
   /* ("\\@desu", [IDENT("@desu")]), */
   |> List.mapi((_index, (input, output)) => {
-       let okInput = Css_lexer.parse(input) |> Result.get_ok;
+       let okInput = Css_lexer.tokenize(input) |> Result.get_ok;
        let inputTokens = Css_lexer.to_string(okInput);
        let outputTokens =
          output
