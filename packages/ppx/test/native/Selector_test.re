@@ -506,6 +506,74 @@ let nested_tests = [
   ),
 ];
 
+let comments_tests = [
+  (
+    ".a",
+    [%expr
+      [%cx
+        {|/*c*/
+    /*c*/
+
+    .a { /* c*/
+    /*c*/
+    /*c*/
+    /*c*/
+    .b {} }
+
+    |}
+      ]
+    ],
+    [%expr
+      CssJs.style([|
+        CssJs.selector({js|.a|js}, [|CssJs.selector({js|.b|js}, [||])|]),
+      |])
+    ],
+  ),
+  (
+    ".a .b",
+    [%expr
+      [%cx
+        {|
+    /*c*/
+    /*c*/
+    display: block; .a/*c*/ /*c*//*c*/.b {}|}
+      ]
+    ],
+    [%expr
+      CssJs.style([|
+        CssJs.display(`block),
+        CssJs.selector({js|.a .b|js}, [||]),
+      |])
+    ],
+  ),
+  (
+    "& .a .b",
+    [%expr [%cx "display: block; /*c*/& /*c*/.a /*c*//*c*/.b /*c*/{}"]],
+    [%expr
+      CssJs.style([|
+        CssJs.display(`block),
+        CssJs.selector({js|& .a .b|js}, [||]),
+      |])
+    ],
+  ),
+  (
+    ".$(aaa) { .$(bbb) { } }",
+    [%expr [%cx {|/*c*/
+    /*c*/
+    /*c*/
+    /*c*/
+    /*c*/.$(aaa) { /*c*/.$(bbb) {} }|}]],
+    [%expr
+      CssJs.style([|
+        CssJs.selector(
+          {js|.|js} ++ aaa,
+          [|CssJs.selector({js|.|js} ++ bbb, [||])|],
+        ),
+      |])
+    ],
+  ),
+];
+
 let runner = tests =>
   List.map(
     item => {
@@ -531,4 +599,5 @@ let tests =
     runner(complex_tests),
     runner(stylesheet_tests),
     runner(nested_tests),
+    runner(comments_tests),
   ]);
