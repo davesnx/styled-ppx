@@ -1,14 +1,16 @@
+module Parser = Css_parser;
+
 [@deriving show({with_path: false})]
 type token =
   | EOF
   | IDENT(string) // <ident-token>
-  | BAD_IDENT // TODO: this is needed?
+  | BAD_IDENT // TODO: Since we don't allow broken syntax, is this needed?
   | FUNCTION(string) // <function-token>
   | AT_KEYWORD(string) // <at-keyword-token>
   | HASH(string, [ | `ID | `UNRESTRICTED]) // <hash-token>
   | STRING(string) // <string-token>
   | URL(string) // <url-token>
-  | BAD_URL // <bad-url-token>
+  | BAD_URL // <bad-url-token> TODO: Since we don't allow broken syntax, is this needed?
   | DELIM(string) // <delim-token>
   | NUMBER(float) // <number-token>
   | PERCENTAGE(float) // <percentage-token>
@@ -63,8 +65,6 @@ let humanize =
   | RIGHT_PAREN => ")"
   | LEFT_BRACE => "{"
   | RIGHT_BRACE => "}";
-
-module Parser = Css_parser;
 
 /* TODO: This should render Token, not Parser.token */
 let token_to_string =
