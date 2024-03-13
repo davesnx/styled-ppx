@@ -1,7 +1,7 @@
 open Alcotest;
 module Parser = Css_parser;
 
-let success_tests_data =
+let success_tests =
   [
     (" \n\t ", [WS]),
     ({|"something"|}, [STRING("something")]),
@@ -106,34 +106,32 @@ let success_tests_data =
     ({|$(Module.variable')|}, [INTERPOLATION(["Module", "variable'"])]),
     ({|-moz|}, [IDENT("-moz")]),
     ({|--color-main|}, [IDENT("--color-main")]),
+    /* TODO: Support for escaped */
+    /* ({|\32|}, [NUMBER("\32")]), */
+    /* ({|\25BA|}, [NUMBER "\25BA"]), */
+    /* TODO: Support escaped "@" and others */
+    /* ("\\@desu", [IDENT("@desu")]), */
   ]
-  /* TODO: Support for escaped */
-  /* ({|\32|}, [IDENT("--color-main")]), */
-  /* ({|\25BA|}, [IDENT("--color-main")]), */
-  /* TODO: Supported escaped "@" and others */
-  /* ("\\@desu", [IDENT("@desu")]), */
-  |> List.mapi((_index, (input, output)) => {
+  |> List.map(((input, output)) => {
        let okInput = Css_lexer.tokenize(input) |> Result.get_ok;
        let inputTokens = Css_lexer.to_string(okInput);
        let outputTokens =
          output
-         /* assign dummy positions since testing */
          |> List.map(token => (token, Lexing.dummy_pos, Lexing.dummy_pos))
          |> Css_lexer.to_string;
 
-       let assertion = () =>
-         check(string, "should match" ++ input, inputTokens, outputTokens);
-
-       test_case(input, `Quick, assertion);
+       test_case(input, `Quick, () =>
+         check(string, "should match" ++ input, inputTokens, outputTokens)
+       );
      });
 
-let tests = success_tests_data;
+let error_tests =
+  [("/*", "Unterminated comment at the end of the string")]
+  |> List.map(((input, output)) => {
+       let error = Css_lexer.tokenize(input) |> Result.get_error;
+       test_case(input, `Quick, () =>
+         check(string, "should match" ++ input, error, output)
+       );
+     });
 
-/*
- TODO: Add error lexing cases when we need it.
-
- test("should error lexing", ({expect, _}) => {
-   let errorInput = parse("/*") |> Result.get_error;
-   expect.string(errorInput).toEqual();
- });
- */
+let tests = List.append(success_tests, error_tests);
