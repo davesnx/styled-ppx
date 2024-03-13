@@ -3710,6 +3710,7 @@ let z_index =
     (~loc, value) => {
       switch (value) {
       | `Auto => [%expr `auto]
+      | `Interpolation(v) => render_variable(~loc, v)
       | `Integer(i) => [%expr `num([%e render_integer(~loc, i)])]
       }
     },
