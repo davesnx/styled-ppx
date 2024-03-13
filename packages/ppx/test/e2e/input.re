@@ -61,6 +61,6 @@ let opacity = `num(100.);
 [%cx
   {|
   width: fit-content;
-  grid-template-columns: fit-content(20px) fit-content(20px);
+  grid-template-columns: fit-content(20px) fit-content(10%);
 |}
 ];
