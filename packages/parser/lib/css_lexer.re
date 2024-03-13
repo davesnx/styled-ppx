@@ -13,7 +13,18 @@ exception LexingError((Lexing.position, Lexing.position, string));
 /* Regexes */
 let newline = [%sedlex.regexp? '\n' | "\r\n" | '\r' | '\012'];
 
-let whitespace = [%sedlex.regexp? " " | '\t' | newline];
+// comment		\/\*[^*]*\*+([^/*][^*]*\*+)*\/ (https://www.w3.org/TR/CSS21/grammar.html)
+let comment = [%sedlex.regexp?
+  (
+    "/*",
+    Star(Compl('*')),
+    Plus('*'),
+    Star((Intersect(Compl('/'), Compl('*')), Star(Compl('*')), Plus('*'))),
+    "/",
+  )
+];
+
+let whitespace = [%sedlex.regexp? " " | '\t' | newline | comment];
 
 let whitespaces = [%sedlex.regexp? Star(whitespace)];
 
@@ -532,6 +543,7 @@ let latin1 = (~skip=0, ~drop=0, lexbuf) => {
 let rec get_next_token = lexbuf => {
   switch%sedlex (lexbuf) {
   | eof => Parser.EOF
+  | Star(comment) => get_next_token(lexbuf)
   | "/*" => discard_comments(lexbuf)
   | '.' => DOT
   | ';' => SEMI_COLON
