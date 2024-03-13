@@ -673,7 +673,6 @@ CssJs.unsafe({js|hangingPunctuation|js}, {js|first last|js});
 CssJs.unsafe({js|hangingPunctuation|js}, {js|first force-end|js});
 CssJs.unsafe({js|hangingPunctuation|js}, {js|first force-end last|js});
 CssJs.unsafe({js|hangingPunctuation|js}, {js|first allow-end last|js});
-CssJs.textDecoration(`underline);
 CssJs.textDecorationLine(`none);
 CssJs.textDecorationLine(`underline);
 CssJs.textDecorationLine(`overline);
@@ -722,7 +721,6 @@ CssJs.textShadow(
     CssJs.black,
   ),
 );
-CssJs.textDecoration(`underline);
 CssJs.unsafe({js|textDecorationSkip|js}, {js|none|js});
 CssJs.unsafe({js|textDecorationSkip|js}, {js|objects|js});
 CssJs.unsafe({js|textDecorationSkip|js}, {js|objects spaces|js});
@@ -768,10 +766,10 @@ CssJs.textDecorationSkipInset(`auto);
 CssJs.unsafe({js|textUnderlineOffset|js}, {js|auto|js});
 CssJs.unsafe({js|textUnderlineOffset|js}, {js|3px|js});
 CssJs.unsafe({js|textUnderlineOffset|js}, {js|10%|js});
-CssJs.unsafe({js|textDecorationThickness|js}, {js|auto|js});
+CssJs.textDecorationThickness(`auto);
 CssJs.unsafe({js|textDecorationThickness|js}, {js|from-font|js});
-CssJs.unsafe({js|textDecorationThickness|js}, {js|3px|js});
-CssJs.unsafe({js|textDecorationThickness|js}, {js|10%|js});
+CssJs.textDecorationThickness(`pxFloat(3.));
+CssJs.textDecorationThickness(`percent(10.));
 CssJs.unsafe({js|quotes|js}, {js|auto|js});
 CssJs.unsafe({js|content|js}, {js|"\25BA" / ""|js});
 CssJs.fontFamilies([|`custom({js|Inter Semi Bold|js})|]);

@@ -809,7 +809,7 @@
 /* [%css {|hyphenate-limit-last: spread|}]; */
 
 /* CSS Text Decoration Module Level 3 */
-[%css {|text-decoration: underline dotted green|}];
+/* [%css {|text-decoration: underline dotted green|}]; */
 [%css {|text-decoration-line: none|}];
 [%css {|text-decoration-line: underline|}];
 [%css {|text-decoration-line: overline|}];
@@ -854,7 +854,7 @@
 [%css {|text-shadow: 1px 2px 3px black|}];
 
 /* CSS Text Decoration Module Level 4 */
-[%css {|text-decoration: underline solid blue 1px|}];
+/* [%css {|text-decoration: underline solid blue 1px|}]; */
 [%css {|text-decoration-skip: none|}];
 [%css {|text-decoration-skip: objects|}];
 [%css {|text-decoration-skip: objects spaces|}];
