@@ -178,7 +178,7 @@ media_feature:
 media_in_parens:
   | LEFT_PAREN mc = media_condition RIGHT_PAREN { mc }
   | LEFT_PAREN WS? mf = media_feature WS? RIGHT_PAREN { Ident mf }
-  | v = interpolation { v }
+  | i = interpolation { i }
 
 media_not: WS? mn = not_operator media_in_parens WS? { Ident mn }
 
@@ -219,7 +219,7 @@ media_condition_without_or:
   | mn = media_not { mn }
   | xs = media_in_parens WS? media_and_star { xs }
 
-/* not | only  */
+/* not | only */
 not_or_only:
   | n = not_operator { n }
   | o = only_operator { o }
