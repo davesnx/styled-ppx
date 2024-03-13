@@ -49,3 +49,18 @@ background-image:
   linear-gradient(45deg, $(Color.dark) 25%, transparent 25%)
 |}
 ];
+
+[%cx {| z-index: 1; |}];
+
+let opacity = `num(100.);
+
+[%cx {|
+  stroke-opacity: $(opacity) !important;
+|}];
+
+[%cx
+  {|
+  width: fit-content;
+  grid-template-columns: fit-content(20px) fit-content(20px);
+|}
+];

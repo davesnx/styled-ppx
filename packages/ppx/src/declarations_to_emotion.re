@@ -3435,10 +3435,9 @@ and render_track_size = (~loc, value: Types.track_size) => {
        [%e render_inflexible_breadth(~loc, inflexible)],
        [%e render_track_breadth(~loc, breadth)],
      ))]
-  | `Fit_content_0 => [%expr `fit_content]
-  | `Fit_content_1(`Extended_length(el)) =>
+  | `Fit_content(`Extended_length(el)) =>
     [%expr `fitContent([%e render_extended_length(~loc, el)])]
-  | `Fit_content_1(`Extended_percentage(ep)) =>
+  | `Fit_content(`Extended_percentage(ep)) =>
     [%expr `fitContent([%e render_extended_percentage(~loc, ep)])]
   };
 };

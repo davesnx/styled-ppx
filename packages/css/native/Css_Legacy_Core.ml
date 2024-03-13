@@ -1580,6 +1580,8 @@ let rec gridLengthToJs x =
   | `zero -> {js|0|js}
   | `minContent -> {js|min-content|js}
   | `maxContent -> {js|max-content|js}
+  | `fitContent x ->
+    {js|fit-content|js} ^ {js|(|js} ^ Length.toString x ^ {js|)|js}
   | `repeat (n, x) ->
     {js|repeat(|js}
     ^ RepeatValue.toString n

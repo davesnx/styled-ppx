@@ -58,9 +58,7 @@ module Make (CssImpl : Css_Core.CssImplementationIntf) :
      and type renderer := CssImpl.renderer = struct
   let insertRule css = CssImpl.injectRaw css
   let renderRule renderer css = CssImpl.renderRaw renderer css
-
-  let global rules =
-    CssImpl.injectRules (toJson rules)
+  let global rules = CssImpl.injectRules (toJson rules)
 
   let renderGlobal renderer selector rules =
     CssImpl.renderRules renderer selector (toJson rules)
@@ -1633,6 +1631,8 @@ let rec gridLengthToJs x =
   | `zero -> {js|0|js}
   | `minContent -> {js|min-content|js}
   | `maxContent -> {js|max-content|js}
+  | `fitContent x ->
+    {js|fit-content|js} ^ {js|(|js} ^ Length.toString x ^ {js|)|js}
   | `repeat (n, x) ->
     {js|repeat(|js}
     ^ RepeatValue.toString n

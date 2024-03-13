@@ -1720,7 +1720,7 @@ and property_word_wrap = [%value.rec "'normal' | 'break-word' | 'anywhere'"]
 and property_writing_mode = [%value.rec
   "'horizontal-tb' | 'vertical-rl' | 'vertical-lr' | 'sideways-rl' | 'sideways-lr' | <svg-writing-mode>"
 ]
-and property_z_index = [%value.rec "'auto' | <integer>"]
+and property_z_index = [%value.rec "'auto' | <integer> | <interpolation>"]
 and property_zoom = [%value.rec
   "'normal' | 'reset' | <number> | <extended-percentage>"
 ]
@@ -1833,13 +1833,13 @@ and track_list_v0 = [%value.rec
   "[ [ <string> ]* <track-group> [ <string> ]* ]+ | 'none'"
 ]
 and track_minmax = [%value.rec
-  "minmax( <track-breadth> ',' <track-breadth> ) | 'auto' | <track-breadth> | 'fit-content' | fit-content( <extended-length> | <extended-percentage> )"
+  "minmax( <track-breadth> ',' <track-breadth> ) | 'auto' | <track-breadth> | fit-content( <extended-length> | <extended-percentage> )"
 ]
 and track_repeat = [%value.rec
   "repeat( <positive-integer> ',' [ [ <line-names> ]? <track-size> ]+ [ <line-names> ]? )"
 ]
 and track_size = [%value.rec
-  "<track-breadth> | minmax( <inflexible-breadth> ',' <track-breadth> ) | 'fit-content' | fit-content( <extended-length> | <extended-percentage> )"
+  "<track-breadth> | minmax( <inflexible-breadth> ',' <track-breadth> ) | fit-content( <extended-length> | <extended-percentage> )"
 ]
 and transform_function = [%value.rec
   "<matrix()> | <translate()> | <translateX()> | <translateY()> | <scale()> | <scaleX()> | <scaleY()> | <rotate()> | <skew()> | <skewX()> | <skewY()> | <matrix3d()> | <translate3d()> | <translateZ()> | <scale3d()> | <scaleZ()> | <rotate3d()> | <rotateX()> | <rotateY()> | <rotateZ()> | <perspective()>"

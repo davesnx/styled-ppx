@@ -1688,6 +1688,8 @@ let rec gridLengthToJs x =
   | `fr x -> Std.Float.toString x ^ {js|fr|js}
   | `zero -> {js|0|js}
   | `minContent -> {js|min-content|js}
+  | `fitContent x ->
+    {js|fit-content|js} ^ {js|(|js} ^ Length.toString x ^ {js|)|js}
   | `maxContent -> {js|max-content|js}
   | `repeat (n, x) ->
     {js|repeat(|js}
