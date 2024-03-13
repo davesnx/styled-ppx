@@ -240,9 +240,6 @@ media_query_prelude:
 
 prelude: xs = value { xs }
 
-/* media_query_prelude:
-    | mq = separated_nonempty_list(WS?, loc(media_query)) { Paren_block mq } */
-
 /* https://www.w3.org/TR/css-syntax-3/#at-rules */
 at_rule:
   /* @media (min-width: 16rem) { ... } */
