@@ -956,7 +956,6 @@ let position_to_string = pos =>
   );
 
 let debug_token = ((token, loc_start, loc_end)) => {
-  /* (loc: Ppxlib.Location.t, token: Tokens.token) => { */
   let pos_start = position_to_string(loc_start);
   let pos_end = position_to_string(loc_end);
   Printf.sprintf(
@@ -974,4 +973,4 @@ let to_string = tokens =>
   |> String.trim;
 
 let to_debug = tokens =>
-  tokens |> List.map(debug_token) |> String.concat(" ") |> String.trim;
+  tokens |> List.map(debug_token) |> String.concat("\n") |> String.trim;

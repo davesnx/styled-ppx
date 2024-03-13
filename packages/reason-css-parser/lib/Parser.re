@@ -1585,7 +1585,7 @@ and property_text_combine_upright = [%value.rec
   "'none' | 'all' | 'digits' [ <integer> ]?"
 ]
 and property_text_decoration = [%value.rec
-  "[ <'text-decoration-line'>] [ <'text-decoration-style'>]? [ <'text-decoration-color'>]?"
+  "[ <'text-decoration-line'>] [<'text-decoration-style'>]? [<'text-decoration-color'>]?"
 ]
 and property_text_decoration_color = [%value.rec "<color>"]
 /* Spec doesn't contain spelling-error and grammar-error: https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-line but this list used to have them | 'spelling-error' | 'grammar-error'. Leaving this comment here for reference */

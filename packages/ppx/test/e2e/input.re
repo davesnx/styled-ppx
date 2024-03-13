@@ -58,6 +58,11 @@ let opacity = `num(100.);
   stroke-opacity: $(opacity) !important;
 |}];
 
+module Media = {
+  let tabletUp = "min-width: 768px";
+  let largeDesktopDown = "min-width: 768px";
+};
+
 let cosas = `underline;
 
 [%cx
@@ -65,5 +70,9 @@ let cosas = `underline;
   width: fit-content;
   grid-template-columns: fit-content(20px) fit-content(10%);
   text-decoration: $(cosas);
+
+  @media $(Media.tabletUp) and $(Media.largeDesktopDown) {
+    grid-template-columns: fit-content(20px) fit-content(10%);
+  }
 |}
 ];
