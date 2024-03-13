@@ -106,6 +106,28 @@ let success_tests =
     ({|$(Module.variable')|}, [INTERPOLATION(["Module", "variable'"])]),
     ({|-moz|}, [IDENT("-moz")]),
     ({|--color-main|}, [IDENT("--color-main")]),
+    (
+      {|
+    /* nice */
+    /* nice */
+
+
+    /* nice */
+    /* nice */
+
+    div {}|},
+      [WS, TAG("div"), WS, LEFT_BRACE, RIGHT_BRACE],
+    ),
+    (
+      {|
+    div /*nice*/ /* nice */   /*ice*/.b {}|},
+      [WS, TAG("div"), WS, DOT, TAG("b"), WS, LEFT_BRACE, RIGHT_BRACE],
+    ),
+    (
+      {|
+    div/*nice*//* nice *//*ice*/.b {}|},
+      [WS, TAG("div"), DOT, TAG("b"), WS, LEFT_BRACE, RIGHT_BRACE],
+    ),
     /* TODO: Support for escaped */
     /* ({|\32|}, [NUMBER("\32")]), */
     /* ({|\25BA|}, [NUMBER "\25BA"]), */
