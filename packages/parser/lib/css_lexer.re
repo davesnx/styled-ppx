@@ -8,7 +8,7 @@ module Location = Ppxlib.Location;
 let (let.ok) = Result.bind;
 
 /** Signals a lexing error at the provided source location. */
-exception LexingError((Lexing.position, string));
+exception LexingError((Lexing.position, Lexing.position, string));
 
 /* Regexes */
 let newline = [%sedlex.regexp? '\n' | "\r\n" | '\r' | '\012'];
@@ -370,9 +370,10 @@ let is_surrogate = char_code => char_code >= 0xD800 && char_code <= 0xDFFF;
 /* sedlex needs a last case as wildcard _. If this error appears, means that
    there's a bug in the lexer and there cases that aren't matched */
 let unreachable = lexbuf => {
-  let (_, curr_pos) = Sedlexing.lexing_positions(lexbuf);
+  let (start_pos, curr_pos) = Sedlexing.lexing_positions(lexbuf);
   raise(
     LexingError((
+      start_pos,
       curr_pos,
       "Unknown failure while lexing. This case should be unreachable",
     )),
@@ -431,95 +432,93 @@ let rec consume_remnants_bad_url = lexbuf =>
   | _ => unreachable(lexbuf)
   };
 
-module Tokenizer = {
-  // https://drafts.csswg.org/css-syntax-3/#consume-url-token
-  let consume_url = lexbuf => {
-    let _ = consume_whitespace(lexbuf);
-    let rec read = acc => {
-      let when_whitespace = () => {
-        let _ = consume_whitespace(lexbuf);
-        switch%sedlex (lexbuf) {
-        | ')' => Ok(Parser.URL(acc))
-        | eof => Error((Parser.URL(acc), Tokens.Eof))
-        | _ =>
-          consume_remnants_bad_url(lexbuf);
-          Ok(BAD_URL);
-        };
-      };
+// https://drafts.csswg.org/css-syntax-3/#consume-url-token
+let consume_url = lexbuf => {
+  let _ = consume_whitespace(lexbuf);
+  let rec read = acc => {
+    let when_whitespace = () => {
+      let _ = consume_whitespace(lexbuf);
       switch%sedlex (lexbuf) {
       | ')' => Ok(Parser.URL(acc))
       | eof => Error((Parser.URL(acc), Tokens.Eof))
-      | whitespace => when_whitespace()
-      | '"'
-      | '\''
-      | '('
-      | non_printable_code_point =>
+      | _ =>
         consume_remnants_bad_url(lexbuf);
-        // TODO: location on error
-        Error((BAD_URL, Tokens.Invalid_code_point));
-      | escape =>
-        switch (consume_escaped(lexbuf)) {
-        | Ok(char) => read(acc ++ char)
-        | Error((_, error)) => Error((BAD_URL, error))
-        }
-      | any => read(acc ++ lexeme(lexbuf))
-      | _ => unreachable(lexbuf)
+        Ok(BAD_URL);
       };
     };
-    read(lexeme(lexbuf));
-  };
-
-  let handle_consume_identifier =
-    fun
-    | Error((_, error)) => Error((Parser.BAD_IDENT, error))
-    | Ok(string) => Ok(string);
-
-  let consume_function = string => {
-    switch (string) {
-    | "nth-last-child"
-    | "nth-child"
-    | "nth-of-type"
-    | "nth-last-of-type" => Parser.NTH_FUNCTION(string)
-    | _ => Parser.FUNCTION(string)
-    };
-  };
-
-  // https://drafts.csswg.org/css-syntax-3/#consume-ident-like-token
-  let consume_ident_like = lexbuf => {
-    let read_url = string => {
-      // TODO: the whitespace trickery here?
-      let _ = consume_whitespace(lexbuf);
-      let is_function =
-        check(_ =>
-          switch%sedlex (lexbuf) {
-          | '\''
-          | '"' => true
-          | _ => false
-          }
-        );
-      is_function(lexbuf)
-        ? Ok(consume_function(string)) : consume_url(lexbuf);
-    };
-
-    let.ok string = consume_identifier(lexbuf) |> handle_consume_identifier;
     switch%sedlex (lexbuf) {
-    | "(" =>
-      switch (string) {
-      | "url" => read_url(string)
-      | _ => Ok(consume_function(string))
+    | ')' => Ok(Parser.URL(acc))
+    | eof => Error((Parser.URL(acc), Tokens.Eof))
+    | whitespace => when_whitespace()
+    | '"'
+    | '\''
+    | '('
+    | non_printable_code_point =>
+      consume_remnants_bad_url(lexbuf);
+      // TODO: location on error
+      Error((BAD_URL, Tokens.Invalid_code_point));
+    | escape =>
+      switch (consume_escaped(lexbuf)) {
+      | Ok(char) => read(acc ++ char)
+      | Error((_, error)) => Error((BAD_URL, error))
       }
-    | _ => is_tag(string) ? Ok(TAG(string)) : Ok(IDENT(string))
+    | any => read(acc ++ lexeme(lexbuf))
+    | _ => unreachable(lexbuf)
     };
+  };
+  read(lexeme(lexbuf));
+};
+
+let handle_consume_identifier =
+  fun
+  | Error((_, error)) => Error((Parser.BAD_IDENT, error))
+  | Ok(string) => Ok(string);
+
+let consume_function = string => {
+  switch (string) {
+  | "nth-last-child"
+  | "nth-child"
+  | "nth-of-type"
+  | "nth-last-of-type" => Parser.NTH_FUNCTION(string)
+  | _ => Parser.FUNCTION(string)
+  };
+};
+
+// https://drafts.csswg.org/css-syntax-3/#consume-ident-like-token
+let consume_ident_like = lexbuf => {
+  let read_url = string => {
+    // TODO: the whitespace trickery here?
+    let _ = consume_whitespace(lexbuf);
+    let is_function =
+      check(_ =>
+        switch%sedlex (lexbuf) {
+        | '\''
+        | '"' => true
+        | _ => false
+        }
+      );
+    is_function(lexbuf)
+      ? Ok(consume_function(string)) : consume_url(lexbuf);
+  };
+
+  let.ok string = consume_identifier(lexbuf) |> handle_consume_identifier;
+  switch%sedlex (lexbuf) {
+  | "(" =>
+    switch (string) {
+    | "url" => read_url(string)
+    | _ => Ok(consume_function(string))
+    }
+  | _ => is_tag(string) ? Ok(TAG(string)) : Ok(IDENT(string))
   };
 };
 
 let handle_tokenizer_error = lexbuf => {
-  let (_, curr_pos) = Sedlexing.lexing_positions(lexbuf);
+  let (start_pos, curr_pos) = Sedlexing.lexing_positions(lexbuf);
   fun
   | Ok(value) => value
   | Error((_, msg)) => {
-      let error: string = Tokens.show_error(msg);
-      raise @@ LexingError((curr_pos, error));
+      let error = Tokens.show_error(msg);
+      raise(LexingError((start_pos, curr_pos, error)));
     };
 };
 
@@ -614,13 +613,14 @@ and get_dimension = (n, lexbuf) => {
   };
 }
 and discard_comments = lexbuf => {
-  let (_, curr_pos) = Sedlexing.lexing_positions(lexbuf);
+  let (start_pos, curr_pos) = Sedlexing.lexing_positions(lexbuf);
   switch%sedlex (lexbuf) {
   | "*/" => get_next_token(lexbuf)
   | any => discard_comments(lexbuf)
   | eof =>
     raise(
       LexingError((
+        start_pos,
         curr_pos,
         "Unterminated comment at the end of the string",
       )),
@@ -938,7 +938,7 @@ let tokenize = input => {
   };
 
   try(Ok(from_string([]))) {
-  | exn => Error(Printexc.to_string(exn))
+  | LexingError((_start_pos, _end_pos, msg)) => Error(msg)
   };
 };
 
