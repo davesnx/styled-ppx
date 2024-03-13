@@ -120,28 +120,29 @@ module Mapper = {
         pmb_name: {loc: _, txt: Some(moduleName)} as name,
         pmb_attributes: _pmb_attributes,
         pmb_loc: moduleLoc,
-        pmb_expr: {
-          pmod_desc:
-            Pmod_extension((
-              {txt: extensionName, loc: extensionLoc},
-              PStr([
-                {
-                  pstr_desc:
-                    Pstr_eval(
-                      {
-                        pexp_loc: stringLoc,
-                        pexp_desc:
-                          Pexp_constant(Pconst_string(str, _loc, _label)),
-                        _,
-                      },
-                      _attributes,
-                    ),
-                  pstr_loc: _,
-                },
-              ]),
-            )),
-          _,
-        },
+        pmb_expr:
+          {
+            pmod_desc:
+              Pmod_extension((
+                {txt: extensionName, loc: extensionLoc},
+                PStr([
+                  {
+                    pstr_desc:
+                      Pstr_eval(
+                        {
+                          pexp_loc: stringLoc,
+                          pexp_desc:
+                            Pexp_constant(Pconst_string(str, _loc, _label)),
+                          _,
+                        },
+                        _attributes,
+                      ),
+                    pstr_loc: _,
+                  },
+                ]),
+              )),
+            _,
+          },
       })
         when isStyled(extensionName) =>
       let htmlTag = getHtmlTagUnsafe(~loc=extensionLoc, extensionName);
@@ -169,23 +170,24 @@ module Mapper = {
         pmb_name: {loc: _, txt: Some(moduleName)} as name,
         pmb_attributes: _pmb_attributes,
         pmb_loc: moduleLoc,
-        pmb_expr: {
-          pmod_desc:
-            Pmod_extension((
-              {txt: extensionName, loc: extensionLoc},
-              PStr([
-                {
-                  pstr_desc:
-                    Pstr_eval(
-                      {pexp_loc: arrayLoc, pexp_desc: Pexp_array(arr), _},
-                      _,
-                    ),
-                  pstr_loc: _,
-                },
-              ]),
-            )),
-          _,
-        },
+        pmb_expr:
+          {
+            pmod_desc:
+              Pmod_extension((
+                {txt: extensionName, loc: extensionLoc},
+                PStr([
+                  {
+                    pstr_desc:
+                      Pstr_eval(
+                        {pexp_loc: arrayLoc, pexp_desc: Pexp_array(arr), _},
+                        _,
+                      ),
+                    pstr_loc: _,
+                  },
+                ]),
+              )),
+            _,
+          },
       })
         when isStyled(extensionName) =>
       let htmlTag = getHtmlTagUnsafe(~loc=extensionLoc, extensionName);
@@ -208,28 +210,34 @@ module Mapper = {
         pmb_name: {loc: _, txt: Some(moduleName)} as name,
         pmb_attributes: _pmb_attributes,
         pmb_loc: moduleLoc,
-        pmb_expr: {
-          pmod_desc:
-            Pmod_extension((
-              {txt: extensionName, loc: extensionLoc},
-              PStr([
-                {
-                  pstr_desc:
-                    Pstr_eval(
-                      {
-                        pexp_loc: functionLoc,
-                        pexp_desc:
-                          Pexp_fun(fnLabel, defaultValue, param, expression),
+        pmb_expr:
+          {
+            pmod_desc:
+              Pmod_extension((
+                {txt: extensionName, loc: extensionLoc},
+                PStr([
+                  {
+                    pstr_desc:
+                      Pstr_eval(
+                        {
+                          pexp_loc: functionLoc,
+                          pexp_desc:
+                            Pexp_fun(
+                              fnLabel,
+                              defaultValue,
+                              param,
+                              expression,
+                            ),
+                          _,
+                        },
                         _,
-                      },
-                      _,
-                    ),
-                  pstr_loc: _,
-                },
-              ]),
-            )),
-          _,
-        },
+                      ),
+                    pstr_loc: _,
+                  },
+                ]),
+              )),
+            _,
+          },
       })
         when isStyled(extensionName) =>
       let htmlTag = getHtmlTagUnsafe(~loc=extensionLoc, extensionName);
@@ -258,28 +266,29 @@ module Mapper = {
           {
             pvb_pat:
               {ppat_desc: Ppat_var({loc: patternLoc, txt: valueName}), _} as pat,
-            pvb_expr: {
-              pexp_desc:
-                Pexp_extension((
-                  {txt: "cx", _},
-                  PStr([
-                    {
-                      pstr_desc:
-                        Pstr_eval(
-                          {
-                            pexp_loc: payloadLoc,
-                            pexp_desc:
-                              Pexp_constant(Pconst_string(styles, _, _)),
+            pvb_expr:
+              {
+                pexp_desc:
+                  Pexp_extension((
+                    {txt: "cx", _},
+                    PStr([
+                      {
+                        pstr_desc:
+                          Pstr_eval(
+                            {
+                              pexp_loc: payloadLoc,
+                              pexp_desc:
+                                Pexp_constant(Pconst_string(styles, _, _)),
+                              _,
+                            },
                             _,
-                          },
-                          _,
-                        ),
-                      _,
-                    },
-                  ]),
-                )),
-              _,
-            },
+                          ),
+                        _,
+                      },
+                    ]),
+                  )),
+                _,
+              },
             pvb_loc: loc,
             _,
           },
@@ -308,27 +317,28 @@ module Mapper = {
           {
             pvb_pat:
               {ppat_desc: Ppat_var({loc: patternLoc, txt: valueName}), _} as pat,
-            pvb_expr: {
-              pexp_desc:
-                Pexp_extension((
-                  {txt: "cx", _},
-                  PStr([
-                    {
-                      pstr_desc:
-                        Pstr_eval(
-                          {
-                            pexp_loc: payloadLoc,
-                            pexp_desc: Pexp_array(arr),
+            pvb_expr:
+              {
+                pexp_desc:
+                  Pexp_extension((
+                    {txt: "cx", _},
+                    PStr([
+                      {
+                        pstr_desc:
+                          Pstr_eval(
+                            {
+                              pexp_loc: payloadLoc,
+                              pexp_desc: Pexp_array(arr),
+                              _,
+                            },
                             _,
-                          },
-                          _,
-                        ),
-                      _,
-                    },
-                  ]),
-                )),
-              _,
-            },
+                          ),
+                        _,
+                      },
+                    ]),
+                  )),
+                _,
+              },
             pvb_loc: loc,
             _,
           },
@@ -350,24 +360,25 @@ module Mapper = {
         [
           {
             pvb_pat: {ppat_desc: Ppat_var(className)},
-            pvb_expr: {
-              pexp_desc:
-                Pexp_extension((
-                  {txt: "style_label"},
-                  PStr([
-                    {
-                      pstr_desc:
-                        Pstr_eval(
-                          {
-                            pexp_desc:
-                              Pexp_construct({txt: Lident("[]")}, None),
-                          },
-                          [],
-                        ),
-                    },
-                  ]),
-                )),
-            },
+            pvb_expr:
+              {
+                pexp_desc:
+                  Pexp_extension((
+                    {txt: "style_label"},
+                    PStr([
+                      {
+                        pstr_desc:
+                          Pstr_eval(
+                            {
+                              pexp_desc:
+                                Pexp_construct({txt: Lident("[]")}, None),
+                            },
+                            [],
+                          ),
+                      },
+                    ]),
+                  )),
+              },
           },
         ],
       ) =>
@@ -383,21 +394,22 @@ module Mapper = {
         [
           {
             pvb_pat: {ppat_desc: Ppat_var(className)},
-            pvb_expr: {
-              pexp_desc:
-                Pexp_extension((
-                  {txt: "style_label"},
-                  PStr([
-                    {
-                      pstr_desc:
-                        Pstr_eval(
-                          {pexp_desc: Pexp_construct(_, Some(exp))},
-                          [],
-                        ),
-                    },
-                  ]),
-                )),
-            },
+            pvb_expr:
+              {
+                pexp_desc:
+                  Pexp_extension((
+                    {txt: "style_label"},
+                    PStr([
+                      {
+                        pstr_desc:
+                          Pstr_eval(
+                            {pexp_desc: Pexp_construct(_, Some(exp))},
+                            [],
+                          ),
+                      },
+                    ]),
+                  )),
+              },
           },
         ],
       ) =>
@@ -413,29 +425,30 @@ module Mapper = {
         [
           {
             pvb_pat: {ppat_desc: Ppat_var(className)},
-            pvb_expr: {
-              pexp_desc:
-                Pexp_fun(
-                  label,
-                  optExp,
-                  pat,
-                  {
-                    pexp_desc:
-                      Pexp_extension((
-                        {txt: "style_label"},
-                        PStr([
-                          {
-                            pstr_desc:
-                              Pstr_eval(
-                                {pexp_desc: Pexp_construct(_, Some(exp))},
-                                [],
-                              ),
-                          },
-                        ]),
-                      )),
-                  },
-                ),
-            },
+            pvb_expr:
+              {
+                pexp_desc:
+                  Pexp_fun(
+                    label,
+                    optExp,
+                    pat,
+                    {
+                      pexp_desc:
+                        Pexp_extension((
+                          {txt: "style_label"},
+                          PStr([
+                            {
+                              pstr_desc:
+                                Pstr_eval(
+                                  {pexp_desc: Pexp_construct(_, Some(exp))},
+                                  [],
+                                ),
+                            },
+                          ]),
+                        )),
+                    },
+                  ),
+              },
           },
         ],
       ) =>
@@ -456,40 +469,41 @@ module Mapper = {
         [
           {
             pvb_pat: {ppat_desc: Ppat_var(className)},
-            pvb_expr: {
-              pexp_desc:
-                Pexp_fun(
-                  label1,
-                  optExp1,
-                  pat1,
-                  {
-                    pexp_desc:
-                      Pexp_fun(
-                        label2,
-                        optExp2,
-                        pat2,
-                        {
-                          pexp_desc:
-                            Pexp_extension((
-                              {txt: "style_label"},
-                              PStr([
-                                {
-                                  pstr_desc:
-                                    Pstr_eval(
-                                      {
-                                        pexp_desc:
-                                          Pexp_construct(_, Some(exp)),
-                                      },
-                                      [],
-                                    ),
-                                },
-                              ]),
-                            )),
-                        },
-                      ),
-                  },
-                ),
-            },
+            pvb_expr:
+              {
+                pexp_desc:
+                  Pexp_fun(
+                    label1,
+                    optExp1,
+                    pat1,
+                    {
+                      pexp_desc:
+                        Pexp_fun(
+                          label2,
+                          optExp2,
+                          pat2,
+                          {
+                            pexp_desc:
+                              Pexp_extension((
+                                {txt: "style_label"},
+                                PStr([
+                                  {
+                                    pstr_desc:
+                                      Pstr_eval(
+                                        {
+                                          pexp_desc:
+                                            Pexp_construct(_, Some(exp)),
+                                        },
+                                        [],
+                                      ),
+                                  },
+                                ]),
+                              )),
+                          },
+                        ),
+                    },
+                  ),
+              },
           },
         ],
       ) =>
@@ -520,29 +534,30 @@ module Mapper = {
         [
           {
             pvb_pat: {ppat_desc: Ppat_var(className)},
-            pvb_expr: {
-              pexp_desc:
-                Pexp_fun(
-                  label,
-                  optExp,
-                  pat,
-                  {
-                    pexp_desc:
-                      Pexp_extension((
-                        {txt: "style_label"},
-                        PStr([
-                          {
-                            pstr_desc:
-                              Pstr_eval(
-                                {pexp_desc: Pexp_match(exp, cases)},
-                                [],
-                              ),
-                          },
-                        ]),
-                      )),
-                  },
-                ),
-            },
+            pvb_expr:
+              {
+                pexp_desc:
+                  Pexp_fun(
+                    label,
+                    optExp,
+                    pat,
+                    {
+                      pexp_desc:
+                        Pexp_extension((
+                          {txt: "style_label"},
+                          PStr([
+                            {
+                              pstr_desc:
+                                Pstr_eval(
+                                  {pexp_desc: Pexp_match(exp, cases)},
+                                  [],
+                                ),
+                            },
+                          ]),
+                        )),
+                    },
+                  ),
+              },
           },
         ],
       ) =>
@@ -568,37 +583,38 @@ module Mapper = {
         [
           {
             pvb_pat: {ppat_desc: Ppat_var(className)},
-            pvb_expr: {
-              pexp_desc:
-                Pexp_fun(
-                  label1,
-                  optExp1,
-                  pat1,
-                  {
-                    pexp_desc:
-                      Pexp_fun(
-                        label2,
-                        optExp2,
-                        pat2,
-                        {
-                          pexp_desc:
-                            Pexp_extension((
-                              {txt: "style_label"},
-                              PStr([
-                                {
-                                  pstr_desc:
-                                    Pstr_eval(
-                                      {pexp_desc: Pexp_match(exp, cases)},
-                                      [],
-                                    ),
-                                },
-                              ]),
-                            )),
-                        },
-                      ),
-                  },
-                ),
-            },
+            pvb_expr:
+              {
+                pexp_desc:
+                  Pexp_fun(
+                    label1,
+                    optExp1,
+                    pat1,
+                    {
+                      pexp_desc:
+                        Pexp_fun(
+                          label2,
+                          optExp2,
+                          pat2,
+                          {
+                            pexp_desc:
+                              Pexp_extension((
+                                {txt: "style_label"},
+                                PStr([
+                                  {
+                                    pstr_desc:
+                                      Pstr_eval(
+                                        {pexp_desc: Pexp_match(exp, cases)},
+                                        [],
+                                      ),
+                                  },
+                                ]),
+                              )),
+                          },
+                        ),
+                    },
+                  ),
+              },
           },
         ],
       ) =>
