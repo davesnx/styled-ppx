@@ -120,8 +120,11 @@ print_media_type: pmt = PRINT_MEDIA_TYPE { pmt }
 all_media_type: amt = ALL_MEDIA_TYPE { amt }
 
 /* https://www.w3.org/TR/mediaqueries-5/#mq-syntax */
+interpolation:
+  v = INTERPOLATION { Variable v}
+
 mf_value:
-  | v = INTERPOLATION { Variable v }
+  | v = interpolation { v }
   | v = value { v }
 
 /* <mf-plain> = <mf-name> : <mf-value> */
@@ -175,6 +178,7 @@ media_feature:
 media_in_parens:
   | LEFT_PAREN mc = media_condition RIGHT_PAREN { mc }
   | LEFT_PAREN WS? mf = media_feature WS? RIGHT_PAREN { Ident mf }
+  | v = interpolation { v }
 
 media_not: WS? mn = not_operator media_in_parens WS? { Ident mn }
 
@@ -235,6 +239,9 @@ media_query_prelude:
   | mq = nonempty_list(loc(media_query)) { Paren_block mq }
 
 prelude: xs = value { xs }
+
+/* media_query_prelude:
+    | mq = separated_nonempty_list(WS?, loc(media_query)) { Paren_block mq } */
 
 /* https://www.w3.org/TR/css-syntax-3/#at-rules */
 at_rule:
