@@ -58,9 +58,7 @@ module Make (CssImpl : Css_Core.CssImplementationIntf) :
      and type renderer := CssImpl.renderer = struct
   let insertRule css = CssImpl.injectRaw css
   let renderRule renderer css = CssImpl.renderRaw renderer css
-
-  let global rules =
-    CssImpl.injectRules (toJson rules)
+  let global rules = CssImpl.injectRules (toJson rules)
 
   let renderGlobal renderer selector rules =
     CssImpl.renderRules renderer selector (toJson rules)

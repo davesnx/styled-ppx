@@ -34,8 +34,7 @@ end)
 
 type cache
 
-external cache : cache = "cache"
-[@@bs.module "@emotion/cache"]
+external cache : cache = "cache" [@@bs.module "@emotion/cache"]
 
 let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
     =

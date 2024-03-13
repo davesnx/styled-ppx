@@ -330,29 +330,30 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       switch (binding) {
       | {
           pvb_pat: {ppat_desc: Ppat_var({txt, _}), _},
-          pvb_expr: {
-            pexp_desc:
-              Pexp_extension((
-                _,
-                PStr([
-                  {
-                    pstr_desc:
-                      Pstr_eval(
-                        {
-                          pexp_desc:
-                            Pexp_constant(
-                              Pconst_string(value, _loc, _delim),
-                            ),
-                          _,
-                        },
-                        _attrs,
-                      ),
-                    _,
-                  },
-                ]),
-              )),
-            _,
-          },
+          pvb_expr:
+            {
+              pexp_desc:
+                Pexp_extension((
+                  _,
+                  PStr([
+                    {
+                      pstr_desc:
+                        Pstr_eval(
+                          {
+                            pexp_desc:
+                              Pexp_constant(
+                                Pconst_string(value, _loc, _delim),
+                              ),
+                            _,
+                          },
+                          _attrs,
+                        ),
+                      _,
+                    },
+                  ]),
+                )),
+              _,
+            },
           _,
         } => (
           txt,
