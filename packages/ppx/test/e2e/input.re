@@ -58,9 +58,12 @@ let opacity = `num(100.);
   stroke-opacity: $(opacity) !important;
 |}];
 
+let cosas = `underline;
+
 [%cx
   {|
   width: fit-content;
   grid-template-columns: fit-content(20px) fit-content(10%);
+  text-decoration: $(cosas);
 |}
 ];

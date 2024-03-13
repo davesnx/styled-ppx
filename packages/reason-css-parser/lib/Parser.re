@@ -1585,14 +1585,14 @@ and property_text_combine_upright = [%value.rec
   "'none' | 'all' | 'digits' [ <integer> ]?"
 ]
 and property_text_decoration = [%value.rec
-  "<'text-decoration-line'> || <'text-decoration-style'> || <'text-decoration-color'> || <'text-decoration-thickness'>"
+  "[ <'text-decoration-line'>] [ <'text-decoration-style'>]? [ <'text-decoration-color'>]?"
 ]
 and property_text_decoration_color = [%value.rec "<color>"]
 /* Spec doesn't contain spelling-error and grammar-error: https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-line but this list used to have them | 'spelling-error' | 'grammar-error'. Leaving this comment here for reference */
 /* and this definition has changed from the origianl, it might be a bug on the spec or our Generator,
    but simplifying to "|" simplifies it and solves the bug */
 and property_text_decoration_line = [%value.rec
-  "'none' | [ 'underline' | 'overline' | 'line-through' | 'blink' ]{1,2}"
+  "'none' | <interpolation> | [ 'underline' | 'overline' | 'line-through' | 'blink' ]{1,2}"
 ]
 and property_text_decoration_skip = [%value.rec
   "'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' ] || 'edges' || 'box-decoration'"
@@ -1679,7 +1679,9 @@ and property_user_select = [%value.rec
 and property_vertical_align = [%value.rec
   "'baseline' | 'sub' | 'super' | 'text-top' | 'text-bottom' | 'middle' | 'top' | 'bottom' | <extended-percentage> | <extended-length>"
 ]
-and property_visibility = [%value.rec "'visible' | 'hidden' | 'collapse'"]
+and property_visibility = [%value.rec
+  "'visible' | 'hidden' | 'collapse' | <interpolation>"
+]
 and property_voice_balance = [%value.rec
   "<number> | 'left' | 'center' | 'right' | 'leftwards' | 'rightwards'"
 ]

@@ -2351,6 +2351,7 @@ let font_variant_emoji =
 let render_text_decoration_line =
     (~loc, value: Types.property_text_decoration_line) =>
   switch (value) {
+  | `Interpolation(v) => render_variable(~loc, v)
   | `None => variant_to_expression(~loc, `None)
   | `Xor([`Underline]) => variant_to_expression(~loc, `Underline)
   | `Xor([`Overline]) => variant_to_expression(~loc, `Overline)
@@ -2388,9 +2389,6 @@ let text_decoration_color =
     (~loc) => [%expr CssJs.textDecorationColor],
     render_color,
   );
-let text_decoration_thickness =
-  unsupportedProperty(Parser.property_text_decoration_thickness);
-
 let render_text_decoration_thickness = (~loc) =>
   fun
   | `Auto => variant_to_expression(~loc, `Auto)
@@ -2398,7 +2396,7 @@ let render_text_decoration_thickness = (~loc) =>
   | `Extended_length(l) => render_extended_length(~loc, l)
   | `Extended_percentage(p) => render_extended_percentage(~loc, p);
 
-let _text_decoration_thickness =
+let text_decoration_thickness =
   monomorphic(
     Parser.property_text_decoration_thickness,
     (~loc) => [%expr CssJs.textDecorationThickness],
@@ -2417,27 +2415,16 @@ let _text_decoration_thickness =
      // properties;
    }; */
 
-/* let render_text_decoration = (~loc, (line, style, color)) => {
-     let _line = line |> Option.map(render_text_decoration_line(~loc));
-     let _style = style |> Option.map(render_text_decoration_style(~loc));
-     let _color = color |> Option.map(render_color(~loc));
-     // let properties = [line, style, color, thickness];
-     // let properties = List.filter((_, v) => v != [], properties);
-     // let properties = List.map((_, v) => v, properties);
-     // let properties = List.flatten(properties);
-     // properties;
-     [%expr `none];
-   }; */
-
 let text_decoration =
   monomorphic(
     Parser.property_text_decoration,
     (~loc) => [%expr CssJs.textDecoration],
     (~loc, v) =>
       switch (v) {
-      | (Some(l), _, _, _) => render_text_decoration_line(~loc, l)
-      | (_l, _s, _c, Some(_)) /* render_text_decoration_with_thickness(~loc, v) */
-      | (_l, _s, _c, None) => raise(Unsupported_feature)
+      | (line, None, None) => render_text_decoration_line(~loc, line)
+      | (_line, None, Some(_color)) => raise(Unsupported_feature)
+      | (_line, Some(_style), None) => raise(Unsupported_feature)
+      | (_line, Some(_style), Some(_color)) => raise(Unsupported_feature)
       },
   );
 
@@ -4035,7 +4022,17 @@ let text_combine_upright =
 let text_orientation = unsupportedProperty(Parser.property_text_orientation);
 let touch_action = unsupportedProperty(Parser.property_touch_action);
 let user_select = unsupportedProperty(Parser.property_user_select);
-let visibility = unsupportedProperty(Parser.property_visibility);
+let visibility =
+  monomorphic(
+    Parser.property_visibility,
+    (~loc) => [%expr CssJs.visibility],
+    (~loc) =>
+      fun
+      | `Visible => [%expr `visible]
+      | `Hidden => [%expr `hidden]
+      | `Collapse => [%expr `collapse]
+      | `Interpolation(v) => render_variable(~loc, v),
+  );
 
 let properties = [
   ("align-content", found(align_content)),
