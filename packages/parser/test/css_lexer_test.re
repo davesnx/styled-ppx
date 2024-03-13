@@ -13,9 +13,9 @@ let success_tests =
     ({|(|}, [LEFT_PAREN]),
     ({|)|}, [RIGHT_PAREN]),
     /* TODO: Treat +1 to NUMBER and not COMBINATOR + NUMBER */
-    /* ({|+12.3|}, [NUMBER("12.3")]), */
+    ({|+12.3|}, [COMBINATOR("+"), NUMBER("12.3")]),
     ({|+ 12.3|}, [COMBINATOR("+"), WS, NUMBER("12.3")]),
-    /* TODO: Deambiguate + sign. Either COMBINATOR(+) or DELIM(+) */
+    /* TODO: Disambiguate + sign. Either COMBINATOR(+) or DELIM(+) */
     ({|+|}, [COMBINATOR("+")]),
     ({|,|}, [COMMA]),
     ({|45.6|}, [NUMBER("45.6")]),
