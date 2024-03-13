@@ -2,6 +2,8 @@
 
 open Css_types
 
+let make_loc = Parser_location.to_ppxlib_location
+
 %}
 
 %token EOF
@@ -60,7 +62,7 @@ stylesheet: s = stylesheet_without_eof; EOF { s }
 stylesheet_without_eof: rs = loc(list(rule)) { rs }
 
 declaration_list:
-  | WS? EOF { ([], Parser_location.make $startpos $endpos) }
+  | WS? EOF { ([], make_loc $startpos $endpos) }
   | ds = loc(declarations) EOF { ds }
 
 /* keyframe may contain {} */
@@ -72,7 +74,7 @@ keyframes:
 
 /* Adds location as a tuple */
 loc(X): x = X {
-  (x, Parser_location.make $startpos(x) $endpos(x))
+  (x, make_loc $startpos(x) $endpos(x))
 }
 
 /* Handle skipping whitespace */
@@ -243,7 +245,7 @@ at_rule:
     { name;
       prelude;
       block = Rule_list ds;
-      loc = Parser_location.make $startpos $endpos;
+      loc = make_loc $startpos $endpos;
     }
   }
   /* @media (min-width: 16rem) {} */
@@ -253,31 +255,31 @@ at_rule:
     { name;
       prelude;
       block = Rule_list b;
-      loc = Parser_location.make $startpos $endpos;
+      loc = make_loc $startpos $endpos;
     }
   }
   /* @keyframes animationName { ... } */
   | name = loc(AT_KEYFRAMES) WS?
     i = IDENT WS?
     block = brace_block(keyframe) {
-    let prelude = (Ident i, Parser_location.make $startpos(i) $endpos(i)) in
-    let block = Rule_list (block, Parser_location.make $startpos $endpos) in
+    let prelude = (Ident i, make_loc $startpos(i) $endpos(i)) in
+    let block = Rule_list (block, make_loc $startpos $endpos) in
     { name;
       prelude;
       block;
-      loc = Parser_location.make $startpos $endpos;
+      loc = make_loc $startpos $endpos;
     }
   }
   /* @keyframes animationName {} */
   | name = loc(AT_KEYFRAMES) WS?
     i = IDENT WS?
     s = loc(empty_brace_block) {
-    let prelude = ((Ident i), Parser_location.make $startpos(i) $endpos(i)) in
+    let prelude = ((Ident i), make_loc $startpos(i) $endpos(i)) in
     let empty_block = Rule_list s in
     ({ name;
       prelude;
       block = empty_block;
-      loc = Parser_location.make $startpos $endpos;
+      loc = make_loc $startpos $endpos;
     }): at_rule
   }
   /* @charset */
@@ -286,7 +288,7 @@ at_rule:
     { name;
       prelude = xs;
       block = Empty;
-      loc = Parser_location.make $startpos $endpos;
+      loc = make_loc $startpos $endpos;
     }
   }
   /* @support { ... } */
@@ -298,7 +300,7 @@ at_rule:
     { name;
       prelude = xs;
       block = Stylesheet s;
-      loc = Parser_location.make $startpos $endpos;
+      loc = make_loc $startpos $endpos;
     }
   }
 
@@ -309,10 +311,10 @@ keyframe_style_rule:
   /* from {} to {} */
   | WS? id = IDENT WS?
     declarations = brace_block(loc(declarations)) WS? {
-    let prelude = [(SimpleSelector (Type id), Parser_location.make $startpos(id) $endpos(id))] in
+    let prelude = [(SimpleSelector (Type id), make_loc $startpos(id) $endpos(id))] in
     Style_rule {
-      prelude = (prelude, Parser_location.make $startpos(id) $endpos(id));
-      loc = Parser_location.make $startpos $endpos;
+      prelude = (prelude, make_loc $startpos(id) $endpos(id));
+      loc = make_loc $startpos $endpos;
       block = declarations;
     }
   }
@@ -320,10 +322,10 @@ keyframe_style_rule:
   | WS? p = percentage; WS?
     declarations = brace_block(loc(declarations)) WS? {
     let item = Percentage p in
-    let prelude = [(SimpleSelector item, Parser_location.make $startpos(p) $endpos(p))] in
+    let prelude = [(SimpleSelector item, make_loc $startpos(p) $endpos(p))] in
     Style_rule {
-      prelude = (prelude, Parser_location.make $startpos(p) $endpos(p));
-      loc = Parser_location.make $startpos $endpos;
+      prelude = (prelude, make_loc $startpos(p) $endpos(p));
+      loc = make_loc $startpos $endpos;
       block = declarations;
     }
   }
@@ -332,11 +334,11 @@ keyframe_style_rule:
     let prelude = percentages
       |> List.map (fun percent -> Percentage percent)
       |> List.map (fun p ->
-        (SimpleSelector p, Parser_location.make $startpos(percentages) $endpos(percentages))
+        (SimpleSelector p, make_loc $startpos(percentages) $endpos(percentages))
       ) in
     Style_rule {
-      prelude = (prelude, Parser_location.make $startpos(percentages) $endpos(percentages));
-      loc = Parser_location.make $startpos $endpos;
+      prelude = (prelude, make_loc $startpos(percentages) $endpos(percentages));
+      loc = make_loc $startpos $endpos;
       block = declarations;
     }
     (* TODO: Handle separated_list(COMMA, percentage) *)
@@ -352,14 +354,14 @@ style_rule:
     block = loc(empty_brace_block) {
     { prelude;
       block;
-      loc = Parser_location.make $startpos $endpos;
+      loc = make_loc $startpos $endpos;
     }
   }
   | prelude = loc(selector_list) WS?
     declarations = brace_block(loc(declarations)) {
     { prelude;
       block = declarations;
-      loc = Parser_location.make $startpos $endpos;
+      loc = make_loc $startpos $endpos;
     }
   }
 
@@ -389,7 +391,7 @@ declaration_without_eof:
     { name = property;
       value;
       important;
-      loc = Parser_location.make $startpos $endpos;
+      loc = make_loc $startpos $endpos;
     }
   }
 
