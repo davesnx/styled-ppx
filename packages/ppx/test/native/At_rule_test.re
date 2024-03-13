@@ -214,6 +214,24 @@ let media_query_tests = [
     ],
   ),
   (
+    "@media $(Media.tabletUp) and $(largeDesktopDown) and $(moare)",
+    [%expr
+      [%cx "@media $(Media.tabletUp) and $(largeDesktopDown) and $(moare) {}"]
+    ],
+    [%expr
+      CssJs.style([|
+        CssJs.media(
+          Media.tabletUp
+          ++ {js| and |js}
+          ++ largeDesktopDown
+          ++ {js| and |js}
+          ++ moare,
+          [||],
+        ),
+      |])
+    ],
+  ),
+  (
     /* TODO: Function values are not valid values in the media query. */
     "@media (width: calc( 1px + 2px ))",
     [%expr [%cx "@media (width: calc( 1px + 2px )) {}"]],
