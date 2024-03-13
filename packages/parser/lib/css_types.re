@@ -1,3 +1,4 @@
+/* We have records with identical field names. Type inference can sometimes struggle to determine which field you're referring to. This ambiguity can lead to compiler warnings or errors, we disable it with -30 because we always construct this with annotations in those cases. */
 [@warning "-30"];
 
 module Location = Ppxlib.Location;
