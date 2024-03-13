@@ -1,32 +1,7 @@
 open Alcotest;
 module Parser = Css_parser;
 
-let parse = input => {
-  let buffer = Sedlexing.Utf8.from_string(input);
-  let rec from_string = acc => {
-    switch (Css_lexer.get_next_token(buffer)) {
-    | Parser.EOF => []
-    | token => [token, ...from_string(acc)]
-    };
-  };
-
-  try(Ok(from_string([]))) {
-  | exn => Error(Printexc.to_string(exn))
-  };
-};
-
-let render_token =
-  fun
-  | Parser.EOF => ""
-  | t => Tokens.token_to_debug(t);
-
-let list_parse_tokens_to_string = tokens =>
-  tokens |> List.map(render_token) |> String.concat(" ") |> String.trim;
-
-let list_tokens_to_string = tokens =>
-  tokens |> List.map(render_token) |> String.concat(" ") |> String.trim;
-
-let success_tests_data =
+let success_tests =
   [
     (" \n\t ", [WS]),
     ({|"something"|}, [STRING("something")]),
@@ -38,11 +13,12 @@ let success_tests_data =
     ({|(|}, [LEFT_PAREN]),
     ({|)|}, [RIGHT_PAREN]),
     /* TODO: Treat +1 to NUMBER and not COMBINATOR + NUMBER */
-    /* ({|+12.3|}, [NUMBER("12.3")]), */
+    ({|+12.3|}, [COMBINATOR("+"), NUMBER("12.3")]),
     ({|+ 12.3|}, [COMBINATOR("+"), WS, NUMBER("12.3")]),
-    /* TODO: COMBINATOR or DELIM(+)? */
+    /* TODO: Disambiguate + sign. Either COMBINATOR(+) or DELIM(+) */
     ({|+|}, [COMBINATOR("+")]),
     ({|,|}, [COMMA]),
+    ({|45.6|}, [NUMBER("45.6")]),
     ({|-45.6|}, [NUMBER("-45.6")]),
     ({|45%|}, [NUMBER("45"), PERCENT]),
     ({|2n|}, [DIMENSION(("2", "n"))]),
@@ -50,6 +26,9 @@ let success_tests_data =
     /* TODO: Store dimension as a variant */
     ({|45.6px|}, [FLOAT_DIMENSION(("45.6", "px"))]),
     ({|10px|}, [FLOAT_DIMENSION(("10", "px"))]),
+    ({|.5|}, [NUMBER(".5")]),
+    /* TODO: Treat 5. as NUMBER("5.0") */
+    ({|5.|}, [NUMBER("5"), DOT]),
     ({|--potato|}, [IDENT("--potato")]),
     ({|-|}, [DELIM("-")]),
     ({|.|}, [DOT]),
@@ -94,6 +73,7 @@ let success_tests_data =
         RIGHT_PAREN,
       ],
     ),
+    ({|+10px|}, [COMBINATOR("+"), FLOAT_DIMENSION(("10", "px"))]),
     (
       {|calc(10px+ 10px)|},
       [
@@ -126,30 +106,32 @@ let success_tests_data =
     ({|$(Module.variable')|}, [INTERPOLATION(["Module", "variable'"])]),
     ({|-moz|}, [IDENT("-moz")]),
     ({|--color-main|}, [IDENT("--color-main")]),
+    /* TODO: Support for escaped */
+    /* ({|\32|}, [NUMBER("\32")]), */
+    /* ({|\25BA|}, [NUMBER "\25BA"]), */
+    /* TODO: Support escaped "@" and others */
+    /* ("\\@desu", [IDENT("@desu")]), */
   ]
-  /* TODO: Support for escaped */
-  /* ({|\32|}, [IDENT("--color-main")]), */
-  /* ({|\25BA|}, [IDENT("--color-main")]), */
-  /* TODO: Supported escaped "@" and others */
-  /* ("\\@desu", [IDENT("@desu")]), */
-  |> List.mapi((_index, (input, output)) => {
-       let okInput = parse(input) |> Result.get_ok;
-       let inputTokens = list_parse_tokens_to_string(okInput);
-       let outputTokens = list_tokens_to_string(output);
+  |> List.map(((input, output)) => {
+       let okInput = Css_lexer.tokenize(input) |> Result.get_ok;
+       let inputTokens = Css_lexer.to_string(okInput);
+       let outputTokens =
+         output
+         |> List.map(token => (token, Lexing.dummy_pos, Lexing.dummy_pos))
+         |> Css_lexer.to_string;
 
-       let assertion = () =>
-         check(string, "should match" ++ input, inputTokens, outputTokens);
-
-       test_case(input, `Quick, assertion);
+       test_case(input, `Quick, () =>
+         check(string, "should match" ++ input, inputTokens, outputTokens)
+       );
      });
 
-let tests = success_tests_data;
+let error_tests =
+  [("/*", "Unterminated comment at the end of the string")]
+  |> List.map(((input, output)) => {
+       let error = Css_lexer.tokenize(input) |> Result.get_error;
+       test_case(input, `Quick, () =>
+         check(string, "should match" ++ input, error, output)
+       );
+     });
 
-/*
- TODO: Add error lexing cases when we need it.
-
- test("should error lexing", ({expect, _}) => {
-   let errorInput = parse("/*") |> Result.get_error;
-   expect.string(errorInput).toEqual();
- });
- */
+let tests = List.append(success_tests, error_tests);

@@ -395,6 +395,15 @@ let complex_tests = [
       CssJs.style([|CssJs.selector({js|& > *:not(:last-child)|js}, [||])|])
     ],
   ),
+  (
+    "&:has(.$(gap))",
+    [%expr [%cx {| &:has(.$(gap)) {} |}]],
+    [%expr
+      CssJs.style([|
+        CssJs.selector({js|&:has(.|js} ++ gap ++ {js|)|js}, [||]),
+      |])
+    ],
+  ),
 ];
 
 let stylesheet_tests = [

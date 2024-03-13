@@ -6,6 +6,6 @@
  (name styled_ppx_css_parser)
  (wrapped false)
  (public_name styled-ppx.css-parser)
- (libraries sedlex menhirLib str ppxlib)
+ (libraries sedlex menhirLib ppxlib)
  (preprocess
   (pps sedlex.ppx ppx_deriving.show)))

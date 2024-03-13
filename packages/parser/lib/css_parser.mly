@@ -2,6 +2,8 @@
 
 open Css_types
 
+let make_loc = Parser_location.to_ppxlib_location
+
 %}
 
 %token EOF
@@ -60,7 +62,7 @@ stylesheet: s = stylesheet_without_eof; EOF { s }
 stylesheet_without_eof: rs = loc(list(rule)) { rs }
 
 declaration_list:
-  | WS? EOF { ([], Parser_location.make $startpos $endpos) }
+  | WS? EOF { ([], make_loc $startpos $endpos) }
   | ds = loc(declarations) EOF { ds }
 
 /* keyframe may contain {} */
@@ -72,7 +74,7 @@ keyframes:
 
 /* Adds location as a tuple */
 loc(X): x = X {
-  (x, Parser_location.make $startpos(x) $endpos(x))
+  (x, make_loc $startpos(x) $endpos(x))
 }
 
 /* Handle skipping whitespace */
@@ -111,20 +113,19 @@ only_operator: o = MEDIA_QUERY_OPERATOR { o }
 /* "not" */
 not_operator: n = MEDIA_QUERY_OPERATOR { n }
 /* "screen" */
-screen_media_type: smt =  SCREEN_MEDIA_TYPE { smt }
+screen_media_type: smt = SCREEN_MEDIA_TYPE { smt }
 /* "print" */
-print_media_type: pmt =  PRINT_MEDIA_TYPE { pmt }
+print_media_type: pmt = PRINT_MEDIA_TYPE { pmt }
 /* "all" */
-all_media_type: amt =  ALL_MEDIA_TYPE { amt }
+all_media_type: amt = ALL_MEDIA_TYPE { amt }
 
 /* https://www.w3.org/TR/mediaqueries-5/#mq-syntax */
-
 mf_value:
   | v = INTERPOLATION { Variable v }
   | v = value { v }
 
 /* <mf-plain> = <mf-name> : <mf-value> */
-mf_plain: mf = IDENT WS? COLON WS? mf_value { mf } 
+mf_plain: mf = IDENT WS? COLON WS? mf_value { mf }
 
 /* <mf-lt> = '<' '='? */
 mf_lt: mflt = less_than equal_sign? { mflt }
@@ -144,9 +145,9 @@ mf_comparison:
       | <mf-value> <mf-lt> <mf-name> <mf-lt> <mf-value>
       | <mf-value> <mf-gt> <mf-name> <mf-gt> <mf-value> */
 mf_range:
-  | xs = IDENT WS mf_comparison WS mf_value { xs } 
+  | xs = IDENT WS mf_comparison WS mf_value { xs }
   | mf_value WS xs = mf_comparison WS IDENT { xs }
-  | mf_value WS xs = mf_lt WS IDENT WS mf_lt WS mf_value { xs } 
+  | mf_value WS xs = mf_lt WS IDENT WS mf_lt WS mf_value { xs }
   | mf_value WS xs = mf_gt WS IDENT WS mf_gt WS mf_value { xs }
 
 screen_or_print_media_type:
@@ -154,7 +155,7 @@ screen_or_print_media_type:
   | mt = print_media_type { mt }
 
 mf_boolean:
- // TODO: IDENT is not safely parsed.
+  /* TODO: IDENT is not safely parsed */
   | i = IDENT WS? { i }
   | all_mt = all_media_type WS? { all_mt }
   | mt = screen_or_print_media_type WS? { mt }
@@ -163,7 +164,7 @@ mf_boolean:
 
 /* <media-feature> = ( [ <mf-plain> | <mf-boolean> | <mf-range> ] ) */
 media_feature:
-// TODO: property & value in mf_plain are not safely parsed.
+  /* TODO: property & value in mf_plain are not safely parsed */
   | mfp = mf_plain { mfp }
   | mfb = mf_boolean { mfb }
   | mfr = mf_range { mfr }
@@ -203,7 +204,7 @@ media_or_star:
 media_and_or_star:
   | xs = media_and_star { xs }
   | xs = media_or_star { xs }
-  
+
 /* <media-condition> = <media-not> | <media-in-parens> [ <media-and>* | <media-or>* ] */
 media_condition:
   | mn = media_not { mn }
@@ -244,7 +245,7 @@ at_rule:
     { name;
       prelude;
       block = Rule_list ds;
-      loc = Parser_location.make $startpos $endpos;
+      loc = make_loc $startpos $endpos;
     }
   }
   /* @media (min-width: 16rem) {} */
@@ -254,31 +255,31 @@ at_rule:
     { name;
       prelude;
       block = Rule_list b;
-      loc = Parser_location.make $startpos $endpos;
+      loc = make_loc $startpos $endpos;
     }
   }
   /* @keyframes animationName { ... } */
   | name = loc(AT_KEYFRAMES) WS?
     i = IDENT WS?
     block = brace_block(keyframe) {
-    let prelude = (Ident i, Parser_location.make $startpos(i) $endpos(i)) in
-    let block = Rule_list (block, Parser_location.make $startpos $endpos) in
+    let prelude = (Ident i, make_loc $startpos(i) $endpos(i)) in
+    let block = Rule_list (block, make_loc $startpos $endpos) in
     { name;
       prelude;
       block;
-      loc = Parser_location.make $startpos $endpos;
+      loc = make_loc $startpos $endpos;
     }
   }
   /* @keyframes animationName {} */
   | name = loc(AT_KEYFRAMES) WS?
     i = IDENT WS?
     s = loc(empty_brace_block) {
-    let prelude = ((Ident i), Parser_location.make $startpos(i) $endpos(i)) in
+    let prelude = ((Ident i), make_loc $startpos(i) $endpos(i)) in
     let empty_block = Rule_list s in
     ({ name;
       prelude;
       block = empty_block;
-      loc = Parser_location.make $startpos $endpos;
+      loc = make_loc $startpos $endpos;
     }): at_rule
   }
   /* @charset */
@@ -287,7 +288,7 @@ at_rule:
     { name;
       prelude = xs;
       block = Empty;
-      loc = Parser_location.make $startpos $endpos;
+      loc = make_loc $startpos $endpos;
     }
   }
   /* @support { ... } */
@@ -299,7 +300,7 @@ at_rule:
     { name;
       prelude = xs;
       block = Stylesheet s;
-      loc = Parser_location.make $startpos $endpos;
+      loc = make_loc $startpos $endpos;
     }
   }
 
@@ -310,10 +311,10 @@ keyframe_style_rule:
   /* from {} to {} */
   | WS? id = IDENT WS?
     declarations = brace_block(loc(declarations)) WS? {
-    let prelude = [(SimpleSelector (Type id), Parser_location.make $startpos(id) $endpos(id))] in
+    let prelude = [(SimpleSelector (Type id), make_loc $startpos(id) $endpos(id))] in
     Style_rule {
-      prelude = (prelude, Parser_location.make $startpos(id) $endpos(id));
-      loc = Parser_location.make $startpos $endpos;
+      prelude = (prelude, make_loc $startpos(id) $endpos(id));
+      loc = make_loc $startpos $endpos;
       block = declarations;
     }
   }
@@ -321,10 +322,10 @@ keyframe_style_rule:
   | WS? p = percentage; WS?
     declarations = brace_block(loc(declarations)) WS? {
     let item = Percentage p in
-    let prelude = [(SimpleSelector item, Parser_location.make $startpos(p) $endpos(p))] in
+    let prelude = [(SimpleSelector item, make_loc $startpos(p) $endpos(p))] in
     Style_rule {
-      prelude = (prelude, Parser_location.make $startpos(p) $endpos(p));
-      loc = Parser_location.make $startpos $endpos;
+      prelude = (prelude, make_loc $startpos(p) $endpos(p));
+      loc = make_loc $startpos $endpos;
       block = declarations;
     }
   }
@@ -333,16 +334,15 @@ keyframe_style_rule:
     let prelude = percentages
       |> List.map (fun percent -> Percentage percent)
       |> List.map (fun p ->
-        (SimpleSelector p, Parser_location.make $startpos(percentages) $endpos(percentages))
+        (SimpleSelector p, make_loc $startpos(percentages) $endpos(percentages))
       ) in
     Style_rule {
-      prelude = (prelude, Parser_location.make $startpos(percentages) $endpos(percentages));
-      loc = Parser_location.make $startpos $endpos;
+      prelude = (prelude, make_loc $startpos(percentages) $endpos(percentages));
+      loc = make_loc $startpos $endpos;
       block = declarations;
     }
+    (* TODO: Handle separated_list(COMMA, percentage) *)
   }
-  /* TODO: Handle separated_list(COMMA, percentage) */
-;
 
 selector_list:
   | selector = loc(selector) WS? { [selector] }
@@ -354,14 +354,14 @@ style_rule:
     block = loc(empty_brace_block) {
     { prelude;
       block;
-      loc = Parser_location.make $startpos $endpos;
+      loc = make_loc $startpos $endpos;
     }
   }
   | prelude = loc(selector_list) WS?
     declarations = brace_block(loc(declarations)) {
     { prelude;
       block = declarations;
-      loc = Parser_location.make $startpos $endpos;
+      loc = make_loc $startpos $endpos;
     }
   }
 
@@ -391,7 +391,7 @@ declaration_without_eof:
     { name = property;
       value;
       important;
-      loc = Parser_location.make $startpos $endpos;
+      loc = make_loc $startpos $endpos;
     }
   }
 
@@ -412,8 +412,8 @@ nth_payload:
     let b = int_of_string b in
     Nth (ANB (((int_of_string (fst a)), combinator, b)))
   }
-  /* This is a hackish solution where combinator isn't cached because the lexer
-  assignes the `-` to NUMBER. This could be solved by leftassoc */
+  /* This is a hackish solution where combinator isn't catched because the lexer
+  assignes the `-` to NUMBER. This could be solved by leftassoc or the lexer */
   | a = DIMENSION WS? b = NUMBER {
     let b = Int.abs (int_of_string (b)) in
     Nth (ANB (((int_of_string (fst a)), "-", b)))

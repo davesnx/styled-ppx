@@ -1,11 +1,3 @@
-let position_to_string = pos =>
-  Printf.sprintf(
-    "[%d,%d+%d]",
-    pos.Lexing.pos_lnum,
-    pos.Lexing.pos_bol,
-    pos.Lexing.pos_cnum - pos.Lexing.pos_bol,
-  );
-
 let render_help = () => {
   print_endline("");
   print_endline("");
@@ -29,28 +21,11 @@ let help =
     args,
   );
 
-let rec printUnlessIsEof = buffer => {
-  let (token, loc_start, loc_end) =
-    Css_lexer.get_next_tokens_with_location(buffer);
-  let pos_start = position_to_string(loc_start);
-  let pos_end = position_to_string(loc_end);
-  print_endline(
-    Tokens.token_to_debug(token)
-    ++ {| [|}
-    ++ pos_start
-    ++ {|..|}
-    ++ pos_end
-    ++ {|]|},
-  );
-
-  switch (token) {
-  | Css_lexer.Parser.EOF => ()
-  | _token => printUnlessIsEof(buffer)
-  };
-};
-
 switch (input, help) {
 | (Some(_), true)
 | (None, _) => render_help()
-| (Some(css), _) => css |> Sedlexing.Latin1.from_string |> printUnlessIsEof
+| (Some(css), _) =>
+  let okInput = Css_lexer.tokenize(css) |> Result.get_ok;
+  let debug = Css_lexer.to_debug(okInput);
+  print_endline(debug);
 };

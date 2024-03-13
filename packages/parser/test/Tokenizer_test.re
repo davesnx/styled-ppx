@@ -1,15 +1,16 @@
 open Alcotest;
 
+module Lexer = Css_lexer;
+
 let parse = input => {
-  open Css_lexer;
   let values =
-    switch (from_string(input)) {
+    switch (Lexer.from_string(input)) {
     | Ok(values) => values
-    | Error(`Frozen) => failwith("Parser got frozen")
+    | Error(`Frozen) => failwith("Lexer got frozen")
     };
 
-  let {loc, _} = List.hd(values);
-  let values = values |> List.map(({txt, _}) => txt);
+  let Lexer.{loc, _} = List.hd(values);
+  let values = values |> List.map((Lexer.{txt, _}) => txt);
   (loc, values);
 };
 
@@ -38,6 +39,7 @@ let list_tokens_to_string = tokens =>
 
 let tests =
   [
+    ({||}, [EOF], 0),
     (" \n\t ", [Tokens.WS], 4),
     ({|"something"|}, [STRING("something")], 11),
     // TODO: is that right?
@@ -65,7 +67,6 @@ let tests =
     ({|]|}, [RIGHT_BRACKET], 1),
     ({|12345678.9|}, [NUMBER(12345678.9)], 10),
     ({|bar|}, [IDENT("bar")], 3),
-    ({||}, [EOF], 0),
     ({|!|}, [DELIM("!")], 1),
     ("1 / 1", [NUMBER(1.), WS, DELIM("/"), WS, NUMBER(1.)], 5),
     (
