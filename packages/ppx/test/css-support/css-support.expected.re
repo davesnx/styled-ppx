@@ -1769,20 +1769,53 @@ CssJs.unsafe({js|backgroundBlendMode|js}, {js|normal, multiply|js});
 CssJs.display(`runIn);
 CssJs.display(`flow);
 CssJs.display(`flowRoot);
-CssJs.unsafe({js|filter|js}, {js|none|js});
-CssJs.unsafe({js|filter|js}, {js|url(#id)|js});
-CssJs.unsafe({js|filter|js}, {js|url(image.svg#id)|js});
-CssJs.unsafe({js|filter|js}, {js|blur(5px)|js});
-CssJs.unsafe({js|filter|js}, {js|brightness(0.5)|js});
-CssJs.unsafe({js|filter|js}, {js|contrast(150%)|js});
-CssJs.unsafe({js|filter|js}, {js|drop-shadow(15px 15px 15px black)|js});
-CssJs.unsafe({js|filter|js}, {js|grayscale(50%)|js});
-CssJs.unsafe({js|filter|js}, {js|hue-rotate(50deg)|js});
-CssJs.unsafe({js|filter|js}, {js|invert(50%)|js});
-CssJs.unsafe({js|filter|js}, {js|opacity(50%)|js});
-CssJs.unsafe({js|filter|js}, {js|sepia(50%)|js});
-CssJs.unsafe({js|filter|js}, {js|saturate(150%)|js});
-CssJs.unsafe({js|filter|js}, {js|grayscale(100%) sepia(100%)|js});
+CssJs.filter([|`none|]);
+CssJs.filter([|`url({js|#id|js})|]);
+CssJs.filter([|`url({js|image.svg#id|js})|]);
+CssJs.filter([|`blur(`pxFloat(5.))|]);
+CssJs.filter([|`brightness(0.5)|]);
+CssJs.filter([|`contrast(`percent(150.))|]);
+CssJs.filter([|
+  `dropShadow((
+    [|`pxFloat(15.), `pxFloat(15.), `pxFloat(15.)|],
+    CssJs.black,
+  )),
+|]);
+CssJs.filter([|`grayscale(`percent(50.))|]);
+CssJs.filter([|`hueRotate(`deg(50.))|]);
+CssJs.filter([|`invert(`percent(50.))|]);
+CssJs.filter([|`opacity(`percent(50.))|]);
+CssJs.filter([|`sepia(`percent(50.))|]);
+CssJs.filter([|`saturate(`percent(150.))|]);
+CssJs.filter([|`grayscale(`percent(100.)), `sepia(`percent(100.))|]);
+CssJs.filter([|
+  `dropShadow((
+    [|`zero, `pxFloat(8.), `pxFloat(32.)|],
+    `rgba((0, 0, 0, `num(0.03))),
+  )),
+|]);
+CssJs.filter([|
+  `dropShadow((
+    [|`zero, `pxFloat(1.), `zero|],
+    DropShadowFilter.dropShadowTop,
+  )),
+  `dropShadow((
+    [|`zero, `pxFloat(1.), `zero|],
+    DropShadowFilter.dropShadowMiddle,
+  )),
+  `dropShadow((
+    [|`zero, `pxFloat(1.), `zero|],
+    DropShadowFilter.dropShadowBottom,
+  )),
+  `dropShadow((
+    [|`zero, `pxFloat(32.), `pxFloat(48.)|],
+    `rgba((0, 0, 0, `num(0.075))),
+  )),
+  `dropShadow((
+    [|`zero, `pxFloat(8.), `pxFloat(32.)|],
+    `rgba((0, 0, 0, `num(0.03))),
+  )),
+|]);
 CssJs.unsafe({js|backdropFilter|js}, {js|none|js});
 CssJs.unsafe({js|backdropFilter|js}, {js|url(#id)|js});
 CssJs.unsafe({js|backdropFilter|js}, {js|url(image.svg#id)|js});

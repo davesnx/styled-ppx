@@ -1045,7 +1045,7 @@ and property_fill = [%value.rec "<paint>"]
 and property_fill_opacity = [%value.rec "<alpha-value>"]
 and property_fill_rule = [%value.rec "'nonzero' | 'evenodd'"]
 and property_filter = [%value.rec
-  "'none' | <filter-function-list> | <-ms-filter-function-list>"
+  "'none' | <interpolation> | <filter-function-list> | <-ms-filter-function-list>"
 ]
 and property_flex = [%value.rec
   "'none' | [<'flex-grow'> [ <'flex-shrink'> ]? || <'flex-basis'>] | <interpolation>"
