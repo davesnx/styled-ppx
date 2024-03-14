@@ -340,17 +340,8 @@ let addLabel = (~loc, label, emotionExprs) => [
   ...emotionExprs,
 ];
 
-let render_style_call = declaration_list => {
-  open Ppxlib;
-  let loc = declaration_list.pexp_loc;
-  let arguments = [(Nolabel, declaration_list)];
-
-  Helper.Exp.apply(
-    ~loc,
-    /* ~attrs=[Platform_attributes.uncurried(~loc)], */
-    CssJs.style(~loc),
-    arguments,
-  );
+let render_style_call = (~loc, declaration_list) => {
+  Helper.Exp.apply(~loc, CssJs.style(~loc), [(Nolabel, declaration_list)]);
 };
 
 let render_keyframes = (declarations: rule_list) => {

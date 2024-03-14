@@ -1,8 +1,8 @@
 open Alcotest;
 
 let parse = input => {
-  let pos = Some(Lexing.dummy_pos);
-  switch (Driver.parse_stylesheet(~pos, input)) {
+  let pos = Lexing.dummy_pos;
+  switch (Driver.parse_stylesheet(~lnum=0, ~pos, input)) {
   | Ok(ast) => Ok(ast)
   | Error((loc, msg)) =>
     let pos = loc.Css_types.loc_start;

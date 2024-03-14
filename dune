@@ -6,15 +6,5 @@
 
 (subdir
  packages
- ; All folders except "editors" and "website"
- (dirs
-  bin
-  css
-  css-spec-parser
-  emotion
-  emotion-hash
-  parser
-  ppx
-  reason-css-parser
-  renderer
-  string_interpolation))
+ ; All folders inside packages/ except "editors" and "website"
+ (dirs :standard \ editors website))

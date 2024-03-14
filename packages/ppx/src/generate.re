@@ -28,7 +28,7 @@ let staticComponent = (~loc, ~htmlTag, styles) => {
 };
 
 let dynamicComponent =
-    (~loc, ~htmlTag, ~label, ~moduleName, ~defaultValue, ~param, ~body) => {
+    (~lnum, ~loc, ~htmlTag, ~label, ~moduleName, ~defaultValue, ~param, ~body) => {
   let (functionExpr, labeledArguments) =
     Generate_lib.getLabeledArgs(label, defaultValue, param, body);
 
@@ -92,13 +92,13 @@ let dynamicComponent =
     switch (functionExpr.pexp_desc) {
     /* styled.div () => "string" */
     | Pexp_constant(Pconst_string(str, loc, _label)) =>
-      switch (Payload.parse(str, ~loc)) {
+      switch (Payload.parse(~lnum, ~loc, str)) {
       | Ok(declarations) =>
         declarations
         |> Css_to_emotion.render_declarations
         |> Css_to_emotion.addLabel(~loc, moduleName)
         |> Builder.pexp_array(~loc)
-        |> Css_to_emotion.render_style_call
+        |> Css_to_emotion.render_style_call(~loc)
       | Error((loc, msg)) => Generate_lib.error(~loc, msg)
       }
 
@@ -108,7 +108,7 @@ let dynamicComponent =
       |> List.rev
       |> Css_to_emotion.addLabel(~loc, moduleName)
       |> Builder.pexp_array(~loc)
-      |> Css_to_emotion.render_style_call
+      |> Css_to_emotion.render_style_call(~loc)
 
     /* styled.div () => {
          ...
@@ -121,7 +121,7 @@ let dynamicComponent =
       let styles =
         sequence
         |> Generate_lib.getLastSequence
-        |> Css_to_emotion.render_style_call;
+        |> Css_to_emotion.render_style_call(~loc);
       Builder.pexp_sequence(~loc, expr, styles);
 
     /* styled.div () => {
@@ -134,12 +134,13 @@ let dynamicComponent =
       let styles =
         expression
         |> Generate_lib.getLastExpression
-        |> Css_to_emotion.render_style_call;
+        |> Css_to_emotion.render_style_call(~loc);
       Builder.pexp_let(~loc, Nonrecursive, value_binding, styles);
 
     /* styled.div () => { styles } */
     | Pexp_ident(ident) =>
-      Builder.pexp_ident(~loc, ident) |> Css_to_emotion.render_style_call
+      Builder.pexp_ident(~loc, ident)
+      |> Css_to_emotion.render_style_call(~loc)
     /* TODO: With this default case we support all expressions here.
        Users might find this confusing, we could give some warnings before the type-checker does. */
     | _ => functionExpr

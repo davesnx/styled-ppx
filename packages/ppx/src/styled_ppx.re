@@ -146,14 +146,16 @@ module Mapper = {
       })
         when isStyled(extensionName) =>
       let htmlTag = getHtmlTagUnsafe(~loc=extensionLoc, extensionName);
+      let pos = stringLoc.loc_start;
+      let lnum = pos.pos_lnum;
       let styles =
-        switch (Payload.parse(str, ~loc=stringLoc)) {
+        switch (Payload.parse(~lnum, ~loc=stringLoc, str)) {
         | Ok(declarations) =>
           declarations
           |> Css_to_emotion.render_declarations
           |> Css_to_emotion.addLabel(~loc=stringLoc, moduleName)
           |> Builder.pexp_array(~loc=stringLoc)
-          |> Css_to_emotion.render_style_call
+          |> Css_to_emotion.render_style_call(~loc=stringLoc)
         | Error((loc, msg)) => Generate_lib.error(~loc, msg)
         };
 
@@ -195,7 +197,7 @@ module Mapper = {
         arr
         |> Css_to_emotion.addLabel(~loc=arrayLoc, moduleName)
         |> Builder.pexp_array(~loc=arrayLoc)
-        |> Css_to_emotion.render_style_call;
+        |> Css_to_emotion.render_style_call(~loc=arrayLoc);
 
       Builder.pstr_module(
         ~loc=moduleLoc,
@@ -249,6 +251,7 @@ module Mapper = {
           ~name,
           ~expr=
             Generate.dynamicComponent(
+              ~lnum=functionLoc.loc_start.pos_lnum,
               ~loc=functionLoc,
               ~htmlTag,
               ~label=fnLabel,
@@ -278,7 +281,9 @@ module Mapper = {
                             {
                               pexp_loc: payloadLoc,
                               pexp_desc:
-                                Pexp_constant(Pconst_string(styles, _, _)),
+                                Pexp_constant(
+                                  Pconst_string(styles, stringLoc, _),
+                                ),
                               _,
                             },
                             _,
@@ -289,24 +294,26 @@ module Mapper = {
                   )),
                 _,
               },
-            pvb_loc: loc,
+            pvb_loc: _,
             _,
           },
         ],
       ) =>
+      let pos = stringLoc.loc_start;
+      let lnum = pos.pos_lnum;
       let expr =
-        switch (Payload.parse(styles, ~loc)) {
+        switch (Payload.parse(~lnum, ~loc=stringLoc, styles)) {
         | Ok(declarations) =>
           declarations
           |> Css_to_emotion.render_declarations
-          |> Css_to_emotion.addLabel(~loc, valueName)
+          |> Css_to_emotion.addLabel(~loc=stringLoc, valueName)
           |> Builder.pexp_array(~loc=payloadLoc)
-          |> Css_to_emotion.render_style_call
+          |> Css_to_emotion.render_style_call(~loc=stringLoc)
         | Error((loc, msg)) => Generate_lib.error(~loc, msg)
         };
 
       Builder.pstr_value(
-        ~loc,
+        ~loc=expr.pexp_loc,
         Nonrecursive,
         [Builder.value_binding(~loc=patternLoc, ~pat, ~expr)],
       );
@@ -348,7 +355,7 @@ module Mapper = {
         arr
         |> Css_to_emotion.addLabel(~loc=payloadLoc, valueName)
         |> Builder.pexp_array(~loc=payloadLoc)
-        |> Css_to_emotion.render_style_call;
+        |> Css_to_emotion.render_style_call(~loc);
 
       Builder.pstr_value(
         ~loc,
@@ -720,20 +727,21 @@ let _ =
           static_pattern,
           (~loc, ~path, payload) => {
             File.set(path);
+            let lnum = loc.loc_start.pos_lnum;
             switch (payload) {
             | `String({loc, txt}, _delim) =>
-              switch (Payload.parse(txt, ~loc)) {
+              switch (Payload.parse(~lnum, ~loc, txt)) {
               | Ok(declarations) =>
                 declarations
                 |> Css_to_emotion.render_declarations
                 |> Builder.pexp_array(~loc)
-                |> Css_to_emotion.render_style_call
+                |> Css_to_emotion.render_style_call(~loc)
               | Error((loc, msg)) => Generate_lib.error(~loc, msg)
               }
             | `Array(arr) =>
               arr
               |> Builder.pexp_array(~loc)
-              |> Css_to_emotion.render_style_call
+              |> Css_to_emotion.render_style_call(~loc)
             };
           },
         ),
@@ -745,8 +753,10 @@ let _ =
           string_payload_pattern,
           (~loc, ~path, payload) => {
             File.set(path);
-            let pos = Some(loc.loc_start);
-            switch (Driver.parse_declaration(~pos, payload)) {
+            let lnum = loc.loc_start.pos_lnum;
+            switch (
+              Driver.parse_declaration(~lnum, ~pos=loc.loc_start, payload)
+            ) {
             | Ok(declarations) =>
               let declarationListValues =
                 Css_to_emotion.render_declaration(declarations);
@@ -766,8 +776,10 @@ let _ =
           string_payload_pattern,
           (~loc, ~path, payload) => {
             File.set(path);
-            let pos = Some(loc.loc_start);
-            switch (Driver.parse_stylesheet(~pos, payload)) {
+            let lnum = loc.loc_start.pos_lnum;
+            switch (
+              Driver.parse_stylesheet(~lnum, ~pos=loc.loc_start, payload)
+            ) {
             | Ok(stylesheets) => Css_to_emotion.render_global(stylesheets)
             | Error((loc, msg)) => Generate_lib.error(~loc, msg)
             };
@@ -781,8 +793,10 @@ let _ =
           string_payload_pattern,
           (~loc, ~path, payload) => {
             File.set(path);
-            let pos = Some(loc.loc_start);
-            switch (Driver.parse_keyframes(~pos, payload)) {
+            let lnum = loc.loc_start.pos_lnum;
+            switch (
+              Driver.parse_keyframes(~lnum, ~pos=loc.loc_start, payload)
+            ) {
             | Ok(declarations) =>
               Css_to_emotion.render_keyframes(declarations)
             | Error((loc, msg)) => Generate_lib.error(~loc, msg)

@@ -36,7 +36,7 @@
   }
  */
 
-let parse = (~loc: Ppxlib.location, payload) => {
+let parse = (~lnum, ~loc: Ppxlib.location, payload) => {
   let loc_start = loc.loc_start;
   /* TODO: Bring back "delimiter location conditional logic" */
   /* let loc_start =
@@ -49,7 +49,7 @@ let parse = (~loc: Ppxlib.location, payload) => {
        }
      }; */
 
-  switch (Driver.parse_declaration_list(~pos=Some(loc_start), payload)) {
+  switch (Driver.parse_declaration_list(~pos=loc_start, ~lnum, payload)) {
   | Ok(declarations) => Ok(declarations)
   | Error((loc, msg)) => Error((loc, msg))
   };
