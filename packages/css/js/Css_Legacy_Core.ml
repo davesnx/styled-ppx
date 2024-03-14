@@ -1602,7 +1602,7 @@ type trackLength =
 
 type gridLength =
   [ trackLength
-  | `repeat of RepeatValue.t * trackLength
+  | `repeat of RepeatValue.t * trackLength array
   ]
 
 let rec gridLengthToJs x =
