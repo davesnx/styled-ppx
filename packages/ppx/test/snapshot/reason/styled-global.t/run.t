@@ -37,7 +37,7 @@
         [|
           CssJs.unsafe({js|borderBottom|js}, {js|none|js}),
           CssJs.textDecoration(`underline),
-          CssJs.textDecoration(`underline),
+          CssJs.unsafe({js|textDecoration|js}, {js|underline dotted|js}),
         |],
       ),
       CssJs.selector({js|b, strong|js}, [|CssJs.fontWeight(`bolder)|]),
