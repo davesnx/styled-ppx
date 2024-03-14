@@ -33,6 +33,7 @@
 
 module Color = {
   let dark = CssJs.black;
+  let var = `var("cosas");
 };
 
 [%css
@@ -79,5 +80,9 @@ let cosas = `underline;
     drop-shadow(0 1px 0 $(Color.dark))
     drop-shadow(0 32px 48px rgba(0, 0, 0, 0.075))
     drop-shadow(0 8px 32px rgba(0, 0, 0, 0.03));
+
+  filter:
+    drop-shadow(0 0 1px $(Color.var))
+    drop-shadow(0 2px 4px $(Color.var));
 |}
 ];

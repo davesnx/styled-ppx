@@ -1764,7 +1764,7 @@ type filter =
   [ `blur of Length.t
   | `brightness of float
   | `contrast of float
-  | `dropShadow of Length.t * Length.t * Length.t * Color.t
+  | `dropShadow of Length.t * Length.t * Length.t * [ Color.t | Var.t ]
   | `grayscale of float
   | `hueRotate of angle
   | `invert of float
@@ -1790,8 +1790,10 @@ let string_of_filter x =
     ^ {js| |js}
     ^ Length.toString c
     ^ {js| |js}
-    ^ Color.toString d
-    ^ {js|)|js}
+    ^
+    (match d with
+    | #Color.t as c -> Color.toString c
+    | #Var.t as v -> Var.toString v ^ {js|)|js})
   | `grayscale v -> ({js|grayscale(|js} ^ Std.Float.toString v) ^ {js|%)|js}
   | `hueRotate v -> ({js|hue-rotate(|js} ^ Angle.toString v) ^ {js|)|js}
   | `invert v -> ({js|invert(|js} ^ Std.Float.toString v) ^ {js|%)|js}
