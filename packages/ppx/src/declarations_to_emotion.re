@@ -3957,30 +3957,23 @@ let cursor =
 let direction = unsupportedProperty(Parser.property_direction);
 
 let render_drop_shadow = (~loc, value: Types.function_drop_shadow) => {
-  /* "drop-shadow( [ <extended-length> ]{2,3} [ <color> ]? )" */
-  let (offsets, color) = value;
-  let offsetsExpr =
-    offsets |> List.map(offset => render_extended_length(~loc, offset));
+  let (offset1, offset2, offset3, color) = value;
+  let offset1Expr = render_extended_length(~loc, offset1);
+  let offset2Expr = render_extended_length(~loc, offset2);
+  let offset3Expr = render_extended_length(~loc, offset3);
   let colorExpr =
     switch (color) {
     /* We default to currentColor since code-generation becomes very easy */
     | None => [%expr `currentColor]
     | Some(c) => render_color(~loc, c)
     };
-  switch (offsetsExpr) {
-  | [_x, _y, _z] as offsets =>
-    [%expr
-     `dropShadow(([%e Builder.pexp_array(~loc, offsets)], [%e colorExpr]))]
-  | [_x, _y] as offsets =>
-    [%expr
-     `dropShadow(([%e Builder.pexp_array(~loc, offsets)], [%e colorExpr]))]
-  | _ =>
-    raise(
-      Invalid_value(
-        "drop-shadow can't have less than 2 or more than 3 offsets",
-      ),
-    )
-  };
+  [%expr
+   `dropShadow((
+     [%e offset1Expr],
+     [%e offset2Expr],
+     [%e offset3Expr],
+     [%e colorExpr],
+   ))];
 };
 
 let render_number_percentage = (~loc, value: Types.number_percentage) => {

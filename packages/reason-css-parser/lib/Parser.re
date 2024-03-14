@@ -293,8 +293,9 @@ and function_counters = [%value.rec
 and function_cross_fade = [%value.rec
   "cross-fade( <cf-mixing-image> ',' [ <cf-final-image> ]? )"
 ]
+/* drop-shadow can have 2 length and order doesn't matter, we changed to be more restrict and always expect 3 */
 and function_drop_shadow = [%value.rec
-  "drop-shadow( [ <extended-length> ]{2,3} [ <color> ]? )"
+  "drop-shadow(<extended-length> <extended-length> <extended-length> [ <color> ]?)"
 ]
 and function_element = [%value.rec "element( <id-selector> )"]
 and function_ellipse = [%value.rec

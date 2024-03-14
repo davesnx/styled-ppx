@@ -74,5 +74,10 @@ let cosas = `underline;
   @media $(Media.tabletUp) and $(Media.largeDesktopDown) {
     grid-template-columns: fit-content(20px) fit-content(10%);
   }
+
+  filter:
+    drop-shadow(0 1px 0 $(Color.dark))
+    drop-shadow(0 32px 48px rgba(0, 0, 0, 0.075))
+    drop-shadow(0 8px 32px rgba(0, 0, 0, 0.03));
 |}
 ];
