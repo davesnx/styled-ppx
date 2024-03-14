@@ -994,6 +994,11 @@ let properties_static_css_tests = [
     [%expr [%css "image-rendering: high-quality"]],
     [%expr CssJs.imageRendering(`highQuality)],
   ),
+  (
+    [%css {|color: red !important|}],
+    [%expr [%css {|color: red !important|}]],
+    [%expr CssJs.important(CssJs.color(CssJs.red))],
+  ),
   // unsupported
   /*   (
          [%css

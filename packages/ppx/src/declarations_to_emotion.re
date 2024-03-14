@@ -4352,17 +4352,23 @@ let findProperty = name => {
   properties |> List.find_opt(((key, _)) => key == name);
 };
 
-let render_to_expr = (~loc, property, value) => {
+let render_to_expr = (~loc, property, value, important) => {
   let.ok expr_of_string =
     switch (findProperty(property)) {
     | Some((_, (_, expr_of_string))) => Ok(expr_of_string)
     | None => Error(`Not_found)
     };
 
-  expr_of_string(~loc, value) |> Result.map_error(str => `Invalid_value(str));
+  switch (expr_of_string(~loc, value)) {
+  | Ok(expr) when important =>
+    Ok(expr |> List.map(expr => [%expr CssJs.important([%e expr])]))
+  | Ok(expr) => Ok(expr)
+  | Error(err) => Error(`Invalid_value(err))
+  /* | exception (Invalid_value(v)) => Error(`Invalid_value(v)) */
+  };
 };
 
-let parse_declarations = (~loc: Location.t, property, value) => {
+let parse_declarations = (~loc: Location.t, property, value, important) => {
   let.ok is_valid_string =
     Parser.check_property(~name=property, value)
     |> Result.map_error((`Unknown_value) => `Not_found);
@@ -4370,7 +4376,7 @@ let parse_declarations = (~loc: Location.t, property, value) => {
   switch (render_css_global_values(~loc, property, value)) {
   | Ok(value) => Ok(value)
   | Error(_) =>
-    switch (render_to_expr(~loc, property, value)) {
+    switch (render_to_expr(~loc, property, value, important)) {
     | Ok(value) => Ok(value)
     | exception (Invalid_value(v)) =>
       Error(`Invalid_value(value ++ ". " ++ v))

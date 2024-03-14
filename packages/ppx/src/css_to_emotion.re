@@ -158,6 +158,7 @@ and render_media_query = (at_rule: at_rule) => {
 and render_declaration = (d: declaration) => {
   let (property, name_loc) = d.name;
   let (_valueList, loc) = d.value;
+  let (important, _) = d.important;
   /* String.trim is a hack, location should be correct and not contain any whitespace */
   let value_source = source_code_of_loc(loc) |> String.trim;
 
@@ -166,6 +167,7 @@ and render_declaration = (d: declaration) => {
       ~loc=name_loc,
       property,
       value_source,
+      important,
     )
   ) {
   | Ok(exprs) => exprs
