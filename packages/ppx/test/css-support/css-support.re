@@ -2136,6 +2136,17 @@
 [%css {|filter: sepia(50%)|}];
 [%css {|filter: saturate(150%)|}];
 [%css {|filter: grayscale(100%) sepia(100%)|}];
+[%css {|filter:
+    drop-shadow(0 8px 32px rgba(0, 0, 0, 0.03));|}];
+[%css
+  {|filter:
+    drop-shadow(0 1px 0 $(DropShadowFilter.dropShadowTop))
+    drop-shadow(0 1px 0 $(DropShadowFilter.dropShadowMiddle))
+    drop-shadow(0 1px 0 $(DropShadowFilter.dropShadowBottom))
+    drop-shadow(0 32px 48px rgba(0, 0, 0, 0.075))
+    drop-shadow(0 8px 32px rgba(0, 0, 0, 0.03));|}
+];
+
 /* [%css {|flood-color: black|}]; */
 /* [%css {|flood-color: #FFF|}]; */
 /* [%css {|flood-opacity: 1|}]; */

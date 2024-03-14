@@ -1401,10 +1401,12 @@ let render_gradient = (~loc, value: Types.gradient) =>
   | `_legacy_gradient(_) => raise(Unsupported_feature)
   };
 
+let render_url = (~loc, url) => [%expr `url([%e render_string(~loc, url)])];
+
 let render_image = (~loc, value: Types.image) =>
   switch (value) {
   | `Gradient(gradient) => render_gradient(~loc, gradient)
-  | `Url(url) => [%expr `url([%e render_string(~loc, url)])]
+  | `Url(url) => render_url(~loc, url)
   | `Interpolation(v) => render_variable(~loc, v)
   | `Function_element(_) => raise(Unsupported_feature)
   | `Function_paint(_) => raise(Unsupported_feature)
@@ -3953,7 +3955,80 @@ let cursor =
     render_cursor,
   );
 let direction = unsupportedProperty(Parser.property_direction);
-let filter = unsupportedProperty(Parser.property_filter);
+
+let render_drop_shadow = (~loc, value: Types.function_drop_shadow) => {
+  let (offset1, offset2, offset3, color) = value;
+  let offset1Expr = render_extended_length(~loc, offset1);
+  let offset2Expr = render_extended_length(~loc, offset2);
+  let offset3Expr = render_extended_length(~loc, offset3);
+  let colorExpr =
+    switch (color) {
+    /* We default to currentColor since code-generation becomes very easy */
+    | None => [%expr `currentColor]
+    | Some(c) => render_color(~loc, c)
+    };
+  [%expr
+   `dropShadow((
+     [%e offset1Expr],
+     [%e offset2Expr],
+     [%e offset3Expr],
+     [%e colorExpr],
+   ))];
+};
+
+let render_number_percentage = (~loc, value: Types.number_percentage) => {
+  switch (value) {
+  | `Number(n) => render_number(~loc, n)
+  | `Extended_percentage(pct) => render_extended_percentage(~loc, pct)
+  };
+};
+
+let render_filter_function = (~loc, value: Types.filter_function) => {
+  switch (value) {
+  | `Function_blur(v) => [%expr `blur([%e render_extended_length(~loc, v)])]
+  | `Function_brightness(v) =>
+    [%expr `brightness([%e render_number_percentage(~loc, v)])]
+  | `Function_contrast(v) =>
+    [%expr `contrast([%e render_number_percentage(~loc, v)])]
+  | `Function_drop_shadow(v) => render_drop_shadow(~loc, v)
+  | `Function_grayscale(v) =>
+    [%expr `grayscale([%e render_number_percentage(~loc, v)])]
+  | `Function_hue_rotate(v) =>
+    [%expr `hueRotate([%e render_extended_angle(~loc, v)])]
+  | `Function_invert(v) =>
+    [%expr `invert([%e render_number_percentage(~loc, v)])]
+  | `Function_opacity(v) =>
+    [%expr `opacity([%e render_number_percentage(~loc, v)])]
+  | `Function_saturate(v) =>
+    [%expr `saturate([%e render_number_percentage(~loc, v)])]
+  | `Function_sepia(v) =>
+    [%expr `sepia([%e render_number_percentage(~loc, v)])]
+  };
+};
+
+let render_filter_function_list = (~loc, value: Types.filter_function_list) => {
+  value
+  |> List.map(ff =>
+       switch (ff) {
+       | `Filter_function(f) => render_filter_function(~loc, f)
+       | `Url(u) => render_url(~loc, u)
+       }
+     )
+  |> Builder.pexp_array(~loc);
+};
+
+let filter =
+  monomorphic(
+    Parser.property_filter,
+    (~loc) => [%expr CssJs.filter],
+    (~loc, value) =>
+      switch (value) {
+      | `None => [%expr [|`none|]]
+      | `Interpolation(v) => render_variable(~loc, v)
+      | `Filter_function_list(ffl) => render_filter_function_list(~loc, ffl)
+      | `_ms_filter_function_list(_) => raise(Unsupported_feature)
+      },
+  );
 let float = unsupportedProperty(Parser.property_float);
 let font_language_override =
   unsupportedProperty(Parser.property_font_language_override);
