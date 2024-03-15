@@ -1679,10 +1679,10 @@ let string_of_filter x =
     ^ {js| |js}
     ^ Length.toString c
     ^ {js| |js}
-    ^
-    (match d with
-    | #Color.t as c -> Color.toString c
-    | #Var.t as v -> Var.toString v ^ {js|)|js})
+    ^ (match d with
+      | #Color.t as c -> Color.toString c
+      | #Var.t as v -> Var.toString v)
+    ^ {js|)|js}
   | `grayscale v -> {js|grayscale(|js} ^ Std.Float.toString v ^ {js|%)|js}
   | `hueRotate v -> {js|hue-rotate(|js} ^ Angle.toString v ^ {js|)|js}
   | `invert v -> {js|invert(|js} ^ Std.Float.toString v ^ {js|%)|js}
