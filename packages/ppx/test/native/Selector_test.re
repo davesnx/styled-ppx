@@ -558,11 +558,15 @@ let comments_tests = [
   ),
   (
     ".$(aaa) { .$(bbb) { } }",
-    [%expr [%cx {|/*c*/
+    [%expr
+      [%cx
+        {|/*c*/
     /*c*/
     /*c*/
     /*c*/
-    /*c*/.$(aaa) { /*c*/.$(bbb) {} }|}]],
+    /*c*/.$(aaa) { /*c*/.$(bbb) {} }|}
+      ]
+    ],
     [%expr
       CssJs.style([|
         CssJs.selector(
