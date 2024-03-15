@@ -734,6 +734,15 @@ let listStylePosition x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
+let tabSize x =
+  D
+    ( {|tabSize|},
+      match x with
+      | #TabSize.t as ts -> TabSize.toString ts
+      | #Length.t as len -> Length.toString len
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
 let marginToString x =
   match x with
   | #Length.t as l -> Length.toString l

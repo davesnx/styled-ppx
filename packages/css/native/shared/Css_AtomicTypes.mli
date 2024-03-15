@@ -222,6 +222,12 @@ module FontStyle : sig
   val toString : [< `italic | `normal | `oblique ] -> string
 end
 
+module TabSize : sig
+  type t = [ `num of float ]
+
+  val toString : [< `num of float ] -> string
+end
+
 module FlexBasis : sig
   type t =
     [ `auto

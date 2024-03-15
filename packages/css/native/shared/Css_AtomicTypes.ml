@@ -261,6 +261,12 @@ module FontStyle = struct
     | `oblique -> {js|oblique|js}
 end
 
+module TabSize = struct
+  type t = [ `num of float ]
+
+  let toString = function `num n -> Std.Float.toString n
+end
+
 module FlexBasis = struct
   type t =
     [ `auto
