@@ -1013,7 +1013,7 @@ and property_contain = [%value.rec
   "'none' | 'strict' | 'content' | 'size' || 'layout' || 'style' || 'paint'"
 ]
 and property_content = [%value.rec
-  "'normal' | 'none' | [ <content-replacement> | <content-list> ] [ '/' <string> ]?"
+  "'normal' | 'none' | [ <content-replacement> | <content-list> ] [ '/' <string> ]? | <interpolation>"
 ]
 and property_counter_increment = [%value.rec
   "[ <custom-ident> [ <integer> ]? ]+ | 'none'"

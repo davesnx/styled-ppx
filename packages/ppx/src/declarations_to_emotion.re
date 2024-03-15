@@ -3869,6 +3869,36 @@ let line_break =
     },
   );
 
+let render_content_list = (~loc, content_list: Types.content_list) => {
+  content_list
+  |> List.map(content_item =>
+      switch (content_item) {
+      | `Contents => [%expr `contents]
+      | `Counter(_label, _unit, _style) => raise(Unsupported_feature)
+      | `Function_attr(_attr) => raise(Unsupported_feature)
+      | `Quote(_quote) => raise(Unsupported_feature)
+      | `String(_str) => raise(Unsupported_feature)
+      | `Url(u) => render_url(~loc, u)
+      }
+     )
+  |> Builder.pexp_array(~loc);
+};
+
+let content =
+  monomorphic(
+    Parser.property_content,
+    (~loc) => [%expr CssJs.contentRule],
+    (~loc, value) => {
+      switch (value) {
+      | `Normal => [%expr `normal]
+      | `None => [%expr `none]
+      | `Interpolation(v) => render_variable(~loc, v)
+      | `Static (`Content_list(lst), _alt) => render_content_list(~loc, lst)
+      | `Static (`Content_replacement(image), _alt) => render_image(~loc, image)
+      }
+    },
+  );
+
 let found = ({ast_of_string, string_to_expr, _}) => {
   /* TODO: Why we have 'check_value' when we don't use it? */
   let check_value = string => {
@@ -4183,6 +4213,7 @@ let properties = [
   ("column-span", found(column_span)),
   ("column-width", found(column_width)),
   ("columns", found(columns)),
+  ("content", found(content)),
   ("counter-increment", found(counter_increment)),
   ("counter-reset", found(counter_reset)),
   ("cursor", found(cursor)),
