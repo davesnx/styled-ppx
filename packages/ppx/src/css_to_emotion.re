@@ -259,7 +259,7 @@ and render_selector = (selector: selector) => {
       ++ (render_nth_payload(payload) |> String.trim)
       ++ ")"
     | Function({name, payload: (payload, _loc)}) => {
-        ":" ++ name ++ "(" ++ (render_selector(payload) |> String.trim) ++ ")";
+        ":" ++ name ++ "(" ++ (render_selectors(payload) |> String.trim) ++ ")";
       }
   and render_pseudo_selector =
     fun
@@ -296,12 +296,17 @@ and render_selector = (selector: selector) => {
          ++ render_selector(selector)
        })
     |> String.concat("");
+  }
+  and render_relative_selector = ({ combinator, complex_selector }) => {
+    Option.fold(~none="", ~some=o => o ++ " ", combinator)
+    ++ render_complex_selector(complex_selector);
   };
 
   switch (selector) {
   | SimpleSelector(simple) => simple |> render_simple_selector
   | ComplexSelector(complex) => complex |> render_complex_selector
   | CompoundSelector(compound) => compound |> render_compound_selector
+  | RelativeSelector(relative) => relative |> render_relative_selector
   };
 }
 and render_selectors = selectors => {
