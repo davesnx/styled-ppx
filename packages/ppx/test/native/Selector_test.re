@@ -309,11 +309,13 @@ let complex_tests = [
       |])
     ],
   ),
-  /* (
-       ".foo:is(.bar, #baz)",
-       [%expr [%cx ".foo:is(.bar, #baz) {}"]],
-       [%expr CssJs.style( [|CssJs.selector({js|.foo:is(.bar, #baz)|js}, [||])|])],
-     ), */
+  (
+    ".foo:is(.bar, #baz)",
+    [%expr [%cx ".foo:is(.bar, #baz) {}"]],
+    [%expr
+      CssJs.style([|CssJs.selector({js|.foo:is(.bar, #baz)|js}, [||])|])
+    ],
+  ),
   (
     "& input[type=\"password\"]",
     [%expr [%cx "& input[type=\"password\"]{} "]],
@@ -401,6 +403,27 @@ let complex_tests = [
     [%expr
       CssJs.style([|
         CssJs.selector({js|&:has(.|js} ++ gap ++ {js|)|js}, [||]),
+      |])
+    ],
+  ),
+  (
+    "&:has(+ .$(gap))",
+    [%expr [%cx {| &:has(+ .$(gap)) {} |}]],
+    [%expr
+      CssJs.style([|
+        CssJs.selector({js|&:has(+ .|js} ++ gap ++ {js|)|js}, [||]),
+      |])
+    ],
+  ),
+  (
+    ":is(h1, $(gap), h3):has(+ :is(h2, h3, h4))",
+    [%expr [%cx {| :is(h1, $(gap), h3):has(+ :is(h2, h3, h4)) {} |}]],
+    [%expr
+      CssJs.style([|
+        CssJs.selector(
+          {js|:is(h1, |js} ++ gap ++ {js|, h3):has(+ :is(h2, h3, h4))|js},
+          [||],
+        ),
       |])
     ],
   ),
@@ -558,11 +581,15 @@ let comments_tests = [
   ),
   (
     ".$(aaa) { .$(bbb) { } }",
-    [%expr [%cx {|/*c*/
+    [%expr
+      [%cx
+        {|/*c*/
     /*c*/
     /*c*/
     /*c*/
-    /*c*/.$(aaa) { /*c*/.$(bbb) {} }|}]],
+    /*c*/.$(aaa) { /*c*/.$(bbb) {} }|}
+      ]
+    ],
     [%expr
       CssJs.style([|
         CssJs.selector(
