@@ -352,6 +352,10 @@ selector_list:
   | selector = loc(selector) WS? { [selector] }
   | selector = loc(selector) WS? COMMA WS? seq = selector_list WS? { selector :: seq }
 
+relative_selector_list:
+  | selector = loc(relative_selector) WS? { [selector] }
+  | selector = loc(relative_selector) WS? COMMA WS? seq = relative_selector_list WS? { selector :: seq }
+
 /* .class {} */
 style_rule:
   | prelude = loc(selector_list) WS?
@@ -446,7 +450,10 @@ nth_payload:
 /* <pseudo-class-selector> = ':' <ident-token> | ':' <function-token> <any-value> ')' */
 pseudo_class_selector:
   | COLON i = IDENT { (Pseudoclass(PseudoIdent i)) } /* :visited */
-  | COLON f = FUNCTION xs = loc(selector) RIGHT_PAREN /* :not() */ {
+  | COLON f = FUNCTION xs = loc(relative_selector_list) RIGHT_PAREN /* :has() */ {
+    (Pseudoclass(Function({ name = f; payload = xs })))
+  }
+  | COLON f = FUNCTION xs = loc(selector_list) RIGHT_PAREN /* :not() */ {
     (Pseudoclass(Function({ name = f; payload = xs })))
   }
   | COLON f = NTH_FUNCTION xs = loc(nth_payload) RIGHT_PAREN /* :nth() */ {
@@ -628,6 +635,10 @@ complex_selector:
       right = seq;
     }
   }
+/* <relative-selector> = <combinator>? <complex-selector> */
+relative_selector:
+  | xs = skip_ws_right(complex_selector) { RelativeSelector { combinator = None; complex_selector = xs} }
+  | c = combinator WS? xs = complex_selector WS? { RelativeSelector { combinator = Some c; complex_selector = xs } }
 
 value:
   | b = paren_block(values) { Paren_block b }

@@ -88,6 +88,7 @@ and selector =
   | SimpleSelector(simple_selector)
   | ComplexSelector(complex_selector)
   | CompoundSelector(compound_selector)
+  | RelativeSelector(relative_selector)
 [@deriving show({with_path: false})]
 and selector_list = list(with_loc(selector))
 [@deriving show({with_path: false})]
@@ -102,6 +103,11 @@ and compound_selector = {
   type_selector: option(simple_selector),
   subclass_selectors: list(subclass_selector),
   pseudo_selectors: list(pseudo_selector) /* TODO: (string, pseudoclass_kind) */
+}
+[@deriving show({with_path: false})]
+and relative_selector = {
+  combinator: option(string),
+  complex_selector: complex_selector
 }
 [@deriving show({with_path: false})]
 and simple_selector =
@@ -139,7 +145,7 @@ and pseudoclass_kind =
   | PseudoIdent(string)
   | Function({
       name: string,
-      payload: with_loc(selector),
+      payload: with_loc(selector_list),
     })
   | NthFunction({
       name: string,
