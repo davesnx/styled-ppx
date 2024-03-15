@@ -1570,7 +1570,7 @@ and property_stroke_linejoin = [%value.rec "'miter' | 'round' | 'bevel'"]
 and property_stroke_miterlimit = [%value.rec "<number-one-or-greater>"]
 and property_stroke_opacity = [%value.rec "<alpha-value>"]
 and property_stroke_width = [%value.rec "<svg-length>"]
-and property_tab_size = [%value.rec "<integer> | <extended-length>"]
+and property_tab_size = [%value.rec " <number> | <extended-length>"]
 and property_table_layout = [%value.rec "'auto' | 'fixed'"]
 and property_text_align = [%value.rec
   "'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | 'match-parent' | 'justify-all'"

@@ -2098,7 +2098,24 @@ let text_transform =
   );
 let white_space =
   variants(Parser.property_white_space, (~loc) => [%expr CssJs.whiteSpace]);
-let tab_size = unsupportedProperty(Parser.property_tab_size);
+
+let render_tab_size = (~loc, value: Types.property_tab_size) => {
+  switch (value) {
+  | `Number(n) =>
+    int_of_float(n) < 0
+      ? raise(Invalid_value("tab-size value can not be less than 0!"))
+      : [%expr `num([%e render_number(~loc, n)])]
+  | `Extended_length(ext) => render_extended_length(~loc, ext)
+  };
+};
+
+let tab_size =
+  monomorphic(
+    Parser.property_tab_size,
+    (~loc) => [%expr CssJs.tabSize],
+    render_tab_size,
+  );
+
 let word_break =
   variants(Parser.property_word_break, (~loc) => [%expr CssJs.wordBreak]);
 let render_line_height = (~loc) =>
@@ -4338,7 +4355,6 @@ let properties = [
   /* ("stroke-width", found(strokeWidth)), */
   ("stroke", found(stroke)),
   ("stroke-opacity", found(strokeOpacity)),
-  ("tab-size", found(tab_size)),
   ("tab-size", found(tab_size)),
   ("text-align-last", found(text_align_last)),
   ("text-align", found(text_align)),

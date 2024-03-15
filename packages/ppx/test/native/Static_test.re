@@ -999,6 +999,31 @@ let properties_static_css_tests = [
     [%expr [%css {|color: red !important|}]],
     [%expr CssJs.important(CssJs.color(CssJs.red))],
   ),
+  (
+    [%css "tab-size: 0"],
+    [%expr [%css "tab-size: 0"]],
+    [%expr CssJs.tabSize(`zero)],
+  ),
+  (
+    [%css "tab-size: 4"],
+    [%expr [%css "tab-size: 4"]],
+    [%expr CssJs.tabSize(`num(4.))],
+  ),
+  (
+    [%css "tab-size: 10px"],
+    [%expr [%css "tab-size: 10px"]],
+    [%expr CssJs.tabSize(`pxFloat(10.))],
+  ),
+  (
+    [%css "tab-size: calc(10px + 10px)"],
+    [%expr [%css "tab-size: calc(10px + 10px)"]],
+    [%expr CssJs.tabSize(`calc(`add((`pxFloat(10.), `pxFloat(10.)))))],
+  ),
+  (
+    [%css "tab-size: calc(10px + 10pt)"],
+    [%expr [%css "tab-size: calc(10px + 10pt)"]],
+    [%expr CssJs.tabSize(`calc(`add((`pxFloat(10.), `pt(10)))))],
+  ),
   // unsupported
   /*   (
          [%css
