@@ -12,7 +12,6 @@ module Option = {
   };
 };
 
-module Helper = Ast_helper;
 module Builder = Ppxlib.Ast_builder.Default;
 module Types = Parser.Types;
 
@@ -38,8 +37,12 @@ type transform('ast, 'value) = {
 
 let add_CssJs_rule_constraint = (~loc, expr) => {
   let typ =
-    Helper.Typ.constr(~loc, {txt: Ldot(Lident("CssJs"), "rule"), loc}, []);
-  Helper.Exp.constraint_(~loc, expr, typ);
+    Builder.ptyp_constr(
+      ~loc,
+      {txt: Ldot(Lident("CssJs"), "rule"), loc},
+      [],
+    );
+  Builder.pexp_constraint(~loc, expr, typ);
 };
 
 /* TODO: emit is better to keep value_of_ast and value_to_expr in the same fn */
@@ -66,7 +69,7 @@ let emit_shorthand = (parser, mapper, value_to_expr) => {
 let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
 
 let render_variable = (~loc, name) =>
-  list_to_longident(name) |> txt(~loc) |> Helper.Exp.ident(~loc);
+  list_to_longident(name) |> txt(~loc) |> Builder.pexp_ident(~loc);
 
 let transform_with_variable = (parser, mapper, value_to_expr) =>
   emit(
@@ -130,22 +133,18 @@ let unsupportedProperty = parser =>
 let render_string = (~loc, s) => {
   switch (File.get()) {
   | Some(ReScript) =>
-    Helper.Exp.constant(
-      ~loc,
-      Helper.Const.string(~quotation_delimiter="*j", s),
-    )
+    Builder.pexp_constant(~loc, Pconst_string(s, loc, Some("*j")))
   | Some(Reason)
-  | _ =>
-    Helper.Exp.constant(
-      ~loc,
-      Helper.Const.string(~quotation_delimiter="js", s),
-    )
+  | _ => Builder.pexp_constant(~loc, Pconst_string(s, loc, Some("js")))
   };
 };
-let render_integer = (~loc, integer) =>
-  Helper.Const.int(integer) |> Helper.Exp.constant(~loc);
+let render_integer = (~loc, integer) => {
+  Builder.pexp_constant(~loc, Pconst_integer(Int.to_string(integer), None));
+};
+
 let render_number = (~loc, number) =>
-  Helper.Const.float(number |> Float.to_string) |> Helper.Exp.constant(~loc);
+  Builder.pexp_constant(~loc, Pconst_float(Float.to_string(number), None));
+
 let render_percentage = (~loc, number) => [%expr
   `percent([%e render_number(~loc, number)])
 ];
@@ -1209,7 +1208,7 @@ let render_box_shadow = (~loc, shadow) => {
   let spread = Option.map(render_length_interp(~loc), spread);
   let inset =
     Option.map(
-      () => Helper.Exp.construct(~loc, {txt: Lident("true"), loc}, None),
+      () => Builder.pexp_construct(~loc, {txt: Lident("true"), loc}, None),
       inset,
     );
 
@@ -1226,7 +1225,7 @@ let render_box_shadow = (~loc, shadow) => {
          Option.map(value => (label, value), value)
        );
 
-  Helper.Exp.apply(~loc, [%expr CssJs.Shadow.box], args);
+  Builder.pexp_apply(~loc, [%expr CssJs.Shadow.box], args);
 };
 
 let background_color =
@@ -1287,7 +1286,7 @@ let render_color_stop_list = (~loc, value: Types.color_stop_list) => {
 
   stops
   |> List.map(stop => render_linear_color_stop(~loc, stop))
-  |> Helper.Exp.array(~loc);
+  |> Builder.pexp_array(~loc);
 };
 
 let render_angular_color_hint = (~loc, value: Types.angular_color_hint) => {
@@ -1314,7 +1313,7 @@ let render_angular_color_stop_list =
          }
        })
     |> List.append([render_angular_color_stop(~loc, last_stops)]);
-  Helper.Exp.array(~loc, stops);
+  Builder.pexp_array(~loc, stops);
 };
 
 let render_function_linear_gradient =
@@ -2591,7 +2590,7 @@ let render_text_shadow = (~loc, shadow) => {
          Option.map(value => (label, value), value)
        );
 
-  Helper.Exp.apply(~loc, [%expr CssJs.Shadow.text], args);
+  Builder.pexp_apply(~loc, [%expr CssJs.Shadow.text], args);
 };
 
 let text_shadow =

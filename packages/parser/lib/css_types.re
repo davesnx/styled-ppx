@@ -1,8 +1,6 @@
 /* We have records with identical field names. Type inference can sometimes struggle to determine which field you're referring to. This ambiguity can lead to compiler warnings or errors, we disable it with -30 because we always construct this with annotations in those cases. */
 [@warning "-30"];
 
-module Location = Ppxlib.Location;
-
 [@deriving show({with_path: false})]
 type position =
   Lexing.position = {
@@ -14,7 +12,7 @@ type position =
 
 [@deriving show({with_path: false})]
 type loc =
-  Location.t = {
+  Ppxlib.Location.t = {
     loc_start: position,
     loc_end: position,
     loc_ghost: bool,
@@ -30,7 +28,6 @@ type declaration = {
   name: with_loc(string),
   value: with_loc(component_value_list),
   important: with_loc(bool),
-  [@printer empty]
   loc,
 }
 [@deriving show({with_path: false})]
@@ -107,7 +104,7 @@ and compound_selector = {
 [@deriving show({with_path: false})]
 and relative_selector = {
   combinator: option(string),
-  complex_selector: complex_selector
+  complex_selector,
 }
 [@deriving show({with_path: false})]
 and simple_selector =
