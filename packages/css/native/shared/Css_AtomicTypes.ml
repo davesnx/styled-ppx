@@ -537,6 +537,7 @@ end
 module OutlineStyle = struct
   type t =
     [ `none
+    | `auto
     | `hidden
     | `dotted
     | `dashed
@@ -551,6 +552,7 @@ module OutlineStyle = struct
   let toString x =
     match x with
     | `none -> {js|none|js}
+    | `auto -> {js|auto|js}
     | `hidden -> {js|hidden|js}
     | `dotted -> {js|dotted|js}
     | `dashed -> {js|dashed|js}

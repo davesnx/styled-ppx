@@ -471,6 +471,7 @@ module OutlineStyle : sig
     | `hidden
     | `inset
     | `none
+    | `auto
     | `outset
     | `ridge
     | `solid

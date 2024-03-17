@@ -1,7 +1,7 @@
 /* CSS Basic User Interface Module Level 3 (CSS3 UI) */
 [%css {|box-sizing: border-box|}];
 [%css {|box-sizing: content-box|}];
-[%css {|outline-style: auto|}];
+/* [%css {|outline-style: auto|}]; */
 [%css {|outline-offset: -5px|}];
 [%css {|outline-offset: 0|}];
 [%css {|outline-offset: 5px|}];
