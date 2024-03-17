@@ -1,25 +1,4 @@
-(executables
- (names standalone)
- (modules standalone)
- (libraries styled-ppx.lib ppxlib))
-
-(rule
- (targets css-support.actual.re)
- (deps
-  (:standalone standalone.exe)
-  (:input css-support.re))
- (action
-  (progn
-   (with-stdout-to
-    %{targets}
-    (run refmt --parse re --print ml %{input}))
-   (run ./%{standalone} --impl %{targets} -o %{targets})
-   (run refmt --parse ml --print re --in-place %{targets}))))
-
-(rule
+(cram
  (alias css_support_test)
  (deps
-  (file css-support.expected.re)
-  (file css-support.actual.re))
- (action
-  (diff css-support.expected.re css-support.actual.re)))
+  (package styled-ppx)))
