@@ -362,7 +362,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   /* [%css {|content: repeating-linear-gradient(white, black);|}]; */
 
   $ dune build
-  File "input.re", line 1, characters 0-19:
+  File "input.re", line 1, characters 20-43:
   Error: This expression has type
            [> `hv of
                 [> `hv of [> `right ] * [> `pxFloat of float ] ] *

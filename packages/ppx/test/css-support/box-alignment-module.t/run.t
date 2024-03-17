@@ -190,7 +190,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   [%css {|margin-trim: all|}];
 
   $ dune build
-  File "input.re", line 1, characters 0-10:
+  File "input.re", line 1, characters 11-24:
   Error: This expression has type [> `unsafe of [> `start ] ]
          but an expression was expected of type
            [< `auto

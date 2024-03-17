@@ -93,7 +93,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   [%css {|backface-visibility: hidden|}];
 
   $ dune build
-  File "input.re", line 1, characters 0-9:
+  File "input.re", line 1, characters 10-25:
   Error: This expression has type
            [> `translate of Css_AtomicTypes.Length.t * int ]
          but an expression was expected of type

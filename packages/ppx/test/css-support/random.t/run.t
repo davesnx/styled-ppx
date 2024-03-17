@@ -130,7 +130,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   [%css {|overflow-inline: $(value)|}];
 
   $ dune build
-  File "input.re", line 1, characters 0-9:
+  File "input.re", line 1, characters 10-15:
   Error: This expression has type [> `ms of int ]
          but an expression was expected of type int
   [1]

@@ -58,7 +58,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   [%css {|backdrop-filter: grayscale(100%) sepia(100%)|}];
 
   $ dune build
-  File "input.re", line 1, characters 0-6:
+  File "input.re", line 1, characters 7-22:
   Error: This expression has type [> `contrast of [> `percent of float ] ]
          but an expression was expected of type
            [< `blur of

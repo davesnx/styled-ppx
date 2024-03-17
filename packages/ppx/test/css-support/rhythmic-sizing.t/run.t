@@ -40,6 +40,6 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   /* [%css {|block-step: 2em padding start nearest|}]; */
 
   $ dune build
-  File "input.re", line 1, characters 0-16:
+  File "input.re", line 1, characters 17-22:
   Error: Unbound value CssJs.lineHeightStep
   [1]

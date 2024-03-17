@@ -217,6 +217,6 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   /* [%css {|justify-tracks: safe start|}]; */
 
   $ dune build
-  File "input.re", line 1, characters 0-21:
+  File "input.re", line 1, characters 22-35:
   Error: Unbound value externals
   [1]

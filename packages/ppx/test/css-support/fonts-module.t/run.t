@@ -15,7 +15,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", line 1, characters 0-11:
+  File "input.re", line 1, characters 12-21:
   Error: Unbound value fonts
   [1]
 

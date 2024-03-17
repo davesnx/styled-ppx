@@ -5,7 +5,7 @@ let parse = input => {
   switch (Driver.parse_stylesheet(~lnum=0, ~pos, input)) {
   | Ok(ast) => Ok(ast)
   | Error((loc, msg)) =>
-    let pos = loc.Css_types.loc_start;
+    let pos = loc.loc_start;
     let curr_pos = pos.pos_cnum;
     let lnum = pos.pos_lnum;
     let pos_bol = pos.pos_bol;

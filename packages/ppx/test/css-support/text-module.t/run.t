@@ -126,7 +126,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   /* [%css {|hyphenate-limit-last: spread|}]; */
 
   $ dune build
-  File "input.re", line 1, characters 0-12:
+  File "input.re", line 1, characters 13-29:
   Error: This expression has type [> `InterCharacter ]
          but an expression was expected of type
            [< `auto

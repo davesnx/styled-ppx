@@ -64,7 +64,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   /* [%css {|padding: clamp(12px, 10 * (1vw + 1vh) / 2, 100px);|}]; */
 
   $ dune build
-  File "input.re", line 1, characters 0-5:
+  File "input.re", line 1, characters 6-18:
   Error: This expression has type
            [> `calc of
                 [> `mult of Css_AtomicTypes.Length.t * [> `one of float ] ] ]
