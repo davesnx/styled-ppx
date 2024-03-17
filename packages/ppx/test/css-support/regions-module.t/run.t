@@ -15,5 +15,14 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune describe pp input.re
+  /* CSS Regions Module Level 1 */
+    /* [%css {|flow-from: none|}]; */
+    /* [%css {|flow-from: named-flow|}]; */
+    /* [%css {|flow-into: none|}]; */
+    /* [%css {|flow-into: named-flow|}]; */
+    /* [%css {|flow-into: named-flow element|}]; */
+    /* [%css {|flow-into: named-flow content|}]; */
+    /* [%css {|region-fragment: auto|}]; */
+    /* [%css {|region-fragment: break|}]; */
 
   $ dune build

@@ -15,5 +15,10 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune describe pp input.re
+  /* CSS Will Change Module Level 1 */
+  [%css {|will-change: scroll-position|}];
+  [%css {|will-change: contents|}];
+  [%css {|will-change: transform|}];
+  [%css {|will-change: top, left|}];
 
   $ dune build

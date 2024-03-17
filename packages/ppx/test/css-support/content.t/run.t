@@ -15,5 +15,13 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune describe pp input.re
+  /* CSS Generated Content Module Level 3 */
+  [%css {|quotes: auto|}];
+  /* [%css {|content: url(./img/star.png) / "New!"|}]; */
+  [%css {|content: "\25BA" / ""|}];
+  
+  [%css {|content: "";|}];
+  /* [%css {|content: counter(ol);|}]; */
+  [%css {|content: unset;|}];
 
   $ dune build
