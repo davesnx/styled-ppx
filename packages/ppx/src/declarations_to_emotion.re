@@ -3308,6 +3308,26 @@ let justify_items =
     },
   );
 
+let justify_self =
+  monomorphic(
+    Parser.property_justify_self,
+    (~loc) => [%expr CssJs.justifySelf],
+    (~loc, value) => {
+      switch (value) {
+      | `Auto => [%expr `auto]
+      | `Normal => [%expr `normal]
+      | `Stretch => [%expr `stretch]
+      | `Static(None, position) =>
+        [%expr [%e render_self_position_left_right(~loc, position)]]
+      | `Static(Some(`Safe), position) =>
+        [%expr `safe([%e render_self_position_left_right(~loc, position)])]
+      | `Static(Some(`Unsafe), position) =>
+        [%expr `unsafe([%e render_self_position_left_right(~loc, position)])]
+      | `Baseline_position(pos, ()) => render_baseline_position(~loc, pos)
+      }
+    },
+  );
+
 let align_items =
   monomorphic(
     Parser.property_align_items,
@@ -4059,7 +4079,6 @@ let font_language_override =
    unsupportedProperty(Parser.property_hyphenate_limit_zone); */
 let ime_mode = unsupportedProperty(Parser.property_ime_mode);
 let isolation = unsupportedProperty(Parser.property_isolation);
-let justify_self = unsupportedProperty(Parser.property_justify_self);
 /* let layout_grid = unsupportedProperty(Parser.property_layout_grid); */
 /* let layout_grid_char = unsupportedProperty(Parser.property_layout_grid_char); */
 /* let layout_grid_line = unsupportedProperty(Parser.property_layout_grid_line); */
