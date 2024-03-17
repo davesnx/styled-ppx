@@ -3201,7 +3201,7 @@ let flex =
         ],
       ]
     | `Or(None, Some(basis)) => [
-        [%expr CssJs.flexBasics([%e render_flex_basis(~loc, basis)])],
+        [%expr CssJs.flexBasis([%e render_flex_basis(~loc, basis)])],
       ]
     }
   );

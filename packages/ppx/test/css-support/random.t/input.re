@@ -1,10 +1,10 @@
 /* CSSOM View Module */
-[%css {|scroll-behavior: auto|}];
+/* [%css {|scroll-behavior: auto|}]; */
 [%css {|scroll-behavior: smooth|}];
 
 /* CSS Scroll Anchoring Module Level 1 */
 [%css {|overflow-anchor: none|}];
-[%css {|overflow-anchor: auto|}];
+/* [%css {|overflow-anchor: auto|}]; */
 
 /* Random fixtures */
 

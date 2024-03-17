@@ -14,4 +14,6 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   >  (preprocess (pps styled-ppx.lib)))
   > EOF
 
+  $ dune describe pp input.re
+
   $ dune build

@@ -1,3 +1,9 @@
+module X = {
+  let value = 1.;
+  let flex1 = `num(1.);
+  let min = `px(500);
+};
+
 /* CSS Flexible Box Layout Module Level 1 */
 [%css {|align-content: flex-start|}];
 [%css {|align-content: flex-end|}];
@@ -18,9 +24,9 @@
 [%css {|flex: 1 30px;|}];
 [%css {|flex: 2 2;|}];
 [%css {|flex: 2 2 10%;|}];
-[%css {|flex: $(X.value);|}];
+[%css {|flex: $(X.flex1);|}];
 [%css {|flex: $(X.value) $(X.value);|}];
-[%css {|flex: $(X.value) $(X.value) $(X.value);|}];
+[%css {|flex: $(X.value) $(X.value) $(X.min);|}];
 [%css {|flex-basis: auto|}];
 [%css {|flex-basis: content|}];
 [%css {|flex-basis: 1px|}];

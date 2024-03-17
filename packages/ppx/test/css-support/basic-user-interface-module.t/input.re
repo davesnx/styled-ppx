@@ -1,7 +1,16 @@
 /* CSS Basic User Interface Module Level 3 (CSS3 UI) */
 [%css {|box-sizing: border-box|}];
 [%css {|box-sizing: content-box|}];
-/* [%css {|outline-style: auto|}]; */
+[%css {|outline-style: auto|}];
+[%css {|outline-style: none|}];
+[%css {|outline-style: dotted|}];
+[%css {|outline-style: dashed|}];
+[%css {|outline-style: solid|}];
+[%css {|outline-style: double|}];
+[%css {|outline-style: groove|}];
+[%css {|outline-style: ridge|}];
+[%css {|outline-style: inset|}];
+[%css {|outline-style: outset|}];
 [%css {|outline-offset: -5px|}];
 [%css {|outline-offset: 0|}];
 [%css {|outline-offset: 5px|}];

@@ -459,7 +459,7 @@ module ListStylePosition : sig
     | `outside
     ]
 
-  val toString : [< `inside | `outside ] -> string
+  val toString : t -> string
 end
 
 module OutlineStyle : sig
@@ -477,19 +477,7 @@ module OutlineStyle : sig
     | `solid
     ]
 
-  val toString :
-    [< `dashed
-    | `dotted
-    | `double
-    | `groove
-    | `hidden
-    | `inset
-    | `none
-    | `outset
-    | `ridge
-    | `solid
-    ] ->
-    string
+  val toString : t -> string
 end
 
 module FontWeight : sig
