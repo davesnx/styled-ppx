@@ -28,6 +28,7 @@ type declaration = {
   name: with_loc(string),
   value: with_loc(component_value_list),
   important: with_loc(bool),
+  [@printer empty]
   loc,
 }
 [@deriving show({with_path: false})]
