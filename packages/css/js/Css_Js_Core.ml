@@ -1019,6 +1019,7 @@ let justifySelf x =
       match x with
       | #JustifySelf.t as j -> JustifySelf.toString j
       | #PositionalAlignment.t as pa -> PositionalAlignment.toString pa
+      | #OverflowAlignment.t as oa -> OverflowAlignment.toString oa
       | #BaselineAlignment.t as ba -> BaselineAlignment.toString ba
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )

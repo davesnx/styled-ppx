@@ -951,6 +951,7 @@ let justifySelf x =
       | #JustifySelf.t as j -> JustifySelf.toString j
       | #PositionalAlignment.t as pa -> PositionalAlignment.toString pa
       | #BaselineAlignment.t as ba -> BaselineAlignment.toString ba
+      | #OverflowAlignment.t as oa -> OverflowAlignment.toString oa
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
