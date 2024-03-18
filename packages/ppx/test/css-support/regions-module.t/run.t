@@ -14,15 +14,24 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   >  (preprocess (pps styled-ppx.lib)))
   > EOF
 
-  $ dune describe pp input.re
-  /* CSS Regions Module Level 1 */
-    /* [%css {|flow-from: none|}]; */
-    /* [%css {|flow-from: named-flow|}]; */
-    /* [%css {|flow-into: none|}]; */
-    /* [%css {|flow-into: named-flow|}]; */
-    /* [%css {|flow-into: named-flow element|}]; */
-    /* [%css {|flow-into: named-flow content|}]; */
-    /* [%css {|region-fragment: auto|}]; */
-    /* [%css {|region-fragment: break|}]; */
-
   $ dune build
+
+  $ dune_describe_pp _build/default/input.re.pp.ml | refmt --parse ml --print re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      load_path: [],
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      transparent_modules: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];

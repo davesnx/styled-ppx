@@ -14,85 +14,108 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   >  (preprocess (pps styled-ppx.lib)))
   > EOF
 
-  $ dune describe pp input.re
-  /* CSS Scroll Snap Module Level 1 */
-  [%css {|scroll-margin: 0px|}];
-  [%css {|scroll-margin: 6px 5px|}];
-  [%css {|scroll-margin: 10px 20px 30px|}];
-  [%css {|scroll-margin: 10px 20px 30px 40px|}];
-  [%css {|scroll-margin: 20px 3em 1in 5rem|}];
-  [%css {|scroll-margin: calc(2px)|}];
-  [%css {|scroll-margin: calc(3 * 25px)|}];
-  [%css {|scroll-margin: calc(3 * 25px) 5px 10em calc(1vw - 5px)|}];
-  [%css {|scroll-margin-block: 10px|}];
-  [%css {|scroll-margin-block: 10px 10px|}];
-  [%css {|scroll-margin-block-end: 10px|}];
-  [%css {|scroll-margin-block-start: 10px|}];
-  [%css {|scroll-margin-bottom: 10px|}];
-  [%css {|scroll-margin-inline: 10px|}];
-  [%css {|scroll-margin-inline: 10px 10px|}];
-  [%css {|scroll-margin-inline-start: 10px|}];
-  [%css {|scroll-margin-inline-end: 10px|}];
-  [%css {|scroll-margin-left: 10px|}];
-  [%css {|scroll-margin-right: 10px|}];
-  [%css {|scroll-margin-top: 10px|}];
-  [%css {|scroll-padding: auto|}];
-  [%css {|scroll-padding: 0px|}];
-  [%css {|scroll-padding: 6px 5px|}];
-  [%css {|scroll-padding: 10px 20px 30px|}];
-  [%css {|scroll-padding: 10px 20px 30px 40px|}];
-  [%css {|scroll-padding: 10px auto 30px auto|}];
-  [%css {|scroll-padding: 10%|}];
-  [%css {|scroll-padding: 20% 3em 1in 5rem|}];
-  [%css {|scroll-padding: calc(2px)|}];
-  [%css {|scroll-padding: calc(50%)|}];
-  [%css {|scroll-padding: calc(3 * 25px)|}];
-  [%css {|scroll-padding: calc(3 * 25px) 5px 10% calc(10% - 5px)|}];
-  [%css {|scroll-padding-block: 10px|}];
-  [%css {|scroll-padding-block: 50%|}];
-  [%css {|scroll-padding-block: 10px 50%|}];
-  [%css {|scroll-padding-block: 50% 50%|}];
-  [%css {|scroll-padding-block-end: 10px|}];
-  [%css {|scroll-padding-block-end: 50%|}];
-  [%css {|scroll-padding-block-start: 10px|}];
-  [%css {|scroll-padding-block-start: 50%|}];
-  [%css {|scroll-padding-bottom: 10px|}];
-  [%css {|scroll-padding-bottom: 50%|}];
-  [%css {|scroll-padding-inline: 10px|}];
-  [%css {|scroll-padding-inline: 50%|}];
-  [%css {|scroll-padding-inline: 10px 50%|}];
-  [%css {|scroll-padding-inline: 50% 50%|}];
-  [%css {|scroll-padding-inline-end: 10px|}];
-  [%css {|scroll-padding-inline-end: 50%|}];
-  [%css {|scroll-padding-inline-start: 10px|}];
-  [%css {|scroll-padding-inline-start: 50%|}];
-  [%css {|scroll-padding-left: 10px|}];
-  [%css {|scroll-padding-left: 50%|}];
-  [%css {|scroll-padding-right: 10px|}];
-  [%css {|scroll-padding-right: 50%|}];
-  [%css {|scroll-padding-top: 10px|}];
-  [%css {|scroll-padding-top: 50%|}];
-  [%css {|scroll-snap-align: none|}];
-  [%css {|scroll-snap-align: start|}];
-  [%css {|scroll-snap-align: end|}];
-  [%css {|scroll-snap-align: center|}];
-  [%css {|scroll-snap-align: none start|}];
-  [%css {|scroll-snap-align: end center|}];
-  [%css {|scroll-snap-align: center start|}];
-  [%css {|scroll-snap-align: end none|}];
-  [%css {|scroll-snap-align: center center|}];
-  [%css {|scroll-snap-stop: normal|}];
-  [%css {|scroll-snap-stop: always|}];
-  [%css {|scroll-snap-type: none|}];
-  [%css {|scroll-snap-type: x mandatory|}];
-  [%css {|scroll-snap-type: y mandatory|}];
-  [%css {|scroll-snap-type: block mandatory|}];
-  [%css {|scroll-snap-type: inline mandatory|}];
-  [%css {|scroll-snap-type: both mandatory|}];
-  [%css {|scroll-snap-type: x proximity|}];
-  [%css {|scroll-snap-type: y proximity|}];
-  [%css {|scroll-snap-type: block proximity|}];
-  [%css {|scroll-snap-type: inline proximity|}];
-  [%css {|scroll-snap-type: both proximity|}];
-
   $ dune build
+
+  $ dune_describe_pp _build/default/input.re.pp.ml | refmt --parse ml --print re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      load_path: [],
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      transparent_modules: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];
+  CssJs.unsafe({js|scrollMargin|js}, {js|0px|js});
+  CssJs.unsafe({js|scrollMargin|js}, {js|6px 5px|js});
+  CssJs.unsafe({js|scrollMargin|js}, {js|10px 20px 30px|js});
+  CssJs.unsafe({js|scrollMargin|js}, {js|10px 20px 30px 40px|js});
+  CssJs.unsafe({js|scrollMargin|js}, {js|20px 3em 1in 5rem|js});
+  CssJs.unsafe({js|scrollMargin|js}, {js|calc(2px)|js});
+  CssJs.unsafe({js|scrollMargin|js}, {js|calc(3 * 25px)|js});
+  CssJs.unsafe(
+    {js|scrollMargin|js},
+    {js|calc(3 * 25px) 5px 10em calc(1vw - 5px)|js},
+  );
+  CssJs.unsafe({js|scrollMarginBlock|js}, {js|10px|js});
+  CssJs.unsafe({js|scrollMarginBlock|js}, {js|10px 10px|js});
+  CssJs.unsafe({js|scrollMarginBlockEnd|js}, {js|10px|js});
+  CssJs.unsafe({js|scrollMarginBlockStart|js}, {js|10px|js});
+  CssJs.unsafe({js|scrollMarginBottom|js}, {js|10px|js});
+  CssJs.unsafe({js|scrollMarginInline|js}, {js|10px|js});
+  CssJs.unsafe({js|scrollMarginInline|js}, {js|10px 10px|js});
+  CssJs.unsafe({js|scrollMarginInlineStart|js}, {js|10px|js});
+  CssJs.unsafe({js|scrollMarginInlineEnd|js}, {js|10px|js});
+  CssJs.unsafe({js|scrollMarginLeft|js}, {js|10px|js});
+  CssJs.unsafe({js|scrollMarginRight|js}, {js|10px|js});
+  CssJs.unsafe({js|scrollMarginTop|js}, {js|10px|js});
+  CssJs.unsafe({js|scrollPadding|js}, {js|auto|js});
+  CssJs.unsafe({js|scrollPadding|js}, {js|0px|js});
+  CssJs.unsafe({js|scrollPadding|js}, {js|6px 5px|js});
+  CssJs.unsafe({js|scrollPadding|js}, {js|10px 20px 30px|js});
+  CssJs.unsafe({js|scrollPadding|js}, {js|10px 20px 30px 40px|js});
+  CssJs.unsafe({js|scrollPadding|js}, {js|10px auto 30px auto|js});
+  CssJs.unsafe({js|scrollPadding|js}, {js|10%|js});
+  CssJs.unsafe({js|scrollPadding|js}, {js|20% 3em 1in 5rem|js});
+  CssJs.unsafe({js|scrollPadding|js}, {js|calc(2px)|js});
+  CssJs.unsafe({js|scrollPadding|js}, {js|calc(50%)|js});
+  CssJs.unsafe({js|scrollPadding|js}, {js|calc(3 * 25px)|js});
+  CssJs.unsafe(
+    {js|scrollPadding|js},
+    {js|calc(3 * 25px) 5px 10% calc(10% - 5px)|js},
+  );
+  CssJs.unsafe({js|scrollPaddingBlock|js}, {js|10px|js});
+  CssJs.unsafe({js|scrollPaddingBlock|js}, {js|50%|js});
+  CssJs.unsafe({js|scrollPaddingBlock|js}, {js|10px 50%|js});
+  CssJs.unsafe({js|scrollPaddingBlock|js}, {js|50% 50%|js});
+  CssJs.unsafe({js|scrollPaddingBlockEnd|js}, {js|10px|js});
+  CssJs.unsafe({js|scrollPaddingBlockEnd|js}, {js|50%|js});
+  CssJs.unsafe({js|scrollPaddingBlockStart|js}, {js|10px|js});
+  CssJs.unsafe({js|scrollPaddingBlockStart|js}, {js|50%|js});
+  CssJs.unsafe({js|scrollPaddingBottom|js}, {js|10px|js});
+  CssJs.unsafe({js|scrollPaddingBottom|js}, {js|50%|js});
+  CssJs.unsafe({js|scrollPaddingInline|js}, {js|10px|js});
+  CssJs.unsafe({js|scrollPaddingInline|js}, {js|50%|js});
+  CssJs.unsafe({js|scrollPaddingInline|js}, {js|10px 50%|js});
+  CssJs.unsafe({js|scrollPaddingInline|js}, {js|50% 50%|js});
+  CssJs.unsafe({js|scrollPaddingInlineEnd|js}, {js|10px|js});
+  CssJs.unsafe({js|scrollPaddingInlineEnd|js}, {js|50%|js});
+  CssJs.unsafe({js|scrollPaddingInlineStart|js}, {js|10px|js});
+  CssJs.unsafe({js|scrollPaddingInlineStart|js}, {js|50%|js});
+  CssJs.unsafe({js|scrollPaddingLeft|js}, {js|10px|js});
+  CssJs.unsafe({js|scrollPaddingLeft|js}, {js|50%|js});
+  CssJs.unsafe({js|scrollPaddingRight|js}, {js|10px|js});
+  CssJs.unsafe({js|scrollPaddingRight|js}, {js|50%|js});
+  CssJs.unsafe({js|scrollPaddingTop|js}, {js|10px|js});
+  CssJs.unsafe({js|scrollPaddingTop|js}, {js|50%|js});
+  CssJs.unsafe({js|scrollSnapAlign|js}, {js|none|js});
+  CssJs.unsafe({js|scrollSnapAlign|js}, {js|start|js});
+  CssJs.unsafe({js|scrollSnapAlign|js}, {js|end|js});
+  CssJs.unsafe({js|scrollSnapAlign|js}, {js|center|js});
+  CssJs.unsafe({js|scrollSnapAlign|js}, {js|none start|js});
+  CssJs.unsafe({js|scrollSnapAlign|js}, {js|end center|js});
+  CssJs.unsafe({js|scrollSnapAlign|js}, {js|center start|js});
+  CssJs.unsafe({js|scrollSnapAlign|js}, {js|end none|js});
+  CssJs.unsafe({js|scrollSnapAlign|js}, {js|center center|js});
+  CssJs.unsafe({js|scrollSnapStop|js}, {js|normal|js});
+  CssJs.unsafe({js|scrollSnapStop|js}, {js|always|js});
+  CssJs.unsafe({js|scrollSnapType|js}, {js|none|js});
+  CssJs.unsafe({js|scrollSnapType|js}, {js|x mandatory|js});
+  CssJs.unsafe({js|scrollSnapType|js}, {js|y mandatory|js});
+  CssJs.unsafe({js|scrollSnapType|js}, {js|block mandatory|js});
+  CssJs.unsafe({js|scrollSnapType|js}, {js|inline mandatory|js});
+  CssJs.unsafe({js|scrollSnapType|js}, {js|both mandatory|js});
+  CssJs.unsafe({js|scrollSnapType|js}, {js|x proximity|js});
+  CssJs.unsafe({js|scrollSnapType|js}, {js|y proximity|js});
+  CssJs.unsafe({js|scrollSnapType|js}, {js|block proximity|js});
+  CssJs.unsafe({js|scrollSnapType|js}, {js|inline proximity|js});
+  CssJs.unsafe({js|scrollSnapType|js}, {js|both proximity|js});

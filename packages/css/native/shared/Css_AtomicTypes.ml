@@ -93,12 +93,23 @@ module Length = struct
 
   type calc_value =
     [ length
+    | `calc of
+      [ length
+      | `add of calc_value * calc_value
+      | `sub of calc_value * calc_value
+      | `mult of calc_value * calc_value
+      ]
     | `num of float
     ]
 
   and t =
     [ length
-    | `calc of [ length | `add of t * t | `sub of t * t | `mult of t * t ]
+    | `calc of
+      [ length
+      | `add of calc_value * calc_value
+      | `sub of calc_value * calc_value
+      | `mult of calc_value * calc_value
+      ]
     ]
 
   let ch x = `ch x
@@ -142,8 +153,8 @@ module Length = struct
   and calc_value_to_string x =
     match x with
     | `num x -> Std.Float.toString x
-    | #length as t -> toString t
     | `calc calc -> calc_to_string calc
+    | #length as t -> toString t
 
   and calc_to_string calc =
     match calc with
@@ -165,7 +176,7 @@ module Length = struct
       ^ {js| * |js}
       ^ calc_value_to_string y
       ^ {js|)|js}
-    | #length as x -> calc_value_to_string x
+    | #length as x -> toString x
 end
 
 module Angle = struct

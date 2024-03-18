@@ -13,7 +13,7 @@
 
 Shows errors in right locations
 
-  $ dune build main.exe
+   main.exe
   File "main.ml", line 1, characters 8-10:
   1 | let foo != syntax_error
               ^^
@@ -29,7 +29,7 @@ Shows errors in right locations
 
 Preprocessing with styled-ppx.lib should not lose the error location
 
-  $ dune build main.exe
+   main.exe
   File "main.ml", line 1, characters 8-10:
   1 | let foo != syntax_error
               ^^

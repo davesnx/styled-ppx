@@ -14,53 +14,42 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   >  (preprocess (pps styled-ppx.lib)))
   > EOF
 
-  $ dune describe pp input.re
-  /* CSS Values and Units Module Level 3 */
-  [%css {|width: 5rem;|}];
-  [%css {|width: 5ch;|}];
-  [%css {|width: 5vw;|}];
-  [%css {|width: 5vh;|}];
-  [%css {|width: 5vmin;|}];
-  [%css {|width: 5vmax;|}];
-  /* [%css {|width: 5q;|}]; */
-  /* [%css {|width: attr(data-px);|}]; */
-  /* [%css {|width: attr(data-px px);|}]; */
-  /* [%css {|width: attr(data-px px, initial);|}]; */
-  [%css {|width: calc(1px + 2px);|}];
-  [%css {|width: calc(5px * 2);|}];
-  [%css {|width: calc(5px / 2);|}];
-  /* [%css {|width: calc(100%/3 - 2*1em - 2*1px);|}]; */
-  /* [%css {|width: calc(attr(data-px)*2);|}]; */
-  [%css {|width: calc(5px - 10px);|}];
-  [%css {|width: calc(1vw - 1px);|}];
-  [%css {|width: calc(100%);|}];
-  [%css {|padding: 5rem;|}];
-  [%css {|padding: 5ch;|}];
-  [%css {|padding: 5vw;|}];
-  [%css {|padding: 5vh;|}];
-  [%css {|padding: 5vmin;|}];
-  [%css {|padding: 5vmax;|}];
-  /* [%css {|padding: 5q;|}]; */
-  /* [%css {|padding: attr(data-px);|}]; */
-  /* [%css {|padding: attr(data-px px);|}]; */
-  /* [%css {|padding: attr(data-px px, initial);|}]; */
-  /* [%css {|padding: calc(1px + 2px);|}]; */
-  /* [%css {|padding: calc(5px*2);|}]; */
-  /* [%css {|padding: calc(5px/2);|}]; */
-  /* [%css {|padding: calc(100%/3 - 2*1em - 2*1px);|}]; */
-  /* [%css {|padding: calc(attr(data-px)*2);|}]; */
-  /* [%css {|padding: calc(5px - 10px);|}]; */
-  /* [%css {|padding: calc(1vw - 1px);|}]; */
-  /* [%css {|padding: calc(calc(100%));|}]; */
-  
-  /* CSS Values and Units Module Level 4 */
-  /* [%css {|width: toggle(1px, 2px);|}]; */
-  /* [%css {|width: min(10 * (1vw + 1vh) / 2, 12px);|}]; */
-  /* [%css {|width: max(10 * (1vw + 1vh) / 2, 12px);|}]; */
-  /* [%css {|width: clamp(12px, 10 * (1vw + 1vh) / 2, 100px);|}]; */
-  /* [%css {|padding: toggle(1px, 2px);|}]; */
-  /* [%css {|padding: min(10 * (1vw + 1vh) / 2, 12px);|}]; */
-  /* [%css {|padding: max(10 * (1vw + 1vh) / 2, 12px);|}]; */
-  /* [%css {|padding: clamp(12px, 10 * (1vw + 1vh) / 2, 100px);|}]; */
-
   $ dune build
+
+  $ dune_describe_pp _build/default/input.re.pp.ml | refmt --parse ml --print re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      load_path: [],
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      transparent_modules: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];
+  CssJs.width(`rem(5.));
+  CssJs.width(`ch(5.));
+  CssJs.width(`vw(5.));
+  CssJs.width(`vh(5.));
+  CssJs.width(`vmin(5.));
+  CssJs.width(`vmax(5.));
+  CssJs.width(`calc(`add((`pxFloat(1.), `pxFloat(2.)))));
+  CssJs.width(`calc(`mult((`pxFloat(5.), `num(2.)))));
+  CssJs.width(`calc(`mult((`pxFloat(5.), `num(2.)))));
+  CssJs.width(`calc(`sub((`pxFloat(5.), `pxFloat(10.)))));
+  CssJs.width(`calc(`sub((`vw(1.), `pxFloat(1.)))));
+  CssJs.width(`percent(100.));
+  CssJs.padding(`rem(5.));
+  CssJs.padding(`ch(5.));
+  CssJs.padding(`vw(5.));
+  CssJs.padding(`vh(5.));
+  CssJs.padding(`vmin(5.));
+  CssJs.padding(`vmax(5.));

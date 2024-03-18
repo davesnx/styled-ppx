@@ -14,23 +14,24 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   >  (preprocess (pps styled-ppx.lib)))
   > EOF
 
-  $ dune describe pp input.re
-  /* Environment Variables Level 1 */
-    /* [%css {|width: env(safe-area-inset-top);|}]; */
-    /* [%css {|width: env(safe-area-inset-top, 12px);|}]; */
-    /* [%css {|width: env(safe-area-inset-right);|}]; */
-    /* [%css {|width: env(safe-area-inset-right, 12px);|}]; */
-    /* [%css {|width: env(safe-area-inset-bottom);|}]; */
-    /* [%css {|width: env(safe-area-inset-bottom, 12px);|}]; */
-    /* [%css {|width: env(safe-area-inset-left);|}]; */
-    /* [%css {|width: env(safe-area-inset-left, 12px);|}]; */
-    /* [%css {|padding: env(safe-area-inset-top);|}]; */
-    /* [%css {|padding: env(safe-area-inset-top, 12px);|}]; */
-    /* [%css {|padding: env(safe-area-inset-right);|}]; */
-    /* [%css {|padding: env(safe-area-inset-right, 12px);|}]; */
-    /* [%css {|padding: env(safe-area-inset-bottom);|}]; */
-    /* [%css {|padding: env(safe-area-inset-bottom, 12px);|}]; */
-    /* [%css {|padding: env(safe-area-inset-left);|}]; */
-    /* [%css {|padding: env(safe-area-inset-left, 12px);|}]; */
-
   $ dune build
+
+  $ dune_describe_pp _build/default/input.re.pp.ml | refmt --parse ml --print re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      load_path: [],
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      transparent_modules: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];

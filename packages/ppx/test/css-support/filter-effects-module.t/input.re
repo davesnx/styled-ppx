@@ -1,5 +1,4 @@
-/* TODO: Remove drop-shadow with colors */
-/* let color = CssJs.hex("333"); */
+let color = CssJs.hex("333");
 
 /* Filter Effects Module Level 1 */
 [%css {|filter: none|}];
@@ -16,16 +15,16 @@
 [%css {|filter: sepia(50%)|}];
 [%css {|filter: saturate(150%)|}];
 [%css {|filter: grayscale(100%) sepia(100%)|}];
-/* [%css {|filter:
-   drop-shadow(0 8px 32px rgba(0, 0, 0, 0.03));|}]; */
-/* [%css
-     {|filter:
+[%css {|filter:
+   drop-shadow(0 8px 32px rgba(0, 0, 0, 0.03));|}];
+[%css
+  {|filter:
        drop-shadow(0 1px 0 $(color))
        drop-shadow(0 1px 0 $(color))
        drop-shadow(0 1px 0 $(color))
        drop-shadow(0 32px 48px rgba(0, 0, 0, 0.075))
        drop-shadow(0 8px 32px rgba(0, 0, 0, 0.03));|}
-   ]; */
+];
 
 /* Filter Effects Module Level 2 */
 [%css {|backdrop-filter: none|}];

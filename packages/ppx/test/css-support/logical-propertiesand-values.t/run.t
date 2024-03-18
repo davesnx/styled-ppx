@@ -14,102 +14,110 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   >  (preprocess (pps styled-ppx.lib)))
   > EOF
 
-  $ dune describe pp input.re
-  /* CSS Logical Properties and Values Level 1 */
-  [%css {|caption-side: inline-start|}];
-  [%css {|caption-side: inline-end|}];
-  [%css {|float: inline-start|}];
-  [%css {|float: inline-end|}];
-  [%css {|clear: inline-start|}];
-  [%css {|clear: inline-end|}];
-  [%css {|resize: block|}];
-  [%css {|resize: inline|}];
-  [%css {|block-size: 100px|}];
-  [%css {|inline-size: 100px|}];
-  [%css {|min-block-size: 100px|}];
-  [%css {|min-inline-size: 100px|}];
-  [%css {|max-block-size: 100px|}];
-  [%css {|max-inline-size: 100px|}];
-  [%css {|margin-block: 10px|}];
-  [%css {|margin-block: 10px 10px|}];
-  [%css {|margin-block-start: 10px|}];
-  [%css {|margin-block-end: 10px|}];
-  [%css {|margin-inline: 10px|}];
-  [%css {|margin-inline: 10px 10px|}];
-  [%css {|margin-inline-start: 10px|}];
-  [%css {|margin-inline-end: 10px|}];
-  [%css {|inset: 10px|}];
-  [%css {|inset: 10px 10px|}];
-  [%css {|inset: 10px 10px 10px|}];
-  [%css {|inset: 10px 10px 10px 10px|}];
-  [%css {|inset-block: 10px|}];
-  [%css {|inset-block: 10px 10px|}];
-  [%css {|inset-block-start: 10px|}];
-  [%css {|inset-block-end: 10px|}];
-  [%css {|inset-inline: 10px|}];
-  [%css {|inset-inline: 10px 10px|}];
-  [%css {|inset-inline-start: 10px|}];
-  [%css {|inset-inline-end: 10px|}];
-  [%css {|padding-block: 10px|}];
-  [%css {|padding-block: 10px 10px|}];
-  [%css {|padding-block-start: 10px|}];
-  [%css {|padding-block-end: 10px|}];
-  [%css {|padding-inline: 10px|}];
-  [%css {|padding-inline: 10px 10px|}];
-  [%css {|padding-inline-start: 10px|}];
-  [%css {|padding-inline-end: 10px|}];
-  [%css {|border-block: 1px|}];
-  [%css {|border-block: 2px dotted|}];
-  [%css {|border-block: medium dashed green|}];
-  [%css {|border-block-start: 1px|}];
-  [%css {|border-block-start: 2px dotted|}];
-  [%css {|border-block-start: medium dashed green|}];
-  [%css {|border-block-start-width: thin|}];
-  [%css {|border-block-start-style: dotted|}];
-  [%css {|border-block-start-color: navy|}];
-  [%css {|border-block-end: 1px|}];
-  [%css {|border-block-end: 2px dotted|}];
-  [%css {|border-block-end: medium dashed green|}];
-  [%css {|border-block-end-width: thin|}];
-  [%css {|border-block-end-style: dotted|}];
-  [%css {|border-block-end-color: navy|}];
-  /* [%css {|border-block-width: thin 2px|}]; */
-  /* [%css {|border-block-style: dotted dashed|}]; */
-  [%css {|border-block-color: navy blue|}];
-  [%css {|border-inline: 1px|}];
-  [%css {|border-inline: 2px dotted|}];
-  [%css {|border-inline: medium dashed green|}];
-  [%css {|border-inline-start: 1px|}];
-  [%css {|border-inline-start: 2px dotted|}];
-  [%css {|border-inline-start: medium dashed green|}];
-  [%css {|border-inline-start-width: thin|}];
-  [%css {|border-inline-start-style: dotted|}];
-  [%css {|border-inline-start-color: navy|}];
-  [%css {|border-inline-end: 1px|}];
-  [%css {|border-inline-end: 2px dotted|}];
-  [%css {|border-inline-end: medium dashed green|}];
-  [%css {|border-inline-end-width: thin|}];
-  [%css {|border-inline-end-style: dotted|}];
-  [%css {|border-inline-end-color: navy|}];
-  /* [%css {|border-inline-width: thin 2px|}]; */
-  /* [%css {|border-inline-style: dotted dashed|}]; */
-  [%css {|border-inline-color: navy blue|}];
-  [%css {|border-start-start-radius: 0|}];
-  [%css {|border-start-start-radius: 50%|}];
-  [%css {|border-start-start-radius: 250px 100px|}];
-  [%css {|border-start-end-radius: 0|}];
-  [%css {|border-start-end-radius: 50%|}];
-  [%css {|border-start-end-radius: 250px 100px|}];
-  [%css {|border-end-start-radius: 0|}];
-  [%css {|border-end-start-radius: 50%|}];
-  [%css {|border-end-start-radius: 250px 100px|}];
-  [%css {|border-end-end-radius: 0|}];
-  [%css {|border-end-end-radius: 50%|}];
-  [%css {|border-end-end-radius: 250px 100px|}];
-  /* [%css {|margin: logical 5px 10px 15px 20px|}]; */
-  /* [%css {|padding: logical 5px 10px 15px 20px|}]; */
-  /* [%css {|border-color: logical red green blue yellow|}]; */
-  /* [%css {|border-style: logical solid dotted dashed none|}]; */
-  /* [%css {|border-width: logical 5px 10px 15px 20px|}]; */
-
   $ dune build
+
+  $ dune_describe_pp _build/default/input.re.pp.ml | refmt --parse ml --print re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      load_path: [],
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      transparent_modules: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];
+  CssJs.unsafe({js|captionSide|js}, {js|inline-start|js});
+  CssJs.unsafe({js|captionSide|js}, {js|inline-end|js});
+  CssJs.unsafe({js|float|js}, {js|inline-start|js});
+  CssJs.unsafe({js|float|js}, {js|inline-end|js});
+  CssJs.unsafe({js|clear|js}, {js|inline-start|js});
+  CssJs.unsafe({js|clear|js}, {js|inline-end|js});
+  CssJs.unsafe({js|resize|js}, {js|block|js});
+  CssJs.unsafe({js|resize|js}, {js|inline|js});
+  CssJs.unsafe({js|blockSize|js}, {js|100px|js});
+  CssJs.unsafe({js|inlineSize|js}, {js|100px|js});
+  CssJs.unsafe({js|minBlockSize|js}, {js|100px|js});
+  CssJs.unsafe({js|minInlineSize|js}, {js|100px|js});
+  CssJs.unsafe({js|maxBlockSize|js}, {js|100px|js});
+  CssJs.unsafe({js|maxInlineSize|js}, {js|100px|js});
+  CssJs.unsafe({js|marginBlock|js}, {js|10px|js});
+  CssJs.unsafe({js|marginBlock|js}, {js|10px 10px|js});
+  CssJs.unsafe({js|marginBlockStart|js}, {js|10px|js});
+  CssJs.unsafe({js|marginBlockEnd|js}, {js|10px|js});
+  CssJs.unsafe({js|marginInline|js}, {js|10px|js});
+  CssJs.unsafe({js|marginInline|js}, {js|10px 10px|js});
+  CssJs.unsafe({js|marginInlineStart|js}, {js|10px|js});
+  CssJs.unsafe({js|marginInlineEnd|js}, {js|10px|js});
+  CssJs.unsafe({js|inset|js}, {js|10px|js});
+  CssJs.unsafe({js|inset|js}, {js|10px 10px|js});
+  CssJs.unsafe({js|inset|js}, {js|10px 10px 10px|js});
+  CssJs.unsafe({js|inset|js}, {js|10px 10px 10px 10px|js});
+  CssJs.unsafe({js|insetBlock|js}, {js|10px|js});
+  CssJs.unsafe({js|insetBlock|js}, {js|10px 10px|js});
+  CssJs.unsafe({js|insetBlockStart|js}, {js|10px|js});
+  CssJs.unsafe({js|insetBlockEnd|js}, {js|10px|js});
+  CssJs.unsafe({js|insetInline|js}, {js|10px|js});
+  CssJs.unsafe({js|insetInline|js}, {js|10px 10px|js});
+  CssJs.unsafe({js|insetInlineStart|js}, {js|10px|js});
+  CssJs.unsafe({js|insetInlineEnd|js}, {js|10px|js});
+  CssJs.unsafe({js|paddingBlock|js}, {js|10px|js});
+  CssJs.unsafe({js|paddingBlock|js}, {js|10px 10px|js});
+  CssJs.unsafe({js|paddingBlockStart|js}, {js|10px|js});
+  CssJs.unsafe({js|paddingBlockEnd|js}, {js|10px|js});
+  CssJs.unsafe({js|paddingInline|js}, {js|10px|js});
+  CssJs.unsafe({js|paddingInline|js}, {js|10px 10px|js});
+  CssJs.unsafe({js|paddingInlineStart|js}, {js|10px|js});
+  CssJs.unsafe({js|paddingInlineEnd|js}, {js|10px|js});
+  CssJs.unsafe({js|borderBlock|js}, {js|1px|js});
+  CssJs.unsafe({js|borderBlock|js}, {js|2px dotted|js});
+  CssJs.unsafe({js|borderBlock|js}, {js|medium dashed green|js});
+  CssJs.unsafe({js|borderBlockStart|js}, {js|1px|js});
+  CssJs.unsafe({js|borderBlockStart|js}, {js|2px dotted|js});
+  CssJs.unsafe({js|borderBlockStart|js}, {js|medium dashed green|js});
+  CssJs.unsafe({js|borderBlockStartWidth|js}, {js|thin|js});
+  CssJs.unsafe({js|borderBlockStartStyle|js}, {js|dotted|js});
+  CssJs.unsafe({js|borderBlockStartColor|js}, {js|navy|js});
+  CssJs.unsafe({js|borderBlockEnd|js}, {js|1px|js});
+  CssJs.unsafe({js|borderBlockEnd|js}, {js|2px dotted|js});
+  CssJs.unsafe({js|borderBlockEnd|js}, {js|medium dashed green|js});
+  CssJs.unsafe({js|borderBlockEndWidth|js}, {js|thin|js});
+  CssJs.unsafe({js|borderBlockEndStyle|js}, {js|dotted|js});
+  CssJs.unsafe({js|borderBlockEndColor|js}, {js|navy|js});
+  CssJs.unsafe({js|borderBlockColor|js}, {js|navy blue|js});
+  CssJs.unsafe({js|borderInline|js}, {js|1px|js});
+  CssJs.unsafe({js|borderInline|js}, {js|2px dotted|js});
+  CssJs.unsafe({js|borderInline|js}, {js|medium dashed green|js});
+  CssJs.unsafe({js|borderInlineStart|js}, {js|1px|js});
+  CssJs.unsafe({js|borderInlineStart|js}, {js|2px dotted|js});
+  CssJs.unsafe({js|borderInlineStart|js}, {js|medium dashed green|js});
+  CssJs.unsafe({js|borderInlineStartWidth|js}, {js|thin|js});
+  CssJs.unsafe({js|borderInlineStartStyle|js}, {js|dotted|js});
+  CssJs.unsafe({js|borderInlineStartColor|js}, {js|navy|js});
+  CssJs.unsafe({js|borderInlineEnd|js}, {js|1px|js});
+  CssJs.unsafe({js|borderInlineEnd|js}, {js|2px dotted|js});
+  CssJs.unsafe({js|borderInlineEnd|js}, {js|medium dashed green|js});
+  CssJs.unsafe({js|borderInlineEndWidth|js}, {js|thin|js});
+  CssJs.unsafe({js|borderInlineEndStyle|js}, {js|dotted|js});
+  CssJs.unsafe({js|borderInlineEndColor|js}, {js|navy|js});
+  CssJs.unsafe({js|borderInlineColor|js}, {js|navy blue|js});
+  CssJs.unsafe({js|borderStartStartRadius|js}, {js|0|js});
+  CssJs.unsafe({js|borderStartStartRadius|js}, {js|50%|js});
+  CssJs.unsafe({js|borderStartStartRadius|js}, {js|250px 100px|js});
+  CssJs.unsafe({js|borderStartEndRadius|js}, {js|0|js});
+  CssJs.unsafe({js|borderStartEndRadius|js}, {js|50%|js});
+  CssJs.unsafe({js|borderStartEndRadius|js}, {js|250px 100px|js});
+  CssJs.unsafe({js|borderEndStartRadius|js}, {js|0|js});
+  CssJs.unsafe({js|borderEndStartRadius|js}, {js|50%|js});
+  CssJs.unsafe({js|borderEndStartRadius|js}, {js|250px 100px|js});
+  CssJs.unsafe({js|borderEndEndRadius|js}, {js|0|js});
+  CssJs.unsafe({js|borderEndEndRadius|js}, {js|50%|js});
+  CssJs.unsafe({js|borderEndEndRadius|js}, {js|250px 100px|js});

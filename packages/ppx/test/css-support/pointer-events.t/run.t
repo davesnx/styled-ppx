@@ -14,26 +14,39 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   >  (preprocess (pps styled-ppx.lib)))
   > EOF
 
-  $ dune describe pp input.re
-  /* Pointer Events Level 1 */
-  [%css {|touch-action: auto|}];
-  [%css {|touch-action: none|}];
-  [%css {|touch-action: pan-x|}];
-  [%css {|touch-action: pan-y|}];
-  [%css {|touch-action: pan-x pan-y|}];
-  [%css {|touch-action: manipulation|}];
-  
-  /* Pointer Events Level 3 */
-  [%css {|touch-action: pan-left|}];
-  [%css {|touch-action: pan-right|}];
-  [%css {|touch-action: pan-up|}];
-  [%css {|touch-action: pan-down|}];
-  [%css {|touch-action: pan-left pan-up|}];
-  
-  /* Compatibility */
-  [%css {|touch-action: pinch-zoom|}];
-  [%css {|touch-action: pan-x pinch-zoom|}];
-  [%css {|touch-action: pan-y pinch-zoom|}];
-  [%css {|touch-action: pan-x pan-y pinch-zoom|}];
-
   $ dune build
+
+  $ dune_describe_pp _build/default/input.re.pp.ml | refmt --parse ml --print re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      load_path: [],
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      transparent_modules: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];
+  CssJs.unsafe({js|touchAction|js}, {js|auto|js});
+  CssJs.unsafe({js|touchAction|js}, {js|none|js});
+  CssJs.unsafe({js|touchAction|js}, {js|pan-x|js});
+  CssJs.unsafe({js|touchAction|js}, {js|pan-y|js});
+  CssJs.unsafe({js|touchAction|js}, {js|pan-x pan-y|js});
+  CssJs.unsafe({js|touchAction|js}, {js|manipulation|js});
+  CssJs.unsafe({js|touchAction|js}, {js|pan-left|js});
+  CssJs.unsafe({js|touchAction|js}, {js|pan-right|js});
+  CssJs.unsafe({js|touchAction|js}, {js|pan-up|js});
+  CssJs.unsafe({js|touchAction|js}, {js|pan-down|js});
+  CssJs.unsafe({js|touchAction|js}, {js|pan-left pan-up|js});
+  CssJs.unsafe({js|touchAction|js}, {js|pinch-zoom|js});
+  CssJs.unsafe({js|touchAction|js}, {js|pan-x pinch-zoom|js});
+  CssJs.unsafe({js|touchAction|js}, {js|pan-y pinch-zoom|js});
+  CssJs.unsafe({js|touchAction|js}, {js|pan-x pan-y pinch-zoom|js});

@@ -14,39 +14,65 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   >  (preprocess (pps styled-ppx.lib)))
   > EOF
 
-  $ dune describe pp input.re
-  /* CSS Animations Level 1 */
-  [%css {|animation-name: foo|}];
-  [%css {|animation-name: foo, bar|}];
-  [%css {|animation-duration: 0s|}];
-  [%css {|animation-duration: 1s|}];
-  [%css {|animation-duration: 100ms|}];
-  [%css {|animation-timing-function: ease|}];
-  [%css {|animation-timing-function: linear|}];
-  [%css {|animation-timing-function: ease-in|}];
-  [%css {|animation-timing-function: ease-out|}];
-  [%css {|animation-timing-function: ease-in-out|}];
-  [%css {|animation-timing-function: cubic-bezier(.5, .5, .5, .5)|}];
-  [%css {|animation-timing-function: cubic-bezier(.5, 1.5, .5, -2.5)|}];
-  [%css {|animation-timing-function: step-start|}];
-  [%css {|animation-timing-function: step-end|}];
-  [%css {|animation-timing-function: steps(3, start)|}];
-  [%css {|animation-timing-function: steps(5, end)|}];
-  [%css {|animation-iteration-count: infinite|}];
-  [%css {|animation-iteration-count: 8|}];
-  [%css {|animation-iteration-count: 4.35|}];
-  [%css {|animation-direction: normal|}];
-  [%css {|animation-direction: alternate|}];
-  [%css {|animation-direction: reverse|}];
-  [%css {|animation-direction: alternate-reverse|}];
-  [%css {|animation-play-state: running|}];
-  [%css {|animation-play-state: paused|}];
-  [%css {|animation-delay: 1s|}];
-  [%css {|animation-delay: -1s|}];
-  [%css {|animation-fill-mode: none|}];
-  [%css {|animation-fill-mode: forwards|}];
-  [%css {|animation-fill-mode: backwards|}];
-  [%css {|animation-fill-mode: both|}];
-  [%css {|animation: foo 1s 2s infinite linear alternate both|}];
-
   $ dune build
+
+  $ dune_describe_pp _build/default/input.re.pp.ml | refmt --parse ml --print re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      load_path: [],
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      transparent_modules: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];
+  CssJs.animationName({js|foo|js});
+  CssJs.unsafe({js|animationName|js}, {js|foo, bar|js});
+  CssJs.animationDuration(`s(0));
+  CssJs.animationDuration(`s(1000));
+  CssJs.animationDuration(`ms(100));
+  CssJs.animationTimingFunction(`ease);
+  CssJs.animationTimingFunction(`linear);
+  CssJs.animationTimingFunction(`easeIn);
+  CssJs.animationTimingFunction(`easeOut);
+  CssJs.animationTimingFunction(`easeInOut);
+  CssJs.animationTimingFunction(`cubicBezier((0.5, 0.5, 0.5, 0.5)));
+  CssJs.animationTimingFunction(`cubicBezier((0.5, 1.5, 0.5, (-2.5))));
+  CssJs.animationTimingFunction(`stepStart);
+  CssJs.animationTimingFunction(`stepEnd);
+  CssJs.animationTimingFunction(`steps((3, `start)));
+  CssJs.animationTimingFunction(`steps((5, `end_)));
+  CssJs.animationIterationCount(`infinite);
+  CssJs.animationIterationCount(`count(8.));
+  CssJs.animationIterationCount(`count(4.35));
+  CssJs.animationDirection(`normal);
+  CssJs.animationDirection(`alternate);
+  CssJs.animationDirection(`reverse);
+  CssJs.animationDirection(`alternateReverse);
+  CssJs.animationPlayState(`running);
+  CssJs.animationPlayState(`paused);
+  CssJs.animationDelay(`s(1000));
+  CssJs.animationDelay(`s(-1000));
+  CssJs.animationFillMode(`none);
+  CssJs.animationFillMode(`forwards);
+  CssJs.animationFillMode(`backwards);
+  CssJs.animationFillMode(`both);
+  CssJs.animation(
+    ~duration=`s(2000),
+    ~delay=`s(1000),
+    ~direction=`alternate,
+    ~timingFunction=`linear,
+    ~fillMode=`both,
+    ~playState=`running,
+    ~iterationCount=`infinite,
+    {js|foo|js},
+  );

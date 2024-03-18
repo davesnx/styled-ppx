@@ -14,98 +14,74 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   >  (preprocess (pps styled-ppx.lib)))
   > EOF
 
-  $ dune describe pp input.re
-  /*Motion Path Module Level 1*/
-  [%css {|offset: none|}];
-  [%css {|offset: auto|}];
-  [%css {|offset: center|}];
-  [%css {|offset: 200px 100px|}];
-  /* [%css {|offset: inset(10% round 10% 40% 10% 40%)|}]; */
-  /* [%css {|offset: ellipse(at top 50% left 20%)|}]; */
-  /* [%css {|offset: circle(at right 5% top)|}]; */
-  [%css {|offset: margin-box|}];
-  [%css {|offset: border-box|}];
-  [%css {|offset: padding-box|}];
-  [%css {|offset: content-box|}];
-  [%css {|offset: fill-box|}];
-  [%css {|offset: stroke-box|}];
-  [%css {|offset: view-box|}];
-  /* [%css {|offset: polygon(100% 0, 100% 100%, 0 100%)|}]; */
-  [%css {|offset: path('M 20 20 H 80 V 30')|}];
-  [%css {|offset: url(image.png)|}];
-  [%css {|offset: ray(45deg closest-side)|}];
-  [%css {|offset: ray(45deg closest-side) 10%|}];
-  [%css {|offset: ray(45deg closest-side) 10% reverse|}];
-  /* [%css {|offset: ray(45deg closest-side) 10% reverse 45deg|}]; */
-  /* [%css {|offset: ray(45deg closest-side) 10% 45deg reverse|}]; */
-  /* [%css {|offset: ray(45deg closest-side) 45deg 10%|}]; */
-  /* [%css {|offset: ray(45deg closest-side) 45deg reverse 10%|}]; */
-  [%css {|offset: ray(45deg closest-side) reverse 10%|}];
-  /* [%css {|offset: 200px 100px ray(45deg closest-side)|}]; */
-  /* [%css {|offset: 200px 100px ray(45deg closest-side) 10%|}]; */
-  /* [%css {|offset: 200px 100px ray(45deg closest-side) 10% reverse|}]; */
-  /* [%css {|offset: 200px 100px ray(45deg closest-side) 10% reverse 45deg|}]; */
-  /* [%css {|offset: 200px 100px ray(45deg closest-side) 10% 45deg reverse|}]; */
-  /* [%css {|offset: 200px 100px ray(45deg closest-side) 45deg 10%|}]; */
-  /* [%css {|offset: 200px 100px ray(45deg closest-side) 45deg reverse 10%|}]; */
-  /* [%css {|offset: 200px 100px ray(45deg closest-side) reverse 10%|}]; */
-  [%css {|offset: auto / center|}];
-  [%css {|offset: center / 200px 100px|}];
-  [%css {|offset: ray(45deg closest-side) / 200px 100px|}];
-  /* [%css {|offset: ray(45deg closest-side) 10% / 200px 100px|}]; */
-  /* [%css {|offset: ray(45deg closest-side) 10% reverse / 200px 100px|}]; */
-  /* [%css {|offset: ray(45deg closest-side) 10% reverse 45deg / 200px 100px|}]; */
-  /* [%css {|offset: ray(45deg closest-side) 10% 45deg reverse / 200px 100px|}]; */
-  /* [%css {|offset: ray(45deg closest-side) 45deg 10% / 200px 100px|}]; */
-  /* [%css {|offset: ray(45deg closest-side) 45deg reverse 10% / 200px 100px|}]; */
-  /* [%css {|offset: ray(45deg closest-side) reverse 10% / 200px 100px|}]; */
-  /* [%css {|offset: 200px 100px ray(45deg closest-side) / 200px 100px|}]; */
-  /* [%css {|offset: 200px 100px ray(45deg closest-side) 10% / 200px 100px|}]; */
-  /* [%css {|offset: 200px 100px ray(45deg closest-side) 10% reverse / 200px 100px|}]; */
-  /* [%css {|offset: 200px 100px ray(45deg closest-side) 10% reverse 45deg / 200px 100px|}]; */
-  /* [%css {|offset: 200px 100px ray(45deg closest-side) 10% 45deg reverse / 200px 100px|}]; */
-  /* [%css {|offset: 200px 100px ray(45deg closest-side) 45deg 10% / 200px 100px|}]; */
-  /* [%css {|offset: 200px 100px ray(45deg closest-side) 45deg reverse 10% / 200px 100px|}]; */
-  /* [%css {|offset: 200px 100px ray(45deg closest-side) reverse 10% / 200px 100px|}]; */
-  [%css {|offset-path: none|}];
-  [%css {|offset-path: ray(45deg closest-side)|}];
-  [%css {|offset-path: ray(45deg farthest-side)|}];
-  [%css {|offset-path: ray(45deg closest-corner)|}];
-  [%css {|offset-path: ray(45deg farthest-corner)|}];
-  /* [%css {|offset-path: ray(45deg sides)|}]; */
-  /* [%css {|offset-path: ray(0.25turn sides contain)|}]; */
-  [%css {|offset-path: ray(100grad closest-side contain)|}];
-  /* [%css {|offset-path: ray(calc(180deg - 0.25turn) closest-side)|}]; */
-  /* [%css {|offset-path: inset(10% round 10% 40% 10% 40%)|}]; */
-  /* [%css {|offset-path: ellipse(at top 50% left 20%)|}]; */
-  /* [%css {|offset-path: circle(at right 5% top)|}]; */
-  [%css {|offset-path: margin-box|}];
-  [%css {|offset-path: border-box|}];
-  [%css {|offset-path: padding-box|}];
-  [%css {|offset-path: content-box|}];
-  [%css {|offset-path: fill-box|}];
-  [%css {|offset-path: stroke-box|}];
-  [%css {|offset-path: view-box|}];
-  [%css {|offset-path: circle(60%) margin-box|}];
-  /* [%css {|offset-path: polygon(100% 0, 100% 100%, 0 100%)|}]; */
-  /* [%css {|offset-path: path('M 20 20 H 80 V 30')|}]; */
-  /* [%css {|offset-path: url(image.png)|}]; */
-  /* [%css {|offset-path: url(#id)|}]; */
-  [%css {|offset-distance: 10%|}];
-  [%css {|offset-position: auto|}];
-  [%css {|offset-position: 200px|}];
-  [%css {|offset-position: 200px 100px|}];
-  [%css {|offset-position: center|}];
-  [%css {|offset-anchor: auto|}];
-  [%css {|offset-anchor: 200px|}];
-  [%css {|offset-anchor: 200px 100px|}];
-  [%css {|offset-anchor: center|}];
-  [%css {|offset-rotate: auto|}];
-  [%css {|offset-rotate: 0deg|}];
-  [%css {|offset-rotate: reverse|}];
-  [%css {|offset-rotate: -45deg|}];
-  [%css {|offset-rotate: auto 180deg|}];
-  [%css {|offset-rotate: reverse 45deg|}];
-  [%css {|offset-rotate: 2turn reverse|}];
-
   $ dune build
+
+  $ dune_describe_pp _build/default/input.re.pp.ml | refmt --parse ml --print re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      load_path: [],
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      transparent_modules: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];
+  CssJs.unsafe({js|offset|js}, {js|none|js});
+  CssJs.unsafe({js|offset|js}, {js|auto|js});
+  CssJs.unsafe({js|offset|js}, {js|center|js});
+  CssJs.unsafe({js|offset|js}, {js|200px 100px|js});
+  CssJs.unsafe({js|offset|js}, {js|margin-box|js});
+  CssJs.unsafe({js|offset|js}, {js|border-box|js});
+  CssJs.unsafe({js|offset|js}, {js|padding-box|js});
+  CssJs.unsafe({js|offset|js}, {js|content-box|js});
+  CssJs.unsafe({js|offset|js}, {js|fill-box|js});
+  CssJs.unsafe({js|offset|js}, {js|stroke-box|js});
+  CssJs.unsafe({js|offset|js}, {js|view-box|js});
+  CssJs.unsafe({js|offset|js}, {js|path('M 20 20 H 80 V 30')|js});
+  CssJs.unsafe({js|offset|js}, {js|url(image.png)|js});
+  CssJs.unsafe({js|offset|js}, {js|ray(45deg closest-side)|js});
+  CssJs.unsafe({js|offset|js}, {js|ray(45deg closest-side) 10%|js});
+  CssJs.unsafe({js|offset|js}, {js|ray(45deg closest-side) 10% reverse|js});
+  CssJs.unsafe({js|offset|js}, {js|ray(45deg closest-side) reverse 10%|js});
+  CssJs.unsafe({js|offset|js}, {js|auto / center|js});
+  CssJs.unsafe({js|offset|js}, {js|center / 200px 100px|js});
+  CssJs.unsafe({js|offset|js}, {js|ray(45deg closest-side) / 200px 100px|js});
+  CssJs.unsafe({js|offsetPath|js}, {js|none|js});
+  CssJs.unsafe({js|offsetPath|js}, {js|ray(45deg closest-side)|js});
+  CssJs.unsafe({js|offsetPath|js}, {js|ray(45deg farthest-side)|js});
+  CssJs.unsafe({js|offsetPath|js}, {js|ray(45deg closest-corner)|js});
+  CssJs.unsafe({js|offsetPath|js}, {js|ray(45deg farthest-corner)|js});
+  CssJs.unsafe({js|offsetPath|js}, {js|ray(100grad closest-side contain)|js});
+  CssJs.unsafe({js|offsetPath|js}, {js|margin-box|js});
+  CssJs.unsafe({js|offsetPath|js}, {js|border-box|js});
+  CssJs.unsafe({js|offsetPath|js}, {js|padding-box|js});
+  CssJs.unsafe({js|offsetPath|js}, {js|content-box|js});
+  CssJs.unsafe({js|offsetPath|js}, {js|fill-box|js});
+  CssJs.unsafe({js|offsetPath|js}, {js|stroke-box|js});
+  CssJs.unsafe({js|offsetPath|js}, {js|view-box|js});
+  CssJs.unsafe({js|offsetPath|js}, {js|circle(60%) margin-box|js});
+  CssJs.unsafe({js|offsetDistance|js}, {js|10%|js});
+  CssJs.unsafe({js|offsetPosition|js}, {js|auto|js});
+  CssJs.unsafe({js|offsetPosition|js}, {js|200px|js});
+  CssJs.unsafe({js|offsetPosition|js}, {js|200px 100px|js});
+  CssJs.unsafe({js|offsetPosition|js}, {js|center|js});
+  CssJs.unsafe({js|offsetAnchor|js}, {js|auto|js});
+  CssJs.unsafe({js|offsetAnchor|js}, {js|200px|js});
+  CssJs.unsafe({js|offsetAnchor|js}, {js|200px 100px|js});
+  CssJs.unsafe({js|offsetAnchor|js}, {js|center|js});
+  CssJs.unsafe({js|offsetRotate|js}, {js|auto|js});
+  CssJs.unsafe({js|offsetRotate|js}, {js|0deg|js});
+  CssJs.unsafe({js|offsetRotate|js}, {js|reverse|js});
+  CssJs.unsafe({js|offsetRotate|js}, {js|-45deg|js});
+  CssJs.unsafe({js|offsetRotate|js}, {js|auto 180deg|js});
+  CssJs.unsafe({js|offsetRotate|js}, {js|reverse 45deg|js});
+  CssJs.unsafe({js|offsetRotate|js}, {js|2turn reverse|js});

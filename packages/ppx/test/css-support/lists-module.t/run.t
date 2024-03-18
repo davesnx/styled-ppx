@@ -14,88 +14,94 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   >  (preprocess (pps styled-ppx.lib)))
   > EOF
 
-  $ dune describe pp input.re
-  /* CSS Lists Module Level 3 */
-  [%css {|list-style-type: disclosure-closed|}];
-  [%css {|list-style-type: disclosure-open|}];
-  [%css {|list-style-type: hebrew|}];
-  [%css {|list-style-type: cjk-decimal|}];
-  [%css {|list-style-type: cjk-ideographic|}];
-  [%css {|list-style-type: hiragana|}];
-  [%css {|list-style-type: katakana|}];
-  [%css {|list-style-type: hiragana-iroha|}];
-  [%css {|list-style-type: katakana-iroha|}];
-  [%css {|list-style-type: japanese-informal|}];
-  [%css {|list-style-type: japanese-formal|}];
-  [%css {|list-style-type: korean-hangul-formal|}];
-  [%css {|list-style-type: korean-hanja-informal|}];
-  [%css {|list-style-type: korean-hanja-formal|}];
-  [%css {|list-style-type: simp-chinese-informal|}];
-  [%css {|list-style-type: simp-chinese-formal|}];
-  [%css {|list-style-type: trad-chinese-informal|}];
-  [%css {|list-style-type: trad-chinese-formal|}];
-  [%css {|list-style-type: cjk-heavenly-stem|}];
-  [%css {|list-style-type: cjk-earthly-branch|}];
-  [%css {|list-style-type: trad-chinese-informal|}];
-  [%css {|list-style-type: trad-chinese-formal|}];
-  [%css {|list-style-type: simp-chinese-informal|}];
-  [%css {|list-style-type: simp-chinese-formal|}];
-  [%css {|list-style-type: japanese-informal|}];
-  [%css {|list-style-type: japanese-formal|}];
-  [%css {|list-style-type: arabic-indic|}];
-  [%css {|list-style-type: persian|}];
-  [%css {|list-style-type: urdu|}];
-  [%css {|list-style-type: devanagari|}];
-  [%css {|list-style-type: gurmukhi|}];
-  [%css {|list-style-type: gujarati|}];
-  [%css {|list-style-type: oriya|}];
-  [%css {|list-style-type: kannada|}];
-  [%css {|list-style-type: malayalam|}];
-  [%css {|list-style-type: bengali|}];
-  [%css {|list-style-type: tamil|}];
-  [%css {|list-style-type: telugu|}];
-  [%css {|list-style-type: thai|}];
-  [%css {|list-style-type: lao|}];
-  [%css {|list-style-type: myanmar|}];
-  [%css {|list-style-type: khmer|}];
-  [%css {|list-style-type: hangul|}];
-  [%css {|list-style-type: hangul-consonant|}];
-  [%css {|list-style-type: ethiopic-halehame|}];
-  [%css {|list-style-type: ethiopic-numeric|}];
-  [%css {|list-style-type: ethiopic-halehame-am|}];
-  [%css {|list-style-type: ethiopic-halehame-ti-er|}];
-  [%css {|list-style-type: ethiopic-halehame-ti-et|}];
-  [%css {|list-style-type: other-style|}];
-  [%css {|list-style-type: inside|}];
-  [%css {|list-style-type: outside|}];
-  [%css {|list-style-type: \32 style|}];
-  [%css {|list-style-type: "-"|}];
-  [%css {|list-style-type: '-'|}];
-  /* [%css {|list-style-type: symbols("*" "\2020" "\2021" "\A7")|}]; */
-  /* [%css {|list-style-type: symbols(cyclic '*' '\2020' '\2021' '\A7')|}]; */
-  /* [%css {|marker-side: match-self|}]; */
-  /* [%css {|marker-side: match-parent|}]; */
-  [%css {|counter-reset: foo|}];
-  [%css {|counter-reset: foo 1|}];
-  [%css {|counter-reset: foo 1 bar|}];
-  [%css {|counter-reset: foo 1 bar 2|}];
-  [%css {|counter-reset: none|}];
-  [%css {|counter-set: foo|}];
-  [%css {|counter-set: foo 1|}];
-  [%css {|counter-set: foo 1 bar|}];
-  [%css {|counter-set: foo 1 bar 2|}];
-  [%css {|counter-set: none|}];
-  [%css {|counter-increment: foo|}];
-  [%css {|counter-increment: foo 1|}];
-  [%css {|counter-increment: foo 1 bar|}];
-  [%css {|counter-increment: foo 1 bar 2|}];
-  [%css {|counter-increment: none|}];
-  /* [%css {|content: counter(chno, upper-latin) '. '|}]; */
-  /* [%css {|content: counter(section, upper-roman) ' - '|}]; */
-  /* [%css {|content: ' [' counter(bq, decimal) ']'|}]; */
-  /* [%css {|content: counter(notecntr, disc) ' '|}]; */
-  /* [%css {|content: counter(p, none)|}]; */
-  /* [%css {|content: counter(h1, upper-alpha) '.' counter(h2, decimal) ' '|}]; */
-  /* [%css {|content: '(' counters(list-item, '.') ') '|}]; */
-
   $ dune build
+
+  $ dune_describe_pp _build/default/input.re.pp.ml | refmt --parse ml --print re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      load_path: [],
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      transparent_modules: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];
+  CssJs.unsafe({js|listStyleType|js}, {js|disclosure-closed|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|disclosure-open|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|hebrew|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|cjk-decimal|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|cjk-ideographic|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|hiragana|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|katakana|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|hiragana-iroha|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|katakana-iroha|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|japanese-informal|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|japanese-formal|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|korean-hangul-formal|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|korean-hanja-informal|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|korean-hanja-formal|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|simp-chinese-informal|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|simp-chinese-formal|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|trad-chinese-informal|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|trad-chinese-formal|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|cjk-heavenly-stem|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|cjk-earthly-branch|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|trad-chinese-informal|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|trad-chinese-formal|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|simp-chinese-informal|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|simp-chinese-formal|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|japanese-informal|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|japanese-formal|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|arabic-indic|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|persian|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|urdu|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|devanagari|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|gurmukhi|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|gujarati|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|oriya|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|kannada|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|malayalam|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|bengali|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|tamil|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|telugu|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|thai|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|lao|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|myanmar|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|khmer|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|hangul|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|hangul-consonant|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|ethiopic-halehame|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|ethiopic-numeric|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|ethiopic-halehame-am|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|ethiopic-halehame-ti-er|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|ethiopic-halehame-ti-et|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|other-style|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|inside|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|outside|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|\32 style|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|"-"|js});
+  CssJs.unsafe({js|listStyleType|js}, {js|'-'|js});
+  CssJs.unsafe({js|counterReset|js}, {js|foo|js});
+  CssJs.unsafe({js|counterReset|js}, {js|foo 1|js});
+  CssJs.unsafe({js|counterReset|js}, {js|foo 1 bar|js});
+  CssJs.unsafe({js|counterReset|js}, {js|foo 1 bar 2|js});
+  CssJs.unsafe({js|counterReset|js}, {js|none|js});
+  CssJs.unsafe({js|counterSet|js}, {js|foo|js});
+  CssJs.unsafe({js|counterSet|js}, {js|foo 1|js});
+  CssJs.unsafe({js|counterSet|js}, {js|foo 1 bar|js});
+  CssJs.unsafe({js|counterSet|js}, {js|foo 1 bar 2|js});
+  CssJs.unsafe({js|counterSet|js}, {js|none|js});
+  CssJs.unsafe({js|counterIncrement|js}, {js|foo|js});
+  CssJs.unsafe({js|counterIncrement|js}, {js|foo 1|js});
+  CssJs.unsafe({js|counterIncrement|js}, {js|foo 1 bar|js});
+  CssJs.unsafe({js|counterIncrement|js}, {js|foo 1 bar 2|js});
+  CssJs.unsafe({js|counterIncrement|js}, {js|none|js});

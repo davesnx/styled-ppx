@@ -14,25 +14,42 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   >  (preprocess (pps styled-ppx.lib)))
   > EOF
 
-  $ dune describe pp input.re
-  /* CSS Color Adjustment Module Level 1 */
-  [%css {|color-adjust: economy|}];
-  [%css {|color-adjust: exact|}];
-  [%css {|forced-color-adjust: auto|}];
-  [%css {|forced-color-adjust: none|}];
-  [%css {|forced-color-adjust: preserve-parent-color|}];
-  [%css {|color-scheme: normal|}];
-  [%css {|color-scheme: light|}];
-  [%css {|color-scheme: dark|}];
-  [%css {|color-scheme: light dark|}];
-  [%css {|color-scheme: dark light|}];
-  [%css {|color-scheme: only light|}];
-  [%css {|color-scheme: light only|}];
-  [%css {|color-scheme: light light|}];
-  [%css {|color-scheme: dark dark|}];
-  [%css {|color-scheme: light purple|}];
-  [%css {|color-scheme: purple dark interesting|}];
-  [%css {|color-scheme: none|}];
-  [%css {|color-scheme: light none|}];
-
   $ dune build
+
+  $ dune_describe_pp _build/default/input.re.pp.ml | refmt --parse ml --print re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      load_path: [],
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      transparent_modules: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];
+  CssJs.unsafe({js|colorAdjust|js}, {js|economy|js});
+  CssJs.unsafe({js|colorAdjust|js}, {js|exact|js});
+  CssJs.unsafe({js|forcedColorAdjust|js}, {js|auto|js});
+  CssJs.unsafe({js|forcedColorAdjust|js}, {js|none|js});
+  CssJs.unsafe({js|forcedColorAdjust|js}, {js|preserve-parent-color|js});
+  CssJs.unsafe({js|colorScheme|js}, {js|normal|js});
+  CssJs.unsafe({js|colorScheme|js}, {js|light|js});
+  CssJs.unsafe({js|colorScheme|js}, {js|dark|js});
+  CssJs.unsafe({js|colorScheme|js}, {js|light dark|js});
+  CssJs.unsafe({js|colorScheme|js}, {js|dark light|js});
+  CssJs.unsafe({js|colorScheme|js}, {js|only light|js});
+  CssJs.unsafe({js|colorScheme|js}, {js|light only|js});
+  CssJs.unsafe({js|colorScheme|js}, {js|light light|js});
+  CssJs.unsafe({js|colorScheme|js}, {js|dark dark|js});
+  CssJs.unsafe({js|colorScheme|js}, {js|light purple|js});
+  CssJs.unsafe({js|colorScheme|js}, {js|purple dark interesting|js});
+  CssJs.unsafe({js|colorScheme|js}, {js|none|js});
+  CssJs.unsafe({js|colorScheme|js}, {js|light none|js});

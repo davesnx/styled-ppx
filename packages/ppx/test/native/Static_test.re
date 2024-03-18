@@ -1,8 +1,6 @@
 open Alcotest;
 open Ppxlib;
 
-let a = CssJs.transitionDelay(`ms(240));
-
 let loc = Location.none;
 
 let label: CssJs.rule = CssJs.label("asdf");

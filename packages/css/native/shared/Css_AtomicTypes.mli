@@ -76,12 +76,23 @@ module Length : sig
 
   type calc_value =
     [ length
+    | `calc of
+      [ length
+      | `add of calc_value * calc_value
+      | `sub of calc_value * calc_value
+      | `mult of calc_value * calc_value
+      ]
     | `num of float
     ]
 
   and t =
     [ length
-    | `calc of [ length | `add of t * t | `sub of t * t | `mult of t * t ]
+    | `calc of
+      [ length
+      | `add of calc_value * calc_value
+      | `sub of calc_value * calc_value
+      | `mult of calc_value * calc_value
+      ]
     ]
 
   val ch : 'a -> [> `ch of 'a ]

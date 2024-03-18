@@ -14,25 +14,33 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   >  (preprocess (pps styled-ppx.lib)))
   > EOF
 
-  $ dune describe pp input.re
-  /* CSS Containment Module Level 1 */
-  [%css {|contain: none|}];
-  [%css {|contain: strict|}];
-  [%css {|contain: content|}];
-  [%css {|contain: size|}];
-  [%css {|contain: layout|}];
-  [%css {|contain: paint|}];
-  [%css {|contain: size layout|}];
-  [%css {|contain: size paint|}];
-  [%css {|contain: size layout paint|}];
-  
-  /* CSS Containment Module Level 2 */
-  /* [%css {|contain: style|}]; */
-  /* [%css {|contain: size style|}]; */
-  /* [%css {|contain: size layout style|}]; */
-  /* [%css {|contain: size layout style paint|}]; */
-  /* [%css {|content-visibility: visible|}]; */
-  /* [%css {|content-visibility: auto|}]; */
-  /* [%css {|content-visibility: hidden|}]; */
-
   $ dune build
+
+  $ dune_describe_pp _build/default/input.re.pp.ml | refmt --parse ml --print re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      load_path: [],
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      transparent_modules: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];
+  CssJs.unsafe({js|contain|js}, {js|none|js});
+  CssJs.unsafe({js|contain|js}, {js|strict|js});
+  CssJs.unsafe({js|contain|js}, {js|content|js});
+  CssJs.unsafe({js|contain|js}, {js|size|js});
+  CssJs.unsafe({js|contain|js}, {js|layout|js});
+  CssJs.unsafe({js|contain|js}, {js|paint|js});
+  CssJs.unsafe({js|contain|js}, {js|size layout|js});
+  CssJs.unsafe({js|contain|js}, {js|size paint|js});
+  CssJs.unsafe({js|contain|js}, {js|size layout paint|js});

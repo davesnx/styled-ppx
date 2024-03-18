@@ -14,94 +14,124 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   >  (preprocess (pps styled-ppx.lib)))
   > EOF
 
-  $ dune describe pp input.re
-  /* CSS Text Decoration Module Level 3 */
-  /* [%css {|text-decoration: underline dotted green|}]; */
-  [%css {|text-decoration-line: none|}];
-  [%css {|text-decoration-line: underline|}];
-  [%css {|text-decoration-line: overline|}];
-  [%css {|text-decoration-line: line-through|}];
-  [%css {|text-decoration-line: underline overline|}];
-  [%css {|text-decoration-color: white|}];
-  [%css {|text-decoration-style: solid|}];
-  [%css {|text-decoration-style: double|}];
-  [%css {|text-decoration-style: dotted|}];
-  [%css {|text-decoration-style: dashed|}];
-  [%css {|text-decoration-style: wavy|}];
-  [%css {|text-underline-position: auto|}];
-  [%css {|text-underline-position: under|}];
-  [%css {|text-underline-position: left|}];
-  [%css {|text-underline-position: right|}];
-  [%css {|text-underline-position: under left|}];
-  [%css {|text-underline-position: under right|}];
-  [%css {|text-emphasis-style: none|}];
-  [%css {|text-emphasis-style: filled|}];
-  [%css {|text-emphasis-style: open|}];
-  [%css {|text-emphasis-style: dot|}];
-  [%css {|text-emphasis-style: circle|}];
-  [%css {|text-emphasis-style: double-circle|}];
-  [%css {|text-emphasis-style: triangle|}];
-  [%css {|text-emphasis-style: sesame|}];
-  [%css {|text-emphasis-style: open dot|}];
-  [%css {|text-emphasis-style: 'foo'|}];
-  [%css {|text-emphasis-color: green|}];
-  [%css {|text-emphasis: open dot green|}];
-  [%css {|text-emphasis-position: left|}];
-  [%css {|text-emphasis-position: over|}];
-  [%css {|text-emphasis-position: under|}];
-  [%css {|text-emphasis-position: over left|}];
-  [%css {|text-emphasis-position: over right|}];
-  [%css {|text-emphasis-position: under left|}];
-  [%css {|text-emphasis-position: left under|}];
-  [%css {|text-emphasis-position: under right|}];
-  [%css {|text-shadow: none|}];
-  /* The following shadow declarations are not supported in the CSS Parser */
-  /* [%css {|text-shadow: 1px 1px|}]; */
-  /* [%css {|text-shadow: 0 0 black|}]; */
-  [%css {|text-shadow: 1px 2px 3px black|}];
-  
-  /* CSS Text Decoration Module Level 4 */
-  /* [%css {|text-decoration: underline solid blue 1px|}]; */
-  [%css {|text-decoration-skip: none|}];
-  [%css {|text-decoration-skip: objects|}];
-  [%css {|text-decoration-skip: objects spaces|}];
-  [%css {|text-decoration-skip: objects leading-spaces|}];
-  [%css {|text-decoration-skip: objects trailing-spaces|}];
-  [%css {|text-decoration-skip: objects leading-spaces trailing-spaces|}];
-  [%css {|text-decoration-skip: objects leading-spaces trailing-spaces edges|}];
-  [%css
-    {|text-decoration-skip: objects leading-spaces trailing-spaces edges box-decoration|}
-  ];
-  [%css {|text-decoration-skip: objects edges|}];
-  [%css {|text-decoration-skip: objects box-decoration|}];
-  [%css {|text-decoration-skip: spaces|}];
-  [%css {|text-decoration-skip: spaces edges|}];
-  [%css {|text-decoration-skip: spaces edges box-decoration|}];
-  [%css {|text-decoration-skip: spaces box-decoration|}];
-  [%css {|text-decoration-skip: leading-spaces|}];
-  [%css {|text-decoration-skip: leading-spaces trailing-spaces edges|}];
-  [%css
-    {|text-decoration-skip: leading-spaces trailing-spaces edges box-decoration|}
-  ];
-  [%css {|text-decoration-skip: edges|}];
-  [%css {|text-decoration-skip: edges box-decoration|}];
-  [%css {|text-decoration-skip: box-decoration|}];
-  [%css {|text-decoration-skip-ink: none|}];
-  [%css {|text-decoration-skip-ink: auto|}];
-  [%css {|text-decoration-skip-ink: all|}];
-  [%css {|text-decoration-skip-box: none|}];
-  [%css {|text-decoration-skip-box: all|}];
-  [%css {|text-decoration-skip-inset: none|}];
-  [%css {|text-decoration-skip-inset: auto|}];
-  [%css {|text-underline-offset: auto|}];
-  [%css {|text-underline-offset: 3px|}];
-  [%css {|text-underline-offset: 10%|}];
-  [%css {|text-decoration-thickness: auto|}];
-  [%css {|text-decoration-thickness: from-font|}];
-  [%css {|text-decoration-thickness: 3px|}];
-  [%css {|text-decoration-thickness: 10%|}];
-
   $ dune build
   File "input.re", line 1, characters 23-28:
   Error: Property 'text-emphasis-position' has an invalid value: 'left'
   [1]
+
+  $ dune_describe_pp _build/default/input.re.pp.ml | refmt --parse ml --print re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      load_path: [],
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      transparent_modules: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];
+  CssJs.textDecorationLine(`none);
+  CssJs.textDecorationLine(`underline);
+  CssJs.textDecorationLine(`overline);
+  CssJs.textDecorationLine(`lineThrough);
+  CssJs.unsafe({js|textDecorationLine|js}, {js|underline overline|js});
+  CssJs.textDecorationColor(CssJs.white);
+  CssJs.textDecorationStyle(`solid);
+  CssJs.textDecorationStyle(`double);
+  CssJs.textDecorationStyle(`dotted);
+  CssJs.textDecorationStyle(`dashed);
+  CssJs.textDecorationStyle(`wavy);
+  CssJs.unsafe({js|textUnderlinePosition|js}, {js|auto|js});
+  CssJs.unsafe({js|textUnderlinePosition|js}, {js|under|js});
+  CssJs.unsafe({js|textUnderlinePosition|js}, {js|left|js});
+  CssJs.unsafe({js|textUnderlinePosition|js}, {js|right|js});
+  CssJs.unsafe({js|textUnderlinePosition|js}, {js|under left|js});
+  CssJs.unsafe({js|textUnderlinePosition|js}, {js|under right|js});
+  CssJs.textEmphasisStyle(`none);
+  CssJs.textEmphasisStyle(`filled);
+  CssJs.textEmphasisStyle(`open_);
+  CssJs.textEmphasisStyle(`dot);
+  CssJs.textEmphasisStyle(`circle);
+  CssJs.textEmphasisStyle(`double_circle);
+  CssJs.textEmphasisStyle(`triangle);
+  CssJs.textEmphasisStyle(`sesame);
+  CssJs.textEmphasisStyles(`open_, `dot);
+  CssJs.textEmphasisStyle(`string({js|foo|js}));
+  CssJs.textEmphasisColor(CssJs.green);
+  CssJs.unsafe({js|textEmphasis|js}, {js|open dot green|js});
+  [%ocaml.error
+    "Property 'text-emphasis-position' has an invalid value: 'left'"
+  ];
+  CssJs.textEmphasisPosition(`over);
+  CssJs.textEmphasisPosition(`under);
+  CssJs.textEmphasisPositions(`over, `left);
+  CssJs.textEmphasisPositions(`over, `right);
+  CssJs.textEmphasisPositions(`under, `left);
+  CssJs.textEmphasisPositions(`under, `left);
+  CssJs.textEmphasisPositions(`under, `right);
+  CssJs.textShadow(`none);
+  CssJs.textShadow(
+    CssJs.Shadow.text(
+      ~x=`pxFloat(1.),
+      ~y=`pxFloat(2.),
+      ~blur=`pxFloat(3.),
+      CssJs.black,
+    ),
+  );
+  CssJs.unsafe({js|textDecorationSkip|js}, {js|none|js});
+  CssJs.unsafe({js|textDecorationSkip|js}, {js|objects|js});
+  CssJs.unsafe({js|textDecorationSkip|js}, {js|objects spaces|js});
+  CssJs.unsafe({js|textDecorationSkip|js}, {js|objects leading-spaces|js});
+  CssJs.unsafe({js|textDecorationSkip|js}, {js|objects trailing-spaces|js});
+  CssJs.unsafe(
+    {js|textDecorationSkip|js},
+    {js|objects leading-spaces trailing-spaces|js},
+  );
+  CssJs.unsafe(
+    {js|textDecorationSkip|js},
+    {js|objects leading-spaces trailing-spaces edges|js},
+  );
+  CssJs.unsafe(
+    {js|textDecorationSkip|js},
+    {js|objects leading-spaces trailing-spaces edges box-decoration|js},
+  );
+  CssJs.unsafe({js|textDecorationSkip|js}, {js|objects edges|js});
+  CssJs.unsafe({js|textDecorationSkip|js}, {js|objects box-decoration|js});
+  CssJs.unsafe({js|textDecorationSkip|js}, {js|spaces|js});
+  CssJs.unsafe({js|textDecorationSkip|js}, {js|spaces edges|js});
+  CssJs.unsafe({js|textDecorationSkip|js}, {js|spaces edges box-decoration|js});
+  CssJs.unsafe({js|textDecorationSkip|js}, {js|spaces box-decoration|js});
+  CssJs.unsafe({js|textDecorationSkip|js}, {js|leading-spaces|js});
+  CssJs.unsafe(
+    {js|textDecorationSkip|js},
+    {js|leading-spaces trailing-spaces edges|js},
+  );
+  CssJs.unsafe(
+    {js|textDecorationSkip|js},
+    {js|leading-spaces trailing-spaces edges box-decoration|js},
+  );
+  CssJs.unsafe({js|textDecorationSkip|js}, {js|edges|js});
+  CssJs.unsafe({js|textDecorationSkip|js}, {js|edges box-decoration|js});
+  CssJs.unsafe({js|textDecorationSkip|js}, {js|box-decoration|js});
+  CssJs.textDecorationSkipInk(`none);
+  CssJs.textDecorationSkipInk(`auto);
+  CssJs.textDecorationSkipInk(`all);
+  CssJs.textDecorationSkipBox(`none);
+  CssJs.textDecorationSkipBox(`all);
+  CssJs.textDecorationSkipInset(`none);
+  CssJs.textDecorationSkipInset(`auto);
+  CssJs.unsafe({js|textUnderlineOffset|js}, {js|auto|js});
+  CssJs.unsafe({js|textUnderlineOffset|js}, {js|3px|js});
+  CssJs.unsafe({js|textUnderlineOffset|js}, {js|10%|js});
+  CssJs.textDecorationThickness(`auto);
+  CssJs.unsafe({js|textDecorationThickness|js}, {js|from-font|js});
+  CssJs.textDecorationThickness(`pxFloat(3.));
+  CssJs.textDecorationThickness(`percent(10.));

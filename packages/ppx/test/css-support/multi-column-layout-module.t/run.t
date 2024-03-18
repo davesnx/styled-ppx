@@ -14,32 +14,47 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   >  (preprocess (pps styled-ppx.lib)))
   > EOF
 
-  $ dune describe pp input.re
-  /* CSS Multi-column Layout Module Level 1 */
-  [%css {|column-width: 10em|}];
-  [%css {|column-width: auto|}];
-  [%css {|column-count: 2|}];
-  [%css {|column-count: auto|}];
-  [%css {|columns: 100px|}];
-  [%css {|columns: 3|}];
-  [%css {|columns: 10em 2|}];
-  /* [%css {|columns: auto 2|}]; */
-  /* [%css {|columns: 10em auto|}]; */
-  [%css {|columns: auto auto|}];
-  [%css {|columns: 2 10em|}];
-  [%css {|columns: auto 10em|}];
-  [%css {|columns: 2 auto|}];
-  [%css {|column-rule-color: red|}];
-  [%css {|column-rule-style: none|}];
-  [%css {|column-rule-style: solid|}];
-  [%css {|column-rule-style: dotted|}];
-  [%css {|column-rule-width: 1px|}];
-  [%css {|column-rule: transparent|}];
-  [%css {|column-rule: 1px solid black|}];
-  [%css {|column-span: none|}];
-  [%css {|column-span: all|}];
-  [%css {|column-fill: auto|}];
-  [%css {|column-fill: balance|}];
-  [%css {|column-fill: balance-all|}];
-
   $ dune build
+
+  $ dune_describe_pp _build/default/input.re.pp.ml | refmt --parse ml --print re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      load_path: [],
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      transparent_modules: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];
+  CssJs.columnWidth(`em(10.));
+  CssJs.columnWidth(`auto);
+  CssJs.unsafe({js|columnCount|js}, {js|2|js});
+  CssJs.unsafe({js|columnCount|js}, {js|auto|js});
+  CssJs.unsafe({js|columns|js}, {js|100px|js});
+  CssJs.unsafe({js|columns|js}, {js|3|js});
+  CssJs.unsafe({js|columns|js}, {js|10em 2|js});
+  CssJs.unsafe({js|columns|js}, {js|auto auto|js});
+  CssJs.unsafe({js|columns|js}, {js|2 10em|js});
+  CssJs.unsafe({js|columns|js}, {js|auto 10em|js});
+  CssJs.unsafe({js|columns|js}, {js|2 auto|js});
+  CssJs.unsafe({js|columnRuleColor|js}, {js|red|js});
+  CssJs.unsafe({js|columnRuleStyle|js}, {js|none|js});
+  CssJs.unsafe({js|columnRuleStyle|js}, {js|solid|js});
+  CssJs.unsafe({js|columnRuleStyle|js}, {js|dotted|js});
+  CssJs.unsafe({js|columnRuleWidth|js}, {js|1px|js});
+  CssJs.unsafe({js|columnRule|js}, {js|transparent|js});
+  CssJs.unsafe({js|columnRule|js}, {js|1px solid black|js});
+  CssJs.unsafe({js|columnSpan|js}, {js|none|js});
+  CssJs.unsafe({js|columnSpan|js}, {js|all|js});
+  CssJs.unsafe({js|columnFill|js}, {js|auto|js});
+  CssJs.unsafe({js|columnFill|js}, {js|balance|js});
+  CssJs.unsafe({js|columnFill|js}, {js|balance-all|js});

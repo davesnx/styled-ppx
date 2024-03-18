@@ -14,39 +14,48 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   >  (preprocess (pps styled-ppx.lib)))
   > EOF
 
-  $ dune describe pp input.re
-  /* CSS Overflow Module Level 3 */
-  [%css {|line-clamp: none|}];
-  [%css {|line-clamp: 1|}];
-  /* [%css {|line-clamp: 5 clip|}]; */
-  /* [%css {|line-clamp: 5 ellipsis|}]; */
-  [%css {|max-lines: none|}];
-  [%css {|max-lines: 1|}];
-  [%css {|overflow-x: visible|}];
-  [%css {|overflow-x: hidden|}];
-  [%css {|overflow-x: clip|}];
-  [%css {|overflow-x: scroll|}];
-  [%css {|overflow-x: auto|}];
-  [%css {|overflow-y: visible|}];
-  [%css {|overflow-y: hidden|}];
-  [%css {|overflow-y: clip|}];
-  [%css {|overflow-y: scroll|}];
-  [%css {|overflow-y: auto|}];
-  [%css {|overflow-inline: visible|}];
-  [%css {|overflow-inline: hidden|}];
-  [%css {|overflow-inline: clip|}];
-  [%css {|overflow-inline: scroll|}];
-  [%css {|overflow-inline: auto|}];
-  [%css {|overflow-block: visible|}];
-  [%css {|overflow-block: hidden|}];
-  [%css {|overflow-block: clip|}];
-  [%css {|overflow-block: scroll|}];
-  [%css {|overflow-block: auto|}];
-  /* [%css {|overflow-clip-margin: content-box|}]; */
-  /* [%css {|overflow-clip-margin: padding-box|}]; */
-  /* [%css {|overflow-clip-margin: border-box|}]; */
-  /* [%css {|overflow-clip-margin: 20px|}]; */
-  /* [%css {|continue: auto|}]; */
-  /* [%css {|continue: discard|}]; */
-
   $ dune build
+
+  $ dune_describe_pp _build/default/input.re.pp.ml | refmt --parse ml --print re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      load_path: [],
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      transparent_modules: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];
+  CssJs.unsafe({js|lineClamp|js}, {js|none|js});
+  CssJs.unsafe({js|lineClamp|js}, {js|1|js});
+  CssJs.unsafe({js|maxLines|js}, {js|none|js});
+  CssJs.unsafe({js|maxLines|js}, {js|1|js});
+  CssJs.overflowX(`visible);
+  CssJs.overflowX(`hidden);
+  CssJs.overflowX(`clip);
+  CssJs.overflowX(`scroll);
+  CssJs.overflowX(`auto);
+  CssJs.overflowY(`visible);
+  CssJs.overflowY(`hidden);
+  CssJs.overflowY(`clip);
+  CssJs.overflowY(`scroll);
+  CssJs.overflowY(`auto);
+  CssJs.overflowInline(`visible);
+  CssJs.overflowInline(`hidden);
+  CssJs.overflowInline(`clip);
+  CssJs.overflowInline(`scroll);
+  CssJs.overflowInline(`auto);
+  CssJs.overflowBlock(`visible);
+  CssJs.overflowBlock(`hidden);
+  CssJs.overflowBlock(`clip);
+  CssJs.overflowBlock(`scroll);
+  CssJs.overflowBlock(`auto);

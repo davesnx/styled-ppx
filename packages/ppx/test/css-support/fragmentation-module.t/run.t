@@ -14,45 +14,62 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   >  (preprocess (pps styled-ppx.lib)))
   > EOF
 
-  $ dune describe pp input.re
-  /* CSS Fragmentation Module Level 3 */
-  [%css {|break-before: auto|}];
-  [%css {|break-before: avoid|}];
-  [%css {|break-before: avoid-page|}];
-  [%css {|break-before: page|}];
-  [%css {|break-before: left|}];
-  [%css {|break-before: right|}];
-  [%css {|break-before: recto|}];
-  [%css {|break-before: verso|}];
-  [%css {|break-before: avoid-column|}];
-  [%css {|break-before: column|}];
-  [%css {|break-before: avoid-region|}];
-  [%css {|break-before: region|}];
-  [%css {|break-after: auto|}];
-  [%css {|break-after: avoid|}];
-  [%css {|break-after: avoid-page|}];
-  [%css {|break-after: page|}];
-  [%css {|break-after: left|}];
-  [%css {|break-after: right|}];
-  [%css {|break-after: recto|}];
-  [%css {|break-after: verso|}];
-  [%css {|break-after: avoid-column|}];
-  [%css {|break-after: column|}];
-  [%css {|break-after: avoid-region|}];
-  [%css {|break-after: region|}];
-  [%css {|break-inside: auto|}];
-  [%css {|break-inside: avoid|}];
-  [%css {|break-inside: avoid-page|}];
-  [%css {|break-inside: avoid-column|}];
-  [%css {|break-inside: avoid-region|}];
-  [%css {|box-decoration-break: slice|}];
-  [%css {|box-decoration-break: clone|}];
-  [%css {|orphans: 1|}];
-  [%css {|orphans: 2|}];
-  [%css {|widows: 1|}];
-  [%css {|widows: 2|}];
-
   $ dune build
   File "input.re", line 1, characters 7-9:
   Error: Unbound value CssJs.widows
   [1]
+
+  $ dune_describe_pp _build/default/input.re.pp.ml | refmt --parse ml --print re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      load_path: [],
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      transparent_modules: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];
+  CssJs.unsafe({js|breakBefore|js}, {js|auto|js});
+  CssJs.unsafe({js|breakBefore|js}, {js|avoid|js});
+  CssJs.unsafe({js|breakBefore|js}, {js|avoid-page|js});
+  CssJs.unsafe({js|breakBefore|js}, {js|page|js});
+  CssJs.unsafe({js|breakBefore|js}, {js|left|js});
+  CssJs.unsafe({js|breakBefore|js}, {js|right|js});
+  CssJs.unsafe({js|breakBefore|js}, {js|recto|js});
+  CssJs.unsafe({js|breakBefore|js}, {js|verso|js});
+  CssJs.unsafe({js|breakBefore|js}, {js|avoid-column|js});
+  CssJs.unsafe({js|breakBefore|js}, {js|column|js});
+  CssJs.unsafe({js|breakBefore|js}, {js|avoid-region|js});
+  CssJs.unsafe({js|breakBefore|js}, {js|region|js});
+  CssJs.unsafe({js|breakAfter|js}, {js|auto|js});
+  CssJs.unsafe({js|breakAfter|js}, {js|avoid|js});
+  CssJs.unsafe({js|breakAfter|js}, {js|avoid-page|js});
+  CssJs.unsafe({js|breakAfter|js}, {js|page|js});
+  CssJs.unsafe({js|breakAfter|js}, {js|left|js});
+  CssJs.unsafe({js|breakAfter|js}, {js|right|js});
+  CssJs.unsafe({js|breakAfter|js}, {js|recto|js});
+  CssJs.unsafe({js|breakAfter|js}, {js|verso|js});
+  CssJs.unsafe({js|breakAfter|js}, {js|avoid-column|js});
+  CssJs.unsafe({js|breakAfter|js}, {js|column|js});
+  CssJs.unsafe({js|breakAfter|js}, {js|avoid-region|js});
+  CssJs.unsafe({js|breakAfter|js}, {js|region|js});
+  CssJs.unsafe({js|breakInside|js}, {js|auto|js});
+  CssJs.unsafe({js|breakInside|js}, {js|avoid|js});
+  CssJs.unsafe({js|breakInside|js}, {js|avoid-page|js});
+  CssJs.unsafe({js|breakInside|js}, {js|avoid-column|js});
+  CssJs.unsafe({js|breakInside|js}, {js|avoid-region|js});
+  CssJs.unsafe({js|boxDecorationBreak|js}, {js|slice|js});
+  CssJs.unsafe({js|boxDecorationBreak|js}, {js|clone|js});
+  CssJs.unsafe({js|orphans|js}, {js|1|js});
+  CssJs.unsafe({js|orphans|js}, {js|2|js});
+  CssJs.widows(1);
+  CssJs.widows(2);

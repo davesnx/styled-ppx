@@ -1541,35 +1541,11 @@ let flexBasis x =
 
 let order x = D ({js|order|js}, Std.Int.toString x)
 
-let string_of_calc x fn =
-  match x with
-  | `one a -> {js|calc(|js} ^ fn a ^ {js|)|js}
-  | `add (a, b) -> {js|calc(|js} ^ fn a ^ {js| + |js} ^ fn b ^ {js|)|js}
-  | `sub (a, b) -> {js|calc(|js} ^ fn a ^ {js| - |js} ^ fn b ^ {js|)|js}
-  | `mult (a, b) -> {js|calc(|js} ^ fn a ^ {js| * |js} ^ fn b ^ {js|)|js}
-
 let string_of_minmax x =
   match x with
   | `auto -> {js|auto|js}
-  | `calc c -> string_of_calc c Length.toString
-  | `ch x -> Std.Float.toString x ^ {js|ch|js}
-  | `cm x -> Std.Float.toString x ^ {js|cm|js}
-  | `em x -> Std.Float.toString x ^ {js|em|js}
-  | `ex x -> Std.Float.toString x ^ {js|ex|js}
-  | `mm x -> Std.Float.toString x ^ {js|mm|js}
-  | `percent x -> Std.Float.toString x ^ {js|%|js}
-  | `pt x -> Std.Int.toString x ^ {js|pt|js}
-  | `px x -> Std.Int.toString x ^ {js|px|js}
-  | `pxFloat x -> Std.Float.toString x ^ {js|px|js}
-  | `rem x -> Std.Float.toString x ^ {js|rem|js}
-  | `vh x -> Std.Float.toString x ^ {js|vh|js}
-  | `vmax x -> Std.Float.toString x ^ {js|vmax|js}
-  | `vmin x -> Std.Float.toString x ^ {js|vmin|js}
-  | `vw x -> Std.Float.toString x ^ {js|vw|js}
+  | #Length.t as l -> Length.toString l
   | `fr x -> Std.Float.toString x ^ {js|fr|js}
-  | `inch x -> Std.Float.toString x ^ {js|in|js}
-  | `pc x -> Std.Float.toString x ^ {js|pc|js}
-  | `zero -> {js|0|js}
   | `minContent -> {js|min-content|js}
   | `maxContent -> {js|max-content|js}
 
@@ -1577,25 +1553,8 @@ let string_of_dimension x =
   match x with
   | `auto -> {js|auto|js}
   | `none -> {js|none|js}
-  | `calc c -> string_of_calc c Length.toString
-  | `ch x -> Std.Float.toString x ^ {js|ch|js}
-  | `cm x -> Std.Float.toString x ^ {js|cm|js}
-  | `em x -> Std.Float.toString x ^ {js|em|js}
-  | `ex x -> Std.Float.toString x ^ {js|ex|js}
-  | `mm x -> Std.Float.toString x ^ {js|mm|js}
-  | `percent x -> Std.Float.toString x ^ {js|%|js}
-  | `pt x -> Std.Int.toString x ^ {js|pt|js}
-  | `px x -> Std.Int.toString x ^ {js|px|js}
-  | `pxFloat x -> Std.Float.toString x ^ {js|px|js}
-  | `rem x -> Std.Float.toString x ^ {js|rem|js}
-  | `vh x -> Std.Float.toString x ^ {js|vh|js}
-  | `vmax x -> Std.Float.toString x ^ {js|vmax|js}
-  | `vmin x -> Std.Float.toString x ^ {js|vmin|js}
-  | `vw x -> Std.Float.toString x ^ {js|vw|js}
+  | #Length.t as l -> Length.toString l
   | `fr x -> Std.Float.toString x ^ {js|fr|js}
-  | `inch x -> Std.Float.toString x ^ {js|in|js}
-  | `pc x -> Std.Float.toString x ^ {js|pc|js}
-  | `zero -> {js|0|js}
   | `fitContent -> {js|fit-content|js}
   | `minContent -> {js|min-content|js}
   | `maxContent -> {js|max-content|js}
@@ -1633,7 +1592,7 @@ let rec gridLengthToJs x =
   | `name name -> name
   | `none -> {js|none|js}
   | `auto -> {js|auto|js}
-  | `calc c -> string_of_calc c Length.toString
+  | `calc c -> Length.calc_to_string c
   | `ch x -> Std.Float.toString x ^ {js|ch|js}
   | `cm x -> Std.Float.toString x ^ {js|cm|js}
   | `em x -> Std.Float.toString x ^ {js|em|js}

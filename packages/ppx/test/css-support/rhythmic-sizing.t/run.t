@@ -14,32 +14,29 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   >  (preprocess (pps styled-ppx.lib)))
   > EOF
 
-  $ dune describe pp input.re
-  /* CSS Rhythmic Sizing */
-  /* [%css {|line-height-step: none|}]; */
-  [%css {|line-height-step: 30px|}];
-  [%css {|line-height-step: 2em|}];
-  /* [%css {|block-step-size: none|}]; */
-  /* [%css {|block-step-size: 30px|}]; */
-  /* [%css {|block-step-size: 2em|}]; */
-  /* [%css {|block-step-insert: margin|}]; */
-  /* [%css {|block-step-insert: padding|}]; */
-  /* [%css {|block-step-align: auto|}]; */
-  /* [%css {|block-step-align: center|}]; */
-  /* [%css {|block-step-align: start|}]; */
-  /* [%css {|block-step-align: end|}]; */
-  /* [%css {|block-step-round: up|}]; */
-  /* [%css {|block-step-round: down|}]; */
-  /* [%css {|block-step-round: nearest|}]; */
-  /* [%css {|block-step: none|}]; */
-  /* [%css {|block-step: padding|}]; */
-  /* [%css {|block-step: end|}]; */
-  /* [%css {|block-step: down|}]; */
-  /* [%css {|block-step: 30px margin|}]; */
-  /* [%css {|block-step: 30px padding center|}]; */
-  /* [%css {|block-step: 2em padding start nearest|}]; */
-
   $ dune build
   File "input.re", line 1, characters 17-22:
   Error: Unbound value CssJs.lineHeightStep
   [1]
+
+  $ dune_describe_pp _build/default/input.re.pp.ml | refmt --parse ml --print re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      load_path: [],
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      transparent_modules: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];
+  CssJs.lineHeightStep(`pxFloat(30.));
+  CssJs.lineHeightStep(`em(2.));

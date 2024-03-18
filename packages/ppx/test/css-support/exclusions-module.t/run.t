@@ -14,16 +14,24 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   >  (preprocess (pps styled-ppx.lib)))
   > EOF
 
-  $ dune describe pp input.re
-  /* CSS Exclusions Module Level 1 */
-    /* [%css {|wrap-flow: auto|}]; */
-    /* [%css {|wrap-flow: both|}]; */
-    /* [%css {|wrap-flow: start|}]; */
-    /* [%css {|wrap-flow: end|}]; */
-    /* [%css {|wrap-flow: minimum|}]; */
-    /* [%css {|wrap-flow: maximum|}]; */
-    /* [%css {|wrap-flow: clear|}]; */
-    /* [%css {|wrap-through: wrap|}]; */
-    /* [%css {|wrap-through: none|}]; */
-
   $ dune build
+
+  $ dune_describe_pp _build/default/input.re.pp.ml | refmt --parse ml --print re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      load_path: [],
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      transparent_modules: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];

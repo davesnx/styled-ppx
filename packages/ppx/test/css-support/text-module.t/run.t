@@ -14,115 +14,86 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   >  (preprocess (pps styled-ppx.lib)))
   > EOF
 
-  $ dune describe pp input.re
-  /* CSS Text Module Level 3 */
-  [%css {|text-transform: full-width|}];
-  [%css {|text-transform: full-size-kana|}];
-  /* [%css {|text-transform: capitalize full-width|}]; */
-  /* [%css {|text-transform: capitalize full-width full-size-kana|}]; */
-  [%css {|tab-size: 4|}];
-  [%css {|tab-size: 1em|}];
-  [%css {|line-break: auto|}];
-  [%css {|line-break: loose|}];
-  [%css {|line-break: normal|}];
-  [%css {|line-break: strict|}];
-  [%css {|line-break: anywhere|}];
-  [%css {|word-break: normal|}];
-  [%css {|word-break: keep-all|}];
-  [%css {|word-break: break-all|}];
-  [%css {|white-space: break-spaces|}];
-  [%css {|hyphens: auto|}];
-  [%css {|hyphens: manual|}];
-  [%css {|hyphens: none|}];
-  [%css {|overflow-wrap: normal|}];
-  [%css {|overflow-wrap: break-word|}];
-  [%css {|overflow-wrap: anywhere|}];
-  [%css {|word-wrap: normal|}];
-  [%css {|word-wrap: break-word|}];
-  [%css {|word-wrap: anywhere|}];
-  [%css {|text-align: start|}];
-  [%css {|text-align: end|}];
-  [%css {|text-align: left|}];
-  [%css {|text-align: right|}];
-  [%css {|text-align: center|}];
-  [%css {|text-align: justify|}];
-  [%css {|text-align: match-parent|}];
-  [%css {|text-align: justify-all|}];
-  [%css {|text-align-all: start|}];
-  [%css {|text-align-all: end|}];
-  [%css {|text-align-all: left|}];
-  [%css {|text-align-all: right|}];
-  [%css {|text-align-all: center|}];
-  [%css {|text-align-all: justify|}];
-  [%css {|text-align-all: match-parent|}];
-  [%css {|text-align-last: auto|}];
-  [%css {|text-align-last: start|}];
-  [%css {|text-align-last: end|}];
-  [%css {|text-align-last: left|}];
-  [%css {|text-align-last: right|}];
-  [%css {|text-align-last: center|}];
-  [%css {|text-align-last: justify|}];
-  [%css {|text-align-last: match-parent|}];
-  [%css {|text-justify: auto|}];
-  [%css {|text-justify: none|}];
-  [%css {|text-justify: inter-word|}];
-  [%css {|text-justify: inter-character|}];
-  [%css {|word-spacing: 50%|}];
-  [%css {|text-indent: 1em hanging|}];
-  [%css {|text-indent: 1em each-line|}];
-  [%css {|text-indent: 1em hanging each-line|}];
-  [%css {|hanging-punctuation: none|}];
-  [%css {|hanging-punctuation: first|}];
-  [%css {|hanging-punctuation: last|}];
-  [%css {|hanging-punctuation: force-end|}];
-  [%css {|hanging-punctuation: allow-end|}];
-  [%css {|hanging-punctuation: first last|}];
-  [%css {|hanging-punctuation: first force-end|}];
-  [%css {|hanging-punctuation: first force-end last|}];
-  [%css {|hanging-punctuation: first allow-end last|}];
-  
-  /* CSS Text Module Level 4 */
-  /* [%css {|text-space-collapse: collapse|}]; */
-  /* [%css {|text-space-collapse: discard|}]; */
-  /* [%css {|text-space-collapse: preserve|}]; */
-  /* [%css {|text-space-collapse: preserve-breaks|}]; */
-  /* [%css {|text-space-collapse: preserve-spaces|}]; */
-  /* [%css {|text-space-trim: none|}]; */
-  /* [%css {|text-space-trim: trim-inner|}]; */
-  /* [%css {|text-space-trim:  discard-before|}]; */
-  /* [%css {|text-space-trim: discard-after|}]; */
-  /* [%css {|text-space-trim: trim-inner discard-before|}]; */
-  /* [%css {|text-space-trim: trim-inner discard-before discard-after|}]; */
-  /* [%css {|text-wrap: wrap|}]; */
-  /* [%css {|text-wrap: nowrap|}]; */
-  /* [%css {|text-wrap: balance |}]; */
-  /* [%css {|wrap-before: auto|}]; */
-  /* [%css {|wrap-before: avoid|}]; */
-  /* [%css {|wrap-before: avoid-line|}]; */
-  /* [%css {|wrap-before: avoid-flex|}]; */
-  /* [%css {|wrap-before: line|}]; */
-  /* [%css {|wrap-before: flex|}]; */
-  /* [%css {|wrap-after: auto|}]; */
-  /* [%css {|wrap-after: avoid|}]; */
-  /* [%css {|wrap-after: avoid-line|}]; */
-  /* [%css {|wrap-after: avoid-flex|}]; */
-  /* [%css {|wrap-after: line|}]; */
-  /* [%css {|wrap-after: flex|}]; */
-  /* [%css {|wrap-inside: auto|}]; */
-  /* [%css {|wrap-inside: avoid|}]; */
-  /* [%css {|hyphenate-character: auto|}]; */
-  /* [%css {|hyphenate-limit-zone: 1%|}]; */
-  /* [%css {|hyphenate-limit-zone: 1em|}]; */
-  /* [%css {|hyphenate-limit-chars: auto|}]; */
-  /* [%css {|hyphenate-limit-chars: 5|}]; */
-  /* [%css {|hyphenate-limit-chars: auto 3|}]; */
-  /* [%css {|hyphenate-limit-chars: 5 4 3|}]; */
-  /* [%css {|hyphenate-limit-lines: no-limit|}]; */
-  /* [%css {|hyphenate-limit-lines: 2|}]; */
-  /* [%css {|hyphenate-limit-last: none|}]; */
-  /* [%css {|hyphenate-limit-last: always|}]; */
-  /* [%css {|hyphenate-limit-last: column|}]; */
-  /* [%css {|hyphenate-limit-last: page|}]; */
-  /* [%css {|hyphenate-limit-last: spread|}]; */
-
   $ dune build
+
+  $ dune_describe_pp _build/default/input.re.pp.ml | refmt --parse ml --print re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      load_path: [],
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      transparent_modules: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];
+  CssJs.unsafe({js|textTransform|js}, {js|full-width|js});
+  CssJs.unsafe({js|textTransform|js}, {js|full-size-kana|js});
+  CssJs.tabSize(`num(4.));
+  CssJs.tabSize(`em(1.));
+  CssJs.lineBreak(`auto);
+  CssJs.lineBreak(`loose);
+  CssJs.lineBreak(`normal);
+  CssJs.lineBreak(`strict);
+  CssJs.lineBreak(`anywhere);
+  CssJs.wordBreak(`normal);
+  CssJs.wordBreak(`keepAll);
+  CssJs.wordBreak(`breakAll);
+  CssJs.whiteSpace(`breakSpaces);
+  CssJs.hyphens(`auto);
+  CssJs.hyphens(`manual);
+  CssJs.hyphens(`none);
+  CssJs.overflowWrap(`normal);
+  CssJs.unsafe({js|overflowWrap|js}, {js|break-word|js});
+  CssJs.overflowWrap(`anywhere);
+  CssJs.wordWrap(`normal);
+  CssJs.unsafe({js|wordWrap|js}, {js|break-word|js});
+  CssJs.wordWrap(`anywhere);
+  CssJs.textAlign(`start);
+  CssJs.textAlign(`end_);
+  CssJs.textAlign(`left);
+  CssJs.textAlign(`right);
+  CssJs.textAlign(`center);
+  CssJs.textAlign(`justify);
+  CssJs.textAlign(`matchParent);
+  CssJs.textAlign(`justifyAll);
+  CssJs.textAlignAll(`start);
+  CssJs.textAlignAll(`end_);
+  CssJs.textAlignAll(`left);
+  CssJs.textAlignAll(`right);
+  CssJs.textAlignAll(`center);
+  CssJs.textAlignAll(`justify);
+  CssJs.textAlignAll(`matchParent);
+  CssJs.textAlignLast(`auto);
+  CssJs.textAlignLast(`start);
+  CssJs.textAlignLast(`end_);
+  CssJs.textAlignLast(`left);
+  CssJs.textAlignLast(`right);
+  CssJs.textAlignLast(`center);
+  CssJs.textAlignLast(`justify);
+  CssJs.textAlignLast(`matchParent);
+  CssJs.textJustify(`auto);
+  CssJs.textJustify(`none);
+  CssJs.textJustify(`interWord);
+  CssJs.textJustify(`interCharacter);
+  CssJs.wordSpacing(`percent(50.));
+  CssJs.unsafe({js|textIndent|js}, {js|1em hanging|js});
+  CssJs.unsafe({js|textIndent|js}, {js|1em each-line|js});
+  CssJs.unsafe({js|textIndent|js}, {js|1em hanging each-line|js});
+  CssJs.unsafe({js|hangingPunctuation|js}, {js|none|js});
+  CssJs.unsafe({js|hangingPunctuation|js}, {js|first|js});
+  CssJs.unsafe({js|hangingPunctuation|js}, {js|last|js});
+  CssJs.unsafe({js|hangingPunctuation|js}, {js|force-end|js});
+  CssJs.unsafe({js|hangingPunctuation|js}, {js|allow-end|js});
+  CssJs.unsafe({js|hangingPunctuation|js}, {js|first last|js});
+  CssJs.unsafe({js|hangingPunctuation|js}, {js|first force-end|js});
+  CssJs.unsafe({js|hangingPunctuation|js}, {js|first force-end last|js});
+  CssJs.unsafe({js|hangingPunctuation|js}, {js|first allow-end last|js});

@@ -20,13 +20,16 @@
 [%css {|-moz-appearance: textfield;|}];
 [%css {|-webkit-appearance: none;|}];
 [%css {|-webkit-box-orient: vertical;|}];
-[%css
-  {|-webkit-box-shadow: inset 0 0 0 1000px $(Color.Background.selectedMuted);|}
-];
+
+module Color = {
+  let text = CssJs.hex("444");
+};
+
+[%css {|-webkit-box-shadow: inset 0 0 0 1000px $(Color.background);|}];
 [%css {|-webkit-line-clamp: 2;|}];
 [%css {|-webkit-overflow-scrolling: touch;|}];
 [%css {|-webkit-tap-highlight-color: transparent;|}];
-[%css {|-webkit-text-fill-color: $(Color.Text.primary);|}];
+[%css {|-webkit-text-fill-color: $(Color.text);|}];
 [%css {|animation: none;|}];
 [%css {|appearance: none;|}];
 [%css {|aspect-ratio: 21 / 8;|}];
@@ -66,9 +69,7 @@ let c = CssJs.hex("e15a46");
 [%css {|justify-items: start;|}];
 [%css {|justify-self: unset;|}];
 [%css {|left: unset;|}];
-
 let maskedImageUrl = `url("https://www.example.com/eye-uncrossed.svg");
-
 [%css {|mask-image: $(maskedImageUrl);|}];
 [%css {|mask-position: center center;|}];
 [%css {|mask-repeat: no-repeat;|}];
@@ -80,7 +81,7 @@ let maskedImageUrl = `url("https://www.example.com/eye-uncrossed.svg");
 [%css {|right: calc(50% - 4px);|}];
 [%css {|scroll-behavior: smooth;|}];
 [%css {|stroke-opacity: 0;|}];
-[%css {|stroke: $(Color.Text.white);|}];
+[%css {|stroke: $(Color.text);|}];
 [%css {|top: calc(50% - 1px);|}];
 [%css {|top: unset;|}];
 [%css {|touch-action: none;|}];
@@ -108,11 +109,13 @@ let maskedImageUrl = `url("https://www.example.com/eye-uncrossed.svg");
 [%css {|outline: medium solid red|}];
 
 /* CSS Overflow Module Level 3 */
+let lola = `hidden;
 [%css {|overflow: $(lola)|}];
 [%css {|overflow: hidden|}];
 [%css {|overflow-y: $(lola)|}];
 [%css {|overflow-x: hidden|}];
 
+let value = `clip;
 [%css {|overflow-block: hidden|}];
 [%css {|overflow-block: $(value)|}];
 [%css {|overflow-inline: $(value)|}];

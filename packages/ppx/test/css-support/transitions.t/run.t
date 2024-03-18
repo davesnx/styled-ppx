@@ -14,28 +14,45 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   >  (preprocess (pps styled-ppx.lib)))
   > EOF
 
-  $ dune describe pp input.re
-  /* CSS Transitions */
-  [%css {|transition-property: none|}];
-  [%css {|transition-property: all|}];
-  [%css {|transition-property: width|}];
-  [%css {|transition-property: width, height|}];
-  [%css {|transition-duration: 0s|}];
-  [%css {|transition-duration: 1s|}];
-  [%css {|transition-duration: 100ms|}];
-  [%css {|transition-timing-function: ease|}];
-  [%css {|transition-timing-function: linear|}];
-  [%css {|transition-timing-function: ease-in|}];
-  [%css {|transition-timing-function: ease-out|}];
-  [%css {|transition-timing-function: ease-in-out|}];
-  [%css {|transition-timing-function: cubic-bezier(.5, .5, .5, .5)|}];
-  [%css {|transition-timing-function: cubic-bezier(.5, 1.5, .5, -2.5)|}];
-  [%css {|transition-timing-function: step-start|}];
-  [%css {|transition-timing-function: step-end|}];
-  [%css {|transition-timing-function: steps(3, start)|}];
-  [%css {|transition-timing-function: steps(5, end)|}];
-  [%css {|transition-delay: 1s|}];
-  [%css {|transition-delay: -1s|}];
-  [%css {|transition: 1s 2s width linear|}];
-
   $ dune build
+
+  $ dune_describe_pp _build/default/input.re.pp.ml | refmt --parse ml --print re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      load_path: [],
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      transparent_modules: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];
+  CssJs.transitionProperty({js|none|js});
+  CssJs.transitionProperty({js|all|js});
+  CssJs.transitionProperty({js|width|js});
+  CssJs.unsafe({js|transitionProperty|js}, {js|width, height|js});
+  CssJs.transitionDuration(`s(0));
+  CssJs.transitionDuration(`s(1000));
+  CssJs.transitionDuration(`ms(100));
+  CssJs.transitionTimingFunction(`ease);
+  CssJs.transitionTimingFunction(`linear);
+  CssJs.transitionTimingFunction(`easeIn);
+  CssJs.transitionTimingFunction(`easeOut);
+  CssJs.transitionTimingFunction(`easeInOut);
+  CssJs.transitionTimingFunction(`cubicBezier((0.5, 0.5, 0.5, 0.5)));
+  CssJs.transitionTimingFunction(`cubicBezier((0.5, 1.5, 0.5, (-2.5))));
+  CssJs.transitionTimingFunction(`stepStart);
+  CssJs.transitionTimingFunction(`stepEnd);
+  CssJs.transitionTimingFunction(`steps((3, `start)));
+  CssJs.transitionTimingFunction(`steps((5, `end_)));
+  CssJs.transitionDelay(`s(1000));
+  CssJs.transitionDelay(`s(-1000));
+  CssJs.unsafe({js|transition|js}, {js|1s 2s width linear|js});
