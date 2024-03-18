@@ -16,7 +16,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
 
   $ dune build
 
-  $ dune_describe_pp _build/default/input.re.pp.ml | refmt --parse ml --print re
+  $ dune describe pp ./input.re.ml | refmt --parse ml --print re
   [@ocaml.ppx.context
     {
       tool_name: "ppx_driver",

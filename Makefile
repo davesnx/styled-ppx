@@ -124,9 +124,9 @@ test_e2e_rescript_v10_promote: ## Run End-to-end tests for JSX4
 test: build
 	@for target in $(TEST_TARGETS); do \
 		if [ "$(CI)" = "true" ]; then \
-			ALCOTEST_VERBOSE=true make test_$${target}; \
+			ALCOTEST_VERBOSE=true make $${target}; \
 		else \
-			ALCOTEST_VERBOSE=false make test_$${target}; \
+			ALCOTEST_VERBOSE=false make $${target}; \
 		fi \
 	done
 
