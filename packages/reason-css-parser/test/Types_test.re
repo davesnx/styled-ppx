@@ -1,81 +1,84 @@
-/* TODO: Run those tests */
-
+open Ppxlib;
 open Alcotest;
+
 let loc = Location.none;
 
-let compare = (input, expected, {expect, _}) => {
-  let typ = Str.type_(~loc, Recursive, [input]);
-  let result = Pprintast.string_of_structure([typ]);
-  let expected = Pprintast.string_of_structure([expected]);
-  expect.string(result).toEqual(expected);
-};
-
-let gen_type = (name, expr) => {
-  let value_binding =
-    Vb.mk(~loc, ~attrs=[], Pat.var(~loc, {txt: name, loc}), expr);
+let test = (name, expr, output) => {
   module Ast_builder =
     Ppxlib.Ast_builder.Make({
-      let loc = loc;
+      let loc = expr.pexp_loc;
     });
+  let pattern = Ast_builder.ppat_var({txt: name, loc});
+  let value_binding = Ast_builder.value_binding(~pat=pattern, ~expr);
   module Emit = Generate.Make(Ast_builder);
   let (name, core_type) = Emit.make_type(value_binding);
-  Emit.make_type_declaration(name, core_type);
+  let type_declaration = Emit.make_type_declaration(name, core_type);
+  let expected = Ast_builder.pstr_type(Nonrecursive, [type_declaration]);
+  test_case(name, `Quick, _ =>
+    check(
+      Alcotest.string,
+      "",
+      Pprintast.string_of_structure([expected]),
+      Pprintast.string_of_structure([output]),
+    )
+  );
 };
 
-let types = [
+let tests: list(Alcotest.test_case(unit)) = [
   // Keyword
-  (
-    gen_type("terminal", [%expr [%value "terminal"]]),
-    [%stri type terminal = unit],
+  test(
+    "terminal",
+    [%expr [%value "terminal"]],
+    [%stri type nonrec terminal = unit],
   ),
   // Data_type
-  (
-    gen_type("ident", [%expr [%value "<string>"]]),
-    [%stri type ident = string],
+  test(
+    "ident",
+    [%expr [%value "<string>"]],
+    [%stri type nonrec ident = string],
   ),
   // Property_type
-  (
-    gen_type("color", [%expr [%value "<'color'>"]]),
-    [%stri type color = property_color],
+  test(
+    "color",
+    [%expr [%value "<'color'>"]],
+    [%stri type nonrec color = property_color],
   ),
   // Delim
-  (
-    gen_type(
-      "calc_sum",
-      [%expr [%value "<calc-product> [ [ '+' | '-' ] <calc-product> ]*"]],
-    ),
+  test(
+    "calc_sum",
+    [%expr [%value "<calc-product> [ [ '+' | '-' ] <calc-product> ]*"]],
     [%stri
-      type calc_sum = (
+      type nonrec calc_sum = (
         calc_product,
         list(([ | `Cross(unit) | `Dash(unit)], calc_product)),
       )
     ],
   ),
   // Xor
-  (
-    gen_type("size", [%expr [%value "relative | static | absolute"]]),
-    [%stri type size = [ | `Relative | `Static | `Absolute]],
+  test(
+    "size",
+    [%expr [%value "relative | static | absolute"]],
+    [%stri type nonrec size = [ | `Relative | `Static | `Absolute]],
   ),
   // And
-  (
-    gen_type(
-      "text_emphasis_position",
-      [%expr [%value "[ 'over' | 'under' ] && [ 'right' | 'left' ]"]],
-    ),
+  test(
+    "text_emphasis_position",
+    [%expr [%value "[ 'over' | 'under' ] && [ 'right' | 'left' ]"]],
     [%stri
-      type text_emphasis_position = ([ | `Over | `Under], [ | `Right | `Left])
+      type nonrec text_emphasis_position = (
+        [ | `Over | `Under],
+        [ | `Right | `Left],
+      )
     ],
   ),
   // Or
-  (
-    gen_type(
-      "property_clip_path",
-      [%expr
-        [%value "<clip-source> | <basic-shape> || <geometry-box> | 'none'"]
-      ],
-    ),
+  test(
+    "property_clip_path",
+    [%expr
+      [%value "<clip-source> | <basic-shape> || <geometry-box> | 'none'"]
+    ],
     [%stri
-      type property_clip_path = [
+      type nonrec property_clip_path = [
         | `Clip_source(clip_source)
         | `Or(option(basic_shape), option(geometry_box))
         | `None
@@ -83,35 +86,36 @@ let types = [
     ],
   ),
   // Static
-  (
-    gen_type("contradiction", [%expr [%value "'not' <string>"]]),
-    [%stri type contradiction = (unit, string)],
+  test(
+    "contradiction",
+    [%expr [%value "'not' <string>"]],
+    [%stri type nonrec contradiction = (unit, string)],
   ),
   // Group
-  (
-    gen_type("supported", [%expr [%value "supported | [not 'supported']"]]),
-    [%stri type supported = [ | `Supported | `Static(unit, unit)]],
+  test(
+    "supported",
+    [%expr [%value "supported | [not 'supported']"]],
+    [%stri type nonrec supported = [ | `Supported | `Static(unit, unit)]],
   ),
   // Function_call
-  (
-    gen_type("calc", [%expr [%value "calc( <calc-sum> )"]]),
-    [%stri type calc = calc_sum],
+  test(
+    "calc",
+    [%expr [%value "calc( <calc-sum> )"]],
+    [%stri type nonrec calc = calc_sum],
   ),
   // Polymorphism
-  (
-    gen_type(
-      "function_color",
-      [%expr
-        [%value
-          "rgb( [ <extended-percentage> ]{3} [ '/' <alpha-value> ]? )
+  test(
+    "function_color",
+    [%expr
+      [%value
+        "rgb( [ <extended-percentage> ]{3} [ '/' <alpha-value> ]? )
           | rgb( [ <number> ]{3} [ '/' <alpha-value> ]? )
           | rgb( [ <extended-percentage> ]#{3} [ ',' <alpha-value> ]? )
           | rgb( [ <number> ]#{3} [ ',' <alpha-value> ]? )"
-        ]
-      ],
-    ),
+      ]
+    ],
     [%stri
-      type function_color = [
+      type nonrec function_color = [
         | `Rgb_0(list(extended_percentage), option((unit, alpha_value)))
         | `Rgb_1(list(number), option((unit, alpha_value)))
         | `Rgb_2(list(extended_percentage), option((unit, alpha_value)))
@@ -120,13 +124,3 @@ let types = [
     ],
   ),
 ];
-
-describe("Should generate valid types based on CSS spec", ({test, _}) => {
-  types
-  |> List.iteri((_index, (result, expected)) =>
-       test(
-         "Type: " ++ Pprintast.string_of_structure([expected]),
-         compare(result, expected),
-       )
-     )
-});

@@ -5,6 +5,8 @@
   styled-ppx.reason-css-parser
   reason_css_parser_ppx_lib
   styled-ppx.css-parser
+  ppxlib
+  ppxlib.astlib
   fmt)
  (preprocess
   (pps reason_css_parser_ppx sedlex.ppx ppxlib.metaquot)))
