@@ -39,7 +39,8 @@ let from_string = (~pos as _initial_position: Lexing.position, ~lnum, string) =>
   buffer;
 };
 
-let parse_string = (~lnum, ~skip_whitespace, ~pos, parser, string) => {
+let parse_string =
+    (~lnum, ~skip_whitespace, ~pos: Lexing.position, parser, string) => {
   let buffer = Sedlexing.Latin1.from_string(string);
   last_buffer := Some(from_string(~lnum, ~pos, string));
   parse(skip_whitespace, buffer, parser);

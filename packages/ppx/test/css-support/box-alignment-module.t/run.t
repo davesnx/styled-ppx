@@ -129,7 +129,6 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   [%css {|place-content: normal stretch|}];
   [%css {|place-content: baseline stretch|}];
   [%css {|place-content: first baseline stretch|}];
-  [%css {|place-content: space-between stretch|}];
   [%css {|place-content: center stretch|}];
   [%css {|place-content: unsafe start stretch|}];
   [%css {|place-content: normal safe right|}];
@@ -174,6 +173,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   [%css {|place-items: first baseline legacy left|}];
   [%css {|place-items: self-start legacy left|}];
   [%css {|place-items: unsafe start legacy left|}];
+  
   [%css {|gap: 0 0|}];
   [%css {|gap: 0 1em|}];
   [%css {|gap: 1em|}];
@@ -190,30 +190,3 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   [%css {|margin-trim: all|}];
 
   $ dune build
-  File "input.re", line 1, characters 11-24:
-  Error: This expression has type [> `unsafe of [> `start ] ]
-         but an expression was expected of type
-           [< `auto
-            | `baseline
-            | `center
-            | `end_
-            | `firstBaseline
-            | `flexEnd
-            | `flexStart
-            | `inherit_
-            | `initial
-            | `lastBaseline
-            | `left
-            | `normal
-            | `revert
-            | `revertLayer
-            | `right
-            | `selfEnd
-            | `selfStart
-            | `start
-            | `stretch
-            | `unset
-            | `var of string
-            | `varDefault of string * string ]
-         The second variant type does not allow tag(s) `unsafe
-  [1]

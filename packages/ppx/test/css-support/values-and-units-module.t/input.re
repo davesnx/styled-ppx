@@ -10,8 +10,8 @@
 /* [%css {|width: attr(data-px px);|}]; */
 /* [%css {|width: attr(data-px px, initial);|}]; */
 [%css {|width: calc(1px + 2px);|}];
-[%css {|width: calc(5px*2);|}];
-[%css {|width: calc(5px/2);|}];
+[%css {|width: calc(5px * 2);|}];
+[%css {|width: calc(5px / 2);|}];
 /* [%css {|width: calc(100%/3 - 2*1em - 2*1px);|}]; */
 /* [%css {|width: calc(attr(data-px)*2);|}]; */
 [%css {|width: calc(5px - 10px);|}];

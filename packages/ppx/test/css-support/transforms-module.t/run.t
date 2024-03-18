@@ -14,135 +14,98 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   >  (preprocess (pps styled-ppx.lib)))
   > EOF
 
-  $ dune describe pp input.re
-  /* CSS Transforms Module Level 1 */
-  [%css {|transform: none|}];
-  [%css {|transform: translate(5px)|}];
-  [%css {|transform: translate(5px, 10px)|}];
-  [%css {|transform: translateY(5px)|}];
-  [%css {|transform: translateX(5px)|}];
-  [%css {|transform: translateY(5%)|}];
-  [%css {|transform: translateX(5%)|}];
-  [%css {|transform: scale(2)|}];
-  [%css {|transform: scale(2, -1)|}];
-  [%css {|transform: scaleX(2)|}];
-  [%css {|transform: scaleY(2.5)|}];
-  [%css {|transform: rotate(45deg)|}];
-  [%css {|transform: skew(45deg)|}];
-  [%css {|transform: skew(45deg, 15deg)|}];
-  [%css {|transform: skewX(45deg)|}];
-  [%css {|transform: skewY(45deg)|}];
-  // [%css {|transform: matrix(1,-.2,0,1,0,0)|}];
-  // [%css {|transform: matrix(1,-.2,0,1,10,10)|}];
-  [%css {|transform: translate(50px, -24px) skew(0, 22.5deg)|}];
-  [%css {|transform: translate3d(0, 0, 5px)|}];
-  [%css {|transform: translateZ(5px)|}];
-  [%css {|transform: scale3d(1, 0, -1)|}];
-  [%css {|transform: scaleZ(1.5)|}];
-  [%css {|transform: rotate3d(1, 1, 1, 45deg)|}];
-  [%css {|transform: rotateX(-45deg)|}];
-  [%css {|transform: rotateY(-45deg)|}];
-  [%css {|transform: rotateZ(-45deg)|}];
-  // [%css {|transform: matrix3d(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)|}];
-  // [%css {|transform: matrix3d(0,0,0,0,0,0,0,0,0,0,1,0,10,10,0,1)|}];
-  [%css
-    {|transform: translate3d(50px, -24px, 5px) rotate3d(1, 2, 3, 180deg) scale3d(-1, 0, .5)|}
-  ];
-  [%css {|transform: perspective(600px)|}];
-  [%css {|transform-origin: 10px|}];
-  [%css {|transform-origin: top|}];
-  [%css {|transform-origin: top left|}];
-  [%css {|transform-origin: 50% 100%|}];
-  [%css {|transform-origin: left 0%|}];
-  [%css {|transform-origin: left 50% 0|}];
-  [%css {|transform-box: border-box|}];
-  [%css {|transform-box: fill-box|}];
-  [%css {|transform-box: view-box|}];
-  [%css {|transform-box: content-box|}];
-  [%css {|transform-box: stroke-box|}];
-  
-  /* CSS Transforms Module Level 2 */
-  [%css {|translate: none|}];
-  [%css {|translate: 50%|}];
-  [%css {|translate: 50% 50%|}];
-  [%css {|translate: 50% 50% 10px|}];
-  [%css {|scale: none|}];
-  [%css {|scale: 2|}];
-  [%css {|scale: 2 2|}];
-  [%css {|scale: 2 2 2|}];
-  [%css {|rotate: none|}];
-  [%css {|rotate:  45deg|}];
-  [%css {|rotate: x 45deg|}];
-  [%css {|rotate: y 45deg|}];
-  [%css {|rotate: z 45deg|}];
-  [%css {|rotate: -1 0 2 45deg|}];
-  [%css {|rotate: 45deg x|}];
-  [%css {|rotate: 45deg y|}];
-  [%css {|rotate: 45deg z|}];
-  [%css {|rotate: 45deg -1 0 2|}];
-  [%css {|transform-style: flat|}];
-  [%css {|transform-style: preserve-3d|}];
-  [%css {|perspective: none|}];
-  [%css {|perspective: 600px|}];
-  [%css {|perspective-origin: 10px|}];
-  [%css {|perspective-origin: top|}];
-  [%css {|perspective-origin: top left|}];
-  [%css {|perspective-origin: 50% 100%|}];
-  [%css {|perspective-origin: left 0%|}];
-  [%css {|backface-visibility: visible|}];
-  [%css {|backface-visibility: hidden|}];
-
   $ dune build
-  File "input.re", line 1, characters 10-25:
-  Error: This expression has type
-           [> `translate of Css_AtomicTypes.Length.t * int ]
-         but an expression was expected of type
-           [< `none
-            | `perspective of int
-            | `rotate of Css_AtomicTypes.Angle.t
-            | `rotate3d of float * float * float * Css_AtomicTypes.Angle.t
-            | `rotateX of Css_AtomicTypes.Angle.t
-            | `rotateY of Css_AtomicTypes.Angle.t
-            | `rotateZ of Css_AtomicTypes.Angle.t
-            | `scale of float * float
-            | `scale3d of float * float * float
-            | `scaleX of float
-            | `scaleY of float
-            | `scaleZ of float
-            | `skew of Css_AtomicTypes.Angle.t * Css_AtomicTypes.Angle.t
-            | `skewX of Css_AtomicTypes.Angle.t
-            | `skewY of Css_AtomicTypes.Angle.t
-            | `translate of Css_AtomicTypes.Length.t * Css_AtomicTypes.Length.t
-            | `translate3d of
-                Css_AtomicTypes.Length.t * Css_AtomicTypes.Length.t *
-                Css_AtomicTypes.Length.t
-            | `translateX of Css_AtomicTypes.Length.t
-            | `translateY of Css_AtomicTypes.Length.t
-            | `translateZ of Css_AtomicTypes.Length.t ]
-         Type int is not compatible with type
-           Css_AtomicTypes.Length.t =
-             [ `calc of
-                 [ `add of Css_AtomicTypes.Length.t * Css_AtomicTypes.Length.t
-                 | `mult of Css_AtomicTypes.Length.t * Css_AtomicTypes.Length.t
-                 | `one of Css_AtomicTypes.Length.t
-                 | `sub of Css_AtomicTypes.Length.t * Css_AtomicTypes.Length.t
-                 ]
-             | `ch of float
-             | `cm of float
-             | `em of float
-             | `ex of float
-             | `inch of float
-             | `mm of float
-             | `pc of float
-             | `percent of float
-             | `pt of int
-             | `px of int
-             | `pxFloat of float
-             | `rem of float
-             | `vh of float
-             | `vmax of float
-             | `vmin of float
-             | `vw of float
-             | `zero ]
-         Types for tag `translate are incompatible
-  [1]
+
+  $ dune_describe_pp _build/default/input.re.pp.ml | refmt --parse ml --print re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      load_path: [],
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      transparent_modules: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];
+  CssJs.transform(`none);
+  CssJs.transform(CssJs.translate(`pxFloat(5.), `zero));
+  CssJs.transform(CssJs.translate(`pxFloat(5.), `pxFloat(10.)));
+  CssJs.transform(CssJs.translateY(`pxFloat(5.)));
+  CssJs.transform(CssJs.translateX(`pxFloat(5.)));
+  CssJs.transform(CssJs.translateY(`percent(5.)));
+  CssJs.transform(CssJs.translateX(`percent(5.)));
+  CssJs.transform(CssJs.scale(2., 2.));
+  CssJs.transform(CssJs.scale(2., -1.));
+  CssJs.transform(CssJs.scaleX(2.));
+  CssJs.transform(CssJs.scaleY(2.5));
+  CssJs.transform(CssJs.rotate(`deg(45.)));
+  CssJs.transform(CssJs.skew(`deg(45.), `deg(0.)));
+  CssJs.transform(CssJs.skew(`deg(45.), `deg(15.)));
+  CssJs.transform(CssJs.skewX(`deg(45.)));
+  CssJs.transform(CssJs.skewY(`deg(45.)));
+  CssJs.transforms([|
+    CssJs.translate(`pxFloat(50.), `pxFloat(-24.)),
+    CssJs.skew(`deg(0.), `deg(22.5)),
+  |]);
+  CssJs.transform(CssJs.translate3d(`zero, `zero, `pxFloat(5.)));
+  CssJs.transform(CssJs.translateZ(`pxFloat(5.)));
+  CssJs.transform(CssJs.scale3d(1., 0., -1.));
+  CssJs.transform(CssJs.scaleZ(1.5));
+  CssJs.transform(CssJs.rotate3d(1., 1., 1., `deg(45.)));
+  CssJs.transform(CssJs.rotateX(`deg(-45.)));
+  CssJs.transform(CssJs.rotateY(`deg(-45.)));
+  CssJs.transform(CssJs.rotateZ(`deg(-45.)));
+  CssJs.transforms([|
+    CssJs.translate3d(`pxFloat(50.), `pxFloat(-24.), `pxFloat(5.)),
+    CssJs.rotate3d(1., 2., 3., `deg(180.)),
+    CssJs.scale3d(-1., 0., 0.5),
+  |]);
+  CssJs.unsafe({js|transform|js}, {js|perspective(600px)|js});
+  CssJs.transformOrigin(`pxFloat(10.));
+  CssJs.transformOrigin(`top);
+  CssJs.transformOrigin2(`top, `left);
+  CssJs.transformOrigin2(`percent(50.), `percent(100.));
+  CssJs.transformOrigin2(`percent(0.), `left);
+  CssJs.unsafe({js|transformOrigin|js}, {js|left 50% 0|js});
+  CssJs.transformBox(`borderBox);
+  CssJs.transformBox(`fillBox);
+  CssJs.transformBox(`viewBox);
+  CssJs.transformBox(`contentBox);
+  CssJs.transformBox(`strokeBox);
+  CssJs.unsafe({js|translate|js}, {js|none|js});
+  CssJs.unsafe({js|translate|js}, {js|50%|js});
+  CssJs.unsafe({js|translate|js}, {js|50% 50%|js});
+  CssJs.unsafe({js|translate|js}, {js|50% 50% 10px|js});
+  CssJs.unsafe({js|scale|js}, {js|none|js});
+  CssJs.unsafe({js|scale|js}, {js|2|js});
+  CssJs.unsafe({js|scale|js}, {js|2 2|js});
+  CssJs.unsafe({js|scale|js}, {js|2 2 2|js});
+  CssJs.unsafe({js|rotate|js}, {js|none|js});
+  CssJs.unsafe({js|rotate|js}, {js|45deg|js});
+  CssJs.unsafe({js|rotate|js}, {js|x 45deg|js});
+  CssJs.unsafe({js|rotate|js}, {js|y 45deg|js});
+  CssJs.unsafe({js|rotate|js}, {js|z 45deg|js});
+  CssJs.unsafe({js|rotate|js}, {js|-1 0 2 45deg|js});
+  CssJs.unsafe({js|rotate|js}, {js|45deg x|js});
+  CssJs.unsafe({js|rotate|js}, {js|45deg y|js});
+  CssJs.unsafe({js|rotate|js}, {js|45deg z|js});
+  CssJs.unsafe({js|rotate|js}, {js|45deg -1 0 2|js});
+  CssJs.transformStyle(`flat);
+  CssJs.transformStyle(`preserve3d);
+  CssJs.unsafe({js|perspective|js}, {js|none|js});
+  CssJs.unsafe({js|perspective|js}, {js|600px|js});
+  CssJs.perspectiveOrigin2(`pxFloat(10.), `center);
+  CssJs.perspectiveOrigin2(`center, `top);
+  CssJs.perspectiveOrigin2(`left, `top);
+  CssJs.unsafe({js|perspectiveOrigin|js}, {js|50% 100%|js});
+  CssJs.unsafe({js|perspectiveOrigin|js}, {js|left 0%|js});
+  CssJs.backfaceVisibility(`visible);
+  CssJs.backfaceVisibility(`hidden);

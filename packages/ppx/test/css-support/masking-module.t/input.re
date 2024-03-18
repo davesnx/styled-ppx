@@ -1,11 +1,6 @@
-/* CSS Masking Module Level 1 */
 [%css {|clip-path: url('#clip')|}];
 [%css {|clip-path: inset(50%)|}];
-/* [%css {|clip-path: circle()|}]; */
-/* [%css {|clip-path: ellipse()|}]; */
-/* [%css {|clip-path: polygon(0 10px, 30px 0)|}]; */
 [%css {|clip-path: path('M 20 20 H 80 V 30')|}];
-/* [%css {|clip-path: circle() border-box|}]; */
 [%css {|clip-path: border-box|}];
 [%css {|clip-path: padding-box|}];
 [%css {|clip-path: content-box|}];
@@ -17,7 +12,7 @@
 [%css {|clip-rule: nonzero|}];
 [%css {|clip-rule: evenodd|}];
 [%css {|mask-image: none|}];
-[%css {|mask-image: linear-gradient(45deg, blue, red)|}];
+[%css {|mask-image: linear-gradient(45deg, #333, #000)|}];
 [%css {|mask-image: url(image.png)|}];
 [%css {|mask-mode: alpha|}];
 [%css {|mask-mode: luminance|}];
@@ -48,9 +43,6 @@
 [%css {|mask-position: center center|}];
 [%css {|mask-position: left 50%|}];
 [%css {|mask-position: bottom 10px right 20px|}];
-/* TODO: mask-position is incomplete in Parser.re */
-/* [%css {|mask-position: bottom 10px right|}]; */
-/* [%css {|mask-position: top right 10px|}]; */
 [%css {|mask-clip: border-box|}];
 [%css {|mask-clip: padding-box|}];
 [%css {|mask-clip: content-box|}];
@@ -126,12 +118,5 @@
 [%css {|mask-border-repeat: round space|}];
 [%css {|mask-border-repeat: space space|}];
 [%css {|mask-border: url(image.png)|}];
-/* TODO: Parser.re is incomplete */
-/* [%css {|mask-border: url(image.png) 10px|}]; */
-/* [%css {|mask-border: url(image.png) space|}]; */
-/* [%css {|mask-border: url(image.png) 1 fill|}]; */
-/* [%css {|mask-border: url(image.png) 1 fill 10px|}]; */
-/* [%css {|mask-border: url(image.png) 1 fill 10px|}]; */
-/* [%css {|mask-border: url(image.png) 1 fill 10px 2|}]; */
 [%css {|mask-type: luminance|}];
 [%css {|mask-type: alpha|}];

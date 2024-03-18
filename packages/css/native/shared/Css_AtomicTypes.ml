@@ -71,7 +71,7 @@ module Url = struct
 end
 
 module Length = struct
-  type t =
+  type length =
     [ `ch of float
     | `em of float
     | `ex of float
@@ -88,8 +88,17 @@ module Length = struct
     | `pc of float
     | `pt of int
     | `zero
-    | `calc of [ `add of t * t | `sub of t * t | `mult of t * t | `one of t ]
     | `percent of float
+    ]
+
+  type calc_value =
+    [ length
+    | `num of float
+    ]
+
+  and t =
+    [ length
+    | `calc of [ length | `add of t * t | `sub of t * t | `mult of t * t ]
     ]
 
   let ch x = `ch x
@@ -127,14 +136,36 @@ module Length = struct
     | `pc x -> Std.Float.toString x ^ {js|pc|js}
     | `pt x -> Std.Int.toString x ^ {js|pt|js}
     | `zero -> {js|0|js}
-    | `calc (`one a) -> ({js|calc(|js} ^ toString a) ^ {js|)|js}
-    | `calc (`add (a, b)) ->
-      {js|calc(|js} ^ toString a ^ {js| + |js} ^ toString b ^ {js|)|js}
-    | `calc (`sub (a, b)) ->
-      {js|calc(|js} ^ toString a ^ {js| - |js} ^ toString b ^ {js|)|js}
-    | `calc (`mult (a, b)) ->
-      {js|calc(|js} ^ toString a ^ {js| * |js} ^ toString b ^ {js|)|js}
+    | `calc calc -> calc_to_string calc
     | `percent x -> Std.Float.toString x ^ {js|%|js}
+
+  and calc_value_to_string x =
+    match x with
+    | `num x -> Std.Float.toString x
+    | #length as t -> toString t
+    | `calc calc -> calc_to_string calc
+
+  and calc_to_string calc =
+    match calc with
+    | `add (x, y) ->
+      {js|calc(|js}
+      ^ calc_value_to_string x
+      ^ {js| + |js}
+      ^ calc_value_to_string y
+      ^ {js|)|js}
+    | `sub (x, y) ->
+      {js|calc(|js}
+      ^ calc_value_to_string x
+      ^ {js| - |js}
+      ^ calc_value_to_string y
+      ^ {js|)|js}
+    | `mult (x, y) ->
+      {js|calc(|js}
+      ^ calc_value_to_string x
+      ^ {js| * |js}
+      ^ calc_value_to_string y
+      ^ {js|)|js}
+    | #length as x -> calc_value_to_string x
 end
 
 module Angle = struct
@@ -604,6 +635,26 @@ module FontWeight = struct
     | `black -> {js|900|js}
     | `lighter -> {js|lighter|js}
     | `bolder -> {js|bolder|js}
+end
+
+module TransformOrigin = struct
+  type t =
+    [ Length.t
+    | `left
+    | `center
+    | `right
+    | `top
+    | `bottom
+    ]
+
+  let toString x =
+    match x with
+    | `left -> {js|left|js}
+    | `center -> {js|center|js}
+    | `right -> {js|right|js}
+    | `top -> {js|top|js}
+    | `bottom -> {js|bottom|js}
+    | #Length.t as x -> Length.toString x
 end
 
 module Transform = struct
@@ -1826,55 +1877,56 @@ module GridArea = struct
       {js|span |js} ^ (match e with `num i -> string_of_int i | `ident s -> s)
 end
 
-module BackdropFilter = struct
+module Filter = struct
   type t =
-    [ `blur of Length.t
-    | `brightness of [ `num of int | `percent of float ]
-    | `contrast of [ `num of int | `percent of float ]
-    | `dropShadow of [ `num of int | `percent of float ]
-    | `grayscale of [ `num of int | `percent of float ]
-    | `hueRotate of [ Angle.t | `zero ]
-    | `invert of [ `num of int | `percent of float ]
-    | `none
-    | `opacity of [ `num of int | `percent of float ]
-    | `saturate of [ `num of int | `percent of float ]
-    | `sepia of [ `num of int | `percent of float ]
+    [ `none
+    | `blur of Length.t
+    | `brightness of [ `percent of float | `num of float ]
+    | `contrast of [ `percent of float | `num of float ]
+    | `dropShadow of Length.t * Length.t * Length.t * [ Color.t | Var.t ]
+    | `grayscale of [ `percent of float | `num of float ]
+    | `hueRotate of Angle.t
+    | `invert of [ `percent of float | `num of float ]
+    | `opacity of [ `percent of float | `num of float ]
+    | `saturate of [ `percent of float | `num of float ]
+    | `sepia of [ `percent of float | `num of float ]
+    | Url.t
+    | Var.t
+    | Cascading.t
     ]
 
-  let string_of_percent p = Std.Float.toString p ^ {js|%|js}
+  let string_of_amount x =
+    match x with
+    | `percent v -> Std.Float.toString v ^ {js|%|js}
+    | `num v -> Std.Float.toString v
 
   let toString x =
     match x with
-    | `blur (#Length.t as b) -> ({js|blur(|js} ^ Length.toString b) ^ {js|)|js}
-    | `brightness (`num b) ->
-      ({js|brightness(|js} ^ string_of_int b) ^ {js|)|js}
-    | `brightness (`percent b) ->
-      ({js|brightness(|js} ^ string_of_percent b) ^ {js|)|js}
-    | `contrast (`num c) -> ({js|contrast(|js} ^ string_of_int c) ^ {js|)|js}
-    | `contrast (`percent c) ->
-      ({js|contrast(|js} ^ string_of_percent c) ^ {js|)|js}
-    | `dropShadow (`num i) ->
-      ({js|drop-shadow(|js} ^ string_of_int i) ^ {js|)|js}
-    | `dropShadow (`percent i) ->
-      ({js|drop-shadow(|js} ^ string_of_percent i) ^ {js|)|js}
-    | `grayscale (`num i) -> ({js|grayscale(|js} ^ string_of_int i) ^ {js|)|js}
-    | `grayscale (`percent i) ->
-      ({js|grayscale(|js} ^ string_of_percent i) ^ {js|)|js}
-    | `hueRotate (#Angle.t as h) ->
-      ({js|hue-rotate(|js} ^ Angle.toString h) ^ {js|)|js}
-    | `hueRotate `zero -> {js|hue-rotate(0deg)|js}
-    | `invert (`num i) -> ({js|invert(|js} ^ string_of_int i) ^ {js|)|js}
-    | `invert (`percent i) ->
-      ({js|invert(|js} ^ string_of_percent i) ^ {js|)|js}
+    | `blur v -> {js|blur(|js} ^ Length.toString v ^ {js|)|js}
+    | `brightness v -> {js|brightness(|js} ^ string_of_amount v ^ {js|%)|js}
+    | `contrast v -> {js|contrast(|js} ^ string_of_amount v ^ {js|%)|js}
+    | `dropShadow (a, b, c, d) ->
+      {js|drop-shadow(|js}
+      ^ Length.toString a
+      ^ {js| |js}
+      ^ Length.toString b
+      ^ {js| |js}
+      ^ Length.toString c
+      ^ {js| |js}
+      ^ (match (d : [ Color.t | Var.t ]) with
+        | #Color.t as c -> Color.toString c
+        | #Var.t as v -> Var.toString v)
+      ^ {js|)|js}
+    | `grayscale v -> {js|grayscale(|js} ^ string_of_amount v ^ {js|%)|js}
+    | `hueRotate v -> {js|hue-rotate(|js} ^ Angle.toString v ^ {js|)|js}
+    | `invert v -> {js|invert(|js} ^ string_of_amount v ^ {js|%)|js}
+    | `opacity v -> {js|opacity(|js} ^ string_of_amount v ^ {js|%)|js}
+    | `saturate v -> {js|saturate(|js} ^ string_of_amount v ^ {js|%)|js}
+    | `sepia v -> {js|sepia(|js} ^ string_of_amount v ^ {js|%)|js}
     | `none -> {js|none|js}
-    | `opacity (`num i) -> ({js|opacity(|js} ^ string_of_int i) ^ {js|)|js}
-    | `opacity (`percent i) ->
-      ({js|opacity(|js} ^ string_of_percent i) ^ {js|)|js}
-    | `saturate (`num i) -> ({js|saturate(|js} ^ string_of_int i) ^ {js|)|js}
-    | `saturate (`percent i) ->
-      ({js|saturate(|js} ^ string_of_percent i) ^ {js|)|js}
-    | `sepia (`num i) -> ({js|sepia(|js} ^ string_of_int i) ^ {js|)|js}
-    | `sepia (`percent i) -> ({js|sepia(|js} ^ string_of_percent i) ^ {js|)|js}
+    | #Url.t as u -> Url.toString u
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
 end
 
 module BackgroundAttachment = struct
@@ -2206,20 +2258,29 @@ module SideOrCorner = struct
 end
 
 module Gradient = struct
-  type 'colorOrVar t =
+  type direction =
+    [ `Angle of Angle.t
+    | `SideOrCorner of
+      [ `Bottom
+      | `BottomLeft
+      | `BottomRight
+      | `Left
+      | `Right
+      | `Top
+      | `TopLeft
+      | `TopRight
+      ]
+    ]
+
+  type t =
     [ `linearGradient of
-      [ `Angle of Angle.t | `SideOrCorner of SideOrCorner.t ] option
-      * (([< Color.t | Var.t ] as 'colorOrVar) * Length.t option) array
+      direction option * ([ Color.t | Var.t ] * Length.t option) array
     | `repeatingLinearGradient of
-      [ `Angle of Angle.t | `SideOrCorner of SideOrCorner.t ] option
-      * (([< Color.t | Var.t ] as 'colorOrVar) * Length.t option) array
-    | `radialGradient of
-      (([< Color.t | Var.t ] as 'colorOrVar) * Length.t option) array
-    | `repeatingRadialGradient of
-      (([< Color.t | Var.t ] as 'colorOrVar) * Length.t option) array
+      direction option * ([ Color.t | Var.t ] * Length.t option) array
+    | `radialGradient of ([ Color.t | Var.t ] * Length.t option) array
+    | `repeatingRadialGradient of ([ Color.t | Var.t ] * Length.t option) array
     | `conicGradient of
-      [ `Angle of Angle.t | `SideOrCorner of SideOrCorner.t ] option
-      * (([< Color.t | Var.t ] as 'colorOrVar) * Length.t option) array
+      direction option * ([ Color.t | Var.t ] * Length.t option) array
     ]
 
   let linearGradient angle stops = `linearGradient (angle, stops)
@@ -2251,7 +2312,7 @@ module Gradient = struct
   let toString x =
     match x with
     | `linearGradient (None, stops) ->
-      ({js|linear-gradient(|js} ^ string_of_stops stops) ^ {js|)|js}
+      {js|linear-gradient(|js} ^ string_of_stops stops ^ {js|)|js}
     | `linearGradient (Some direction, stops) ->
       {js|linear-gradient(|js}
       ^ direction_to_string direction
@@ -2267,11 +2328,11 @@ module Gradient = struct
       ^ string_of_stops stops
       ^ {js|)|js}
     | `radialGradient stops ->
-      ({js|radial-gradient(|js} ^ string_of_stops stops) ^ {js|)|js}
+      {js|radial-gradient(|js} ^ string_of_stops stops ^ {js|)|js}
     | `repeatingRadialGradient stops ->
-      ({js|repeating-radial-gradient(|js} ^ string_of_stops stops) ^ {js|)|js}
+      {js|repeating-radial-gradient(|js} ^ string_of_stops stops ^ {js|)|js}
     | `conicGradient (None, stops) ->
-      ({js|conic-gradient(|js} ^ string_of_stops stops) ^ {js|)|js}
+      {js|conic-gradient(|js} ^ string_of_stops stops ^ {js|)|js}
     | `conicGradient (Some direction, stops) ->
       {js|conic-gradient(|js}
       ^ direction_to_string direction

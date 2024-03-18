@@ -126,19 +126,3 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   /* [%css {|hyphenate-limit-last: spread|}]; */
 
   $ dune build
-  File "input.re", line 1, characters 13-29:
-  Error: This expression has type [> `InterCharacter ]
-         but an expression was expected of type
-           [< `auto
-            | `inherit_
-            | `initial
-            | `interCharacter
-            | `interWord
-            | `none
-            | `revert
-            | `revertLayer
-            | `unset
-            | `var of string
-            | `varDefault of string * string ]
-         The second variant type does not allow tag(s) `InterCharacter
-  [1]

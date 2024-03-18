@@ -255,7 +255,7 @@ let variant_to_expression = (~loc) =>
   | `Wrap_reverse => id([%expr `wrapReverse])
   | `Manual => id([%expr `manual])
   | `Inter_word => id([%expr `interWord])
-  | `Inter_character => id([%expr `InterCharacter])
+  | `Inter_character => id([%expr `interCharacter])
   | `Sub => id([%expr `sub])
   | `Super => id([%expr `super])
   | `All_small_caps => id([%expr `allSmallCaps])
@@ -327,7 +327,7 @@ let rec render_function_calc = (~loc, calc_sum) => {
 and pick_operation = ((op, _)) => op
 and render_list_of_products = (~loc, list_of_products) => {
   switch (list_of_products) {
-  | [one] => [%expr `one([%e render_product_op(~loc, one)])]
+  | [one] => render_product_op(~loc, one)
   | list => render_list_of_products(~loc, list)
   };
 }
@@ -349,12 +349,12 @@ and render_product = (~loc, product) => {
 and render_product_op = (~loc, op) => {
   switch (op) {
   | `Static_0((), calc_value) => render_calc_value(~loc, calc_value)
-  | `Static_1((), float) => render_number(~loc, float)
+  | `Static_1((), float) => [%expr `num([%e render_number(~loc, float)])]
   };
 }
 and render_calc_value = (~loc, calc_value) => {
-  switch (calc_value) {
-  | `Number(float) => render_number(~loc, float)
+  switch ((calc_value: Types.calc_value)) {
+  | `Number(float) => [%expr `num([%e render_number(~loc, float)])]
   | `Extended_length(l) => render_extended_length(~loc, l)
   | `Extended_percentage(p) => render_extended_percentage(~loc, p)
   | `Function_calc(fc) => render_function_calc(~loc, fc)
@@ -1485,7 +1485,7 @@ let background_attachment =
   );
 
 let render_background_position = (~loc, position) => {
-  let render_static =
+  let render_one =
     fun
     | `Center => variant_to_expression(~loc, `Center)
     | `Left => variant_to_expression(~loc, `Left)
@@ -1495,35 +1495,25 @@ let render_background_position = (~loc, position) => {
     | `Extended_length(l) => render_extended_length(~loc, l)
     | `Extended_percentage(p) => render_extended_percentage(~loc, p);
 
-  let render_and =
-    fun
-    | `Center => [%expr `center]
-    | `Static(a, b) =>
-      switch (b) {
-      | Some(b) =>
-        [%expr `hv(([%e render_static(a)], [%e render_static(b)]))]
-      | None => render_static(a)
-      };
-
   switch (position) {
-  | `Center => variant_to_expression(~loc, `Center)
-  | `Left => variant_to_expression(~loc, `Left)
-  | `Right => variant_to_expression(~loc, `Right)
-  | `Bottom => variant_to_expression(~loc, `Bottom)
-  | `Top => variant_to_expression(~loc, `Top)
-  | `Extended_length(l) => render_extended_length(~loc, l)
-  | `Extended_percentage(a) => render_extended_percentage(~loc, a)
+  | `Center as position
+  | `Left as position
+  | `Right as position
+  | `Bottom as position
+  | `Top as position
+  | `Extended_length(_) as position
+  | `Extended_percentage(_) as position =>
+    [%expr ([%e render_one(position)], None)]
   | `Static(x, y) =>
-    [%expr `hv(([%e render_static(x)], [%e render_static(y)]))]
-  | `And(left, right) =>
-    [%expr `hv(([%e render_and(left)], [%e render_and(right)]))]
+    [%expr ([%e render_one(x)], Some([%e render_one(y)]))]
+  | `And(_left, _right) => raise(Unsupported_feature)
   };
 };
 
 let background_position =
   monomorphic(
     Parser.property_background_position,
-    (~loc) => [%expr CssJs.backgroundPosition],
+    (~loc) => [%expr CssJs.backgroundPosition2],
     (~loc) =>
       fun
       | [] => failwith("expected at least one argument")
@@ -2646,14 +2636,14 @@ let render_transform = (~loc, value: Types.transform_function) =>
          [%e render_transform_functions(~loc, v)],
        )]
     | None =>
-      [%expr CssJs.skew([%e render_transform_functions(~loc, a1)], 0)]
+      [%expr CssJs.skew([%e render_transform_functions(~loc, a1)], `deg(0.))]
     }
   | `Function_skewX(v) =>
     [%expr CssJs.skewX([%e render_transform_functions(~loc, v)])]
   | `Function_skewY(v) =>
     [%expr CssJs.skewY([%e render_transform_functions(~loc, v)])]
   | `Function_translate(x, None) =>
-    [%expr CssJs.translate([%e render_length_percentage(~loc, x)], 0)]
+    [%expr CssJs.translate([%e render_length_percentage(~loc, x)], `zero)]
   | `Function_translate(x, Some(((), v))) =>
     [%expr
      CssJs.translate(
@@ -2726,21 +2716,27 @@ let transform_origin =
     | `Static((y, x), None) => {
         [
           [%expr
-            CssJs.transformOrigin(
+            CssJs.transformOrigin2(
               [%e render_origin(~loc, x)],
               [%e render_origin(~loc, y)],
             )
           ],
         ];
       }
-    | `Center => [[%expr CssJs.transformOrigin(`Center, `Center)]]
-    | `Left => [[%expr CssJs.transformOrigin(`Left, `Center)]]
-    | `Right => [[%expr CssJs.transformOrigin(`Right, `Center)]]
-    | `Bottom => [[%expr CssJs.transformOrigin(`Bottom, `Center)]]
-    | `Top => [[%expr CssJs.transformOrigin(`Top, `Center)]]
-    | `Static(_, Some(_))
-    | `Extended_length(_)
-    | `Extended_percentage(_) => raise(Unsupported_feature)
+    | `Center => [[%expr CssJs.transformOrigin(`center)]]
+    | `Left => [[%expr CssJs.transformOrigin(`left)]]
+    | `Right => [[%expr CssJs.transformOrigin(`right)]]
+    | `Bottom => [[%expr CssJs.transformOrigin(`bottom)]]
+    | `Top => [[%expr CssJs.transformOrigin(`top)]]
+    | `Extended_length(el) => [
+        [%expr CssJs.transformOrigin([%e render_extended_length(~loc, el)])],
+      ]
+    | `Extended_percentage(ep) => [
+        [%expr
+          CssJs.transformOrigin([%e render_extended_percentage(~loc, ep)])
+        ],
+      ]
+    | `Static(_, Some(_)) => raise(Unsupported_feature)
   );
 let transform_box =
   variants(Parser.property_transform_box, (~loc) =>
@@ -2770,7 +2766,7 @@ let perspective_origin =
     Parser.property_perspective_origin,
     (~loc, position) => {
       let (x, y) = render_position(~loc, position);
-      [[%expr CssJs.perspectiveOrigin([%e x], [%e y])]];
+      [[%expr CssJs.perspectiveOrigin2([%e x], [%e y])]];
     },
   );
 
@@ -2817,11 +2813,11 @@ let render_time_as_int = (~loc) =>
   fun
   | `Ms(f) => {
       let value = Float.to_int(f);
-      [%expr [%e render_integer(~loc, value)]];
+      [%expr `ms([%e render_integer(~loc, value)])];
     }
   | `S(f) => {
       let value = f *. 1000.0 |> Float.to_int;
-      [%expr [%e render_integer(~loc, value)]];
+      [%expr `s([%e render_integer(~loc, value)])];
     };
 
 let render_duration = (~loc) =>
@@ -3070,7 +3066,7 @@ let render_single_animation =
     iteration_count
     |> Option.mapWithDefault(
          render_animation_iteration_count(~loc),
-         [%expr `count(1)],
+         [%expr `count(1.)],
        );
   let name =
     name |> Option.mapWithDefault(render_animation_name(~loc), [%expr `none]);
@@ -3994,7 +3990,7 @@ let render_drop_shadow = (~loc, value: Types.function_drop_shadow) => {
 
 let render_number_percentage = (~loc, value: Types.number_percentage) => {
   switch (value) {
-  | `Number(n) => render_number(~loc, n)
+  | `Number(number) => [%expr `num([%e render_number(~loc, number)])]
   | `Extended_percentage(pct) => render_extended_percentage(~loc, pct)
   };
 };
@@ -4045,6 +4041,19 @@ let filter =
       | `_ms_filter_function_list(_) => raise(Unsupported_feature)
       },
   );
+
+let backdrop_filter =
+  monomorphic(
+    Parser.property_backdrop_filter,
+    (~loc) => [%expr CssJs.backdropFilter],
+    (~loc, value) =>
+      switch (value) {
+      | `None => [%expr [|`none|]]
+      | `Interpolation(v) => render_variable(~loc, v)
+      | `Filter_function_list(ffl) => render_filter_function_list(~loc, ffl)
+      },
+  );
+
 let float = unsupportedProperty(Parser.property_float);
 let font_language_override =
   unsupportedProperty(Parser.property_font_language_override);
@@ -4139,6 +4148,7 @@ let properties = [
   ("animation-timing-function", found(animation_timing_function)),
   ("animation", found(animation)),
   ("backface-visibility", found(backface_visibility)),
+  ("backdrop-filter", found(backdrop_filter)),
   ("background-attachment", found(background_attachment)),
   ("background-clip", found(background_clip)),
   ("background-clip", found(background_clip)),

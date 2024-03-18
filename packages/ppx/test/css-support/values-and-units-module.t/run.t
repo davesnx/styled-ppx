@@ -27,8 +27,8 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   /* [%css {|width: attr(data-px px);|}]; */
   /* [%css {|width: attr(data-px px, initial);|}]; */
   [%css {|width: calc(1px + 2px);|}];
-  [%css {|width: calc(5px*2);|}];
-  [%css {|width: calc(5px/2);|}];
+  [%css {|width: calc(5px * 2);|}];
+  [%css {|width: calc(5px / 2);|}];
   /* [%css {|width: calc(100%/3 - 2*1em - 2*1px);|}]; */
   /* [%css {|width: calc(attr(data-px)*2);|}]; */
   [%css {|width: calc(5px - 10px);|}];
@@ -64,68 +64,3 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   /* [%css {|padding: clamp(12px, 10 * (1vw + 1vh) / 2, 100px);|}]; */
 
   $ dune build
-  File "input.re", line 1, characters 6-18:
-  Error: This expression has type
-           [> `calc of
-                [> `mult of Css_AtomicTypes.Length.t * [> `one of float ] ] ]
-         but an expression was expected of type
-           [< `auto
-            | `calc of
-                [ `add of Css_AtomicTypes.Length.t * Css_AtomicTypes.Length.t
-                | `mult of Css_AtomicTypes.Length.t * Css_AtomicTypes.Length.t
-                | `one of Css_AtomicTypes.Length.t
-                | `sub of Css_AtomicTypes.Length.t * Css_AtomicTypes.Length.t ]
-            | `ch of float
-            | `cm of float
-            | `em of float
-            | `ex of float
-            | `fitContent
-            | `inch of float
-            | `inherit_
-            | `initial
-            | `maxContent
-            | `minContent
-            | `mm of float
-            | `pc of float
-            | `percent of float
-            | `pt of int
-            | `px of int
-            | `pxFloat of float
-            | `rem of float
-            | `revert
-            | `revertLayer
-            | `unset
-            | `var of string
-            | `varDefault of string * string
-            | `vh of float
-            | `vmax of float
-            | `vmin of float
-            | `vw of float
-            | `zero ]
-         Type [> `one of float ] is not compatible with type
-           Css_AtomicTypes.Length.t =
-             [ `calc of
-                 [ `add of Css_AtomicTypes.Length.t * Css_AtomicTypes.Length.t
-                 | `mult of Css_AtomicTypes.Length.t * Css_AtomicTypes.Length.t
-                 | `one of Css_AtomicTypes.Length.t
-                 | `sub of Css_AtomicTypes.Length.t * Css_AtomicTypes.Length.t
-                 ]
-             | `ch of float
-             | `cm of float
-             | `em of float
-             | `ex of float
-             | `inch of float
-             | `mm of float
-             | `pc of float
-             | `percent of float
-             | `pt of int
-             | `px of int
-             | `pxFloat of float
-             | `rem of float
-             | `vh of float
-             | `vmax of float
-             | `vmin of float
-             | `vw of float
-             | `zero ]
-         The second variant type does not allow tag(s) `one
-  [1]

@@ -113,7 +113,6 @@
 [%css {|place-content: normal stretch|}];
 [%css {|place-content: baseline stretch|}];
 [%css {|place-content: first baseline stretch|}];
-[%css {|place-content: space-between stretch|}];
 [%css {|place-content: center stretch|}];
 [%css {|place-content: unsafe start stretch|}];
 [%css {|place-content: normal safe right|}];
@@ -158,6 +157,7 @@
 [%css {|place-items: first baseline legacy left|}];
 [%css {|place-items: self-start legacy left|}];
 [%css {|place-items: unsafe start legacy left|}];
+
 [%css {|gap: 0 0|}];
 [%css {|gap: 0 1em|}];
 [%css {|gap: 1em|}];

@@ -30,6 +30,8 @@
 [%css {|animation: none;|}];
 [%css {|appearance: none;|}];
 [%css {|aspect-ratio: 21 / 8;|}];
+
+let c = CssJs.hex("e15a46");
 [%css {|background-color: $(c);|}];
 [%css {|border: none;|}];
 [%css {|bottom: unset;|}];
@@ -45,7 +47,7 @@
 [%css {|display: -webkit-box;|}];
 [%css {|display: contents;|}];
 [%css {|display: table;|}];
-[%css {|fill: $(color);|}];
+[%css {|fill: $(c);|}];
 [%css {|fill: currentColor;|}];
 [%css {|gap: 4px;|}];
 /* [%css {|grid-column-end: span 2;|}]; */
@@ -64,7 +66,10 @@
 [%css {|justify-items: start;|}];
 [%css {|justify-self: unset;|}];
 [%css {|left: unset;|}];
-[%css {|mask-image: $(eyeCrossedIcon);|}];
+
+let maskedImageUrl = `url("https://www.example.com/eye-uncrossed.svg");
+
+[%css {|mask-image: $(maskedImageUrl);|}];
 [%css {|mask-position: center center;|}];
 [%css {|mask-repeat: no-repeat;|}];
 [%css {|max-width: max-content;|}];

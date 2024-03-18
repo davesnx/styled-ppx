@@ -10,127 +10,287 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   $ cat >dune <<EOF
   > (executable
   >  (name input)
-  >  (libraries styled-ppx.emotion_native styled-ppx.css_native)
+  >  (libraries styled-ppx.css_native styled-ppx.emotion_native)
   >  (preprocess (pps styled-ppx.lib)))
   > EOF
 
-  $ dune describe pp input.re
-  /* CSSOM View Module */
-  /* [%css {|scroll-behavior: auto|}]; */
-  [%css {|scroll-behavior: smooth|}];
-  
-  /* CSS Scroll Anchoring Module Level 1 */
-  [%css {|overflow-anchor: none|}];
-  /* [%css {|overflow-anchor: auto|}]; */
-  
-  /* Random fixtures */
-  
-  [%css {|width: calc(50% + 4px)|}];
-  [%css {|width: calc(20px - 10px)|}];
-  [%css {|width: calc(100vh - calc(2rem + 120px))|}];
-  /* [%css {|width: calc(100vh * 2)|}]; */
-  [%css
-    {|width: calc(100vh - calc(2rem + calc(2rem + calc(2rem + calc(2rem + 120px)))))|}
-  ];
-  /* [%css {|width: calc(100vh * calc(2rem - calc(2rem * calc(2rem * calc(2rem / 4)))))|}]; */
-  
-  [%css {|-moz-appearance: textfield;|}];
-  [%css {|-webkit-appearance: none;|}];
-  [%css {|-webkit-box-orient: vertical;|}];
-  [%css
-    {|-webkit-box-shadow: inset 0 0 0 1000px $(Color.Background.selectedMuted);|}
-  ];
-  [%css {|-webkit-line-clamp: 2;|}];
-  [%css {|-webkit-overflow-scrolling: touch;|}];
-  [%css {|-webkit-tap-highlight-color: transparent;|}];
-  [%css {|-webkit-text-fill-color: $(Color.Text.primary);|}];
-  [%css {|animation: none;|}];
-  [%css {|appearance: none;|}];
-  [%css {|aspect-ratio: 21 / 8;|}];
-  [%css {|background-color: $(c);|}];
-  [%css {|border: none;|}];
-  [%css {|bottom: unset;|}];
-  [%css {|box-shadow: none;|}];
-  [%css {|break-inside: avoid;|}];
-  [%css {|caret-color: #e15a46;|}];
-  [%css {|color: inherit;|}];
-  [%css {|color: var(--color-link);|}];
-  [%css {|column-width: 125px;|}];
-  [%css {|column-width: auto;|}];
-  /* [%css {|counter-increment: ol;|}]; */
-  /* [%css {|counter-reset: ol;|}]; */
-  [%css {|display: -webkit-box;|}];
-  [%css {|display: contents;|}];
-  [%css {|display: table;|}];
-  [%css {|fill: $(color);|}];
-  [%css {|fill: currentColor;|}];
-  [%css {|gap: 4px;|}];
-  /* [%css {|grid-column-end: span 2;|}]; */
-  [%css {|grid-column: unset;|}];
-  [%css {|grid-row: unset;|}];
-  [%css {|grid-template-columns: max-content max-content;|}];
-  [%css
-    {|grid-template-columns: minmax(10px, auto) fit-content(20px) fit-content(20px);|}
-  ];
-  [%css
-    {|grid-template-columns: minmax(51px, auto) fit-content(20px) fit-content(20px);|}
-  ];
-  [%css {|grid-template-columns: repeat(2, auto);|}];
-  [%css {|grid-template-columns: repeat(3, auto);|}];
-  [%css {|height: fit-content;|}];
-  [%css {|justify-items: start;|}];
-  [%css {|justify-self: unset;|}];
-  [%css {|left: unset;|}];
-  [%css {|mask-image: $(eyeCrossedIcon);|}];
-  [%css {|mask-position: center center;|}];
-  [%css {|mask-repeat: no-repeat;|}];
-  [%css {|max-width: max-content;|}];
-  [%css {|outline: none;|}];
-  [%css {|overflow-anchor: none;|}];
-  [%css {|position: unset;|}];
-  [%css {|resize: none;|}];
-  [%css {|right: calc(50% - 4px);|}];
-  [%css {|scroll-behavior: smooth;|}];
-  [%css {|stroke-opacity: 0;|}];
-  [%css {|stroke: $(Color.Text.white);|}];
-  [%css {|top: calc(50% - 1px);|}];
-  [%css {|top: unset;|}];
-  [%css {|touch-action: none;|}];
-  [%css {|touch-action: pan-x pan-y;|}];
-  /* [%css {|transform-origin: center bottom;|}]; */
-  [%css {|transform-origin: center left;|}];
-  [%css {|transform-origin: center right;|}];
-  [%css {|transform-origin: 2px;|}];
-  [%css {|transform-origin: bottom;|}];
-  [%css {|transform-origin: 3cm 2px;|}];
-  [%css {|transform-origin: left 2px;|}];
-  /* [%css {|transform-origin: center top;|}]; */
-  [%css {|transform: none;|}];
-  /* [%css {|width: -webkit-fill-available;|}]; */
-  [%css {|width: fit-content;|}];
-  [%css {|width: max-content;|}];
-  
-  [%css {|transition-delay: 240ms|}];
-  [%css {|animation-duration: 150ms|}];
-  
-  /* [%css {|top: calc(50% + var(--value-from-var));|}]; */
-  
-  [%css {|border-width: thin|}];
-  [%css {|outline-width: medium|}];
-  [%css {|outline: medium solid red|}];
-  
-  /* CSS Overflow Module Level 3 */
-  [%css {|overflow: $(lola)|}];
-  [%css {|overflow: hidden|}];
-  [%css {|overflow-y: $(lola)|}];
-  [%css {|overflow-x: hidden|}];
-  
-  [%css {|overflow-block: hidden|}];
-  [%css {|overflow-block: $(value)|}];
-  [%css {|overflow-inline: $(value)|}];
+  $ dune build
+  File "input.re", line 1, characters 7-27:
+  Error: Unbound module Color
+  [1]
+
+  $ dune_describe_pp _build/default/input.re.pp.ml
+  [@@@ocaml.ppx.context
+    {
+      tool_name = "ppx_driver";
+      include_dirs = [];
+      load_path = [];
+      open_modules = [];
+      for_package = None;
+      debug = false;
+      use_threads = false;
+      use_vmthreads = false;
+      recursive_types = false;
+      principal = false;
+      transparent_modules = false;
+      unboxed_types = false;
+      unsafe_string = false;
+      cookies = []
+    }]
+  ;;CssJs.unsafe {js|scrollBehavior|js} {js|smooth|js}
+  ;;CssJs.unsafe {js|overflowAnchor|js} {js|none|js}
+  ;;CssJs.width (`calc (`add ((`percent 50.), (`pxFloat 4.))))
+  ;;CssJs.width (`calc (`sub ((`pxFloat 20.), (`pxFloat 10.))))
+  ;;CssJs.width
+      (`calc (`sub ((`vh 100.), (`calc (`add ((`rem 2.), (`pxFloat 120.)))))))
+  ;;CssJs.width
+      (`calc
+         (`sub
+            ((`vh 100.),
+              (`calc
+                 (`add
+                    ((`rem 2.),
+                      (`calc
+                         (`add
+                            ((`rem 2.),
+                              (`calc
+                                 (`add
+                                    ((`rem 2.),
+                                      (`calc
+                                         (`add ((`rem 2.), (`pxFloat 120.))))))))))))))))
+  ;;CssJs.unsafe {js|MozAppearance|js} {js|textfield|js}
+  ;;CssJs.unsafe {js|WebkitAppearance|js} {js|none|js}
+  ;;CssJs.unsafe {js|WebkitBoxOrient|js} {js|vertical|js}
+  ;;CssJs.unsafe {js|WebkitBoxShadow|js}
+      {js|inset 0 0 0 1000px $(Color.Background.selectedMuted)|js}
+  ;;CssJs.unsafe {js|WebkitLineClamp|js} {js|2|js}
+  ;;CssJs.unsafe {js|WebkitOverflowScrolling|js} {js|touch|js}
+  ;;CssJs.unsafe {js|WebkitTapHighlightColor|js} {js|transparent|js}
+  ;;CssJs.unsafe {js|WebkitTextFillColor|js} {js|$(Color.Text.primary)|js}
+  ;;CssJs.animation ~duration:(`ms 0) ~delay:(`ms 0) ~direction:`normal
+      ~timingFunction:`ease ~fillMode:`none ~playState:`running
+      ~iterationCount:(`count 1.) {js|none|js}
+  ;;CssJs.unsafe {js|appearance|js} {js|none|js}
+  ;;CssJs.unsafe {js|aspectRatio|js} {js|21 / 8|js}
+  let c = CssJs.hex "e15a46"
+  ;;(CssJs.backgroundColor c : CssJs.rule)
+  ;;CssJs.unsafe {js|border|js} {js|none|js}
+  ;;CssJs.unsafe {js|bottom|js} {js|unset|js}
+  ;;CssJs.boxShadow `none
+  ;;CssJs.unsafe {js|breakInside|js} {js|avoid|js}
+  ;;CssJs.unsafe {js|caretColor|js} {js|#e15a46|js}
+  ;;CssJs.unsafe {js|color|js} {js|inherit|js}
+  ;;CssJs.color (`var {js|--color-link|js})
+  ;;CssJs.columnWidth (`pxFloat 125.)
+  ;;CssJs.columnWidth `auto
+  ;;CssJs.display `webkitBox
+  ;;CssJs.display `contents
+  ;;CssJs.display `table
+  ;;(CssJs.SVG.fill c : CssJs.rule)
+  ;;CssJs.SVG.fill `currentColor
+  ;;CssJs.gap (`pxFloat 4.)
+  ;;CssJs.unsafe {js|grid-column|js} {js|unset|js}
+  ;;CssJs.unsafe {js|grid-row|js} {js|unset|js}
+  ;;CssJs.gridTemplateColumns [|`maxContent;`maxContent|]
+  ;;CssJs.gridTemplateColumns
+      [|(`minmax ((`pxFloat 10.), `auto));(`fitContent (`pxFloat 20.));(
+        `fitContent (`pxFloat 20.))|]
+  ;;CssJs.gridTemplateColumns
+      [|(`minmax ((`pxFloat 51.), `auto));(`fitContent (`pxFloat 20.));(
+        `fitContent (`pxFloat 20.))|]
+  ;;CssJs.gridTemplateColumns [|(`repeat ((`num 2), [|`auto|]))|]
+  ;;CssJs.gridTemplateColumns [|(`repeat ((`num 3), [|`auto|]))|]
+  ;;CssJs.unsafe {js|height|js} {js|fit-content|js}
+  ;;CssJs.justifyItems `start
+  ;;CssJs.unsafe {js|justify-self|js} {js|unset|js}
+  ;;CssJs.unsafe {js|left|js} {js|unset|js}
+  let maskedImageUrl = `url "https://www.example.com/eye-uncrossed.svg"
+  ;;(CssJs.maskImage maskedImageUrl : CssJs.rule)
+  ;;CssJs.unsafe {js|maskPosition|js} {js|center center|js}
+  ;;CssJs.unsafe {js|maskRepeat|js} {js|no-repeat|js}
+  ;;CssJs.maxWidth `maxContent
+  ;;CssJs.unsafe {js|outline|js} {js|none|js}
+  ;;CssJs.unsafe {js|overflowAnchor|js} {js|none|js}
+  ;;CssJs.unsafe {js|position|js} {js|unset|js}
+  ;;CssJs.unsafe {js|resize|js} {js|none|js}
+  ;;CssJs.right (`calc (`sub ((`percent 50.), (`pxFloat 4.))))
+  ;;CssJs.unsafe {js|scrollBehavior|js} {js|smooth|js}
+  ;;CssJs.SVG.strokeOpacity (`num 0.)
+  ;;(CssJs.SVG.stroke Color.Text.white : CssJs.rule)
+  ;;CssJs.top (`calc (`sub ((`percent 50.), (`pxFloat 1.))))
+  ;;CssJs.unsafe {js|top|js} {js|unset|js}
+  ;;CssJs.unsafe {js|touchAction|js} {js|none|js}
+  ;;CssJs.unsafe {js|touchAction|js} {js|pan-x pan-y|js}
+  ;;CssJs.transformOrigin2 `center `left
+  ;;CssJs.transformOrigin2 `center `right
+  ;;CssJs.transformOrigin (`pxFloat 2.)
+  ;;CssJs.transformOrigin `bottom
+  ;;CssJs.transformOrigin2 (`cm 3.) (`pxFloat 2.)
+  ;;CssJs.transformOrigin2 (`pxFloat 2.) `left
+  ;;CssJs.transform `none
+  ;;CssJs.unsafe {js|width|js} {js|fit-content|js}
+  ;;CssJs.width `maxContent
+  ;;CssJs.transitionDelay (`ms 240)
+  ;;CssJs.animationDuration (`ms 150)
+  ;;CssJs.borderWidth `thin
+  ;;CssJs.outlineWidth `medium
+  ;;CssJs.outline `medium `solid CssJs.red
+  ;;CssJs.overflow lola
+  ;;CssJs.overflow `hidden
+  ;;(CssJs.overflowY lola : CssJs.rule)
+  ;;CssJs.overflowX `hidden
+  ;;CssJs.overflowBlock `hidden
+  ;;(CssJs.overflowBlock value : CssJs.rule)
+  ;;(CssJs.overflowInline value : CssJs.rule)
 
   $ dune build
-  File "input.re", line 1, characters 10-15:
-  Error: This expression has type [> `ms of int ]
-         but an expression was expected of type int
+  File "input.re", line 1, characters 7-27:
+  Error: Unbound module Color
   [1]
+
+  $ dune_describe_pp _build/default/input.re.pp.ml | refmt --parse ml --print re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      load_path: [],
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      transparent_modules: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];
+  CssJs.unsafe({js|scrollBehavior|js}, {js|smooth|js});
+  CssJs.unsafe({js|overflowAnchor|js}, {js|none|js});
+  CssJs.width(`calc(`add((`percent(50.), `pxFloat(4.)))));
+  CssJs.width(`calc(`sub((`pxFloat(20.), `pxFloat(10.)))));
+  CssJs.width(
+    `calc(`sub((`vh(100.), `calc(`add((`rem(2.), `pxFloat(120.))))))),
+  );
+  CssJs.width(
+    `calc(
+      `sub((
+        `vh(100.),
+        `calc(
+          `add((
+            `rem(2.),
+            `calc(
+              `add((
+                `rem(2.),
+                `calc(
+                  `add((
+                    `rem(2.),
+                    `calc(`add((`rem(2.), `pxFloat(120.)))),
+                  )),
+                ),
+              )),
+            ),
+          )),
+        ),
+      )),
+    ),
+  );
+  CssJs.unsafe({js|MozAppearance|js}, {js|textfield|js});
+  CssJs.unsafe({js|WebkitAppearance|js}, {js|none|js});
+  CssJs.unsafe({js|WebkitBoxOrient|js}, {js|vertical|js});
+  CssJs.unsafe(
+    {js|WebkitBoxShadow|js},
+    {js|inset 0 0 0 1000px $(Color.Background.selectedMuted)|js},
+  );
+  CssJs.unsafe({js|WebkitLineClamp|js}, {js|2|js});
+  CssJs.unsafe({js|WebkitOverflowScrolling|js}, {js|touch|js});
+  CssJs.unsafe({js|WebkitTapHighlightColor|js}, {js|transparent|js});
+  CssJs.unsafe({js|WebkitTextFillColor|js}, {js|$(Color.Text.primary)|js});
+  CssJs.animation(
+    ~duration=`ms(0),
+    ~delay=`ms(0),
+    ~direction=`normal,
+    ~timingFunction=`ease,
+    ~fillMode=`none,
+    ~playState=`running,
+    ~iterationCount=`count(1.),
+    {js|none|js},
+  );
+  CssJs.unsafe({js|appearance|js}, {js|none|js});
+  CssJs.unsafe({js|aspectRatio|js}, {js|21 / 8|js});
+  let c = CssJs.hex("e15a46");
+  (CssJs.backgroundColor(c): CssJs.rule);
+  CssJs.unsafe({js|border|js}, {js|none|js});
+  CssJs.unsafe({js|bottom|js}, {js|unset|js});
+  CssJs.boxShadow(`none);
+  CssJs.unsafe({js|breakInside|js}, {js|avoid|js});
+  CssJs.unsafe({js|caretColor|js}, {js|#e15a46|js});
+  CssJs.unsafe({js|color|js}, {js|inherit|js});
+  CssJs.color(`var({js|--color-link|js}));
+  CssJs.columnWidth(`pxFloat(125.));
+  CssJs.columnWidth(`auto);
+  CssJs.display(`webkitBox);
+  CssJs.display(`contents);
+  CssJs.display(`table);
+  (CssJs.SVG.fill(c): CssJs.rule);
+  CssJs.SVG.fill(`currentColor);
+  CssJs.gap(`pxFloat(4.));
+  CssJs.unsafe({js|grid-column|js}, {js|unset|js});
+  CssJs.unsafe({js|grid-row|js}, {js|unset|js});
+  CssJs.gridTemplateColumns([|`maxContent, `maxContent|]);
+  CssJs.gridTemplateColumns([|
+    `minmax((`pxFloat(10.), `auto)),
+    `fitContent(`pxFloat(20.)),
+    `fitContent(`pxFloat(20.)),
+  |]);
+  CssJs.gridTemplateColumns([|
+    `minmax((`pxFloat(51.), `auto)),
+    `fitContent(`pxFloat(20.)),
+    `fitContent(`pxFloat(20.)),
+  |]);
+  CssJs.gridTemplateColumns([|`repeat((`num(2), [|`auto|]))|]);
+  CssJs.gridTemplateColumns([|`repeat((`num(3), [|`auto|]))|]);
+  CssJs.unsafe({js|height|js}, {js|fit-content|js});
+  CssJs.justifyItems(`start);
+  CssJs.unsafe({js|justify-self|js}, {js|unset|js});
+  CssJs.unsafe({js|left|js}, {js|unset|js});
+  let maskedImageUrl = `url("https://www.example.com/eye-uncrossed.svg");
+  (CssJs.maskImage(maskedImageUrl): CssJs.rule);
+  CssJs.unsafe({js|maskPosition|js}, {js|center center|js});
+  CssJs.unsafe({js|maskRepeat|js}, {js|no-repeat|js});
+  CssJs.maxWidth(`maxContent);
+  CssJs.unsafe({js|outline|js}, {js|none|js});
+  CssJs.unsafe({js|overflowAnchor|js}, {js|none|js});
+  CssJs.unsafe({js|position|js}, {js|unset|js});
+  CssJs.unsafe({js|resize|js}, {js|none|js});
+  CssJs.right(`calc(`sub((`percent(50.), `pxFloat(4.)))));
+  CssJs.unsafe({js|scrollBehavior|js}, {js|smooth|js});
+  CssJs.SVG.strokeOpacity(`num(0.));
+  (CssJs.SVG.stroke(Color.Text.white): CssJs.rule);
+  CssJs.top(`calc(`sub((`percent(50.), `pxFloat(1.)))));
+  CssJs.unsafe({js|top|js}, {js|unset|js});
+  CssJs.unsafe({js|touchAction|js}, {js|none|js});
+  CssJs.unsafe({js|touchAction|js}, {js|pan-x pan-y|js});
+  CssJs.transformOrigin2(`center, `left);
+  CssJs.transformOrigin2(`center, `right);
+  CssJs.transformOrigin(`pxFloat(2.));
+  CssJs.transformOrigin(`bottom);
+  CssJs.transformOrigin2(`cm(3.), `pxFloat(2.));
+  CssJs.transformOrigin2(`pxFloat(2.), `left);
+  CssJs.transform(`none);
+  CssJs.unsafe({js|width|js}, {js|fit-content|js});
+  CssJs.width(`maxContent);
+  CssJs.transitionDelay(`ms(240));
+  CssJs.animationDuration(`ms(150));
+  CssJs.borderWidth(`thin);
+  CssJs.outlineWidth(`medium);
+  CssJs.outline(`medium, `solid, CssJs.red);
+  CssJs.overflow(lola);
+  CssJs.overflow(`hidden);
+  (CssJs.overflowY(lola): CssJs.rule);
+  CssJs.overflowX(`hidden);
+  CssJs.overflowBlock(`hidden);
+  (CssJs.overflowBlock(value): CssJs.rule);
+  (CssJs.overflowInline(value): CssJs.rule);

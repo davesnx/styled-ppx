@@ -14,143 +14,151 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   >  (preprocess (pps styled-ppx.lib)))
   > EOF
 
-  $ dune describe pp input.re
-  /* CSS Masking Module Level 1 */
-  [%css {|clip-path: url('#clip')|}];
-  [%css {|clip-path: inset(50%)|}];
-  /* [%css {|clip-path: circle()|}]; */
-  /* [%css {|clip-path: ellipse()|}]; */
-  /* [%css {|clip-path: polygon(0 10px, 30px 0)|}]; */
-  [%css {|clip-path: path('M 20 20 H 80 V 30')|}];
-  /* [%css {|clip-path: circle() border-box|}]; */
-  [%css {|clip-path: border-box|}];
-  [%css {|clip-path: padding-box|}];
-  [%css {|clip-path: content-box|}];
-  [%css {|clip-path: margin-box|}];
-  [%css {|clip-path: fill-box|}];
-  [%css {|clip-path: stroke-box|}];
-  [%css {|clip-path: view-box|}];
-  [%css {|clip-path: none|}];
-  [%css {|clip-rule: nonzero|}];
-  [%css {|clip-rule: evenodd|}];
-  [%css {|mask-image: none|}];
-  [%css {|mask-image: linear-gradient(45deg, blue, red)|}];
-  [%css {|mask-image: url(image.png)|}];
-  [%css {|mask-mode: alpha|}];
-  [%css {|mask-mode: luminance|}];
-  [%css {|mask-mode: match-source|}];
-  [%css {|mask-repeat: repeat-x|}];
-  [%css {|mask-repeat: repeat-y|}];
-  [%css {|mask-repeat: repeat|}];
-  [%css {|mask-repeat: space|}];
-  [%css {|mask-repeat: round|}];
-  [%css {|mask-repeat: no-repeat|}];
-  [%css {|mask-repeat: repeat repeat|}];
-  [%css {|mask-repeat: space repeat|}];
-  [%css {|mask-repeat: round repeat|}];
-  [%css {|mask-repeat: no-repeat repeat|}];
-  [%css {|mask-repeat: repeat space|}];
-  [%css {|mask-repeat: space space|}];
-  [%css {|mask-repeat: round space|}];
-  [%css {|mask-repeat: no-repeat space|}];
-  [%css {|mask-repeat: repeat round|}];
-  [%css {|mask-repeat: space round|}];
-  [%css {|mask-repeat: round round|}];
-  [%css {|mask-repeat: no-repeat round|}];
-  [%css {|mask-repeat: repeat no-repeat|}];
-  [%css {|mask-repeat: space no-repeat|}];
-  [%css {|mask-repeat: round no-repeat|}];
-  [%css {|mask-repeat: no-repeat no-repeat|}];
-  [%css {|mask-position: center|}];
-  [%css {|mask-position: center center|}];
-  [%css {|mask-position: left 50%|}];
-  [%css {|mask-position: bottom 10px right 20px|}];
-  /* TODO: mask-position is incomplete in Parser.re */
-  /* [%css {|mask-position: bottom 10px right|}]; */
-  /* [%css {|mask-position: top right 10px|}]; */
-  [%css {|mask-clip: border-box|}];
-  [%css {|mask-clip: padding-box|}];
-  [%css {|mask-clip: content-box|}];
-  [%css {|mask-clip: margin-box|}];
-  [%css {|mask-clip: fill-box|}];
-  [%css {|mask-clip: stroke-box|}];
-  [%css {|mask-clip: view-box|}];
-  [%css {|mask-clip: no-clip|}];
-  [%css {|mask-origin: border-box|}];
-  [%css {|mask-origin: padding-box|}];
-  [%css {|mask-origin: content-box|}];
-  [%css {|mask-origin: margin-box|}];
-  [%css {|mask-origin: fill-box|}];
-  [%css {|mask-origin: stroke-box|}];
-  [%css {|mask-origin: view-box|}];
-  [%css {|mask-size: auto|}];
-  [%css {|mask-size: 10px|}];
-  [%css {|mask-size: cover|}];
-  [%css {|mask-size: contain|}];
-  [%css {|mask-size: 10px|}];
-  [%css {|mask-size: 50%|}];
-  [%css {|mask-size: 10px auto|}];
-  [%css {|mask-size: auto 10%|}];
-  [%css {|mask-size: 50em 50%|}];
-  [%css {|mask-composite: add|}];
-  [%css {|mask-composite: subtract|}];
-  [%css {|mask-composite: intersect|}];
-  [%css {|mask-composite: exclude|}];
-  [%css {|mask: top|}];
-  [%css {|mask: space|}];
-  [%css {|mask: url(image.png)|}];
-  [%css {|mask: url(image.png) luminance|}];
-  [%css {|mask: url(image.png) luminance top space|}];
-  [%css {|mask-border-source: none|}];
-  [%css {|mask-border-source: url(image.png)|}];
-  [%css {|mask-border-slice: 0 fill|}];
-  [%css {|mask-border-slice: 50% fill|}];
-  [%css {|mask-border-slice: 1.1 fill|}];
-  [%css {|mask-border-slice: 0 1 fill|}];
-  [%css {|mask-border-slice: 0 1 2 fill|}];
-  [%css {|mask-border-slice: 0 1 2 3 fill|}];
-  [%css {|mask-border-width: auto|}];
-  [%css {|mask-border-width: 10px|}];
-  [%css {|mask-border-width: 50%|}];
-  [%css {|mask-border-width: 1|}];
-  [%css {|mask-border-width: 1.0|}];
-  [%css {|mask-border-width: auto 1|}];
-  [%css {|mask-border-width: auto 1 50%|}];
-  [%css {|mask-border-width: auto 1 50% 1.1|}];
-  [%css {|mask-border-outset: 0|}];
-  [%css {|mask-border-outset: 1.1|}];
-  [%css {|mask-border-outset: 0 1|}];
-  [%css {|mask-border-outset: 0 1 2|}];
-  [%css {|mask-border-outset: 0 1 2 3|}];
-  [%css {|mask-border-repeat: stretch|}];
-  [%css {|mask-border-repeat: repeat|}];
-  [%css {|mask-border-repeat: round|}];
-  [%css {|mask-border-repeat: space|}];
-  [%css {|mask-border-repeat: stretch stretch|}];
-  [%css {|mask-border-repeat: repeat stretch|}];
-  [%css {|mask-border-repeat: round stretch|}];
-  [%css {|mask-border-repeat: space stretch|}];
-  [%css {|mask-border-repeat: stretch repeat|}];
-  [%css {|mask-border-repeat: repeat repeat|}];
-  [%css {|mask-border-repeat: round repeat|}];
-  [%css {|mask-border-repeat: space repeat|}];
-  [%css {|mask-border-repeat: stretch round|}];
-  [%css {|mask-border-repeat: repeat round|}];
-  [%css {|mask-border-repeat: round round|}];
-  [%css {|mask-border-repeat: space round|}];
-  [%css {|mask-border-repeat: stretch space|}];
-  [%css {|mask-border-repeat: repeat space|}];
-  [%css {|mask-border-repeat: round space|}];
-  [%css {|mask-border-repeat: space space|}];
-  [%css {|mask-border: url(image.png)|}];
-  /* TODO: Parser.re is incomplete */
-  /* [%css {|mask-border: url(image.png) 10px|}]; */
-  /* [%css {|mask-border: url(image.png) space|}]; */
-  /* [%css {|mask-border: url(image.png) 1 fill|}]; */
-  /* [%css {|mask-border: url(image.png) 1 fill 10px|}]; */
-  /* [%css {|mask-border: url(image.png) 1 fill 10px|}]; */
-  /* [%css {|mask-border: url(image.png) 1 fill 10px 2|}]; */
-  [%css {|mask-type: luminance|}];
-  [%css {|mask-type: alpha|}];
-
   $ dune build
+
+  $ dune_describe_pp _build/default/input.re.pp.ml | refmt --parse ml --print re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      load_path: [],
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      transparent_modules: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];
+  CssJs.unsafe({js|clipPath|js}, {js|url('#clip')|js});
+  CssJs.unsafe({js|clipPath|js}, {js|inset(50%)|js});
+  CssJs.unsafe({js|clipPath|js}, {js|path('M 20 20 H 80 V 30')|js});
+  CssJs.unsafe({js|clipPath|js}, {js|border-box|js});
+  CssJs.unsafe({js|clipPath|js}, {js|padding-box|js});
+  CssJs.unsafe({js|clipPath|js}, {js|content-box|js});
+  CssJs.unsafe({js|clipPath|js}, {js|margin-box|js});
+  CssJs.unsafe({js|clipPath|js}, {js|fill-box|js});
+  CssJs.unsafe({js|clipPath|js}, {js|stroke-box|js});
+  CssJs.unsafe({js|clipPath|js}, {js|view-box|js});
+  CssJs.unsafe({js|clipPath|js}, {js|none|js});
+  CssJs.unsafe({js|clipRule|js}, {js|nonzero|js});
+  CssJs.unsafe({js|clipRule|js}, {js|evenodd|js});
+  CssJs.maskImage(`none);
+  CssJs.maskImage(
+    `linearGradient((
+      Some(`Angle(`deg(45.))),
+      [|(`hex({js|333|js}), None), (`hex({js|000|js}), None)|],
+    )),
+  );
+  CssJs.unsafe({js|maskImage|js}, {js|url(image.png)|js});
+  CssJs.unsafe({js|maskMode|js}, {js|alpha|js});
+  CssJs.unsafe({js|maskMode|js}, {js|luminance|js});
+  CssJs.unsafe({js|maskMode|js}, {js|match-source|js});
+  CssJs.unsafe({js|maskRepeat|js}, {js|repeat-x|js});
+  CssJs.unsafe({js|maskRepeat|js}, {js|repeat-y|js});
+  CssJs.unsafe({js|maskRepeat|js}, {js|repeat|js});
+  CssJs.unsafe({js|maskRepeat|js}, {js|space|js});
+  CssJs.unsafe({js|maskRepeat|js}, {js|round|js});
+  CssJs.unsafe({js|maskRepeat|js}, {js|no-repeat|js});
+  CssJs.unsafe({js|maskRepeat|js}, {js|repeat repeat|js});
+  CssJs.unsafe({js|maskRepeat|js}, {js|space repeat|js});
+  CssJs.unsafe({js|maskRepeat|js}, {js|round repeat|js});
+  CssJs.unsafe({js|maskRepeat|js}, {js|no-repeat repeat|js});
+  CssJs.unsafe({js|maskRepeat|js}, {js|repeat space|js});
+  CssJs.unsafe({js|maskRepeat|js}, {js|space space|js});
+  CssJs.unsafe({js|maskRepeat|js}, {js|round space|js});
+  CssJs.unsafe({js|maskRepeat|js}, {js|no-repeat space|js});
+  CssJs.unsafe({js|maskRepeat|js}, {js|repeat round|js});
+  CssJs.unsafe({js|maskRepeat|js}, {js|space round|js});
+  CssJs.unsafe({js|maskRepeat|js}, {js|round round|js});
+  CssJs.unsafe({js|maskRepeat|js}, {js|no-repeat round|js});
+  CssJs.unsafe({js|maskRepeat|js}, {js|repeat no-repeat|js});
+  CssJs.unsafe({js|maskRepeat|js}, {js|space no-repeat|js});
+  CssJs.unsafe({js|maskRepeat|js}, {js|round no-repeat|js});
+  CssJs.unsafe({js|maskRepeat|js}, {js|no-repeat no-repeat|js});
+  CssJs.unsafe({js|maskPosition|js}, {js|center|js});
+  CssJs.unsafe({js|maskPosition|js}, {js|center center|js});
+  CssJs.unsafe({js|maskPosition|js}, {js|left 50%|js});
+  CssJs.unsafe({js|maskPosition|js}, {js|bottom 10px right 20px|js});
+  CssJs.unsafe({js|maskClip|js}, {js|border-box|js});
+  CssJs.unsafe({js|maskClip|js}, {js|padding-box|js});
+  CssJs.unsafe({js|maskClip|js}, {js|content-box|js});
+  CssJs.unsafe({js|maskClip|js}, {js|margin-box|js});
+  CssJs.unsafe({js|maskClip|js}, {js|fill-box|js});
+  CssJs.unsafe({js|maskClip|js}, {js|stroke-box|js});
+  CssJs.unsafe({js|maskClip|js}, {js|view-box|js});
+  CssJs.unsafe({js|maskClip|js}, {js|no-clip|js});
+  CssJs.unsafe({js|maskOrigin|js}, {js|border-box|js});
+  CssJs.unsafe({js|maskOrigin|js}, {js|padding-box|js});
+  CssJs.unsafe({js|maskOrigin|js}, {js|content-box|js});
+  CssJs.unsafe({js|maskOrigin|js}, {js|margin-box|js});
+  CssJs.unsafe({js|maskOrigin|js}, {js|fill-box|js});
+  CssJs.unsafe({js|maskOrigin|js}, {js|stroke-box|js});
+  CssJs.unsafe({js|maskOrigin|js}, {js|view-box|js});
+  CssJs.unsafe({js|maskSize|js}, {js|auto|js});
+  CssJs.unsafe({js|maskSize|js}, {js|10px|js});
+  CssJs.unsafe({js|maskSize|js}, {js|cover|js});
+  CssJs.unsafe({js|maskSize|js}, {js|contain|js});
+  CssJs.unsafe({js|maskSize|js}, {js|10px|js});
+  CssJs.unsafe({js|maskSize|js}, {js|50%|js});
+  CssJs.unsafe({js|maskSize|js}, {js|10px auto|js});
+  CssJs.unsafe({js|maskSize|js}, {js|auto 10%|js});
+  CssJs.unsafe({js|maskSize|js}, {js|50em 50%|js});
+  CssJs.unsafe({js|maskComposite|js}, {js|add|js});
+  CssJs.unsafe({js|maskComposite|js}, {js|subtract|js});
+  CssJs.unsafe({js|maskComposite|js}, {js|intersect|js});
+  CssJs.unsafe({js|maskComposite|js}, {js|exclude|js});
+  CssJs.unsafe({js|mask|js}, {js|top|js});
+  CssJs.unsafe({js|mask|js}, {js|space|js});
+  CssJs.unsafe({js|mask|js}, {js|url(image.png)|js});
+  CssJs.unsafe({js|mask|js}, {js|url(image.png) luminance|js});
+  CssJs.unsafe({js|mask|js}, {js|url(image.png) luminance top space|js});
+  CssJs.unsafe({js|maskBorderSource|js}, {js|none|js});
+  CssJs.unsafe({js|maskBorderSource|js}, {js|url(image.png)|js});
+  CssJs.unsafe({js|maskBorderSlice|js}, {js|0 fill|js});
+  CssJs.unsafe({js|maskBorderSlice|js}, {js|50% fill|js});
+  CssJs.unsafe({js|maskBorderSlice|js}, {js|1.1 fill|js});
+  CssJs.unsafe({js|maskBorderSlice|js}, {js|0 1 fill|js});
+  CssJs.unsafe({js|maskBorderSlice|js}, {js|0 1 2 fill|js});
+  CssJs.unsafe({js|maskBorderSlice|js}, {js|0 1 2 3 fill|js});
+  CssJs.unsafe({js|maskBorderWidth|js}, {js|auto|js});
+  CssJs.unsafe({js|maskBorderWidth|js}, {js|10px|js});
+  CssJs.unsafe({js|maskBorderWidth|js}, {js|50%|js});
+  CssJs.unsafe({js|maskBorderWidth|js}, {js|1|js});
+  CssJs.unsafe({js|maskBorderWidth|js}, {js|1.0|js});
+  CssJs.unsafe({js|maskBorderWidth|js}, {js|auto 1|js});
+  CssJs.unsafe({js|maskBorderWidth|js}, {js|auto 1 50%|js});
+  CssJs.unsafe({js|maskBorderWidth|js}, {js|auto 1 50% 1.1|js});
+  CssJs.unsafe({js|maskBorderOutset|js}, {js|0|js});
+  CssJs.unsafe({js|maskBorderOutset|js}, {js|1.1|js});
+  CssJs.unsafe({js|maskBorderOutset|js}, {js|0 1|js});
+  CssJs.unsafe({js|maskBorderOutset|js}, {js|0 1 2|js});
+  CssJs.unsafe({js|maskBorderOutset|js}, {js|0 1 2 3|js});
+  CssJs.unsafe({js|maskBorderRepeat|js}, {js|stretch|js});
+  CssJs.unsafe({js|maskBorderRepeat|js}, {js|repeat|js});
+  CssJs.unsafe({js|maskBorderRepeat|js}, {js|round|js});
+  CssJs.unsafe({js|maskBorderRepeat|js}, {js|space|js});
+  CssJs.unsafe({js|maskBorderRepeat|js}, {js|stretch stretch|js});
+  CssJs.unsafe({js|maskBorderRepeat|js}, {js|repeat stretch|js});
+  CssJs.unsafe({js|maskBorderRepeat|js}, {js|round stretch|js});
+  CssJs.unsafe({js|maskBorderRepeat|js}, {js|space stretch|js});
+  CssJs.unsafe({js|maskBorderRepeat|js}, {js|stretch repeat|js});
+  CssJs.unsafe({js|maskBorderRepeat|js}, {js|repeat repeat|js});
+  CssJs.unsafe({js|maskBorderRepeat|js}, {js|round repeat|js});
+  CssJs.unsafe({js|maskBorderRepeat|js}, {js|space repeat|js});
+  CssJs.unsafe({js|maskBorderRepeat|js}, {js|stretch round|js});
+  CssJs.unsafe({js|maskBorderRepeat|js}, {js|repeat round|js});
+  CssJs.unsafe({js|maskBorderRepeat|js}, {js|round round|js});
+  CssJs.unsafe({js|maskBorderRepeat|js}, {js|space round|js});
+  CssJs.unsafe({js|maskBorderRepeat|js}, {js|stretch space|js});
+  CssJs.unsafe({js|maskBorderRepeat|js}, {js|repeat space|js});
+  CssJs.unsafe({js|maskBorderRepeat|js}, {js|round space|js});
+  CssJs.unsafe({js|maskBorderRepeat|js}, {js|space space|js});
+  CssJs.unsafe({js|maskBorder|js}, {js|url(image.png)|js});
+  CssJs.unsafe({js|maskType|js}, {js|luminance|js});
+  CssJs.unsafe({js|maskType|js}, {js|alpha|js});
