@@ -391,13 +391,20 @@ let unreachable = lexbuf => {
   );
 };
 
+let lexeme = (~skip=0, ~drop=0, lexbuf) => {
+  switch (skip, drop) {
+  | (0, 0) => Sedlexing.Utf8.lexeme(lexbuf)
+  | (_, _) =>
+    let len = Sedlexing.lexeme_length(lexbuf) - skip - drop;
+    Sedlexing.Utf8.sub_lexeme(lexbuf, skip, len);
+  };
+};
+
 let consume_whitespace = lexbuf =>
   switch%sedlex (lexbuf) {
   | Star(whitespace) => Parser.WS
   | _ => Parser.WS
   };
-
-let lexeme = Sedlexing.Utf8.lexeme;
 
 // https://drafts.csswg.org/css-syntax-3/#consume-an-escaped-code-point
 let consume_escaped = lexbuf => {
@@ -535,11 +542,6 @@ let handle_tokenizer_error = lexbuf => {
 
 let skip_whitespace = ref(false);
 
-let latin1 = (~skip=0, ~drop=0, lexbuf) => {
-  let len = Sedlexing.lexeme_length(lexbuf) - skip - drop;
-  Sedlexing.Latin1.sub_lexeme(lexbuf, skip, len);
-};
-
 let rec get_next_token = lexbuf => {
   switch%sedlex (lexbuf) {
   | eof => Parser.EOF
@@ -567,54 +569,53 @@ let rec get_next_token = lexbuf => {
   | ',' => COMMA
   | variable =>
     INTERPOLATION(
-      latin1(~skip=2, ~drop=1, lexbuf) |> String.split_on_char('.'),
+      lexeme(~skip=2, ~drop=1, lexbuf) |> String.split_on_char('.'),
     )
-  | operator => OPERATOR(latin1(lexbuf))
-  | combinator => COMBINATOR(latin1(lexbuf))
-  | string => STRING(latin1(~skip=1, ~drop=1, lexbuf))
+  | operator => OPERATOR(lexeme(lexbuf))
+  | combinator => COMBINATOR(lexeme(lexbuf))
+  | string => STRING(lexeme(~skip=1, ~drop=1, lexbuf))
   | important => IMPORTANT
-  | equal_sign => EQUAL_SIGN(latin1(lexbuf))
-  | mq_operator => MEDIA_QUERY_OPERATOR(latin1(lexbuf))
-  | mq_feature_comparison => MEDIA_FEATURE_COMPARISON(latin1(lexbuf))
-  | all_media_type => ALL_MEDIA_TYPE(latin1(lexbuf))
-  | screen_media_type => SCREEN_MEDIA_TYPE(latin1(lexbuf))
-  | print_media_type => PRINT_MEDIA_TYPE(latin1(lexbuf))
+  | equal_sign => EQUAL_SIGN(lexeme(lexbuf))
+  | mq_operator => MEDIA_QUERY_OPERATOR(lexeme(lexbuf))
+  | mq_feature_comparison => MEDIA_FEATURE_COMPARISON(lexeme(lexbuf))
+  | all_media_type => ALL_MEDIA_TYPE(lexeme(lexbuf))
+  | screen_media_type => SCREEN_MEDIA_TYPE(lexeme(lexbuf))
+  | print_media_type => PRINT_MEDIA_TYPE(lexeme(lexbuf))
   | at_media =>
     skip_whitespace.contents = false;
-    AT_MEDIA(latin1(~skip=1, lexbuf));
+    AT_MEDIA(lexeme(~skip=1, lexbuf));
   | at_keyframes =>
     skip_whitespace.contents = false;
-    AT_KEYFRAMES(latin1(~skip=1, lexbuf));
+    AT_KEYFRAMES(lexeme(~skip=1, lexbuf));
   | at_rule =>
     skip_whitespace.contents = false;
-    AT_RULE(latin1(~skip=1, lexbuf));
+    AT_RULE(lexeme(~skip=1, lexbuf));
   | at_rule_without_body =>
     skip_whitespace.contents = false;
-    AT_RULE_STATEMENT(latin1(~skip=1, lexbuf));
+    AT_RULE_STATEMENT(lexeme(~skip=1, lexbuf));
   /* NOTE: should be placed above ident, otherwise pattern with
    * '-[0-9a-z]{1,6}' cannot be matched */
-  | (_u, '+', unicode_range) => UNICODE_RANGE(latin1(lexbuf))
-  | ('#', name) => HASH(latin1(~skip=1, lexbuf))
+  | (_u, '+', unicode_range) => UNICODE_RANGE(lexeme(lexbuf))
+  | ('#', name) => HASH(lexeme(~skip=1, lexbuf))
   /* TODO: get_dimension and handle_numeric should be the same */
-  | number => get_dimension(latin1(lexbuf), lexbuf)
+  | number => get_dimension(lexeme(lexbuf), lexbuf)
   | whitespaces =>
     if (skip_whitespace^) {
       get_next_token(lexbuf);
     } else {
       WS;
     }
-  | ("-", ident) => IDENT(latin1(lexbuf))
+  | ("-", ident) => IDENT(lexeme(lexbuf))
   /* --variable */
-  | ("-", "-", ident) => IDENT(latin1(lexbuf))
+  | ("-", "-", ident) => IDENT(lexeme(lexbuf))
   | identifier_start_code_point =>
     let _ = Sedlexing.backtrack(lexbuf);
     consume_ident_like(lexbuf) |> handle_tokenizer_error(lexbuf);
-  | any => DELIM(latin1(lexbuf))
+  | any => DELIM(lexeme(lexbuf))
   | _ => unreachable(lexbuf)
   };
 }
 and get_dimension = (n, lexbuf) => {
-  open Sedlexing.Utf8;
   switch%sedlex (lexbuf) {
   | length => FLOAT_DIMENSION((n, lexeme(lexbuf)))
   | angle => FLOAT_DIMENSION((n, lexeme(lexbuf)))
@@ -642,14 +643,13 @@ and discard_comments = lexbuf => {
 };
 
 let get_next_tokens_with_location = lexbuf => {
-  let (_, position_end) = Sedlexing.lexing_positions(lexbuf);
+  let (position_start, _) = Sedlexing.lexing_positions(lexbuf);
   let token = get_next_token(lexbuf);
-  let (_, position_end_after) = Sedlexing.lexing_positions(lexbuf);
+  let (_, position_end) = Sedlexing.lexing_positions(lexbuf);
 
-  (token, position_end, position_end_after);
+  (token, position_start, position_end);
 };
 
-open Sedlexing.Utf8;
 open Tokens;
 
 let check_if_three_codepoints_would_start_an_identifier =

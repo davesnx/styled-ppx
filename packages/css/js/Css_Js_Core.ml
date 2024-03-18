@@ -82,7 +82,9 @@ let join strings separator =
       if index = 0 then item else acc ^ separator ^ item)
 
 module Converter = struct
-  let string_of_time t = Std.Int.toString t ^ {js|ms|js}
+  let string_of_time = function
+    | `ms t -> Std.Int.toString t ^ {js|ms|js}
+    | `s t -> Std.Int.toString t ^ {js|s|js}
 
   let string_of_content x =
     match x with
@@ -170,6 +172,7 @@ let alignContent x =
       | #AlignContent.t as ac -> AlignContent.toString ac
       | #NormalAlignment.t as na -> NormalAlignment.toString na
       | #BaselineAlignment.t as ba -> BaselineAlignment.toString ba
+      | #OverflowAlignment.t as oa -> OverflowAlignment.toString oa
       | #DistributedAlignment.t as da -> DistributedAlignment.toString da
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
@@ -191,6 +194,7 @@ let alignSelf x =
       match x with
       | #AlignSelf.t as a -> AlignSelf.toString a
       | #PositionalAlignment.t as pa -> PositionalAlignment.toString pa
+      | #OverflowAlignment.t as pa -> OverflowAlignment.toString pa
       | #BaselineAlignment.t as ba -> BaselineAlignment.toString ba
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
@@ -225,9 +229,8 @@ let backfaceVisibility x =
 let backdropFilter x =
   D
     ( {js|backdropFilter|js},
-      x
-      |. Std.Array.map BackdropFilter.toString
-      |. Std.Array.joinWith ~sep:{js|, |js} )
+      x |. Std.Array.map Filter.toString |. Std.Array.joinWith ~sep:{js|, |js}
+    )
 
 let backgroundAttachment x =
   D
@@ -286,24 +289,34 @@ let backgroundOrigin x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let string_of_backgroundposition x =
-  match x with
-  | #BackgroundPosition.t as bp -> BackgroundPosition.toString bp
-  | `hv (h, v) ->
-    (match h with
+let string_of_backgroundposition2 (x, y) =
+  match x, y with
+  | x, Some y ->
+    (match x with
     | #BackgroundPosition.X.t as h -> BackgroundPosition.X.toString h
     | #Length.t as l -> Length.toString l)
     ^ {js| |js}
     ^
-    (match v with
+    (match y with
     | #BackgroundPosition.Y.t as v -> BackgroundPosition.Y.toString v
     | #Length.t as l -> Length.toString l)
+  | x, None ->
+    (match x with
+    | #BackgroundPosition.t as bp -> BackgroundPosition.toString bp
+    | #Length.t as l -> Length.toString l)
+
+let string_of_backgroundposition x =
+  match x with
+  | #BackgroundPosition.t as bp -> BackgroundPosition.toString bp
   | #Length.t as l -> Length.toString l
   | #Var.t as va -> Var.toString va
   | #Cascading.t as c -> Cascading.toString c
 
 let backgroundPosition x =
   D ({js|backgroundPosition|js}, string_of_backgroundposition x)
+
+let backgroundPosition2 x =
+  D ({js|backgroundPosition|js}, string_of_backgroundposition2 x)
 
 let backgroundPositions bp =
   D
@@ -727,6 +740,7 @@ let justifyItems x =
   D
     ( {js|justifyItems|js},
       match x with
+      | `stretch -> {js|stretch|js}
       | #PositionalAlignment.t as pa -> PositionalAlignment.toString pa
       | #NormalAlignment.t as na -> NormalAlignment.toString na
       | #BaselineAlignment.t as ba -> BaselineAlignment.toString ba
@@ -957,17 +971,24 @@ let perspective x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let perspectiveOrigin x y =
+let perspectiveOrigin x =
+  D
+    ( {js|perspectiveOrigin|js},
+      match x with
+      | #Perspective.t as p -> Perspective.toString p
+      | #TransformOrigin.t as t -> TransformOrigin.toString t )
+
+let perspectiveOrigin2 x y =
   D
     ( {js|perspectiveOrigin|js},
       (match x with
       | #Perspective.t as p -> Perspective.toString p
-      | #Length.t as l -> Length.toString l)
+      | #TransformOrigin.t as t -> TransformOrigin.toString t)
       ^ {js| |js}
       ^
       match y with
       | #Perspective.t as p -> Perspective.toString p
-      | #Length.t as l -> Length.toString l )
+      | #TransformOrigin.t as t -> TransformOrigin.toString t )
 
 let pointerEvents x =
   D
@@ -998,6 +1019,7 @@ let justifySelf x =
       match x with
       | #JustifySelf.t as j -> JustifySelf.toString j
       | #PositionalAlignment.t as pa -> PositionalAlignment.toString pa
+      | #OverflowAlignment.t as oa -> OverflowAlignment.toString oa
       | #BaselineAlignment.t as ba -> BaselineAlignment.toString ba
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
@@ -1142,8 +1164,12 @@ let transforms x =
       x |. Std.Array.map Transform.toString |. Std.Array.joinWith ~sep:{js| |js}
     )
 
-let transformOrigin x y =
-  D ({js|transformOrigin|js}, Length.toString x ^ {js| |js} ^ Length.toString y)
+let transformOrigin x = D ({js|transformOrigin|js}, TransformOrigin.toString x)
+
+let transformOrigin2 x y =
+  D
+    ( {js|transformOrigin|js},
+      TransformOrigin.toString x ^ {js| |js} ^ TransformOrigin.toString y )
 
 let transformOrigin3d x y z =
   D
@@ -1367,7 +1393,7 @@ type listStyleType = ListStyleType.t
 type repeatValue = RepeatValue.t
 type outlineStyle = OutlineStyle.t
 type transform = Transform.t
-type 'colorOrVar gradient = 'colorOrVar Gradient.t
+type gradient = Gradient.t
 
 let initial = Cascading.initial
 let inherit_ = Cascading.inherit_
@@ -1632,35 +1658,11 @@ let flexBasis x =
 
 let order x = D ({js|order|js}, Std.Int.toString x)
 
-let string_of_calc x fn =
-  match x with
-  | `one a -> {js|calc(|js} ^ fn a ^ {js|)|js}
-  | `add (a, b) -> {js|calc(|js} ^ fn a ^ {js| + |js} ^ fn b ^ {js|)|js}
-  | `sub (a, b) -> {js|calc(|js} ^ fn a ^ {js| - |js} ^ fn b ^ {js|)|js}
-  | `mult (a, b) -> {js|calc(|js} ^ fn a ^ {js| * |js} ^ fn b ^ {js|)|js}
-
 let string_of_minmax x =
   match x with
   | `auto -> {js|auto|js}
-  | `calc c -> string_of_calc c Length.toString
-  | `ch x -> Std.Float.toString x ^ {js|ch|js}
-  | `cm x -> Std.Float.toString x ^ {js|cm|js}
-  | `em x -> Std.Float.toString x ^ {js|em|js}
-  | `ex x -> Std.Float.toString x ^ {js|ex|js}
-  | `mm x -> Std.Float.toString x ^ {js|mm|js}
-  | `percent x -> Std.Float.toString x ^ {js|%|js}
-  | `pt x -> Std.Int.toString x ^ {js|pt|js}
-  | `px x -> Std.Int.toString x ^ {js|px|js}
-  | `pxFloat x -> Std.Float.toString x ^ {js|px|js}
-  | `rem x -> Std.Float.toString x ^ {js|rem|js}
-  | `vh x -> Std.Float.toString x ^ {js|vh|js}
-  | `vmax x -> Std.Float.toString x ^ {js|vmax|js}
-  | `vmin x -> Std.Float.toString x ^ {js|vmin|js}
-  | `vw x -> Std.Float.toString x ^ {js|vw|js}
+  | #Length.t as l -> Length.toString l
   | `fr x -> Std.Float.toString x ^ {js|fr|js}
-  | `inch x -> Std.Float.toString x ^ {js|in|js}
-  | `pc x -> Std.Float.toString x ^ {js|pc|js}
-  | `zero -> {js|0|js}
   | `minContent -> {js|min-content|js}
   | `maxContent -> {js|max-content|js}
 
@@ -1668,25 +1670,8 @@ let string_of_dimension x =
   match x with
   | `auto -> {js|auto|js}
   | `none -> {js|none|js}
-  | `calc c -> string_of_calc c Length.toString
-  | `ch x -> Std.Float.toString x ^ {js|ch|js}
-  | `cm x -> Std.Float.toString x ^ {js|cm|js}
-  | `em x -> Std.Float.toString x ^ {js|em|js}
-  | `ex x -> Std.Float.toString x ^ {js|ex|js}
-  | `mm x -> Std.Float.toString x ^ {js|mm|js}
-  | `percent x -> Std.Float.toString x ^ {js|%|js}
-  | `pt x -> Std.Int.toString x ^ {js|pt|js}
-  | `px x -> Std.Int.toString x ^ {js|px|js}
-  | `pxFloat x -> Std.Float.toString x ^ {js|px|js}
-  | `rem x -> Std.Float.toString x ^ {js|rem|js}
-  | `vh x -> Std.Float.toString x ^ {js|vh|js}
-  | `vmax x -> Std.Float.toString x ^ {js|vmax|js}
-  | `vmin x -> Std.Float.toString x ^ {js|vmin|js}
-  | `vw x -> Std.Float.toString x ^ {js|vw|js}
+  | #Length.t as l -> Length.toString l
   | `fr x -> Std.Float.toString x ^ {js|fr|js}
-  | `inch x -> Std.Float.toString x ^ {js|in|js}
-  | `pc x -> Std.Float.toString x ^ {js|pc|js}
-  | `zero -> {js|0|js}
   | `fitContent -> {js|fit-content|js}
   | `minContent -> {js|min-content|js}
   | `maxContent -> {js|max-content|js}
@@ -1724,25 +1709,8 @@ let rec gridLengthToJs x =
   | `name name -> name
   | `none -> {js|none|js}
   | `auto -> {js|auto|js}
-  | `calc c -> string_of_calc c Length.toString
-  | `ch x -> Std.Float.toString x ^ {js|ch|js}
-  | `cm x -> Std.Float.toString x ^ {js|cm|js}
-  | `em x -> Std.Float.toString x ^ {js|em|js}
-  | `ex x -> Std.Float.toString x ^ {js|ex|js}
-  | `mm x -> Std.Float.toString x ^ {js|mm|js}
-  | `percent x -> Std.Float.toString x ^ {js|%|js}
-  | `pt x -> Std.Int.toString x ^ {js|pt|js}
-  | `px x -> Std.Int.toString x ^ {js|px|js}
-  | `pxFloat x -> Std.Float.toString x ^ {js|px|js}
-  | `rem x -> Std.Float.toString x ^ {js|rem|js}
-  | `vh x -> Std.Float.toString x ^ {js|vh|js}
-  | `inch x -> Std.Float.toString x ^ {js|in|js}
-  | `pc x -> Std.Float.toString x ^ {js|pc|js}
-  | `vmax x -> Std.Float.toString x ^ {js|vmax|js}
-  | `vmin x -> Std.Float.toString x ^ {js|vmin|js}
-  | `vw x -> Std.Float.toString x ^ {js|vw|js}
+  | #Length.t as l -> Length.toString l
   | `fr x -> Std.Float.toString x ^ {js|fr|js}
-  | `zero -> {js|0|js}
   | `minContent -> {js|min-content|js}
   | `maxContent -> {js|max-content|js}
   | `fitContent x ->
@@ -1820,26 +1788,31 @@ let gridTemplateAreas l =
 
 type filter =
   [ `blur of Length.t
-  | `brightness of float
-  | `contrast of float
+  | `brightness of [ `percent of float | `num of float ]
+  | `contrast of [ `percent of float | `num of float ]
   | `dropShadow of Length.t * Length.t * Length.t * [ Color.t | Var.t ]
-  | `grayscale of float
+  | `grayscale of [ `percent of float | `num of float ]
   | `hueRotate of angle
-  | `invert of float
-  | `opacity of float
-  | `saturate of float
-  | `sepia of float
+  | `invert of [ `percent of float | `num of float ]
+  | `opacity of [ `percent of float | `num of float ]
+  | `saturate of [ `percent of float | `num of float ]
+  | `sepia of [ `percent of float | `num of float ]
   | `url of string
   | `none
   | Var.t
   | Cascading.t
   ]
 
+let string_of_amount x =
+  match x with
+  | `percent v -> Std.Float.toString v ^ {js|%|js}
+  | `num v -> Std.Float.toString v
+
 let string_of_filter x =
   match x with
-  | `blur v -> ({js|blur(|js} ^ Length.toString v) ^ {js|)|js}
-  | `brightness v -> ({js|brightness(|js} ^ Std.Float.toString v) ^ {js|%)|js}
-  | `contrast v -> ({js|contrast(|js} ^ Std.Float.toString v) ^ {js|%)|js}
+  | `blur v -> {js|blur(|js} ^ Length.toString v ^ {js|)|js}
+  | `brightness v -> {js|brightness(|js} ^ string_of_amount v ^ {js|%)|js}
+  | `contrast v -> {js|contrast(|js} ^ string_of_amount v ^ {js|%)|js}
   | `dropShadow (a, b, c, d) ->
     {js|drop-shadow(|js}
     ^ Length.toString a
@@ -1848,16 +1821,16 @@ let string_of_filter x =
     ^ {js| |js}
     ^ Length.toString c
     ^ {js| |js}
-    ^ (match d with
+    ^ (match (d : [ Color.t | Var.t ]) with
       | #Color.t as c -> Color.toString c
       | #Var.t as v -> Var.toString v)
     ^ {js|)|js}
-  | `grayscale v -> ({js|grayscale(|js} ^ Std.Float.toString v) ^ {js|%)|js}
-  | `hueRotate v -> ({js|hue-rotate(|js} ^ Angle.toString v) ^ {js|)|js}
-  | `invert v -> ({js|invert(|js} ^ Std.Float.toString v) ^ {js|%)|js}
-  | `opacity v -> ({js|opacity(|js} ^ Std.Float.toString v) ^ {js|%)|js}
-  | `saturate v -> ({js|saturate(|js} ^ Std.Float.toString v) ^ {js|%)|js}
-  | `sepia v -> ({js|sepia(|js} ^ Std.Float.toString v) ^ {js|%)|js}
+  | `grayscale v -> {js|grayscale(|js} ^ string_of_amount v ^ {js|%)|js}
+  | `hueRotate v -> {js|hue-rotate(|js} ^ Angle.toString v ^ {js|)|js}
+  | `invert v -> {js|invert(|js} ^ string_of_amount v ^ {js|%)|js}
+  | `opacity v -> {js|opacity(|js} ^ string_of_amount v ^ {js|%)|js}
+  | `saturate v -> {js|saturate(|js} ^ string_of_amount v ^ {js|%)|js}
+  | `sepia v -> {js|sepia(|js} ^ string_of_amount v ^ {js|%)|js}
   | `none -> {js|none|js}
   | #Url.t as u -> Url.toString u
   | #Var.t as va -> Var.toString va
@@ -2092,8 +2065,8 @@ let transformStyle x =
 module Transition = struct
   type t = [ `value of string ]
 
-  let shorthand ?(duration = 0) ?(delay = 0) ?(timingFunction = `ease) property
-      =
+  let shorthand ?(duration = `ms 0) ?(delay = `ms 0) ?(timingFunction = `ease)
+    property =
     `value
       (string_of_time duration
       ^ {js| |js}
@@ -2133,7 +2106,7 @@ let transitionProperty x = D ({js|transitionProperty|js}, x)
 module Animation = struct
   type t = [ `value of string ]
 
-  let shorthand ?(duration = 0) ?(delay = 0) ?(direction = `normal)
+  let shorthand ?(duration = `ms 0) ?(delay = `ms 0) ?(direction = `normal)
     ?(timingFunction = `ease) ?(fillMode = `none) ?(playState = `running)
     ?(iterationCount = `count 1.) name =
     `value

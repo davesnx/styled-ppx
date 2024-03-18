@@ -61,8 +61,8 @@ let render_variable = (~loc, v) => {
   Helper.Exp.ident({loc, txt});
 };
 
-let source_code_of_loc = (loc: Location.t) => {
-  let Location.{loc_start, loc_end, _} = loc;
+let source_code_of_loc = (loc: Ppxlib.Location.t) => {
+  let {loc_start, loc_end, _} = loc;
   switch (Driver.last_buffer^) {
   | Some(buffer: Sedlexing.lexbuf) =>
     /* TODO: pos_offset is hardcoded to 0, unsure about the effects */
@@ -162,9 +162,18 @@ and render_declaration = (d: declaration) => {
   /* String.trim is a hack, location should be correct and not contain any whitespace */
   let value_source = source_code_of_loc(loc) |> String.trim;
 
+  /* let lnum =
+       switch (Driver.container_lnum_ref^) {
+       | Some(lnum) => lnum
+       | None => d.loc.loc_start.pos_lnum
+       };
+     let loc_start = {...d.loc.loc_start, pos_lnum: lnum};
+     let loc_end = {...d.loc.loc_end, pos_lnum: lnum};
+     let _hack_loc = {...d.loc, loc_start, loc_end}; */
+
   switch (
     Declarations_to_emotion.parse_declarations(
-      ~loc=name_loc,
+      ~loc,
       property,
       value_source,
       important,
@@ -259,7 +268,11 @@ and render_selector = (selector: selector) => {
       ++ (render_nth_payload(payload) |> String.trim)
       ++ ")"
     | Function({name, payload: (payload, _loc)}) => {
-        ":" ++ name ++ "(" ++ (render_selectors(payload) |> String.trim) ++ ")";
+        ":"
+        ++ name
+        ++ "("
+        ++ (render_selectors(payload) |> String.trim)
+        ++ ")";
       }
   and render_pseudo_selector =
     fun
@@ -297,7 +310,7 @@ and render_selector = (selector: selector) => {
        })
     |> String.concat("");
   }
-  and render_relative_selector = ({ combinator, complex_selector }) => {
+  and render_relative_selector = ({combinator, complex_selector}) => {
     Option.fold(~none="", ~some=o => o ++ " ", combinator)
     ++ render_complex_selector(complex_selector);
   };
@@ -329,7 +342,6 @@ and render_style_rule = (rule: style_rule) => {
 
   Helper.Exp.apply(
     ~loc,
-    /* ~attrs=[Platform_attributes.uncurried(~loc=rule.loc)], */
     CssJs.selector(~loc=rule.loc),
     [(Nolabel, selector_name), (Nolabel, selector_expr)],
   );

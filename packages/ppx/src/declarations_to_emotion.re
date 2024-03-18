@@ -12,7 +12,6 @@ module Option = {
   };
 };
 
-module Helper = Ast_helper;
 module Builder = Ppxlib.Ast_builder.Default;
 module Types = Parser.Types;
 
@@ -38,8 +37,12 @@ type transform('ast, 'value) = {
 
 let add_CssJs_rule_constraint = (~loc, expr) => {
   let typ =
-    Helper.Typ.constr(~loc, {txt: Ldot(Lident("CssJs"), "rule"), loc}, []);
-  Helper.Exp.constraint_(~loc, expr, typ);
+    Builder.ptyp_constr(
+      ~loc,
+      {txt: Ldot(Lident("CssJs"), "rule"), loc},
+      [],
+    );
+  Builder.pexp_constraint(~loc, expr, typ);
 };
 
 /* TODO: emit is better to keep value_of_ast and value_to_expr in the same fn */
@@ -66,7 +69,7 @@ let emit_shorthand = (parser, mapper, value_to_expr) => {
 let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
 
 let render_variable = (~loc, name) =>
-  list_to_longident(name) |> txt(~loc) |> Helper.Exp.ident(~loc);
+  list_to_longident(name) |> txt(~loc) |> Builder.pexp_ident(~loc);
 
 let transform_with_variable = (parser, mapper, value_to_expr) =>
   emit(
@@ -130,24 +133,20 @@ let unsupportedProperty = parser =>
 let render_string = (~loc, s) => {
   switch (File.get()) {
   | Some(ReScript) =>
-    Helper.Exp.constant(
-      ~loc,
-      Helper.Const.string(~quotation_delimiter="*j", s),
-    )
+    Builder.pexp_constant(~loc, Pconst_string(s, loc, Some("*j")))
   | Some(Reason)
-  | _ =>
-    Helper.Exp.constant(
-      ~loc,
-      Helper.Const.string(~quotation_delimiter="js", s),
-    )
+  | _ => Builder.pexp_constant(~loc, Pconst_string(s, loc, Some("js")))
   };
 };
-let render_integer = (~loc, integer) =>
-  Helper.Const.int(integer) |> Helper.Exp.constant(~loc);
-let render_number = (~loc, number) =>
-  Helper.Const.float(number |> Float.to_string) |> Helper.Exp.constant(~loc);
+let render_integer = (~loc, integer) => {
+  Builder.pexp_constant(~loc, Pconst_integer(Int.to_string(integer), None));
+};
+
+let render_float = (~loc, number) =>
+  Builder.pexp_constant(~loc, Pconst_float(Float.to_string(number), None));
+
 let render_percentage = (~loc, number) => [%expr
-  `percent([%e render_number(~loc, number)])
+  `percent([%e render_float(~loc, number)])
 ];
 
 let render_css_global_values = (~loc, name, value) => {
@@ -256,7 +255,7 @@ let variant_to_expression = (~loc) =>
   | `Wrap_reverse => id([%expr `wrapReverse])
   | `Manual => id([%expr `manual])
   | `Inter_word => id([%expr `interWord])
-  | `Inter_character => id([%expr `InterCharacter])
+  | `Inter_character => id([%expr `interCharacter])
   | `Sub => id([%expr `sub])
   | `Super => id([%expr `super])
   | `All_small_caps => id([%expr `allSmallCaps])
@@ -283,26 +282,26 @@ let variant_to_expression = (~loc) =>
 let render_length = (~loc) =>
   fun
   | `Cap(_n) => raise(Unsupported_feature)
-  | `Ch(n) => [%expr `ch([%e render_number(~loc, n)])]
-  | `Cm(n) => [%expr `cm([%e render_number(~loc, n)])]
-  | `Em(n) => [%expr `em([%e render_number(~loc, n)])]
-  | `Ex(n) => [%expr `ex([%e render_number(~loc, n)])]
+  | `Ch(n) => [%expr `ch([%e render_float(~loc, n)])]
+  | `Cm(n) => [%expr `cm([%e render_float(~loc, n)])]
+  | `Em(n) => [%expr `em([%e render_float(~loc, n)])]
+  | `Ex(n) => [%expr `ex([%e render_float(~loc, n)])]
   | `Ic(_n) => raise(Unsupported_feature)
   | `In(_n) => raise(Unsupported_feature)
   | `Lh(_n) => raise(Unsupported_feature)
-  | `Mm(n) => [%expr `mm([%e render_number(~loc, n)])]
-  | `Pc(n) => [%expr `pc([%e render_number(~loc, n)])]
+  | `Mm(n) => [%expr `mm([%e render_float(~loc, n)])]
+  | `Pc(n) => [%expr `pc([%e render_float(~loc, n)])]
   | `Pt(n) => [%expr `pt([%e render_integer(~loc, n |> Float.to_int)])]
-  | `Px(n) => [%expr `pxFloat([%e render_number(~loc, n)])]
+  | `Px(n) => [%expr `pxFloat([%e render_float(~loc, n)])]
   | `Q(_n) => raise(Unsupported_feature)
-  | `Rem(n) => [%expr `rem([%e render_number(~loc, n)])]
+  | `Rem(n) => [%expr `rem([%e render_float(~loc, n)])]
   | `Rlh(_n) => raise(Unsupported_feature)
   | `Vb(_n) => raise(Unsupported_feature)
-  | `Vh(n) => [%expr `vh([%e render_number(~loc, n)])]
+  | `Vh(n) => [%expr `vh([%e render_float(~loc, n)])]
   | `Vi(_n) => raise(Unsupported_feature)
-  | `Vmax(n) => [%expr `vmax([%e render_number(~loc, n)])]
-  | `Vmin(n) => [%expr `vmin([%e render_number(~loc, n)])]
-  | `Vw(n) => [%expr `vw([%e render_number(~loc, n)])]
+  | `Vmax(n) => [%expr `vmax([%e render_float(~loc, n)])]
+  | `Vmin(n) => [%expr `vmin([%e render_float(~loc, n)])]
+  | `Vw(n) => [%expr `vw([%e render_float(~loc, n)])]
   | `Zero => [%expr `zero];
 
 let rec render_function_calc = (~loc, calc_sum) => {
@@ -328,7 +327,7 @@ let rec render_function_calc = (~loc, calc_sum) => {
 and pick_operation = ((op, _)) => op
 and render_list_of_products = (~loc, list_of_products) => {
   switch (list_of_products) {
-  | [one] => [%expr `one([%e render_product_op(~loc, one)])]
+  | [one] => render_product_op(~loc, one)
   | list => render_list_of_products(~loc, list)
   };
 }
@@ -350,12 +349,12 @@ and render_product = (~loc, product) => {
 and render_product_op = (~loc, op) => {
   switch (op) {
   | `Static_0((), calc_value) => render_calc_value(~loc, calc_value)
-  | `Static_1((), float) => render_number(~loc, float)
+  | `Static_1((), float) => [%expr `num([%e render_float(~loc, float)])]
   };
 }
 and render_calc_value = (~loc, calc_value) => {
-  switch (calc_value) {
-  | `Number(float) => render_number(~loc, float)
+  switch ((calc_value: Types.calc_value)) {
+  | `Number(float) => [%expr `num([%e render_float(~loc, float)])]
   | `Extended_length(l) => render_extended_length(~loc, l)
   | `Extended_percentage(p) => render_extended_percentage(~loc, p)
   | `Function_calc(fc) => render_function_calc(~loc, fc)
@@ -438,10 +437,10 @@ let render_min_size = (~loc) =>
 
 let render_angle = (~loc) =>
   fun
-  | `Deg(number) => id([%expr `deg([%e render_number(~loc, number)])])
-  | `Rad(number) => id([%expr `rad([%e render_number(~loc, number)])])
-  | `Grad(number) => id([%expr `grad([%e render_number(~loc, number)])])
-  | `Turn(number) => id([%expr `turn([%e render_number(~loc, number)])]);
+  | `Deg(number) => id([%expr `deg([%e render_float(~loc, number)])])
+  | `Rad(number) => id([%expr `rad([%e render_float(~loc, number)])])
+  | `Grad(number) => id([%expr `grad([%e render_float(~loc, number)])])
+  | `Turn(number) => id([%expr `turn([%e render_float(~loc, number)])]);
 
 let render_extended_angle = (~loc) =>
   fun
@@ -798,7 +797,7 @@ let render_named_color = (~loc) =>
 
 let render_color_alpha = (~loc, color_alpha) =>
   switch (color_alpha) {
-  | `Number(number) => [%expr `num([%e render_number(~loc, number)])]
+  | `Number(number) => [%expr `num([%e render_float(~loc, number)])]
   | `Extended_percentage(`Percentage(pct)) =>
     render_percentage(~loc, pct /. 100.0)
   | `Extended_percentage(pct) => render_extended_percentage(~loc, pct)
@@ -1074,9 +1073,9 @@ let opacity =
     (~loc) => [%expr CssJs.opacity],
     (~loc) =>
       fun
-      | `Number(number) => render_number(~loc, number)
+      | `Number(number) => render_float(~loc, number)
       | `Extended_percentage(`Percentage(number)) =>
-        render_number(~loc, number /. 100.0)
+        render_float(~loc, number /. 100.0)
       | `Extended_percentage(pct) => render_extended_percentage(~loc, pct),
   );
 
@@ -1209,7 +1208,7 @@ let render_box_shadow = (~loc, shadow) => {
   let spread = Option.map(render_length_interp(~loc), spread);
   let inset =
     Option.map(
-      () => Helper.Exp.construct(~loc, {txt: Lident("true"), loc}, None),
+      () => Builder.pexp_construct(~loc, {txt: Lident("true"), loc}, None),
       inset,
     );
 
@@ -1226,7 +1225,7 @@ let render_box_shadow = (~loc, shadow) => {
          Option.map(value => (label, value), value)
        );
 
-  Helper.Exp.apply(~loc, [%expr CssJs.Shadow.box], args);
+  Builder.pexp_apply(~loc, [%expr CssJs.Shadow.box], args);
 };
 
 let background_color =
@@ -1287,7 +1286,7 @@ let render_color_stop_list = (~loc, value: Types.color_stop_list) => {
 
   stops
   |> List.map(stop => render_linear_color_stop(~loc, stop))
-  |> Helper.Exp.array(~loc);
+  |> Builder.pexp_array(~loc);
 };
 
 let render_angular_color_hint = (~loc, value: Types.angular_color_hint) => {
@@ -1314,7 +1313,7 @@ let render_angular_color_stop_list =
          }
        })
     |> List.append([render_angular_color_stop(~loc, last_stops)]);
-  Helper.Exp.array(~loc, stops);
+  Builder.pexp_array(~loc, stops);
 };
 
 let render_function_linear_gradient =
@@ -1486,7 +1485,7 @@ let background_attachment =
   );
 
 let render_background_position = (~loc, position) => {
-  let render_static =
+  let render_one =
     fun
     | `Center => variant_to_expression(~loc, `Center)
     | `Left => variant_to_expression(~loc, `Left)
@@ -1496,35 +1495,25 @@ let render_background_position = (~loc, position) => {
     | `Extended_length(l) => render_extended_length(~loc, l)
     | `Extended_percentage(p) => render_extended_percentage(~loc, p);
 
-  let render_and =
-    fun
-    | `Center => [%expr `center]
-    | `Static(a, b) =>
-      switch (b) {
-      | Some(b) =>
-        [%expr `hv(([%e render_static(a)], [%e render_static(b)]))]
-      | None => render_static(a)
-      };
-
   switch (position) {
-  | `Center => variant_to_expression(~loc, `Center)
-  | `Left => variant_to_expression(~loc, `Left)
-  | `Right => variant_to_expression(~loc, `Right)
-  | `Bottom => variant_to_expression(~loc, `Bottom)
-  | `Top => variant_to_expression(~loc, `Top)
-  | `Extended_length(l) => render_extended_length(~loc, l)
-  | `Extended_percentage(a) => render_extended_percentage(~loc, a)
+  | `Center as position
+  | `Left as position
+  | `Right as position
+  | `Bottom as position
+  | `Top as position
+  | `Extended_length(_) as position
+  | `Extended_percentage(_) as position =>
+    [%expr ([%e render_one(position)], None)]
   | `Static(x, y) =>
-    [%expr `hv(([%e render_static(x)], [%e render_static(y)]))]
-  | `And(left, right) =>
-    [%expr `hv(([%e render_and(left)], [%e render_and(right)]))]
+    [%expr ([%e render_one(x)], Some([%e render_one(y)]))]
+  | `And(_left, _right) => raise(Unsupported_feature)
   };
 };
 
 let background_position =
   monomorphic(
     Parser.property_background_position,
-    (~loc) => [%expr CssJs.backgroundPosition],
+    (~loc) => [%expr CssJs.backgroundPosition2],
     (~loc) =>
       fun
       | [] => failwith("expected at least one argument")
@@ -2104,7 +2093,7 @@ let render_tab_size = (~loc, value: Types.property_tab_size) => {
   | `Number(n) =>
     int_of_float(n) < 0
       ? raise(Invalid_value("tab-size value can not be less than 0!"))
-      : [%expr `num([%e render_number(~loc, n)])]
+      : [%expr `num([%e render_float(~loc, n)])]
   | `Extended_length(ext) => render_extended_length(~loc, ext)
   };
 };
@@ -2123,7 +2112,7 @@ let render_line_height = (~loc) =>
   | `Extended_length(ext) => render_extended_length(~loc, ext)
   | `Extended_percentage(ext) => render_extended_percentage(~loc, ext)
   | `Normal => variant_to_expression(~loc, `Normal)
-  | `Number(float) => [%expr `abs([%e render_number(~loc, float)])];
+  | `Number(float) => [%expr `abs([%e render_float(~loc, float)])];
 
 let line_height =
   monomorphic(
@@ -2591,7 +2580,7 @@ let render_text_shadow = (~loc, shadow) => {
          Option.map(value => (label, value), value)
        );
 
-  Helper.Exp.apply(~loc, [%expr CssJs.Shadow.text], args);
+  Builder.pexp_apply(~loc, [%expr CssJs.Shadow.text], args);
 };
 
 let text_shadow =
@@ -2627,9 +2616,9 @@ let render_transform = (~loc, value: Types.transform_function) =>
   | `Function_rotate3d(x, (), y, (), z, (), a) =>
     [%expr
      CssJs.rotate3d(
-       [%e render_number(~loc, x)],
-       [%e render_number(~loc, y)],
-       [%e render_number(~loc, z)],
+       [%e render_float(~loc, x)],
+       [%e render_float(~loc, y)],
+       [%e render_float(~loc, z)],
        [%e render_transform_functions(~loc, a)],
      )]
   | `Function_rotateX(v) =>
@@ -2647,14 +2636,14 @@ let render_transform = (~loc, value: Types.transform_function) =>
          [%e render_transform_functions(~loc, v)],
        )]
     | None =>
-      [%expr CssJs.skew([%e render_transform_functions(~loc, a1)], 0)]
+      [%expr CssJs.skew([%e render_transform_functions(~loc, a1)], `deg(0.))]
     }
   | `Function_skewX(v) =>
     [%expr CssJs.skewX([%e render_transform_functions(~loc, v)])]
   | `Function_skewY(v) =>
     [%expr CssJs.skewY([%e render_transform_functions(~loc, v)])]
   | `Function_translate(x, None) =>
-    [%expr CssJs.translate([%e render_length_percentage(~loc, x)], 0)]
+    [%expr CssJs.translate([%e render_length_percentage(~loc, x)], `zero)]
   | `Function_translate(x, Some(((), v))) =>
     [%expr
      CssJs.translate(
@@ -2676,20 +2665,20 @@ let render_transform = (~loc, value: Types.transform_function) =>
     [%expr CssJs.translateZ([%e render_extended_length(~loc, z)])]
   | `Function_scale(x, None) =>
     [%expr
-     CssJs.scale([%e render_number(~loc, x)], [%e render_number(~loc, x)])]
+     CssJs.scale([%e render_float(~loc, x)], [%e render_float(~loc, x)])]
   | `Function_scale(x, Some(((), v))) =>
     [%expr
-     CssJs.scale([%e render_number(~loc, x)], [%e render_number(~loc, v)])]
+     CssJs.scale([%e render_float(~loc, x)], [%e render_float(~loc, v)])]
   | `Function_scale3d(x, (), y, (), z) =>
     [%expr
      CssJs.scale3d(
-       [%e render_number(~loc, x)],
-       [%e render_number(~loc, y)],
-       [%e render_number(~loc, z)],
+       [%e render_float(~loc, x)],
+       [%e render_float(~loc, y)],
+       [%e render_float(~loc, z)],
      )]
-  | `Function_scaleX(x) => [%expr CssJs.scaleX([%e render_number(~loc, x)])]
-  | `Function_scaleY(y) => [%expr CssJs.scaleY([%e render_number(~loc, y)])]
-  | `Function_scaleZ(z) => [%expr CssJs.scaleZ([%e render_number(~loc, z)])]
+  | `Function_scaleX(x) => [%expr CssJs.scaleX([%e render_float(~loc, x)])]
+  | `Function_scaleY(y) => [%expr CssJs.scaleY([%e render_float(~loc, y)])]
+  | `Function_scaleZ(z) => [%expr CssJs.scaleZ([%e render_float(~loc, z)])]
   };
 
 // css-transforms-2
@@ -2727,21 +2716,27 @@ let transform_origin =
     | `Static((y, x), None) => {
         [
           [%expr
-            CssJs.transformOrigin(
+            CssJs.transformOrigin2(
               [%e render_origin(~loc, x)],
               [%e render_origin(~loc, y)],
             )
           ],
         ];
       }
-    | `Center => [[%expr CssJs.transformOrigin(`Center, `Center)]]
-    | `Left => [[%expr CssJs.transformOrigin(`Left, `Center)]]
-    | `Right => [[%expr CssJs.transformOrigin(`Right, `Center)]]
-    | `Bottom => [[%expr CssJs.transformOrigin(`Bottom, `Center)]]
-    | `Top => [[%expr CssJs.transformOrigin(`Top, `Center)]]
-    | `Static(_, Some(_))
-    | `Extended_length(_)
-    | `Extended_percentage(_) => raise(Unsupported_feature)
+    | `Center => [[%expr CssJs.transformOrigin(`center)]]
+    | `Left => [[%expr CssJs.transformOrigin(`left)]]
+    | `Right => [[%expr CssJs.transformOrigin(`right)]]
+    | `Bottom => [[%expr CssJs.transformOrigin(`bottom)]]
+    | `Top => [[%expr CssJs.transformOrigin(`top)]]
+    | `Extended_length(el) => [
+        [%expr CssJs.transformOrigin([%e render_extended_length(~loc, el)])],
+      ]
+    | `Extended_percentage(ep) => [
+        [%expr
+          CssJs.transformOrigin([%e render_extended_percentage(~loc, ep)])
+        ],
+      ]
+    | `Static(_, Some(_)) => raise(Unsupported_feature)
   );
 let transform_box =
   variants(Parser.property_transform_box, (~loc) =>
@@ -2771,7 +2766,7 @@ let perspective_origin =
     Parser.property_perspective_origin,
     (~loc, position) => {
       let (x, y) = render_position(~loc, position);
-      [[%expr CssJs.perspectiveOrigin([%e x], [%e y])]];
+      [[%expr CssJs.perspectiveOrigin2([%e x], [%e y])]];
     },
   );
 
@@ -2818,11 +2813,11 @@ let render_time_as_int = (~loc) =>
   fun
   | `Ms(f) => {
       let value = Float.to_int(f);
-      [%expr [%e render_integer(~loc, value)]];
+      [%expr `ms([%e render_integer(~loc, value)])];
     }
   | `S(f) => {
       let value = f *. 1000.0 |> Float.to_int;
-      [%expr [%e render_integer(~loc, value)]];
+      [%expr `s([%e render_integer(~loc, value)])];
     };
 
 let render_duration = (~loc) =>
@@ -2856,10 +2851,10 @@ let render_cubic_bezier_timing_function = (~loc) =>
   | `Ease_in_out => [%expr `easeInOut]
   | `Cubic_bezier(p0, (), p1, (), p2, (), p3) => [%expr
       `cubicBezier((
-        [%e render_number(~loc, p0)],
-        [%e render_number(~loc, p1)],
-        [%e render_number(~loc, p2)],
-        [%e render_number(~loc, p3)],
+        [%e render_float(~loc, p0)],
+        [%e render_float(~loc, p1)],
+        [%e render_float(~loc, p2)],
+        [%e render_float(~loc, p3)],
       ))
     ];
 
@@ -2960,7 +2955,7 @@ let animation_timing_function =
 let render_animation_iteration_count = (~loc) =>
   fun
   | `Infinite => [%expr `infinite]
-  | `Number(n) => [%expr `count([%e render_number(~loc, n)])];
+  | `Number(n) => [%expr `count([%e render_float(~loc, n)])];
 
 let animation_iteration_count =
   monomorphic(
@@ -3071,7 +3066,7 @@ let render_single_animation =
     iteration_count
     |> Option.mapWithDefault(
          render_animation_iteration_count(~loc),
-         [%expr `count(1)],
+         [%expr `count(1.)],
        );
   let name =
     name |> Option.mapWithDefault(render_animation_name(~loc), [%expr `none]);
@@ -3131,9 +3126,9 @@ let order =
     (~loc) => [%expr CssJs.order],
     render_integer,
   );
-let render_number_interp = (~loc, value) => {
+let render_float_interp = (~loc, value) => {
   switch (value) {
-  | `Number(n) => [%expr [%e render_number(~loc, n)]]
+  | `Number(n) => [%expr [%e render_float(~loc, n)]]
   | `Interpolation(v) => render_variable(~loc, v)
   };
 };
@@ -3142,13 +3137,13 @@ let flex_grow =
   monomorphic(
     Parser.property_flex_grow,
     (~loc) => [%expr CssJs.flexGrow],
-    render_number_interp,
+    render_float_interp,
   );
 let flex_shrink =
   monomorphic(
     Parser.property_flex_shrink,
     (~loc) => [%expr CssJs.flexShrink],
-    render_number_interp,
+    render_float_interp,
   );
 
 let render_flex_basis = (~loc) =>
@@ -3173,13 +3168,13 @@ let flex =
       ]
     | `Or(None, None) => [[%expr CssJs.flex1(`none)]]
     | `Or(Some((grow, None)), None) => [
-        [%expr CssJs.flex1(`num([%e render_number_interp(~loc, grow)]))],
+        [%expr CssJs.flex1(`num([%e render_float_interp(~loc, grow)]))],
       ]
     | `Or(Some((grow, Some(shrink))), None) => [
         [%expr
           CssJs.flex2(
-            ~shrink=[%e render_number_interp(~loc, shrink)],
-            [%e render_number_interp(~loc, grow)],
+            ~shrink=[%e render_float_interp(~loc, shrink)],
+            [%e render_float_interp(~loc, grow)],
           )
         ],
       ]
@@ -3187,21 +3182,21 @@ let flex =
         [%expr
           CssJs.flex2(
             ~basis=[%e render_flex_basis(~loc, basis)],
-            [%e render_number_interp(~loc, grow)],
+            [%e render_float_interp(~loc, grow)],
           )
         ],
       ]
     | `Or(Some((grow, Some(shrink))), Some(basis)) => [
         [%expr
           CssJs.flex(
-            [%e render_number_interp(~loc, grow)],
-            [%e render_number_interp(~loc, shrink)],
+            [%e render_float_interp(~loc, grow)],
+            [%e render_float_interp(~loc, shrink)],
             [%e render_flex_basis(~loc, basis)],
           )
         ],
       ]
     | `Or(None, Some(basis)) => [
-        [%expr CssJs.flexBasics([%e render_flex_basis(~loc, basis)])],
+        [%expr CssJs.flexBasis([%e render_flex_basis(~loc, basis)])],
       ]
     }
   );
@@ -3422,7 +3417,7 @@ let render_fixed_breadth = (~loc, value: Types.fixed_breadth) => {
 
 let render_flex_value = (~loc, value: Types.flex_value) => {
   switch (value) {
-  | `Fr(f) => [%expr `fr([%e render_number(~loc, f)])]
+  | `Fr(f) => [%expr `fr([%e render_float(~loc, f)])]
   };
 };
 
@@ -3878,7 +3873,7 @@ let stroke =
 
 let render_alpha_value = (~loc, value: Types.alpha_value) => {
   switch (value) {
-  | `Number(n) => [%expr `num([%e render_number(~loc, n)])]
+  | `Number(n) => [%expr `num([%e render_float(~loc, n)])]
   | `Extended_percentage(pct) => render_extended_percentage(~loc, pct)
   };
 };
@@ -4013,9 +4008,9 @@ let render_drop_shadow = (~loc, value: Types.function_drop_shadow) => {
    ))];
 };
 
-let render_number_percentage = (~loc, value: Types.number_percentage) => {
+let render_float_percentage = (~loc, value: Types.number_percentage) => {
   switch (value) {
-  | `Number(n) => render_number(~loc, n)
+  | `Number(number) => [%expr `num([%e render_float(~loc, number)])]
   | `Extended_percentage(pct) => render_extended_percentage(~loc, pct)
   };
 };
@@ -4024,22 +4019,22 @@ let render_filter_function = (~loc, value: Types.filter_function) => {
   switch (value) {
   | `Function_blur(v) => [%expr `blur([%e render_extended_length(~loc, v)])]
   | `Function_brightness(v) =>
-    [%expr `brightness([%e render_number_percentage(~loc, v)])]
+    [%expr `brightness([%e render_float_percentage(~loc, v)])]
   | `Function_contrast(v) =>
-    [%expr `contrast([%e render_number_percentage(~loc, v)])]
+    [%expr `contrast([%e render_float_percentage(~loc, v)])]
   | `Function_drop_shadow(v) => render_drop_shadow(~loc, v)
   | `Function_grayscale(v) =>
-    [%expr `grayscale([%e render_number_percentage(~loc, v)])]
+    [%expr `grayscale([%e render_float_percentage(~loc, v)])]
   | `Function_hue_rotate(v) =>
     [%expr `hueRotate([%e render_extended_angle(~loc, v)])]
   | `Function_invert(v) =>
-    [%expr `invert([%e render_number_percentage(~loc, v)])]
+    [%expr `invert([%e render_float_percentage(~loc, v)])]
   | `Function_opacity(v) =>
-    [%expr `opacity([%e render_number_percentage(~loc, v)])]
+    [%expr `opacity([%e render_float_percentage(~loc, v)])]
   | `Function_saturate(v) =>
-    [%expr `saturate([%e render_number_percentage(~loc, v)])]
+    [%expr `saturate([%e render_float_percentage(~loc, v)])]
   | `Function_sepia(v) =>
-    [%expr `sepia([%e render_number_percentage(~loc, v)])]
+    [%expr `sepia([%e render_float_percentage(~loc, v)])]
   };
 };
 
@@ -4066,6 +4061,19 @@ let filter =
       | `_ms_filter_function_list(_) => raise(Unsupported_feature)
       },
   );
+
+let backdrop_filter =
+  monomorphic(
+    Parser.property_backdrop_filter,
+    (~loc) => [%expr CssJs.backdropFilter],
+    (~loc, value) =>
+      switch (value) {
+      | `None => [%expr [|`none|]]
+      | `Interpolation(v) => render_variable(~loc, v)
+      | `Filter_function_list(ffl) => render_filter_function_list(~loc, ffl)
+      },
+  );
+
 let float = unsupportedProperty(Parser.property_float);
 let font_language_override =
   unsupportedProperty(Parser.property_font_language_override);
@@ -4159,6 +4167,7 @@ let properties = [
   ("animation-timing-function", found(animation_timing_function)),
   ("animation", found(animation)),
   ("backface-visibility", found(backface_visibility)),
+  ("backdrop-filter", found(backdrop_filter)),
   ("background-attachment", found(background_attachment)),
   ("background-clip", found(background_clip)),
   ("background-clip", found(background_clip)),

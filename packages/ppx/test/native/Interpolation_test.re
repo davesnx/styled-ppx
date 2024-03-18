@@ -155,7 +155,7 @@ let tests =
     (
       "transition-duration: 500ms;",
       [%expr [%css "transition-duration: 500ms"]],
-      [%expr CssJs.transitionDuration(500)],
+      [%expr CssJs.transitionDuration(`ms(500))],
     ),
     (
       "transition-duration: $(duration)",

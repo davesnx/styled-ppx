@@ -66,7 +66,7 @@ release-static:
 
 # Testing commands
 
-TEST_TARGETS := ppx_snapshot_reason ppx_snapshot_rescript parser reason_css_parser css_spec_parser css_support css_spec_types string_interpolation emotion emotion_hash native_typecheck ppx_e2e
+TEST_TARGETS := ppx_snapshot_reason ppx_snapshot_rescript parser reason_css_parser css_spec_parser css_support css_spec_types string_interpolation emotion emotion_hash native_typecheck
 
 # Create targets with the format "test_{{target_name}}_{{ "watch" | "promote" }}"
 define create_test

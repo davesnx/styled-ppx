@@ -3,8 +3,6 @@ If this test fail means that Css_Js_Core or CssJs_Legacy_Core (from styled-ppx.c
 
 This test only runs against Css_Js_Core from styled-ppx.css_native
 
-TODO: Migrate all snapshot tests from css-suppor to this e2e
-
   $ cat >dune-project <<EOF
   > (lang dune 3.10)
   > EOF
@@ -12,8 +10,14 @@ TODO: Migrate all snapshot tests from css-suppor to this e2e
   $ cat >dune <<EOF
   > (executable
   >  (name input)
-  >  (libraries styled-ppx.emotion_native styled-ppx.css_native)
+  >  (libraries styled-ppx.css_native styled-ppx.emotion_native)
   >  (preprocess (pps styled-ppx.lib)))
   > EOF
 
-  $ dune build
+
+  $ dune_describe_pp _build/default/input.re.pp.ml
+  _build/default/input.re.pp.ml: No such file or directory
+
+  $ dune_describe_pp _build/default/input.re.pp.ml | refmt --parse ml --print re
+  Syntaxerr.Error(_)
+  [1]

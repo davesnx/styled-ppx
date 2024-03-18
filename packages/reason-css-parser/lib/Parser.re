@@ -833,7 +833,7 @@ and property_aspect_ratio = [%value.rec "'auto' | <ratio>"]
 and property_azimuth = [%value.rec
   "<extended-angle> | [ 'left-side' | 'far-left' | 'left' | 'center-left' | 'center' | 'center-right' | 'right' | 'far-right' | 'right-side' ] || 'behind' | 'leftwards' | 'rightwards'"
 ]
-and property_backdrop_filter = [%value.rec "'none' | <filter-function-list>"]
+and property_backdrop_filter = [%value.rec "'none' | <interpolation> | <filter-function-list>"]
 and property_backface_visibility = [%value.rec "'visible' | 'hidden'"]
 and property_background = [%value.rec "[ <bg-layer> ',' ]* <final-bg-layer>"]
 and property_background_attachment = [%value.rec "[ <attachment> ]#"]

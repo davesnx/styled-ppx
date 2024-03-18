@@ -14,9 +14,7 @@ module Cascading : sig
   val unset : [> `unset ]
   val revert : [> `revert ]
   val revertLayer : [> `revertLayer ]
-
-  val toString :
-    [< `inherit_ | `initial | `revert | `revertLayer | `unset ] -> string
+  val toString : t -> string
 end
 
 module Var : sig
@@ -28,7 +26,7 @@ module Var : sig
   val var : 'a -> [> `var of 'a ]
   val varDefault : 'a -> 'b -> [> `varDefault of 'a * 'b ]
   val prefix : string -> string
-  val toString : [< `var of string | `varDefault of string * string ] -> string
+  val toString : t -> string
 end
 
 module Time : sig
@@ -39,42 +37,62 @@ module Time : sig
 
   val s : 'a -> [> `s of 'a ]
   val ms : 'a -> [> `ms of 'a ]
-  val toString : [< `ms of float | `s of float ] -> string
+  val toString : t -> string
 end
 
 module Percentage : sig
   type t = [ `percent of float ]
 
   val pct : 'a -> [> `percent of 'a ]
-  val toString : [< `percent of float ] -> string
+  val toString : t -> string
 end
 
 module Url : sig
   type t = [ `url of string ]
 
-  val toString : [< `url of string ] -> string
+  val toString : t -> string
 end
 
 module Length : sig
-  type t =
-    [ `calc of [ `add of t * t | `mult of t * t | `one of t | `sub of t * t ]
-    | `ch of float
-    | `cm of float
+  type length =
+    [ `ch of float
     | `em of float
     | `ex of float
-    | `inch of float
-    | `mm of float
-    | `pc of float
-    | `percent of float
-    | `pt of int
-    | `px of int
-    | `pxFloat of float
     | `rem of float
     | `vh of float
-    | `vmax of float
-    | `vmin of float
     | `vw of float
+    | `vmin of float
+    | `vmax of float
+    | `px of int
+    | `pxFloat of float
+    | `cm of float
+    | `mm of float
+    | `inch of float
+    | `pc of float
+    | `pt of int
     | `zero
+    | `percent of float
+    ]
+
+  type calc_value =
+    [ length
+    | `calc of
+      [ length
+      | `add of calc_value * calc_value
+      | `sub of calc_value * calc_value
+      | `mult of calc_value * calc_value
+      ]
+    | `num of float
+    ]
+
+  and t =
+    [ length
+    | `calc of
+      [ length
+      | `add of calc_value * calc_value
+      | `sub of calc_value * calc_value
+      | `mult of calc_value * calc_value
+      ]
     ]
 
   val ch : 'a -> [> `ch of 'a ]
@@ -93,31 +111,7 @@ module Length : sig
   val pc : 'a -> [> `pc of 'a ]
   val pt : 'a -> [> `pt of 'a ]
   val zero : [> `zero ]
-
-  val toString :
-    ([< `calc of
-        [< `add of 'a * 'a | `mult of 'a * 'a | `one of 'a | `sub of 'a * 'a ]
-     | `ch of float
-     | `cm of float
-     | `em of float
-     | `ex of float
-     | `inch of float
-     | `mm of float
-     | `pc of float
-     | `percent of float
-     | `pt of int
-     | `px of int
-     | `pxFloat of float
-     | `rem of float
-     | `vh of float
-     | `vmax of float
-     | `vmin of float
-     | `vw of float
-     | `zero
-     ]
-     as
-     'a) ->
-    string
+  val toString : t -> string
 end
 
 module Angle : sig
@@ -132,10 +126,7 @@ module Angle : sig
   val rad : float -> [> `rad of float ]
   val grad : float -> [> `grad of float ]
   val turn : float -> [> `turn of float ]
-
-  val toString :
-    [< `deg of float | `grad of float | `rad of float | `turn of float ] ->
-    string
+  val toString : t -> string
 end
 
 module Direction : sig
@@ -146,7 +137,7 @@ module Direction : sig
 
   val ltr : [> `ltr ]
   val rtl : [> `rtl ]
-  val toString : [< `ltr | `rtl ] -> string
+  val toString : t -> string
 end
 
 module Position : sig
@@ -163,9 +154,7 @@ module Position : sig
   val static : [> `static ]
   val fixed : [> `fixed ]
   val sticky : [> `sticky ]
-
-  val toString :
-    [< `absolute | `fixed | `relative | `static | `sticky ] -> string
+  val toString : t -> string
 end
 
 module Isolation : sig
@@ -174,7 +163,7 @@ module Isolation : sig
     | `isolate
     ]
 
-  val toString : [< `auto | `isolate ] -> string
+  val toString : t -> string
 end
 
 module Resize : sig
@@ -193,9 +182,7 @@ module Resize : sig
   val vertical : [> `vertical ]
   val block : [> `block ]
   val inline : [> `inline ]
-
-  val toString :
-    [< `block | `both | `horizontal | `inline | `none | `vertical ] -> string
+  val toString : t -> string
 end
 
 module FontVariant : sig
@@ -206,7 +193,7 @@ module FontVariant : sig
 
   val normal : [> `normal ]
   val smallCaps : [> `smallCaps ]
-  val toString : [< `normal | `smallCaps ] -> string
+  val toString : t -> string
 end
 
 module FontStyle : sig
@@ -219,13 +206,13 @@ module FontStyle : sig
   val normal : [> `normal ]
   val italic : [> `italic ]
   val oblique : [> `oblique ]
-  val toString : [< `italic | `normal | `oblique ] -> string
+  val toString : t -> string
 end
 
 module TabSize : sig
   type t = [ `num of float ]
 
-  val toString : [< `num of float ] -> string
+  val toString : t -> string
 end
 
 module FlexBasis : sig
@@ -243,10 +230,7 @@ module FlexBasis : sig
   val maxContent : [> `maxContent ]
   val minContent : [> `minContent ]
   val fitContent : [> `fitContent ]
-
-  val toString :
-    [< `auto | `content | `fill | `fitContent | `maxContent | `minContent ] ->
-    string
+  val toString : t -> string
 end
 
 module Overflow : sig
@@ -263,14 +247,14 @@ module Overflow : sig
   val scroll : [> `scroll ]
   val auto : [> `auto ]
   val clip : [> `clip ]
-  val toString : [< `auto | `clip | `hidden | `scroll | `visible ] -> string
+  val toString : t -> string
 end
 
 module Margin : sig
   type t = [ `auto ]
 
   val auto : [> `auto ]
-  val toString : [< `auto ] -> string
+  val toString : t -> string
 end
 
 module GridAutoFlow : sig
@@ -281,13 +265,13 @@ module GridAutoFlow : sig
     | `rowDense
     ]
 
-  val toString : [< `column | `columnDense | `row | `rowDense ] -> string
+  val toString : t -> string
 end
 
 module Gap : sig
   type t = [ `normal ]
 
-  val toString : [< `normal ] -> string
+  val toString : t -> string
 end
 
 module RowGap = Gap
@@ -299,7 +283,7 @@ module ScrollBehavior : sig
     | `smooth
     ]
 
-  val toString : [< `auto | `smooth ] -> string
+  val toString : t -> string
 end
 
 module OverscrollBehavior : sig
@@ -309,7 +293,7 @@ module OverscrollBehavior : sig
     | `none
     ]
 
-  val toString : [< `auto | `contain | `none ] -> string
+  val toString : t -> string
 end
 
 module OverflowAnchor : sig
@@ -318,19 +302,19 @@ module OverflowAnchor : sig
     | `none
     ]
 
-  val toString : [< `auto | `none ] -> string
+  val toString : t -> string
 end
 
 module ColumnWidth : sig
   type t = [ `auto ]
 
-  val toString : [< `auto ] -> string
+  val toString : t -> string
 end
 
 module CaretColor : sig
   type t = [ `auto ]
 
-  val toString : [< `auto ] -> string
+  val toString : t -> string
 end
 
 module VerticalAlign : sig
@@ -345,17 +329,7 @@ module VerticalAlign : sig
     | `top
     ]
 
-  val toString :
-    [< `baseline
-    | `bottom
-    | `middle
-    | `sub
-    | `super
-    | `textBottom
-    | `textTop
-    | `top
-    ] ->
-    string
+  val toString : t -> string
 end
 
 module TimingFunction : sig
@@ -391,23 +365,7 @@ module TimingFunction : sig
   val jumpEnd : [> `jumpEnd ]
   val jumpNone : [> `jumpNone ]
   val jumpBoth : [> `jumpBoth ]
-
-  val toString :
-    [< `cubicBezier of float * float * float * float
-    | `ease
-    | `easeIn
-    | `easeInOut
-    | `easeOut
-    | `jumpBoth
-    | `jumpEnd
-    | `jumpNone
-    | `jumpStart
-    | `linear
-    | `stepEnd
-    | `stepStart
-    | `steps of int * [< `end_ | `start ]
-    ] ->
-    string
+  val toString : t -> string
 end
 
 module RepeatValue : sig
@@ -417,7 +375,7 @@ module RepeatValue : sig
     | `num of int
     ]
 
-  val toString : [< `autoFill | `autoFit | `num of int ] -> string
+  val toString : t -> string
 end
 
 module ListStyleType : sig
@@ -436,21 +394,7 @@ module ListStyleType : sig
     | `upperRoman
     ]
 
-  val toString :
-    [< `circle
-    | `decimal
-    | `disc
-    | `lowerAlpha
-    | `lowerGreek
-    | `lowerLatin
-    | `lowerRoman
-    | `none
-    | `square
-    | `upperAlpha
-    | `upperLatin
-    | `upperRoman
-    ] ->
-    string
+  val toString : t -> string
 end
 
 module ListStylePosition : sig
@@ -459,7 +403,7 @@ module ListStylePosition : sig
     | `outside
     ]
 
-  val toString : [< `inside | `outside ] -> string
+  val toString : t -> string
 end
 
 module OutlineStyle : sig
@@ -471,24 +415,13 @@ module OutlineStyle : sig
     | `hidden
     | `inset
     | `none
+    | `auto
     | `outset
     | `ridge
     | `solid
     ]
 
-  val toString :
-    [< `dashed
-    | `dotted
-    | `double
-    | `groove
-    | `hidden
-    | `inset
-    | `none
-    | `outset
-    | `ridge
-    | `solid
-    ] ->
-    string
+  val toString : t -> string
 end
 
 module FontWeight : sig
@@ -516,22 +449,20 @@ module FontWeight : sig
   val extraBold : [> `extraBold ]
   val lighter : [> `lighter ]
   val bolder : [> `bolder ]
+  val toString : t -> string
+end
 
-  val toString :
-    [< `black
-    | `bold
-    | `bolder
-    | `extraBold
-    | `extraLight
-    | `light
-    | `lighter
-    | `medium
-    | `normal
-    | `num of int
-    | `semiBold
-    | `thin
-    ] ->
-    string
+module TransformOrigin : sig
+  type t =
+    [ Length.t
+    | `left
+    | `center
+    | `right
+    | `top
+    | `bottom
+    ]
+
+  val toString : t -> string
 end
 
 module Transform : sig
@@ -576,298 +507,8 @@ module Transform : sig
   val skewX : 'a -> [> `skewX of 'a ]
   val skewY : 'a -> [> `skewY of 'a ]
   val string_of_scale : float -> float -> string
-
-  val string_of_translate3d :
-    ([< `calc of
-        [< `add of 'a * 'a | `mult of 'a * 'a | `one of 'a | `sub of 'a * 'a ]
-     | `ch of float
-     | `cm of float
-     | `em of float
-     | `ex of float
-     | `inch of float
-     | `mm of float
-     | `pc of float
-     | `percent of float
-     | `pt of int
-     | `px of int
-     | `pxFloat of float
-     | `rem of float
-     | `vh of float
-     | `vmax of float
-     | `vmin of float
-     | `vw of float
-     | `zero
-     ]
-     as
-     'a) ->
-    ([< `calc of
-        [< `add of 'b * 'b | `mult of 'b * 'b | `one of 'b | `sub of 'b * 'b ]
-     | `ch of float
-     | `cm of float
-     | `em of float
-     | `ex of float
-     | `inch of float
-     | `mm of float
-     | `pc of float
-     | `percent of float
-     | `pt of int
-     | `px of int
-     | `pxFloat of float
-     | `rem of float
-     | `vh of float
-     | `vmax of float
-     | `vmin of float
-     | `vw of float
-     | `zero
-     ]
-     as
-     'b) ->
-    ([< `calc of
-        [< `add of 'c * 'c | `mult of 'c * 'c | `one of 'c | `sub of 'c * 'c ]
-     | `ch of float
-     | `cm of float
-     | `em of float
-     | `ex of float
-     | `inch of float
-     | `mm of float
-     | `pc of float
-     | `percent of float
-     | `pt of int
-     | `px of int
-     | `pxFloat of float
-     | `rem of float
-     | `vh of float
-     | `vmax of float
-     | `vmin of float
-     | `vw of float
-     | `zero
-     ]
-     as
-     'c) ->
-    string
-
-  val toString :
-    [< `perspective of int
-    | `rotate of
-      [< `deg of float | `grad of float | `rad of float | `turn of float ]
-    | `rotate3d of
-      float
-      * float
-      * float
-      * [< `deg of float | `grad of float | `rad of float | `turn of float ]
-    | `rotateX of
-      [< `deg of float | `grad of float | `rad of float | `turn of float ]
-    | `rotateY of
-      [< `deg of float | `grad of float | `rad of float | `turn of float ]
-    | `rotateZ of
-      [< `deg of float | `grad of float | `rad of float | `turn of float ]
-    | `scale of float * float
-    | `scale3d of float * float * float
-    | `scaleX of float
-    | `scaleY of float
-    | `scaleZ of float
-    | `skew of
-      [< `deg of float | `grad of float | `rad of float | `turn of float ]
-      * [< `deg of float | `grad of float | `rad of float | `turn of float ]
-    | `skewX of
-      [< `deg of float | `grad of float | `rad of float | `turn of float ]
-    | `skewY of
-      [< `deg of float | `grad of float | `rad of float | `turn of float ]
-    | `translate of
-      ([< `calc of
-          [< `add of 'a * 'a | `mult of 'a * 'a | `one of 'a | `sub of 'a * 'a ]
-       | `ch of float
-       | `cm of float
-       | `em of float
-       | `ex of float
-       | `inch of float
-       | `mm of float
-       | `pc of float
-       | `percent of float
-       | `pt of int
-       | `px of int
-       | `pxFloat of float
-       | `rem of float
-       | `vh of float
-       | `vmax of float
-       | `vmin of float
-       | `vw of float
-       | `zero
-       ]
-       as
-       'a)
-      * ([< `calc of
-            [< `add of 'b * 'b
-            | `mult of 'b * 'b
-            | `one of 'b
-            | `sub of 'b * 'b
-            ]
-         | `ch of float
-         | `cm of float
-         | `em of float
-         | `ex of float
-         | `inch of float
-         | `mm of float
-         | `pc of float
-         | `percent of float
-         | `pt of int
-         | `px of int
-         | `pxFloat of float
-         | `rem of float
-         | `vh of float
-         | `vmax of float
-         | `vmin of float
-         | `vw of float
-         | `zero
-         ]
-         as
-         'b)
-    | `translate3d of
-      ([< `calc of
-          [< `add of 'c * 'c | `mult of 'c * 'c | `one of 'c | `sub of 'c * 'c ]
-       | `ch of float
-       | `cm of float
-       | `em of float
-       | `ex of float
-       | `inch of float
-       | `mm of float
-       | `pc of float
-       | `percent of float
-       | `pt of int
-       | `px of int
-       | `pxFloat of float
-       | `rem of float
-       | `vh of float
-       | `vmax of float
-       | `vmin of float
-       | `vw of float
-       | `zero
-       ]
-       as
-       'c)
-      * ([< `calc of
-            [< `add of 'd * 'd
-            | `mult of 'd * 'd
-            | `one of 'd
-            | `sub of 'd * 'd
-            ]
-         | `ch of float
-         | `cm of float
-         | `em of float
-         | `ex of float
-         | `inch of float
-         | `mm of float
-         | `pc of float
-         | `percent of float
-         | `pt of int
-         | `px of int
-         | `pxFloat of float
-         | `rem of float
-         | `vh of float
-         | `vmax of float
-         | `vmin of float
-         | `vw of float
-         | `zero
-         ]
-         as
-         'd)
-      * ([< `calc of
-            [< `add of 'e * 'e
-            | `mult of 'e * 'e
-            | `one of 'e
-            | `sub of 'e * 'e
-            ]
-         | `ch of float
-         | `cm of float
-         | `em of float
-         | `ex of float
-         | `inch of float
-         | `mm of float
-         | `pc of float
-         | `percent of float
-         | `pt of int
-         | `px of int
-         | `pxFloat of float
-         | `rem of float
-         | `vh of float
-         | `vmax of float
-         | `vmin of float
-         | `vw of float
-         | `zero
-         ]
-         as
-         'e)
-    | `translateX of
-      ([< `calc of
-          [< `add of 'f * 'f | `mult of 'f * 'f | `one of 'f | `sub of 'f * 'f ]
-       | `ch of float
-       | `cm of float
-       | `em of float
-       | `ex of float
-       | `inch of float
-       | `mm of float
-       | `pc of float
-       | `percent of float
-       | `pt of int
-       | `px of int
-       | `pxFloat of float
-       | `rem of float
-       | `vh of float
-       | `vmax of float
-       | `vmin of float
-       | `vw of float
-       | `zero
-       ]
-       as
-       'f)
-    | `translateY of
-      ([< `calc of
-          [< `add of 'g * 'g | `mult of 'g * 'g | `one of 'g | `sub of 'g * 'g ]
-       | `ch of float
-       | `cm of float
-       | `em of float
-       | `ex of float
-       | `inch of float
-       | `mm of float
-       | `pc of float
-       | `percent of float
-       | `pt of int
-       | `px of int
-       | `pxFloat of float
-       | `rem of float
-       | `vh of float
-       | `vmax of float
-       | `vmin of float
-       | `vw of float
-       | `zero
-       ]
-       as
-       'g)
-    | `translateZ of
-      ([< `calc of
-          [< `add of 'h * 'h | `mult of 'h * 'h | `one of 'h | `sub of 'h * 'h ]
-       | `ch of float
-       | `cm of float
-       | `em of float
-       | `ex of float
-       | `inch of float
-       | `mm of float
-       | `pc of float
-       | `percent of float
-       | `pt of int
-       | `px of int
-       | `pxFloat of float
-       | `rem of float
-       | `vh of float
-       | `vmax of float
-       | `vmin of float
-       | `vw of float
-       | `zero
-       ]
-       as
-       'h)
-    ] ->
-    string
+  val string_of_translate3d : Length.t -> Length.t -> Length.t -> string
+  val toString : t -> string
 end
 
 module AnimationDirection : sig
@@ -878,8 +519,7 @@ module AnimationDirection : sig
     | `reverse
     ]
 
-  val toString :
-    [< `alternate | `alternateReverse | `normal | `reverse ] -> string
+  val toString : t -> string
 end
 
 module AnimationFillMode : sig
@@ -890,7 +530,7 @@ module AnimationFillMode : sig
     | `none
     ]
 
-  val toString : [< `backwards | `both | `forwards | `none ] -> string
+  val toString : t -> string
 end
 
 module AnimationIterationCount : sig
@@ -899,7 +539,7 @@ module AnimationIterationCount : sig
     | `infinite
     ]
 
-  val toString : [< `count of float | `infinite ] -> string
+  val toString : t -> string
 end
 
 module AnimationPlayState : sig
@@ -908,7 +548,7 @@ module AnimationPlayState : sig
     | `running
     ]
 
-  val toString : [< `paused | `running ] -> string
+  val toString : t -> string
 end
 
 module Cursor : sig
@@ -987,55 +627,7 @@ module Cursor : sig
   val nwseResize : [> `nwseResize ]
   val zoomIn : [> `zoomIn ]
   val zoomOut : [> `zoomOut ]
-
-  val toString :
-    [< `_moz_grab
-    | `_moz_grabbing
-    | `_moz_zoom_in
-    | `_moz_zoom_out
-    | `_webkit_grab
-    | `_webkit_grabbing
-    | `_webkit_zoom_in
-    | `_webkit_zoom_out
-    | `alias
-    | `allScroll
-    | `auto
-    | `cell
-    | `colResize
-    | `contextMenu
-    | `copy
-    | `crosshair
-    | `default
-    | `eResize
-    | `ewResize
-    | `grab
-    | `grabbing
-    | `hand
-    | `help
-    | `move
-    | `nResize
-    | `neResize
-    | `neswResize
-    | `noDrop
-    | `none
-    | `notAllowed
-    | `nsResize
-    | `nwResize
-    | `nwseResize
-    | `pointer
-    | `progress
-    | `rowResize
-    | `sResize
-    | `seResize
-    | `swResize
-    | `text
-    | `verticalText
-    | `wResize
-    | `wait
-    | `zoomIn
-    | `zoomOut
-    ] ->
-    string
+  val toString : t -> string
 end
 
 module ColorMixMethod : sig
@@ -1047,7 +639,7 @@ module ColorMixMethod : sig
       | `oklch
       ]
 
-    val toString : [< `hsl | `hwb | `lch | `oklch ] -> string
+    val toString : t -> string
   end
 
   module Rectangular_or_Polar_color_space : sig
@@ -1066,24 +658,7 @@ module ColorMixMethod : sig
       | PolarColorSpace.t
       ]
 
-    val toString :
-      [< `srgb
-      | `srgbLinear
-      | `displayP3
-      | `a98Rgb
-      | `prophotoRgb
-      | `rec2020
-      | `lab
-      | `oklab
-      | `xyz
-      | `xyzD50
-      | `xyzD65
-      | `hsl
-      | `hwb
-      | `lch
-      | `oklch
-      ] ->
-      string
+    val toString : t -> string
   end
 
   module HueSize : sig
@@ -1094,7 +669,7 @@ module ColorMixMethod : sig
       | `decreasing
       ]
 
-    val toString : [< `shorter | `longer | `increasing | `decreasing ] -> string
+    val toString : t -> string
   end
 
   type t =
@@ -1127,25 +702,7 @@ module Color : sig
   val transparent : [> `transparent ]
   val currentColor : [> `currentColor ]
   val string_of_alpha : [< `num of float | `percent of float ] -> string
-
-  val toString :
-    [ `currentColor
-    | `hex of string
-    | `colorMix of ColorMixMethod.t * (t * Percentage.t) * (t * Percentage.t)
-    | `hsl of
-      [ `deg of float | `grad of float | `rad of float | `turn of float ]
-      * [ `percent of float ]
-      * [ `percent of float ]
-    | `hsla of
-      [ `deg of float | `grad of float | `rad of float | `turn of float ]
-      * [ `percent of float ]
-      * [ `percent of float ]
-      * [ `num of float | `percent of float ]
-    | `rgb of int * int * int
-    | `rgba of int * int * int * [ `num of float | `percent of float ]
-    | `transparent
-    ] ->
-    string
+  val toString : t -> string
 end
 
 module BorderStyle : sig
@@ -1162,19 +719,7 @@ module BorderStyle : sig
     | `solid
     ]
 
-  val toString :
-    [< `dashed
-    | `dotted
-    | `double
-    | `groove
-    | `hidden
-    | `inset
-    | `none
-    | `outset
-    | `ridge
-    | `solid
-    ] ->
-    string
+  val toString : t -> string
 end
 
 module PointerEvents : sig
@@ -1192,33 +737,20 @@ module PointerEvents : sig
     | `visibleStroke
     ]
 
-  val toString :
-    [< `all
-    | `auto
-    | `fill
-    | `inherit_
-    | `none
-    | `painted
-    | `stroke
-    | `visible
-    | `visibleFill
-    | `visiblePainted
-    | `visibleStroke
-    ] ->
-    string
+  val toString : t -> string
 end
 
 module Perspective : sig
   type t = [ `none ]
 
-  val toString : [< `none ] -> string
+  val toString : t -> string
 end
 
 module LetterSpacing : sig
   type t = [ `normal ]
 
   val normal : [> `normal ]
-  val toString : [< `normal ] -> string
+  val toString : t -> string
 end
 
 module LineHeight : sig
@@ -1227,74 +759,24 @@ module LineHeight : sig
     | `normal
     ]
 
-  val toString : [< `abs of float | `normal ] -> string
+  val toString : t -> string
 end
 
 module LineWidth : sig
   type t =
-    [ `calc of
-      [ `add of Length.t * Length.t
-      | `mult of Length.t * Length.t
-      | `one of Length.t
-      | `sub of Length.t * Length.t
-      ]
-    | `ch of float
-    | `cm of float
-    | `em of float
-    | `ex of float
-    | `inch of float
-    | `medium
-    | `mm of float
-    | `pc of float
-    | `percent of float
-    | `pt of int
-    | `px of int
-    | `pxFloat of float
-    | `rem of float
-    | `thick
+    [ Length.t
     | `thin
-    | `vh of float
-    | `vmax of float
-    | `vmin of float
-    | `vw of float
-    | `zero
+    | `medium
+    | `thick
     ]
 
-  val toString :
-    [< `calc of
-       [ `add of Length.t * Length.t
-       | `mult of Length.t * Length.t
-       | `one of Length.t
-       | `sub of Length.t * Length.t
-       ]
-    | `ch of float
-    | `cm of float
-    | `em of float
-    | `ex of float
-    | `inch of float
-    | `medium
-    | `mm of float
-    | `pc of float
-    | `percent of float
-    | `pt of int
-    | `px of int
-    | `pxFloat of float
-    | `rem of float
-    | `thick
-    | `thin
-    | `vh of float
-    | `vmax of float
-    | `vmin of float
-    | `vw of float
-    | `zero
-    ] ->
-    string
+  val toString : t -> string
 end
 
 module WordSpacing : sig
   type t = [ `normal ]
 
-  val toString : [< `normal ] -> string
+  val toString : t -> string
 end
 
 module DisplayOld : sig
@@ -1320,28 +802,7 @@ module DisplayOld : sig
     | `webkitInlineFlex
     ]
 
-  val toString :
-    [< `flow
-    | `flowRoot
-    | `mozBox
-    | `mozInlineBox
-    | `mozInlineStack
-    | `msFlexbox
-    | `msGrid
-    | `msInlineFlexbox
-    | `msInlineGrid
-    | `ruby
-    | `rubyBase
-    | `rubyBaseContainer
-    | `rubyText
-    | `rubyTextContainer
-    | `runIn
-    | `webkitBox
-    | `webkitFlex
-    | `webkitInlineBox
-    | `webkitInlineFlex
-    ] ->
-    string
+  val toString : t -> string
 end
 
 module DisplayOutside : sig
@@ -1351,7 +812,7 @@ module DisplayOutside : sig
     | `runIn
     ]
 
-  val toString : [< `block | `inline | `runIn ] -> string
+  val toString : t -> string
 end
 
 module DisplayInside : sig
@@ -1361,13 +822,13 @@ module DisplayInside : sig
     | `table
     ]
 
-  val toString : [< `flex | `grid | `table ] -> string
+  val toString : t -> string
 end
 
 module DisplayListItem : sig
   type t = [ `listItem ]
 
-  val toString : [< `listItem ] -> string
+  val toString : t -> string
 end
 
 module DisplayInternal : sig
@@ -1382,17 +843,7 @@ module DisplayInternal : sig
     | `tableRowGroup
     ]
 
-  val toString :
-    [< `tableCaption
-    | `tableCell
-    | `tableColumn
-    | `tableColumnGroup
-    | `tableFooterGroup
-    | `tableHeaderGroup
-    | `tableRow
-    | `tableRowGroup
-    ] ->
-    string
+  val toString : t -> string
 end
 
 module DisplayBox : sig
@@ -1401,7 +852,7 @@ module DisplayBox : sig
     | `none
     ]
 
-  val toString : [< `contents | `none ] -> string
+  val toString : t -> string
 end
 
 module DisplayLegacy : sig
@@ -1412,8 +863,7 @@ module DisplayLegacy : sig
     | `inlineTable
     ]
 
-  val toString :
-    [< `inlineBlock | `inlineFlex | `inlineGrid | `inlineTable ] -> string
+  val toString : t -> string
 end
 
 module JustifySelf : sig
@@ -1423,7 +873,7 @@ module JustifySelf : sig
     | `stretch
     ]
 
-  val toString : [< `auto | `normal | `stretch ] -> string
+  val toString : t -> string
 end
 
 module TextEmphasisStyle : sig
@@ -1433,7 +883,7 @@ module TextEmphasisStyle : sig
       | `open_
       ]
 
-    val toString : [< `filled | `open_ ] -> string
+    val toString : t -> string
   end
 
   module Shape : sig
@@ -1461,18 +911,7 @@ module TextEmphasisStyle : sig
     | `triangle
     ]
 
-  val toString :
-    [< `circle
-    | `dot
-    | `double_circle
-    | `filled
-    | `none
-    | `open_
-    | `sesame
-    | `string of string
-    | `triangle
-    ] ->
-    string
+  val toString : t -> string
 end
 
 module TextEmphasisPosition : sig
@@ -1482,7 +921,7 @@ module TextEmphasisPosition : sig
       | `right
       ]
 
-    val toString : [< `left | `right ] -> string
+    val toString : t -> string
   end
 
   module OverOrUnder : sig
@@ -1491,7 +930,7 @@ module TextEmphasisPosition : sig
       | `under
       ]
 
-    val toString : [< `over | `under ] -> string
+    val toString : t -> string
   end
 end
 
@@ -1508,18 +947,7 @@ module PositionalAlignment : sig
     | `start
     ]
 
-  val toString :
-    [< `center
-    | `end_
-    | `flexEnd
-    | `flexStart
-    | `left
-    | `right
-    | `selfEnd
-    | `selfStart
-    | `start
-    ] ->
-    string
+  val toString : t -> string
 end
 
 module OverflowAlignment : sig
@@ -1528,31 +956,7 @@ module OverflowAlignment : sig
     | `unsafe of PositionalAlignment.t
     ]
 
-  val toString :
-    [< `safe of
-       [< `center
-       | `end_
-       | `flexEnd
-       | `flexStart
-       | `left
-       | `right
-       | `selfEnd
-       | `selfStart
-       | `start
-       ]
-    | `unsafe of
-      [< `center
-      | `end_
-      | `flexEnd
-      | `flexStart
-      | `left
-      | `right
-      | `selfEnd
-      | `selfStart
-      | `start
-      ]
-    ] ->
-    string
+  val toString : t -> string
 end
 
 module BaselineAlignment : sig
@@ -1562,13 +966,13 @@ module BaselineAlignment : sig
     | `lastBaseline
     ]
 
-  val toString : [< `baseline | `firstBaseline | `lastBaseline ] -> string
+  val toString : t -> string
 end
 
 module NormalAlignment : sig
   type t = [ `normal ]
 
-  val toString : [< `normal ] -> string
+  val toString : t -> string
 end
 
 module DistributedAlignment : sig
@@ -1579,8 +983,7 @@ module DistributedAlignment : sig
     | `stretch
     ]
 
-  val toString :
-    [< `spaceAround | `spaceBetween | `spaceEvenly | `stretch ] -> string
+  val toString : t -> string
 end
 
 module LegacyAlignment : sig
@@ -1591,8 +994,7 @@ module LegacyAlignment : sig
     | `legacyRight
     ]
 
-  val toString :
-    [< `legacy | `legacyCenter | `legacyLeft | `legacyRight ] -> string
+  val toString : t -> string
 end
 
 module TextAlign : sig
@@ -1607,17 +1009,7 @@ module TextAlign : sig
     | `start
     ]
 
-  val toString :
-    [< `center
-    | `end_
-    | `justify
-    | `justifyAll
-    | `left
-    | `matchParent
-    | `right
-    | `start
-    ] ->
-    string
+  val toString : t -> string
 end
 
 module TextAlignAll : sig
@@ -1631,9 +1023,7 @@ module TextAlignAll : sig
     | `start
     ]
 
-  val toString :
-    [< `center | `end_ | `justify | `left | `matchParent | `right | `start ] ->
-    string
+  val toString : t -> string
 end
 
 module TextAlignLast : sig
@@ -1648,17 +1038,7 @@ module TextAlignLast : sig
     | `start
     ]
 
-  val toString :
-    [< `auto
-    | `center
-    | `end_
-    | `justify
-    | `left
-    | `matchParent
-    | `right
-    | `start
-    ] ->
-    string
+  val toString : t -> string
 end
 
 module WordBreak : sig
@@ -1668,7 +1048,7 @@ module WordBreak : sig
     | `normal
     ]
 
-  val toString : [< `breakAll | `keepAll | `normal ] -> string
+  val toString : t -> string
 end
 
 module WhiteSpace : sig
@@ -1681,8 +1061,7 @@ module WhiteSpace : sig
     | `preWrap
     ]
 
-  val toString :
-    [< `breakSpaces | `normal | `nowrap | `pre | `preLine | `preWrap ] -> string
+  val toString : t -> string
 end
 
 module AlignItems : sig
@@ -1691,7 +1070,7 @@ module AlignItems : sig
     | `stretch
     ]
 
-  val toString : [< `normal | `stretch ] -> string
+  val toString : t -> string
 end
 
 module AlignSelf : sig
@@ -1701,7 +1080,7 @@ module AlignSelf : sig
     | `stretch
     ]
 
-  val toString : [< `auto | `normal | `stretch ] -> string
+  val toString : t -> string
 end
 
 module AlignContent : sig
@@ -1713,7 +1092,7 @@ module AlignContent : sig
     | `start
     ]
 
-  val toString : [< `center | `end_ | `flexEnd | `flexStart | `start ] -> string
+  val toString : t -> string
 end
 
 module ObjectFit : sig
@@ -1725,7 +1104,7 @@ module ObjectFit : sig
     | `scaleDown
     ]
 
-  val toString : [< `contain | `cover | `fill | `none | `scaleDown ] -> string
+  val toString : t -> string
 end
 
 module Clear : sig
@@ -1738,8 +1117,7 @@ module Clear : sig
     | `right
     ]
 
-  val toString :
-    [< `both | `inlineEnd | `inlineStart | `left | `none | `right ] -> string
+  val toString : t -> string
 end
 
 module Float : sig
@@ -1751,8 +1129,7 @@ module Float : sig
     | `right
     ]
 
-  val toString :
-    [< `inlineEnd | `inlineStart | `left | `none | `right ] -> string
+  val toString : t -> string
 end
 
 module Visibility : sig
@@ -1762,7 +1139,7 @@ module Visibility : sig
     | `visible
     ]
 
-  val toString : [< `collapse | `hidden | `visible ] -> string
+  val toString : t -> string
 end
 
 module TableLayout : sig
@@ -1771,13 +1148,13 @@ module TableLayout : sig
     | `fixed
     ]
 
-  val toString : [< `auto | `fixed ] -> string
+  val toString : t -> string
 end
 
 module BorderImageSource : sig
   type t = [ `none ]
 
-  val toString : [< `none ] -> string
+  val toString : t -> string
 end
 
 module BorderCollapse : sig
@@ -1786,7 +1163,7 @@ module BorderCollapse : sig
     | `separate
     ]
 
-  val toString : [< `collapse | `separate ] -> string
+  val toString : t -> string
 end
 
 module FlexWrap : sig
@@ -1796,7 +1173,7 @@ module FlexWrap : sig
     | `wrapReverse
     ]
 
-  val toString : [< `nowrap | `wrap | `wrapReverse ] -> string
+  val toString : t -> string
 end
 
 module FlexDirection : sig
@@ -1807,7 +1184,7 @@ module FlexDirection : sig
     | `rowReverse
     ]
 
-  val toString : [< `column | `columnReverse | `row | `rowReverse ] -> string
+  val toString : t -> string
 end
 
 module BoxSizing : sig
@@ -1816,7 +1193,7 @@ module BoxSizing : sig
     | `contentBox
     ]
 
-  val toString : [< `borderBox | `contentBox ] -> string
+  val toString : t -> string
 end
 
 module ColumnCount : sig
@@ -1825,7 +1202,7 @@ module ColumnCount : sig
     | `count of int
     ]
 
-  val toString : [< `auto | `count of int ] -> string
+  val toString : t -> string
 end
 
 module UserSelect : sig
@@ -1837,7 +1214,7 @@ module UserSelect : sig
     | `text
     ]
 
-  val toString : [< `all | `auto | `contain | `none | `text ] -> string
+  val toString : t -> string
 end
 
 module TextTransform : sig
@@ -1848,7 +1225,7 @@ module TextTransform : sig
     | `uppercase
     ]
 
-  val toString : [< `capitalize | `lowercase | `none | `uppercase ] -> string
+  val toString : t -> string
 end
 
 module GridTemplateAreas : sig
@@ -1858,7 +1235,7 @@ module GridTemplateAreas : sig
     ]
 
   val areas : 'a -> [> `areas of 'a ]
-  val toString : [< `areas of string array | `none ] -> string
+  val toString : t -> string
 end
 
 module GridArea : sig
@@ -1875,60 +1252,28 @@ module GridArea : sig
   val num : 'a -> [> `num of 'a ]
   val numIdent : 'a -> 'b -> [> `numIdent of 'a * 'b ]
   val span : 'a -> [> `span of 'a ]
-
-  val toString :
-    [< `auto
-    | `ident of string
-    | `num of int
-    | `numIdent of int * string
-    | `span of [< `ident of string | `num of int ]
-    ] ->
-    string
+  val toString : t -> string
 end
 
-module BackdropFilter : sig
+module Filter : sig
   type t =
-    [ `blur of Length.t
-    | `brightness of [ `num of int | `percent of float ]
-    | `contrast of [ `num of int | `percent of float ]
-    | `dropShadow of [ `num of int | `percent of float ]
-    | `grayscale of [ `num of int | `percent of float ]
-    | `hueRotate of
-      [ `deg of float
-      | `grad of float
-      | `rad of float
-      | `turn of float
-      | `zero
-      ]
-    | `invert of [ `num of int | `percent of float ]
-    | `none
-    | `opacity of [ `num of int | `percent of float ]
-    | `saturate of [ `num of int | `percent of float ]
-    | `sepia of [ `num of int | `percent of float ]
+    [ `none
+    | `blur of Length.t
+    | `brightness of [ `percent of float | `num of float ]
+    | `contrast of [ `percent of float | `num of float ]
+    | `dropShadow of Length.t * Length.t * Length.t * [ Color.t | Var.t ]
+    | `grayscale of [ `percent of float | `num of float ]
+    | `hueRotate of Angle.t
+    | `invert of [ `percent of float | `num of float ]
+    | `opacity of [ `percent of float | `num of float ]
+    | `saturate of [ `percent of float | `num of float ]
+    | `sepia of [ `percent of float | `num of float ]
+    | Url.t
+    | Var.t
+    | Cascading.t
     ]
 
-  val string_of_percent : float -> string
-
-  val toString :
-    [< `blur of [< Length.t ]
-    | `brightness of [< `num of int | `percent of float ]
-    | `contrast of [< `num of int | `percent of float ]
-    | `dropShadow of [< `num of int | `percent of float ]
-    | `grayscale of [< `num of int | `percent of float ]
-    | `hueRotate of
-      [< `deg of float
-      | `grad of float
-      | `rad of float
-      | `turn of float
-      | `zero
-      ]
-    | `invert of [< `num of int | `percent of float ]
-    | `none
-    | `opacity of [< `num of int | `percent of float ]
-    | `saturate of [< `num of int | `percent of float ]
-    | `sepia of [< `num of int | `percent of float ]
-    ] ->
-    string
+  val toString : t -> string
 end
 
 module BackgroundAttachment : sig
@@ -1938,7 +1283,7 @@ module BackgroundAttachment : sig
     | `scroll
     ]
 
-  val toString : [< `fixed | `local | `scroll ] -> string
+  val toString : t -> string
 end
 
 module BackgroundClip : sig
@@ -1948,7 +1293,7 @@ module BackgroundClip : sig
     | `paddingBox
     ]
 
-  val toString : [< `borderBox | `contentBox | `paddingBox ] -> string
+  val toString : t -> string
 end
 
 module BackgroundOrigin : sig
@@ -1958,7 +1303,7 @@ module BackgroundOrigin : sig
     | `paddingBox
     ]
 
-  val toString : [< `borderBox | `contentBox | `paddingBox ] -> string
+  val toString : t -> string
 end
 
 module BackgroundPosition : sig
@@ -1969,7 +1314,7 @@ module BackgroundPosition : sig
       | `right
       ]
 
-    val toString : [< `center | `left | `right ] -> string
+    val toString : t -> string
   end
 
   module Y : sig
@@ -1979,7 +1324,7 @@ module BackgroundPosition : sig
       | `top
       ]
 
-    val toString : [< `bottom | `center | `top ] -> string
+    val toString : t -> string
   end
 
   type t =
@@ -1990,7 +1335,7 @@ module BackgroundPosition : sig
     | `top
     ]
 
-  val toString : [< `bottom | `center | `left | `right | `top ] -> string
+  val toString : t -> string
 end
 
 module MaskPosition : sig
@@ -2001,7 +1346,7 @@ module MaskPosition : sig
       | `right
       ]
 
-    val toString : [< `center | `left | `right ] -> string
+    val toString : t -> string
   end
 
   module Y : sig
@@ -2011,7 +1356,7 @@ module MaskPosition : sig
       | `top
       ]
 
-    val toString : [< `bottom | `center | `top ] -> string
+    val toString : t -> string
   end
 
   type t =
@@ -2022,7 +1367,7 @@ module MaskPosition : sig
     | `top
     ]
 
-  val toString : [< `bottom | `center | `left | `right | `top ] -> string
+  val toString : t -> string
 end
 
 module BackgroundRepeat : sig
@@ -2045,8 +1390,7 @@ module BackgroundRepeat : sig
   type horizontal = twoValue
   type vertical = twoValue
 
-  val toString :
-    [< `noRepeat | `repeat | `repeatX | `repeatY | `round | `space ] -> string
+  val toString : t -> string
 end
 
 module TextOverflow : sig
@@ -2056,7 +1400,7 @@ module TextOverflow : sig
     | `string of string
     ]
 
-  val toString : [< `clip | `ellipsis | `string of string ] -> string
+  val toString : t -> string
 end
 
 module TextDecorationLine : sig
@@ -2068,8 +1412,7 @@ module TextDecorationLine : sig
     | `underline
     ]
 
-  val toString :
-    [< `blink | `lineThrough | `none | `overline | `underline ] -> string
+  val toString : t -> string
 end
 
 module TextDecorationStyle : sig
@@ -2081,7 +1424,7 @@ module TextDecorationStyle : sig
     | `wavy
     ]
 
-  val toString : [< `dashed | `dotted | `double | `solid | `wavy ] -> string
+  val toString : t -> string
 end
 
 module TextDecorationThickness : sig
@@ -2090,7 +1433,7 @@ module TextDecorationThickness : sig
     | `fromFont
     ]
 
-  val toString : [< `auto | `fromFont ] -> string
+  val toString : t -> string
 end
 
 module TextDecorationSkipInk : sig
@@ -2100,7 +1443,7 @@ module TextDecorationSkipInk : sig
     | `none
     ]
 
-  val toString : [< `all | `auto | `none ] -> string
+  val toString : t -> string
 end
 
 module TextDecorationSkipBox : sig
@@ -2109,7 +1452,7 @@ module TextDecorationSkipBox : sig
     | `none
     ]
 
-  val toString : [< `all | `none ] -> string
+  val toString : t -> string
 end
 
 module TextDecorationSkipInset : sig
@@ -2118,7 +1461,7 @@ module TextDecorationSkipInset : sig
     | `none
     ]
 
-  val toString : [< `auto | `none ] -> string
+  val toString : t -> string
 end
 
 module Width : sig
@@ -2129,13 +1472,13 @@ module Width : sig
     | `minContent
     ]
 
-  val toString : [< `auto | `fitContent | `maxContent | `minContent ] -> string
+  val toString : t -> string
 end
 
 module None : sig
   type t = [ `none ]
 
-  val toString : [< `none ] -> string
+  val toString : t -> string
 end
 
 module MinWidth = None
@@ -2149,7 +1492,7 @@ module Height : sig
     | `minContent
     ]
 
-  val toString : [< `auto | `fitContent | `maxContent | `minContent ] -> string
+  val toString : t -> string
 end
 
 module MaxHeight = None
@@ -2162,7 +1505,7 @@ module OverflowWrap : sig
     | `normal
     ]
 
-  val toString : [< `anywhere | `breakWord | `normal ] -> string
+  val toString : t -> string
 end
 
 module SideOrCorner : sig
@@ -2177,51 +1520,34 @@ module SideOrCorner : sig
     | `TopRight
     ]
 
-  val toString :
-    [< `Bottom
-    | `BottomLeft
-    | `BottomRight
-    | `Left
-    | `Right
-    | `Top
-    | `TopLeft
-    | `TopRight
-    ] ->
-    string
+  val toString : t -> string
 end
 
 module Gradient : sig
-  type 'a t =
-    [ `conicGradient of
-      [ `Angle of Angle.t | `SideOrCorner of SideOrCorner.t ] option
-      * ('a * Length.t option) array
-    | `linearGradient of
-      [ `Angle of Angle.t | `SideOrCorner of SideOrCorner.t ] option
-      * ('a * Length.t option) array
-    | `radialGradient of ('a * Length.t option) array
-    | `repeatingLinearGradient of
-      [ `Angle of Angle.t | `SideOrCorner of SideOrCorner.t ] option
-      * ('a * Length.t option) array
-    | `repeatingRadialGradient of ('a * Length.t option) array
-    ]
-    constraint
-      'a =
-      [< `currentColor
-      | `hex of string
-      | `colorMix of
-        ColorMixMethod.t * (Color.t * Percentage.t) * (Color.t * Percentage.t)
-      | `hsl of Angle.t * Percentage.t * Percentage.t
-      | `hsla of
-        Angle.t
-        * Percentage.t
-        * Percentage.t
-        * [ `num of float | `percent of float ]
-      | `rgb of int * int * int
-      | `rgba of int * int * int * [ `num of float | `percent of float ]
-      | `transparent
-      | `var of string
-      | `varDefault of string * string
+  type direction =
+    [ `Angle of Angle.t
+    | `SideOrCorner of
+      [ `Bottom
+      | `BottomLeft
+      | `BottomRight
+      | `Left
+      | `Right
+      | `Top
+      | `TopLeft
+      | `TopRight
       ]
+    ]
+
+  type t =
+    [ `linearGradient of
+      direction option * ([ Color.t | Var.t ] * Length.t option) array
+    | `repeatingLinearGradient of
+      direction option * ([ Color.t | Var.t ] * Length.t option) array
+    | `radialGradient of ([ Color.t | Var.t ] * Length.t option) array
+    | `repeatingRadialGradient of ([ Color.t | Var.t ] * Length.t option) array
+    | `conicGradient of
+      direction option * ([ Color.t | Var.t ] * Length.t option) array
+    ]
 
   val linearGradient : 'a -> 'b -> [> `linearGradient of 'a * 'b ]
 
@@ -2231,374 +1557,19 @@ module Gradient : sig
   val radialGradient : 'a -> [> `radialGradient of 'a ]
   val repeatingRadialGradient : 'a -> [> `repeatingRadialGradient of 'a ]
   val conicGradient : 'a -> 'b -> [> `conicGradient of 'a * 'b ]
-
-  val string_of_color :
-    [< `currentColor
-    | `hex of string
-    | `colorMix of
-      ColorMixMethod.t * (Color.t * Percentage.t) * (Color.t * Percentage.t)
-    | `hsl of Angle.t * Percentage.t * Percentage.t
-    | `hsla of
-      Angle.t
-      * Percentage.t
-      * Percentage.t
-      * [ `num of float | `percent of float ]
-    | `rgb of int * int * int
-    | `rgba of int * int * int * [ `num of float | `percent of float ]
-    | `transparent
-    | `var of string
-    | `varDefault of string * string
-    ] ->
-    string
-
-  val string_of_stops :
-    ([< `currentColor
-     | `hex of string
-     | `colorMix of
-       ColorMixMethod.t * (Color.t * Percentage.t) * (Color.t * Percentage.t)
-     | `hsl of Angle.t * Percentage.t * Percentage.t
-     | `hsla of
-       Angle.t
-       * Percentage.t
-       * Percentage.t
-       * [ `num of float | `percent of float ]
-     | `rgb of int * int * int
-     | `rgba of int * int * int * [ `num of float | `percent of float ]
-     | `transparent
-     | `var of string
-     | `varDefault of string * string
-     ]
-    * ([< `calc of
-          [< `add of 'a * 'a | `mult of 'a * 'a | `one of 'a | `sub of 'a * 'a ]
-       | `ch of float
-       | `cm of float
-       | `em of float
-       | `ex of float
-       | `inch of float
-       | `mm of float
-       | `pc of float
-       | `percent of float
-       | `pt of int
-       | `px of int
-       | `pxFloat of float
-       | `rem of float
-       | `vh of float
-       | `vmax of float
-       | `vmin of float
-       | `vw of float
-       | `zero
-       ]
-       as
-       'a)
-      option)
-    array ->
-    string
-
-  val direction_to_string :
-    [< `Angle of
-       [< `deg of float | `grad of float | `rad of float | `turn of float ]
-    | `SideOrCorner of
-      [< `Bottom
-      | `BottomLeft
-      | `BottomRight
-      | `Left
-      | `Right
-      | `Top
-      | `TopLeft
-      | `TopRight
-      ]
-    ] ->
-    string
+  val string_of_color : [ Color.t | Var.t ] -> string
+  val string_of_stops : ([ Color.t | Var.t ] * Length.t option) array -> string
+  val direction_to_string : direction -> string
 
   val toString :
     [< `conicGradient of
-       [< `Angle of
-          [< `deg of float | `grad of float | `rad of float | `turn of float ]
-       | `SideOrCorner of
-         [< `Bottom
-         | `BottomLeft
-         | `BottomRight
-         | `Left
-         | `Right
-         | `Top
-         | `TopLeft
-         | `TopRight
-         ]
-       ]
-       option
-       * ([< `currentColor
-          | `hex of string
-          | `colorMix of
-            ColorMixMethod.t
-            * (Color.t * Percentage.t)
-            * (Color.t * Percentage.t)
-          | `hsl of Angle.t * Percentage.t * Percentage.t
-          | `hsla of
-            Angle.t
-            * Percentage.t
-            * Percentage.t
-            * [ `num of float | `percent of float ]
-          | `rgb of int * int * int
-          | `rgba of int * int * int * [ `num of float | `percent of float ]
-          | `transparent
-          | `var of string
-          | `varDefault of string * string
-          ]
-         * ([< `calc of
-               [< `add of 'a * 'a
-               | `mult of 'a * 'a
-               | `one of 'a
-               | `sub of 'a * 'a
-               ]
-               & [< `add of 'a * 'a
-                 | `mult of 'a * 'a
-                 | `one of 'a
-                 | `sub of 'a * 'a
-                 ]
-            | `ch of float
-            | `cm of float
-            | `em of float
-            | `ex of float
-            | `inch of float
-            | `mm of float
-            | `pc of float
-            | `percent of float
-            | `pt of int
-            | `px of int
-            | `pxFloat of float
-            | `rem of float
-            | `vh of float
-            | `vmax of float
-            | `vmin of float
-            | `vw of float
-            | `zero
-            ]
-            as
-            'a)
-           option)
-         array
+       direction option * ([ Color.t | Var.t ] * Length.t option) array
     | `linearGradient of
-      [< `Angle of
-         [< `deg of float | `grad of float | `rad of float | `turn of float ]
-      | `SideOrCorner of
-        [< `Bottom
-        | `BottomLeft
-        | `BottomRight
-        | `Left
-        | `Right
-        | `Top
-        | `TopLeft
-        | `TopRight
-        ]
-      ]
-      option
-      * ([< `currentColor
-         | `hex of string
-         | `colorMix of
-           ColorMixMethod.t
-           * (Color.t * Percentage.t)
-           * (Color.t * Percentage.t)
-         | `hsl of Angle.t * Percentage.t * Percentage.t
-         | `hsla of
-           Angle.t
-           * Percentage.t
-           * Percentage.t
-           * [ `num of float | `percent of float ]
-         | `rgb of int * int * int
-         | `rgba of int * int * int * [ `num of float | `percent of float ]
-         | `transparent
-         | `var of string
-         | `varDefault of string * string
-         ]
-        * ([< `calc of
-              [< `add of 'b * 'b
-              | `mult of 'b * 'b
-              | `one of 'b
-              | `sub of 'b * 'b
-              ]
-              & [< `add of 'b * 'b
-                | `mult of 'b * 'b
-                | `one of 'b
-                | `sub of 'b * 'b
-                ]
-           | `ch of float
-           | `cm of float
-           | `em of float
-           | `ex of float
-           | `inch of float
-           | `mm of float
-           | `pc of float
-           | `percent of float
-           | `pt of int
-           | `px of int
-           | `pxFloat of float
-           | `rem of float
-           | `vh of float
-           | `vmax of float
-           | `vmin of float
-           | `vw of float
-           | `zero
-           ]
-           as
-           'b)
-          option)
-        array
-    | `radialGradient of
-      ([< `currentColor
-       | `hex of string
-       | `colorMix of
-         ColorMixMethod.t * (Color.t * Percentage.t) * (Color.t * Percentage.t)
-       | `hsl of Angle.t * Percentage.t * Percentage.t
-       | `hsla of
-         Angle.t
-         * Percentage.t
-         * Percentage.t
-         * [ `num of float | `percent of float ]
-       | `rgb of int * int * int
-       | `rgba of int * int * int * [ `num of float | `percent of float ]
-       | `transparent
-       | `var of string
-       | `varDefault of string * string
-       ]
-      * ([< `calc of
-            [< `add of 'c * 'c
-            | `mult of 'c * 'c
-            | `one of 'c
-            | `sub of 'c * 'c
-            ]
-         | `ch of float
-         | `cm of float
-         | `em of float
-         | `ex of float
-         | `inch of float
-         | `mm of float
-         | `pc of float
-         | `percent of float
-         | `pt of int
-         | `px of int
-         | `pxFloat of float
-         | `rem of float
-         | `vh of float
-         | `vmax of float
-         | `vmin of float
-         | `vw of float
-         | `zero
-         ]
-         as
-         'c)
-        option)
-      array
+      direction option * ([ Color.t | Var.t ] * Length.t option) array
+    | `radialGradient of ([ Color.t | Var.t ] * Length.t option) array
     | `repeatingLinearGradient of
-      [< `Angle of
-         [< `deg of float | `grad of float | `rad of float | `turn of float ]
-      | `SideOrCorner of
-        [< `Bottom
-        | `BottomLeft
-        | `BottomRight
-        | `Left
-        | `Right
-        | `Top
-        | `TopLeft
-        | `TopRight
-        ]
-      ]
-      option
-      * ([< `currentColor
-         | `hex of string
-         | `colorMix of
-           ColorMixMethod.t
-           * (Color.t * Percentage.t)
-           * (Color.t * Percentage.t)
-         | `hsl of Angle.t * Percentage.t * Percentage.t
-         | `hsla of
-           Angle.t
-           * Percentage.t
-           * Percentage.t
-           * [ `num of float | `percent of float ]
-         | `rgb of int * int * int
-         | `rgba of int * int * int * [ `num of float | `percent of float ]
-         | `transparent
-         | `var of string
-         | `varDefault of string * string
-         ]
-        * ([< `calc of
-              [< `add of 'd * 'd
-              | `mult of 'd * 'd
-              | `one of 'd
-              | `sub of 'd * 'd
-              ]
-              & [< `add of 'd * 'd
-                | `mult of 'd * 'd
-                | `one of 'd
-                | `sub of 'd * 'd
-                ]
-           | `ch of float
-           | `cm of float
-           | `em of float
-           | `ex of float
-           | `inch of float
-           | `mm of float
-           | `pc of float
-           | `percent of float
-           | `pt of int
-           | `px of int
-           | `pxFloat of float
-           | `rem of float
-           | `vh of float
-           | `vmax of float
-           | `vmin of float
-           | `vw of float
-           | `zero
-           ]
-           as
-           'd)
-          option)
-        array
-    | `repeatingRadialGradient of
-      ([< `currentColor
-       | `hex of string
-       | `colorMix of
-         ColorMixMethod.t * (Color.t * Percentage.t) * (Color.t * Percentage.t)
-       | `hsl of Angle.t * Percentage.t * Percentage.t
-       | `hsla of
-         Angle.t
-         * Percentage.t
-         * Percentage.t
-         * [ `num of float | `percent of float ]
-       | `rgb of int * int * int
-       | `rgba of int * int * int * [ `num of float | `percent of float ]
-       | `transparent
-       | `var of string
-       | `varDefault of string * string
-       ]
-      * ([< `calc of
-            [< `add of 'e * 'e
-            | `mult of 'e * 'e
-            | `one of 'e
-            | `sub of 'e * 'e
-            ]
-         | `ch of float
-         | `cm of float
-         | `em of float
-         | `ex of float
-         | `inch of float
-         | `mm of float
-         | `pc of float
-         | `percent of float
-         | `pt of int
-         | `px of int
-         | `pxFloat of float
-         | `rem of float
-         | `vh of float
-         | `vmax of float
-         | `vmin of float
-         | `vw of float
-         | `zero
-         ]
-         as
-         'e)
-        option)
-      array
+      direction option * ([ Color.t | Var.t ] * Length.t option) array
+    | `repeatingRadialGradient of ([ Color.t | Var.t ] * Length.t option) array
     ] ->
     string
 end
@@ -2606,13 +1577,13 @@ end
 module BackgroundImage : sig
   type t = [ `none ]
 
-  val toString : [< `none ] -> string
+  val toString : t -> string
 end
 
 module MaskImage : sig
   type t = [ `none ]
 
-  val toString : [< `none ] -> string
+  val toString : t -> string
 end
 
 module ImageRendering : sig
@@ -2624,8 +1595,7 @@ module ImageRendering : sig
     | `crispEdges
     ]
 
-  val toString :
-    [< `auto | `smooth | `highQuality | `pixelated | `crispEdges ] -> string
+  val toString : t -> string
 end
 
 module GeometryBox : sig
@@ -2646,23 +1616,13 @@ module GeometryBox : sig
   val fillBox : [> `fillBox ]
   val strokeBox : [> `strokeBox ]
   val viewBox : [> `viewBox ]
-
-  val toString :
-    [< `borderBox
-    | `contentBox
-    | `fillBox
-    | `marginBox
-    | `paddingBox
-    | `strokeBox
-    | `viewBox
-    ] ->
-    string
+  val toString : t -> string
 end
 
 module ClipPath : sig
   type t = [ `none ]
 
-  val toString : [< `none ] -> string
+  val toString : t -> string
 end
 
 module BackfaceVisibility : sig
@@ -2671,7 +1631,7 @@ module BackfaceVisibility : sig
     | `visible
     ]
 
-  val toString : [< `hidden | `visible ] -> string
+  val toString : t -> string
 end
 
 module Flex : sig
@@ -2681,7 +1641,7 @@ module Flex : sig
     | `none
     ]
 
-  val toString : [< `auto | `initial | `none ] -> string
+  val toString : t -> string
 end
 
 module TransformStyle : sig
@@ -2690,7 +1650,7 @@ module TransformStyle : sig
     | `preserve3d
     ]
 
-  val toString : [< `flat | `preserve3d ] -> string
+  val toString : t -> string
 end
 
 module TransformBox : sig
@@ -2702,14 +1662,13 @@ module TransformBox : sig
     | `viewBox
     ]
 
-  val toString :
-    [< `borderBox | `contentBox | `fillBox | `strokeBox | `viewBox ] -> string
+  val toString : t -> string
 end
 
 module ListStyleImage : sig
   type t = [ `none ]
 
-  val toString : [< `none ] -> string
+  val toString : t -> string
 end
 
 module FontFamilyName : sig
@@ -2736,20 +1695,7 @@ module FontFamilyName : sig
   val emoji : [> `emoji ]
   val math : [> `math ]
   val fangsong : [> `fangsong ]
-
-  val toString :
-    [< `cursive
-    | `custom of string
-    | `emoji
-    | `fangsong
-    | `fantasy
-    | `math
-    | `monospace
-    | `sansSerif
-    | `serif
-    | `systemUi
-    ] ->
-    string
+  val toString : t -> string
 end
 
 module FontDisplay : sig
@@ -2766,13 +1712,13 @@ module FontDisplay : sig
   val swap : [> `swap ]
   val fallback : [> `fallback ]
   val optional : [> `optional ]
-  val toString : [< `auto | `block | `fallback | `optional | `swap ] -> string
+  val toString : t -> string
 end
 
 module CounterStyleType : sig
   type t = ListStyleType.t
 
-  val toString : [< ListStyleType.t ] -> string
+  val toString : t -> string
 end
 
 module Counter : sig
@@ -2795,26 +1741,7 @@ module Counter : sig
   type t = [ `counter of string * style ]
 
   val counter : ?style:([> `unset ] as 'a) -> 'b -> [> `counter of 'b * 'a ]
-
-  val toString :
-    [< `counter of
-       string
-       * [< `circle
-         | `decimal
-         | `disc
-         | `lowerAlpha
-         | `lowerGreek
-         | `lowerLatin
-         | `lowerRoman
-         | `none
-         | `square
-         | `unset
-         | `upperAlpha
-         | `upperLatin
-         | `upperRoman
-         ]
-    ] ->
-    string
+  val toString : t -> string
 end
 
 module Counters : sig
@@ -2842,26 +1769,7 @@ module Counters : sig
     'b ->
     [> `counters of 'b * string * 'a ]
 
-  val toString :
-    [< `counters of
-       string
-       * string
-       * [< `circle
-         | `decimal
-         | `disc
-         | `lowerAlpha
-         | `lowerGreek
-         | `lowerLatin
-         | `lowerRoman
-         | `none
-         | `square
-         | `unset
-         | `upperAlpha
-         | `upperLatin
-         | `upperRoman
-         ]
-    ] ->
-    string
+  val toString : t -> string
 end
 
 module CounterIncrement : sig
@@ -2871,7 +1779,7 @@ module CounterIncrement : sig
     ]
 
   val increment : ?value:int -> 'a -> [> `increment of 'a * int ]
-  val toString : [< `increment of string * int | `none ] -> string
+  val toString : t -> string
 end
 
 module CounterReset : sig
@@ -2881,7 +1789,7 @@ module CounterReset : sig
     ]
 
   val reset : ?value:int -> 'a -> [> `reset of 'a * int ]
-  val toString : [< `none | `reset of string * int ] -> string
+  val toString : t -> string
 end
 
 module CounterSet : sig
@@ -2891,7 +1799,7 @@ module CounterSet : sig
     ]
 
   val set : ?value:int -> 'a -> [> `set of 'a * int ]
-  val toString : [< `none | `set of string * int ] -> string
+  val toString : t -> string
 end
 
 module Content : sig
@@ -2907,18 +1815,7 @@ module Content : sig
     ]
 
   val text_to_string : string -> string
-
-  val toString :
-    [< `attr of string
-    | `closeQuote
-    | `noCloseQuote
-    | `noOpenQuote
-    | `none
-    | `normal
-    | `openQuote
-    | `text of string
-    ] ->
-    string
+  val toString : t -> string
 end
 
 module SVG : sig
@@ -2931,7 +1828,7 @@ module SVG : sig
 
     val contextFill : [> `contextFill ]
     val contextStroke : [> `contextStroke ]
-    val toString : [< `contextFill | `contextStroke | `none ] -> string
+    val toString : t -> string
   end
 end
 
@@ -2949,19 +1846,7 @@ module TouchAction : sig
     | `pinchZoom
     ]
 
-  val toString :
-    [< `auto
-    | `manipulation
-    | `none
-    | `panDown
-    | `panLeft
-    | `panRight
-    | `panUp
-    | `panX
-    | `panY
-    | `pinchZoom
-    ] ->
-    string
+  val toString : t -> string
 end
 
 module ZIndex : sig
@@ -2970,7 +1855,7 @@ module ZIndex : sig
     | `num of int
     ]
 
-  val toString : [< `auto | `num of int ] -> string
+  val toString : t -> string
 end
 
 module AlphaValue : sig
@@ -2979,7 +1864,7 @@ module AlphaValue : sig
     | `percent of float
     ]
 
-  val toString : [< `num of float | `percent of float ] -> string
+  val toString : t -> string
 end
 
 module LineBreak : sig
@@ -2991,7 +1876,7 @@ module LineBreak : sig
     | `strict
     ]
 
-  val toString : [< `anywhere | `auto | `loose | `normal | `strict ] -> string
+  val toString : t -> string
 end
 
 module Hyphens : sig
@@ -3001,7 +1886,7 @@ module Hyphens : sig
     | `none
     ]
 
-  val toString : [< `auto | `manual | `none ] -> string
+  val toString : t -> string
 end
 
 module TextJustify : sig
@@ -3012,7 +1897,7 @@ module TextJustify : sig
     | `none
     ]
 
-  val toString : [< `auto | `interCharacter | `interWord | `none ] -> string
+  val toString : t -> string
 end
 
 module OverflowInline : sig
@@ -3024,7 +1909,7 @@ module OverflowInline : sig
     | `visible
     ]
 
-  val toString : [< `auto | `clip | `hidden | `scroll | `visible ] -> string
+  val toString : t -> string
 end
 
 module FontSynthesisWeight : sig
@@ -3033,7 +1918,7 @@ module FontSynthesisWeight : sig
     | `none
     ]
 
-  val toString : [< `auto | `none ] -> string
+  val toString : t -> string
 end
 
 module FontSynthesisStyle : sig
@@ -3042,7 +1927,7 @@ module FontSynthesisStyle : sig
     | `none
     ]
 
-  val toString : [< `auto | `none ] -> string
+  val toString : t -> string
 end
 
 module FontSynthesisSmallCaps : sig
@@ -3051,7 +1936,7 @@ module FontSynthesisSmallCaps : sig
     | `none
     ]
 
-  val toString : [< `auto | `none ] -> string
+  val toString : t -> string
 end
 
 module FontSynthesisPosition : sig
@@ -3060,7 +1945,7 @@ module FontSynthesisPosition : sig
     | `none
     ]
 
-  val toString : [< `auto | `none ] -> string
+  val toString : t -> string
 end
 
 module FontKerning : sig
@@ -3070,7 +1955,7 @@ module FontKerning : sig
     | `normal
     ]
 
-  val toString : [< `auto | `none | `normal ] -> string
+  val toString : t -> string
 end
 
 module FontVariantPosition : sig
@@ -3080,7 +1965,7 @@ module FontVariantPosition : sig
     | `super
     ]
 
-  val toString : [< `normal | `sub | `super ] -> string
+  val toString : t -> string
 end
 
 module FontVariantCaps : sig
@@ -3094,16 +1979,7 @@ module FontVariantCaps : sig
     | `unicase
     ]
 
-  val toString :
-    [< `allPetiteCaps
-    | `allSmallCaps
-    | `normal
-    | `petiteCaps
-    | `smallCaps
-    | `titlingCaps
-    | `unicase
-    ] ->
-    string
+  val toString : t -> string
 end
 
 module FontOpticalSizing : sig
@@ -3112,7 +1988,7 @@ module FontOpticalSizing : sig
     | `none
     ]
 
-  val toString : [< `auto | `none ] -> string
+  val toString : t -> string
 end
 
 module FontVariantEmoji : sig
@@ -3123,5 +1999,5 @@ module FontVariantEmoji : sig
     | `unicode
     ]
 
-  val toString : [< `emoji | `normal | `text | `unicode ] -> string
+  val toString : t -> string
 end

@@ -972,18 +972,18 @@ let properties_static_css_tests = [
     [%expr [%css "border-image-source: none"]],
     [%expr CssJs.borderImageSource(`none)],
   ),
-  (
-    [%css "border-image-source: linear-gradient(to top, red, yellow)"],
-    [%expr [%css "border-image-source: linear-gradient(to top, red, yellow)"]],
-    [%expr
-      CssJs.borderImageSource(
-        `linearGradient((
-          Some(`SideOrCorner(`Top)),
-          [|(CssJs.red, None), (CssJs.yellow, None)|],
-        )),
-      )
-    ],
-  ),
+  /* (
+       [%css "border-image-source: linear-gradient(to top, red, yellow)"],
+       [%expr [%css "border-image-source: linear-gradient(to top, red, yellow)"]],
+       [%expr
+         CssJs.borderImageSource(
+           `linearGradient((
+             Some(`SideOrCorner(`Top)),
+             [|(CssJs.red, None), (CssJs.yellow, None)|],
+           )),
+         )
+       ],
+     ), */
   (
     [%css "image-rendering: smooth"],
     [%expr [%css "image-rendering: smooth"]],

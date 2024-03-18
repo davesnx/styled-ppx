@@ -1,0 +1,17 @@
+(executables
+ (names standalone)
+ (public_names standalone)
+ (modules standalone)
+ (libraries styled-ppx.lib ppxlib))
+
+(executables
+ (names rewriter)
+ (public_names rewriter)
+ (modules rewriter)
+ (libraries styled-ppx.lib ppxlib))
+
+(executables
+ (names dune_describe_pp)
+ (public_names dune_describe_pp)
+ (modules dune_describe_pp)
+ (libraries ppxlib ppxlib.ast ppxlib.astlib))

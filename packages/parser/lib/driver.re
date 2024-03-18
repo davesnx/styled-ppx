@@ -33,18 +33,16 @@ let parse = (skip_whitespaces, lexbuf, parser) => {
 let container_lnum_ref: ref(option(int)) = ref(None);
 let last_buffer = ref(None);
 
-let from_string = (~pos as initial_position: Lexing.position, ~lnum, string) => {
+let from_string = (~pos as _initial_position: Lexing.position, ~lnum, string) => {
   let buffer = Sedlexing.Latin1.from_string(string);
   container_lnum_ref := Some(lnum);
-  Sedlexing.set_position(buffer, initial_position);
   buffer;
 };
 
-let parse_string = (~lnum, ~skip_whitespace, ~pos, parser, string) => {
+let parse_string =
+    (~lnum, ~skip_whitespace, ~pos: Lexing.position, parser, string) => {
   let buffer = Sedlexing.Latin1.from_string(string);
-
   last_buffer := Some(from_string(~lnum, ~pos, string));
-
   parse(skip_whitespace, buffer, parser);
 };
 

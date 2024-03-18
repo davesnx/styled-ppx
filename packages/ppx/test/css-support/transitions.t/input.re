@@ -1,0 +1,22 @@
+/* CSS Transitions */
+[%css {|transition-property: none|}];
+[%css {|transition-property: all|}];
+[%css {|transition-property: width|}];
+[%css {|transition-property: width, height|}];
+[%css {|transition-duration: 0s|}];
+[%css {|transition-duration: 1s|}];
+[%css {|transition-duration: 100ms|}];
+[%css {|transition-timing-function: ease|}];
+[%css {|transition-timing-function: linear|}];
+[%css {|transition-timing-function: ease-in|}];
+[%css {|transition-timing-function: ease-out|}];
+[%css {|transition-timing-function: ease-in-out|}];
+[%css {|transition-timing-function: cubic-bezier(.5, .5, .5, .5)|}];
+[%css {|transition-timing-function: cubic-bezier(.5, 1.5, .5, -2.5)|}];
+[%css {|transition-timing-function: step-start|}];
+[%css {|transition-timing-function: step-end|}];
+[%css {|transition-timing-function: steps(3, start)|}];
+[%css {|transition-timing-function: steps(5, end)|}];
+[%css {|transition-delay: 1s|}];
+[%css {|transition-delay: -1s|}];
+[%css {|transition: 1s 2s width linear|}];
