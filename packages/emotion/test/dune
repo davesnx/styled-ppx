@@ -12,7 +12,7 @@
   (pps styled-ppx.lib)))
 
 (rule
- (alias emotion_test)
+ (alias test_emotion)
  (deps test.exe)
  (action
   (run %{deps})))

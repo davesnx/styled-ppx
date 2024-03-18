@@ -10,7 +10,7 @@ help: ## Print this help message
 	@echo "List of available make commands";
 	@echo "";
 	@grep -E '^[a-zA-Z0-9_.-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2}';
-	@echo $(TEST_TARGETS) | tr -s " " "\012" | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36mtest_%-20s\033[0m Run %s test \33[1;97m(or \"test_%s_watch\" to watch them)\033[0m\n", $$1, $$1, $$1}';
+	@echo $(TEST_TARGETS) | tr -s " " "\012" | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m Run %s test \33[1;97m(or \"%s_watch\" to watch them)\033[0m\n", $$1, $$1, $$1}';
 	@echo "";
 
 .PHONY: build
@@ -66,25 +66,25 @@ release-static:
 
 # Testing commands
 
-TEST_TARGETS := ppx_snapshot_reason ppx_snapshot_rescript parser reason_css_parser css_spec_parser css_support css_spec_types string_interpolation emotion emotion_hash native_typecheck
+TEST_TARGETS := test_parser test_reason_css_parser test_native_typecheck test_ppx_snapshot_reason test_ppx_snapshot_rescript test_css_support test_css_spec_types test_emotion test_emotion_hash test_css_spec_parser test_string_interpolation
 
 # Create targets with the format "test_{{target_name}}_{{ "watch" | "promote" }}"
 define create_test
-.PHONY: test_$(1)
-test_$(1): ## Run $(1) tests
-	$$(DUNE) build @$(1)_test
+.PHONY: $(1)
+$(1): ## Run $(1) tests
+	$$(DUNE) build @$(1)
 endef
 
 define create_test_watch
-.PHONY: test_$(1)_watch
-test_$(1)_watch: ## Run $(1) tests
-	$$(DUNE) build @$(1)_test --watch
+.PHONY: $(1)_watch
+$(1)_watch: ## Run $(1) tests
+	$$(DUNE) build @$(1) --watch
 endef
 
 define create_test_promote
-.PHONY: test_$(1)_promote
-test_$(1)_promote: ## Run $(1) tests
-	$$(DUNE) build @$(1)_test --auto-promote
+.PHONY: $(1)_promote
+$(1)_promote: ## Run $(1) tests
+	$$(DUNE) build @$(1) --auto-promote
 endef
 
 # Apply the create_watch_target rule for each test target

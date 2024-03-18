@@ -1,5 +1,4 @@
 Alcotest.run(
-  ~verbose=true,
   "Reason CSS Parser",
   [
     ("Combinators", Combinators_test.tests),

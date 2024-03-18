@@ -9,7 +9,7 @@
   ppx_deriving.runtime))
 
 (rule
- (alias parser_test)
+ (alias test_parser)
  (deps Runner.exe)
  (action
   (run %{deps})))

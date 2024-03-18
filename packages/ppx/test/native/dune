@@ -14,7 +14,7 @@
   (pps ppxlib.metaquot styled-ppx.lib -- -no-merge)))
 
 (rule
- (alias native_typecheck_test)
+ (alias test_native_typecheck)
  (deps Runner.exe)
  (action
   (run %{deps})))

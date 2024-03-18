@@ -5,7 +5,7 @@
 
 (cram
  (package styled-ppx)
- (alias emotion_hash_test)
+ (alias test_emotion_hash)
  (deps
   %{bin:styled-ppx.native_hash}
   %{bin:node}

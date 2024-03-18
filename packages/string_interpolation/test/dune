@@ -5,7 +5,7 @@
   (pps ppxlib.metaquot)))
 
 (rule
- (alias string_interpolation_test)
+ (alias test_string_interpolation)
  (deps transform_test.exe)
  (action
   (run %{deps})))
