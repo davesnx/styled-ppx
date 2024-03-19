@@ -15,7 +15,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", line 1, characters 17-22:
+  File "input.re", line 3, characters 17-22:
   Error: Unbound value CssJs.lineHeightStep
   [1]
 

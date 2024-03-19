@@ -162,18 +162,18 @@ and render_declaration = (d: declaration) => {
   /* String.trim is a hack, location should be correct and not contain any whitespace */
   let value_source = source_code_of_loc(loc) |> String.trim;
 
-  /* let lnum =
-       switch (Driver.container_lnum_ref^) {
-       | Some(lnum) => lnum
-       | None => d.loc.loc_start.pos_lnum
-       };
-     let loc_start = {...d.loc.loc_start, pos_lnum: lnum};
-     let loc_end = {...d.loc.loc_end, pos_lnum: lnum};
-     let _hack_loc = {...d.loc, loc_start, loc_end}; */
+  let lnum =
+    switch (Driver.container_lnum_ref^) {
+    | Some(lnum) => lnum
+    | None => d.loc.loc_start.pos_lnum
+    };
+  let loc_start = {...loc.loc_start, pos_lnum: lnum};
+  let loc_end = {...d.loc.loc_end, pos_lnum: lnum};
+  let hack_loc = {...d.loc, loc_start, loc_end};
 
   switch (
     Declarations_to_emotion.parse_declarations(
-      ~loc,
+      ~loc=hack_loc,
       property,
       value_source,
       important,

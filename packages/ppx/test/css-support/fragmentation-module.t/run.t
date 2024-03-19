@@ -15,7 +15,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", line 1, characters 7-9:
+  File "input.re", line 35, characters 7-9:
   Error: Unbound value CssJs.widows
   [1]
 
