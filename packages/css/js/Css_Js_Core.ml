@@ -1670,6 +1670,7 @@ let string_of_dimension x =
   match x with
   | `auto -> {js|auto|js}
   | `none -> {js|none|js}
+  | `subgrid -> {js|subgrid|js}
   | #Length.t as l -> Length.toString l
   | `fr x -> Std.Float.toString x ^ {js|fr|js}
   | `fitContent -> {js|fit-content|js}
@@ -1707,6 +1708,7 @@ type gridLength =
 let rec gridLengthToJs x =
   match x with
   | `name name -> name
+  | `subgrid -> {js|subgrid|js}
   | `none -> {js|none|js}
   | `auto -> {js|auto|js}
   | #Length.t as l -> Length.toString l

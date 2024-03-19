@@ -3599,7 +3599,7 @@ let grid_template_columns =
       | `Track_list(track_list, line_names) =>
         render_track_list(~loc, track_list, line_names)
       | `Auto_track_list(list) => render_auto_track_list(~loc, list)
-      | `Static((), None) => [%expr `subgrid]
+      | `Static((), None) => [%expr [|`subgrid|]]
       | `Static((), Some(subgrid)) => render_subgrid(~loc, subgrid)
       },
   );
@@ -3615,7 +3615,7 @@ let grid_template_rows =
       | `Track_list(track_list, line_names) =>
         render_track_list(~loc, track_list, line_names)
       | `Auto_track_list(list) => render_auto_track_list(~loc, list)
-      | `Static((), None) => [%expr `subgrid]
+      | `Static((), None) => [%expr [|`subgrid|]]
       | `Static((), Some(subgrid)) => render_subgrid(~loc, subgrid)
       },
   );
