@@ -146,13 +146,10 @@ module Mapper = {
       })
         when isStyled(extensionName) =>
       let htmlTag = getHtmlTagUnsafe(~loc=extensionLoc, extensionName);
-      let pos = stringLoc.loc_start;
-      let lnum = pos.pos_lnum;
       let styles =
         switch (
           Styled_ppx_css_parser.Driver.parse_declaration_list(
-            ~lnum,
-            ~loc=stringLoc.loc_start,
+            ~loc=stringLoc,
             str,
           )
         ) {
@@ -257,7 +254,6 @@ module Mapper = {
           ~name,
           ~expr=
             Generate.dynamicComponent(
-              ~lnum=functionLoc.loc_start.pos_lnum,
               ~loc=functionLoc,
               ~htmlTag,
               ~label=fnLabel,
@@ -305,13 +301,10 @@ module Mapper = {
           },
         ],
       ) =>
-      let pos = stringLoc.loc_start;
-      let lnum = pos.pos_lnum;
       let expr =
         switch (
           Styled_ppx_css_parser.Driver.parse_declaration_list(
-            ~lnum,
-            ~loc=stringLoc.loc_start,
+            ~loc=stringLoc,
             styles,
           )
         ) {
@@ -739,15 +732,10 @@ let _ =
           static_pattern,
           (~loc, ~path, payload) => {
             File.set(path);
-            let lnum = loc.loc_start.pos_lnum;
             switch (payload) {
             | `String({loc, txt}, _delim) =>
               switch (
-                Styled_ppx_css_parser.Driver.parse_declaration_list(
-                  ~lnum,
-                  ~loc=loc.loc_start,
-                  txt,
-                )
+                Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, txt)
               ) {
               | Ok(declarations) =>
                 declarations
@@ -771,13 +759,8 @@ let _ =
           string_payload_pattern,
           (~loc, ~path, payload) => {
             File.set(path);
-            let lnum = loc.loc_start.pos_lnum;
             switch (
-              Styled_ppx_css_parser.Driver.parse_declaration(
-                ~lnum,
-                ~loc=loc.loc_start,
-                payload,
-              )
+              Styled_ppx_css_parser.Driver.parse_declaration(~loc, payload)
             ) {
             | Ok(declarations) =>
               let declarationListValues =
@@ -798,13 +781,8 @@ let _ =
           string_payload_pattern,
           (~loc, ~path, payload) => {
             File.set(path);
-            let lnum = loc.loc_start.pos_lnum;
             switch (
-              Styled_ppx_css_parser.Driver.parse_stylesheet(
-                ~lnum,
-                ~loc=loc.loc_start,
-                payload,
-              )
+              Styled_ppx_css_parser.Driver.parse_stylesheet(~loc, payload)
             ) {
             | Ok(stylesheets) =>
               Css_to_emotion.render_global(~loc, stylesheets)
@@ -820,13 +798,8 @@ let _ =
           string_payload_pattern,
           (~loc, ~path, payload) => {
             File.set(path);
-            let lnum = loc.loc_start.pos_lnum;
             switch (
-              Styled_ppx_css_parser.Driver.parse_keyframes(
-                ~lnum,
-                ~loc=loc.loc_start,
-                payload,
-              )
+              Styled_ppx_css_parser.Driver.parse_keyframes(~loc, payload)
             ) {
             | Ok(declarations) =>
               Css_to_emotion.render_keyframes(~loc, declarations)

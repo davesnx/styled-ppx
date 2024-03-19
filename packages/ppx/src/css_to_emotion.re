@@ -150,11 +150,7 @@ and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
   /* String.trim is a hack, location should be correct and not contain any whitespace */
   let value_source = source_code_of_loc(value_loc) |> String.trim;
 
-  let lnum =
-    switch (Styled_ppx_css_parser.Driver.container_lnum_ref^) {
-    | Some(lnum) => lnum
-    | None => d.loc.loc_start.pos_lnum
-    };
+  let lnum = loc.loc_start.pos_lnum;
   let loc_start = {
     ...name_loc.loc_start,
     pos_lnum: lnum,

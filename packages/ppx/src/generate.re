@@ -28,7 +28,7 @@ let staticComponent = (~loc, ~htmlTag, styles) => {
 };
 
 let dynamicComponent =
-    (~lnum, ~loc, ~htmlTag, ~label, ~moduleName, ~defaultValue, ~param, ~body) => {
+    (~loc, ~htmlTag, ~label, ~moduleName, ~defaultValue, ~param, ~body) => {
   let (functionExpr, labeledArguments) =
     Generate_lib.getLabeledArgs(label, defaultValue, param, body);
 
@@ -92,13 +92,7 @@ let dynamicComponent =
     switch (functionExpr.pexp_desc) {
     /* styled.div () => "string" */
     | Pexp_constant(Pconst_string(str, loc, _label)) =>
-      switch (
-        Styled_ppx_css_parser.Driver.parse_declaration_list(
-          ~lnum,
-          ~loc=loc.loc_start,
-          str,
-        )
-      ) {
+      switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, str)) {
       | Ok(declarations) =>
         declarations
         |> Css_to_emotion.render_declarations(~loc)

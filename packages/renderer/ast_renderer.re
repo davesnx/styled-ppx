@@ -23,17 +23,17 @@ let help =
     args,
   );
 
+let loc =
+  Styled_ppx_css_parser.Parser_location.to_ppxlib_location(
+    Lexing.dummy_pos,
+    Lexing.dummy_pos,
+  );
+
 switch (input, help) {
 | (Some(_), true)
 | (None, _) => render_help()
 | (Some(css), _) =>
-  switch (
-    Styled_ppx_css_parser.Driver.parse_declaration_list(
-      ~lnum=0,
-      ~loc=Lexing.dummy_pos,
-      css,
-    )
-  ) {
+  switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, css)) {
   | Ok(declarations) =>
     print_endline(
       Styled_ppx_css_parser.Css_types.show_rule_list(declarations),
