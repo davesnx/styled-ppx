@@ -33,34 +33,34 @@ let parse = (skip_whitespaces, lexbuf, parser) => {
 let container_lnum_ref: ref(option(int)) = ref(None);
 let last_buffer = ref(None);
 
-let from_string = (~pos as _initial_position: Lexing.position, ~lnum, string) => {
+let from_string = (~loc as _initial_position: Lexing.position, ~lnum, string) => {
   let buffer = Sedlexing.Latin1.from_string(string);
   container_lnum_ref := Some(lnum);
   buffer;
 };
 
 let parse_string =
-    (~lnum, ~skip_whitespace, ~pos: Lexing.position, parser, string) => {
+    (~lnum, ~skip_whitespace, ~loc: Lexing.position, parser, string) => {
   let buffer = Sedlexing.Latin1.from_string(string);
-  last_buffer := Some(from_string(~lnum, ~pos, string));
+  last_buffer := Some(from_string(~lnum, ~loc, string));
   parse(skip_whitespace, buffer, parser);
 };
 
-let parse_declaration_list = (~lnum, ~pos, input: string) => {
+let parse_declaration_list = (~lnum, ~loc, input: string) => {
   parse_string(
     ~lnum,
-    ~pos,
+    ~loc,
     ~skip_whitespace=false,
     Parser.declaration_list,
     input,
   );
 };
 
-let parse_declaration = (~lnum, ~pos, input: string) =>
-  parse_string(~lnum, ~pos, ~skip_whitespace=true, Parser.declaration, input);
+let parse_declaration = (~lnum, ~loc, input: string) =>
+  parse_string(~lnum, ~loc, ~skip_whitespace=true, Parser.declaration, input);
 
-let parse_stylesheet = (~lnum, ~pos, input: string) =>
-  parse_string(~lnum, ~pos, ~skip_whitespace=false, Parser.stylesheet, input);
+let parse_stylesheet = (~lnum, ~loc, input: string) =>
+  parse_string(~lnum, ~loc, ~skip_whitespace=false, Parser.stylesheet, input);
 
-let parse_keyframes = (~lnum, ~pos, input: string) =>
-  parse_string(~lnum, ~pos, ~skip_whitespace=false, Parser.keyframes, input);
+let parse_keyframes = (~lnum, ~loc, input: string) =>
+  parse_string(~lnum, ~loc, ~skip_whitespace=false, Parser.keyframes, input);

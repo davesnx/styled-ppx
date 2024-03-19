@@ -1,4 +1,4 @@
-open Tokens;
+open Styled_ppx_css_parser.Tokens;
 
 type error = list(string);
 type data('a) = result('a, error);
