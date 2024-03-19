@@ -15,9 +15,6 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", line 3, characters 17-22:
-  Error: Unbound value CssJs.lineHeightStep
-  [1]
 
   $ dune describe pp ./input.re.ml | refmt --parse ml --print re
   [@ocaml.ppx.context
@@ -38,5 +35,3 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       cookies: [],
     }
   ];
-  CssJs.lineHeightStep(`pxFloat(30.));
-  CssJs.lineHeightStep(`em(2.));

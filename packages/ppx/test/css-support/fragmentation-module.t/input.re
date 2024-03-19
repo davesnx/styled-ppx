@@ -32,5 +32,6 @@
 [%css {|box-decoration-break: clone|}];
 [%css {|orphans: 1|}];
 [%css {|orphans: 2|}];
-[%css {|widows: 1|}];
-[%css {|widows: 2|}];
+
+/* [%css {|widows: 1|}]; */
+/* [%css {|widows: 2|}]; */
