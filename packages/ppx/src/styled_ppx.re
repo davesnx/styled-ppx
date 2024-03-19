@@ -149,10 +149,16 @@ module Mapper = {
       let pos = stringLoc.loc_start;
       let lnum = pos.pos_lnum;
       let styles =
-        switch (Payload.parse(~lnum, ~loc=stringLoc, str)) {
+        switch (
+          Styled_ppx_css_parser.Driver.parse_declaration_list(
+            ~lnum,
+            ~loc=stringLoc.loc_start,
+            str,
+          )
+        ) {
         | Ok(declarations) =>
           declarations
-          |> Css_to_emotion.render_declarations
+          |> Css_to_emotion.render_declarations(~loc=stringLoc)
           |> Css_to_emotion.addLabel(~loc=stringLoc, moduleName)
           |> Builder.pexp_array(~loc=stringLoc)
           |> Css_to_emotion.render_style_call(~loc=stringLoc)
@@ -302,10 +308,16 @@ module Mapper = {
       let pos = stringLoc.loc_start;
       let lnum = pos.pos_lnum;
       let expr =
-        switch (Payload.parse(~lnum, ~loc=stringLoc, styles)) {
+        switch (
+          Styled_ppx_css_parser.Driver.parse_declaration_list(
+            ~lnum,
+            ~loc=stringLoc.loc_start,
+            styles,
+          )
+        ) {
         | Ok(declarations) =>
           declarations
-          |> Css_to_emotion.render_declarations
+          |> Css_to_emotion.render_declarations(~loc=stringLoc)
           |> Css_to_emotion.addLabel(~loc=stringLoc, valueName)
           |> Builder.pexp_array(~loc=payloadLoc)
           |> Css_to_emotion.render_style_call(~loc=stringLoc)
@@ -684,14 +696,14 @@ let static_pattern =
   );
 
 /* let _ =
-   Driver.add_arg(
+   Styled_ppx_css_parser.Driver.add_arg(
      Settings.jsxVersion.flag,
      Arg.Int(Settings.Update.jsxVersion),
      ~doc=Settings.jsxVersion.doc,
    ); */
 
 /* let _ =
-   Driver.add_arg(
+   Styled_ppx_css_parser.Driver.add_arg(
      Settings.jsxMode.flag,
      Arg.String(value => Settings.Update.jsxMode(Some(value))),
      ~doc=Settings.jsxMode.doc,
@@ -730,10 +742,16 @@ let _ =
             let lnum = loc.loc_start.pos_lnum;
             switch (payload) {
             | `String({loc, txt}, _delim) =>
-              switch (Payload.parse(~lnum, ~loc, txt)) {
+              switch (
+                Styled_ppx_css_parser.Driver.parse_declaration_list(
+                  ~lnum,
+                  ~loc=loc.loc_start,
+                  txt,
+                )
+              ) {
               | Ok(declarations) =>
                 declarations
-                |> Css_to_emotion.render_declarations
+                |> Css_to_emotion.render_declarations(~loc)
                 |> Builder.pexp_array(~loc)
                 |> Css_to_emotion.render_style_call(~loc)
               | Error((loc, msg)) => Generate_lib.error(~loc, msg)
@@ -755,11 +773,15 @@ let _ =
             File.set(path);
             let lnum = loc.loc_start.pos_lnum;
             switch (
-              Driver.parse_declaration(~lnum, ~pos=loc.loc_start, payload)
+              Styled_ppx_css_parser.Driver.parse_declaration(
+                ~lnum,
+                ~loc=loc.loc_start,
+                payload,
+              )
             ) {
             | Ok(declarations) =>
               let declarationListValues =
-                Css_to_emotion.render_declaration(declarations);
+                Css_to_emotion.render_declaration(~loc, declarations);
               List.nth(declarationListValues, 0);
             | Error((loc, msg)) => Generate_lib.error(~loc, msg)
             };
@@ -778,9 +800,14 @@ let _ =
             File.set(path);
             let lnum = loc.loc_start.pos_lnum;
             switch (
-              Driver.parse_stylesheet(~lnum, ~pos=loc.loc_start, payload)
+              Styled_ppx_css_parser.Driver.parse_stylesheet(
+                ~lnum,
+                ~loc=loc.loc_start,
+                payload,
+              )
             ) {
-            | Ok(stylesheets) => Css_to_emotion.render_global(stylesheets)
+            | Ok(stylesheets) =>
+              Css_to_emotion.render_global(~loc, stylesheets)
             | Error((loc, msg)) => Generate_lib.error(~loc, msg)
             };
           },
@@ -795,10 +822,14 @@ let _ =
             File.set(path);
             let lnum = loc.loc_start.pos_lnum;
             switch (
-              Driver.parse_keyframes(~lnum, ~pos=loc.loc_start, payload)
+              Styled_ppx_css_parser.Driver.parse_keyframes(
+                ~lnum,
+                ~loc=loc.loc_start,
+                payload,
+              )
             ) {
             | Ok(declarations) =>
-              Css_to_emotion.render_keyframes(declarations)
+              Css_to_emotion.render_keyframes(~loc, declarations)
             | Error((loc, msg)) => Generate_lib.error(~loc, msg)
             };
           },

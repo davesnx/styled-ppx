@@ -92,10 +92,16 @@ let dynamicComponent =
     switch (functionExpr.pexp_desc) {
     /* styled.div () => "string" */
     | Pexp_constant(Pconst_string(str, loc, _label)) =>
-      switch (Payload.parse(~lnum, ~loc, str)) {
+      switch (
+        Styled_ppx_css_parser.Driver.parse_declaration_list(
+          ~lnum,
+          ~loc=loc.loc_start,
+          str,
+        )
+      ) {
       | Ok(declarations) =>
         declarations
-        |> Css_to_emotion.render_declarations
+        |> Css_to_emotion.render_declarations(~loc)
         |> Css_to_emotion.addLabel(~loc, moduleName)
         |> Builder.pexp_array(~loc)
         |> Css_to_emotion.render_style_call(~loc)
