@@ -62,7 +62,7 @@ stylesheet: s = stylesheet_without_eof; EOF { s }
 stylesheet_without_eof: rs = loc(list(rule)) { rs }
 
 declaration_list:
-  | WS? EOF { ([], make_loc $startpos $endpos) }
+  | EOF { ([], make_loc $startpos $endpos) }
   | ds = loc(declarations) EOF { ds }
 
 /* keyframe may contain {} */
@@ -390,12 +390,11 @@ declaration: d = declaration_without_eof; EOF { d }
 
 declaration_without_eof:
   /* property: value; */
-  | WS? property = loc(IDENT)
+  | property = loc(IDENT)
     WS? COLON
     WS? value = loc(values)
     WS? important = loc(boption(IMPORTANT))
-    WS? SEMI_COLON?
-    WS? {
+    WS? SEMI_COLON? {
     { name = property;
       value;
       important;

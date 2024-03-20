@@ -7,7 +7,7 @@ let parse = input => {
   switch (Styled_ppx_css_parser.Driver.parse_stylesheet(~loc, input)) {
   | Ok(ast) => Ok(ast)
   | Error((loc, msg)) =>
-    open Styled_ppx_css_parser.Css_types;
+    open Styled_ppx_css_parser.Ast;
     let pos = loc.loc_start;
     let curr_pos = pos.pos_cnum;
     let lnum = pos.pos_lnum;
