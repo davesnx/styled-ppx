@@ -1,6 +1,6 @@
 %{
 
-open Css_types
+open Ast
 
 let make_loc = Parser_location.to_ppxlib_location
 

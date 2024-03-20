@@ -1,4 +1,4 @@
-open Styled_ppx_css_parser.Css_types;
+open Styled_ppx_css_parser.Ast;
 
 module Helper = Ppxlib.Ast_helper;
 module Builder = Ppxlib.Ast_builder.Default;

@@ -1,7 +1,7 @@
 /** CSS lexer
   * Reference:
   * https://www.w3.org/TR/css-syntax-3/ */
-module Types = Css_types;
+module Types = Ast;
 module Parser = Css_parser;
 module Location = Ppxlib.Location;
 

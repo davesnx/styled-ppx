@@ -18,17 +18,33 @@ type loc =
     loc_ghost: bool,
   };
 
-let empty = (fmt, _) => Format.pp_print_string(fmt, "{}");
+let location = (fmt, loc: Ppxlib.location) =>
+  Format.pp_print_string(
+    fmt,
+    Format.sprintf(
+      "start %d %d %d (L:%d c:%d) end %d %d %d (L:%d c:%d)",
+      loc.loc_start.pos_lnum,
+      loc.loc_start.pos_bol,
+      loc.loc_start.pos_cnum,
+      loc.loc_start.pos_lnum,
+      loc.loc_start.pos_cnum - loc.loc_start.pos_bol,
+      loc.loc_end.pos_lnum,
+      loc.loc_end.pos_bol,
+      loc.loc_end.pos_cnum,
+      loc.loc_end.pos_lnum,
+      loc.loc_end.pos_cnum - loc.loc_end.pos_bol,
+    ),
+  );
 
 [@deriving show({with_path: false})]
-type with_loc('a) = ('a, [@printer empty] loc);
+type with_loc('a) = ('a, [@printer location] loc);
 
 [@deriving show({with_path: false})]
 type declaration = {
   name: with_loc(string),
   value: with_loc(component_value_list),
   important: with_loc(bool),
-  [@printer empty]
+  [@printer location]
   loc,
 }
 [@deriving show({with_path: false})]
@@ -62,7 +78,7 @@ and at_rule = {
   name: with_loc(string),
   prelude: with_loc(component_value),
   block: brace_block,
-  [@printer empty]
+  [@printer location]
   loc,
 }
 [@deriving show({with_path: false})]
@@ -76,7 +92,7 @@ and rule =
 and style_rule = {
   prelude: with_loc(selector_list),
   block: rule_list,
-  [@printer empty]
+  [@printer location]
   loc,
 }
 [@deriving show({with_path: false})]

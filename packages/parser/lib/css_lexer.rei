@@ -1,4 +1,4 @@
-module Types = Css_types;
+module Types = Ast;
 module Parser = Css_parser;
 module Location = Ppxlib.Location;
 

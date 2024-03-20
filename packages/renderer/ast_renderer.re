@@ -35,11 +35,9 @@ switch (input, help) {
 | (Some(css), _) =>
   switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, css)) {
   | Ok(declarations) =>
-    print_endline(
-      Styled_ppx_css_parser.Css_types.show_rule_list(declarations),
-    )
+    print_endline(Styled_ppx_css_parser.Ast.show_rule_list(declarations))
   | Error((loc, msg)) =>
-    open Styled_ppx_css_parser.Css_types;
+    open Styled_ppx_css_parser.Ast;
     let position = loc.loc_start;
     let curr_char_pos = position.pos_cnum;
     let lnum = position.pos_lnum;
