@@ -15,10 +15,10 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", line 10, characters 18-21:
+  File "input.re", lines 9-10, characters 17-20:
    8 | ..
-   9 | ...............
-  10 |   display: blocki;
+   9 | ..............;
+  10 |   display: blocki.
   Error: Property 'display' has an invalid value: 'blocki'
   [1]
 

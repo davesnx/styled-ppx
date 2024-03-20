@@ -8,7 +8,7 @@ let print_location label ({ loc_start; loc_end; _ } : Ppxlib.location) =
   Printf.sprintf "%s start %d %d %d (L:%d c:%d) end %d %d %d (L:%d c:%d)" label
     loc_start.pos_lnum loc_start.pos_bol loc_start.pos_cnum loc_start.pos_lnum
     loc_start_column loc_end.pos_lnum loc_end.pos_bol loc_end.pos_cnum
-    loc_end_column loc_end.pos_lnum
+    loc_end.pos_lnum loc_end_column
 
 let intersection (loc1 : Ppxlib.location) (loc2 : Ppxlib.location) :
   Ppxlib.location =
@@ -16,21 +16,25 @@ let intersection (loc1 : Ppxlib.location) (loc2 : Ppxlib.location) :
     Lexing.
       {
         pos_fname = loc1.loc_start.pos_fname;
-        pos_lnum = loc1.loc_start.pos_lnum + loc2.loc_start.pos_lnum;
+        pos_lnum = loc1.loc_start.pos_lnum + loc2.loc_start.pos_lnum - 1;
         pos_bol = loc1.loc_start.pos_bol + loc2.loc_start.pos_bol;
-        pos_cnum = loc1.loc_start.pos_cnum + loc2.loc_start.pos_cnum + 1;
+        pos_cnum = loc1.loc_start.pos_cnum + loc2.loc_start.pos_cnum;
       }
   in
   let end_pos =
     Lexing.
       {
         pos_fname = loc1.loc_end.pos_fname;
-        pos_lnum = loc1.loc_start.pos_lnum + loc2.loc_start.pos_lnum;
+        pos_lnum = loc1.loc_start.pos_lnum + loc2.loc_end.pos_lnum - 1;
         pos_bol = loc1.loc_start.pos_bol + loc2.loc_end.pos_bol;
-        pos_cnum = loc1.loc_start.pos_cnum + loc2.loc_end.pos_cnum + 1;
+        pos_cnum = loc1.loc_start.pos_cnum + loc2.loc_end.pos_cnum;
       }
   in
-  { loc_start = start_pos; loc_end = end_pos; loc_ghost = false }
+  {
+    Ppxlib.Location.loc_start = start_pos;
+    loc_end = end_pos;
+    loc_ghost = false;
+  }
 
 let update_loc_with_delimiter (loc : Ppxlib.location) delimiter :
   Ppxlib.location =
