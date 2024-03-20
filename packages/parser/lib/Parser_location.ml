@@ -12,7 +12,6 @@ let print_location label ({ loc_start; loc_end; _ } : Ppxlib.location) =
 
 let intersection (loc1 : Ppxlib.location) (loc2 : Ppxlib.location) :
   Ppxlib.location =
-  (* print_endline @@ print_location "declaration -> " loc2; *)
   let start_pos =
     Lexing.
       {
