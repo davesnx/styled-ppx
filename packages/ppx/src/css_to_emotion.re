@@ -150,43 +150,15 @@ and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
   /* String.trim is a hack, location should be correct and not contain any whitespace */
   let value_source = source_code_of_loc(value_loc) |> String.trim;
 
-  let lnum = loc.loc_start.pos_lnum;
-  let loc_start = {
-    ...name_loc.loc_start,
-    pos_lnum: lnum,
-    pos_bol: name_loc.loc_start.pos_bol,
-    pos_cnum: name_loc.loc_start.pos_cnum + 16,
-  };
-  let loc_end = {
-    ...d.loc.loc_end,
-    pos_lnum: lnum,
-    pos_cnum: name_loc.loc_end.pos_cnum,
-  };
-  let hack_loc = {...d.loc, loc_start, loc_end};
+  let declaration_location =
+    Styled_ppx_css_parser.Parser_location.intersection(loc, d.loc);
 
-  let property_loc_start = {
-    pos_fname: loc.loc_start.pos_fname,
-    pos_lnum: loc.loc_start.pos_lnum + name_loc.loc_start.pos_lnum - 1,
-    pos_bol: loc.loc_start.pos_bol + name_loc.loc_start.pos_bol - 1,
-    pos_cnum: loc.loc_start.pos_cnum + 1,
-  };
-
-  let property_loc_end = {
-    pos_fname: loc.loc_end.pos_fname,
-    pos_lnum: loc.loc_end.pos_lnum + name_loc.loc_end.pos_lnum - 1,
-    pos_bol: loc.loc_end.pos_bol + name_loc.loc_end.pos_bol - 1,
-    pos_cnum: loc.loc_end.pos_cnum + property_loc_start.pos_cnum,
-  };
-
-  let property_location: Ppxlib.location = {
-    loc_start: property_loc_start,
-    loc_end: property_loc_end,
-    loc_ghost: false,
-  };
+  let property_location =
+    Styled_ppx_css_parser.Parser_location.intersection(loc, name_loc);
 
   switch (
     Declarations_to_emotion.parse_declarations(
-      ~loc=hack_loc,
+      ~loc=declaration_location,
       property,
       value_source,
       important,
@@ -201,7 +173,7 @@ and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
     ]
   | Error(`Invalid_value(value)) => [
       Generate_lib.error(
-        ~loc=property_location,
+        ~loc=declaration_location,
         "Property '"
         ++ property
         ++ "' has an invalid value: '"

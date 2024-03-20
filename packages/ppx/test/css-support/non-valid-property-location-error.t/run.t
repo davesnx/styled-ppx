@@ -15,11 +15,11 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", line 10, characters 18-21:
-   8 | ..
-   9 | ...............
-  10 |   display: blocki;
-  Error: Property 'display' has an invalid value: 'blocki'
+  File "input.re", line 3, characters 23-15:
+  1 | .....
+  2 | .................
+  3 |   heightx.......
+  Error: Unknown property 'heightx'
   [1]
 
   $ dune describe pp ./input.re.ml | refmt --parse ml --print re
@@ -41,12 +41,9 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       cookies: [],
     }
   ];
-  Js.log("2000");
   CssJs.style([|
-    CssJs.height(`percent(100.)),
-    CssJs.height(`percent(100.)),
-    CssJs.height(`percent(100.)),
-    CssJs.height(`percent(100.)),
-    CssJs.height(`percent(100.)),
-    [%ocaml.error "Property 'display' has an invalid value: 'blocki'"],
+    CssJs.display(`block),
+    [%ocaml.error "Unknown property 'heightx'"],
   |]);
+
+[%cx {js|display: blocki;              width: 10px; |js}];

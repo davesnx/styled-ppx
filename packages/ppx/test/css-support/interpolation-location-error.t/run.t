@@ -15,7 +15,9 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", line 2, characters 16-24:
+  File "input.re", line 3, characters 15-33:
+  3 | let a = [%cx {| display: $(grid); |}];
+                     ^^^^^^^^^^^^^^^^^^
   Error: This expression has type [> `gri ]
          but an expression was expected of type
            [< `block
@@ -87,4 +89,5 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
     }
   ];
   let grid = `gri;
-  let a: CssJs.rule = CssJs.display(grid);
+  let a =
+    CssJs.style([|CssJs.label("a"), (CssJs.display(grid): CssJs.rule)|]);
