@@ -2,7 +2,7 @@
  (name ast_renderer)
  (public_name ast-renderer)
  (modules ast_renderer)
- (libraries styled-ppx.css-parser ppx_deriving.runtime))
+ (libraries styled-ppx.css-parser ppx_deriving.runtime ppxlib))
 
 (executable
  (name lexer_renderer)

@@ -15,6 +15,12 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
+  File "input.re", lines 2-3, characters 22-14:
+  1 | .....
+  2 | ................;
+  3 |   height........
+  Error: Unknown property 'heightx'
+  [1]
 
   $ dune describe pp ./input.re.ml | refmt --parse ml --print re
   [@ocaml.ppx.context
@@ -35,3 +41,9 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       cookies: [],
     }
   ];
+  CssJs.style([|
+    CssJs.display(`block),
+    [%ocaml.error "Unknown property 'heightx'"],
+  |]);
+
+[%cx {js|display: blocki;              width: 10px; |js}];

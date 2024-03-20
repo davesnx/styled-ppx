@@ -1,4 +1,2 @@
 (cram
- (alias test_css_support)
- (deps
-  (package styled-ppx)))
+ (alias test_css_support))

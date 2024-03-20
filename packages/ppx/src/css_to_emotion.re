@@ -1,25 +1,9 @@
-open Css_types;
+open Styled_ppx_css_parser.Ast;
 
 module Helper = Ppxlib.Ast_helper;
 module Builder = Ppxlib.Ast_builder.Default;
 
 exception Empty_buffer(string);
-
-let reduce_result = (~empty, fn, list) => {
-  let rec sequence_result =
-    fun
-    | [] => empty
-    | [x, ...xs] =>
-      switch (fn(x)) {
-      | Error(_) as error => error
-      | Ok(value) =>
-        switch (sequence_result(xs)) {
-        | Error(_) as error => error
-        | Ok(values) => Ok([value, ...values])
-        }
-      };
-  sequence_result(list);
-};
 
 module CssJs = {
   let ident = (~loc, name) =>
@@ -63,7 +47,7 @@ let render_variable = (~loc, v) => {
 
 let source_code_of_loc = (loc: Ppxlib.Location.t) => {
   let {loc_start, loc_end, _} = loc;
-  switch (Driver.last_buffer^) {
+  switch (Styled_ppx_css_parser.Driver.last_buffer^) {
   | Some(buffer: Sedlexing.lexbuf) =>
     /* TODO: pos_offset is hardcoded to 0, unsure about the effects */
     let pos_offset = 0;
@@ -78,49 +62,54 @@ let concat = (~loc, expr, acc) => {
   Helper.Exp.apply(~loc, concat_fn, [(Nolabel, expr), (Nolabel, acc)]);
 };
 
-let rec render_at_rule = (at_rule: at_rule) => {
-  switch (at_rule.name) {
-  | ("media", _) => render_media_query(at_rule)
-  | ("keyframes", loc) =>
+let rec render_at_rule = (~loc, at_rule: at_rule) => {
+  let (at_rule_name, at_rule_name_loc) = at_rule.name;
+  switch (at_rule_name) {
+  | "media" => render_media_query(~loc, at_rule)
+  | "keyframes" =>
     Generate_lib.error(
-      ~loc,
+      ~loc=at_rule_name_loc,
       "@keyframes should be defined with %%keyframe(...)",
     )
-  | (
-      "charset" as n | "import" as n | "namespace" as n | "supports" as n |
-      "page" as n |
-      "font-face" as n |
-      "counter-style" as n |
-      "font-feature-values" as n |
-      "swash" as n |
-      "ornaments" as n |
-      "annotation" as n |
-      "stylistic" as n |
-      "styleset" as n |
-      "character-variant" as n |
-      "property" as n |
-      /* Experimental */ "color-profile" as n |
-      /* Experimental */ "viewport" as n |
-      /* Deprecated */ "document" as n, /* Deprecated */
-      loc,
-    ) =>
+  | "charset" as n
+  | "import" as n
+  | "namespace" as n
+  | "supports" as n
+  | "page" as n
+  | "font-face" as n
+  | "counter-style" as n
+  | "font-feature-values" as n
+  | "swash" as n
+  | "ornaments" as n
+  | "annotation" as n
+  | "stylistic" as n
+  | "styleset" as n
+  | "character-variant" as n
+  | "property" as n
+  | /* Experimental */ "color-profile" as n
+  | /* Experimental */ "viewport" as n
+  | /* Deprecated */ "document" as n =>
     Generate_lib.error(
-      ~loc,
+      ~loc=at_rule_name_loc,
       Printf.sprintf("At-rule @%s is not supported in styled-ppx", n),
     )
-  | (n, loc) => Generate_lib.error(~loc, Printf.sprintf("Unknown @%s ", n))
+  | n =>
+    Generate_lib.error(
+      ~loc=at_rule_name_loc,
+      Printf.sprintf("Unknown @%s ", n),
+    )
   };
 }
-and render_media_query = (at_rule: at_rule) => {
+and render_media_query = (~loc, at_rule: at_rule) => {
   let parse_condition = {
-    let (value, loc) = at_rule.prelude;
+    let (value, at_rule_loc) = at_rule.prelude;
     switch (value) {
     | Variable(variable) => Ok(render_variable_as_string(variable))
     | Paren_block([(Ident(_), ident_loc)]) =>
       /* TODO: String.trim is a hack around, but a media query should be all clean. */
       Ok(source_code_of_loc(ident_loc) |> String.trim)
     /* In any other case, we believe on the source_code and transform it to string. This is unsafe */
-    | _whatever => Ok(source_code_of_loc(loc) |> String.trim)
+    | _whatever => Ok(source_code_of_loc(at_rule_loc) |> String.trim)
     };
   };
 
@@ -138,7 +127,7 @@ and render_media_query = (at_rule: at_rule) => {
       switch (at_rule.block) {
       | Empty => Builder.pexp_array(~loc=at_rule.loc, [])
       | Rule_list(declaration) =>
-        render_declarations(declaration)
+        render_declarations(~loc, declaration)
         |> Builder.pexp_array(~loc=at_rule.loc)
       | Stylesheet(_) =>
         Generate_lib.error(
@@ -149,31 +138,27 @@ and render_media_query = (at_rule: at_rule) => {
 
     Helper.Exp.apply(
       ~loc=at_rule.loc,
-      /* ~attrs=[Platform_attributes.uncurried(~loc=at_rule.loc)], */
       CssJs.media(~loc=at_rule.loc),
       [(Nolabel, query), (Nolabel, rules)],
     );
   };
 }
-and render_declaration = (d: declaration) => {
+and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
   let (property, name_loc) = d.name;
-  let (_valueList, loc) = d.value;
+  let (_valueList, value_loc) = d.value;
   let (important, _) = d.important;
   /* String.trim is a hack, location should be correct and not contain any whitespace */
-  let value_source = source_code_of_loc(loc) |> String.trim;
+  let value_source = source_code_of_loc(value_loc) |> String.trim;
 
-  /* let lnum =
-       switch (Driver.container_lnum_ref^) {
-       | Some(lnum) => lnum
-       | None => d.loc.loc_start.pos_lnum
-       };
-     let loc_start = {...d.loc.loc_start, pos_lnum: lnum};
-     let loc_end = {...d.loc.loc_end, pos_lnum: lnum};
-     let _hack_loc = {...d.loc, loc_start, loc_end}; */
+  let declaration_location =
+    Styled_ppx_css_parser.Parser_location.intersection(loc, d.loc);
+
+  let property_location =
+    Styled_ppx_css_parser.Parser_location.intersection(loc, name_loc);
 
   switch (
     Declarations_to_emotion.parse_declarations(
-      ~loc,
+      ~loc=declaration_location,
       property,
       value_source,
       important,
@@ -182,13 +167,13 @@ and render_declaration = (d: declaration) => {
   | Ok(exprs) => exprs
   | Error(`Not_found) => [
       Generate_lib.error(
-        ~loc=name_loc,
+        ~loc=property_location,
         "Unknown property '" ++ property ++ "'",
       ),
     ]
   | Error(`Invalid_value(value)) => [
       Generate_lib.error(
-        ~loc,
+        ~loc=declaration_location,
         "Property '"
         ++ property
         ++ "' has an invalid value: '"
@@ -198,13 +183,13 @@ and render_declaration = (d: declaration) => {
     ]
   };
 }
-and render_declarations = ((ds, _loc: Ppxlib.location)) => {
+and render_declarations = (~loc: Ppxlib.location, (ds, _d_loc)) => {
   ds
   |> List.concat_map(declaration =>
        switch (declaration) {
-       | Declaration(decl) => render_declaration(decl)
-       | At_rule(ar) => [render_at_rule(ar)]
-       | Style_rule(style_rules) => [render_style_rule(style_rules)]
+       | Declaration(decl) => render_declaration(~loc, decl)
+       | At_rule(ar) => [render_at_rule(~loc, ar)]
+       | Style_rule(style_rules) => [render_style_rule(~loc, style_rules)]
        }
      );
 }
@@ -327,21 +312,23 @@ and render_selectors = selectors => {
   |> List.map(((selector, _loc)) => render_selector(selector))
   |> String.concat(", ");
 }
-and render_style_rule = (rule: style_rule) => {
-  let (prelude, _loc) = rule.prelude;
-  let (_block, loc) = rule.block;
+and render_style_rule = (~loc, rule: style_rule) => {
+  let (prelude, _prelude_loc) = rule.prelude;
+  let (_block, _block_loc) = rule.block;
   let selector_expr =
-    render_declarations(rule.block) |> Builder.pexp_array(~loc);
-  let (delimiter, attrs) = Platform_attributes.string_delimiter(~loc);
+    render_declarations(~loc, rule.block)
+    |> Builder.pexp_array(~loc=rule.loc);
+  let (delimiter, attrs) =
+    Platform_attributes.string_delimiter(~loc=rule.loc);
 
   let selector_name =
     prelude
     |> render_selectors
     |> String.trim
-    |> String_interpolation.transform(~attrs, ~delimiter, ~loc);
+    |> String_interpolation.transform(~attrs, ~delimiter, ~loc=rule.loc);
 
   Helper.Exp.apply(
-    ~loc,
+    ~loc=rule.loc,
     CssJs.selector(~loc=rule.loc),
     [(Nolabel, selector_name), (Nolabel, selector_expr)],
   );
@@ -363,8 +350,8 @@ let render_style_call = (~loc, declaration_list) => {
   Helper.Exp.apply(~loc, CssJs.style(~loc), [(Nolabel, declaration_list)]);
 };
 
-let render_keyframes = (declarations: rule_list) => {
-  let (declarations, loc) = declarations;
+let render_keyframes = (~loc, declarations: rule_list) => {
+  let (declarations, declarations_loc) = declarations;
   let invalid_selector = {|
     keyframe selector can be from | to | <percentage>
 
@@ -390,21 +377,37 @@ let render_keyframes = (declarations: rule_list) => {
       switch (selector) {
       // https://drafts.csswg.org/css-animations/#keyframes
       // `from` is equivalent to the value 0%
-      | Type(v) when v == "from" => Builder.eint(~loc, 0)
+      | Type(v) when v == "from" => Builder.eint(~loc=declarations_loc, 0)
       // `to` is equivalent to the value 100%
-      | Type(v) when v == "to" => Builder.eint(~loc, 100)
-      | Type(t) => Generate_lib.error(~loc, invalid_prelude_value(t))
+      | Type(v) when v == "to" => Builder.eint(~loc=declarations_loc, 100)
+      | Type(t) =>
+        Generate_lib.error(~loc=declarations_loc, invalid_prelude_value(t))
       | Percentage(n) =>
         switch (int_of_string_opt(n)) {
-        | Some(n) when n >= 0 && n <= 100 => Builder.eint(~loc, n)
-        | _ => Generate_lib.error(~loc, invalid_percentage_value(n))
+        | Some(n) when n >= 0 && n <= 100 =>
+          Builder.eint(~loc=declarations_loc, n)
+        | _ =>
+          Generate_lib.error(
+            ~loc=declarations_loc,
+            invalid_percentage_value(n),
+          )
         }
-      | Ampersand => Generate_lib.error(~loc, invalid_prelude_value("&"))
-      | Universal => Generate_lib.error(~loc, invalid_prelude_value("*"))
-      | Subclass(_) => Generate_lib.error(~loc, invalid_prelude_value_opaque)
-      | Variable(_) => Generate_lib.error(~loc, invalid_prelude_value_opaque)
+      | Ampersand =>
+        Generate_lib.error(~loc=declarations_loc, invalid_prelude_value("&"))
+      | Universal =>
+        Generate_lib.error(~loc=declarations_loc, invalid_prelude_value("*"))
+      | Subclass(_) =>
+        Generate_lib.error(
+          ~loc=declarations_loc,
+          invalid_prelude_value_opaque,
+        )
+      | Variable(_) =>
+        Generate_lib.error(
+          ~loc=declarations_loc,
+          invalid_prelude_value_opaque,
+        )
       }
-    | _ => Generate_lib.error(~loc, invalid_selector)
+    | _ => Generate_lib.error(~loc=declarations_loc, invalid_selector)
     };
   };
 
@@ -415,22 +418,24 @@ let render_keyframes = (declarations: rule_list) => {
          | Style_rule({prelude: (prelude, _), block, loc: style_loc}) =>
            let percentages = prelude |> List.map(render_select_as_keyframe);
            let rules =
-             render_declarations(block) |> Builder.pexp_array(~loc);
+             render_declarations(~loc, block)
+             |> Builder.pexp_array(~loc=declarations_loc);
            percentages
            |> List.map(p => Builder.pexp_tuple(~loc=style_loc, [p, rules]));
-         | _ => [Generate_lib.error(~loc, invalid_selector)]
+         | _ => [Generate_lib.error(~loc=declarations_loc, invalid_selector)]
          }
        })
     |> List.flatten
-    |> Builder.pexp_array(~loc);
+    |> Builder.pexp_array(~loc=declarations_loc);
 
-  {
-    ...Builder.eapply(~loc, CssJs.keyframes(~loc), [keyframes]),
-    pexp_attributes: [] /* Platform_attributes.uncurried(~loc) */,
-  };
+  Builder.eapply(
+    ~loc=declarations_loc,
+    CssJs.keyframes(~loc=declarations_loc),
+    [keyframes],
+  );
 };
 
-let render_global = ((ruleList, loc): stylesheet) => {
+let render_global = (~loc, (ruleList, stylesheet_loc): stylesheet) => {
   let onlyStyleRulesAndAtRulesSupported = {|Declarations does not make sense in global styles. Global should consists of style rules or at-rules (e.g @media, @print, etc.)
 
 If your intent is to apply the declaration to all elements, use the universal selector
@@ -442,13 +447,21 @@ If your intent is to apply the declaration to all elements, use the universal se
     ruleList
     |> List.map(rule => {
          switch (rule) {
-         | Style_rule(style_rule) => render_style_rule(style_rule)
-         | At_rule(at_rule) => render_at_rule(at_rule)
-         | _ => Generate_lib.error(~loc, onlyStyleRulesAndAtRulesSupported)
+         | Style_rule(style_rule) => render_style_rule(~loc, style_rule)
+         | At_rule(at_rule) => render_at_rule(~loc, at_rule)
+         | _ =>
+           Generate_lib.error(
+             ~loc=stylesheet_loc,
+             onlyStyleRulesAndAtRulesSupported,
+           )
          }
        })
-    |> Builder.pexp_array(~loc);
+    |> Builder.pexp_array(~loc=stylesheet_loc);
 
-  Helper.Exp.apply(~loc, CssJs.global(~loc), [(Nolabel, styles)])
-  |> Generate_lib.applyIgnore(~loc);
+  Helper.Exp.apply(
+    ~loc=stylesheet_loc,
+    CssJs.global(~loc=stylesheet_loc),
+    [(Nolabel, styles)],
+  )
+  |> Generate_lib.applyIgnore(~loc=stylesheet_loc);
 };

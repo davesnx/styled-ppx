@@ -15,9 +15,6 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", line 1, characters 7-9:
-  Error: Unbound value CssJs.widows
-  [1]
 
   $ dune describe pp ./input.re.ml | refmt --parse ml --print re
   [@ocaml.ppx.context
@@ -71,5 +68,3 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.unsafe({js|boxDecorationBreak|js}, {js|clone|js});
   CssJs.unsafe({js|orphans|js}, {js|1|js});
   CssJs.unsafe({js|orphans|js}, {js|2|js});
-  CssJs.widows(1);
-  CssJs.widows(2);

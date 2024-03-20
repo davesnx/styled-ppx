@@ -1,5 +1,7 @@
 open Alcotest;
-module Parser = Css_parser;
+
+module Lexer = Styled_ppx_css_parser.Css_lexer;
+module Parser = Styled_ppx_css_parser.Css_parser;
 
 let success_tests =
   [
@@ -135,12 +137,12 @@ let success_tests =
     /* ("\\@desu", [IDENT("@desu")]), */
   ]
   |> List.map(((input, output)) => {
-       let okInput = Css_lexer.tokenize(input) |> Result.get_ok;
-       let inputTokens = Css_lexer.to_string(okInput);
+       let okInput = Lexer.tokenize(input) |> Result.get_ok;
+       let inputTokens = Lexer.to_string(okInput);
        let outputTokens =
          output
          |> List.map(token => (token, Lexing.dummy_pos, Lexing.dummy_pos))
-         |> Css_lexer.to_string;
+         |> Lexer.to_string;
 
        test_case(input, `Quick, () =>
          check(string, "should match" ++ input, inputTokens, outputTokens)
@@ -150,7 +152,7 @@ let success_tests =
 let error_tests =
   [("/*", "Unterminated comment at the end of the string")]
   |> List.map(((input, output)) => {
-       let error = Css_lexer.tokenize(input) |> Result.get_error;
+       let error = Lexer.tokenize(input) |> Result.get_error;
        test_case(input, `Quick, () =>
          check(string, "should match" ++ input, error, output)
        );

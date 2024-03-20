@@ -10,7 +10,6 @@ let render_help = () => {
   print_endline("");
 };
 
-let pos = Lexing.dummy_pos;
 let args = Sys.argv |> Array.to_list;
 let input = List.nth_opt(args, 1);
 let help =
@@ -24,15 +23,22 @@ let help =
     args,
   );
 
+let loc =
+  Styled_ppx_css_parser.Parser_location.to_ppxlib_location(
+    Lexing.dummy_pos,
+    Lexing.dummy_pos,
+  );
+
 switch (input, help) {
 | (Some(_), true)
 | (None, _) => render_help()
 | (Some(css), _) =>
-  switch (Driver.parse_declaration_list(~lnum=0, ~pos, css)) {
+  switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, css)) {
   | Ok(declarations) =>
-    print_endline(Css_types.show_rule_list(declarations))
+    print_endline(Styled_ppx_css_parser.Ast.show_rule_list(declarations))
   | Error((loc, msg)) =>
-    let position = loc.Css_types.loc_start;
+    open Styled_ppx_css_parser.Ast;
+    let position = loc.loc_start;
     let curr_char_pos = position.pos_cnum;
     let lnum = position.pos_lnum;
     let pos_bol = position.pos_bol;

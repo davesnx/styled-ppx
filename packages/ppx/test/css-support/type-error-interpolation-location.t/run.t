@@ -15,23 +15,19 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-
-  $ dune describe pp ./input.re.ml | refmt --parse ml --print re
-  [@ocaml.ppx.context
-    {
-      tool_name: "ppx_driver",
-      include_dirs: [],
-      load_path: [],
-      open_modules: [],
-      for_package: None,
-      debug: false,
-      use_threads: false,
-      use_vmthreads: false,
-      recursive_types: false,
-      principal: false,
-      transparent_modules: false,
-      unboxed_types: false,
-      unsafe_string: false,
-      cookies: [],
-    }
-  ];
+  File "input.re", lines 10-11, characters 6-36:
+  10 | ......|
+  11 |     text-decoration: $(cosas).
+  Error: This expression has type [> `underlin ]
+         but an expression was expected of type
+           [< `inherit_
+            | `initial
+            | `lineThrough
+            | `none
+            | `overline
+            | `underline
+            | `unset
+            | `var of string
+            | `varDefault of string * string ]
+         The second variant type does not allow tag(s) `underlin
+  [1]

@@ -165,3 +165,5 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.overflowBlock(`hidden);
   (CssJs.overflowBlock(value): CssJs.rule);
   (CssJs.overflowInline(value): CssJs.rule);
+
+  $ dune build

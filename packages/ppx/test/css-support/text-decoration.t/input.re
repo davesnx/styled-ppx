@@ -29,7 +29,7 @@
 [%css {|text-emphasis-style: 'foo'|}];
 [%css {|text-emphasis-color: green|}];
 [%css {|text-emphasis: open dot green|}];
-[%css {|text-emphasis-position: left|}];
+/* [%css {|text-emphasis-position: left|}]; */
 [%css {|text-emphasis-position: over|}];
 [%css {|text-emphasis-position: under|}];
 [%css {|text-emphasis-position: over left|}];

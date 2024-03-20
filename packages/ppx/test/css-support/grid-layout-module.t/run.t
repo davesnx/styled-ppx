@@ -15,9 +15,6 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", line 1, characters 22-35:
-  Error: Unbound value externals
-  [1]
 
   $ dune describe pp ./input.re.ml | refmt --parse ml --print re
   [@ocaml.ppx.context
@@ -128,7 +125,19 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
     `repeat((`autoFit, [|`name({js|[linename1]|js}), `pxFloat(300.)|])),
     `name({js|[linename3]|js}),
   |]);
-  (CssJs.gridTemplateColumns(externals): CssJs.rule);
+  let value = [|
+    `repeat((
+      `num(4),
+      [|
+        `pxFloat(10.),
+        `name({js|[col-start]|js}),
+        `pxFloat(250.),
+        `name({js|[col-end]|js}),
+      |],
+    )),
+    `pxFloat(10.),
+  |];
+  (CssJs.gridTemplateColumns(value): CssJs.rule);
   CssJs.gridTemplateRows([|`none|]);
   CssJs.gridTemplateRows([|`auto|]);
   CssJs.gridTemplateRows([|`pxFloat(100.)|]);
@@ -228,7 +237,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.unsafe({js|gridGap|js}, {js|0 1em|js});
   CssJs.gridGap(`em(1.));
   CssJs.unsafe({js|gridGap|js}, {js|1em 1em|js});
-  CssJs.gridTemplateColumns(`subgrid);
+  CssJs.gridTemplateColumns([|`subgrid|]);
   CssJs.gridTemplateColumns([|`subgrid, `name({js|[sub-a]|js})|]);
   CssJs.gridTemplateColumns([|
     `subgrid,
@@ -262,7 +271,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
     `name({js|[sub-e]|js}),
     `repeat((`num(1), [|`name({js|[sub-g]|js})|])),
   |]);
-  CssJs.gridTemplateRows(`subgrid);
+  CssJs.gridTemplateRows([|`subgrid|]);
   CssJs.gridTemplateRows([|`subgrid, `name({js|[sub-a]|js})|]);
   CssJs.gridTemplateRows([|
     `subgrid,

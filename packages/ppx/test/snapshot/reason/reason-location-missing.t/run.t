@@ -1,6 +1,4 @@
-  $ cat > main.ml <<EOF
-  > let foo != syntax_error
-  > EOF
+Example to show errors in right locations (without styled-ppx pp)
 
   $ cat > dune-project <<EOF
   > (lang dune 3.7)
@@ -11,7 +9,9 @@
   >  (name main))
   > EOF
 
-Shows errors in right locations
+  $ cat > main.ml <<EOF
+  > let foo != syntax_error
+  > EOF
 
   $ dune build main.exe
   File "main.ml", line 1, characters 8-10:
@@ -19,6 +19,8 @@ Shows errors in right locations
               ^^
   Error: Syntax error
   [1]
+
+Same example but with styled-ppx pp (error location should be at the same place)
 
   $ cat > dune <<EOF
   > (executable

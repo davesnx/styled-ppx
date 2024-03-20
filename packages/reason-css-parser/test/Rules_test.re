@@ -1,8 +1,8 @@
 open Alcotest;
 open Reason_css_parser;
-open Tokens;
 open Rule;
 open! Data;
+open Styled_ppx_css_parser.Tokens;
 
 let data_monad_tests: list(Alcotest.test_case(unit)) = [
   // TODO: check static order

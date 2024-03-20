@@ -15,6 +15,12 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
+  File "input.re", lines 9-10, characters 17-20:
+   8 | ..
+   9 | ..............;
+  10 |   display: blocki.
+  Error: Property 'display' has an invalid value: 'blocki'
+  [1]
 
   $ dune describe pp ./input.re.ml | refmt --parse ml --print re
   [@ocaml.ppx.context
@@ -35,3 +41,12 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       cookies: [],
     }
   ];
+  Js.log("2000");
+  CssJs.style([|
+    CssJs.height(`percent(100.)),
+    CssJs.height(`percent(100.)),
+    CssJs.height(`percent(100.)),
+    CssJs.height(`percent(100.)),
+    CssJs.height(`percent(100.)),
+    [%ocaml.error "Property 'display' has an invalid value: 'blocki'"],
+  |]);

@@ -1652,6 +1652,7 @@ let rec gridLengthToJs x =
   | `name name -> name
   | `none -> {js|none|js}
   | `auto -> {js|auto|js}
+  | `subgrid -> {js|subgrid|js}
   | #Length.t as l -> Length.toString l
   | `fr x -> Std.Float.toString x ^ {js|fr|js}
   | `minContent -> {js|min-content|js}

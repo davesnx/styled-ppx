@@ -1,4 +1,4 @@
-open Tokens;
+open Styled_ppx_css_parser.Tokens;
 open Combinator;
 open Rule.Let;
 open Rule.Pattern;

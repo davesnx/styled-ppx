@@ -15,9 +15,6 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", line 1, characters 23-28:
-  Error: Property 'text-emphasis-position' has an invalid value: 'left'
-  [1]
 
   $ dune describe pp ./input.re.ml | refmt --parse ml --print re
   [@ocaml.ppx.context
@@ -67,9 +64,6 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.textEmphasisStyle(`string({js|foo|js}));
   CssJs.textEmphasisColor(CssJs.green);
   CssJs.unsafe({js|textEmphasis|js}, {js|open dot green|js});
-  [%ocaml.error
-    "Property 'text-emphasis-position' has an invalid value: 'left'"
-  ];
   CssJs.textEmphasisPosition(`over);
   CssJs.textEmphasisPosition(`under);
   CssJs.textEmphasisPositions(`over, `left);

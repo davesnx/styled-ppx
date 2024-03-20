@@ -130,9 +130,11 @@ module Mapper = {
                     pstr_desc:
                       Pstr_eval(
                         {
-                          pexp_loc: stringLoc,
+                          pexp_loc: _stringLoc,
                           pexp_desc:
-                            Pexp_constant(Pconst_string(str, _loc, _label)),
+                            Pexp_constant(
+                              Pconst_string(str, stringLoc, delimiter),
+                            ),
                           _,
                         },
                         _attributes,
@@ -146,16 +148,21 @@ module Mapper = {
       })
         when isStyled(extensionName) =>
       let htmlTag = getHtmlTagUnsafe(~loc=extensionLoc, extensionName);
-      let pos = stringLoc.loc_start;
-      let lnum = pos.pos_lnum;
+      let loc =
+        Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
+          stringLoc,
+          delimiter,
+        );
       let styles =
-        switch (Payload.parse(~lnum, ~loc=stringLoc, str)) {
+        switch (
+          Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, str)
+        ) {
         | Ok(declarations) =>
           declarations
-          |> Css_to_emotion.render_declarations
-          |> Css_to_emotion.addLabel(~loc=stringLoc, moduleName)
-          |> Builder.pexp_array(~loc=stringLoc)
-          |> Css_to_emotion.render_style_call(~loc=stringLoc)
+          |> Css_to_emotion.render_declarations(~loc)
+          |> Css_to_emotion.addLabel(~loc, moduleName)
+          |> Builder.pexp_array(~loc)
+          |> Css_to_emotion.render_style_call(~loc)
         | Error((loc, msg)) => Generate_lib.error(~loc, msg)
         };
 
@@ -164,7 +171,7 @@ module Mapper = {
         Builder.module_binding(
           ~loc=moduleLoc,
           ~name,
-          ~expr=Generate.staticComponent(~loc=stringLoc, ~htmlTag, styles),
+          ~expr=Generate.staticComponent(~loc, ~htmlTag, styles),
         ),
       );
     /* [%styled.div [||]] */
@@ -251,7 +258,6 @@ module Mapper = {
           ~name,
           ~expr=
             Generate.dynamicComponent(
-              ~lnum=functionLoc.loc_start.pos_lnum,
               ~loc=functionLoc,
               ~htmlTag,
               ~label=fnLabel,
@@ -279,10 +285,10 @@ module Mapper = {
                         pstr_desc:
                           Pstr_eval(
                             {
-                              pexp_loc: payloadLoc,
+                              pexp_loc: _payloadLoc,
                               pexp_desc:
                                 Pexp_constant(
-                                  Pconst_string(styles, stringLoc, _),
+                                  Pconst_string(styles, stringLoc, delim),
                                 ),
                               _,
                             },
@@ -299,16 +305,21 @@ module Mapper = {
           },
         ],
       ) =>
-      let pos = stringLoc.loc_start;
-      let lnum = pos.pos_lnum;
+      let loc =
+        Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
+          stringLoc,
+          delim,
+        );
       let expr =
-        switch (Payload.parse(~lnum, ~loc=stringLoc, styles)) {
+        switch (
+          Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, styles)
+        ) {
         | Ok(declarations) =>
           declarations
-          |> Css_to_emotion.render_declarations
-          |> Css_to_emotion.addLabel(~loc=stringLoc, valueName)
-          |> Builder.pexp_array(~loc=payloadLoc)
-          |> Css_to_emotion.render_style_call(~loc=stringLoc)
+          |> Css_to_emotion.render_declarations(~loc)
+          |> Css_to_emotion.addLabel(~loc, valueName)
+          |> Builder.pexp_array(~loc)
+          |> Css_to_emotion.render_style_call(~loc)
         | Error((loc, msg)) => Generate_lib.error(~loc, msg)
         };
 
@@ -684,14 +695,14 @@ let static_pattern =
   );
 
 /* let _ =
-   Driver.add_arg(
+   Styled_ppx_css_parser.Driver.add_arg(
      Settings.jsxVersion.flag,
      Arg.Int(Settings.Update.jsxVersion),
      ~doc=Settings.jsxVersion.doc,
    ); */
 
 /* let _ =
-   Driver.add_arg(
+   Styled_ppx_css_parser.Driver.add_arg(
      Settings.jsxMode.flag,
      Arg.String(value => Settings.Update.jsxMode(Some(value))),
      ~doc=Settings.jsxMode.doc,
@@ -707,7 +718,9 @@ switch (version) {
 };
 
 let string_payload_pattern =
-  Ppxlib.Ast_pattern.(single_expr_payload(estring(__)));
+  Ppxlib.Ast_pattern.(
+    single_expr_payload(pexp_constant(pconst_string(__, __, __)))
+  );
 
 let any_payload_pattern = Ppxlib.Ast_pattern.(single_expr_payload(__));
 
@@ -727,17 +740,23 @@ let _ =
           static_pattern,
           (~loc, ~path, payload) => {
             File.set(path);
-            let lnum = loc.loc_start.pos_lnum;
             switch (payload) {
-            | `String({loc, txt}, _delim) =>
-              switch (Payload.parse(~lnum, ~loc, txt)) {
+            | `String({loc, txt}, delimiter) =>
+              let loc =
+                Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
+                  loc,
+                  delimiter,
+                );
+              switch (
+                Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, txt)
+              ) {
               | Ok(declarations) =>
                 declarations
-                |> Css_to_emotion.render_declarations
+                |> Css_to_emotion.render_declarations(~loc)
                 |> Builder.pexp_array(~loc)
                 |> Css_to_emotion.render_style_call(~loc)
               | Error((loc, msg)) => Generate_lib.error(~loc, msg)
-              }
+              };
             | `Array(arr) =>
               arr
               |> Builder.pexp_array(~loc)
@@ -751,15 +770,19 @@ let _ =
           "css",
           Ppxlib.Extension.Context.Expression,
           string_payload_pattern,
-          (~loc, ~path, payload) => {
+          (~loc, ~path, payload, _stringLoc, delimiter) => {
             File.set(path);
-            let lnum = loc.loc_start.pos_lnum;
+            let loc =
+              Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
+                loc,
+                delimiter,
+              );
             switch (
-              Driver.parse_declaration(~lnum, ~pos=loc.loc_start, payload)
+              Styled_ppx_css_parser.Driver.parse_declaration(~loc, payload)
             ) {
             | Ok(declarations) =>
               let declarationListValues =
-                Css_to_emotion.render_declaration(declarations);
+                Css_to_emotion.render_declaration(~loc, declarations);
               List.nth(declarationListValues, 0);
             | Error((loc, msg)) => Generate_lib.error(~loc, msg)
             };
@@ -774,13 +797,18 @@ let _ =
           "styled.global",
           Ppxlib.Extension.Context.Expression,
           string_payload_pattern,
-          (~loc, ~path, payload) => {
+          (~loc, ~path, payload, _stringLoc, delimiter) => {
             File.set(path);
-            let lnum = loc.loc_start.pos_lnum;
+            let loc =
+              Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
+                loc,
+                delimiter,
+              );
             switch (
-              Driver.parse_stylesheet(~lnum, ~pos=loc.loc_start, payload)
+              Styled_ppx_css_parser.Driver.parse_stylesheet(~loc, payload)
             ) {
-            | Ok(stylesheets) => Css_to_emotion.render_global(stylesheets)
+            | Ok(stylesheets) =>
+              Css_to_emotion.render_global(~loc, stylesheets)
             | Error((loc, msg)) => Generate_lib.error(~loc, msg)
             };
           },
@@ -791,14 +819,18 @@ let _ =
           "keyframe",
           Ppxlib.Extension.Context.Expression,
           string_payload_pattern,
-          (~loc, ~path, payload) => {
+          (~loc, ~path, payload, _stringLoc, delimiter) => {
             File.set(path);
-            let lnum = loc.loc_start.pos_lnum;
+            let loc =
+              Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
+                loc,
+                delimiter,
+              );
             switch (
-              Driver.parse_keyframes(~lnum, ~pos=loc.loc_start, payload)
+              Styled_ppx_css_parser.Driver.parse_keyframes(~loc, payload)
             ) {
             | Ok(declarations) =>
-              Css_to_emotion.render_keyframes(declarations)
+              Css_to_emotion.render_keyframes(~loc, declarations)
             | Error((loc, msg)) => Generate_lib.error(~loc, msg)
             };
           },

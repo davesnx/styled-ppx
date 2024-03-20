@@ -1,4 +1,4 @@
-open Tokens;
+open Styled_ppx_css_parser.Tokens;
 
 /*
    A rule is a function that maps a list of tokens into a tuple where

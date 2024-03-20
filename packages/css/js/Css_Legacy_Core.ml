@@ -1592,6 +1592,7 @@ let rec gridLengthToJs x =
   match x with
   | `name name -> name
   | `none -> {js|none|js}
+  | `subgrid -> {js|subgrid|js}
   | `auto -> {js|auto|js}
   | #Length.t as l -> Length.toString l
   | `fr x -> Std.Float.toString x ^ {js|fr|js}
