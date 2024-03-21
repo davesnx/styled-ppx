@@ -332,11 +332,8 @@ and render_function_min_or_max = (~loc, calc_sums: list(Types.calc_sum)) => {
   switch (calc_sums) {
   | [] => raise(Invalid_value("expected at least one argument"))
   | [x, ...xs] =>
-    let calc_sums =
-      [x] |> List.append(xs |> List.map(x => x) |> List.rev) |> List.rev;
-    calc_sums
-    |> List.map(x => render_calc_sum(~loc, x))
-    |> Builder.pexp_array(~loc);
+    let calc_sums = [x] @ List.map(Fun.id, xs);
+    List.map(render_calc_sum(~loc), calc_sums) |> Builder.pexp_array(~loc);
   };
 }
 and render_function_min = (~loc, calc_sums) => {
