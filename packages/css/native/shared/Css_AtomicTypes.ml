@@ -1118,6 +1118,7 @@ module Color = struct
   type rgb = int * int * int
 
   type 'a calc_min_max =
+    (*TODO: Support `num on calc *)
     [ `calc of [ `add of 'a * 'a | `sub of 'a * 'a | `mult of 'a * 'a ]
     | `min of 'a array
     | `max of 'a array

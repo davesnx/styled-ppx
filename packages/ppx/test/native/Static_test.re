@@ -1312,7 +1312,21 @@ let properties_static_css_tests = [
     [%expr CssJs.tabSize(`calc(`add((`num(10.), `num(10.)))))],
   ),
   // unsupported
-  /*   (
+  /*
+   (
+     [%css "color: hsl(calc(120 + 10) 100% 50%)"],
+     [%expr [%css "color: hsl(calc(120 + 10) 100% 50%)"]],
+     [%expr
+       CssJs.color(
+         `hsl((
+           `calc(`add((`deg(120.), `deg(10.)))),
+           `percent(100.),
+           `percent(50.),
+         )),
+       )
+     ],
+   ),
+   (
          [%css
            "border-image-source: repeating-linear-gradient(45deg, transparent, #4d9f0c 20px);"
          ],
