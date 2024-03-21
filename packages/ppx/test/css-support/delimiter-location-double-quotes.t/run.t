@@ -20,7 +20,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
 
   $ dune build
   File "input.re", line 1, characters 6-22:
-  0 |  [%cx "display: blocki;"];
+  1 |  [%cx "display: blocki;"];
             ^^^^^^^^^^^^^^^^
   Error: Property 'display' has an invalid value: 'blocki'
   [1]
@@ -30,9 +30,9 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", line 1, characters 18-35:
+  File "input.re", line 1, characters 19-35:
   1 |  [%cx "width: 100%; display: blocki;"];
-                        ^^^^^^^^^^^^^^^^^
+                         ^^^^^^^^^^^^^^^^
   Error: Property 'display' has an invalid value: 'blocki'
   [1]
 
@@ -43,9 +43,9 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", line 2, characters 23-40:
+  File "input.re", line 2, characters 24-40:
   1 | ......
-  2 | ................; display: blocki.
+  2 | ................. display: blocki.
   Error: Property 'display' has an invalid value: 'blocki'
   [1]
 
@@ -57,9 +57,8 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", lines 2-3, characters 23-27:
-  1 | ......
-  2 | ................;
-  3 |      display: blocki.
+  File "input.re", line 3, characters 11-27:
+  2 | ......
+  3 | .... display: blocki.
   Error: Property 'display' has an invalid value: 'blocki'
   [1]

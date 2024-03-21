@@ -165,5 +165,32 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.overflowBlock(`hidden);
   (CssJs.overflowBlock(value): CssJs.rule);
   (CssJs.overflowInline(value): CssJs.rule);
+  CssJs.style([||]);
+  let _chart =
+    CssJs.style([|
+      CssJs.label("_chart"),
+      CssJs.unsafe({js|userSelect|js}, {js|none|js}),
+      CssJs.selector(
+        {js|.recharts-cartesian-grid-horizontal|js},
+        [|
+          CssJs.selector(
+            {js|line|js},
+            [|
+              CssJs.selector(
+                {js|:nth-last-child(1), :nth-last-child(2)|js},
+                [|CssJs.SVG.strokeOpacity(`num(0.))|],
+              ),
+            |],
+          ),
+        |],
+      ),
+      CssJs.selector(
+        {js|.recharts-scatter .recharts-scatter-symbol .recharts-symbols|js},
+        [|
+          CssJs.opacity(0.8),
+          CssJs.selector({js|:hover|js}, [|CssJs.opacity(1.)|]),
+        |],
+      ),
+    |]);
 
   $ dune build
