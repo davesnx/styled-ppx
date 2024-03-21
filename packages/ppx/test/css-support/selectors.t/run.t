@@ -10,17 +10,9 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   $ cat >dune <<EOF
   > (executable
   >  (name input)
-  >  (libraries styled-ppx.emotion_native styled-ppx.css_native)
+  >  (libraries styled-ppx.css_native styled-ppx.emotion_native)
   >  (preprocess (pps styled-ppx.lib)))
   > EOF
-
-  $ dune build
-  File "input.re", lines 9-10, characters 17-20:
-   8 | ..
-   9 | ..............;
-  10 |   display: blocki.
-  Error: Property 'display' has an invalid value: 'blocki'
-  [1]
 
   $ dune describe pp ./input.re.ml | refmt --parse ml --print re
   [@ocaml.ppx.context
@@ -41,12 +33,31 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       cookies: [],
     }
   ];
-  Js.log("2000");
-  CssJs.style([|
-    CssJs.height(`percent(100.)),
-    CssJs.height(`percent(100.)),
-    CssJs.height(`percent(100.)),
-    CssJs.height(`percent(100.)),
-    CssJs.height(`percent(100.)),
-    [%ocaml.error "Property 'display' has an invalid value: 'blocki'"],
-  |]);
+  let _chart =
+    CssJs.style([|
+      CssJs.label("_chart"),
+      CssJs.unsafe({js|userSelect|js}, {js|none|js}),
+      CssJs.selector(
+        {js|.recharts-cartesian-grid-horizontal|js},
+        [|
+          CssJs.selector(
+            {js|line|js},
+            [|
+              CssJs.selector(
+                {js|:nth-last-child(1), :nth-last-child(2)|js},
+                [|CssJs.SVG.strokeOpacity(`num(0.))|],
+              ),
+            |],
+          ),
+        |],
+      ),
+      CssJs.selector(
+        {js|.recharts-scatter .recharts-scatter-symbol .recharts-symbols|js},
+        [|
+          CssJs.opacity(0.8),
+          CssJs.selector({js|:hover|js}, [|CssJs.opacity(1.)|]),
+        |],
+      ),
+    |]);
+
+  $ dune build

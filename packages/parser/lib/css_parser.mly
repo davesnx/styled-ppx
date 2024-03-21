@@ -382,15 +382,15 @@ declarations:
 %inline rule:
   /* Rule can have declarations, since we have nesting, so both style_rules and
   declarations can live side by side. */
-  | d = skip_ws_right(declaration_without_eof); { Declaration d }
+  | d = skip_ws(declaration_without_eof); { Declaration d }
   | r = skip_ws(at_rule) { At_rule r }
   | s = skip_ws(style_rule) { Style_rule s }
 
-declaration: d = declaration_without_eof; EOF { d }
+declaration: d = skip_ws_left(declaration_without_eof); WS? EOF { d }
 
 declaration_without_eof:
   /* property: value; */
-  | WS? property = loc(IDENT)
+  | property = loc(IDENT)
     WS? COLON
     WS? value = loc(values)
     WS? important = loc(boption(IMPORTANT))
