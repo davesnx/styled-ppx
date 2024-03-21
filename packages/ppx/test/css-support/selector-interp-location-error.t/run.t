@@ -15,8 +15,8 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", line 2, characters 11-20:
-  Error: Parse error while reading token '('
+  File "input.re", line 2, characters 19-21:
+  Error: Parse error while reading token '2'
   [1]
 
   $ dune describe pp ./input.re.ml | refmt --parse ml --print re
@@ -38,4 +38,12 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       cookies: [],
     }
   ];
-  let _className = [%ocaml.error "Parse error while reading token '('"];
+  let _className =
+    CssJs.style([|
+      CssJs.label("_className"),
+      CssJs.selector(
+        {js|.lolaso :nth-child(2n)|js},
+        [|CssJs.color(CssJs.red)|],
+      ),
+    |]);
+  let _className = [%ocaml.error "Parse error while reading token '2'"];

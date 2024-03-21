@@ -1,10 +1,5 @@
-/* Missing Media.tablet */
-
-let media = [%cx
-  {|
-       @media $(Media.tablet) {
-         width: 100%;
-         height: $(sizeTablet);
-       }
-     |}
-];
+let _className = [%cx {|
+  .lolaso :-nthchil(2) {
+    color: red;
+  }
+|}];

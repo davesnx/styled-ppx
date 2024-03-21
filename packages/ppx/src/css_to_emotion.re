@@ -196,7 +196,7 @@ and render_declarations = (~loc: Ppxlib.location, (ds, _d_loc)) => {
 and render_variable_as_string = variable => {
   "$(" ++ String.concat(".", variable) ++ ")";
 }
-and render_selector = (selector: selector) => {
+and render_selector = (~loc, selector: selector) => {
   let rec render_simple_selector =
     fun
     | Ampersand => "&"
@@ -205,12 +205,6 @@ and render_selector = (selector: selector) => {
     | Subclass(v) => render_subclass_selector(v)
     | Variable(v) => render_variable_as_string(v)
     | Percentage(v) => Printf.sprintf("%s%%", v)
-  /* TODO: Add locations to selector */
-  /* TODO: Generate an error here */
-  /* Generate_lib.error(
-       ~loc=Location.none,
-       "Percentage is not a valid selector",
-     ) */
   and render_subclass_selector =
     fun
     | Id(v) => Printf.sprintf("#%s", v)
@@ -227,7 +221,6 @@ and render_selector = (selector: selector) => {
       }
     | Pseudo_class(psc) => render_pseudo_selector(psc)
   and render_nth =
-    /* TODO: Add location in ast, pass it here */
     fun
     | Even => "even"
     | Odd => "odd"
@@ -256,7 +249,7 @@ and render_selector = (selector: selector) => {
         ":"
         ++ name
         ++ "("
-        ++ (render_selectors(payload) |> String.trim)
+        ++ (render_selectors(~loc, payload) |> String.trim)
         ++ ")";
       }
   and render_pseudo_selector =
@@ -281,17 +274,17 @@ and render_selector = (selector: selector) => {
   and render_complex_selector = complex => {
     switch (complex) {
     | Combinator({left, right}) =>
-      let left = render_selector(left);
+      let left = render_selector(~loc, left);
       let right = render_right_combinator(right);
       left ++ right;
-    | Selector(selector) => render_selector(selector)
+    | Selector(selector) => render_selector(~loc, selector)
     };
   }
   and render_right_combinator = right => {
     right
     |> List.map(((combinator, selector)) => {
          Option.fold(~none=" ", ~some=o => " " ++ o ++ " ", combinator)
-         ++ render_selector(selector)
+         ++ render_selector(~loc, selector)
        })
     |> String.concat("");
   }
@@ -307,42 +300,48 @@ and render_selector = (selector: selector) => {
   | RelativeSelector(relative) => relative |> render_relative_selector
   };
 }
-and render_selectors = selectors => {
+and render_selectors = (~loc, selectors) => {
   selectors
-  |> List.map(((selector, _loc)) => render_selector(selector))
+  |> List.map(((selector, _loc)) => render_selector(~loc, selector))
   |> String.concat(", ");
 }
 and render_style_rule = (~loc, rule: style_rule) => {
-  let (prelude, _prelude_loc) = rule.prelude;
-  let (_block, _block_loc) = rule.block;
+  let (prelude, prelude_loc) = rule.prelude;
+  let (_block, block_loc) = rule.block;
+  let selector_location =
+    Styled_ppx_css_parser.Parser_location.intersection(loc, prelude_loc);
+  let block_location =
+    Styled_ppx_css_parser.Parser_location.intersection(loc, block_loc);
+
   let selector_expr =
-    render_declarations(~loc, rule.block)
-    |> Builder.pexp_array(~loc=rule.loc);
+    render_declarations(~loc=block_location, rule.block)
+    |> Builder.pexp_array(~loc=selector_location);
+
   let (delimiter, attrs) =
-    Platform_attributes.string_delimiter(~loc=rule.loc);
+    Platform_attributes.string_delimiter(~loc=selector_location);
 
   let selector_name =
     prelude
-    |> render_selectors
+    |> render_selectors(~loc=selector_location)
     |> String.trim
-    |> String_interpolation.transform(~attrs, ~delimiter, ~loc=rule.loc);
+    |> String_interpolation.transform(
+         ~attrs,
+         ~delimiter,
+         ~loc=selector_location,
+       );
 
   Helper.Exp.apply(
-    ~loc=rule.loc,
-    CssJs.selector(~loc=rule.loc),
+    ~loc=selector_location,
+    CssJs.selector(~loc=selector_location),
     [(Nolabel, selector_name), (Nolabel, selector_expr)],
   );
 };
 
-let bsEmotionLabel = (~loc, label) => {
+let addLabel = (~loc, label, emotionExprs) => [
   Helper.Exp.apply(
     CssJs.label(~loc),
     [(Nolabel, Helper.Exp.constant(Pconst_string(label, loc, None)))],
-  );
-};
-
-let addLabel = (~loc, label, emotionExprs) => [
-  bsEmotionLabel(~loc, label),
+  ),
   ...emotionExprs,
 ];
 
@@ -353,7 +352,7 @@ let render_style_call = (~loc, declaration_list) => {
 let render_keyframes = (~loc, declarations: rule_list) => {
   let (declarations, declarations_loc) = declarations;
   let invalid_selector = {|
-    keyframe selector can be from | to | <percentage>
+    keyframe selector can be `from`, `to` or <percentage>`
 
     Like following:
         [%keyframe "
