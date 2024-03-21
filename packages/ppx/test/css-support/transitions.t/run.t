@@ -40,7 +40,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.transitionProperty({js|width|js});
   CssJs.unsafe({js|transitionProperty|js}, {js|width, height|js});
   CssJs.transitionDuration(`s(0));
-  CssJs.transitionDuration(`s(1000));
+  CssJs.transitionDuration(`s(1));
   CssJs.transitionDuration(`ms(100));
   CssJs.transitionTimingFunction(`ease);
   CssJs.transitionTimingFunction(`linear);
@@ -53,6 +53,6 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.transitionTimingFunction(`stepEnd);
   CssJs.transitionTimingFunction(`steps((3, `start)));
   CssJs.transitionTimingFunction(`steps((5, `end_)));
-  CssJs.transitionDelay(`s(1000));
-  CssJs.transitionDelay(`s(-1000));
+  CssJs.transitionDelay(`s(1));
+  CssJs.transitionDelay(`s(-1));
   CssJs.unsafe({js|transition|js}, {js|1s 2s width linear|js});

@@ -128,7 +128,7 @@ and calc_product = [%value.rec
 and calc_sum = [%value.rec "<calc-product> [ [ '+' | '-' ] <calc-product> ]*"]
 /* and calc_value = [%value.rec "<number> | <dimension> | <extended-percentage> | <calc>"] */
 and calc_value = [%value.rec
-  "<number> | <extended-length> | <extended-percentage> | <calc()>"
+  "<number> | <extended-length> | <extended-percentage> | <extended-angle> | <extended-time>"
 ]
 and cf_final_image = [%value.rec "<image> | <color>"]
 and cf_mixing_image = [%value.rec "[ <extended-percentage> ]? && <image>"]
@@ -834,7 +834,9 @@ and property_aspect_ratio = [%value.rec "'auto' | <ratio>"]
 and property_azimuth = [%value.rec
   "<extended-angle> | [ 'left-side' | 'far-left' | 'left' | 'center-left' | 'center' | 'center-right' | 'right' | 'far-right' | 'right-side' ] || 'behind' | 'leftwards' | 'rightwards'"
 ]
-and property_backdrop_filter = [%value.rec "'none' | <interpolation> | <filter-function-list>"]
+and property_backdrop_filter = [%value.rec
+  "'none' | <interpolation> | <filter-function-list>"
+]
 and property_backface_visibility = [%value.rec "'visible' | 'hidden'"]
 and property_background = [%value.rec "[ <bg-layer> ',' ]* <final-bg-layer>"]
 and property_background_attachment = [%value.rec "[ <attachment> ]#"]
@@ -1162,7 +1164,7 @@ and property_hanging_punctuation = [%value.rec
   "'none' | 'first' || [ 'force-end' | 'allow-end' ] || 'last'"
 ]
 and property_height = [%value.rec
-  "'auto' | <extended-length> | <extended-percentage> | 'min-content' | 'max-content' | 'fit-content' | fit-content( <extended-length> | <extended-percentage> ) | <calc()>"
+  "'auto' | <extended-length> | <extended-percentage> | 'min-content' | 'max-content' | 'fit-content' | fit-content( <extended-length> | <extended-percentage> )"
 ]
 and property_hyphens = [%value.rec "'none' | 'manual' | 'auto'"]
 and property_image_orientation = [%value.rec
@@ -1277,12 +1279,12 @@ and property_mask_size = [%value.rec "[ <bg-size> ]#"]
 and property_mask_type = [%value.rec "'luminance' | 'alpha'"]
 and property_max_block_size = [%value.rec "<'max-width'>"]
 and property_max_height = [%value.rec
-  "'none' | 'auto' | <extended-length> | <extended-percentage> | 'min-content' | 'max-content' | 'fit-content' | fit-content( <extended-length> | <extended-percentage> ) | <calc()>"
+  "'auto' | <extended-length> | <extended-percentage> | 'min-content' | 'max-content' | 'fit-content' | fit-content( <extended-length> | <extended-percentage> )"
 ]
 and property_max_inline_size = [%value.rec "<'max-width'>"]
 and property_max_lines = [%value.rec "'none' | <integer>"]
 and property_max_width = [%value.rec
-  "<extended-length> | <extended-percentage> | 'none' | 'max-content' | 'min-content' | 'fit-content' | fit-content( <extended-length> | <extended-percentage> ) | 'fill-available' | <-non-standard-width> | <calc()>"
+  "<extended-length> | <extended-percentage> | 'none' | 'max-content' | 'min-content' | 'fit-content' | fit-content( <extended-length> | <extended-percentage> ) | 'fill-available' | <-non-standard-width>"
 ]
 and property_min_block_size = [%value.rec "<'min-width'>"]
 and property_min_height = [%value.rec
@@ -1711,7 +1713,7 @@ and property_white_space = [%value.rec
 ]
 and property_widows = [%value.rec "<integer>"]
 and property_width = [%value.rec
-  "'auto' | <extended-length> | <extended-percentage> | 'min-content' | 'max-content' | 'fit-content' | fit-content( <extended-length> | <extended-percentage> ) | <calc()>"
+  "'auto' | <extended-length> | <extended-percentage> | 'min-content' | 'max-content' | 'fit-content' | fit-content( <extended-length> | <extended-percentage> )"
 ]
 and property_will_change = [%value.rec "'auto' | [ <animateable-feature> ]#"]
 and property_word_break = [%value.rec
@@ -1811,14 +1813,20 @@ and symbol = [%value.rec "<string> | <image> | <custom-ident>"]
 and target = [%value.rec
   "<target-counter()> | <target-counters()> | <target-text()>"
 ]
-and extended_length = [%value.rec "<length> | <calc()> | <interpolation>"]
-and extended_frequency = [%value.rec
-  "<frequency> | <calc()> | <interpolation>"
+and extended_length = [%value.rec
+  "<length> | <calc()> | <interpolation> | <min()> | <max()>"
 ]
-and extended_angle = [%value.rec "<angle> | <calc()> | <interpolation>"]
-and extended_time = [%value.rec "<time> | <calc()> | <interpolation>"]
+and extended_frequency = [%value.rec
+  "<frequency> | <calc()> | <interpolation> | <min()> | <max()>"
+]
+and extended_angle = [%value.rec
+  "<angle> | <calc()> | <interpolation> | <min()> | <max()>"
+]
+and extended_time = [%value.rec
+  "<time> | <calc()> | <interpolation> | <min()> | <max()>"
+]
 and extended_percentage = [%value.rec
-  "<percentage> | <calc()> | <interpolation>"
+  "<percentage> | <calc()> | <interpolation> | <min()> | <max()> "
 ]
 and timing_function = [%value.rec
   "'linear' | <cubic-bezier-timing-function> | <step-timing-function>"

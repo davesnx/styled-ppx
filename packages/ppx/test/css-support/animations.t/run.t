@@ -38,7 +38,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.animationName({js|foo|js});
   CssJs.unsafe({js|animationName|js}, {js|foo, bar|js});
   CssJs.animationDuration(`s(0));
-  CssJs.animationDuration(`s(1000));
+  CssJs.animationDuration(`s(1));
   CssJs.animationDuration(`ms(100));
   CssJs.animationTimingFunction(`ease);
   CssJs.animationTimingFunction(`linear);
@@ -60,15 +60,15 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.animationDirection(`alternateReverse);
   CssJs.animationPlayState(`running);
   CssJs.animationPlayState(`paused);
-  CssJs.animationDelay(`s(1000));
-  CssJs.animationDelay(`s(-1000));
+  CssJs.animationDelay(`s(1));
+  CssJs.animationDelay(`s(-1));
   CssJs.animationFillMode(`none);
   CssJs.animationFillMode(`forwards);
   CssJs.animationFillMode(`backwards);
   CssJs.animationFillMode(`both);
   CssJs.animation(
-    ~duration=`s(2000),
-    ~delay=`s(1000),
+    ~duration=`s(1),
+    ~delay=`s(2),
     ~direction=`alternate,
     ~timingFunction=`linear,
     ~fillMode=`both,

@@ -42,19 +42,95 @@ module Var = struct
     | `varDefault (x, v) -> {js|var(|js} ^ prefix x ^ {js|,|js} ^ v ^ {js|)|js}
 end
 
+let max_or_min_values fn values =
+  values
+  |. Std.Array.map (fun v -> {js| |js} ^ fn v)
+  |. Std.Array.joinWith ~sep:{js|, |js}
+
+let calc_min_max_to_string fn = function
+  | `calc (`add (a, b)) -> {js|calc(|js} ^ fn a ^ {js| + |js} ^ fn b ^ {js|)|js}
+  | `calc (`sub (a, b)) -> {js|calc(|js} ^ fn a ^ {js| - |js} ^ fn b ^ {js|)|js}
+  | `calc (`mult (a, b)) ->
+    {js|calc(|js} ^ fn a ^ {js| * |js} ^ fn b ^ {js|)|js}
+  | `num n -> Std.Float.toString n
+  | `min xs -> {js|min(|js} ^ max_or_min_values fn xs ^ {js|)|js}
+  | `max xs -> {js|max(|js} ^ max_or_min_values fn xs ^ {js|)|js}
+
 module Time = struct
-  type t =
-    [ `s of float
-    | `ms of float
+  type time =
+    [ `s of int
+    | `ms of int
+    ]
+
+  type calc_value =
+    [ time
+    | `calc of
+      [ time
+      | `add of calc_value * calc_value
+      | `sub of calc_value * calc_value
+      | `mult of calc_value * calc_value
+      ]
+    | `min of t array
+    | `max of t array
+    | `num of float
+    ]
+
+  and t =
+    [ time
+    | `min of t array
+    | `max of t array
+    | `calc of
+      [ time
+      | `add of calc_value * calc_value
+      | `sub of calc_value * calc_value
+      | `mult of calc_value * calc_value
+      ]
     ]
 
   let s x = `s x
   let ms x = `ms x
 
-  let toString x =
+  let rec toString x =
     match x with
-    | `s v -> Std.Float.toString v ^ {js|s|js}
-    | `ms v -> Std.Float.toString v ^ {js|ms|js}
+    | `s t -> Std.Int.toString t ^ {js|s|js}
+    | `ms t -> Std.Int.toString t ^ {js|ms|js}
+    | `calc calc -> calc_to_string calc
+    | (`min _ | `max _) as x -> minmax_to_string x
+
+  and minmax_to_string = function
+    | (`calc _ | `min _ | `max _ | `num _) as x ->
+      calc_min_max_to_string toString x
+    | #time as t -> toString t
+
+  and calc_value_to_string x =
+    match x with
+    | `num x -> Std.Float.toString x
+    | `calc calc -> calc_to_string calc
+    | (`min _ | `max _) as x -> minmax_to_string x
+    | #time as t -> toString t
+
+  and calc_to_string calc =
+    match calc with
+    | `add (x, y) ->
+      {js|calc(|js}
+      ^ calc_value_to_string x
+      ^ {js| + |js}
+      ^ calc_value_to_string y
+      ^ {js|)|js}
+    | `sub (x, y) ->
+      {js|calc(|js}
+      ^ calc_value_to_string x
+      ^ {js| - |js}
+      ^ calc_value_to_string y
+      ^ {js|)|js}
+    | `mult (x, y) ->
+      {js|calc(|js}
+      ^ calc_value_to_string x
+      ^ {js| * |js}
+      ^ calc_value_to_string y
+      ^ {js|)|js}
+    | (`min _ | `max _) as x -> minmax_to_string x
+    | #time as t -> toString t
 end
 
 module Percentage = struct
@@ -99,6 +175,8 @@ module Length = struct
       | `sub of calc_value * calc_value
       | `mult of calc_value * calc_value
       ]
+    | `min of t array
+    | `max of t array
     | `num of float
     ]
 
@@ -110,6 +188,8 @@ module Length = struct
       | `sub of calc_value * calc_value
       | `mult of calc_value * calc_value
       ]
+    | `min of t array
+    | `max of t array
     ]
 
   let ch x = `ch x
@@ -149,11 +229,13 @@ module Length = struct
     | `zero -> {js|0|js}
     | `calc calc -> calc_to_string calc
     | `percent x -> Std.Float.toString x ^ {js|%|js}
+    | (`min _ | `max _) as x -> minmax_to_string x
 
   and calc_value_to_string x =
     match x with
     | `num x -> Std.Float.toString x
     | `calc calc -> calc_to_string calc
+    | (`min _ | `max _) as x -> minmax_to_string x
     | #length as t -> toString t
 
   and calc_to_string calc =
@@ -176,7 +258,13 @@ module Length = struct
       ^ {js| * |js}
       ^ calc_value_to_string y
       ^ {js|)|js}
+    | (`min _ | `max _) as x -> minmax_to_string x
     | #length as x -> toString x
+
+  and minmax_to_string = function
+    | (`calc _ | `min _ | `max _ | `num _) as x ->
+      calc_min_max_to_string toString x
+    | #length as l -> toString l
 end
 
 module Angle = struct
@@ -1027,13 +1115,40 @@ module ColorMixMethod = struct
 end
 
 module Color = struct
+  type rgb = int * int * int
+
+  type 'a calc_min_max =
+    [ `calc of [ `add of 'a * 'a | `sub of 'a * 'a | `mult of 'a * 'a ]
+    | `min of 'a array
+    | `max of 'a array
+    ]
+
+  type rgba =
+    int
+    * int
+    * int
+    * [ `num of float | Percentage.t | Percentage.t calc_min_max ]
+
+  type hsl =
+    [ Angle.t | Angle.t calc_min_max ]
+    * [ Percentage.t | Percentage.t calc_min_max ]
+    * [ Percentage.t | Percentage.t calc_min_max ]
+
+  type hsla =
+    [ Angle.t | Angle.t calc_min_max ]
+    * [ Percentage.t | Percentage.t calc_min_max ]
+    * [ Percentage.t | Percentage.t calc_min_max ]
+    * [ `num of float | `percent of float | Percentage.t calc_min_max ]
+
+  type 'a colorMix =
+    ColorMixMethod.t * ('a * Percentage.t) * ('a * Percentage.t)
+
   type t =
-    [ `rgb of int * int * int
-    | `rgba of int * int * int * [ `num of float | Percentage.t ]
-    | `colorMix of ColorMixMethod.t * (t * Percentage.t) * (t * Percentage.t)
-    | `hsl of Angle.t * Percentage.t * Percentage.t
-    | `hsla of
-      Angle.t * Percentage.t * Percentage.t * [ `num of float | Percentage.t ]
+    [ `rgb of rgb
+    | `colorMix of t colorMix
+    | `rgba of rgba
+    | `hsl of hsl
+    | `hsla of hsla
     | `hex of string
     | `transparent
     | `currentColor
@@ -1047,31 +1162,33 @@ module Color = struct
   let transparent = `transparent
   let currentColor = `currentColor
 
+  let string_of_angle x =
+    match x with
+    | (`calc _ | `min _ | `max _) as x ->
+      calc_min_max_to_string Angle.toString x
+    | #Angle.t as pc -> Angle.toString pc
+
   let string_of_alpha x =
     match x with
-    | `num f -> Std.Float.toString f
+    | (`calc _ | `min _ | `max _ | `num _) as x ->
+      calc_min_max_to_string Percentage.toString x
     | #Percentage.t as pc -> Percentage.toString pc
+
+  let string_of_alpha' x =
+    match x with
+    | (`calc _ | `min _ | `max _) as x ->
+      calc_min_max_to_string Percentage.toString x
+    | #Percentage.t as pc -> Percentage.toString pc
+
+  let rgb_to_string r g b =
+    Std.Int.toString r
+    ^ {js|, |js}
+    ^ Std.Int.toString g
+    ^ {js|, |js}
+    ^ Std.Int.toString b
 
   let rec toString x =
     match x with
-    | `rgb (r, g, b) ->
-      {js|rgb(|js}
-      ^ Std.Int.toString r
-      ^ {js|, |js}
-      ^ Std.Int.toString g
-      ^ {js|, |js}
-      ^ Std.Int.toString b
-      ^ {js|)|js}
-    | `rgba (r, g, b, a) ->
-      {js|rgba(|js}
-      ^ Std.Int.toString r
-      ^ {js|, |js}
-      ^ Std.Int.toString g
-      ^ {js|, |js}
-      ^ Std.Int.toString b
-      ^ {js|, |js}
-      ^ string_of_alpha a
-      ^ {js|)|js}
     | `colorMix (method', color_x, color_y) ->
       {js|color-mix(|js}
       ^ (match method' with
@@ -1083,21 +1200,28 @@ module Color = struct
       ^ {js|, |js}
       ^ string_of_color color_x color_y
       ^ {js|)|js}
+    | `rgb (r, g, b) -> {js|rgb(|js} ^ rgb_to_string r g b ^ {js|)|js}
+    | `rgba (r, g, b, a) ->
+      {js|rgba(|js}
+      ^ rgb_to_string r g b
+      ^ {js|, |js}
+      ^ string_of_alpha a
+      ^ {js|)|js}
     | `hsl (h, s, l) ->
       {js|hsl(|js}
-      ^ Angle.toString h
+      ^ string_of_angle h
       ^ {js|, |js}
-      ^ Percentage.toString s
+      ^ string_of_alpha' s
       ^ {js|, |js}
-      ^ Percentage.toString l
+      ^ string_of_alpha' l
       ^ {js|)|js}
     | `hsla (h, s, l, a) ->
       {js|hsla(|js}
-      ^ Angle.toString h
+      ^ string_of_angle h
       ^ {js|, |js}
-      ^ Percentage.toString s
+      ^ string_of_alpha' s
       ^ {js|, |js}
-      ^ Percentage.toString l
+      ^ string_of_alpha' l
       ^ {js|, |js}
       ^ string_of_alpha a
       ^ {js|)|js}

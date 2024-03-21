@@ -30,9 +30,34 @@ module Var : sig
 end
 
 module Time : sig
-  type t =
-    [ `ms of float
-    | `s of float
+  type time =
+    [ `s of int
+    | `ms of int
+    ]
+
+  type calc_value =
+    [ time
+    | `calc of
+      [ time
+      | `add of calc_value * calc_value
+      | `sub of calc_value * calc_value
+      | `mult of calc_value * calc_value
+      ]
+    | `min of t array
+    | `max of t array
+    | `num of float
+    ]
+
+  and t =
+    [ time
+    | `min of t array
+    | `max of t array
+    | `calc of
+      [ time
+      | `add of calc_value * calc_value
+      | `sub of calc_value * calc_value
+      | `mult of calc_value * calc_value
+      ]
     ]
 
   val s : 'a -> [> `s of 'a ]
@@ -82,6 +107,8 @@ module Length : sig
       | `sub of calc_value * calc_value
       | `mult of calc_value * calc_value
       ]
+    | `min of t array
+    | `max of t array
     | `num of float
     ]
 
@@ -93,6 +120,8 @@ module Length : sig
       | `sub of calc_value * calc_value
       | `mult of calc_value * calc_value
       ]
+    | `min of t array
+    | `max of t array
     ]
 
   val ch : 'a -> [> `ch of 'a ]
@@ -679,18 +708,42 @@ module ColorMixMethod : sig
 end
 
 module Color : sig
+  type rgb = int * int * int
+
+  type 'a calc_min_max =
+    [ `calc of [ `add of 'a * 'a | `mult of 'a * 'a | `sub of 'a * 'a ]
+    | `max of 'a array
+    | `min of 'a array
+    ]
+
+  type rgba =
+    int
+    * int
+    * int
+    * [ Percentage.t calc_min_max | `num of float | `percent of float ]
+
+  type hsl =
+    [ Angle.t | Angle.t calc_min_max ]
+    * [ Percentage.t calc_min_max | `percent of float ]
+    * [ Percentage.t calc_min_max | `percent of float ]
+
+  type hsla =
+    [ Angle.t | Angle.t calc_min_max ]
+    * [ Percentage.t | Percentage.t calc_min_max ]
+    * [ Percentage.t | Percentage.t calc_min_max ]
+    * [ `num of float | `percent of float | Percentage.t calc_min_max ]
+
+  type 'a colorMix =
+    ColorMixMethod.t * ('a * Percentage.t) * ('a * Percentage.t)
+
   type t =
-    [ `currentColor
+    [ `colorMix of t colorMix
+    | `currentColor
     | `hex of string
-    | `colorMix of ColorMixMethod.t * (t * Percentage.t) * (t * Percentage.t)
-    | `hsl of Angle.t * Percentage.t * Percentage.t
-    | `hsla of
-      Angle.t
-      * Percentage.t
-      * Percentage.t
-      * [ `num of float | `percent of float ]
-    | `rgb of int * int * int
-    | `rgba of int * int * int * [ `num of float | `percent of float ]
+    | `hsl of hsl
+    | `hsla of hsla
+    | `rgb of rgb
+    | `rgba of rgba
     | `transparent
     ]
 

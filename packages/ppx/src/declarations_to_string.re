@@ -4,6 +4,8 @@ open Reason_css_parser;
 module Helper = Ast_helper;
 module Builder = Ppxlib.Ast_builder.Default;
 
+exception Invalid_value(string);
+
 let loc = Location.none;
 let txt = txt => {Location.loc: Location.none, txt};
 
@@ -126,6 +128,9 @@ let render_length =
   | `Zero => render_string("0");
 
 let rec render_function_calc = calc_sum => {
+  render_calc_sum(calc_sum);
+}
+and render_calc_sum = calc_sum =>
   switch (calc_sum) {
   | (product, []) => render_product(product)
   | (product, list_of_sums) =>
@@ -135,8 +140,21 @@ let rec render_function_calc = calc_sum => {
     let op = pick_operation(List.hd(list_of_sums));
     let first = render_product(product);
     let second = render_list_of_sums(list_of_sums);
-    [%expr "calc(" + [%e first] ++ [%e op] ++ [%e second] ++ ")"];
+    [%expr "calc(" ++ [%e first] ++ [%e op] ++ [%e second] ++ ")"];
+  }
+and render_function_min_or_max = calc_sums => {
+  switch (calc_sums) {
+  | [] => raise(Invalid_value("expected at least one argument"))
+  | [x, ...xs] =>
+    let calc_sums = [x] |> List.append(xs |> List.map(x => x)) |> List.rev;
+    calc_sums |> List.map(v => render_calc_sum(v)) |> Helper.Exp.array;
   };
+}
+and render_function_min = calc_sums => {
+  render_function_min_or_max(calc_sums);
+}
+and render_function_max = calc_sums => {
+  render_function_min_or_max(calc_sums);
 }
 and render_sum_op = op => {
   switch (op) {
@@ -177,20 +195,59 @@ and render_calc_value = calc_value => {
   | `Number(float) => render_number(float, "")
   | `Extended_length(l) => render_extended_length(l)
   | `Extended_percentage(p) => render_extended_percentage(p)
-  | `Function_calc(fc) => render_function_calc(fc)
+  | `Extended_angle(a) => render_extended_angle(a)
+  | `Extended_time(t) => render_extended_time(t)
   };
 }
+and render_time_as_int =
+  fun
+  | `Ms(f) => {
+      let value = Float.to_int(f);
+      render_integer(value);
+    }
+  | `S(f) => {
+      let value = Float.to_int(f);
+      render_integer(value);
+    }
+
+and render_extended_time =
+  fun
+  | `Time(t) => render_time_as_int(t)
+  | `Function_calc(fc) => render_function_calc(fc)
+  | `Interpolation(v) => render_variable(v)
+  | `Function_min(values) => render_function_min(values)
+  | `Function_max(values) => render_function_max(values)
+
+and render_angle =
+  fun
+  | `Deg(number)
+  | `Rad(number)
+  | `Grad(number)
+  | `Turn(number) => render_number(number, "")
+
+and render_extended_angle =
+  fun
+  | `Angle(a) => render_angle(a)
+  | `Function_calc(fc) => render_function_calc(fc)
+  | `Interpolation(i) => render_variable(i)
+  | `Function_min(values) => render_function_min(values)
+  | `Function_max(values) => render_function_max(values)
+
 and render_extended_length =
   fun
   | `Length(l) => render_length(l)
   | `Function_calc(fc) => render_function_calc(fc)
+  | `Function_min(values) => render_function_min(values)
+  | `Function_max(values) => render_function_max(values)
   | `Interpolation(i) => render_variable(i)
 
 and render_extended_percentage =
   fun
   | `Percentage(p) => render_percentage(p)
   | `Function_calc(fc) => render_function_calc(fc)
-  | `Interpolation(i) => render_variable(i);
+  | `Interpolation(i) => render_variable(i)
+  | `Function_min(values) => render_function_min(values)
+  | `Function_max(values) => render_function_max(values);
 
 let render_length_percentage =
   fun
@@ -206,8 +263,7 @@ let render_size =
   | `Max_content => [%expr "max-content"]
   | `Min_content => [%expr "min-content"]
   | `Fit_content_0 => [%expr "fit-content"]
-  | `Fit_content_1(lp) => render_length_percentage(lp)
-  | `Function_calc(fc) => render_function_calc(fc);
+  | `Fit_content_1(lp) => render_length_percentage(lp);
 
 let render_css_global_values = (name, value) => {
   let.ok value = Parser.parse(Standard.css_wide_keywords, value);
@@ -538,6 +594,7 @@ let parse_declarations = (property: string, value: string) => {
 
   switch (render_css_global_values(property, value)) {
   | Ok(value) => Ok(value)
+  | exception (Invalid_value(v)) => Error(`Invalid_value(value ++ ". " ++ v))
   | Error(_) => render_to_expr(property, value)
   };
 };
