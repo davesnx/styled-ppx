@@ -1134,12 +1134,11 @@ let object_fit =
   variants(Parser.property_object_fit, (~loc) => [%expr CssJs.objectFit]);
 
 let object_position =
-  monomorphic(
+  polymorphic(
     Parser.property_object_position,
-    (~loc) => [%expr CssJs.objectPosition],
     (~loc, position: Types.position) => {
       let (x, y) = render_position(~loc, position);
-      [%expr `hv(([%e x], [%e y]))];
+      [[%expr CssJs.objectPosition2([%e x], [%e y])]];
     },
   );
 
@@ -1484,17 +1483,17 @@ let background_attachment =
       | _ => raise(Unsupported_feature),
   );
 
-let render_background_position = (~loc, position) => {
-  let render_one =
-    fun
-    | `Center => variant_to_expression(~loc, `Center)
-    | `Left => variant_to_expression(~loc, `Left)
-    | `Right => variant_to_expression(~loc, `Right)
-    | `Bottom => variant_to_expression(~loc, `Bottom)
-    | `Top => variant_to_expression(~loc, `Top)
-    | `Extended_length(l) => render_extended_length(~loc, l)
-    | `Extended_percentage(p) => render_extended_percentage(~loc, p);
+let render_background_position_one = (~loc) =>
+  fun
+  | `Center => variant_to_expression(~loc, `Center)
+  | `Left => variant_to_expression(~loc, `Left)
+  | `Right => variant_to_expression(~loc, `Right)
+  | `Bottom => variant_to_expression(~loc, `Bottom)
+  | `Top => variant_to_expression(~loc, `Top)
+  | `Extended_length(l) => render_extended_length(~loc, l)
+  | `Extended_percentage(p) => render_extended_percentage(~loc, p);
 
+let render_background_position = (~loc, position: Types.bg_position) => {
   switch (position) {
   | `Center as position
   | `Left as position
@@ -1503,23 +1502,33 @@ let render_background_position = (~loc, position) => {
   | `Top as position
   | `Extended_length(_) as position
   | `Extended_percentage(_) as position =>
-    [%expr ([%e render_one(position)], None)]
+    [%expr
+     CssJs.backgroundPosition(
+       [%e render_background_position_one(~loc, position)],
+     )]
   | `Static(x, y) =>
-    [%expr ([%e render_one(x)], Some([%e render_one(y)]))]
+    [%expr
+     CssJs.backgroundPosition2(
+       [%e render_background_position_one(~loc, x)],
+       [%e render_background_position_one(~loc, y)],
+     )]
   | `And(_left, _right) => raise(Unsupported_feature)
   };
 };
 
 let background_position =
-  monomorphic(
-    Parser.property_background_position,
-    (~loc) => [%expr CssJs.backgroundPosition2],
-    (~loc) =>
-      fun
-      | [] => failwith("expected at least one argument")
-      | [l] => render_background_position(~loc, l)
-      | _ => raise(Unsupported_feature),
+  polymorphic(Parser.property_background_position, (~loc) =>
+    fun
+    | [] => failwith("expected at least one argument")
+    | [l] => [render_background_position(~loc, l)]
+    | _ => raise(Unsupported_feature)
   );
+
+let background_position_x =
+  unsupportedProperty(Parser.property_background_position_x);
+let background_position_y =
+  unsupportedProperty(Parser.property_background_position_y);
+
 let background_clip =
   monomorphic(
     Parser.property_background_clip,
@@ -1590,24 +1599,10 @@ let render_background = (~loc, background: Types.property_background) => {
     @ (
       switch (position) {
       | Some((pos, Some(((), size)))) => [
-          [
-            [%expr
-              CssJs.backgroundPosition(
-                [%e render_background_position(~loc, pos)],
-              )
-            ],
-          ],
+          [render_background_position(~loc, pos)],
           [[%expr CssJs.backgroundSize([%e render_bg_size(~loc, size)])]],
         ]
-      | Some((pos, None)) => [
-          [
-            [%expr
-              CssJs.backgroundPosition(
-                [%e render_background_position(~loc, pos)],
-              )
-            ],
-          ],
-        ]
+      | Some((pos, None)) => [[render_background_position(~loc, pos)]]
       | None => []
       }
     );
@@ -1646,24 +1641,10 @@ let render_background = (~loc, background: Types.property_background) => {
     @ (
       switch (position) {
       | Some((pos, Some(((), size)))) => [
-          [
-            [%expr
-              CssJs.backgroundPosition(
-                [%e render_background_position(~loc, pos)],
-              )
-            ],
-          ],
+          [render_background_position(~loc, pos)],
           [[%expr CssJs.backgroundSize([%e render_bg_size(~loc, size)])]],
         ]
-      | Some((pos, None)) => [
-          [
-            [%expr
-              CssJs.backgroundPosition(
-                [%e render_background_position(~loc, pos)],
-              )
-            ],
-          ],
-        ]
+      | Some((pos, None)) => [[render_background_position(~loc, pos)]]
       | None => []
       }
     );
@@ -4175,6 +4156,8 @@ let properties = [
   ("background-image", found(background_image)),
   ("background-origin", found(background_origin)),
   ("background-position", found(background_position)),
+  ("background-position-x", found(background_position_x)),
+  ("background-position-y", found(background_position_y)),
   ("background-repeat", found(background_repeat)),
   ("background-size", found(background_size)),
   ("background", found(background)),

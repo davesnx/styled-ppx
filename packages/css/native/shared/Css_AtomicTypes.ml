@@ -211,7 +211,8 @@ module Direction = struct
   let toString x = match x with `ltr -> {js|ltr|js} | `rtl -> {js|rtl|js}
 end
 
-module Position = struct
+(* Don't confuse with Position (from object-position or background-position) *)
+module PropertyPosition = struct
   type t =
     [ `absolute
     | `relative
@@ -1428,6 +1429,28 @@ module TextEmphasisPosition = struct
   end
 end
 
+module Position = struct
+  type t =
+    [ `top
+    | `bottom
+    | `left
+    | `right
+    | `center
+    | Percentage.t
+    | Length.t
+    ]
+
+  let toString p =
+    match p with
+    | `top -> {js|top|js}
+    | `bottom -> {js|bottom|js}
+    | `left -> {js|left|js}
+    | `right -> {js|right|js}
+    | `center -> {js|center|js}
+    | #Percentage.t as p -> Percentage.toString p
+    | #Length.t as l -> Length.toString l
+end
+
 module PositionalAlignment = struct
   type t =
     [ `center
@@ -1980,49 +2003,6 @@ module BackgroundOrigin = struct
     | `borderBox -> {js|border-box|js}
     | `contentBox -> {js|content-box|js}
     | `paddingBox -> {js|padding-box|js}
-end
-
-module BackgroundPosition = struct
-  module X = struct
-    type t =
-      [ `left
-      | `right
-      | `center
-      ]
-
-    let toString x =
-      match x with
-      | `left -> {js|left|js}
-      | `right -> {js|right|js}
-      | `center -> {js|center|js}
-  end
-
-  module Y = struct
-    type t =
-      [ `top
-      | `bottom
-      | `center
-      ]
-
-    let toString x =
-      match x with
-      | `top -> {js|top|js}
-      | `bottom -> {js|bottom|js}
-      | `center -> {js|center|js}
-  end
-
-  type t =
-    [ X.t
-    | Y.t
-    ]
-
-  let toString x =
-    match x with
-    | `left -> {js|left|js}
-    | `right -> {js|right|js}
-    | `top -> {js|top|js}
-    | `bottom -> {js|bottom|js}
-    | `center -> {js|center|js}
 end
 
 module MaskPosition = struct

@@ -302,11 +302,6 @@ let properties_static_css_tests = [
     [%expr CssJs.objectFit(`fill)],
   ),
   (
-    [%css "object-position: right bottom"],
-    [%expr [%css "object-position: right bottom"]],
-    [%expr CssJs.objectPosition(`hv((`right, `bottom)))],
-  ),
-  (
     [%css "background-color: red"],
     [%expr [%css "background-color: red"]],
     [%expr CssJs.backgroundColor(CssJs.red)],

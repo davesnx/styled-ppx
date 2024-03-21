@@ -289,50 +289,30 @@ let backgroundOrigin x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let string_of_backgroundposition2 (x, y) =
-  match x, y with
-  | x, Some y ->
-    (match x with
-    | #BackgroundPosition.X.t as h -> BackgroundPosition.X.toString h
-    | #Length.t as l -> Length.toString l)
-    ^ {js| |js}
-    ^
-    (match y with
-    | #BackgroundPosition.Y.t as v -> BackgroundPosition.Y.toString v
-    | #Length.t as l -> Length.toString l)
-  | x, None ->
-    (match x with
-    | #BackgroundPosition.t as bp -> BackgroundPosition.toString bp
-    | #Length.t as l -> Length.toString l)
-
-let string_of_backgroundposition x =
+let string_of_backgroundPosition x =
   match x with
-  | #BackgroundPosition.t as bp -> BackgroundPosition.toString bp
-  | #Length.t as l -> Length.toString l
+  | #Position.t as bp -> Position.toString bp
   | #Var.t as va -> Var.toString va
   | #Cascading.t as c -> Cascading.toString c
 
 let backgroundPosition x =
-  D ({js|backgroundPosition|js}, string_of_backgroundposition x)
+  D ({js|backgroundPosition|js}, string_of_backgroundPosition x)
 
-let backgroundPosition2 x =
-  D ({js|backgroundPosition|js}, string_of_backgroundposition2 x)
-
-let backgroundPositions bp =
+let backgroundPosition2 x y =
   D
     ( {js|backgroundPosition|js},
-      bp
-      |. Std.Array.map string_of_backgroundposition
-      |. Std.Array.joinWith ~sep:{js|, |js} )
+      string_of_backgroundPosition x
+      ^ {js| |js}
+      ^ string_of_backgroundPosition y )
 
 let backgroundPosition4 ~x ~offsetX ~y ~offsetY =
   D
     ( {js|backgroundPosition|js},
-      BackgroundPosition.X.toString x
+      string_of_backgroundPosition x
       ^ {js| |js}
       ^ Length.toString offsetX
       ^ {js| |js}
-      ^ BackgroundPosition.Y.toString y
+      ^ string_of_backgroundPosition y
       ^ {js| |js}
       ^ Length.toString offsetY )
 
@@ -904,7 +884,15 @@ let objectFit x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let objectPosition x = D ({js|objectPosition|js}, string_of_backgroundposition x)
+let objectPosition x = D ({js|objectPosition|js}, string_of_backgroundPosition x)
+
+let objectPosition2 x y =
+  D
+    ( {js|objectPosition|js},
+      string_of_backgroundPosition x
+      ^ {js| |js}
+      ^ string_of_backgroundPosition y )
+
 let opacity x = D ({js|opacity|js}, Std.Float.toString x)
 
 let outline size style color =
@@ -1002,7 +990,7 @@ let position x =
   D
     ( {js|position|js},
       match x with
-      | #Position.t as p -> Position.toString p
+      | #PropertyPosition.t as p -> PropertyPosition.toString p
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
@@ -1423,11 +1411,11 @@ let grad = Angle.grad
 let turn = Angle.turn
 let ltr = Direction.ltr
 let rtl = Direction.rtl
-let absolute = Position.absolute
-let relative = Position.relative
-let static = Position.static
-let fixed = `fixed
-let sticky = Position.sticky
+let absolute = PropertyPosition.absolute
+let relative = PropertyPosition.relative
+let static = PropertyPosition.static
+let fixed = PropertyPosition.fixed
+let sticky = PropertyPosition.sticky
 let isolate = `isolate
 let horizontal = Resize.horizontal
 let vertical = Resize.vertical

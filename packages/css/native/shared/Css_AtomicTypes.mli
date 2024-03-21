@@ -140,7 +140,7 @@ module Direction : sig
   val toString : t -> string
 end
 
-module Position : sig
+module PropertyPosition : sig
   type t =
     [ `absolute
     | `fixed
@@ -934,6 +934,20 @@ module TextEmphasisPosition : sig
   end
 end
 
+module Position : sig
+  type t =
+    [ `top
+    | `bottom
+    | `left
+    | `right
+    | `center
+    | Percentage.t
+    | Length.t
+    ]
+
+  val toString : t -> string
+end
+
 module PositionalAlignment : sig
   type t =
     [ `center
@@ -1301,38 +1315,6 @@ module BackgroundOrigin : sig
     [ `borderBox
     | `contentBox
     | `paddingBox
-    ]
-
-  val toString : t -> string
-end
-
-module BackgroundPosition : sig
-  module X : sig
-    type t =
-      [ `center
-      | `left
-      | `right
-      ]
-
-    val toString : t -> string
-  end
-
-  module Y : sig
-    type t =
-      [ `bottom
-      | `center
-      | `top
-      ]
-
-    val toString : t -> string
-  end
-
-  type t =
-    [ `bottom
-    | `center
-    | `left
-    | `right
-    | `top
     ]
 
   val toString : t -> string

@@ -296,4 +296,26 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.imageRendering(`highQuality);
   CssJs.imageRendering(`pixelated);
   CssJs.imageRendering(`crispEdges);
+  CssJs.backgroundPosition(`bottom);
+  CssJs.unsafe({js|backgroundPositionX|js}, {js|50%|js});
+  CssJs.unsafe({js|backgroundPositionY|js}, {js|0|js});
+  CssJs.backgroundPosition2(`zero, `zero);
+  CssJs.backgroundPosition2(`rem(1.), `zero);
+  CssJs.objectPosition2(`center, `top);
+  CssJs.objectPosition2(`center, `bottom);
+  CssJs.objectPosition2(`left, `center);
+  CssJs.objectPosition2(`right, `center);
+  CssJs.objectPosition2(`center, `center);
+  CssJs.unsafe({js|objectPosition|js}, {js|25% 75%|js});
+  CssJs.objectPosition2(`zero, `zero);
+  CssJs.objectPosition2(`cm(1.), `cm(2.));
+  CssJs.objectPosition2(`ch(10.), `em(8.));
+  CssJs.unsafe({js|objectPosition|js}, {js|bottom 10px right 20px|js});
+  CssJs.unsafe({js|objectPosition|js}, {js|right 3em bottom 10px|js});
+  CssJs.unsafe({js|objectPosition|js}, {js|top 0 right 10px|js});
+  CssJs.unsafe({js|object-position|js}, {js|inherit|js});
+  CssJs.unsafe({js|object-position|js}, {js|initial|js});
+  CssJs.unsafe({js|object-position|js}, {js|revert|js});
+  CssJs.unsafe({js|object-position|js}, {js|revert-layer|js});
+  CssJs.unsafe({js|object-position|js}, {js|unset|js});
 

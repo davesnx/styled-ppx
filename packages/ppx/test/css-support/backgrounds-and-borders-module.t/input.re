@@ -349,3 +349,32 @@ module Color = {
 /* [%css {|content: radial-gradient(50%, white, black);|}]; */
 /* [%css {|content: radial-gradient(60% 60%, white, black);|}]; */
 /* [%css {|content: repeating-linear-gradient(white, black);|}]; */
+
+[%css {|background-position: bottom;|}];
+[%css {|background-position-x: 50%;|}];
+[%css {|background-position-y: 0;|}];
+[%css {|background-position: 0 0;|}];
+[%css {|background-position: 1rem 0;|}];
+
+/* Object Position */
+[%css {| object-position: top |}];
+[%css {| object-position: bottom |}];
+[%css {| object-position: left |}];
+[%css {| object-position: right |}];
+[%css {| object-position: center |}];
+
+[%css {| object-position: 25% 75% |}];
+
+[%css {| object-position: 0 0 |}];
+[%css {| object-position: 1cm 2cm |}];
+[%css {| object-position: 10ch 8em |}];
+
+[%css {| object-position: bottom 10px right 20px |}];
+[%css {| object-position: right 3em bottom 10px |}];
+[%css {| object-position: top 0 right 10px |}];
+
+[%css {| object-position: inherit |}];
+[%css {| object-position: initial |}];
+[%css {| object-position: revert |}];
+[%css {| object-position: revert-layer |}];
+[%css {| object-position: unset |}];
