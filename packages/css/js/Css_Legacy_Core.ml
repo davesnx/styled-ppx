@@ -320,7 +320,10 @@ let backgroundPositions bp =
   D
     ( {js|backgroundPosition|js},
       bp
-      |. Std.Array.map string_of_backgroundPosition
+      |. Std.Array.map (fun (x, y) ->
+             string_of_backgroundPosition x
+             ^ {js| |js}
+             ^ string_of_backgroundPosition y)
       |. Std.Array.joinWith ~sep:{js|, |js} )
 
 let backgroundRepeat x =
