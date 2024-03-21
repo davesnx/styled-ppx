@@ -241,6 +241,16 @@ let backgroundPosition2 x y =
       ^ {js| |js}
       ^ string_of_backgroundPosition y )
 
+let backgroundPositions bp =
+  D
+    ( {js|backgroundPosition|js},
+      bp
+      |. Std.Array.map (fun (x, y) ->
+             string_of_backgroundPosition x
+             ^ {js| |js}
+             ^ string_of_backgroundPosition y)
+      |. Std.Array.joinWith ~sep:{js|, |js} )
+
 let backgroundPosition4 ~x ~offsetX ~y ~offsetY =
   D
     ( {js|backgroundPosition|js},

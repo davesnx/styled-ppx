@@ -316,6 +316,13 @@ let backgroundPosition4 ~x ~offsetX ~y ~offsetY =
       ^ {js| |js}
       ^ Length.toString offsetY )
 
+let backgroundPositions bp =
+  D
+    ( {js|backgroundPosition|js},
+      bp
+      |. Std.Array.map string_of_backgroundPosition
+      |. Std.Array.joinWith ~sep:{js|, |js} )
+
 let backgroundRepeat x =
   D
     ( {js|backgroundRepeat|js},
