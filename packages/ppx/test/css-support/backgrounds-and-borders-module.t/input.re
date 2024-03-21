@@ -364,6 +364,7 @@ module Color = {
 [%css {| object-position: center |}];
 
 [%css {| object-position: 25% 75% |}];
+[%css {| object-position: 25% |}];
 
 [%css {| object-position: 0 0 |}];
 [%css {| object-position: 1cm 2cm |}];

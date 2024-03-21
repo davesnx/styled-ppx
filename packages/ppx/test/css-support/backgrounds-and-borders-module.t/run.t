@@ -307,6 +307,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.objectPosition2(`right, `center);
   CssJs.objectPosition2(`center, `center);
   CssJs.unsafe({js|objectPosition|js}, {js|25% 75%|js});
+  CssJs.objectPosition2(`percent(25.), `center);
   CssJs.objectPosition2(`zero, `zero);
   CssJs.objectPosition2(`cm(1.), `cm(2.));
   CssJs.objectPosition2(`ch(10.), `em(8.));
