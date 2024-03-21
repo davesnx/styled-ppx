@@ -319,4 +319,9 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.unsafe({js|object-position|js}, {js|revert|js});
   CssJs.unsafe({js|object-position|js}, {js|revert-layer|js});
   CssJs.unsafe({js|object-position|js}, {js|unset|js});
+  let _loadingKeyframes =
+    CssJs.keyframes([|
+      (0, [|CssJs.backgroundPosition2(`zero, `zero)|]),
+      (100, [|CssJs.backgroundPosition2(`rem(1.), `zero)|]),
+    |]);
 

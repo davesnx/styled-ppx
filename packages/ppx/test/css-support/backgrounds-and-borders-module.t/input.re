@@ -379,3 +379,10 @@ module Color = {
 [%css {| object-position: revert |}];
 [%css {| object-position: revert-layer |}];
 [%css {| object-position: unset |}];
+
+let _loadingKeyframes = [%keyframe
+  {|
+  0% { background-position: 0 0; }
+  100% { background-position: 1rem 0; }
+|}
+];
