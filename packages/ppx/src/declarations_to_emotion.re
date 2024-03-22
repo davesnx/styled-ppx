@@ -305,6 +305,10 @@ let render_length = (~loc) =>
   | `Zero => [%expr `zero];
 
 let rec render_function_calc = (~loc, calc_sum) => {
+  render_calc_sum(~loc, calc_sum);
+}
+
+and render_calc_sum = (~loc, calc_sum) => {
   switch (calc_sum) {
   | (product, []) => render_product(~loc, product)
   | (product, list_of_sums) =>
@@ -323,6 +327,20 @@ let rec render_function_calc = (~loc, calc_sum) => {
       [%expr `calc(`add(([%e first], [%e second])))];
     };
   };
+}
+and render_function_min_or_max = (~loc, calc_sums: list(Types.calc_sum)) => {
+  switch (calc_sums) {
+  | [] => raise(Invalid_value("expected at least one argument"))
+  | [x, ...xs] =>
+    let calc_sums = [x] @ List.map(Fun.id, xs);
+    List.map(render_calc_sum(~loc), calc_sums) |> Builder.pexp_array(~loc);
+  };
+}
+and render_function_min = (~loc, calc_sums) => {
+  [%expr `min([%e render_function_min_or_max(~loc, calc_sums)])];
+}
+and render_function_max = (~loc, calc_sums) => {
+  [%expr `max([%e render_function_min_or_max(~loc, calc_sums)])];
 }
 and pick_operation = ((op, _)) => op
 and render_list_of_products = (~loc, list_of_products) => {
@@ -352,24 +370,63 @@ and render_product_op = (~loc, op) => {
   | `Static_1((), float) => [%expr `num([%e render_float(~loc, float)])]
   };
 }
+and render_angle = (~loc) =>
+  fun
+  | `Deg(number) => id([%expr `deg([%e render_float(~loc, number)])])
+  | `Rad(number) => id([%expr `rad([%e render_float(~loc, number)])])
+  | `Grad(number) => id([%expr `grad([%e render_float(~loc, number)])])
+  | `Turn(number) => id([%expr `turn([%e render_float(~loc, number)])])
+
+and render_extended_angle = (~loc) =>
+  fun
+  | `Angle(a) => render_angle(~loc, a)
+  | `Function_calc(fc) => render_function_calc(~loc, fc)
+  | `Interpolation(i) => render_variable(~loc, i)
+  | `Function_min(values) => render_function_min(~loc, values)
+  | `Function_max(values) => render_function_max(~loc, values)
+
+and render_time_as_int = (~loc) =>
+  fun
+  | `Ms(f) => {
+      let value = Float.to_int(f);
+      [%expr `ms([%e render_integer(~loc, value)])];
+    }
+  | `S(f) => {
+      let value = Float.to_int(f);
+      [%expr `s([%e render_integer(~loc, value)])];
+    }
+
+and render_extended_time = (~loc) =>
+  fun
+  | `Time(t) => render_time_as_int(~loc, t)
+  | `Function_calc(fc) => render_function_calc(~loc, fc)
+  | `Interpolation(v) => render_variable(~loc, v)
+  | `Function_min(values) => render_function_min(~loc, values)
+  | `Function_max(values) => render_function_max(~loc, values)
+
 and render_calc_value = (~loc, calc_value) => {
   switch ((calc_value: Types.calc_value)) {
   | `Number(float) => [%expr `num([%e render_float(~loc, float)])]
   | `Extended_length(l) => render_extended_length(~loc, l)
   | `Extended_percentage(p) => render_extended_percentage(~loc, p)
-  | `Function_calc(fc) => render_function_calc(~loc, fc)
+  | `Extended_angle(a) => render_extended_angle(~loc, a)
+  | `Extended_time(t) => render_extended_time(~loc, t)
   };
 }
 and render_extended_length = (~loc) =>
   fun
   | `Length(l) => render_length(~loc, l)
   | `Function_calc(fc) => render_function_calc(~loc, fc)
+  | `Function_min(values) => render_function_min(~loc, values)
+  | `Function_max(values) => render_function_max(~loc, values)
   | `Interpolation(i) => render_variable(~loc, i)
 and render_extended_percentage = (~loc) =>
   fun
   | `Percentage(p) => render_percentage(~loc, p)
   | `Function_calc(fc) => render_function_calc(~loc, fc)
-  | `Interpolation(i) => render_variable(~loc, i);
+  | `Interpolation(i) => render_variable(~loc, i)
+  | `Function_min(values) => render_function_min(~loc, values)
+  | `Function_max(values) => render_function_max(~loc, values);
 
 let render_length_percentage = (~loc) =>
   fun
@@ -382,7 +439,6 @@ let render_size = (~loc) =>
   | `Auto => variant_to_expression(~loc, `Auto)
   | `Extended_length(l) => render_extended_length(~loc, l)
   | `Extended_percentage(p) => render_extended_percentage(~loc, p)
-  | `Function_calc(fc) => render_function_calc(~loc, fc)
   | `Fit_content_0 => variant_to_expression(~loc, `FitContent)
   | `Max_content => variant_to_expression(~loc, `MaxContent)
   | `Min_content => variant_to_expression(~loc, `MinContent)
@@ -418,7 +474,6 @@ let render_max_width = (~loc) =>
   fun
   | `Extended_length(l) => render_extended_length(~loc, l)
   | `Extended_percentage(p) => render_extended_percentage(~loc, p)
-  | `Function_calc(fc) => render_function_calc(~loc, fc)
   | `Fit_content_0 => variant_to_expression(~loc, `FitContent)
   | `Max_content => variant_to_expression(~loc, `MaxContent)
   | `Min_content => variant_to_expression(~loc, `MinContent)
@@ -446,7 +501,9 @@ let render_extended_angle = (~loc) =>
   fun
   | `Angle(a) => render_angle(~loc, a)
   | `Function_calc(fc) => render_function_calc(~loc, fc)
-  | `Interpolation(i) => render_variable(~loc, i);
+  | `Interpolation(i) => render_variable(~loc, i)
+  | `Function_min(values) => render_function_min(~loc, values)
+  | `Function_max(values) => render_function_max(~loc, values);
 
 let render_side_or_corner = (~loc, value: Types.side_or_corner) => {
   switch (value) {
@@ -812,7 +869,9 @@ let render_function_rgb = (~loc, ast: Types.function_rgb) => {
     | `Percentage(pct) => color_to_float(pct *. 2.55)
     | `Function_calc(fc) => render_function_calc(~loc, fc)
     | `Interpolation(v) => render_variable(~loc, v)
-    | `Extended_percentage(ext) => render_extended_percentage(~loc, ext);
+    | `Extended_percentage(ext) => render_extended_percentage(~loc, ext)
+    | `Function_min(values) => render_function_min(~loc, values)
+    | `Function_max(values) => render_function_max(~loc, values);
 
   let (colors, alpha) =
     switch (ast) {
@@ -852,7 +911,9 @@ let render_function_rgba = (~loc, ast: Types.function_rgba) => {
     | `Percentage(pct) => color_to_float(pct *. 2.55)
     | `Function_calc(fc) => render_function_calc(~loc, fc)
     | `Interpolation(v) => render_variable(~loc, v)
-    | `Extended_percentage(ext) => render_extended_percentage(~loc, ext);
+    | `Extended_percentage(ext) => render_extended_percentage(~loc, ext)
+    | `Function_min(values) => render_function_min(~loc, values)
+    | `Function_max(values) => render_function_max(~loc, values);
 
   let (colors, alpha) =
     switch (ast) {
@@ -2779,34 +2840,6 @@ let transition_property =
       | `Single_transition_property(_) => raise(Unsupported_feature),
   );
 
-/* bs-css doesn't support `S. PR: https://github.com/giraud/bs-css/pull/264 */
-/* let render_time = (~loc) => fun
-   | `Ms(f) => {
-     let value = Float.to_int(f);
-     [%expr `ms([%e render_integer(~loc, value)])]
-   }
-   | `S(f) => {
-     let value = Float.to_int(f);
-     [%expr `s([%e render_integer(~loc, value)])]
-   }; */
-
-let render_time_as_int = (~loc) =>
-  fun
-  | `Ms(f) => {
-      let value = Float.to_int(f);
-      [%expr `ms([%e render_integer(~loc, value)])];
-    }
-  | `S(f) => {
-      let value = f *. 1000.0 |> Float.to_int;
-      [%expr `s([%e render_integer(~loc, value)])];
-    };
-
-let render_duration = (~loc) =>
-  fun
-  | `Time(t) => render_time_as_int(~loc, t)
-  | `Function_calc(fc) => render_function_calc(~loc, fc)
-  | `Interpolation(v) => render_variable(~loc, v);
-
 let transition_duration =
   monomorphic(
     Parser.property_transition_duration,
@@ -2814,7 +2847,7 @@ let transition_duration =
     (~loc) =>
       fun
       | [] => [%expr `none]
-      | [one] => render_duration(~loc, one)
+      | [one] => render_extended_time(~loc, one)
       | _ => raise(Unsupported_feature),
   );
 let widows =
@@ -2898,7 +2931,7 @@ let render_keyframes_name = (~loc) =>
 
 let render_animation_name = (~loc) =>
   fun
-  | `None => [%expr `none]
+  | `None => [%expr "none"]
   | `Keyframes_name(name) => render_keyframes_name(~loc, name);
 
 // css-animation-1
@@ -2918,8 +2951,8 @@ let animation_duration =
     (~loc) => [%expr CssJs.animationDuration],
     (~loc) =>
       fun
-      | [] => [%expr `none]
-      | [one] => render_duration(~loc, one)
+      | [] => [%expr `ms(0)]
+      | [one] => render_extended_time(~loc, one)
       | _ => raise(Unsupported_feature),
   );
 
@@ -2986,7 +3019,7 @@ let animation_delay =
     (~loc) => [%expr CssJs.animationDelay],
     (~loc) =>
       fun
-      | [one] => render_duration(~loc, one)
+      | [one] => render_extended_time(~loc, one)
       | _ => raise(Unsupported_feature),
   );
 
@@ -3011,9 +3044,9 @@ let render_single_animation =
     (
       ~loc,
       (
-        duration,
-        timing_function,
         delay,
+        timing_function,
+        duration,
         iteration_count,
         direction,
         fillMode,
@@ -3022,9 +3055,11 @@ let render_single_animation =
       ),
     ) => {
   let duration =
-    duration |> Option.mapWithDefault(render_duration(~loc), [%expr `ms(0)]);
+    duration
+    |> Option.mapWithDefault(render_extended_time(~loc), [%expr `ms(0)]);
   let delay =
-    delay |> Option.mapWithDefault(render_duration(~loc), [%expr `ms(0)]);
+    delay
+    |> Option.mapWithDefault(render_extended_time(~loc), [%expr `ms(0)]);
   let direction =
     direction
     |> Option.mapWithDefault(
@@ -3050,7 +3085,8 @@ let render_single_animation =
          [%expr `count(1.)],
        );
   let name =
-    name |> Option.mapWithDefault(render_animation_name(~loc), [%expr `none]);
+    name
+    |> Option.mapWithDefault(render_animation_name(~loc), [%expr "none"]);
 
   [%expr
    CssJs.animation(

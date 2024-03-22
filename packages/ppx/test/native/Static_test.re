@@ -176,6 +176,11 @@ let properties_static_css_tests = [
     [%expr CssJs.paddingRight(`pxFloat(1.))],
   ),
   (
+    [%css "padding-right: min(1px, 2%)"],
+    [%expr [%css "padding-right: min(1px, 2%)"]],
+    [%expr CssJs.paddingRight(`min([|`pxFloat(1.), `percent(2.)|]))],
+  ),
+  (
     [%css "padding-bottom: 2px"],
     [%expr [%css "padding-bottom: 2px"]],
     [%expr CssJs.paddingBottom(`pxFloat(2.))],
@@ -189,6 +194,11 @@ let properties_static_css_tests = [
     [%css "padding: 1px"],
     [%expr [%css "padding: 1px"]],
     [%expr CssJs.padding(`pxFloat(1.))],
+  ),
+  (
+    [%css "padding: min(1px, 2%)"],
+    [%expr [%css "padding: min(1px, 2%)"]],
+    [%expr CssJs.padding(`min([|`pxFloat(1.), `percent(2.)|]))],
   ),
   (
     [%css "padding: 1px 2px"],
@@ -279,10 +289,89 @@ let properties_static_css_tests = [
     [%expr CssJs.color(`rgba((1, 2, 3, `percent(0.5))))],
   ),
   (
+    [%css "color: rgba(1, 2, 3, calc(50% + 10%))"],
+    [%expr [%css "color: rgba(1, 2, 3, calc(50% + 10%))"]],
+    [%expr
+      CssJs.color(
+        `rgba((1, 2, 3, `calc(`add((`percent(50.), `percent(10.)))))),
+      )
+    ],
+  ),
+  (
+    [%css "color: rgba(1, 2, 3, min(50%, 10%))"],
+    [%expr [%css "color: rgba(1, 2, 3, min(50%, 10%))"]],
+    [%expr
+      CssJs.color(
+        `rgba((1, 2, 3, `min([|`percent(50.), `percent(10.)|]))),
+      )
+    ],
+  ),
+  (
+    [%css "color: hsl(calc(120deg + 10deg) 100% 50%)"],
+    [%expr [%css "color: hsl(calc(120deg + 10deg) 100% 50%)"]],
+    [%expr
+      CssJs.color(
+        `hsl((
+          `calc(`add((`deg(120.), `deg(10.)))),
+          `percent(100.),
+          `percent(50.),
+        )),
+      )
+    ],
+  ),
+  (
+    [%css "color: hsl(min(120deg, 10deg) 100% 50%)"],
+    [%expr [%css "color: hsl(min(120deg, 10deg) 100% 50%)"]],
+    [%expr
+      CssJs.color(
+        `hsl((
+          `min([|`deg(120.), `deg(10.)|]),
+          `percent(100.),
+          `percent(50.),
+        )),
+      )
+    ],
+  ),
+  (
+    [%css "color: hsl(max(120deg) 100% 50%)"],
+    [%expr [%css "color: hsl(max(120deg) 100% 50%)"]],
+    [%expr
+      CssJs.color(
+        `hsl((`max([|`deg(120.)|]), `percent(100.), `percent(50.))),
+      )
+    ],
+  ),
+  (
     [%css "color: hsl(120deg 100% 50%)"],
     [%expr [%css "color: hsl(120deg 100% 50%)"]],
     [%expr
       CssJs.color(`hsl((`deg(120.), `percent(100.), `percent(50.))))
+    ],
+  ),
+  (
+    [%css "color: hsl(120deg 100% calc(50% + 10%))"],
+    [%expr [%css "color: hsl(120deg 100% calc(50% + 10%))"]],
+    [%expr
+      CssJs.color(
+        `hsl((
+          `deg(120.),
+          `percent(100.),
+          `calc(`add((`percent(50.), `percent(10.)))),
+        )),
+      )
+    ],
+  ),
+  (
+    [%css "color: hsl(120deg calc(50% + 10%) max(50%, 10%))"],
+    [%expr [%css "color: hsl(120deg calc(50% + 10%) max(50%, 10%))"]],
+    [%expr
+      CssJs.color(
+        `hsl((
+          `deg(120.),
+          `calc(`add((`percent(50.), `percent(10.)))),
+          `max([|`percent(50.), `percent(10.)|]),
+        )),
+      )
     ],
   ),
   (
@@ -653,6 +742,110 @@ let properties_static_css_tests = [
     [%expr CssJs.width(`calc(`add((`percent(100.), `pxFloat(32.)))))],
   ),
   (
+    [%css "width: calc(100% + min(32px))"],
+    [%expr [%css "width: calc(100% + min(32px))"]],
+    [%expr
+      CssJs.width(`calc(`add((`percent(100.), `min([|`pxFloat(32.)|])))))
+    ],
+  ),
+  (
+    [%css "width: calc(100% + min(32px, 100%))"],
+    [%expr [%css "width: calc(100% + min(32px, 100%))"]],
+    [%expr
+      CssJs.width(
+        `calc(
+          `add((`percent(100.), `min([|`pxFloat(32.), `percent(100.)|]))),
+        ),
+      )
+    ],
+  ),
+  (
+    [%css "width: min(100%)"],
+    [%expr [%css "width: min(100%)"]],
+    [%expr CssJs.width(`min([|`percent(100.)|]))],
+  ),
+  (
+    [%css "width: min(100%, 30%)"],
+    [%expr [%css "width: min(100%, 30%)"]],
+    [%expr CssJs.width(`min([|`percent(100.), `percent(30.)|]))],
+  ),
+  (
+    [%css "width: min(100em, 30px)"],
+    [%expr [%css "width: min(100em, 30px)"]],
+    [%expr CssJs.width(`min([|`em(100.), `pxFloat(30.)|]))],
+  ),
+  (
+    [%css "width: min(100%, calc(100% + 32px))"],
+    [%expr [%css "width: min(100%, calc(100% + 32px))"]],
+    [%expr
+      CssJs.width(
+        `min([|
+          `percent(100.),
+          `calc(`add((`percent(100.), `pxFloat(32.)))),
+        |]),
+      )
+    ],
+  ),
+  (
+    [%css "width: min(100em, 30px, 10%)"],
+    [%expr [%css "width: min(100em, 30px, 10%)"]],
+    [%expr
+      CssJs.width(`min([|`em(100.), `pxFloat(30.), `percent(10.)|]))
+    ],
+  ),
+  (
+    [%css "width: calc(100% + max(32px))"],
+    [%expr [%css "width: calc(100% + max(32px))"]],
+    [%expr
+      CssJs.width(`calc(`add((`percent(100.), `max([|`pxFloat(32.)|])))))
+    ],
+  ),
+  (
+    [%css "width: calc(100% + max(32px, 100%))"],
+    [%expr [%css "width: calc(100% + max(32px, 100%))"]],
+    [%expr
+      CssJs.width(
+        `calc(
+          `add((`percent(100.), `max([|`pxFloat(32.), `percent(100.)|]))),
+        ),
+      )
+    ],
+  ),
+  (
+    [%css "width: max(100%)"],
+    [%expr [%css "width: max(100%)"]],
+    [%expr CssJs.width(`max([|`percent(100.)|]))],
+  ),
+  (
+    [%css "width: max(100%, 30%)"],
+    [%expr [%css "width: max(100%, 30%)"]],
+    [%expr CssJs.width(`max([|`percent(100.), `percent(30.)|]))],
+  ),
+  (
+    [%css "width: max(100em, 30px)"],
+    [%expr [%css "width: max(100em, 30px)"]],
+    [%expr CssJs.width(`max([|`em(100.), `pxFloat(30.)|]))],
+  ),
+  (
+    [%css "width: max(100%, calc(100% + 32px))"],
+    [%expr [%css "width: max(100%, calc(100% + 32px))"]],
+    [%expr
+      CssJs.width(
+        `max([|
+          `percent(100.),
+          `calc(`add((`percent(100.), `pxFloat(32.)))),
+        |]),
+      )
+    ],
+  ),
+  (
+    [%css "width: max(100em, 30px, 10%)"],
+    [%expr [%css "width: max(100em, 30px, 10%)"]],
+    [%expr
+      CssJs.width(`max([|`em(100.), `pxFloat(30.), `percent(10.)|]))
+    ],
+  ),
+  (
     [%css "width: calc(100vh - 120px)"],
     [%expr [%css "width: calc(100vh - 120px)"]],
     [%expr CssJs.width(`calc(`sub((`vh(100.), `pxFloat(120.)))))],
@@ -1019,8 +1212,116 @@ let properties_static_css_tests = [
     [%expr [%css "tab-size: calc(10px + 10pt)"]],
     [%expr CssJs.tabSize(`calc(`add((`pxFloat(10.), `pt(10)))))],
   ),
+  (
+    [%css "transition-duration: 3s"],
+    [%expr [%css "transition-duration: 3s"]],
+    [%expr CssJs.transitionDuration(`s(3))],
+  ),
+  (
+    [%css "transition-duration: calc(3s + 1ms)"],
+    [%expr [%css "transition-duration: calc(3s + 1ms)"]],
+    [%expr CssJs.transitionDuration(`calc(`add((`s(3), `ms(1)))))],
+  ),
+  (
+    [%css "transition-duration: min(3s)"],
+    [%expr [%css "transition-duration: min(3s)"]],
+    [%expr CssJs.transitionDuration(`min([|`s(3)|]))],
+  ),
+  (
+    [%css "transition-duration: max(3s, calc(1ms))"],
+    [%expr [%css "transition-duration: max(3s, calc(1ms))"]],
+    [%expr CssJs.transitionDuration(`max([|`s(3), `ms(1)|]))],
+  ),
+  (
+    [%css "transition-duration: max(+3s, calc(-0ms))"],
+    [%expr [%css "transition-duration: max(+3s, calc(-0ms))"]],
+    [%expr CssJs.transitionDuration(`max([|`s(3), `ms(0)|]))],
+  ),
+  (
+    [%css "animation: 3s"],
+    [%expr [%css "animation: 3s"]],
+    [%expr
+      CssJs.animation(
+        ~duration=`s(3),
+        ~delay=`ms(0),
+        ~direction=`normal,
+        ~timingFunction=`ease,
+        ~fillMode=`none,
+        ~playState=`running,
+        ~iterationCount=`count(1.),
+        "none",
+      )
+    ],
+  ),
+  (
+    [%css "animation: calc(3s + 1ms)"],
+    [%expr [%css "animation: calc(3s + 1ms)"]],
+    [%expr
+      CssJs.animation(
+        ~duration=`calc(`add((`s(3), `ms(1)))),
+        ~delay=`ms(0),
+        ~direction=`normal,
+        ~timingFunction=`ease,
+        ~fillMode=`none,
+        ~playState=`running,
+        ~iterationCount=`count(1.),
+        "none",
+      )
+    ],
+  ),
+  (
+    [%css "animation: calc(3 + 1)"],
+    [%expr [%css "animation: calc(3 + 1)"]],
+    [%expr
+      CssJs.animation(
+        ~duration=`calc(`add((`num(3.), `num(1.)))),
+        ~delay=`ms(0),
+        ~direction=`normal,
+        ~timingFunction=`ease,
+        ~fillMode=`none,
+        ~playState=`running,
+        ~iterationCount=`count(1.),
+        "none",
+      )
+    ],
+  ),
+  (
+    [%css "animation: max(3s, 1ms)"],
+    [%expr [%css "animation: max(3s, 1ms)"]],
+    [%expr
+      CssJs.animation(
+        ~duration=`max([|`s(3), `ms(1)|]),
+        ~delay=`ms(0),
+        ~direction=`normal,
+        ~timingFunction=`ease,
+        ~fillMode=`none,
+        ~playState=`running,
+        ~iterationCount=`count(1.),
+        "none",
+      )
+    ],
+  ),
+  (
+    [%css "tab-size: calc(10 + 10)"],
+    [%expr [%css "tab-size: calc(10 + 10)"]],
+    [%expr CssJs.tabSize(`calc(`add((`num(10.), `num(10.)))))],
+  ),
   // unsupported
-  /*   (
+  /*
+   (
+     [%css "color: hsl(calc(120 + 10) 100% 50%)"],
+     [%expr [%css "color: hsl(calc(120 + 10) 100% 50%)"]],
+     [%expr
+       CssJs.color(
+         `hsl((
+           `calc(`add((`deg(120.), `deg(10.)))),
+           `percent(100.),
+           `percent(50.),
+         )),
+       )
+     ],
+   ),
+   (
          [%css
            "border-image-source: repeating-linear-gradient(45deg, transparent, #4d9f0c 20px);"
          ],

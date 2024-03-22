@@ -82,10 +82,6 @@ let join strings separator =
       if index = 0 then item else acc ^ separator ^ item)
 
 module Converter = struct
-  let string_of_time = function
-    | `ms t -> Std.Int.toString t ^ {js|ms|js}
-    | `s t -> Std.Int.toString t ^ {js|s|js}
-
   let string_of_content x =
     match x with
     | #Content.t as c -> Content.toString c
@@ -199,12 +195,12 @@ let alignSelf x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let animationDelay x = D ({js|animationDelay|js}, string_of_time x)
+let animationDelay x = D ({js|animationDelay|js}, Time.toString x)
 
 let animationDirection x =
   D ({js|animationDirection|js}, AnimationDirection.toString x)
 
-let animationDuration x = D ({js|animationDuration|js}, string_of_time x)
+let animationDuration x = D ({js|animationDuration|js}, Time.toString x)
 
 let animationFillMode x =
   D ({js|animationFillMode|js}, AnimationFillMode.toString x)
@@ -2068,11 +2064,11 @@ module Transition = struct
   let shorthand ?(duration = `ms 0) ?(delay = `ms 0) ?(timingFunction = `ease)
     property =
     `value
-      (string_of_time duration
+      (Time.toString duration
       ^ {js| |js}
       ^ TimingFunction.toString timingFunction
       ^ {js| |js}
-      ^ string_of_time delay
+      ^ Time.toString delay
       ^ {js| |js}
       ^ property)
 
@@ -2095,8 +2091,8 @@ let transition ?duration ?delay ?timingFunction property =
   transitionValue
     (Transition.shorthand ?duration ?delay ?timingFunction property)
 
-let transitionDelay i = D ({js|transitionDelay|js}, string_of_time i)
-let transitionDuration i = D ({js|transitionDuration|js}, string_of_time i)
+let transitionDelay i = D ({js|transitionDelay|js}, Time.toString i)
+let transitionDuration i = D ({js|transitionDuration|js}, Time.toString i)
 
 let transitionTimingFunction x =
   D ({js|transitionTimingFunction|js}, TimingFunction.toString x)
@@ -2112,11 +2108,11 @@ module Animation = struct
     `value
       (name
       ^ {js| |js}
-      ^ string_of_time duration
+      ^ Time.toString duration
       ^ {js| |js}
       ^ TimingFunction.toString timingFunction
       ^ {js| |js}
-      ^ string_of_time delay
+      ^ Time.toString delay
       ^ {js| |js}
       ^ AnimationIterationCount.toString iterationCount
       ^ {js| |js}
