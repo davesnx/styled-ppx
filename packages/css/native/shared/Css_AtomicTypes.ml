@@ -47,7 +47,7 @@ let max_or_min_values fn values =
   |. Std.Array.map (fun v -> {js| |js} ^ fn v)
   |. Std.Array.joinWith ~sep:{js|, |js}
 
-let calc_min_max_to_string fn = function
+let calc_min_max_num_to_string fn = function
   | `calc (`add (a, b)) -> {js|calc(|js} ^ fn a ^ {js| + |js} ^ fn b ^ {js|)|js}
   | `calc (`sub (a, b)) -> {js|calc(|js} ^ fn a ^ {js| - |js} ^ fn b ^ {js|)|js}
   | `calc (`mult (a, b)) ->
@@ -55,6 +55,16 @@ let calc_min_max_to_string fn = function
   | `num n -> Std.Float.toString n
   | `min xs -> {js|min(|js} ^ max_or_min_values fn xs ^ {js|)|js}
   | `max xs -> {js|max(|js} ^ max_or_min_values fn xs ^ {js|)|js}
+
+let calc_min_max_to_string x =
+  let aux fn fn' x' =
+    match x' with
+    | `add (x, y) -> {js|calc(|js} ^ fn x ^ {js| + |js} ^ fn y ^ {js|)|js}
+    | `sub (x, y) -> {js|calc(|js} ^ fn x ^ {js| - |js} ^ fn y ^ {js|)|js}
+    | `mult (x, y) -> {js|calc(|js} ^ fn x ^ {js| * |js} ^ fn y ^ {js|)|js}
+    | (`min _ | `max _) as x -> fn' x
+  in
+  aux x
 
 module Time = struct
   type time =
@@ -94,42 +104,25 @@ module Time = struct
     match x with
     | `s t -> Std.Int.toString t ^ {js|s|js}
     | `ms t -> Std.Int.toString t ^ {js|ms|js}
-    | `calc calc -> calc_to_string calc
+    | `calc calc -> string_of_calc_min_max calc
     | (`min _ | `max _) as x -> minmax_to_string x
 
   and minmax_to_string = function
     | (`calc _ | `min _ | `max _ | `num _) as x ->
-      calc_min_max_to_string toString x
+      calc_min_max_num_to_string toString x
     | #time as t -> toString t
 
   and calc_value_to_string x =
     match x with
     | `num x -> Std.Float.toString x
-    | `calc calc -> calc_to_string calc
+    | `calc calc -> string_of_calc_min_max calc
     | (`min _ | `max _) as x -> minmax_to_string x
     | #time as t -> toString t
 
-  and calc_to_string calc =
+  and string_of_calc_min_max calc =
     match calc with
-    | `add (x, y) ->
-      {js|calc(|js}
-      ^ calc_value_to_string x
-      ^ {js| + |js}
-      ^ calc_value_to_string y
-      ^ {js|)|js}
-    | `sub (x, y) ->
-      {js|calc(|js}
-      ^ calc_value_to_string x
-      ^ {js| - |js}
-      ^ calc_value_to_string y
-      ^ {js|)|js}
-    | `mult (x, y) ->
-      {js|calc(|js}
-      ^ calc_value_to_string x
-      ^ {js| * |js}
-      ^ calc_value_to_string y
-      ^ {js|)|js}
-    | (`min _ | `max _) as x -> minmax_to_string x
+    | (`add _ | `sub _ | `mult _ | `min _ | `max _) as x ->
+      calc_min_max_to_string calc_value_to_string minmax_to_string x
     | #time as t -> toString t
 end
 
@@ -227,43 +220,26 @@ module Length = struct
     | `pc x -> Std.Float.toString x ^ {js|pc|js}
     | `pt x -> Std.Int.toString x ^ {js|pt|js}
     | `zero -> {js|0|js}
-    | `calc calc -> calc_to_string calc
+    | `calc calc -> string_of_calc_min_max calc
     | `percent x -> Std.Float.toString x ^ {js|%|js}
     | (`min _ | `max _) as x -> minmax_to_string x
 
   and calc_value_to_string x =
     match x with
     | `num x -> Std.Float.toString x
-    | `calc calc -> calc_to_string calc
+    | `calc calc -> string_of_calc_min_max calc
     | (`min _ | `max _) as x -> minmax_to_string x
     | #length as t -> toString t
 
-  and calc_to_string calc =
+  and string_of_calc_min_max calc =
     match calc with
-    | `add (x, y) ->
-      {js|calc(|js}
-      ^ calc_value_to_string x
-      ^ {js| + |js}
-      ^ calc_value_to_string y
-      ^ {js|)|js}
-    | `sub (x, y) ->
-      {js|calc(|js}
-      ^ calc_value_to_string x
-      ^ {js| - |js}
-      ^ calc_value_to_string y
-      ^ {js|)|js}
-    | `mult (x, y) ->
-      {js|calc(|js}
-      ^ calc_value_to_string x
-      ^ {js| * |js}
-      ^ calc_value_to_string y
-      ^ {js|)|js}
-    | (`min _ | `max _) as x -> minmax_to_string x
-    | #length as x -> toString x
+    | (`add _ | `sub _ | `mult _ | `min _ | `max _) as x ->
+      calc_min_max_to_string calc_value_to_string minmax_to_string x
+    | #length as l -> toString l
 
   and minmax_to_string = function
     | (`calc _ | `min _ | `max _ | `num _) as x ->
-      calc_min_max_to_string toString x
+      calc_min_max_num_to_string toString x
     | #length as l -> toString l
 end
 
@@ -1166,19 +1142,19 @@ module Color = struct
   let string_of_angle x =
     match x with
     | (`calc _ | `min _ | `max _) as x ->
-      calc_min_max_to_string Angle.toString x
+      calc_min_max_num_to_string Angle.toString x
     | #Angle.t as pc -> Angle.toString pc
 
   let string_of_alpha x =
     match x with
     | (`calc _ | `min _ | `max _ | `num _) as x ->
-      calc_min_max_to_string Percentage.toString x
+      calc_min_max_num_to_string Percentage.toString x
     | #Percentage.t as pc -> Percentage.toString pc
 
   let string_of_alpha' x =
     match x with
     | (`calc _ | `min _ | `max _) as x ->
-      calc_min_max_to_string Percentage.toString x
+      calc_min_max_num_to_string Percentage.toString x
     | #Percentage.t as pc -> Percentage.toString pc
 
   let rgb_to_string r g b =
