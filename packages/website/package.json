@@ -1,42 +1,33 @@
 {
-  "name": "styled-ppx.vercel.app",
-  "version": "0.3.0",
-  "description": "",
-  "author": "David Sancho <dsnxmoreno@gmail.com>",
+  "name": "website",
   "license": "MIT",
-  "homepage": "https://styled-ppx.vercel.app",
-  "main": "index.js",
+  "workspaces": [
+    "site",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "next -p 7007",
-    "start": "next",
-    "build": "next build",
-    "post-install": "patch-package"
-  },
-  "dependencies": {
-    "@mdx-js/loader": "2.1.2",
-    "@reach/skip-nav": "^0.16.0",
-    "focus-visible": "^5.1.0",
-    "intersection-observer": "^0.10.0",
-    "markdown-to-jsx": "^6.11.4",
-    "next": "11.0.1",
-    "next-themes": "^0.2.0",
-    "nextra": "1.1.0",
-    "nextra-theme-docs": "1.2.6",
-    "patch-package": "^6.4.7",
-    "react": "17",
-    "react-dom": "17",
-    "react-intersection-observer": "^8.26.2",
-    "rehype-pretty-code": "^0.3.2",
-    "shiki": "^0.10.1"
+    "patch": "patch-package"
   },
   "devDependencies": {
-    "autoprefixer": "^10.4.2",
-    "cssnano": "^5.1.12",
-    "postcss": "^8.4.5",
-    "postcss-preset-env": "^6.7.0",
-    "tailwindcss": "^3.0.16"
-  },
-  "resolutions": {
-    "prism-react-renderer": "1.3.5"
+    "@changesets/cli": "2.26.2",
+    "@edge-runtime/vm": "3.1.0",
+    "@ianvs/prettier-plugin-sort-imports": "4.1.1",
+    "@next/eslint-plugin-next": "14.0.4",
+    "@typescript-eslint/eslint-plugin": "6.19.0",
+    "@typescript-eslint/parser": "6.19.0",
+    "eslint": "8.56.0",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-import": "2.29.1",
+    "eslint-plugin-react": "7.33.2",
+    "eslint-plugin-react-hooks": "4.6.0",
+    "eslint-plugin-tailwindcss": "3.14.0",
+    "eslint-plugin-typescript-sort-keys": "3.1.0",
+    "eslint-plugin-unicorn": "50.0.1",
+    "prettier": "3.0.3",
+    "prettier-plugin-pkg": "0.18.0",
+    "prettier-plugin-tailwindcss": "0.5.11",
+    "rimraf": "5.0.5",
+    "tsup": "7.2.0",
+    "typescript": "^5.3.3"
   }
 }

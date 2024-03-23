@@ -1,0 +1,43 @@
+---
+title: Dynamic components
+---
+
+# Dynamic components
+
+Dynamic components are components that generate styles based on their props. You can derive styles from props, apply a variant conditionally, or any other logic.
+
+`styled.{{tag}}` can be defined by a function, where it should return a string. This function is going to be available via the props API for that component, including all props from the element. Like following:
+
+```rescript
+module Dynamic = %styled.div(
+  (~color, ~background) => `
+    color: $(color);
+    background-color: $(background);
+  `
+)
+
+<Dynamic color=CssJs.hex("#EB5757") background=CssJs.hex("#516CF0")>
+  {React.string("Hello!")}
+</Dynamic>
+```
+```reason
+module Dynamic = [%styled.div
+  (~color, ~background) => {|
+    color: $(color);
+    background-color: $(background);
+  |}
+];
+
+<Dynamic color={CssJs.hex("#EB5757")} background={CssJs.hex("#516CF0")}>
+  {React.string("Hello!")}
+</Dynamic>;
+```
+
+Note: The returned expression (the last expression of the function) needs to be an string (it can't be a reference or a function call). This is a limitation of ppxes where it needs to check the current AST to know which type it is.
+
+All the rules from [Interpolation](./interpolation) are applied here. In the example, `color` and `background` are `CssJs.Color.t{:rescript}` since it gets inferred from the CSS property. It's called type holes https://twitter.com/davesnx/status/1552305210558742528
+
+### Collision
+
+If you create a dynamic component with a prop that collides with the name of a React prop, it will override it.
+For example, if your dynamic component is defined with a prop "size" it will override [`size`](https://github.com/rescript-lang/rescript-react/blob/master/src/ReactDOM.res#L367) from makeProps. This mechanism is to ensure that you can name your props the way you want it.

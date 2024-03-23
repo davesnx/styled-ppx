@@ -142,6 +142,9 @@ export const themeSchema = z.strictObject({
     titleComponent: z.custom<
       ReactNode | FC<{ title: string; type: string; route: string }>
     >(...reactNode),
+    extraContent: z.custom<
+      ReactNode | FC<{}>
+    >(...reactNode),
     toggleButton: z.boolean()
   }),
   themeSwitch: z.strictObject({
