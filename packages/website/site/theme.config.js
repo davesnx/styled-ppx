@@ -19,8 +19,7 @@ let Logo = () => {
 
 const Head = (props) => {
   const url = "https://styled-ppx.vercel.app";
-  const title =
-    props.title + " | styled-ppx" || "Typed styled components in ReScript";
+  const title = props.title || "Typed styled components in ReScript";
   const prefix = `${url}  |  Documentation`;
   const description = props.description
     ? `${prefix} · ${props.description}`
@@ -48,14 +47,6 @@ const Head = (props) => {
       <meta name="og:title" content={title} />
       <meta name="og:url" content={url} />
       <meta name="apple-mobile-web-app-title" content={title} />
-      <link
-        href="https://fonts.googleapis.com/css2?family=Archivo&display=swap"
-        rel="stylesheet"
-      />
-      <link
-        href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap"
-        rel="stylesheet"
-      />
       <link
         rel="apple-touch-icon"
         sizes="180x180"
@@ -100,6 +91,11 @@ export default {
   },
   sidebar: {
     extraContent: LanguageSwitch,
-    toggleButton: true
-  }
+    toggleButton: true,
+  },
+  useNextSeoProps() {
+    return {
+      titleTemplate: "%s | styled-ppx",
+    };
+  },
 };
