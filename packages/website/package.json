@@ -5,9 +5,6 @@
     "site",
     "packages/*"
   ],
-  "scripts": {
-    "patch": "patch-package"
-  },
   "devDependencies": {
     "@changesets/cli": "2.26.2",
     "@edge-runtime/vm": "3.1.0",

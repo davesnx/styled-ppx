@@ -9,8 +9,7 @@
   "scripts": {
     "dev": "next -p 7007",
     "start": "next start",
-    "build": "next build",
-    "postinstall": "cd ../ && npm run patch"
+    "build": "next build"
   },
   "dependencies": {
     "nextra": "*",
