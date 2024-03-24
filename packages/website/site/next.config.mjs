@@ -1,6 +1,6 @@
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import fs from "node:fs"
+import fs from "node:fs";
 import nextra from "nextra";
 import { getHighlighter } from "shiki";
 import { bundledLanguages } from "shiki/langs";
@@ -112,7 +112,7 @@ const withNextra = nextra({
   themeConfig: "./theme.config.js",
   mdxOptions: {
     rehypePrettyCodeOptions: {
-      theme: "github-light",
+      theme: { light: "github-light", dark: "github-dark-dimmed" },
       getHighlighter: (options) =>
         getHighlighter({
           ...options,

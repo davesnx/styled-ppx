@@ -31,9 +31,9 @@ export const parseMeta =
   }
 
 export const attachMeta = () => tree => {
-  visit(tree, ['div', 'pre'], node => {
-    if ('data-rehype-pretty-code-fragment' in node.properties) {
-      // remove <div data-rehype-pretty-code-fragment /> element that wraps <pre /> element
+  visit(tree, ['figure', 'pre'], node => {
+    if ('data-rehype-pretty-code-figure' in node.properties) {
+      // remove <figure data-rehype-pretty-code-figure /> element that wraps <pre /> element
       // because we'll wrap with our own <div />
       Object.assign(node, node.children[0])
     }
