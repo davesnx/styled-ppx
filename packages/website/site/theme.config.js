@@ -48,6 +48,14 @@ const Head = (props) => {
       <meta name="og:url" content={url} />
       <meta name="apple-mobile-web-app-title" content={title} />
       <link
+        href="https://fonts.googleapis.com/css2?family=Archivo&display=swap"
+        rel="stylesheet"
+      />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap"
+        rel="stylesheet"
+      />
+      <link
         rel="apple-touch-icon"
         sizes="180x180"
         href={`${url}/favicon/apple-touch-icon.png`}

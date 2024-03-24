@@ -4,14 +4,6 @@ import "nextra-theme-docs/style.css";
 import "../overrides.css";
 
 import Head from "next/head";
-import { Archivo, Archivo_Black } from "next/font/google";
-
-const archivo = Archivo({ display: "swap", subsets: ["latin"], weight: "400" });
-const archivoBlack = Archivo_Black({
-  display: "swap",
-  subsets: ["latin"],
-  weight: "400",
-});
 
 export default function Nextra({ Component, pageProps }) {
   return (
@@ -42,14 +34,7 @@ export default function Nextra({ Component, pageProps }) {
         />
         <script async src="https://cdn.splitbee.io/sb.js"></script>
       </Head>
-      <main
-        id="root"
-        className={[
-          archivo.className,
-          archivoBlack.className,
-          "syntax__rescript",
-        ].join(" ")}
-      >
+      <main id="root" className="syntax__rescript">
         <Component {...pageProps} />
       </main>
     </>

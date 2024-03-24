@@ -5,9 +5,5 @@
   "about": "About",
   "css-support": "CSS Support",
   "faq": "FAQ",
-  "releases": {
-    "title": "Releases",
-    "href": "https://github.com/davesnx/styled-ppx/releases",
-    "newWindow": true
-  }
+  "releases": "Releases"
 }

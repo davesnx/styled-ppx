@@ -8,7 +8,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "next -p 7007",
-    "start": "next",
+    "start": "next start",
     "build": "next build",
     "postinstall": "cd ../ && npm run patch"
   },
@@ -23,6 +23,7 @@
     "patch-package": "^6.4.7",
     "postcss": "^8.4.5",
     "postcss-preset-env": "^6.7.0",
+    "remark-normalize-headings": "^4.0.0",
     "shiki": "^0.14.3",
     "tailwindcss": "^3.0.16",
     "typescript": "5.4.3"
