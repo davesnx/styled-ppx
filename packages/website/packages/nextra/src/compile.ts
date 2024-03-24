@@ -33,7 +33,6 @@ import {
   remarkStaticImage,
   remarkStructurize
 } from './mdx-plugins'
-import theme from './theme.json'
 import type {
   LoaderOptions,
   PageOpts,
@@ -49,8 +48,7 @@ globalThis.__nextra_temp_do_not_use = () => {
 const require = createRequire(import.meta.url)
 
 const DEFAULT_REHYPE_PRETTY_CODE_OPTIONS: RehypePrettyCodeOptions = {
-  // @ts-expect-error -- TODO: fix type error
-  theme,
+  theme: { light: 'github-light', dark: 'github-dark-dimmed' },
   filterMetaString: (meta: string) =>
     meta.replace(CODE_BLOCK_FILENAME_REGEX, '')
 }

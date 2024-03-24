@@ -8,23 +8,23 @@ import { Callout } from 'nextra/components'
 
 Interpolation allows you to use any identifier as a value inside CSS, where "any identifier" refers to any ReScript variables or [module accessors](https://rescript-lang.org/try?code=LYewJgrgNgpgBAFQBY2PAvHA3gKDnWAFzgHMAnGATzkwGEBnegKXoDoUAPACgCIAhAKJ8AInwAcPAJQ4AvjiA). This is useful for reusing variables, handling themes, or conditionally applying styles based on props at run-time.
 
-```rescript showLineNumbers {1}
+```rescript
 module Component = %styled.div(`
   border: 1px solid $(Theme.black);
 `)
 ```
-```reason showLineNumbers
+```reason
 module Component = [%styled.div {|
   border: 1px solid $(Theme.black);
 |}];
 ```
 
-```rescript showLineNumbers
+```rescript
 module Component = %styled.div(`
   max-width: $(maxWidth);
 `)
 ```
-```reason showLineNumbers
+```reason
 module Component = [%styled.div {|
   max-width: $(maxWidth);
 |}];
