@@ -1,0 +1,27 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "pipeline": {
+    "build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": ["dist/**", ".next/**", "loader.js"]
+    },
+    "build:tailwind": {
+      "dependsOn": [],
+      "outputs": ["style.css"]
+    },
+    "test": {},
+    "types:check": {
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "clean": {
+      "cache": false
+    },
+    "dev": {
+      "cache": false
+    }
+  }
+}

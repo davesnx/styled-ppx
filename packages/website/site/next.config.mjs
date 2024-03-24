@@ -122,6 +122,4 @@ const withNextra = nextra({
   },
 });
 
-export default withNextra({
-  transpilePackages: ["nextra-theme-docs", "nextra"],
-});
+export default withNextra({});
