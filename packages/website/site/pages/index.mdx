@@ -31,13 +31,13 @@ module Center = [%styled.div {|
 <Center> {React.string("Hello from the future!")} </Center>;
 ```
 
-Highlights:
+## Highlights
 
-- Type-safe CSS.
-- Component-based styling.
-- Implements utility helpers such as `classname` and `css`.
-- There's no abstraction over standard CSS - it's neither a new language nor a [DSL](https://en.wikipedia.org/wiki/Domain-specific_language).
-- Supports the power of the underlying language: pattern-matching, composition, labelled arguments, etc.
-- Built on top of [emotion](https://emotion.sh).
+- Type-safe CSS
+- Component-based styling
+- Implements utility helpers such as `classname` and `css`
+- There's no abstraction over standard CSS - it's neither a new language nor a [DSL](https://en.wikipedia.org/wiki/Domain-specific_language)
+- Supports the power of the underlying language: pattern-matching, composition, labelled arguments, etc
+- Built on top of [emotion](https://emotion.sh)
 
 **styled-ppx** is a ppx. You can learn more about ppxs in [Tarides blog: Introduction to OCaml ppx ecosystem](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem). Generally speaking, they are similar to [babel plugins](https://babeljs.io/docs/en/plugins/). They run before the compilation of your code, and expands styled-ppx notations (e.g., `%styled.div{:rescript}` `[%styled.div]{:reason}` or `%cx{:rescript}` `[%cx]{:reason}`) into valid ReScript code.
