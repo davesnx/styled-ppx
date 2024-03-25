@@ -4,9 +4,9 @@ title: className `cx` extension
 
 # className: `cx` extension
 
-Aside from the styled extension, **styled-ppx** provides the `%cx{:rescript}` extension.
+Aside from the styled extension, **styled-ppx** provides the `%cx{:rescript}` `[%cx]{:reason}` extension.
 
-`%cx{:rescript}` `[%cx]{:reason}` generates a `className` given one or more CSS declarations. This is useful to attach to a React component via the `className` prop. Sometimes is hard to give the right name for a styled component or maybe those styles are only used once, that's why `%cx{:rescript}` exists.
+`%cx{:rescript}` `[%cx]{:reason}` generates a `className` given one or more CSS declarations. This is useful to attach to a React component via the `className` prop. Sometimes is hard to give the right name for a styled component or maybe those styles are only used once, that's why `%cx{:rescript}` `[%cx]{:reason}` exists.
 
 ## Examples
 
@@ -56,5 +56,5 @@ The value `fullWidth` is a string that contains a hash pointing to a style HTML 
 ## Features
 
 - Selectors, media queries and other nesting is supported in CSS declarations.
-- Interpolation is allowed. `%cx("color: $(Theme.colors.primary)"){:rescript}`.
-- Curly braces aren't allowed. `%cx("{ display: block; }"){:rescript}` will break.
+- Interpolation is allowed. `%cx("color: $(Theme.colors.primary)"){:rescript}` `[%cx "color: $(Theme.colors.primary)"]{:reason}`.
+- Curly braces aren't allowed. `%cx("{ display: block; }"){:rescript}` `[%cx "{ display: block; }"]{:reason}` will break.

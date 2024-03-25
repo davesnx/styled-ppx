@@ -35,7 +35,7 @@ module Dynamic = [%styled.div
 
 Note: The returned expression (the last expression of the function) needs to be an string (it can't be a reference or a function call). This is a limitation of ppxes where it needs to check the current AST to know which type it is.
 
-All the rules from [Interpolation](./interpolation) are applied here. In the example, `color` and `background` are `CssJs.Color.t{:rescript}` since it gets inferred from the CSS property. It's called type holes https://twitter.com/davesnx/status/1552305210558742528
+All the rules from [Interpolation](./interpolation) are applied here. In the example, `color` and `background` are `CssJs.Color.t{:rescript}` `CssJs.Color.t{:reason}`  since it gets inferred from the CSS property. It's called type holes https://twitter.com/davesnx/status/1552305210558742528
 
 ### Collision
 
