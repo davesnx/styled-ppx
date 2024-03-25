@@ -1,0 +1,47 @@
+---
+title: About
+---
+
+# About
+
+Author and maintainer: [David Sancho](https://sancho.dev)
+
+<br />
+
+# Motivation
+
+There are a few reasons why this project exists and why it came to live.
+
+### There was a need
+In my experience, writing React with a CSS-in-JS library is one of the best combos for writing scalable design systems, UI libraries and applications. When I discovered Reason back in the day (around 2018), it wasn't possible to bind to styled-components or emotion. Even ([a](https://reasonml.chat/t/idiomatic-way-to-bind-to-styled-components/886) [f](https://reasonml.chat/t/styled-components-possible/554)[e](https://reasonml.chat/t/styling-solutions-reasonreact-as-of-aug-18/958)[w](https://reasonml.chat/t/options-and-best-practices-for-styling-in-reasonreact/261) [p](https://twitter.com/lyovson/status/1233397294311100417)[e](https://discord.gg/byjdYFH)[o](https://discord.gg/byjdYFH)[p](https://discord.gg/byjdYFH)[l](https://discord.gg/byjdYFH)[e](https://forum.rescript-lang.org/t/how-to-create-bindings-for-emotion-styled/2995) were asking for it.
+
+During that time, there were a few efforts to bring type-safety to CSS with [bs-css](https://github.com/giraud/bs-css) and [bs-emotion](https://github.com/ahrefs/bs-emotion). Even though I liked that approach, it had a few drawbacks:
+- The need for learning a new DSL on top of CSS was tedious. Very fancy for simple properties, but almost impossible for more complex ones (a classic example `width: calc(100% - 20px){:styled-ppx-css}` became `CssJs.width(calc(min, percent(100.), px(20))){:rescript}` `CssJs.width(calc(min, percent(100.), px(20)));{:reason}`). In real world usage I would end up using `CssJs.unsafe`.
+- The runtime was huge. The bundle-size of bs-css starts with 64kb and goes up considerably with the usage, even with ReScripts dead code elimination.
+- The fact of having a runtime involved to only write safe CSS doesn't seem like a nice trade-off.
+
+### It's possible and a good solution
+Embedding CSS inside Reason/OCaml seemed like a bad idea at first, mostly since most CSS-in-JS solutions that use native CSS relied on a JavaScript feature that isn't available in Reason: [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals).
+
+After discovering what a ppx was (*"a mechanism to embed other languages inside Reason"*), and it could mimic the template literals, I jumped straight into hacking a prototype that became this project.
+
+Embedding languages inside others isn't a new concept and has been happening for a long time. In fact, the most common case of an embedded language is usually CSS inside HTML.
+Using CSS enables all sorts of integrations: Editors, DevTools, prototyping tools, Github Copilot, etc. Even for designers that don't want to understand or care about ReScript.
+
+### It can be more powerful than the JavaScript equivalents
+Enabling type-safety in CSS is a nice to have, rather than a hard requirement, but nevertheless useful. styled-ppx brings an entire CSS compiler and type-chcker. This enables features from SASS (like supporting future CSS version features) with features from emotion to inline your styles and code together.
+ Features that aren't implemented but are on the horizon are mostly related in extracting the CSS from the runtime and making your styles static at runtime and have zero run-time.
+
+To know more about how it works or what are the benefits I recommend you watch [my talk at ReasonSTHLM Meetup](https://www.youtube.com/watch?v=ekHCBZiCviM).
+
+## Credits
+
+Here's a list of people that helped me and I couldn't have made styled-ppx without them:
+
+- [Javier Chávarri](https://github.com/jchavarri): for the introduction to Reason. Teaching me all his knowledge about OCaml, AST, ppx rewriters and the help of bootstrapping the project.
+- [Alessandro Strada](https://github.com/astrada): this project started with inspiration from [bs-css-ppx](https://github.com/astrada/ppx_bs_css).
+- [Eduardo Rafael](https://github.com/EduardoRFS/): to teach me how to write a compiler and a type-checker. His initial implementation of the CSS Value definition and the parser combinator.
+- [Rizo](https://github.com/rizo): for the help with the API design, discussions and great conversations about styling and CSS.
+- [Max Lantas](https://github.com/mnxn): for implementing the VSCode extension.
+- [Egor Chemohonenko](https://github.com/ixzzd): for implementing the vim plugin.
+- This project builds on a long line of earlier work by clever folks in the JavaScript community from around the world. People from [styled-components](https://github.com/styled-components/styled-components), [emotion](https://github.com/emotion-js/emotion), [compiledcssinjs](https://github.com/atlassian-labs/compiled), [linaria](https://github.com/callstack/linaria), and many more.

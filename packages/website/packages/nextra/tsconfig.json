@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "ESNext",
+    "declaration": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "allowJs": true,
+    "jsx": "react-jsx",
+    "lib": ["es2022", "dom"],
+    "moduleResolution": "node",
+    "types": ["vitest/globals", "webpack-env"],
+    "resolveJsonModule": true
+  }
+}

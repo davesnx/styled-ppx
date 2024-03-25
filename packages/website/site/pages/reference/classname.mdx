@@ -1,0 +1,60 @@
+---
+title: className `cx` extension
+---
+
+# className: `cx` extension
+
+Aside from the styled extension, **styled-ppx** provides the `%cx{:rescript}` `[%cx]{:reason}` extension.
+
+`%cx{:rescript}` `[%cx]{:reason}` generates a `className` given one or more CSS declarations. This is useful to attach to a React component via the `className` prop. Sometimes is hard to give the right name for a styled component or maybe those styles are only used once, that's why `%cx{:rescript}` `[%cx]{:reason}` exists.
+
+## Examples
+
+```rescript
+<span className=%cx("font-size: 32px")> {React.string("Hello!")} </span>
+```
+```reason
+<span className=[%cx "font-size: 32px"]>
+  {React.string("Hello!")}
+</span>;
+```
+
+```rescript
+let fullWidth: string = %cx(`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+`)
+
+<div className=fullWidth> {React.string("Hello!")} </div>
+```
+```reason
+let fullWidth: string = [%cx
+  {|
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+|}
+];
+
+<div className=fullWidth> {React.string("Hello!")} </div>;
+```
+
+The value `fullWidth` is a string that contains a hash pointing to a style HTML tag in the `<head>`. If you want to concatenate it with other styles, you can use the string concatenation operator (`++`):
+
+```rescript
+<div className=fullWidth ++ " " ++ "extra-classname"> {React.string("Hello!")} </div>
+```
+```reason
+<div className=fullWidth ++ " " ++ "extra-classname"> {React.string("Hello!")} </div>
+```
+
+## Features
+
+- Selectors, media queries and other nesting is supported in CSS declarations.
+- Interpolation is allowed. `%cx("color: $(Theme.colors.primary)"){:rescript}` `[%cx "color: $(Theme.colors.primary)"]{:reason}`.
+- Curly braces aren't allowed. `%cx("{ display: block; }"){:rescript}` `[%cx "{ display: block; }"]{:reason}` will break.

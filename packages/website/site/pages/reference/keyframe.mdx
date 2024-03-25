@@ -1,0 +1,50 @@
+---
+title: Keyframe animations
+---
+
+# Define keyframes
+
+**Generates keyframes**, method to create keyframe animations in CSS
+
+```rescript
+let fadeIn = %keyframe(`
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+`)
+
+module Component = %styled.div(`
+  animation-name: $(fadeIn);
+  width: 100px;
+  height: 100px;
+`)
+```
+```reason
+let fadeIn = [%keyframe
+  {|
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+|}
+];
+
+module Component = [%styled.div
+  {|
+  animation-name: $(fadeIn);
+  width: 100px;
+  height: 100px;
+|}
+];
+```
+
+- Braces are optional. `%keyframe({ ... }){:rescript}` `[%keyframe { ... }]{:reason}`  and `%keyframe(...){:rescript}` `[%keyframe ...]{:reason}`  are the same.
+- The keyframe name is defined outside of the CSS.
+- The type of the keyframe is `string`, but hidden in an [opaque type](https://reasonml.github.io/docs/en/type#opaque-types).
