@@ -1,9 +1,8 @@
 import { useMounted } from "nextra/hooks";
-import { useEffect } from "react";
 import type { ReactElement } from "react";
 import { z } from "zod";
 import { Select } from "./select";
-import { useLocalStorage } from "../utils/use-local-storage";
+import { useLanguage } from "../utils/use-language";
 
 function ReScriptIcon() {
   return (
@@ -50,28 +49,12 @@ export const themeOptionsSchema = z.strictObject({
 
 type ThemeOptions = z.infer<typeof themeOptionsSchema>;
 
-const CLASS_PREFIX = "syntax__";
-
 export function LanguageSwitch({
   lite,
   className,
 }: ThemeSwitchProps): ReactElement {
-  const [language, setLanguage] = useLocalStorage("language", "rescript", {
-    initializeWithValue: false,
-  });
+  const { setLanguage, language } = useLanguage();
   const mounted = useMounted();
-
-  function selectOption(option) {
-    const root = document.getElementById("root")
-    Array.from(root.classList)
-      .filter((value) => value.startsWith(CLASS_PREFIX))
-      .forEach((cls) => root.classList.remove(cls));
-    root.classList.add(`${CLASS_PREFIX}${option}`);
-  }
-
-  useEffect(() => {
-    selectOption(language);
-  }, [language]);
 
   const options: ThemeOptions = {
     reason: "Reason",
