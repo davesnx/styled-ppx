@@ -37,8 +37,7 @@ let make = () => {
 }
 ```
 ```reason
-module Input = [%styled.input
-  {|
+module Input = [%styled.input {|
   border: 1px solid #cccccc;
   border-radius: 4px;
   padding: 8px;
@@ -48,8 +47,7 @@ module Input = [%styled.input
   &:focus {
     border-color: #aaaaaa;
   }
-|}
-];
+|}];
 
 [@react.component]
 let make = () =>

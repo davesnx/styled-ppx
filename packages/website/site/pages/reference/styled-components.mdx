@@ -23,15 +23,13 @@ module StyledComponent = %styled.div(`
 </StyledComponent>
 ```
 ```reason
-module StyledComponent = [%styled.div
-  {|
+module StyledComponent = [%styled.div {|
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   width: 100vw;
-|}
-];
+|}];
 
 <StyledComponent> {React.string("Hello from the style")} </StyledComponent>;
 ```
@@ -59,8 +57,7 @@ module Input = %styled.input(`
 />
 ```
 ```reason
-module Input = [%styled.input
-  {|
+module Input = [%styled.input {|
   border: 1px solid #cccccc;
   border-radius: 4px;
   padding: 8px;
@@ -68,8 +65,7 @@ module Input = [%styled.input
   &:focus {
     border-color: #aaaaaa;
   }
-|}
-];
+|}];
 
 <Input
   placeholder="Enter your name..."

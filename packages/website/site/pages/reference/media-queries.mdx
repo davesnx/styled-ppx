@@ -19,8 +19,7 @@ let container = %cx(`
 `)
 ```
 ```reason
-let container = [%cx
-  {|
+let container = [%cx {|
   display: grid;
   grid-column-gap: 48px;
   grid-template-columns: repeat(2, 1fr);
@@ -29,8 +28,7 @@ let container = [%cx
   @media screen and (max-width: 767px) {
     grid-template-columns: 100%;
   }
-|}
-];
+|}];
 ```
 
 ## Interpolation in Media queries
@@ -56,8 +54,7 @@ module Media = {
   let mobileDown = "(max-width: 767px)";
 };
 
-let container = [%cx
-  {|
+let container = [%cx {|
   display: grid;
   grid-column-gap: 48px;
   grid-template-columns: repeat(2, 1fr);
@@ -66,6 +63,5 @@ let container = [%cx
   @media screen and $(Media.mobileDown) {
     grid-template-columns: 100%;
   }
-|}
-];
+|}];
 ```

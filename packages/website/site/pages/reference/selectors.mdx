@@ -18,15 +18,13 @@ let link = %cx(`
 `)
 ```
 ```reason
-let link = [%cx
-  {|
+let link = [%cx {|
   color: $(Color.Text.body);
 
   &:hover {
     color: $(Color.Text.accent);
   }
-|}
-];
+|}];
 ```
 > Note: Selectors can be nested within your CSS which will be attached to the classname generated (in this case by `cx`)
 
@@ -62,15 +60,13 @@ let outlined = [%cx {|
   outline: 1px solid red;
 |}];
 
-let link = [%cx
-  {|
+let link = [%cx {|
   color: $(Color.Text.body);
 
   & .$(outlined) {
     padding: 0px;
   }
-|}
-];
+|}];
 
 <div className={(link ++ " ") ++ (if (isActive) {outlined} else {""})} />;
 ```

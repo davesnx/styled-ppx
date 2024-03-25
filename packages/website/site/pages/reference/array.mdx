@@ -21,9 +21,10 @@ module Component = %styled.section([
 let className = %cx([%css("display: flex;")])
 ```
 ```reason
-module Component = [%styled.section
-  [|[%css "display: flex"], [%css "justify-content: center"]|]
-];
+module Component = [%styled.section [|
+  [%css "display: flex"],
+  [%css "justify-content: center"]
+|]];
 
 let className = [%cx [|[%css "display: flex;"]|]];
 ```
@@ -60,8 +61,7 @@ module Button = [%styled.button
 ```
 
 ```rescript
-module Align = %styled.div(
-  (~distribute=#Center, ~align=#Center) => [
+module Align = %styled.div((~distribute=#Center, ~align=#Center) => [
     %css("display: flex"),
     %css("height: 100%"),
     %css("width: 100%;"),
@@ -81,23 +81,21 @@ module Align = %styled.div(
 <Align distribute=#Start align=#Start />
 ```
 ```reason
-module Align = [%styled.div
-  (~distribute=`Center, ~align=`Center) => [|
-    [%css "display: flex"],
-    [%css "height: 100%"],
-    [%css "width: 100%;"],
-    switch (distribute) {
-    | `Start => [%css "justify-content: flex-start"]
-    | `Center => [%css "justify-content: center"]
-    | `End => [%css "justify-content: flex-end"]
-    },
-    switch (align) {
-    | `Start => [%css "align-items: flex-start"]
-    | `Center => [%css "align-items: center"]
-    | `End => [%css "align-items: flex-end"]
-    },
-  |]
-];
+module Align = [%styled.div (~distribute=`Center, ~align=`Center) => [|
+  [%css "display: flex"],
+  [%css "height: 100%"],
+  [%css "width: 100%;"],
+  switch (distribute) {
+  | `Start => [%css "justify-content: flex-start"]
+  | `Center => [%css "justify-content: center"]
+  | `End => [%css "justify-content: flex-end"]
+  },
+  switch (align) {
+  | `Start => [%css "align-items: flex-start"]
+  | `Center => [%css "align-items: center"]
+  | `End => [%css "align-items: flex-end"]
+  },
+|]];
 
 <Align distribute=`Start align=`Start />;
 ```
@@ -107,30 +105,26 @@ module Align = [%styled.div
 There's a nice composability that dynamic components and the Array API provides. You can create a component that can run any code before the styles. It will be called each time the component renders. Such as this example of runtime styles where it derives the color's background button based on a `variant` prop passed to a Theme module.
 
 ```rescript
-module Button = %styled.button(
-  (~variant) => {
-    let color = Theme.button(~variant)
+module Button = %styled.button((~variant) => {
+  let color = Theme.button(~variant)
 
-    [
-      %css("background-color: $(color)"),
-      %css("width: 100%;"),
-      %css("display: inline-flex"),
-    ]
-  }
-)
+  [
+    %css("background-color: $(color)"),
+    %css("width: 100%;"),
+    %css("display: inline-flex"),
+  ]
+})
 ```
 ```reason
-module Button = [%styled.button
-  (~variant) => {
-    let color = Theme.button(~variant);
+module Button = [%styled.button (~variant) => {
+  let color = Theme.button(~variant);
 
-    [|
-      [%css "background-color: $(color)"],
-      [%css "width: 100%;"],
-      [%css "display: inline-flex"],
-    |];
-  }
-];
+  [|
+    [%css "background-color: $(color)"],
+    [%css "width: 100%;"],
+    [%css "display: inline-flex"],
+  |];
+}];
 ```
 
 Note: The returned expression (the last expression of the function) has to be an array of `Css.rules` (it can't be a reference or a function call). This is a limitation of ppxes where it needs to check the current AST to know which type is.

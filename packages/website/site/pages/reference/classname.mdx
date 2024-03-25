@@ -31,15 +31,13 @@ let fullWidth: string = %cx(`
 <div className=fullWidth> {React.string("Hello!")} </div>
 ```
 ```reason
-let fullWidth: string = [%cx
-  {|
+let fullWidth: string = [%cx {|
   position: absolute;
   width: 100%;
   height: 100%;
   top: 0;
   left: 0;
-|}
-];
+|}];
 
 <div className=fullWidth> {React.string("Hello!")} </div>;
 ```
