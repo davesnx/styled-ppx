@@ -4,7 +4,8 @@ To contribute, just clone this repository and run the following command to start
 
 ```bash
 npm install
-npm run dev
+npx turbo build build:tailwind
+npm run dev -w site
 ```
 
 This website uses nextra https://github.com/shuding/nextra
