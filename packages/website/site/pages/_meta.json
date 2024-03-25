@@ -1,9 +1,40 @@
 {
-  "index": "Introduction",
-  "getting-started": "Getting Started",
+  "index": {
+    "title": "Introduction",
+    "theme": {
+      "breadcrumb": false,
+      "toc": false
+    }
+  },
+  "getting-started": {
+    "title": "Getting Started",
+    "theme": {
+      "breadcrumb": false
+    }
+  },
   "reference": "API Reference",
-  "about": "About",
-  "css-support": "CSS Support",
-  "faq": "FAQ",
-  "releases": "Releases"
+  "about": {
+    "title": "About",
+    "theme": {
+      "breadcrumb": false
+    }
+  },
+  "css-support": {
+    "title": "CSS Support",
+    "theme": {
+      "breadcrumb": false
+    }
+  },
+  "faq": {
+    "title": "FAQ",
+    "theme": {
+      "breadcrumb": false
+    }
+  },
+  "releases": {
+    "title": "Releases",
+    "theme": {
+      "breadcrumb": false
+    }
+  }
 }

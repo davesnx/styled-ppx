@@ -32,15 +32,13 @@ let fadeIn = [%keyframe {|
   100% {
     opacity: 1;
   }
-|}
-];
+|}];
 
 module Component = [%styled.div {|
   animation-name: $(fadeIn);
   width: 100px;
   height: 100px;
-|}
-];
+|}];
 ```
 
 - Brackets inside the keyframe declaration are optional. `%keyframe('{ ... }'){:rescript}` `[%keyframe {| { ... } |}]{:reason}` and `%keyframe('...'){:rescript}` `[%keyframe {| ... |}]{:reason}`  are the same.

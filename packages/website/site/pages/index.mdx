@@ -2,7 +2,7 @@
 title: Introduction to styled-ppx
 ---
 
-### Typed styled components for ReScript
+# Typed styled components for ReScript
 
 **styled-ppx** is the [ppx](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem) that brings typed styled components to ReScript, allowing you to create **React Components** with type-safe style definitions that look like good old CSS.
 
@@ -26,8 +26,7 @@ module Center = [%styled.div {|
   display: flex;
   align-items: center;
   justify-content: center;
-|}
-];
+|}];
 
 <Center> {React.string("Hello from the future!")} </Center>;
 ```
