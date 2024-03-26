@@ -6,12 +6,7 @@
       "toc": false
     }
   },
-  "getting-started": {
-    "title": "Getting Started",
-    "theme": {
-      "breadcrumb": false
-    }
-  },
+  "getting-started": "Getting Started",
   "reference": "API Reference",
   "about": {
     "title": "About",
