@@ -7,8 +7,6 @@ import { useLanguage } from "../utils/use-language";
 import Head from "next/head";
 
 export default function Nextra({ Component, pageProps }) {
-  const { language } = useLanguage();
-
   return (
     <>
       <Head>
@@ -37,9 +35,7 @@ export default function Nextra({ Component, pageProps }) {
         />
         <script async src="https://cdn.splitbee.io/sb.js"></script>
       </Head>
-      <main id="root" className={`syntax__${language}`}>
-        <Component {...pageProps} />
-      </main>
+      <Component {...pageProps} />
     </>
   );
 }

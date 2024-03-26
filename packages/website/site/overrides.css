@@ -154,8 +154,8 @@ html.light .logo {
 }
 
 :root {
-  .syntax__rescript :is(pre[data-language="reason"], code[data-language="reason"]),
-  .syntax__reason :is(pre[data-language="rescript"], code[data-language="rescript"]) {
+  .syntax__rescript:not(.show-all-language) :is(pre[data-language="reason"], code[data-language="reason"]),
+  .syntax__reason:not(.show-all-language) :is(pre[data-language="rescript"], code[data-language="rescript"]) {
     display: none;
   }
 }
