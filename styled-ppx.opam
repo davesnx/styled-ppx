@@ -44,5 +44,5 @@ build: [
 ]
 dev-repo: "git+https://github.com/davesnx/styled-ppx.git"
 pin-depends: [
-  ["server-reason-react.dev" "https://github.com/ml-in-barcelona/server-reason-react/archive/04374f5fc974b9da47d8d27acd875f20e208377b.tar.gz"]
+  ["server-reason-react.dev" "git+https://github.com/ml-in-barcelona/server-reason-react.git"]
 ]
