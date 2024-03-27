@@ -2032,7 +2032,7 @@ module Filter = struct
 
   let string_of_amount x =
     match x with
-    | `percent v -> Std.Float.toString v ^ {js|%|js}
+    | `percent v -> Std.Float.toString v
     | `num v -> Std.Float.toString v
 
   let toString x =
