@@ -1096,6 +1096,11 @@ let properties_static_css_tests = [
     [%expr CssJs.fontVariantEmoji(`unicode)],
   ),
   (
+    [%css "text-decoration: var(--bar)"],
+    [%expr [%css "text-decoration: var(--bar)"]],
+    [%expr CssJs.textDecoration(`var({js|--bar|js}))],
+  ),
+  (
     [%css "text-decoration-skip-ink: auto"],
     [%expr [%css "text-decoration-skip-ink: auto"]],
     [%expr CssJs.textDecorationSkipInk(`auto)],

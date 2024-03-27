@@ -2404,6 +2404,7 @@ let render_text_decoration_line =
     (~loc, value: Types.property_text_decoration_line) =>
   switch (value) {
   | `Interpolation(v) => render_variable(~loc, v)
+  | `Function_var(v) => render_var(~loc, v)
   | `None => variant_to_expression(~loc, `None)
   | `Xor([`Underline]) => variant_to_expression(~loc, `Underline)
   | `Xor([`Overline]) => variant_to_expression(~loc, `Overline)
