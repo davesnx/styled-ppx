@@ -1231,19 +1231,19 @@ and property_margin_block = [%value.rec "[ <'margin-left'> ]{1,2}"]
 and property_margin_block_end = [%value.rec "<'margin-left'>"]
 and property_margin_block_start = [%value.rec "<'margin-left'>"]
 and property_margin_bottom = [%value.rec
-  "<extended-length> | <extended-percentage> | 'auto'"
+  "<extended-length> | <extended-percentage> | 'auto' | <var()>"
 ]
 and property_margin_inline = [%value.rec "[ <'margin-left'> ]{1,2}"]
 and property_margin_inline_end = [%value.rec "<'margin-left'>"]
 and property_margin_inline_start = [%value.rec "<'margin-left'>"]
 and property_margin_left = [%value.rec
-  "<extended-length> | <extended-percentage> | 'auto'"
+  "<extended-length> | <extended-percentage> | 'auto' | <var()>"
 ]
 and property_margin_right = [%value.rec
-  "<extended-length> | <extended-percentage> | 'auto'"
+  "<extended-length> | <extended-percentage> | 'auto' | <var()>"
 ]
 and property_margin_top = [%value.rec
-  "<extended-length> | <extended-percentage> | 'auto'"
+  "<extended-length> | <extended-percentage> | 'auto' | <var()> "
 ]
 and property_margin_trim = [%value.rec "'none' | 'in-flow' | 'all'"]
 and property_marker = [%value.rec "'none' | <url>"]

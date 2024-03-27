@@ -587,7 +587,8 @@ let render_margin = (~loc) =>
   fun
   | `Auto => variant_to_expression(~loc, `Auto)
   | `Extended_length(l) => render_extended_length(~loc, l)
-  | `Extended_percentage(p) => render_extended_percentage(~loc, p);
+  | `Extended_percentage(p) => render_extended_percentage(~loc, p)
+  | `Function_var(v) => render_var(~loc, v);
 
 let render_padding = (~loc) =>
   fun
