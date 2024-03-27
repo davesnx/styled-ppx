@@ -55,6 +55,11 @@ let properties_static_css_tests = [
     [%expr CssJs.height(`vh(100.))],
   ),
   (
+    [%css "height: var(--foo)"],
+    [%expr [%css "height: var(--foo)"]],
+    [%expr CssJs.height(`var({js|--foo|js}))],
+  ),
+  (
     [%css "margin: 0"],
     [%expr [%css "margin: 0"]],
     [%expr CssJs.margin(`zero)],

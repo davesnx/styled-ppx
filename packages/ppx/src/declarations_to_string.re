@@ -255,6 +255,10 @@ let render_length_percentage =
   | `Extended_percentage(percentage) =>
     render_extended_percentage(percentage);
 
+let render_var = string => {
+  render_string(string);
+};
+
 let render_size =
   fun
   | `Auto => variants_to_string(`Auto)
@@ -263,6 +267,7 @@ let render_size =
   | `Max_content => [%expr "max-content"]
   | `Min_content => [%expr "min-content"]
   | `Fit_content_0 => [%expr "fit-content"]
+  | `Function_var(v) => render_var(v)
   | `Fit_content_1(lp) => render_length_percentage(lp);
 
 let render_css_global_values = (name, value) => {

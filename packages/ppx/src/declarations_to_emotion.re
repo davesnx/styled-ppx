@@ -433,6 +433,11 @@ let render_length_percentage = (~loc) =>
   | `Extended_length(ext) => render_extended_length(~loc, ext)
   | `Extended_percentage(ext) => render_extended_percentage(~loc, ext);
 
+let render_var = (~loc, string) => {
+  let string = render_string(~loc, string);
+  [%expr `var([%e string])];
+};
+
 // css-sizing-3
 let render_size = (~loc) =>
   fun
@@ -442,6 +447,7 @@ let render_size = (~loc) =>
   | `Fit_content_0 => variant_to_expression(~loc, `FitContent)
   | `Max_content => variant_to_expression(~loc, `MaxContent)
   | `Min_content => variant_to_expression(~loc, `MinContent)
+  | `Function_var(v) => render_var(~loc, v)
   | `Fit_content_1(_)
   | _ => raise(Unsupported_feature);
 
@@ -996,11 +1002,6 @@ let render_function_hsla = (~loc, (hue, saturation, lightness, alpha)) => {
     )
   | None => id([%expr `hsl(([%e hue], [%e saturation], [%e lightness]))])
   };
-};
-
-let render_var = (~loc, string) => {
-  let string = render_string(~loc, string);
-  [%expr `var([%e string])];
 };
 
 let rec render_color = (~loc, value) =>
