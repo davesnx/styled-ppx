@@ -2032,14 +2032,14 @@ module Filter = struct
 
   let string_of_amount x =
     match x with
-    | `percent v -> Std.Float.toString v
+    | `percent v -> Std.Float.toString v ^ {js|%|js}
     | `num v -> Std.Float.toString v
 
   let toString x =
     match x with
     | `blur v -> {js|blur(|js} ^ Length.toString v ^ {js|)|js}
-    | `brightness v -> {js|brightness(|js} ^ string_of_amount v ^ {js|%)|js}
-    | `contrast v -> {js|contrast(|js} ^ string_of_amount v ^ {js|%)|js}
+    | `brightness v -> {js|brightness(|js} ^ string_of_amount v ^ {js|)|js}
+    | `contrast v -> {js|contrast(|js} ^ string_of_amount v ^ {js|)|js}
     | `dropShadow (a, b, c, d) ->
       {js|drop-shadow(|js}
       ^ Length.toString a
@@ -2052,12 +2052,12 @@ module Filter = struct
         | #Color.t as c -> Color.toString c
         | #Var.t as v -> Var.toString v)
       ^ {js|)|js}
-    | `grayscale v -> {js|grayscale(|js} ^ string_of_amount v ^ {js|%)|js}
+    | `grayscale v -> {js|grayscale(|js} ^ string_of_amount v ^ {js|)|js}
     | `hueRotate v -> {js|hue-rotate(|js} ^ Angle.toString v ^ {js|)|js}
-    | `invert v -> {js|invert(|js} ^ string_of_amount v ^ {js|%)|js}
-    | `opacity v -> {js|opacity(|js} ^ string_of_amount v ^ {js|%)|js}
-    | `saturate v -> {js|saturate(|js} ^ string_of_amount v ^ {js|%)|js}
-    | `sepia v -> {js|sepia(|js} ^ string_of_amount v ^ {js|%)|js}
+    | `invert v -> {js|invert(|js} ^ string_of_amount v ^ {js|)|js}
+    | `opacity v -> {js|opacity(|js} ^ string_of_amount v ^ {js|)|js}
+    | `saturate v -> {js|saturate(|js} ^ string_of_amount v ^ {js|)|js}
+    | `sepia v -> {js|sepia(|js} ^ string_of_amount v ^ {js|)|js}
     | `none -> {js|none|js}
     | #Url.t as u -> Url.toString u
     | #Var.t as va -> Var.toString va
