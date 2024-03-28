@@ -959,7 +959,7 @@
       | Some(str) => " " ++ str
       | None => ""
       };
-    let deleteProp = [%raw "(newProps, key) => delete newProps[key]"];
+    let deleteProp = [%mel.raw "(newProps, key) => delete newProps[key]"];
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles = CssJs.style([|CssJs.label("SelfClosingElement")|]);

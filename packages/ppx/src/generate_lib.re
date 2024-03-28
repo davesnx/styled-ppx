@@ -618,8 +618,29 @@ let makeProps = (~loc, customProps) => {
   };
 };
 
+/* [%mel.raw payload] */
+let rawExtension = (~loc, payload) => {
+  let ext_name =
+    switch (File.get()) {
+    | Some(ReScript) => "raw"
+    | _ => "mel.raw"
+    };
+
+  Helper.Exp.extension(
+    ~loc,
+    (
+      withLoc(~loc, ext_name),
+      PStr([Helper.Str.eval(~loc, Builder.estring(~loc, payload))]),
+    ),
+  );
+};
+
 let defineDeletePropFn = (~loc) => {
-  [%stri let deleteProp = [%raw "(newProps, key) => delete newProps[key]"]];
+  [%stri
+    let deleteProp = [%e
+      rawExtension(~loc, "(newProps, key) => delete newProps[key]")
+    ]
+  ];
 };
 
 /* [%stri external assign2 : Js.t({ .. }) => Js.t({ .. }) => Js.t({ .. }) => Js.t({ .. }) = "Object.assign"] */
