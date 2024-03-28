@@ -360,7 +360,8 @@ describe("GridArea", () => {
     expect([%css("grid-area: 1")])->toBe({"gridArea": "1"})
     expect([%css("grid-area: 1 a")])->toBe({"gridArea": "1 a"})
     expect([%css("grid-area: span 1")])->toBe({"gridArea": "span 1"})
-    // expect([%css("grid-area: span a")])->toBe({"gridArea": "span a"})
+    /* expect([%css("grid-area: span 1 a")])->toBe({"gridArea": "span 1 a"})
+     expect([%css("grid-area: span a")])->toBe({"gridArea": "span a"}) */
     expect([%css("grid-area: inherit")])->toBe({"grid-area": "inherit"})
     expect([%css("grid-area: initial")])->toBe({"grid-area": "initial"})
     expect([%css("grid-area: unset")])->toBe({"grid-area": "unset"})
@@ -605,18 +606,18 @@ describe("counter", () => {
   test("test reset", _ => {
     expect([%css("counter-reset: none")])->toBe({"counterReset": "none"})
     expect([%css("counter-reset: foo 2")])->toBe({"counterReset": "foo 2"})
-    // expect([%css("counter-reset: var(--bar)")])->toBe({"counterReset": "var(--bar)"})
+    expect([%css("counter-reset: var(--bar)")])->toBe({"counterReset": "var(--bar)"})
   })
 
   test("test set", _ => {
     expect([%css("counter-set: none")])->toBe({"counterSet": "none"})
     expect([%css("counter-set: foo 2")])->toBe({"counterSet": "foo 2"})
-    // expect([%css("counter-set: var(--bar)")])->toBe({"counterSet": "var(--bar)"})
+    expect([%css("counter-set: var(--bar)")])->toBe({"counterSet": "var(--bar)"})
   })
 
   test("test increment", _ => {
     expect([%css("counter-increment: none")])->toBe({"counterIncrement": "none"})
     expect([%css("counter-increment: foo 2")])->toBe({"counterIncrement": "foo 2"})
-    // expect([%css("counter-increment: var(--bar)")])->toBe({"counterIncrement": "var(--bar)"})
+    expect([%css("counter-increment: var(--bar)")])->toBe({"counterIncrement": "var(--bar)"})
   })
 })

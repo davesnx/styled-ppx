@@ -1019,13 +1019,13 @@ and property_content = [%value.rec
   "'normal' | 'none' | [ <content-replacement> | <content-list> ] [ '/' <string> ]?"
 ]
 and property_counter_increment = [%value.rec
-  "[ <custom-ident> [ <integer> ]? ]+ | 'none'"
+  "[ <custom-ident> [ <integer> ]? ]+ | 'none' | <var()>"
 ]
 and property_counter_reset = [%value.rec
-  "[ <custom-ident> [ <integer> ]? ]+ | 'none'"
+  "[ <custom-ident> [ <integer> ]? ]+ | 'none' | <var()>"
 ]
 and property_counter_set = [%value.rec
-  "[ <custom-ident> [ <integer> ]? ]+ | 'none'"
+  "[ <custom-ident> [ <integer> ]? ]+ | 'none' | <var()>"
 ]
 and property_cue = [%value.rec "<'cue-before'> [ <'cue-after'> ]?"]
 and property_cue_after = [%value.rec "<url> [ <decibel> ]? | 'none'"]
