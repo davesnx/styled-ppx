@@ -1164,7 +1164,7 @@ and property_hanging_punctuation = [%value.rec
   "'none' | 'first' || [ 'force-end' | 'allow-end' ] || 'last'"
 ]
 and property_height = [%value.rec
-  "'auto' | <extended-length> | <var()> | <extended-percentage> | 'min-content' | 'max-content' | 'fit-content' | fit-content( <extended-length> | <extended-percentage> )"
+  "'auto' | <extended-length> | <extended-percentage> | 'min-content' | 'max-content' | 'fit-content' | fit-content( <extended-length> | <extended-percentage> )"
 ]
 and property_hyphens = [%value.rec "'none' | 'manual' | 'auto'"]
 and property_image_orientation = [%value.rec
@@ -1231,19 +1231,19 @@ and property_margin_block = [%value.rec "[ <'margin-left'> ]{1,2}"]
 and property_margin_block_end = [%value.rec "<'margin-left'>"]
 and property_margin_block_start = [%value.rec "<'margin-left'>"]
 and property_margin_bottom = [%value.rec
-  "<extended-length> | <extended-percentage> | 'auto' | <var()>"
+  "<extended-length> | <extended-percentage> | 'auto'"
 ]
 and property_margin_inline = [%value.rec "[ <'margin-left'> ]{1,2}"]
 and property_margin_inline_end = [%value.rec "<'margin-left'>"]
 and property_margin_inline_start = [%value.rec "<'margin-left'>"]
 and property_margin_left = [%value.rec
-  "<extended-length> | <extended-percentage> | 'auto' | <var()>"
+  "<extended-length> | <extended-percentage> | 'auto'"
 ]
 and property_margin_right = [%value.rec
-  "<extended-length> | <extended-percentage> | 'auto' | <var()>"
+  "<extended-length> | <extended-percentage> | 'auto'"
 ]
 and property_margin_top = [%value.rec
-  "<extended-length> | <extended-percentage> | 'auto' | <var()> "
+  "<extended-length> | <extended-percentage> | 'auto'"
 ]
 and property_margin_trim = [%value.rec "'none' | 'in-flow' | 'all'"]
 and property_marker = [%value.rec "'none' | <url>"]
@@ -1279,7 +1279,7 @@ and property_mask_size = [%value.rec "[ <bg-size> ]#"]
 and property_mask_type = [%value.rec "'luminance' | 'alpha'"]
 and property_max_block_size = [%value.rec "<'max-width'>"]
 and property_max_height = [%value.rec
-  "'auto' | <extended-length> | <extended-percentage>| <var()> | 'min-content' | 'max-content' | 'fit-content' | fit-content( <extended-length> | <extended-percentage> )"
+  "'auto' | <extended-length> | <extended-percentage> | 'min-content' | 'max-content' | 'fit-content' | fit-content( <extended-length> | <extended-percentage> )"
 ]
 and property_max_inline_size = [%value.rec "<'max-width'>"]
 and property_max_lines = [%value.rec "'none' | <integer>"]
@@ -1713,7 +1713,7 @@ and property_white_space = [%value.rec
 ]
 and property_widows = [%value.rec "<integer>"]
 and property_width = [%value.rec
-  "'auto' | <var()> | <extended-length> | <extended-percentage> | 'min-content' | 'max-content' | 'fit-content' | fit-content( <extended-length> | <extended-percentage> )"
+  "'auto' | <extended-length> | <extended-percentage> | 'min-content' | 'max-content' | 'fit-content' | fit-content( <extended-length> | <extended-percentage> )"
 ]
 and property_will_change = [%value.rec "'auto' | [ <animateable-feature> ]#"]
 and property_word_break = [%value.rec
@@ -1814,19 +1814,19 @@ and target = [%value.rec
   "<target-counter()> | <target-counters()> | <target-text()>"
 ]
 and extended_length = [%value.rec
-  "<length> | <calc()> | <interpolation> | <min()> | <max()>"
+  "<length> | <calc()> | <interpolation> | <min()> | <max()> | <var()>"
 ]
 and extended_frequency = [%value.rec
-  "<frequency> | <calc()> | <interpolation> | <min()> | <max()>"
+  "<frequency> | <calc()> | <interpolation> | <min()> | <max()> | <var()>"
 ]
 and extended_angle = [%value.rec
-  "<angle> | <calc()> | <interpolation> | <min()> | <max()>"
+  "<angle> | <calc()> | <interpolation> | <min()> | <max()> | <var()>"
 ]
 and extended_time = [%value.rec
-  "<time> | <calc()> | <interpolation> | <min()> | <max()>"
+  "<time> | <calc()> | <interpolation> | <min()> | <max()> | <var()>"
 ]
 and extended_percentage = [%value.rec
-  "<percentage> | <calc()> | <interpolation> | <min()> | <max()> "
+  "<percentage> | <calc()> | <interpolation> | <min()> | <max()> | <var()>"
 ]
 and timing_function = [%value.rec
   "'linear' | <cubic-bezier-timing-function> | <step-timing-function>"

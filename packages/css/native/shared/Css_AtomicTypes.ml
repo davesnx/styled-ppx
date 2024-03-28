@@ -2364,6 +2364,12 @@ module Gradient = struct
       ]
     ]
 
+  (* TODO: Fix inconsistencies on [Gradient.t]
+     For example the following do not compile;
+     - "background-image: linear-gradient(#e66465, #9198e5)"
+     - "background: linear-gradient(45deg, #FF0000 0, #0000FF 100%)"
+     - et cetera
+  *)
   type t =
     [ `linearGradient of
       direction option * ([ Color.t | Var.t ] * Length.t option) array

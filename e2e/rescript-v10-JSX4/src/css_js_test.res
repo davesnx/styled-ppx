@@ -441,7 +441,8 @@ describe("backgroundImage", () =>
   test("test values", _ => {
     expect([%css("background-image: none")])->toBe({"backgroundImage": "none"})
     expect([%css("background-image: url(x)")])->toBe({"backgroundImage": "url(x)"})
-    /* expect([%css("background-image: linear-gradient(5deg, #FF0000 10%)")])->toBe({
+    /* TODO: The following tests don't compile because of type inconsistencies in [Gradient.t]
+     expect([%css("background-image: linear-gradient(5deg, #FF0000 10%)")])->toBe({
       "backgroundImage": "linear-gradient(5deg, #FF0000 10%)",
     })
     expect([%css("background-image: repeating-linear-gradient(6rad, #000000 20%)")])->toBe({
@@ -456,7 +457,8 @@ describe("backgroundImage", () =>
   })
 )
 
-/* describe("Gradient background", () =>
+/* TODO: The following tests don't compile because of type inconsistencies in [Gradient.t]
+ describe("Gradient background", () =>
   test("test values", _ => {
     expect([%css("background: linear-gradient(45deg, #FF0000 0, #0000FF 100%)")])->toBe({
       "background": "linear-gradient(45deg, #FF0000 0, #0000FF 100%)",

@@ -217,6 +217,7 @@ and render_extended_time =
   | `Interpolation(v) => render_variable(v)
   | `Function_min(values) => render_function_min(values)
   | `Function_max(values) => render_function_max(values)
+  | `Function_var(v) => render_var(v)
 
 and render_angle =
   fun
@@ -224,6 +225,9 @@ and render_angle =
   | `Rad(number)
   | `Grad(number)
   | `Turn(number) => render_number(number, "")
+and render_var = string => {
+  render_string(string);
+}
 
 and render_extended_angle =
   fun
@@ -232,6 +236,7 @@ and render_extended_angle =
   | `Interpolation(i) => render_variable(i)
   | `Function_min(values) => render_function_min(values)
   | `Function_max(values) => render_function_max(values)
+  | `Function_var(v) => render_var(v)
 
 and render_extended_length =
   fun
@@ -240,6 +245,7 @@ and render_extended_length =
   | `Function_min(values) => render_function_min(values)
   | `Function_max(values) => render_function_max(values)
   | `Interpolation(i) => render_variable(i)
+  | `Function_var(v) => render_var(v)
 
 and render_extended_percentage =
   fun
@@ -247,17 +253,15 @@ and render_extended_percentage =
   | `Function_calc(fc) => render_function_calc(fc)
   | `Interpolation(i) => render_variable(i)
   | `Function_min(values) => render_function_min(values)
-  | `Function_max(values) => render_function_max(values);
+  | `Function_max(values) => render_function_max(values)
+  | `Function_var(v) => render_var(v);
 
 let render_length_percentage =
   fun
   | `Extended_length(length) => render_extended_length(length)
   | `Extended_percentage(percentage) =>
-    render_extended_percentage(percentage);
-
-let render_var = string => {
-  render_string(string);
-};
+    render_extended_percentage(percentage)
+  | `Function_var(v) => render_var(v);
 
 let render_size =
   fun
@@ -267,7 +271,6 @@ let render_size =
   | `Max_content => [%expr "max-content"]
   | `Min_content => [%expr "min-content"]
   | `Fit_content_0 => [%expr "fit-content"]
-  | `Function_var(v) => render_var(v)
   | `Fit_content_1(lp) => render_length_percentage(lp);
 
 let render_css_global_values = (name, value) => {
