@@ -156,7 +156,7 @@ let backfaceVisibility x =
 let backdropFilter x =
   D
     ( {js|backdrop-filter|js},
-      x |. Std.List.map Filter.toString |. Std.List.joinWith ~sep:{js|, |js} )
+      x |. Std.List.map Filter.toString |. Std.List.joinWith ~sep:{js| |js} )
 
 let backgroundAttachment x =
   D

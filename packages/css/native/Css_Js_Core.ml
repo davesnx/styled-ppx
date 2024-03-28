@@ -157,8 +157,7 @@ let backfaceVisibility x =
 let backdropFilter x =
   D
     ( {js|backdrop-filter|js},
-      x |. Std.Array.map Filter.toString |. Std.Array.joinWith ~sep:{js|, |js}
-    )
+      x |. Std.Array.map Filter.toString |. Std.Array.joinWith ~sep:{js| |js} )
 
 let () =
   let _ = backdropFilter [| `none |] in
