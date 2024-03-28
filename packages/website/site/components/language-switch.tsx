@@ -3,6 +3,7 @@ import type { ReactElement } from "react";
 import { z } from "zod";
 import { Select } from "./select";
 import { useLanguage } from "../utils/use-language";
+import { useConfig } from "nextra-theme-docs";
 
 function ReScriptIcon() {
   return (
@@ -53,6 +54,7 @@ export function LanguageSwitch({
   lite,
   className,
 }: ThemeSwitchProps): ReactElement {
+  const { frontMatter } = useConfig()
   const { setLanguage, language } = useLanguage();
   const mounted = useMounted();
 
@@ -62,6 +64,10 @@ export function LanguageSwitch({
   };
 
   const IconToUse = mounted && language == "reason" ? ReasonIcon : ReScriptIcon;
+
+  if (frontMatter.showAllLanguage) {
+    return null
+  }
 
   return (
     <Select

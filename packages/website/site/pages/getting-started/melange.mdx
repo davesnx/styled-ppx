@@ -1,0 +1,75 @@
+---
+title: Getting Started - Melange
+showAllLanguage: true
+---
+
+import { Callout } from 'nextra/components'
+import Link from 'next/link'
+
+# Melange
+
+Depends on [rescript-react](https://github.com/rescript-lang/rescript-react). Please make sure you have it installed first.
+
+### Install
+
+```bash
+yarn add @davesnx/styled-ppx
+# Or
+npm install @davesnx/styled-ppx
+```
+
+### Update `bsconfig.json`
+
+Add `"@davesnx/styled-ppx/ppx"{:json}` under bsconfig `"ppx-flags"{:json}`.
+The diff on `bsconfig.json` should contain the following:
+
+```diff
+{
+  "bs-dependencies": [
+    "@rescript/react",
++   "@davesnx/styled-ppx/css",
++   "@davesnx/styled-ppx/emotion"
+  ],
++ "ppx-flags": ["@davesnx/styled-ppx/ppx"]
+}
+```
+
+(Added in v0.40.0)
+- `@davesnx/styled-ppx/css` are the CSS bindings.
+- `@davesnx/styled-ppx/emotion` are the bindings to `emotion.sh`.
+
+### Example
+
+```reason
+module Link = [%styled.a (~color=CssJs.hex("4299E1")) => {|
+  font-size: 1.875rem;
+  line-height: 1.5;
+  text-decoration: none;
+  margin: 0px;
+  padding: 10px 0px;
+  color: $(color);
+|}];
+
+module Layout = [%styled.div [|
+  [%css "display: flex"],
+  [%css "width: 100%;"],
+  [%css "height: 100%;"],
+  [%css "justify-content: center;"],
+  [%css "align-items: center"],
+|]];
+
+/* Later in a component */
+<Layout>
+  <Link
+    color={CssJs.hex("333333")}
+    href="https://sancho.dev"
+    rel="noopener noreferrer"
+  />
+  <span className=[%cx {|color: black; position: absolute; left: 0px;|}]>
+    {React.string("sancho.dev")}
+  </span>
+</Layout>;
+```
+
+### Playground
+If you want to try it out, just fork https://github.com/davesnx/try-styled-ppx and follow the installation instructions there.

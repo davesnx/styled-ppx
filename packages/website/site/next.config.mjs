@@ -61,6 +61,13 @@ const styledPpxReasonGrammar = {
   injectTo: ["source.reason"],
 };
 
+const duneGrammar = {
+  ...JSON.parse(
+    Fs.readFileSync(Path.join(syntaxes, "dune.tmLanguage.json"), "utf8")
+  ),
+  name: "dune",
+};
+
 const withNextra = nextra({
   theme: "nextra-theme-docs",
   themeConfig: "./theme.config.tsx",
@@ -78,6 +85,7 @@ const withNextra = nextra({
             styledPpxOCamlGrammar,
             styledPpxReScriptGrammar,
             styledPpxReasonGrammar,
+            duneGrammar,
           ],
         }),
     },

@@ -1,4 +1,7 @@
+import { useConfig } from "nextra-theme-docs";
 import { LanguageSwitch } from "./components/language-switch";
+import { useLanguage } from "./utils/use-language";
+import cn from "clsx";
 
 let Logo = () => {
   return (
@@ -91,6 +94,21 @@ export default {
   darkMode: true,
   logo: Logo,
   head: Head,
+  main: ({ children }) => {
+    const { frontMatter } = useConfig();
+    const { language } = useLanguage();
+
+    return (
+      <div
+        className={cn(
+          `syntax__${language}`,
+          frontMatter.showAllLanguage && "show-all-language"
+        )}
+      >
+        {children}
+      </div>
+    );
+  },
   feedback: {
     labels: "feedback",
   },
