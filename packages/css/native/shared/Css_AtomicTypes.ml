@@ -2038,8 +2038,8 @@ module Filter = struct
   let toString x =
     match x with
     | `blur v -> {js|blur(|js} ^ Length.toString v ^ {js|)|js}
-    | `brightness v -> {js|brightness(|js} ^ string_of_amount v ^ {js|%)|js}
-    | `contrast v -> {js|contrast(|js} ^ string_of_amount v ^ {js|%)|js}
+    | `brightness v -> {js|brightness(|js} ^ string_of_amount v ^ {js|)|js}
+    | `contrast v -> {js|contrast(|js} ^ string_of_amount v ^ {js|)|js}
     | `dropShadow (a, b, c, d) ->
       {js|drop-shadow(|js}
       ^ Length.toString a
@@ -2052,12 +2052,12 @@ module Filter = struct
         | #Color.t as c -> Color.toString c
         | #Var.t as v -> Var.toString v)
       ^ {js|)|js}
-    | `grayscale v -> {js|grayscale(|js} ^ string_of_amount v ^ {js|%)|js}
+    | `grayscale v -> {js|grayscale(|js} ^ string_of_amount v ^ {js|)|js}
     | `hueRotate v -> {js|hue-rotate(|js} ^ Angle.toString v ^ {js|)|js}
-    | `invert v -> {js|invert(|js} ^ string_of_amount v ^ {js|%)|js}
-    | `opacity v -> {js|opacity(|js} ^ string_of_amount v ^ {js|%)|js}
-    | `saturate v -> {js|saturate(|js} ^ string_of_amount v ^ {js|%)|js}
-    | `sepia v -> {js|sepia(|js} ^ string_of_amount v ^ {js|%)|js}
+    | `invert v -> {js|invert(|js} ^ string_of_amount v ^ {js|)|js}
+    | `opacity v -> {js|opacity(|js} ^ string_of_amount v ^ {js|)|js}
+    | `saturate v -> {js|saturate(|js} ^ string_of_amount v ^ {js|)|js}
+    | `sepia v -> {js|sepia(|js} ^ string_of_amount v ^ {js|)|js}
     | `none -> {js|none|js}
     | #Url.t as u -> Url.toString u
     | #Var.t as va -> Var.toString va
@@ -2364,6 +2364,12 @@ module Gradient = struct
       ]
     ]
 
+  (* TODO: Fix inconsistencies on [Gradient.t]
+     For example the following do not compile;
+     - "background-image: linear-gradient(#e66465, #9198e5)"
+     - "background: linear-gradient(45deg, #FF0000 0, #0000FF 100%)"
+     - et cetera
+  *)
   type t =
     [ `linearGradient of
       direction option * ([ Color.t | Var.t ] * Length.t option) array

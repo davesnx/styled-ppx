@@ -376,7 +376,10 @@ and render_angle = (~loc) =>
   | `Rad(number) => id([%expr `rad([%e render_float(~loc, number)])])
   | `Grad(number) => id([%expr `grad([%e render_float(~loc, number)])])
   | `Turn(number) => id([%expr `turn([%e render_float(~loc, number)])])
-
+and render_var = (~loc, string) => {
+  let string = render_string(~loc, string);
+  [%expr `var([%e string])];
+}
 and render_extended_angle = (~loc) =>
   fun
   | `Angle(a) => render_angle(~loc, a)
@@ -384,6 +387,7 @@ and render_extended_angle = (~loc) =>
   | `Interpolation(i) => render_variable(~loc, i)
   | `Function_min(values) => render_function_min(~loc, values)
   | `Function_max(values) => render_function_max(~loc, values)
+  | `Function_var(v) => render_var(~loc, v)
 
 and render_time_as_int = (~loc) =>
   fun
@@ -403,6 +407,7 @@ and render_extended_time = (~loc) =>
   | `Interpolation(v) => render_variable(~loc, v)
   | `Function_min(values) => render_function_min(~loc, values)
   | `Function_max(values) => render_function_max(~loc, values)
+  | `Function_var(v) => render_var(~loc, v)
 
 and render_calc_value = (~loc, calc_value) => {
   switch ((calc_value: Types.calc_value)) {
@@ -420,13 +425,15 @@ and render_extended_length = (~loc) =>
   | `Function_min(values) => render_function_min(~loc, values)
   | `Function_max(values) => render_function_max(~loc, values)
   | `Interpolation(i) => render_variable(~loc, i)
+  | `Function_var(v) => render_var(~loc, v)
 and render_extended_percentage = (~loc) =>
   fun
   | `Percentage(p) => render_percentage(~loc, p)
   | `Function_calc(fc) => render_function_calc(~loc, fc)
   | `Interpolation(i) => render_variable(~loc, i)
   | `Function_min(values) => render_function_min(~loc, values)
-  | `Function_max(values) => render_function_max(~loc, values);
+  | `Function_max(values) => render_function_max(~loc, values)
+  | `Function_var(v) => render_var(~loc, v);
 
 let render_length_percentage = (~loc) =>
   fun
@@ -496,14 +503,6 @@ let render_angle = (~loc) =>
   | `Rad(number) => id([%expr `rad([%e render_float(~loc, number)])])
   | `Grad(number) => id([%expr `grad([%e render_float(~loc, number)])])
   | `Turn(number) => id([%expr `turn([%e render_float(~loc, number)])]);
-
-let render_extended_angle = (~loc) =>
-  fun
-  | `Angle(a) => render_angle(~loc, a)
-  | `Function_calc(fc) => render_function_calc(~loc, fc)
-  | `Interpolation(i) => render_variable(~loc, i)
-  | `Function_min(values) => render_function_min(~loc, values)
-  | `Function_max(values) => render_function_max(~loc, values);
 
 let render_side_or_corner = (~loc, value: Types.side_or_corner) => {
   switch (value) {
@@ -871,7 +870,8 @@ let render_function_rgb = (~loc, ast: Types.function_rgb) => {
     | `Interpolation(v) => render_variable(~loc, v)
     | `Extended_percentage(ext) => render_extended_percentage(~loc, ext)
     | `Function_min(values) => render_function_min(~loc, values)
-    | `Function_max(values) => render_function_max(~loc, values);
+    | `Function_max(values) => render_function_max(~loc, values)
+    | `Function_var(v) => render_var(~loc, v);
 
   let (colors, alpha) =
     switch (ast) {
@@ -913,7 +913,8 @@ let render_function_rgba = (~loc, ast: Types.function_rgba) => {
     | `Interpolation(v) => render_variable(~loc, v)
     | `Extended_percentage(ext) => render_extended_percentage(~loc, ext)
     | `Function_min(values) => render_function_min(~loc, values)
-    | `Function_max(values) => render_function_max(~loc, values);
+    | `Function_max(values) => render_function_max(~loc, values)
+    | `Function_var(v) => render_var(~loc, v);
 
   let (colors, alpha) =
     switch (ast) {
@@ -996,11 +997,6 @@ let render_function_hsla = (~loc, (hue, saturation, lightness, alpha)) => {
     )
   | None => id([%expr `hsl(([%e hue], [%e saturation], [%e lightness]))])
   };
-};
-
-let render_var = (~loc, string) => {
-  let string = render_string(~loc, string);
-  [%expr `var([%e string])];
 };
 
 let rec render_color = (~loc, value) =>
@@ -2402,6 +2398,7 @@ let render_text_decoration_line =
     (~loc, value: Types.property_text_decoration_line) =>
   switch (value) {
   | `Interpolation(v) => render_variable(~loc, v)
+  | `Function_var(v) => render_var(~loc, v)
   | `None => variant_to_expression(~loc, `None)
   | `Xor([`Underline]) => variant_to_expression(~loc, `Underline)
   | `Xor([`Overline]) => variant_to_expression(~loc, `Overline)

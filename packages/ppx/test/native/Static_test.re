@@ -55,6 +55,11 @@ let properties_static_css_tests = [
     [%expr CssJs.height(`vh(100.))],
   ),
   (
+    [%css "height: var(--foo)"],
+    [%expr [%css "height: var(--foo)"]],
+    [%expr CssJs.height(`var({js|--foo|js}))],
+  ),
+  (
     [%css "margin: 0"],
     [%expr [%css "margin: 0"]],
     [%expr CssJs.margin(`zero)],
@@ -1089,6 +1094,11 @@ let properties_static_css_tests = [
     [%css "font-variant-emoji: unicode"],
     [%expr [%css "font-variant-emoji: unicode"]],
     [%expr CssJs.fontVariantEmoji(`unicode)],
+  ),
+  (
+    [%css "text-decoration: var(--bar)"],
+    [%expr [%css "text-decoration: var(--bar)"]],
+    [%expr CssJs.textDecoration(`var({js|--bar|js}))],
   ),
   (
     [%css "text-decoration-skip-ink: auto"],

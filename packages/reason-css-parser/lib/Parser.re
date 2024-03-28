@@ -1019,13 +1019,13 @@ and property_content = [%value.rec
   "'normal' | 'none' | [ <content-replacement> | <content-list> ] [ '/' <string> ]?"
 ]
 and property_counter_increment = [%value.rec
-  "[ <custom-ident> [ <integer> ]? ]+ | 'none'"
+  "[ <custom-ident> [ <integer> ]? ]+ | 'none' | <var()>"
 ]
 and property_counter_reset = [%value.rec
-  "[ <custom-ident> [ <integer> ]? ]+ | 'none'"
+  "[ <custom-ident> [ <integer> ]? ]+ | 'none' | <var()>"
 ]
 and property_counter_set = [%value.rec
-  "[ <custom-ident> [ <integer> ]? ]+ | 'none'"
+  "[ <custom-ident> [ <integer> ]? ]+ | 'none' | <var()>"
 ]
 and property_cue = [%value.rec "<'cue-before'> [ <'cue-after'> ]?"]
 and property_cue_after = [%value.rec "<url> [ <decibel> ]? | 'none'"]
@@ -1596,7 +1596,7 @@ and property_text_decoration_color = [%value.rec "<color>"]
 /* and this definition has changed from the origianl, it might be a bug on the spec or our Generator,
    but simplifying to "|" simplifies it and solves the bug */
 and property_text_decoration_line = [%value.rec
-  "'none' | <interpolation> | [ 'underline' | 'overline' | 'line-through' | 'blink' ]{1,2}"
+  "'none' | <interpolation> | <var()>| [ 'underline' | 'overline' | 'line-through' | 'blink' ]{1,2}"
 ]
 and property_text_decoration_skip = [%value.rec
   "'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' ] || 'edges' || 'box-decoration'"
@@ -1814,19 +1814,19 @@ and target = [%value.rec
   "<target-counter()> | <target-counters()> | <target-text()>"
 ]
 and extended_length = [%value.rec
-  "<length> | <calc()> | <interpolation> | <min()> | <max()>"
+  "<length> | <calc()> | <interpolation> | <min()> | <max()> | <var()>"
 ]
 and extended_frequency = [%value.rec
-  "<frequency> | <calc()> | <interpolation> | <min()> | <max()>"
+  "<frequency> | <calc()> | <interpolation> | <min()> | <max()> | <var()>"
 ]
 and extended_angle = [%value.rec
-  "<angle> | <calc()> | <interpolation> | <min()> | <max()>"
+  "<angle> | <calc()> | <interpolation> | <min()> | <max()> | <var()>"
 ]
 and extended_time = [%value.rec
-  "<time> | <calc()> | <interpolation> | <min()> | <max()>"
+  "<time> | <calc()> | <interpolation> | <min()> | <max()> | <var()>"
 ]
 and extended_percentage = [%value.rec
-  "<percentage> | <calc()> | <interpolation> | <min()> | <max()> "
+  "<percentage> | <calc()> | <interpolation> | <min()> | <max()> | <var()>"
 ]
 and timing_function = [%value.rec
   "'linear' | <cubic-bezier-timing-function> | <step-timing-function>"
