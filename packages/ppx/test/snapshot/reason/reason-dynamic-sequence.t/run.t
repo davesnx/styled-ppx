@@ -953,7 +953,7 @@
     [@mel.module "react"]
     external createVariadicElement: (string, Js.t({..})) => React.element =
       "createElement";
-    let deleteProp = [%raw "(newProps, key) => delete newProps[key]"];
+    let deleteProp = [%mel.raw "(newProps, key) => delete newProps[key]"];
     let getOrEmpty = str =>
       switch (str) {
       | Some(str) => " " ++ str
@@ -1937,7 +1937,7 @@
     [@mel.module "react"]
     external createVariadicElement: (string, Js.t({..})) => React.element =
       "createElement";
-    let deleteProp = [%raw "(newProps, key) => delete newProps[key]"];
+    let deleteProp = [%mel.raw "(newProps, key) => delete newProps[key]"];
     let getOrEmpty = str =>
       switch (str) {
       | Some(str) => " " ++ str
