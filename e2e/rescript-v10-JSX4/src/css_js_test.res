@@ -181,28 +181,6 @@ describe("Backdrop filter", () =>
   })
 )
 
-/* describe("Gradient background", () =>
-  test("test values", _ => {
-    expect([%css("background: linear-gradient(45deg, #FF0000 0, #0000FF 100%)")])->toBe({
-      "background": "linear-gradient(45deg, #FF0000 0, #0000FF 100%)",
-    })
-    expect([%css("background: repeating-linear-gradient(45deg, #FF0000 0, #0000FF 10px)")])->toBe({
-      "background": "repeating-linear-gradient(45deg, #FF0000 0, #0000FF 10px)",
-    })
-    expect([%css("background: radial-gradient(#FF0000 0, #0000FF 100%) ")])->toBe({
-      "background": "radial-gradient(#FF0000 0, #0000FF 100%)",
-    })
-    expect([
-      %css("background: repeating-radial-gradient(#FF0000 0, #0000FF calc(20% + 5px))"),
-    ])->toBe({
-      "background": "repeating-radial-gradient(#FF0000 0, #0000FF calc(20% + 5px))",
-    })
-    expect([%css("background: conic-gradient(from 45deg, #FF0000 0, #0000FF 100%)")])->toBe({
-      "background": "conic-gradient(from 45deg, #FF0000 0, #0000FF 100%)",
-    })
-  })
-) */
-
 describe("Position", () => {
   test("should use length", _ => {
     expect([%css("top: 10px")])->toBe({"top": "10px"})
@@ -478,16 +456,35 @@ describe("backgroundImage", () =>
   })
 )
 
-/* describe("background shorthand", () =>
+/* describe("Gradient background", () =>
   test("test values", _ => {
-    expect([%css("background: rgb(1, 2, 3)")])->toBe({"background": "rgb(1, 2, 3)"})
-    expect([%css("background: url(x)")])->toBe({"background": "url(x)"})
-    expect([%css("background: linear-gradient(5deg, #FF0000 10%)")])->toBe({
-      "background": "linear-gradient(5deg, #FF0000 10%)",
+    expect([%css("background: linear-gradient(45deg, #FF0000 0, #0000FF 100%)")])->toBe({
+      "background": "linear-gradient(45deg, #FF0000 0, #0000FF 100%)",
     })
-    expect([%css("background: none")])->toBe({"background": "none"})
+    expect([%css("background: repeating-linear-gradient(45deg, #FF0000 0, #0000FF 10px)")])->toBe({
+      "background": "repeating-linear-gradient(45deg, #FF0000 0, #0000FF 10px)",
+    })
+    expect([%css("background: radial-gradient(#FF0000 0, #0000FF 100%) ")])->toBe({
+      "background": "radial-gradient(#FF0000 0, #0000FF 100%)",
+    })
+    expect([
+      %css("background: repeating-radial-gradient(#FF0000 0, #0000FF calc(20% + 5px))"),
+    ])->toBe({
+      "background": "repeating-radial-gradient(#FF0000 0, #0000FF calc(20% + 5px))",
+    })
+    expect([%css("background: conic-gradient(from 45deg, #FF0000 0, #0000FF 100%)")])->toBe({
+      "background": "conic-gradient(from 45deg, #FF0000 0, #0000FF 100%)",
+    })
   })
 ) */
+
+describe("background shorthand", () =>
+  test("test values", _ => {
+    expect([%css("background: rgb(1, 2, 3)")])->toBe({"backgroundColor": "rgb(1, 2, 3)"})
+    expect([%css("background: url(x)")])->toBe({"backgroundImage": "url(x)"})
+    expect([%css("background: none")])->toBe({"backgroundImage": "none"})
+  })
+)
 
 describe("clipPath", () =>
   test("test values", _ => {
