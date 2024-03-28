@@ -163,21 +163,21 @@ describe("Backdrop filter", () =>
   test("test values", _ => {
     expect([%css("backdrop-filter: none")])->toBe({"backdropFilter": "none"})
     expect([%css("backdrop-filter: blur(2px)")])->toBe({"backdropFilter": "blur(2px)"})
-    /* expect([%css("backdrop-filter: blur(10px), brightness(42%)")])->toBe({
-      "backdropFilter": "blur(10px), brightness(42%)",
+    expect([%css("backdrop-filter: blur(10px) brightness(42%)")])->toBe({
+      "backdropFilter": "blur(10px) brightness(42%)",
     })
-     expect([%css("backdrop-filter: contrast(10), drop-shadow(0.5%)")])->toBe({
-      "backdropFilter": "contrast(10), drop-shadow(0.5%)",
+    expect([%css("backdrop-filter: contrast(10) drop-shadow(4px 4px 10px rgb(1,2,3))")])->toBe({
+      "backdropFilter": "contrast(10) drop-shadow(4px 4px 10px rgb(1, 2, 3))",
     })
-    expect([%css("backdrop-filter: grayscale(99.9%), hue-rotate(90deg)")])->toBe({
-      "backdropFilter": "grayscale(99.9%), hue-rotate(90deg)",
+    expect([%css("backdrop-filter: grayscale(99.9%) hue-rotate(90deg)")])->toBe({
+      "backdropFilter": "grayscale(99.9%) hue-rotate(90deg)",
     })
-    expect([%css("backdrop-filter: invert(30), opacity(10%)")])->toBe({
-      "backdropFilter": "invert(30), opacity(10%)",
+    expect([%css("backdrop-filter: invert(30) opacity(10%)")])->toBe({
+      "backdropFilter": "invert(30) opacity(10%)",
     })
-    expect([%css("backdrop-filter: saturate(30), sepia(10%)")])->toBe({
-      "backdropFilter": "saturate(30), sepia(10%)",
-     }) */
+    expect([%css("backdrop-filter: saturate(30) sepia(10%)")])->toBe({
+      "backdropFilter": "saturate(30) sepia(10%)",
+    })
   })
 )
 
