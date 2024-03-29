@@ -247,6 +247,110 @@ let variadicElement = (~loc, ~htmlTag) => {
   );
 };
 
+let getLabel = str =>
+  switch (str) {
+  | Optional(str)
+  | Labelled(str) => str
+  | Nolabel => ""
+  };
+
+let makeParam =
+    (
+      ~loc,
+      ~default: option(expression)=?,
+      ~isOptional=false,
+      ~discard=false,
+      ~coreType=?,
+      label,
+    ) => {
+  let labelPattern =
+    Helper.Pat.mk(
+      ~loc,
+      discard ? Ppat_any : Ppat_var(withLoc(label, ~loc)),
+    );
+
+  (
+    isOptional ? Optional(label) : Labelled(label),
+    default,
+    switch (coreType) {
+    | Some(typ) =>
+      Helper.Pat.mk(
+        ~loc,
+        Ppat_constraint(
+          labelPattern,
+          isOptional ? [%type: option([%t typ])] : typ,
+        ),
+      )
+    | None => labelPattern
+    },
+  );
+};
+
+let domPropParam = (~loc, ~isOptional, domProp) => {
+  switch (domProp) {
+  | MakeProps.Event({name, type_}) =>
+    makeParam(
+      ~loc,
+      ~isOptional,
+      ~coreType=
+        Helper.Typ.arrow(
+          ~loc,
+          Nolabel,
+          Helper.Typ.constr(
+            ~loc,
+            withLoc(~loc, MakeProps.eventTypeToIdent(type_)),
+            [],
+          ),
+          Helper.Typ.constr(~loc, withLoc(Lident("unit"), ~loc), []),
+        ),
+      name,
+    )
+  | MakeProps.Attribute({name, type_, _}) =>
+    makeParam(
+      ~loc,
+      ~isOptional,
+      ~coreType=
+        Helper.Typ.constr(
+          ~loc,
+          withLoc(~loc, MakeProps.attributeTypeToIdent(type_)),
+          [],
+        ),
+      name,
+    )
+  };
+};
+
+let serverCreateElement = (~loc, ~htmlTag) => {
+  let finalHtmlTag =
+    switch%expr ([%e Helper.Exp.ident(~loc, withLoc(~loc, Lident("as_")))]) {
+    | Some(v) => v
+    | None => [%e Builder.estring(~loc, htmlTag)]
+    };
+
+  let params =
+    MakeProps.get(["key", "ref", "className"])
+    |> List.map(domPropParam(~loc, ~isOptional=true))
+    |> List.map(((label, _, _)) =>
+         (
+           label,
+           Helper.Exp.ident(~loc, withLoc(~loc, Lident(getLabel(label)))),
+         )
+       );
+
+  let domProps =
+    Helper.Exp.apply(
+      [%expr ReactDOM.domProps],
+      [
+        (Labelled("className"), [%expr className]),
+        (Optional("ref"), [%expr innerRef]),
+      ]
+      @ params
+      @ [(Nolabel, [%expr ()])],
+    );
+
+  [%expr React.createElement([%e finalHtmlTag], [%e domProps], [children])];
+};
+
 /* let stylesObject = { "className": className, "ref": props.ref }; */
 let stylesAndRefObject = (~loc) => {
   let className = (
@@ -313,12 +417,60 @@ let makeBody = (~loc, ~htmlTag, ~className as classNameValue, ~variables) => {
   );
 };
 
-let getLabel = str =>
-  switch (str) {
-  | Optional(str)
-  | Labelled(str) => str
-  | Nolabel => ""
+let makeBodyServer = (~loc, ~htmlTag, ~className as classNameValue) => {
+  Helper.Exp.let_(
+    ~loc,
+    Nonrecursive,
+    [className(~loc, classNameValue)],
+    serverCreateElement(~loc, ~htmlTag),
+  );
+};
+
+let rec makeFn = (~loc, params, body) => {
+  switch (params) {
+  | [] => [%expr (() => [%e body])]
+  | [(argLabel, expr, pat)] =>
+    Helper.Exp.fun_(~loc, argLabel, expr, pat, body)
+  | [(argLabel, expr, pat), ...rest] =>
+    Helper.Exp.fun_(~loc, argLabel, expr, pat, makeFn(~loc, rest, body))
   };
+};
+
+/* let make = (~key, ~innerRef, ~as_, ~children, ...reactDomParams, ()) => + makeBody */
+let makeFnJSXServer = (~loc, ~htmlTag, ~className) => {
+  makeFn(
+    ~loc,
+    {
+      let reactDomParams =
+        MakeProps.get(["key"])
+        |> List.map(domPropParam(~loc, ~isOptional=true));
+      [
+        makeParam(
+          ~loc,
+          ~isOptional=true,
+          ~discard=true,
+          ~coreType=[%type: string],
+          "key",
+        ),
+        makeParam(~loc, ~isOptional=true, "innerRef"),
+        makeParam(~loc, ~isOptional=true, "as_"),
+        makeParam(
+          ~loc,
+          ~isOptional=true,
+          ~default=[%expr React.null],
+          "children",
+        ),
+      ]
+      @ reactDomParams
+      @ [(Nolabel, None, [%pat? ()])];
+    },
+    makeBodyServer(
+      ~loc,
+      ~htmlTag,
+      ~className=[%expr [%e className] ++ getOrEmpty(className)],
+    ),
+  );
+};
 
 /* let make = (props: makeProps) => + makeBody */
 let makeFnJSX3 = (~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames) => {
@@ -373,6 +525,9 @@ let component =
     switch (File.get()) {
     | Some(ReScript) when Settings.Get.jsxVersion() === 4 =>
       makeFnJSX4(~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames)
+    | Some(Reason)
+    | Some(OCaml) when Settings.Get.native() =>
+      makeFnJSXServer(~loc, ~htmlTag, ~className)
     | _ =>
       makeFnJSX3(~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames)
     };

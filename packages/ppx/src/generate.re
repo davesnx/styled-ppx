@@ -4,7 +4,26 @@ module Builder = Generate_lib.Builder;
 
 let styleVariableName = "styles";
 
-let staticComponent = (~loc, ~htmlTag, styles) => {
+let staticComponentServer = (~loc, ~htmlTag, styles) => {
+  let styleReference = [%expr styles];
+
+  Builder.pmod_structure(
+    ~loc,
+    [
+      Generate_lib.defineGetOrEmptyFn(~loc),
+      Generate_lib.styles(~loc, ~name=styleVariableName, ~expr=styles),
+      Generate_lib.component(
+        ~loc,
+        ~htmlTag,
+        ~className=styleReference,
+        ~makePropTypes=[],
+        ~labeledArguments=[],
+      ),
+    ],
+  );
+};
+
+let staticComponentClient = (~loc, ~htmlTag, styles) => {
   let styleReference = [%expr styles];
 
   Builder.pmod_structure(
@@ -25,6 +44,12 @@ let staticComponent = (~loc, ~htmlTag, styles) => {
       ),
     ],
   );
+};
+
+let staticComponent = (~loc, ~htmlTag, styles) => {
+  Settings.Get.native()
+    ? staticComponentServer(~loc, ~htmlTag, styles)
+    : staticComponentClient(~loc, ~htmlTag, styles);
 };
 
 let dynamicComponent =
