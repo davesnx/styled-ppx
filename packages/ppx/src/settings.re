@@ -26,12 +26,20 @@ let jsxMode = {
   defaultValue: "classic",
 };
 
+let native = {
+  flag: "--native",
+  doc: "Generate code for server-reason-react",
+  value: None,
+  defaultValue: false,
+};
+
 type settings = {
   jsxVersion: flag(int),
   jsxMode: flag(string),
   production: flag(bool),
+  native: flag(bool),
 };
-let settings = {jsxVersion, jsxMode, production};
+let settings = {jsxVersion, jsxMode, production, native};
 
 let currentSettings = ref(settings);
 let updateSettings = newSettings => currentSettings := newSettings;
@@ -46,6 +54,9 @@ module Get = {
   let production = () =>
     currentSettings.contents.production.value
     |> Option.value(~default=currentSettings.contents.production.defaultValue);
+  let native = () =>
+    currentSettings.contents.native.value
+    |> Option.value(~default=currentSettings.contents.native.defaultValue);
 };
 
 module Update = {
@@ -70,6 +81,14 @@ module Update = {
       ...currentSettings.contents,
       production: {
         ...currentSettings.contents.production,
+        value: Some(value),
+      },
+    });
+  let native = value =>
+    updateSettings({
+      ...currentSettings.contents,
+      native: {
+        ...currentSettings.contents.native,
         value: Some(value),
       },
     });
