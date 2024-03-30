@@ -455,17 +455,28 @@ let render_one_bg_size = (~loc, value) => {
 
 let render_bg_size = (~loc, value: Types.bg_size) =>
   switch (value) {
-  /* bs-css doesn't support auto in each size */
-  | `One_bg_size([`Auto, _]) => raise(Unsupported_feature)
-  | `One_bg_size([_, `Auto]) => raise(Unsupported_feature)
+  | `One_bg_size([`Auto]) => variant_to_expression(~loc, `Auto)
+  | `One_bg_size([one]) => render_one_bg_size(~loc, one)
+  | `One_bg_size([`Auto, two]) =>
+    [%expr
+     `size((
+       [%e variant_to_expression(~loc, `Auto)],
+       [%e render_one_bg_size(~loc, two)],
+     ))]
+  | `One_bg_size([one, `Auto]) =>
+    [%expr
+     `size((
+       [%e render_one_bg_size(~loc, one)],
+       [%e variant_to_expression(~loc, `Auto)],
+     ))]
   | `One_bg_size([one, two]) =>
     [%expr
      `size((
        [%e render_one_bg_size(~loc, one)],
        [%e render_one_bg_size(~loc, two)],
      ))]
-  /* bs-css doesn't support one size */
-  | `One_bg_size(_) => raise(Unsupported_feature)
+  | `One_bg_size(_) =>
+    raise(Invalid_value("Values can not be more than two"))
   | `Cover => variant_to_expression(~loc, `Cover)
   | `Contain => variant_to_expression(~loc, `Contain)
   };
@@ -865,7 +876,6 @@ let render_function_rgb = (~loc, ast: Types.function_rgb) => {
 
   let to_number =
     fun
-    // TODO: bs-css rgb(float, float, float)
     | `Percentage(pct) => color_to_float(pct *. 2.55)
     | `Function_calc(fc) => render_function_calc(~loc, fc)
     | `Interpolation(v) => render_variable(~loc, v)
@@ -907,7 +917,6 @@ let render_function_rgba = (~loc, ast: Types.function_rgba) => {
 
   let to_number =
     fun
-    // TODO: bs-css rgb(float, float, float)
     | `Percentage(pct) => color_to_float(pct *. 2.55)
     | `Function_calc(fc) => render_function_calc(~loc, fc)
     | `Interpolation(v) => render_variable(~loc, v)

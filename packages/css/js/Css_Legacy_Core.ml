@@ -575,6 +575,7 @@ let fontSize x =
   D
     ( {js|fontSize|js},
       match x with
+      | #FontSize.t as fs -> FontSize.toString fs
       | #Length.t as l -> Length.toString l
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
@@ -1801,14 +1802,7 @@ let backgrounds x =
              | `none -> {js|none|js})
       |. Std.List.joinWith ~sep:{js|, |js} )
 
-let backgroundSize x =
-  D
-    ( {js|backgroundSize|js},
-      match x with
-      | `size (x, y) -> Length.toString x ^ {js| |js} ^ Length.toString y
-      | `auto -> {js|auto|js}
-      | `cover -> {js|cover|js}
-      | `contain -> {js|contain|js} )
+let backgroundSize x = D ({js|backgroundSize|js}, BackgroundSize.toString x)
 
 let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
     =

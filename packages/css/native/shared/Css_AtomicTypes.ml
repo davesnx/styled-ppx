@@ -368,6 +368,15 @@ module FontStyle = struct
     | `oblique -> {js|oblique|js}
 end
 
+module FontSize = struct
+  type t =
+    [ `small
+    | `large
+    ]
+
+  let toString = function `small -> {js|small|js} | `large -> {js|large|js}
+end
+
 module TabSize = struct
   type t = [ `num of float ]
 
@@ -2076,6 +2085,38 @@ module BackgroundAttachment = struct
     | `scroll -> {js|scroll|js}
     | `fixed -> {js|fixed|js}
     | `local -> {js|local|js}
+end
+
+module BackgroundSize = struct
+  type size =
+    [ `auto
+    | Length.t
+    | `size of size * size
+    ]
+
+  type t =
+    [ `cover
+    | `contain
+    | size
+    | Length.t
+    ]
+
+  let rec toString = function
+    | `cover -> {js|cover|js}
+    | `contain -> {js|contain|js}
+    | `auto -> {js|auto|js}
+    | #Length.t as l -> Length.toString l
+    | `size _ as s -> size_to_string s
+
+  and foo = function
+    | `auto -> {js|auto|js}
+    | #Length.t as l -> Length.toString l
+
+  and size_to_string = function
+    | `size (x, y) ->
+      (match x, y with
+      | `auto, `auto -> {js|auto auto|js}
+      | l, l2 -> foo l ^ {js| |js} ^ foo l2)
 end
 
 module BackgroundClip = struct

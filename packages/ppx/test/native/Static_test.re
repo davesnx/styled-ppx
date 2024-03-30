@@ -10,6 +10,45 @@ let c = CssJs.style([|block, label|]);
 /* The tests that are commented, means that we don't support them safely */
 let properties_static_css_tests = [
   (
+    [%css "background-size: 3em 25%"],
+    [%expr [%css "background-size: 3em 25%"]],
+    [%expr CssJs.backgroundSize(`size((`em(3.), `percent(25.))))],
+  ),
+  (
+    [%css "background-size: auto 25%"],
+    [%expr [%css "background-size: auto 25%"]],
+    [%expr CssJs.backgroundSize(`size((`auto, `percent(25.))))],
+  ),
+  (
+    [%css "background-size: 25% auto"],
+    [%expr [%css "background-size: 25% auto"]],
+    [%expr CssJs.backgroundSize(`size((`percent(25.), `auto)))],
+  ),
+  (
+    [%css "background-size: calc(2% + 2em) auto"],
+    [%expr [%css "background-size:calc(2% + 2em) auto"]],
+    [%expr
+      CssJs.backgroundSize(
+        `size((`calc(`add((`percent(2.), `em(2.)))), `auto)),
+      )
+    ],
+  ),
+  (
+    [%css "background-size: auto"],
+    [%expr [%css "background-size: auto"]],
+    [%expr CssJs.backgroundSize(`auto)],
+  ),
+  (
+    [%css "background-size: 2%"],
+    [%expr [%css "background-size: 2%"]],
+    [%expr CssJs.backgroundSize(`percent(2.))],
+  ),
+  (
+    [%css "background-size: calc(2% + 2em)"],
+    [%expr [%css "background-size: calc(2% + 2em)"]],
+    [%expr CssJs.backgroundSize(`calc(`add((`percent(2.), `em(2.)))))],
+  ),
+  (
     [%css "display: block;"],
     [%expr [%css "display: block;"]],
     [%expr CssJs.display(`block)],
@@ -48,6 +87,16 @@ let properties_static_css_tests = [
     [%css "font-size: 30px"],
     [%expr [%css "font-size: 30px"]],
     [%expr CssJs.fontSize(`pxFloat(30.))],
+  ),
+  (
+    [%css "font-size: large"],
+    [%expr [%css "font-size: large"]],
+    [%expr CssJs.fontSize(`large)],
+  ),
+  (
+    [%css "font-size: small"],
+    [%expr [%css "font-size: small"]],
+    [%expr CssJs.fontSize(`small)],
   ),
   (
     [%css "height: 100vh"],

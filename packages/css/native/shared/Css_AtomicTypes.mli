@@ -238,6 +238,15 @@ module FontStyle : sig
   val toString : t -> string
 end
 
+module FontSize : sig
+  type t =
+    [ `small
+    | `large
+    ]
+
+  val toString : t -> string
+end
+
 module TabSize : sig
   type t = [ `num of float ]
 
@@ -1351,6 +1360,30 @@ module BackgroundAttachment : sig
     ]
 
   val toString : t -> string
+end
+
+module BackgroundSize : sig
+  type size =
+    [ `auto
+    | Length.t
+    | `size of size * size
+    ]
+
+  type t =
+    [ `cover
+    | `contain
+    | size
+    | Length.t
+    ]
+
+  val toString :
+    [< `auto
+    | `contain
+    | `cover
+    | Length.t
+    | `size of ([ `auto | Length.t ] as 'a) * 'a
+    ] ->
+    string
 end
 
 module BackgroundClip : sig
