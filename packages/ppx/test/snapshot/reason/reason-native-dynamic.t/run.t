@@ -7,15 +7,17 @@
       | Some(str) => " " ++ str
       | None => ""
       };
-    let styles = (~var, _) =>
+    let styles = (~var, ~id, _) =>
       CssJs.style([|
         CssJs.label("DynamicComponent"),
         (CssJs.color(var): CssJs.rule),
         CssJs.display(`flex),
+        (CssJs.backgroundColor(id): CssJs.rule),
       |]);
     let make =
         (
           ~var,
+          ~id,
           ~onWheel: option(React.Event.Wheel.t => unit)=?,
           ~onWaiting: option(React.Event.Media.t => unit)=?,
           ~onVolumeChange: option(React.Event.Media.t => unit)=?,
@@ -313,7 +315,6 @@
           ~in_: option(string)=?,
           ~imageRendering: option(string)=?,
           ~ideographic: option(string)=?,
-          ~id: option(string)=?,
           ~icon: option(string)=?,
           ~httpEquiv: option(string)=?,
           ~htmlFor: option(string)=?,
@@ -491,7 +492,7 @@
           ~key as _: option(string)=?,
           _,
         ) => {
-      let className = styles(~var, ()) ++ getOrEmpty(className);
+      let className = styles(~id, ~var, ()) ++ getOrEmpty(className);
       React.createElement(
         switch (as_) {
         | Some(v) => v
@@ -670,7 +671,6 @@
           ~htmlFor?,
           ~httpEquiv?,
           ~icon?,
-          ~id?,
           ~ideographic?,
           ~imageRendering?,
           ~in_?,

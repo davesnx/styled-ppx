@@ -2,10 +2,11 @@ let stack = [%cx "display: flex; flex-direction: column"];
 let stackGap = gap => [%cx "gap: $(gap)"];
 
 module Cositas = [%styled.div
-  (~lola=CssJs.px(0)) => {|
+  (~lola=CssJs.px(0), ~id) => {|
   display: flex;
   flex-direction: column;
   gap: $(lola);
+  background-color: $(id);
 |}
 ];
 
@@ -47,7 +48,7 @@ let clx = [%cx
 module App = {
   [@react.component]
   let make = () =>
-    <Cositas as_="section" lola={CssJs.px(10)}>
+    <Cositas as_="section" lola={CssJs.px(10)} id=CssJs.red>
       <div className=clx> {React.string("code everywhere!")} </div>
       <div className=selectors> {React.string("Red text")} </div>
     </Cositas>;
