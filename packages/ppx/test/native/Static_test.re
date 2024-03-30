@@ -124,6 +124,16 @@ let properties_static_css_tests = [
     [%expr CssJs.height(`vh(100.))],
   ),
   (
+    [%css "height: 100vi"],
+    [%expr [%css "height: 100vi"]],
+    [%expr CssJs.height(`vi(100.))],
+  ),
+  (
+    [%css "height: 100in"],
+    [%expr [%css "height: 100in"]],
+    [%expr CssJs.height(`in_(100.))],
+  ),
+  (
     [%css "margin: 0"],
     [%expr [%css "margin: 0"]],
     [%expr CssJs.margin(`zero)],

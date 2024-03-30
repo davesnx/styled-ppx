@@ -97,6 +97,14 @@ module Length : sig
     | `pt of int
     | `zero
     | `percent of float
+    | `cap of float
+    | `ic of float
+    | `in_ of float
+    | `lh of float
+    | `rlh of float
+    | `vb of float
+    | `vi of float
+    | `q of float
     ]
 
   type calc_value =
@@ -140,6 +148,14 @@ module Length : sig
   val pc : 'a -> [> `pc of 'a ]
   val pt : 'a -> [> `pt of 'a ]
   val zero : [> `zero ]
+  val cap : 'a -> [> `cap of 'a ]
+  val ic : 'a -> [> `ic of 'a ]
+  val in_ : 'a -> [> `in_ of 'a ]
+  val lh : 'a -> [> `lh of 'a ]
+  val rlh : 'a -> [> `rlh of 'a ]
+  val vb : 'a -> [> `vb of 'a ]
+  val vi : 'a -> [> `vi of 'a ]
+  val q : 'a -> [> `q of 'a ]
   val toString : t -> string
 end
 

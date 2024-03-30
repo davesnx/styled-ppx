@@ -156,6 +156,14 @@ module Length = struct
     | `inch of float
     | `pc of float
     | `pt of int
+    | `cap of float
+    | `ic of float
+    | `in_ of float
+    | `lh of float
+    | `rlh of float
+    | `vb of float
+    | `vi of float
+    | `q of float
     | `zero
     | `percent of float
     ]
@@ -201,6 +209,14 @@ module Length = struct
   let pc x = `pc x
   let pt x = `pt x
   let zero = `zero
+  let cap x = `cap x
+  let ic x = `ic x
+  let in_ x = `in_ x
+  let lh x = `lh x
+  let rlh x = `rlh x
+  let vb x = `vb x
+  let vi x = `vi x
+  let q x = `q x
 
   let rec toString x =
     match x with
@@ -222,6 +238,14 @@ module Length = struct
     | `zero -> {js|0|js}
     | `calc calc -> string_of_calc_min_max calc
     | `percent x -> Std.Float.toString x ^ {js|%|js}
+    | `cap x -> Std.Float.toString x ^ {js|cap|js}
+    | `ic x -> Std.Float.toString x ^ {js|ic|js}
+    | `in_ x -> Std.Float.toString x ^ {js|in|js}
+    | `lh x -> Std.Float.toString x ^ {js|lh|js}
+    | `rlh x -> Std.Float.toString x ^ {js|rlh|js}
+    | `vb x -> Std.Float.toString x ^ {js|vb|js}
+    | `vi x -> Std.Float.toString x ^ {js|vi|js}
+    | `q x -> Std.Float.toString x ^ {js|q|js}
     | (`min _ | `max _) as x -> minmax_to_string x
 
   and calc_value_to_string x =

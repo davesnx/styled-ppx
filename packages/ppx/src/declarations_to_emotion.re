@@ -278,27 +278,26 @@ let variant_to_expression = (~loc) =>
   | `Full_width => raise(Unsupported_feature)
   | `Full_size_kana => raise(Unsupported_feature);
 
-// TODO: all of them could be float, but bs-css doesn't support it
 let render_length = (~loc) =>
   fun
-  | `Cap(_n) => raise(Unsupported_feature)
+  | `Cap(n) => [%expr `cap([%e render_float(~loc, n)])]
   | `Ch(n) => [%expr `ch([%e render_float(~loc, n)])]
   | `Cm(n) => [%expr `cm([%e render_float(~loc, n)])]
   | `Em(n) => [%expr `em([%e render_float(~loc, n)])]
   | `Ex(n) => [%expr `ex([%e render_float(~loc, n)])]
-  | `Ic(_n) => raise(Unsupported_feature)
-  | `In(_n) => raise(Unsupported_feature)
-  | `Lh(_n) => raise(Unsupported_feature)
+  | `Ic(n) => [%expr `ic([%e render_float(~loc, n)])]
+  | `In(n) => [%expr `in_([%e render_float(~loc, n)])]
+  | `Lh(n) => [%expr `lh([%e render_float(~loc, n)])]
   | `Mm(n) => [%expr `mm([%e render_float(~loc, n)])]
   | `Pc(n) => [%expr `pc([%e render_float(~loc, n)])]
   | `Pt(n) => [%expr `pt([%e render_integer(~loc, n |> Float.to_int)])]
   | `Px(n) => [%expr `pxFloat([%e render_float(~loc, n)])]
-  | `Q(_n) => raise(Unsupported_feature)
+  | `Q(n) => [%expr `q([%e render_float(~loc, n)])]
   | `Rem(n) => [%expr `rem([%e render_float(~loc, n)])]
-  | `Rlh(_n) => raise(Unsupported_feature)
-  | `Vb(_n) => raise(Unsupported_feature)
+  | `Rlh(n) => [%expr `rlh([%e render_float(~loc, n)])]
+  | `Vb(n) => [%expr `vb([%e render_float(~loc, n)])]
   | `Vh(n) => [%expr `vh([%e render_float(~loc, n)])]
-  | `Vi(_n) => raise(Unsupported_feature)
+  | `Vi(n) => [%expr `vi([%e render_float(~loc, n)])]
   | `Vmax(n) => [%expr `vmax([%e render_float(~loc, n)])]
   | `Vmin(n) => [%expr `vmin([%e render_float(~loc, n)])]
   | `Vw(n) => [%expr `vw([%e render_float(~loc, n)])]
