@@ -284,6 +284,9 @@ let makeParam =
       )
     | None => labelPattern
     },
+    label,
+    loc,
+    None,
   );
 };
 
@@ -330,11 +333,16 @@ let serverCreateElement = (~loc, ~htmlTag) => {
 
   let params =
     MakeProps.get(["key", "ref", "className"])
-    |> List.map(domPropParam(~loc, ~isOptional=true))
-    |> List.map(((label, _, _)) =>
+    |> List.map(value =>
+         switch (value) {
+         | MakeProps.Event({name, _}) => name
+         | MakeProps.Attribute({name, _}) => name
+         }
+       )
+    |> List.map(label =>
          (
-           label,
-           Helper.Exp.ident(~loc, withLoc(~loc, Lident(getLabel(label)))),
+           Optional(label),
+           Helper.Exp.ident(~loc, withLoc(~loc, Lident(label))),
          )
        );
 
@@ -427,20 +435,6 @@ let makeBodyServer = (~loc, ~htmlTag, ~className as classNameValue) => {
   );
 };
 
-let rec fnWithLabeledArgsNonTail = (~loc, params, body) => {
-  switch (params) {
-  | [] => [%expr (() => [%e body])]
-  | [(argLabel, expr, pat), ...rest] =>
-    Helper.Exp.fun_(
-      ~loc,
-      argLabel,
-      expr,
-      pat,
-      fnWithLabeledArgsNonTail(~loc, rest, body),
-    )
-  };
-};
-
 let typeVariable = (~loc, name) => Builder.ptyp_var(~loc, name);
 
 let getIsOptional = str =>
@@ -478,13 +472,13 @@ let makeStyleParams = (~labeledArguments) => {
 /* let make = (~key, ~innerRef, ~as_, ~children, ...reactDomParams, ()) => + makeBody */
 let makeFnJSXServer =
     (~loc, ~htmlTag, ~className, ~styleParams, ~variableNames) => {
-  fnWithLabeledArgsNonTail(
-    ~loc,
+  fnWithLabeledArgs(
     {
       let reactDomParams =
         MakeProps.get(["key"] @ variableNames)
         |> List.map(domPropParam(~loc, ~isOptional=true));
       [
+        (Nolabel, None, Builder.ppat_any(~loc), "_", Location.none, None),
         makeParam(
           ~loc,
           ~isOptional=true,
