@@ -65,13 +65,13 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.backgroundOrigin(`borderBox);
   CssJs.backgroundOrigin(`paddingBox);
   CssJs.backgroundOrigin(`contentBox);
-  CssJs.unsafe({js|backgroundSize|js}, {js|auto|js});
+  CssJs.backgroundSize(`auto);
   CssJs.backgroundSize(`cover);
   CssJs.backgroundSize(`contain);
-  CssJs.unsafe({js|backgroundSize|js}, {js|10px|js});
-  CssJs.unsafe({js|backgroundSize|js}, {js|50%|js});
-  CssJs.unsafe({js|backgroundSize|js}, {js|10px auto|js});
-  CssJs.unsafe({js|backgroundSize|js}, {js|auto 10%|js});
+  CssJs.backgroundSize(`pxFloat(10.));
+  CssJs.backgroundSize(`percent(50.));
+  CssJs.backgroundSize(`size((`pxFloat(10.), `auto)));
+  CssJs.backgroundSize(`size((`auto, `percent(10.))));
   CssJs.backgroundSize(`size((`em(50.), `percent(50.))));
   CssJs.unsafe({js|background|js}, {js|top left / 50% 60%|js});
   CssJs.backgroundOrigin(`borderBox);
