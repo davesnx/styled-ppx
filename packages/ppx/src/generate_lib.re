@@ -259,6 +259,7 @@ let makeParam =
       ~loc,
       ~default: option(expression)=?,
       ~isOptional=false,
+      ~wrapOption=isOptional,
       ~discard=false,
       ~coreType=?,
       label,
@@ -278,7 +279,7 @@ let makeParam =
         ~loc,
         Ppat_constraint(
           labelPattern,
-          isOptional ? [%type: option([%t typ])] : typ,
+          wrapOption ? [%type: option([%t typ])] : typ,
         ),
       )
     | None => labelPattern
@@ -426,23 +427,62 @@ let makeBodyServer = (~loc, ~htmlTag, ~className as classNameValue) => {
   );
 };
 
-let rec makeFn = (~loc, params, body) => {
+let rec fnWithLabeledArgsNonTail = (~loc, params, body) => {
   switch (params) {
   | [] => [%expr (() => [%e body])]
-  | [(argLabel, expr, pat)] =>
-    Helper.Exp.fun_(~loc, argLabel, expr, pat, body)
   | [(argLabel, expr, pat), ...rest] =>
-    Helper.Exp.fun_(~loc, argLabel, expr, pat, makeFn(~loc, rest, body))
+    Helper.Exp.fun_(
+      ~loc,
+      argLabel,
+      expr,
+      pat,
+      fnWithLabeledArgsNonTail(~loc, rest, body),
+    )
   };
 };
 
+let typeVariable = (~loc, name) => Builder.ptyp_var(~loc, name);
+
+let getIsOptional = str =>
+  switch (str) {
+  | Optional(_) => true
+  | _ => false
+  };
+
+let makeStyleParams = (~labeledArguments) => {
+  labeledArguments
+  |> List.map(((arg, defaultExpr, _, _, loc, type_)) => {
+       let (kind, type_) =
+         switch (type_) {
+         | Some(type_) => (`Typed, type_)
+         | None => (`Open, typeVariable(~loc, getLabel(arg)))
+         };
+
+       (loc, arg, defaultExpr, kind, type_);
+     })
+  |> List.map(((loc, arg, _, kind, type_)) => {
+       makeParam(
+         ~loc,
+         ~isOptional=getIsOptional(arg),
+         ~wrapOption=false,
+         ~coreType=?
+           switch (kind) {
+           | `Open => None
+           | `Typed => Some(type_)
+           },
+         getLabel(arg),
+       )
+     });
+};
+
 /* let make = (~key, ~innerRef, ~as_, ~children, ...reactDomParams, ()) => + makeBody */
-let makeFnJSXServer = (~loc, ~htmlTag, ~className) => {
-  makeFn(
+let makeFnJSXServer =
+    (~loc, ~htmlTag, ~className, ~styleParams, ~variableNames) => {
+  fnWithLabeledArgsNonTail(
     ~loc,
     {
       let reactDomParams =
-        MakeProps.get(["key"])
+        MakeProps.get(["key"] @ variableNames)
         |> List.map(domPropParam(~loc, ~isOptional=true));
       [
         makeParam(
@@ -462,7 +502,7 @@ let makeFnJSXServer = (~loc, ~htmlTag, ~className) => {
         ),
       ]
       @ reactDomParams
-      @ [(Nolabel, None, [%pat? ()])];
+      @ styleParams;
     },
     makeBodyServer(
       ~loc,
@@ -527,7 +567,13 @@ let component =
       makeFnJSX4(~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames)
     | Some(Reason)
     | Some(OCaml) when Settings.Get.native() =>
-      makeFnJSXServer(~loc, ~htmlTag, ~className)
+      makeFnJSXServer(
+        ~loc,
+        ~htmlTag,
+        ~className,
+        ~styleParams=makeStyleParams(~labeledArguments),
+        ~variableNames,
+      )
     | _ =>
       makeFnJSX3(~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames)
     };
@@ -551,8 +597,6 @@ let customPropLabel = (~loc, ~optional, name, type_) => {
       ? optionalType(~loc, type_) : type_,
   );
 };
-
-let typeVariable = (~loc, name) => Builder.ptyp_var(~loc, name);
 
 /* href: string */
 /* Melange expects record fields to be optional */
@@ -848,12 +892,6 @@ let raiseError = (~loc, ~description, ~example, ~link) => {
 
   raise(error);
 };
-
-let getIsOptional = str =>
-  switch (str) {
-  | Optional(_) => true
-  | _ => false
-  };
 
 let getIsLabelled = str =>
   switch (str) {

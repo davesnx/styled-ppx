@@ -4,115 +4,39 @@ module Builder = Generate_lib.Builder;
 
 let styleVariableName = "styles";
 
-let staticComponentServer = (~loc, ~htmlTag, styles) => {
-  let styleReference = [%expr styles];
-
-  Builder.pmod_structure(
-    ~loc,
-    [
-      Generate_lib.defineGetOrEmptyFn(~loc),
-      Generate_lib.styles(~loc, ~name=styleVariableName, ~expr=styles),
-      Generate_lib.component(
-        ~loc,
-        ~htmlTag,
-        ~className=styleReference,
-        ~makePropTypes=[],
-        ~labeledArguments=[],
-      ),
-    ],
-  );
-};
-
-let staticComponentClient = (~loc, ~htmlTag, styles) => {
-  let styleReference = [%expr styles];
-
-  Builder.pmod_structure(
-    ~loc,
-    [
-      Generate_lib.makeProps(~loc, None),
-      Generate_lib.bindingCreateVariadicElement(~loc),
-      Generate_lib.defineGetOrEmptyFn(~loc),
-      Generate_lib.defineDeletePropFn(~loc),
-      Generate_lib.defineAssign2(~loc),
-      Generate_lib.styles(~loc, ~name=styleVariableName, ~expr=styles),
-      Generate_lib.component(
-        ~loc,
-        ~htmlTag,
-        ~className=styleReference,
-        ~makePropTypes=[],
-        ~labeledArguments=[],
-      ),
-    ],
-  );
+let staticComponentCodegenSteps = (~loc, ~htmlTag, styles) => {
+  (
+    Settings.Get.native()
+      ? [Generate_lib.defineGetOrEmptyFn(~loc)]
+      : [
+        Generate_lib.makeProps(~loc, None),
+        Generate_lib.bindingCreateVariadicElement(~loc),
+        Generate_lib.defineGetOrEmptyFn(~loc),
+        Generate_lib.defineDeletePropFn(~loc),
+        Generate_lib.defineAssign2(~loc),
+      ]
+  )
+  @ [
+    Generate_lib.styles(~loc, ~name=styleVariableName, ~expr=styles),
+    Generate_lib.component(
+      ~loc,
+      ~htmlTag,
+      ~className=[%expr styles],
+      ~makePropTypes=[],
+      ~labeledArguments=[],
+    ),
+  ];
 };
 
 let staticComponent = (~loc, ~htmlTag, styles) => {
-  Settings.Get.native()
-    ? staticComponentServer(~loc, ~htmlTag, styles)
-    : staticComponentClient(~loc, ~htmlTag, styles);
+  Builder.pmod_structure(
+    ~loc,
+    staticComponentCodegenSteps(~loc, ~htmlTag, styles),
+  );
 };
 
-let dynamicComponent =
-    (~loc, ~htmlTag, ~label, ~moduleName, ~defaultValue, ~param, ~body) => {
-  let (functionExpr, labeledArguments) =
-    Generate_lib.getLabeledArgs(label, defaultValue, param, body);
-
-  let variableList =
-    labeledArguments
-    |> List.map(((arg, defaultExpr, _, _, loc, type_)) => {
-         let (kind, type_) =
-           switch (type_) {
-           | Some(type_) => (`Typed, type_)
-           | None => (
-               `Open,
-               Generate_lib.typeVariable(~loc, Generate_lib.getLabel(arg)),
-             )
-           };
-
-         (arg, defaultExpr, kind, type_);
-       });
-
-  /* ('a, 'b) */
-  let propsGenericParams: list(core_type) =
-    variableList
-    |> List.filter_map(
-         fun
-         | (_, _, `Open, type_) => Some(type_)
-         | _ => None,
-       );
-
-  /* type makeProps('a) = { a: 'a } */
-  let propGenericFields =
-    variableList
-    |> List.map(((arg, defaultValue, _, type_)) =>
-         Generate_lib.customPropLabel(
-           ~loc,
-           ~optional=Option.is_some(defaultValue),
-           Generate_lib.getLabel(arg),
-           type_,
-         )
-       );
-
-  /* (~arg1=props.arg1, ~arg2=props.arg2, ...) */
-  let styledArguments =
-    List.map(
-      ((argumentName, _defaultValue, _, _, loc, _)) => {
-        let value =
-          Generate_lib.propItem(~loc, Generate_lib.getLabel(argumentName));
-        (argumentName, value);
-      },
-      labeledArguments,
-    );
-
-  /* let styles = styles(...) */
-  let stylesFunctionCall =
-    Builder.pexp_apply(
-      ~loc,
-      Builder.pexp_ident(~loc, {txt: Lident(styleVariableName), loc}),
-      /* Last argument is a unit to avoid the warning of optinal labeled args */
-      styledArguments @ [(Nolabel, [%expr ()])],
-    );
-
+let generateDynamicStyles =
+    (~loc, ~moduleName, ~functionExpr, ~labeledArguments) => {
   let styles =
     switch (functionExpr.pexp_desc) {
     /* styled.div () => "string" */
@@ -171,8 +95,102 @@ let dynamicComponent =
     | _ => functionExpr
     };
 
-  Builder.pmod_structure(
+  Generate_lib.dynamicStyles(
     ~loc,
+    ~name=styleVariableName,
+    ~args=labeledArguments,
+    ~expr=styles,
+  );
+};
+
+let generateStylesCall = (~loc, ~labeledArguments) => {
+  /* native: (~arg1, ~arg2, ...) */
+  /* client: (~arg1=props.arg1, ~arg2=props.arg2, ...) */
+  let styledArguments =
+    List.map(
+      ((argumentName, _defaultValue, _, _, loc, _)) => {
+        let value =
+          Settings.Get.native()
+            ? Builder.pexp_ident(
+                ~loc,
+                Generate_lib.withLoc(
+                  Lident(Generate_lib.getLabel(argumentName)),
+                  ~loc,
+                ),
+              )
+            : Generate_lib.propItem(
+                ~loc,
+                Generate_lib.getLabel(argumentName),
+              );
+        (argumentName, value);
+      },
+      labeledArguments,
+    );
+
+  /* let styles = styles(...) */
+  Builder.pexp_apply(
+    ~loc,
+    Builder.pexp_ident(~loc, {txt: Lident(styleVariableName), loc}),
+    /* Last argument is a unit to avoid the warning of optinal labeled args */
+    styledArguments @ [(Nolabel, [%expr ()])],
+  );
+};
+
+let dynamicComponentCodegenSteps =
+    (~loc, ~htmlTag, ~moduleName, ~functionExpr, ~labeledArguments) =>
+  if (Settings.Get.native()) {
+    [
+      Generate_lib.defineGetOrEmptyFn(~loc),
+      generateDynamicStyles(
+        ~loc,
+        ~moduleName,
+        ~functionExpr,
+        ~labeledArguments,
+      ),
+      Generate_lib.component(
+        ~loc,
+        ~htmlTag,
+        ~className=generateStylesCall(~loc, ~labeledArguments),
+        ~makePropTypes=[],
+        ~labeledArguments,
+      ),
+    ];
+  } else {
+    let variableList =
+      labeledArguments
+      |> List.map(((arg, defaultExpr, _, _, loc, type_)) => {
+           let (kind, type_) =
+             switch (type_) {
+             | Some(type_) => (`Typed, type_)
+             | None => (
+                 `Open,
+                 Generate_lib.typeVariable(~loc, Generate_lib.getLabel(arg)),
+               )
+             };
+
+           (arg, defaultExpr, kind, type_);
+         });
+
+    let propsGenericParams: list(core_type) =
+      variableList
+      |> List.filter_map(
+           fun
+           | (_, _, `Open, type_) => Some(type_)
+           | _ => None,
+         );
+
+    /* type makeProps('a) = { a: 'a } */
+    let propGenericFields =
+      variableList
+      |> List.map(((arg, defaultValue, _, type_)) =>
+           Generate_lib.customPropLabel(
+             ~loc,
+             ~optional=Option.is_some(defaultValue),
+             Generate_lib.getLabel(arg),
+             type_,
+           )
+         );
+
     [
       Generate_lib.makeProps(
         ~loc,
@@ -182,19 +200,35 @@ let dynamicComponent =
       Generate_lib.defineDeletePropFn(~loc),
       Generate_lib.defineGetOrEmptyFn(~loc),
       Generate_lib.defineAssign2(~loc),
-      Generate_lib.dynamicStyles(
+      generateDynamicStyles(
         ~loc,
-        ~name=styleVariableName,
-        ~args=labeledArguments,
-        ~expr=styles,
+        ~moduleName,
+        ~functionExpr,
+        ~labeledArguments,
       ),
       Generate_lib.component(
         ~loc,
         ~htmlTag,
-        ~className=stylesFunctionCall,
+        ~className=generateStylesCall(~loc, ~labeledArguments),
         ~makePropTypes=propsGenericParams,
         ~labeledArguments,
       ),
-    ],
+    ];
+  };
+
+let dynamicComponent =
+    (~loc, ~htmlTag, ~label, ~moduleName, ~defaultValue, ~param, ~body) => {
+  let (functionExpr, labeledArguments) =
+    Generate_lib.getLabeledArgs(label, defaultValue, param, body);
+
+  Builder.pmod_structure(
+    ~loc,
+    dynamicComponentCodegenSteps(
+      ~loc,
+      ~htmlTag,
+      ~moduleName,
+      ~functionExpr,
+      ~labeledArguments,
+    ),
   );
 };
