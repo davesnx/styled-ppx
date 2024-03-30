@@ -1,14 +1,11 @@
 let stack = [%cx "display: flex; flex-direction: column"];
 let stackGap = gap => [%cx "gap: $(gap)"];
 
-let nav = [%cx
-  {|
-  margin: 0 auto 24px auto;
-  font-family: "Roboto", sans-serif;
-  padding: 0px 16px;
-  color: rgba(0, 0, 0, 0.66);
-  font-size: 13px;
-  line-height: 16px;
+module Cositas = [%styled.div
+  (~lola=CssJs.px(0)) => {|
+  display: flex;
+  flex-direction: column;
+  gap: $(lola);
 |}
 ];
 
@@ -50,8 +47,12 @@ let clx = [%cx
 module App = {
   [@react.component]
   let make = () =>
-    <div>
+    <Cositas as_="section" lola={CssJs.px(10)}>
       <div className=clx> {React.string("code everywhere!")} </div>
       <div className=selectors> {React.string("Red text")} </div>
-    </div>;
+    </Cositas>;
+};
+
+let getStaticMarkup = () => {
+  ReactDOM.renderToStaticMarkup(<App />);
 };
