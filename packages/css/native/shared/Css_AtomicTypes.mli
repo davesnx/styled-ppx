@@ -239,9 +239,21 @@ module FontStyle : sig
 end
 
 module FontSize : sig
+  type relative_size =
+    [ `smaller
+    | `larger
+    ]
+
   type t =
-    [ `small
+    [ relative_size
+    | `xx_small
+    | `x_small
+    | `small
+    | `medium
     | `large
+    | `x_large
+    | `xx_large
+    | `xxx_large
     ]
 
   val toString : t -> string

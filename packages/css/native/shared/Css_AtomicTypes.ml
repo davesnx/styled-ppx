@@ -369,12 +369,34 @@ module FontStyle = struct
 end
 
 module FontSize = struct
-  type t =
-    [ `small
-    | `large
+  type relative_size =
+    [ `smaller
+    | `larger
     ]
 
-  let toString = function `small -> {js|small|js} | `large -> {js|large|js}
+  type t =
+    [ relative_size
+    | `xx_small
+    | `x_small
+    | `small
+    | `medium
+    | `large
+    | `x_large
+    | `xx_large
+    | `xxx_large
+    ]
+
+  let toString = function
+    | `smaller -> {js|smaller|js}
+    | `larger -> {js|larger|js}
+    | `xx_small -> {js|xx-small|js}
+    | `x_small -> {js|x-small|js}
+    | `small -> {js|small|js}
+    | `medium -> {js|medium|js}
+    | `large -> {js|large|js}
+    | `x_large -> {js|x-large|js}
+    | `xx_large -> {js|xx-large|js}
+    | `xxx_large -> {js|xxx-large|js}
 end
 
 module TabSize = struct

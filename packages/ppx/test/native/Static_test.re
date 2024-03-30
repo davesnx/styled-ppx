@@ -99,6 +99,26 @@ let properties_static_css_tests = [
     [%expr CssJs.fontSize(`small)],
   ),
   (
+    [%css "font-size: larger"],
+    [%expr [%css "font-size: larger"]],
+    [%expr CssJs.fontSize(`larger)],
+  ),
+  (
+    [%css "font-size: x-large"],
+    [%expr [%css "font-size: x-large"]],
+    [%expr CssJs.fontSize(`x_large)],
+  ),
+  (
+    [%css "font-size: xx-large"],
+    [%expr [%css "font-size: xx-large"]],
+    [%expr CssJs.fontSize(`xx_large)],
+  ),
+  (
+    [%css "font-size: xx-small"],
+    [%expr [%css "font-size: xx-small"]],
+    [%expr CssJs.fontSize(`xx_small)],
+  ),
+  (
     [%css "height: 100vh"],
     [%expr [%css "height: 100vh"]],
     [%expr CssJs.height(`vh(100.))],

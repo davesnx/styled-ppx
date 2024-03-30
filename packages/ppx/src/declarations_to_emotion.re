@@ -2312,7 +2312,6 @@ let font_style =
     render_font_style,
   );
 
-/* bs-css does not support these variants */
 let render_absolute_size = (~loc, value: Types.absolute_size) =>
   switch (value) {
   | `Large => id([%expr `large])
