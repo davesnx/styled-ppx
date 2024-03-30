@@ -324,7 +324,7 @@ let domPropParam = (~loc, ~isOptional, domProp) => {
   };
 };
 
-let serverCreateElement = (~loc, ~htmlTag) => {
+let serverCreateElement = (~loc, ~htmlTag, ~variableNames) => {
   let finalHtmlTag =
     switch%expr ([%e Helper.Exp.ident(~loc, withLoc(~loc, Lident("as_")))]) {
     | Some(v) => v
@@ -332,7 +332,7 @@ let serverCreateElement = (~loc, ~htmlTag) => {
     };
 
   let params =
-    MakeProps.get(["key", "ref", "className"])
+    MakeProps.get(["key", "ref", "className"] @ variableNames)
     |> List.map(value =>
          switch (value) {
          | MakeProps.Event({name, _}) => name
@@ -426,12 +426,13 @@ let makeBody = (~loc, ~htmlTag, ~className as classNameValue, ~variables) => {
   );
 };
 
-let makeBodyServer = (~loc, ~htmlTag, ~className as classNameValue) => {
+let makeBodyServer =
+    (~loc, ~htmlTag, ~className as classNameValue, ~variableNames) => {
   Helper.Exp.let_(
     ~loc,
     Nonrecursive,
     [className(~loc, classNameValue)],
-    serverCreateElement(~loc, ~htmlTag),
+    serverCreateElement(~loc, ~htmlTag, ~variableNames),
   );
 };
 
@@ -502,6 +503,7 @@ let makeFnJSXServer =
       ~loc,
       ~htmlTag,
       ~className=[%expr [%e className] ++ getOrEmpty(className)],
+      ~variableNames,
     ),
   );
 };
