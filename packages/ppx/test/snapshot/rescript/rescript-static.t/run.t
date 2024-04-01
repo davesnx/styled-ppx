@@ -105,7 +105,7 @@
         contextMenu: string [@bs.optional ];
         controls: bool [@bs.optional ];
         coords: string [@bs.optional ];
-        crossorigin: bool [@bs.optional ];
+        crossOrigin: string [@bs.optional ];
         cursor: string [@bs.optional ];
         cx: string [@bs.optional ];
         cy: string [@bs.optional ];
@@ -235,7 +235,7 @@
         maxLength: int [@bs.optional ];
         media: string [@bs.optional ];
         mediaGroup: string [@bs.optional ];
-        min: int [@bs.optional ];
+        min: string [@bs.optional ];
         minLength: int [@bs.optional ];
         mode: string [@bs.optional ];
         multiple: bool [@bs.optional ];

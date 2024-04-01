@@ -8,4 +8,4 @@
   server-reason-react.belt
   server-reason-react.reactDom)
  (preprocess
-  (pps styled-ppx.lib server-reason-react.ppx)))
+  (pps styled-ppx.lib --native server-reason-react.ppx)))

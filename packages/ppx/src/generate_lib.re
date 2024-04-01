@@ -247,6 +247,119 @@ let variadicElement = (~loc, ~htmlTag) => {
   );
 };
 
+let getLabel = str =>
+  switch (str) {
+  | Optional(str)
+  | Labelled(str) => str
+  | Nolabel => ""
+  };
+
+let makeParam =
+    (
+      ~loc,
+      ~default: option(expression)=?,
+      ~isOptional=false,
+      ~wrapOption=isOptional,
+      ~discard=false,
+      ~coreType=?,
+      label,
+    ) => {
+  let labelPattern =
+    Helper.Pat.mk(
+      ~loc,
+      discard ? Ppat_any : Ppat_var(withLoc(label, ~loc)),
+    );
+
+  (
+    isOptional ? Optional(label) : Labelled(label),
+    default,
+    switch (coreType) {
+    | Some(typ) =>
+      Helper.Pat.mk(
+        ~loc,
+        Ppat_constraint(
+          labelPattern,
+          wrapOption ? [%type: option([%t typ])] : typ,
+        ),
+      )
+    | None => labelPattern
+    },
+    label,
+    loc,
+    None,
+  );
+};
+
+let domPropParam = (~loc, ~isOptional, domProp) => {
+  switch (domProp) {
+  | MakeProps.Event({name, type_}) =>
+    makeParam(
+      ~loc,
+      ~isOptional,
+      ~coreType=
+        Helper.Typ.arrow(
+          ~loc,
+          Nolabel,
+          Helper.Typ.constr(
+            ~loc,
+            withLoc(~loc, MakeProps.eventTypeToIdent(type_)),
+            [],
+          ),
+          Helper.Typ.constr(~loc, withLoc(Lident("unit"), ~loc), []),
+        ),
+      name,
+    )
+  | MakeProps.Attribute({name, type_, _}) =>
+    makeParam(
+      ~loc,
+      ~isOptional,
+      ~coreType=
+        Helper.Typ.constr(
+          ~loc,
+          withLoc(~loc, MakeProps.attributeTypeToIdent(type_)),
+          [],
+        ),
+      name,
+    )
+  };
+};
+
+let serverCreateElement = (~loc, ~htmlTag, ~variableNames) => {
+  let finalHtmlTag =
+    switch%expr ([%e Helper.Exp.ident(~loc, withLoc(~loc, Lident("as_")))]) {
+    | Some(v) => v
+    | None => [%e Builder.estring(~loc, htmlTag)]
+    };
+
+  let params =
+    MakeProps.get(["key", "ref", "className"] @ variableNames)
+    |> List.map(value =>
+         switch (value) {
+         | MakeProps.Event({name, _}) => name
+         | MakeProps.Attribute({name, _}) => name
+         }
+       )
+    |> List.map(label =>
+         (
+           Optional(label),
+           Helper.Exp.ident(~loc, withLoc(~loc, Lident(label))),
+         )
+       );
+
+  let domProps =
+    Helper.Exp.apply(
+      [%expr ReactDOM.domProps],
+      [
+        (Labelled("className"), [%expr className]),
+        (Optional("ref"), [%expr innerRef]),
+      ]
+      @ params
+      @ [(Nolabel, [%expr ()])],
+    );
+
+  [%expr React.createElement([%e finalHtmlTag], [%e domProps], [children])];
+};
+
 /* let stylesObject = { "className": className, "ref": props.ref }; */
 let stylesAndRefObject = (~loc) => {
   let className = (
@@ -313,12 +426,87 @@ let makeBody = (~loc, ~htmlTag, ~className as classNameValue, ~variables) => {
   );
 };
 
-let getLabel = str =>
+let makeBodyServer =
+    (~loc, ~htmlTag, ~className as classNameValue, ~variableNames) => {
+  Helper.Exp.let_(
+    ~loc,
+    Nonrecursive,
+    [className(~loc, classNameValue)],
+    serverCreateElement(~loc, ~htmlTag, ~variableNames),
+  );
+};
+
+let typeVariable = (~loc, name) => Builder.ptyp_var(~loc, name);
+
+let getIsOptional = str =>
   switch (str) {
-  | Optional(str)
-  | Labelled(str) => str
-  | Nolabel => ""
+  | Optional(_) => true
+  | _ => false
   };
+
+let makeStyleParams = (~labeledArguments) => {
+  labeledArguments
+  |> List.map(((arg, defaultExpr, _, _, loc, type_)) => {
+       let (kind, type_) =
+         switch (type_) {
+         | Some(type_) => (`Typed, type_)
+         | None => (`Open, typeVariable(~loc, getLabel(arg)))
+         };
+
+       (loc, arg, defaultExpr, kind, type_);
+     })
+  |> List.map(((loc, arg, _, kind, type_)) => {
+       makeParam(
+         ~loc,
+         ~isOptional=getIsOptional(arg),
+         ~wrapOption=false,
+         ~coreType=?
+           switch (kind) {
+           | `Open => None
+           | `Typed => Some(type_)
+           },
+         getLabel(arg),
+       )
+     });
+};
+
+/* let make = (~key, ~innerRef, ~as_, ~children, ...reactDomParams, ()) => + makeBody */
+let makeFnJSXServer =
+    (~loc, ~htmlTag, ~className, ~styleParams, ~variableNames) => {
+  fnWithLabeledArgs(
+    {
+      let reactDomParams =
+        MakeProps.get(["key"] @ variableNames)
+        |> List.map(domPropParam(~loc, ~isOptional=true));
+      [
+        (Nolabel, None, Builder.ppat_any(~loc), "_", Location.none, None),
+        makeParam(
+          ~loc,
+          ~isOptional=true,
+          ~discard=true,
+          ~coreType=[%type: string],
+          "key",
+        ),
+        makeParam(~loc, ~isOptional=true, "innerRef"),
+        makeParam(~loc, ~isOptional=true, "as_"),
+        makeParam(
+          ~loc,
+          ~isOptional=true,
+          ~default=[%expr React.null],
+          "children",
+        ),
+      ]
+      @ reactDomParams
+      @ styleParams;
+    },
+    makeBodyServer(
+      ~loc,
+      ~htmlTag,
+      ~className=[%expr [%e className] ++ getOrEmpty(className)],
+      ~variableNames,
+    ),
+  );
+};
 
 /* let make = (props: makeProps) => + makeBody */
 let makeFnJSX3 = (~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames) => {
@@ -373,6 +561,15 @@ let component =
     switch (File.get()) {
     | Some(ReScript) when Settings.Get.jsxVersion() === 4 =>
       makeFnJSX4(~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames)
+    | Some(Reason)
+    | Some(OCaml) when Settings.Get.native() =>
+      makeFnJSXServer(
+        ~loc,
+        ~htmlTag,
+        ~className,
+        ~styleParams=makeStyleParams(~labeledArguments),
+        ~variableNames,
+      )
     | _ =>
       makeFnJSX3(~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames)
     };
@@ -396,8 +593,6 @@ let customPropLabel = (~loc, ~optional, name, type_) => {
       ? optionalType(~loc, type_) : type_,
   );
 };
-
-let typeVariable = (~loc, name) => Builder.ptyp_var(~loc, name);
 
 /* href: string */
 /* Melange expects record fields to be optional */
@@ -618,8 +813,29 @@ let makeProps = (~loc, customProps) => {
   };
 };
 
+/* [%mel.raw payload] */
+let rawExtension = (~loc, payload) => {
+  let ext_name =
+    switch (File.get()) {
+    | Some(ReScript) => "raw"
+    | _ => "mel.raw"
+    };
+
+  Helper.Exp.extension(
+    ~loc,
+    (
+      withLoc(~loc, ext_name),
+      PStr([Helper.Str.eval(~loc, Builder.estring(~loc, payload))]),
+    ),
+  );
+};
+
 let defineDeletePropFn = (~loc) => {
-  [%stri let deleteProp = [%raw "(newProps, key) => delete newProps[key]"]];
+  [%stri
+    let deleteProp = [%e
+      rawExtension(~loc, "(newProps, key) => delete newProps[key]")
+    ]
+  ];
 };
 
 /* [%stri external assign2 : Js.t({ .. }) => Js.t({ .. }) => Js.t({ .. }) => Js.t({ .. }) = "Object.assign"] */
@@ -672,12 +888,6 @@ let raiseError = (~loc, ~description, ~example, ~link) => {
 
   raise(error);
 };
-
-let getIsOptional = str =>
-  switch (str) {
-  | Optional(_) => true
-  | _ => false
-  };
 
 let getIsLabelled = str =>
   switch (str) {
