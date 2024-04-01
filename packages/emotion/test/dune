@@ -9,7 +9,7 @@
   styled-ppx.emotion_native
   styled-ppx.emotion-hash)
  (preprocess
-  (pps styled-ppx.lib)))
+  (pps styled-ppx)))
 
 (rule
  (alias test_emotion)

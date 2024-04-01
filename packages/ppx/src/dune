@@ -1,6 +1,6 @@
 (library
  (name styled_ppx)
- (public_name styled-ppx.lib)
+ (public_name styled-ppx)
  (kind ppx_rewriter)
  (flags
   (:standard -w -9))

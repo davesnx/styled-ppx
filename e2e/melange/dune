@@ -4,7 +4,7 @@
  (modules :standard \ debug)
  (libraries ui styled-ppx.css styled-ppx.emotion reason-react)
  (preprocess
-  (pps melange.ppx styled-ppx.lib reason-react-ppx))
+  (pps melange.ppx styled-ppx reason-react-ppx))
  (module_systems
   (commonjs bs.js)))
 
@@ -14,4 +14,4 @@
  (modules :standard \ index)
  (libraries ui_native styled-ppx.emotion_native styled-ppx.css_native)
  (preprocess
-  (pps styled-ppx.lib)))
+  (pps styled-ppx)))

@@ -4,4 +4,4 @@
  (modes melange)
  (libraries melange.belt styled-ppx.css styled-ppx.emotion reason-react)
  (preprocess
-  (pps melange.ppx styled-ppx.lib reason-react-ppx)))
+  (pps melange.ppx styled-ppx reason-react-ppx)))

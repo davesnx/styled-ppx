@@ -1,4 +1,4 @@
 (executable
  (name bin)
  (public_name styled-ppx)
- (libraries styled-ppx.lib ppxlib))
+ (libraries styled-ppx ppxlib))

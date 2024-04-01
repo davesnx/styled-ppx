@@ -26,10 +26,10 @@ Same example but with styled-ppx pp (error location should be at the same place)
   > (executable
   >  (name main)
   >  (preprocess
-  >   (pps styled-ppx.lib)))
+  >   (pps styled-ppx)))
   > EOF
 
-Preprocessing with styled-ppx.lib should not lose the error location
+Preprocessing with styled-ppx should not lose the error location
 
   $ dune build main.exe
   File "main.ml", line 1, characters 8-10:

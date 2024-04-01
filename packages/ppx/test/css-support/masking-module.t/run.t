@@ -11,7 +11,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > (executable
   >  (name input)
   >  (libraries styled-ppx.emotion_native styled-ppx.css_native)
-  >  (preprocess (pps styled-ppx.lib)))
+  >  (preprocess (pps styled-ppx)))
   > EOF
 
 

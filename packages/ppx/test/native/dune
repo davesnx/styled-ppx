@@ -2,7 +2,7 @@
  (name Runner)
  (libraries
   alcotest
-  styled-ppx.lib
+  styled-ppx
   styled-ppx.css_native
   styled-ppx.emotion_native
   ppxlib
@@ -11,7 +11,7 @@
   server-reason-react.js
   fmt)
  (preprocess
-  (pps ppxlib.metaquot styled-ppx.lib -- -no-merge)))
+  (pps ppxlib.metaquot styled-ppx -- -no-merge)))
 
 (rule
  (alias test_native_typecheck)
