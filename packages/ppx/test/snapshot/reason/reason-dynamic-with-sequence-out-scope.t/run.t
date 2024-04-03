@@ -201,7 +201,7 @@
       [@mel.optional]
       coords: option(string),
       [@mel.optional]
-      crossorigin: option(bool),
+      crossOrigin: option(string),
       [@mel.optional]
       cursor: option(string),
       [@mel.optional]
@@ -461,7 +461,7 @@
       [@mel.optional]
       mediaGroup: option(string),
       [@mel.optional]
-      min: option(int),
+      min: option(string),
       [@mel.optional]
       minLength: option(int),
       [@mel.optional]
@@ -957,7 +957,7 @@
     [@mel.module "react"]
     external createVariadicElement: (string, Js.t({..})) => React.element =
       "createElement";
-    let deleteProp = [%raw "(newProps, key) => delete newProps[key]"];
+    let deleteProp = [%mel.raw "(newProps, key) => delete newProps[key]"];
     let getOrEmpty = str =>
       switch (str) {
       | Some(str) => " " ++ str

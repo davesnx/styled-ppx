@@ -3,7 +3,7 @@
   $ refmt --parse ml --print re output.ml
   module DynamicComponent = {
     [@deriving (jsProperties, getSet)]
-    type makeProps('var) = {
+    type makeProps('id, 'var) = {
       [@mel.optional]
       innerRef: option(ReactDOM.domRef),
       [@mel.optional]
@@ -199,7 +199,7 @@
       [@mel.optional]
       coords: option(string),
       [@mel.optional]
-      crossorigin: option(bool),
+      crossOrigin: option(string),
       [@mel.optional]
       cursor: option(string),
       [@mel.optional]
@@ -353,8 +353,6 @@
       [@mel.optional]
       icon: option(string),
       [@mel.optional]
-      id: option(string),
-      [@mel.optional]
       ideographic: option(string),
       [@mel.optional]
       imageRendering: option(string),
@@ -459,7 +457,7 @@
       [@mel.optional]
       mediaGroup: option(string),
       [@mel.optional]
-      min: option(int),
+      min: option(string),
       [@mel.optional]
       minLength: option(int),
       [@mel.optional]
@@ -950,12 +948,13 @@
       onWaiting: option(React.Event.Media.t => unit),
       [@mel.optional]
       onWheel: option(React.Event.Wheel.t => unit),
+      id: 'id,
       var: 'var,
     };
     [@mel.module "react"]
     external createVariadicElement: (string, Js.t({..})) => React.element =
       "createElement";
-    let deleteProp = [%raw "(newProps, key) => delete newProps[key]"];
+    let deleteProp = [%mel.raw "(newProps, key) => delete newProps[key]"];
     let getOrEmpty = str =>
       switch (str) {
       | Some(str) => " " ++ str
@@ -963,17 +962,20 @@
       };
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
-    let styles = (~var, _) =>
+    let styles = (~var, ~id, _) =>
       CssJs.style([|
         CssJs.label("DynamicComponent"),
         (CssJs.color(var): CssJs.rule),
         CssJs.display(`flex),
+        (CssJs.backgroundColor(id): CssJs.rule),
       |]);
-    let make = (props: makeProps('var)) => {
+    let make = (props: makeProps('id, 'var)) => {
       let className =
-        styles(~var=varGet(props), ()) ++ getOrEmpty(classNameGet(props));
+        styles(~id=idGet(props), ~var=varGet(props), ())
+        ++ getOrEmpty(classNameGet(props));
       let stylesObject = {"className": className, "ref": innerRefGet(props)};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
+      ignore(deleteProp(. newProps, "id"));
       ignore(deleteProp(. newProps, "var"));
       ignore(deleteProp(. newProps, "innerRef"));
       let asTag = as_Get(props);

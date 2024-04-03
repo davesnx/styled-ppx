@@ -701,12 +701,12 @@ let static_pattern =
      ~doc=Settings.jsxVersion.doc,
    ); */
 
-/* let _ =
-   Styled_ppx_css_parser.Driver.add_arg(
-     Settings.jsxMode.flag,
-     Arg.String(value => Settings.Update.jsxMode(Some(value))),
-     ~doc=Settings.jsxMode.doc,
-   ); */
+let _ =
+  Ppxlib.Driver.add_arg(
+    Settings.native.flag,
+    Arg.Unit(_ => Settings.Update.native(true)),
+    ~doc=Settings.native.doc,
+  );
 
 let (version, mode) = Bsconfig.getJSX();
 

@@ -201,7 +201,7 @@
       [@mel.optional]
       coords: option(string),
       [@mel.optional]
-      crossorigin: option(bool),
+      crossOrigin: option(string),
       [@mel.optional]
       cursor: option(string),
       [@mel.optional]
@@ -461,7 +461,7 @@
       [@mel.optional]
       mediaGroup: option(string),
       [@mel.optional]
-      min: option(int),
+      min: option(string),
       [@mel.optional]
       minLength: option(int),
       [@mel.optional]
@@ -961,7 +961,7 @@
       | Some(str) => " " ++ str
       | None => ""
       };
-    let deleteProp = [%raw "(newProps, key) => delete newProps[key]"];
+    let deleteProp = [%mel.raw "(newProps, key) => delete newProps[key]"];
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles =

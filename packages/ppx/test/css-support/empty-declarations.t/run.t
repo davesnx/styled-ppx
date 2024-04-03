@@ -3,11 +3,11 @@ If this test fail means that Css_Js_Core or CssJs_Legacy_Core (from styled-ppx.c
 
 This test only runs against Css_Js_Core from styled-ppx.css_native
 
-  $ cat >dune-project <<EOF
+  $ cat > dune-project << EOF
   > (lang dune 3.10)
   > EOF
 
-  $ cat >dune <<EOF
+  $ cat > dune << EOF
   > (executable
   >  (name input)
   >  (libraries styled-ppx.css_native styled-ppx.emotion_native)
