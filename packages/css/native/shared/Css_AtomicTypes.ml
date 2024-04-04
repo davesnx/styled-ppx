@@ -2083,6 +2083,7 @@ module BackgroundClip = struct
     [ `borderBox
     | `paddingBox
     | `contentBox
+    | `text
     ]
 
   let toString x =
@@ -2090,6 +2091,7 @@ module BackgroundClip = struct
     | `borderBox -> {js|border-box|js}
     | `contentBox -> {js|content-box|js}
     | `paddingBox -> {js|padding-box|js}
+    | `text -> {js|text|js}
 end
 
 module BackgroundOrigin = struct

@@ -1597,7 +1597,8 @@ let background_clip =
     (~loc) =>
       fun
       | [] => failwith("expected at least one argument")
-      | [v] => variant_to_expression(~loc, v)
+      | [`Box(b)] => variant_to_expression(~loc, b)
+      | [`Text] => variant_to_expression(~loc, `Text)
       | _ => raise(Unsupported_feature),
   );
 let background_origin =

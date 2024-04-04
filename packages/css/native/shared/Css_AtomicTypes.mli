@@ -1358,6 +1358,7 @@ module BackgroundClip : sig
     [ `borderBox
     | `contentBox
     | `paddingBox
+    | `text
     ]
 
   val toString : t -> string
