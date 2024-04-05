@@ -1466,7 +1466,9 @@ let render_function_radial_gradient =
     let shape = render_eding_shape(~loc, shape);
     [%expr
      `radialGradient((
-       [%e shape], None, None,
+       [%e shape],
+       None,
+       None,
        [%e render_color_stop_list(~loc, color_stop_list)]: Css_AtomicTypes.Gradient.color_stop_list,
      ))];
   | (shape, Some(radial_size), None, None | Some (), color_stop_list) =>
@@ -1474,7 +1476,9 @@ let render_function_radial_gradient =
     let size = render_radial_size(~loc, radial_size);
     [%expr
      `radialGradient((
-       [%e shape], Some([%e size]), None,
+       [%e shape],
+       Some([%e size]),
+       None,
        [%e render_color_stop_list(~loc, color_stop_list)]: Css_AtomicTypes.Gradient.color_stop_list,
      ))];
   | (shape, None, Some(((), position)), None | Some (), color_stop_list) =>
@@ -1482,7 +1486,9 @@ let render_function_radial_gradient =
     let (positionX, positionY) = render_position(~loc, position);
     [%expr
      `radialGradient((
-       [%e shape], None, Some(([%e positionX], [%e positionY])),
+       [%e shape],
+       None,
+       Some(([%e positionX], [%e positionY])),
        [%e render_color_stop_list(~loc, color_stop_list)]: Css_AtomicTypes.Gradient.color_stop_list,
      ))];
   | (
@@ -1497,9 +1503,9 @@ let render_function_radial_gradient =
     let (positionX, positionY) = render_position(~loc, position);
     [%expr
      `radialGradient((
-        [%e shape],
-        Some([%e size]),
-        Some(([%e positionX], [%e positionY])),
+       [%e shape],
+       Some([%e size]),
+       Some(([%e positionX], [%e positionY])),
        [%e render_color_stop_list(~loc, color_stop_list)]: Css_AtomicTypes.Gradient.color_stop_list,
      ))];
   };
@@ -4201,13 +4207,6 @@ let list_style_image =
       }
     },
   );
-
-/* let width =
-   monomorphic(
-     Parser.property_width,
-     (~loc) => [%expr CssJs.width],
-     render_size,
-   ); */
 
 let list_style_position =
   unsupportedProperty(Parser.property_list_style_position);
