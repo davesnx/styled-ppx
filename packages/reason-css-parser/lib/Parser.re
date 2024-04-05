@@ -143,7 +143,12 @@ and color_stop_angle = [%value.rec "[ <extended-angle> ]{1,2}"]
 and color_stop_length = [%value.rec
   "<extended-length> | <extended-percentage>"
 ]
-/* color_stop_list is modified from the original spec, here is a simplified version where it tries to be fully compatible but easier for code-gen, original spec is `color_stop_list = [%value.rec "[ <linear-color-stop> [ ',' <linear-color-hint> ]? ]# ',' <linear-color-stop>"]` */
+/* color_stop_list is modified from the original spec, here is a simplified version where it tries to be fully compatible but easier for code-gen:
+
+The current impl allows values that aren't really supported such as: `linear-gradient(0deg, 10%, blue)` which is invalid, but we allow it for now to make it easier to generate the types. The correct value would require always a color to be in the first position `linear-gradient(0deg, red, 10%, blue);`
+
+The original spec is `color_stop_list = [%value.rec "[ <linear-color-stop> [ ',' <linear-color-hint> ]? ]# ',' <linear-color-stop>"]`
+*/
 and color_stop_list = [%value.rec
   "[ [<color>? <length-percentage>] | [<color> <length-percentage>?] ]#"
 ]

@@ -2364,25 +2364,32 @@ module Gradient = struct
     | `TopRight
     ]
 
+  type color_stop_list = ([ Color.t | Var.t ] option * Length.t option) array
+
+  type angular_color_stop_list =
+    ([ Color.t | Var.t ] option * Length.t option) array
+
   type t =
-    [ `linearGradient of
-      direction option * ([ Color.t | Var.t ] * Length.t option) array
-    | `repeatingLinearGradient of
-      direction option * ([ Color.t | Var.t ] * Length.t option) array
-    | `radialGradient of ([ Color.t | Var.t ] * Length.t option) array
-    | `repeatingRadialGradient of ([ Color.t | Var.t ] * Length.t option) array
-    | `conicGradient of
-      direction option * ([ Color.t | Var.t ] * Length.t option) array
+    [ `linearGradient of direction option * color_stop_list
+    | `repeatingLinearGradient of direction option * color_stop_list
+    | `radialGradient of color_stop_list
+    | `repeatingRadialGradient of color_stop_list
+    | `conicGradient of direction option * angular_color_stop_list
     ]
 
-  let linearGradient angle stops = `linearGradient (angle, stops)
+  let linearGradient direction (stops : color_stop_list) =
+    `linearGradient (Some direction, stops)
 
-  let repeatingLinearGradient angle stops =
-    `repeatingLinearGradient (angle, stops)
+  let repeatingLinearGradient direction (stops : color_stop_list) =
+    `repeatingLinearGradient (Some direction, stops)
 
-  let radialGradient stops = `radialGradient stops
-  let repeatingRadialGradient stops = `repeatingRadialGradient stops
-  let conicGradient angle stops = `conicGradient (angle, stops)
+  let radialGradient (stops : color_stop_list) = `radialGradient stops
+
+  let repeatingRadialGradient (stops : color_stop_list) =
+    `repeatingRadialGradient stops
+
+  let conicGradient angle (stops : color_stop_list) =
+    `conicGradient (Some angle, stops)
 
   let string_of_color x =
     match x with
@@ -2392,9 +2399,12 @@ module Gradient = struct
   let string_of_stops stops =
     stops
     |. Std.Array.map (fun (c, l) ->
-           match l with
-           | None -> string_of_color c
-           | Some l -> string_of_color c ^ {js| |js} ^ Length.toString l)
+           match c, l with
+           (* This is the consequence of having wrong spec, we can generate broken CSS for gradients, very unlickely that manually you construct a gradient with (None, None), but still. *)
+           | None, None -> {| |}
+           | None, Some l -> Length.toString l
+           | Some c, None -> string_of_color c
+           | Some c, Some l -> string_of_color c ^ {js| |js} ^ Length.toString l)
     |. Std.Array.joinWith ~sep:{js|, |js}
 
   let direction_to_string = function
