@@ -2366,11 +2366,24 @@ module Gradient = struct
 
   type color_stop_list = ([ Color.t | Var.t ] option * Length.t option) array
 
+  type shape =
+    [ `ellipse
+    | `circle
+    ]
+
+  type radial_size =
+    [ `closestSide
+    | `closestCorner
+    | `farthestSide
+    | `farthestCorner
+    ]
+
   type t =
     [ `linearGradient of direction option * color_stop_list
     | `repeatingLinearGradient of direction option * color_stop_list
-    | `radialGradient of color_stop_list
-    | `repeatingRadialGradient of color_stop_list
+    | `radialGradient of
+      shape option * radial_size option * Position.t option * color_stop_list
+    | `repeatingRadialGradient of shape option * radial_size option * Position.t option * color_stop_list
     | `conicGradient of direction option * color_stop_list
     ]
 
@@ -2379,8 +2392,14 @@ module Gradient = struct
   let repeatingLinearGradient direction stops =
     `repeatingLinearGradient (Some direction, stops)
 
-  let radialGradient stops = `radialGradient stops
-  let repeatingRadialGradient stops = `repeatingRadialGradient stops
+  let radialGradient (shape : shape) (size : radial_size)
+    (position : Position.t) (stops : color_stop_list) =
+    `radialGradient (Some shape, Some size, Some position, stops)
+
+  let repeatingRadialGradient (shape : shape) (size : radial_size)
+    (position : Position.t) (stops : color_stop_list) =
+    `repeatingRadialGradient (Some shape, Some size, Some position, stops)
+
   let conicGradient angle stops = `conicGradient (Some angle, stops)
 
   let string_of_color x =
@@ -2403,6 +2422,64 @@ module Gradient = struct
     | `Angle a -> Angle.toString a
     | #SideOrCorner.t as s -> SideOrCorner.toString s
 
+  let string_of_shape shape =
+    match shape with `ellipse -> {js|ellipse|js} | `circle -> {js|circle|js}
+
+  let string_of_size size =
+    match size with
+    | `closestSide -> {js|closest-side|js}
+    | `closestCorner -> {js|closest-corner|js}
+    | `farthestSide -> {js|farthest-side|js}
+    | `farthestCorner -> {js|farthest-corner|js}
+
+  let string_of_position position =
+    match position with
+    | `top -> {js|top|js}
+    | `bottom -> {js|bottom|js}
+    | `left -> {js|left|js}
+    | `right -> {js|right|js}
+    | `center -> {js|center|js}
+    | #Percentage.t as p -> Percentage.toString p
+    | #Length.t as l -> Length.toString l
+
+  let maybe_string_of_shape = function
+    | None -> {js||js}
+    | Some shape -> string_of_shape shape ^ {js| |js}
+
+  let maybe_string_of_size = function
+    | None -> {js||js}
+    | Some size -> string_of_size size ^ {js| |js}
+
+  let maybe_string_of_position = function
+    | None -> {js||js}
+    | Some position -> {|at |} ^ string_of_position position ^ {js| |js}
+
+  let string_of_radialGradient gradient =
+    match gradient with
+    | None, None, None, stops ->
+      {js|radial-gradient(|js} ^ string_of_stops stops ^ {js|)|js}
+    | shape, size, position, stops ->
+      {js|radial-gradient(|js}
+      ^ maybe_string_of_shape shape
+      ^ maybe_string_of_size size
+      ^ maybe_string_of_position position
+      ^ ","
+      ^ string_of_stops stops
+      ^ {js|)|js}
+
+  let string_of_repeatingRadialGradients gradient =
+    match gradient with
+    | None, None, None, stops ->
+      {js|repeating-radial-gradient(|js} ^ string_of_stops stops ^ {js|)|js}
+    | shape, size, position, stops ->
+      {js|repeating-radial-gradient(|js}
+      ^ maybe_string_of_shape shape
+      ^ maybe_string_of_size size
+      ^ maybe_string_of_position position
+      ^ ","
+      ^ string_of_stops stops
+      ^ {js|)|js}
+
   let toString (x : t) =
     match x with
     | `linearGradient (None, stops) ->
@@ -2421,10 +2498,9 @@ module Gradient = struct
       ^ {js|, |js}
       ^ string_of_stops stops
       ^ {js|)|js}
-    | `radialGradient stops ->
-      {js|radial-gradient(|js} ^ string_of_stops stops ^ {js|)|js}
-    | `repeatingRadialGradient stops ->
-      {js|repeating-radial-gradient(|js} ^ string_of_stops stops ^ {js|)|js}
+    | `radialGradient radialGradient -> string_of_radialGradient radialGradient
+    | `repeatingRadialGradient radialGradient ->
+      string_of_repeatingRadialGradients radialGradient
     | `conicGradient (None, stops) ->
       {js|conic-gradient(|js} ^ string_of_stops stops ^ {js|)|js}
     | `conicGradient (Some direction, stops) ->

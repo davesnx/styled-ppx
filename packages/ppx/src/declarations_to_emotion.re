@@ -1440,13 +1440,60 @@ let render_function_repeating_linear_gradient =
   };
 };
 
-/* | #radialGradient(array<(Length.t, [< Color.t | Var.t] as 'colorOrVar)>) */
+let render_eding_shape = (~loc, value) => {
+  switch (value) {
+  | Some(`Circle) => [%expr `circle]
+  | Some(`Ellipse) => [%expr `ellipse]
+  | None => [%expr `ellipse]
+  };
+};
+
+let render_radial_size = (~loc, value: Types.radial_size) => {
+  switch (value) {
+  | `Extended_length(l) => render_extended_length(~loc, l)
+  | `Farthest_side => [%expr `farthestSide]
+  | `Closest_side => [%expr `closestSide]
+  | `Closest_corner => [%expr `closestCorner]
+  | `Farthest_corner => [%expr `farthestCorner]
+  | `Xor(_) => raise(Unsupported_feature)
+  };
+};
+
 let render_function_radial_gradient =
     (~loc, value: Types.function_radial_gradient) => {
   switch (value) {
-  | (None, None, (), stops) =>
-    [%expr `radialGradient([%e render_color_stop_list(~loc, stops)])]
-  | _ => raise(Unsupported_feature)
+  | (shape, None, None, None | Some (), color_stop_list) =>
+    let shape = render_eding_shape(~loc, shape);
+    [%expr
+     `radialGradient((
+       ([%e shape], None, None),
+       [%e render_color_stop_list(~loc, color_stop_list)],
+     ))];
+  | (shape, Some(radial_size), None, None | Some (), color_stop_list) =>
+    let shape = render_eding_shape(~loc, shape);
+    let size = render_radial_size(~loc, radial_size);
+    [%expr
+     `radialGradient((
+       ([%e shape], [%e size], None),
+       [%e render_color_stop_list(~loc, color_stop_list)],
+     ))];
+  | (shape, None, Some(((), position)), None | Some (), color_stop_list) =>
+    let shape = render_eding_shape(~loc, shape);
+    let (positionX, positionY) = render_position(~loc, position);
+    [%expr
+     `radialGradient((
+       ([%e shape], None, Some(([%e positionX], [%e positionY]))),
+       [%e render_color_stop_list(~loc, color_stop_list)],
+     ))];
+  | (shape, Some(radial_size), Some(((), position)), None | Some (), color_stop_list) =>
+    let shape = render_eding_shape(~loc, shape);
+    let size = render_radial_size(~loc, radial_size);
+    let (positionX, positionY) = render_position(~loc, position);
+    [%expr
+     `radialGradient((
+       ([%e shape], Some([%e size]), Some(([%e positionX], [%e positionY]))),
+       [%e render_color_stop_list(~loc, color_stop_list)],
+     ))];
   };
 };
 

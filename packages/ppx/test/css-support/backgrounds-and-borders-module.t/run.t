@@ -333,6 +333,16 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   );
   CssJs.backgroundImage(
     `linearGradient((
+      Some(`Angle(`deg(90.))),
+      [|
+        (Some(CssJs.blue), None),
+        (None, Some(`percent(10.))),
+        (Some(CssJs.red), None),
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.backgroundImage(
+    `linearGradient((
       None,
       [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
@@ -426,6 +436,56 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
   |]);
+  CssJs.backgroundImage(
+    `radialGradient((
+      (`ellipse, None, None),
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|],
+    )),
+  );
+  CssJs.backgroundImage(
+    `radialGradient((
+      (`circle, None, None),
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|],
+    )),
+  );
+  CssJs.backgroundImage(
+    `radialGradient((
+      (`ellipse, None, None),
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|],
+    )),
+  );
+  CssJs.backgroundImage(
+    `radialGradient((
+      (`circle, `closestCorner, None),
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|],
+    )),
+  );
+  CssJs.backgroundImage(
+    `radialGradient((
+      (`ellipse, `farthestSide, None),
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|],
+    )),
+  );
+  CssJs.backgroundImage(
+    `radialGradient((
+      (`circle, `farthestSide, None),
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|],
+    )),
+  );
+  CssJs.backgroundImage(
+    `radialGradient((
+      (`ellipse, None, None),
+      [|
+        (None, Some(`percent(50.))),
+        (Some(CssJs.white), None),
+        (Some(CssJs.black), None),
+      |],
+    )),
+  );
+  CssJs.unsafe(
+    {js|backgroundImage|js},
+    {js|radial-gradient(60% 60%, white, black)|js},
+  );
   CssJs.listStyleImage(
     `linearGradient((
       None,
@@ -490,6 +550,62 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
         (Some(CssJs.blue), Some(`percent(100.))),
       |]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
+  );
+  CssJs.listStyleImage(
+    `radialGradient((
+      (`ellipse, None, None),
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|],
+    )),
+  );
+  CssJs.listStyleImage(
+    `radialGradient((
+      (`circle, None, None),
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|],
+    )),
+  );
+  CssJs.listStyleImage(
+    `radialGradient((
+      (`ellipse, None, None),
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|],
+    )),
+  );
+  CssJs.listStyleImage(
+    `radialGradient((
+      (`ellipse, `closestCorner, None),
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|],
+    )),
+  );
+  CssJs.listStyleImage(
+    `radialGradient((
+      (`circle, `closestCorner, None),
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|],
+    )),
+  );
+  CssJs.listStyleImage(
+    `radialGradient((
+      (`ellipse, `farthestSide, None),
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|],
+    )),
+  );
+  CssJs.listStyleImage(
+    `radialGradient((
+      (`circle, `farthestSide, None),
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|],
+    )),
+  );
+  CssJs.listStyleImage(
+    `radialGradient((
+      (`ellipse, None, None),
+      [|
+        (None, Some(`percent(50.))),
+        (Some(CssJs.white), None),
+        (Some(CssJs.black), None),
+      |],
+    )),
+  );
+  CssJs.unsafe(
+    {js|listStyleImage|js},
+    {js|radial-gradient(60% 60%, white, black)|js},
   );
   CssJs.imageRendering(`auto);
   CssJs.imageRendering(`smooth);

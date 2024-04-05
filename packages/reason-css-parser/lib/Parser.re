@@ -353,7 +353,7 @@ and function_polygon = [%value.rec
   "polygon( [ <fill-rule> ]? ',' [ <extended-length> | <extended-percentage> <extended-length> | <extended-percentage> ]# )"
 ]
 and function_radial_gradient = [%value.rec
-  "radial-gradient( [ <ending-shape> || <size> ]? [ 'at' <position> ]? ',' <color-stop-list> )"
+  "radial-gradient( <ending-shape>? <radial-size>? ['at' <position> ]? ','? <color-stop-list> )"
 ]
 and function_repeating_linear_gradient = [%value.rec
   "repeating-linear-gradient( [ <extended-angle> | 'to' <side-or-corner> ]? ',' <color-stop-list> )"
@@ -1351,7 +1351,7 @@ and property_offset_distance = [%value.rec
   "<extended-length> | <extended-percentage>"
 ]
 and property_offset_path = [%value.rec
-  "'none' | ray( <extended-angle> && [ <size> ]? && [ 'contain' ]? ) | <path()> | <url> | <basic-shape> || <geometry-box>"
+  "'none' | ray( <extended-angle> && [ <ray_size> ]? && [ 'contain' ]? ) | <path()> | <url> | <basic-shape> || <geometry-box>"
 ]
 and property_offset_position = [%value.rec "'auto' | <position>"]
 and property_offset_rotate = [%value.rec
@@ -1788,6 +1788,12 @@ and single_transition_property = [%value.rec
   "'all' | <custom-ident> | <interpolation>"
 ]
 and size = [%value.rec
+  "'closest-side' | 'farthest-side' | 'closest-corner' | 'farthest-corner' | <extended-length> | [ <extended-length> | <extended-percentage> ]{2}"
+]
+and ray_size = [%value.rec
+  "'closest-side' | 'farthest-side' | 'closest-corner' | 'farthest-corner' | 'sides'"
+]
+and radial_size = [%value.rec
   "'closest-side' | 'farthest-side' | 'closest-corner' | 'farthest-corner' | <extended-length> | [ <extended-length> | <extended-percentage> ]{2}"
 ]
 and step_position = [%value.rec
@@ -3274,6 +3280,9 @@ let check_map =
       ("single-transition", check(single_transition)),
       ("single-transition-property", check(single_transition_property)),
       ("size", check(size)),
+
+      ("ray-size", check(ray_size)),
+      ("radial-size", check(radial_size)),
       ("step-position", check(step_position)),
       ("step-timing-function", check(step_timing_function)),
       ("subclass-selector", check(subclass_selector)),

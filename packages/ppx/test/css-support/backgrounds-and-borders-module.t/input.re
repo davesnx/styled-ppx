@@ -236,6 +236,7 @@ module Color = {
 [%css {|background-image: linear-gradient(45deg, blue, red);|}];
 [%css {|background-image: linear-gradient(90deg, blue 10%, red 20%);|}];
 [%css {|background-image: linear-gradient(90deg, blue 10%, red);|}];
+[%css {|background-image: linear-gradient(90deg, blue, 10%, red);|}];
 [%css {|background-image: linear-gradient(white, black);|}];
 [%css {|background-image: linear-gradient(to right, white, black);|}];
 [%css {|background-image: linear-gradient(45deg, white, black);|}];
@@ -260,15 +261,22 @@ module Color = {
          linear-gradient(45deg, blue, red);
      |}
 ];
-/* [%css {|background-image: radial-gradient(white, black);|}]; */
-/* [%css {|background-image: radial-gradient(circle, white, black);|}]; */
-/* [%css {|background-image: radial-gradient(ellipse, white, black);|}]; */
-/* [%css {|background-image: radial-gradient(closest-corner, white, black);|}]; */
-/* [%css {|background-image: radial-gradient(circle closest-corner, white, black);|}]; */
-/* [%css {|background-image: radial-gradient(farthest-side, white, black);|}]; */
-/* [%css {|background-image: radial-gradient(circle farthest-side, white, black);|}]; */
-/* [%css {|background-image: radial-gradient(50%, white, black);|}]; */
-/* [%css {|background-image: radial-gradient(60% 60%, white, black);|}]; */
+/* This is currently valid, but it's part of the issue with different spec for linear-gradients
+   [%css {|background-image: linear-gradient(90deg, 10%, 10%, red);|}];
+    */
+
+[%css {|background-image: radial-gradient(white, black);|}];
+[%css {|background-image: radial-gradient(circle, white, black);|}];
+[%css {|background-image: radial-gradient(ellipse, white, black);|}];
+[%css
+  {|background-image: radial-gradient(circle closest-corner, white, black);|}
+];
+[%css {|background-image: radial-gradient(farthest-side, white, black);|}];
+[%css
+  {|background-image: radial-gradient(circle farthest-side, white, black);|}
+];
+[%css {|background-image: radial-gradient(50%, white, black);|}];
+[%css {|background-image: radial-gradient(60% 60%, white, black);|}];
 /* [%css {|background-image: repeating-linear-gradient(white, black);|}]; */
 /* [%css {|background-image: repeating-radial-gradient(white, black);|}]; */
 [%css {|list-style-image: linear-gradient(white, black);|}];
@@ -281,15 +289,19 @@ module Color = {
 [%css
   {|list-style-image: linear-gradient(red -50px, white calc(-25px + 50%), blue 100%);|}
 ];
-/* [%css {|list-style-image: radial-gradient(white, black);|}]; */
-/* [%css {|list-style-image: radial-gradient(circle, white, black);|}]; */
-/* [%css {|list-style-image: radial-gradient(ellipse, white, black);|}]; */
-/* [%css {|list-style-image: radial-gradient(closest-corner, white, black);|}]; */
-/* [%css {|list-style-image: radial-gradient(circle closest-corner, white, black);|}]; */
-/* [%css {|list-style-image: radial-gradient(farthest-side, white, black);|}]; */
-/* [%css {|list-style-image: radial-gradient(circle farthest-side, white, black);|}]; */
-/* [%css {|list-style-image: radial-gradient(50%, white, black);|}]; */
-/* [%css {|list-style-image: radial-gradient(60% 60%, white, black);|}]; */
+[%css {|list-style-image: radial-gradient(white, black);|}];
+[%css {|list-style-image: radial-gradient(circle, white, black);|}];
+[%css {|list-style-image: radial-gradient(ellipse, white, black);|}];
+[%css {|list-style-image: radial-gradient(closest-corner, white, black);|}];
+[%css
+  {|list-style-image: radial-gradient(circle closest-corner, white, black);|}
+];
+[%css {|list-style-image: radial-gradient(farthest-side, white, black);|}];
+[%css
+  {|list-style-image: radial-gradient(circle farthest-side, white, black);|}
+];
+[%css {|list-style-image: radial-gradient(50%, white, black);|}];
+[%css {|list-style-image: radial-gradient(60% 60%, white, black);|}];
 /* [%css {|list-style-image: repeating-linear-gradient(white, black);|}]; */
 /* [%css {|list-style-image: repeating-radial-gradient(white, black);|}]; */
 /* [%css {|border-image: linear-gradient(white, black);|}]; */
