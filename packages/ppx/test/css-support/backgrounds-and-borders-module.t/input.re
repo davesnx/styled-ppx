@@ -193,14 +193,14 @@ module Color = {
 [%css {|background-position-x: 30px|}];
 [%css {|background-position-x: 0%, 10%, 20%, 30%|}];
 [%css {|background-position-x: left, left, left, left, left|}];
-/* [%css {|background-position-x: calc(20px)|}]; */
-/* [%css {|background-position-x: calc(20px + 1em)|}]; */
-/* [%css {|background-position-x: calc(20px / 2)|}]; */
-/* [%css {|background-position-x: calc(20px + 50%)|}]; */
-/* [%css {|background-position-x: calc(50% - 10px)|}]; */
-/* [%css {|background-position-x: calc(-20px)|}]; */
-/* [%css {|background-position-x: calc(-50%)|}]; */
-/* [%css {|background-position-x: calc(-20%)|}]; */
+[%css {|background-position-x: calc(20px)|}];
+[%css {|background-position-x: calc(20px + 1em)|}];
+[%css {|background-position-x: calc(20px / 2)|}];
+[%css {|background-position-x: calc(20px + 50%)|}];
+[%css {|background-position-x: calc(50% - 10px)|}];
+[%css {|background-position-x: calc(-20px)|}];
+[%css {|background-position-x: calc(-50%)|}];
+[%css {|background-position-x: calc(-20%)|}];
 [%css {|background-position-x: right 20px|}];
 [%css {|background-position-x: left 20px|}];
 [%css {|background-position-x: right -50px|}];
@@ -218,14 +218,14 @@ module Color = {
 [%css {|background-position-y: 30px|}];
 [%css {|background-position-y: 0%, 10%, 20%, 30%|}];
 [%css {|background-position-y: top, top, top, top, top|}];
-/* [%css {|background-position-y: calc(20px)|}]; */
-/* [%css {|background-position-y: calc(20px + 1em)|}]; */
-/* [%css {|background-position-y: calc(20px / 2)|}]; */
-/* [%css {|background-position-y: calc(20px + 50%)|}]; */
-/* [%css {|background-position-y: calc(50% - 10px)|}]; */
-/* [%css {|background-position-y: calc(-20px)|}]; */
-/* [%css {|background-position-y: calc(-50%)|}]; */
-/* [%css {|background-position-y: calc(-20%)|}]; */
+[%css {|background-position-y: calc(20px)|}];
+[%css {|background-position-y: calc(20px + 1em)|}];
+[%css {|background-position-y: calc(20px / 2)|}];
+[%css {|background-position-y: calc(20px + 50%)|}];
+[%css {|background-position-y: calc(50% - 10px)|}];
+[%css {|background-position-y: calc(-20px)|}];
+[%css {|background-position-y: calc(-50%)|}];
+[%css {|background-position-y: calc(-20%)|}];
 [%css {|background-position-y: bottom 20px|}];
 [%css {|background-position-y: top 20px|}];
 [%css {|background-position-y: bottom -50px|}];
@@ -271,14 +271,16 @@ module Color = {
 /* [%css {|background-image: radial-gradient(60% 60%, white, black);|}]; */
 /* [%css {|background-image: repeating-linear-gradient(white, black);|}]; */
 /* [%css {|background-image: repeating-radial-gradient(white, black);|}]; */
-/* [%css {|list-style-image: linear-gradient(white, black);|}]; */
-/* [%css {|list-style-image: linear-gradient(to right, white, black);|}]; */
-/* [%css {|list-style-image: linear-gradient(45deg, white, black);|}]; */
-/* [%css {|list-style-image: linear-gradient(white 50%, black);|}]; */
-/* [%css {|list-style-image: linear-gradient(white 5px, black);|}]; */
-/* [%css {|list-style-image: linear-gradient(white, #f06, black);|}]; */
-/* [%css {|list-style-image: linear-gradient(currentColor, black);|}]; */
-/* [%css {|list-style-image: linear-gradient(red -50px, white calc(-25px + 50%), blue 100%);|}]; */
+[%css {|list-style-image: linear-gradient(white, black);|}];
+[%css {|list-style-image: linear-gradient(to right, white, black);|}];
+[%css {|list-style-image: linear-gradient(45deg, white, black);|}];
+[%css {|list-style-image: linear-gradient(white 50%, black);|}];
+[%css {|list-style-image: linear-gradient(white 5px, black);|}];
+[%css {|list-style-image: linear-gradient(white, #f06, black);|}];
+[%css {|list-style-image: linear-gradient(currentColor, black);|}];
+[%css
+  {|list-style-image: linear-gradient(red -50px, white calc(-25px + 50%), blue 100%);|}
+];
 /* [%css {|list-style-image: radial-gradient(white, black);|}]; */
 /* [%css {|list-style-image: radial-gradient(circle, white, black);|}]; */
 /* [%css {|list-style-image: radial-gradient(ellipse, white, black);|}]; */

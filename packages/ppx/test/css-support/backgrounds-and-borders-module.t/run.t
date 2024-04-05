@@ -272,6 +272,14 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
     {js|backgroundPositionX|js},
     {js|left, left, left, left, left|js},
   );
+  CssJs.unsafe({js|backgroundPositionX|js}, {js|calc(20px)|js});
+  CssJs.unsafe({js|backgroundPositionX|js}, {js|calc(20px + 1em)|js});
+  CssJs.unsafe({js|backgroundPositionX|js}, {js|calc(20px / 2)|js});
+  CssJs.unsafe({js|backgroundPositionX|js}, {js|calc(20px + 50%)|js});
+  CssJs.unsafe({js|backgroundPositionX|js}, {js|calc(50% - 10px)|js});
+  CssJs.unsafe({js|backgroundPositionX|js}, {js|calc(-20px)|js});
+  CssJs.unsafe({js|backgroundPositionX|js}, {js|calc(-50%)|js});
+  CssJs.unsafe({js|backgroundPositionX|js}, {js|calc(-20%)|js});
   CssJs.unsafe({js|backgroundPositionX|js}, {js|right 20px|js});
   CssJs.unsafe({js|backgroundPositionX|js}, {js|left 20px|js});
   CssJs.unsafe({js|backgroundPositionX|js}, {js|right -50px|js});
@@ -289,6 +297,14 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.unsafe({js|backgroundPositionY|js}, {js|30px|js});
   CssJs.unsafe({js|backgroundPositionY|js}, {js|0%, 10%, 20%, 30%|js});
   CssJs.unsafe({js|backgroundPositionY|js}, {js|top, top, top, top, top|js});
+  CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(20px)|js});
+  CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(20px + 1em)|js});
+  CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(20px / 2)|js});
+  CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(20px + 50%)|js});
+  CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(50% - 10px)|js});
+  CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(-20px)|js});
+  CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(-50%)|js});
+  CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(-20%)|js});
   CssJs.unsafe({js|backgroundPositionY|js}, {js|bottom 20px|js});
   CssJs.unsafe({js|backgroundPositionY|js}, {js|top 20px|js});
   CssJs.unsafe({js|backgroundPositionY|js}, {js|bottom -50px|js});
@@ -410,6 +426,71 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
   |]);
+  CssJs.listStyleImage(
+    `linearGradient((
+      None,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.listStyleImage(
+    `linearGradient((
+      Some(`Right),
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.listStyleImage(
+    `linearGradient((
+      Some(`Angle(`deg(45.))),
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.listStyleImage(
+    `linearGradient((
+      None,
+      [|
+        (Some(CssJs.white), Some(`percent(50.))),
+        (Some(CssJs.black), None),
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.listStyleImage(
+    `linearGradient((
+      None,
+      [|
+        (Some(CssJs.white), Some(`pxFloat(5.))),
+        (Some(CssJs.black), None),
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.listStyleImage(
+    `linearGradient((
+      None,
+      [|
+        (Some(CssJs.white), None),
+        (Some(`hex({js|f06|js})), None),
+        (Some(CssJs.black), None),
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.listStyleImage(
+    `linearGradient((
+      None,
+      [|(Some(`currentColor), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.listStyleImage(
+    `linearGradient((
+      None,
+      [|
+        (Some(CssJs.red), Some(`pxFloat(-50.))),
+        (
+          Some(CssJs.white),
+          Some(`calc(`add((`pxFloat(-25.), `percent(50.))))),
+        ),
+        (Some(CssJs.blue), Some(`percent(100.))),
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
   CssJs.imageRendering(`auto);
   CssJs.imageRendering(`smooth);
   CssJs.imageRendering(`highQuality);

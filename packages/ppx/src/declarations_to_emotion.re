@@ -1349,23 +1349,25 @@ let render_angular_color_stop = (~loc, value: Types.angular_color_stop) => {
 /* and color_stop_list = [%value.rec "[ ',' <linear-color-hint> ]# ',' <linear-color-stop>"] */
 let render_color_stop_list = (~loc, value: Types.color_stop_list) => {
   value
-  |> List.map(stop => switch (stop) {
-    | `Static_0(None, length_percentage) =>
-      let length = render_length_percentage(~loc, length_percentage);
-      [%expr (None, Some([%e length]))]
-    | `Static_0(Some(color), length_percentage) =>
-      let length = render_length_percentage(~loc, length_percentage);
-      let color = render_color(~loc, color);
-      [%expr (Some([%e color]), Some([%e length]))]
-    | `Static_1(color, None) =>
-      let color = render_color(~loc, color);
-      [%expr (Some([%e color]), None)]
-    | `Static_1(color, Some(length_percentage)) =>
-      let length = render_length_percentage(~loc, length_percentage);
-      let color = render_color(~loc, color);
-      [%expr (Some([%e color]), Some([%e length]))]
-  })
-  |> Builder.pexp_array(~loc)
+  |> List.map(stop =>
+       switch (stop) {
+       | `Static_0(None, length_percentage) =>
+         let length = render_length_percentage(~loc, length_percentage);
+         [%expr (None, Some([%e length]))];
+       | `Static_0(Some(color), length_percentage) =>
+         let length = render_length_percentage(~loc, length_percentage);
+         let color = render_color(~loc, color);
+         [%expr (Some([%e color]), Some([%e length]))];
+       | `Static_1(color, None) =>
+         let color = render_color(~loc, color);
+         [%expr (Some([%e color]), None)];
+       | `Static_1(color, Some(length_percentage)) =>
+         let length = render_length_percentage(~loc, length_percentage);
+         let color = render_color(~loc, color);
+         [%expr (Some([%e color]), Some([%e length]))];
+       }
+     )
+  |> Builder.pexp_array(~loc);
 };
 
 let render_angular_color_hint = (~loc, value: Types.angular_color_hint) => {
@@ -1399,18 +1401,22 @@ let render_function_linear_gradient =
     (~loc, value: Types.function_linear_gradient) => {
   switch (value) {
   | (None, stops) =>
-    [%expr `linearGradient((None, ([%e render_color_stop_list(~loc, stops)]: Css_AtomicTypes.Gradient.color_stop_list)))]
+    [%expr
+     `linearGradient((
+       None,
+       [%e render_color_stop_list(~loc, stops)]: Css_AtomicTypes.Gradient.color_stop_list,
+     ))]
   | (Some(`Static_0(angle, ())), stops) =>
     [%expr
      `linearGradient((
        Some(`Angle([%e render_extended_angle(~loc, angle)])),
-       ([%e render_color_stop_list(~loc, stops)]: Css_AtomicTypes.Gradient.color_stop_list),
+       [%e render_color_stop_list(~loc, stops)]: Css_AtomicTypes.Gradient.color_stop_list,
      ))]
   | (Some(`Static_1((), side_or_corner, ())), stops) =>
     [%expr
      `linearGradient((
        Some([%e render_side_or_corner(~loc, side_or_corner)]),
-       ([%e render_color_stop_list(~loc, stops)]: Css_AtomicTypes.Gradient.color_stop_list),
+       [%e render_color_stop_list(~loc, stops)]: Css_AtomicTypes.Gradient.color_stop_list,
      ))]
   };
 };
@@ -4129,7 +4135,25 @@ let isolation = unsupportedProperty(Parser.property_isolation);
 /* let layout_grid_type = unsupportedProperty(Parser.property_layout_grid_type); */
 let line_clamp = unsupportedProperty(Parser.property_line_clamp);
 let list_style = unsupportedProperty(Parser.property_list_style);
-let list_style_image = unsupportedProperty(Parser.property_list_style_image);
+let list_style_image =
+  monomorphic(
+    Parser.property_list_style_image,
+    (~loc) => [%expr CssJs.listStyleImage],
+    (~loc, value: Types.property_list_style_image) => {
+      switch (value) {
+      | `None => [%expr `none]
+      | `Image(i) => render_image(~loc, i)
+      }
+    },
+  );
+
+/* let width =
+   monomorphic(
+     Parser.property_width,
+     (~loc) => [%expr CssJs.width],
+     render_size,
+   ); */
+
 let list_style_position =
   unsupportedProperty(Parser.property_list_style_position);
 let list_style_type = unsupportedProperty(Parser.property_list_style_type);
