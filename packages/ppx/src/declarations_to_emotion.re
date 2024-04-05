@@ -1428,13 +1428,13 @@ let render_function_repeating_linear_gradient =
     [%expr
      `repeatingLinearGradient((
        Some([%e render_extended_angle(~loc, angle)]),
-       [%e render_color_stop_list(~loc, stops)],
+       [%e render_color_stop_list(~loc, stops)]: Css_AtomicTypes.Gradient.color_stop_list,
      ))]
   | (None, (), stops) =>
     [%expr
      `repeatingLinearGradient((
        None,
-       [%e render_color_stop_list(~loc, stops)],
+       [%e render_color_stop_list(~loc, stops)]: Css_AtomicTypes.Gradient.color_stop_list,
      ))]
   | (Some(_), (), _stops) => raise(Unsupported_feature)
   };
@@ -1442,9 +1442,9 @@ let render_function_repeating_linear_gradient =
 
 let render_eding_shape = (~loc, value) => {
   switch (value) {
-  | Some(`Circle) => [%expr `circle]
-  | Some(`Ellipse) => [%expr `ellipse]
-  | None => [%expr `ellipse]
+  | Some(`Circle) => [%expr Some(`circle)]
+  | Some(`Ellipse) => [%expr Some(`ellipse)]
+  | None => [%expr Some(`ellipse)]
   };
 };
 
@@ -1466,33 +1466,41 @@ let render_function_radial_gradient =
     let shape = render_eding_shape(~loc, shape);
     [%expr
      `radialGradient((
-       ([%e shape], None, None),
-       [%e render_color_stop_list(~loc, color_stop_list)],
+       [%e shape], None, None,
+       [%e render_color_stop_list(~loc, color_stop_list)]: Css_AtomicTypes.Gradient.color_stop_list,
      ))];
   | (shape, Some(radial_size), None, None | Some (), color_stop_list) =>
     let shape = render_eding_shape(~loc, shape);
     let size = render_radial_size(~loc, radial_size);
     [%expr
      `radialGradient((
-       ([%e shape], [%e size], None),
-       [%e render_color_stop_list(~loc, color_stop_list)],
+       [%e shape], Some([%e size]), None,
+       [%e render_color_stop_list(~loc, color_stop_list)]: Css_AtomicTypes.Gradient.color_stop_list,
      ))];
   | (shape, None, Some(((), position)), None | Some (), color_stop_list) =>
     let shape = render_eding_shape(~loc, shape);
     let (positionX, positionY) = render_position(~loc, position);
     [%expr
      `radialGradient((
-       ([%e shape], None, Some(([%e positionX], [%e positionY]))),
-       [%e render_color_stop_list(~loc, color_stop_list)],
+       [%e shape], None, Some(([%e positionX], [%e positionY])),
+       [%e render_color_stop_list(~loc, color_stop_list)]: Css_AtomicTypes.Gradient.color_stop_list,
      ))];
-  | (shape, Some(radial_size), Some(((), position)), None | Some (), color_stop_list) =>
+  | (
+      shape,
+      Some(radial_size),
+      Some(((), position)),
+      None | Some (),
+      color_stop_list,
+    ) =>
     let shape = render_eding_shape(~loc, shape);
     let size = render_radial_size(~loc, radial_size);
     let (positionX, positionY) = render_position(~loc, position);
     [%expr
      `radialGradient((
-       ([%e shape], Some([%e size]), Some(([%e positionX], [%e positionY]))),
-       [%e render_color_stop_list(~loc, color_stop_list)],
+        [%e shape],
+        Some([%e size]),
+        Some(([%e positionX], [%e positionY])),
+       [%e render_color_stop_list(~loc, color_stop_list)]: Css_AtomicTypes.Gradient.color_stop_list,
      ))];
   };
 };
