@@ -1295,7 +1295,7 @@ let background_color =
     render_color,
   );
 
-let render_color_stop_length = (~loc, value: Types.color_stop_length) => {
+let _render_color_stop_length = (~loc, value: Types.color_stop_length) => {
   switch (value) {
   | `Extended_length(l) => render_extended_length(~loc, l)
   | `Extended_percentage(p) => render_extended_percentage(~loc, p)
@@ -1310,17 +1310,29 @@ let render_color_stop_angle = (~loc, value: Types.color_stop_angle) => {
   };
 };
 
-let render_linear_color_stop = (~loc, value: Types.linear_color_stop) => {
+let _render_linear_color_stop = (~loc, value: Types.linear_color_stop) => {
   switch (value) {
+  | (color, Some(length_percentage)) =>
+    let length = render_length_percentage(~loc, length_percentage);
+    let color = render_color(~loc, color);
+    [%expr ([%e color], Some([%e length]))];
   | (color, None) =>
     let color = render_color(~loc, color);
     [%expr ([%e color], None)];
-  | (color, Some(length)) =>
-    let color = render_color(~loc, color);
-    let length = render_color_stop_length(~loc, length);
-    [%expr ([%e color], Some([%e length]))];
   };
 };
+
+/* let render_linear_color_stop = (~loc, value: Types.linear_color_stop) => {
+     switch (value) {
+     | (color, None) =>
+       let color = render_color(~loc, color);
+       [%expr ([%e color], None)];
+     | (color, Some(length_percentage)) =>
+       let color = render_color(~loc, color);
+       let length = render_length_percentage(~loc, length_percentage);
+       [%expr ([%e color], Some([%e length]))];
+     };
+   }; */
 
 let render_angular_color_stop = (~loc, value: Types.angular_color_stop) => {
   switch (value) {
@@ -1334,18 +1346,25 @@ let render_angular_color_stop = (~loc, value: Types.angular_color_stop) => {
   };
 };
 
-/* and color_stop_list = [%value.rec "[ ',' <linear-color-stop> ]# ',' <linear-color-stop>"] */
+/* and color_stop_list = [%value.rec "[ ',' <linear-color-hint> ]# ',' <linear-color-stop>"] */
 let render_color_stop_list = (~loc, value: Types.color_stop_list) => {
-  let (first, middle_stops, (), last_stop) = value;
-  let first_stop = Option.to_list(first);
-  let stops =
-    first_stop
-    |> List.append(middle_stops |> List.map(((_, stop)) => stop))
-    |> List.append([last_stop])
-    |> List.rev;
-
-  stops
-  |> List.map(stop => render_linear_color_stop(~loc, stop))
+  value
+  |> List.map(stop => switch (stop) {
+    | `Static_0(None, length_percentage) =>
+      let length = render_length_percentage(~loc, length_percentage);
+      [%expr (None, Some([%e length]))]
+    | `Static_0(Some(color), length_percentage) =>
+      let length = render_length_percentage(~loc, length_percentage);
+      let color = render_color(~loc, color);
+      [%expr (Some([%e color]), Some([%e length]))]
+    | `Static_1(color, None) =>
+      let color = render_color(~loc, color);
+      [%expr (Some([%e color]), None)]
+    | `Static_1(color, Some(length_percentage)) =>
+      let length = render_length_percentage(~loc, length_percentage);
+      let color = render_color(~loc, color);
+      [%expr (Some([%e color]), Some([%e length]))]
+  })
   |> Builder.pexp_array(~loc);
 };
 
@@ -1358,7 +1377,7 @@ let render_angular_color_hint = (~loc, value: Types.angular_color_hint) => {
 
 let render_angular_color_stop_list =
     (~loc, value: Types.angular_color_stop_list) => {
-  let (rest_of_stops, _, last_stops) = value;
+  let (rest_of_stops, (), last_stops) = value;
   let stops =
     rest_of_stops
     |> List.map(stop => {
@@ -1381,18 +1400,16 @@ let render_function_linear_gradient =
   switch (value) {
   | (None, stops) =>
     [%expr `linearGradient((None, [%e render_color_stop_list(~loc, stops)]))]
-  | (Some(`Extended_angle(angle)), stops) =>
+  | (Some(`Static_0(angle, ())), stops) =>
     [%expr
      `linearGradient((
        Some(`Angle([%e render_extended_angle(~loc, angle)])),
        [%e render_color_stop_list(~loc, stops)],
      ))]
-  | (Some(`Static((), side_or_corner)), stops) =>
+  | (Some(`Static_1((), side_or_corner, ())), stops) =>
     [%expr
      `linearGradient((
-       Some(
-         `SideOrCorner([%e render_side_or_corner(~loc, side_or_corner)]),
-       ),
+       Some([%e render_side_or_corner(~loc, side_or_corner)]),
        [%e render_color_stop_list(~loc, stops)],
      ))]
   };

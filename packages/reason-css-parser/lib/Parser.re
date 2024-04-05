@@ -143,9 +143,9 @@ and color_stop_angle = [%value.rec "[ <extended-angle> ]{1,2}"]
 and color_stop_length = [%value.rec
   "<extended-length> | <extended-percentage>"
 ]
-/* and color_stop_list = [%value.rec "[ <linear-color-stop> [ ',' <linear-color-hint> ]? ]# ',' <linear-color-stop>"] */
+/* color_stop_list is modified from the original spec, here is a simplified version where it tries to be fully compatible but easier for code-gen, original spec is `color_stop_list = [%value.rec "[ <linear-color-stop> [ ',' <linear-color-hint> ]? ]# ',' <linear-color-stop>"]` */
 and color_stop_list = [%value.rec
-  "[<linear-color-stop> ]? [ ',' <linear-color-stop> ]# ',' <linear-color-stop>"
+  "[ [<color>? <length-percentage>] | [<color> <length-percentage>?] ]#"
 ]
 and hue_interpolation_method = [%value.rec
   " [ 'shorter' | 'longer' | 'increasing' | 'decreasing' ] && 'hue' "
@@ -328,7 +328,7 @@ and function_inset = [%value.rec
 and function_invert = [%value.rec "invert( <number-percentage> )"]
 and function_leader = [%value.rec "leader( <leader-type> )"]
 and function_linear_gradient = [%value.rec
-  "linear-gradient( [ <extended-angle> | 'to' <side-or-corner> ]? <color-stop-list> )"
+  "linear-gradient( [ [<extended-angle> ','] | ['to' <side-or-corner> ','] ]? <color-stop-list> )"
 ]
 /* and function_linear_gradient = [%value.rec "linear-gradient( [ <extended-angle> | 'to' <side-or-corner> ]? ',' <color-stop-list> )"] */
 and function_matrix = [%value.rec "matrix( [ <number> ]#{6} )"]
@@ -467,7 +467,7 @@ and line_width = [%value.rec "<extended-length> | 'thin' | 'medium' | 'thick'"]
 and linear_color_hint = [%value.rec
   "<extended-length> | <extended-percentage>"
 ]
-and linear_color_stop = [%value.rec "<color> [ <color-stop-length> ]?"]
+and linear_color_stop = [%value.rec "<color> <length-percentage>?"]
 and mask_image = [%value.rec "[ <mask-reference> ]#"]
 and mask_layer = [%value.rec
   "<mask-reference> || <position> [ '/' <bg-size> ]? || <repeat-style> || <geometry-box> || [ <geometry-box> | 'no-clip' ] || <compositing-operator> || <masking-mode>"
@@ -1815,6 +1815,9 @@ and target = [%value.rec
 ]
 and extended_length = [%value.rec
   "<length> | <calc()> | <interpolation> | <min()> | <max()>"
+]
+and length_percentage = [%value.rec
+  "<extended-length> | <extended-percentage>"
 ]
 and extended_frequency = [%value.rec
   "<frequency> | <calc()> | <interpolation> | <min()> | <max()>"

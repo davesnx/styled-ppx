@@ -2354,16 +2354,14 @@ end
 module Gradient = struct
   type direction =
     [ `Angle of Angle.t
-    | `SideOrCorner of
-      [ `Bottom
-      | `BottomLeft
-      | `BottomRight
-      | `Left
-      | `Right
-      | `Top
-      | `TopLeft
-      | `TopRight
-      ]
+    | `Bottom
+    | `BottomLeft
+    | `BottomRight
+    | `Left
+    | `Right
+    | `Top
+    | `TopLeft
+    | `TopRight
     ]
 
   type t =
@@ -2401,7 +2399,7 @@ module Gradient = struct
 
   let direction_to_string = function
     | `Angle a -> Angle.toString a
-    | `SideOrCorner s -> SideOrCorner.toString s
+    | #SideOrCorner.t as s -> SideOrCorner.toString s
 
   let toString x =
     match x with

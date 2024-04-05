@@ -1562,16 +1562,14 @@ end
 module Gradient : sig
   type direction =
     [ `Angle of Angle.t
-    | `SideOrCorner of
-      [ `Bottom
-      | `BottomLeft
-      | `BottomRight
-      | `Left
-      | `Right
-      | `Top
-      | `TopLeft
-      | `TopRight
-      ]
+    | `Bottom
+    | `BottomLeft
+    | `BottomRight
+    | `Left
+    | `Right
+    | `Top
+    | `TopLeft
+    | `TopRight
     ]
 
   type t =
