@@ -1365,7 +1365,7 @@ let render_color_stop_list = (~loc, value: Types.color_stop_list) => {
       let color = render_color(~loc, color);
       [%expr (Some([%e color]), Some([%e length]))]
   })
-  |> Builder.pexp_array(~loc);
+  |> Builder.pexp_array(~loc)
 };
 
 let render_angular_color_hint = (~loc, value: Types.angular_color_hint) => {
@@ -1399,18 +1399,18 @@ let render_function_linear_gradient =
     (~loc, value: Types.function_linear_gradient) => {
   switch (value) {
   | (None, stops) =>
-    [%expr `linearGradient((None, [%e render_color_stop_list(~loc, stops)]))]
+    [%expr `linearGradient((None, ([%e render_color_stop_list(~loc, stops)]: Css_AtomicTypes.Gradient.color_stop_list)))]
   | (Some(`Static_0(angle, ())), stops) =>
     [%expr
      `linearGradient((
        Some(`Angle([%e render_extended_angle(~loc, angle)])),
-       [%e render_color_stop_list(~loc, stops)],
+       ([%e render_color_stop_list(~loc, stops)]: Css_AtomicTypes.Gradient.color_stop_list),
      ))]
   | (Some(`Static_1((), side_or_corner, ())), stops) =>
     [%expr
      `linearGradient((
        Some([%e render_side_or_corner(~loc, side_or_corner)]),
-       [%e render_color_stop_list(~loc, stops)],
+       ([%e render_color_stop_list(~loc, stops)]: Css_AtomicTypes.Gradient.color_stop_list),
      ))]
   };
 };

@@ -15,91 +15,6 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", lines 232-233, characters 1-53:
-  232 | [%css {|background-image: linear-gradient(45deg, blue, red);|}];
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  Error: This expression has type
-           [> `linearGradient of
-                Css_AtomicTypes.Gradient.direction option *
-                (Css_AtomicTypes.Color.t option * 'a option) array ]
-         but an expression was expected of type
-           [< `conicGradient of
-                Css_AtomicTypes.Gradient.direction option *
-                ([ `colorMix of
-                     Css_AtomicTypes.Color.t Css_AtomicTypes.Color.colorMix
-                 | `currentColor
-                 | `hex of string
-                 | `hsl of Css_AtomicTypes.Color.hsl
-                 | `hsla of Css_AtomicTypes.Color.hsla
-                 | `rgb of Css_AtomicTypes.Color.rgb
-                 | `rgba of Css_AtomicTypes.Color.rgba
-                 | `transparent
-                 | `var of string
-                 | `varDefault of string * string ] *
-                 Css_AtomicTypes.Length.t option)
-                array
-            | `linearGradient of
-                Css_AtomicTypes.Gradient.direction option *
-                ([ `colorMix of
-                     Css_AtomicTypes.Color.t Css_AtomicTypes.Color.colorMix
-                 | `currentColor
-                 | `hex of string
-                 | `hsl of Css_AtomicTypes.Color.hsl
-                 | `hsla of Css_AtomicTypes.Color.hsla
-                 | `rgb of Css_AtomicTypes.Color.rgb
-                 | `rgba of Css_AtomicTypes.Color.rgba
-                 | `transparent
-                 | `var of string
-                 | `varDefault of string * string ] *
-                 Css_AtomicTypes.Length.t option)
-                array
-            | `none
-            | `radialGradient of
-                ([ `colorMix of
-                     Css_AtomicTypes.Color.t Css_AtomicTypes.Color.colorMix
-                 | `currentColor
-                 | `hex of string
-                 | `hsl of Css_AtomicTypes.Color.hsl
-                 | `hsla of Css_AtomicTypes.Color.hsla
-                 | `rgb of Css_AtomicTypes.Color.rgb
-                 | `rgba of Css_AtomicTypes.Color.rgba
-                 | `transparent
-                 | `var of string
-                 | `varDefault of string * string ] *
-                 Css_AtomicTypes.Length.t option)
-                array
-            | `repeatingLinearGradient of
-                Css_AtomicTypes.Gradient.direction option *
-                ([ `colorMix of
-                     Css_AtomicTypes.Color.t Css_AtomicTypes.Color.colorMix
-                 | `currentColor
-                 | `hex of string
-                 | `hsl of Css_AtomicTypes.Color.hsl
-                 | `hsla of Css_AtomicTypes.Color.hsla
-                 | `rgb of Css_AtomicTypes.Color.rgb
-                 | `rgba of Css_AtomicTypes.Color.rgba
-                 | `transparent
-                 | `var of string
-                 | `varDefault of string * string ] *
-                 Css_AtomicTypes.Length.t option)
-                array
-            | `repeatingRadialGradient of
-                ([ `colorMix of
-                     Css_AtomicTypes.Color.t Css_AtomicTypes.Color.colorMix
-                 | `currentColor
-                 | `hex of string
-                 | `hsl of Css_AtomicTypes.Color.hsl
-                 | `hsla of Css_AtomicTypes.Color.hsla
-                 | `rgb of Css_AtomicTypes.Color.rgb
-                 | `rgba of Css_AtomicTypes.Color.rgba
-                 | `transparent
-                 | `var of string
-                 | `varDefault of string * string ] *
-                 Css_AtomicTypes.Length.t option)
-                array
-            | `url of string ]
-         Types for tag `linearGradient are incompatible
-  [1]
 
   $ dune describe pp ./input.re.ml | refmt --parse ml --print re
   [@ocaml.ppx.context
@@ -121,6 +36,9 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
     }
   ];
   module Color = {
+    module Background = {
+      let boxDark = `hex("000000");
+    };
     module Shadow = {
       let elevation1 = `rgba((0, 0, 0, `num(0.03)));
     };
@@ -379,7 +297,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.backgroundImage(
     `linearGradient((
       Some(`Angle(`deg(45.))),
-      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|],
+      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -388,34 +306,31 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       [|
         (Some(CssJs.blue), Some(`percent(10.))),
         (Some(CssJs.red), Some(`percent(20.))),
-      |],
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
     `linearGradient((
       Some(`Angle(`deg(90.))),
-      [|
-        (Some(CssJs.blue), Some(`percent(10.))),
-        (Some(CssJs.red), None),
-      |],
+      [|(Some(CssJs.blue), Some(`percent(10.))), (Some(CssJs.red), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
     `linearGradient((
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|],
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
     `linearGradient((
       Some(`Right),
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|],
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
     `linearGradient((
       Some(`Angle(`deg(45.))),
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|],
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -424,7 +339,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       [|
         (Some(CssJs.white), Some(`percent(50.))),
         (Some(CssJs.black), None),
-      |],
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -434,7 +349,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
         (Some(CssJs.white), None),
         (Some(`hex({js|f06|js})), None),
         (Some(CssJs.black), None),
-      |],
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -447,13 +362,13 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
           Some(`calc(`add((`pxFloat(-25.), `percent(50.))))),
         ),
         (Some(CssJs.blue), Some(`percent(100.))),
-      |],
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImages([|
     `linearGradient((
       Some(`Angle(`deg(45.))),
-      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|],
+      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
     `linearGradient((
       None,
@@ -464,11 +379,11 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
           Some(`calc(`add((`pxFloat(-25.), `percent(50.))))),
         ),
         (Some(CssJs.blue), Some(`percent(100.))),
-      |],
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
     `linearGradient((
       Some(`Angle(`deg(45.))),
-      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|],
+      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
   |]);
   CssJs.backgroundImages([|
@@ -477,7 +392,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       [|
         (Some(Color.Background.boxDark), Some(`percent(25.))),
         (Some(`transparent), Some(`percent(25.))),
-      |],
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
     `linearGradient((
       None,
@@ -488,11 +403,11 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
           Some(`calc(`add((`pxFloat(-25.), `percent(50.))))),
         ),
         (Some(CssJs.blue), Some(`percent(100.))),
-      |],
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
     `linearGradient((
       Some(`Angle(`deg(45.))),
-      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|],
+      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
   |]);
   CssJs.imageRendering(`auto);

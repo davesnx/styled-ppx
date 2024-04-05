@@ -1574,15 +1574,12 @@ module Gradient : sig
 
   type color_stop_list = ([ Color.t | Var.t ] option * Length.t option) array
 
-  type angular_color_stop_list =
-    ([ Color.t | Var.t ] option * Length.t option) array
-
   type t =
     [ `linearGradient of direction option * color_stop_list
     | `repeatingLinearGradient of direction option * color_stop_list
     | `radialGradient of color_stop_list
     | `repeatingRadialGradient of color_stop_list
-    | `conicGradient of direction option * angular_color_stop_list
+    | `conicGradient of direction option * color_stop_list
     ]
 
   val linearGradient :

@@ -1,4 +1,7 @@
 module Color = {
+  module Background = {
+    let boxDark = `hex("000000");
+  };
   module Shadow = {
     let elevation1 = `rgba((0, 0, 0, `num(0.03)));
   };

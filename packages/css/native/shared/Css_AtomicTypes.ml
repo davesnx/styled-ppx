@@ -2366,30 +2366,22 @@ module Gradient = struct
 
   type color_stop_list = ([ Color.t | Var.t ] option * Length.t option) array
 
-  type angular_color_stop_list =
-    ([ Color.t | Var.t ] option * Length.t option) array
-
   type t =
     [ `linearGradient of direction option * color_stop_list
     | `repeatingLinearGradient of direction option * color_stop_list
     | `radialGradient of color_stop_list
     | `repeatingRadialGradient of color_stop_list
-    | `conicGradient of direction option * angular_color_stop_list
+    | `conicGradient of direction option * color_stop_list
     ]
 
-  let linearGradient direction (stops : color_stop_list) =
-    `linearGradient (Some direction, stops)
+  let linearGradient direction stops = `linearGradient (Some direction, stops)
 
-  let repeatingLinearGradient direction (stops : color_stop_list) =
+  let repeatingLinearGradient direction stops =
     `repeatingLinearGradient (Some direction, stops)
 
-  let radialGradient (stops : color_stop_list) = `radialGradient stops
-
-  let repeatingRadialGradient (stops : color_stop_list) =
-    `repeatingRadialGradient stops
-
-  let conicGradient angle (stops : color_stop_list) =
-    `conicGradient (Some angle, stops)
+  let radialGradient stops = `radialGradient stops
+  let repeatingRadialGradient stops = `repeatingRadialGradient stops
+  let conicGradient angle stops = `conicGradient (Some angle, stops)
 
   let string_of_color x =
     match x with
@@ -2411,7 +2403,7 @@ module Gradient = struct
     | `Angle a -> Angle.toString a
     | #SideOrCorner.t as s -> SideOrCorner.toString s
 
-  let toString x =
+  let toString (x : t) =
     match x with
     | `linearGradient (None, stops) ->
       {js|linear-gradient(|js} ^ string_of_stops stops ^ {js|)|js}
