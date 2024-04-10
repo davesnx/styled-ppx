@@ -1,4 +1,7 @@
 module Color = {
+  module Background = {
+    let boxDark = `hex("000000");
+  };
   module Shadow = {
     let elevation1 = `rgba((0, 0, 0, `num(0.03)));
   };
@@ -190,14 +193,14 @@ module Color = {
 [%css {|background-position-x: 30px|}];
 [%css {|background-position-x: 0%, 10%, 20%, 30%|}];
 [%css {|background-position-x: left, left, left, left, left|}];
-/* [%css {|background-position-x: calc(20px)|}]; */
-/* [%css {|background-position-x: calc(20px + 1em)|}]; */
-/* [%css {|background-position-x: calc(20px / 2)|}]; */
-/* [%css {|background-position-x: calc(20px + 50%)|}]; */
-/* [%css {|background-position-x: calc(50% - 10px)|}]; */
-/* [%css {|background-position-x: calc(-20px)|}]; */
-/* [%css {|background-position-x: calc(-50%)|}]; */
-/* [%css {|background-position-x: calc(-20%)|}]; */
+[%css {|background-position-x: calc(20px)|}];
+[%css {|background-position-x: calc(20px + 1em)|}];
+[%css {|background-position-x: calc(20px / 2)|}];
+[%css {|background-position-x: calc(20px + 50%)|}];
+[%css {|background-position-x: calc(50% - 10px)|}];
+[%css {|background-position-x: calc(-20px)|}];
+[%css {|background-position-x: calc(-50%)|}];
+[%css {|background-position-x: calc(-20%)|}];
 [%css {|background-position-x: right 20px|}];
 [%css {|background-position-x: left 20px|}];
 [%css {|background-position-x: right -50px|}];
@@ -215,14 +218,14 @@ module Color = {
 [%css {|background-position-y: 30px|}];
 [%css {|background-position-y: 0%, 10%, 20%, 30%|}];
 [%css {|background-position-y: top, top, top, top, top|}];
-/* [%css {|background-position-y: calc(20px)|}]; */
-/* [%css {|background-position-y: calc(20px + 1em)|}]; */
-/* [%css {|background-position-y: calc(20px / 2)|}]; */
-/* [%css {|background-position-y: calc(20px + 50%)|}]; */
-/* [%css {|background-position-y: calc(50% - 10px)|}]; */
-/* [%css {|background-position-y: calc(-20px)|}]; */
-/* [%css {|background-position-y: calc(-50%)|}]; */
-/* [%css {|background-position-y: calc(-20%)|}]; */
+[%css {|background-position-y: calc(20px)|}];
+[%css {|background-position-y: calc(20px + 1em)|}];
+[%css {|background-position-y: calc(20px / 2)|}];
+[%css {|background-position-y: calc(20px + 50%)|}];
+[%css {|background-position-y: calc(50% - 10px)|}];
+[%css {|background-position-y: calc(-20px)|}];
+[%css {|background-position-y: calc(-50%)|}];
+[%css {|background-position-y: calc(-20%)|}];
 [%css {|background-position-y: bottom 20px|}];
 [%css {|background-position-y: top 20px|}];
 [%css {|background-position-y: bottom -50px|}];
@@ -230,61 +233,75 @@ module Color = {
 [%css {|background-position-y: bottom 20px|}];
 
 /* CSS Images Module Level 3 */
-/* [%css {|background-image: linear-gradient(45deg, blue, red);|}]; */
-/* [%css {|background-image: linear-gradient(90deg, blue 10%, red 20%);|}]; */
-/* [%css {|background-image: linear-gradient(90deg, blue 10%, red);|}]; */
-/* [%css {|background-image: linear-gradient(white, black);|}]; */
-/* [%css {|background-image: linear-gradient(to right, white, black);|}]; */
-/* [%css {|background-image: linear-gradient(45deg, white, black);|}]; */
-/* [%css {|background-image: linear-gradient(white 50%, black);|}]; */
-/* [%css {|background-image: linear-gradient(white, #f06, black);|}]; */
-/* [%css
-     {|background-image: linear-gradient(red -50px, white calc(-25px + 50%), blue 100%);|}
-   ]; */
-/* [%css
-     {|
+[%css {|background-image: linear-gradient(45deg, blue, red);|}];
+[%css {|background-image: linear-gradient(90deg, blue 10%, red 20%);|}];
+[%css {|background-image: linear-gradient(90deg, blue 10%, red);|}];
+[%css {|background-image: linear-gradient(90deg, blue, 10%, red);|}];
+[%css {|background-image: linear-gradient(white, black);|}];
+[%css {|background-image: linear-gradient(to right, white, black);|}];
+[%css {|background-image: linear-gradient(45deg, white, black);|}];
+[%css {|background-image: linear-gradient(white 50%, black);|}];
+[%css {|background-image: linear-gradient(white, #f06, black);|}];
+[%css
+  {|background-image: linear-gradient(red -50px, white calc(-25px + 50%), blue 100%);|}
+];
+[%css
+  {|
        background-image:
          linear-gradient(45deg, blue, red),
          linear-gradient(red -50px, white calc(-25px + 50%), blue 100%),
          linear-gradient(45deg, blue, red);
      |}
-   ]; */
-/* [%css
-     {|
+];
+[%css
+  {|
        background-image:
          linear-gradient(45deg, $(Color.Background.boxDark) 25%, transparent 25%),
          linear-gradient(red -50px, white calc(-25px + 50%), blue 100%),
          linear-gradient(45deg, blue, red);
      |}
-   ]; */
-/* [%css {|background-image: radial-gradient(white, black);|}]; */
-/* [%css {|background-image: radial-gradient(circle, white, black);|}]; */
-/* [%css {|background-image: radial-gradient(ellipse, white, black);|}]; */
-/* [%css {|background-image: radial-gradient(closest-corner, white, black);|}]; */
-/* [%css {|background-image: radial-gradient(circle closest-corner, white, black);|}]; */
-/* [%css {|background-image: radial-gradient(farthest-side, white, black);|}]; */
-/* [%css {|background-image: radial-gradient(circle farthest-side, white, black);|}]; */
-/* [%css {|background-image: radial-gradient(50%, white, black);|}]; */
-/* [%css {|background-image: radial-gradient(60% 60%, white, black);|}]; */
+];
+/* This is currently valid, but it's part of the issue with different spec for linear-gradients
+   [%css {|background-image: linear-gradient(90deg, 10%, 10%, red);|}];
+    */
+
+[%css {|background-image: radial-gradient(white, black);|}];
+[%css {|background-image: radial-gradient(circle, white, black);|}];
+[%css {|background-image: radial-gradient(ellipse, white, black);|}];
+[%css
+  {|background-image: radial-gradient(circle closest-corner, white, black);|}
+];
+[%css {|background-image: radial-gradient(farthest-side, white, black);|}];
+[%css
+  {|background-image: radial-gradient(circle farthest-side, white, black);|}
+];
+[%css {|background-image: radial-gradient(50%, white, black);|}];
+[%css {|background-image: radial-gradient(60% 60%, white, black);|}];
 /* [%css {|background-image: repeating-linear-gradient(white, black);|}]; */
 /* [%css {|background-image: repeating-radial-gradient(white, black);|}]; */
-/* [%css {|list-style-image: linear-gradient(white, black);|}]; */
-/* [%css {|list-style-image: linear-gradient(to right, white, black);|}]; */
-/* [%css {|list-style-image: linear-gradient(45deg, white, black);|}]; */
-/* [%css {|list-style-image: linear-gradient(white 50%, black);|}]; */
-/* [%css {|list-style-image: linear-gradient(white 5px, black);|}]; */
-/* [%css {|list-style-image: linear-gradient(white, #f06, black);|}]; */
-/* [%css {|list-style-image: linear-gradient(currentColor, black);|}]; */
-/* [%css {|list-style-image: linear-gradient(red -50px, white calc(-25px + 50%), blue 100%);|}]; */
-/* [%css {|list-style-image: radial-gradient(white, black);|}]; */
-/* [%css {|list-style-image: radial-gradient(circle, white, black);|}]; */
-/* [%css {|list-style-image: radial-gradient(ellipse, white, black);|}]; */
-/* [%css {|list-style-image: radial-gradient(closest-corner, white, black);|}]; */
-/* [%css {|list-style-image: radial-gradient(circle closest-corner, white, black);|}]; */
-/* [%css {|list-style-image: radial-gradient(farthest-side, white, black);|}]; */
-/* [%css {|list-style-image: radial-gradient(circle farthest-side, white, black);|}]; */
-/* [%css {|list-style-image: radial-gradient(50%, white, black);|}]; */
-/* [%css {|list-style-image: radial-gradient(60% 60%, white, black);|}]; */
+[%css {|list-style-image: linear-gradient(white, black);|}];
+[%css {|list-style-image: linear-gradient(to right, white, black);|}];
+[%css {|list-style-image: linear-gradient(45deg, white, black);|}];
+[%css {|list-style-image: linear-gradient(white 50%, black);|}];
+[%css {|list-style-image: linear-gradient(white 5px, black);|}];
+[%css {|list-style-image: linear-gradient(white, #f06, black);|}];
+[%css {|list-style-image: linear-gradient(currentColor, black);|}];
+[%css
+  {|list-style-image: linear-gradient(red -50px, white calc(-25px + 50%), blue 100%);|}
+];
+[%css {|list-style-image: radial-gradient(white, black);|}];
+[%css {|list-style-image: radial-gradient(circle, white, black);|}];
+[%css {|list-style-image: radial-gradient(ellipse, white, black);|}];
+[%css {|list-style-image: radial-gradient(closest-corner, white, black);|}];
+[%css
+  {|list-style-image: radial-gradient(circle closest-corner, white, black);|}
+];
+[%css {|list-style-image: radial-gradient(farthest-side, white, black);|}];
+[%css
+  {|list-style-image: radial-gradient(circle farthest-side, white, black);|}
+];
+[%css {|list-style-image: radial-gradient(50%, white, black);|}];
+[%css {|list-style-image: radial-gradient(60% 60%, white, black);|}];
 /* [%css {|list-style-image: repeating-linear-gradient(white, black);|}]; */
 /* [%css {|list-style-image: repeating-radial-gradient(white, black);|}]; */
 /* [%css {|border-image: linear-gradient(white, black);|}]; */

@@ -1,7 +1,10 @@
 open Alcotest;
 open Reason_css_parser;
+open Combinator;
 open Standard;
+open Modifier;
 open Parser;
+open Rule.Match;
 
 let check = (location, testable, recived, expected) =>
   check(~pos=location, testable, "", expected, recived);
@@ -409,6 +412,20 @@ let tests = [
       to_check,
       parse("[a b c]"),
       Ok(((), ["a", "b", "c"], ())),
+    );
+  }),
+  test("chars", () => {
+    let parse = parse([%value "<string>? ',' <string>"]);
+    let to_check =
+      result(
+        triple(option(Alcotest.string), unit, Alcotest.string),
+        Alcotest.string,
+      );
+    check(
+      __POS__,
+      to_check,
+      parse("'lola' , 'flores'"),
+      Ok((Some("lola"), (), "flores")),
     );
   }),
   test("interpolation", () => {

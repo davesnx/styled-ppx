@@ -119,3 +119,9 @@ let value = `clip;
 [%css {|overflow-block: hidden|}];
 [%css {|overflow-block: $(value)|}];
 [%css {|overflow-inline: $(value)|}];
+
+[%cx
+  {|
+    background-image: linear-gradient(84deg, #F80 0%, rgba(255, 255, 255, 0.80) 50%, #2A97FF 100%);
+  |}
+];

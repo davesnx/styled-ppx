@@ -712,6 +712,7 @@ let listStyleImage x =
       | #ListStyleImage.t as lsi -> ListStyleImage.toString lsi
       | #Url.t as u -> Url.toString u
       | #Var.t as va -> Var.toString va
+      | #Gradient.t as g -> Gradient.toString g
       | #Cascading.t as c -> Cascading.toString c )
 
 let listStyleType x =

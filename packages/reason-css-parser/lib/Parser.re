@@ -143,9 +143,14 @@ and color_stop_angle = [%value.rec "[ <extended-angle> ]{1,2}"]
 and color_stop_length = [%value.rec
   "<extended-length> | <extended-percentage>"
 ]
-/* and color_stop_list = [%value.rec "[ <linear-color-stop> [ ',' <linear-color-hint> ]? ]# ',' <linear-color-stop>"] */
+/* color_stop_list is modified from the original spec, here is a simplified version where it tries to be fully compatible but easier for code-gen:
+
+   The current impl allows values that aren't really supported such as: `linear-gradient(0deg, 10%, blue)` which is invalid, but we allow it for now to make it easier to generate the types. The correct value would require always a color to be in the first position `linear-gradient(0deg, red, 10%, blue);`
+
+   The original spec is `color_stop_list = [%value.rec "[ <linear-color-stop> [ ',' <linear-color-hint> ]? ]# ',' <linear-color-stop>"]`
+   */
 and color_stop_list = [%value.rec
-  "[<linear-color-stop> ]? [ ',' <linear-color-stop> ]# ',' <linear-color-stop>"
+  "[ [<color>? <length-percentage>] | [<color> <length-percentage>?] ]#"
 ]
 and hue_interpolation_method = [%value.rec
   " [ 'shorter' | 'longer' | 'increasing' | 'decreasing' ] && 'hue' "
@@ -328,7 +333,7 @@ and function_inset = [%value.rec
 and function_invert = [%value.rec "invert( <number-percentage> )"]
 and function_leader = [%value.rec "leader( <leader-type> )"]
 and function_linear_gradient = [%value.rec
-  "linear-gradient( [ <extended-angle> | 'to' <side-or-corner> ]? <color-stop-list> )"
+  "linear-gradient( [ [<extended-angle> ','] | ['to' <side-or-corner> ','] ]? <color-stop-list> )"
 ]
 /* and function_linear_gradient = [%value.rec "linear-gradient( [ <extended-angle> | 'to' <side-or-corner> ]? ',' <color-stop-list> )"] */
 and function_matrix = [%value.rec "matrix( [ <number> ]#{6} )"]
@@ -348,7 +353,7 @@ and function_polygon = [%value.rec
   "polygon( [ <fill-rule> ]? ',' [ <extended-length> | <extended-percentage> <extended-length> | <extended-percentage> ]# )"
 ]
 and function_radial_gradient = [%value.rec
-  "radial-gradient( [ <ending-shape> || <size> ]? [ 'at' <position> ]? ',' <color-stop-list> )"
+  "radial-gradient( <ending-shape>? <radial-size>? ['at' <position> ]? ','? <color-stop-list> )"
 ]
 and function_repeating_linear_gradient = [%value.rec
   "repeating-linear-gradient( [ <extended-angle> | 'to' <side-or-corner> ]? ',' <color-stop-list> )"
@@ -467,7 +472,7 @@ and line_width = [%value.rec "<extended-length> | 'thin' | 'medium' | 'thick'"]
 and linear_color_hint = [%value.rec
   "<extended-length> | <extended-percentage>"
 ]
-and linear_color_stop = [%value.rec "<color> [ <color-stop-length> ]?"]
+and linear_color_stop = [%value.rec "<color> <length-percentage>?"]
 and mask_image = [%value.rec "[ <mask-reference> ]#"]
 and mask_layer = [%value.rec
   "<mask-reference> || <position> [ '/' <bg-size> ]? || <repeat-style> || <geometry-box> || [ <geometry-box> | 'no-clip' ] || <compositing-operator> || <masking-mode>"
@@ -1219,7 +1224,7 @@ and property_line_height_step = [%value.rec "<extended-length>"]
 and property_list_style = [%value.rec
   "<'list-style-type'> || <'list-style-position'> || <'list-style-image'>"
 ]
-and property_list_style_image = [%value.rec "<url> | 'none'"]
+and property_list_style_image = [%value.rec "'none' | <image>"]
 and property_list_style_position = [%value.rec "'inside' | 'outside'"]
 and property_list_style_type = [%value.rec
   "<counter-style> | <string> | 'none'"
@@ -1346,7 +1351,7 @@ and property_offset_distance = [%value.rec
   "<extended-length> | <extended-percentage>"
 ]
 and property_offset_path = [%value.rec
-  "'none' | ray( <extended-angle> && [ <size> ]? && [ 'contain' ]? ) | <path()> | <url> | <basic-shape> || <geometry-box>"
+  "'none' | ray( <extended-angle> && [ <ray_size> ]? && [ 'contain' ]? ) | <path()> | <url> | <basic-shape> || <geometry-box>"
 ]
 and property_offset_position = [%value.rec "'auto' | <position>"]
 and property_offset_rotate = [%value.rec
@@ -1785,6 +1790,12 @@ and single_transition_property = [%value.rec
 and size = [%value.rec
   "'closest-side' | 'farthest-side' | 'closest-corner' | 'farthest-corner' | <extended-length> | [ <extended-length> | <extended-percentage> ]{2}"
 ]
+and ray_size = [%value.rec
+  "'closest-side' | 'farthest-side' | 'closest-corner' | 'farthest-corner' | 'sides'"
+]
+and radial_size = [%value.rec
+  "'closest-side' | 'farthest-side' | 'closest-corner' | 'farthest-corner' | <extended-length> | [ <extended-length> | <extended-percentage> ]{2}"
+]
 and step_position = [%value.rec
   "'jump-start' | 'jump-end' | 'jump-none' | 'jump-both' | 'start' | 'end'"
 ]
@@ -1815,6 +1826,9 @@ and target = [%value.rec
 ]
 and extended_length = [%value.rec
   "<length> | <calc()> | <interpolation> | <min()> | <max()>"
+]
+and length_percentage = [%value.rec
+  "<extended-length> | <extended-percentage>"
 ]
 and extended_frequency = [%value.rec
   "<frequency> | <calc()> | <interpolation> | <min()> | <max()>"
@@ -3266,6 +3280,9 @@ let check_map =
       ("single-transition", check(single_transition)),
       ("single-transition-property", check(single_transition_property)),
       ("size", check(size)),
+
+      ("ray-size", check(ray_size)),
+      ("radial-size", check(radial_size)),
       ("step-position", check(step_position)),
       ("step-timing-function", check(step_timing_function)),
       ("subclass-selector", check(subclass_selector)),

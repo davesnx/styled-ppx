@@ -1562,52 +1562,80 @@ end
 module Gradient : sig
   type direction =
     [ `Angle of Angle.t
-    | `SideOrCorner of
-      [ `Bottom
-      | `BottomLeft
-      | `BottomRight
-      | `Left
-      | `Right
-      | `Top
-      | `TopLeft
-      | `TopRight
-      ]
+    | `Bottom
+    | `BottomLeft
+    | `BottomRight
+    | `Left
+    | `Right
+    | `Top
+    | `TopLeft
+    | `TopRight
+    ]
+
+  type color_stop_list = ([ Color.t | Var.t ] option * Length.t option) array
+
+  type shape =
+    [ `ellipse
+    | `circle
+    ]
+
+  type radial_size =
+    [ `closestSide
+    | `closestCorner
+    | `farthestSide
+    | `farthestCorner
     ]
 
   type t =
-    [ `linearGradient of
-      direction option * ([ Color.t | Var.t ] * Length.t option) array
-    | `repeatingLinearGradient of
-      direction option * ([ Color.t | Var.t ] * Length.t option) array
-    | `radialGradient of ([ Color.t | Var.t ] * Length.t option) array
-    | `repeatingRadialGradient of ([ Color.t | Var.t ] * Length.t option) array
-    | `conicGradient of
-      direction option * ([ Color.t | Var.t ] * Length.t option) array
+    [ `linearGradient of direction option * color_stop_list
+    | `repeatingLinearGradient of direction option * color_stop_list
+    | `radialGradient of
+      shape option * radial_size option * Position.t option * color_stop_list
+    | `repeatingRadialGradient of
+      shape option * radial_size option * Position.t option * color_stop_list
+    | `conicGradient of direction option * color_stop_list
     ]
 
-  val linearGradient : 'a -> 'b -> [> `linearGradient of 'a * 'b ]
+  val linearGradient :
+    direction ->
+    color_stop_list ->
+    [> `linearGradient of direction option * color_stop_list ]
 
   val repeatingLinearGradient :
-    'a -> 'b -> [> `repeatingLinearGradient of 'a * 'b ]
+    direction ->
+    color_stop_list ->
+    [> `repeatingLinearGradient of direction option * color_stop_list ]
 
-  val radialGradient : 'a -> [> `radialGradient of 'a ]
-  val repeatingRadialGradient : 'a -> [> `repeatingRadialGradient of 'a ]
-  val conicGradient : 'a -> 'b -> [> `conicGradient of 'a * 'b ]
+  val radialGradient :
+    shape ->
+    radial_size ->
+    Position.t ->
+    color_stop_list ->
+    [> `radialGradient of
+       shape option * radial_size option * Position.t option * color_stop_list
+    ]
+
+  val repeatingRadialGradient :
+    shape ->
+    radial_size ->
+    Position.t ->
+    color_stop_list ->
+    [> `repeatingRadialGradient of
+       shape option * radial_size option * Position.t option * color_stop_list
+    ]
+
+  val conicGradient :
+    direction ->
+    color_stop_list ->
+    [> `conicGradient of direction option * color_stop_list ]
+
   val string_of_color : [ Color.t | Var.t ] -> string
-  val string_of_stops : ([ Color.t | Var.t ] * Length.t option) array -> string
-  val direction_to_string : direction -> string
 
-  val toString :
-    [< `conicGradient of
-       direction option * ([ Color.t | Var.t ] * Length.t option) array
-    | `linearGradient of
-      direction option * ([ Color.t | Var.t ] * Length.t option) array
-    | `radialGradient of ([ Color.t | Var.t ] * Length.t option) array
-    | `repeatingLinearGradient of
-      direction option * ([ Color.t | Var.t ] * Length.t option) array
-    | `repeatingRadialGradient of ([ Color.t | Var.t ] * Length.t option) array
-    ] ->
-    string
+  val string_of_stops :
+    ([ Color.t | Var.t ] option * Length.t option) array -> string
+
+  val direction_to_string : direction -> string
+  val toString : t -> string
 end
 
 module BackgroundImage : sig

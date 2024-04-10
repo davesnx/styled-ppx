@@ -36,6 +36,9 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
     }
   ];
   module Color = {
+    module Background = {
+      let boxDark = `hex("000000");
+    };
     module Shadow = {
       let elevation1 = `rgba((0, 0, 0, `num(0.03)));
     };
@@ -269,6 +272,14 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
     {js|backgroundPositionX|js},
     {js|left, left, left, left, left|js},
   );
+  CssJs.unsafe({js|backgroundPositionX|js}, {js|calc(20px)|js});
+  CssJs.unsafe({js|backgroundPositionX|js}, {js|calc(20px + 1em)|js});
+  CssJs.unsafe({js|backgroundPositionX|js}, {js|calc(20px / 2)|js});
+  CssJs.unsafe({js|backgroundPositionX|js}, {js|calc(20px + 50%)|js});
+  CssJs.unsafe({js|backgroundPositionX|js}, {js|calc(50% - 10px)|js});
+  CssJs.unsafe({js|backgroundPositionX|js}, {js|calc(-20px)|js});
+  CssJs.unsafe({js|backgroundPositionX|js}, {js|calc(-50%)|js});
+  CssJs.unsafe({js|backgroundPositionX|js}, {js|calc(-20%)|js});
   CssJs.unsafe({js|backgroundPositionX|js}, {js|right 20px|js});
   CssJs.unsafe({js|backgroundPositionX|js}, {js|left 20px|js});
   CssJs.unsafe({js|backgroundPositionX|js}, {js|right -50px|js});
@@ -286,11 +297,346 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.unsafe({js|backgroundPositionY|js}, {js|30px|js});
   CssJs.unsafe({js|backgroundPositionY|js}, {js|0%, 10%, 20%, 30%|js});
   CssJs.unsafe({js|backgroundPositionY|js}, {js|top, top, top, top, top|js});
+  CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(20px)|js});
+  CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(20px + 1em)|js});
+  CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(20px / 2)|js});
+  CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(20px + 50%)|js});
+  CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(50% - 10px)|js});
+  CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(-20px)|js});
+  CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(-50%)|js});
+  CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(-20%)|js});
   CssJs.unsafe({js|backgroundPositionY|js}, {js|bottom 20px|js});
   CssJs.unsafe({js|backgroundPositionY|js}, {js|top 20px|js});
   CssJs.unsafe({js|backgroundPositionY|js}, {js|bottom -50px|js});
   CssJs.unsafe({js|backgroundPositionY|js}, {js|top -50px|js});
   CssJs.unsafe({js|backgroundPositionY|js}, {js|bottom 20px|js});
+  CssJs.backgroundImage(
+    `linearGradient((
+      Some(`Angle(`deg(45.))),
+      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.backgroundImage(
+    `linearGradient((
+      Some(`Angle(`deg(90.))),
+      [|
+        (Some(CssJs.blue), Some(`percent(10.))),
+        (Some(CssJs.red), Some(`percent(20.))),
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.backgroundImage(
+    `linearGradient((
+      Some(`Angle(`deg(90.))),
+      [|(Some(CssJs.blue), Some(`percent(10.))), (Some(CssJs.red), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.backgroundImage(
+    `linearGradient((
+      Some(`Angle(`deg(90.))),
+      [|
+        (Some(CssJs.blue), None),
+        (None, Some(`percent(10.))),
+        (Some(CssJs.red), None),
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.backgroundImage(
+    `linearGradient((
+      None,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.backgroundImage(
+    `linearGradient((
+      Some(`Right),
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.backgroundImage(
+    `linearGradient((
+      Some(`Angle(`deg(45.))),
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.backgroundImage(
+    `linearGradient((
+      None,
+      [|
+        (Some(CssJs.white), Some(`percent(50.))),
+        (Some(CssJs.black), None),
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.backgroundImage(
+    `linearGradient((
+      None,
+      [|
+        (Some(CssJs.white), None),
+        (Some(`hex({js|f06|js})), None),
+        (Some(CssJs.black), None),
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.backgroundImage(
+    `linearGradient((
+      None,
+      [|
+        (Some(CssJs.red), Some(`pxFloat(-50.))),
+        (
+          Some(CssJs.white),
+          Some(`calc(`add((`pxFloat(-25.), `percent(50.))))),
+        ),
+        (Some(CssJs.blue), Some(`percent(100.))),
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.backgroundImages([|
+    `linearGradient((
+      Some(`Angle(`deg(45.))),
+      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+    `linearGradient((
+      None,
+      [|
+        (Some(CssJs.red), Some(`pxFloat(-50.))),
+        (
+          Some(CssJs.white),
+          Some(`calc(`add((`pxFloat(-25.), `percent(50.))))),
+        ),
+        (Some(CssJs.blue), Some(`percent(100.))),
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+    `linearGradient((
+      Some(`Angle(`deg(45.))),
+      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  |]);
+  CssJs.backgroundImages([|
+    `linearGradient((
+      Some(`Angle(`deg(45.))),
+      [|
+        (Some(Color.Background.boxDark), Some(`percent(25.))),
+        (Some(`transparent), Some(`percent(25.))),
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+    `linearGradient((
+      None,
+      [|
+        (Some(CssJs.red), Some(`pxFloat(-50.))),
+        (
+          Some(CssJs.white),
+          Some(`calc(`add((`pxFloat(-25.), `percent(50.))))),
+        ),
+        (Some(CssJs.blue), Some(`percent(100.))),
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+    `linearGradient((
+      Some(`Angle(`deg(45.))),
+      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  |]);
+  CssJs.backgroundImage(
+    `radialGradient((
+      Some(`ellipse),
+      None,
+      None,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.backgroundImage(
+    `radialGradient((
+      Some(`circle),
+      None,
+      None,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.backgroundImage(
+    `radialGradient((
+      Some(`ellipse),
+      None,
+      None,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.backgroundImage(
+    `radialGradient((
+      Some(`circle),
+      Some(`closestCorner),
+      None,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.backgroundImage(
+    `radialGradient((
+      Some(`ellipse),
+      Some(`farthestSide),
+      None,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.backgroundImage(
+    `radialGradient((
+      Some(`circle),
+      Some(`farthestSide),
+      None,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.backgroundImage(
+    `radialGradient((
+      Some(`ellipse),
+      None,
+      None,
+      [|
+        (None, Some(`percent(50.))),
+        (Some(CssJs.white), None),
+        (Some(CssJs.black), None),
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.unsafe(
+    {js|backgroundImage|js},
+    {js|radial-gradient(60% 60%, white, black)|js},
+  );
+  CssJs.listStyleImage(
+    `linearGradient((
+      None,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.listStyleImage(
+    `linearGradient((
+      Some(`Right),
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.listStyleImage(
+    `linearGradient((
+      Some(`Angle(`deg(45.))),
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.listStyleImage(
+    `linearGradient((
+      None,
+      [|
+        (Some(CssJs.white), Some(`percent(50.))),
+        (Some(CssJs.black), None),
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.listStyleImage(
+    `linearGradient((
+      None,
+      [|
+        (Some(CssJs.white), Some(`pxFloat(5.))),
+        (Some(CssJs.black), None),
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.listStyleImage(
+    `linearGradient((
+      None,
+      [|
+        (Some(CssJs.white), None),
+        (Some(`hex({js|f06|js})), None),
+        (Some(CssJs.black), None),
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.listStyleImage(
+    `linearGradient((
+      None,
+      [|(Some(`currentColor), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.listStyleImage(
+    `linearGradient((
+      None,
+      [|
+        (Some(CssJs.red), Some(`pxFloat(-50.))),
+        (
+          Some(CssJs.white),
+          Some(`calc(`add((`pxFloat(-25.), `percent(50.))))),
+        ),
+        (Some(CssJs.blue), Some(`percent(100.))),
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.listStyleImage(
+    `radialGradient((
+      Some(`ellipse),
+      None,
+      None,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.listStyleImage(
+    `radialGradient((
+      Some(`circle),
+      None,
+      None,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.listStyleImage(
+    `radialGradient((
+      Some(`ellipse),
+      None,
+      None,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.listStyleImage(
+    `radialGradient((
+      Some(`ellipse),
+      Some(`closestCorner),
+      None,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.listStyleImage(
+    `radialGradient((
+      Some(`circle),
+      Some(`closestCorner),
+      None,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.listStyleImage(
+    `radialGradient((
+      Some(`ellipse),
+      Some(`farthestSide),
+      None,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.listStyleImage(
+    `radialGradient((
+      Some(`circle),
+      Some(`farthestSide),
+      None,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.listStyleImage(
+    `radialGradient((
+      Some(`ellipse),
+      None,
+      None,
+      [|
+        (None, Some(`percent(50.))),
+        (Some(CssJs.white), None),
+        (Some(CssJs.black), None),
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.unsafe(
+    {js|listStyleImage|js},
+    {js|radial-gradient(60% 60%, white, black)|js},
+  );
   CssJs.imageRendering(`auto);
   CssJs.imageRendering(`smooth);
   CssJs.imageRendering(`highQuality);
