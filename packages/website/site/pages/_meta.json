@@ -27,10 +27,5 @@
       "breadcrumb": false
     }
   },
-  "releases": {
-    "title": "Releases",
-    "theme": {
-      "breadcrumb": false
-    }
-  }
+  "releases": "Releases"
 }
