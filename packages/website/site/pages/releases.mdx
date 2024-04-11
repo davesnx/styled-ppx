@@ -15,7 +15,7 @@ export const getStaticProps = async () => {
 Published on ${new Date(release.published_at).toDateString()}
 \n
 ${body}`
-  }).join('\n\n')
+  }).join('\n\n').replaceAll(/[{}]/g, '\\$&')
   const mdxSource = await buildDynamicMDX(markdown, { mdxOptions: { remarkPlugins: [remarkNormalizeHeadings] } })
   return { props: mdxSource }
 }
