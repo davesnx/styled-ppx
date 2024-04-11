@@ -66,7 +66,7 @@ release-static:
 
 # Testing commands
 
-TEST_TARGETS := test_parser test_reason_css_parser test_native_typecheck test_ppx_snapshot_reason test_ppx_snapshot_rescript test_css_support test_css_spec_types test_emotion test_emotion_hash test_css_spec_parser test_string_interpolation
+TEST_TARGETS := test_parser test_reason_css_parser test_native_typecheck test_ppx_snapshot_reason test_ppx_snapshot_rescript test_css_support test_css_spec_types test_emotion test_murmur2 test_css_spec_parser test_string_interpolation
 
 # Create targets with the format "test_{{target_name}}_{{ "watch" | "promote" }}"
 define create_test

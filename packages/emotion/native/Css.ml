@@ -308,7 +308,7 @@ let style (styles : rule list) =
   match styles with
   | [] -> ""
   | _ ->
-    let hash = Emotion_hash.Hash.default (rules_to_string styles) in
+    let hash = Murmur2.default (rules_to_string styles) in
     let className = render_hash "css" hash styles in
     Stylesheet.push instance (className, Classnames styles);
     className
@@ -317,7 +317,7 @@ let keyframes (keyframes : (int * rule list) list) =
   match keyframes with
   | [] -> ""
   | _ ->
-    let hash = Emotion_hash.Hash.default (keyframes_to_string keyframes) in
+    let hash = Murmur2.default (keyframes_to_string keyframes) in
     let animationName = Printf.sprintf "%s-%s" "animation" hash in
     Stylesheet.push instance (animationName, Keyframes keyframes);
     animationName

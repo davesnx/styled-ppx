@@ -1,0 +1,4 @@
+(library
+ (name murmur2)
+ (public_name styled-ppx.murmur2)
+ (modes :standard melange))

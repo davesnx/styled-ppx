@@ -1,5 +1,0 @@
-(library
- (name emotion_hash)
- (public_name styled-ppx.emotion-hash)
- (modules hash)
- (modes :standard melange))

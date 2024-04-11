@@ -4,5 +4,5 @@ let () =
     exit 1);
 
   let input_string = Sys.argv.(1) in
-  let result = Emotion_hash.Hash.default input_string in
+  let result = Murmur2.default input_string in
   print_endline result

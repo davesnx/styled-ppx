@@ -1,0 +1,8 @@
+(executable
+ (name cli_murmur2)
+ (libraries murmur2))
+
+(cram
+ (package styled-ppx)
+ (alias test_murmur2)
+ (deps cli_murmur2.exe %{bin:node} ./compare.sh ./emotion-hash.js))
