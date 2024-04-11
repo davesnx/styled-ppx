@@ -7,7 +7,6 @@ maintainer: ["David Sancho <dsnxmoreno@gmail.com>"]
 authors: ["David Sancho <dsnxmoreno@gmail.com>"]
 license: "MIT"
 homepage: "https://styled-ppx.vercel.app"
-doc: "https://styled-ppx.vercel.app"
 bug-reports: "https://github.com/davesnx/styled-ppx/issues"
 depends: [
   "dune" {>= "3.8"}

@@ -12,7 +12,6 @@
 
 (source (github davesnx/styled-ppx))
 (homepage "https://styled-ppx.vercel.app")
-(documentation "https://styled-ppx.vercel.app")
 (bug_reports "https://github.com/davesnx/styled-ppx/issues")
 
 (license MIT)
