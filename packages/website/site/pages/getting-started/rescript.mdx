@@ -8,7 +8,7 @@ import Link from 'next/link'
 
 # ReScript
 
-Depends on [rescript-react](https://github.com/rescript-lang/rescript-react). Please make sure you have it installed first.
+ReScript version supported are v9.0 and v10.
 
 ### Install
 
@@ -17,6 +17,12 @@ yarn add @davesnx/styled-ppx
 # Or
 npm install @davesnx/styled-ppx
 ```
+
+### Packages available
+
+- `@davesnx/styled-ppx/ppx` is the ppx as a binary
+- `@davesnx/styled-ppx/css` are the CSS bindings
+- `@davesnx/styled-ppx/emotion` are the `emotion.sh` bindings
 
 ### Update `bsconfig.json`
 
@@ -34,9 +40,7 @@ The diff on `bsconfig.json` should contain the following:
 }
 ```
 
-(Added in v0.40.0)
-- `@davesnx/styled-ppx/css` are the CSS bindings.
-- `@davesnx/styled-ppx/emotion` are the bindings to `emotion.sh`.
+Note: `@rescript/react` is optional, and only needed if you use styled components (`%styled.div(``)`).
 
 ### Example
 
@@ -50,25 +54,24 @@ module Link = %styled.a((~color=CssJs.hex("4299E1")) => `
   color: $(color);
 `)
 
-module Layout = %styled.div([|
-  %css("display: flex"),
-  %css("width: 100%;"),
-  %css("height: 100%;"),
-  %css("justify-content: center;"),
-  %css("align-items: center"),
-|])
+/* This is a unique className pointing to those styles */
+let layout = %cx(`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center
+`)
 
 /* Later in a component */
-<Layout>
+<div className=layout>
   <Link
-    color=CssJs.hex("333333")
+    color={CssJs.hex("333333")}
     href="https://sancho.dev"
-    rel="noopener noreferrer"
-  />
-  <span className={%cx(`color: black; position: absolute; left: 0px;`)}>
+    rel="noopener noreferrer">
     {React.string("sancho.dev")}
-  </span>
-</Layout>
+  </Link>
+</div>
 ```
 
 ### Playground
