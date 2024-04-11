@@ -1,6 +1,6 @@
 ![styled-ppx-header-light](./.github/header-light.png#gh-dark-mode-only)![styled-ppx-header-dark](./.github/header-dark.png#gh-light-mode-only)
 
-### Typed styled components for ReScript and Melange
+### Typed styled components for ReScript, Melange and Native
 
 ![demo](./.github/demo-dark.png#gh-dark-mode-only)![styled-ppx-demo-dark](./.github/demo-light.png#gh-light-mode-only)
 
@@ -12,7 +12,7 @@ Built on top of [emotion](https://emotion.sh), it allows you to style apps safel
 
 For the entire documentation, visit [styled-ppx.vercel.app](https://styled-ppx.vercel.app)
 
-### Editor Support
+## [Editor Support](https://styled-ppx.vercel.app/editor-support)
 
 We provide an editor extension that brings syntax highlighting:
 
