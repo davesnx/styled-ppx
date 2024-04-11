@@ -1,0 +1,80 @@
+---
+title: Getting Started - Native
+showAllLanguage: false
+---
+
+import { Callout } from "nextra/components";
+import Link from "next/link";
+
+# Native
+
+This guide assumes that you'll use opam and dune.
+
+### Install
+
+```bash
+opam install styled-ppx
+```
+
+### Packages available
+
+- `styled-ppx` is the ppx
+- `styled-ppx.css_native` are the CSS bindings
+- `styled-ppx.emotion_native` is a native implementaiton of `emotion.sh` capable of storing CSS, hashing it and generating a unique className, autoprefixing, etc.
+
+### Usage
+
+Add `styled-ppx` under dune's preprocess pps for any library or executable. Add `styled-ppx.css_native` and `styled-ppx.emotion_emotion` as libraries.
+
+```diff
+(library
+  (name ...)
+  (libraries styled-ppx.css styled-ppx.emotion server-reason-react)
+  (preprocess
++  (pps melange.ppx styled-ppx server-reason-react-ppx)))
+```
+
+```diff
+(melange.emit
+  (libraries styled-ppx.css styled-ppx.emotion server-reason-react)
+  (preprocess
++  (pps melange.ppx styled-ppx server-reason-react-ppx)))
+```
+
+Note: `server-reason-react` and `server-reason-react-ppx` are optional, and only needed if you use styled components (`[%styled.div {||}]`).
+
+### Example
+
+```reason
+/* This is a server-reason-react module with those styles encoded as a unique className */
+module Link = [%styled.a (~color=CssJs.hex("4299E1")) => {|
+  font-size: 1.875rem;
+  line-height: 1.5;
+  text-decoration: none;
+  margin: 0px;
+  padding: 10px 0px;
+  color: $(color);
+|}];
+
+/* This is a unique className pointing to those styles */
+let layout = [%cx {|
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center
+|}];
+
+/* Later in a component */
+let app =
+  <div className=layout>
+    <Link
+      color={CssJs.hex("333333")}
+      href="https://sancho.dev"
+      rel="noopener noreferrer">
+      {React.string("sancho.dev")}
+    </Link>
+  </div>;
+
+let stylesheet = CssJs.render_style_tag(); /* This will render the stylesheet to be present in the head of the document */
+```
