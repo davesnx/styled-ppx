@@ -1,3 +1,0 @@
-pin-depends: [
-  ["server-reason-react.dev" "git+https://github.com/ml-in-barcelona/server-reason-react.git"]
-]
