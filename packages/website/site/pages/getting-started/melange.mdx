@@ -32,16 +32,28 @@ Add `styled-ppx` under dune's preprocess pps for library with `(modes melange)` 
 (library
   (name ...)
   (modes melange)
-  (libraries styled-ppx.css styled-ppx.emotion reason-react)
+  (libraries
++   styled-ppx.css
++   styled-ppx.emotion
+    reason-react)
   (preprocess
-+  (pps melange.ppx styled-ppx reason-react-ppx)))
+    (pps
++     styled-ppx
+      melange.ppx
+      reason-react-ppx)))
 ```
 
 ```diff
 (melange.emit
-  (libraries styled-ppx.css styled-ppx.emotion reason-react)
+  (libraries
++   styled-ppx.css
++   styled-ppx.emotion
+    reason-react)
   (preprocess
-+  (pps melange.ppx styled-ppx reason-react-ppx)))
+    (pps
++     styled-ppx
+      melange.ppx
+      reason-react-ppx)))
 ```
 
 Note: `reason-react` and `reason-react-ppx` are optional, and only needed if you use styled components (`[%styled.div {||}]`).
