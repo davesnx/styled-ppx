@@ -1,4 +1,5 @@
 {
   "rescript": "ReScript",
-  "editor-support": "Editor Support"
+  "melange": "Melange",
+  "native": "Native"
 }
