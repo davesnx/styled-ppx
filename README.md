@@ -1,33 +1,12 @@
 ![styled-ppx-header-light](./.github/header-light.png#gh-dark-mode-only)![styled-ppx-header-dark](./.github/header-dark.png#gh-light-mode-only)
 
+### Typed styled components for ReScript and Melange
+
 ![demo](./.github/demo-dark.png#gh-dark-mode-only)![styled-ppx-demo-dark](./.github/demo-light.png#gh-light-mode-only)
 
-### Typed styled components for ReScript
+**styled-ppx** is a [ppx](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem) and a library that brings styled components to ReScript and Melange. It allows you to create **React Components** with type-safe style definitions that don't rely on a different language ([DSL](https://en.wikipedia.org/wiki/Domain-specific_language)) except CSS, but also can be used without React.
 
-**styled-ppx** is a [ppx](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem) that brings styled components to ReScript. Built on top of [emotion](https://emotion.sh), it allows you to style apps safely, quickly, and performantly - just as you have always done it. styled-ppx allows you to create **React Components** with type-safe style definitions that don't rely on a different language ([DSL](https://en.wikipedia.org/wiki/Domain-specific_language)) except CSS
-
-## Usage
-
-```bash
-npm install @davesnx/styled-ppx
-```
-
-### Update `bsconfig.json`
-
-Add `"@davesnx/styled-ppx/ppx"` under bsconfig `"ppx-flags"`:
-
-```diff
-{
-  "bs-dependencies": [
-    "@rescript/react",
-+   "@davesnx/styled-ppx/css",
-+   "@davesnx/styled-ppx/emotion"
-  ],
-+ "ppx-flags": ["@davesnx/styled-ppx/ppx"]
-}
-```
-
-Read more about [getting started](https://styled-ppx.vercel.app/getting-started)
+Built on top of [emotion](https://emotion.sh), it allows you to style apps safely, quickly, and performantly - just as you have always done it.
 
 ## [Documentation](https://styled-ppx.vercel.app)
 
