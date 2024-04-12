@@ -50,7 +50,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.maskImage(`none);
   CssJs.maskImage(
     `linearGradient((
-      Some(`Angle(`deg(45.))),
+      Some(`deg(45.)),
       [|(Some(`hex({js|333|js})), None), (Some(`hex({js|000|js})), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
   );

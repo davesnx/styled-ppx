@@ -1409,7 +1409,7 @@ let render_function_linear_gradient =
   | (Some(`Static_0(angle, ())), stops) =>
     [%expr
      `linearGradient((
-       Some(`Angle([%e render_extended_angle(~loc, angle)])),
+       Some([%e render_extended_angle(~loc, angle)]),
        [%e render_color_stop_list(~loc, stops)]: Css_AtomicTypes.Gradient.color_stop_list,
      ))]
   | (Some(`Static_1((), side_or_corner, ())), stops) =>

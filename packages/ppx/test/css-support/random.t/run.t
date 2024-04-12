@@ -168,7 +168,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.style([|
     CssJs.backgroundImage(
       `linearGradient((
-        Some(`Angle(`deg(84.))),
+        Some(`deg(84.)),
         [|
           (Some(`hex({js|F80|js})), Some(`percent(0.))),
           (Some(`rgba((255, 255, 255, `num(0.8)))), Some(`percent(50.))),

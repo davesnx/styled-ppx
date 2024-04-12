@@ -253,6 +253,34 @@ module Color = {
          linear-gradient(45deg, blue, red);
      |}
 ];
+let color = `hex("333");
+[%css
+  {|
+       background-image:
+        linear-gradient(45deg,
+          $(color) 25%,
+          transparent 0%,
+          transparent 50%,
+          $(color) 0%,
+          $(color) 75%,
+          transparent 0%,
+          transparent 100%
+        )
+     |}
+];
+[%css
+  {|
+    background-image:
+      repeating-linear-gradient(
+        45deg,
+        $(color) 0px,
+        $(color) 4px,
+        $(color) 5px,
+        $(color) 9px
+      )
+    |}
+];
+
 [%css
   {|
        background-image:

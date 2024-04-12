@@ -66,3 +66,18 @@ module App = {
       <div className=selectors> {React.string("Red text")} </div>
     </Cositas>;
 };
+
+let color = `hex("333");
+
+let _ = [%css
+  {|
+    background-image:
+      repeating-linear-gradient(
+        45deg,
+        $(color) 0px,
+        $(color) 4px,
+        $(color) 5px,
+        $(color) 9px
+      )
+    |}
+];

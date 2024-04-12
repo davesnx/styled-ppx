@@ -312,13 +312,13 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.unsafe({js|backgroundPositionY|js}, {js|bottom 20px|js});
   CssJs.backgroundImage(
     `linearGradient((
-      Some(`Angle(`deg(45.))),
+      Some(`deg(45.)),
       [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
     `linearGradient((
-      Some(`Angle(`deg(90.))),
+      Some(`deg(90.)),
       [|
         (Some(CssJs.blue), Some(`percent(10.))),
         (Some(CssJs.red), Some(`percent(20.))),
@@ -327,13 +327,13 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   );
   CssJs.backgroundImage(
     `linearGradient((
-      Some(`Angle(`deg(90.))),
+      Some(`deg(90.)),
       [|(Some(CssJs.blue), Some(`percent(10.))), (Some(CssJs.red), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
     `linearGradient((
-      Some(`Angle(`deg(90.))),
+      Some(`deg(90.)),
       [|
         (Some(CssJs.blue), None),
         (None, Some(`percent(10.))),
@@ -355,7 +355,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   );
   CssJs.backgroundImage(
     `linearGradient((
-      Some(`Angle(`deg(45.))),
+      Some(`deg(45.)),
       [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
   );
@@ -393,7 +393,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   );
   CssJs.backgroundImages([|
     `linearGradient((
-      Some(`Angle(`deg(45.))),
+      Some(`deg(45.)),
       [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
     `linearGradient((
@@ -408,13 +408,39 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       |]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
     `linearGradient((
-      Some(`Angle(`deg(45.))),
+      Some(`deg(45.)),
       [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
   |]);
+  let color = `hex("333");
+  CssJs.backgroundImage(
+    `linearGradient((
+      Some(`deg(45.)),
+      [|
+        (Some(color), Some(`percent(25.))),
+        (Some(`transparent), Some(`percent(0.))),
+        (Some(`transparent), Some(`percent(50.))),
+        (Some(color), Some(`percent(0.))),
+        (Some(color), Some(`percent(75.))),
+        (Some(`transparent), Some(`percent(0.))),
+        (Some(`transparent), Some(`percent(100.))),
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
+  CssJs.backgroundImage(
+    `repeatingLinearGradient((
+      Some(`deg(45.)),
+      [|
+        (Some(color), Some(`pxFloat(0.))),
+        (Some(color), Some(`pxFloat(4.))),
+        (Some(color), Some(`pxFloat(5.))),
+        (Some(color), Some(`pxFloat(9.))),
+      |]: Css_AtomicTypes.Gradient.color_stop_list,
+    )),
+  );
   CssJs.backgroundImages([|
     `linearGradient((
-      Some(`Angle(`deg(45.))),
+      Some(`deg(45.)),
       [|
         (Some(Color.Background.boxDark), Some(`percent(25.))),
         (Some(`transparent), Some(`percent(25.))),
@@ -432,7 +458,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       |]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
     `linearGradient((
-      Some(`Angle(`deg(45.))),
+      Some(`deg(45.)),
       [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
   |]);
@@ -514,7 +540,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   );
   CssJs.listStyleImage(
     `linearGradient((
-      Some(`Angle(`deg(45.))),
+      Some(`deg(45.)),
       [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
   );
