@@ -1,6 +1,6 @@
 {
   "name": "@davesnx/styled-ppx",
-  "version": "0.54.1",
+  "version": "0.56.0",
   "description": "Typed styled components in ReScript",
   "author": "David Sancho <dsnxmoreno@gmail.com>",
   "license": "BSD-2",
@@ -9,8 +9,9 @@
     "rescript",
     "reason",
     "ocaml",
+    "melange",
+    "native",
     "ppx",
-    "bucklescript",
     "css",
     "styled-components",
     "emotion",
