@@ -1,9 +1,9 @@
-import { useLocalStorage } from './use-local-storage'
+import { useLocalStorage } from "./use-local-storage";
 
 export function useLanguage() {
-  const [language, setLanguage] = useLocalStorage('language', 'rescript', {
-    initializeWithValue: false
-  })
+  const [language, setLanguage] = useLocalStorage("language", "rescript", {
+    initializeWithValue: false,
+  });
 
-  return { language, setLanguage }
+  return { language, setLanguage };
 }

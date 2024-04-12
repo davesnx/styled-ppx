@@ -1,7 +1,7 @@
 import Path from "node:path";
 import URL from "node:url";
 import Fs from "node:fs";
-import nextra from "nextra";
+import Nextra from "nextra";
 import * as Shiki from "shiki";
 import { bundledLanguages } from "shiki/langs";
 
@@ -68,7 +68,7 @@ const duneGrammar = {
   name: "dune",
 };
 
-const withNextra = nextra({
+const withNextra = Nextra({
   theme: "nextra-theme-docs",
   themeConfig: "./theme.config.tsx",
   mdxOptions: {

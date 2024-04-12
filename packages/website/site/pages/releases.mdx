@@ -4,12 +4,11 @@ title: Release
 
 import { buildDynamicMDX } from 'nextra/remote'
 import { RemoteContent } from 'nextra/ssg'
-import { useData } from 'nextra/data'
 import remarkNormalizeHeadings from 'remark-normalize-headings'
 
 export const getStaticProps = async () => {
   const releases = await fetch('https://api.github.com/repos/davesnx/styled-ppx/releases').then(res => res.json())
-  const markdown = "# Releases\n\`styled-ppx\` version works like semver but without major releases. The major version is always 0, like \`0.x.x\`. That each minor update can contain a breaking change.\n" + releases.map(release => {
+  const markdown = "# Releases\n\`styled-ppx\` version works like semver but without major releases. The major version is always 0, like \`0.x.x\`. Each minor version can contain a breaking change.\n" + releases.map(release => {
     const body = release.body || "";
     return `# <a href="${release.html_url}" target="_blank" rel="noopener">${release.name}</a>
 Published on ${new Date(release.published_at).toDateString()}
