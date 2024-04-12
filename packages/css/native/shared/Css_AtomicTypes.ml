@@ -2353,7 +2353,7 @@ end
 
 module Gradient = struct
   type direction =
-    [ `Angle of Angle.t
+    [ Angle.t
     | `Bottom
     | `BottomLeft
     | `BottomRight
@@ -2383,7 +2383,8 @@ module Gradient = struct
     | `repeatingLinearGradient of direction option * color_stop_list
     | `radialGradient of
       shape option * radial_size option * Position.t option * color_stop_list
-    | `repeatingRadialGradient of shape option * radial_size option * Position.t option * color_stop_list
+    | `repeatingRadialGradient of
+      shape option * radial_size option * Position.t option * color_stop_list
     | `conicGradient of direction option * color_stop_list
     ]
 
@@ -2419,7 +2420,7 @@ module Gradient = struct
     |. Std.Array.joinWith ~sep:{js|, |js}
 
   let direction_to_string = function
-    | `Angle a -> Angle.toString a
+    | #Angle.t as a -> Angle.toString a
     | #SideOrCorner.t as s -> SideOrCorner.toString s
 
   let string_of_shape shape =

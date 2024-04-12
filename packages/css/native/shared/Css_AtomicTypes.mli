@@ -1561,7 +1561,7 @@ end
 
 module Gradient : sig
   type direction =
-    [ `Angle of Angle.t
+    [ Angle.t
     | `Bottom
     | `BottomLeft
     | `BottomRight
