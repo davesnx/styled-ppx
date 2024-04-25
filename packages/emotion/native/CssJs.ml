@@ -350,7 +350,7 @@ let style (styles : rule array) =
 
 let global (styles : rule array) =
   match styles with
-  | [||] -> "";
+  | [||] -> ""
   | _ ->
     let hash = Murmur2.default (rules_to_string (Array.to_list styles)) in
     Stylesheet.push instance (hash, Globals styles);
@@ -365,13 +365,15 @@ let keyframes (keyframes : (int * rule array) array) =
     Stylesheet.push instance (animationName, Keyframes keyframes);
     animationName
 
+(** Deprecated: Use get_style_rules instead*)
 let render_style_tag () =
   Stylesheet.get_all instance
   |> List.fold_left
        (fun accumulator (hash, rules) ->
          match rules with
-         | Globals rules -> 
-           Printf.sprintf "%s %s" accumulator (rules_to_string (Array.to_list rules))
+         | Globals rules ->
+           Printf.sprintf "%s %s" accumulator
+             (rules_to_string (Array.to_list rules))
          | Classnames rules ->
            let rules = pp_rules hash rules |> String.trim in
            Printf.sprintf "%s %s" accumulator rules
@@ -380,3 +382,5 @@ let render_style_tag () =
            Printf.sprintf "%s %s" accumulator rules)
        ""
   |> String.trim
+
+let get_string_style_rules = render_style_tag
