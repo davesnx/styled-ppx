@@ -238,6 +238,7 @@ let pp_rules hash rules =
   Printf.sprintf "%s %s" declarations selectors
 
 type declarations =
+  | Globals of rule list
   | Classnames of rule list
   | Keyframes of (int * rule list) list
 
@@ -313,6 +314,15 @@ let style (styles : rule list) =
     Stylesheet.push instance (className, Classnames styles);
     className
 
+let global (styles : rule list) =
+  match styles with
+  | [] -> "";
+  | _ ->
+    let hash = Murmur2.default (rules_to_string styles) in
+    Stylesheet.push instance (hash, Globals styles);
+    hash
+    
+
 let keyframes (keyframes : (int * rule list) list) =
   match keyframes with
   | [] -> ""
@@ -327,6 +337,8 @@ let render_style_tag () =
   |> List.fold_left
        (fun accumulator (hash, rules) ->
          match rules with
+         | Globals rules ->
+           Printf.sprintf "%s %s" accumulator (rules_to_string rules)
          | Classnames rules ->
            let rules = pp_rules hash rules |> String.trim in
            Printf.sprintf "%s %s" accumulator rules
