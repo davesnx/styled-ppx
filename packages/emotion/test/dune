@@ -5,6 +5,7 @@
   alcotest
   fmt
   server-reason-react.js
+  server-reason-react.reactDom
   styled-ppx.css_native
   styled-ppx.emotion_native
   styled-ppx.murmur2)
