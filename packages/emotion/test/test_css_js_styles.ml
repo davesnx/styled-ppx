@@ -286,6 +286,44 @@ let hover_selector () =
         255, 0.7); } .%s:hover { color: rgba(255, 255, 255, 0.7); }"
        className className className)
 
+let hashes () =
+  let global =
+    CssJs.global [| CssJs.selector "html" [| CssJs.lineHeight (`abs 1.15) |] |]
+  in
+  let className = CssJs.style [| CssJs.display `block |] in
+  let classNameHash = String.sub className 4 (String.length className - 4) in
+  let hashes = CssJs.get_string_style_hashes () in
+  let _ = CssJs.flush () in
+  assert_string hashes (Printf.sprintf "%s %s" global classNameHash)
+
+let style_tag () =
+  let global =
+    CssJs.global [| CssJs.selector "html" [| CssJs.lineHeight (`abs 1.15) |] |]
+  in
+  let animationName =
+    CssJs.keyframes
+      [|
+        0, [| CssJs.transform (`rotate (`deg 0.)) |];
+        100, [| CssJs.transform (`rotate (`deg (-360.))) |];
+      |]
+  in
+  let animationNameHash =
+    String.sub animationName 10 (String.length animationName - 10)
+  in
+  let className = CssJs.style [| CssJs.display `block |] in
+  let classNameHash = String.sub className 4 (String.length className - 4) in
+  let css = CssJs.style_tag () |> ReactDOM.renderToString in
+  let _ = CssJs.flush () in
+  assert_string css
+    (Printf.sprintf
+       "<style data-emotion=\"css %s %s %s\" data-s>html{line-height:1.15;} \
+        @keyframes %s { 0%% { -webkit-transform: rotate(0deg); -moz-transform: \
+        rotate(0deg); -ms-transform: rotate(0deg); transform: rotate(0deg); } \
+        100%% { -webkit-transform: rotate(-360deg); -moz-transform: \
+        rotate(-360deg); -ms-transform: rotate(-360deg); transform: \
+        rotate(-360deg); } } .%s { display: block; }</style>"
+       global animationNameHash classNameHash animationName className)
+
 let case title fn = Alcotest.test_case title `Quick fn
 
 let tests =
@@ -310,4 +348,6 @@ let tests =
       case "selector_with_ppx" selector_with_ppx;
       case "avoid_hash_collision" avoid_hash_collision;
       case "hover_selector" hover_selector;
+      case "hashes" hashes;
+      case "style_tag" style_tag;
     ] )
