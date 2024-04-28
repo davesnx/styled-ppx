@@ -295,6 +295,7 @@ let rec rules_to_string rules =
   Buffer.contents buff
 
 type declarations =
+  | Globals of rule array
   | Classnames of rule array
   | Keyframes of (int * rule array) array
 
@@ -347,6 +348,14 @@ let style (styles : rule array) =
     Stylesheet.push instance (className, Classnames styles);
     className
 
+let global (styles : rule array) =
+  match styles with
+  | [||] -> "";
+  | _ ->
+    let hash = Murmur2.default (rules_to_string (Array.to_list styles)) in
+    Stylesheet.push instance (hash, Globals styles);
+    hash
+
 let keyframes (keyframes : (int * rule array) array) =
   match keyframes with
   | [||] -> ""
@@ -361,6 +370,8 @@ let render_style_tag () =
   |> List.fold_left
        (fun accumulator (hash, rules) ->
          match rules with
+         | Globals rules -> 
+           Printf.sprintf "%s %s" accumulator (rules_to_string (Array.to_list rules))
          | Classnames rules ->
            let rules = pp_rules hash rules |> String.trim in
            Printf.sprintf "%s %s" accumulator rules

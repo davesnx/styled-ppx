@@ -254,6 +254,13 @@ let keyframe () =
         %s; }"
        animationName className animationName animationName)
 
+let global () =
+  let _ =
+    CssJs.global [| CssJs.selector "html" [| CssJs.lineHeight (`abs 1.15) |] |]
+  in
+  let css = render_style_tag () in
+  assert_string css (Printf.sprintf "html{line-height:1.15;}")
+
 let duplicated_styles_unique () =
   let className1 = CssJs.style [| CssJs.flexGrow 1. |] in
   let className2 = CssJs.style [| CssJs.flexGrow 1. |] in
@@ -298,6 +305,7 @@ let tests =
       case "selector_ampersand_at_the_middle" selector_ampersand_at_the_middle;
       case "selector_params" selector_params;
       case "keyframe" keyframe;
+      case "global" global;
       case "duplicated_styles_unique" duplicated_styles_unique;
       case "selector_with_ppx" selector_with_ppx;
       case "avoid_hash_collision" avoid_hash_collision;
