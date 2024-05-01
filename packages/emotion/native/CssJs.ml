@@ -240,17 +240,17 @@ let resolve_selectors rules =
   in
   rules |> List.map resolve_selector |> List.flatten
 
-let pp_keyframes hash keyframes =
+let pp_keyframes animationName keyframes =
   let pp_keyframe (percentage, rules) =
     Printf.sprintf "%i%% { %s }" percentage (render_declarations rules)
   in
   let definition =
     keyframes |> Array.map pp_keyframe |> Array.to_list |> String.concat " "
   in
-  Printf.sprintf "@keyframes %s { %s }" hash definition
+  Printf.sprintf "@keyframes %s { %s }" animationName definition
 
 (* Removes nesting on selectors, run the autoprefixer. *)
-let pp_rules hash rules =
+let pp_rules className rules =
   (* TODO: Refactor with partition or partition_map. List.filter_map is error prone.
      Ss might need to respect the order of definition, and this breaks the order *)
   let list_of_rules = rules |> Array.to_list |> resolve_selectors in
@@ -260,11 +260,11 @@ let pp_rules hash rules =
     |> List.flatten
     |> List.filter_map render_declaration
     |> String.concat " "
-    |> fun all -> Printf.sprintf ".%s { %s }" hash all
+    |> fun all -> Printf.sprintf ".%s { %s }" className all
   in
   let selectors =
     list_of_rules
-    |> List.filter_map (render_selectors hash)
+    |> List.filter_map (render_selectors className)
     |> String.concat " "
   in
   Printf.sprintf "%s %s" declarations selectors
@@ -296,8 +296,14 @@ let rec rules_to_string rules =
 
 type declarations =
   | Globals of rule array
-  | Classnames of rule array
-  | Keyframes of (int * rule array) array
+  | Classnames of {
+      className : string;
+      styles : rule array;
+    }
+  | Keyframes of {
+      animationName : string;
+      keyframes : (int * rule array) array;
+    }
 
 module Stylesheet = struct
   module Hashes = Set.Make (String)
@@ -330,11 +336,11 @@ let keyframes_to_string keyframes =
   in
   keyframes |> Array.map pp_keyframe |> Array.to_list |> String.concat ""
 
-let render_hash prefix hash styles =
+let render_hash hash styles =
   let is_label = function D ("label", value) -> Some value | _ -> None in
   match Array.find_map is_label styles with
-  | None -> Printf.sprintf "%s-%s" prefix hash
-  | Some label -> Printf.sprintf "%s-%s-%s" prefix hash label
+  | None -> Printf.sprintf "%s" hash
+  | Some label -> Printf.sprintf "%s-%s" hash label
 
 let instance = Stylesheet.make ()
 let flush () = Stylesheet.flush instance
@@ -343,14 +349,18 @@ let style (styles : rule array) =
   match styles with
   | [||] -> ""
   | _ ->
-    let hash = Murmur2.default (rules_to_string (Array.to_list styles)) in
-    let className = render_hash "css" hash styles in
-    Stylesheet.push instance (className, Classnames styles);
+    let hash =
+      render_hash
+        (Murmur2.default (rules_to_string (Array.to_list styles)))
+        styles
+    in
+    let className = Printf.sprintf "%s-%s" "css" hash in
+    Stylesheet.push instance (hash, Classnames { className; styles });
     className
 
 let global (styles : rule array) =
   match styles with
-  | [||] -> "";
+  | [||] -> ""
   | _ ->
     let hash = Murmur2.default (rules_to_string (Array.to_list styles)) in
     Stylesheet.push instance (hash, Globals styles);
@@ -362,21 +372,41 @@ let keyframes (keyframes : (int * rule array) array) =
   | _ ->
     let hash = Murmur2.default (keyframes_to_string keyframes) in
     let animationName = Printf.sprintf "%s-%s" "animation" hash in
-    Stylesheet.push instance (animationName, Keyframes keyframes);
+    Stylesheet.push instance (hash, Keyframes { animationName; keyframes });
     animationName
 
+(** Deprecated: Use get_style_rules instead*)
 let render_style_tag () =
   Stylesheet.get_all instance
   |> List.fold_left
-       (fun accumulator (hash, rules) ->
+       (fun accumulator (_, rules) ->
          match rules with
-         | Globals rules -> 
-           Printf.sprintf "%s %s" accumulator (rules_to_string (Array.to_list rules))
-         | Classnames rules ->
-           let rules = pp_rules hash rules |> String.trim in
+         | Globals rules ->
+           Printf.sprintf "%s %s" accumulator
+             (rules_to_string (Array.to_list rules))
+         | Classnames { className; styles } ->
+           let rules = pp_rules className styles |> String.trim in
            Printf.sprintf "%s %s" accumulator rules
-         | Keyframes keyframes ->
-           let rules = pp_keyframes hash keyframes |> String.trim in
+         | Keyframes { animationName; keyframes } ->
+           let rules = pp_keyframes animationName keyframes |> String.trim in
            Printf.sprintf "%s %s" accumulator rules)
        ""
   |> String.trim
+
+let get_string_style_rules = render_style_tag
+
+let get_string_style_hashes () =
+  Stylesheet.get_all instance
+  |> List.fold_left
+       (fun accumulator (hash, _) ->
+         Printf.sprintf "%s %s" accumulator hash |> String.trim)
+       ""
+
+let style_tag ?key:_ ?children:_ () =
+  React.createElement "style"
+    [
+      String ("data-emotion", "css " ^ get_string_style_hashes ());
+      Bool ("data-s", true);
+      DangerouslyInnerHtml (get_string_style_rules ());
+    ]
+    []

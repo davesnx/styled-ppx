@@ -1,6 +1,19 @@
+[%styled.global
+  {|
+  div {
+    background-color: green;
+  }
+
+  @media (min-width: 400px) {
+    div {
+      background-color: red;
+    }
+  }
+|}
+];
+
 let stack = [%cx "display: flex; flex-direction: column"];
 let stackGap = gap => [%cx "gap: $(gap)"];
-
 module Cositas = [%styled.div
   (~lola=CssJs.px(0), ~id) => {|
   display: flex;
