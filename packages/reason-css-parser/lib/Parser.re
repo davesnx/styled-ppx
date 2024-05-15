@@ -3280,7 +3280,6 @@ let check_map =
       ("single-transition", check(single_transition)),
       ("single-transition-property", check(single_transition_property)),
       ("size", check(size)),
-
       ("ray-size", check(ray_size)),
       ("radial-size", check(radial_size)),
       ("step-position", check(step_position)),

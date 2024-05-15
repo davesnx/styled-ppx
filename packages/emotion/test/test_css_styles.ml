@@ -229,7 +229,7 @@ let style_tag () =
   in
   let className = Css.style [ Css.display `block ] in
   let classNameHash = String.sub className 4 (String.length className - 4) in
-  let css = ReactDOM.renderToString (Css.style_tag ~children: "" ()) in
+  let css = ReactDOM.renderToString (Css.style_tag ~children:"" ()) in
   let _ = Css.flush () in
   assert_string css
     (Printf.sprintf

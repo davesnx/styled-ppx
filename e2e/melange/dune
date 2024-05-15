@@ -12,6 +12,11 @@
  (name debug)
  (public_name e2e_melange_debug)
  (modules :standard \ index)
- (libraries ui_native server-reason-react.react server-reason-react.reactDom styled-ppx.emotion_native styled-ppx.css_native)
+ (libraries
+  ui_native
+  server-reason-react.react
+  server-reason-react.reactDom
+  styled-ppx.emotion_native
+  styled-ppx.css_native)
  (preprocess
   (pps styled-ppx)))
