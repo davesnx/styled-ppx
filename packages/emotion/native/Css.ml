@@ -322,11 +322,10 @@ let style (styles : rule list) =
 
 let global (styles : rule list) =
   match styles with
-  | [] -> ""
+  | [] -> ()
   | _ ->
     let hash = Murmur2.default (rules_to_string styles) in
-    Stylesheet.push instance (hash, Globals styles);
-    hash
+    Stylesheet.push instance (hash, Globals styles)
 
 let keyframes (keyframes : (int * rule list) list) =
   match keyframes with

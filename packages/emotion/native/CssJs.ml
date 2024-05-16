@@ -360,11 +360,10 @@ let style (styles : rule array) =
 
 let global (styles : rule array) =
   match styles with
-  | [||] -> ""
+  | [||] -> ()
   | _ ->
     let hash = Murmur2.default (rules_to_string (Array.to_list styles)) in
-    Stylesheet.push instance (hash, Globals styles);
-    hash
+    Stylesheet.push instance (hash, Globals styles)
 
 let keyframes (keyframes : (int * rule array) array) =
   match keyframes with

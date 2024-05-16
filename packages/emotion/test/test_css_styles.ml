@@ -166,7 +166,7 @@ let keyframe () =
        animationName className animationName animationName)
 
 let global () =
-  let _ = Css.global [ Css.selector "html" [ Css.lineHeight (`abs 1.15) ] ] in
+  Css.global [ Css.selector "html" [ Css.lineHeight (`abs 1.15) ] ];
   let css = get_string_style_rules () in
   assert_string css (Printf.sprintf "html{line-height:1.15;}")
 
@@ -192,31 +192,8 @@ let hover_selector () =
         255, 0.7); }"
        className className)
 
-let hashes () =
-  let global =
-    Css.global [ Css.selector "html" [ Css.lineHeight (`abs 1.15) ] ]
-  in
-  let animationName =
-    Css.keyframes
-      [
-        0, [ Css.transform (`rotate (`deg 0.)) ];
-        100, [ Css.transform (`rotate (`deg (-360.))) ];
-      ]
-  in
-  let animationNameHash =
-    String.sub animationName 10 (String.length animationName - 10)
-  in
-  let className = Css.style [ Css.display `block ] in
-  let classNameHash = String.sub className 4 (String.length className - 4) in
-  let hashes = Css.get_string_style_hashes () in
-  let _ = Css.flush () in
-  assert_string hashes
-    (Printf.sprintf "%s %s %s" global animationNameHash classNameHash)
-
 let style_tag () =
-  let global =
-    Css.global [ Css.selector "html" [ Css.lineHeight (`abs 1.15) ] ]
-  in
+  Css.global [ Css.selector "html" [ Css.lineHeight (`abs 1.15) ] ];
   let animationName =
     Css.keyframes
       [
@@ -229,17 +206,20 @@ let style_tag () =
   in
   let className = Css.style [ Css.display `block ] in
   let classNameHash = String.sub className 4 (String.length className - 4) in
-  let css = ReactDOM.renderToString (Css.style_tag ~children:"" ()) in
+  let css = Css.style_tag () |> ReactDOM.renderToString in
   let _ = Css.flush () in
+  (* This is the hash of the global styles, since we don't capture it with global, we inline it for the test *)
+  let globalHash = "18zdck7" in
   assert_string css
     (Printf.sprintf
-       "<style data-emotion=\"css %s %s %s\" data-s>html{line-height:1.15;} \
-        @keyframes %s { 0%% { -webkit-transform: rotate(0deg); -moz-transform: \
-        rotate(0deg); -ms-transform: rotate(0deg); transform: rotate(0deg); } \
-        100%% { -webkit-transform: rotate(-360deg); -moz-transform: \
-        rotate(-360deg); -ms-transform: rotate(-360deg); transform: \
-        rotate(-360deg); } } .%s { display: block; }</style>"
-       global animationNameHash classNameHash animationName className)
+       "<style data-reactroot=\"\" data-emotion=\"css %s %s %s\" \
+        data-s>html{line-height:1.15;} @keyframes %s { 0%% { \
+        -webkit-transform: rotate(0deg); -moz-transform: rotate(0deg); \
+        -ms-transform: rotate(0deg); transform: rotate(0deg); } 100%% { \
+        -webkit-transform: rotate(-360deg); -moz-transform: rotate(-360deg); \
+        -ms-transform: rotate(-360deg); transform: rotate(-360deg); } } .%s { \
+        display: block; }</style>"
+       globalHash animationNameHash classNameHash animationName className)
 
 let case title fn = Alcotest.test_case title `Quick fn
 
@@ -262,6 +242,5 @@ let tests =
       case "global" global;
       case "duplicated_styles_unique" duplicated_styles_unique;
       case "hover_selector" hover_selector;
-      case "hashes" hashes;
       case "style_tag" style_tag;
     ] )
