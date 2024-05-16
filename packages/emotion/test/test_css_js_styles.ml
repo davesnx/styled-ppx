@@ -284,6 +284,49 @@ let hover_selector () =
         255, 0.7); } .%s:hover { color: rgba(255, 255, 255, 0.7); }"
        className className className)
 
+let pseudo () =
+  let className =
+    [%cx
+      {|
+          padding: 0;
+
+          &::before,
+          &::after {
+            content: "";
+            transform: translateX(-50%);
+          }
+        |}]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { padding: 0; } .%s::before, .%s::after { content: \"\"; \
+        -webkit-transform: translateX(-50%%); -moz-transform: \
+        translateX(-50%%); -ms-transform: translateX(-50%%); transform: \
+        translateX(-50%%); }"
+       className className className)
+
+let pseudo_2 () =
+  let button_active = [%cx "background-color: red;"] in
+  let classname =
+    [%cx
+      {|
+    &.$(button_active) {
+      &::before,
+      &::after {
+        top: 50px;
+      }
+    }
+  |}]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { background-color: #FF0000; } .%s {  } .%s .%s {  } .%s.%s \
+        .%s::before, .%s::after { top: 50px; }"
+       button_active classname classname button_active classname button_active
+       classname classname)
+
 let style_tag () =
   CssJs.global [| CssJs.selector "html" [| CssJs.lineHeight (`abs 1.15) |] |];
   let animationName =
@@ -338,4 +381,6 @@ let tests =
       case "avoid_hash_collision" avoid_hash_collision;
       case "hover_selector" hover_selector;
       case "style_tag" style_tag;
+      case "pseudo" pseudo;
+      case "pseudo_2" pseudo_2;
     ] )
