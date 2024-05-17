@@ -306,26 +306,64 @@ let pseudo () =
         translateX(-50%%); }"
        className className className)
 
-let pseudo_2 () =
+let multiple_nested_selectors () =
   let button_active = [%cx "background-color: red;"] in
   let classname =
     [%cx
       {|
-    &.$(button_active) {
+     &.$(button_active) {
+       &::before,
+       &::after {
+         top: 50px;
+       }
+     }
+   |}]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { background-color: #FF0000; } .%s {  } .%s .%s {  } .%s \
+        .%s::before { top: 50px; } .%s .%s::after { top: 50px; }"
+       button_active classname classname button_active classname button_active
+       classname button_active)
+
+let multiple_selectors () =
+  let classname =
+    [%cx
+      {|
+      background-color: red;
+
       &::before,
       &::after {
         top: 50px;
       }
-    }
   |}]
   in
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s { background-color: #FF0000; } .%s {  } .%s .%s {  } .%s.%s \
-        .%s::before, .%s::after { top: 50px; }"
-       button_active classname classname button_active classname button_active
-       classname classname)
+       ".%s { background-color: #FF0000; } .%s::before, .%s::after { top: \
+        50px; }"
+       classname classname classname)
+
+let multiple_nested_pseudo_selectors () =
+  let classname =
+    [%cx
+      {|
+      background-color: red;
+      &:hover {
+        &::after {
+          top: 50px;
+        }
+      }
+  |}]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { background-color: #FF0000; } .%s:hover {  } .%s:hover::after { \
+        top: 50px; }"
+       classname classname classname)
 
 let style_tag () =
   CssJs.global [| CssJs.selector "html" [| CssJs.lineHeight (`abs 1.15) |] |];
@@ -382,5 +420,7 @@ let tests =
       case "hover_selector" hover_selector;
       case "style_tag" style_tag;
       case "pseudo" pseudo;
-      case "pseudo_2" pseudo_2;
+      case "multiple_selectors" multiple_selectors;
+      case "multiple_nested_selectors" multiple_nested_selectors;
+      case "multiple_nested_pseudo_selectors" multiple_nested_pseudo_selectors;
     ] )
