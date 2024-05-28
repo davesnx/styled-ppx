@@ -1893,7 +1893,10 @@ let transformStyle x =
 
 (** Transition *)
 module Transition = struct
-  type t = [ `value of string ]
+  type t =
+    [ `value of string
+    | `none
+    ]
 
   let shorthand ?(duration = `ms 0) ?(delay = `ms 0) ?(timingFunction = `ease)
     property =
@@ -1906,7 +1909,7 @@ module Transition = struct
       ^ {js| |js}
       ^ property)
 
-  let toString x = match x with `value v -> v
+  let toString x = match x with `value v -> v | `none -> {js|none|js}
 end
 
 let transitionValue x = D ({js|transition|js}, Transition.toString x)

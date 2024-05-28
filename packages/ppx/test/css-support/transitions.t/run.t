@@ -63,14 +63,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       {js|width|js},
     ),
   |]);
-  CssJs.transitionList([|
-    CssJs.Transition.shorthand(
-      ~duration=?None,
-      ~delay=?None,
-      ~timingFunction=?None,
-      {js|none|js},
-    ),
-  |]);
+  CssJs.transitionList([|`none|]);
   CssJs.transitionList([|
     CssJs.Transition.shorthand(
       ~duration=?None,

@@ -1782,10 +1782,10 @@ and single_animation_fill_mode = [%value.rec
 and single_animation_iteration_count = [%value.rec "'infinite' | <number>"]
 and single_animation_play_state = [%value.rec "'running' | 'paused'"]
 and single_transition = [%value.rec
-  "[ 'none' | <single-transition-property> ] || <extended-time> || <timing-function> || <extended-time>"
+  "[ <single-transition-property> | 'none' ] || <extended-time> || <timing-function> || <extended-time>"
 ]
 and single_transition_property = [%value.rec
-  "'all' | <custom-ident> | <interpolation>"
+  "<custom-ident> | <interpolation> | 'all'"
 ]
 and size = [%value.rec
   "'closest-side' | 'farthest-side' | 'closest-corner' | 'farthest-corner' | <extended-length> | [ <extended-length> | <extended-percentage> ]{2}"
