@@ -3007,7 +3007,7 @@ let transition_delay =
   );
 let transition =
   unsupportedValue(Parser.property_transition, (~loc) =>
-    [%expr CssJs.transition]
+    [%expr CssJs.transitionList]
   );
 
 let render_keyframes_name = (~loc) =>
