@@ -66,6 +66,11 @@ let emit_shorthand = (parser, mapper, value_to_expr) => {
   {ast_of_string, ast_to_expr, string_to_expr};
 };
 
+let render_option = (~loc, f) =>
+  fun
+  | Some(v) => [%expr Some([%e f(~loc, v)])]
+  | None => [%expr None];
+
 let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
 
 let render_variable = (~loc, name) =>
@@ -391,7 +396,10 @@ and render_time_as_int = (~loc) =>
       let value = Float.to_int(f);
       [%expr `ms([%e render_integer(~loc, value)])];
     }
-  | `S(f) => {
+  | `S(f) =>
+    if (f > 0. && f < 1.) {
+      render_time_as_int(~loc, `Ms(f *. 1000.));
+    } else {
       let value = Float.to_int(f);
       [%expr `s([%e render_integer(~loc, value)])];
     }
@@ -2902,7 +2910,8 @@ let backface_visibility =
     [%expr CssJs.backfaceVisibility]
   );
 
-let render_single_transition = (~loc, value: Types.single_transition_property) => {
+let render_single_transition_property =
+    (~loc, value: Types.single_transition_property) => {
   switch (value) {
   | `All => render_string(~loc, "all")
   | `Custom_ident(v) => render_string(~loc, v)
@@ -2919,7 +2928,7 @@ let transition_property =
       fun
       | `None => render_string(~loc, "none")
       | `Single_transition_property([transition]) =>
-        render_single_transition(~loc, transition)
+        render_single_transition_property(~loc, transition)
       /* bs-css unsupports multiple transition_properties,
          but should be easy to bypass with string concatenation */
       | `Single_transition_property(_) => raise(Unsupported_feature),
@@ -3004,9 +3013,46 @@ let transition_delay =
       | [`Interpolation(v)] => render_variable(~loc, v)
       | _ => raise(Unsupported_feature),
   );
+
+let render_single_transition =
+    (
+      ~loc,
+      (property, delay, timingFunction, duration): Types.single_transition,
+    ) => {
+  switch (Option.value(property, ~default=`Single_transition_property(`All))) {
+  | `None => variant_to_expression(~loc, `None)
+  | `Single_transition_property(property) =>
+    let duration = render_option(~loc, render_extended_time, duration);
+    let timingFunction = render_option(~loc, render_timing, timingFunction);
+    let delay = render_option(~loc, render_extended_time, delay);
+    [%expr
+     CssJs.Transition.shorthand(
+       ~duration=?{
+         [%e duration];
+       },
+       ~delay=?{
+         [%e delay];
+       },
+       ~timingFunction=?{
+         [%e timingFunction];
+       },
+       [%e render_single_transition_property(~loc, property)],
+     )];
+  };
+};
+
 let transition =
-  unsupportedValue(Parser.property_transition, (~loc) =>
-    [%expr CssJs.transition]
+  monomorphic(
+    Parser.property_transition,
+    (~loc) => [%expr CssJs.transitionList],
+    (~loc) =>
+      fun
+      | [] => raise(Invalid_value("expected at least one argument"))
+      | [x, ...xs] => {
+          let transitions = [x] @ List.map(Fun.id, xs);
+          List.map(render_single_transition(~loc), transitions)
+          |> Builder.pexp_array(~loc);
+        },
   );
 
 let render_keyframes_name = (~loc) =>

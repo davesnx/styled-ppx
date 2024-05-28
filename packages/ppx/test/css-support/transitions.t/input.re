@@ -20,3 +20,10 @@
 [%css {|transition-delay: 1s|}];
 [%css {|transition-delay: -1s|}];
 [%css {|transition: 1s 2s width linear|}];
+[%css {|transition: none|}];
+[%css {|transition: margin-right|}];
+[%css {|transition: margin-right ease-in|}];
+[%css {|transition: .5s|}];
+[%css {|transition: 200ms .5s|}];
+[%css {|transition: linear|}];
+[%css {|transition: 1s .5s linear margin-right|}];
