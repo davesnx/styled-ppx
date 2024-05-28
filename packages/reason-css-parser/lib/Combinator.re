@@ -19,6 +19,19 @@ let rec match_longest = ((left_key, left_rule), rules) =>
     };
   };
 
+let rec match_first = ((left_key, left_rule), rules) =>
+  switch (rules) {
+  | [] =>
+    let.bind_match value = left_rule;
+    return_match((left_key, value));
+  | [new_left, ...rules] =>
+    let.bind_data value = left_rule;
+    switch (value) {
+    | Ok(value) => return_match((left_key, value))
+    | Error(_) => match_first(new_left, rules)
+    };
+  };
+
 let combine_static = rules => {
   let rec match_everything = (values, rules) =>
     switch (rules) {
@@ -37,6 +50,16 @@ let combine_xor =
       let rules: list((unit, Rule.rule('a))) =
         List.map(rule => ((), rule), rules);
       let.map_match ((), value) = match_longest(((), left), rules);
+      value;
+    };
+
+let combine_xor_first =
+  fun
+  | [] => failwith("xor doesn't makes sense without a single value")
+  | [left, ...rules] => {
+      let rules: list((unit, Rule.rule('a))) =
+        List.map(rule => ((), rule), rules);
+      let.map_match ((), value) = match_first(((), left), rules);
       value;
     };
 
