@@ -53,7 +53,7 @@ let combine_xor =
       value;
     };
 
-let combine_xor_first =
+let first =
   fun
   | [] => failwith("xor doesn't makes sense without a single value")
   | [left, ...rules] => {

@@ -74,9 +74,7 @@ let render_variable = (~loc, name) =>
 
 let transform_with_variable = (parser, mapper, value_to_expr) =>
   emit(
-    /* This Xor is defined here for those properties that aren't defined with
-       <interpolation> as a valid definition */
-    Combinator.combine_xor_first([
+    Combinator.first([
       /* If the entire CSS value is interpolated, we treat it as a `Variable */
       Rule.Match.map(Standard.interpolation, data => `Variable(data)),
       /* Otherwise it's a regular CSS `Value and match the parser */
