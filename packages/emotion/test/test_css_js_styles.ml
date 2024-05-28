@@ -336,27 +336,6 @@ let nested_selectors_2 () =
        ".%s { background-color: #FF0000; } .%s {  } .%s.%s .%s { top: 50px; }"
        button_active classname classname button_active classname)
 
-let multiple_nested_selectors () =
-  let button_active = [%cx "background-color: red;"] in
-  let classname =
-    [%cx
-      {|
-     &.$(button_active) {
-       &::before,
-       &::after {
-         top: 50px;
-       }
-     }
-   |}]
-  in
-  let css = get_string_style_rules () in
-  assert_string css
-    (Printf.sprintf
-       ".%s { background-color: #FF0000; } .%s {  } .%s.%s {  } .%s.%s::before \
-        { top: 50px; } .%s.%s::after { top: 50px; }"
-       button_active classname classname button_active classname button_active
-       classname button_active)
-
 let multiple_selectors () =
   let classname =
     [%cx
@@ -473,6 +452,7 @@ let tests =
       case "nested_selectors" nested_selectors;
       case "nested_selectors_2" nested_selectors_2;
       case "nested_pseudo_with_interp" nested_pseudo_with_interp;
-      (* case "multiple_nested_selectors" multiple_nested_selectors;
-         case "multiple_nested_pseudo_selectors" multiple_nested_pseudo_selectors; *)
+      (* TODO: More than 2 levels of nesting is broken for selectors with ampersands. issue https://github.com/davesnx/styled-ppx/issues/359 *)
+      (* case "multiple_nested_selectors" multiple_nested_selectors; *)
+      (* case "multiple_nested_pseudo_selectors" multiple_nested_pseudo_selectors; *)
     ] )
