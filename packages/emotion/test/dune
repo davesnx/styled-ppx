@@ -5,6 +5,7 @@
   alcotest
   fmt
   server-reason-react.js
+  server-reason-react.belt
   server-reason-react.reactDom
   styled-ppx.css_native
   styled-ppx.emotion_native

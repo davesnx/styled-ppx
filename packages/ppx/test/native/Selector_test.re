@@ -527,6 +527,30 @@ let nested_tests = [
       |])
     ],
   ),
+  (
+    "&.$(button_active):hover { top: 50px; }",
+    [%expr [%cx "&.$(button_active):hover { top: 50px; }"]],
+    [%expr
+      CssJs.style([|
+        CssJs.selector(
+          {js|&.|js} ++ button_active ++ {js|:hover|js},
+          [|CssJs.top(`pxFloat(50.))|],
+        ),
+      |])
+    ],
+  ),
+  (
+    "&.$(button_active)::before { top: 50px; }",
+    [%expr [%cx "&.$(button_active)::before { top: 50px; }"]],
+    [%expr
+      CssJs.style([|
+        CssJs.selector(
+          {js|&.|js} ++ button_active ++ {js|::before|js},
+          [|CssJs.top(`pxFloat(50.))|],
+        ),
+      |])
+    ],
+  ),
 ];
 
 let comments_tests = [
