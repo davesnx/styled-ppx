@@ -428,6 +428,20 @@ let tests = [
       Ok((Some("lola"), (), "flores")),
     );
   }),
+  test("custom-ident vs all", () => {
+    let parse = parse([%value "<custom-ident> | 'all'"]);
+    let render_output = (x: [> | `All | `Custom_ident(string)]) => {
+      switch (x) {
+      | `All => "ALL"
+      | `Custom_ident(ident) => Printf.sprintf("IDENT(%s)", ident)
+      };
+    };
+    let pp_output = (ppf, x) => Fmt.pf(ppf, "%S", render_output(x));
+    let output = testable(pp_output, (==));
+    let to_check = result(output, Alcotest.string);
+    check(__POS__, to_check, parse("all"), Ok(`All));
+    check(__POS__, to_check, parse("moar"), Ok(`Custom_ident("moar")));
+  }),
   test("interpolation", () => {
     let parse = parse([%value "<interpolation>"]);
     let to_check = result(list(Alcotest.string), Alcotest.string);
