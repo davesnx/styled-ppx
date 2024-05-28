@@ -322,9 +322,19 @@ let nested_selectors () =
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s { background-color: #FF0000; } .%s {  } .%s.%s {  } .%s.%s { top: \
-        50px; }"
-       button_active classname classname button_active classname button_active)
+       ".%s { background-color: #FF0000; } .%s {  } .%s.%s { top: 50px; }"
+       button_active classname classname button_active)
+
+let nested_selectors_2 () =
+  let button_active = [%cx "background-color: red;"] in
+  let classname = [%cx {|
+     &.$(button_active) & { top: 50px; }
+   |}] in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { background-color: #FF0000; } .%s {  } .%s.%s .%s { top: 50px; }"
+       button_active classname classname button_active classname)
 
 let multiple_nested_selectors () =
   let button_active = [%cx "background-color: red;"] in
@@ -385,24 +395,24 @@ let multiple_nested_pseudo_selectors () =
         top: 50px; }"
        classname classname classname)
 
-(* let nested_pseudo_with_interp () =
-   let button_active = [%cx "background-color: green;"] in
-   let classname =
-     [%cx
-       {|
-       cursor: pointer;
-
-       &.$(button_active)::before {
-         top: 50px;
-       }
-    |}]
-   in
-   let css = get_string_style_rules () in
-   assert_string css
-     (Printf.sprintf
-        ".%s { background-color: #008000; } .%s { cursor: pointer; } \
-         .%s.%s::before { top: 50px; }"
-        button_active classname classname button_active) *)
+let nested_pseudo_with_interp () =
+  let button_active = [%cx "background-color: green;"] in
+  let rules =
+    [|
+      CssJs.cursor `pointer;
+      CssJs.selector
+        ({js|&.|js} ^ button_active ^ {js|::before|js})
+        [| CssJs.top (`pxFloat 50.) |];
+    |]
+  in
+  let classname = CssJs.style rules in
+  CssJs.print_rules rules;
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { background-color: #008000; } .%s { cursor: pointer; } \
+        .%s.%s::before { top: 50px; }"
+       button_active classname classname button_active)
 
 let style_tag () =
   CssJs.global [| CssJs.selector "html" [| CssJs.lineHeight (`abs 1.15) |] |];
@@ -461,7 +471,8 @@ let tests =
       case "pseudo" pseudo;
       case "multiple_selectors" multiple_selectors;
       case "nested_selectors" nested_selectors;
+      case "nested_selectors_2" nested_selectors_2;
+      case "nested_pseudo_with_interp" nested_pseudo_with_interp;
       (* case "multiple_nested_selectors" multiple_nested_selectors;
          case "multiple_nested_pseudo_selectors" multiple_nested_pseudo_selectors; *)
-      (* case "nested_pseudo_with_interp" nested_pseudo_with_interp; *)
     ] )

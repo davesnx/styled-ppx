@@ -245,15 +245,6 @@ let resolve_selectors rules =
   in
   let rec unnest ~prefix =
     List.partition_map (function
-      (* (* If selector starts with &, we remove the ampersand and concat the selector with the "prefix" *)
-         | S (title, selector_rules) when starts_with_ampersand title ->
-           let new_prelude = prefix ^ remove_first_char title in
-           let selector_rules = split_multiple_selectors selector_rules in
-           let rule_array = Array.to_list selector_rules in
-           let content, tail = unnest ~prefix:new_prelude rule_array in
-           let new_selector = S (new_prelude, Array.of_list content) in
-           Right (new_selector :: List.flatten tail) *)
-      (* In any other case, append with a whitespace *)
       | S (title, selector_rules) ->
         let new_prelude = prefix ^ title in
         let selector_rules = split_multiple_selectors selector_rules in
