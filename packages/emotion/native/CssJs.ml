@@ -137,6 +137,7 @@ let render_declarations (rules : rule array) =
 
 let is_at_rule selector = String.contains selector '@'
 let is_a_pseudo_selector selector = String.starts_with ~prefix:":" selector
+let starts_with_ampersand selector = String.starts_with ~prefix:"&" selector
 let contains_multiple_selectors selector = String.contains selector ','
 
 let prefix ~pre s =
@@ -161,7 +162,7 @@ let chop_prefix ~pre s =
 let remove_first_ampersand selector =
   selector |> chop_prefix ~pre:"&" |> Option.value ~default:selector
 
-let replace_ampersand str with_ =
+let replace_ampersand ~by str =
   let rec replace_ampersand' str var =
     let len = String.length str in
     if len = 0 then ""
@@ -170,9 +171,13 @@ let replace_ampersand str with_ =
     else
       String.sub str 0 1 ^ replace_ampersand' (String.sub str 1 (len - 1)) var
   in
-  replace_ampersand' str with_
+  replace_ampersand' str by
 
-let resolve_ampersand hash selector = replace_ampersand selector ("." ^ hash)
+let resolve_ampersand hash selector =
+  let classname = "." ^ hash in
+  let resolved_selector = replace_ampersand ~by:classname selector in
+  if starts_with_ampersand selector then resolved_selector
+  else Printf.sprintf ".%s %s" hash resolved_selector
 
 (* Renders all selectors with the hash given *)
 let render_selectors hash rule =
@@ -184,12 +189,7 @@ let render_selectors hash rule =
          (render_declarations rules))
   | S (selector, rules) ->
     (* Resolving the ampersand means to replace all ampersands by the hash *)
-    let resolved_selector = resolve_ampersand hash selector in
-    let new_selector =
-      if is_a_pseudo_selector resolved_selector then
-        Printf.sprintf ".%s%s" hash resolved_selector
-      else Printf.sprintf ".%s %s" hash resolved_selector
-    in
+    let new_selector = resolve_ampersand hash selector in
     Some (Printf.sprintf "%s { %s }" new_selector (render_declarations rules))
   (* S (aka Selectors) are the only ones used by styled-ppx, we don't use PseudoClass neither PseucodClassParam. TODO: Remove them.
      Meanwhile we have them, it's a good idea to check if the first character of the selector is a `:` because it's expected to not have a space between the selector and the :pseudoselector. *)
@@ -245,14 +245,14 @@ let resolve_selectors rules =
   in
   let rec unnest ~prefix =
     List.partition_map (function
-      (* If selector starts with &, we remove the ampersand and concat the selector with the "prefix" *)
-      | S (title, selector_rules) when String.starts_with ~prefix:"&" title ->
-        let new_prelude = prefix ^ remove_first_char title in
-        let selector_rules = split_multiple_selectors selector_rules in
-        let rule_array = Array.to_list selector_rules in
-        let content, tail = unnest ~prefix:new_prelude rule_array in
-        let new_selector = S (new_prelude, Array.of_list content) in
-        Right (new_selector :: List.flatten tail)
+      (* (* If selector starts with &, we remove the ampersand and concat the selector with the "prefix" *)
+         | S (title, selector_rules) when starts_with_ampersand title ->
+           let new_prelude = prefix ^ remove_first_char title in
+           let selector_rules = split_multiple_selectors selector_rules in
+           let rule_array = Array.to_list selector_rules in
+           let content, tail = unnest ~prefix:new_prelude rule_array in
+           let new_selector = S (new_prelude, Array.of_list content) in
+           Right (new_selector :: List.flatten tail) *)
       (* In any other case, append with a whitespace *)
       | S (title, selector_rules) ->
         let new_prelude = prefix ^ title in
