@@ -5,6 +5,8 @@ let combine_static: combinator('a, list('a));
 
 let combine_xor: combinator('a, 'a);
 
+let first: combinator('a, 'a);
+
 let combine_and: combinator('a, list('a));
 
 let combine_or: combinator('a, list(option('a)));
