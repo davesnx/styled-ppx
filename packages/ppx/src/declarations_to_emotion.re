@@ -3015,28 +3015,33 @@ let transition_delay =
 let render_single_transition =
     (
       ~loc,
-      (property, delay, timingFunction, duration): Types.single_transition,
+      (delay, duration, property, timingFunction): Types.single_transition,
     ) => {
-  switch (Option.value(property, ~default=`Single_transition_property(`All))) {
-  | `None => variant_to_expression(~loc, `None)
-  | `Single_transition_property(property) =>
-    let duration = render_option(~loc, render_extended_time, duration);
-    let timingFunction = render_option(~loc, render_timing, timingFunction);
-    let delay = render_option(~loc, render_extended_time, delay);
-    [%expr
-     CssJs.Transition.shorthand(
-       ~duration=?{
-         [%e duration];
-       },
-       ~delay=?{
-         [%e delay];
-       },
-       ~timingFunction=?{
-         [%e timingFunction];
-       },
-       [%e render_single_transition_property(~loc, property)],
-     )];
-  };
+  let property =
+    switch (
+      Option.value(property, ~default=`Single_transition_property(`All))
+    ) {
+    | `None => render_string(~loc, "none")
+    | `Single_transition_property(x) =>
+      render_single_transition_property(~loc, x)
+    };
+  let duration = render_option(~loc, render_extended_time, duration);
+  let timingFunction = render_option(~loc, render_timing, timingFunction);
+  let delay = render_option(~loc, render_extended_time, delay);
+
+  [%expr
+   CssJs.Transition.shorthand(
+     ~duration=?{
+       [%e duration];
+     },
+     ~delay=?{
+       [%e delay];
+     },
+     ~timingFunction=?{
+       [%e timingFunction];
+     },
+     [%e property],
+   )];
 };
 
 let transition =
@@ -3045,11 +3050,13 @@ let transition =
     (~loc) => [%expr CssJs.transitionList],
     (~loc) =>
       fun
-      | [] => raise(Invalid_value("expected at least one argument"))
-      | [x, ...xs] => {
-          let transitions = [x] @ List.map(Fun.id, xs);
+      | `Interpolation(v) => render_variable(~loc, v)
+      | `Single_transition(transitions) =>
+        switch (transitions) {
+        | [] => raise(Invalid_value("expected at least one argument"))
+        | transitions =>
           List.map(render_single_transition(~loc), transitions)
-          |> Builder.pexp_array(~loc);
+          |> Builder.pexp_array(~loc)
         },
   );
 

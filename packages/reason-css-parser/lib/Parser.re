@@ -1668,7 +1668,7 @@ and property_transform_origin = [%value.rec
   "<extended-length> | <extended-percentage> | 'left' | 'center' | 'right' | 'top' | 'bottom' | [ [ <extended-length> | <extended-percentage> | 'left' | 'center' | 'right' ] && [ <extended-length> | <extended-percentage> | 'top' | 'center' | 'bottom' ] ] [ <extended-length> ]?"
 ]
 and property_transform_style = [%value.rec "'flat' | 'preserve-3d'"]
-and property_transition = [%value.rec "[ <single-transition> ]#"]
+and property_transition = [%value.rec "[ <single-transition> ]# | <interpolation>"]
 and property_transition_delay = [%value.rec "[ <extended-time> ]#"]
 and property_transition_duration = [%value.rec "[ <extended-time> ]#"]
 and property_transition_property = [%value.rec
@@ -1782,7 +1782,7 @@ and single_animation_fill_mode = [%value.rec
 and single_animation_iteration_count = [%value.rec "'infinite' | <number>"]
 and single_animation_play_state = [%value.rec "'running' | 'paused'"]
 and single_transition = [%value.rec
-  "[ <single-transition-property> | 'none' ] || <extended-time> || <timing-function> || <extended-time>"
+  "<extended-time> || <extended-time> || [ <single-transition-property> | 'none' ] || <timing-function>"
 ]
 and single_transition_property = [%value.rec
   "<custom-ident> | <interpolation> | 'all'"
