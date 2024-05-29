@@ -43,3 +43,6 @@ build: [
   ]
 ]
 dev-repo: "git+https://github.com/davesnx/styled-ppx.git"
+depexts: [
+  ["@emotion/css"] {npm-version = ">=11.0.0"}
+]
