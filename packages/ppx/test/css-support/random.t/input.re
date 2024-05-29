@@ -24,12 +24,13 @@
 module Color = {
   let text = CssJs.hex("444");
 };
+let colorTextString = Color.text |> CssJs.Color.toString;
 
 [%css {|-webkit-box-shadow: inset 0 0 0 1000px $(Color.background);|}];
 [%css {|-webkit-line-clamp: 2;|}];
 [%css {|-webkit-overflow-scrolling: touch;|}];
 [%css {|-webkit-tap-highlight-color: transparent;|}];
-[%css {|-webkit-text-fill-color: $(Color.text);|}];
+[%css {|-webkit-text-fill-color: $(colorTextString);|}];
 [%css {|animation: none;|}];
 [%css {|appearance: none;|}];
 [%css {|aspect-ratio: 21 / 8;|}];

@@ -177,11 +177,11 @@ let tests =
       [%expr [%css "column-gap: $(Size.px30)"]],
       [%expr CssJs.unsafe({js|columnGap|js}, Size.px30)],
     ),
+    // Test for property not inside properties list on declarations_to_emotion.re, should trigger unsafe interpolation
     (
-      "padding-inline: $(Size.px30);",
-      [%expr [%css "padding-inline: $(Size.px30)"]],
-      // This is because padding-inline is not inside the properties list on declarations_to_emotion.re
-      [%expr CssJs.unsafe({js|paddingInline|js}, {js|$(Size.px30)|js})],
+      "-webkit-text-fill-color: $(Color.red);",
+      [%expr [%css "-webkit-text-fill-color: $(Color.red)"]],
+      [%expr CssJs.unsafe({js|WebkitTextFillColor|js}, Color.red)],
     ),
   ]
   |> List.map(item => {
