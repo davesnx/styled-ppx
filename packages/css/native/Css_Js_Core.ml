@@ -2009,10 +2009,7 @@ let transformStyle x =
       | #Cascading.t as c -> Cascading.toString c )
 
 module Transition = struct
-  type t =
-    [ `value of string
-    | `none
-    ]
+  type t = [ `value of string ]
 
   let shorthand ?(duration = `ms 0) ?(delay = `ms 0) ?(timingFunction = `ease)
     property =
@@ -2025,7 +2022,7 @@ module Transition = struct
       ^ {js| |js}
       ^ property)
 
-  let toString x = match x with `value v -> v | `none -> {js|none|js}
+  let toString x = match x with `value v -> v
 end
 [@@ns.doc "\n * Transition\n "]
 
