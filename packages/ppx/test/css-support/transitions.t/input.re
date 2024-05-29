@@ -19,6 +19,7 @@
 [%css {|transition-timing-function: steps(5, end)|}];
 [%css {|transition-delay: 1s|}];
 [%css {|transition-delay: -1s|}];
+[%css {|transition: margin-right 2s, opacity 0.5s|}];
 [%css {|transition: 1s 2s width linear|}];
 [%css {|transition: none|}];
 [%css {|transition: margin-right|}];
@@ -27,3 +28,19 @@
 [%css {|transition: 200ms .5s|}];
 [%css {|transition: linear|}];
 [%css {|transition: 1s .5s linear margin-right|}];
+
+// Interpolation
+let transitions = [|CssJs.Transition.shorthand("margin-left")|];
+let property = "margin-right";
+let duration = `ms(200);
+let delay = `s(3);
+let property2 = "opacity";
+
+[%css {|transition: $(transitions)|}];
+[%css {|transition: $(property) $(duration), $(property2) ease-in|}];
+[%css {|transition: $(property) $(duration)|}];
+[%css {|transition: $(property) $(duration) $(delay)|}];
+[%css {|transition: $(property) ease-in $(duration) $(delay)|}];
+[%css {|transition: margin-right ease-in $(duration) $(delay)|}];
+[%css {|transition: margin-right ease-in 2s $(delay)|}];
+[%css {|transition: margin-right ease-in $(duration) 2s|}];
