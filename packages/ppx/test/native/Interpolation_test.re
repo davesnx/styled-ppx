@@ -172,6 +172,17 @@ let tests =
       [%expr [%css "animation-play-state: paused"]],
       [%expr CssJs.animationPlayState(`paused)],
     ),
+    (
+      "column-gap: $(Size.px30);",
+      [%expr [%css "column-gap: $(Size.px30)"]],
+      [%expr CssJs.unsafe({js|columnGap|js}, Size.px30)],
+    ),
+    (
+      "padding-inline: $(Size.px30);",
+      [%expr [%css "padding-inline: $(Size.px30)"]],
+      // This is because padding-inline is not inside the properties list on declarations_to_emotion.re
+      [%expr CssJs.unsafe({js|paddingInline|js}, {js|$(Size.px30)|js})],
+    ),
   ]
   |> List.map(item => {
        let (title, input, expected) = item;

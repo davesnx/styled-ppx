@@ -575,6 +575,14 @@ pseudo_list:
   compound_selector expects first to be a <type-selector>, since we support
   nesting and that can be a few more things look at <simple-selector> */
 compound_selector:
+  /* a#id::hover:visited */
+  | t = type_selector sub = nonempty_list(subclass_selector) ps = pseudo_list {
+     {
+      type_selector = Some t;
+      subclass_selectors = sub;
+      pseudo_selectors = ps;
+    }
+  }
   /* #id::hover:visited */
   | sub = nonempty_list(subclass_selector) ps = pseudo_list {
      {

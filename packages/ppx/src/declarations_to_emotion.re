@@ -22,6 +22,7 @@ let (let.ok) = Result.bind;
 /* TODO: Separate unsupported_feature from bs-css doesn't support or can't interpolate on those */
 /* TODO: Add payload on those exceptions */
 exception Unsupported_feature;
+exception Unsafe_interpolation(expression);
 
 exception Invalid_value(string);
 
@@ -78,9 +79,7 @@ let render_variable = (~loc, name) =>
 
 let transform_with_variable = (parser, mapper, value_to_expr) =>
   emit(
-    /* This Xor is defined here for those properties that aren't defined with
-       <interpolation> as a valid definition */
-    Combinator.combine_xor([
+    Combinator.first([
       /* If the entire CSS value is interpolated, we treat it as a `Variable */
       Rule.Match.map(Standard.interpolation, data => `Variable(data)),
       /* Otherwise it's a regular CSS `Value and match the parser */
@@ -132,7 +131,7 @@ let unsupportedProperty = parser =>
   transform_with_variable(
     parser,
     (~loc as _, _) => raise(Unsupported_feature),
-    (~loc as _) => raise(Unsupported_feature),
+    (~loc as _, arg) => raise(Unsafe_interpolation(arg)),
   );
 
 let render_string = (~loc, s) => {
@@ -4623,7 +4622,6 @@ let render_when_unsupported_features = (~loc, property, value) => {
 
   /* Transform property name to camelCase since we bind to emotion with the Object API */
   let propertyName = property |> to_camel_case |> render_string(~loc);
-  let value = value |> render_string(~loc);
 
   [%expr CssJs.unsafe([%e propertyName], [%e value])];
 };
@@ -4660,10 +4658,18 @@ let parse_declarations = (~loc: Location.t, property, value, important) => {
     | Ok(value) => Ok(value)
     | exception (Invalid_value(v)) =>
       Error(`Invalid_value(value ++ ". " ++ v))
+    | exception (Unsafe_interpolation(value)) =>
+      Ok([render_when_unsupported_features(~loc, property, value)])
     | Error(_)
     | exception Unsupported_feature =>
       let.ok () = is_valid_string ? Ok() : Error(`Invalid_value(value));
-      Ok([render_when_unsupported_features(~loc, property, value)]);
+      Ok([
+        render_when_unsupported_features(
+          ~loc,
+          property,
+          render_string(~loc, value),
+        ),
+      ]);
     }
   };
 };
