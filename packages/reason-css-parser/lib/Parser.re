@@ -1843,7 +1843,7 @@ and extended_percentage = [%value.rec
   "<percentage> | <calc()> | <interpolation> | <min()> | <max()> "
 ]
 and timing_function = [%value.rec
-  "'linear' | <cubic-bezier-timing-function> | <step-timing-function>"
+  "'linear' | <cubic-bezier-timing-function> | <step-timing-function> | <interpolation>"
 ]
 and top = [%value.rec "<extended-length> | 'auto'"]
 and track_breadth = [%value.rec

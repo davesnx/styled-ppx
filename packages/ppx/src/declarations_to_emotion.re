@@ -2990,7 +2990,8 @@ let render_timing = (~loc) =>
   | `Linear => [%expr `linear]
   | `Cubic_bezier_timing_function(v) =>
     render_cubic_bezier_timing_function(~loc, v)
-  | `Step_timing_function(v) => render_steps_function(~loc, v);
+  | `Step_timing_function(v) => render_steps_function(~loc, v)
+  | `Interpolation(v) => render_variable(~loc, v);
 
 let transition_timing_function =
   monomorphic(
@@ -4631,7 +4632,7 @@ let render_when_unsupported_features = (~loc, property, value) => {
   let unsafeInterpolation =
     value
     |> Parser.parse(Standard.interpolation)
-    |> Result.map(render_variable(~loc))
+    |> Result.map(render_variable(~loc));
   let value =
     Result.value(unsafeInterpolation, ~default=render_string(~loc, value));
 
