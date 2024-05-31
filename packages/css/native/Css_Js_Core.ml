@@ -1677,7 +1677,7 @@ let rec gridLengthToJs x =
     ^ {js|)|js}
 
 and string_of_dimensions dimensions =
-  dimensions |. Std.Array.map gridLengthToJs |. Std.Array.joinWith ~sep:{js||js}
+  dimensions |. Std.Array.map gridLengthToJs |. Std.Array.joinWith ~sep:{js| |js}
 
 let gridTemplateColumns dimensions =
   D ({js|grid-template-columns|js}, string_of_dimensions dimensions)
