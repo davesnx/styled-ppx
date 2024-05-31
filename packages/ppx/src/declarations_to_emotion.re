@@ -3043,11 +3043,11 @@ let render_single_transition = (~loc) =>
          [%e render_transition_property(~loc, property)],
        )];
     }
-  | `Static_1(property, duration, delay) => {
+  | `Static_1(property, duration, timingFunction) => {
       [%expr
        CssJs.Transition.shorthand(
          ~duration=[%e render_extended_time(~loc, duration)],
-         ~delay=[%e render_extended_time(~loc, delay)],
+         ~timingFunction=[%e render_timing(~loc, timingFunction)],
          [%e render_transition_property(~loc, property)],
        )];
     }

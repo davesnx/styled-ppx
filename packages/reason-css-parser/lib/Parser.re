@@ -1783,9 +1783,13 @@ and single_animation_fill_mode = [%value.rec
 ]
 and single_animation_iteration_count = [%value.rec "'infinite' | <number>"]
 and single_animation_play_state = [%value.rec "'running' | 'paused'"]
-and single_transition_no_interp = [%value.rec "[ <single-transition-property-no-interp> | 'none' ] || <extended-time-no-interp> || <timing-function-no-interp> || <extended-time-no-interp>" ]
+and single_transition_no_interp = [%value.rec
+  "[ <single-transition-property-no-interp> | 'none' ] || <extended-time-no-interp> || <timing-function-no-interp> || <extended-time-no-interp>"
+]
 and single_transition = [%value.rec
-  "[ [<single-transition-property> | 'none'] <extended-time>] | [ [<single-transition-property> | 'none'] <extended-time> <extended-time>] | [ [<single-transition-property> | 'none'] <extended-time> <timing-function> <extended-time>] "
+  "[ [<single-transition-property> | 'none'] <extended-time>]
+  | [ [<single-transition-property> | 'none'] <extended-time> <timing-function>]
+  | [ [<single-transition-property> | 'none'] <extended-time> <timing-function> <extended-time>]"
 ]
 and single_transition_property = [%value.rec
   "<custom-ident> | <interpolation> | 'all'"

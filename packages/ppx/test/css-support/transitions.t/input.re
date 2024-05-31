@@ -46,9 +46,20 @@ let property2 = "opacity";
 [%css
   {|transition: $(property) $(duration) $(timingFunction) $(delay), $(property2) 0s|}
 ];
-[%css {|transition: margin-right 0s $(timingFunction) 0s|}];
-[%css {|transition: all 2s $(timingFunction) 0s|}];
-[%css {|transition: $(property) 0s|}];
-[%css {|transition: all $(duration)|}];
-[%css {|transition: all $(duration) ease 3s|}];
-[%css {|transition: all 0s ease $(delay)|}];
+[%css {|transition: $(property) 0.2s ease-out 3s|}];
+[%css {|transition: $(property) 0.2s $(timingFunction) 3s|}];
+[%css {|transition: $(property) $(duration) $(timingFunction) 3s|}];
+[%css {|transition: margin-right $(duration) ease-out $(delay)|}];
+[%css {|transition: $(property) $(duration) ease-out $(delay)|}];
+[%css {|transition: margin-right 0.2s $(timingFunction) 3s|}];
+[%css {|transition: margin-right 0.2s ease-out $(delay)|}];
+[%css {|transition: $(property) 0.2s ease-in|}];
+[%css {|transition: $(property) 0.2s $(timingFunction)|}];
+[%css {|transition: margin-right $(duration) ease-in|}];
+[%css {|transition: $(property) $(duration) ease-in|}];
+[%css {|transition: margin-right 0.2s $(timingFunction)|}];
+[%css {|transition: $(property) 0.2s ease-in|}];
+[%css {|transition: margin-right $(duration) ease-in|}];
+[%css {|transition: margin-right 0.2s $(timingFunction)|}];
+[%css {|transition: $(property) 0.2s|}];
+[%css {|transition: margin-right $(duration)|}];
