@@ -144,72 +144,45 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   let property2 = "opacity";
   (CssJs.transitionList(transitions): CssJs.rule);
   CssJs.transitionList([|
-    CssJs.Transition.shorthand(
-      ~duration=?Some(duration),
-      ~delay=?Some(delay),
-      ~timingFunction=?Some(timingFunction),
-      property,
-    ),
+    CssJs.Transition.shorthand(~duration, ~delay, ~timingFunction, property),
+  |]);
+  CssJs.transitionList([|
+    CssJs.Transition.shorthand(~duration, ~delay, ~timingFunction, property),
+    CssJs.Transition.shorthand(~duration=`s(0), property2),
   |]);
   CssJs.transitionList([|
     CssJs.Transition.shorthand(
-      ~duration=?Some(duration),
-      ~delay=?Some(delay),
-      ~timingFunction=?Some(timingFunction),
-      property,
-    ),
-    CssJs.Transition.shorthand(
-      ~duration=?None,
-      ~delay=?None,
-      ~timingFunction=?Some(`ease),
-      property2,
-    ),
-  |]);
-  CssJs.transitionList([|
-    CssJs.Transition.shorthand(
-      ~duration=?None,
-      ~delay=?None,
-      ~timingFunction=?Some(timingFunction),
+      ~duration=`s(0),
+      ~delay=`s(0),
+      ~timingFunction,
       {js|margin-right|js},
     ),
   |]);
   CssJs.transitionList([|
     CssJs.Transition.shorthand(
-      ~duration=?Some(`s(2)),
-      ~delay=?None,
-      ~timingFunction=?Some(timingFunction),
+      ~duration=`s(2),
+      ~delay=`s(0),
+      ~timingFunction,
+      {js|all|js},
+    ),
+  |]);
+  CssJs.transitionList([|
+    CssJs.Transition.shorthand(~duration=`s(0), property),
+  |]);
+  CssJs.transitionList([|CssJs.Transition.shorthand(~duration, {js|all|js})|]);
+  CssJs.transitionList([|
+    CssJs.Transition.shorthand(
+      ~duration,
+      ~delay=`s(3),
+      ~timingFunction=`ease,
       {js|all|js},
     ),
   |]);
   CssJs.transitionList([|
     CssJs.Transition.shorthand(
-      ~duration=?None,
-      ~delay=?None,
-      ~timingFunction=?Some(`ease),
-      property,
-    ),
-  |]);
-  CssJs.transitionList([|
-    CssJs.Transition.shorthand(
-      ~duration=?Some(duration),
-      ~delay=?None,
-      ~timingFunction=?Some(`ease),
-      {js|all|js},
-    ),
-  |]);
-  CssJs.transitionList([|
-    CssJs.Transition.shorthand(
-      ~duration=?Some(duration),
-      ~delay=?Some(`s(3)),
-      ~timingFunction=?Some(`ease),
-      {js|all|js},
-    ),
-  |]);
-  CssJs.transitionList([|
-    CssJs.Transition.shorthand(
-      ~duration=?Some(`s(0)),
-      ~delay=?Some(delay),
-      ~timingFunction=?Some(`ease),
+      ~duration=`s(0),
+      ~delay,
+      ~timingFunction=`ease,
       {js|all|js},
     ),
   |]);
