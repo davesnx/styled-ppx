@@ -1668,7 +1668,9 @@ and property_transform_origin = [%value.rec
   "<extended-length> | <extended-percentage> | 'left' | 'center' | 'right' | 'top' | 'bottom' | [ [ <extended-length> | <extended-percentage> | 'left' | 'center' | 'right' ] && [ <extended-length> | <extended-percentage> | 'top' | 'center' | 'bottom' ] ] [ <extended-length> ]?"
 ]
 and property_transform_style = [%value.rec "'flat' | 'preserve-3d'"]
-and property_transition = [%value.rec "[ <single-transition> ]# | <interpolation>"]
+and property_transition = [%value.rec
+  "[ <single-transition> | <single-transition-no-interp> ]# | <interpolation>"
+]
 and property_transition_delay = [%value.rec "[ <extended-time> ]#"]
 and property_transition_duration = [%value.rec "[ <extended-time> ]#"]
 and property_transition_property = [%value.rec
@@ -1781,11 +1783,15 @@ and single_animation_fill_mode = [%value.rec
 ]
 and single_animation_iteration_count = [%value.rec "'infinite' | <number>"]
 and single_animation_play_state = [%value.rec "'running' | 'paused'"]
+and single_transition_no_interp = [%value.rec "[ <single-transition-property-no-interp> | 'none' ] || <extended-time-no-interp> || <timing-function-no-interp> || <extended-time-no-interp>" ]
 and single_transition = [%value.rec
-  "<extended-time> || <extended-time> || [ <single-transition-property> | 'none' ] || <timing-function>"
+  "[ [<single-transition-property> | 'none'] <extended-time>] | [ [<single-transition-property> | 'none'] <extended-time> <extended-time>] | [ [<single-transition-property> | 'none'] <extended-time> <timing-function> <extended-time>] "
 ]
 and single_transition_property = [%value.rec
   "<custom-ident> | <interpolation> | 'all'"
+]
+and single_transition_property_no_interp = [%value.rec
+  "<custom-ident> | 'all'"
 ]
 and size = [%value.rec
   "'closest-side' | 'farthest-side' | 'closest-corner' | 'farthest-corner' | <extended-length> | [ <extended-length> | <extended-percentage> ]{2}"
@@ -1839,11 +1845,17 @@ and extended_angle = [%value.rec
 and extended_time = [%value.rec
   "<time> | <calc()> | <interpolation> | <min()> | <max()>"
 ]
+and extended_time_no_interp = [%value.rec
+  "<time> | <calc()> | <min()> | <max()>"
+]
 and extended_percentage = [%value.rec
   "<percentage> | <calc()> | <interpolation> | <min()> | <max()> "
 ]
 and timing_function = [%value.rec
   "'linear' | <cubic-bezier-timing-function> | <step-timing-function> | <interpolation>"
+]
+and timing_function_no_interp = [%value.rec
+  "'linear' | <cubic-bezier-timing-function> | <step-timing-function>"
 ]
 and top = [%value.rec "<extended-length> | 'auto'"]
 and track_breadth = [%value.rec

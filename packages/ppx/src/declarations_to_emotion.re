@@ -402,13 +402,18 @@ and render_time_as_int = (~loc) =>
       [%expr `s([%e render_integer(~loc, value)])];
     }
 
-and render_extended_time = (~loc) =>
+and render_extended_time_no_interp = (~loc) =>
   fun
   | `Time(t) => render_time_as_int(~loc, t)
   | `Function_calc(fc) => render_function_calc(~loc, fc)
-  | `Interpolation(v) => render_variable(~loc, v)
   | `Function_min(values) => render_function_min(~loc, values)
   | `Function_max(values) => render_function_max(~loc, values)
+
+and render_extended_time = (~loc) =>
+  fun
+  | #Types.extended_time_no_interp as x =>
+    render_extended_time_no_interp(~loc, x)
+  | `Interpolation(v) => render_variable(~loc, v)
 
 and render_calc_value = (~loc, calc_value) => {
   switch ((calc_value: Types.calc_value)) {
@@ -2908,11 +2913,17 @@ let backface_visibility =
     [%expr CssJs.backfaceVisibility]
   );
 
-let render_single_transition_property =
-    (~loc, value: Types.single_transition_property) => {
+let render_single_transition_property_no_interp = (~loc, value) => {
   switch (value) {
   | `All => render_string(~loc, "all")
   | `Custom_ident(v) => render_string(~loc, v)
+  };
+};
+
+let render_single_transition_property = (~loc, value) => {
+  switch (value) {
+  | #Types.single_transition_property_no_interp as x =>
+    render_single_transition_property_no_interp(~loc, x)
   | `Interpolation(v) => render_variable(~loc, v)
   };
 };
@@ -2985,12 +2996,16 @@ let render_steps_function = (~loc) =>
     ]
   | `Steps(_, None) => raise(Unsupported_feature);
 
-let render_timing = (~loc) =>
+let render_timing_no_interp = (~loc) =>
   fun
   | `Linear => [%expr `linear]
   | `Cubic_bezier_timing_function(v) =>
     render_cubic_bezier_timing_function(~loc, v)
-  | `Step_timing_function(v) => render_steps_function(~loc, v)
+  | `Step_timing_function(v) => render_steps_function(~loc, v);
+
+let render_timing = (~loc) =>
+  fun
+  | #Types.timing_function_no_interp as x => render_timing_no_interp(~loc, x)
   | `Interpolation(v) => render_variable(~loc, v);
 
 let transition_timing_function =
@@ -3013,22 +3028,60 @@ let transition_delay =
       | _ => raise(Unsupported_feature),
   );
 
-let render_single_transition =
+let render_transition_property = (~loc) =>
+  fun
+  | `None => render_string(~loc, "none")
+  | `Single_transition_property(x) =>
+    render_single_transition_property(~loc, x);
+
+let render_single_transition = (~loc) =>
+  fun
+  | `Static_0(property, duration) => {
+      [%expr
+       CssJs.Transition.shorthand(
+         ~duration=[%e render_extended_time(~loc, duration)],
+         [%e render_transition_property(~loc, property)],
+       )];
+    }
+  | `Static_1(property, duration, delay) => {
+      [%expr
+       CssJs.Transition.shorthand(
+         ~duration=[%e render_extended_time(~loc, duration)],
+         ~delay=[%e render_extended_time(~loc, delay)],
+         [%e render_transition_property(~loc, property)],
+       )];
+    }
+  | `Static_2(property, duration, timingFunction, delay) => {
+      [%expr
+       CssJs.Transition.shorthand(
+         ~duration=[%e render_extended_time(~loc, duration)],
+         ~delay=[%e render_extended_time(~loc, delay)],
+         ~timingFunction=[%e render_timing(~loc, timingFunction)],
+         [%e render_transition_property(~loc, property)],
+       )];
+    };
+
+let render_single_transition_no_interp =
     (
       ~loc,
-      (delay, duration, property, timingFunction): Types.single_transition,
+      (property, delay, timingFunction, duration): Types.single_transition_no_interp,
     ) => {
   let property =
     switch (
-      Option.value(property, ~default=`Single_transition_property(`All))
+      Option.value(
+        property,
+        ~default=`Single_transition_property_no_interp(`All),
+      )
     ) {
     | `None => render_string(~loc, "none")
-    | `Single_transition_property(x) =>
-      render_single_transition_property(~loc, x)
+    | `Single_transition_property_no_interp(x) =>
+      render_single_transition_property_no_interp(~loc, x)
     };
-  let duration = render_option(~loc, render_extended_time, duration);
-  let timingFunction = render_option(~loc, render_timing, timingFunction);
-  let delay = render_option(~loc, render_extended_time, delay);
+  let duration =
+    render_option(~loc, render_extended_time_no_interp, duration);
+  let timingFunction =
+    render_option(~loc, render_timing_no_interp, timingFunction);
+  let delay = render_option(~loc, render_extended_time_no_interp, delay);
 
   [%expr
    CssJs.Transition.shorthand(
@@ -3052,11 +3105,17 @@ let transition =
     (~loc) =>
       fun
       | `Interpolation(v) => render_variable(~loc, v)
-      | `Single_transition(transitions) =>
+      | `Xor(transitions) =>
         switch (transitions) {
         | [] => raise(Invalid_value("expected at least one argument"))
         | transitions =>
-          List.map(render_single_transition(~loc), transitions)
+          List.map(
+            fun
+            | `Single_transition(x) => render_single_transition(~loc, x)
+            | `Single_transition_no_interp(x) =>
+              render_single_transition_no_interp(~loc, x),
+            transitions,
+          )
           |> Builder.pexp_array(~loc)
         },
   );

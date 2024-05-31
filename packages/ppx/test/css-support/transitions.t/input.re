@@ -42,17 +42,13 @@ let property2 = "opacity";
 
 [%css {|transition: $(transitions)|}];
 // This is the order of interpolation, from left to right.
-[%css {|transition: $(timingFunction) $(property) $(duration) $(delay)|}];
+[%css {|transition: $(property) $(duration) $(timingFunction) $(delay)|}];
 [%css
-  {|transition: $(timingFunction) $(property) $(duration) $(delay), ease $(property2)|}
+  {|transition: $(property) $(duration) $(timingFunction) $(delay), $(property2) 0s|}
 ];
-[%css {|transition: margin-right $(timingFunction)|}];
-[%css {|transition: 2s $(timingFunction)|}];
-[%css {|transition: ease $(property)|}];
-[%css {|transition: all ease $(duration)|}];
-[%css {|transition: all ease $(duration) 3s|}];
-[%css {|transition: all ease 0s $(delay)|}];
-
-/* This is invalid since the first INTERPOLATION is parsed as timingFunction, and we add it again (with linear)
- * [%css {|transition: $(duration) 2s width linear|}];
- */
+[%css {|transition: margin-right 0s $(timingFunction) 0s|}];
+[%css {|transition: all 2s $(timingFunction) 0s|}];
+[%css {|transition: $(property) 0s|}];
+[%css {|transition: all $(duration)|}];
+[%css {|transition: all $(duration) ease 3s|}];
+[%css {|transition: all 0s ease $(delay)|}];
