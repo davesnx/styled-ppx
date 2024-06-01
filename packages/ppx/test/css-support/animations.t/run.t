@@ -67,12 +67,32 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.animationFillMode(`backwards);
   CssJs.animationFillMode(`both);
   CssJs.animation(
-    ~duration=`s(1),
-    ~delay=`s(2),
-    ~direction=`alternate,
-    ~timingFunction=`linear,
-    ~fillMode=`both,
-    ~playState=`running,
-    ~iterationCount=`infinite,
+    ~duration=?Some(`s(1)),
+    ~delay=?Some(`s(2)),
+    ~direction=?Some(`alternate),
+    ~timingFunction=?Some(`linear),
+    ~fillMode=?Some(`both),
+    ~playState=?None,
+    ~iterationCount=?Some(`infinite),
     {js|foo|js},
+  );
+  CssJs.animation(
+    ~duration=?Some(`s(4)),
+    ~delay=?Some(`s(1)),
+    ~direction=?Some(`reverse),
+    ~timingFunction=?Some(`easeIn),
+    ~fillMode=?Some(`both),
+    ~playState=?Some(`paused),
+    ~iterationCount=?Some(`infinite),
+    {js|none|js},
+  );
+  CssJs.animation(
+    ~duration=?Some(`ms(300)),
+    ~delay=?Some(`ms(400)),
+    ~direction=?Some(`reverse),
+    ~timingFunction=?Some(`linear),
+    ~fillMode=?Some(`forwards),
+    ~playState=?Some(`running),
+    ~iterationCount=?Some(`infinite),
+    {js|a|js},
   );

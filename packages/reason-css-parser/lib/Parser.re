@@ -827,7 +827,7 @@ and property_animation_fill_mode = [%value.rec
 and property_animation_iteration_count = [%value.rec
   "[ <single-animation-iteration-count> ]#"
 ]
-and property_animation_name = [%value.rec "[ 'none' | <keyframes-name> ]#"]
+and property_animation_name = [%value.rec "[ <keyframes-name> | 'none' ]#"]
 and property_animation_play_state = [%value.rec
   "[ <single-animation-play-state> ]#"
 ]
@@ -1771,7 +1771,7 @@ and side_or_corner = [%value.rec
   "[ 'left' | 'right' ] || [ 'top' | 'bottom' ]"
 ]
 and single_animation = [%value.rec
-  "<extended-time> || <timing-function> || <extended-time> || <single-animation-iteration-count> || <single-animation-direction> || <single-animation-fill-mode> || <single-animation-play-state> || [ 'none' | <keyframes-name> ]"
+  "[ <keyframes-name> | 'none' ] || <extended-time> || <timing-function> || <extended-time> || <single-animation-iteration-count> || <single-animation-direction> || <single-animation-fill-mode> || <single-animation-play-state>"
 ]
 and single_animation_direction = [%value.rec
   "'normal' | 'reverse' | 'alternate' | 'alternate-reverse'"

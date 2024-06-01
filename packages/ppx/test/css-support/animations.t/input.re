@@ -31,3 +31,5 @@
 [%css {|animation-fill-mode: backwards|}];
 [%css {|animation-fill-mode: both|}];
 [%css {|animation: foo 1s 2s infinite linear alternate both|}];
+[%css "animation: 4s ease-in 1s infinite reverse both paused"];
+[%css "animation: a 300ms linear 400ms infinite reverse forwards running"];
