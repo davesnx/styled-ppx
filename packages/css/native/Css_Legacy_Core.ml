@@ -1896,7 +1896,7 @@ module Transition = struct
   type t = [ `value of string ]
 
   let shorthand ?(duration = `ms 0) ?(delay = `ms 0) ?(timingFunction = `ease)
-    property =
+    property : t =
     `value
       (Time.toString duration
       ^ {js| |js}
@@ -1906,7 +1906,7 @@ module Transition = struct
       ^ {js| |js}
       ^ property)
 
-  let toString x = match x with `value v -> v
+  let toString (x : t) = match x with `value v -> v
 end
 
 let transitionValue x = D ({js|transition|js}, Transition.toString x)
