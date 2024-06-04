@@ -22,7 +22,6 @@ let (let.ok) = Result.bind;
 /* TODO: Separate unsupported_feature from bs-css doesn't support or can't interpolate on those */
 /* TODO: Add payload on those exceptions */
 exception Unsupported_feature;
-exception Unsafe_interpolation(expression);
 
 exception Invalid_value(string);
 
@@ -67,6 +66,11 @@ let emit_shorthand = (parser, mapper, value_to_expr) => {
   {ast_of_string, ast_to_expr, string_to_expr};
 };
 
+let render_option = (~loc, f) =>
+  fun
+  | Some(v) => [%expr Some([%e f(~loc, v)])]
+  | None => [%expr None];
+
 let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
 
 let render_variable = (~loc, name) =>
@@ -74,7 +78,7 @@ let render_variable = (~loc, name) =>
 
 let transform_with_variable = (parser, mapper, value_to_expr) =>
   emit(
-    Combinator.first([
+    Combinator.combine_xor([
       /* If the entire CSS value is interpolated, we treat it as a `Variable */
       Rule.Match.map(Standard.interpolation, data => `Variable(data)),
       /* Otherwise it's a regular CSS `Value and match the parser */
@@ -125,8 +129,8 @@ let unsupportedValue = (parser, property) =>
 let unsupportedProperty = parser =>
   transform_with_variable(
     parser,
-    (~loc as _, _) => raise(Unsupported_feature),
-    (~loc as _, arg) => raise(Unsafe_interpolation(arg)),
+    (~loc as _) => raise(Unsupported_feature),
+    (~loc as _) => raise(Unsupported_feature),
   );
 
 let render_string = (~loc, s) => {
@@ -390,18 +394,26 @@ and render_time_as_int = (~loc) =>
       let value = Float.to_int(f);
       [%expr `ms([%e render_integer(~loc, value)])];
     }
-  | `S(f) => {
+  | `S(f) =>
+    if (f > 0. && f < 1.) {
+      render_time_as_int(~loc, `Ms(f *. 1000.));
+    } else {
       let value = Float.to_int(f);
       [%expr `s([%e render_integer(~loc, value)])];
     }
 
-and render_extended_time = (~loc) =>
+and render_extended_time_no_interp = (~loc) =>
   fun
   | `Time(t) => render_time_as_int(~loc, t)
   | `Function_calc(fc) => render_function_calc(~loc, fc)
-  | `Interpolation(v) => render_variable(~loc, v)
   | `Function_min(values) => render_function_min(~loc, values)
   | `Function_max(values) => render_function_max(~loc, values)
+
+and render_extended_time = (~loc) =>
+  fun
+  | #Types.extended_time_no_interp as x =>
+    render_extended_time_no_interp(~loc, x)
+  | `Interpolation(v) => render_variable(~loc, v)
 
 and render_calc_value = (~loc, calc_value) => {
   switch ((calc_value: Types.calc_value)) {
@@ -2901,10 +2913,17 @@ let backface_visibility =
     [%expr CssJs.backfaceVisibility]
   );
 
-let render_single_transition = (~loc, value: Types.single_transition_property) => {
+let render_single_transition_property_no_interp = (~loc, value) => {
   switch (value) {
   | `All => render_string(~loc, "all")
   | `Custom_ident(v) => render_string(~loc, v)
+  };
+};
+
+let render_single_transition_property = (~loc, value) => {
+  switch (value) {
+  | #Types.single_transition_property_no_interp as x =>
+    render_single_transition_property_no_interp(~loc, x)
   | `Interpolation(v) => render_variable(~loc, v)
   };
 };
@@ -2918,7 +2937,7 @@ let transition_property =
       fun
       | `None => render_string(~loc, "none")
       | `Single_transition_property([transition]) =>
-        render_single_transition(~loc, transition)
+        render_single_transition_property(~loc, transition)
       /* bs-css unsupports multiple transition_properties,
          but should be easy to bypass with string concatenation */
       | `Single_transition_property(_) => raise(Unsupported_feature),
@@ -2977,12 +2996,17 @@ let render_steps_function = (~loc) =>
     ]
   | `Steps(_, None) => raise(Unsupported_feature);
 
-let render_timing = (~loc) =>
+let render_timing_no_interp = (~loc) =>
   fun
   | `Linear => [%expr `linear]
   | `Cubic_bezier_timing_function(v) =>
     render_cubic_bezier_timing_function(~loc, v)
   | `Step_timing_function(v) => render_steps_function(~loc, v);
+
+let render_timing = (~loc) =>
+  fun
+  | #Types.timing_function_no_interp as x => render_timing_no_interp(~loc, x)
+  | `Interpolation(v) => render_variable(~loc, v);
 
 let transition_timing_function =
   monomorphic(
@@ -3003,9 +3027,90 @@ let transition_delay =
       | [`Interpolation(v)] => render_variable(~loc, v)
       | _ => raise(Unsupported_feature),
   );
+
+let render_transition_property = (~loc) =>
+  fun
+  | `None => render_string(~loc, "none")
+  | `Single_transition_property(x) =>
+    render_single_transition_property(~loc, x);
+
+let render_single_transition = (~loc) =>
+  fun
+  | `Static_0(property, duration) => {
+      [%expr
+       CssJs.Transition.shorthand(
+         ~duration=[%e render_extended_time(~loc, duration)],
+         [%e render_transition_property(~loc, property)],
+       )];
+    }
+  | `Static_1(property, duration, timingFunction) => {
+      [%expr
+       CssJs.Transition.shorthand(
+         ~duration=[%e render_extended_time(~loc, duration)],
+         ~timingFunction=[%e render_timing(~loc, timingFunction)],
+         [%e render_transition_property(~loc, property)],
+       )];
+    }
+  | `Static_2(property, duration, timingFunction, delay) => {
+      [%expr
+       CssJs.Transition.shorthand(
+         ~duration=[%e render_extended_time(~loc, duration)],
+         ~delay=[%e render_extended_time(~loc, delay)],
+         ~timingFunction=[%e render_timing(~loc, timingFunction)],
+         [%e render_transition_property(~loc, property)],
+       )];
+    };
+
+let render_single_transition_no_interp =
+    (
+      ~loc,
+      (property, delay, timingFunction, duration): Types.single_transition_no_interp,
+    ) => {
+  let property =
+    switch (
+      Option.value(
+        property,
+        ~default=`Single_transition_property_no_interp(`All),
+      )
+    ) {
+    | `None => render_string(~loc, "none")
+    | `Single_transition_property_no_interp(x) =>
+      render_single_transition_property_no_interp(~loc, x)
+    };
+
+  [%expr
+   CssJs.Transition.shorthand(
+     ~duration=?[%e
+       render_option(~loc, render_extended_time_no_interp, duration)
+     ],
+     ~delay=?[%e render_option(~loc, render_extended_time_no_interp, delay)],
+     ~timingFunction=?[%e
+       render_option(~loc, render_timing_no_interp, timingFunction)
+     ],
+     [%e property],
+   )];
+};
+
 let transition =
-  unsupportedValue(Parser.property_transition, (~loc) =>
-    [%expr CssJs.transitionList]
+  monomorphic(
+    Parser.property_transition,
+    (~loc) => [%expr CssJs.transitionList],
+    (~loc) =>
+      fun
+      | `Interpolation(v) => render_variable(~loc, v)
+      | `Xor(transitions) =>
+        switch (transitions) {
+        | [] => raise(Invalid_value("expected at least one argument"))
+        | transitions =>
+          transitions
+          |> List.map(
+               fun
+               | `Single_transition(x) => render_single_transition(~loc, x)
+               | `Single_transition_no_interp(x) =>
+                 render_single_transition_no_interp(~loc, x),
+             )
+          |> Builder.pexp_array(~loc)
+        },
   );
 
 let render_keyframes_name = (~loc) =>
@@ -4576,6 +4681,12 @@ let render_when_unsupported_features = (~loc, property, value) => {
 
   /* Transform property name to camelCase since we bind to emotion with the Object API */
   let propertyName = property |> to_camel_case |> render_string(~loc);
+  let unsafeInterpolation =
+    value
+    |> Parser.parse(Standard.interpolation)
+    |> Result.map(render_variable(~loc));
+  let value =
+    Result.value(unsafeInterpolation, ~default=render_string(~loc, value));
 
   [%expr CssJs.unsafe([%e propertyName], [%e value])];
 };
@@ -4612,18 +4723,10 @@ let parse_declarations = (~loc: Location.t, property, value, important) => {
     | Ok(value) => Ok(value)
     | exception (Invalid_value(v)) =>
       Error(`Invalid_value(value ++ ". " ++ v))
-    | exception (Unsafe_interpolation(value)) =>
-      Ok([render_when_unsupported_features(~loc, property, value)])
     | Error(_)
     | exception Unsupported_feature =>
       let.ok () = is_valid_string ? Ok() : Error(`Invalid_value(value));
-      Ok([
-        render_when_unsupported_features(
-          ~loc,
-          property,
-          render_string(~loc, value),
-        ),
-      ]);
+      Ok([render_when_unsupported_features(~loc, property, value)]);
     }
   };
 };

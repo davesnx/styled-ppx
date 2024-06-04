@@ -69,6 +69,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   module Color = {
     let text = CssJs.hex("444");
   };
+  let colorTextString = Color.text |> CssJs.Color.toString;
   CssJs.unsafe(
     {js|WebkitBoxShadow|js},
     {js|inset 0 0 0 1000px $(Color.background)|js},
@@ -76,7 +77,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.unsafe({js|WebkitLineClamp|js}, {js|2|js});
   CssJs.unsafe({js|WebkitOverflowScrolling|js}, {js|touch|js});
   CssJs.unsafe({js|WebkitTapHighlightColor|js}, {js|transparent|js});
-  CssJs.unsafe({js|WebkitTextFillColor|js}, {js|$(Color.text)|js});
+  CssJs.unsafe({js|WebkitTextFillColor|js}, colorTextString);
   CssJs.animation(
     ~duration=`ms(0),
     ~delay=`ms(0),
