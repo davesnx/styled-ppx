@@ -3077,23 +3077,16 @@ let render_single_transition_no_interp =
     | `Single_transition_property_no_interp(x) =>
       render_single_transition_property_no_interp(~loc, x)
     };
-  let duration =
-    render_option(~loc, render_extended_time_no_interp, duration);
-  let timingFunction =
-    render_option(~loc, render_timing_no_interp, timingFunction);
-  let delay = render_option(~loc, render_extended_time_no_interp, delay);
 
   [%expr
    CssJs.Transition.shorthand(
-     ~duration=?{
-       [%e duration];
-     },
-     ~delay=?{
-       [%e delay];
-     },
-     ~timingFunction=?{
-       [%e timingFunction];
-     },
+     ~duration=?[%e
+       render_option(~loc, render_extended_time_no_interp, duration)
+     ],
+     ~delay=?[%e render_option(~loc, render_extended_time_no_interp, delay)],
+     ~timingFunction=?[%e
+       render_option(~loc, render_timing_no_interp, timingFunction)
+     ],
      [%e property],
    )];
 };
@@ -3109,13 +3102,13 @@ let transition =
         switch (transitions) {
         | [] => raise(Invalid_value("expected at least one argument"))
         | transitions =>
-          List.map(
-            fun
-            | `Single_transition(x) => render_single_transition(~loc, x)
-            | `Single_transition_no_interp(x) =>
-              render_single_transition_no_interp(~loc, x),
-            transitions,
-          )
+          transitions
+          |> List.map(
+               fun
+               | `Single_transition(x) => render_single_transition(~loc, x)
+               | `Single_transition_no_interp(x) =>
+                 render_single_transition_no_interp(~loc, x),
+             )
           |> Builder.pexp_array(~loc)
         },
   );
