@@ -79,13 +79,13 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.unsafe({js|WebkitTapHighlightColor|js}, {js|transparent|js});
   CssJs.unsafe({js|WebkitTextFillColor|js}, colorTextString);
   CssJs.animation(
-    ~duration=`ms(0),
-    ~delay=`ms(0),
-    ~direction=`normal,
-    ~timingFunction=`ease,
-    ~fillMode=`none,
-    ~playState=`running,
-    ~iterationCount=`count(1.),
+    ~duration=?None,
+    ~delay=?None,
+    ~direction=?None,
+    ~timingFunction=?None,
+    ~fillMode=?Some(`none),
+    ~playState=?None,
+    ~iterationCount=?None,
     {js|none|js},
   );
   CssJs.unsafe({js|appearance|js}, {js|none|js});

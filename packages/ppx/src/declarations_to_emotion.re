@@ -3120,7 +3120,7 @@ let render_keyframes_name = (~loc) =>
 
 let render_animation_name = (~loc) =>
   fun
-  | `None => [%expr "none"]
+  | `None => render_string(~loc, "none")
   | `Keyframes_name(name) => render_keyframes_name(~loc, name);
 
 // css-animation-1
@@ -3233,60 +3233,34 @@ let render_single_animation =
     (
       ~loc,
       (
+        name,
         delay,
-        timing_function,
+        timingFunction,
         duration,
-        iteration_count,
+        iterationCount,
         direction,
         fillMode,
         playState,
-        name,
-      ),
+      ): Types.single_animation,
     ) => {
-  let duration =
-    duration
-    |> Option.mapWithDefault(render_extended_time(~loc), [%expr `ms(0)]);
-  let delay =
-    delay
-    |> Option.mapWithDefault(render_extended_time(~loc), [%expr `ms(0)]);
-  let direction =
-    direction
-    |> Option.mapWithDefault(
-         render_animation_direction(~loc),
-         [%expr `normal],
-       );
-  let timingFunction =
-    timing_function
-    |> Option.mapWithDefault(render_timing(~loc), [%expr `ease]);
-  let fillMode =
-    fillMode
-    |> Option.mapWithDefault(render_animation_fill_mode(~loc), [%expr `none]);
-  let playState =
-    playState
-    |> Option.mapWithDefault(
-         render_animation_play_state(~loc),
-         [%expr `running],
-       );
-  let iterationCount =
-    iteration_count
-    |> Option.mapWithDefault(
-         render_animation_iteration_count(~loc),
-         [%expr `count(1.)],
-       );
-  let name =
-    name
-    |> Option.mapWithDefault(render_animation_name(~loc), [%expr "none"]);
-
   [%expr
    CssJs.animation(
-     ~duration=[%e duration],
-     ~delay=[%e delay],
-     ~direction=[%e direction],
-     ~timingFunction=[%e timingFunction],
-     ~fillMode=[%e fillMode],
-     ~playState=[%e playState],
-     ~iterationCount=[%e iterationCount],
-     [%e name],
+     ~duration=?[%e render_option(~loc, render_extended_time, duration)],
+     ~delay=?[%e render_option(~loc, render_extended_time, delay)],
+     ~direction=?[%e
+       render_option(~loc, render_animation_direction, direction)
+     ],
+     ~timingFunction=?[%e render_option(~loc, render_timing, timingFunction)],
+     ~fillMode=?[%e
+       render_option(~loc, render_animation_fill_mode, fillMode)
+     ],
+     ~playState=?[%e
+       render_option(~loc, render_animation_play_state, playState)
+     ],
+     ~iterationCount=?[%e
+       render_option(~loc, render_animation_iteration_count, iterationCount)
+     ],
+     [%e render_animation_name(~loc, Option.value(name, ~default=`None))],
    )];
 };
 
