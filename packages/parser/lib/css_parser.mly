@@ -42,6 +42,7 @@ let make_loc = Parser_location.to_ppxlib_location
 %token <string> PRINT_MEDIA_TYPE
 %token <string> ALL_MEDIA_TYPE
 %token <string> AT_KEYFRAMES
+%token <string> AT_CONTAINER
 %token <string> AT_RULE
 %token <string> AT_RULE_STATEMENT
 %token <string> HASH
@@ -240,6 +241,49 @@ media_query_prelude:
 
 prelude: xs = value { xs }
 
+// <query-in-parens>     = ( <container-query> )
+//                      | ( <size-feature> )
+//                      | style( <style-query> )
+//                      | <general-enclosed>
+query_in_parens:
+  | LEFT_PAREN cq = container_query RIGHT_PAREN { cq }
+  | LEFT_PAREN mf = media_feature RIGHT_PAREN { mf }
+
+query_in_parens_with_and: v = skip_ws_right(and_operator) query_in_parens { v }
+
+// [ and <query-in-parens> ]*
+query_in_parens_with_and_star:
+  | { [] }
+  | x = query_in_parens_with_and xs = query_in_parens_with_and_star { x :: xs }
+
+query_in_parens_with_or: v = skip_ws_right(or_operator) query_in_parens { v }
+
+// [ or <query-in-parens> ]*
+query_in_parens_with_or_star:
+  | { [] }
+  | x = query_in_parens_with_or xs = query_in_parens_with_or_star { x :: xs }
+
+// [ and <query-in-parens> ]* | [ or <query-in-parens> ]*
+query_in_parens_with_or_or_and_list:
+  | v = query_in_parens_with_or_star { v }
+  | v = query_in_parens_with_and_star { v }
+
+// <container-query>     = not <query-in-parens>
+//                       | <query-in-parens> [ [ and <query-in-parens> ]* | [ or <query-in-parens> ]* ]
+container_query:
+  | v = skip_ws_right(not_operator) query_in_parens { v }
+  | v = skip_ws_right(query_in_parens) query_in_parens_with_or_or_and_list { v }
+
+// <container-name> = <custom-ident>
+container_name: xs = wq_name { xs }
+// <container-condition> = [ <container-name> ]? <container-query>
+container_condition: name = skip_ws_right(container_name)?; query = container_query { (name, query) }
+
+container_prelude: xs = separated_nonempty_list(COMMA, skip_ws(container_condition)) {
+  let container_conditions = List.map (fun ((name, query)) -> (Option.value ~default:"" name) ^ " " ^ query) xs in
+  Ident(String.concat ", " container_conditions)
+}
+
 /* https://www.w3.org/TR/css-syntax-3/#at-rules */
 at_rule:
   /* @media (min-width: 16rem) { ... } */
@@ -285,6 +329,15 @@ at_rule:
       block = empty_block;
       loc = make_loc $startpos $endpos;
     }): at_rule
+  }
+  | name = loc(AT_CONTAINER) WS?
+    xs = loc(container_prelude) WS?
+    s = brace_block(stylesheet_without_eof) WS? {
+    { name;
+      prelude = xs;
+      block = Stylesheet s;
+      loc = make_loc $startpos $endpos;
+    }
   }
   /* @charset */
   | name = loc(AT_RULE_STATEMENT) WS?
