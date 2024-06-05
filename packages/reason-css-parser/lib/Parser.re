@@ -1737,6 +1737,9 @@ and property_z_index = [%value.rec "'auto' | <integer> | <interpolation>"]
 and property_zoom = [%value.rec
   "'normal' | 'reset' | <number> | <extended-percentage>"
 ]
+and property_container = [%value.rec "<'container-name'> [ '/' <'container-type'> ]?"]
+and property_container_name = [%value.rec "<custom-ident>+ | 'none'"]
+and property_container_type = [%value.rec "'normal' | 'size' | 'inline-size'"]
 and pseudo_class_selector = [%value.rec
   "':' <ident-token> | ':' <function-token> <any-value> ')'"
 ]
@@ -3267,6 +3270,9 @@ let check_map =
       ("property-writing-mode", check(property_writing_mode)),
       ("property-z-index", check(property_z_index)),
       ("property-zoom", check(property_zoom)),
+      ("property-container", check(property_container)),
+      ("property-container-name", check(property_container_name)),
+      ("property-container-type", check(property_container_type)),
       ("pseudo-class-selector", check(pseudo_class_selector)),
       ("pseudo-element-selector", check(pseudo_element_selector)),
       ("pseudo-page", check(pseudo_page)),
