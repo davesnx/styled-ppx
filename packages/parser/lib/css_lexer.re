@@ -129,6 +129,8 @@ let at_media = [%sedlex.regexp? ("@", "media")];
 
 let at_keyframes = [%sedlex.regexp? ("@", "keyframes")];
 
+let at_container = [%sedlex.regexp? ("@", "container")];
+
 let non_ascii_code_point = [%sedlex.regexp? Sub(any, '\000' .. '\128')]; // greater than \u0080
 
 let identifier_start_code_point = [%sedlex.regexp?
@@ -587,6 +589,9 @@ let rec get_next_token = lexbuf => {
   | at_keyframes =>
     skip_whitespace.contents = false;
     AT_KEYFRAMES(lexeme(~skip=1, lexbuf));
+  | at_container =>
+    skip_whitespace.contents = false;
+    AT_CONTAINER(lexeme(~skip=1, lexbuf));
   | at_rule =>
     skip_whitespace.contents = false;
     AT_RULE(lexeme(~skip=1, lexbuf));
