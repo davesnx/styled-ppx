@@ -55,6 +55,12 @@ let tests = [
     let render_length = (x: Types.length) => {
       switch (x) {
       | `Cm(x) => string_of_float(x) ++ "cm"
+      | `Cqw(x) => string_of_float(x) ++ "cqw"
+      | `Cqh(x) => string_of_float(x) ++ "cqh"
+      | `Cqi(x) => string_of_float(x) ++ "cqi"
+      | `Cqb(x) => string_of_float(x) ++ "cqb"
+      | `Cqmin(x) => string_of_float(x) ++ "cqmin"
+      | `Cqmax(x) => string_of_float(x) ++ "cqmax"
       | `Em(x) => string_of_float(x) ++ "em"
       | `Ex(x) => string_of_float(x) ++ "ex"
       | `In(x) => string_of_float(x) ++ "in"
