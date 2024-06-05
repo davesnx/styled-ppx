@@ -1242,7 +1242,15 @@ let wordSpacing x =
 
 let wordWrap = overflowWrap
 let zIndex x = D ({js|z-index|js}, ZIndex.toString x)
-let media = fun [@u] query rules -> S ({js|@media |js} ^ query, rules)
+
+let atRule ?(params = "") name rules =
+  S ({js|@|js} ^ name ^ {js| |js} ^ params, rules)
+
+let media query rules = atRule ~params:query "media" rules
+
+let container ?(name = "") query rules =
+  atRule ~params:(name ^ {js| |js} ^ query) "container" rules
+
 let selector = fun [@u] selector rules -> S (selector, rules)
 let pseudoClass selector rules = PseudoClass (selector, rules)
 let active rules = pseudoClass {js|active|js} rules
@@ -1677,7 +1685,9 @@ let rec gridLengthToJs x =
     ^ {js|)|js}
 
 and string_of_dimensions dimensions =
-  dimensions |. Std.Array.map gridLengthToJs |. Std.Array.joinWith ~sep:{js| |js}
+  dimensions
+  |. Std.Array.map gridLengthToJs
+  |. Std.Array.joinWith ~sep:{js| |js}
 
 let gridTemplateColumns dimensions =
   D ({js|grid-template-columns|js}, string_of_dimensions dimensions)
