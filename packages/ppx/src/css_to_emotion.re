@@ -147,11 +147,9 @@ and render_media_query = (~loc, at_rule: at_rule) => {
 }
 and render_container_query = (~loc, at_rule: at_rule) => {
   let parse_condition = {
-    let (value, at_rule_loc) = at_rule.prelude;
-    switch (value) {
-    /* In any other case, we believe on the source_code and transform it to string. This is unsafe */
-    | _whatever => Ok(source_code_of_loc(at_rule_loc) |> String.trim)
-    };
+    let (_, at_rule_loc) = at_rule.prelude;
+    /* We believe on the source_code and transform it to string. This is unsafe */
+    Ok(source_code_of_loc(at_rule_loc) |> String.trim);
   };
 
   let (delimiter, attrs) =
