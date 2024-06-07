@@ -10,7 +10,7 @@ let parse = input => {
     open Styled_ppx_css_parser.Ast;
     let pos = loc.loc_start;
     let curr_pos = pos.pos_cnum;
-    let lnum = pos.pos_lnum;
+    let lnum = pos.pos_lnum + 1;
     let pos_bol = pos.pos_bol;
     let err =
       Printf.sprintf(

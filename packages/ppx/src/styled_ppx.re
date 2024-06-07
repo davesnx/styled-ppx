@@ -770,11 +770,11 @@ let _ =
           "css",
           Ppxlib.Extension.Context.Expression,
           string_payload_pattern,
-          (~loc, ~path, payload, _stringLoc, delimiter) => {
+          (~loc as _, ~path, payload, stringLoc, delimiter) => {
             File.set(path);
             let loc =
               Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-                loc,
+                stringLoc,
                 delimiter,
               );
             switch (
@@ -797,11 +797,11 @@ let _ =
           "styled.global",
           Ppxlib.Extension.Context.Expression,
           string_payload_pattern,
-          (~loc, ~path, payload, _stringLoc, delimiter) => {
+          (~loc as _, ~path, payload, stringLoc, delimiter) => {
             File.set(path);
             let loc =
               Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-                loc,
+                stringLoc,
                 delimiter,
               );
             switch (
@@ -819,11 +819,11 @@ let _ =
           "keyframe",
           Ppxlib.Extension.Context.Expression,
           string_payload_pattern,
-          (~loc, ~path, payload, _stringLoc, delimiter) => {
+          (~loc as _, ~path, payload, stringLoc, delimiter) => {
             File.set(path);
             let loc =
               Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-                loc,
+                stringLoc,
                 delimiter,
               );
             switch (

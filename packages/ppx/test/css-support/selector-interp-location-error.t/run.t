@@ -15,7 +15,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", line 2, characters 19-21:
+  File "input.re", line 8, characters 19-21:
   Error: Parse error while reading token '2'
   [1]
 
