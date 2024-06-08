@@ -64,6 +64,8 @@ let concat = (~loc, expr, acc) => {
 
 let rec render_at_rule = (~loc, at_rule: at_rule) => {
   let (at_rule_name, at_rule_name_loc) = at_rule.name;
+  let at_rule_name_loc =
+    Styled_ppx_css_parser.Parser_location.intersection(loc, at_rule_name_loc);
   switch (at_rule_name) {
   | "media" => render_media_query(~loc, at_rule)
   | "keyframes" =>
