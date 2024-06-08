@@ -15,11 +15,11 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", lines 8-9, characters 24-24:
-   | ..............
-   | ...
-   | ..
-   | ..
+  File "input.re", lines 5-6, characters 13-13:
+  3 | ..
+  4 | 
+  5 | ......... {
+  6 |     color.......
   Error: Unknown property 'colorx'
   [1]
 

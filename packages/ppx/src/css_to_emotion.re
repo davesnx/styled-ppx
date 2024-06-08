@@ -309,14 +309,11 @@ and render_selectors = (~loc, selectors) => {
 }
 and render_style_rule = (~loc, rule: style_rule) => {
   let (prelude, prelude_loc) = rule.prelude;
-  let (_block, block_loc) = rule.block;
   let selector_location =
     Styled_ppx_css_parser.Parser_location.intersection(loc, prelude_loc);
-  let block_location =
-    Styled_ppx_css_parser.Parser_location.intersection(loc, block_loc);
 
   let selector_expr =
-    render_declarations(~loc=block_location, rule.block)
+    render_declarations(~loc, rule.block)
     |> Builder.pexp_array(~loc=selector_location);
 
   let (delimiter, attrs) =
