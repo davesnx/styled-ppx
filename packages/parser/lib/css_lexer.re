@@ -592,12 +592,12 @@ let rec get_next_token = lexbuf => {
   | at_container =>
     skip_whitespace.contents = false;
     AT_CONTAINER(lexeme(~skip=1, lexbuf));
-  | at_rule =>
-    skip_whitespace.contents = false;
-    AT_RULE(lexeme(~skip=1, lexbuf));
   | at_rule_without_body =>
     skip_whitespace.contents = false;
     AT_RULE_STATEMENT(lexeme(~skip=1, lexbuf));
+  | at_rule =>
+    skip_whitespace.contents = false;
+    AT_RULE(lexeme(~skip=1, lexbuf));
   /* NOTE: should be placed above ident, otherwise pattern with
    * '-[0-9a-z]{1,6}' cannot be matched */
   | (_u, '+', unicode_range) => UNICODE_RANGE(lexeme(lexbuf))

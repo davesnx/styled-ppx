@@ -345,7 +345,7 @@ at_rule:
   }
   /* @charset */
   | name = loc(AT_RULE_STATEMENT) WS?
-    xs = loc(prelude) WS? SEMI_COLON? {
+    xs = loc(prelude) WS? SEMI_COLON {
     { name;
       prelude = xs;
       block = Empty;
@@ -356,7 +356,7 @@ at_rule:
   /* @page { ... } */
   /* @{{rule}} { ... } */
   | name = loc(AT_RULE) WS?
-    xs = loc(prelude) WS?
+    xs = loc(prelude_any) WS?
     s = brace_block(stylesheet_without_eof) WS? {
     { name;
       prelude = xs;
@@ -431,6 +431,7 @@ style_rule:
   }
 
 values: xs = nonempty_list(loc(skip_ws(value))) { xs }
+prelude_any: xs = list(loc(skip_ws(value))) { Paren_block xs }
 
 declarations:
   | WS? xs = nonempty_list(rule) SEMI_COLON? { xs }

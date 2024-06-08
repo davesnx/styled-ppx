@@ -88,6 +88,10 @@ let rec render_at_rule = (~loc, at_rule: at_rule) => {
   | "styleset" as n
   | "character-variant" as n
   | "property" as n
+  | "font-palette-values" as n
+  | "layer" as n
+  | "scope" as n
+  | "starting-style" as n
   | /* Experimental */ "color-profile" as n
   | /* Experimental */ "viewport" as n
   | /* Deprecated */ "document" as n =>
