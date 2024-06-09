@@ -15,10 +15,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", lines 2-3, characters 22-14:
-  1 | .....
-  2 | ................;
-  3 |   height........
+  File "input.re", line 3, characters 2-9:
   Error: Unknown property 'heightx'
   [1]
 

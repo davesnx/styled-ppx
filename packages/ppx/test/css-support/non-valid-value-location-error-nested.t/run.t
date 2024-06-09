@@ -15,11 +15,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", lines 5-6, characters 13-22:
-  3 | ..
-  4 | 
-  5 | ......... {
-  6 |     color: cositas.
+  File "input.re", line 6, characters 10-18:
   Error: Property 'color' has an invalid value: 'cositas'
   [1]
 

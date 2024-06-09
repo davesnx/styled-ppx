@@ -20,14 +20,8 @@ let parse = (~loc: Ppxlib.location, skip_whitespaces, lexbuf, parser) => {
     Error((loc, msg));
   | _ =>
     let (token, start_pos, end_pos) = last_token^;
-    let loc =
-      Parser_location.to_ppxlib_location(
-        {
-          ...start_pos,
-          pos_lnum: start_pos.pos_lnum + loc.loc_start.pos_lnum - 1,
-        },
-        {...end_pos, pos_lnum: end_pos.pos_lnum + loc.loc_start.pos_lnum - 1},
-      );
+    let token_loc = Parser_location.to_ppxlib_location(start_pos, end_pos);
+    let loc = Parser_location.update_pos_lnum(token_loc, loc)
     let msg =
       Printf.sprintf(
         "Parse error while reading token '%s'",
