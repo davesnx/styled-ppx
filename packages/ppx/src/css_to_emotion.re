@@ -153,30 +153,47 @@ and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
   let value_source = source_code_of_loc(value_loc) |> String.trim;
 
   let declaration_location =
-    Styled_ppx_css_parser.Parser_location.update_pos_lnum(value_loc, loc);
+    Styled_ppx_css_parser.Parser_location.update_pos_lnum(
+      {
+        let offset =
+          value_loc.loc_start.pos_lnum == 1
+            ? loc.loc_start.pos_cnum - loc.loc_start.pos_bol + 1 : 0;
+        {
+          ...value_loc,
+          loc_start: {
+            ...value_loc.loc_start,
+            pos_cnum: value_loc.loc_start.pos_cnum + offset,
+          },
+          loc_end: {
+            ...value_loc.loc_end,
+            pos_cnum: value_loc.loc_end.pos_cnum + offset,
+          },
+        };
+      },
+      loc,
+    );
 
-  let fixed_name_loc = {
-    let offset = loc.loc_start.pos_cnum - loc.loc_start.pos_bol;
-    let pos_bol =
-      name_loc.loc_start.pos_lnum == 0
-        ? name_loc.loc_end.pos_bol + offset : name_loc.loc_end.pos_bol;
-    {
-      ...name_loc,
-      loc_start: {
-        ...name_loc.loc_start,
-        pos_lnum: name_loc.loc_start.pos_lnum + 1,
-        pos_bol,
-        pos_cnum: name_loc.loc_end.pos_cnum - String.length(property),
-      },
-      loc_end: {
-        ...name_loc.loc_end,
-        pos_bol,
-      },
-    };
-  };
   let property_location =
     Styled_ppx_css_parser.Parser_location.update_pos_lnum(
-      fixed_name_loc,
+      {
+        let offset =
+          name_loc.loc_end.pos_lnum == 1
+            ? loc.loc_start.pos_cnum - loc.loc_start.pos_bol + 1 : 0;
+        {
+          ...name_loc,
+          loc_start: {
+            ...name_loc.loc_start,
+            pos_lnum: name_loc.loc_end.pos_lnum,
+            pos_bol: name_loc.loc_end.pos_bol,
+            pos_cnum:
+              name_loc.loc_end.pos_cnum + offset - String.length(property),
+          },
+          loc_end: {
+            ...name_loc.loc_end,
+            pos_cnum: name_loc.loc_end.pos_cnum + offset,
+          },
+        };
+      },
       loc,
     );
 

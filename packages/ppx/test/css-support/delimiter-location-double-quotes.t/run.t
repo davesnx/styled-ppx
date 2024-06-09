@@ -19,7 +19,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", line 1, characters 9-15:
+  File "input.re", line 1, characters 16-22:
   Error: Property 'display' has an invalid value: 'blocki'
   [1]
 
@@ -28,7 +28,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", line 1, characters 22-28:
+  File "input.re", line 1, characters 29-35:
   Error: Property 'display' has an invalid value: 'blocki'
   [1]
 

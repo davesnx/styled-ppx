@@ -15,7 +15,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", line 2, characters 10-17:
+  File "input.re", line 2, characters 25-32:
   Error: This expression has type [> `gri ]
          but an expression was expected of type
            [< `block
