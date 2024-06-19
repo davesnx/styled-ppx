@@ -11,7 +11,7 @@ module List = struct
       | x :: [] -> acc ^ x
       | x :: xs -> run xs ((acc ^ x) ^ sep)
     in
-    run strings {js||js}
+    run strings {||}
 end
 
 module Array = struct
