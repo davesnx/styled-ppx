@@ -15,8 +15,8 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", line 8, characters 19-21:
-  Error: Parse error while reading token '2'
+  File "input.re", line 6, characters 10-18:
+  Error: Property 'color' has an invalid value: 'cositas'
   [1]
 
   $ dune describe pp ./input.re.ml | refmt --parse ml --print re
@@ -38,12 +38,14 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       cookies: [],
     }
   ];
-  let _className =
+  let selectors =
     CssJs.style([|
-      CssJs.label("_className"),
+      CssJs.label("selectors"),
+      CssJs.color(CssJs.white),
       CssJs.selector(
-        {js|.lolaso :nth-child(2n)|js},
-        [|CssJs.color(CssJs.red)|],
+        {js|&:hover|js},
+        [|[%ocaml.error "Property 'color' has an invalid value: 'cositas'"]|],
       ),
     |]);
-  let _className = [%ocaml.error "Parse error while reading token '2'"];
+
+[%cx {js|display: blocki;              width: 10px; |js}];

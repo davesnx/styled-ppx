@@ -64,6 +64,8 @@ let concat = (~loc, expr, acc) => {
 
 let rec render_at_rule = (~loc, at_rule: at_rule) => {
   let (at_rule_name, at_rule_name_loc) = at_rule.name;
+  let at_rule_name_loc =
+    Styled_ppx_css_parser.Parser_location.intersection(loc, at_rule_name_loc);
   switch (at_rule_name) {
   | "media" => render_media_query(~loc, at_rule)
   | "keyframes" =>
@@ -151,10 +153,49 @@ and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
   let value_source = source_code_of_loc(value_loc) |> String.trim;
 
   let declaration_location =
-    Styled_ppx_css_parser.Parser_location.intersection(loc, d.loc);
+    Styled_ppx_css_parser.Parser_location.update_pos_lnum(
+      {
+        let offset =
+          value_loc.loc_start.pos_lnum == 1
+            ? loc.loc_start.pos_cnum - loc.loc_start.pos_bol + 1 : 0;
+        {
+          ...value_loc,
+          loc_start: {
+            ...value_loc.loc_start,
+            pos_cnum: value_loc.loc_start.pos_cnum + offset,
+          },
+          loc_end: {
+            ...value_loc.loc_end,
+            pos_cnum: value_loc.loc_end.pos_cnum + offset,
+          },
+        };
+      },
+      loc,
+    );
 
   let property_location =
-    Styled_ppx_css_parser.Parser_location.intersection(loc, name_loc);
+    Styled_ppx_css_parser.Parser_location.update_pos_lnum(
+      {
+        let offset =
+          name_loc.loc_end.pos_lnum == 1
+            ? loc.loc_start.pos_cnum - loc.loc_start.pos_bol + 1 : 0;
+        {
+          ...name_loc,
+          loc_start: {
+            ...name_loc.loc_start,
+            pos_lnum: name_loc.loc_end.pos_lnum,
+            pos_bol: name_loc.loc_end.pos_bol,
+            pos_cnum:
+              name_loc.loc_end.pos_cnum + offset - String.length(property),
+          },
+          loc_end: {
+            ...name_loc.loc_end,
+            pos_cnum: name_loc.loc_end.pos_cnum + offset,
+          },
+        };
+      },
+      loc,
+    );
 
   switch (
     Declarations_to_emotion.parse_declarations(
@@ -307,14 +348,11 @@ and render_selectors = (~loc, selectors) => {
 }
 and render_style_rule = (~loc, rule: style_rule) => {
   let (prelude, prelude_loc) = rule.prelude;
-  let (_block, block_loc) = rule.block;
   let selector_location =
     Styled_ppx_css_parser.Parser_location.intersection(loc, prelude_loc);
-  let block_location =
-    Styled_ppx_css_parser.Parser_location.intersection(loc, block_loc);
 
   let selector_expr =
-    render_declarations(~loc=block_location, rule.block)
+    render_declarations(~loc, rule.block)
     |> Builder.pexp_array(~loc=selector_location);
 
   let (delimiter, attrs) =
