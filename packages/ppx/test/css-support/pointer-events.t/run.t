@@ -35,18 +35,18 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       cookies: [],
     }
   ];
-  CssJs.unsafe({js|touchAction|js}, {js|auto|js});
-  CssJs.unsafe({js|touchAction|js}, {js|none|js});
-  CssJs.unsafe({js|touchAction|js}, {js|pan-x|js});
-  CssJs.unsafe({js|touchAction|js}, {js|pan-y|js});
-  CssJs.unsafe({js|touchAction|js}, {js|pan-x pan-y|js});
-  CssJs.unsafe({js|touchAction|js}, {js|manipulation|js});
-  CssJs.unsafe({js|touchAction|js}, {js|pan-left|js});
-  CssJs.unsafe({js|touchAction|js}, {js|pan-right|js});
-  CssJs.unsafe({js|touchAction|js}, {js|pan-up|js});
-  CssJs.unsafe({js|touchAction|js}, {js|pan-down|js});
-  CssJs.unsafe({js|touchAction|js}, {js|pan-left pan-up|js});
-  CssJs.unsafe({js|touchAction|js}, {js|pinch-zoom|js});
-  CssJs.unsafe({js|touchAction|js}, {js|pan-x pinch-zoom|js});
-  CssJs.unsafe({js|touchAction|js}, {js|pan-y pinch-zoom|js});
-  CssJs.unsafe({js|touchAction|js}, {js|pan-x pan-y pinch-zoom|js});
+  CssJs.unsafe({|touchAction|}, {|auto|});
+  CssJs.unsafe({|touchAction|}, {|none|});
+  CssJs.unsafe({|touchAction|}, {|pan-x|});
+  CssJs.unsafe({|touchAction|}, {|pan-y|});
+  CssJs.unsafe({|touchAction|}, {|pan-x pan-y|});
+  CssJs.unsafe({|touchAction|}, {|manipulation|});
+  CssJs.unsafe({|touchAction|}, {|pan-left|});
+  CssJs.unsafe({|touchAction|}, {|pan-right|});
+  CssJs.unsafe({|touchAction|}, {|pan-up|});
+  CssJs.unsafe({|touchAction|}, {|pan-down|});
+  CssJs.unsafe({|touchAction|}, {|pan-left pan-up|});
+  CssJs.unsafe({|touchAction|}, {|pinch-zoom|});
+  CssJs.unsafe({|touchAction|}, {|pan-x pinch-zoom|});
+  CssJs.unsafe({|touchAction|}, {|pan-y pinch-zoom|});
+  CssJs.unsafe({|touchAction|}, {|pan-x pan-y pinch-zoom|});

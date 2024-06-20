@@ -35,10 +35,10 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       cookies: [],
     }
   ];
-  CssJs.unsafe({js|lineClamp|js}, {js|none|js});
-  CssJs.unsafe({js|lineClamp|js}, {js|1|js});
-  CssJs.unsafe({js|maxLines|js}, {js|none|js});
-  CssJs.unsafe({js|maxLines|js}, {js|1|js});
+  CssJs.unsafe({|lineClamp|}, {|none|});
+  CssJs.unsafe({|lineClamp|}, {|1|});
+  CssJs.unsafe({|maxLines|}, {|none|});
+  CssJs.unsafe({|maxLines|}, {|1|});
   CssJs.overflowX(`visible);
   CssJs.overflowX(`hidden);
   CssJs.overflowX(`clip);

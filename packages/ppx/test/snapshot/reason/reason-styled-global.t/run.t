@@ -7,7 +7,7 @@
         {js|html|js},
         [|
           CssJs.lineHeight(`abs(1.15)),
-          CssJs.unsafe({js|textSizeAdjust|js}, {js|100%|js}),
+          CssJs.unsafe({|textSizeAdjust|}, {|100%|}),
         |],
       ),
       CssJs.selector({js|body|js}, [|CssJs.margin(`zero)|]),
@@ -35,9 +35,9 @@
       CssJs.selector(
         {js|abbr[title]|js},
         [|
-          CssJs.unsafe({js|borderBottom|js}, {js|none|js}),
+          CssJs.unsafe("borderBottom", "none"),
           CssJs.textDecoration(`underline),
-          CssJs.unsafe({js|textDecoration|js}, {js|underline dotted|js}),
+          CssJs.unsafe({|textDecoration|}, {|underline dotted|}),
         |],
       ),
       CssJs.selector({js|b, strong|js}, [|CssJs.fontWeight(`bolder)|]),
@@ -54,7 +54,7 @@
         [|
           CssJs.fontSize(`percent(75.)),
           CssJs.lineHeight(`zero),
-          CssJs.unsafe({js|position|js}, {js|relative|js}),
+          CssJs.unsafe({|position|}, {|relative|}),
           CssJs.verticalAlign(`baseline),
         |],
       ),
@@ -64,7 +64,7 @@
       CssJs.selector(
         {js|button, input, optgroup, select, textarea|js},
         [|
-          CssJs.unsafe({js|font-family|js}, {js|inherit|js}),
+          CssJs.unsafe({|font-family|}, {|inherit|}),
           CssJs.fontSize(`percent(100.)),
           CssJs.lineHeight(`abs(1.15)),
           CssJs.margin(`zero),
@@ -74,7 +74,7 @@
       CssJs.selector({js|button, select|js}, [|CssJs.textTransform(`none)|]),
       CssJs.selector(
         {js|button, [type="button"], [type="reset"], [type="submit"]|js},
-        [|CssJs.unsafe({js|WebkitAppearance|js}, {js|button|js})|],
+        [|CssJs.unsafe({|WebkitAppearance|}, {|button|})|],
       ),
       CssJs.selector(
         {js|button::-moz-focus-inner, [type="button"]::-moz-focus-inner, [type="reset"]::-moz-focus-inner, [type="submit"]::-moz-focus-inner|js},
@@ -82,7 +82,7 @@
       ),
       CssJs.selector(
         {js|button:-moz-focusring, [type="button"]:-moz-focusring, [type="reset"]:-moz-focusring, [type="submit"]:-moz-focusring|js},
-        [|CssJs.unsafe({js|outline|js}, {js|1px dotted ButtonText|js})|],
+        [|CssJs.unsafe({|outline|}, {|1px dotted ButtonText|})|],
       ),
       CssJs.selector(
         {js|fieldset|js},
@@ -94,7 +94,7 @@
         {js|legend|js},
         [|
           CssJs.boxSizing(`borderBox),
-          CssJs.unsafe({js|color|js}, {js|inherit|js}),
+          CssJs.unsafe({|color|}, {|inherit|}),
           CssJs.display(`table),
           CssJs.maxWidth(`percent(100.)),
           CssJs.padding(`zero),
@@ -114,19 +114,19 @@
       CssJs.selector(
         {js|[type="search"]|js},
         [|
-          CssJs.unsafe({js|WebkitAppearance|js}, {js|textfield|js}),
+          CssJs.unsafe({|WebkitAppearance|}, {|textfield|}),
           CssJs.outlineOffset(`pxFloat(-2.)),
         |],
       ),
       CssJs.selector(
         {js|[type="search"]::-webkit-search-decoration|js},
-        [|CssJs.unsafe({js|WebkitAppearance|js}, {js|none|js})|],
+        [|CssJs.unsafe({|WebkitAppearance|}, {|none|})|],
       ),
       CssJs.selector(
         {js|::-webkit-file-upload-button|js},
         [|
-          CssJs.unsafe({js|WebkitAppearance|js}, {js|button|js}),
-          CssJs.unsafe({js|font|js}, {js|inherit|js}),
+          CssJs.unsafe({|WebkitAppearance|}, {|button|}),
+          CssJs.unsafe({|font|}, {|inherit|}),
         |],
       ),
       CssJs.selector({js|details|js}, [|CssJs.display(`block)|]),

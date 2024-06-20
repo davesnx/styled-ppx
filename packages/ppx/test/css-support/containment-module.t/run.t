@@ -35,12 +35,12 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       cookies: [],
     }
   ];
-  CssJs.unsafe({js|contain|js}, {js|none|js});
-  CssJs.unsafe({js|contain|js}, {js|strict|js});
-  CssJs.unsafe({js|contain|js}, {js|content|js});
-  CssJs.unsafe({js|contain|js}, {js|size|js});
-  CssJs.unsafe({js|contain|js}, {js|layout|js});
-  CssJs.unsafe({js|contain|js}, {js|paint|js});
-  CssJs.unsafe({js|contain|js}, {js|size layout|js});
-  CssJs.unsafe({js|contain|js}, {js|size paint|js});
-  CssJs.unsafe({js|contain|js}, {js|size layout paint|js});
+  CssJs.unsafe({|contain|}, {|none|});
+  CssJs.unsafe({|contain|}, {|strict|});
+  CssJs.unsafe({|contain|}, {|content|});
+  CssJs.unsafe({|contain|}, {|size|});
+  CssJs.unsafe({|contain|}, {|layout|});
+  CssJs.unsafe({|contain|}, {|paint|});
+  CssJs.unsafe({|contain|}, {|size layout|});
+  CssJs.unsafe({|contain|}, {|size paint|});
+  CssJs.unsafe({|contain|}, {|size layout paint|});

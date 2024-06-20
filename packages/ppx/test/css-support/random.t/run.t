@@ -33,8 +33,8 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       cookies: [],
     }
   ];
-  CssJs.unsafe({js|scrollBehavior|js}, {js|smooth|js});
-  CssJs.unsafe({js|overflowAnchor|js}, {js|none|js});
+  CssJs.unsafe({|scrollBehavior|}, {|smooth|});
+  CssJs.unsafe({|overflowAnchor|}, {|none|});
   CssJs.width(`calc(`add((`percent(50.), `pxFloat(4.)))));
   CssJs.width(`calc(`sub((`pxFloat(20.), `pxFloat(10.)))));
   CssJs.width(
@@ -63,21 +63,18 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       )),
     ),
   );
-  CssJs.unsafe({js|MozAppearance|js}, {js|textfield|js});
-  CssJs.unsafe({js|WebkitAppearance|js}, {js|none|js});
-  CssJs.unsafe({js|WebkitBoxOrient|js}, {js|vertical|js});
+  CssJs.unsafe({|MozAppearance|}, {|textfield|});
+  CssJs.unsafe({|WebkitAppearance|}, {|none|});
+  CssJs.unsafe({|WebkitBoxOrient|}, {|vertical|});
   module Color = {
     let text = CssJs.hex("444");
   };
   let colorTextString = Color.text |> CssJs.Color.toString;
-  CssJs.unsafe(
-    {js|WebkitBoxShadow|js},
-    {js|inset 0 0 0 1000px $(Color.background)|js},
-  );
-  CssJs.unsafe({js|WebkitLineClamp|js}, {js|2|js});
-  CssJs.unsafe({js|WebkitOverflowScrolling|js}, {js|touch|js});
-  CssJs.unsafe({js|WebkitTapHighlightColor|js}, {js|transparent|js});
-  CssJs.unsafe({js|WebkitTextFillColor|js}, colorTextString);
+  CssJs.unsafe({|WebkitBoxShadow|}, {|inset 0 0 0 1000px $(Color.background)|});
+  CssJs.unsafe({|WebkitLineClamp|}, {|2|});
+  CssJs.unsafe({|WebkitOverflowScrolling|}, {|touch|});
+  CssJs.unsafe({|WebkitTapHighlightColor|}, {|transparent|});
+  CssJs.unsafe({|WebkitTextFillColor|}, colorTextString);
   CssJs.animation(
     ~duration=?None,
     ~delay=?None,
@@ -86,19 +83,19 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
     ~fillMode=?Some(`none),
     ~playState=?None,
     ~iterationCount=?None,
-    {js|none|js},
+    {|none|},
   );
-  CssJs.unsafe({js|appearance|js}, {js|none|js});
-  CssJs.unsafe({js|aspectRatio|js}, {js|21 / 8|js});
+  CssJs.unsafe({|appearance|}, {|none|});
+  CssJs.unsafe({|aspectRatio|}, {|21 / 8|});
   let c = CssJs.hex("e15a46");
   (CssJs.backgroundColor(c): CssJs.rule);
-  CssJs.unsafe({js|border|js}, {js|none|js});
-  CssJs.unsafe({js|bottom|js}, {js|unset|js});
+  CssJs.unsafe("border", "none");
+  CssJs.unsafe({|bottom|}, {|unset|});
   CssJs.boxShadow(`none);
-  CssJs.unsafe({js|breakInside|js}, {js|avoid|js});
-  CssJs.unsafe({js|caretColor|js}, {js|#e15a46|js});
-  CssJs.unsafe({js|color|js}, {js|inherit|js});
-  CssJs.color(`var({js|--color-link|js}));
+  CssJs.unsafe({|breakInside|}, {|avoid|});
+  CssJs.unsafe({|caretColor|}, {|#e15a46|});
+  CssJs.unsafe({|color|}, {|inherit|});
+  CssJs.color(`var({|--color-link|}));
   CssJs.columnWidth(`pxFloat(125.));
   CssJs.columnWidth(`auto);
   CssJs.display(`webkitBox);
@@ -107,8 +104,8 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   (CssJs.SVG.fill(c): CssJs.rule);
   CssJs.SVG.fill(`currentColor);
   CssJs.gap(`pxFloat(4.));
-  CssJs.unsafe({js|grid-column|js}, {js|unset|js});
-  CssJs.unsafe({js|grid-row|js}, {js|unset|js});
+  CssJs.unsafe({|grid-column|}, {|unset|});
+  CssJs.unsafe({|grid-row|}, {|unset|});
   CssJs.gridTemplateColumns([|`maxContent, `maxContent|]);
   CssJs.gridTemplateColumns([|
     `minmax((`pxFloat(10.), `auto)),
@@ -122,27 +119,27 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   |]);
   CssJs.gridTemplateColumns([|`repeat((`num(2), [|`auto|]))|]);
   CssJs.gridTemplateColumns([|`repeat((`num(3), [|`auto|]))|]);
-  CssJs.unsafe({js|height|js}, {js|fit-content|js});
+  CssJs.unsafe({|height|}, {|fit-content|});
   CssJs.justifyItems(`start);
-  CssJs.unsafe({js|justify-self|js}, {js|unset|js});
-  CssJs.unsafe({js|left|js}, {js|unset|js});
+  CssJs.unsafe({|justify-self|}, {|unset|});
+  CssJs.unsafe({|left|}, {|unset|});
   let maskedImageUrl = `url("https://www.example.com/eye-uncrossed.svg");
   (CssJs.maskImage(maskedImageUrl): CssJs.rule);
-  CssJs.unsafe({js|maskPosition|js}, {js|center center|js});
-  CssJs.unsafe({js|maskRepeat|js}, {js|no-repeat|js});
+  CssJs.unsafe({|maskPosition|}, {|center center|});
+  CssJs.unsafe({|maskRepeat|}, {|no-repeat|});
   CssJs.maxWidth(`maxContent);
-  CssJs.unsafe({js|outline|js}, {js|none|js});
-  CssJs.unsafe({js|overflowAnchor|js}, {js|none|js});
-  CssJs.unsafe({js|position|js}, {js|unset|js});
-  CssJs.unsafe({js|resize|js}, {js|none|js});
+  CssJs.unsafe("outline", "none");
+  CssJs.unsafe({|overflowAnchor|}, {|none|});
+  CssJs.unsafe({|position|}, {|unset|});
+  CssJs.unsafe({|resize|}, {|none|});
   CssJs.right(`calc(`sub((`percent(50.), `pxFloat(4.)))));
-  CssJs.unsafe({js|scrollBehavior|js}, {js|smooth|js});
+  CssJs.unsafe({|scrollBehavior|}, {|smooth|});
   CssJs.SVG.strokeOpacity(`num(0.));
   (CssJs.SVG.stroke(Color.text): CssJs.rule);
   CssJs.top(`calc(`sub((`percent(50.), `pxFloat(1.)))));
-  CssJs.unsafe({js|top|js}, {js|unset|js});
-  CssJs.unsafe({js|touchAction|js}, {js|none|js});
-  CssJs.unsafe({js|touchAction|js}, {js|pan-x pan-y|js});
+  CssJs.unsafe({|top|}, {|unset|});
+  CssJs.unsafe({|touchAction|}, {|none|});
+  CssJs.unsafe({|touchAction|}, {|pan-x pan-y|});
   CssJs.transformOrigin2(`center, `left);
   CssJs.transformOrigin2(`center, `right);
   CssJs.transformOrigin(`pxFloat(2.));
@@ -150,7 +147,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.transformOrigin2(`cm(3.), `pxFloat(2.));
   CssJs.transformOrigin2(`pxFloat(2.), `left);
   CssJs.transform(`none);
-  CssJs.unsafe({js|width|js}, {js|fit-content|js});
+  CssJs.unsafe({|width|}, {|fit-content|});
   CssJs.width(`maxContent);
   CssJs.transitionDelay(`ms(240));
   CssJs.animationDuration(`ms(150));
@@ -171,9 +168,9 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       `linearGradient((
         Some(`deg(84.)),
         [|
-          (Some(`hex({js|F80|js})), Some(`percent(0.))),
+          (Some(`hex({|F80|})), Some(`percent(0.))),
           (Some(`rgba((255, 255, 255, `num(0.8)))), Some(`percent(50.))),
-          (Some(`hex({js|2A97FF|js})), Some(`percent(100.))),
+          (Some(`hex({|2A97FF|})), Some(`percent(100.))),
         |]: Css_AtomicTypes.Gradient.color_stop_list,
       )),
     ),

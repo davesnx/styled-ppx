@@ -35,10 +35,10 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       cookies: [],
     }
   ];
-  CssJs.transitionProperty({js|none|js});
-  CssJs.transitionProperty({js|all|js});
-  CssJs.transitionProperty({js|width|js});
-  CssJs.unsafe({js|transitionProperty|js}, {js|width, height|js});
+  CssJs.transitionProperty({|none|});
+  CssJs.transitionProperty({|all|});
+  CssJs.transitionProperty({|width|});
+  CssJs.unsafe({|transitionProperty|}, {|width, height|});
   CssJs.transitionDuration(`s(0));
   CssJs.transitionDuration(`s(1));
   CssJs.transitionDuration(`ms(100));
@@ -60,13 +60,13 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       ~duration=?Some(`s(2)),
       ~delay=?None,
       ~timingFunction=?None,
-      {js|margin-right|js},
+      {|margin-right|},
     ),
     CssJs.Transition.shorthand(
       ~duration=?Some(`ms(500)),
       ~delay=?None,
       ~timingFunction=?None,
-      {js|opacity|js},
+      {|opacity|},
     ),
   |]);
   CssJs.transitionList([|
@@ -74,7 +74,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       ~duration=?Some(`s(1)),
       ~delay=?Some(`s(2)),
       ~timingFunction=?Some(`linear),
-      {js|width|js},
+      {|width|},
     ),
   |]);
   CssJs.transitionList([|
@@ -82,7 +82,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       ~duration=?None,
       ~delay=?None,
       ~timingFunction=?None,
-      {js|none|js},
+      {|none|},
     ),
   |]);
   CssJs.transitionList([|
@@ -90,7 +90,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       ~duration=?None,
       ~delay=?None,
       ~timingFunction=?None,
-      {js|margin-right|js},
+      {|margin-right|},
     ),
   |]);
   CssJs.transitionList([|
@@ -98,7 +98,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       ~duration=?None,
       ~delay=?None,
       ~timingFunction=?Some(`easeIn),
-      {js|margin-right|js},
+      {|margin-right|},
     ),
   |]);
   CssJs.transitionList([|
@@ -106,7 +106,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       ~duration=?Some(`ms(500)),
       ~delay=?None,
       ~timingFunction=?None,
-      {js|all|js},
+      {|all|},
     ),
   |]);
   CssJs.transitionList([|
@@ -114,7 +114,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       ~duration=?Some(`ms(200)),
       ~delay=?Some(`ms(500)),
       ~timingFunction=?None,
-      {js|all|js},
+      {|all|},
     ),
   |]);
   CssJs.transitionList([|
@@ -122,7 +122,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       ~duration=?None,
       ~delay=?None,
       ~timingFunction=?Some(`linear),
-      {js|all|js},
+      {|all|},
     ),
   |]);
   CssJs.transitionList([|
@@ -130,7 +130,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       ~duration=?Some(`s(1)),
       ~delay=?Some(`ms(500)),
       ~timingFunction=?Some(`linear),
-      {js|margin-right|js},
+      {|margin-right|},
     ),
   |]);
   let transitions = [|
@@ -179,7 +179,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       ~duration,
       ~delay,
       ~timingFunction=`easeOut,
-      {js|margin-right|js},
+      {|margin-right|},
     ),
   |]);
   CssJs.transitionList([|
@@ -195,7 +195,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       ~duration=`ms(200),
       ~delay=`s(3),
       ~timingFunction,
-      {js|margin-right|js},
+      {|margin-right|},
     ),
   |]);
   CssJs.transitionList([|
@@ -203,7 +203,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       ~duration=`ms(200),
       ~delay,
       ~timingFunction=`easeOut,
-      {js|margin-right|js},
+      {|margin-right|},
     ),
   |]);
   CssJs.transitionList([|
@@ -220,7 +220,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
     CssJs.Transition.shorthand(
       ~duration,
       ~timingFunction=`easeIn,
-      {js|margin-right|js},
+      {|margin-right|},
     ),
   |]);
   CssJs.transitionList([|
@@ -230,7 +230,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
     CssJs.Transition.shorthand(
       ~duration=`ms(200),
       ~timingFunction,
-      {js|margin-right|js},
+      {|margin-right|},
     ),
   |]);
   CssJs.transitionList([|
@@ -244,19 +244,19 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
     CssJs.Transition.shorthand(
       ~duration,
       ~timingFunction=`easeIn,
-      {js|margin-right|js},
+      {|margin-right|},
     ),
   |]);
   CssJs.transitionList([|
     CssJs.Transition.shorthand(
       ~duration=`ms(200),
       ~timingFunction,
-      {js|margin-right|js},
+      {|margin-right|},
     ),
   |]);
   CssJs.transitionList([|
     CssJs.Transition.shorthand(~duration=`ms(200), property),
   |]);
   CssJs.transitionList([|
-    CssJs.Transition.shorthand(~duration, {js|margin-right|js}),
+    CssJs.Transition.shorthand(~duration, {|margin-right|}),
   |]);

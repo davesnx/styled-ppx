@@ -35,7 +35,7 @@ let string_to_const = (~loc, s) => {
   | _ =>
     Helper.Exp.constant(
       ~loc,
-      Helper.Const.string(~quotation_delimiter="js", s),
+      Helper.Const.string(~quotation_delimiter="", s),
     )
   };
 };

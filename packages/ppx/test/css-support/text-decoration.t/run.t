@@ -39,19 +39,19 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.textDecorationLine(`underline);
   CssJs.textDecorationLine(`overline);
   CssJs.textDecorationLine(`lineThrough);
-  CssJs.unsafe({js|textDecorationLine|js}, {js|underline overline|js});
+  CssJs.unsafe({|textDecorationLine|}, {|underline overline|});
   CssJs.textDecorationColor(CssJs.white);
   CssJs.textDecorationStyle(`solid);
   CssJs.textDecorationStyle(`double);
   CssJs.textDecorationStyle(`dotted);
   CssJs.textDecorationStyle(`dashed);
   CssJs.textDecorationStyle(`wavy);
-  CssJs.unsafe({js|textUnderlinePosition|js}, {js|auto|js});
-  CssJs.unsafe({js|textUnderlinePosition|js}, {js|under|js});
-  CssJs.unsafe({js|textUnderlinePosition|js}, {js|left|js});
-  CssJs.unsafe({js|textUnderlinePosition|js}, {js|right|js});
-  CssJs.unsafe({js|textUnderlinePosition|js}, {js|under left|js});
-  CssJs.unsafe({js|textUnderlinePosition|js}, {js|under right|js});
+  CssJs.unsafe({|textUnderlinePosition|}, {|auto|});
+  CssJs.unsafe({|textUnderlinePosition|}, {|under|});
+  CssJs.unsafe({|textUnderlinePosition|}, {|left|});
+  CssJs.unsafe({|textUnderlinePosition|}, {|right|});
+  CssJs.unsafe({|textUnderlinePosition|}, {|under left|});
+  CssJs.unsafe({|textUnderlinePosition|}, {|under right|});
   CssJs.textEmphasisStyle(`none);
   CssJs.textEmphasisStyle(`filled);
   CssJs.textEmphasisStyle(`open_);
@@ -61,9 +61,9 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.textEmphasisStyle(`triangle);
   CssJs.textEmphasisStyle(`sesame);
   CssJs.textEmphasisStyles(`open_, `dot);
-  CssJs.textEmphasisStyle(`string({js|foo|js}));
+  CssJs.textEmphasisStyle(`string({|foo|}));
   CssJs.textEmphasisColor(CssJs.green);
-  CssJs.unsafe({js|textEmphasis|js}, {js|open dot green|js});
+  CssJs.unsafe({|textEmphasis|}, {|open dot green|});
   CssJs.textEmphasisPosition(`over);
   CssJs.textEmphasisPosition(`under);
   CssJs.textEmphasisPositions(`over, `left);
@@ -80,41 +80,41 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       CssJs.black,
     ),
   );
-  CssJs.unsafe({js|textDecorationSkip|js}, {js|none|js});
-  CssJs.unsafe({js|textDecorationSkip|js}, {js|objects|js});
-  CssJs.unsafe({js|textDecorationSkip|js}, {js|objects spaces|js});
-  CssJs.unsafe({js|textDecorationSkip|js}, {js|objects leading-spaces|js});
-  CssJs.unsafe({js|textDecorationSkip|js}, {js|objects trailing-spaces|js});
+  CssJs.unsafe({|textDecorationSkip|}, {|none|});
+  CssJs.unsafe({|textDecorationSkip|}, {|objects|});
+  CssJs.unsafe({|textDecorationSkip|}, {|objects spaces|});
+  CssJs.unsafe({|textDecorationSkip|}, {|objects leading-spaces|});
+  CssJs.unsafe({|textDecorationSkip|}, {|objects trailing-spaces|});
   CssJs.unsafe(
-    {js|textDecorationSkip|js},
-    {js|objects leading-spaces trailing-spaces|js},
+    {|textDecorationSkip|},
+    {|objects leading-spaces trailing-spaces|},
   );
   CssJs.unsafe(
-    {js|textDecorationSkip|js},
-    {js|objects leading-spaces trailing-spaces edges|js},
+    {|textDecorationSkip|},
+    {|objects leading-spaces trailing-spaces edges|},
   );
   CssJs.unsafe(
-    {js|textDecorationSkip|js},
-    {js|objects leading-spaces trailing-spaces edges box-decoration|js},
+    {|textDecorationSkip|},
+    {|objects leading-spaces trailing-spaces edges box-decoration|},
   );
-  CssJs.unsafe({js|textDecorationSkip|js}, {js|objects edges|js});
-  CssJs.unsafe({js|textDecorationSkip|js}, {js|objects box-decoration|js});
-  CssJs.unsafe({js|textDecorationSkip|js}, {js|spaces|js});
-  CssJs.unsafe({js|textDecorationSkip|js}, {js|spaces edges|js});
-  CssJs.unsafe({js|textDecorationSkip|js}, {js|spaces edges box-decoration|js});
-  CssJs.unsafe({js|textDecorationSkip|js}, {js|spaces box-decoration|js});
-  CssJs.unsafe({js|textDecorationSkip|js}, {js|leading-spaces|js});
+  CssJs.unsafe({|textDecorationSkip|}, {|objects edges|});
+  CssJs.unsafe({|textDecorationSkip|}, {|objects box-decoration|});
+  CssJs.unsafe({|textDecorationSkip|}, {|spaces|});
+  CssJs.unsafe({|textDecorationSkip|}, {|spaces edges|});
+  CssJs.unsafe({|textDecorationSkip|}, {|spaces edges box-decoration|});
+  CssJs.unsafe({|textDecorationSkip|}, {|spaces box-decoration|});
+  CssJs.unsafe({|textDecorationSkip|}, {|leading-spaces|});
   CssJs.unsafe(
-    {js|textDecorationSkip|js},
-    {js|leading-spaces trailing-spaces edges|js},
+    {|textDecorationSkip|},
+    {|leading-spaces trailing-spaces edges|},
   );
   CssJs.unsafe(
-    {js|textDecorationSkip|js},
-    {js|leading-spaces trailing-spaces edges box-decoration|js},
+    {|textDecorationSkip|},
+    {|leading-spaces trailing-spaces edges box-decoration|},
   );
-  CssJs.unsafe({js|textDecorationSkip|js}, {js|edges|js});
-  CssJs.unsafe({js|textDecorationSkip|js}, {js|edges box-decoration|js});
-  CssJs.unsafe({js|textDecorationSkip|js}, {js|box-decoration|js});
+  CssJs.unsafe({|textDecorationSkip|}, {|edges|});
+  CssJs.unsafe({|textDecorationSkip|}, {|edges box-decoration|});
+  CssJs.unsafe({|textDecorationSkip|}, {|box-decoration|});
   CssJs.textDecorationSkipInk(`none);
   CssJs.textDecorationSkipInk(`auto);
   CssJs.textDecorationSkipInk(`all);
@@ -122,10 +122,10 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.textDecorationSkipBox(`all);
   CssJs.textDecorationSkipInset(`none);
   CssJs.textDecorationSkipInset(`auto);
-  CssJs.unsafe({js|textUnderlineOffset|js}, {js|auto|js});
-  CssJs.unsafe({js|textUnderlineOffset|js}, {js|3px|js});
-  CssJs.unsafe({js|textUnderlineOffset|js}, {js|10%|js});
+  CssJs.unsafe({|textUnderlineOffset|}, {|auto|});
+  CssJs.unsafe({|textUnderlineOffset|}, {|3px|});
+  CssJs.unsafe({|textUnderlineOffset|}, {|10%|});
   CssJs.textDecorationThickness(`auto);
-  CssJs.unsafe({js|textDecorationThickness|js}, {js|from-font|js});
+  CssJs.unsafe({|textDecorationThickness|}, {|from-font|});
   CssJs.textDecorationThickness(`pxFloat(3.));
   CssJs.textDecorationThickness(`percent(10.));

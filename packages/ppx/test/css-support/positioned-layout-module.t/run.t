@@ -35,4 +35,4 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       cookies: [],
     }
   ];
-  CssJs.unsafe({js|position|js}, {js|sticky|js});
+  CssJs.unsafe({|position|}, {|sticky|});

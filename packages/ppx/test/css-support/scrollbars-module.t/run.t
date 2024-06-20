@@ -35,11 +35,11 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       cookies: [],
     }
   ];
-  CssJs.unsafe({js|scrollbarColor|js}, {js|auto|js});
-  CssJs.unsafe({js|scrollbarColor|js}, {js|dark|js});
-  CssJs.unsafe({js|scrollbarColor|js}, {js|light|js});
-  CssJs.unsafe({js|scrollbarColor|js}, {js|red blue|js});
-  CssJs.unsafe({js|scrollbarWidth|js}, {js|auto|js});
-  CssJs.unsafe({js|scrollbarWidth|js}, {js|thin|js});
-  CssJs.unsafe({js|scrollbarWidth|js}, {js|none|js});
-  CssJs.unsafe({js|scrollbarWidth|js}, {js|12px|js});
+  CssJs.unsafe({|scrollbarColor|}, {|auto|});
+  CssJs.unsafe({|scrollbarColor|}, {|dark|});
+  CssJs.unsafe({|scrollbarColor|}, {|light|});
+  CssJs.unsafe({|scrollbarColor|}, {|red blue|});
+  CssJs.unsafe({|scrollbarWidth|}, {|auto|});
+  CssJs.unsafe({|scrollbarWidth|}, {|thin|});
+  CssJs.unsafe({|scrollbarWidth|}, {|none|});
+  CssJs.unsafe({|scrollbarWidth|}, {|12px|});

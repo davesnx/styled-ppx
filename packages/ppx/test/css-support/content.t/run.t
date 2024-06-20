@@ -35,7 +35,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       cookies: [],
     }
   ];
-  CssJs.unsafe({js|quotes|js}, {js|auto|js});
-  CssJs.unsafe({js|content|js}, {js|"\25BA" / ""|js});
-  CssJs.unsafe({js|content|js}, {js|""|js});
-  CssJs.unsafe({js|content|js}, {js|unset|js});
+  CssJs.unsafe({|quotes|}, {|auto|});
+  CssJs.unsafe({|content|}, {|"\25BA" / ""|});
+  CssJs.unsafe({|content|}, {|""|});
+  CssJs.unsafe({|content|}, {|unset|});

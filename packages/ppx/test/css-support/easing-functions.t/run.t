@@ -35,7 +35,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       cookies: [],
     }
   ];
-  CssJs.unsafe({js|transitionTimingFunction|js}, {js|steps(2, jump-start)|js});
-  CssJs.unsafe({js|transitionTimingFunction|js}, {js|steps(2, jump-end)|js});
-  CssJs.unsafe({js|transitionTimingFunction|js}, {js|steps(1, jump-both)|js});
-  CssJs.unsafe({js|transitionTimingFunction|js}, {js|steps(2, jump-none)|js});
+  CssJs.unsafe({|transitionTimingFunction|}, {|steps(2, jump-start)|});
+  CssJs.unsafe({|transitionTimingFunction|}, {|steps(2, jump-end)|});
+  CssJs.unsafe({|transitionTimingFunction|}, {|steps(1, jump-both)|});
+  CssJs.unsafe({|transitionTimingFunction|}, {|steps(2, jump-none)|});

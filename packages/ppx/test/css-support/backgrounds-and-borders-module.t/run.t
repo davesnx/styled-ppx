@@ -68,136 +68,133 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.backgroundOrigin(`borderBox);
   CssJs.backgroundOrigin(`paddingBox);
   CssJs.backgroundOrigin(`contentBox);
-  CssJs.unsafe({js|backgroundSize|js}, {js|auto|js});
+  CssJs.unsafe({|backgroundSize|}, {|auto|});
   CssJs.backgroundSize(`cover);
   CssJs.backgroundSize(`contain);
-  CssJs.unsafe({js|backgroundSize|js}, {js|10px|js});
-  CssJs.unsafe({js|backgroundSize|js}, {js|50%|js});
-  CssJs.unsafe({js|backgroundSize|js}, {js|10px auto|js});
-  CssJs.unsafe({js|backgroundSize|js}, {js|auto 10%|js});
+  CssJs.unsafe({|backgroundSize|}, {|10px|});
+  CssJs.unsafe({|backgroundSize|}, {|50%|});
+  CssJs.unsafe({|backgroundSize|}, {|10px auto|});
+  CssJs.unsafe({|backgroundSize|}, {|auto 10%|});
   CssJs.backgroundSize(`size((`em(50.), `percent(50.))));
-  CssJs.unsafe({js|background|js}, {js|top left / 50% 60%|js});
+  CssJs.unsafe({|background|}, {|top left / 50% 60%|});
   CssJs.backgroundOrigin(`borderBox);
   CssJs.backgroundColor(CssJs.blue);
   CssJs.backgroundColor(CssJs.red);
   CssJs.backgroundClip(`paddingBox);
   CssJs.unsafe(
-    {js|background|js},
-    {js|url(foo.png) bottom right / cover padding-box content-box|js},
+    {|background|},
+    {|url(foo.png) bottom right / cover padding-box content-box|},
   );
   CssJs.borderTopLeftRadius(`zero);
   CssJs.borderTopLeftRadius(`percent(50.));
-  CssJs.unsafe({js|borderTopLeftRadius|js}, {js|250px 100px|js});
+  CssJs.unsafe({|borderTopLeftRadius|}, {|250px 100px|});
   CssJs.borderTopRightRadius(`zero);
   CssJs.borderTopRightRadius(`percent(50.));
-  CssJs.unsafe({js|borderTopRightRadius|js}, {js|250px 100px|js});
+  CssJs.unsafe({|borderTopRightRadius|}, {|250px 100px|});
   CssJs.borderBottomRightRadius(`zero);
   CssJs.borderBottomRightRadius(`percent(50.));
-  CssJs.unsafe({js|borderBottomRightRadius|js}, {js|250px 100px|js});
+  CssJs.unsafe({|borderBottomRightRadius|}, {|250px 100px|});
   CssJs.borderBottomLeftRadius(`zero);
   CssJs.borderBottomLeftRadius(`percent(50.));
-  CssJs.unsafe({js|borderBottomLeftRadius|js}, {js|250px 100px|js});
+  CssJs.unsafe({|borderBottomLeftRadius|}, {|250px 100px|});
   CssJs.borderRadius(`pxFloat(10.));
   CssJs.borderRadius(`percent(50.));
   CssJs.borderImageSource(`none);
-  CssJs.borderImageSource(`url({js|foo.png|js}));
-  CssJs.unsafe({js|borderImageSlice|js}, {js|10|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|30%|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|10 10|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|30% 10|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|10 30%|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|30% 30%|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|10 10 10|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|30% 10 10|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|10 30% 10|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|30% 30% 10|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|10 10 30%|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|30% 10 30%|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|10 30% 30%|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|30% 30% 30%|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|10 10 10 10|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|30% 10 10 10|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|10 30% 10 10|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|30% 30% 10 10|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|10 10 30% 10|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|30% 10 30% 10|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|10 30% 30% 10|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|30% 30% 30% 10|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|10 10 10 30%|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|30% 10 10 30%|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|10 30% 10 30%|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|30% 30% 10 30%|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|10 10 30% 30%|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|30% 10 30% 30%|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|10 30% 30% 30%|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|30% 30% 30% 30%|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|fill 30%|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|fill 10|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|fill 2 4 8% 16%|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|30% fill|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|10 fill|js});
-  CssJs.unsafe({js|borderImageSlice|js}, {js|2 4 8% 16% fill|js});
-  CssJs.unsafe({js|borderImageWidth|js}, {js|10px|js});
-  CssJs.unsafe({js|borderImageWidth|js}, {js|5%|js});
-  CssJs.unsafe({js|borderImageWidth|js}, {js|28|js});
-  CssJs.unsafe({js|borderImageWidth|js}, {js|auto|js});
-  CssJs.unsafe({js|borderImageWidth|js}, {js|10px 10px|js});
-  CssJs.unsafe({js|borderImageWidth|js}, {js|5% 10px|js});
-  CssJs.unsafe({js|borderImageWidth|js}, {js|28 10px|js});
-  CssJs.unsafe({js|borderImageWidth|js}, {js|auto 10px|js});
-  CssJs.unsafe({js|borderImageWidth|js}, {js|10px 5%|js});
-  CssJs.unsafe({js|borderImageWidth|js}, {js|5% 5%|js});
-  CssJs.unsafe({js|borderImageWidth|js}, {js|28 5%|js});
-  CssJs.unsafe({js|borderImageWidth|js}, {js|auto 5%|js});
-  CssJs.unsafe({js|borderImageWidth|js}, {js|10px 28|js});
-  CssJs.unsafe({js|borderImageWidth|js}, {js|5% 28|js});
-  CssJs.unsafe({js|borderImageWidth|js}, {js|28 28|js});
-  CssJs.unsafe({js|borderImageWidth|js}, {js|auto 28|js});
-  CssJs.unsafe({js|borderImageWidth|js}, {js|10px auto|js});
-  CssJs.unsafe({js|borderImageWidth|js}, {js|5% auto|js});
-  CssJs.unsafe({js|borderImageWidth|js}, {js|28 auto|js});
-  CssJs.unsafe({js|borderImageWidth|js}, {js|auto auto|js});
-  CssJs.unsafe({js|borderImageWidth|js}, {js|10px 10% 10|js});
-  CssJs.unsafe({js|borderImageWidth|js}, {js|5% 10px 20 auto|js});
-  CssJs.unsafe({js|borderImageOutset|js}, {js|10px|js});
-  CssJs.unsafe({js|borderImageOutset|js}, {js|20|js});
-  CssJs.unsafe({js|borderImageOutset|js}, {js|10px 20|js});
-  CssJs.unsafe({js|borderImageOutset|js}, {js|10px 20px|js});
-  CssJs.unsafe({js|borderImageOutset|js}, {js|20 30|js});
-  CssJs.unsafe({js|borderImageOutset|js}, {js|2px 3px 4|js});
-  CssJs.unsafe({js|borderImageOutset|js}, {js|1 2px 3px 4|js});
-  CssJs.unsafe({js|borderImageRepeat|js}, {js|stretch|js});
-  CssJs.unsafe({js|borderImageRepeat|js}, {js|repeat|js});
-  CssJs.unsafe({js|borderImageRepeat|js}, {js|round|js});
-  CssJs.unsafe({js|borderImageRepeat|js}, {js|space|js});
-  CssJs.unsafe({js|borderImageRepeat|js}, {js|stretch stretch|js});
-  CssJs.unsafe({js|borderImageRepeat|js}, {js|repeat stretch|js});
-  CssJs.unsafe({js|borderImageRepeat|js}, {js|round stretch|js});
-  CssJs.unsafe({js|borderImageRepeat|js}, {js|space stretch|js});
-  CssJs.unsafe({js|borderImageRepeat|js}, {js|stretch repeat|js});
-  CssJs.unsafe({js|borderImageRepeat|js}, {js|repeat repeat|js});
-  CssJs.unsafe({js|borderImageRepeat|js}, {js|round repeat|js});
-  CssJs.unsafe({js|borderImageRepeat|js}, {js|space repeat|js});
-  CssJs.unsafe({js|borderImageRepeat|js}, {js|stretch round|js});
-  CssJs.unsafe({js|borderImageRepeat|js}, {js|repeat round|js});
-  CssJs.unsafe({js|borderImageRepeat|js}, {js|round round|js});
-  CssJs.unsafe({js|borderImageRepeat|js}, {js|space round|js});
-  CssJs.unsafe({js|borderImageRepeat|js}, {js|stretch space|js});
-  CssJs.unsafe({js|borderImageRepeat|js}, {js|repeat space|js});
-  CssJs.unsafe({js|borderImageRepeat|js}, {js|round space|js});
-  CssJs.unsafe({js|borderImageRepeat|js}, {js|space space|js});
-  CssJs.unsafe({js|borderImage|js}, {js|url(foo.png) 10|js});
-  CssJs.unsafe({js|borderImage|js}, {js|url(foo.png) 10%|js});
-  CssJs.unsafe({js|borderImage|js}, {js|url(foo.png) 10% fill|js});
-  CssJs.unsafe({js|borderImage|js}, {js|url(foo.png) 10 round|js});
-  CssJs.unsafe({js|borderImage|js}, {js|url(foo.png) 10 stretch repeat|js});
-  CssJs.unsafe({js|borderImage|js}, {js|url(foo.png) 10 / 10px|js});
-  CssJs.unsafe({js|borderImage|js}, {js|url(foo.png) 10 / 10% / 10px|js});
-  CssJs.unsafe({js|borderImage|js}, {js|url(foo.png) fill 10 / 10% / 10px|js});
-  CssJs.unsafe(
-    {js|borderImage|js},
-    {js|url(foo.png) fill 10 / 10% / 10px space|js},
-  );
+  CssJs.borderImageSource(`url({|foo.png|}));
+  CssJs.unsafe({|borderImageSlice|}, {|10|});
+  CssJs.unsafe({|borderImageSlice|}, {|30%|});
+  CssJs.unsafe({|borderImageSlice|}, {|10 10|});
+  CssJs.unsafe({|borderImageSlice|}, {|30% 10|});
+  CssJs.unsafe({|borderImageSlice|}, {|10 30%|});
+  CssJs.unsafe({|borderImageSlice|}, {|30% 30%|});
+  CssJs.unsafe({|borderImageSlice|}, {|10 10 10|});
+  CssJs.unsafe({|borderImageSlice|}, {|30% 10 10|});
+  CssJs.unsafe({|borderImageSlice|}, {|10 30% 10|});
+  CssJs.unsafe({|borderImageSlice|}, {|30% 30% 10|});
+  CssJs.unsafe({|borderImageSlice|}, {|10 10 30%|});
+  CssJs.unsafe({|borderImageSlice|}, {|30% 10 30%|});
+  CssJs.unsafe({|borderImageSlice|}, {|10 30% 30%|});
+  CssJs.unsafe({|borderImageSlice|}, {|30% 30% 30%|});
+  CssJs.unsafe({|borderImageSlice|}, {|10 10 10 10|});
+  CssJs.unsafe({|borderImageSlice|}, {|30% 10 10 10|});
+  CssJs.unsafe({|borderImageSlice|}, {|10 30% 10 10|});
+  CssJs.unsafe({|borderImageSlice|}, {|30% 30% 10 10|});
+  CssJs.unsafe({|borderImageSlice|}, {|10 10 30% 10|});
+  CssJs.unsafe({|borderImageSlice|}, {|30% 10 30% 10|});
+  CssJs.unsafe({|borderImageSlice|}, {|10 30% 30% 10|});
+  CssJs.unsafe({|borderImageSlice|}, {|30% 30% 30% 10|});
+  CssJs.unsafe({|borderImageSlice|}, {|10 10 10 30%|});
+  CssJs.unsafe({|borderImageSlice|}, {|30% 10 10 30%|});
+  CssJs.unsafe({|borderImageSlice|}, {|10 30% 10 30%|});
+  CssJs.unsafe({|borderImageSlice|}, {|30% 30% 10 30%|});
+  CssJs.unsafe({|borderImageSlice|}, {|10 10 30% 30%|});
+  CssJs.unsafe({|borderImageSlice|}, {|30% 10 30% 30%|});
+  CssJs.unsafe({|borderImageSlice|}, {|10 30% 30% 30%|});
+  CssJs.unsafe({|borderImageSlice|}, {|30% 30% 30% 30%|});
+  CssJs.unsafe({|borderImageSlice|}, {|fill 30%|});
+  CssJs.unsafe({|borderImageSlice|}, {|fill 10|});
+  CssJs.unsafe({|borderImageSlice|}, {|fill 2 4 8% 16%|});
+  CssJs.unsafe({|borderImageSlice|}, {|30% fill|});
+  CssJs.unsafe({|borderImageSlice|}, {|10 fill|});
+  CssJs.unsafe({|borderImageSlice|}, {|2 4 8% 16% fill|});
+  CssJs.unsafe({|borderImageWidth|}, {|10px|});
+  CssJs.unsafe({|borderImageWidth|}, {|5%|});
+  CssJs.unsafe({|borderImageWidth|}, {|28|});
+  CssJs.unsafe({|borderImageWidth|}, {|auto|});
+  CssJs.unsafe({|borderImageWidth|}, {|10px 10px|});
+  CssJs.unsafe({|borderImageWidth|}, {|5% 10px|});
+  CssJs.unsafe({|borderImageWidth|}, {|28 10px|});
+  CssJs.unsafe({|borderImageWidth|}, {|auto 10px|});
+  CssJs.unsafe({|borderImageWidth|}, {|10px 5%|});
+  CssJs.unsafe({|borderImageWidth|}, {|5% 5%|});
+  CssJs.unsafe({|borderImageWidth|}, {|28 5%|});
+  CssJs.unsafe({|borderImageWidth|}, {|auto 5%|});
+  CssJs.unsafe({|borderImageWidth|}, {|10px 28|});
+  CssJs.unsafe({|borderImageWidth|}, {|5% 28|});
+  CssJs.unsafe({|borderImageWidth|}, {|28 28|});
+  CssJs.unsafe({|borderImageWidth|}, {|auto 28|});
+  CssJs.unsafe({|borderImageWidth|}, {|10px auto|});
+  CssJs.unsafe({|borderImageWidth|}, {|5% auto|});
+  CssJs.unsafe({|borderImageWidth|}, {|28 auto|});
+  CssJs.unsafe({|borderImageWidth|}, {|auto auto|});
+  CssJs.unsafe({|borderImageWidth|}, {|10px 10% 10|});
+  CssJs.unsafe({|borderImageWidth|}, {|5% 10px 20 auto|});
+  CssJs.unsafe({|borderImageOutset|}, {|10px|});
+  CssJs.unsafe({|borderImageOutset|}, {|20|});
+  CssJs.unsafe({|borderImageOutset|}, {|10px 20|});
+  CssJs.unsafe({|borderImageOutset|}, {|10px 20px|});
+  CssJs.unsafe({|borderImageOutset|}, {|20 30|});
+  CssJs.unsafe({|borderImageOutset|}, {|2px 3px 4|});
+  CssJs.unsafe({|borderImageOutset|}, {|1 2px 3px 4|});
+  CssJs.unsafe({|borderImageRepeat|}, {|stretch|});
+  CssJs.unsafe({|borderImageRepeat|}, {|repeat|});
+  CssJs.unsafe({|borderImageRepeat|}, {|round|});
+  CssJs.unsafe({|borderImageRepeat|}, {|space|});
+  CssJs.unsafe({|borderImageRepeat|}, {|stretch stretch|});
+  CssJs.unsafe({|borderImageRepeat|}, {|repeat stretch|});
+  CssJs.unsafe({|borderImageRepeat|}, {|round stretch|});
+  CssJs.unsafe({|borderImageRepeat|}, {|space stretch|});
+  CssJs.unsafe({|borderImageRepeat|}, {|stretch repeat|});
+  CssJs.unsafe({|borderImageRepeat|}, {|repeat repeat|});
+  CssJs.unsafe({|borderImageRepeat|}, {|round repeat|});
+  CssJs.unsafe({|borderImageRepeat|}, {|space repeat|});
+  CssJs.unsafe({|borderImageRepeat|}, {|stretch round|});
+  CssJs.unsafe({|borderImageRepeat|}, {|repeat round|});
+  CssJs.unsafe({|borderImageRepeat|}, {|round round|});
+  CssJs.unsafe({|borderImageRepeat|}, {|space round|});
+  CssJs.unsafe({|borderImageRepeat|}, {|stretch space|});
+  CssJs.unsafe({|borderImageRepeat|}, {|repeat space|});
+  CssJs.unsafe({|borderImageRepeat|}, {|round space|});
+  CssJs.unsafe({|borderImageRepeat|}, {|space space|});
+  CssJs.unsafe({|borderImage|}, {|url(foo.png) 10|});
+  CssJs.unsafe({|borderImage|}, {|url(foo.png) 10%|});
+  CssJs.unsafe({|borderImage|}, {|url(foo.png) 10% fill|});
+  CssJs.unsafe({|borderImage|}, {|url(foo.png) 10 round|});
+  CssJs.unsafe({|borderImage|}, {|url(foo.png) 10 stretch repeat|});
+  CssJs.unsafe({|borderImage|}, {|url(foo.png) 10 / 10px|});
+  CssJs.unsafe({|borderImage|}, {|url(foo.png) 10 / 10% / 10px|});
+  CssJs.unsafe({|borderImage|}, {|url(foo.png) fill 10 / 10% / 10px|});
+  CssJs.unsafe({|borderImage|}, {|url(foo.png) fill 10 / 10% / 10px space|});
   CssJs.boxShadows([|
     CssJs.Shadow.box(
       ~x=`pxFloat(1.),
@@ -257,59 +254,56 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       Color.Shadow.elevation1,
     ),
   |]);
-  CssJs.unsafe({js|backgroundPositionX|js}, {js|right|js});
-  CssJs.unsafe({js|backgroundPositionX|js}, {js|center|js});
-  CssJs.unsafe({js|backgroundPositionX|js}, {js|50%|js});
-  CssJs.unsafe({js|backgroundPositionX|js}, {js|left, left|js});
-  CssJs.unsafe({js|backgroundPositionX|js}, {js|left, right|js});
-  CssJs.unsafe({js|backgroundPositionX|js}, {js|right, left|js});
-  CssJs.unsafe({js|backgroundPositionX|js}, {js|left, 0%|js});
-  CssJs.unsafe({js|backgroundPositionX|js}, {js|10%, 20%, 40%|js});
-  CssJs.unsafe({js|backgroundPositionX|js}, {js|0px|js});
-  CssJs.unsafe({js|backgroundPositionX|js}, {js|30px|js});
-  CssJs.unsafe({js|backgroundPositionX|js}, {js|0%, 10%, 20%, 30%|js});
-  CssJs.unsafe(
-    {js|backgroundPositionX|js},
-    {js|left, left, left, left, left|js},
-  );
-  CssJs.unsafe({js|backgroundPositionX|js}, {js|calc(20px)|js});
-  CssJs.unsafe({js|backgroundPositionX|js}, {js|calc(20px + 1em)|js});
-  CssJs.unsafe({js|backgroundPositionX|js}, {js|calc(20px / 2)|js});
-  CssJs.unsafe({js|backgroundPositionX|js}, {js|calc(20px + 50%)|js});
-  CssJs.unsafe({js|backgroundPositionX|js}, {js|calc(50% - 10px)|js});
-  CssJs.unsafe({js|backgroundPositionX|js}, {js|calc(-20px)|js});
-  CssJs.unsafe({js|backgroundPositionX|js}, {js|calc(-50%)|js});
-  CssJs.unsafe({js|backgroundPositionX|js}, {js|calc(-20%)|js});
-  CssJs.unsafe({js|backgroundPositionX|js}, {js|right 20px|js});
-  CssJs.unsafe({js|backgroundPositionX|js}, {js|left 20px|js});
-  CssJs.unsafe({js|backgroundPositionX|js}, {js|right -50px|js});
-  CssJs.unsafe({js|backgroundPositionX|js}, {js|left -50px|js});
-  CssJs.unsafe({js|backgroundPositionX|js}, {js|right 20px|js});
-  CssJs.unsafe({js|backgroundPositionY|js}, {js|bottom|js});
-  CssJs.unsafe({js|backgroundPositionY|js}, {js|center|js});
-  CssJs.unsafe({js|backgroundPositionY|js}, {js|50%|js});
-  CssJs.unsafe({js|backgroundPositionY|js}, {js|top, top|js});
-  CssJs.unsafe({js|backgroundPositionY|js}, {js|top, bottom|js});
-  CssJs.unsafe({js|backgroundPositionY|js}, {js|bottom, top|js});
-  CssJs.unsafe({js|backgroundPositionY|js}, {js|top, 0%|js});
-  CssJs.unsafe({js|backgroundPositionY|js}, {js|10%, 20%, 40%|js});
-  CssJs.unsafe({js|backgroundPositionY|js}, {js|0px|js});
-  CssJs.unsafe({js|backgroundPositionY|js}, {js|30px|js});
-  CssJs.unsafe({js|backgroundPositionY|js}, {js|0%, 10%, 20%, 30%|js});
-  CssJs.unsafe({js|backgroundPositionY|js}, {js|top, top, top, top, top|js});
-  CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(20px)|js});
-  CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(20px + 1em)|js});
-  CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(20px / 2)|js});
-  CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(20px + 50%)|js});
-  CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(50% - 10px)|js});
-  CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(-20px)|js});
-  CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(-50%)|js});
-  CssJs.unsafe({js|backgroundPositionY|js}, {js|calc(-20%)|js});
-  CssJs.unsafe({js|backgroundPositionY|js}, {js|bottom 20px|js});
-  CssJs.unsafe({js|backgroundPositionY|js}, {js|top 20px|js});
-  CssJs.unsafe({js|backgroundPositionY|js}, {js|bottom -50px|js});
-  CssJs.unsafe({js|backgroundPositionY|js}, {js|top -50px|js});
-  CssJs.unsafe({js|backgroundPositionY|js}, {js|bottom 20px|js});
+  CssJs.unsafe({|backgroundPositionX|}, {|right|});
+  CssJs.unsafe({|backgroundPositionX|}, {|center|});
+  CssJs.unsafe({|backgroundPositionX|}, {|50%|});
+  CssJs.unsafe({|backgroundPositionX|}, {|left, left|});
+  CssJs.unsafe({|backgroundPositionX|}, {|left, right|});
+  CssJs.unsafe({|backgroundPositionX|}, {|right, left|});
+  CssJs.unsafe({|backgroundPositionX|}, {|left, 0%|});
+  CssJs.unsafe({|backgroundPositionX|}, {|10%, 20%, 40%|});
+  CssJs.unsafe({|backgroundPositionX|}, {|0px|});
+  CssJs.unsafe({|backgroundPositionX|}, {|30px|});
+  CssJs.unsafe({|backgroundPositionX|}, {|0%, 10%, 20%, 30%|});
+  CssJs.unsafe({|backgroundPositionX|}, {|left, left, left, left, left|});
+  CssJs.unsafe({|backgroundPositionX|}, {|calc(20px)|});
+  CssJs.unsafe({|backgroundPositionX|}, {|calc(20px + 1em)|});
+  CssJs.unsafe({|backgroundPositionX|}, {|calc(20px / 2)|});
+  CssJs.unsafe({|backgroundPositionX|}, {|calc(20px + 50%)|});
+  CssJs.unsafe({|backgroundPositionX|}, {|calc(50% - 10px)|});
+  CssJs.unsafe({|backgroundPositionX|}, {|calc(-20px)|});
+  CssJs.unsafe({|backgroundPositionX|}, {|calc(-50%)|});
+  CssJs.unsafe({|backgroundPositionX|}, {|calc(-20%)|});
+  CssJs.unsafe({|backgroundPositionX|}, {|right 20px|});
+  CssJs.unsafe({|backgroundPositionX|}, {|left 20px|});
+  CssJs.unsafe({|backgroundPositionX|}, {|right -50px|});
+  CssJs.unsafe({|backgroundPositionX|}, {|left -50px|});
+  CssJs.unsafe({|backgroundPositionX|}, {|right 20px|});
+  CssJs.unsafe({|backgroundPositionY|}, {|bottom|});
+  CssJs.unsafe({|backgroundPositionY|}, {|center|});
+  CssJs.unsafe({|backgroundPositionY|}, {|50%|});
+  CssJs.unsafe({|backgroundPositionY|}, {|top, top|});
+  CssJs.unsafe({|backgroundPositionY|}, {|top, bottom|});
+  CssJs.unsafe({|backgroundPositionY|}, {|bottom, top|});
+  CssJs.unsafe({|backgroundPositionY|}, {|top, 0%|});
+  CssJs.unsafe({|backgroundPositionY|}, {|10%, 20%, 40%|});
+  CssJs.unsafe({|backgroundPositionY|}, {|0px|});
+  CssJs.unsafe({|backgroundPositionY|}, {|30px|});
+  CssJs.unsafe({|backgroundPositionY|}, {|0%, 10%, 20%, 30%|});
+  CssJs.unsafe({|backgroundPositionY|}, {|top, top, top, top, top|});
+  CssJs.unsafe({|backgroundPositionY|}, {|calc(20px)|});
+  CssJs.unsafe({|backgroundPositionY|}, {|calc(20px + 1em)|});
+  CssJs.unsafe({|backgroundPositionY|}, {|calc(20px / 2)|});
+  CssJs.unsafe({|backgroundPositionY|}, {|calc(20px + 50%)|});
+  CssJs.unsafe({|backgroundPositionY|}, {|calc(50% - 10px)|});
+  CssJs.unsafe({|backgroundPositionY|}, {|calc(-20px)|});
+  CssJs.unsafe({|backgroundPositionY|}, {|calc(-50%)|});
+  CssJs.unsafe({|backgroundPositionY|}, {|calc(-20%)|});
+  CssJs.unsafe({|backgroundPositionY|}, {|bottom 20px|});
+  CssJs.unsafe({|backgroundPositionY|}, {|top 20px|});
+  CssJs.unsafe({|backgroundPositionY|}, {|bottom -50px|});
+  CssJs.unsafe({|backgroundPositionY|}, {|top -50px|});
+  CssJs.unsafe({|backgroundPositionY|}, {|bottom 20px|});
   CssJs.backgroundImage(
     `linearGradient((
       Some(`deg(45.)),
@@ -373,7 +367,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       None,
       [|
         (Some(CssJs.white), None),
-        (Some(`hex({js|f06|js})), None),
+        (Some(`hex({|f06|})), None),
         (Some(CssJs.black), None),
       |]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
@@ -522,10 +516,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       |]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
   );
-  CssJs.unsafe(
-    {js|backgroundImage|js},
-    {js|radial-gradient(60% 60%, white, black)|js},
-  );
+  CssJs.unsafe({|backgroundImage|}, {|radial-gradient(60% 60%, white, black)|});
   CssJs.listStyleImage(
     `linearGradient((
       None,
@@ -567,7 +558,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       None,
       [|
         (Some(CssJs.white), None),
-        (Some(`hex({js|f06|js})), None),
+        (Some(`hex({|f06|})), None),
         (Some(CssJs.black), None),
       |]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
@@ -659,18 +650,15 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       |]: Css_AtomicTypes.Gradient.color_stop_list,
     )),
   );
-  CssJs.unsafe(
-    {js|listStyleImage|js},
-    {js|radial-gradient(60% 60%, white, black)|js},
-  );
+  CssJs.unsafe({|listStyleImage|}, {|radial-gradient(60% 60%, white, black)|});
   CssJs.imageRendering(`auto);
   CssJs.imageRendering(`smooth);
   CssJs.imageRendering(`highQuality);
   CssJs.imageRendering(`pixelated);
   CssJs.imageRendering(`crispEdges);
   CssJs.backgroundPosition(`bottom);
-  CssJs.unsafe({js|backgroundPositionX|js}, {js|50%|js});
-  CssJs.unsafe({js|backgroundPositionY|js}, {js|0|js});
+  CssJs.unsafe({|backgroundPositionX|}, {|50%|});
+  CssJs.unsafe({|backgroundPositionY|}, {|0|});
   CssJs.backgroundPosition2(`zero, `zero);
   CssJs.backgroundPosition2(`rem(1.), `zero);
   CssJs.objectPosition2(`center, `top);
@@ -678,19 +666,19 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.objectPosition2(`left, `center);
   CssJs.objectPosition2(`right, `center);
   CssJs.objectPosition2(`center, `center);
-  CssJs.unsafe({js|objectPosition|js}, {js|25% 75%|js});
+  CssJs.unsafe({|objectPosition|}, {|25% 75%|});
   CssJs.objectPosition2(`percent(25.), `center);
   CssJs.objectPosition2(`zero, `zero);
   CssJs.objectPosition2(`cm(1.), `cm(2.));
   CssJs.objectPosition2(`ch(10.), `em(8.));
-  CssJs.unsafe({js|objectPosition|js}, {js|bottom 10px right 20px|js});
-  CssJs.unsafe({js|objectPosition|js}, {js|right 3em bottom 10px|js});
-  CssJs.unsafe({js|objectPosition|js}, {js|top 0 right 10px|js});
-  CssJs.unsafe({js|object-position|js}, {js|inherit|js});
-  CssJs.unsafe({js|object-position|js}, {js|initial|js});
-  CssJs.unsafe({js|object-position|js}, {js|revert|js});
-  CssJs.unsafe({js|object-position|js}, {js|revert-layer|js});
-  CssJs.unsafe({js|object-position|js}, {js|unset|js});
+  CssJs.unsafe({|objectPosition|}, {|bottom 10px right 20px|});
+  CssJs.unsafe({|objectPosition|}, {|right 3em bottom 10px|});
+  CssJs.unsafe({|objectPosition|}, {|top 0 right 10px|});
+  CssJs.unsafe({|object-position|}, {|inherit|});
+  CssJs.unsafe({|object-position|}, {|initial|});
+  CssJs.unsafe({|object-position|}, {|revert|});
+  CssJs.unsafe({|object-position|}, {|revert-layer|});
+  CssJs.unsafe({|object-position|}, {|unset|});
   let _loadingKeyframes =
     CssJs.keyframes([|
       (0, [|CssJs.backgroundPosition2(`zero, `zero)|]),

@@ -35,7 +35,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       cookies: [],
     }
   ];
-  CssJs.unsafe({js|willChange|js}, {js|scroll-position|js});
-  CssJs.unsafe({js|willChange|js}, {js|contents|js});
-  CssJs.unsafe({js|willChange|js}, {js|transform|js});
-  CssJs.unsafe({js|willChange|js}, {js|top, left|js});
+  CssJs.unsafe({|willChange|}, {|scroll-position|});
+  CssJs.unsafe({|willChange|}, {|contents|});
+  CssJs.unsafe({|willChange|}, {|transform|});
+  CssJs.unsafe({|willChange|}, {|top, left|});

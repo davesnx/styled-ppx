@@ -36,8 +36,8 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   ];
   let color = CssJs.hex("333");
   CssJs.filter([|`none|]);
-  CssJs.filter([|`url({js|#id|js})|]);
-  CssJs.filter([|`url({js|image.svg#id|js})|]);
+  CssJs.filter([|`url({|#id|})|]);
+  CssJs.filter([|`url({|image.svg#id|})|]);
   CssJs.filter([|`blur(`pxFloat(5.))|]);
   CssJs.filter([|`brightness(`num(0.5))|]);
   CssJs.filter([|`contrast(`percent(150.))|]);
@@ -46,7 +46,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       `pxFloat(15.),
       `pxFloat(15.),
       `pxFloat(15.),
-      `hex({js|123|js}),
+      `hex({|123|}),
     )),
   |]);
   CssJs.filter([|`grayscale(`percent(50.))|]);
@@ -82,8 +82,8 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
     )),
   |]);
   CssJs.backdropFilter([|`none|]);
-  CssJs.backdropFilter([|`url({js|#id|js})|]);
-  CssJs.backdropFilter([|`url({js|image.svg#id|js})|]);
+  CssJs.backdropFilter([|`url({|#id|})|]);
+  CssJs.backdropFilter([|`url({|image.svg#id|})|]);
   CssJs.backdropFilter([|`blur(`pxFloat(5.))|]);
   CssJs.backdropFilter([|`brightness(`num(0.5))|]);
   CssJs.backdropFilter([|`contrast(`percent(150.))|]);

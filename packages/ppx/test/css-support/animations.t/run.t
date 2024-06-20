@@ -35,8 +35,8 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       cookies: [],
     }
   ];
-  CssJs.animationName({js|foo|js});
-  CssJs.unsafe({js|animationName|js}, {js|foo, bar|js});
+  CssJs.animationName({|foo|});
+  CssJs.unsafe({|animationName|}, {|foo, bar|});
   CssJs.animationDuration(`s(0));
   CssJs.animationDuration(`s(1));
   CssJs.animationDuration(`ms(100));
@@ -74,7 +74,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
     ~fillMode=?Some(`both),
     ~playState=?None,
     ~iterationCount=?Some(`infinite),
-    {js|foo|js},
+    {|foo|},
   );
   CssJs.animation(
     ~duration=?Some(`s(4)),
@@ -84,7 +84,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
     ~fillMode=?Some(`both),
     ~playState=?Some(`paused),
     ~iterationCount=?Some(`infinite),
-    {js|none|js},
+    {|none|},
   );
   CssJs.animation(
     ~duration=?Some(`ms(300)),
@@ -94,5 +94,5 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
     ~fillMode=?Some(`forwards),
     ~playState=?Some(`running),
     ~iterationCount=?Some(`infinite),
-    {js|a|js},
+    {|a|},
   );

@@ -35,7 +35,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       cookies: [],
     }
   ];
-  CssJs.unsafe({js|color|js}, {js|unset|js});
-  CssJs.unsafe({js|font-weight|js}, {js|unset|js});
-  CssJs.unsafe({js|background-image|js}, {js|unset|js});
-  CssJs.unsafe({js|width|js}, {js|unset|js});
+  CssJs.unsafe({|color|}, {|unset|});
+  CssJs.unsafe({|font-weight|}, {|unset|});
+  CssJs.unsafe({|background-image|}, {|unset|});
+  CssJs.unsafe({|width|}, {|unset|});

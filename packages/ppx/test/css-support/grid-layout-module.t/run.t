@@ -50,9 +50,9 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       `num(4),
       [|
         `pxFloat(10.),
-        `name({js|[col-start]|js}),
+        `name({|[col-start]|}),
         `pxFloat(250.),
-        `name({js|[col-end]|js}),
+        `name({|[col-end]|}),
       |],
     )),
     `pxFloat(10.),
@@ -67,36 +67,36 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
     `repeat((`autoFill, [|`minmax((`ch(25.), `fr(1.)))|])),
   |]);
   CssJs.gridTemplateColumns([|
-    `name({js|[col-end]|js}),
+    `name({|[col-end]|}),
     `pxFloat(10.),
-    `name({js|[col-start]|js}),
+    `name({|[col-start]|}),
     `pxFloat(250.),
   |]);
   CssJs.gridTemplateColumns([|
-    `name({js|[last]|js}),
-    `name({js|[first nav-start]|js}),
+    `name({|[last]|}),
+    `name({|[first nav-start]|}),
     `pxFloat(150.),
-    `name({js|[main-start]|js}),
+    `name({|[main-start]|}),
     `fr(1.),
   |]);
   CssJs.gridTemplateColumns([|
     `pxFloat(10.),
-    `name({js|[col-start]|js}),
+    `name({|[col-start]|}),
     `pxFloat(250.),
-    `name({js|[col-end]|js}),
+    `name({|[col-end]|}),
     `pxFloat(10.),
-    `name({js|[col-start]|js}),
+    `name({|[col-start]|}),
     `pxFloat(250.),
-    `name({js|[col-end]|js}),
+    `name({|[col-end]|}),
     `pxFloat(10.),
   |]);
   CssJs.gridTemplateColumns([|
-    `name({js|[a]|js}),
+    `name({|[a]|}),
     `auto,
-    `name({js|[b]|js}),
+    `name({|[b]|}),
     `minmax((`minContent, `fr(1.))),
-    `name({js|[b c d]|js}),
-    `repeat((`num(2), [|`name({js|[e]|js}), `pxFloat(40.)|])),
+    `name({|[b c d]|}),
+    `repeat((`num(2), [|`name({|[e]|}), `pxFloat(40.)|])),
     `repeat((`num(5), [|`auto|])),
   |]);
   CssJs.gridTemplateColumns([|
@@ -110,20 +110,20 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
     `percent(20.),
   |]);
   CssJs.gridTemplateColumns([|
-    `name({js|[linename1]|js}),
+    `name({|[linename1]|}),
     `pxFloat(100.),
-    `name({js|[linename2]|js}),
+    `name({|[linename2]|}),
     `repeat((
       `autoFit,
-      [|`name({js|[linename3 linename4]|js}), `pxFloat(300.)|],
+      [|`name({|[linename3 linename4]|}), `pxFloat(300.)|],
     )),
     `pxFloat(100.),
   |]);
   CssJs.gridTemplateColumns([|
-    `name({js|[linename1 linename2]|js}),
+    `name({|[linename1 linename2]|}),
     `pxFloat(100.),
-    `repeat((`autoFit, [|`name({js|[linename1]|js}), `pxFloat(300.)|])),
-    `name({js|[linename3]|js}),
+    `repeat((`autoFit, [|`name({|[linename1]|}), `pxFloat(300.)|])),
+    `name({|[linename3]|}),
   |]);
   let value = [|
     `repeat((
@@ -153,155 +153,144 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
     `minmax((`minContent, `fr(1.))),
   |]);
   CssJs.gridTemplateRows([|
-    `name({js|[row-end]|js}),
+    `name({|[row-end]|}),
     `pxFloat(10.),
-    `name({js|[row-start]|js}),
+    `name({|[row-start]|}),
     `pxFloat(250.),
   |]);
   CssJs.gridTemplateRows([|
-    `name({js|[last]|js}),
-    `name({js|[first header-start]|js}),
+    `name({|[last]|}),
+    `name({|[first header-start]|}),
     `pxFloat(50.),
-    `name({js|[main-start]|js}),
+    `name({|[main-start]|}),
     `fr(1.),
-    `name({js|[footer-start]|js}),
+    `name({|[footer-start]|}),
     `pxFloat(50.),
   |]);
-  CssJs.unsafe({js|gridTemplateAreas|js}, {js|none|js});
-  CssJs.unsafe({js|gridTemplateAreas|js}, {js|'articles'|js});
-  CssJs.unsafe({js|gridTemplateAreas|js}, {js|'head head'|js});
+  CssJs.unsafe({|gridTemplateAreas|}, {|none|});
+  CssJs.unsafe({|gridTemplateAreas|}, {|'articles'|});
+  CssJs.unsafe({|gridTemplateAreas|}, {|'head head'|});
+  CssJs.unsafe({|gridTemplateAreas|}, {|'head head' 'nav main' 'foot ....'|});
+  CssJs.unsafe({|gridTemplate|}, {|none|});
+  CssJs.unsafe({|gridTemplate|}, {|auto 1fr auto / auto 1fr|});
   CssJs.unsafe(
-    {js|gridTemplateAreas|js},
-    {js|'head head' 'nav main' 'foot ....'|js},
+    {|gridTemplate|},
+    {|[header-top] 'a   a   a' [header-bottom] [main-top] 'b   b   b' 1fr [main-bottom] / auto 1fr auto|},
   );
-  CssJs.unsafe({js|gridTemplate|js}, {js|none|js});
-  CssJs.unsafe({js|gridTemplate|js}, {js|auto 1fr auto / auto 1fr|js});
+  CssJs.unsafe({|gridAutoColumns|}, {|auto|});
+  CssJs.unsafe({|gridAutoColumns|}, {|1fr|});
+  CssJs.unsafe({|gridAutoColumns|}, {|100px|});
+  CssJs.unsafe({|gridAutoColumns|}, {|max-content|});
+  CssJs.unsafe({|gridAutoColumns|}, {|minmax(min-content, 1fr)|});
+  CssJs.unsafe({|gridAutoColumns|}, {|min-content max-content auto|});
+  CssJs.unsafe({|gridAutoColumns|}, {|100px 150px 390px|});
   CssJs.unsafe(
-    {js|gridTemplate|js},
-    {js|[header-top] 'a   a   a' [header-bottom] [main-top] 'b   b   b' 1fr [main-bottom] / auto 1fr auto|js},
+    {|gridAutoColumns|},
+    {|100px minmax(100px, auto) 10% 0.5fr fit-content(400px)|},
   );
-  CssJs.unsafe({js|gridAutoColumns|js}, {js|auto|js});
-  CssJs.unsafe({js|gridAutoColumns|js}, {js|1fr|js});
-  CssJs.unsafe({js|gridAutoColumns|js}, {js|100px|js});
-  CssJs.unsafe({js|gridAutoColumns|js}, {js|max-content|js});
-  CssJs.unsafe({js|gridAutoColumns|js}, {js|minmax(min-content, 1fr)|js});
-  CssJs.unsafe({js|gridAutoColumns|js}, {js|min-content max-content auto|js});
-  CssJs.unsafe({js|gridAutoColumns|js}, {js|100px 150px 390px|js});
+  CssJs.unsafe({|gridAutoRows|}, {|auto|});
+  CssJs.unsafe({|gridAutoRows|}, {|1fr|});
+  CssJs.unsafe({|gridAutoRows|}, {|100px|});
+  CssJs.unsafe({|gridAutoRows|}, {|100px 30%|});
+  CssJs.unsafe({|gridAutoRows|}, {|100px 30% 1em|});
+  CssJs.unsafe({|gridAutoRows|}, {|min-content|});
+  CssJs.unsafe({|gridAutoRows|}, {|minmax(min-content, 1fr)|});
+  CssJs.unsafe({|gridAutoRows|}, {|min-content max-content auto|});
   CssJs.unsafe(
-    {js|gridAutoColumns|js},
-    {js|100px minmax(100px, auto) 10% 0.5fr fit-content(400px)|js},
+    {|gridAutoRows|},
+    {|100px minmax(100px, auto) 10% 0.5fr fit-content(400px)|},
   );
-  CssJs.unsafe({js|gridAutoRows|js}, {js|auto|js});
-  CssJs.unsafe({js|gridAutoRows|js}, {js|1fr|js});
-  CssJs.unsafe({js|gridAutoRows|js}, {js|100px|js});
-  CssJs.unsafe({js|gridAutoRows|js}, {js|100px 30%|js});
-  CssJs.unsafe({js|gridAutoRows|js}, {js|100px 30% 1em|js});
-  CssJs.unsafe({js|gridAutoRows|js}, {js|min-content|js});
-  CssJs.unsafe({js|gridAutoRows|js}, {js|minmax(min-content, 1fr)|js});
-  CssJs.unsafe({js|gridAutoRows|js}, {js|min-content max-content auto|js});
-  CssJs.unsafe(
-    {js|gridAutoRows|js},
-    {js|100px minmax(100px, auto) 10% 0.5fr fit-content(400px)|js},
-  );
-  CssJs.unsafe({js|gridAutoFlow|js}, {js|row|js});
-  CssJs.unsafe({js|gridAutoFlow|js}, {js|column|js});
-  CssJs.unsafe({js|gridAutoFlow|js}, {js|row dense|js});
-  CssJs.unsafe({js|gridAutoFlow|js}, {js|column dense|js});
-  CssJs.unsafe({js|gridRowStart|js}, {js|auto|js});
-  CssJs.unsafe({js|gridRowStart|js}, {js|4|js});
-  CssJs.unsafe({js|gridRowStart|js}, {js|C|js});
-  CssJs.unsafe({js|gridRowStart|js}, {js|C 2|js});
-  CssJs.unsafe({js|gridColumnStart|js}, {js|auto|js});
-  CssJs.unsafe({js|gridColumnStart|js}, {js|4|js});
-  CssJs.unsafe({js|gridColumnStart|js}, {js|C|js});
-  CssJs.unsafe({js|gridColumnStart|js}, {js|C 2|js});
-  CssJs.unsafe({js|gridRowEnd|js}, {js|auto|js});
-  CssJs.unsafe({js|gridRowEnd|js}, {js|4|js});
-  CssJs.unsafe({js|gridRowEnd|js}, {js|C|js});
-  CssJs.unsafe({js|gridRowEnd|js}, {js|C 2|js});
-  CssJs.unsafe({js|gridColumnEnd|js}, {js|auto|js});
-  CssJs.unsafe({js|gridColumnEnd|js}, {js|4|js});
-  CssJs.unsafe({js|gridColumnEnd|js}, {js|C|js});
-  CssJs.unsafe({js|gridColumnEnd|js}, {js|C 2|js});
-  CssJs.unsafe({js|gridColumn|js}, {js|auto|js});
-  CssJs.unsafe({js|gridColumn|js}, {js|1|js});
-  CssJs.unsafe({js|gridColumn|js}, {js|-1|js});
-  CssJs.unsafe({js|gridRow|js}, {js|auto|js});
-  CssJs.unsafe({js|gridRow|js}, {js|1|js});
-  CssJs.unsafe({js|gridRow|js}, {js|-1|js});
+  CssJs.unsafe({|gridAutoFlow|}, {|row|});
+  CssJs.unsafe({|gridAutoFlow|}, {|column|});
+  CssJs.unsafe({|gridAutoFlow|}, {|row dense|});
+  CssJs.unsafe({|gridAutoFlow|}, {|column dense|});
+  CssJs.unsafe({|gridRowStart|}, {|auto|});
+  CssJs.unsafe({|gridRowStart|}, {|4|});
+  CssJs.unsafe({|gridRowStart|}, {|C|});
+  CssJs.unsafe({|gridRowStart|}, {|C 2|});
+  CssJs.unsafe({|gridColumnStart|}, {|auto|});
+  CssJs.unsafe({|gridColumnStart|}, {|4|});
+  CssJs.unsafe({|gridColumnStart|}, {|C|});
+  CssJs.unsafe({|gridColumnStart|}, {|C 2|});
+  CssJs.unsafe({|gridRowEnd|}, {|auto|});
+  CssJs.unsafe({|gridRowEnd|}, {|4|});
+  CssJs.unsafe({|gridRowEnd|}, {|C|});
+  CssJs.unsafe({|gridRowEnd|}, {|C 2|});
+  CssJs.unsafe({|gridColumnEnd|}, {|auto|});
+  CssJs.unsafe({|gridColumnEnd|}, {|4|});
+  CssJs.unsafe({|gridColumnEnd|}, {|C|});
+  CssJs.unsafe({|gridColumnEnd|}, {|C 2|});
+  CssJs.unsafe({|gridColumn|}, {|auto|});
+  CssJs.unsafe({|gridColumn|}, {|1|});
+  CssJs.unsafe({|gridColumn|}, {|-1|});
+  CssJs.unsafe({|gridRow|}, {|auto|});
+  CssJs.unsafe({|gridRow|}, {|1|});
+  CssJs.unsafe({|gridRow|}, {|-1|});
   CssJs.gridColumnGap(`zero);
   CssJs.gridColumnGap(`em(1.));
   CssJs.gridRowGap(`zero);
   CssJs.gridRowGap(`em(1.));
-  CssJs.unsafe({js|gridGap|js}, {js|0 0|js});
-  CssJs.unsafe({js|gridGap|js}, {js|0 1em|js});
+  CssJs.unsafe({|gridGap|}, {|0 0|});
+  CssJs.unsafe({|gridGap|}, {|0 1em|});
   CssJs.gridGap(`em(1.));
-  CssJs.unsafe({js|gridGap|js}, {js|1em 1em|js});
+  CssJs.unsafe({|gridGap|}, {|1em 1em|});
   CssJs.gridTemplateColumns([|`subgrid|]);
-  CssJs.gridTemplateColumns([|`subgrid, `name({js|[sub-a]|js})|]);
+  CssJs.gridTemplateColumns([|`subgrid, `name({|[sub-a]|})|]);
   CssJs.gridTemplateColumns([|
     `subgrid,
-    `name({js|[sub-a]|js}),
-    `name({js|[sub-b]|js}),
+    `name({|[sub-a]|}),
+    `name({|[sub-b]|}),
   |]);
   CssJs.gridTemplateColumns([|
     `subgrid,
-    `repeat((`num(1), [|`name({js|[sub-a]|js})|])),
+    `repeat((`num(1), [|`name({|[sub-a]|})|])),
   |]);
   CssJs.gridTemplateColumns([|
     `subgrid,
-    `repeat((`num(2), [|`name({js|[sub-a]|js}), `name({js|[sub-b]|js})|])),
-    `name({js|[sub-c]|js}),
+    `repeat((`num(2), [|`name({|[sub-a]|}), `name({|[sub-b]|})|])),
+    `name({|[sub-c]|}),
   |]);
   CssJs.gridTemplateColumns([|
     `subgrid,
-    `repeat((`autoFill, [|`name({js|[sub-a]|js}), `name({js|[sub-b]|js})|])),
+    `repeat((`autoFill, [|`name({|[sub-a]|}), `name({|[sub-b]|})|])),
   |]);
   CssJs.gridTemplateColumns([|
     `subgrid,
-    `name({js|[sub-a]|js}),
+    `name({|[sub-a]|}),
     `repeat((
       `autoFill,
-      [|
-        `name({js|[sub-b]|js}),
-        `name({js|[sub-c]|js}),
-        `name({js|[sub-d]|js}),
-      |],
+      [|`name({|[sub-b]|}), `name({|[sub-c]|}), `name({|[sub-d]|})|],
     )),
-    `name({js|[sub-e]|js}),
-    `repeat((`num(1), [|`name({js|[sub-g]|js})|])),
+    `name({|[sub-e]|}),
+    `repeat((`num(1), [|`name({|[sub-g]|})|])),
   |]);
   CssJs.gridTemplateRows([|`subgrid|]);
-  CssJs.gridTemplateRows([|`subgrid, `name({js|[sub-a]|js})|]);
+  CssJs.gridTemplateRows([|`subgrid, `name({|[sub-a]|})|]);
   CssJs.gridTemplateRows([|
     `subgrid,
-    `name({js|[sub-a]|js}),
-    `name({js|[sub-b]|js}),
+    `name({|[sub-a]|}),
+    `name({|[sub-b]|}),
   |]);
   CssJs.gridTemplateRows([|
     `subgrid,
-    `repeat((`num(1), [|`name({js|[sub-a]|js})|])),
+    `repeat((`num(1), [|`name({|[sub-a]|})|])),
   |]);
   CssJs.gridTemplateRows([|
     `subgrid,
-    `repeat((`num(2), [|`name({js|[sub-a]|js}), `name({js|[sub-b]|js})|])),
-    `name({js|[sub-c]|js}),
+    `repeat((`num(2), [|`name({|[sub-a]|}), `name({|[sub-b]|})|])),
+    `name({|[sub-c]|}),
   |]);
   CssJs.gridTemplateRows([|
     `subgrid,
-    `repeat((`autoFill, [|`name({js|[sub-a]|js}), `name({js|[sub-b]|js})|])),
+    `repeat((`autoFill, [|`name({|[sub-a]|}), `name({|[sub-b]|})|])),
   |]);
   CssJs.gridTemplateRows([|
     `subgrid,
-    `name({js|[sub-a]|js}),
+    `name({|[sub-a]|}),
     `repeat((
       `autoFill,
-      [|
-        `name({js|[sub-b]|js}),
-        `name({js|[sub-c]|js}),
-        `name({js|[sub-d]|js}),
-      |],
+      [|`name({|[sub-b]|}), `name({|[sub-c]|}), `name({|[sub-d]|})|],
     )),
-    `name({js|[sub-e]|js}),
-    `repeat((`num(1), [|`name({js|[sub-g]|js})|])),
+    `name({|[sub-e]|}),
+    `repeat((`num(1), [|`name({|[sub-g]|})|])),
   |]);

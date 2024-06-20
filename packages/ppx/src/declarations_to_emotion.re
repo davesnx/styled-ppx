@@ -138,7 +138,7 @@ let render_string = (~loc, s) => {
   | Some(ReScript) =>
     Builder.pexp_constant(~loc, Pconst_string(s, loc, Some("*j")))
   | Some(Reason)
-  | _ => Builder.pexp_constant(~loc, Pconst_string(s, loc, Some("js")))
+  | _ => Builder.pexp_constant(~loc, Pconst_string(s, loc, Some("")))
   };
 };
 let render_integer = (~loc, integer) => {
@@ -1946,17 +1946,17 @@ let direction_to_border = (~loc) =>
 
 let direction_to_fn_name = (~loc) =>
   fun
-  | All => [%expr {js|border|js}]
-  | Left => [%expr {js|borderLeft|js}]
-  | Bottom => [%expr {js|borderBottom|js}]
-  | Right => [%expr {js|borderRight|js}]
-  | Top => [%expr {js|borderTop|js}];
+  | All => [%expr "border"]
+  | Left => [%expr "borderLeft"]
+  | Bottom => [%expr "borderBottom"]
+  | Right => [%expr "borderRight"]
+  | Top => [%expr "borderTop"];
 
 let render_border = (~loc, ~direction: borderDirection, border) => {
   switch (border) {
   | `None =>
     let borderFn = direction_to_fn_name(~loc, direction);
-    [[%expr CssJs.unsafe([%e borderFn], {js|none|js})]];
+    [[%expr CssJs.unsafe([%e borderFn], "none")]];
   | `Xor(`Interpolation(name)) =>
     let borderFn = direction_to_border(~loc, direction);
     [[%expr [%e borderFn]([%e render_variable(~loc, name)])]];
@@ -1986,7 +1986,7 @@ let render_outline_style_interp = (~loc) =>
 
 let render_outline = (~loc) =>
   fun
-  | `None => [[%expr CssJs.unsafe({js|outline|js}, {js|none|js})]]
+  | `None => [[%expr CssJs.unsafe("outline", "none")]]
   | `Property_outline_width(`Interpolation(name)) => [
       [%expr CssJs.outline([%e render_variable(~loc, name)])],
     ]
@@ -2474,7 +2474,7 @@ let font_variant_east_asian =
 let font_variant =
   polymorphic(Parser.property_font_variant, (~loc) =>
     fun
-    | `None => [[%expr CssJs.unsafe({|fontVariant|}, {|none|})]]
+    | `None => [[%expr CssJs.unsafe("fontVariant", "none")]]
     | `Normal => [[%expr CssJs.fontVariant(`normal)]]
     | `Small_caps => [[%expr CssJs.fontVariant(`smallCaps)]]
     | _ => raise(Unsupported_feature)

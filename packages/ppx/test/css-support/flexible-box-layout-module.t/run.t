@@ -85,7 +85,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.justifyContent(`flexEnd);
   CssJs.justifyContent(`spaceBetween);
   CssJs.justifyContent(`spaceAround);
-  CssJs.unsafe({js|minHeight|js}, {js|auto|js});
-  CssJs.unsafe({js|minWidth|js}, {js|auto|js});
+  CssJs.unsafe({|minHeight|}, {|auto|});
+  CssJs.unsafe({|minWidth|}, {|auto|});
   CssJs.order(0);
   CssJs.order(1);

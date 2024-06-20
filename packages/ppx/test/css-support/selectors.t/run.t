@@ -36,7 +36,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   let _chart =
     CssJs.style([|
       CssJs.label("_chart"),
-      CssJs.unsafe({js|userSelect|js}, {js|none|js}),
+      CssJs.unsafe({|userSelect|}, {|none|}),
       CssJs.selector(
         {js|.recharts-cartesian-grid-horizontal|js},
         [|

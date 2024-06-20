@@ -36,7 +36,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
     }
   ];
   CssJs.flexBasis(`auto);
-  CssJs.unsafe({js|flex|js}, {js|initial|js});
+  CssJs.unsafe({|flex|}, {|initial|});
   CssJs.flex1(`none);
   CssJs.flex1(`num(2.));
   CssJs.flexBasis(`em(10.));

@@ -495,8 +495,8 @@
         CssJs.style
           [|(CssJs.label "ArrayDynamicComponent");(CssJs.display `block);((
             match var with
-            | `Black -> CssJs.color (`hex {js|999999|js})
-            | `White -> CssJs.color (`hex {js|FAFAFA|js})))|]
+            | `Black -> CssJs.color (`hex {|999999|})
+            | `White -> CssJs.color (`hex {|FAFAFA|})))|]
       let make (props : 'var makeProps) =
         let className =
           (styles ~var:(varGet props) ()) ^ (getOrEmpty (classNameGet props)) in

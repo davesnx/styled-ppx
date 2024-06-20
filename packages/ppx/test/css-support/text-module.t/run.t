@@ -35,8 +35,8 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       cookies: [],
     }
   ];
-  CssJs.unsafe({js|textTransform|js}, {js|full-width|js});
-  CssJs.unsafe({js|textTransform|js}, {js|full-size-kana|js});
+  CssJs.unsafe({|textTransform|}, {|full-width|});
+  CssJs.unsafe({|textTransform|}, {|full-size-kana|});
   CssJs.tabSize(`num(4.));
   CssJs.tabSize(`em(1.));
   CssJs.lineBreak(`auto);
@@ -52,10 +52,10 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.hyphens(`manual);
   CssJs.hyphens(`none);
   CssJs.overflowWrap(`normal);
-  CssJs.unsafe({js|overflowWrap|js}, {js|break-word|js});
+  CssJs.unsafe({|overflowWrap|}, {|break-word|});
   CssJs.overflowWrap(`anywhere);
   CssJs.wordWrap(`normal);
-  CssJs.unsafe({js|wordWrap|js}, {js|break-word|js});
+  CssJs.unsafe({|wordWrap|}, {|break-word|});
   CssJs.wordWrap(`anywhere);
   CssJs.textAlign(`start);
   CssJs.textAlign(`end_);
@@ -85,15 +85,15 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.textJustify(`interWord);
   CssJs.textJustify(`interCharacter);
   CssJs.wordSpacing(`percent(50.));
-  CssJs.unsafe({js|textIndent|js}, {js|1em hanging|js});
-  CssJs.unsafe({js|textIndent|js}, {js|1em each-line|js});
-  CssJs.unsafe({js|textIndent|js}, {js|1em hanging each-line|js});
-  CssJs.unsafe({js|hangingPunctuation|js}, {js|none|js});
-  CssJs.unsafe({js|hangingPunctuation|js}, {js|first|js});
-  CssJs.unsafe({js|hangingPunctuation|js}, {js|last|js});
-  CssJs.unsafe({js|hangingPunctuation|js}, {js|force-end|js});
-  CssJs.unsafe({js|hangingPunctuation|js}, {js|allow-end|js});
-  CssJs.unsafe({js|hangingPunctuation|js}, {js|first last|js});
-  CssJs.unsafe({js|hangingPunctuation|js}, {js|first force-end|js});
-  CssJs.unsafe({js|hangingPunctuation|js}, {js|first force-end last|js});
-  CssJs.unsafe({js|hangingPunctuation|js}, {js|first allow-end last|js});
+  CssJs.unsafe({|textIndent|}, {|1em hanging|});
+  CssJs.unsafe({|textIndent|}, {|1em each-line|});
+  CssJs.unsafe({|textIndent|}, {|1em hanging each-line|});
+  CssJs.unsafe({|hangingPunctuation|}, {|none|});
+  CssJs.unsafe({|hangingPunctuation|}, {|first|});
+  CssJs.unsafe({|hangingPunctuation|}, {|last|});
+  CssJs.unsafe({|hangingPunctuation|}, {|force-end|});
+  CssJs.unsafe({|hangingPunctuation|}, {|allow-end|});
+  CssJs.unsafe({|hangingPunctuation|}, {|first last|});
+  CssJs.unsafe({|hangingPunctuation|}, {|first force-end|});
+  CssJs.unsafe({|hangingPunctuation|}, {|first force-end last|});
+  CssJs.unsafe({|hangingPunctuation|}, {|first allow-end last|});
