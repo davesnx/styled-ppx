@@ -106,25 +106,40 @@ let render_length =
   fun
   | `Cap(n) => render_number(n, "cap")
   | `Ch(n) => render_number(n, "cm")
-  | `Cm(n) => render_number(n, "cm")
   | `Em(n) => render_number(n, "em")
   | `Ex(n) => render_number(n, "ex")
   | `Ic(n) => render_number(n, "ic")
-  | `In(n) => render_number(n, "in")
   | `Lh(n) => render_number(n, "lh")
-  | `Mm(n) => render_number(n, "mm")
-  | `Pc(n) => render_number(n, "pc")
-  | `Pt(n) => render_number(n, "pt")
-  | `Px(n) => render_number(n, "px")
-  | `Q(n) => render_number(n, "q")
+
+  | `Rcap(n) => render_number(n, "rcap")
+  | `Rch(n) => render_number(n, "rch")
   | `Rem(n) => render_number(n, "rem")
+  | `Rex(n) => render_number(n, "rex")
+  | `Ric(n) => render_number(n, "ric")
   | `Rlh(n) => render_number(n, "rlh")
-  | `Vb(n) => render_number(n, "vb")
+
   | `Vh(n) => render_number(n, "vh")
-  | `Vi(n) => render_number(n, "vi")
+  | `Vw(n) => render_number(n, "vw")
   | `Vmax(n) => render_number(n, "vmax")
   | `Vmin(n) => render_number(n, "vmin")
-  | `Vw(n) => render_number(n, "vw")
+  | `Vb(n) => render_number(n, "vb")
+  | `Vi(n) => render_number(n, "vi")
+
+  | `Cqw(n) => render_number(n, "cqw")
+  | `Cqh(n) => render_number(n, "cqh")
+  | `Cqi(n) => render_number(n, "cqi")
+  | `Cqb(n) => render_number(n, "cqb")
+  | `Cqmin(n) => render_number(n, "cqmin")
+  | `Cqmax(n) => render_number(n, "cqmax")
+
+  | `Px(n) => render_number(n, "px")
+  | `Cm(n) => render_number(n, "cm")
+  | `Mm(n) => render_number(n, "mm")
+  | `Q(n) => render_number(n, "q")
+  | `In(n) => render_number(n, "in")
+  | `Pc(n) => render_number(n, "pc")
+  | `Pt(n) => render_number(n, "pt")
+
   | `Zero => render_string("0");
 
 let rec render_function_calc = calc_sum => {
@@ -321,14 +336,13 @@ let min_height =
 let max_height =
   apply(Parser.property_height, [%expr "max-height"], render_size);
 
-let render_ratio =
-  fun
-  | `Static(a, (), b) => [%expr
-      [%e string_of_int(a) |> render_string]
-      ++ "/"
-      ++ [%e string_of_int(b) |> render_string]
-    ]
-  | `Integer(i) => [%expr [%e render_integer(i)]];
+let render_ratio = ((a, b)) => {
+  let b = Option.value(Option.map(snd, b), ~default=1.);
+  [%expr
+   [%e string_of_float(a) |> render_string]
+   ++ "/"
+   ++ [%e string_of_float(b) |> render_string]];
+};
 
 let aspect_ratio =
   apply(

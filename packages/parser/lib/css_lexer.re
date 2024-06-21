@@ -96,39 +96,15 @@ let number = [%sedlex.regexp?
   (Opt('-'), '.', Plus(digit), Opt('e' | 'E', '+' | '-', Plus(digit)))
 ];
 
-let equal_sign = [%sedlex.regexp? "="];
-let only_operator = [%sedlex.regexp? "only"];
-let or_operator = [%sedlex.regexp? "or"];
-let and_operator = [%sedlex.regexp? "and"];
-let not_operator = [%sedlex.regexp? "not"];
+let operator = [%sedlex.regexp? "~=" | "|=" | "^=" | "$=" | "*=" | "="];
 
-let mq_operator = [%sedlex.regexp?
-  (or_operator, whitespace) | (and_operator, whitespace) |
-  (not_operator, whitespace) |
-  (only_operator, whitespace)
-];
-
-let mq_feature_comparison = [%sedlex.regexp? '<' | '>'];
-
-let operator = [%sedlex.regexp? "~=" | "|=" | "^=" | "$=" | "*="];
-
-let combinator = [%sedlex.regexp? '+' | '~' | "||"];
+let combinator = [%sedlex.regexp? '+' | '~' | '>'];
 
 let at_rule_without_body = [%sedlex.regexp?
   ("@", "charset" | "import" | "namespace")
 ];
 
 let at_rule = [%sedlex.regexp? ("@", ident)];
-
-/* [<screen, print, all>_media_type] is purposely for media query parsing */
-let screen_media_type = [%sedlex.regexp? "screen"];
-let print_media_type = [%sedlex.regexp? "print"];
-let all_media_type = [%sedlex.regexp? "all"];
-
-let at_media = [%sedlex.regexp? ("@", "media")];
-
-let at_keyframes = [%sedlex.regexp? ("@", "keyframes")];
-
 let non_ascii_code_point = [%sedlex.regexp? Sub(any, '\000' .. '\128')]; // greater than \u0080
 
 let identifier_start_code_point = [%sedlex.regexp?
@@ -305,23 +281,37 @@ let important = [%sedlex.regexp?
 ];
 
 let length = [%sedlex.regexp?
+  // relative length units based on font
   (_c, _a, _p) | (_c, _h) | (_e, _m) | (_e, _x) | (_i, _c) | (_l, _h) |
+  // relative length units based on root element's font
+  (_r, _c, _a, _p) |
+  (_r, _c, _h) |
   (_r, _e, _m) |
+  (_r, _e, _x) |
+  (_r, _i, _c) |
   (_r, _l, _h) |
+  // relative length units based on viewport
   (_v, _h) |
   (_v, _w) |
-  (_v, _i) |
-  (_v, _b) |
-  (_v, _m, _i, _n) |
   (_v, _m, _a, _x) |
+  (_v, _m, _i, _n) |
+  (_v, _b) |
+  (_v, _i) |
+  // container query length units
+  (_c, _q, _w) |
+  (_c, _q, _h) |
+  (_c, _q, _i) |
+  (_c, _q, _b) |
+  (_c, _q, _m, _i, _n) |
+  (_c, _q, _m, _a, _x) |
+  // absolute length units
+  (_p, _x) |
   (_c, _m) |
   (_m, _m) |
   _q |
   (_i, _n) |
   (_p, _c) |
-  (_p, _t) |
-  (_p, _x) |
-  (_f, _r)
+  (_p, _t)
 ];
 
 let angle = [%sedlex.regexp?
@@ -575,18 +565,9 @@ let rec get_next_token = lexbuf => {
   | combinator => COMBINATOR(lexeme(lexbuf))
   | string => STRING(lexeme(~skip=1, ~drop=1, lexbuf))
   | important => IMPORTANT
-  | equal_sign => EQUAL_SIGN(lexeme(lexbuf))
-  | mq_operator => MEDIA_QUERY_OPERATOR(lexeme(lexbuf))
-  | mq_feature_comparison => MEDIA_FEATURE_COMPARISON(lexeme(lexbuf))
-  | all_media_type => ALL_MEDIA_TYPE(lexeme(lexbuf))
-  | screen_media_type => SCREEN_MEDIA_TYPE(lexeme(lexbuf))
-  | print_media_type => PRINT_MEDIA_TYPE(lexeme(lexbuf))
-  | at_media =>
+  | at_rule_without_body =>
     skip_whitespace.contents = false;
-    AT_MEDIA(lexeme(~skip=1, lexbuf));
-  | at_keyframes =>
-    skip_whitespace.contents = false;
-    AT_KEYFRAMES(lexeme(~skip=1, lexbuf));
+    AT_RULE_STATEMENT(lexeme(~skip=1, lexbuf));
   | at_rule =>
     skip_whitespace.contents = false;
     AT_RULE(lexeme(~skip=1, lexbuf));

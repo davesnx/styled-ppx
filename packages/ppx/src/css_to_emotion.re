@@ -14,6 +14,7 @@ module CssJs = {
   let label = (~loc) => ident(~loc, "label");
   let style = (~loc) => ident(~loc, "style");
   let keyframes = (~loc) => ident(~loc, "keyframes");
+  let atRule = (~loc) => ident(~loc, "atRule");
 };
 
 let number_to_const = number =>
@@ -67,30 +68,36 @@ let rec render_at_rule = (~loc, at_rule: at_rule) => {
   let at_rule_name_loc =
     Styled_ppx_css_parser.Parser_location.intersection(loc, at_rule_name_loc);
   switch (at_rule_name) {
+  // nested
   | "media" => render_media_query(~loc, at_rule)
+  | "container" => render_container_query(~loc, at_rule)
   | "keyframes" =>
     Generate_lib.error(
       ~loc=at_rule_name_loc,
       "@keyframes should be defined with %%keyframe(...)",
     )
-  | "charset" as n
-  | "import" as n
-  | "namespace" as n
+  | "scope" as n
+  | "starting-style" as n
   | "supports" as n
+  | "document" as n
   | "page" as n
   | "font-face" as n
   | "counter-style" as n
+  | "font-palette-values" as n
   | "font-feature-values" as n
   | "swash" as n
-  | "ornaments" as n
   | "annotation" as n
+  | "ornaments" as n
   | "stylistic" as n
   | "styleset" as n
   | "character-variant" as n
   | "property" as n
-  | /* Experimental */ "color-profile" as n
-  | /* Experimental */ "viewport" as n
-  | /* Deprecated */ "document" as n =>
+  | "layer" as n
+  | "color-profile" as n
+  // regular
+  | "charset" as n
+  | "import" as n
+  | "namespace" as n =>
     Generate_lib.error(
       ~loc=at_rule_name_loc,
       Printf.sprintf("At-rule @%s is not supported in styled-ppx", n),
@@ -103,23 +110,26 @@ let rec render_at_rule = (~loc, at_rule: at_rule) => {
   };
 }
 and render_media_query = (~loc, at_rule: at_rule) => {
+  let (_, at_rule_loc) = at_rule.prelude;
   let parse_condition = {
-    let (value, at_rule_loc) = at_rule.prelude;
-    switch (value) {
-    | Variable(variable) => Ok(render_variable_as_string(variable))
-    | Paren_block([(Ident(_), ident_loc)]) =>
-      /* TODO: String.trim is a hack around, but a media query should be all clean. */
-      Ok(source_code_of_loc(ident_loc) |> String.trim)
-    /* In any other case, we believe on the source_code and transform it to string. This is unsafe */
-    | _whatever => Ok(source_code_of_loc(at_rule_loc) |> String.trim)
-    };
+    let prelude = source_code_of_loc(at_rule_loc) |> String.trim;
+    Reason_css_parser.Parser.(parse(media_query_list, prelude))
+    |> Result.map(_ => prelude);
   };
 
   let (delimiter, attrs) =
     Platform_attributes.string_delimiter(~loc=at_rule.loc);
 
   switch (parse_condition) {
-  | Error(error_expr) => error_expr
+  | Error(error_msg) =>
+    Generate_lib.error(
+      ~loc=
+        Styled_ppx_css_parser.Parser_location.update_pos_lnum(
+          at_rule_loc,
+          loc,
+        ),
+      error_msg,
+    )
   | Ok(conditions) =>
     let query =
       conditions
@@ -131,17 +141,55 @@ and render_media_query = (~loc, at_rule: at_rule) => {
       | Rule_list(declaration) =>
         render_declarations(~loc, declaration)
         |> Builder.pexp_array(~loc=at_rule.loc)
-      | Stylesheet(_) =>
-        Generate_lib.error(
-          ~loc=at_rule.loc,
-          "@media content expect to have declarations, not an stylesheets. Selectors aren't allowed in @media.",
-        )
+      | Stylesheet(stylesheet) =>
+        render_declarations(~loc, stylesheet)
+        |> Builder.pexp_array(~loc=at_rule.loc)
       };
 
     Helper.Exp.apply(
       ~loc=at_rule.loc,
       CssJs.media(~loc=at_rule.loc),
       [(Nolabel, query), (Nolabel, rules)],
+    );
+  };
+}
+and render_container_query = (~loc, at_rule: at_rule) => {
+  let (_, at_rule_loc) = at_rule.prelude;
+  let parse_condition = {
+    let prelude = source_code_of_loc(at_rule_loc) |> String.trim;
+    Reason_css_parser.Parser.(parse(container_condition_list, prelude))
+    |> Result.map(_ => prelude);
+  };
+
+  let (delimiter, attrs) =
+    Platform_attributes.string_delimiter(~loc=at_rule.loc);
+
+  switch (parse_condition) {
+  | Error(error_msg) => Generate_lib.error(~loc=at_rule_loc, error_msg)
+  | Ok(conditions) =>
+    let query =
+      conditions
+      |> String_interpolation.transform(~attrs, ~delimiter, ~loc=at_rule.loc);
+
+    let rules =
+      switch (at_rule.block) {
+      | Empty => Builder.pexp_array(~loc=at_rule.loc, [])
+      | Rule_list(declaration) =>
+        render_declarations(~loc, declaration)
+        |> Builder.pexp_array(~loc=at_rule.loc)
+      | Stylesheet(stylesheet) =>
+        render_declarations(~loc, stylesheet)
+        |> Builder.pexp_array(~loc=at_rule.loc)
+      };
+
+    Helper.Exp.apply(
+      ~loc=at_rule.loc,
+      CssJs.atRule(~loc=at_rule.loc),
+      [
+        (Labelled("condition"), query),
+        (Nolabel, Builder.estring(~loc=at_rule.loc, "container")),
+        (Nolabel, rules),
+      ],
     );
   };
 }

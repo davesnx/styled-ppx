@@ -5,7 +5,16 @@ open Rule.Pattern;
 
 let keyword = string => expect(IDENT(string));
 let comma = expect(COMMA);
-let delim = string => expect(DELIM(string));
+let delim =
+  fun
+  | "(" => expect(LEFT_PAREN)
+  | ")" => expect(RIGHT_PAREN)
+  | "[" => expect(LEFT_BRACKET)
+  | "]" => expect(RIGHT_BRACKET)
+  | ":" => expect(COLON)
+  | ";" => expect(SEMI_COLON)
+  | s => expect(DELIM(s));
+
 let function_call = (name, rule) => {
   let.bind_match () =
     token(
@@ -45,28 +54,38 @@ let length =
     switch (token) {
     | DIMENSION(number, dimension) =>
       switch (dimension) {
-      | "em" => Ok(`Em(number))
-      | "ex" => Ok(`Ex(number))
       | "cap" => Ok(`Cap(number))
       | "ch" => Ok(`Ch(number))
+      | "em" => Ok(`Em(number))
+      | "ex" => Ok(`Ex(number))
       | "ic" => Ok(`Ic(number))
-      | "rem" => Ok(`Rem(number))
       | "lh" => Ok(`Lh(number))
+      | "rcap" => Ok(`Rcap(number))
+      | "rch" => Ok(`Rch(number))
+      | "rem" => Ok(`Rem(number))
+      | "rex" => Ok(`Rex(number))
+      | "ric" => Ok(`Ric(number))
       | "rlh" => Ok(`Rlh(number))
-      | "vw" => Ok(`Vw(number))
       | "vh" => Ok(`Vh(number))
-      | "vi" => Ok(`Vi(number))
-      | "vb" => Ok(`Vb(number))
-      | "vmin" => Ok(`Vmin(number))
+      | "vw" => Ok(`Vw(number))
       | "vmax" => Ok(`Vmax(number))
+      | "vmin" => Ok(`Vmin(number))
+      | "vb" => Ok(`Vb(number))
+      | "vi" => Ok(`Vi(number))
+      | "cqw" => Ok(`Cqw(number))
+      | "cqh" => Ok(`Cqh(number))
+      | "cqi" => Ok(`Cqi(number))
+      | "cqb" => Ok(`Cqb(number))
+      | "cqmin" => Ok(`Cqmin(number))
+      | "cqmax" => Ok(`Cqmax(number))
       // absolute
+      | "px" => Ok(`Px(number))
       | "cm" => Ok(`Cm(number))
       | "mm" => Ok(`Mm(number))
       | "Q" => Ok(`Q(number))
       | "in" => Ok(`In(number))
-      | "pt" => Ok(`Pt(number))
       | "pc" => Ok(`Pc(number))
-      | "px" => Ok(`Px(number))
+      | "pt" => Ok(`Pt(number))
       | _ => Error(["unknown dimension"])
       }
     | NUMBER(0.) => Ok(`Zero)
@@ -239,18 +258,6 @@ let interpolation = {
   Match.return(path);
 };
 
-/* TODO: LEFT_BRACKET and RIGHT_BRACKET are wrongly lexed as DELIM('[') and DELIM(']'), we use a handmade parser to by-pass it, and use LEFT_BRACKET/RIGHT_BRACKET correctly. The original spec is "'[' [ <custom-ident> ]* ']'" */
-let line_names = {
-  open Rule;
-  open Rule.Let;
-
-  let.bind_match left = Pattern.expect(LEFT_BRACKET);
-  let.bind_match path = Modifier.one_or_more(custom_ident);
-  let.bind_match right = Pattern.expect(RIGHT_BRACKET);
-
-  return_match((left, path, right));
-};
-
 let flex_value =
   token(
     fun
@@ -260,4 +267,23 @@ let flex_value =
       | _ => Error(["only fr dimension is valid"])
       }
     | _ => Error(["expected flex_value"]),
+  );
+
+let media_type =
+  token(
+    fun
+    | IDENT(value) => {
+        switch (value) {
+        | "only"
+        | "not"
+        | "and"
+        | "or"
+        | "layer" =>
+          Error([
+            "'only', 'not', 'and', 'or', and 'layer' are not allowed on media_type",
+          ])
+        | _ => Ok(value)
+        };
+      }
+    | _ => Error(["expected media_type"]),
   );

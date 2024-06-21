@@ -72,7 +72,6 @@ module Types = {
   and hex_color = string
   and interpolation = list(string)
   and flex_value = [ | `Fr(float)]
-  and line_names = (unit, list(string), unit)
   and ident_token = unit
   and function_token = unit
   and string_token = unit

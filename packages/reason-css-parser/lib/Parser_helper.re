@@ -56,7 +56,6 @@ let attr_name = invalid;
 let attr_fallback = invalid;
 let string_token = invalid;
 let ident_token = invalid;
-let dimension = invalid;
 let declaration_value = invalid;
 let positive_integer = integer;
 let function_token = invalid;

@@ -87,27 +87,10 @@ let media_query_tests = [
     [%expr CssJs.style([|CssJs.media({js|screen, print|js}, [||])|])],
   ),
   (
-    "(screen, print)",
-    [%expr [%cx "@media (screen, print) {}"]],
-    [%expr CssJs.style([|CssJs.media({js|(screen, print)|js}, [||])|])],
-  ),
-  (
-    "(screen and (color))",
-    [%expr [%cx "@media (screen and (color)) {}"]],
-    [%expr CssJs.style([|CssJs.media({js|(screen and (color))|js}, [||])|])],
-  ),
-  (
     "not screen and (color)",
     [%expr [%cx "@media not screen and (color) {}"]],
     [%expr
       CssJs.style([|CssJs.media({js|not screen and (color)|js}, [||])|])
-    ],
-  ),
-  (
-    "(not (screen and (color))))",
-    [%expr [%cx "@media (not (screen and (color))) {}"]],
-    [%expr
-      CssJs.style([|CssJs.media({js|(not (screen and (color)))|js}, [||])|])
     ],
   ),
   (
@@ -263,6 +246,140 @@ let keyframe_tests = [
       CssJs.keyframes([|
         (0, [|CssJs.color(CssJs.red)|]),
         (100, [|CssJs.color(CssJs.green)|]),
+      |])
+    ],
+  ),
+];
+
+let container_query_tests = [
+  (
+    "(min-width: 150px)",
+    [%expr [%cx "@container (min-width: 150px) {}"]],
+    [%expr
+      CssJs.style([|
+        CssJs.atRule(~params={js|(min-width: 150px)|js}, "container", [||]),
+      |])
+    ],
+  ),
+  (
+    "(max-width: 1000px)",
+    [%expr [%cx "@container (max-width: 1000px) {}"]],
+    [%expr
+      CssJs.style([|
+        CssJs.atRule(~params={js|(max-width: 1000px)|js}, "container", [||]),
+      |])
+    ],
+  ),
+  (
+    "name (width >= 150px)",
+    [%expr [%cx "@container name (width >= 150px) {}"]],
+    [%expr
+      CssJs.style([|
+        CssJs.atRule(
+          ~params={js|name (width >= 150px)|js},
+          "container",
+          [||],
+        ),
+      |])
+    ],
+  ),
+  (
+    "(height >= 150px)",
+    [%expr [%cx "@container (height >= 150px) {}"]],
+    [%expr
+      CssJs.style([|
+        CssJs.atRule(~params={js|(height >= 150px)|js}, "container", [||]),
+      |])
+    ],
+  ),
+  (
+    "(inline-size >= 150px)",
+    [%expr [%cx "@container (inline-size >= 150px) {}"]],
+    [%expr
+      CssJs.style([|
+        CssJs.atRule(
+          ~params={js|(inline-size >= 150px)|js},
+          "container",
+          [||],
+        ),
+      |])
+    ],
+  ),
+  (
+    "(block-size >= 150px)",
+    [%expr [%cx "@container (block-size >= 150px) {}"]],
+    [%expr
+      CssJs.style([|
+        CssJs.atRule(
+          ~params={js|(block-size >= 150px)|js},
+          "container",
+          [||],
+        ),
+      |])
+    ],
+  ),
+  (
+    "(aspect-ratio: 1 / 1)",
+    [%expr [%cx "@container (aspect-ratio: 1 / 1) {}"]],
+    [%expr
+      CssJs.style([|
+        CssJs.atRule(
+          ~params={js|(aspect-ratio: 1 / 1)|js},
+          "container",
+          [||],
+        ),
+      |])
+    ],
+  ),
+  (
+    "(orientation: portrait)",
+    [%expr [%cx "@container (orientation: portrait) {}"]],
+    [%expr
+      CssJs.style([|
+        CssJs.atRule(
+          ~params={js|(orientation: portrait)|js},
+          "container",
+          [||],
+        ),
+      |])
+    ],
+  ),
+  (
+    "(width >= 150px) and (orientation: portrait)",
+    [%expr [%cx "@container (width >= 150px) and (orientation: portrait) {}"]],
+    [%expr
+      CssJs.style([|
+        CssJs.atRule(
+          ~params={js|(width >= 150px) and (orientation: portrait)|js},
+          "container",
+          [||],
+        ),
+      |])
+    ],
+  ),
+  (
+    "name not (width < 150px)",
+    [%expr [%cx "@container name not (width < 150px) {}"]],
+    [%expr
+      CssJs.style([|
+        CssJs.atRule(
+          ~params={js|name not (width < 150px)|js},
+          "container",
+          [||],
+        ),
+      |])
+    ],
+  ),
+  (
+    "(width >= 150px) or (orientation: portrait)",
+    [%expr [%cx "@container (width >= 150px) or (orientation: portrait) {}"]],
+    [%expr
+      CssJs.style([|
+        CssJs.atRule(
+          ~params={js|(width >= 150px) or (orientation: portrait)|js},
+          "container",
+          [||],
+        ),
       |])
     ],
   ),

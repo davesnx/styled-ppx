@@ -76,7 +76,7 @@ and brace_block =
 [@deriving show({with_path: false})]
 and at_rule = {
   name: with_loc(string),
-  prelude: with_loc(component_value),
+  prelude: with_loc(component_value_list),
   block: brace_block,
   [@printer location]
   loc,
