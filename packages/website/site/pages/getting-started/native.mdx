@@ -30,8 +30,8 @@ Add `styled-ppx` under dune's preprocess pps for any library or executable. Add 
 (library
   (name ...)
   (libraries
-+  styled-ppx.css
-+  styled-ppx.emotion
++  styled-ppx.css_native
++  styled-ppx.emotion_native
    server-reason-react)
   (preprocess
    (pps
@@ -58,7 +58,7 @@ Note: `server-reason-react` and `server-reason-react-ppx` are optional, and only
 
 ### Example
 
-```reason
+```reasonml
 /* This is a server-reason-react module with those styles encoded as a unique className */
 module Link = [%styled.a (~color=CssJs.hex("4299E1")) => {|
   font-size: 1.875rem;
@@ -91,3 +91,61 @@ let app =
 
 let stylesheet = CssJs.render_style_tag(); /* This will render the stylesheet to be present in the head of the document */
 ```
+
+
+This can be used in the Page component of your server side rendered React components
+
+```reasonml
+module Page = {
+  [@react.component]
+  let make = ( ... ) => 
+...
+<head>
+...
+<style> {React.string(CssJs.render_style_tag())} </style>
+...
+</head>
+}
+```
+
+If you're using dynamic css props, (ie your style components' css
+relies on dynamic values), make sure to run this function only after
+the react components are rendered.
+
+Rendering the React components first, gives the React runtime to force
+out the values from the dynamic css styles which are represented lazily.
+
+
+Example
+
+```reasonml
+
+module Page = {
+  [@react.component]
+  let make = (~appHTMLString) => {
+    let stylesheet = CssJs.render_style_tag();
+    <html>
+	    ...
+        <style> {React.string(stylesheet)} </style>
+      </head>
+      <body>
+        <div
+          dangerouslySetInnerHTML={"__html": appHTMLString}
+        />
+      </body>
+    </html>;
+  };
+};
+
+
+let hello_route_handler = _request => {
+  let appHTMLString =
+    ReactDOM.renderToString(<Reason_india_website_native.App />);
+  Dream.html(
+    ReactDOM.renderToString(
+      <Page scripts=["/static/app.js"] appHTMLString />,
+    ),
+  );
+};
+```
+
