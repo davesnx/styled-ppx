@@ -2024,7 +2024,6 @@ module Transition = struct
 
   let toString (x : t) = match x with `value v -> v
 end
-[@@ns.doc "\n * Transition\n "]
 
 let transitionValue x = D ({js|transition|js}, Transition.toString x)
 
