@@ -222,18 +222,28 @@ let string_of_backgroundPosition x =
   | #Cascading.t as c -> Cascading.toString c
 
 let backgroundPosition x =
-  D ({js|backgroundPosition|js}, string_of_backgroundPosition x)
+  D ({js|background-position|js}, string_of_backgroundPosition x)
 
 let backgroundPosition2 x y =
   D
-    ( {js|backgroundPosition|js},
+    ( {js|background-position|js},
       string_of_backgroundPosition x
       ^ {js| |js}
       ^ string_of_backgroundPosition y )
 
+let backgroundPositions bp =
+  D
+    ( {js|background-position|js},
+      bp
+      |. Std.Array.map (fun (x, y) ->
+             string_of_backgroundPosition x
+             ^ {js| |js}
+             ^ string_of_backgroundPosition y)
+      |. Std.Array.joinWith ~sep:{js|, |js} )
+
 let backgroundPosition4 ~x ~offsetX ~y ~offsetY =
   D
-    ( {js|backgroundPosition|js},
+    ( {js|background-position|js},
       string_of_backgroundPosition x
       ^ {js| |js}
       ^ Length.toString offsetX
@@ -241,16 +251,6 @@ let backgroundPosition4 ~x ~offsetX ~y ~offsetY =
       ^ string_of_backgroundPosition y
       ^ {js| |js}
       ^ Length.toString offsetY )
-
-let backgroundPositions bp =
-  D
-    ( {js|backgroundPosition|js},
-      bp
-      |. Std.Array.map (fun (x, y) ->
-             string_of_backgroundPosition x
-             ^ {js| |js}
-             ^ string_of_backgroundPosition y)
-      |. Std.Array.joinWith ~sep:{js|, |js} )
 
 let backgroundRepeat x =
   D
