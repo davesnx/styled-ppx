@@ -151,8 +151,6 @@ let prefix ~pre s =
     in
     check 0)
 
-let remove_first_char str = String.sub str 1 (String.length str - 1)
-
 let chop_prefix ~pre s =
   if prefix ~pre s then
     Some
@@ -182,6 +180,8 @@ let resolve_ampersand hash selector =
 (* Renders all selectors with the hash given *)
 let render_selectors hash rule =
   match rule with
+  (* Remove empty selectors *)
+  | S (_selector, rules) when Array.length rules == 0 -> None
   (* In case of being @media (or any at_rule) render the selector first and declarations with the hash inside *)
   | S (selector, rules) when is_at_rule selector ->
     Some

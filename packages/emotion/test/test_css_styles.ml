@@ -105,7 +105,7 @@ let selector_ampersand () =
   in
   let css = get_string_style_rules () in
   assert_string css
-    (Printf.sprintf ".%s { font-size: 42px; } .%s  .div { font-size: 24px; }"
+    (Printf.sprintf ".%s { font-size: 42px; } .%s .div { font-size: 24px; }"
        className className)
 
 let selector_ampersand_at_the_middle () =
@@ -117,7 +117,7 @@ let selector_ampersand_at_the_middle () =
   in
   let css = get_string_style_rules () in
   assert_string css
-    (Printf.sprintf ".%s { font-size: 42px; } .%s  div .%s { font-size: 24px; }"
+    (Printf.sprintf ".%s { font-size: 42px; } .%s div .%s { font-size: 24px; }"
        className className className)
 
 let media_queries () =
@@ -132,8 +132,44 @@ let media_queries () =
   assert_string css
     (Printf.sprintf
        ".%s { max-width: 800px; } @media (max-width: 768px) { .%s { width: \
-        300px; } }"
+        300px; }  }"
        className className)
+
+(* let media_queries_nested () =
+   let className =
+     Css.style
+       [
+         Css.maxWidth (`px 800);
+         Css.media "(min-width: 300px)"
+           [ Css.media "(max-width: 768px)" [ Css.display `flex ] ];
+       ]
+   in
+   let css = get_string_style_rules () in
+   assert_string css
+     (Printf.sprintf
+        ".%s { max-width: 800px; } @media (max-width: 768px) and @media \
+         (min-width: 300px) { .%s { display: flex; }  }"
+        className className) *)
+
+(* let media_queries_nested_2 () =
+   let className =
+     Css.style
+       [
+         Css.maxWidth (`px 800);
+         Css.media "(min-width: 300px)"
+           [
+             Css.color `transparent;
+             Css.media "(max-width: 768px)" [ Css.display `flex ];
+           ];
+       ]
+   in
+   let css = get_string_style_rules () in
+   assert_string css
+     (Printf.sprintf
+        ".%s { max-width: 800px; } @media (min-width: 300px) { color: \
+         transparent; } @media (max-width: 768px) and @media (min-width: 300px) \
+         { .%s { display: flex; }  }"
+        className className) *)
 
 let selector_params () =
   let className =
@@ -192,6 +228,41 @@ let hover_selector () =
         255, 0.7); }"
        className className)
 
+let ampersand_selector_with_classname () =
+  let nested_classname = Css.style [] in
+  let rules =
+    [
+      Css.display `block;
+      Css.selector ("&" ^ nested_classname)
+        [ Css.media "(min-width: 768px)" [ Css.height `auto ] ];
+    ]
+  in
+  let className = Css.style rules in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { display: block; } @media (min-width: 768px) { .%s {  } .%s { \
+        height: auto; } }"
+       className className className)
+
+let selector_with_classname () =
+  let nested_classname = Css.style [] in
+  let rules =
+    [
+      Css.display `block;
+      Css.selector
+        (".lola " ^ nested_classname)
+        [ Css.media "(min-width: 768px)" [ Css.height `auto ] ];
+    ]
+  in
+  let className = Css.style rules in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { display: block; } @media (min-width: 768px) { .%s {  } .%s \
+        .lola  { height: auto; } }"
+       className className className)
+
 let style_tag () =
   Css.global [ Css.selector "html" [ Css.lineHeight (`abs 1.15) ] ];
   let animationName =
@@ -234,7 +305,6 @@ let tests =
       case "label" label;
       case "selector_nested" selector_nested;
       case "selector_nested_x10" selector_nested_x10;
-      case "media_queries" media_queries;
       case "selector_ampersand" selector_ampersand;
       case "selector_ampersand_at_the_middle" selector_ampersand_at_the_middle;
       case "selector_params" selector_params;
@@ -243,4 +313,9 @@ let tests =
       case "duplicated_styles_unique" duplicated_styles_unique;
       case "hover_selector" hover_selector;
       case "style_tag" style_tag;
+      case "media_queries" media_queries;
+      case "ampersand_selector_with_classname" ampersand_selector_with_classname;
+      case "selector_with_classname" selector_with_classname;
+      (* case "media_queries_nested" media_queries_nested; *)
+      (* case "media_queries_nested_2" media_queries_nested_2; *)
     ] )

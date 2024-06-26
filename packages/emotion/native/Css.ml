@@ -107,6 +107,9 @@ let render_declarations (rules : rule list) =
 
 let is_at_rule selector = String.contains selector '@'
 let is_a_pseudo_selector selector = String.starts_with ~prefix:":" selector
+let starts_with_at selector = String.starts_with ~prefix:"@" selector
+let starts_with_ampersand selector = String.starts_with ~prefix:"&" selector
+let contains_multiple_selectors selector = String.contains selector ','
 
 let prefix ~pre s =
   let len = String.length pre in
@@ -114,8 +117,7 @@ let prefix ~pre s =
   else (
     let rec check i =
       if i = len then true
-      else if Stdlib.( <> ) (String.unsafe_get s i) (String.unsafe_get pre i)
-      then false
+      else if String.unsafe_get s i <> String.unsafe_get pre i then false
       else check (i + 1)
     in
     check 0)
@@ -126,10 +128,10 @@ let chop_prefix ~pre s =
       (String.sub s (String.length pre) (String.length s - String.length pre))
   else None
 
-let remove_first_ampersand selector =
-  selector |> chop_prefix ~pre:"&" |> Option.value ~default:selector
+(* let remove_first_ampersand selector =
+   selector |> chop_prefix ~pre:"&" |> Option.value ~default:selector *)
 
-let replace_ampersand str with_ =
+let replace_ampersand ~by str =
   let rec replace_ampersand' str var =
     let len = String.length str in
     if len = 0 then ""
@@ -138,38 +140,14 @@ let replace_ampersand str with_ =
     else
       String.sub str 0 1 ^ replace_ampersand' (String.sub str 1 (len - 1)) var
   in
-  replace_ampersand' str with_
+  replace_ampersand' str by
 
-let resolve_ampersand hash selector = replace_ampersand selector ("." ^ hash)
-
-let render_prelude hash selector =
-  let new_selector =
-    selector |> remove_first_ampersand |> resolve_ampersand hash
-  in
-  (* S (aka Selectors) are the only ones used by styled-ppx, we don't use PseudoClass neither PseucodClassParam. TODO: Remove them.
-     Meanwhile we have them, it's a good idea to check if the first character of the selector is a `:` because it's expected to not have a space between the selector and the :pseudoselector. *)
-  if is_a_pseudo_selector new_selector then
-    Printf.sprintf ".%s%s" hash new_selector
-  else Printf.sprintf ".%s %s" hash new_selector
-
-let render_selectors hash rule =
-  match rule with
-  | S (selector, rules) when is_at_rule selector ->
-    Some
-      (Printf.sprintf "%s { .%s { %s } }" selector hash
-         (render_declarations rules))
-  | S (selector, rules) ->
-    let prelude = render_prelude hash selector in
-    Some (Printf.sprintf "%s { %s }" prelude (render_declarations rules))
-  | PseudoClass (pseduoclass, rules) ->
-    Some
-      (Printf.sprintf ".%s:%s { %s }" hash pseduoclass
-         (render_declarations rules))
-  | PseudoClassParam (pseudoclass, param, rules) ->
-    Some
-      (Printf.sprintf ".%s:%s ( %s ) %s" hash pseudoclass param
-         (render_declarations rules))
-  | _ -> None
+let resolve_ampersand hash selector =
+  let classname = "." ^ hash in
+  let resolved_selector = replace_ampersand ~by:classname selector in
+  if starts_with_ampersand selector then resolved_selector
+  else if starts_with_at selector then resolved_selector
+  else Printf.sprintf ".%s %s" hash resolved_selector
 
 let rec rule_to_debug nesting accumulator rule =
   let next_rule =
@@ -177,8 +155,13 @@ let rec rule_to_debug nesting accumulator rule =
     | D (property, value) ->
       Printf.sprintf "Declaration (\"%s\", \"%s\")" property value
     | S (selector, rules) ->
-      Printf.sprintf "Selector (\"%s\", %s)" selector
-        (to_debug (nesting + 1) rules)
+      if nesting = 0 then
+        Printf.sprintf "Selector (\"%s\", [%s])" selector
+          (to_debug (nesting + 1) rules)
+      else
+        Printf.sprintf "Selector (\"%s\", [%s\n%s])" selector
+          (to_debug (nesting + 1) rules)
+          (String.make (nesting + 1) ' ')
     | PseudoClass (pseduoclass, rules) ->
       Printf.sprintf "PseudoClass (\"%s\", %s)" pseduoclass
         (to_debug (nesting + 1) rules)
@@ -195,19 +178,82 @@ let print_rules rules =
   rules |> List.iter (fun rule -> print_endline (to_debug 0 [ rule ]))
 
 let resolve_selectors rules =
+  let rules_contain_media rules =
+    List.exists
+      (function S (s, _) when is_at_rule s -> true | _ -> false)
+      rules
+  in
+
+  (* media selectors should be at the top. .a { @media () {} }
+     should be @media () { .a {}} *)
+  let move_media_at_top rule_list =
+    List.fold_left
+      (fun acc rule ->
+        match rule with
+        | S (selector, rules) when rules_contain_media rules ->
+          let media_rule_list =
+            List.find_map
+              (function S (s, r) when is_at_rule s -> Some (s, r) | _ -> None)
+              rules
+          in
+          (match media_rule_list with
+          | None -> []
+          (* | Some (media_selector, media_rule_list) when starts_with_at selector
+             ->
+             (* parent and current are "@media" -> join them with " and " *)
+             List.append acc
+               [
+                 S (selector, rules);
+                 S (media_selector ^ " and " ^ selector, media_rule_list);
+               ] *)
+          | Some (media_selector, media_rule_list) ->
+            List.append acc
+              [ S (media_selector, [ S (selector, media_rule_list) ]) ])
+        | _ -> List.append acc [ rule ])
+      [] rule_list
+  in
+
+  print_rules rules;
+  print_endline " ";
+  let rules = move_media_at_top rules in
+  print_endline "-- RESOLVED -- ";
+  print_rules rules;
+
+  (* unnest takes a list of rules and unnest them into a flat list of rules *)
   let rec unnest ~prefix =
+    (* multiple selectors are defined with commas: like .a, .b {}
+       we split those into separate selectors with the same rules *)
+    let split_multiple_selectors rule_list =
+      List.fold_left
+        (fun acc rule ->
+          match rule with
+          | S (selector, rules) when contains_multiple_selectors selector ->
+            let selector_list = String.split_on_char ',' selector in
+            let new_rules =
+              List.map
+                (* for each selector, we apply the same rules *)
+                  (fun selector -> S (String.trim selector, rules))
+                selector_list
+            in
+            List.append acc new_rules
+          | rule -> List.append acc [ rule ])
+        [] rule_list
+    in
+
     List.partition_map (function
+      (* in case of being at @media, don't touch this selector *)
+      | S (title, selector_rules) when starts_with_at title ->
+        Right [ S (title, selector_rules) ]
       | S (title, selector_rules) ->
         let new_prelude = prefix ^ title in
-        let content, tail = unnest ~prefix:(new_prelude ^ " ") selector_rules in
-        Right (S (new_prelude, content) :: List.flatten tail)
+        let new_rules = split_multiple_selectors selector_rules in
+        let content, tail = unnest ~prefix:(new_prelude ^ " ") new_rules in
+        let new_selector = S (new_prelude, content) in
+        Right (new_selector :: List.flatten tail)
       | _ as rule -> Left rule)
   in
-  let resolve_selector rule =
-    let declarations, selectors = unnest ~prefix:"" [ rule ] in
-    List.flatten (declarations :: selectors)
-  in
-  rules |> List.map resolve_selector |> List.flatten
+  let declarations, selectors = unnest ~prefix:"" rules in
+  List.flatten (declarations :: selectors)
 
 let pp_keyframes animationName keyframes =
   let pp_keyframe (percentage, rules) =
@@ -216,11 +262,10 @@ let pp_keyframes animationName keyframes =
   let definition = keyframes |> List.map pp_keyframe |> String.concat " " in
   Printf.sprintf "@keyframes %s { %s }" animationName definition
 
-(* `resolved_rule` here means to print valid CSS, selectors are nested
-   and properties aren't autoprefixed. This function transforms into correct CSS. *)
-let pp_rules className rules =
+(* Removes nesting on selectors, run the autoprefixer. *)
+let rec pp_rules className rules =
   (* TODO: Refactor with partition or partition_map. List.filter_map is error prone.
-     Ss might need to respect the order of definition, and this breaks the order *)
+     Also it might need to respect the order of definition, and this breaks the order *)
   let list_of_rules = rules |> resolve_selectors in
   let declarations =
     list_of_rules
@@ -230,12 +275,73 @@ let pp_rules className rules =
     |> String.concat " "
     |> fun all -> Printf.sprintf ".%s { %s }" className all
   in
+
+  print_endline " ";
+  print_endline "-- pre-render -- ";
+  print_rules list_of_rules;
+
   let selectors =
     list_of_rules
     |> List.filter_map (render_selectors className)
     |> String.concat " "
   in
   Printf.sprintf "%s %s" declarations selectors
+
+(* Renders all selectors with the hash given *)
+and render_selectors hash rule =
+  match rule with
+  | S (_selector, rules) when List.is_empty rules -> None
+  (* In case of being @media (or any at_rule) render the selector first and declarations with the hash inside *)
+  | S (selector, rules) when is_at_rule selector ->
+    let nested_selectors = pp_rules hash rules in
+    Some (Printf.sprintf "%s { %s }" selector nested_selectors)
+  (* | S (selector, rules) when is_at_rule selector ->
+     let all_selectors = render_selectors hash (S (selector, rules)) in
+     (match all_selectors with
+     | None -> None
+     | Some all_selectors ->
+       Some (Printf.sprintf "%s { .%s { %s } }" selector hash all_selectors)) *)
+  | S (selector, rules) ->
+    (* Resolving the ampersand means to replace all ampersands by the hash *)
+    let new_selector = resolve_ampersand hash selector in
+    Some (Printf.sprintf "%s { %s }" new_selector (render_declarations rules))
+  (* S (aka Selectors) are the only ones used by styled-ppx, we don't use PseudoClass neither PseucodClassParam. TODO: Remove them.
+     Meanwhile we have them, it's a good idea to check if the first character of the selector is a `:` because it's expected to not have a space between the selector and the :pseudoselector. *)
+  | PseudoClass (pseduoclass, rules) ->
+    Some
+      (Printf.sprintf ".%s:%s { %s }" hash pseduoclass
+         (render_declarations rules))
+  | PseudoClassParam (pseudoclass, param, rules) ->
+    Some
+      (Printf.sprintf ".%s:%s ( %s ) %s" hash pseudoclass param
+         (render_declarations rules))
+  (* Declarations aren't there *)
+  | D (_, _) -> None
+
+(* rules_to_string renders the rule in a format where the hash matches with `@emotion/serialise`
+     It doesn't render any whitespace. (compared to pp_rules)
+     TODO: Ensure Selector is rendered correctly.
+     TODO: Ensure PsuedoClass is rendered correctly.
+     TODO: Ensure PseudoClassParam is rendered correctly.
+*)
+let rec rules_to_string rules =
+  let buff = Buffer.create 16 in
+  let push = Buffer.add_string buff in
+  let rule_to_string rule =
+    match rule with
+    | D (property, value) -> push (Printf.sprintf "%s:%s;" property value)
+    | S (selector, rules) ->
+      let rules = rules |> rules_to_string in
+      push (Printf.sprintf "%s{%s}" selector rules)
+    | PseudoClass (pseudoclass, rules) ->
+      let rules = rules |> rules_to_string in
+      push (Printf.sprintf ":%s{%s}" pseudoclass rules)
+    | PseudoClassParam (pseudoclass, param, rules) ->
+      let rules = rules |> rules_to_string in
+      push (Printf.sprintf ":%s (%s) {%s}" pseudoclass param rules)
+  in
+  List.iter rule_to_string rules;
+  Buffer.contents buff
 
 type declarations =
   | Globals of rule list
@@ -251,7 +357,7 @@ type declarations =
 module Stylesheet = struct
   module Hashes = Set.Make (String)
 
-  type 'a t = {
+  type t = {
     mutable rules : (string * declarations) list;
     mutable hashes : Hashes.t;
   }
@@ -272,33 +378,6 @@ module Stylesheet = struct
     stylesheet.hashes <- Hashes.empty
 end
 
-let instance = Stylesheet.make ()
-let flush () = Stylesheet.flush instance
-
-(* rules_to_string renders the rule in a format where the hash matches with `@emotion/serialise`
-   It doesn't render any whitespace. (compared to pp_rules)
-   TODO: Ensure Selector is rendered correctly.
-   TODO: Ensure PsuedoClass is rendered correctly.
-   TODO: Ensure PseudoClassParam is rendered correctly.
-*)
-let rec rules_to_string rules =
-  let buff = Buffer.create 16 in
-  let push = Buffer.add_string buff in
-  let rule_to_string rule =
-    match rule with
-    | D (property, value) -> push (Printf.sprintf "%s:%s;" property value)
-    | S (selector, rules) ->
-      push (Printf.sprintf "%s{%s}" selector (rules_to_string rules))
-    | PseudoClass (pseudoclass, rules) ->
-      push (Printf.sprintf ":%s{%s}" pseudoclass (rules_to_string rules))
-    | PseudoClassParam (pseudoclass, param, rules) ->
-      push
-        (Printf.sprintf ":%s (%s) {%s}" pseudoclass param
-           (rules_to_string rules))
-  in
-  rules |> List.iter rule_to_string;
-  Buffer.contents buff
-
 let keyframes_to_string keyframes =
   let pp_keyframe (percentage, rules) =
     Printf.sprintf "%d%%{%s}" percentage (rules_to_string rules)
@@ -308,8 +387,11 @@ let keyframes_to_string keyframes =
 let render_hash hash styles =
   let is_label = function D ("label", value) -> Some value | _ -> None in
   match List.find_map is_label styles with
-  | None -> Printf.sprintf "%s" hash
   | Some label -> Printf.sprintf "%s-%s" hash label
+  | None -> Printf.sprintf "%s" hash
+
+let instance = Stylesheet.make ()
+let flush () = Stylesheet.flush instance
 
 let style (styles : rule list) =
   match styles with
