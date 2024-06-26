@@ -116,3 +116,7 @@ let _ = [%css
       )
     |}
 ];
+
+let getStaticMarkup = () => {
+  ReactDOM.renderToStaticMarkup(<App />);
+};
