@@ -565,7 +565,7 @@ let gridAutoFlow x =
 let gridColumn start end' =
   D
     ( {js|grid-column|js},
-      Std.Int.toString start ^ {js|- |js} ^ Std.Int.toString end' )
+      Std.Int.toString start ^ {js| / |js} ^ Std.Int.toString end' )
 
 let gridColumnGap x = D ({js|grid-column-gap|js}, string_of_column_gap x)
 let gridColumnStart n = D ({js|grid-column-start|js}, Std.Int.toString n)
@@ -574,7 +574,7 @@ let gridColumnEnd n = D ({js|grid-column-end|js}, Std.Int.toString n)
 let gridRow start end' =
   D
     ( {js|grid-row|js},
-      Std.Int.toString start ^ {js|- |js} ^ Std.Int.toString end' )
+      Std.Int.toString start ^ {js| / |js} ^ Std.Int.toString end' )
 
 let gap x = D ({js|gap|js}, string_of_gap x)
 let gridGap x = D ({js|grid-gap|js}, string_of_gap x)
@@ -1702,7 +1702,7 @@ let gridArea s =
 let gridArea2 s s2 =
   D
     ( {js|grid-area|js},
-      (GridArea.toString s ^ {js|- |js}) ^ GridArea.toString s2 )
+      (GridArea.toString s ^ {js| / |js}) ^ GridArea.toString s2 )
 
 let gridArea3 s s2 s3 =
   D
