@@ -89,7 +89,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
     {js|none|js},
   );
   CssJs.unsafe({js|appearance|js}, {js|none|js});
-  CssJs.unsafe({js|aspectRatio|js}, {js|21 / 8|js});
+  CssJs.aspectRatio(`ratio((21, 8)));
   let c = CssJs.hex("e15a46");
   (CssJs.backgroundColor(c): CssJs.rule);
   CssJs.unsafe({js|border|js}, {js|none|js});
@@ -178,5 +178,6 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       )),
     ),
   |]);
+  CssJs.style([|CssJs.aspectRatio(`ratio((16, 9)))|]);
 
   $ dune build

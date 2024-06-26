@@ -53,9 +53,9 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.maxHeight(`maxContent);
   CssJs.maxHeight(`minContent);
   CssJs.unsafe({js|maxHeight|js}, {js|fit-content(10%)|js});
-  CssJs.unsafe({js|aspectRatio|js}, {js|auto|js});
-  CssJs.unsafe({js|aspectRatio|js}, {js|2|js});
-  CssJs.unsafe({js|aspectRatio|js}, {js|16 / 9|js});
+  CssJs.aspectRatio(`auto);
+  CssJs.aspectRatio(`num(2.));
+  CssJs.aspectRatio(`ratio((16, 9)));
   CssJs.unsafe({js|width|js}, {js|fit-content|js});
   CssJs.unsafe({js|minWidth|js}, {js|fit-content|js});
   CssJs.unsafe({js|maxWidth|js}, {js|fit-content|js});

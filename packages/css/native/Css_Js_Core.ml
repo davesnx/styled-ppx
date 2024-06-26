@@ -93,6 +93,14 @@ let important v =
 
 let label label = D ({js|label|js}, label)
 
+let aspectRatio x =
+  D
+    ( {js|aspect-ratio|js},
+      match x with
+      | #AspectRatio.t as ar -> AspectRatio.toString ar
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c )
+
 let alignContent x =
   D
     ( {js|align-content|js},

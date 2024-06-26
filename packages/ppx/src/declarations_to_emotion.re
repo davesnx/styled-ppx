@@ -3271,6 +3271,31 @@ let animation =
     | _ => raise(Unsupported_feature)
   );
 
+let render_ratio = (~loc, value: Types.ratio) => {
+  switch (value) {
+  | `Number(n) => [%expr `num([%e render_float(~loc, n)])]
+  | `Interpolation(v) => render_variable(~loc, v)
+  | `Static(up, _, down) =>
+    [%expr
+     `ratio((
+       [%e render_integer(~loc, up)],
+       [%e render_integer(~loc, down)],
+     ))]
+  };
+};
+
+let aspect_ratio =
+  monomorphic(
+    Parser.property_aspect_ratio,
+    (~loc) => [%expr CssJs.aspectRatio],
+    (~loc, value) => {
+      switch (value) {
+      | `Auto => [%expr `auto]
+      | `Ratio(ratio) => render_ratio(~loc, ratio)
+      }
+    },
+  );
+
 // css-flexbox-1
 let flex_direction =
   variants(Parser.property_flex_direction, (~loc) =>
@@ -4357,6 +4382,7 @@ let properties = [
   ("animation-play-state", found(animation_play_state)),
   ("animation-timing-function", found(animation_timing_function)),
   ("animation", found(animation)),
+  ("aspect-ratio", found(aspect_ratio)),
   ("backface-visibility", found(backface_visibility)),
   ("backdrop-filter", found(backdrop_filter)),
   ("background-attachment", found(background_attachment)),
