@@ -2074,7 +2074,6 @@ module Animation = struct
 
   let toString x = match x with `value v -> v
 end
-[@@ns.doc "\n * Animation\n "]
 
 let animationValue x = D ({js|animation|js}, Animation.toString x)
 
