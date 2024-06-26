@@ -320,6 +320,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       type_("interpolation", [%type: list(string)]),
       type_("flex_value", [%type: [ | `Fr(float)]]),
       type_("media_type", [%type: string]),
+      type_("container_name", [%type: string]),
       // From Parser_helper, those are `invalid` represented here as unit
       type_("ident_token", [%type: unit]),
       type_("function_token", [%type: unit]),

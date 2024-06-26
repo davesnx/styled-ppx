@@ -517,7 +517,6 @@ and media_query = [%value.rec
 and media_query_list = [%value.rec "[ <media-query> ]# | <interpolation>"]
 and container_condition_list = [%value.rec "<container-condition>#"]
 and container_condition = [%value.rec "[ <container-name> ]? <container-query>"]
-and container_name = [%value.rec "<custom-ident>"]
 and container_query = [%value.rec
   "'not' <query-in-parens> | <query-in-parens> [ [ 'and' <query-in-parens> ]* | [ 'or' <query-in-parens> ]* ]"
 ]
@@ -1761,6 +1760,9 @@ and property_z_index = [%value.rec "'auto' | <integer> | <interpolation>"]
 and property_zoom = [%value.rec
   "'normal' | 'reset' | <number> | <extended-percentage>"
 ]
+and property_container = [%value.rec "<container-name> [ '/' <'container-type'> ]?"]
+and property_container_name = [%value.rec "<container-name>+ | 'none'"]
+and property_container_type = [%value.rec "'normal' | 'size' | 'inline-size'"]
 and pseudo_class_selector = [%value.rec
   "':' <ident-token> | ':' <function-token> <any-value> ')'"
 ]
@@ -3290,6 +3292,9 @@ let check_map =
       ("property-writing-mode", check(property_writing_mode)),
       ("property-z-index", check(property_z_index)),
       ("property-zoom", check(property_zoom)),
+      ("property-container", check(property_container)),
+      ("property-container-name", check(property_container_name)),
+      ("property-container-type", check(property_container_type)),
       ("pseudo-class-selector", check(pseudo_class_selector)),
       ("pseudo-element-selector", check(pseudo_element_selector)),
       ("pseudo-page", check(pseudo_page)),

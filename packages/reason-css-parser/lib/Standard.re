@@ -280,10 +280,26 @@ let media_type =
         | "or"
         | "layer" =>
           Error([
-            "'only', 'not', 'and', 'or', and 'layer' are not allowed on media_type",
+            "'only', 'not', 'and', 'or', and 'layer' are invalid media types",
           ])
         | _ => Ok(value)
         };
       }
     | _ => Error(["expected media_type"]),
   );
+
+let container_name = {
+  open Rule.Let;
+  let.bind_match name = custom_ident;
+  let value = {
+    switch (name) {
+    | "none"
+    | "and"
+    | "not"
+    | "or" =>
+      Error(["'none', 'and', 'not', and 'or' are invalid container names"])
+    | _ => Ok(name)
+    };
+  };
+  return_data(value);
+};

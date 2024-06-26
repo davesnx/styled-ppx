@@ -66,15 +66,38 @@ let concat = (~loc, expr, acc) => {
 let rec render_at_rule = (~loc, at_rule: at_rule) => {
   let (at_rule_name, at_rule_name_loc) = at_rule.name;
   let at_rule_name_loc =
-    Styled_ppx_css_parser.Parser_location.intersection(loc, at_rule_name_loc);
+    Styled_ppx_css_parser.Parser_location.update_pos_lnum(
+      {
+        ...at_rule_name_loc,
+        loc_start: {
+          ...at_rule_name_loc.loc_start,
+          pos_bol: at_rule_name_loc.loc_end.pos_bol,
+          pos_cnum:
+            at_rule_name_loc.loc_end.pos_cnum - String.length(at_rule_name),
+          pos_lnum: at_rule_name_loc.loc_end.pos_lnum,
+        },
+      },
+      loc,
+    );
+
   switch (at_rule_name) {
   // nested
-  | "media" => render_media_query(~loc, at_rule)
-  | "container" => render_container_query(~loc, at_rule)
   | "keyframes" =>
     Generate_lib.error(
       ~loc=at_rule_name_loc,
       "@keyframes should be defined with %%keyframe(...)",
+    )
+  | "media" =>
+    render_nested_at_rule(
+      ~loc,
+      at_rule,
+      Reason_css_parser.Parser.media_query_list,
+    )
+  | "container" =>
+    render_nested_at_rule(
+      ~loc,
+      at_rule,
+      Reason_css_parser.Parser.container_condition_list,
     )
   | "scope" as n
   | "starting-style" as n
@@ -109,90 +132,63 @@ let rec render_at_rule = (~loc, at_rule: at_rule) => {
     )
   };
 }
-and render_media_query = (~loc, at_rule: at_rule) => {
-  let (_, at_rule_loc) = at_rule.prelude;
-  let parse_condition = {
-    let prelude = source_code_of_loc(at_rule_loc) |> String.trim;
-    Reason_css_parser.Parser.(parse(media_query_list, prelude))
-    |> Result.map(_ => prelude);
-  };
+and render_nested_at_rule:
+  'a.
+  (~loc: Ppxlib.location, at_rule, Reason_css_parser.Rule.rule('a)) =>
+  Ppxlib.expression
+ =
+  (~loc, at_rule, rule) => {
+    let (_, at_rule_prelude_loc) = at_rule.prelude;
+    let parse_condition = {
+      let prelude = source_code_of_loc(at_rule_prelude_loc) |> String.trim;
+      Reason_css_parser.Parser.parse(rule, prelude)
+      |> Result.map(_ => prelude);
+    };
 
-  let (delimiter, attrs) =
-    Platform_attributes.string_delimiter(~loc=at_rule.loc);
+    let (delimiter, attrs) =
+      Platform_attributes.string_delimiter(~loc=at_rule.loc);
 
-  switch (parse_condition) {
-  | Error(error_msg) =>
-    Generate_lib.error(
-      ~loc=
-        Styled_ppx_css_parser.Parser_location.update_pos_lnum(
-          at_rule_loc,
-          loc,
-        ),
-      error_msg,
-    )
-  | Ok(conditions) =>
-    let query =
-      conditions
-      |> String_interpolation.transform(~attrs, ~delimiter, ~loc=at_rule.loc);
+    switch (parse_condition) {
+    | Error(error_msg) =>
+      Generate_lib.error(
+        ~loc=
+          Styled_ppx_css_parser.Parser_location.update_pos_lnum(
+            at_rule_prelude_loc,
+            loc,
+          ),
+        error_msg,
+      )
+    | Ok(conditions) =>
+      let query =
+        conditions
+        |> String_interpolation.transform(
+             ~attrs,
+             ~delimiter,
+             ~loc=at_rule.loc,
+           );
 
-    let rules =
-      switch (at_rule.block) {
-      | Empty => Builder.pexp_array(~loc=at_rule.loc, [])
-      | Rule_list(declaration) =>
-        render_declarations(~loc, declaration)
-        |> Builder.pexp_array(~loc=at_rule.loc)
-      | Stylesheet(stylesheet) =>
-        render_declarations(~loc, stylesheet)
-        |> Builder.pexp_array(~loc=at_rule.loc)
-      };
+      let rules =
+        switch (at_rule.block) {
+        | Empty => Builder.pexp_array(~loc=at_rule.loc, [])
+        | Rule_list(declaration) =>
+          render_declarations(~loc, declaration)
+          |> Builder.pexp_array(~loc=at_rule.loc)
+        | Stylesheet(stylesheet) =>
+          render_declarations(~loc, stylesheet)
+          |> Builder.pexp_array(~loc=at_rule.loc)
+        };
 
-    Helper.Exp.apply(
-      ~loc=at_rule.loc,
-      CssJs.media(~loc=at_rule.loc),
-      [(Nolabel, query), (Nolabel, rules)],
-    );
-  };
-}
-and render_container_query = (~loc, at_rule: at_rule) => {
-  let (_, at_rule_loc) = at_rule.prelude;
-  let parse_condition = {
-    let prelude = source_code_of_loc(at_rule_loc) |> String.trim;
-    Reason_css_parser.Parser.(parse(container_condition_list, prelude))
-    |> Result.map(_ => prelude);
-  };
-
-  let (delimiter, attrs) =
-    Platform_attributes.string_delimiter(~loc=at_rule.loc);
-
-  switch (parse_condition) {
-  | Error(error_msg) => Generate_lib.error(~loc=at_rule_loc, error_msg)
-  | Ok(conditions) =>
-    let query =
-      conditions
-      |> String_interpolation.transform(~attrs, ~delimiter, ~loc=at_rule.loc);
-
-    let rules =
-      switch (at_rule.block) {
-      | Empty => Builder.pexp_array(~loc=at_rule.loc, [])
-      | Rule_list(declaration) =>
-        render_declarations(~loc, declaration)
-        |> Builder.pexp_array(~loc=at_rule.loc)
-      | Stylesheet(stylesheet) =>
-        render_declarations(~loc, stylesheet)
-        |> Builder.pexp_array(~loc=at_rule.loc)
-      };
-
-    Helper.Exp.apply(
-      ~loc=at_rule.loc,
-      CssJs.atRule(~loc=at_rule.loc),
-      [
-        (Labelled("condition"), query),
-        (Nolabel, Builder.estring(~loc=at_rule.loc, "container")),
-        (Nolabel, rules),
-      ],
-    );
-  };
-}
+      Helper.Exp.apply(
+        ~loc=at_rule.loc,
+        CssJs.atRule(~loc=at_rule.loc),
+        [
+          (Labelled("condition"), query),
+          (Nolabel, Builder.estring(~loc=at_rule.loc, fst(at_rule.name))),
+          (Nolabel, rules),
+        ],
+      );
+    };
+  }
 and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
   let (property, name_loc) = d.name;
   let (_valueList, value_loc) = d.value;
