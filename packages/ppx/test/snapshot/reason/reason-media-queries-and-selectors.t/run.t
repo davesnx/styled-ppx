@@ -965,8 +965,9 @@
     let styles =
       CssJs.style([|
         CssJs.label("SelectorsMediaQueries"),
-        CssJs.media(
-          {js|(min-width: 600px)|js},
+        CssJs.atRule(
+          ~condition={js|(min-width: 600px)|js},
+          "media",
           [|CssJs.backgroundColor(CssJs.blue)|],
         ),
         CssJs.selector(

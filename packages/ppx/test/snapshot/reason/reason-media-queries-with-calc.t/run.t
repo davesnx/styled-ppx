@@ -965,12 +965,14 @@
     let styles =
       CssJs.style([|
         CssJs.label("MediaQueryCalc"),
-        CssJs.media(
-          {js|(min-width: calc(2px + 1px))|js},
+        CssJs.atRule(
+          ~condition={js|(min-width: calc(2px + 1px))|js},
+          "media",
           [|CssJs.color(CssJs.red)|],
         ),
-        CssJs.media(
-          {js|(min-width: calc(1000px - 2%))|js},
+        CssJs.atRule(
+          ~condition={js|(min-width: calc(1000px - 2%))|js},
+          "media",
           [|CssJs.color(CssJs.red)|],
         ),
       |]);

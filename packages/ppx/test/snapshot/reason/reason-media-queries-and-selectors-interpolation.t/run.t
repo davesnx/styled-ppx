@@ -967,14 +967,17 @@
     let styles =
       CssJs.style([|
         CssJs.label("SelectorWithInterpolation"),
-        CssJs.media(
-          {js|only screen and (min-width: |js} ++ width ++ {js|)|js},
+        CssJs.atRule(
+          ~condition={js|only screen and (min-width: |js} ++ width ++ {js|)|js},
+          "media",
           [|CssJs.color(CssJs.blue)|],
         ),
-        CssJs.media(
-          {js|(min-width: 700px) and (orientation: |js}
-          ++ orientation
-          ++ {js|)|js},
+        CssJs.atRule(
+          ~condition=
+            {js|(min-width: 700px) and (orientation: |js}
+            ++ orientation
+            ++ {js|)|js},
+          "media",
           [|CssJs.display(`none)|],
         ),
       |]);
