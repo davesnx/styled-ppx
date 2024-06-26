@@ -126,3 +126,5 @@ let value = `clip;
     background-image: linear-gradient(84deg, #F80 0%, rgba(255, 255, 255, 0.80) 50%, #2A97FF 100%);
   |}
 ];
+
+[%cx {|aspect-ratio: 16 / 9;|}];

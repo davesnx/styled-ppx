@@ -310,6 +310,21 @@ module Isolation = struct
     match x with `auto -> {js|auto|js} | `isolate -> {js|isolate|js}
 end
 
+module AspectRatio = struct
+  type t =
+    [ `auto
+    | `num of float
+    | `ratio of int * int
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `num num -> Std.Float.toString num
+    | `ratio (up, down) ->
+      Std.Int.toString up ^ {js| / |js} ^ Std.Int.toString down
+end
+
 module Resize = struct
   type t =
     [ `none
