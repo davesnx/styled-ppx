@@ -2147,10 +2147,9 @@ module SVG = struct
   let stopColor x = D ({js|stop-color|js}, string_of_color x)
   let stopOpacity x = D ({js|stop-opacity|js}, Std.Float.toString x)
 end
-[@@ns.doc "\n * SVG\n "]
 
 let touchAction x = D ({js|touch-action|js}, x |. TouchAction.toString)
-let textEmphasisColor x = D ({js|textEmphasisColor|js}, string_of_color x)
+let textEmphasisColor x = D ({js|text-emphasis-color|js}, string_of_color x)
 
 let lineBreak x =
   D
@@ -2186,7 +2185,7 @@ let overflowInline x =
 
 let overflowBlock x =
   D
-    ( {js|overflowBlock|js},
+    ( {js|overflow-block|js},
       match x with
       | #OverflowInline.t as ov -> OverflowInline.toString ov
       | #Var.t as var -> Var.toString var

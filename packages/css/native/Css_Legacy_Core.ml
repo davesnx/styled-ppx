@@ -920,6 +920,22 @@ let textAlign x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
+let textAlignAll x =
+  D
+    ( {js|text-align-all|js},
+      match x with
+      | #TextAlignAll.t as taa -> TextAlignAll.toString taa
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c )
+
+let textAlignLast x =
+  D
+    ( {js|text-align-last|js},
+      match x with
+      | #TextAlignLast.t as tal -> TextAlignLast.toString tal
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c )
+
 let textDecorationColor x =
   D
     ( {js|text-decoration-color|js},
@@ -959,6 +975,31 @@ let textIndent x =
       match x with
       | #Percentage.t as p -> Percentage.toString p
       | #Length.t as l -> Length.toString l
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c )
+
+let textDecorationSkipInk x =
+  D
+    ( {js|text-decoration-skip-ink|js},
+      match x with
+      | #TextDecorationSkipInk.t as tdsi -> TextDecorationSkipInk.toString tdsi
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c )
+
+let textDecorationSkipBox x =
+  D
+    ( {js|text-decoration-skip-box|js},
+      match x with
+      | #TextDecorationSkipBox.t as tdsb -> TextDecorationSkipBox.toString tdsb
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c )
+
+let textDecorationSkipInset x =
+  D
+    ( {js|text-decoration-skip-inset|js},
+      match x with
+      | #TextDecorationSkipInset.t as tdsi ->
+        TextDecorationSkipInset.toString tdsi
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
@@ -1010,7 +1051,12 @@ let transformOrigin3d x y z =
       ^ Length.toString z
       ^ {js| |js} )
 
-let transformBox x = D ({js|transform-box|js}, TransformBox.toString x)
+let transformBox x =
+  D
+    ( {js|transform-box|js},
+      match x with
+      | #TransformBox.t as tb -> TransformBox.toString tb
+      | #Cascading.t as c -> Cascading.toString c )
 
 let explode s =
   let rec exp i l = if i < 0 then l else exp (i - 1) (s.[i] :: l) in
@@ -2033,3 +2079,117 @@ module SVG = struct
 end
 
 let touchAction x = D ({js|touch-action|js}, x |. TouchAction.toString)
+let textEmphasisColor x = D ({js|text-emphasis-color|js}, string_of_color x)
+
+let lineBreak x =
+  D
+    ( {js|line-break|js},
+      match x with
+      | #LineBreak.t as lb -> LineBreak.toString lb
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let hyphens x =
+  D
+    ( {js|hyphens|js},
+      match x with
+      | #Hyphens.t as h -> Hyphens.toString h
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let textJustify x =
+  D
+    ( {js|text-justify|js},
+      match x with
+      | #TextJustify.t as tj -> TextJustify.toString tj
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let overflowInline x =
+  D
+    ( {js|overflow-inline|js},
+      match x with
+      | #OverflowInline.t as ov -> OverflowInline.toString ov
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let overflowBlock x =
+  D
+    ( {js|overflow-block|js},
+      match x with
+      | #OverflowInline.t as ov -> OverflowInline.toString ov
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let fontSynthesisWeight x =
+  D
+    ( {js|font-synthesis-weight|js},
+      match x with
+      | #FontSynthesisWeight.t as fsw -> FontSynthesisWeight.toString fsw
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let fontSynthesisStyle x =
+  D
+    ( {js|font-synthesis-style|js},
+      match x with
+      | #FontSynthesisStyle.t as fss -> FontSynthesisStyle.toString fss
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let fontSynthesisSmallCaps x =
+  D
+    ( {js|font-synthesis-small-caps|js},
+      match x with
+      | #FontSynthesisSmallCaps.t as fssc ->
+        FontSynthesisSmallCaps.toString fssc
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let fontSynthesisPosition x =
+  D
+    ( {js|font-synthesis-weight|js},
+      match x with
+      | #FontSynthesisPosition.t as fsp -> FontSynthesisPosition.toString fsp
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let fontKerning x =
+  D
+    ( {js|font-kerning|js},
+      match x with
+      | #FontKerning.t as fk -> FontKerning.toString fk
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let fontVariantPosition x =
+  D
+    ( {js|font-variant-position|js},
+      match x with
+      | #FontVariantPosition.t as fvp -> FontVariantPosition.toString fvp
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let fontVariantCaps x =
+  D
+    ( {js|font-variant-caps|js},
+      match x with
+      | #FontVariantCaps.t as fvc -> FontVariantCaps.toString fvc
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let fontOpticalSizing x =
+  D
+    ( {js|font-optical-sizing|js},
+      match x with
+      | #FontOpticalSizing.t as fos -> FontOpticalSizing.toString fos
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let fontVariantEmoji x =
+  D
+    ( {js|font-variant-emoji|js},
+      match x with
+      | #FontVariantEmoji.t as fve -> FontVariantEmoji.toString fve
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
