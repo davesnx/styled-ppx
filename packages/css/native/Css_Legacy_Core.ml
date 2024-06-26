@@ -1624,7 +1624,7 @@ let rec gridLengthToJs x =
   | `minmax (a, b) ->
     {js|minmax(|js}
     ^ string_of_minmax a
-    ^ {js|,|js}
+    ^ {js|, |js}
     ^ string_of_minmax b
     ^ {js|)|js}
 
