@@ -8,12 +8,6 @@ type rule =
   | PseudoClassParam of string * string * rule list
 
 module Converter = struct
-  let string_of_stops stops =
-    stops
-    |. Std.List.map (fun (c, l) ->
-           Color.toString c ^ {js| |js} ^ Length.toString l)
-    |. Std.List.joinWith ~sep:{js|, |js}
-
   let string_of_content x =
     match x with
     | #Content.t as c -> Content.toString c
@@ -112,6 +106,7 @@ let alignItems x =
       | #AlignItems.t as ai -> AlignItems.toString ai
       | #PositionalAlignment.t as pa -> PositionalAlignment.toString pa
       | #BaselineAlignment.t as ba -> BaselineAlignment.toString ba
+      | #OverflowAlignment.t as oa -> OverflowAlignment.toString oa
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
@@ -320,6 +315,18 @@ let borderLeftColor x = D ({js|border-left-color|js}, string_of_color x)
 let borderLeftWidth x = D ({js|border-left-width|js}, LineWidth.toString x)
 let borderSpacing x = D ({js|border-spacing|js}, Length.toString x)
 let borderRadius x = D ({js|border-radius|js}, Length.toString x)
+
+let borderRadius4 ~topLeft ~topRight ~bottomLeft ~bottomRight =
+  D
+    ( {js|border-radius|js},
+      Length.toString topLeft
+      ^ {js| |js}
+      ^ Length.toString topRight
+      ^ {js| |js}
+      ^ Length.toString bottomLeft
+      ^ {js| |js}
+      ^ Length.toString bottomRight )
+
 let borderRightColor x = D ({js|border-right-color|js}, string_of_color x)
 let borderRightWidth x = D ({js|border-right-width|js}, LineWidth.toString x)
 let borderTopColor x = D ({js|border-top-color|js}, string_of_color x)
@@ -593,6 +600,7 @@ let justifyContent x =
       | #PositionalAlignment.t as pa -> PositionalAlignment.toString pa
       | #NormalAlignment.t as na -> NormalAlignment.toString na
       | #DistributedAlignment.t as da -> DistributedAlignment.toString da
+      | #OverflowAlignment.t as oa -> OverflowAlignment.toString oa
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
@@ -1545,6 +1553,7 @@ let string_of_minmax x =
   match x with
   | `auto -> {js|auto|js}
   | #Length.t as l -> Length.toString l
+  | `fr x -> Std.Float.toString x ^ {js|fr|js}
   | `minContent -> {js|min-content|js}
   | `maxContent -> {js|max-content|js}
 

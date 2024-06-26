@@ -386,8 +386,8 @@ let columnCount x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let rowGap x = D ({js|row-gap|js}, string_of_row_gap x)
 let columnGap x = D ({js|column-gap|js}, string_of_column_gap x)
+let rowGap x = D ({js|row-gap|js}, string_of_row_gap x)
 let contentRule x = D ({js|content|js}, string_of_content x)
 
 let contentRules xs =
@@ -1677,7 +1677,9 @@ let rec gridLengthToJs x =
     ^ {js|)|js}
 
 and string_of_dimensions dimensions =
-  dimensions |. Std.Array.map gridLengthToJs |. Std.Array.joinWith ~sep:{js| |js}
+  dimensions
+  |. Std.Array.map gridLengthToJs
+  |. Std.Array.joinWith ~sep:{js| |js}
 
 let gridTemplateColumns dimensions =
   D ({js|grid-template-columns|js}, string_of_dimensions dimensions)
