@@ -6,18 +6,21 @@ let get_string_style_rules () =
   let _ = Css.flush () in
   content
 
-let one_property () =
+let one_property =
+  test "one_property" @@ fun () ->
   let className = Css.style [ Css.display `block ] in
   let css = get_string_style_rules () in
   assert_string css (Printf.sprintf ".%s { display: block; }" className)
 
-let multiple_properties () =
+let multiple_properties =
+  test "multiple_properties" @@ fun () ->
   let className = Css.style [ Css.display `block; Css.fontSize (`px 10) ] in
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf ".%s { display: block; font-size: 10px; }" className)
 
-let multiple_declarations () =
+let multiple_declarations =
+  test "multiple_declarations" @@ fun () ->
   let className1 = Css.style [ Css.display `block; Css.fontSize (`px 10) ] in
   let className2 = Css.style [ Css.display `block; Css.fontSize (`px 99) ] in
   let css = get_string_style_rules () in
@@ -27,17 +30,20 @@ let multiple_declarations () =
         font-size: 99px; }"
        className1 className2)
 
-let label () =
+let label =
+  test "label" @@ fun () ->
   let className = Css.style [ Css.label "className"; Css.display `block ] in
   let css = get_string_style_rules () in
   assert_string css (Printf.sprintf ".%s { display: block; }" className)
 
-let float_values () =
+let float_values =
+  test "float_values" @@ fun () ->
   let className = Css.style [ Css.padding (`rem 10.) ] in
   let css = get_string_style_rules () in
   assert_string css (Printf.sprintf ".%s { padding: 10rem; }" className)
 
-let selector_one_nesting () =
+let selector_one_nesting =
+  test "selector_one_nesting" @@ fun () ->
   let className =
     Css.style
       [
@@ -50,7 +56,8 @@ let selector_one_nesting () =
     (Printf.sprintf ".%s { color: #F0F8FF; } .%s a { color: #663399; }"
        className className)
 
-let selector_nested () =
+let selector_nested =
+  test "selector_nested" @@ fun () ->
   let className =
     Css.style
       [
@@ -66,7 +73,8 @@ let selector_nested () =
         none; }"
        className className className)
 
-let selector_nested_x10 () =
+let selector_nested_x10 =
+  test "selector_nested_x10" @@ fun () ->
   let className =
     Css.style
       [
@@ -98,7 +106,8 @@ let selector_nested_x10 () =
         none; } .%s a div span hr code { display: none; }"
        className className className className className className)
 
-let selector_ampersand () =
+let selector_ampersand =
+  test "selector_ampersand" @@ fun () ->
   let className =
     Css.style
       [ Css.fontSize (`px 42); Css.selector "& .div" [ Css.fontSize (`px 24) ] ]
@@ -108,7 +117,8 @@ let selector_ampersand () =
     (Printf.sprintf ".%s { font-size: 42px; } .%s .div { font-size: 24px; }"
        className className)
 
-let selector_ampersand_at_the_middle () =
+let selector_ampersand_at_the_middle =
+  test "selector_ampersand_at_the_middle" @@ fun () ->
   let className =
     Css.style
       [
@@ -120,7 +130,8 @@ let selector_ampersand_at_the_middle () =
     (Printf.sprintf ".%s { font-size: 42px; } .%s div .%s { font-size: 24px; }"
        className className className)
 
-let media_queries () =
+let media_queries =
+  test "media_queries" @@ fun () ->
   let className =
     Css.style
       [
@@ -135,7 +146,8 @@ let media_queries () =
         300px; }  }"
        className className)
 
-let media_queries_nested () =
+let media_queries_nested =
+  test "media_queries_nested" @@ fun () ->
   let className =
     Css.style
       [
@@ -151,7 +163,8 @@ let media_queries_nested () =
         300px) { .%s { display: flex; }  }"
        className className)
 
-let media_queries_nested_2 () =
+let media_queries_nested_2 =
+  test "media_queries_nested_2" @@ fun () ->
   let className =
     Css.style
       [
@@ -171,7 +184,8 @@ let media_queries_nested_2 () =
         display: flex; }  }"
        className className className)
 
-let media_queries_nested_3 () =
+let media_queries_nested_3 =
+  test "media_queries_nested_3" @@ fun () ->
   let className =
     Css.style
       [
@@ -191,7 +205,8 @@ let media_queries_nested_3 () =
         display: flex; }  }"
        className className className)
 
-let selector_params () =
+let selector_params =
+  test "selector_params" @@ fun () ->
   let className =
     Css.style [ Css.maxWidth (`px 800); Css.firstChild [ Css.width (`px 300) ] ]
   in
@@ -201,7 +216,8 @@ let selector_params () =
        ".%s { max-width: 800px; } .%s:first-child { width: 300px; }" className
        className)
 
-let keyframe () =
+let keyframe =
+  test "keyframe" @@ fun () ->
   let animationName =
     Css.keyframes
       [
@@ -221,19 +237,22 @@ let keyframe () =
         %s; }"
        animationName className animationName animationName)
 
-let global () =
+let global =
+  test "global" @@ fun () ->
   Css.global [ Css.selector "html" [ Css.lineHeight (`abs 1.15) ] ];
   let css = get_string_style_rules () in
   assert_string css (Printf.sprintf "html{line-height:1.15;}")
 
-let duplicated_styles_unique () =
+let duplicated_styles_unique =
+  test "duplicated_styles_unique" @@ fun () ->
   let className1 = Css.style [ Css.flexGrow 1. ] in
   let className2 = Css.style [ Css.flexGrow 1. ] in
   let css = get_string_style_rules () in
   assert_string className1 className2;
   assert_string css (Printf.sprintf ".%s { flex-grow: 1; }" className1)
 
-let hover_selector () =
+let hover_selector =
+  test "hover_selector" @@ fun () ->
   let className =
     Css.style
       [
@@ -248,7 +267,8 @@ let hover_selector () =
         255, 0.7); }"
        className className)
 
-let ampersand_selector_with_classname () =
+let ampersand_selector_with_classname =
+  test "ampersand_selector_with_classname" @@ fun () ->
   let nested_classname = Css.style [] in
   let rules =
     [
@@ -265,7 +285,8 @@ let ampersand_selector_with_classname () =
         height: auto; } }"
        className className className)
 
-let selector_with_classname () =
+let selector_with_classname =
+  test "selector_with_classname" @@ fun () ->
   let nested_classname = Css.style [] in
   let rules =
     [
@@ -283,7 +304,8 @@ let selector_with_classname () =
         .lola  { height: auto; } }"
        className className className)
 
-let media_queries_with_selectors () =
+let media_queries_with_selectors =
+  test "media_queries_with_selectors" @@ fun () ->
   let rules =
     [
       Css.display `block;
@@ -299,7 +321,8 @@ let media_queries_with_selectors () =
         auto; } .%s .lola { color: transparent; } }"
        className className className)
 
-let style_tag () =
+let style_tag =
+  test "style_tag" @@ fun () ->
   Css.global [ Css.selector "html" [ Css.lineHeight (`abs 1.15) ] ];
   let animationName =
     Css.keyframes
@@ -331,26 +354,26 @@ let style_tag () =
 let tests =
   ( "Css",
     [
-      test "one_property" one_property;
-      test "multiple_properties" multiple_properties;
-      test "multiple_declarations" multiple_declarations;
-      test "float_values" float_values;
-      test "selector_one_nesting" selector_one_nesting;
-      test "label" label;
-      test "selector_nested" selector_nested;
-      test "selector_nested_x10" selector_nested_x10;
-      test "selector_ampersand" selector_ampersand;
-      test "selector_ampersand_at_the_middle" selector_ampersand_at_the_middle;
-      test "selector_params" selector_params;
-      test "keyframe" keyframe;
-      test "global" global;
-      test "duplicated_styles_unique" duplicated_styles_unique;
-      test "hover_selector" hover_selector;
-      test "style_tag" style_tag;
-      test "media_queries" media_queries;
-      test "ampersand_selector_with_classname" ampersand_selector_with_classname;
-      test "selector_with_classname" selector_with_classname;
-      test "media_queries_with_selectors" media_queries_with_selectors;
-      test "media_queries_nested" media_queries_nested;
-      test "media_queries_nested_2" media_queries_nested_2;
+      one_property;
+      multiple_properties;
+      multiple_declarations;
+      float_values;
+      selector_one_nesting;
+      label;
+      selector_nested;
+      selector_nested_x10;
+      selector_ampersand;
+      selector_ampersand_at_the_middle;
+      selector_params;
+      keyframe;
+      global;
+      duplicated_styles_unique;
+      hover_selector;
+      style_tag;
+      media_queries;
+      ampersand_selector_with_classname;
+      selector_with_classname;
+      media_queries_with_selectors;
+      media_queries_nested;
+      media_queries_nested_2;
     ] )
