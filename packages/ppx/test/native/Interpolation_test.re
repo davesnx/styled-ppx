@@ -175,7 +175,7 @@ let tests =
     (
       "column-gap: $(Size.px30);",
       [%expr [%css "column-gap: $(Size.px30)"]],
-      [%expr CssJs.unsafe({js|columnGap|js}, Size.px30)],
+      [%expr (CssJs.columnGap(Size.px30): CssJs.rule)],
     ),
     // Test for property not inside properties list on declarations_to_emotion.re, should trigger unsafe interpolation
     (

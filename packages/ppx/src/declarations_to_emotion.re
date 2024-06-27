@@ -4121,7 +4121,12 @@ let clip = unsupportedProperty(Parser.property_clip);
 let clip_path = unsupportedProperty(Parser.property_clip_path);
 let column_count = unsupportedProperty(Parser.property_column_count);
 let column_fill = unsupportedProperty(Parser.property_column_fill);
-let column_gap = unsupportedProperty(Parser.property_column_gap);
+let column_gap =
+  monomorphic(
+    Parser.property_column_gap,
+    (~loc) => [%expr CssJs.columnGap],
+    (~loc) => render_gap(~loc),
+  );
 let column_rule = unsupportedProperty(Parser.property_column_rule);
 let column_rule_color =
   unsupportedProperty(Parser.property_column_rule_color);
@@ -4321,7 +4326,13 @@ let mix_blend_mode = unsupportedProperty(Parser.property_mix_blend_mode);
 /* let nav_up = unsupportedProperty(Parser.property_nav_up); */
 let position = unsupportedProperty(Parser.property_position);
 let resize = unsupportedProperty(Parser.property_resize);
-let row_gap = unsupportedProperty(Parser.property_row_gap);
+let row_gap =
+  monomorphic(
+    Parser.property_row_gap,
+    (~loc) => [%expr CssJs.rowGap],
+    (~loc) => render_gap(~loc),
+  );
+
 /* let scrollbar_3dlight_color =
    unsupportedProperty(Parser.property_scrollbar_3dlight_color); */
 /* let scrollbar_arrow_color =
