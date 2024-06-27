@@ -1,0 +1,41 @@
+{
+  "name": "styled-ppx-demo-rescript-v11",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {
+    "start": "concurrently --names rescript,js+www --kill-others yarn:watch yarn:bundle:watch",
+    "bundle": "vite build --mode development",
+    "bundle:watch": "vite serve --mode development --open --host 0.0.0.0",
+    "build": "rescript build -with-deps",
+    "watch": "rescript build -with-deps -w",
+    "clean": "rm -rf src/bundle.js; rescript clean",
+    "test_watch": "concurrently 'npm run watch' 'vitest'",
+    "pretest": "npm run build",
+    "test": "vitest --run",
+    "test_promote": "vitest --run --silent -u"
+  },
+  "dependencies": {
+    "@emotion/css": "^11.11.2",
+    "@jihchi/vite-plugin-rescript": "6.0.0",
+    "@rescript/react": "0.12.2",
+    "@rescriptbr/react-testing-library": "1.0.1",
+    "concurrently": "^5.1.0",
+    "jsdom": "^21.1.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "rescript": "^11.1.2",
+    "rescript-vitest": "^1.1.0",
+    "rescript-webapi": "^0.9.1",
+    "vite": "^5.3.2",
+    "vite-plugin-cjs-interop": "^1.1.0",
+    "vitest": "^0.34.6",
+    "vite-plugin-externalize-deps": "^0.8.0"
+  },
+  "overrides": {
+    "@rescriptbr/react-testing-library": {
+      "react": "18.2.0",
+      "react-dom": "18.2.0",
+      "@rescript/react": "0.12.2"
+    }
+  }
+}
