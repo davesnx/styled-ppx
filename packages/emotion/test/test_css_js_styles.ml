@@ -1,5 +1,5 @@
 let get_string_style_rules () =
-  let content = CssJs.get_string_style_rules () in
+  let content = CssJs.get_stylesheet () in
   let _ = CssJs.flush () in
   content
 

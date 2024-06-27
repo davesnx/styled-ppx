@@ -1,8 +1,5 @@
-let assert_string left right =
-  Alcotest.check Alcotest.string "should be equal" right left
-
 let get_string_style_rules () =
-  let content = Css.get_string_style_rules () in
+  let content = Css.get_stylesheet () in
   let _ = Css.flush () in
   content
 

@@ -1,6 +1,6 @@
 let prefix_one_declaration declaration output =
   let hash = Css.style [ declaration ] in
-  let css = Css.render_style_tag () in
+  let css = Css.get_stylesheet () in
   let _ = Css.flush () in
   assert_string css (Printf.sprintf ".%s { %s }" hash output)
 
