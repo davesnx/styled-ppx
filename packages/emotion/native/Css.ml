@@ -416,8 +416,7 @@ let keyframes (keyframes : (int * rule list) list) =
     Stylesheet.push instance (hash, Keyframes { animationName; keyframes });
     animationName
 
-(** Deprecated: Use get_style_rules instead*)
-let render_style_tag () =
+let get_stylesheet () =
   Stylesheet.get_all instance
   |> List.fold_left
        (fun accumulator (_, rules) ->
@@ -433,8 +432,6 @@ let render_style_tag () =
        ""
   |> String.trim
 
-let get_string_style_rules = render_style_tag
-
 let get_string_style_hashes () =
   Stylesheet.get_all instance
   |> List.fold_left
@@ -447,6 +444,6 @@ let style_tag ?key:_ ?children:_ () =
     [
       String ("data-emotion", "css " ^ get_string_style_hashes ());
       Bool ("data-s", true);
-      DangerouslyInnerHtml (get_string_style_rules ());
+      DangerouslyInnerHtml (get_stylesheet ());
     ]
     []
