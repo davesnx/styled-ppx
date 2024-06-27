@@ -57,8 +57,9 @@ There are some end-to-end tests to ensure all the ppx generation is working as e
 $ tree -L 1 e2e
 e2e
 ├── melange
-├── rescript-v10-JSX4
-└── rescript-v9-JSX3
+├── rescript-v11
+├── rescript-v10
+└── rescript-v9
 ```
 
 ```bash
