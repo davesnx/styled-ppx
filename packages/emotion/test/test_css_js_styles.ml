@@ -43,11 +43,6 @@ let label () =
   let css = get_string_style_rules () in
   assert_string css (Printf.sprintf ".%s { display: block; }" className)
 
-let label_with_ppx () =
-  let className = [%cx {| display: block; |}] in
-  let css = get_string_style_rules () in
-  assert_string css (Printf.sprintf ".%s { display: block; }" className)
-
 let selector_with_ppx () =
   let className =
     [%cx {|
@@ -223,7 +218,7 @@ let media_queries () =
   assert_string css
     (Printf.sprintf
        ".%s { max-width: 800px; } @media (max-width: 768px) { .%s { width: \
-        300px; } }"
+        300px; }  }"
        className className)
 
 let selector_params () =
@@ -422,6 +417,96 @@ let style_tag () =
         display: block; }</style>"
        globalHash animationNameHash classNameHash animationName className)
 
+let ampersand_selector_with_classname () =
+  let nested_classname = CssJs.style [||] in
+  let rules =
+    [|
+      CssJs.display `block;
+      CssJs.selector ("&" ^ nested_classname)
+        [| CssJs.media "(min-width: 768px)" [| CssJs.height `auto |] |];
+    |]
+  in
+  let className = CssJs.style rules in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { display: block; } @media (min-width: 768px) { .%s {  } .%s { \
+        height: auto; } }"
+       className className className)
+
+let selector_with_classname () =
+  let nested_classname = CssJs.style [||] in
+  let rules =
+    [|
+      CssJs.display `block;
+      CssJs.selector
+        (".lola " ^ nested_classname)
+        [| CssJs.media "(min-width: 768px)" [| CssJs.height `auto |] |];
+    |]
+  in
+  let className = CssJs.style rules in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { display: block; } @media (min-width: 768px) { .%s {  } .%s \
+        .lola  { height: auto; } }"
+       className className className)
+
+let media_queries_with_selectors () =
+  let rules =
+    [|
+      CssJs.display `block;
+      CssJs.media "(min-width: 768px)"
+        [|
+          CssJs.height `auto;
+          CssJs.selector ".lola" [| CssJs.color `transparent |];
+        |];
+    |]
+  in
+  let className = CssJs.style rules in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { display: block; } @media (min-width: 768px) { .%s { height: \
+        auto; } .%s .lola { color: transparent; } }"
+       className className className)
+
+let media_queries_nested () =
+  let className =
+    CssJs.style
+      [|
+        CssJs.maxWidth (`px 800);
+        CssJs.media "(min-width: 300px)"
+          [| CssJs.media "(max-width: 768px)" [| CssJs.display `flex |] |];
+      |]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { max-width: 800px; } @media (max-width: 768px) and (min-width: \
+        300px) { .%s { display: flex; }  }"
+       className className)
+
+let media_queries_nested_2 () =
+  let className =
+    CssJs.style
+      [|
+        CssJs.maxWidth (`px 800);
+        CssJs.media "(min-width: 300px)"
+          [|
+            CssJs.position `fixed;
+            CssJs.media "(max-width: 768px)" [| CssJs.display `flex |];
+          |];
+      |]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { max-width: 800px; } @media (min-width: 300px) { .%s { position: \
+        fixed; }  } @media (max-width: 768px) and (min-width: 300px) { .%s { \
+        display: flex; }  }"
+       className className className)
+
 let case title fn = Alcotest.test_case title `Quick fn
 
 let tests =
@@ -433,10 +518,8 @@ let tests =
       case "float_values" float_values;
       case "selector_one_nesting" selector_one_nesting;
       case "label" label;
-      case "label_with_ppx" label_with_ppx;
       case "selector_nested" selector_nested;
       case "selector_nested_x10" selector_nested_x10;
-      case "media_queries" media_queries;
       case "selector_ampersand" selector_ampersand;
       case "selector_ampersand_at_the_middle" selector_ampersand_at_the_middle;
       case "selector_params" selector_params;
@@ -452,7 +535,10 @@ let tests =
       case "nested_selectors" nested_selectors;
       case "nested_selectors_2" nested_selectors_2;
       case "nested_pseudo_with_interp" nested_pseudo_with_interp;
-      (* TODO: More than 2 levels of nesting is broken for selectors with ampersands. issue https://github.com/davesnx/styled-ppx/issues/359 *)
-      (* case "multiple_nested_selectors" multiple_nested_selectors; *)
-      (* case "multiple_nested_pseudo_selectors" multiple_nested_pseudo_selectors; *)
+      case "media_queries" media_queries;
+      case "ampersand_selector_with_classname" ampersand_selector_with_classname;
+      case "selector_with_classname" selector_with_classname;
+      case "media_queries_with_selectors" media_queries_with_selectors;
+      case "media_queries_nested" media_queries_nested;
+      case "media_queries_nested_2" media_queries_nested_2;
     ] )

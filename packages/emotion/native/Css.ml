@@ -127,9 +127,6 @@ let chop_prefix ~pre s =
       (String.sub s (String.length pre) (String.length s - String.length pre))
   else None
 
-(* let remove_first_ampersand selector =
-   selector |> chop_prefix ~pre:"&" |> Option.value ~default:selector *)
-
 let replace_ampersand ~by str =
   let rec replace_ampersand' str var =
     let len = String.length str in
