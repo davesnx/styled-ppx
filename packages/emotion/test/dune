@@ -1,6 +1,7 @@
 (test
  (name test)
- (modules :standard)
+ (flags
+  (:standard -open Alcotest_extra))
  (libraries
   alcotest
   fmt
@@ -8,6 +9,7 @@
   server-reason-react.belt
   server-reason-react.reactDom
   styled-ppx.css_native
+  styled-ppx.alcotest-extra
   styled-ppx.emotion_native
   styled-ppx.murmur2)
  (preprocess

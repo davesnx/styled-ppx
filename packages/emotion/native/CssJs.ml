@@ -1,6 +1,5 @@
 include Css_Colors
 include Css_Js_Core
-module Core = Css_Js_Core
 module Types = Css_AtomicTypes
 
 module Array = struct
@@ -30,6 +29,8 @@ module Array = struct
         incr j
     done;
     match !r with None -> [||] | Some r -> Stdlib.Array.sub r 0 !j
+
+  let filter a f = filter_map a (fun x -> if f x then Some x else None)
 end
 
 module Autoprefixer = struct
@@ -43,12 +44,12 @@ module Autoprefixer = struct
   let khtml property = Printf.sprintf "-khtml-%s" property
 
   let prefix_property (property : string) (value : string) prefixes =
-    prefixes |> List.map (fun prefixer -> Core.D (prefixer property, value))
+    prefixes |> List.map (fun prefixer -> D (prefixer property, value))
 
   let prefix_value (property : string) (value : string) prefixes =
-    prefixes |> List.map (fun prefixer -> Core.D (property, prefixer value))
+    prefixes |> List.map (fun prefixer -> D (property, prefixer value))
 
-  let prefix (rule : Core.rule) : Core.rule list =
+  let prefix (rule : rule) : rule list =
     match rule with
     | D
         ( (( "animation" | "animation-name" | "animation-duration"
@@ -137,6 +138,7 @@ let render_declarations (rules : rule array) =
 
 let is_at_rule selector = String.contains selector '@'
 let is_a_pseudo_selector selector = String.starts_with ~prefix:":" selector
+let starts_with_at selector = String.starts_with ~prefix:"@" selector
 let starts_with_ampersand selector = String.starts_with ~prefix:"&" selector
 let contains_multiple_selectors selector = String.contains selector ','
 
@@ -151,16 +153,11 @@ let prefix ~pre s =
     in
     check 0)
 
-let remove_first_char str = String.sub str 1 (String.length str - 1)
-
 let chop_prefix ~pre s =
   if prefix ~pre s then
     Some
       (String.sub s (String.length pre) (String.length s - String.length pre))
   else None
-
-let remove_first_ampersand selector =
-  selector |> chop_prefix ~pre:"&" |> Option.value ~default:selector
 
 let replace_ampersand ~by str =
   let rec replace_ampersand' str var =
@@ -173,45 +170,19 @@ let replace_ampersand ~by str =
   in
   replace_ampersand' str by
 
-let resolve_ampersand hash selector =
-  let classname = "." ^ hash in
-  let resolved_selector = replace_ampersand ~by:classname selector in
-  if starts_with_ampersand selector then resolved_selector
-  else Printf.sprintf ".%s %s" hash resolved_selector
-
-(* Renders all selectors with the hash given *)
-let render_selectors hash rule =
-  match rule with
-  (* In case of being @media (or any at_rule) render the selector first and declarations with the hash inside *)
-  | S (selector, rules) when is_at_rule selector ->
-    Some
-      (Printf.sprintf "%s { .%s { %s } }" selector hash
-         (render_declarations rules))
-  | S (selector, rules) ->
-    (* Resolving the ampersand means to replace all ampersands by the hash *)
-    let new_selector = resolve_ampersand hash selector in
-    Some (Printf.sprintf "%s { %s }" new_selector (render_declarations rules))
-  (* S (aka Selectors) are the only ones used by styled-ppx, we don't use PseudoClass neither PseucodClassParam. TODO: Remove them.
-     Meanwhile we have them, it's a good idea to check if the first character of the selector is a `:` because it's expected to not have a space between the selector and the :pseudoselector. *)
-  | PseudoClass (pseduoclass, rules) ->
-    Some
-      (Printf.sprintf ".%s:%s { %s }" hash pseduoclass
-         (render_declarations rules))
-  | PseudoClassParam (pseudoclass, param, rules) ->
-    Some
-      (Printf.sprintf ".%s:%s ( %s ) %s" hash pseudoclass param
-         (render_declarations rules))
-  (* Declarations aren't there *)
-  | D (_, _) -> None
-
 let rec rule_to_debug nesting accumulator rule =
   let next_rule =
     match rule with
     | D (property, value) ->
       Printf.sprintf "Declaration (\"%s\", \"%s\")" property value
     | S (selector, rules) ->
-      Printf.sprintf "Selector (\"%s\", %s)" selector
-        (to_debug (nesting + 1) rules)
+      if nesting = 0 then
+        Printf.sprintf "Selector (\"%s\", [%s])" selector
+          (to_debug (nesting + 1) rules)
+      else
+        Printf.sprintf "Selector (\"%s\", [%s\n%s])" selector
+          (to_debug (nesting + 1) rules)
+          (String.make (nesting + 1) ' ')
     | PseudoClass (pseduoclass, rules) ->
       Printf.sprintf "PseudoClass (\"%s\", %s)" pseduoclass
         (to_debug (nesting + 1) rules)
@@ -225,26 +196,90 @@ let rec rule_to_debug nesting accumulator rule =
 and to_debug nesting rules = rules |> Array.fold_left (rule_to_debug nesting) ""
 
 let print_rules rules =
-  rules |> Stdlib.Array.iter (fun rule -> print_endline (to_debug 0 [| rule |]))
+  rules |> Array.iter (fun rule -> print_endline (to_debug 0 [| rule |]))
 
 let resolve_selectors rules =
-  (* multiple selectors are defined with commas: like .a, .b {}
-     we split those into separate rules *)
-  let split_multiple_selectors rule_list =
+  let rules_contain_media rules =
+    Array.exists
+      (function S (s, _) when is_at_rule s -> true | _ -> false)
+      rules
+  in
+
+  let remove_media_from_selector selector =
+    (* replace "@media" (min-width: 768px) from @media (min-width: 768px) *)
+    chop_prefix ~pre:"@media " selector |> Option.value ~default:selector
+  in
+
+  let create_and_medias left right =
+    left ^ " and " ^ remove_media_from_selector right
+  in
+
+  (* media selectors should be at the top. .a { @media () {} }
+     should be @media () { .a {}} *)
+  (* TODO: Only works with 2 levels *)
+  let move_media_at_top rule_list =
     Array.fold_left
       (fun acc rule ->
         match rule with
-        | S (selector, rules) when contains_multiple_selectors selector ->
-          let selectors = String.split_on_char ',' selector in
-          let new_rules =
-            List.map (fun selector -> S (String.trim selector, rules)) selectors
+        | S (selector, rules) when rules_contain_media rules ->
+          let media_rule_list =
+            Array.find_map
+              (function S (s, r) when is_at_rule s -> Some (s, r) | _ -> None)
+              rules
           in
-          Array.append acc (Array.of_list new_rules)
-        | rule -> Array.append acc [| rule |])
-      [||] rule_list
+          (match media_rule_list with
+          | None -> []
+          | Some (media_selector, media_rule_list) when starts_with_at selector
+            ->
+            (* parent and current are "@media" -> join them with " and " *)
+            (* We take media_rule_list from the first selector, and append it on an "and" rule list *)
+            let diff =
+              Array.filter rules (fun rule ->
+                  rule <> S (media_selector, media_rule_list))
+            in
+
+            List.append acc
+              [
+                S (selector, diff);
+                S (create_and_medias media_selector selector, media_rule_list);
+              ]
+          | Some (media_selector, media_rule_list) ->
+            List.append acc
+              [ S (media_selector, [| S (selector, media_rule_list) |]) ])
+        | _ -> List.append acc [ rule ])
+      [] rule_list
   in
+
+  let rules = move_media_at_top rules in
+
+  (* multiple selectors are defined with commas: like .a, .b {}
+     we split those into separate rules *)
+
+  (* unnest takes a list of rules and unnest them into a flat list of rules *)
   let rec unnest ~prefix =
+    (* multiple selectors are defined with commas: like .a, .b {}
+       we split those into separate selectors with the same rules *)
+    let split_multiple_selectors rule_list =
+      Array.fold_left
+        (fun acc rule ->
+          match rule with
+          | S (selector, rules) when contains_multiple_selectors selector ->
+            let selectors = String.split_on_char ',' selector in
+            let new_rules =
+              List.map
+                (fun selector -> S (String.trim selector, rules))
+                selectors
+            in
+            Array.append acc (Array.of_list new_rules)
+          | rule -> Array.append acc [| rule |])
+        [||] rule_list
+    in
+
     List.partition_map (function
+      (* in case of being at @media, don't do anything to it *)
+      | S (title, selector_rules) when starts_with_at title ->
+        Right [ S (title, selector_rules) ]
+      (* in case of being a regular selector, unnest with the prefix *)
       | S (title, selector_rules) ->
         let new_prelude = prefix ^ title in
         let selector_rules = split_multiple_selectors selector_rules in
@@ -254,11 +289,8 @@ let resolve_selectors rules =
         Right (new_selector :: List.flatten tail)
       | _ as rule -> Left rule)
   in
-  let resolve_selector rule =
-    let declarations, selectors = unnest ~prefix:"" [ rule ] in
-    List.flatten (declarations :: selectors)
-  in
-  rules |> List.map resolve_selector |> List.flatten
+  let declarations, selectors = unnest ~prefix:"" rules in
+  List.flatten (declarations :: selectors)
 
 let pp_keyframes animationName keyframes =
   let pp_keyframe (percentage, rules) =
@@ -270,10 +302,10 @@ let pp_keyframes animationName keyframes =
   Printf.sprintf "@keyframes %s { %s }" animationName definition
 
 (* Removes nesting on selectors, run the autoprefixer. *)
-let pp_rules className rules =
+let rec render_rules className rules =
   (* TODO: Refactor with partition or partition_map. List.filter_map is error prone.
      Also it might need to respect the order of definition, and this breaks the order *)
-  let list_of_rules = rules |> Array.to_list |> resolve_selectors in
+  let list_of_rules = rules |> resolve_selectors in
   let declarations =
     list_of_rules
     |> List.map Autoprefixer.prefix
@@ -290,12 +322,39 @@ let pp_rules className rules =
   in
   Printf.sprintf "%s %s" declarations selectors
 
-(* rules_to_string renders the rule in a format where the hash matches with `@emotion/serialise`
-     It doesn't render any whitespace. (compared to pp_rules)
-     TODO: Ensure Selector is rendered correctly.
-     TODO: Ensure PsuedoClass is rendered correctly.
-     TODO: Ensure PseudoClassParam is rendered correctly.
-*)
+(* Renders all selectors with the hash given *)
+and render_selectors hash rule =
+  match rule with
+  | S (_selector, rules) when Array.length rules == 0 -> None
+  (* In case of being @media (or any at_rule) render the selector first and declarations with the hash inside *)
+  | S (selector, rules) when is_at_rule selector ->
+    let nested_selectors = render_rules hash rules in
+    Some (Printf.sprintf "%s { %s }" selector nested_selectors)
+  | S (selector, rules) ->
+    (* Resolving the ampersand means to replace all ampersands by the hash *)
+    let classname = "." ^ hash in
+    let resolved_selector = replace_ampersand ~by:classname selector in
+    let new_selector =
+      if starts_with_ampersand selector then resolved_selector
+      else if starts_with_at selector then resolved_selector
+      else Printf.sprintf ".%s %s" hash resolved_selector
+    in
+    Some (Printf.sprintf "%s { %s }" new_selector (render_declarations rules))
+  (* S (aka Selectors) are the only ones used by styled-ppx, we don't use PseudoClass neither PseucodClassParam. TODO: Remove them.
+     Meanwhile we have them, it's a good idea to check if the first character of the selector is a `:` because it's expected to not have a space between the selector and the :pseudoselector. *)
+  | PseudoClass (pseduoclass, rules) ->
+    Some
+      (Printf.sprintf ".%s:%s { %s }" hash pseduoclass
+         (render_declarations rules))
+  | PseudoClassParam (pseudoclass, param, rules) ->
+    Some
+      (Printf.sprintf ".%s:%s ( %s ) %s" hash pseudoclass param
+         (render_declarations rules))
+  (* Declarations aren't there *)
+  | D (_, _) -> None
+
+(* rules_to_string renders the rule in a format where the hash matches with `@emotion/serialise`. It doesn't render any whitespace. (compared to render_rules) *)
+(* TODO: Ensure Selector is rendered correctly *)
 let rec rules_to_string rules =
   let buff = Buffer.create 16 in
   let push = Buffer.add_string buff in
@@ -405,7 +464,7 @@ let render_style_tag () =
            Printf.sprintf "%s %s" accumulator
              (rules_to_string (Array.to_list rules))
          | Classnames { className; styles } ->
-           let rules = pp_rules className styles |> String.trim in
+           let rules = render_rules className styles |> String.trim in
            Printf.sprintf "%s %s" accumulator rules
          | Keyframes { animationName; keyframes } ->
            let rules = pp_keyframes animationName keyframes |> String.trim in

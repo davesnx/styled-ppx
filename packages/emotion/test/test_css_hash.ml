@@ -1,4 +1,4 @@
-let quoted s = Printf.sprintf "\"%s\"" s
+let quoted = Printf.sprintf "%S"
 
 let check_equality (input, expected) =
   ( quoted input,

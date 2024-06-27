@@ -93,6 +93,14 @@ let important v =
 
 let label label = D ({js|label|js}, label)
 
+let aspectRatio x =
+  D
+    ( {js|aspect-ratio|js},
+      match x with
+      | #AspectRatio.t as ar -> AspectRatio.toString ar
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c )
+
 let alignContent x =
   D
     ( {js|align-content|js},
@@ -228,18 +236,18 @@ let string_of_backgroundPosition x =
   | #Cascading.t as c -> Cascading.toString c
 
 let backgroundPosition x =
-  D ({js|backgroundPosition|js}, string_of_backgroundPosition x)
+  D ({js|background-position|js}, string_of_backgroundPosition x)
 
 let backgroundPosition2 x y =
   D
-    ( {js|backgroundPosition|js},
+    ( {js|background-position|js},
       string_of_backgroundPosition x
       ^ {js| |js}
       ^ string_of_backgroundPosition y )
 
 let backgroundPositions bp =
   D
-    ( {js|backgroundPosition|js},
+    ( {js|background-position|js},
       bp
       |. Std.Array.map (fun (x, y) ->
              string_of_backgroundPosition x
@@ -386,8 +394,8 @@ let columnCount x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let rowGap x = D ({js|row-gap|js}, string_of_row_gap x)
 let columnGap x = D ({js|column-gap|js}, string_of_column_gap x)
+let rowGap x = D ({js|row-gap|js}, string_of_row_gap x)
 let contentRule x = D ({js|content|js}, string_of_content x)
 
 let contentRules xs =
@@ -565,7 +573,7 @@ let gridAutoFlow x =
 let gridColumn start end' =
   D
     ( {js|grid-column|js},
-      Std.Int.toString start ^ {js|- |js} ^ Std.Int.toString end' )
+      Std.Int.toString start ^ {js| / |js} ^ Std.Int.toString end' )
 
 let gridColumnGap x = D ({js|grid-column-gap|js}, string_of_column_gap x)
 let gridColumnStart n = D ({js|grid-column-start|js}, Std.Int.toString n)
@@ -574,7 +582,7 @@ let gridColumnEnd n = D ({js|grid-column-end|js}, Std.Int.toString n)
 let gridRow start end' =
   D
     ( {js|grid-row|js},
-      Std.Int.toString start ^ {js|- |js} ^ Std.Int.toString end' )
+      Std.Int.toString start ^ {js| / |js} ^ Std.Int.toString end' )
 
 let gap x = D ({js|gap|js}, string_of_gap x)
 let gridGap x = D ({js|grid-gap|js}, string_of_gap x)
@@ -1677,7 +1685,9 @@ let rec gridLengthToJs x =
     ^ {js|)|js}
 
 and string_of_dimensions dimensions =
-  dimensions |. Std.Array.map gridLengthToJs |. Std.Array.joinWith ~sep:{js| |js}
+  dimensions
+  |. Std.Array.map gridLengthToJs
+  |. Std.Array.joinWith ~sep:{js| |js}
 
 let gridTemplateColumns dimensions =
   D ({js|grid-template-columns|js}, string_of_dimensions dimensions)
@@ -1702,7 +1712,7 @@ let gridArea s =
 let gridArea2 s s2 =
   D
     ( {js|grid-area|js},
-      (GridArea.toString s ^ {js|- |js}) ^ GridArea.toString s2 )
+      (GridArea.toString s ^ {js| / |js}) ^ GridArea.toString s2 )
 
 let gridArea3 s s2 s3 =
   D
@@ -2024,7 +2034,6 @@ module Transition = struct
 
   let toString (x : t) = match x with `value v -> v
 end
-[@@ns.doc "\n * Transition\n "]
 
 let transitionValue x = D ({js|transition|js}, Transition.toString x)
 
@@ -2074,7 +2083,6 @@ module Animation = struct
 
   let toString x = match x with `value v -> v
 end
-[@@ns.doc "\n * Animation\n "]
 
 let animationValue x = D ({js|animation|js}, Animation.toString x)
 
@@ -2149,10 +2157,9 @@ module SVG = struct
   let stopColor x = D ({js|stop-color|js}, string_of_color x)
   let stopOpacity x = D ({js|stop-opacity|js}, Std.Float.toString x)
 end
-[@@ns.doc "\n * SVG\n "]
 
 let touchAction x = D ({js|touch-action|js}, x |. TouchAction.toString)
-let textEmphasisColor x = D ({js|textEmphasisColor|js}, string_of_color x)
+let textEmphasisColor x = D ({js|text-emphasis-color|js}, string_of_color x)
 
 let lineBreak x =
   D
@@ -2188,7 +2195,7 @@ let overflowInline x =
 
 let overflowBlock x =
   D
-    ( {js|overflowBlock|js},
+    ( {js|overflow-block|js},
       match x with
       | #OverflowInline.t as ov -> OverflowInline.toString ov
       | #Var.t as var -> Var.toString var

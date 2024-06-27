@@ -14,6 +14,8 @@
  (modules :standard \ index)
  (libraries
   ui_native
+  server-reason-react.js
+  server-reason-react.belt
   server-reason-react.react
   server-reason-react.reactDom
   styled-ppx.emotion_native

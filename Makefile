@@ -137,6 +137,14 @@ demo_e2e_rescript_v10: build ## Run the ReScript v10 demo with JSX4
 	npm --prefix 'e2e/rescript-v10-JSX4' install
 	npm --prefix 'e2e/rescript-v10-JSX4' run start
 
+.PHONY: demo_e2e_melange_debug
+demo_e2e_melange_debug: ## Run the melange server demo
+	$(DUNE) exec e2e_melange_debug
+
+.PHONY: demo_e2e_melange_debug_watch
+demo_e2e_melange_debug_watch: ## Run (and watch) the melange server demo
+	$(DUNE) exec e2e_melange_debug --watch
+
 # Debug commands
 
 .PHONY: ast
