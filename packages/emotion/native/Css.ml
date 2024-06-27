@@ -288,7 +288,7 @@ let rec render_rules className rules =
 (* Renders all selectors with the hash given *)
 and render_selectors hash rule =
   match rule with
-  | S (_selector, rules) when List.is_empty rules -> None
+  | S (_selector, rules) when List.length rules == 0 -> None
   (* In case of being @media (or any at_rule) render the selector first and declarations with the hash inside *)
   | S (selector, rules) when is_at_rule selector ->
     let nested_selectors = render_rules hash rules in
