@@ -1,5 +1,4 @@
 include Css_Colors
-module Core = Css_Legacy_Core
 include Css_Legacy_Core
 module Types = Css_AtomicTypes
 
@@ -14,12 +13,12 @@ module Autoprefixer = struct
   let khtml property = Printf.sprintf "-khtml-%s" property
 
   let prefix_property (property : string) (value : string) prefixes =
-    prefixes |> List.map (fun prefixer -> Core.D (prefixer property, value))
+    prefixes |> List.map (fun prefixer -> D (prefixer property, value))
 
   let prefix_value (property : string) (value : string) prefixes =
-    prefixes |> List.map (fun prefixer -> Core.D (property, prefixer value))
+    prefixes |> List.map (fun prefixer -> D (property, prefixer value))
 
-  let prefix (rule : Core.rule) : Core.rule list =
+  let prefix (rule : rule) : rule list =
     match rule with
     | D
         ( (( "animation" | "animation-name" | "animation-duration"
