@@ -135,41 +135,41 @@ let media_queries () =
         300px; }  }"
        className className)
 
-(* let media_queries_nested () =
-   let className =
-     Css.style
-       [
-         Css.maxWidth (`px 800);
-         Css.media "(min-width: 300px)"
-           [ Css.media "(max-width: 768px)" [ Css.display `flex ] ];
-       ]
-   in
-   let css = get_string_style_rules () in
-   assert_string css
-     (Printf.sprintf
-        ".%s { max-width: 800px; } @media (max-width: 768px) and @media \
-         (min-width: 300px) { .%s { display: flex; }  }"
-        className className) *)
+let media_queries_nested () =
+  let className =
+    Css.style
+      [
+        Css.maxWidth (`px 800);
+        Css.media "(min-width: 300px)"
+          [ Css.media "(max-width: 768px)" [ Css.display `flex ] ];
+      ]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { max-width: 800px; } @media (max-width: 768px) and (min-width: \
+        300px) { .%s { display: flex; }  }"
+       className className)
 
-(* let media_queries_nested_2 () =
-   let className =
-     Css.style
-       [
-         Css.maxWidth (`px 800);
-         Css.media "(min-width: 300px)"
-           [
-             Css.color `transparent;
-             Css.media "(max-width: 768px)" [ Css.display `flex ];
-           ];
-       ]
-   in
-   let css = get_string_style_rules () in
-   assert_string css
-     (Printf.sprintf
-        ".%s { max-width: 800px; } @media (min-width: 300px) { color: \
-         transparent; } @media (max-width: 768px) and @media (min-width: 300px) \
-         { .%s { display: flex; }  }"
-        className className) *)
+let media_queries_nested_2 () =
+  let className =
+    Css.style
+      [
+        Css.maxWidth (`px 800);
+        Css.media "(min-width: 300px)"
+          [
+            Css.position `fixed;
+            Css.media "(max-width: 768px)" [ Css.display `flex ];
+          ];
+      ]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { max-width: 800px; } @media (min-width: 300px) { .%s { position: \
+        fixed; }  } @media (max-width: 768px) and (min-width: 300px) { .%s { \
+        display: flex; }  }"
+       className className className)
 
 let selector_params () =
   let className =
@@ -263,6 +263,22 @@ let selector_with_classname () =
         .lola  { height: auto; } }"
        className className className)
 
+let media_queries_with_selectors () =
+  let rules =
+    [
+      Css.display `block;
+      Css.media "(min-width: 768px)"
+        [ Css.height `auto; Css.selector ".lola" [ Css.color `transparent ] ];
+    ]
+  in
+  let className = Css.style rules in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { display: block; } @media (min-width: 768px) { .%s { height: \
+        auto; } .%s .lola { color: transparent; } }"
+       className className className)
+
 let style_tag () =
   Css.global [ Css.selector "html" [ Css.lineHeight (`abs 1.15) ] ];
   let animationName =
@@ -316,6 +332,7 @@ let tests =
       case "media_queries" media_queries;
       case "ampersand_selector_with_classname" ampersand_selector_with_classname;
       case "selector_with_classname" selector_with_classname;
-      (* case "media_queries_nested" media_queries_nested; *)
-      (* case "media_queries_nested_2" media_queries_nested_2; *)
+      case "media_queries_with_selectors" media_queries_with_selectors;
+      case "media_queries_nested" media_queries_nested;
+      case "media_queries_nested_2" media_queries_nested_2;
     ] )

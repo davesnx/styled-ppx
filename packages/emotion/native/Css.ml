@@ -184,6 +184,15 @@ let resolve_selectors rules =
       rules
   in
 
+  let remove_media_from_selector selector =
+    (* replace "@media" (min-width: 768px) from @media (min-width: 768px) *)
+    chop_prefix ~pre:"@media " selector |> Option.value ~default:selector
+  in
+
+  let create_and_medias left right =
+    left ^ " and " ^ remove_media_from_selector right
+  in
+
   (* media selectors should be at the top. .a { @media () {} }
      should be @media () { .a {}} *)
   let move_media_at_top rule_list =
@@ -198,14 +207,20 @@ let resolve_selectors rules =
           in
           (match media_rule_list with
           | None -> []
-          (* | Some (media_selector, media_rule_list) when starts_with_at selector
-             ->
-             (* parent and current are "@media" -> join them with " and " *)
-             List.append acc
-               [
-                 S (selector, rules);
-                 S (media_selector ^ " and " ^ selector, media_rule_list);
-               ] *)
+          | Some (media_selector, media_rule_list) when starts_with_at selector
+            ->
+            (* parent and current are "@media" -> join them with " and " *)
+            (* We take media_rule_list from the first selector, and append it on an "and" rule list *)
+            let diff =
+              List.filter
+                (fun rule -> rule <> S (media_selector, media_rule_list))
+                rules
+            in
+            List.append acc
+              [
+                S (selector, diff);
+                S (create_and_medias media_selector selector, media_rule_list);
+              ]
           | Some (media_selector, media_rule_list) ->
             List.append acc
               [ S (media_selector, [ S (selector, media_rule_list) ]) ])
@@ -216,8 +231,9 @@ let resolve_selectors rules =
   print_rules rules;
   print_endline " ";
   let rules = move_media_at_top rules in
-  print_endline "-- RESOLVED -- ";
-  print_rules rules;
+
+  (* print_endline "-- RESOLVED -- ";
+     print_rules rules; *)
 
   (* unnest takes a list of rules and unnest them into a flat list of rules *)
   let rec unnest ~prefix =
@@ -276,10 +292,9 @@ let rec pp_rules className rules =
     |> fun all -> Printf.sprintf ".%s { %s }" className all
   in
 
-  print_endline " ";
-  print_endline "-- pre-render -- ";
-  print_rules list_of_rules;
-
+  (* print_endline " ";
+     print_endline "-- pre-render -- ";
+     print_rules list_of_rules; *)
   let selectors =
     list_of_rules
     |> List.filter_map (render_selectors className)
