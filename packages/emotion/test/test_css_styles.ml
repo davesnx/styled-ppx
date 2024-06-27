@@ -328,31 +328,29 @@ let style_tag () =
         display: block; }</style>"
        globalHash animationNameHash classNameHash animationName className)
 
-let case title fn = Alcotest.test_case title `Quick fn
-
 let tests =
   ( "Css",
     [
-      case "one_property" one_property;
-      case "multiple_properties" multiple_properties;
-      case "multiple_declarations" multiple_declarations;
-      case "float_values" float_values;
-      case "selector_one_nesting" selector_one_nesting;
-      case "label" label;
-      case "selector_nested" selector_nested;
-      case "selector_nested_x10" selector_nested_x10;
-      case "selector_ampersand" selector_ampersand;
-      case "selector_ampersand_at_the_middle" selector_ampersand_at_the_middle;
-      case "selector_params" selector_params;
-      case "keyframe" keyframe;
-      case "global" global;
-      case "duplicated_styles_unique" duplicated_styles_unique;
-      case "hover_selector" hover_selector;
-      case "style_tag" style_tag;
-      case "media_queries" media_queries;
-      case "ampersand_selector_with_classname" ampersand_selector_with_classname;
-      case "selector_with_classname" selector_with_classname;
-      case "media_queries_with_selectors" media_queries_with_selectors;
-      case "media_queries_nested" media_queries_nested;
-      case "media_queries_nested_2" media_queries_nested_2;
+      test "one_property" one_property;
+      test "multiple_properties" multiple_properties;
+      test "multiple_declarations" multiple_declarations;
+      test "float_values" float_values;
+      test "selector_one_nesting" selector_one_nesting;
+      test "label" label;
+      test "selector_nested" selector_nested;
+      test "selector_nested_x10" selector_nested_x10;
+      test "selector_ampersand" selector_ampersand;
+      test "selector_ampersand_at_the_middle" selector_ampersand_at_the_middle;
+      test "selector_params" selector_params;
+      test "keyframe" keyframe;
+      test "global" global;
+      test "duplicated_styles_unique" duplicated_styles_unique;
+      test "hover_selector" hover_selector;
+      test "style_tag" style_tag;
+      test "media_queries" media_queries;
+      test "ampersand_selector_with_classname" ampersand_selector_with_classname;
+      test "selector_with_classname" selector_with_classname;
+      test "media_queries_with_selectors" media_queries_with_selectors;
+      test "media_queries_nested" media_queries_nested;
+      test "media_queries_nested_2" media_queries_nested_2;
     ] )

@@ -1,9 +1,3 @@
-let assert_string left right =
-  Alcotest.check Alcotest.string "should be equal" right left
-
-let assert_not_equal_string left right =
-  Alcotest.check (Alcotest.neg Alcotest.string) "should not be equal" right left
-
 let get_string_style_rules () =
   let content = CssJs.get_string_style_rules () in
   let _ = CssJs.flush () in
@@ -507,38 +501,36 @@ let media_queries_nested_2 () =
         display: flex; }  }"
        className className className)
 
-let case title fn = Alcotest.test_case title `Quick fn
-
 let tests =
   ( "CssJs",
     [
-      case "one_property" one_property;
-      case "multiple_properties" multiple_properties;
-      case "multiple_declarations" multiple_declarations;
-      case "float_values" float_values;
-      case "selector_one_nesting" selector_one_nesting;
-      case "label" label;
-      case "selector_nested" selector_nested;
-      case "selector_nested_x10" selector_nested_x10;
-      case "selector_ampersand" selector_ampersand;
-      case "selector_ampersand_at_the_middle" selector_ampersand_at_the_middle;
-      case "selector_params" selector_params;
-      case "keyframe" keyframe;
-      case "global" global;
-      case "duplicated_styles_unique" duplicated_styles_unique;
-      case "selector_with_ppx" selector_with_ppx;
-      case "avoid_hash_collision" avoid_hash_collision;
-      case "hover_selector" hover_selector;
-      case "style_tag" style_tag;
-      case "pseudo" pseudo;
-      case "multiple_selectors" multiple_selectors;
-      case "nested_selectors" nested_selectors;
-      case "nested_selectors_2" nested_selectors_2;
-      case "nested_pseudo_with_interp" nested_pseudo_with_interp;
-      case "media_queries" media_queries;
-      case "ampersand_selector_with_classname" ampersand_selector_with_classname;
-      case "selector_with_classname" selector_with_classname;
-      case "media_queries_with_selectors" media_queries_with_selectors;
-      case "media_queries_nested" media_queries_nested;
-      case "media_queries_nested_2" media_queries_nested_2;
+      test "one_property" one_property;
+      test "multiple_properties" multiple_properties;
+      test "multiple_declarations" multiple_declarations;
+      test "float_values" float_values;
+      test "selector_one_nesting" selector_one_nesting;
+      test "label" label;
+      test "selector_nested" selector_nested;
+      test "selector_nested_x10" selector_nested_x10;
+      test "selector_ampersand" selector_ampersand;
+      test "selector_ampersand_at_the_middle" selector_ampersand_at_the_middle;
+      test "selector_params" selector_params;
+      test "keyframe" keyframe;
+      test "global" global;
+      test "duplicated_styles_unique" duplicated_styles_unique;
+      test "selector_with_ppx" selector_with_ppx;
+      test "avoid_hash_collision" avoid_hash_collision;
+      test "hover_selector" hover_selector;
+      test "style_tag" style_tag;
+      test "pseudo" pseudo;
+      test "multiple_selectors" multiple_selectors;
+      test "nested_selectors" nested_selectors;
+      test "nested_selectors_2" nested_selectors_2;
+      test "nested_pseudo_with_interp" nested_pseudo_with_interp;
+      test "media_queries" media_queries;
+      test "ampersand_selector_with_classname" ampersand_selector_with_classname;
+      test "selector_with_classname" selector_with_classname;
+      test "media_queries_with_selectors" media_queries_with_selectors;
+      test "media_queries_nested" media_queries_nested;
+      test "media_queries_nested_2" media_queries_nested_2;
     ] )
