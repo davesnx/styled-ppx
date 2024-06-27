@@ -196,11 +196,11 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.gap2(~rowGap=`zero, ~columnGap=`em(1.));
   CssJs.gap(`em(1.));
   CssJs.gap2(~rowGap=`em(1.), ~columnGap=`em(1.));
-  CssJs.unsafe({js|columnGap|js}, {js|0|js});
-  CssJs.unsafe({js|columnGap|js}, {js|1em|js});
-  CssJs.unsafe({js|columnGap|js}, {js|normal|js});
-  CssJs.unsafe({js|rowGap|js}, {js|0|js});
-  CssJs.unsafe({js|rowGap|js}, {js|1em|js});
+  CssJs.columnGap(`zero);
+  CssJs.columnGap(`em(1.));
+  CssJs.columnGap(`normal);
+  CssJs.rowGap(`zero);
+  CssJs.rowGap(`em(1.));
   CssJs.unsafe({js|marginTrim|js}, {js|none|js});
   CssJs.unsafe({js|marginTrim|js}, {js|in-flow|js});
   CssJs.unsafe({js|marginTrim|js}, {js|all|js});
