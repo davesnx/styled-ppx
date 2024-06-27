@@ -171,6 +171,26 @@ let media_queries_nested_2 () =
         display: flex; }  }"
        className className className)
 
+let media_queries_nested_3 () =
+  let className =
+    Css.style
+      [
+        Css.maxWidth (`px 800);
+        Css.media "(min-width: 300px)"
+          [
+            Css.media "(max-width: 768px)"
+              [ Css.media "(max-width: 768px)" [ Css.display `flex ] ];
+          ];
+      ]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { max-width: 800px; } @media (min-width: 300px) { .%s { position: \
+        fixed; }  } @media (max-width: 768px) and (min-width: 300px) { .%s { \
+        display: flex; }  }"
+       className className className)
+
 let selector_params () =
   let className =
     Css.style [ Css.maxWidth (`px 800); Css.firstChild [ Css.width (`px 300) ] ]

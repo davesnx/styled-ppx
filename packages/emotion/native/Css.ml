@@ -142,13 +142,6 @@ let replace_ampersand ~by str =
   in
   replace_ampersand' str by
 
-let resolve_ampersand hash selector =
-  let classname = "." ^ hash in
-  let resolved_selector = replace_ampersand ~by:classname selector in
-  if starts_with_ampersand selector then resolved_selector
-  else if starts_with_at selector then resolved_selector
-  else Printf.sprintf ".%s %s" hash resolved_selector
-
 let rec rule_to_debug nesting accumulator rule =
   let next_rule =
     match rule with
@@ -195,6 +188,7 @@ let resolve_selectors rules =
 
   (* media selectors should be at the top. .a { @media () {} }
      should be @media () { .a {}} *)
+  (* TODO: Only works with 2 levels *)
   let move_media_at_top rule_list =
     List.fold_left
       (fun acc rule ->
@@ -228,12 +222,7 @@ let resolve_selectors rules =
       [] rule_list
   in
 
-  print_rules rules;
-  print_endline " ";
   let rules = move_media_at_top rules in
-
-  (* print_endline "-- RESOLVED -- ";
-     print_rules rules; *)
 
   (* unnest takes a list of rules and unnest them into a flat list of rules *)
   let rec unnest ~prefix =
@@ -257,9 +246,10 @@ let resolve_selectors rules =
     in
 
     List.partition_map (function
-      (* in case of being at @media, don't touch this selector *)
+      (* in case of being at @media, don't do anything to it *)
       | S (title, selector_rules) when starts_with_at title ->
         Right [ S (title, selector_rules) ]
+      (* in case of being a regular selector, unnest with the prefix *)
       | S (title, selector_rules) ->
         let new_prelude = prefix ^ title in
         let new_rules = split_multiple_selectors selector_rules in
@@ -279,7 +269,7 @@ let pp_keyframes animationName keyframes =
   Printf.sprintf "@keyframes %s { %s }" animationName definition
 
 (* Removes nesting on selectors, run the autoprefixer. *)
-let rec pp_rules className rules =
+let rec render_rules className rules =
   (* TODO: Refactor with partition or partition_map. List.filter_map is error prone.
      Also it might need to respect the order of definition, and this breaks the order *)
   let list_of_rules = rules |> resolve_selectors in
@@ -292,9 +282,6 @@ let rec pp_rules className rules =
     |> fun all -> Printf.sprintf ".%s { %s }" className all
   in
 
-  (* print_endline " ";
-     print_endline "-- pre-render -- ";
-     print_rules list_of_rules; *)
   let selectors =
     list_of_rules
     |> List.filter_map (render_selectors className)
@@ -308,17 +295,17 @@ and render_selectors hash rule =
   | S (_selector, rules) when List.is_empty rules -> None
   (* In case of being @media (or any at_rule) render the selector first and declarations with the hash inside *)
   | S (selector, rules) when is_at_rule selector ->
-    let nested_selectors = pp_rules hash rules in
+    let nested_selectors = render_rules hash rules in
     Some (Printf.sprintf "%s { %s }" selector nested_selectors)
-  (* | S (selector, rules) when is_at_rule selector ->
-     let all_selectors = render_selectors hash (S (selector, rules)) in
-     (match all_selectors with
-     | None -> None
-     | Some all_selectors ->
-       Some (Printf.sprintf "%s { .%s { %s } }" selector hash all_selectors)) *)
   | S (selector, rules) ->
     (* Resolving the ampersand means to replace all ampersands by the hash *)
-    let new_selector = resolve_ampersand hash selector in
+    let classname = "." ^ hash in
+    let resolved_selector = replace_ampersand ~by:classname selector in
+    let new_selector =
+      if starts_with_ampersand selector then resolved_selector
+      else if starts_with_at selector then resolved_selector
+      else Printf.sprintf ".%s %s" hash resolved_selector
+    in
     Some (Printf.sprintf "%s { %s }" new_selector (render_declarations rules))
   (* S (aka Selectors) are the only ones used by styled-ppx, we don't use PseudoClass neither PseucodClassParam. TODO: Remove them.
      Meanwhile we have them, it's a good idea to check if the first character of the selector is a `:` because it's expected to not have a space between the selector and the :pseudoselector. *)
@@ -334,7 +321,7 @@ and render_selectors hash rule =
   | D (_, _) -> None
 
 (* rules_to_string renders the rule in a format where the hash matches with `@emotion/serialise`
-     It doesn't render any whitespace. (compared to pp_rules)
+     It doesn't render any whitespace. (compared to render_rules)
      TODO: Ensure Selector is rendered correctly.
      TODO: Ensure PsuedoClass is rendered correctly.
      TODO: Ensure PseudoClassParam is rendered correctly.
@@ -442,7 +429,7 @@ let render_style_tag () =
          | Globals rules ->
            Printf.sprintf "%s %s" accumulator (rules_to_string rules)
          | Classnames { className; styles } ->
-           let rules = pp_rules className styles |> String.trim in
+           let rules = render_rules className styles |> String.trim in
            Printf.sprintf "%s %s" accumulator rules
          | Keyframes { animationName; keyframes } ->
            let rules = pp_keyframes animationName keyframes |> String.trim in
