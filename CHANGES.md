@@ -1,5 +1,9 @@
 # Changes
 
+## Unreleased
+
+- Rename `render_style_tag` to `get_stylesheet` (@davesnx)
+
 ## 0.56.0
 
 - Improvement for locations in both code-gen and error reporting (#456) by @davesnx
