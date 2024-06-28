@@ -1,0 +1,6 @@
+{
+  "name": "@davesnx/styled-ppx-emotion",
+  "dependencies": {
+    "@emotion/css": "^11.11.2"
+  }
+}

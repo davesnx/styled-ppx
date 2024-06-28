@@ -1,0 +1,5 @@
+{
+  "name": "@davesnx/styled-ppx-emotion",
+  "sources": ["."],
+  "bs-dependencies": ["@davesnx/styled-ppx-css"]
+}
