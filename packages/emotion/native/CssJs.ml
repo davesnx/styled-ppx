@@ -139,6 +139,7 @@ let render_declarations (rules : rule array) =
 let is_at_rule selector = String.contains selector '@'
 let is_a_pseudo_selector selector = String.starts_with ~prefix:":" selector
 let starts_with_at selector = String.starts_with ~prefix:"@" selector
+let starts_with_double_dot selector = String.starts_with ~prefix:":" selector
 let starts_with_ampersand selector = String.starts_with ~prefix:"&" selector
 let contains_multiple_selectors selector = String.contains selector ','
 
@@ -337,6 +338,8 @@ and render_selectors hash rule =
     let new_selector =
       if starts_with_ampersand selector then resolved_selector
       else if starts_with_at selector then resolved_selector
+      else if starts_with_double_dot selector then
+        Printf.sprintf ".%s%s" hash resolved_selector
       else Printf.sprintf ".%s %s" hash resolved_selector
     in
     Some (Printf.sprintf "%s { %s }" new_selector (render_declarations rules))

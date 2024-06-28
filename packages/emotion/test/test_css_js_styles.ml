@@ -294,23 +294,23 @@ let hover_selector =
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s { color: rgb(255, 255, 255); } .%s :hover { color: rgba(255, 255, \
+       ".%s { color: rgb(255, 255, 255); } .%s:hover { color: rgba(255, 255, \
         255, 0.7); } .%s:hover { color: rgba(255, 255, 255, 0.7); } .%s  \
         :hover { color: rgba(255, 255, 255, 0.7); }"
        classname classname classname classname)
 
-let pseudo =
-  test "pseudo" @@ fun () ->
+let multiple_pseudo =
+  test "multiple_pseudo" @@ fun () ->
   let classname =
     [%cx
       {|
-          padding: 0;
+        padding: 0;
 
-          &::before,
-          &::after {
-            content: "";
-            transform: translateX(-50%);
-          }
+        &::before,
+        &::after {
+          content: "";
+          transform: translateX(-50%);
+        }
         |}]
   in
   let css = get_string_style_rules () in
@@ -551,10 +551,6 @@ let pseudo_selectors =
 
     :focus {
       outline: none;
-
-      ::placeholder {
-        color: red;
-      }
     }
 
     :disabled {
@@ -565,11 +561,45 @@ let pseudo_selectors =
   assert_string css
     (Printf.sprintf
        ".%s { box-sizing: border-box; padding-top: 9px; padding-bottom: 9px; \
-        border-radius: 0; } .%s ::placeholder { color: #008000; } .%s :hover { \
-        border: 1px solid transparent; } .%s :focus { outline: none; } .%s \
-        :focus ::placeholder { color: #FF0000; } .%s :disabled { color: \
-        #000000; }"
-       classname classname classname classname classname classname)
+        border-radius: 0; } .%s::placeholder { color: #008000; } .%s:hover { \
+        border: 1px solid transparent; } .%s:focus { outline: none; } \
+        .%s:disabled { color: #000000; }"
+       classname classname classname classname classname)
+
+let pseudo_selectors_2 =
+  test "pseudo_selectors_2" @@ fun () ->
+  let classname =
+    [%cx
+      {|
+    box-sizing: border-box;
+    padding-top: 9px;
+    padding-bottom: 9px;
+    border-radius: 0;
+
+    &::placeholder {
+      color: green;
+    }
+
+    &:hover {
+      border: 1px solid transparent;
+    }
+
+    &:focus {
+      outline: none;
+    }
+
+    &:disabled {
+      color: black;
+    }|}]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { box-sizing: border-box; padding-top: 9px; padding-bottom: 9px; \
+        border-radius: 0; } .%s::placeholder { color: #008000; } .%s:hover { \
+        border: 1px solid transparent; } .%s:focus { outline: none; } \
+        .%s:disabled { color: #000000; }"
+       classname classname classname classname classname)
 
 let tests =
   ( "CssJs",
@@ -578,30 +608,33 @@ let tests =
       multiple_properties;
       multiple_declarations;
       float_values;
-      selector_one_nesting;
       label;
+      avoid_hash_collision;
+      keyframe;
+      global;
+      duplicated_styles_unique;
+      style_tag;
+      (* selectors *)
+      hover_selector;
+      selector_with_classname;
+      selector_with_ppx;
+      selector_one_nesting;
       selector_nested;
       selector_nested_x10;
       selector_ampersand;
       selector_ampersand_at_the_middle;
       selector_params;
-      keyframe;
-      global;
-      duplicated_styles_unique;
-      selector_with_ppx;
-      avoid_hash_collision;
-      hover_selector;
-      style_tag;
-      pseudo;
+      ampersand_selector_with_classname;
       multiple_selectors;
       nested_selectors;
       nested_selectors_2;
+      multiple_pseudo;
       nested_pseudo_with_interp;
+      pseudo_selectors;
+      pseudo_selectors_2;
+      (* media queries *)
       media_queries;
-      ampersand_selector_with_classname;
-      selector_with_classname;
-      media_queries_with_selectors;
       media_queries_nested;
       media_queries_nested_2;
-      pseudo_selectors;
+      media_queries_with_selectors;
     ] )
