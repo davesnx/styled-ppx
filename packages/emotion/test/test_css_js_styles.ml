@@ -531,6 +531,46 @@ let media_queries_nested_2 =
         display: flex; }  }"
        classname classname classname)
 
+let pseudo_selectors =
+  test "pseudo_selectors" @@ fun () ->
+  let classname =
+    [%cx
+      {|
+    box-sizing: border-box;
+    padding-top: 9px;
+    padding-bottom: 9px;
+    border-radius: 0;
+
+    ::placeholder {
+      color: green;
+    }
+
+    :hover {
+      border: 1px solid transparent;
+    }
+
+    :focus {
+      outline: none;
+
+      ::placeholder {
+        color: red;
+      }
+    }
+
+    :disabled {
+      color: black;
+    }|}]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { box-sizing: border-box; padding-top: 9px; padding-bottom: 9px; \
+        border-radius: 0; } .%s ::placeholder { color: #008000; } .%s :hover { \
+        border: 1px solid transparent; } .%s :focus { outline: none; } .%s \
+        :focus ::placeholder { color: #FF0000; } .%s :disabled { color: \
+        #000000; }"
+       classname classname classname classname classname classname)
+
 let tests =
   ( "CssJs",
     [
@@ -563,4 +603,5 @@ let tests =
       media_queries_with_selectors;
       media_queries_nested;
       media_queries_nested_2;
+      pseudo_selectors;
     ] )
