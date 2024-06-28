@@ -255,14 +255,15 @@ let hover_selector =
       [
         Css.color (`rgb (255, 255, 255));
         Css.selector "&:hover" [ Css.color (`rgba (255, 255, 255, `num 0.7)) ];
+        Css.selector ":hover" [ Css.color (`rgba (255, 255, 255, `num 0.7)) ];
       ]
   in
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
        ".%s { color: rgb(255, 255, 255); } .%s:hover { color: rgba(255, 255, \
-        255, 0.7); }"
-       className className)
+        255, 0.7); } .%s:hover { color: rgba(255, 255, 255, 0.7); }"
+       className className className)
 
 let ampersand_selector_with_classname =
   test "ampersand_selector_with_classname" @@ fun () ->
