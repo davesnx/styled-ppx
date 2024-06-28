@@ -186,6 +186,7 @@ let resolve_selectors rules =
   (* media selectors should be at the top. .a { @media () {} }
      should be @media () { .a {}} *)
   (* TODO: Only works with 2 levels *)
+  (* TODO: Should push to top any selector *)
   let move_media_at_top rule_list =
     List.fold_left
       (fun acc rule ->

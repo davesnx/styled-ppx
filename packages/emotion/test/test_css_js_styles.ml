@@ -637,4 +637,5 @@ let tests =
       media_queries_nested;
       media_queries_nested_2;
       media_queries_with_selectors;
+      (* multiple_nested_pseudo_selectors; *)
     ] )
