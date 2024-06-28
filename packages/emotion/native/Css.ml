@@ -220,6 +220,7 @@ let resolve_selectors rules =
       [] rule_list
   in
 
+  print_rules rules;
   let rules = move_media_at_top rules in
 
   (* unnest takes a list of rules and unnest them into a flat list of rules *)
@@ -285,6 +286,10 @@ let rec render_rules className rules =
     |> List.filter_map (render_selectors className)
     |> String.concat " "
   in
+
+  print_endline "After moving media at top:";
+  print_rules list_of_rules;
+
   Printf.sprintf "%s %s" declarations selectors
 
 (* Renders all selectors with the hash given *)
