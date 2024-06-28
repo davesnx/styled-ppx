@@ -9,8 +9,8 @@ type rule =
 
 let rec ruleToDict dict rule =
   (match rule with
-  | D (name, value) -> dict |. Js.Dict.set name (Js.Json.string value)
-  | S (name, ruleset) -> dict |. Js.Dict.set name (toJson ruleset)
+  | D (name, value) -> Js.Dict.set dict name (Js.Json.string value)
+  | S (name, ruleset) -> Js.Dict.set dict name (toJson ruleset)
   | PseudoClass (name, ruleset) ->
     dict |. Js.Dict.set ({js|:|js} ^ name) (toJson ruleset)
   | PseudoClassParam (name, param, ruleset) ->
