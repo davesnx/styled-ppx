@@ -58,13 +58,48 @@ let clx = [%cx
 |}
 ];
 
+let post = [%cx {|
+  border: 2px solid;
+  container-type: inline-size;
+|}];
+
+let card = [%cx
+  {|
+  margin: 10px;
+  border: 2px dotted;
+  font-size: 1.5em;
+  |}
+];
+
+let container = [%cx
+  {|
+  @container (width < 600px) {
+    width: 50%;
+    background-color: gray;
+    font-size: 1em;
+
+    .my-content {
+      font-weight: bold;
+    }
+  }
+|}
+];
+
 module App = {
   [@react.component]
   let make = () =>
-    <Cositas as_="section" lola={CssJs.px(10)}>
-      <div className=clx> {React.string("code everywhere!")} </div>
-      <div className=selectors> {React.string("Red text")} </div>
-    </Cositas>;
+    <>
+      <div className=post>
+        <div className={card ++ " " ++ container}>
+          <h2> {React.string("Card title")} </h2>
+          <p className="my-content"> {React.string("Card content")} </p>
+        </div>
+      </div>
+      <Cositas as_="section" lola={CssJs.px(10)}>
+        <div className=clx> {React.string("code everywhere!")} </div>
+        <div className=selectors> {React.string("Red text")} </div>
+      </Cositas>
+    </>;
 };
 
 let color = `hex("333");

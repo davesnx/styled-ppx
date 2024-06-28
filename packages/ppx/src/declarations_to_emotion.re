@@ -287,6 +287,12 @@ let render_length = (~loc) =>
   | `Cap(_n) => raise(Unsupported_feature)
   | `Ch(n) => [%expr `ch([%e render_float(~loc, n)])]
   | `Cm(n) => [%expr `cm([%e render_float(~loc, n)])]
+  | `Cqw(n) => [%expr `cqw([%e render_float(~loc, n)])]
+  | `Cqh(n) => [%expr `cqh([%e render_float(~loc, n)])]
+  | `Cqi(n) => [%expr `cqi([%e render_float(~loc, n)])]
+  | `Cqb(n) => [%expr `cqb([%e render_float(~loc, n)])]
+  | `Cqmin(n) => [%expr `cqmin([%e render_float(~loc, n)])]
+  | `Cqmax(n) => [%expr `cqmax([%e render_float(~loc, n)])]
   | `Em(n) => [%expr `em([%e render_float(~loc, n)])]
   | `Ex(n) => [%expr `ex([%e render_float(~loc, n)])]
   | `Ic(_n) => raise(Unsupported_feature)

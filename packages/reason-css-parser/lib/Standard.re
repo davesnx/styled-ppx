@@ -59,6 +59,12 @@ let length =
       | "vb" => Ok(`Vb(number))
       | "vmin" => Ok(`Vmin(number))
       | "vmax" => Ok(`Vmax(number))
+      | "cqw" => Ok(`Cqw(number))
+      | "cqh" => Ok(`Cqh(number))
+      | "cqi" => Ok(`Cqi(number))
+      | "cqb" => Ok(`Cqb(number))
+      | "cqmin" => Ok(`Cqmin(number))
+      | "cqmax" => Ok(`Cqmax(number))
       // absolute
       | "cm" => Ok(`Cm(number))
       | "mm" => Ok(`Mm(number))

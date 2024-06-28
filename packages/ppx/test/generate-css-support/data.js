@@ -6517,6 +6517,94 @@ export default {
     },
   },
 
+  "css-containment-3": {
+    title: "CSS Containment Module Level 3",
+    links: {
+      tr: "css-contain-3",
+      dev: "css-contain-3",
+    },
+    values: {
+      properties: ["width"],
+      cqw: {
+        links: {
+          tr: "#container-lengths",
+          dev: "#container-lengths",
+          mdn: "length",
+        },
+        tests: "5cqw",
+      },
+      cqh: {
+        links: {
+          tr: "#container-lengths",
+          dev: "#container-lengths",
+          mdn: "length",
+        },
+        tests: "5cqh",
+      },
+      cqi: {
+        links: {
+          tr: "#container-lengths",
+          dev: "#container-lengths",
+          mdn: "length",
+        },
+        tests: "5cqi",
+      },
+      cqb: {
+        links: {
+          tr: "#container-lengths",
+          dev: "#container-lengths",
+          mdn: "length",
+        },
+        tests: "5cqb",
+      },
+      cqmin: {
+        links: {
+          tr: "#container-lengths",
+          dev: "#container-lengths",
+          mdn: "length",
+        },
+        tests: "5cqmin",
+      },
+      cqmax: {
+        links: {
+          tr: "#container-lengths",
+          dev: "#container-lengths",
+          mdn: "length",
+        },
+        tests: "5cqmax",
+      },
+    },
+    properties: {
+      "container-type": {
+        links: {
+          tr: "#container-type",
+          dev: "#container-type",
+        },
+        tests: ["normal", "size", "inline-size"],
+      },
+      "container-name": {
+        links: {
+          tr: "#container-name",
+          dev: "#container-name",
+        },
+        tests: ["none", "x", "x y"],
+      },
+      container: {
+        links: {
+          tr: "#container-shorthand",
+          dev: "#container-shorthand",
+        },
+        tests: [
+          "none",
+          "x / normal",
+          "x / size",
+          "x / inline-size",
+          "x y / size",
+        ],
+      },
+    },
+  },
+
   "css-sizing-3": {
     title: "CSS Box Sizing Module Level 3",
     links: {

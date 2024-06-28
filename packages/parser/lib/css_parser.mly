@@ -42,6 +42,7 @@ let make_loc = Parser_location.to_ppxlib_location
 %token <string> PRINT_MEDIA_TYPE
 %token <string> ALL_MEDIA_TYPE
 %token <string> AT_KEYFRAMES
+%token <string> AT_CONTAINER
 %token <string> AT_RULE
 %token <string> AT_RULE_STATEMENT
 %token <string> HASH
@@ -128,7 +129,7 @@ mf_value:
   | v = value { v }
 
 /* <mf-plain> = <mf-name> : <mf-value> */
-mf_plain: mf = IDENT WS? COLON WS? mf_value { mf }
+mf_plain: mf = IDENT WS? COLON WS? values { mf }
 
 /* <mf-lt> = '<' '='? */
 mf_lt: mflt = less_than equal_sign? { mflt }
@@ -240,6 +241,53 @@ media_query_prelude:
 
 prelude: xs = value { xs }
 
+// <size-feature> = ( [ <mf-plain> | <mf-range> ] )
+size_feature:
+  /* TODO: property & value in mf_plain are not safely parsed */
+  | mfp = mf_plain { mfp }
+  | mfr = mf_range { mfr }
+
+// <query-in-parens>     = ( <container-query> )
+//                      | ( <size-feature> )
+//                      | style( <style-query> )
+//                      | <general-enclosed>
+query_in_parens:
+  | LEFT_PAREN cq = container_query RIGHT_PAREN { cq }
+  | LEFT_PAREN WS? mf = size_feature WS? RIGHT_PAREN { Ident mf }
+  | i = interpolation { i }
+
+query_in_parens_with_and: v = and_operator WS? query_in_parens { v }
+
+// [ and <query-in-parens> ]*
+query_in_parens_with_and_star:
+  | { [] }
+  | x = query_in_parens_with_and WS? xs = query_in_parens_with_and_star { x :: xs }
+
+query_in_parens_with_or: v = or_operator WS? query_in_parens { v }
+
+// [ or <query-in-parens> ]*
+query_in_parens_with_or_star:
+  | { [] }
+  | x = query_in_parens_with_or WS? xs = query_in_parens_with_or_star { x :: xs }
+
+// [ and <query-in-parens> ]* | [ or <query-in-parens> ]*
+query_in_parens_with_or_or_and_list:
+  | v = query_in_parens_with_or_star { v }
+  | v = query_in_parens_with_and_star { v }
+
+// <container-query>     = not <query-in-parens>
+//                       | <query-in-parens> [ [ and <query-in-parens> ]* | [ or <query-in-parens> ]* ]
+container_query:
+  | v = not_operator WS? query_in_parens { Ident v }
+  | v = skip_ws_right(query_in_parens) query_in_parens_with_or_or_and_list { v }
+
+// <container-name> = <custom-ident>
+container_name: xs = wq_name { xs }
+// <container-condition> = [ <container-name> ]? <container-query>
+container_condition: skip_ws_right(container_name)? query = container_query { query }
+
+container_prelude: xs = separated_nonempty_list(COMMA, loc(skip_ws(container_condition))) { Paren_block xs }
+
 /* https://www.w3.org/TR/css-syntax-3/#at-rules */
 at_rule:
   /* @media (min-width: 16rem) { ... } */
@@ -286,9 +334,18 @@ at_rule:
       loc = make_loc $startpos $endpos;
     }): at_rule
   }
+  | name = loc(AT_CONTAINER) WS?
+    xs = loc(container_prelude) WS?
+    s = brace_block(stylesheet_without_eof) WS? {
+    { name;
+      prelude = xs;
+      block = Stylesheet s;
+      loc = make_loc $startpos $endpos;
+    }
+  }
   /* @charset */
   | name = loc(AT_RULE_STATEMENT) WS?
-    xs = loc(prelude) WS? SEMI_COLON? {
+    xs = loc(prelude) WS? SEMI_COLON {
     { name;
       prelude = xs;
       block = Empty;
@@ -299,7 +356,7 @@ at_rule:
   /* @page { ... } */
   /* @{{rule}} { ... } */
   | name = loc(AT_RULE) WS?
-    xs = loc(prelude) WS?
+    xs = loc(prelude_any) WS?
     s = brace_block(stylesheet_without_eof) WS? {
     { name;
       prelude = xs;
@@ -374,6 +431,7 @@ style_rule:
   }
 
 values: xs = nonempty_list(loc(skip_ws(value))) { xs }
+prelude_any: xs = list(loc(skip_ws(value))) { Paren_block xs }
 
 declarations:
   | WS? xs = nonempty_list(rule) SEMI_COLON? { xs }
