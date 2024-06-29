@@ -129,7 +129,7 @@ mf_value:
   | v = value { v }
 
 /* <mf-plain> = <mf-name> : <mf-value> */
-mf_plain: mf = IDENT WS? COLON WS? mf_value { mf }
+mf_plain: mf = IDENT WS? COLON WS? values { mf }
 
 /* <mf-lt> = '<' '='? */
 mf_lt: mflt = less_than equal_sign? { mflt }

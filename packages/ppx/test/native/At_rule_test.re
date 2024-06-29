@@ -335,19 +335,19 @@ let container_query_tests = [
       |])
     ],
   ),
-  //(
-  //  "(aspect-ratio: 1 / 1)",
-  //  [%expr [%cx "@container (aspect-ratio: 1 / 1) {}"]],
-  //  [%expr
-  //    CssJs.style([|
-  //      CssJs.atRule(
-  //        ~params={js|(aspect-ratio: 1 / 1)|js},
-  //        "container",
-  //        [||],
-  //      ),
-  //    |])
-  //  ],
-  //),
+  (
+    "(aspect-ratio: 1 / 1)",
+    [%expr [%cx "@container (aspect-ratio: 1 / 1) {}"]],
+    [%expr
+      CssJs.style([|
+        CssJs.atRule(
+          ~params={js|(aspect-ratio: 1 / 1)|js},
+          "container",
+          [||],
+        ),
+      |])
+    ],
+  ),
   (
     "(orientation: portrait)",
     [%expr [%cx "@container (orientation: portrait) {}"]],
