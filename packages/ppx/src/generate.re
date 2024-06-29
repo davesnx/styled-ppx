@@ -40,7 +40,13 @@ let generateDynamicStyles =
   let styles =
     switch (functionExpr.pexp_desc) {
     /* styled.div () => "string" */
-    | Pexp_constant(Pconst_string(str, loc, _label)) =>
+    | Pexp_constant(Pconst_string(str, loc, delimiter)) =>
+      let loc =
+        Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
+          loc,
+          delimiter,
+        );
+
       switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, str)) {
       | Ok(declarations) =>
         declarations
@@ -49,7 +55,7 @@ let generateDynamicStyles =
         |> Builder.pexp_array(~loc)
         |> Css_to_emotion.render_style_call(~loc)
       | Error((loc, msg)) => Generate_lib.error(~loc, msg)
-      }
+      };
 
     /* styled.div () => "[||]" */
     | Pexp_array(arr) =>

@@ -1748,7 +1748,7 @@ and pseudo_page = [%value.rec "':' [ 'left' | 'right' | 'first' | 'blank' ]"]
 and quote = [%value.rec
   "'open-quote' | 'close-quote' | 'no-open-quote' | 'no-close-quote'"
 ]
-and ratio = [%value.rec "<integer> '/' <integer> | <integer>"]
+and ratio = [%value.rec "<integer> '/' <integer> | <number> | <interpolation>"]
 and relative_selector = [%value.rec "[ <combinator> ]? <complex-selector>"]
 and relative_selector_list = [%value.rec "[ <relative-selector> ]#"]
 and relative_size = [%value.rec "'larger' | 'smaller'"]

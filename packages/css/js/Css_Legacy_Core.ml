@@ -163,6 +163,14 @@ let important v =
 
 let label label = D ({js|label|js}, label)
 
+let aspectRatio x =
+  D
+    ( {js|aspectRatio|js},
+      match x with
+      | #AspectRatio.t as ar -> AspectRatio.toString ar
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c )
+
 let alignContent x =
   D
     ( {js|alignContent|js},
@@ -1910,7 +1918,6 @@ module Transition = struct
 
   let toString (x : t) = match x with `value v -> v
 end
-[@@ns.doc "\n * Transition\n "]
 
 let transitionValue x = D ({js|transition|js}, Transition.toString x)
 
@@ -1959,7 +1966,6 @@ module Animation = struct
 
   let toString x = match x with `value v -> v
 end
-[@@ns.doc "\n * Animation\n "]
 
 let animationValue x = D ({js|animation|js}, Animation.toString x)
 
@@ -2033,6 +2039,5 @@ module SVG = struct
   let stopColor x = D ({js|stopColor|js}, string_of_color x)
   let stopOpacity x = D ({js|stopOpacity|js}, Std.Float.toString x)
 end
-[@@ns.doc "\n * SVG\n "]
 
 let touchAction x = D ({js|touchAction|js}, x |. TouchAction.toString)

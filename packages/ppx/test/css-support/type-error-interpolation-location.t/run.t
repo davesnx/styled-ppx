@@ -15,9 +15,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", lines 10-11, characters 6-36:
-  10 | ......|
-  11 |     text-decoration: $(cosas).
+  File "input.re", line 11, characters 21-29:
   Error: This expression has type [> `underlin ]
          but an expression was expected of type
            [< `inherit_

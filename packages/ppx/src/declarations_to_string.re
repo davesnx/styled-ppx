@@ -331,10 +331,11 @@ let render_ratio =
   fun
   | `Static(a, (), b) => [%expr
       [%e string_of_int(a) |> render_string]
-      ++ "/"
+      ++ " / "
       ++ [%e string_of_int(b) |> render_string]
     ]
-  | `Integer(i) => [%expr [%e render_integer(i)]];
+  | `Number(i) => [%expr [%e string_of_float(i) |> render_string]]
+  | `Interpolation(v) => render_variable(v);
 
 let aspect_ratio =
   apply(

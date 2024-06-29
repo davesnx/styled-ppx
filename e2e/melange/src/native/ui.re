@@ -54,6 +54,7 @@ let clx = [%cx
   animation-name: $(bounce);
   font-family: $(code);
   cursor: $(lola);
+  grid-template-columns: auto 40%;
 |}
 ];
 

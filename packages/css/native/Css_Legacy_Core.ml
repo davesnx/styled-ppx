@@ -8,12 +8,6 @@ type rule =
   | PseudoClassParam of string * string * rule list
 
 module Converter = struct
-  let string_of_stops stops =
-    stops
-    |. Std.List.map (fun (c, l) ->
-           Color.toString c ^ {js| |js} ^ Length.toString l)
-    |. Std.List.joinWith ~sep:{js|, |js}
-
   let string_of_content x =
     match x with
     | #Content.t as c -> Content.toString c
@@ -93,6 +87,14 @@ let important v =
 
 let label label = D ({js|label|js}, label)
 
+let aspectRatio x =
+  D
+    ( {js|aspect-ratio|js},
+      match x with
+      | #AspectRatio.t as ar -> AspectRatio.toString ar
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c )
+
 let alignContent x =
   D
     ( {js|align-content|js},
@@ -112,6 +114,7 @@ let alignItems x =
       | #AlignItems.t as ai -> AlignItems.toString ai
       | #PositionalAlignment.t as pa -> PositionalAlignment.toString pa
       | #BaselineAlignment.t as ba -> BaselineAlignment.toString ba
+      | #OverflowAlignment.t as oa -> OverflowAlignment.toString oa
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
@@ -222,18 +225,28 @@ let string_of_backgroundPosition x =
   | #Cascading.t as c -> Cascading.toString c
 
 let backgroundPosition x =
-  D ({js|backgroundPosition|js}, string_of_backgroundPosition x)
+  D ({js|background-position|js}, string_of_backgroundPosition x)
 
 let backgroundPosition2 x y =
   D
-    ( {js|backgroundPosition|js},
+    ( {js|background-position|js},
       string_of_backgroundPosition x
       ^ {js| |js}
       ^ string_of_backgroundPosition y )
 
+let backgroundPositions bp =
+  D
+    ( {js|background-position|js},
+      bp
+      |. Std.Array.map (fun (x, y) ->
+             string_of_backgroundPosition x
+             ^ {js| |js}
+             ^ string_of_backgroundPosition y)
+      |. Std.Array.joinWith ~sep:{js|, |js} )
+
 let backgroundPosition4 ~x ~offsetX ~y ~offsetY =
   D
-    ( {js|backgroundPosition|js},
+    ( {js|background-position|js},
       string_of_backgroundPosition x
       ^ {js| |js}
       ^ Length.toString offsetX
@@ -241,16 +254,6 @@ let backgroundPosition4 ~x ~offsetX ~y ~offsetY =
       ^ string_of_backgroundPosition y
       ^ {js| |js}
       ^ Length.toString offsetY )
-
-let backgroundPositions bp =
-  D
-    ( {js|backgroundPosition|js},
-      bp
-      |. Std.Array.map (fun (x, y) ->
-             string_of_backgroundPosition x
-             ^ {js| |js}
-             ^ string_of_backgroundPosition y)
-      |. Std.Array.joinWith ~sep:{js|, |js} )
 
 let backgroundRepeat x =
   D
@@ -320,6 +323,18 @@ let borderLeftColor x = D ({js|border-left-color|js}, string_of_color x)
 let borderLeftWidth x = D ({js|border-left-width|js}, LineWidth.toString x)
 let borderSpacing x = D ({js|border-spacing|js}, Length.toString x)
 let borderRadius x = D ({js|border-radius|js}, Length.toString x)
+
+let borderRadius4 ~topLeft ~topRight ~bottomLeft ~bottomRight =
+  D
+    ( {js|border-radius|js},
+      Length.toString topLeft
+      ^ {js| |js}
+      ^ Length.toString topRight
+      ^ {js| |js}
+      ^ Length.toString bottomLeft
+      ^ {js| |js}
+      ^ Length.toString bottomRight )
+
 let borderRightColor x = D ({js|border-right-color|js}, string_of_color x)
 let borderRightWidth x = D ({js|border-right-width|js}, LineWidth.toString x)
 let borderTopColor x = D ({js|border-top-color|js}, string_of_color x)
@@ -593,6 +608,7 @@ let justifyContent x =
       | #PositionalAlignment.t as pa -> PositionalAlignment.toString pa
       | #NormalAlignment.t as na -> NormalAlignment.toString na
       | #DistributedAlignment.t as da -> DistributedAlignment.toString da
+      | #OverflowAlignment.t as oa -> OverflowAlignment.toString oa
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
@@ -920,6 +936,22 @@ let textAlign x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
+let textAlignAll x =
+  D
+    ( {js|text-align-all|js},
+      match x with
+      | #TextAlignAll.t as taa -> TextAlignAll.toString taa
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c )
+
+let textAlignLast x =
+  D
+    ( {js|text-align-last|js},
+      match x with
+      | #TextAlignLast.t as tal -> TextAlignLast.toString tal
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c )
+
 let textDecorationColor x =
   D
     ( {js|text-decoration-color|js},
@@ -959,6 +991,31 @@ let textIndent x =
       match x with
       | #Percentage.t as p -> Percentage.toString p
       | #Length.t as l -> Length.toString l
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c )
+
+let textDecorationSkipInk x =
+  D
+    ( {js|text-decoration-skip-ink|js},
+      match x with
+      | #TextDecorationSkipInk.t as tdsi -> TextDecorationSkipInk.toString tdsi
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c )
+
+let textDecorationSkipBox x =
+  D
+    ( {js|text-decoration-skip-box|js},
+      match x with
+      | #TextDecorationSkipBox.t as tdsb -> TextDecorationSkipBox.toString tdsb
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c )
+
+let textDecorationSkipInset x =
+  D
+    ( {js|text-decoration-skip-inset|js},
+      match x with
+      | #TextDecorationSkipInset.t as tdsi ->
+        TextDecorationSkipInset.toString tdsi
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
@@ -1010,7 +1067,12 @@ let transformOrigin3d x y z =
       ^ Length.toString z
       ^ {js| |js} )
 
-let transformBox x = D ({js|transform-box|js}, TransformBox.toString x)
+let transformBox x =
+  D
+    ( {js|transform-box|js},
+      match x with
+      | #TransformBox.t as tb -> TransformBox.toString tb
+      | #Cascading.t as c -> Cascading.toString c )
 
 let explode s =
   let rec exp i l = if i < 0 then l else exp (i - 1) (s.[i] :: l) in
@@ -1507,6 +1569,7 @@ let string_of_minmax x =
   match x with
   | `auto -> {js|auto|js}
   | #Length.t as l -> Length.toString l
+  | `fr x -> Std.Float.toString x ^ {js|fr|js}
   | `minContent -> {js|min-content|js}
   | `maxContent -> {js|max-content|js}
 
@@ -1569,7 +1632,7 @@ let rec gridLengthToJs x =
   | `minmax (a, b) ->
     {js|minmax(|js}
     ^ string_of_minmax a
-    ^ {js|,|js}
+    ^ {js|, |js}
     ^ string_of_minmax b
     ^ {js|)|js}
 
@@ -2041,3 +2104,117 @@ module SVG = struct
 end
 
 let touchAction x = D ({js|touch-action|js}, x |. TouchAction.toString)
+let textEmphasisColor x = D ({js|text-emphasis-color|js}, string_of_color x)
+
+let lineBreak x =
+  D
+    ( {js|line-break|js},
+      match x with
+      | #LineBreak.t as lb -> LineBreak.toString lb
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let hyphens x =
+  D
+    ( {js|hyphens|js},
+      match x with
+      | #Hyphens.t as h -> Hyphens.toString h
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let textJustify x =
+  D
+    ( {js|text-justify|js},
+      match x with
+      | #TextJustify.t as tj -> TextJustify.toString tj
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let overflowInline x =
+  D
+    ( {js|overflow-inline|js},
+      match x with
+      | #OverflowInline.t as ov -> OverflowInline.toString ov
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let overflowBlock x =
+  D
+    ( {js|overflow-block|js},
+      match x with
+      | #OverflowInline.t as ov -> OverflowInline.toString ov
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let fontSynthesisWeight x =
+  D
+    ( {js|font-synthesis-weight|js},
+      match x with
+      | #FontSynthesisWeight.t as fsw -> FontSynthesisWeight.toString fsw
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let fontSynthesisStyle x =
+  D
+    ( {js|font-synthesis-style|js},
+      match x with
+      | #FontSynthesisStyle.t as fss -> FontSynthesisStyle.toString fss
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let fontSynthesisSmallCaps x =
+  D
+    ( {js|font-synthesis-small-caps|js},
+      match x with
+      | #FontSynthesisSmallCaps.t as fssc ->
+        FontSynthesisSmallCaps.toString fssc
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let fontSynthesisPosition x =
+  D
+    ( {js|font-synthesis-weight|js},
+      match x with
+      | #FontSynthesisPosition.t as fsp -> FontSynthesisPosition.toString fsp
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let fontKerning x =
+  D
+    ( {js|font-kerning|js},
+      match x with
+      | #FontKerning.t as fk -> FontKerning.toString fk
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let fontVariantPosition x =
+  D
+    ( {js|font-variant-position|js},
+      match x with
+      | #FontVariantPosition.t as fvp -> FontVariantPosition.toString fvp
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let fontVariantCaps x =
+  D
+    ( {js|font-variant-caps|js},
+      match x with
+      | #FontVariantCaps.t as fvc -> FontVariantCaps.toString fvc
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let fontOpticalSizing x =
+  D
+    ( {js|font-optical-sizing|js},
+      match x with
+      | #FontOpticalSizing.t as fos -> FontOpticalSizing.toString fos
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )
+
+let fontVariantEmoji x =
+  D
+    ( {js|font-variant-emoji|js},
+      match x with
+      | #FontVariantEmoji.t as fve -> FontVariantEmoji.toString fve
+      | #Var.t as var -> Var.toString var
+      | #Cascading.t as c -> Cascading.toString c )

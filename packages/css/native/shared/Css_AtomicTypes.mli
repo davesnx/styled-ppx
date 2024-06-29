@@ -155,6 +155,16 @@ module Length : sig
   val toString : t -> string
 end
 
+module AspectRatio : sig
+  type t =
+    [ `auto
+    | `num of float
+    | `ratio of int * int
+    ]
+
+  val toString : t -> string
+end
+
 module Angle : sig
   type t =
     [ `deg of float
