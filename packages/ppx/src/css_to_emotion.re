@@ -66,7 +66,19 @@ let concat = (~loc, expr, acc) => {
 let rec render_at_rule = (~loc, at_rule: at_rule) => {
   let (at_rule_name, at_rule_name_loc) = at_rule.name;
   let at_rule_name_loc =
-    Styled_ppx_css_parser.Parser_location.intersection(loc, at_rule_name_loc);
+    Styled_ppx_css_parser.Parser_location.update_pos_lnum(
+      {
+        ...at_rule_name_loc,
+        loc_start: {
+          ...at_rule_name_loc.loc_start,
+          pos_bol: at_rule_name_loc.loc_end.pos_bol,
+          pos_cnum:
+            at_rule_name_loc.loc_end.pos_cnum - String.length(at_rule_name),
+          pos_lnum: at_rule_name_loc.loc_end.pos_lnum,
+        },
+      },
+      loc,
+    );
   switch (at_rule_name) {
   | "media" => render_media_query(~loc, at_rule)
   | "container" => render_container_query(~loc, at_rule)
