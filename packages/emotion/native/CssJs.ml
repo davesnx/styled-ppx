@@ -262,68 +262,65 @@ let resolve_selectors rules =
       [] rule_list
   in
 
-  print_rules rules;
-  let rules = move_media_at_top rules in
-
   (* multiple selectors are defined with commas: like .a, .b {}
      we split those into separate rules *)
+  let split_multiple_selectors rule_list =
+    List.fold_left
+      (fun acc rule ->
+        match rule with
+        | S (selector, rules) when contains_multiple_selectors selector ->
+          let selector_list = String.split_on_char ',' selector in
+          let new_rules =
+            (* for each selector, we apply the same rules *)
+            List.map
+              (fun selector -> S (String.trim selector, rules))
+              selector_list
+          in
+          List.append acc new_rules
+        | rule -> List.append acc [ rule ])
+      [] rule_list
+  in
 
   (* unnest takes a list of rules and unnest them into a flat list of rules *)
-  let rec unnest ~prefix =
+  let rec unnest_selectors ~prefix rules =
     (* multiple selectors are defined with commas: like .a, .b {}
        we split those into separate selectors with the same rules *)
-    let split_multiple_selectors rule_list =
-      Array.fold_left
-        (fun acc rule ->
-          match rule with
-          | S (selector, rules) when contains_multiple_selectors selector ->
-            let selectors = String.split_on_char ',' selector in
-            let new_rules =
-              List.map
-                (fun selector -> S (String.trim selector, rules))
-                selectors
-            in
-            Array.append acc (Array.of_list new_rules)
-          | rule -> Array.append acc [| rule |])
-        [||] rule_list
-    in
-
-    List.partition_map (function
-      (* in case of being at @media, don't do anything to it *)
-      | S (current_selector, selector_rules)
-        when starts_with_at current_selector ->
-        Right [ S (current_selector, selector_rules) ]
-      | S (current_selector, selector_rules) ->
-        Printf.sprintf "\nDEBUG---- with ampersand" |> print_endline;
-        Printf.sprintf "CURRENT_SELECTOR %s" current_selector |> print_endline;
-        Printf.sprintf "PREFIX %s" prefix |> print_endline;
-        let is_first_level = prefix != "" in
-        let new_prelude =
-          if is_first_level && starts_with_ampersand current_selector then
-            prefix ^ remove_first_ampersand current_selector
-          else if is_first_level && starts_with_dot current_selector then
-            prefix ^ remove_first_ampersand current_selector
-          else if is_first_level && starts_with_double_dot current_selector then
-            prefix ^ current_selector
-          else if is_first_level || starts_with_dot current_selector then
-            prefix ^ " " ^ current_selector
-          else prefix ^ current_selector
-        in
-        let selector_rules = split_multiple_selectors selector_rules in
-        let rule_array = Array.to_list selector_rules in
-        let prefix = new_prelude in
-        let content, tail = unnest ~prefix rule_array in
-        let new_selector = S (prefix, Array.of_list content) in
-        Right (new_selector :: List.flatten tail)
-      | _ as rule -> Left rule)
+    List.partition_map
+      (function
+        (* in case of being at @media, don't do anything to it *)
+        | S (current_selector, selector_rules)
+          when starts_with_at current_selector ->
+          Right [ S (current_selector, selector_rules) ]
+        | S (current_selector, selector_rules) ->
+          Printf.sprintf "CURRENT_SELECTOR %s" current_selector |> print_endline;
+          Printf.sprintf "PREFIX %s" prefix |> print_endline;
+          let is_first_level = prefix != "" in
+          let new_prelude =
+            if is_first_level && starts_with_ampersand current_selector then
+              prefix ^ remove_first_ampersand current_selector
+            else if is_first_level && starts_with_dot current_selector then
+              prefix ^ remove_first_ampersand current_selector
+            else if is_first_level && starts_with_double_dot current_selector
+            then prefix ^ current_selector
+            else if is_first_level || starts_with_dot current_selector then
+              prefix ^ " " ^ current_selector
+            else prefix ^ current_selector
+          in
+          let content, tail =
+            unnest_selectors ~prefix:new_prelude (Array.to_list selector_rules)
+          in
+          let new_selector = S (new_prelude, Array.of_list content) in
+          Right (new_selector :: List.flatten tail)
+        | _ as rule -> Left rule)
+      rules
   in
-  let declarations, selectors = unnest ~prefix:"" rules in
-  let sol = List.flatten (declarations :: selectors) in
-  print_endline "\n -- SOLVED -- ";
-  print_rules @@ Array.of_list sol;
-  sol
 
-let pp_keyframes animationName keyframes =
+  let rules = move_media_at_top rules in
+  let rules = split_multiple_selectors rules in
+  let declarations, selectors = unnest_selectors ~prefix:"" rules in
+  List.flatten (declarations :: selectors)
+
+let render_keyframes animationName keyframes =
   let pp_keyframe (percentage, rules) =
     Printf.sprintf "%i%% { %s }" percentage (render_declarations rules)
   in
@@ -491,7 +488,9 @@ let get_stylesheet () =
            let rules = render_rules className styles |> String.trim in
            Printf.sprintf "%s %s" accumulator rules
          | Keyframes { animationName; keyframes } ->
-           let rules = pp_keyframes animationName keyframes |> String.trim in
+           let rules =
+             render_keyframes animationName keyframes |> String.trim
+           in
            Printf.sprintf "%s %s" accumulator rules)
        ""
   |> String.trim
