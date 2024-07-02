@@ -166,6 +166,26 @@ let selector_nested =
         none; }"
        classname classname classname)
 
+let selector_nested_with_ampersand =
+  test "selector_nested_with_ampersand" @@ fun () ->
+  let classname =
+    CssJs.style
+      [|
+        CssJs.margin @@ CssJs.px 10;
+        CssJs.selector "& > a"
+          [|
+            CssJs.margin @@ CssJs.px 11;
+            CssJs.selector "& > div" [| CssJs.margin @@ CssJs.px 12 |];
+          |];
+      |]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { margin: 10px; } .%s > a { margin: 11px; } .%s > a > div { \
+        margin: 12px; }"
+       classname classname classname)
+
 let selector_nested_x10 =
   test "selector_nested_x10" @@ fun () ->
   let classname =
@@ -674,6 +694,7 @@ let tests =
       selector_nested;
       selector_nested_x10;
       selector_ampersand;
+      selector_nested_with_ampersand;
       selector_ampersand_at_the_middle;
       selector_params;
       ampersand_selector_with_classname_and_mq;
