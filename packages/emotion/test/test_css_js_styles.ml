@@ -41,6 +41,24 @@ let label =
   let css = get_string_style_rules () in
   assert_string css (Printf.sprintf ".%s { display: block; }" classname)
 
+let empty_selector_simple =
+  test "empty_selector_simple" @@ fun () ->
+  let is_active_classname = [%cx ""] in
+  let classname =
+    [%cx
+      {|
+        position: relative;
+
+        & $(is_active_classname) {
+          position: absolute;
+        }
+    |}]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf ".%s { position: relative; } .%s %s { position: absolute; }"
+       classname classname is_active_classname)
+
 let selector_with_ppx =
   test "selector_with_ppx" @@ fun () ->
   let classname =
@@ -379,6 +397,44 @@ let multiple_nested_pseudo_selectors =
   assert_string css
     (Printf.sprintf
        ".%s { position: relative; } .%s:hover::after { top: 50px; }" classname
+       classname)
+
+let multiple_nested_pseudo_selectors_2 =
+  test "multiple_nested_pseudo_selectors_2" @@ fun () ->
+  let classname =
+    [%cx
+      {|
+      position: relative;
+      :hover {
+        ::after {
+          top: 50px;
+        }
+      }
+  |}]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { position: relative; } .%s:hover::after { top: 50px; }" classname
+       classname)
+
+let multiple_nested_pseudo_selectors_3 =
+  test "multiple_nested_pseudo_selectors_3" @@ fun () ->
+  let classname =
+    [%cx
+      {|
+      position: relative;
+      &:hover {
+        & ::after {
+          top: 50px;
+        }
+      }
+  |}]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { position: relative; } .%s:hover ::after { top: 50px; }" classname
        classname)
 
 let nested_pseudo_with_interp =

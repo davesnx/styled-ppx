@@ -301,6 +301,10 @@ let resolve_selectors rules =
         let new_prelude =
           if is_first_level && starts_with_ampersand current_selector then
             prefix ^ remove_first_ampersand current_selector
+          else if is_first_level && starts_with_dot current_selector then
+            prefix ^ remove_first_ampersand current_selector
+          else if is_first_level && starts_with_double_dot current_selector then
+            prefix ^ current_selector
           else if is_first_level || starts_with_dot current_selector then
             prefix ^ " " ^ current_selector
           else prefix ^ current_selector
