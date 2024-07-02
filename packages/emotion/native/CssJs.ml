@@ -448,7 +448,7 @@ let flush () = Stylesheet.flush instance
 
 let style (styles : rule array) =
   match styles with
-  | [||] -> ""
+  | [||] -> "css-0"
   | _ ->
     let hash =
       render_hash

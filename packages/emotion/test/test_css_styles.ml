@@ -271,7 +271,7 @@ let ampersand_selector_with_classname =
   let rules =
     [
       Css.display `block;
-      Css.selector ("&" ^ nested_classname)
+      Css.selector ("&." ^ nested_classname)
         [ Css.media "(min-width: 768px)" [ Css.height `auto ] ];
     ]
   in
@@ -279,9 +279,9 @@ let ampersand_selector_with_classname =
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s { display: block; } @media (min-width: 768px) { .%s {  } .%s { \
+       ".%s { display: block; } @media (min-width: 768px) { .%s {  } .%s.%s { \
         height: auto; } }"
-       classname classname classname)
+       classname classname classname nested_classname)
 
 let selector_with_classname =
   test "selector_with_classname" @@ fun () ->
@@ -290,7 +290,7 @@ let selector_with_classname =
     [
       Css.display `block;
       Css.selector
-        (".lola " ^ nested_classname)
+        (".lola ." ^ nested_classname)
         [ Css.media "(min-width: 768px)" [ Css.height `auto ] ];
     ]
   in
@@ -298,9 +298,9 @@ let selector_with_classname =
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s { display: block; } @media (min-width: 768px) { .%s {  } .%s \
-        .lola  { height: auto; } }"
-       classname classname classname)
+       ".%s { display: block; } @media (min-width: 768px) { .%s {  } .%s .lola \
+        .%s { height: auto; } }"
+       classname classname classname nested_classname)
 
 let media_queries_with_selectors =
   test "media_queries_with_selectors" @@ fun () ->

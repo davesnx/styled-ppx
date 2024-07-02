@@ -401,7 +401,7 @@ let flush () = Stylesheet.flush instance
 
 let style (styles : rule list) =
   match styles with
-  | [] -> ""
+  | [] -> "css-0"
   | _ ->
     let hash = render_hash (Murmur2.default (rules_to_string styles)) styles in
     let className = Printf.sprintf "%s-%s" "css" hash in

@@ -431,13 +431,13 @@ let style_tag =
         display: block; }</style>"
        global_hash animationNameHash classname_hash animationName classname)
 
-let ampersand_selector_with_classname =
-  test "ampersand_selector_with_classname" @@ fun () ->
+let ampersand_selector_with_classname_and_mq =
+  test "ampersand_selector_with_classname_and_mq" @@ fun () ->
   let nested_classname = CssJs.style [||] in
   let rules =
     [|
       CssJs.display `block;
-      CssJs.selector ("&" ^ nested_classname)
+      CssJs.selector ("&." ^ nested_classname)
         [| CssJs.media "(min-width: 768px)" [| CssJs.height `auto |] |];
     |]
   in
@@ -445,18 +445,18 @@ let ampersand_selector_with_classname =
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s { display: block; } @media (min-width: 768px) { .%s {  } .%s { \
+       ".%s { display: block; } @media (min-width: 768px) { .%s {  } .%s.%s { \
         height: auto; } }"
-       classname classname classname)
+       classname classname classname nested_classname)
 
-let selector_with_classname =
-  test "selector_with_classname" @@ fun () ->
+let selector_with_classname_and_mq =
+  test "selector_with_classname_and_mq" @@ fun () ->
   let nested_classname = CssJs.style [||] in
   let rules =
     [|
       CssJs.display `block;
       CssJs.selector
-        (".lola " ^ nested_classname)
+        (".lola ." ^ nested_classname)
         [| CssJs.media "(min-width: 768px)" [| CssJs.height `auto |] |];
     |]
   in
@@ -465,8 +465,8 @@ let selector_with_classname =
   assert_string css
     (Printf.sprintf
        ".%s { display: block; } @media (min-width: 768px) { .%s {  } .%s  \
-        .lola  { height: auto; } }"
-       classname classname classname)
+        .lola .%s { height: auto; } }"
+       classname classname classname nested_classname)
 
 let media_queries_with_selectors =
   test "media_queries_with_selectors" @@ fun () ->
@@ -611,7 +611,8 @@ let tests =
       style_tag;
       (* selectors *)
       hover_selector;
-      selector_with_classname;
+      selector_with_classname_and_mq;
+      empty_selector_simple;
       selector_with_ppx;
       selector_one_nesting;
       selector_nested;
@@ -619,7 +620,7 @@ let tests =
       selector_ampersand;
       selector_ampersand_at_the_middle;
       selector_params;
-      ampersand_selector_with_classname;
+      ampersand_selector_with_classname_and_mq;
       multiple_selectors;
       nested_selectors;
       nested_selectors_2;
@@ -633,4 +634,6 @@ let tests =
       media_queries_nested_2;
       media_queries_with_selectors;
       multiple_nested_pseudo_selectors;
+      multiple_nested_pseudo_selectors_2;
+      multiple_nested_pseudo_selectors_3;
     ] )
