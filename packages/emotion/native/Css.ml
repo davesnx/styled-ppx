@@ -220,7 +220,6 @@ let resolve_selectors rules =
       [] rule_list
   in
 
-  print_rules rules;
   let rules = move_media_at_top rules in
 
   (* unnest takes a list of rules and unnest them into a flat list of rules *)
@@ -260,7 +259,7 @@ let resolve_selectors rules =
   let declarations, selectors = unnest ~prefix:"" rules in
   List.flatten (declarations :: selectors)
 
-let pp_keyframes animationName keyframes =
+let render_keyframes animationName keyframes =
   let pp_keyframe (percentage, rules) =
     Printf.sprintf "%i%% { %s }" percentage (render_declarations rules)
   in
@@ -436,7 +435,9 @@ let get_stylesheet () =
            let rules = render_rules className styles |> String.trim in
            Printf.sprintf "%s %s" accumulator rules
          | Keyframes { animationName; keyframes } ->
-           let rules = pp_keyframes animationName keyframes |> String.trim in
+           let rules =
+             render_keyframes animationName keyframes |> String.trim
+           in
            Printf.sprintf "%s %s" accumulator rules)
        ""
   |> String.trim

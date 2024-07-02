@@ -44,18 +44,20 @@ let label =
 let selector_with_ppx =
   test "selector_with_ppx" @@ fun () ->
   let classname =
-    [%cx {|
-    color: red;
+    [%cx
+      {|
+    position: relative;
 
     & > * {
-      color: blue;
+      position: absolute;
     }
   |}]
   in
   let css = get_string_style_rules () in
   assert_string css
-    (Printf.sprintf ".%s { color: #FF0000; } .%s > * { color: #0000FF; }"
-       classname classname)
+    (Printf.sprintf
+       ".%s { position: relative; } .%s > * { position: absolute; }" classname
+       classname)
 
 let avoid_hash_collision =
   test "avoid_hash_collision" @@ fun () ->
@@ -118,21 +120,21 @@ let selector_one_nesting =
   let classname =
     CssJs.style
       [|
-        CssJs.color CssJs.aliceblue;
-        CssJs.selector "a" [| CssJs.color CssJs.rebeccapurple |];
+        CssJs.margin @@ CssJs.px 10;
+        CssJs.selector "a" [| CssJs.margin @@ CssJs.px 60 |];
       |]
   in
   let css = get_string_style_rules () in
   assert_string css
-    (Printf.sprintf ".%s { color: #F0F8FF; } .%s a { color: #663399; }"
-       classname classname)
+    (Printf.sprintf ".%s { margin: 10px; } .%s a { margin: 60px; }" classname
+       classname)
 
 let selector_nested =
   test "selector_nested" @@ fun () ->
   let classname =
     CssJs.style
       [|
-        CssJs.color CssJs.aliceblue;
+        CssJs.margin @@ CssJs.px 10;
         CssJs.selector "a"
           [|
             CssJs.display `block; CssJs.selector "div" [| CssJs.display `none |];
@@ -142,7 +144,7 @@ let selector_nested =
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s { color: #F0F8FF; } .%s a { display: block; } .%s a div { display: \
+       ".%s { margin: 10px; } .%s a { display: block; } .%s a div { display: \
         none; }"
        classname classname classname)
 
@@ -281,22 +283,18 @@ let hover_selector =
   test "hover_selector" @@ fun () ->
   let rules =
     [|
-      CssJs.color (`rgb (255, 255, 255));
-      CssJs.selector ":hover"
-        [| CssJs.color (`rgba (255, 255, 255, `num 0.7)) |];
-      CssJs.selector "&:hover"
-        [| CssJs.color (`rgba (255, 255, 255, `num 0.7)) |];
-      CssJs.selector " :hover"
-        [| CssJs.color (`rgba (255, 255, 255, `num 0.7)) |];
+      CssJs.color `currentColor;
+      CssJs.selector ":hover" [| CssJs.color `transparent |];
+      CssJs.selector "&:hover" [| CssJs.color `transparent |];
+      CssJs.selector " :hover" [| CssJs.color `transparent |];
     |]
   in
   let classname = CssJs.style rules in
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s { color: rgb(255, 255, 255); } .%s:hover { color: rgba(255, 255, \
-        255, 0.7); } .%s:hover { color: rgba(255, 255, 255, 0.7); } .%s  \
-        :hover { color: rgba(255, 255, 255, 0.7); }"
+       ".%s { color: currentColor; } .%s:hover { color: transparent; } \
+        .%s:hover { color: transparent; } .%s  :hover { color: transparent; }"
        classname classname classname classname)
 
 let multiple_pseudo =
@@ -324,26 +322,25 @@ let multiple_pseudo =
 
 let nested_selectors =
   test "nested_selectors" @@ fun () ->
-  let button_active = [%cx "background-color: red;"] in
+  let button_active = [%cx "position: relative;"] in
   let classname = [%cx {|
      &.$(button_active) { top: 50px; }
    |}] in
   let css = get_string_style_rules () in
   assert_string css
-    (Printf.sprintf
-       ".%s { background-color: #FF0000; } .%s {  } .%s.%s { top: 50px; }"
+    (Printf.sprintf ".%s { position: relative; } .%s {  } .%s.%s { top: 50px; }"
        button_active classname classname button_active)
 
 let nested_selectors_2 =
   test "nested_selectors_2" @@ fun () ->
-  let button_active = [%cx "background-color: red;"] in
+  let button_active = [%cx "position: relative;"] in
   let classname = [%cx {|
      &.$(button_active) & { top: 50px; }
    |}] in
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s { background-color: #FF0000; } .%s {  } .%s.%s .%s { top: 50px; }"
+       ".%s { position: relative; } .%s {  } .%s.%s .%s { top: 50px; }"
        button_active classname classname button_active classname)
 
 let multiple_selectors =
@@ -351,7 +348,7 @@ let multiple_selectors =
   let classname =
     [%cx
       {|
-      background-color: red;
+      position: relative;
 
       &::before,
       &::after {
@@ -362,8 +359,7 @@ let multiple_selectors =
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s { background-color: #FF0000; } .%s::before, .%s::after { top: \
-        50px; }"
+       ".%s { position: relative; } .%s::before, .%s::after { top: 50px; }"
        classname classname classname)
 
 let multiple_nested_pseudo_selectors =
@@ -371,7 +367,7 @@ let multiple_nested_pseudo_selectors =
   let classname =
     [%cx
       {|
-      background-color: red;
+      position: relative;
       &:hover {
         &::after {
           top: 50px;
@@ -382,13 +378,12 @@ let multiple_nested_pseudo_selectors =
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s { background-color: #FF0000; } .%s:hover {  } .%s:hover::after { \
-        top: 50px; }"
-       classname classname classname)
+       ".%s { position: relative; } .%s:hover::after { top: 50px; }" classname
+       classname)
 
 let nested_pseudo_with_interp =
   test "nested_pseudo_with_interp" @@ fun () ->
-  let button_active = [%cx "background-color: green;"] in
+  let button_active = [%cx "position: absolute;"] in
   let rules =
     [|
       CssJs.cursor `pointer;
@@ -402,8 +397,8 @@ let nested_pseudo_with_interp =
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s { background-color: #008000; } .%s { cursor: pointer; } \
-        .%s.%s::before { top: 50px; }"
+       ".%s { position: absolute; } .%s { cursor: pointer; } .%s.%s::before { \
+        top: 50px; }"
        button_active classname classname button_active)
 
 let style_tag =
@@ -469,7 +464,7 @@ let selector_with_classname =
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s { display: block; } @media (min-width: 768px) { .%s {  } .%s \
+       ".%s { display: block; } @media (min-width: 768px) { .%s {  } .%s  \
         .lola  { height: auto; } }"
        classname classname classname)
 
@@ -490,7 +485,7 @@ let media_queries_with_selectors =
   assert_string css
     (Printf.sprintf
        ".%s { display: block; } @media (min-width: 768px) { .%s { height: \
-        auto; } .%s .lola { color: transparent; } }"
+        auto; } .%s  .lola { color: transparent; } }"
        classname classname classname)
 
 let media_queries_nested =
@@ -542,7 +537,7 @@ let pseudo_selectors =
     border-radius: 0;
 
     ::placeholder {
-      color: green;
+      color: currentColor;
     }
 
     :hover {
@@ -554,16 +549,16 @@ let pseudo_selectors =
     }
 
     :disabled {
-      color: black;
+      color: transparent;
     }|}]
   in
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
        ".%s { box-sizing: border-box; padding-top: 9px; padding-bottom: 9px; \
-        border-radius: 0; } .%s::placeholder { color: #008000; } .%s:hover { \
-        border: 1px solid transparent; } .%s:focus { outline: none; } \
-        .%s:disabled { color: #000000; }"
+        border-radius: 0; } .%s::placeholder { color: currentColor; } \
+        .%s:hover { border: 1px solid transparent; } .%s:focus { outline: \
+        none; } .%s:disabled { color: transparent; }"
        classname classname classname classname classname)
 
 let pseudo_selectors_2 =
@@ -577,7 +572,7 @@ let pseudo_selectors_2 =
     border-radius: 0;
 
     &::placeholder {
-      color: green;
+      color: currentColor;
     }
 
     &:hover {
@@ -589,16 +584,16 @@ let pseudo_selectors_2 =
     }
 
     &:disabled {
-      color: black;
+      color: transparent;
     }|}]
   in
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
        ".%s { box-sizing: border-box; padding-top: 9px; padding-bottom: 9px; \
-        border-radius: 0; } .%s::placeholder { color: #008000; } .%s:hover { \
-        border: 1px solid transparent; } .%s:focus { outline: none; } \
-        .%s:disabled { color: #000000; }"
+        border-radius: 0; } .%s::placeholder { color: currentColor; } \
+        .%s:hover { border: 1px solid transparent; } .%s:focus { outline: \
+        none; } .%s:disabled { color: transparent; }"
        classname classname classname classname classname)
 
 let tests =
@@ -637,5 +632,5 @@ let tests =
       media_queries_nested;
       media_queries_nested_2;
       media_queries_with_selectors;
-      (* multiple_nested_pseudo_selectors; *)
+      multiple_nested_pseudo_selectors;
     ] )

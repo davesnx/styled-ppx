@@ -137,9 +137,9 @@ let render_declarations (rules : rule array) =
   |> String.concat " "
 
 let is_at_rule selector = String.contains selector '@'
-let is_a_pseudo_selector selector = String.starts_with ~prefix:":" selector
 let starts_with_at selector = String.starts_with ~prefix:"@" selector
 let starts_with_double_dot selector = String.starts_with ~prefix:":" selector
+let starts_with_dot selector = String.starts_with ~prefix:"." selector
 let starts_with_ampersand selector = String.starts_with ~prefix:"&" selector
 let contains_multiple_selectors selector = String.contains selector ','
 
@@ -159,6 +159,8 @@ let chop_prefix ~pre s =
     Some
       (String.sub s (String.length pre) (String.length s - String.length pre))
   else None
+
+let remove_first_ampersand str = String.sub str 1 (String.length str - 1)
 
 let replace_ampersand ~by str =
   let rec replace_ampersand' str var =
@@ -198,6 +200,15 @@ and to_debug nesting rules = rules |> Array.fold_left (rule_to_debug nesting) ""
 
 let print_rules rules =
   rules |> Array.iter (fun rule -> print_endline (to_debug 0 [| rule |]))
+
+let resolve_ampersand hash selector =
+  let classname = "." ^ hash in
+  let resolved_selector = replace_ampersand ~by:classname selector in
+  if starts_with_ampersand selector then resolved_selector
+  else if starts_with_at selector then resolved_selector
+  else if starts_with_double_dot selector then
+    Printf.sprintf ".%s%s" hash resolved_selector
+  else Printf.sprintf ".%s %s" hash resolved_selector
 
 let resolve_selectors rules =
   let rules_contain_media rules =
@@ -251,6 +262,7 @@ let resolve_selectors rules =
       [] rule_list
   in
 
+  print_rules rules;
   let rules = move_media_at_top rules in
 
   (* multiple selectors are defined with commas: like .a, .b {}
@@ -278,20 +290,34 @@ let resolve_selectors rules =
 
     List.partition_map (function
       (* in case of being at @media, don't do anything to it *)
-      | S (title, selector_rules) when starts_with_at title ->
-        Right [ S (title, selector_rules) ]
-      (* in case of being a regular selector, unnest with the prefix *)
-      | S (title, selector_rules) ->
-        let new_prelude = prefix ^ title in
+      | S (current_selector, selector_rules)
+        when starts_with_at current_selector ->
+        Right [ S (current_selector, selector_rules) ]
+      | S (current_selector, selector_rules) ->
+        Printf.sprintf "\nDEBUG---- with ampersand" |> print_endline;
+        Printf.sprintf "CURRENT_SELECTOR %s" current_selector |> print_endline;
+        Printf.sprintf "PREFIX %s" prefix |> print_endline;
+        let is_first_level = prefix != "" in
+        let new_prelude =
+          if is_first_level && starts_with_ampersand current_selector then
+            prefix ^ remove_first_ampersand current_selector
+          else if is_first_level || starts_with_dot current_selector then
+            prefix ^ " " ^ current_selector
+          else prefix ^ current_selector
+        in
         let selector_rules = split_multiple_selectors selector_rules in
         let rule_array = Array.to_list selector_rules in
-        let content, tail = unnest ~prefix:(new_prelude ^ " ") rule_array in
-        let new_selector = S (new_prelude, Array.of_list content) in
+        let prefix = new_prelude in
+        let content, tail = unnest ~prefix rule_array in
+        let new_selector = S (prefix, Array.of_list content) in
         Right (new_selector :: List.flatten tail)
       | _ as rule -> Left rule)
   in
   let declarations, selectors = unnest ~prefix:"" rules in
-  List.flatten (declarations :: selectors)
+  let sol = List.flatten (declarations :: selectors) in
+  print_endline "\n -- SOLVED -- ";
+  print_rules @@ Array.of_list sol;
+  sol
 
 let pp_keyframes animationName keyframes =
   let pp_keyframe (percentage, rules) =
@@ -332,16 +358,8 @@ and render_selectors hash rule =
     let nested_selectors = render_rules hash rules in
     Some (Printf.sprintf "%s { %s }" selector nested_selectors)
   | S (selector, rules) ->
+    let new_selector = resolve_ampersand hash selector in
     (* Resolving the ampersand means to replace all ampersands by the hash *)
-    let classname = "." ^ hash in
-    let resolved_selector = replace_ampersand ~by:classname selector in
-    let new_selector =
-      if starts_with_ampersand selector then resolved_selector
-      else if starts_with_at selector then resolved_selector
-      else if starts_with_double_dot selector then
-        Printf.sprintf ".%s%s" hash resolved_selector
-      else Printf.sprintf ".%s %s" hash resolved_selector
-    in
     Some (Printf.sprintf "%s { %s }" new_selector (render_declarations rules))
   (* S (aka Selectors) are the only ones used by styled-ppx, we don't use PseudoClass neither PseucodClassParam. TODO: Remove them.
      Meanwhile we have them, it's a good idea to check if the first character of the selector is a `:` because it's expected to not have a space between the selector and the :pseudoselector. *)
