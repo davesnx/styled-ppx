@@ -1,3 +1,5 @@
+[@@@warning "-32"]
+
 let get_string_style_rules () =
   let content = CssJs.get_stylesheet () in
   let _ = CssJs.flush () in
@@ -679,6 +681,32 @@ let pseudo_selectors =
         none; } .%s:disabled { color: transparent; }"
        classname classname classname classname classname)
 
+let real_world =
+  test "real_world" @@ fun () ->
+  let buttonActive = [%cx ""] in
+  let classname =
+    [%cx
+      {|
+        padding: 0;
+
+        &.$(buttonActive) {
+          margin: 0px;
+
+          ::before,
+          ::after {
+            top: 40px;
+          }
+        }
+  |}]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { padding: 0; } .%s.%s { margin: 0px; } .%s.%s::before { top: \
+        40px; } .%s.%s::after { top: 40px; }"
+       classname classname buttonActive classname buttonActive classname
+       buttonActive)
+
 let pseudo_selectors_2 =
   test "pseudo_selectors_2" @@ fun () ->
   let classname =
@@ -759,4 +787,6 @@ let tests =
       media_queries_nested;
       media_queries_nested_2;
       media_queries_with_selectors;
+      (*  *)
+      real_world;
     ] )

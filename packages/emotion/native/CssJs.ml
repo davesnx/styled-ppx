@@ -229,7 +229,7 @@ let resolve_selectors rules =
   (* media selectors should be at the top. .a { @media () {} }
      should be @media () { .a {}} *)
   (* TODO: Only works with 2 levels *)
-  let move_media_at_top rule_list =
+  let move_media_at_top (rule_list : rule array) : rule array =
     Array.fold_left
       (fun acc rule ->
         match rule with
@@ -240,7 +240,7 @@ let resolve_selectors rules =
               rules
           in
           (match media_rule_list with
-          | None -> []
+          | None -> [||]
           | Some (media_selector, media_rule_list) when starts_with_at selector
             ->
             (* parent and current are "@media" -> join them with " and " *)
@@ -250,22 +250,22 @@ let resolve_selectors rules =
                   rule <> S (media_selector, media_rule_list))
             in
 
-            List.append acc
-              [
+            Array.append acc
+              [|
                 S (selector, diff);
                 S (create_and_medias media_selector selector, media_rule_list);
-              ]
+              |]
           | Some (media_selector, media_rule_list) ->
-            List.append acc
-              [ S (media_selector, [| S (selector, media_rule_list) |]) ])
-        | _ -> List.append acc [ rule ])
-      [] rule_list
+            Array.append acc
+              [| S (media_selector, [| S (selector, media_rule_list) |]) |])
+        | _ -> Array.append acc [| rule |])
+      [||] rule_list
   in
 
   (* multiple selectors are defined with commas: like .a, .b {}
      we split those into separate rules *)
   let split_multiple_selectors rule_list =
-    List.fold_left
+    Array.fold_left
       (fun acc rule ->
         match rule with
         | S (selector, rules) when contains_multiple_selectors selector ->
@@ -292,8 +292,6 @@ let resolve_selectors rules =
           when starts_with_at current_selector ->
           Right [ S (current_selector, selector_rules) ]
         | S (current_selector, selector_rules) ->
-          Printf.sprintf "CURRENT_SELECTOR %s" current_selector |> print_endline;
-          Printf.sprintf "PREFIX %s" prefix |> print_endline;
           let is_first_level = prefix != "" in
           let new_prelude =
             if is_first_level && starts_with_ampersand current_selector then
@@ -306,8 +304,9 @@ let resolve_selectors rules =
               prefix ^ " " ^ current_selector
             else prefix ^ current_selector
           in
+          let selector_rules = split_multiple_selectors selector_rules in
           let content, tail =
-            unnest_selectors ~prefix:new_prelude (Array.to_list selector_rules)
+            unnest_selectors ~prefix:new_prelude selector_rules
           in
           let new_selector = S (new_prelude, Array.of_list content) in
           Right (new_selector :: List.flatten tail)

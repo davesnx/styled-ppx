@@ -286,9 +286,6 @@ let rec render_rules className rules =
     |> String.concat " "
   in
 
-  print_endline "After moving media at top:";
-  print_rules list_of_rules;
-
   Printf.sprintf "%s %s" declarations selectors
 
 (* Renders all selectors with the hash given *)
