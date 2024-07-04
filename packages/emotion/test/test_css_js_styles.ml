@@ -672,6 +672,49 @@ let media_queries_nested_3 =
         transparent; } }"
        classname classname classname classname)
 
+let media_queries_nested_10 =
+  test "media_queries_nested_10" @@ fun () ->
+  let classname =
+    [%cx
+      {|
+      max-width: 800px;
+      @media (min-width: 300px) {
+        margin-left: 10px;
+        @media (max-width: 768px) {
+          position: fixed;
+          @media (max-width: 1200px) {
+            border: 1px solid transparent;
+            @media (max-width: 1200px) {
+              border: 1px solid transparent;
+              @media (max-width: 1200px) {
+              border: 1px solid transparent;
+                @media (max-width: 1200px) {
+                  border: 1px solid transparent;
+                }
+              }
+            }
+          }
+        }
+      }
+  |}]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { max-width: 800px; } @media (min-width: 300px) { .%s { \
+        margin-left: 10px; } } @media (min-width: 300px) and (max-width: \
+        768px) { .%s { position: fixed; } } @media (min-width: 300px) and \
+        (max-width: 768px) and (max-width: 1200px) { .%s { border: 1px solid \
+        transparent; } } @media (min-width: 300px) and (max-width: 768px) and \
+        (max-width: 1200px) and (max-width: 1200px) { .%s { border: 1px solid \
+        transparent; } } @media (min-width: 300px) and (max-width: 768px) and \
+        (max-width: 1200px) and (max-width: 1200px) and (max-width: 1200px) { \
+        .%s { border: 1px solid transparent; } } @media (min-width: 300px) and \
+        (max-width: 768px) and (max-width: 1200px) and (max-width: 1200px) and \
+        (max-width: 1200px) and (max-width: 1200px) { .%s { border: 1px solid \
+        transparent; } }"
+       classname classname classname classname classname classname classname)
+
 let media_queries_nested_without_declarations =
   test "media_queries_nested_without_declarations" @@ fun () ->
   let classname =
@@ -869,5 +912,6 @@ let tests =
          media_queries_nested_without_declarations; *)
       (*  *)
       (* selector_with_interp_classname_and_mq; *)
-      media_queries_nested_3;
+      (* media_queries_nested_3; *)
+      media_queries_nested_10;
     ] )
