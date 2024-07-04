@@ -1,7 +1,6 @@
 (library
  (name ui_native)
  (libraries
-  styled-ppx.css_native
   styled-ppx.emotion_native
   server-reason-react.react
   server-reason-react.js

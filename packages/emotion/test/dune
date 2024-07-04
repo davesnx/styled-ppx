@@ -8,7 +8,6 @@
   server-reason-react.js
   server-reason-react.belt
   server-reason-react.reactDom
-  styled-ppx.css_native
   alcotest_extra
   styled-ppx.emotion_native
   styled-ppx.murmur2)

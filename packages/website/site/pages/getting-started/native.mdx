@@ -19,19 +19,17 @@ opam install styled-ppx
 ### Packages available
 
 - `styled-ppx` is the ppx
-- `styled-ppx.css_native` is the library with the CSS bindings
-- `styled-ppx.emotion_native` is the native library which implementaits `emotion.sh` on the server. Capable of storing CSS, hashing it and generating a unique classnames, autoprefixing, etc.
+- `styled-ppx.lib_native` is the library with the CSS bindings, and the implementation of `emotion.sh` on the server. Capable of storing CSS, hashing it and generating a unique classnames, autoprefixing, etc.
 
 ### Usage
 
-Add `styled-ppx` under dune's preprocess pps for any library or executable. Add `styled-ppx.css_native` and `styled-ppx.emotion_emotion` as libraries.
+Add `styled-ppx` under dune's preprocess pps for any library or executable. Add `styled-ppx.lib-native` as libraries.
 
 ```diff
 (library
   (name ...)
   (libraries
-+  styled-ppx.css_native
-+  styled-ppx.emotion_native
++  styled-ppx.lib-native
    server-reason-react)
   (preprocess
    (pps

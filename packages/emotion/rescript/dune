@@ -14,27 +14,14 @@
 ; but later on the actions, we remove the ml file, using the Kloth.res file
 
 (rule
- (deps ./Kloth.ml)
+ (deps Kloth.ml CssJs.ml)
  (action
   (progn
    (with-stdout-to
     bsconfig.json
     (run
      echo
-     "{ \"name\": \"@davesnx/styled-ppx/css\", \"sources\": [\".\"]}"))
-   (with-stdout-to
-    package.json
-    (run echo "{\"name\": \"@davesnx/styled-ppx/css\"}")))))
-
-(rule
- (deps Css.ml CssJs.ml)
- (action
-  (progn
-   (with-stdout-to
-    bsconfig.json
-    (run
-     echo
-     "{\"name\": \"@davesnx/styled-ppx/emotion\", \"sources\": [\".\"], \"bs-dependencies\": [\"@davesnx/styled-ppx/css\"]}"))
+     "{\"name\": \"@davesnx/styled-ppx/emotion\", \"sources\": [\".\"], \"bs-dependencies\": []}"))
    (with-stdout-to
     package.json
     (run
