@@ -1,5 +1,3 @@
-[@@@warning "-32"]
-
 let get_string_style_rules () =
   let content = CssJs.get_stylesheet () in
   let _ = CssJs.flush () in
@@ -521,6 +519,24 @@ let selector_with_interp_and_pseudo =
         top: 50px; }"
        button_active classname classname button_active)
 
+let selector_with_empty_interp =
+  test "selector_with_empty_interp" @@ fun () ->
+  let empty_classname = [%cx ""] in
+  let classname =
+    [%cx
+      {|
+        position: absolute;
+        &.$(empty_classname)::before {
+          top: 50px;
+        }
+      |}]
+  in
+
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf ".%s { position: absolute; } .%s.%s::before { top: 50px; }"
+       classname classname empty_classname)
+
 let style_tag =
   test "style_tag" @@ fun () ->
   CssJs.global [| CssJs.selector "html" [| CssJs.lineHeight (`abs 1.15) |] |];
@@ -768,23 +784,6 @@ let mq_nested_without_declarations =
     CssJs.style
       [|
         CssJs.media "(min-width: 300px)"
-          [| CssJs.media "(max-width: 768px)" [| CssJs.display `flex |] |];
-      |]
-  in
-  let css = get_string_style_rules () in
-  assert_string css
-    (Printf.sprintf
-       ".%s { max-width: 800px; } @media (min-width: 300px) { .%s { position: \
-        fixed; }  } @media (min-width: 300px) and (max-width: 768px) { .%s { \
-        display: flex; }  }"
-       classname classname classname)
-
-let mq_nested_without_declarations =
-  test "mq_nested_without_declarations" @@ fun () ->
-  let classname =
-    CssJs.style
-      [|
-        CssJs.media "(min-width: 300px)"
           [| CssJs.media "(max-width: 500px)" [| CssJs.display `flex |] |];
       |]
   in
@@ -928,6 +927,7 @@ let tests =
       real_world;
       hover_selector;
       selector_with_classname_and_mq;
+      selector_with_empty_interp;
       empty_selector_simple;
       selector_with_ppx;
       simple_selector;
