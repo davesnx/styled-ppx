@@ -213,10 +213,14 @@ let rec rule_to_debug nesting accumulator rule =
 
 and to_debug nesting rules = rules |> Array.fold_left (rule_to_debug nesting) ""
 
-let print_rules rules =
+let print_rules ?(initial = 0) rules =
   match rules with
-  | [||] -> print_endline "\nEmpty []\n"
-  | _ -> rules |> Array.iter (fun rule -> print_endline (to_debug 0 [| rule |]))
+  | [||] ->
+    let space = if initial > 0 then String.make (initial * 2) ' ' else "" in
+    print_endline @@ Printf.sprintf "\n%s Empty []\n" space
+  | _ ->
+    rules
+    |> Array.iter (fun rule -> print_endline (to_debug initial [| rule |]))
 
 let split_by_kind rules =
   Array.partition (function D _ -> true | _ -> false) rules
@@ -255,26 +259,76 @@ let rec move_media_at_top (rule_list : rule array) : rule array =
   Array.fold_left
     (fun acc rule ->
       match rule with
+      (* current_select is a @media and contains @media inside their rules:
+
+         @media (min-width: 768px) {
+           display: block;
+
+           @media (min-width: 1200px) {
+             height: auto;
+           }
+         }
+      *)
       | S (current_selector, rules)
         when is_at_rule current_selector && rules_contain_media rules ->
         let new_rules = swap current_selector rules in
         Array.append acc new_rules
+      (* current_selector isn't a media query, but it's a selecotr. It may contain media-queries inside the rules: Example:
+
+         display: block;
+
+         & div {
+           @media (min-width: 768px) {
+             height: auto;
+           }
+         }
+      *)
+      | S (current_selector, rules)
+        when Array.is_not_empty rules && rules_contain_media rules ->
+        print_endline
+        @@ Printf.sprintf "\n!! WPOWPWOPW (rules_contain_media) %s !!\n" current_selector;
+        let declarations, selectors = split_by_kind rules in
+        let media_selectors, non_media_selectors =
+          Array.partition
+            (function S (s, _) when is_at_rule s -> true | _ -> false)
+            selectors
+        in
+        print_endline @@ Printf.sprintf "    declarations";
+        print_rules ~initial:4 declarations;
+        (* print_endline @@ Printf.sprintf "    selectors";
+           print_rules ~initial:4 selectors; *)
+        print_endline @@ Printf.sprintf "    media_selectors";
+        print_rules ~initial:4 media_selectors;
+        print_endline @@ Printf.sprintf "    non_media_selectors";
+        print_rules ~initial:4 non_media_selectors;
+        let new_media_rules =
+          Array.map
+            (fun media_rules ->
+              match media_rules with
+              | S (nested_media_selector, nested_media_rule_list)
+                when is_at_rule nested_media_selector ->
+                [|
+                  S
+                    ( nested_media_selector,
+                      [| S (current_selector, nested_media_rule_list) |] );
+                  (* S
+                     ( join_media at_media_selector nested_media_selector,
+                       nested_media_rule_list ); *)
+                |]
+              | S (nested_media_selector, nested_media_rule_list) ->
+                print_endline nested_media_selector;
+                [|
+                  (* S
+                     ( join_media at_media_selector nested_media_selector,
+                       nested_media_rule_list ); *)
+                |]
+              | _ -> [||])
+            media_selectors
+          |> Array.flatten
+        in
+        Array.( acc @ [|S (current_selector, declarations)|] @ new_media_rules)
+      (* media query may be inside a selector *)
       | S (current_selector, rules) when Array.is_not_empty rules ->
-        (* let declarations, selectors = split_by_kind rules in
-           let media_selectors =
-             Array.filter
-               (function S (s, _) when is_at_rule s -> true | _ -> false)
-               selectors
-           in
-           print_endline @@ Printf.sprintf "\n!! nestedddd !!\n";
-           print_endline @@ Printf.sprintf "declarations";
-           print_rules declarations;
-           print_endline @@ Printf.sprintf "selectors";
-           print_rules selectors;
-           print_endline @@ Printf.sprintf "media_selectors";
-           print_rules media_selectors;
-           let _new_selectors = move_media_at_top selectors in *)
-        (* let new_rules = Array.append declarations new_selectors in *)
         Array.append acc [| rule |]
       | D (_, _) as rule -> Array.append acc [| rule |]
       | _ -> acc)
@@ -308,85 +362,6 @@ and swap at_media_selector media_rules =
   print_endline @@ Printf.sprintf "resolved_media_selectors";
   print_rules resolved_media_selectors;
   move_media_at_top resolved_media_selectors
-(* let rec move_media_at_top (rule_list : rule array) : rule array =
-   Array.fold_left
-     (fun acc rule ->
-       match rule with
-       | S (current_selector, current_rules)
-         when is_at_rule current_selector && rules_contain_media current_rules ->
-         let current_declarations, current_selectors =
-           split_by_kind current_rules
-         in
-         print_endline @@ Printf.sprintf "current_declarations";
-         print_rules current_declarations;
-         print_endline @@ Printf.sprintf "current_selector";
-         print_rules current_selectors;
-         let media_selectors =
-           Array.map
-             (fun media_rules ->
-               match media_rules with
-               | S (media_selector, media_rule_list)
-                 when rules_contain_media media_rule_list ->
-                 print_endline
-                 @@ Printf.sprintf "Media selector: %s" media_selector;
-                 print_rules media_rule_list;
-                 print_endline
-                 @@ Printf.sprintf "Joined selector: %s"
-                      (join_media current_selector media_selector);
-                 (* let declarations, child_media_selectors =
-                      split_by_kind media_rule_list
-                    in *)
-                 (* let diff =
-                      Array.filter
-                        (fun rule -> rule <> S (media_selector, media_rule_list))
-                        child_media_selectors
-                    in
-                    print_endline @@ Printf.sprintf "CHILD MEDIA SEL (declarations)";
-                    print_rules declarations;
-                    print_endline @@ Printf.sprintf "DIFF";
-                    print_rules diff; *)
-                 (match current_declarations, media_rule_list with
-                 | [||], [||] -> [||]
-                 | [||], _ ->
-                   [|
-                     S
-                       ( join_media current_selector media_selector,
-                         media_rule_list );
-                   |]
-                 | _, _ ->
-                   [|
-                     S (current_selector, current_declarations);
-                     S
-                       ( join_media current_selector media_selector,
-                         media_rule_list );
-                   |])
-               | _ -> [||])
-             current_selectors
-           |> Array.flatten
-         in
-
-         print_endline @@ Printf.sprintf "\n Before rec:";
-         print_rules media_selectors;
-         let new_media_selectors = move_media_at_top media_selectors in
-
-         print_endline @@ Printf.sprintf "\n New media selectors:";
-         print_rules new_media_selectors;
-
-         Array.(acc @ new_media_selectors)
-       (*
-           TODO: Nested selectors
-           | S (selector, media_rule_list) when rules_do_not_contain_media rules ->
-            let new_media_rule_list = move_media_at_top media_rule_list in
-            Array.append acc [| S (selector, new_media_rule_list) |] *)
-       (* | S (_, _) as rule -> Array.append acc [| rule |] *)
-       | D (_prop, _) as rule -> Array.append acc [| rule |]
-       | S (selector, rules) as _rule
-         when is_at_rule selector
-              && rules_do_not_contain_media rules
-              && Array.is_not_empty rules ->
-         acc
-       | _ as _rule -> acc) (* | _ as rule -> Array.append acc [| rule |]) *)
-     [||] rule_list *)
 
 (* multiple selectors are defined with commas: like .a, .b {}
      we split those into separate rules *)
@@ -440,7 +415,6 @@ let resolve_selectors rules =
   in
 
   print_endline "\n - RESOLVE SELECTORS --------";
-  print_rules rules;
   let rules = move_media_at_top rules in
   print_endline "\n -- After moving media at top --";
   print_rules rules;
@@ -463,8 +437,8 @@ let render_keyframes animationName keyframes =
 
 (* Removes nesting on selectors, run the autoprefixer. *)
 let rec render_rules className rules =
-  (* TODO: Refactor with partition or partition_map. List.filter_map is error prone.
-     Also it might need to respect the order of definition, and this breaks the order *)
+  print_endline "\n - RENDER RULES --------";
+  print_rules rules;
   let declarations, selectors = split_by_kind_list (resolve_selectors rules) in
 
   let declarations =

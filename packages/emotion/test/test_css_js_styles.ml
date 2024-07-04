@@ -262,8 +262,8 @@ let selector_ampersand_at_the_middle =
     (Printf.sprintf ".%s { font-size: 42px; } .%s div .%s { font-size: 24px; }"
        classname classname classname)
 
-let media_queries =
-  test "media_queries" @@ fun () ->
+let mq =
+  test "mq" @@ fun () ->
   let classname =
     CssJs.style
       [|
@@ -283,7 +283,8 @@ let selector_params =
   let classname =
     CssJs.style
       [|
-        CssJs.maxWidth (`px 800); CssJs.firstChild [| CssJs.width (`px 300) |];
+        CssJs.maxWidth (`px 800);
+        CssJs.selector {js|:first-child|js} [| CssJs.width (`px 300) |];
       |]
   in
   let css = get_string_style_rules () in
@@ -550,23 +551,69 @@ let style_tag =
         display: block; }</style>"
        global_hash animationNameHash classname_hash animationName classname)
 
-let selector_with_interp_classname_and_mq =
-  test "selector_with_interp_classname_and_mq" @@ fun () ->
-  let nested_classname = CssJs.style [||] in
-  let rules =
-    [|
-      CssJs.display `block;
-      CssJs.selector ("&." ^ nested_classname)
-        [| CssJs.media "(min-width: 768px)" [| CssJs.height `auto |] |];
-    |]
+let mq_inside_selector =
+  test "mq_inside_selector" @@ fun () ->
+  let classname =
+    [%cx
+      {|
+      display: block;
+      & div {
+        @media (min-width: 768px) {
+          height: auto;
+        }
+      }
+  |}]
   in
-  let classname = CssJs.style rules in
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s { display: block; } @media (min-width: 768px) { .%s.%s { height: \
+       ".%s { display: block; } @media (min-width: 768px) { .%s div { height: \
         auto; } }"
-       classname classname nested_classname)
+       classname classname)
+
+let mq_inside_selector_with_declarations =
+  test "mq_inside_selector_with_declarations" @@ fun () ->
+  let classname =
+    [%cx
+      {|
+      display: block;
+      & div {
+        display: flex;
+        @media (min-width: 768px) {
+          height: auto;
+        }
+      }
+  |}]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { display: block; } .%s div { display: flex; } @media (min-width: \
+        768px) { .%s div { height: auto; } }"
+       classname classname classname)
+
+let mq_and_selectors_2 =
+  test "mq_and_selectors_2" @@ fun () ->
+  let classname =
+    [%cx
+      {|
+      display: block;
+      & div {
+        display: flex;
+        @media (min-width: 768px) {
+          a {
+            height: auto;
+          }
+        }
+      }
+  |}]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { display: block; } .%s div { display: flex; } @media (min-width: \
+        768px) { .%s div a { height: auto; } }"
+       classname classname classname)
 
 let selector_with_classname_and_mq =
   test "selector_with_classname_and_mq" @@ fun () ->
@@ -587,8 +634,8 @@ let selector_with_classname_and_mq =
         height: auto; } }"
        classname classname nested_classname)
 
-let media_queries_with_selectors =
-  test "media_queries_with_selectors" @@ fun () ->
+let mq_with_selectors =
+  test "mq_with_selectors" @@ fun () ->
   let rules =
     [|
       CssJs.display `block;
@@ -607,8 +654,8 @@ let media_queries_with_selectors =
         auto; } .%s  .lola { color: transparent; } }"
        classname classname classname)
 
-let media_queries_nested =
-  test "media_queries_nested" @@ fun () ->
+let mq_nested =
+  test "mq_nested" @@ fun () ->
   let classname =
     CssJs.style
       [|
@@ -624,8 +671,8 @@ let media_queries_nested =
         768px) { .%s { display: flex; } }"
        classname classname)
 
-let media_queries_nested_2 =
-  test "media_queries_nested_2" @@ fun () ->
+let mq_nested_2 =
+  test "mq_nested_2" @@ fun () ->
   let classname =
     CssJs.style
       [|
@@ -645,8 +692,8 @@ let media_queries_nested_2 =
         display: flex; } }"
        classname classname classname)
 
-let media_queries_nested_3 =
-  test "media_queries_nested_3" @@ fun () ->
+let mq_nested_3 =
+  test "mq_nested_3" @@ fun () ->
   let classname =
     [%cx
       {|
@@ -672,8 +719,8 @@ let media_queries_nested_3 =
         transparent; } }"
        classname classname classname classname)
 
-let media_queries_nested_10 =
-  test "media_queries_nested_10" @@ fun () ->
+let mq_nested_10 =
+  test "mq_nested_10" @@ fun () ->
   let classname =
     [%cx
       {|
@@ -715,8 +762,8 @@ let media_queries_nested_10 =
         transparent; } }"
        classname classname classname classname classname classname classname)
 
-let media_queries_nested_without_declarations =
-  test "media_queries_nested_without_declarations" @@ fun () ->
+let mq_nested_without_declarations =
+  test "mq_nested_without_declarations" @@ fun () ->
   let classname =
     CssJs.style
       [|
@@ -732,8 +779,8 @@ let media_queries_nested_without_declarations =
         display: flex; }  }"
        classname classname classname)
 
-let media_queries_nested_without_declarations =
-  test "media_queries_nested_without_declarations" @@ fun () ->
+let mq_nested_without_declarations =
+  test "mq_nested_without_declarations" @@ fun () ->
   let classname =
     CssJs.style
       [|
@@ -748,8 +795,8 @@ let media_queries_nested_without_declarations =
         flex; } }"
        classname)
 
-let media_queries_nested_with_declarations =
-  test "media_queries_nested_with_declarations" @@ fun () ->
+let mq_nested_with_declarations =
+  test "mq_nested_with_declarations" @@ fun () ->
   let classname =
     CssJs.style
       [|
@@ -868,50 +915,50 @@ let pseudo_selectors_2 =
 let tests =
   ( "CssJs",
     [
-      (* one_property;
-         multiple_properties;
-         multiple_declarations;
-         float_values;
-         label_should_not_be_rendered;
-         avoid_hash_collision;
-         keyframe;
-         global;
-         duplicated_styles_unique;
-         style_tag;
-         real_world;
-         hover_selector;
-         selector_with_classname_and_mq;
-         empty_selector_simple;
-         selector_with_ppx;
-         simple_selector;
-         selector_nested;
-         selector_nested_x10;
-         selector_ampersand_with_space;
-         selector_ampersand_with_no_space;
-         selector_nested_with_ampersand;
-         selector_ampersand_at_the_middle;
-         selector_params;
-
-         selectors_with_coma;
-         selectors_with_coma_simple;
-         selectors_with_coma_and_pseudo;
-         nested_selectors;
-         nested_selectors_2;
-         multiple_pseudo;
-         selector_with_interp_and_pseudo;
-         pseudo_selectors;
-         pseudo_selectors_2;
-         selector_nested_with_pseudo;
-         selector_nested_with_pseudo_2;
-         selector_nested_with_pseudo_3;
-         media_queries_with_selectors;
-         media_queries;
-         media_queries_nested;
-         media_queries_nested_2;
-         media_queries_nested_with_declarations;
-         media_queries_nested_without_declarations; *)
-      (*  *)
-      (* selector_with_interp_classname_and_mq; *)
-      (* media_queries_nested_3; *)
-      media_queries_nested_10;
+      one_property;
+      multiple_properties;
+      multiple_declarations;
+      float_values;
+      label_should_not_be_rendered;
+      avoid_hash_collision;
+      keyframe;
+      global;
+      duplicated_styles_unique;
+      style_tag;
+      real_world;
+      hover_selector;
+      selector_with_classname_and_mq;
+      empty_selector_simple;
+      selector_with_ppx;
+      simple_selector;
+      selector_nested;
+      selector_nested_x10;
+      selector_ampersand_with_space;
+      selector_ampersand_with_no_space;
+      selector_nested_with_ampersand;
+      selector_ampersand_at_the_middle;
+      selector_params;
+      selectors_with_coma;
+      selectors_with_coma_simple;
+      selectors_with_coma_and_pseudo;
+      nested_selectors;
+      nested_selectors_2;
+      multiple_pseudo;
+      selector_with_interp_and_pseudo;
+      pseudo_selectors;
+      pseudo_selectors_2;
+      selector_nested_with_pseudo;
+      selector_nested_with_pseudo_2;
+      selector_nested_with_pseudo_3;
+      mq_with_selectors;
+      mq;
+      mq_nested;
+      mq_nested_2;
+      mq_nested_with_declarations;
+      mq_nested_without_declarations;
+      mq_nested_10;
+      mq_nested_3;
+      mq_inside_selector;
+      mq_inside_selector_with_declarations;
+      mq_and_selectors_2;
     ] )
