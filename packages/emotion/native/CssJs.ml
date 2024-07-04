@@ -1,5 +1,3 @@
-[@@@warning "-27-39"]
-
 include Css_Colors
 include Css_Js_Core
 module Types = Css_AtomicTypes
@@ -285,22 +283,12 @@ let rec move_media_at_top (rule_list : rule array) : rule array =
       *)
       | S (current_selector, rules)
         when Array.is_not_empty rules && rules_contain_media rules ->
-        print_endline
-        @@ Printf.sprintf "\n!! WPOWPWOPW (rules_contain_media) %s !!\n" current_selector;
         let declarations, selectors = split_by_kind rules in
-        let media_selectors, non_media_selectors =
+        let media_selectors, _non_media_selectors =
           Array.partition
             (function S (s, _) when is_at_rule s -> true | _ -> false)
             selectors
         in
-        print_endline @@ Printf.sprintf "    declarations";
-        print_rules ~initial:4 declarations;
-        (* print_endline @@ Printf.sprintf "    selectors";
-           print_rules ~initial:4 selectors; *)
-        print_endline @@ Printf.sprintf "    media_selectors";
-        print_rules ~initial:4 media_selectors;
-        print_endline @@ Printf.sprintf "    non_media_selectors";
-        print_rules ~initial:4 non_media_selectors;
         let new_media_rules =
           Array.map
             (fun media_rules ->
@@ -311,24 +299,15 @@ let rec move_media_at_top (rule_list : rule array) : rule array =
                   S
                     ( nested_media_selector,
                       [| S (current_selector, nested_media_rule_list) |] );
-                  (* S
-                     ( join_media at_media_selector nested_media_selector,
-                       nested_media_rule_list ); *)
-                |]
-              | S (nested_media_selector, nested_media_rule_list) ->
-                print_endline nested_media_selector;
-                [|
-                  (* S
-                     ( join_media at_media_selector nested_media_selector,
-                       nested_media_rule_list ); *)
                 |]
               | _ -> [||])
             media_selectors
           |> Array.flatten
         in
-        Array.( acc @ [|S (current_selector, declarations)|] @ new_media_rules)
+        let selector_without_media = [| S (current_selector, declarations) |] in
+        Array.(acc @ selector_without_media @ new_media_rules)
       (* media query may be inside a selector *)
-      | S (current_selector, rules) when Array.is_not_empty rules ->
+      | S (_current_selector, rules) when Array.is_not_empty rules ->
         Array.append acc [| rule |]
       | D (_, _) as rule -> Array.append acc [| rule |]
       | _ -> acc)
@@ -414,16 +393,10 @@ let resolve_selectors rules =
          | _ as rule -> Left rule)
   in
 
-  print_endline "\n - RESOLVE SELECTORS --------";
   let rules = move_media_at_top rules in
-  print_endline "\n -- After moving media at top --";
-  print_rules rules;
   let rules = split_multiple_selectors rules in
   let declarations, selectors = unnest_selectors ~prefix:"" rules in
-  let rut = List.flatten (declarations :: selectors) in
-  print_endline "\n -- FINAL --";
-  print_rules (Array.of_list rules);
-  rut
+  List.flatten (declarations :: selectors)
 
 let render_keyframes animationName keyframes =
   let definition =
@@ -435,10 +408,8 @@ let render_keyframes animationName keyframes =
   in
   Printf.sprintf "@keyframes %s { %s }" animationName definition
 
-(* Removes nesting on selectors, run the autoprefixer. *)
+(* Removes nesting on selectors, uplifts media-queries, runs the autoprefixer *)
 let rec render_rules className rules =
-  print_endline "\n - RENDER RULES --------";
-  print_rules rules;
   let declarations, selectors = split_by_kind_list (resolve_selectors rules) in
 
   let declarations =
@@ -462,7 +433,7 @@ let rec render_rules className rules =
       |> String.concat " "
   in
 
-  (* This trim is to ensure there isn't an empty space when one of `declarations` or `selectors` is empty. *)
+  (* Trimming is necessary to ensure there isn't an empty space when one of `declarations` or `selectors` is empty. *)
   String.trim @@ String.concat " " [ declarations; selectors ]
 
 (* Renders all selectors with the hash given *)
@@ -481,7 +452,7 @@ and render_selectors hash rule =
   | _ -> None
 
 (* rules_to_string renders the rule in a format where the hash matches with `@emotion/serialise`. It doesn't render any whitespace. (compared to render_rules) *)
-(* TODO: Ensure Selector is rendered correctly *)
+(* TODO: Ensure Selector is serialised correctly *)
 let rec rules_to_string rules =
   let buff = Buffer.create 16 in
   let push = Buffer.add_string buff in
