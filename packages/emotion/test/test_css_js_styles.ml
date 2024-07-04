@@ -275,7 +275,7 @@ let media_queries =
   assert_string css
     (Printf.sprintf
        ".%s { max-width: 800px; } @media (max-width: 768px) { .%s { width: \
-        300px; }  }"
+        300px; } }"
        classname classname)
 
 let selector_params =
@@ -378,8 +378,8 @@ let nested_selectors =
    |}] in
   let css = get_string_style_rules () in
   assert_string css
-    (Printf.sprintf ".%s { position: relative; } .%s {  } .%s.%s { top: 50px; }"
-       button_active classname classname button_active)
+    (Printf.sprintf ".%s { position: relative; } .%s.%s { top: 50px; }"
+       button_active classname button_active)
 
 let nested_selectors_2 =
   test "nested_selectors_2" @@ fun () ->
@@ -389,9 +389,8 @@ let nested_selectors_2 =
    |}] in
   let css = get_string_style_rules () in
   assert_string css
-    (Printf.sprintf
-       ".%s { position: relative; } .%s {  } .%s.%s .%s { top: 50px; }"
-       button_active classname classname button_active classname)
+    (Printf.sprintf ".%s { position: relative; } .%s.%s .%s { top: 50px; }"
+       button_active classname button_active classname)
 
 let selectors_with_coma =
   test "selectors_with_coma" @@ fun () ->
@@ -422,8 +421,8 @@ let selectors_with_coma_simple =
   |}] in
   let css = get_string_style_rules () in
   assert_string css
-    (Printf.sprintf ".%s {  } .%s  .a { top: 50px; } .%s  .b { top: 50px; }"
-       classname classname classname)
+    (Printf.sprintf ".%s  .a { top: 50px; } .%s  .b { top: 50px; }" classname
+       classname)
 
 let selectors_with_coma_and_pseudo =
   test "selectors_with_coma_and_pseudo" @@ fun () ->
@@ -565,9 +564,9 @@ let selector_with_interp_classname_and_mq =
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s { display: block; } @media (min-width: 768px) { .%s {  } .%s.%s { \
-        height: auto; } }"
-       classname classname classname nested_classname)
+       ".%s { display: block; } @media (min-width: 768px) { .%s.%s { height: \
+        auto; } }"
+       classname classname nested_classname)
 
 let selector_with_classname_and_mq =
   test "selector_with_classname_and_mq" @@ fun () ->
@@ -584,9 +583,9 @@ let selector_with_classname_and_mq =
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s { display: block; } @media (min-width: 768px) { .%s {  } .%s  \
-        .lola .%s { height: auto; } }"
-       classname classname classname nested_classname)
+       ".%s { display: block; } @media (min-width: 768px) { .%s  .lola .%s { \
+        height: auto; } }"
+       classname classname nested_classname)
 
 let media_queries_with_selectors =
   test "media_queries_with_selectors" @@ fun () ->
@@ -621,8 +620,8 @@ let media_queries_nested =
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s { max-width: 800px; } @media (max-width: 768px) and (min-width: \
-        300px) { .%s { display: flex; }  }"
+       ".%s { max-width: 800px; } @media (min-width: 300px) and (max-width: \
+        768px) { .%s { display: flex; } }"
        classname classname)
 
 let media_queries_nested_2 =
@@ -642,8 +641,89 @@ let media_queries_nested_2 =
   assert_string css
     (Printf.sprintf
        ".%s { max-width: 800px; } @media (min-width: 300px) { .%s { position: \
-        fixed; }  } @media (max-width: 768px) and (min-width: 300px) { .%s { \
+        fixed; } } @media (min-width: 300px) and (max-width: 768px) { .%s { \
+        display: flex; } }"
+       classname classname classname)
+
+let media_queries_nested_3 =
+  test "media_queries_nested_3" @@ fun () ->
+  let classname =
+    [%cx
+      {|
+      max-width: 800px;
+      @media (min-width: 300px) {
+        margin-left: 10px;
+        @media (max-width: 768px) {
+          position: fixed;
+          @media (max-width: 1200px) {
+            border: 1px solid transparent;
+          }
+        }
+      }
+  |}]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { max-width: 800px; } @media (min-width: 300px) { .%s { \
+        margin-left: 10px; } } @media (min-width: 300px) and (max-width: \
+        768px) { .%s { position: fixed; } } @media (min-width: 300px) and \
+        (max-width: 768px) and (max-width: 1200px) { .%s { border: 1px solid \
+        transparent; } }"
+       classname classname classname classname)
+
+let media_queries_nested_without_declarations =
+  test "media_queries_nested_without_declarations" @@ fun () ->
+  let classname =
+    CssJs.style
+      [|
+        CssJs.media "(min-width: 300px)"
+          [| CssJs.media "(max-width: 768px)" [| CssJs.display `flex |] |];
+      |]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { max-width: 800px; } @media (min-width: 300px) { .%s { position: \
+        fixed; }  } @media (min-width: 300px) and (max-width: 768px) { .%s { \
         display: flex; }  }"
+       classname classname classname)
+
+let media_queries_nested_without_declarations =
+  test "media_queries_nested_without_declarations" @@ fun () ->
+  let classname =
+    CssJs.style
+      [|
+        CssJs.media "(min-width: 300px)"
+          [| CssJs.media "(max-width: 500px)" [| CssJs.display `flex |] |];
+      |]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       "@media (min-width: 300px) and (max-width: 500px) { .%s { display: \
+        flex; } }"
+       classname)
+
+let media_queries_nested_with_declarations =
+  test "media_queries_nested_with_declarations" @@ fun () ->
+  let classname =
+    CssJs.style
+      [|
+        CssJs.color `transparent;
+        CssJs.media "(min-width: 300px)"
+          [|
+            CssJs.margin (`px 10);
+            CssJs.media "(max-width: 400px)" [| CssJs.borderRadius (`px 10) |];
+          |];
+      |]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { color: transparent; } @media (min-width: 300px) { .%s { margin: \
+        10px; } } @media (min-width: 300px) and (max-width: 400px) { .%s { \
+        border-radius: 10px; } }"
        classname classname classname)
 
 let pseudo_selectors =
@@ -745,48 +825,49 @@ let pseudo_selectors_2 =
 let tests =
   ( "CssJs",
     [
-      (************** basic **************)
-      one_property;
-      multiple_properties;
-      multiple_declarations;
-      float_values;
-      label_should_not_be_rendered;
-      avoid_hash_collision;
-      keyframe;
-      global;
-      duplicated_styles_unique;
-      style_tag;
-      (************** selectors **************)
-      hover_selector;
-      selector_with_classname_and_mq;
-      empty_selector_simple;
-      selector_with_ppx;
-      simple_selector;
-      selector_nested;
-      selector_nested_x10;
-      selector_ampersand_with_space;
-      selector_ampersand_with_no_space;
-      selector_nested_with_ampersand;
-      selector_ampersand_at_the_middle;
-      selector_params;
-      selector_with_interp_classname_and_mq;
-      selectors_with_coma;
-      selectors_with_coma_simple;
-      selectors_with_coma_and_pseudo;
-      nested_selectors;
-      nested_selectors_2;
-      multiple_pseudo;
-      selector_with_interp_and_pseudo;
-      pseudo_selectors;
-      pseudo_selectors_2;
-      selector_nested_with_pseudo;
-      selector_nested_with_pseudo_2;
-      selector_nested_with_pseudo_3;
-      (* ************* media queries ************* *)
-      media_queries;
-      media_queries_nested;
-      media_queries_nested_2;
-      media_queries_with_selectors;
+      (* one_property;
+         multiple_properties;
+         multiple_declarations;
+         float_values;
+         label_should_not_be_rendered;
+         avoid_hash_collision;
+         keyframe;
+         global;
+         duplicated_styles_unique;
+         style_tag;
+         real_world;
+         hover_selector;
+         selector_with_classname_and_mq;
+         empty_selector_simple;
+         selector_with_ppx;
+         simple_selector;
+         selector_nested;
+         selector_nested_x10;
+         selector_ampersand_with_space;
+         selector_ampersand_with_no_space;
+         selector_nested_with_ampersand;
+         selector_ampersand_at_the_middle;
+         selector_params;
+
+         selectors_with_coma;
+         selectors_with_coma_simple;
+         selectors_with_coma_and_pseudo;
+         nested_selectors;
+         nested_selectors_2;
+         multiple_pseudo;
+         selector_with_interp_and_pseudo;
+         pseudo_selectors;
+         pseudo_selectors_2;
+         selector_nested_with_pseudo;
+         selector_nested_with_pseudo_2;
+         selector_nested_with_pseudo_3;
+         media_queries_with_selectors;
+         media_queries;
+         media_queries_nested;
+         media_queries_nested_2;
+         media_queries_nested_with_declarations;
+         media_queries_nested_without_declarations; *)
       (*  *)
-      real_world;
+      (* selector_with_interp_classname_and_mq; *)
+      media_queries_nested_3;
     ] )

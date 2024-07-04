@@ -181,27 +181,6 @@ let media_queries_nested_2 =
         display: flex; }  }"
        classname classname classname)
 
-(* let media_queries_nested_3 =
-   test "media_queries_nested_3" @@ fun () ->
-   let classname =
-     Css.style
-       [
-         Css.maxWidth (`px 800);
-         Css.media "(min-width: 300px)"
-           [
-             Css.media "(max-width: 768px)"
-               [ Css.media "(max-width: 768px)" [ Css.display `flex ] ];
-           ];
-       ]
-   in
-   let css = get_string_style_rules () in
-   assert_string css
-     (Printf.sprintf
-        ".%s { max-width: 800px; } @media (min-width: 300px) { .%s { position: \
-         fixed; }  } @media (max-width: 768px) and (min-width: 300px) { .%s { \
-         display: flex; }  }"
-        classname classname classname) *)
-
 let selector_params =
   test "selector_params" @@ fun () ->
   let classname =
@@ -374,5 +353,4 @@ let tests =
       media_queries_with_selectors;
       media_queries_nested;
       media_queries_nested_2;
-      (* media_queries_nested_3 *)
     ] )
