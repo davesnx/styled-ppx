@@ -1,5 +1,9 @@
 # Changes
 
+## 0.57.1
+- Remove public_name from alcotest_extra #484 (@davesnx)
+- Fix nesting for selectors (and pseudo) in native #483 (@davesnx)
+
 ## 0.57.0
 
 - Improvement for locations in both code-gen and error reporting by @davesnx in https://github.com/davesnx/styled-ppx/pull/456
