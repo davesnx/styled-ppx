@@ -273,9 +273,7 @@ let container_query_tests = [
     "(min-width: 150px)",
     [%expr [%cx "@container (min-width: 150px) {}"]],
     [%expr
-      CssJs.style([|
-        CssJs.atRule(~params={js|(min-width: 150px)|js}, "container", [||]),
-      |])
+      CssJs.style([|CssJs.containerQuery({js|(min-width: 150px)|js}, [||])|])
     ],
   ),
   (
@@ -283,7 +281,7 @@ let container_query_tests = [
     [%expr [%cx "@container (max-width: 1000px) {}"]],
     [%expr
       CssJs.style([|
-        CssJs.atRule(~params={js|(max-width: 1000px)|js}, "container", [||]),
+        CssJs.containerQuery({js|(max-width: 1000px)|js}, [||]),
       |])
     ],
   ),
@@ -292,11 +290,7 @@ let container_query_tests = [
     [%expr [%cx "@container name (width >= 150px) {}"]],
     [%expr
       CssJs.style([|
-        CssJs.atRule(
-          ~params={js|name (width >= 150px)|js},
-          "container",
-          [||],
-        ),
+        CssJs.containerQuery({js|name (width >= 150px)|js}, [||]),
       |])
     ],
   ),
@@ -304,9 +298,7 @@ let container_query_tests = [
     "(height >= 150px)",
     [%expr [%cx "@container (height >= 150px) {}"]],
     [%expr
-      CssJs.style([|
-        CssJs.atRule(~params={js|(height >= 150px)|js}, "container", [||]),
-      |])
+      CssJs.style([|CssJs.containerQuery({js|(height >= 150px)|js}, [||])|])
     ],
   ),
   (
@@ -314,11 +306,7 @@ let container_query_tests = [
     [%expr [%cx "@container (inline-size >= 150px) {}"]],
     [%expr
       CssJs.style([|
-        CssJs.atRule(
-          ~params={js|(inline-size >= 150px)|js},
-          "container",
-          [||],
-        ),
+        CssJs.containerQuery({js|(inline-size >= 150px)|js}, [||]),
       |])
     ],
   ),
@@ -327,11 +315,7 @@ let container_query_tests = [
     [%expr [%cx "@container (block-size >= 150px) {}"]],
     [%expr
       CssJs.style([|
-        CssJs.atRule(
-          ~params={js|(block-size >= 150px)|js},
-          "container",
-          [||],
-        ),
+        CssJs.containerQuery({js|(block-size >= 150px)|js}, [||]),
       |])
     ],
   ),
@@ -340,11 +324,7 @@ let container_query_tests = [
     [%expr [%cx "@container (aspect-ratio: 1 / 1) {}"]],
     [%expr
       CssJs.style([|
-        CssJs.atRule(
-          ~params={js|(aspect-ratio: 1 / 1)|js},
-          "container",
-          [||],
-        ),
+        CssJs.containerQuery({js|(aspect-ratio: 1 / 1)|js}, [||]),
       |])
     ],
   ),
@@ -353,11 +333,7 @@ let container_query_tests = [
     [%expr [%cx "@container (orientation: portrait) {}"]],
     [%expr
       CssJs.style([|
-        CssJs.atRule(
-          ~params={js|(orientation: portrait)|js},
-          "container",
-          [||],
-        ),
+        CssJs.containerQuery({js|(orientation: portrait)|js}, [||]),
       |])
     ],
   ),
@@ -366,9 +342,8 @@ let container_query_tests = [
     [%expr [%cx "@container (width >= 150px) and (orientation: portrait) {}"]],
     [%expr
       CssJs.style([|
-        CssJs.atRule(
-          ~params={js|(width >= 150px) and (orientation: portrait)|js},
-          "container",
+        CssJs.containerQuery(
+          {js|(width >= 150px) and (orientation: portrait)|js},
           [||],
         ),
       |])
@@ -379,11 +354,7 @@ let container_query_tests = [
     [%expr [%cx "@container name not (width < 150px) {}"]],
     [%expr
       CssJs.style([|
-        CssJs.atRule(
-          ~params={js|name not (width < 150px)|js},
-          "container",
-          [||],
-        ),
+        CssJs.containerQuery({js|name not (width < 150px)|js}, [||]),
       |])
     ],
   ),
@@ -392,9 +363,8 @@ let container_query_tests = [
     [%expr [%cx "@container (width >= 150px) or (orientation: portrait) {}"]],
     [%expr
       CssJs.style([|
-        CssJs.atRule(
-          ~params={js|(width >= 150px) or (orientation: portrait)|js},
-          "container",
+        CssJs.containerQuery(
+          {js|(width >= 150px) or (orientation: portrait)|js},
           [||],
         ),
       |])
