@@ -3,6 +3,8 @@
  (public_name styled-ppx.emotion_native)
  (libraries
   server-reason-react.react
-  styled-ppx.css_native
+  server-reason-react.belt
   styled-ppx.murmur2)
- (wrapped false))
+ (wrapped false)
+ (preprocess
+  (pps server-reason-react.melange_ppx)))

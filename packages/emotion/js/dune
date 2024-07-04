@@ -3,6 +3,6 @@
  (public_name styled-ppx.emotion)
  (modes melange)
  (wrapped false)
- (libraries styled-ppx.css melange.js)
+ (libraries melange.js melange.belt)
  (preprocess
   (pps melange.ppx -alert -deprecated)))
