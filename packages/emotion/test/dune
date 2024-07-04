@@ -9,7 +9,7 @@
   server-reason-react.belt
   server-reason-react.reactDom
   styled-ppx.css_native
-  styled-ppx.alcotest-extra
+  alcotest_extra
   styled-ppx.emotion_native
   styled-ppx.murmur2)
  (preprocess
