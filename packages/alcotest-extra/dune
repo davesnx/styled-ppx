@@ -1,4 +1,3 @@
 (library
  (name alcotest_extra)
- (public_name styled-ppx.alcotest-extra)
  (libraries alcotest))

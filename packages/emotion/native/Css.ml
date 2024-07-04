@@ -107,6 +107,7 @@ let render_declarations (rules : rule list) =
 let is_at_rule selector = String.contains selector '@'
 let is_a_pseudo_selector selector = String.starts_with ~prefix:":" selector
 let starts_with_at selector = String.starts_with ~prefix:"@" selector
+let starts_with_double_dot selector = String.starts_with ~prefix:":" selector
 let starts_with_ampersand selector = String.starts_with ~prefix:"&" selector
 let contains_multiple_selectors selector = String.contains selector ','
 
@@ -257,7 +258,7 @@ let resolve_selectors rules =
   let declarations, selectors = unnest ~prefix:"" rules in
   List.flatten (declarations :: selectors)
 
-let pp_keyframes animationName keyframes =
+let render_keyframes animationName keyframes =
   let pp_keyframe (percentage, rules) =
     Printf.sprintf "%i%% { %s }" percentage (render_declarations rules)
   in
@@ -283,6 +284,7 @@ let rec render_rules className rules =
     |> List.filter_map (render_selectors className)
     |> String.concat " "
   in
+
   Printf.sprintf "%s %s" declarations selectors
 
 (* Renders all selectors with the hash given *)
@@ -300,6 +302,8 @@ and render_selectors hash rule =
     let new_selector =
       if starts_with_ampersand selector then resolved_selector
       else if starts_with_at selector then resolved_selector
+      else if starts_with_double_dot selector then
+        Printf.sprintf ".%s%s" hash resolved_selector
       else Printf.sprintf ".%s %s" hash resolved_selector
     in
     Some (Printf.sprintf "%s { %s }" new_selector (render_declarations rules))
@@ -393,7 +397,7 @@ let flush () = Stylesheet.flush instance
 
 let style (styles : rule list) =
   match styles with
-  | [] -> ""
+  | [] -> "css-0"
   | _ ->
     let hash = render_hash (Murmur2.default (rules_to_string styles)) styles in
     let className = Printf.sprintf "%s-%s" "css" hash in
@@ -427,7 +431,9 @@ let get_stylesheet () =
            let rules = render_rules className styles |> String.trim in
            Printf.sprintf "%s %s" accumulator rules
          | Keyframes { animationName; keyframes } ->
-           let rules = pp_keyframes animationName keyframes |> String.trim in
+           let rules =
+             render_keyframes animationName keyframes |> String.trim
+           in
            Printf.sprintf "%s %s" accumulator rules)
        ""
   |> String.trim
