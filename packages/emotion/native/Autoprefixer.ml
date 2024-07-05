@@ -9,11 +9,11 @@ let khtml property = Printf.sprintf "-khtml-%s" property
 
 let prefix_property (property : string) (value : string) prefixes =
   prefixes
-  |> List.map (fun prefixer -> Rule.declaration (prefixer property) value)
+  |> List.map (fun prefixer -> Rule.declaration (prefixer property, value))
 
 let prefix_value (property : string) (value : string) prefixes =
   prefixes
-  |> List.map (fun prefixer -> Rule.declaration property (prefixer value))
+  |> List.map (fun prefixer -> Rule.declaration (property, prefixer value))
 
 let prefix rule =
   match rule with

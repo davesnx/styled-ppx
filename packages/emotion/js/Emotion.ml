@@ -46,3 +46,48 @@ let keyframes frames = makeKeyframes (framesToDict frames)
 
 let renderKeyframes renderer frames =
   renderKeyframes renderer (framesToDict frames)
+
+(* This method is a Css_type function, but with side-effects. It pushes the fontFace as global style *)
+let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
+    =
+  let open Css_types in
+  let fontStyle =
+    match fontStyle with
+    | Some value -> {js|font-style: |js} ^ FontStyle.toString value ^ {js|;|js}
+    | _ -> ""
+  in
+  let src =
+    src
+    |. Kloth.Array.map FontFace.toString
+    |. Kloth.Array.joinWith ~sep:{js|, |js}
+  in
+  let fontWeight =
+    Belt.Option.mapWithDefault fontWeight {js||js} (fun w ->
+        ({js|font-weight: |js}
+        ^
+        match w with
+        | #FontWeight.t as f -> FontWeight.toString f
+        | #Var.t as va -> Var.toString va
+        | #Cascading.t as c -> Cascading.toString c)
+        ^ {js|;|js})
+  in
+  let fontDisplay =
+    Belt.Option.mapWithDefault fontDisplay {js||js} (fun f ->
+        {js|font-display: |js} ^ FontDisplay.toString f ^ {js|;|js})
+  in
+  let sizeAdjust =
+    Belt.Option.mapWithDefault sizeAdjust {js||js} (fun s ->
+        {js|size-adjust: |js} ^ Percentage.toString s ^ {js|;|js})
+  in
+  let fontFace =
+    {js|@font-face {|js}
+    ^ ({js|font-family: |js} ^ fontFamily)
+    ^ ({js|; src: |js} ^ src ^ {js|;|js})
+    ^ fontStyle
+    ^ fontWeight
+    ^ fontDisplay
+    ^ sizeAdjust
+    ^ {js|}|js}
+  in
+  injectRaw fontFace;
+  fontFamily

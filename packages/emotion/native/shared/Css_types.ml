@@ -2650,6 +2650,18 @@ module ListStyleImage = struct
   let toString x = match x with `none -> {js|none|js}
 end
 
+module FontFace = struct
+  type t =
+    [ Url.t
+    | `local of string
+    ]
+
+  let toString x =
+    match x with
+    | `local value -> ({js|local("|js} ^ value) ^ {js|")|js}
+    | `url value -> ({js|url("|js} ^ value) ^ {js|")|js}
+end
+
 module FontFamilyName = struct
   type t =
     [ `custom of string

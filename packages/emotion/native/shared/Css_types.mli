@@ -1747,6 +1747,15 @@ module ListStyleImage : sig
   val toString : t -> string
 end
 
+module FontFace : sig
+  type t =
+    [ Url.t
+    | `local of string
+    ]
+
+  val toString : t -> string
+end
+
 module FontFamilyName : sig
   type t =
     [ `cursive

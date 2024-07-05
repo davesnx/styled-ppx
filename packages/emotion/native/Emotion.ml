@@ -462,14 +462,14 @@ let get_stylesheet () =
        (fun accumulator (_, rules) ->
          match rules with
          | Globals rules ->
-           Printf.sprintf "%s %s" accumulator
-             (rules_to_string (Array.to_list rules))
+           let rules = String.trim @@ rules_to_string (Array.to_list rules) in
+           Printf.sprintf "%s %s" accumulator rules
          | Classnames { className; styles } ->
-           let rules = render_rules className styles |> String.trim in
+           let rules = String.trim @@ render_rules className styles in
            Printf.sprintf "%s %s" accumulator rules
          | Keyframes { animationName; keyframes } ->
            let rules =
-             render_keyframes animationName keyframes |> String.trim
+             String.trim @@ render_keyframes animationName keyframes
            in
            Printf.sprintf "%s %s" accumulator rules)
        ""
@@ -479,7 +479,7 @@ let get_string_style_hashes () =
   Stylesheet.get_all instance
   |> List.fold_left
        (fun accumulator (hash, _) ->
-         Printf.sprintf "%s %s" accumulator hash |> String.trim)
+         String.trim @@ Printf.sprintf "%s %s" accumulator hash)
        ""
 
 let style_tag ?key:_ ?children:_ () =
@@ -490,3 +490,20 @@ let style_tag ?key:_ ?children:_ () =
       DangerouslyInnerHtml (get_stylesheet ());
     ]
     []
+
+(* This method is a Css_type function, but with side-effects. It pushes the fontFace as global style *)
+let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
+    =
+  let fontFace =
+    [|
+      Rule.Declaration ("font-family", fontFamily);
+      Rule.Declaration ("src", src);
+      Rule.Declaration ("font-style", Option.value ~default:"normal" fontStyle);
+      Rule.Declaration ("font-weight", Option.value ~default:"normal" fontWeight);
+      Rule.Declaration ("font-display", Option.value ~default:"auto" fontDisplay);
+      Rule.Declaration
+        ("font-size-adjust", Option.value ~default:"none" sizeAdjust);
+    |]
+  in
+  global [| Rule.Selector ("@font-face", fontFace) |];
+  fontFamily

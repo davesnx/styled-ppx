@@ -18,7 +18,7 @@ let camelCaseToKebabCase str =
   in
   String.concat "" (List.rev (List.fold_left insert_dash [] (explode str)))
 
-let declaration property value =
+let declaration (property, value) =
   Declaration (camelCaseToKebabCase property, value)
 
 let selector selector rules = Selector (selector, rules)
