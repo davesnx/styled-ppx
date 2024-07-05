@@ -284,7 +284,7 @@ let rec move_media_at_top (rule_list : rule array) : rule array =
       | S (current_selector, rules)
         when Array.is_not_empty rules && rules_contain_media rules ->
         let declarations, selectors = split_by_kind rules in
-        let media_selectors, _non_media_selectors =
+        let media_selectors, non_media_selectors =
           Array.partition
             (function S (s, _) when is_at_rule s -> true | _ -> false)
             selectors
@@ -304,7 +304,9 @@ let rec move_media_at_top (rule_list : rule array) : rule array =
             media_selectors
           |> Array.flatten
         in
-        let selector_without_media = [| S (current_selector, declarations) |] in
+        let selector_without_media =
+          [| S (current_selector, Array.(declarations @ non_media_selectors)) |]
+        in
         Array.(acc @ selector_without_media @ new_media_rules)
       (* media query may be inside a selector *)
       | S (_current_selector, rules) when Array.is_not_empty rules ->
@@ -314,15 +316,7 @@ let rec move_media_at_top (rule_list : rule array) : rule array =
     [||] rule_list
 
 and swap at_media_selector media_rules =
-  print_endline @@ Printf.sprintf "\n!! SWAP !!\n";
-  print_endline @@ Printf.sprintf "at_media_selector %s" at_media_selector;
-  print_endline @@ Printf.sprintf "media_rules";
-  print_rules media_rules;
   let media_declarations, media_rules_selectors = split_by_kind media_rules in
-  print_endline @@ Printf.sprintf "media_declarations";
-  print_rules media_declarations;
-  print_endline @@ Printf.sprintf "media_rules_selectors";
-  print_rules media_rules_selectors;
   let resolved_media_selectors =
     Array.map
       (fun media_rules ->
@@ -338,8 +332,6 @@ and swap at_media_selector media_rules =
       media_rules_selectors
     |> Array.flatten
   in
-  print_endline @@ Printf.sprintf "resolved_media_selectors";
-  print_rules resolved_media_selectors;
   move_media_at_top resolved_media_selectors
 
 (* multiple selectors are defined with commas: like .a, .b {}
@@ -373,6 +365,7 @@ let resolve_selectors rules =
            Right [ S (current_selector, selector_rules) ]
          | S (current_selector, selector_rules) ->
            let is_first_level = prefix != "" in
+           (* TODO: Simplify this monstruosity *)
            let new_prelude =
              if is_first_level && starts_with_ampersand current_selector then
                prefix ^ remove_first_ampersand current_selector

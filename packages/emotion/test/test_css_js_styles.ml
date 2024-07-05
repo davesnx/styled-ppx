@@ -9,6 +9,35 @@ let one_property =
   let css = get_string_style_rules () in
   assert_string css (Printf.sprintf ".%s { display: block; }" classname)
 
+let selector_nested_with_mq_and_declarations =
+  test "selector_nested_with_mq_and_declarations" @@ fun () ->
+  let mobile = "(max-width: 767px)" in
+  let classname =
+    [%cx
+      {|
+  li {
+    list-style-type: none;
+
+    ::before {
+      position: absolute;
+      left: -20px;
+      content: "✓";
+    }
+
+    @media $(mobile) {
+      position: relative;
+    }
+  }
+|}]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s li { list-style-type: none; } .%s li::before { position: absolute; \
+        left: -20px; content: \"✓\"; } @media (max-width: 767px) { .%s li { \
+        position: relative; } }"
+       classname classname classname)
+
 let multiple_properties =
   test "multiple_properties" @@ fun () ->
   let classname =
@@ -950,6 +979,7 @@ let tests =
       selector_nested_with_pseudo;
       selector_nested_with_pseudo_2;
       selector_nested_with_pseudo_3;
+      selector_nested_with_mq_and_declarations;
       mq_with_selectors;
       mq;
       mq_nested;
