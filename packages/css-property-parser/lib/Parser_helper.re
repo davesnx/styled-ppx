@@ -1,6 +1,4 @@
-open Rule.Pattern;
 open Styled_ppx_css_parser.Tokens;
-open Standard;
 
 module StringMap = Map.Make(String);
 
@@ -51,14 +49,14 @@ let check = (prop: Rule.rule('a), value) =>
   parse(prop, value) |> Result.is_ok;
 
 // TODO: workarounds
-let invalid = expect(STRING("not-implemented"));
+let invalid = Rule.Pattern.expect(STRING("not-implemented"));
 let attr_name = invalid;
 let attr_fallback = invalid;
 let string_token = invalid;
 let ident_token = invalid;
 let dimension = invalid;
 let declaration_value = invalid;
-let positive_integer = integer;
+let positive_integer = Standard.integer;
 let function_token = invalid;
 let any_value = invalid;
 let hash_token = invalid;

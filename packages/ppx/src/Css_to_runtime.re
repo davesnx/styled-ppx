@@ -10,19 +10,11 @@ module CssJs = {
     {txt: Ldot(Lident("CssJs"), name), loc} |> Builder.pexp_ident(~loc);
   let selector = (~loc) => ident(~loc, "selector");
   let media = (~loc) => ident(~loc, "media");
-  let atContainer = (~loc) => ident(~loc, "atContainer");
   let global = (~loc) => ident(~loc, "global");
   let label = (~loc) => ident(~loc, "label");
   let style = (~loc) => ident(~loc, "style");
   let keyframes = (~loc) => ident(~loc, "keyframes");
 };
-
-let number_to_const = number =>
-  if (String.contains(number, '.')) {
-    Helper.Const.float(number);
-  } else {
-    Helper.Const.integer(number);
-  };
 
 let string_to_const = (~loc, s) => {
   switch (File.get()) {
@@ -83,7 +75,7 @@ let rec render_at_rule = (~loc, at_rule: at_rule) => {
   | "media" => render_media_query(~loc, at_rule)
   | "container" => render_container_query(~loc, at_rule)
   | "keyframes" =>
-    Generate_lib.error(
+    Error.expr(
       ~loc=at_rule_name_loc,
       "@keyframes should be defined with %%keyframe(...)",
     )
@@ -109,15 +101,11 @@ let rec render_at_rule = (~loc, at_rule: at_rule) => {
   | /* Experimental */ "color-profile" as n
   | /* Experimental */ "viewport" as n
   | /* Deprecated */ "document" as n =>
-    Generate_lib.error(
+    Error.expr(
       ~loc=at_rule_name_loc,
       Printf.sprintf("At-rule @%s is not supported in styled-ppx", n),
     )
-  | n =>
-    Generate_lib.error(
-      ~loc=at_rule_name_loc,
-      Printf.sprintf("Unknown @%s ", n),
-    )
+  | n => Error.expr(~loc=at_rule_name_loc, Printf.sprintf("Unknown @%s ", n))
   };
 }
 and render_media_query = (~loc, at_rule: at_rule) => {
@@ -150,7 +138,7 @@ and render_media_query = (~loc, at_rule: at_rule) => {
         render_declarations(~loc, declaration)
         |> Builder.pexp_array(~loc=at_rule.loc)
       | Stylesheet(_) =>
-        Generate_lib.error(
+        Error.expr(
           ~loc=at_rule.loc,
           "@media content expect to have declarations, not an stylesheets. Selectors aren't allowed in @media.",
         )
@@ -255,7 +243,7 @@ and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
     );
 
   switch (
-    Declarations_to_emotion.parse_declarations(
+    Property_to_runtime.render(
       ~loc=declaration_location,
       property,
       value_source,
@@ -264,13 +252,13 @@ and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
   ) {
   | Ok(exprs) => exprs
   | Error(`Not_found) => [
-      Generate_lib.error(
+      Error.expr(
         ~loc=property_location,
         "Unknown property '" ++ property ++ "'",
       ),
     ]
   | Error(`Invalid_value(value)) => [
-      Generate_lib.error(
+      Error.expr(
         ~loc=declaration_location,
         "Property '"
         ++ property
@@ -475,33 +463,23 @@ let render_keyframes = (~loc, declarations: rule_list) => {
       // `to` is equivalent to the value 100%
       | Type(v) when v == "to" => Builder.eint(~loc=declarations_loc, 100)
       | Type(t) =>
-        Generate_lib.error(~loc=declarations_loc, invalid_prelude_value(t))
+        Error.expr(~loc=declarations_loc, invalid_prelude_value(t))
       | Percentage(n) =>
         switch (int_of_string_opt(n)) {
         | Some(n) when n >= 0 && n <= 100 =>
           Builder.eint(~loc=declarations_loc, n)
-        | _ =>
-          Generate_lib.error(
-            ~loc=declarations_loc,
-            invalid_percentage_value(n),
-          )
+        | _ => Error.expr(~loc=declarations_loc, invalid_percentage_value(n))
         }
       | Ampersand =>
-        Generate_lib.error(~loc=declarations_loc, invalid_prelude_value("&"))
+        Error.expr(~loc=declarations_loc, invalid_prelude_value("&"))
       | Universal =>
-        Generate_lib.error(~loc=declarations_loc, invalid_prelude_value("*"))
+        Error.expr(~loc=declarations_loc, invalid_prelude_value("*"))
       | Subclass(_) =>
-        Generate_lib.error(
-          ~loc=declarations_loc,
-          invalid_prelude_value_opaque,
-        )
+        Error.expr(~loc=declarations_loc, invalid_prelude_value_opaque)
       | Variable(_) =>
-        Generate_lib.error(
-          ~loc=declarations_loc,
-          invalid_prelude_value_opaque,
-        )
+        Error.expr(~loc=declarations_loc, invalid_prelude_value_opaque)
       }
-    | _ => Generate_lib.error(~loc=declarations_loc, invalid_selector)
+    | _ => Error.expr(~loc=declarations_loc, invalid_selector)
     };
   };
 
@@ -516,7 +494,7 @@ let render_keyframes = (~loc, declarations: rule_list) => {
              |> Builder.pexp_array(~loc=declarations_loc);
            percentages
            |> List.map(p => Builder.pexp_tuple(~loc=style_loc, [p, rules]));
-         | _ => [Generate_lib.error(~loc=declarations_loc, invalid_selector)]
+         | _ => [Error.expr(~loc=declarations_loc, invalid_selector)]
          }
        })
     |> List.flatten
@@ -544,18 +522,16 @@ If your intent is to apply the declaration to all elements, use the universal se
          | Style_rule(style_rule) => render_style_rule(~loc, style_rule)
          | At_rule(at_rule) => render_at_rule(~loc, at_rule)
          | _ =>
-           Generate_lib.error(
-             ~loc=stylesheet_loc,
-             onlyStyleRulesAndAtRulesSupported,
-           )
+           Error.expr(~loc=stylesheet_loc, onlyStyleRulesAndAtRulesSupported)
          }
        })
     |> Builder.pexp_array(~loc=stylesheet_loc);
 
-  Helper.Exp.apply(
-    ~loc=stylesheet_loc,
-    CssJs.global(~loc=stylesheet_loc),
-    [(Nolabel, styles)],
-  )
-  |> Generate_lib.applyIgnore(~loc=stylesheet_loc);
+  let expr =
+    Helper.Exp.apply(
+      ~loc=stylesheet_loc,
+      CssJs.global(~loc=stylesheet_loc),
+      [(Nolabel, styles)],
+    );
+  [%expr ignore([%e expr])];
 };

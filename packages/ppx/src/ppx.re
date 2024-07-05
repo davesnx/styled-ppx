@@ -55,7 +55,7 @@ module Mapper = {
     switch (getHtmlTag(str)) {
     | Some(tag) => tag
     | None =>
-      Generate_lib.raiseError(
+      Error.raise(
         ~loc,
         ~description=
           "This styled component is not valid. Doesn't have the right format.",
@@ -159,11 +159,11 @@ module Mapper = {
         ) {
         | Ok(declarations) =>
           declarations
-          |> Css_to_emotion.render_declarations(~loc)
-          |> Css_to_emotion.addLabel(~loc, moduleName)
+          |> Css_to_runtime.render_declarations(~loc)
+          |> Css_to_runtime.addLabel(~loc, moduleName)
           |> Builder.pexp_array(~loc)
-          |> Css_to_emotion.render_style_call(~loc)
-        | Error((loc, msg)) => Generate_lib.error(~loc, msg)
+          |> Css_to_runtime.render_style_call(~loc)
+        | Error((loc, msg)) => Error.expr(~loc, msg)
         };
 
       Builder.pstr_module(
@@ -202,9 +202,9 @@ module Mapper = {
       let htmlTag = getHtmlTagUnsafe(~loc=extensionLoc, extensionName);
       let styles =
         arr
-        |> Css_to_emotion.addLabel(~loc=arrayLoc, moduleName)
+        |> Css_to_runtime.addLabel(~loc=arrayLoc, moduleName)
         |> Builder.pexp_array(~loc=arrayLoc)
-        |> Css_to_emotion.render_style_call(~loc=arrayLoc);
+        |> Css_to_runtime.render_style_call(~loc=arrayLoc);
 
       Builder.pstr_module(
         ~loc=moduleLoc,
@@ -316,11 +316,11 @@ module Mapper = {
         ) {
         | Ok(declarations) =>
           declarations
-          |> Css_to_emotion.render_declarations(~loc)
-          |> Css_to_emotion.addLabel(~loc, valueName)
+          |> Css_to_runtime.render_declarations(~loc)
+          |> Css_to_runtime.addLabel(~loc, valueName)
           |> Builder.pexp_array(~loc)
-          |> Css_to_emotion.render_style_call(~loc)
-        | Error((loc, msg)) => Generate_lib.error(~loc, msg)
+          |> Css_to_runtime.render_style_call(~loc)
+        | Error((loc, msg)) => Error.expr(~loc, msg)
         };
 
       Builder.pstr_value(
@@ -364,9 +364,9 @@ module Mapper = {
       ) =>
       let expr =
         arr
-        |> Css_to_emotion.addLabel(~loc=payloadLoc, valueName)
+        |> Css_to_runtime.addLabel(~loc=payloadLoc, valueName)
         |> Builder.pexp_array(~loc=payloadLoc)
-        |> Css_to_emotion.render_style_call(~loc);
+        |> Css_to_runtime.render_style_call(~loc);
 
       Builder.pstr_value(
         ~loc,
@@ -752,15 +752,15 @@ let _ =
               ) {
               | Ok(declarations) =>
                 declarations
-                |> Css_to_emotion.render_declarations(~loc)
+                |> Css_to_runtime.render_declarations(~loc)
                 |> Builder.pexp_array(~loc)
-                |> Css_to_emotion.render_style_call(~loc)
-              | Error((loc, msg)) => Generate_lib.error(~loc, msg)
+                |> Css_to_runtime.render_style_call(~loc)
+              | Error((loc, msg)) => Error.expr(~loc, msg)
               };
             | `Array(arr) =>
               arr
               |> Builder.pexp_array(~loc)
-              |> Css_to_emotion.render_style_call(~loc)
+              |> Css_to_runtime.render_style_call(~loc)
             };
           },
         ),
@@ -782,9 +782,9 @@ let _ =
             ) {
             | Ok(declarations) =>
               let declarationListValues =
-                Css_to_emotion.render_declaration(~loc, declarations);
+                Css_to_runtime.render_declaration(~loc, declarations);
               List.nth(declarationListValues, 0);
-            | Error((loc, msg)) => Generate_lib.error(~loc, msg)
+            | Error((loc, msg)) => Error.expr(~loc, msg)
             };
             /* TODO: Instead of getting the first element,
                  fail when there's more than one declaration or
@@ -808,8 +808,8 @@ let _ =
               Styled_ppx_css_parser.Driver.parse_stylesheet(~loc, payload)
             ) {
             | Ok(stylesheets) =>
-              Css_to_emotion.render_global(~loc, stylesheets)
-            | Error((loc, msg)) => Generate_lib.error(~loc, msg)
+              Css_to_runtime.render_global(~loc, stylesheets)
+            | Error((loc, msg)) => Error.expr(~loc, msg)
             };
           },
         ),
@@ -830,8 +830,8 @@ let _ =
               Styled_ppx_css_parser.Driver.parse_keyframes(~loc, payload)
             ) {
             | Ok(declarations) =>
-              Css_to_emotion.render_keyframes(~loc, declarations)
-            | Error((loc, msg)) => Generate_lib.error(~loc, msg)
+              Css_to_runtime.render_keyframes(~loc, declarations)
+            | Error((loc, msg)) => Error.expr(~loc, msg)
             };
           },
         ),
@@ -843,7 +843,7 @@ let _ =
           Ppxlib.Extension.Context.Module_expr,
           any_payload_pattern,
           (~loc, ~path as _, payload) => {
-          Generate_lib.raiseError(
+          Error.raise(
             ~loc,
             ~description=
               "An styled component without a tag is not valid. You must define an HTML tag, like, `styled.div`",

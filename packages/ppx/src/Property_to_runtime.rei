@@ -1,6 +1,6 @@
 open Ppxlib;
 
-let parse_declarations:
+let render:
   (~loc: Location.t, string, string, bool) =>
   result(
     list(Parsetree.expression),
