@@ -9,13 +9,14 @@ let khtml property = Printf.sprintf "-khtml-%s" property
 
 let prefix_property (property : string) (value : string) prefixes =
   prefixes
-  |> List.map (fun prefixer -> Rule.declaration (prefixer property, value))
+  |> Array.map (fun prefixer -> Rule.declaration (prefixer property, value))
 
 let prefix_value (property : string) (value : string) prefixes =
   prefixes
-  |> List.map (fun prefixer -> Rule.declaration (property, prefixer value))
+  |> Array.map (fun prefixer -> Rule.declaration (property, prefixer value))
 
 let prefix rule =
+  let ( @ ) = Array.append in
   match rule with
   | Rule.Declaration
       ( (( "animation" | "animation-name" | "animation-duration"
@@ -45,43 +46,43 @@ let prefix rule =
          | "padding-inline-end" ) as property),
         value )
   | Declaration (("columns" as property), value) ->
-    prefix_property property value [ webkit ] @ [ rule ]
+    prefix_property property value [| webkit |] @ [| rule |]
   | Declaration (("user-select" as property), value)
   | Declaration (("appearance" as property), value)
   | Declaration (("transform" as property), value)
   | Declaration (("hyphens" as property), value)
   | Declaration (("text-size-adjust" as property), value) ->
-    prefix_property property value [ webkit; moz; ms ] @ [ rule ]
+    prefix_property property value [| webkit; moz; ms |] @ [| rule |]
   | Declaration ((("grid-row" | "grid-column") as property), value) ->
-    prefix_property property value [ ms ] @ [ rule ]
+    prefix_property property value [| ms |] @ [| rule |]
   | Declaration (("flex" as property), value)
   | Declaration (("flex-direction" as property), value)
   | Declaration (("scroll-snap-type" as property), value)
   | Declaration (("writing-mode" as property), value) ->
-    prefix_property property value [ webkit; ms ] @ [ rule ]
+    prefix_property property value [| webkit; ms |] @ [| rule |]
   | Declaration (("tab-size" as property), value) ->
-    prefix_property property value [ moz; o ] @ [ rule ]
+    prefix_property property value [| moz; o |] @ [| rule |]
   | Declaration ("color-adjust", value) ->
-    prefix_property "print-color-adjust" value [ webkit ] @ [ rule ]
+    prefix_property "print-color-adjust" value [| webkit |] @ [| rule |]
   | Declaration
       ( (( "align-items" | "align-content" | "flex-shrink" | "flex-basis"
          | "align-self" | "flex-grow" | "justify-content" ) as _property),
         _value ) ->
-    [ rule ]
+    [| rule |]
   | Declaration (("cursor" as property), (("grab" | "grabbing") as value)) ->
-    prefix_value property value [ webkit ] @ [ rule ]
+    prefix_value property value [| webkit |] @ [| rule |]
   | Declaration
       ( (( "width" | "min-width" | "max-width" | "height" | "min-height"
          | "max-height" | "min-block-size" | "max-block-size" ) as property),
         (("fit-content" | "max-content" | "min-content" | "fill-available") as
          value) ) ->
-    prefix_value property value [ webkit; moz ] @ [ rule ]
+    prefix_value property value [| webkit; moz |] @ [| rule |]
   | Declaration
       ( (( "width" | "min-width" | "max-width" | "height" | "min-height"
          | "max-height" ) as property),
         "stretch" ) ->
-    prefix_value property "fill-available" [ webkit ]
-    @ prefix_value property "available" [ moz ]
-    @ [ rule ]
+    (prefix_value property "fill-available" [| webkit |]
+    @ prefix_value property "available" [| moz |])
+    @ [| rule |]
   (* TODO: Add -webkit-image-set on "background" | "background-image" image-set *)
-  | _ -> [ rule ]
+  | _ -> [| rule |]

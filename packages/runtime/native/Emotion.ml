@@ -1,44 +1,60 @@
 module Array = struct
-  include Stdlib.Array
+  (* Similar Array interface as https://github.com/janestreet/base *)
+  include Stdlib.ArrayLabels
 
+  external caml_make_vect : int -> 'a -> 'a array = "caml_make_vect"
+
+  let join ~sep a = String.concat sep (Array.to_list a)
+
+  let create ~len x =
+    try caml_make_vect len x
+    with Invalid_argument _ ->
+      failwith @@ Printf.sprintf "Array.create ~len:%d: invalid length" len
+
+  let filter_mapi ~f t =
+    let r = ref [||] in
+    let k = ref 0 in
+    for i = 0 to length t - 1 do
+      match f i (unsafe_get t i) with
+      | None -> ()
+      | Some a ->
+        if !k = 0 then r := create ~len:(length t) a;
+        unsafe_set !r !k a;
+        incr k
+    done;
+    if !k = length t then !r else if !k > 0 then sub ~pos:0 ~len:!k !r else [||]
+
+  let filter_map ~f t = (filter_mapi t ~f:(fun _i a -> f a) [@nontail])
   let ( @ ) = Stdlib.Array.append
   let is_empty a = Array.length a == 0
   let is_not_empty a = Array.length a != 0
 
-  external getUnsafe : 'a array -> int -> 'a = "%array_unsafe_get"
-  external setUnsafe : 'a array -> int -> 'a -> unit = "%array_unsafe_set"
+  let map t ~(f : _ -> _) =
+    let len = length t in
+    if len = 0 then [||]
+    else (
+      let r = create ~len (f (unsafe_get t 0)) in
+      for i = 1 to len - 1 do
+        unsafe_set r i (f (unsafe_get t i))
+      done;
+      r)
 
-  let partition_map f a =
-    List.partition_map f (Array.to_list a) |> fun (a, b) ->
-    Array.of_list a, Array.of_list b
+  let partition_map ~f t =
+    let (both : _ Either.t t) = map t ~f in
+    let firsts =
+      filter_map ~f:(function Either.Left x -> Some x | Right _ -> None) both
+    in
+    let seconds =
+      filter_map ~f:(function Either.Left _ -> None | Right x -> Some x) both
+    in
+    firsts, seconds
 
-  let partition f a =
-    List.partition f (Array.to_list a) |> fun (a, b) ->
-    Array.of_list a, Array.of_list b
+  let partition ~f t =
+    (partition_map t ~f:(fun x ->
+         match f x with true -> Left x | false -> Right x)
+    [@nontail])
 
-  let filter_map f a =
-    let l = length a in
-    let r = ref None in
-    let j = ref 0 in
-    for i = 0 to l - 1 do
-      let v = getUnsafe a i in
-      match f v with
-      | None -> ()
-      | Some v ->
-        let r =
-          match !r with
-          | None ->
-            let newr = Array.make l v in
-            r := Some newr;
-            newr
-          | Some r -> r
-        in
-        setUnsafe r !j v;
-        incr j
-    done;
-    match !r with None -> [||] | Some r -> Stdlib.Array.sub r 0 !j
-
-  let filter f a = filter_map (fun x -> if f x then Some x else None) a
+  let filter ~f t = filter_map ~f:(fun x -> if f x then Some x else None) t
   let flatten a = Array.concat (Array.to_list a)
 end
 
@@ -52,11 +68,10 @@ let render_declaration rule =
 
 let render_declarations rules =
   rules
-  |> Array.to_list
-  |> List.map Autoprefixer.prefix
-  |> List.flatten
-  |> List.filter_map render_declaration
-  |> String.concat " "
+  |> Array.map ~f:Autoprefixer.prefix
+  |> Array.flatten
+  |> Array.filter_map ~f:render_declaration
+  |> Array.join ~sep:" "
 
 let is_at_rule selector = String.contains selector '@'
 let starts_with_at selector = String.starts_with ~prefix:"@" selector
@@ -112,7 +127,8 @@ let rec rule_to_debug nesting accumulator rule =
   let space = if nesting > 0 then String.make (nesting * 2) ' ' else "" in
   accumulator ^ Printf.sprintf "\n%s" space ^ next_rule
 
-and to_debug nesting rules = rules |> Array.fold_left (rule_to_debug nesting) ""
+and to_debug nesting rules =
+  rules |> Array.fold_left ~f:(rule_to_debug nesting) ~init:""
 
 let print_rules ?(initial = 0) rules =
   match rules with
@@ -121,13 +137,10 @@ let print_rules ?(initial = 0) rules =
     print_endline @@ Printf.sprintf "\n%s Empty []\n" space
   | _ ->
     rules
-    |> Array.iter (fun rule -> print_endline (to_debug initial [| rule |]))
+    |> Array.iter ~f:(fun rule -> print_endline (to_debug initial [| rule |]))
 
 let split_by_kind rules =
-  Array.partition (function Rule.Declaration _ -> true | _ -> false) rules
-
-let split_by_kind_list rules =
-  List.partition (function Rule.Declaration _ -> true | _ -> false) rules
+  Array.partition ~f:(function Rule.Declaration _ -> true | _ -> false) rules
 
 let resolve_ampersand hash selector =
   let classname = "." ^ hash in
@@ -146,19 +159,19 @@ let join_media left right = left ^ " and " ^ remove_media_from_selector right
 
 let rules_do_not_contain_media rules =
   Array.exists
-    (function Rule.Selector (s, _) when is_at_rule s -> false | _ -> true)
+    ~f:(function Rule.Selector (s, _) when is_at_rule s -> false | _ -> true)
     rules
 
 let rules_contain_media rules =
   Array.exists
-    (function Rule.Selector (s, _) when is_at_rule s -> true | _ -> false)
+    ~f:(function Rule.Selector (s, _) when is_at_rule s -> true | _ -> false)
     rules
 
 (* media selectors should be at the top. .a { @media () {} }
      should be @media () { .a {}} *)
 let rec move_media_at_top (rule_list : Rule.t array) : Rule.t array =
   Array.fold_left
-    (fun acc rule ->
+    ~f:(fun acc rule ->
       match rule with
       (* current_select is a @media and contains @media inside their rules:
 
@@ -188,14 +201,13 @@ let rec move_media_at_top (rule_list : Rule.t array) : Rule.t array =
         when Array.is_not_empty rules && rules_contain_media rules ->
         let declarations, selectors = split_by_kind rules in
         let media_selectors, non_media_selectors =
-          Array.partition
-            (function
-              | Rule.Selector (s, _) when is_at_rule s -> true | _ -> false)
-            selectors
+          Array.partition selectors ~f:(function
+            | Rule.Selector (s, _) when is_at_rule s -> true
+            | _ -> false)
         in
         let new_media_rules =
           Array.map
-            (fun media_rules ->
+            ~f:(fun media_rules ->
               match media_rules with
               | Rule.Selector (nested_media_selector, nested_media_rule_list)
                 when is_at_rule nested_media_selector ->
@@ -223,13 +235,13 @@ let rec move_media_at_top (rule_list : Rule.t array) : Rule.t array =
         Array.append acc [| rule |]
       | Rule.Declaration (_, _) as rule -> Array.append acc [| rule |]
       | _ -> acc)
-    [||] rule_list
+    ~init:[||] rule_list
 
 and swap at_media_selector media_rules =
   let media_declarations, media_rules_selectors = split_by_kind media_rules in
   let resolved_media_selectors =
     Array.map
-      (fun media_rules ->
+      ~f:(fun media_rules ->
         match media_rules with
         | Rule.Selector (nested_media_selector, nested_media_rule_list) ->
           [|
@@ -248,7 +260,7 @@ and swap at_media_selector media_rules =
      we split those into separate rules *)
 let split_multiple_selectors rule_list =
   Array.fold_left
-    (fun acc rule ->
+    ~f:(fun acc rule ->
       match rule with
       | Rule.Selector (selector, rules)
         when contains_multiple_selectors selector ->
@@ -261,82 +273,75 @@ let split_multiple_selectors rule_list =
         in
         List.append acc new_rules
       | rule -> List.append acc [ rule ])
-    [] rule_list
+    ~init:[] rule_list
+  |> Array.of_list
 
 let resolve_selectors rules =
   (* unnest takes a list of rules and unnest them into a flat list of rules *)
   let rec unnest_selectors ~prefix rules =
     (* multiple selectors are defined with commas: like .a, .b {}
        we split those into separate selectors with the same rules *)
-    rules
-    |> List.partition_map (function
-         (* in case of being at @media, don't do anything to it *)
-         | Rule.Selector (current_selector, selector_rules)
-           when starts_with_at current_selector ->
-           Right [ Rule.Selector (current_selector, selector_rules) ]
-         | Rule.Selector (current_selector, selector_rules) ->
-           let is_first_level = prefix != "" in
-           (* TODO: Simplify this monstruosity *)
-           let new_prelude =
-             if is_first_level && starts_with_ampersand current_selector then
-               prefix ^ remove_first_ampersand current_selector
-             else if is_first_level && starts_with_dot current_selector then
-               prefix ^ remove_first_ampersand current_selector
-             else if is_first_level && starts_with_double_dot current_selector
-             then prefix ^ current_selector
-             else if is_first_level || starts_with_dot current_selector then
-               prefix ^ " " ^ current_selector
-             else prefix ^ current_selector
-           in
-           let selector_rules = split_multiple_selectors selector_rules in
-           let selectors, rest_of_declarations =
-             unnest_selectors ~prefix:new_prelude selector_rules
-           in
-           let new_selector =
-             Rule.Selector (new_prelude, Array.of_list selectors)
-           in
-           Right (new_selector :: List.flatten rest_of_declarations)
-         | _ as rule -> Left rule)
+    Array.partition_map rules ~f:(function
+      (* in case of being at @media, don't do anything to it *)
+      | Rule.Selector (current_selector, selector_rules)
+        when starts_with_at current_selector ->
+        Right [| Rule.Selector (current_selector, selector_rules) |]
+      | Rule.Selector (current_selector, selector_rules) ->
+        let is_first_level = prefix != "" in
+        (* TODO: Simplify this monstruosity *)
+        let new_prelude =
+          if is_first_level && starts_with_ampersand current_selector then
+            prefix ^ remove_first_ampersand current_selector
+          else if is_first_level && starts_with_dot current_selector then
+            prefix ^ remove_first_ampersand current_selector
+          else if is_first_level && starts_with_double_dot current_selector then
+            prefix ^ current_selector
+          else if is_first_level || starts_with_dot current_selector then
+            prefix ^ " " ^ current_selector
+          else prefix ^ current_selector
+        in
+        let selector_rules = split_multiple_selectors selector_rules in
+        let selectors, rest_of_declarations =
+          unnest_selectors ~prefix:new_prelude selector_rules
+        in
+        let new_selector = Rule.Selector (new_prelude, selectors) in
+        Right
+          (Array.append [| new_selector |] (Array.flatten rest_of_declarations))
+      | _ as rule -> Left rule)
   in
 
   let rules = move_media_at_top rules in
   let rules = split_multiple_selectors rules in
   let declarations, selectors = unnest_selectors ~prefix:"" rules in
-  List.flatten (declarations :: selectors)
+  Array.append declarations (Array.flatten selectors)
 
 let render_keyframes animationName keyframes =
   let definition =
     keyframes
-    |> Array.map (fun (percentage, rules) ->
+    |> Array.map ~f:(fun (percentage, rules) ->
            Printf.sprintf "%i%% { %s }" percentage (render_declarations rules))
-    |> Array.to_list
-    |> String.concat " "
+    |> Array.join ~sep:" "
   in
   Printf.sprintf "@keyframes %s { %s }" animationName definition
 
 (* Removes nesting on selectors, uplifts media-queries, runs the autoprefixer *)
 let rec render_rules className rules =
-  let declarations, selectors = split_by_kind_list (resolve_selectors rules) in
+  let declarations, selectors = split_by_kind (resolve_selectors rules) in
 
   let declarations =
     match declarations with
-    | [] -> ""
+    | [||] -> ""
     | _ ->
-      declarations
-      |> List.map Autoprefixer.prefix
-      |> List.flatten
-      |> List.filter_map render_declaration
-      |> String.concat " "
-      |> fun all -> Printf.sprintf ".%s { %s }" className all
+      Printf.sprintf ".%s { %s }" className (render_declarations declarations)
   in
 
   let selectors =
     match selectors with
-    | [] -> ""
+    | [||] -> ""
     | _ ->
       selectors
-      |> List.filter_map (render_selectors className)
-      |> String.concat " "
+      |> Array.filter_map ~f:(render_selectors className)
+      |> Array.join ~sep:" "
   in
 
   (* Trimming is necessary to ensure there isn't an empty space when one of `declarations` or `selectors` is empty. *)
@@ -367,10 +372,10 @@ let rec rules_to_string rules =
     | Rule.Declaration (property, value) ->
       push (Printf.sprintf "%s:%s;" property value)
     | Rule.Selector (selector, rules) ->
-      let rules = rules |> Array.to_list |> rules_to_string in
+      let rules = rules_to_string rules in
       push (Printf.sprintf "%s{%s}" selector rules)
   in
-  List.iter rule_to_string rules;
+  Array.iter ~f:rule_to_string rules;
   Buffer.contents buff
 
 type declarations =
@@ -410,17 +415,16 @@ end
 
 let keyframes_to_string keyframes =
   let pp_keyframe (percentage, rules) =
-    Printf.sprintf "%d%%{%s}" percentage
-      (rules |> Array.to_list |> rules_to_string)
+    Printf.sprintf "%d%%{%s}" percentage (rules_to_string rules)
   in
-  keyframes |> Array.map pp_keyframe |> Array.to_list |> String.concat ""
+  keyframes |> Array.map ~f:pp_keyframe |> Array.to_list |> String.concat ""
 
 let render_hash hash styles =
   let is_label = function
     | Rule.Declaration ("label", value) -> Some value
     | _ -> None
   in
-  match Array.find_map is_label styles with
+  match Array.find_map ~f:is_label styles with
   | Some label -> Printf.sprintf "%s-%s" hash label
   | None -> Printf.sprintf "%s" hash
 
@@ -431,11 +435,7 @@ let style (styles : Rule.t array) =
   match styles with
   | [||] -> "css-0"
   | _ ->
-    let hash =
-      render_hash
-        (Murmur2.default (rules_to_string (Array.to_list styles)))
-        styles
-    in
+    let hash = render_hash (Murmur2.default (rules_to_string styles)) styles in
     let className = Printf.sprintf "%s-%s" "css" hash in
     Stylesheet.push instance (hash, Classnames { className; styles });
     className
@@ -444,7 +444,7 @@ let global (styles : Rule.t array) =
   match styles with
   | [||] -> ()
   | _ ->
-    let hash = Murmur2.default (rules_to_string (Array.to_list styles)) in
+    let hash = Murmur2.default (rules_to_string styles) in
     Stylesheet.push instance (hash, Globals styles)
 
 let keyframes (keyframes : (int * Rule.t array) array) =
@@ -462,7 +462,7 @@ let get_stylesheet () =
        (fun accumulator (_, rules) ->
          match rules with
          | Globals rules ->
-           let rules = String.trim @@ rules_to_string (Array.to_list rules) in
+           let rules = String.trim @@ rules_to_string rules in
            Printf.sprintf "%s %s" accumulator rules
          | Classnames { className; styles } ->
            let rules = String.trim @@ render_rules className styles in

@@ -8,6 +8,4 @@
   server-reason-react.belt
   server-reason-react.js
   styled-ppx.murmur2)
- (wrapped false)
- (preprocess
-  (pps server-reason-react.melange_ppx)))
+ (wrapped false))
