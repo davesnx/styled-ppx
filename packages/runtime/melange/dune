@@ -1,0 +1,14 @@
+(library
+ (name styled_ppx_runtime_melange)
+ (public_name styled-ppx.melange)
+ (modes melange)
+ (wrapped false)
+ (preprocess
+  (pps melange.ppx -alert -deprecated)))
+
+(copy_files#
+ (mode fallback)
+ (files ../native/shared/**[!.pp].ml))
+
+(copy_files#
+ (files ../native/shared/Kloth.mli))

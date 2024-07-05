@@ -1,9 +1,0 @@
-(include_subdirs unqualified)
-
-(library
- (name css_native)
- (public_name styled-ppx.css_native)
- (wrapped false)
- (libraries server-reason-react.js server-reason-react.belt)
- (preprocess
-  (pps server-reason-react.melange_ppx)))

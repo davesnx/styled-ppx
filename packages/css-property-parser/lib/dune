@@ -1,0 +1,8 @@
+(library
+ (name Css_property_parser)
+ (public_name styled-ppx.css-property-parser)
+ (libraries sedlex styled-ppx.css-parser ppx_deriving.runtime compiler-libs)
+ (preprocess
+  (per_module
+   ((pps reason_css_parser_ppx sedlex.ppx)
+    Parser))))

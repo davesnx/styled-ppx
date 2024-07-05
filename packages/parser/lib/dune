@@ -1,5 +1,5 @@
 (menhir
- (modules css_parser)
+ (modules Parser)
  (flags --explain --unused-tokens))
 
 (library

@@ -1,0 +1,35 @@
+(copy_files#
+ (files ../native/shared/Css_types.{ml,mli}))
+
+(copy_files#
+ (files ../native/shared/Kloth.mli))
+
+(copy_files#
+ (files ../native/shared/Properties.ml))
+
+(copy_files#
+ (files ../native/shared/Alias.ml))
+
+(copy_files#
+ (files ../melange/Rule.ml))
+
+(copy_files#
+ (files ../native/shared/Colors.ml))
+
+; Copy files into the root of the folder (which collides with Kloth.ml)
+; but later on the actions, we remove the ml file, using the Kloth.res file
+
+(rule
+ (deps Kloth.ml CssJs.ml Emotion.ml)
+ (action
+  (progn
+   (with-stdout-to
+    bsconfig.json
+    (run
+     echo
+     "{\"name\": \"@davesnx/styled-ppx/emotion\", \"sources\": [\".\"], \"bs-dependencies\": []}"))
+   (with-stdout-to
+    package.json
+    (run
+     echo
+     "{\"name\": \"@davesnx/styled-ppx/emotion\", \"dependencies\": { \"@emotion/css\": \"^11.11.2\" } }")))))

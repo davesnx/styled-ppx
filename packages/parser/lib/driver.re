@@ -1,5 +1,3 @@
-module Lexer = Css_lexer;
-module Parser = Css_parser;
 module Location = Ppxlib.Location;
 
 let menhir = MenhirLib.Convert.Simplified.traditional2revised;
@@ -21,7 +19,7 @@ let parse = (~loc: Ppxlib.location, skip_whitespaces, lexbuf, parser) => {
   | _ =>
     let (token, start_pos, end_pos) = last_token^;
     let token_loc = Parser_location.to_ppxlib_location(start_pos, end_pos);
-    let loc = Parser_location.update_pos_lnum(token_loc, loc)
+    let loc = Parser_location.update_pos_lnum(token_loc, loc);
     let msg =
       Printf.sprintf(
         "Parse error while reading token '%s'",

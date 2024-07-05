@@ -1,6 +1,6 @@
 open Alcotest;
 
-module Lexer = Styled_ppx_css_parser.Css_lexer;
+module Lexer = Styled_ppx_css_parser.Lexer;
 module Tokens = Styled_ppx_css_parser.Tokens;
 
 let parse = input => {

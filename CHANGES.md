@@ -1,5 +1,17 @@
 # Changes
 
+## 0.58.0
+- [FEATURE] Initial @container support #476 (@zakybilfagih)
+- [FIX] Make selector nested maintain other selectors #486 (@davesnx)
+- [BREAKING] Remove `Css` module, `styled_label` and friends #487 (@davesnx)
+- [BREAKING] Merge styled-ppx.css and styled-ppx.emotion into styled-ppx.melange #487 (@davesnx)
+- [BREAKING] Merge styled-ppx.css-native and styled-ppx.emotion-native into styled-ppx.native #487 (@davesnx)
+- [BREAKING] Merge styled-ppx.css-native and styled-ppx.emotion-native into styled-ppx.native #487 (@davesnx)
+- [BREAKING] Remove PseudoClass and PseudoClassParam #487 (@davesnx)
+- Remove functor from Css_Js_Core #487 (@davesnx)
+- Remove melange.js and melange.belt from styled-ppx.melange #487 (@davesnx)
+- Remove server-reason-react.js and server-reason-react.belt from styled-ppx.native #487 (@davesnx)
+
 ## 0.57.1
 - Remove public_name from alcotest_extra #484 (@davesnx)
 - Fix nesting for selectors (and pseudo) in native #483 (@davesnx)

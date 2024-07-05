@@ -1,7 +1,5 @@
-This test ensures the ppx generates the correct output against styled-ppx.css_native
-If this test fail means that Css_Js_Core or CssJs_Legacy_Core (from styled-ppx.css or styled-ppx.css_native) are not in sync with the ppx
-
-This test only runs against Css_Js_Core from styled-ppx.css_native
+This test ensures the ppx generates the correct output against styled-ppx.native
+If this test fail means that the module is not in sync with the ppx
 
   $ cat > dune-project << EOF
   > (lang dune 3.10)
@@ -10,7 +8,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   $ cat > dune << EOF
   > (executable
   >  (name input)
-  >  (libraries styled-ppx.css_native styled-ppx.emotion_native)
+  >  (libraries styled-ppx.native)
   >  (preprocess (pps styled-ppx)))
   > EOF
 
@@ -174,7 +172,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
           (Some(`hex({js|F80|js})), Some(`percent(0.))),
           (Some(`rgba((255, 255, 255, `num(0.8)))), Some(`percent(50.))),
           (Some(`hex({js|2A97FF|js})), Some(`percent(100.))),
-        |]: Css_AtomicTypes.Gradient.color_stop_list,
+        |]: CssJs.Types.Gradient.color_stop_list,
       )),
     ),
   |]);

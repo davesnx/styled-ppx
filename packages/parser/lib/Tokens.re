@@ -1,5 +1,3 @@
-module Parser = Css_parser;
-
 [@deriving show({with_path: false})]
 type token =
   | EOF

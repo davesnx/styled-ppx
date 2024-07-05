@@ -1,7 +1,5 @@
-This test ensures the ppx generates the correct output against styled-ppx.css_native
-If this test fail means that Css_Js_Core or CssJs_Legacy_Core (from styled-ppx.css or styled-ppx.css_native) are not in sync with the ppx
-
-This test only runs against Css_Js_Core from styled-ppx.css_native
+This test ensures the ppx generates the correct output against styled-ppx.native
+If this test fail means that the module is not in sync with the ppx
 
   $ cat > dune-project << EOF
   > (lang dune 3.10)
@@ -10,7 +8,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   $ cat > dune << EOF
   > (executable
   >  (name input)
-  >  (libraries styled-ppx.emotion_native styled-ppx.css_native)
+  >  (libraries styled-ppx.native)
   >  (preprocess (pps styled-ppx)))
   > EOF
 
@@ -313,7 +311,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.backgroundImage(
     `linearGradient((
       Some(`deg(45.)),
-      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -322,13 +320,13 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       [|
         (Some(CssJs.blue), Some(`percent(10.))),
         (Some(CssJs.red), Some(`percent(20.))),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
     `linearGradient((
       Some(`deg(90.)),
-      [|(Some(CssJs.blue), Some(`percent(10.))), (Some(CssJs.red), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.blue), Some(`percent(10.))), (Some(CssJs.red), None)|]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -338,25 +336,25 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
         (Some(CssJs.blue), None),
         (None, Some(`percent(10.))),
         (Some(CssJs.red), None),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
     `linearGradient((
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
     `linearGradient((
       Some(`Right),
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
     `linearGradient((
       Some(`deg(45.)),
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -365,7 +363,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       [|
         (Some(CssJs.white), Some(`percent(50.))),
         (Some(CssJs.black), None),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -375,7 +373,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
         (Some(CssJs.white), None),
         (Some(`hex({js|f06|js})), None),
         (Some(CssJs.black), None),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -388,13 +386,13 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
           Some(`calc(`add((`pxFloat(-25.), `percent(50.))))),
         ),
         (Some(CssJs.blue), Some(`percent(100.))),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImages([|
     `linearGradient((
       Some(`deg(45.)),
-      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: CssJs.Types.Gradient.color_stop_list,
     )),
     `linearGradient((
       None,
@@ -405,11 +403,11 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
           Some(`calc(`add((`pxFloat(-25.), `percent(50.))))),
         ),
         (Some(CssJs.blue), Some(`percent(100.))),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: CssJs.Types.Gradient.color_stop_list,
     )),
     `linearGradient((
       Some(`deg(45.)),
-      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: CssJs.Types.Gradient.color_stop_list,
     )),
   |]);
   let color = `hex("333");
@@ -424,7 +422,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
         (Some(color), Some(`percent(75.))),
         (Some(`transparent), Some(`percent(0.))),
         (Some(`transparent), Some(`percent(100.))),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -435,7 +433,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
         (Some(color), Some(`pxFloat(4.))),
         (Some(color), Some(`pxFloat(5.))),
         (Some(color), Some(`pxFloat(9.))),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImages([|
@@ -444,7 +442,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       [|
         (Some(Color.Background.boxDark), Some(`percent(25.))),
         (Some(`transparent), Some(`percent(25.))),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: CssJs.Types.Gradient.color_stop_list,
     )),
     `linearGradient((
       None,
@@ -455,11 +453,11 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
           Some(`calc(`add((`pxFloat(-25.), `percent(50.))))),
         ),
         (Some(CssJs.blue), Some(`percent(100.))),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: CssJs.Types.Gradient.color_stop_list,
     )),
     `linearGradient((
       Some(`deg(45.)),
-      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: CssJs.Types.Gradient.color_stop_list,
     )),
   |]);
   CssJs.backgroundImage(
@@ -467,7 +465,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       Some(`ellipse),
       None,
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -475,7 +473,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       Some(`circle),
       None,
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -483,7 +481,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       Some(`ellipse),
       None,
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -491,7 +489,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       Some(`circle),
       Some(`closestCorner),
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -499,7 +497,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       Some(`ellipse),
       Some(`farthestSide),
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -507,7 +505,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       Some(`circle),
       Some(`farthestSide),
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -519,7 +517,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
         (None, Some(`percent(50.))),
         (Some(CssJs.white), None),
         (Some(CssJs.black), None),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.unsafe(
@@ -529,19 +527,19 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   CssJs.listStyleImage(
     `linearGradient((
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
     `linearGradient((
       Some(`Right),
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
     `linearGradient((
       Some(`deg(45.)),
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
@@ -550,7 +548,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       [|
         (Some(CssJs.white), Some(`percent(50.))),
         (Some(CssJs.black), None),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
@@ -559,7 +557,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       [|
         (Some(CssJs.white), Some(`pxFloat(5.))),
         (Some(CssJs.black), None),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
@@ -569,13 +567,13 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
         (Some(CssJs.white), None),
         (Some(`hex({js|f06|js})), None),
         (Some(CssJs.black), None),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
     `linearGradient((
       None,
-      [|(Some(`currentColor), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(`currentColor), None), (Some(CssJs.black), None)|]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
@@ -588,7 +586,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
           Some(`calc(`add((`pxFloat(-25.), `percent(50.))))),
         ),
         (Some(CssJs.blue), Some(`percent(100.))),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
@@ -596,7 +594,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       Some(`ellipse),
       None,
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
@@ -604,7 +602,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       Some(`circle),
       None,
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
@@ -612,7 +610,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       Some(`ellipse),
       None,
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
@@ -620,7 +618,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       Some(`ellipse),
       Some(`closestCorner),
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
@@ -628,7 +626,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       Some(`circle),
       Some(`closestCorner),
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
@@ -636,7 +634,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       Some(`ellipse),
       Some(`farthestSide),
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
@@ -644,7 +642,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       Some(`circle),
       Some(`farthestSide),
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
@@ -656,7 +654,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
         (None, Some(`percent(50.))),
         (Some(CssJs.white), None),
         (Some(CssJs.black), None),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.unsafe(

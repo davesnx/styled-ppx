@@ -26,7 +26,7 @@ let make = () => {
   let focusInput = () =>
     input.current
     ->Js.Nullable.toOption
-    ->Belt.Option.forEach(input => input->focus)
+    ->Belt.Option.forEach(input => focus(input))
 
   let onClick = _ => focusInput()
 
