@@ -78,19 +78,12 @@ jobs:
           name: ${{ matrix.os }}
           path: _build/default/packages/bin/bin.exe
 
-      - name: Upload runtime artifacts for @davesnx/styled-ppx/runtime/css
+      - name: Upload runtime artifacts for @davesnx/styled-ppx/runtime
         if: matrix.os == 'ubuntu-20.04'
         uses: actions/upload-artifact@v3
         with:
-          name: runtime-css
-          path: _build/default/packages/css/rescript
-
-      - name: Upload runtime artifacts for @davesnx/styled-ppx/runtime/emotion
-        if: matrix.os == 'ubuntu-20.04'
-        uses: actions/upload-artifact@v3
-        with:
-          name: runtime-emotion
-          path: _build/default/packages/emotion/rescript
+          name: runtime-rescript
+          path: _build/default/packages/runtime/rescript
 
       - name: Save cache when not Windows
         uses: actions/cache/save@v3
@@ -151,18 +144,11 @@ jobs:
       #   with:
       #     name: windows-latest
       #     path: _release/platform-windows-x64
-
-      - name: Download runtime-css artifacts
+      - name: Download runtime-rescript artifacts
         uses: actions/download-artifact@v3
         with:
-          name: runtime-css
-          path: _release/css
-
-      - name: Download runtime-emotion artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: runtime-emotion
-          path: _release/emotion
+          name: runtime-rescript
+          path: _release/rescript
 
       - name: Release nightly (@davesnx/styled-ppx) package
         if: ${{ success() && github.event_name == 'pull_request' && github.event.pull_request.user.login == 'davesnx' }}
