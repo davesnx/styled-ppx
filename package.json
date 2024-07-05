@@ -1,6 +1,6 @@
 {
   "name": "@davesnx/styled-ppx",
-  "version": "0.56.0",
+  "version": "0.57.0",
   "description": "Typed styled components in ReScript",
   "author": "David Sancho <dsnxmoreno@gmail.com>",
   "license": "BSD-2",
@@ -27,9 +27,6 @@
     "url": "https://github.com/davesnx/styled-ppx.git"
   },
   "peerDependencies": {
-    "rescript": "9.x || 10.x"
-  },
-  "devDependencies": {
-    "rescript": "10.1.4"
+    "rescript": "9.x || 10.x || 11.x"
   }
 }

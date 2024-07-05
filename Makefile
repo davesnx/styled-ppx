@@ -94,31 +94,45 @@ $(foreach target,$(TEST_TARGETS), $(eval $(call create_test_promote,$(target))))
 
 .PHONY: test_e2e_rescript_v9
 test_e2e_rescript_v9: ## Run End-to-end tests for JSX3
-	npm --prefix 'e2e/rescript-v9-JSX3' install
-	npm --prefix 'e2e/rescript-v9-JSX3' run build
-	npm --prefix 'e2e/rescript-v9-JSX3' run test
+	npm --prefix 'e2e/rescript-v9' install
+	npm --prefix 'e2e/rescript-v9' run build
+	npm --prefix 'e2e/rescript-v9' run test
 
 .PHONY: test_e2e_rescript_v9_watch
 test_e2e_rescript_v9_watch: ## Run End-to-end tests for JSX3
-	npm --prefix 'e2e/rescript-v9-JSX3' run test_watch
+	npm --prefix 'e2e/rescript-v9' run test_watch
 
 .PHONY: test_e2e_rescript_v9_promote
 test_e2e_rescript_v9_promote: ## Run End-to-end tests for JSX3
-	npm --prefix 'e2e/rescript-v9-JSX3' run test_promote
+	npm --prefix 'e2e/rescript-v9' run test_promote
 
 .PHONY: test_e2e_rescript_v10
 test_e2e_rescript_v10: ## Run End-to-end tests for JSX4
-	npm --prefix 'e2e/rescript-v10-JSX4' install
-	npm --prefix 'e2e/rescript-v10-JSX4' run build
-	npm --prefix 'e2e/rescript-v10-JSX4' run test
+	npm --prefix 'e2e/rescript-v10' install
+	npm --prefix 'e2e/rescript-v10' run build
+	npm --prefix 'e2e/rescript-v10' run test
 
 .PHONY: test_e2e_rescript_v10_watch
 test_e2e_rescript_v10_watch: ## Run End-to-end tests for JSX4
-	npm --prefix 'e2e/rescript-v10-JSX4' run test_watch
+	npm --prefix 'e2e/rescript-v10' run test_watch
 
 .PHONY: test_e2e_rescript_v10_promote
 test_e2e_rescript_v10_promote: ## Run End-to-end tests for JSX4
-	npm --prefix 'e2e/rescript-v10-JSX4' run test_promote
+	npm --prefix 'e2e/rescript-v10' run test_promote
+
+.PHONY: test_e2e_rescript_v11
+test_e2e_rescript_v11: ## Run End-to-end tests for JSX4
+	npm --prefix 'e2e/rescript-v11' install
+	npm --prefix 'e2e/rescript-v11' run build
+	npm --prefix 'e2e/rescript-v11' run test
+
+.PHONY: test_e2e_rescript_v11_watch
+test_e2e_rescript_v11_watch: ## Run End-to-end tests for JSX4
+	npm --prefix 'e2e/rescript-v11' run test_watch
+
+.PHONY: test_e2e_rescript_v11_promote
+test_e2e_rescript_v11_promote: ## Run End-to-end tests for JSX4
+	npm --prefix 'e2e/rescript-v11' run test_promote
 
 .PHONY: test
 test: build
@@ -134,8 +148,8 @@ test: build
 
 .PHONY: demo_e2e_rescript_v10
 demo_e2e_rescript_v10: build ## Run the ReScript v10 demo with JSX4
-	npm --prefix 'e2e/rescript-v10-JSX4' install
-	npm --prefix 'e2e/rescript-v10-JSX4' run start
+	npm --prefix 'e2e/rescript-v10' install
+	npm --prefix 'e2e/rescript-v10' run start
 
 .PHONY: demo_e2e_melange_debug
 demo_e2e_melange_debug: ## Run the melange server demo
