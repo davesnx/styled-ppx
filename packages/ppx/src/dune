@@ -1,5 +1,5 @@
 (library
- (name styled_ppx)
+ (name ppx)
  (public_name styled-ppx)
  (kind ppx_rewriter)
  (flags
