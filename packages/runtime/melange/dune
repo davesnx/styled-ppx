@@ -3,7 +3,6 @@
  (public_name styled-ppx.melange)
  (modes melange)
  (wrapped false)
- (libraries melange.js melange.belt)
  (preprocess
   (pps melange.ppx -alert -deprecated)))
 

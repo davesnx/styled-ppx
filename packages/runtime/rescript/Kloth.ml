@@ -18,7 +18,7 @@ end
 module String = struct
   let get = String.get
   let length = Js.String.length
-  let startsWith affix str = Js.String.startsWith affix str
+  let startsWith ~prefix str = Js.String.startsWith prefix str
 end
 
 module Int = struct

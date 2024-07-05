@@ -32,7 +32,7 @@ module Var = struct
   let varDefault x default = `varDefault (x, default)
 
   let prefix x =
-    if Kloth.String.startsWith {js|--|js} x then x else {js|--|js} ^ x
+    if Kloth.String.startsWith ~prefix:{js|--|js} x then x else {js|--|js} ^ x
 
   let toString x =
     match x with

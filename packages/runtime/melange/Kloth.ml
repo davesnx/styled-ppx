@@ -1,13 +1,27 @@
-module List = struct
-  let map = Belt.List.map
-end
-
 module Array = struct
-  let reduceU = Belt.Array.reduceU
-  let reduceWithIndex = Belt.Array.reduceWithIndex
-  let reduceWithIndexU = Belt.Array.reduceWithIndexU
-  let reduce = Belt.Array.reduce
-  let map = Belt.Array.map
+  external ( .!() ) : 'a array -> int -> 'a = "%array_unsafe_get"
+  external length : 'a array -> int = "%array_length"
+  external makeUninitializedUnsafe : int -> 'a array = "Array" [@@mel.new]
+  external ( .!()<- ) : 'a array -> int -> 'a -> unit = "%array_unsafe_set"
+
+  let reduceU a x f =
+    let r = ref x in
+    for i = 0 to length a - 1 do
+      r.contents <- (f r.contents a.!(i) [@u])
+    done;
+    r.contents
+
+  let reduce a x f = reduceU a x (fun [@u] a b -> f a b)
+
+  let mapU a f =
+    let l = length a in
+    let r = makeUninitializedUnsafe l in
+    for i = 0 to l - 1 do
+      r.!(i) <- (f a.!(i) [@u])
+    done;
+    r
+
+  let map a f = mapU a (fun [@u] a -> f a)
 
   let joinWithMap ~sep strings ~f =
     let len = Array.length strings in
@@ -20,17 +34,25 @@ module Array = struct
 end
 
 module String = struct
-  let get = String.get
-  let length = Js.String.length
-  let startsWith affix str = Js.String.startsWith ~prefix:affix str
+  external get : string -> int -> char = "%string_safe_get"
+  external length : string -> int = "length" [@@mel.get]
+
+  external startsWith : prefix:string -> bool = "startsWith"
+  [@@mel.send.pipe: string]
 end
 
 module Int = struct
-  let toString = Js.Int.toString
+  external toStringWithRadix : ?radix:int -> string = "toString"
+  [@@mel.send.pipe: int]
+
+  let toString v = toStringWithRadix v
 end
 
 module Float = struct
-  let toString = Js.Float.toString
+  external toStringWithRadix : ?radix:int -> string = "toString"
+  [@@mel.send.pipe: float]
+
+  let toString v = toStringWithRadix v
 end
 
 module Option = struct
