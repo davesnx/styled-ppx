@@ -1,18 +1,4 @@
-open Css_AtomicTypes
-module Std = Kloth
-
-type rule =
-  | D of string * string
-  | S of string * rule array
-
-let selector selector rules = S (selector, rules)
-let media query rules = S ({|@media |} ^ query, rules)
-
-type animationName = string
-
-let join strings separator =
-  Std.Array.reduceWithIndexU strings {js||js} (fun [@u] acc item index ->
-      if index = 0 then item else acc ^ separator ^ item)
+open Css_types
 
 let string_of_content x =
   match x with
@@ -85,22 +71,23 @@ let string_of_dasharray x =
 
 let important v =
   match v with
-  | D (name, value) -> D (name, value ^ {js| !important|js})
-  | S (_, _) -> v
+  | Rule.Declaration (name, value) ->
+    Rule.Declaration (name, value ^ {js| !important|js})
+  | Rule.Selector (_, _) -> v
 
-let label label = D ({js|label|js}, label)
+let label label = Rule.declaration ({js|label|js}, label)
 
 let aspectRatio x =
-  D
-    ( {js|aspect-ratio|js},
+  Rule.Declaration
+    ( {js|aspectRatio|js},
       match x with
       | #AspectRatio.t as ar -> AspectRatio.toString ar
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let alignContent x =
-  D
-    ( {js|align-content|js},
+  Rule.Declaration
+    ( {js|alignContent|js},
       match x with
       | #AlignContent.t as ac -> AlignContent.toString ac
       | #NormalAlignment.t as na -> NormalAlignment.toString na
@@ -111,8 +98,8 @@ let alignContent x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let alignItems x =
-  D
-    ( {js|align-items|js},
+  Rule.Declaration
+    ( {js|alignItems|js},
       match x with
       | #AlignItems.t as ai -> AlignItems.toString ai
       | #PositionalAlignment.t as pa -> PositionalAlignment.toString pa
@@ -122,8 +109,8 @@ let alignItems x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let alignSelf x =
-  D
-    ( {js|align-self|js},
+  Rule.Declaration
+    ( {js|alignSelf|js},
       match x with
       | #AlignSelf.t as a -> AlignSelf.toString a
       | #PositionalAlignment.t as pa -> PositionalAlignment.toString pa
@@ -132,56 +119,56 @@ let alignSelf x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let animationDelay x = D ({js|animation-delay|js}, Time.toString x)
+let animationDelay x = Rule.declaration ({js|animationDelay|js}, Time.toString x)
 
 let animationDirection x =
-  D ({js|animation-direction|js}, AnimationDirection.toString x)
+  Rule.declaration ({js|animationDirection|js}, AnimationDirection.toString x)
 
-let animationDuration x = D ({js|animation-duration|js}, Time.toString x)
+let animationDuration x =
+  Rule.declaration ({js|animationDuration|js}, Time.toString x)
 
 let animationFillMode x =
-  D ({js|animation-fill-mode|js}, AnimationFillMode.toString x)
+  Rule.declaration ({js|animationFillMode|js}, AnimationFillMode.toString x)
 
 let animationIterationCount x =
-  D ({js|animation-iteration-count|js}, AnimationIterationCount.toString x)
+  Rule.Declaration
+    ({js|animationIterationCount|js}, AnimationIterationCount.toString x)
 
 let animationPlayState x =
-  D ({js|animation-play-state|js}, AnimationPlayState.toString x)
+  Rule.declaration ({js|animationPlayState|js}, AnimationPlayState.toString x)
 
 let animationTimingFunction x =
-  D ({js|animation-timing-function|js}, TimingFunction.toString x)
+  Rule.declaration ({js|animationTimingFunction|js}, TimingFunction.toString x)
 
 let backfaceVisibility x =
-  D
-    ( {js|backface-visibility|js},
+  Rule.Declaration
+    ( {js|backfaceVisibility|js},
       match x with
       | #BackfaceVisibility.t as bv -> BackfaceVisibility.toString bv
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let backdropFilter x =
-  D
-    ( {js|backdrop-filter|js},
-      x |. Std.Array.map Filter.toString |. Std.Array.joinWith ~sep:{js|, |js}
-    )
-
-let () =
-  let _ = backdropFilter [| `none |] in
-  ()
+  Rule.Declaration
+    ( {js|backdropFilter|js},
+      x
+      |. Kloth.Array.map Filter.toString
+      |. Kloth.Array.joinWith ~sep:{js|, |js} )
 
 let backgroundAttachment x =
-  D
-    ( {js|background-attachment|js},
+  Rule.Declaration
+    ( {js|backgroundAttachment|js},
       match x with
       | #BackgroundAttachment.t as ba -> BackgroundAttachment.toString ba
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let backgroundColor x = D ({js|background-color|js}, string_of_color x)
+let backgroundColor x =
+  Rule.declaration ({js|backgroundColor|js}, string_of_color x)
 
 let backgroundClip x =
-  D
-    ( {js|background-clip|js},
+  Rule.Declaration
+    ( {js|backgroundClip|js},
       match x with
       | #BackgroundClip.t as bc -> BackgroundClip.toString bc
       | #Var.t as va -> Var.toString va
@@ -193,34 +180,35 @@ let string_of_backgroundImage x =
   | #Url.t as u -> Url.toString u
   | #Gradient.t as g -> Gradient.toString g
 
-let backgroundImage x = D ({js|background-image|js}, string_of_backgroundImage x)
+let backgroundImage x =
+  Rule.declaration ({js|backgroundImage|js}, string_of_backgroundImage x)
 
 let backgroundImages imgs =
-  D
-    ( {js|background-image|js},
+  Rule.Declaration
+    ( {js|backgroundImage|js},
       imgs
-      |. Std.Array.map string_of_backgroundImage
-      |. Std.Array.joinWith ~sep:{js|, |js} )
+      |. Kloth.Array.map string_of_backgroundImage
+      |. Kloth.Array.joinWith ~sep:{js|, |js} )
 
 let maskImage x =
-  D
-    ( {js|mask-image|js},
+  Rule.Declaration
+    ( {js|maskImage|js},
       match x with
       | #MaskImage.t as mi -> MaskImage.toString mi
       | #Url.t as u -> Url.toString u
       | #Gradient.t as g -> Gradient.toString g )
 
 let imageRendering x =
-  D
-    ( {js|image-rendering|js},
+  Rule.Declaration
+    ( {js|imageRendering|js},
       match x with
       | #ImageRendering.t as ir -> ImageRendering.toString ir
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let backgroundOrigin x =
-  D
-    ( {js|background-origin|js},
+  Rule.Declaration
+    ( {js|backgroundOrigin|js},
       match x with
       | #BackgroundOrigin.t as bo -> BackgroundOrigin.toString bo
       | #Var.t as va -> Var.toString va
@@ -233,27 +221,17 @@ let string_of_backgroundPosition x =
   | #Cascading.t as c -> Cascading.toString c
 
 let backgroundPosition x =
-  D ({js|background-position|js}, string_of_backgroundPosition x)
+  Rule.declaration ({js|backgroundPosition|js}, string_of_backgroundPosition x)
 
 let backgroundPosition2 x y =
-  D
-    ( {js|background-position|js},
+  Rule.Declaration
+    ( {js|backgroundPosition|js},
       string_of_backgroundPosition x
       ^ {js| |js}
       ^ string_of_backgroundPosition y )
 
-let backgroundPositions bp =
-  D
-    ( {js|background-position|js},
-      bp
-      |. Std.Array.map (fun (x, y) ->
-             string_of_backgroundPosition x
-             ^ {js| |js}
-             ^ string_of_backgroundPosition y)
-      |. Std.Array.joinWith ~sep:{js|, |js} )
-
 let backgroundPosition4 ~x ~offsetX ~y ~offsetY =
-  D
+  Rule.Declaration
     ( {js|backgroundPosition|js},
       string_of_backgroundPosition x
       ^ {js| |js}
@@ -263,9 +241,19 @@ let backgroundPosition4 ~x ~offsetX ~y ~offsetY =
       ^ {js| |js}
       ^ Length.toString offsetY )
 
+let backgroundPositions bp =
+  Rule.Declaration
+    ( {js|backgroundPosition|js},
+      bp
+      |. Kloth.Array.map (fun (x, y) ->
+             string_of_backgroundPosition x
+             ^ {js| |js}
+             ^ string_of_backgroundPosition y)
+      |. Kloth.Array.joinWith ~sep:{js|, |js} )
+
 let backgroundRepeat x =
-  D
-    ( {js|background-repeat|js},
+  Rule.Declaration
+    ( {js|backgroundRepeat|js},
       match x with
       | #BackgroundRepeat.t as br -> BackgroundRepeat.toString br
       | `hv
@@ -291,50 +279,58 @@ let string_of_maskposition x =
   | #Var.t as va -> Var.toString va
   | #Cascading.t as c -> Cascading.toString c
 
-let maskPosition x = D ({js|mask-position|js}, string_of_maskposition x)
+let maskPosition x =
+  Rule.declaration ({js|maskPosition|js}, string_of_maskposition x)
 
 let maskPositions mp =
-  D
-    ( {js|mask-position|js},
+  Rule.Declaration
+    ( {js|maskPosition|js},
       mp
-      |. Std.Array.map string_of_maskposition
-      |. Std.Array.joinWith ~sep:{js|, |js} )
+      |. Kloth.Array.map string_of_maskposition
+      |. Kloth.Array.joinWith ~sep:{js|, |js} )
 
 let borderImageSource x =
-  D
-    ( {js|border-image-source|js},
+  Rule.Declaration
+    ( {js|borderImageSource|js},
       match x with
       | #BorderImageSource.t as b -> BorderImageSource.toString b
       | #Url.t as u -> Url.toString u
       | #Gradient.t as g -> Gradient.toString g )
 
-let borderBottomColor x = D ({js|border-bottom-color|js}, string_of_color x)
+let borderBottomColor x =
+  Rule.declaration ({js|borderBottomColor|js}, string_of_color x)
 
 let borderBottomLeftRadius x =
-  D ({js|border-bottom-left-radius|js}, Length.toString x)
+  Rule.declaration ({js|borderBottomLeftRadius|js}, Length.toString x)
 
 let borderBottomRightRadius x =
-  D ({js|border-bottom-right-radius|js}, Length.toString x)
+  Rule.declaration ({js|borderBottomRightRadius|js}, Length.toString x)
 
-let borderBottomWidth x = D ({js|border-bottom-width|js}, LineWidth.toString x)
+let borderBottomWidth x =
+  Rule.declaration ({js|borderBottomWidth|js}, LineWidth.toString x)
 
 let borderCollapse x =
-  D
-    ( {js|border-collapse|js},
+  Rule.Declaration
+    ( {js|borderCollapse|js},
       match x with
       | #BorderCollapse.t as bc -> BorderCollapse.toString bc
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let borderColor x = D ({js|border-color|js}, string_of_color x)
-let borderLeftColor x = D ({js|border-left-color|js}, string_of_color x)
-let borderLeftWidth x = D ({js|border-left-width|js}, LineWidth.toString x)
-let borderSpacing x = D ({js|border-spacing|js}, Length.toString x)
-let borderRadius x = D ({js|border-radius|js}, Length.toString x)
+let borderColor x = Rule.declaration ({js|borderColor|js}, string_of_color x)
+
+let borderLeftColor x =
+  Rule.declaration ({js|borderLeftColor|js}, string_of_color x)
+
+let borderLeftWidth x =
+  Rule.declaration ({js|borderLeftWidth|js}, LineWidth.toString x)
+
+let borderSpacing x = Rule.declaration ({js|borderSpacing|js}, Length.toString x)
+let borderRadius x = Rule.declaration ({js|borderRadius|js}, Length.toString x)
 
 let borderRadius4 ~topLeft ~topRight ~bottomLeft ~bottomRight =
-  D
-    ( {js|border-radius|js},
+  Rule.Declaration
+    ( {js|borderRadius|js},
       Length.toString topLeft
       ^ {js| |js}
       ^ Length.toString topRight
@@ -343,28 +339,37 @@ let borderRadius4 ~topLeft ~topRight ~bottomLeft ~bottomRight =
       ^ {js| |js}
       ^ Length.toString bottomRight )
 
-let borderRightColor x = D ({js|border-right-color|js}, string_of_color x)
-let borderRightWidth x = D ({js|border-right-width|js}, LineWidth.toString x)
-let borderTopColor x = D ({js|border-top-color|js}, string_of_color x)
-let borderTopLeftRadius x = D ({js|border-top-left-radius|js}, Length.toString x)
+let borderRightColor x =
+  Rule.declaration ({js|borderRightColor|js}, string_of_color x)
+
+let borderRightWidth x =
+  Rule.declaration ({js|borderRightWidth|js}, LineWidth.toString x)
+
+let borderTopColor x =
+  Rule.declaration ({js|borderTopColor|js}, string_of_color x)
+
+let borderTopLeftRadius x =
+  Rule.declaration ({js|borderTopLeftRadius|js}, Length.toString x)
 
 let borderTopRightRadius x =
-  D ({js|border-top-right-radius|js}, Length.toString x)
+  Rule.declaration ({js|borderTopRightRadius|js}, Length.toString x)
 
-let borderTopWidth x = D ({js|border-top-width|js}, LineWidth.toString x)
-let borderWidth x = D ({js|border-width|js}, LineWidth.toString x)
-let bottom x = D ({js|bottom|js}, string_of_position x)
+let borderTopWidth x =
+  Rule.declaration ({js|borderTopWidth|js}, LineWidth.toString x)
+
+let borderWidth x = Rule.declaration ({js|borderWidth|js}, LineWidth.toString x)
+let bottom x = Rule.declaration ({js|bottom|js}, string_of_position x)
 
 let boxSizing x =
-  D
-    ( {js|box-sizing|js},
+  Rule.Declaration
+    ( {js|boxSizing|js},
       match x with
       | #BoxSizing.t as bs -> BoxSizing.toString bs
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let clear x =
-  D
+  Rule.Declaration
     ( {js|clear|js},
       match x with
       | #Clear.t as cl -> Clear.toString cl
@@ -372,8 +377,8 @@ let clear x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let clipPath x =
-  D
-    ( {js|clip-path|js},
+  Rule.Declaration
+    ( {js|clipPath|js},
       match x with
       | #ClipPath.t as cp -> ClipPath.toString cp
       | #Url.t as u -> Url.toString u
@@ -381,58 +386,60 @@ let clipPath x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let color x = D ({js|color|js}, string_of_color x)
+let color x = Rule.declaration ({js|color|js}, string_of_color x)
 
 let columnCount x =
-  D
-    ( {js|column-count|js},
+  Rule.Declaration
+    ( {js|columnCount|js},
       match x with
       | #ColumnCount.t as cc -> ColumnCount.toString cc
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let columnGap x = D ({js|column-gap|js}, string_of_column_gap x)
-let rowGap x = D ({js|row-gap|js}, string_of_row_gap x)
-let contentRule x = D ({js|content|js}, string_of_content x)
+let rowGap x = Rule.declaration ({js|rowGap|js}, string_of_row_gap x)
+let columnGap x = Rule.declaration ({js|columnGap|js}, string_of_column_gap x)
+let contentRule x = Rule.declaration ({js|content|js}, string_of_content x)
 
 let contentRules xs =
-  D
+  Rule.Declaration
     ( {js|content|js},
-      xs |. Std.Array.map string_of_content |. Std.Array.joinWith ~sep:{js| |js}
-    )
+      xs
+      |. Kloth.Array.map string_of_content
+      |. Kloth.Array.joinWith ~sep:{js| |js} )
 
 let counterIncrement x =
-  D ({js|counter-increment|js}, string_of_counter_increment x)
+  Rule.declaration ({js|counterIncrement|js}, string_of_counter_increment x)
 
 let countersIncrement xs =
-  D
-    ( {js|counter-increment|js},
+  Rule.Declaration
+    ( {js|counterIncrement|js},
       xs
-      |. Std.Array.map string_of_counter_increment
-      |. Std.Array.joinWith ~sep:{js| |js} )
+      |. Kloth.Array.map string_of_counter_increment
+      |. Kloth.Array.joinWith ~sep:{js| |js} )
 
-let counterReset x = D ({js|counter-reset|js}, string_of_counter_reset x)
+let counterReset x =
+  Rule.declaration ({js|counterReset|js}, string_of_counter_reset x)
 
 let countersReset xs =
-  D
-    ( {js|counter-reset|js},
+  Rule.Declaration
+    ( {js|counterReset|js},
       xs
-      |. Std.Array.map string_of_counter_reset
-      |. Std.Array.joinWith ~sep:{js| |js} )
+      |. Kloth.Array.map string_of_counter_reset
+      |. Kloth.Array.joinWith ~sep:{js| |js} )
 
-let counterSet x = D ({js|counter-set|js}, string_of_counter_set x)
+let counterSet x = Rule.declaration ({js|counterSet|js}, string_of_counter_set x)
 
 let countersSet xs =
-  D
-    ( {js|counter-set|js},
+  Rule.Declaration
+    ( {js|counterSet|js},
       xs
-      |. Std.Array.map string_of_counter_set
-      |. Std.Array.joinWith ~sep:{js||js} )
+      |. Kloth.Array.map string_of_counter_set
+      |. Kloth.Array.joinWith ~sep:{js| |js} )
 
-let cursor x = D ({js|cursor|js}, Cursor.toString x)
+let cursor x = Rule.declaration ({js|cursor|js}, Cursor.toString x)
 
 let direction x =
-  D
+  Rule.Declaration
     ( {js|direction|js},
       match x with
       | #Direction.t as d -> Direction.toString d
@@ -440,7 +447,7 @@ let direction x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let display x =
-  D
+  Rule.Declaration
     ( {js|display|js},
       match x with
       | #DisplayOutside.t as o -> DisplayOutside.toString o
@@ -454,11 +461,11 @@ let display x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let flex grow shrink basis =
-  D
+  Rule.Declaration
     ( {js|flex|js},
-      Std.Float.toString grow
+      Kloth.Float.toString grow
       ^ {js| |js}
-      ^ Std.Float.toString shrink
+      ^ Kloth.Float.toString shrink
       ^ {js| |js}
       ^
       match basis with
@@ -466,18 +473,18 @@ let flex grow shrink basis =
       | #Length.t as l -> Length.toString l )
 
 let flex1 x =
-  D
+  Rule.Declaration
     ( {js|flex|js},
       match x with
       | #Flex.t as f -> Flex.toString f
-      | `num n -> Std.Float.toString n )
+      | `num n -> Kloth.Float.toString n )
 
 let flex2 ?basis ?shrink grow =
-  D
+  Rule.Declaration
     ( {js|flex|js},
-      Std.Float.toString grow
+      Kloth.Float.toString grow
       ^ (match shrink with
-        | Some s -> {js| |js} ^ Std.Float.toString s
+        | Some s -> {js| |js} ^ Kloth.Float.toString s
         | None -> {js||js})
       ^
       match basis with
@@ -486,26 +493,26 @@ let flex2 ?basis ?shrink grow =
       | None -> {js||js} )
 
 let flexDirection x =
-  D
-    ( {js|flex-direction|js},
+  Rule.Declaration
+    ( {js|flexDirection|js},
       match x with
       | #FlexDirection.t as fd -> FlexDirection.toString fd
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let flexGrow x = D ({js|flex-grow|js}, Std.Float.toString x)
-let flexShrink x = D ({js|flex-shrink|js}, Std.Float.toString x)
+let flexGrow x = Rule.declaration ({js|flexGrow|js}, Kloth.Float.toString x)
+let flexShrink x = Rule.declaration ({js|flexShrink|js}, Kloth.Float.toString x)
 
 let flexWrap x =
-  D
-    ( {js|flex-wrap|js},
+  Rule.Declaration
+    ( {js|flexWrap|js},
       match x with
       | #FlexWrap.t as fw -> FlexWrap.toString fw
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let float x =
-  D
+  Rule.Declaration
     ( {js|float|js},
       match x with
       | #Float.t as f -> Float.toString f
@@ -513,94 +520,102 @@ let float x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let fontFamily x =
-  D
-    ( {js|font-family|js},
+  Rule.Declaration
+    ( {js|fontFamily|js},
       match x with
       | #FontFamilyName.t as n -> FontFamilyName.toString n
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let fontFamilies xs =
-  D
-    ( {js|font-family|js},
+  Rule.Declaration
+    ( {js|fontFamily|js},
       xs
-      |. Std.Array.map FontFamilyName.toString
-      |. Std.Array.joinWith ~sep:{js|, |js} )
+      |. Kloth.Array.map FontFamilyName.toString
+      |. Kloth.Array.joinWith ~sep:{js|, |js} )
 
 let fontSize x =
-  D
-    ( {js|font-size|js},
+  Rule.Declaration
+    ( {js|fontSize|js},
       match x with
       | #Length.t as l -> Length.toString l
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let fontStyle x =
-  D
-    ( {js|font-style|js},
+  Rule.Declaration
+    ( {js|fontStyle|js},
       match x with
       | #FontStyle.t as f -> FontStyle.toString f
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let fontVariant x =
-  D
-    ( {js|font-variant|js},
+  Rule.Declaration
+    ( {js|fontVariant|js},
       match x with
       | #FontVariant.t as f -> FontVariant.toString f
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let fontWeight x =
-  D
-    ( {js|font-weight|js},
+  Rule.Declaration
+    ( {js|fontWeight|js},
       match x with
       | #FontWeight.t as f -> FontWeight.toString f
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let gridAutoFlow x =
-  D
-    ( {js|grid-auto-flow|js},
+  Rule.Declaration
+    ( {js|gridAutoFlow|js},
       match x with
       | #GridAutoFlow.t as f -> GridAutoFlow.toString f
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let gridColumn start end' =
-  D
-    ( {js|grid-column|js},
-      Std.Int.toString start ^ {js| / |js} ^ Std.Int.toString end' )
+  Rule.Declaration
+    ( {js|gridColumn|js},
+      Kloth.Int.toString start ^ {js| / |js} ^ Kloth.Int.toString end' )
 
-let gridColumnGap x = D ({js|grid-column-gap|js}, string_of_column_gap x)
-let gridColumnStart n = D ({js|grid-column-start|js}, Std.Int.toString n)
-let gridColumnEnd n = D ({js|grid-column-end|js}, Std.Int.toString n)
+let gridColumnGap x =
+  Rule.declaration ({js|gridColumnGap|js}, string_of_column_gap x)
+
+let gridColumnStart n =
+  Rule.declaration ({js|gridColumnStart|js}, Kloth.Int.toString n)
+
+let gridColumnEnd n =
+  Rule.declaration ({js|gridColumnEnd|js}, Kloth.Int.toString n)
 
 let gridRow start end' =
-  D
-    ( {js|grid-row|js},
-      Std.Int.toString start ^ {js| / |js} ^ Std.Int.toString end' )
+  Rule.Declaration
+    ( {js|gridRow|js},
+      Kloth.Int.toString start ^ {js| / |js} ^ Kloth.Int.toString end' )
 
-let gap x = D ({js|gap|js}, string_of_gap x)
-let gridGap x = D ({js|grid-gap|js}, string_of_gap x)
+let gap x = Rule.declaration ({js|gap|js}, string_of_gap x)
+let gridGap x = Rule.declaration ({js|gridGap|js}, string_of_gap x)
 
 let gap2 ~rowGap ~columnGap =
-  D ({js|gap|js}, string_of_gap rowGap ^ {js| |js} ^ string_of_gap columnGap)
+  Rule.Declaration
+    ({js|gap|js}, string_of_gap rowGap ^ {js| |js} ^ string_of_gap columnGap)
 
 let gridRowGap x =
-  D
-    ( {js|grid-row-gap|js},
+  Rule.Declaration
+    ( {js|gridRowGap|js},
       match x with
       | #Percentage.t as p -> Percentage.toString p
       | #Length.t as l -> Length.toString l
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let gridRowEnd n = D ({js|grid-row-end|js}, Std.Int.toString n)
-let gridRowStart n = D ({js|grid-row-start|js}, Std.Int.toString n)
+let gridRowEnd n = Rule.declaration ({js|gridRowEnd|js}, Kloth.Int.toString n)
+
+let gridRowStart n =
+  Rule.declaration ({js|gridRowStart|js}, Kloth.Int.toString n)
 
 let height x =
-  D
+  Rule.Declaration
     ( {js|height|js},
       match x with
       | #Height.t as h -> Height.toString h
@@ -610,16 +625,16 @@ let height x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let textEmphasisStyle x =
-  D
-    ( {js|text-emphasis-style|js},
+  Rule.Declaration
+    ( {js|textEmphasisStyle|js},
       match x with
       | #TextEmphasisStyle.t as tes -> TextEmphasisStyle.toString tes
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let textEmphasisStyles x y =
-  D
-    ( {js|text-emphasis-styles|js},
+  Rule.Declaration
+    ( {js|textEmphasisStyles|js},
       match x with
       | #TextEmphasisStyle.FilledOrOpen.t as fo ->
         TextEmphasisStyle.FilledOrOpen.toString fo
@@ -631,7 +646,8 @@ let textEmphasisStyles x y =
         (match y with
         | #TextEmphasisStyle.Shape.t as shape ->
           TextEmphasisStyle.Shape.toString shape
-        | #Var.t as va -> Var.toString va) )
+        | #Var.t as va -> Var.toString va
+        | #Cascading.t as c -> Cascading.toString c) )
 
 let textEmphasisPosition' = function
   | #TextEmphasisPosition.OverOrUnder.t as ou ->
@@ -640,11 +656,11 @@ let textEmphasisPosition' = function
   | #Cascading.t as c -> Cascading.toString c
 
 let textEmphasisPosition x =
-  D ({js|text-emphasis-position|js}, textEmphasisPosition' x)
+  Rule.declaration ({js|textEmphasisPosition|js}, textEmphasisPosition' x)
 
 let textEmphasisPositions x y =
-  D
-    ( {js|text-emphasis-positions|js},
+  Rule.Declaration
+    ( {js|textEmphasisPositions|js},
       textEmphasisPosition' x
       ^ {js| |js}
       ^
@@ -655,8 +671,8 @@ let textEmphasisPositions x y =
       | #Cascading.t as c -> Cascading.toString c )
 
 let justifyContent x =
-  D
-    ( {js|justify-content|js},
+  Rule.Declaration
+    ( {js|justifyContent|js},
       match x with
       | #PositionalAlignment.t as pa -> PositionalAlignment.toString pa
       | #NormalAlignment.t as na -> NormalAlignment.toString na
@@ -666,8 +682,8 @@ let justifyContent x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let justifyItems x =
-  D
-    ( {js|justify-items|js},
+  Rule.Declaration
+    ( {js|justifyItems|js},
       match x with
       | `stretch -> {js|stretch|js}
       | #PositionalAlignment.t as pa -> PositionalAlignment.toString pa
@@ -678,11 +694,11 @@ let justifyItems x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let left x = D ({js|left|js}, string_of_position x)
+let left x = Rule.declaration ({js|left|js}, string_of_position x)
 
 let letterSpacing x =
-  D
-    ( {js|letter-spacing|js},
+  Rule.Declaration
+    ( {js|letterSpacing|js},
       match x with
       | #LetterSpacing.t as s -> LetterSpacing.toString s
       | #Length.t as l -> Length.toString l
@@ -690,8 +706,8 @@ let letterSpacing x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let lineHeight x =
-  D
-    ( {js|line-height|js},
+  Rule.Declaration
+    ( {js|lineHeight|js},
       match x with
       | #LineHeight.t as h -> LineHeight.toString h
       | #Length.t as l -> Length.toString l
@@ -699,8 +715,8 @@ let lineHeight x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let listStyle style position image =
-  D
-    ( {js|list-style|js},
+  Rule.Declaration
+    ( {js|listStyle|js},
       ListStyleType.toString style
       ^ {js| |js}
       ^ ListStylePosition.toString position
@@ -711,8 +727,8 @@ let listStyle style position image =
       | #Url.t as u -> Url.toString u )
 
 let listStyleImage x =
-  D
-    ( {js|list-style-image|js},
+  Rule.Declaration
+    ( {js|listStyleImage|js},
       match x with
       | #ListStyleImage.t as lsi -> ListStyleImage.toString lsi
       | #Url.t as u -> Url.toString u
@@ -721,24 +737,24 @@ let listStyleImage x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let listStyleType x =
-  D
-    ( {js|list-style-type|js},
+  Rule.Declaration
+    ( {js|listStyleType|js},
       match x with
       | #ListStyleType.t as lsp -> ListStyleType.toString lsp
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let listStylePosition x =
-  D
-    ( {js|list-style-position|js},
+  Rule.Declaration
+    ( {js|listStylePosition|js},
       match x with
       | #ListStylePosition.t as lsp -> ListStylePosition.toString lsp
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let tabSize x =
-  D
-    ( {|tab-size|},
+  Rule.Declaration
+    ( {|tabSize|},
       match x with
       | #TabSize.t as ts -> TabSize.toString ts
       | #Length.t as len -> Length.toString len
@@ -752,13 +768,14 @@ let marginToString x =
   | #Var.t as va -> Var.toString va
   | #Cascading.t as c -> Cascading.toString c
 
-let margin x = D ({js|margin|js}, marginToString x)
+let margin x = Rule.declaration ({js|margin|js}, marginToString x)
 
 let margin2 ~v ~h =
-  D ({js|margin|js}, marginToString v ^ {js| |js} ^ marginToString h)
+  Rule.Declaration
+    ({js|margin|js}, marginToString v ^ {js| |js} ^ marginToString h)
 
 let margin3 ~top ~h ~bottom =
-  D
+  Rule.Declaration
     ( {js|margin|js},
       marginToString top
       ^ {js| |js}
@@ -767,7 +784,7 @@ let margin3 ~top ~h ~bottom =
       ^ marginToString bottom )
 
 let margin4 ~top ~right ~bottom ~left =
-  D
+  Rule.Declaration
     ( {js|margin|js},
       marginToString top
       ^ {js| |js}
@@ -777,14 +794,14 @@ let margin4 ~top ~right ~bottom ~left =
       ^ {js| |js}
       ^ marginToString left )
 
-let marginLeft x = D ({js|margin-left|js}, marginToString x)
-let marginRight x = D ({js|margin-right|js}, marginToString x)
-let marginTop x = D ({js|margin-top|js}, marginToString x)
-let marginBottom x = D ({js|margin-bottom|js}, marginToString x)
+let marginLeft x = Rule.declaration ({js|marginLeft|js}, marginToString x)
+let marginRight x = Rule.declaration ({js|marginRight|js}, marginToString x)
+let marginTop x = Rule.declaration ({js|marginTop|js}, marginToString x)
+let marginBottom x = Rule.declaration ({js|marginBottom|js}, marginToString x)
 
 let maxHeight x =
-  D
-    ( {js|max-height|js},
+  Rule.Declaration
+    ( {js|maxHeight|js},
       match x with
       | #Height.t as mh -> Height.toString mh
       | #MaxHeight.t as mh -> MaxHeight.toString mh
@@ -794,8 +811,8 @@ let maxHeight x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let maxWidth x =
-  D
-    ( {js|max-width|js},
+  Rule.Declaration
+    ( {js|maxWidth|js},
       match x with
       | #Width.t as mw -> Width.toString mw
       | #MaxWidth.t as mw -> MaxWidth.toString mw
@@ -805,8 +822,8 @@ let maxWidth x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let minHeight x =
-  D
-    ( {js|min-height|js},
+  Rule.Declaration
+    ( {js|minHeight|js},
       match x with
       | #Height.t as h -> Height.toString h
       | #MinHeight.t as mh -> MinHeight.toString mh
@@ -816,8 +833,8 @@ let minHeight x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let minWidth x =
-  D
-    ( {js|min-width|js},
+  Rule.Declaration
+    ( {js|minWidth|js},
       match x with
       | #Width.t as w -> Width.toString w
       | #MinWidth.t as w -> MinWidth.toString w
@@ -827,27 +844,27 @@ let minWidth x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let objectFit x =
-  D
-    ( {js|object-fit|js},
+  Rule.Declaration
+    ( {js|objectFit|js},
       match x with
       | #ObjectFit.t as o -> ObjectFit.toString o
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let objectPosition x =
-  D ({js|object-position|js}, string_of_backgroundPosition x)
+  Rule.declaration ({js|objectPosition|js}, string_of_backgroundPosition x)
 
 let objectPosition2 x y =
-  D
+  Rule.Declaration
     ( {js|objectPosition|js},
       string_of_backgroundPosition x
       ^ {js| |js}
       ^ string_of_backgroundPosition y )
 
-let opacity x = D ({js|opacity|js}, Std.Float.toString x)
+let opacity x = Rule.declaration ({js|opacity|js}, Kloth.Float.toString x)
 
 let outline size style color =
-  D
+  Rule.Declaration
     ( {js|outline|js},
       LineWidth.toString size
       ^ {js| |js}
@@ -855,29 +872,35 @@ let outline size style color =
       ^ {js| |js}
       ^ string_of_color color )
 
-let outlineColor x = D ({js|outline-color|js}, string_of_color x)
-let outlineOffset x = D ({js|outline-offset|js}, Length.toString x)
-let outlineStyle x = D ({js|outline-style|js}, OutlineStyle.toString x)
-let outlineWidth x = D ({js|outline-width|js}, LineWidth.toString x)
-let overflow x = D ({js|overflow|js}, Overflow.toString x)
-let overflowX x = D ({js|overflow-x|js}, Overflow.toString x)
-let overflowY x = D ({js|overflow-y|js}, Overflow.toString x)
+let outlineColor x = Rule.declaration ({js|outlineColor|js}, string_of_color x)
+let outlineOffset x = Rule.declaration ({js|outlineOffset|js}, Length.toString x)
+
+let outlineStyle x =
+  Rule.declaration ({js|outlineStyle|js}, OutlineStyle.toString x)
+
+let outlineWidth x =
+  Rule.declaration ({js|outlineWidth|js}, LineWidth.toString x)
+
+let overflow x = Rule.declaration ({js|overflow|js}, Overflow.toString x)
+let overflowX x = Rule.declaration ({js|overflowX|js}, Overflow.toString x)
+let overflowY x = Rule.declaration ({js|overflowY|js}, Overflow.toString x)
 
 let overflowWrap x =
-  D
-    ( {js|overflow-wrap|js},
+  Rule.Declaration
+    ( {js|overflowWrap|js},
       match x with
       | #OverflowWrap.t as ow -> OverflowWrap.toString ow
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let padding x = D ({js|padding|js}, Length.toString x)
+let padding x = Rule.declaration ({js|padding|js}, Length.toString x)
 
 let padding2 ~v ~h =
-  D ({js|padding|js}, Length.toString v ^ {js| |js} ^ Length.toString h)
+  Rule.Declaration
+    ({js|padding|js}, Length.toString v ^ {js| |js} ^ Length.toString h)
 
 let padding3 ~top ~h ~bottom =
-  D
+  Rule.Declaration
     ( {js|padding|js},
       Length.toString top
       ^ {js| |js}
@@ -886,7 +909,7 @@ let padding3 ~top ~h ~bottom =
       ^ Length.toString bottom )
 
 let padding4 ~top ~right ~bottom ~left =
-  D
+  Rule.Declaration
     ( {js|padding|js},
       Length.toString top
       ^ {js| |js}
@@ -896,13 +919,13 @@ let padding4 ~top ~right ~bottom ~left =
       ^ {js| |js}
       ^ Length.toString left )
 
-let paddingBottom x = D ({js|padding-bottom|js}, Length.toString x)
-let paddingLeft x = D ({js|padding-left|js}, Length.toString x)
-let paddingRight x = D ({js|padding-right|js}, Length.toString x)
-let paddingTop x = D ({js|padding-top|js}, Length.toString x)
+let paddingBottom x = Rule.declaration ({js|paddingBottom|js}, Length.toString x)
+let paddingLeft x = Rule.declaration ({js|paddingLeft|js}, Length.toString x)
+let paddingRight x = Rule.declaration ({js|paddingRight|js}, Length.toString x)
+let paddingTop x = Rule.declaration ({js|paddingTop|js}, Length.toString x)
 
 let perspective x =
-  D
+  Rule.Declaration
     ( {js|perspective|js},
       match x with
       | #Perspective.t as p -> Perspective.toString p
@@ -911,15 +934,15 @@ let perspective x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let perspectiveOrigin x =
-  D
-    ( {js|perspective-origin|js},
+  Rule.Declaration
+    ( {js|perspectiveOrigin|js},
       match x with
       | #Perspective.t as p -> Perspective.toString p
       | #TransformOrigin.t as t -> TransformOrigin.toString t )
 
 let perspectiveOrigin2 x y =
-  D
-    ( {js|perspective-origin|js},
+  Rule.Declaration
+    ( {js|perspectiveOrigin|js},
       (match x with
       | #Perspective.t as p -> Perspective.toString p
       | #TransformOrigin.t as t -> TransformOrigin.toString t)
@@ -930,15 +953,15 @@ let perspectiveOrigin2 x y =
       | #TransformOrigin.t as t -> TransformOrigin.toString t )
 
 let pointerEvents x =
-  D
-    ( {js|pointer-events|js},
+  Rule.Declaration
+    ( {js|pointerEvents|js},
       match x with
       | #PointerEvents.t as p -> PointerEvents.toString p
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let position x =
-  D
+  Rule.Declaration
     ( {js|position|js},
       match x with
       | #PropertyPosition.t as p -> PropertyPosition.toString p
@@ -946,173 +969,175 @@ let position x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let isolation x =
-  D
+  Rule.Declaration
     ( {js|isolation|js},
       match x with
       | #Isolation.t as i -> Isolation.toString i
       | #Cascading.t as c -> Cascading.toString c )
 
 let justifySelf x =
-  D
-    ( {js|justify-self|js},
+  Rule.Declaration
+    ( {js|justifySelf|js},
       match x with
       | #JustifySelf.t as j -> JustifySelf.toString j
       | #PositionalAlignment.t as pa -> PositionalAlignment.toString pa
-      | #BaselineAlignment.t as ba -> BaselineAlignment.toString ba
       | #OverflowAlignment.t as oa -> OverflowAlignment.toString oa
+      | #BaselineAlignment.t as ba -> BaselineAlignment.toString ba
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let resize x =
-  D
+  Rule.Declaration
     ( {js|resize|js},
       match x with
       | #Resize.t as r -> Resize.toString r
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let right x = D ({js|right|js}, string_of_position x)
+let right x = Rule.declaration ({js|right|js}, string_of_position x)
 
 let tableLayout x =
-  D
-    ( {js|table-layout|js},
+  Rule.Declaration
+    ( {js|tableLayout|js},
       match x with
       | #TableLayout.t as tl -> TableLayout.toString tl
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let textAlign x =
-  D
-    ( {js|text-align|js},
+  Rule.Declaration
+    ( {js|textAlign|js},
       match x with
       | #TextAlign.t as ta -> TextAlign.toString ta
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let textAlignAll x =
-  D
-    ( {js|text-align-all|js},
+  Rule.Declaration
+    ( {js|textAlignAll|js},
       match x with
       | #TextAlignAll.t as taa -> TextAlignAll.toString taa
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let textAlignLast x =
-  D
-    ( {js|text-align-last|js},
+  Rule.Declaration
+    ( {js|textAlignLast|js},
       match x with
       | #TextAlignLast.t as tal -> TextAlignLast.toString tal
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let textDecorationColor x =
-  D
-    ( {js|text-decoration-color|js},
+  Rule.Declaration
+    ( {js|textDecorationColor|js},
       match x with
       | #Color.t as co -> Color.toString co
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let textDecorationLine x =
-  D
-    ( {js|text-decoration-line|js},
+  Rule.Declaration
+    ( {js|textDecorationLine|js},
       match x with
       | #TextDecorationLine.t as tdl -> TextDecorationLine.toString tdl
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let textDecorationStyle x =
-  D
-    ( {js|text-decoration-style|js},
+  Rule.Declaration
+    ( {js|textDecorationStyle|js},
       match x with
       | #TextDecorationStyle.t as tds -> TextDecorationStyle.toString tds
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let textDecorationThickness x =
-  D
-    ( {js|text-decoration-thickness|js},
+  Rule.Declaration
+    ( {js|textDecorationThickness|js},
       match x with
       | #TextDecorationThickness.t as t -> TextDecorationThickness.toString t
       | #Length.t as l -> Length.toString l
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let textIndent x =
-  D
-    ( {js|text-indent|js},
-      match x with
-      | #Percentage.t as p -> Percentage.toString p
-      | #Length.t as l -> Length.toString l
-      | #Var.t as va -> Var.toString va
-      | #Cascading.t as c -> Cascading.toString c )
-
 let textDecorationSkipInk x =
-  D
-    ( {js|text-decoration-skip-ink|js},
+  Rule.Declaration
+    ( {js|textDecorationSkipInk|js},
       match x with
       | #TextDecorationSkipInk.t as tdsi -> TextDecorationSkipInk.toString tdsi
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let textDecorationSkipBox x =
-  D
-    ( {js|text-decoration-skip-box|js},
+  Rule.Declaration
+    ( {js|textDecorationSkipBox|js},
       match x with
       | #TextDecorationSkipBox.t as tdsb -> TextDecorationSkipBox.toString tdsb
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let textDecorationSkipInset x =
-  D
-    ( {js|text-decoration-skip-inset|js},
+  Rule.Declaration
+    ( {js|textDecorationSkipInset|js},
       match x with
       | #TextDecorationSkipInset.t as tdsi ->
         TextDecorationSkipInset.toString tdsi
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
+let textIndent x =
+  Rule.Declaration
+    ( {js|textIndent|js},
+      match x with
+      | #Percentage.t as p -> Percentage.toString p
+      | #Length.t as l -> Length.toString l
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c )
+
 let textOverflow x =
-  D
-    ( {js|text-overflow|js},
+  Rule.Declaration
+    ( {js|textOverflow|js},
       match x with
       | #TextOverflow.t as txo -> TextOverflow.toString txo
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let textTransform x =
-  D
-    ( {js|text-transform|js},
+  Rule.Declaration
+    ( {js|textTransform|js},
       match x with
       | #TextTransform.t as tt -> TextTransform.toString tt
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let top x = D ({js|top|js}, string_of_position x)
+let top x = Rule.declaration ({js|top|js}, string_of_position x)
 
 let transform x =
-  D
+  Rule.Declaration
     ( {js|transform|js},
       match x with
       | `none -> {js|none|js}
       | #Transform.t as t -> Transform.toString t )
 
 let transforms x =
-  D
+  Rule.Declaration
     ( {js|transform|js},
-      x |. Std.Array.map Transform.toString |. Std.Array.joinWith ~sep:{js| |js}
-    )
+      x
+      |. Kloth.Array.map Transform.toString
+      |. Kloth.Array.joinWith ~sep:{js| |js} )
 
-let transformOrigin x = D ({js|transform-origin|js}, TransformOrigin.toString x)
+let transformOrigin x =
+  Rule.declaration ({js|transformOrigin|js}, TransformOrigin.toString x)
 
 let transformOrigin2 x y =
-  D
-    ( {js|transform-origin|js},
+  Rule.Declaration
+    ( {js|transformOrigin|js},
       TransformOrigin.toString x ^ {js| |js} ^ TransformOrigin.toString y )
 
 let transformOrigin3d x y z =
-  D
-    ( {js|transform-origin|js},
+  Rule.Declaration
+    ( {js|transformOrigin|js},
       Length.toString x
       ^ {js| |js}
       ^ Length.toString y
@@ -1121,38 +1146,25 @@ let transformOrigin3d x y z =
       ^ {js| |js} )
 
 let transformBox x =
-  D
-    ( {js|transform-box|js},
+  Rule.Declaration
+    ( {js|transformBox|js},
       match x with
       | #TransformBox.t as tb -> TransformBox.toString tb
       | #Cascading.t as c -> Cascading.toString c )
 
-let explode s =
-  let rec exp i l = if i < 0 then l else exp (i - 1) (s.[i] :: l) in
-  exp (String.length s - 1) []
-
-let camelCaseToKebabCase str =
-  let insert_dash acc letter =
-    match letter with
-    | 'A' .. 'Z' as letter ->
-      ("-" ^ String.make 1 (Char.lowercase_ascii letter)) :: acc
-    | _ -> String.make 1 letter :: acc
-  in
-  String.concat "" (List.rev (List.fold_left insert_dash [] (explode str)))
-
-let unsafe property value = D (camelCaseToKebabCase property, value)
+let unsafe property value = Rule.declaration (property, value)
 
 let userSelect x =
-  D
-    ( {js|user-select|js},
+  Rule.Declaration
+    ( {js|userSelect|js},
       match x with
       | #UserSelect.t as us -> UserSelect.toString us
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let verticalAlign x =
-  D
-    ( {js|vertical-align|js},
+  Rule.Declaration
+    ( {js|verticalAlign|js},
       match x with
       | #VerticalAlign.t as v -> VerticalAlign.toString v
       | #Length.t as l -> Length.toString l
@@ -1160,7 +1172,7 @@ let verticalAlign x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let visibility x =
-  D
+  Rule.Declaration
     ( {js|visibility|js},
       match x with
       | #Visibility.t as v -> Visibility.toString v
@@ -1168,32 +1180,32 @@ let visibility x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let scrollBehavior x =
-  D
-    ( {js|scroll-behavior|js},
+  Rule.Declaration
+    ( {js|scrollBehavior|js},
       match x with
       | #ScrollBehavior.t as sb -> ScrollBehavior.toString sb
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let overscrollBehavior x =
-  D
-    ( {js|overscroll-behavior|js},
+  Rule.Declaration
+    ( {js|overscrollBehavior|js},
       match x with
       | #OverscrollBehavior.t as osb -> OverscrollBehavior.toString osb
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let overflowAnchor x =
-  D
-    ( {js|overflow-anchor|js},
+  Rule.Declaration
+    ( {js|overflowAnchor|js},
       match x with
       | #OverflowAnchor.t as oa -> OverflowAnchor.toString oa
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let columnWidth x =
-  D
-    ( {js|column-width|js},
+  Rule.Declaration
+    ( {js|columnWidth|js},
       match x with
       | #ColumnWidth.t as cw -> ColumnWidth.toString cw
       | #Length.t as l -> Length.toString l
@@ -1201,8 +1213,8 @@ let columnWidth x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let caretColor x =
-  D
-    ( {js|caret-color|js},
+  Rule.Declaration
+    ( {js|caretColor|js},
       match x with
       | #CaretColor.t as ct -> CaretColor.toString ct
       | #Color.t as c -> Color.toString c
@@ -1210,7 +1222,7 @@ let caretColor x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let width x =
-  D
+  Rule.Declaration
     ( {js|width|js},
       match x with
       | #Width.t as w -> Width.toString w
@@ -1220,24 +1232,24 @@ let width x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let whiteSpace x =
-  D
-    ( {js|white-space|js},
+  Rule.Declaration
+    ( {js|whiteSpace|js},
       match x with
       | #WhiteSpace.t as w -> WhiteSpace.toString w
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let wordBreak x =
-  D
-    ( {js|word-break|js},
+  Rule.Declaration
+    ( {js|wordBreak|js},
       match x with
       | #WordBreak.t as w -> WordBreak.toString w
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let wordSpacing x =
-  D
-    ( {js|word-spacing|js},
+  Rule.Declaration
+    ( {js|wordSpacing|js},
       match x with
       | #WordSpacing.t as w -> WordSpacing.toString w
       | #Percentage.t as p -> Percentage.toString p
@@ -1246,21 +1258,21 @@ let wordSpacing x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let wordWrap x =
-  D
-    ( {js|word-wrap|js},
+  Rule.Declaration
+    ( {js|wordWrap|js},
       match x with
       | #OverflowWrap.t as ow -> OverflowWrap.toString ow
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let zIndex x = D ({js|z-index|js}, ZIndex.toString x)
+let zIndex x = Rule.declaration ({js|zIndex|js}, ZIndex.toString x)
 
 let flex3 ~grow ~shrink ~basis =
-  D
+  Rule.Declaration
     ( {js|flex|js},
-      Std.Float.toString grow
+      Kloth.Float.toString grow
       ^ {js| |js}
-      ^ Std.Float.toString shrink
+      ^ Kloth.Float.toString shrink
       ^ {js| |js}
       ^
       match basis with
@@ -1268,19 +1280,19 @@ let flex3 ~grow ~shrink ~basis =
       | #Length.t as l -> Length.toString l )
 
 let flexBasis x =
-  D
-    ( {js|flex-basis|js},
+  Rule.Declaration
+    ( {js|flexBasis|js},
       match x with
       | #FlexBasis.t as b -> FlexBasis.toString b
       | #Length.t as l -> Length.toString l )
 
-let order x = D ({js|order|js}, Std.Int.toString x)
+let order x = Rule.declaration ({js|order|js}, Kloth.Int.toString x)
 
 let string_of_minmax x =
   match x with
   | `auto -> {js|auto|js}
   | #Length.t as l -> Length.toString l
-  | `fr x -> Std.Float.toString x ^ {js|fr|js}
+  | `fr x -> Kloth.Float.toString x ^ {js|fr|js}
   | `minContent -> {js|min-content|js}
   | `maxContent -> {js|max-content|js}
 
@@ -1288,8 +1300,9 @@ let string_of_dimension x =
   match x with
   | `auto -> {js|auto|js}
   | `none -> {js|none|js}
+  | `subgrid -> {js|subgrid|js}
   | #Length.t as l -> Length.toString l
-  | `fr x -> Std.Float.toString x ^ {js|fr|js}
+  | `fr x -> Kloth.Float.toString x ^ {js|fr|js}
   | `fitContent -> {js|fit-content|js}
   | `minContent -> {js|min-content|js}
   | `maxContent -> {js|max-content|js}
@@ -1325,15 +1338,15 @@ type gridLength =
 let rec gridLengthToJs x =
   match x with
   | `name name -> name
+  | `subgrid -> {js|subgrid|js}
   | `none -> {js|none|js}
   | `auto -> {js|auto|js}
-  | `subgrid -> {js|subgrid|js}
   | #Length.t as l -> Length.toString l
-  | `fr x -> Std.Float.toString x ^ {js|fr|js}
+  | `fr x -> Kloth.Float.toString x ^ {js|fr|js}
   | `minContent -> {js|min-content|js}
+  | `maxContent -> {js|max-content|js}
   | `fitContent x ->
     {js|fit-content|js} ^ {js|(|js} ^ Length.toString x ^ {js|)|js}
-  | `maxContent -> {js|max-content|js}
   | `repeat (n, x) ->
     {js|repeat(|js}
     ^ RepeatValue.toString n
@@ -1349,117 +1362,68 @@ let rec gridLengthToJs x =
 
 and string_of_dimensions dimensions =
   dimensions
-  |. Std.Array.map gridLengthToJs
-  |. Std.Array.joinWith ~sep:{js| |js}
+  |. Kloth.Array.map gridLengthToJs
+  |. Kloth.Array.joinWith ~sep:{js| |js}
 
 let gridTemplateColumns dimensions =
-  D ({js|grid-template-columns|js}, string_of_dimensions dimensions)
+  Rule.declaration ({js|gridTemplateColumns|js}, string_of_dimensions dimensions)
 
 let gridTemplateRows dimensions =
-  D ({js|grid-template-rows|js}, string_of_dimensions dimensions)
+  Rule.declaration ({js|gridTemplateRows|js}, string_of_dimensions dimensions)
 
 let gridAutoColumns dimensions =
-  D ({js|grid-auto-columns|js}, string_of_dimension dimensions)
+  Rule.declaration ({js|gridAutoColumns|js}, string_of_dimension dimensions)
 
 let gridAutoRows dimensions =
-  D ({js|grid-auto-rows|js}, string_of_dimension dimensions)
+  Rule.declaration ({js|gridAutoRows|js}, string_of_dimension dimensions)
 
 let gridArea s =
-  D
-    ( {js|grid-area|js},
+  Rule.Declaration
+    ( {js|gridArea|js},
       match s with
       | #GridArea.t as t -> GridArea.toString t
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let gridArea2 s s2 =
-  D
-    ( {js|grid-area|js},
+  Rule.Declaration
+    ( {js|gridArea|js},
       (GridArea.toString s ^ {js| / |js}) ^ GridArea.toString s2 )
 
 let gridArea3 s s2 s3 =
-  D
-    ( {js|grid-area|js},
+  Rule.Declaration
+    ( {js|gridArea|js},
       GridArea.toString s
-      ^ {js|- |js}
+      ^ {js| / |js}
       ^ GridArea.toString s2
-      ^ {js|- |js}
+      ^ {js| / |js}
       ^ GridArea.toString s3 )
 
 let gridArea4 s s2 s3 s4 =
-  D
-    ( {js|grid-area|js},
+  Rule.Declaration
+    ( {js|gridArea|js},
       GridArea.toString s
-      ^ {js|- |js}
+      ^ {js| / |js}
       ^ GridArea.toString s2
-      ^ {js|- |js}
+      ^ {js| / |js}
       ^ GridArea.toString s3
-      ^ {js|- |js}
+      ^ {js| / |js}
       ^ GridArea.toString s4 )
 
 let gridTemplateAreas l =
-  D
-    ( {js|grid-template-areas|js},
+  Rule.Declaration
+    ( {js|gridTemplateAreas|js},
       match l with
       | #GridTemplateAreas.t as t -> GridTemplateAreas.toString t
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-type filter =
-  [ `blur of Length.t
-  | `brightness of float
-  | `contrast of [ `percent of float | `num of float ]
-  | `dropShadow of Length.t * Length.t * Length.t * [ Color.t | Var.t ]
-  | `grayscale of float
-  | `hueRotate of Angle.t
-  | `invert of float
-  | `opacity of float
-  | `saturate of float
-  | `sepia of float
-  | `url of string
-  | `none
-  | Var.t
-  | Cascading.t
-  ]
-
-let string_of_amount x =
-  match x with
-  | `percent v -> Std.Float.toString v ^ {js|%|js}
-  | `num v -> Std.Float.toString v
-
-let string_of_filter x =
-  match x with
-  | `blur v -> {js|blur(|js} ^ Length.toString v ^ {js|)|js}
-  | `brightness v -> {js|brightness(|js} ^ string_of_amount v ^ {js|%)|js}
-  | `contrast v -> {js|contrast(|js} ^ string_of_amount v ^ {js|%)|js}
-  | `dropShadow (a, b, c, d) ->
-    {js|drop-shadow(|js}
-    ^ Length.toString a
-    ^ {js| |js}
-    ^ Length.toString b
-    ^ {js| |js}
-    ^ Length.toString c
-    ^ {js| |js}
-    ^ (match (d : [ Color.t | Var.t ]) with
-      | #Color.t as c -> Color.toString c
-      | #Var.t as v -> Var.toString v)
-    ^ {js|)|js}
-  | `grayscale v -> {js|grayscale(|js} ^ string_of_amount v ^ {js|%)|js}
-  | `hueRotate v -> {js|hue-rotate(|js} ^ Angle.toString v ^ {js|)|js}
-  | `invert v -> {js|invert(|js} ^ string_of_amount v ^ {js|%)|js}
-  | `opacity v -> {js|opacity(|js} ^ string_of_amount v ^ {js|%)|js}
-  | `saturate v -> {js|saturate(|js} ^ string_of_amount v ^ {js|%)|js}
-  | `sepia v -> {js|sepia(|js} ^ string_of_amount v ^ {js|%)|js}
-  | `none -> {js|none|js}
-  | #Url.t as u -> Url.toString u
-  | #Var.t as va -> Var.toString va
-  | #Cascading.t as c -> Cascading.toString c
-
 let filter x =
-  D
+  Rule.Declaration
     ( {js|filter|js},
-      x |. Std.Array.map string_of_filter |. Std.Array.joinWith ~sep:{js| |js}
-    )
+      x
+      |. Kloth.Array.map Filter.toString
+      |. Kloth.Array.joinWith ~sep:{js| |js} )
 
 module Shadow = struct
   type 'a value = string
@@ -1483,7 +1447,7 @@ module Shadow = struct
       ^ Length.toString spread
       ^ {js| |js}
       ^ string_of_color color
-      ^ if inset then {js|inset|js} else {js||js})
+      ^ if inset then {js| inset|js} else {js||js})
 
   let text ?(x = `zero) ?(y = `zero) ?(blur = `zero) color =
     `shadow
@@ -1500,18 +1464,19 @@ module Shadow = struct
 end
 
 let boxShadow x =
-  D
-    ( {js|box-shadow|js},
+  Rule.Declaration
+    ( {js|boxShadow|js},
       match x with
       | #Shadow.t as s -> Shadow.toString s
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let boxShadows x =
-  D
-    ( {js|box-shadow|js},
-      x |. Std.Array.map Shadow.toString |. Std.Array.joinWith ~sep:{js|, |js}
-    )
+  Rule.Declaration
+    ( {js|boxShadow|js},
+      x
+      |. Kloth.Array.map Shadow.toString
+      |. Kloth.Array.joinWith ~sep:{js|, |js} )
 
 let string_of_borderstyle x =
   match x with
@@ -1520,7 +1485,7 @@ let string_of_borderstyle x =
   | #Cascading.t as c -> Cascading.toString c
 
 let border px style color =
-  D
+  Rule.Declaration
     ( {js|border|js},
       LineWidth.toString px
       ^ {js| |js}
@@ -1528,44 +1493,48 @@ let border px style color =
       ^ {js| |js}
       ^ string_of_color color )
 
-let borderStyle x = D ({js|border-style|js}, string_of_borderstyle x)
+let borderStyle x =
+  Rule.declaration ({js|borderStyle|js}, string_of_borderstyle x)
 
 let borderLeft px style color =
-  D
-    ( {js|border-left|js},
+  Rule.Declaration
+    ( {js|borderLeft|js},
       LineWidth.toString px
       ^ {js| |js}
       ^ string_of_borderstyle style
       ^ {js| |js}
       ^ string_of_color color )
 
-let borderLeftStyle x = D ({js|border-left-style|js}, string_of_borderstyle x)
+let borderLeftStyle x =
+  Rule.declaration ({js|borderLeftStyle|js}, string_of_borderstyle x)
 
 let borderRight px style color =
-  D
-    ( {js|border-right|js},
+  Rule.Declaration
+    ( {js|borderRight|js},
       LineWidth.toString px
       ^ {js| |js}
       ^ string_of_borderstyle style
       ^ {js| |js}
       ^ string_of_color color )
 
-let borderRightStyle x = D ({js|border-right-style|js}, string_of_borderstyle x)
+let borderRightStyle x =
+  Rule.declaration ({js|borderRightStyle|js}, string_of_borderstyle x)
 
 let borderTop px style color =
-  D
-    ( {js|border-top|js},
+  Rule.Declaration
+    ( {js|borderTop|js},
       LineWidth.toString px
       ^ {js| |js}
       ^ string_of_borderstyle style
       ^ {js| |js}
       ^ string_of_color color )
 
-let borderTopStyle x = D ({js|border-top-style|js}, string_of_borderstyle x)
+let borderTopStyle x =
+  Rule.declaration ({js|borderTopStyle|js}, string_of_borderstyle x)
 
 let borderBottom px style color =
-  D
-    ( {js|border-bottom|js},
+  Rule.Declaration
+    ( {js|borderBottom|js},
       LineWidth.toString px
       ^ {js| |js}
       ^ string_of_borderstyle style
@@ -1573,10 +1542,10 @@ let borderBottom px style color =
       ^ string_of_color color )
 
 let borderBottomStyle x =
-  D ({js|border-bottom-style|js}, string_of_borderstyle x)
+  Rule.declaration ({js|borderBottomStyle|js}, string_of_borderstyle x)
 
 let background x =
-  D
+  Rule.Declaration
     ( {js|background|js},
       match x with
       | #Color.t as c -> Color.toString c
@@ -1585,39 +1554,40 @@ let background x =
       | `none -> {js|none|js} )
 
 let backgrounds x =
-  D
+  Rule.Declaration
     ( {js|background|js},
       x
-      |. Std.Array.map (fun item ->
+      |. Kloth.Array.map (fun item ->
              match item with
              | #Color.t as c -> Color.toString c
              | #Url.t as u -> Url.toString u
              | #Gradient.t as g -> Gradient.toString g
              | `none -> {js|none|js})
-      |. Std.Array.joinWith ~sep:{js|, |js} )
+      |. Kloth.Array.joinWith ~sep:{js|, |js} )
 
 let backgroundSize x =
-  D
-    ( {js|background-size|js},
+  Rule.Declaration
+    ( {js|backgroundSize|js},
       match x with
       | `size (x, y) -> (Length.toString x ^ {js| |js}) ^ Length.toString y
       | `auto -> {js|auto|js}
       | `cover -> {js|cover|js}
       | `contain -> {js|contain|js} )
 
-let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
-    =
+let fontFace_to_string ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay
+  ?sizeAdjust () =
+  let fontStyle =
+    match fontStyle with
+    | Some value -> {js|font-style: |js} ^ FontStyle.toString value ^ {js|;|js}
+    | _ -> ""
+  in
   let src =
     src
-    |. Std.Array.map (fun x ->
+    |. Kloth.Array.map (fun x ->
            match x with
-           | `localUrl value -> {js|local("|js} ^ value ^ {js|")|js}
-           | `url value -> {js|url("|js} ^ value ^ {js|")|js})
-    |. Std.Array.joinWith ~sep:{js|, |js}
-  in
-  let fontStyle =
-    Belt.Option.mapWithDefault fontStyle {js||js} (fun s ->
-        {js|font-style: |js} ^ FontStyle.toString s ^ {js|;|js})
+           | `localUrl value -> ({js|local("|js} ^ value) ^ {js|")|js}
+           | `url value -> ({js|url("|js} ^ value) ^ {js|")|js})
+    |. Kloth.Array.joinWith ~sep:{js|, |js}
   in
   let fontWeight =
     Belt.Option.mapWithDefault fontWeight {js||js} (fun w ->
@@ -1631,11 +1601,11 @@ let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
   in
   let fontDisplay =
     Belt.Option.mapWithDefault fontDisplay {js||js} (fun f ->
-        ({js|font-display: |js} ^ FontDisplay.toString f) ^ {js|;|js})
+        {js|font-display: |js} ^ FontDisplay.toString f ^ {js|;|js})
   in
   let sizeAdjust =
     Belt.Option.mapWithDefault sizeAdjust {js||js} (fun s ->
-        ({js|size-adjust: |js} ^ Percentage.toString s) ^ {js|;|js})
+        {js|size-adjust: |js} ^ Percentage.toString s ^ {js|;|js})
   in
   {js|@font-face {|js}
   ^ ({js|font-family: |js} ^ fontFamily)
@@ -1646,9 +1616,18 @@ let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
   ^ sizeAdjust
   ^ {js|}|js}
 
+let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
+    =
+  let fontFace =
+    fontFace_to_string ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay
+      ?sizeAdjust ()
+  in
+  Emotion.injectRaw fontFace;
+  fontFamily
+
 let textDecoration x =
-  D
-    ( {js|text-decoration|js},
+  Rule.Declaration
+    ( {js|textDecoration|js},
       match x with
       | `none -> {js|none|js}
       | `underline -> {js|underline|js}
@@ -1660,22 +1639,23 @@ let textDecoration x =
       | #Var.t as va -> Var.toString va )
 
 let textShadow x =
-  D
-    ( {js|text-shadow|js},
+  Rule.Declaration
+    ( {js|textShadow|js},
       match x with
       | #Shadow.t as s -> Shadow.toString s
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
 let textShadows x =
-  D
-    ( {js|text-shadow|js},
-      x |. Std.Array.map Shadow.toString |. Std.Array.joinWith ~sep:{js|, |js}
-    )
+  Rule.Declaration
+    ( {js|textShadow|js},
+      x
+      |. Kloth.Array.map Shadow.toString
+      |. Kloth.Array.joinWith ~sep:{js|, |js} )
 
 let transformStyle x =
-  D
-    ( {js|transform-style|js},
+  Rule.Declaration
+    ( {js|transformStyle|js},
       match x with
       | #TransformStyle.t as ts -> TransformStyle.toString ts
       | #Var.t as va -> Var.toString va
@@ -1698,14 +1678,15 @@ module Transition = struct
   let toString (x : t) = match x with `value v -> v
 end
 
-let transitionValue x = D ({js|transition|js}, Transition.toString x)
+let transitionValue x =
+  Rule.declaration ({js|transition|js}, Transition.toString x)
 
 let transitionList x =
-  D
+  Rule.Declaration
     ( {js|transition|js},
       x
-      |. Std.Array.map Transition.toString
-      |. Std.Array.joinWith ~sep:{js|, |js} )
+      |. Kloth.Array.map Transition.toString
+      |. Kloth.Array.joinWith ~sep:{js|, |js} )
 
 let transitions = transitionList
 
@@ -1713,13 +1694,16 @@ let transition ?duration ?delay ?timingFunction property =
   transitionValue
     (Transition.shorthand ?duration ?delay ?timingFunction property)
 
-let transitionDelay i = D ({js|transition-delay|js}, Time.toString i)
-let transitionDuration i = D ({js|transition-duration|js}, Time.toString i)
+let transitionDelay i =
+  Rule.declaration ({js|transitionDelay|js}, Time.toString i)
+
+let transitionDuration i =
+  Rule.declaration ({js|transitionDuration|js}, Time.toString i)
 
 let transitionTimingFunction x =
-  D ({js|transition-timing-function|js}, TimingFunction.toString x)
+  Rule.declaration ({js|transitionTimingFunction|js}, TimingFunction.toString x)
 
-let transitionProperty x = D ({js|transition-property|js}, x)
+let transitionProperty x = Rule.declaration ({js|transitionProperty|js}, x)
 
 module Animation = struct
   type t = [ `value of string ]
@@ -1747,7 +1731,7 @@ module Animation = struct
   let toString x = match x with `value v -> v
 end
 
-let animationValue x = D ({js|animation|js}, Animation.toString x)
+let animationValue x = Rule.declaration ({js|animation|js}, Animation.toString x)
 
 let animation ?duration ?delay ?direction ?timingFunction ?fillMode ?playState
   ?iterationCount name =
@@ -1756,17 +1740,17 @@ let animation ?duration ?delay ?direction ?timingFunction ?fillMode ?playState
        ?playState ?iterationCount name)
 
 let animations x =
-  D
+  Rule.Declaration
     ( {js|animation|js},
       x
-      |. Std.Array.map Animation.toString
-      |. Std.Array.joinWith ~sep:{js|, |js} )
+      |. Kloth.Array.map Animation.toString
+      |. Kloth.Array.joinWith ~sep:{js|, |js} )
 
-let animationName x = D ({js|animation-name|js}, x)
+let animationName x = Rule.declaration ({js|animationName|js}, x)
 
 module SVG = struct
   let fill x =
-    D
+    Rule.Declaration
       ( {js|fill|js},
         match x with
         | #SVG.Fill.t as f -> SVG.Fill.toString f
@@ -1774,66 +1758,73 @@ module SVG = struct
         | #Var.t as v -> Var.toString v
         | #Url.t as u -> Url.toString u )
 
-  let fillOpacity opacity = D ({js|fill-opacity|js}, Std.Float.toString opacity)
+  let fillOpacity opacity =
+    Rule.declaration ({js|fillOpacity|js}, Kloth.Float.toString opacity)
 
   let fillRule x =
-    D
-      ( {js|fill-rule|js},
+    Rule.Declaration
+      ( {js|fillRule|js},
         match x with `evenodd -> {js|evenodd|js} | `nonzero -> {js|nonzero|js}
       )
 
-  let stroke x = D ({js|stroke|js}, string_of_color x)
+  let stroke x = Rule.declaration ({js|stroke|js}, string_of_color x)
 
   let strokeDasharray x =
-    D
-      ( {js|stroke-dasharray|js},
+    Rule.Declaration
+      ( {js|strokeDasharray|js},
         match x with
         | `none -> {js|none|js}
         | `dasharray a ->
           a
-          |. Std.Array.map string_of_dasharray
-          |. Std.Array.joinWith ~sep:{js||js} )
+          |. Kloth.Array.map string_of_dasharray
+          |. Kloth.Array.joinWith ~sep:{js| |js} )
 
-  let strokeWidth x = D ({js|stroke-width|js}, Length.toString x)
+  let strokeWidth x = Rule.declaration ({js|strokeWidth|js}, Length.toString x)
 
   let strokeOpacity opacity =
-    D ({js|stroke-opacity|js}, AlphaValue.toString opacity)
+    Rule.declaration ({js|strokeOpacity|js}, AlphaValue.toString opacity)
 
-  let strokeMiterlimit x = D ({js|stroke-miterlimit|js}, Std.Float.toString x)
+  let strokeMiterlimit x =
+    Rule.declaration ({js|strokeMiterlimit|js}, Kloth.Float.toString x)
 
   let strokeLinecap x =
-    D
-      ( {js|stroke-linecap|js},
+    Rule.Declaration
+      ( {js|strokeLinecap|js},
         match x with
         | `butt -> {js|butt|js}
         | `round -> {js|round|js}
         | `square -> {js|square|js} )
 
   let strokeLinejoin x =
-    D
-      ( {js|stroke-linejoin|js},
+    Rule.Declaration
+      ( {js|strokeLinejoin|js},
         match x with
         | `miter -> {js|miter|js}
         | `round -> {js|round|js}
         | `bevel -> {js|bevel|js} )
 
-  let stopColor x = D ({js|stop-color|js}, string_of_color x)
-  let stopOpacity x = D ({js|stop-opacity|js}, Std.Float.toString x)
+  let stopColor x = Rule.declaration ({js|stopColor|js}, string_of_color x)
+
+  let stopOpacity x =
+    Rule.declaration ({js|stopOpacity|js}, Kloth.Float.toString x)
 end
 
-let touchAction x = D ({js|touch-action|js}, x |. TouchAction.toString)
-let textEmphasisColor x = D ({js|text-emphasis-color|js}, string_of_color x)
+let touchAction x =
+  Rule.declaration ({js|touchAction|js}, x |. TouchAction.toString)
+
+let textEmphasisColor x =
+  Rule.declaration ({js|textEmphasisColor|js}, string_of_color x)
 
 let lineBreak x =
-  D
-    ( {js|line-break|js},
+  Rule.Declaration
+    ( {js|lineBreak|js},
       match x with
       | #LineBreak.t as lb -> LineBreak.toString lb
       | #Var.t as var -> Var.toString var
       | #Cascading.t as c -> Cascading.toString c )
 
 let hyphens x =
-  D
+  Rule.Declaration
     ( {js|hyphens|js},
       match x with
       | #Hyphens.t as h -> Hyphens.toString h
@@ -1841,48 +1832,48 @@ let hyphens x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let textJustify x =
-  D
-    ( {js|text-justify|js},
+  Rule.Declaration
+    ( {js|textJustify|js},
       match x with
       | #TextJustify.t as tj -> TextJustify.toString tj
       | #Var.t as var -> Var.toString var
       | #Cascading.t as c -> Cascading.toString c )
 
 let overflowInline x =
-  D
-    ( {js|overflow-inline|js},
+  Rule.Declaration
+    ( {js|overflowInline|js},
       match x with
       | #OverflowInline.t as ov -> OverflowInline.toString ov
       | #Var.t as var -> Var.toString var
       | #Cascading.t as c -> Cascading.toString c )
 
 let overflowBlock x =
-  D
-    ( {js|overflow-block|js},
+  Rule.Declaration
+    ( {js|overflowBlock|js},
       match x with
       | #OverflowInline.t as ov -> OverflowInline.toString ov
       | #Var.t as var -> Var.toString var
       | #Cascading.t as c -> Cascading.toString c )
 
 let fontSynthesisWeight x =
-  D
-    ( {js|font-synthesis-weight|js},
+  Rule.Declaration
+    ( {js|fontSynthesisWeight|js},
       match x with
       | #FontSynthesisWeight.t as fsw -> FontSynthesisWeight.toString fsw
       | #Var.t as var -> Var.toString var
       | #Cascading.t as c -> Cascading.toString c )
 
 let fontSynthesisStyle x =
-  D
-    ( {js|font-synthesis-style|js},
+  Rule.Declaration
+    ( {js|fontSynthesisStyle|js},
       match x with
       | #FontSynthesisStyle.t as fss -> FontSynthesisStyle.toString fss
       | #Var.t as var -> Var.toString var
       | #Cascading.t as c -> Cascading.toString c )
 
 let fontSynthesisSmallCaps x =
-  D
-    ( {js|font-synthesis-small-caps|js},
+  Rule.Declaration
+    ( {js|fontSynthesisSmallCaps|js},
       match x with
       | #FontSynthesisSmallCaps.t as fssc ->
         FontSynthesisSmallCaps.toString fssc
@@ -1890,309 +1881,49 @@ let fontSynthesisSmallCaps x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let fontSynthesisPosition x =
-  D
-    ( {js|font-synthesis-weight|js},
+  Rule.Declaration
+    ( {js|fontSynthesisWeight|js},
       match x with
       | #FontSynthesisPosition.t as fsp -> FontSynthesisPosition.toString fsp
       | #Var.t as var -> Var.toString var
       | #Cascading.t as c -> Cascading.toString c )
 
 let fontKerning x =
-  D
-    ( {js|font-kerning|js},
+  Rule.Declaration
+    ( {js|fontKerning|js},
       match x with
       | #FontKerning.t as fk -> FontKerning.toString fk
       | #Var.t as var -> Var.toString var
       | #Cascading.t as c -> Cascading.toString c )
 
 let fontVariantPosition x =
-  D
-    ( {js|font-variant-position|js},
+  Rule.Declaration
+    ( {js|fontVariantPosition|js},
       match x with
       | #FontVariantPosition.t as fvp -> FontVariantPosition.toString fvp
       | #Var.t as var -> Var.toString var
       | #Cascading.t as c -> Cascading.toString c )
 
 let fontVariantCaps x =
-  D
-    ( {js|font-variant-caps|js},
+  Rule.Declaration
+    ( {js|fontVariantCaps|js},
       match x with
       | #FontVariantCaps.t as fvc -> FontVariantCaps.toString fvc
       | #Var.t as var -> Var.toString var
       | #Cascading.t as c -> Cascading.toString c )
 
 let fontOpticalSizing x =
-  D
-    ( {js|font-optical-sizing|js},
+  Rule.Declaration
+    ( {js|fontOpticalSizing|js},
       match x with
       | #FontOpticalSizing.t as fos -> FontOpticalSizing.toString fos
       | #Var.t as var -> Var.toString var
       | #Cascading.t as c -> Cascading.toString c )
 
 let fontVariantEmoji x =
-  D
-    ( {js|font-variant-emoji|js},
+  Rule.Declaration
+    ( {js|fontVariantEmoji|js},
       match x with
       | #FontVariantEmoji.t as fve -> FontVariantEmoji.toString fve
       | #Var.t as var -> Var.toString var
       | #Cascading.t as c -> Cascading.toString c )
-
-(* Aliases *)
-
-type angle = Angle.t
-type animationDirection = AnimationDirection.t
-type animationFillMode = AnimationFillMode.t
-type animationIterationCount = AnimationIterationCount.t
-type animationPlayState = AnimationPlayState.t
-type cascading = Cascading.t
-type color = Color.t
-type fontStyle = FontStyle.t
-type fontWeight = FontWeight.t
-type length = Length.t
-type listStyleType = ListStyleType.t
-type repeatValue = RepeatValue.t
-type outlineStyle = OutlineStyle.t
-type transform = Transform.t
-type gradient = Gradient.t
-
-let initial = Cascading.initial
-let inherit_ = Cascading.inherit_
-let unset = Cascading.unset
-let var = Var.var
-let varDefault = Var.varDefault
-let auto = `auto
-let none = `none
-let text = `text
-let pct = Percentage.pct
-let ch = Length.ch
-let cm = Length.cm
-let em = Length.em
-let ex = Length.ex
-let mm = Length.mm
-let pt = Length.pt
-let px = Length.px
-let pxFloat = Length.pxFloat
-let rem = Length.rem
-let vh = Length.vh
-let vmin = Length.vmin
-let vmax = Length.vmax
-let zero = Length.zero
-let deg = Angle.deg
-let rad = Angle.rad
-let grad = Angle.grad
-let turn = Angle.turn
-let ltr = Direction.ltr
-let rtl = Direction.rtl
-let absolute = PropertyPosition.absolute
-let relative = PropertyPosition.relative
-let static = PropertyPosition.static
-let fixed = PropertyPosition.fixed
-let sticky = PropertyPosition.sticky
-let isolate = `isolate
-let horizontal = Resize.horizontal
-let vertical = Resize.vertical
-let smallCaps = FontVariant.smallCaps
-let italic = FontStyle.italic
-let oblique = FontStyle.oblique
-let hidden = `hidden
-let visible = `visible
-let scroll = `scroll
-let rgb = Color.rgb
-let rgba = Color.rgba
-let hsl = Color.hsl
-let hsla = Color.hsla
-let hex = Color.hex
-let currentColor = Color.currentColor
-let transparent = Color.transparent
-let linear = TimingFunction.linear
-let ease = TimingFunction.ease
-let easeIn = TimingFunction.easeIn
-let easeInOut = TimingFunction.easeInOut
-let easeOut = TimingFunction.easeOut
-let stepStart = TimingFunction.stepStart
-let stepEnd = TimingFunction.stepEnd
-let steps = TimingFunction.steps
-let cubicBezier = TimingFunction.cubicBezier
-let marginBox = GeometryBox.marginBox
-let fillBox = GeometryBox.fillBox
-let strokeBox = GeometryBox.strokeBox
-let viewBox = GeometryBox.viewBox
-let translate = Transform.translate
-let translate3d = Transform.translate3d
-let translateX = Transform.translateX
-let translateY = Transform.translateY
-let translateZ = Transform.translateZ
-let scaleX = Transform.scaleX
-let scaleY = Transform.scaleY
-let scaleZ = Transform.scaleZ
-let rotateX = Transform.rotateX
-let rotateY = Transform.rotateY
-let rotateZ = Transform.rotateZ
-let scale = Transform.scale
-let scale3d = Transform.scale3d
-let skew = Transform.skew
-let skewX = Transform.skewX
-let skewY = Transform.skewY
-let thin = FontWeight.thin
-let extraLight = FontWeight.extraLight
-let light = FontWeight.light
-let medium = FontWeight.medium
-let semiBold = FontWeight.semiBold
-let bold = FontWeight.bold
-let extraBold = FontWeight.extraBold
-let lighter = FontWeight.lighter
-let bolder = FontWeight.bolder
-let linearGradient = Gradient.linearGradient
-let repeatingLinearGradient = Gradient.repeatingLinearGradient
-let radialGradient = Gradient.radialGradient
-let repeatingRadialGradient = Gradient.repeatingRadialGradient
-let conicGradient = Gradient.conicGradient
-let areas = GridTemplateAreas.areas
-let ident = GridArea.ident
-let numIdent = GridArea.numIdent
-let contextMenu = Cursor.contextMenu
-let help = Cursor.help
-let pointer = Cursor.pointer
-let progress = Cursor.progress
-let wait = Cursor.wait
-let cell = Cursor.cell
-let crosshair = Cursor.crosshair
-let verticalText = Cursor.verticalText
-let alias = Cursor.alias
-let copy = Cursor.copy
-let move = Cursor.move
-let noDrop = Cursor.noDrop
-let notAllowed = Cursor.notAllowed
-let grab = Cursor.grab
-let grabbing = Cursor.grabbing
-let allScroll = Cursor.allScroll
-let colResize = Cursor.colResize
-let rowResize = Cursor.rowResize
-let nResize = Cursor.nResize
-let eResize = Cursor.eResize
-let sResize = Cursor.sResize
-let wResize = Cursor.wResize
-let neResize = Cursor.neResize
-let nwResize = Cursor.nwResize
-let seResize = Cursor.seResize
-let swResize = Cursor.swResize
-let ewResize = Cursor.ewResize
-let nsResize = Cursor.nsResize
-let neswResize = Cursor.neswResize
-let nwseResize = Cursor.nwseResize
-let zoomIn = Cursor.zoomIn
-let zoomOut = Cursor.zoomOut
-let vw x = `vw x
-let fr x = `fr x
-
-module Calc = struct
-  let ( - ) a b = `calc (`sub (a, b))
-  let ( + ) a b = `calc (`add (a, b))
-  let ( * ) a b = `calc (`mult (a, b))
-end
-
-let size x y = `size (x, y)
-let all = `all
-let backwards = `backwards
-let baseline = `baseline
-let block = `block
-let borderBox = `borderBox
-let both = `both
-let center = `center
-let column = `column
-let columnReverse = `columnReverse
-let contain = `contain
-let contentBox = `contentBox
-let count x = `count x
-let cover = `cover
-let dashed = `dashed
-let dotted = `dotted
-let flexBox = `flex
-let grid = `grid
-let inlineGrid = `inlineGrid
-let flexEnd = `flexEnd
-let flexStart = `flexStart
-let forwards = `forwards
-let infinite = `infinite
-let inline = `inline
-let contents = `contents
-let inlineBlock = `inlineBlock
-let inlineFlex = `inlineFlex
-let inlineTable = `inlineTable
-let listItem = `listItem
-let runIn = `runIn
-let table = `table
-let tableCaption = `tableCaption
-let tableColumnGroup = `tableColumnGroup
-let tableHeaderGroup = `tableHeaderGroup
-let tableFooterGroup = `tableFooterGroup
-let tableRowGroup = `tableRowGroup
-let tableCell = `tableCell
-let tableColumn = `tableColumn
-let tableRow = `tableRow
-let local = `local
-let localUrl x = `localUrl x
-let noRepeat = `noRepeat
-let space = `space
-let nowrap = `nowrap
-let paddingBox = `paddingBox
-let paused = `paused
-let repeat = `repeat
-let minmax = `minmax
-let repeatX = `repeatX
-let repeatY = `repeatY
-let rotate a = `rotate a
-let rotate3d x y z a = `rotate3d (x, y, z, a)
-let row = `row
-let rowReverse = `rowReverse
-let running = `running
-let solid = `solid
-let spaceAround = `spaceAround
-let spaceBetween = `spaceBetween
-let spaceEvenly = `spaceEvenly
-let stretch = `stretch
-let url x = `url x
-let wrap = `wrap
-let wrapReverse = `wrapReverse
-let inside = `inside
-let outside = `outside
-let underline = `underline
-let overline = `overline
-let lineThrough = `lineThrough
-let clip = `clip
-let ellipsis = `ellipsis
-let wavy = `wavy
-let double = `double
-let uppercase = `uppercase
-let lowercase = `lowercase
-let capitalize = `capitalize
-let sub = `sub
-let super = `super
-let textTop = `textTop
-let textBottom = `textBottom
-let middle = `middle
-let normal = `normal
-let breakAll = `breakAll
-let keepAll = `keepAll
-let breakWord = `breakWord
-let reverse = `reverse
-let alternate = `alternate
-let alternateReverse = `alternateReverse
-let fill = `fill
-let content = `content
-let maxContent = `maxContent
-let minContent = `minContent
-let fitContent = `fitContent
-let round = `round
-let miter = `miter
-let bevel = `bevel
-let butt = `butt
-let square = `square
-let panX = `panX
-let panY = `panY
-let panLeft = `panLeft
-let panRight = `panRight
-let panUp = `panUp
-let panDown = `panDown
-let pinchZoom = `pinchZoom
-let manipulation = `manipulation

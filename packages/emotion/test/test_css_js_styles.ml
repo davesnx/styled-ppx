@@ -15,20 +15,20 @@ let selector_nested_with_mq_and_declarations =
   let classname =
     [%cx
       {|
-  li {
-    list-style-type: none;
+      li {
+        list-style-type: none;
 
-    ::before {
-      position: absolute;
-      left: -20px;
-      content: "✓";
-    }
+        ::before {
+          position: absolute;
+          left: -20px;
+          content: "✓";
+        }
 
-    @media $(mobile) {
-      position: relative;
-    }
-  }
-|}]
+        @media $(mobile) {
+          position: relative;
+        }
+      }
+    |}]
   in
   let css = get_string_style_rules () in
   assert_string css
@@ -75,11 +75,11 @@ let selector_with_ppx =
   let classname =
     [%cx
       {|
-    position: relative;
-    & > * {
-      position: absolute;
-    }
-  |}]
+       position: relative;
+       & > * {
+         position: absolute;
+       }
+     |}]
   in
   let css = get_string_style_rules () in
   assert_string css
@@ -93,12 +93,12 @@ let empty_selector_simple =
   let classname =
     [%cx
       {|
-        position: relative;
+           position: relative;
 
-        & $(is_active_classname) {
-          position: absolute;
-        }
-    |}]
+           & $(is_active_classname) {
+             position: absolute;
+           }
+       |}]
   in
   let css = get_string_style_rules () in
   assert_string css
@@ -113,42 +113,42 @@ let avoid_hash_collision =
     let disabledColor = `var "alt-text--tertiary" in
     [%cx
       {|
-      color: $(color);
+         color: $(color);
 
-      :disabled {
-        color: $(disabledColor);
-      }
+         :disabled {
+           color: $(disabledColor);
+         }
 
-      :hover {
-        color: $(hoverColor);
-      }
-    |}]
+         :hover {
+           color: $(hoverColor);
+         }
+       |}]
   in
   let classname2 =
     let padding = `px 16 in
     [%cx
       {|
-      display: flex;
+         display: flex;
 
-      :before,
-      :after {
-        content: '';
-        flex: 0 0 $(padding);
-      }
-    |}]
+         :before,
+         :after {
+           content: '';
+           flex: 0 0 $(padding);
+         }
+       |}]
   in
   let classname3 =
     let padding = `px 16 in
     [%cx
       {|
-      display: flex;
+         display: flex;
 
-      :before,
-      :after {
-        content: '';
-        flex: 0 1 $(padding);
-      }
-    |}]
+         :before,
+         :after {
+           content: '';
+           flex: 0 1 $(padding);
+         }
+       |}]
   in
   let _css = get_string_style_rules () in
   assert_not_equal_string classname1 classname2;
@@ -378,14 +378,14 @@ let multiple_pseudo =
   let classname =
     [%cx
       {|
-        padding: 0;
+           padding: 0;
 
-        &::before,
-        &::after {
-          content: "";
-          transform: translateX(-50%);
-        }
-        |}]
+           &::before,
+           &::after {
+             content: "";
+             transform: translateX(-50%);
+           }
+           |}]
   in
   let css = get_string_style_rules () in
   assert_string css
@@ -402,8 +402,8 @@ let nested_selectors =
   test "nested_selectors" @@ fun () ->
   let button_active = [%cx "position: relative;"] in
   let classname = [%cx {|
-     &.$(button_active) { top: 50px; }
-   |}] in
+        &.$(button_active) { top: 50px; }
+      |}] in
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf ".%s { position: relative; } .%s.%s { top: 50px; }"
@@ -412,9 +412,11 @@ let nested_selectors =
 let nested_selectors_2 =
   test "nested_selectors_2" @@ fun () ->
   let button_active = [%cx "position: relative;"] in
-  let classname = [%cx {|
-     &.$(button_active) & { top: 50px; }
-   |}] in
+  let classname =
+    [%cx {|
+        &.$(button_active) & { top: 50px; }
+      |}]
+  in
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf ".%s { position: relative; } .%s.%s .%s { top: 50px; }"
@@ -425,13 +427,13 @@ let selectors_with_coma =
   let classname =
     [%cx
       {|
-      position: relative;
+         position: relative;
 
-      &.lola,
-      & a {
-        top: 50px;
-      }
-  |}]
+         &.lola,
+         & a {
+           top: 50px;
+         }
+     |}]
   in
   let css = get_string_style_rules () in
   assert_string css
@@ -442,11 +444,13 @@ let selectors_with_coma =
 
 let selectors_with_coma_simple =
   test "selectors_with_coma_simple" @@ fun () ->
-  let classname = [%cx {|
-    .a, .b {
-      top: 50px;
-    }
-  |}] in
+  let classname =
+    [%cx {|
+       .a, .b {
+         top: 50px;
+       }
+     |}]
+  in
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf ".%s  .a { top: 50px; } .%s  .b { top: 50px; }" classname
@@ -457,13 +461,13 @@ let selectors_with_coma_and_pseudo =
   let classname =
     [%cx
       {|
-      position: relative;
+         position: relative;
 
-      &::before,
-      &::after {
-        top: 50px;
-      }
-  |}]
+         &::before,
+         &::after {
+           top: 50px;
+         }
+     |}]
   in
   let css = get_string_style_rules () in
   assert_string css
@@ -477,13 +481,13 @@ let selector_nested_with_pseudo =
   let classname =
     [%cx
       {|
-      position: relative;
-      &:hover {
-        &::after {
-          top: 50px;
-        }
-      }
-  |}]
+         position: relative;
+         &:hover {
+           &::after {
+             top: 50px;
+           }
+         }
+     |}]
   in
   let css = get_string_style_rules () in
   assert_string css
@@ -496,13 +500,13 @@ let selector_nested_with_pseudo_2 =
   let classname =
     [%cx
       {|
-      position: relative;
-      :hover {
-        ::after {
-          top: 50px;
-        }
-      }
-  |}]
+         position: relative;
+         :hover {
+           ::after {
+             top: 50px;
+           }
+         }
+     |}]
   in
   let css = get_string_style_rules () in
   assert_string css
@@ -515,13 +519,13 @@ let selector_nested_with_pseudo_3 =
   let classname =
     [%cx
       {|
-      position: relative;
-      &:hover {
-        & ::after {
-          top: 50px;
-        }
-      }
-  |}]
+         position: relative;
+         &:hover {
+           & ::after {
+             top: 50px;
+           }
+         }
+     |}]
   in
   let css = get_string_style_rules () in
   assert_string css
@@ -554,11 +558,11 @@ let selector_with_empty_interp =
   let classname =
     [%cx
       {|
-        position: absolute;
-        &.$(empty_classname)::before {
-          top: 50px;
-        }
-      |}]
+           position: absolute;
+           &.$(empty_classname)::before {
+             top: 50px;
+           }
+         |}]
   in
 
   let css = get_string_style_rules () in
@@ -601,13 +605,13 @@ let mq_inside_selector =
   let classname =
     [%cx
       {|
-      display: block;
-      & div {
-        @media (min-width: 768px) {
-          height: auto;
-        }
-      }
-  |}]
+         display: block;
+         & div {
+           @media (min-width: 768px) {
+             height: auto;
+           }
+         }
+     |}]
   in
   let css = get_string_style_rules () in
   assert_string css
@@ -621,14 +625,14 @@ let mq_inside_selector_with_declarations =
   let classname =
     [%cx
       {|
-      display: block;
-      & div {
-        display: flex;
-        @media (min-width: 768px) {
-          height: auto;
-        }
-      }
-  |}]
+         display: block;
+         & div {
+           display: flex;
+           @media (min-width: 768px) {
+             height: auto;
+           }
+         }
+     |}]
   in
   let css = get_string_style_rules () in
   assert_string css
@@ -642,16 +646,16 @@ let mq_and_selectors_2 =
   let classname =
     [%cx
       {|
-      display: block;
-      & div {
-        display: flex;
-        @media (min-width: 768px) {
-          a {
-            height: auto;
-          }
-        }
-      }
-  |}]
+         display: block;
+         & div {
+           display: flex;
+           @media (min-width: 768px) {
+             a {
+               height: auto;
+             }
+           }
+         }
+     |}]
   in
   let css = get_string_style_rules () in
   assert_string css
@@ -742,17 +746,17 @@ let mq_nested_3 =
   let classname =
     [%cx
       {|
-      max-width: 800px;
-      @media (min-width: 300px) {
-        margin-left: 10px;
-        @media (max-width: 768px) {
-          position: fixed;
-          @media (max-width: 1200px) {
-            border: 1px solid transparent;
-          }
-        }
-      }
-  |}]
+         max-width: 800px;
+         @media (min-width: 300px) {
+           margin-left: 10px;
+           @media (max-width: 768px) {
+             position: fixed;
+             @media (max-width: 1200px) {
+               border: 1px solid transparent;
+             }
+           }
+         }
+     |}]
   in
   let css = get_string_style_rules () in
   assert_string css
@@ -769,26 +773,26 @@ let mq_nested_10 =
   let classname =
     [%cx
       {|
-      max-width: 800px;
-      @media (min-width: 300px) {
-        margin-left: 10px;
-        @media (max-width: 768px) {
-          position: fixed;
-          @media (max-width: 1200px) {
-            border: 1px solid transparent;
-            @media (max-width: 1200px) {
-              border: 1px solid transparent;
-              @media (max-width: 1200px) {
-              border: 1px solid transparent;
-                @media (max-width: 1200px) {
-                  border: 1px solid transparent;
-                }
-              }
-            }
-          }
-        }
-      }
-  |}]
+         max-width: 800px;
+         @media (min-width: 300px) {
+           margin-left: 10px;
+           @media (max-width: 768px) {
+             position: fixed;
+             @media (max-width: 1200px) {
+               border: 1px solid transparent;
+               @media (max-width: 1200px) {
+                 border: 1px solid transparent;
+                 @media (max-width: 1200px) {
+                 border: 1px solid transparent;
+                   @media (max-width: 1200px) {
+                     border: 1px solid transparent;
+                   }
+                 }
+               }
+             }
+           }
+         }
+     |}]
   in
   let css = get_string_style_rules () in
   assert_string css
@@ -849,26 +853,26 @@ let pseudo_selectors =
   let classname =
     [%cx
       {|
-    box-sizing: border-box;
-    padding-top: 9px;
-    padding-bottom: 9px;
-    border-radius: 0;
+       box-sizing: border-box;
+       padding-top: 9px;
+       padding-bottom: 9px;
+       border-radius: 0;
 
-    ::placeholder {
-      color: currentColor;
-    }
+       ::placeholder {
+         color: currentColor;
+       }
 
-    :hover {
-      border: 1px solid transparent;
-    }
+       :hover {
+         border: 1px solid transparent;
+       }
 
-    :focus {
-      outline: none;
-    }
+       :focus {
+         outline: none;
+       }
 
-    :disabled {
-      color: transparent;
-    }|}]
+       :disabled {
+         color: transparent;
+       }|}]
   in
   let css = get_string_style_rules () in
   assert_string css
@@ -885,17 +889,17 @@ let real_world =
   let classname =
     [%cx
       {|
-        padding: 0;
+           padding: 0;
 
-        &.$(buttonActive) {
-          margin: 0px;
+           &.$(buttonActive) {
+             margin: 0px;
 
-          ::before,
-          ::after {
-            top: 40px;
-          }
-        }
-  |}]
+             ::before,
+             ::after {
+               top: 40px;
+             }
+           }
+     |}]
   in
   let css = get_string_style_rules () in
   assert_string css
@@ -910,26 +914,26 @@ let pseudo_selectors_2 =
   let classname =
     [%cx
       {|
-    box-sizing: border-box;
-    padding-top: 9px;
-    padding-bottom: 9px;
-    border-radius: 0;
+       box-sizing: border-box;
+       padding-top: 9px;
+       padding-bottom: 9px;
+       border-radius: 0;
 
-    &::placeholder {
-      color: currentColor;
-    }
+       &::placeholder {
+         color: currentColor;
+       }
 
-    &:hover {
-      border: 1px solid transparent;
-    }
+       &:hover {
+         border: 1px solid transparent;
+       }
 
-    &:focus {
-      outline: none;
-    }
+       &:focus {
+         outline: none;
+       }
 
-    &:disabled {
-      color: transparent;
-    }|}]
+       &:disabled {
+         color: transparent;
+       }|}]
   in
   let css = get_string_style_rules () in
   assert_string css

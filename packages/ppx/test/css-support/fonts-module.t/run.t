@@ -33,9 +33,9 @@ If this test fail means that the module is not in sync with the ppx
     }
   ];
   CssJs.fontFamilies([|`custom({js|Inter Semi Bold|js})|]);
-  CssJs.fontFamilies(fonts: array(Css_AtomicTypes.FontFamilyName.t));
+  CssJs.fontFamilies(fonts: array(Types.FontFamilyName.t));
   CssJs.fontFamilies([|`custom({js|Inter|js})|]);
-  CssJs.fontFamilies(font: array(Css_AtomicTypes.FontFamilyName.t));
+  CssJs.fontFamilies(font: array(Types.FontFamilyName.t));
   CssJs.fontFamilies([|`custom({js|Inter|js}), `custom({js|Sans|js})|]);
   CssJs.fontFamilies([|`custom({js|Inter|js}), font|]);
   CssJs.fontFamilies([|`custom({js|Gill Sans Extrabold|js}), `sansSerif|]);

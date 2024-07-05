@@ -1,5 +1,7 @@
 module Std = Kloth
 
+type animationName = string
+
 module Cascading : sig
   type t =
     [ `inherit_

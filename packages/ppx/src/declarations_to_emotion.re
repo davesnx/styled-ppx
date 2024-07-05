@@ -1415,19 +1415,19 @@ let render_function_linear_gradient =
     [%expr
      `linearGradient((
        None,
-       [%e render_color_stop_list(~loc, stops)]: Css_AtomicTypes.Gradient.color_stop_list,
+       [%e render_color_stop_list(~loc, stops)]: Css_types.Gradient.color_stop_list,
      ))]
   | (Some(`Static_0(angle, ())), stops) =>
     [%expr
      `linearGradient((
        Some([%e render_extended_angle(~loc, angle)]),
-       [%e render_color_stop_list(~loc, stops)]: Css_AtomicTypes.Gradient.color_stop_list,
+       [%e render_color_stop_list(~loc, stops)]: Css_types.Gradient.color_stop_list,
      ))]
   | (Some(`Static_1((), side_or_corner, ())), stops) =>
     [%expr
      `linearGradient((
        Some([%e render_side_or_corner(~loc, side_or_corner)]),
-       [%e render_color_stop_list(~loc, stops)]: Css_AtomicTypes.Gradient.color_stop_list,
+       [%e render_color_stop_list(~loc, stops)]: Css_types.Gradient.color_stop_list,
      ))]
   };
 };
@@ -1439,13 +1439,13 @@ let render_function_repeating_linear_gradient =
     [%expr
      `repeatingLinearGradient((
        Some([%e render_extended_angle(~loc, angle)]),
-       [%e render_color_stop_list(~loc, stops)]: Css_AtomicTypes.Gradient.color_stop_list,
+       [%e render_color_stop_list(~loc, stops)]: Css_types.Gradient.color_stop_list,
      ))]
   | (None, (), stops) =>
     [%expr
      `repeatingLinearGradient((
        None,
-       [%e render_color_stop_list(~loc, stops)]: Css_AtomicTypes.Gradient.color_stop_list,
+       [%e render_color_stop_list(~loc, stops)]: Css_types.Gradient.color_stop_list,
      ))]
   | (Some(_), (), _stops) => raise(Unsupported_feature)
   };
@@ -1480,7 +1480,7 @@ let render_function_radial_gradient =
        [%e shape],
        None,
        None,
-       [%e render_color_stop_list(~loc, color_stop_list)]: Css_AtomicTypes.Gradient.color_stop_list,
+       [%e render_color_stop_list(~loc, color_stop_list)]: Css_types.Gradient.color_stop_list,
      ))];
   | (shape, Some(radial_size), None, None | Some (), color_stop_list) =>
     let shape = render_eding_shape(~loc, shape);
@@ -1490,7 +1490,7 @@ let render_function_radial_gradient =
        [%e shape],
        Some([%e size]),
        None,
-       [%e render_color_stop_list(~loc, color_stop_list)]: Css_AtomicTypes.Gradient.color_stop_list,
+       [%e render_color_stop_list(~loc, color_stop_list)]: Css_types.Gradient.color_stop_list,
      ))];
   | (shape, None, Some(((), position)), None | Some (), color_stop_list) =>
     let shape = render_eding_shape(~loc, shape);
@@ -1500,7 +1500,7 @@ let render_function_radial_gradient =
        [%e shape],
        None,
        Some(([%e positionX], [%e positionY])),
-       [%e render_color_stop_list(~loc, color_stop_list)]: Css_AtomicTypes.Gradient.color_stop_list,
+       [%e render_color_stop_list(~loc, color_stop_list)]: Css_types.Gradient.color_stop_list,
      ))];
   | (
       shape,
@@ -1517,7 +1517,7 @@ let render_function_radial_gradient =
        [%e shape],
        Some([%e size]),
        Some(([%e positionX], [%e positionY])),
-       [%e render_color_stop_list(~loc, color_stop_list)]: Css_AtomicTypes.Gradient.color_stop_list,
+       [%e render_color_stop_list(~loc, color_stop_list)]: Css_types.Gradient.color_stop_list,
      ))];
   };
 };
@@ -2344,7 +2344,7 @@ let font_family =
     switch (value) {
     | `Interpolation(v) =>
       /* We need to add annotation since arrays can be mutable and the type isn't scoped enough */
-      let annotation = [%type: array(Css_AtomicTypes.FontFamilyName.t)];
+      let annotation = [%type: array(Css_types.FontFamilyName.t)];
       [
         [%expr
           CssJs.fontFamilies([%e render_variable(~loc, v)]: [%t annotation])

@@ -172,7 +172,7 @@ If this test fail means that the module is not in sync with the ppx
           (Some(`hex({js|F80|js})), Some(`percent(0.))),
           (Some(`rgba((255, 255, 255, `num(0.8)))), Some(`percent(50.))),
           (Some(`hex({js|2A97FF|js})), Some(`percent(100.))),
-        |]: Css_AtomicTypes.Gradient.color_stop_list,
+        |]: Types.Gradient.color_stop_list,
       )),
     ),
   |]);

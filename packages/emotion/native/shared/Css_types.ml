@@ -1,5 +1,7 @@
 module Std = Kloth
 
+type animationName = string
+
 module Cascading = struct
   type t =
     [ `initial
@@ -43,9 +45,8 @@ module Var = struct
 end
 
 let max_or_min_values fn values =
-  values
-  |. Std.Array.map (fun v -> {js| |js} ^ fn v)
-  |. Std.Array.joinWith ~sep:{js|, |js}
+  Std.Array.map values (fun v -> {js| |js} ^ fn v)
+  |> Std.Array.joinWith ~sep:{js|, |js}
 
 let calc_min_max_num_to_string fn = function
   | `calc (`add (a, b)) -> {js|calc(|js} ^ fn a ^ {js| + |js} ^ fn b ^ {js|)|js}
@@ -2424,15 +2425,14 @@ module Gradient = struct
     | #Var.t as va -> Var.toString va
 
   let string_of_stops stops =
-    stops
-    |. Std.Array.map (fun (c, l) ->
-           match c, l with
-           (* This is the consequence of having wrong spec, we can generate broken CSS for gradients, very unlickely that manually you construct a gradient with (None, None), but still. *)
-           | None, None -> {| |}
-           | None, Some l -> Length.toString l
-           | Some c, None -> string_of_color c
-           | Some c, Some l -> string_of_color c ^ {js| |js} ^ Length.toString l)
-    |. Std.Array.joinWith ~sep:{js|, |js}
+    Std.Array.map stops (fun (c, l) ->
+        match c, l with
+        (* This is the consequence of having wrong spec, we can generate broken CSS for gradients, very unlickely that manually you construct a gradient with (None, None), but still. *)
+        | None, None -> {| |}
+        | None, Some l -> Length.toString l
+        | Some c, None -> string_of_color c
+        | Some c, Some l -> string_of_color c ^ {js| |js} ^ Length.toString l)
+    |> Std.Array.joinWith ~sep:{js|, |js}
 
   let direction_to_string = function
     | #Angle.t as a -> Angle.toString a

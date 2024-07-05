@@ -311,7 +311,7 @@ If this test fail means that the module is not in sync with the ppx
   CssJs.backgroundImage(
     `linearGradient((
       Some(`deg(45.)),
-      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -320,13 +320,13 @@ If this test fail means that the module is not in sync with the ppx
       [|
         (Some(CssJs.blue), Some(`percent(10.))),
         (Some(CssJs.red), Some(`percent(20.))),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
     `linearGradient((
       Some(`deg(90.)),
-      [|(Some(CssJs.blue), Some(`percent(10.))), (Some(CssJs.red), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.blue), Some(`percent(10.))), (Some(CssJs.red), None)|]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -336,25 +336,25 @@ If this test fail means that the module is not in sync with the ppx
         (Some(CssJs.blue), None),
         (None, Some(`percent(10.))),
         (Some(CssJs.red), None),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
     `linearGradient((
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
     `linearGradient((
       Some(`Right),
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
     `linearGradient((
       Some(`deg(45.)),
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -363,7 +363,7 @@ If this test fail means that the module is not in sync with the ppx
       [|
         (Some(CssJs.white), Some(`percent(50.))),
         (Some(CssJs.black), None),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -373,7 +373,7 @@ If this test fail means that the module is not in sync with the ppx
         (Some(CssJs.white), None),
         (Some(`hex({js|f06|js})), None),
         (Some(CssJs.black), None),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -386,13 +386,13 @@ If this test fail means that the module is not in sync with the ppx
           Some(`calc(`add((`pxFloat(-25.), `percent(50.))))),
         ),
         (Some(CssJs.blue), Some(`percent(100.))),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImages([|
     `linearGradient((
       Some(`deg(45.)),
-      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: Css_types.Gradient.color_stop_list,
     )),
     `linearGradient((
       None,
@@ -403,11 +403,11 @@ If this test fail means that the module is not in sync with the ppx
           Some(`calc(`add((`pxFloat(-25.), `percent(50.))))),
         ),
         (Some(CssJs.blue), Some(`percent(100.))),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: Css_types.Gradient.color_stop_list,
     )),
     `linearGradient((
       Some(`deg(45.)),
-      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: Css_types.Gradient.color_stop_list,
     )),
   |]);
   let color = `hex("333");
@@ -422,7 +422,7 @@ If this test fail means that the module is not in sync with the ppx
         (Some(color), Some(`percent(75.))),
         (Some(`transparent), Some(`percent(0.))),
         (Some(`transparent), Some(`percent(100.))),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -433,7 +433,7 @@ If this test fail means that the module is not in sync with the ppx
         (Some(color), Some(`pxFloat(4.))),
         (Some(color), Some(`pxFloat(5.))),
         (Some(color), Some(`pxFloat(9.))),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImages([|
@@ -442,7 +442,7 @@ If this test fail means that the module is not in sync with the ppx
       [|
         (Some(Color.Background.boxDark), Some(`percent(25.))),
         (Some(`transparent), Some(`percent(25.))),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: Css_types.Gradient.color_stop_list,
     )),
     `linearGradient((
       None,
@@ -453,11 +453,11 @@ If this test fail means that the module is not in sync with the ppx
           Some(`calc(`add((`pxFloat(-25.), `percent(50.))))),
         ),
         (Some(CssJs.blue), Some(`percent(100.))),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: Css_types.Gradient.color_stop_list,
     )),
     `linearGradient((
       Some(`deg(45.)),
-      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.blue), None), (Some(CssJs.red), None)|]: Css_types.Gradient.color_stop_list,
     )),
   |]);
   CssJs.backgroundImage(
@@ -465,7 +465,7 @@ If this test fail means that the module is not in sync with the ppx
       Some(`ellipse),
       None,
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -473,7 +473,7 @@ If this test fail means that the module is not in sync with the ppx
       Some(`circle),
       None,
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -481,7 +481,7 @@ If this test fail means that the module is not in sync with the ppx
       Some(`ellipse),
       None,
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -489,7 +489,7 @@ If this test fail means that the module is not in sync with the ppx
       Some(`circle),
       Some(`closestCorner),
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -497,7 +497,7 @@ If this test fail means that the module is not in sync with the ppx
       Some(`ellipse),
       Some(`farthestSide),
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -505,7 +505,7 @@ If this test fail means that the module is not in sync with the ppx
       Some(`circle),
       Some(`farthestSide),
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.backgroundImage(
@@ -517,7 +517,7 @@ If this test fail means that the module is not in sync with the ppx
         (None, Some(`percent(50.))),
         (Some(CssJs.white), None),
         (Some(CssJs.black), None),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.unsafe(
@@ -527,19 +527,19 @@ If this test fail means that the module is not in sync with the ppx
   CssJs.listStyleImage(
     `linearGradient((
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
     `linearGradient((
       Some(`Right),
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
     `linearGradient((
       Some(`deg(45.)),
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
@@ -548,7 +548,7 @@ If this test fail means that the module is not in sync with the ppx
       [|
         (Some(CssJs.white), Some(`percent(50.))),
         (Some(CssJs.black), None),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
@@ -557,7 +557,7 @@ If this test fail means that the module is not in sync with the ppx
       [|
         (Some(CssJs.white), Some(`pxFloat(5.))),
         (Some(CssJs.black), None),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
@@ -567,13 +567,13 @@ If this test fail means that the module is not in sync with the ppx
         (Some(CssJs.white), None),
         (Some(`hex({js|f06|js})), None),
         (Some(CssJs.black), None),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
     `linearGradient((
       None,
-      [|(Some(`currentColor), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(`currentColor), None), (Some(CssJs.black), None)|]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
@@ -586,7 +586,7 @@ If this test fail means that the module is not in sync with the ppx
           Some(`calc(`add((`pxFloat(-25.), `percent(50.))))),
         ),
         (Some(CssJs.blue), Some(`percent(100.))),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
@@ -594,7 +594,7 @@ If this test fail means that the module is not in sync with the ppx
       Some(`ellipse),
       None,
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
@@ -602,7 +602,7 @@ If this test fail means that the module is not in sync with the ppx
       Some(`circle),
       None,
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
@@ -610,7 +610,7 @@ If this test fail means that the module is not in sync with the ppx
       Some(`ellipse),
       None,
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
@@ -618,7 +618,7 @@ If this test fail means that the module is not in sync with the ppx
       Some(`ellipse),
       Some(`closestCorner),
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
@@ -626,7 +626,7 @@ If this test fail means that the module is not in sync with the ppx
       Some(`circle),
       Some(`closestCorner),
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
@@ -634,7 +634,7 @@ If this test fail means that the module is not in sync with the ppx
       Some(`ellipse),
       Some(`farthestSide),
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
@@ -642,7 +642,7 @@ If this test fail means that the module is not in sync with the ppx
       Some(`circle),
       Some(`farthestSide),
       None,
-      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(CssJs.white), None), (Some(CssJs.black), None)|]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.listStyleImage(
@@ -654,7 +654,7 @@ If this test fail means that the module is not in sync with the ppx
         (None, Some(`percent(50.))),
         (Some(CssJs.white), None),
         (Some(CssJs.black), None),
-      |]: Css_AtomicTypes.Gradient.color_stop_list,
+      |]: Css_types.Gradient.color_stop_list,
     )),
   );
   CssJs.unsafe(

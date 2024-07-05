@@ -49,7 +49,7 @@ If this test fail means that the module is not in sync with the ppx
   CssJs.maskImage(
     `linearGradient((
       Some(`deg(45.)),
-      [|(Some(`hex({js|333|js})), None), (Some(`hex({js|000|js})), None)|]: Css_AtomicTypes.Gradient.color_stop_list,
+      [|(Some(`hex({js|333|js})), None), (Some(`hex({js|000|js})), None)|]: Types.Gradient.color_stop_list,
     )),
   );
   CssJs.unsafe({js|maskImage|js}, {js|url(image.png)|js});

@@ -1,14 +1,8 @@
 (copy_files#
- (files ../native/shared/Css_AtomicTypes.{ml,mli}))
+ (files ../native/shared/Css_types.{ml,mli}))
 
 (copy_files#
- (files ../native/shared/Css_Colors.ml))
-
-(copy_files#
- (files ../native/shared/Css_Core.ml))
-
-(copy_files#
- (files ../js/Css_Js_Core.ml))
+ (files ../native/shared/Colors.ml))
 
 ; Copy files into the root of the folder (which collides with Kloth.ml)
 ; but later on the actions, we remove the ml file, using the Kloth.res file
