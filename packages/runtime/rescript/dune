@@ -8,7 +8,7 @@
  (files ../native/shared/Alias.ml))
 
 (copy_files#
- (files ../js/Rule.ml))
+ (files ../melange/Rule.ml))
 
 (copy_files#
  (files ../native/shared/Colors.ml))
