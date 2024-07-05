@@ -1,6 +1,6 @@
 (library
- (name reason_css_parser)
- (public_name styled-ppx.reason-css-parser)
+ (name Css_property_parser)
+ (public_name styled-ppx.css-property-parser)
  (libraries sedlex styled-ppx.css-parser ppx_deriving.runtime compiler-libs)
  (preprocess
   (per_module

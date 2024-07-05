@@ -1,5 +1,5 @@
 open Ppxlib;
-open Reason_css_parser;
+open Css_property_parser;
 
 module Option = {
   include Option;
@@ -13,7 +13,7 @@ module Option = {
 };
 
 module Builder = Ppxlib.Ast_builder.Default;
-module Types = Parser.Types;
+module Types = Css_property_parser.Parser.Types;
 
 let txt = (~loc, txt) => {Location.loc, txt};
 

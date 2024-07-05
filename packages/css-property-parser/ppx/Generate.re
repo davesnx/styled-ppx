@@ -403,7 +403,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       );
     let type_anotation = [%type:
       list(Tokens.token) =>
-      (Reason_css_parser__Rule.data([%t core_type]), list(Tokens.token))
+      (Css_property_parser__Rule.data([%t core_type]), list(Tokens.token))
     ];
     [%expr ([%e expression]: [%t type_anotation])];
   };

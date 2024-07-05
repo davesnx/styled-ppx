@@ -1,5 +1,5 @@
 open Alcotest;
-open Reason_css_parser;
+open Css_property_parser;
 open Rule;
 open! Data;
 open Styled_ppx_css_parser.Tokens;

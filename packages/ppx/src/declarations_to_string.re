@@ -1,5 +1,5 @@
 open Ppxlib;
-open Reason_css_parser;
+open Css_property_parser;
 
 module Helper = Ast_helper;
 module Builder = Ppxlib.Ast_builder.Default;
@@ -272,7 +272,8 @@ let render_size =
   | `Fit_content_1(lp) => render_length_percentage(lp);
 
 let render_css_global_values = (name, value) => {
-  let.ok value = Parser.parse(Standard.css_wide_keywords, value);
+  let.ok value =
+    Parser.parse(Css_property_parser.Standard.css_wide_keywords, value);
 
   let value =
     switch (value) {

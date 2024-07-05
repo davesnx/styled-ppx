@@ -3341,3 +3341,21 @@ let check_map =
       ("extended-percentage", check(extended_percentage)),
     ]),
   );
+
+let parse = Parser_helper.parse;
+
+module StringMap = Map.Make(String);
+
+let (let.ok) = Result.bind;
+
+let check_value = (~name, value) => {
+  let.ok check =
+    check_map
+    |> StringMap.find_opt(name)
+    |> Option.to_result(~none=`Unknown_value);
+
+  Ok(check(value));
+};
+
+let check_property = (~name) => check_value(~name="property-" ++ name);
+/* let check_media_query = (~name) => check_value(~name="media-" ++ name); */

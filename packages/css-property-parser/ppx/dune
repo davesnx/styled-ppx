@@ -11,6 +11,6 @@
  (kind ppx_rewriter)
  (wrapped false)
  (libraries styled-ppx.css-spec-parser ppxlib reason_css_parser_ppx_lib)
- (modules Reason_css_parser_ppx)
+ (modules Css_property_parser_ppx)
  (preprocess
   (pps ppxlib.metaquot)))

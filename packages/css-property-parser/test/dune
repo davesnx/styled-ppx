@@ -2,7 +2,7 @@
  (name Runner)
  (libraries
   alcotest
-  styled-ppx.reason-css-parser
+  styled-ppx.css-property-parser
   reason_css_parser_ppx_lib
   styled-ppx.css-parser
   ppxlib

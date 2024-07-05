@@ -1,5 +1,5 @@
 open Alcotest;
-open Reason_css_parser;
+open Css_property_parser;
 open Rule.Match;
 open Modifier;
 open Combinator;

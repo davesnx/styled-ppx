@@ -1,7 +1,4 @@
-module Parser = {
-  include Parser;
-  include Parse_from_string;
-};
+module Parser = Parser;
 module Rule = Rule;
 module Standard = Standard;
 module Combinator = Combinator;
