@@ -181,7 +181,7 @@ and render_container_query = (~loc, at_rule: at_rule) => {
         ~attrs,
         ~delimiter,
         ~loc=at_rule.loc,
-        conditions,
+        "@container " ++ conditions,
       );
 
     let rules =
@@ -198,7 +198,7 @@ and render_container_query = (~loc, at_rule: at_rule) => {
     Helper.Exp.apply(
       ~loc=at_rule.loc,
       CssJs.selector(~loc=at_rule.loc),
-      [(Nolabel, [%expr "@container " ++ [%e query]]), (Nolabel, rules)],
+      [(Nolabel, query), (Nolabel, rules)],
     );
   };
 }
