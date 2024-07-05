@@ -1,4 +1,3 @@
-module Types = Ast;
 module Parser = Css_parser;
 module Location = Ppxlib.Location;
 
@@ -10,7 +9,7 @@ let skip_whitespace: ref(bool);
 
 type token_with_location = {
   txt: result(Tokens.token, (Tokens.token, Tokens.error)),
-  loc: Types.loc,
+  loc: Ast.loc,
 };
 
 let get_next_token: Sedlexing.lexbuf => Parser.token;

@@ -1,4 +1,4 @@
-This test ensures the ppx generates the correct output against styled-ppx.emotion_native
+This test ensures the ppx generates the correct output against styled-ppx.native
 If this test fail means that the module is not in sync with the ppx
 
   $ cat > dune-project << EOF
@@ -8,7 +8,7 @@ If this test fail means that the module is not in sync with the ppx
   $ cat > dune << EOF
   > (executable
   >  (name input)
-  >  (libraries styled-ppx.emotion_native)
+  >  (libraries styled-ppx.native)
   >  (preprocess (pps styled-ppx)))
   > EOF
 

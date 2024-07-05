@@ -1,8 +1,8 @@
 (include_subdirs unqualified)
 
 (library
- (name emotion_native)
- (public_name styled-ppx.emotion_native)
+ (name native)
+ (public_name styled-ppx.native)
  (libraries
   server-reason-react.react
   server-reason-react.belt

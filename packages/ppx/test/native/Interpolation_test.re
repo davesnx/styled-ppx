@@ -68,7 +68,7 @@ let tests =
     (
       "font-family: $(mono)",
       [%expr [%css "font-family: $(mono)"]],
-      [%expr CssJs.fontFamilies(mono: array(Types.FontFamilyName.t))],
+      [%expr CssJs.fontFamilies(mono: array(CssJs.Types.FontFamilyName.t))],
     ),
     (
       "line-height: $(lh)",

@@ -1,7 +1,7 @@
 (library
  (name ui_native)
  (libraries
-  styled-ppx.emotion_native
+  styled-ppx.native
   server-reason-react.react
   server-reason-react.js
   server-reason-react.belt

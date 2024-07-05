@@ -1,4 +1,4 @@
-This test ensures the ppx generates the correct output against styled-ppx.emotion_native
+This test ensures the ppx generates the correct output against styled-ppx.native
 If this test fail means that the module is not in sync with the ppx
 
   $ cat > dune-project << EOF
@@ -8,7 +8,7 @@ If this test fail means that the module is not in sync with the ppx
   $ cat > dune << EOF
   > (executable
   >  (name input)
-  >  (libraries styled-ppx.emotion_native)
+  >  (libraries styled-ppx.native)
   >  (preprocess (pps styled-ppx)))
   > EOF
 
@@ -49,7 +49,7 @@ If this test fail means that the module is not in sync with the ppx
   CssJs.maskImage(
     `linearGradient((
       Some(`deg(45.)),
-      [|(Some(`hex({js|333|js})), None), (Some(`hex({js|000|js})), None)|]: Types.Gradient.color_stop_list,
+      [|(Some(`hex({js|333|js})), None), (Some(`hex({js|000|js})), None)|]: CssJs.Types.Gradient.color_stop_list,
     )),
   );
   CssJs.unsafe({js|maskImage|js}, {js|url(image.png)|js});

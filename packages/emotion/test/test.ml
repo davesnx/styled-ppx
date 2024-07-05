@@ -1,5 +1,4 @@
 let () =
-  Alcotest.run ~show_errors:true ~compact:true ~tail_errors:`Unlimited "Emotion"
-    [
-      Test_css_js_styles.tests; Test_css_autoprefixer.tests; Test_css_hash.tests;
-    ]
+  Alcotest.run ~show_errors:true ~compact:true ~tail_errors:`Unlimited
+    "styled-ppx.native"
+    [ Test_styles.tests; Test_autoprefixer.tests; Test_hash.tests ]

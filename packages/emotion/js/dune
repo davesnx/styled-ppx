@@ -1,6 +1,6 @@
 (library
- (name emotion)
- (public_name styled-ppx.emotion)
+ (name runtime)
+ (public_name styled-ppx.melange)
  (modes melange)
  (wrapped false)
  (libraries melange.js melange.belt)

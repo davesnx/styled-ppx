@@ -2,7 +2,7 @@
  (alias e2e-melange)
  (target e2e-melange)
  (modules :standard \ debug)
- (libraries ui styled-ppx.emotion reason-react)
+ (libraries ui styled-ppx.melange reason-react)
  (preprocess
   (pps melange.ppx styled-ppx reason-react-ppx))
  (module_systems
@@ -18,6 +18,6 @@
   server-reason-react.belt
   server-reason-react.react
   server-reason-react.reactDom
-  styled-ppx.emotion_native)
+  styled-ppx.native)
  (preprocess
   (pps styled-ppx)))
