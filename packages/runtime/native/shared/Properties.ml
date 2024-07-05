@@ -151,9 +151,7 @@ let backfaceVisibility x =
 let backdropFilter x =
   Rule.declaration
     ( {js|backdropFilter|js},
-      x
-      |. Kloth.Array.map Filter.toString
-      |. Kloth.Array.joinWith ~sep:{js|, |js} )
+      Kloth.Array.joinWithMap ~sep:{js|, |js} x ~f:Filter.toString )
 
 let backgroundAttachment x =
   Rule.declaration
@@ -186,9 +184,8 @@ let backgroundImage x =
 let backgroundImages imgs =
   Rule.declaration
     ( {js|backgroundImage|js},
-      imgs
-      |. Kloth.Array.map string_of_backgroundImage
-      |. Kloth.Array.joinWith ~sep:{js|, |js} )
+      Kloth.Array.joinWithMap imgs ~sep:{js|, |js} ~f:string_of_backgroundImage
+    )
 
 let maskImage x =
   Rule.declaration
@@ -244,12 +241,10 @@ let backgroundPosition4 ~x ~offsetX ~y ~offsetY =
 let backgroundPositions bp =
   Rule.declaration
     ( {js|backgroundPosition|js},
-      bp
-      |. Kloth.Array.map (fun (x, y) ->
-             string_of_backgroundPosition x
-             ^ {js| |js}
-             ^ string_of_backgroundPosition y)
-      |. Kloth.Array.joinWith ~sep:{js|, |js} )
+      Kloth.Array.joinWithMap bp ~sep:{js|, |js} ~f:(fun (x, y) ->
+          string_of_backgroundPosition x
+          ^ {js| |js}
+          ^ string_of_backgroundPosition y) )
 
 let backgroundRepeat x =
   Rule.declaration
@@ -285,9 +280,7 @@ let maskPosition x =
 let maskPositions mp =
   Rule.declaration
     ( {js|maskPosition|js},
-      mp
-      |. Kloth.Array.map string_of_maskposition
-      |. Kloth.Array.joinWith ~sep:{js|, |js} )
+      Kloth.Array.joinWithMap mp ~sep:{js|, |js} ~f:string_of_maskposition )
 
 let borderImageSource x =
   Rule.declaration
@@ -403,9 +396,7 @@ let contentRule x = Rule.declaration ({js|content|js}, string_of_content x)
 let contentRules xs =
   Rule.declaration
     ( {js|content|js},
-      xs
-      |. Kloth.Array.map string_of_content
-      |. Kloth.Array.joinWith ~sep:{js| |js} )
+      Kloth.Array.joinWithMap ~sep:{js| |js} xs ~f:string_of_content )
 
 let counterIncrement x =
   Rule.declaration ({js|counterIncrement|js}, string_of_counter_increment x)
@@ -413,9 +404,8 @@ let counterIncrement x =
 let countersIncrement xs =
   Rule.declaration
     ( {js|counterIncrement|js},
-      xs
-      |. Kloth.Array.map string_of_counter_increment
-      |. Kloth.Array.joinWith ~sep:{js| |js} )
+      Kloth.Array.joinWithMap ~sep:{js| |js} xs ~f:string_of_counter_increment
+    )
 
 let counterReset x =
   Rule.declaration ({js|counterReset|js}, string_of_counter_reset x)
@@ -423,18 +413,14 @@ let counterReset x =
 let countersReset xs =
   Rule.declaration
     ( {js|counterReset|js},
-      xs
-      |. Kloth.Array.map string_of_counter_reset
-      |. Kloth.Array.joinWith ~sep:{js| |js} )
+      Kloth.Array.joinWithMap ~sep:{js| |js} xs ~f:string_of_counter_reset )
 
 let counterSet x = Rule.declaration ({js|counterSet|js}, string_of_counter_set x)
 
 let countersSet xs =
   Rule.declaration
     ( {js|counterSet|js},
-      xs
-      |. Kloth.Array.map string_of_counter_set
-      |. Kloth.Array.joinWith ~sep:{js| |js} )
+      Kloth.Array.joinWithMap ~sep:{js| |js} xs ~f:string_of_counter_set )
 
 let cursor x = Rule.declaration ({js|cursor|js}, Cursor.toString x)
 
@@ -530,9 +516,7 @@ let fontFamily x =
 let fontFamilies xs =
   Rule.declaration
     ( {js|fontFamily|js},
-      xs
-      |. Kloth.Array.map FontFamilyName.toString
-      |. Kloth.Array.joinWith ~sep:{js|, |js} )
+      Kloth.Array.joinWithMap ~sep:{js|, |js} ~f:FontFamilyName.toString xs )
 
 let fontSize x =
   Rule.declaration
@@ -1123,9 +1107,7 @@ let transform x =
 let transforms x =
   Rule.declaration
     ( {js|transform|js},
-      x
-      |. Kloth.Array.map Transform.toString
-      |. Kloth.Array.joinWith ~sep:{js| |js} )
+      Kloth.Array.joinWithMap ~sep:{js| |js} ~f:Transform.toString x )
 
 let transformOrigin x =
   Rule.declaration ({js|transformOrigin|js}, TransformOrigin.toString x)
@@ -1361,9 +1343,7 @@ let rec gridLengthToJs x =
     ^ {js|)|js}
 
 and string_of_dimensions dimensions =
-  dimensions
-  |. Kloth.Array.map gridLengthToJs
-  |. Kloth.Array.joinWith ~sep:{js| |js}
+  Kloth.Array.joinWithMap ~f:gridLengthToJs ~sep:{js| |js} dimensions
 
 let gridTemplateColumns dimensions =
   Rule.declaration ({js|gridTemplateColumns|js}, string_of_dimensions dimensions)
@@ -1420,10 +1400,7 @@ let gridTemplateAreas l =
 
 let filter x =
   Rule.declaration
-    ( {js|filter|js},
-      x
-      |. Kloth.Array.map Filter.toString
-      |. Kloth.Array.joinWith ~sep:{js| |js} )
+    ({js|filter|js}, Kloth.Array.joinWithMap ~f:Filter.toString ~sep:{js| |js} x)
 
 module Shadow = struct
   type 'a value = string
@@ -1474,9 +1451,7 @@ let boxShadow x =
 let boxShadows x =
   Rule.declaration
     ( {js|boxShadow|js},
-      x
-      |. Kloth.Array.map Shadow.toString
-      |. Kloth.Array.joinWith ~sep:{js|, |js} )
+      Kloth.Array.joinWithMap ~sep:{js|, |js} ~f:Shadow.toString x )
 
 let string_of_borderstyle x =
   match x with
@@ -1556,14 +1531,12 @@ let background x =
 let backgrounds x =
   Rule.declaration
     ( {js|background|js},
-      x
-      |. Kloth.Array.map (fun item ->
-             match item with
-             | #Color.t as c -> Color.toString c
-             | #Url.t as u -> Url.toString u
-             | #Gradient.t as g -> Gradient.toString g
-             | `none -> {js|none|js})
-      |. Kloth.Array.joinWith ~sep:{js|, |js} )
+      Kloth.Array.joinWithMap ~sep:{js|, |js} x ~f:(fun item ->
+          match item with
+          | #Color.t as c -> Color.toString c
+          | #Url.t as u -> Url.toString u
+          | #Gradient.t as g -> Gradient.toString g
+          | `none -> {js|none|js}) )
 
 let backgroundSize x =
   Rule.declaration
@@ -1598,9 +1571,8 @@ let textShadow x =
 let textShadows x =
   Rule.declaration
     ( {js|textShadow|js},
-      x
-      |. Kloth.Array.map Shadow.toString
-      |. Kloth.Array.joinWith ~sep:{js|, |js} )
+      Kloth.Array.joinWithMap ~sep:{js|, |js} x ~f:Shadow.toString
+    )
 
 let transformStyle x =
   Rule.declaration
@@ -1633,9 +1605,7 @@ let transitionValue x =
 let transitionList x =
   Rule.declaration
     ( {js|transition|js},
-      x
-      |. Kloth.Array.map Transition.toString
-      |. Kloth.Array.joinWith ~sep:{js|, |js} )
+      Kloth.Array.joinWithMap ~sep:{js|, |js} ~f:Transition.toString x )
 
 let transitions = transitionList
 
@@ -1691,9 +1661,7 @@ let animation ?duration ?delay ?direction ?timingFunction ?fillMode ?playState
 let animations x =
   Rule.declaration
     ( {js|animation|js},
-      x
-      |. Kloth.Array.map Animation.toString
-      |. Kloth.Array.joinWith ~sep:{js|, |js} )
+      Kloth.Array.joinWithMap ~sep:{js|, |js} ~f:Animation.toString x )
 
 let animationName x = Rule.declaration ({js|animationName|js}, x)
 
@@ -1724,9 +1692,7 @@ module SVG = struct
         match x with
         | `none -> {js|none|js}
         | `dasharray a ->
-          a
-          |. Kloth.Array.map string_of_dasharray
-          |. Kloth.Array.joinWith ~sep:{js| |js} )
+          Kloth.Array.joinWithMap a ~f:string_of_dasharray ~sep:{js| |js} )
 
   let strokeWidth x = Rule.declaration ({js|strokeWidth|js}, Length.toString x)
 
@@ -1759,7 +1725,7 @@ module SVG = struct
 end
 
 let touchAction x =
-  Rule.declaration ({js|touchAction|js}, x |. TouchAction.toString)
+  Rule.declaration ({js|touchAction|js}, TouchAction.toString x)
 
 let textEmphasisColor x =
   Rule.declaration ({js|textEmphasisColor|js}, string_of_color x)

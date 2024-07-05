@@ -20,12 +20,12 @@ module Array = struct
   let reduce = Belt.Array.reduce
   let map = Belt.Array.map
 
-  let joinWith ~sep strings =
+  let joinWithMap ~sep strings ~f =
     let len = Array.length strings in
     let rec run i acc =
       if i >= len then acc
-      else if i = len - 1 then acc ^ strings.(i)
-      else run (i + 1) (acc ^ strings.(i) ^ sep)
+      else if i = len - 1 then acc ^ f strings.(i)
+      else run (i + 1) (acc ^ f strings.(i) ^ sep)
     in
     run 0 ""
 end

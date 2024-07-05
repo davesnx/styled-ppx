@@ -45,8 +45,7 @@ module Var = struct
 end
 
 let max_or_min_values fn values =
-  Std.Array.map values (fun v -> {js| |js} ^ fn v)
-  |> Std.Array.joinWith ~sep:{js|, |js}
+  Std.Array.joinWithMap ~sep:{js|, |js} ~f:(fun v -> {js| |js} ^ fn v) values
 
 let calc_min_max_num_to_string fn = function
   | `calc (`add (a, b)) -> {js|calc(|js} ^ fn a ^ {js| + |js} ^ fn b ^ {js|)|js}
@@ -2443,14 +2442,15 @@ module Gradient = struct
     | #Var.t as va -> Var.toString va
 
   let string_of_stops stops =
-    Std.Array.map stops (fun (c, l) ->
+    Std.Array.joinWithMap ~sep:{js|, |js}
+      ~f:(fun (c, l) ->
         match c, l with
         (* This is the consequence of having wrong spec, we can generate broken CSS for gradients, very unlickely that manually you construct a gradient with (None, None), but still. *)
         | None, None -> {| |}
         | None, Some l -> Length.toString l
         | Some c, None -> string_of_color c
         | Some c, Some l -> string_of_color c ^ {js| |js} ^ Length.toString l)
-    |> Std.Array.joinWith ~sep:{js|, |js}
+      stops
 
   let direction_to_string = function
     | #Angle.t as a -> Angle.toString a
