@@ -25,8 +25,7 @@ switch (input, help) {
 | (Some(_), true)
 | (None, _) => render_help()
 | (Some(css), _) =>
-  let okInput =
-    Styled_ppx_css_parser.Css_lexer.tokenize(css) |> Result.get_ok;
-  let debug = Styled_ppx_css_parser.Css_lexer.to_debug(okInput);
+  let okInput = Styled_ppx_css_parser.Lexer.tokenize(css) |> Result.get_ok;
+  let debug = Styled_ppx_css_parser.Lexer.to_debug(okInput);
   print_endline(debug);
 };

@@ -1,6 +1,3 @@
-module Parser = Css_parser;
-module Location = Ppxlib.Location;
-
 /** Signals a lexing error at the provided source location. */
 exception LexingError((Lexing.position, Lexing.position, string));
 

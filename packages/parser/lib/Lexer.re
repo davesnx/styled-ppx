@@ -2,7 +2,6 @@
   * Reference:
   * https://www.w3.org/TR/css-syntax-3/ */
 module Types = Ast;
-module Parser = Css_parser;
 module Location = Ppxlib.Location;
 
 let (let.ok) = Result.bind;
