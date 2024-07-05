@@ -1,5 +1,5 @@
 (library
- (name runtime)
+ (name styled_ppx_runtime_melange)
  (public_name styled-ppx.melange)
  (modes melange)
  (wrapped false)
