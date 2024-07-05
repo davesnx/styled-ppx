@@ -9,3 +9,6 @@
 (copy_files#
  (mode fallback)
  (files ../native/shared/**[!.pp].ml))
+
+(copy_files#
+ (files ../native/shared/Kloth.mli))

@@ -212,7 +212,7 @@ module Length = struct
   let pt x = `pt x
   let zero = `zero
 
-  let rec toString x =
+  let rec toString (x : t) : string =
     match x with
     | `ch x -> Kloth.Float.toString x ^ {js|ch|js}
     | `cqw x -> Kloth.Float.toString x ^ {js|cqw|js}
@@ -249,7 +249,7 @@ module Length = struct
 
   and string_of_calc_min_max calc =
     match calc with
-    | (`add _ | `sub _ | `mult _ | `min _ | `max _) as x ->
+    | (`add _ | `sub _ | `mult _) as x ->
       calc_min_max_to_string calc_value_to_string minmax_to_string x
     | #length as l -> toString l
 
@@ -2013,13 +2013,13 @@ module GridTemplateAreas = struct
 
   let areas x = `areas x
 
-  let toString x =
+  let toString (x : t) : string =
     match x with
     | `none -> {js|none|js}
-    | `areas items ->
-      String.trim
-        (Kloth.Array.reduce items {js||js} (fun carry item ->
-             carry ^ {js|'|js} ^ item ^ {js|' |js}))
+    | `areas (items : string array) ->
+      Kloth.Array.joinWithMap ~sep:{js| |js}
+        ~f:(fun item -> {js|'|js} ^ item ^ {js|'|js})
+        items
 end
 
 module GridArea = struct

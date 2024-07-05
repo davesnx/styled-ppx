@@ -11,7 +11,7 @@ external injectRawRules : Js.Json.t -> unit = "injectGlobal"
 let injectRules = injectRawRules
 
 let renderRules _ selector rules =
-  injectRawRules (Js.Dict.fromArray [| selector, rules |] |. Js.Json.object_)
+  injectRawRules (Js.Json.object_ (Js.Dict.fromArray [| selector, rules |]))
 
 external mergeStyles : styleEncoding array -> styleEncoding = "cx"
 [@@bs.module "@emotion/css"]
@@ -36,9 +36,11 @@ let merge3 s s2 s3 = merge [| s; s2; s3 |]
 let merge4 s s2 s3 s4 = merge [| s; s2; s3; s4 |]
 
 let framesToDict frames =
-  Kloth.Array.reduce frames (Js.Dict.empty ()) (fun dict (stop, rules) ->
+  Kloth.Array.reduce ~init:(Js.Dict.empty ())
+    ~f:(fun dict (stop, rules) ->
       Js.Dict.set dict (Kloth.Int.toString stop ^ {js|%|js}) (Rule.toJson rules);
       dict)
+    frames
 
 let keyframes frames = makeKeyframes (framesToDict frames)
 let renderKeyframes _renderer frames = makeAnimation (framesToDict frames)
@@ -48,9 +50,8 @@ let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
     =
   let open Css_types in
   let fontStyle =
-    match fontStyle with
-    | Some value -> {js|font-style: |js} ^ FontStyle.toString value ^ {js|;|js}
-    | _ -> ""
+    Kloth.Option.mapWithDefault fontStyle {js||js} (fun value ->
+        {js|font-style: |js} ^ FontStyle.toString value ^ {js|;|js})
   in
   let src = Kloth.Array.joinWithMap ~sep:{js|, |js} ~f:FontFace.toString src in
   let fontWeight =
@@ -74,7 +75,7 @@ let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
   let fontFace =
     {js|@font-face {|js}
     ^ ({js|font-family: |js} ^ fontFamily)
-    ^ ({js|; src: |js} ^ src ^ {js|;|js})
+    ^ ({js|; src: |js} ^ src)
     ^ fontStyle
     ^ fontWeight
     ^ fontDisplay

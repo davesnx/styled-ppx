@@ -1,30 +1,17 @@
 module Array = struct
-  external ( .!() ) : 'a array -> int -> 'a = "%array_unsafe_get"
-  external length : 'a array -> int = "%array_length"
-  external makeUninitializedUnsafe : int -> 'a array = "Array" [@@mel.new]
-  external ( .!()<- ) : 'a array -> int -> 'a -> unit = "%array_unsafe_set"
+  external reduceU :
+    'a array -> f:(('b -> 'a -> 'b)[@mel.uncurry]) -> init:'b -> 'b = "reduce"
+  [@@mel.send]
 
-  let reduceU a x f =
-    let r = ref x in
-    for i = 0 to length a - 1 do
-      r.contents <- (f r.contents a.!(i) [@u])
-    done;
-    r.contents
+  let reduce ~init ~f t = reduceU t ~init ~f:(fun a b -> f a b)
 
-  let reduce a x f = reduceU a x (fun [@u] a b -> f a b)
+  external mapU : 'a array -> f:(('a -> 'b)[@mel.uncurry]) -> 'b array = "map"
+  [@@mel.send]
 
-  let mapU a f =
-    let l = length a in
-    let r = makeUninitializedUnsafe l in
-    for i = 0 to l - 1 do
-      r.!(i) <- (f a.!(i) [@u])
-    done;
-    r
+  let map ~f t = mapU t ~f:(fun a -> f a)
 
-  let map f t = mapU t (fun [@u] a -> f a)
-
-  let joinWithMap ~sep strings ~f =
-    let len = Array.length strings in
+  let joinWithMap ~sep ~f strings =
+    let len = Stdlib.Array.length strings in
     let rec run i acc =
       if i >= len then acc
       else if i = len - 1 then acc ^ f strings.(i)
@@ -37,22 +24,24 @@ module String = struct
   external get : string -> int -> char = "%string_safe_get"
   external length : string -> int = "length" [@@mel.get]
 
-  external startsWith : prefix:string -> bool = "startsWith"
-  [@@mel.send.pipe: string]
+  external startsWith : string -> prefix:string -> bool = "startsWith"
+  [@@mel.send]
+
+  external trim : string -> string = "trim" [@@mel.send]
 end
 
 module Int = struct
-  external toStringWithRadix : ?radix:int -> string = "toString"
-  [@@mel.send.pipe: int]
+  external toStringWithRadix : int -> radix:int -> string = "toString"
+  [@@mel.send]
 
-  let toString v = toStringWithRadix v
+  let toString v = toStringWithRadix ~radix:10 v
 end
 
 module Float = struct
-  external toStringWithRadix : ?radix:int -> string = "toString"
-  [@@mel.send.pipe: float]
+  external toStringWithRadix : float -> radix:int -> string = "toString"
+  [@@mel.send]
 
-  let toString v = toStringWithRadix v
+  let toString v = toStringWithRadix ~radix:10 v
 end
 
 module Option = struct

@@ -6,7 +6,8 @@ let declaration (property, value) = Declaration (property, value)
 let selector selector rules = Selector (selector, rules)
 let media query rules = Selector ({|@media |} ^ query, rules)
 
-let rec ruleToDict dict rule =
+let rec ruleToDict (dict : Js.Json.t Js.Dict.t) (rule : t) : Js.Json.t Js.Dict.t
+    =
   let _ =
     match rule with
     | Declaration (name, value) -> Js.Dict.set dict name (Js.Json.string value)
@@ -14,5 +15,6 @@ let rec ruleToDict dict rule =
   in
   dict
 
-and toJson rules =
-  Kloth.Array.reduce rules (Js.Dict.empty ()) ruleToDict |. Js.Json.object_
+and toJson (rules : t array) : Js.Json.t =
+  Js.Json.object_
+    (Kloth.Array.reduce ~init:(Js.Dict.empty ()) ~f:ruleToDict rules)

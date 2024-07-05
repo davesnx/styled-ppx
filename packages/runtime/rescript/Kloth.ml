@@ -1,11 +1,14 @@
 module Array = struct
-  let reduceU = Belt.Array.reduceU
-  let reduceWithIndex = Belt.Array.reduceWithIndex
-  let reduceWithIndexU = Belt.Array.reduceWithIndexU
-  let reduce = Belt.Array.reduce
-  let map = Belt.Array.map
+  external array_reduce : 'b array -> ('a -> 'b -> 'a) -> 'a -> 'a = "reduce"
+  [@@mel.send]
 
-  let joinWithMap ~sep strings ~f =
+  let reduce ~init ~f t = array_reduce t f init
+
+  external array_map : 'a array -> ('a -> 'b) -> 'b array = "map" [@@mel.send]
+
+  let map ~f t = array_map t f
+
+  let joinWithMap ~sep ~f strings =
     let len = Array.length strings in
     let rec run i acc =
       if i >= len then acc
@@ -16,17 +19,27 @@ module Array = struct
 end
 
 module String = struct
-  let get = String.get
-  let length = Js.String.length
-  let startsWith ~prefix str = Js.String.startsWith prefix str
+  external get : string -> int -> char = "%string_safe_get"
+  external length : string -> int = "length" [@@bs.get]
+
+  external startsWith : prefix:string -> string -> bool = "startsWith"
+  [@@bs.send]
+
+  external trim : string -> string = "trim" [@@bs.send]
 end
 
 module Int = struct
-  let toString = Js.Int.toString
+  external toStringWithRadix : int -> radix:int -> string = "toString"
+  [@@bs.send]
+
+  let toString v = toStringWithRadix ~radix:10 v
 end
 
 module Float = struct
-  let toString = Js.Float.toString
+  external toStringWithRadix : float -> radix:int -> string = "toString"
+  [@@bs.send]
+
+  let toString v = toStringWithRadix ~radix:10 v
 end
 
 module Option = struct

@@ -1,12 +1,12 @@
 module Array = struct
-  let reduce a x f =
-    let r = ref x in
-    for i = 0 to Stdlib.Array.length a - 1 do
-      r := f !r (Stdlib.Array.unsafe_get a i)
+  let reduce ~init ~f t =
+    let r = ref init in
+    for i = 0 to Stdlib.Array.length t - 1 do
+      r := f !r (Stdlib.Array.unsafe_get t i)
     done;
     !r
 
-  let map f a = Stdlib.Array.map f a
+  let map ~f t = Stdlib.ArrayLabels.map ~f t
 
   let joinWithMap ~sep ~f strings =
     let len = Stdlib.Array.length strings in
@@ -19,7 +19,8 @@ module Array = struct
 end
 
 module String = struct
-  let get = String.get
+  let get = Stdlib.String.get
+  let trim = Stdlib.String.trim
   let length = Stdlib.String.length
 
   let startsWith ~prefix str =
