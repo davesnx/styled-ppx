@@ -273,32 +273,28 @@ let container_query_tests = [
     "(min-width: 150px)",
     [%expr [%cx "@container (min-width: 150px) {}"]],
     [%expr
-      CssJs.style([|CssJs.containerQuery({js|(min-width: 150px)|js}, [||])|])
+      CssJs.style([|CssJs.atContainer({js|(min-width: 150px)|js}, [||])|])
     ],
   ),
   (
     "(max-width: 1000px)",
     [%expr [%cx "@container (max-width: 1000px) {}"]],
     [%expr
-      CssJs.style([|
-        CssJs.containerQuery({js|(max-width: 1000px)|js}, [||]),
-      |])
+      CssJs.style([|CssJs.atContainer({js|(max-width: 1000px)|js}, [||])|])
     ],
   ),
   (
     "name (width >= 150px)",
     [%expr [%cx "@container name (width >= 150px) {}"]],
     [%expr
-      CssJs.style([|
-        CssJs.containerQuery({js|name (width >= 150px)|js}, [||]),
-      |])
+      CssJs.style([|CssJs.atContainer({js|name (width >= 150px)|js}, [||])|])
     ],
   ),
   (
     "(height >= 150px)",
     [%expr [%cx "@container (height >= 150px) {}"]],
     [%expr
-      CssJs.style([|CssJs.containerQuery({js|(height >= 150px)|js}, [||])|])
+      CssJs.style([|CssJs.atContainer({js|(height >= 150px)|js}, [||])|])
     ],
   ),
   (
@@ -306,7 +302,7 @@ let container_query_tests = [
     [%expr [%cx "@container (inline-size >= 150px) {}"]],
     [%expr
       CssJs.style([|
-        CssJs.containerQuery({js|(inline-size >= 150px)|js}, [||]),
+        CssJs.atContainer({js|(inline-size >= 150px)|js}, [||]),
       |])
     ],
   ),
@@ -314,18 +310,14 @@ let container_query_tests = [
     "(block-size >= 150px)",
     [%expr [%cx "@container (block-size >= 150px) {}"]],
     [%expr
-      CssJs.style([|
-        CssJs.containerQuery({js|(block-size >= 150px)|js}, [||]),
-      |])
+      CssJs.style([|CssJs.atContainer({js|(block-size >= 150px)|js}, [||])|])
     ],
   ),
   (
     "(aspect-ratio: 1 / 1)",
     [%expr [%cx "@container (aspect-ratio: 1 / 1) {}"]],
     [%expr
-      CssJs.style([|
-        CssJs.containerQuery({js|(aspect-ratio: 1 / 1)|js}, [||]),
-      |])
+      CssJs.style([|CssJs.atContainer({js|(aspect-ratio: 1 / 1)|js}, [||])|])
     ],
   ),
   (
@@ -333,7 +325,7 @@ let container_query_tests = [
     [%expr [%cx "@container (orientation: portrait) {}"]],
     [%expr
       CssJs.style([|
-        CssJs.containerQuery({js|(orientation: portrait)|js}, [||]),
+        CssJs.atContainer({js|(orientation: portrait)|js}, [||]),
       |])
     ],
   ),
@@ -342,7 +334,7 @@ let container_query_tests = [
     [%expr [%cx "@container (width >= 150px) and (orientation: portrait) {}"]],
     [%expr
       CssJs.style([|
-        CssJs.containerQuery(
+        CssJs.atContainer(
           {js|(width >= 150px) and (orientation: portrait)|js},
           [||],
         ),
@@ -354,7 +346,7 @@ let container_query_tests = [
     [%expr [%cx "@container name not (width < 150px) {}"]],
     [%expr
       CssJs.style([|
-        CssJs.containerQuery({js|name not (width < 150px)|js}, [||]),
+        CssJs.atContainer({js|name not (width < 150px)|js}, [||]),
       |])
     ],
   ),
@@ -363,7 +355,7 @@ let container_query_tests = [
     [%expr [%cx "@container (width >= 150px) or (orientation: portrait) {}"]],
     [%expr
       CssJs.style([|
-        CssJs.containerQuery(
+        CssJs.atContainer(
           {js|(width >= 150px) or (orientation: portrait)|js},
           [||],
         ),

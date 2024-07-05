@@ -10,7 +10,7 @@ module CssJs = {
     {txt: Ldot(Lident("CssJs"), name), loc} |> Builder.pexp_ident(~loc);
   let selector = (~loc) => ident(~loc, "selector");
   let media = (~loc) => ident(~loc, "media");
-  let containerQuery = (~loc) => ident(~loc, "containerQuery");
+  let atContainer = (~loc) => ident(~loc, "atContainer");
   let global = (~loc) => ident(~loc, "global");
   let label = (~loc) => ident(~loc, "label");
   let style = (~loc) => ident(~loc, "style");
@@ -193,7 +193,7 @@ and render_container_query = (~loc, at_rule: at_rule) => {
 
     Helper.Exp.apply(
       ~loc=at_rule.loc,
-      CssJs.containerQuery(~loc=at_rule.loc),
+      CssJs.atContainer(~loc=at_rule.loc),
       [(Nolabel, query), (Nolabel, rules)],
     );
   };
