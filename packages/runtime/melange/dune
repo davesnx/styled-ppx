@@ -8,5 +8,4 @@
   (pps melange.ppx -alert -deprecated)))
 
 (copy_files#
- (mode fallback)
  (files ../native/shared/**[!.pp].ml))
