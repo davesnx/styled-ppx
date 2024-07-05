@@ -6,9 +6,9 @@ module Array = struct
     done;
     !r
 
-  let map = Stdlib.Array.map
+  let map f a = Stdlib.Array.map f a
 
-  let joinWithMap ~sep strings ~f =
+  let joinWithMap ~sep ~f strings =
     let len = Stdlib.Array.length strings in
     let rec run i acc =
       if i >= len then acc

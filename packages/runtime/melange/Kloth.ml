@@ -21,7 +21,7 @@ module Array = struct
     done;
     r
 
-  let map a f = mapU a (fun [@u] a -> f a)
+  let map f t = mapU t (fun [@u] a -> f a)
 
   let joinWithMap ~sep strings ~f =
     let len = Array.length strings in

@@ -52,11 +52,7 @@ let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
     | Some value -> {js|font-style: |js} ^ FontStyle.toString value ^ {js|;|js}
     | _ -> ""
   in
-  let src =
-    src
-    |. Kloth.Array.map FontFace.toString
-    |. Kloth.Array.joinWith ~sep:{js|, |js}
-  in
+  let src = Kloth.Array.joinWithMap ~sep:{js|, |js} ~f:FontFace.toString src in
   let fontWeight =
     Kloth.Option.mapWithDefault fontWeight {js||js} (fun w ->
         ({js|font-weight: |js}
