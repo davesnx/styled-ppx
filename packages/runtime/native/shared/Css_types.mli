@@ -1,7 +1,3 @@
-module Std = Kloth
-
-type animationName = string
-
 module Cascading : sig
   type t =
     [ `inherit_
@@ -562,6 +558,10 @@ module Transform : sig
   val string_of_scale : float -> float -> string
   val string_of_translate3d : Length.t -> Length.t -> Length.t -> string
   val toString : t -> string
+end
+
+module AnimationName : sig
+  type t
 end
 
 module AnimationDirection : sig

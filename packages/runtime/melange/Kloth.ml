@@ -1,17 +1,5 @@
 module List = struct
   let map = Belt.List.map
-  let reduceU = Belt.List.reduceU
-  let reduce = Belt.List.reduce
-  let toArray = Array.of_list
-
-  let joinWith ~sep strings =
-    let rec run strings acc =
-      match strings with
-      | [] -> acc
-      | x :: [] -> acc ^ x
-      | x :: xs -> run xs ((acc ^ x) ^ sep)
-    in
-    run strings {js||js}
 end
 
 module Array = struct
@@ -21,12 +9,12 @@ module Array = struct
   let reduce = Belt.Array.reduce
   let map = Belt.Array.map
 
-  let joinWith ~sep strings =
+  let joinWithMap ~sep strings ~f =
     let len = Array.length strings in
     let rec run i acc =
       if i >= len then acc
-      else if i = len - 1 then acc ^ strings.(i)
-      else run (i + 1) (acc ^ strings.(i) ^ sep)
+      else if i = len - 1 then acc ^ f strings.(i)
+      else run (i + 1) (acc ^ f strings.(i) ^ sep)
     in
     run 0 ""
 end

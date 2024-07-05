@@ -58,7 +58,7 @@ let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
     |. Kloth.Array.joinWith ~sep:{js|, |js}
   in
   let fontWeight =
-    Belt.Option.mapWithDefault fontWeight {js||js} (fun w ->
+    Kloth.Option.mapWithDefault fontWeight {js||js} (fun w ->
         ({js|font-weight: |js}
         ^
         match w with
@@ -68,11 +68,11 @@ let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
         ^ {js|;|js})
   in
   let fontDisplay =
-    Belt.Option.mapWithDefault fontDisplay {js||js} (fun f ->
+    Kloth.Option.mapWithDefault fontDisplay {js||js} (fun f ->
         {js|font-display: |js} ^ FontDisplay.toString f ^ {js|;|js})
   in
   let sizeAdjust =
-    Belt.Option.mapWithDefault sizeAdjust {js||js} (fun s ->
+    Kloth.Option.mapWithDefault sizeAdjust {js||js} (fun s ->
         {js|size-adjust: |js} ^ Percentage.toString s ^ {js|;|js})
   in
   let fontFace =

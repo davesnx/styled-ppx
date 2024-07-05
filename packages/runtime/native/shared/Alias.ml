@@ -1,5 +1,6 @@
 open Css_types
 
+type animationName = AnimationName.t
 type angle = Angle.t
 type animationDirection = AnimationDirection.t
 type animationFillMode = AnimationFillMode.t

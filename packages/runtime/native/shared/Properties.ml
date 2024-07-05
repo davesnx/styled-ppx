@@ -1571,8 +1571,7 @@ let textShadow x =
 let textShadows x =
   Rule.declaration
     ( {js|textShadow|js},
-      Kloth.Array.joinWithMap ~sep:{js|, |js} x ~f:Shadow.toString
-    )
+      Kloth.Array.joinWithMap ~sep:{js|, |js} x ~f:Shadow.toString )
 
 let transformStyle x =
   Rule.declaration
