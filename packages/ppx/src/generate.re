@@ -1012,8 +1012,7 @@ let staticComponent = (~loc, ~htmlTag, styles) => {
   );
 };
 
-let generateDynamicStyles =
-    (~loc, ~moduleName, ~functionExpr, ~labeledArguments) => {
+let dynamicStyles = (~loc, ~moduleName, ~functionExpr, ~labeledArguments) => {
   let styles =
     switch (functionExpr.pexp_desc) {
     /* styled.div () => "string" */
@@ -1084,7 +1083,7 @@ let generateDynamicStyles =
   );
 };
 
-let generateStylesCall = (~loc, ~labeledArguments) => {
+let stylesCall = (~loc, ~labeledArguments) => {
   /* native: (~arg1, ~arg2, ...) */
   /* client: (~arg1=props.arg1, ~arg2=props.arg2, ...) */
   let styledArguments =
@@ -1116,16 +1115,11 @@ let dynamicComponentCodegenSteps =
   if (Settings.Get.native()) {
     [
       defineGetOrEmptyFn(~loc),
-      generateDynamicStyles(
-        ~loc,
-        ~moduleName,
-        ~functionExpr,
-        ~labeledArguments,
-      ),
+      dynamicStyles(~loc, ~moduleName, ~functionExpr, ~labeledArguments),
       component(
         ~loc,
         ~htmlTag,
-        ~className=generateStylesCall(~loc, ~labeledArguments),
+        ~className=stylesCall(~loc, ~labeledArguments),
         ~makePropTypes=[],
         ~labeledArguments,
       ),
@@ -1169,16 +1163,11 @@ let dynamicComponentCodegenSteps =
       defineDeletePropFn(~loc),
       defineGetOrEmptyFn(~loc),
       defineAssign2(~loc),
-      generateDynamicStyles(
-        ~loc,
-        ~moduleName,
-        ~functionExpr,
-        ~labeledArguments,
-      ),
+      dynamicStyles(~loc, ~moduleName, ~functionExpr, ~labeledArguments),
       component(
         ~loc,
         ~htmlTag,
-        ~className=generateStylesCall(~loc, ~labeledArguments),
+        ~className=stylesCall(~loc, ~labeledArguments),
         ~makePropTypes=propsGenericParams,
         ~labeledArguments,
       ),
