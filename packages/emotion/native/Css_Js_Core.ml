@@ -4,8 +4,9 @@ module Std = Kloth
 type rule =
   | D of string * string
   | S of string * rule array
-  | PseudoClass of string * rule array
-  | PseudoClassParam of string * string * rule array
+
+let selector selector rules = S (selector, rules)
+let media query rules = S ({|@media |} ^ query, rules)
 
 type animationName = string
 
@@ -13,83 +14,79 @@ let join strings separator =
   Std.Array.reduceWithIndexU strings {js||js} (fun [@u] acc item index ->
       if index = 0 then item else acc ^ separator ^ item)
 
-module Converter = struct
-  let string_of_content x =
-    match x with
-    | #Content.t as c -> Content.toString c
-    | #Counter.t as c -> Counter.toString c
-    | #Counters.t as c -> Counters.toString c
-    | #Gradient.t as g -> Gradient.toString g
-    | #Url.t as u -> Url.toString u
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+let string_of_content x =
+  match x with
+  | #Content.t as c -> Content.toString c
+  | #Counter.t as c -> Counter.toString c
+  | #Counters.t as c -> Counters.toString c
+  | #Gradient.t as g -> Gradient.toString g
+  | #Url.t as u -> Url.toString u
+  | #Var.t as va -> Var.toString va
+  | #Cascading.t as c -> Cascading.toString c
 
-  let string_of_counter_increment x =
-    match x with
-    | #CounterIncrement.t as o -> CounterIncrement.toString o
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+let string_of_counter_increment x =
+  match x with
+  | #CounterIncrement.t as o -> CounterIncrement.toString o
+  | #Var.t as va -> Var.toString va
+  | #Cascading.t as c -> Cascading.toString c
 
-  let string_of_counter_reset x =
-    match x with
-    | #CounterReset.t as o -> CounterReset.toString o
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+let string_of_counter_reset x =
+  match x with
+  | #CounterReset.t as o -> CounterReset.toString o
+  | #Var.t as va -> Var.toString va
+  | #Cascading.t as c -> Cascading.toString c
 
-  let string_of_counter_set x =
-    match x with
-    | #CounterSet.t as o -> CounterSet.toString o
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+let string_of_counter_set x =
+  match x with
+  | #CounterSet.t as o -> CounterSet.toString o
+  | #Var.t as va -> Var.toString va
+  | #Cascading.t as c -> Cascading.toString c
 
-  let string_of_column_gap x =
-    match x with
-    | #ColumnGap.t as gcg -> ColumnGap.toString gcg
-    | #Percentage.t as p -> Percentage.toString p
-    | #Length.t as l -> Length.toString l
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+let string_of_column_gap x =
+  match x with
+  | #ColumnGap.t as gcg -> ColumnGap.toString gcg
+  | #Percentage.t as p -> Percentage.toString p
+  | #Length.t as l -> Length.toString l
+  | #Var.t as va -> Var.toString va
+  | #Cascading.t as c -> Cascading.toString c
 
-  let string_of_row_gap x =
-    match x with
-    | #RowGap.t as rg -> RowGap.toString rg
-    | #Percentage.t as p -> Percentage.toString p
-    | #Length.t as l -> Length.toString l
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+let string_of_row_gap x =
+  match x with
+  | #RowGap.t as rg -> RowGap.toString rg
+  | #Percentage.t as p -> Percentage.toString p
+  | #Length.t as l -> Length.toString l
+  | #Var.t as va -> Var.toString va
+  | #Cascading.t as c -> Cascading.toString c
 
-  let string_of_gap x =
-    match x with
-    | #Gap.t as rg -> Gap.toString rg
-    | #Percentage.t as p -> Percentage.toString p
-    | #Length.t as l -> Length.toString l
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+let string_of_gap x =
+  match x with
+  | #Gap.t as rg -> Gap.toString rg
+  | #Percentage.t as p -> Percentage.toString p
+  | #Length.t as l -> Length.toString l
+  | #Var.t as va -> Var.toString va
+  | #Cascading.t as c -> Cascading.toString c
 
-  let string_of_position x =
-    match x with
-    | `auto -> {js|auto|js}
-    | #Length.t as l -> Length.toString l
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+let string_of_position x =
+  match x with
+  | `auto -> {js|auto|js}
+  | #Length.t as l -> Length.toString l
+  | #Var.t as va -> Var.toString va
+  | #Cascading.t as c -> Cascading.toString c
 
-  let string_of_color x =
-    match x with
-    | #Color.t as co -> Color.toString co
-    | #Var.t as va -> Var.toString va
+let string_of_color x =
+  match x with
+  | #Color.t as co -> Color.toString co
+  | #Var.t as va -> Var.toString va
 
-  let string_of_dasharray x =
-    match x with
-    | #Percentage.t as p -> Percentage.toString p
-    | #Length.t as l -> Length.toString l
-end
-
-include Converter
+let string_of_dasharray x =
+  match x with
+  | #Percentage.t as p -> Percentage.toString p
+  | #Length.t as l -> Length.toString l
 
 let important v =
   match v with
   | D (name, value) -> D (name, value ^ {js| !important|js})
-  | S (_, _) | PseudoClass (_, _) | PseudoClassParam (_, _, _) -> v
+  | S (_, _) -> v
 
 let label label = D ({js|label|js}, label)
 
@@ -1248,349 +1245,15 @@ let wordSpacing x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let wordWrap = overflowWrap
+let wordWrap x =
+  D
+    ( {js|word-wrap|js},
+      match x with
+      | #OverflowWrap.t as ow -> OverflowWrap.toString ow
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c )
+
 let zIndex x = D ({js|z-index|js}, ZIndex.toString x)
-let media = fun [@u] query rules -> S ({js|@media |js} ^ query, rules)
-let selector = fun [@u] selector rules -> S (selector, rules)
-let pseudoClass selector rules = PseudoClass (selector, rules)
-let active rules = pseudoClass {js|active|js} rules
-let checked rules = pseudoClass {js|checked|js} rules
-let default rules = pseudoClass {js|default|js} rules
-let defined rules = pseudoClass {js|defined|js} rules
-let disabled rules = pseudoClass {js|disabled|js} rules
-let empty rules = pseudoClass {js|empty|js} rules
-let enabled rules = pseudoClass {js|enabled|js} rules
-let first rules = pseudoClass {js|first|js} rules
-let firstChild rules = pseudoClass {js|first-child|js} rules
-let firstOfType rules = pseudoClass {js|first-of-type|js} rules
-let focus rules = pseudoClass {js|focus|js} rules
-let focusVisible rules = pseudoClass {js|focus-visible|js} rules
-let focusWithin rules = pseudoClass {js|focus-within|js} rules
-
-let host ?selector rules =
-  match selector with
-  | None -> PseudoClass ({js|host|js}, rules)
-  | Some s -> PseudoClassParam ({js|host|js}, s, rules)
-
-let hover rules = pseudoClass {js|hover|js} rules
-let indeterminate rules = pseudoClass {js|indeterminate|js} rules
-let inRange rules = pseudoClass {js|in-range|js} rules
-let invalid rules = pseudoClass {js|invalid|js} rules
-let lang code rules = PseudoClassParam ({js|lang|js}, code, rules)
-let lastChild rules = pseudoClass {js|last-child|js} rules
-let lastOfType rules = pseudoClass {js|last-of-type|js} rules
-let link rules = pseudoClass {js|link|js} rules
-let not_ selector rules = PseudoClassParam ({js|not|js}, selector, rules)
-
-module Nth = struct
-  type t =
-    [ `odd
-    | `even
-    | `n of int
-    | `add of int * int
-    ]
-
-  let toString x =
-    match x with
-    | `odd -> {js|odd|js}
-    | `even -> {js|even|js}
-    | `n x -> Std.Int.toString x ^ {js|n|js}
-    | `add (x, y) -> Std.Int.toString x ^ {js|n+|js} ^ Std.Int.toString y
-end
-
-let nthChild x rules =
-  PseudoClassParam ({js|nth-child|js}, Nth.toString x, rules)
-
-let nthLastChild x rules =
-  PseudoClassParam ({js|nth-last-child|js}, Nth.toString x, rules)
-
-let nthLastOfType x rules =
-  PseudoClassParam ({js|nth-last-of-type|js}, Nth.toString x, rules)
-
-let nthOfType x rules =
-  PseudoClassParam ({js|nth-of-type|js}, Nth.toString x, rules)
-
-let onlyChild rules = pseudoClass {js|only-child|js} rules
-let onlyOfType rules = pseudoClass {js|only-of-type|js} rules
-let optional rules = pseudoClass {js|optional|js} rules
-let outOfRange rules = pseudoClass {js|out-of-range|js} rules
-let readOnly rules = pseudoClass {js|read-only|js} rules
-let readWrite rules = pseudoClass {js|read-write|js} rules
-let required rules = pseudoClass {js|required|js} rules
-let root rules = pseudoClass {js|root|js} rules
-let scope rules = pseudoClass {js|scope|js} rules
-let target rules = pseudoClass {js|target|js} rules
-let valid rules = pseudoClass {js|valid|js} rules
-let visited rules = pseudoClass {js|visited|js} rules
-let after rules = (selector {js|::after|js} rules [@u])
-let before rules = (selector {js|::before|js} rules [@u])
-let firstLetter rules = (selector {js|::first-letter|js} rules [@u])
-let firstLine rules = (selector {js|::first-line|js} rules [@u])
-let selection rules = (selector {js|::selection|js} rules [@u])
-let child x rules = (selector ({js|> |js} ^ x) rules [@u])
-let children rules = (selector {js|> *|js} rules [@u])
-let directSibling rules = (selector {js|+ |js} rules [@u])
-let placeholder rules = (selector {js|::placeholder|js} rules [@u])
-let siblings rules = (selector {js|~ |js} rules [@u])
-let anyLink rules = (selector {js|:any-link|js} rules [@u])
-
-type angle = Angle.t
-type animationDirection = AnimationDirection.t
-type animationFillMode = AnimationFillMode.t
-type animationIterationCount = AnimationIterationCount.t
-type animationPlayState = AnimationPlayState.t
-type cascading = Cascading.t
-type color = Color.t
-type fontStyle = FontStyle.t
-type fontWeight = FontWeight.t
-type length = Length.t
-type listStyleType = ListStyleType.t
-type repeatValue = RepeatValue.t
-type outlineStyle = OutlineStyle.t
-type transform = Transform.t
-type gradient = Gradient.t
-
-let initial = Cascading.initial
-let inherit_ = Cascading.inherit_
-let unset = Cascading.unset
-let var = Var.var
-let varDefault = Var.varDefault
-let auto = `auto
-let none = `none
-let text = `text
-let pct = Percentage.pct
-let ch = Length.ch
-let cm = Length.cm
-let em = Length.em
-let ex = Length.ex
-let mm = Length.mm
-let pt = Length.pt
-let px = Length.px
-let pxFloat = Length.pxFloat
-let rem = Length.rem
-let vh = Length.vh
-let vmin = Length.vmin
-let vmax = Length.vmax
-let zero = Length.zero
-let deg = Angle.deg
-let rad = Angle.rad
-let grad = Angle.grad
-let turn = Angle.turn
-let ltr = Direction.ltr
-let rtl = Direction.rtl
-let absolute = PropertyPosition.absolute
-let relative = PropertyPosition.relative
-let static = PropertyPosition.static
-let fixed = PropertyPosition.fixed
-let sticky = PropertyPosition.sticky
-let isolate = `isolate
-let horizontal = Resize.horizontal
-let vertical = Resize.vertical
-let smallCaps = FontVariant.smallCaps
-let italic = FontStyle.italic
-let oblique = FontStyle.oblique
-let hidden = `hidden
-let visible = `visible
-let scroll = `scroll
-let rgb = Color.rgb
-let rgba = Color.rgba
-let hsl = Color.hsl
-let hsla = Color.hsla
-let hex = Color.hex
-let currentColor = Color.currentColor
-let transparent = Color.transparent
-let linear = TimingFunction.linear
-let ease = TimingFunction.ease
-let easeIn = TimingFunction.easeIn
-let easeInOut = TimingFunction.easeInOut
-let easeOut = TimingFunction.easeOut
-let stepStart = TimingFunction.stepStart
-let stepEnd = TimingFunction.stepEnd
-let steps = TimingFunction.steps
-let cubicBezier = TimingFunction.cubicBezier
-let marginBox = GeometryBox.marginBox
-let fillBox = GeometryBox.fillBox
-let strokeBox = GeometryBox.strokeBox
-let viewBox = GeometryBox.viewBox
-let translate = Transform.translate
-let translate3d = Transform.translate3d
-let translateX = Transform.translateX
-let translateY = Transform.translateY
-let translateZ = Transform.translateZ
-let scaleX = Transform.scaleX
-let scaleY = Transform.scaleY
-let scaleZ = Transform.scaleZ
-let rotateX = Transform.rotateX
-let rotateY = Transform.rotateY
-let rotateZ = Transform.rotateZ
-let scale = Transform.scale
-let scale3d = Transform.scale3d
-let skew = Transform.skew
-let skewX = Transform.skewX
-let skewY = Transform.skewY
-let thin = FontWeight.thin
-let extraLight = FontWeight.extraLight
-let light = FontWeight.light
-let medium = FontWeight.medium
-let semiBold = FontWeight.semiBold
-let bold = FontWeight.bold
-let extraBold = FontWeight.extraBold
-let lighter = FontWeight.lighter
-let bolder = FontWeight.bolder
-let linearGradient = Gradient.linearGradient
-let repeatingLinearGradient = Gradient.repeatingLinearGradient
-let radialGradient = Gradient.radialGradient
-let repeatingRadialGradient = Gradient.repeatingRadialGradient
-let conicGradient = Gradient.conicGradient
-let areas = GridTemplateAreas.areas
-let ident = GridArea.ident
-let numIdent = GridArea.numIdent
-let contextMenu = Cursor.contextMenu
-let help = Cursor.help
-let pointer = Cursor.pointer
-let progress = Cursor.progress
-let wait = Cursor.wait
-let cell = Cursor.cell
-let crosshair = Cursor.crosshair
-let verticalText = Cursor.verticalText
-let alias = Cursor.alias
-let copy = Cursor.copy
-let move = Cursor.move
-let noDrop = Cursor.noDrop
-let notAllowed = Cursor.notAllowed
-let grab = Cursor.grab
-let grabbing = Cursor.grabbing
-let allScroll = Cursor.allScroll
-let colResize = Cursor.colResize
-let rowResize = Cursor.rowResize
-let nResize = Cursor.nResize
-let eResize = Cursor.eResize
-let sResize = Cursor.sResize
-let wResize = Cursor.wResize
-let neResize = Cursor.neResize
-let nwResize = Cursor.nwResize
-let seResize = Cursor.seResize
-let swResize = Cursor.swResize
-let ewResize = Cursor.ewResize
-let nsResize = Cursor.nsResize
-let neswResize = Cursor.neswResize
-let nwseResize = Cursor.nwseResize
-let zoomIn = Cursor.zoomIn
-let zoomOut = Cursor.zoomOut
-let vw x = `vw x
-let fr x = `fr x
-
-module Calc = struct
-  let ( - ) a b = `calc (`sub (a, b))
-  let ( + ) a b = `calc (`add (a, b))
-  let ( * ) a b = `calc (`mult (a, b))
-end
-
-let size x y = `size (x, y)
-let all = `all
-let backwards = `backwards
-let baseline = `baseline
-let block = `block
-let borderBox = `borderBox
-let both = `both
-let center = `center
-let column = `column
-let columnReverse = `columnReverse
-let contain = `contain
-let contentBox = `contentBox
-let count x = `count x
-let cover = `cover
-let dashed = `dashed
-let dotted = `dotted
-let flexBox = `flex
-let grid = `grid
-let inlineGrid = `inlineGrid
-let flexEnd = `flexEnd
-let flexStart = `flexStart
-let forwards = `forwards
-let infinite = `infinite
-let inline = `inline
-let contents = `contents
-let inlineBlock = `inlineBlock
-let inlineFlex = `inlineFlex
-let inlineTable = `inlineTable
-let listItem = `listItem
-let runIn = `runIn
-let table = `table
-let tableCaption = `tableCaption
-let tableColumnGroup = `tableColumnGroup
-let tableHeaderGroup = `tableHeaderGroup
-let tableFooterGroup = `tableFooterGroup
-let tableRowGroup = `tableRowGroup
-let tableCell = `tableCell
-let tableColumn = `tableColumn
-let tableRow = `tableRow
-let local = `local
-let localUrl x = `localUrl x
-let noRepeat = `noRepeat
-let space = `space
-let nowrap = `nowrap
-let paddingBox = `paddingBox
-let paused = `paused
-let repeat = `repeat
-let minmax = `minmax
-let repeatX = `repeatX
-let repeatY = `repeatY
-let rotate a = `rotate a
-let rotate3d x y z a = `rotate3d (x, y, z, a)
-let row = `row
-let rowReverse = `rowReverse
-let running = `running
-let solid = `solid
-let spaceAround = `spaceAround
-let spaceBetween = `spaceBetween
-let spaceEvenly = `spaceEvenly
-let stretch = `stretch
-let url x = `url x
-let wrap = `wrap
-let wrapReverse = `wrapReverse
-let inside = `inside
-let outside = `outside
-let underline = `underline
-let overline = `overline
-let lineThrough = `lineThrough
-let clip = `clip
-let ellipsis = `ellipsis
-let wavy = `wavy
-let double = `double
-let uppercase = `uppercase
-let lowercase = `lowercase
-let capitalize = `capitalize
-let sub = `sub
-let super = `super
-let textTop = `textTop
-let textBottom = `textBottom
-let middle = `middle
-let normal = `normal
-let breakAll = `breakAll
-let keepAll = `keepAll
-let breakWord = `breakWord
-let reverse = `reverse
-let alternate = `alternate
-let alternateReverse = `alternateReverse
-let fill = `fill
-let content = `content
-let maxContent = `maxContent
-let minContent = `minContent
-let fitContent = `fitContent
-let round = `round
-let miter = `miter
-let bevel = `bevel
-let butt = `butt
-let square = `square
-let panX = `panX
-let panY = `panY
-let panLeft = `panLeft
-let panRight = `panRight
-let panUp = `panUp
-let panDown = `panDown
-let pinchZoom = `pinchZoom
-let manipulation = `manipulation
 
 let flex3 ~grow ~shrink ~basis =
   D
@@ -1748,7 +1411,7 @@ type filter =
   | `contrast of [ `percent of float | `num of float ]
   | `dropShadow of Length.t * Length.t * Length.t * [ Color.t | Var.t ]
   | `grayscale of float
-  | `hueRotate of angle
+  | `hueRotate of Angle.t
   | `invert of float
   | `opacity of float
   | `saturate of float
@@ -1808,7 +1471,7 @@ module Shadow = struct
     | `none
     ]
 
-  let box ?(x = zero) ?(y = zero) ?(blur = zero) ?(spread = zero)
+  let box ?(x = `zero) ?(y = `zero) ?(blur = `zero) ?(spread = `zero)
     ?(inset = false) color =
     `shadow
       (Length.toString x
@@ -1822,7 +1485,7 @@ module Shadow = struct
       ^ string_of_color color
       ^ if inset then {js|inset|js} else {js||js})
 
-  let text ?(x = zero) ?(y = zero) ?(blur = zero) color =
+  let text ?(x = `zero) ?(y = `zero) ?(blur = `zero) color =
     `shadow
       (Length.toString x
       ^ {js| |js}
@@ -2273,3 +1936,263 @@ let fontVariantEmoji x =
       | #FontVariantEmoji.t as fve -> FontVariantEmoji.toString fve
       | #Var.t as var -> Var.toString var
       | #Cascading.t as c -> Cascading.toString c )
+
+(* Aliases *)
+
+type angle = Angle.t
+type animationDirection = AnimationDirection.t
+type animationFillMode = AnimationFillMode.t
+type animationIterationCount = AnimationIterationCount.t
+type animationPlayState = AnimationPlayState.t
+type cascading = Cascading.t
+type color = Color.t
+type fontStyle = FontStyle.t
+type fontWeight = FontWeight.t
+type length = Length.t
+type listStyleType = ListStyleType.t
+type repeatValue = RepeatValue.t
+type outlineStyle = OutlineStyle.t
+type transform = Transform.t
+type gradient = Gradient.t
+
+let initial = Cascading.initial
+let inherit_ = Cascading.inherit_
+let unset = Cascading.unset
+let var = Var.var
+let varDefault = Var.varDefault
+let auto = `auto
+let none = `none
+let text = `text
+let pct = Percentage.pct
+let ch = Length.ch
+let cm = Length.cm
+let em = Length.em
+let ex = Length.ex
+let mm = Length.mm
+let pt = Length.pt
+let px = Length.px
+let pxFloat = Length.pxFloat
+let rem = Length.rem
+let vh = Length.vh
+let vmin = Length.vmin
+let vmax = Length.vmax
+let zero = Length.zero
+let deg = Angle.deg
+let rad = Angle.rad
+let grad = Angle.grad
+let turn = Angle.turn
+let ltr = Direction.ltr
+let rtl = Direction.rtl
+let absolute = PropertyPosition.absolute
+let relative = PropertyPosition.relative
+let static = PropertyPosition.static
+let fixed = PropertyPosition.fixed
+let sticky = PropertyPosition.sticky
+let isolate = `isolate
+let horizontal = Resize.horizontal
+let vertical = Resize.vertical
+let smallCaps = FontVariant.smallCaps
+let italic = FontStyle.italic
+let oblique = FontStyle.oblique
+let hidden = `hidden
+let visible = `visible
+let scroll = `scroll
+let rgb = Color.rgb
+let rgba = Color.rgba
+let hsl = Color.hsl
+let hsla = Color.hsla
+let hex = Color.hex
+let currentColor = Color.currentColor
+let transparent = Color.transparent
+let linear = TimingFunction.linear
+let ease = TimingFunction.ease
+let easeIn = TimingFunction.easeIn
+let easeInOut = TimingFunction.easeInOut
+let easeOut = TimingFunction.easeOut
+let stepStart = TimingFunction.stepStart
+let stepEnd = TimingFunction.stepEnd
+let steps = TimingFunction.steps
+let cubicBezier = TimingFunction.cubicBezier
+let marginBox = GeometryBox.marginBox
+let fillBox = GeometryBox.fillBox
+let strokeBox = GeometryBox.strokeBox
+let viewBox = GeometryBox.viewBox
+let translate = Transform.translate
+let translate3d = Transform.translate3d
+let translateX = Transform.translateX
+let translateY = Transform.translateY
+let translateZ = Transform.translateZ
+let scaleX = Transform.scaleX
+let scaleY = Transform.scaleY
+let scaleZ = Transform.scaleZ
+let rotateX = Transform.rotateX
+let rotateY = Transform.rotateY
+let rotateZ = Transform.rotateZ
+let scale = Transform.scale
+let scale3d = Transform.scale3d
+let skew = Transform.skew
+let skewX = Transform.skewX
+let skewY = Transform.skewY
+let thin = FontWeight.thin
+let extraLight = FontWeight.extraLight
+let light = FontWeight.light
+let medium = FontWeight.medium
+let semiBold = FontWeight.semiBold
+let bold = FontWeight.bold
+let extraBold = FontWeight.extraBold
+let lighter = FontWeight.lighter
+let bolder = FontWeight.bolder
+let linearGradient = Gradient.linearGradient
+let repeatingLinearGradient = Gradient.repeatingLinearGradient
+let radialGradient = Gradient.radialGradient
+let repeatingRadialGradient = Gradient.repeatingRadialGradient
+let conicGradient = Gradient.conicGradient
+let areas = GridTemplateAreas.areas
+let ident = GridArea.ident
+let numIdent = GridArea.numIdent
+let contextMenu = Cursor.contextMenu
+let help = Cursor.help
+let pointer = Cursor.pointer
+let progress = Cursor.progress
+let wait = Cursor.wait
+let cell = Cursor.cell
+let crosshair = Cursor.crosshair
+let verticalText = Cursor.verticalText
+let alias = Cursor.alias
+let copy = Cursor.copy
+let move = Cursor.move
+let noDrop = Cursor.noDrop
+let notAllowed = Cursor.notAllowed
+let grab = Cursor.grab
+let grabbing = Cursor.grabbing
+let allScroll = Cursor.allScroll
+let colResize = Cursor.colResize
+let rowResize = Cursor.rowResize
+let nResize = Cursor.nResize
+let eResize = Cursor.eResize
+let sResize = Cursor.sResize
+let wResize = Cursor.wResize
+let neResize = Cursor.neResize
+let nwResize = Cursor.nwResize
+let seResize = Cursor.seResize
+let swResize = Cursor.swResize
+let ewResize = Cursor.ewResize
+let nsResize = Cursor.nsResize
+let neswResize = Cursor.neswResize
+let nwseResize = Cursor.nwseResize
+let zoomIn = Cursor.zoomIn
+let zoomOut = Cursor.zoomOut
+let vw x = `vw x
+let fr x = `fr x
+
+module Calc = struct
+  let ( - ) a b = `calc (`sub (a, b))
+  let ( + ) a b = `calc (`add (a, b))
+  let ( * ) a b = `calc (`mult (a, b))
+end
+
+let size x y = `size (x, y)
+let all = `all
+let backwards = `backwards
+let baseline = `baseline
+let block = `block
+let borderBox = `borderBox
+let both = `both
+let center = `center
+let column = `column
+let columnReverse = `columnReverse
+let contain = `contain
+let contentBox = `contentBox
+let count x = `count x
+let cover = `cover
+let dashed = `dashed
+let dotted = `dotted
+let flexBox = `flex
+let grid = `grid
+let inlineGrid = `inlineGrid
+let flexEnd = `flexEnd
+let flexStart = `flexStart
+let forwards = `forwards
+let infinite = `infinite
+let inline = `inline
+let contents = `contents
+let inlineBlock = `inlineBlock
+let inlineFlex = `inlineFlex
+let inlineTable = `inlineTable
+let listItem = `listItem
+let runIn = `runIn
+let table = `table
+let tableCaption = `tableCaption
+let tableColumnGroup = `tableColumnGroup
+let tableHeaderGroup = `tableHeaderGroup
+let tableFooterGroup = `tableFooterGroup
+let tableRowGroup = `tableRowGroup
+let tableCell = `tableCell
+let tableColumn = `tableColumn
+let tableRow = `tableRow
+let local = `local
+let localUrl x = `localUrl x
+let noRepeat = `noRepeat
+let space = `space
+let nowrap = `nowrap
+let paddingBox = `paddingBox
+let paused = `paused
+let repeat = `repeat
+let minmax = `minmax
+let repeatX = `repeatX
+let repeatY = `repeatY
+let rotate a = `rotate a
+let rotate3d x y z a = `rotate3d (x, y, z, a)
+let row = `row
+let rowReverse = `rowReverse
+let running = `running
+let solid = `solid
+let spaceAround = `spaceAround
+let spaceBetween = `spaceBetween
+let spaceEvenly = `spaceEvenly
+let stretch = `stretch
+let url x = `url x
+let wrap = `wrap
+let wrapReverse = `wrapReverse
+let inside = `inside
+let outside = `outside
+let underline = `underline
+let overline = `overline
+let lineThrough = `lineThrough
+let clip = `clip
+let ellipsis = `ellipsis
+let wavy = `wavy
+let double = `double
+let uppercase = `uppercase
+let lowercase = `lowercase
+let capitalize = `capitalize
+let sub = `sub
+let super = `super
+let textTop = `textTop
+let textBottom = `textBottom
+let middle = `middle
+let normal = `normal
+let breakAll = `breakAll
+let keepAll = `keepAll
+let breakWord = `breakWord
+let reverse = `reverse
+let alternate = `alternate
+let alternateReverse = `alternateReverse
+let fill = `fill
+let content = `content
+let maxContent = `maxContent
+let minContent = `minContent
+let fitContent = `fitContent
+let round = `round
+let miter = `miter
+let bevel = `bevel
+let butt = `butt
+let square = `square
+let panX = `panX
+let panY = `panY
+let panLeft = `panLeft
+let panRight = `panRight
+let panUp = `panUp
+let panDown = `panDown
+let pinchZoom = `pinchZoom
+let manipulation = `manipulation

@@ -199,12 +199,6 @@ let rec rule_to_debug nesting accumulator rule =
         Printf.sprintf "Selector (\"%s\", [%s\n%s])" selector
           (to_debug (nesting + 1) rules)
           (String.make (nesting + 1) ' ')
-    | PseudoClass (pseduoclass, rules) ->
-      Printf.sprintf "PseudoClass (\"%s\", %s)" pseduoclass
-        (to_debug (nesting + 1) rules)
-    | PseudoClassParam (pseudoclass, param, rules) ->
-      Printf.sprintf "PseudoClassParam (\"%s\", \"%s\", %s)" pseudoclass param
-        (to_debug (nesting + 1) rules)
   in
   let space = if nesting > 0 then String.make (nesting * 2) ' ' else "" in
   accumulator ^ Printf.sprintf "\n%s" space ^ next_rule
@@ -455,12 +449,6 @@ let rec rules_to_string rules =
     | S (selector, rules) ->
       let rules = rules |> Array.to_list |> rules_to_string in
       push (Printf.sprintf "%s{%s}" selector rules)
-    | PseudoClass (pseudoclass, rules) ->
-      let rules = rules |> Array.to_list |> rules_to_string in
-      push (Printf.sprintf ":%s{%s}" pseudoclass rules)
-    | PseudoClassParam (pseudoclass, param, rules) ->
-      let rules = rules |> Array.to_list |> rules_to_string in
-      push (Printf.sprintf ":%s (%s) {%s}" pseudoclass param rules)
   in
   List.iter rule_to_string rules;
   Buffer.contents buff

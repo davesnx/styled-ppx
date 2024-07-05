@@ -757,8 +757,8 @@ module Color : sig
     | `transparent
     ]
 
-  val rgb : 'a -> 'b -> 'c -> [> `rgb of 'a * 'b * 'c ]
-  val rgba : 'a -> 'b -> 'c -> 'd -> [> `rgba of 'a * 'b * 'c * 'd ]
+  val rgb : int -> int -> int -> [> `rgb of int * int * int ]
+  val rgba : int -> int -> 'c -> 'd -> [> `rgba of int * int * 'c * 'd ]
   val hsl : 'a -> 'b -> 'c -> [> `hsl of 'a * 'b * 'c ]
   val hsla : 'a -> 'b -> 'c -> 'd -> [> `hsla of 'a * 'b * 'c * 'd ]
   val hex : 'a -> [> `hex of 'a ]
