@@ -143,6 +143,12 @@ end
 module Length = struct
   type length =
     [ `ch of float
+    | `cqw of float
+    | `cqh of float
+    | `cqi of float
+    | `cqb of float
+    | `cqmin of float
+    | `cqmax of float
     | `em of float
     | `ex of float
     | `rem of float
@@ -187,6 +193,12 @@ module Length = struct
     ]
 
   let ch x = `ch x
+  let cqw x = `cqw x
+  let cqh x = `cqh x
+  let cqi x = `cqi x
+  let cqb x = `cqb x
+  let cqmin x = `cqmin x
+  let cqmax x = `cqmax x
   let em x = `em x
   let ex x = `ex x
   let rem x = `rem x
@@ -206,6 +218,12 @@ module Length = struct
   let rec toString x =
     match x with
     | `ch x -> Std.Float.toString x ^ {js|ch|js}
+    | `cqw x -> Std.Float.toString x ^ {js|cqw|js}
+    | `cqh x -> Std.Float.toString x ^ {js|cqh|js}
+    | `cqi x -> Std.Float.toString x ^ {js|cqi|js}
+    | `cqb x -> Std.Float.toString x ^ {js|cqb|js}
+    | `cqmin x -> Std.Float.toString x ^ {js|cqmin|js}
+    | `cqmax x -> Std.Float.toString x ^ {js|cqmax|js}
     | `em x -> Std.Float.toString x ^ {js|em|js}
     | `ex x -> Std.Float.toString x ^ {js|ex|js}
     | `rem x -> Std.Float.toString x ^ {js|rem|js}

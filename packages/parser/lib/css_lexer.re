@@ -129,6 +129,8 @@ let at_media = [%sedlex.regexp? ("@", "media")];
 
 let at_keyframes = [%sedlex.regexp? ("@", "keyframes")];
 
+let at_container = [%sedlex.regexp? ("@", "container")];
+
 let non_ascii_code_point = [%sedlex.regexp? Sub(any, '\000' .. '\128')]; // greater than \u0080
 
 let identifier_start_code_point = [%sedlex.regexp?
@@ -587,12 +589,15 @@ let rec get_next_token = lexbuf => {
   | at_keyframes =>
     skip_whitespace.contents = false;
     AT_KEYFRAMES(lexeme(~skip=1, lexbuf));
-  | at_rule =>
+  | at_container =>
     skip_whitespace.contents = false;
-    AT_RULE(lexeme(~skip=1, lexbuf));
+    AT_CONTAINER(lexeme(~skip=1, lexbuf));
   | at_rule_without_body =>
     skip_whitespace.contents = false;
     AT_RULE_STATEMENT(lexeme(~skip=1, lexbuf));
+  | at_rule =>
+    skip_whitespace.contents = false;
+    AT_RULE(lexeme(~skip=1, lexbuf));
   /* NOTE: should be placed above ident, otherwise pattern with
    * '-[0-9a-z]{1,6}' cannot be matched */
   | (_u, '+', unicode_range) => UNICODE_RANGE(lexeme(lexbuf))
