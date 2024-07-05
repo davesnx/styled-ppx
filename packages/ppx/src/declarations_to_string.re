@@ -106,6 +106,12 @@ let render_length =
   fun
   | `Cap(n) => render_number(n, "cap")
   | `Ch(n) => render_number(n, "cm")
+  | `Cqw(n) => render_number(n, "cqw")
+  | `Cqh(n) => render_number(n, "cqh")
+  | `Cqi(n) => render_number(n, "cqi")
+  | `Cqb(n) => render_number(n, "cqb")
+  | `Cqmin(n) => render_number(n, "cqmin")
+  | `Cqmax(n) => render_number(n, "cqmax")
   | `Cm(n) => render_number(n, "cm")
   | `Em(n) => render_number(n, "em")
   | `Ex(n) => render_number(n, "ex")

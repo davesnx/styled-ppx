@@ -10,6 +10,7 @@ module CssJs = {
     {txt: Ldot(Lident("CssJs"), name), loc} |> Builder.pexp_ident(~loc);
   let selector = (~loc) => ident(~loc, "selector");
   let media = (~loc) => ident(~loc, "media");
+  let atContainer = (~loc) => ident(~loc, "atContainer");
   let global = (~loc) => ident(~loc, "global");
   let label = (~loc) => ident(~loc, "label");
   let style = (~loc) => ident(~loc, "style");
@@ -65,9 +66,22 @@ let concat = (~loc, expr, acc) => {
 let rec render_at_rule = (~loc, at_rule: at_rule) => {
   let (at_rule_name, at_rule_name_loc) = at_rule.name;
   let at_rule_name_loc =
-    Styled_ppx_css_parser.Parser_location.intersection(loc, at_rule_name_loc);
+    Styled_ppx_css_parser.Parser_location.update_pos_lnum(
+      {
+        ...at_rule_name_loc,
+        loc_start: {
+          ...at_rule_name_loc.loc_start,
+          pos_bol: at_rule_name_loc.loc_end.pos_bol,
+          pos_cnum:
+            at_rule_name_loc.loc_end.pos_cnum - String.length(at_rule_name),
+          pos_lnum: at_rule_name_loc.loc_end.pos_lnum,
+        },
+      },
+      loc,
+    );
   switch (at_rule_name) {
   | "media" => render_media_query(~loc, at_rule)
+  | "container" => render_container_query(~loc, at_rule)
   | "keyframes" =>
     Generate_lib.error(
       ~loc=at_rule_name_loc,
@@ -88,6 +102,10 @@ let rec render_at_rule = (~loc, at_rule: at_rule) => {
   | "styleset" as n
   | "character-variant" as n
   | "property" as n
+  | "font-palette-values" as n
+  | "layer" as n
+  | "scope" as n
+  | "starting-style" as n
   | /* Experimental */ "color-profile" as n
   | /* Experimental */ "viewport" as n
   | /* Deprecated */ "document" as n =>
@@ -141,6 +159,41 @@ and render_media_query = (~loc, at_rule: at_rule) => {
     Helper.Exp.apply(
       ~loc=at_rule.loc,
       CssJs.media(~loc=at_rule.loc),
+      [(Nolabel, query), (Nolabel, rules)],
+    );
+  };
+}
+and render_container_query = (~loc, at_rule: at_rule) => {
+  let parse_condition = {
+    let (_, at_rule_loc) = at_rule.prelude;
+    /* We believe on the source_code and transform it to string. This is unsafe */
+    Ok(source_code_of_loc(at_rule_loc) |> String.trim);
+  };
+
+  let (delimiter, attrs) =
+    Platform_attributes.string_delimiter(~loc=at_rule.loc);
+
+  switch (parse_condition) {
+  | Error(error_expr) => error_expr
+  | Ok(conditions) =>
+    let query =
+      conditions
+      |> String_interpolation.transform(~attrs, ~delimiter, ~loc=at_rule.loc);
+
+    let rules =
+      switch (at_rule.block) {
+      | Empty => Builder.pexp_array(~loc=at_rule.loc, [])
+      | Rule_list(declaration) =>
+        render_declarations(~loc, declaration)
+        |> Builder.pexp_array(~loc=at_rule.loc)
+      | Stylesheet(stylesheet) =>
+        render_declarations(~loc, stylesheet)
+        |> Builder.pexp_array(~loc=at_rule.loc)
+      };
+
+    Helper.Exp.apply(
+      ~loc=at_rule.loc,
+      CssJs.atContainer(~loc=at_rule.loc),
       [(Nolabel, query), (Nolabel, rules)],
     );
   };

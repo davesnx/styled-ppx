@@ -1184,7 +1184,11 @@ let wordSpacing x =
 
 let wordWrap = overflowWrap
 let zIndex x = D ({js|zIndex|js}, ZIndex.toString x)
-let media query rules = S ({js|@media |js} ^ query, rules)
+
+let media query rules = S ({js|@media|js} ^ {js| |js} ^ query, rules)
+
+let atContainer query rules = S ({js|@container|js} ^ {js| |js} ^ query, rules)
+
 let selector selector rules = S (selector, rules)
 let pseudoClass selector rules = PseudoClass (selector, rules)
 let active rules = pseudoClass {js|active|js} rules

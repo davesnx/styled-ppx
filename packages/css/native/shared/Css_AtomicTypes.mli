@@ -81,6 +81,12 @@ end
 module Length : sig
   type length =
     [ `ch of float
+    | `cqw of float
+    | `cqh of float
+    | `cqi of float
+    | `cqb of float
+    | `cqmin of float
+    | `cqmax of float
     | `em of float
     | `ex of float
     | `rem of float
@@ -125,6 +131,12 @@ module Length : sig
     ]
 
   val ch : 'a -> [> `ch of 'a ]
+  val cqh : 'a -> [> `cqh of 'a ]
+  val cqw : 'a -> [> `cqw of 'a ]
+  val cqi : 'a -> [> `cqi of 'a ]
+  val cqb : 'a -> [> `cqb of 'a ]
+  val cqmin : 'a -> [> `cqmin of 'a ]
+  val cqmax : 'a -> [> `cqmax of 'a ]
   val em : 'a -> [> `em of 'a ]
   val ex : 'a -> [> `ex of 'a ]
   val rem : 'a -> [> `rem of 'a ]
