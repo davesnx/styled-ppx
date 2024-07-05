@@ -2,9 +2,6 @@ type t =
   | Declaration of string * string
   | Selector of string * t array
 
-(* alias for backwards compatibility *)
-type rule = t
-
 let declaration (property, value) = Declaration (property, value)
 let selector selector rules = Selector (selector, rules)
 let media query rules = Selector ({|@media |} ^ query, rules)

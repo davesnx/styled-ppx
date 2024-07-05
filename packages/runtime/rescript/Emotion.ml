@@ -1,13 +1,12 @@
 type styleEncoding
-type renderer = Js.Json.t
 
 external injectRaw : string -> unit = "injectGlobal"
-[@@mel.module "@emotion/css"]
+[@@bs.module "@emotion/css"]
 
 let renderRaw _ css = injectRaw css
 
 external injectRawRules : Js.Json.t -> unit = "injectGlobal"
-[@@mel.module "@emotion/css"]
+[@@bs.module "@emotion/css"]
 
 let injectRules = injectRawRules
 
@@ -15,12 +14,12 @@ let renderRules _ selector rules =
   injectRawRules (Js.Dict.fromArray [| selector, rules |] |. Js.Json.object_)
 
 external mergeStyles : styleEncoding array -> styleEncoding = "cx"
-[@@mel.module "@emotion/css"]
+[@@bs.module "@emotion/css"]
 
-external make : Js.Json.t -> string = "css" [@@mel.module "@emotion/css"]
+external make : Js.Json.t -> string = "css" [@@bs.module "@emotion/css"]
 
 external makeAnimation : Js.Json.t Js.Dict.t -> string = "keyframes"
-[@@mel.module "@emotion/css"]
+[@@bs.module "@emotion/css"]
 
 let makeKeyframes frames = makeAnimation frames
 let insertRule css = injectRaw css

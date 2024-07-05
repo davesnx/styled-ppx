@@ -11,10 +11,7 @@
       "type": "dev"
     },
     {
-      "dir": "../../_build/default/packages/css/rescript"
-    },
-    {
-      "dir": "../../_build/default/packages/emotion/rescript"
+      "dir": "../../_build/default/packages/runtime/rescript"
     }
   ],
   "package-specs": [
