@@ -1,10 +1,10 @@
 module Array = struct
   external array_reduce : 'b array -> ('a -> 'b -> 'a) -> 'a -> 'a = "reduce"
-  [@@mel.send]
+  [@@bs.send]
 
   let reduce ~init ~f t = array_reduce t f init
 
-  external array_map : 'a array -> ('a -> 'b) -> 'b array = "map" [@@mel.send]
+  external array_map : 'a array -> ('a -> 'b) -> 'b array = "map" [@@bs.send]
 
   let map ~f t = array_map t f
 
