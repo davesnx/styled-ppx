@@ -18,18 +18,18 @@ opam install styled-ppx
 
 ### Packages available
 
-- `styled-ppx` is the ppx
-- `styled-ppx.lib_native` is the library with the CSS bindings, and the implementation of `emotion.sh` on the server. Capable of storing CSS, hashing it and generating a unique classnames, autoprefixing, etc.
+- `styled-ppx` is the ppx to transform `[%styled.div ""]` and `[%cx ""]`
+- `styled-ppx.native` is the library with the CSS bindings, and the implementation of `emotion.sh` on the server. Capable of storing CSS, hashing it and generating a unique classnames, autoprefixing, etc.
 
 ### Usage
 
-Add `styled-ppx` under dune's preprocess pps for any library or executable. Add `styled-ppx.lib-native` as libraries.
+Add `styled-ppx` under dune's preprocess pps for any library or executable. Add `styled-ppx.native` as libraries.
 
 ```diff
 (library
   (name ...)
   (libraries
-+  styled-ppx.lib-native
++  styled-ppx.native
    server-reason-react)
   (preprocess
    (pps
@@ -42,7 +42,6 @@ Add `styled-ppx` under dune's preprocess pps for any library or executable. Add 
 (melange.emit
   (target ...)
   (libraries
-+  styled-ppx.css_native
 +  styled-ppx.native
    server-reason-react)
   (preprocess
@@ -56,9 +55,37 @@ Note: `server-reason-react` and `server-reason-react-ppx` are optional, and only
 
 ### API
 
-The summary would be to use `<CssJs.style_tag />` in your `<head>` which generates the `<style>` tag.
+- `CssJs.get_stylesheet` returns a string with all styles
+- `CssJs.style_tag` returns a `<style />` React element, with all styles. This is designed to be used with server-reason-react.
 
 ### Example
+
+```reasonml
+let className = [%cx {|
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center
+|}];
+
+let stylesheet: string = CssJs.get_stylesheet();
+
+print_endline(className);
+/* .css-1xuw4bg */
+
+print_endline(stylesheet);
+/*
+  .css-1xuw4bg {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+  } */
+```
+
+### Example with server-reason-react
 
 ```reasonml
 /* This is a server-reason-react module with those styles encoded as a unique className */
