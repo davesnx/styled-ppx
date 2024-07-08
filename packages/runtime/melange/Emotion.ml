@@ -49,38 +49,27 @@ let renderKeyframes _renderer frames = makeAnimation (framesToDict frames)
 (* This method is a Css_type function, but with side-effects. It pushes the fontFace as global style *)
 let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
     =
-  let open Css_types in
-  let fontStyle =
-    Kloth.Option.mapWithDefault fontStyle {js||js} (fun value ->
-        {js|font-style: |js} ^ FontStyle.toString value ^ {js|;|js})
-  in
-  let src = Kloth.Array.joinWithMap ~sep:{js|, |js} ~f:FontFace.toString src in
-  let fontWeight =
-    Kloth.Option.mapWithDefault fontWeight {js||js} (fun w ->
-        ({js|font-weight: |js}
-        ^
-        match w with
-        | #FontWeight.t as f -> FontWeight.toString f
-        | #Var.t as va -> Var.toString va
-        | #Cascading.t as c -> Cascading.toString c)
-        ^ {js|;|js})
-  in
-  let fontDisplay =
-    Kloth.Option.mapWithDefault fontDisplay {js||js} (fun f ->
-        {js|font-display: |js} ^ FontDisplay.toString f ^ {js|;|js})
-  in
-  let sizeAdjust =
-    Kloth.Option.mapWithDefault sizeAdjust {js||js} (fun s ->
-        {js|size-adjust: |js} ^ Percentage.toString s ^ {js|;|js})
-  in
   let fontFace =
-    {js|@font-face {|js}
-    ^ ({js|font-family: |js} ^ fontFamily)
-    ^ ({js|; src: |js} ^ src)
-    ^ fontStyle
-    ^ fontWeight
-    ^ fontDisplay
-    ^ sizeAdjust
+    {js|@font-face {| font-family: |js}
+    ^ fontFamily
+    ^ ({js|; src: |js}
+      ^ Kloth.Array.joinWithMap ~sep:{js|, |js} ~f:Css_types.FontFace.toString
+          src
+      ^ {js|;|js})
+    ^ Kloth.Option.mapWithDefault fontStyle {js||js} (fun value ->
+          {js|font-style: |js} ^ Css_types.FontStyle.toString value ^ {js|;|js})
+    ^ Kloth.Option.mapWithDefault fontWeight {js||js} (fun w ->
+          ({js|font-weight: |js}
+          ^
+          match w with
+          | #Css_types.FontWeight.t as f -> Css_types.FontWeight.toString f
+          | #Css_types.Var.t as va -> Css_types.Var.toString va
+          | #Css_types.Cascading.t as c -> Css_types.Cascading.toString c)
+          ^ {js|;|js})
+    ^ Kloth.Option.mapWithDefault fontDisplay {js||js} (fun f ->
+          {js|font-display: |js} ^ Css_types.FontDisplay.toString f ^ {js|;|js})
+    ^ Kloth.Option.mapWithDefault sizeAdjust {js||js} (fun s ->
+          {js|size-adjust: |js} ^ Css_types.Percentage.toString s ^ {js|;|js})
     ^ {js|}|js}
   in
   injectRaw fontFace;

@@ -496,14 +496,36 @@ let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
     =
   let fontFace =
     [|
-      Rule.Declaration ("font-family", fontFamily);
-      Rule.Declaration ("src", src);
-      Rule.Declaration ("font-style", Option.value ~default:"normal" fontStyle);
-      Rule.Declaration ("font-weight", Option.value ~default:"normal" fontWeight);
-      Rule.Declaration ("font-display", Option.value ~default:"auto" fontDisplay);
-      Rule.Declaration
-        ("font-size-adjust", Option.value ~default:"none" sizeAdjust);
+      Some (Rule.Declaration ("font-family", fontFamily));
+      Some
+        (Rule.Declaration
+           ( "src",
+             Kloth.Array.joinWithMap ~sep:{js|, |js}
+               ~f:Css_types.FontFace.toString src ));
+      Kloth.Option.map
+        (fun value ->
+          Rule.Declaration ("font-style", Css_types.FontStyle.toString value))
+        fontStyle;
+      Kloth.Option.map
+        (fun w ->
+          Rule.Declaration
+            ( {js|font-weight|js},
+              match w with
+              | #Css_types.FontWeight.t as f -> Css_types.FontWeight.toString f
+              | #Css_types.Var.t as va -> Css_types.Var.toString va
+              | #Css_types.Cascading.t as c -> Css_types.Cascading.toString c ))
+        fontWeight;
+      Kloth.Option.map
+        (fun f ->
+          Rule.Declaration
+            ({js|font-display|js}, Css_types.FontDisplay.toString f))
+        fontDisplay;
+      Kloth.Option.map
+        (fun s ->
+          Rule.Declaration ({js|size-adjust|js}, Css_types.Percentage.toString s))
+        sizeAdjust;
     |]
+    |> Array.filter_map ~f:Fun.id
   in
   global [| Rule.Selector ("@font-face", fontFace) |];
   fontFamily
