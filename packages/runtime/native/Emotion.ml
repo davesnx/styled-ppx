@@ -277,8 +277,6 @@ let split_multiple_selectors rule_list =
   |> Array.of_list
 
 let resolve_selectors rules =
-  print_endline "Before moving media at top";
-  print_rules rules;
   (* unnest takes a list of rules and unnest them into a flat list of rules *)
   let rec unnest_selectors ~prefix rules =
     (* multiple selectors are defined with commas: like .a, .b {}
@@ -467,7 +465,8 @@ let get_stylesheet () =
        (fun accumulator (_, rules) ->
          match rules with
          | Globals rules ->
-           let rules = String.trim @@ rules_to_string rules in
+           let new_rules = resolve_selectors rules in
+           let rules = String.trim @@ rules_to_string new_rules in
            Printf.sprintf "%s %s" accumulator rules
          | Classnames { className; styles } ->
            let rules = String.trim @@ render_rules className styles in

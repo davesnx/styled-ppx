@@ -999,6 +999,16 @@ let pseudo_selectors_2 =
         none; } .%s:disabled { color: transparent; }"
        classname classname classname classname classname)
 
+let global_with_selector =
+  test "global_with_selector" @@ fun () ->
+  [%global
+    {| html { line-height: 1.15; }
+    a { :hover { padding: 0; } }
+   |}];
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf "html{line-height:1.15;}a{}a:hover{padding:0;}")
+
 let tests =
   ( "CssJs",
     [
@@ -1051,4 +1061,5 @@ let tests =
       mq_inside_selector;
       mq_inside_selector_with_declarations;
       mq_and_selectors_2;
+      global_with_selector;
     ] )
