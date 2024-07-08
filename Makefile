@@ -66,9 +66,9 @@ release-static:
 
 # Testing commands
 
-TEST_TARGETS := test_parser test_reason_css_parser test_native_typecheck test_ppx_snapshot_reason test_ppx_snapshot_rescript test_css_support test_css_spec_types test_emotion test_murmur2 test_css_spec_parser test_string_interpolation
+TEST_TARGETS := test-parser test-css-property-parser test-ppx-native test-ppx-snapshot-reason test-ppx-snapshot-rescript test-css-support test-css-spec-types test-runtime test-murmur2 test-css-spec-parser test-string-interpolation
 
-# Create targets with the format "test_{{target_name}}_{{ "watch" | "promote" }}"
+# Create targets with the format "test-{{target_name}}-{{ "watch" | "promote" }}"
 define create_test
 .PHONY: $(1)
 $(1): ## Run $(1) tests
@@ -76,14 +76,14 @@ $(1): ## Run $(1) tests
 endef
 
 define create_test_watch
-.PHONY: $(1)_watch
-$(1)_watch: ## Run $(1) tests
+.PHONY: $(1)-watch
+$(1)-watch: ## Run $(1) tests
 	$$(DUNE) build @$(1) --watch
 endef
 
 define create_test_promote
-.PHONY: $(1)_promote
-$(1)_promote: ## Run $(1) tests
+.PHONY: $(1)-promote
+$(1)-promote: ## Run $(1) tests
 	$$(DUNE) build @$(1) --auto-promote
 endef
 
@@ -92,32 +92,32 @@ $(foreach target,$(TEST_TARGETS), $(eval $(call create_test,$(target))))
 $(foreach target,$(TEST_TARGETS), $(eval $(call create_test_watch,$(target))))
 $(foreach target,$(TEST_TARGETS), $(eval $(call create_test_promote,$(target))))
 
-.PHONY: test_e2e_rescript_v9
-test_e2e_rescript_v9: ## Run End-to-end tests for JSX3
+.PHONY: test-e2e-rescript_v9
+test-e2e-rescript_v9: ## Run End-to-end tests for JSX3
 	npm --prefix 'e2e/rescript-v9-JSX3' install
 	npm --prefix 'e2e/rescript-v9-JSX3' run build
 	npm --prefix 'e2e/rescript-v9-JSX3' run test
 
-.PHONY: test_e2e_rescript_v9_watch
-test_e2e_rescript_v9_watch: ## Run End-to-end tests for JSX3
+.PHONY: test-e2e-rescript_v9_watch
+test-e2e-rescript_v9_watch: ## Run End-to-end tests for JSX3
 	npm --prefix 'e2e/rescript-v9-JSX3' run test_watch
 
-.PHONY: test_e2e_rescript_v9_promote
-test_e2e_rescript_v9_promote: ## Run End-to-end tests for JSX3
+.PHONY: test-e2e-rescript_v9_promote
+test-e2e-rescript_v9_promote: ## Run End-to-end tests for JSX3
 	npm --prefix 'e2e/rescript-v9-JSX3' run test_promote
 
-.PHONY: test_e2e_rescript_v10
-test_e2e_rescript_v10: ## Run End-to-end tests for JSX4
+.PHONY: test-e2e-rescript_v10
+test-e2e-rescript_v10: ## Run End-to-end tests for JSX4
 	npm --prefix 'e2e/rescript-v10-JSX4' install
 	npm --prefix 'e2e/rescript-v10-JSX4' run build
 	npm --prefix 'e2e/rescript-v10-JSX4' run test
 
-.PHONY: test_e2e_rescript_v10_watch
-test_e2e_rescript_v10_watch: ## Run End-to-end tests for JSX4
+.PHONY: test-e2e-rescript_v10_watch
+test-e2e-rescript_v10_watch: ## Run End-to-end tests for JSX4
 	npm --prefix 'e2e/rescript-v10-JSX4' run test_watch
 
-.PHONY: test_e2e_rescript_v10_promote
-test_e2e_rescript_v10_promote: ## Run End-to-end tests for JSX4
+.PHONY: test-e2e-rescript_v10_promote
+test-e2e-rescript_v10_promote: ## Run End-to-end tests for JSX4
 	npm --prefix 'e2e/rescript-v10-JSX4' run test_promote
 
 .PHONY: test
@@ -132,18 +132,18 @@ test: build
 
 # Demo
 
-.PHONY: demo_e2e_rescript_v10
-demo_e2e_rescript_v10: build ## Run the ReScript v10 demo with JSX4
+.PHONY: demo-e2e-rescript-v10
+demo-e2e-rescript-v10: build ## Run the ReScript v10 demo with JSX4
 	npm --prefix 'e2e/rescript-v10-JSX4' install
 	npm --prefix 'e2e/rescript-v10-JSX4' run start
 
-.PHONY: demo_e2e_melange_debug
-demo_e2e_melange_debug: ## Run the melange server demo
-	$(DUNE) exec e2e_melange_debug
+.PHONY: demo-e2e-melange-debug
+demo-e2e-melange-debug: ## Run the melange server demo
+	$(DUNE) exec e2e-melange-debug
 
-.PHONY: demo_e2e_melange_debug_watch
-demo_e2e_melange_debug_watch: ## Run (and watch) the melange server demo
-	$(DUNE) exec e2e_melange_debug --watch
+.PHONY: demo-e2e-melange-debug-watch
+demo-e2e-melange-debug_watch: ## Run (and watch) the melange server demo
+	$(DUNE) exec e2e-melange-debug --watch
 
 # Debug commands
 
@@ -159,4 +159,4 @@ lexer: ## Print the command to debug the lexer
 
 .PHONY: interpreter
 interpreter: ## Run menhir as interpret
-	$(OPAM_EXEC) menhir --interpret --interpret-show-cst packages/parser/lib/css_parser.mly
+	$(OPAM_EXEC) menhir --interpret --interpret-show-cst packages/parser/lib/Parser.mly

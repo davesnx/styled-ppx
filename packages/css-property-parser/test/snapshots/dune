@@ -16,7 +16,7 @@
    (run refmt --parse ml --print re --in-place %{targets}))))
 
 (rule
- (alias test_css_spec_types)
+ (alias test-css-spec-types)
  (deps
   (file Spec.expected.re)
   (file Spec.actual.re))

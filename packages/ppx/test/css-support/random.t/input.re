@@ -24,7 +24,7 @@
 module Color = {
   let text = CssJs.hex("444");
 };
-let colorTextString = Color.text |> CssJs.Type.Color.toString;
+let colorTextString = Color.text |> CssJs.Types.Color.toString;
 
 [%css {|-webkit-box-shadow: inset 0 0 0 1000px $(Color.background);|}];
 [%css {|-webkit-line-clamp: 2;|}];

@@ -15,7 +15,7 @@
   (pps styled-ppx)))
 
 (rule
- (alias test_emotion)
+ (alias test-runtime)
  (deps test.exe)
  (action
   (run %{deps})))

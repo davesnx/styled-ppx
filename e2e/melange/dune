@@ -10,7 +10,7 @@
 
 (executable
  (name debug)
- (public_name e2e_melange_debug)
+ (public_name e2e-melange-debug)
  (modules :standard \ index)
  (libraries
   ui_native

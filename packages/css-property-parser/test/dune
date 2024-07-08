@@ -12,7 +12,7 @@
   (pps reason_css_parser_ppx sedlex.ppx ppxlib.metaquot)))
 
 (rule
- (alias test_reason_css_parser)
+ (alias test-css-property-parser)
  (deps Runner.exe)
  (action
   (run %{deps})))

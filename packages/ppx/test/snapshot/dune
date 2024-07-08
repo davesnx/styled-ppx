@@ -4,7 +4,7 @@
 (subdir
  reason
  (cram
-  (alias test_ppx_snapshot_reason)
+  (alias test-ppx-snapshot-reason)
   (deps
    %{bin:standalone}
    %{bin:refmt}
@@ -13,7 +13,7 @@
 (subdir
  rescript
  (cram
-  (alias test_ppx_snapshot_rescript)
+  (alias test-ppx-snapshot-rescript)
   (enabled_if
    (= %{env:OPAM_REPO_CI=false} false))
   (deps
