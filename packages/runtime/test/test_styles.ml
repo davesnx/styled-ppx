@@ -263,6 +263,57 @@ let selector_ampersand_with_space =
     (Printf.sprintf ".%s { font-size: 42px; } .%s .div { font-size: 24px; }"
        classname classname)
 
+let ampersand_everywhere =
+  test "ampersand_everywhere" @@ fun () ->
+  let classname =
+    [%cx
+      {|
+      font-size: 1px;
+      & .lola {
+        font-size: 2px;
+      }
+      & .lola & {
+        font-size: 3px;
+      }
+      .lola & {
+        font-size: 4px;
+      }
+      .lola {
+        font-size: 5px;
+      }
+      .lola & & & & .lola {
+        font-size: 6px;
+      }
+    |}]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { font-size: 1px; } .%s .lola { font-size: 2px; } .%s .lola .%s { \
+        font-size: 3px; } .lola .%s { font-size: 4px; } .%s .lola { font-size: \
+        5px; } .lola .%s .%s .%s .%s .lola { font-size: 6px; }"
+       classname classname classname classname classname classname classname
+       classname classname classname)
+
+let ampersand_everywhere_2 =
+  test "ampersand_everywhere_2" @@ fun () ->
+  let classname =
+    [%cx
+      {|
+      font-size: 1px;
+      & .lola {
+        .felipe & {
+          display: none;
+        }
+      }
+    |}]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { font-size: 1px; } .felipe .%s .lola { display: none; }" classname
+       classname)
+
 let selector_ampersand_with_no_space =
   test "selector_ampersand_with_space" @@ fun () ->
   let classname =
@@ -1035,6 +1086,8 @@ let tests =
       selector_ampersand_with_no_space;
       selector_nested_with_ampersand;
       selector_ampersand_at_the_middle;
+      ampersand_everywhere;
+      ampersand_everywhere_2;
       selector_params;
       selectors_with_coma;
       selectors_with_coma_simple;

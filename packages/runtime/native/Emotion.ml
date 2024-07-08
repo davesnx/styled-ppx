@@ -74,6 +74,7 @@ let render_declarations rules =
   |> Array.join ~sep:" "
 
 let is_at_rule selector = String.contains selector '@'
+let contains_ampersand selector = String.contains selector '&'
 let starts_with_at selector = String.starts_with ~prefix:"@" selector
 let starts_with_double_dot selector = String.starts_with ~prefix:":" selector
 let starts_with_dot selector = String.starts_with ~prefix:"." selector
@@ -145,7 +146,7 @@ let split_by_kind rules =
 let resolve_ampersand hash selector =
   let classname = "." ^ hash in
   let resolved_selector = replace_ampersand ~by:classname selector in
-  if starts_with_ampersand selector then resolved_selector
+  if contains_ampersand selector then resolved_selector
   else if starts_with_at selector then resolved_selector
   else if starts_with_double_dot selector then
     Printf.sprintf ".%s%s" hash resolved_selector
@@ -277,6 +278,8 @@ let split_multiple_selectors rule_list =
   |> Array.of_list
 
 let resolve_selectors rules =
+  print_endline "Before moving media at top";
+  print_rules rules;
   (* unnest takes a list of rules and unnest them into a flat list of rules *)
   let rec unnest_selectors ~prefix rules =
     (* multiple selectors are defined with commas: like .a, .b {}
@@ -295,6 +298,9 @@ let resolve_selectors rules =
             if starts_with_ampersand current_selector then
               prefix ^ remove_first_ampersand current_selector
               (* child starts with dot, join them without space *)
+            else if contains_ampersand current_selector then
+              (* reemplazar el ampersand del current_selector, con el padre *)
+              replace_ampersand ~by:prefix current_selector
             else if starts_with_double_dot current_selector then
               prefix ^ current_selector
               (* This case is the same as the "else", but I keep it for reference *)
@@ -316,7 +322,10 @@ let resolve_selectors rules =
   let rules = move_media_at_top rules in
   let rules = split_multiple_selectors rules in
   let declarations, selectors = unnest_selectors ~prefix:"" rules in
-  Array.append declarations (Array.flatten selectors)
+  let fut = Array.append declarations (Array.flatten selectors) in
+  print_endline "\nFINAL";
+  print_rules ~initial:2 fut;
+  fut
 
 let render_keyframes animationName keyframes =
   let definition =
@@ -360,6 +369,7 @@ and render_selectors hash rule =
     Some (Printf.sprintf "%s { %s }" selector nested_selectors)
   | Rule.Selector (selector, rules) ->
     let new_selector = resolve_ampersand hash selector in
+    print_endline @@ Printf.sprintf "inside %s" new_selector;
     (* Resolving the ampersand means to replace all ampersands by the hash *)
     Some (Printf.sprintf "%s { %s }" new_selector (render_declarations rules))
   (* Declarations aren't there *)
