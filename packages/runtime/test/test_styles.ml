@@ -1,3 +1,5 @@
+[@@@warning "-32"]
+
 let get_string_style_rules () =
   let content = CssJs.get_stylesheet () in
   let _ = CssJs.flush () in
@@ -453,7 +455,7 @@ let selectors_with_coma_simple =
   in
   let css = get_string_style_rules () in
   assert_string css
-    (Printf.sprintf ".%s  .a { top: 50px; } .%s  .b { top: 50px; }" classname
+    (Printf.sprintf ".%s .a { top: 50px; } .%s .b { top: 50px; }" classname
        classname)
 
 let selectors_with_coma_and_pseudo =
@@ -664,6 +666,59 @@ let mq_and_selectors_2 =
         768px) { .%s div a { height: auto; } }"
        classname classname classname)
 
+let selector_nested_inerpolation_with_multiple =
+  test "selector_nested_inerpolation_with_multiple" @@ fun () ->
+  let px24 = CssJs.px 24 in
+  let languageIcon =
+    [%cx {|
+  vertical-align: middle;
+  margin: 0.5em 0;
+  opacity: 0.6;
+|}]
+  in
+  let menuOpened = [%cx {||}] in
+  let classname =
+    [%cx
+      {|
+  margin-right: $(px24);
+
+  &:hover, .$(menuOpened) {
+    .$(languageIcon) {
+      opacity: 1.0;
+    }
+  }
+|}]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { vertical-align: middle; margin: 0.5em 0; opacity: 0.6; } .%s { \
+        margin-right: 24px; } .%s:hover .%s { opacity: 1; } .%s .%s .%s { \
+        opacity: 1; }"
+       languageIcon classname classname languageIcon classname menuOpened
+       languageIcon)
+
+let selector_nested_inerpolation_with_multiple =
+  test "selector_nested_inerpolation_with_multiple" @@ fun () ->
+  let languageIcon = [%cx {| opacity: 0.6; |}] in
+  let menuOpened = [%cx {||}] in
+  let classname =
+    [%cx
+      {|
+  &:hover, .$(menuOpened) {
+    &.$(languageIcon) {
+      opacity: 1.0;
+    }
+  }
+|}]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { opacity: 0.6; } .%s:hover.%s { opacity: 1; } .%s .%s.%s { \
+        opacity: 1; }"
+       languageIcon classname languageIcon classname menuOpened languageIcon)
+
 let selector_with_classname_and_mq =
   test "selector_with_classname_and_mq" @@ fun () ->
   let nested_classname = CssJs.style [||] in
@@ -679,7 +734,7 @@ let selector_with_classname_and_mq =
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s { display: block; } @media (min-width: 768px) { .%s  .lola .%s { \
+       ".%s { display: block; } @media (min-width: 768px) { .%s .lola .%s { \
         height: auto; } }"
        classname classname nested_classname)
 
@@ -700,7 +755,7 @@ let mq_with_selectors =
   assert_string css
     (Printf.sprintf
        ".%s { display: block; } @media (min-width: 768px) { .%s { height: \
-        auto; } .%s  .lola { color: transparent; } }"
+        auto; } .%s .lola { color: transparent; } }"
        classname classname classname)
 
 let mq_nested =
@@ -984,6 +1039,7 @@ let tests =
       selector_nested_with_pseudo_2;
       selector_nested_with_pseudo_3;
       selector_nested_with_mq_and_declarations;
+      selector_nested_inerpolation_with_multiple;
       mq_with_selectors;
       mq;
       mq_nested;

@@ -277,6 +277,8 @@ let split_multiple_selectors rule_list =
   |> Array.of_list
 
 let resolve_selectors rules =
+  print_endline "Before moving media at top";
+  print_rules rules;
   (* unnest takes a list of rules and unnest them into a flat list of rules *)
   let rec unnest_selectors ~prefix rules =
     (* multiple selectors are defined with commas: like .a, .b {}
@@ -288,23 +290,26 @@ let resolve_selectors rules =
         Right [| Rule.Selector (current_selector, selector_rules) |]
       | Rule.Selector (current_selector, selector_rules) ->
         let is_first_level = prefix != "" in
-        (* TODO: Simplify this monstruosity *)
-        let new_prelude =
-          if is_first_level && starts_with_ampersand current_selector then
-            prefix ^ remove_first_ampersand current_selector
-          else if is_first_level && starts_with_dot current_selector then
-            prefix ^ remove_first_ampersand current_selector
-          else if is_first_level && starts_with_double_dot current_selector then
-            prefix ^ current_selector
-          else if is_first_level || starts_with_dot current_selector then
-            prefix ^ " " ^ current_selector
+        (* we derive the new prefix based on the current_selector and the previous "prefix" (aka the prefix added by the parent selector) *)
+        let new_prefix =
+          if is_first_level then
+            (* child starts with &, join them without space *)
+            if starts_with_ampersand current_selector then
+              prefix ^ remove_first_ampersand current_selector
+              (* child starts with dot, join them without space *)
+            else if starts_with_double_dot current_selector then
+              prefix ^ current_selector
+              (* This case is the same as the "else", but I keep it for reference *)
+            else if starts_with_dot current_selector then
+              prefix ^ " " ^ current_selector
+            else prefix ^ " " ^ current_selector
           else prefix ^ current_selector
         in
         let selector_rules = split_multiple_selectors selector_rules in
         let selectors, rest_of_declarations =
-          unnest_selectors ~prefix:new_prelude selector_rules
+          unnest_selectors ~prefix:new_prefix selector_rules
         in
-        let new_selector = Rule.Selector (new_prelude, selectors) in
+        let new_selector = Rule.Selector (new_prefix, selectors) in
         Right
           (Array.append [| new_selector |] (Array.flatten rest_of_declarations))
       | _ as rule -> Left rule)
