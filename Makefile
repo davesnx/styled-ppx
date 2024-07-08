@@ -10,7 +10,7 @@ help: ## Print this help message
 	@echo "List of available make commands";
 	@echo "";
 	@grep -E '^[a-zA-Z0-9_.-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2}';
-	@echo $(TEST_TARGETS) | tr -s " " "\012" | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m Run %s test \33[1;97m(or \"%s_watch\" to watch them)\033[0m\n", $$1, $$1, $$1}';
+	@echo $(TEST_TARGETS) | tr -s " " "\012" | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m Run %s test \33[1;97m(add \"-watch\" or \"-promote\")\033[0m\n", $$1, $$1}';
 	@echo "";
 
 .PHONY: build
@@ -69,28 +69,27 @@ release-static:
 TEST_TARGETS := test-parser test-css-property-parser test-ppx-native test-ppx-snapshot-reason test-ppx-snapshot-rescript test-css-support test-css-spec-types test-runtime test-murmur2 test-css-spec-parser test-string-interpolation
 
 # Create targets with the format "test-{{target_name}}-{{ "watch" | "promote" }}"
-define create_test
+define create-test
 .PHONY: $(1)
 $(1): ## Run $(1) tests
 	$$(DUNE) build @$(1)
 endef
 
-define create_test_watch
+define create-test-watch
 .PHONY: $(1)-watch
 $(1)-watch: ## Run $(1) tests
 	$$(DUNE) build @$(1) --watch
 endef
 
-define create_test_promote
+define create-test-promote
 .PHONY: $(1)-promote
 $(1)-promote: ## Run $(1) tests
 	$$(DUNE) build @$(1) --auto-promote
 endef
 
-# Apply the create_watch_target rule for each test target
-$(foreach target,$(TEST_TARGETS), $(eval $(call create_test,$(target))))
-$(foreach target,$(TEST_TARGETS), $(eval $(call create_test_watch,$(target))))
-$(foreach target,$(TEST_TARGETS), $(eval $(call create_test_promote,$(target))))
+$(foreach target,$(TEST_TARGETS), $(eval $(call create-test,$(target))))
+$(foreach target,$(TEST_TARGETS), $(eval $(call create-test-watch,$(target))))
+$(foreach target,$(TEST_TARGETS), $(eval $(call create-test-promote,$(target))))
 
 .PHONY: test-e2e-rescript_v9
 test-e2e-rescript_v9: ## Run End-to-end tests for JSX3
@@ -98,27 +97,27 @@ test-e2e-rescript_v9: ## Run End-to-end tests for JSX3
 	npm --prefix 'e2e/rescript-v9-JSX3' run build
 	npm --prefix 'e2e/rescript-v9-JSX3' run test
 
-.PHONY: test-e2e-rescript_v9_watch
-test-e2e-rescript_v9_watch: ## Run End-to-end tests for JSX3
-	npm --prefix 'e2e/rescript-v9-JSX3' run test_watch
+.PHONY: test-e2e-rescript-v9-watch
+test-e2e-rescript-v9-watch: ## Run End-to-end tests for JSX3
+	npm --prefix 'e2e/rescript-v9-JSX3' run test-watch
 
-.PHONY: test-e2e-rescript_v9_promote
-test-e2e-rescript_v9_promote: ## Run End-to-end tests for JSX3
-	npm --prefix 'e2e/rescript-v9-JSX3' run test_promote
+.PHONY: test-e2e-rescript-v9-promote
+test-e2e-rescript-v9-promote: ## Run End-to-end tests for JSX3
+	npm --prefix 'e2e/rescript-v9-JSX3' run test-promote
 
-.PHONY: test-e2e-rescript_v10
-test-e2e-rescript_v10: ## Run End-to-end tests for JSX4
+.PHONY: test-e2e-rescript-v10
+test-e2e-rescript-v10: ## Run End-to-end tests for JSX4
 	npm --prefix 'e2e/rescript-v10-JSX4' install
 	npm --prefix 'e2e/rescript-v10-JSX4' run build
 	npm --prefix 'e2e/rescript-v10-JSX4' run test
 
-.PHONY: test-e2e-rescript_v10_watch
-test-e2e-rescript_v10_watch: ## Run End-to-end tests for JSX4
-	npm --prefix 'e2e/rescript-v10-JSX4' run test_watch
+.PHONY: test-e2e-rescript-v10-watch
+test-e2e-rescript-v10-watch: ## Run End-to-end tests for JSX4
+	npm --prefix 'e2e/rescript-v10-JSX4' run test-watch
 
-.PHONY: test-e2e-rescript_v10_promote
-test-e2e-rescript_v10_promote: ## Run End-to-end tests for JSX4
-	npm --prefix 'e2e/rescript-v10-JSX4' run test_promote
+.PHONY: test-e2e-rescript-v10-promote
+test-e2e-rescript-v10-promote: ## Run End-to-end tests for JSX4
+	npm --prefix 'e2e/rescript-v10-JSX4' run test-promote
 
 .PHONY: test
 test: build
@@ -142,7 +141,7 @@ demo-e2e-melange-debug: ## Run the melange server demo
 	$(DUNE) exec e2e-melange-debug
 
 .PHONY: demo-e2e-melange-debug-watch
-demo-e2e-melange-debug_watch: ## Run (and watch) the melange server demo
+demo-e2e-melange-debug-watch: ## Run (and watch) the melange server demo
 	$(DUNE) exec e2e-melange-debug --watch
 
 # Debug commands
