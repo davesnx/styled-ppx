@@ -94,7 +94,10 @@ module Types = {
 };
 let rec _legacy_gradient:
   list(Tokens.token) =>
-  (Reason_css_parser__Rule.data(Types._legacy_gradient), list(Tokens.token)) =
+  (
+    Css_property_parser__Rule.data(Types._legacy_gradient),
+    list(Tokens.token),
+  ) =
   tokens =>
     combine_xor(
       [
@@ -113,7 +116,7 @@ let rec _legacy_gradient:
 and _legacy_linear_gradient:
   list(Tokens.token) =>
   (
-    Reason_css_parser__Rule.data(Types._legacy_linear_gradient),
+    Css_property_parser__Rule.data(Types._legacy_linear_gradient),
     list(Tokens.token),
   ) =
   tokens =>
@@ -148,7 +151,10 @@ and _legacy_linear_gradient:
     )
 and property_height:
   list(Tokens.token) =>
-  (Reason_css_parser__Rule.data(Types.property_height), list(Tokens.token)) =
+  (
+    Css_property_parser__Rule.data(Types.property_height),
+    list(Tokens.token),
+  ) =
   tokens =>
     combine_xor(
       [

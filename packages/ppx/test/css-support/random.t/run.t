@@ -67,7 +67,7 @@ If this test fail means that the module is not in sync with the ppx
   module Color = {
     let text = CssJs.hex("444");
   };
-  let colorTextString = Color.text |> CssJs.Color.toString;
+  let colorTextString = Color.text |> CssJs.Types.Color.toString;
   CssJs.unsafe(
     {js|WebkitBoxShadow|js},
     {js|inset 0 0 0 1000px $(Color.background)|js},
