@@ -30,12 +30,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # https://github.com/mmottl/pcre-ocaml/issues/18
-      # https://github.com/actions/runner-images/issues/6634
-      - name: Install pcre (only MacOS)
-        if: matrix.os == 'macos-latest'
-        run: brew install pcre
-
       - name: Use Node.js
         uses: actions/setup-node@v3
 
