@@ -278,8 +278,6 @@ let split_multiple_selectors rule_list =
   |> Array.of_list
 
 let resolve_selectors rules =
-  print_endline "Before moving media at top";
-  print_rules rules;
   (* unnest takes a list of rules and unnest them into a flat list of rules *)
   let rec unnest_selectors ~prefix rules =
     (* multiple selectors are defined with commas: like .a, .b {}
@@ -322,10 +320,7 @@ let resolve_selectors rules =
   let rules = move_media_at_top rules in
   let rules = split_multiple_selectors rules in
   let declarations, selectors = unnest_selectors ~prefix:"" rules in
-  let fut = Array.append declarations (Array.flatten selectors) in
-  print_endline "\nFINAL";
-  print_rules ~initial:2 fut;
-  fut
+  Array.append declarations (Array.flatten selectors)
 
 let render_keyframes animationName keyframes =
   let definition =
