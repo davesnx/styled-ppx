@@ -1,45 +1,13 @@
 module Array = struct
-  (* Similar Array interface as https://github.com/janestreet/base *)
+  include Kloth.Array
   include Stdlib.ArrayLabels
+
+  type 'a t = 'a array
 
   let ( @ ) = Stdlib.Array.append
   let is_empty a = Array.length a == 0
   let is_not_empty a = Array.length a != 0
-
-  external caml_make_vect : int -> 'a -> 'a array = "caml_make_vect"
-
   let join ~sep a = String.concat sep (Array.to_list a)
-
-  let create ~len x =
-    try caml_make_vect len x
-    with Invalid_argument _ ->
-      failwith @@ Printf.sprintf "Array.create ~len:%d: invalid length" len
-
-  let filter_mapi ~f t =
-    let r = ref [||] in
-    let k = ref 0 in
-    for i = 0 to length t - 1 do
-      match f i (unsafe_get t i) with
-      | None -> ()
-      | Some a ->
-        if !k = 0 then r := create ~len:(length t) a;
-        unsafe_set !r !k a;
-        incr k
-    done;
-    if !k = length t then !r else if !k > 0 then sub ~pos:0 ~len:!k !r else [||]
-
-  let filter_map ~f t = (filter_mapi t ~f:(fun _i a -> f a) [@nontail])
-  let filter ~f t = filter_map ~f:(fun x -> if f x then Some x else None) t
-
-  let map t ~(f : _ -> _) =
-    let len = length t in
-    if len = 0 then [||]
-    else (
-      let r = create ~len (f (unsafe_get t 0)) in
-      for i = 1 to len - 1 do
-        unsafe_set r i (f (unsafe_get t i))
-      done;
-      r)
 
   let partition_map ~f t =
     let (both : _ Either.t t) = map t ~f in
@@ -74,13 +42,13 @@ let render_declarations rules =
   |> Array.filter_map ~f:render_declaration
   |> Array.join ~sep:" "
 
-let is_at_rule selector = String.contains selector '@'
+let contains_at selector = String.contains selector '@'
 let contains_ampersand selector = String.contains selector '&'
+let contains_a_coma selector = String.contains selector ','
 let starts_with_at selector = String.starts_with ~prefix:"@" selector
-let starts_with_double_dot selector = String.starts_with ~prefix:":" selector
 let starts_with_dot selector = String.starts_with ~prefix:"." selector
+let starts_with_double_dot selector = String.starts_with ~prefix:":" selector
 let starts_with_ampersand selector = String.starts_with ~prefix:"&" selector
-let contains_multiple_selectors selector = String.contains selector ','
 
 let prefix ~pre s =
   let len = String.length pre in
@@ -162,12 +130,12 @@ let join_media left right = left ^ " and " ^ remove_media_from_selector right
 
 let rules_do_not_contain_media rules =
   Array.exists
-    ~f:(function Rule.Selector (s, _) when is_at_rule s -> false | _ -> true)
+    ~f:(function Rule.Selector (s, _) when contains_at s -> false | _ -> true)
     rules
 
 let rules_contain_media rules =
   Array.exists
-    ~f:(function Rule.Selector (s, _) when is_at_rule s -> true | _ -> false)
+    ~f:(function Rule.Selector (s, _) when contains_at s -> true | _ -> false)
     rules
 
 (* media selectors should be at the top. .a { @media () {} }
@@ -187,7 +155,7 @@ let rec move_media_at_top (rule_list : Rule.t array) : Rule.t array =
          }
       *)
       | Rule.Selector (current_selector, rules)
-        when is_at_rule current_selector && rules_contain_media rules ->
+        when contains_at current_selector && rules_contain_media rules ->
         let new_rules = swap current_selector rules in
         Array.append acc new_rules
       (* current_selector isn't a media query, but it's a selecotr. It may contain media-queries inside the rules: Example:
@@ -205,7 +173,7 @@ let rec move_media_at_top (rule_list : Rule.t array) : Rule.t array =
         let declarations, selectors = split_by_kind rules in
         let media_selectors, non_media_selectors =
           Array.partition selectors ~f:(function
-            | Rule.Selector (s, _) when is_at_rule s -> true
+            | Rule.Selector (s, _) when contains_at s -> true
             | _ -> false)
         in
         let new_media_rules =
@@ -213,7 +181,7 @@ let rec move_media_at_top (rule_list : Rule.t array) : Rule.t array =
             ~f:(fun media_rules ->
               match media_rules with
               | Rule.Selector (nested_media_selector, nested_media_rule_list)
-                when is_at_rule nested_media_selector ->
+                when contains_at nested_media_selector ->
                 [|
                   Rule.Selector
                     ( nested_media_selector,
@@ -265,8 +233,7 @@ let split_multiple_selectors rule_list =
   Array.fold_left
     ~f:(fun acc rule ->
       match rule with
-      | Rule.Selector (selector, rules)
-        when contains_multiple_selectors selector ->
+      | Rule.Selector (selector, rules) when contains_a_coma selector ->
         let selector_list = String.split_on_char ',' selector in
         let new_rules =
           (* for each selector, we apply the same rules *)
@@ -362,7 +329,7 @@ and render_selectors hash rule =
   match rule with
   | Rule.Selector (_selector, rules) when Array.is_empty rules -> None
   (* In case of being @media (or any at_rule) render the selector first and declarations with the hash inside *)
-  | Rule.Selector (selector, rules) when is_at_rule selector ->
+  | Rule.Selector (selector, rules) when contains_at selector ->
     let nested_selectors = render_rules hash rules in
     Some (Printf.sprintf "%s { %s }" selector nested_selectors)
   | Rule.Selector (selector, rules) ->
@@ -508,15 +475,15 @@ let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
     =
   let fontFace =
     [|
-      Kloth.Option.map Properties.fontStyle fontStyle;
-      Kloth.Option.map Properties.fontWeight fontWeight;
-      Kloth.Option.map Properties.fontDisplay fontDisplay;
-      Kloth.Option.map Properties.sizeAdjust sizeAdjust;
+      Kloth.Option.map ~f:Properties.fontStyle fontStyle;
+      Kloth.Option.map ~f:Properties.fontWeight fontWeight;
+      Kloth.Option.map ~f:Properties.fontDisplay fontDisplay;
+      Kloth.Option.map ~f:Properties.sizeAdjust sizeAdjust;
       Some (Properties.fontFamily fontFamily);
       Some
         (Rule.Declaration
            ( "src",
-             Kloth.Array.joinWithMap ~sep:{js|, |js}
+             Kloth.Array.map_and_join ~sep:{js|, |js}
                ~f:Css_types.FontFace.toString src ));
     |]
     |> Array.filter_map ~f:Fun.id

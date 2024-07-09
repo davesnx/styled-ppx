@@ -32,7 +32,7 @@ module Var = struct
   let varDefault x default = `varDefault (x, default)
 
   let prefix x =
-    if Kloth.String.startsWith ~prefix:{js|--|js} x then x else {js|--|js} ^ x
+    if Kloth.String.starts_with ~prefix:{js|--|js} x then x else {js|--|js} ^ x
 
   let toString x =
     match x with
@@ -41,14 +41,14 @@ module Var = struct
 end
 
 let max_or_min_values fn values =
-  Kloth.Array.joinWithMap ~sep:{js|, |js} ~f:(fun v -> {js| |js} ^ fn v) values
+  Kloth.Array.map_and_join ~sep:{js|, |js} ~f:(fun v -> {js| |js} ^ fn v) values
 
 let calc_min_max_num_to_string fn = function
   | `calc (`add (a, b)) -> {js|calc(|js} ^ fn a ^ {js| + |js} ^ fn b ^ {js|)|js}
   | `calc (`sub (a, b)) -> {js|calc(|js} ^ fn a ^ {js| - |js} ^ fn b ^ {js|)|js}
   | `calc (`mult (a, b)) ->
     {js|calc(|js} ^ fn a ^ {js| * |js} ^ fn b ^ {js|)|js}
-  | `num n -> Kloth.Float.toString n
+  | `num n -> Kloth.Float.to_string n
   | `min xs -> {js|min(|js} ^ max_or_min_values fn xs ^ {js|)|js}
   | `max xs -> {js|max(|js} ^ max_or_min_values fn xs ^ {js|)|js}
 
@@ -98,8 +98,8 @@ module Time = struct
 
   let rec toString x =
     match x with
-    | `s t -> Kloth.Int.toString t ^ {js|s|js}
-    | `ms t -> Kloth.Int.toString t ^ {js|ms|js}
+    | `s t -> Kloth.Int.to_string t ^ {js|s|js}
+    | `ms t -> Kloth.Int.to_string t ^ {js|ms|js}
     | `calc calc -> string_of_calc_min_max calc
     | (`min _ | `max _) as x -> minmax_to_string x
 
@@ -110,7 +110,7 @@ module Time = struct
 
   and calc_value_to_string x =
     match x with
-    | `num x -> Kloth.Float.toString x
+    | `num x -> Kloth.Float.to_string x
     | `calc calc -> string_of_calc_min_max calc
     | (`min _ | `max _) as x -> minmax_to_string x
     | #time as t -> toString t
@@ -128,7 +128,7 @@ module Percentage = struct
   let pct x = `percent x
 
   let toString x =
-    match x with `percent x -> Kloth.Float.toString x ^ {js|%|js}
+    match x with `percent x -> Kloth.Float.to_string x ^ {js|%|js}
 end
 
 module Url = struct
@@ -214,35 +214,35 @@ module Length = struct
 
   let rec toString (x : t) : string =
     match x with
-    | `ch x -> Kloth.Float.toString x ^ {js|ch|js}
-    | `cqw x -> Kloth.Float.toString x ^ {js|cqw|js}
-    | `cqh x -> Kloth.Float.toString x ^ {js|cqh|js}
-    | `cqi x -> Kloth.Float.toString x ^ {js|cqi|js}
-    | `cqb x -> Kloth.Float.toString x ^ {js|cqb|js}
-    | `cqmin x -> Kloth.Float.toString x ^ {js|cqmin|js}
-    | `cqmax x -> Kloth.Float.toString x ^ {js|cqmax|js}
-    | `em x -> Kloth.Float.toString x ^ {js|em|js}
-    | `ex x -> Kloth.Float.toString x ^ {js|ex|js}
-    | `rem x -> Kloth.Float.toString x ^ {js|rem|js}
-    | `vh x -> Kloth.Float.toString x ^ {js|vh|js}
-    | `vw x -> Kloth.Float.toString x ^ {js|vw|js}
-    | `vmin x -> Kloth.Float.toString x ^ {js|vmin|js}
-    | `vmax x -> Kloth.Float.toString x ^ {js|vmax|js}
-    | `px x -> Kloth.Int.toString x ^ {js|px|js}
-    | `pxFloat x -> Kloth.Float.toString x ^ {js|px|js}
-    | `cm x -> Kloth.Float.toString x ^ {js|cm|js}
-    | `mm x -> Kloth.Float.toString x ^ {js|mm|js}
-    | `inch x -> Kloth.Float.toString x ^ {js|in|js}
-    | `pc x -> Kloth.Float.toString x ^ {js|pc|js}
-    | `pt x -> Kloth.Int.toString x ^ {js|pt|js}
+    | `ch x -> Kloth.Float.to_string x ^ {js|ch|js}
+    | `cqw x -> Kloth.Float.to_string x ^ {js|cqw|js}
+    | `cqh x -> Kloth.Float.to_string x ^ {js|cqh|js}
+    | `cqi x -> Kloth.Float.to_string x ^ {js|cqi|js}
+    | `cqb x -> Kloth.Float.to_string x ^ {js|cqb|js}
+    | `cqmin x -> Kloth.Float.to_string x ^ {js|cqmin|js}
+    | `cqmax x -> Kloth.Float.to_string x ^ {js|cqmax|js}
+    | `em x -> Kloth.Float.to_string x ^ {js|em|js}
+    | `ex x -> Kloth.Float.to_string x ^ {js|ex|js}
+    | `rem x -> Kloth.Float.to_string x ^ {js|rem|js}
+    | `vh x -> Kloth.Float.to_string x ^ {js|vh|js}
+    | `vw x -> Kloth.Float.to_string x ^ {js|vw|js}
+    | `vmin x -> Kloth.Float.to_string x ^ {js|vmin|js}
+    | `vmax x -> Kloth.Float.to_string x ^ {js|vmax|js}
+    | `px x -> Kloth.Int.to_string x ^ {js|px|js}
+    | `pxFloat x -> Kloth.Float.to_string x ^ {js|px|js}
+    | `cm x -> Kloth.Float.to_string x ^ {js|cm|js}
+    | `mm x -> Kloth.Float.to_string x ^ {js|mm|js}
+    | `inch x -> Kloth.Float.to_string x ^ {js|in|js}
+    | `pc x -> Kloth.Float.to_string x ^ {js|pc|js}
+    | `pt x -> Kloth.Int.to_string x ^ {js|pt|js}
     | `zero -> {js|0|js}
     | `calc calc -> string_of_calc_min_max calc
-    | `percent x -> Kloth.Float.toString x ^ {js|%|js}
+    | `percent x -> Kloth.Float.to_string x ^ {js|%|js}
     | (`min _ | `max _) as x -> minmax_to_string x
 
   and calc_value_to_string x =
     match x with
-    | `num x -> Kloth.Float.toString x
+    | `num x -> Kloth.Float.to_string x
     | `calc calc -> string_of_calc_min_max calc
     | (`min _ | `max _) as x -> minmax_to_string x
     | #length as t -> toString t
@@ -274,10 +274,10 @@ module Angle = struct
 
   let toString x =
     match x with
-    | `deg x -> Kloth.Float.toString x ^ {js|deg|js}
-    | `rad x -> Kloth.Float.toString x ^ {js|rad|js}
-    | `grad x -> Kloth.Float.toString x ^ {js|grad|js}
-    | `turn x -> Kloth.Float.toString x ^ {js|turn|js}
+    | `deg x -> Kloth.Float.to_string x ^ {js|deg|js}
+    | `rad x -> Kloth.Float.to_string x ^ {js|rad|js}
+    | `grad x -> Kloth.Float.to_string x ^ {js|grad|js}
+    | `turn x -> Kloth.Float.to_string x ^ {js|turn|js}
 end
 
 module Direction = struct
@@ -336,9 +336,9 @@ module AspectRatio = struct
   let toString x =
     match x with
     | `auto -> {js|auto|js}
-    | `num num -> Kloth.Float.toString num
+    | `num num -> Kloth.Float.to_string num
     | `ratio (up, down) ->
-      Kloth.Int.toString up ^ {js| / |js} ^ Kloth.Int.toString down
+      Kloth.Int.to_string up ^ {js| / |js} ^ Kloth.Int.to_string down
 end
 
 module Resize = struct
@@ -402,7 +402,7 @@ end
 module TabSize = struct
   type t = [ `num of float ]
 
-  let toString = function `num n -> Kloth.Float.toString n
+  let toString = function `num n -> Kloth.Float.to_string n
 end
 
 module FlexBasis = struct
@@ -597,18 +597,18 @@ module TimingFunction = struct
     | `stepStart -> {js|step-start|js}
     | `stepEnd -> {js|step-end|js}
     | `steps (i, `start) ->
-      ({js|steps(|js} ^ Kloth.Int.toString i) ^ {js|, start)|js}
+      ({js|steps(|js} ^ Kloth.Int.to_string i) ^ {js|, start)|js}
     | `steps (i, `end_) ->
-      ({js|steps(|js} ^ Kloth.Int.toString i) ^ {js|, end)|js}
+      ({js|steps(|js} ^ Kloth.Int.to_string i) ^ {js|, end)|js}
     | `cubicBezier (a, b, c, d) ->
       {js|cubic-bezier(|js}
-      ^ Kloth.Float.toString a
+      ^ Kloth.Float.to_string a
       ^ {js|, |js}
-      ^ Kloth.Float.toString b
+      ^ Kloth.Float.to_string b
       ^ {js|, |js}
-      ^ Kloth.Float.toString c
+      ^ Kloth.Float.to_string c
       ^ {js|, |js}
-      ^ Kloth.Float.toString d
+      ^ Kloth.Float.to_string d
       ^ {js|)|js}
     | `jumpStart -> {js|jump-start|js}
     | `jumpEnd -> {js|jump-end|js}
@@ -627,7 +627,7 @@ module RepeatValue = struct
     match x with
     | `autoFill -> {js|auto-fill|js}
     | `autoFit -> {js|auto-fit|js}
-    | `num x -> Kloth.Int.toString x
+    | `num x -> Kloth.Int.to_string x
 end
 
 module ListStyleType = struct
@@ -730,7 +730,7 @@ module FontWeight = struct
 
   let toString x =
     match x with
-    | `num n -> Kloth.Int.toString n
+    | `num n -> Kloth.Int.to_string n
     | `thin -> {js|100|js}
     | `extraLight -> {js|200|js}
     | `light -> {js|300|js}
@@ -808,9 +808,9 @@ module Transform = struct
 
   let string_of_scale x y =
     {js|scale(|js}
-    ^ Kloth.Float.toString x
+    ^ Kloth.Float.to_string x
     ^ {js|, |js}
-    ^ Kloth.Float.toString y
+    ^ Kloth.Float.to_string y
     ^ {js|)|js}
 
   let string_of_translate3d x y z =
@@ -837,23 +837,23 @@ module Transform = struct
     | `scale (x, y) -> string_of_scale x y
     | `scale3d (x, y, z) ->
       {js|scale3d(|js}
-      ^ Kloth.Float.toString x
+      ^ Kloth.Float.to_string x
       ^ {js|, |js}
-      ^ Kloth.Float.toString y
+      ^ Kloth.Float.to_string y
       ^ {js|, |js}
-      ^ Kloth.Float.toString z
+      ^ Kloth.Float.to_string z
       ^ {js|)|js}
-    | `scaleX x -> {js|scaleX(|js} ^ Kloth.Float.toString x ^ {js|)|js}
-    | `scaleY y -> {js|scaleY(|js} ^ Kloth.Float.toString y ^ {js|)|js}
-    | `scaleZ z -> {js|scaleZ(|js} ^ Kloth.Float.toString z ^ {js|)|js}
+    | `scaleX x -> {js|scaleX(|js} ^ Kloth.Float.to_string x ^ {js|)|js}
+    | `scaleY y -> {js|scaleY(|js} ^ Kloth.Float.to_string y ^ {js|)|js}
+    | `scaleZ z -> {js|scaleZ(|js} ^ Kloth.Float.to_string z ^ {js|)|js}
     | `rotate a -> {js|rotate(|js} ^ Angle.toString a ^ {js|)|js}
     | `rotate3d (x, y, z, a) ->
       {js|rotate3d(|js}
-      ^ Kloth.Float.toString x
+      ^ Kloth.Float.to_string x
       ^ {js|, |js}
-      ^ Kloth.Float.toString y
+      ^ Kloth.Float.to_string y
       ^ {js|, |js}
-      ^ Kloth.Float.toString z
+      ^ Kloth.Float.to_string z
       ^ {js|, |js}
       ^ Angle.toString a
       ^ {js|)|js}
@@ -868,7 +868,7 @@ module Transform = struct
       ^ {js|)|js}
     | `skewX a -> {js|skewX(|js} ^ Angle.toString a ^ {js|)|js}
     | `skewY a -> {js|skewY(|js} ^ Angle.toString a ^ {js|)|js}
-    | `perspective x -> {js|perspective(|js} ^ Kloth.Int.toString x ^ {js|)|js}
+    | `perspective x -> {js|perspective(|js} ^ Kloth.Int.to_string x ^ {js|)|js}
 end
 
 module AnimationName = struct
@@ -915,7 +915,7 @@ module AnimationIterationCount = struct
 
   let toString x =
     match x with
-    | `count x -> Kloth.Float.toString x
+    | `count x -> Kloth.Float.to_string x
     | `infinite -> {js|infinite|js}
 end
 
@@ -1194,11 +1194,11 @@ module Color = struct
     | #Percentage.t as pc -> Percentage.toString pc
 
   let rgb_to_string r g b =
-    Kloth.Int.toString r
+    Kloth.Int.to_string r
     ^ {js|, |js}
-    ^ Kloth.Int.toString g
+    ^ Kloth.Int.to_string g
     ^ {js|, |js}
-    ^ Kloth.Int.toString b
+    ^ Kloth.Int.to_string b
 
   let rec toString x =
     match x with
@@ -1327,7 +1327,7 @@ module LineHeight = struct
     ]
 
   let toString x =
-    match x with `normal -> {js|normal|js} | `abs x -> Kloth.Float.toString x
+    match x with `normal -> {js|normal|js} | `abs x -> Kloth.Float.to_string x
 end
 
 module LineWidth = struct
@@ -1968,7 +1968,7 @@ module ColumnCount = struct
     ]
 
   let toString x =
-    match x with `auto -> {js|auto|js} | `count v -> Kloth.Int.toString v
+    match x with `auto -> {js|auto|js} | `count v -> Kloth.Int.to_string v
 end
 
 module UserSelect = struct
@@ -2017,7 +2017,7 @@ module GridTemplateAreas = struct
     match x with
     | `none -> {js|none|js}
     | `areas (items : string array) ->
-      Kloth.Array.joinWithMap ~sep:{js| |js}
+      Kloth.Array.map_and_join ~sep:{js| |js}
         ~f:(fun item -> {js|'|js} ^ item ^ {js|'|js})
         items
 end
@@ -2067,8 +2067,8 @@ module Filter = struct
 
   let string_of_amount x =
     match x with
-    | `percent v -> Kloth.Float.toString v ^ {js|%|js}
-    | `num v -> Kloth.Float.toString v
+    | `percent v -> Kloth.Float.to_string v ^ {js|%|js}
+    | `num v -> Kloth.Float.to_string v
 
   let toString x =
     match x with
@@ -2444,7 +2444,7 @@ module Gradient = struct
     | #Var.t as va -> Var.toString va
 
   let string_of_stops stops =
-    Kloth.Array.joinWithMap ~sep:{js|, |js}
+    Kloth.Array.map_and_join ~sep:{js|, |js}
       ~f:(fun (c, l) ->
         match c, l with
         (* This is the consequence of having wrong spec, we can generate broken CSS for gradients, very unlickely that manually you construct a gradient with (None, None), but still. *)
@@ -2939,7 +2939,7 @@ module ZIndex = struct
     ]
 
   let toString x =
-    match x with `auto -> {js|auto|js} | `num x -> Kloth.Int.toString x
+    match x with `auto -> {js|auto|js} | `num x -> Kloth.Int.to_string x
 end
 
 module AlphaValue = struct
@@ -2950,8 +2950,8 @@ module AlphaValue = struct
 
   let toString x =
     match x with
-    | `num x -> Kloth.Float.toString x
-    | `percent x -> Kloth.Float.toString x ^ {js|%|js}
+    | `num x -> Kloth.Float.to_string x
+    | `percent x -> Kloth.Float.to_string x ^ {js|%|js}
 end
 
 module LineBreak = struct

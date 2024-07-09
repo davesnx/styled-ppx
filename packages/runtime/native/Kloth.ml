@@ -1,4 +1,33 @@
 module Array = struct
+  (* Taken from https://github.com/janestreet/base *)
+
+  external caml_make_vect : int -> 'a -> 'a array = "caml_make_vect"
+
+  let length = Stdlib.Array.length
+  let unsafe_get = Stdlib.Array.unsafe_get
+  let unsafe_set = Stdlib.Array.unsafe_set
+  let sub = Stdlib.ArrayLabels.sub
+
+  let create ~len x =
+    try caml_make_vect len x
+    with Invalid_argument _ ->
+      failwith @@ Printf.sprintf "Array.create ~len:%d: invalid length" len
+
+  let filter_mapi ~f t =
+    let r = ref [||] in
+    let k = ref 0 in
+    for i = 0 to length t - 1 do
+      match f i (unsafe_get t i) with
+      | None -> ()
+      | Some a ->
+        if !k = 0 then r := create ~len:(length t) a;
+        unsafe_set !r !k a;
+        incr k
+    done;
+    if !k = length t then !r else if !k > 0 then sub ~pos:0 ~len:!k !r else [||]
+
+  (* Public API *)
+
   let reduce ~init ~f t =
     let r = ref init in
     for i = 0 to Stdlib.Array.length t - 1 do
@@ -6,9 +35,10 @@ module Array = struct
     done;
     !r
 
-  let map ~f t = Stdlib.ArrayLabels.map ~f t
+  let map = Stdlib.ArrayLabels.map
+  let filter_map ~f t = (filter_mapi t ~f:(fun _i a -> f a) [@nontail])
 
-  let joinWithMap ~sep ~f strings =
+  let map_and_join ~sep ~f strings =
     let len = Stdlib.Array.length strings in
     let rec run i acc =
       if i >= len then acc
@@ -23,7 +53,7 @@ module String = struct
   let trim = Stdlib.String.trim
   let length = Stdlib.String.length
 
-  let startsWith ~prefix str =
+  let starts_with ~prefix str =
     let len_prefix = String.length prefix in
     let len_str = String.length str in
     let rec compare_prefix i =
@@ -34,11 +64,11 @@ module String = struct
 end
 
 module Int = struct
-  let toString v = Stdlib.string_of_int v
+  let to_string v = Stdlib.string_of_int v
 end
 
 module Float = struct
-  let toString t =
+  let to_string t =
     (* round x rounds x to the nearest integer with ties (fractional values of 0.5) rounded away from zero, regardless of the current rounding direction. If x is an integer, +0., -0., nan, or infinite, x itself is returned.
 
        On 64-bit mingw-w64, this function may be emulated owing to a bug in the C runtime library (CRT) on this platform. *)
@@ -49,11 +79,11 @@ module Float = struct
 end
 
 module Option = struct
-  let getWithDefault default opt =
+  let get_with_default default opt =
     match opt with Some x -> x | None -> default
 
-  let mapWithDefault opt default fn =
+  let map_with_default opt default fn =
     match opt with Some x -> fn x | None -> default
 
-  let map f opt = match opt with Some x -> Some (f x) | None -> None
+  let map ~f opt = match opt with Some x -> Some (f x) | None -> None
 end

@@ -38,7 +38,9 @@ let merge4 s s2 s3 s4 = merge [| s; s2; s3; s4 |]
 let framesToDict frames =
   Kloth.Array.reduce ~init:(Js.Dict.empty ())
     ~f:(fun dict (stop, rules) ->
-      Js.Dict.set dict (Kloth.Int.toString stop ^ {js|%|js}) (Rule.toJson rules);
+      Js.Dict.set dict
+        (Kloth.Int.to_string stop ^ {js|%|js})
+        (Rule.toJson rules);
       dict)
     frames
 
@@ -48,39 +50,20 @@ let renderKeyframes _renderer frames = makeAnimation (framesToDict frames)
 (* This method is a Css_type function, but with side-effects. It pushes the fontFace as global style *)
 let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
     =
-  let open Css_types in
-  let fontStyle =
-    Kloth.Option.mapWithDefault fontStyle {js||js} (fun value ->
-        {js|font-style: |js} ^ FontStyle.toString value ^ {js|;|js})
-  in
-  let src = Kloth.Array.joinWithMap ~sep:{js|, |js} ~f:FontFace.toString src in
-  let fontWeight =
-    Kloth.Option.mapWithDefault fontWeight {js||js} (fun w ->
-        ({js|font-weight: |js}
-        ^
-        match w with
-        | #FontWeight.t as f -> FontWeight.toString f
-        | #Var.t as va -> Var.toString va
-        | #Cascading.t as c -> Cascading.toString c)
-        ^ {js|;|js})
-  in
-  let fontDisplay =
-    Kloth.Option.mapWithDefault fontDisplay {js||js} (fun f ->
-        {js|font-display: |js} ^ FontDisplay.toString f ^ {js|;|js})
-  in
-  let sizeAdjust =
-    Kloth.Option.mapWithDefault sizeAdjust {js||js} (fun s ->
-        {js|size-adjust: |js} ^ Percentage.toString s ^ {js|;|js})
-  in
   let fontFace =
-    {js|@font-face {|js}
-    ^ ({js|font-family: |js} ^ fontFamily)
-    ^ ({js|; src: |js} ^ src)
-    ^ fontStyle
-    ^ fontWeight
-    ^ fontDisplay
-    ^ sizeAdjust
-    ^ {js|}|js}
+    [|
+      Kloth.Option.map ~f:Properties.fontStyle fontStyle;
+      Kloth.Option.map ~f:Properties.fontWeight fontWeight;
+      Kloth.Option.map ~f:Properties.fontDisplay fontDisplay;
+      Kloth.Option.map ~f:Properties.sizeAdjust sizeAdjust;
+      Some (Properties.fontFamily fontFamily);
+      Some
+        (Rule.Declaration
+           ( "src",
+             Kloth.Array.map_and_join ~sep:{js|, |js}
+               ~f:Css_types.FontFace.toString src ));
+    |]
+    |> Kloth.Array.filter_map ~f:Fun.id
   in
-  injectRaw fontFace;
+  global [| Rule.Selector ("@font-face", fontFace) |];
   fontFamily

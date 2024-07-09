@@ -151,7 +151,7 @@ let backfaceVisibility x =
 let backdropFilter x =
   Rule.declaration
     ( {js|backdropFilter|js},
-      Kloth.Array.joinWithMap ~sep:{js|, |js} x ~f:Filter.toString )
+      Kloth.Array.map_and_join ~sep:{js|, |js} x ~f:Filter.toString )
 
 let backgroundAttachment x =
   Rule.declaration
@@ -184,7 +184,7 @@ let backgroundImage x =
 let backgroundImages imgs =
   Rule.declaration
     ( {js|backgroundImage|js},
-      Kloth.Array.joinWithMap imgs ~sep:{js|, |js} ~f:string_of_backgroundImage
+      Kloth.Array.map_and_join imgs ~sep:{js|, |js} ~f:string_of_backgroundImage
     )
 
 let maskImage x =
@@ -241,7 +241,7 @@ let backgroundPosition4 ~x ~offsetX ~y ~offsetY =
 let backgroundPositions bp =
   Rule.declaration
     ( {js|backgroundPosition|js},
-      Kloth.Array.joinWithMap bp ~sep:{js|, |js} ~f:(fun (x, y) ->
+      Kloth.Array.map_and_join bp ~sep:{js|, |js} ~f:(fun (x, y) ->
           string_of_backgroundPosition x
           ^ {js| |js}
           ^ string_of_backgroundPosition y) )
@@ -280,7 +280,7 @@ let maskPosition x =
 let maskPositions mp =
   Rule.declaration
     ( {js|maskPosition|js},
-      Kloth.Array.joinWithMap mp ~sep:{js|, |js} ~f:string_of_maskposition )
+      Kloth.Array.map_and_join mp ~sep:{js|, |js} ~f:string_of_maskposition )
 
 let borderImageSource x =
   Rule.declaration
@@ -396,7 +396,7 @@ let contentRule x = Rule.declaration ({js|content|js}, string_of_content x)
 let contentRules xs =
   Rule.declaration
     ( {js|content|js},
-      Kloth.Array.joinWithMap ~sep:{js| |js} xs ~f:string_of_content )
+      Kloth.Array.map_and_join ~sep:{js| |js} xs ~f:string_of_content )
 
 let counterIncrement x =
   Rule.declaration ({js|counterIncrement|js}, string_of_counter_increment x)
@@ -404,7 +404,7 @@ let counterIncrement x =
 let countersIncrement xs =
   Rule.declaration
     ( {js|counterIncrement|js},
-      Kloth.Array.joinWithMap ~sep:{js| |js} xs ~f:string_of_counter_increment
+      Kloth.Array.map_and_join ~sep:{js| |js} xs ~f:string_of_counter_increment
     )
 
 let counterReset x =
@@ -413,14 +413,14 @@ let counterReset x =
 let countersReset xs =
   Rule.declaration
     ( {js|counterReset|js},
-      Kloth.Array.joinWithMap ~sep:{js| |js} xs ~f:string_of_counter_reset )
+      Kloth.Array.map_and_join ~sep:{js| |js} xs ~f:string_of_counter_reset )
 
 let counterSet x = Rule.declaration ({js|counterSet|js}, string_of_counter_set x)
 
 let countersSet xs =
   Rule.declaration
     ( {js|counterSet|js},
-      Kloth.Array.joinWithMap ~sep:{js| |js} xs ~f:string_of_counter_set )
+      Kloth.Array.map_and_join ~sep:{js| |js} xs ~f:string_of_counter_set )
 
 let cursor x = Rule.declaration ({js|cursor|js}, Cursor.toString x)
 
@@ -449,9 +449,9 @@ let display x =
 let flex grow shrink basis =
   Rule.declaration
     ( {js|flex|js},
-      Kloth.Float.toString grow
+      Kloth.Float.to_string grow
       ^ {js| |js}
-      ^ Kloth.Float.toString shrink
+      ^ Kloth.Float.to_string shrink
       ^ {js| |js}
       ^
       match basis with
@@ -463,14 +463,14 @@ let flex1 x =
     ( {js|flex|js},
       match x with
       | #Flex.t as f -> Flex.toString f
-      | `num n -> Kloth.Float.toString n )
+      | `num n -> Kloth.Float.to_string n )
 
 let flex2 ?basis ?shrink grow =
   Rule.declaration
     ( {js|flex|js},
-      Kloth.Float.toString grow
+      Kloth.Float.to_string grow
       ^ (match shrink with
-        | Some s -> {js| |js} ^ Kloth.Float.toString s
+        | Some s -> {js| |js} ^ Kloth.Float.to_string s
         | None -> {js||js})
       ^
       match basis with
@@ -486,8 +486,8 @@ let flexDirection x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let flexGrow x = Rule.declaration ({js|flexGrow|js}, Kloth.Float.toString x)
-let flexShrink x = Rule.declaration ({js|flexShrink|js}, Kloth.Float.toString x)
+let flexGrow x = Rule.declaration ({js|flexGrow|js}, Kloth.Float.to_string x)
+let flexShrink x = Rule.declaration ({js|flexShrink|js}, Kloth.Float.to_string x)
 
 let flexWrap x =
   Rule.declaration
@@ -516,7 +516,7 @@ let fontFamily x =
 let fontFamilies xs =
   Rule.declaration
     ( {js|fontFamily|js},
-      Kloth.Array.joinWithMap ~sep:{js|, |js} ~f:FontFamilyName.toString xs )
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:FontFamilyName.toString xs )
 
 let fontSize x =
   Rule.declaration
@@ -577,21 +577,21 @@ let gridAutoFlow x =
 let gridColumn start end' =
   Rule.declaration
     ( {js|gridColumn|js},
-      Kloth.Int.toString start ^ {js| / |js} ^ Kloth.Int.toString end' )
+      Kloth.Int.to_string start ^ {js| / |js} ^ Kloth.Int.to_string end' )
 
 let gridColumnGap x =
   Rule.declaration ({js|gridColumnGap|js}, string_of_column_gap x)
 
 let gridColumnStart n =
-  Rule.declaration ({js|gridColumnStart|js}, Kloth.Int.toString n)
+  Rule.declaration ({js|gridColumnStart|js}, Kloth.Int.to_string n)
 
 let gridColumnEnd n =
-  Rule.declaration ({js|gridColumnEnd|js}, Kloth.Int.toString n)
+  Rule.declaration ({js|gridColumnEnd|js}, Kloth.Int.to_string n)
 
 let gridRow start end' =
   Rule.declaration
     ( {js|gridRow|js},
-      Kloth.Int.toString start ^ {js| / |js} ^ Kloth.Int.toString end' )
+      Kloth.Int.to_string start ^ {js| / |js} ^ Kloth.Int.to_string end' )
 
 let gap x = Rule.declaration ({js|gap|js}, string_of_gap x)
 let gridGap x = Rule.declaration ({js|gridGap|js}, string_of_gap x)
@@ -609,10 +609,10 @@ let gridRowGap x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let gridRowEnd n = Rule.declaration ({js|gridRowEnd|js}, Kloth.Int.toString n)
+let gridRowEnd n = Rule.declaration ({js|gridRowEnd|js}, Kloth.Int.to_string n)
 
 let gridRowStart n =
-  Rule.declaration ({js|gridRowStart|js}, Kloth.Int.toString n)
+  Rule.declaration ({js|gridRowStart|js}, Kloth.Int.to_string n)
 
 let height x =
   Rule.declaration
@@ -861,7 +861,7 @@ let objectPosition2 x y =
       ^ {js| |js}
       ^ string_of_backgroundPosition y )
 
-let opacity x = Rule.declaration ({js|opacity|js}, Kloth.Float.toString x)
+let opacity x = Rule.declaration ({js|opacity|js}, Kloth.Float.to_string x)
 
 let outline size style color =
   Rule.declaration
@@ -1123,7 +1123,7 @@ let transform x =
 let transforms x =
   Rule.declaration
     ( {js|transform|js},
-      Kloth.Array.joinWithMap ~sep:{js| |js} ~f:Transform.toString x )
+      Kloth.Array.map_and_join ~sep:{js| |js} ~f:Transform.toString x )
 
 let transformOrigin x =
   Rule.declaration ({js|transformOrigin|js}, TransformOrigin.toString x)
@@ -1268,9 +1268,9 @@ let zIndex x = Rule.declaration ({js|zIndex|js}, ZIndex.toString x)
 let flex3 ~grow ~shrink ~basis =
   Rule.declaration
     ( {js|flex|js},
-      Kloth.Float.toString grow
+      Kloth.Float.to_string grow
       ^ {js| |js}
-      ^ Kloth.Float.toString shrink
+      ^ Kloth.Float.to_string shrink
       ^ {js| |js}
       ^
       match basis with
@@ -1284,13 +1284,13 @@ let flexBasis x =
       | #FlexBasis.t as b -> FlexBasis.toString b
       | #Length.t as l -> Length.toString l )
 
-let order x = Rule.declaration ({js|order|js}, Kloth.Int.toString x)
+let order x = Rule.declaration ({js|order|js}, Kloth.Int.to_string x)
 
 let string_of_minmax x =
   match x with
   | `auto -> {js|auto|js}
   | #Length.t as l -> Length.toString l
-  | `fr x -> Kloth.Float.toString x ^ {js|fr|js}
+  | `fr x -> Kloth.Float.to_string x ^ {js|fr|js}
   | `minContent -> {js|min-content|js}
   | `maxContent -> {js|max-content|js}
 
@@ -1300,7 +1300,7 @@ let string_of_dimension x =
   | `none -> {js|none|js}
   | `subgrid -> {js|subgrid|js}
   | #Length.t as l -> Length.toString l
-  | `fr x -> Kloth.Float.toString x ^ {js|fr|js}
+  | `fr x -> Kloth.Float.to_string x ^ {js|fr|js}
   | `fitContent -> {js|fit-content|js}
   | `minContent -> {js|min-content|js}
   | `maxContent -> {js|max-content|js}
@@ -1340,7 +1340,7 @@ let rec gridLengthToJs x =
   | `none -> {js|none|js}
   | `auto -> {js|auto|js}
   | #Length.t as l -> Length.toString l
-  | `fr x -> Kloth.Float.toString x ^ {js|fr|js}
+  | `fr x -> Kloth.Float.to_string x ^ {js|fr|js}
   | `minContent -> {js|min-content|js}
   | `maxContent -> {js|max-content|js}
   | `fitContent x ->
@@ -1359,7 +1359,7 @@ let rec gridLengthToJs x =
     ^ {js|)|js}
 
 and string_of_dimensions dimensions =
-  Kloth.Array.joinWithMap ~f:gridLengthToJs ~sep:{js| |js} dimensions
+  Kloth.Array.map_and_join ~f:gridLengthToJs ~sep:{js| |js} dimensions
 
 let gridTemplateColumns dimensions =
   Rule.declaration ({js|gridTemplateColumns|js}, string_of_dimensions dimensions)
@@ -1416,7 +1416,8 @@ let gridTemplateAreas l =
 
 let filter x =
   Rule.declaration
-    ({js|filter|js}, Kloth.Array.joinWithMap ~f:Filter.toString ~sep:{js| |js} x)
+    ( {js|filter|js},
+      Kloth.Array.map_and_join ~f:Filter.toString ~sep:{js| |js} x )
 
 module Shadow = struct
   type 'a value = string
@@ -1467,7 +1468,7 @@ let boxShadow x =
 let boxShadows x =
   Rule.declaration
     ( {js|boxShadow|js},
-      Kloth.Array.joinWithMap ~sep:{js|, |js} ~f:Shadow.toString x )
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:Shadow.toString x )
 
 let string_of_borderstyle x =
   match x with
@@ -1547,7 +1548,7 @@ let background x =
 let backgrounds x =
   Rule.declaration
     ( {js|background|js},
-      Kloth.Array.joinWithMap ~sep:{js|, |js} x ~f:(fun item ->
+      Kloth.Array.map_and_join ~sep:{js|, |js} x ~f:(fun item ->
           match item with
           | #Color.t as c -> Color.toString c
           | #Url.t as u -> Url.toString u
@@ -1587,7 +1588,7 @@ let textShadow x =
 let textShadows x =
   Rule.declaration
     ( {js|textShadow|js},
-      Kloth.Array.joinWithMap ~sep:{js|, |js} x ~f:Shadow.toString )
+      Kloth.Array.map_and_join ~sep:{js|, |js} x ~f:Shadow.toString )
 
 let transformStyle x =
   Rule.declaration
@@ -1620,7 +1621,7 @@ let transitionValue x =
 let transitionList x =
   Rule.declaration
     ( {js|transition|js},
-      Kloth.Array.joinWithMap ~sep:{js|, |js} ~f:Transition.toString x )
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:Transition.toString x )
 
 let transitions = transitionList
 
@@ -1676,7 +1677,7 @@ let animation ?duration ?delay ?direction ?timingFunction ?fillMode ?playState
 let animations x =
   Rule.declaration
     ( {js|animation|js},
-      Kloth.Array.joinWithMap ~sep:{js|, |js} ~f:Animation.toString x )
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:Animation.toString x )
 
 let animationName x = Rule.declaration ({js|animationName|js}, x)
 
@@ -1691,7 +1692,7 @@ module SVG = struct
         | #Url.t as u -> Url.toString u )
 
   let fillOpacity opacity =
-    Rule.declaration ({js|fillOpacity|js}, Kloth.Float.toString opacity)
+    Rule.declaration ({js|fillOpacity|js}, Kloth.Float.to_string opacity)
 
   let fillRule x =
     Rule.declaration
@@ -1707,7 +1708,7 @@ module SVG = struct
         match x with
         | `none -> {js|none|js}
         | `dasharray a ->
-          Kloth.Array.joinWithMap a ~f:string_of_dasharray ~sep:{js| |js} )
+          Kloth.Array.map_and_join a ~f:string_of_dasharray ~sep:{js| |js} )
 
   let strokeWidth x = Rule.declaration ({js|strokeWidth|js}, Length.toString x)
 
@@ -1715,7 +1716,7 @@ module SVG = struct
     Rule.declaration ({js|strokeOpacity|js}, AlphaValue.toString opacity)
 
   let strokeMiterlimit x =
-    Rule.declaration ({js|strokeMiterlimit|js}, Kloth.Float.toString x)
+    Rule.declaration ({js|strokeMiterlimit|js}, Kloth.Float.to_string x)
 
   let strokeLinecap x =
     Rule.declaration
@@ -1736,7 +1737,7 @@ module SVG = struct
   let stopColor x = Rule.declaration ({js|stopColor|js}, string_of_color x)
 
   let stopOpacity x =
-    Rule.declaration ({js|stopOpacity|js}, Kloth.Float.toString x)
+    Rule.declaration ({js|stopOpacity|js}, Kloth.Float.to_string x)
 end
 
 let touchAction x =
