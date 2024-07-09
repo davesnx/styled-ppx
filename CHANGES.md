@@ -2,6 +2,9 @@
 
 ## 0.58.1
 - [BREAKING] FontFamilyName.t is now a string (@davesnx)
+- [FIX] Make unsafe calls from "Cascading" be camelCase to avoid emotion's warning #488 (@davesnx)
+- [FIX] Keep classname when ampersand is at the end of the selector (@davesnx)
+- [FIX] Fix fontFace in both melange and native (@davesnx)
 
 ## 0.58.0
 - [FEATURE] Initial @container support #476 (@zakybilfagih)

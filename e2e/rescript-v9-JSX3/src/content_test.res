@@ -12,8 +12,8 @@ let testData = [
   (Content.toString(#text(`'single'`)), `'single'`),
   (Content.toString(#text(`"double"`)), `"double"`),
   (Content.toString(#text(`'`)), `"'"`),
-  (FontFamily.toString(#custom("Inter")), `"Inter"`),
-  (FontFamily.toString(#custom(`"Inter Bold"`)), `"Inter Bold"`),
+  (FontFamily.toString("Inter"), `"Inter"`),
+  (FontFamily.toString(`"Inter Bold"`), `"Inter Bold"`),
 ]
 
 describe("content as string", () => {
@@ -28,8 +28,8 @@ let testData = list{
   (%css(`content: '\"'`), CssJs.contentRule(#text("'\"'"))),
   (%css("content: ' '"), CssJs.contentRule(#text("' '"))),
   (%css("content: 'single'"), CssJs.contentRule(#text("'single'"))),
-  (%css(`font-family: "Lola"`), CssJs.fontFamily(#custom("Lola"))),
-  (%css(`font-family: "Lola del rio"`), CssJs.fontFamily(#custom("Lola del rio"))),
+  (%css(`font-family: "Lola"`), CssJs.fontFamily("Lola")),
+  (%css(`font-family: "Lola del rio"`), CssJs.fontFamily("Lola del rio")),
 }
 
 describe("content to rule", () => {

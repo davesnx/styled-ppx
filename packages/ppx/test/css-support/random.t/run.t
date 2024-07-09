@@ -105,8 +105,8 @@ If this test fail means that the module is not in sync with the ppx
   (CssJs.SVG.fill(c): CssJs.rule);
   CssJs.SVG.fill(`currentColor);
   CssJs.gap(`pxFloat(4.));
-  CssJs.unsafe({js|grid-column|js}, {js|unset|js});
-  CssJs.unsafe({js|grid-row|js}, {js|unset|js});
+  CssJs.unsafe({js|gridColumn|js}, {js|unset|js});
+  CssJs.unsafe({js|gridRow|js}, {js|unset|js});
   CssJs.gridTemplateColumns([|`maxContent, `maxContent|]);
   CssJs.gridTemplateColumns([|
     `minmax((`pxFloat(10.), `auto)),
@@ -122,7 +122,7 @@ If this test fail means that the module is not in sync with the ppx
   CssJs.gridTemplateColumns([|`repeat((`num(3), [|`auto|]))|]);
   CssJs.unsafe({js|height|js}, {js|fit-content|js});
   CssJs.justifyItems(`start);
-  CssJs.unsafe({js|justify-self|js}, {js|unset|js});
+  CssJs.unsafe({js|justifySelf|js}, {js|unset|js});
   CssJs.unsafe({js|left|js}, {js|unset|js});
   let maskedImageUrl = `url("https://www.example.com/eye-uncrossed.svg");
   (CssJs.maskImage(maskedImageUrl): CssJs.rule);

@@ -32,13 +32,13 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
-  CssJs.fontFamilies([|`custom({js|Inter Semi Bold|js})|]);
+  CssJs.fontFamilies([|{js|Inter Semi Bold|js}|]);
   CssJs.fontFamilies(fonts: array(CssJs.Types.FontFamilyName.t));
-  CssJs.fontFamilies([|`custom({js|Inter|js})|]);
+  CssJs.fontFamilies([|{js|Inter|js}|]);
   CssJs.fontFamilies(font: array(CssJs.Types.FontFamilyName.t));
-  CssJs.fontFamilies([|`custom({js|Inter|js}), `custom({js|Sans|js})|]);
-  CssJs.fontFamilies([|`custom({js|Inter|js}), font|]);
-  CssJs.fontFamilies([|`custom({js|Gill Sans Extrabold|js}), `sansSerif|]);
+  CssJs.fontFamilies([|{js|Inter|js}, {js|Sans|js}|]);
+  CssJs.fontFamilies([|{js|Inter|js}, font|]);
+  CssJs.fontFamilies([|{js|Gill Sans Extrabold|js}, "sans-serif"|]);
   CssJs.fontSynthesisWeight(`none);
   CssJs.fontSynthesisStyle(`auto);
   CssJs.fontSynthesisSmallCaps(`none);

@@ -34,6 +34,6 @@ If this test fail means that the module is not in sync with the ppx
     }
   ];
   CssJs.unsafe({js|color|js}, {js|unset|js});
-  CssJs.unsafe({js|font-weight|js}, {js|unset|js});
-  CssJs.unsafe({js|background-image|js}, {js|unset|js});
+  CssJs.unsafe({js|fontWeight|js}, {js|unset|js});
+  CssJs.unsafe({js|backgroundImage|js}, {js|unset|js});
   CssJs.unsafe({js|width|js}, {js|unset|js});

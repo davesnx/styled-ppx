@@ -806,10 +806,10 @@ and property_align_content = [%value.rec
   "'normal' | <baseline-position> | <content-distribution> | [ <overflow-position> ]? <content-position>"
 ]
 and property_align_items = [%value.rec
-  "'normal' | 'stretch' | <baseline-position> | [ <overflow-position> ]? <self-position>"
+  "'normal' | 'stretch' | <baseline-position> | [ <overflow-position> ]? <self-position> | <interpolation>"
 ]
 and property_align_self = [%value.rec
-  "'auto' | 'normal' | 'stretch' | <baseline-position> | [ <overflow-position> ]? <self-position>"
+  "'auto' | 'normal' | 'stretch' | <baseline-position> | [ <overflow-position> ]? <self-position> | <interpolation>"
 ]
 and property_alignment_baseline = [%value.rec
   "'auto' | 'baseline' | 'before-edge' | 'text-before-edge' | 'middle' | 'central' | 'after-edge' | 'text-after-edge' | 'ideographic' | 'alphabetic' | 'hanging' | 'mathematical'"

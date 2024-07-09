@@ -486,7 +486,7 @@ let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
              Kloth.Array.map_and_join ~sep:{js|, |js}
                ~f:Css_types.FontFace.toString src ));
     |]
-    |> Array.filter_map ~f:Fun.id
+    |> Kloth.Array.filter_map ~f:(fun i -> i)
   in
   global [| Rule.Selector ("@font-face", fontFace) |];
   fontFamily
