@@ -1002,8 +1002,10 @@ and property_clip_path = [%value.rec
 ]
 and property_clip_rule = [%value.rec "'nonzero' | 'evenodd'"]
 and property_color = [%value.rec "<color>"]
-and property_color_interpolation_filters = [%value.rec "'auto' | 'sRGB'"]
-and property_color_interpolation = [%value.rec "'auto' | 'sRGB'"]
+and property_color_interpolation_filters = [%value.rec
+  "'auto' | 'sRGB' | 'linearRGB'"
+]
+and property_color_interpolation = [%value.rec "'auto' | 'sRGB' | 'linearRGB'"]
 
 and property_color_adjust = [%value.rec "'economy' | 'exact'"]
 and property_column_count = [%value.rec "<integer> | 'auto'"]
@@ -1026,9 +1028,7 @@ and property_contain = [%value.rec
 and property_content = [%value.rec
   "'normal' | 'none' | [ <content-replacement> | <content-list> ] [ '/' <string> ]?"
 ]
-and property_content_visibility = [%value.rec
-  "'visible' | 'hidden' | 'collapse'"
-]
+and property_content_visibility = [%value.rec "'visible' | 'hidden' | 'auto'"]
 and property_counter_increment = [%value.rec
   "[ <custom-ident> [ <integer> ]? ]+ | 'none'"
 ]
@@ -1178,7 +1178,7 @@ and property_height = [%value.rec
   "'auto' | <extended-length> | <extended-percentage> | 'min-content' | 'max-content' | 'fit-content' | fit-content( <extended-length> | <extended-percentage> )"
 ]
 and property_hyphens = [%value.rec "'none' | 'manual' | 'auto'"]
-and property_hyphenate_character = [%value.rec "'auto' | <string-token>'-'"]
+and property_hyphenate_character = [%value.rec "'auto' | <string-token>"]
 and property_hyphenate_limit_chars = [%value.rec "'auto' | <integer>"]
 and property_hyphenate_limit_lines = [%value.rec "'no-limit' | <integer>"]
 and property_hyphenate_limit_zone = [%value.rec
