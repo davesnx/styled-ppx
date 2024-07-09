@@ -288,10 +288,11 @@ let resolve_selectors rules =
         when starts_with_at current_selector ->
         Right [| Rule.Selector (current_selector, selector_rules) |]
       | Rule.Selector (current_selector, selector_rules) ->
-        let is_first_level = prefix != "" in
         (* we derive the new prefix based on the current_selector and the previous "prefix" (aka the prefix added by the parent selector) *)
         let new_prefix =
-          if is_first_level then
+          match prefix with
+          | None -> current_selector
+          | Some prefix ->
             (* child starts with &, join them without space *)
             if starts_with_ampersand current_selector then
               prefix ^ remove_first_ampersand current_selector
@@ -305,22 +306,22 @@ let resolve_selectors rules =
             else if starts_with_dot current_selector then
               prefix ^ " " ^ current_selector
             else prefix ^ " " ^ current_selector
-          else prefix ^ current_selector
         in
         let selector_rules = split_multiple_selectors selector_rules in
         let selectors, rest_of_declarations =
-          unnest_selectors ~prefix:new_prefix selector_rules
+          unnest_selectors ~prefix:(Some new_prefix) selector_rules
         in
         let new_selector = Rule.Selector (new_prefix, selectors) in
-        Right
-          (Array.append [| new_selector |] (Array.flatten rest_of_declarations))
+        Right (Array.append [| new_selector |] rest_of_declarations)
       | _ as rule -> Left rule)
+    |> fun (selectors, declarations) -> selectors, Array.flatten declarations
   in
 
   let rules = move_media_at_top rules in
   let rules = split_multiple_selectors rules in
-  let declarations, selectors = unnest_selectors ~prefix:"" rules in
-  Array.append declarations (Array.flatten selectors)
+  (* The base case for unnesting is without any prefix *)
+  let declarations, selectors = unnest_selectors ~prefix:None rules in
+  Array.append declarations selectors
 
 let render_keyframes animationName keyframes =
   let definition =
