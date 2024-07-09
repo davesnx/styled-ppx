@@ -3603,6 +3603,7 @@ let align_items =
         [%expr `safe([%e render_self_position(~loc, position)])]
       | `Static(Some(`Unsafe), position) =>
         [%expr `unsafe([%e render_self_position(~loc, position)])]
+      | `Interpolation(v) => render_variable(~loc, v)
       }
     },
   );
@@ -3623,6 +3624,7 @@ let align_self =
         [%expr `safe([%e render_self_position(~loc, position)])]
       | `Static(Some(`Unsafe), position) =>
         [%expr `unsafe([%e render_self_position(~loc, position)])]
+      | `Interpolation(v) => render_variable(~loc, v)
       }
     },
   );
