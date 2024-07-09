@@ -91,8 +91,8 @@ $(foreach target,$(TEST_TARGETS), $(eval $(call create-test,$(target))))
 $(foreach target,$(TEST_TARGETS), $(eval $(call create-test-watch,$(target))))
 $(foreach target,$(TEST_TARGETS), $(eval $(call create-test-promote,$(target))))
 
-.PHONY: test-e2e-rescript_v9
-test-e2e-rescript_v9: ## Run End-to-end tests for JSX3
+.PHONY: test-e2e-rescript-v9
+test-e2e-rescript-v9: ## Run End-to-end tests for JSX3
 	npm --prefix 'e2e/rescript-v9-JSX3' install
 	npm --prefix 'e2e/rescript-v9-JSX3' run build
 	npm --prefix 'e2e/rescript-v9-JSX3' run test
