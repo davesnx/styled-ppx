@@ -86,9 +86,7 @@
       ),
       CSS.selector(
         {js|fieldset|js},
-        [|
-          CSS.padding3(~top=`em(0.35), ~h=`em(0.75), ~bottom=`em(0.625)),
-        |],
+        [|CSS.padding3(~top=`em(0.35), ~h=`em(0.75), ~bottom=`em(0.625))|],
       ),
       CSS.selector(
         {js|legend|js},
