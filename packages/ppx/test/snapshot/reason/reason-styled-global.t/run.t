@@ -27,8 +27,8 @@
       CSS.selector(
         {js|pre|js},
         [|
-          CSS.fontFamilies([|`monospace, `monospace|]),
-          CSS.fontSize(`em(1.)),
+          CssJs.fontFamilies([|"monospace", "monospace"|]),
+          CssJs.fontSize(`em(1.)),
         |],
       ),
       CSS.selector({js|a|js}, [|CSS.backgroundColor(`transparent)|]),
@@ -44,8 +44,8 @@
       CSS.selector(
         {js|code, kbd, samp|js},
         [|
-          CSS.fontFamilies([|`monospace, `monospace|]),
-          CSS.fontSize(`em(1.)),
+          CssJs.fontFamilies([|"monospace", "monospace"|]),
+          CssJs.fontSize(`em(1.)),
         |],
       ),
       CSS.selector({js|small|js}, [|CSS.fontSize(`percent(80.))|]),
@@ -64,10 +64,10 @@
       CSS.selector(
         {js|button, input, optgroup, select, textarea|js},
         [|
-          CSS.unsafe({js|font-family|js}, {js|inherit|js}),
-          CSS.fontSize(`percent(100.)),
-          CSS.lineHeight(`abs(1.15)),
-          CSS.margin(`zero),
+          CssJs.unsafe({js|fontFamily|js}, {js|inherit|js}),
+          CssJs.fontSize(`percent(100.)),
+          CssJs.lineHeight(`abs(1.15)),
+          CssJs.margin(`zero),
         |],
       ),
       CSS.selector({js|button, input|js}, [|CSS.overflow(`visible)|]),

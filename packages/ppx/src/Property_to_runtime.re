@@ -2318,7 +2318,7 @@ let line_height_step =
   );
 
 let hyphens =
-  variants(Property_parser.property_hyphens, (~loc) => [%expr CSS.hyphens]);
+  variants(Property_parser.property_hyphens, (~loc) => [%expr CssJs.hyphens]);
 
 let overflow_wrap =
   variants(Property_parser.property_overflow_wrap, (~loc) =>
@@ -3949,7 +3949,9 @@ let grid_auto_flow =
   );
 
 let grid =
-  unsupportedValue(Property_parser.property_grid, (~loc) => [%expr CSS.grid]);
+  unsupportedValue(Property_parser.property_grid, (~loc) =>
+    [%expr CssJs.grid]
+  );
 
 let grid_row_start =
   unsupportedValue(Property_parser.property_grid_row_start, (~loc) =>
@@ -4807,7 +4809,7 @@ let table_layout = unsupportedProperty(Property_parser.property_table_layout);
 let will_change =
   monomorphic(
     Property_parser.property_will_change,
-    (~loc) => [%expr CSS.willChange],
+    (~loc) => [%expr CssJs.willChange],
     (~loc, value: Types.property_will_change) => {
       switch (value) {
       | `Auto => [%expr `auto]
@@ -4826,7 +4828,7 @@ let touch_action = unsupportedProperty(Property_parser.property_touch_action);
 let user_select =
   monomorphic(
     Property_parser.property_user_select,
-    (~loc) => [%expr CSS.userSelect],
+    (~loc) => [%expr CssJs.userSelect],
     (~loc) =>
       fun
       | `Auto => [%expr `auto]
@@ -4840,7 +4842,7 @@ let user_select =
 let zoom =
   monomorphic(
     Property_parser.property_zoom,
-    (~loc) => [%expr CSS.zoom],
+    (~loc) => [%expr CssJs.zoom],
     (~loc) =>
       fun
       | `Number(number) => [%expr `num([%e render_float(~loc, number)])]

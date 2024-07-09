@@ -32,10 +32,10 @@ If this test fail means that the module is not in sync with the ppx
     }
   ];
   let _chart =
-    CSS.style([|
-      CSS.label("_chart"),
-      CSS.userSelect(`none),
-      CSS.selector(
+    CssJs.style([|
+      CssJs.label("_chart"),
+      CssJs.userSelect(`none),
+      CssJs.selector(
         {js|.recharts-cartesian-grid-horizontal|js},
         [|
           CSS.selector(

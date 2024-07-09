@@ -1,5 +1,10 @@
 # Changes
 
+## 0.59.0
+- [BREAKING] Change entry point module `CSS` (from `CssJs`) on `styled-ppx.melange`, `styled-ppx.native` and `styled-ppx.rescript` (#490) (@davesnx)
+- [FEATURE] Add support and interpolation for `zoom`, `will-change` and `user-select` properties (#489) (@davesnx)
+- [FIX] Add 100 unsupported properties, which will render properly (#489) (@davesnx)
+
 ## 0.58.1
 - [BREAKING] FontFamilyName.t is now a string (@davesnx)
 - [FIX] Make unsafe calls from "Cascading" be camelCase to avoid emotion's warning #488 (@davesnx)
