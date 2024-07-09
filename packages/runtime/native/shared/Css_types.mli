@@ -1769,30 +1769,9 @@ module FontFace : sig
 end
 
 module FontFamilyName : sig
-  type t =
-    [ `cursive
-    | `custom of string
-    | `emoji
-    | `fangsong
-    | `fantasy
-    | `math
-    | `monospace
-    | `sansSerif
-    | `serif
-    | `systemUi
-    ]
+  type t = string
 
-  val custom : [> `custom ]
-  val serif : [> `serif ]
-  val sansSerif : [> `sansSerif ]
-  val cursive : [> `cursive ]
-  val fantasy : [> `fantasy ]
-  val monospace : [> `monospace ]
-  val systemUi : [> `systemUi ]
-  val emoji : [> `emoji ]
-  val math : [> `math ]
-  val fangsong : [> `fangsong ]
-  val toString : t -> string
+  val toString : string -> string
 end
 
 module FontDisplay : sig

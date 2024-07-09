@@ -46,7 +46,7 @@ let bounce = [%keyframe
 |}
 ];
 
-let code = [|`custom("Menlo"), `monospace|];
+let code = [|"Menlo", "monospace"|];
 let lola = `auto;
 
 let clx = [%cx

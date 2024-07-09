@@ -2683,46 +2683,13 @@ module FontFace = struct
 end
 
 module FontFamilyName = struct
-  type t =
-    [ `custom of string
-    | `serif
-    | `sansSerif
-    | `cursive
-    | `fantasy
-    | `monospace
-    | `systemUi
-    | `emoji
-    | `math
-    | `fangsong
-    ]
-
-  let custom = `custom
-  let serif = `serif
-  let sansSerif = `sansSerif
-  let cursive = `cursive
-  let fantasy = `fantasy
-  let monospace = `monospace
-  let systemUi = `systemUi
-  let emoji = `emoji
-  let math = `math
-  let fangsong = `fangsong
+  type t = string
 
   let toString x =
-    match x with
-    | `custom value ->
-      (match String.get value 0 with
-      | '\'' -> value
-      | '"' -> value
-      | _ -> ({js|"|js} ^ value) ^ {js|"|js})
-    | `serif -> {js|serif|js}
-    | `sansSerif -> {js|sans-serif|js}
-    | `cursive -> {js|cursive|js}
-    | `fantasy -> {js|fantasy|js}
-    | `monospace -> {js|monospace|js}
-    | `systemUi -> {js|system-ui|js}
-    | `emoji -> {js|emoji|js}
-    | `math -> {js|math|js}
-    | `fangsong -> {js|fangsong|js}
+    match String.get x 0 with
+    | '\'' -> x
+    | '"' -> x
+    | _ -> ({js|"|js} ^ x) ^ {js|"|js}
 end
 
 module FontDisplay = struct

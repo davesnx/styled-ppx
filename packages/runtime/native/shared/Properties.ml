@@ -506,12 +506,7 @@ let float x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let fontFamily x =
-  Rule.declaration
-    ( {js|fontFamily|js},
-      match x with
-      | #FontFamilyName.t as n -> FontFamilyName.toString n
-      | #Var.t as va -> Var.toString va
-      | #Cascading.t as c -> Cascading.toString c )
+  Rule.declaration ({js|fontFamily|js}, FontFamilyName.toString x)
 
 let fontFamilies xs =
   Rule.declaration
