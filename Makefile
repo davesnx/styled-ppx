@@ -130,7 +130,7 @@ test: build
 	done
 
 .PHONY: test-e2e
-test-e2e: test-e2e-rescript-v9 test-e2e-rescript-v10 ## Run E2E tests
+test-e2e: build test-e2e-rescript-v9 test-e2e-rescript-v10 ## Run E2E tests
 
 # Demo
 
