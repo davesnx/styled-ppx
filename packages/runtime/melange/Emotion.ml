@@ -50,7 +50,8 @@ let renderKeyframes _renderer frames = makeAnimation (framesToDict frames)
 let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
     =
   let fontFace =
-    {js|@font-face {| font-family: |js}
+    {js|@font-face {
+      font-family: |js}
     ^ fontFamily
     ^ ({js|; src: |js}
       ^ Kloth.Array.joinWithMap ~sep:{js|, |js} ~f:Css_types.FontFace.toString
