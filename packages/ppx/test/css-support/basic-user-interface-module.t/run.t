@@ -90,10 +90,10 @@ If this test fail means that the module is not in sync with the ppx
   CssJs.unsafe({js|textOverflow|js}, {js|clip 'foo'|js});
   CssJs.unsafe({js|textOverflow|js}, {js|ellipsis 'foo'|js});
   CssJs.unsafe({js|textOverflow|js}, {js|'foo' 'foo'|js});
-  CssJs.unsafe({js|userSelect|js}, {js|auto|js});
-  CssJs.unsafe({js|userSelect|js}, {js|text|js});
-  CssJs.unsafe({js|userSelect|js}, {js|none|js});
-  CssJs.unsafe({js|userSelect|js}, {js|contain|js});
-  CssJs.unsafe({js|userSelect|js}, {js|all|js});
+  CssJs.userSelect(`auto);
+  CssJs.userSelect(`text);
+  CssJs.userSelect(`none);
+  CssJs.userSelect(`contain);
+  CssJs.userSelect(`all);
 
   $ dune build

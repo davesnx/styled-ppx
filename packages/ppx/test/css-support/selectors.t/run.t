@@ -34,7 +34,7 @@ If this test fail means that the module is not in sync with the ppx
   let _chart =
     CssJs.style([|
       CssJs.label("_chart"),
-      CssJs.unsafe({js|userSelect|js}, {js|none|js}),
+      CssJs.userSelect(`none),
       CssJs.selector(
         {js|.recharts-cartesian-grid-horizontal|js},
         [|

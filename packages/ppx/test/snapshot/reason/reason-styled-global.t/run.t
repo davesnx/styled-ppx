@@ -27,7 +27,7 @@
       CssJs.selector(
         {js|pre|js},
         [|
-          CssJs.fontFamilies([|`monospace, `monospace|]),
+          CssJs.fontFamilies([|"monospace", "monospace"|]),
           CssJs.fontSize(`em(1.)),
         |],
       ),
@@ -44,7 +44,7 @@
       CssJs.selector(
         {js|code, kbd, samp|js},
         [|
-          CssJs.fontFamilies([|`monospace, `monospace|]),
+          CssJs.fontFamilies([|"monospace", "monospace"|]),
           CssJs.fontSize(`em(1.)),
         |],
       ),
@@ -64,7 +64,7 @@
       CssJs.selector(
         {js|button, input, optgroup, select, textarea|js},
         [|
-          CssJs.unsafe({js|font-family|js}, {js|inherit|js}),
+          CssJs.unsafe({js|fontFamily|js}, {js|inherit|js}),
           CssJs.fontSize(`percent(100.)),
           CssJs.lineHeight(`abs(1.15)),
           CssJs.margin(`zero),
