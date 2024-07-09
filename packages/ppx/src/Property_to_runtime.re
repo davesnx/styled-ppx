@@ -2,17 +2,6 @@ open Ppxlib;
 
 module Builder = Ppxlib.Ast_builder.Default;
 
-module Option = {
-  include Option;
-
-  let mapWithDefault = (f, default, opt) => {
-    switch (opt) {
-    | Some(x) => f(x)
-    | None => default
-    };
-  };
-};
-
 module Standard = Css_property_parser.Standard;
 module Property_parser = Css_property_parser.Parser;
 module Types = Property_parser.Types;
@@ -146,6 +135,7 @@ let render_string = (~loc, s) => {
   | _ => Builder.pexp_constant(~loc, Pconst_string(s, loc, Some("js")))
   };
 };
+
 let render_integer = (~loc, integer) => {
   Builder.pexp_constant(~loc, Pconst_integer(Int.to_string(integer), None));
 };
@@ -567,42 +557,49 @@ let width =
     (~loc) => [%expr CssJs.width],
     render_size,
   );
+
 let height =
   monomorphic(
     Property_parser.property_height,
     (~loc) => [%expr CssJs.height],
     render_size,
   );
+
 let min_width =
   monomorphic(
     Property_parser.property_min_width,
     (~loc) => [%expr CssJs.minWidth],
     render_min_size,
   );
+
 let min_height =
   monomorphic(
     Property_parser.property_min_height,
     (~loc) => [%expr CssJs.minHeight],
     render_min_size,
   );
+
 let max_width =
   monomorphic(
     Property_parser.property_max_width,
     (~loc) => [%expr CssJs.maxWidth],
     render_max_width,
   );
+
 let max_height =
   monomorphic(
     Property_parser.property_max_height,
     (~loc) => [%expr CssJs.maxHeight],
     render_size,
   );
+
 let box_sizing =
   monomorphic(
     Property_parser.property_box_sizing,
     (~loc) => [%expr CssJs.boxSizing],
     variant_to_expression,
   );
+
 let column_width =
   monomorphic(
     Property_parser.property_column_width,
@@ -633,18 +630,21 @@ let margin_top =
     (~loc) => [%expr CssJs.marginTop],
     render_margin,
   );
+
 let margin_right =
   monomorphic(
     Property_parser.property_margin_right,
     (~loc) => [%expr CssJs.marginRight],
     render_margin,
   );
+
 let margin_bottom =
   monomorphic(
     Property_parser.property_margin_bottom,
     (~loc) => [%expr CssJs.marginBottom],
     render_margin,
   );
+
 let margin_left =
   monomorphic(
     Property_parser.property_margin_left,
@@ -688,18 +688,21 @@ let padding_top =
     (~loc) => [%expr CssJs.paddingTop],
     render_padding,
   );
+
 let padding_right =
   monomorphic(
     Property_parser.property_padding_right,
     (~loc) => [%expr CssJs.paddingRight],
     render_padding,
   );
+
 let padding_bottom =
   monomorphic(
     Property_parser.property_padding_bottom,
     (~loc) => [%expr CssJs.paddingBottom],
     render_padding,
   );
+
 let padding_left =
   monomorphic(
     Property_parser.property_padding_left,
@@ -1165,6 +1168,7 @@ let color =
     (~loc) => [%expr CssJs.color],
     render_color,
   );
+
 let opacity =
   monomorphic(
     Property_parser.property_opacity,
@@ -1262,8 +1266,10 @@ let pointer_events =
       }
     },
   );
+
 let image_resolution =
   unsupportedProperty(Property_parser.property_image_resolution);
+
 let image_orientation =
   unsupportedProperty(Property_parser.property_image_orientation);
 
@@ -1350,30 +1356,6 @@ let render_color_stop_angle = (~loc, value: Types.color_stop_angle) => {
   };
 };
 
-let _render_linear_color_stop = (~loc, value: Types.linear_color_stop) => {
-  switch (value) {
-  | (color, Some(length_percentage)) =>
-    let length = render_length_percentage(~loc, length_percentage);
-    let color = render_color(~loc, color);
-    [%expr ([%e color], Some([%e length]))];
-  | (color, None) =>
-    let color = render_color(~loc, color);
-    [%expr ([%e color], None)];
-  };
-};
-
-/* let render_linear_color_stop = (~loc, value: Types.linear_color_stop) => {
-     switch (value) {
-     | (color, None) =>
-       let color = render_color(~loc, color);
-       [%expr ([%e color], None)];
-     | (color, Some(length_percentage)) =>
-       let color = render_color(~loc, color);
-       let length = render_length_percentage(~loc, length_percentage);
-       [%expr ([%e color], Some([%e length]))];
-     };
-   }; */
-
 let render_angular_color_stop = (~loc, value: Types.angular_color_stop) => {
   switch (value) {
   | (color, None) =>
@@ -1386,7 +1368,6 @@ let render_angular_color_stop = (~loc, value: Types.angular_color_stop) => {
   };
 };
 
-/* and color_stop_list = [%value.rec "[ ',' <linear-color-hint> ]# ',' <linear-color-stop>"] */
 let render_color_stop_list = (~loc, value: Types.color_stop_list) => {
   value
   |> List.map(stop =>
@@ -1551,7 +1532,6 @@ let render_function_radial_gradient =
   };
 };
 
-/* | #repeatingRadialGradient(array<(Length.t, [< Color.t | Var.t] as 'colorOrVar)>) */
 let render_function_repeating_radial_gradient =
     (~loc, value: Types.function_repeating_radial_gradient) => {
   switch (value) {
@@ -1561,7 +1541,6 @@ let render_function_repeating_radial_gradient =
   };
 };
 
-/* | #conicGradient(Angle.t, array<(Length.t, [< Color.t | Var.t] as 'colorOrVar)>) */
 let render_function_conic_gradient =
     (~loc, value: Types.function_conic_gradient) => {
   switch (value) {
@@ -1657,6 +1636,7 @@ let background_repeat =
       | [`Xor(_) as v] => render_repeat_style(~loc, v)
       | _ => raise(Unsupported_feature),
   );
+
 let background_attachment =
   monomorphic(
     Property_parser.property_background_attachment,
@@ -1711,6 +1691,7 @@ let background_position =
 
 let background_position_x =
   unsupportedProperty(Property_parser.property_background_position_x);
+
 let background_position_y =
   unsupportedProperty(Property_parser.property_background_position_y);
 
@@ -1725,6 +1706,7 @@ let background_clip =
       | [`Text] => variant_to_expression(~loc, `Text)
       | _ => raise(Unsupported_feature),
   );
+
 let background_origin =
   monomorphic(
     Property_parser.property_background_origin,
@@ -1892,14 +1874,17 @@ let border_right_style =
   variants(Property_parser.property_border_right_style, (~loc) =>
     [%expr CssJs.borderRightStyle]
   );
+
 let border_bottom_style =
   variants(Property_parser.property_border_bottom_style, (~loc) =>
     [%expr CssJs.borderBottomStyle]
   );
+
 let border_left_style =
   variants(Property_parser.property_border_left_style, (~loc) =>
     [%expr CssJs.borderLeftStyle]
   );
+
 let border_style =
   monomorphic(
     Property_parser.property_border_style,
@@ -1921,24 +1906,28 @@ let border_top_width =
     (~loc) => [%expr CssJs.borderTopWidth],
     render_line_width,
   );
+
 let border_right_width =
   monomorphic(
     Property_parser.property_border_right_width,
     (~loc) => [%expr CssJs.borderRightWidth],
     render_line_width,
   );
+
 let border_bottom_width =
   monomorphic(
     Property_parser.property_border_bottom_width,
     (~loc) => [%expr CssJs.borderBottomWidth],
     render_line_width,
   );
+
 let border_left_width =
   monomorphic(
     Property_parser.property_border_left_width,
     (~loc) => [%expr CssJs.borderLeftWidth],
     render_line_width,
   );
+
 let border_width =
   monomorphic(
     Property_parser.property_border_width,
@@ -2042,18 +2031,21 @@ let outline_color =
     (~loc) => [%expr CssJs.outlineColor],
     render_color,
   );
+
 let outline_offset =
   monomorphic(
     Property_parser.property_outline_offset,
     (~loc) => [%expr CssJs.outlineOffset],
     render_extended_length,
   );
+
 let outline_style =
   monomorphic(
     Property_parser.property_outline_style,
     (~loc) => [%expr CssJs.outlineStyle],
     render_outline_style_interp,
   );
+
 let outline_width =
   monomorphic(
     Property_parser.property_outline_width,
@@ -2098,11 +2090,13 @@ let border_right =
     Property_parser.property_border,
     render_border(~direction=Right),
   );
+
 let border_bottom =
   polymorphic(
     Property_parser.property_border,
     render_border(~direction=Bottom),
   );
+
 let border_left =
   polymorphic(
     Property_parser.property_border,
@@ -2121,24 +2115,28 @@ let border_top_left_radius =
     (~loc) => [%expr CssJs.borderTopLeftRadius],
     render_border_radius_value,
   );
+
 let border_top_right_radius =
   monomorphic(
     Property_parser.property_border_top_right_radius,
     (~loc) => [%expr CssJs.borderTopRightRadius],
     render_border_radius_value,
   );
+
 let border_bottom_right_radius =
   monomorphic(
     Property_parser.property_border_bottom_right_radius,
     (~loc) => [%expr CssJs.borderBottomRightRadius],
     render_border_radius_value,
   );
+
 let border_bottom_left_radius =
   monomorphic(
     Property_parser.property_border_bottom_left_radius,
     (~loc) => [%expr CssJs.borderBottomLeftRadius],
     render_border_radius_value,
   );
+
 let border_radius =
   monomorphic(
     Property_parser.property_border_radius,
@@ -2160,12 +2158,16 @@ let border_image_source =
 
 let border_image_slice =
   unsupportedProperty(Property_parser.property_border_image_slice);
+
 let border_image_width =
   unsupportedProperty(Property_parser.property_border_image_width);
+
 let border_image_outset =
   unsupportedProperty(Property_parser.property_border_image_outset);
+
 let border_image_repeat =
   unsupportedProperty(Property_parser.property_border_image_repeat);
+
 let border_image = unsupportedProperty(Property_parser.property_border_image);
 
 let box_shadow =
@@ -2265,6 +2267,7 @@ let text_overflow =
       | _ => raise(Unsupported_feature),
   );
 // let block_ellipsis = unsupportedProperty(Property_parser.property_block_ellipsis);
+
 let max_lines = unsupportedProperty(Property_parser.property_max_lines);
 // let continue = unsupportedProperty(Property_parser.property_continue);
 
@@ -2273,6 +2276,7 @@ let text_transform =
   variants(Property_parser.property_text_transform, (~loc) =>
     [%expr CssJs.textTransform]
   );
+
 let white_space =
   variants(Property_parser.property_white_space, (~loc) =>
     [%expr CssJs.whiteSpace]
@@ -2299,6 +2303,7 @@ let word_break =
   variants(Property_parser.property_word_break, (~loc) =>
     [%expr CssJs.wordBreak]
   );
+
 let render_line_height = (~loc) =>
   fun
   | `Extended_length(ext) => render_extended_length(~loc, ext)
@@ -2312,38 +2317,47 @@ let line_height =
     (~loc) => [%expr CssJs.lineHeight],
     render_line_height,
   );
+
 let line_height_step =
   monomorphic(
     Property_parser.property_line_height_step,
     (~loc) => [%expr CssJs.lineHeightStep],
     render_extended_length,
   );
+
 let hyphens =
   variants(Property_parser.property_hyphens, (~loc) => [%expr CssJs.hyphens]);
+
 let overflow_wrap =
   variants(Property_parser.property_overflow_wrap, (~loc) =>
     [%expr CssJs.overflowWrap]
   );
+
 let word_wrap =
   variants(Property_parser.property_word_wrap, (~loc) =>
     [%expr CssJs.wordWrap]
   );
+
 let text_align =
   variants(Property_parser.property_text_align, (~loc) =>
     [%expr CssJs.textAlign]
   );
+
 let text_align_all =
   variants(Property_parser.property_text_align_all, (~loc) =>
     [%expr CssJs.textAlignAll]
   );
+
 let text_align_last =
   variants(Property_parser.property_text_align_last, (~loc) =>
     [%expr CssJs.textAlignLast]
   );
+
 let text_justify =
   variants(Property_parser.property_text_justify, (~loc) =>
     [%expr CssJs.textJustify]
   );
+
 let word_spacing =
   monomorphic(
     Property_parser.property_word_spacing,
@@ -2354,6 +2368,7 @@ let word_spacing =
       | `Extended_length(l) => render_extended_length(~loc, l)
       | `Extended_percentage(p) => render_extended_percentage(~loc, p),
   );
+
 let letter_spacing =
   monomorphic(
     Property_parser.property_word_spacing,
@@ -2364,6 +2379,7 @@ let letter_spacing =
       | `Extended_length(l) => render_extended_length(~loc, l)
       | `Extended_percentage(p) => render_extended_percentage(~loc, p),
   );
+
 let text_indent =
   monomorphic(
     Property_parser.property_text_indent,
@@ -2495,43 +2511,56 @@ let font_size =
 
 let font_size_adjust =
   unsupportedProperty(Property_parser.property_font_size_adjust);
+
 let font = unsupportedProperty(Property_parser.property_font);
+
 let font_synthesis_weight =
   variants(Property_parser.property_font_synthesis_weight, (~loc) =>
     [%expr CssJs.fontSynthesisWeight]
   );
+
 let font_synthesis_style =
   variants(Property_parser.property_font_synthesis_style, (~loc) =>
     [%expr CssJs.fontSynthesisStyle]
   );
+
 let font_synthesis_small_caps =
   variants(Property_parser.property_font_synthesis_small_caps, (~loc) =>
     [%expr CssJs.fontSynthesisSmallCaps]
   );
+
 let font_synthesis_position =
   variants(Property_parser.property_font_synthesis_position, (~loc) =>
     [%expr CssJs.fontSynthesisPosition]
   );
+
 let font_synthesis =
   unsupportedProperty(Property_parser.property_font_synthesis);
+
 let font_kerning =
   variants(Property_parser.property_font_kerning, (~loc) =>
     [%expr CssJs.fontKerning]
   );
+
 let font_variant_ligatures =
   unsupportedProperty(Property_parser.property_font_variant_ligatures);
+
 let font_variant_position =
   variants(Property_parser.property_font_variant_position, (~loc) =>
     [%expr CssJs.fontVariantPosition]
   );
+
 let font_variant_caps =
   variants(Property_parser.property_font_variant_caps, (~loc) =>
     [%expr CssJs.fontVariantCaps]
   );
+
 let font_variant_numeric =
   unsupportedProperty(Property_parser.property_font_variant_numeric);
+
 let font_variant_alternates =
   unsupportedProperty(Property_parser.property_font_variant_alternates);
+
 let font_variant_east_asian =
   unsupportedProperty(Property_parser.property_font_variant_east_asian);
 
@@ -2543,15 +2572,20 @@ let font_variant =
     | `Small_caps => [[%expr CssJs.fontVariant(`smallCaps)]]
     | _ => raise(Unsupported_feature)
   );
+
 let font_feature_settings =
   unsupportedProperty(Property_parser.property_font_feature_settings);
+
 let font_optical_sizing =
   variants(Property_parser.property_font_optical_sizing, (~loc) =>
     [%expr CssJs.fontOpticalSizing]
   );
+
 let font_variation_settings =
   unsupportedProperty(Property_parser.property_font_variation_settings);
-// let font_palette = unsupportedProperty(Property_parser.property_font_palette);
+
+let font_palette = unsupportedProperty(Property_parser.property_font_palette);
+
 let font_variant_emoji =
   variants(Property_parser.property_font_variant_emoji, (~loc) =>
     [%expr CssJs.fontVariantEmoji]
@@ -2599,6 +2633,7 @@ let text_decoration_color =
     (~loc) => [%expr CssJs.textDecorationColor],
     render_color,
   );
+
 let render_text_decoration_thickness = (~loc) =>
   fun
   | `Auto => variant_to_expression(~loc, `Auto)
@@ -2612,18 +2647,6 @@ let text_decoration_thickness =
     (~loc) => [%expr CssJs.textDecorationThickness],
     render_text_decoration_thickness,
   );
-
-/* let render_text_decoration_with_thickness = (~loc, (line, style, color, thickness)) => {
-     let _line = line |> Option.map(render_text_decoration_line(~loc));
-     let _style = style |> Option.map(render_text_decoration_style(~loc));
-     let _color = color |> Option.map(render_color(~loc));
-     let _thickness = thickness |> Option.map(render_text_decoration_thickness(~loc));
-     // let properties = [line, style, color, thickness];
-     // let properties = List.filter((_, v) => v != [], properties);
-     // let properties = List.map((_, v) => v, properties);
-     // let properties = List.flatten(properties);
-     // properties;
-   }; */
 
 let text_decoration =
   monomorphic(
@@ -2640,22 +2663,29 @@ let text_decoration =
 
 let text_underline_position =
   unsupportedProperty(Property_parser.property_text_underline_position);
+
 let text_underline_offset =
   unsupportedProperty(Property_parser.property_text_underline_offset);
+
 let text_decoration_skip =
   unsupportedProperty(Property_parser.property_text_decoration_skip);
-// let text_decoration_skip_self =
-//   unsupportedProperty(Property_parser.property_text_decoration_skip_self);
+
+let text_decoration_skip_self =
+  unsupportedProperty(Property_parser.property_text_decoration_skip_self);
+
 let text_decoration_skip_box =
   variants(Property_parser.property_text_decoration_skip_box, (~loc) =>
     [%expr CssJs.textDecorationSkipBox]
   );
+
 let text_decoration_skip_inset =
   variants(Property_parser.property_text_decoration_skip_inset, (~loc) =>
     [%expr CssJs.textDecorationSkipInset]
   );
-// let text_decoration_skip_spaces =
-//   unsupportedProperty(Property_parser.property_text_decoration_skip_spaces);
+
+let text_decoration_skip_spaces =
+  unsupportedProperty(Property_parser.property_text_decoration_skip_spaces);
+
 let text_decoration_skip_ink =
   variants(Property_parser.property_text_decoration_skip_ink, (~loc) =>
     [%expr CssJs.textDecorationSkipInk]
@@ -2772,10 +2802,8 @@ let render_text_shadow = (~loc, shadow) => {
         Nolabel,
         Some(
           color
-          |> Option.mapWithDefault(
-               render_color_interp(~loc),
-               [%expr `Color(`CurrentColor)],
-             ),
+          |> Option.map(render_color_interp(~loc))
+          |> Option.value(~default=[%expr `Color(`CurrentColor)]),
         ),
       ),
     ]
@@ -2941,22 +2969,27 @@ let transform_origin =
       ]
     | `Static(_, Some(_)) => raise(Unsupported_feature)
   );
+
 let transform_box =
   variants(Property_parser.property_transform_box, (~loc) =>
     [%expr CssJs.transformBox]
   );
+
 let translate =
   unsupportedValue(Property_parser.property_translate, (~loc) =>
     [%expr CssJs.translate]
   );
+
 let rotate =
   unsupportedValue(Property_parser.property_rotate, (~loc) =>
     [%expr CssJs.rotate]
   );
+
 let scale =
   unsupportedValue(Property_parser.property_scale, (~loc) =>
     [%expr CssJs.scale]
   );
+
 let transform_style =
   monomorphic(
     Property_parser.property_transform_style,
@@ -2966,6 +2999,7 @@ let transform_style =
       | `Flat => variant_to_expression(~loc, `Flat)
       | `Preserve_3d => variant_to_expression(~loc, `Preserve_3d),
   );
+
 let perspective = unsupportedProperty(Property_parser.property_perspective);
 
 let perspective_origin =
@@ -3022,6 +3056,7 @@ let transition_duration =
       | [one] => render_extended_time(~loc, one)
       | _ => raise(Unsupported_feature),
   );
+
 let widows =
   monomorphic(
     Property_parser.property_widows,
@@ -3086,6 +3121,7 @@ let transition_timing_function =
       | [t] => render_timing(~loc, t)
       | _ => raise(Unsupported_feature),
   );
+
 let transition_delay =
   monomorphic(
     Property_parser.property_transition_delay,
@@ -3370,6 +3406,7 @@ let flex_direction =
   variants(Property_parser.property_flex_direction, (~loc) =>
     [%expr CssJs.flexDirection]
   );
+
 let flex_wrap =
   variants(Property_parser.property_flex_wrap, (~loc) =>
     [%expr CssJs.flexWrap]
@@ -3402,6 +3439,7 @@ let order =
     (~loc) => [%expr CssJs.order],
     render_integer,
   );
+
 let render_float_interp = (~loc, value) => {
   switch (value) {
   | `Number(n) => [%expr [%e render_float(~loc, n)]]
@@ -3415,6 +3453,7 @@ let flex_grow =
     (~loc) => [%expr CssJs.flexGrow],
     render_float_interp,
   );
+
 let flex_shrink =
   monomorphic(
     Property_parser.property_flex_shrink,
@@ -3897,28 +3936,35 @@ let grid_template_rows =
       | `Static((), Some(subgrid)) => render_subgrid(~loc, subgrid)
       },
   );
+
 let grid_template_areas =
   unsupportedValue(Property_parser.property_grid_template_areas, (~loc) =>
     [%expr CssJs.gridTemplateAreas]
   );
+
 let grid_template =
   unsupportedProperty(Property_parser.property_grid_template);
+
 let grid_auto_columns =
   unsupportedValue(Property_parser.property_grid_auto_columns, (~loc) =>
     [%expr CssJs.gridAutoColumns]
   );
+
 let grid_auto_rows =
   unsupportedValue(Property_parser.property_grid_auto_rows, (~loc) =>
     [%expr CssJs.gridAutoRows]
   );
+
 let grid_auto_flow =
   unsupportedValue(Property_parser.property_grid_auto_flow, (~loc) =>
     [%expr CssJs.gridAutoFlow]
   );
+
 let grid =
   unsupportedValue(Property_parser.property_grid, (~loc) =>
     [%expr CssJs.grid]
   );
+
 let grid_row_start =
   unsupportedValue(Property_parser.property_grid_row_start, (~loc) =>
     [%expr CssJs.gridRowStart]
@@ -3948,22 +3994,27 @@ let grid_column_start =
   unsupportedValue(Property_parser.property_grid_column_start, (~loc) =>
     [%expr CssJs.gridColumnStart]
   );
+
 let grid_row_end =
   unsupportedValue(Property_parser.property_grid_row_end, (~loc) =>
     [%expr CssJs.gridRowEnd]
   );
+
 let grid_column_end =
   unsupportedValue(Property_parser.property_grid_column_end, (~loc) =>
     [%expr CssJs.gridColumnEnd]
   );
+
 let grid_row =
   unsupportedValue(Property_parser.property_grid_row, (~loc) =>
     [%expr CssJs.gridRow]
   );
+
 let grid_column =
   unsupportedValue(Property_parser.property_grid_column, (~loc) =>
     [%expr CssJs.gridColumn]
   );
+
 let grid_area =
   unsupportedValue(Property_parser.property_grid_area, (~loc) =>
     [%expr CssJs.gridArea]
@@ -4104,15 +4155,6 @@ let display =
     render_display,
   );
 
-/* let render_mask_source = (~loc) => fun
-     | `Interpolation(v) => render_variable(v)
-     | `Cross_fade()
-     | `Element()
-     | `Image()
-     | `Image_set()
-     | `Paint() => raise(Unsupported_feature)
-   ; */
-
 let render_mask_image = (~loc) =>
   fun
   | `None => [%expr `none]
@@ -4161,7 +4203,7 @@ let render_alpha_value = (~loc, value: Types.alpha_value) => {
   };
 };
 
-let strokeOpacity =
+let stroke_opacity =
   monomorphic(
     Property_parser.property_stroke_opacity,
     (~loc) => [%expr CssJs.SVG.strokeOpacity],
@@ -4194,30 +4236,46 @@ let found = ({ast_of_string, string_to_expr, _}) => {
 };
 
 let caret_color = unsupportedProperty(Property_parser.property_caret_color);
+
 let clear = unsupportedProperty(Property_parser.property_clear);
+
 let clip = unsupportedProperty(Property_parser.property_clip);
+
 let clip_path = unsupportedProperty(Property_parser.property_clip_path);
+
 let column_count = unsupportedProperty(Property_parser.property_column_count);
+
 let column_fill = unsupportedProperty(Property_parser.property_column_fill);
+
 let column_gap =
   monomorphic(
     Property_parser.property_column_gap,
     (~loc) => [%expr CssJs.columnGap],
     (~loc) => render_gap(~loc),
   );
+
 let column_rule = unsupportedProperty(Property_parser.property_column_rule);
+
 let column_rule_color =
   unsupportedProperty(Property_parser.property_column_rule_color);
+
 let column_rule_style =
   unsupportedProperty(Property_parser.property_column_rule_style);
+
 let column_rule_width =
   unsupportedProperty(Property_parser.property_column_rule_width);
+
 let column_span = unsupportedProperty(Property_parser.property_column_span);
+
 let columns = unsupportedProperty(Property_parser.property_columns);
+
 let counter_increment =
   unsupportedProperty(Property_parser.property_counter_increment);
+
 let counter_reset =
   unsupportedProperty(Property_parser.property_counter_reset);
+
+let counter_set = unsupportedProperty(Property_parser.property_counter_set);
 
 let render_cursor = (~loc, value) =>
   switch (value) {
@@ -4275,6 +4333,7 @@ let cursor =
     (~loc) => [%expr CssJs.cursor],
     render_cursor,
   );
+
 let direction = unsupportedProperty(Property_parser.property_direction);
 
 let render_drop_shadow = (~loc, value: Types.function_drop_shadow) => {
@@ -4364,25 +4423,18 @@ let backdrop_filter =
   );
 
 let float = unsupportedProperty(Property_parser.property_float);
+
 let font_language_override =
   unsupportedProperty(Property_parser.property_font_language_override);
-/* let hyphenate_character =
-   unsupportedProperty(Property_parser.property_hyphenate_character); */
-/* let hyphenate_limit_chars =
-   unsupportedProperty(Property_parser.property_hyphenate_limit_chars); */
-/* let hyphenate_limit_lines =
-   unsupportedProperty(Property_parser.property_hyphenate_limit_lines); */
-/* let hyphenate_limit_zone =
-   unsupportedProperty(Property_parser.property_hyphenate_limit_zone); */
+
 let ime_mode = unsupportedProperty(Property_parser.property_ime_mode);
+
 let isolation = unsupportedProperty(Property_parser.property_isolation);
-/* let layout_grid = unsupportedProperty(Property_parser.property_layout_grid); */
-/* let layout_grid_char = unsupportedProperty(Property_parser.property_layout_grid_char); */
-/* let layout_grid_line = unsupportedProperty(Property_parser.property_layout_grid_line); */
-/* let layout_grid_mode = unsupportedProperty(Property_parser.property_layout_grid_mode); */
-/* let layout_grid_type = unsupportedProperty(Property_parser.property_layout_grid_type); */
+
 let line_clamp = unsupportedProperty(Property_parser.property_line_clamp);
+
 let list_style = unsupportedProperty(Property_parser.property_list_style);
+
 let list_style_image =
   monomorphic(
     Property_parser.property_list_style_image,
@@ -4397,16 +4449,17 @@ let list_style_image =
 
 let list_style_position =
   unsupportedProperty(Property_parser.property_list_style_position);
+
 let list_style_type =
   unsupportedProperty(Property_parser.property_list_style_type);
+
 let mix_blend_mode =
   unsupportedProperty(Property_parser.property_mix_blend_mode);
-/* let nav_down = unsupportedProperty(Property_parser.property_nav_down); */
-/* let nav_left = unsupportedProperty(Property_parser.property_nav_left); */
-/* let nav_right = unsupportedProperty(Property_parser.property_nav_right); */
-/* let nav_up = unsupportedProperty(Property_parser.property_nav_up); */
+
 let position = unsupportedProperty(Property_parser.property_position);
+
 let resize = unsupportedProperty(Property_parser.property_resize);
+
 let row_gap =
   monomorphic(
     Property_parser.property_row_gap,
@@ -4414,43 +4467,405 @@ let row_gap =
     (~loc) => render_gap(~loc),
   );
 
-/* let scrollbar_3dlight_color =
-   unsupportedProperty(Property_parser.property_scrollbar_3dlight_color); */
-/* let scrollbar_arrow_color =
-   unsupportedProperty(Property_parser.property_scrollbar_arrow_color); */
-/* let scrollbar_base_color =
-   unsupportedProperty(Property_parser.property_scrollbar_base_color); */
+let scrollbar_3dlight_color =
+  unsupportedProperty(Property_parser.property_scrollbar_3dlight_color);
+
+let scrollbar_arrow_color =
+  unsupportedProperty(Property_parser.property_scrollbar_arrow_color);
+
+let scrollbar_base_color =
+  unsupportedProperty(Property_parser.property_scrollbar_base_color);
+
 let scrollbar_color =
   unsupportedProperty(Property_parser.property_scrollbar_color);
-/* let scrollbar_darkshadow_color = */
-/* unsupportedProperty(Property_parser.property_scrollbar_darkshadow_color); */
-/* let scrollbar_face_color = */
-/* unsupportedProperty(Property_parser.property_scrollbar_face_color); */
-/* let scrollbar_highlight_color = */
-/* unsupportedProperty(Property_parser.property_scrollbar_highlight_color); */
-/* let scrollbar_shadow_color = */
-/* unsupportedProperty(Property_parser.property_scrollbar_shadow_color); */
-/* let scrollbar_track_color = */
-/* unsupportedProperty(Property_parser.property_scrollbar_track_color); */
-/* let scrollbar_width = unsupportedProperty(Property_parser.property_scrollbar_width); */
-/* let strokeDasharray = unsupportedProperty(Property_parser.property_strokeDasharray); */
-/* let strokeLinecap = unsupportedProperty(Property_parser.property_strokeLinecap); */
-/* let strokeLinejoin = unsupportedProperty(Property_parser.property_strokeLinejoin); */
-/* let strokeMiterlimit = unsupportedProperty(Property_parser.property_strokeMiterlimit); */
-/* let strokeWidth = unsupportedProperty(Property_parser.property_strokeWidth); */
-/* let text_autospace = unsupportedProperty(Property_parser.property_text_autospace); */
-/* let text_blink = unsupportedProperty(Property_parser.property_text_blink); */
+
+let scrollbar_darkshadow_color =
+  unsupportedProperty(Property_parser.property_scrollbar_darkshadow_color);
+
+let scrollbar_face_color =
+  unsupportedProperty(Property_parser.property_scrollbar_face_color);
+
+let scrollbar_highlight_color =
+  unsupportedProperty(Property_parser.property_scrollbar_highlight_color);
+
+let scrollbar_shadow_color =
+  unsupportedProperty(Property_parser.property_scrollbar_shadow_color);
+
+let scrollbar_track_color =
+  unsupportedProperty(Property_parser.property_scrollbar_track_color);
+
+let scrollbar_width =
+  unsupportedProperty(Property_parser.property_scrollbar_width);
+
+let stroke_dasharray =
+  unsupportedProperty(Property_parser.property_stroke_dasharray);
+
+let stroke_linecap =
+  unsupportedProperty(Property_parser.property_stroke_linecap);
+
+let stroke_linejoin =
+  unsupportedProperty(Property_parser.property_stroke_linejoin);
+
+let stroke_miterlimit =
+  unsupportedProperty(Property_parser.property_stroke_miterlimit);
+
+let stroke_width = unsupportedProperty(Property_parser.property_stroke_width);
+
 let text_combine_upright =
   unsupportedProperty(Property_parser.property_text_combine_upright);
-/* let text_justify_trim =
-   unsupportedProperty(Property_parser.property_text_justify_trim); */
-/* let text_kashida = unsupportedProperty(Property_parser.property_text_kashida); */
-/* let text_kashida_space =
-   unsupportedProperty(Property_parser.property_text_kashida_space); */
+
+let all = unsupportedProperty(Property_parser.property_all);
+
+let appearance = unsupportedProperty(Property_parser.property_appearance);
+
+let background_blend_mode =
+  unsupportedProperty(Property_parser.property_background_blend_mode);
+
+let baseline_shift =
+  unsupportedProperty(Property_parser.property_baseline_shift);
+
+let block_size = unsupportedProperty(Property_parser.property_block_size);
+
+let border_block_color =
+  unsupportedProperty(Property_parser.property_border_block_color);
+
+let border_block_end_color =
+  unsupportedProperty(Property_parser.property_border_block_end_color);
+
+let border_block_end_style =
+  unsupportedProperty(Property_parser.property_border_block_end_style);
+
+let border_block_end_width =
+  unsupportedProperty(Property_parser.property_border_block_end_width);
+
+let border_block_end =
+  unsupportedProperty(Property_parser.property_border_block_end);
+
+let border_block_start_color =
+  unsupportedProperty(Property_parser.property_border_block_start_color);
+
+let border_block_start_style =
+  unsupportedProperty(Property_parser.property_border_block_start_style);
+
+let border_block_start_width =
+  unsupportedProperty(Property_parser.property_border_block_start_width);
+
+let border_block_start =
+  unsupportedProperty(Property_parser.property_border_block_start);
+
+let border_block_style =
+  unsupportedProperty(Property_parser.property_border_block_style);
+
+let border_block_width =
+  unsupportedProperty(Property_parser.property_border_block_width);
+
+let border_block = unsupportedProperty(Property_parser.property_border_block);
+
+let border_collapse =
+  unsupportedProperty(Property_parser.property_border_collapse);
+
+let border_end_end_radius =
+  unsupportedProperty(Property_parser.property_border_end_end_radius);
+
+let border_end_start_radius =
+  unsupportedProperty(Property_parser.property_border_end_start_radius);
+
+let border_inline_color =
+  unsupportedProperty(Property_parser.property_border_inline_color);
+
+let border_inline_end_color =
+  unsupportedProperty(Property_parser.property_border_inline_end_color);
+
+let border_inline_end_style =
+  unsupportedProperty(Property_parser.property_border_inline_end_style);
+
+let border_inline_end_width =
+  unsupportedProperty(Property_parser.property_border_inline_end_width);
+
+let border_inline_end =
+  unsupportedProperty(Property_parser.property_border_inline_end);
+
+let border_inline_start_color =
+  unsupportedProperty(Property_parser.property_border_inline_start_color);
+
+let border_inline_start_style =
+  unsupportedProperty(Property_parser.property_border_inline_start_style);
+
+let border_inline_start_width =
+  unsupportedProperty(Property_parser.property_border_inline_start_width);
+
+let border_inline_start =
+  unsupportedProperty(Property_parser.property_border_inline_start);
+
+let border_inline_style =
+  unsupportedProperty(Property_parser.property_border_inline_style);
+
+let border_inline_width =
+  unsupportedProperty(Property_parser.property_border_inline_width);
+
+let border_inline =
+  unsupportedProperty(Property_parser.property_border_inline);
+
+let border_spacing =
+  unsupportedProperty(Property_parser.property_border_spacing);
+
+let border_start_end_radius =
+  unsupportedProperty(Property_parser.property_border_start_end_radius);
+
+let border_start_start_radius =
+  unsupportedProperty(Property_parser.property_border_start_start_radius);
+
+let box_decoration_break =
+  unsupportedProperty(Property_parser.property_box_decoration_break);
+
+let break_after = unsupportedProperty(Property_parser.property_break_after);
+
+let break_before = unsupportedProperty(Property_parser.property_break_before);
+
+let break_inside = unsupportedProperty(Property_parser.property_break_inside);
+
+let caption_side = unsupportedProperty(Property_parser.property_caption_side);
+
+let clip_rule = unsupportedProperty(Property_parser.property_clip_rule);
+
+let color_adjust = unsupportedProperty(Property_parser.property_color_adjust);
+
+let color_interpolation_filters =
+  unsupportedProperty(Property_parser.property_color_interpolation_filters);
+
+let color_interpolation =
+  unsupportedProperty(Property_parser.property_color_interpolation);
+
+let color_scheme = unsupportedProperty(Property_parser.property_color_scheme);
+
+let contain = unsupportedProperty(Property_parser.property_contain);
+
+let content_visibility =
+  unsupportedProperty(Property_parser.property_content_visibility);
+
+let content = unsupportedProperty(Property_parser.property_content);
+
+let empty_cells = unsupportedProperty(Property_parser.property_empty_cells);
+
+let fill_opacity = unsupportedProperty(Property_parser.property_fill_opacity);
+
+let fill_rule = unsupportedProperty(Property_parser.property_fill_rule);
+
+let hyphenate_character =
+  unsupportedProperty(Property_parser.property_hyphenate_character);
+
+let hyphenate_limit_chars =
+  unsupportedProperty(Property_parser.property_hyphenate_limit_chars);
+
+let hyphenate_limit_lines =
+  unsupportedProperty(Property_parser.property_hyphenate_limit_lines);
+
+let hyphenate_limit_zone =
+  unsupportedProperty(Property_parser.property_hyphenate_limit_zone);
+
+let initial_letter_align =
+  unsupportedProperty(Property_parser.property_initial_letter_align);
+
+let initial_letter =
+  unsupportedProperty(Property_parser.property_initial_letter);
+
+let inline_size = unsupportedProperty(Property_parser.property_inline_size);
+
+let inset_block_end =
+  unsupportedProperty(Property_parser.property_inset_block_end);
+
+let inset_block_start =
+  unsupportedProperty(Property_parser.property_inset_block_start);
+
+let inset_block = unsupportedProperty(Property_parser.property_inset_block);
+
+let inset_inline_end =
+  unsupportedProperty(Property_parser.property_inset_inline_end);
+
+let inset_inline_start =
+  unsupportedProperty(Property_parser.property_inset_inline_start);
+
+let inset_inline = unsupportedProperty(Property_parser.property_inset_inline);
+
+let inset = unsupportedProperty(Property_parser.property_inset);
+
+let layout_grid_char =
+  unsupportedProperty(Property_parser.property_layout_grid_char);
+
+let layout_grid_line =
+  unsupportedProperty(Property_parser.property_layout_grid_line);
+
+let layout_grid_mode =
+  unsupportedProperty(Property_parser.property_layout_grid_mode);
+
+let layout_grid_type =
+  unsupportedProperty(Property_parser.property_layout_grid_type);
+
+let layout_grid = unsupportedProperty(Property_parser.property_layout_grid);
+
+let mask_border_mode =
+  unsupportedProperty(Property_parser.property_mask_border_mode);
+
+let mask_border_outset =
+  unsupportedProperty(Property_parser.property_mask_border_outset);
+
+let mask_border_repeat =
+  unsupportedProperty(Property_parser.property_mask_border_repeat);
+
+let mask_border_slice =
+  unsupportedProperty(Property_parser.property_mask_border_slice);
+
+let mask_border_source =
+  unsupportedProperty(Property_parser.property_mask_border_source);
+
+let mask_border_width =
+  unsupportedProperty(Property_parser.property_mask_border_width);
+
+let mask_clip = unsupportedProperty(Property_parser.property_mask_clip);
+
+let mask_composite =
+  unsupportedProperty(Property_parser.property_mask_composite);
+
+let mask_mode = unsupportedProperty(Property_parser.property_mask_mode);
+
+let mask_origin = unsupportedProperty(Property_parser.property_mask_origin);
+
+let mask_position =
+  unsupportedProperty(Property_parser.property_mask_position);
+
+let mask_repeat = unsupportedProperty(Property_parser.property_mask_repeat);
+
+let mask_size = unsupportedProperty(Property_parser.property_mask_size);
+
+let mask_type = unsupportedProperty(Property_parser.property_mask_type);
+
+let max_block_size =
+  unsupportedProperty(Property_parser.property_max_block_size);
+
+let max_inline_size =
+  unsupportedProperty(Property_parser.property_max_inline_size);
+
+let min_block_size =
+  unsupportedProperty(Property_parser.property_min_block_size);
+
+let min_inline_size =
+  unsupportedProperty(Property_parser.property_min_inline_size);
+
+let nav_down = unsupportedProperty(Property_parser.property_nav_down);
+
+let nav_left = unsupportedProperty(Property_parser.property_nav_left);
+
+let nav_right = unsupportedProperty(Property_parser.property_nav_right);
+
+let nav_up = unsupportedProperty(Property_parser.property_nav_up);
+
+let offset_anchor =
+  unsupportedProperty(Property_parser.property_offset_anchor);
+
+let offset_distance =
+  unsupportedProperty(Property_parser.property_offset_distance);
+
+let offset_path = unsupportedProperty(Property_parser.property_offset_path);
+
+let offset_position =
+  unsupportedProperty(Property_parser.property_offset_position);
+
+let offset_rotate =
+  unsupportedProperty(Property_parser.property_offset_rotate);
+
+let offset = unsupportedProperty(Property_parser.property_offset);
+
+let orphans = unsupportedProperty(Property_parser.property_orphans);
+
+let overflow_anchor =
+  unsupportedProperty(Property_parser.property_overflow_anchor);
+
+let overflow_clip_box =
+  unsupportedProperty(Property_parser.property_overflow_clip_box);
+
+let padding_block_end =
+  unsupportedProperty(Property_parser.property_padding_block_end);
+
+let padding_block_start =
+  unsupportedProperty(Property_parser.property_padding_block_start);
+
+let padding_block =
+  unsupportedProperty(Property_parser.property_padding_block);
+
+let padding_inline_end =
+  unsupportedProperty(Property_parser.property_padding_inline_end);
+
+let padding_inline_start =
+  unsupportedProperty(Property_parser.property_padding_inline_start);
+
+let padding_inline =
+  unsupportedProperty(Property_parser.property_padding_inline);
+
+let page_break_after =
+  unsupportedProperty(Property_parser.property_page_break_after);
+
+let page_break_before =
+  unsupportedProperty(Property_parser.property_page_break_before);
+
+let page_break_inside =
+  unsupportedProperty(Property_parser.property_page_break_inside);
+
+let table_layout = unsupportedProperty(Property_parser.property_table_layout);
+
+/* let render_animatable_feature = (~loc) =>
+  fun
+  | `Scroll_position => [%expr `scrollPosition]
+  | `Contents => [%expr `contents]
+  | `Custom_ident(v) => render_string(~loc, v); */
+
+let will_change =
+  monomorphic(
+    Property_parser.property_will_change,
+    (~loc) => [%expr CssJs.willChange],
+    (~loc, value: Types.property_will_change) => {
+      switch (value) {
+      | `Auto => [%expr `auto]
+      | _ =>
+        raise(
+          Unsupported_feature
+        )
+      }
+    },
+  );
+
+let writing_mode = unsupportedProperty(Property_parser.property_writing_mode);
+
 let text_orientation =
   unsupportedProperty(Property_parser.property_text_orientation);
+
 let touch_action = unsupportedProperty(Property_parser.property_touch_action);
-let user_select = unsupportedProperty(Property_parser.property_user_select);
+
+let user_select =
+  monomorphic(
+    Property_parser.property_user_select,
+    (~loc) => [%expr CssJs.userSelect],
+    (~loc) =>
+      fun
+      | `Auto => [%expr `auto]
+      | `Text => [%expr `text]
+      | `Contain => [%expr `contain]
+      | `All => [%expr `all]
+      | `None => [%expr `none]
+      | `Interpolation(v) => render_variable(~loc, v),
+  );
+
+let zoom =
+  monomorphic(
+    Property_parser.property_zoom,
+    (~loc) => [%expr CssJs.zoom],
+    (~loc) =>
+      fun
+      | `Number(number) => [%expr `num([%e render_float(~loc, number)])]
+      | `Extended_percentage(v) => render_extended_percentage(~loc, v)
+      | `Reset => [%expr `reset]
+      | `Normal => [%expr `normal],
+  );
+
 let visibility =
   monomorphic(
     Property_parser.property_visibility,
@@ -4467,6 +4882,7 @@ let properties = [
   ("align-content", found(align_content)),
   ("align-items", found(align_items)),
   ("align-self", found(align_self)),
+  ("all", found(all)),
   ("animation-delay", found(animation_delay)),
   ("animation-direction", found(animation_direction)),
   ("animation-duration", found(animation_duration)),
@@ -4476,44 +4892,76 @@ let properties = [
   ("animation-play-state", found(animation_play_state)),
   ("animation-timing-function", found(animation_timing_function)),
   ("animation", found(animation)),
+  ("appearance", found(appearance)),
   ("aspect-ratio", found(aspect_ratio)),
-  ("backface-visibility", found(backface_visibility)),
   ("backdrop-filter", found(backdrop_filter)),
+  ("backface-visibility", found(backface_visibility)),
   ("background-attachment", found(background_attachment)),
-  ("background-clip", found(background_clip)),
+  ("background-blend-mode", found(background_blend_mode)),
   ("background-clip", found(background_clip)),
   ("background-color", found(background_color)),
   ("background-image", found(background_image)),
   ("background-origin", found(background_origin)),
-  ("background-position", found(background_position)),
   ("background-position-x", found(background_position_x)),
   ("background-position-y", found(background_position_y)),
+  ("background-position", found(background_position)),
   ("background-repeat", found(background_repeat)),
   ("background-size", found(background_size)),
   ("background", found(background)),
+  ("baseline-shift", found(baseline_shift)),
+  ("block-size", found(block_size)),
+  ("border-block-color", found(border_block_color)),
+  ("border-block-end-color", found(border_block_end_color)),
+  ("border-block-end-style", found(border_block_end_style)),
+  ("border-block-end-width", found(border_block_end_width)),
+  ("border-block-end", found(border_block_end)),
+  ("border-block-start-color", found(border_block_start_color)),
+  ("border-block-start-style", found(border_block_start_style)),
+  ("border-block-start-width", found(border_block_start_width)),
+  ("border-block-start", found(border_block_start)),
+  ("border-block-style", found(border_block_style)),
+  ("border-block-width", found(border_block_width)),
+  ("border-block", found(border_block)),
   ("border-bottom-color", found(border_bottom_color)),
   ("border-bottom-left-radius", found(border_bottom_left_radius)),
   ("border-bottom-right-radius", found(border_bottom_right_radius)),
   ("border-bottom-style", found(border_bottom_style)),
   ("border-bottom-width", found(border_bottom_width)),
   ("border-bottom", found(border_bottom)),
+  ("border-collapse", found(border_collapse)),
   ("border-color", found(border_color)),
+  ("border-end-end-radius", found(border_end_end_radius)),
+  ("border-end-start-radius", found(border_end_start_radius)),
   ("border-image-outset", found(border_image_outset)),
   ("border-image-repeat", found(border_image_repeat)),
   ("border-image-slice", found(border_image_slice)),
   ("border-image-source", found(border_image_source)),
   ("border-image-width", found(border_image_width)),
   ("border-image", found(border_image)),
+  ("border-inline-color", found(border_inline_color)),
+  ("border-inline-end-color", found(border_inline_end_color)),
+  ("border-inline-end-style", found(border_inline_end_style)),
+  ("border-inline-end-width", found(border_inline_end_width)),
+  ("border-inline-end", found(border_inline_end)),
+  ("border-inline-start-color", found(border_inline_start_color)),
+  ("border-inline-start-style", found(border_inline_start_style)),
+  ("border-inline-start-width", found(border_inline_start_width)),
+  ("border-inline-start", found(border_inline_start)),
+  ("border-inline-style", found(border_inline_style)),
+  ("border-inline-width", found(border_inline_width)),
+  ("border-inline", found(border_inline)),
   ("border-left-color", found(border_left_color)),
   ("border-left-style", found(border_left_style)),
   ("border-left-width", found(border_left_width)),
   ("border-left", found(border_left)),
   ("border-radius", found(border_radius)),
-  ("border-radius", found(border_radius)),
   ("border-right-color", found(border_right_color)),
   ("border-right-style", found(border_right_style)),
   ("border-right-width", found(border_right_width)),
   ("border-right", found(border_right)),
+  ("border-spacing", found(border_spacing)),
+  ("border-start-end-radius", found(border_start_end_radius)),
+  ("border-start-start-radius", found(border_start_start_radius)),
   ("border-style", found(border_style)),
   ("border-top-color", found(border_top_color)),
   ("border-top-left-radius", found(border_top_left_radius)),
@@ -4524,12 +4972,22 @@ let properties = [
   ("border-width", found(border_width)),
   ("border", found(border)),
   ("bottom", found(bottom)),
+  ("box-decoration-break", found(box_decoration_break)),
   ("box-shadow", found(box_shadow)),
   ("box-sizing", found(box_sizing)),
+  ("break-after", found(break_after)),
+  ("break-before", found(break_before)),
+  ("break-inside", found(break_inside)),
+  ("caption-side", found(caption_side)),
   ("caret-color", found(caret_color)),
   ("clear", found(clear)),
   ("clip-path", found(clip_path)),
+  ("clip-rule", found(clip_rule)),
   ("clip", found(clip)),
+  ("color-adjust", found(color_adjust)),
+  ("color-interpolation-filters", found(color_interpolation_filters)),
+  ("color-interpolation", found(color_interpolation)),
+  ("color-scheme", found(color_scheme)),
   ("color", found(color)),
   ("column-count", found(column_count)),
   ("column-fill", found(column_fill)),
@@ -4541,20 +4999,27 @@ let properties = [
   ("column-span", found(column_span)),
   ("column-width", found(column_width)),
   ("columns", found(columns)),
+  ("contain", found(contain)),
+  ("content-visibility", found(content_visibility)),
+  ("content", found(content)),
   ("counter-increment", found(counter_increment)),
   ("counter-reset", found(counter_reset)),
+  ("counter-set", found(counter_set)),
   ("cursor", found(cursor)),
   ("direction", found(direction)),
   ("display", found(display)),
+  ("empty-cells", found(empty_cells)),
+  ("fill-opacity", found(fill_opacity)),
+  ("fill-rule", found(fill_rule)),
   ("fill", found(fill)),
   ("filter", found(filter)),
+  ("flex", found(flex)),
   ("flex-basis", found(flex_basis)),
   ("flex-direction", found(flex_direction)),
   ("flex-flow", found(flex_flow)),
   ("flex-grow", found(flex_grow)),
   ("flex-shrink", found(flex_shrink)),
   ("flex-wrap", found(flex_wrap)),
-  ("flex", found(flex)),
   ("float", found(float)),
   ("font-family", found(font_family)),
   ("font-feature-settings", found(font_feature_settings)),
@@ -4563,19 +5028,21 @@ let properties = [
   ("font-optical-sizing", found(font_optical_sizing)),
   ("font-size-adjust", found(font_size_adjust)),
   ("font-size", found(font_size)),
+  ("font-palette", found(font_palette)),
   ("font-stretch", found(font_stretch)),
   ("font-style", found(font_style)),
-  ("font-synthesis", found(font_synthesis)),
-  ("font-synthesis-weight", found(font_synthesis_weight)),
-  ("font-synthesis-style", found(font_synthesis_style)),
-  ("font-synthesis-small-caps", found(font_synthesis_small_caps)),
   ("font-synthesis-position", found(font_synthesis_position)),
+  ("font-synthesis-small-caps", found(font_synthesis_small_caps)),
+  ("font-synthesis-style", found(font_synthesis_style)),
+  ("font-synthesis-weight", found(font_synthesis_weight)),
+  ("font-synthesis", found(font_synthesis)),
   ("font-variant-alternates", found(font_variant_alternates)),
   ("font-variant-caps", found(font_variant_caps)),
   ("font-variant-east-asian", found(font_variant_east_asian)),
   ("font-variant-ligatures", found(font_variant_ligatures)),
   ("font-variant-numeric", found(font_variant_numeric)),
   ("font-variant-position", found(font_variant_position)),
+  ("font-variant-emoji", found(font_variant_emoji)),
   ("font-variant", found(font_variant)),
   ("font-variation-settings", found(font_variation_settings)),
   ("font-weight", found(font_weight)),
@@ -4601,24 +5068,34 @@ let properties = [
   ("grid", found(grid)),
   ("hanging-punctuation", found(hanging_punctuation)),
   ("height", found(height)),
-  /* ("hyphenate-character", found(hyphenate_character)), */
-  /* ("hyphenate-limit-chars", found(hyphenate_limit_chars)), */
-  /* ("hyphenate-limit-lines", found(hyphenate_limit_lines)), */
-  /* ("hyphenate-limit-zone", found(hyphenate_limit_zone)), */
+  ("hyphenate-character", found(hyphenate_character)),
+  ("hyphenate-limit-chars", found(hyphenate_limit_chars)),
+  ("hyphenate-limit-lines", found(hyphenate_limit_lines)),
+  ("hyphenate-limit-zone", found(hyphenate_limit_zone)),
   ("hyphens", found(hyphens)),
   ("image-orientation", found(image_orientation)),
   ("image-rendering", found(image_rendering)),
   ("image-resolution", found(image_resolution)),
   ("ime-mode", found(ime_mode)),
+  ("initial-letter-align", found(initial_letter_align)),
+  ("initial-letter", found(initial_letter)),
+  ("inline-size", found(inline_size)),
+  ("inset-block-end", found(inset_block_end)),
+  ("inset-block-start", found(inset_block_start)),
+  ("inset-block", found(inset_block)),
+  ("inset-inline-end", found(inset_inline_end)),
+  ("inset-inline-start", found(inset_inline_start)),
+  ("inset-inline", found(inset_inline)),
+  ("inset", found(inset)),
   ("isolation", found(isolation)),
   ("justify-content", found(justify_content)),
   ("justify-items", found(justify_items)),
   ("justify-self", found(justify_self)),
-  /* ("layout-grid-char", found(layout_grid_char)), */
-  /* ("layout-grid-line", found(layout_grid_line)), */
-  /* ("layout-grid-mode", found(layout_grid_mode)), */
-  /* ("layout-grid-type", found(layout_grid_type)), */
-  /* ("layout-grid", found(layout_grid)), */
+  ("layout-grid-char", found(layout_grid_char)),
+  ("layout-grid-line", found(layout_grid_line)),
+  ("layout-grid-mode", found(layout_grid_mode)),
+  ("layout-grid-type", found(layout_grid_type)),
+  ("layout-grid", found(layout_grid)),
   ("left", found(left)),
   ("letter-spacing", found(letter_spacing)),
   ("line-break", found(line_break)),
@@ -4634,40 +5111,73 @@ let properties = [
   ("margin-right", found(margin_right)),
   ("margin-top", found(margin_top)),
   ("margin", found(margin)),
+  ("mask-border-mode", found(mask_border_mode)),
+  ("mask-border-outset", found(mask_border_outset)),
+  ("mask-border-repeat", found(mask_border_repeat)),
+  ("mask-border-slice", found(mask_border_slice)),
+  ("mask-border-source", found(mask_border_source)),
+  ("mask-border-width", found(mask_border_width)),
+  ("mask-clip", found(mask_clip)),
+  ("mask-composite", found(mask_composite)),
   ("mask-image", found(mask_image)),
-  ("mask-image", found(mask_image)),
+  ("mask-mode", found(mask_mode)),
+  ("mask-origin", found(mask_origin)),
+  ("mask-position", found(mask_position)),
+  ("mask-repeat", found(mask_repeat)),
+  ("mask-size", found(mask_size)),
+  ("mask-type", found(mask_type)),
+  ("max-block-size", found(max_block_size)),
   ("max-height", found(max_height)),
+  ("max-inline-size", found(max_inline_size)),
   ("max-lines", found(max_lines)),
   ("max-width", found(max_width)),
+  ("min-block-size", found(min_block_size)),
   ("min-height", found(min_height)),
+  ("min-inline-size", found(min_inline_size)),
   ("min-width", found(min_width)),
   ("mix-blend-mode", found(mix_blend_mode)),
-  /* ("nav-down", found(nav_down)), */
-  /* ("nav-left", found(nav_left)), */
-  /* ("nav-right", found(nav_right)), */
-  /* ("nav-up", found(nav_up)), */
+  ("nav-down", found(nav_down)),
+  ("nav-left", found(nav_left)),
+  ("nav-right", found(nav_right)),
+  ("nav-up", found(nav_up)),
   ("object-fit", found(object_fit)),
   ("object-position", found(object_position)),
+  ("offset-anchor", found(offset_anchor)),
+  ("offset-distance", found(offset_distance)),
+  ("offset-path", found(offset_path)),
+  ("offset-position", found(offset_position)),
+  ("offset-rotate", found(offset_rotate)),
+  ("offset", found(offset)),
   ("opacity", found(opacity)),
   ("order", found(order)),
-  ("order", found(order)),
+  ("orphans", found(orphans)),
+  ("outline", found(outline)),
   ("outline-color", found(outline_color)),
   ("outline-offset", found(outline_offset)),
   ("outline-style", found(outline_style)),
   ("outline-width", found(outline_width)),
-  ("outline", found(outline)),
-  ("overflow-inline", found(overflow_inline)),
+  ("overflow-anchor", found(overflow_anchor)),
   ("overflow-block", found(overflow_block)),
+  ("overflow-clip-box", found(overflow_clip_box)),
+  ("overflow-inline", found(overflow_inline)),
   ("overflow-wrap", found(overflow_wrap)),
-  ("overflow-x", found(overflow_x)),
   ("overflow-x", found(overflow_x)),
   ("overflow-y", found(overflow_y)),
   ("overflow", found(overflow)),
+  ("padding-block-end", found(padding_block_end)),
+  ("padding-block-start", found(padding_block_start)),
+  ("padding-block", found(padding_block)),
   ("padding-bottom", found(padding_bottom)),
+  ("padding-inline-end", found(padding_inline_end)),
+  ("padding-inline-start", found(padding_inline_start)),
+  ("padding-inline", found(padding_inline)),
   ("padding-left", found(padding_left)),
   ("padding-right", found(padding_right)),
   ("padding-top", found(padding_top)),
   ("padding", found(padding)),
+  ("page-break-after", found(page_break_after)),
+  ("page-break-before", found(page_break_before)),
+  ("page-break-inside", found(page_break_inside)),
   ("perspective-origin", found(perspective_origin)),
   ("perspective", found(perspective)),
   ("pointer-events", found(pointer_events)),
@@ -4677,31 +5187,28 @@ let properties = [
   ("rotate", found(rotate)),
   ("row-gap", found(row_gap)),
   ("scale", found(scale)),
-  /* ("scrollbar-3dlight-color", found(scrollbar_3dlight_color)), */
-  /* ("scrollbar-arrow-color", found(scrollbar_arrow_color)), */
-  /* ("scrollbar-base-color", found(scrollbar_base_color)), */
+  ("scrollbar-3dlight-color", found(scrollbar_3dlight_color)),
+  ("scrollbar-arrow-color", found(scrollbar_arrow_color)),
+  ("scrollbar-base-color", found(scrollbar_base_color)),
   ("scrollbar-color", found(scrollbar_color)),
-  /* ("scrollbar-darkshadow-color", found(scrollbar_darkshadow_color)), */
-  /* ("scrollbar-face-color", found(scrollbar_face_color)), */
-  /* ("scrollbar-highlight-color", found(scrollbar_highlight_color)), */
-  /* ("scrollbar-shadow-color", found(scrollbar_shadow_color)), */
-  /* ("scrollbar-track-color", found(scrollbar_track_color)), */
-  /* ("scrollbar-width", found(scrollbar_width)), */
-  /* ("stop-color", found(stopColor)), */
-  /* ("stop-opacity", found(stopOpacity)), */
-  /* ("stroke-dasharray", found(strokeDasharray)), */
-  /* ("stroke-linecap", found(strokeLinecap)), */
-  /* ("stroke-linejoin", found(strokeLinejoin)), */
-  /* ("stroke-miterlimit", found(strokeMiterlimit)), */
-  /* ("stroke-width", found(strokeWidth)), */
+  ("scrollbar-darkshadow-color", found(scrollbar_darkshadow_color)),
+  ("scrollbar-face-color", found(scrollbar_face_color)),
+  ("scrollbar-highlight-color", found(scrollbar_highlight_color)),
+  ("scrollbar-shadow-color", found(scrollbar_shadow_color)),
+  ("scrollbar-track-color", found(scrollbar_track_color)),
+  ("scrollbar-width", found(scrollbar_width)),
+  ("stroke-opacity", found(stroke_opacity)),
+  ("stroke-width", found(stroke_width)),
+  ("stroke-dasharray", found(stroke_dasharray)),
+  ("stroke-linecap", found(stroke_linecap)),
+  ("stroke-linejoin", found(stroke_linejoin)),
+  ("stroke-miterlimit", found(stroke_miterlimit)),
   ("stroke", found(stroke)),
-  ("stroke-opacity", found(strokeOpacity)),
   ("tab-size", found(tab_size)),
+  ("table-layout", found(table_layout)),
   ("text-align-last", found(text_align_last)),
   ("text-align", found(text_align)),
   ("text-align-all", found(text_align_all)),
-  /* ("text-autospace", found(text_autospace)), */
-  /* ("text-blink", found(text_blink)), */
   ("text-combine-upright", found(text_combine_upright)),
   ("text-decoration-color", found(text_decoration_color)),
   ("text-decoration-line", found(text_decoration_line)),
@@ -4710,16 +5217,16 @@ let properties = [
   ("text-decoration-style", found(text_decoration_style)),
   ("text-decoration-thickness", found(text_decoration_thickness)),
   ("text-decoration", found(text_decoration)),
+  ("text-decoration-skip-box", found(text_decoration_skip_box)),
+  ("text-decoration-skip-inset", found(text_decoration_skip_inset)),
+  ("text-decoration-skip-self", found(text_decoration_skip_self)),
+  ("text-decoration-skip-spaces", found(text_decoration_skip_spaces)),
   ("text-emphasis-color", found(text_emphasis_color)),
   ("text-emphasis-position", found(text_emphasis_position)),
   ("text-emphasis-style", found(text_emphasis_style)),
   ("text-emphasis", found(text_emphasis)),
   ("text-indent", found(text_indent)),
-  ("text-indent", found(text_indent)),
-  /* ("text-justify-trim", found(text_justify_trim)), */
   ("text-justify", found(text_justify)),
-  /* ("text-kashida-space", found(text_kashida_space)), */
-  /* ("text-kashida", found(text_kashida)), */
   ("text-orientation", found(text_orientation)),
   ("text-overflow", found(text_overflow)),
   ("text-shadow", found(text_shadow)),
@@ -4741,23 +5248,16 @@ let properties = [
   ("user-select", found(user_select)),
   ("vertical-align", found(vertical_align)),
   ("visibility", found(visibility)),
+  ("will-change", found(will_change)),
   ("white-space", found(white_space)),
   ("widows", found(widows)),
   ("width", found(width)),
   ("word-break", found(word_break)),
   ("word-spacing", found(word_spacing)),
   ("word-wrap", found(word_wrap)),
+  ("writing-mode", found(writing_mode)),
   ("z-index", found(z_index)),
-  // ("block-ellipsis", found(block_ellipsis)),
-  // ("continue", found(continue)),
-  // ("font-palette", found(font_palette)),
-  ("font-variant-emoji", found(font_variant_emoji)),
-  // ("overflow-clip-margin", found(overflow_clip_margin)),
-  ("text-decoration-skip-box", found(text_decoration_skip_box)),
-  ("text-decoration-skip-inset", found(text_decoration_skip_inset)),
-  // ("text-decoration-skip-self", found(text_decoration_skip_self)),
-  // ("text-decoration-skip-spaces", found(text_decoration_skip_spaces)),
-  // ("text-emphasis-skip", found(text_emphasis_skip)),
+  ("zoom", found(zoom)),
 ];
 
 let render_when_unsupported_features = (~loc, property, value) => {
