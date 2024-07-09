@@ -1002,8 +1002,10 @@ and property_clip_path = [%value.rec
 ]
 and property_clip_rule = [%value.rec "'nonzero' | 'evenodd'"]
 and property_color = [%value.rec "<color>"]
-and property_color_interpolation_filters = [%value.rec "'auto' | 'sRGB'"]
-and property_color_interpolation = [%value.rec "'auto' | 'sRGB'"]
+and property_color_interpolation_filters = [%value.rec
+  "'auto' | 'sRGB' | 'linearRGB'"
+]
+and property_color_interpolation = [%value.rec "'auto' | 'sRGB' | 'linearRGB'"]
 
 and property_color_adjust = [%value.rec "'economy' | 'exact'"]
 and property_column_count = [%value.rec "<integer> | 'auto'"]
@@ -1026,7 +1028,7 @@ and property_contain = [%value.rec
 and property_content = [%value.rec
   "'normal' | 'none' | [ <content-replacement> | <content-list> ] [ '/' <string> ]?"
 ]
-and property_content_visibility = [%value.rec "'visible' | 'hidden' | 'collapse'"]
+and property_content_visibility = [%value.rec "'visible' | 'hidden' | 'auto'"]
 and property_counter_increment = [%value.rec
   "[ <custom-ident> [ <integer> ]? ]+ | 'none'"
 ]
@@ -1176,7 +1178,7 @@ and property_height = [%value.rec
   "'auto' | <extended-length> | <extended-percentage> | 'min-content' | 'max-content' | 'fit-content' | fit-content( <extended-length> | <extended-percentage> )"
 ]
 and property_hyphens = [%value.rec "'none' | 'manual' | 'auto'"]
-and property_hyphenate_character = [%value.rec "'auto' | <string-token>'-'"]
+and property_hyphenate_character = [%value.rec "'auto' | <string-token>"]
 and property_hyphenate_limit_chars = [%value.rec "'auto' | <integer>"]
 and property_hyphenate_limit_lines = [%value.rec "'no-limit' | <integer>"]
 and property_hyphenate_limit_zone = [%value.rec
@@ -1613,7 +1615,9 @@ and property_stroke_opacity = [%value.rec "<alpha-value>"]
 and property_stroke_width = [%value.rec "<svg-length>"]
 and property_tab_size = [%value.rec " <number> | <extended-length>"]
 and property_table_layout = [%value.rec "'auto' | 'fixed'"]
-and property_text_autospace = [%value.rec "'none' | 'ideograph-alpha' | 'ideograph-numeric' | 'ideograph-parenthesis' | 'ideograph-space'"]
+and property_text_autospace = [%value.rec
+  "'none' | 'ideograph-alpha' | 'ideograph-numeric' | 'ideograph-parenthesis' | 'ideograph-space'"
+]
 and property_text_blink = [%value.rec "'none' | 'blink' | 'blink-anywhere'"]
 and property_text_align = [%value.rec
   "'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | 'match-parent' | 'justify-all'"
@@ -1632,7 +1636,9 @@ and property_text_decoration = [%value.rec
   "[ <'text-decoration-line'>] [<'text-decoration-style'>]? [<'text-decoration-color'>]?"
 ]
 and property_text_justify_trim = [%value.rec "'none' | 'all' | 'auto'"]
-and property_text_kashida = [%value.rec "'none' | 'horizontal' | 'vertical' | 'both'"]
+and property_text_kashida = [%value.rec
+  "'none' | 'horizontal' | 'vertical' | 'both'"
+]
 and property_text_kashida_space = [%value.rec "'normal' | 'pre' | 'post'"]
 and property_text_decoration_color = [%value.rec "<color>"]
 /* Spec doesn't contain spelling-error and grammar-error: https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-line but this list used to have them | 'spelling-error' | 'grammar-error'. Leaving this comment here for reference */
@@ -1644,10 +1650,14 @@ and property_text_decoration_line = [%value.rec
 and property_text_decoration_skip = [%value.rec
   "'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' ] || 'edges' || 'box-decoration'"
 ]
-and property_text_decoration_skip_self = [%value.rec "'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' ] || 'edges' || 'box-decoration'"]
+and property_text_decoration_skip_self = [%value.rec
+  "'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' ] || 'edges' || 'box-decoration'"
+]
 and property_text_decoration_skip_ink = [%value.rec "'auto' | 'all' | 'none'"]
 and property_text_decoration_skip_box = [%value.rec "'none' | 'all'"]
-and property_text_decoration_skip_spaces = [%value.rec "'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' ] || 'edges' || 'box-decoration'"]
+and property_text_decoration_skip_spaces = [%value.rec
+  "'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' ] || 'edges' || 'box-decoration'"
+]
 and property_text_decoration_skip_inset = [%value.rec "'none' | 'auto'"]
 
 and property_text_decoration_style = [%value.rec
