@@ -2,12 +2,12 @@
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   module Theme = {
-    let var = CssJs.hex("333333");
+    let var = CSS.hex("333333");
     module Border = {
-      let black = CssJs.hex("222222");
+      let black = CSS.hex("222222");
     };
   };
-  let black = CssJs.hex("000");
+  let black = CSS.hex("000");
   module StringInterpolation = {
     [@deriving (jsProperties, getSet)]
     type makeProps = {
@@ -970,12 +970,12 @@
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles =
-      CssJs.style([|
-        CssJs.label("StringInterpolation"),
-        (CssJs.color(Theme.var): CssJs.rule),
-        (CssJs.backgroundColor(black): CssJs.rule),
-        (CssJs.borderColor(Theme.Border.black): CssJs.rule),
-        CssJs.display(`block),
+      CSS.style([|
+        CSS.label("StringInterpolation"),
+        (CSS.color(Theme.var): CSS.rule),
+        (CSS.backgroundColor(black): CSS.rule),
+        (CSS.borderColor(Theme.Border.black): CSS.rule),
+        CSS.display(`block),
       |]);
     let make = (props: makeProps) => {
       let className = styles ++ getOrEmpty(classNameGet(props));

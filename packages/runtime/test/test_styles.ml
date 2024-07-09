@@ -1,31 +1,25 @@
 let get_string_style_rules () =
-  let content = CssJs.get_stylesheet () in
-  let _ = CssJs.flush () in
+  let content = CSS.get_stylesheet () in
+  let _ = CSS.flush () in
   content
 
 let one_property =
   test "one_property" @@ fun () ->
-  let classname = CssJs.style [| CssJs.display `block |] in
+  let classname = CSS.style [| CSS.display `block |] in
   let css = get_string_style_rules () in
   assert_string css (Printf.sprintf ".%s { display: block; }" classname)
 
 let multiple_properties =
   test "multiple_properties" @@ fun () ->
-  let classname =
-    CssJs.style [| CssJs.display `block; CssJs.fontSize (`px 10) |]
-  in
+  let classname = CSS.style [| CSS.display `block; CSS.fontSize (`px 10) |] in
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf ".%s { display: block; font-size: 10px; }" classname)
 
 let multiple_declarations =
   test "multiple_declarations" @@ fun () ->
-  let classname1 =
-    CssJs.style [| CssJs.display `block; CssJs.fontSize (`px 10) |]
-  in
-  let classname2 =
-    CssJs.style [| CssJs.display `block; CssJs.fontSize (`px 99) |]
-  in
+  let classname1 = CSS.style [| CSS.display `block; CSS.fontSize (`px 10) |] in
+  let classname2 = CSS.style [| CSS.display `block; CSS.fontSize (`px 99) |] in
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
@@ -35,9 +29,7 @@ let multiple_declarations =
 
 let label_should_not_be_rendered =
   test "label_should_not_be_rendered" @@ fun () ->
-  let classname =
-    CssJs.style [| CssJs.label "classname"; CssJs.display `block |]
-  in
+  let classname = CSS.style [| CSS.label "classname"; CSS.display `block |] in
   let css = get_string_style_rules () in
   assert_string css (Printf.sprintf ".%s { display: block; }" classname)
 
@@ -128,17 +120,16 @@ let avoid_hash_collision =
 
 let float_values =
   test "float_values" @@ fun () ->
-  let classname = CssJs.style [| CssJs.padding (`rem 10.) |] in
+  let classname = CSS.style [| CSS.padding (`rem 10.) |] in
   let css = get_string_style_rules () in
   assert_string css (Printf.sprintf ".%s { padding: 10rem; }" classname)
 
 let simple_selector =
   test "simple_selector" @@ fun () ->
   let classname =
-    CssJs.style
+    CSS.style
       [|
-        CssJs.margin @@ CssJs.px 10;
-        CssJs.selector "a" [| CssJs.margin @@ CssJs.px 60 |];
+        CSS.margin @@ CSS.px 10; CSS.selector "a" [| CSS.margin @@ CSS.px 60 |];
       |]
   in
   let css = get_string_style_rules () in
@@ -149,13 +140,11 @@ let simple_selector =
 let selector_nested =
   test "selector_nested" @@ fun () ->
   let classname =
-    CssJs.style
+    CSS.style
       [|
-        CssJs.margin @@ CssJs.px 10;
-        CssJs.selector "a"
-          [|
-            CssJs.display `block; CssJs.selector "div" [| CssJs.display `none |];
-          |];
+        CSS.margin @@ CSS.px 10;
+        CSS.selector "a"
+          [| CSS.display `block; CSS.selector "div" [| CSS.display `none |] |];
       |]
   in
   let css = get_string_style_rules () in
@@ -168,13 +157,13 @@ let selector_nested =
 let selector_nested_with_ampersand =
   test "selector_nested_with_ampersand" @@ fun () ->
   let classname =
-    CssJs.style
+    CSS.style
       [|
-        CssJs.margin @@ CssJs.px 10;
-        CssJs.selector "& > a"
+        CSS.margin @@ CSS.px 10;
+        CSS.selector "& > a"
           [|
-            CssJs.margin @@ CssJs.px 11;
-            CssJs.selector "& > div" [| CssJs.margin @@ CssJs.px 12 |];
+            CSS.margin @@ CSS.px 11;
+            CSS.selector "& > div" [| CSS.margin @@ CSS.px 12 |];
           |];
       |]
   in
@@ -188,22 +177,22 @@ let selector_nested_with_ampersand =
 let selector_nested_x10 =
   test "selector_nested_x10" @@ fun () ->
   let classname =
-    CssJs.style
+    CSS.style
       [|
-        CssJs.display `flex;
-        CssJs.selector "a"
+        CSS.display `flex;
+        CSS.selector "a"
           [|
-            CssJs.display `block;
-            CssJs.selector "div"
+            CSS.display `block;
+            CSS.selector "div"
               [|
-                CssJs.display `none;
-                CssJs.selector "span"
+                CSS.display `none;
+                CSS.selector "span"
                   [|
-                    CssJs.display `none;
-                    CssJs.selector "hr"
+                    CSS.display `none;
+                    CSS.selector "hr"
                       [|
-                        CssJs.display `none;
-                        CssJs.selector "code" [| CssJs.display `none |];
+                        CSS.display `none;
+                        CSS.selector "code" [| CSS.display `none |];
                       |];
                   |];
               |];
@@ -221,10 +210,9 @@ let selector_nested_x10 =
 let selector_ampersand_with_space =
   test "selector_ampersand_with_space" @@ fun () ->
   let classname =
-    CssJs.style
+    CSS.style
       [|
-        CssJs.fontSize (`px 42);
-        CssJs.selector "& .div" [| CssJs.fontSize (`px 24) |];
+        CSS.fontSize (`px 42); CSS.selector "& .div" [| CSS.fontSize (`px 24) |];
       |]
   in
   let css = get_string_style_rules () in
@@ -308,10 +296,9 @@ let pseudo_selectors_everywhere =
 let selector_ampersand_with_no_space =
   test "selector_ampersand_with_space" @@ fun () ->
   let classname =
-    CssJs.style
+    CSS.style
       [|
-        CssJs.fontSize (`px 42);
-        CssJs.selector "&.div" [| CssJs.fontSize (`px 24) |];
+        CSS.fontSize (`px 42); CSS.selector "&.div" [| CSS.fontSize (`px 24) |];
       |]
   in
   let css = get_string_style_rules () in
@@ -322,10 +309,10 @@ let selector_ampersand_with_no_space =
 let selector_ampersand_at_the_middle =
   test "selector_ampersand_at_the_middle" @@ fun () ->
   let classname =
-    CssJs.style
+    CSS.style
       [|
-        CssJs.fontSize (`px 42);
-        CssJs.selector "& div &" [| CssJs.fontSize (`px 24) |];
+        CSS.fontSize (`px 42);
+        CSS.selector "& div &" [| CSS.fontSize (`px 24) |];
       |]
   in
   let css = get_string_style_rules () in
@@ -365,10 +352,10 @@ let selector_nested_with_mq_and_declarations =
 let mq =
   test "mq" @@ fun () ->
   let classname =
-    CssJs.style
+    CSS.style
       [|
-        CssJs.maxWidth (`px 800);
-        CssJs.media "(max-width: 768px)" [| CssJs.width (`px 300) |];
+        CSS.maxWidth (`px 800);
+        CSS.media "(max-width: 768px)" [| CSS.width (`px 300) |];
       |]
   in
   let css = get_string_style_rules () in
@@ -381,10 +368,10 @@ let mq =
 let selector_params =
   test "selector_params" @@ fun () ->
   let classname =
-    CssJs.style
+    CSS.style
       [|
-        CssJs.maxWidth (`px 800);
-        CssJs.selector {js|:first-child|js} [| CssJs.width (`px 300) |];
+        CSS.maxWidth (`px 800);
+        CSS.selector {js|:first-child|js} [| CSS.width (`px 300) |];
       |]
   in
   let css = get_string_style_rules () in
@@ -396,13 +383,13 @@ let selector_params =
 let keyframe =
   test "keyframe" @@ fun () ->
   let animationName =
-    CssJs.keyframes
+    CSS.keyframes
       [|
-        0, [| CssJs.transform (`rotate (`deg 0.)) |];
-        100, [| CssJs.transform (`rotate (`deg (-360.))) |];
+        0, [| CSS.transform (`rotate (`deg 0.)) |];
+        100, [| CSS.transform (`rotate (`deg (-360.))) |];
       |]
   in
-  let classname = CssJs.style [| CssJs.animationName animationName |] in
+  let classname = CSS.style [| CSS.animationName animationName |] in
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
@@ -416,14 +403,14 @@ let keyframe =
 
 let global =
   test "global" @@ fun () ->
-  CssJs.global [| CssJs.selector "html" [| CssJs.lineHeight (`abs 1.15) |] |];
+  CSS.global [| CSS.selector "html" [| CSS.lineHeight (`abs 1.15) |] |];
   let css = get_string_style_rules () in
   assert_string css (Printf.sprintf "html{line-height:1.15;}")
 
 let duplicated_styles_unique =
   test "duplicated_styles_unique" @@ fun () ->
-  let classname1 = CssJs.style [| CssJs.flexGrow 1. |] in
-  let classname2 = CssJs.style [| CssJs.flexGrow 1. |] in
+  let classname1 = CSS.style [| CSS.flexGrow 1. |] in
+  let classname2 = CSS.style [| CSS.flexGrow 1. |] in
   let css = get_string_style_rules () in
   assert_string classname1 classname2;
   assert_string css (Printf.sprintf ".%s { flex-grow: 1; }" classname1)
@@ -432,13 +419,13 @@ let hover_selector =
   test "hover_selector" @@ fun () ->
   let rules =
     [|
-      CssJs.color `currentColor;
-      CssJs.selector ":hover" [| CssJs.color `transparent |];
-      CssJs.selector "&:hover" [| CssJs.color `transparent |];
-      CssJs.selector " :hover" [| CssJs.color `transparent |];
+      CSS.color `currentColor;
+      CSS.selector ":hover" [| CSS.color `transparent |];
+      CSS.selector "&:hover" [| CSS.color `transparent |];
+      CSS.selector " :hover" [| CSS.color `transparent |];
     |]
   in
-  let classname = CssJs.style rules in
+  let classname = CSS.style rules in
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
@@ -611,13 +598,13 @@ let selector_with_interp_and_pseudo =
   let button_active = [%cx "position: absolute;"] in
   let rules =
     [|
-      CssJs.cursor `pointer;
-      CssJs.selector
+      CSS.cursor `pointer;
+      CSS.selector
         ({js|&.|js} ^ button_active ^ {js|::before|js})
-        [| CssJs.top (`pxFloat 50.) |];
+        [| CSS.top (`pxFloat 50.) |];
     |]
   in
-  let classname = CssJs.style rules in
+  let classname = CSS.style rules in
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
@@ -645,21 +632,21 @@ let selector_with_empty_interp =
 
 let style_tag =
   test "style_tag" @@ fun () ->
-  CssJs.global [| CssJs.selector "html" [| CssJs.lineHeight (`abs 1.15) |] |];
+  CSS.global [| CSS.selector "html" [| CSS.lineHeight (`abs 1.15) |] |];
   let animationName =
-    CssJs.keyframes
+    CSS.keyframes
       [|
-        0, [| CssJs.transform (`rotate (`deg 0.)) |];
-        100, [| CssJs.transform (`rotate (`deg (-360.))) |];
+        0, [| CSS.transform (`rotate (`deg 0.)) |];
+        100, [| CSS.transform (`rotate (`deg (-360.))) |];
       |]
   in
   let animationNameHash =
     String.sub animationName 10 (String.length animationName - 10)
   in
-  let classname = CssJs.style [| CssJs.display `block |] in
+  let classname = CSS.style [| CSS.display `block |] in
   let classname_hash = String.sub classname 4 (String.length classname - 4) in
-  let css = CssJs.style_tag () |> ReactDOM.renderToString in
-  let _ = CssJs.flush () in
+  let css = CSS.style_tag () |> ReactDOM.renderToString in
+  let _ = CSS.flush () in
   (* This is the hash of the global styles, since we don't capture it with global, we inline it for the test *)
   let global_hash = "18zdck7" in
   assert_string css
@@ -760,16 +747,16 @@ let selector_nested_interpolation_with_multiple =
 
 let selector_with_classname_and_mq =
   test "selector_with_classname_and_mq" @@ fun () ->
-  let nested_classname = CssJs.style [||] in
+  let nested_classname = CSS.style [||] in
   let rules =
     [|
-      CssJs.display `block;
-      CssJs.selector
+      CSS.display `block;
+      CSS.selector
         (".lola ." ^ nested_classname)
-        [| CssJs.media "(min-width: 768px)" [| CssJs.height `auto |] |];
+        [| CSS.media "(min-width: 768px)" [| CSS.height `auto |] |];
     |]
   in
-  let classname = CssJs.style rules in
+  let classname = CSS.style rules in
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
@@ -781,15 +768,14 @@ let mq_with_selectors =
   test "mq_with_selectors" @@ fun () ->
   let rules =
     [|
-      CssJs.display `block;
-      CssJs.media "(min-width: 768px)"
+      CSS.display `block;
+      CSS.media "(min-width: 768px)"
         [|
-          CssJs.height `auto;
-          CssJs.selector ".lola" [| CssJs.color `transparent |];
+          CSS.height `auto; CSS.selector ".lola" [| CSS.color `transparent |];
         |];
     |]
   in
-  let classname = CssJs.style rules in
+  let classname = CSS.style rules in
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
@@ -800,11 +786,11 @@ let mq_with_selectors =
 let mq_nested =
   test "mq_nested" @@ fun () ->
   let classname =
-    CssJs.style
+    CSS.style
       [|
-        CssJs.maxWidth (`px 800);
-        CssJs.media "(min-width: 300px)"
-          [| CssJs.media "(max-width: 768px)" [| CssJs.display `flex |] |];
+        CSS.maxWidth (`px 800);
+        CSS.media "(min-width: 300px)"
+          [| CSS.media "(max-width: 768px)" [| CSS.display `flex |] |];
       |]
   in
   let css = get_string_style_rules () in
@@ -817,13 +803,13 @@ let mq_nested =
 let mq_nested_2 =
   test "mq_nested_2" @@ fun () ->
   let classname =
-    CssJs.style
+    CSS.style
       [|
-        CssJs.maxWidth (`px 800);
-        CssJs.media "(min-width: 300px)"
+        CSS.maxWidth (`px 800);
+        CSS.media "(min-width: 300px)"
           [|
-            CssJs.position `fixed;
-            CssJs.media "(max-width: 768px)" [| CssJs.display `flex |];
+            CSS.position `fixed;
+            CSS.media "(max-width: 768px)" [| CSS.display `flex |];
           |];
       |]
   in
@@ -908,10 +894,10 @@ let mq_nested_10 =
 let mq_nested_without_declarations =
   test "mq_nested_without_declarations" @@ fun () ->
   let classname =
-    CssJs.style
+    CSS.style
       [|
-        CssJs.media "(min-width: 300px)"
-          [| CssJs.media "(max-width: 500px)" [| CssJs.display `flex |] |];
+        CSS.media "(min-width: 300px)"
+          [| CSS.media "(max-width: 500px)" [| CSS.display `flex |] |];
       |]
   in
   let css = get_string_style_rules () in
@@ -924,13 +910,13 @@ let mq_nested_without_declarations =
 let mq_nested_with_declarations =
   test "mq_nested_with_declarations" @@ fun () ->
   let classname =
-    CssJs.style
+    CSS.style
       [|
-        CssJs.color `transparent;
-        CssJs.media "(min-width: 300px)"
+        CSS.color `transparent;
+        CSS.media "(min-width: 300px)"
           [|
-            CssJs.margin (`px 10);
-            CssJs.media "(max-width: 400px)" [| CssJs.borderRadius (`px 10) |];
+            CSS.margin (`px 10);
+            CSS.media "(max-width: 400px)" [| CSS.borderRadius (`px 10) |];
           |];
       |]
   in
@@ -1049,7 +1035,7 @@ let global_with_selector =
     (Printf.sprintf "html{line-height:1.15;}a{}a:hover{padding:0;}")
 
 let tests =
-  ( "CssJs",
+  ( "CSS",
     [
       one_property;
       multiple_properties;

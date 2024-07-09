@@ -1006,7 +1006,6 @@ and property_color_interpolation_filters = [%value.rec
   "'auto' | 'sRGB' | 'linearRGB'"
 ]
 and property_color_interpolation = [%value.rec "'auto' | 'sRGB' | 'linearRGB'"]
-
 and property_color_adjust = [%value.rec "'economy' | 'exact'"]
 and property_column_count = [%value.rec "<integer> | 'auto'"]
 and property_column_fill = [%value.rec "'auto' | 'balance' | 'balance-all'"]

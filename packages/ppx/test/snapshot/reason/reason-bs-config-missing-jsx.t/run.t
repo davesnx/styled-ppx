@@ -972,12 +972,12 @@
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles = (~var, _) =>
-      CssJs.style([|
-        CssJs.label("ArrayDynamicComponent"),
-        CssJs.display(`block),
+      CSS.style([|
+        CSS.label("ArrayDynamicComponent"),
+        CSS.display(`block),
         switch (var) {
-        | `Black => CssJs.color(`hex({js|999999|js}))
-        | `White => CssJs.color(`hex({js|FAFAFA|js}))
+        | `Black => CSS.color(`hex({js|999999|js}))
+        | `White => CSS.color(`hex({js|FAFAFA|js}))
         },
       |]);
     let make = (props: makeProps('var)) => {

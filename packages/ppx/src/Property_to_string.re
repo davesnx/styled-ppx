@@ -285,7 +285,7 @@ let render_css_global_values = (name, value) => {
     };
 
   /* bs-css doesn't have those */
-  Ok([[%expr CssJs.unsafe([%e render_string(name)], [%e value])]]);
+  Ok([[%expr CSS.unsafe([%e render_string(name)], [%e value])]]);
 };
 
 let found = ({ast_of_string, string_to_expr, _}) => {

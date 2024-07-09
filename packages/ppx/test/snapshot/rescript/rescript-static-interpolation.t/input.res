@@ -1,10 +1,10 @@
 module Theme = {
-  let var = CssJs.hex("333333")
+  let var = CSS.hex("333333")
   module Border = {
-    let black = CssJs.hex("222222")
+    let black = CSS.hex("222222")
   }
 }
-let black = CssJs.hex("000")
+let black = CSS.hex("000")
 
 module StringInterpolation = %styled.div(j`
   color: $(Theme.var);

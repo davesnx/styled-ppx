@@ -55,8 +55,8 @@ Note: `server-reason-react` and `server-reason-react-ppx` are optional, and only
 
 ### API
 
-- `CssJs.get_stylesheet` returns a string with all styles
-- `CssJs.style_tag` returns a `<style />` React element, with all styles. This is designed to be used with server-reason-react.
+- `CSS.get_stylesheet` returns a string with all styles
+- `CSS.style_tag` returns a `<style />` React element, with all styles. This is designed to be used with server-reason-react.
 
 ### Example
 
@@ -69,7 +69,7 @@ let className = [%cx {|
   align-items: center
 |}];
 
-let stylesheet: string = CssJs.get_stylesheet();
+let stylesheet: string = CSS.get_stylesheet();
 
 print_endline(className);
 /* .css-1xuw4bg */
@@ -89,7 +89,7 @@ print_endline(stylesheet);
 
 ```reasonml
 /* This is a server-reason-react module with those styles encoded as a unique className */
-module Link = [%styled.a (~color=CssJs.hex("4299E1")) => {|
+module Link = [%styled.a (~color=CSS.hex("4299E1")) => {|
   font-size: 1.875rem;
   line-height: 1.5;
   text-decoration: none;
@@ -111,7 +111,7 @@ let layout = [%cx {|
 let app =
   <div className=layout>
     <Link
-      color={CssJs.hex("333333")}
+      color={CSS.hex("333333")}
       href="https://sancho.dev"
       rel="noopener noreferrer">
       {React.string("sancho.dev")}
@@ -119,7 +119,7 @@ let app =
   </div>;
 ```
 
-To generate the CSS on the server, you would need to use `<CssJs.style_tag />`. This component will render a `<style>` with all generated stylesheet.
+To generate the CSS on the server, you would need to use `<CSS.style_tag />`. This component will render a `<style>` with all generated stylesheet.
 
 Given a `Page` component to simulate a real-world scenario:
 
@@ -129,7 +129,7 @@ module Page = {
   let make = () => {
     <html>
       <head>
-        <CssJs.style_tag />
+        <CSS.style_tag />
       </head>
     </html>
   }
@@ -151,7 +151,7 @@ module Component = {
 };
 ```
 
-This component needs to be rendered before the `CssJs.style_tag` otherwise the `[%cx]` calls won't be added to the stylesheet, since they aren't being executed yet.
+This component needs to be rendered before the `CSS.style_tag` otherwise the `[%cx]` calls won't be added to the stylesheet, since they aren't being executed yet.
 
 To solve this, we recommend: render the React application first, and then inject the result as `dangerouslySetInnerHTML`.
 
@@ -164,7 +164,7 @@ module Document = {
 
     <html>
       <head>
-        <CssJs.style_tag />
+        <CSS.style_tag />
       </head>
       <body>
         <div id="#root" dangerouslySetInnerHTML={"__html": app} />
@@ -182,7 +182,7 @@ let some_server_side_handler = _request => {
 
 ### Advanced
 
-If you don't want to render the stylesheet directly, you can use `CssJs.get_stylesheet` to obtain the `stylesheet` as a `string`. In this case, the hydration with the client won't be supported.
+If you don't want to render the stylesheet directly, you can use `CSS.get_stylesheet` to obtain the `stylesheet` as a `string`. In this case, the hydration with the client won't be supported.
 
 To make sure hydration works, you would need the following `<style/>` tag
 
@@ -190,8 +190,8 @@ To make sure hydration works, you would need the following `<style/>` tag
 React.createElement "style"
   [
     Bool ("data-s", true);
-    String ("data-emotion", "css " ^ CssJs.get_string_style_hashes ());
-    DangerouslyInnerHtml (CssJs.get_stylesheet ());
+    String ("data-emotion", "css " ^ CSS.get_string_style_hashes ());
+    DangerouslyInnerHtml (CSS.get_stylesheet ());
   ]
   []
 ```

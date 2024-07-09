@@ -492,11 +492,11 @@
         < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t =
           "Object.assign"[@@bs.val ]
       let styles ~var:((var)[@ns.namedArgLoc ])  _ =
-        CssJs.style
-          [|(CssJs.label "ArrayDynamicComponent");(CssJs.display `block);((
+        CSS.style
+          [|(CSS.label "ArrayDynamicComponent");(CSS.display `block);((
             match var with
-            | `Black -> CssJs.color (`hex {js|999999|js})
-            | `White -> CssJs.color (`hex {js|FAFAFA|js})))|]
+            | `Black -> CSS.color (`hex {js|999999|js})
+            | `White -> CSS.color (`hex {js|FAFAFA|js})))|]
       let make (props : 'var makeProps) =
         let className =
           (styles ~var:(varGet props) ()) ^ (getOrEmpty (classNameGet props)) in

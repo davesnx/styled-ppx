@@ -33,38 +33,38 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
-  CssJs.animationName({js|foo|js});
-  CssJs.unsafe({js|animationName|js}, {js|foo, bar|js});
-  CssJs.animationDuration(`s(0));
-  CssJs.animationDuration(`s(1));
-  CssJs.animationDuration(`ms(100));
-  CssJs.animationTimingFunction(`ease);
-  CssJs.animationTimingFunction(`linear);
-  CssJs.animationTimingFunction(`easeIn);
-  CssJs.animationTimingFunction(`easeOut);
-  CssJs.animationTimingFunction(`easeInOut);
-  CssJs.animationTimingFunction(`cubicBezier((0.5, 0.5, 0.5, 0.5)));
-  CssJs.animationTimingFunction(`cubicBezier((0.5, 1.5, 0.5, (-2.5))));
-  CssJs.animationTimingFunction(`stepStart);
-  CssJs.animationTimingFunction(`stepEnd);
-  CssJs.animationTimingFunction(`steps((3, `start)));
-  CssJs.animationTimingFunction(`steps((5, `end_)));
-  CssJs.animationIterationCount(`infinite);
-  CssJs.animationIterationCount(`count(8.));
-  CssJs.animationIterationCount(`count(4.35));
-  CssJs.animationDirection(`normal);
-  CssJs.animationDirection(`alternate);
-  CssJs.animationDirection(`reverse);
-  CssJs.animationDirection(`alternateReverse);
-  CssJs.animationPlayState(`running);
-  CssJs.animationPlayState(`paused);
-  CssJs.animationDelay(`s(1));
-  CssJs.animationDelay(`s(-1));
-  CssJs.animationFillMode(`none);
-  CssJs.animationFillMode(`forwards);
-  CssJs.animationFillMode(`backwards);
-  CssJs.animationFillMode(`both);
-  CssJs.animation(
+  CSS.animationName({js|foo|js});
+  CSS.unsafe({js|animationName|js}, {js|foo, bar|js});
+  CSS.animationDuration(`s(0));
+  CSS.animationDuration(`s(1));
+  CSS.animationDuration(`ms(100));
+  CSS.animationTimingFunction(`ease);
+  CSS.animationTimingFunction(`linear);
+  CSS.animationTimingFunction(`easeIn);
+  CSS.animationTimingFunction(`easeOut);
+  CSS.animationTimingFunction(`easeInOut);
+  CSS.animationTimingFunction(`cubicBezier((0.5, 0.5, 0.5, 0.5)));
+  CSS.animationTimingFunction(`cubicBezier((0.5, 1.5, 0.5, (-2.5))));
+  CSS.animationTimingFunction(`stepStart);
+  CSS.animationTimingFunction(`stepEnd);
+  CSS.animationTimingFunction(`steps((3, `start)));
+  CSS.animationTimingFunction(`steps((5, `end_)));
+  CSS.animationIterationCount(`infinite);
+  CSS.animationIterationCount(`count(8.));
+  CSS.animationIterationCount(`count(4.35));
+  CSS.animationDirection(`normal);
+  CSS.animationDirection(`alternate);
+  CSS.animationDirection(`reverse);
+  CSS.animationDirection(`alternateReverse);
+  CSS.animationPlayState(`running);
+  CSS.animationPlayState(`paused);
+  CSS.animationDelay(`s(1));
+  CSS.animationDelay(`s(-1));
+  CSS.animationFillMode(`none);
+  CSS.animationFillMode(`forwards);
+  CSS.animationFillMode(`backwards);
+  CSS.animationFillMode(`both);
+  CSS.animation(
     ~duration=?Some(`s(1)),
     ~delay=?Some(`s(2)),
     ~direction=?Some(`alternate),
@@ -74,7 +74,7 @@ If this test fail means that the module is not in sync with the ppx
     ~iterationCount=?Some(`infinite),
     {js|foo|js},
   );
-  CssJs.animation(
+  CSS.animation(
     ~duration=?Some(`s(4)),
     ~delay=?Some(`s(1)),
     ~direction=?Some(`reverse),
@@ -84,7 +84,7 @@ If this test fail means that the module is not in sync with the ppx
     ~iterationCount=?Some(`infinite),
     {js|none|js},
   );
-  CssJs.animation(
+  CSS.animation(
     ~duration=?Some(`ms(300)),
     ~delay=?Some(`ms(400)),
     ~direction=?Some(`reverse),

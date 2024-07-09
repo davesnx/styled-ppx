@@ -11,119 +11,111 @@ let media_query_tests = [
   (
     "(min-width: 33px)",
     [%expr [%cx "@media (min-width: 33px) {}"]],
-    [%expr CssJs.style([|CssJs.media({js|(min-width: 33px)|js}, [||])|])],
+    [%expr CSS.style([|CSS.media({js|(min-width: 33px)|js}, [||])|])],
   ),
   (
     "(min-width: 33px)",
     [%expr [%cx "@media (min-width: 33px), (min-width: 13px) {}"]],
     [%expr
-      CssJs.style([|
-        CssJs.media({js|(min-width: 33px), (min-width: 13px)|js}, [||]),
+      CSS.style([|
+        CSS.media({js|(min-width: 33px), (min-width: 13px)|js}, [||]),
       |])
     ],
   ),
   (
     "(width >= 33px)",
     [%expr [%cx "@media (width >= 33px) {}"]],
-    [%expr CssJs.style([|CssJs.media({js|(width >= 33px)|js}, [||])|])],
+    [%expr CSS.style([|CSS.media({js|(width >= 33px)|js}, [||])|])],
   ),
   (
     "(width <= 33px)",
     [%expr [%cx "@media (width <= 33px) {}"]],
-    [%expr CssJs.style([|CssJs.media({js|(width <= 33px)|js}, [||])|])],
+    [%expr CSS.style([|CSS.media({js|(width <= 33px)|js}, [||])|])],
   ),
   (
     "(width < 33px)",
     [%expr [%cx "@media (width < 33px) {}"]],
-    [%expr CssJs.style([|CssJs.media({js|(width < 33px)|js}, [||])|])],
+    [%expr CSS.style([|CSS.media({js|(width < 33px)|js}, [||])|])],
   ),
   (
     "(width > 33px)",
     [%expr [%cx "@media (width > 33px) {}"]],
-    [%expr CssJs.style([|CssJs.media({js|(width > 33px)|js}, [||])|])],
+    [%expr CSS.style([|CSS.media({js|(width > 33px)|js}, [||])|])],
   ),
   (
     "(30em <= width <= 50em)",
     [%expr [%cx "@media (30em <= width <= 50em) {}"]],
-    [%expr
-      CssJs.style([|CssJs.media({js|(30em <= width <= 50em)|js}, [||])|])
-    ],
+    [%expr CSS.style([|CSS.media({js|(30em <= width <= 50em)|js}, [||])|])],
   ),
   (
     "(30em < width < 50em)",
     [%expr [%cx "@media (30em < width < 50em) {}"]],
-    [%expr
-      CssJs.style([|CssJs.media({js|(30em < width < 50em)|js}, [||])|])
-    ],
+    [%expr CSS.style([|CSS.media({js|(30em < width < 50em)|js}, [||])|])],
   ),
   (
     "(hover: hover)",
     [%expr [%cx "@media (hover: hover) {}"]],
-    [%expr CssJs.style([|CssJs.media({js|(hover: hover)|js}, [||])|])],
+    [%expr CSS.style([|CSS.media({js|(hover: hover)|js}, [||])|])],
   ),
   (
     "print",
     [%expr [%cx "@media print {}"]],
-    [%expr CssJs.style([|CssJs.media({js|print|js}, [||])|])],
+    [%expr CSS.style([|CSS.media({js|print|js}, [||])|])],
   ),
   (
     "not print",
     [%expr [%cx "@media not print {}"]],
-    [%expr CssJs.style([|CssJs.media({js|not print|js}, [||])|])],
+    [%expr CSS.style([|CSS.media({js|not print|js}, [||])|])],
   ),
   (
     "screen and (color))",
     [%expr [%cx "@media screen and (color) {}"]],
-    [%expr CssJs.style([|CssJs.media({js|screen and (color)|js}, [||])|])],
+    [%expr CSS.style([|CSS.media({js|screen and (color)|js}, [||])|])],
   ),
   (
     "(screen)",
     [%expr [%cx "@media (screen) {}"]],
-    [%expr CssJs.style([|CssJs.media({js|(screen)|js}, [||])|])],
+    [%expr CSS.style([|CSS.media({js|(screen)|js}, [||])|])],
   ),
   (
     "screen, print",
     [%expr [%cx "@media screen, print {}"]],
-    [%expr CssJs.style([|CssJs.media({js|screen, print|js}, [||])|])],
+    [%expr CSS.style([|CSS.media({js|screen, print|js}, [||])|])],
   ),
   (
     "(screen, print)",
     [%expr [%cx "@media (screen, print) {}"]],
-    [%expr CssJs.style([|CssJs.media({js|(screen, print)|js}, [||])|])],
+    [%expr CSS.style([|CSS.media({js|(screen, print)|js}, [||])|])],
   ),
   (
     "(screen and (color))",
     [%expr [%cx "@media (screen and (color)) {}"]],
-    [%expr CssJs.style([|CssJs.media({js|(screen and (color))|js}, [||])|])],
+    [%expr CSS.style([|CSS.media({js|(screen and (color))|js}, [||])|])],
   ),
   (
     "not screen and (color)",
     [%expr [%cx "@media not screen and (color) {}"]],
-    [%expr
-      CssJs.style([|CssJs.media({js|not screen and (color)|js}, [||])|])
-    ],
+    [%expr CSS.style([|CSS.media({js|not screen and (color)|js}, [||])|])],
   ),
   (
     "(not (screen and (color))))",
     [%expr [%cx "@media (not (screen and (color))) {}"]],
     [%expr
-      CssJs.style([|CssJs.media({js|(not (screen and (color)))|js}, [||])|])
+      CSS.style([|CSS.media({js|(not (screen and (color)))|js}, [||])|])
     ],
   ),
   (
     "(hover: hover) and (color)",
     [%expr [%cx "@media (hover: hover) and (color) {}"]],
     [%expr
-      CssJs.style([|CssJs.media({js|(hover: hover) and (color)|js}, [||])|])
+      CSS.style([|CSS.media({js|(hover: hover) and (color)|js}, [||])|])
     ],
   ),
   (
     "(not (color)) and (not (hover))",
     [%expr [%cx "@media (not (color)) and (not (hover)) {}"]],
     [%expr
-      CssJs.style([|
-        CssJs.media({js|(not (color)) and (not (hover))|js}, [||]),
-      |])
+      CSS.style([|CSS.media({js|(not (color)) and (not (hover))|js}, [||])|])
     ],
   ),
   (
@@ -132,8 +124,8 @@ let media_query_tests = [
       [%cx "@media screen and (min-width: 33px) and (max-height: 15rem) {}"]
     ],
     [%expr
-      CssJs.style([|
-        CssJs.media(
+      CSS.style([|
+        CSS.media(
           {js|screen and (min-width: 33px) and (max-height: 15rem)|js},
           [||],
         ),
@@ -143,27 +135,23 @@ let media_query_tests = [
   (
     "(all)",
     [%expr [%cx "@media (all) {}"]],
-    [%expr CssJs.style([|CssJs.media({js|(all)|js}, [||])|])],
+    [%expr CSS.style([|CSS.media({js|(all)|js}, [||])|])],
   ),
   (
     "all and (not (hover))",
     [%expr [%cx "@media all and (not (hover)){}"]],
-    [%expr
-      CssJs.style([|CssJs.media({js|all and (not (hover))|js}, [||])|])
-    ],
+    [%expr CSS.style([|CSS.media({js|all and (not (hover))|js}, [||])|])],
   ),
   (
     "not all and (monochrome)",
     [%expr [%cx "@media not all and (monochrome) {}"]],
-    [%expr
-      CssJs.style([|CssJs.media({js|not all and (monochrome)|js}, [||])|])
-    ],
+    [%expr CSS.style([|CSS.media({js|not all and (monochrome)|js}, [||])|])],
   ),
   (
     "screen, print and (color)",
     [%expr [%cx "@media screen, print and (color) {}"]],
     [%expr
-      CssJs.style([|CssJs.media({js|screen, print and (color)|js}, [||])|])
+      CSS.style([|CSS.media({js|screen, print and (color)|js}, [||])|])
     ],
   ),
   (
@@ -172,8 +160,8 @@ let media_query_tests = [
       [%cx "@media (min-height: 680px), screen and (orientation: portrait) {}"]
     ],
     [%expr
-      CssJs.style([|
-        CssJs.media(
+      CSS.style([|
+        CSS.media(
           {js|(min-height: 680px), screen and (orientation: portrait)|js},
           [||],
         ),
@@ -183,33 +171,28 @@ let media_query_tests = [
   (
     "(not (color)) or (hover)",
     [%expr [%cx "@media (not (color)) or (hover) {}"]],
-    [%expr
-      CssJs.style([|CssJs.media({js|(not (color)) or (hover)|js}, [||])|])
-    ],
+    [%expr CSS.style([|CSS.media({js|(not (color)) or (hover)|js}, [||])|])],
   ),
   (
     "(max-height: $(wat)",
     [%expr [%cx "@media (max-height: $(wat)) {}"]],
     [%expr
-      CssJs.style([|
-        CssJs.media({js|(max-height: |js} ++ wat ++ {js|)|js}, [||]),
+      CSS.style([|
+        CSS.media({js|(max-height: |js} ++ wat ++ {js|)|js}, [||]),
       |])
     ],
   ),
   (
     "$(wat)",
     [%expr [%cx "@media $(wat) {}"]],
-    [%expr CssJs.style([|CssJs.media(wat, [||])|])],
+    [%expr CSS.style([|CSS.media(wat, [||])|])],
   ),
   (
     "@media $(Media.tabletUp) and $(largeDesktopDown)",
     [%expr [%cx "@media $(Media.tabletUp) and $(largeDesktopDown){}"]],
     [%expr
-      CssJs.style([|
-        CssJs.media(
-          Media.tabletUp ++ {js| and |js} ++ largeDesktopDown,
-          [||],
-        ),
+      CSS.style([|
+        CSS.media(Media.tabletUp ++ {js| and |js} ++ largeDesktopDown, [||]),
       |])
     ],
   ),
@@ -218,7 +201,7 @@ let media_query_tests = [
     "@media (width: calc( 1px + 2px ))",
     [%expr [%cx "@media (width: calc( 1px + 2px )) {}"]],
     [%expr
-      CssJs.style([|CssJs.media({js|(width: calc( 1px + 2px ))|js}, [||])|])
+      CSS.style([|CSS.media({js|(width: calc( 1px + 2px ))|js}, [||])|])
     ],
   ),
 ];
@@ -228,9 +211,9 @@ let keyframe_tests = [
     {|%keyframe "0% { color: red } 100% { color: green }"|},
     [%expr [%keyframe "0% { color: red } 100% { color: green }"]],
     [%expr
-      CssJs.keyframes([|
-        (0, [|CssJs.color(CssJs.red)|]),
-        (100, [|CssJs.color(CssJs.green)|]),
+      CSS.keyframes([|
+        (0, [|CSS.color(CSS.red)|]),
+        (100, [|CSS.color(CSS.green)|]),
       |])
     ],
   ),
@@ -238,11 +221,11 @@ let keyframe_tests = [
     {|%keyframe "0%, 50%, 3% { color: red } 100% { color: green }"|},
     [%expr [%keyframe "0%, 50%, 3% { color: red } 100% { color: green }"]],
     [%expr
-      CssJs.keyframes([|
-        (0, [|CssJs.color(CssJs.red)|]),
-        (50, [|CssJs.color(CssJs.red)|]),
-        (3, [|CssJs.color(CssJs.red)|]),
-        (100, [|CssJs.color(CssJs.green)|]),
+      CSS.keyframes([|
+        (0, [|CSS.color(CSS.red)|]),
+        (50, [|CSS.color(CSS.red)|]),
+        (3, [|CSS.color(CSS.red)|]),
+        (100, [|CSS.color(CSS.green)|]),
       |])
     ],
   ),
@@ -250,9 +233,9 @@ let keyframe_tests = [
     {|%keyframe "0% { color: red } 100% { color: green }"|},
     [%expr [%keyframe "{ 0% { color: red } 100% { color: green }}"]],
     [%expr
-      CssJs.keyframes([|
-        (0, [|CssJs.color(CssJs.red)|]),
-        (100, [|CssJs.color(CssJs.green)|]),
+      CSS.keyframes([|
+        (0, [|CSS.color(CSS.red)|]),
+        (100, [|CSS.color(CSS.green)|]),
       |])
     ],
   ),
@@ -260,9 +243,9 @@ let keyframe_tests = [
     {|%keyframe "from { color: red } to { color: green }"|},
     [%expr [%keyframe "{ from { color: red } to { color: green }}"]],
     [%expr
-      CssJs.keyframes([|
-        (0, [|CssJs.color(CssJs.red)|]),
-        (100, [|CssJs.color(CssJs.green)|]),
+      CSS.keyframes([|
+        (0, [|CSS.color(CSS.red)|]),
+        (100, [|CSS.color(CSS.green)|]),
       |])
     ],
   ),
@@ -273,8 +256,8 @@ let container_query_tests = [
     "(min-width: 150px)",
     [%expr [%cx "@container (min-width: 150px) {}"]],
     [%expr
-      CssJs.style([|
-        CssJs.selector({js|@container (min-width: 150px)|js}, [||]),
+      CSS.style([|
+        CSS.selector({js|@container (min-width: 150px)|js}, [||]),
       |])
     ],
   ),
@@ -282,8 +265,8 @@ let container_query_tests = [
     "(max-width: 1000px)",
     [%expr [%cx "@container (max-width: 1000px) {}"]],
     [%expr
-      CssJs.style([|
-        CssJs.selector({js|@container (max-width: 1000px)|js}, [||]),
+      CSS.style([|
+        CSS.selector({js|@container (max-width: 1000px)|js}, [||]),
       |])
     ],
   ),
@@ -291,8 +274,8 @@ let container_query_tests = [
     "name (width >= 150px)",
     [%expr [%cx "@container name (width >= 150px) {}"]],
     [%expr
-      CssJs.style([|
-        CssJs.selector({js|@container name (width >= 150px)|js}, [||]),
+      CSS.style([|
+        CSS.selector({js|@container name (width >= 150px)|js}, [||]),
       |])
     ],
   ),
@@ -300,17 +283,15 @@ let container_query_tests = [
     "(height >= 150px)",
     [%expr [%cx "@container (height >= 150px) {}"]],
     [%expr
-      CssJs.style([|
-        CssJs.selector({js|@container (height >= 150px)|js}, [||]),
-      |])
+      CSS.style([|CSS.selector({js|@container (height >= 150px)|js}, [||])|])
     ],
   ),
   (
     "(inline-size >= 150px)",
     [%expr [%cx "@container (inline-size >= 150px) {}"]],
     [%expr
-      CssJs.style([|
-        CssJs.selector({js|@container (inline-size >= 150px)|js}, [||]),
+      CSS.style([|
+        CSS.selector({js|@container (inline-size >= 150px)|js}, [||]),
       |])
     ],
   ),
@@ -318,8 +299,8 @@ let container_query_tests = [
     "(block-size >= 150px)",
     [%expr [%cx "@container (block-size >= 150px) {}"]],
     [%expr
-      CssJs.style([|
-        CssJs.selector({js|@container (block-size >= 150px)|js}, [||]),
+      CSS.style([|
+        CSS.selector({js|@container (block-size >= 150px)|js}, [||]),
       |])
     ],
   ),
@@ -327,8 +308,8 @@ let container_query_tests = [
     "(aspect-ratio: 1 / 1)",
     [%expr [%cx "@container (aspect-ratio: 1 / 1) {}"]],
     [%expr
-      CssJs.style([|
-        CssJs.selector({js|@container (aspect-ratio: 1 / 1)|js}, [||]),
+      CSS.style([|
+        CSS.selector({js|@container (aspect-ratio: 1 / 1)|js}, [||]),
       |])
     ],
   ),
@@ -336,8 +317,8 @@ let container_query_tests = [
     "(orientation: portrait)",
     [%expr [%cx "@container (orientation: portrait) {}"]],
     [%expr
-      CssJs.style([|
-        CssJs.selector({js|@container (orientation: portrait)|js}, [||]),
+      CSS.style([|
+        CSS.selector({js|@container (orientation: portrait)|js}, [||]),
       |])
     ],
   ),
@@ -345,8 +326,8 @@ let container_query_tests = [
     "(width >= 150px) and (orientation: portrait)",
     [%expr [%cx "@container (width >= 150px) and (orientation: portrait) {}"]],
     [%expr
-      CssJs.style([|
-        CssJs.selector(
+      CSS.style([|
+        CSS.selector(
           {js|@container (width >= 150px) and (orientation: portrait)|js},
           [||],
         ),
@@ -357,8 +338,8 @@ let container_query_tests = [
     "name not (width < 150px)",
     [%expr [%cx "@container name not (width < 150px) {}"]],
     [%expr
-      CssJs.style([|
-        CssJs.selector({js|@container name not (width < 150px)|js}, [||]),
+      CSS.style([|
+        CSS.selector({js|@container name not (width < 150px)|js}, [||]),
       |])
     ],
   ),
@@ -366,8 +347,8 @@ let container_query_tests = [
     "(width >= 150px) or (orientation: portrait)",
     [%expr [%cx "@container (width >= 150px) or (orientation: portrait) {}"]],
     [%expr
-      CssJs.style([|
-        CssJs.selector(
+      CSS.style([|
+        CSS.selector(
           {js|@container (width >= 150px) or (orientation: portrait)|js},
           [||],
         ),

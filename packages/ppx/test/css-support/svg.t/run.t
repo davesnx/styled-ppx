@@ -33,13 +33,13 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
-  CssJs.pointerEvents(`auto);
-  CssJs.pointerEvents(`visiblePainted);
-  CssJs.pointerEvents(`visibleFill);
-  CssJs.pointerEvents(`visibleStroke);
-  CssJs.pointerEvents(`visible);
-  CssJs.pointerEvents(`painted);
-  CssJs.pointerEvents(`fill);
-  CssJs.pointerEvents(`stroke);
-  CssJs.pointerEvents(`all);
-  CssJs.pointerEvents(`none);
+  CSS.pointerEvents(`auto);
+  CSS.pointerEvents(`visiblePainted);
+  CSS.pointerEvents(`visibleFill);
+  CSS.pointerEvents(`visibleStroke);
+  CSS.pointerEvents(`visible);
+  CSS.pointerEvents(`painted);
+  CSS.pointerEvents(`fill);
+  CSS.pointerEvents(`stroke);
+  CSS.pointerEvents(`all);
+  CSS.pointerEvents(`none);

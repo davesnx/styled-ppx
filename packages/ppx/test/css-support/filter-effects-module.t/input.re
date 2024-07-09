@@ -1,4 +1,4 @@
-let color = CssJs.hex("333");
+let color = CSS.hex("333");
 
 /* Filter Effects Module Level 1 */
 [%css {|filter: none|}];

@@ -37,11 +37,11 @@ If this test fail means that the module is not in sync with the ppx
     }
   ];
   Js.log("2000");
-  CssJs.style([|
-    CssJs.height(`percent(100.)),
-    CssJs.height(`percent(100.)),
-    CssJs.height(`percent(100.)),
-    CssJs.height(`percent(100.)),
-    CssJs.height(`percent(100.)),
+  CSS.style([|
+    CSS.height(`percent(100.)),
+    CSS.height(`percent(100.)),
+    CSS.height(`percent(100.)),
+    CSS.height(`percent(100.)),
+    CSS.height(`percent(100.)),
     [%ocaml.error "Property 'display' has an invalid value: 'blocki'"],
   |]);

@@ -22,9 +22,9 @@
 [%css {|-webkit-box-orient: vertical;|}];
 
 module Color = {
-  let text = CssJs.hex("444");
+  let text = CSS.hex("444");
 };
-let colorTextString = Color.text |> CssJs.Types.Color.toString;
+let colorTextString = Color.text |> CSS.Types.Color.toString;
 
 [%css {|-webkit-box-shadow: inset 0 0 0 1000px $(Color.background);|}];
 [%css {|-webkit-line-clamp: 2;|}];
@@ -35,7 +35,7 @@ let colorTextString = Color.text |> CssJs.Types.Color.toString;
 [%css {|appearance: none;|}];
 [%css {|aspect-ratio: 21 / 8;|}];
 
-let c = CssJs.hex("e15a46");
+let c = CSS.hex("e15a46");
 [%css {|background-color: $(c);|}];
 [%css {|border: none;|}];
 [%css {|bottom: unset;|}];

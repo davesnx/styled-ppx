@@ -963,7 +963,7 @@
       "Object.assign";
     let styles = (~size, _) => {
       Js.log("Logging when render");
-      CssJs.style([|(CssJs.width(size): CssJs.rule), CssJs.display(`block)|]);
+      CSS.style([|(CSS.width(size): CSS.rule), CSS.display(`block)|]);
     };
     let make = (props: makeProps('size)) => {
       let className =
@@ -1947,10 +1947,10 @@
       "Object.assign";
     let styles = (~variant, _) => {
       let color = Theme.button(variant);
-      CssJs.style([|
-        CssJs.display(`inlineFlex),
-        (CssJs.color(color): CssJs.rule),
-        CssJs.width(`percent(100.)),
+      CSS.style([|
+        CSS.display(`inlineFlex),
+        (CSS.color(color): CSS.rule),
+        CSS.width(`percent(100.)),
       |]);
     };
     let make = (props: makeProps('variant)) => {

@@ -16,11 +16,11 @@
 (copy_files#
  (files ../native/shared/Colors.ml))
 
-; Copy files into the root of the folder (which collides with Kloth.ml)
-; but later on the actions, we remove the ml file, using the Kloth.res file
+(copy_files#
+ (files ../melange/CSS.ml))
 
 (rule
- (deps Kloth.ml CssJs.ml Emotion.ml)
+ (deps Kloth.ml Emotion_bindings.ml)
  (action
   (progn
    (with-stdout-to

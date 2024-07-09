@@ -31,8 +31,8 @@
 
 // Interpolation
 let transitions = [|
-  CssJs.Transition.shorthand("margin-left"),
-  CssJs.Transition.shorthand(~duration=`s(2), "opacity"),
+  CSS.Transition.shorthand("margin-left"),
+  CSS.Transition.shorthand(~duration=`s(2), "opacity"),
 |];
 let property = "margin-right";
 let timingFunction = `easeOut;

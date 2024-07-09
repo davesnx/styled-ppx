@@ -33,11 +33,11 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
-  CssJs.verticalAlign(`baseline);
-  CssJs.verticalAlign(`sub);
-  CssJs.verticalAlign(`super);
-  CssJs.verticalAlign(`top);
-  CssJs.verticalAlign(`textTop);
-  CssJs.verticalAlign(`middle);
-  CssJs.verticalAlign(`bottom);
-  CssJs.verticalAlign(`textBottom);
+  CSS.verticalAlign(`baseline);
+  CSS.verticalAlign(`sub);
+  CSS.verticalAlign(`super);
+  CSS.verticalAlign(`top);
+  CSS.verticalAlign(`textTop);
+  CSS.verticalAlign(`middle);
+  CSS.verticalAlign(`bottom);
+  CSS.verticalAlign(`textBottom);

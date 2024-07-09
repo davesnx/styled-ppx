@@ -2,7 +2,7 @@ include Properties
 include Colors
 include Alias
 include Rule
-include Emotion
+include Emotion_bindings
 module Types = Css_types
 
 (* alias for backwards compatibility *)
