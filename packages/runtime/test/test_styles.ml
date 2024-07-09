@@ -737,40 +737,8 @@ let mq_and_selectors_2 =
         768px) { .%s div a { height: auto; } }"
        classname classname classname)
 
-let selector_nested_inerpolation_with_multiple =
-  test "selector_nested_inerpolation_with_multiple" @@ fun () ->
-  let px24 = CssJs.px 24 in
-  let languageIcon =
-    [%cx {|
-  vertical-align: middle;
-  margin: 0.5em 0;
-  opacity: 0.6;
-|}]
-  in
-  let menuOpened = [%cx {||}] in
-  let classname =
-    [%cx
-      {|
-  margin-right: $(px24);
-
-  &:hover, .$(menuOpened) {
-    .$(languageIcon) {
-      opacity: 1.0;
-    }
-  }
-|}]
-  in
-  let css = get_string_style_rules () in
-  assert_string css
-    (Printf.sprintf
-       ".%s { vertical-align: middle; margin: 0.5em 0; opacity: 0.6; } .%s { \
-        margin-right: 24px; } .%s:hover .%s { opacity: 1; } .%s .%s .%s { \
-        opacity: 1; }"
-       languageIcon classname classname languageIcon classname menuOpened
-       languageIcon)
-
-let selector_nested_inerpolation_with_multiple =
-  test "selector_nested_inerpolation_with_multiple" @@ fun () ->
+let selector_nested_interpolation_with_multiple =
+  test "selector_nested_interpolation_with_multiple" @@ fun () ->
   let languageIcon = [%cx {| opacity: 0.6; |}] in
   let menuOpened = [%cx {||}] in
   let classname =
@@ -1123,7 +1091,7 @@ let tests =
       selector_nested_with_pseudo_2;
       selector_nested_with_pseudo_3;
       selector_nested_with_mq_and_declarations;
-      selector_nested_inerpolation_with_multiple;
+      selector_nested_interpolation_with_multiple;
       mq_with_selectors;
       mq;
       mq_nested;

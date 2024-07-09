@@ -2,6 +2,10 @@ module Array = struct
   (* Similar Array interface as https://github.com/janestreet/base *)
   include Stdlib.ArrayLabels
 
+  let ( @ ) = Stdlib.Array.append
+  let is_empty a = Array.length a == 0
+  let is_not_empty a = Array.length a != 0
+
   external caml_make_vect : int -> 'a -> 'a array = "caml_make_vect"
 
   let join ~sep a = String.concat sep (Array.to_list a)
@@ -25,9 +29,7 @@ module Array = struct
     if !k = length t then !r else if !k > 0 then sub ~pos:0 ~len:!k !r else [||]
 
   let filter_map ~f t = (filter_mapi t ~f:(fun _i a -> f a) [@nontail])
-  let ( @ ) = Stdlib.Array.append
-  let is_empty a = Array.length a == 0
-  let is_not_empty a = Array.length a != 0
+  let filter ~f t = filter_map ~f:(fun x -> if f x then Some x else None) t
 
   let map t ~(f : _ -> _) =
     let len = length t in
@@ -54,7 +56,6 @@ module Array = struct
          match f x with true -> Left x | false -> Right x)
     [@nontail])
 
-  let filter ~f t = filter_map ~f:(fun x -> if f x then Some x else None) t
   let flatten a = Array.concat (Array.to_list a)
 end
 
@@ -507,34 +508,16 @@ let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
     =
   let fontFace =
     [|
-      Some (Rule.Declaration ("font-family", fontFamily));
+      Kloth.Option.map Properties.fontStyle fontStyle;
+      Kloth.Option.map Properties.fontWeight fontWeight;
+      Kloth.Option.map Properties.fontDisplay fontDisplay;
+      Kloth.Option.map Properties.sizeAdjust sizeAdjust;
+      Some (Properties.fontFamily fontFamily);
       Some
         (Rule.Declaration
            ( "src",
              Kloth.Array.joinWithMap ~sep:{js|, |js}
                ~f:Css_types.FontFace.toString src ));
-      Kloth.Option.map
-        (fun value ->
-          Rule.Declaration ("font-style", Css_types.FontStyle.toString value))
-        fontStyle;
-      Kloth.Option.map
-        (fun w ->
-          Rule.Declaration
-            ( {js|font-weight|js},
-              match w with
-              | #Css_types.FontWeight.t as f -> Css_types.FontWeight.toString f
-              | #Css_types.Var.t as va -> Css_types.Var.toString va
-              | #Css_types.Cascading.t as c -> Css_types.Cascading.toString c ))
-        fontWeight;
-      Kloth.Option.map
-        (fun f ->
-          Rule.Declaration
-            ({js|font-display|js}, Css_types.FontDisplay.toString f))
-        fontDisplay;
-      Kloth.Option.map
-        (fun s ->
-          Rule.Declaration ({js|size-adjust|js}, Css_types.Percentage.toString s))
-        sizeAdjust;
     |]
     |> Array.filter_map ~f:Fun.id
   in

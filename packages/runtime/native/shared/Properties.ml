@@ -550,6 +550,22 @@ let fontWeight x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
+let fontDisplay x =
+  Rule.declaration
+    ( {js|fontDisplay|js},
+      match x with
+      | #FontDisplay.t as f -> FontDisplay.toString f
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c )
+
+let sizeAdjust x =
+  Rule.declaration
+    ( {js|sizeAdjust|js},
+      match x with
+      | #Percentage.t as p -> Percentage.toString p
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c )
+
 let gridAutoFlow x =
   Rule.declaration
     ( {js|gridAutoFlow|js},

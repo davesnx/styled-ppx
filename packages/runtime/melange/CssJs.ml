@@ -1,5 +1,5 @@
-include Colors
 include Properties
+include Colors
 include Alias
 include Rule
 include Emotion
