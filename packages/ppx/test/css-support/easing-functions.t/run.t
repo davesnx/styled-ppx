@@ -33,7 +33,7 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
-  CssJs.unsafe({js|transitionTimingFunction|js}, {js|steps(2, jump-start)|js});
-  CssJs.unsafe({js|transitionTimingFunction|js}, {js|steps(2, jump-end)|js});
-  CssJs.unsafe({js|transitionTimingFunction|js}, {js|steps(1, jump-both)|js});
-  CssJs.unsafe({js|transitionTimingFunction|js}, {js|steps(2, jump-none)|js});
+  CSS.unsafe({js|transitionTimingFunction|js}, {js|steps(2, jump-start)|js});
+  CSS.unsafe({js|transitionTimingFunction|js}, {js|steps(2, jump-end)|js});
+  CSS.unsafe({js|transitionTimingFunction|js}, {js|steps(1, jump-both)|js});
+  CSS.unsafe({js|transitionTimingFunction|js}, {js|steps(2, jump-none)|js});

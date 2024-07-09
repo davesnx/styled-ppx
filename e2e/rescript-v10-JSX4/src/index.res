@@ -89,9 +89,9 @@ module Component = %styled.div(`
 
 let stilos = %cx("box-shadow: inset 10px 10px 0 0 #ff0000, 10px 10px 0 0 #ff0000")
 
-let styles = CssJs.style([
-  CssJs.label("ComponentName"),
-  CssJs.display(#block),
+let styles = CSS.style([
+  CSS.label("ComponentName"),
+  CSS.display(#block),
   %css("flex-direction: row"),
 ])
 
@@ -118,12 +118,12 @@ module Button = %styled.button(
 
 let fonts = ["Inter"]
 
-let title = CssJs.style([
-  CssJs.label("title"),
+let title = CSS.style([
+  CSS.label("title"),
   %css("font-family: $(fonts)"),
-  CssJs.fontSize(#px(24)),
-  CssJs.fontWeight(#bold),
-  CssJs.color(#hex("333")),
+  CSS.fontSize(#px(24)),
+  CSS.fontWeight(#bold),
+  CSS.color(#hex("333")),
 ])
 
 module App = {
@@ -138,7 +138,7 @@ module App = {
         <li> {React.string("emotion/css")} </li>
       </ul>
       <Wat \"as"="section" className="more-classes">
-        <DynamicComponent var={CssJs.hex("516CF0")}> {React.string("Halo :)")} </DynamicComponent>
+        <DynamicComponent var={CSS.hex("516CF0")}> {React.string("Halo :)")} </DynamicComponent>
         <Button color={Theme.Main}> {React.string("CLICK ME!")} </Button>
       </Wat>
       <TextInput />

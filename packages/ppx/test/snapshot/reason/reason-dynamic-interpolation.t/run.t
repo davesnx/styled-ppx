@@ -964,10 +964,10 @@
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles = (~var, _) =>
-      CssJs.style([|
-        CssJs.label("DynamicComponent"),
-        (CssJs.color(var): CssJs.rule),
-        CssJs.display(`block),
+      CSS.style([|
+        CSS.label("DynamicComponent"),
+        (CSS.color(var): CSS.rule),
+        CSS.display(`block),
       |]);
     let make = (props: makeProps('var)) => {
       let className =

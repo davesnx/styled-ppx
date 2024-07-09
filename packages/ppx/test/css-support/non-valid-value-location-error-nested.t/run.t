@@ -37,10 +37,10 @@ If this test fail means that the module is not in sync with the ppx
     }
   ];
   let selectors =
-    CssJs.style([|
-      CssJs.label("selectors"),
-      CssJs.color(CssJs.white),
-      CssJs.selector(
+    CSS.style([|
+      CSS.label("selectors"),
+      CSS.color(CSS.white),
+      CSS.selector(
         {js|&:hover|js},
         [|[%ocaml.error "Property 'color' has an invalid value: 'cositas'"]|],
       ),

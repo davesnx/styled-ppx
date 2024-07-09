@@ -33,4 +33,4 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
-  CssJs.unsafe({js|position|js}, {js|sticky|js});
+  CSS.unsafe({js|position|js}, {js|sticky|js});

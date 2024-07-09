@@ -33,18 +33,18 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
-  CssJs.unsafe({js|touchAction|js}, {js|auto|js});
-  CssJs.unsafe({js|touchAction|js}, {js|none|js});
-  CssJs.unsafe({js|touchAction|js}, {js|pan-x|js});
-  CssJs.unsafe({js|touchAction|js}, {js|pan-y|js});
-  CssJs.unsafe({js|touchAction|js}, {js|pan-x pan-y|js});
-  CssJs.unsafe({js|touchAction|js}, {js|manipulation|js});
-  CssJs.unsafe({js|touchAction|js}, {js|pan-left|js});
-  CssJs.unsafe({js|touchAction|js}, {js|pan-right|js});
-  CssJs.unsafe({js|touchAction|js}, {js|pan-up|js});
-  CssJs.unsafe({js|touchAction|js}, {js|pan-down|js});
-  CssJs.unsafe({js|touchAction|js}, {js|pan-left pan-up|js});
-  CssJs.unsafe({js|touchAction|js}, {js|pinch-zoom|js});
-  CssJs.unsafe({js|touchAction|js}, {js|pan-x pinch-zoom|js});
-  CssJs.unsafe({js|touchAction|js}, {js|pan-y pinch-zoom|js});
-  CssJs.unsafe({js|touchAction|js}, {js|pan-x pan-y pinch-zoom|js});
+  CSS.unsafe({js|touchAction|js}, {js|auto|js});
+  CSS.unsafe({js|touchAction|js}, {js|none|js});
+  CSS.unsafe({js|touchAction|js}, {js|pan-x|js});
+  CSS.unsafe({js|touchAction|js}, {js|pan-y|js});
+  CSS.unsafe({js|touchAction|js}, {js|pan-x pan-y|js});
+  CSS.unsafe({js|touchAction|js}, {js|manipulation|js});
+  CSS.unsafe({js|touchAction|js}, {js|pan-left|js});
+  CSS.unsafe({js|touchAction|js}, {js|pan-right|js});
+  CSS.unsafe({js|touchAction|js}, {js|pan-up|js});
+  CSS.unsafe({js|touchAction|js}, {js|pan-down|js});
+  CSS.unsafe({js|touchAction|js}, {js|pan-left pan-up|js});
+  CSS.unsafe({js|touchAction|js}, {js|pinch-zoom|js});
+  CSS.unsafe({js|touchAction|js}, {js|pan-x pinch-zoom|js});
+  CSS.unsafe({js|touchAction|js}, {js|pan-y pinch-zoom|js});
+  CSS.unsafe({js|touchAction|js}, {js|pan-x pan-y pinch-zoom|js});

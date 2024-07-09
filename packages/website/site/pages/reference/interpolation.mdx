@@ -71,7 +71,7 @@ Any value from any property can be interpolated. It relies on the position of th
 
 ```rescript
 module Size = {
-  let small = CssJs.px(10)
+  let small = CSS.px(10)
 }
 
 %cx("margin: $(Size.small)") // -> margin: 10px;
@@ -80,7 +80,7 @@ module Size = {
 ```
 ```reason
 module Size = {
-  let small = CssJs.px(10);
+  let small = CSS.px(10);
 };
 
 [%cx "margin: $(Size.small)"]; // -> margin: 10px;
@@ -95,7 +95,7 @@ module Size = {
 
 ## Type-safety
 
-The example above introduces the API from [`CssJs`](./runtime) to define the value of `margin`. We expect you to use it to make sure the values are interpoilated with the right type. In the example above `margin` expects one of:
+The example above introduces the API from [`CSS`](./runtime) to define the value of `margin`. We expect you to use it to make sure the values are interpoilated with the right type. In the example above `margin` expects one of:
 
 ```rescript
 type length = [
@@ -168,25 +168,25 @@ The workaround is to use the [Array API](./array) to generate `%cx{:rescript}` `
 
 ```rescript
 let block: Css.Rule.t = %css("display: block")
-let randomProperty = CssJs.unsafe("-webkit-invented-property", "10px");
+let randomProperty = CSS.unsafe("-webkit-invented-property", "10px");
 let picture = %cx([block, randomProperty]);
 ```
 ```reason
 let block: Css.Rule.t = [%css "display: block"];
-let randomProperty = CssJs.unsafe("-webkit-invented-property", "10px");
+let randomProperty = CSS.unsafe("-webkit-invented-property", "10px");
 let picture = [%cx [|block, randomProperty|]];
 ```
 
 ```rescript
-let randomProperty = CssJs.unsafe("-webkit-invented-property", "10px");
+let randomProperty = CSS.unsafe("-webkit-invented-property", "10px");
 let picture = %styled.div([randomProperty]);
 ```
 ```reason
-let randomProperty = CssJs.unsafe("-webkit-invented-property", "10px");
+let randomProperty = CSS.unsafe("-webkit-invented-property", "10px");
 let picture = [%styled.div [|randomProperty|]];
 ```
 
-Here the safety will rely on your usage of `CssJs.unsafe{:rescript}` `CssJs.unsafe{:reason}` correctly.
+Here the safety will rely on your usage of `CSS.unsafe{:rescript}` `CSS.unsafe{:reason}` correctly.
 
 For a general overview of the list take a look at [support for CSS](https://styled-ppx.vercel.app/css-support).
 

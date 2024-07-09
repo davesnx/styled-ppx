@@ -964,11 +964,11 @@
       };
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
-    let styles = (~var=CssJs.hex("333"), _) =>
-      CssJs.style([|
-        CssJs.label("DynamicComponentWithDefaultValue"),
-        CssJs.display(`block),
-        (CssJs.color(var): CssJs.rule),
+    let styles = (~var=CSS.hex("333"), _) =>
+      CSS.style([|
+        CSS.label("DynamicComponentWithDefaultValue"),
+        CSS.display(`block),
+        (CSS.color(var): CSS.rule),
       |]);
     let make = (props: makeProps('var)) => {
       let className =

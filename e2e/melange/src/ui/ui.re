@@ -16,7 +16,7 @@ let stack = [%cx "display: flex; flex-direction: column"];
 let stackGap = gap => [%cx "gap: $(gap)"];
 
 module Cositas = [%styled.div
-  (~lola=CssJs.px(0)) => {|
+  (~lola=CSS.px(0)) => {|
   display: flex;
   flex-direction: column;
   gap: $(lola);
@@ -95,7 +95,7 @@ module App = {
           <p className="my-content"> {React.string("Card content")} </p>
         </div>
       </div>
-      <Cositas as_="section" lola={CssJs.px(10)}>
+      <Cositas as_="section" lola={CSS.px(10)}>
         <div className=clx> {React.string("code everywhere!")} </div>
         <div className=selectors> {React.string("Red text")} </div>
       </Cositas>

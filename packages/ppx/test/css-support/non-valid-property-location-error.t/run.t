@@ -36,8 +36,8 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
-  CssJs.style([|
-    CssJs.display(`block),
+  CSS.style([|
+    CSS.display(`block),
     [%ocaml.error "Unknown property 'heightx'"],
   |]);
 

@@ -33,11 +33,11 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
-  CssJs.unsafe({js|scrollbarColor|js}, {js|auto|js});
-  CssJs.unsafe({js|scrollbarColor|js}, {js|dark|js});
-  CssJs.unsafe({js|scrollbarColor|js}, {js|light|js});
-  CssJs.unsafe({js|scrollbarColor|js}, {js|red blue|js});
-  CssJs.unsafe({js|scrollbarWidth|js}, {js|auto|js});
-  CssJs.unsafe({js|scrollbarWidth|js}, {js|thin|js});
-  CssJs.unsafe({js|scrollbarWidth|js}, {js|none|js});
-  CssJs.unsafe({js|scrollbarWidth|js}, {js|12px|js});
+  CSS.unsafe({js|scrollbarColor|js}, {js|auto|js});
+  CSS.unsafe({js|scrollbarColor|js}, {js|dark|js});
+  CSS.unsafe({js|scrollbarColor|js}, {js|light|js});
+  CSS.unsafe({js|scrollbarColor|js}, {js|red blue|js});
+  CSS.unsafe({js|scrollbarWidth|js}, {js|auto|js});
+  CSS.unsafe({js|scrollbarWidth|js}, {js|thin|js});
+  CSS.unsafe({js|scrollbarWidth|js}, {js|none|js});
+  CSS.unsafe({js|scrollbarWidth|js}, {js|12px|js});

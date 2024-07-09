@@ -1,10 +1,10 @@
 open Vitest
 
 let testData = list{
-  (%cx("opacity: 0.9"), CssJs.style([CssJs.opacity(0.9)])),
+  (%cx("opacity: 0.9"), CSS.style([CSS.opacity(0.9)])),
   (
     %cx("@media (min-width: 30em) { color: brown; }"),
-    CssJs.style([CssJs.media("(min-width: 30em)", [CssJs.color(CssJs.brown)])]),
+    CSS.style([CSS.media("(min-width: 30em)", [CSS.color(CSS.brown)])]),
   ),
 }
 

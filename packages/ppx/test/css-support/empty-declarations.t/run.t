@@ -31,14 +31,14 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
-  CssJs.style([||]);
-  CssJs.style([||]);
-  CssJs.style([||]);
-  let _a = CssJs.style([|CssJs.label("_a")|]);
-  let _a = CssJs.style([|CssJs.label("_a")|]);
-  let _a = CssJs.style([|CssJs.label("_a")|]);
-  let _a = CssJs.style([|CssJs.label("_a")|]);
-  let _a = CssJs.style([|CssJs.label("_a")|]);
-  let _a = CssJs.style([|CssJs.label("_a")|]);
+  CSS.style([||]);
+  CSS.style([||]);
+  CSS.style([||]);
+  let _a = CSS.style([|CSS.label("_a")|]);
+  let _a = CSS.style([|CSS.label("_a")|]);
+  let _a = CSS.style([|CSS.label("_a")|]);
+  let _a = CSS.style([|CSS.label("_a")|]);
+  let _a = CSS.style([|CSS.label("_a")|]);
+  let _a = CSS.style([|CSS.label("_a")|]);
 
   $ dune build

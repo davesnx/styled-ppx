@@ -33,7 +33,7 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
-  CssJs.unsafe({js|quotes|js}, {js|auto|js});
-  CssJs.unsafe({js|content|js}, {js|"\25BA" / ""|js});
-  CssJs.unsafe({js|content|js}, {js|""|js});
-  CssJs.unsafe({js|content|js}, {js|unset|js});
+  CSS.unsafe({js|quotes|js}, {js|auto|js});
+  CSS.unsafe({js|content|js}, {js|"\25BA" / ""|js});
+  CSS.unsafe({js|content|js}, {js|""|js});
+  CSS.unsafe({js|content|js}, {js|unset|js});

@@ -963,9 +963,9 @@
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles =
-      CssJs.style([|
-        CssJs.label("OneSingleProperty"),
-        CssJs.display(`block),
+      CSS.style([|
+        CSS.label("OneSingleProperty"),
+        CSS.display(`block),
       |]);
     let make = (props: makeProps) => {
       let className = styles ++ getOrEmpty(classNameGet(props));

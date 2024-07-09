@@ -85,5 +85,4 @@ If this test fail means that the module is not in sync with the ppx
     }
   ];
   let grid = `gri;
-  let a =
-    CssJs.style([|CssJs.label("a"), (CssJs.display(grid): CssJs.rule)|]);
+  let a = CSS.style([|CSS.label("a"), (CSS.display(grid): CSS.rule)|]);

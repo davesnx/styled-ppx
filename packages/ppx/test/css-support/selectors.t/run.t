@@ -32,28 +32,28 @@ If this test fail means that the module is not in sync with the ppx
     }
   ];
   let _chart =
-    CssJs.style([|
-      CssJs.label("_chart"),
-      CssJs.unsafe({js|userSelect|js}, {js|none|js}),
-      CssJs.selector(
+    CSS.style([|
+      CSS.label("_chart"),
+      CSS.userSelect(`none),
+      CSS.selector(
         {js|.recharts-cartesian-grid-horizontal|js},
         [|
-          CssJs.selector(
+          CSS.selector(
             {js|line|js},
             [|
-              CssJs.selector(
+              CSS.selector(
                 {js|:nth-last-child(1), :nth-last-child(2)|js},
-                [|CssJs.SVG.strokeOpacity(`num(0.))|],
+                [|CSS.SVG.strokeOpacity(`num(0.))|],
               ),
             |],
           ),
         |],
       ),
-      CssJs.selector(
+      CSS.selector(
         {js|.recharts-scatter .recharts-scatter-symbol .recharts-symbols|js},
         [|
-          CssJs.opacity(0.8),
-          CssJs.selector({js|:hover|js}, [|CssJs.opacity(1.)|]),
+          CSS.opacity(0.8),
+          CSS.selector({js|:hover|js}, [|CSS.opacity(1.)|]),
         |],
       ),
     |]);
