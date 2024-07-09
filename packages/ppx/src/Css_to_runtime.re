@@ -5,9 +5,9 @@ module Builder = Ppxlib.Ast_builder.Default;
 
 exception Empty_buffer(string);
 
-module CssJs = {
+module CSS = {
   let ident = (~loc, name) =>
-    {txt: Ldot(Lident("CssJs"), name), loc} |> Builder.pexp_ident(~loc);
+    {txt: Ldot(Lident("CSS"), name), loc} |> Builder.pexp_ident(~loc);
   let selector = (~loc) => ident(~loc, "selector");
   let media = (~loc) => ident(~loc, "media");
   let global = (~loc) => ident(~loc, "global");
@@ -146,7 +146,7 @@ and render_media_query = (~loc, at_rule: at_rule) => {
 
     Helper.Exp.apply(
       ~loc=at_rule.loc,
-      CssJs.media(~loc=at_rule.loc),
+      CSS.media(~loc=at_rule.loc),
       [(Nolabel, query), (Nolabel, rules)],
     );
   };
@@ -185,7 +185,7 @@ and render_container_query = (~loc, at_rule: at_rule) => {
 
     Helper.Exp.apply(
       ~loc=at_rule.loc,
-      CssJs.selector(~loc=at_rule.loc),
+      CSS.selector(~loc=at_rule.loc),
       [(Nolabel, query), (Nolabel, rules)],
     );
   };
@@ -415,21 +415,21 @@ and render_style_rule = (~loc, rule: style_rule) => {
 
   Helper.Exp.apply(
     ~loc=selector_location,
-    CssJs.selector(~loc=selector_location),
+    CSS.selector(~loc=selector_location),
     [(Nolabel, selector_name), (Nolabel, selector_expr)],
   );
 };
 
 let addLabel = (~loc, label, emotionExprs) => [
   Helper.Exp.apply(
-    CssJs.label(~loc),
+    CSS.label(~loc),
     [(Nolabel, Helper.Exp.constant(Pconst_string(label, loc, None)))],
   ),
   ...emotionExprs,
 ];
 
 let render_style_call = (~loc, declaration_list) => {
-  Helper.Exp.apply(~loc, CssJs.style(~loc), [(Nolabel, declaration_list)]);
+  Helper.Exp.apply(~loc, CSS.style(~loc), [(Nolabel, declaration_list)]);
 };
 
 let render_keyframes = (~loc, declarations: rule_list) => {
@@ -502,7 +502,7 @@ let render_keyframes = (~loc, declarations: rule_list) => {
 
   Builder.eapply(
     ~loc=declarations_loc,
-    CssJs.keyframes(~loc=declarations_loc),
+    CSS.keyframes(~loc=declarations_loc),
     [keyframes],
   );
 };
@@ -530,7 +530,7 @@ If your intent is to apply the declaration to all elements, use the universal se
   let expr =
     Helper.Exp.apply(
       ~loc=stylesheet_loc,
-      CssJs.global(~loc=stylesheet_loc),
+      CSS.global(~loc=stylesheet_loc),
       [(Nolabel, styles)],
     );
   [%expr ignore([%e expr])];

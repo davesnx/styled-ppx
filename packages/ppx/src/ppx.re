@@ -446,7 +446,7 @@ let _ =
     ~instrument=
       Ppxlib.Driver.Instrument.make(~position=Before, traverser#structure),
     ~rules=[
-      /* %cx without let binding, it doesn't have CssJs.label
+      /* %cx without let binding, it doesn't have CSS.label
          %cx is defined in traverser#structure */
       Ppxlib.Context_free.Rule.extension(
         Ppxlib.Extension.declare(

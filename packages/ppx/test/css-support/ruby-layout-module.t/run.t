@@ -33,8 +33,8 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
-  CssJs.display(`ruby);
-  CssJs.display(`rubyBase);
-  CssJs.display(`rubyText);
-  CssJs.display(`rubyBaseContainer);
-  CssJs.display(`rubyTextContainer);
+  CSS.display(`ruby);
+  CSS.display(`rubyBase);
+  CSS.display(`rubyText);
+  CSS.display(`rubyBaseContainer);
+  CSS.display(`rubyTextContainer);

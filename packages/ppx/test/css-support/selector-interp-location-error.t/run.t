@@ -37,11 +37,8 @@ If this test fail means that the module is not in sync with the ppx
     }
   ];
   let _className =
-    CssJs.style([|
-      CssJs.label("_className"),
-      CssJs.selector(
-        {js|.lolaso :nth-child(2n)|js},
-        [|CssJs.color(CssJs.red)|],
-      ),
+    CSS.style([|
+      CSS.label("_className"),
+      CSS.selector({js|.lolaso :nth-child(2n)|js}, [|CSS.color(CSS.red)|]),
     |]);
   let _className = [%ocaml.error "Parse error while reading token '2'"];

@@ -1,3 +1,12 @@
+include Properties
+include Colors
+include Alias
+include Rule
+module Types = Css_types
+
+(* alias for backwards compatibility *)
+type rule = Rule.t
+
 module Array = struct
   include Kloth.Array
   include Stdlib.ArrayLabels

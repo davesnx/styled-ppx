@@ -59,7 +59,7 @@ Note: `reason-react` and `reason-react-ppx` are optional, and only needed if you
 
 ```reason
 /* This is a ReasonReact module with those styles encoded as a unique className */
-module Link = [%styled.a (~color=CssJs.hex("4299E1")) => {|
+module Link = [%styled.a (~color=CSS.hex("4299E1")) => {|
   font-size: 1.875rem;
   line-height: 1.5;
   text-decoration: none;
@@ -80,7 +80,7 @@ let layout = [%cx {|
 /* Later in a component */
 <div className=layout>
   <Link
-    color={CssJs.hex("333333")}
+    color={CSS.hex("333333")}
     href="https://sancho.dev"
     rel="noopener noreferrer">
     {React.string("sancho.dev")}

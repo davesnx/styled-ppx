@@ -33,15 +33,15 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
-  CssJs.flexBasis(`auto);
-  CssJs.unsafe({js|flex|js}, {js|initial|js});
-  CssJs.flex1(`none);
-  CssJs.flex1(`num(2.));
-  CssJs.flexBasis(`em(10.));
-  CssJs.flexBasis(`percent(30.));
-  CssJs.flexBasis(`minContent);
-  CssJs.flex2(~basis=`pxFloat(30.), 1.);
-  CssJs.flex2(~shrink=2., 2.);
-  CssJs.flex(2., 2., `percent(10.));
-  CssJs.flex(2., 2., `em(10.));
-  CssJs.flex(2., 2., `minContent);
+  CSS.flexBasis(`auto);
+  CSS.unsafe({js|flex|js}, {js|initial|js});
+  CSS.flex1(`none);
+  CSS.flex1(`num(2.));
+  CSS.flexBasis(`em(10.));
+  CSS.flexBasis(`percent(30.));
+  CSS.flexBasis(`minContent);
+  CSS.flex2(~basis=`pxFloat(30.), 1.);
+  CSS.flex2(~shrink=2., 2.);
+  CSS.flex(2., 2., `percent(10.));
+  CSS.flex(2., 2., `em(10.));
+  CSS.flex(2., 2., `minContent);

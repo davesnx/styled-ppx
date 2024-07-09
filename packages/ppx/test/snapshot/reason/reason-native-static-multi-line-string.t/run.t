@@ -8,10 +8,10 @@
       | None => ""
       };
     let styles =
-      CssJs.style([|
-        CssJs.label("MultiLineStrings"),
-        CssJs.display(`flex),
-        CssJs.justifyContent(`center),
+      CSS.style([|
+        CSS.label("MultiLineStrings"),
+        CSS.display(`flex),
+        CSS.justifyContent(`center),
       |]);
     let make =
         (

@@ -33,6 +33,6 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
-  CssJs.display(`runIn);
-  CssJs.display(`flow);
-  CssJs.display(`flowRoot);
+  CSS.display(`runIn);
+  CSS.display(`flow);
+  CSS.display(`flowRoot);

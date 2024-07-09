@@ -26,13 +26,9 @@ type transform('ast, 'value) = {
     (~loc: Location.t, string) => result(list(Parsetree.expression), string),
 };
 
-let add_CssJs_rule_constraint = (~loc, expr) => {
+let add_CSS_rule_constraint = (~loc, expr) => {
   let typ =
-    Builder.ptyp_constr(
-      ~loc,
-      {txt: Ldot(Lident("CssJs"), "rule"), loc},
-      [],
-    );
+    Builder.ptyp_constr(~loc, {txt: Ldot(Lident("CSS"), "rule"), loc}, []);
   Builder.pexp_constraint(~loc, expr, typ);
 };
 
@@ -83,11 +79,11 @@ let transform_with_variable = (parser, mapper, value_to_expr) => {
       (~loc, expression) => {
         switch (expression) {
         // Since we are treating with expressions here, we don't have any other way to detect if it's interpolation or not. We want to add type constraints on interpolation only.
-        | {pexp_desc: Pexp_ident({txt: Ldot(Lident("CssJs"), _), _}), _} as exp =>
+        | {pexp_desc: Pexp_ident({txt: Ldot(Lident("CSS"), _), _}), _} as exp =>
           value_to_expr(~loc, exp)
         | {pexp_desc: Pexp_ident(_), pexp_loc: _, _} as exp =>
           value_to_expr(~loc, exp)
-          |> List.map(add_CssJs_rule_constraint(~loc))
+          |> List.map(add_CSS_rule_constraint(~loc))
         | exp => value_to_expr(~loc, exp)
         }
       },
@@ -98,7 +94,7 @@ let transform_with_variable = (parser, mapper, value_to_expr) => {
 /* Monomoprhipc properties are the ones that can only have one representation
     of the value (and it's one argument also) which it's also possible to interpolate on them.
 
-   For example: Property_parser.property_font_size => CssJs.fontSize
+   For example: Property_parser.property_font_size => CSS.fontSize
    */
 let monomorphic = (parser, property_renderer, value_renderer) =>
   transform_with_variable(parser, value_renderer, (~loc, value) =>
@@ -177,7 +173,7 @@ let render_css_global_values = (~loc, name, value) => {
 
   Ok([
     [%expr
-      CssJs.unsafe(
+      CSS.unsafe(
         [%e name |> to_camel_case |> render_string(~loc)],
         [%e value],
       )
@@ -554,56 +550,56 @@ let variants = (parser, identifier) =>
 let width =
   monomorphic(
     Property_parser.property_width,
-    (~loc) => [%expr CssJs.width],
+    (~loc) => [%expr CSS.width],
     render_size,
   );
 
 let height =
   monomorphic(
     Property_parser.property_height,
-    (~loc) => [%expr CssJs.height],
+    (~loc) => [%expr CSS.height],
     render_size,
   );
 
 let min_width =
   monomorphic(
     Property_parser.property_min_width,
-    (~loc) => [%expr CssJs.minWidth],
+    (~loc) => [%expr CSS.minWidth],
     render_min_size,
   );
 
 let min_height =
   monomorphic(
     Property_parser.property_min_height,
-    (~loc) => [%expr CssJs.minHeight],
+    (~loc) => [%expr CSS.minHeight],
     render_min_size,
   );
 
 let max_width =
   monomorphic(
     Property_parser.property_max_width,
-    (~loc) => [%expr CssJs.maxWidth],
+    (~loc) => [%expr CSS.maxWidth],
     render_max_width,
   );
 
 let max_height =
   monomorphic(
     Property_parser.property_max_height,
-    (~loc) => [%expr CssJs.maxHeight],
+    (~loc) => [%expr CSS.maxHeight],
     render_size,
   );
 
 let box_sizing =
   monomorphic(
     Property_parser.property_box_sizing,
-    (~loc) => [%expr CssJs.boxSizing],
+    (~loc) => [%expr CSS.boxSizing],
     variant_to_expression,
   );
 
 let column_width =
   monomorphic(
     Property_parser.property_column_width,
-    (~loc) => [%expr CssJs.columnWidth],
+    (~loc) => [%expr CSS.columnWidth],
     (~loc, value: Types.property_column_width) =>
       switch (value) {
       | `Auto => variant_to_expression(~loc, `Auto)
@@ -627,28 +623,28 @@ let render_padding = (~loc) =>
 let margin_top =
   monomorphic(
     Property_parser.property_margin_top,
-    (~loc) => [%expr CssJs.marginTop],
+    (~loc) => [%expr CSS.marginTop],
     render_margin,
   );
 
 let margin_right =
   monomorphic(
     Property_parser.property_margin_right,
-    (~loc) => [%expr CssJs.marginRight],
+    (~loc) => [%expr CSS.marginRight],
     render_margin,
   );
 
 let margin_bottom =
   monomorphic(
     Property_parser.property_margin_bottom,
-    (~loc) => [%expr CssJs.marginBottom],
+    (~loc) => [%expr CSS.marginBottom],
     render_margin,
   );
 
 let margin_left =
   monomorphic(
     Property_parser.property_margin_left,
-    (~loc) => [%expr CssJs.marginLeft],
+    (~loc) => [%expr CSS.marginLeft],
     render_margin,
   );
 
@@ -663,14 +659,14 @@ let margin =
       | `Interpolation(name) => render_variable(~loc, name),
     (~loc) =>
       fun
-      | [all] => [[%expr CssJs.margin([%e all])]]
-      | [v, h] => [[%expr CssJs.margin2(~v=[%e v], ~h=[%e h])]]
+      | [all] => [[%expr CSS.margin([%e all])]]
+      | [v, h] => [[%expr CSS.margin2(~v=[%e v], ~h=[%e h])]]
       | [t, h, b] => [
-          [%expr CssJs.margin3(~top=[%e t], ~h=[%e h], ~bottom=[%e b])],
+          [%expr CSS.margin3(~top=[%e t], ~h=[%e h], ~bottom=[%e b])],
         ]
       | [t, r, b, l] => [
           [%expr
-            CssJs.margin4(
+            CSS.margin4(
               ~top=[%e t],
               ~right=[%e r],
               ~bottom=[%e b],
@@ -685,28 +681,28 @@ let margin =
 let padding_top =
   monomorphic(
     Property_parser.property_padding_top,
-    (~loc) => [%expr CssJs.paddingTop],
+    (~loc) => [%expr CSS.paddingTop],
     render_padding,
   );
 
 let padding_right =
   monomorphic(
     Property_parser.property_padding_right,
-    (~loc) => [%expr CssJs.paddingRight],
+    (~loc) => [%expr CSS.paddingRight],
     render_padding,
   );
 
 let padding_bottom =
   monomorphic(
     Property_parser.property_padding_bottom,
-    (~loc) => [%expr CssJs.paddingBottom],
+    (~loc) => [%expr CSS.paddingBottom],
     render_padding,
   );
 
 let padding_left =
   monomorphic(
     Property_parser.property_padding_left,
-    (~loc) => [%expr CssJs.paddingLeft],
+    (~loc) => [%expr CSS.paddingLeft],
     render_padding,
   );
 
@@ -720,14 +716,14 @@ let padding =
       | `Interpolation(name) => render_variable(~loc, name),
     (~loc) =>
       fun
-      | [all] => [[%expr CssJs.padding([%e all])]]
-      | [v, h] => [[%expr CssJs.padding2(~v=[%e v], ~h=[%e h])]]
+      | [all] => [[%expr CSS.padding([%e all])]]
+      | [v, h] => [[%expr CSS.padding2(~v=[%e v], ~h=[%e h])]]
       | [t, h, b] => [
-          [%expr CssJs.padding3(~top=[%e t], ~h=[%e h], ~bottom=[%e b])],
+          [%expr CSS.padding3(~top=[%e t], ~h=[%e h], ~bottom=[%e b])],
         ]
       | [t, r, b, l] => [
           [%expr
-            CssJs.padding4(
+            CSS.padding4(
               ~top=[%e t],
               ~right=[%e r],
               ~bottom=[%e b],
@@ -742,154 +738,154 @@ let padding =
 let render_named_color = (~loc) =>
   fun
   | `Transparent => variant_to_expression(~loc, `Transparent)
-  | `Aliceblue => [%expr CssJs.aliceblue]
-  | `Antiquewhite => [%expr CssJs.antiquewhite]
-  | `Aqua => [%expr CssJs.aqua]
-  | `Aquamarine => [%expr CssJs.aquamarine]
-  | `Azure => [%expr CssJs.azure]
-  | `Beige => [%expr CssJs.beige]
-  | `Bisque => [%expr CssJs.bisque]
-  | `Black => [%expr CssJs.black]
-  | `Blanchedalmond => [%expr CssJs.blanchedalmond]
-  | `Blue => [%expr CssJs.blue]
-  | `Blueviolet => [%expr CssJs.blueviolet]
-  | `Brown => [%expr CssJs.brown]
-  | `Burlywood => [%expr CssJs.burlywood]
-  | `Cadetblue => [%expr CssJs.cadetblue]
-  | `Chartreuse => [%expr CssJs.chartreuse]
-  | `Chocolate => [%expr CssJs.chocolate]
-  | `Coral => [%expr CssJs.coral]
-  | `Cornflowerblue => [%expr CssJs.cornflowerblue]
-  | `Cornsilk => [%expr CssJs.cornsilk]
-  | `Crimson => [%expr CssJs.crimson]
-  | `Cyan => [%expr CssJs.cyan]
-  | `Darkblue => [%expr CssJs.darkblue]
-  | `Darkcyan => [%expr CssJs.darkcyan]
-  | `Darkgoldenrod => [%expr CssJs.darkgoldenrod]
-  | `Darkgray => [%expr CssJs.darkgray]
-  | `Darkgreen => [%expr CssJs.darkgreen]
-  | `Darkgrey => [%expr CssJs.darkgrey]
-  | `Darkkhaki => [%expr CssJs.darkkhaki]
-  | `Darkmagenta => [%expr CssJs.darkmagenta]
-  | `Darkolivegreen => [%expr CssJs.darkolivegreen]
-  | `Darkorange => [%expr CssJs.darkorange]
-  | `Darkorchid => [%expr CssJs.darkorchid]
-  | `Darkred => [%expr CssJs.darkred]
-  | `Darksalmon => [%expr CssJs.darksalmon]
-  | `Darkseagreen => [%expr CssJs.darkseagreen]
-  | `Darkslateblue => [%expr CssJs.darkslateblue]
-  | `Darkslategray => [%expr CssJs.darkslategray]
-  | `Darkslategrey => [%expr CssJs.darkslategrey]
-  | `Darkturquoise => [%expr CssJs.darkturquoise]
-  | `Darkviolet => [%expr CssJs.darkviolet]
-  | `Deeppink => [%expr CssJs.deeppink]
-  | `Deepskyblue => [%expr CssJs.deepskyblue]
-  | `Dimgray => [%expr CssJs.dimgray]
-  | `Dimgrey => [%expr CssJs.dimgrey]
-  | `Dodgerblue => [%expr CssJs.dodgerblue]
-  | `Firebrick => [%expr CssJs.firebrick]
-  | `Floralwhite => [%expr CssJs.floralwhite]
-  | `Forestgreen => [%expr CssJs.forestgreen]
-  | `Fuchsia => [%expr CssJs.fuchsia]
-  | `Gainsboro => [%expr CssJs.gainsboro]
-  | `Ghostwhite => [%expr CssJs.ghostwhite]
-  | `Gold => [%expr CssJs.gold]
-  | `Goldenrod => [%expr CssJs.goldenrod]
-  | `Gray => [%expr CssJs.gray]
-  | `Green => [%expr CssJs.green]
-  | `Greenyellow => [%expr CssJs.greenyellow]
-  | `Grey => [%expr CssJs.grey]
-  | `Honeydew => [%expr CssJs.honeydew]
-  | `Hotpink => [%expr CssJs.hotpink]
-  | `Indianred => [%expr CssJs.indianred]
-  | `Indigo => [%expr CssJs.indigo]
-  | `Ivory => [%expr CssJs.ivory]
-  | `Khaki => [%expr CssJs.khaki]
-  | `Lavender => [%expr CssJs.lavender]
-  | `Lavenderblush => [%expr CssJs.lavenderblush]
-  | `Lawngreen => [%expr CssJs.lawngreen]
-  | `Lemonchiffon => [%expr CssJs.lemonchiffon]
-  | `Lightblue => [%expr CssJs.lightblue]
-  | `Lightcoral => [%expr CssJs.lightcoral]
-  | `Lightcyan => [%expr CssJs.lightcyan]
-  | `Lightgoldenrodyellow => [%expr CssJs.lightgoldenrodyellow]
-  | `Lightgray => [%expr CssJs.lightgray]
-  | `Lightgreen => [%expr CssJs.lightgreen]
-  | `Lightgrey => [%expr CssJs.lightgrey]
-  | `Lightpink => [%expr CssJs.lightpink]
-  | `Lightsalmon => [%expr CssJs.lightsalmon]
-  | `Lightseagreen => [%expr CssJs.lightseagreen]
-  | `Lightskyblue => [%expr CssJs.lightskyblue]
-  | `Lightslategray => [%expr CssJs.lightslategray]
-  | `Lightslategrey => [%expr CssJs.lightslategrey]
-  | `Lightsteelblue => [%expr CssJs.lightsteelblue]
-  | `Lightyellow => [%expr CssJs.lightyellow]
-  | `Lime => [%expr CssJs.lime]
-  | `Limegreen => [%expr CssJs.limegreen]
-  | `Linen => [%expr CssJs.linen]
-  | `Magenta => [%expr CssJs.magenta]
-  | `Maroon => [%expr CssJs.maroon]
-  | `Mediumaquamarine => [%expr CssJs.mediumaquamarine]
-  | `Mediumblue => [%expr CssJs.mediumblue]
-  | `Mediumorchid => [%expr CssJs.mediumorchid]
-  | `Mediumpurple => [%expr CssJs.mediumpurple]
-  | `Mediumseagreen => [%expr CssJs.mediumseagreen]
-  | `Mediumslateblue => [%expr CssJs.mediumslateblue]
-  | `Mediumspringgreen => [%expr CssJs.mediumspringgreen]
-  | `Mediumturquoise => [%expr CssJs.mediumturquoise]
-  | `Mediumvioletred => [%expr CssJs.mediumvioletred]
-  | `Midnightblue => [%expr CssJs.midnightblue]
-  | `Mintcream => [%expr CssJs.mintcream]
-  | `Mistyrose => [%expr CssJs.mistyrose]
-  | `Moccasin => [%expr CssJs.moccasin]
-  | `Navajowhite => [%expr CssJs.navajowhite]
-  | `Navy => [%expr CssJs.navy]
-  | `Oldlace => [%expr CssJs.oldlace]
-  | `Olive => [%expr CssJs.olive]
-  | `Olivedrab => [%expr CssJs.olivedrab]
-  | `Orange => [%expr CssJs.orange]
-  | `Orangered => [%expr CssJs.orangered]
-  | `Orchid => [%expr CssJs.orchid]
-  | `Palegoldenrod => [%expr CssJs.palegoldenrod]
-  | `Palegreen => [%expr CssJs.palegreen]
-  | `Paleturquoise => [%expr CssJs.paleturquoise]
-  | `Palevioletred => [%expr CssJs.palevioletred]
-  | `Papayawhip => [%expr CssJs.papayawhip]
-  | `Peachpuff => [%expr CssJs.peachpuff]
-  | `Peru => [%expr CssJs.peru]
-  | `Pink => [%expr CssJs.pink]
-  | `Plum => [%expr CssJs.plum]
-  | `Powderblue => [%expr CssJs.powderblue]
-  | `Purple => [%expr CssJs.purple]
-  | `Rebeccapurple => [%expr CssJs.rebeccapurple]
-  | `Red => [%expr CssJs.red]
-  | `Rosybrown => [%expr CssJs.rosybrown]
-  | `Royalblue => [%expr CssJs.royalblue]
-  | `Saddlebrown => [%expr CssJs.saddlebrown]
-  | `Salmon => [%expr CssJs.salmon]
-  | `Sandybrown => [%expr CssJs.sandybrown]
-  | `Seagreen => [%expr CssJs.seagreen]
-  | `Seashell => [%expr CssJs.seashell]
-  | `Sienna => [%expr CssJs.sienna]
-  | `Silver => [%expr CssJs.silver]
-  | `Skyblue => [%expr CssJs.skyblue]
-  | `Slateblue => [%expr CssJs.slateblue]
-  | `Slategray => [%expr CssJs.slategray]
-  | `Slategrey => [%expr CssJs.slategrey]
-  | `Snow => [%expr CssJs.snow]
-  | `Springgreen => [%expr CssJs.springgreen]
-  | `Steelblue => [%expr CssJs.steelblue]
-  | `Tan => [%expr CssJs.tan]
-  | `Teal => [%expr CssJs.teal]
-  | `Thistle => [%expr CssJs.thistle]
-  | `Tomato => [%expr CssJs.tomato]
-  | `Turquoise => [%expr CssJs.turquoise]
-  | `Violet => [%expr CssJs.violet]
-  | `Wheat => [%expr CssJs.wheat]
-  | `White => [%expr CssJs.white]
-  | `Whitesmoke => [%expr CssJs.whitesmoke]
-  | `Yellow => [%expr CssJs.yellow]
-  | `Yellowgreen => [%expr CssJs.yellowgreen]
+  | `Aliceblue => [%expr CSS.aliceblue]
+  | `Antiquewhite => [%expr CSS.antiquewhite]
+  | `Aqua => [%expr CSS.aqua]
+  | `Aquamarine => [%expr CSS.aquamarine]
+  | `Azure => [%expr CSS.azure]
+  | `Beige => [%expr CSS.beige]
+  | `Bisque => [%expr CSS.bisque]
+  | `Black => [%expr CSS.black]
+  | `Blanchedalmond => [%expr CSS.blanchedalmond]
+  | `Blue => [%expr CSS.blue]
+  | `Blueviolet => [%expr CSS.blueviolet]
+  | `Brown => [%expr CSS.brown]
+  | `Burlywood => [%expr CSS.burlywood]
+  | `Cadetblue => [%expr CSS.cadetblue]
+  | `Chartreuse => [%expr CSS.chartreuse]
+  | `Chocolate => [%expr CSS.chocolate]
+  | `Coral => [%expr CSS.coral]
+  | `Cornflowerblue => [%expr CSS.cornflowerblue]
+  | `Cornsilk => [%expr CSS.cornsilk]
+  | `Crimson => [%expr CSS.crimson]
+  | `Cyan => [%expr CSS.cyan]
+  | `Darkblue => [%expr CSS.darkblue]
+  | `Darkcyan => [%expr CSS.darkcyan]
+  | `Darkgoldenrod => [%expr CSS.darkgoldenrod]
+  | `Darkgray => [%expr CSS.darkgray]
+  | `Darkgreen => [%expr CSS.darkgreen]
+  | `Darkgrey => [%expr CSS.darkgrey]
+  | `Darkkhaki => [%expr CSS.darkkhaki]
+  | `Darkmagenta => [%expr CSS.darkmagenta]
+  | `Darkolivegreen => [%expr CSS.darkolivegreen]
+  | `Darkorange => [%expr CSS.darkorange]
+  | `Darkorchid => [%expr CSS.darkorchid]
+  | `Darkred => [%expr CSS.darkred]
+  | `Darksalmon => [%expr CSS.darksalmon]
+  | `Darkseagreen => [%expr CSS.darkseagreen]
+  | `Darkslateblue => [%expr CSS.darkslateblue]
+  | `Darkslategray => [%expr CSS.darkslategray]
+  | `Darkslategrey => [%expr CSS.darkslategrey]
+  | `Darkturquoise => [%expr CSS.darkturquoise]
+  | `Darkviolet => [%expr CSS.darkviolet]
+  | `Deeppink => [%expr CSS.deeppink]
+  | `Deepskyblue => [%expr CSS.deepskyblue]
+  | `Dimgray => [%expr CSS.dimgray]
+  | `Dimgrey => [%expr CSS.dimgrey]
+  | `Dodgerblue => [%expr CSS.dodgerblue]
+  | `Firebrick => [%expr CSS.firebrick]
+  | `Floralwhite => [%expr CSS.floralwhite]
+  | `Forestgreen => [%expr CSS.forestgreen]
+  | `Fuchsia => [%expr CSS.fuchsia]
+  | `Gainsboro => [%expr CSS.gainsboro]
+  | `Ghostwhite => [%expr CSS.ghostwhite]
+  | `Gold => [%expr CSS.gold]
+  | `Goldenrod => [%expr CSS.goldenrod]
+  | `Gray => [%expr CSS.gray]
+  | `Green => [%expr CSS.green]
+  | `Greenyellow => [%expr CSS.greenyellow]
+  | `Grey => [%expr CSS.grey]
+  | `Honeydew => [%expr CSS.honeydew]
+  | `Hotpink => [%expr CSS.hotpink]
+  | `Indianred => [%expr CSS.indianred]
+  | `Indigo => [%expr CSS.indigo]
+  | `Ivory => [%expr CSS.ivory]
+  | `Khaki => [%expr CSS.khaki]
+  | `Lavender => [%expr CSS.lavender]
+  | `Lavenderblush => [%expr CSS.lavenderblush]
+  | `Lawngreen => [%expr CSS.lawngreen]
+  | `Lemonchiffon => [%expr CSS.lemonchiffon]
+  | `Lightblue => [%expr CSS.lightblue]
+  | `Lightcoral => [%expr CSS.lightcoral]
+  | `Lightcyan => [%expr CSS.lightcyan]
+  | `Lightgoldenrodyellow => [%expr CSS.lightgoldenrodyellow]
+  | `Lightgray => [%expr CSS.lightgray]
+  | `Lightgreen => [%expr CSS.lightgreen]
+  | `Lightgrey => [%expr CSS.lightgrey]
+  | `Lightpink => [%expr CSS.lightpink]
+  | `Lightsalmon => [%expr CSS.lightsalmon]
+  | `Lightseagreen => [%expr CSS.lightseagreen]
+  | `Lightskyblue => [%expr CSS.lightskyblue]
+  | `Lightslategray => [%expr CSS.lightslategray]
+  | `Lightslategrey => [%expr CSS.lightslategrey]
+  | `Lightsteelblue => [%expr CSS.lightsteelblue]
+  | `Lightyellow => [%expr CSS.lightyellow]
+  | `Lime => [%expr CSS.lime]
+  | `Limegreen => [%expr CSS.limegreen]
+  | `Linen => [%expr CSS.linen]
+  | `Magenta => [%expr CSS.magenta]
+  | `Maroon => [%expr CSS.maroon]
+  | `Mediumaquamarine => [%expr CSS.mediumaquamarine]
+  | `Mediumblue => [%expr CSS.mediumblue]
+  | `Mediumorchid => [%expr CSS.mediumorchid]
+  | `Mediumpurple => [%expr CSS.mediumpurple]
+  | `Mediumseagreen => [%expr CSS.mediumseagreen]
+  | `Mediumslateblue => [%expr CSS.mediumslateblue]
+  | `Mediumspringgreen => [%expr CSS.mediumspringgreen]
+  | `Mediumturquoise => [%expr CSS.mediumturquoise]
+  | `Mediumvioletred => [%expr CSS.mediumvioletred]
+  | `Midnightblue => [%expr CSS.midnightblue]
+  | `Mintcream => [%expr CSS.mintcream]
+  | `Mistyrose => [%expr CSS.mistyrose]
+  | `Moccasin => [%expr CSS.moccasin]
+  | `Navajowhite => [%expr CSS.navajowhite]
+  | `Navy => [%expr CSS.navy]
+  | `Oldlace => [%expr CSS.oldlace]
+  | `Olive => [%expr CSS.olive]
+  | `Olivedrab => [%expr CSS.olivedrab]
+  | `Orange => [%expr CSS.orange]
+  | `Orangered => [%expr CSS.orangered]
+  | `Orchid => [%expr CSS.orchid]
+  | `Palegoldenrod => [%expr CSS.palegoldenrod]
+  | `Palegreen => [%expr CSS.palegreen]
+  | `Paleturquoise => [%expr CSS.paleturquoise]
+  | `Palevioletred => [%expr CSS.palevioletred]
+  | `Papayawhip => [%expr CSS.papayawhip]
+  | `Peachpuff => [%expr CSS.peachpuff]
+  | `Peru => [%expr CSS.peru]
+  | `Pink => [%expr CSS.pink]
+  | `Plum => [%expr CSS.plum]
+  | `Powderblue => [%expr CSS.powderblue]
+  | `Purple => [%expr CSS.purple]
+  | `Rebeccapurple => [%expr CSS.rebeccapurple]
+  | `Red => [%expr CSS.red]
+  | `Rosybrown => [%expr CSS.rosybrown]
+  | `Royalblue => [%expr CSS.royalblue]
+  | `Saddlebrown => [%expr CSS.saddlebrown]
+  | `Salmon => [%expr CSS.salmon]
+  | `Sandybrown => [%expr CSS.sandybrown]
+  | `Seagreen => [%expr CSS.seagreen]
+  | `Seashell => [%expr CSS.seashell]
+  | `Sienna => [%expr CSS.sienna]
+  | `Silver => [%expr CSS.silver]
+  | `Skyblue => [%expr CSS.skyblue]
+  | `Slateblue => [%expr CSS.slateblue]
+  | `Slategray => [%expr CSS.slategray]
+  | `Slategrey => [%expr CSS.slategrey]
+  | `Snow => [%expr CSS.snow]
+  | `Springgreen => [%expr CSS.springgreen]
+  | `Steelblue => [%expr CSS.steelblue]
+  | `Tan => [%expr CSS.tan]
+  | `Teal => [%expr CSS.teal]
+  | `Thistle => [%expr CSS.thistle]
+  | `Tomato => [%expr CSS.tomato]
+  | `Turquoise => [%expr CSS.turquoise]
+  | `Violet => [%expr CSS.violet]
+  | `Wheat => [%expr CSS.wheat]
+  | `White => [%expr CSS.white]
+  | `Whitesmoke => [%expr CSS.whitesmoke]
+  | `Yellow => [%expr CSS.yellow]
+  | `Yellowgreen => [%expr CSS.yellowgreen]
   | _ => raise(Unsupported_feature);
 
 let render_color_alpha = (~loc, color_alpha) =>
@@ -1165,14 +1161,14 @@ and render_function_color_mix = (~loc, value: Types.function_color_mix) => {
 let color =
   monomorphic(
     Property_parser.property_color,
-    (~loc) => [%expr CssJs.color],
+    (~loc) => [%expr CSS.color],
     render_color,
   );
 
 let opacity =
   monomorphic(
     Property_parser.property_opacity,
-    (~loc) => [%expr CssJs.opacity],
+    (~loc) => [%expr CSS.opacity],
     (~loc) =>
       fun
       | `Number(number) => render_float(~loc, number)
@@ -1234,7 +1230,7 @@ let render_position = (~loc, position: Types.position) => {
 
 let object_fit =
   variants(Property_parser.property_object_fit, (~loc) =>
-    [%expr CssJs.objectFit]
+    [%expr CSS.objectFit]
   );
 
 let object_position =
@@ -1242,14 +1238,14 @@ let object_position =
     Property_parser.property_object_position,
     (~loc, position: Types.position) => {
       let (x, y) = render_position(~loc, position);
-      [[%expr CssJs.objectPosition2([%e x], [%e y])]];
+      [[%expr CSS.objectPosition2([%e x], [%e y])]];
     },
   );
 
 let pointer_events =
   monomorphic(
     Property_parser.property_pointer_events,
-    (~loc) => [%expr CssJs.pointerEvents],
+    (~loc) => [%expr CSS.pointerEvents],
     (~loc, value: Types.property_pointer_events) => {
       switch (value) {
       | `Auto => [%expr `auto]
@@ -1275,7 +1271,7 @@ let image_orientation =
 
 let image_rendering =
   variants(Property_parser.property_image_rendering, (~loc) =>
-    [%expr CssJs.imageRendering]
+    [%expr CSS.imageRendering]
   );
 
 let render_color_interp = (~loc) =>
@@ -1331,13 +1327,13 @@ let render_box_shadow = (~loc, shadow) => {
          Option.map(value => (label, value), value)
        );
 
-  Builder.pexp_apply(~loc, [%expr CssJs.Shadow.box], args);
+  Builder.pexp_apply(~loc, [%expr CSS.Shadow.box], args);
 };
 
 let background_color =
   monomorphic(
     Property_parser.property_background_color,
-    (~loc) => [%expr CssJs.backgroundColor],
+    (~loc) => [%expr CSS.backgroundColor],
     render_color,
   );
 
@@ -1425,19 +1421,19 @@ let render_function_linear_gradient =
     [%expr
      `linearGradient((
        None,
-       [%e render_color_stop_list(~loc, stops)]: CssJs.Types.Gradient.color_stop_list,
+       [%e render_color_stop_list(~loc, stops)]: CSS.Types.Gradient.color_stop_list,
      ))]
   | (Some(`Static_0(angle, ())), stops) =>
     [%expr
      `linearGradient((
        Some([%e render_extended_angle(~loc, angle)]),
-       [%e render_color_stop_list(~loc, stops)]: CssJs.Types.Gradient.color_stop_list,
+       [%e render_color_stop_list(~loc, stops)]: CSS.Types.Gradient.color_stop_list,
      ))]
   | (Some(`Static_1((), side_or_corner, ())), stops) =>
     [%expr
      `linearGradient((
        Some([%e render_side_or_corner(~loc, side_or_corner)]),
-       [%e render_color_stop_list(~loc, stops)]: CssJs.Types.Gradient.color_stop_list,
+       [%e render_color_stop_list(~loc, stops)]: CSS.Types.Gradient.color_stop_list,
      ))]
   };
 };
@@ -1449,13 +1445,13 @@ let render_function_repeating_linear_gradient =
     [%expr
      `repeatingLinearGradient((
        Some([%e render_extended_angle(~loc, angle)]),
-       [%e render_color_stop_list(~loc, stops)]: CssJs.Types.Gradient.color_stop_list,
+       [%e render_color_stop_list(~loc, stops)]: CSS.Types.Gradient.color_stop_list,
      ))]
   | (None, (), stops) =>
     [%expr
      `repeatingLinearGradient((
        None,
-       [%e render_color_stop_list(~loc, stops)]: CssJs.Types.Gradient.color_stop_list,
+       [%e render_color_stop_list(~loc, stops)]: CSS.Types.Gradient.color_stop_list,
      ))]
   | (Some(_), (), _stops) => raise(Unsupported_feature)
   };
@@ -1490,7 +1486,7 @@ let render_function_radial_gradient =
        [%e shape],
        None,
        None,
-       [%e render_color_stop_list(~loc, color_stop_list)]: CssJs.Types.Gradient.color_stop_list,
+       [%e render_color_stop_list(~loc, color_stop_list)]: CSS.Types.Gradient.color_stop_list,
      ))];
   | (shape, Some(radial_size), None, None | Some (), color_stop_list) =>
     let shape = render_eding_shape(~loc, shape);
@@ -1500,7 +1496,7 @@ let render_function_radial_gradient =
        [%e shape],
        Some([%e size]),
        None,
-       [%e render_color_stop_list(~loc, color_stop_list)]: CssJs.Types.Gradient.color_stop_list,
+       [%e render_color_stop_list(~loc, color_stop_list)]: CSS.Types.Gradient.color_stop_list,
      ))];
   | (shape, None, Some(((), position)), None | Some (), color_stop_list) =>
     let shape = render_eding_shape(~loc, shape);
@@ -1510,7 +1506,7 @@ let render_function_radial_gradient =
        [%e shape],
        None,
        Some(([%e positionX], [%e positionY])),
-       [%e render_color_stop_list(~loc, color_stop_list)]: CssJs.Types.Gradient.color_stop_list,
+       [%e render_color_stop_list(~loc, color_stop_list)]: CSS.Types.Gradient.color_stop_list,
      ))];
   | (
       shape,
@@ -1527,7 +1523,7 @@ let render_function_radial_gradient =
        [%e shape],
        Some([%e size]),
        Some(([%e positionX], [%e positionY])),
-       [%e render_color_stop_list(~loc, color_stop_list)]: CssJs.Types.Gradient.color_stop_list,
+       [%e render_color_stop_list(~loc, color_stop_list)]: CSS.Types.Gradient.color_stop_list,
      ))];
   };
 };
@@ -1618,16 +1614,16 @@ let background_image =
   polymorphic(Property_parser.property_background_image, (~loc) =>
     fun
     | [] => failwith("expected at least one value")
-    | [i] => [[%expr CssJs.backgroundImage([%e render_bg_image(~loc, i)])]]
+    | [i] => [[%expr CSS.backgroundImage([%e render_bg_image(~loc, i)])]]
     | more => [
-        [%expr CssJs.backgroundImages([%e render_bg_images(~loc, more)])],
+        [%expr CSS.backgroundImages([%e render_bg_images(~loc, more)])],
       ]
   );
 
 let background_repeat =
   monomorphic(
     Property_parser.property_background_repeat,
-    (~loc) => [%expr CssJs.backgroundRepeat],
+    (~loc) => [%expr CSS.backgroundRepeat],
     (~loc) =>
       fun
       | [] => failwith("expected at least one value")
@@ -1640,7 +1636,7 @@ let background_repeat =
 let background_attachment =
   monomorphic(
     Property_parser.property_background_attachment,
-    (~loc) => [%expr CssJs.backgroundAttachment],
+    (~loc) => [%expr CSS.backgroundAttachment],
     (~loc) =>
       fun
       | [] => failwith("expected at least one argument")
@@ -1668,12 +1664,12 @@ let render_background_position = (~loc, position: Types.bg_position) => {
   | `Extended_length(_) as position
   | `Extended_percentage(_) as position =>
     [%expr
-     CssJs.backgroundPosition(
+     CSS.backgroundPosition(
        [%e render_background_position_one(~loc, position)],
      )]
   | `Static(x, y) =>
     [%expr
-     CssJs.backgroundPosition2(
+     CSS.backgroundPosition2(
        [%e render_background_position_one(~loc, x)],
        [%e render_background_position_one(~loc, y)],
      )]
@@ -1698,7 +1694,7 @@ let background_position_y =
 let background_clip =
   monomorphic(
     Property_parser.property_background_clip,
-    (~loc) => [%expr CssJs.backgroundClip],
+    (~loc) => [%expr CSS.backgroundClip],
     (~loc) =>
       fun
       | [] => failwith("expected at least one argument")
@@ -1710,7 +1706,7 @@ let background_clip =
 let background_origin =
   monomorphic(
     Property_parser.property_background_origin,
-    (~loc) => [%expr CssJs.backgroundOrigin],
+    (~loc) => [%expr CSS.backgroundOrigin],
     (~loc) =>
       fun
       | [] => failwith("expected at least one argument")
@@ -1721,7 +1717,7 @@ let background_origin =
 let background_size =
   monomorphic(
     Property_parser.property_background_size,
-    (~loc) => [%expr CssJs.backgroundSize],
+    (~loc) => [%expr CSS.backgroundSize],
     (~loc) =>
       fun
       | [] => failwith("expected at least one argument")
@@ -1738,29 +1734,25 @@ let render_background = (~loc, background: Types.property_background) => {
   let render_layers = (value: Types.bg_layer) => {
     let (image, position, repeat_style, attachment, clip, origin) = value;
     [
-      render_layer(
-        image,
-        [%expr CssJs.backgroundImage],
-        render_bg_image(~loc),
-      ),
+      render_layer(image, [%expr CSS.backgroundImage], render_bg_image(~loc)),
       render_layer(
         repeat_style,
-        [%expr CssJs.backgroundRepeat],
+        [%expr CSS.backgroundRepeat],
         render_repeat_style(~loc),
       ),
       render_layer(
         attachment,
-        [%expr CssJs.backgroundRepeat],
+        [%expr CSS.backgroundRepeat],
         render_attachment(~loc),
       ),
       render_layer(
         clip,
-        [%expr CssJs.backgroundClip],
+        [%expr CSS.backgroundClip],
         variant_to_expression(~loc),
       ),
       render_layer(
         origin,
-        [%expr CssJs.backgroundOrigin],
+        [%expr CSS.backgroundOrigin],
         variant_to_expression(~loc),
       ),
     ]
@@ -1768,7 +1760,7 @@ let render_background = (~loc, background: Types.property_background) => {
       switch (position) {
       | Some((pos, Some(((), size)))) => [
           [render_background_position(~loc, pos)],
-          [[%expr CssJs.backgroundSize([%e render_bg_size(~loc, size)])]],
+          [[%expr CSS.backgroundSize([%e render_bg_size(~loc, size)])]],
         ]
       | Some((pos, None)) => [[render_background_position(~loc, pos)]]
       | None => []
@@ -1779,30 +1771,30 @@ let render_background = (~loc, background: Types.property_background) => {
   let render_final_layer = (value: Types.final_bg_layer) => {
     let (color, image, position, repeat_style, attachment, clip, origin) = value;
     [
-      render_layer(color, [%expr CssJs.backgroundColor], render_color(~loc)),
+      render_layer(color, [%expr CSS.backgroundColor], render_color(~loc)),
       render_layer(
         image,
-        [%expr CssJs.backgroundImage],
+        [%expr CSS.backgroundImage],
         render_bg_image(~loc),
       ),
       render_layer(
         repeat_style,
-        [%expr CssJs.backgroundRepeat],
+        [%expr CSS.backgroundRepeat],
         render_repeat_style(~loc),
       ),
       render_layer(
         attachment,
-        [%expr CssJs.backgroundRepeat],
+        [%expr CSS.backgroundRepeat],
         render_attachment(~loc),
       ),
       render_layer(
         clip,
-        [%expr CssJs.backgroundClip],
+        [%expr CSS.backgroundClip],
         variant_to_expression(~loc),
       ),
       render_layer(
         origin,
-        [%expr CssJs.backgroundOrigin],
+        [%expr CSS.backgroundOrigin],
         variant_to_expression(~loc),
       ),
     ]
@@ -1810,7 +1802,7 @@ let render_background = (~loc, background: Types.property_background) => {
       switch (position) {
       | Some((pos, Some(((), size)))) => [
           [render_background_position(~loc, pos)],
-          [[%expr CssJs.backgroundSize([%e render_bg_size(~loc, size)])]],
+          [[%expr CSS.backgroundSize([%e render_bg_size(~loc, size)])]],
         ]
       | Some((pos, None)) => [[render_background_position(~loc, pos)]]
       | None => []
@@ -1830,35 +1822,35 @@ let background =
 let border_top_color =
   monomorphic(
     Property_parser.property_border_top_color,
-    (~loc) => [%expr CssJs.borderTopColor],
+    (~loc) => [%expr CSS.borderTopColor],
     render_color,
   );
 
 let border_right_color =
   monomorphic(
     Property_parser.property_border_right_color,
-    (~loc) => [%expr CssJs.borderRightColor],
+    (~loc) => [%expr CSS.borderRightColor],
     render_color,
   );
 
 let border_bottom_color =
   monomorphic(
     Property_parser.property_border_bottom_color,
-    (~loc) => [%expr CssJs.borderBottomColor],
+    (~loc) => [%expr CSS.borderBottomColor],
     render_color,
   );
 
 let border_left_color =
   monomorphic(
     Property_parser.property_border_left_color,
-    (~loc) => [%expr CssJs.borderLeftColor],
+    (~loc) => [%expr CSS.borderLeftColor],
     render_color,
   );
 
 let border_color =
   monomorphic(
     Property_parser.property_border_color,
-    (~loc) => [%expr CssJs.borderColor],
+    (~loc) => [%expr CSS.borderColor],
     (~loc) =>
       fun
       | [c] => render_color(~loc, c)
@@ -1867,28 +1859,28 @@ let border_color =
 
 let border_top_style =
   variants(Property_parser.property_border_top_style, (~loc) =>
-    [%expr CssJs.borderTopStyle]
+    [%expr CSS.borderTopStyle]
   );
 
 let border_right_style =
   variants(Property_parser.property_border_right_style, (~loc) =>
-    [%expr CssJs.borderRightStyle]
+    [%expr CSS.borderRightStyle]
   );
 
 let border_bottom_style =
   variants(Property_parser.property_border_bottom_style, (~loc) =>
-    [%expr CssJs.borderBottomStyle]
+    [%expr CSS.borderBottomStyle]
   );
 
 let border_left_style =
   variants(Property_parser.property_border_left_style, (~loc) =>
-    [%expr CssJs.borderLeftStyle]
+    [%expr CSS.borderLeftStyle]
   );
 
 let border_style =
   monomorphic(
     Property_parser.property_border_style,
-    (~loc) => [%expr CssJs.borderStyle],
+    (~loc) => [%expr CSS.borderStyle],
     variant_to_expression,
   );
 
@@ -1903,35 +1895,35 @@ let render_line_width = (~loc, value: Types.line_width) =>
 let border_top_width =
   monomorphic(
     Property_parser.property_border_top_width,
-    (~loc) => [%expr CssJs.borderTopWidth],
+    (~loc) => [%expr CSS.borderTopWidth],
     render_line_width,
   );
 
 let border_right_width =
   monomorphic(
     Property_parser.property_border_right_width,
-    (~loc) => [%expr CssJs.borderRightWidth],
+    (~loc) => [%expr CSS.borderRightWidth],
     render_line_width,
   );
 
 let border_bottom_width =
   monomorphic(
     Property_parser.property_border_bottom_width,
-    (~loc) => [%expr CssJs.borderBottomWidth],
+    (~loc) => [%expr CSS.borderBottomWidth],
     render_line_width,
   );
 
 let border_left_width =
   monomorphic(
     Property_parser.property_border_left_width,
-    (~loc) => [%expr CssJs.borderLeftWidth],
+    (~loc) => [%expr CSS.borderLeftWidth],
     render_line_width,
   );
 
 let border_width =
   monomorphic(
     Property_parser.property_border_width,
-    (~loc) => [%expr CssJs.borderWidth],
+    (~loc) => [%expr CSS.borderWidth],
     (~loc) =>
       fun
       | [w] => render_line_width(~loc, w)
@@ -1957,11 +1949,11 @@ type borderDirection =
 
 let direction_to_border = (~loc) =>
   fun
-  | All => [%expr CssJs.border]
-  | Left => [%expr CssJs.borderLeft]
-  | Bottom => [%expr CssJs.borderBottom]
-  | Right => [%expr CssJs.borderRight]
-  | Top => [%expr CssJs.borderTop];
+  | All => [%expr CSS.border]
+  | Left => [%expr CSS.borderLeft]
+  | Bottom => [%expr CSS.borderBottom]
+  | Right => [%expr CSS.borderRight]
+  | Top => [%expr CSS.borderTop];
 
 let direction_to_fn_name = (~loc) =>
   fun
@@ -1975,7 +1967,7 @@ let render_border = (~loc, ~direction: borderDirection, border) => {
   switch (border) {
   | `None =>
     let borderFn = direction_to_fn_name(~loc, direction);
-    [[%expr CssJs.unsafe([%e borderFn], {js|none|js})]];
+    [[%expr CSS.unsafe([%e borderFn], {js|none|js})]];
   | `Xor(`Interpolation(name)) =>
     let borderFn = direction_to_border(~loc, direction);
     [[%expr [%e borderFn]([%e render_variable(~loc, name)])]];
@@ -2005,9 +1997,9 @@ let render_outline_style_interp = (~loc) =>
 
 let render_outline = (~loc) =>
   fun
-  | `None => [[%expr CssJs.unsafe({js|outline|js}, {js|none|js})]]
+  | `None => [[%expr CSS.unsafe({js|outline|js}, {js|none|js})]]
   | `Property_outline_width(`Interpolation(name)) => [
-      [%expr CssJs.outline([%e render_variable(~loc, name)])],
+      [%expr CSS.outline([%e render_variable(~loc, name)])],
     ]
   /* bs-css doesn't support outline: 1px; */
   | `Property_outline_width(_) => raise(Unsupported_feature)
@@ -2015,7 +2007,7 @@ let render_outline = (~loc) =>
   | `Static_0(_) => raise(Unsupported_feature)
   | `Static_1(line_width, style, color) => [
       [%expr
-        CssJs.outline(
+        CSS.outline(
           [%e render_line_width_interp(~loc, line_width)],
           [%e render_outline_style_interp(~loc, style)],
           [%e render_color_interp(~loc, color)],
@@ -2028,35 +2020,35 @@ let outline = polymorphic(Property_parser.property_outline, render_outline);
 let outline_color =
   monomorphic(
     Property_parser.property_outline_color,
-    (~loc) => [%expr CssJs.outlineColor],
+    (~loc) => [%expr CSS.outlineColor],
     render_color,
   );
 
 let outline_offset =
   monomorphic(
     Property_parser.property_outline_offset,
-    (~loc) => [%expr CssJs.outlineOffset],
+    (~loc) => [%expr CSS.outlineOffset],
     render_extended_length,
   );
 
 let outline_style =
   monomorphic(
     Property_parser.property_outline_style,
-    (~loc) => [%expr CssJs.outlineStyle],
+    (~loc) => [%expr CSS.outlineStyle],
     render_outline_style_interp,
   );
 
 let outline_width =
   monomorphic(
     Property_parser.property_outline_width,
-    (~loc) => [%expr CssJs.outlineWidth],
+    (~loc) => [%expr CSS.outlineWidth],
     render_line_width_interp,
   );
 
 let vertical_align =
   monomorphic(
     Property_parser.property_vertical_align,
-    (~loc) => [%expr CssJs.verticalAlign],
+    (~loc) => [%expr CSS.verticalAlign],
     (~loc, value) => {
       switch (value) {
       | `Baseline => [%expr `baseline]
@@ -2112,42 +2104,42 @@ let render_border_radius_value = (~loc) =>
 let border_top_left_radius =
   monomorphic(
     Property_parser.property_border_top_left_radius,
-    (~loc) => [%expr CssJs.borderTopLeftRadius],
+    (~loc) => [%expr CSS.borderTopLeftRadius],
     render_border_radius_value,
   );
 
 let border_top_right_radius =
   monomorphic(
     Property_parser.property_border_top_right_radius,
-    (~loc) => [%expr CssJs.borderTopRightRadius],
+    (~loc) => [%expr CSS.borderTopRightRadius],
     render_border_radius_value,
   );
 
 let border_bottom_right_radius =
   monomorphic(
     Property_parser.property_border_bottom_right_radius,
-    (~loc) => [%expr CssJs.borderBottomRightRadius],
+    (~loc) => [%expr CSS.borderBottomRightRadius],
     render_border_radius_value,
   );
 
 let border_bottom_left_radius =
   monomorphic(
     Property_parser.property_border_bottom_left_radius,
-    (~loc) => [%expr CssJs.borderBottomLeftRadius],
+    (~loc) => [%expr CSS.borderBottomLeftRadius],
     render_border_radius_value,
   );
 
 let border_radius =
   monomorphic(
     Property_parser.property_border_radius,
-    (~loc) => [%expr CssJs.borderRadius],
+    (~loc) => [%expr CSS.borderRadius],
     render_length_percentage,
   );
 
 let border_image_source =
   monomorphic(
     Property_parser.property_border_image_source,
-    (~loc) => [%expr CssJs.borderImageSource],
+    (~loc) => [%expr CSS.borderImageSource],
     (~loc, value) => {
       switch (value) {
       | `None => [%expr `none]
@@ -2178,40 +2170,40 @@ let box_shadow =
     | `Interpolation(variable) =>
       /* Here we rely on boxShadow*s* which makes the value be an array */
       let var = render_variable(~loc, variable);
-      [[%expr CssJs.boxShadows([%e var])]];
+      [[%expr CSS.boxShadows([%e var])]];
     | `None =>
       let none = variant_to_expression(~loc, `None);
-      [[%expr CssJs.boxShadow([%e none])]];
+      [[%expr CSS.boxShadow([%e none])]];
     | `Shadow(shadows) =>
       let shadows = shadows |> List.map(render_box_shadow(~loc));
       let shadows = Builder.pexp_array(~loc, shadows);
-      [[%expr CssJs.boxShadows([%e shadows])]];
+      [[%expr CSS.boxShadows([%e shadows])]];
     }
   );
 
 // css-overflow-3
 let overflow_x =
   variants(Property_parser.property_overflow_x, (~loc) =>
-    [%expr CssJs.overflowX]
+    [%expr CSS.overflowX]
   );
 
 let overflow_y =
   variants(Property_parser.property_overflow_y, (~loc) =>
-    [%expr CssJs.overflowY]
+    [%expr CSS.overflowY]
   );
 
 let overflow =
   polymorphic(Property_parser.property_overflow, (~loc) =>
     fun
     | `Xor([all]) => [
-        [%expr CssJs.overflow([%e variant_to_expression(~loc, all)])],
+        [%expr CSS.overflow([%e variant_to_expression(~loc, all)])],
       ]
     | `Xor([x, y]) => [
-        [%expr CssJs.overflowX([%e variant_to_expression(~loc, x)])],
-        [%expr CssJs.overflowY([%e variant_to_expression(~loc, y)])],
+        [%expr CSS.overflowX([%e variant_to_expression(~loc, x)])],
+        [%expr CSS.overflowY([%e variant_to_expression(~loc, y)])],
       ]
     | `Interpolation(i) => [
-        [%expr CssJs.overflow([%e render_variable(~loc, i)])],
+        [%expr CSS.overflow([%e render_variable(~loc, i)])],
       ]
     | `Xor(_) => raise(Unsupported_feature)
     | _ => raise(Unsupported_feature)
@@ -2222,7 +2214,7 @@ let overflow =
 let overflow_block =
   monomorphic(
     Property_parser.property_overflow_block,
-    (~loc) => [%expr CssJs.overflowBlock],
+    (~loc) => [%expr CSS.overflowBlock],
     (~loc, value) => {
       switch (value) {
       | `Interpolation(i) => render_variable(~loc, i)
@@ -2238,7 +2230,7 @@ let overflow_block =
 let overflow_inline =
   monomorphic(
     Property_parser.property_overflow_inline,
-    (~loc) => [%expr CssJs.overflowInline],
+    (~loc) => [%expr CSS.overflowInline],
     (~loc, value) => {
       switch (value) {
       | `Interpolation(i) => render_variable(~loc, i)
@@ -2254,7 +2246,7 @@ let overflow_inline =
 let text_overflow =
   monomorphic(
     Property_parser.property_text_overflow,
-    (~loc) => [%expr CssJs.textOverflow],
+    (~loc) => [%expr CSS.textOverflow],
     (~loc) =>
       fun
       | [one] =>
@@ -2274,12 +2266,12 @@ let max_lines = unsupportedProperty(Property_parser.property_max_lines);
 // css-text-3
 let text_transform =
   variants(Property_parser.property_text_transform, (~loc) =>
-    [%expr CssJs.textTransform]
+    [%expr CSS.textTransform]
   );
 
 let white_space =
   variants(Property_parser.property_white_space, (~loc) =>
-    [%expr CssJs.whiteSpace]
+    [%expr CSS.whiteSpace]
   );
 
 let render_tab_size = (~loc, value: Types.property_tab_size) => {
@@ -2295,13 +2287,13 @@ let render_tab_size = (~loc, value: Types.property_tab_size) => {
 let tab_size =
   monomorphic(
     Property_parser.property_tab_size,
-    (~loc) => [%expr CssJs.tabSize],
+    (~loc) => [%expr CSS.tabSize],
     render_tab_size,
   );
 
 let word_break =
   variants(Property_parser.property_word_break, (~loc) =>
-    [%expr CssJs.wordBreak]
+    [%expr CSS.wordBreak]
   );
 
 let render_line_height = (~loc) =>
@@ -2314,54 +2306,54 @@ let render_line_height = (~loc) =>
 let line_height =
   monomorphic(
     Property_parser.property_line_height,
-    (~loc) => [%expr CssJs.lineHeight],
+    (~loc) => [%expr CSS.lineHeight],
     render_line_height,
   );
 
 let line_height_step =
   monomorphic(
     Property_parser.property_line_height_step,
-    (~loc) => [%expr CssJs.lineHeightStep],
+    (~loc) => [%expr CSS.lineHeightStep],
     render_extended_length,
   );
 
 let hyphens =
-  variants(Property_parser.property_hyphens, (~loc) => [%expr CssJs.hyphens]);
+  variants(Property_parser.property_hyphens, (~loc) => [%expr CSS.hyphens]);
 
 let overflow_wrap =
   variants(Property_parser.property_overflow_wrap, (~loc) =>
-    [%expr CssJs.overflowWrap]
+    [%expr CSS.overflowWrap]
   );
 
 let word_wrap =
   variants(Property_parser.property_word_wrap, (~loc) =>
-    [%expr CssJs.wordWrap]
+    [%expr CSS.wordWrap]
   );
 
 let text_align =
   variants(Property_parser.property_text_align, (~loc) =>
-    [%expr CssJs.textAlign]
+    [%expr CSS.textAlign]
   );
 
 let text_align_all =
   variants(Property_parser.property_text_align_all, (~loc) =>
-    [%expr CssJs.textAlignAll]
+    [%expr CSS.textAlignAll]
   );
 
 let text_align_last =
   variants(Property_parser.property_text_align_last, (~loc) =>
-    [%expr CssJs.textAlignLast]
+    [%expr CSS.textAlignLast]
   );
 
 let text_justify =
   variants(Property_parser.property_text_justify, (~loc) =>
-    [%expr CssJs.textJustify]
+    [%expr CSS.textJustify]
   );
 
 let word_spacing =
   monomorphic(
     Property_parser.property_word_spacing,
-    (~loc) => [%expr CssJs.wordSpacing],
+    (~loc) => [%expr CSS.wordSpacing],
     (~loc) =>
       fun
       | `Normal => variant_to_expression(~loc, `Normal)
@@ -2372,7 +2364,7 @@ let word_spacing =
 let letter_spacing =
   monomorphic(
     Property_parser.property_word_spacing,
-    (~loc) => [%expr CssJs.letterSpacing],
+    (~loc) => [%expr CSS.letterSpacing],
     (~loc) =>
       fun
       | `Normal => variant_to_expression(~loc, `Normal)
@@ -2383,7 +2375,7 @@ let letter_spacing =
 let text_indent =
   monomorphic(
     Property_parser.property_text_indent,
-    (~loc) => [%expr CssJs.textIndent],
+    (~loc) => [%expr CSS.textIndent],
     (~loc) =>
       fun
       | (`Extended_length(l), None, None) => render_extended_length(~loc, l)
@@ -2420,15 +2412,15 @@ let font_family =
     switch (value) {
     | `Interpolation(v) =>
       /* We need to add annotation since arrays can be mutable and the type isn't scoped enough */
-      let annotation = [%type: array(CssJs.Types.FontFamilyName.t)];
+      let annotation = [%type: array(CSS.Types.FontFamilyName.t)];
       [
         [%expr
-          CssJs.fontFamilies([%e render_variable(~loc, v)]: [%t annotation])
+          CSS.fontFamilies([%e render_variable(~loc, v)]: [%t annotation])
         ],
       ];
     | `Font_families(font_families) => [
         [%expr
-          CssJs.fontFamilies(
+          CSS.fontFamilies(
             [%e
               font_families
               |> List.map(render_font_family(~loc))
@@ -2454,7 +2446,7 @@ let render_font_weight = (~loc) =>
 let font_weight =
   monomorphic(
     Property_parser.property_font_weight,
-    (~loc) => [%expr CssJs.fontWeight],
+    (~loc) => [%expr CSS.fontWeight],
     render_font_weight,
   );
 
@@ -2471,7 +2463,7 @@ let render_font_style = (~loc) =>
 let font_style =
   monomorphic(
     Property_parser.property_font_style,
-    (~loc) => [%expr CssJs.fontStyle],
+    (~loc) => [%expr CSS.fontStyle],
     render_font_style,
   );
 
@@ -2505,7 +2497,7 @@ let render_font_size = (~loc, value: Types.property_font_size) =>
 let font_size =
   monomorphic(
     Property_parser.property_font_size,
-    (~loc) => [%expr CssJs.fontSize],
+    (~loc) => [%expr CSS.fontSize],
     render_font_size,
   );
 
@@ -2516,22 +2508,22 @@ let font = unsupportedProperty(Property_parser.property_font);
 
 let font_synthesis_weight =
   variants(Property_parser.property_font_synthesis_weight, (~loc) =>
-    [%expr CssJs.fontSynthesisWeight]
+    [%expr CSS.fontSynthesisWeight]
   );
 
 let font_synthesis_style =
   variants(Property_parser.property_font_synthesis_style, (~loc) =>
-    [%expr CssJs.fontSynthesisStyle]
+    [%expr CSS.fontSynthesisStyle]
   );
 
 let font_synthesis_small_caps =
   variants(Property_parser.property_font_synthesis_small_caps, (~loc) =>
-    [%expr CssJs.fontSynthesisSmallCaps]
+    [%expr CSS.fontSynthesisSmallCaps]
   );
 
 let font_synthesis_position =
   variants(Property_parser.property_font_synthesis_position, (~loc) =>
-    [%expr CssJs.fontSynthesisPosition]
+    [%expr CSS.fontSynthesisPosition]
   );
 
 let font_synthesis =
@@ -2539,7 +2531,7 @@ let font_synthesis =
 
 let font_kerning =
   variants(Property_parser.property_font_kerning, (~loc) =>
-    [%expr CssJs.fontKerning]
+    [%expr CSS.fontKerning]
   );
 
 let font_variant_ligatures =
@@ -2547,12 +2539,12 @@ let font_variant_ligatures =
 
 let font_variant_position =
   variants(Property_parser.property_font_variant_position, (~loc) =>
-    [%expr CssJs.fontVariantPosition]
+    [%expr CSS.fontVariantPosition]
   );
 
 let font_variant_caps =
   variants(Property_parser.property_font_variant_caps, (~loc) =>
-    [%expr CssJs.fontVariantCaps]
+    [%expr CSS.fontVariantCaps]
   );
 
 let font_variant_numeric =
@@ -2567,9 +2559,9 @@ let font_variant_east_asian =
 let font_variant =
   polymorphic(Property_parser.property_font_variant, (~loc) =>
     fun
-    | `None => [[%expr CssJs.unsafe({|fontVariant|}, {|none|})]]
-    | `Normal => [[%expr CssJs.fontVariant(`normal)]]
-    | `Small_caps => [[%expr CssJs.fontVariant(`smallCaps)]]
+    | `None => [[%expr CSS.unsafe({|fontVariant|}, {|none|})]]
+    | `Normal => [[%expr CSS.fontVariant(`normal)]]
+    | `Small_caps => [[%expr CSS.fontVariant(`smallCaps)]]
     | _ => raise(Unsupported_feature)
   );
 
@@ -2578,7 +2570,7 @@ let font_feature_settings =
 
 let font_optical_sizing =
   variants(Property_parser.property_font_optical_sizing, (~loc) =>
-    [%expr CssJs.fontOpticalSizing]
+    [%expr CSS.fontOpticalSizing]
   );
 
 let font_variation_settings =
@@ -2588,7 +2580,7 @@ let font_palette = unsupportedProperty(Property_parser.property_font_palette);
 
 let font_variant_emoji =
   variants(Property_parser.property_font_variant_emoji, (~loc) =>
-    [%expr CssJs.fontVariantEmoji]
+    [%expr CSS.fontVariantEmoji]
   );
 
 // css-text-decor-3
@@ -2608,7 +2600,7 @@ let render_text_decoration_line =
 let text_decoration_line =
   monomorphic(
     Property_parser.property_text_decoration_line,
-    (~loc) => [%expr CssJs.textDecorationLine],
+    (~loc) => [%expr CSS.textDecorationLine],
     render_text_decoration_line,
   );
 
@@ -2623,14 +2615,14 @@ let render_text_decoration_style = (~loc) =>
 let text_decoration_style =
   monomorphic(
     Property_parser.property_text_decoration_style,
-    (~loc) => [%expr CssJs.textDecorationStyle],
+    (~loc) => [%expr CSS.textDecorationStyle],
     render_text_decoration_style,
   );
 
 let text_decoration_color =
   monomorphic(
     Property_parser.property_text_decoration_color,
-    (~loc) => [%expr CssJs.textDecorationColor],
+    (~loc) => [%expr CSS.textDecorationColor],
     render_color,
   );
 
@@ -2644,14 +2636,14 @@ let render_text_decoration_thickness = (~loc) =>
 let text_decoration_thickness =
   monomorphic(
     Property_parser.property_text_decoration_thickness,
-    (~loc) => [%expr CssJs.textDecorationThickness],
+    (~loc) => [%expr CSS.textDecorationThickness],
     render_text_decoration_thickness,
   );
 
 let text_decoration =
   monomorphic(
     Property_parser.property_text_decoration,
-    (~loc) => [%expr CssJs.textDecoration],
+    (~loc) => [%expr CSS.textDecoration],
     (~loc, v) =>
       switch (v) {
       | (line, None, None) => render_text_decoration_line(~loc, line)
@@ -2675,12 +2667,12 @@ let text_decoration_skip_self =
 
 let text_decoration_skip_box =
   variants(Property_parser.property_text_decoration_skip_box, (~loc) =>
-    [%expr CssJs.textDecorationSkipBox]
+    [%expr CSS.textDecorationSkipBox]
   );
 
 let text_decoration_skip_inset =
   variants(Property_parser.property_text_decoration_skip_inset, (~loc) =>
-    [%expr CssJs.textDecorationSkipInset]
+    [%expr CSS.textDecorationSkipInset]
   );
 
 let text_decoration_skip_spaces =
@@ -2688,7 +2680,7 @@ let text_decoration_skip_spaces =
 
 let text_decoration_skip_ink =
   variants(Property_parser.property_text_decoration_skip_ink, (~loc) =>
-    [%expr CssJs.textDecorationSkipInk]
+    [%expr CSS.textDecorationSkipInk]
   );
 
 let text_emphasis_style =
@@ -2712,26 +2704,24 @@ let text_emphasis_style =
 
       switch (value) {
       | `Or(Some(x), None) => [
-          [%expr
-            CssJs.textEmphasisStyle([%e render_filled_or_open(~loc, x)])
-          ],
+          [%expr CSS.textEmphasisStyle([%e render_filled_or_open(~loc, x)])],
         ]
       | `Or(None, Some(y)) => [
-          [%expr CssJs.textEmphasisStyle([%e render_shape(~loc, y)])],
+          [%expr CSS.textEmphasisStyle([%e render_shape(~loc, y)])],
         ]
       | `Or(Some(x), Some(y)) => [
           [%expr
-            CssJs.textEmphasisStyles(
+            CSS.textEmphasisStyles(
               [%e render_filled_or_open(~loc, x)],
               [%e render_shape(~loc, y)],
             )
           ],
         ]
       | `Or(None, None)
-      | `None => [[%expr CssJs.textEmphasisStyle(`none)]]
+      | `None => [[%expr CSS.textEmphasisStyle(`none)]]
       | `String(str) => [
           [%expr
-            CssJs.textEmphasisStyle(`string([%e render_string(~loc, str)]))
+            CSS.textEmphasisStyle(`string([%e render_string(~loc, str)]))
           ],
         ]
       };
@@ -2741,7 +2731,7 @@ let text_emphasis_style =
 let text_emphasis_color =
   monomorphic(
     Property_parser.property_text_emphasis_color,
-    (~loc) => [%expr CssJs.textEmphasisColor],
+    (~loc) => [%expr CSS.textEmphasisColor],
     render_color,
   );
 
@@ -2767,12 +2757,12 @@ let text_emphasis_position =
       switch (value) {
       | (y, None) => [
           [%expr
-            CssJs.textEmphasisPosition([%e render_over_or_under(~loc, y)])
+            CSS.textEmphasisPosition([%e render_over_or_under(~loc, y)])
           ],
         ]
       | (y, Some(position)) => [
           [%expr
-            CssJs.textEmphasisPositions(
+            CSS.textEmphasisPositions(
               [%e render_over_or_under(~loc, y)],
               [%e render_position_left_right(~loc, position)],
             )
@@ -2811,24 +2801,24 @@ let render_text_shadow = (~loc, shadow) => {
          Option.map(value => (label, value), value)
        );
 
-  Builder.pexp_apply(~loc, [%expr CssJs.Shadow.text], args);
+  Builder.pexp_apply(~loc, [%expr CSS.Shadow.text], args);
 };
 
 let text_shadow =
   polymorphic(Property_parser.property_text_shadow, (~loc) =>
     fun
     | `Interpolation(variable) => [
-        [%expr CssJs.textShadows([%e render_variable(~loc, variable)])],
+        [%expr CSS.textShadows([%e render_variable(~loc, variable)])],
       ]
     | `None => [
-        [%expr CssJs.textShadow([%e variant_to_expression(~loc, `None)])],
+        [%expr CSS.textShadow([%e variant_to_expression(~loc, `None)])],
       ]
     | `Shadow_t([shadow]) => [
-        [%expr CssJs.textShadow([%e render_text_shadow(~loc, shadow)])],
+        [%expr CSS.textShadow([%e render_text_shadow(~loc, shadow)])],
       ]
     | `Shadow_t(shadows) => {
         let shadows = shadows |> List.map(render_text_shadow(~loc));
-        [[%expr CssJs.textShadows([%e Builder.pexp_array(~loc, shadows)])]];
+        [[%expr CSS.textShadows([%e Builder.pexp_array(~loc, shadows)])]];
       }
   );
 
@@ -2843,87 +2833,85 @@ let render_transform = (~loc, value: Types.transform_function) =>
   | `Function_matrix(_) => raise(Unsupported_feature)
   | `Function_matrix3d(_) => raise(Unsupported_feature)
   | `Function_rotate(v) =>
-    [%expr CssJs.rotate([%e render_transform_functions(~loc, v)])]
+    [%expr CSS.rotate([%e render_transform_functions(~loc, v)])]
   | `Function_rotate3d(x, (), y, (), z, (), a) =>
     [%expr
-     CssJs.rotate3d(
+     CSS.rotate3d(
        [%e render_float(~loc, x)],
        [%e render_float(~loc, y)],
        [%e render_float(~loc, z)],
        [%e render_transform_functions(~loc, a)],
      )]
   | `Function_rotateX(v) =>
-    [%expr CssJs.rotateX([%e render_transform_functions(~loc, v)])]
+    [%expr CSS.rotateX([%e render_transform_functions(~loc, v)])]
   | `Function_rotateY(v) =>
-    [%expr CssJs.rotateY([%e render_transform_functions(~loc, v)])]
+    [%expr CSS.rotateY([%e render_transform_functions(~loc, v)])]
   | `Function_rotateZ(v) =>
-    [%expr CssJs.rotateZ([%e render_transform_functions(~loc, v)])]
+    [%expr CSS.rotateZ([%e render_transform_functions(~loc, v)])]
   | `Function_skew(a1, a2) =>
     switch (a2) {
     | Some(((), v)) =>
       [%expr
-       CssJs.skew(
+       CSS.skew(
          [%e render_transform_functions(~loc, a1)],
          [%e render_transform_functions(~loc, v)],
        )]
     | None =>
-      [%expr CssJs.skew([%e render_transform_functions(~loc, a1)], `deg(0.))]
+      [%expr CSS.skew([%e render_transform_functions(~loc, a1)], `deg(0.))]
     }
   | `Function_skewX(v) =>
-    [%expr CssJs.skewX([%e render_transform_functions(~loc, v)])]
+    [%expr CSS.skewX([%e render_transform_functions(~loc, v)])]
   | `Function_skewY(v) =>
-    [%expr CssJs.skewY([%e render_transform_functions(~loc, v)])]
+    [%expr CSS.skewY([%e render_transform_functions(~loc, v)])]
   | `Function_translate(x, None) =>
-    [%expr CssJs.translate([%e render_length_percentage(~loc, x)], `zero)]
+    [%expr CSS.translate([%e render_length_percentage(~loc, x)], `zero)]
   | `Function_translate(x, Some(((), v))) =>
     [%expr
-     CssJs.translate(
+     CSS.translate(
        [%e render_length_percentage(~loc, x)],
        [%e render_length_percentage(~loc, v)],
      )]
   | `Function_translate3d(x, (), y, (), z) =>
     [%expr
-     CssJs.translate3d(
+     CSS.translate3d(
        [%e render_length_percentage(~loc, x)],
        [%e render_length_percentage(~loc, y)],
        [%e render_extended_length(~loc, z)],
      )]
   | `Function_translateX(x) =>
-    [%expr CssJs.translateX([%e render_length_percentage(~loc, x)])]
+    [%expr CSS.translateX([%e render_length_percentage(~loc, x)])]
   | `Function_translateY(y) =>
-    [%expr CssJs.translateY([%e render_length_percentage(~loc, y)])]
+    [%expr CSS.translateY([%e render_length_percentage(~loc, y)])]
   | `Function_translateZ(z) =>
-    [%expr CssJs.translateZ([%e render_extended_length(~loc, z)])]
+    [%expr CSS.translateZ([%e render_extended_length(~loc, z)])]
   | `Function_scale(x, None) =>
-    [%expr
-     CssJs.scale([%e render_float(~loc, x)], [%e render_float(~loc, x)])]
+    [%expr CSS.scale([%e render_float(~loc, x)], [%e render_float(~loc, x)])]
   | `Function_scale(x, Some(((), v))) =>
-    [%expr
-     CssJs.scale([%e render_float(~loc, x)], [%e render_float(~loc, v)])]
+    [%expr CSS.scale([%e render_float(~loc, x)], [%e render_float(~loc, v)])]
   | `Function_scale3d(x, (), y, (), z) =>
     [%expr
-     CssJs.scale3d(
+     CSS.scale3d(
        [%e render_float(~loc, x)],
        [%e render_float(~loc, y)],
        [%e render_float(~loc, z)],
      )]
-  | `Function_scaleX(x) => [%expr CssJs.scaleX([%e render_float(~loc, x)])]
-  | `Function_scaleY(y) => [%expr CssJs.scaleY([%e render_float(~loc, y)])]
-  | `Function_scaleZ(z) => [%expr CssJs.scaleZ([%e render_float(~loc, z)])]
+  | `Function_scaleX(x) => [%expr CSS.scaleX([%e render_float(~loc, x)])]
+  | `Function_scaleY(y) => [%expr CSS.scaleY([%e render_float(~loc, y)])]
+  | `Function_scaleZ(z) => [%expr CSS.scaleZ([%e render_float(~loc, z)])]
   };
 
 // css-transforms-2
 let transform =
   polymorphic(Property_parser.property_transform, (~loc) =>
     fun
-    | `None => [[%expr CssJs.transform(`none)]]
+    | `None => [[%expr CSS.transform(`none)]]
     | `Transform_list([one]) => [
-        [%expr CssJs.transform([%e render_transform(~loc, one)])],
+        [%expr CSS.transform([%e render_transform(~loc, one)])],
       ]
     | `Transform_list(list) => {
         let transforms =
           List.map(render_transform(~loc), list) |> Builder.pexp_array(~loc);
-        [[%expr CssJs.transforms([%e transforms])]];
+        [[%expr CSS.transforms([%e transforms])]];
       }
   );
 
@@ -2947,24 +2935,24 @@ let transform_origin =
     | `Static((y, x), None) => {
         [
           [%expr
-            CssJs.transformOrigin2(
+            CSS.transformOrigin2(
               [%e render_origin(~loc, x)],
               [%e render_origin(~loc, y)],
             )
           ],
         ];
       }
-    | `Center => [[%expr CssJs.transformOrigin(`center)]]
-    | `Left => [[%expr CssJs.transformOrigin(`left)]]
-    | `Right => [[%expr CssJs.transformOrigin(`right)]]
-    | `Bottom => [[%expr CssJs.transformOrigin(`bottom)]]
-    | `Top => [[%expr CssJs.transformOrigin(`top)]]
+    | `Center => [[%expr CSS.transformOrigin(`center)]]
+    | `Left => [[%expr CSS.transformOrigin(`left)]]
+    | `Right => [[%expr CSS.transformOrigin(`right)]]
+    | `Bottom => [[%expr CSS.transformOrigin(`bottom)]]
+    | `Top => [[%expr CSS.transformOrigin(`top)]]
     | `Extended_length(el) => [
-        [%expr CssJs.transformOrigin([%e render_extended_length(~loc, el)])],
+        [%expr CSS.transformOrigin([%e render_extended_length(~loc, el)])],
       ]
     | `Extended_percentage(ep) => [
         [%expr
-          CssJs.transformOrigin([%e render_extended_percentage(~loc, ep)])
+          CSS.transformOrigin([%e render_extended_percentage(~loc, ep)])
         ],
       ]
     | `Static(_, Some(_)) => raise(Unsupported_feature)
@@ -2972,28 +2960,28 @@ let transform_origin =
 
 let transform_box =
   variants(Property_parser.property_transform_box, (~loc) =>
-    [%expr CssJs.transformBox]
+    [%expr CSS.transformBox]
   );
 
 let translate =
   unsupportedValue(Property_parser.property_translate, (~loc) =>
-    [%expr CssJs.translate]
+    [%expr CSS.translate]
   );
 
 let rotate =
   unsupportedValue(Property_parser.property_rotate, (~loc) =>
-    [%expr CssJs.rotate]
+    [%expr CSS.rotate]
   );
 
 let scale =
   unsupportedValue(Property_parser.property_scale, (~loc) =>
-    [%expr CssJs.scale]
+    [%expr CSS.scale]
   );
 
 let transform_style =
   monomorphic(
     Property_parser.property_transform_style,
-    (~loc) => [%expr CssJs.transformStyle],
+    (~loc) => [%expr CSS.transformStyle],
     (~loc) =>
       fun
       | `Flat => variant_to_expression(~loc, `Flat)
@@ -3007,13 +2995,13 @@ let perspective_origin =
     Property_parser.property_perspective_origin,
     (~loc, position) => {
       let (x, y) = render_position(~loc, position);
-      [[%expr CssJs.perspectiveOrigin2([%e x], [%e y])]];
+      [[%expr CSS.perspectiveOrigin2([%e x], [%e y])]];
     },
   );
 
 let backface_visibility =
   variants(Property_parser.property_backface_visibility, (~loc) =>
-    [%expr CssJs.backfaceVisibility]
+    [%expr CSS.backfaceVisibility]
   );
 
 let render_single_transition_property_no_interp = (~loc, value) => {
@@ -3035,7 +3023,7 @@ let render_single_transition_property = (~loc, value) => {
 let transition_property =
   monomorphic(
     Property_parser.property_transition_property,
-    (~loc) => [%expr CssJs.transitionProperty],
+    (~loc) => [%expr CSS.transitionProperty],
     (~loc) =>
       fun
       | `None => render_string(~loc, "none")
@@ -3049,7 +3037,7 @@ let transition_property =
 let transition_duration =
   monomorphic(
     Property_parser.property_transition_duration,
-    (~loc) => [%expr CssJs.transitionDuration],
+    (~loc) => [%expr CSS.transitionDuration],
     (~loc) =>
       fun
       | [] => [%expr `none]
@@ -3060,7 +3048,7 @@ let transition_duration =
 let widows =
   monomorphic(
     Property_parser.property_widows,
-    (~loc) => [%expr CssJs.widows],
+    (~loc) => [%expr CSS.widows],
     render_integer,
   );
 
@@ -3115,7 +3103,7 @@ let render_timing = (~loc) =>
 let transition_timing_function =
   monomorphic(
     Property_parser.property_transition_timing_function,
-    (~loc) => [%expr CssJs.transitionTimingFunction],
+    (~loc) => [%expr CSS.transitionTimingFunction],
     (~loc) =>
       fun
       | [t] => render_timing(~loc, t)
@@ -3125,7 +3113,7 @@ let transition_timing_function =
 let transition_delay =
   monomorphic(
     Property_parser.property_transition_delay,
-    (~loc) => [%expr CssJs.transitionDelay],
+    (~loc) => [%expr CSS.transitionDelay],
     (~loc) =>
       fun
       | [`Time(t)] => render_time_as_int(~loc, t)
@@ -3143,14 +3131,14 @@ let render_single_transition = (~loc) =>
   fun
   | `Static_0(property, duration) => {
       [%expr
-       CssJs.Transition.shorthand(
+       CSS.Transition.shorthand(
          ~duration=[%e render_extended_time(~loc, duration)],
          [%e render_transition_property(~loc, property)],
        )];
     }
   | `Static_1(property, duration, timingFunction) => {
       [%expr
-       CssJs.Transition.shorthand(
+       CSS.Transition.shorthand(
          ~duration=[%e render_extended_time(~loc, duration)],
          ~timingFunction=[%e render_timing(~loc, timingFunction)],
          [%e render_transition_property(~loc, property)],
@@ -3158,7 +3146,7 @@ let render_single_transition = (~loc) =>
     }
   | `Static_2(property, duration, timingFunction, delay) => {
       [%expr
-       CssJs.Transition.shorthand(
+       CSS.Transition.shorthand(
          ~duration=[%e render_extended_time(~loc, duration)],
          ~delay=[%e render_extended_time(~loc, delay)],
          ~timingFunction=[%e render_timing(~loc, timingFunction)],
@@ -3184,7 +3172,7 @@ let render_single_transition_no_interp =
     };
 
   [%expr
-   CssJs.Transition.shorthand(
+   CSS.Transition.shorthand(
      ~duration=?[%e
        render_option(~loc, render_extended_time_no_interp, duration)
      ],
@@ -3199,7 +3187,7 @@ let render_single_transition_no_interp =
 let transition =
   monomorphic(
     Property_parser.property_transition,
-    (~loc) => [%expr CssJs.transitionList],
+    (~loc) => [%expr CSS.transitionList],
     (~loc) =>
       fun
       | `Interpolation(v) => render_variable(~loc, v)
@@ -3232,7 +3220,7 @@ let render_animation_name = (~loc) =>
 let animation_name =
   monomorphic(
     Property_parser.property_animation_name,
-    (~loc) => [%expr CssJs.animationName],
+    (~loc) => [%expr CSS.animationName],
     (~loc) =>
       fun
       | [one] => render_animation_name(~loc, one)
@@ -3242,7 +3230,7 @@ let animation_name =
 let animation_duration =
   monomorphic(
     Property_parser.property_animation_duration,
-    (~loc) => [%expr CssJs.animationDuration],
+    (~loc) => [%expr CSS.animationDuration],
     (~loc) =>
       fun
       | [] => [%expr `ms(0)]
@@ -3253,7 +3241,7 @@ let animation_duration =
 let animation_timing_function =
   monomorphic(
     Property_parser.property_animation_timing_function,
-    (~loc) => [%expr CssJs.animationTimingFunction],
+    (~loc) => [%expr CSS.animationTimingFunction],
     (~loc) =>
       fun
       | [t] => render_timing(~loc, t)
@@ -3268,7 +3256,7 @@ let render_animation_iteration_count = (~loc) =>
 let animation_iteration_count =
   monomorphic(
     Property_parser.property_animation_iteration_count,
-    (~loc) => [%expr CssJs.animationIterationCount],
+    (~loc) => [%expr CSS.animationIterationCount],
     (~loc) =>
       fun
       | [one] => render_animation_iteration_count(~loc, one)
@@ -3285,7 +3273,7 @@ let render_animation_direction = (~loc) =>
 let animation_direction =
   monomorphic(
     Property_parser.property_animation_direction,
-    (~loc) => [%expr CssJs.animationDirection],
+    (~loc) => [%expr CSS.animationDirection],
     (~loc) =>
       fun
       | [one] => render_animation_direction(~loc, one)
@@ -3300,7 +3288,7 @@ let render_animation_play_state = (~loc) =>
 let animation_play_state =
   monomorphic(
     Property_parser.property_animation_play_state,
-    (~loc) => [%expr CssJs.animationPlayState],
+    (~loc) => [%expr CSS.animationPlayState],
     (~loc) =>
       fun
       | [one] => render_animation_play_state(~loc, one)
@@ -3310,7 +3298,7 @@ let animation_play_state =
 let animation_delay =
   monomorphic(
     Property_parser.property_animation_delay,
-    (~loc) => [%expr CssJs.animationDelay],
+    (~loc) => [%expr CSS.animationDelay],
     (~loc) =>
       fun
       | [one] => render_extended_time(~loc, one)
@@ -3327,7 +3315,7 @@ let render_animation_fill_mode = (~loc) =>
 let animation_fill_mode =
   monomorphic(
     Property_parser.property_animation_fill_mode,
-    (~loc) => [%expr CssJs.animationFillMode],
+    (~loc) => [%expr CSS.animationFillMode],
     (~loc) =>
       fun
       | [one] => render_animation_fill_mode(~loc, one)
@@ -3349,7 +3337,7 @@ let render_single_animation =
       ): Types.single_animation,
     ) => {
   [%expr
-   CssJs.animation(
+   CSS.animation(
      ~duration=?[%e render_option(~loc, render_extended_time, duration)],
      ~delay=?[%e render_option(~loc, render_extended_time, delay)],
      ~direction=?[%e
@@ -3392,7 +3380,7 @@ let render_ratio = (~loc, value: Types.ratio) => {
 let aspect_ratio =
   monomorphic(
     Property_parser.property_aspect_ratio,
-    (~loc) => [%expr CssJs.aspectRatio],
+    (~loc) => [%expr CSS.aspectRatio],
     (~loc, value) => {
       switch (value) {
       | `Auto => [%expr `auto]
@@ -3404,12 +3392,12 @@ let aspect_ratio =
 // css-flexbox-1
 let flex_direction =
   variants(Property_parser.property_flex_direction, (~loc) =>
-    [%expr CssJs.flexDirection]
+    [%expr CSS.flexDirection]
   );
 
 let flex_wrap =
   variants(Property_parser.property_flex_wrap, (~loc) =>
-    [%expr CssJs.flexWrap]
+    [%expr CSS.flexWrap]
   );
 
 // shorthand - https://drafts.csswg.org/css-flexbox-1/#flex-flow-property
@@ -3436,7 +3424,7 @@ let flex_flow =
 let order =
   monomorphic(
     Property_parser.property_order,
-    (~loc) => [%expr CssJs.order],
+    (~loc) => [%expr CSS.order],
     render_integer,
   );
 
@@ -3450,14 +3438,14 @@ let render_float_interp = (~loc, value) => {
 let flex_grow =
   monomorphic(
     Property_parser.property_flex_grow,
-    (~loc) => [%expr CssJs.flexGrow],
+    (~loc) => [%expr CSS.flexGrow],
     render_float_interp,
   );
 
 let flex_shrink =
   monomorphic(
     Property_parser.property_flex_shrink,
-    (~loc) => [%expr CssJs.flexShrink],
+    (~loc) => [%expr CSS.flexShrink],
     render_float_interp,
   );
 
@@ -3470,24 +3458,24 @@ let render_flex_basis = (~loc) =>
 let flex_basis =
   monomorphic(
     Property_parser.property_flex_basis,
-    (~loc) => [%expr CssJs.flexBasis],
+    (~loc) => [%expr CSS.flexBasis],
     render_flex_basis,
   );
 
 let flex =
   polymorphic(Property_parser.property_flex, (~loc, value) =>
     switch (value) {
-    | `None => [[%expr CssJs.flex1(`none)]]
+    | `None => [[%expr CSS.flex1(`none)]]
     | `Interpolation(interp) => [
-        [%expr CssJs.flex1([%e render_variable(~loc, interp)])],
+        [%expr CSS.flex1([%e render_variable(~loc, interp)])],
       ]
-    | `Or(None, None) => [[%expr CssJs.flex1(`none)]]
+    | `Or(None, None) => [[%expr CSS.flex1(`none)]]
     | `Or(Some((grow, None)), None) => [
-        [%expr CssJs.flex1(`num([%e render_float_interp(~loc, grow)]))],
+        [%expr CSS.flex1(`num([%e render_float_interp(~loc, grow)]))],
       ]
     | `Or(Some((grow, Some(shrink))), None) => [
         [%expr
-          CssJs.flex2(
+          CSS.flex2(
             ~shrink=[%e render_float_interp(~loc, shrink)],
             [%e render_float_interp(~loc, grow)],
           )
@@ -3495,7 +3483,7 @@ let flex =
       ]
     | `Or(Some((grow, None)), Some(basis)) => [
         [%expr
-          CssJs.flex2(
+          CSS.flex2(
             ~basis=[%e render_flex_basis(~loc, basis)],
             [%e render_float_interp(~loc, grow)],
           )
@@ -3503,7 +3491,7 @@ let flex =
       ]
     | `Or(Some((grow, Some(shrink))), Some(basis)) => [
         [%expr
-          CssJs.flex(
+          CSS.flex(
             [%e render_float_interp(~loc, grow)],
             [%e render_float_interp(~loc, shrink)],
             [%e render_flex_basis(~loc, basis)],
@@ -3511,7 +3499,7 @@ let flex =
         ],
       ]
     | `Or(None, Some(basis)) => [
-        [%expr CssJs.flexBasis([%e render_flex_basis(~loc, basis)])],
+        [%expr CSS.flexBasis([%e render_flex_basis(~loc, basis)])],
       ]
     }
   );
@@ -3564,7 +3552,7 @@ let render_content_distribution = (~loc) =>
 let justify_content =
   monomorphic(
     Property_parser.property_justify_content,
-    (~loc) => [%expr CssJs.justifyContent],
+    (~loc) => [%expr CSS.justifyContent],
     (~loc, value) => {
       switch (value) {
       | `Normal => [%expr `normal]
@@ -3600,7 +3588,7 @@ let render_baseline_position = (~loc, value) => {
 let justify_items =
   monomorphic(
     Property_parser.property_justify_items,
-    (~loc) => [%expr CssJs.justifyItems],
+    (~loc) => [%expr CSS.justifyItems],
     (~loc, value) => {
       switch (value) {
       | `Normal => [%expr `normal]
@@ -3621,7 +3609,7 @@ let justify_items =
 let justify_self =
   monomorphic(
     Property_parser.property_justify_self,
-    (~loc) => [%expr CssJs.justifySelf],
+    (~loc) => [%expr CSS.justifySelf],
     (~loc, value) => {
       switch (value) {
       | `Auto => [%expr `auto]
@@ -3641,7 +3629,7 @@ let justify_self =
 let align_items =
   monomorphic(
     Property_parser.property_align_items,
-    (~loc) => [%expr CssJs.alignItems],
+    (~loc) => [%expr CSS.alignItems],
     (~loc, value) => {
       switch (value) {
       | `Normal => [%expr `normal]
@@ -3661,7 +3649,7 @@ let align_items =
 let align_self =
   monomorphic(
     Property_parser.property_align_self,
-    (~loc) => [%expr CssJs.alignSelf],
+    (~loc) => [%expr CSS.alignSelf],
     (~loc, value) => {
       switch (value) {
       | `Auto => [%expr `auto]
@@ -3682,7 +3670,7 @@ let align_self =
 let align_content =
   monomorphic(
     Property_parser.property_align_content,
-    (~loc) => [%expr CssJs.alignContent],
+    (~loc) => [%expr CSS.alignContent],
     (~loc, value) => {
       switch (value) {
       | `Baseline_position(pos, ()) => render_baseline_position(~loc, pos)
@@ -3908,7 +3896,7 @@ let render_subgrid = (~loc, line_name_list: Types.line_name_list) => {
 let grid_template_columns =
   monomorphic(
     Property_parser.property_grid_template_columns,
-    (~loc) => [%expr CssJs.gridTemplateColumns],
+    (~loc) => [%expr CSS.gridTemplateColumns],
     (~loc, value: Types.property_grid_template_columns) =>
       switch (value) {
       | `None => [%expr [|`none|]]
@@ -3924,7 +3912,7 @@ let grid_template_columns =
 let grid_template_rows =
   monomorphic(
     Property_parser.property_grid_template_rows,
-    (~loc) => [%expr CssJs.gridTemplateRows],
+    (~loc) => [%expr CSS.gridTemplateRows],
     (~loc, value: Types.property_grid_template_rows) =>
       switch (value) {
       | `None => [%expr [|`none|]]
@@ -3939,7 +3927,7 @@ let grid_template_rows =
 
 let grid_template_areas =
   unsupportedValue(Property_parser.property_grid_template_areas, (~loc) =>
-    [%expr CssJs.gridTemplateAreas]
+    [%expr CSS.gridTemplateAreas]
   );
 
 let grid_template =
@@ -3947,33 +3935,31 @@ let grid_template =
 
 let grid_auto_columns =
   unsupportedValue(Property_parser.property_grid_auto_columns, (~loc) =>
-    [%expr CssJs.gridAutoColumns]
+    [%expr CSS.gridAutoColumns]
   );
 
 let grid_auto_rows =
   unsupportedValue(Property_parser.property_grid_auto_rows, (~loc) =>
-    [%expr CssJs.gridAutoRows]
+    [%expr CSS.gridAutoRows]
   );
 
 let grid_auto_flow =
   unsupportedValue(Property_parser.property_grid_auto_flow, (~loc) =>
-    [%expr CssJs.gridAutoFlow]
+    [%expr CSS.gridAutoFlow]
   );
 
 let grid =
-  unsupportedValue(Property_parser.property_grid, (~loc) =>
-    [%expr CssJs.grid]
-  );
+  unsupportedValue(Property_parser.property_grid, (~loc) => [%expr CSS.grid]);
 
 let grid_row_start =
   unsupportedValue(Property_parser.property_grid_row_start, (~loc) =>
-    [%expr CssJs.gridRowStart]
+    [%expr CSS.gridRowStart]
   );
 
 let grid_row_gap =
   monomorphic(
     Property_parser.property_grid_row_gap,
-    (~loc) => [%expr CssJs.gridRowGap],
+    (~loc) => [%expr CSS.gridRowGap],
     (~loc) =>
       fun
       | `Extended_length(el) => render_extended_length(~loc, el)
@@ -3983,7 +3969,7 @@ let grid_row_gap =
 let grid_column_gap =
   monomorphic(
     Property_parser.property_grid_column_gap,
-    (~loc) => [%expr CssJs.gridColumnGap],
+    (~loc) => [%expr CSS.gridColumnGap],
     (~loc) =>
       fun
       | `Extended_length(el) => render_extended_length(~loc, el)
@@ -3992,38 +3978,38 @@ let grid_column_gap =
 
 let grid_column_start =
   unsupportedValue(Property_parser.property_grid_column_start, (~loc) =>
-    [%expr CssJs.gridColumnStart]
+    [%expr CSS.gridColumnStart]
   );
 
 let grid_row_end =
   unsupportedValue(Property_parser.property_grid_row_end, (~loc) =>
-    [%expr CssJs.gridRowEnd]
+    [%expr CSS.gridRowEnd]
   );
 
 let grid_column_end =
   unsupportedValue(Property_parser.property_grid_column_end, (~loc) =>
-    [%expr CssJs.gridColumnEnd]
+    [%expr CSS.gridColumnEnd]
   );
 
 let grid_row =
   unsupportedValue(Property_parser.property_grid_row, (~loc) =>
-    [%expr CssJs.gridRow]
+    [%expr CSS.gridRow]
   );
 
 let grid_column =
   unsupportedValue(Property_parser.property_grid_column, (~loc) =>
-    [%expr CssJs.gridColumn]
+    [%expr CSS.gridColumn]
   );
 
 let grid_area =
   unsupportedValue(Property_parser.property_grid_area, (~loc) =>
-    [%expr CssJs.gridArea]
+    [%expr CSS.gridArea]
   );
 
 let grid_gap =
   monomorphic(
     Property_parser.property_grid_gap,
-    (~loc) => [%expr CssJs.gridGap],
+    (~loc) => [%expr CSS.gridGap],
     (~loc) =>
       fun
       | (`Extended_length(el), None) => render_extended_length(~loc, el)
@@ -4044,10 +4030,10 @@ let render_gap =
 
 let render_property_gap = (~loc, value: Types.property_gap) => {
   switch (value) {
-  | (row, None) => [[%expr CssJs.gap([%e render_gap(~loc, row)])]]
+  | (row, None) => [[%expr CSS.gap([%e render_gap(~loc, row)])]]
   | (row, Some(column)) => [
       [%expr
-        CssJs.gap2(
+        CSS.gap2(
           ~rowGap=[%e render_gap(~loc, row)],
           ~columnGap=[%e render_gap(~loc, column)],
         )
@@ -4061,7 +4047,7 @@ let gap = polymorphic(Property_parser.property_gap, render_property_gap);
 let z_index =
   monomorphic(
     Property_parser.property_z_index,
-    (~loc) => [%expr CssJs.zIndex],
+    (~loc) => [%expr CSS.zIndex],
     (~loc, value) => {
       switch (value) {
       | `Auto => [%expr `auto]
@@ -4080,28 +4066,28 @@ let render_position_value = (~loc) =>
 let left =
   monomorphic(
     Property_parser.property_left,
-    (~loc) => [%expr CssJs.left],
+    (~loc) => [%expr CSS.left],
     render_position_value,
   );
 
 let top =
   monomorphic(
     Property_parser.property_top,
-    (~loc) => [%expr CssJs.top],
+    (~loc) => [%expr CSS.top],
     render_position_value,
   );
 
 let right =
   monomorphic(
     Property_parser.property_right,
-    (~loc) => [%expr CssJs.right],
+    (~loc) => [%expr CSS.right],
     render_position_value,
   );
 
 let bottom =
   monomorphic(
     Property_parser.property_bottom,
-    (~loc) => [%expr CssJs.bottom],
+    (~loc) => [%expr CSS.bottom],
     render_position_value,
   );
 
@@ -4151,7 +4137,7 @@ let render_display = (~loc) =>
 let display =
   monomorphic(
     Property_parser.property_display,
-    (~loc) => [%expr CssJs.display],
+    (~loc) => [%expr CSS.display],
     render_display,
   );
 
@@ -4164,7 +4150,7 @@ let render_mask_image = (~loc) =>
 let mask_image =
   monomorphic(
     Property_parser.property_mask_image,
-    (~loc) => [%expr CssJs.maskImage],
+    (~loc) => [%expr CSS.maskImage],
     (~loc) =>
       fun
       | [one] => render_mask_image(~loc, one)
@@ -4185,14 +4171,14 @@ let render_paint = (~loc, value: Types.paint) => {
 let fill =
   monomorphic(
     Property_parser.property_fill,
-    (~loc) => [%expr CssJs.SVG.fill],
+    (~loc) => [%expr CSS.SVG.fill],
     render_paint,
   );
 
 let stroke =
   monomorphic(
     Property_parser.property_stroke,
-    (~loc) => [%expr CssJs.SVG.stroke],
+    (~loc) => [%expr CSS.SVG.stroke],
     render_paint,
   );
 
@@ -4206,14 +4192,14 @@ let render_alpha_value = (~loc, value: Types.alpha_value) => {
 let stroke_opacity =
   monomorphic(
     Property_parser.property_stroke_opacity,
-    (~loc) => [%expr CssJs.SVG.strokeOpacity],
+    (~loc) => [%expr CSS.SVG.strokeOpacity],
     render_alpha_value,
   );
 
 let line_break =
   monomorphic(
     Property_parser.property_line_break,
-    (~loc) => [%expr CssJs.lineBreak],
+    (~loc) => [%expr CSS.lineBreak],
     (~loc, value) => {
       switch (value) {
       | `Auto => [%expr `auto]
@@ -4250,7 +4236,7 @@ let column_fill = unsupportedProperty(Property_parser.property_column_fill);
 let column_gap =
   monomorphic(
     Property_parser.property_column_gap,
-    (~loc) => [%expr CssJs.columnGap],
+    (~loc) => [%expr CSS.columnGap],
     (~loc) => render_gap(~loc),
   );
 
@@ -4330,7 +4316,7 @@ let render_cursor = (~loc, value) =>
 let cursor =
   monomorphic(
     Property_parser.property_cursor,
-    (~loc) => [%expr CssJs.cursor],
+    (~loc) => [%expr CSS.cursor],
     render_cursor,
   );
 
@@ -4400,7 +4386,7 @@ let render_filter_function_list = (~loc, value: Types.filter_function_list) => {
 let filter =
   monomorphic(
     Property_parser.property_filter,
-    (~loc) => [%expr CssJs.filter],
+    (~loc) => [%expr CSS.filter],
     (~loc, value) =>
       switch (value) {
       | `None => [%expr [|`none|]]
@@ -4413,7 +4399,7 @@ let filter =
 let backdrop_filter =
   monomorphic(
     Property_parser.property_backdrop_filter,
-    (~loc) => [%expr CssJs.backdropFilter],
+    (~loc) => [%expr CSS.backdropFilter],
     (~loc, value) =>
       switch (value) {
       | `None => [%expr [|`none|]]
@@ -4438,7 +4424,7 @@ let list_style = unsupportedProperty(Property_parser.property_list_style);
 let list_style_image =
   monomorphic(
     Property_parser.property_list_style_image,
-    (~loc) => [%expr CssJs.listStyleImage],
+    (~loc) => [%expr CSS.listStyleImage],
     (~loc, value: Types.property_list_style_image) => {
       switch (value) {
       | `None => [%expr `none]
@@ -4463,7 +4449,7 @@ let resize = unsupportedProperty(Property_parser.property_resize);
 let row_gap =
   monomorphic(
     Property_parser.property_row_gap,
-    (~loc) => [%expr CssJs.rowGap],
+    (~loc) => [%expr CSS.rowGap],
     (~loc) => render_gap(~loc),
   );
 
@@ -4813,22 +4799,19 @@ let page_break_inside =
 let table_layout = unsupportedProperty(Property_parser.property_table_layout);
 
 /* let render_animatable_feature = (~loc) =>
-  fun
-  | `Scroll_position => [%expr `scrollPosition]
-  | `Contents => [%expr `contents]
-  | `Custom_ident(v) => render_string(~loc, v); */
+   fun
+   | `Scroll_position => [%expr `scrollPosition]
+   | `Contents => [%expr `contents]
+   | `Custom_ident(v) => render_string(~loc, v); */
 
 let will_change =
   monomorphic(
     Property_parser.property_will_change,
-    (~loc) => [%expr CssJs.willChange],
+    (~loc) => [%expr CSS.willChange],
     (~loc, value: Types.property_will_change) => {
       switch (value) {
       | `Auto => [%expr `auto]
-      | _ =>
-        raise(
-          Unsupported_feature
-        )
+      | _ => raise(Unsupported_feature)
       }
     },
   );
@@ -4843,7 +4826,7 @@ let touch_action = unsupportedProperty(Property_parser.property_touch_action);
 let user_select =
   monomorphic(
     Property_parser.property_user_select,
-    (~loc) => [%expr CssJs.userSelect],
+    (~loc) => [%expr CSS.userSelect],
     (~loc) =>
       fun
       | `Auto => [%expr `auto]
@@ -4857,7 +4840,7 @@ let user_select =
 let zoom =
   monomorphic(
     Property_parser.property_zoom,
-    (~loc) => [%expr CssJs.zoom],
+    (~loc) => [%expr CSS.zoom],
     (~loc) =>
       fun
       | `Number(number) => [%expr `num([%e render_float(~loc, number)])]
@@ -4869,7 +4852,7 @@ let zoom =
 let visibility =
   monomorphic(
     Property_parser.property_visibility,
-    (~loc) => [%expr CssJs.visibility],
+    (~loc) => [%expr CSS.visibility],
     (~loc) =>
       fun
       | `Visible => [%expr `visible]
@@ -5270,7 +5253,7 @@ let render_when_unsupported_features = (~loc, property, value) => {
   let value =
     Result.value(unsafeInterpolation, ~default=render_string(~loc, value));
 
-  [%expr CssJs.unsafe([%e propertyName], [%e value])];
+  [%expr CSS.unsafe([%e propertyName], [%e value])];
 };
 
 let findProperty = name => {
@@ -5286,7 +5269,7 @@ let render_to_expr = (~loc, property, value, important) => {
 
   switch (expr_of_string(~loc, value)) {
   | Ok(expr) when important =>
-    Ok(expr |> List.map(expr => [%expr CssJs.important([%e expr])]))
+    Ok(expr |> List.map(expr => [%expr CSS.important([%e expr])]))
   | Ok(expr) => Ok(expr)
   | Error(err) => Error(`Invalid_value(err))
   /* | exception (Invalid_value(v)) => Error(`Invalid_value(v)) */

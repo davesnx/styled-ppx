@@ -118,9 +118,9 @@ let tests =
       ],
       [%expr
         ignore(
-          CssJs.global(.
+          CSS.global(.
             {js|html, body, #root, .class|js},
-            [|CssJs.margin(`zero)|],
+            [|CSS.margin(`zero)|],
           ),
         )
       ],
@@ -135,9 +135,9 @@ let tests =
       ],
       [%expr
         ignore(
-          CssJs.global(.
+          CSS.global(.
             {js|html, body, #root, .class|js},
-            [|CssJs.margin(`zero)|],
+            [|CSS.margin(`zero)|],
           ),
         )
       ],

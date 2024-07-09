@@ -2,136 +2,136 @@
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   ignore(
-    CssJs.global([|
-      CssJs.selector(
+    CSS.global([|
+      CSS.selector(
         {js|html|js},
         [|
-          CssJs.lineHeight(`abs(1.15)),
-          CssJs.unsafe({js|textSizeAdjust|js}, {js|100%|js}),
+          CSS.lineHeight(`abs(1.15)),
+          CSS.unsafe({js|textSizeAdjust|js}, {js|100%|js}),
         |],
       ),
-      CssJs.selector({js|body|js}, [|CssJs.margin(`zero)|]),
-      CssJs.selector({js|main|js}, [|CssJs.display(`block)|]),
-      CssJs.selector(
+      CSS.selector({js|body|js}, [|CSS.margin(`zero)|]),
+      CSS.selector({js|main|js}, [|CSS.display(`block)|]),
+      CSS.selector(
         {js|h1|js},
-        [|CssJs.fontSize(`em(2.)), CssJs.margin2(~v=`em(0.67), ~h=`zero)|],
+        [|CSS.fontSize(`em(2.)), CSS.margin2(~v=`em(0.67), ~h=`zero)|],
       ),
-      CssJs.selector(
+      CSS.selector(
         {js|hr|js},
         [|
-          CssJs.boxSizing(`contentBox),
-          CssJs.height(`zero),
-          CssJs.overflow(`visible),
+          CSS.boxSizing(`contentBox),
+          CSS.height(`zero),
+          CSS.overflow(`visible),
         |],
       ),
-      CssJs.selector(
+      CSS.selector(
         {js|pre|js},
         [|
-          CssJs.fontFamilies([|`monospace, `monospace|]),
-          CssJs.fontSize(`em(1.)),
+          CSS.fontFamilies([|`monospace, `monospace|]),
+          CSS.fontSize(`em(1.)),
         |],
       ),
-      CssJs.selector({js|a|js}, [|CssJs.backgroundColor(`transparent)|]),
-      CssJs.selector(
+      CSS.selector({js|a|js}, [|CSS.backgroundColor(`transparent)|]),
+      CSS.selector(
         {js|abbr[title]|js},
         [|
-          CssJs.unsafe({js|borderBottom|js}, {js|none|js}),
-          CssJs.textDecoration(`underline),
-          CssJs.unsafe({js|textDecoration|js}, {js|underline dotted|js}),
+          CSS.unsafe({js|borderBottom|js}, {js|none|js}),
+          CSS.textDecoration(`underline),
+          CSS.unsafe({js|textDecoration|js}, {js|underline dotted|js}),
         |],
       ),
-      CssJs.selector({js|b, strong|js}, [|CssJs.fontWeight(`bolder)|]),
-      CssJs.selector(
+      CSS.selector({js|b, strong|js}, [|CSS.fontWeight(`bolder)|]),
+      CSS.selector(
         {js|code, kbd, samp|js},
         [|
-          CssJs.fontFamilies([|`monospace, `monospace|]),
-          CssJs.fontSize(`em(1.)),
+          CSS.fontFamilies([|`monospace, `monospace|]),
+          CSS.fontSize(`em(1.)),
         |],
       ),
-      CssJs.selector({js|small|js}, [|CssJs.fontSize(`percent(80.))|]),
-      CssJs.selector(
+      CSS.selector({js|small|js}, [|CSS.fontSize(`percent(80.))|]),
+      CSS.selector(
         {js|sub, sup|js},
         [|
-          CssJs.fontSize(`percent(75.)),
-          CssJs.lineHeight(`zero),
-          CssJs.unsafe({js|position|js}, {js|relative|js}),
-          CssJs.verticalAlign(`baseline),
+          CSS.fontSize(`percent(75.)),
+          CSS.lineHeight(`zero),
+          CSS.unsafe({js|position|js}, {js|relative|js}),
+          CSS.verticalAlign(`baseline),
         |],
       ),
-      CssJs.selector({js|sub|js}, [|CssJs.bottom(`em(-0.25))|]),
-      CssJs.selector({js|sup|js}, [|CssJs.top(`em(-0.5))|]),
-      CssJs.selector({js|img|js}, [|CssJs.borderStyle(`none)|]),
-      CssJs.selector(
+      CSS.selector({js|sub|js}, [|CSS.bottom(`em(-0.25))|]),
+      CSS.selector({js|sup|js}, [|CSS.top(`em(-0.5))|]),
+      CSS.selector({js|img|js}, [|CSS.borderStyle(`none)|]),
+      CSS.selector(
         {js|button, input, optgroup, select, textarea|js},
         [|
-          CssJs.unsafe({js|font-family|js}, {js|inherit|js}),
-          CssJs.fontSize(`percent(100.)),
-          CssJs.lineHeight(`abs(1.15)),
-          CssJs.margin(`zero),
+          CSS.unsafe({js|font-family|js}, {js|inherit|js}),
+          CSS.fontSize(`percent(100.)),
+          CSS.lineHeight(`abs(1.15)),
+          CSS.margin(`zero),
         |],
       ),
-      CssJs.selector({js|button, input|js}, [|CssJs.overflow(`visible)|]),
-      CssJs.selector({js|button, select|js}, [|CssJs.textTransform(`none)|]),
-      CssJs.selector(
+      CSS.selector({js|button, input|js}, [|CSS.overflow(`visible)|]),
+      CSS.selector({js|button, select|js}, [|CSS.textTransform(`none)|]),
+      CSS.selector(
         {js|button, [type="button"], [type="reset"], [type="submit"]|js},
-        [|CssJs.unsafe({js|WebkitAppearance|js}, {js|button|js})|],
+        [|CSS.unsafe({js|WebkitAppearance|js}, {js|button|js})|],
       ),
-      CssJs.selector(
+      CSS.selector(
         {js|button::-moz-focus-inner, [type="button"]::-moz-focus-inner, [type="reset"]::-moz-focus-inner, [type="submit"]::-moz-focus-inner|js},
-        [|CssJs.borderStyle(`none), CssJs.padding(`zero)|],
+        [|CSS.borderStyle(`none), CSS.padding(`zero)|],
       ),
-      CssJs.selector(
+      CSS.selector(
         {js|button:-moz-focusring, [type="button"]:-moz-focusring, [type="reset"]:-moz-focusring, [type="submit"]:-moz-focusring|js},
-        [|CssJs.unsafe({js|outline|js}, {js|1px dotted ButtonText|js})|],
+        [|CSS.unsafe({js|outline|js}, {js|1px dotted ButtonText|js})|],
       ),
-      CssJs.selector(
+      CSS.selector(
         {js|fieldset|js},
         [|
-          CssJs.padding3(~top=`em(0.35), ~h=`em(0.75), ~bottom=`em(0.625)),
+          CSS.padding3(~top=`em(0.35), ~h=`em(0.75), ~bottom=`em(0.625)),
         |],
       ),
-      CssJs.selector(
+      CSS.selector(
         {js|legend|js},
         [|
-          CssJs.boxSizing(`borderBox),
-          CssJs.unsafe({js|color|js}, {js|inherit|js}),
-          CssJs.display(`table),
-          CssJs.maxWidth(`percent(100.)),
-          CssJs.padding(`zero),
-          CssJs.whiteSpace(`normal),
+          CSS.boxSizing(`borderBox),
+          CSS.unsafe({js|color|js}, {js|inherit|js}),
+          CSS.display(`table),
+          CSS.maxWidth(`percent(100.)),
+          CSS.padding(`zero),
+          CSS.whiteSpace(`normal),
         |],
       ),
-      CssJs.selector({js|progress|js}, [|CssJs.verticalAlign(`baseline)|]),
-      CssJs.selector({js|textarea|js}, [|CssJs.overflow(`auto)|]),
-      CssJs.selector(
+      CSS.selector({js|progress|js}, [|CSS.verticalAlign(`baseline)|]),
+      CSS.selector({js|textarea|js}, [|CSS.overflow(`auto)|]),
+      CSS.selector(
         {js|[type="checkbox"], [type="radio"]|js},
-        [|CssJs.boxSizing(`borderBox), CssJs.padding(`zero)|],
+        [|CSS.boxSizing(`borderBox), CSS.padding(`zero)|],
       ),
-      CssJs.selector(
+      CSS.selector(
         {js|[type="number"]::-webkit-inner-spin-button, [type="number"]::-webkit-outer-spin-button|js},
-        [|CssJs.height(`auto)|],
+        [|CSS.height(`auto)|],
       ),
-      CssJs.selector(
+      CSS.selector(
         {js|[type="search"]|js},
         [|
-          CssJs.unsafe({js|WebkitAppearance|js}, {js|textfield|js}),
-          CssJs.outlineOffset(`pxFloat(-2.)),
+          CSS.unsafe({js|WebkitAppearance|js}, {js|textfield|js}),
+          CSS.outlineOffset(`pxFloat(-2.)),
         |],
       ),
-      CssJs.selector(
+      CSS.selector(
         {js|[type="search"]::-webkit-search-decoration|js},
-        [|CssJs.unsafe({js|WebkitAppearance|js}, {js|none|js})|],
+        [|CSS.unsafe({js|WebkitAppearance|js}, {js|none|js})|],
       ),
-      CssJs.selector(
+      CSS.selector(
         {js|::-webkit-file-upload-button|js},
         [|
-          CssJs.unsafe({js|WebkitAppearance|js}, {js|button|js}),
-          CssJs.unsafe({js|font|js}, {js|inherit|js}),
+          CSS.unsafe({js|WebkitAppearance|js}, {js|button|js}),
+          CSS.unsafe({js|font|js}, {js|inherit|js}),
         |],
       ),
-      CssJs.selector({js|details|js}, [|CssJs.display(`block)|]),
-      CssJs.selector({js|summary|js}, [|CssJs.display(`listItem)|]),
-      CssJs.selector({js|template|js}, [|CssJs.display(`none)|]),
-      CssJs.selector({js|[hidden]|js}, [|CssJs.display(`none)|]),
+      CSS.selector({js|details|js}, [|CSS.display(`block)|]),
+      CSS.selector({js|summary|js}, [|CSS.display(`listItem)|]),
+      CSS.selector({js|template|js}, [|CSS.display(`none)|]),
+      CSS.selector({js|[hidden]|js}, [|CSS.display(`none)|]),
     |]),
   );

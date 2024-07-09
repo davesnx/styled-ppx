@@ -33,7 +33,7 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
-  CssJs.unsafe({js|willChange|js}, {js|scroll-position|js});
-  CssJs.unsafe({js|willChange|js}, {js|contents|js});
-  CssJs.unsafe({js|willChange|js}, {js|transform|js});
-  CssJs.unsafe({js|willChange|js}, {js|top, left|js});
+  CSS.unsafe({js|willChange|js}, {js|scroll-position|js});
+  CSS.unsafe({js|willChange|js}, {js|contents|js});
+  CSS.unsafe({js|willChange|js}, {js|transform|js});
+  CSS.unsafe({js|willChange|js}, {js|top, left|js});

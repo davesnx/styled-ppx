@@ -1,16 +1,16 @@
 open Vitest
 
 let testData = list{
-  (%cx("opacity: 0.9"), CssJs.style([CssJs.opacity(0.9)])),
+  (%cx("opacity: 0.9"), CSS.style([CSS.opacity(0.9)])),
   (
     %cx("@media (min-width: 30em) { color: brown; }"),
-    CssJs.style([CssJs.media("(min-width: 30em)", [CssJs.color(CssJs.brown)])]),
+    CSS.style([CSS.media("(min-width: 30em)", [CSS.color(CSS.brown)])]),
   ),
-  (%cx("text-transform: initial"), CssJs.style([CssJs.textTransform(#initial)])),
-  (%cx("text-transform: unset"), CssJs.style([CssJs.textTransform(#unset)])),
-  (%cx("text-transform: inherit"), CssJs.style([CssJs.textTransform(#inherit_)])),
-  (%cx("text-transform: revert"), CssJs.style([CssJs.textTransform(#revert)])),
-  (%cx("text-transform: revert-layer"), CssJs.style([CssJs.textTransform(#revertLayer)])),
+  (%cx("text-transform: initial"), CSS.style([CSS.textTransform(#initial)])),
+  (%cx("text-transform: unset"), CSS.style([CSS.textTransform(#unset)])),
+  (%cx("text-transform: inherit"), CSS.style([CSS.textTransform(#inherit_)])),
+  (%cx("text-transform: revert"), CSS.style([CSS.textTransform(#revert)])),
+  (%cx("text-transform: revert-layer"), CSS.style([CSS.textTransform(#revertLayer)])),
 }
 
 describe("cx", () => {

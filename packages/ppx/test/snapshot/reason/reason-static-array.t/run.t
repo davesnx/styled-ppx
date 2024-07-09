@@ -963,10 +963,10 @@
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles =
-      CssJs.style([|
-        CssJs.label("ArrayStatic"),
-        CssJs.display(`flex),
-        CssJs.justifyContent(`center),
+      CSS.style([|
+        CSS.label("ArrayStatic"),
+        CSS.display(`flex),
+        CSS.justifyContent(`center),
       |]);
     let make = (props: makeProps) => {
       let className = styles ++ getOrEmpty(classNameGet(props));

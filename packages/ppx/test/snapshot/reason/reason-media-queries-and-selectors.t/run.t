@@ -963,19 +963,19 @@
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles =
-      CssJs.style([|
-        CssJs.label("SelectorsMediaQueries"),
-        CssJs.media(
+      CSS.style([|
+        CSS.label("SelectorsMediaQueries"),
+        CSS.media(
           {js|(min-width: 600px)|js},
-          [|CssJs.backgroundColor(CssJs.blue)|],
+          [|CSS.backgroundColor(CSS.blue)|],
         ),
-        CssJs.selector(
+        CSS.selector(
           {js|&:hover|js},
-          [|CssJs.backgroundColor(CssJs.green)|],
+          [|CSS.backgroundColor(CSS.green)|],
         ),
-        CssJs.selector(
+        CSS.selector(
           {js|& > p|js},
-          [|CssJs.color(CssJs.pink), CssJs.fontSize(`pxFloat(24.))|],
+          [|CSS.color(CSS.pink), CSS.fontSize(`pxFloat(24.))|],
         ),
       |]);
     let make = (props: makeProps) => {
