@@ -684,11 +684,11 @@ If this test fail means that the module is not in sync with the ppx
   CssJs.unsafe({js|objectPosition|js}, {js|bottom 10px right 20px|js});
   CssJs.unsafe({js|objectPosition|js}, {js|right 3em bottom 10px|js});
   CssJs.unsafe({js|objectPosition|js}, {js|top 0 right 10px|js});
-  CssJs.unsafe({js|object-position|js}, {js|inherit|js});
-  CssJs.unsafe({js|object-position|js}, {js|initial|js});
-  CssJs.unsafe({js|object-position|js}, {js|revert|js});
-  CssJs.unsafe({js|object-position|js}, {js|revert-layer|js});
-  CssJs.unsafe({js|object-position|js}, {js|unset|js});
+  CssJs.unsafe({js|objectPosition|js}, {js|inherit|js});
+  CssJs.unsafe({js|objectPosition|js}, {js|initial|js});
+  CssJs.unsafe({js|objectPosition|js}, {js|revert|js});
+  CssJs.unsafe({js|objectPosition|js}, {js|revert-layer|js});
+  CssJs.unsafe({js|objectPosition|js}, {js|unset|js});
   let _loadingKeyframes =
     CssJs.keyframes([|
       (0, [|CssJs.backgroundPosition2(`zero, `zero)|]),

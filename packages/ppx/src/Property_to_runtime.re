@@ -157,6 +157,18 @@ let render_percentage = (~loc, number) => [%expr
   `percent([%e render_float(~loc, number)])
 ];
 
+let to_camel_case = txt =>
+  (
+    switch (String.split_on_char('-', txt)) {
+    | [first, ...remaining] => [
+        first,
+        ...List.map(String.capitalize_ascii, remaining),
+      ]
+    | [] => []
+    }
+  )
+  |> String.concat("");
+
 let render_css_global_values = (~loc, name, value) => {
   let.ok value =
     Css_property_parser.Parser.parse(
@@ -166,19 +178,18 @@ let render_css_global_values = (~loc, name, value) => {
 
   let value =
     switch (value) {
-    | `Inherit => "inherit"
-    | `Initial => "initial"
-    | `Unset => "unset"
-    | `Revert => "revert"
-    | `RevertLayer => "revert-layer"
+    | `Inherit => [%expr {js|inherit|js}]
+    | `Initial => [%expr {js|initial|js}]
+    | `Unset => [%expr {js|unset|js}]
+    | `Revert => [%expr {js|revert|js}]
+    | `RevertLayer => [%expr {js|revert-layer|js}]
     };
 
-  /* bs-css doesn't have those */
   Ok([
     [%expr
       CssJs.unsafe(
-        [%e render_string(~loc, name)],
-        [%e render_string(~loc, value)],
+        [%e name |> to_camel_case |> render_string(~loc)],
+        [%e value],
       )
     ],
   ]);
@@ -4750,18 +4761,6 @@ let properties = [
 ];
 
 let render_when_unsupported_features = (~loc, property, value) => {
-  let to_camel_case = txt =>
-    (
-      switch (String.split_on_char('-', txt)) {
-      | [first, ...remaining] => [
-          first,
-          ...List.map(String.capitalize_ascii, remaining),
-        ]
-      | [] => []
-      }
-    )
-    |> String.concat("");
-
   /* Transform property name to camelCase since we bind to emotion with the Object API */
   let propertyName = property |> to_camel_case |> render_string(~loc);
   let unsafeInterpolation =
