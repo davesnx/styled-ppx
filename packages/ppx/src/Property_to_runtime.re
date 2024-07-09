@@ -2364,26 +2364,25 @@ let text_indent =
         render_extended_percentage(~loc, p)
       | _ => raise(Unsupported_feature),
   );
+
 let hanging_punctuation =
   unsupportedProperty(Property_parser.property_hanging_punctuation);
 
 let render_generic_family = (~loc) =>
   fun
-  | `Cursive => [%expr `cursive]
-  | `Fantasy => [%expr `fantasy]
-  | `Monospace => [%expr `monospace]
-  | `Sans_serif => [%expr `sansSerif]
-  | `Serif => [%expr `serif]
-  | `_apple_system => [%expr `custom("-apple-system")];
+  | `Cursive => [%expr "cursive"]
+  | `Fantasy => [%expr "fantasy"]
+  | `Monospace => [%expr "monospace"]
+  | `Sans_serif => [%expr "sans-serif"]
+  | `Serif => [%expr "serif"]
+  | `_apple_system => [%expr "-apple-system"];
 
 let render_font_family = (~loc, value) =>
   switch (value) {
   | `Interpolation(v) => render_variable(~loc, v)
   | `Generic_family(v) => render_generic_family(~loc, v)
-  | `Family_name(`String(str)) =>
-    [%expr `custom([%e render_string(~loc, str)])]
-  | `Family_name(`Custom_ident(ident)) =>
-    [%expr `custom([%e render_string(~loc, ident)])]
+  | `Family_name(`String(str)) => render_string(~loc, str)
+  | `Family_name(`Custom_ident(ident)) => render_string(~loc, ident)
   };
 
 // css-fonts-4
