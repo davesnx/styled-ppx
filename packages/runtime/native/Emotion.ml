@@ -148,6 +148,7 @@ let resolve_ampersand hash selector =
   let resolved_selector = replace_ampersand ~by:classname selector in
   if contains_ampersand selector then resolved_selector
   else if starts_with_at selector then resolved_selector
+    (* This is the differente between SASS and Emotion. Emotion doesn't add a space on pseuo-selectors, while SASS does *)
   else if starts_with_double_dot selector then
     Printf.sprintf ".%s%s" hash resolved_selector
   else Printf.sprintf ".%s %s" hash resolved_selector

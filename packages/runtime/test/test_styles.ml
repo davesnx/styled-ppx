@@ -314,6 +314,28 @@ let ampersand_everywhere_2 =
        ".%s { font-size: 1px; } .felipe .%s .lola { display: none; }" classname
        classname)
 
+let pseudo_selectors_everywhere =
+  test "pseudo_selectors_everywhere " @@ fun () ->
+  let classname =
+    [%cx
+      {|
+        display: block;
+
+        ::before {
+          display: none;
+          ::after {
+            display: none;
+          }
+        }
+    |}]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { display: block; } .%s::before { display: none; } \
+        .%s::before::after { display: none; }"
+       classname classname classname)
+
 let selector_ampersand_with_no_space =
   test "selector_ampersand_with_space" @@ fun () ->
   let classname =
@@ -1098,6 +1120,7 @@ let tests =
       selector_with_interp_and_pseudo;
       pseudo_selectors;
       pseudo_selectors_2;
+      pseudo_selectors_everywhere;
       selector_nested_with_pseudo;
       selector_nested_with_pseudo_2;
       selector_nested_with_pseudo_3;
