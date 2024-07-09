@@ -96,11 +96,8 @@ jobs:
       - name: Grant permission to run ppx
         run: chmod +x _build/default/packages/bin/bin.exe
 
-      - name: Run E2E ReScript v9 tests
-        run: make test_e2e_rescript_v9
-
-      - name: Run E2E ReScript v10 tests
-        run: make test_e2e_rescript_v10
+      - name: Run E2E tests
+        run: make test-e2e
 
   publish:
     name: Publish

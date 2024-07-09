@@ -1,5 +1,8 @@
 # Changes
 
+## 0.58.1
+- [BREAKING] FontFamilyName.t is now a string (@davesnx)
+
 ## 0.58.0
 - [FEATURE] Initial @container support #476 (@zakybilfagih)
 - [FIX] Make selector nested maintain other selectors #486 (@davesnx)
