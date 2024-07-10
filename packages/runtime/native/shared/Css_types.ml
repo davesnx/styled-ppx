@@ -1124,11 +1124,24 @@ module ColorMixMethod = struct
     [ `in1 of Rectangular_or_Polar_color_space.t
     | `in2 of PolarColorSpace.t * HueSize.t
     ]
+
+  let toString (x : t) : string =
+    match x with
+    | `in1 x -> Rectangular_or_Polar_color_space.toString x
+    | `in2 (x, y) ->
+      (match x with
+      | `hsl -> "hsl"
+      | `hwb -> "hwb"
+      | `lch -> "lch"
+      | `oklch -> "oklch")
+      ^ {js| |js}
+      ^ HueSize.toString y
 end
 
 module Color = struct
   type rgb = int * int * int
 
+  (* TODO: Move calc_min_max to <length>, <frequency>, <angle>, <time>, <percentage>, <number>, o <integer>, and remove the 'a and this type from this signature *)
   type 'a calc_min_max =
     (*TODO: Support `num on calc *)
     [ `calc of [ `add of 'a * 'a | `sub of 'a * 'a | `mult of 'a * 'a ]
