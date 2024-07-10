@@ -49,11 +49,6 @@ let string_of_position x =
   | #Var.t as va -> Var.toString va
   | #Cascading.t as c -> Cascading.toString c
 
-let string_of_color x =
-  match x with
-  | #Color.t as co -> Color.toString co
-  | #Var.t as va -> Var.toString va
-
 let string_of_dasharray x =
   match x with
   | #Percentage.t as p -> Percentage.toString p
@@ -152,7 +147,7 @@ let backgroundAttachment x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let backgroundColor x =
-  Rule.declaration ({js|backgroundColor|js}, string_of_color x)
+  Rule.declaration ({js|backgroundColor|js}, Color.toString x)
 
 let backgroundClip x =
   Rule.declaration
@@ -281,7 +276,7 @@ let borderImageSource x =
       | #Gradient.t as g -> Gradient.toString g )
 
 let borderBottomColor x =
-  Rule.declaration ({js|borderBottomColor|js}, string_of_color x)
+  Rule.declaration ({js|borderBottomColor|js}, Color.toString x)
 
 let borderBottomLeftRadius x =
   Rule.declaration ({js|borderBottomLeftRadius|js}, Length.toString x)
@@ -300,10 +295,10 @@ let borderCollapse x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let borderColor x = Rule.declaration ({js|borderColor|js}, string_of_color x)
+let borderColor x = Rule.declaration ({js|borderColor|js}, Color.toString x)
 
 let borderLeftColor x =
-  Rule.declaration ({js|borderLeftColor|js}, string_of_color x)
+  Rule.declaration ({js|borderLeftColor|js}, Color.toString x)
 
 let borderLeftWidth x =
   Rule.declaration ({js|borderLeftWidth|js}, LineWidth.toString x)
@@ -323,13 +318,13 @@ let borderRadius4 ~topLeft ~topRight ~bottomLeft ~bottomRight =
       ^ Length.toString bottomRight )
 
 let borderRightColor x =
-  Rule.declaration ({js|borderRightColor|js}, string_of_color x)
+  Rule.declaration ({js|borderRightColor|js}, Color.toString x)
 
 let borderRightWidth x =
   Rule.declaration ({js|borderRightWidth|js}, LineWidth.toString x)
 
 let borderTopColor x =
-  Rule.declaration ({js|borderTopColor|js}, string_of_color x)
+  Rule.declaration ({js|borderTopColor|js}, Color.toString x)
 
 let borderTopLeftRadius x =
   Rule.declaration ({js|borderTopLeftRadius|js}, Length.toString x)
@@ -369,7 +364,7 @@ let clipPath x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let color x = Rule.declaration ({js|color|js}, string_of_color x)
+let color x = Rule.declaration ({js|color|js}, Color.toString x)
 
 let columnCount x =
   Rule.declaration
@@ -863,9 +858,9 @@ let outline size style color =
       ^ {js| |js}
       ^ OutlineStyle.toString style
       ^ {js| |js}
-      ^ string_of_color color )
+      ^ Color.toString color )
 
-let outlineColor x = Rule.declaration ({js|outlineColor|js}, string_of_color x)
+let outlineColor x = Rule.declaration ({js|outlineColor|js}, Color.toString x)
 let outlineOffset x = Rule.declaration ({js|outlineOffset|js}, Length.toString x)
 
 let outlineStyle x =
@@ -1028,12 +1023,7 @@ let textAlignLast x =
       | #Cascading.t as c -> Cascading.toString c )
 
 let textDecorationColor x =
-  Rule.declaration
-    ( {js|textDecorationColor|js},
-      match x with
-      | #Color.t as co -> Color.toString co
-      | #Var.t as va -> Var.toString va
-      | #Cascading.t as c -> Cascading.toString c )
+  Rule.declaration ({js|textDecorationColor|js}, Color.toString x)
 
 let textDecorationLine x =
   Rule.declaration
@@ -1209,14 +1199,7 @@ let columnWidth x =
       | #Var.t as va -> Var.toString va
       | #Cascading.t as c -> Cascading.toString c )
 
-let caretColor x =
-  Rule.declaration
-    ( {js|caretColor|js},
-      match x with
-      | #CaretColor.t as ct -> CaretColor.toString ct
-      | #Color.t as c -> Color.toString c
-      | #Var.t as va -> Var.toString va
-      | #Cascading.t as c -> Cascading.toString c )
+let caretColor x = Rule.declaration ({js|caretColor|js}, CaretColor.toString x)
 
 let width x =
   Rule.declaration
@@ -1439,7 +1422,7 @@ module Shadow = struct
       ^ {js| |js}
       ^ Length.toString spread
       ^ {js| |js}
-      ^ string_of_color color
+      ^ Color.toString color
       ^ if inset then {js| inset|js} else {js||js})
 
   let text ?(x = `zero) ?(y = `zero) ?(blur = `zero) color =
@@ -1450,7 +1433,7 @@ module Shadow = struct
       ^ {js| |js}
       ^ Length.toString blur
       ^ {js| |js}
-      ^ string_of_color color)
+      ^ Color.toString color)
 
   let (toString : 'a t -> string) =
    fun x -> match x with `shadow x -> x | `none -> {js|none|js}
@@ -1482,7 +1465,7 @@ let border px style color =
       ^ {js| |js}
       ^ string_of_borderstyle style
       ^ {js| |js}
-      ^ string_of_color color )
+      ^ Color.toString color )
 
 let borderStyle x =
   Rule.declaration ({js|borderStyle|js}, string_of_borderstyle x)
@@ -1494,7 +1477,7 @@ let borderLeft px style color =
       ^ {js| |js}
       ^ string_of_borderstyle style
       ^ {js| |js}
-      ^ string_of_color color )
+      ^ Color.toString color )
 
 let borderLeftStyle x =
   Rule.declaration ({js|borderLeftStyle|js}, string_of_borderstyle x)
@@ -1506,7 +1489,7 @@ let borderRight px style color =
       ^ {js| |js}
       ^ string_of_borderstyle style
       ^ {js| |js}
-      ^ string_of_color color )
+      ^ Color.toString color )
 
 let borderRightStyle x =
   Rule.declaration ({js|borderRightStyle|js}, string_of_borderstyle x)
@@ -1518,7 +1501,7 @@ let borderTop px style color =
       ^ {js| |js}
       ^ string_of_borderstyle style
       ^ {js| |js}
-      ^ string_of_color color )
+      ^ Color.toString color )
 
 let borderTopStyle x =
   Rule.declaration ({js|borderTopStyle|js}, string_of_borderstyle x)
@@ -1530,7 +1513,7 @@ let borderBottom px style color =
       ^ {js| |js}
       ^ string_of_borderstyle style
       ^ {js| |js}
-      ^ string_of_color color )
+      ^ Color.toString color )
 
 let borderBottomStyle x =
   Rule.declaration ({js|borderBottomStyle|js}, string_of_borderstyle x)
@@ -1681,14 +1664,7 @@ let animations x =
 let animationName x = Rule.declaration ({js|animationName|js}, x)
 
 module SVG = struct
-  let fill x =
-    Rule.declaration
-      ( {js|fill|js},
-        match x with
-        | #SVG.Fill.t as f -> SVG.Fill.toString f
-        | #Color.t as c -> Color.toString c
-        | #Var.t as v -> Var.toString v
-        | #Url.t as u -> Url.toString u )
+  let fill x = Rule.declaration ({js|fill|js}, SVG.Fill.toString x)
 
   let fillOpacity opacity =
     Rule.declaration ({js|fillOpacity|js}, Kloth.Float.to_string opacity)
@@ -1699,7 +1675,7 @@ module SVG = struct
         match x with `evenodd -> {js|evenodd|js} | `nonzero -> {js|nonzero|js}
       )
 
-  let stroke x = Rule.declaration ({js|stroke|js}, string_of_color x)
+  let stroke x = Rule.declaration ({js|stroke|js}, Color.toString x)
 
   let strokeDasharray x =
     Rule.declaration
@@ -1733,7 +1709,7 @@ module SVG = struct
         | `round -> {js|round|js}
         | `bevel -> {js|bevel|js} )
 
-  let stopColor x = Rule.declaration ({js|stopColor|js}, string_of_color x)
+  let stopColor x = Rule.declaration ({js|stopColor|js}, Color.toString x)
 
   let stopOpacity x =
     Rule.declaration ({js|stopOpacity|js}, Kloth.Float.to_string x)
@@ -1743,7 +1719,7 @@ let touchAction x =
   Rule.declaration ({js|touchAction|js}, TouchAction.toString x)
 
 let textEmphasisColor x =
-  Rule.declaration ({js|textEmphasisColor|js}, string_of_color x)
+  Rule.declaration ({js|textEmphasisColor|js}, Color.toString x)
 
 let lineBreak x =
   Rule.declaration
