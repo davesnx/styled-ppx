@@ -2,7 +2,6 @@ open Standard;
 open Modifier;
 open Rule.Match;
 open Driver;
-
 module Types = {
   type _legacy_gradient = [
     | `Function__webkit_gradient(function__webkit_gradient)
