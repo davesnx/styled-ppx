@@ -1,6 +1,5 @@
 open Alcotest;
 open Css_property_parser;
-open Combinator;
 open Standard;
 open Modifier;
 open Parser;

@@ -1,5 +1,4 @@
 open Standard;
-open Combinator;
 open Modifier;
 open Rule.Match;
 open Driver;

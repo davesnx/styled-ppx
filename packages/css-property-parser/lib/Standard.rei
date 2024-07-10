@@ -70,6 +70,8 @@ let string: Rule.rule(string);
 
 let url: Rule.rule(string);
 
+let var: Rule.rule(string);
+
 let hex_color: Rule.rule(string);
 
 let interpolation: Rule.rule(list(string));

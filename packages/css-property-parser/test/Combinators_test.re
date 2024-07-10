@@ -2,7 +2,6 @@ open Alcotest;
 open Css_property_parser;
 open Rule.Match;
 open Modifier;
-open Combinator;
 open Standard;
 
 let check = (location, testable, recived, expected) =>

@@ -654,8 +654,6 @@ let get_next_tokens_with_location = lexbuf => {
   (token, position_start, position_end);
 };
 
-open Tokens;
-
 let check_if_three_codepoints_would_start_an_identifier =
   check(check_if_three_codepoints_would_start_an_identifier);
 let check_if_three_code_points_would_start_a_number =

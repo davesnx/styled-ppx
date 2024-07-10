@@ -11,9 +11,7 @@ let function_call = (name, rule) => {
       fun
       | FUNCTION(called_name) when name == called_name => Ok()
       | token =>
-        Error([
-          "expected a function " ++ name ++ ". got an " ++ show_token(token),
-        ]),
+        Error(["expected a " ++ name ++ ". got an " ++ show_token(token)]),
     );
   let.bind_match value = rule;
   let.bind_match () = expect(RIGHT_PAREN);
@@ -205,6 +203,10 @@ let url = {
   let url_fun = function_call("url", string);
   Combine.xor([url_token, url_fun]);
 };
+
+// TODO: <url-modifier>
+// https://drafts.csswg.org/css-values-4/#urls
+let var = function_call("var", dashed_ident);
 
 // css-color-4
 // https://drafts.csswg.org/css-color-4/#hex-notation
