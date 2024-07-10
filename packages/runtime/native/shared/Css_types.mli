@@ -275,7 +275,7 @@ module FlexBasis : sig
     ]
 
   val fill : [> `fill ]
-  val content : [> `content ]
+  val content_ : [> `content ]
   val maxContent : [> `maxContent ]
   val minContent : [> `minContent ]
   val fitContent : [> `fitContent ]
@@ -972,8 +972,7 @@ module TextEmphasisStyle : sig
       | `triangle
       ]
 
-    val toString :
-      [< `circle | `dot | `double_circle | `sesame | `triangle ] -> string
+    val toString : t -> string
   end
 
   type t =
@@ -1880,14 +1879,18 @@ end
 
 module Content : sig
   type t =
-    [ `attr of string
-    | `closeQuote
-    | `noCloseQuote
-    | `noOpenQuote
-    | `none
+    [ `none
     | `normal
     | `openQuote
+    | `closeQuote
+    | `noOpenQuote
+    | `noCloseQuote
+    | `attr of string
     | `text of string
+    | Counter.t
+    | Counters.t
+    | Var.t
+    | Cascading.t
     ]
 
   val text_to_string : string -> string
@@ -2077,3 +2080,20 @@ module FontVariantEmoji : sig
 
   val toString : t -> string
 end
+
+type animationName = AnimationName.t
+type angle = Angle.t
+type animationDirection = AnimationDirection.t
+type animationFillMode = AnimationFillMode.t
+type animationIterationCount = AnimationIterationCount.t
+type animationPlayState = AnimationPlayState.t
+type cascading = Cascading.t
+type color = Color.t
+type fontStyle = FontStyle.t
+type fontWeight = FontWeight.t
+type length = Length.t
+type listStyleType = ListStyleType.t
+type repeatValue = RepeatValue.t
+type outlineStyle = OutlineStyle.t
+type transform = Transform.t
+type gradient = Gradient.t

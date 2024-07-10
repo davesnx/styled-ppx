@@ -13,6 +13,11 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
+  File "input.re", line 15, characters 16-55:
+  Error: This expression has type [> `url of string ]
+         but an expression was expected of type Css_types.Content.t
+         The second variant type does not allow tag(s) `url
+  [1]
 
   $ dune describe pp ./input.re.ml | refmt --parse ml --print re
   [@ocaml.ppx.context

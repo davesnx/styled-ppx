@@ -1,3 +1,7 @@
+(* TODO: Remove all modules, keep type cascading = ..., and cascading_to_string *)
+(* TODO: Inline all toString functions on each module *)
+(* TODO: Move all "alias" to Alias module or after the 2nd todo, move all aliases here *)
+
 module Cascading = struct
   type t =
     [ `initial
@@ -416,7 +420,7 @@ module FlexBasis = struct
     ]
 
   let fill = `fill
-  let content = `content
+  let content_ = `content
   let maxContent = `maxContent
   let minContent = `minContent
   let fitContent = `fitContent
@@ -2579,6 +2583,18 @@ module MaskImage = struct
   let toString x = match x with `none -> {js|none|js}
 end
 
+module Image = struct
+  type t =
+    [ Url.t
+    | Gradient.t
+    ]
+
+  let toString x =
+    match x with
+    | #Url.t as u -> Url.toString u
+    | #Gradient.t as g -> Gradient.toString g
+end
+
 module ImageRendering = struct
   type t =
     [ `auto
@@ -2844,6 +2860,10 @@ module Content = struct
     | `noCloseQuote
     | `attr of string
     | `text of string
+    | Counter.t
+    | Counters.t
+    | Var.t
+    | Cascading.t
     ]
 
   let text_to_string value =
@@ -2870,6 +2890,11 @@ module Content = struct
     | `noCloseQuote -> {js|no-close-quote|js}
     | `attr name -> ({js|attr(|js} ^ name) ^ {js|)|js}
     | `text v -> text_to_string v
+    | #Image.t as c -> Image.toString c
+    | #Counter.t as c -> Counter.toString c
+    | #Counters.t as c -> Counters.toString c
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
 end
 
 module SVG = struct
@@ -3117,3 +3142,20 @@ module FontVariantEmoji = struct
     | `emoji -> {js|emoji|js}
     | `unicode -> {js|unicode|js}
 end
+
+type animationName = AnimationName.t
+type angle = Angle.t
+type animationDirection = AnimationDirection.t
+type animationFillMode = AnimationFillMode.t
+type animationIterationCount = AnimationIterationCount.t
+type animationPlayState = AnimationPlayState.t
+type cascading = Cascading.t
+type color = Color.t
+type fontStyle = FontStyle.t
+type fontWeight = FontWeight.t
+type length = Length.t
+type listStyleType = ListStyleType.t
+type repeatValue = RepeatValue.t
+type outlineStyle = OutlineStyle.t
+type transform = Transform.t
+type gradient = Gradient.t

@@ -1,15 +1,5 @@
 open Css_types
 
-let string_of_content x =
-  match x with
-  | #Content.t as c -> Content.toString c
-  | #Counter.t as c -> Counter.toString c
-  | #Counters.t as c -> Counters.toString c
-  | #Gradient.t as g -> Gradient.toString g
-  | #Url.t as u -> Url.toString u
-  | #Var.t as va -> Var.toString va
-  | #Cascading.t as c -> Cascading.toString c
-
 let string_of_counter_increment x =
   match x with
   | #CounterIncrement.t as o -> CounterIncrement.toString o
@@ -391,12 +381,20 @@ let columnCount x =
 
 let rowGap x = Rule.declaration ({js|rowGap|js}, string_of_row_gap x)
 let columnGap x = Rule.declaration ({js|columnGap|js}, string_of_column_gap x)
-let contentRule x = Rule.declaration ({js|content|js}, string_of_content x)
+let contentRule x = Rule.declaration ({js|content|js}, Content.toString x)
 
-let contentRules xs =
-  Rule.declaration
-    ( {js|content|js},
-      Kloth.Array.map_and_join ~sep:{js| |js} xs ~f:string_of_content )
+let contentsRule xs alt =
+  match alt with
+  | None ->
+    Rule.declaration
+      ( {js|content|js},
+        Kloth.Array.map_and_join xs ~f:Content.toString ~sep:{js| |js} )
+  | Some alt ->
+    Rule.declaration
+      ( {js|content|js},
+        Kloth.Array.map_and_join xs ~sep:{js| |js} ~f:Content.toString
+        ^ " / "
+        ^ Content.toString (`text alt) )
 
 let counterIncrement x =
   Rule.declaration ({js|counterIncrement|js}, string_of_counter_increment x)
