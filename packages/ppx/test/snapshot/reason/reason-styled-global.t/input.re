@@ -1,4 +1,5 @@
-[%styled.global {|
+[%styled.global
+  {|
 /*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */
 
 /* Document
@@ -348,4 +349,9 @@ template {
 [hidden] {
   display: none;
 }
-|}];
+
+:root {
+  --shiki-color-text: oklch(37.53% 0 0);
+}
+|}
+];
