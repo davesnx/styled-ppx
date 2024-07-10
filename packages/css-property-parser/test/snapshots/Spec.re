@@ -2,7 +2,7 @@ open Standard;
 open Combinator;
 open Modifier;
 open Rule.Match;
-open Parser_helper;
+open Driver;
 
 let rec _legacy_gradient = [%value.rec
   "<-webkit-gradient()> | <-legacy-linear-gradient> | <-legacy-repeating-linear-gradient> | <-legacy-radial-gradient> | <-legacy-repeating-radial-gradient>"

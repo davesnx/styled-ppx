@@ -1,9 +1,11 @@
 open Standard;
-open Combinator;
 open Modifier;
 open Rule.Match;
-open Parser_helper;
 open Styled_ppx_css_parser;
+
+module StringMap = Map.Make(String);
+
+let (let.ok) = Result.bind;
 
 let rec _legacy_gradient = [%value.rec
   "<-webkit-gradient()> | <-legacy-linear-gradient> | <-legacy-repeating-linear-gradient> | <-legacy-radial-gradient> | <-legacy-repeating-radial-gradient>"
@@ -1956,6 +1958,51 @@ and wq_name = [%value.rec "[ <ns-prefix> ]? <ident-token>"]
 and x = [%value.rec "<number>"]
 and y = [%value.rec "<number>"];
 
+let apply_parser = (parser, tokens_with_loc) => {
+  open Styled_ppx_css_parser.Lexer;
+
+  let tokens =
+    tokens_with_loc
+    |> List.map(({txt, _}) =>
+         switch (txt) {
+         | Ok(token) => token
+         | Error((token, _)) => token
+         }
+       )
+    |> List.rev;
+
+  let tokens_without_ws = tokens |> List.filter((!=)(Tokens.WS));
+
+  let (output, remaining_tokens) = parser(tokens_without_ws);
+  let.ok output =
+    switch (output) {
+    | Ok(data) => Ok(data)
+    | Error([message, ..._]) => Error(message)
+    | Error([]) => Error("weird")
+    };
+  let.ok () =
+    switch (remaining_tokens) {
+    | []
+    | [Tokens.EOF] => Ok()
+    | tokens =>
+      let tokens =
+        tokens |> List.map(Tokens.show_token) |> String.concat(", ");
+      Error("tokens remaining: " ++ tokens);
+    };
+  Ok(output);
+};
+
+let parse = (rule_parser: Rule.rule('a), str) => {
+  let.ok tokens_with_loc =
+    Styled_ppx_css_parser.Lexer.from_string(str)
+    |> Result.map_error(_ => "frozen");
+
+  apply_parser(rule_parser, tokens_with_loc);
+};
+
+let check = (prop: Rule.rule('a), value) =>
+  parse(prop, value) |> Result.is_ok;
+
 let check_map =
   StringMap.of_seq(
     List.to_seq([
@@ -3396,12 +3443,6 @@ let check_map =
       ("extended-percentage", check(extended_percentage)),
     ]),
   );
-
-let parse = Parser_helper.parse;
-
-module StringMap = Map.Make(String);
-
-let (let.ok) = Result.bind;
 
 let check_value = (~name, value) => {
   let.ok check =

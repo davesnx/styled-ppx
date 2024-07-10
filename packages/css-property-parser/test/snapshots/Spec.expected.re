@@ -2,7 +2,8 @@ open Standard;
 open Combinator;
 open Modifier;
 open Rule.Match;
-open Parser_helper;
+open Driver;
+
 module Types = {
   type _legacy_gradient = [
     | `Function__webkit_gradient(function__webkit_gradient)
@@ -99,7 +100,7 @@ let rec _legacy_gradient:
     list(Tokens.token),
   ) =
   tokens =>
-    combine_xor(
+    Combine.xor(
       [
         map(function__webkit_gradient, v => `Function__webkit_gradient(v)),
         map(_legacy_linear_gradient, v => `_legacy_linear_gradient(v)),
@@ -120,7 +121,7 @@ and _legacy_linear_gradient:
     list(Tokens.token),
   ) =
   tokens =>
-    combine_xor(
+    Combine.xor(
       [
         map(
           function_call(
@@ -156,7 +157,7 @@ and property_height:
     list(Tokens.token),
   ) =
   tokens =>
-    combine_xor(
+    Combine.xor(
       [
         map(keyword("auto"), _v => `Auto),
         map(extended_length, v => `Extended_length(v)),
@@ -167,7 +168,7 @@ and property_height:
         map(
           function_call(
             "fit-content",
-            combine_xor([
+            Combine.xor([
               map(extended_length, v => `Extended_length(v)),
               map(extended_percentage, v => `Extended_percentage(v)),
             ]),

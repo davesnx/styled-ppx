@@ -1,5 +1,4 @@
 open Styled_ppx_css_parser.Tokens;
-open Combinator;
 open Rule.Let;
 open Rule.Pattern;
 
@@ -160,7 +159,7 @@ let ident =
 
 // https://drafts.csswg.org/css-values-4/#textual-values
 let css_wide_keywords =
-  combine_xor([
+  Combine.xor([
     value(`Initial, keyword("initial")),
     value(`Inherit, keyword("inherit")),
     value(`Unset, keyword("unset")),
@@ -204,7 +203,7 @@ let url = {
       | _ => Error(["expected a url"]),
     );
   let url_fun = function_call("url", string);
-  combine_xor([url_token, url_fun]);
+  Combine.xor([url_token, url_fun]);
 };
 
 // css-color-4
@@ -267,3 +266,29 @@ let flex_value =
       }
     | _ => Error(["expected flex_value"]),
   );
+
+// TODO: workarounds
+let invalid = expect(STRING("not-implemented"));
+let attr_name = invalid;
+let attr_fallback = invalid;
+let string_token = invalid;
+let ident_token = invalid;
+let dimension = invalid;
+let declaration_value = invalid;
+let positive_integer = integer;
+let function_token = invalid;
+let any_value = invalid;
+let hash_token = invalid;
+let zero = invalid;
+let custom_property_name = invalid;
+let declaration_list = invalid;
+let name_repeat = invalid;
+let ratio = invalid;
+let an_plus_b = invalid;
+let declaration = invalid;
+let y = invalid;
+let x = invalid;
+let decibel = invalid;
+let urange = invalid;
+let semitones = invalid;
+let url_token = invalid;

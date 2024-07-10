@@ -351,7 +351,7 @@ let tests = [
       parse("revert-layer"),
       Ok(`RevertLayer),
     );
-    /* TODO: combine_xor should combine the error messages */
+    /* TODO: xor should combine the error messages */
     check(
       __POS__,
       result(css_wide_keywords, Alcotest.string),
