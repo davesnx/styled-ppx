@@ -11,7 +11,7 @@ let simple_tests = [
       CSS.style([|
         CSS.selector(
           {js|:before|js},
-          [|CSS.unsafe({js|content|js}, {js|'点'|js})|],
+          [|CSS.contentsRule([|`text({js|'点'|js})|], None)|],
         ),
       |])
     ],
@@ -23,7 +23,7 @@ let simple_tests = [
       CSS.style([|
         CSS.selector(
           {js|:before|js},
-          [|CSS.unsafe({js|content|js}, {js|'•'|js})|],
+          [|CSS.contentsRule([|`text({js|'•'|js})|], None)|],
         ),
       |])
     ],
