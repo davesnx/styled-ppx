@@ -66,7 +66,7 @@ let render_variable = (~loc, name) =>
 let transform_with_variable = (parser, mapper, value_to_expr) => {
   Css_property_parser.(
     emit(
-      Combine.xor([
+      Combinator.xor([
         /* If the entire CSS value is interpolated, we treat it as a `Variable */
         Rule.Match.map(Standard.interpolation, data => `Variable(data)),
         /* Otherwise it's a regular CSS `Value and match the parser */

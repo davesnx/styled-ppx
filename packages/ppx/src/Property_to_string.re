@@ -298,7 +298,7 @@ let found = ({ast_of_string, string_to_expr, _}) => {
 
 let transform_with_variable = (parser, mapper, value_to_expr) =>
   emit(
-    Combine.xor([
+    Combinator.xor([
       /* If the CSS value is an interpolation, we treat as one `
          ariable */
       Rule.Match.map(Standard.interpolation, data => `Variable(data)),
