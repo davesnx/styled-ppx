@@ -877,6 +877,12 @@ let outlineWidth x =
   Rule.declaration ({js|outlineWidth|js}, LineWidth.toString x)
 
 let overflow x = Rule.declaration ({js|overflow|js}, Overflow.toString x)
+
+let overflows x =
+  Rule.declaration
+    ( {js|overflow|js},
+      Kloth.Array.map_and_join ~sep:{js| |js} ~f:Overflow.toString x )
+
 let overflowX x = Rule.declaration ({js|overflowX|js}, Overflow.toString x)
 let overflowY x = Rule.declaration ({js|overflowY|js}, Overflow.toString x)
 

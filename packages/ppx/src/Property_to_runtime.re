@@ -2195,21 +2195,39 @@ let overflow_y =
 let overflow =
   polymorphic(Property_parser.property_overflow, (~loc) =>
     fun
-    | `Xor([all]) => [
-        [%expr CSS.overflow([%e variant_to_expression(~loc, all)])],
-      ]
-    | `Xor([x, y]) => [
-        [%expr CSS.overflowX([%e variant_to_expression(~loc, x)])],
-        [%expr CSS.overflowY([%e variant_to_expression(~loc, y)])],
-      ]
     | `Interpolation(i) => [
         [%expr CSS.overflow([%e render_variable(~loc, i)])],
       ]
-    | `Xor(_) => raise(Unsupported_feature)
-    | _ => raise(Unsupported_feature)
+    | `Xor([x]) => [
+        [%expr CSS.overflow([%e variant_to_expression(~loc, x)])],
+      ]
+    | `Xor(many) => {
+        let overflows =
+          many
+          |> List.map(variant_to_expression(~loc))
+          |> Builder.pexp_array(~loc);
+        [[%expr CSS.overflows([%e overflows])]];
+      }
+    | `_non_standard_overflow(non_standard) => {
+        switch (non_standard) {
+        | `_moz_scrollbars_none => [
+            [%expr CSS.unsafe("overflow", "-moz-scrollbars-none")],
+          ]
+        | `_moz_scrollbars_horizontal => [
+            [%expr CSS.unsafe("overflow", "-moz-scrollbars-horizontal")],
+          ]
+        | `_moz_scrollbars_vertical => [
+            [%expr CSS.unsafe("overflow", "-moz-scrollbars-vertical")],
+          ]
+        | _moz_hidden_unscrollable => [
+            [%expr CSS.unsafe("overflow", "-moz-hidden-unscrollable")],
+          ]
+        };
+      }
   );
 
-// let overflow_clip_margin = unsupportedProperty(Property_parser.property_overflow_clip_margin);
+/* let overflow_clip_margin =
+   unsupportedProperty(Property_parser.property_overflow_clip_margin); */
 
 let overflow_block =
   monomorphic(
