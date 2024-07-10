@@ -66,7 +66,7 @@ let render_variable = (~loc, name) =>
 let transform_with_variable = (parser, mapper, value_to_expr) => {
   Css_property_parser.(
     emit(
-      Combinator.combine_xor([
+      Combine.xor([
         /* If the entire CSS value is interpolated, we treat it as a `Variable */
         Rule.Match.map(Standard.interpolation, data => `Variable(data)),
         /* Otherwise it's a regular CSS `Value and match the parser */
@@ -5260,11 +5260,21 @@ let findProperty = name => {
   properties |> List.find_opt(((key, _)) => key == name);
 };
 
+let isVariableDeclaration = name => String.sub(name, 0, 2) == "--";
+
+let render_variable_declaration = (~loc, property, value) => {
+  [%expr
+   CSS.unsafe(
+     [%e render_string(~loc, property)],
+     [%e render_string(~loc, value)],
+   )];
+};
+
 let render_to_expr = (~loc, property, value, important) => {
   let.ok expr_of_string =
     switch (findProperty(property)) {
     | Some((_, (_, expr_of_string))) => Ok(expr_of_string)
-    | None => Error(`Not_found)
+    | None => Error(`Property_not_found)
     };
 
   switch (expr_of_string(~loc, value)) {
@@ -5272,26 +5282,29 @@ let render_to_expr = (~loc, property, value, important) => {
     Ok(expr |> List.map(expr => [%expr CSS.important([%e expr])]))
   | Ok(expr) => Ok(expr)
   | Error(err) => Error(`Invalid_value(err))
-  /* | exception (Invalid_value(v)) => Error(`Invalid_value(v)) */
+  | exception (Invalid_value(v)) => Error(`Invalid_value(v))
   };
 };
 
-let render = (~loc: Location.t, property, value, important) => {
-  let.ok is_valid_string =
-    Property_parser.check_property(~name=property, value)
-    |> Result.map_error((`Unknown_value) => `Not_found);
+let render = (~loc: Location.t, property, value, important) =>
+  if (isVariableDeclaration(property)) {
+    Ok([render_variable_declaration(~loc, property, value)]);
+  } else {
+    let.ok is_valid_string =
+      Property_parser.check_property(~name=property, value)
+      |> Result.map_error((`Unknown_value) => `Property_not_found);
 
-  switch (render_css_global_values(~loc, property, value)) {
-  | Ok(value) => Ok(value)
-  | Error(_) =>
-    switch (render_to_expr(~loc, property, value, important)) {
+    switch (render_css_global_values(~loc, property, value)) {
     | Ok(value) => Ok(value)
-    | exception (Invalid_value(v)) =>
-      Error(`Invalid_value(value ++ ". " ++ v))
-    | Error(_)
-    | exception Unsupported_feature =>
-      let.ok () = is_valid_string ? Ok() : Error(`Invalid_value(value));
-      Ok([render_when_unsupported_features(~loc, property, value)]);
-    }
+    | Error(_) =>
+      switch (render_to_expr(~loc, property, value, important)) {
+      | Ok(value) => Ok(value)
+      | exception (Invalid_value(v)) =>
+        Error(`Invalid_value(value ++ ". " ++ v))
+      | Error(_)
+      | exception Unsupported_feature =>
+        let.ok () = is_valid_string ? Ok() : Error(`Invalid_value(value));
+        Ok([render_when_unsupported_features(~loc, property, value)]);
+      }
+    };
   };
-};
