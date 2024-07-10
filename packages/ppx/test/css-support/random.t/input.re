@@ -128,3 +128,5 @@ let value = `clip;
 ];
 
 [%cx {|aspect-ratio: 16 / 9;|}];
+
+[%css {|color: var(--color-link);|}];

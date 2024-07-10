@@ -177,5 +177,6 @@ If this test fail means that the module is not in sync with the ppx
     ),
   |]);
   CSS.style([|CSS.aspectRatio(`ratio((16, 9)))|]);
+  CSS.color(`var({js|--color-link|js}));
 
   $ dune build

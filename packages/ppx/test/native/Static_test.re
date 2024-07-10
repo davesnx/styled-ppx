@@ -1294,6 +1294,11 @@ let properties_static_css_tests = [
     [%expr [%css "tab-size: calc(10 + 10)"]],
     [%expr CSS.tabSize(`calc(`add((`num(10.), `num(10.)))))],
   ),
+  (
+    [%css {|color: var(--color-link);|}],
+    [%expr [%css {|color: var(--color-link);|}]],
+    [%expr CSS.color(`var({js|--color-link|js}))],
+  ),
   // unsupported
   /*
    (
