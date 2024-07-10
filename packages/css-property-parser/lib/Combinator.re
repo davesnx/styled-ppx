@@ -19,7 +19,7 @@ let rec match_longest = ((left_key, left_rule), rules) =>
     };
   };
 
-let combine_static = rules => {
+let static = rules => {
   let rec match_everything = (values, rules) =>
     switch (rules) {
     | [] => return_match(values |> List.rev)
@@ -30,7 +30,7 @@ let combine_static = rules => {
   match_everything([], rules);
 };
 
-let combine_xor =
+let xor =
   fun
   | [] => failwith("xor doesn't makes sense without a single value")
   | [left, ...rules] => {
@@ -40,7 +40,7 @@ let combine_xor =
       value;
     };
 
-let combine_and = rules => {
+let and_ = rules => {
   // TODO: an array is a better choice
   let rec match_everything = (values, rules) =>
     switch (rules) {
@@ -59,4 +59,4 @@ let combine_and = rules => {
 };
 
 // [ A || B ] = [ A? && B? ]!
-let combine_or = rules => rules |> List.map(optional) |> combine_and;
+let or_ = rules => rules |> List.map(optional) |> and_;

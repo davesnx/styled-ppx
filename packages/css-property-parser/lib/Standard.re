@@ -1,5 +1,4 @@
 open Styled_ppx_css_parser.Tokens;
-open Combinator;
 open Rule.Let;
 open Rule.Pattern;
 
@@ -12,9 +11,7 @@ let function_call = (name, rule) => {
       fun
       | FUNCTION(called_name) when name == called_name => Ok()
       | token =>
-        Error([
-          "expected a function " ++ name ++ ". got an " ++ show_token(token),
-        ]),
+        Error(["expected a " ++ name ++ ". got an " ++ show_token(token)]),
     );
   let.bind_match value = rule;
   let.bind_match () = expect(RIGHT_PAREN);
@@ -160,7 +157,7 @@ let ident =
 
 // https://drafts.csswg.org/css-values-4/#textual-values
 let css_wide_keywords =
-  combine_xor([
+  Combinator.xor([
     value(`Initial, keyword("initial")),
     value(`Inherit, keyword("inherit")),
     value(`Unset, keyword("unset")),
@@ -204,8 +201,11 @@ let url = {
       | _ => Error(["expected a url"]),
     );
   let url_fun = function_call("url", string);
-  combine_xor([url_token, url_fun]);
+  Combinator.xor([url_token, url_fun]);
 };
+
+// https://drafts.csswg.org/css-variables-2/#funcdef-var
+/* let var = function_call("var", dashed_ident); */
 
 // css-color-4
 // https://drafts.csswg.org/css-color-4/#hex-notation
@@ -267,3 +267,29 @@ let flex_value =
       }
     | _ => Error(["expected flex_value"]),
   );
+
+// TODO: workarounds
+let invalid = expect(STRING("not-implemented"));
+let attr_name = invalid;
+let attr_fallback = invalid;
+let string_token = invalid;
+let ident_token = invalid;
+let dimension = invalid;
+let declaration_value = invalid;
+let positive_integer = integer;
+let function_token = invalid;
+let any_value = invalid;
+let hash_token = invalid;
+let zero = invalid;
+let custom_property_name = invalid;
+let declaration_list = invalid;
+let name_repeat = invalid;
+let ratio = invalid;
+let an_plus_b = invalid;
+let declaration = invalid;
+let y = invalid;
+let x = invalid;
+let decibel = invalid;
+let urange = invalid;
+let semitones = invalid;
+let url_token = invalid;

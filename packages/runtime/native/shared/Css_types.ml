@@ -1124,11 +1124,24 @@ module ColorMixMethod = struct
     [ `in1 of Rectangular_or_Polar_color_space.t
     | `in2 of PolarColorSpace.t * HueSize.t
     ]
+
+  let toString (x : t) : string =
+    match x with
+    | `in1 x -> Rectangular_or_Polar_color_space.toString x
+    | `in2 (x, y) ->
+      (match x with
+      | `hsl -> "hsl"
+      | `hwb -> "hwb"
+      | `lch -> "lch"
+      | `oklch -> "oklch")
+      ^ {js| |js}
+      ^ HueSize.toString y
 end
 
 module Color = struct
   type rgb = int * int * int
 
+  (* TODO: Move calc_min_max to <length>, <frequency>, <angle>, <time>, <percentage>, <number>, o <integer>, and remove the 'a and this type from this signature *)
   type 'a calc_min_max =
     (*TODO: Support `num on calc *)
     [ `calc of [ `add of 'a * 'a | `sub of 'a * 'a | `mult of 'a * 'a ]
@@ -1194,53 +1207,60 @@ module Color = struct
     | #Percentage.t as pc -> Percentage.toString pc
 
   let rgb_to_string r g b =
-    Kloth.Int.to_string r
+    {js|rgb(|js}
+    ^ Kloth.Int.to_string r
     ^ {js|, |js}
     ^ Kloth.Int.to_string g
     ^ {js|, |js}
     ^ Kloth.Int.to_string b
+    ^ {js|)|js}
+
+  let rgba_to_string r g b a =
+    {js|rgba(|js}
+    ^ Kloth.Int.to_string r
+    ^ {js|, |js}
+    ^ Kloth.Int.to_string g
+    ^ {js|, |js}
+    ^ Kloth.Int.to_string b
+    ^ {js|, |js}
+    ^ string_of_alpha a
+    ^ {js|)|js}
+
+  let hsl_to_string h s l =
+    {js|hsl(|js}
+    ^ string_of_angle h
+    ^ {js|, |js}
+    ^ string_of_alpha' s
+    ^ {js|, |js}
+    ^ string_of_alpha' l
+    ^ {js|)|js}
+
+  let hsla_to_string h s l a =
+    {js|hsla(|js}
+    ^ string_of_angle h
+    ^ {js|, |js}
+    ^ string_of_alpha' s
+    ^ {js|, |js}
+    ^ string_of_alpha' l
+    ^ {js|, |js}
+    ^ string_of_alpha a
+    ^ {js|)|js}
 
   let rec toString x =
     match x with
-    | `colorMix (method', color_x, color_y) ->
-      {js|color-mix(|js}
-      ^ (match method' with
-        | `in1 x -> ColorMixMethod.Rectangular_or_Polar_color_space.toString x
-        | `in2 (x, y) ->
-          ColorMixMethod.PolarColorSpace.toString x
-          ^ {js| |js}
-          ^ ColorMixMethod.HueSize.toString y)
-      ^ {js|, |js}
-      ^ string_of_color color_x color_y
-      ^ {js|)|js}
-    | `rgb (r, g, b) -> {js|rgb(|js} ^ rgb_to_string r g b ^ {js|)|js}
-    | `rgba (r, g, b, a) ->
-      {js|rgba(|js}
-      ^ rgb_to_string r g b
-      ^ {js|, |js}
-      ^ string_of_alpha a
-      ^ {js|)|js}
-    | `hsl (h, s, l) ->
-      {js|hsl(|js}
-      ^ string_of_angle h
-      ^ {js|, |js}
-      ^ string_of_alpha' s
-      ^ {js|, |js}
-      ^ string_of_alpha' l
-      ^ {js|)|js}
-    | `hsla (h, s, l, a) ->
-      {js|hsla(|js}
-      ^ string_of_angle h
-      ^ {js|, |js}
-      ^ string_of_alpha' s
-      ^ {js|, |js}
-      ^ string_of_alpha' l
-      ^ {js|, |js}
-      ^ string_of_alpha a
-      ^ {js|)|js}
     | `hex s -> {js|#|js} ^ s
     | `transparent -> {js|transparent|js}
     | `currentColor -> {js|currentColor|js}
+    | `rgb (r, g, b) -> rgb_to_string r g b
+    | `rgba (r, g, b, a) -> rgba_to_string r g b a
+    | `hsl (h, s, l) -> hsl_to_string h s l
+    | `hsla (h, s, l, a) -> hsla_to_string h s l a
+    | `colorMix (method', x, y) ->
+      {js|color-mix(|js}
+      ^ ColorMixMethod.toString method'
+      ^ {js|, |js}
+      ^ string_of_color x y
+      ^ {js|)|js}
 
   and string_of_color x y =
     string_of_actual_color x ^ {js|, |js} ^ string_of_actual_color y

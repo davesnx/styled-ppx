@@ -66,7 +66,7 @@ let render_variable = (~loc, name) =>
 let transform_with_variable = (parser, mapper, value_to_expr) => {
   Css_property_parser.(
     emit(
-      Combinator.combine_xor([
+      Combinator.xor([
         /* If the entire CSS value is interpolated, we treat it as a `Variable */
         Rule.Match.map(Standard.interpolation, data => `Variable(data)),
         /* Otherwise it's a regular CSS `Value and match the parser */
@@ -2195,21 +2195,39 @@ let overflow_y =
 let overflow =
   polymorphic(Property_parser.property_overflow, (~loc) =>
     fun
-    | `Xor([all]) => [
-        [%expr CSS.overflow([%e variant_to_expression(~loc, all)])],
-      ]
-    | `Xor([x, y]) => [
-        [%expr CSS.overflowX([%e variant_to_expression(~loc, x)])],
-        [%expr CSS.overflowY([%e variant_to_expression(~loc, y)])],
-      ]
     | `Interpolation(i) => [
         [%expr CSS.overflow([%e render_variable(~loc, i)])],
       ]
-    | `Xor(_) => raise(Unsupported_feature)
-    | _ => raise(Unsupported_feature)
+    | `Xor([x]) => [
+        [%expr CSS.overflow([%e variant_to_expression(~loc, x)])],
+      ]
+    | `Xor(many) => {
+        let overflows =
+          many
+          |> List.map(variant_to_expression(~loc))
+          |> Builder.pexp_array(~loc);
+        [[%expr CSS.overflows([%e overflows])]];
+      }
+    | `_non_standard_overflow(non_standard) => {
+        switch (non_standard) {
+        | `_moz_scrollbars_none => [
+            [%expr CSS.unsafe("overflow", "-moz-scrollbars-none")],
+          ]
+        | `_moz_scrollbars_horizontal => [
+            [%expr CSS.unsafe("overflow", "-moz-scrollbars-horizontal")],
+          ]
+        | `_moz_scrollbars_vertical => [
+            [%expr CSS.unsafe("overflow", "-moz-scrollbars-vertical")],
+          ]
+        | _moz_hidden_unscrollable => [
+            [%expr CSS.unsafe("overflow", "-moz-hidden-unscrollable")],
+          ]
+        };
+      }
   );
 
-// let overflow_clip_margin = unsupportedProperty(Property_parser.property_overflow_clip_margin);
+/* let overflow_clip_margin =
+   unsupportedProperty(Property_parser.property_overflow_clip_margin); */
 
 let overflow_block =
   monomorphic(
@@ -5260,11 +5278,21 @@ let findProperty = name => {
   properties |> List.find_opt(((key, _)) => key == name);
 };
 
+let isVariableDeclaration = name => String.sub(name, 0, 2) == "--";
+
+let render_variable_declaration = (~loc, property, value) => {
+  [%expr
+   CSS.unsafe(
+     [%e render_string(~loc, property)],
+     [%e render_string(~loc, value)],
+   )];
+};
+
 let render_to_expr = (~loc, property, value, important) => {
   let.ok expr_of_string =
     switch (findProperty(property)) {
     | Some((_, (_, expr_of_string))) => Ok(expr_of_string)
-    | None => Error(`Not_found)
+    | None => Error(`Property_not_found)
     };
 
   switch (expr_of_string(~loc, value)) {
@@ -5272,26 +5300,29 @@ let render_to_expr = (~loc, property, value, important) => {
     Ok(expr |> List.map(expr => [%expr CSS.important([%e expr])]))
   | Ok(expr) => Ok(expr)
   | Error(err) => Error(`Invalid_value(err))
-  /* | exception (Invalid_value(v)) => Error(`Invalid_value(v)) */
+  | exception (Invalid_value(v)) => Error(`Invalid_value(v))
   };
 };
 
-let render = (~loc: Location.t, property, value, important) => {
-  let.ok is_valid_string =
-    Property_parser.check_property(~name=property, value)
-    |> Result.map_error((`Unknown_value) => `Not_found);
+let render = (~loc: Location.t, property, value, important) =>
+  if (isVariableDeclaration(property)) {
+    Ok([render_variable_declaration(~loc, property, value)]);
+  } else {
+    let.ok is_valid_string =
+      Property_parser.check_property(~name=property, value)
+      |> Result.map_error((`Unknown_value) => `Property_not_found);
 
-  switch (render_css_global_values(~loc, property, value)) {
-  | Ok(value) => Ok(value)
-  | Error(_) =>
-    switch (render_to_expr(~loc, property, value, important)) {
+    switch (render_css_global_values(~loc, property, value)) {
     | Ok(value) => Ok(value)
-    | exception (Invalid_value(v)) =>
-      Error(`Invalid_value(value ++ ". " ++ v))
-    | Error(_)
-    | exception Unsupported_feature =>
-      let.ok () = is_valid_string ? Ok() : Error(`Invalid_value(value));
-      Ok([render_when_unsupported_features(~loc, property, value)]);
-    }
+    | Error(_) =>
+      switch (render_to_expr(~loc, property, value, important)) {
+      | Ok(value) => Ok(value)
+      | exception (Invalid_value(v)) =>
+        Error(`Invalid_value(value ++ ". " ++ v))
+      | Error(_)
+      | exception Unsupported_feature =>
+        let.ok () = is_valid_string ? Ok() : Error(`Invalid_value(value));
+        Ok([render_when_unsupported_features(~loc, property, value)]);
+      }
+    };
   };
-};

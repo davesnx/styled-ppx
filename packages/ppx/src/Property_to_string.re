@@ -298,7 +298,7 @@ let found = ({ast_of_string, string_to_expr, _}) => {
 
 let transform_with_variable = (parser, mapper, value_to_expr) =>
   emit(
-    Combinator.combine_xor([
+    Combinator.xor([
       /* If the CSS value is an interpolation, we treat as one `
          ariable */
       Rule.Match.map(Standard.interpolation, data => `Variable(data)),
@@ -589,7 +589,7 @@ let render_to_expr = (property, value) => {
   let.ok expr_of_string =
     switch (findProperty(property)) {
     | Some((_, (_, expr_of_string))) => Ok(expr_of_string)
-    | None => Error(`Not_found)
+    | None => Error(`Property_not_found)
     };
 
   expr_of_string(value) |> Result.map_error(str => `Invalid_value(str));
@@ -598,7 +598,7 @@ let render_to_expr = (property, value) => {
 let parse_declarations = (property: string, value: string) => {
   let.ok _ =
     Parser.check_property(~name=property, value)
-    |> Result.map_error((`Unknown_value) => `Not_found);
+    |> Result.map_error((`Unknown_value) => `Property_not_found);
 
   switch (render_css_global_values(property, value)) {
   | Ok(value) => Ok(value)

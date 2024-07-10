@@ -559,21 +559,21 @@ let properties_static_css_tests = [
     [%expr [%css "overflow: scroll"]],
     [%expr CSS.overflow(`scroll)],
   ),
-  /* (
-       [%css "overflow: scroll visible"],
-       [%expr [%css "overflow: scroll visible"]],
-       [%expr CSS.overflowX(`scroll), CSS.overflowY(`visible)],
-     ), */
-  /* (
-       [%css "text-overflow: clip"],
-       [%expr [%css "text-overflow: clip"]],
-       [%expr CSS.textOverflow(`clip)],
-     ), */
-  /* (
-       [%css "text-overflow: ellipsis"],
-       [%expr [%css "text-overflow: ellipsis"]],
-       [%expr CSS.textOverflow(`ellipsis)],
-     ), */
+  (
+    [%css "overflow: scroll visible"],
+    [%expr [%css "overflow: scroll visible"]],
+    [%expr CSS.overflows([|`scroll, `visible|])],
+  ),
+  (
+    [%css "text-overflow: clip"],
+    [%expr [%css "text-overflow: clip"]],
+    [%expr CSS.textOverflow(`clip)],
+  ),
+  (
+    [%css "text-overflow: ellipsis"],
+    [%expr [%css "text-overflow: ellipsis"]],
+    [%expr CSS.textOverflow(`ellipsis)],
+  ),
   (
     [%css "text-transform: capitalize"],
     [%expr [%css "text-transform: capitalize"]],
@@ -858,11 +858,13 @@ let properties_static_css_tests = [
       |])
     ],
   ),
-  /* (
-       [%css "color: var(--main-c, #fff)"],
-       [%expr [%css "color: var(--main-c, #fff)"]],
-       [%expr CSS.color(`var({js|--main-c|js}, `hex({js|fff|js})))]
-     ), */
+  /*
+   TODO: Variables don't support default argument on Parser.re (propertyp-arser)
+   (
+     [%css "color: var(--main-c, #fff)"],
+     [%expr [%css "color: var(--main-c, #fff)"]],
+     [%expr CSS.color(`var(({js|--main-c|js}, `hex({js|fff|js}))))],
+   ), */
   (
     [%css "background-image: url('img_tree.gif')"],
     [%expr [%css "background-image: url('img_tree.gif')"]],
@@ -1148,18 +1150,18 @@ let properties_static_css_tests = [
     [%expr [%css "border-image-source: none"]],
     [%expr CSS.borderImageSource(`none)],
   ),
-  /* (
-       [%css "border-image-source: linear-gradient(to top, red, yellow)"],
-       [%expr [%css "border-image-source: linear-gradient(to top, red, yellow)"]],
-       [%expr
-         CSS.borderImageSource(
-           `linearGradient((
-             Some(`SideOrCorner(`Top)),
-             [|(CSS.red, None), (CSS.yellow, None)|],
-           )),
-         )
-       ],
-     ), */
+  (
+    [%css "border-image-source: linear-gradient(to top, red, yellow)"],
+    [%expr [%css "border-image-source: linear-gradient(to top, red, yellow)"]],
+    [%expr
+      CSS.borderImageSource(
+        `linearGradient((
+          Some(`Top),
+          [|(Some(CSS.red), None), (Some(CSS.yellow), None)|]: CSS.Types.Gradient.color_stop_list,
+        )),
+      )
+    ],
+  ),
   (
     [%css "image-rendering: smooth"],
     [%expr [%css "image-rendering: smooth"]],
@@ -1293,6 +1295,11 @@ let properties_static_css_tests = [
     [%css "tab-size: calc(10 + 10)"],
     [%expr [%css "tab-size: calc(10 + 10)"]],
     [%expr CSS.tabSize(`calc(`add((`num(10.), `num(10.)))))],
+  ),
+  (
+    [%css {|color: var(--color-link);|}],
+    [%expr [%css {|color: var(--color-link);|}]],
+    [%expr CSS.color(`var({js|--color-link|js}))],
   ),
   // unsupported
   /*

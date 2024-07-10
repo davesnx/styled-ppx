@@ -131,5 +131,9 @@
       CSS.selector({js|summary|js}, [|CSS.display(`listItem)|]),
       CSS.selector({js|template|js}, [|CSS.display(`none)|]),
       CSS.selector({js|[hidden]|js}, [|CSS.display(`none)|]),
+      CSS.selector(
+        {js|:root|js},
+        [|CSS.unsafe({js|--shiki-color-text|js}, {js|oklch(37.53% 0 0)|js})|],
+      ),
     |]),
   );

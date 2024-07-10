@@ -252,7 +252,7 @@ and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
     )
   ) {
   | Ok(exprs) => exprs
-  | Error(`Not_found) => [
+  | Error(`Property_not_found) => [
       Error.expr(
         ~loc=property_location,
         "Unknown property '" ++ property ++ "'",

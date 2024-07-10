@@ -564,10 +564,10 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       };
       let op_ident =
         fun
-        | Static => evar("combine_static")
-        | Xor => evar("combine_xor")
-        | And => evar("combine_and")
-        | Or => evar("combine_or");
+        | Static => evar("Combinator.static")
+        | Xor => evar("Combinator.xor")
+        | And => evar("Combinator.and_")
+        | Or => evar("Combinator.or_");
 
       let map_value = (content, (name, value)) => {
         let variant = pexp_variant(name, content ? Some(evar("v")) : None);

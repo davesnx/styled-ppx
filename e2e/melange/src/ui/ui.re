@@ -1,3 +1,5 @@
+let c = CSS.color(`var({js|--color-link|js}));
+
 [%styled.global
   {|
   div {

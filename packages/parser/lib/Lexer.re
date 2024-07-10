@@ -654,8 +654,6 @@ let get_next_tokens_with_location = lexbuf => {
   (token, position_start, position_end);
 };
 
-open Tokens;
-
 let check_if_three_codepoints_would_start_an_identifier =
   check(check_if_three_codepoints_would_start_an_identifier);
 let check_if_three_code_points_would_start_a_number =
@@ -767,13 +765,13 @@ let consume_string = (ending_code_point, lexbuf) => {
   };
 };
 
-let handle_consume_identifier_ =
+let handle_consume_identifier =
   fun
   | Error((_, error)) => Error((Tokens.BAD_IDENT, error))
   | Ok(string) => Ok(string);
 
 // https://drafts.csswg.org/css-syntax-3/#consume-ident-like-token
-let consume_ident_like_ = lexbuf => {
+let consume_ident_like = lexbuf => {
   let read_url = string => {
     // TODO: the whitespace trickery here?
     let _ = consume_whitespace_(lexbuf);
@@ -790,7 +788,7 @@ let consume_ident_like_ = lexbuf => {
   };
 
   // TODO: should it return IDENT() when error?
-  let.ok string = consume_identifier(lexbuf) |> handle_consume_identifier_;
+  let.ok string = consume_identifier(lexbuf) |> handle_consume_identifier;
 
   switch%sedlex (lexbuf) {
   | '(' =>
@@ -808,7 +806,7 @@ let consume_numeric = lexbuf => {
   let (number, _kind) = consume_number(lexbuf);
   if (check_if_three_codepoints_would_start_an_identifier(lexbuf)) {
     // TODO: should it be BAD_IDENT?
-    let.ok string = consume_identifier(lexbuf) |> handle_consume_identifier_;
+    let.ok string = consume_identifier(lexbuf) |> handle_consume_identifier;
     Ok(Tokens.DIMENSION(number, string));
   } else {
     switch%sedlex (lexbuf) {
@@ -828,11 +826,11 @@ let consume = lexbuf => {
       | identifier_start_code_point =>
         Sedlexing.rollback(lexbuf);
         let.ok string =
-          consume_identifier(lexbuf) |> handle_consume_identifier_;
+          consume_identifier(lexbuf) |> handle_consume_identifier;
         Ok(Tokens.HASH(string, `ID));
       | _ =>
         let.ok string =
-          consume_identifier(lexbuf) |> handle_consume_identifier_;
+          consume_identifier(lexbuf) |> handle_consume_identifier;
         Ok(Tokens.HASH(string, `UNRESTRICTED));
       };
     | _ => Ok(DELIM("#"))
@@ -844,7 +842,7 @@ let consume = lexbuf => {
       consume_numeric(lexbuf);
     | starts_an_identifier =>
       Sedlexing.rollback(lexbuf);
-      consume_ident_like_(lexbuf);
+      consume_ident_like(lexbuf);
     | _ =>
       let _ = Sedlexing.next(lexbuf);
       Ok(DELIM("-"));
@@ -882,8 +880,7 @@ let consume = lexbuf => {
   | "@" =>
     if (check_if_three_codepoints_would_start_an_identifier(lexbuf)) {
       // TODO: grr BAD_IDENT
-      let.ok string =
-        consume_identifier(lexbuf) |> handle_consume_identifier_;
+      let.ok string = consume_identifier(lexbuf) |> handle_consume_identifier;
       Ok(Tokens.AT_KEYWORD(string));
     } else {
       Ok(DELIM("@"));
@@ -894,7 +891,7 @@ let consume = lexbuf => {
     switch%sedlex (lexbuf) {
     | starts_with_a_valid_escape =>
       Sedlexing.rollback(lexbuf);
-      consume_ident_like_(lexbuf);
+      consume_ident_like(lexbuf);
     // TODO: this error should be different
     | _ => Error((DELIM("/"), Invalid_code_point))
     };
@@ -904,7 +901,7 @@ let consume = lexbuf => {
     consume_numeric(lexbuf);
   | identifier_start_code_point =>
     let _ = Sedlexing.backtrack(lexbuf);
-    consume_ident_like_(lexbuf);
+    consume_ident_like(lexbuf);
   | eof => Ok(EOF)
   | any => Ok(DELIM(lexeme(lexbuf)))
   | _ => unreachable(lexbuf)
@@ -916,7 +913,6 @@ type token_with_location = {
   loc: Location.t,
 };
 
-/* TODO: Use lex_buffer from parser to keep track of the file */
 let from_string = string => {
   let lexbuf = Sedlexing.Utf8.from_string(string);
   let rec read = acc => {
