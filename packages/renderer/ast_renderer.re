@@ -1,15 +1,3 @@
-let render_help = () => {
-  print_endline("");
-  print_endline("");
-  print_endline(
-    {|  ast-renderer pretty-prints the CSS AST of parser/css_lexer.re|},
-  );
-  print_endline("");
-  print_endline({|    EXAMPLE: dune exec ast-renderer ".a { color: red }"|});
-  print_endline("");
-  print_endline("");
-};
-
 let args = Sys.argv |> Array.to_list;
 let input = List.nth_opt(args, 1);
 let help =
@@ -31,7 +19,12 @@ let loc =
 
 switch (input, help) {
 | (Some(_), true)
-| (None, _) => render_help()
+| (None, _) =>
+  print_endline(
+    "\n  `ast-renderer` pretty-prints the CSS AST of the input string.
+
+  EXAMPLE: dune exec ast-renderer \".a { color: red }\"\n",
+  )
 | (Some(css), _) =>
   switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, css)) {
   | Ok(declarations) =>
