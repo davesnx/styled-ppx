@@ -52,11 +52,11 @@ let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
     =
   let fontFace =
     [|
-      Kloth.Option.map ~f:Properties.fontStyle fontStyle;
-      Kloth.Option.map ~f:Properties.fontWeight fontWeight;
-      Kloth.Option.map ~f:Properties.fontDisplay fontDisplay;
-      Kloth.Option.map ~f:Properties.sizeAdjust sizeAdjust;
-      Some (Properties.fontFamily fontFamily);
+      Kloth.Option.map ~f:Declarations.fontStyle fontStyle;
+      Kloth.Option.map ~f:Declarations.fontWeight fontWeight;
+      Kloth.Option.map ~f:Declarations.fontDisplay fontDisplay;
+      Kloth.Option.map ~f:Declarations.sizeAdjust sizeAdjust;
+      Some (Declarations.fontFamily fontFamily);
       Some
         (Rule.Declaration
            ( "src",
