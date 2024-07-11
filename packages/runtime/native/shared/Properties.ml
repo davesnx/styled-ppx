@@ -1401,51 +1401,9 @@ let filter x =
     ( {js|filter|js},
       Kloth.Array.map_and_join ~f:Filter.toString ~sep:{js| |js} x )
 
-module Shadow = struct
-  type 'a value = string
-  type box
-  type text
-
-  type 'a t =
-    [ `shadow of 'a value
-    | `none
-    ]
-
-  let box ?(x = `zero) ?(y = `zero) ?(blur = `zero) ?(spread = `zero)
-    ?(inset = false) color =
-    `shadow
-      (Length.toString x
-      ^ {js| |js}
-      ^ Length.toString y
-      ^ {js| |js}
-      ^ Length.toString blur
-      ^ {js| |js}
-      ^ Length.toString spread
-      ^ {js| |js}
-      ^ Color.toString color
-      ^ if inset then {js| inset|js} else {js||js})
-
-  let text ?(x = `zero) ?(y = `zero) ?(blur = `zero) color =
-    `shadow
-      (Length.toString x
-      ^ {js| |js}
-      ^ Length.toString y
-      ^ {js| |js}
-      ^ Length.toString blur
-      ^ {js| |js}
-      ^ Color.toString color)
-
-  let (toString : 'a t -> string) =
-   fun x -> match x with `shadow x -> x | `none -> {js|none|js}
-end
-
 let boxShadow x =
   Rule.declaration
-    ( {js|boxShadow|js},
-      match x with
-      | #Shadow.t as s -> Shadow.toString s
-      | #Var.t as va -> Var.toString va
-      | #Cascading.t as c -> Cascading.toString c )
+    ({js|boxShadow|js}, match x with #Shadow.t as s -> Shadow.toString s)
 
 let boxShadows x =
   Rule.declaration
@@ -1561,11 +1519,7 @@ let textDecoration x =
 
 let textShadow x =
   Rule.declaration
-    ( {js|textShadow|js},
-      match x with
-      | #Shadow.t as s -> Shadow.toString s
-      | #Var.t as va -> Var.toString va
-      | #Cascading.t as c -> Cascading.toString c )
+    ({js|textShadow|js}, match x with #Shadow.t as s -> Shadow.toString s)
 
 let textShadows x =
   Rule.declaration
@@ -1575,27 +1529,7 @@ let textShadows x =
 let transformStyle x =
   Rule.declaration
     ( {js|transformStyle|js},
-      match x with
-      | #TransformStyle.t as ts -> TransformStyle.toString ts
-      | #Var.t as va -> Var.toString va
-      | #Cascading.t as c -> Cascading.toString c )
-
-module Transition = struct
-  type t = [ `value of string ]
-
-  let shorthand ?(duration = `ms 0) ?(delay = `ms 0) ?(timingFunction = `ease)
-    property : t =
-    `value
-      (Time.toString duration
-      ^ {js| |js}
-      ^ TimingFunction.toString timingFunction
-      ^ {js| |js}
-      ^ Time.toString delay
-      ^ {js| |js}
-      ^ property)
-
-  let toString (x : t) = match x with `value v -> v
-end
+      match x with #TransformStyle.t as ts -> TransformStyle.toString ts )
 
 let transitionValue x =
   Rule.declaration ({js|transition|js}, Transition.toString x)
@@ -1604,8 +1538,6 @@ let transitionList x =
   Rule.declaration
     ( {js|transition|js},
       Kloth.Array.map_and_join ~sep:{js|, |js} ~f:Transition.toString x )
-
-let transitions = transitionList
 
 let transition ?duration ?delay ?timingFunction property =
   transitionValue
@@ -1621,33 +1553,6 @@ let transitionTimingFunction x =
   Rule.declaration ({js|transitionTimingFunction|js}, TimingFunction.toString x)
 
 let transitionProperty x = Rule.declaration ({js|transitionProperty|js}, x)
-
-module Animation = struct
-  type t = [ `value of string ]
-
-  let shorthand ?(duration = `ms 0) ?(delay = `ms 0) ?(direction = `normal)
-    ?(timingFunction = `ease) ?(fillMode = `none) ?(playState = `running)
-    ?(iterationCount = `count 1.) name =
-    `value
-      (name
-      ^ {js| |js}
-      ^ Time.toString duration
-      ^ {js| |js}
-      ^ TimingFunction.toString timingFunction
-      ^ {js| |js}
-      ^ Time.toString delay
-      ^ {js| |js}
-      ^ AnimationIterationCount.toString iterationCount
-      ^ {js| |js}
-      ^ AnimationDirection.toString direction
-      ^ {js| |js}
-      ^ AnimationFillMode.toString fillMode
-      ^ {js| |js}
-      ^ AnimationPlayState.toString playState)
-
-  let toString x = match x with `value v -> v
-end
-
 let animationValue x = Rule.declaration ({js|animation|js}, Animation.toString x)
 
 let animation ?duration ?delay ?direction ?timingFunction ?fillMode ?playState
@@ -1669,14 +1574,17 @@ module SVG = struct
   let fillOpacity opacity =
     Rule.declaration ({js|fillOpacity|js}, Kloth.Float.to_string opacity)
 
+  (* ??? *)
   let fillRule x =
     Rule.declaration
       ( {js|fillRule|js},
         match x with `evenodd -> {js|evenodd|js} | `nonzero -> {js|nonzero|js}
       )
 
+  (* ??? *)
   let stroke x = Rule.declaration ({js|stroke|js}, Color.toString x)
 
+  (* ??? *)
   let strokeDasharray x =
     Rule.declaration
       ( {js|strokeDasharray|js},
@@ -1685,8 +1593,10 @@ module SVG = struct
         | `dasharray a ->
           Kloth.Array.map_and_join a ~f:string_of_dasharray ~sep:{js| |js} )
 
+  (* ??? *)
   let strokeWidth x = Rule.declaration ({js|strokeWidth|js}, Length.toString x)
 
+  (* ??? *)
   let strokeOpacity opacity =
     Rule.declaration ({js|strokeOpacity|js}, AlphaValue.toString opacity)
 
@@ -1709,9 +1619,11 @@ module SVG = struct
         | `round -> {js|round|js}
         | `bevel -> {js|bevel|js} )
 
+  (* ??? *)
   let stopColor x = Rule.declaration ({js|stopColor|js}, Color.toString x)
 
   let stopOpacity x =
+    (* ??? *)
     Rule.declaration ({js|stopOpacity|js}, Kloth.Float.to_string x)
 end
 
@@ -1724,112 +1636,76 @@ let textEmphasisColor x =
 let lineBreak x =
   Rule.declaration
     ( {js|lineBreak|js},
-      match x with
-      | #LineBreak.t as lb -> LineBreak.toString lb
-      | #Var.t as var -> Var.toString var
-      | #Cascading.t as c -> Cascading.toString c )
+      match x with #LineBreak.t as lb -> LineBreak.toString lb )
 
 let hyphens x =
   Rule.declaration
-    ( {js|hyphens|js},
-      match x with
-      | #Hyphens.t as h -> Hyphens.toString h
-      | #Var.t as var -> Var.toString var
-      | #Cascading.t as c -> Cascading.toString c )
+    ({js|hyphens|js}, match x with #Hyphens.t as h -> Hyphens.toString h)
 
 let textJustify x =
   Rule.declaration
     ( {js|textJustify|js},
-      match x with
-      | #TextJustify.t as tj -> TextJustify.toString tj
-      | #Var.t as var -> Var.toString var
-      | #Cascading.t as c -> Cascading.toString c )
+      match x with #TextJustify.t as tj -> TextJustify.toString tj )
 
 let overflowInline x =
   Rule.declaration
     ( {js|overflowInline|js},
-      match x with
-      | #OverflowInline.t as ov -> OverflowInline.toString ov
-      | #Var.t as var -> Var.toString var
-      | #Cascading.t as c -> Cascading.toString c )
+      match x with #OverflowInline.t as ov -> OverflowInline.toString ov )
 
 let overflowBlock x =
   Rule.declaration
     ( {js|overflowBlock|js},
-      match x with
-      | #OverflowInline.t as ov -> OverflowInline.toString ov
-      | #Var.t as var -> Var.toString var
-      | #Cascading.t as c -> Cascading.toString c )
+      match x with #OverflowInline.t as ov -> OverflowInline.toString ov )
 
 let fontSynthesisWeight x =
   Rule.declaration
     ( {js|fontSynthesisWeight|js},
       match x with
-      | #FontSynthesisWeight.t as fsw -> FontSynthesisWeight.toString fsw
-      | #Var.t as var -> Var.toString var
-      | #Cascading.t as c -> Cascading.toString c )
+      | #FontSynthesisWeight.t as fsw -> FontSynthesisWeight.toString fsw )
 
 let fontSynthesisStyle x =
   Rule.declaration
     ( {js|fontSynthesisStyle|js},
       match x with
-      | #FontSynthesisStyle.t as fss -> FontSynthesisStyle.toString fss
-      | #Var.t as var -> Var.toString var
-      | #Cascading.t as c -> Cascading.toString c )
+      | #FontSynthesisStyle.t as fss -> FontSynthesisStyle.toString fss )
 
 let fontSynthesisSmallCaps x =
   Rule.declaration
     ( {js|fontSynthesisSmallCaps|js},
       match x with
       | #FontSynthesisSmallCaps.t as fssc ->
-        FontSynthesisSmallCaps.toString fssc
-      | #Var.t as var -> Var.toString var
-      | #Cascading.t as c -> Cascading.toString c )
+        FontSynthesisSmallCaps.toString fssc )
 
 let fontSynthesisPosition x =
   Rule.declaration
     ( {js|fontSynthesisWeight|js},
       match x with
-      | #FontSynthesisPosition.t as fsp -> FontSynthesisPosition.toString fsp
-      | #Var.t as var -> Var.toString var
-      | #Cascading.t as c -> Cascading.toString c )
+      | #FontSynthesisPosition.t as fsp -> FontSynthesisPosition.toString fsp )
 
 let fontKerning x =
   Rule.declaration
     ( {js|fontKerning|js},
-      match x with
-      | #FontKerning.t as fk -> FontKerning.toString fk
-      | #Var.t as var -> Var.toString var
-      | #Cascading.t as c -> Cascading.toString c )
+      match x with #FontKerning.t as fk -> FontKerning.toString fk )
 
 let fontVariantPosition x =
   Rule.declaration
     ( {js|fontVariantPosition|js},
       match x with
-      | #FontVariantPosition.t as fvp -> FontVariantPosition.toString fvp
-      | #Var.t as var -> Var.toString var
-      | #Cascading.t as c -> Cascading.toString c )
+      | #FontVariantPosition.t as fvp -> FontVariantPosition.toString fvp )
 
 let fontVariantCaps x =
   Rule.declaration
     ( {js|fontVariantCaps|js},
-      match x with
-      | #FontVariantCaps.t as fvc -> FontVariantCaps.toString fvc
-      | #Var.t as var -> Var.toString var
-      | #Cascading.t as c -> Cascading.toString c )
+      match x with #FontVariantCaps.t as fvc -> FontVariantCaps.toString fvc )
 
 let fontOpticalSizing x =
   Rule.declaration
     ( {js|fontOpticalSizing|js},
       match x with
-      | #FontOpticalSizing.t as fos -> FontOpticalSizing.toString fos
-      | #Var.t as var -> Var.toString var
-      | #Cascading.t as c -> Cascading.toString c )
+      | #FontOpticalSizing.t as fos -> FontOpticalSizing.toString fos )
 
 let fontVariantEmoji x =
   Rule.declaration
     ( {js|fontVariantEmoji|js},
-      match x with
-      | #FontVariantEmoji.t as fve -> FontVariantEmoji.toString fve
-      | #Var.t as var -> Var.toString var
-      | #Cascading.t as c -> Cascading.toString c )
+      match x with #FontVariantEmoji.t as fve -> FontVariantEmoji.toString fve
+    )

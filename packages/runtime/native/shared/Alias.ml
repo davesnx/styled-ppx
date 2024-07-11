@@ -1,3 +1,5 @@
+(* Alias is used to have a few utilities for users that are not aware of the underlying type *)
+
 open Css_types
 
 let initial : Cascading.t = `initial
@@ -242,3 +244,16 @@ let panUp = `panUp
 let panDown = `panDown
 let pinchZoom = `pinchZoom
 let manipulation = `manipulation
+
+module Shadow = struct
+  let box = Css_types.Shadow.box
+  let text = Css_types.Shadow.text
+end
+
+module Animation = struct
+  let shorthand = Css_types.Animation.shorthand
+end
+
+module Transition = struct
+  let shorthand = Css_types.Transition.shorthand
+end

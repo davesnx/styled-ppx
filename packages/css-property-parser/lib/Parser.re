@@ -166,7 +166,7 @@ and color_interpolation_method = [%value.rec
 ]
 and function_color_mix = [%value.rec
   // TODO: Use <extended-percentage>
-  "color-mix(<color-interpolation-method> ',' [ <color> && <percentage>? ]#{2})"
+  "color-mix(<color-interpolation-method> ',' [ <color> && <percentage>? ] ',' [ <color> && <percentage>? ])"
 ]
 and combinator = [%value.rec "'>' | '+' | '~' | '||'"]
 and common_lig_values = [%value.rec

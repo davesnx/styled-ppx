@@ -1090,72 +1090,38 @@ and render_function_color_mix = (~loc, value: Types.function_color_mix) => {
     | `Increasing => [%expr `increasing]
     | `Decreasing => [%expr `decreasing];
 
-  switch (value) {
-  | (x, (), colors: list((Types.color, option(Types.percentage)))) =>
-    let ((color_one, percentage_one), (color_two, percentage_two)) =
-      switch (colors) {
-      | [(c1, p1), (c2, p2)] => ((c1, p1), (c2, p2))
-      | _ => failwith("unreachable")
-      };
+  let (color_interpolation_method, (), color_x, (), color_y) = value;
 
-    /*
-     https://drafts.csswg.org/css-color-5/#color-mix-percent-norm
-
-      - If p1 + p2 ≠ 100%, then p1' = p1 / (p1 + p2) and p2' = p2 / (p1 + p2),
-          where p1' and p2' are the normalization results.
-      - If p1 = p2 = 0%, the function is invalid
-      - If both percentage, p1 and p2 are ommited, then p1 = p2 = 50%.
-      - If p1 is omitted, then p1 = 100% - p2.
-      - If p2 is omitted, then p2 = 100% - p1 */
-
-    let render_percentage = (p1, p2) => {
-      switch (p1, p2) {
-      | (Some(p1'), Some(p2')) when p1' == 0. && p2' == 0. =>
-        raise(Invalid_value("Both percentages can not be 0!"))
-      | (Some(p1'), Some(p2')) when p1' +. p2' != 100. =>
-        render_percentage(~loc, p1' /. (p1' +. p2'))
-      | (Some(p1'), Some(_p2')) => render_percentage(~loc, p1')
-      | (Some(p1'), None) => render_percentage(~loc, p1')
-      | (None, Some(p2')) => render_percentage(~loc, 100. -. p2')
-      | (None, None) => render_percentage(~loc, 50.)
-      };
-    };
-
-    let render_percentage_one =
-      render_percentage(percentage_one, percentage_two);
-    let render_percentage_two =
-      render_percentage(percentage_two, percentage_one);
-
-    let render_color_one = render_color(~loc, color_one);
-    let render_color_two = render_color(~loc, color_two);
-
-    switch (x) {
-    | ((), `Rectangular_color_space(x)) =>
-      [%expr
-       `colorMix((
-         `in1([%e render_rectangular_color_space(x)]),
-         ([%e render_color_one], [%e render_percentage_one]),
-         ([%e render_color_two], [%e render_percentage_two]),
-       ))]
-    | ((), `Static(pcs, None)) =>
-      [%expr
-       `colorMix((
-         `in1([%e render_polar_color_space(pcs)]),
-         ([%e render_color_one], [%e render_percentage_one]),
-         ([%e render_color_two], [%e render_percentage_two]),
-       ))]
+  let color_interpolation_method_expr =
+    switch (color_interpolation_method) {
+    | ((), `Rectangular_color_space(x)) => render_rectangular_color_space(x)
+    | ((), `Static(pcs, None)) => render_polar_color_space(pcs)
     | ((), `Static(pcs, Some((size, ())))) =>
       [%expr
-       `colorMix((
-         `in2((
-           [%e render_polar_color_space(pcs)],
-           [%e render_hue_size((), size)],
-         )),
-         ([%e render_color_one], [%e render_percentage_one]),
-         ([%e render_color_two], [%e render_percentage_two]),
+       `polar_with_hue((
+         [%e render_polar_color_space(pcs)],
+         [%e render_hue_size((), size)],
        ))]
     };
+
+  let render_color_with_percentage = (~loc, (color, percentage)) => {
+    switch (percentage) {
+    | Some(percentage) =>
+      [%expr
+       (
+         [%e render_color(~loc, color)],
+         Some([%e render_percentage(~loc, percentage)]),
+       )]
+    | None => [%expr ([%e render_color(~loc, color)], None)]
+    };
   };
+
+  [%expr
+   `colorMix((
+     [%e color_interpolation_method_expr],
+     [%e render_color_with_percentage(~loc, color_x)],
+     [%e render_color_with_percentage(~loc, color_y)],
+   ))];
 };
 
 let color =
@@ -4675,8 +4641,7 @@ let render_content_string = (~loc, str) => {
       switch (first, last) {
       | ('\'', '\'') => [%expr [%e render_string(~loc, str)]]
       | ('"', '"') => [%expr [%e render_string(~loc, str)]]
-      | _ =>
-        [%expr [%e render_string(~loc, str)]];
+      | _ => [%expr [%e render_string(~loc, str)]]
       };
     };
   [%expr `text([%e str])];

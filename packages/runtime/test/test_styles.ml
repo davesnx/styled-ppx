@@ -453,7 +453,7 @@ let multiple_pseudo =
        ".%s { padding: 0; } .%s::before { content: ' '; -webkit-transform: \
         translateX(-50%%); -moz-transform: translateX(-50%%); -ms-transform: \
         translateX(-50%%); transform: translateX(-50%%); } .%s::after { \
-        content: \" \"; -webkit-transform: translateX(-50%%); -moz-transform: \
+        content: ' '; -webkit-transform: translateX(-50%%); -moz-transform: \
         translateX(-50%%); -ms-transform: translateX(-50%%); transform: \
         translateX(-50%%); }"
        classname classname classname)
