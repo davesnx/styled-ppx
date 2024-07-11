@@ -330,6 +330,8 @@ module PropertyPosition = struct
     | `static
     | `fixed
     | `sticky
+    | Var.t
+    | Cascading.t
     ]
 
   let absolute = `absolute
@@ -345,6 +347,8 @@ module PropertyPosition = struct
     | `static -> {js|static|js}
     | `fixed -> {js|fixed|js}
     | `sticky -> {js|sticky|js}
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
 end
 
 module Isolation = struct
@@ -384,6 +388,8 @@ module Resize = struct
     | `vertical
     | `block
     | `inline
+    | Var.t
+    | Cascading.t
     ]
 
   let both = `both
@@ -400,6 +406,8 @@ module Resize = struct
     | `vertical -> {js|vertical|js}
     | `block -> {js|block|js}
     | `inline -> {js|inline|js}
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
 end
 
 module FontVariant = struct
@@ -580,10 +588,16 @@ module ScrollBehavior = struct
   type t =
     [ Auto.t
     | `smooth
+    | Var.t
+    | Cascading.t
     ]
 
   let toString x =
-    match x with #Auto.t -> Auto.toString | `smooth -> {js|smooth|js}
+    match x with
+    | #Auto.t -> Auto.toString
+    | `smooth -> {js|smooth|js}
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
 end
 
 module OverscrollBehavior = struct
@@ -591,13 +605,17 @@ module OverscrollBehavior = struct
     [ Auto.t
     | `contain
     | None.t
+    | Var.t
+    | Cascading.t
     ]
 
   let toString x =
     match x with
-    | #Auto.t -> Auto.toString
     | `contain -> {js|contain|js}
+    | #Auto.t -> Auto.toString
     | #None.t -> None.toString
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
 end
 
 module OverflowAnchor = struct
@@ -903,6 +921,9 @@ module Transform = struct
     | `skewX of Angle.t
     | `skewY of Angle.t
     | `perspective of int
+    | Var.t
+    | Cascading.t
+    | None.t
     ]
 
   let translate x y = `translate (x, y)
@@ -987,10 +1008,13 @@ module Transform = struct
     | `skewX a -> {js|skewX(|js} ^ Angle.toString a ^ {js|)|js}
     | `skewY a -> {js|skewY(|js} ^ Angle.toString a ^ {js|)|js}
     | `perspective x -> {js|perspective(|js} ^ Kloth.Int.to_string x ^ {js|)|js}
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
+    | #None.t -> None.toString
 end
 
 module AnimationName = struct
-  type t
+  type t = string
 end
 
 module AnimationDirection = struct
@@ -1515,6 +1539,8 @@ module BorderStyle = struct
     | `ridge
     | `inset
     | `outset
+    | Var.t
+    | Cascading.t
     ]
 
   let toString x =
@@ -1529,6 +1555,8 @@ module BorderStyle = struct
     | `ridge -> {js|ridge|js}
     | `inset -> {js|inset|js}
     | `outset -> {js|outset|js}
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
 end
 
 module PointerEvents = struct
@@ -1543,7 +1571,8 @@ module PointerEvents = struct
     | `fill
     | `stroke
     | `all
-    | `inherit_
+    | Var.t
+    | Cascading.t
     ]
 
   let toString x =
@@ -1558,7 +1587,8 @@ module PointerEvents = struct
     | `fill -> {js|fill|js}
     | `stroke -> {js|stroke|js}
     | `all -> {js|all|js}
-    | `inherit_ -> {js|inherit|js}
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
 end
 
 module Perspective = struct
@@ -1575,6 +1605,20 @@ module Perspective = struct
     | #Length.t as l -> Length.toString l
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
+end
+
+module PerspectiveOrigin = struct
+  type t =
+    [ Perspective.t
+    | TransformOrigin.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | #Perspective.t as p -> Perspective.toString p
+    | #TransformOrigin.t as t -> TransformOrigin.toString t
 end
 
 module LetterSpacing = struct
@@ -1630,9 +1674,20 @@ module LineWidth = struct
 end
 
 module WordSpacing = struct
-  type t = [ `normal ]
+  (* https://developer.mozilla.org/en-US/docs/Web/CSS/word-spacing *)
+  type t =
+    [ `normal
+    | Var.t
+    | Cascading.t
+    | Length.t
+    ]
 
-  let toString x = match x with `normal -> {js|normal|js}
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | #Length.t as l -> Length.toString l
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
 end
 
 module DisplayOld = struct
@@ -1783,10 +1838,16 @@ module TextEmphasisStyle = struct
     type t =
       [ `filled
       | `open_
+      | Var.t
+      | Cascading.t
       ]
 
     let toString x =
-      match x with `filled -> {js|filled|js} | `open_ -> {js|open|js}
+      match x with
+      | `filled -> {js|filled|js}
+      | `open_ -> {js|open|js}
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c
   end
 
   module Shape = struct
@@ -1796,6 +1857,8 @@ module TextEmphasisStyle = struct
       | `double_circle
       | `triangle
       | `sesame
+      | Var.t
+      | Cascading.t
       ]
 
     let toString x =
@@ -1805,6 +1868,8 @@ module TextEmphasisStyle = struct
       | `double_circle -> {js|double-circle|js}
       | `triangle -> {js|triangle|js}
       | `sesame -> {js|sesame|js}
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c
   end
 
   type t =
@@ -1836,20 +1901,32 @@ module TextEmphasisPosition = struct
     type t =
       [ `left
       | `right
+      | Var.t
+      | Cascading.t
       ]
 
     let toString x =
-      match x with `left -> {js|left|js} | `right -> {js|right|js}
+      match x with
+      | `left -> {js|left|js}
+      | `right -> {js|right|js}
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c
   end
 
   module OverOrUnder = struct
     type t =
       [ `over
       | `under
+      | Var.t
+      | Cascading.t
       ]
 
     let toString x =
-      match x with `over -> {js|over|js} | `under -> {js|under|js}
+      match x with
+      | `over -> {js|over|js}
+      | `under -> {js|under|js}
+      | #Var.t as va -> Var.toString va
+      | #Cascading.t as c -> Cascading.toString c
   end
 end
 
@@ -2003,6 +2080,8 @@ module TextAlign = struct
     | `justify
     | `matchParent
     | `justifyAll
+    | Var.t
+    | Cascading.t
     ]
 
   let toString x =
@@ -2015,6 +2094,8 @@ module TextAlign = struct
     | `justify -> {js|justify|js}
     | `matchParent -> {js|match-parent|js}
     | `justifyAll -> {js|justify-all|js}
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
 end
 
 module TextAlignAll = struct
@@ -2026,6 +2107,8 @@ module TextAlignAll = struct
     | `center
     | `justify
     | `matchParent
+    | Var.t
+    | Cascading.t
     ]
 
   let toString x =
@@ -2037,6 +2120,8 @@ module TextAlignAll = struct
     | `center -> {js|center|js}
     | `justify -> {js|justify|js}
     | `matchParent -> {js|match-parent|js}
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
 end
 
 module TextAlignLast = struct
@@ -2049,6 +2134,8 @@ module TextAlignLast = struct
     | `center
     | `justify
     | `matchParent
+    | Var.t
+    | Cascading.t
     ]
 
   let toString x =
@@ -2061,6 +2148,8 @@ module TextAlignLast = struct
     | `center -> {js|center|js}
     | `justify -> {js|justify|js}
     | `matchParent -> {js|match-parent|js}
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
 end
 
 module WordBreak = struct
@@ -2325,6 +2414,15 @@ module TableLayout = struct
     | `fixed -> {js|fixed|js}
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
+end
+
+module Border = struct
+  let toString px style color =
+    LineWidth.toString px
+    ^ {js| |js}
+    ^ BorderStyle.toString style
+    ^ {js| |js}
+    ^ Color.toString color
 end
 
 module BorderCollapse = struct
@@ -2794,6 +2892,8 @@ module TextDecorationSkipInk = struct
     [ Auto.t
     | None.t
     | `all
+    | Var.t
+    | Cascading.t
     ]
 
   let toString x =
@@ -2801,25 +2901,40 @@ module TextDecorationSkipInk = struct
     | #Auto.t -> Auto.toString
     | #None.t -> None.toString
     | `all -> {js|all|js}
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
 end
 
 module TextDecorationSkipBox = struct
   type t =
     [ None.t
     | `all
+    | Var.t
+    | Cascading.t
     ]
 
-  let toString x = match x with `none -> None.toString | `all -> {js|all|js}
+  let toString x =
+    match x with
+    | `none -> None.toString
+    | `all -> {js|all|js}
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
 end
 
 module TextDecorationSkipInset = struct
   type t =
     [ None.t
     | Auto.t
+    | Var.t
+    | Cascading.t
     ]
 
   let toString x =
-    match x with `none -> None.toString | #Auto.t -> Auto.toString
+    match x with
+    | `none -> None.toString
+    | #Auto.t -> Auto.toString
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
 end
 
 module TextDecoration = struct
@@ -3171,15 +3286,19 @@ module BackgroundSize = struct
     | Auto.t
     | `cover
     | `contain
+    | Var.t
+    | Cascading.t
     ]
 
   let toString x =
     match x with
-    | #None.t -> None.toString
     | `size (x, y) -> (Length.toString x ^ {js| |js}) ^ Length.toString y
-    | #Auto.t -> Auto.toString
     | `cover -> {js|cover|js}
     | `contain -> {js|contain|js}
+    | #None.t -> None.toString
+    | #Auto.t -> Auto.toString
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
 end
 
 module Image = struct
@@ -3209,6 +3328,19 @@ module BackgroundImage = struct
     | #Gradient.t as g -> Gradient.toString g
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
+end
+
+module Background = struct
+  (* https://developer.mozilla.org/en-US/docs/Web/CSS/background *)
+  type t =
+    [ BackgroundImage.t
+    | Color.t
+    ]
+
+  let toString x =
+    match x with
+    | #Color.t as c -> Color.toString c
+    | #BackgroundImage.t as u -> BackgroundImage.toString u
 end
 
 module BorderImageSource = struct
@@ -3261,6 +3393,8 @@ module GeometryBox = struct
     | `fillBox
     | `strokeBox
     | `viewBox
+    | Var.t
+    | Cascading.t
     ]
 
   let marginBox = `marginBox
@@ -3280,6 +3414,8 @@ module GeometryBox = struct
     | `fillBox -> {js|fill-box|js}
     | `strokeBox -> {js|stroke-box|js}
     | `viewBox -> {js|view-box|js}
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
 end
 
 module ClipPath = struct
@@ -3288,8 +3424,6 @@ module ClipPath = struct
     [ None.t
     | Url.t
     | GeometryBox.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -3297,8 +3431,6 @@ module ClipPath = struct
     | #None.t -> None.toString
     | #Url.t as u -> Url.toString u
     | #GeometryBox.t as gb -> GeometryBox.toString gb
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module BackfaceVisibility = struct
@@ -3354,6 +3486,8 @@ module TransformBox = struct
     | `fillBox
     | `strokeBox
     | `viewBox
+    | Var.t
+    | Cascading.t
     ]
 
   let toString x =
@@ -3363,6 +3497,8 @@ module TransformBox = struct
     | `fillBox -> {js|fill-box|js}
     | `strokeBox -> {js|stroke-box|js}
     | `viewBox -> {js|view-box|js}
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
 end
 
 module ListStyleImage = struct
