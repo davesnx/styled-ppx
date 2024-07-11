@@ -442,7 +442,7 @@ let multiple_pseudo =
 
            &::before,
            &::after {
-             content: "";
+             content: " ";
              transform: translateX(-50%);
            }
            |}]
@@ -450,10 +450,10 @@ let multiple_pseudo =
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s { padding: 0; } .%s::before { content: \"\"; -webkit-transform: \
+       ".%s { padding: 0; } .%s::before { content: ' '; -webkit-transform: \
         translateX(-50%%); -moz-transform: translateX(-50%%); -ms-transform: \
         translateX(-50%%); transform: translateX(-50%%); } .%s::after { \
-        content: \"\"; -webkit-transform: translateX(-50%%); -moz-transform: \
+        content: \" \"; -webkit-transform: translateX(-50%%); -moz-transform: \
         translateX(-50%%); -ms-transform: translateX(-50%%); transform: \
         translateX(-50%%); }"
        classname classname classname)

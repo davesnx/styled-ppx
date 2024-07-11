@@ -1,3 +1,7 @@
+(* TODO: Remove all modules, keep type cascading = ..., and cascading_to_string *)
+(* TODO: Inline all toString functions on each module *)
+(* TODO: Move all "alias" to Alias module or after the 2nd todo, move all aliases here *)
+
 module Cascading = struct
   type t =
     [ `initial
@@ -416,7 +420,7 @@ module FlexBasis = struct
     ]
 
   let fill = `fill
-  let content = `content
+  let content_ = `content
   let maxContent = `maxContent
   let minContent = `minContent
   let fitContent = `fitContent
@@ -521,12 +525,6 @@ module OverflowAnchor = struct
 end
 
 module ColumnWidth = struct
-  type t = [ `auto ]
-
-  let toString x = match x with `auto -> {js|auto|js}
-end
-
-module CaretColor = struct
   type t = [ `auto ]
 
   let toString x = match x with `auto -> {js|auto|js}
@@ -1178,6 +1176,8 @@ module Color = struct
     | `hex of string
     | `transparent
     | `currentColor
+    | Var.t
+    | Cascading.t
     ]
 
   let rgb r g b = `rgb (r, g, b)
@@ -1261,12 +1261,24 @@ module Color = struct
       ^ {js|, |js}
       ^ string_of_color x y
       ^ {js|)|js}
+    | #Var.t as v -> Var.toString v
+    | #Cascading.t as c -> Cascading.toString c
 
   and string_of_color x y =
     string_of_actual_color x ^ {js|, |js} ^ string_of_actual_color y
 
   and string_of_actual_color = function
     | color, percent -> toString color ^ {js| |js} ^ Percentage.toString percent
+end
+
+module CaretColor = struct
+  type t =
+    [ `auto
+    | Color.t
+    ]
+
+  let toString x =
+    match x with `auto -> {js|auto|js} | #Color.t as c -> Color.toString c
 end
 
 module BorderStyle = struct
@@ -2103,9 +2115,7 @@ module Filter = struct
       ^ {js| |js}
       ^ Length.toString c
       ^ {js| |js}
-      ^ (match (d : [ Color.t | Var.t ]) with
-        | #Color.t as c -> Color.toString c
-        | #Var.t as v -> Var.toString v)
+      ^ Color.toString d
       ^ {js|)|js}
     | `grayscale v -> {js|grayscale(|js} ^ string_of_amount v ^ {js|%)|js}
     | `hueRotate v -> {js|hue-rotate(|js} ^ Angle.toString v ^ {js|)|js}
@@ -2458,11 +2468,6 @@ module Gradient = struct
 
   let conicGradient angle stops = `conicGradient (Some angle, stops)
 
-  let string_of_color x =
-    match x with
-    | #Color.t as co -> Color.toString co
-    | #Var.t as va -> Var.toString va
-
   let string_of_stops stops =
     Kloth.Array.map_and_join ~sep:{js|, |js}
       ~f:(fun (c, l) ->
@@ -2470,8 +2475,8 @@ module Gradient = struct
         (* This is the consequence of having wrong spec, we can generate broken CSS for gradients, very unlickely that manually you construct a gradient with (None, None), but still. *)
         | None, None -> {| |}
         | None, Some l -> Length.toString l
-        | Some c, None -> string_of_color c
-        | Some c, Some l -> string_of_color c ^ {js| |js} ^ Length.toString l)
+        | Some c, None -> Color.toString c
+        | Some c, Some l -> Color.toString c ^ {js| |js} ^ Length.toString l)
       stops
 
   let direction_to_string = function
@@ -2577,6 +2582,18 @@ module MaskImage = struct
   type t = [ `none ]
 
   let toString x = match x with `none -> {js|none|js}
+end
+
+module Image = struct
+  type t =
+    [ Url.t
+    | Gradient.t
+    ]
+
+  let toString x =
+    match x with
+    | #Url.t as u -> Url.toString u
+    | #Gradient.t as g -> Gradient.toString g
 end
 
 module ImageRendering = struct
@@ -2844,20 +2861,26 @@ module Content = struct
     | `noCloseQuote
     | `attr of string
     | `text of string
+    | Counter.t
+    | Counters.t
+    | Var.t
+    | Cascading.t
     ]
 
   let text_to_string value =
     if Kloth.String.length value = 0 then {js|''|js} (* value = "" -> '' *)
+    else if Kloth.String.length value = 1 && Kloth.String.get value 0 = '"' then
+      {js|'"'|js}
+    else if Kloth.String.length value = 1 && Kloth.String.get value 0 = '\''
+    then {js|"'"|js}
     else if
       Kloth.String.length value = 2
       && Kloth.String.get value 0 = '"'
       && Kloth.String.get value 1 = '"'
     then {js|''|js}
     else (
-      match Kloth.String.get value 0, Kloth.String.length value with
-      | '\'', 1 -> {js|"'"|js}
-      | '"', 1 -> {js|'"'|js}
-      | '\'', _ | '"', _ -> value
+      match Kloth.String.get value 0 with
+      | '\'' | '"' -> value
       | _ -> {js|"|js} ^ value ^ {js|"|js})
 
   let toString x =
@@ -2870,6 +2893,11 @@ module Content = struct
     | `noCloseQuote -> {js|no-close-quote|js}
     | `attr name -> ({js|attr(|js} ^ name) ^ {js|)|js}
     | `text v -> text_to_string v
+    | #Image.t as c -> Image.toString c
+    | #Counter.t as c -> Counter.toString c
+    | #Counters.t as c -> Counters.toString c
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
 end
 
 module SVG = struct
@@ -2878,6 +2906,8 @@ module SVG = struct
       [ `none
       | `contextFill
       | `contextStroke
+      | Color.t
+      | Url.t
       ]
 
     let contextFill = `contextFill
@@ -2888,6 +2918,8 @@ module SVG = struct
       | `none -> {js|none|js}
       | `contextFill -> {js|context-fill|js}
       | `contextStroke -> {js|context-stroke|js}
+      | #Color.t as c -> Color.toString c
+      | #Url.t as u -> Url.toString u
   end
 end
 
@@ -3117,3 +3149,20 @@ module FontVariantEmoji = struct
     | `emoji -> {js|emoji|js}
     | `unicode -> {js|unicode|js}
 end
+
+type animationName = AnimationName.t
+type angle = Angle.t
+type animationDirection = AnimationDirection.t
+type animationFillMode = AnimationFillMode.t
+type animationIterationCount = AnimationIterationCount.t
+type animationPlayState = AnimationPlayState.t
+type cascading = Cascading.t
+type color = Color.t
+type fontStyle = FontStyle.t
+type fontWeight = FontWeight.t
+type length = Length.t
+type listStyleType = ListStyleType.t
+type repeatValue = RepeatValue.t
+type outlineStyle = OutlineStyle.t
+type transform = Transform.t
+type gradient = Gradient.t

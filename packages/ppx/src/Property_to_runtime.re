@@ -2935,11 +2935,11 @@ let transform =
 
 let render_origin = (~loc) =>
   fun
-  | `Center => variant_to_expression(~loc, `Center)
-  | `Left => variant_to_expression(~loc, `Left)
-  | `Right => variant_to_expression(~loc, `Right)
-  | `Bottom => variant_to_expression(~loc, `Bottom)
-  | `Top => variant_to_expression(~loc, `Top)
+  | `Center as x
+  | `Left as x
+  | `Right as x
+  | `Top as x
+  | `Bottom as x => variant_to_expression(~loc, x)
   | `Function_calc(fc) => render_function_calc(~loc, fc)
   | `Interpolation(v) => render_variable(~loc, v)
   | `Length(l) => render_length(~loc, l)
@@ -4647,7 +4647,91 @@ let contain = unsupportedProperty(Property_parser.property_contain);
 let content_visibility =
   unsupportedProperty(Property_parser.property_content_visibility);
 
-let content = unsupportedProperty(Property_parser.property_content);
+let render_quote = (~loc, quote: Types.quote) => {
+  switch (quote) {
+  | `Close_quote => [%expr `closeQuote]
+  | `No_close_quote => [%expr `noCloseQuote]
+  | `No_open_quote => [%expr `noOpenQuote]
+  | `Open_quote => [%expr `openQuote]
+  };
+};
+
+let render_content_string = (~loc, str) => {
+  let length = String.length(str);
+  let str =
+    if (length == 0) {
+      [%expr {js|''|js}];
+    } else if (length == 1 && str.[0] == '"') {
+      [%expr {js|'"'|js}];
+    } else if (length == 1 && str.[0] == ' ') {
+      [%expr {js|' '|js}];
+    } else if (length == 1 && str.[0] == '\'') {
+      [%expr {js|"'"|js}];
+    } else if (length == 2 && str.[0] == '"' && str.[1] == '"') {
+      [%expr {js|""|js}];
+    } else {
+      let first = str.[0];
+      let last = str.[length - 1];
+      switch (first, last) {
+      | ('\'', '\'') => [%expr [%e render_string(~loc, str)]]
+      | ('"', '"') => [%expr [%e render_string(~loc, str)]]
+      | _ =>
+        [%expr [%e render_string(~loc, str)]];
+      };
+    };
+  [%expr `text([%e str])];
+};
+
+let render_content_list = (~loc, content_list: Types.content_list) => {
+  content_list
+  |> List.map(content_item =>
+       switch (content_item) {
+       | `Contents => [%expr `contents]
+       | `Quote(quote) => render_quote(~loc, quote)
+       | `String(str) => render_content_string(~loc, str)
+       | `Url(u) => render_url(~loc, u)
+       | `Counter(_label, _, _style) => raise(Unsupported_feature)
+       | `Function_attr(_attr) => raise(Unsupported_feature)
+       }
+     )
+  |> Builder.pexp_array(~loc);
+};
+
+let content =
+  polymorphic(Property_parser.property_content, (~loc, value) => {
+    switch (value) {
+    | `Normal => [[%expr CSS.contentRule(`normal)]]
+    | `None => [[%expr CSS.contentRule(`none)]]
+    | `String(str) => [
+        [%expr CSS.contentRule([%e render_content_string(~loc, str)])],
+      ]
+    | `Interpolation(v) => [
+        [%expr CSS.contentRule([%e render_variable(~loc, v)])],
+      ]
+    | `Static(`Content_list(lst), None) => [
+        [%expr CSS.contentsRule([%e render_content_list(~loc, lst)], None)],
+      ]
+    | `Static(`Content_list(lst), Some((_, alt))) => [
+        [%expr
+          CSS.contentsRule(
+            [%e render_content_list(~loc, lst)],
+            Some([%e render_string(~loc, alt)]),
+          )
+        ],
+      ]
+    | `Static(`Content_replacement(image), None) => [
+        [%expr CSS.contentRule([%e render_image(~loc, image)])],
+      ]
+    | `Static(`Content_replacement(image), Some((_, alt))) => [
+        [%expr
+          CSS.contentsRule(
+            [|`url([%e render_image(~loc, image)])|],
+            Some([%e render_string(~loc, alt)]),
+          )
+        ],
+      ]
+    }
+  });
 
 let empty_cells = unsupportedProperty(Property_parser.property_empty_cells);
 
@@ -4985,6 +5069,7 @@ let properties = [
   ("clip-path", found(clip_path)),
   ("clip-rule", found(clip_rule)),
   ("clip", found(clip)),
+  ("content", found(content)),
   ("color-adjust", found(color_adjust)),
   ("color-interpolation-filters", found(color_interpolation_filters)),
   ("color-interpolation", found(color_interpolation)),

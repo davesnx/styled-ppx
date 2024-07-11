@@ -1027,7 +1027,7 @@ and property_contain = [%value.rec
   "'none' | 'strict' | 'content' | 'size' || 'layout' || 'style' || 'paint'"
 ]
 and property_content = [%value.rec
-  "'normal' | 'none' | [ <content-replacement> | <content-list> ] [ '/' <string> ]?"
+  "'normal' | 'none' | <string> | <interpolation> | [ <content-replacement> | <content-list> ] [ '/' <string> ]?"
 ]
 and property_content_visibility = [%value.rec "'visible' | 'hidden' | 'auto'"]
 and property_counter_increment = [%value.rec
