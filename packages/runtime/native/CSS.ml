@@ -434,14 +434,14 @@ let global (styles : Rule.t array) =
     let hash = Murmur2.default (rules_to_string styles) in
     Stylesheet.push instance (hash, Globals styles)
 
-let keyframes (keyframes : (int * Rule.t array) array) =
+let keyframes (keyframes : (int * Rule.t array) array) : Types.animationName =
   match keyframes with
-  | [||] -> ""
+  | [||] -> Types.AnimationName.make ""
   | _ ->
     let hash = Murmur2.default (keyframes_to_string keyframes) in
     let animationName = Printf.sprintf "%s-%s" "animation" hash in
     Stylesheet.push instance (hash, Keyframes { animationName; keyframes });
-    animationName
+    Types.AnimationName.make animationName
 
 let get_stylesheet () =
   Stylesheet.get_all instance

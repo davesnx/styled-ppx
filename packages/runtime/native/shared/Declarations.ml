@@ -853,19 +853,20 @@ let transitionTimingFunction x =
 let transitionProperty x = Rule.declaration ({js|transitionProperty|js}, x)
 
 let animation ?duration ?delay ?direction ?timingFunction ?fillMode ?playState
-  ?iterationCount name =
+  ?iterationCount ~name () =
   Rule.declaration
     ( {js|animation|js},
       Animation.toString
       @@ Animation.make ?duration ?delay ?direction ?timingFunction ?fillMode
-           ?playState ?iterationCount name )
+           ?playState ?iterationCount ~name () )
 
 let animations x =
   Rule.declaration
     ( {js|animation|js},
       Kloth.Array.map_and_join ~sep:{js|, |js} ~f:Animation.toString x )
 
-let animationName x = Rule.declaration ({js|animationName|js}, x)
+let animationName (x : AnimationName.t) =
+  Rule.declaration ({js|animationName|js}, AnimationName.toString x)
 
 module SVG = struct
   let fill x = Rule.declaration ({js|fill|js}, SVG.Fill.toString x)

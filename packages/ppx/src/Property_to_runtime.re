@@ -3337,7 +3337,8 @@ let render_single_animation =
      ~iterationCount=?[%e
        render_option(~loc, render_animation_iteration_count, iterationCount)
      ],
-     [%e render_animation_name(~loc, Option.value(name, ~default=`None))],
+     ~name=[%e render_animation_name(~loc, Option.value(name, ~default=`None))],
+     ()
    )];
 };
 

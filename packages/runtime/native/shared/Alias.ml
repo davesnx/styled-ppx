@@ -246,6 +246,8 @@ let pinchZoom = `pinchZoom
 let manipulation = `manipulation
 
 module Shadow = struct
+  type 'a t = 'a Css_types.Shadow.t
+
   let box = Css_types.Shadow.box
   let text = Css_types.Shadow.text
 end

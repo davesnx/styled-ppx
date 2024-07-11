@@ -44,7 +44,9 @@ let framesToDict frames =
       dict)
     frames
 
-let keyframes frames = makeKeyframes (framesToDict frames)
+let keyframes frames =
+  makeKeyframes (framesToDict frames) |> Css_types.AnimationName.make
+
 let renderKeyframes _renderer frames = makeAnimation (framesToDict frames)
 
 (* This method is a Css_type function, but with side-effects. It pushes the fontFace as global style *)

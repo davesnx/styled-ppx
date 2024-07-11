@@ -1013,8 +1013,16 @@ module Transform = struct
     | #None.t -> None.toString
 end
 
-module AnimationName = struct
+module AnimationName : sig
+  type t
+
+  val make : string -> t
+  val toString : t -> string
+end = struct
   type t = string
+
+  let make x = x
+  let toString x = x
 end
 
 module AnimationDirection = struct
@@ -1124,7 +1132,7 @@ module Animation = struct
     fillMode : AnimationFillMode.t;
     playState : AnimationPlayState.t;
     iterationCount : AnimationIterationCount.t;
-    name : string;
+    name : AnimationName.t;
   }
 
   type t =
@@ -1136,7 +1144,7 @@ module Animation = struct
 
   let make ?(duration = `ms 0) ?(delay = `ms 0) ?(direction = `normal)
     ?(timingFunction = `ease) ?(fillMode = `none) ?(playState = `running)
-    ?(iterationCount = `count 1.) name =
+    ?(iterationCount = `count 1.) ~name () =
     `value
       {
         duration;
@@ -1146,13 +1154,13 @@ module Animation = struct
         fillMode;
         playState;
         iterationCount;
-        name;
+        name = AnimationName.make name;
       }
 
   let toString x =
     match x with
     | `value v ->
-      v.name
+      AnimationName.toString v.name
       ^ {js| |js}
       ^ Time.toString v.duration
       ^ {js| |js}
@@ -1167,8 +1175,6 @@ module Animation = struct
       ^ AnimationFillMode.toString v.fillMode
       ^ {js| |js}
       ^ AnimationPlayState.toString v.playState
-      ^ {js| |js}
-      ^ v.name
     | #None.t -> None.toString
     | #Var.t as var -> Var.toString var
     | #Cascading.t as c -> Cascading.toString c
