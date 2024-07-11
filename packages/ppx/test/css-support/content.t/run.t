@@ -35,7 +35,7 @@ If this test fail means that the module is not in sync with the ppx
   ];
   CSS.unsafe({js|quotes|js}, {js|auto|js});
   CSS.contentsRule([|`text({js|►|js})|], Some({js||js}));
-  CSS.contentsRule([|`text({js||js})|], None);
+  CSS.contentsRule([|`text({js|''|js})|], None);
   CSS.unsafe({js|content|js}, {js|unset|js});
   CSS.contentRule(`normal);
   CSS.contentRule(`none);
@@ -79,3 +79,13 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|content|js}, {js|revert|js});
   CSS.unsafe({js|content|js}, {js|revert-layer|js});
   CSS.unsafe({js|content|js}, {js|unset|js});
+  CSS.contentsRule([|`text({js|点|js})|], None);
+  CSS.contentsRule([|`text({js|点|js})|], None);
+  CSS.contentsRule([|`text({js|点|js})|], None);
+  CSS.contentsRule([|`text({js|lola|js})|], None);
+  CSS.contentsRule([|`text({js|''|js})|], None);
+  CSS.contentsRule([|`text({js|' '|js})|], None);
+  CSS.contentsRule([|`text({js|' '|js})|], None);
+  CSS.contentsRule([|`text({js|''|js})|], None);
+  CSS.contentsRule([|`text({js|"'"|js})|], None);
+  CSS.contentsRule([|`text({js|'"'|js})|], None);

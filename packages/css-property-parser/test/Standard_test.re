@@ -90,16 +90,12 @@ let tests = [
     let pp_length = (ppf, x) => Fmt.pf(ppf, "%S", render_length(x));
     let length = Alcotest.testable(pp_length, (==));
     let to_check = Alcotest.result(length, Alcotest.string);
-    check(__POS__, to_check, parse("56cm"), Ok(`Cm(56.)));
-    check(__POS__, to_check, parse("57px"), Ok(`Px(57.)));
-    check(
-      __POS__,
-      to_check,
-      parse("59invalid"),
-      Error("unknown dimension"),
-    );
-    check(__POS__, to_check, parse("0"), Ok(`Zero));
-    check(__POS__, to_check, parse("60"), Error("expected length"));
+    let expect = check(__POS__, to_check);
+    expect(parse("56cm"), Ok(`Cm(56.)));
+    expect(parse("57px"), Ok(`Px(57.)));
+    expect(parse("59invalid"), Error("unknown dimension"));
+    expect(parse("0"), Ok(`Zero));
+    expect(parse("60"), Error("expected length"));
   }),
   test("<angle>", () => {
     let parse = parse([%value "<angle>"]);
@@ -307,13 +303,9 @@ let tests = [
   test("<ident>", () => {
     let parse = parse([%value "<ident>"]);
     let to_check = Alcotest.result(Alcotest.string, Alcotest.string);
-    check(__POS__, to_check, parse("test"), Ok("test"));
-    check(
-      __POS__,
-      to_check,
-      parse("'ohno'"),
-      Error("expected an indentifier"),
-    );
+    let expect = check(__POS__, to_check);
+    expect(parse("test"), Ok("test"));
+    expect(parse("'ohno'"), Error("expected an indentifier"));
   }),
   test("<css-wide-keywords>", () => {
     let parse = parse([%value "<css-wide-keywords>"]);
@@ -370,34 +362,34 @@ let tests = [
   test("<string>", () => {
     let parse = parse([%value "<string>"]);
     let to_check = Alcotest.result(Alcotest.string, Alcotest.string);
-    check(__POS__, to_check, parse("'tuturu'"), Ok("tuturu"));
-    check(__POS__, to_check, parse("'67.8'"), Ok("67.8"));
-    check(__POS__, to_check, parse("ident"), Error("expected a string"));
-    check(__POS__, to_check, parse("68.9"), Error("expected a string"));
+    let expect = check(__POS__, to_check);
+    expect(parse({|'tuturu'|}), Ok("tuturu"));
+    expect(parse({|'67.8'|}), Ok("67.8"));
+    expect(parse({|ident|}), Error("expected a string"));
+    expect(parse({|68.9|}), Error("expected a string"));
+    expect(parse({|"this is a 'string'."|}), Ok("this is a 'string'."));
+    expect(parse({|""|}), Ok(""));
+    expect(parse({|''|}), Ok(""));
+    expect(parse({|" "|}), Ok(" "));
+    expect(parse({|'"'|}), Ok("\""));
+    expect(parse({|' '|}), Ok(" "));
+    expect(parse({|"this is a \"string\"."|}), Ok("this is a \"string\"."));
+    expect(parse({|'this is a "string".'|}), Ok("this is a \"string\"."));
+    expect(parse({|'this is a \'string\'.'|}), Ok("this is a \'string\'."));
   }),
   test("<dashed-ident>", () => {
     let parse = parse([%value "<dashed-ident>"]);
     let to_check = Alcotest.result(Alcotest.string, Alcotest.string);
-    check(__POS__, to_check, parse("--random"), Ok("--random"));
-    check(
-      __POS__,
-      to_check,
-      parse("random'"),
-      Error("expected a --variable"),
-    );
+    let expect = check(__POS__, to_check);
+    expect(parse("--random"), Ok("--random"));
+    expect(parse("random'"), Error("expected a --variable"));
   }),
   test("<url>", () => {
     let parse = parse([%value "<url>"]);
     let to_check = Alcotest.result(Alcotest.string, Alcotest.string);
-    check(
-      __POS__,
-      to_check,
-      parse("url(https://google.com)"),
-      Ok("https://google.com"),
-    );
-    check(
-      __POS__,
-      to_check,
+    let expect = check(__POS__, to_check);
+    expect(parse("url(https://google.com)"), Ok("https://google.com"));
+    expect(
       parse("url(\"https://duckduckgo.com\")"),
       Ok("https://duckduckgo.com"),
     );
@@ -406,14 +398,10 @@ let tests = [
   test("<hex-color>", () => {
     let parse = parse([%value "<hex-color>"]);
     let to_check = Alcotest.result(Alcotest.string, Alcotest.string);
-    check(__POS__, to_check, parse("#abc"), Ok("abc"));
-    check(__POS__, to_check, parse("#abcdefgh"), Ok("abcdefgh"));
-    check(
-      __POS__,
-      to_check,
-      parse("#abcdefghi"),
-      Error("expected a hex-color"),
-    );
+    let expect = check(__POS__, to_check);
+    expect(parse("#abc"), Ok("abc"));
+    expect(parse("#abcdefgh"), Ok("abcdefgh"));
+    expect(parse("#abcdefghi"), Error("expected a hex-color"));
   }),
   test("<linenames>", () => {
     let parse = parse([%value "<line_names>"]);
@@ -426,14 +414,10 @@ let tests = [
         ),
         Alcotest.string,
       );
-    check(__POS__, to_check, parse("[abc]"), Ok(((), ["abc"], ())));
-    check(__POS__, to_check, parse("[a b]"), Ok(((), ["a", "b"], ())));
-    check(
-      __POS__,
-      to_check,
-      parse("[a b c]"),
-      Ok(((), ["a", "b", "c"], ())),
-    );
+    let expect = check(__POS__, to_check);
+    expect(parse("[abc]"), Ok(((), ["abc"], ())));
+    expect(parse("[a b]"), Ok(((), ["a", "b"], ())));
+    expect(parse("[a b c]"), Ok(((), ["a", "b", "c"], ())));
   }),
   test("chars", () => {
     let parse = parse([%value "<string>? ',' <string>"]);
@@ -446,12 +430,8 @@ let tests = [
         ),
         Alcotest.string,
       );
-    check(
-      __POS__,
-      to_check,
-      parse("'lola' , 'flores'"),
-      Ok((Some("lola"), (), "flores")),
-    );
+    let expect = check(__POS__, to_check);
+    expect(parse("'lola' , 'flores'"), Ok((Some("lola"), (), "flores")));
   }),
   test("custom-ident vs all", () => {
     let parse = parse([%value "<custom-ident> | 'all'"]);
@@ -464,29 +444,19 @@ let tests = [
     let pp_output = (ppf, x) => Fmt.pf(ppf, "%S", render_output(x));
     let output = Alcotest.testable(pp_output, (==));
     let to_check = Alcotest.result(output, Alcotest.string);
-    check(__POS__, to_check, parse("all"), Ok(`All));
-    check(__POS__, to_check, parse("moar"), Ok(`Custom_ident("moar")));
+    let expect = check(__POS__, to_check);
+    expect(parse("all"), Ok(`All));
+    expect(parse("moar"), Ok(`Custom_ident("moar")));
   }),
   test("interpolation", () => {
     let parse = parse([%value "<interpolation>"]);
     let to_check =
       Alcotest.result(Alcotest.list(Alcotest.string), Alcotest.string);
-    check(
-      __POS__,
-      to_check,
-      parse("$(Module.value)"),
-      Ok(["Module", "value"]),
-    );
-    check(
-      __POS__,
-      to_check,
-      parse("$(Module'.value')"),
-      Ok(["Module'", "value'"]),
-    );
+    let expect = check(__POS__, to_check);
+    expect(parse("$(Module.value)"), Ok(["Module", "value"]));
+    expect(parse("$(Module'.value')"), Ok(["Module'", "value'"]));
     /* TODO: Add error message into interpolation */
-    check(
-      __POS__,
-      to_check,
+    expect(
       parse("asd"),
       Error("Expected 'delimiter $' but instead got ident asd"),
     );

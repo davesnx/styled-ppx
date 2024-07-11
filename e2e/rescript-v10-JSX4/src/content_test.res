@@ -23,11 +23,13 @@ describe("content as string", () => {
 })
 
 let testData = list{
-  (%css("content: ''"), CSS.contentRule(#text("''"))),
-  (%css("content: '\"'"), CSS.contentRule(#text(`'"'`))),
-  (%css(`content: '\"'`), CSS.contentRule(#text("'\"'"))),
-  (%css("content: ' '"), CSS.contentRule(#text("' '"))),
-  (%css("content: 'single'"), CSS.contentRule(#text("'single'"))),
+  (%css(`content: ''`), CSS.contentRule(#text("''"))),
+  (%css(`content: ""`), CSS.contentRule(#text("''"))),
+  (%css(`content: ' '`), CSS.contentRule(#text("' '"))),
+  (%css(`content: " "`), CSS.contentRule(#text("' '"))),
+  (%css(`content: '"'`), CSS.contentRule(#text("\""))),
+  (%css(`content: "'"`), CSS.contentRule(#text("'"))),
+  (%css(`content: 'xxx'`), CSS.contentRule(#text(`xxx`))),
   (%css(`font-family: "Lola"`), CSS.fontFamily("Lola")),
   (%css(`font-family: "Lola del rio"`), CSS.fontFamily("Lola del rio")),
 }

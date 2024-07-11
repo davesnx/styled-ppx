@@ -2935,11 +2935,11 @@ let transform =
 
 let render_origin = (~loc) =>
   fun
-  | `Center => variant_to_expression(~loc, `Center)
-  | `Left => variant_to_expression(~loc, `Left)
-  | `Right => variant_to_expression(~loc, `Right)
-  | `Bottom => variant_to_expression(~loc, `Bottom)
-  | `Top => variant_to_expression(~loc, `Top)
+  | `Center as x
+  | `Left as x
+  | `Right as x
+  | `Top as x
+  | `Bottom as x => variant_to_expression(~loc, x)
   | `Function_calc(fc) => render_function_calc(~loc, fc)
   | `Interpolation(v) => render_variable(~loc, v)
   | `Length(l) => render_length(~loc, l)
@@ -4656,11 +4656,31 @@ let render_quote = (~loc, quote: Types.quote) => {
   };
 };
 
-/* let render_counter = (~loc, label, style) => {
-  let labelExpr = render_string(~loc, label);
-  let styleExpr = render_string(~loc, style);
-  [%expr `counter(([%e labelExpr], [%e styleExpr]))];
-}; */
+let render_content_string = (~loc, str) => {
+  let length = String.length(str);
+  let str =
+    if (length == 0) {
+      [%expr {js|''|js}];
+    } else if (length == 1 && str.[0] == '"') {
+      [%expr {js|'"'|js}];
+    } else if (length == 1 && str.[0] == ' ') {
+      [%expr {js|' '|js}];
+    } else if (length == 1 && str.[0] == '\'') {
+      [%expr {js|"'"|js}];
+    } else if (length == 2 && str.[0] == '"' && str.[1] == '"') {
+      [%expr {js|""|js}];
+    } else {
+      let first = str.[0];
+      let last = str.[length - 1];
+      switch (first, last) {
+      | ('\'', '\'') => [%expr [%e render_string(~loc, str)]]
+      | ('"', '"') => [%expr [%e render_string(~loc, str)]]
+      | _ =>
+        [%expr [%e render_string(~loc, str)]];
+      };
+    };
+  [%expr `text([%e str])];
+};
 
 let render_content_list = (~loc, content_list: Types.content_list) => {
   content_list
@@ -4668,7 +4688,7 @@ let render_content_list = (~loc, content_list: Types.content_list) => {
        switch (content_item) {
        | `Contents => [%expr `contents]
        | `Quote(quote) => render_quote(~loc, quote)
-       | `String(str) => [%expr `text([%e render_string(~loc, str)])]
+       | `String(str) => render_content_string(~loc, str)
        | `Url(u) => render_url(~loc, u)
        | `Counter(_label, _, _style) => raise(Unsupported_feature)
        | `Function_attr(_attr) => raise(Unsupported_feature)
@@ -4683,7 +4703,7 @@ let content =
     | `Normal => [[%expr CSS.contentRule(`normal)]]
     | `None => [[%expr CSS.contentRule(`none)]]
     | `String(str) => [
-        [%expr CSS.contentRule(`text([%e render_string(~loc, str)]))],
+        [%expr CSS.contentRule([%e render_content_string(~loc, str)])],
       ]
     | `Interpolation(v) => [
         [%expr CSS.contentRule([%e render_variable(~loc, v)])],

@@ -49,3 +49,15 @@
 [%css {|content: revert;|}];
 [%css {|content: revert-layer;|}];
 [%css {|content: unset;|}];
+
+[%css "content: '点';"];
+[%css {|content: '点';|}];
+[%css {|content: "点";|}];
+[%css {|content: "lola";|}];
+[%css {|content: 'lola';|}];
+[%css {|content: "";|}];
+[%css {|content: " ";|}];
+[%css {|content: ' ';|}];
+[%css {|content: '';|}];
+[%css {|content: "'";|}];
+[%css {|content: '"';|}];
