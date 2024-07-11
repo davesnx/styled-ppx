@@ -418,11 +418,7 @@ let properties_static_css_tests = [
     [%expr [%css "background-color: color-mix(in srgb, white, red)"]],
     [%expr
       CSS.backgroundColor(
-        `colorMix((
-          `srgb,
-          (CSS.white, None),
-          (CSS.red, None),
-        )),
+        `colorMix((`srgb, (CSS.white, None), (CSS.red, None))),
       )
     ],
   ),

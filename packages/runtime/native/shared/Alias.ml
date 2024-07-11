@@ -251,9 +251,11 @@ module Shadow = struct
 end
 
 module Animation = struct
-  let shorthand = Css_types.Animation.shorthand
+  (* backwards compatibility *)
+  let shorthand = Css_types.Animation.make
 end
 
 module Transition = struct
-  let shorthand = Css_types.Transition.shorthand
+  (* backwards compatibility *)
+  let shorthand = Css_types.Transition.make
 end

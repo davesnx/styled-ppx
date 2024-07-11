@@ -1,4 +1,4 @@
-include Properties
+include Declarations
 include Colors
 include Alias
 include Rule
