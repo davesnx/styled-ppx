@@ -342,7 +342,6 @@ and render_selectors hash rule =
     Some (Printf.sprintf "%s { %s }" selector nested_selectors)
   | Rule.Selector (selector, rules) ->
     let new_selector = resolve_ampersand hash selector in
-    print_endline @@ Printf.sprintf "inside %s" new_selector;
     (* Resolving the ampersand means to replace all ampersands by the hash *)
     Some (Printf.sprintf "%s { %s }" new_selector (render_declarations rules))
   (* Declarations aren't there *)
