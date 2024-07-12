@@ -393,9 +393,9 @@ let properties_static_css_tests = [
     [%expr
       CSS.backgroundColor(
         `colorMix((
-          `in1(`srgb),
-          (CSS.white, `percent(10.)),
-          (CSS.red, `percent(90.)),
+          `srgb,
+          (CSS.white, Some(`percent(10.))),
+          (CSS.red, None),
         )),
       )
     ],
@@ -406,9 +406,9 @@ let properties_static_css_tests = [
     [%expr
       CSS.backgroundColor(
         `colorMix((
-          `in1(`srgb),
-          (CSS.white, `percent(0.5)),
-          (CSS.red, `percent(0.5)),
+          `srgb,
+          (CSS.white, Some(`percent(10.))),
+          (CSS.red, Some(`percent(10.))),
         )),
       )
     ],
@@ -418,11 +418,7 @@ let properties_static_css_tests = [
     [%expr [%css "background-color: color-mix(in srgb, white, red)"]],
     [%expr
       CSS.backgroundColor(
-        `colorMix((
-          `in1(`srgb),
-          (CSS.white, `percent(50.)),
-          (CSS.red, `percent(50.)),
-        )),
+        `colorMix((`srgb, (CSS.white, None), (CSS.red, None))),
       )
     ],
   ),
@@ -432,59 +428,9 @@ let properties_static_css_tests = [
     [%expr
       CSS.backgroundColor(
         `colorMix((
-          `in1(`srgb),
-          (CSS.white, `percent(90.)),
-          (CSS.red, `percent(10.)),
-        )),
-      )
-    ],
-  ),
-  (
-    [%css "background-color: color-mix(in srgb, white 100%, red 100%)"],
-    [%expr
-      [%css "background-color: color-mix(in srgb, white 100%, red 100%)"]
-    ],
-    [%expr
-      CSS.backgroundColor(
-        `colorMix((
-          `in1(`srgb),
-          (CSS.white, `percent(0.5)),
-          (CSS.red, `percent(0.5)),
-        )),
-      )
-    ],
-  ),
-  (
-    [%css "background-color: color-mix(in srgb-linear, white, red)"],
-    [%expr [%css "background-color: color-mix(in srgb-linear, white, red)"]],
-    [%expr
-      CSS.backgroundColor(
-        `colorMix((
-          `in1(`srgbLinear),
-          (CSS.white, `percent(50.)),
-          (CSS.red, `percent(50.)),
-        )),
-      )
-    ],
-  ),
-  (
-    [%css
-      "background-color: color-mix(in hsl longer hue, #34c9eb, hsl(120 100% 50%))"
-    ],
-    [%expr
-      [%css
-        "background-color: color-mix(in hsl longer hue, #34c9eb, hsl(120 100% 50%))"
-      ]
-    ],
-    [%expr
-      CSS.backgroundColor(
-        `colorMix((
-          `in2((`hsl, `longer)),
-          (`hex({js|34c9eb|js}), `percent(50.)),
-          (
-            `hsl((`deg(120.), `percent(100.), `percent(50.))),
-            `percent(50.),
-          ),
+          `srgb,
+          (CSS.white, None),
+          (CSS.red, Some(`percent(10.))),
         )),
       )
     ],
@@ -1239,7 +1185,8 @@ let properties_static_css_tests = [
         ~fillMode=?None,
         ~playState=?None,
         ~iterationCount=?None,
-        {js|none|js},
+        ~name=CSS.Types.AnimationName.make({js|none|js}),
+        (),
       )
     ],
   ),
@@ -1255,7 +1202,8 @@ let properties_static_css_tests = [
         ~fillMode=?None,
         ~playState=?None,
         ~iterationCount=?None,
-        {js|none|js},
+        ~name=CSS.Types.AnimationName.make({js|none|js}),
+        (),
       )
     ],
   ),
@@ -1271,7 +1219,8 @@ let properties_static_css_tests = [
         ~fillMode=?None,
         ~playState=?None,
         ~iterationCount=?None,
-        {js|none|js},
+        ~name=CSS.Types.AnimationName.make({js|none|js}),
+        (),
       )
     ],
   ),
@@ -1287,7 +1236,8 @@ let properties_static_css_tests = [
         ~fillMode=?None,
         ~playState=?None,
         ~iterationCount=?None,
-        {js|none|js},
+        ~name=CSS.Types.AnimationName.make({js|none|js}),
+        (),
       )
     ],
   ),

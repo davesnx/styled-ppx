@@ -390,6 +390,7 @@ let keyframe =
       |]
   in
   let classname = CSS.style [| CSS.animationName animationName |] in
+  let animationName = Css_types.AnimationName.toString animationName in
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
@@ -453,7 +454,7 @@ let multiple_pseudo =
        ".%s { padding: 0; } .%s::before { content: ' '; -webkit-transform: \
         translateX(-50%%); -moz-transform: translateX(-50%%); -ms-transform: \
         translateX(-50%%); transform: translateX(-50%%); } .%s::after { \
-        content: \" \"; -webkit-transform: translateX(-50%%); -moz-transform: \
+        content: ' '; -webkit-transform: translateX(-50%%); -moz-transform: \
         translateX(-50%%); -ms-transform: translateX(-50%%); transform: \
         translateX(-50%%); }"
        classname classname classname)
@@ -640,6 +641,7 @@ let style_tag =
         100, [| CSS.transform (`rotate (`deg (-360.))) |];
       |]
   in
+  let animationName = Css_types.AnimationName.toString animationName in
   let animationNameHash =
     String.sub animationName 10 (String.length animationName - 10)
   in

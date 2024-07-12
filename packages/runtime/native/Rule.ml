@@ -1,6 +1,6 @@
-type t =
+type rule =
   | Declaration of string * string
-  | Selector of string * t array
+  | Selector of string * rule array
 
 let explode s =
   let rec exp i l = if i < 0 then l else exp (i - 1) (s.[i] :: l) in
@@ -20,3 +20,8 @@ let declaration (property, value) =
 
 let selector selector rules = Selector (selector, rules)
 let media query rules = Selector ({|@media |} ^ query, rules)
+
+let important v =
+  match v with
+  | Declaration (name, value) -> Declaration (name, value ^ {js| !important|js})
+  | Selector (_, _) -> v

@@ -21,6 +21,8 @@ If this test fail means that the module is not in sync with the ppx
             | `lineThrough
             | `none
             | `overline
+            | `revert
+            | `revertLayer
             | `underline
             | `unset
             | `var of string

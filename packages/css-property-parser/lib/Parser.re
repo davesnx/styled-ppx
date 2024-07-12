@@ -7,6 +7,7 @@ module StringMap = Map.Make(String);
 
 let (let.ok) = Result.bind;
 
+/* https://developer.mozilla.org/en-US/docs/Web/CSS/gradient */
 let rec _legacy_gradient = [%value.rec
   "<-webkit-gradient()> | <-legacy-linear-gradient> | <-legacy-repeating-linear-gradient> | <-legacy-radial-gradient> | <-legacy-repeating-radial-gradient>"
 ]
@@ -166,7 +167,7 @@ and color_interpolation_method = [%value.rec
 ]
 and function_color_mix = [%value.rec
   // TODO: Use <extended-percentage>
-  "color-mix(<color-interpolation-method> ',' [ <color> && <percentage>? ]#{2})"
+  "color-mix(<color-interpolation-method> ',' [ <color> && <percentage>? ] ',' [ <color> && <percentage>? ])"
 ]
 and combinator = [%value.rec "'>' | '+' | '~' | '||'"]
 and common_lig_values = [%value.rec
@@ -829,7 +830,7 @@ and property_animation_fill_mode = [%value.rec
 and property_animation_iteration_count = [%value.rec
   "[ <single-animation-iteration-count> ]#"
 ]
-and property_animation_name = [%value.rec "[ <keyframes-name> | 'none' ]#"]
+and property_animation_name = [%value.rec "[ <keyframes-name> | 'none' | <interpolation> ]#"]
 and property_animation_play_state = [%value.rec
   "[ <single-animation-play-state> ]#"
 ]

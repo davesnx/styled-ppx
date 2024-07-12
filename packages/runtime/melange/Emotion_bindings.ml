@@ -45,7 +45,9 @@ let framesToDict frames =
       dict)
     frames
 
-let keyframes frames = makeKeyframes (framesToDict frames)
+let keyframes frames =
+  makeKeyframes (framesToDict frames) |> Css_types.AnimationName.make
+
 let renderKeyframes _renderer frames = makeAnimation (framesToDict frames)
 
 (* This method is a Css_type function, but with side-effects. It pushes the fontFace as global style *)
@@ -53,11 +55,11 @@ let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
     =
   let fontFace =
     [|
-      Kloth.Option.map ~f:Properties.fontStyle fontStyle;
-      Kloth.Option.map ~f:Properties.fontWeight fontWeight;
-      Kloth.Option.map ~f:Properties.fontDisplay fontDisplay;
-      Kloth.Option.map ~f:Properties.sizeAdjust sizeAdjust;
-      Some (Properties.fontFamily fontFamily);
+      Kloth.Option.map ~f:Declarations.fontStyle fontStyle;
+      Kloth.Option.map ~f:Declarations.fontWeight fontWeight;
+      Kloth.Option.map ~f:Declarations.fontDisplay fontDisplay;
+      Kloth.Option.map ~f:Declarations.sizeAdjust sizeAdjust;
+      Some (Declarations.fontFamily fontFamily);
       Some
         (Rule.Declaration
            ( "src",

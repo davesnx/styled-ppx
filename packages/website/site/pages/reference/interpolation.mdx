@@ -167,12 +167,12 @@ There is no way to add unsafe behaviour to CSS definitions. We prefer to keep im
 The workaround is to use the [Array API](./array) to generate `%cx{:rescript}` `[%cx]{:reason}` calls. For example:
 
 ```rescript
-let block: Css.Rule.t = %css("display: block")
+let block: Css.rule = %css("display: block")
 let randomProperty = CSS.unsafe("-webkit-invented-property", "10px");
 let picture = %cx([block, randomProperty]);
 ```
 ```reason
-let block: Css.Rule.t = [%css "display: block"];
+let block: Css.rule = [%css "display: block"];
 let randomProperty = CSS.unsafe("-webkit-invented-property", "10px");
 let picture = [%cx [|block, randomProperty|]];
 ```

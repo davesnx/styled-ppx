@@ -1,6 +1,10 @@
+let foo = [%keyframe {|0% { opacity: 0.0 } 100% { opacity: 1.0 }|}];
+let bar = [%keyframe {|0% { opacity: 0.0 } 100% { opacity: 1.0 }|}];
+
 /* CSS Animations Level 1 */
-[%css {|animation-name: foo|}];
-[%css {|animation-name: foo, bar|}];
+[%css {|animation-name: random|}];
+[%css {|animation-name: $(foo)|}];
+[%css {|animation-name: $(foo), $(bar)|}];
 [%css {|animation-duration: 0s|}];
 [%css {|animation-duration: 1s|}];
 [%css {|animation-duration: 100ms|}];

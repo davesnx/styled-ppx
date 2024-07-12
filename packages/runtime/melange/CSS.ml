@@ -1,9 +1,8 @@
-include Properties
+include Declarations
 include Colors
 include Alias
 include Rule
 include Emotion_bindings
-module Types = Css_types
 
-(* alias for backwards compatibility *)
-type rule = Rule.t
+(* The reason to have a module called Css_types and not Types directly, is because we use a unwrapped library, so all modules are exposed. "Types" would collide with a lot of modules in user's application *)
+module Types = Css_types

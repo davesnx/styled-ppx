@@ -247,3 +247,8 @@
 /* [%css {|color-interpolation-filters: linearRGB|}]; */
 /* [%css {|lighting-color: white|}]; */
 /* [%css {|lighting-color: #000|}]; */
+
+/* color + calc */
+
+[%css {|color: rgba(0, 0, 0, calc(1))|}];
+[%css {|color: rgba(0, 0, 0, calc(10 - 1))|}];

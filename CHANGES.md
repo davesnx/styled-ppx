@@ -3,7 +3,14 @@
 ## 0.59.0
 - [BREAKING] Change entry point module `CSS` (from `CssJs`) on `styled-ppx.melange`, `styled-ppx.native` and `styled-ppx.rescript` (#490) (@davesnx)
 - [FEATURE] Add support and interpolation for `zoom`, `will-change` and `user-select` properties (#489) (@davesnx)
+- [FEATURE] Support content with interpolation #494 (@davesnx)
+- [FEATURE] Support define CSS variables in global and use CSS variables in properties #492 (@davesnx)
+- [FEATURE] Support overflow with 2 values
+- [FEATURE] Make animation-name abstract (@davesnx)
 - [FIX] Add 100 unsupported properties, which will render properly (#489) (@davesnx)
+- [FIX] Inline all CSS.Var and CSS.Cascading in properties (#495) (@davesnx)
+- [FIX] Color with support for rgba/hsla and others with calc/min and max (#495) (@davesnx)
+- [FIX] Warning of kebab-case on emotion client side (#493) (@davesnx)
 
 ## 0.58.1
 - [BREAKING] FontFamilyName.t is now a string (@davesnx)

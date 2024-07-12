@@ -118,3 +118,49 @@ let _ = [%css
       )
     |}
 ];
+
+type calc_value = CSS.Types.Length.calc_value;
+
+let rec modify =
+        (
+          fn_float,
+          fn_int,
+          fn_calc: calc_value => calc_value,
+          value: CSS.length,
+        )
+        : CSS.length =>
+  switch (value) {
+  | `calc(c) => `calc(fn_calc(c))
+  | `cqmax(f) => `cqmax(fn_float(f))
+  | `cqh(f) => `cqmax(fn_float(f))
+  | `cqw(f) => `cqmax(fn_float(f))
+  | `cqmin(f) => `cqmax(fn_float(f))
+  | `cqb(f) => `cqmax(fn_float(f))
+  | `min(m) => `min(Array.map(modify(fn_float, fn_int, fn_calc), m))
+  | `max(m) => `max(Array.map(modify(fn_float, fn_int, fn_calc), m))
+  | `cqi(f) => `cqi(fn_float(f))
+  | `ch(f) => `ch(fn_float(f))
+  | `cm(f) => `cm(fn_float(f))
+  | `em(f) => `em(fn_float(f))
+  | `ex(f) => `ex(fn_float(f))
+  | `inch(f) => `inch(fn_float(f))
+  | `mm(f) => `mm(fn_float(f))
+  | `pc(f) => `pc(fn_float(f))
+  | `percent(f) => `percent(fn_float(f))
+  | `pt(f) => `pt(fn_int(f))
+  | `px(i) => `px(fn_int(i))
+  | `pxFloat(i) => `pxFloat(fn_float(i))
+  | `rem(f) => `rem(fn_float(f))
+  | `vh(f) => `vh(fn_float(f))
+  | `vmax(f) => `vmax(fn_float(f))
+  | `vmin(f) => `vmin(fn_float(f))
+  | `vw(f) => `vw(fn_float(f))
+  | `zero => `zero
+  };
+
+let negate_in_calc = (v: calc_value): calc_value =>
+  `calc(`mult((v, `num(-1.))));
+let half_in_calc = (v: calc_value): calc_value => `calc(`div((v, 2.)));
+
+let negative = value => modify((~-.), (~-), negate_in_calc, value);
+let half = value => modify(x => x /. 2., x => x / 2, half_in_calc, value);

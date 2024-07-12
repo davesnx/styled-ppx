@@ -33,34 +33,6 @@ If this test fail means that the module is not in sync with the ppx
   ];
   CSS.unsafe({js|scrollBehavior|js}, {js|smooth|js});
   CSS.unsafe({js|overflowAnchor|js}, {js|none|js});
-  CSS.width(`calc(`add((`percent(50.), `pxFloat(4.)))));
-  CSS.width(`calc(`sub((`pxFloat(20.), `pxFloat(10.)))));
-  CSS.width(
-    `calc(`sub((`vh(100.), `calc(`add((`rem(2.), `pxFloat(120.))))))),
-  );
-  CSS.width(
-    `calc(
-      `sub((
-        `vh(100.),
-        `calc(
-          `add((
-            `rem(2.),
-            `calc(
-              `add((
-                `rem(2.),
-                `calc(
-                  `add((
-                    `rem(2.),
-                    `calc(`add((`rem(2.), `pxFloat(120.)))),
-                  )),
-                ),
-              )),
-            ),
-          )),
-        ),
-      )),
-    ),
-  );
   CSS.unsafe({js|MozAppearance|js}, {js|textfield|js});
   CSS.unsafe({js|WebkitAppearance|js}, {js|none|js});
   CSS.unsafe({js|WebkitBoxOrient|js}, {js|vertical|js});
@@ -84,7 +56,8 @@ If this test fail means that the module is not in sync with the ppx
     ~fillMode=?Some(`none),
     ~playState=?None,
     ~iterationCount=?None,
-    {js|none|js},
+    ~name=CSS.Types.AnimationName.make({js|none|js}),
+    (),
   );
   CSS.unsafe({js|appearance|js}, {js|none|js});
   CSS.aspectRatio(`ratio((21, 8)));

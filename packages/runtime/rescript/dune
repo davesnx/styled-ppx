@@ -5,7 +5,7 @@
  (files ../native/shared/Kloth.mli))
 
 (copy_files#
- (files ../native/shared/Properties.ml))
+ (files ../native/shared/Declarations.ml))
 
 (copy_files#
  (files ../native/shared/Alias.ml))

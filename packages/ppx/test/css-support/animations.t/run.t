@@ -33,8 +33,19 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
-  CSS.animationName({js|foo|js});
-  CSS.unsafe({js|animationName|js}, {js|foo, bar|js});
+  let foo =
+    CSS.keyframes([|
+      (0, [|CSS.opacity(0.)|]),
+      (100, [|CSS.opacity(1.)|]),
+    |]);
+  let bar =
+    CSS.keyframes([|
+      (0, [|CSS.opacity(0.)|]),
+      (100, [|CSS.opacity(1.)|]),
+    |]);
+  CSS.animationName(CSS.Types.AnimationName.make({js|random|js}));
+  CSS.animationName(foo);
+  CSS.animationNames([|foo, bar|]);
   CSS.animationDuration(`s(0));
   CSS.animationDuration(`s(1));
   CSS.animationDuration(`ms(100));
@@ -72,7 +83,8 @@ If this test fail means that the module is not in sync with the ppx
     ~fillMode=?Some(`both),
     ~playState=?None,
     ~iterationCount=?Some(`infinite),
-    {js|foo|js},
+    ~name=CSS.Types.AnimationName.make({js|foo|js}),
+    (),
   );
   CSS.animation(
     ~duration=?Some(`s(4)),
@@ -82,7 +94,8 @@ If this test fail means that the module is not in sync with the ppx
     ~fillMode=?Some(`both),
     ~playState=?Some(`paused),
     ~iterationCount=?Some(`infinite),
-    {js|none|js},
+    ~name=CSS.Types.AnimationName.make({js|none|js}),
+    (),
   );
   CSS.animation(
     ~duration=?Some(`ms(300)),
@@ -92,5 +105,6 @@ If this test fail means that the module is not in sync with the ppx
     ~fillMode=?Some(`forwards),
     ~playState=?Some(`running),
     ~iterationCount=?Some(`infinite),
-    {js|a|js},
+    ~name=CSS.Types.AnimationName.make({js|a|js}),
+    (),
   );

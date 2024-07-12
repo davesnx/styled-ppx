@@ -1,11 +1,10 @@
-include Properties
+include Declarations
 include Colors
 include Alias
 include Rule
-module Types = Css_types
 
-(* alias for backwards compatibility *)
-type rule = Rule.t
+(* The reason to have a module called Css_types and not Types directly, is because we use a unwrapped library, so all modules are exposed. "Types" would collide with a lot of modules in user's application *)
+module Types = Css_types
 
 module Array = struct
   include Kloth.Array
@@ -149,7 +148,7 @@ let rules_contain_media rules =
 
 (* media selectors should be at the top. .a { @media () {} }
      should be @media () { .a {}} *)
-let rec move_media_at_top (rule_list : Rule.t array) : Rule.t array =
+let rec move_media_at_top (rule_list : rule array) : rule array =
   Array.fold_left
     ~f:(fun acc rule ->
       match rule with
@@ -365,14 +364,14 @@ let rec rules_to_string rules =
   Buffer.contents buff
 
 type declarations =
-  | Globals of Rule.t array
+  | Globals of rule array
   | Classnames of {
       className : string;
-      styles : Rule.t array;
+      styles : rule array;
     }
   | Keyframes of {
       animationName : string;
-      keyframes : (int * Rule.t array) array;
+      keyframes : (int * rule array) array;
     }
 
 module Stylesheet = struct
@@ -417,7 +416,7 @@ let render_hash hash styles =
 let instance = Stylesheet.make ()
 let flush () = Stylesheet.flush instance
 
-let style (styles : Rule.t array) =
+let style (styles : rule array) =
   match styles with
   | [||] -> "css-0"
   | _ ->
@@ -426,21 +425,21 @@ let style (styles : Rule.t array) =
     Stylesheet.push instance (hash, Classnames { className; styles });
     className
 
-let global (styles : Rule.t array) =
+let global (styles : rule array) =
   match styles with
   | [||] -> ()
   | _ ->
     let hash = Murmur2.default (rules_to_string styles) in
     Stylesheet.push instance (hash, Globals styles)
 
-let keyframes (keyframes : (int * Rule.t array) array) =
+let keyframes (keyframes : (int * rule array) array) =
   match keyframes with
-  | [||] -> ""
+  | [||] -> Types.AnimationName.make ""
   | _ ->
     let hash = Murmur2.default (keyframes_to_string keyframes) in
     let animationName = Printf.sprintf "%s-%s" "animation" hash in
     Stylesheet.push instance (hash, Keyframes { animationName; keyframes });
-    animationName
+    Types.AnimationName.make animationName
 
 let get_stylesheet () =
   Stylesheet.get_all instance
@@ -483,11 +482,11 @@ let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
     =
   let fontFace =
     [|
-      Kloth.Option.map ~f:Properties.fontStyle fontStyle;
-      Kloth.Option.map ~f:Properties.fontWeight fontWeight;
-      Kloth.Option.map ~f:Properties.fontDisplay fontDisplay;
-      Kloth.Option.map ~f:Properties.sizeAdjust sizeAdjust;
-      Some (Properties.fontFamily fontFamily);
+      Kloth.Option.map ~f:Declarations.fontStyle fontStyle;
+      Kloth.Option.map ~f:Declarations.fontWeight fontWeight;
+      Kloth.Option.map ~f:Declarations.fontDisplay fontDisplay;
+      Kloth.Option.map ~f:Declarations.sizeAdjust sizeAdjust;
+      Some (Declarations.fontFamily fontFamily);
       Some
         (Rule.Declaration
            ( "src",
