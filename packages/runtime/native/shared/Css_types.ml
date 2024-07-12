@@ -72,6 +72,8 @@ module Calc = struct
       {js|calc(|js} ^ fn a ^ {js| - |js} ^ fn b ^ {js|)|js}
     | `calc (`mult (a, b)) ->
       {js|calc(|js} ^ fn a ^ {js| * |js} ^ fn b ^ {js|)|js}
+    | `calc (`div (a, b)) ->
+      {js|calc(|js} ^ fn a ^ {js| / |js} ^ Kloth.Float.to_string b ^ {js|)|js}
     | `num n -> Kloth.Float.to_string n
     | `min xs -> {js|min(|js} ^ max_or_min_values fn xs ^ {js|)|js}
     | `max xs -> {js|max(|js} ^ max_or_min_values fn xs ^ {js|)|js}
@@ -1325,34 +1327,38 @@ module Color = struct
     ^ {js|)|js}
 
   type 'a calc_min_max =
-    [ `calc of [ `add of 'a * 'a | `sub of 'a * 'a | `mult of 'a * 'a ]
+    [ `calc of
+      [ `add of 'a * 'a
+      | `sub of 'a * 'a
+      | `mult of 'a * 'a
+      | `div of 'a * float
+      ]
     | `min of 'a array
     | `max of 'a array
     ]
 
-  let string_of_angle x =
-    match x with
-    | (`calc _ | `min _ | `max _) as x ->
-      Calc.min_max_num_to_string Angle.toString x
-    | #Angle.t as pc -> Angle.toString pc
+  type alpha =
+    [ `num of float
+    | Percentage.t
+    ]
 
-  let string_of_alpha x =
-    match x with
-    | (`calc _ | `min _ | `max _ | `num _) as x ->
-      Calc.min_max_num_to_string Percentage.toString x
+  type alpha_with_calc =
+    [ alpha
+    | alpha calc_min_max
+    ]
+
+  type rgba = int * int * int * alpha_with_calc
+
+  let string_of_alpha : alpha -> string = function
+    | `num x -> Kloth.Float.to_string x
     | #Percentage.t as pc -> Percentage.toString pc
 
-  let string_of_alpha' x =
+  let string_of_alpha_with_calc (x : alpha_with_calc) =
     match x with
+    | `num _ as alpha -> string_of_alpha alpha
+    | #Percentage.t as alpha -> string_of_alpha alpha
     | (`calc _ | `min _ | `max _) as x ->
-      Calc.min_max_num_to_string Percentage.toString x
-    | #Percentage.t as pc -> Percentage.toString pc
-
-  type rgba =
-    int
-    * int
-    * int
-    * [ `num of float | Percentage.t | Percentage.t calc_min_max ]
+      Calc.min_max_num_to_string string_of_alpha x
 
   let rgba_to_string r g b a =
     {js|rgba(|js}
@@ -1362,38 +1368,54 @@ module Color = struct
     ^ {js|, |js}
     ^ Kloth.Int.to_string b
     ^ {js|, |js}
-    ^ string_of_alpha a
+    ^ string_of_alpha_with_calc a
     ^ {js|)|js}
 
-  type hsl =
-    [ Angle.t | Angle.t calc_min_max ]
-    * [ Percentage.t | Percentage.t calc_min_max ]
-    * [ Percentage.t | Percentage.t calc_min_max ]
+  type percent_with_calc =
+    [ Percentage.t
+    | Percentage.t calc_min_max
+    ]
+
+  type angle_with_calc =
+    [ Angle.t
+    | Angle.t calc_min_max
+    ]
+
+  type hsl = angle_with_calc * percent_with_calc * percent_with_calc
+
+  let string_of_angle_with_calc x =
+    match x with
+    | #Angle.t as pc -> Angle.toString pc
+    | (`calc _ | `min _ | `max _) as x ->
+      Calc.min_max_num_to_string Angle.toString x
+
+  let string_of_percent_with_calc x =
+    match x with
+    | #Percentage.t as pc -> Percentage.toString pc
+    | (`calc _ | `min _ | `max _) as x ->
+      Calc.min_max_num_to_string Percentage.toString x
 
   let hsl_to_string h s l =
     {js|hsl(|js}
-    ^ string_of_angle h
+    ^ string_of_angle_with_calc h
     ^ {js|, |js}
-    ^ string_of_alpha' s
+    ^ string_of_percent_with_calc s
     ^ {js|, |js}
-    ^ string_of_alpha' l
+    ^ string_of_percent_with_calc l
     ^ {js|)|js}
 
   type hsla =
-    [ Angle.t | Angle.t calc_min_max ]
-    * [ Percentage.t | Percentage.t calc_min_max ]
-    * [ Percentage.t | Percentage.t calc_min_max ]
-    * [ `num of float | Percentage.t | Percentage.t calc_min_max ]
+    angle_with_calc * percent_with_calc * percent_with_calc * alpha_with_calc
 
   let hsla_to_string h s l a =
     {js|hsla(|js}
-    ^ string_of_angle h
+    ^ string_of_angle_with_calc h
     ^ {js|, |js}
-    ^ string_of_alpha' s
+    ^ string_of_percent_with_calc s
     ^ {js|, |js}
-    ^ string_of_alpha' l
+    ^ string_of_percent_with_calc l
     ^ {js|, |js}
-    ^ string_of_alpha a
+    ^ string_of_alpha_with_calc a
     ^ {js|)|js}
 
   type polar_color_space =
