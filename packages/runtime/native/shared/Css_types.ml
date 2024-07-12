@@ -234,7 +234,7 @@ module Length = struct
   let pt x = `pt x
   let zero = `zero
 
-  let rec toString (x : t) : string =
+  let rec toString x =
     match x with
     | `ch x -> Kloth.Float.to_string x ^ {js|ch|js}
     | `cqw x -> Kloth.Float.to_string x ^ {js|cqw|js}
@@ -1944,12 +1944,14 @@ module Position = struct
     | `center
     | Percentage.t
     | Length.t
+    | Auto.t
     | Var.t
     | Cascading.t
     ]
 
   let toString p =
     match p with
+    | #Auto.t -> Auto.toString
     | `top -> {js|top|js}
     | `bottom -> {js|bottom|js}
     | `left -> {js|left|js}
