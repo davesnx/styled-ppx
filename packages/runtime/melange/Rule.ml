@@ -6,6 +6,11 @@ let declaration (property, value) = Declaration (property, value)
 let selector selector rules = Selector (selector, rules)
 let media query rules = Selector ({|@media |} ^ query, rules)
 
+let important v =
+  match v with
+  | Declaration (name, value) -> Declaration (name, value ^ {js| !important|js})
+  | Selector (_, _) -> v
+
 let rec ruleToDict (dict : Js.Json.t Js.Dict.t) (rule : rule) :
   Js.Json.t Js.Dict.t =
   let _ =

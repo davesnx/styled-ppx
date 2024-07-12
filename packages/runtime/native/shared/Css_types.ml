@@ -1,7 +1,3 @@
-(* TODO: Remove all modules, keep type cascading = ..., and cascading_to_string *)
-(* TODO: Move all "alias" to Alias module or after the 2nd todo, move all aliases here *)
-(* TODO: Move calc_min_max to <length>, <frequency>, <angle>, <time>, <percentage>, <number>, o <integer>, and remove the 'a and this type from this signature *)
-(* TODO: make calc part of the right properties instead of everywhere, replicate what's happening on Lenght.t to Percentage and others *)
 (* TODO: Split Types and Properties from this file, types are (the rest are properties) https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Types *)
 
 module Cascading = struct

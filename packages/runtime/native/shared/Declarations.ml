@@ -1,11 +1,5 @@
 open Css_types
 
-let important v =
-  match v with
-  | Rule.Declaration (name, value) ->
-    Rule.Declaration (name, value ^ {js| !important|js})
-  | Rule.Selector (_, _) -> v
-
 let label label = Rule.declaration ({js|label|js}, label)
 
 let aspectRatio x =
