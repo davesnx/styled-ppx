@@ -58,27 +58,36 @@ module Var = struct
     | `varDefault (x, v) -> {js|var(|js} ^ prefix x ^ {js|,|js} ^ v ^ {js|)|js}
 end
 
-let max_or_min_values fn values =
-  Kloth.Array.map_and_join ~sep:{js|, |js} ~f:(fun v -> {js| |js} ^ fn v) values
+module Calc = struct
+  (* Since calc is recursive, we need to have some abstract functions to print depending on each type: calc of time, length, angle, etc. *)
+  let max_or_min_values fn values =
+    Kloth.Array.map_and_join ~sep:{js|, |js}
+      ~f:(fun v -> {js| |js} ^ fn v)
+      values
 
-let calc_min_max_num_to_string fn = function
-  | `calc (`add (a, b)) -> {js|calc(|js} ^ fn a ^ {js| + |js} ^ fn b ^ {js|)|js}
-  | `calc (`sub (a, b)) -> {js|calc(|js} ^ fn a ^ {js| - |js} ^ fn b ^ {js|)|js}
-  | `calc (`mult (a, b)) ->
-    {js|calc(|js} ^ fn a ^ {js| * |js} ^ fn b ^ {js|)|js}
-  | `num n -> Kloth.Float.to_string n
-  | `min xs -> {js|min(|js} ^ max_or_min_values fn xs ^ {js|)|js}
-  | `max xs -> {js|max(|js} ^ max_or_min_values fn xs ^ {js|)|js}
+  let min_max_num_to_string fn = function
+    | `calc (`add (a, b)) ->
+      {js|calc(|js} ^ fn a ^ {js| + |js} ^ fn b ^ {js|)|js}
+    | `calc (`sub (a, b)) ->
+      {js|calc(|js} ^ fn a ^ {js| - |js} ^ fn b ^ {js|)|js}
+    | `calc (`mult (a, b)) ->
+      {js|calc(|js} ^ fn a ^ {js| * |js} ^ fn b ^ {js|)|js}
+    | `num n -> Kloth.Float.to_string n
+    | `min xs -> {js|min(|js} ^ max_or_min_values fn xs ^ {js|)|js}
+    | `max xs -> {js|max(|js} ^ max_or_min_values fn xs ^ {js|)|js}
 
-let calc_min_max_to_string x =
-  let aux fn fn' x' =
-    match x' with
-    | `add (x, y) -> {js|calc(|js} ^ fn x ^ {js| + |js} ^ fn y ^ {js|)|js}
-    | `sub (x, y) -> {js|calc(|js} ^ fn x ^ {js| - |js} ^ fn y ^ {js|)|js}
-    | `mult (x, y) -> {js|calc(|js} ^ fn x ^ {js| * |js} ^ fn y ^ {js|)|js}
-    | (`min _ | `max _) as x -> fn' x
-  in
-  aux x
+  let min_max_to_string x =
+    let aux fn fn_max_min x' =
+      match x' with
+      | `add (x, y) -> {js|calc(|js} ^ fn x ^ {js| + |js} ^ fn y ^ {js|)|js}
+      | `sub (x, y) -> {js|calc(|js} ^ fn x ^ {js| - |js} ^ fn y ^ {js|)|js}
+      | `mult (x, y) -> {js|calc(|js} ^ fn x ^ {js| * |js} ^ fn y ^ {js|)|js}
+      | `div (x, y) ->
+        {js|calc(|js} ^ fn x ^ {js| / |js} ^ Kloth.Float.to_string y ^ {js|)|js}
+      | (`min _ | `max _) as x -> fn_max_min x
+    in
+    aux x
+end
 
 module Time = struct
   type time =
@@ -88,59 +97,49 @@ module Time = struct
 
   type calc_value =
     [ time
-    | `calc of
-      [ time
-      | `add of calc_value * calc_value
-      | `sub of calc_value * calc_value
-      | `mult of calc_value * calc_value
-      ]
     | `min of t array
     | `max of t array
-    | `num of float
+    | `add of calc_value * calc_value
+    | `sub of calc_value * calc_value
+    | `mult of calc_value * calc_value
+    | `div of calc_value * float
+    | (* calc_value can be a nested `calc.
+         Ej. width: calc(100vh - calc(2rem + 120px))) *)
+      `calc of
+      calc_value
+    | (* `num is used to represent a number in a calc expression, necessary for mult and div *)
+      `num of
+      float
     ]
 
   and t =
     [ time
+    | `calc of calc_value
     | `min of t array
     | `max of t array
-    | `calc of
-      [ time
-      | `add of calc_value * calc_value
-      | `sub of calc_value * calc_value
-      | `mult of calc_value * calc_value
-      ]
-    | Var.t
-    | Cascading.t
     ]
 
   let s x = `s x
   let ms x = `ms x
 
-  let rec toString x =
+  let rec toString (x : t) =
     match x with
     | `s t -> Kloth.Int.to_string t ^ {js|s|js}
     | `ms t -> Kloth.Int.to_string t ^ {js|ms|js}
-    | `calc calc -> string_of_calc_min_max calc
+    | `calc calc -> calc_value_to_string calc
     | (`min _ | `max _) as x -> minmax_to_string x
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 
   and minmax_to_string = function
     | (`calc _ | `min _ | `max _ | `num _) as x ->
-      calc_min_max_num_to_string toString x
+      Calc.min_max_num_to_string toString x
     | #time as t -> toString t
 
   and calc_value_to_string x =
     match x with
     | `num x -> Kloth.Float.to_string x
-    | `calc calc -> string_of_calc_min_max calc
-    | (`min _ | `max _) as x -> minmax_to_string x
-    | #time as t -> toString t
-
-  and string_of_calc_min_max calc =
-    match calc with
-    | (`add _ | `sub _ | `mult _ | `min _ | `max _) as x ->
-      calc_min_max_to_string calc_value_to_string minmax_to_string x
+    | `calc calc -> calc_value_to_string calc
+    | (`add _ | `sub _ | `mult _ | `div _ | `min _ | `max _) as x ->
+      Calc.min_max_to_string calc_value_to_string minmax_to_string x
     | #time as t -> toString t
 end
 
@@ -188,25 +187,24 @@ module Length = struct
 
   type calc_value =
     [ length
-    | `calc of
-      [ length
-      | `add of calc_value * calc_value
-      | `sub of calc_value * calc_value
-      | `mult of calc_value * calc_value
-      ]
     | `min of t array
     | `max of t array
-    | `num of float
+    | `add of calc_value * calc_value
+    | `sub of calc_value * calc_value
+    | `mult of calc_value * calc_value
+    | `div of calc_value * float
+    | (* calc_value can be a nested `calc.
+         Ej. width: calc(100vh - calc(2rem + 120px))) *)
+      `calc of
+      calc_value
+    | (* `num is used to represent a number in a calc expression, necessary for mult and div *)
+      `num of
+      float
     ]
 
   and t =
     [ length
-    | `calc of
-      [ length
-      | `add of calc_value * calc_value
-      | `sub of calc_value * calc_value
-      | `mult of calc_value * calc_value
-      ]
+    | `calc of calc_value
     | `min of t array
     | `max of t array
     ]
@@ -234,7 +232,7 @@ module Length = struct
   let pt x = `pt x
   let zero = `zero
 
-  let rec toString x =
+  let rec toString (x : t) =
     match x with
     | `ch x -> Kloth.Float.to_string x ^ {js|ch|js}
     | `cqw x -> Kloth.Float.to_string x ^ {js|cqw|js}
@@ -258,26 +256,22 @@ module Length = struct
     | `pc x -> Kloth.Float.to_string x ^ {js|pc|js}
     | `pt x -> Kloth.Int.to_string x ^ {js|pt|js}
     | `zero -> {js|0|js}
-    | `calc calc -> string_of_calc_min_max calc
     | #Percentage.t as p -> Percentage.toString p
+    | `calc calc -> calc_value_to_string calc
     | (`min _ | `max _) as x -> minmax_to_string x
 
   and calc_value_to_string x =
     match x with
-    | `num x -> Kloth.Float.to_string x
-    | `calc calc -> string_of_calc_min_max calc
-    | (`min _ | `max _) as x -> minmax_to_string x
     | #length as t -> toString t
-
-  and string_of_calc_min_max calc =
-    match calc with
-    | (`add _ | `sub _ | `mult _) as x ->
-      calc_min_max_to_string calc_value_to_string minmax_to_string x
-    | #length as l -> toString l
+    | `num x -> Kloth.Float.to_string x
+    | `calc calc -> calc_value_to_string calc
+    | (`min _ | `max _) as x -> minmax_to_string x
+    | (`add _ | `sub _ | `mult _ | `div _) as x ->
+      Calc.min_max_to_string calc_value_to_string minmax_to_string x
 
   and minmax_to_string = function
     | (`calc _ | `min _ | `max _ | `num _) as x ->
-      calc_min_max_num_to_string toString x
+      Calc.min_max_num_to_string toString x
     | #length as l -> toString l
 end
 
@@ -1339,19 +1333,19 @@ module Color = struct
   let string_of_angle x =
     match x with
     | (`calc _ | `min _ | `max _) as x ->
-      calc_min_max_num_to_string Angle.toString x
+      Calc.min_max_num_to_string Angle.toString x
     | #Angle.t as pc -> Angle.toString pc
 
   let string_of_alpha x =
     match x with
     | (`calc _ | `min _ | `max _ | `num _) as x ->
-      calc_min_max_num_to_string Percentage.toString x
+      Calc.min_max_num_to_string Percentage.toString x
     | #Percentage.t as pc -> Percentage.toString pc
 
   let string_of_alpha' x =
     match x with
     | (`calc _ | `min _ | `max _) as x ->
-      calc_min_max_num_to_string Percentage.toString x
+      Calc.min_max_num_to_string Percentage.toString x
     | #Percentage.t as pc -> Percentage.toString pc
 
   type rgba =
@@ -1389,7 +1383,7 @@ module Color = struct
     [ Angle.t | Angle.t calc_min_max ]
     * [ Percentage.t | Percentage.t calc_min_max ]
     * [ Percentage.t | Percentage.t calc_min_max ]
-    * [ `num of float | `percent of float | Percentage.t calc_min_max ]
+    * [ `num of float | Percentage.t | Percentage.t calc_min_max ]
 
   let hsla_to_string h s l a =
     {js|hsla(|js}
@@ -2614,15 +2608,15 @@ module Filter = struct
   type t =
     [ None.t
     | `blur of Length.t
-    | `brightness of [ `percent of float | `num of float ]
-    | `contrast of [ `percent of float | `num of float ]
+    | `brightness of [ Percentage.t | `num of float ]
+    | `contrast of [ Percentage.t | `num of float ]
     | `dropShadow of Length.t * Length.t * Length.t * [ Color.t | Var.t ]
-    | `grayscale of [ `percent of float | `num of float ]
+    | `grayscale of [ Percentage.t | `num of float ]
     | `hueRotate of Angle.t
-    | `invert of [ `percent of float | `num of float ]
-    | `opacity of [ `percent of float | `num of float ]
-    | `saturate of [ `percent of float | `num of float ]
-    | `sepia of [ `percent of float | `num of float ]
+    | `invert of [ Percentage.t | `num of float ]
+    | `opacity of [ Percentage.t | `num of float ]
+    | `saturate of [ Percentage.t | `num of float ]
+    | `sepia of [ Percentage.t | `num of float ]
     | Url.t
     | Var.t
     | Cascading.t
@@ -2630,7 +2624,7 @@ module Filter = struct
 
   let string_of_amount x =
     match x with
-    | `percent v -> Kloth.Float.to_string v ^ {js|%|js}
+    | #Percentage.t as p -> Percentage.toString p
     | `num v -> Kloth.Float.to_string v
 
   let toString x =
@@ -3808,7 +3802,7 @@ end
 module AlphaValue = struct
   type t =
     [ `num of float
-    | `percent of float
+    | Percentage.t
     | Var.t
     | Cascading.t
     ]
@@ -3816,7 +3810,7 @@ module AlphaValue = struct
   let toString x =
     match x with
     | `num x -> Kloth.Float.to_string x
-    | `percent x -> Kloth.Float.to_string x ^ {js|%|js}
+    | #Percentage.t as p -> Percentage.toString p
     | #Var.t as var -> Var.toString var
     | #Cascading.t as c -> Cascading.toString c
 end
@@ -3834,11 +3828,11 @@ module LineBreak = struct
 
   let toString x =
     match x with
-    | #Auto.t -> Auto.toString
     | `loose -> {js|loose|js}
     | `normal -> {js|normal|js}
     | `strict -> {js|strict|js}
     | `anywhere -> {js|anywhere|js}
+    | #Auto.t -> Auto.toString
     | #Var.t as var -> Var.toString var
     | #Cascading.t as c -> Cascading.toString c
 end
@@ -3854,8 +3848,8 @@ module Hyphens = struct
 
   let toString x =
     match x with
-    | #None.t -> None.toString
     | `manual -> {js|manual|js}
+    | #None.t -> None.toString
     | #Auto.t -> Auto.toString
     | #Var.t as var -> Var.toString var
     | #Cascading.t as c -> Cascading.toString c
@@ -3863,20 +3857,20 @@ end
 
 module TextJustify = struct
   type t =
-    [ Auto.t
-    | None.t
-    | `interWord
+    [ `interWord
     | `interCharacter
+    | Auto.t
+    | None.t
     | Var.t
     | Cascading.t
     ]
 
   let toString x =
     match x with
-    | #Auto.t -> Auto.toString
-    | #None.t -> None.toString
     | `interWord -> {js|inter-word|js}
     | `interCharacter -> {js|inter-character|js}
+    | #Auto.t -> Auto.toString
+    | #None.t -> None.toString
     | #Var.t as var -> Var.toString var
     | #Cascading.t as c -> Cascading.toString c
 end
@@ -3886,8 +3880,8 @@ module OverflowInline = struct
     [ `hidden
     | `visible
     | `scroll
-    | Auto.t
     | `clip
+    | Auto.t
     | Var.t
     | Cascading.t
     ]
@@ -3897,8 +3891,8 @@ module OverflowInline = struct
     | `hidden -> {js|hidden|js}
     | `visible -> {js|visible|js}
     | `scroll -> {js|scroll|js}
-    | #Auto.t -> Auto.toString
     | `clip -> {js|clip|js}
+    | #Auto.t -> Auto.toString
     | #Var.t as var -> Var.toString var
     | #Cascading.t as c -> Cascading.toString c
 end
@@ -3969,28 +3963,23 @@ end
 
 module FontKerning = struct
   type t =
-    [ Auto.t
+    [ `normal
     | None.t
-    | `normal
     | Var.t
+    | Auto.t
     | Cascading.t
     ]
 
   let toString x =
     match x with
+    | `normal -> {js|normal|js}
     | #Auto.t -> Auto.toString
     | #None.t -> None.toString
-    | `normal -> {js|normal|js}
     | #Var.t as var -> Var.toString var
     | #Cascading.t as c -> Cascading.toString c
 end
 
 module FontVariantPosition = struct
-  type 'a css_value =
-    [ Var.t
-    | Cascading.t
-    ]
-
   type t =
     [ `normal
     | `sub
