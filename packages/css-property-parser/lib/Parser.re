@@ -7,6 +7,7 @@ module StringMap = Map.Make(String);
 
 let (let.ok) = Result.bind;
 
+/* https://developer.mozilla.org/en-US/docs/Web/CSS/gradient */
 let rec _legacy_gradient = [%value.rec
   "<-webkit-gradient()> | <-legacy-linear-gradient> | <-legacy-repeating-linear-gradient> | <-legacy-radial-gradient> | <-legacy-repeating-radial-gradient>"
 ]
