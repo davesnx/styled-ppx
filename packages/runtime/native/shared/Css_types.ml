@@ -1144,7 +1144,7 @@ module Animation = struct
 
   let make ?(duration = `ms 0) ?(delay = `ms 0) ?(direction = `normal)
     ?(timingFunction = `ease) ?(fillMode = `none) ?(playState = `running)
-    ?(iterationCount = `count 1.) ~name () =
+    ?(iterationCount = `count 1.) ?(name = AnimationName.make "none") () =
     `value
       {
         duration;
@@ -1154,7 +1154,7 @@ module Animation = struct
         fillMode;
         playState;
         iterationCount;
-        name = AnimationName.make name;
+        name;
       }
 
   let toString x =

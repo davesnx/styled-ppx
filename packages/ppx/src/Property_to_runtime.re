@@ -3197,18 +3197,30 @@ let render_keyframes_name = (~loc) =>
 
 let render_animation_name = (~loc) =>
   fun
-  | `None => render_string(~loc, "none")
-  | `Keyframes_name(name) => render_keyframes_name(~loc, name);
+  | `None => [%expr
+      Css_types.AnimationName.make([%e render_string(~loc, "none")])
+    ]
+  | `Keyframes_name(name) => {
+      [%expr
+       Css_types.AnimationName.make([%e render_keyframes_name(~loc, name)])];
+    }
+  | `Interpolation(v) => render_variable(~loc, v);
 
 // css-animation-1
 let animation_name =
-  monomorphic(
-    Property_parser.property_animation_name,
-    (~loc) => [%expr CSS.animationName],
-    (~loc) =>
-      fun
-      | [one] => render_animation_name(~loc, one)
-      | _ => raise(Unsupported_feature),
+  polymorphic(Property_parser.property_animation_name, (~loc) =>
+    fun
+    | [one] => {
+        let value = render_animation_name(~loc, one);
+        [[%expr CSS.animationName([%e value])]];
+      }
+    | many => {
+        let values =
+          many
+          |> List.map(render_animation_name(~loc))
+          |> Builder.pexp_array(~loc);
+        [[%expr CSS.animationNames([%e values])]];
+      }
   );
 
 let animation_duration =
@@ -3337,17 +3349,20 @@ let render_single_animation =
      ~iterationCount=?[%e
        render_option(~loc, render_animation_iteration_count, iterationCount)
      ],
-     ~name=[%e render_animation_name(~loc, Option.value(name, ~default=`None))],
-     ()
+     ~name=[%e
+       render_animation_name(~loc, Option.value(name, ~default=`None))
+     ],
+     (),
    )];
 };
 
 let animation =
-  polymorphic(Property_parser.property_animation, (~loc) =>
+  polymorphic(Property_parser.property_animation, (~loc) => {
     fun
     | [one] => [render_single_animation(~loc, one)]
+    /* TODO: Support multiple animations */
     | _ => raise(Unsupported_feature)
-  );
+  });
 
 let render_ratio = (~loc, value: Types.ratio) => {
   switch (value) {
