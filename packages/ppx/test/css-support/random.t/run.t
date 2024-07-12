@@ -84,7 +84,8 @@ If this test fail means that the module is not in sync with the ppx
     ~fillMode=?Some(`none),
     ~playState=?None,
     ~iterationCount=?None,
-    {js|none|js},
+    ~name={js|none|js},
+    (),
   );
   CSS.unsafe({js|appearance|js}, {js|none|js});
   CSS.aspectRatio(`ratio((21, 8)));

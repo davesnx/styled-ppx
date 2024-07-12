@@ -72,7 +72,8 @@ If this test fail means that the module is not in sync with the ppx
     ~fillMode=?Some(`both),
     ~playState=?None,
     ~iterationCount=?Some(`infinite),
-    {js|foo|js},
+    ~name={js|foo|js},
+    (),
   );
   CSS.animation(
     ~duration=?Some(`s(4)),
@@ -82,7 +83,8 @@ If this test fail means that the module is not in sync with the ppx
     ~fillMode=?Some(`both),
     ~playState=?Some(`paused),
     ~iterationCount=?Some(`infinite),
-    {js|none|js},
+    ~name={js|none|js},
+    (),
   );
   CSS.animation(
     ~duration=?Some(`ms(300)),
@@ -92,5 +94,6 @@ If this test fail means that the module is not in sync with the ppx
     ~fillMode=?Some(`forwards),
     ~playState=?Some(`running),
     ~iterationCount=?Some(`infinite),
-    {js|a|js},
+    ~name={js|a|js},
+    (),
   );
