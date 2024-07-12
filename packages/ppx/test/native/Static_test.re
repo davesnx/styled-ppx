@@ -1185,7 +1185,8 @@ let properties_static_css_tests = [
         ~fillMode=?None,
         ~playState=?None,
         ~iterationCount=?None,
-        {js|none|js},
+        ~name=CSS.Types.AnimationName.make({js|none|js}),
+        (),
       )
     ],
   ),
@@ -1201,7 +1202,8 @@ let properties_static_css_tests = [
         ~fillMode=?None,
         ~playState=?None,
         ~iterationCount=?None,
-        {js|none|js},
+        ~name=CSS.Types.AnimationName.make({js|none|js}),
+        (),
       )
     ],
   ),
@@ -1217,7 +1219,8 @@ let properties_static_css_tests = [
         ~fillMode=?None,
         ~playState=?None,
         ~iterationCount=?None,
-        {js|none|js},
+        ~name=CSS.Types.AnimationName.make({js|none|js}),
+        (),
       )
     ],
   ),
@@ -1233,7 +1236,8 @@ let properties_static_css_tests = [
         ~fillMode=?None,
         ~playState=?None,
         ~iterationCount=?None,
-        {js|none|js},
+        ~name=CSS.Types.AnimationName.make({js|none|js}),
+        (),
       )
     ],
   ),

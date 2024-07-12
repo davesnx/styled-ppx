@@ -3198,11 +3198,11 @@ let render_keyframes_name = (~loc) =>
 let render_animation_name = (~loc) =>
   fun
   | `None => [%expr
-      Css_types.AnimationName.make([%e render_string(~loc, "none")])
+      CSS.Types.AnimationName.make([%e render_string(~loc, "none")])
     ]
   | `Keyframes_name(name) => {
       [%expr
-       Css_types.AnimationName.make([%e render_keyframes_name(~loc, name)])];
+       CSS.Types.AnimationName.make([%e render_keyframes_name(~loc, name)])];
     }
   | `Interpolation(v) => render_variable(~loc, v);
 

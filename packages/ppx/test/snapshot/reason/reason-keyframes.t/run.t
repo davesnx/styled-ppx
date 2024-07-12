@@ -968,10 +968,7 @@
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles =
-      CSS.style([|
-        CSS.label("FadeIn"),
-        (CSS.animationName(animation): CSS.rule),
-      |]);
+      CSS.style([|CSS.label("FadeIn"), CSS.animationName(animation)|]);
     let make = (props: makeProps) => {
       let className = styles ++ getOrEmpty(classNameGet(props));
       let stylesObject = {"className": className, "ref": innerRefGet(props)};
