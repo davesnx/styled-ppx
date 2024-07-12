@@ -262,3 +262,20 @@ module Transition = struct
   (* backwards compatibility *)
   let shorthand = Css_types.Transition.make
 end
+
+type animationName = AnimationName.t
+type angle = Angle.t
+type animationDirection = AnimationDirection.t
+type animationFillMode = AnimationFillMode.t
+type animationIterationCount = AnimationIterationCount.t
+type animationPlayState = AnimationPlayState.t
+type cascading = Cascading.t
+type color = Color.t
+type fontStyle = FontStyle.t
+type fontWeight = FontWeight.t
+type length = Length.t
+type listStyleType = ListStyleType.t
+type repeatValue = RepeatValue.t
+type outlineStyle = OutlineStyle.t
+type transform = Transform.t
+type gradient = Gradient.t

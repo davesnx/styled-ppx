@@ -3106,7 +3106,7 @@ module Shadow = struct
     ]
 
   let box ?(x = `zero) ?(y = `zero) ?(blur = `zero) ?(spread = `zero)
-    ?(inset = false) color =
+    ?(inset = false) (color : Color.t) : box t =
     `shadow
       (Length.toString x
       ^ {js| |js}
@@ -3119,7 +3119,8 @@ module Shadow = struct
       ^ Color.toString color
       ^ if inset then {js| inset|js} else {js||js})
 
-  let text ?(x = `zero) ?(y = `zero) ?(blur = `zero) color =
+  let text ?(x = `zero) ?(y = `zero) ?(blur = `zero) (color : Color.t) : text t
+      =
     `shadow
       (Length.toString x
       ^ {js| |js}
@@ -3129,8 +3130,7 @@ module Shadow = struct
       ^ {js| |js}
       ^ Color.toString color)
 
-  let (toString : 'a t -> string) =
-   fun x ->
+  let toString x =
     match x with
     | `shadow x -> x
     | #None.t -> None.toString
@@ -4067,20 +4067,3 @@ module FontVariantEmoji = struct
     | #Var.t as var -> Var.toString var
     | #Cascading.t as c -> Cascading.toString c
 end
-
-type animationName = AnimationName.t
-type angle = Angle.t
-type animationDirection = AnimationDirection.t
-type animationFillMode = AnimationFillMode.t
-type animationIterationCount = AnimationIterationCount.t
-type animationPlayState = AnimationPlayState.t
-type cascading = Cascading.t
-type color = Color.t
-type fontStyle = FontStyle.t
-type fontWeight = FontWeight.t
-type length = Length.t
-type listStyleType = ListStyleType.t
-type repeatValue = RepeatValue.t
-type outlineStyle = OutlineStyle.t
-type transform = Transform.t
-type gradient = Gradient.t

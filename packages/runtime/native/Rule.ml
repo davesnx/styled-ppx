@@ -1,6 +1,6 @@
-type t =
+type rule =
   | Declaration of string * string
-  | Selector of string * t array
+  | Selector of string * rule array
 
 let explode s =
   let rec exp i l = if i < 0 then l else exp (i - 1) (s.[i] :: l) in
