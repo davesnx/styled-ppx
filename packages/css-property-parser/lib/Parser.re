@@ -830,7 +830,9 @@ and property_animation_fill_mode = [%value.rec
 and property_animation_iteration_count = [%value.rec
   "[ <single-animation-iteration-count> ]#"
 ]
-and property_animation_name = [%value.rec "[ <keyframes-name> | 'none' | <interpolation> ]#"]
+and property_animation_name = [%value.rec
+  "[ <keyframes-name> | 'none' | <interpolation> ]#"
+]
 and property_animation_play_state = [%value.rec
   "[ <single-animation-play-state> ]#"
 ]
