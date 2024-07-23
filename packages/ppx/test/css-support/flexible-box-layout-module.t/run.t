@@ -13,7 +13,7 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
 
-  $ dune describe pp ./input.re.ml | refmt --parse ml --print re
+  $ dune describe pp ./input.re
   [@ocaml.ppx.context
     {
       tool_name: "ppx_driver",
@@ -37,6 +37,7 @@ If this test fail means that the module is not in sync with the ppx
     let flex1 = `num(1.);
     let min = `px(500);
   };
+  
   CSS.alignContent(`flexStart);
   CSS.alignContent(`flexEnd);
   CSS.alignContent(`spaceBetween);

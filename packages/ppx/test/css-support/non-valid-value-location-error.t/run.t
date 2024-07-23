@@ -17,7 +17,7 @@ If this test fail means that the module is not in sync with the ppx
   Error: Property 'display' has an invalid value: 'blocki'
   [1]
 
-  $ dune describe pp ./input.re.ml | refmt --parse ml --print re
+  $ dune describe pp ./input.re
   [@ocaml.ppx.context
     {
       tool_name: "ppx_driver",
@@ -37,6 +37,7 @@ If this test fail means that the module is not in sync with the ppx
     }
   ];
   Js.log("2000");
+  
   CSS.style([|
     CSS.height(`percent(100.)),
     CSS.height(`percent(100.)),

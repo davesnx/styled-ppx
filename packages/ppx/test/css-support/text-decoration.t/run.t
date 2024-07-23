@@ -14,7 +14,7 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune build
 
-  $ dune describe pp ./input.re.ml | refmt --parse ml --print re
+  $ dune describe pp ./input.re
   [@ocaml.ppx.context
     {
       tool_name: "ppx_driver",
@@ -33,6 +33,7 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
+  
   CSS.textDecorationLine(`none);
   CSS.textDecorationLine(`underline);
   CSS.textDecorationLine(`overline);
@@ -62,6 +63,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.textEmphasisStyle(`string({js|foo|js}));
   CSS.textEmphasisColor(CSS.green);
   CSS.unsafe({js|textEmphasis|js}, {js|open dot green|js});
+  
   CSS.textEmphasisPosition(`over);
   CSS.textEmphasisPosition(`under);
   CSS.textEmphasisPositions(`over, `left);
@@ -70,6 +72,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.textEmphasisPositions(`under, `left);
   CSS.textEmphasisPositions(`under, `right);
   CSS.textShadow(`none);
+  
   CSS.textShadow(
     CSS.Shadow.text(
       ~x=`pxFloat(1.),
@@ -78,6 +81,7 @@ If this test fail means that the module is not in sync with the ppx
       CSS.black,
     ),
   );
+  
   CSS.unsafe({js|textDecorationSkip|js}, {js|none|js});
   CSS.unsafe({js|textDecorationSkip|js}, {js|objects|js});
   CSS.unsafe({js|textDecorationSkip|js}, {js|objects spaces|js});

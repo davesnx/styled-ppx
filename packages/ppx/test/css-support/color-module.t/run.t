@@ -14,7 +14,7 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune build
 
-  $ dune describe pp ./input.re.ml | refmt --parse ml --print re
+  $ dune describe pp ./input.re
   [@ocaml.ppx.context
     {
       tool_name: "ppx_driver",
@@ -33,6 +33,7 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
+  
   CSS.color(`rgba((0, 0, 0, `num(0.5))));
   CSS.color(`hex({js|F06|js}));
   CSS.color(`hex({js|FF0066|js}));
@@ -68,6 +69,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|columnRuleColor|js}, {js|hsl(0,0%,0%,.5)|js});
   CSS.unsafe({js|columnRuleColor|js}, {js|transparent|js});
   CSS.unsafe({js|columnRuleColor|js}, {js|currentColor|js});
+  
   CSS.color(`rgb((0, 51, 178)));
   CSS.color(`rgb((0, 64, 185)));
   CSS.color(`hsl((`deg(0.), `percent(0.), `percent(0.))));
@@ -84,6 +86,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.color(`hex({js|000F|js}));
   CSS.color(`hex({js|000000FF|js}));
   CSS.color(CSS.rebeccapurple);
+  
   CSS.backgroundColor(`rgb((0, 51, 178)));
   CSS.backgroundColor(`rgb((0, 64, 185)));
   CSS.backgroundColor(`hsl((`deg(0.), `percent(0.), `percent(0.))));
@@ -160,5 +163,6 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|columnRuleColor|js}, {js|#000F|js});
   CSS.unsafe({js|columnRuleColor|js}, {js|#000000FF|js});
   CSS.unsafe({js|columnRuleColor|js}, {js|rebeccapurple|js});
+  
   CSS.color(`rgba((0, 0, 0, `num(1.))));
   CSS.color(`rgba((0, 0, 0, `calc(`sub((`num(10.), `num(1.)))))));

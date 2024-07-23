@@ -14,7 +14,7 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune build
 
-  $ dune describe pp ./input.re.ml | refmt --parse ml --print re
+  $ dune describe pp ./input.re
   [@ocaml.ppx.context
     {
       tool_name: "ppx_driver",
@@ -33,6 +33,7 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
+  
   CSS.unsafe({js|contain|js}, {js|none|js});
   CSS.unsafe({js|contain|js}, {js|strict|js});
   CSS.unsafe({js|contain|js}, {js|content|js});
@@ -42,6 +43,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|contain|js}, {js|size layout|js});
   CSS.unsafe({js|contain|js}, {js|size paint|js});
   CSS.unsafe({js|contain|js}, {js|size layout paint|js});
+  
   CSS.style([|CSS.width(`cqw(5.))|]);
   CSS.style([|CSS.width(`cqh(5.))|]);
   CSS.style([|CSS.width(`cqi(5.))|]);

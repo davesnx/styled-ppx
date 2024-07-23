@@ -66,7 +66,7 @@ This test ensures the location of the error is correct
          The second variant type does not allow tag(s) `gri
   [1]
 
-  $ dune describe pp ./input.re.ml | refmt --parse ml --print re
+  $ dune describe pp ./input.re
   [@ocaml.ppx.context
     {
       tool_name: "ppx_driver",

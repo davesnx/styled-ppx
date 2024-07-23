@@ -14,7 +14,7 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune build
 
-  $ dune describe pp ./input.re.ml | refmt --parse ml --print re
+  $ dune describe pp ./input.re
   [@ocaml.ppx.context
     {
       tool_name: "ppx_driver",
@@ -33,6 +33,7 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
+  
   CSS.boxSizing(`borderBox);
   CSS.boxSizing(`contentBox);
   CSS.outlineStyle(`auto);
@@ -54,6 +55,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|resize|js}, {js|vertical|js});
   CSS.textOverflow(`clip);
   CSS.textOverflow(`ellipsis);
+  
   CSS.cursor(`default);
   CSS.cursor(`none);
   CSS.cursor(`contextMenu);
@@ -76,19 +78,26 @@ If this test fail means that the module is not in sync with the ppx
   CSS.cursor(`zoomOut);
   CSS.unsafe({js|caretColor|js}, {js|auto|js});
   CSS.unsafe({js|caretColor|js}, {js|green|js});
+  
   CSS.unsafe({js|appearance|js}, {js|auto|js});
   CSS.unsafe({js|appearance|js}, {js|none|js});
+  
   CSS.textOverflow(`clip);
   CSS.textOverflow(`ellipsis);
+  
   CSS.textOverflow(`string({js|foo|js}));
   CSS.unsafe({js|textOverflow|js}, {js|clip clip|js});
   CSS.unsafe({js|textOverflow|js}, {js|ellipsis clip|js});
+  
   CSS.unsafe({js|textOverflow|js}, {js|'foo' clip|js});
   CSS.unsafe({js|textOverflow|js}, {js|clip ellipsis|js});
   CSS.unsafe({js|textOverflow|js}, {js|ellipsis ellipsis|js});
+  
   CSS.unsafe({js|textOverflow|js}, {js|'foo' ellipsis|js});
+  
   CSS.unsafe({js|textOverflow|js}, {js|clip 'foo'|js});
   CSS.unsafe({js|textOverflow|js}, {js|ellipsis 'foo'|js});
+  
   CSS.unsafe({js|textOverflow|js}, {js|'foo' 'foo'|js});
   CSS.userSelect(`auto);
   CSS.userSelect(`text);
