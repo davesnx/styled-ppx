@@ -66,24 +66,6 @@ This test ensures the location of the error is correct
          The second variant type does not allow tag(s) `gri
   [1]
 
-  $ dune describe pp ./input.re
-  [@ocaml.ppx.context
-    {
-      tool_name: "ppx_driver",
-      include_dirs: [],
-      load_path: [],
-      open_modules: [],
-      for_package: None,
-      debug: false,
-      use_threads: false,
-      use_vmthreads: false,
-      recursive_types: false,
-      principal: false,
-      transparent_modules: false,
-      unboxed_types: false,
-      unsafe_string: false,
-      cookies: [],
-    }
-  ];
+  $ dune describe pp ./input.re | sed '1,/^];$/d'
   let grid = `gri;
   let a = CSS.style([|CSS.label("a"), (CSS.display(grid): CSS.rule)|]);
