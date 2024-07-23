@@ -14,7 +14,7 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune build
 
-  $ dune describe pp ./input.re.ml | refmt --parse ml --print re
+  $ dune describe pp ./input.re
   [@ocaml.ppx.context
     {
       tool_name: "ppx_driver",
@@ -33,6 +33,7 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
+  
   CSS.unsafe({js|captionSide|js}, {js|inline-start|js});
   CSS.unsafe({js|captionSide|js}, {js|inline-end|js});
   CSS.unsafe({js|float|js}, {js|inline-start|js});
@@ -90,6 +91,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|borderBlockEndWidth|js}, {js|thin|js});
   CSS.unsafe({js|borderBlockEndStyle|js}, {js|dotted|js});
   CSS.unsafe({js|borderBlockEndColor|js}, {js|navy|js});
+  
   CSS.unsafe({js|borderBlockColor|js}, {js|navy blue|js});
   CSS.unsafe({js|borderInline|js}, {js|1px|js});
   CSS.unsafe({js|borderInline|js}, {js|2px dotted|js});
@@ -106,6 +108,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|borderInlineEndWidth|js}, {js|thin|js});
   CSS.unsafe({js|borderInlineEndStyle|js}, {js|dotted|js});
   CSS.unsafe({js|borderInlineEndColor|js}, {js|navy|js});
+  
   CSS.unsafe({js|borderInlineColor|js}, {js|navy blue|js});
   CSS.unsafe({js|borderStartStartRadius|js}, {js|0|js});
   CSS.unsafe({js|borderStartStartRadius|js}, {js|50%|js});

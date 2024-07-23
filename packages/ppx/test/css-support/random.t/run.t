@@ -12,7 +12,7 @@ If this test fail means that the module is not in sync with the ppx
   >  (preprocess (pps styled-ppx)))
   > EOF
 
-  $ dune describe pp ./input.re.ml | refmt --parse ml --print re
+  $ dune describe pp ./input.re
   [@ocaml.ppx.context
     {
       tool_name: "ppx_driver",
@@ -31,15 +31,20 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
+  
   CSS.unsafe({js|scrollBehavior|js}, {js|smooth|js});
+  
   CSS.unsafe({js|overflowAnchor|js}, {js|none|js});
+  
   CSS.unsafe({js|MozAppearance|js}, {js|textfield|js});
   CSS.unsafe({js|WebkitAppearance|js}, {js|none|js});
   CSS.unsafe({js|WebkitBoxOrient|js}, {js|vertical|js});
+  
   module Color = {
     let text = CSS.hex("444");
   };
   let colorTextString = Color.text |> CSS.Types.Color.toString;
+  
   CSS.unsafe(
     {js|WebkitBoxShadow|js},
     {js|inset 0 0 0 1000px $(Color.background)|js},
@@ -61,6 +66,7 @@ If this test fail means that the module is not in sync with the ppx
   );
   CSS.unsafe({js|appearance|js}, {js|none|js});
   CSS.aspectRatio(`ratio((21, 8)));
+  
   let c = CSS.hex("e15a46");
   (CSS.backgroundColor(c): CSS.rule);
   CSS.unsafe({js|border|js}, {js|none|js});
@@ -72,12 +78,14 @@ If this test fail means that the module is not in sync with the ppx
   CSS.color(`var({js|--color-link|js}));
   CSS.columnWidth(`pxFloat(125.));
   CSS.columnWidth(`auto);
+  
   CSS.display(`webkitBox);
   CSS.display(`contents);
   CSS.display(`table);
   (CSS.SVG.fill(c): CSS.rule);
   CSS.SVG.fill(`currentColor);
   CSS.gap(`pxFloat(4.));
+  
   CSS.unsafe({js|gridColumn|js}, {js|unset|js});
   CSS.unsafe({js|gridRow|js}, {js|unset|js});
   CSS.gridTemplateColumns([|`maxContent, `maxContent|]);
@@ -114,29 +122,37 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|top|js}, {js|unset|js});
   CSS.unsafe({js|touchAction|js}, {js|none|js});
   CSS.unsafe({js|touchAction|js}, {js|pan-x pan-y|js});
+  
   CSS.transformOrigin2(`center, `left);
   CSS.transformOrigin2(`center, `right);
   CSS.transformOrigin(`pxFloat(2.));
   CSS.transformOrigin(`bottom);
   CSS.transformOrigin2(`cm(3.), `pxFloat(2.));
   CSS.transformOrigin2(`pxFloat(2.), `left);
+  
   CSS.transform(`none);
+  
   CSS.unsafe({js|width|js}, {js|fit-content|js});
   CSS.width(`maxContent);
+  
   CSS.transitionDelay(`ms(240));
   CSS.animationDuration(`ms(150));
+  
   CSS.borderWidth(`thin);
   CSS.outlineWidth(`medium);
   CSS.outline(`medium, `solid, CSS.red);
+  
   let lola = `hidden;
   CSS.overflow(lola);
   CSS.overflow(`hidden);
   (CSS.overflowY(lola): CSS.rule);
   CSS.overflowX(`hidden);
+  
   let value = `clip;
   CSS.overflowBlock(`hidden);
   (CSS.overflowBlock(value): CSS.rule);
   (CSS.overflowInline(value): CSS.rule);
+  
   CSS.style([|
     CSS.backgroundImage(
       `linearGradient((
@@ -149,7 +165,9 @@ If this test fail means that the module is not in sync with the ppx
       )),
     ),
   |]);
+  
   CSS.style([|CSS.aspectRatio(`ratio((16, 9)))|]);
+  
   CSS.color(`var({js|--color-link|js}));
 
   $ dune build

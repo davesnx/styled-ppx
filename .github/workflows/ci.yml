@@ -8,6 +8,10 @@ on:
     branches:
       - main
 
+env:
+  OPAM_VERSION: 2.2.0
+  DUNE_PROFILE: release
+
 permissions:
   contents: write
   pull-requests: write
@@ -34,9 +38,11 @@ jobs:
         uses: actions/setup-node@v3
 
       - name: Use OCaml ${{ matrix.ocaml-compiler }}
-        uses: ocaml/setup-ocaml@v2
+        uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
+          dune-cache: true
+          opam-disable-sandboxing: true
 
       - name: Load opam cache when not Windows
         if: runner.os != 'Windows'

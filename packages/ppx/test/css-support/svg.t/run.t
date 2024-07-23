@@ -14,7 +14,7 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune build
 
-  $ dune describe pp ./input.re.ml | refmt --parse ml --print re
+  $ dune describe pp ./input.re
   [@ocaml.ppx.context
     {
       tool_name: "ppx_driver",
@@ -33,7 +33,9 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
+  
   CSS.pointerEvents(`auto);
+  
   CSS.pointerEvents(`visiblePainted);
   CSS.pointerEvents(`visibleFill);
   CSS.pointerEvents(`visibleStroke);

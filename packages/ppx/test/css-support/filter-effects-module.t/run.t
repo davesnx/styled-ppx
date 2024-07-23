@@ -13,7 +13,7 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
 
-  $ dune describe pp ./input.re.ml | refmt --parse ml --print re
+  $ dune describe pp ./input.re
   [@ocaml.ppx.context
     {
       tool_name: "ppx_driver",
@@ -33,6 +33,7 @@ If this test fail means that the module is not in sync with the ppx
     }
   ];
   let color = CSS.hex("333");
+  
   CSS.filter([|`none|]);
   CSS.filter([|`url({js|#id|js})|]);
   CSS.filter([|`url({js|image.svg#id|js})|]);
@@ -79,6 +80,7 @@ If this test fail means that the module is not in sync with the ppx
       `rgba((0, 0, 0, `num(0.03))),
     )),
   |]);
+  
   CSS.backdropFilter([|`none|]);
   CSS.backdropFilter([|`url({js|#id|js})|]);
   CSS.backdropFilter([|`url({js|image.svg#id|js})|]);

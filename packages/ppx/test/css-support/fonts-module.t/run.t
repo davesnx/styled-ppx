@@ -13,7 +13,7 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
 
-  $ dune describe pp ./input.re.ml | refmt --parse ml --print re
+  $ dune describe pp ./input.re
   [@ocaml.ppx.context
     {
       tool_name: "ppx_driver",
@@ -32,6 +32,7 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
+  
   CSS.fontFamilies([|{js|Inter Semi Bold|js}|]);
   CSS.fontFamilies(fonts: array(CSS.Types.FontFamilyName.t));
   CSS.fontFamilies([|{js|Inter|js}|]);
@@ -39,6 +40,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.fontFamilies([|{js|Inter|js}, {js|Sans|js}|]);
   CSS.fontFamilies([|{js|Inter|js}, font|]);
   CSS.fontFamilies([|{js|Gill Sans Extrabold|js}, "sans-serif"|]);
+  
   CSS.fontSynthesisWeight(`none);
   CSS.fontSynthesisStyle(`auto);
   CSS.fontSynthesisSmallCaps(`none);
@@ -90,6 +92,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.fontVariantEmoji(`text);
   CSS.fontVariantEmoji(`emoji);
   CSS.fontVariantEmoji(`unicode);
+  
   CSS.unsafe({js|fontStretch|js}, {js|normal|js});
   CSS.unsafe({js|fontStretch|js}, {js|ultra-condensed|js});
   CSS.unsafe({js|fontStretch|js}, {js|extra-condensed|js});

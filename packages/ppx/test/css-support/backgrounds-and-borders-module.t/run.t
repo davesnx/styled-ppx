@@ -14,7 +14,7 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune build
 
-  $ dune describe pp ./input.re.ml | refmt --parse ml --print re
+  $ dune describe pp ./input.re
   [@ocaml.ppx.context
     {
       tool_name: "ppx_driver",
@@ -41,6 +41,7 @@ If this test fail means that the module is not in sync with the ppx
       let elevation1 = `rgba((0, 0, 0, `num(0.03)));
     };
   };
+  
   CSS.backgroundRepeat(`space);
   CSS.backgroundRepeat(`round);
   CSS.backgroundRepeat(`hv((`repeat, `repeat)));
@@ -60,6 +61,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.backgroundRepeat(`hv((`round, `noRepeat)));
   CSS.backgroundRepeat(`hv((`noRepeat, `noRepeat)));
   CSS.backgroundAttachment(`local);
+  
   CSS.backgroundClip(`borderBox);
   CSS.backgroundClip(`paddingBox);
   CSS.backgroundClip(`contentBox);
@@ -74,10 +76,12 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|backgroundSize|js}, {js|10px auto|js});
   CSS.unsafe({js|backgroundSize|js}, {js|auto 10%|js});
   CSS.backgroundSize(`size((`em(50.), `percent(50.))));
+  
   CSS.unsafe({js|background|js}, {js|top left / 50% 60%|js});
   CSS.backgroundOrigin(`borderBox);
   CSS.backgroundColor(CSS.blue);
   CSS.backgroundColor(CSS.red);
+  
   CSS.backgroundClip(`paddingBox);
   CSS.unsafe(
     {js|background|js},
@@ -97,6 +101,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|borderBottomLeftRadius|js}, {js|250px 100px|js});
   CSS.borderRadius(`pxFloat(10.));
   CSS.borderRadius(`percent(50.));
+  
   CSS.borderImageSource(`none);
   CSS.borderImageSource(`url({js|foo.png|js}));
   CSS.unsafe({js|borderImageSlice|js}, {js|10|js});
@@ -196,6 +201,7 @@ If this test fail means that the module is not in sync with the ppx
     {js|borderImage|js},
     {js|url(foo.png) fill 10 / 10% / 10px space|js},
   );
+  
   CSS.boxShadows([|
     CSS.Shadow.box(
       ~x=`pxFloat(1.),
@@ -255,6 +261,7 @@ If this test fail means that the module is not in sync with the ppx
       Color.Shadow.elevation1,
     ),
   |]);
+  
   CSS.unsafe({js|backgroundPositionX|js}, {js|right|js});
   CSS.unsafe({js|backgroundPositionX|js}, {js|center|js});
   CSS.unsafe({js|backgroundPositionX|js}, {js|50%|js});
@@ -305,6 +312,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|backgroundPositionY|js}, {js|bottom -50px|js});
   CSS.unsafe({js|backgroundPositionY|js}, {js|top -50px|js});
   CSS.unsafe({js|backgroundPositionY|js}, {js|bottom 20px|js});
+  
   CSS.backgroundImage(
     `linearGradient((
       Some(`deg(45.)),
@@ -430,6 +438,7 @@ If this test fail means that the module is not in sync with the ppx
       |]: CSS.Types.Gradient.color_stop_list,
     )),
   );
+  
   CSS.backgroundImages([|
     `linearGradient((
       Some(`deg(45.)),
@@ -454,6 +463,7 @@ If this test fail means that the module is not in sync with the ppx
       [|(Some(CSS.blue), None), (Some(CSS.red), None)|]: CSS.Types.Gradient.color_stop_list,
     )),
   |]);
+  
   CSS.backgroundImage(
     `radialGradient((
       Some(`ellipse),
@@ -518,6 +528,7 @@ If this test fail means that the module is not in sync with the ppx
     {js|backgroundImage|js},
     {js|radial-gradient(60% 60%, white, black)|js},
   );
+  
   CSS.listStyleImage(
     `linearGradient((
       None,
@@ -649,34 +660,42 @@ If this test fail means that the module is not in sync with the ppx
     {js|listStyleImage|js},
     {js|radial-gradient(60% 60%, white, black)|js},
   );
+  
   CSS.imageRendering(`auto);
   CSS.imageRendering(`smooth);
   CSS.imageRendering(`highQuality);
   CSS.imageRendering(`pixelated);
   CSS.imageRendering(`crispEdges);
+  
   CSS.backgroundPosition(`bottom);
   CSS.unsafe({js|backgroundPositionX|js}, {js|50%|js});
   CSS.unsafe({js|backgroundPositionY|js}, {js|0|js});
   CSS.backgroundPosition2(`zero, `zero);
   CSS.backgroundPosition2(`rem(1.), `zero);
+  
   CSS.objectPosition2(`center, `top);
   CSS.objectPosition2(`center, `bottom);
   CSS.objectPosition2(`left, `center);
   CSS.objectPosition2(`right, `center);
   CSS.objectPosition2(`center, `center);
+  
   CSS.unsafe({js|objectPosition|js}, {js|25% 75%|js});
   CSS.objectPosition2(`percent(25.), `center);
+  
   CSS.objectPosition2(`zero, `zero);
   CSS.objectPosition2(`cm(1.), `cm(2.));
   CSS.objectPosition2(`ch(10.), `em(8.));
+  
   CSS.unsafe({js|objectPosition|js}, {js|bottom 10px right 20px|js});
   CSS.unsafe({js|objectPosition|js}, {js|right 3em bottom 10px|js});
   CSS.unsafe({js|objectPosition|js}, {js|top 0 right 10px|js});
+  
   CSS.unsafe({js|objectPosition|js}, {js|inherit|js});
   CSS.unsafe({js|objectPosition|js}, {js|initial|js});
   CSS.unsafe({js|objectPosition|js}, {js|revert|js});
   CSS.unsafe({js|objectPosition|js}, {js|revert-layer|js});
   CSS.unsafe({js|objectPosition|js}, {js|unset|js});
+  
   let _loadingKeyframes =
     CSS.keyframes([|
       (0, [|CSS.backgroundPosition2(`zero, `zero)|]),

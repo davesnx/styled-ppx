@@ -14,7 +14,7 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune build
 
-  $ dune describe pp ./input.re.ml | refmt --parse ml --print re
+  $ dune describe pp ./input.re
   [@ocaml.ppx.context
     {
       tool_name: "ppx_driver",
@@ -33,6 +33,7 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
+  
   CSS.transitionProperty({js|none|js});
   CSS.transitionProperty({js|all|js});
   CSS.transitionProperty({js|width|js});
@@ -131,6 +132,7 @@ If this test fail means that the module is not in sync with the ppx
       {js|margin-right|js},
     ),
   |]);
+  
   let transitions = [|
     CSS.Transition.shorthand("margin-left"),
     CSS.Transition.shorthand(~duration=`s(2), "opacity"),
@@ -140,7 +142,9 @@ If this test fail means that the module is not in sync with the ppx
   let duration = `ms(200);
   let delay = `s(3);
   let property2 = "opacity";
+  
   (CSS.transitionList(transitions): CSS.rule);
+  
   CSS.transitionList([|
     CSS.Transition.shorthand(~duration, ~delay, ~timingFunction, property),
   |]);

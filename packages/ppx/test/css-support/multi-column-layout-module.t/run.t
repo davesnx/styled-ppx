@@ -14,7 +14,7 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune build
 
-  $ dune describe pp ./input.re.ml | refmt --parse ml --print re
+  $ dune describe pp ./input.re
   [@ocaml.ppx.context
     {
       tool_name: "ppx_driver",
@@ -33,6 +33,7 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
+  
   CSS.columnWidth(`em(10.));
   CSS.columnWidth(`auto);
   CSS.unsafe({js|columnCount|js}, {js|2|js});
@@ -40,6 +41,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|columns|js}, {js|100px|js});
   CSS.unsafe({js|columns|js}, {js|3|js});
   CSS.unsafe({js|columns|js}, {js|10em 2|js});
+  
   CSS.unsafe({js|columns|js}, {js|auto auto|js});
   CSS.unsafe({js|columns|js}, {js|2 10em|js});
   CSS.unsafe({js|columns|js}, {js|auto 10em|js});

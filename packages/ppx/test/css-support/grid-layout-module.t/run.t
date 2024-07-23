@@ -14,7 +14,7 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune build
 
-  $ dune describe pp ./input.re.ml | refmt --parse ml --print re
+  $ dune describe pp ./input.re
   [@ocaml.ppx.context
     {
       tool_name: "ppx_driver",
@@ -33,6 +33,7 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
+  
   CSS.display(`grid);
   CSS.display(`inlineGrid);
   CSS.gridTemplateColumns([|`none|]);
@@ -117,6 +118,7 @@ If this test fail means that the module is not in sync with the ppx
     )),
     `pxFloat(100.),
   |]);
+  
   CSS.gridTemplateColumns([|
     `name({js|[linename1 linename2]|js}),
     `pxFloat(100.),
@@ -205,28 +207,35 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|gridAutoFlow|js}, {js|column|js});
   CSS.unsafe({js|gridAutoFlow|js}, {js|row dense|js});
   CSS.unsafe({js|gridAutoFlow|js}, {js|column dense|js});
+  
   CSS.unsafe({js|gridRowStart|js}, {js|auto|js});
   CSS.unsafe({js|gridRowStart|js}, {js|4|js});
   CSS.unsafe({js|gridRowStart|js}, {js|C|js});
   CSS.unsafe({js|gridRowStart|js}, {js|C 2|js});
+  
   CSS.unsafe({js|gridColumnStart|js}, {js|auto|js});
   CSS.unsafe({js|gridColumnStart|js}, {js|4|js});
   CSS.unsafe({js|gridColumnStart|js}, {js|C|js});
   CSS.unsafe({js|gridColumnStart|js}, {js|C 2|js});
+  
   CSS.unsafe({js|gridRowEnd|js}, {js|auto|js});
   CSS.unsafe({js|gridRowEnd|js}, {js|4|js});
   CSS.unsafe({js|gridRowEnd|js}, {js|C|js});
   CSS.unsafe({js|gridRowEnd|js}, {js|C 2|js});
+  
   CSS.unsafe({js|gridColumnEnd|js}, {js|auto|js});
   CSS.unsafe({js|gridColumnEnd|js}, {js|4|js});
   CSS.unsafe({js|gridColumnEnd|js}, {js|C|js});
   CSS.unsafe({js|gridColumnEnd|js}, {js|C 2|js});
+  
   CSS.unsafe({js|gridColumn|js}, {js|auto|js});
   CSS.unsafe({js|gridColumn|js}, {js|1|js});
   CSS.unsafe({js|gridColumn|js}, {js|-1|js});
+  
   CSS.unsafe({js|gridRow|js}, {js|auto|js});
   CSS.unsafe({js|gridRow|js}, {js|1|js});
   CSS.unsafe({js|gridRow|js}, {js|-1|js});
+  
   CSS.gridColumnGap(`zero);
   CSS.gridColumnGap(`em(1.));
   CSS.gridRowGap(`zero);
@@ -235,6 +244,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|gridGap|js}, {js|0 1em|js});
   CSS.gridGap(`em(1.));
   CSS.unsafe({js|gridGap|js}, {js|1em 1em|js});
+  
   CSS.gridTemplateColumns([|`subgrid|]);
   CSS.gridTemplateColumns([|`subgrid, `name({js|[sub-a]|js})|]);
   CSS.gridTemplateColumns([|

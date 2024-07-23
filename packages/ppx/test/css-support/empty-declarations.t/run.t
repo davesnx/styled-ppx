@@ -12,7 +12,7 @@ If this test fail means that the module is not in sync with the ppx
   >  (preprocess (pps styled-ppx)))
   > EOF
 
-  $ dune describe pp ./input.re.ml | refmt --parse ml --print re
+  $ dune describe pp ./input.re
   [@ocaml.ppx.context
     {
       tool_name: "ppx_driver",
@@ -34,11 +34,15 @@ If this test fail means that the module is not in sync with the ppx
   CSS.style([||]);
   CSS.style([||]);
   CSS.style([||]);
+  
   let _a = CSS.style([|CSS.label("_a")|]);
   let _a = CSS.style([|CSS.label("_a")|]);
   let _a = CSS.style([|CSS.label("_a")|]);
+  
   let _a = CSS.style([|CSS.label("_a")|]);
+  
   let _a = CSS.style([|CSS.label("_a")|]);
+  
   let _a = CSS.style([|CSS.label("_a")|]);
 
   $ dune build

@@ -17,7 +17,7 @@ If this test fail means that the module is not in sync with the ppx
   Error: Parse error while reading token '2'
   [1]
 
-  $ dune describe pp ./input.re.ml | refmt --parse ml --print re
+  $ dune describe pp ./input.re
   [@ocaml.ppx.context
     {
       tool_name: "ppx_driver",
@@ -41,4 +41,5 @@ If this test fail means that the module is not in sync with the ppx
       CSS.label("_className"),
       CSS.selector({js|.lolaso :nth-child(2n)|js}, [|CSS.color(CSS.red)|]),
     |]);
+  
   let _className = [%ocaml.error "Parse error while reading token '2'"];

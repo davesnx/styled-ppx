@@ -13,7 +13,7 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
 
-  $ dune describe pp ./input.re.ml | refmt --parse ml --print re
+  $ dune describe pp ./input.re
   [@ocaml.ppx.context
     {
       tool_name: "ppx_driver",
@@ -32,6 +32,7 @@ If this test fail means that the module is not in sync with the ppx
       cookies: [],
     }
   ];
+  
   CSS.transform(`none);
   CSS.transform(CSS.translate(`pxFloat(5.), `zero));
   CSS.transform(CSS.translate(`pxFloat(5.), `pxFloat(10.)));
@@ -48,6 +49,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.transform(CSS.skew(`deg(45.), `deg(15.)));
   CSS.transform(CSS.skewX(`deg(45.)));
   CSS.transform(CSS.skewY(`deg(45.)));
+  
   CSS.transforms([|
     CSS.translate(`pxFloat(50.), `pxFloat(-24.)),
     CSS.skew(`deg(0.), `deg(22.5)),
@@ -60,6 +62,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.transform(CSS.rotateX(`deg(-45.)));
   CSS.transform(CSS.rotateY(`deg(-45.)));
   CSS.transform(CSS.rotateZ(`deg(-45.)));
+  
   CSS.transforms([|
     CSS.translate3d(`pxFloat(50.), `pxFloat(-24.), `pxFloat(5.)),
     CSS.rotate3d(1., 2., 3., `deg(180.)),
@@ -77,6 +80,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.transformBox(`viewBox);
   CSS.transformBox(`contentBox);
   CSS.transformBox(`strokeBox);
+  
   CSS.unsafe({js|translate|js}, {js|none|js});
   CSS.unsafe({js|translate|js}, {js|50%|js});
   CSS.unsafe({js|translate|js}, {js|50% 50%|js});
