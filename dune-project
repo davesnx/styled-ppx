@@ -14,7 +14,7 @@
 (homepage "https://styled-ppx.vercel.app")
 (bug_reports "https://github.com/davesnx/styled-ppx/issues")
 
-(license MIT)
+(license "BSD-2-Clause")
 
 (authors "David Sancho <dsnxmoreno@gmail.com>")
 
