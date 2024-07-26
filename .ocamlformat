@@ -1,8 +1,8 @@
-version=0.26.1
+version=0.26.2
 quiet=true
 profile=default
 
-m=80
+margin=80
 break-infix-before-func=false
 break-infix=fit-or-vertical
 cases-exp-indent=2

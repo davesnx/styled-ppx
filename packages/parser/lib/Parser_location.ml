@@ -54,9 +54,6 @@ let update_pos_lnum (a : Ppxlib.location) (b : Ppxlib.location) =
     }
   in
   let loc_end =
-    {
-      a.loc_end with
-      pos_lnum = a.loc_end.pos_lnum + b.loc_start.pos_lnum - 1;
-    }
+    { a.loc_end with pos_lnum = a.loc_end.pos_lnum + b.loc_start.pos_lnum - 1 }
   in
   { a with loc_start; loc_end }
