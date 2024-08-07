@@ -12,10 +12,12 @@
 
 module Color = {
   let text = CSS.hex("444");
+  let background = CSS.hex("333");
 };
+let backgroundString = Color.background |> CSS.Types.Color.toString;
 let colorTextString = Color.text |> CSS.Types.Color.toString;
 
-[%css {|-webkit-box-shadow: inset 0 0 0 1000px $(Color.background);|}];
+[%css {|-webkit-box-shadow: inset 0 0 0 1000px $(backgroundString);|}];
 [%css {|-webkit-line-clamp: 2;|}];
 [%css {|-webkit-overflow-scrolling: touch;|}];
 [%css {|-webkit-tap-highlight-color: transparent;|}];

@@ -5329,15 +5329,11 @@ let properties = [
 
 let render_when_unsupported_features = (~loc, property, value) => {
   /* Transform property name to camelCase since we bind to emotion with the Object API */
-  let propertyName = property |> to_camel_case |> render_string(~loc);
-  let unsafeInterpolation =
-    value
-    |> Property_parser.parse(Standard.interpolation)
-    |> Result.map(render_variable(~loc));
-  let value =
-    Result.value(unsafeInterpolation, ~default=render_string(~loc, value));
+  let propertyExpr = property |> to_camel_case |> render_string(~loc);
+  let valueExpr =
+    String_interpolation.transform(~loc, ~delimiter="js", value);
 
-  [%expr CSS.unsafe([%e propertyName], [%e value])];
+  [%expr CSS.unsafe([%e propertyExpr], [%e valueExpr])];
 };
 
 let findProperty = name => {

@@ -24,12 +24,14 @@ If this test fail means that the module is not in sync with the ppx
   
   module Color = {
     let text = CSS.hex("444");
+    let background = CSS.hex("333");
   };
+  let backgroundString = Color.background |> CSS.Types.Color.toString;
   let colorTextString = Color.text |> CSS.Types.Color.toString;
   
   CSS.unsafe(
     {js|WebkitBoxShadow|js},
-    {js|inset 0 0 0 1000px $(Color.background)|js},
+    {js|inset 0 0 0 1000px |js} ++ backgroundString,
   );
   CSS.unsafe({js|WebkitLineClamp|js}, {js|2|js});
   CSS.unsafe({js|WebkitOverflowScrolling|js}, {js|touch|js});
