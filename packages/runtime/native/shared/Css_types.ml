@@ -1098,7 +1098,7 @@ module Transition = struct
     ]
 
   let make ?(duration = `ms 0) ?(delay = `ms 0) ?(timingFunction = `ease)
-    property : t =
+    ?(property = "all") () : t =
     `value { duration; delay; timingFunction; property }
 
   let toString x =
