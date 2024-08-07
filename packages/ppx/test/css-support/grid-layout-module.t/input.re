@@ -35,18 +35,19 @@
 [%css
   {|grid-template-columns: [linename1 linename2] 100px repeat(auto-fit, [linename1] 300px) [linename3]; |}
 ];
-let value = [|
-  `repeat((
-    `num(4),
-    [|
-      `pxFloat(10.),
-      `name({js|[col-start]|js}),
-      `pxFloat(250.),
-      `name({js|[col-end]|js}),
-    |],
-  )),
-  `pxFloat(10.),
-|];
+let value =
+  `value([|
+    `repeat((
+      `num(4),
+      [|
+        `pxFloat(10.),
+        `lineNames({js|[col-start]|js}),
+        `pxFloat(250.),
+        `lineNames({js|[col-end]|js}),
+      |],
+    )),
+    `pxFloat(10.),
+  |]);
 [%css {|grid-template-columns: $(value)|}];
 [%css {|grid-template-rows: none|}];
 [%css {|grid-template-rows: auto|}];

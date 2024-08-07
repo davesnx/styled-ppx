@@ -2,9 +2,9 @@
 
 open Css_types
 
-let initial : Cascading.t = `initial
-let inherit_ : Cascading.t = `inherit_
-let unset : Cascading.t = `unset
+let initial = `initial
+let inherit_ = `inherit_
+let unset = `unset
 
 let var ?default (x : string) : Var.t =
   match default with None -> `var x | Some default -> `varDefault (x, default)
@@ -12,26 +12,26 @@ let var ?default (x : string) : Var.t =
 let auto = `auto
 let none = `none
 let text = `text
-let pct (f : float) : Percentage.t = `percent f
-let ch x : Length.t = `ch x
-let cm x : Length.t = `cm x
-let em x : Length.t = `em x
-let ex x : Length.t = `ex x
-let mm x : Length.t = `mm x
-let pt x : Length.t = `pt x
-let px x : Length.t = `px x
-let pxFloat x : Length.t = `pxFloat x
-let rem x : Length.t = `rem x
-let vh x : Length.t = `vh x
-let vmin x : Length.t = `vmin x
-let vmax x : Length.t = `vmax x
-let zero : Length.t = `zero
-let deg x : Angle.t = `deg x
-let rad x : Angle.t = `rad x
-let grad x : Angle.t = `grad x
-let turn x : Angle.t = `turn x
-let ltr : Direction.t = `ltr
-let rtl : Direction.t = `rtl
+let pct (f : float) = `percent f
+let ch x = `ch x
+let cm x = `cm x
+let em x = `em x
+let ex x = `ex x
+let mm x = `mm x
+let pt x = `pt x
+let px x = `px x
+let pxFloat x = `pxFloat x
+let rem x = `rem x
+let vh x = `vh x
+let vmin x = `vmin x
+let vmax x = `vmax x
+let zero = `zero
+let deg x = `deg x
+let rad x = `rad x
+let grad x = `grad x
+let turn x = `turn x
+let ltr = `ltr
+let rtl = `rtl
 let absolute = PropertyPosition.absolute
 let relative = PropertyPosition.relative
 let static = PropertyPosition.static

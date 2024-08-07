@@ -729,20 +729,6 @@ module TimingFunction = struct
     | #Cascading.t as c -> Cascading.toString c
 end
 
-module RepeatValue = struct
-  type t =
-    [ `autoFill
-    | `autoFit
-    | `num of int
-    ]
-
-  let toString x =
-    match x with
-    | `autoFill -> {js|auto-fill|js}
-    | `autoFit -> {js|auto-fit|js}
-    | `num x -> Kloth.Int.to_string x
-end
-
 module ListStyleType = struct
   type t =
     [ `disc
@@ -4076,3 +4062,167 @@ module FontVariantEmoji = struct
     | #Var.t as var -> Var.toString var
     | #Cascading.t as c -> Cascading.toString c
 end
+
+module InflexibleBreadth = struct
+  type t =
+    [ Length.t
+    | `minContent
+    | `maxContent
+    | `auto
+    ]
+
+  let toString x =
+    match x with
+    | #Length.t as x -> Length.toString x
+    | `minContent -> {js|min-content|js}
+    | `maxContent -> {js|max-content|js}
+    | `auto -> {js|auto|js}
+end
+
+module TrackBreadth = struct
+  type t =
+    [ InflexibleBreadth.t
+    | `fr of float
+    ]
+
+  let toString x =
+    match x with
+    | #InflexibleBreadth.t as x -> InflexibleBreadth.toString x
+    | `fr x -> Kloth.Float.to_string x ^ {js|fr|js}
+end
+
+module MinMax = struct
+  type t = [ `minmax of InflexibleBreadth.t * TrackBreadth.t ]
+
+  let toString (x : t) =
+    match x with
+    | `minmax (a, b) ->
+      {js|minmax(|js}
+      ^ InflexibleBreadth.toString a
+      ^ {js|,|js}
+      ^ TrackBreadth.toString b
+      ^ {js|)|js}
+end
+
+module TrackSize = struct
+  type t =
+    [ TrackBreadth.t
+    | MinMax.t
+    | `fitContent of Length.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | #TrackBreadth.t as x -> TrackBreadth.toString x
+    | #MinMax.t as x -> MinMax.toString x
+    | `fitContent x ->
+      {js|fit-content|js} ^ {js|(|js} ^ Length.toString x ^ {js|)|js}
+end
+
+module GridAutoRows = struct
+  type t =
+    [ `value of TrackSize.t array
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value xs ->
+      Kloth.Array.map_and_join ~f:TrackSize.toString ~sep:{js| |js} xs
+    | #Var.t as var -> Var.toString var
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+module GridAutoColumns = GridAutoRows
+
+module FixedSize = struct
+  type t =
+    [ Length.t
+    | MinMax.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | #Length.t as x -> Length.toString x
+    | #MinMax.t as x -> MinMax.toString x
+end
+
+module RepeatValue = struct
+  type t =
+    [ `autoFill
+    | `autoFit
+    | `num of int
+    ]
+
+  let toString x =
+    match x with
+    | `autoFill -> {js|auto-fill|js}
+    | `autoFit -> {js|auto-fit|js}
+    | `num x -> Kloth.Int.to_string x
+end
+
+module RepeatTrack = struct
+  type t =
+    [ `lineNames of string
+    | FixedSize.t
+    | TrackSize.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | `lineNames name -> name
+    | #FixedSize.t as x -> FixedSize.toString x
+    | #TrackSize.t as x -> TrackSize.toString x
+end
+
+module Repeat = struct
+  type t = [ `repeat of RepeatValue.t * RepeatTrack.t array ]
+
+  let toString (x : t) =
+    match x with
+    | `repeat (n, x) ->
+      {js|repeat(|js}
+      ^ RepeatValue.toString n
+      ^ {js|, |js}
+      ^ Kloth.Array.map_and_join ~f:RepeatTrack.toString ~sep:{js| |js} x
+      ^ {js|)|js}
+end
+
+module Track = struct
+  type t =
+    [ `lineNames of string
+    | `subgrid
+    | FixedSize.t
+    | Repeat.t
+    | TrackSize.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | `lineNames names -> names
+    | `subgrid -> {js|subgrid|js}
+    | #FixedSize.t as x -> FixedSize.toString x
+    | #Repeat.t as x -> Repeat.toString x
+    | #TrackSize.t as x -> TrackSize.toString x
+end
+
+module GridTemplateRows = struct
+  type t =
+    [ None.t
+    | `value of Track.t array
+    | Var.t
+    | Cascading.t
+    ]
+
+  let value x = `value x
+
+  let toString (x : t) =
+    match x with
+    | #None.t -> None.toString
+    | `value x -> Kloth.Array.map_and_join ~f:Track.toString ~sep:{js| |js} x
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+module GridTemplateColumns = GridTemplateRows
