@@ -642,92 +642,19 @@ let flexBasis x =
 
 let order x = Rule.declaration ({js|order|js}, Kloth.Int.to_string x)
 
-let string_of_minmax x =
-  match x with
-  | `auto -> {js|auto|js}
-  | #Length.t as l -> Length.toString l
-  | `fr x -> Kloth.Float.to_string x ^ {js|fr|js}
-  | `minContent -> {js|min-content|js}
-  | `maxContent -> {js|max-content|js}
-
-let string_of_dimension x =
-  match x with
-  | `auto -> {js|auto|js}
-  | `none -> {js|none|js}
-  | `subgrid -> {js|subgrid|js}
-  | #Length.t as l -> Length.toString l
-  | `fr x -> Kloth.Float.to_string x ^ {js|fr|js}
-  | `fitContent -> {js|fit-content|js}
-  | `minContent -> {js|min-content|js}
-  | `maxContent -> {js|max-content|js}
-  | `minmax (a, b) ->
-    {js|minmax(|js}
-    ^ string_of_minmax a
-    ^ {js|,|js}
-    ^ string_of_minmax b
-    ^ {js|)|js}
-
-type minmax =
-  [ `fr of float
-  | `minContent
-  | `maxContent
-  | `auto
-  | Length.t
-  ]
-
-type trackLength =
-  [ Length.t
-  | `auto
-  | `fr of float
-  | `minContent
-  | `maxContent
-  | `minmax of minmax * minmax
-  ]
-
-type gridLength =
-  [ trackLength
-  | `repeat of RepeatValue.t * trackLength array
-  ]
-
-let rec gridLengthToJs x =
-  match x with
-  | `name name -> name
-  | `subgrid -> {js|subgrid|js}
-  | `none -> {js|none|js}
-  | `auto -> {js|auto|js}
-  | #Length.t as l -> Length.toString l
-  | `fr x -> Kloth.Float.to_string x ^ {js|fr|js}
-  | `minContent -> {js|min-content|js}
-  | `maxContent -> {js|max-content|js}
-  | `fitContent x ->
-    {js|fit-content|js} ^ {js|(|js} ^ Length.toString x ^ {js|)|js}
-  | `repeat (n, x) ->
-    {js|repeat(|js}
-    ^ RepeatValue.toString n
-    ^ {js|, |js}
-    ^ string_of_dimensions x
-    ^ {js|)|js}
-  | `minmax (a, b) ->
-    {js|minmax(|js}
-    ^ string_of_minmax a
-    ^ {js|,|js}
-    ^ string_of_minmax b
-    ^ {js|)|js}
-
-and string_of_dimensions dimensions =
-  Kloth.Array.map_and_join ~f:gridLengthToJs ~sep:{js| |js} dimensions
-
 let gridTemplateColumns dimensions =
-  Rule.declaration ({js|gridTemplateColumns|js}, string_of_dimensions dimensions)
+  Rule.declaration
+    ({js|gridTemplateColumns|js}, GridTemplateColumns.toString dimensions)
 
 let gridTemplateRows dimensions =
-  Rule.declaration ({js|gridTemplateRows|js}, string_of_dimensions dimensions)
+  Rule.declaration
+    ({js|gridTemplateRows|js}, GridTemplateRows.toString dimensions)
 
-let gridAutoColumns dimensions =
-  Rule.declaration ({js|gridAutoColumns|js}, string_of_dimension dimensions)
+let gridAutoColumns sizes =
+  Rule.declaration ({js|gridAutoColumns|js}, GridAutoColumns.toString sizes)
 
-let gridAutoRows dimensions =
-  Rule.declaration ({js|gridAutoRows|js}, string_of_dimension dimensions)
+let gridAutoRows sizes =
+  Rule.declaration ({js|gridAutoRows|js}, GridAutoRows.toString sizes)
 
 let gridArea x = Rule.declaration ({js|gridArea|js}, GridArea.toString x)
 

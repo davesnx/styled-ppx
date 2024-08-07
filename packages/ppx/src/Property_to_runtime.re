@@ -3692,7 +3692,7 @@ let render_line_names = (~loc, value: Types.line_names) => {
   line_names
   |> String.concat(" ")
   |> Printf.sprintf("[%s]")
-  |> (name => [[%expr `name([%e render_string(~loc, name)])]]);
+  |> (name => [[%expr `lineNames([%e render_string(~loc, name)])]]);
 };
 
 let render_maybe_line_names = (~loc, value) => {
@@ -3899,13 +3899,15 @@ let grid_template_columns =
     (~loc) => [%expr CSS.gridTemplateColumns],
     (~loc, value: Types.property_grid_template_columns) =>
       switch (value) {
-      | `None => [%expr [|`none|]]
       | `Interpolation(v) => render_variable(~loc, v)
+      | `None => [%expr `none]
       | `Track_list(track_list, line_names) =>
-        render_track_list(~loc, track_list, line_names)
-      | `Auto_track_list(list) => render_auto_track_list(~loc, list)
-      | `Static((), None) => [%expr [|`subgrid|]]
-      | `Static((), Some(subgrid)) => render_subgrid(~loc, subgrid)
+        [%expr `value([%e render_track_list(~loc, track_list, line_names)])]
+      | `Auto_track_list(list) =>
+        [%expr `value([%e render_auto_track_list(~loc, list)])]
+      | `Static((), None) => [%expr `value([|`subgrid|])]
+      | `Static((), Some(subgrid)) =>
+        [%expr `value([%e render_subgrid(~loc, subgrid)])]
       },
   );
 
@@ -3915,13 +3917,15 @@ let grid_template_rows =
     (~loc) => [%expr CSS.gridTemplateRows],
     (~loc, value: Types.property_grid_template_rows) =>
       switch (value) {
-      | `None => [%expr [|`none|]]
       | `Interpolation(v) => render_variable(~loc, v)
+      | `None => [%expr `none]
       | `Track_list(track_list, line_names) =>
-        render_track_list(~loc, track_list, line_names)
-      | `Auto_track_list(list) => render_auto_track_list(~loc, list)
-      | `Static((), None) => [%expr [|`subgrid|]]
-      | `Static((), Some(subgrid)) => render_subgrid(~loc, subgrid)
+        [%expr `value([%e render_track_list(~loc, track_list, line_names)])]
+      | `Auto_track_list(list) =>
+        [%expr `value([%e render_auto_track_list(~loc, list)])]
+      | `Static((), None) => [%expr `value([|`subgrid|])]
+      | `Static((), Some(subgrid)) =>
+        [%expr `value([%e render_subgrid(~loc, subgrid)])]
       },
   );
 
