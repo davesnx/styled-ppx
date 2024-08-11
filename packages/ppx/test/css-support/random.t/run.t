@@ -57,7 +57,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|breakInside|js}, {js|avoid|js});
   CSS.unsafe({js|caretColor|js}, {js|#e15a46|js});
   CSS.unsafe({js|color|js}, {js|inherit|js});
-  CSS.color(`var({js|--color-link|js}));
+  CSS.unsafe({js|color|js}, {js|var(--color-link)|js});
   CSS.columnWidth(`pxFloat(125.));
   CSS.columnWidth(`auto);
   
@@ -150,6 +150,6 @@ If this test fail means that the module is not in sync with the ppx
   
   CSS.style([|CSS.aspectRatio(`ratio((16, 9)))|]);
   
-  CSS.color(`var({js|--color-link|js}));
+  CSS.unsafe({js|color|js}, {js|var(--color-link)|js});
 
   $ dune build

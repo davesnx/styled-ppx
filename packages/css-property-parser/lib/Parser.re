@@ -138,7 +138,7 @@ and cf_mixing_image = [%value.rec "[ <extended-percentage> ]? && <image>"]
 and class_selector = [%value.rec "'.' <ident-token>"]
 and clip_source = [%value.rec "<url>"]
 and color = [%value.rec
-  "<rgb()> | <rgba()> | <hsl()> | <hsla()> | <hex-color> | <named-color> | 'currentColor' | <deprecated-system-color> | <interpolation> | <var()> | <color-mix()>"
+  "<rgb()> | <rgba()> | <hsl()> | <hsla()> | <hex-color> | <named-color> | 'currentColor' | <deprecated-system-color> | <interpolation> | <color-mix()>"
 ]
 and color_stop = [%value.rec "<color-stop-length> | <color-stop-angle>"]
 and color_stop_angle = [%value.rec "[ <extended-angle> ]{1,2}"]

@@ -1034,11 +1034,6 @@ let render_function_hsla = (~loc, (hue, saturation, lightness, alpha)) => {
   };
 };
 
-let render_var = (~loc, string) => {
-  let string = render_string(~loc, string);
-  [%expr `var([%e string])];
-};
-
 let rec render_color = (~loc, value) =>
   switch ((value: Types.color)) {
   | `Interpolation(v) => render_variable(~loc, v)
@@ -1049,7 +1044,6 @@ let rec render_color = (~loc, value) =>
     render_function_color_mix(~loc, color_mix)
   | `Function_rgb(rgb) => render_function_rgb(~loc, rgb)
   | `Function_rgba(rgba) => render_function_rgba(~loc, rgba)
-  | `Function_var(v) => render_var(~loc, v)
   | `Function_hsl(`Hsl_0(hsl)) => render_function_hsl(~loc, hsl)
   | `Function_hsla(`Hsla_0(hsla)) => render_function_hsla(~loc, hsla)
   /* Function_hsl(a) with `Hsl(a)_1 aren't supported */
@@ -5370,6 +5364,33 @@ let render_to_expr = (~loc, property, value, important) => {
   };
 };
 
+let render_css_variable = (~loc, property, value) => {
+  let.ok tokens =
+    Styled_ppx_css_parser.Lexer.tokenize(property ++ ": " ++ value ++ ";")
+    |> Result.map_error(_ =>
+         failwith("property and value should already be valid")
+       );
+
+  let varExist =
+    List.exists(
+      ((token, _, _)) => {
+        switch ((token: Styled_ppx_css_parser.Parser.token)) {
+        | FUNCTION("var") => true
+        | _ => false
+        }
+      },
+      tokens,
+    );
+
+  if (varExist) {
+    let property = property |> to_camel_case |> render_string(~loc);
+    let value = value |> render_string(~loc);
+    Ok([[%expr CSS.unsafe([%e property], [%e value])]]);
+  } else {
+    Error("CSS variable does not exist");
+  };
+};
+
 let render = (~loc: Location.t, property, value, important) =>
   if (isVariableDeclaration(property)) {
     Ok([render_variable_declaration(~loc, property, value)]);
@@ -5378,17 +5399,21 @@ let render = (~loc: Location.t, property, value, important) =>
       Property_parser.check_property(~name=property, value)
       |> Result.map_error((`Unknown_value) => `Property_not_found);
 
-    switch (render_css_global_values(~loc, property, value)) {
+    switch (render_css_variable(~loc, property, value)) {
     | Ok(value) => Ok(value)
     | Error(_) =>
-      switch (render_to_expr(~loc, property, value, important)) {
+      switch (render_css_global_values(~loc, property, value)) {
       | Ok(value) => Ok(value)
-      | exception (Invalid_value(v)) =>
-        Error(`Invalid_value(value ++ ". " ++ v))
-      | Error(_)
-      | exception Unsupported_feature =>
-        let.ok () = is_valid_string ? Ok() : Error(`Invalid_value(value));
-        Ok([render_when_unsupported_features(~loc, property, value)]);
+      | Error(_) =>
+        switch (render_to_expr(~loc, property, value, important)) {
+        | Ok(value) => Ok(value)
+        | exception (Invalid_value(v)) =>
+          Error(`Invalid_value(value ++ ". " ++ v))
+        | Error(_)
+        | exception Unsupported_feature =>
+          let.ok () = is_valid_string ? Ok() : Error(`Invalid_value(value));
+          Ok([render_when_unsupported_features(~loc, property, value)]);
+        }
       }
     };
   };
