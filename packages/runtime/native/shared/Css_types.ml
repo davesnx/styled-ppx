@@ -1501,11 +1501,10 @@ module Color = struct
     | #rectangular_color_space as rcs -> rectangular_color_space_to_string rcs
     | #polar_color_space as pcs -> polar_color_space_to_string pcs
     | `polar_with_hue (pcs, hs) ->
-      {js|polar-with-hue(|js}
-      ^ polar_color_space_to_string pcs
-      ^ {js|, |js}
+      polar_color_space_to_string pcs
+      ^ {js| |js}
       ^ hue_size_to_string hs
-      ^ {js|)|js}
+      ^ {js| hue|js}
 
   let rec toString (x : t) =
     match x with
