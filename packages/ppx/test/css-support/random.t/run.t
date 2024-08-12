@@ -72,19 +72,23 @@ If this test fail means that the module is not in sync with the ppx
   
   CSS.unsafe({js|gridColumn|js}, {js|unset|js});
   CSS.unsafe({js|gridRow|js}, {js|unset|js});
-  CSS.gridTemplateColumns([|`maxContent, `maxContent|]);
-  CSS.gridTemplateColumns([|
-    `minmax((`pxFloat(10.), `auto)),
-    `fitContent(`pxFloat(20.)),
-    `fitContent(`pxFloat(20.)),
-  |]);
-  CSS.gridTemplateColumns([|
-    `minmax((`pxFloat(51.), `auto)),
-    `fitContent(`pxFloat(20.)),
-    `fitContent(`pxFloat(20.)),
-  |]);
-  CSS.gridTemplateColumns([|`repeat((`num(2), [|`auto|]))|]);
-  CSS.gridTemplateColumns([|`repeat((`num(3), [|`auto|]))|]);
+  CSS.gridTemplateColumns(`value([|`maxContent, `maxContent|]));
+  CSS.gridTemplateColumns(
+    `value([|
+      `minmax((`pxFloat(10.), `auto)),
+      `fitContent(`pxFloat(20.)),
+      `fitContent(`pxFloat(20.)),
+    |]),
+  );
+  CSS.gridTemplateColumns(
+    `value([|
+      `minmax((`pxFloat(51.), `auto)),
+      `fitContent(`pxFloat(20.)),
+      `fitContent(`pxFloat(20.)),
+    |]),
+  );
+  CSS.gridTemplateColumns(`value([|`repeat((`num(2), [|`auto|]))|]));
+  CSS.gridTemplateColumns(`value([|`repeat((`num(3), [|`auto|]))|]));
   CSS.unsafe({js|height|js}, {js|fit-content|js});
   CSS.justifyItems(`start);
   CSS.unsafe({js|justifySelf|js}, {js|unset|js});
