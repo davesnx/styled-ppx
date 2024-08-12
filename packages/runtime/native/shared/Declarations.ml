@@ -829,11 +829,11 @@ let transitionList x =
     ( {js|transition|js},
       Kloth.Array.map_and_join ~sep:{js|, |js} ~f:Transition.toString x )
 
-let transition ?duration ?delay ?timingFunction property =
+let transition ?duration ?delay ?timingFunction ?property () =
   Rule.declaration
     ( {js|transition|js},
       Transition.toString
-        (Transition.make ?duration ?delay ?timingFunction property) )
+        (Transition.make ?duration ?delay ?timingFunction ?property ()) )
 
 let transitionDelay i =
   Rule.declaration ({js|transitionDelay|js}, Time.toString i)
