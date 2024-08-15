@@ -320,28 +320,33 @@ let render_length = (~loc) =>
   | `Zero => [%expr `zero];
 
 let rec render_function_calc = (~loc, calc_sum) => {
-  render_calc_sum(~loc, calc_sum);
+  [%expr `calc([%e render_calc_sum(~loc, calc_sum)])];
 }
 
-and render_calc_sum = (~loc, calc_sum) => {
-  switch (calc_sum) {
-  | (product, []) => render_product(~loc, product)
-  | (product, list_of_sums) =>
-    /* This isn't a great design of the types, but we need to know the operation
-       which is in the first position of the array, we ensure that there's one value
-       since we are on this branch of the switch */
-    let op = pick_operation(List.hd(list_of_sums));
-    switch (op) {
-    | `Dash () =>
-      let first = render_product(~loc, product);
-      let second = render_list_of_sums(~loc, list_of_sums);
-      [%expr `calc(`sub(([%e first], [%e second])))];
-    | `Cross () =>
-      let first = render_product(~loc, product);
-      let second = render_list_of_sums(~loc, list_of_sums);
-      [%expr `calc(`add(([%e first], [%e second])))];
+and render_calc_sum = (~loc, (product, sums): Types.calc_sum) => {
+  let rec go = (left, rest) => {
+    switch (rest) {
+    | [] => left
+    | [x, ...xs] =>
+      switch (x) {
+      | (`Cross (), calc_product) =>
+        go(
+          [%expr
+            `add(([%e left], [%e render_calc_product(~loc, calc_product)]))
+          ],
+          xs,
+        )
+      | (`Dash (), calc_product) =>
+        go(
+          [%expr
+            `sub(([%e left], [%e render_calc_product(~loc, calc_product)]))
+          ],
+          xs,
+        )
+      }
     };
   };
+  go(render_calc_product(~loc, product), sums);
 }
 and render_function_min_or_max = (~loc, calc_sums: list(Types.calc_sum)) => {
   switch (calc_sums) {
@@ -357,33 +362,26 @@ and render_function_min = (~loc, calc_sums) => {
 and render_function_max = (~loc, calc_sums) => {
   [%expr `max([%e render_function_min_or_max(~loc, calc_sums)])];
 }
-and pick_operation = ((op, _)) => op
-and render_list_of_products = (~loc, list_of_products) => {
-  switch (list_of_products) {
-  | [one] => render_product_op(~loc, one)
-  | list => render_list_of_products(~loc, list)
+and render_calc_product = (~loc, (value, products): Types.calc_product) => {
+  let rec go = (left, rest) => {
+    switch (rest) {
+    | [] => left
+    | [x, ...xs] =>
+      switch (x) {
+      | (`Asterisk (), value) =>
+        go(
+          [%expr `mult(([%e left], [%e render_calc_value(~loc, value)]))],
+          xs,
+        )
+      | (`Bar (), value) =>
+        go(
+          [%expr `div(([%e left], [%e render_calc_value(~loc, value)]))],
+          xs,
+        )
+      }
+    };
   };
-}
-and render_list_of_sums = (~loc, list_of_sums) => {
-  switch (list_of_sums) {
-  | [(_, one)] => render_product(~loc, one)
-  | list => render_list_of_sums(~loc, list)
-  };
-}
-and render_product = (~loc, product) => {
-  switch (product) {
-  | (calc_value, []) => render_calc_value(~loc, calc_value)
-  | (calc_value, list_of_products) =>
-    let first = render_calc_value(~loc, calc_value);
-    let second = render_list_of_products(~loc, list_of_products);
-    [%expr `calc(`mult(([%e first], [%e second])))];
-  };
-}
-and render_product_op = (~loc, op) => {
-  switch (op) {
-  | `Static_0((), calc_value) => render_calc_value(~loc, calc_value)
-  | `Static_1((), float) => [%expr `num([%e render_float(~loc, float)])]
-  };
+  go(render_calc_value(~loc, value), products);
 }
 and render_angle = (~loc) =>
   fun
@@ -434,6 +432,7 @@ and render_calc_value = (~loc, calc_value) => {
   | `Extended_percentage(p) => render_extended_percentage(~loc, p)
   | `Extended_angle(a) => render_extended_angle(~loc, a)
   | `Extended_time(t) => render_extended_time(~loc, t)
+  | `Static(_, calc_sum, _) => render_calc_sum(~loc, calc_sum)
   };
 }
 and render_extended_length = (~loc) =>
