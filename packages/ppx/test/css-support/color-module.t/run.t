@@ -146,5 +146,5 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|columnRuleColor|js}, {js|#000000FF|js});
   CSS.unsafe({js|columnRuleColor|js}, {js|rebeccapurple|js});
   
-  CSS.color(`rgba((0, 0, 0, `num(1.))));
+  CSS.color(`rgba((0, 0, 0, `calc(`num(1.)))));
   CSS.color(`rgba((0, 0, 0, `calc(`sub((`num(10.), `num(1.)))))));

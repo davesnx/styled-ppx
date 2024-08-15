@@ -53,9 +53,7 @@ If this test fail means that the module is not in sync with the ppx
             `calc(
               `mult((
                 `rem(2.),
-                `calc(
-                  `mult((`rem(2.), `calc(`mult((`rem(2.), `num(4.)))))),
-                ),
+                `calc(`mult((`rem(2.), `calc(`div((`rem(2.), 4.)))))),
               )),
             ),
           )),

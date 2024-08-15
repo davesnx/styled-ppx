@@ -69,7 +69,8 @@ module Calc = struct
     | `calc (`mult (a, b)) ->
       {js|calc(|js} ^ fn a ^ {js| * |js} ^ fn b ^ {js|)|js}
     | `calc (`div (a, b)) ->
-      {js|calc(|js} ^ fn a ^ {js| / |js} ^ fn b ^ {js|)|js}
+      {js|calc(|js} ^ fn a ^ {js| / |js} ^ Kloth.Float.to_string b ^ {js|)|js}
+    | `calc (`num a) -> {js|calc(|js} ^ Kloth.Float.to_string a ^ {js|)|js}
     | `num n -> Kloth.Float.to_string n
     | `min xs -> {js|min(|js} ^ max_or_min_values fn xs ^ {js|)|js}
     | `max xs -> {js|max(|js} ^ max_or_min_values fn xs ^ {js|)|js}
@@ -80,7 +81,8 @@ module Calc = struct
       | `add (x, y) -> {js|calc(|js} ^ fn x ^ {js| + |js} ^ fn y ^ {js|)|js}
       | `sub (x, y) -> {js|calc(|js} ^ fn x ^ {js| - |js} ^ fn y ^ {js|)|js}
       | `mult (x, y) -> {js|calc(|js} ^ fn x ^ {js| * |js} ^ fn y ^ {js|)|js}
-      | `div (x, y) -> {js|calc(|js} ^ fn x ^ {js| / |js} ^ fn y ^ {js|)|js}
+      | `div (x, y) ->
+        {js|calc(|js} ^ fn x ^ {js| / |js} ^ Kloth.Float.to_string y ^ {js|)|js}
       | (`min _ | `max _) as x -> fn_max_min x
     in
     aux x
@@ -99,7 +101,7 @@ module Time = struct
     | `add of calc_value * calc_value
     | `sub of calc_value * calc_value
     | `mult of calc_value * calc_value
-    | `div of calc_value * calc_value
+    | `div of calc_value * float
     | (* calc_value can be a nested `calc.
          Ej. width: calc(100vh - calc(2rem + 120px))) *)
       `calc of
@@ -189,7 +191,7 @@ module Length = struct
     | `add of calc_value * calc_value
     | `sub of calc_value * calc_value
     | `mult of calc_value * calc_value
-    | `div of calc_value * calc_value
+    | `div of calc_value * float
     | (* calc_value can be a nested `calc.
          Ej. width: calc(100vh - calc(2rem + 120px))) *)
       `calc of
@@ -1323,7 +1325,12 @@ module Color = struct
 
   type 'a calc_min_max =
     [ `calc of
-      [ `add of 'a * 'a | `sub of 'a * 'a | `mult of 'a * 'a | `div of 'a * 'a ]
+      [ `add of 'a * 'a
+      | `sub of 'a * 'a
+      | `mult of 'a * 'a
+      | `div of 'a * float
+      | `num of float
+      ]
     | `min of 'a array
     | `max of 'a array
     ]

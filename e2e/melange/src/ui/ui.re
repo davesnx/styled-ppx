@@ -162,7 +162,7 @@ let rec modify =
 let negate_in_calc = (v: calc_value): calc_value =>
   `calc(`mult((v, `num(-1.))));
 let half_in_calc = (v: calc_value): calc_value =>
-  `calc(`div((v, `num(2.))));
+  `calc(`div((v, 2.)));
 
 let negative = value => modify((~-.), (~-), negate_in_calc, value);
 let half = value => modify(x => x /. 2., x => x / 2, half_in_calc, value);

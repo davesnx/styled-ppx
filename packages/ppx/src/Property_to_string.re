@@ -137,18 +137,27 @@ let rec render_function_calc =
         (calc_sum: Css_property_parser.Parser.Types.calc_sum) => {
   [%expr "calc(" ++ [%e render_calc_sum(calc_sum)] ++ ")"];
 }
-and render_calc_sum = _calc_sum => failwith("not implemented")
-//switch (calc_sum) {
-//| (product, None) => render_product(product)
-//| (product, Some((`Cross (), calc_product))) =>
-//  let first = render_product(product);
-//  let second = render_product(calc_product);
-//  [%expr [%e first] ++ " + " ++ [%e second]];
-//| (product, Some((`Dash (), calc_product))) =>
-//  let first = render_product(product);
-//  let second = render_product(calc_product);
-//  [%expr [%e first] ++ " - " ++ [%e second]];
-//}
+and render_calc_sum = ((product, sums)) => {
+  let rec go = (left, rest) => {
+    switch (rest) {
+    | [] => left
+    | [x, ...xs] =>
+      switch (x) {
+      | (`Cross (), calc_product) =>
+        go(
+          [%expr [%e left] ++ " + " ++ [%e render_product(calc_product)]],
+          xs,
+        )
+      | (`Dash (), calc_product) =>
+        go(
+          [%expr [%e left] ++ " - " ++ [%e render_product(calc_product)]],
+          xs,
+        )
+      }
+    };
+  };
+  go(render_product(product), sums);
+}
 and render_function_min_or_max = calc_sums => {
   switch (calc_sums) {
   | [] => raise(Invalid_value("expected at least one argument"))
@@ -163,62 +172,67 @@ and render_function_min = calc_sums => {
 and render_function_max = calc_sums => {
   render_function_min_or_max(calc_sums);
 }
-//and render_product = product => {
-//  switch (product) {
-//  | (value, None) => render_calc_value(value)
-//  | (left, Some((`Asterisk (), right))) =>
-//    let first = render_calc_value(left);
-//    let second = render_calc_value(right);
-//    [%expr [%e first] ++ " * " ++ [%e second]];
-//  | (left, Some((`Bar (), right))) =>
-//    let first = render_calc_value(left);
-//    let second = render_calc_value(right);
-//    [%expr [%e first] ++ " / " ++ [%e second]];
-//  };
-//}
-//and render_calc_value = calc_value => {
-//  switch (calc_value) {
-//  | `Number(float) => render_number(float, "")
-//  | `Extended_length(l) => render_extended_length(l)
-//  | `Extended_percentage(p) => render_extended_percentage(p)
-//  | `Extended_angle(a) => render_extended_angle(a)
-//  | `Extended_time(t) => render_extended_time(t)
-//  | `Static(_, calc_sum, _) => render_calc_sum(calc_sum)
-//  };
-//}
-//and render_time_as_int =
-//  fun
-//  | `Ms(f) => {
-//      let value = Float.to_int(f);
-//      render_integer(value);
-//    }
-//  | `S(f) => {
-//      let value = Float.to_int(f);
-//      render_integer(value);
-//    }
-//
-//and render_extended_time =
-//  fun
-//  | `Time(t) => render_time_as_int(t)
-//  | `Function_calc(fc) => render_function_calc(fc)
-//  | `Interpolation(v) => render_variable(v)
-//  | `Function_min(values) => render_function_min(values)
-//  | `Function_max(values) => render_function_max(values)
-//
-//and render_angle =
-//  fun
-//  | `Deg(number)
-//  | `Rad(number)
-//  | `Grad(number)
-//  | `Turn(number) => render_number(number, "")
-//
-//and render_extended_angle =
-//  fun
-//  | `Angle(a) => render_angle(a)
-//  | `Function_calc(fc) => render_function_calc(fc)
-//  | `Interpolation(i) => render_variable(i)
-//  | `Function_min(values) => render_function_min(values)
-//  | `Function_max(values) => render_function_max(values)
+and render_product = ((value, products)) => {
+  let rec go = (left, rest) => {
+    switch (rest) {
+    | [] => left
+    | [x, ...xs] =>
+      switch (x) {
+      | `Static_0(_, value) =>
+        go([%expr [%e left] ++ " * " ++ [%e render_calc_value(value)]], xs)
+      | `Static_1(_, float_value) =>
+        go(
+          [%expr [%e left] ++ " / " ++ [%e render_number(float_value, "")]],
+          xs,
+        )
+      }
+    };
+  };
+  go(render_calc_value(value), products);
+}
+and render_calc_value = calc_value => {
+  switch (calc_value) {
+  | `Number(float) => render_number(float, "")
+  | `Extended_length(l) => render_extended_length(l)
+  | `Extended_percentage(p) => render_extended_percentage(p)
+  | `Extended_angle(a) => render_extended_angle(a)
+  | `Extended_time(t) => render_extended_time(t)
+  | `Static(_, calc_sum, _) => render_calc_sum(calc_sum)
+  };
+}
+and render_time_as_int =
+  fun
+  | `Ms(f) => {
+      let value = Float.to_int(f);
+      render_integer(value);
+    }
+  | `S(f) => {
+      let value = Float.to_int(f);
+      render_integer(value);
+    }
+
+and render_extended_time =
+  fun
+  | `Time(t) => render_time_as_int(t)
+  | `Function_calc(fc) => render_function_calc(fc)
+  | `Interpolation(v) => render_variable(v)
+  | `Function_min(values) => render_function_min(values)
+  | `Function_max(values) => render_function_max(values)
+
+and render_angle =
+  fun
+  | `Deg(number)
+  | `Rad(number)
+  | `Grad(number)
+  | `Turn(number) => render_number(number, "")
+
+and render_extended_angle =
+  fun
+  | `Angle(a) => render_angle(a)
+  | `Function_calc(fc) => render_function_calc(fc)
+  | `Interpolation(i) => render_variable(i)
+  | `Function_min(values) => render_function_min(values)
+  | `Function_max(values) => render_function_max(values)
 
 and render_extended_length =
   fun
