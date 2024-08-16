@@ -332,14 +332,14 @@ and render_calc_sum = (~loc, (product, sums): Types.calc_sum) => {
       | (`Cross (), calc_product) =>
         go(
           [%expr
-            `add([%e left], [%e render_calc_product(~loc, calc_product)])
+            `add(([%e left], [%e render_calc_product(~loc, calc_product)]))
           ],
           xs,
         )
       | (`Dash (), calc_product) =>
         go(
           [%expr
-            `sub([%e left], [%e render_calc_product(~loc, calc_product)])
+            `sub(([%e left], [%e render_calc_product(~loc, calc_product)]))
           ],
           xs,
         )
@@ -370,12 +370,12 @@ and render_calc_product = (~loc, (value, products): Types.calc_product) => {
       switch (x) {
       | `Static_0(_, value) =>
         go(
-          [%expr `mult([%e left], [%e render_calc_value(~loc, value)])],
+          [%expr `mult(([%e left], [%e render_calc_value(~loc, value)]))],
           xs,
         )
       | `Static_1(_, float_value) =>
         go(
-          [%expr `div([%e left], [%e render_float(~loc, float_value)])],
+          [%expr `div(([%e left], [%e render_float(~loc, float_value)]))],
           xs,
         )
       }

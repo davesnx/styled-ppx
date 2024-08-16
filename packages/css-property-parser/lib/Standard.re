@@ -4,7 +4,15 @@ open Rule.Pattern;
 
 let keyword = string => expect(IDENT(string));
 let comma = expect(COMMA);
-let delim = string => expect(DELIM(string));
+let delim =
+  fun
+  | "(" => expect(LEFT_PAREN)
+  | ")" => expect(RIGHT_PAREN)
+  | "[" => expect(LEFT_BRACKET)
+  | "]" => expect(RIGHT_BRACKET)
+  | ":" => expect(COLON)
+  | ";" => expect(SEMI_COLON)
+  | s => expect(DELIM(s));
 let function_call = (name, rule) => {
   let.bind_match () =
     token(
