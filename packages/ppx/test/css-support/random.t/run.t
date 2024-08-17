@@ -24,12 +24,14 @@ If this test fail means that the module is not in sync with the ppx
   
   module Color = {
     let text = CSS.hex("444");
+    let background = CSS.hex("333");
   };
+  let backgroundString = Color.background |> CSS.Types.Color.toString;
   let colorTextString = Color.text |> CSS.Types.Color.toString;
   
   CSS.unsafe(
     {js|WebkitBoxShadow|js},
-    {js|inset 0 0 0 1000px $(Color.background)|js},
+    {js|inset 0 0 0 1000px |js} ++ backgroundString,
   );
   CSS.unsafe({js|WebkitLineClamp|js}, {js|2|js});
   CSS.unsafe({js|WebkitOverflowScrolling|js}, {js|touch|js});
@@ -70,19 +72,23 @@ If this test fail means that the module is not in sync with the ppx
   
   CSS.unsafe({js|gridColumn|js}, {js|unset|js});
   CSS.unsafe({js|gridRow|js}, {js|unset|js});
-  CSS.gridTemplateColumns([|`maxContent, `maxContent|]);
-  CSS.gridTemplateColumns([|
-    `minmax((`pxFloat(10.), `auto)),
-    `fitContent(`pxFloat(20.)),
-    `fitContent(`pxFloat(20.)),
-  |]);
-  CSS.gridTemplateColumns([|
-    `minmax((`pxFloat(51.), `auto)),
-    `fitContent(`pxFloat(20.)),
-    `fitContent(`pxFloat(20.)),
-  |]);
-  CSS.gridTemplateColumns([|`repeat((`num(2), [|`auto|]))|]);
-  CSS.gridTemplateColumns([|`repeat((`num(3), [|`auto|]))|]);
+  CSS.gridTemplateColumns(`value([|`maxContent, `maxContent|]));
+  CSS.gridTemplateColumns(
+    `value([|
+      `minmax((`pxFloat(10.), `auto)),
+      `fitContent(`pxFloat(20.)),
+      `fitContent(`pxFloat(20.)),
+    |]),
+  );
+  CSS.gridTemplateColumns(
+    `value([|
+      `minmax((`pxFloat(51.), `auto)),
+      `fitContent(`pxFloat(20.)),
+      `fitContent(`pxFloat(20.)),
+    |]),
+  );
+  CSS.gridTemplateColumns(`value([|`repeat((`num(2), [|`auto|]))|]));
+  CSS.gridTemplateColumns(`value([|`repeat((`num(3), [|`auto|]))|]));
   CSS.unsafe({js|height|js}, {js|fit-content|js});
   CSS.justifyItems(`start);
   CSS.unsafe({js|justifySelf|js}, {js|unset|js});

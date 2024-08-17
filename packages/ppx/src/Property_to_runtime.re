@@ -3107,6 +3107,8 @@ let transition_delay =
 let render_transition_property = (~loc) =>
   fun
   | `None => render_string(~loc, "none")
+  | `Single_transition_property_no_interp(x) =>
+    render_single_transition_property_no_interp(~loc, x)
   | `Single_transition_property(x) =>
     render_single_transition_property(~loc, x);
 
@@ -3116,7 +3118,8 @@ let render_single_transition = (~loc) =>
       [%expr
        CSS.Transition.shorthand(
          ~duration=[%e render_extended_time(~loc, duration)],
-         [%e render_transition_property(~loc, property)],
+         ~property=[%e render_transition_property(~loc, property)],
+         (),
        )];
     }
   | `Static_1(property, duration, timingFunction) => {
@@ -3124,7 +3127,8 @@ let render_single_transition = (~loc) =>
        CSS.Transition.shorthand(
          ~duration=[%e render_extended_time(~loc, duration)],
          ~timingFunction=[%e render_timing(~loc, timingFunction)],
-         [%e render_transition_property(~loc, property)],
+         ~property=[%e render_transition_property(~loc, property)],
+         (),
        )];
     }
   | `Static_2(property, duration, timingFunction, delay) => {
@@ -3133,7 +3137,8 @@ let render_single_transition = (~loc) =>
          ~duration=[%e render_extended_time(~loc, duration)],
          ~delay=[%e render_extended_time(~loc, delay)],
          ~timingFunction=[%e render_timing(~loc, timingFunction)],
-         [%e render_transition_property(~loc, property)],
+         ~property=[%e render_transition_property(~loc, property)],
+         (),
        )];
     };
 
@@ -3142,18 +3147,6 @@ let render_single_transition_no_interp =
       ~loc,
       (property, delay, timingFunction, duration): Types.single_transition_no_interp,
     ) => {
-  let property =
-    switch (
-      Option.value(
-        property,
-        ~default=`Single_transition_property_no_interp(`All),
-      )
-    ) {
-    | `None => render_string(~loc, "none")
-    | `Single_transition_property_no_interp(x) =>
-      render_single_transition_property_no_interp(~loc, x)
-    };
-
   [%expr
    CSS.Transition.shorthand(
      ~duration=?[%e
@@ -3163,7 +3156,8 @@ let render_single_transition_no_interp =
      ~timingFunction=?[%e
        render_option(~loc, render_timing_no_interp, timingFunction)
      ],
-     [%e property],
+     ~property=?[%e render_option(~loc, render_transition_property, property)],
+     (),
    )];
 };
 
@@ -3691,7 +3685,7 @@ let render_line_names = (~loc, value: Types.line_names) => {
   line_names
   |> String.concat(" ")
   |> Printf.sprintf("[%s]")
-  |> (name => [[%expr `name([%e render_string(~loc, name)])]]);
+  |> (name => [[%expr `lineNames([%e render_string(~loc, name)])]]);
 };
 
 let render_maybe_line_names = (~loc, value) => {
@@ -3898,13 +3892,15 @@ let grid_template_columns =
     (~loc) => [%expr CSS.gridTemplateColumns],
     (~loc, value: Types.property_grid_template_columns) =>
       switch (value) {
-      | `None => [%expr [|`none|]]
       | `Interpolation(v) => render_variable(~loc, v)
+      | `None => [%expr `none]
       | `Track_list(track_list, line_names) =>
-        render_track_list(~loc, track_list, line_names)
-      | `Auto_track_list(list) => render_auto_track_list(~loc, list)
-      | `Static((), None) => [%expr [|`subgrid|]]
-      | `Static((), Some(subgrid)) => render_subgrid(~loc, subgrid)
+        [%expr `value([%e render_track_list(~loc, track_list, line_names)])]
+      | `Auto_track_list(list) =>
+        [%expr `value([%e render_auto_track_list(~loc, list)])]
+      | `Static((), None) => [%expr `value([|`subgrid|])]
+      | `Static((), Some(subgrid)) =>
+        [%expr `value([%e render_subgrid(~loc, subgrid)])]
       },
   );
 
@@ -3914,13 +3910,15 @@ let grid_template_rows =
     (~loc) => [%expr CSS.gridTemplateRows],
     (~loc, value: Types.property_grid_template_rows) =>
       switch (value) {
-      | `None => [%expr [|`none|]]
       | `Interpolation(v) => render_variable(~loc, v)
+      | `None => [%expr `none]
       | `Track_list(track_list, line_names) =>
-        render_track_list(~loc, track_list, line_names)
-      | `Auto_track_list(list) => render_auto_track_list(~loc, list)
-      | `Static((), None) => [%expr [|`subgrid|]]
-      | `Static((), Some(subgrid)) => render_subgrid(~loc, subgrid)
+        [%expr `value([%e render_track_list(~loc, track_list, line_names)])]
+      | `Auto_track_list(list) =>
+        [%expr `value([%e render_auto_track_list(~loc, list)])]
+      | `Static((), None) => [%expr `value([|`subgrid|])]
+      | `Static((), Some(subgrid)) =>
+        [%expr `value([%e render_subgrid(~loc, subgrid)])]
       },
   );
 
@@ -5328,15 +5326,11 @@ let properties = [
 
 let render_when_unsupported_features = (~loc, property, value) => {
   /* Transform property name to camelCase since we bind to emotion with the Object API */
-  let propertyName = property |> to_camel_case |> render_string(~loc);
-  let unsafeInterpolation =
-    value
-    |> Property_parser.parse(Standard.interpolation)
-    |> Result.map(render_variable(~loc));
-  let value =
-    Result.value(unsafeInterpolation, ~default=render_string(~loc, value));
+  let propertyExpr = property |> to_camel_case |> render_string(~loc);
+  let valueExpr =
+    String_interpolation.transform(~loc, ~delimiter="js", value);
 
-  [%expr CSS.unsafe([%e propertyName], [%e value])];
+  [%expr CSS.unsafe([%e propertyExpr], [%e valueExpr])];
 };
 
 let findProperty = name => {
