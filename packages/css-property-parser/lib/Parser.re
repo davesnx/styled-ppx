@@ -131,7 +131,7 @@ and calc_product = [%value.rec
 and calc_sum = [%value.rec "<calc-product> [ [ '+' | '-' ] <calc-product> ]*"]
 /* and calc_value = [%value.rec "<number> | <dimension> | <extended-percentage> | <calc>"] */
 and calc_value = [%value.rec
-  "<number> | <extended-length> | <extended-percentage> | <extended-angle> | <extended-time>"
+  "<number> | <extended-length> | <extended-percentage> | <extended-angle> | <extended-time> | '(' <calc-sum> ')'"
 ]
 and cf_final_image = [%value.rec "<image> | <color>"]
 and cf_mixing_image = [%value.rec "[ <extended-percentage> ]? && <image>"]

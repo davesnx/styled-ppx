@@ -22,6 +22,7 @@ module Cositas = [%styled.div
   display: flex;
   flex-direction: column;
   gap: $(lola);
+  height: calc(1px * (2 + 3 / 3));
 |}
 ];
 

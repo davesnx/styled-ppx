@@ -350,5 +350,5 @@ If this test fail means that the module is not in sync with the ppx
     {js|color-mix(in lab, teal 65%, olive)|js},
   );
   
-  CSS.color(`rgba((0, 0, 0, `num(1.))));
+  CSS.color(`rgba((0, 0, 0, `calc(`num(1.)))));
   CSS.color(`rgba((0, 0, 0, `calc(`sub((`num(10.), `num(1.)))))));

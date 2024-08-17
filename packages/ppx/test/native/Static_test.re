@@ -668,11 +668,10 @@ let properties_static_css_tests = [
     [%expr [%css "flex: none"]],
     [%expr CSS.flex1(`none)],
   ),
-  /* Since calc(x) -> x */
   (
     [%css "width: calc(100px)"],
     [%expr [%css "width: calc(100px)"]],
-    [%expr CSS.width(`pxFloat(100.))],
+    [%expr CSS.width(`calc(`pxFloat(100.)))],
   ),
   (
     [%css "width: calc(100% + 32px)"],
@@ -1166,12 +1165,12 @@ let properties_static_css_tests = [
   (
     [%css "transition-duration: max(3s, calc(1ms))"],
     [%expr [%css "transition-duration: max(3s, calc(1ms))"]],
-    [%expr CSS.transitionDuration(`max([|`s(3), `ms(1)|]))],
+    [%expr CSS.transitionDuration(`max([|`s(3), `calc(`ms(1))|]))],
   ),
   (
     [%css "transition-duration: max(+3s, calc(-0ms))"],
     [%expr [%css "transition-duration: max(+3s, calc(-0ms))"]],
-    [%expr CSS.transitionDuration(`max([|`s(3), `ms(0)|]))],
+    [%expr CSS.transitionDuration(`max([|`s(3), `calc(`ms(0))|]))],
   ),
   (
     [%css "animation: 3s"],

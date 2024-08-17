@@ -70,6 +70,7 @@ module Calc = struct
       {js|calc(|js} ^ fn a ^ {js| * |js} ^ fn b ^ {js|)|js}
     | `calc (`div (a, b)) ->
       {js|calc(|js} ^ fn a ^ {js| / |js} ^ Kloth.Float.to_string b ^ {js|)|js}
+    | `calc (`num a) -> {js|calc(|js} ^ Kloth.Float.to_string a ^ {js|)|js}
     | `num n -> Kloth.Float.to_string n
     | `min xs -> {js|min(|js} ^ max_or_min_values fn xs ^ {js|)|js}
     | `max xs -> {js|max(|js} ^ max_or_min_values fn xs ^ {js|)|js}
@@ -1314,6 +1315,7 @@ module Color = struct
       | `sub of 'a * 'a
       | `mult of 'a * 'a
       | `div of 'a * float
+      | `num of float
       ]
     | `min of 'a array
     | `max of 'a array
