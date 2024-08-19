@@ -1732,7 +1732,7 @@ and property_transition_property = [%value.rec
 ]
 and property_transition_timing_function = [%value.rec "[ <timing-function> ]#"]
 and property_translate = [%value.rec
-  "'none' | <extended-length> | <extended-percentage> [ <extended-length> | <extended-percentage> [ <extended-length> ]? ]?"
+  "'none' | <length-percentage> [ <length-percentage> <length>? ]?"
 ]
 and property_unicode_bidi = [%value.rec
   "'normal' | 'embed' | 'isolate' | 'bidi-override' | 'isolate-override' | 'plaintext' | '-moz-isolate' | '-moz-isolate-override' | '-moz-plaintext' | '-webkit-isolate'"

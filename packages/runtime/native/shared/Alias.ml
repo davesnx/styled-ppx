@@ -2,42 +2,42 @@
 
 open Css_types
 
-let initial = `initial
-let inherit_ = `inherit_
-let unset = `unset
+let initial = Cascading.initial
+let inherit_ = Cascading.inherit_
+let unset = Cascading.unset
 
-let var ?default (x : string) : Var.t =
+let var ?default (x : string) : [> Var.t ] =
   match default with None -> `var x | Some default -> `varDefault (x, default)
 
-let auto = `auto
-let none = `none
+let auto = Auto.auto
+let none = None.none
 let text = `text
-let pct (f : float) = `percent f
-let ch x = `ch x
-let cm x = `cm x
-let em x = `em x
-let ex x = `ex x
-let mm x = `mm x
-let pt x = `pt x
-let px x = `px x
-let pxFloat x = `pxFloat x
-let rem x = `rem x
-let vh x = `vh x
-let vmin x = `vmin x
-let vmax x = `vmax x
-let zero = `zero
-let deg x = `deg x
-let rad x = `rad x
-let grad x = `grad x
-let turn x = `turn x
-let ltr = `ltr
-let rtl = `rtl
+let pct f = Percentage.pct f
+let ch x = Length.ch x
+let cm x = Length.cm x
+let em x = Length.em x
+let ex x = Length.ex x
+let mm x = Length.mm x
+let pt x = Length.pt x
+let px x = Length.px x
+let pxFloat x = Length.pxFloat x
+let rem x = Length.rem x
+let vh x = Length.vh x
+let vmin x = Length.vmin x
+let vmax x = Length.vmax x
+let zero = Length.zero
+let deg x = Angle.deg x
+let rad x = Angle.rad x
+let grad x = Angle.grad x
+let turn x = Angle.turn x
+let ltr = Direction.ltr
+let rtl = Direction.rtl
 let absolute = PropertyPosition.absolute
 let relative = PropertyPosition.relative
 let static = PropertyPosition.static
 let fixed = PropertyPosition.fixed
 let sticky = PropertyPosition.sticky
-let isolate = `isolate
+let isolate = Isolation.isolate
 let horizontal = Resize.horizontal
 let vertical = Resize.vertical
 let smallCaps = FontVariant.smallCaps
@@ -244,6 +244,7 @@ let panUp = `panUp
 let panDown = `panDown
 let pinchZoom = `pinchZoom
 let manipulation = `manipulation
+let num (f : float) = `num f
 
 module Shadow = struct
   type box = Css_types.Shadow.box Css_types.Shadow.t

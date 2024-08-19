@@ -906,3 +906,9 @@ let fontOpticalSizing x =
 
 let fontVariantEmoji x =
   Rule.declaration ({js|fontVariantEmoji|js}, FontVariantEmoji.toString x)
+
+let translateProperty x =
+  Rule.declaration ({js|translate|js}, Translate.toString x)
+
+let rotateProperty x = Rule.declaration ({js|rotate|js}, Rotate.toString x)
+let scaleProperty x = Rule.declaration ({js|scale|js}, Scale.toString x)

@@ -2947,8 +2947,28 @@ let transform_box =
   );
 
 let translate =
-  unsupportedValue(Property_parser.property_translate, (~loc) =>
-    [%expr CSS.translate]
+  monomorphic(
+    Property_parser.property_translate,
+    (~loc) => [%expr CSS.translateProperty],
+    (~loc) =>
+      fun
+      | `None => [%expr `none]
+      | `Static(x, None) => [%expr
+          `x([%e render_length_percentage(~loc, x)])
+        ]
+      | `Static(x, Some((y, None))) => [%expr
+          `xy((
+            [%e render_length_percentage(~loc, x)],
+            [%e render_length_percentage(~loc, y)],
+          ))
+        ]
+      | `Static(x, Some((y, Some(z)))) => [%expr
+          `xyz((
+            [%e render_length_percentage(~loc, x)],
+            [%e render_length_percentage(~loc, y)],
+            [%e render_length(~loc, z)],
+          ))
+        ],
   );
 
 let rotate =

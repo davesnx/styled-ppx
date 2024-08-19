@@ -27,12 +27,14 @@ end
 module None = struct
   type t = [ `none ]
 
+  let none : [> t ] = `none
   let toString = {js|none|js}
 end
 
 module Auto = struct
   type t = [ `auto ]
 
+  let auto : [> t ] = `auto
   let toString = {js|auto|js}
 end
 
@@ -145,7 +147,7 @@ end
 module Percentage = struct
   type t = [ `percent of float ]
 
-  let pct x = `percent x
+  let pct x : [> t ] = `percent x
 
   let toString x =
     match x with `percent x -> Kloth.Float.to_string x ^ {js|%|js}
@@ -208,28 +210,28 @@ module Length = struct
     | `max of t array
     ]
 
-  let ch x = `ch x
-  let cqw x = `cqw x
-  let cqh x = `cqh x
-  let cqi x = `cqi x
-  let cqb x = `cqb x
-  let cqmin x = `cqmin x
-  let cqmax x = `cqmax x
-  let em x = `em x
-  let ex x = `ex x
-  let rem x = `rem x
-  let vh x = `vh x
-  let vw x = `vw x
-  let vmin x = `vmin x
-  let vmax x = `vmax x
-  let px x = `px x
-  let pxFloat x = `pxFloat x
-  let cm x = `cm x
-  let mm x = `mm x
-  let inch x = `inch x
-  let pc x = `pc x
-  let pt x = `pt x
-  let zero = `zero
+  let ch x : [> t ] = `ch x
+  let cqw x : [> t ] = `cqw x
+  let cqh x : [> t ] = `cqh x
+  let cqi x : [> t ] = `cqi x
+  let cqb x : [> t ] = `cqb x
+  let cqmin x : [> t ] = `cqmin x
+  let cqmax x : [> t ] = `cqmax x
+  let em x : [> t ] = `em x
+  let ex x : [> t ] = `ex x
+  let rem x : [> t ] = `rem x
+  let vh x : [> t ] = `vh x
+  let vw x : [> t ] = `vw x
+  let vmin x : [> t ] = `vmin x
+  let vmax x : [> t ] = `vmax x
+  let px x : [> t ] = `px x
+  let pxFloat x : [> t ] = `pxFloat x
+  let cm x : [> t ] = `cm x
+  let mm x : [> t ] = `mm x
+  let inch x : [> t ] = `inch x
+  let pc x : [> t ] = `pc x
+  let pt x : [> t ] = `pt x
+  let zero : [> t ] = `zero
 
   let rec toString (x : t) =
     match x with
@@ -282,12 +284,12 @@ module Angle = struct
     | `turn of float
     ]
 
-  let deg (x : float) = `deg x
-  let rad (x : float) = `rad x
-  let grad (x : float) = `grad x
-  let turn (x : float) = `turn x
+  let deg x : [> t ] = `deg x
+  let rad x : [> t ] = `rad x
+  let grad x : [> t ] = `grad x
+  let turn x : [> t ] = `turn x
 
-  let toString x =
+  let toString (x : t) =
     match x with
     | `deg x -> Kloth.Float.to_string x ^ {js|deg|js}
     | `rad x -> Kloth.Float.to_string x ^ {js|rad|js}
@@ -303,10 +305,10 @@ module Direction = struct
     | Cascading.t
     ]
 
-  let ltr = `ltr
-  let rtl = `rtl
+  let ltr : [> t ] = `ltr
+  let rtl : [> t ] = `rtl
 
-  let toString x =
+  let toString (x : t) =
     match x with
     | `ltr -> {js|ltr|js}
     | `rtl -> {js|rtl|js}
@@ -326,13 +328,13 @@ module PropertyPosition = struct
     | Cascading.t
     ]
 
-  let absolute = `absolute
-  let relative = `relative
-  let static = `static
-  let fixed = `fixed
-  let sticky = `sticky
+  let absolute : [> t ] = `absolute
+  let relative : [> t ] = `relative
+  let static : [> t ] = `static
+  let fixed : [> t ] = `fixed
+  let sticky : [> t ] = `sticky
 
-  let toString x =
+  let toString (x : t) =
     match x with
     | `absolute -> {js|absolute|js}
     | `relative -> {js|relative|js}
@@ -349,7 +351,9 @@ module Isolation = struct
     | `isolate
     ]
 
-  let toString x =
+  let isolate : [> t ] = `isolate
+
+  let toString (x : t) =
     match x with #Auto.t -> Auto.toString | `isolate -> {js|isolate|js}
 end
 
@@ -362,7 +366,9 @@ module AspectRatio = struct
     | Cascading.t
     ]
 
-  let toString x =
+  let ratio x y : [> t ] = `ratio (x, y)
+
+  let toString (x : t) =
     match x with
     | #Auto.t -> Auto.toString
     | `num num -> Kloth.Float.to_string num
@@ -4227,3 +4233,122 @@ module GridTemplateRows = struct
 end
 
 module GridTemplateColumns = GridTemplateRows
+
+module Translate = struct
+  type value =
+    [ Length.t
+    | Var.t
+    ]
+
+  let value_to_string (x : value) =
+    match x with
+    | #Length.t as x -> Length.toString x
+    | #Var.t as x -> Var.toString x
+
+  type values =
+    [ `x of value
+    | `xy of value * value
+    | `xyz of value * value * value
+    ]
+
+  let values_to_string (x : values) =
+    match x with
+    | `x x -> value_to_string x
+    | `xy (x, y) -> value_to_string x ^ {js| |js} ^ value_to_string y
+    | `xyz (x, y, z) ->
+      value_to_string x
+      ^ {js| |js}
+      ^ value_to_string y
+      ^ {js| |js}
+      ^ value_to_string z
+
+  type t =
+    [ values
+    | None.t
+    | Cascading.t
+    | Var.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | #values as x -> values_to_string x
+    | #None.t -> None.toString
+    | #Cascading.t as x -> Cascading.toString x
+    | #Var.t as x -> Var.toString x
+end
+
+module Rotate = struct
+  type t =
+    [ None.t
+    | `rotate of Angle.t
+    | `rotateX of Angle.t
+    | `rotateY of Angle.t
+    | `rotateZ of Angle.t
+    | `rotate3d of float * float * float * Angle.t
+    | Cascading.t
+    | Var.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | #None.t -> None.toString
+    | `rotate v -> Angle.toString v
+    | `rotateX v -> {js|x |js} ^ Angle.toString v
+    | `rotateY v -> {js|y |js} ^ Angle.toString v
+    | `rotateZ v -> {js|z |js} ^ Angle.toString v
+    | `rotate3d (x, y, z, a) ->
+      Kloth.Float.to_string x
+      ^ {js| |js}
+      ^ Kloth.Float.to_string y
+      ^ {js| |js}
+      ^ Kloth.Float.to_string z
+      ^ {js| |js}
+      ^ Angle.toString a
+    | #Cascading.t as x -> Cascading.toString x
+    | #Var.t as x -> Var.toString x
+end
+
+module Scale = struct
+  type value =
+    [ `num of float
+    | Percentage.t
+    | Var.t
+    ]
+
+  let value_to_string (x : value) =
+    match x with
+    | `num x -> Kloth.Float.to_string x
+    | #Percentage.t as x -> Percentage.toString x
+    | #Var.t as x -> Var.toString x
+
+  type values =
+    [ `x of value
+    | `xy of value * value
+    | `xyz of value * value * value
+    ]
+
+  let values_to_string (x : values) =
+    match x with
+    | `x x -> value_to_string x
+    | `xy (x, y) -> value_to_string x ^ {js| |js} ^ value_to_string y
+    | `xyz (x, y, z) ->
+      value_to_string x
+      ^ {js| |js}
+      ^ value_to_string y
+      ^ {js| |js}
+      ^ value_to_string z
+
+  type t =
+    [ values
+    | None.t
+    | Cascading.t
+    | Var.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | #values as x -> values_to_string x
+    | #None.t -> None.toString
+    | #Cascading.t as x -> Cascading.toString x
+    | #Var.t as x -> Var.toString x
+end
