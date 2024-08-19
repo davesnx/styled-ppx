@@ -3176,7 +3176,9 @@ let render_single_transition_no_interp =
      ~timingFunction=?[%e
        render_option(~loc, render_timing_no_interp, timingFunction)
      ],
-     ~property=?[%e render_option(~loc, render_transition_property, property)],
+     ~property=?[%e
+       render_option(~loc, render_transition_property, property)
+     ],
      (),
    )];
 };
@@ -3943,8 +3945,24 @@ let grid_template_rows =
   );
 
 let grid_template_areas =
-  unsupportedValue(Property_parser.property_grid_template_areas, (~loc) =>
-    [%expr CSS.gridTemplateAreas]
+  monomorphic(
+    Property_parser.property_grid_template_areas,
+    (~loc) => [%expr CSS.gridTemplateAreas],
+    (~loc) =>
+      fun
+      | `None => [%expr `none]
+      | `Xor(areas) => {
+          let areasExpr =
+            areas
+            |> List.map(area =>
+                 switch (area) {
+                 | `Interpolation(value) => render_variable(~loc, value)
+                 | `String(value) => render_string(~loc, value)
+                 }
+               )
+            |> Builder.pexp_array(~loc);
+          [%expr `areas([%e areasExpr])];
+        },
   );
 
 let grid_template =

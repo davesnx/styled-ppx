@@ -443,7 +443,7 @@ and gradient = [%value.rec
   "<linear-gradient()> | <repeating-linear-gradient()> | <radial-gradient()> | <repeating-radial-gradient()> | <conic-gradient()> | <-legacy-gradient>"
 ]
 and grid_line = [%value.rec
-  "'auto' | <custom-ident> | <integer> && [ <custom-ident> ]? | 'span' && [ <integer> || <custom-ident> ]"
+  "<custom-ident> | <integer> && [ <custom-ident> ]? | 'span' && [ <integer> || <custom-ident> ] | 'auto'"
 ]
 and historical_lig_values = [%value.rec
   "'historical-ligatures' | 'no-historical-ligatures'"
@@ -1168,7 +1168,7 @@ and property_grid_row_start = [%value.rec "<grid-line>"]
 and property_grid_template = [%value.rec
   "'none' | <'grid-template-rows'> '/' <'grid-template-columns'> | [ [ <line-names> ]? <string> [ <track-size> ]? [ <line-names> ]? ]+ [ '/' <explicit-track-list> ]?"
 ]
-and property_grid_template_areas = [%value.rec "'none' | [ <string> ]+"]
+and property_grid_template_areas = [%value.rec "'none' | [ <string> | <interpolation> ]+"]
 and property_grid_template_columns = [%value.rec
   "'none' | <track-list> | <auto-track-list> | 'subgrid' [ <line-name-list> ]? | <interpolation>"
 ]
