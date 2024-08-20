@@ -52,17 +52,15 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
 
   let value_name_of_css = str =>
     String.(
-      {
-        let length = length(str);
-        let str =
-          if (is_function(str)) {
-            let str = sub(str, 0, length - 2);
-            function_value_name(str);
-          } else {
-            str;
-          };
-        kebab_case_to_snake_case(str);
-      }
+      let length = length(str);
+      let str =
+        if (is_function(str)) {
+          let str = sub(str, 0, length - 2);
+          function_value_name(str);
+        } else {
+          str;
+        };
+      kebab_case_to_snake_case(str)
     );
 
   // TODO: multiplier name
@@ -115,7 +113,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       ~params=[],
       ~cstrs=[],
       ~kind=Ptype_abstract,
-      ~private_=Public,
+      ~private=Public,
       ~manifest=Some(core_type),
     );
   };
@@ -250,7 +248,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         ~name={txt: name, loc: Location.none},
         ~params=[],
         ~cstrs=[],
-        ~private_=Public,
+        ~private=Public,
         ~manifest=Some(core_type),
         ~kind,
       );
