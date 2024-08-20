@@ -4008,13 +4008,32 @@ let grid_auto_flow =
       | (None, None) => failwith("impossible"),
   );
 
+let render_grid_line = (~loc, x: Types.grid_line) =>
+  switch (x) {
+  | `Auto => [%expr `auto]
+  | `Custom_ident(x) => render_string(~loc, x)
+  | `And_0(num, None) => [%expr `num([%e render_integer(~loc, num)])]
+  | `And_0(num, Some(ident)) =>
+    [%expr
+     `numIdent((
+       [%e render_integer(~loc, num)],
+       [%e render_string(~loc, ident)],
+     ))]
+  | `And_1(_span, (Some(num), None)) =>
+    [%expr `spanNum([%e render_integer(~loc, num)])]
+  | `And_1(_span, (None, Some(ident))) =>
+    [%expr `spanIdent([%e render_string(~loc, ident)])]
+  | `And_1(_span, (Some(num), Some(ident))) =>
+    [%expr
+     `spanNumIdent((
+       [%e render_integer(~loc, num)],
+       [%e render_string(~loc, ident)],
+     ))]
+  | `And_1(_span, (None, None)) => failwith("impossible")
+  };
+
 let grid =
   unsupportedValue(Property_parser.property_grid, (~loc) => [%expr CSS.grid]);
-
-let grid_row_start =
-  unsupportedValue(Property_parser.property_grid_row_start, (~loc) =>
-    [%expr CSS.gridRowStart]
-  );
 
 let grid_row_gap =
   monomorphic(
@@ -4036,19 +4055,67 @@ let grid_column_gap =
       | `Extended_percentage(ep) => render_extended_percentage(~loc, ep),
   );
 
+let grid_row_start =
+  monomorphic(
+    Property_parser.property_grid_row_start,
+    (~loc) => [%expr CSS.gridRowStart],
+    render_grid_line,
+  );
+
 let grid_column_start =
-  unsupportedValue(Property_parser.property_grid_column_start, (~loc) =>
-    [%expr CSS.gridColumnStart]
+  monomorphic(
+    Property_parser.property_grid_column_start,
+    (~loc) => [%expr CSS.gridColumnStart],
+    render_grid_line,
   );
 
 let grid_row_end =
-  unsupportedValue(Property_parser.property_grid_row_end, (~loc) =>
-    [%expr CSS.gridRowEnd]
+  monomorphic(
+    Property_parser.property_grid_row_end,
+    (~loc) => [%expr CSS.gridRowEnd],
+    render_grid_line,
   );
 
 let grid_column_end =
-  unsupportedValue(Property_parser.property_grid_column_end, (~loc) =>
-    [%expr CSS.gridColumnEnd]
+  monomorphic(
+    Property_parser.property_grid_column_end,
+    (~loc) => [%expr CSS.gridColumnEnd],
+    render_grid_line,
+  );
+
+let grid_area =
+  polymorphic(Property_parser.property_grid_area, (~loc, value) =>
+    switch (value) {
+    | (gl1, [(_, gl2), (_, gl3), (_, gl4), ..._]) => [
+        [%expr
+          CSS.gridArea4(
+            [%e render_grid_line(~loc, gl1)],
+            [%e render_grid_line(~loc, gl2)],
+            [%e render_grid_line(~loc, gl3)],
+            [%e render_grid_line(~loc, gl4)],
+          )
+        ],
+      ]
+    | (gl1, [(_, gl2), (_, gl3), ..._]) => [
+        [%expr
+          CSS.gridArea3(
+            [%e render_grid_line(~loc, gl1)],
+            [%e render_grid_line(~loc, gl2)],
+            [%e render_grid_line(~loc, gl3)],
+          )
+        ],
+      ]
+
+    | (gl1, [(_, gl2), ..._]) => [
+        [%expr
+          CSS.gridArea2(
+            [%e render_grid_line(~loc, gl1)],
+            [%e render_grid_line(~loc, gl2)],
+          )
+        ],
+      ]
+    | (gl1, []) => [[%expr CSS.gridArea([%e render_grid_line(~loc, gl1)])]]
+    }
   );
 
 let grid_row =
@@ -4059,11 +4126,6 @@ let grid_row =
 let grid_column =
   unsupportedValue(Property_parser.property_grid_column, (~loc) =>
     [%expr CSS.gridColumn]
-  );
-
-let grid_area =
-  unsupportedValue(Property_parser.property_grid_area, (~loc) =>
-    [%expr CSS.gridArea]
   );
 
 let grid_gap =

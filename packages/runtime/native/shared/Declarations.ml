@@ -284,23 +284,27 @@ let sizeAdjust x = Rule.declaration ({js|sizeAdjust|js}, Percentage.toString x)
 let gridAutoFlow x =
   Rule.declaration ({js|gridAutoFlow|js}, GridAutoFlow.toString x)
 
-let gridColumn start end' =
+let gridColumn x = Rule.declaration ({js|gridColumn|js}, GridColumn.toString x)
+
+let gridColumn2 start end' =
   Rule.declaration
     ( {js|gridColumn|js},
-      Kloth.Int.to_string start ^ {js| / |js} ^ Kloth.Int.to_string end' )
+      GridLine.toString start ^ {js| / |js} ^ GridLine.toString end' )
 
 let gridColumnGap x = Rule.declaration ({js|gridColumnGap|js}, Gap.toString x)
 
 let gridColumnStart n =
-  Rule.declaration ({js|gridColumnStart|js}, Kloth.Int.to_string n)
+  Rule.declaration ({js|gridColumnStart|js}, GridColumnStart.toString n)
 
 let gridColumnEnd n =
-  Rule.declaration ({js|gridColumnEnd|js}, Kloth.Int.to_string n)
+  Rule.declaration ({js|gridColumnEnd|js}, GridColumnEnd.toString n)
 
-let gridRow start end' =
+let gridRow x = Rule.declaration ({js|gridRow|js}, GridRow.toString x)
+
+let gridRow2 start end' =
   Rule.declaration
     ( {js|gridRow|js},
-      Kloth.Int.to_string start ^ {js| / |js} ^ Kloth.Int.to_string end' )
+      GridLine.toString start ^ {js| / |js} ^ GridLine.toString end' )
 
 let gap x = Rule.declaration ({js|gap|js}, Gap.toString x)
 let gridGap x = Rule.declaration ({js|gridGap|js}, Gap.toString x)
@@ -310,10 +314,10 @@ let gap2 ~rowGap ~columnGap =
     ({js|gap|js}, Gap.toString rowGap ^ {js| |js} ^ Gap.toString columnGap)
 
 let gridRowGap x = Rule.declaration ({js|gridRowGap|js}, Gap.toString x)
-let gridRowEnd n = Rule.declaration ({js|gridRowEnd|js}, Kloth.Int.to_string n)
+let gridRowEnd n = Rule.declaration ({js|gridRowEnd|js}, GridRowEnd.toString n)
 
 let gridRowStart n =
-  Rule.declaration ({js|gridRowStart|js}, Kloth.Int.to_string n)
+  Rule.declaration ({js|gridRowStart|js}, GridRowStart.toString n)
 
 let height x = Rule.declaration ({js|height|js}, Height.toString x)
 
@@ -661,27 +665,27 @@ let gridArea x = Rule.declaration ({js|gridArea|js}, GridArea.toString x)
 let gridArea2 s s2 =
   Rule.declaration
     ( {js|gridArea|js},
-      (GridArea.toString s ^ {js| / |js}) ^ GridArea.toString s2 )
+      (GridLine.toString s ^ {js| / |js}) ^ GridLine.toString s2 )
 
 let gridArea3 s s2 s3 =
   Rule.declaration
     ( {js|gridArea|js},
-      GridArea.toString s
+      GridLine.toString s
       ^ {js| / |js}
-      ^ GridArea.toString s2
+      ^ GridLine.toString s2
       ^ {js| / |js}
-      ^ GridArea.toString s3 )
+      ^ GridLine.toString s3 )
 
 let gridArea4 s s2 s3 s4 =
   Rule.declaration
     ( {js|gridArea|js},
-      GridArea.toString s
+      GridLine.toString s
       ^ {js| / |js}
-      ^ GridArea.toString s2
+      ^ GridLine.toString s2
       ^ {js| / |js}
-      ^ GridArea.toString s3
+      ^ GridLine.toString s3
       ^ {js| / |js}
-      ^ GridArea.toString s4 )
+      ^ GridLine.toString s4 )
 
 let gridTemplateAreas x =
   Rule.declaration ({js|gridTemplateAreas|js}, GridTemplateAreas.toString x)

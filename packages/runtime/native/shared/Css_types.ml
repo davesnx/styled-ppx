@@ -2588,34 +2588,52 @@ module GridTemplateAreas = struct
     | #Cascading.t as c -> Cascading.toString c
 end
 
-module GridArea = struct
+module GridLine = struct
   type t =
     [ Auto.t
     | `ident of string
     | `num of int
     | `numIdent of int * string
-    | `span of [ `num of int | `ident of string ]
-    | Var.t
-    | Cascading.t
+    | `spanNum of int
+    | `spanIdent of string
+    | `spanNumIdent of int * string
     ]
 
-  let auto = `auto
-  let ident x = `ident x
-  let num x = `num x
-  let numIdent x y = `numIdent (x, y)
-  let span x = `span x
+  let auto : [> t ] = `auto
+  let ident x : [> t ] = `ident x
+  let num x : [> t ] = `num x
+  let numIdent x y : [> t ] = `numIdent (x, y)
+  let spanNum x : [> t ] = `span x
+  let spanIdent x : [> t ] = `span x
+  let spanNumIdent x y : [> t ] = `spanNumIdent (x, y)
 
-  let toString t =
-    match t with
+  let toString (x : t) =
+    match x with
     | #Auto.t -> Auto.toString
     | `ident s -> s
     | `num i -> string_of_int i
     | `numIdent (i, s) -> (string_of_int i ^ {js| |js}) ^ s
-    | `span e ->
-      {js|span |js} ^ (match e with `num i -> string_of_int i | `ident s -> s)
+    | `spanNum n -> {js|span |js} ^ string_of_int n
+    | `spanIdent i -> {js|span |js} ^ i
+    | `spanNumIdent (n, i) -> {js|span |js} ^ string_of_int n ^ {js| |js} ^ i
+end
+
+module GridArea = struct
+  type t =
+    [ GridLine.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | #GridLine.t as x -> GridLine.toString x
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
 end
+
+module GridRow = GridArea
+module GridColumn = GridArea
 
 module Filter = struct
   type t =
@@ -4354,3 +4372,9 @@ module Scale = struct
     | #Cascading.t as x -> Cascading.toString x
     | #Var.t as x -> Var.toString x
 end
+
+module GridRowStart = GridArea
+module GridRowEnd = GridArea
+module GridColumnStart = GridArea
+
+module GridColumnEnd = GridArea
