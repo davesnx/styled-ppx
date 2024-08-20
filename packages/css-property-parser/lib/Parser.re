@@ -443,7 +443,7 @@ and gradient = [%value.rec
   "<linear-gradient()> | <repeating-linear-gradient()> | <radial-gradient()> | <repeating-radial-gradient()> | <conic-gradient()> | <-legacy-gradient>"
 ]
 and grid_line = [%value.rec
-  "<custom-ident> | <integer> && [ <custom-ident> ]? | 'span' && [ <integer> || <custom-ident> ] | 'auto'"
+  "<custom-ident> | <integer> && [ <custom-ident> ]? | [ <integer> || <custom-ident> ] && 'span' | 'auto'"
 ]
 and historical_lig_values = [%value.rec
   "'historical-ligatures' | 'no-historical-ligatures'"
@@ -1511,7 +1511,7 @@ and property_ruby_merge = [%value.rec "'separate' | 'collapse' | 'auto'"]
 and property_ruby_position = [%value.rec
   "'over' | 'under' | 'inter-character'"
 ]
-and property_scale = [%value.rec "'none' | [ <number> ]{1,3}"]
+and property_scale = [%value.rec "'none' | [ <number-percentage> ]{1,3}"]
 and property_scroll_behavior = [%value.rec "'auto' | 'smooth'"]
 and property_scroll_margin = [%value.rec "[ <extended-length> ]{1,4}"]
 and property_scroll_margin_block = [%value.rec "[ <extended-length> ]{1,2}"]

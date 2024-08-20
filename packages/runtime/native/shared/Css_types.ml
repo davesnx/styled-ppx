@@ -2632,8 +2632,13 @@ module GridArea = struct
     | #Cascading.t as c -> Cascading.toString c
 end
 
-module GridRow = GridArea
-module GridColumn = GridArea
+module GridRow = struct
+  include GridArea
+end
+
+module GridColumn = struct
+  include GridArea
+end
 
 module Filter = struct
   type t =
@@ -4121,6 +4126,8 @@ end
 module MinMax = struct
   type t = [ `minmax of InflexibleBreadth.t * TrackBreadth.t ]
 
+  let minmax x y : [> t ] = `minmax (x, y)
+
   let toString (x : t) =
     match x with
     | `minmax (a, b) ->
@@ -4138,6 +4145,8 @@ module TrackSize = struct
     | `fitContent of Length.t
     ]
 
+  let fitContent x : [> t ] = `fitContent x
+
   let toString (x : t) =
     match x with
     | #TrackBreadth.t as x -> TrackBreadth.toString x
@@ -4153,7 +4162,7 @@ module GridAutoRows = struct
     | Cascading.t
     ]
 
-  let toString x =
+  let toString (x : t) =
     match x with
     | `value xs ->
       Kloth.Array.map_and_join ~f:TrackSize.toString ~sep:{js| |js} xs
@@ -4161,7 +4170,9 @@ module GridAutoRows = struct
     | #Cascading.t as c -> Cascading.toString c
 end
 
-module GridAutoColumns = GridAutoRows
+module GridAutoColumns = struct
+  include GridAutoRows
+end
 
 module FixedSize = struct
   type t =
@@ -4206,6 +4217,8 @@ end
 module Repeat = struct
   type t = [ `repeat of RepeatValue.t * RepeatTrack.t array ]
 
+  let repeat x y : [> t ] = `repeat (x, y)
+
   let toString (x : t) =
     match x with
     | `repeat (n, x) ->
@@ -4234,67 +4247,86 @@ module Track = struct
     | #TrackSize.t as x -> TrackSize.toString x
 end
 
-module GridTemplateRows = struct
+module ExplicitTrack = struct
   type t =
-    [ None.t
-    | `value of Track.t array
-    | Var.t
-    | Cascading.t
+    [ `lineNames of string
+    | TrackSize.t
     ]
-
-  let value x = `value x
 
   let toString (x : t) =
     match x with
-    | #None.t -> None.toString
-    | `value x -> Kloth.Array.map_and_join ~f:Track.toString ~sep:{js| |js} x
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    | `lineNames names -> names
+    | #TrackSize.t as x -> TrackSize.toString x
 end
 
-module GridTemplateColumns = GridTemplateRows
-
-module Translate = struct
-  type value =
-    [ Length.t
-    | Var.t
+module ExplicitTrackWithArea = struct
+  type t =
+    [ ExplicitTrack.t
+    | `area of string
     ]
 
-  let value_to_string (x : value) =
+  let toString (x : t) =
     match x with
-    | #Length.t as x -> Length.toString x
-    | #Var.t as x -> Var.toString x
+    | `area x -> {js|'|js} ^ x ^ {js|'|js}
+    | #ExplicitTrack.t as x -> ExplicitTrack.toString x
+end
 
-  type values =
-    [ `x of value
-    | `xy of value * value
-    | `xyz of value * value * value
-    ]
+module GridTemplateRows = struct
+  module Value = struct
+    type t =
+      [ None.t
+      | `value of Track.t array
+      ]
 
-  let values_to_string (x : values) =
-    match x with
-    | `x x -> value_to_string x
-    | `xy (x, y) -> value_to_string x ^ {js| |js} ^ value_to_string y
-    | `xyz (x, y, z) ->
-      value_to_string x
-      ^ {js| |js}
-      ^ value_to_string y
-      ^ {js| |js}
-      ^ value_to_string z
+    let value x : [> t ] = `value x
+
+    let toString (x : t) =
+      match x with
+      | #None.t -> None.toString
+      | `value x -> Kloth.Array.map_and_join ~f:Track.toString ~sep:{js| |js} x
+  end
 
   type t =
-    [ values
-    | None.t
+    [ Value.t
     | Cascading.t
     | Var.t
     ]
 
   let toString (x : t) =
     match x with
-    | #values as x -> values_to_string x
-    | #None.t -> None.toString
+    | #Value.t as x -> Value.toString x
     | #Cascading.t as x -> Cascading.toString x
     | #Var.t as x -> Var.toString x
+end
+
+module GridTemplateColumns = struct
+  include GridTemplateRows
+end
+
+module Translate = struct
+  module Value = struct
+    type t =
+      [ Length.t
+      | Var.t
+      ]
+
+    let toString (x : t) =
+      match x with
+      | #Length.t as x -> Length.toString x
+      | #Var.t as x -> Var.toString x
+  end
+
+  type t =
+    [ Value.t
+    | None.t
+    | Cascading.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | #Value.t as x -> Value.toString x
+    | #None.t -> None.toString
+    | #Cascading.t as x -> Cascading.toString x
 end
 
 module Rotate = struct
@@ -4329,52 +4361,78 @@ module Rotate = struct
 end
 
 module Scale = struct
-  type value =
-    [ `num of float
-    | Percentage.t
-    | Var.t
-    ]
+  module Value = struct
+    type t =
+      [ `num of float
+      | Percentage.t
+      | Var.t
+      ]
 
-  let value_to_string (x : value) =
-    match x with
-    | `num x -> Kloth.Float.to_string x
-    | #Percentage.t as x -> Percentage.toString x
-    | #Var.t as x -> Var.toString x
-
-  type values =
-    [ `x of value
-    | `xy of value * value
-    | `xyz of value * value * value
-    ]
-
-  let values_to_string (x : values) =
-    match x with
-    | `x x -> value_to_string x
-    | `xy (x, y) -> value_to_string x ^ {js| |js} ^ value_to_string y
-    | `xyz (x, y, z) ->
-      value_to_string x
-      ^ {js| |js}
-      ^ value_to_string y
-      ^ {js| |js}
-      ^ value_to_string z
+    let toString (x : t) =
+      match x with
+      | `num x -> Kloth.Float.to_string x
+      | #Percentage.t as x -> Percentage.toString x
+      | #Var.t as x -> Var.toString x
+  end
 
   type t =
-    [ values
+    [ Value.t
     | None.t
     | Cascading.t
-    | Var.t
     ]
 
   let toString (x : t) =
     match x with
-    | #values as x -> values_to_string x
+    | #Value.t as x -> Value.toString x
     | #None.t -> None.toString
     | #Cascading.t as x -> Cascading.toString x
-    | #Var.t as x -> Var.toString x
 end
 
-module GridRowStart = GridArea
-module GridRowEnd = GridArea
-module GridColumnStart = GridArea
+module GridRowStart = struct
+  include GridArea
+end
 
-module GridColumnEnd = GridArea
+module GridRowEnd = struct
+  include GridArea
+end
+
+module GridColumnStart = struct
+  include GridArea
+end
+
+module GridColumnEnd = struct
+  include GridArea
+end
+
+module GridTemplate = struct
+  type t =
+    [ None.t
+    | `rowsColumns of GridTemplateRows.Value.t * GridTemplateColumns.Value.t
+    | `areasRows of ExplicitTrackWithArea.t array
+    | `areasRowsColumns of ExplicitTrackWithArea.t array * ExplicitTrack.t array
+    | Var.t
+    | Cascading.t
+    ]
+
+  let rowsColumns x y : [> t ] = `rowsColumns (x, y)
+  let areasRows x : [> t ] = `areasRows x
+  let areasRowsColumns x y : [> t ] = `areasRowsColumns (x, y)
+
+  let toString (x : t) =
+    match x with
+    | #None.t -> None.toString
+    | `rowsColumns (r, c) ->
+      GridTemplateRows.Value.toString r
+      ^ {js| / |js}
+      ^ GridTemplateColumns.Value.toString c
+    | `areasRows x ->
+      Kloth.Array.map_and_join ~sep:{js| |js} ~f:ExplicitTrackWithArea.toString
+        x
+    | `areasRowsColumns (ar, c) ->
+      Kloth.Array.map_and_join ~sep:{js| |js} ~f:ExplicitTrackWithArea.toString
+        ar
+      ^ {js| / |js}
+      ^ Kloth.Array.map_and_join ~sep:{js| |js} ~f:ExplicitTrack.toString c
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end

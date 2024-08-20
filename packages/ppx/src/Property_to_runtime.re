@@ -3783,6 +3783,13 @@ and render_track_size = (~loc, value: Types.track_size) => {
   };
 };
 
+let render_maybe_track_size = (~loc, value) => {
+  switch (value) {
+  | None => []
+  | Some(size) => [render_track_size(~loc, size)]
+  };
+};
+
 let render_track_list = (~loc, track_list, line_names) => {
   let tracks =
     track_list
@@ -3907,41 +3914,34 @@ let render_subgrid = (~loc, line_name_list: Types.line_name_list) => {
   |> Builder.pexp_array(~loc);
 };
 
+let render_grid_template_rows_and_columns = (~loc) =>
+  fun
+  | `Interpolation(v) => render_variable(~loc, v)
+  | `None => [%expr `none]
+  | `Track_list(track_list, line_names) => [%expr
+      `value([%e render_track_list(~loc, track_list, line_names)])
+    ]
+  | `Auto_track_list(list) => [%expr
+      `value([%e render_auto_track_list(~loc, list)])
+    ]
+  | `Static((), None) => [%expr `value([|`subgrid|])]
+  | `Static((), Some(subgrid)) => [%expr
+      `value([%e render_subgrid(~loc, subgrid)])
+    ];
+
 // css-grid-1
 let grid_template_columns =
   monomorphic(
     Property_parser.property_grid_template_columns,
     (~loc) => [%expr CSS.gridTemplateColumns],
-    (~loc, value: Types.property_grid_template_columns) =>
-      switch (value) {
-      | `Interpolation(v) => render_variable(~loc, v)
-      | `None => [%expr `none]
-      | `Track_list(track_list, line_names) =>
-        [%expr `value([%e render_track_list(~loc, track_list, line_names)])]
-      | `Auto_track_list(list) =>
-        [%expr `value([%e render_auto_track_list(~loc, list)])]
-      | `Static((), None) => [%expr `value([|`subgrid|])]
-      | `Static((), Some(subgrid)) =>
-        [%expr `value([%e render_subgrid(~loc, subgrid)])]
-      },
+    render_grid_template_rows_and_columns,
   );
 
 let grid_template_rows =
   monomorphic(
     Property_parser.property_grid_template_rows,
     (~loc) => [%expr CSS.gridTemplateRows],
-    (~loc, value: Types.property_grid_template_rows) =>
-      switch (value) {
-      | `Interpolation(v) => render_variable(~loc, v)
-      | `None => [%expr `none]
-      | `Track_list(track_list, line_names) =>
-        [%expr `value([%e render_track_list(~loc, track_list, line_names)])]
-      | `Auto_track_list(list) =>
-        [%expr `value([%e render_auto_track_list(~loc, list)])]
-      | `Static((), None) => [%expr `value([|`subgrid|])]
-      | `Static((), Some(subgrid)) =>
-        [%expr `value([%e render_subgrid(~loc, subgrid)])]
-      },
+    render_grid_template_rows_and_columns,
   );
 
 let grid_template_areas =
@@ -3965,8 +3965,55 @@ let grid_template_areas =
         },
   );
 
+let render_area_rows = (~loc, area_rows) =>
+  area_rows
+  |> List.concat_map(((names_before, area, track_size, names_after)) => {
+       render_maybe_line_names(~loc, names_before)
+       @ [[%expr `area([%e render_string(~loc, area)])]]
+       @ render_maybe_track_size(~loc, track_size)
+       @ render_maybe_line_names(~loc, names_after)
+     })
+  |> Builder.pexp_array(~loc);
+let render_explicit_track_list = (~loc, track_list, line_names) => {
+  let tracks =
+    track_list
+    |> List.concat_map(((line_name, track)) => {
+         let lineNameExpr = render_maybe_line_names(~loc, line_name);
+         List.append(lineNameExpr, [render_track_size(~loc, track)]);
+       });
+  let lineNamesExpr = render_maybe_line_names(~loc, line_names);
+  List.append(lineNamesExpr, tracks) |> Builder.pexp_array(~loc);
+};
+
 let grid_template =
-  unsupportedProperty(Property_parser.property_grid_template);
+  monomorphic(
+    Property_parser.property_grid_template,
+    (~loc) => [%expr CSS.gridTemplate],
+    (~loc) =>
+      fun
+      | `None => [%expr `none]
+      | `Static_0(rows, _, columns) => [%expr
+          `rowsColumns((
+            [%e render_grid_template_rows_and_columns(~loc, rows)],
+            [%e render_grid_template_rows_and_columns(~loc, columns)],
+          ))
+        ]
+      | `Static_1(area_rows, None) => [%expr
+          `areasRows([%e render_area_rows(~loc, area_rows)])
+        ]
+      | `Static_1(area_rows, Some((_, (explicit_track_list, line_names)))) => [%expr
+          `areasRowsColumns((
+            [%e render_area_rows(~loc, area_rows)],
+            [%e
+              render_explicit_track_list(
+                ~loc,
+                explicit_track_list,
+                line_names,
+              )
+            ],
+          ))
+        ],
+  );
 
 let grid_auto_columns =
   monomorphic(
@@ -4011,7 +4058,7 @@ let grid_auto_flow =
 let render_grid_line = (~loc, x: Types.grid_line) =>
   switch (x) {
   | `Auto => [%expr `auto]
-  | `Custom_ident(x) => render_string(~loc, x)
+  | `Custom_ident(x) => [%expr `ident([%e render_string(~loc, x)])]
   | `And_0(num, None) => [%expr `num([%e render_integer(~loc, num)])]
   | `And_0(num, Some(ident)) =>
     [%expr
@@ -4019,17 +4066,17 @@ let render_grid_line = (~loc, x: Types.grid_line) =>
        [%e render_integer(~loc, num)],
        [%e render_string(~loc, ident)],
      ))]
-  | `And_1(_span, (Some(num), None)) =>
+  | `And_1((Some(num), None), _span) =>
     [%expr `spanNum([%e render_integer(~loc, num)])]
-  | `And_1(_span, (None, Some(ident))) =>
+  | `And_1((None, Some(ident)), _span) =>
     [%expr `spanIdent([%e render_string(~loc, ident)])]
-  | `And_1(_span, (Some(num), Some(ident))) =>
+  | `And_1((Some(num), Some(ident)), _span) =>
     [%expr
      `spanNumIdent((
        [%e render_integer(~loc, num)],
        [%e render_string(~loc, ident)],
      ))]
-  | `And_1(_span, (None, None)) => failwith("impossible")
+  | `And_1((None, None), _span) => failwith("impossible")
   };
 
 let grid =
@@ -4119,13 +4166,35 @@ let grid_area =
   );
 
 let grid_row =
-  unsupportedValue(Property_parser.property_grid_row, (~loc) =>
-    [%expr CSS.gridRow]
+  polymorphic(Property_parser.property_grid_row, (~loc) =>
+    fun
+    | (start, None) => [
+        [%expr CSS.gridRow([%e render_grid_line(~loc, start)])],
+      ]
+    | (start, Some((_, end_))) => [
+        [%expr
+          CSS.gridRow2(
+            [%e render_grid_line(~loc, start)],
+            [%e render_grid_line(~loc, end_)],
+          )
+        ],
+      ]
   );
 
 let grid_column =
-  unsupportedValue(Property_parser.property_grid_column, (~loc) =>
-    [%expr CSS.gridColumn]
+  polymorphic(Property_parser.property_grid_column, (~loc) =>
+    fun
+    | (start, None) => [
+        [%expr CSS.gridColumn([%e render_grid_line(~loc, start)])],
+      ]
+    | (start, Some((_, end_))) => [
+        [%expr
+          CSS.gridColumn2(
+            [%e render_grid_line(~loc, start)],
+            [%e render_grid_line(~loc, end_)],
+          )
+        ],
+      ]
   );
 
 let grid_gap =

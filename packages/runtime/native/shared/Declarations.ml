@@ -646,13 +646,14 @@ let flexBasis x =
 
 let order x = Rule.declaration ({js|order|js}, Kloth.Int.to_string x)
 
-let gridTemplateColumns dimensions =
-  Rule.declaration
-    ({js|gridTemplateColumns|js}, GridTemplateColumns.toString dimensions)
+let gridTemplate x =
+  Rule.declaration ({js|gridTemplate|js}, GridTemplate.toString x)
 
-let gridTemplateRows dimensions =
-  Rule.declaration
-    ({js|gridTemplateRows|js}, GridTemplateRows.toString dimensions)
+let gridTemplateColumns x =
+  Rule.declaration ({js|gridTemplateColumns|js}, GridTemplateColumns.toString x)
+
+let gridTemplateRows x =
+  Rule.declaration ({js|gridTemplateRows|js}, GridTemplateRows.toString x)
 
 let gridAutoColumns sizes =
   Rule.declaration ({js|gridAutoColumns|js}, GridAutoColumns.toString sizes)
@@ -914,5 +915,32 @@ let fontVariantEmoji x =
 let translateProperty x =
   Rule.declaration ({js|translate|js}, Translate.toString x)
 
+let translateProperty2 x y =
+  Rule.declaration
+    ( {js|translate|js},
+      Translate.Value.toString x ^ {js| |js} ^ Translate.Value.toString y )
+
+let translateProperty3 x y z =
+  Rule.declaration
+    ( {js|translate|js},
+      Translate.Value.toString x
+      ^ {js| |js}
+      ^ Translate.Value.toString y
+      ^ {js| |js}
+      ^ Translate.Value.toString z )
+
 let rotateProperty x = Rule.declaration ({js|rotate|js}, Rotate.toString x)
 let scaleProperty x = Rule.declaration ({js|scale|js}, Scale.toString x)
+
+let scaleProperty2 x y =
+  Rule.declaration
+    ({js|scale|js}, Scale.Value.toString x ^ {js| |js} ^ Scale.Value.toString y)
+
+let scaleProperty3 x y z =
+  Rule.declaration
+    ( {js|scale|js},
+      Scale.Value.toString x
+      ^ {js| |js}
+      ^ Scale.Value.toString y
+      ^ {js| |js}
+      ^ Scale.Value.toString z )
