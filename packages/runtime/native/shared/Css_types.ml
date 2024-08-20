@@ -536,6 +536,7 @@ module GridAutoFlow = struct
     | `row
     | `columnDense
     | `rowDense
+    | `dense
     | Var.t
     | Cascading.t
     ]
@@ -546,6 +547,7 @@ module GridAutoFlow = struct
     | `row -> {js|row|js}
     | `columnDense -> {js|column dense|js}
     | `rowDense -> {js|row dense|js}
+    | `dense -> {js|dense|js}
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
 end

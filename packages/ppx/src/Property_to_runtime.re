@@ -3969,18 +3969,43 @@ let grid_template =
   unsupportedProperty(Property_parser.property_grid_template);
 
 let grid_auto_columns =
-  unsupportedValue(Property_parser.property_grid_auto_columns, (~loc) =>
-    [%expr CSS.gridAutoColumns]
+  monomorphic(
+    Property_parser.property_grid_auto_columns,
+    (~loc) => [%expr CSS.gridAutoColumns],
+    (~loc, sizes) => {
+      let sizesExpr =
+        sizes
+        |> List.map(render_track_size(~loc))
+        |> Builder.pexp_array(~loc);
+      [%expr `value([%e sizesExpr])];
+    },
   );
 
 let grid_auto_rows =
-  unsupportedValue(Property_parser.property_grid_auto_rows, (~loc) =>
-    [%expr CSS.gridAutoRows]
+  monomorphic(
+    Property_parser.property_grid_auto_rows,
+    (~loc) => [%expr CSS.gridAutoRows],
+    (~loc, sizes) => {
+      let sizesExpr =
+        sizes
+        |> List.map(render_track_size(~loc))
+        |> Builder.pexp_array(~loc);
+      [%expr `value([%e sizesExpr])];
+    },
   );
 
 let grid_auto_flow =
-  unsupportedValue(Property_parser.property_grid_auto_flow, (~loc) =>
-    [%expr CSS.gridAutoFlow]
+  monomorphic(
+    Property_parser.property_grid_auto_flow,
+    (~loc) => [%expr CSS.gridAutoFlow],
+    (~loc) =>
+      fun
+      | (Some(`Row), None) => [%expr `row]
+      | (Some(`Column), None) => [%expr `column]
+      | (None, Some(_)) => [%expr `dense]
+      | (Some(`Row), Some(_)) => [%expr `rowDense]
+      | (Some(`Column), Some(_)) => [%expr `columnDense]
+      | (None, None) => failwith("impossible"),
   );
 
 let grid =
