@@ -445,7 +445,7 @@ and gradient = [%value.rec
   "<linear-gradient()> | <repeating-linear-gradient()> | <radial-gradient()> | <repeating-radial-gradient()> | <conic-gradient()> | <-legacy-gradient>"
 ]
 and grid_line = [%value.rec
-  "<custom-ident> | <integer> && [ <custom-ident> ]? | [ <integer> || <custom-ident> ] && 'span' | 'auto'"
+  "<custom-ident-without-span-or-auto> | <integer> && [ <custom-ident-without-span-or-auto> ]? | 'span' && [ <integer> || <custom-ident-without-span-or-auto> ] | 'auto'"
 ]
 and historical_lig_values = [%value.rec
   "'historical-ligatures' | 'no-historical-ligatures'"
@@ -1112,7 +1112,7 @@ and property_font_stretch = [%value.rec "<font-stretch-absolute>"]
 and property_font_style = [%value.rec
   "'normal' | 'italic' | 'oblique' | <interpolation> | [ 'oblique' <extended-angle> ]?"
 ]
-and property_font_synthesis = [%value.rec "'none' | 'weight' || 'style'"]
+and property_font_synthesis = [%value.rec "'none' | [ 'weight' || 'style' || 'small-caps' || 'position' ]"]
 and property_font_synthesis_weight = [%value.rec "'auto' | 'none'"]
 and property_font_synthesis_style = [%value.rec "'auto' | 'none'"]
 and property_font_synthesis_small_caps = [%value.rec "'auto' | 'none'"]
@@ -1149,7 +1149,9 @@ and property_gap = [%value.rec "<'row-gap'> [ <'column-gap'> ]?"]
 and property_glyph_orientation_horizontal = [%value.rec "<extended-angle>"]
 and property_glyph_orientation_vertical = [%value.rec "<extended-angle>"]
 and property_grid = [%value.rec
-  "<'grid-template'> | <'grid-template-rows'> '/' [ 'auto-flow' && [ 'dense' ]? ] [ <'grid-auto-columns'> ]? | [ 'auto-flow' && [ 'dense' ]? ] [ <'grid-auto-rows'> ]? '/' <'grid-template-columns'>"
+  "<'grid-template'>
+  | <'grid-template-rows'> '/' [ 'auto-flow' && [ 'dense' ]? ] [ <'grid-auto-columns'> ]?
+  | [ 'auto-flow' && [ 'dense' ]? ] [ <'grid-auto-rows'> ]? '/' <'grid-template-columns'>"
 ]
 and property_grid_area = [%value.rec "<grid-line> [ '/' <grid-line> ]{0,3}"]
 and property_grid_auto_columns = [%value.rec "[ <track-size> ]+"]

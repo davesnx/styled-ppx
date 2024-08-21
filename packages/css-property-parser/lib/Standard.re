@@ -276,6 +276,18 @@ let flex_value =
     | _ => Error(["expected flex_value"]),
   );
 
+let custom_ident_without_span_or_auto =
+  token(
+    fun
+    | IDENT("auto")
+    | STRING("auto")
+    | IDENT("span")
+    | STRING("span") => Error(["custom ident cannot be span or auto"])
+    | IDENT(string) => Ok(string)
+    | STRING(string) => Ok(string)
+    | _ => Error(["expected an identifier"]),
+  );
+
 // TODO: workarounds
 let invalid = expect(STRING("not-implemented"));
 let attr_name = invalid;

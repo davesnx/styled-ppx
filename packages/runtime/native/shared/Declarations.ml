@@ -32,10 +32,7 @@ let animationTimingFunction x =
   Rule.declaration ({js|animationTimingFunction|js}, TimingFunction.toString x)
 
 let backfaceVisibility x =
-  Rule.declaration
-    ( {js|backfaceVisibility|js},
-      match x with
-      | #BackfaceVisibility.t as bv -> BackfaceVisibility.toString bv )
+  Rule.declaration ({js|backfaceVisibility|js}, BackfaceVisibility.toString x)
 
 let backdropFilter x =
   Rule.declaration
@@ -226,17 +223,9 @@ let flex grow shrink basis =
       ^ {js| |js}
       ^ Kloth.Float.to_string shrink
       ^ {js| |js}
-      ^
-      match basis with
-      | #FlexBasis.t as b -> FlexBasis.toString b
-      | #Length.t as l -> Length.toString l )
+      ^ FlexBasis.Value.toString basis )
 
-let flex1 x =
-  Rule.declaration
-    ( {js|flex|js},
-      match x with
-      | #Flex.t as f -> Flex.toString f
-      | `num n -> Kloth.Float.to_string n )
+let flex1 x = Rule.declaration ({js|flex|js}, Flex.toString x)
 
 let flex2 ?basis ?shrink grow =
   Rule.declaration
@@ -247,8 +236,7 @@ let flex2 ?basis ?shrink grow =
         | None -> {js||js})
       ^
       match basis with
-      | Some (#FlexBasis.t as b) -> {js| |js} ^ FlexBasis.toString b
-      | Some (#Length.t as l) -> {js| |js} ^ Length.toString l
+      | Some (b) -> {js| |js} ^ FlexBasis.toString b
       | None -> {js||js} )
 
 let flexDirection x =
@@ -279,6 +267,7 @@ let fontDisplay x =
   Rule.declaration ({js|fontDisplay|js}, FontDisplay.toString x)
 
 let sizeAdjust x = Rule.declaration ({js|sizeAdjust|js}, Percentage.toString x)
+let gridProperty x = Rule.declaration ({js|grid|js}, Grid.toString x)
 
 let gridAutoFlow x =
   Rule.declaration ({js|gridAutoFlow|js}, GridAutoFlow.toString x)
@@ -365,9 +354,7 @@ let listStyle style position image =
       ^ {js| |js}
       ^ ListStylePosition.toString position
       ^ {js| |js}
-      ^
-      match image with #ListStyleImage.t as lsi -> ListStyleImage.toString lsi
-    )
+      ^ ListStyleImage.toString image )
 
 let listStyleImage x =
   Rule.declaration ({js|listStyleImage|js}, ListStyleImage.toString x)
@@ -505,13 +492,7 @@ let pointerEvents x =
   Rule.declaration ({js|pointerEvents|js}, PointerEvents.toString x)
 
 let position x = Rule.declaration ({js|position|js}, PropertyPosition.toString x)
-
-let isolation x =
-  Rule.declaration
-    ( {js|isolation|js},
-      match x with
-      | #Isolation.t as i -> Isolation.toString i
-      | #Cascading.t as c -> Cascading.toString c )
+let isolation x = Rule.declaration ({js|isolation|js}, Isolation.toString x)
 
 let justifySelf x =
   Rule.declaration ({js|justifySelf|js}, JustifySelf.toString x)
@@ -537,10 +518,7 @@ let textDecorationLine x =
   Rule.declaration ({js|textDecorationLine|js}, TextDecorationLine.toString x)
 
 let textDecorationStyle x =
-  Rule.declaration
-    ( {js|textDecorationStyle|js},
-      match x with
-      | #TextDecorationStyle.t as tds -> TextDecorationStyle.toString tds )
+  Rule.declaration ({js|textDecorationStyle|js}, TextDecorationStyle.toString x)
 
 let textDecorationThickness x =
   Rule.declaration
@@ -548,10 +526,7 @@ let textDecorationThickness x =
 
 let textDecorationSkipInk x =
   Rule.declaration
-    ( {js|textDecorationSkipInk|js},
-      match x with
-      | #TextDecorationSkipInk.t as tdsi -> TextDecorationSkipInk.toString tdsi
-    )
+    ({js|textDecorationSkipInk|js}, TextDecorationSkipInk.toString x)
 
 let textDecorationSkipBox x =
   Rule.declaration
@@ -624,9 +599,7 @@ let whiteSpace x = Rule.declaration ({js|whiteSpace|js}, WhiteSpace.toString x)
 let wordBreak x = Rule.declaration ({js|wordBreak|js}, WordBreak.toString x)
 
 let wordSpacing x =
-  Rule.declaration
-    ( {js|wordSpacing|js},
-      match x with #WordSpacing.t as w -> WordSpacing.toString w )
+  Rule.declaration ({js|wordSpacing|js}, WordSpacing.toString x)
 
 let wordWrap x = Rule.declaration ({js|wordWrap|js}, OverflowWrap.toString x)
 let zIndex x = Rule.declaration ({js|zIndex|js}, ZIndex.toString x)
@@ -638,18 +611,9 @@ let flex3 ~grow ~shrink ~basis =
       ^ {js| |js}
       ^ Kloth.Float.to_string shrink
       ^ {js| |js}
-      ^
-      match basis with
-      | #FlexBasis.t as b -> FlexBasis.toString b
-      | #Length.t as l -> Length.toString l )
+      ^ FlexBasis.Value.toString basis )
 
-let flexBasis x =
-  Rule.declaration
-    ( {js|flexBasis|js},
-      match x with
-      | #FlexBasis.t as b -> FlexBasis.toString b
-      | #Length.t as l -> Length.toString l )
-
+let flexBasis x = Rule.declaration ({js|flexBasis|js}, FlexBasis.toString x)
 let order x = Rule.declaration ({js|order|js}, Kloth.Int.to_string x)
 
 let gridTemplate x =
@@ -784,12 +748,14 @@ let transitionDuration i =
 let transitionTimingFunction x =
   Rule.declaration ({js|transitionTimingFunction|js}, TimingFunction.toString x)
 
-let transitionProperty x = Rule.declaration ({js|transitionProperty|js}, TransitionProperty.toString x)
+let transitionProperty x =
+  Rule.declaration ({js|transitionProperty|js}, TransitionProperty.toString x)
 
 let transitionProperties x =
   Rule.declaration
     ( {js|transitionProperty|js},
-      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:SingleTransitionProperty.toString x )
+      Kloth.Array.map_and_join ~sep:{js|, |js}
+        ~f:SingleTransitionProperty.toString x )
 
 let animation ?duration ?delay ?direction ?timingFunction ?fillMode ?playState
   ?iterationCount ?name () =
@@ -891,16 +857,10 @@ let overflowBlock x =
   Rule.declaration ({js|overflowBlock|js}, OverflowInline.toString x)
 
 let fontSynthesisWeight x =
-  Rule.declaration
-    ( {js|fontSynthesisWeight|js},
-      match x with
-      | #FontSynthesisWeight.t as fsw -> FontSynthesisWeight.toString fsw )
+  Rule.declaration ({js|fontSynthesisWeight|js}, FontSynthesisWeight.toString x)
 
 let fontSynthesisStyle x =
-  Rule.declaration
-    ( {js|fontSynthesisStyle|js},
-      match x with
-      | #FontSynthesisStyle.t as fss -> FontSynthesisStyle.toString fss )
+  Rule.declaration ({js|fontSynthesisStyle|js}, FontSynthesisStyle.toString x)
 
 let fontSynthesisSmallCaps x =
   Rule.declaration
@@ -908,7 +868,7 @@ let fontSynthesisSmallCaps x =
 
 let fontSynthesisPosition x =
   Rule.declaration
-    ({js|fontSynthesisWeight|js}, FontSynthesisPosition.toString x)
+    ({js|fontSynthesisPosition|js}, FontSynthesisPosition.toString x)
 
 let fontKerning x =
   Rule.declaration ({js|fontKerning|js}, FontKerning.toString x)

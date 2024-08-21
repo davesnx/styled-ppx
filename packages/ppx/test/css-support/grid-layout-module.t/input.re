@@ -36,17 +36,17 @@
   {|grid-template-columns: [linename1 linename2] 100px repeat(auto-fit, [linename1] 300px) [linename3]; |}
 ];
 let value =
-  `value([|
-    `repeat((
-      `num(4),
+  CSS.tracks([|
+    CSS.repeatFn(
+      CSS.numInt(4),
       [|
-        `pxFloat(10.),
-        `lineNames({js|[col-start]|js}),
-        `pxFloat(250.),
-        `lineNames({js|[col-end]|js}),
+        CSS.pxFloat(10.),
+        CSS.lineNames({js|[col-start]|js}),
+        CSS.pxFloat(250.),
+        CSS.lineNames({js|[col-end]|js}),
       |],
-    )),
-    `pxFloat(10.),
+    ),
+    CSS.pxFloat(10.),
   |]);
 [%css {|grid-template-columns: $(value)|}];
 [%css {|grid-template-rows: none|}];
@@ -94,53 +94,53 @@ let value =
 [%css {|grid-auto-flow: column|}];
 [%css {|grid-auto-flow: row dense|}];
 [%css {|grid-auto-flow: column dense|}];
-/* [%css {|grid: auto-flow 1fr / 100px|}]; */
-/* [%css {|grid: none / auto-flow 1fr|}]; */
-/* [%css {|grid: auto-flow / auto 1fr|}]; */
-/* [%css {|grid: repeat(auto-fill, 5em) / auto-flow 1fr|}]; */
-/* [%css {|grid:  auto-flow 1fr / repeat(auto-fill, 5em)|}]; */
-/* [%css {|grid: 'H    H ' 'A    B ' 'F    F ' 30px / auto 1fr|}]; */
+[%css {|grid: auto-flow 1fr / 100px|}];
+[%css {|grid: none / auto-flow 1fr|}];
+[%css {|grid: auto-flow / auto 1fr|}];
+[%css {|grid: repeat(auto-fill, 5em) / auto-flow 1fr|}];
+[%css {|grid:  auto-flow 1fr / repeat(auto-fill, 5em)|}];
+[%css {|grid: 'H    H ' 'A    B ' 'F    F ' 30px / auto 1fr|}];
 [%css {|grid-row-start: auto|}];
 [%css {|grid-row-start: 4|}];
 [%css {|grid-row-start: C|}];
 [%css {|grid-row-start: C 2|}];
-/* [%css {|grid-row-start: span C|}]; */
-/* [%css {|grid-row-start: span 1|}]; */
+[%css {|grid-row-start: span C|}];
+[%css {|grid-row-start: span 1|}];
 [%css {|grid-column-start: auto|}];
 [%css {|grid-column-start: 4|}];
 [%css {|grid-column-start: C|}];
 [%css {|grid-column-start: C 2|}];
-/* [%css {|grid-column-start: span C|}]; */
-/* [%css {|grid-column-start: span 1|}]; */
+[%css {|grid-column-start: span C|}];
+[%css {|grid-column-start: span 1|}];
 [%css {|grid-row-end: auto|}];
 [%css {|grid-row-end: 4|}];
 [%css {|grid-row-end: C|}];
 [%css {|grid-row-end: C 2|}];
-/* [%css {|grid-row-end: span C|}]; */
-/* [%css {|grid-row-end: span 1|}]; */
+[%css {|grid-row-end: span C|}];
+[%css {|grid-row-end: span 1|}];
 [%css {|grid-column-end: auto|}];
 [%css {|grid-column-end: 4|}];
 [%css {|grid-column-end: C|}];
 [%css {|grid-column-end: C 2|}];
-/* [%css {|grid-column-end: span C|}]; */
-/* [%css {|grid-column-end: span 1|}]; */
+[%css {|grid-column-end: span C|}];
+[%css {|grid-column-end: span 1|}];
 [%css {|grid-column: auto|}];
 [%css {|grid-column: 1|}];
 [%css {|grid-column: -1|}];
-/* [%css {|grid-column: 1 / 1|}]; */
-/* [%css {|grid-column: 1 / -1|}]; */
-/* [%css {|grid-column: auto / auto|}]; */
-/* [%css {|grid-column: 2 / span 2|}]; */
+[%css {|grid-column: 1 / 1|}];
+[%css {|grid-column: 1 / -1|}];
+[%css {|grid-column: auto / auto|}];
+[%css {|grid-column: 2 / span 2|}];
 [%css {|grid-row: auto|}];
 [%css {|grid-row: 1|}];
 [%css {|grid-row: -1|}];
-/* [%css {|grid-row: 1 / 1|}]; */
-/* [%css {|grid-row: 1 / -1|}]; */
-/* [%css {|grid-row: auto / auto|}]; */
-/* [%css {|grid-row: 2 / span 2|}]; */
-/* [%css {|grid-area: 1 / 1|}]; */
-/* [%css {|grid-area: 1 / span 1|}]; */
-/* [%css {|grid-area: span / 10 / -1|}]; */
+[%css {|grid-row: 1 / 1|}];
+[%css {|grid-row: 1 / -1|}];
+[%css {|grid-row: auto / auto|}];
+[%css {|grid-row: 2 / span 2|}];
+[%css {|grid-area: 1 / 1|}];
+[%css {|grid-area: 1 / span 1|}];
+[%css {|grid-area: span 1 / 10 / -1|}];
 [%css {|grid-column-gap: 0|}];
 [%css {|grid-column-gap: 1em|}];
 [%css {|grid-row-gap: 0|}];

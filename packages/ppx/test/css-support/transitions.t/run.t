@@ -16,10 +16,10 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   
-  CSS.transitionProperty({js|none|js});
-  CSS.transitionProperty({js|all|js});
-  CSS.transitionProperty({js|width|js});
-  CSS.unsafe({js|transitionProperty|js}, {js|width, height|js});
+  CSS.transitionProperty(`none);
+  CSS.transitionProperties([|`all|]);
+  CSS.transitionProperties([|`ident({js|width|js})|]);
+  CSS.transitionProperties([|`ident({js|width|js}), `ident({js|height|js})|]);
   CSS.transitionDuration(`s(0));
   CSS.transitionDuration(`s(1));
   CSS.transitionDuration(`ms(100));
@@ -41,14 +41,14 @@ If this test fail means that the module is not in sync with the ppx
       ~duration=?Some(`s(2)),
       ~delay=?None,
       ~timingFunction=?None,
-      ~property=?Some({js|margin-right|js}),
+      ~property=?Some(`ident({js|margin-right|js})),
       (),
     ),
     CSS.Transition.shorthand(
       ~duration=?Some(`ms(500)),
       ~delay=?None,
       ~timingFunction=?None,
-      ~property=?Some({js|opacity|js}),
+      ~property=?Some(`ident({js|opacity|js})),
       (),
     ),
   |]);
@@ -57,7 +57,7 @@ If this test fail means that the module is not in sync with the ppx
       ~duration=?Some(`s(1)),
       ~delay=?Some(`s(2)),
       ~timingFunction=?Some(`linear),
-      ~property=?Some({js|width|js}),
+      ~property=?Some(`ident({js|width|js})),
       (),
     ),
   |]);
@@ -66,7 +66,7 @@ If this test fail means that the module is not in sync with the ppx
       ~duration=?None,
       ~delay=?None,
       ~timingFunction=?None,
-      ~property=?Some({js|none|js}),
+      ~property=?Some(`none),
       (),
     ),
   |]);
@@ -75,7 +75,7 @@ If this test fail means that the module is not in sync with the ppx
       ~duration=?None,
       ~delay=?None,
       ~timingFunction=?None,
-      ~property=?Some({js|margin-right|js}),
+      ~property=?Some(`ident({js|margin-right|js})),
       (),
     ),
   |]);
@@ -84,7 +84,7 @@ If this test fail means that the module is not in sync with the ppx
       ~duration=?None,
       ~delay=?None,
       ~timingFunction=?Some(`easeIn),
-      ~property=?Some({js|margin-right|js}),
+      ~property=?Some(`ident({js|margin-right|js})),
       (),
     ),
   |]);
@@ -120,29 +120,27 @@ If this test fail means that the module is not in sync with the ppx
       ~duration=?Some(`s(1)),
       ~delay=?Some(`ms(500)),
       ~timingFunction=?Some(`linear),
-      ~property=?Some({js|margin-right|js}),
+      ~property=?Some(`ident({js|margin-right|js})),
       (),
     ),
   |]);
   
-  let transitions = [|
-    CSS.Transition.shorthand(~property="margin-left", ()),
-    CSS.Transition.shorthand(~duration=`s(2), ~property="opacity", ()),
-  |];
-  let property = "margin-right";
+  let property = `ident("margin-right");
+  let property2 = `all;
   let timingFunction = `easeOut;
   let duration = `ms(200);
   let delay = `s(3);
-  let property2 = "opacity";
+  let property3 = `ident("opacity");
   
-  (CSS.transitionList(transitions): CSS.rule);
+  CSS.transitionList([|CSS.Transition.shorthand(~property, ())|]);
+  CSS.transitionList([|CSS.Transition.shorthand(~property=property2, ())|]);
   
   CSS.transitionList([|
     CSS.Transition.shorthand(~duration, ~delay, ~timingFunction, ~property, ()),
   |]);
   CSS.transitionList([|
     CSS.Transition.shorthand(~duration, ~delay, ~timingFunction, ~property, ()),
-    CSS.Transition.shorthand(~duration=`s(0), ~property=property2, ()),
+    CSS.Transition.shorthand(~duration=`s(0), ~property=property3, ()),
   |]);
   CSS.transitionList([|
     CSS.Transition.shorthand(
@@ -176,7 +174,7 @@ If this test fail means that the module is not in sync with the ppx
       ~duration,
       ~delay,
       ~timingFunction=`easeOut,
-      ~property={js|margin-right|js},
+      ~property=`ident({js|margin-right|js}),
       (),
     ),
   |]);
@@ -194,7 +192,7 @@ If this test fail means that the module is not in sync with the ppx
       ~duration=`ms(200),
       ~delay=`s(3),
       ~timingFunction,
-      ~property={js|margin-right|js},
+      ~property=`ident({js|margin-right|js}),
       (),
     ),
   |]);
@@ -203,7 +201,7 @@ If this test fail means that the module is not in sync with the ppx
       ~duration=`ms(200),
       ~delay,
       ~timingFunction=`easeOut,
-      ~property={js|margin-right|js},
+      ~property=`ident({js|margin-right|js}),
       (),
     ),
   |]);
@@ -227,7 +225,7 @@ If this test fail means that the module is not in sync with the ppx
     CSS.Transition.shorthand(
       ~duration,
       ~timingFunction=`easeIn,
-      ~property={js|margin-right|js},
+      ~property=`ident({js|margin-right|js}),
       (),
     ),
   |]);
@@ -238,7 +236,7 @@ If this test fail means that the module is not in sync with the ppx
     CSS.Transition.shorthand(
       ~duration=`ms(200),
       ~timingFunction,
-      ~property={js|margin-right|js},
+      ~property=`ident({js|margin-right|js}),
       (),
     ),
   |]);
@@ -254,7 +252,7 @@ If this test fail means that the module is not in sync with the ppx
     CSS.Transition.shorthand(
       ~duration,
       ~timingFunction=`easeIn,
-      ~property={js|margin-right|js},
+      ~property=`ident({js|margin-right|js}),
       (),
     ),
   |]);
@@ -262,7 +260,7 @@ If this test fail means that the module is not in sync with the ppx
     CSS.Transition.shorthand(
       ~duration=`ms(200),
       ~timingFunction,
-      ~property={js|margin-right|js},
+      ~property=`ident({js|margin-right|js}),
       (),
     ),
   |]);
@@ -270,5 +268,9 @@ If this test fail means that the module is not in sync with the ppx
     CSS.Transition.shorthand(~duration=`ms(200), ~property, ()),
   |]);
   CSS.transitionList([|
-    CSS.Transition.shorthand(~duration, ~property={js|margin-right|js}, ()),
+    CSS.Transition.shorthand(
+      ~duration,
+      ~property=`ident({js|margin-right|js}),
+      (),
+    ),
   |]);

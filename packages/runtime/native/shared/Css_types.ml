@@ -27,14 +27,14 @@ end
 module None = struct
   type t = [ `none ]
 
-  let none : [> t ] = `none
+  let none = `none
   let toString = {js|none|js}
 end
 
 module Auto = struct
   type t = [ `auto ]
 
-  let auto : [> t ] = `auto
+  let auto = `auto
   let toString = {js|auto|js}
 end
 
@@ -147,7 +147,7 @@ end
 module Percentage = struct
   type t = [ `percent of float ]
 
-  let pct x : [> t ] = `percent x
+  let pct (x : float) = `percent x
 
   let toString (x : t) =
     match x with `percent x -> Kloth.Float.to_string x ^ {js|%|js}
@@ -156,6 +156,7 @@ end
 module Url = struct
   type t = [ `url of string ]
 
+  let url (x : string) = `url x
   let toString (x : t) = match x with `url s -> ({js|url(|js} ^ s) ^ {js|)|js}
 end
 
@@ -210,28 +211,29 @@ module Length = struct
     | `max of t array
     ]
 
-  let ch x : [> t ] = `ch x
-  let cqw x : [> t ] = `cqw x
-  let cqh x : [> t ] = `cqh x
-  let cqi x : [> t ] = `cqi x
-  let cqb x : [> t ] = `cqb x
-  let cqmin x : [> t ] = `cqmin x
-  let cqmax x : [> t ] = `cqmax x
-  let em x : [> t ] = `em x
-  let ex x : [> t ] = `ex x
-  let rem x : [> t ] = `rem x
-  let vh x : [> t ] = `vh x
-  let vw x : [> t ] = `vw x
-  let vmin x : [> t ] = `vmin x
-  let vmax x : [> t ] = `vmax x
-  let px x : [> t ] = `px x
-  let pxFloat x : [> t ] = `pxFloat x
-  let cm x : [> t ] = `cm x
-  let mm x : [> t ] = `mm x
-  let inch x : [> t ] = `inch x
-  let pc x : [> t ] = `pc x
-  let pt x : [> t ] = `pt x
-  let zero : [> t ] = `zero
+  let ch (x : float) = `ch x
+  let cqw (x : float) = `cqw x
+  let cqh (x : float) = `cqh x
+  let cqi (x : float) = `cqi x
+  let cqb (x : float) = `cqb x
+  let cqmin (x : float) = `cqmin x
+  let cqmax (x : float) = `cqmax x
+  let em (x : float) = `em x
+  let ex (x : float) = `ex x
+  let rem (x : float) = `rem x
+  let vh (x : float) = `vh x
+  let vw (x : float) = `vw x
+  let vmin (x : float) = `vmin x
+  let vmax (x : float) = `vmax x
+  let px (x : int) = `px x
+  let pxFloat (x : float) = `pxFloat x
+  let cm (x : float) = `cm x
+  let mm (x : float) = `mm x
+  let inch (x : float) = `inch x
+  let pc (x : float) = `pc x
+  let pt (x : int) = `pt x
+  let zero = `zero
+  let num (x : float) = `num x
 
   let rec toString (x : t) =
     match x with
@@ -284,10 +286,10 @@ module Angle = struct
     | `turn of float
     ]
 
-  let deg x : [> t ] = `deg x
-  let rad x : [> t ] = `rad x
-  let grad x : [> t ] = `grad x
-  let turn x : [> t ] = `turn x
+  let deg (x : float) = `deg x
+  let rad (x : float) = `rad x
+  let grad (x : float) = `grad x
+  let turn (x : float) = `turn x
 
   let toString (x : t) =
     match x with
@@ -305,8 +307,8 @@ module Direction = struct
     | Cascading.t
     ]
 
-  let ltr : [> t ] = `ltr
-  let rtl : [> t ] = `rtl
+  let ltr = `ltr
+  let rtl = `rtl
 
   let toString (x : t) =
     match x with
@@ -328,11 +330,11 @@ module PropertyPosition = struct
     | Cascading.t
     ]
 
-  let absolute : [> t ] = `absolute
-  let relative : [> t ] = `relative
-  let static : [> t ] = `static
-  let fixed : [> t ] = `fixed
-  let sticky : [> t ] = `sticky
+  let absolute = `absolute
+  let relative = `relative
+  let static = `static
+  let fixed = `fixed
+  let sticky = `sticky
 
   let toString (x : t) =
     match x with
@@ -349,12 +351,18 @@ module Isolation = struct
   type t =
     [ Auto.t
     | `isolate
+    | Cascading.t
+    | Var.t
     ]
 
-  let isolate : [> t ] = `isolate
+  let isolate = `isolate
 
   let toString (x : t) =
-    match x with #Auto.t -> Auto.toString | `isolate -> {js|isolate|js}
+    match x with
+    | #Auto.t -> Auto.toString
+    | `isolate -> {js|isolate|js}
+    | #Cascading.t as x -> Cascading.toString x
+    | #Var.t as x -> Var.toString x
 end
 
 module AspectRatio = struct
@@ -366,7 +374,7 @@ module AspectRatio = struct
     | Cascading.t
     ]
 
-  let ratio x y : [> t ] = `ratio (x, y)
+  let ratio (x : int) (y : int) = `ratio (x, y)
 
   let toString (x : t) =
     match x with
@@ -464,32 +472,6 @@ module TabSize = struct
     | #Cascading.t as c -> Cascading.toString c
 end
 
-module FlexBasis = struct
-  type t =
-    [ Auto.t
-    | `fill
-    | `content
-    | `maxContent
-    | `minContent
-    | `fitContent
-    ]
-
-  let fill = `fill
-  let content_ = `content
-  let maxContent = `maxContent
-  let minContent = `minContent
-  let fitContent = `fitContent
-
-  let toString (x : t) =
-    match x with
-    | #Auto.t -> Auto.toString
-    | `fill -> {js|fill|js}
-    | `content -> {js|content|js}
-    | `maxContent -> {js|max-content|js}
-    | `minContent -> {js|min-content|js}
-    | `fitContent -> {js|fit-content|js}
-end
-
 module Overflow = struct
   type t =
     [ `hidden
@@ -502,7 +484,6 @@ module Overflow = struct
   let hidden = `hidden
   let visible = `visible
   let scroll = `scroll
-  let auto = `auto
   let clip = `clip
 
   let toString (x : t) =
@@ -700,8 +681,11 @@ module TimingFunction = struct
   let easeOut = `easeOut
   let stepStart = `stepStart
   let stepEnd = `stepEnd
-  let steps i dir = `steps (i, dir)
-  let cubicBezier a b c d = `cubicBezier (a, b, c, d)
+  let steps (i : int) (dir : [ `start | `end_ ]) = `steps (i, dir)
+
+  let cubicBezier (a : float) (b : float) (c : float) (d : float) =
+    `cubicBezier (a, b, c, d)
+
   let jumpStart = `jumpStart
   let jumpEnd = `jumpEnd
   let jumpNone = `jumpNone
@@ -822,7 +806,7 @@ end
 
 module FontWeight = struct
   type t =
-    [ `num of int
+    [ `numInt of int
     | `thin
     | `extraLight
     | `light
@@ -850,7 +834,7 @@ module FontWeight = struct
 
   let toString (x : t) =
     match x with
-    | `num n -> Kloth.Int.to_string n
+    | `numInt n -> Kloth.Int.to_string n
     | `thin -> {js|100|js}
     | `extraLight -> {js|200|js}
     | `light -> {js|300|js}
@@ -912,24 +896,31 @@ module Transform = struct
     | None.t
     ]
 
-  let translate x y = `translate (x, y)
-  let translate3d x y z = `translate3d (x, y, z)
-  let translateX x = `translateX x
-  let translateY y = `translateY y
-  let translateZ z = `translateZ z
-  let scale x y = `scale (x, y)
-  let scale3d x y z = `scale3d (x, y, z)
-  let scaleX x = `scaleX x
-  let scaleY x = `scaleY x
-  let scaleZ x = `scaleZ x
-  let rotate a = `rotate a
-  let rotate3d x y z a = `rotate3d (x, y, z, a)
-  let rotateX a = `rotateX a
-  let rotateY a = `rotateY a
-  let rotateZ a = `rotateZ a
-  let skew a a' = `skew (a, a')
-  let skewX a = `skewX a
-  let skewY a = `skewY a
+  let translate (x : Length.t) (y : Length.t) = `translate (x, y)
+
+  let translate3d (x : Length.t) (y : Length.t) (z : Length.t) =
+    `translate3d (x, y, z)
+
+  let translateX (x : Length.t) = `translateX x
+  let translateY (y : Length.t) = `translateY y
+  let translateZ (z : Length.t) = `translateZ z
+  let scale (x : float) (y : float) = `scale (x, y)
+  let scale3d (x : float) (y : float) (z : float) = `scale3d (x, y, z)
+  let scaleX (x : float) = `scaleX x
+  let scaleY (x : float) = `scaleY x
+  let scaleZ (x : float) = `scaleZ x
+  let rotate (a : Angle.t) = `rotate a
+
+  let rotate3d (x : float) (y : float) (z : float) (a : Angle.t) =
+    `rotate3d (x, y, z, a)
+
+  let rotateX (a : Angle.t) = `rotateX a
+  let rotateY (a : Angle.t) = `rotateY a
+  let rotateZ (a : Angle.t) = `rotateZ a
+  let skew (a : Angle.t) (a' : float) = `skew (a, a')
+  let skewX (a : Angle.t) = `skewX a
+  let skewY (a : Angle.t) = `skewY a
+  let perspective (x : int) = `perspective x
 
   let string_of_scale x y =
     {js|scale(|js}
@@ -1245,7 +1236,6 @@ module Cursor = struct
     | Cascading.t
     ]
 
-  let auto = `auto
   let default = `default
   let none = `none
   let contextMenu = `contextMenu
@@ -1513,11 +1503,20 @@ module Color = struct
     | Cascading.t
     ]
 
-  let rgb r g b = `rgb (r, g, b)
-  let rgba r g b a = `rgba (r, g, b, a)
-  let hsl h s l = `hsl (h, s, l)
-  let hsla h s l a = `hsla (h, s, l, a)
-  let hex x = `hex x
+  let rgb (r : int) (g : int) (b : int) = `rgb (r, g, b)
+
+  let rgba (r : int) (g : int) (b : int) (a : alpha_with_calc) =
+    `rgba (r, g, b, a)
+
+  let hsl (h : angle_with_calc) (s : percent_with_calc) (l : percent_with_calc)
+      =
+    `hsl (h, s, l)
+
+  let hsla (h : angle_with_calc) (s : percent_with_calc) (l : percent_with_calc)
+    (a : angle_with_calc) =
+    `hsla (h, s, l, a)
+
+  let hex (x : string) = `hex x
   let transparent = `transparent
   let currentColor = `currentColor
 
@@ -2019,13 +2018,16 @@ module Position = struct
     | Length.t
     ]
 
-  let hv x y : [> t ] = `hv (x, y)
-  let hvOffset x xo y yo : [> t ] = `hvOffset (x, xo, y, yo)
-  let top : [> t ] = `top
-  let bottom : [> t ] = `bottom
-  let left : [> t ] = `left
-  let right : [> t ] = `right
-  let center : [> t ] = `center
+  let hv (x : [ X.t | Length.t ]) (y : [ Y.t | Length.t ]) = `hv (x, y)
+
+  let hvOffset (x : X.t) (xo : Length.t) (y : Y.t) (yo : Length.t) =
+    `hvOffset (x, xo, y, yo)
+
+  let top = `top
+  let bottom = `bottom
+  let left = `left
+  let right = `right
+  let center = `center
 
   let toString (x : t) =
     match x with
@@ -2069,13 +2071,18 @@ module BgPosition = struct
     | Length.t
     ]
 
-  let hv x y : [> t ] = `hv (x, y)
-  let hvOffset x y : [> t ] = `hvOffset (x, y)
-  let top : [> t ] = `top
-  let bottom : [> t ] = `bottom
-  let left : [> t ] = `left
-  let right : [> t ] = `right
-  let center : [> t ] = `center
+  let hv = Position.hv
+
+  let hvOffset
+    (x : [ X.t | `leftOffset of Length.t | `rightOffset of Length.t ])
+    (y : [ Y.t | `topOffset of Length.t | `bottomOffset of Length.t ]) =
+    `hvOffset (x, y)
+
+  let top = `top
+  let bottom = `bottom
+  let left = `left
+  let right = `right
+  let center = `center
   let topOffset (x : Length.t) = `topOffset x
   let bottomOffset (x : Length.t) = `bottomOffset x
   let leftOffset (x : Length.t) = `leftOffset x
@@ -2750,7 +2757,7 @@ module GridTemplateAreas = struct
     | Cascading.t
     ]
 
-  let areas x = `areas x
+  let areas (x : string array) = `areas x
 
   let toString (x : t) : string =
     match x with
@@ -2767,30 +2774,29 @@ module GridLine = struct
   type t =
     [ Auto.t
     | `ident of string
-    | `num of int
-    | `numIdent of int * string
-    | `spanNum of int
+    | `numInt of int
+    | `numIntIdent of int * string
+    | `spanNumInt of int
     | `spanIdent of string
-    | `spanNumIdent of int * string
+    | `spanNumIntIdent of int * string
     ]
 
-  let auto : [> t ] = `auto
-  let ident x : [> t ] = `ident x
-  let num x : [> t ] = `num x
-  let numIdent x y : [> t ] = `numIdent (x, y)
-  let spanNum x : [> t ] = `span x
-  let spanIdent x : [> t ] = `span x
-  let spanNumIdent x y : [> t ] = `spanNumIdent (x, y)
+  let ident (x : string) = `ident x
+  let numInt (x : int) = `numInt x
+  let numIntIdent (x : int) (y : string) = `numIntIdent (x, y)
+  let spanNumInt (x : int) = `spanNumInt x
+  let spanIdent (x : string) = `spanIdent x
+  let spanNumIntIdent (x : int) (y : string) = `spanNumIntIdent (x, y)
 
   let toString (x : t) =
     match x with
     | #Auto.t -> Auto.toString
     | `ident s -> s
-    | `num i -> string_of_int i
-    | `numIdent (i, s) -> (string_of_int i ^ {js| |js}) ^ s
-    | `spanNum n -> {js|span |js} ^ string_of_int n
+    | `numInt i -> string_of_int i
+    | `numIntIdent (i, s) -> (string_of_int i ^ {js| |js}) ^ s
+    | `spanNumInt n -> {js|span |js} ^ string_of_int n
     | `spanIdent i -> {js|span |js} ^ i
-    | `spanNumIdent (n, i) -> {js|span |js} ^ string_of_int n ^ {js| |js} ^ i
+    | `spanNumIntIdent (n, i) -> {js|span |js} ^ string_of_int n ^ {js| |js} ^ i
 end
 
 module GridArea = struct
@@ -3110,23 +3116,33 @@ module TextDecoration = struct
 end
 
 module Width = struct
+  module Value = struct
+    type t =
+      [ Auto.t
+      | `fitContent
+      | `maxContent
+      | `minContent
+      | Length.t
+      ]
+
+    let toString (x : t) =
+      match x with
+      | #Auto.t -> Auto.toString
+      | `fitContent -> {js|fit-content|js}
+      | `maxContent -> {js|max-content|js}
+      | `minContent -> {js|min-content|js}
+      | #Length.t as l -> Length.toString l
+  end
+
   type t =
-    [ Auto.t
-    | `fitContent
-    | `maxContent
-    | `minContent
-    | Length.t
+    [ Value.t
     | Var.t
     | Cascading.t
     ]
 
   let toString (x : t) =
     match x with
-    | #Auto.t -> Auto.toString
-    | `fitContent -> {js|fit-content|js}
-    | `maxContent -> {js|max-content|js}
-    | `minContent -> {js|min-content|js}
-    | #Length.t as l -> Length.toString l
+    | #Value.t as x -> Value.toString x
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
 end
@@ -3134,21 +3150,7 @@ end
 module MinWidth = struct
   type t =
     [ None.t
-    | Width.t
-    | Length.t
-    | Var.t
-    | Cascading.t
-    ]
-
-  let toString (x : t) =
-    match x with #None.t -> None.toString | #Width.t as w -> Width.toString w
-end
-
-module MaxWidth = struct
-  type t =
-    [ None.t
-    | Width.t
-    | Length.t
+    | Width.Value.t
     | Var.t
     | Cascading.t
     ]
@@ -3156,7 +3158,51 @@ module MaxWidth = struct
   let toString (x : t) =
     match x with
     | #None.t -> None.toString
-    | #Width.t as mw -> Width.toString mw
+    | #Width.Value.t as w -> Width.Value.toString w
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+module MaxWidth = struct
+  type t =
+    [ None.t
+    | Width.Value.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | #None.t -> None.toString
+    | #Width.Value.t as mw -> Width.Value.toString mw
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+module FlexBasis = struct
+  module Value = struct
+    type t =
+      [ `content
+      | Width.Value.t
+      ]
+
+    let toString (x : t) =
+      match x with
+      | `content -> {js|content|js}
+      | #Width.Value.t as x -> Width.Value.toString x
+  end
+
+  type t =
+    [ Value.t
+    | Cascading.t
+    | Var.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | #Value.t as x -> Value.toString x
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
 end
 
 module Height = struct
@@ -3322,9 +3368,11 @@ module Gradient = struct
     | `conicGradient of direction option * color_stop_list
     ]
 
-  let linearGradient direction stops = `linearGradient (Some direction, stops)
+  let linearGradient (direction : direction option) (stops : color_stop_list) =
+    `linearGradient (Some direction, stops)
 
-  let repeatingLinearGradient direction stops =
+  let repeatingLinearGradient (direction : direction option)
+    (stops : color_stop_list) =
     `repeatingLinearGradient (Some direction, stops)
 
   let radialGradient (shape : shape) (size : radial_size)
@@ -3335,7 +3383,8 @@ module Gradient = struct
     (position : Position.t) (stops : color_stop_list) =
     `repeatingRadialGradient (Some shape, Some size, Some position, stops)
 
-  let conicGradient angle stops = `conicGradient (Some angle, stops)
+  let conicGradient (angle : direction option) (stops : color_stop_list) =
+    `conicGradient (Some angle, stops)
 
   let string_of_stops stops =
     Kloth.Array.map_and_join ~sep:{js|, |js}
@@ -3441,6 +3490,8 @@ module BackgroundSize = struct
     | Var.t
     | Cascading.t
     ]
+
+  let size (x : Length.t) (y : Length.t) = `size (x, y)
 
   let toString (x : t) =
     match x with
@@ -3603,16 +3654,20 @@ end
 
 module Flex = struct
   type t =
-    [ Auto.t
-    | `initial
+    [ FlexBasis.Value.t
+    | `num of float
     | None.t
+    | Cascading.t
+    | Var.t
     ]
 
   let toString (x : t) =
     match x with
-    | #Auto.t -> Auto.toString
-    | `initial -> {js|initial|js}
     | #None.t -> None.toString
+    | #FlexBasis.Value.t as x -> FlexBasis.Value.toString x
+    | `num x -> Kloth.Float.to_string x
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
 end
 
 module TransformStyle = struct
@@ -3937,7 +3992,7 @@ end
 module ZIndex = struct
   type t =
     [ Auto.t
-    | `num of int
+    | `numInt of int
     | Var.t
     | Cascading.t
     ]
@@ -3945,7 +4000,7 @@ module ZIndex = struct
   let toString (x : t) =
     match x with
     | #Auto.t -> Auto.toString
-    | `num x -> Kloth.Int.to_string x
+    | `numInt x -> Kloth.Int.to_string x
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
 end
@@ -4065,51 +4120,15 @@ module FontSynthesisWeight = struct
 end
 
 module FontSynthesisStyle = struct
-  type t =
-    [ Auto.t
-    | None.t
-    | Var.t
-    | Cascading.t
-    ]
-
-  let toString (x : t) =
-    match x with
-    | #Auto.t -> Auto.toString
-    | #None.t -> None.toString
-    | #Var.t as var -> Var.toString var
-    | #Cascading.t as c -> Cascading.toString c
+  include FontSynthesisWeight
 end
 
 module FontSynthesisSmallCaps = struct
-  type t =
-    [ Auto.t
-    | None.t
-    | Var.t
-    | Cascading.t
-    ]
-
-  let toString (x : t) =
-    match x with
-    | #Auto.t -> Auto.toString
-    | #None.t -> None.toString
-    | #Var.t as var -> Var.toString var
-    | #Cascading.t as c -> Cascading.toString c
+  include FontSynthesisWeight
 end
 
 module FontSynthesisPosition = struct
-  type t =
-    [ Auto.t
-    | None.t
-    | Var.t
-    | Cascading.t
-    ]
-
-  let toString (x : t) =
-    match x with
-    | #Auto.t -> Auto.toString
-    | #None.t -> None.toString
-    | #Var.t as var -> Var.toString var
-    | #Cascading.t as c -> Cascading.toString c
+  include FontSynthesisWeight
 end
 
 module FontKerning = struct
@@ -4213,17 +4232,17 @@ end
 module InflexibleBreadth = struct
   type t =
     [ Length.t
+    | Auto.t
     | `minContent
     | `maxContent
-    | `auto
     ]
 
   let toString (x : t) =
     match x with
     | #Length.t as x -> Length.toString x
+    | #Auto.t -> Auto.toString
     | `minContent -> {js|min-content|js}
     | `maxContent -> {js|max-content|js}
-    | `auto -> {js|auto|js}
 end
 
 module TrackBreadth = struct
@@ -4231,6 +4250,8 @@ module TrackBreadth = struct
     [ InflexibleBreadth.t
     | `fr of float
     ]
+
+  let fr (x : float) = `fr x
 
   let toString (x : t) =
     match x with
@@ -4241,7 +4262,7 @@ end
 module MinMax = struct
   type t = [ `minmax of InflexibleBreadth.t * TrackBreadth.t ]
 
-  let minmax x y : [> t ] = `minmax (x, y)
+  let minmax (x : InflexibleBreadth.t) (y : TrackBreadth.t) = `minmax (x, y)
 
   let toString (x : t) =
     match x with
@@ -4257,29 +4278,31 @@ module TrackSize = struct
   type t =
     [ TrackBreadth.t
     | MinMax.t
-    | `fitContent of Length.t
+    | `fitContentFn of Length.t
     ]
 
-  let fitContent x : [> t ] = `fitContent x
+  let fitContentFn (x : Length.t) = `fitContentFn x
 
   let toString (x : t) =
     match x with
     | #TrackBreadth.t as x -> TrackBreadth.toString x
     | #MinMax.t as x -> MinMax.toString x
-    | `fitContent x ->
+    | `fitContentFn x ->
       {js|fit-content|js} ^ {js|(|js} ^ Length.toString x ^ {js|)|js}
 end
 
 module GridAutoRows = struct
   type t =
-    [ `value of TrackSize.t array
+    [ `trackSizes of TrackSize.t array
     | Var.t
     | Cascading.t
     ]
 
+  let trackSizes (x : TrackSize.t array) = `trackSizes x
+
   let toString (x : t) =
     match x with
-    | `value xs ->
+    | `trackSizes xs ->
       Kloth.Array.map_and_join ~f:TrackSize.toString ~sep:{js| |js} xs
     | #Var.t as var -> Var.toString var
     | #Cascading.t as c -> Cascading.toString c
@@ -4305,14 +4328,14 @@ module RepeatValue = struct
   type t =
     [ `autoFill
     | `autoFit
-    | `num of int
+    | `numInt of int
     ]
 
   let toString (x : t) =
     match x with
     | `autoFill -> {js|auto-fill|js}
     | `autoFit -> {js|auto-fit|js}
-    | `num x -> Kloth.Int.to_string x
+    | `numInt x -> Kloth.Int.to_string x
 end
 
 module RepeatTrack = struct
@@ -4330,13 +4353,13 @@ module RepeatTrack = struct
 end
 
 module Repeat = struct
-  type t = [ `repeat of RepeatValue.t * RepeatTrack.t array ]
+  type t = [ `repeatFn of RepeatValue.t * RepeatTrack.t array ]
 
-  let repeat x y : [> t ] = `repeat (x, y)
+  let repeatFn (x : RepeatValue.t) (y : RepeatTrack.t array) = `repeatFn (x, y)
 
   let toString (x : t) =
     match x with
-    | `repeat (n, x) ->
+    | `repeatFn (n, x) ->
       {js|repeat(|js}
       ^ RepeatValue.toString n
       ^ {js|, |js}
@@ -4352,6 +4375,9 @@ module Track = struct
     | Repeat.t
     | TrackSize.t
     ]
+
+  let subgrid = `subgrid
+  let lineNames (x : string) = `lineNames x
 
   let toString (x : t) =
     match x with
@@ -4380,6 +4406,8 @@ module ExplicitTrackWithArea = struct
     | `area of string
     ]
 
+  let area (x : string) = `area x
+
   let toString (x : t) =
     match x with
     | `area x -> {js|'|js} ^ x ^ {js|'|js}
@@ -4390,15 +4418,15 @@ module GridTemplateRows = struct
   module Value = struct
     type t =
       [ None.t
-      | `value of Track.t array
+      | `tracks of Track.t array
       ]
 
-    let value x : [> t ] = `value x
+    let tracks (x : Track.t array) = `tracks x
 
     let toString (x : t) =
       match x with
       | #None.t -> None.toString
-      | `value x -> Kloth.Array.map_and_join ~f:Track.toString ~sep:{js| |js} x
+      | `tracks x -> Kloth.Array.map_and_join ~f:Track.toString ~sep:{js| |js} x
   end
 
   type t =
@@ -4416,6 +4444,10 @@ end
 
 module GridTemplateColumns = struct
   include GridTemplateRows
+
+  module Value = struct
+    include GridTemplateRows.Value
+  end
 end
 
 module Translate = struct
@@ -4520,34 +4552,51 @@ module GridColumnEnd = struct
 end
 
 module GridTemplate = struct
+  module Value = struct
+    type t =
+      [ None.t
+      | `rowsColumns of GridTemplateRows.Value.t * GridTemplateColumns.Value.t
+      | `areasRows of ExplicitTrackWithArea.t array
+      | `areasRowsColumns of
+        ExplicitTrackWithArea.t array * ExplicitTrack.t array
+      ]
+
+    let rowsColumns (x : GridTemplateRows.Value.t)
+      (y : GridTemplateColumns.Value.t) =
+      `rowsColumns (x, y)
+
+    let areasRows (x : ExplicitTrackWithArea.t) = `areasRows x
+
+    let areasRowsColumns (x : ExplicitTrackWithArea.t array)
+      (y : ExplicitTrack.t array) =
+      `areasRowsColumns (x, y)
+
+    let toString (x : t) =
+      match x with
+      | #None.t -> None.toString
+      | `rowsColumns (r, c) ->
+        GridTemplateRows.Value.toString r
+        ^ {js| / |js}
+        ^ GridTemplateColumns.Value.toString c
+      | `areasRows x ->
+        Kloth.Array.map_and_join ~sep:{js| |js}
+          ~f:ExplicitTrackWithArea.toString x
+      | `areasRowsColumns (ar, c) ->
+        Kloth.Array.map_and_join ~sep:{js| |js}
+          ~f:ExplicitTrackWithArea.toString ar
+        ^ {js| / |js}
+        ^ Kloth.Array.map_and_join ~sep:{js| |js} ~f:ExplicitTrack.toString c
+  end
+
   type t =
-    [ None.t
-    | `rowsColumns of GridTemplateRows.Value.t * GridTemplateColumns.Value.t
-    | `areasRows of ExplicitTrackWithArea.t array
-    | `areasRowsColumns of ExplicitTrackWithArea.t array * ExplicitTrack.t array
+    [ Value.t
     | Var.t
     | Cascading.t
     ]
 
-  let rowsColumns x y : [> t ] = `rowsColumns (x, y)
-  let areasRows x : [> t ] = `areasRows x
-  let areasRowsColumns x y : [> t ] = `areasRowsColumns (x, y)
-
   let toString (x : t) =
     match x with
-    | #None.t -> None.toString
-    | `rowsColumns (r, c) ->
-      GridTemplateRows.Value.toString r
-      ^ {js| / |js}
-      ^ GridTemplateColumns.Value.toString c
-    | `areasRows x ->
-      Kloth.Array.map_and_join ~sep:{js| |js} ~f:ExplicitTrackWithArea.toString
-        x
-    | `areasRowsColumns (ar, c) ->
-      Kloth.Array.map_and_join ~sep:{js| |js} ~f:ExplicitTrackWithArea.toString
-        ar
-      ^ {js| / |js}
-      ^ Kloth.Array.map_and_join ~sep:{js| |js} ~f:ExplicitTrack.toString c
+    | #Value.t as x -> Value.toString x
     | #Var.t as x -> Var.toString x
     | #Cascading.t as x -> Cascading.toString x
 end
@@ -4576,4 +4625,50 @@ end
 
 module Left = struct
   include Bottom
+end
+
+module Grid = struct
+  type t =
+    [ `template of GridTemplate.Value.t
+    | `autoColumns of GridTemplateRows.Value.t * bool * TrackSize.t array option
+    | `autoRows of bool * TrackSize.t array option * GridTemplateColumns.Value.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let template (x : GridTemplate.Value.t) = `template x
+
+  let autoColumns ~(templateRows : GridTemplateRows.Value.t) ~(dense : bool)
+    ~(autoColumns : TrackSize.t array option) =
+    `autoColumns (templateRows, dense, autoColumns)
+
+  let autoRows ~(dense : bool) ~(autoRows : TrackSize.t array option)
+    ~(templateColumns : GridTemplateColumns.Value.t) =
+    `autoRows (dense, autoRows, templateColumns)
+
+  let toString (x : t) =
+    match x with
+    | `template x -> GridTemplate.Value.toString x
+    | `autoColumns (templateRows, dense, autoColumns) ->
+      GridTemplateRows.Value.toString templateRows
+      ^ {js| / auto-flow|js}
+      ^ (if dense then {js| dense|js} else {js||js})
+      ^
+      (match autoColumns with
+      | Some cols ->
+        {js| |js}
+        ^ Kloth.Array.map_and_join ~f:TrackSize.toString ~sep:{js| |js} cols
+      | None -> {js||js})
+    | `autoRows (dense, autoRows, templateColumns) ->
+      {js|auto-flow|js}
+      ^ (if dense then {js| dense|js} else {js||js})
+      ^ (match autoRows with
+        | Some rows ->
+          {js| |js}
+          ^ Kloth.Array.map_and_join ~f:TrackSize.toString ~sep:{js| |js} rows
+        | None -> {js||js})
+      ^ {js| / |js}
+      ^ GridTemplateColumns.Value.toString templateColumns
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
 end

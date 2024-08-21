@@ -107,12 +107,12 @@ let polymorphic = (property, value_to_expr) => {
 };
 
 /* Triggers Unsupported_feature and it's rendered as a string */
-let unsupportedValue = (parser, property) =>
-  transform_with_variable(
-    parser,
-    (~loc as _, _) => raise(Unsupported_feature),
-    (~loc, arg) => [[%expr [%e property(~loc)]([%e arg])]],
-  );
+//let unsupportedValue = (parser, property) =>
+//  transform_with_variable(
+//    parser,
+//    (~loc as _, _) => raise(Unsupported_feature),
+//    (~loc, arg) => [[%expr [%e property(~loc)]([%e arg])]],
+//  );
 
 /* Triggers Unsupported_feature and it's rendered as a string,
    supports interpolation as a string, which is unsafe */
@@ -2409,7 +2409,7 @@ let render_font_weight = (~loc) =>
   | `Font_weight_absolute(`Normal) => variant_to_expression(~loc, `Normal)
   | `Font_weight_absolute(`Bold) => variant_to_expression(~loc, `Bold)
   | `Font_weight_absolute(`Integer(num)) => [%expr
-      `num([%e render_integer(~loc, num)])
+      `numInt([%e render_integer(~loc, num)])
     ];
 
 let font_weight =
@@ -3806,7 +3806,10 @@ let rec render_track_repeat = (~loc, repeat: Types.track_repeat) => {
   let items =
     List.append(trackSizesExpr, lineNamesExpr) |> Builder.pexp_array(~loc);
   [%expr
-   `repeat((`num([%e render_integer(~loc, positiveInteger)]), [%e items]))];
+   `repeatFn((
+     `numInt([%e render_integer(~loc, positiveInteger)]),
+     [%e items],
+   ))];
 }
 and render_track_size = (~loc, value: Types.track_size) => {
   switch (value) {
@@ -3818,9 +3821,9 @@ and render_track_size = (~loc, value: Types.track_size) => {
        [%e render_track_breadth(~loc, breadth)],
      ))]
   | `Fit_content(`Extended_length(el)) =>
-    [%expr `fitContent([%e render_extended_length(~loc, el)])]
+    [%expr `fitContentFn([%e render_extended_length(~loc, el)])]
   | `Fit_content(`Extended_percentage(ep)) =>
-    [%expr `fitContent([%e render_extended_percentage(~loc, ep)])]
+    [%expr `fitContentFn([%e render_extended_percentage(~loc, ep)])]
   };
 };
 
@@ -3878,7 +3881,7 @@ let render_fixed_repeat = (~loc, value: Types.fixed_repeat) => {
        })
     |> List.append(lineNamesExpr)
     |> Builder.pexp_array(~loc);
-  [%expr `repeat((`num([%e number]), [%e fixedSizesExpr]))];
+  [%expr `repeatFn((`numInt([%e number]), [%e fixedSizesExpr]))];
 };
 
 let render_auto_repeat = (~loc, value: Types.auto_repeat) => {
@@ -3898,7 +3901,7 @@ let render_auto_repeat = (~loc, value: Types.auto_repeat) => {
        });
   let items =
     List.append(lineNamesExpr, fixedExpr) |> Builder.pexp_array(~loc);
-  [%expr `repeat(([%e autosExpr], [%e items]))];
+  [%expr `repeatFn(([%e autosExpr], [%e items]))];
 };
 
 let render_repeat_fixed = (~loc, value) => {
@@ -3934,10 +3937,13 @@ let render_name_repeat = (~loc, value: Types.name_repeat) => {
     |> List.concat_map(render_line_names(~loc))
     |> Builder.pexp_array(~loc);
   switch (repeatValue) {
-  | `Auto_fill => [[%expr `repeat((`autoFill, [%e lineNamesExpr]))]]
+  | `Auto_fill => [[%expr `repeatFn((`autoFill, [%e lineNamesExpr]))]]
   | `Positive_integer(i) => [
       [%expr
-        `repeat((`num([%e render_integer(~loc, i)]), [%e lineNamesExpr]))
+        `repeatFn((
+          `numInt([%e render_integer(~loc, i)]),
+          [%e lineNamesExpr],
+        ))
       ],
     ]
   };
@@ -3960,14 +3966,14 @@ let render_grid_template_rows_and_columns = (~loc) =>
   | `Interpolation(v) => render_variable(~loc, v)
   | `None => [%expr `none]
   | `Track_list(track_list, line_names) => [%expr
-      `value([%e render_track_list(~loc, track_list, line_names)])
+      `tracks([%e render_track_list(~loc, track_list, line_names)])
     ]
   | `Auto_track_list(list) => [%expr
-      `value([%e render_auto_track_list(~loc, list)])
+      `tracks([%e render_auto_track_list(~loc, list)])
     ]
-  | `Static((), None) => [%expr `value([|`subgrid|])]
+  | `Static((), None) => [%expr `tracks([|`subgrid|])]
   | `Static((), Some(subgrid)) => [%expr
-      `value([%e render_subgrid(~loc, subgrid)])
+      `tracks([%e render_subgrid(~loc, subgrid)])
     ];
 
 // css-grid-1
@@ -4026,34 +4032,32 @@ let render_explicit_track_list = (~loc, track_list, line_names) => {
   List.append(lineNamesExpr, tracks) |> Builder.pexp_array(~loc);
 };
 
+let render_grid_template = (~loc) =>
+  fun
+  | `None => [%expr `none]
+  | `Static_0(rows, _, columns) => [%expr
+      `rowsColumns((
+        [%e render_grid_template_rows_and_columns(~loc, rows)],
+        [%e render_grid_template_rows_and_columns(~loc, columns)],
+      ))
+    ]
+  | `Static_1(area_rows, None) => [%expr
+      `areasRows([%e render_area_rows(~loc, area_rows)])
+    ]
+  | `Static_1(area_rows, Some((_, (explicit_track_list, line_names)))) => [%expr
+      `areasRowsColumns((
+        [%e render_area_rows(~loc, area_rows)],
+        [%e
+          render_explicit_track_list(~loc, explicit_track_list, line_names)
+        ],
+      ))
+    ];
+
 let grid_template =
   monomorphic(
     Property_parser.property_grid_template,
     (~loc) => [%expr CSS.gridTemplate],
-    (~loc) =>
-      fun
-      | `None => [%expr `none]
-      | `Static_0(rows, _, columns) => [%expr
-          `rowsColumns((
-            [%e render_grid_template_rows_and_columns(~loc, rows)],
-            [%e render_grid_template_rows_and_columns(~loc, columns)],
-          ))
-        ]
-      | `Static_1(area_rows, None) => [%expr
-          `areasRows([%e render_area_rows(~loc, area_rows)])
-        ]
-      | `Static_1(area_rows, Some((_, (explicit_track_list, line_names)))) => [%expr
-          `areasRowsColumns((
-            [%e render_area_rows(~loc, area_rows)],
-            [%e
-              render_explicit_track_list(
-                ~loc,
-                explicit_track_list,
-                line_names,
-              )
-            ],
-          ))
-        ],
+    render_grid_template,
   );
 
 let grid_auto_columns =
@@ -4065,7 +4069,7 @@ let grid_auto_columns =
         sizes
         |> List.map(render_track_size(~loc))
         |> Builder.pexp_array(~loc);
-      [%expr `value([%e sizesExpr])];
+      [%expr `trackSizes([%e sizesExpr])];
     },
   );
 
@@ -4078,7 +4082,7 @@ let grid_auto_rows =
         sizes
         |> List.map(render_track_size(~loc))
         |> Builder.pexp_array(~loc);
-      [%expr `value([%e sizesExpr])];
+      [%expr `trackSizes([%e sizesExpr])];
     },
   );
 
@@ -4094,35 +4098,93 @@ let grid_auto_flow =
       | `Or(None, Some(_)) => [%expr `dense]
       | `Or(Some(`Row), Some(_)) => [%expr `rowDense]
       | `Or(Some(`Column), Some(_)) => [%expr `columnDense]
-      | `Or(None, None) => failwith("impossible"),
+      | `Or(None, None) => failwith("impossible 3"),
   );
 
 let render_grid_line = (~loc, x: Types.grid_line) =>
   switch (x) {
   | `Auto => [%expr `auto]
-  | `Custom_ident(x) => [%expr `ident([%e render_string(~loc, x)])]
-  | `And_0(num, None) => [%expr `num([%e render_integer(~loc, num)])]
+  | `Custom_ident_without_span_or_auto(x) =>
+    [%expr `ident([%e render_string(~loc, x)])]
+  | `And_0(num, None) => [%expr `numInt([%e render_integer(~loc, num)])]
   | `And_0(num, Some(ident)) =>
     [%expr
-     `numIdent((
+     `numIntIdent((
        [%e render_integer(~loc, num)],
        [%e render_string(~loc, ident)],
      ))]
-  | `And_1((Some(num), None), _span) =>
-    [%expr `spanNum([%e render_integer(~loc, num)])]
-  | `And_1((None, Some(ident)), _span) =>
+  | `And_1(_span, (Some(num), None)) =>
+    [%expr `spanNumInt([%e render_integer(~loc, num)])]
+  | `And_1(_span, (None, Some(ident))) =>
     [%expr `spanIdent([%e render_string(~loc, ident)])]
-  | `And_1((Some(num), Some(ident)), _span) =>
+  | `And_1(_span, (Some(num), Some(ident))) =>
     [%expr
-     `spanNumIdent((
+     `spanNumIntIdent((
        [%e render_integer(~loc, num)],
        [%e render_string(~loc, ident)],
      ))]
-  | `And_1((None, None), _span) => failwith("impossible")
+  | `And_1(_span, (None, None)) =>
+    raise(Invalid_value("This should've not parse."))
   };
 
 let grid =
-  unsupportedValue(Property_parser.property_grid, (~loc) => [%expr CSS.grid]);
+  monomorphic(
+    Property_parser.property_grid,
+    (~loc) => [%expr CSS.gridProperty],
+    (~loc) =>
+      fun
+      | `Property_grid_template(x) => [%expr
+          `template([%e render_grid_template(~loc, x)])
+        ]
+      | `Static_0(template_rows, _, (_, dense), auto_columns) => {
+          let template_rows =
+            render_grid_template_rows_and_columns(~loc, template_rows);
+          let dense =
+            switch (dense) {
+            | Some(_) => [%expr true]
+            | None => [%expr false]
+            };
+          let auto_columns =
+            switch (auto_columns) {
+            | Some(cols) =>
+              [%expr
+               Some(
+                 [%e
+                   cols
+                   |> List.map(render_track_size(~loc))
+                   |> Builder.pexp_array(~loc)
+                 ],
+               )]
+            | None => [%expr None]
+            };
+          [%expr
+           `autoColumns(([%e template_rows], [%e dense], [%e auto_columns]))];
+        }
+      | `Static_1((_, dense), auto_rows, _, template_columns) => {
+          let dense =
+            switch (dense) {
+            | Some(_) => [%expr true]
+            | None => [%expr false]
+            };
+          let auto_rows =
+            switch (auto_rows) {
+            | Some(cols) =>
+              [%expr
+               Some(
+                 [%e
+                   cols
+                   |> List.map(render_track_size(~loc))
+                   |> Builder.pexp_array(~loc)
+                 ],
+               )]
+            | None => [%expr None]
+            };
+          let template_columns =
+            render_grid_template_rows_and_columns(~loc, template_columns);
+          [%expr
+           `autoRows(([%e dense], [%e auto_rows], [%e template_columns]))];
+        },
+  );
 
 let grid_row_gap =
   monomorphic(
@@ -4284,7 +4346,7 @@ let z_index =
       switch (value) {
       | `Auto => [%expr `auto]
       | `Interpolation(v) => render_variable(~loc, v)
-      | `Integer(i) => [%expr `num([%e render_integer(~loc, i)])]
+      | `Integer(i) => [%expr `numInt([%e render_integer(~loc, i)])]
       }
     },
   );
@@ -5621,8 +5683,8 @@ let render = (~loc: Location.t, property, value, important) =>
     | Error(_) =>
       switch (render_to_expr(~loc, property, value, important)) {
       | Ok(value) => Ok(value)
-      | exception (Invalid_value(v)) =>
-        Error(`Invalid_value(value ++ ". " ++ v))
+      | Error(`Invalid_value(_))
+      | exception (Invalid_value(_)) => Error(`Invalid_value(value))
       | Error(_)
       | exception Unsupported_feature =>
         let.ok () = is_valid_string ? Ok() : Error(`Invalid_value(value));
