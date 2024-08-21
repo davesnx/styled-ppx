@@ -4452,10 +4452,6 @@ end
 
 module GridTemplateColumns = struct
   include GridTemplateRows
-
-  module Value = struct
-    include GridTemplateRows.Value
-  end
 end
 
 module Translate = struct
