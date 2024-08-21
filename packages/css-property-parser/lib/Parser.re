@@ -111,7 +111,9 @@ and bg_layer = [%value.rec
   "<bg-image> || <bg-position> [ '/' <bg-size> ]? || <repeat-style> || <attachment> || <box> || <box>"
 ]
 and bg_position = [%value.rec
-  "'left' | 'center' | 'right' | 'top' | 'bottom' | <extended-length> | <extended-percentage> | [ 'left' | 'center' | 'right' | <extended-length> | <extended-percentage> ] [ 'top' | 'center' | 'bottom' | <extended-length> | <extended-percentage> ] | [ 'center' | [ 'left' | 'right' ] [ <extended-length> | <extended-percentage> ]? ] && [ 'center' | [ 'top' | 'bottom' ] [ <extended-length> | <extended-percentage> ]? ]"
+  "[ 'left' | 'center' | 'right' | 'top' | 'bottom' | <length-percentage> ]
+  | [ 'left' | 'center' | 'right' | <length-percentage> ] [ 'top' | 'center' | 'bottom' | <length-percentage> ]
+  | [ 'center' | [ 'left' | 'right' ] <length-percentage>? ] && [ 'center' | [ 'top' | 'bottom' ] <length-percentage>? ]"
 ]
 /* one_bg_size isn't part of the spec, helps us with Type generation */
 and one_bg_size = [%value.rec
@@ -551,7 +553,10 @@ and paint = [%value.rec
   "'none' | <color> | <url> [ 'none' | <color> ]? | 'context-fill' | 'context-stroke' | <interpolation>"
 ]
 and position = [%value.rec
-  "[ 'left' | 'center' | 'right' ] || [ 'top' | 'center' | 'bottom' ] | [ 'left' | 'center' | 'right' | <extended-length> | <extended-percentage> ] [ 'top' | 'center' | 'bottom' | <extended-length> | <extended-percentage> ]? | [ 'left' | 'right' ] [<extended-length> | <extended-percentage>] && [ 'top' | 'bottom' ] [<extended-length> | <extended-percentage>]"
+  "[ 'left' | 'center' | 'right' | 'top' | 'bottom' | <length-percentage> ]
+  | [ 'left' | 'center' | 'right' ] && [ 'top' | 'center' | 'bottom' ]
+  | [ 'left' | 'center' | 'right' | <length-percentage> ] [ 'top' | 'center' | 'bottom' | <length-percentage> ]
+  | [ [ 'left' | 'right' ] <length-percentage> ] && [ [ 'top' | 'bottom' ] <length-percentage> ]"
 ]
 and positive_integer = [%value.rec "<integer>"]
 and property__moz_appearance = [%value.rec
@@ -1723,12 +1728,12 @@ and property_transform_origin = [%value.rec
 ]
 and property_transform_style = [%value.rec "'flat' | 'preserve-3d'"]
 and property_transition = [%value.rec
-  "[ <single-transition> | <single-transition-no-interp> ]# | <interpolation>"
+  "[ <single-transition> | <single-transition-no-interp> ]#"
 ]
 and property_transition_delay = [%value.rec "[ <extended-time> ]#"]
 and property_transition_duration = [%value.rec "[ <extended-time> ]#"]
 and property_transition_property = [%value.rec
-  "'none' | [ <single-transition-property> ]#"
+  "[ <single-transition-property> ]# | 'none'"
 ]
 and property_transition_timing_function = [%value.rec "[ <timing-function> ]#"]
 and property_translate = [%value.rec
@@ -1850,7 +1855,8 @@ and single_transition_no_interp = [%value.rec
   "[ <single-transition-property-no-interp> | 'none' ] || <extended-time-no-interp> || <timing-function-no-interp> || <extended-time-no-interp>"
 ]
 and single_transition = [%value.rec
-  "[ [<single-transition-property> | 'none'] <extended-time> ]
+  "[<single-transition-property> | 'none']
+  | [ [<single-transition-property> | 'none'] <extended-time> ]
   | [ [<single-transition-property> | 'none'] <extended-time> <timing-function> ]
   | [ [<single-transition-property> | 'none'] <extended-time> <timing-function> <extended-time> ]"
 ]

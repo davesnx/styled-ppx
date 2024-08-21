@@ -30,21 +30,19 @@
 [%css {|transition: 1s .5s linear margin-right|}];
 
 // Interpolation
-let transitions = [|
-  CSS.Transition.shorthand(~property="margin-left", ()),
-  CSS.Transition.shorthand(~duration=`s(2), ~property="opacity", ()),
-|];
-let property = "margin-right";
+let property = `ident("margin-right");
+let property2 = `all;
 let timingFunction = `easeOut;
 let duration = `ms(200);
 let delay = `s(3);
-let property2 = "opacity";
+let property3 = `ident("opacity");
 
-[%css {|transition: $(transitions)|}];
+[%css {|transition: $(property)|}];
+[%css {|transition: $(property2)|}];
 // This is the order of interpolation, from left to right.
 [%css {|transition: $(property) $(duration) $(timingFunction) $(delay)|}];
 [%css
-  {|transition: $(property) $(duration) $(timingFunction) $(delay), $(property2) 0s|}
+  {|transition: $(property) $(duration) $(timingFunction) $(delay), $(property3) 0s|}
 ];
 [%css {|transition: $(property) 0.2s ease-out 3s|}];
 [%css {|transition: $(property) 0.2s $(timingFunction) 3s|}];

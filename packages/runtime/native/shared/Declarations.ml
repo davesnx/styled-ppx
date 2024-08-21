@@ -72,29 +72,20 @@ let backgroundOrigin x =
   Rule.declaration ({js|backgroundOrigin|js}, BackgroundOrigin.toString x)
 
 let backgroundPosition x =
-  Rule.declaration ({js|backgroundPosition|js}, Position.toString x)
+  Rule.declaration ({js|backgroundPosition|js}, BackgroundPosition.toString x)
 
 let backgroundPosition2 x y =
   Rule.declaration
-    ( {js|backgroundPosition|js},
-      Position.toString x ^ {js| |js} ^ Position.toString y )
+    ({js|backgroundPosition|js}, BgPosition.toString (BgPosition.hv x y))
 
-let backgroundPosition4 ~x ~offsetX ~y ~offsetY =
+let backgroundPosition4 ~x ~y =
+  Rule.declaration
+    ({js|backgroundPosition|js}, BgPosition.toString (BgPosition.hvOffset x y))
+
+let backgroundPositions x =
   Rule.declaration
     ( {js|backgroundPosition|js},
-      Position.toString x
-      ^ {js| |js}
-      ^ Length.toString offsetX
-      ^ {js| |js}
-      ^ Position.toString y
-      ^ {js| |js}
-      ^ Length.toString offsetY )
-
-let backgroundPositions bp =
-  Rule.declaration
-    ( {js|backgroundPosition|js},
-      Kloth.Array.map_and_join bp ~sep:{js|, |js} ~f:(fun (x, y) ->
-          Position.toString x ^ {js| |js} ^ Position.toString y) )
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:BgPosition.toString x )
 
 let backgroundRepeat x =
   Rule.declaration ({js|backgroundRepeat|js}, BackgroundRepeat.toString x)
@@ -102,10 +93,18 @@ let backgroundRepeat x =
 let maskPosition x =
   Rule.declaration ({js|maskPosition|js}, MaskPosition.toString x)
 
-let maskPositions mp =
+let maskPosition2 x y =
+  Rule.declaration ({js|maskPosition|js}, Position.toString (Position.hv x y))
+
+let maskPosition4 ~x ~offsetX ~y ~offsetY =
   Rule.declaration
     ( {js|maskPosition|js},
-      Kloth.Array.map_and_join mp ~sep:{js|, |js} ~f:MaskPosition.toString )
+      Position.toString (Position.hvOffset x offsetX y offsetY) )
+
+let maskPositions x =
+  Rule.declaration
+    ( {js|maskPosition|js},
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:Position.toString x )
 
 (* https://developer.mozilla.org/en-US/docs/Web/CSS/border-image-source *)
 let borderImageSource x =
@@ -167,7 +166,7 @@ let borderTopWidth x =
   Rule.declaration ({js|borderTopWidth|js}, LineWidth.toString x)
 
 let borderWidth x = Rule.declaration ({js|borderWidth|js}, LineWidth.toString x)
-let bottom x = Rule.declaration ({js|bottom|js}, Position.toString x)
+let bottom x = Rule.declaration ({js|bottom|js}, Bottom.toString x)
 let boxSizing x = Rule.declaration ({js|boxSizing|js}, BoxSizing.toString x)
 let clear x = Rule.declaration ({js|clear|js}, Clear.toString x)
 let clipPath x = Rule.declaration ({js|clipPath|js}, ClipPath.toString x)
@@ -313,6 +312,10 @@ let gap2 ~rowGap ~columnGap =
   Rule.declaration
     ({js|gap|js}, Gap.toString rowGap ^ {js| |js} ^ Gap.toString columnGap)
 
+let gridGap2 ~rowGap ~columnGap =
+  Rule.declaration
+    ({js|gap|js}, Gap.toString rowGap ^ {js| |js} ^ Gap.toString columnGap)
+
 let gridRowGap x = Rule.declaration ({js|gridRowGap|js}, Gap.toString x)
 let gridRowEnd n = Rule.declaration ({js|gridRowEnd|js}, GridRowEnd.toString n)
 
@@ -348,7 +351,7 @@ let justifyContent x =
 let justifyItems x =
   Rule.declaration ({js|justifyItems|js}, JustifyItems.toString x)
 
-let left x = Rule.declaration ({js|left|js}, Position.toString x)
+let left x = Rule.declaration ({js|left|js}, Left.toString x)
 
 let letterSpacing x =
   Rule.declaration ({js|letterSpacing|js}, LetterSpacing.toString x)
@@ -413,12 +416,15 @@ let minWidth x = Rule.declaration ({js|minWidth|js}, MinWidth.toString x)
 let objectFit x = Rule.declaration ({js|objectFit|js}, ObjectFit.toString x)
 
 let objectPosition x =
-  Rule.declaration ({js|objectPosition|js}, Position.toString x)
+  Rule.declaration ({js|objectPosition|js}, ObjectPosition.toString x)
 
 let objectPosition2 x y =
+  Rule.declaration ({js|objectPosition|js}, Position.toString (Position.hv x y))
+
+let objectPosition4 ~x ~offsetX ~y ~offsetY =
   Rule.declaration
     ( {js|objectPosition|js},
-      Position.toString x ^ {js| |js} ^ Position.toString y )
+      Position.toString (Position.hvOffset x offsetX y offsetY) )
 
 let opacity x = Rule.declaration ({js|opacity|js}, Kloth.Float.to_string x)
 
@@ -511,7 +517,7 @@ let justifySelf x =
   Rule.declaration ({js|justifySelf|js}, JustifySelf.toString x)
 
 let resize x = Rule.declaration ({js|resize|js}, Resize.toString x)
-let right x = Rule.declaration ({js|right|js}, Position.toString x)
+let right x = Rule.declaration ({js|right|js}, Right.toString x)
 
 let tableLayout x =
   Rule.declaration ({js|tableLayout|js}, TableLayout.toString x)
@@ -563,7 +569,7 @@ let textOverflow x =
 let textTransform x =
   Rule.declaration ({js|textTransform|js}, TextTransform.toString x)
 
-let top x = Rule.declaration ({js|top|js}, Position.toString x)
+let top x = Rule.declaration ({js|top|js}, Top.toString x)
 let transform x = Rule.declaration ({js|transform|js}, Transform.toString x)
 
 let transforms x =
@@ -696,9 +702,10 @@ let filter x =
     ( {js|filter|js},
       Kloth.Array.map_and_join ~f:Filter.toString ~sep:{js| |js} x )
 
-let boxShadow x = Rule.declaration ({js|boxShadow|js}, Shadow.toString x)
+let boxShadow (x : Shadow.box Shadow.t) =
+  Rule.declaration ({js|boxShadow|js}, Shadow.toString x)
 
-let boxShadows x =
+let boxShadows (x : Shadow.box Shadow.t array) =
   Rule.declaration
     ( {js|boxShadow|js},
       Kloth.Array.map_and_join ~sep:{js|, |js} ~f:Shadow.toString x )
@@ -746,9 +753,10 @@ let backgroundSize x =
 let textDecoration x =
   Rule.declaration ({js|textDecoration|js}, TextDecoration.toString x)
 
-let textShadow x = Rule.declaration ({js|textShadow|js}, Shadow.toString x)
+let textShadow (x : Shadow.text Shadow.t) =
+  Rule.declaration ({js|textShadow|js}, Shadow.toString x)
 
-let textShadows x =
+let textShadows (x : Shadow.text Shadow.t array) =
   Rule.declaration
     ( {js|textShadow|js},
       Kloth.Array.map_and_join ~sep:{js|, |js} x ~f:Shadow.toString )
@@ -776,7 +784,12 @@ let transitionDuration i =
 let transitionTimingFunction x =
   Rule.declaration ({js|transitionTimingFunction|js}, TimingFunction.toString x)
 
-let transitionProperty x = Rule.declaration ({js|transitionProperty|js}, x)
+let transitionProperty x = Rule.declaration ({js|transitionProperty|js}, TransitionProperty.toString x)
+
+let transitionProperties x =
+  Rule.declaration
+    ( {js|transitionProperty|js},
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:SingleTransitionProperty.toString x )
 
 let animation ?duration ?delay ?direction ?timingFunction ?fillMode ?playState
   ?iterationCount ?name () =
