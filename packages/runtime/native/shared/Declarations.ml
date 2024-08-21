@@ -236,7 +236,7 @@ let flex2 ?basis ?shrink grow =
         | None -> {js||js})
       ^
       match basis with
-      | Some (b) -> {js| |js} ^ FlexBasis.toString b
+      | Some b -> {js| |js} ^ FlexBasis.toString b
       | None -> {js||js} )
 
 let flexDirection x =
@@ -477,7 +477,7 @@ let paddingLeft x = Rule.declaration ({js|paddingLeft|js}, Length.toString x)
 let paddingRight x = Rule.declaration ({js|paddingRight|js}, Length.toString x)
 let paddingTop x = Rule.declaration ({js|paddingTop|js}, Length.toString x)
 
-let perspective x =
+let perspectiveProperty x =
   Rule.declaration ({js|perspective|js}, Perspective.toString x)
 
 let perspectiveOrigin x =
@@ -485,8 +485,24 @@ let perspectiveOrigin x =
 
 let perspectiveOrigin2 x y =
   Rule.declaration
+    ({js|perspectiveOrigin|js}, Position.toString (Position.hv x y))
+
+let perspectiveOrigin4 ~x ~offsetX ~y ~offsetY =
+  Rule.declaration
     ( {js|perspectiveOrigin|js},
-      PerspectiveOrigin.toString x ^ {js| |js} ^ PerspectiveOrigin.toString y )
+      Position.toString (Position.hvOffset x offsetX y offsetY) )
+
+let offsetAnchor x =
+  Rule.declaration ({js|offsetAnchor|js}, OffsetAnchor.toString x)
+
+let offsetAnchor2 x y =
+  Rule.declaration
+    ({js|offsetAnchor|js}, Position.toString (Position.hv x y))
+
+let offsetAnchor3 ~x ~offsetX ~y ~offsetY =
+  Rule.declaration
+    ( {js|offsetAnchor|js},
+      Position.toString (Position.hvOffset x offsetX y offsetY) )
 
 let pointerEvents x =
   Rule.declaration ({js|pointerEvents|js}, PointerEvents.toString x)

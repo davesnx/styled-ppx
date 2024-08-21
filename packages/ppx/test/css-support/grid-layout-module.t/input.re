@@ -171,17 +171,17 @@ let value =
 ];
 
 /* CSS Grid Layout Module Level 3 */
-/* [%css {|grid-template-columns: masonry|}]; */
-/* [%css {|grid-template-rows: masonry |}]; */
-/* [%css {|masonry-auto-flow: pack|}]; */
-/* [%css {|masonry-auto-flow: next|}]; */
-/* [%css {|masonry-auto-flow: definite-first|}]; */
-/* [%css {|masonry-auto-flow: ordered|}]; */
-/* [%css {|masonry-auto-flow: pack definite-first|}]; */
-/* [%css {|masonry-auto-flow: pack ordered|}]; */
-/* [%css {|masonry-auto-flow: next definite-first|}]; */
-/* [%css {|masonry-auto-flow: next ordered|}]; */
-/* [%css {|masonry-auto-flow: ordered pack|}]; */
+[%css {|grid-template-columns: masonry|}];
+[%css {|grid-template-rows: masonry |}];
+[%css {|masonry-auto-flow: pack|}];
+[%css {|masonry-auto-flow: next|}];
+[%css {|masonry-auto-flow: definite-first|}];
+[%css {|masonry-auto-flow: ordered|}];
+[%css {|masonry-auto-flow: pack definite-first|}];
+[%css {|masonry-auto-flow: pack ordered|}];
+[%css {|masonry-auto-flow: next definite-first|}];
+[%css {|masonry-auto-flow: next ordered|}];
+[%css {|masonry-auto-flow: ordered pack|}];
 /* [%css {|align-tracks: normal|}]; */
 /* [%css {|align-tracks: baseline|}]; */
 /* [%css {|align-tracks: first baseline|}]; */

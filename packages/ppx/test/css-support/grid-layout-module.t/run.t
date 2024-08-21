@@ -427,3 +427,15 @@ If this test fail means that the module is not in sync with the ppx
       `repeatFn((`numInt(1), [|`lineNames({js|[sub-g]|js})|])),
     |]),
   );
+  
+  CSS.gridTemplateColumns(`masonry);
+  CSS.gridTemplateRows(`masonry);
+  CSS.unsafe({js|masonryAutoFlow|js}, {js|pack|js});
+  CSS.unsafe({js|masonryAutoFlow|js}, {js|next|js});
+  CSS.unsafe({js|masonryAutoFlow|js}, {js|definite-first|js});
+  CSS.unsafe({js|masonryAutoFlow|js}, {js|ordered|js});
+  CSS.unsafe({js|masonryAutoFlow|js}, {js|pack definite-first|js});
+  CSS.unsafe({js|masonryAutoFlow|js}, {js|pack ordered|js});
+  CSS.unsafe({js|masonryAutoFlow|js}, {js|next definite-first|js});
+  CSS.unsafe({js|masonryAutoFlow|js}, {js|next ordered|js});
+  CSS.unsafe({js|masonryAutoFlow|js}, {js|ordered pack|js});

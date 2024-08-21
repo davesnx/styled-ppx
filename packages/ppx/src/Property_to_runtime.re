@@ -2943,7 +2943,7 @@ let translate =
       ]
     | `Static(x, Some((y, None))) => [
         [%expr
-          CSS.translateProperty(
+          CSS.translateProperty2(
             [%e render_length_percentage(~loc, x)],
             [%e render_length_percentage(~loc, y)],
           )
@@ -2951,7 +2951,7 @@ let translate =
       ]
     | `Static(x, Some((y, Some(z)))) => [
         [%expr
-          CSS.translateProperty(
+          CSS.translateProperty3(
             [%e render_length_percentage(~loc, x)],
             [%e render_length_percentage(~loc, y)],
             [%e render_length(~loc, z)],
@@ -2992,7 +2992,7 @@ let rotate =
 
 let render_number_percentage = (~loc) =>
   fun
-  | `Number(x) => render_float(~loc, x)
+  | `Number(x) => [%expr `num([%e render_float(~loc, x)])]
   | `Extended_percentage(x) => render_extended_percentage(~loc, x);
 
 let scale =
@@ -3001,7 +3001,7 @@ let scale =
     | `None => [[%expr CSS.translateProperty(`none)]]
     | `Number_percentage([x, y, z, ..._]) => [
         [%expr
-          CSS.scaleProperty(
+          CSS.scaleProperty3(
             [%e render_number_percentage(~loc, x)],
             [%e render_number_percentage(~loc, y)],
             [%e render_number_percentage(~loc, z)],
@@ -3010,16 +3010,14 @@ let scale =
       ]
     | `Number_percentage([x, y, ..._]) => [
         [%expr
-          CSS.translateProperty(
+          CSS.scaleProperty2(
             [%e render_number_percentage(~loc, x)],
             [%e render_number_percentage(~loc, y)],
           )
         ],
       ]
     | `Number_percentage([x, ..._]) => [
-        [%expr
-          CSS.translateProperty([%e render_number_percentage(~loc, x)])
-        ],
+        [%expr CSS.scaleProperty([%e render_number_percentage(~loc, x)])],
       ]
     | `Number_percentage([]) => failwith("impossible")
   );
@@ -3034,12 +3032,22 @@ let transform_style =
       | `Preserve_3d => variant_to_expression(~loc, `Preserve_3d),
   );
 
-let perspective = unsupportedProperty(Property_parser.property_perspective);
+let perspective =
+  monomorphic(
+    Property_parser.property_perspective,
+    (~loc) => [%expr CSS.perspectiveProperty],
+    (~loc) =>
+      fun
+      | `None => [%expr `none]
+      | `Extended_length(x) => render_extended_length(~loc, x),
+  );
 
 let perspective_origin =
-  polymorphic(Property_parser.property_perspective_origin, (~loc, position) => {
-    [[%expr CSS.perspectiveOrigin2([%e render_position(~loc, position)])]]
-  });
+  monomorphic(
+    Property_parser.property_perspective_origin,
+    (~loc) => [%expr CSS.perspectiveOrigin],
+    render_position,
+  );
 
 let backface_visibility =
   variants(Property_parser.property_backface_visibility, (~loc) =>
@@ -3965,6 +3973,7 @@ let render_grid_template_rows_and_columns = (~loc) =>
   fun
   | `Interpolation(v) => render_variable(~loc, v)
   | `None => [%expr `none]
+  | `Masonry => [%expr `masonry]
   | `Track_list(track_list, line_names) => [%expr
       `tracks([%e render_track_list(~loc, track_list, line_names)])
     ]
@@ -5133,7 +5142,14 @@ let nav_right = unsupportedProperty(Property_parser.property_nav_right);
 let nav_up = unsupportedProperty(Property_parser.property_nav_up);
 
 let offset_anchor =
-  unsupportedProperty(Property_parser.property_offset_anchor);
+  monomorphic(
+    Property_parser.property_offset_anchor,
+    (~loc) => [%expr CSS.offsetAnchor],
+    (~loc) =>
+      fun
+      | `Auto => [%expr `auto]
+      | `Position(x) => render_position(~loc, x),
+  );
 
 let offset_distance =
   unsupportedProperty(Property_parser.property_offset_distance);

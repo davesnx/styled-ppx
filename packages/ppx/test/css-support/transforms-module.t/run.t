@@ -65,12 +65,12 @@ If this test fail means that the module is not in sync with the ppx
   
   CSS.translateProperty(`none);
   CSS.translateProperty(`percent(50.));
-  CSS.translateProperty(`percent(50.), `percent(50.));
-  CSS.translateProperty(`percent(50.), `percent(50.), `pxFloat(10.));
+  CSS.translateProperty2(`percent(50.), `percent(50.));
+  CSS.translateProperty3(`percent(50.), `percent(50.), `pxFloat(10.));
   CSS.translateProperty(`none);
-  CSS.translateProperty(2.);
-  CSS.translateProperty(2., 2.);
-  CSS.scaleProperty(2., 2., 2.);
+  CSS.scaleProperty(`num(2.));
+  CSS.scaleProperty2(`num(2.), `num(2.));
+  CSS.scaleProperty3(`num(2.), `num(2.), `num(2.));
   CSS.rotateProperty(`none);
   CSS.rotateProperty(`rotate(`deg(45.)));
   CSS.rotateProperty(`rotateX(`deg(45.)));
@@ -83,12 +83,12 @@ If this test fail means that the module is not in sync with the ppx
   CSS.rotateProperty(`rotate3d(((-1.), 0., 2., `deg(45.))));
   CSS.transformStyle(`flat);
   CSS.transformStyle(`preserve3d);
-  CSS.unsafe({js|perspective|js}, {js|none|js});
-  CSS.unsafe({js|perspective|js}, {js|600px|js});
-  CSS.perspectiveOrigin2(`pxFloat(10.));
-  CSS.perspectiveOrigin2(`top);
-  CSS.perspectiveOrigin2(`hv((`left, `top)));
-  CSS.perspectiveOrigin2(`hv((`percent(50.), `percent(100.))));
-  CSS.perspectiveOrigin2(`hv((`left, `percent(0.))));
+  CSS.perspectiveProperty(`none);
+  CSS.perspectiveProperty(`pxFloat(600.));
+  CSS.perspectiveOrigin(`pxFloat(10.));
+  CSS.perspectiveOrigin(`top);
+  CSS.perspectiveOrigin(`hv((`left, `top)));
+  CSS.perspectiveOrigin(`hv((`percent(50.), `percent(100.))));
+  CSS.perspectiveOrigin(`hv((`left, `percent(0.))));
   CSS.backfaceVisibility(`visible);
   CSS.backfaceVisibility(`hidden);

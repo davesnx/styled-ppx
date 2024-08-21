@@ -1646,20 +1646,6 @@ module Perspective = struct
     | #Cascading.t as c -> Cascading.toString c
 end
 
-module PerspectiveOrigin = struct
-  type t =
-    [ Perspective.t
-    | TransformOrigin.t
-    | Var.t
-    | Cascading.t
-    ]
-
-  let toString (x : t) =
-    match x with
-    | #Perspective.t as p -> Perspective.toString p
-    | #TransformOrigin.t as t -> TransformOrigin.toString t
-end
-
 module LetterSpacing = struct
   type t =
     [ `normal
@@ -2120,6 +2106,22 @@ module BgPosition = struct
     | #Length.t as l -> Length.toString l
 end
 
+module OffsetAnchor = struct
+  type t =
+    [ Auto.t
+    | Position.t
+    | Cascading.t
+    | Var.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | #Auto.t -> Auto.toString
+    | #Position.t as x -> Position.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Var.t as x -> Var.toString x
+end
+
 module MaskPosition = struct
   type t =
     [ Position.t
@@ -2135,6 +2137,10 @@ module MaskPosition = struct
 end
 
 module ObjectPosition = struct
+  include MaskPosition
+end
+
+module PerspectiveOrigin = struct
   include MaskPosition
 end
 
@@ -4418,6 +4424,7 @@ module GridTemplateRows = struct
   module Value = struct
     type t =
       [ None.t
+      | `masonry
       | `tracks of Track.t array
       ]
 
@@ -4426,6 +4433,7 @@ module GridTemplateRows = struct
     let toString (x : t) =
       match x with
       | #None.t -> None.toString
+      | `masonry -> {js|masonry|js}
       | `tracks x -> Kloth.Array.map_and_join ~f:Track.toString ~sep:{js| |js} x
   end
 

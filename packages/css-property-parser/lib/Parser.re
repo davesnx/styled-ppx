@@ -1177,10 +1177,10 @@ and property_grid_template = [%value.rec
 ]
 and property_grid_template_areas = [%value.rec "'none' | [ <string> | <interpolation> ]+"]
 and property_grid_template_columns = [%value.rec
-  "'none' | <track-list> | <auto-track-list> | 'subgrid' [ <line-name-list> ]? | <interpolation>"
+  "'none' | <track-list> | <auto-track-list> | 'subgrid' [ <line-name-list> ]? | 'masonry' | <interpolation>"
 ]
 and property_grid_template_rows = [%value.rec
-  "'none' | <track-list> | <auto-track-list> | 'subgrid' [ <line-name-list> ]? | <interpolation>"
+  "'none' | <track-list> | <auto-track-list> | 'subgrid' [ <line-name-list> ]? | 'masonry' | <interpolation>"
 ]
 and property_hanging_punctuation = [%value.rec
   "'none' | 'first' || [ 'force-end' | 'allow-end' ] || 'last'"
@@ -1320,6 +1320,7 @@ and property_mask_position = [%value.rec "[ <position> ]#"]
 and property_mask_repeat = [%value.rec "[ <repeat-style> ]#"]
 and property_mask_size = [%value.rec "[ <bg-size> ]#"]
 and property_mask_type = [%value.rec "'luminance' | 'alpha'"]
+and property_masonry_auto_flow = [%value.rec "[ 'pack' | 'next' ] || [ 'definite-first' | 'ordered' ]"]
 and property_max_block_size = [%value.rec "<'max-width'>"]
 and property_max_height = [%value.rec
   "'auto' | <extended-length> | <extended-percentage> | 'min-content' | 'max-content' | 'fit-content' | fit-content( <extended-length> | <extended-percentage> )"
@@ -3051,6 +3052,7 @@ let check_map =
       ("property-mask-repeat", check(property_mask_repeat)),
       ("property-mask-size", check(property_mask_size)),
       ("property-mask-type", check(property_mask_type)),
+      ("property-masonry-auto-flow", check(property_masonry_auto_flow)),
       ("property-max-block-size", check(property_max_block_size)),
       ("property-max-height", check(property_max_height)),
       ("property-max-inline-size", check(property_max_inline_size)),
