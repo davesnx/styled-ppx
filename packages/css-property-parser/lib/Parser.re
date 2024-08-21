@@ -1148,7 +1148,7 @@ and property_grid = [%value.rec
 ]
 and property_grid_area = [%value.rec "<grid-line> [ '/' <grid-line> ]{0,3}"]
 and property_grid_auto_columns = [%value.rec "[ <track-size> ]+"]
-and property_grid_auto_flow = [%value.rec "[ 'row' | 'column' ] || 'dense'"]
+and property_grid_auto_flow = [%value.rec "[ [ 'row' | 'column' ] || 'dense' ] | <interpolation>"]
 and property_grid_auto_rows = [%value.rec "[ <track-size> ]+"]
 and property_grid_column = [%value.rec "<grid-line> [ '/' <grid-line> ]?"]
 and property_grid_column_end = [%value.rec "<grid-line>"]

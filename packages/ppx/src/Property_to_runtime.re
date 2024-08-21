@@ -4047,12 +4047,13 @@ let grid_auto_flow =
     (~loc) => [%expr CSS.gridAutoFlow],
     (~loc) =>
       fun
-      | (Some(`Row), None) => [%expr `row]
-      | (Some(`Column), None) => [%expr `column]
-      | (None, Some(_)) => [%expr `dense]
-      | (Some(`Row), Some(_)) => [%expr `rowDense]
-      | (Some(`Column), Some(_)) => [%expr `columnDense]
-      | (None, None) => failwith("impossible"),
+      | `Interpolation(values) => render_variable(~loc, values)
+      | `Or((Some(`Row), None)) => [%expr `row]
+      | `Or((Some(`Column), None)) => [%expr `column]
+      | `Or((None, Some(_))) => [%expr `dense]
+      | `Or((Some(`Row), Some(_))) => [%expr `rowDense]
+      | `Or((Some(`Column), Some(_))) => [%expr `columnDense]
+      | `Or((None, None)) => failwith("impossible"),
   );
 
 let render_grid_line = (~loc, x: Types.grid_line) =>
