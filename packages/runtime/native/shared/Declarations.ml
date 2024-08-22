@@ -65,6 +65,9 @@ let maskImage x = Rule.declaration ({js|maskImage|js}, MaskImage.toString x)
 let imageRendering x =
   Rule.declaration ({js|imageRendering|js}, ImageRendering.toString x)
 
+let imageOrientation x =
+  Rule.declaration ({js|imageOrientation|js}, ImageOrientation.toString x)
+
 let backgroundOrigin x =
   Rule.declaration ({js|backgroundOrigin|js}, BackgroundOrigin.toString x)
 
@@ -496,8 +499,7 @@ let offsetAnchor x =
   Rule.declaration ({js|offsetAnchor|js}, OffsetAnchor.toString x)
 
 let offsetAnchor2 x y =
-  Rule.declaration
-    ({js|offsetAnchor|js}, Position.toString (Position.hv x y))
+  Rule.declaration ({js|offsetAnchor|js}, Position.toString (Position.hv x y))
 
 let offsetAnchor3 ~x ~offsetX ~y ~offsetY =
   Rule.declaration
@@ -532,6 +534,14 @@ let textDecorationColor x =
 
 let textDecorationLine x =
   Rule.declaration ({js|textDecorationLine|js}, TextDecorationLine.toString x)
+
+let textDecorationLine2 ?(underline = false) ?(overline = false)
+  ?(lineThrough = false) ?(blink = false) () =
+  Rule.declaration
+    ( {js|textDecorationLine|js},
+      TextDecorationLine.toString
+      @@ TextDecorationLine.Value.make ~underline ~overline ~lineThrough ~blink
+           () )
 
 let textDecorationStyle x =
   Rule.declaration ({js|textDecorationStyle|js}, TextDecorationStyle.toString x)
@@ -599,6 +609,9 @@ let overscrollBehavior x =
 
 let overflowAnchor x =
   Rule.declaration ({js|overflowAnchor|js}, OverflowAnchor.toString x)
+
+let overflowClipMargin x =
+  Rule.declaration ({js|overflowClipMargin|js}, OverflowClipMargin.toString x)
 
 let columnWidth x =
   Rule.declaration ({js|columnWidth|js}, ColumnWidth.toString x)
@@ -727,6 +740,12 @@ let backgroundSize x =
 let textDecoration x =
   Rule.declaration ({js|textDecoration|js}, TextDecoration.toString x)
 
+let textDecoration2 ?line ?thickness ?style ?color () =
+  Rule.declaration
+    ( {js|textDecoration|js},
+      TextDecoration.toString
+      @@ TextDecoration.make ?line ?thickness ?style ?color () )
+
 let textShadow (x : Shadow.text Shadow.t) =
   Rule.declaration ({js|textShadow|js}, Shadow.toString x)
 
@@ -741,13 +760,15 @@ let transformStyle x =
 let transitionList x =
   Rule.declaration
     ( {js|transition|js},
-      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:Transition.toString x )
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:Transition.Value.toString x )
 
-let transition ?duration ?delay ?timingFunction ?property () =
+let transition x = Rule.declaration ({js|transition|js}, Transition.toString x)
+
+let transition4 ?duration ?delay ?timingFunction ?property () =
   Rule.declaration
     ( {js|transition|js},
       Transition.toString
-        (Transition.make ?duration ?delay ?timingFunction ?property ()) )
+        (Transition.Value.make ?duration ?delay ?timingFunction ?property ()) )
 
 let transitionDelay i =
   Rule.declaration ({js|transitionDelay|js}, Time.toString i)
@@ -864,7 +885,7 @@ let overflowInline x =
 
 let overflowBlock x =
   (* overflowBlock and overflowInline have the same values *)
-  Rule.declaration ({js|overflowBlock|js}, OverflowInline.toString x)
+  Rule.declaration ({js|overflowBlock|js}, OverflowBlock.toString x)
 
 let fontSynthesisWeight x =
   Rule.declaration ({js|fontSynthesisWeight|js}, FontSynthesisWeight.toString x)
@@ -927,3 +948,112 @@ let scaleProperty3 x y z =
       ^ Scale.Value.toString y
       ^ {js| |js}
       ^ Scale.Value.toString z )
+
+let borderImageSlice x =
+  Rule.declaration ({js|borderImageSlice|js}, BorderImageSlice.toString x)
+
+let borderImageSlice1 ?(fill = false) x =
+  Rule.declaration
+    ( {js|borderImageSlice|js},
+      BorderImageSlice.Value.toString x
+      ^ if fill then {js| |js} ^ BorderImageSlice.Fill.toString else {js||js} )
+
+let borderImageSlice2 ?(fill = false) v h =
+  Rule.declaration
+    ( {js|borderImageSlice|js},
+      BorderImageSlice.Value.toString v
+      ^ {js| |js}
+      ^ BorderImageSlice.Value.toString h
+      ^ if fill then {js| |js} ^ BorderImageSlice.Fill.toString else {js||js} )
+
+let borderImageSlice3 ?(fill = false) t h b =
+  Rule.declaration
+    ( {js|borderImageSlice|js},
+      BorderImageSlice.Value.toString t
+      ^ {js| |js}
+      ^ BorderImageSlice.Value.toString h
+      ^ {js| |js}
+      ^ BorderImageSlice.Value.toString b
+      ^ if fill then {js| |js} ^ BorderImageSlice.Fill.toString else {js||js} )
+
+let borderImageSlice4 ?(fill = false) t r b l =
+  Rule.declaration
+    ( {js|borderImageSlice|js},
+      BorderImageSlice.Value.toString t
+      ^ {js| |js}
+      ^ BorderImageSlice.Value.toString r
+      ^ {js| |js}
+      ^ BorderImageSlice.Value.toString b
+      ^ {js| |js}
+      ^ BorderImageSlice.Value.toString l
+      ^ if fill then {js| |js} ^ BorderImageSlice.Fill.toString else {js||js} )
+
+let borderImageWidth x =
+  Rule.declaration ({js|borderImageWidth|js}, BorderImageWidth.toString x)
+
+let borderImageWidth2 v h =
+  Rule.declaration
+    ( {js|borderImageWidth|js},
+      BorderImageWidth.Value.toString v
+      ^ {js| |js}
+      ^ BorderImageWidth.Value.toString h )
+
+let borderImageWidth3 t h b =
+  Rule.declaration
+    ( {js|borderImageWidth|js},
+      BorderImageWidth.Value.toString t
+      ^ {js| |js}
+      ^ BorderImageWidth.Value.toString h
+      ^ {js| |js}
+      ^ BorderImageWidth.Value.toString b )
+
+let borderImageWidth4 t r b l =
+  Rule.declaration
+    ( {js|borderImageWidth|js},
+      BorderImageWidth.Value.toString t
+      ^ {js| |js}
+      ^ BorderImageWidth.Value.toString r
+      ^ {js| |js}
+      ^ BorderImageWidth.Value.toString b
+      ^ {js| |js}
+      ^ BorderImageWidth.Value.toString l )
+
+let borderImageOutset x =
+  Rule.declaration ({js|borderImageOutset|js}, BorderImageOutset.toString x)
+
+let borderImageOutset2 v h =
+  Rule.declaration
+    ( {js|borderImageOutset|js},
+      BorderImageOutset.Value.toString v
+      ^ {js| |js}
+      ^ BorderImageOutset.Value.toString h )
+
+let borderImageOutset3 t h b =
+  Rule.declaration
+    ( {js|borderImageOutset|js},
+      BorderImageOutset.Value.toString t
+      ^ {js| |js}
+      ^ BorderImageOutset.Value.toString h
+      ^ {js| |js}
+      ^ BorderImageOutset.Value.toString b )
+
+let borderImageOutset4 t r b l =
+  Rule.declaration
+    ( {js|borderImageOutset|js},
+      BorderImageOutset.Value.toString t
+      ^ {js| |js}
+      ^ BorderImageOutset.Value.toString r
+      ^ {js| |js}
+      ^ BorderImageOutset.Value.toString b
+      ^ {js| |js}
+      ^ BorderImageOutset.Value.toString l )
+
+let borderImageRepeat x =
+  Rule.declaration ({js|borderImageRepeat|js}, BorderImageRepeat.toString x)
+
+let borderImageRepeat2 v h =
+  Rule.declaration
+    ( {js|borderImageRepeat|js},
+      BorderImageRepeat.Value.toString v
+      ^ {js| |js}
+      ^ BorderImageRepeat.Value.toString h )

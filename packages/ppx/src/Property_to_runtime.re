@@ -2134,13 +2134,25 @@ let box_shadow =
 
 // css-overflow-3
 let overflow_x =
-  variants(Property_parser.property_overflow_x, (~loc) =>
-    [%expr CSS.overflowX]
+  monomorphic(
+    Property_parser.property_overflow_x,
+    (~loc) => [%expr CSS.overflowX],
+    (~loc) =>
+      fun
+      | `Interpolation(x) => render_variable(~loc, x)
+      | (`Visible | `Hidden | `Clip | `Scroll | `Auto) as x =>
+        variant_to_expression(~loc, x),
   );
 
 let overflow_y =
-  variants(Property_parser.property_overflow_y, (~loc) =>
-    [%expr CSS.overflowY]
+  monomorphic(
+    Property_parser.property_overflow_y,
+    (~loc) => [%expr CSS.overflowY],
+    (~loc) =>
+      fun
+      | `Interpolation(x) => render_variable(~loc, x)
+      | (`Visible | `Hidden | `Clip | `Scroll | `Auto) as x =>
+        variant_to_expression(~loc, x),
   );
 
 let overflow =
@@ -2177,39 +2189,29 @@ let overflow =
       }
   );
 
-/* let overflow_clip_margin =
-   unsupportedProperty(Property_parser.property_overflow_clip_margin); */
+let overflow_clip_margin =
+  unsupportedProperty(Property_parser.property_overflow_clip_margin);
 
 let overflow_block =
   monomorphic(
     Property_parser.property_overflow_block,
     (~loc) => [%expr CSS.overflowBlock],
-    (~loc, value) => {
-      switch (value) {
-      | `Interpolation(i) => render_variable(~loc, i)
-      | `Auto => variant_to_expression(~loc, `Auto)
-      | `Clip => variant_to_expression(~loc, `Clip)
-      | `Hidden => variant_to_expression(~loc, `Hidden)
-      | `Scroll => variant_to_expression(~loc, `Scroll)
-      | `Visible => variant_to_expression(~loc, `Visible)
-      }
-    },
+    (~loc) =>
+      fun
+      | `Interpolation(x) => render_variable(~loc, x)
+      | (`Visible | `Hidden | `Clip | `Scroll | `Auto) as x =>
+        variant_to_expression(~loc, x),
   );
 
 let overflow_inline =
   monomorphic(
     Property_parser.property_overflow_inline,
     (~loc) => [%expr CSS.overflowInline],
-    (~loc, value) => {
-      switch (value) {
-      | `Interpolation(i) => render_variable(~loc, i)
-      | `Auto => variant_to_expression(~loc, `Auto)
-      | `Clip => variant_to_expression(~loc, `Clip)
-      | `Hidden => variant_to_expression(~loc, `Hidden)
-      | `Scroll => variant_to_expression(~loc, `Scroll)
-      | `Visible => variant_to_expression(~loc, `Visible)
-      }
-    },
+    (~loc) =>
+      fun
+      | `Interpolation(x) => render_variable(~loc, x)
+      | (`Visible | `Hidden | `Clip | `Scroll | `Auto) as x =>
+        variant_to_expression(~loc, x),
   );
 
 let text_overflow =
@@ -2552,20 +2554,27 @@ let font_variant_emoji =
     [%expr CSS.fontVariantEmoji]
   );
 
-// css-text-decor-3
-let render_text_decoration_line =
-    (~loc, value: Types.property_text_decoration_line) =>
-  switch (value) {
+let render_text_decoration_line = (~loc) =>
+  fun
   | `Interpolation(v) => render_variable(~loc, v)
-  | `None => variant_to_expression(~loc, `None)
-  | `Xor([`Underline]) => variant_to_expression(~loc, `Underline)
-  | `Xor([`Overline]) => variant_to_expression(~loc, `Overline)
-  | `Xor([`Line_through]) => variant_to_expression(~loc, `Line_Through)
-  | `Xor([`Blink]) => variant_to_expression(~loc, `Blink)
-  /* bs-css doesn't support multiple text decoration line */
-  | `Xor(_) => raise(Unsupported_feature)
-  };
+  | `None => [%expr `none]
+  | `Or(underline, overline, lineThrough, blink) => [%expr
+      CSS.Types.TextDecorationLine.Value.make(
+        ~underline=?[%e
+          render_option(~loc, (~loc, _) => [%expr true], underline)
+        ],
+        ~overline=?[%e
+          render_option(~loc, (~loc, _) => [%expr true], overline)
+        ],
+        ~lineThrough=?[%e
+          render_option(~loc, (~loc, _) => [%expr true], lineThrough)
+        ],
+        ~blink=?[%e render_option(~loc, (~loc, _) => [%expr true], blink)],
+        (),
+      )
+    ];
 
+// css-text-decor-3
 let text_decoration_line =
   monomorphic(
     Property_parser.property_text_decoration_line,
@@ -2610,16 +2619,24 @@ let text_decoration_thickness =
   );
 
 let text_decoration =
-  monomorphic(
+  polymorphic(
     Property_parser.property_text_decoration,
-    (~loc) => [%expr CSS.textDecoration],
-    (~loc, v) =>
-      switch (v) {
-      | (line, None, None) => render_text_decoration_line(~loc, line)
-      | (_line, None, Some(_color)) => raise(Unsupported_feature)
-      | (_line, Some(_style), None) => raise(Unsupported_feature)
-      | (_line, Some(_style), Some(_color)) => raise(Unsupported_feature)
-      },
+    (~loc, (color, style, thickness, line)) =>
+    [
+      [%expr
+        CSS.textDecoration2(
+          ~line=?[%e render_option(~loc, render_text_decoration_line, line)],
+          ~thickness=?[%e
+            render_option(~loc, render_text_decoration_thickness, thickness)
+          ],
+          ~style=?[%e
+            render_option(~loc, render_text_decoration_style, style)
+          ],
+          ~color=?[%e render_option(~loc, render_color, color)],
+          (),
+        )
+      ],
+    ]
   );
 
 let text_underline_position =
@@ -5148,9 +5165,6 @@ let orphans = unsupportedProperty(Property_parser.property_orphans);
 let overflow_anchor =
   unsupportedProperty(Property_parser.property_overflow_anchor);
 
-let overflow_clip_box =
-  unsupportedProperty(Property_parser.property_overflow_clip_box);
-
 let padding_block_end =
   unsupportedProperty(Property_parser.property_padding_block_end);
 
@@ -5524,7 +5538,7 @@ let properties = [
   ("outline-width", found(outline_width)),
   ("overflow-anchor", found(overflow_anchor)),
   ("overflow-block", found(overflow_block)),
-  ("overflow-clip-box", found(overflow_clip_box)),
+  ("overflow-clip-margin", found(overflow_clip_margin)),
   ("overflow-inline", found(overflow_inline)),
   ("overflow-wrap", found(overflow_wrap)),
   ("overflow-x", found(overflow_x)),

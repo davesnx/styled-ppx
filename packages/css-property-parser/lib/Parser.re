@@ -1415,7 +1415,7 @@ and property_overflow_anchor = [%value.rec "'auto' | 'none'"]
 and property_overflow_block = [%value.rec
   "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"
 ]
-and property_overflow_clip_box = [%value.rec "'padding-box' | 'content-box'"]
+and property_overflow_clip_margin = [%value.rec "<visual-box> || <extended-length>"]
 and property_overflow_inline = [%value.rec
   "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"
 ]
@@ -1423,10 +1423,10 @@ and property_overflow_wrap = [%value.rec
   "'normal' | 'break-word' | 'anywhere'"
 ]
 and property_overflow_x = [%value.rec
-  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto'"
+  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"
 ]
 and property_overflow_y = [%value.rec
-  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto'"
+  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"
 ]
 and property_overscroll_behavior = [%value.rec
   "[ 'contain' | 'none' | 'auto' ]{1,2}"
@@ -1645,7 +1645,7 @@ and property_text_combine_upright = [%value.rec
   "'none' | 'all' | 'digits' [ <integer> ]?"
 ]
 and property_text_decoration = [%value.rec
-  "[ <'text-decoration-line'>] [<'text-decoration-style'>]? [<'text-decoration-color'>]?"
+  "<'text-decoration-color'> || <'text-decoration-style'> || <'text-decoration-thickness'> || <'text-decoration-line'>"
 ]
 and property_text_justify_trim = [%value.rec "'none' | 'all' | 'auto'"]
 and property_text_kashida = [%value.rec
@@ -1657,7 +1657,7 @@ and property_text_decoration_color = [%value.rec "<color>"]
 /* and this definition has changed from the origianl, it might be a bug on the spec or our Generator,
    but simplifying to "|" simplifies it and solves the bug */
 and property_text_decoration_line = [%value.rec
-  "'none' | <interpolation> | [ 'underline' | 'overline' | 'line-through' | 'blink' ]{1,2}"
+  "'none' | <interpolation> | [ 'underline' || 'overline' || 'line-through' || 'blink' ]"
 ]
 and property_text_decoration_skip = [%value.rec
   "'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' ] || 'edges' || 'box-decoration'"
@@ -1968,6 +1968,7 @@ and type_selector = [%value.rec "<wq-name> | [ <ns-prefix> ]? '*'"]
 and viewport_length = [%value.rec
   "'auto' | <extended-length> | <extended-percentage>"
 ]
+and visual_box = [%value.rec "'content-box' | 'padding-box' | 'border-box'"]
 and wq_name = [%value.rec "[ <ns-prefix> ]? <ident-token>"]
 and x = [%value.rec "<number>"]
 and y = [%value.rec "<number>"];
@@ -3084,7 +3085,7 @@ let check_map =
       ("property-overflow", check(property_overflow)),
       ("property-overflow-anchor", check(property_overflow_anchor)),
       ("property-overflow-block", check(property_overflow_block)),
-      ("property-overflow-clip-box", check(property_overflow_clip_box)),
+      ("property-overflow-clip-margin", check(property_overflow_clip_margin)),
       ("property-overflow-inline", check(property_overflow_inline)),
       ("property-overflow-wrap", check(property_overflow_wrap)),
       ("property-overflow-x", check(property_overflow_x)),

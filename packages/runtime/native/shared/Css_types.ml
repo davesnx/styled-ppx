@@ -1076,36 +1076,47 @@ module TransitionProperty = struct
 end
 
 module Transition = struct
-  type transitionValue = {
-    duration : Time.t;
-    delay : Time.t;
-    timingFunction : TimingFunction.t;
-    property : [ SingleTransitionProperty.t | None.t ];
-  }
+  module Value = struct
+    type value = {
+      duration : Time.t;
+      delay : Time.t;
+      timingFunction : TimingFunction.t;
+      property : [ SingleTransitionProperty.t | None.t ];
+    }
+
+    type t = [ `value of value ]
+
+    let make ?(duration = `ms 0) ?(delay = `ms 0) ?(timingFunction = `ease)
+      ?(property = `all) () =
+      `value { duration; delay; timingFunction; property }
+
+    let toString (x : t) =
+      match x with
+      | `value v ->
+        Time.toString v.duration
+        ^ {js| |js}
+        ^ TimingFunction.toString v.timingFunction
+        ^ {js| |js}
+        ^ Time.toString v.delay
+        ^ {js| |js}
+        ^
+        (match v.property with
+        | #SingleTransitionProperty.t as x ->
+          SingleTransitionProperty.toString x
+        | #None.t -> None.toString)
+  end
 
   type t =
-    [ `value of transitionValue
-    | None.t
+    [ Value.t
+    | Var.t
+    | Cascading.t
     ]
-
-  let make ?(duration = `ms 0) ?(delay = `ms 0) ?(timingFunction = `ease)
-    ?(property = `all) () : t =
-    `value { duration; delay; timingFunction; property }
 
   let toString (x : t) =
     match x with
-    | `value v ->
-      Time.toString v.duration
-      ^ {js| |js}
-      ^ TimingFunction.toString v.timingFunction
-      ^ {js| |js}
-      ^ Time.toString v.delay
-      ^ {js| |js}
-      ^
-      (match v.property with
-      | #SingleTransitionProperty.t as x -> SingleTransitionProperty.toString x
-      | #None.t -> None.toString)
-    | #None.t -> None.toString
+    | #Value.t as x -> Value.toString x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
 end
 
 module Animation = struct
@@ -3019,67 +3030,113 @@ module TextOverflow = struct
 end
 
 module TextDecorationLine = struct
+  module Value = struct
+    type value = {
+      underline : bool;
+      overline : bool;
+      lineThrough : bool;
+      blink : bool;
+    }
+
+    type t =
+      [ None.t
+      | `value of value
+      ]
+
+    let make ?(underline = false) ?(overline = false) ?(lineThrough = false)
+      ?(blink = false) () =
+      `value { underline; overline; lineThrough; blink }
+
+    let toString (x : t) =
+      match x with
+      | `value { underline; overline; lineThrough; blink } ->
+        (match underline, overline, lineThrough, blink with
+        | false, false, false, false -> None.toString
+        | _, _, _, _ ->
+          [|
+            (if underline then Some {js|underline|js} else None);
+            (if overline then Some {js|overline|js} else None);
+            (if lineThrough then Some {js|line-through|js} else None);
+            (if blink then Some {js|blink|js} else None);
+          |]
+          |> Kloth.Array.filter_map ~f:Fun.id
+          |> Kloth.Array.map_and_join ~f:Fun.id ~sep:{js| |js})
+      | #None.t -> None.toString
+  end
+
   type t =
-    [ None.t
-    | `underline
-    | `overline
-    | `lineThrough
-    | `blink
+    [ Value.t
     | Var.t
     | Cascading.t
     ]
 
   let toString (x : t) =
     match x with
-    | #None.t -> None.toString
-    | `underline -> {js|underline|js}
-    | `overline -> {js|overline|js}
-    | `lineThrough -> {js|line-through|js}
-    | `blink -> {js|blink|js}
+    | #Value.t as x -> Value.toString x
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
 end
 
 module TextDecorationStyle = struct
+  module Value = struct
+    type t =
+      [ None.t
+      | `solid
+      | `double
+      | `dotted
+      | `dashed
+      | `wavy
+      ]
+
+    let toString (x : t) =
+      match x with
+      | `solid -> {js|solid|js}
+      | `double -> {js|double|js}
+      | `dotted -> {js|dotted|js}
+      | `dashed -> {js|dashed|js}
+      | `wavy -> {js|wavy|js}
+      | #None.t -> None.toString
+  end
+
   type t =
-    [ None.t
-    | `solid
-    | `double
-    | `dotted
-    | `dashed
-    | `wavy
+    [ Value.t
     | Var.t
     | Cascading.t
     ]
 
   let toString (x : t) =
     match x with
-    | `solid -> {js|solid|js}
-    | `double -> {js|double|js}
-    | `dotted -> {js|dotted|js}
-    | `dashed -> {js|dashed|js}
-    | `wavy -> {js|wavy|js}
-    | #None.t -> None.toString
+    | #Value.t as x -> Value.toString x
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
 end
 
 module TextDecorationThickness = struct
+  module Value = struct
+    type t =
+      [ `fromFont
+      | Auto.t
+      | None.t
+      | Length.t
+      ]
+
+    let toString (x : t) =
+      match x with
+      | `fromFont -> {js|from-font|js}
+      | #Auto.t -> Auto.toString
+      | #None.t -> None.toString
+      | #Length.t as l -> Length.toString l
+  end
+
   type t =
-    [ `fromFont
-    | Auto.t
-    | None.t
-    | Length.t
+    [ Value.t
     | Var.t
     | Cascading.t
     ]
 
   let toString (x : t) =
     match x with
-    | `fromFont -> {js|from-font|js}
-    | #Auto.t -> Auto.toString
-    | #None.t -> None.toString
-    | #Length.t as l -> Length.toString l
+    | #Value.t as x -> Value.toString x
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
 end
@@ -3135,21 +3192,33 @@ module TextDecorationSkipInset = struct
 end
 
 module TextDecoration = struct
+  type value = {
+    line : TextDecorationLine.Value.t;
+    thickness : TextDecorationThickness.Value.t;
+    style : TextDecorationStyle.Value.t;
+    color : Color.t;
+  }
+
   type t =
-    [ None.t
-    | `underline
-    | `overline
-    | `lineThrough
+    [ `value of value
     | Var.t
     | Cascading.t
     ]
 
+  let make ?(line = `none) ?(thickness = `auto) ?(style = `solid)
+    ?(color = `currentColor) () =
+    `value { line; thickness; style; color }
+
   let toString (x : t) =
     match x with
-    | #None.t -> None.toString
-    | `underline -> {js|underline|js}
-    | `overline -> {js|overline|js}
-    | `lineThrough -> {js|line-through|js}
+    | `value x ->
+      TextDecorationLine.Value.toString x.line
+      ^ {js| |js}
+      ^ TextDecorationThickness.Value.toString x.thickness
+      ^ {js| |js}
+      ^ TextDecorationStyle.Value.toString x.style
+      ^ {js| |js}
+      ^ Color.toString x.color
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
 end
@@ -3586,13 +3655,29 @@ module Background = struct
 end
 
 module BorderImageSource = struct
+  module Value = struct
+    type t =
+      [ None.t
+      | Image.t
+      ]
+
+    let toString (x : t) =
+      match x with
+      | #None.t -> None.toString
+      | #Image.t as i -> Image.toString i
+  end
+
   type t =
-    [ None.t
-    | Image.t
+    [ Value.t
+    | Cascading.t
+    | Var.t
     ]
 
   let toString (x : t) =
-    match x with #None.t -> None.toString | #Image.t as i -> Image.toString i
+    match x with
+    | #Value.t as x -> Value.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Var.t as x -> Var.toString x
 end
 
 module MaskImage = struct
@@ -3622,6 +3707,21 @@ module ImageRendering = struct
     | `highQuality -> {js|high-quality|js}
     | `pixelated -> {js|pixelated|js}
     | `crispEdges -> {js|crisp-edges|js}
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+module ImageOrientation = struct
+  type t =
+    [ None.t
+    | `fromImage
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString = function
+    | #None.t -> None.toString
+    | `fromImage -> {js|from-image|js}
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
 end
@@ -4140,6 +4240,10 @@ module OverflowInline = struct
     | #Auto.t -> Auto.toString
     | #Var.t as var -> Var.toString var
     | #Cascading.t as c -> Cascading.toString c
+end
+
+module OverflowBlock = struct
+  include OverflowInline
 end
 
 module FontSynthesisWeight = struct
@@ -4708,4 +4812,155 @@ module Grid = struct
       ^ GridTemplateColumns.Value.toString templateColumns
     | #Var.t as x -> Var.toString x
     | #Cascading.t as x -> Cascading.toString x
+end
+
+module BorderImageSlice = struct
+  module Value = struct
+    type t =
+      [ `num of float
+      | Percentage.t
+      ]
+
+    let toString (x : t) =
+      match x with
+      | `num x -> Kloth.Float.to_string x
+      | #Percentage.t as x -> Percentage.toString x
+  end
+
+  module Fill = struct
+    let toString = {js|fill|js}
+  end
+
+  type t =
+    [ Value.t
+    | Cascading.t
+    | Var.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | #Value.t as x -> Value.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Var.t as x -> Var.toString x
+end
+
+module BorderImageWidth = struct
+  module Value = struct
+    type t =
+      [ Auto.t
+      | `num of float
+      | Length.t
+      ]
+
+    let toString (x : t) =
+      match x with
+      | `num x -> Kloth.Float.to_string x
+      | #Auto.t -> Auto.toString
+      | #Length.t as x -> Length.toString x
+  end
+
+  type t =
+    [ Value.t
+    | Cascading.t
+    | Var.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | #Value.t as x -> Value.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Var.t as x -> Var.toString x
+end
+
+module BorderImageOutset = struct
+  module Value = struct
+    type t =
+      [ `num of float
+      | Length.t
+      ]
+
+    let toString (x : t) =
+      match x with
+      | `num x -> Kloth.Float.to_string x
+      | #Length.t as x -> Length.toString x
+  end
+
+  type t =
+    [ Value.t
+    | Cascading.t
+    | Var.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | #Value.t as x -> Value.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Var.t as x -> Var.toString x
+end
+
+module BorderImageRepeat = struct
+  module Value = struct
+    type t =
+      [ `stretch
+      | `repeat
+      | `round
+      | `space
+      ]
+
+    let toString (x : t) =
+      match x with
+      | `stretch -> {js|stretch|js}
+      | `repeat -> {js|repeat|js}
+      | `round -> {js|round|js}
+      | `space -> {js|space|js}
+  end
+
+  type t =
+    [ Value.t
+    | Cascading.t
+    | Var.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | #Value.t as x -> Value.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Var.t as x -> Var.toString x
+end
+
+module VisualBox = struct
+  type t =
+    [ `contentBox
+    | `paddingBox
+    | `borderBox
+    ]
+
+  let toString (x : t) =
+    match x with
+    | `contentBox -> {js|content-box|js}
+    | `paddingBox -> {js|padding-box|js}
+    | `borderBox -> {js|border-box|js}
+end
+
+module OverflowClipMargin = struct
+  type t =
+    [ `visualBox of VisualBox.t
+    | `length of Length.t
+    | `visualBoxLength of VisualBox.t * Length.t
+    | Cascading.t
+    | Var.t
+    ]
+
+  let visualBox (x : VisualBox.t) = `visualBox x
+  let length (x : Length.t) = `length x
+  let visualBoxLength (x : VisualBox.t) (y : Length.t) = `visualBoxLength (x, y)
+
+  let toString (x : t) =
+    match x with
+    | `visualBox x -> VisualBox.toString x
+    | `length x -> Length.toString x
+    | `visualBoxLength (x, y) ->
+      VisualBox.toString x ^ {js| |js} ^ Length.toString y
+    | #Cascading.t as c -> Cascading.toString c
+    | #Var.t as va -> Var.toString va
 end
