@@ -1727,7 +1727,9 @@ and property_transform_box = [%value.rec
   "'content-box' | 'border-box' | 'fill-box' | 'stroke-box' | 'view-box'"
 ]
 and property_transform_origin = [%value.rec
-  "<extended-length> | <extended-percentage> | 'left' | 'center' | 'right' | 'top' | 'bottom' | [ [ <extended-length> | <extended-percentage> | 'left' | 'center' | 'right' ] && [ <extended-length> | <extended-percentage> | 'top' | 'center' | 'bottom' ] ] [ <extended-length> ]?"
+  "[ 'left' | 'center' | 'right' | 'top' | 'bottom' | <length-percentage> ]
+  | [ 'left' | 'center' | 'right' | <length-percentage> ] [ 'top' | 'center' | 'bottom' | <length-percentage> ] <length>?
+  | [[ 'center' | 'left' | 'right' ] && [ 'center' | 'top' | 'bottom' ]] <length>? "
 ]
 and property_transform_style = [%value.rec "'flat' | 'preserve-3d'"]
 and property_transition = [%value.rec

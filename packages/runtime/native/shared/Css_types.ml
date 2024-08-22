@@ -850,26 +850,6 @@ module FontWeight = struct
     | #Cascading.t as c -> Cascading.toString c
 end
 
-module TransformOrigin = struct
-  type t =
-    [ Length.t
-    | `left
-    | `center
-    | `right
-    | `top
-    | `bottom
-    ]
-
-  let toString (x : t) =
-    match x with
-    | `left -> {js|left|js}
-    | `center -> {js|center|js}
-    | `right -> {js|right|js}
-    | `top -> {js|top|js}
-    | `bottom -> {js|bottom|js}
-    | #Length.t as x -> Length.toString x
-end
-
 module Transform = struct
   type t =
     [ `translate of Length.t * Length.t
@@ -2104,6 +2084,59 @@ module BgPosition = struct
           | `bottomOffset l -> Length.toString l
         end
     | #Length.t as l -> Length.toString l
+end
+
+module TransformOrigin = struct
+  module X = Position.X
+  module Y = Position.Y
+
+  let top = `top
+  let bottom = `bottom
+  let left = `left
+  let right = `right
+  let center = `center
+  let hv = Position.hv
+
+  let hvOffset (h : [ X.t | Length.t ]) (v : [ Y.t | Length.t ])
+    (offset : Length.t) =
+    `hvOffset (h, v, offset)
+
+  type t =
+    [ X.t
+    | Y.t
+    | Length.t
+    | `hv of [ X.t | Length.t ] * [ Y.t | Length.t ]
+    | `hvOffset of [ X.t | Length.t ] * [ Y.t | Length.t ] * Length.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | #X.t as x -> X.toString x
+    | #Y.t as x -> Y.toString x
+    | #Length.t as x -> Length.toString x
+    | `hv (h, v) ->
+      (match h with
+      | #X.t as h -> X.toString h
+      | #Length.t as l -> Length.toString l)
+      ^ {js| |js}
+      ^
+      (match v with
+      | #Y.t as v -> Y.toString v
+      | #Length.t as l -> Length.toString l)
+    | `hvOffset (h, v, o) ->
+      (match h with
+      | #X.t as h -> X.toString h
+      | #Length.t as l -> Length.toString l)
+      ^ {js| |js}
+      ^ (match v with
+        | #Y.t as v -> Y.toString v
+        | #Length.t as l -> Length.toString l)
+      ^ {js||js}
+      ^ Length.toString o
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
 end
 
 module OffsetAnchor = struct

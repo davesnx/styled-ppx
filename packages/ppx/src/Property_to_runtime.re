@@ -2884,47 +2884,26 @@ let transform =
       }
   );
 
-let render_origin = (~loc) =>
-  fun
-  | `Center as x
-  | `Left as x
-  | `Right as x
-  | `Top as x
-  | `Bottom as x => variant_to_expression(~loc, x)
-  | `Function_calc(fc) => render_function_calc(~loc, fc)
-  | `Interpolation(v) => render_variable(~loc, v)
-  | `Length(l) => render_length(~loc, l)
-  | `Extended_length(l) => render_extended_length(~loc, l)
-  | `Extended_percentage(p) => render_extended_percentage(~loc, p);
+let render_transform_origin_3 = (~loc, x, y, z) => [%expr
+  `hvOffset((
+    [%e render_position_one(~loc, x)],
+    [%e render_position_one(~loc, y)],
+    [%e render_length(~loc, z)],
+  ))
+];
 
 let transform_origin =
-  polymorphic(Property_parser.property_transform_origin, (~loc) =>
-    fun
-    /* x, y are swapped on purpose */
-    | `Static((y, x), None) => {
-        [
-          [%expr
-            CSS.transformOrigin2(
-              [%e render_origin(~loc, x)],
-              [%e render_origin(~loc, y)],
-            )
-          ],
-        ];
-      }
-    | `Center => [[%expr CSS.transformOrigin(`center)]]
-    | `Left => [[%expr CSS.transformOrigin(`left)]]
-    | `Right => [[%expr CSS.transformOrigin(`right)]]
-    | `Bottom => [[%expr CSS.transformOrigin(`bottom)]]
-    | `Top => [[%expr CSS.transformOrigin(`top)]]
-    | `Extended_length(el) => [
-        [%expr CSS.transformOrigin([%e render_extended_length(~loc, el)])],
-      ]
-    | `Extended_percentage(ep) => [
-        [%expr
-          CSS.transformOrigin([%e render_extended_percentage(~loc, ep)])
-        ],
-      ]
-    | `Static(_, Some(_)) => raise(Unsupported_feature)
+  monomorphic(
+    Property_parser.property_transform_origin,
+    (~loc) => [%expr CSS.transformOrigin],
+    (~loc) =>
+      fun
+      | `Xor(x) => render_position_one(~loc, x)
+      | `Static_0(h, v, None) => render_position_two(~loc, h, v)
+      | `Static_1((h, v), None) => render_position_two(~loc, h, v)
+      | `Static_0(h, v, Some(o)) => render_transform_origin_3(~loc, h, v, o)
+      | `Static_1((h, v), Some(o)) =>
+        render_transform_origin_3(~loc, h, v, o),
   );
 
 let transform_box =

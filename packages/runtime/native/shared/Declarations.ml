@@ -573,18 +573,12 @@ let transformOrigin x =
 
 let transformOrigin2 x y =
   Rule.declaration
-    ( {js|transformOrigin|js},
-      TransformOrigin.toString x ^ {js| |js} ^ TransformOrigin.toString y )
+    ({js|transformOrigin|js}, TransformOrigin.toString (TransformOrigin.hv x y))
 
-let transformOrigin3d x y z =
+let transformOrigin3 x y z =
   Rule.declaration
     ( {js|transformOrigin|js},
-      Length.toString x
-      ^ {js| |js}
-      ^ Length.toString y
-      ^ {js| |js}
-      ^ Length.toString z
-      ^ {js| |js} )
+      TransformOrigin.toString (TransformOrigin.hvOffset x y z) )
 
 let transformBox x =
   Rule.declaration ({js|transformBox|js}, TransformBox.toString x)

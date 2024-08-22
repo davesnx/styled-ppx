@@ -53,10 +53,10 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|transform|js}, {js|perspective(600px)|js});
   CSS.transformOrigin(`pxFloat(10.));
   CSS.transformOrigin(`top);
-  CSS.transformOrigin2(`top, `left);
-  CSS.transformOrigin2(`percent(50.), `percent(100.));
-  CSS.transformOrigin2(`percent(0.), `left);
-  CSS.unsafe({js|transformOrigin|js}, {js|left 50% 0|js});
+  CSS.transformOrigin(`hv((`left, `top)));
+  CSS.transformOrigin(`hv((`percent(50.), `percent(100.))));
+  CSS.transformOrigin(`hv((`left, `percent(0.))));
+  CSS.transformOrigin(`hvOffset((`left, `percent(50.), `zero)));
   CSS.transformBox(`borderBox);
   CSS.transformBox(`fillBox);
   CSS.transformBox(`viewBox);

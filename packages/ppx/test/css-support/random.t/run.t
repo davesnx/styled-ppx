@@ -111,12 +111,12 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|touchAction|js}, {js|none|js});
   CSS.unsafe({js|touchAction|js}, {js|pan-x pan-y|js});
   
-  CSS.transformOrigin2(`center, `left);
-  CSS.transformOrigin2(`center, `right);
+  CSS.transformOrigin(`hv((`left, `center)));
+  CSS.transformOrigin(`hv((`right, `center)));
   CSS.transformOrigin(`pxFloat(2.));
   CSS.transformOrigin(`bottom);
-  CSS.transformOrigin2(`cm(3.), `pxFloat(2.));
-  CSS.transformOrigin2(`pxFloat(2.), `left);
+  CSS.transformOrigin(`hv((`cm(3.), `pxFloat(2.))));
+  CSS.transformOrigin(`hv((`left, `pxFloat(2.))));
   
   CSS.transform(`none);
   
