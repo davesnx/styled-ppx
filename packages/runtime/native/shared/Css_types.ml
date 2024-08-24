@@ -3059,8 +3059,8 @@ module TextDecorationLine = struct
             (if lineThrough then Some {js|line-through|js} else None);
             (if blink then Some {js|blink|js} else None);
           |]
-          |> Kloth.Array.filter_map ~f:Fun.id
-          |> Kloth.Array.map_and_join ~f:Fun.id ~sep:{js| |js})
+          |> Kloth.Array.filter_map ~f:Kloth.Fun.id
+          |> Kloth.Array.map_and_join ~f:Kloth.Fun.id ~sep:{js| |js})
       | #None.t -> None.toString
   end
 
