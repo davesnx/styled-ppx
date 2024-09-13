@@ -35,20 +35,22 @@ module Array = struct
   let flatten a = Array.concat (Array.to_list a)
 end
 
-let render_declaration rule =
+let render_declaration out rule =
   match rule with
   (* https://emotion.sh/docs/labels should be ignored on the rendering *)
-  | Rule.Declaration ("label", _value) -> None
+  | Rule.Declaration ("label", _value) -> ()
   | Rule.Declaration (property, value) ->
-    Some (Printf.sprintf "%s: %s;" property value)
-  | _ -> None
+    Buffer.add_string out property;
+    Buffer.add_string out ": ";
+    Buffer.add_string out value;
+    Buffer.add_char out ';';
+    Buffer.add_char out ' '
+  | _ -> ()
 
-let render_declarations rules =
-  rules
-  |> Array.map ~f:Autoprefixer.prefix
-  |> Array.flatten
-  |> Array.filter_map ~f:render_declaration
-  |> Array.join ~sep:" "
+let render_declarations out rules =
+  let ls = rules |> Array.map ~f:Autoprefixer.prefix |> Array.flatten in
+  ls |> Array.iter ~f:(render_declaration out);
+  if Array.length ls > 0 then Buffer.truncate out (Buffer.length out - 1)
 
 let contains_at selector = String.contains selector '@'
 let contains_ampersand selector = String.contains selector '&'
@@ -300,68 +302,81 @@ let resolve_selectors rules =
   let declarations, selectors = unnest_selectors ~prefix:None rules in
   Array.append declarations selectors
 
-let render_keyframes animationName keyframes =
-  let definition =
-    keyframes
-    |> Array.map ~f:(fun (percentage, rules) ->
-           Printf.sprintf "%i%% { %s }" percentage (render_declarations rules))
-    |> Array.join ~sep:" "
-  in
-  Printf.sprintf "@keyframes %s { %s }" animationName definition
+let render_keyframes out animationName keyframes =
+  Buffer.add_string out "@keyframes ";
+  Buffer.add_string out animationName;
+  Buffer.add_string out " { ";
+  keyframes
+  |> Array.iter ~f:(fun (percentage, rules) ->
+         Buffer.add_string out (string_of_int percentage);
+         Buffer.add_string out "% { ";
+         render_declarations out rules;
+         Buffer.add_string out " }";
+         Buffer.add_char out ' ');
+  if Array.length keyframes > 0 then Buffer.truncate out (Buffer.length out - 1);
+  Buffer.add_string out " }"
 
 (* Removes nesting on selectors, uplifts media-queries, runs the autoprefixer *)
-let rec render_rules className rules =
+let rec render_rules out className rules =
   let declarations, selectors = split_by_kind (resolve_selectors rules) in
-
-  let declarations =
-    match declarations with
-    | [||] -> ""
-    | _ ->
-      Printf.sprintf ".%s { %s }" className (render_declarations declarations)
-  in
-
-  let selectors =
-    match selectors with
-    | [||] -> ""
-    | _ ->
-      selectors
-      |> Array.filter_map ~f:(render_selectors className)
-      |> Array.join ~sep:" "
-  in
-
-  (* Trimming is necessary to ensure there isn't an empty space when one of `declarations` or `selectors` is empty. *)
-  String.trim @@ String.concat " " [ declarations; selectors ]
+  (match declarations with
+  | [||] -> ()
+  | _ ->
+    Buffer.add_char out '.';
+    Buffer.add_string out className;
+    Buffer.add_string out " { ";
+    render_declarations out declarations;
+    Buffer.add_string out " }");
+  match selectors with
+  | [||] -> ()
+  | _ ->
+    if Array.length declarations > 0 then Buffer.add_char out ' ';
+    selectors
+    |> Array.iter ~f:(fun selector -> render_selectors out className selector);
+    Buffer.truncate out (Buffer.length out - 1)
 
 (* Renders all selectors with the hash given *)
-and render_selectors hash rule =
+and render_selectors out hash rule =
   match rule with
-  | Rule.Selector (_selector, rules) when Array.is_empty rules -> None
+  | Rule.Selector (_selector, rules) when Array.is_empty rules -> ()
   (* In case of being @media (or any at_rule) render the selector first and declarations with the hash inside *)
   | Rule.Selector (selector, rules) when contains_at selector ->
-    let nested_selectors = render_rules hash rules in
-    Some (Printf.sprintf "%s { %s }" selector nested_selectors)
+    Buffer.add_string out selector;
+    Buffer.add_string out " { ";
+    render_rules out hash rules;
+    Buffer.add_string out " }";
+    Buffer.add_char out ' '
   | Rule.Selector (selector, rules) ->
-    let new_selector = resolve_ampersand hash selector in
-    (* Resolving the ampersand means to replace all ampersands by the hash *)
-    Some (Printf.sprintf "%s { %s }" new_selector (render_declarations rules))
+    Buffer.add_string out (resolve_ampersand hash selector);
+    Buffer.add_string out " { ";
+    render_declarations out rules;
+    Buffer.add_string out " }";
+    Buffer.add_char out ' '
   (* Declarations aren't there *)
-  | _ -> None
+  | _ -> ()
 
 (* rules_to_string renders the rule in a format where the hash matches with `@emotion/serialise`. It doesn't render any whitespace. (compared to render_rules) *)
 (* TODO: Ensure Selector is serialised correctly *)
-let rec rules_to_string rules =
-  let buff = Buffer.create 16 in
-  let push = Buffer.add_string buff in
-  let rule_to_string rule =
-    match rule with
-    | Rule.Declaration (property, value) ->
-      push (Printf.sprintf "%s:%s;" property value)
-    | Rule.Selector (selector, rules) ->
-      let rules = rules_to_string rules in
-      push (Printf.sprintf "%s{%s}" selector rules)
+let rules_to_string rules =
+  let out = Buffer.create 1024 in
+  let rec go rules =
+    let rule_to_string rule =
+      match rule with
+      | Rule.Declaration (property, value) ->
+        Buffer.add_string out property;
+        Buffer.add_char out ':';
+        Buffer.add_string out value;
+        Buffer.add_char out ';'
+      | Rule.Selector (selector, rules) ->
+        Buffer.add_string out selector;
+        Buffer.add_char out '{';
+        go rules;
+        Buffer.add_char out '}'
+    in
+    Array.iter ~f:rule_to_string rules
   in
-  Array.iter ~f:rule_to_string rules;
-  Buffer.contents buff
+  go rules;
+  Buffer.contents out
 
 type declarations =
   | Globals of rule array
@@ -399,10 +414,14 @@ module Stylesheet = struct
 end
 
 let keyframes_to_string keyframes =
-  let pp_keyframe (percentage, rules) =
-    Printf.sprintf "%d%%{%s}" percentage (rules_to_string rules)
-  in
-  keyframes |> Array.map ~f:pp_keyframe |> Array.to_list |> String.concat ""
+  let out = Buffer.create 1024 in
+  keyframes
+  |> Array.iter ~f:(fun (percentage, rules) ->
+         Buffer.add_string out (string_of_int percentage);
+         Buffer.add_string out "%{";
+         Buffer.add_string out (rules_to_string rules);
+         Buffer.add_char out '}');
+  Buffer.contents out
 
 let render_hash hash styles =
   let is_label = function
@@ -442,24 +461,23 @@ let keyframes (keyframes : (int * rule array) array) =
     Types.AnimationName.make animationName
 
 let get_stylesheet () =
-  Stylesheet.get_all instance
-  |> List.fold_left
-       (fun accumulator (_, rules) ->
+  let out = Buffer.create 1024 in
+  let ls = Stylesheet.get_all instance in
+  ls
+  |> List.iter (fun (_, rules) ->
          match rules with
          | Globals rules ->
            let new_rules = resolve_selectors rules in
-           let rules = String.trim @@ rules_to_string new_rules in
-           Printf.sprintf "%s %s" accumulator rules
+           Buffer.add_string out (rules_to_string new_rules);
+           Buffer.add_char out ' '
          | Classnames { className; styles } ->
-           let rules = String.trim @@ render_rules className styles in
-           Printf.sprintf "%s %s" accumulator rules
+           render_rules out className styles;
+           Buffer.add_char out ' '
          | Keyframes { animationName; keyframes } ->
-           let rules =
-             String.trim @@ render_keyframes animationName keyframes
-           in
-           Printf.sprintf "%s %s" accumulator rules)
-       ""
-  |> String.trim
+           render_keyframes out animationName keyframes;
+           Buffer.add_char out ' ');
+  if List.length ls > 0 then Buffer.truncate out (Buffer.length out - 1);
+  Buffer.contents out
 
 let get_string_style_hashes () =
   Stylesheet.get_all instance
