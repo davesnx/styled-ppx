@@ -43,14 +43,16 @@ let render_declaration out rule =
     Buffer.add_string out property;
     Buffer.add_string out ": ";
     Buffer.add_string out value;
-    Buffer.add_char out ';';
-    Buffer.add_char out ' '
+    Buffer.add_string out "; "
   | _ -> ()
 
 let render_declarations out rules =
-  let ls = rules |> Array.map ~f:Autoprefixer.prefix |> Array.flatten in
-  ls |> Array.iter ~f:(render_declaration out);
-  if Array.length ls > 0 then Buffer.truncate out (Buffer.length out - 1)
+  let declarations =
+    rules |> Array.map ~f:Autoprefixer.prefix |> Array.flatten
+  in
+  Array.iter ~f:(render_declaration out) declarations;
+  if Array.length declarations > 0 then
+    Buffer.truncate out (Buffer.length out - 1)
 
 let contains_at selector = String.contains selector '@'
 let contains_ampersand selector = String.contains selector '&'
@@ -306,13 +308,13 @@ let render_keyframes out animationName keyframes =
   Buffer.add_string out "@keyframes ";
   Buffer.add_string out animationName;
   Buffer.add_string out " { ";
-  keyframes
-  |> Array.iter ~f:(fun (percentage, rules) ->
-         Buffer.add_string out (string_of_int percentage);
-         Buffer.add_string out "% { ";
-         render_declarations out rules;
-         Buffer.add_string out " }";
-         Buffer.add_char out ' ');
+  Array.iter
+    ~f:(fun (percentage, rules) ->
+      Buffer.add_string out (string_of_int percentage);
+      Buffer.add_string out "% { ";
+      render_declarations out rules;
+      Buffer.add_string out " } ")
+    keyframes;
   if Array.length keyframes > 0 then Buffer.truncate out (Buffer.length out - 1);
   Buffer.add_string out " }"
 
@@ -331,8 +333,9 @@ let rec render_rules out className rules =
   | [||] -> ()
   | _ ->
     if Array.length declarations > 0 then Buffer.add_char out ' ';
-    selectors
-    |> Array.iter ~f:(fun selector -> render_selectors out className selector);
+    Array.iter
+      ~f:(fun selector -> render_selectors out className selector)
+      selectors;
     Buffer.truncate out (Buffer.length out - 1)
 
 (* Renders all selectors with the hash given *)
@@ -344,14 +347,12 @@ and render_selectors out hash rule =
     Buffer.add_string out selector;
     Buffer.add_string out " { ";
     render_rules out hash rules;
-    Buffer.add_string out " }";
-    Buffer.add_char out ' '
+    Buffer.add_string out " } "
   | Rule.Selector (selector, rules) ->
     Buffer.add_string out (resolve_ampersand hash selector);
     Buffer.add_string out " { ";
     render_declarations out rules;
-    Buffer.add_string out " }";
-    Buffer.add_char out ' '
+    Buffer.add_string out " } "
   (* Declarations aren't there *)
   | _ -> ()
 
@@ -415,12 +416,13 @@ end
 
 let keyframes_to_string keyframes =
   let out = Buffer.create 1024 in
-  keyframes
-  |> Array.iter ~f:(fun (percentage, rules) ->
-         Buffer.add_string out (string_of_int percentage);
-         Buffer.add_string out "%{";
-         Buffer.add_string out (rules_to_string rules);
-         Buffer.add_char out '}');
+  Array.iter
+    ~f:(fun (percentage, rules) ->
+      Buffer.add_string out (string_of_int percentage);
+      Buffer.add_string out "%{";
+      Buffer.add_string out (rules_to_string rules);
+      Buffer.add_char out '}')
+    keyframes;
   Buffer.contents out
 
 let render_hash hash styles =
@@ -462,21 +464,22 @@ let keyframes (keyframes : (int * rule array) array) =
 
 let get_stylesheet () =
   let out = Buffer.create 1024 in
-  let ls = Stylesheet.get_all instance in
-  ls
-  |> List.iter (fun (_, rules) ->
-         match rules with
-         | Globals rules ->
-           let new_rules = resolve_selectors rules in
-           Buffer.add_string out (rules_to_string new_rules);
-           Buffer.add_char out ' '
-         | Classnames { className; styles } ->
-           render_rules out className styles;
-           Buffer.add_char out ' '
-         | Keyframes { animationName; keyframes } ->
-           render_keyframes out animationName keyframes;
-           Buffer.add_char out ' ');
-  if List.length ls > 0 then Buffer.truncate out (Buffer.length out - 1);
+  let stylesheet = Stylesheet.get_all instance in
+  List.iter
+    (fun (_, rules) ->
+      match rules with
+      | Globals rules ->
+        let new_rules = resolve_selectors rules in
+        Buffer.add_string out (rules_to_string new_rules);
+        Buffer.add_char out ' '
+      | Classnames { className; styles } ->
+        render_rules out className styles;
+        Buffer.add_char out ' '
+      | Keyframes { animationName; keyframes } ->
+        render_keyframes out animationName keyframes;
+        Buffer.add_char out ' ')
+    stylesheet;
+  if List.length stylesheet > 0 then Buffer.truncate out (Buffer.length out - 1);
   Buffer.contents out
 
 let get_string_style_hashes () =
