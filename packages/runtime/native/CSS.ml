@@ -35,24 +35,20 @@ module Array = struct
   let flatten a = Array.concat (Array.to_list a)
 end
 
-let render_declaration out rule =
-  match rule with
-  (* https://emotion.sh/docs/labels should be ignored on the rendering *)
-  | Rule.Declaration ("label", _value) -> ()
-  | Rule.Declaration (property, value) ->
-    Buffer.add_string out property;
-    Buffer.add_string out ": ";
-    Buffer.add_string out value;
-    Buffer.add_string out "; "
-  | _ -> ()
+let pp_space ppf () = Format.pp_print_char ppf ' '
 
-let render_declarations out rules =
-  let declarations =
-    rules |> Array.map ~f:Autoprefixer.prefix |> Array.flatten
-  in
-  Array.iter ~f:(render_declaration out) declarations;
-  if Array.length declarations > 0 then
-    Buffer.truncate out (Buffer.length out - 1)
+let render_declaration ppf (property, value) =
+  Format.fprintf ppf "%s: %s;" property value
+
+let render_declarations ppf rules =
+  rules
+  |> Array.map ~f:Autoprefixer.prefix
+  |> Array.flatten
+  |> Array.filter_map ~f:(function
+       | Rule.Declaration ("label", _value) -> None
+       | Rule.Declaration (property, value) -> Some (property, value)
+       | _ -> None)
+  |> Format.pp_print_array ~pp_sep:pp_space render_declaration ppf
 
 let contains_at selector = String.contains selector '@'
 let contains_ampersand selector = String.contains selector '&'
@@ -304,80 +300,66 @@ let resolve_selectors rules =
   let declarations, selectors = unnest_selectors ~prefix:None rules in
   Array.append declarations selectors
 
-let render_keyframes out animationName keyframes =
-  Buffer.add_string out "@keyframes ";
-  Buffer.add_string out animationName;
-  Buffer.add_string out " { ";
-  Array.iter
-    ~f:(fun (percentage, rules) ->
-      Buffer.add_string out (string_of_int percentage);
-      Buffer.add_string out "% { ";
-      render_declarations out rules;
-      Buffer.add_string out " } ")
-    keyframes;
-  if Array.length keyframes > 0 then Buffer.truncate out (Buffer.length out - 1);
-  Buffer.add_string out " }"
+let render_keyframes ppf animationName keyframes =
+  let pp_keyframe ppf (percentage, rules) =
+    Format.fprintf ppf "%d%% { %a }" percentage render_declarations rules
+  in
+  let pp_keyframes ppf keyframes =
+    Format.pp_print_array ~pp_sep:pp_space pp_keyframe ppf keyframes
+  in
+  Format.fprintf ppf "@keyframes %s { %a }" animationName pp_keyframes keyframes
 
 (* Removes nesting on selectors, uplifts media-queries, runs the autoprefixer *)
-let rec render_rules out className rules =
+let rec render_rules ppf className rules =
   let declarations, selectors = split_by_kind (resolve_selectors rules) in
   (match declarations with
   | [||] -> ()
   | _ ->
-    Buffer.add_char out '.';
-    Buffer.add_string out className;
-    Buffer.add_string out " { ";
-    render_declarations out declarations;
-    Buffer.add_string out " }");
+    Format.fprintf ppf ".%s { %a }" className render_declarations declarations);
   match selectors with
   | [||] -> ()
   | _ ->
-    if Array.length declarations > 0 then Buffer.add_char out ' ';
-    Array.iter
-      ~f:(fun selector -> render_selectors out className selector)
-      selectors;
-    Buffer.truncate out (Buffer.length out - 1)
+    if Array.length declarations > 0 then pp_space ppf ();
+    selectors
+    |> Array.filter_map ~f:(function
+         | Rule.Selector (_selector, rules) when Array.is_empty rules -> None
+         | Rule.Selector (selector, rules) -> Some (selector, rules)
+         | _ -> None)
+    |> Format.pp_print_array ~pp_sep:pp_space
+         (fun out -> render_selectors out className)
+         ppf
 
 (* Renders all selectors with the hash given *)
-and render_selectors out hash rule =
+and render_selectors ppf hash rule =
   match rule with
-  | Rule.Selector (_selector, rules) when Array.is_empty rules -> ()
   (* In case of being @media (or any at_rule) render the selector first and declarations with the hash inside *)
-  | Rule.Selector (selector, rules) when contains_at selector ->
-    Buffer.add_string out selector;
-    Buffer.add_string out " { ";
-    render_rules out hash rules;
-    Buffer.add_string out " } "
-  | Rule.Selector (selector, rules) ->
-    Buffer.add_string out (resolve_ampersand hash selector);
-    Buffer.add_string out " { ";
-    render_declarations out rules;
-    Buffer.add_string out " } "
-  (* Declarations aren't there *)
-  | _ -> ()
+  | selector, rules when contains_at selector ->
+    Format.fprintf ppf "%s { %a }" selector
+      (fun out -> render_rules out hash)
+      rules
+  | selector, rules ->
+    Format.fprintf ppf "%s { %a }"
+      (resolve_ampersand hash selector)
+      render_declarations rules
 
 (* rules_to_string renders the rule in a format where the hash matches with `@emotion/serialise`. It doesn't render any whitespace. (compared to render_rules) *)
 (* TODO: Ensure Selector is serialised correctly *)
 let rules_to_string rules =
-  let out = Buffer.create 1024 in
-  let rec go rules =
-    let rule_to_string rule =
+  let b = Buffer.create 1024 in
+  let fmt = Format.formatter_of_buffer b in
+  let rec go ppf rules =
+    let rule_to_string ppf rule =
       match rule with
       | Rule.Declaration (property, value) ->
-        Buffer.add_string out property;
-        Buffer.add_char out ':';
-        Buffer.add_string out value;
-        Buffer.add_char out ';'
+        Format.fprintf ppf "%s:%s;" property value
       | Rule.Selector (selector, rules) ->
-        Buffer.add_string out selector;
-        Buffer.add_char out '{';
-        go rules;
-        Buffer.add_char out '}'
+        Format.fprintf ppf "%s{%a}" selector go rules
     in
-    Array.iter ~f:rule_to_string rules
+    Format.pp_print_array ~pp_sep:(fun _ _ -> ()) rule_to_string ppf rules
   in
-  go rules;
-  Buffer.contents out
+  go fmt rules;
+  Format.pp_print_flush fmt ();
+  Buffer.contents b
 
 type declarations =
   | Globals of rule array
@@ -415,15 +397,14 @@ module Stylesheet = struct
 end
 
 let keyframes_to_string keyframes =
-  let out = Buffer.create 1024 in
-  Array.iter
-    ~f:(fun (percentage, rules) ->
-      Buffer.add_string out (string_of_int percentage);
-      Buffer.add_string out "%{";
-      Buffer.add_string out (rules_to_string rules);
-      Buffer.add_char out '}')
-    keyframes;
-  Buffer.contents out
+  let b = Buffer.create 1024 in
+  let fmt = Format.formatter_of_buffer b in
+  let pp_keyframe ppf (percentage, rules) =
+    Format.fprintf ppf "%d%%{%s}" percentage (rules_to_string rules)
+  in
+  Format.pp_print_array ~pp_sep:(fun _ _ -> ()) pp_keyframe fmt keyframes;
+  Format.pp_print_flush fmt ();
+  Buffer.contents b
 
 let render_hash hash styles =
   let is_label = function
@@ -463,24 +444,21 @@ let keyframes (keyframes : (int * rule array) array) =
     Types.AnimationName.make animationName
 
 let get_stylesheet () =
-  let out = Buffer.create 1024 in
+  let b = Buffer.create 1024 in
+  let fmt = Format.formatter_of_buffer b in
   let stylesheet = Stylesheet.get_all instance in
-  List.iter
-    (fun (_, rules) ->
-      match rules with
-      | Globals rules ->
-        let new_rules = resolve_selectors rules in
-        Buffer.add_string out (rules_to_string new_rules);
-        Buffer.add_char out ' '
-      | Classnames { className; styles } ->
-        render_rules out className styles;
-        Buffer.add_char out ' '
-      | Keyframes { animationName; keyframes } ->
-        render_keyframes out animationName keyframes;
-        Buffer.add_char out ' ')
-    stylesheet;
-  if List.length stylesheet > 0 then Buffer.truncate out (Buffer.length out - 1);
-  Buffer.contents out
+  let pp_rule ppf (_, rule) =
+    match rule with
+    | Globals rule ->
+      let new_rule = resolve_selectors rule in
+      Format.fprintf ppf "%s" (rules_to_string new_rule)
+    | Classnames { className; styles } -> render_rules ppf className styles
+    | Keyframes { animationName; keyframes } ->
+      render_keyframes ppf animationName keyframes
+  in
+  Format.pp_print_list ~pp_sep:pp_space pp_rule fmt stylesheet;
+  Format.pp_print_flush fmt ();
+  Buffer.contents b
 
 let get_string_style_hashes () =
   Stylesheet.get_all instance
