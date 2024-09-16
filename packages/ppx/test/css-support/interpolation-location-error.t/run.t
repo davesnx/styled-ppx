@@ -16,53 +16,7 @@ This test ensures the location of the error is correct
   $ dune build
   File "input.re", line 2, characters 25-32:
   Error: This expression has type [> `gri ]
-         but an expression was expected of type
-           [< `block
-            | `contents
-            | `flex
-            | `flow
-            | `flowRoot
-            | `grid
-            | `inherit_
-            | `initial
-            | `inline
-            | `inlineBlock
-            | `inlineFlex
-            | `inlineGrid
-            | `inlineTable
-            | `listItem
-            | `mozBox
-            | `mozInlineBox
-            | `mozInlineStack
-            | `msFlexbox
-            | `msGrid
-            | `msInlineFlexbox
-            | `msInlineGrid
-            | `none
-            | `revert
-            | `revertLayer
-            | `ruby
-            | `rubyBase
-            | `rubyBaseContainer
-            | `rubyText
-            | `rubyTextContainer
-            | `runIn
-            | `table
-            | `tableCaption
-            | `tableCell
-            | `tableColumn
-            | `tableColumnGroup
-            | `tableFooterGroup
-            | `tableHeaderGroup
-            | `tableRow
-            | `tableRowGroup
-            | `unset
-            | `var of string
-            | `varDefault of string * string
-            | `webkitBox
-            | `webkitFlex
-            | `webkitInlineBox
-            | `webkitInlineFlex ]
+         but an expression was expected of type Css_types.Display.t
          The second variant type does not allow tag(s) `gri
   [1]
 

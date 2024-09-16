@@ -63,6 +63,7 @@ let css_wide_keywords:
   Rule.rule([> | `Inherit | `Initial | `Revert | `RevertLayer | `Unset]);
 
 let custom_ident: Rule.rule(string);
+let custom_ident_without_span_or_auto: Rule.rule(string);
 
 let dashed_ident: Rule.rule(string);
 

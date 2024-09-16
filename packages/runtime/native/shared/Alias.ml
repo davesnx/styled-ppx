@@ -2,42 +2,45 @@
 
 open Css_types
 
-let initial = `initial
-let inherit_ = `inherit_
-let unset = `unset
+let initial = Cascading.initial
+let inherit_ = Cascading.inherit_
+let unset = Cascading.unset
 
-let var ?default (x : string) : Var.t =
+let var ?default (x : string) : [> Var.t ] =
   match default with None -> `var x | Some default -> `varDefault (x, default)
 
-let auto = `auto
-let none = `none
+let auto = Auto.auto
+let none = None.none
 let text = `text
-let pct (f : float) = `percent f
-let ch x = `ch x
-let cm x = `cm x
-let em x = `em x
-let ex x = `ex x
-let mm x = `mm x
-let pt x = `pt x
-let px x = `px x
-let pxFloat x = `pxFloat x
-let rem x = `rem x
-let vh x = `vh x
-let vmin x = `vmin x
-let vmax x = `vmax x
-let zero = `zero
-let deg x = `deg x
-let rad x = `rad x
-let grad x = `grad x
-let turn x = `turn x
-let ltr = `ltr
-let rtl = `rtl
+let pct = Percentage.pct
+let num = Length.num
+let ch = Length.ch
+let cm = Length.cm
+let em = Length.em
+let ex = Length.ex
+let mm = Length.mm
+let pt = Length.pt
+let px = Length.px
+let pxFloat = Length.pxFloat
+let rem = Length.rem
+let vh = Length.vh
+let vw = Length.vw
+let vmin = Length.vmin
+let vmax = Length.vmax
+let zero = Length.zero
+let fr = TrackBreadth.fr
+let deg = Angle.deg
+let rad = Angle.rad
+let grad = Angle.grad
+let turn = Angle.turn
+let ltr = Direction.ltr
+let rtl = Direction.rtl
 let absolute = PropertyPosition.absolute
 let relative = PropertyPosition.relative
 let static = PropertyPosition.static
 let fixed = PropertyPosition.fixed
 let sticky = PropertyPosition.sticky
-let isolate = `isolate
+let isolate = Isolation.isolate
 let horizontal = Resize.horizontal
 let vertical = Resize.vertical
 let smallCaps = FontVariant.smallCaps
@@ -96,9 +99,16 @@ let repeatingLinearGradient = Gradient.repeatingLinearGradient
 let radialGradient = Gradient.radialGradient
 let repeatingRadialGradient = Gradient.repeatingRadialGradient
 let conicGradient = Gradient.conicGradient
+let area = ExplicitTrackWithArea.area
 let areas = GridTemplateAreas.areas
-let ident = GridArea.ident
-let numIdent = GridArea.numIdent
+let trackSizes = GridAutoColumns.trackSizes
+let tracks = GridTemplateRows.Value.tracks
+let numInt = GridLine.numInt
+let ident = GridLine.ident
+let numIntIdent = GridLine.numIntIdent
+let spanNumInt = GridLine.spanNumInt
+let spanIdent = GridLine.spanIdent
+let spanNumIntIdent = GridLine.spanNumIntIdent
 let contextMenu = Cursor.contextMenu
 let help = Cursor.help
 let pointer = Cursor.pointer
@@ -131,8 +141,6 @@ let neswResize = Cursor.neswResize
 let nwseResize = Cursor.nwseResize
 let zoomIn = Cursor.zoomIn
 let zoomOut = Cursor.zoomOut
-let vw x = `vw x
-let fr x = `fr x
 
 module Calc = struct
   let ( - ) a b = `calc (`sub (a, b))
@@ -140,7 +148,7 @@ module Calc = struct
   let ( * ) a b = `calc (`mult (a, b))
 end
 
-let size x y = `size (x, y)
+let size = BackgroundSize.size
 let all = `all
 let backwards = `backwards
 let baseline = `baseline
@@ -186,12 +194,13 @@ let space = `space
 let nowrap = `nowrap
 let paddingBox = `paddingBox
 let paused = `paused
+let repeatFn = Repeat.repeatFn
 let repeat = `repeat
-let minmax = `minmax
+let minmax = MinMax.minmax
 let repeatX = `repeatX
 let repeatY = `repeatY
-let rotate a = `rotate a
-let rotate3d x y z a = `rotate3d (x, y, z, a)
+let rotate = Transform.rotate
+let rotate3d = Transform.rotate3d
 let row = `row
 let rowReverse = `rowReverse
 let running = `running
@@ -200,7 +209,7 @@ let spaceAround = `spaceAround
 let spaceBetween = `spaceBetween
 let spaceEvenly = `spaceEvenly
 let stretch = `stretch
-let url x = `url x
+let url = Url.url
 let wrap = `wrap
 let wrapReverse = `wrapReverse
 let inside = `inside
@@ -231,6 +240,7 @@ let fill = `fill
 let maxContent = `maxContent
 let minContent = `minContent
 let fitContent = `fitContent
+let fitContentFn = TrackSize.fitContentFn
 let round = `round
 let miter = `miter
 let bevel = `bevel
@@ -244,6 +254,8 @@ let panUp = `panUp
 let panDown = `panDown
 let pinchZoom = `pinchZoom
 let manipulation = `manipulation
+let subgrid = Track.subgrid
+let lineNames = Track.lineNames
 
 module Shadow = struct
   type box = Css_types.Shadow.box Css_types.Shadow.t
@@ -260,7 +272,7 @@ end
 
 module Transition = struct
   (* backwards compatibility *)
-  let shorthand = Css_types.Transition.make
+  let shorthand = Css_types.Transition.Value.make
 end
 
 type animationName = AnimationName.t

@@ -73,6 +73,7 @@ module Types = {
   and percentage = float
   and ident = string
   and custom_ident = string
+  and custom_ident_without_span_or_auto = string
   and url = string
   and hex_color = string
   and interpolation = list(string)

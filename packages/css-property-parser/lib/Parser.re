@@ -111,7 +111,9 @@ and bg_layer = [%value.rec
   "<bg-image> || <bg-position> [ '/' <bg-size> ]? || <repeat-style> || <attachment> || <box> || <box>"
 ]
 and bg_position = [%value.rec
-  "'left' | 'center' | 'right' | 'top' | 'bottom' | <extended-length> | <extended-percentage> | [ 'left' | 'center' | 'right' | <extended-length> | <extended-percentage> ] [ 'top' | 'center' | 'bottom' | <extended-length> | <extended-percentage> ] | [ 'center' | [ 'left' | 'right' ] [ <extended-length> | <extended-percentage> ]? ] && [ 'center' | [ 'top' | 'bottom' ] [ <extended-length> | <extended-percentage> ]? ]"
+  "[ 'left' | 'center' | 'right' | 'top' | 'bottom' | <length-percentage> ]
+  | [ 'left' | 'center' | 'right' | <length-percentage> ] [ 'top' | 'center' | 'bottom' | <length-percentage> ]
+  | [ 'center' | [ 'left' | 'right' ] <length-percentage>? ] && [ 'center' | [ 'top' | 'bottom' ] <length-percentage>? ]"
 ]
 /* one_bg_size isn't part of the spec, helps us with Type generation */
 and one_bg_size = [%value.rec
@@ -443,7 +445,7 @@ and gradient = [%value.rec
   "<linear-gradient()> | <repeating-linear-gradient()> | <radial-gradient()> | <repeating-radial-gradient()> | <conic-gradient()> | <-legacy-gradient>"
 ]
 and grid_line = [%value.rec
-  "'auto' | <custom-ident> | <integer> && [ <custom-ident> ]? | 'span' && [ <integer> || <custom-ident> ]"
+  "<custom-ident-without-span-or-auto> | <integer> && [ <custom-ident-without-span-or-auto> ]? | 'span' && [ <integer> || <custom-ident-without-span-or-auto> ] | 'auto'"
 ]
 and historical_lig_values = [%value.rec
   "'historical-ligatures' | 'no-historical-ligatures'"
@@ -551,7 +553,10 @@ and paint = [%value.rec
   "'none' | <color> | <url> [ 'none' | <color> ]? | 'context-fill' | 'context-stroke' | <interpolation>"
 ]
 and position = [%value.rec
-  "[ 'left' | 'center' | 'right' ] || [ 'top' | 'center' | 'bottom' ] | [ 'left' | 'center' | 'right' | <extended-length> | <extended-percentage> ] [ 'top' | 'center' | 'bottom' | <extended-length> | <extended-percentage> ]? | [ 'left' | 'right' ] [<extended-length> | <extended-percentage>] && [ 'top' | 'bottom' ] [<extended-length> | <extended-percentage>]"
+  "[ 'left' | 'center' | 'right' | 'top' | 'bottom' | <length-percentage> ]
+  | [ 'left' | 'center' | 'right' ] && [ 'top' | 'center' | 'bottom' ]
+  | [ 'left' | 'center' | 'right' | <length-percentage> ] [ 'top' | 'center' | 'bottom' | <length-percentage> ]
+  | [ [ 'left' | 'right' ] <length-percentage> ] && [ [ 'top' | 'bottom' ] <length-percentage> ]"
 ]
 and positive_integer = [%value.rec "<integer>"]
 and property__moz_appearance = [%value.rec
@@ -1107,7 +1112,7 @@ and property_font_stretch = [%value.rec "<font-stretch-absolute>"]
 and property_font_style = [%value.rec
   "'normal' | 'italic' | 'oblique' | <interpolation> | [ 'oblique' <extended-angle> ]?"
 ]
-and property_font_synthesis = [%value.rec "'none' | 'weight' || 'style'"]
+and property_font_synthesis = [%value.rec "'none' | [ 'weight' || 'style' || 'small-caps' || 'position' ]"]
 and property_font_synthesis_weight = [%value.rec "'auto' | 'none'"]
 and property_font_synthesis_style = [%value.rec "'auto' | 'none'"]
 and property_font_synthesis_small_caps = [%value.rec "'auto' | 'none'"]
@@ -1144,11 +1149,13 @@ and property_gap = [%value.rec "<'row-gap'> [ <'column-gap'> ]?"]
 and property_glyph_orientation_horizontal = [%value.rec "<extended-angle>"]
 and property_glyph_orientation_vertical = [%value.rec "<extended-angle>"]
 and property_grid = [%value.rec
-  "<'grid-template'> | <'grid-template-rows'> '/' [ 'auto-flow' && [ 'dense' ]? ] [ <'grid-auto-columns'> ]? | [ 'auto-flow' && [ 'dense' ]? ] [ <'grid-auto-rows'> ]? '/' <'grid-template-columns'>"
+  "<'grid-template'>
+  | <'grid-template-rows'> '/' [ 'auto-flow' && [ 'dense' ]? ] [ <'grid-auto-columns'> ]?
+  | [ 'auto-flow' && [ 'dense' ]? ] [ <'grid-auto-rows'> ]? '/' <'grid-template-columns'>"
 ]
 and property_grid_area = [%value.rec "<grid-line> [ '/' <grid-line> ]{0,3}"]
 and property_grid_auto_columns = [%value.rec "[ <track-size> ]+"]
-and property_grid_auto_flow = [%value.rec "[ 'row' | 'column' ] || 'dense'"]
+and property_grid_auto_flow = [%value.rec "[ [ 'row' | 'column' ] || 'dense' ] | <interpolation>"]
 and property_grid_auto_rows = [%value.rec "[ <track-size> ]+"]
 and property_grid_column = [%value.rec "<grid-line> [ '/' <grid-line> ]?"]
 and property_grid_column_end = [%value.rec "<grid-line>"]
@@ -1168,12 +1175,12 @@ and property_grid_row_start = [%value.rec "<grid-line>"]
 and property_grid_template = [%value.rec
   "'none' | <'grid-template-rows'> '/' <'grid-template-columns'> | [ [ <line-names> ]? <string> [ <track-size> ]? [ <line-names> ]? ]+ [ '/' <explicit-track-list> ]?"
 ]
-and property_grid_template_areas = [%value.rec "'none' | [ <string> ]+"]
+and property_grid_template_areas = [%value.rec "'none' | [ <string> | <interpolation> ]+"]
 and property_grid_template_columns = [%value.rec
-  "'none' | <track-list> | <auto-track-list> | 'subgrid' [ <line-name-list> ]? | <interpolation>"
+  "'none' | <track-list> | <auto-track-list> | 'subgrid' [ <line-name-list> ]? | 'masonry' | <interpolation>"
 ]
 and property_grid_template_rows = [%value.rec
-  "'none' | <track-list> | <auto-track-list> | 'subgrid' [ <line-name-list> ]? | <interpolation>"
+  "'none' | <track-list> | <auto-track-list> | 'subgrid' [ <line-name-list> ]? | 'masonry' | <interpolation>"
 ]
 and property_hanging_punctuation = [%value.rec
   "'none' | 'first' || [ 'force-end' | 'allow-end' ] || 'last'"
@@ -1313,6 +1320,7 @@ and property_mask_position = [%value.rec "[ <position> ]#"]
 and property_mask_repeat = [%value.rec "[ <repeat-style> ]#"]
 and property_mask_size = [%value.rec "[ <bg-size> ]#"]
 and property_mask_type = [%value.rec "'luminance' | 'alpha'"]
+and property_masonry_auto_flow = [%value.rec "[ 'pack' | 'next' ] || [ 'definite-first' | 'ordered' ]"]
 and property_max_block_size = [%value.rec "<'max-width'>"]
 and property_max_height = [%value.rec
   "'auto' | <extended-length> | <extended-percentage> | 'min-content' | 'max-content' | 'fit-content' | fit-content( <extended-length> | <extended-percentage> )"
@@ -1407,7 +1415,7 @@ and property_overflow_anchor = [%value.rec "'auto' | 'none'"]
 and property_overflow_block = [%value.rec
   "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"
 ]
-and property_overflow_clip_box = [%value.rec "'padding-box' | 'content-box'"]
+and property_overflow_clip_margin = [%value.rec "<visual-box> || <extended-length>"]
 and property_overflow_inline = [%value.rec
   "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"
 ]
@@ -1415,10 +1423,10 @@ and property_overflow_wrap = [%value.rec
   "'normal' | 'break-word' | 'anywhere'"
 ]
 and property_overflow_x = [%value.rec
-  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto'"
+  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"
 ]
 and property_overflow_y = [%value.rec
-  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto'"
+  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"
 ]
 and property_overscroll_behavior = [%value.rec
   "[ 'contain' | 'none' | 'auto' ]{1,2}"
@@ -1511,7 +1519,7 @@ and property_ruby_merge = [%value.rec "'separate' | 'collapse' | 'auto'"]
 and property_ruby_position = [%value.rec
   "'over' | 'under' | 'inter-character'"
 ]
-and property_scale = [%value.rec "'none' | [ <number> ]{1,3}"]
+and property_scale = [%value.rec "'none' | [ <number-percentage> ]{1,3}"]
 and property_scroll_behavior = [%value.rec "'auto' | 'smooth'"]
 and property_scroll_margin = [%value.rec "[ <extended-length> ]{1,4}"]
 and property_scroll_margin_block = [%value.rec "[ <extended-length> ]{1,2}"]
@@ -1637,7 +1645,7 @@ and property_text_combine_upright = [%value.rec
   "'none' | 'all' | 'digits' [ <integer> ]?"
 ]
 and property_text_decoration = [%value.rec
-  "[ <'text-decoration-line'>] [<'text-decoration-style'>]? [<'text-decoration-color'>]?"
+  "<'text-decoration-color'> || <'text-decoration-style'> || <'text-decoration-thickness'> || <'text-decoration-line'>"
 ]
 and property_text_justify_trim = [%value.rec "'none' | 'all' | 'auto'"]
 and property_text_kashida = [%value.rec
@@ -1649,7 +1657,7 @@ and property_text_decoration_color = [%value.rec "<color>"]
 /* and this definition has changed from the origianl, it might be a bug on the spec or our Generator,
    but simplifying to "|" simplifies it and solves the bug */
 and property_text_decoration_line = [%value.rec
-  "'none' | <interpolation> | [ 'underline' | 'overline' | 'line-through' | 'blink' ]{1,2}"
+  "'none' | <interpolation> | [ 'underline' || 'overline' || 'line-through' || 'blink' ]"
 ]
 and property_text_decoration_skip = [%value.rec
   "'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' ] || 'edges' || 'box-decoration'"
@@ -1719,20 +1727,22 @@ and property_transform_box = [%value.rec
   "'content-box' | 'border-box' | 'fill-box' | 'stroke-box' | 'view-box'"
 ]
 and property_transform_origin = [%value.rec
-  "<extended-length> | <extended-percentage> | 'left' | 'center' | 'right' | 'top' | 'bottom' | [ [ <extended-length> | <extended-percentage> | 'left' | 'center' | 'right' ] && [ <extended-length> | <extended-percentage> | 'top' | 'center' | 'bottom' ] ] [ <extended-length> ]?"
+  "[ 'left' | 'center' | 'right' | 'top' | 'bottom' | <length-percentage> ]
+  | [ 'left' | 'center' | 'right' | <length-percentage> ] [ 'top' | 'center' | 'bottom' | <length-percentage> ] <length>?
+  | [[ 'center' | 'left' | 'right' ] && [ 'center' | 'top' | 'bottom' ]] <length>? "
 ]
 and property_transform_style = [%value.rec "'flat' | 'preserve-3d'"]
 and property_transition = [%value.rec
-  "[ <single-transition> | <single-transition-no-interp> ]# | <interpolation>"
+  "[ <single-transition> | <single-transition-no-interp> ]#"
 ]
 and property_transition_delay = [%value.rec "[ <extended-time> ]#"]
 and property_transition_duration = [%value.rec "[ <extended-time> ]#"]
 and property_transition_property = [%value.rec
-  "'none' | [ <single-transition-property> ]#"
+  "[ <single-transition-property> ]# | 'none'"
 ]
 and property_transition_timing_function = [%value.rec "[ <timing-function> ]#"]
 and property_translate = [%value.rec
-  "'none' | <extended-length> | <extended-percentage> [ <extended-length> | <extended-percentage> [ <extended-length> ]? ]?"
+  "'none' | <length-percentage> [ <length-percentage> <length>? ]?"
 ]
 and property_unicode_bidi = [%value.rec
   "'normal' | 'embed' | 'isolate' | 'bidi-override' | 'isolate-override' | 'plaintext' | '-moz-isolate' | '-moz-isolate-override' | '-moz-plaintext' | '-webkit-isolate'"
@@ -1850,7 +1860,8 @@ and single_transition_no_interp = [%value.rec
   "[ <single-transition-property-no-interp> | 'none' ] || <extended-time-no-interp> || <timing-function-no-interp> || <extended-time-no-interp>"
 ]
 and single_transition = [%value.rec
-  "[ [<single-transition-property> | 'none'] <extended-time> ]
+  "[<single-transition-property> | 'none']
+  | [ [<single-transition-property> | 'none'] <extended-time> ]
   | [ [<single-transition-property> | 'none'] <extended-time> <timing-function> ]
   | [ [<single-transition-property> | 'none'] <extended-time> <timing-function> <extended-time> ]"
 ]
@@ -1957,6 +1968,7 @@ and type_selector = [%value.rec "<wq-name> | [ <ns-prefix> ]? '*'"]
 and viewport_length = [%value.rec
   "'auto' | <extended-length> | <extended-percentage>"
 ]
+and visual_box = [%value.rec "'content-box' | 'padding-box' | 'border-box'"]
 and wq_name = [%value.rec "[ <ns-prefix> ]? <ident-token>"]
 and x = [%value.rec "<number>"]
 and y = [%value.rec "<number>"];
@@ -3043,6 +3055,7 @@ let check_map =
       ("property-mask-repeat", check(property_mask_repeat)),
       ("property-mask-size", check(property_mask_size)),
       ("property-mask-type", check(property_mask_type)),
+      ("property-masonry-auto-flow", check(property_masonry_auto_flow)),
       ("property-max-block-size", check(property_max_block_size)),
       ("property-max-height", check(property_max_height)),
       ("property-max-inline-size", check(property_max_inline_size)),
@@ -3072,7 +3085,7 @@ let check_map =
       ("property-overflow", check(property_overflow)),
       ("property-overflow-anchor", check(property_overflow_anchor)),
       ("property-overflow-block", check(property_overflow_block)),
-      ("property-overflow-clip-box", check(property_overflow_clip_box)),
+      ("property-overflow-clip-margin", check(property_overflow_clip_margin)),
       ("property-overflow-inline", check(property_overflow_inline)),
       ("property-overflow-wrap", check(property_overflow_wrap)),
       ("property-overflow-x", check(property_overflow_x)),

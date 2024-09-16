@@ -82,3 +82,7 @@ module Option = struct
 
   let map ~f opt = match opt with Some x -> Some (f x) | None -> None
 end
+
+module Fun = struct
+  let id = Fun.id
+end

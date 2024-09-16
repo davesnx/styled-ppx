@@ -60,10 +60,12 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|maskRepeat|js}, {js|space no-repeat|js});
   CSS.unsafe({js|maskRepeat|js}, {js|round no-repeat|js});
   CSS.unsafe({js|maskRepeat|js}, {js|no-repeat no-repeat|js});
-  CSS.unsafe({js|maskPosition|js}, {js|center|js});
-  CSS.unsafe({js|maskPosition|js}, {js|center center|js});
-  CSS.unsafe({js|maskPosition|js}, {js|left 50%|js});
-  CSS.unsafe({js|maskPosition|js}, {js|bottom 10px right 20px|js});
+  CSS.maskPositions([|`center|]);
+  CSS.maskPositions([|`hv((`center, `center))|]);
+  CSS.maskPositions([|`hv((`left, `percent(50.)))|]);
+  CSS.maskPositions([|
+    `hvOffset((`right, `pxFloat(20.), `bottom, `pxFloat(10.))),
+  |]);
   CSS.unsafe({js|maskClip|js}, {js|border-box|js});
   CSS.unsafe({js|maskClip|js}, {js|padding-box|js});
   CSS.unsafe({js|maskClip|js}, {js|content-box|js});

@@ -63,10 +63,10 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|offsetPosition|js}, {js|200px|js});
   CSS.unsafe({js|offsetPosition|js}, {js|200px 100px|js});
   CSS.unsafe({js|offsetPosition|js}, {js|center|js});
-  CSS.unsafe({js|offsetAnchor|js}, {js|auto|js});
-  CSS.unsafe({js|offsetAnchor|js}, {js|200px|js});
-  CSS.unsafe({js|offsetAnchor|js}, {js|200px 100px|js});
-  CSS.unsafe({js|offsetAnchor|js}, {js|center|js});
+  CSS.offsetAnchor(`auto);
+  CSS.offsetAnchor(`pxFloat(200.));
+  CSS.offsetAnchor(`hv((`pxFloat(200.), `pxFloat(100.))));
+  CSS.offsetAnchor(`center);
   CSS.unsafe({js|offsetRotate|js}, {js|auto|js});
   CSS.unsafe({js|offsetRotate|js}, {js|0deg|js});
   CSS.unsafe({js|offsetRotate|js}, {js|reverse|js});
