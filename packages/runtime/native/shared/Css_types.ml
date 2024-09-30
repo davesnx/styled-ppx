@@ -4066,13 +4066,17 @@ end
 
 module URange = struct
   type t =
-    [ `single of string | `range of string * string | `wildcard of string * string ] array
+    [ `single of string
+    | `range of string * string
+    | `wildcard of string * string
+    ]
+    array
 
   let toString (x : t) =
     Kloth.Array.map_and_join
       ~f:(function
         | `single x -> "U+" ^ x
-        | `range (x, y) -> "U" ^ x ^ "-" ^ y
+        | `range (x, y) -> "U+" ^ x ^ "-" ^ y
         | `wildcard (x, y) -> "U+" ^ x ^ y)
       ~sep:{js|, |js} x
 end
