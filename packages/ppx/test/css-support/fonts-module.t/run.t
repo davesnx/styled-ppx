@@ -155,3 +155,10 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|fontFeatureSettings|js}, {js|'smcp' on|js});
   CSS.unsafe({js|fontFeatureSettings|js}, {js|'liga' off|js});
   CSS.unsafe({js|fontFeatureSettings|js}, {js|'smcp', 'swsh' 2|js});
+  CSS.unicode_range([|`single({js|3FF|js})|]);
+  CSS.unicode_range([|`wildcard(({js|4|js}, {js|??|js}))|]);
+  CSS.unicode_range([|`range(({js|0025|js}, {js|00FF|js}))|]);
+  CSS.unicode_range([|
+    `range(({js|0025|js}, {js|00FF|js})),
+    `single({js|0025|js}),
+  |]);

@@ -80,6 +80,8 @@ let line_names: Rule.rule((unit, list(string), unit));
 
 let flex_value: Rule.rule([> | `Fr(float)]);
 
+let urange: Rule.rule([> | `Single(string) | `Range(string, string) | `Wildcard(string, string)]);
+
 let invalid: Rule.rule(unit);
 
 let attr_name: Rule.rule(unit);
@@ -121,8 +123,6 @@ let y: Rule.rule(unit);
 let x: Rule.rule(unit);
 
 let decibel: Rule.rule(unit);
-
-let urange: Rule.rule(unit);
 
 let semitones: Rule.rule(unit);
 

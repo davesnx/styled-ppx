@@ -276,6 +276,23 @@ let flex_value =
     | _ => Error(["expected flex_value"]),
   );
 
+let urange =
+  token(
+    fun
+    | UNICODE(range) => {
+        Ok(`Single(range));
+      }
+    | UNICODE_WILDCARD(hex, wildcard) => {
+        Ok(`Wildcard(hex, wildcard));
+      }
+    | UNICODE_RANGE(start, end_) => {
+        Ok(`Range(start, end_));
+      }
+    | _ => {
+        Error(["expected urange"]);
+      },
+  );
+
 // TODO: workarounds
 let invalid = expect(STRING("not-implemented"));
 let attr_name = invalid;
@@ -298,6 +315,5 @@ let declaration = invalid;
 let y = invalid;
 let x = invalid;
 let decibel = invalid;
-let urange = invalid;
 let semitones = invalid;
 let url_token = invalid;

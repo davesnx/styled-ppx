@@ -33,10 +33,11 @@ let hex_digit = [%sedlex.regexp? digit | 'A' .. 'F' | 'a' .. 'f'];
 
 let up_to_6_hex_digits = [%sedlex.regexp? Rep(hex_digit, 1 .. 6)];
 
-let unicode = [%sedlex.regexp? ('\\', up_to_6_hex_digits, Opt(whitespace))];
+let unicode = [%sedlex.regexp? (up_to_6_hex_digits, Opt(whitespace))];
+
+let unicode_wildcard = [%sedlex.regexp? Rep(hex_digit | '?', 1 .. 6)];
 
 let unicode_range = [%sedlex.regexp?
-  Rep(hex_digit | '?', 1 .. 6) |
   (up_to_6_hex_digits, '-', up_to_6_hex_digits)
 ];
 
@@ -816,6 +817,24 @@ let consume_numeric = lexbuf => {
   };
 };
 
+let extract_unicode_parts = lexbuf => {
+  let unicode_str =
+    String.sub(lexeme(lexbuf), 2, String.length(lexeme(lexbuf)) - 2);
+
+  let (hex, wildcard) = String.fold_left(
+    ((hex_acc, wildcard_acc), char) => 
+      switch (char) {
+      | '0'..'9' | 'A'..'F' | 'a'..'f' => (hex_acc ++ String.make(1, char), wildcard_acc)
+      | '?' => (hex_acc, wildcard_acc ++ "?")
+      | _ => (hex_acc, wildcard_acc) // Ignore other characters
+      },
+    ("", ""),
+    unicode_str
+  );
+
+  Ok(Tokens.UNICODE_WILDCARD(hex, wildcard));
+};
+
 let consume = lexbuf => {
   let consume_hash = () =>
     switch%sedlex (lexbuf) {
@@ -849,6 +868,21 @@ let consume = lexbuf => {
     };
   switch%sedlex (lexbuf) {
   | whitespace => Ok(consume_whitespace_(lexbuf))
+  | (_u, '+', unicode) =>
+    Ok(
+      UNICODE(
+        String.sub(lexeme(lexbuf), 2, String.length(lexeme(lexbuf)) - 2),
+      ),
+    )
+  | (_u, '+', unicode_range) =>
+    switch (
+      String.sub(lexeme(lexbuf), 2, String.length(lexeme(lexbuf)) - 2)
+      |> String.split_on_char('-')
+    ) {
+    | [start, end_] => Ok(UNICODE_RANGE(start, end_))
+    | _ => unreachable(lexbuf)
+    }
+  | (_u, '+', unicode_wildcard) => extract_unicode_parts(lexbuf)
   | "\"" => consume_string("\"", lexbuf)
   | "#" => consume_hash()
   | "'" => consume_string("'", lexbuf)
