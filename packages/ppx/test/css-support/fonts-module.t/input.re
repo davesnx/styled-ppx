@@ -130,3 +130,7 @@
 [%css {|font-feature-settings: 'smcp' on|}];
 [%css {|font-feature-settings: 'liga' off|}];
 [%css {|font-feature-settings: 'smcp', 'swsh' 2|}];
+[%css {|unicode-range: U+3FF|}];
+[%css {|unicode-range: U+4??|}];
+[%css {|unicode-range: U+0025-00FF|}];
+[%css {|unicode-range: U+0025-00FF, U+0025|}];
