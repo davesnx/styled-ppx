@@ -35,20 +35,20 @@ module Array = struct
   let flatten a = Array.concat (Array.to_list a)
 end
 
-let render_declaration rule =
-  match rule with
-  (* https://emotion.sh/docs/labels should be ignored on the rendering *)
-  | Rule.Declaration ("label", _value) -> None
-  | Rule.Declaration (property, value) ->
-    Some (Printf.sprintf "%s: %s;" property value)
-  | _ -> None
+let pp_space ppf () = Format.pp_print_char ppf ' '
 
-let render_declarations rules =
+let render_declaration ppf (property, value) =
+  Format.fprintf ppf "%s: %s;" property value
+
+let render_declarations ppf rules =
   rules
   |> Array.map ~f:Autoprefixer.prefix
   |> Array.flatten
-  |> Array.filter_map ~f:render_declaration
-  |> Array.join ~sep:" "
+  |> Array.filter_map ~f:(function
+       | Rule.Declaration ("label", _value) -> None
+       | Rule.Declaration (property, value) -> Some (property, value)
+       | _ -> None)
+  |> Format.pp_print_array ~pp_sep:pp_space render_declaration ppf
 
 let contains_at selector = String.contains selector '@'
 let contains_ampersand selector = String.contains selector '&'
@@ -300,68 +300,66 @@ let resolve_selectors rules =
   let declarations, selectors = unnest_selectors ~prefix:None rules in
   Array.append declarations selectors
 
-let render_keyframes animationName keyframes =
-  let definition =
-    keyframes
-    |> Array.map ~f:(fun (percentage, rules) ->
-           Printf.sprintf "%i%% { %s }" percentage (render_declarations rules))
-    |> Array.join ~sep:" "
+let render_keyframes ppf animationName keyframes =
+  let pp_keyframe ppf (percentage, rules) =
+    Format.fprintf ppf "%d%% { %a }" percentage render_declarations rules
   in
-  Printf.sprintf "@keyframes %s { %s }" animationName definition
+  let pp_keyframes ppf keyframes =
+    Format.pp_print_array ~pp_sep:pp_space pp_keyframe ppf keyframes
+  in
+  Format.fprintf ppf "@keyframes %s { %a }" animationName pp_keyframes keyframes
 
 (* Removes nesting on selectors, uplifts media-queries, runs the autoprefixer *)
-let rec render_rules className rules =
+let rec render_rules ppf className rules =
   let declarations, selectors = split_by_kind (resolve_selectors rules) in
-
-  let declarations =
-    match declarations with
-    | [||] -> ""
-    | _ ->
-      Printf.sprintf ".%s { %s }" className (render_declarations declarations)
-  in
-
-  let selectors =
-    match selectors with
-    | [||] -> ""
-    | _ ->
-      selectors
-      |> Array.filter_map ~f:(render_selectors className)
-      |> Array.join ~sep:" "
-  in
-
-  (* Trimming is necessary to ensure there isn't an empty space when one of `declarations` or `selectors` is empty. *)
-  String.trim @@ String.concat " " [ declarations; selectors ]
+  (match declarations with
+  | [||] -> ()
+  | _ ->
+    Format.fprintf ppf ".%s { %a }" className render_declarations declarations);
+  match selectors with
+  | [||] -> ()
+  | _ ->
+    if Array.length declarations > 0 then pp_space ppf ();
+    selectors
+    |> Array.filter_map ~f:(function
+         | Rule.Selector (_selector, rules) when Array.is_empty rules -> None
+         | Rule.Selector (selector, rules) -> Some (selector, rules)
+         | _ -> None)
+    |> Format.pp_print_array ~pp_sep:pp_space
+         (fun out -> render_selectors out className)
+         ppf
 
 (* Renders all selectors with the hash given *)
-and render_selectors hash rule =
+and render_selectors ppf hash rule =
   match rule with
-  | Rule.Selector (_selector, rules) when Array.is_empty rules -> None
   (* In case of being @media (or any at_rule) render the selector first and declarations with the hash inside *)
-  | Rule.Selector (selector, rules) when contains_at selector ->
-    let nested_selectors = render_rules hash rules in
-    Some (Printf.sprintf "%s { %s }" selector nested_selectors)
-  | Rule.Selector (selector, rules) ->
-    let new_selector = resolve_ampersand hash selector in
-    (* Resolving the ampersand means to replace all ampersands by the hash *)
-    Some (Printf.sprintf "%s { %s }" new_selector (render_declarations rules))
-  (* Declarations aren't there *)
-  | _ -> None
+  | selector, rules when contains_at selector ->
+    Format.fprintf ppf "%s { %a }" selector
+      (fun out -> render_rules out hash)
+      rules
+  | selector, rules ->
+    Format.fprintf ppf "%s { %a }"
+      (resolve_ampersand hash selector)
+      render_declarations rules
 
 (* rules_to_string renders the rule in a format where the hash matches with `@emotion/serialise`. It doesn't render any whitespace. (compared to render_rules) *)
 (* TODO: Ensure Selector is serialised correctly *)
-let rec rules_to_string rules =
-  let buff = Buffer.create 16 in
-  let push = Buffer.add_string buff in
-  let rule_to_string rule =
-    match rule with
-    | Rule.Declaration (property, value) ->
-      push (Printf.sprintf "%s:%s;" property value)
-    | Rule.Selector (selector, rules) ->
-      let rules = rules_to_string rules in
-      push (Printf.sprintf "%s{%s}" selector rules)
+let rules_to_string rules =
+  let b = Buffer.create 1024 in
+  let fmt = Format.formatter_of_buffer b in
+  let rec go ppf rules =
+    let rule_to_string ppf rule =
+      match rule with
+      | Rule.Declaration (property, value) ->
+        Format.fprintf ppf "%s:%s;" property value
+      | Rule.Selector (selector, rules) ->
+        Format.fprintf ppf "%s{%a}" selector go rules
+    in
+    Format.pp_print_array ~pp_sep:(fun _ _ -> ()) rule_to_string ppf rules
   in
-  Array.iter ~f:rule_to_string rules;
-  Buffer.contents buff
+  go fmt rules;
+  Format.pp_print_flush fmt ();
+  Buffer.contents b
 
 type declarations =
   | Globals of rule array
@@ -399,10 +397,14 @@ module Stylesheet = struct
 end
 
 let keyframes_to_string keyframes =
-  let pp_keyframe (percentage, rules) =
-    Printf.sprintf "%d%%{%s}" percentage (rules_to_string rules)
+  let b = Buffer.create 1024 in
+  let fmt = Format.formatter_of_buffer b in
+  let pp_keyframe ppf (percentage, rules) =
+    Format.fprintf ppf "%d%%{%s}" percentage (rules_to_string rules)
   in
-  keyframes |> Array.map ~f:pp_keyframe |> Array.to_list |> String.concat ""
+  Format.pp_print_array ~pp_sep:(fun _ _ -> ()) pp_keyframe fmt keyframes;
+  Format.pp_print_flush fmt ();
+  Buffer.contents b
 
 let render_hash hash styles =
   let is_label = function
@@ -442,24 +444,21 @@ let keyframes (keyframes : (int * rule array) array) =
     Types.AnimationName.make animationName
 
 let get_stylesheet () =
-  Stylesheet.get_all instance
-  |> List.fold_left
-       (fun accumulator (_, rules) ->
-         match rules with
-         | Globals rules ->
-           let new_rules = resolve_selectors rules in
-           let rules = String.trim @@ rules_to_string new_rules in
-           Printf.sprintf "%s %s" accumulator rules
-         | Classnames { className; styles } ->
-           let rules = String.trim @@ render_rules className styles in
-           Printf.sprintf "%s %s" accumulator rules
-         | Keyframes { animationName; keyframes } ->
-           let rules =
-             String.trim @@ render_keyframes animationName keyframes
-           in
-           Printf.sprintf "%s %s" accumulator rules)
-       ""
-  |> String.trim
+  let b = Buffer.create 1024 in
+  let fmt = Format.formatter_of_buffer b in
+  let stylesheet = Stylesheet.get_all instance in
+  let pp_rule ppf (_, rule) =
+    match rule with
+    | Globals rule ->
+      let new_rule = resolve_selectors rule in
+      Format.fprintf ppf "%s" (rules_to_string new_rule)
+    | Classnames { className; styles } -> render_rules ppf className styles
+    | Keyframes { animationName; keyframes } ->
+      render_keyframes ppf animationName keyframes
+  in
+  Format.pp_print_list ~pp_sep:pp_space pp_rule fmt stylesheet;
+  Format.pp_print_flush fmt ();
+  Buffer.contents b
 
 let get_string_style_hashes () =
   Stylesheet.get_all instance
@@ -478,14 +477,15 @@ let style_tag ?key:_ ?children:_ () =
     []
 
 (* This method is a Css_type function, but with side-effects. It pushes the fontFace as global style *)
-let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
-    =
+let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust
+  ?unicodeRange () =
   let fontFace =
     [|
       Kloth.Option.map ~f:Declarations.fontStyle fontStyle;
       Kloth.Option.map ~f:Declarations.fontWeight fontWeight;
       Kloth.Option.map ~f:Declarations.fontDisplay fontDisplay;
       Kloth.Option.map ~f:Declarations.sizeAdjust sizeAdjust;
+      Kloth.Option.map ~f:Declarations.unicodeRange unicodeRange;
       Some (Declarations.fontFamily fontFamily);
       Some
         (Rule.Declaration

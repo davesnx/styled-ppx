@@ -3156,7 +3156,9 @@ let render_single_transition_no_interp =
      ~timingFunction=?[%e
        render_option(~loc, render_timing_no_interp, timingFunction)
      ],
-     ~property=?[%e render_option(~loc, render_transition_property, property)],
+     ~property=?[%e
+       render_option(~loc, render_transition_property, property)
+     ],
      (),
    )];
 };

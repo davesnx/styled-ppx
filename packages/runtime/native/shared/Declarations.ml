@@ -906,3 +906,5 @@ let fontOpticalSizing x =
 
 let fontVariantEmoji x =
   Rule.declaration ({js|fontVariantEmoji|js}, FontVariantEmoji.toString x)
+
+let unicodeRange x = Rule.declaration ({js|unicodeRange|js}, URange.toString x)

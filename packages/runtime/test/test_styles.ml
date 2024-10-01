@@ -408,6 +408,21 @@ let global =
   let css = get_string_style_rules () in
   assert_string css (Printf.sprintf "html{line-height:1.15;}")
 
+let fontFace =
+  test "global" @@ fun () ->
+  let _ =
+    CSS.fontFace ~fontFamily:"foo" ~fontWeight:`bold
+      ~src:[| `url "foo.bar" |]
+      ~fontDisplay:`swap ~fontStyle:`normal ()
+      ~unicodeRange:
+        [| `wildcard ("30", "??"); `range ("3040", "309F"); `single "30A0" |]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       "@font-face{font-style:normal;font-weight:700;font-display:swap;unicode-range:U+30??, \
+        U+3040-309F, U+30A0;font-family:\"foo\";src:url(\"foo.bar\");}")
+
 let duplicated_styles_unique =
   test "duplicated_styles_unique" @@ fun () ->
   let classname1 = CSS.style [| CSS.flexGrow 1. |] in
@@ -1046,6 +1061,7 @@ let tests =
       avoid_hash_collision;
       keyframe;
       global;
+      fontFace;
       duplicated_styles_unique;
       style_tag;
       real_world;
