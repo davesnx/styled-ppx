@@ -35,6 +35,8 @@ module Array = struct
   let flatten a = Array.concat (Array.to_list a)
 end
 
+let approximate_chars_in_rules = 50
+
 let render_declaration ~buffer (property, value) =
   Buffer.add_string buffer property;
   Buffer.add_string buffer ": ";
@@ -50,8 +52,8 @@ let render_declarations ~buffer rules =
        | Rule.Declaration (property, value) -> Some (property, value)
        | _ -> None)
   |> Array.iteri ~f:(fun i decl ->
-       if i > 0 then Buffer.add_char buffer ' ';
-       render_declaration ~buffer decl)
+         if i > 0 then Buffer.add_char buffer ' ';
+         render_declaration ~buffer decl)
 
 let contains_at selector = String.contains selector '@'
 let contains_ampersand selector = String.contains selector '&'
@@ -308,11 +310,11 @@ let render_keyframes ~buffer animationName keyframes =
   Buffer.add_string buffer animationName;
   Buffer.add_string buffer " { ";
   Array.iteri keyframes ~f:(fun i (percentage, rules) ->
-    if i > 0 then Buffer.add_char buffer ' ';
-    Buffer.add_string buffer (string_of_int percentage);
-    Buffer.add_string buffer "% { ";
-    render_declarations ~buffer rules;
-    Buffer.add_string buffer " }");
+      if i > 0 then Buffer.add_char buffer ' ';
+      Buffer.add_string buffer (string_of_int percentage);
+      Buffer.add_string buffer "% { ";
+      render_declarations ~buffer rules;
+      Buffer.add_string buffer " }");
   Buffer.add_string buffer " }"
 
 (* Removes nesting on selectors, uplifts media-queries, runs the autoprefixer *)
@@ -336,8 +338,8 @@ let rec render_rules ~buffer className rules =
          | Rule.Selector (selector, rules) -> Some (selector, rules)
          | _ -> None)
     |> Array.iteri ~f:(fun i rule ->
-         if i > 0 then Buffer.add_char buffer ' ';
-         render_selectors ~buffer className rule)
+           if i > 0 then Buffer.add_char buffer ' ';
+           render_selectors ~buffer className rule)
 
 (* Renders all selectors with the hash given *)
 and render_selectors ~buffer hash (selector, rules) =
@@ -355,7 +357,8 @@ and render_selectors ~buffer hash (selector, rules) =
 (* rules_to_string renders the rule in a format where the hash matches with `@emotion/serialise`. It doesn't render any whitespace. (compared to render_rules) *)
 (* TODO: Ensure Selector is serialised correctly *)
 let rules_to_string rules =
-  let buffer = Buffer.create 1024 in
+  let initial_size = Array.length rules * approximate_chars_in_rules in
+  let buffer = Buffer.create initial_size in
   let rec go rules =
     Array.iter rules ~f:(function
       | Rule.Declaration (property, value) ->
@@ -410,11 +413,11 @@ end
 let keyframes_to_string keyframes =
   let buffer = Buffer.create 1024 in
   Array.iteri keyframes ~f:(fun i (percentage, rules) ->
-    if i > 0 then Buffer.add_char buffer ' ';
-    Buffer.add_string buffer (string_of_int percentage);
-    Buffer.add_string buffer "%{";
-    Buffer.add_string buffer (rules_to_string rules);
-    Buffer.add_char buffer '}');
+      if i > 0 then Buffer.add_char buffer ' ';
+      Buffer.add_string buffer (string_of_int percentage);
+      Buffer.add_string buffer "%{";
+      Buffer.add_string buffer (rules_to_string rules);
+      Buffer.add_char buffer '}');
   Buffer.contents buffer
 
 let render_hash hash styles =
@@ -456,16 +459,20 @@ let keyframes (keyframes : (int * rule array) array) =
 
 let get_stylesheet () =
   let stylesheet = Stylesheet.get_all instance in
-  let buffer = Buffer.create ((List.length stylesheet) * 50) in
-  List.iteri (fun i (_, rule) ->
-    if i > 0 then Buffer.add_char buffer ' ';
-    match rule with
-    | Globals rule ->
-      let new_rule = resolve_selectors rule in
-      Buffer.add_string buffer (rules_to_string new_rule)
-    | Classnames { className; styles } -> render_rules ~buffer className styles
-    | Keyframes { animationName; keyframes } ->
-      render_keyframes ~buffer animationName keyframes) stylesheet;
+  let initial_size = List.length stylesheet * approximate_chars_in_rules in
+  let buffer = Buffer.create initial_size in
+  List.iteri
+    (fun i (_, rule) ->
+      if i > 0 then Buffer.add_char buffer ' ';
+      match rule with
+      | Globals rule ->
+        let new_rule = resolve_selectors rule in
+        Buffer.add_string buffer (rules_to_string new_rule)
+      | Classnames { className; styles } ->
+        render_rules ~buffer className styles
+      | Keyframes { animationName; keyframes } ->
+        render_keyframes ~buffer animationName keyframes)
+    stylesheet;
   Buffer.contents buffer
 
 let get_string_style_hashes () =
