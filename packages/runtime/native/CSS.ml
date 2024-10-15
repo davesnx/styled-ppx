@@ -444,9 +444,10 @@ let keyframes (keyframes : (int * rule array) array) =
     Types.AnimationName.make animationName
 
 let get_stylesheet () =
-  let b = Buffer.create 1024 in
-  let fmt = Format.formatter_of_buffer b in
   let stylesheet = Stylesheet.get_all instance in
+  let stylesheet_size = List.length stylesheet in
+  let b = Buffer.create (stylesheet_size * 50) in
+  let fmt = Format.formatter_of_buffer b in
   let pp_rule ppf (_, rule) =
     match rule with
     | Globals rule ->
