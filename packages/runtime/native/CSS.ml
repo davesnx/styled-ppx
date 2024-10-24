@@ -412,8 +412,7 @@ end
 
 let keyframes_to_string keyframes =
   let buffer = Buffer.create 1024 in
-  Array.iteri keyframes ~f:(fun i (percentage, rules) ->
-      if i > 0 then Buffer.add_char buffer ' ';
+  Array.iter keyframes ~f:(fun (percentage, rules) ->
       Buffer.add_string buffer (string_of_int percentage);
       Buffer.add_string buffer "%{";
       Buffer.add_string buffer (rules_to_string rules);
