@@ -78,6 +78,11 @@ module Types = {
   and interpolation = list(string)
   and flex_value = [ | `Fr(float)]
   and line_names = (unit, list(string), unit)
+  and urange = [
+    | `Single(string)
+    | `Range(string, string)
+    | `Wildcard(string, string)
+  ]
   and ident_token = unit
   and function_token = unit
   and string_token = unit
@@ -87,7 +92,6 @@ module Types = {
   and declaration_value = unit
   and zero = unit
   and decibel = unit
-  and urange = unit
   and semitones = unit
   and an_plus_b = unit;
 };

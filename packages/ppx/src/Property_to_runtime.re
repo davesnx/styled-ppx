@@ -4905,6 +4905,22 @@ let text_orientation =
 
 let touch_action = unsupportedProperty(Property_parser.property_touch_action);
 
+let unicode_range =
+  monomorphic(
+    Property_parser.property_unicode_range,
+    (~loc) => [%expr CSS.unicode_range],
+    (~loc, value) =>
+      Builder.pexp_array(
+        ~loc,
+        List.map(
+        fun
+        | `Single(v) => [%expr `single([%e render_string(~loc, v)])]
+        | `Range(v1, v2) => [%expr `range([%e render_string(~loc, v1)], [%e render_string(~loc, v2)])]
+        | `Wildcard(v1, v2) => [%expr `wildcard([%e render_string(~loc, v1)], [%e render_string(~loc, v2)])]
+        , value),
+      ),
+  );
+
 let user_select =
   monomorphic(
     Property_parser.property_user_select,
@@ -5311,6 +5327,7 @@ let properties = [
   ("transition-timing-function", found(transition_timing_function)),
   ("transition", found(transition)),
   ("translate", found(translate)),
+  ("unicode-range", found(unicode_range)),
   ("user-select", found(user_select)),
   ("vertical-align", found(vertical_align)),
   ("visibility", found(visibility)),
