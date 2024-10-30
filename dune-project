@@ -26,7 +26,7 @@
  (description
   "styled-ppx is the ppx that brings styled components to ReScript and Melange, allowing you to create React Components with type-safe style definitions using CSS.")
   (depends
-   (ocaml (>= 5.1.0))
+   (ocaml (>= 5.2.0))
    (reason (>= 3.11.0))
    (menhir (>= 20220210))
    (ppx_deriving (>= 5.0))
