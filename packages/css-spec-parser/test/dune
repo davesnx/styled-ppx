@@ -1,9 +1,9 @@
 (test
- (name CSSSpecParserTest)
+ (name test)
  (libraries styled-ppx.css-spec-parser ppx_deriving.runtime alcotest))
 
 (rule
- (alias test_css_spec_parser)
- (deps CSSSpecParserTest.exe)
+ (alias test-css-spec-parser)
+ (deps test.exe)
  (action
   (run %{deps})))

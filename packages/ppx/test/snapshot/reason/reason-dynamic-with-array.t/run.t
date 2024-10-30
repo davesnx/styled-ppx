@@ -963,12 +963,12 @@
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles = (~size, ~color, _) =>
-      CssJs.style([|
-        CssJs.label("DynamicComponentWithArray"),
-        CssJs.width(`percent(100.)),
-        CssJs.display(`block),
-        (CssJs.color(color): CssJs.rule),
-        (CssJs.width(size): CssJs.rule),
+      CSS.style([|
+        CSS.label("DynamicComponentWithArray"),
+        CSS.width(`percent(100.)),
+        CSS.display(`block),
+        (CSS.color(color): CSS.rule),
+        (CSS.width(size): CSS.rule),
       |]);
     let make = (props: makeProps('color, 'size)) => {
       let className =

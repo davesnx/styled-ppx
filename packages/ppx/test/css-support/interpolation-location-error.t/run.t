@@ -1,7 +1,5 @@
-This test ensures the ppx generates the correct output against styled-ppx.css_native
-If this test fail means that Css_Js_Core or CssJs_Legacy_Core (from styled-ppx.css or styled-ppx.css_native) are not in sync with the ppx
-
-This test only runs against Css_Js_Core from styled-ppx.css_native
+This test ensures the ppx generates the correct output against styled-ppx.native
+If this test fail means that the module is not in sync with the ppx
 
   $ cat > dune-project << EOF
   > (lang dune 3.10)
@@ -10,14 +8,13 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   $ cat > dune << EOF
   > (executable
   >  (name input)
-  >  (libraries styled-ppx.emotion_native styled-ppx.css_native)
+  >  (libraries styled-ppx.native)
   >  (preprocess (pps styled-ppx)))
   > EOF
 
+This test ensures the location of the error is correct
   $ dune build
-  File "input.re", line 2, characters 14-32:
-  2 | let a = [%cx {| display: $(grid); |}];
-                    ^^^^^^^^^^^^^^^^^^
+  File "input.re", line 2, characters 25-32:
   Error: This expression has type [> `gri ]
          but an expression was expected of type
            [< `block
@@ -69,25 +66,6 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
          The second variant type does not allow tag(s) `gri
   [1]
 
-  $ dune describe pp ./input.re.ml | refmt --parse ml --print re
-  [@ocaml.ppx.context
-    {
-      tool_name: "ppx_driver",
-      include_dirs: [],
-      load_path: [],
-      open_modules: [],
-      for_package: None,
-      debug: false,
-      use_threads: false,
-      use_vmthreads: false,
-      recursive_types: false,
-      principal: false,
-      transparent_modules: false,
-      unboxed_types: false,
-      unsafe_string: false,
-      cookies: [],
-    }
-  ];
+  $ dune describe pp ./input.re | sed '1,/^];$/d'
   let grid = `gri;
-  let a =
-    CssJs.style([|CssJs.label("a"), (CssJs.display(grid): CssJs.rule)|]);
+  let a = CSS.style([|CSS.label("a"), (CSS.display(grid): CSS.rule)|]);

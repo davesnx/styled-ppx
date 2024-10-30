@@ -1,0 +1,24 @@
+(executable
+ (name Standalone)
+ (libraries reason_css_parser_ppx ppxlib))
+
+(rule
+ (targets Spec.actual.re)
+ (deps
+  (:pp Standalone.exe)
+  (:input Spec.re))
+ (action
+  (progn
+   (with-stdout-to
+    %{targets}
+    (run refmt --parse re --print ml %{input}))
+   (run ./%{pp} --impl %{targets} -o %{targets})
+   (run refmt --parse ml --print re --in-place %{targets}))))
+
+(rule
+ (alias test-css-spec-types)
+ (deps
+  (file Spec.expected.re)
+  (file Spec.actual.re))
+ (action
+  (diff Spec.expected.re Spec.actual.re)))

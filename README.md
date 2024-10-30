@@ -4,9 +4,9 @@
 
 ![demo](./.github/demo-dark.png#gh-dark-mode-only)![styled-ppx-demo-dark](./.github/demo-light.png#gh-light-mode-only)
 
-**styled-ppx** is a [ppx](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem) and a library that brings styled components to ReScript and Melange. It allows you to create **React Components** with type-safe style definitions that don't rely on a different language ([DSL](https://en.wikipedia.org/wiki/Domain-specific_language)) except CSS, but also can be used without React.
+**styled-ppx** is a [ppx](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem) and a library that brings styled components to ReScript, Melange and Native. Create **React Components** or simply `class` with type-safe style definitions wiht only CSS.
 
-Built on top of [emotion](https://emotion.sh), it allows you to style apps safely, quickly, and performantly - just as you have always done it.
+ Built on top of [emotion](https://emotion.sh), it allows you to style apps safely, quickly, and performantly - just as you always done it.
 
 ## [Documentation](https://styled-ppx.vercel.app)
 

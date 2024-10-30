@@ -1,0 +1,18 @@
+(test
+ (name Runner)
+ (libraries
+  alcotest
+  styled-ppx.css-property-parser
+  reason_css_parser_ppx_lib
+  styled-ppx.css-parser
+  ppxlib
+  ppxlib.astlib
+  fmt)
+ (preprocess
+  (pps reason_css_parser_ppx sedlex.ppx ppxlib.metaquot)))
+
+(rule
+ (alias test-css-property-parser)
+ (deps Runner.exe)
+ (action
+  (run %{deps})))

@@ -1,7 +1,5 @@
-This test ensures the ppx generates the correct output against styled-ppx.css_native
-If this test fail means that Css_Js_Core or CssJs_Legacy_Core (from styled-ppx.css or styled-ppx.css_native) are not in sync with the ppx
-
-This test only runs against Css_Js_Core from styled-ppx.css_native
+This test ensures the ppx generates the correct output against styled-ppx.native
+If this test fail means that the module is not in sync with the ppx
 
   $ cat > dune-project << EOF
   > (lang dune 3.10)
@@ -10,7 +8,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   $ cat > dune << EOF
   > (executable
   >  (name input)
-  >  (libraries styled-ppx.emotion_native styled-ppx.css_native)
+  >  (libraries styled-ppx.native)
   >  (preprocess (pps styled-ppx)))
   > EOF
 
@@ -19,9 +17,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", line 1, characters 9-25:
-  0 |  [%cx {js|display: blocki;|js}];
-               ^^^^^^^^^^^^^^^^
+  File "input.re", line 1, characters 19-25:
   Error: Property 'display' has an invalid value: 'blocki'
   [1]
 
@@ -30,9 +26,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", line 1, characters 21-38:
-  1 |  [%cx {js|width: 100%; display: blocki;|js}];
-                           ^^^^^^^^^^^^^^^^^
+  File "input.re", line 1, characters 32-38:
   Error: Property 'display' has an invalid value: 'blocki'
   [1]
 
@@ -43,9 +37,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", line 2, characters 26-43:
-  1 | .........
-  2 | ................; display: blocki.
+  File "input.re", line 2, characters 27-33:
   Error: Property 'display' has an invalid value: 'blocki'
   [1]
 
@@ -57,9 +49,6 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   > EOF
 
   $ dune build
-  File "input.re", lines 2-3, characters 26-30:
-  1 | .........
-  2 | ................;
-  3 |      display: blocki.
+  File "input.re", line 3, characters 14-20:
   Error: Property 'display' has an invalid value: 'blocki'
   [1]

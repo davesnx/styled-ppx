@@ -6,35 +6,27 @@
 [%css {|overflow-anchor: none|}];
 /* [%css {|overflow-anchor: auto|}]; */
 
-/* Random fixtures */
-
-[%css {|width: calc(50% + 4px)|}];
-[%css {|width: calc(20px - 10px)|}];
-[%css {|width: calc(100vh - calc(2rem + 120px))|}];
-/* [%css {|width: calc(100vh * 2)|}]; */
-[%css
-  {|width: calc(100vh - calc(2rem + calc(2rem + calc(2rem + calc(2rem + 120px)))))|}
-];
-/* [%css {|width: calc(100vh * calc(2rem - calc(2rem * calc(2rem * calc(2rem / 4)))))|}]; */
-
 [%css {|-moz-appearance: textfield;|}];
 [%css {|-webkit-appearance: none;|}];
 [%css {|-webkit-box-orient: vertical;|}];
 
 module Color = {
-  let text = CssJs.hex("444");
+  let text = CSS.hex("444");
+  let background = CSS.hex("333");
 };
+let backgroundString = Color.background |> CSS.Types.Color.toString;
+let colorTextString = Color.text |> CSS.Types.Color.toString;
 
-[%css {|-webkit-box-shadow: inset 0 0 0 1000px $(Color.background);|}];
+[%css {|-webkit-box-shadow: inset 0 0 0 1000px $(backgroundString);|}];
 [%css {|-webkit-line-clamp: 2;|}];
 [%css {|-webkit-overflow-scrolling: touch;|}];
 [%css {|-webkit-tap-highlight-color: transparent;|}];
-[%css {|-webkit-text-fill-color: $(Color.text);|}];
+[%css {|-webkit-text-fill-color: $(colorTextString);|}];
 [%css {|animation: none;|}];
 [%css {|appearance: none;|}];
 [%css {|aspect-ratio: 21 / 8;|}];
 
-let c = CssJs.hex("e15a46");
+let c = CSS.hex("e15a46");
 [%css {|background-color: $(c);|}];
 [%css {|border: none;|}];
 [%css {|bottom: unset;|}];
@@ -125,3 +117,7 @@ let value = `clip;
     background-image: linear-gradient(84deg, #F80 0%, rgba(255, 255, 255, 0.80) 50%, #2A97FF 100%);
   |}
 ];
+
+[%cx {|aspect-ratio: 16 / 9;|}];
+
+[%css {|color: var(--color-link);|}];

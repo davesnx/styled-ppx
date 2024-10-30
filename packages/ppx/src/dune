@@ -1,12 +1,12 @@
 (library
- (name styled_ppx)
+ (name ppx)
  (public_name styled-ppx)
  (kind ppx_rewriter)
  (flags
   (:standard -w -9))
  (libraries
   styled-ppx.css-parser
-  styled-ppx.reason-css-parser
+  styled-ppx.css-property-parser
   styled-ppx.string-interpolation
   sedlex
   ppxlib

@@ -1,11 +1,19 @@
 (test
  (name transform_test)
- (libraries alcotest ppxlib ppxlib.astlib string_interpolation fmt)
+ (flags
+  (:standard -open Alcotest_extra))
+ (libraries
+  alcotest
+  alcotest_extra
+  ppxlib
+  ppxlib.astlib
+  string_interpolation
+  fmt)
  (preprocess
   (pps ppxlib.metaquot)))
 
 (rule
- (alias test_string_interpolation)
+ (alias test-string-interpolation)
  (deps transform_test.exe)
  (action
   (run %{deps})))

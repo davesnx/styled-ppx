@@ -4,9 +4,9 @@ title: Introduction to styled-ppx
 
 ### Typed styled components for ReScript, Melange and Native
 
-**styled-ppx** is a [ppx](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem) and a library that brings styled components to ReScript, Melange and Native. It allows you to create **React Components** with type-safe style definitions that don't rely on a different language ([DSL](https://en.wikipedia.org/wiki/Domain-specific_language)) except CSS, but also can be used without React.
+**styled-ppx** is a [ppx](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem) and a library that brings styled components to ReScript, Melange and Native. Create **React Components** or simply `class` with type-safe style definitions wiht only CSS.
 
-Built on top of [emotion](https://emotion.sh), it allows you to style apps safely, quickly, and performantly - just as you have always done it.
+Built on top of [emotion](https://emotion.sh), it allows you to style apps safely, quickly, and performantly - just as you always done it.
 
 ```rescript
 module Center = %styled.div(`
@@ -31,14 +31,19 @@ module Center = [%styled.div {|
 <Center> {React.string("Hello from the future!")} </Center>;
 ```
 
-## Highlights
+## Feaatures
 
 - Type-safe CSS
 - Component-based styling
-- Implements utilities such as `cx` to generate classNames and `css` to generate `Css.rules`
-- 0 abstraction over standard CSS - it's neither a new language nor a [DSL](https://en.wikipedia.org/wiki/Domain-specific_language)
-- Supports the power of the underlying language: pattern-matching, composition, labelled arguments, etc
-- Integrates with [reason-react], [@resript-react] and [server-reason-react], accordingly
-- Adds labels for better DX
+- Zero abstraction over CSS
+- Supports the power of the underlying language: pattern-matching, composition, labelled arguments, static type-safety.
+- Implements utilities such as `cx` to generate classNames and `css` to generate `Css.rule`
+- Integrates with [@resript-react], [reason-react], and [server-reason-react]
+- It can also work without React
+- Adds labels on the className hashes for better DX
 
-The main part of **styled-ppx** is a ppx. You can learn more about it in [Tarides blog: Introduction to OCaml ppx ecosystem](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem). Generally speaking, they are similar to [babel plugins](https://babeljs.io/docs/en/plugins/). They run before the compilation of your code, to transform your source-code. In this case, expands styled-ppx notations (e.g., `%styled.div{:rescript}` `[%styled.div]{:reason}` or `%cx{:rescript}` `[%cx]{:reason}`) into valid ReScript code.
+The main part of **styled-ppx** is a ppx. Generally speaking, a ppx is the system from OCaml to have some sort of macro. They are similar to [babel plugins](https://babeljs.io/docs/en/plugins/). Run before the compilation of your code, and can transform your source-code.
+
+In this case, expands styled-ppx extensions (e.g., `%styled.div{:rescript}` `[%styled.div]{:reason}` or `%cx{:rescript}` `[%cx]{:reason}`) into valid code.
+
+You can learn more about it in [Tarides blog: Introduction to OCaml ppx ecosystem](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem).

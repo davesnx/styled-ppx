@@ -4,5 +4,5 @@
 
 (cram
  (package styled-ppx)
- (alias test_murmur2)
+ (alias test-murmur2)
  (deps cli_murmur2.exe %{bin:node} ./compare.sh ./emotion-hash.js))

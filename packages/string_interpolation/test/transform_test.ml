@@ -1,4 +1,3 @@
-open Alcotest
 module Pprintast = Ppxlib.Pprintast
 module Location = Ppxlib.Location
 
@@ -14,106 +13,127 @@ let ast =
       (Ppxlib_ast.Pprintast.string_of_expression expected)
       (Ppxlib_ast.Pprintast.string_of_expression actual)
   in
-  testable pp_ast compare
+  Alcotest.testable pp_ast compare
 
-let assert_equal title actual expected = check ast title expected actual
-let test0 () = assert_equal "one char" (transform "x") [%expr {js|x|js}]
+let assert_equal actual expected =
+  Alcotest.check ast "should match" expected actual
 
-let test1 () =
-  assert_equal "dont transform string" (transform "Hello") [%expr {js|Hello|js}]
+let one_char =
+  test "one char" @@ fun () -> assert_equal (transform "x") [%expr {js|x|js}]
 
-let test2 () =
-  assert_equal "dont transform multiple strings" (transform "Hello world")
-    [%expr {js|Hello world|js}]
+let dont_transform_string =
+  test "dont transform string" @@ fun () ->
+  assert_equal (transform "Hello") [%expr {js|Hello|js}]
 
-let test3 () = assert_equal "inline variable" (transform "$(name)") [%expr name]
+let dont_transform_multiple_strings =
+  test "dont transform multiple strings" @@ fun () ->
+  assert_equal (transform "Hello world") [%expr {js|Hello world|js}]
 
-let test4 () =
-  assert_equal "concat string before variable"
-    (transform "Hello $(name)")
-    [%expr {js|Hello |js} ^ name]
+let inline_variable =
+  test "inline variable" @@ fun () ->
+  assert_equal (transform "$(name)") [%expr name]
 
-let test5 () =
-  assert_equal "concat string after variable" (transform "H$(name)")
-    [%expr {js|H|js} ^ name]
+let concat_string_before_variable =
+  test "concat string before variable" @@ fun () ->
+  assert_equal (transform "Hello $(name)") [%expr {js|Hello |js} ^ name]
 
-let test6 () =
-  assert_equal "concat string after variable"
-    (transform "$(name) Hello")
-    [%expr name ^ {js| Hello|js}]
+let concat_char_after_variable =
+  test "concat char after variable" @@ fun () ->
+  assert_equal (transform "H$(name)") [%expr {js|H|js} ^ name]
 
-let test7 () =
-  assert_equal "concat more than one variable"
-    (transform "$(name)$(name)")
-    [%expr name ^ name]
+let concat_string_after_variable =
+  test "concat string after variable" @@ fun () ->
+  assert_equal (transform "$(name) Hello") [%expr name ^ {js| Hello|js}]
 
-let test8 () =
-  assert_equal "concat more than one variable"
+let concat_more_than_one_variable =
+  test "concat more than one variable" @@ fun () ->
+  assert_equal (transform "$(name)$(name)") [%expr name ^ name]
+
+let concat_more_than_one_variable_with_middle =
+  test "concat more than one variable with middle" @@ fun () ->
+  assert_equal
     (transform "$(name) hello $(name)")
     [%expr name ^ {js| hello |js} ^ name]
 
-let test9 () =
-  assert_equal "empty variable"
+let empty_variable =
+  test "empty variable" @@ fun () ->
+  assert_equal
     (transform "$(name) hello $(name) world")
     [%expr name ^ {js| hello |js} ^ name ^ {js| world|js}]
 
-let test10 () =
-  assert_equal "test"
+let random_test =
+  test "random test" @@ fun () ->
+  assert_equal
     (transform "$(name)$(name) : $(name)$(name)")
     [%expr name ^ name ^ {js| : |js} ^ name ^ name]
 
-let test11 () =
-  assert_equal "test" (transform "$(Module.value)") [%expr Module.value]
+let module_access =
+  test "module access" @@ fun () ->
+  assert_equal (transform "$(Module.value)") [%expr Module.value]
 
-let test12 () =
-  assert_equal "test"
+let module_access_with_text =
+  test "module access with text" @@ fun () ->
+  assert_equal
     (transform "$(Module.value) more")
     [%expr Module.value ^ {js| more|js}]
 
-let test13 () = assert_equal "$" (transform {|$|}) [%expr {js|$|js}]
+let simply_a_dollar_sign =
+  test "simply a dollar sign" @@ fun () ->
+  assert_equal (transform {|$|}) [%expr {js|$|js}]
 
-let test14 () =
-  assert_equal "before" (transform {|before$|}) [%expr {js|before$|js}]
+let simply_a_dollar_sign_with_before =
+  test "simply a dollar sign with before" @@ fun () ->
+  assert_equal (transform {|before$|}) [%expr {js|before$|js}]
 
-let test15 () =
-  assert_equal "before with space" (transform {|before $|})
-    [%expr {js|before $|js}]
+let simply_a_dollar_sign_with_before_space =
+  test "simply a dollar sign with before space" @@ fun () ->
+  assert_equal (transform {|before $|}) [%expr {js|before $|js}]
 
-let test16 () =
-  assert_equal "after" (transform {|$after|}) [%expr {js|$after|js}]
+let simply_a_dollar_sign_with_after =
+  test "simply a dollar sign with after" @@ fun () ->
+  assert_equal (transform {|$after|}) [%expr {js|$after|js}]
 
-let test17 () =
-  assert_equal "both" (transform {|before$after|}) [%expr {js|before$after|js}]
+let simply_a_dollar_sign_with_both =
+  test "simply a dollar sign with both" @@ fun () ->
+  assert_equal (transform {|before$after|}) [%expr {js|before$after|js}]
 
-let test18 () =
-  assert_equal "double" (transform {|$ a $|}) [%expr {js|$ a $|js}]
+let doble_dollar_sign =
+  test "doble dollar sign" @@ fun () ->
+  assert_equal (transform {|$ a $|}) [%expr {js|$ a $|js}]
 
-let test19 () = assert_equal "$()" (transform {|$()|}) [%expr {js|$()|js}]
-let test20 () = assert_equal "$(" (transform {|$(|}) [%expr {js|$(|js}]
+let empty_dollar_sign =
+  test "empty dollar sign" @@ fun () ->
+  assert_equal (transform {|$()|}) [%expr {js|$()|js}]
 
-let cases =
-  [
-    "Test 0", `Quick, test0;
-    "Test 1", `Quick, test1;
-    "Test 2", `Quick, test2;
-    "Test 3", `Quick, test3;
-    "Test 4", `Quick, test4;
-    "Test 5", `Quick, test5;
-    "Test 6", `Quick, test6;
-    "Test 7", `Quick, test7;
-    "Test 8", `Quick, test8;
-    "Test 9", `Quick, test9;
-    "Test 10", `Quick, test10;
-    "Test 11", `Quick, test11;
-    "Test 12", `Quick, test12;
-    "Test 13", `Quick, test13;
-    "Test 14", `Quick, test14;
-    "Test 15", `Quick, test15;
-    "Test 16", `Quick, test16;
-    "Test 17", `Quick, test17;
-    "Test 18", `Quick, test18;
-    "Test 19", `Quick, test19;
-    "Test 20", `Quick, test20;
-  ]
+let half_dollar_sign =
+  test "half dollar sign" @@ fun () ->
+  assert_equal (transform {|$(|}) [%expr {js|$(|js}]
 
-let () = run "String interpolation test suit" [ "Transform", cases ]
+let () =
+  Alcotest.run "String interpolation test suit"
+    [
+      ( "Transform",
+        [
+          one_char;
+          dont_transform_string;
+          dont_transform_multiple_strings;
+          inline_variable;
+          concat_string_before_variable;
+          concat_char_after_variable;
+          concat_string_after_variable;
+          concat_more_than_one_variable;
+          concat_more_than_one_variable_with_middle;
+          empty_variable;
+          random_test;
+          module_access;
+          module_access_with_text;
+          simply_a_dollar_sign;
+          simply_a_dollar_sign_with_before;
+          simply_a_dollar_sign_with_before_space;
+          simply_a_dollar_sign_with_after;
+          simply_a_dollar_sign_with_both;
+          doble_dollar_sign;
+          empty_dollar_sign;
+          half_dollar_sign;
+        ] );
+    ]

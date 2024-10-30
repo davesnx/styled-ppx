@@ -5,7 +5,7 @@ description:
   "styled-ppx is the ppx that brings styled components to ReScript and Melange, allowing you to create React Components with type-safe style definitions using CSS."
 maintainer: ["David Sancho <dsnxmoreno@gmail.com>"]
 authors: ["David Sancho <dsnxmoreno@gmail.com>"]
-license: "MIT"
+license: "BSD-2-Clause"
 homepage: "https://styled-ppx.vercel.app"
 bug-reports: "https://github.com/davesnx/styled-ppx/issues"
 depends: [
@@ -18,7 +18,7 @@ depends: [
   "ppxlib" {>= "0.27.0"}
   "sedlex" {>= "3.2"}
   "melange" {>= "3.0.0"}
-  "server-reason-react"
+  "server-reason-react" {>= "0.3.1"}
   "reason-react" {>= "0.14.0"}
   "alcotest" {with-test}
   "conf-npm" {with-test}

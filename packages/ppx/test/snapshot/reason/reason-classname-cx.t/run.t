@@ -1,19 +1,15 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  let className =
-    CssJs.style([|CssJs.label("className"), CssJs.display(`block)|]);
+  let className = CSS.style([|CSS.label("className"), CSS.display(`block)|]);
   let classNameWithMultiLine =
-    CssJs.style([|
-      CssJs.label("classNameWithMultiLine"),
-      CssJs.display(`block),
-    |]);
+    CSS.style([|CSS.label("classNameWithMultiLine"), CSS.display(`block)|]);
   let classNameWithArray =
-    CssJs.style([|CssJs.label("classNameWithArray"), cssProperty|]);
-  let cssRule = CssJs.color(CssJs.blue);
+    CSS.style([|CSS.label("classNameWithArray"), cssProperty|]);
+  let cssRule = CSS.color(CSS.blue);
   let classNameWithCss =
-    CssJs.style([|
-      CssJs.label("classNameWithCss"),
+    CSS.style([|
+      CSS.label("classNameWithCss"),
       cssRule,
-      CssJs.backgroundColor(CssJs.green),
+      CSS.backgroundColor(CSS.green),
     |]);

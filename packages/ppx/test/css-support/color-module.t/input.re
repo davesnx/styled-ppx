@@ -155,15 +155,16 @@
 [%css {|column-rule-color: rebeccapurple;|}];
 
 /* CSS Color Module Level 5 */
-/* [%css {|color: color-mix(in srgb, teal 65%, olive);|}]; */
-/* [%css {|color: color-mix(in srgb, rgb(255, 0, 0, .2) 65%, olive);|}]; */
-/* [%css {|color: color-mix(in srgb, currentColor, rgba(0, 0, 0, .5) 65%;|}]; */
-/* [%css {|color: color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, .5) 65%;|}]; */
-/* [%css {|color: color-mix(in lch, teal 65%, olive);|}]; */
-/* [%css {|color: color-mix(in hsl, teal 65%, olive);|}]; */
-/* [%css {|color: color-mix(in hwb, teal 65%, olive);|}]; */
-/* [%css {|color: color-mix(in xyz, teal 65%, olive);|}]; */
-/* [%css {|color: color-mix(in lab, teal 65%, olive);|}]; */
+[%css {|color: color-mix(in srgb, teal 65%, olive);|}];
+[%css {|color: color-mix(in srgb, rgb(255, 0, 0, .2) 65%, olive);|}];
+[%css {|color: color-mix(in srgb, currentColor, rgba(0, 0, 0, .5) 65%);|}];
+[%css {|color: color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, .5) 65%);|}];
+[%css {|color: color-mix(in lch, teal 65%, olive);|}];
+[%css {|color: color-mix(in hsl, teal 65%, olive);|}];
+[%css {|color: color-mix(in hwb, teal 65%, olive);|}];
+[%css {|color: color-mix(in xyz, teal 65%, olive);|}];
+[%css {|color: color-mix(in lab, teal 65%, olive);|}];
+[%css {|color: color-mix(in lch longer hue, hsl(200deg 50% 80%), coral);|}];
 /* [%css {|color: color-contrast(wheat vs tan, sienna, #b22222, #d2691e);|}]; */
 /* [%css {|color: color-contrast(hsl(200 50% 80%) vs hsl(200 83% 23%), purple, hsl(300 100% 25%));|}]; */
 /* [%css {|color: color-adjust(peru lightness -20%);|}]; */
@@ -171,15 +172,15 @@
 /* [%css {|color: hsl(from lightseagreen calc(h+180) s l);|}]; */
 /* [%css {|color: lab(from orchid l 0 0);|}]; */
 /* [%css {|color: lch(from peru calc(l * 0.8) c h);|}]; */
-/* [%css {|background-color: color-mix(in srgb, teal 65%, olive);|}]; */
-/* [%css {|background-color: color-mix(in srgb, rgb(255, 0, 0, .2) 65%, olive);|}]; */
-/* [%css {|background-color: color-mix(in srgb, currentColor, rgba(0, 0, 0, .5) 65%;|}]; */
-/* [%css {|background-color: color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, .5) 65%;|}]; */
-/* [%css {|background-color: color-mix(in lch, teal 65%, olive);|}]; */
-/* [%css {|background-color: color-mix(in hsl, teal 65%, olive);|}]; */
-/* [%css {|background-color: color-mix(in hwb, teal 65%, olive);|}]; */
-/* [%css {|background-color: color-mix(in xyz, teal 65%, olive);|}]; */
-/* [%css {|background-color: color-mix(in lab, teal 65%, olive);|}]; */
+[%css {|background-color: color-mix(in srgb, teal 65%, olive);|}];
+[%css {|background-color: color-mix(in srgb, rgb(255, 0, 0, .2) 65%, olive);|}];
+[%css {|background-color: color-mix(in srgb, currentColor, rgba(0, 0, 0, .5) 65%);|}];
+[%css {|background-color: color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, .5) 65%);|}];
+[%css {|background-color: color-mix(in lch, teal 65%, olive);|}];
+[%css {|background-color: color-mix(in hsl, teal 65%, olive);|}];
+[%css {|background-color: color-mix(in hwb, teal 65%, olive);|}];
+[%css {|background-color: color-mix(in xyz, teal 65%, olive);|}];
+[%css {|background-color: color-mix(in lab, teal 65%, olive);|}];
 /* [%css {|background-color: color-contrast(wheat vs tan, sienna, #b22222, #d2691e);|}]; */
 /* [%css {|background-color: color-contrast(hsl(200 50% 80%) vs hsl(200 83% 23%), purple, hsl(300 100% 25%));|}]; */
 /* [%css {|background-color: color-adjust(peru lightness -20%);|}]; */
@@ -187,15 +188,15 @@
 /* [%css {|background-color: hsl(from lightseagreen calc(h+180) s l);|}]; */
 /* [%css {|background-color: lab(from orchid l 0 0);|}]; */
 /* [%css {|background-color: lch(from peru calc(l * 0.8) c h);|}]; */
-/* [%css {|border-color: color-mix(in srgb, teal 65%, olive);|}]; */
-/* [%css {|border-color: color-mix(in srgb, rgb(255, 0, 0, .2) 65%, olive);|}]; */
-/* [%css {|border-color: color-mix(in srgb, currentColor, rgba(0, 0, 0, .5) 65%;|}]; */
-/* [%css {|border-color: color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, .5) 65%;|}]; */
-/* [%css {|border-color: color-mix(in lch, teal 65%, olive);|}]; */
-/* [%css {|border-color: color-mix(in hsl, teal 65%, olive);|}]; */
-/* [%css {|border-color: color-mix(in hwb, teal 65%, olive);|}]; */
-/* [%css {|border-color: color-mix(in xyz, teal 65%, olive);|}]; */
-/* [%css {|border-color: color-mix(in lab, teal 65%, olive);|}]; */
+[%css {|border-color: color-mix(in srgb, teal 65%, olive);|}];
+[%css {|border-color: color-mix(in srgb, rgb(255, 0, 0, .2) 65%, olive);|}];
+[%css {|border-color: color-mix(in srgb, currentColor, rgba(0, 0, 0, .5) 65%);|}];
+[%css {|border-color: color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, .5) 65%);|}];
+[%css {|border-color: color-mix(in lch, teal 65%, olive);|}];
+[%css {|border-color: color-mix(in hsl, teal 65%, olive);|}];
+[%css {|border-color: color-mix(in hwb, teal 65%, olive);|}];
+[%css {|border-color: color-mix(in xyz, teal 65%, olive);|}];
+[%css {|border-color: color-mix(in lab, teal 65%, olive);|}];
 /* [%css {|border-color: color-contrast(wheat vs tan, sienna, #b22222, #d2691e);|}]; */
 /* [%css {|border-color: color-contrast(hsl(200 50% 80%) vs hsl(200 83% 23%), purple, hsl(300 100% 25%));|}]; */
 /* [%css {|border-color: color-adjust(peru lightness -20%);|}]; */
@@ -203,15 +204,15 @@
 /* [%css {|border-color: hsl(from lightseagreen calc(h+180) s l);|}]; */
 /* [%css {|border-color: lab(from orchid l 0 0);|}]; */
 /* [%css {|border-color: lch(from peru calc(l * 0.8) c h);|}]; */
-/* [%css {|text-decoration-color: color-mix(in srgb, teal 65%, olive);|}]; */
-/* [%css {|text-decoration-color: color-mix(in srgb, rgb(255, 0, 0, .2) 65%, olive);|}]; */
-/* [%css {|text-decoration-color: color-mix(in srgb, currentColor, rgba(0, 0, 0, .5) 65%;|}]; */
-/* [%css {|text-decoration-color: color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, .5) 65%;|}]; */
-/* [%css {|text-decoration-color: color-mix(in lch, teal 65%, olive);|}]; */
-/* [%css {|text-decoration-color: color-mix(in hsl, teal 65%, olive);|}]; */
-/* [%css {|text-decoration-color: color-mix(in hwb, teal 65%, olive);|}]; */
-/* [%css {|text-decoration-color: color-mix(in xyz, teal 65%, olive);|}]; */
-/* [%css {|text-decoration-color: color-mix(in lab, teal 65%, olive);|}]; */
+[%css {|text-decoration-color: color-mix(in srgb, teal 65%, olive);|}];
+[%css {|text-decoration-color: color-mix(in srgb, rgb(255, 0, 0, .2) 65%, olive);|}];
+[%css {|text-decoration-color: color-mix(in srgb, currentColor, rgba(0, 0, 0, .5) 65%);|}];
+[%css {|text-decoration-color: color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, .5) 65%);|}];
+[%css {|text-decoration-color: color-mix(in lch, teal 65%, olive);|}];
+[%css {|text-decoration-color: color-mix(in hsl, teal 65%, olive);|}];
+[%css {|text-decoration-color: color-mix(in hwb, teal 65%, olive);|}];
+[%css {|text-decoration-color: color-mix(in xyz, teal 65%, olive);|}];
+[%css {|text-decoration-color: color-mix(in lab, teal 65%, olive);|}];
 /* [%css {|text-decoration-color: color-contrast(wheat vs tan, sienna, #b22222, #d2691e);|}]; */
 /* [%css {|text-decoration-color: color-contrast(hsl(200 50% 80%) vs hsl(200 83% 23%), purple, hsl(300 100% 25%));|}]; */
 /* [%css {|text-decoration-color: color-adjust(peru lightness -20%);|}]; */
@@ -219,15 +220,15 @@
 /* [%css {|text-decoration-color: hsl(from lightseagreen calc(h+180) s l);|}]; */
 /* [%css {|text-decoration-color: lab(from orchid l 0 0);|}]; */
 /* [%css {|text-decoration-color: lch(from peru calc(l * 0.8) c h);|}]; */
-/* [%css {|column-rule-color: color-mix(in srgb, teal 65%, olive);|}]; */
-/* [%css {|column-rule-color: color-mix(in srgb, rgb(255, 0, 0, .2) 65%, olive);|}]; */
-/* [%css {|column-rule-color: color-mix(in srgb, currentColor, rgba(0, 0, 0, .5) 65%;|}]; */
-/* [%css {|column-rule-color: color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, .5) 65%;|}]; */
-/* [%css {|column-rule-color: color-mix(in lch, teal 65%, olive);|}]; */
-/* [%css {|column-rule-color: color-mix(in hsl, teal 65%, olive);|}]; */
-/* [%css {|column-rule-color: color-mix(in hwb, teal 65%, olive);|}]; */
-/* [%css {|column-rule-color: color-mix(in xyz, teal 65%, olive);|}]; */
-/* [%css {|column-rule-color: color-mix(in lab, teal 65%, olive);|}]; */
+[%css {|column-rule-color: color-mix(in srgb, teal 65%, olive);|}];
+[%css {|column-rule-color: color-mix(in srgb, rgb(255, 0, 0, .2) 65%, olive);|}];
+[%css {|column-rule-color: color-mix(in srgb, currentColor, rgba(0, 0, 0, .5) 65%);|}];
+[%css {|column-rule-color: color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, .5) 65%);|}];
+[%css {|column-rule-color: color-mix(in lch, teal 65%, olive);|}];
+[%css {|column-rule-color: color-mix(in hsl, teal 65%, olive);|}];
+[%css {|column-rule-color: color-mix(in hwb, teal 65%, olive);|}];
+[%css {|column-rule-color: color-mix(in xyz, teal 65%, olive);|}];
+[%css {|column-rule-color: color-mix(in lab, teal 65%, olive);|}];
 /* [%css {|column-rule-color: color-contrast(wheat vs tan, sienna, #b22222, #d2691e);|}]; */
 /* [%css {|column-rule-color: color-contrast(hsl(200 50% 80%) vs hsl(200 83% 23%), purple, hsl(300 100% 25%));|}]; */
 /* [%css {|column-rule-color: color-adjust(peru lightness -20%);|}]; */
@@ -247,3 +248,8 @@
 /* [%css {|color-interpolation-filters: linearRGB|}]; */
 /* [%css {|lighting-color: white|}]; */
 /* [%css {|lighting-color: #000|}]; */
+
+/* color + calc */
+
+[%css {|color: rgba(0, 0, 0, calc(1))|}];
+[%css {|color: rgba(0, 0, 0, calc(10 - 1))|}];

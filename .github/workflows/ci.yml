@@ -8,6 +8,10 @@ on:
     branches:
       - main
 
+env:
+  OPAM_VERSION: 2.2.0
+  DUNE_PROFILE: release
+
 permissions:
   contents: write
   pull-requests: write
@@ -30,19 +34,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # https://github.com/mmottl/pcre-ocaml/issues/18
-      # https://github.com/actions/runner-images/issues/6634
-      - name: Install pcre (only MacOS)
-        if: matrix.os == 'macos-latest'
-        run: brew install pcre
-
       - name: Use Node.js
         uses: actions/setup-node@v3
 
       - name: Use OCaml ${{ matrix.ocaml-compiler }}
-        uses: ocaml/setup-ocaml@v2
+        uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
+          dune-cache: true
+          opam-disable-sandboxing: true
 
       - name: Load opam cache when not Windows
         if: runner.os != 'Windows'
@@ -78,19 +78,12 @@ jobs:
           name: ${{ matrix.os }}
           path: _build/default/packages/bin/bin.exe
 
-      - name: Upload runtime artifacts for @davesnx/styled-ppx/runtime/css
+      - name: Upload runtime artifacts for @davesnx/styled-ppx/runtime
         if: matrix.os == 'ubuntu-20.04'
         uses: actions/upload-artifact@v3
         with:
-          name: runtime-css
-          path: _build/default/packages/css/rescript
-
-      - name: Upload runtime artifacts for @davesnx/styled-ppx/runtime/emotion
-        if: matrix.os == 'ubuntu-20.04'
-        uses: actions/upload-artifact@v3
-        with:
-          name: runtime-emotion
-          path: _build/default/packages/emotion/rescript
+          name: runtime-rescript
+          path: _build/default/packages/runtime/rescript
 
       - name: Save cache when not Windows
         uses: actions/cache/save@v3
@@ -109,11 +102,8 @@ jobs:
       - name: Grant permission to run ppx
         run: chmod +x _build/default/packages/bin/bin.exe
 
-      - name: Run E2E ReScript v9 tests
-        run: make test_e2e_rescript_v9
-
-      - name: Run E2E ReScript v10 tests
-        run: make test_e2e_rescript_v10
+      - name: Run E2E tests
+        run: make test-e2e
 
   publish:
     name: Publish
@@ -152,17 +142,11 @@ jobs:
       #     name: windows-latest
       #     path: _release/platform-windows-x64
 
-      - name: Download runtime-css artifacts
+      - name: Download runtime-rescript artifacts
         uses: actions/download-artifact@v3
         with:
-          name: runtime-css
-          path: _release/css
-
-      - name: Download runtime-emotion artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: runtime-emotion
-          path: _release/emotion
+          name: runtime-rescript
+          path: _release/rescript
 
       - name: Release nightly (@davesnx/styled-ppx) package
         if: ${{ success() && github.event_name == 'pull_request' && github.event.pull_request.user.login == 'davesnx' }}

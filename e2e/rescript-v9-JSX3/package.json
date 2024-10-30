@@ -8,8 +8,8 @@
     "watch": "rescript build -with-deps -w",
     "clean": "rescript clean",
     "test": "vitest --run --silent",
-    "test_watch": "concurrently 'npm run watch' 'vitest'",
-    "test_promote": "vitest --run --silent -u",
+    "test-watch": "concurrently 'npm run watch' 'vitest'",
+    "test-promote": "vitest --run --silent -u",
     "start": "npm run test"
   },
   "dependencies": {

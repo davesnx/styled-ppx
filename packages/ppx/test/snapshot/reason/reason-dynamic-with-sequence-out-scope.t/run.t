@@ -1,8 +1,8 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  let sharedStylesBetweenDynamicComponents = (color): CssJs.rule =>
-    CssJs.color(color);
+  let sharedStylesBetweenDynamicComponents = (color): CSS.rule =>
+    CSS.color(color);
   module DynamicCompnentWithLetIn = {
     [@deriving (jsProperties, getSet)]
     type makeProps('color) = {
@@ -967,7 +967,7 @@
       "Object.assign";
     let styles = (~color, _) => {
       let styles = sharedStylesBetweenDynamicComponents(color);
-      CssJs.style(styles);
+      CSS.style(styles);
     };
     let make = (props: makeProps('color)) => {
       let className =

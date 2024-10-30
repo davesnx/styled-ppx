@@ -15,11 +15,10 @@
 let stack = [%cx "display: flex; flex-direction: column"];
 let stackGap = gap => [%cx "gap: $(gap)"];
 module Cositas = [%styled.div
-  (~lola=CssJs.px(0), ~id) => {|
+  (~lola=CSS.px(0)) => {|
   display: flex;
   flex-direction: column;
   gap: $(lola);
-  background-color: $(id);
 |}
 ];
 
@@ -47,7 +46,7 @@ let bounce = [%keyframe
 |}
 ];
 
-let code = [|`custom("Menlo"), `monospace|];
+let code = [|"Menlo", "monospace"|];
 let lola = `auto;
 
 let clx = [%cx
@@ -55,17 +54,68 @@ let clx = [%cx
   animation-name: $(bounce);
   font-family: $(code);
   cursor: $(lola);
+  grid-template-columns: auto 40%;
+|}
+];
+
+let post = [%cx {|
+  border: 2px solid;
+  container-type: inline-size;
+|}];
+
+let card = [%cx
+  {|
+  margin: 10px;
+  border: 2px dotted;
+  font-size: 1.5em;
+  |}
+];
+
+let container = [%cx
+  {|
+  @container (width < 650px) {
+    width: 50%;
+    background-color: gray;
+    font-size: 1em;
+
+    .my-content {
+      font-weight: bold;
+    }
+  }
 |}
 ];
 
 module App = {
   [@react.component]
   let make = () =>
-    <Cositas as_="section" lola={CssJs.px(10)} id=CssJs.red>
-      <div className=clx> {React.string("code everywhere!")} </div>
-      <div className=selectors> {React.string("Red text")} </div>
-    </Cositas>;
+    <>
+      <div className=post>
+        <div className={card ++ " " ++ container}>
+          <h2> {React.string("Card title")} </h2>
+          <p> {React.string("Card content")} </p>
+        </div>
+      </div>
+      <Cositas as_="section" lola={CSS.px(10)}>
+        <div className=clx> {React.string("code everywhere!")} </div>
+        <div className=selectors> {React.string("Red text")} </div>
+      </Cositas>
+    </>;
 };
+
+let color = `hex("333");
+
+let _ = [%css
+  {|
+    background-image:
+      repeating-linear-gradient(
+        45deg,
+        $(color) 0px,
+        $(color) 4px,
+        $(color) 5px,
+        $(color) 9px
+      )
+    |}
+];
 
 let getStaticMarkup = () => {
   ReactDOM.renderToStaticMarkup(<App />);

@@ -9,10 +9,10 @@
     "build": "rescript build -with-deps",
     "watch": "rescript build -with-deps -w",
     "clean": "rm -rf src/bundle.js; rescript clean",
-    "test_watch": "concurrently 'npm run watch' 'vitest'",
+    "test-watch": "concurrently 'npm run watch' 'vitest'",
     "pretest": "npm run build",
     "test": "vitest --run",
-    "test_promote": "vitest --run --silent -u"
+    "test-promote": "vitest --run --silent -u"
   },
   "dependencies": {
     "@emotion/css": "^11.11.2",

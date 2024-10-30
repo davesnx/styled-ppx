@@ -45,3 +45,15 @@ let update_loc_with_delimiter (loc : Ppxlib.location) delimiter :
     { loc.loc_start with pos_cnum = loc.loc_start.pos_cnum + offset }
   and loc_end = { loc.loc_end with pos_cnum = loc.loc_end.pos_cnum + offset } in
   { loc_start; loc_end; loc_ghost = false }
+
+let update_pos_lnum (a : Ppxlib.location) (b : Ppxlib.location) =
+  let loc_start =
+    {
+      a.loc_start with
+      pos_lnum = a.loc_start.pos_lnum + b.loc_start.pos_lnum - 1;
+    }
+  in
+  let loc_end =
+    { a.loc_end with pos_lnum = a.loc_end.pos_lnum + b.loc_start.pos_lnum - 1 }
+  in
+  { a with loc_start; loc_end }

@@ -1,0 +1,3 @@
+(library
+ (name alcotest_extra)
+ (libraries alcotest))

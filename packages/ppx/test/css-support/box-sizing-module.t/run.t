@@ -1,7 +1,5 @@
-This test ensures the ppx generates the correct output against styled-ppx.css_native
-If this test fail means that Css_Js_Core or CssJs_Legacy_Core (from styled-ppx.css or styled-ppx.css_native) are not in sync with the ppx
-
-This test only runs against Css_Js_Core from styled-ppx.css_native
+This test ensures the ppx generates the correct output against styled-ppx.native
+If this test fail means that the module is not in sync with the ppx
 
   $ cat > dune-project << EOF
   > (lang dune 3.10)
@@ -10,55 +8,45 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   $ cat > dune << EOF
   > (executable
   >  (name input)
-  >  (libraries styled-ppx.emotion_native styled-ppx.css_native)
+  >  (libraries styled-ppx.native)
   >  (preprocess (pps styled-ppx)))
   > EOF
 
   $ dune build
 
-  $ dune describe pp ./input.re.ml | refmt --parse ml --print re
-  [@ocaml.ppx.context
-    {
-      tool_name: "ppx_driver",
-      include_dirs: [],
-      load_path: [],
-      open_modules: [],
-      for_package: None,
-      debug: false,
-      use_threads: false,
-      use_vmthreads: false,
-      recursive_types: false,
-      principal: false,
-      transparent_modules: false,
-      unboxed_types: false,
-      unsafe_string: false,
-      cookies: [],
-    }
-  ];
-  CssJs.width(`maxContent);
-  CssJs.width(`minContent);
-  CssJs.unsafe({js|width|js}, {js|fit-content(10%)|js});
-  CssJs.minWidth(`maxContent);
-  CssJs.minWidth(`minContent);
-  CssJs.unsafe({js|minWidth|js}, {js|fit-content(10%)|js});
-  CssJs.maxWidth(`maxContent);
-  CssJs.maxWidth(`minContent);
-  CssJs.unsafe({js|maxWidth|js}, {js|fit-content(10%)|js});
-  CssJs.height(`maxContent);
-  CssJs.height(`minContent);
-  CssJs.unsafe({js|height|js}, {js|fit-content(10%)|js});
-  CssJs.minHeight(`maxContent);
-  CssJs.minHeight(`minContent);
-  CssJs.unsafe({js|minHeight|js}, {js|fit-content(10%)|js});
-  CssJs.maxHeight(`maxContent);
-  CssJs.maxHeight(`minContent);
-  CssJs.unsafe({js|maxHeight|js}, {js|fit-content(10%)|js});
-  CssJs.unsafe({js|aspectRatio|js}, {js|auto|js});
-  CssJs.unsafe({js|aspectRatio|js}, {js|2|js});
-  CssJs.unsafe({js|aspectRatio|js}, {js|16 / 9|js});
-  CssJs.unsafe({js|width|js}, {js|fit-content|js});
-  CssJs.unsafe({js|minWidth|js}, {js|fit-content|js});
-  CssJs.unsafe({js|maxWidth|js}, {js|fit-content|js});
-  CssJs.unsafe({js|height|js}, {js|fit-content|js});
-  CssJs.unsafe({js|minHeight|js}, {js|fit-content|js});
-  CssJs.unsafe({js|maxHeight|js}, {js|fit-content|js});
+  $ dune describe pp ./input.re | sed '1,/^];$/d'
+  
+  CSS.width(`maxContent);
+  CSS.width(`minContent);
+  CSS.unsafe({js|width|js}, {js|fit-content(10%)|js});
+  CSS.minWidth(`maxContent);
+  CSS.minWidth(`minContent);
+  CSS.unsafe({js|minWidth|js}, {js|fit-content(10%)|js});
+  CSS.maxWidth(`maxContent);
+  CSS.maxWidth(`minContent);
+  CSS.unsafe({js|maxWidth|js}, {js|fit-content(10%)|js});
+  CSS.height(`maxContent);
+  CSS.height(`minContent);
+  CSS.unsafe({js|height|js}, {js|fit-content(10%)|js});
+  CSS.minHeight(`maxContent);
+  CSS.minHeight(`minContent);
+  CSS.unsafe({js|minHeight|js}, {js|fit-content(10%)|js});
+  CSS.maxHeight(`maxContent);
+  CSS.maxHeight(`minContent);
+  CSS.unsafe({js|maxHeight|js}, {js|fit-content(10%)|js});
+  
+  CSS.aspectRatio(`auto);
+  CSS.aspectRatio(`num(2.));
+  CSS.aspectRatio(`ratio((16, 9)));
+  
+  CSS.unsafe({js|width|js}, {js|fit-content|js});
+  
+  CSS.unsafe({js|minWidth|js}, {js|fit-content|js});
+  
+  CSS.unsafe({js|maxWidth|js}, {js|fit-content|js});
+  
+  CSS.unsafe({js|height|js}, {js|fit-content|js});
+  
+  CSS.unsafe({js|minHeight|js}, {js|fit-content|js});
+  
+  CSS.unsafe({js|maxHeight|js}, {js|fit-content|js});

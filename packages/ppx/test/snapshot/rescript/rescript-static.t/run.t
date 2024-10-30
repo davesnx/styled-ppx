@@ -493,7 +493,7 @@
       external assign2 :
         < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t -> < .. >  Js.t =
           "Object.assign"[@@bs.val ]
-      let styles = CssJs.style [|(CssJs.label "Input");(CssJs.display `flex)|]
+      let styles = CSS.style [|(CSS.label "Input");(CSS.display `flex)|]
       let make (props : makeProps) =
         let className = styles ^ (getOrEmpty (classNameGet props)) in
         let stylesObject = [%bs.obj { className; ref = (innerRefGet props) }] in

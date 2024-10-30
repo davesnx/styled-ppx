@@ -14,7 +14,7 @@
 (homepage "https://styled-ppx.vercel.app")
 (bug_reports "https://github.com/davesnx/styled-ppx/issues")
 
-(license MIT)
+(license "BSD-2-Clause")
 
 (authors "David Sancho <dsnxmoreno@gmail.com>")
 
@@ -34,7 +34,7 @@
    (ppxlib (>= 0.27.0))
    (sedlex (>= 3.2))
    (melange (>= 3.0.0))
-   server-reason-react
+   (server-reason-react (>= 0.3.1))
    (reason-react (>= 0.14.0))
    (alcotest :with-test)
    (conf-npm :with-test)

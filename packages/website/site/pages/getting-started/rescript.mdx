@@ -8,7 +8,7 @@ import Link from 'next/link'
 
 # ReScript
 
-ReScript version supported are v9.0 and v10.
+ReScript version supported are v9 and v10.
 
 ### Install
 
@@ -20,9 +20,8 @@ npm install @davesnx/styled-ppx
 
 ### Packages available
 
-- `@davesnx/styled-ppx/ppx` is the ppx as a binary
-- `@davesnx/styled-ppx/css` are the CSS bindings
-- `@davesnx/styled-ppx/emotion` are the `emotion.sh` bindings
+- `@davesnx/styled-ppx/ppx` is the ppx as a binary, transforms `%styled.div("")`, `%cx("")` and `%css("")`
+- `@davesnx/styled-ppx/rescript` is library with the runtime (expose CSS)
 
 ### Update `bsconfig.json`
 
@@ -33,8 +32,7 @@ The diff on `bsconfig.json` should contain the following:
 {
   "bs-dependencies": [
     "@rescript/react",
-+   "@davesnx/styled-ppx/css",
-+   "@davesnx/styled-ppx/emotion"
++   "@davesnx/styled-ppx/rescript",
   ],
 + "ppx-flags": ["@davesnx/styled-ppx/ppx"]
 }
@@ -45,7 +43,7 @@ Note: `@rescript/react` is optional, and only needed if you use styled component
 ### Example
 
 ```rescript
-module Link = %styled.a((~color=CssJs.hex("4299E1")) => `
+module Link = %styled.a((~color=CSS.hex("4299E1")) => `
   font-size: 1.875rem;
   line-height: 1.5;
   text-decoration: none;
@@ -66,7 +64,7 @@ let layout = %cx(`
 /* Later in a component */
 <div className=layout>
   <Link
-    color={CssJs.hex("333333")}
+    color={CSS.hex("333333")}
     href="https://sancho.dev"
     rel="noopener noreferrer">
     {React.string("sancho.dev")}

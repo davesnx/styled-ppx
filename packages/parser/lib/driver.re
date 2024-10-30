@@ -1,10 +1,8 @@
-module Lexer = Css_lexer;
-module Parser = Css_parser;
 module Location = Ppxlib.Location;
 
 let menhir = MenhirLib.Convert.Simplified.traditional2revised;
 
-let parse = (skip_whitespaces, lexbuf, parser) => {
+let parse = (~loc: Ppxlib.location, skip_whitespaces, lexbuf, parser) => {
   Lexer.skip_whitespace.contents = skip_whitespaces;
 
   let last_token = ref((Parser.EOF, Lexing.dummy_pos, Lexing.dummy_pos));
@@ -20,7 +18,8 @@ let parse = (skip_whitespaces, lexbuf, parser) => {
     Error((loc, msg));
   | _ =>
     let (token, start_pos, end_pos) = last_token^;
-    let loc = Parser_location.to_ppxlib_location(start_pos, end_pos);
+    let token_loc = Parser_location.to_ppxlib_location(start_pos, end_pos);
+    let loc = Parser_location.update_pos_lnum(token_loc, loc);
     let msg =
       Printf.sprintf(
         "Parse error while reading token '%s'",
@@ -32,11 +31,10 @@ let parse = (skip_whitespaces, lexbuf, parser) => {
 
 let last_buffer = ref(None);
 
-let parse_string =
-    (~skip_whitespace, ~loc as _: Ppxlib.location, parser, string) => {
+let parse_string = (~skip_whitespace, ~loc, parser, string) => {
   let buffer = Sedlexing.Latin1.from_string(string);
   last_buffer := Some(Sedlexing.Latin1.from_string(string));
-  parse(skip_whitespace, buffer, parser);
+  parse(~loc, skip_whitespace, buffer, parser);
 };
 
 let parse_declaration_list = (~loc, input: string) => {

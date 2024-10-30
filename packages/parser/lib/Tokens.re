@@ -1,5 +1,3 @@
-module Parser = Css_parser;
-
 [@deriving show({with_path: false})]
 type token =
   | EOF
@@ -96,6 +94,7 @@ let token_to_string =
   | MEDIA_FEATURE_COMPARISON(s) => s
   | AT_MEDIA(s)
   | AT_KEYFRAMES(s)
+  | AT_CONTAINER(s)
   | AT_RULE_STATEMENT(s)
   | AT_RULE(s) => "@" ++ s
   | HASH(s) => "#" ++ s
@@ -145,6 +144,7 @@ let token_to_debug =
   | ALL_MEDIA_TYPE(s) => "ALL('" ++ s ++ "')"
   | MEDIA_FEATURE_COMPARISON(s) => "MEDIA_FEATURE_COMPARISON('" ++ s ++ "')"
   | AT_KEYFRAMES(s) => "AT_KEYFRAMES('" ++ s ++ "')"
+  | AT_CONTAINER(s) => "AT_CONTAINER('" ++ s ++ "')"
   | HASH(s) => "HASH('" ++ s ++ "')"
   | NUMBER(s) => "NUMBER('" ++ s ++ "')"
   | UNICODE_RANGE(s) => "UNICODE_RANGE('" ++ s ++ "')"

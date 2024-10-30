@@ -1,7 +1,5 @@
-This test ensures the ppx generates the correct output against styled-ppx.css_native
-If this test fail means that Css_Js_Core or CssJs_Legacy_Core (from styled-ppx.css or styled-ppx.css_native) are not in sync with the ppx
-
-This test only runs against Css_Js_Core from styled-ppx.css_native
+This test ensures the ppx generates the correct output against styled-ppx.native
+If this test fail means that the module is not in sync with the ppx
 
   $ cat > dune-project << EOF
   > (lang dune 3.10)
@@ -10,38 +8,21 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   $ cat > dune << EOF
   > (executable
   >  (name input)
-  >  (libraries styled-ppx.emotion_native styled-ppx.css_native)
+  >  (libraries styled-ppx.native)
   >  (preprocess (pps styled-ppx)))
   > EOF
 
 
-  $ dune describe pp ./input.re.ml | refmt --parse ml --print re
-  [@ocaml.ppx.context
-    {
-      tool_name: "ppx_driver",
-      include_dirs: [],
-      load_path: [],
-      open_modules: [],
-      for_package: None,
-      debug: false,
-      use_threads: false,
-      use_vmthreads: false,
-      recursive_types: false,
-      principal: false,
-      transparent_modules: false,
-      unboxed_types: false,
-      unsafe_string: false,
-      cookies: [],
-    }
-  ];
-  let color = CssJs.hex("333");
-  CssJs.filter([|`none|]);
-  CssJs.filter([|`url({js|#id|js})|]);
-  CssJs.filter([|`url({js|image.svg#id|js})|]);
-  CssJs.filter([|`blur(`pxFloat(5.))|]);
-  CssJs.filter([|`brightness(`num(0.5))|]);
-  CssJs.filter([|`contrast(`percent(150.))|]);
-  CssJs.filter([|
+  $ dune describe pp ./input.re | sed '1,/^];$/d'
+  let color = CSS.hex("333");
+  
+  CSS.filter([|`none|]);
+  CSS.filter([|`url({js|#id|js})|]);
+  CSS.filter([|`url({js|image.svg#id|js})|]);
+  CSS.filter([|`blur(`pxFloat(5.))|]);
+  CSS.filter([|`brightness(`num(0.5))|]);
+  CSS.filter([|`contrast(`percent(150.))|]);
+  CSS.filter([|
     `dropShadow((
       `pxFloat(15.),
       `pxFloat(15.),
@@ -49,14 +30,14 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       `hex({js|123|js}),
     )),
   |]);
-  CssJs.filter([|`grayscale(`percent(50.))|]);
-  CssJs.filter([|`hueRotate(`deg(50.))|]);
-  CssJs.filter([|`invert(`percent(50.))|]);
-  CssJs.filter([|`opacity(`percent(50.))|]);
-  CssJs.filter([|`sepia(`percent(50.))|]);
-  CssJs.filter([|`saturate(`percent(150.))|]);
-  CssJs.filter([|`grayscale(`percent(100.)), `sepia(`percent(100.))|]);
-  CssJs.filter([|
+  CSS.filter([|`grayscale(`percent(50.))|]);
+  CSS.filter([|`hueRotate(`deg(50.))|]);
+  CSS.filter([|`invert(`percent(50.))|]);
+  CSS.filter([|`opacity(`percent(50.))|]);
+  CSS.filter([|`sepia(`percent(50.))|]);
+  CSS.filter([|`saturate(`percent(150.))|]);
+  CSS.filter([|`grayscale(`percent(100.)), `sepia(`percent(100.))|]);
+  CSS.filter([|
     `dropShadow((
       `zero,
       `pxFloat(8.),
@@ -64,7 +45,7 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       `rgba((0, 0, 0, `num(0.03))),
     )),
   |]);
-  CssJs.filter([|
+  CSS.filter([|
     `dropShadow((`zero, `pxFloat(1.), `zero, color)),
     `dropShadow((`zero, `pxFloat(1.), `zero, color)),
     `dropShadow((`zero, `pxFloat(1.), `zero, color)),
@@ -81,13 +62,14 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       `rgba((0, 0, 0, `num(0.03))),
     )),
   |]);
-  CssJs.backdropFilter([|`none|]);
-  CssJs.backdropFilter([|`url({js|#id|js})|]);
-  CssJs.backdropFilter([|`url({js|image.svg#id|js})|]);
-  CssJs.backdropFilter([|`blur(`pxFloat(5.))|]);
-  CssJs.backdropFilter([|`brightness(`num(0.5))|]);
-  CssJs.backdropFilter([|`contrast(`percent(150.))|]);
-  CssJs.backdropFilter([|
+  
+  CSS.backdropFilter([|`none|]);
+  CSS.backdropFilter([|`url({js|#id|js})|]);
+  CSS.backdropFilter([|`url({js|image.svg#id|js})|]);
+  CSS.backdropFilter([|`blur(`pxFloat(5.))|]);
+  CSS.backdropFilter([|`brightness(`num(0.5))|]);
+  CSS.backdropFilter([|`contrast(`percent(150.))|]);
+  CSS.backdropFilter([|
     `dropShadow((
       `pxFloat(15.),
       `pxFloat(15.),
@@ -95,13 +77,13 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
       `rgba((0, 0, 0, `num(1.))),
     )),
   |]);
-  CssJs.backdropFilter([|`grayscale(`percent(50.))|]);
-  CssJs.backdropFilter([|`hueRotate(`deg(50.))|]);
-  CssJs.backdropFilter([|`invert(`percent(50.))|]);
-  CssJs.backdropFilter([|`opacity(`percent(50.))|]);
-  CssJs.backdropFilter([|`sepia(`percent(50.))|]);
-  CssJs.backdropFilter([|`saturate(`percent(150.))|]);
-  CssJs.backdropFilter([|
+  CSS.backdropFilter([|`grayscale(`percent(50.))|]);
+  CSS.backdropFilter([|`hueRotate(`deg(50.))|]);
+  CSS.backdropFilter([|`invert(`percent(50.))|]);
+  CSS.backdropFilter([|`opacity(`percent(50.))|]);
+  CSS.backdropFilter([|`sepia(`percent(50.))|]);
+  CSS.backdropFilter([|`saturate(`percent(150.))|]);
+  CSS.backdropFilter([|
     `grayscale(`percent(100.)),
     `sepia(`percent(100.)),
   |]);

@@ -965,17 +965,17 @@
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles =
-      CssJs.style([|
-        CssJs.label("SelectorWithInterpolation"),
-        CssJs.media(
+      CSS.style([|
+        CSS.label("SelectorWithInterpolation"),
+        CSS.media(
           {js|only screen and (min-width: |js} ++ width ++ {js|)|js},
-          [|CssJs.color(CssJs.blue)|],
+          [|CSS.color(CSS.blue)|],
         ),
-        CssJs.media(
+        CSS.media(
           {js|(min-width: 700px) and (orientation: |js}
           ++ orientation
           ++ {js|)|js},
-          [|CssJs.display(`none)|],
+          [|CSS.display(`none)|],
         ),
       |]);
     let make = (props: makeProps) => {

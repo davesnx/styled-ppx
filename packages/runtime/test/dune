@@ -1,0 +1,21 @@
+(test
+ (name test)
+ (flags
+  (:standard -open Alcotest_extra))
+ (libraries
+  alcotest
+  fmt
+  server-reason-react.js
+  server-reason-react.belt
+  server-reason-react.reactDom
+  alcotest_extra
+  styled-ppx.native
+  styled-ppx.murmur2)
+ (preprocess
+  (pps styled-ppx)))
+
+(rule
+ (alias test-runtime)
+ (deps test.exe)
+ (action
+  (run %{deps})))

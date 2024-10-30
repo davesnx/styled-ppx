@@ -1,7 +1,5 @@
-This test ensures the ppx generates the correct output against styled-ppx.css_native
-If this test fail means that Css_Js_Core or CssJs_Legacy_Core (from styled-ppx.css or styled-ppx.css_native) are not in sync with the ppx
-
-This test only runs against Css_Js_Core from styled-ppx.css_native
+This test ensures the ppx generates the correct output against styled-ppx.native
+If this test fail means that the module is not in sync with the ppx
 
   $ cat > dune-project << EOF
   > (lang dune 3.10)
@@ -10,39 +8,18 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   $ cat > dune << EOF
   > (executable
   >  (name input)
-  >  (libraries styled-ppx.emotion_native styled-ppx.css_native)
+  >  (libraries styled-ppx.native)
   >  (preprocess (pps styled-ppx)))
   > EOF
 
   $ dune build
-  File "input.re", lines 2-3, characters 22-14:
-  1 | .....
-  2 | ................;
-  3 |   height........
+  File "input.re", line 3, characters 2-9:
   Error: Unknown property 'heightx'
   [1]
 
-  $ dune describe pp ./input.re.ml | refmt --parse ml --print re
-  [@ocaml.ppx.context
-    {
-      tool_name: "ppx_driver",
-      include_dirs: [],
-      load_path: [],
-      open_modules: [],
-      for_package: None,
-      debug: false,
-      use_threads: false,
-      use_vmthreads: false,
-      recursive_types: false,
-      principal: false,
-      transparent_modules: false,
-      unboxed_types: false,
-      unsafe_string: false,
-      cookies: [],
-    }
-  ];
-  CssJs.style([|
-    CssJs.display(`block),
+  $ dune describe pp ./input.re | sed '1,/^];$/d'
+  CSS.style([|
+    CSS.display(`block),
     [%ocaml.error "Unknown property 'heightx'"],
   |]);
 

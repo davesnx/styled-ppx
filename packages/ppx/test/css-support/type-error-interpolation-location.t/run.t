@@ -1,7 +1,5 @@
-This test ensures the ppx generates the correct output against styled-ppx.css_native
-If this test fail means that Css_Js_Core or CssJs_Legacy_Core (from styled-ppx.css or styled-ppx.css_native) are not in sync with the ppx
-
-This test only runs against Css_Js_Core from styled-ppx.css_native
+This test ensures the ppx generates the correct output against styled-ppx.native
+If this test fail means that the module is not in sync with the ppx
 
   $ cat > dune-project << EOF
   > (lang dune 3.10)
@@ -10,14 +8,12 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
   $ cat > dune << EOF
   > (executable
   >  (name input)
-  >  (libraries styled-ppx.emotion_native styled-ppx.css_native)
+  >  (libraries styled-ppx.native)
   >  (preprocess (pps styled-ppx)))
   > EOF
 
   $ dune build
-  File "input.re", lines 10-11, characters 6-36:
-  10 | ......|
-  11 |     text-decoration: $(cosas).
+  File "input.re", line 11, characters 21-29:
   Error: This expression has type [> `underlin ]
          but an expression was expected of type
            [< `inherit_
@@ -25,6 +21,8 @@ This test only runs against Css_Js_Core from styled-ppx.css_native
             | `lineThrough
             | `none
             | `overline
+            | `revert
+            | `revertLayer
             | `underline
             | `unset
             | `var of string

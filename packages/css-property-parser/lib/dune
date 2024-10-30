@@ -1,0 +1,11 @@
+(library
+ (name Css_property_parser)
+ (public_name styled-ppx.css-property-parser)
+ (libraries
+  sedlex
+  styled-ppx.css-parser ; since we use the Tokens from the CSS parser
+  )
+ (preprocess
+  (per_module
+   ((pps reason_css_parser_ppx sedlex.ppx)
+    Parser))))

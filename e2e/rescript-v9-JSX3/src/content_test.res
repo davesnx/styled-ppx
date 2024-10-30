@@ -1,7 +1,7 @@
 open Vitest
 
-module Content = CssJs.Types.Content
-module FontFamily = CssJs.Types.FontFamilyName
+module Content = CSS.Types.Content
+module FontFamily = CSS.Types.FontFamilyName
 
 let testData = [
   (Content.toString(#text("")), "''"),
@@ -12,8 +12,8 @@ let testData = [
   (Content.toString(#text(`'single'`)), `'single'`),
   (Content.toString(#text(`"double"`)), `"double"`),
   (Content.toString(#text(`'`)), `"'"`),
-  (FontFamily.toString(#custom("Inter")), `"Inter"`),
-  (FontFamily.toString(#custom(`"Inter Bold"`)), `"Inter Bold"`),
+  (FontFamily.toString("Inter"), `"Inter"`),
+  (FontFamily.toString(`"Inter Bold"`), `"Inter Bold"`),
 ]
 
 describe("content as string", () => {
@@ -23,13 +23,15 @@ describe("content as string", () => {
 })
 
 let testData = list{
-  (%css("content: ''"), CssJs.contentRule(#text("''"))),
-  (%css("content: '\"'"), CssJs.contentRule(#text(`'"'`))),
-  (%css(`content: '\"'`), CssJs.contentRule(#text("'\"'"))),
-  (%css("content: ' '"), CssJs.contentRule(#text("' '"))),
-  (%css("content: 'single'"), CssJs.contentRule(#text("'single'"))),
-  (%css(`font-family: "Lola"`), CssJs.fontFamily(#custom("Lola"))),
-  (%css(`font-family: "Lola del rio"`), CssJs.fontFamily(#custom("Lola del rio"))),
+  (%css(`content: ''`), CSS.contentRule(#text("''"))),
+  (%css(`content: ""`), CSS.contentRule(#text("''"))),
+  (%css(`content: ' '`), CSS.contentRule(#text("' '"))),
+  (%css(`content: " "`), CSS.contentRule(#text("' '"))),
+  (%css(`content: '"'`), CSS.contentRule(#text("\""))),
+  (%css(`content: "'"`), CSS.contentRule(#text("'"))),
+  (%css(`content: 'xxx'`), CSS.contentRule(#text(`xxx`))),
+  (%css(`font-family: "Lola"`), CSS.fontFamily("Lola")),
+  (%css(`font-family: "Lola del rio"`), CSS.fontFamily("Lola del rio")),
 }
 
 describe("content to rule", () => {
