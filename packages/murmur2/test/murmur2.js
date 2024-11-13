@@ -1,3 +1,6 @@
+// This code is copied from: https://github.com/emotion-js/emotion/blob/f3b268f7c52103979402da919c9c0dd3f9e0e189/packages/hash/src/index.js
+// to simulate the murmur2 hash function in emotion.
+
 function murmur2(str) {
   // 'm' and 'r' are mixing constants generated offline.
   // They're not really 'magic', they just happen to work well.
@@ -10,7 +13,6 @@ function murmur2(str) {
   var h = 0;
 
   // Mix 4 bytes at a time into the hash
-
   var k,
     i = 0,
     len = str.length;
@@ -34,7 +36,6 @@ function murmur2(str) {
   }
 
   // Handle the last few bytes of the input array
-
   switch (len) {
     case 3:
       h ^= (str.charCodeAt(i + 2) & 0xff) << 16;
@@ -46,7 +47,6 @@ function murmur2(str) {
         /* Math.imul(h, m): */
         (h & 0xffff) * 0x5bd1e995 + (((h >>> 16) * 0xe995) << 16);
   }
-
   // Do a few final mixes of the hash to ensure the last few
   // bytes are well-incorporated.
 
@@ -58,4 +58,4 @@ function murmur2(str) {
   return ((h ^ (h >>> 15)) >>> 0).toString(36);
 }
 
-process.stdout.write(murmur2(process.argv[2]));
+module.exports = murmur2;

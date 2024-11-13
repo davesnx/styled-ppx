@@ -1,11 +1,6 @@
 #!/bin/sh
-
-set -e
-
-input=$1
-
-native_hashes=$(./cli_murmur2.exe "${input}")
-js_hashes=$(node './cli_murmur2.js' "${input}")
+native_hashes=$(./malformed.exe)
+js_hashes=$(node './malformed.js')
 
 if [ "$native_hashes" = "$js_hashes" ]; then
   echo "Hashes match: ${native_hashes}"
