@@ -79,9 +79,90 @@
   $ ./compare.sh "z-index: 10"
   Hashes match: 7au0g0
 
-The following two rule sets produced the same hash (see https://github.com/davesnx/styled-ppx/pull/376)
+Special chars
+  $ ./compare.sh 'é'
+  Hashes match: dcz6rs
+  $ ./compare.sh '®'
+  Hashes match: 13s0tnc
+  $ ./compare.sh '😀'
+  Hashes match: 1ek03rz
+  $ ./compare.sh '中'
+  Hashes match: 182x3xl
+  $ ./compare.sh '𐍈'
+  Hashes match: mzbau4
+  $ ./compare.sh '™'
+  Hashes match: 19lqsls
+  $ ./compare.sh '☃'
+  Hashes match: hlpok8
+  $ ./compare.sh 'أ'
+  Hashes match: wm3gqk
+  $ ./compare.sh 'ß'
+  Hashes match: wodsab
+  $ ./compare.sh 'α'
+  Hashes match: 1t3vr8o
+  $ ./compare.sh '♥'
+  Hashes match: 1wuke12
+  $ ./compare.sh 'א'
+  Hashes match: 175czf5
+  $ ./compare.sh 'ᵖ'
+  Hashes match: 18p4nib
 
+UTF-16 Code Units
+  $ ./compare.sh '\u{FFFF}'
+  Hashes match: gjbtx8
+  $ ./compare.sh '\u{10000}'
+  Hashes match: 1jnazj1
+  $ ./compare.sh '\u{FFFF}\u{10000}'
+  Hashes match: hesjam
+
+Surrogate Pair Ranges
+  $ ./compare.sh '\u{D800}'
+  Hashes match: 1fnu2h4
+  $ ./compare.sh '\u{DC00}'
+  Hashes match: hqb3mb
+
+Combining Marks
+  $ ./compare.sh 'e\u0301'
+  Hashes match: 14y1ft9
+  $ ./compare.sh 'n\u0303o\u0301'
+  Hashes match: 1mz7ewt
+
+Mixed BMP and non-BMP
+  $ ./compare.sh 'a𐍈z'
+  Hashes match: 16j7at3
+  $ ./compare.sh 'é😀中'
+  Hashes match: 1951hkp
+
+Emoji combinations
+  $ ./compare.sh '👍🏽'
+  Hashes match: k0hfz4
+  $ ./compare.sh '👩‍💻'
+  Hashes match: q1f8iz
+
+Chinese and Hindi characters
+  $ ./compare.sh 'content: "漢字"'
+  Hashes match: 1s623fv
+  $ ./compare.sh 'content: "हिन्दी"'
+  Hashes match: 1jqc061
+
+Non-Printable ASCII and Control Characters
+  $ ./compare.sh 'Line1\nLine2'
+  Hashes match: 1dow2q7
+  $ ./compare.sh 'Tab\tSpace'
+  Hashes match: kxc8sq
+
+Long strings
+  $ ./compare.sh "$(head -c 1000 < /dev/zero | tr '\0' 'a')"
+  Hashes match: 11lsq50
+  $ ./compare.sh "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+  Hashes match: j9pabx
+
+The following two rule sets produced the same hash (see https://github.com/davesnx/styled-ppx/pull/376)
   $ ./compare.sh "color:var(--alt-text--tertiary);:disabled{color:var(--alt-text--tertiary);}:hover{color:var(--alt-text--primary);}"
   Hashes match: 66bc4u
   $ ./compare.sh "display:flex;:before, :after{content:'';flex:0 0 16px;}"
   Hashes match: ab0yh7
+
+Malformed UTF-8
+  $ ./compare-malformed.sh
+  Hashes match: z68v9f (2 bytes) - c4jucd (3 bytes) - c4jucd (4 bytes)
