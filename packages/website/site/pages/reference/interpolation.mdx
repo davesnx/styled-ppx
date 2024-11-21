@@ -2,6 +2,7 @@
 title: Interpolation
 ---
 
+import { Re, Res } from "../../components/language-content";
 import { Callout } from 'nextra/components'
 
 # Interpolation
@@ -29,9 +30,16 @@ module Component = [%styled.div {|
 |}];
 ```
 
+<Res>
 <Callout>
   Don't confuse interpolation from [String Interpolation from ReScript](https://rescript-lang.org/docs/manual/latest/primitive-types#string-interpolation)
 </Callout>
+</Res>
+<Re>
+<Callout>
+  Don't confuse interpolation from [String Interpolation from Reason](https://reasonml.github.io/docs/en/primitives)
+</Callout>
+</Re>
 
 ## Features
 
@@ -64,7 +72,7 @@ module Component = [%styled.div {|
 
 It's not allowed to interpolate on entire properties, neither any other interpolation. Which might be slightly different from other SASS/Less and JavaScript-based solutions (such as styled-components or emotion) as their interpolation is more dynamic and can be used everywhere.
 
-**styled-ppx** forces you to be more rigid but with the promise of being always type-safe, which is the same way as ReScript does ❤️. The dynamism from JavaScript-based solutions comes with the cost of being unsafe.
+**styled-ppx** forces you to be more rigid but with the promise of being always type-safe, which is the same way as <Res>ReScript</Res><Re>Reason</Re> does ❤️. The dynamism from JavaScript-based solutions comes with the cost of being unsafe.
 
 Here's a valid JavaScript example `` `margin-${whatever}: 10px`{:js} `` from styled-components. Which isn't valid in **styled-ppx** with the same syntax. As explained above, this interpolation can't be applied to entire **properties** or half-properties.
 
@@ -178,7 +186,7 @@ background: #fff url(img.png); /* The background is white with an image */
 background: url(img.png) no-repeat; /* The background is a non-repeating image */
 ```
 
-In this case, to interpolate the background's value like: `background: $(variable1) $(variable2)` the type-checker can't know the type of `$(variable1)` and `(variable2)` ahead of time, because there are numerous possibilities for a valid `background` CSS property. This is called an [overload](https://www.typescriptlang.org/docs/handbook/declaration-files/by-example.html#overloaded-functions) in other languages and it's not available in ReScript due to it's nature of being a static typed language.
+In this case, to interpolate the background's value like: `background: $(variable1) $(variable2)` the type-checker can't know the type of `$(variable1)` and `(variable2)` ahead of time, because there are numerous possibilities for a valid `background` CSS property. This is called an [overload](https://www.typescriptlang.org/docs/handbook/declaration-files/by-example.html#overloaded-functions) in other languages and it's not available in <Res>ReScript</Res><Re>Reason</Re> due to it's nature of being a static typed language.
 
 ## What if a property isn't supported
 

@@ -2,6 +2,8 @@
 title: About
 ---
 
+import { Re, Res } from "../components/language-content";
+
 # About
 
 Author and maintainer: [David Sancho](https://sancho.dev)
@@ -13,11 +15,11 @@ Author and maintainer: [David Sancho](https://sancho.dev)
 There are a few reasons why this project exists and why it came to live.
 
 ### There was a need
-In my experience, writing React with a CSS-in-JS library is one of the best combos for writing scalable design systems, UI libraries and applications. When I discovered Reason back in the day (around 2018), it wasn't possible to bind to styled-components or emotion. Even ([a](https://reasonml.chat/t/idiomatic-way-to-bind-to-styled-components/886) [f](https://reasonml.chat/t/styled-components-possible/554)[e](https://reasonml.chat/t/styling-solutions-reasonreact-as-of-aug-18/958)[w](https://reasonml.chat/t/options-and-best-practices-for-styling-in-reasonreact/261) [p](https://twitter.com/lyovson/status/1233397294311100417)[e](https://discord.gg/byjdYFH)[o](https://discord.gg/byjdYFH)[p](https://discord.gg/byjdYFH)[l](https://discord.gg/byjdYFH)[e](https://forum.rescript-lang.org/t/how-to-create-bindings-for-emotion-styled/2995) were asking for it.
+In my experience, writing React with a CSS-in-JS library is one of the best combos for writing scalable design systems, UI libraries and applications. When I discovered Reason back in the day (around 2018), it wasn't possible to bind to styled-components or emotion. Even [a](https://reasonml.chat/t/idiomatic-way-to-bind-to-styled-components/886) [f](https://reasonml.chat/t/styled-components-possible/554)[e](https://reasonml.chat/t/styling-solutions-reasonreact-as-of-aug-18/958)[w](https://reasonml.chat/t/options-and-best-practices-for-styling-in-reasonreact/261) [p](https://twitter.com/lyovson/status/1233397294311100417)[e](https://discord.gg/byjdYFH)[o](https://discord.gg/byjdYFH)[p](https://discord.gg/byjdYFH)[l](https://discord.gg/byjdYFH)[e](https://forum.rescript-lang.org/t/how-to-create-bindings-for-emotion-styled/2995) were asking for it.
 
 During that time, there were a few efforts to bring type-safety to CSS with [bs-css](https://github.com/giraud/bs-css) and [bs-emotion](https://github.com/ahrefs/bs-emotion). Even though I liked that approach, it had a few drawbacks:
 - The need for learning a new DSL on top of CSS was tedious. Very fancy for simple properties, but almost impossible for more complex ones (a classic example `width: calc(100% - 20px){:styled-ppx-css}` became `CSS.width(calc(min, percent(100.), px(20))){:rescript}` `CSS.width(calc(min, percent(100.), px(20)));{:reason}`). In real world usage I would end up using `CSS.unsafe`.
-- The runtime was huge. The bundle-size of bs-css starts with 64kb and goes up considerably with the usage, even with ReScripts dead code elimination.
+- The runtime was huge. The bundle-size of bs-css starts with 64kb and goes up considerably with the usage, even with the dead code elimination made by the compiler.
 - The fact of having a runtime involved to only write safe CSS doesn't seem like a nice trade-off.
 
 ### It's possible and a good solution
@@ -26,7 +28,7 @@ Embedding CSS inside Reason/OCaml seemed like a bad idea at first, mostly since 
 After discovering what a ppx was (*"a mechanism to embed other languages inside Reason"*), and it could mimic the template literals, I jumped straight into hacking a prototype that became this project.
 
 Embedding languages inside others isn't a new concept and has been happening for a long time. In fact, the most common case of an embedded language is usually CSS inside HTML.
-Using CSS enables all sorts of integrations: Editors, DevTools, prototyping tools, Github Copilot, etc. Even for designers that don't want to understand or care about ReScript.
+Using CSS enables all sorts of integrations: Editors, DevTools, prototyping tools, Github Copilot, etc. Even for designers that don't want to understand or care about <Res>ReScript</Res><Re>Reason</Re>.
 
 ### It can be more powerful than the JavaScript equivalents
 Enabling type-safety in CSS is a nice to have, rather than a hard requirement, but nevertheless useful. styled-ppx brings an entire CSS compiler and type-chcker. This enables features from SASS (like supporting future CSS version features) with features from emotion to inline your styles and code together.
