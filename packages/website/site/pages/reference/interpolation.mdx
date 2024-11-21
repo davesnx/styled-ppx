@@ -6,7 +6,7 @@ import { Callout } from 'nextra/components'
 
 # Interpolation
 
-Interpolation allows you to use any identifier as a value inside CSS, where "any identifier" refers to any ReScript variables or [module accessors](https://rescript-lang.org/try?code=LYewJgrgNgpgBAFQBY2PAvHA3gKDnWAFzgHMAnGATzkwGEBnegKXoDoUAPACgCIAhAKJ8AInwAcPAJQ4AvjiA). This is useful for reusing variables, handling themes, or conditionally applying styles based on props at run-time.
+Interpolation is one of the most powerful and useful patterns in styled-ppx. You can use variables from your code to define the values of your styles. This is useful for reusing variables, handling themes, or conditionally applying styles based on props.
 
 ```rescript
 module Component = %styled.div(`
@@ -18,7 +18,6 @@ module Component = [%styled.div {|
   border: 1px solid $(Theme.black);
 |}];
 ```
-
 ```rescript
 module Component = %styled.div(`
   max-width: $(maxWidth);
@@ -29,18 +28,45 @@ module Component = [%styled.div {|
   max-width: $(maxWidth);
 |}];
 ```
-
-Interpolation works inside values, media-queries and selectors. It doesn't work for entire properties or any interpolation, which is slightly different from SASS/Less and other JavaScript-based solutions (such as styled-components or emotion) as their interpolation is more dynamic and can be used everywhere.
 
 <Callout>
-  Don't confuse interpolation from [String Interpolation from ReScript](https://rescript-lang.org/docs/manual/latest/primitive-types#string-interpolation).
+  Don't confuse interpolation from [String Interpolation from ReScript](https://rescript-lang.org/docs/manual/latest/primitive-types#string-interpolation)
 </Callout>
 
-The rules for interpolation works the same way as [CSS variables](https://www.w3.org/TR/css-variables-1/#using-variables) (`var(){:styled-ppx-css}`);
+## Features
 
-**styled-ppx** forces you to be more rigid but with the promise of being type-safe, which is the same way as ReScript does ❤️. The dynamism from JavaScript-based solutions comes with the cost of being unsafe.
+- Type-safety via type holes
+- Support for properties
+- Support for shorthand properties
+- Support for selectors
+- Support for media queries
 
-Here's an example: `` `margin-${whatever}: 10px`{:js} `` is valid in JavaScript, while isn't valid in **styled-ppx**. As explained above, this interpolation can't be applied to entire **properties** or half-properties.
+## Rules
+
+Interpolation allows you to use any identifier as a value inside CSS, where "any identifier" refers to any runtime variables or [module accessors](https://rescript-lang.org/try?code=LYewJgrgNgpgBAFQBY2PAvHA3gKDnWAFzgHMAnGATzkwGEBnegKXoDoUAPACgCIAhAKJ8AInwAcPAJQ4AvjiA). Arbitrary expressions are not supported, yet. More information [here](https://github.com/davesnx/styled-ppx/issues/430).
+
+Interpolation works inside property values, media-queries and selectors. The rules for interpolation works the same way as [CSS variables](https://www.w3.org/TR/css-variables-1/#using-variables) (`var(){:styled-ppx-css}`).
+
+```rescript
+module Component = %styled.div(`
+  border: 1px solid $(Theme.black); // ✅
+  @media $(Theme.small) { ... } // ✅
+  &:$(Theme.small) { ... } // ✅
+`)
+```
+```reason
+module Component = [%styled.div {|
+  border: 1px solid $(Theme.black); // ✅
+  @media $(Theme.small) { ... } // ✅
+  &:$(Theme.small) { ... } // ✅
+|}];
+```
+
+It's not allowed to interpolate on entire properties, neither any other interpolation. Which might be slightly different from other SASS/Less and JavaScript-based solutions (such as styled-components or emotion) as their interpolation is more dynamic and can be used everywhere.
+
+**styled-ppx** forces you to be more rigid but with the promise of being always type-safe, which is the same way as ReScript does ❤️. The dynamism from JavaScript-based solutions comes with the cost of being unsafe.
+
+Here's a valid JavaScript example `` `margin-${whatever}: 10px`{:js} `` from styled-components. Which isn't valid in **styled-ppx** with the same syntax. As explained above, this interpolation can't be applied to entire **properties** or half-properties.
 
 The solution is simple, you would handle all properties based on the dynamic value:
 
@@ -87,11 +113,6 @@ module Size = {
 [%cx "margin: $(Size.small) 0"]; // -> margin: 10px 0;
 [%cx "margin: $(Size.small) $(Size.small)"]; // margin: 10px 10px;
 ```
-
-## Features
-
-- Type-safety via type holes.
-- Support for shorthand properties and interpolate on a value.
 
 ## Type-safety
 
@@ -144,7 +165,9 @@ Since `Size.small{:rescript}` `Size.small{:reason}` is `#px(int){:rescript}` `` 
 
 ## A note about the polymorphism of CSS
 
-There are plenty of properties in CSS that accept different types of values. Some of the most challenging ones are `animation`, `box-shadow`/`text-shadow`, `background`, `transition` and `transform`, to name a few. These properties are not challenging because they are shorthand properties, but because they have values that are positional **<u>and</u>** optional at the same time.
+There are plenty of shorthand properties in CSS that accept different values that depend on the position to have a certain meaning. Making it challenging for the type-checker to know which value to use. Some of the most problematic ones are `animation`, `box-shadow`/`text-shadow`, `background`, `transition` and `transform`, to name a few.
+
+These properties are not challenging to type because they are shorthand properties, but because they have values that are positional **<u>and</u>** optional at the same time.
 
 Let's look at `background`.
 
