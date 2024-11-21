@@ -9,7 +9,7 @@ on:
       - main
 
 env:
-  OPAM_VERSION: 2.2.0
+  OPAM_VERSION: 2.3.0
   DUNE_PROFILE: release
 
 permissions:
@@ -18,7 +18,7 @@ permissions:
 
 defaults:
   run:
-    shell: bash
+    shell: bash -xeuo pipefail {0}
 
 jobs:
   build:
@@ -32,33 +32,59 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Use Node.js
         uses: actions/setup-node@v3
 
+
+      - name: Load opam cache
+        id: opam-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ${{ runner.tool_cache }}/opam
+            ~/.opam
+            _opam
+            .opam-path
+          key: opam-${{ matrix.os }}-${{ matrix.ocaml-compiler }}-${{ hashFiles('**.opam') }}
+
       - name: Use OCaml ${{ matrix.ocaml-compiler }}
-        uses: ocaml/setup-ocaml@v3
+        uses: ocaml/setup-ocaml@v3.0.15
+        if: steps.opam-cache.outputs.cache-hit != 'true'
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
-          dune-cache: true
+          dune-cache: false
           opam-disable-sandboxing: true
 
-      - name: Load opam cache when not Windows
-        if: runner.os != 'Windows'
-        id: opam-cache
-        uses: actions/cache/restore@v3
+      - name: Get OPAM executable path
+        if: steps.opam-cache.outputs.cache-hit != 'true'
+        uses: actions/github-script@v7
         with:
-          path: ~/.opam
-          key: opam-${{ matrix.os }}-${{ hashFiles('**.opam') }}
+          script: |
+            const opam_path = await io.which('opam', true);
+            console.log('opam executable found: %s', opam_path);
+            const Fs = require('fs/promises');
+            await Fs.writeFile('.opam-path', opam_path, 'utf-8');
+            console.log('stored path to .opam-path');
 
-      - name: Load opam cache when Windows
-        if: runner.os == 'Windows'
-        id: opam-cache-windows
-        uses: actions/cache/restore@v3
-        with:
-          path: _opam
-          key: opam-${{ matrix.os }}-${{ hashFiles('**.opam') }}
+      - name: Use cached OPAM environment
+        # if: steps.opam-cache.outputs.cache-hit == 'true'
+        shell: bash
+        run: |
+          # https://github.com/ocaml/setup-ocaml/blob/b2105f9/packages/setup-ocaml/src/installer.ts#L33
+          echo "OPAMVERBOSE=$RUNNER_DEBUG"   >> "$GITHUB_ENV"
+          echo "OPAMCOLOR=always"            >> "$GITHUB_ENV"
+          echo "OPAMCONFIRMLEVEL=unsafe-yes" >> "$GITHUB_ENV"
+          echo "OPAMERRLOGLEN=0"             >> "$GITHUB_ENV"
+          echo "OPAMPRECISETRACKING=1"       >> "$GITHUB_ENV"
+          echo "OPAMYES=1"                   >> "$GITHUB_ENV"
+
+          echo "OPAMROOT=$HOME/.opam"        >> "$GITHUB_ENV"
+
+          OPAM_PATH="$(cat .opam-path)"
+          chmod +x "$OPAM_PATH"
+          dirname "$OPAM_PATH" >> "$GITHUB_PATH"
 
       - name: Install dependencies
         run: make install
@@ -85,19 +111,22 @@ jobs:
           name: runtime-rescript
           path: _build/default/packages/runtime/rescript
 
-      - name: Save cache when not Windows
-        uses: actions/cache/save@v3
-        if: steps.opam-cache.outputs.cache-hit != 'true' && runner.os != 'Windows'
+      - name: Save opam cache
+        uses: actions/cache/save@v4
+        if: steps.opam-cache.outputs.cache-hit != 'true'
         with:
-          path: ~/.opam
-          key: opam-${{ matrix.os }}-${{ hashFiles('**.opam') }}
+          path: |
+            ${{ runner.tool_cache }}/opam
+            ~/.opam
+            _opam
+            .opam-path
+          key: opam-${{ matrix.os }}-${{ matrix.ocaml-compiler }}-${{ hashFiles('**.opam') }}
 
-      - name: Save cache when Windows
-        uses: actions/cache/save@v3
-        if: steps.opam-cache-windows.outputs.cache-hit != 'true' && runner.os == 'Windows'
+      - name: Save npm cache
+        uses: actions/cache/save@v4
         with:
-          path: _opam
-          key: opam-${{ matrix.os }}-${{ hashFiles('**.opam') }}
+          path: node_modules
+          key: npm-${{ matrix.os }}-${{ hashFiles('package.json') }}
 
       - name: Grant permission to run ppx
         run: chmod +x _build/default/packages/bin/bin.exe
@@ -112,10 +141,10 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
 
       - name: Make NPM release skeleton
         run: node scripts/release-make-skeleton.js
