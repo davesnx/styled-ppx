@@ -12,20 +12,12 @@ Interpolation is one of the most powerful and useful patterns in styled-ppx. You
 ```rescript
 module Component = %styled.div(`
   border: 1px solid $(Theme.black);
-`)
-```
-```reason
-module Component = [%styled.div {|
-  border: 1px solid $(Theme.black);
-|}];
-```
-```rescript
-module Component = %styled.div(`
   max-width: $(maxWidth);
 `)
 ```
 ```reason
 module Component = [%styled.div {|
+  border: 1px solid $(Theme.black);
   max-width: $(maxWidth);
 |}];
 ```
