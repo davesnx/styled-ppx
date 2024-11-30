@@ -22,7 +22,10 @@ type token =
   | LEFT_PAREN // <(-token>
   | RIGHT_PAREN // <)-token>
   | LEFT_BRACE // <{-token>
-  | RIGHT_BRACE; // <}-token>
+  | RIGHT_BRACE // <}-token>
+  | UNICODE(string)
+  | UNICODE_WILDCARD(string, string)
+  | UNICODE_RANGE(string, string);
 
 let string_of_char = c => String.make(1, c);
 
@@ -62,7 +65,10 @@ let humanize =
   | LEFT_PAREN => "("
   | RIGHT_PAREN => ")"
   | LEFT_BRACE => "{"
-  | RIGHT_BRACE => "}";
+  | RIGHT_BRACE => "}"
+  | UNICODE(s) => "unicode" ++ s
+  | UNICODE_WILDCARD(s, w) => "unicode-wildcard: " ++ s ++ w
+  | UNICODE_RANGE(s, e) => "unicode-range:" ++ s ++ "-" ++ e;
 
 /* TODO: This should render Token, not Parser.token */
 let token_to_string =
