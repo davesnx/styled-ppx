@@ -46,26 +46,25 @@ let framesToDict frames =
     frames
 
 let keyframes frames =
-  makeKeyframes (framesToDict frames) |> Css_types.AnimationName.make
+  makeKeyframes (framesToDict frames) |> Value.AnimationName.make
 
 let renderKeyframes _renderer frames = makeAnimation (framesToDict frames)
 
 (* This method is a Css_type function, but with side-effects. It pushes the fontFace as global style *)
-let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust
-  ?unicodeRange () =
+let fontFace ~fontFamily ~src ?(fontStyle : Value.FontStyle.t option)
+  ?(fontWeight : Value.FontWeight.t option)
+  ?(fontDisplay : Value.FontDisplay.t option)
+  ?(sizeAdjust : Value.Percentage.t option)
+  ?(unicodeRange : Value.UnicodeRange.t option) () =
   let fontFace =
     [|
-      Kloth.Option.map ~f:Declarations.fontStyle fontStyle;
-      Kloth.Option.map ~f:Declarations.fontWeight fontWeight;
-      Kloth.Option.map ~f:Declarations.fontDisplay fontDisplay;
-      Kloth.Option.map ~f:Declarations.sizeAdjust sizeAdjust;
-      Kloth.Option.map ~f:Declarations.unicodeRange unicodeRange;
-      Some (Declarations.fontFamily fontFamily);
-      Some
-        (Rule.Declaration
-           ( "src",
-             Kloth.Array.map_and_join ~sep:{js|, |js}
-               ~f:Css_types.FontFace.toString src ));
+      Kloth.Option.map ~f:Property.fontStyle fontStyle;
+      Kloth.Option.map ~f:Property.fontWeight fontWeight;
+      Kloth.Option.map ~f:Property.fontDisplay fontDisplay;
+      Kloth.Option.map ~f:Property.sizeAdjust sizeAdjust;
+      Kloth.Option.map ~f:Property.unicodeRange unicodeRange;
+      Some (Property.fontFamily fontFamily);
+      Some (Property.src src);
     |]
     |> Kloth.Array.filter_map ~f:(fun i -> i)
   in

@@ -4064,7 +4064,7 @@ module FontVariantEmoji = struct
     | #Cascading.t as c -> Cascading.toString c
 end
 
-module URange = struct
+module UnicodeRange = struct
   type t =
     [ `single of string
     | `range of string * string

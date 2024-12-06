@@ -1,10 +1,11 @@
-include Declarations
+(* Properties is included for users that don't use the ppx *)
+include Property
 include Colors
-include Alias
 include Rule
+include Alias
 
-(* The reason to have a module called Css_types and not Types directly, is because we use a unwrapped library, so all modules are exposed. "Types" would collide with a lot of modules in user's application *)
-module Types = Css_types
+(* The reason to have this alias, and not a module called "Types" directly, is because we use a unwrapped library, so all modules are exposed. "Types" would collide with a lot of modules in user's application *)
+module Types = Value
 
 module Array = struct
   include Kloth.Array
@@ -449,12 +450,12 @@ let global (styles : rule array) =
 
 let keyframes (keyframes : (int * rule array) array) =
   match keyframes with
-  | [||] -> Types.AnimationName.make ""
+  | [||] -> Value.AnimationName.make ""
   | _ ->
     let hash = Murmur2.default (keyframes_to_string keyframes) in
     let animationName = Printf.sprintf "%s-%s" "animation" hash in
     Stylesheet.push instance (hash, Keyframes { animationName; keyframes });
-    Types.AnimationName.make animationName
+    Value.AnimationName.make animationName
 
 let get_stylesheet () =
   let stylesheet = Stylesheet.get_all instance in
@@ -495,17 +496,13 @@ let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust
   ?unicodeRange () =
   let fontFace =
     [|
-      Kloth.Option.map ~f:Declarations.fontStyle fontStyle;
-      Kloth.Option.map ~f:Declarations.fontWeight fontWeight;
-      Kloth.Option.map ~f:Declarations.fontDisplay fontDisplay;
-      Kloth.Option.map ~f:Declarations.sizeAdjust sizeAdjust;
-      Kloth.Option.map ~f:Declarations.unicodeRange unicodeRange;
-      Some (Declarations.fontFamily fontFamily);
-      Some
-        (Rule.Declaration
-           ( "src",
-             Kloth.Array.map_and_join ~sep:{js|, |js}
-               ~f:Css_types.FontFace.toString src ));
+      Kloth.Option.map ~f:Property.fontStyle fontStyle;
+      Kloth.Option.map ~f:Property.fontWeight fontWeight;
+      Kloth.Option.map ~f:Property.fontDisplay fontDisplay;
+      Kloth.Option.map ~f:Property.sizeAdjust sizeAdjust;
+      Kloth.Option.map ~f:Property.unicodeRange unicodeRange;
+      Some (Property.fontFamily fontFamily);
+      Some (Property.src src);
     |]
     |> Kloth.Array.filter_map ~f:(fun i -> i)
   in

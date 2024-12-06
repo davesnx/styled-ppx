@@ -1,4 +1,4 @@
-open Css_types
+open Value
 
 let label label = Rule.declaration ({js|label|js}, label)
 
@@ -907,4 +907,9 @@ let fontOpticalSizing x =
 let fontVariantEmoji x =
   Rule.declaration ({js|fontVariantEmoji|js}, FontVariantEmoji.toString x)
 
-let unicodeRange x = Rule.declaration ({js|unicodeRange|js}, URange.toString x)
+let unicodeRange x = Rule.declaration ({js|unicodeRange|js}, UnicodeRange.toString x)
+
+let src x =
+  Rule.declaration
+    ( {js|src|js},
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:Value.FontFace.toString x )

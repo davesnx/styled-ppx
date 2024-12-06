@@ -1,6 +1,6 @@
-(* Alias is used to have a few utilities for users that are not aware of the underlying type *)
+(* Alias is used to have a few utilities (funcctions) for users that don't deal with the underlying *)
 
-open Css_types
+open Value
 
 let initial = `initial
 let inherit_ = `inherit_
@@ -246,21 +246,21 @@ let pinchZoom = `pinchZoom
 let manipulation = `manipulation
 
 module Shadow = struct
-  type box = Css_types.Shadow.box Css_types.Shadow.t
-  type text = Css_types.Shadow.text Css_types.Shadow.t
+  type box = Value.Shadow.box Value.Shadow.t
+  type text = Value.Shadow.text Value.Shadow.t
 
-  let box = Css_types.Shadow.box
-  let text = Css_types.Shadow.text
+  let box = Value.Shadow.box
+  let text = Value.Shadow.text
 end
 
 module Animation = struct
   (* backwards compatibility *)
-  let shorthand = Css_types.Animation.make
+  let shorthand = Value.Animation.make
 end
 
 module Transition = struct
   (* backwards compatibility *)
-  let shorthand = Css_types.Transition.make
+  let shorthand = Value.Transition.make
 end
 
 type animationName = AnimationName.t
