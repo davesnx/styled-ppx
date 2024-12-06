@@ -201,6 +201,11 @@ html.dark .nextra-code-block>pre {
   background: rgba(255, 255, 255, 0.04);
 }
 
+html.dark pre code {
+  background: transparent !important;
+  border-color: transparent !important;
+}
+
 html.light .nextra-code-block>pre {
   background: rgba(0, 0, 0, 0.04);
 }
@@ -212,5 +217,10 @@ html.light [data-rehype-pretty-code-figure] code {
 
 html.light code {
   background: rgba(0, 0, 0, 0.04) !important;
+  border-color: transparent !important;
+}
+
+html.light pre code {
+  background: transparent !important;
   border-color: transparent !important;
 }

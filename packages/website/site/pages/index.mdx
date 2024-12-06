@@ -2,9 +2,9 @@
 title: Introduction to styled-ppx
 ---
 
-### Typed styled components for ReScript, Melange and Native
+### styled components with type-safe CSS for ReScript, Melange and Native
 
-**styled-ppx** is a [ppx](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem) and a library that brings styled components to ReScript, Melange and Native. Create **React Components** or simply `class` with type-safe style definitions wiht only CSS.
+**styled-ppx** is a [ppx](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem) and a library that brings styled components to ReScript, Melange and Native. Create **React Components** with type-safe style definitions with only CSS.
 
 It allows you to style apps safely, quickly, and performant - just as you always done it.
 
@@ -31,11 +31,14 @@ module Center = [%styled.div {|
 <Center> {React.string("Hello from the future!")} </Center>
 ```
 
+## Type-safe CSS
+
+styled-ppx comes with its own CSS Parser and CSS type-checker, so you can write CSS and be sure it will be valid and all types will be correct. This is a **huge** time-saver when working at large scale with CSS.
+
 ## Features
 
-- Type-safe CSS
-- Component-based styling
-- Zero abstraction over CSS
+- **Zero abstraction over CSS**
+- **Component-based styling**
 - Supports the power of the underlying language: pattern-matching, composition, labelled arguments, static type-safety.
 - Implements utilities such as `cx` to generate classNames and `css` to generate `Css.rule`
 - Supports [ReScript](https://rescript-lang.org/), [Melange](https://melange.re) and [native](/getting-started/native.mdx).
