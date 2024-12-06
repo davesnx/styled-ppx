@@ -2,11 +2,15 @@
 title: Array API
 ---
 
+import { Re, Res } from "../../components/language-content";
+
 # Array API
 
-`%styled.{{tag}}{:rescript}` `[%styled.{{tag}}]{:reason}` and `%cx{:rescript}` `[%cx]{:reason}` support an alternative to the string-based API. It's the **Array API**, where the rules can be defined as an array of `Css.rules{:rescript}` `Css.rules{:reason}`.
+`%styled.{{tag}}{:rescript}` `[%styled.{{tag}}]{:reason}` and `%cx{:rescript}` `[%cx]{:reason}` support an alternative to the string-based API. That's the **Array API**, where the rules can be defined as an array of `Css.rules{:rescript}` `Css.rules{:reason}`.
 
-A `Css.rule{:rescript}` `Css.rule{:reason}` can be created with [`%css`](./css) or [`CSS`](./runtime) calls.
+The type `Css.rule{:rescript}` `Css.rule{:reason}` is a reference to a [CSS declaration rule](https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/CSS_basics#declaration) which can be a [CSS property](https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/CSS_basics#properties), a [CSS selector](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Selectors) or an [CSS at-rule](https://developer.mozilla.org/en-US/docs/Web/CSS/At-rule) (like `@media` or `@font-face`).
+
+To create a `CSS.rule` you can use the extension <Re>[`[%css ...]`](./css)</Re><Res>[`%css(...)`](./css)</Res> or the [`CSS`](./runtime) module.
 
 ## Example
 
@@ -29,7 +33,7 @@ module Component = [%styled.section [|
 let className = [%cx [|[%css "display: flex;"]|]];
 ```
 
-<small>Any expression that is a `Css.Rule.t` is valid inside the array.</small>
+<small>Any expression that is a `Css.rule` is valid inside the array.</small>
 
 ## Features
 
@@ -127,4 +131,4 @@ module Button = [%styled.button (~variant) => {
 }];
 ```
 
-Note: The returned expression (the last expression of the function) has to be an array of `Css.rules` (it can't be a reference or a function call). This is a limitation of ppxes where it needs to check the current AST to know which type is.
+Note: The last expression of the function, the returned value has to be an array of `Css.rules` (it can't be a reference or a function call). This is a limitation of ppxes where it needs to check the current AST to know which type is.

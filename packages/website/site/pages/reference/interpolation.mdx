@@ -10,16 +10,34 @@ import { Callout } from 'nextra/components'
 Interpolation is one of the most powerful and useful patterns in styled-ppx. You can use variables from your code to define the values of your styles. This is useful for reusing variables, handling themes, or conditionally applying styles based on props.
 
 ```rescript
+let maxWidth = CSS.px(100)
+// CSS comes from the library called "styled-ppx" and it exposes all CSS values
+// More information in the `Runtime: CSS` section
+
+module Theme = {
+  let black = CSS.black
+}
+
 module Component = %styled.div(`
   border: 1px solid $(Theme.black);
   max-width: $(maxWidth);
 `)
 ```
 ```reason
-module Component = [%styled.div {|
+let maxWidth = CSS.px(100);
+// CSS comes from the library called "styled-ppx" and it exposes all CSS values
+// More information in the `Runtime: CSS` section
+
+module Theme = {
+  let black = CSS.black;
+};
+
+module Component = [%styled.div
+  {|
   border: 1px solid $(Theme.black);
   max-width: $(maxWidth);
-|}];
+|}
+];
 ```
 
 <Res>
