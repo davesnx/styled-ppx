@@ -25,7 +25,10 @@ opam install styled-ppx
 
 ### Usage
 
-Add `styled-ppx` under dune's preprocess pps for library with `(modes melange)` or `melange.emit`. Add `styled-ppx.melange` under libraries.
+1) Add `styled-ppx` under dune's preprocess pps
+2) Add `styled-ppx.melange` under libraries
+
+in a dune library with `(modes melange)`:
 
 ```diff
 (library
@@ -40,6 +43,8 @@ Add `styled-ppx` under dune's preprocess pps for library with `(modes melange)` 
       melange.ppx
       reason-react-ppx)))
 ```
+
+or in the `melange.emit` stanza:
 
 ```diff
 (melange.emit

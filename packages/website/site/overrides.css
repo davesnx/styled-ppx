@@ -205,12 +205,12 @@ html.light .nextra-code-block>pre {
   background: rgba(0, 0, 0, 0.04);
 }
 
-html.dark [data-rehype-pretty-code-figure] code {
+html.light [data-rehype-pretty-code-figure] code {
   background: rgba(0, 0, 0, 0.04);
   border-color: transparent;
 }
 
-html.dark code {
+html.light code {
   background: rgba(0, 0, 0, 0.04) !important;
   border-color: transparent !important;
 }

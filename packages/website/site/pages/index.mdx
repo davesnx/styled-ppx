@@ -6,7 +6,7 @@ title: Introduction to styled-ppx
 
 **styled-ppx** is a [ppx](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem) and a library that brings styled components to ReScript, Melange and Native. Create **React Components** or simply `class` with type-safe style definitions wiht only CSS.
 
-Built on top of [emotion](https://emotion.sh), it allows you to style apps safely, quickly, and performantly - just as you always done it.
+It allows you to style apps safely, quickly, and performant - just as you always done it.
 
 ```rescript
 module Center = %styled.div(`
@@ -28,7 +28,7 @@ module Center = [%styled.div {|
   justify-content: center;
 |}];
 
-<Center> {React.string("Hello from the future!")} </Center>;
+<Center> {React.string("Hello from the future!")} </Center>
 ```
 
 ## Features
@@ -38,12 +38,15 @@ module Center = [%styled.div {|
 - Zero abstraction over CSS
 - Supports the power of the underlying language: pattern-matching, composition, labelled arguments, static type-safety.
 - Implements utilities such as `cx` to generate classNames and `css` to generate `Css.rule`
-- Integrates with [@resript-react], [reason-react], and [server-reason-react]
+- Supports [ReScript](https://rescript-lang.org/), [Melange](https://melange.re) and [native](/getting-started/native.mdx).
+- Integrates with [`@rescript-react`](https://rescript-lang.org/docs/react/latest/introduction), [`reason-react`](https://reasonml.github.io/reason-react/), and [`server-reason-react`](https://github.com/ml-in-barcelona/server-reason-react)
 - It can also work without React
 - Adds labels on the className hashes for better DX
 
-The main part of **styled-ppx** is a ppx. Generally speaking, a ppx is the system from OCaml to have some sort of macro. They are similar to [babel plugins](https://babeljs.io/docs/en/plugins/). Run before the compilation of your code, and can transform your source-code.
+The main part of **styled-ppx** is a ppx. Generally speaking, a ppx is the system from OCaml to have some sort of macros. A small program that run before the compilation, and can transform your source-code.
 
-In this case, expands styled-ppx extensions (e.g., `%styled.div{:rescript}` `[%styled.div]{:reason}` or `%cx{:rescript}` `[%cx]{:reason}`) into valid code.
+They are similar to [babel plugins](https://babeljs.io/docs/en/plugins/).
+
+In this case, expands those extensions (e.g., `%styled.div{:rescript}` `[%styled.div]{:reason}`, `%cx{:rescript}` `[%cx]{:reason}` and `%css{:rescript}` `[%css]{:reason}`) into valid code.
 
 You can learn more about it in [Tarides blog: Introduction to OCaml ppx ecosystem](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem).
