@@ -162,3 +162,7 @@ lexer: ## Print the command to debug the lexer
 .PHONY: interpreter
 interpreter: ## Run menhir as interpret
 	$(OPAM_EXEC) menhir --interpret --interpret-show-cst packages/parser/lib/Parser.mly
+
+.PHONY: website-dev
+website-dev: ## Run the website locally
+	cd packages/website && npm run dev -w site
