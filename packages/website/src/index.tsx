@@ -5,6 +5,8 @@ import { MDXProvider } from 'nextra/mdx'
 import type { ReactElement, ReactNode } from 'react'
 import { Banner } from './components/banner'
 import { Head } from './components/head'
+import { Footer } from './components/footer'
+import { Navbar } from './components/navbar'
 
 import {
   ActiveAnchorProvider,
@@ -13,7 +15,7 @@ import {
   useThemeConfig
 } from './contexts'
 import { getComponents } from './mdx-components'
-import { renderComponent } from './utils'
+import { renderComponent } from './render'
 
 function InnerLayout({ children }: { children: ReactNode }): ReactElement {
   const themeConfig = useThemeConfig()
@@ -41,19 +43,13 @@ function InnerLayout({ children }: { children: ReactNode }): ReactElement {
       <div dir={dir}>
         <Head title={title} description={description} />
         <Banner />
-        {themeContext.navbar &&
-          renderComponent(themeConfig.navbar.component, {
-            items: topLevelNavbarItems
-          })}
+        <Navbar items={topLevelNavbarItems} />
         <ActiveAnchorProvider>
           <MDXProvider disableParentContext components={components}>
             {children}
           </MDXProvider>
         </ActiveAnchorProvider>
-        {themeContext.footer &&
-          renderComponent(themeConfig.footer.component, {
-            menu: config.hideSidebar
-          })}
+        <Footer menu={config.hideSidebar} />
       </div>
     </ThemeProvider>
   )

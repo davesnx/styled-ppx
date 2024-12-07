@@ -5,9 +5,10 @@ import type { ReactElement } from 'react'
 import { useEffect, useRef } from 'react'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import { useActiveAnchor, useThemeConfig } from '../contexts'
-import { renderComponent } from '../utils'
+import { renderComponent } from '../render'
 import { Anchor } from './anchor'
 import { BackToTop } from './back-to-top'
+import { useGitEditUrl } from '../git-url'
 
 export type TOCProps = {
   toc: Heading[]
@@ -21,6 +22,18 @@ const linkClassName = cn(
   'contrast-more:_text-gray-700 contrast-more:dark:_text-gray-100'
 )
 
+function EditLink({ className, filePath, children }) {
+  const editUrl = useGitEditUrl(filePath)
+  if (!editUrl) {
+    return null
+  }
+  return (
+    <Anchor className={className} href={editUrl}>
+      {children}
+    </Anchor>
+  )
+}
+
 export function TOC({ toc, filePath }: TOCProps): ReactElement {
   const activeAnchor = useActiveAnchor()
   const tocRef = useRef<HTMLUListElement>(null)
@@ -29,9 +42,9 @@ export function TOC({ toc, filePath }: TOCProps): ReactElement {
   const hasHeadings = toc.length > 0
   const hasMetaInfo = Boolean(
     themeConfig.feedback.content ||
-      themeConfig.editLink.component ||
-      themeConfig.toc.extraContent ||
-      themeConfig.toc.backToTop
+    themeConfig.editLink.component ||
+    themeConfig.toc.extraContent ||
+    themeConfig.toc.backToTop
   )
 
   const activeSlug = Object.entries(activeAnchor).find(
@@ -126,11 +139,14 @@ export function TOC({ toc, filePath }: TOCProps): ReactElement {
             </Anchor>
           ) : null}
 
-          {renderComponent(themeConfig.editLink.component, {
-            filePath,
-            className: linkClassName,
-            children: renderComponent(themeConfig.editLink.content)
-          })}
+
+
+          <EditLink
+            filePath={filePath}
+            className={linkClassName}
+          >
+            Edit this page
+          </EditLink>
 
           {renderComponent(themeConfig.toc.extraContent)}
 

@@ -23,7 +23,8 @@ import type { AnchorProps } from './components/anchor'
 import type { DocsThemeConfig } from './constants'
 import { useConfig, useSetActiveAnchor, useThemeConfig } from './contexts'
 import { useIntersectionObserver, useSlugs } from './contexts/active-anchor'
-import { renderComponent } from './utils'
+import { renderComponent } from './render'
+import { useLanguage } from './contexts/use-language'
 
 function Code({
   children,
@@ -306,6 +307,8 @@ function Body({ children }: { children: ReactNode }): ReactElement {
   const config = useConfig()
   const themeConfig = useThemeConfig()
   const mounted = useMounted()
+  const { language } = useLanguage()
+
   const {
     activeThemeContext: themeContext,
     activeType,
@@ -339,7 +342,7 @@ function Body({ children }: { children: ReactNode }): ReactElement {
       {children}
       {gitTimestampEl}
       {renderComponent(themeContext.bottomContent)}
-      {activeType !== 'page' && themeContext.pagination && (
+      {activeType !== 'page' && (
         <NavLinks
           flatDocsDirectories={flatDocsDirectories}
           currentIndex={activeIndex}
@@ -348,11 +351,16 @@ function Body({ children }: { children: ReactNode }): ReactElement {
     </>
   )
 
-  const body = themeConfig.main ? (
-    <themeConfig.main>{content}</themeConfig.main>
-  ) : (
-    content
-  )
+  const body = (
+    <div
+      className={cn(
+        `syntax__${language}`,
+        config.frontMatter.showAllLanguage && "show-all-language"
+      )}
+    >
+      {content}
+    </div>
+  );
 
   if (themeContext.layout === 'full') {
     return (

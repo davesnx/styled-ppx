@@ -1,7 +1,7 @@
 import cn from 'clsx'
 import type { ReactElement } from 'react'
 import { useThemeConfig } from '../contexts'
-import { renderComponent } from '../utils'
+import { renderComponent } from '../render'
 import { LocaleSwitch } from './locale-switch'
 
 export function Footer({ menu }: { menu?: boolean }): ReactElement {
@@ -11,7 +11,7 @@ export function Footer({ menu }: { menu?: boolean }): ReactElement {
       <div
         className={cn(
           '_mx-auto _flex _max-w-[90rem] _gap-2 _py-2 _px-4',
-          menu && (themeConfig.i18n.length > 0 || themeConfig.darkMode)
+          menu && (themeConfig.i18n.length > 0)
             ? '_flex'
             : '_hidden'
         )}

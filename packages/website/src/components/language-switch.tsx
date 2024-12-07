@@ -1,7 +1,7 @@
 import { useMounted } from "nextra/hooks";
 import type { ReactElement } from "react";
 import { z } from "zod";
-import { useLanguage } from "../utils/use-language";
+import { useLanguage } from "../contexts/use-language";
 import { useConfig } from "../contexts/config";
 import { Select } from "./select";
 

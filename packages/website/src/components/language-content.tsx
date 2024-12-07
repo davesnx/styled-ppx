@@ -1,4 +1,4 @@
-import { useLanguage } from "../utils/use-language";
+import { useLanguage } from "../contexts/use-language";
 
 export function LanguageContent({ language, children }) {
   const { language: storedLanguage } = useLanguage();

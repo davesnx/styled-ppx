@@ -11,6 +11,6 @@ const MenuContext = createContext<Menu>({
   setMenu: () => false
 })
 MenuContext.displayName = 'Menu'
-export const useMenu = () => useContext(MenuContext)
 
+export const useMenu = () => useContext(MenuContext)
 export const MenuProvider = MenuContext.Provider

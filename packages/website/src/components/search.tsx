@@ -5,7 +5,6 @@ import {
   ComboboxOptions
 } from '@headlessui/react'
 import cn from 'clsx'
-// eslint-disable-next-line no-restricted-imports -- since we don't need newWindow prop
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 import { useMounted } from 'nextra/hooks'
@@ -14,7 +13,7 @@ import type { FocusEventHandler, ReactElement, SyntheticEvent } from 'react'
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { useMenu, useThemeConfig } from '../contexts'
 import type { SearchResult } from '../types'
-import { renderComponent, renderString } from '../utils'
+import { renderComponent, renderString } from '../render'
 
 type SearchProps = {
   className?: string
@@ -184,7 +183,7 @@ export function Search({
             error || loading || !results.length
               ? 'md:_h-[100px]'
               : // headlessui adds max-height as style, use !important to override
-                'md:!_max-h-[min(calc(100vh-5rem),400px)]',
+              'md:!_max-h-[min(calc(100vh-5rem),400px)]',
             '_w-full md:_w-[576px]',
             'empty:_invisible'
           )

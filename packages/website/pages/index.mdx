@@ -46,10 +46,8 @@ styled-ppx comes with its own CSS Parser and CSS type-checker, so you can write 
 - It can also work without React
 - Adds labels on the className hashes for better DX
 
-The main part of **styled-ppx** is a ppx. Generally speaking, a ppx is the system from OCaml to have some sort of macros. A small program that run before the compilation, and can transform your source-code.
+The main part of **styled-ppx** is a ppx. Generally speaking, a ppx is the system from OCaml to have some sort of macros; similar to [babel plugins](https://babeljs.io/docs/en/plugins/). A small program that run before the compilation, and can transform your source-code.
 
-They are similar to [babel plugins](https://babeljs.io/docs/en/plugins/).
+In this case, expands those extensions (e.g., `%styled.div{:rescript}` `[%styled.div]{:reason}`, `%cx{:rescript}` `[%cx]{:reason}` and `%css{:rescript}` `[%css]{:reason}`) into valid code. If you are curious about the actual transformation, you can check the [snapshot tests](https://github.com/davesnx/styled-ppx/tree/main/packages/ppx/test/snapshot/reason/reason-classname-cx.t).
 
-In this case, expands those extensions (e.g., `%styled.div{:rescript}` `[%styled.div]{:reason}`, `%cx{:rescript}` `[%cx]{:reason}` and `%css{:rescript}` `[%css]{:reason}`) into valid code.
-
-You can learn more about it in [Tarides blog: Introduction to OCaml ppx ecosystem](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem).
+You can learn more about them in [Tarides blog: Introduction to OCaml ppx ecosystem](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem).

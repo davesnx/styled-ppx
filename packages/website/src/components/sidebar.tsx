@@ -19,7 +19,7 @@ import {
 } from 'react'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import { useActiveAnchor, useMenu, useThemeConfig } from '../contexts'
-import { renderComponent } from '../utils'
+import { renderComponent } from '../render'
 import { Anchor } from './anchor'
 import { Collapse } from './collapse'
 import { LocaleSwitch } from './locale-switch'
@@ -381,8 +381,7 @@ export function Sidebar({
 
   const themeConfig = useThemeConfig()
   const hasI18n = themeConfig.i18n.length > 0
-  const hasMenu =
-    themeConfig.darkMode || hasI18n || themeConfig.sidebar.toggleButton
+  const hasMenu = themeConfig.darkMode || hasI18n
 
   return (
     <>
@@ -485,30 +484,28 @@ export function Sidebar({
               </div>
             )}
             <LanguageSwitch lite={!showSidebar} />
-            {themeConfig.sidebar.toggleButton && (
-              <Button
-                title={showSidebar ? 'Hide sidebar' : 'Show sidebar'}
-                className={({ hover }) =>
-                  cn(
-                    'max-md:_hidden _rounded-md _p-2',
-                    hover
-                      ? '_bg-gray-100 _text-gray-900 dark:_bg-primary-100/5 dark:_text-gray-50'
-                      : '_text-gray-600 dark:_text-gray-400'
-                  )
-                }
-                onClick={() => {
-                  setSidebar(!showSidebar)
-                  setToggleAnimation(true)
-                }}
-              >
-                <ExpandIcon
-                  height="12"
-                  className={cn(
-                    !showSidebar && 'first:*:_origin-[35%] first:*:_rotate-180'
-                  )}
-                />
-              </Button>
-            )}
+            <Button
+              title={showSidebar ? 'Hide sidebar' : 'Show sidebar'}
+              className={({ hover }) =>
+                cn(
+                  'max-md:_hidden _rounded-md _p-2',
+                  hover
+                    ? '_bg-gray-100 _text-gray-900 dark:_bg-primary-100/5 dark:_text-gray-50'
+                    : '_text-gray-600 dark:_text-gray-400'
+                )
+              }
+              onClick={() => {
+                setSidebar(!showSidebar)
+                setToggleAnimation(true)
+              }}
+            >
+              <ExpandIcon
+                height="12"
+                className={cn(
+                  !showSidebar && 'first:*:_origin-[35%] first:*:_rotate-180'
+                )}
+              />
+            </Button>
           </div>
         )}
       </aside>

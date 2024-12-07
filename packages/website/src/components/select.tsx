@@ -4,7 +4,7 @@ import { useMounted } from "nextra/hooks";
 import { CheckIcon } from "nextra/icons";
 import type { ReactElement, ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { usePopper } from "../utils/use-popper";
+import { usePopper } from "../contexts/use-popper";
 
 interface MenuOption {
   key: string;

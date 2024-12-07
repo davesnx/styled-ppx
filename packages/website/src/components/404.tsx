@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import { useMounted } from 'nextra/hooks'
 import type { ReactElement } from 'react'
 import { useThemeConfig } from '../contexts'
-import { getGitIssueUrl, renderComponent } from '../utils'
+import { getGitIssueUrl, renderComponent } from '../git-url'
 import { Anchor } from './anchor'
 
 export function NotFoundPage(): ReactElement | null {
