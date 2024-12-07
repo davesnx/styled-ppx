@@ -72,10 +72,6 @@ export const DEFAULT_THEME: DocsThemeConfig = {
     )
   },
   i18n: [],
-  nextThemes: {
-    defaultTheme: 'system',
-    storageKey: 'theme'
-  },
   notFound: {
     content: 'Submit an issue about broken link →',
     labels: 'bug'

@@ -38,7 +38,8 @@ function InnerLayout({ children }: { children: ReactNode }): ReactElement {
     <ThemeProvider
       attribute="class"
       disableTransitionOnChange
-      {...themeConfig.nextThemes}
+      defaultTheme="system"
+      storageKey="theme"
     >
       <div dir={dir}>
         <Head title={title} description={description} />
@@ -51,7 +52,7 @@ function InnerLayout({ children }: { children: ReactNode }): ReactElement {
         </ActiveAnchorProvider>
         <Footer menu={config.hideSidebar} />
       </div>
-    </ThemeProvider>
+    </ThemeProvider >
   )
 }
 
