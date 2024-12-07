@@ -51,16 +51,6 @@ function Code({
   )
 }
 
-function toggleWordWrap() {
-  const htmlDataset = document.documentElement.dataset
-  const hasWordWrap = 'nextraWordWrap' in htmlDataset
-  if (hasWordWrap) {
-    delete htmlDataset.nextraWordWrap
-  } else {
-    htmlDataset.nextraWordWrap = ''
-  }
-}
-
 function Pre({
   children,
   className,
@@ -93,6 +83,7 @@ function Pre({
         )}
         ref={preRef}
         {...props}
+        data-language={_language}
       >
         {children}
       </pre>

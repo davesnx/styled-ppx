@@ -1,4 +1,5 @@
 import { useRouter } from 'nextra/hooks'
+import cn from 'clsx'
 import { DiscordIcon, GitHubIcon } from 'nextra/icons'
 import { isValidElement } from 'react'
 import type { z } from 'zod'
@@ -10,6 +11,8 @@ import { ThemeSwitch } from './components/theme-switch'
 import { TOC } from './components/toc'
 import type { publicThemeSchema, themeSchema } from './schemas'
 import { getGitIssueUrl, useGitEditUrl } from './utils'
+import { useConfig } from './contexts/config'
+import { useLanguage } from './utils/use-language'
 
 export const DEFAULT_LOCALE = 'en-US'
 
@@ -41,6 +44,21 @@ export const DEFAULT_THEME: DocsThemeConfig = {
   banner: {
     dismissible: true,
     key: 'nextra-banner'
+  },
+  main: ({ children }) => {
+    const { frontMatter } = useConfig();
+    const { language } = useLanguage();
+
+    return (
+      <div
+        className={cn(
+          `syntax__${language}`,
+          frontMatter.showAllLanguage && "show-all-language"
+        )}
+      >
+        {children}
+      </div>
+    );
   },
   chat: {
     icon: (

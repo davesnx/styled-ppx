@@ -336,8 +336,8 @@
 
   :root {
 
-    .syntax__rescript:not(.show-all-language) :is(code[data-language="reason"], code[data-language="reason"]),
-    .syntax__reason:not(.show-all-language) :is(code[data-language="rescript"], code[data-language="rescript"]) {
+    .syntax__rescript:not(.show-all-language) :is(pre[data-language="reason"], code[data-language="reason"]),
+    .syntax__reason:not(.show-all-language) :is(pre[data-language="rescript"], code[data-language="rescript"]) {
       display: none;
     }
 
