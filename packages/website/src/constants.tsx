@@ -82,7 +82,7 @@ export const DEFAULT_THEME: DocsThemeConfig = {
   darkMode: true,
   direction: 'ltr',
   docsRepositoryBase:
-    "https://github.com/davesnx/styled-ppx/tree/main/packages/website/",
+    "https://github.com/davesnx/styled-ppx/tree/main/packages/website",
   editLink: {
     component: function EditLink({ className, filePath, children }) {
       const editUrl = useGitEditUrl(filePath)

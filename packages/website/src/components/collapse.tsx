@@ -18,7 +18,6 @@ export function Collapse({
   const containerRef = useRef<HTMLDivElement>(null!)
   const initialOpen = useRef(isOpen)
   const animationRef = useRef(0)
-  const initialRender = useRef(true)
   useEffect(() => {
     const animation = animationRef.current
     const container = containerRef.current
@@ -27,9 +26,6 @@ export function Collapse({
       animationRef.current = 0
     }
 
-    if (initialRender.current) {
-      return
-    }
     const child = container.children[0] as HTMLDivElement
 
     if (horizontal) {
@@ -54,10 +50,6 @@ export function Collapse({
       })
     }
   }, [horizontal, isOpen, openDuration])
-
-  useEffect(() => {
-    initialRender.current = false
-  }, [])
 
   return (
     <div
