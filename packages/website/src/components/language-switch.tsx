@@ -73,7 +73,6 @@ export function LanguageSwitch({
       ]}
       onChange={(option) => {
         setLanguage(option.key);
-        console.log(option.key);
       }}
       selected={{
         key: language,
