@@ -1,6 +1,6 @@
 ---
 title: Getting Started - Native
-showAllLanguage: false
+showAllLanguage: true
 ---
 
 import { Callout } from "nextra/components";
@@ -60,7 +60,7 @@ Note: `server-reason-react` and `server-reason-react-ppx` are optional, and only
 
 ### Example
 
-```reasonml
+```reason
 let className = [%cx {|
   display: flex;
   width: 100%;
@@ -87,7 +87,7 @@ print_endline(stylesheet);
 
 ### Example with server-reason-react
 
-```reasonml
+```reason
 /* This is a server-reason-react module with those styles encoded as a unique className */
 module Link = [%styled.a (~color=CSS.hex("4299E1")) => {|
   font-size: 1.875rem;
@@ -123,7 +123,7 @@ To generate the CSS on the server, you would need to use `<CSS.style_tag />`. Th
 
 Given a `Page` component to simulate a real-world scenario:
 
-```reasonml
+```reason
 module Page = {
   [@react.component]
   let make = () => {
@@ -138,7 +138,7 @@ module Page = {
 
 If you're using dynamic CSS values, such as [dynamic-components](./dynamic-components) or [interpolation](./interpolation) based on runtime values. You would need to evaluate your app before extracting all the CSS.
 
-```reasonml
+```reason
 module Component = {
   [@react.component]
   let make = (~value) => {
@@ -155,7 +155,7 @@ This component needs to be rendered before the `CSS.style_tag` otherwise the `[%
 
 To solve this, we recommend: render the React application first, and then inject the result as `dangerouslySetInnerHTML`.
 
-```reasonml
+```reason
 /* `App` here is the entry component of your React application, while the `Document` component is only meant to run on the server. */
 module Document = {
   [@react.component]
