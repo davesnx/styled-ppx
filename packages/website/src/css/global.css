@@ -314,30 +314,10 @@
     color: rgb(0 0 0 / 75%);
   }
 
-  .docs-container a {
-    --text-opacity: 1;
-    --text-opacity-background: 0.1;
-    color: rgba(66, 153, 225, var(--text-opacity));
-    background: rgba(66, 153, 225, var(--text-opacity-background));
-    padding: 2px 4px;
-    text-decoration: underline;
-    text-underline-position: under;
-    border-radius: 2px;
-  }
-
-  .docs-container a:hover {
-    --text-opacity-background: 0.2;
-  }
-
-  .docs-container footer a,
-  .docs-container footer a:hover {
-    --text-opacity-background: 0;
-  }
-
   :root {
 
-    .syntax__rescript:not(.show-all-language) :is(pre[data-language="reason"], code[data-language="reason"]),
-    .syntax__reason:not(.show-all-language) :is(pre[data-language="rescript"], code[data-language="rescript"]) {
+    .syntax__rescript:not(.show-all-language) :is([data-language="reason"], .nextra-code [data-language="reason"]),
+    .syntax__reason:not(.show-all-language) :is([data-language="rescript"], .nextra-code [data-language="rescript"]) {
       display: none;
     }
 
