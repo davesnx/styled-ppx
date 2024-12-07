@@ -25,6 +25,14 @@ const reasonGrammar = {
   name: "reason",
 };
 
+const ocamlGrammar = {
+  ...JSON.parse(
+    Fs.readFileSync(Path.join(syntaxes, "ocaml.tmLanguage.json"), "utf8")
+  ),
+  sourceName: "ocaml",
+  name: "ocaml",
+};
+
 const styledPpxCssGrammar = {
   ...JSON.parse(
     Fs.readFileSync(
@@ -83,6 +91,7 @@ const withNextra = Nextra({
             ...Object.keys(bundledLanguages),
             rescriptGrammar,
             reasonGrammar,
+            ocamlGrammar,
             styledPpxCssGrammar,
             styledPpxOCamlGrammar,
             styledPpxReScriptGrammar,
