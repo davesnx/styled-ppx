@@ -30,9 +30,8 @@ export function LocaleSwitch({
       className={className}
       onChange={option => {
         const date = new Date(Date.now() + ONE_YEAR)
-        document.cookie = `NEXT_LOCALE=${
-          option.key
-        }; expires=${date.toUTCString()}; path=/`
+        document.cookie = `NEXT_LOCALE=${option.key
+          }; expires=${date.toUTCString()}; path=/`
         const href = addBasePath(asPath.replace(`/${locale}`, `/${option.key}`))
         location.href = href
       }}

@@ -9,7 +9,6 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "dev:tailwind": "TAILWIND_MODE=watch pnpm postcss css/styles.css -o pages/style.css --watch",
     "start": "next start"
   },
   "dependencies": {
@@ -23,6 +22,7 @@
     "nextra": "^3.2.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "remark-normalize-headings": "^4.0.0",
     "scroll-into-view-if-needed": "^3.1.0",
     "shiki": "^1.24.0",
     "zod": "^3.22.3"

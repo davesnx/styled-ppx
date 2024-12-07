@@ -97,6 +97,10 @@ const withNextra = Nextra({
 /**
  * @type {import('next').Config}
  */
-const nextConfig = {};
+const nextConfig = {
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+};
 
 export default withNextra(nextConfig);

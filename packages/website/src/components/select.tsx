@@ -9,7 +9,7 @@ import { usePopper } from "../utils/use-popper";
 interface MenuOption {
   key: string;
   name: ReactElement | string;
-  icon: ReactNode;
+  icon?: ReactNode;
 }
 
 interface MenuProps {
