@@ -1,12 +1,4 @@
 open Ast;
-let render_field = ((key, value)) => Printf.sprintf("  %s: %s", key, value);
-
-let render_record = record =>
-  record
-  |> List.map(render_field)
-  |> String.concat(",\n")
-  |> Printf.sprintf("{\n%s\n}");
-
 let rec render_stylesheet = (ast: stylesheet) => {
   ast |> fst |> List.map(render_rule) |> String.concat(" ");
 }
