@@ -286,13 +286,13 @@ container_name: xs = wq_name { xs }
 // <container-condition> = [ <container-name> ]? <container-query>
 container_condition: skip_ws_right(container_name)? query = container_query { query }
 
-container_prelude: xs = separated_nonempty_list(COMMA, loc(skip_ws(container_condition))) { Paren_block xs }
+container_prelude: xs = separated_nonempty_list(COMMA, loc(skip_ws(container_condition))) { xs }
 
 /* https://www.w3.org/TR/css-syntax-3/#at-rules */
 at_rule:
   /* @media (min-width: 16rem) { ... } */
   | name = loc(AT_MEDIA) WS?
-    prelude = loc(media_query_prelude) WS?
+    prelude = loc(values) WS?
     ds = brace_block(loc(declarations)) WS? {
     { name;
       prelude;
@@ -302,7 +302,7 @@ at_rule:
   }
   /* @media (min-width: 16rem) {} */
   | name = loc(AT_MEDIA) WS?
-    prelude = loc(media_query_prelude) WS?
+    prelude = loc(values) WS?
     b = loc(empty_brace_block) WS? {
     { name;
       prelude;
@@ -314,7 +314,7 @@ at_rule:
   | name = loc(AT_KEYFRAMES) WS?
     i = IDENT WS?
     block = brace_block(keyframe) {
-    let prelude = (Ident i, make_loc $startpos(i) $endpos(i)) in
+    let prelude = ([(Ident i, make_loc $startpos(i) $endpos(i))], make_loc $startpos(i) $endpos(i)) in
     let block = Rule_list (block, make_loc $startpos $endpos) in
     { name;
       prelude;
@@ -326,7 +326,7 @@ at_rule:
   | name = loc(AT_KEYFRAMES) WS?
     i = IDENT WS?
     s = loc(empty_brace_block) {
-    let prelude = ((Ident i), make_loc $startpos(i) $endpos(i)) in
+    let prelude = ([(Ident i, make_loc $startpos(i) $endpos(i))], make_loc $startpos(i) $endpos(i)) in
     let empty_block = Rule_list s in
     ({ name;
       prelude;
@@ -345,7 +345,7 @@ at_rule:
   }
   /* @charset */
   | name = loc(AT_RULE_STATEMENT) WS?
-    xs = loc(prelude) WS? SEMI_COLON {
+    xs = loc(values) WS? SEMI_COLON {
     { name;
       prelude = xs;
       block = Empty;
@@ -356,7 +356,7 @@ at_rule:
   /* @page { ... } */
   /* @{{rule}} { ... } */
   | name = loc(AT_RULE) WS?
-    xs = loc(prelude_any) WS?
+    xs = loc(values) WS?
     s = brace_block(stylesheet_without_eof) WS? {
     { name;
       prelude = xs;

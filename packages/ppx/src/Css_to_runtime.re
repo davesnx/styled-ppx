@@ -111,15 +111,8 @@ let rec render_at_rule = (~loc, at_rule: at_rule) => {
 }
 and render_media_query = (~loc, at_rule: at_rule) => {
   let parse_condition = {
-    let (value, at_rule_loc) = at_rule.prelude;
-    switch (value) {
-    | Variable(variable) => Ok(render_variable_as_string(variable))
-    | Paren_block([(Ident(_), ident_loc)]) =>
-      /* TODO: String.trim is a hack around, but a media query should be all clean. */
-      Ok(source_code_of_loc(ident_loc) |> String.trim)
-    /* In any other case, we believe on the source_code and transform it to string. This is unsafe */
-    | _whatever => Ok(source_code_of_loc(at_rule_loc) |> String.trim)
-    };
+    let (_, at_rule_loc) = at_rule.prelude;
+    Ok(source_code_of_loc(at_rule_loc) |> String.trim)
   };
 
   let (delimiter, attrs) =

@@ -96,16 +96,6 @@ let number = [%sedlex.regexp?
 ];
 
 let equal_sign = [%sedlex.regexp? "="];
-let only_operator = [%sedlex.regexp? "only"];
-let or_operator = [%sedlex.regexp? "or"];
-let and_operator = [%sedlex.regexp? "and"];
-let not_operator = [%sedlex.regexp? "not"];
-
-let mq_operator = [%sedlex.regexp?
-  (or_operator, whitespace) | (and_operator, whitespace) |
-  (not_operator, whitespace) |
-  (only_operator, whitespace)
-];
 
 let mq_feature_comparison = [%sedlex.regexp? '<' | '>'];
 
@@ -577,7 +567,6 @@ let rec get_next_token = lexbuf => {
   | string => STRING(lexeme(~skip=1, ~drop=1, lexbuf))
   | important => IMPORTANT
   | equal_sign => EQUAL_SIGN(lexeme(lexbuf))
-  | mq_operator => MEDIA_QUERY_OPERATOR(lexeme(lexbuf))
   | mq_feature_comparison => MEDIA_FEATURE_COMPARISON(lexeme(lexbuf))
   | all_media_type => ALL_MEDIA_TYPE(lexeme(lexbuf))
   | screen_media_type => SCREEN_MEDIA_TYPE(lexeme(lexbuf))
