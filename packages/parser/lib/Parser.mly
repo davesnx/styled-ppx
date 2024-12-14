@@ -132,10 +132,10 @@ mf_value:
 mf_plain: mf = IDENT WS? COLON WS? values { mf }
 
 /* <mf-lt> = '<' '='? */
-mf_lt: mflt = less_than equal_sign? { mflt }
+mf_lt: mflt = less_than eq = equal_sign? { mflt ^ Option.value eq ~default:"" }
 
 /* <mf-gt> = '>' '='? */
-mf_gt: mglt = greater_than equal_sign? { mglt }
+mf_gt: mglt = greater_than eq = equal_sign? { mglt ^ Option.value eq ~default:"" }
 
 /* <mf-comparison> = <mf-lt> | <mf-gt> | <mf-eq> */
 mf_comparison:
@@ -335,7 +335,7 @@ at_rule:
     }): at_rule
   }
   | name = loc(AT_CONTAINER) WS?
-    xs = loc(container_prelude) WS?
+    xs = loc(values) WS?
     s = brace_block(stylesheet_without_eof) WS? {
     { name;
       prelude = xs;
@@ -728,6 +728,8 @@ value:
   | v = INTERPOLATION { Variable v } /* $(Lola.value) */
   | f = loc(FUNCTION) v = loc(values) RIGHT_PAREN; { Function (f, v) } /* calc() */
   | u = URL { Uri u } /* url() */
-  | mq_operator = MEDIA_QUERY_OPERATOR { Operator mq_operator }
-  | all = ALL_MEDIA_TYPE { Operator all }
-  | screen = SCREEN_MEDIA_TYPE { Ident screen}
+  | mq_operator = MEDIA_QUERY_OPERATOR { Operator (String.trim(mq_operator)) }
+  | mf_comparison = mf_comparison { Operator mf_comparison }
+  | all = ALL_MEDIA_TYPE { Ident all }
+  | screen = SCREEN_MEDIA_TYPE { Ident screen }
+  | print = PRINT_MEDIA_TYPE { Ident print }
