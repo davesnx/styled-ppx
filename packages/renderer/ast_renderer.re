@@ -28,7 +28,7 @@ switch (input, help) {
 | (Some(css), _) =>
   switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, css)) {
   | Ok(declarations) =>
-    print_endline(Styled_ppx_css_parser.Ast.show_rule_list(declarations))
+    print_endline(Styled_ppx_css_parser.Render.render_rule_list(declarations))
   | Error((loc, msg)) =>
     open Styled_ppx_css_parser.Ast;
     let position = loc.loc_start;
