@@ -1,18 +1,9 @@
-a #b > .c[data-foo=bar] ~ .d {
-    color: red;
-    content: '点';
-    content: url("http://www.example.com/test.png");
-    content: linear-gradient(#e66465, #9198e5);
-
-    .e {
-        color: green;
-    }
+.some-grid {
+  grid: [line1] minmax(20em, max-content) / auto-flow dense 40%;
 }
 
-@supports (display: flex) {
-  @media screen and (200px < width < 900px) {
-    article {
-      display: flex;
-    }
+.a, href > h1, h3[data-foo*=bar] {
+  &::after, href > h1, &:is(h1), &:has(+ :is(h3)) {
+    padding: 20px 30px calc(20px+30px*(20 * 400/2));
   }
 }

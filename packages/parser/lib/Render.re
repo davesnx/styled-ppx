@@ -1,6 +1,6 @@
 open Ast;
 let rec render_stylesheet = (ast: stylesheet) => {
-  ast |> fst |> List.map(render_rule) |> String.concat(" ");
+  ast |> fst |> List.map(render_rule) |> String.concat("");
 }
 and render_rule = (ast: rule) => {
   switch (ast) {
@@ -11,14 +11,14 @@ and render_rule = (ast: rule) => {
 }
 and render_style_rule = ({prelude, block, _}: style_rule) => {
   Printf.sprintf(
-    "%s { %s }",
+    "%s{%s}",
     prelude |> fst |> render_selector_list,
     render_rule_list(block),
   );
 }
 and render_at_rule = ({name, prelude, block, _}: at_rule) => {
   Printf.sprintf(
-    "@%s %s { %s }",
+    "@%s %s{%s}",
     name |> fst,
     prelude |> fst |> render_component_value_list,
     render_brace_block(block),
@@ -32,11 +32,11 @@ and render_brace_block = ast => {
   };
 }
 and render_rule_list = (rule_list: rule_list) => {
-  rule_list |> fst |> List.map(render_rule) |> String.concat(" ");
+  rule_list |> fst |> List.map(render_rule) |> String.concat("");
 }
 and render_declaration = ({name, value, important, _}: declaration) => {
   Printf.sprintf(
-    "%s: %s%s;",
+    "%s:%s%s;",
     name |> fst,
     value |> fst |> render_component_value_list,
     important |> fst ? " !important" : "",
@@ -46,7 +46,7 @@ and render_component_value_list = (ast: component_value_list) => {
   ast
   |> List.map(fst)
   |> List.map(render_component_value)
-  |> String.concat(" ");
+  |> String.concat("");
 }
 
 and render_variable = v => "$(" ++ String.concat(".", v) ++ ")"
@@ -148,10 +148,11 @@ and render_selector = (ast: selector) => {
   };
 }
 and render_selector_list = (ast: selector_list) => {
-  ast |> List.map(fst) |> List.map(render_selector) |> String.concat(", ");
+  ast |> List.map(fst) |> List.map(render_selector) |> String.concat(",");
 }
 and render_component_value = (ast: component_value) => {
   switch (ast) {
+  | Whitespace => " "
   | Paren_block(block) => "(" ++ render_component_value_list(block) ++ ")"
   | Bracket_block(block) => "[" ++ render_component_value_list(block) ++ "]"
   | Percentage(string) => string ++ "%"
