@@ -430,7 +430,7 @@ style_rule:
     }
   }
 
-values: xs = nonempty_list(loc(skip_ws(value))) { xs }
+values: xs = nonempty_list(loc(value)) { xs }
 prelude_any: xs = list(loc(skip_ws(value))) { Paren_block xs }
 
 declarations:
@@ -450,7 +450,7 @@ declaration_without_eof:
   /* property: value; */
   | property = loc(IDENT)
     WS? COLON
-    WS? value = loc(values)
+    WS? value = loc(skip_ws(values))
     WS? important = loc(boption(IMPORTANT))
     WS? SEMI_COLON? {
     { name = property;
@@ -706,6 +706,7 @@ relative_selector:
   | c = combinator WS? xs = complex_selector WS? { RelativeSelector { combinator = Some c; complex_selector = xs } }
 
 value:
+  | WS { Whitespace }
   | b = paren_block(values) { Paren_block b }
   | b = bracket_block(values) { Bracket_block b }
   | n = percentage { Percentage n }

@@ -542,6 +542,7 @@ let handle_tokenizer_error = lexbuf => {
 };
 
 let skip_whitespace = ref(false);
+let prev_skip_whitespace = ref(false);
 
 let rec get_next_token = lexbuf => {
   switch%sedlex (lexbuf) {
@@ -549,7 +550,9 @@ let rec get_next_token = lexbuf => {
   | Star(comment) => get_next_token(lexbuf)
   | "/*" => discard_comments(lexbuf)
   | '.' => DOT
-  | ';' => SEMI_COLON
+  | ';' =>
+    skip_whitespace.contents = prev_skip_whitespace.contents;
+    SEMI_COLON;
   | '}' =>
     skip_whitespace.contents = false;
     RIGHT_BRACE;
@@ -557,7 +560,10 @@ let rec get_next_token = lexbuf => {
     skip_whitespace.contents = true;
     LEFT_BRACE;
   | "::" => DOUBLE_COLON
-  | ':' => COLON
+  | ':' =>
+    prev_skip_whitespace.contents = skip_whitespace.contents;
+    skip_whitespace.contents = false;
+    COLON;
   | '(' => LEFT_PAREN
   | ')' => RIGHT_PAREN
   | '[' => LEFT_BRACKET
