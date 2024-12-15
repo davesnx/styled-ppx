@@ -729,7 +729,7 @@ value:
   | v = INTERPOLATION { Variable v } /* $(Lola.value) */
   | f = loc(FUNCTION) v = loc(values) RIGHT_PAREN; { Function (f, v) } /* calc() */
   | u = URL { Uri u } /* url() */
-  | mq_operator = MEDIA_QUERY_OPERATOR { Operator (String.trim(mq_operator)) }
+  | mq_operator = MEDIA_QUERY_OPERATOR { Operator mq_operator }
   | mf_comparison = mf_comparison { Operator mf_comparison }
   | all = ALL_MEDIA_TYPE { Ident all }
   | screen = SCREEN_MEDIA_TYPE { Ident screen }
