@@ -1,0 +1,18 @@
+a #b > .c[data-foo=bar] ~ .d {
+    color: red;
+    content: '点';
+    content: url("http://www.example.com/test.png");
+    content: linear-gradient(#e66465, #9198e5);
+
+    .e {
+        color: green;
+    }
+}
+
+@supports (display: flex) {
+  @media screen and (200px < width < 900px) {
+    article {
+      display: flex;
+    }
+  }
+}
