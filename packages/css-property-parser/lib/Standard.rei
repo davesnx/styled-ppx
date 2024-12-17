@@ -15,31 +15,35 @@ let length:
     [>
       | `Cap(float)
       | `Ch(float)
-      | `Cm(float)
-      | `Cqb(float)
-      | `Cqh(float)
-      | `Cqi(float)
-      | `Cqmax(float)
-      | `Cqmin(float)
-      | `Cqw(float)
       | `Em(float)
       | `Ex(float)
       | `Ic(float)
-      | `In(float)
       | `Lh(float)
-      | `Mm(float)
-      | `Pc(float)
-      | `Pt(float)
-      | `Px(float)
-      | `Q(float)
+      | `Rcap(float)
+      | `Rch(float)
       | `Rem(float)
+      | `Rex(float)
+      | `Ric(float)
       | `Rlh(float)
-      | `Vb(float)
       | `Vh(float)
-      | `Vi(float)
+      | `Vw(float)
       | `Vmax(float)
       | `Vmin(float)
-      | `Vw(float)
+      | `Vb(float)
+      | `Vi(float)
+      | `Cqw(float)
+      | `Cqh(float)
+      | `Cqi(float)
+      | `Cqb(float)
+      | `Cqmin(float)
+      | `Cqmax(float)
+      | `Px(float)
+      | `Cm(float)
+      | `Mm(float)
+      | `Q(float)
+      | `In(float)
+      | `Pc(float)
+      | `Pt(float)
       | `Zero
     ],
   );
@@ -76,7 +80,9 @@ let hex_color: Rule.rule(string);
 
 let interpolation: Rule.rule(list(string));
 
-let line_names: Rule.rule((unit, list(string), unit));
+let media_type: Rule.rule(string);
+
+let container_name: Rule.rule(string);
 
 let flex_value: Rule.rule([> | `Fr(float)]);
 
@@ -89,8 +95,6 @@ let attr_fallback: Rule.rule(unit);
 let string_token: Rule.rule(unit);
 
 let ident_token: Rule.rule(unit);
-
-let dimension: Rule.rule(unit);
 
 let declaration_value: Rule.rule(unit);
 

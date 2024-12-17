@@ -128,6 +128,7 @@ and box = [%value.rec "'border-box' | 'padding-box' | 'content-box'"]
 and calc_product = [%value.rec
   "<calc-value> [ '*' <calc-value> | '/' <number> ]*"
 ]
+and dimension = [%value.rec "<extended-length> | <extended-time> | <extended-frequency> | <resolution>"]
 and calc_sum = [%value.rec "<calc-product> [ [ '+' | '-' ] <calc-product> ]*"]
 /* and calc_value = [%value.rec "<number> | <dimension> | <extended-percentage> | <calc>"] */
 and calc_value = [%value.rec
@@ -264,6 +265,7 @@ and filter_function_list = [%value.rec "[ <filter-function> | <url> ]+"]
 and final_bg_layer = [%value.rec
   "<'background-color'> || <bg-image> || <bg-position> [ '/' <bg-size> ]? || <repeat-style> || <attachment> || <box> || <box>"
 ]
+and line_names = [%value.rec "'[' <custom-ident>* ']'"]
 and fixed_breadth = [%value.rec "<extended-length> | <extended-percentage>"]
 and fixed_repeat = [%value.rec
   "repeat( <positive-integer> ',' [ [ <line-names> ]? <fixed-size> ]+ [ <line-names> ]? )"
@@ -486,33 +488,54 @@ and mask_position = [%value.rec
 and mask_reference = [%value.rec "'none' | <image> | <mask-source>"]
 and mask_source = [%value.rec "<url>"]
 and masking_mode = [%value.rec "'alpha' | 'luminance' | 'match-source'"]
-and media_and = [%value.rec "<media-in-parens> [ 'and' <media-in-parens> ]+"]
-and media_condition = [%value.rec
-  "<media-not> | <media-and> | <media-or> | <media-in-parens>"
+and mf_comparison = [%value.rec "<mf-lt> | <mf-gt> | <mf-eq>"]
+and mf_eq = [%value.rec "'='"]
+and mf_gt = [%value.rec "'>=' | '>'"]
+and mf_lt = [%value.rec "'<=' | '<'"]
+and mf_value = [%value.rec "<number> | <dimension> | <ident> | <ratio> | <interpolation>"]
+and mf_name = [%value.rec "<ident>"]
+and mf_range = [%value.rec
+  "<mf-name> <mf-comparison> <mf-value> | <mf-value> <mf-comparison> <mf-name> | <mf-value> <mf-lt> <mf-name> <mf-lt> <mf-value> | <mf-value> <mf-gt> <mf-name> <mf-gt> <mf-value>"
 ]
-and media_condition_without_or = [%value.rec
-  "<media-not> | <media-and> | <media-in-parens>"
-]
+and mf_boolean = [%value.rec "<mf-name>"]
+and mf_plain = [%value.rec "<mf-name> ':' <mf-value>"]
 and media_feature = [%value.rec
   "'(' [ <mf-plain> | <mf-boolean> | <mf-range> ] ')'"
 ]
 and media_in_parens = [%value.rec
-  "'(' <media-condition> ')' | <media-feature> | <general-enclosed>"
+  "'(' <media-condition> ')' | <media-feature> | <general-enclosed> | <interpolation>"
 ]
+and media_or = [%value.rec "'or' <media-in-parens>"]
+and media_and = [%value.rec "'and' <media-in-parens>"]
 and media_not = [%value.rec "'not' <media-in-parens>"]
-and media_or = [%value.rec "<media-in-parens> [ 'or' <media-in-parens> ]+"]
+and media_condition_without_or = [%value.rec
+  "<media-not> | <media-in-parens> <media-and>*"
+]
+and media_condition = [%value.rec
+  "<media-not> | <media-in-parens> [ <media-and>* | <media-or>* ]"
+]
 and media_query = [%value.rec
   "<media-condition> | [ 'not' | 'only' ]? <media-type> [ 'and' <media-condition-without-or> ]?"
 ]
-and media_query_list = [%value.rec "[ <media-query> ]#"]
-and media_type = [%value.rec "<ident>"]
-and mf_boolean = [%value.rec "<mf-name>"]
-and mf_name = [%value.rec "<ident>"]
-and mf_plain = [%value.rec "<mf-name> ':' <mf-value>"]
-and mf_range = [%value.rec
-  "<mf-name> [ '<' | '>' ]? [ '=' ]? <mf-value> | <mf-value> [ '<' | '>' ]? [ '=' ]? <mf-name> | <mf-value> '<' [ '=' ]? <mf-name> '<' [ '=' ]? <mf-value> | <mf-value> '>' [ '=' ]? <mf-name> '>' [ '=' ]? <mf-value>"
+and media_query_list = [%value.rec "[ <media-query> ]# | <interpolation>"]
+and container_condition_list = [%value.rec "<container-condition>#"]
+and container_condition = [%value.rec "[ <container-name> ]? <container-query>"]
+and container_query = [%value.rec
+  "'not' <query-in-parens> | <query-in-parens> [ [ 'and' <query-in-parens> ]* | [ 'or' <query-in-parens> ]* ]"
 ]
-and mf_value = [%value.rec "<number> | <dimension> | <ident> | <ratio>"]
+and query_in_parens = [%value.rec
+  "'(' <container-query> ')' | '(' <size-feature> ')' | style( <style-query> ) | <general-enclosed>"
+]
+and size_feature = [%value.rec
+  "<mf-plain> | <mf-boolean> | <mf-range>"
+]
+and style_query = [%value.rec
+  "'not' <style-in-parens> | <style-in-parens> [ [ and <style-in-parens> ]* | [ or <style-in-parens> ]* ] | <style-feature>"
+]
+and style_feature = [%value.rec "<dashed_ident> ':' <mf-value>"]
+and style_in_parens = [%value.rec
+  "'(' <style-query> ')' | '(' <style-feature> ')' | <general-enclosed>"
+]
 and name_repeat = [%value.rec
   "repeat( [ <positive-integer> | 'auto-fill' ] ',' [ <line-names> ]+ )"
 ]

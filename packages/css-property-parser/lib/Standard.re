@@ -50,20 +50,24 @@ let length =
     switch (token) {
     | DIMENSION(number, dimension) =>
       switch (dimension) {
-      | "em" => Ok(`Em(number))
-      | "ex" => Ok(`Ex(number))
       | "cap" => Ok(`Cap(number))
       | "ch" => Ok(`Ch(number))
+      | "em" => Ok(`Em(number))
+      | "ex" => Ok(`Ex(number))
       | "ic" => Ok(`Ic(number))
-      | "rem" => Ok(`Rem(number))
       | "lh" => Ok(`Lh(number))
+      | "rcap" => Ok(`Rcap(number))
+      | "rch" => Ok(`Rch(number))
+      | "rem" => Ok(`Rem(number))
+      | "rex" => Ok(`Rex(number))
+      | "ric" => Ok(`Ric(number))
       | "rlh" => Ok(`Rlh(number))
-      | "vw" => Ok(`Vw(number))
       | "vh" => Ok(`Vh(number))
-      | "vi" => Ok(`Vi(number))
-      | "vb" => Ok(`Vb(number))
-      | "vmin" => Ok(`Vmin(number))
+      | "vw" => Ok(`Vw(number))
       | "vmax" => Ok(`Vmax(number))
+      | "vmin" => Ok(`Vmin(number))
+      | "vb" => Ok(`Vb(number))
+      | "vi" => Ok(`Vi(number))
       | "cqw" => Ok(`Cqw(number))
       | "cqh" => Ok(`Cqh(number))
       | "cqi" => Ok(`Cqi(number))
@@ -71,13 +75,13 @@ let length =
       | "cqmin" => Ok(`Cqmin(number))
       | "cqmax" => Ok(`Cqmax(number))
       // absolute
+      | "px" => Ok(`Px(number))
       | "cm" => Ok(`Cm(number))
       | "mm" => Ok(`Mm(number))
       | "Q" => Ok(`Q(number))
       | "in" => Ok(`In(number))
-      | "pt" => Ok(`Pt(number))
       | "pc" => Ok(`Pc(number))
-      | "px" => Ok(`Px(number))
+      | "pt" => Ok(`Pt(number))
       | _ => Error(["unknown dimension"])
       }
     | NUMBER(0.) => Ok(`Zero)
@@ -253,16 +257,39 @@ let interpolation = {
   Match.return(path);
 };
 
-/* TODO: LEFT_BRACKET and RIGHT_BRACKET are wrongly lexed as DELIM('[') and DELIM(']'), we use a handmade parser to by-pass it, and use LEFT_BRACKET/RIGHT_BRACKET correctly. The original spec is "'[' [ <custom-ident> ]* ']'" */
-let line_names = {
-  open Rule;
+let media_type =
+  token(
+    fun
+    | IDENT(value) => {
+        switch (value) {
+        | "only"
+        | "not"
+        | "and"
+        | "or"
+        | "layer" =>
+          Error([
+            "'only', 'not', 'and', 'or', and 'layer' are invalid media types",
+          ])
+        | _ => Ok(value)
+        };
+      }
+    | _ => Error(["expected media_type"]),
+  );
+
+let container_name = {
   open Rule.Let;
-
-  let.bind_match left = Pattern.expect(LEFT_BRACKET);
-  let.bind_match path = Modifier.one_or_more(custom_ident);
-  let.bind_match right = Pattern.expect(RIGHT_BRACKET);
-
-  return_match((left, path, right));
+  let.bind_match name = custom_ident;
+  let value = {
+    switch (name) {
+    | "none"
+    | "and"
+    | "not"
+    | "or" =>
+      Error(["'none', 'and', 'not', and 'or' are invalid container names"])
+    | _ => Ok(name)
+    };
+  };
+  return_data(value);
 };
 
 let flex_value =
@@ -282,7 +309,6 @@ let attr_name = invalid;
 let attr_fallback = invalid;
 let string_token = invalid;
 let ident_token = invalid;
-let dimension = invalid;
 let declaration_value = invalid;
 let positive_integer = integer;
 let function_token = invalid;
