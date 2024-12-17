@@ -43,17 +43,17 @@ let success_tests =
     /* TODO: Support comments in the lexer? */
     /* ({|<!--|}, [CDO]), */
     /* ({|-->|}, [CDC]), */
-    ({|<|}, [MEDIA_FEATURE_COMPARISON("<")]),
+    ({|<|}, [DELIM("<")]),
     ({|not|}, [IDENT("not")]),
-    ({|not |}, [MEDIA_QUERY_OPERATOR("not ")]),
+    ({|not |}, [IDENT("not"), WS]),
     ({|only|}, [IDENT("only")]),
-    ({|only |}, [MEDIA_QUERY_OPERATOR("only ")]),
+    ({|only |}, [IDENT("only"), WS]),
     ({|and|}, [IDENT("and")]),
-    ({|and |}, [MEDIA_QUERY_OPERATOR("and ")]),
-    ({|or |}, [MEDIA_QUERY_OPERATOR("or ")]),
-    ({|all|}, [ALL_MEDIA_TYPE("all")]),
-    ({|screen|}, [SCREEN_MEDIA_TYPE("screen")]),
-    ({|print|}, [PRINT_MEDIA_TYPE("print")]),
+    ({|and |}, [IDENT("and"), WS]),
+    ({|or |}, [IDENT("or"), WS]),
+    ({|all|}, [IDENT("all")]),
+    ({|screen|}, [IDENT("screen")]),
+    ({|print|}, [IDENT("print")]),
     ({|@mayushii|}, [AT_RULE("mayushii")]),
     ({|@|}, [DELIM("@")]),
     ({|[|}, [LEFT_BRACKET]),
@@ -289,6 +289,8 @@ let test_with_location =
       19,
     ),
     ({|--color-main|}, [IDENT("--color-main")], 12),
+    ({|>=|}, [IDENT(">=")], 2),
+    ({|<=|}, [IDENT("<=")], 2),
   ]
   |> List.mapi((_index, (input, output, last_position)) => {
        let (loc, values) = parse(input);

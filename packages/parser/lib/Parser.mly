@@ -34,15 +34,7 @@ let make_loc = Parser_location.to_ppxlib_location
 %token <string> NTH_FUNCTION
 %token <string> URL
 %token BAD_URL
-%token <string> EQUAL_SIGN
-%token <string> MEDIA_QUERY_OPERATOR
-%token <string> MEDIA_FEATURE_COMPARISON
-%token <string> AT_MEDIA
-%token <string> SCREEN_MEDIA_TYPE
-%token <string> PRINT_MEDIA_TYPE
-%token <string> ALL_MEDIA_TYPE
 %token <string> AT_KEYFRAMES
-%token <string> AT_CONTAINER
 %token <string> AT_RULE
 %token <string> AT_RULE_STATEMENT
 %token <string> HASH
@@ -97,219 +89,11 @@ bracket_block (X): xs = delimited(LEFT_BRACKET, X, RIGHT_BRACKET) { xs }
 /* () */
 paren_block (X): xs = delimited(LEFT_PAREN, X, RIGHT_PAREN) { xs }
 
-/* https://www.w3.org/TR/mediaqueries-5 */
-
-/* ">" */
-greater_than: gt = MEDIA_FEATURE_COMPARISON { gt }
-/* "<" */
-less_than: lt = MEDIA_FEATURE_COMPARISON { lt }
-/* "=" */
-equal_sign: eq = EQUAL_SIGN { eq }
-/* "and" */
-and_operator: a = MEDIA_QUERY_OPERATOR { a }
-/* "or" */
-or_operator: o = MEDIA_QUERY_OPERATOR { o }
-/* "only" */
-only_operator: o = MEDIA_QUERY_OPERATOR { o }
-/* "not" */
-not_operator: n = MEDIA_QUERY_OPERATOR { n }
-/* "screen" */
-screen_media_type: smt = SCREEN_MEDIA_TYPE { smt }
-/* "print" */
-print_media_type: pmt = PRINT_MEDIA_TYPE { pmt }
-/* "all" */
-all_media_type: amt = ALL_MEDIA_TYPE { amt }
-
-/* https://www.w3.org/TR/mediaqueries-5/#mq-syntax */
 interpolation:
-  v = INTERPOLATION { Variable v}
-
-mf_value:
-  | v = interpolation { v }
-  | v = value { v }
-
-/* <mf-plain> = <mf-name> : <mf-value> */
-mf_plain: mf = IDENT WS? COLON WS? values { mf }
-
-/* <mf-lt> = '<' '='? */
-mf_lt: mflt = less_than eq = equal_sign? { mflt ^ Option.value eq ~default:"" }
-
-/* <mf-gt> = '>' '='? */
-mf_gt: mglt = greater_than eq = equal_sign? { mglt ^ Option.value eq ~default:"" }
-
-/* <mf-comparison> = <mf-lt> | <mf-gt> | <mf-eq> */
-mf_comparison:
-  | mflt = mf_lt { mflt }
-  | mfgt = mf_gt { mfgt }
-  | mfeq = equal_sign { mfeq }
-
-/* <mf-range> =
-      <mf-name> <mf-comparison> <mf-value>
-      | <mf-value> <mf-comparison> <mf-name>
-      | <mf-value> <mf-lt> <mf-name> <mf-lt> <mf-value>
-      | <mf-value> <mf-gt> <mf-name> <mf-gt> <mf-value> */
-mf_range:
-  | xs = IDENT WS mf_comparison WS mf_value { xs }
-  | mf_value WS xs = mf_comparison WS IDENT { xs }
-  | mf_value WS xs = mf_lt WS IDENT WS mf_lt WS mf_value { xs }
-  | mf_value WS xs = mf_gt WS IDENT WS mf_gt WS mf_value { xs }
-
-screen_or_print_media_type:
-  | mt = screen_media_type { mt }
-  | mt = print_media_type { mt }
-
-mf_boolean:
-  /* TODO: IDENT is not safely parsed */
-  | i = IDENT WS? { i }
-  | all_mt = all_media_type WS? { all_mt }
-  | mt = screen_or_print_media_type WS? { mt }
-  | mt = screen_or_print_media_type WS and_media_condition_without_or? WS? { mt }
-  | mt = screen_or_print_media_type WS? COMMA WS? screen_or_print_media_type WS? { mt }
-
-/* <media-feature> = ( [ <mf-plain> | <mf-boolean> | <mf-range> ] ) */
-media_feature:
-  /* TODO: property & value in mf_plain are not safely parsed */
-  | mfp = mf_plain { mfp }
-  | mfb = mf_boolean { mfb }
-  | mfr = mf_range { mfr }
-
-/* TODO: <general-enclosed> = [ <function-token> <any-value> ) ] | ( <ident> <any-value> ) */
-
-/* <media-in-parens> = ( <media-condition> ) | <media-feature> | TODO: <general-enclosed> */
-media_in_parens:
-  | LEFT_PAREN mc = media_condition RIGHT_PAREN { mc }
-  | LEFT_PAREN WS? mf = media_feature WS? RIGHT_PAREN { Ident mf }
-  | i = interpolation { i }
-
-media_not: WS? mn = not_operator media_in_parens WS? { Ident mn }
-
-/* <media-and> = and <media-in-parens> */
-media_and: xs = and_operator media_in_parens { xs }
-
-/* <media-and>* */
-media_and_star:
-  | /* Empty case, represents zero occurrences of <media-and> */
-    { [] }
-  | and_rule = media_and
-      rest = media_and_star
-    { and_rule :: rest }
-
-/* <media-or> = or <media-in-parens> */
-media_or: xs = or_operator media_in_parens { xs }
-
-/* <media-or>* */
-media_or_star:
-  | /* Empty case, represents zero occurrences of <media-or> */
-    { [] }
-  | or_rule = media_or
-      rest = media_or_star
-    { or_rule :: rest }
-
-/* [ <media-and>* | <media-or>* ] */
-media_and_or_star:
-  | xs = media_and_star { xs }
-  | xs = media_or_star { xs }
-
-/* <media-condition> = <media-not> | <media-in-parens> [ <media-and>* | <media-or>* ] */
-media_condition:
-  | mn = media_not { mn }
-  | xs = media_in_parens WS? media_and_or_star { xs }
-
-/* <media-condition-without-or> = <media-not> | <media-in-parens> <media-and>* */
-media_condition_without_or:
-  | mn = media_not { mn }
-  | xs = media_in_parens WS? media_and_star { xs }
-
-/* not | only */
-not_or_only:
-  | n = not_operator { n }
-  | o = only_operator { o }
-
-/* and <media-condition-without-or>  */
-and_media_condition_without_or: xs = and_operator media_condition_without_or { Ident xs }
-
-/* media_query = <media-condition> | [ not | only ]? <media-type> [ and <media-condition-without-or> ]? */
-media_query:
-  | mc = media_condition WS? COMMA? WS? { mc }
-  | not_or_only? xs = screen_or_print_media_type WS? COMMA?
-    WS? and_media_condition_without_or ?COMMA? WS?  { Ident xs }
-  | not_or_only? xs = all_media_type WS? and_media_condition_without_or? WS?  { Ident xs }
-
-media_query_prelude:
-  | v = INTERPOLATION { Variable v }
-  | mq = nonempty_list(loc(media_query)) { Paren_block mq }
-
-prelude: xs = value { xs }
-
-// <size-feature> = ( [ <mf-plain> | <mf-range> ] )
-size_feature:
-  /* TODO: property & value in mf_plain are not safely parsed */
-  | mfp = mf_plain { mfp }
-  | mfr = mf_range { mfr }
-
-// <query-in-parens>     = ( <container-query> )
-//                      | ( <size-feature> )
-//                      | style( <style-query> )
-//                      | <general-enclosed>
-query_in_parens:
-  | LEFT_PAREN cq = container_query RIGHT_PAREN { cq }
-  | LEFT_PAREN WS? mf = size_feature WS? RIGHT_PAREN { Ident mf }
-  | i = interpolation { i }
-
-query_in_parens_with_and: v = and_operator WS? query_in_parens { v }
-
-// [ and <query-in-parens> ]*
-query_in_parens_with_and_star:
-  | { [] }
-  | x = query_in_parens_with_and WS? xs = query_in_parens_with_and_star { x :: xs }
-
-query_in_parens_with_or: v = or_operator WS? query_in_parens { v }
-
-// [ or <query-in-parens> ]*
-query_in_parens_with_or_star:
-  | { [] }
-  | x = query_in_parens_with_or WS? xs = query_in_parens_with_or_star { x :: xs }
-
-// [ and <query-in-parens> ]* | [ or <query-in-parens> ]*
-query_in_parens_with_or_or_and_list:
-  | v = query_in_parens_with_or_star { v }
-  | v = query_in_parens_with_and_star { v }
-
-// <container-query>     = not <query-in-parens>
-//                       | <query-in-parens> [ [ and <query-in-parens> ]* | [ or <query-in-parens> ]* ]
-container_query:
-  | v = not_operator WS? query_in_parens { Ident v }
-  | v = skip_ws_right(query_in_parens) query_in_parens_with_or_or_and_list { v }
-
-// <container-name> = <custom-ident>
-container_name: xs = wq_name { xs }
-// <container-condition> = [ <container-name> ]? <container-query>
-container_condition: skip_ws_right(container_name)? query = container_query { query }
-
-container_prelude: xs = separated_nonempty_list(COMMA, loc(skip_ws(container_condition))) { xs }
+  v = INTERPOLATION { Variable v }
 
 /* https://www.w3.org/TR/css-syntax-3/#at-rules */
 at_rule:
-  /* @media (min-width: 16rem) { ... } */
-  | name = loc(AT_MEDIA) WS?
-    prelude = loc(values) WS?
-    ds = brace_block(loc(declarations)) WS? {
-    { name;
-      prelude;
-      block = Rule_list ds;
-      loc = make_loc $startpos $endpos;
-    }
-  }
-  /* @media (min-width: 16rem) {} */
-  | name = loc(AT_MEDIA) WS?
-    prelude = loc(values) WS?
-    b = loc(empty_brace_block) WS? {
-    { name;
-      prelude;
-      block = Rule_list b;
-      loc = make_loc $startpos $endpos;
-    }
-  }
   /* @keyframes animationName { ... } */
   | name = loc(AT_KEYFRAMES) WS?
     i = IDENT WS?
@@ -333,15 +117,6 @@ at_rule:
       block = empty_block;
       loc = make_loc $startpos $endpos;
     }): at_rule
-  }
-  | name = loc(AT_CONTAINER) WS?
-    xs = loc(values) WS?
-    s = brace_block(stylesheet_without_eof) WS? {
-    { name;
-      prelude = xs;
-      block = Stylesheet s;
-      loc = make_loc $startpos $endpos;
-    }
   }
   /* @charset */
   | name = loc(AT_RULE_STATEMENT) WS?
@@ -462,7 +237,6 @@ declaration_without_eof:
 
 combinator:
   | c = COMBINATOR { c }
-  | c = greater_than { c }
 
 nth_payload:
   /* TODO implement [of <complex-selector-list>]? */
@@ -522,7 +296,6 @@ pseudo_class_selector:
 /* "~=" | "|=" | "^=" | "$=" | "*=" | "=" */
 attr_matcher:
  | o = OPERATOR { o }
- | eq = EQUAL_SIGN { eq }
 
 wq_name:
   | i = IDENT { i }
@@ -729,8 +502,3 @@ value:
   | v = INTERPOLATION { Variable v } /* $(Lola.value) */
   | f = loc(FUNCTION) v = loc(values) RIGHT_PAREN; { Function (f, v) } /* calc() */
   | u = URL { Uri u } /* url() */
-  | mq_operator = MEDIA_QUERY_OPERATOR { Operator mq_operator }
-  | mf_comparison = mf_comparison { Operator mf_comparison }
-  | all = ALL_MEDIA_TYPE { Ident all }
-  | screen = SCREEN_MEDIA_TYPE { Ident screen }
-  | print = PRINT_MEDIA_TYPE { Ident print }

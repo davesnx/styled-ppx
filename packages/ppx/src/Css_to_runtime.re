@@ -110,16 +110,21 @@ let rec render_at_rule = (~loc, at_rule: at_rule) => {
   };
 }
 and render_media_query = (~loc, at_rule: at_rule) => {
+  let (_, at_rule_prelude_loc) = at_rule.prelude;
   let parse_condition = {
-    let (_, at_rule_loc) = at_rule.prelude;
-    Ok(source_code_of_loc(at_rule_loc) |> String.trim)
+    let prelude = source_code_of_loc(at_rule_prelude_loc) |> String.trim;
+    Css_property_parser.Parser.parse(
+      Css_property_parser.Parser.media_query_list,
+      prelude,
+    )
+    |> Result.map(_ => prelude);
   };
 
   let (delimiter, attrs) =
     Platform_attributes.string_delimiter(~loc=at_rule.loc);
 
   switch (parse_condition) {
-  | Error(error_expr) => error_expr
+  | Error(error_msg) => Error.expr(~loc=at_rule_prelude_loc, error_msg)
   | Ok(conditions) =>
     let query =
       conditions
@@ -131,11 +136,9 @@ and render_media_query = (~loc, at_rule: at_rule) => {
       | Rule_list(declaration) =>
         render_declarations(~loc, declaration)
         |> Builder.pexp_array(~loc=at_rule.loc)
-      | Stylesheet(_) =>
-        Error.expr(
-          ~loc=at_rule.loc,
-          "@media content expect to have declarations, not an stylesheets. Selectors aren't allowed in @media.",
-        )
+      | Stylesheet(stylesheet) =>
+        render_declarations(~loc, stylesheet)
+        |> Builder.pexp_array(~loc=at_rule.loc)
       };
 
     Helper.Exp.apply(
@@ -146,17 +149,21 @@ and render_media_query = (~loc, at_rule: at_rule) => {
   };
 }
 and render_container_query = (~loc, at_rule: at_rule) => {
+  let (_, at_rule_prelude_loc) = at_rule.prelude;
   let parse_condition = {
-    let (_, at_rule_loc) = at_rule.prelude;
-    /* We believe on the source_code and transform it to string. This is unsafe */
-    Ok(source_code_of_loc(at_rule_loc) |> String.trim);
+    let prelude = source_code_of_loc(at_rule_prelude_loc) |> String.trim;
+    Css_property_parser.Parser.parse(
+      Css_property_parser.Parser.container_condition_list,
+      prelude,
+    )
+    |> Result.map(_ => prelude);
   };
 
   let (delimiter, attrs) =
     Platform_attributes.string_delimiter(~loc=at_rule.loc);
 
   switch (parse_condition) {
-  | Error(error_expr) => error_expr
+  | Error(error_msg) => Error.expr(~loc=at_rule_prelude_loc, error_msg)
   | Ok(conditions) =>
     let query =
       String_interpolation.transform(
