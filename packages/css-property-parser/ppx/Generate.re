@@ -313,6 +313,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       type_("interpolation", [%type: list(string)]),
       type_("flex_value", [%type: [ | `Fr(float)]]),
       type_("line_names", [%type: (unit, list(string), unit)]),
+      type_("urange", [%type: [ | `Single(string) | `Range(string, string) | `Wildcard(string, string)]]),
       // From Parser_helper, those are `invalid` represented here as unit
       type_("ident_token", [%type: unit]),
       type_("function_token", [%type: unit]),
@@ -323,7 +324,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       type_("declaration_value", [%type: unit]),
       type_("zero", [%type: unit]),
       type_("decibel", [%type: unit]),
-      type_("urange", [%type: unit]),
       type_("semitones", [%type: unit]),
       type_("an_plus_b", [%type: unit]),
     ];
