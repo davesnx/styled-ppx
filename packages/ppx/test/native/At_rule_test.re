@@ -83,14 +83,9 @@ let media_query_tests = [
     [%expr CSS.style([|CSS.media({js|screen, print|js}, [||])|])],
   ),
   (
-    "(screen, print)",
-    [%expr [%cx "@media (screen, print) {}"]],
-    [%expr CSS.style([|CSS.media({js|(screen, print)|js}, [||])|])],
-  ),
-  (
-    "(screen and (color))",
-    [%expr [%cx "@media (screen and (color)) {}"]],
-    [%expr CSS.style([|CSS.media({js|(screen and (color))|js}, [||])|])],
+    "((screen) and (color))",
+    [%expr [%cx "@media ((screen) and (color)) {}"]],
+    [%expr CSS.style([|CSS.media({js|((screen) and (color))|js}, [||])|])],
   ),
   (
     "not screen and (color)",
@@ -98,10 +93,10 @@ let media_query_tests = [
     [%expr CSS.style([|CSS.media({js|not screen and (color)|js}, [||])|])],
   ),
   (
-    "(not (screen and (color))))",
-    [%expr [%cx "@media (not (screen and (color))) {}"]],
+    "(not ((screen) and (color))))",
+    [%expr [%cx "@media (not ((screen) and (color))) {}"]],
     [%expr
-      CSS.style([|CSS.media({js|(not (screen and (color)))|js}, [||])|])
+      CSS.style([|CSS.media({js|(not ((screen) and (color)))|js}, [||])|])
     ],
   ),
   (
