@@ -124,7 +124,15 @@ and render_media_query = (~loc, at_rule: at_rule) => {
     Platform_attributes.string_delimiter(~loc=at_rule.loc);
 
   switch (parse_condition) {
-  | Error(error_msg) => Error.expr(~loc=at_rule_prelude_loc, error_msg)
+  | Error(error_msg) =>
+    Error.expr(
+      ~loc=
+        Styled_ppx_css_parser.Parser_location.update_pos_lnum(
+          at_rule_prelude_loc,
+          loc,
+        ),
+      error_msg,
+    )
   | Ok(conditions) =>
     let query =
       conditions
@@ -163,7 +171,15 @@ and render_container_query = (~loc, at_rule: at_rule) => {
     Platform_attributes.string_delimiter(~loc=at_rule.loc);
 
   switch (parse_condition) {
-  | Error(error_msg) => Error.expr(~loc=at_rule_prelude_loc, error_msg)
+  | Error(error_msg) =>
+    Error.expr(
+      ~loc=
+        Styled_ppx_css_parser.Parser_location.update_pos_lnum(
+          at_rule_prelude_loc,
+          loc,
+        ),
+      error_msg,
+    )
   | Ok(conditions) =>
     let query =
       String_interpolation.transform(

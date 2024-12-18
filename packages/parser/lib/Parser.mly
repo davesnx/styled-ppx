@@ -131,7 +131,7 @@ at_rule:
   /* @page { ... } */
   /* @{{rule}} { ... } */
   | name = loc(AT_RULE) WS?
-    xs = loc(values) WS?
+    xs = loc(skip_ws(values)) WS?
     s = brace_block(stylesheet_without_eof) WS? {
     { name;
       prelude = xs;
@@ -205,7 +205,7 @@ style_rule:
     }
   }
 
-values: xs = nonempty_list(loc(value)) { xs }
+values: xs = list(loc(value)) { xs }
 prelude_any: xs = list(loc(skip_ws(value))) { Paren_block xs }
 
 declarations:
