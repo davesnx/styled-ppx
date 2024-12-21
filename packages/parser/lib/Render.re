@@ -1,4 +1,111 @@
 open Ast;
+
+let rec contains_ampersand = (selector: selector) => {
+  switch (selector) {
+  | SimpleSelector(Ampersand) => true
+  | ComplexSelector(Selector(selector)) => contains_ampersand(selector)
+  | ComplexSelector(Combinator({left: selector_left, right})) =>
+    contains_ampersand(selector_left)
+    || right
+    |> List.map(snd)
+    |> List.exists(contains_ampersand)
+  | CompoundSelector({type_selector, pseudo_selectors, subclass_selectors}) =>
+    type_selector
+    |> Option.map(sel => contains_ampersand(SimpleSelector(sel)))
+    |> Option.value(~default=false)
+    || pseudo_selectors
+    |> List.exists(pseudo_selector_contains_ampersand)
+    || subclass_selectors
+    |> List.exists(
+         fun
+         | Pseudo_class(pseudo_selector) =>
+           pseudo_selector_contains_ampersand(pseudo_selector)
+         | _ => false,
+       )
+  | RelativeSelector({complex_selector, _}) =>
+    contains_ampersand(ComplexSelector(complex_selector))
+  | _ => false
+  };
+}
+and pseudo_selector_contains_ampersand =
+  fun
+  | Pseudoclass(Function({payload: (selector_list, _), _})) =>
+    selector_list |> List.map(fst) |> List.exists(contains_ampersand)
+  | Pseudoclass(NthFunction({payload: (NthSelector(csl), _), _})) =>
+    csl |> List.exists(cs => contains_ampersand(ComplexSelector(cs)))
+  | _ => false;
+
+let split_multiple_selectors = ((rule_list, loc): rule_list) => {
+  (
+    List.fold_left(
+      (acc, rule) => {
+        switch (rule) {
+        | Style_rule({prelude: (selector_list, prelude_loc), block, loc}) =>
+          let new_rules =
+            List.map(
+              selector =>
+                Style_rule({
+                  prelude: ([selector], prelude_loc),
+                  block,
+                  loc,
+                }),
+              selector_list,
+            );
+          List.append(acc, new_rules);
+        | _ => List.append(acc, [rule])
+        }
+      },
+      [],
+      rule_list,
+    ),
+    loc,
+  );
+};
+
+let rec brace_block_contain_media = (bb: brace_block) => {
+  switch (bb) {
+  | Empty => false
+  | Rule_list(rule_list) => rule_list_contain_media(rule_list)
+  | Stylesheet(stylesheet) => stylesheet_contain_media(stylesheet)
+  };
+}
+and stylesheet_contain_media = ((stylesheet, _): stylesheet) => {
+  stylesheet |> List.exists(rule_contain_media);
+}
+and rule_list_contain_media = ((rule_list, _): rule_list) => {
+  rule_list |> List.exists(rule_contain_media);
+}
+and rule_contain_media = (rule: rule) => {
+  switch (rule) {
+  | Declaration(_) => false
+  | Style_rule(_) => false
+  | At_rule({name: (name, _), _}) => name == "media"
+  };
+};
+
+let rec move_media_at_top = ((rule_list, loc): rule_list) => {
+  (
+    List.fold_left(
+      (acc, rule) => {
+        switch (rule) {
+        | At_rule({name: (name, _), block, _} as at_rule)
+            when name == "media" && brace_block_contain_media(block) =>
+          let new_rules = swap(at_rule);
+          List.append(acc, new_rules);
+        | Declaration(_) as x => List.append(acc, [x])
+        | _ as x => List.append(acc, [x])
+        }
+      },
+      [],
+      rule_list,
+    ),
+    loc,
+  );
+}
+and swap = ({prelude: _, block: _, loc: _, _}: at_rule) => {
+  failwith("TODO");
+};
+
 let rec render_stylesheet = (ast: stylesheet) => {
   ast |> fst |> List.map(render_rule) |> String.concat("");
 }
