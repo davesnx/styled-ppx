@@ -35,30 +35,27 @@ and pseudo_selector_contains_ampersand =
     csl |> List.exists(cs => contains_ampersand(ComplexSelector(cs)))
   | _ => false;
 
-let split_multiple_selectors = ((rule_list, loc): rule_list) => {
-  (
-    List.fold_left(
-      (acc, rule) => {
-        switch (rule) {
-        | Style_rule({prelude: (selector_list, prelude_loc), block, loc}) =>
-          let new_rules =
-            List.map(
-              selector =>
-                Style_rule({
-                  prelude: ([selector], prelude_loc),
-                  block,
-                  loc,
-                }),
-              selector_list,
-            );
-          List.append(acc, new_rules);
-        | _ => List.append(acc, [rule])
-        }
-      },
-      [],
-      rule_list,
-    ),
-    loc,
+let split_multiple_selectors = (rules: list(rule)) => {
+  List.fold_left(
+    (acc, rule) => {
+      switch (rule) {
+      | Style_rule({prelude: (selector_list, prelude_loc), block, loc}) =>
+        let new_rules =
+          List.map(
+            selector =>
+              Style_rule({
+                prelude: ([selector], prelude_loc),
+                block,
+                loc,
+              }),
+            selector_list,
+          );
+        acc @ new_rules;
+      | _ => acc @ [rule]
+      }
+    },
+    [],
+    rules,
   );
 };
 
@@ -238,6 +235,42 @@ and swap = ({prelude: swap_prelude, block, loc, _}: at_rule) => {
   move_media_at_top(resolved_media_selectors);
 };
 
+let resolve_selectors = (rules: list(rule)) => {
+  let rec unnest_selectors = (~prefix as _, rules) => {
+    List.partition_map(
+      fun
+      | Style_rule({prelude: (_, _), block: (rules, _), _}) => {
+          let new_prefix = failwith("TODO");
+          let selector_rules = split_multiple_selectors(rules);
+          let (selectors, rest_of_declarations) =
+            unnest_selectors(~prefix=Some(new_prefix), selector_rules);
+          let new_selector =
+            Style_rule({
+              prelude: ([new_prefix], Ppxlib.Location.none),
+              block: (selectors, Ppxlib.Location.none),
+              loc: Location.none,
+            });
+          Right([new_selector, ...rest_of_declarations]);
+        }
+      | At_rule(_) as at_rule => Right([at_rule])
+      | Declaration(_) as dec => Left(dec),
+      rules,
+    )
+    |> (
+      ((declarations, selectors)) => (
+        declarations,
+        List.flatten(selectors),
+      )
+    );
+  };
+  let (declarations, selectors) =
+    rules
+    |> move_media_at_top
+    |> split_multiple_selectors
+    |> unnest_selectors(~prefix=None);
+  declarations @ selectors;
+};
+
 let rec render_stylesheet = (ast: stylesheet) => {
   ast |> fst |> List.map(render_rule) |> String.concat("");
 }
@@ -271,11 +304,11 @@ and render_brace_block = ast => {
   };
 }
 and render_rule_list = (rule_list: rule_list) => {
-  rule_list
-  |> fst
-  |> move_media_at_top
-  |> List.map(render_rule)
-  |> String.concat("");
+  let resolved_rule_list = {
+    let (declarations, selectors) = rule_list |> fst |> split_by_kind;
+    declarations @ selectors;
+  };
+  resolved_rule_list |> List.map(render_rule) |> String.concat("");
 }
 and render_declaration = ({name, value, important, _}: declaration) => {
   Printf.sprintf(
