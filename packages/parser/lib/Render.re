@@ -62,48 +62,180 @@ let split_multiple_selectors = ((rule_list, loc): rule_list) => {
   );
 };
 
-let rec brace_block_contain_media = (bb: brace_block) => {
-  switch (bb) {
+let rec brace_block_contain_media =
+  fun
   | Empty => false
   | Rule_list(rule_list) => rule_list_contain_media(rule_list)
   | Stylesheet(stylesheet) => stylesheet_contain_media(stylesheet)
-  };
-}
 and stylesheet_contain_media = ((stylesheet, _): stylesheet) => {
-  stylesheet |> List.exists(rule_contain_media);
+  List.exists(rule_contain_media, stylesheet);
 }
 and rule_list_contain_media = ((rule_list, _): rule_list) => {
-  rule_list |> List.exists(rule_contain_media);
+  List.exists(rule_contain_media, rule_list);
 }
-and rule_contain_media = (rule: rule) => {
-  switch (rule) {
+and rule_contain_media =
+  fun
   | Declaration(_) => false
   | Style_rule(_) => false
-  | At_rule({name: (name, _), _}) => name == "media"
-  };
+  | At_rule({name: (name, _), _}) => name == "media";
+
+let trim_right = (vs: component_value_list) => {
+  let rec go = (vs, acc) =>
+    switch (vs) {
+    | [(Whitespace, _)] => acc
+    | [v, ...rest] => go(rest, [v, ...acc])
+    | [] => acc
+    };
+  go(vs, []);
 };
 
-let rec move_media_at_top = ((rule_list, loc): rule_list) => {
+let join_media =
+    (
+      (left, left_loc): with_loc(component_value_list),
+      (right, right_loc): with_loc(component_value_list),
+    ) => {
+  let new_loc = Parser_location.intersection(left_loc, right_loc);
   (
-    List.fold_left(
-      (acc, rule) => {
-        switch (rule) {
-        | At_rule({name: (name, _), block, _} as at_rule)
-            when name == "media" && brace_block_contain_media(block) =>
-          let new_rules = swap(at_rule);
-          List.append(acc, new_rules);
-        | Declaration(_) as x => List.append(acc, [x])
-        | _ as x => List.append(acc, [x])
-        }
-      },
-      [],
-      rule_list,
-    ),
-    loc,
+    trim_right(left)
+    @ [
+      (Whitespace, Ppxlib.Location.none),
+      (Ident("and"), Ppxlib.Location.none),
+      (Whitespace, Ppxlib.Location.none),
+    ]
+    @ right,
+    new_loc,
+  );
+};
+
+let split_by_kind = (rules: list(rule)) => {
+  List.partition(
+    fun
+    | Declaration(_) => true
+    | _ => false,
+    rules,
+  );
+};
+
+let rec move_media_at_top = (rules: list(rule)) => {
+  List.fold_left(
+    (acc, rule) => {
+      switch (rule) {
+      | At_rule({name: (name, _), block, _} as at_rule)
+          when name == "media" && brace_block_contain_media(block) =>
+        let new_rules = swap(at_rule);
+        acc @ new_rules;
+      | Style_rule({block: (block, _) as block_with_loc, prelude, loc})
+          when rule_list_contain_media(block_with_loc) =>
+        let (declarations, selectors) = split_by_kind(block);
+        let (media_selectors, non_media_selectors) =
+          List.partition(
+            fun
+            | At_rule({name: (name, _), _}) => name == "media"
+            | _ => false,
+            selectors,
+          );
+        let new_media_rules =
+          List.map(
+            fun
+            | At_rule({
+                name: (name, _) as name_with_loc,
+                prelude: nested_media_selector,
+                block,
+                _,
+              })
+                when name == "media" => {
+                let nested_media_rule_list =
+                  switch (block) {
+                  | Empty => []
+                  | Rule_list((block, _)) => block
+                  | Stylesheet((block, _)) => block
+                  };
+                [
+                  At_rule({
+                    name: name_with_loc,
+                    prelude: nested_media_selector,
+                    block:
+                      Rule_list((
+                        [
+                          Style_rule({
+                            prelude,
+                            block: (
+                              nested_media_rule_list,
+                              Ppxlib.Location.none,
+                            ),
+                            loc,
+                          }),
+                        ],
+                        Ppxlib.Location.none,
+                      )),
+                    loc,
+                  }),
+                ];
+              }
+            | _ => [],
+            media_selectors,
+          )
+          |> List.flatten;
+        let selector_without_media = [
+          Style_rule({
+            prelude,
+            block: (declarations @ non_media_selectors, Ppxlib.Location.none),
+            loc,
+          }),
+        ];
+        acc @ selector_without_media @ new_media_rules;
+      | Style_rule({block: (block, _), _}) when !List.is_empty(block) =>
+        acc @ [rule]
+      | At_rule({block: Rule_list((block, _)), _})
+          when !List.is_empty(block) =>
+        acc @ [rule]
+      | At_rule({block: Stylesheet((block, _)), _})
+          when !List.is_empty(block) =>
+        acc @ [rule]
+      | Declaration(_) => acc @ [rule]
+      | _ => acc
+      }
+    },
+    [],
+    rules,
   );
 }
-and swap = ({prelude: _, block: _, loc: _, _}: at_rule) => {
-  failwith("TODO");
+and swap = ({prelude: swap_prelude, block, loc, _}: at_rule) => {
+  let rules =
+    switch (block) {
+    | Empty => []
+    | Rule_list((rule_list, _)) => rule_list
+    | Stylesheet((stylesheet, _)) => stylesheet
+    };
+  let (media_declarations, media_rules_selectors) = split_by_kind(rules);
+  let resolved_media_selectors =
+    List.map(
+      fun
+      | At_rule({
+          name: (name, _) as nested_name,
+          prelude: nested_prelude,
+          block: nested_block,
+          _,
+        })
+          when name == "media" => [
+          At_rule({
+            name: nested_name,
+            prelude: swap_prelude,
+            block: Rule_list((media_declarations, Ppxlib.Location.none)),
+            loc,
+          }),
+          At_rule({
+            name: nested_name,
+            prelude: join_media(swap_prelude, nested_prelude),
+            block: nested_block,
+            loc,
+          }),
+        ]
+      | _ => [],
+      media_rules_selectors,
+    )
+    |> List.flatten;
+  move_media_at_top(resolved_media_selectors);
 };
 
 let rec render_stylesheet = (ast: stylesheet) => {
@@ -139,7 +271,11 @@ and render_brace_block = ast => {
   };
 }
 and render_rule_list = (rule_list: rule_list) => {
-  rule_list |> fst |> List.map(render_rule) |> String.concat("");
+  rule_list
+  |> fst
+  |> move_media_at_top
+  |> List.map(render_rule)
+  |> String.concat("");
 }
 and render_declaration = ({name, value, important, _}: declaration) => {
   Printf.sprintf(
