@@ -1045,11 +1045,38 @@ let global_with_selector =
   [%global
     {| html { line-height: 1.15; }
     a { :hover { padding: 0; } }
-    .foo { & .bar & .baz { padding: 0; } }
    |}];
   let css = get_string_style_rules () in
   assert_string css
-    (Printf.sprintf "html{line-height:1.15;}a{}a:hover{padding:0;}.foo{}.foo .bar .foo .baz{padding:0;}")
+    (Printf.sprintf "html{line-height:1.15;}a{}a:hover{padding:0;}")
+
+let ampersand_everywhere_global =
+  test "ampersand_everywhere_global" @@ fun () ->
+    [%global
+      {|
+      .foo {
+        &[data-foo=bar] .lola {
+          font-size: 2px;
+        }
+        & .lola &::placeholder {
+          font-size: 3px;
+        }
+        .lola &:not(a) {
+          font-size: 4px;
+        }
+        .lola {
+          font-size: 5px;
+        }
+        .lola & &:focus & & .lola {
+          font-size: 6px;
+        }
+      }
+    |}];
+  let css = get_string_style_rules () in
+  assert_string css
+       ".foo{}.foo[data-foo=bar] .lola{font-size:2px;}.foo .lola .foo::placeholder{font-size:3px;}\
+       .lola .foo:not(a){font-size:4px;}.foo .lola{font-size:5px;}\
+       .lola .foo .foo:focus .foo .foo .lola{font-size:6px;}"
 
 let tests =
   ( "CSS",
@@ -1108,4 +1135,5 @@ let tests =
       mq_inside_selector_with_declarations;
       mq_and_selectors_2;
       global_with_selector;
+      ampersand_everywhere_global;
     ] )
