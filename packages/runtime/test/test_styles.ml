@@ -1045,10 +1045,11 @@ let global_with_selector =
   [%global
     {| html { line-height: 1.15; }
     a { :hover { padding: 0; } }
+    .foo { & .bar & .baz { padding: 0; } }
    |}];
   let css = get_string_style_rules () in
   assert_string css
-    (Printf.sprintf "html{line-height:1.15;}a{}a:hover{padding:0;}")
+    (Printf.sprintf "html{line-height:1.15;}a{}a:hover{padding:0;}.foo{}.foo .bar .foo .baz{padding:0;}")
 
 let tests =
   ( "CSS",

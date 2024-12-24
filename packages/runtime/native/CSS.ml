@@ -275,11 +275,7 @@ let resolve_selectors rules =
           match prefix with
           | None -> current_selector
           | Some prefix ->
-            (* child starts with &, join them without space *)
-            if starts_with_ampersand current_selector then
-              prefix ^ remove_first_ampersand current_selector
-              (* child starts with dot, join them without space *)
-            else if contains_ampersand current_selector then
+            if contains_ampersand current_selector then
               (* reemplazar el ampersand del current_selector, con el padre *)
               replace_ampersand ~by:prefix current_selector
             else if starts_with_double_dot current_selector then
