@@ -236,19 +236,26 @@ and swap = ({prelude: swap_prelude, block, loc, _}: at_rule) => {
 };
 
 let resolve_selectors = (rules: list(rule)) => {
-  let rec unnest_selectors = (~prefix as _, rules) => {
+  let rec unnest_selectors = (~prefix, rules) => {
     List.partition_map(
       fun
-      | Style_rule({prelude: (_, _), block: (rules, _), _}) => {
-          let new_prefix = failwith("TODO");
+      | Style_rule({prelude: (prelude, _), block: (rules, _), _}) => {
+          let new_prefix =
+            switch (prefix) {
+            | None => prelude |> List.hd |> fst
+            | Some(prefix) => prefix
+            };
           let selector_rules = split_multiple_selectors(rules);
           let (selectors, rest_of_declarations) =
             unnest_selectors(~prefix=Some(new_prefix), selector_rules);
           let new_selector =
             Style_rule({
-              prelude: ([new_prefix], Ppxlib.Location.none),
+              prelude: (
+                [(new_prefix, Ppxlib.Location.none)],
+                Ppxlib.Location.none,
+              ),
               block: (selectors, Ppxlib.Location.none),
-              loc: Location.none,
+              loc: Ppxlib.Location.none,
             });
           Right([new_selector, ...rest_of_declarations]);
         }
