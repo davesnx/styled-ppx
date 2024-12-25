@@ -9,7 +9,7 @@ module CSS = {
   /* This is the public API of the CSS module */
   let ident = (~loc, name) =>
     {txt: Ldot(Lident("CSS"), name), loc} |> Builder.pexp_ident(~loc);
-  let selector = (~loc) => ident(~loc, "selector");
+  let selectorMany = (~loc) => ident(~loc, "selectorMany");
   let media = (~loc) => ident(~loc, "media");
   let global = (~loc) => ident(~loc, "global");
   let label = (~loc) => ident(~loc, "label");
@@ -189,7 +189,7 @@ and render_container_query = (~loc, at_rule: at_rule) => {
 
     Helper.Exp.apply(
       ~loc=at_rule.loc,
-      CSS.selector(~loc=at_rule.loc),
+      CSS.selectorMany(~loc=at_rule.loc),
       [(Nolabel, query), (Nolabel, rules)],
     );
   };
@@ -425,7 +425,7 @@ and render_style_rule = (~loc, rule: style_rule) => {
 
   Helper.Exp.apply(
     ~loc=selector_location,
-    CSS.selector(~loc=selector_location),
+    CSS.selectorMany(~loc=selector_location),
     [(Nolabel, selector_name), (Nolabel, selector_expr)],
   );
 };

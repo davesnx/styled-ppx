@@ -3,7 +3,8 @@ type rule =
   | Selector of string array * rule array
 
 let declaration (property, value) = Declaration (property, value)
-let selector selector rules = Selector (selector, rules)
+let selector selector rules = Selector ([| selector |], rules)
+let selectorMany selector_list rules = Selector (selector_list, rules)
 let media query rules = Selector ([| {|@media |} ^ query |], rules)
 
 let important v =

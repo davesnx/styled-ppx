@@ -3,20 +3,20 @@
   $ refmt --parse ml --print re output.ml
   ignore(
     CSS.global([|
-      CSS.selector(
+      CSS.selectorMany(
         [|{js|html|js}|],
         [|
           CSS.lineHeight(`abs(1.15)),
           CSS.unsafe({js|textSizeAdjust|js}, {js|100%|js}),
         |],
       ),
-      CSS.selector([|{js|body|js}|], [|CSS.margin(`zero)|]),
-      CSS.selector([|{js|main|js}|], [|CSS.display(`block)|]),
-      CSS.selector(
+      CSS.selectorMany([|{js|body|js}|], [|CSS.margin(`zero)|]),
+      CSS.selectorMany([|{js|main|js}|], [|CSS.display(`block)|]),
+      CSS.selectorMany(
         [|{js|h1|js}|],
         [|CSS.fontSize(`em(2.)), CSS.margin2(~v=`em(0.67), ~h=`zero)|],
       ),
-      CSS.selector(
+      CSS.selectorMany(
         [|{js|hr|js}|],
         [|
           CSS.boxSizing(`contentBox),
@@ -24,15 +24,15 @@
           CSS.overflow(`visible),
         |],
       ),
-      CSS.selector(
+      CSS.selectorMany(
         [|{js|pre|js}|],
         [|
           CSS.fontFamilies([|"monospace", "monospace"|]),
           CSS.fontSize(`em(1.)),
         |],
       ),
-      CSS.selector([|{js|a|js}|], [|CSS.backgroundColor(`transparent)|]),
-      CSS.selector(
+      CSS.selectorMany([|{js|a|js}|], [|CSS.backgroundColor(`transparent)|]),
+      CSS.selectorMany(
         [|{js|abbr[title]|js}|],
         [|
           CSS.unsafe({js|borderBottom|js}, {js|none|js}),
@@ -40,19 +40,19 @@
           CSS.unsafe({js|textDecoration|js}, {js|underline dotted|js}),
         |],
       ),
-      CSS.selector(
+      CSS.selectorMany(
         [|{js|b|js}, {js|strong|js}|],
         [|CSS.fontWeight(`bolder)|],
       ),
-      CSS.selector(
+      CSS.selectorMany(
         [|{js|code|js}, {js|kbd|js}, {js|samp|js}|],
         [|
           CSS.fontFamilies([|"monospace", "monospace"|]),
           CSS.fontSize(`em(1.)),
         |],
       ),
-      CSS.selector([|{js|small|js}|], [|CSS.fontSize(`percent(80.))|]),
-      CSS.selector(
+      CSS.selectorMany([|{js|small|js}|], [|CSS.fontSize(`percent(80.))|]),
+      CSS.selectorMany(
         [|{js|sub|js}, {js|sup|js}|],
         [|
           CSS.fontSize(`percent(75.)),
@@ -61,10 +61,10 @@
           CSS.verticalAlign(`baseline),
         |],
       ),
-      CSS.selector([|{js|sub|js}|], [|CSS.bottom(`em(-0.25))|]),
-      CSS.selector([|{js|sup|js}|], [|CSS.top(`em(-0.5))|]),
-      CSS.selector([|{js|img|js}|], [|CSS.borderStyle(`none)|]),
-      CSS.selector(
+      CSS.selectorMany([|{js|sub|js}|], [|CSS.bottom(`em(-0.25))|]),
+      CSS.selectorMany([|{js|sup|js}|], [|CSS.top(`em(-0.5))|]),
+      CSS.selectorMany([|{js|img|js}|], [|CSS.borderStyle(`none)|]),
+      CSS.selectorMany(
         [|
           {js|button|js},
           {js|input|js},
@@ -79,15 +79,15 @@
           CSS.margin(`zero),
         |],
       ),
-      CSS.selector(
+      CSS.selectorMany(
         [|{js|button|js}, {js|input|js}|],
         [|CSS.overflow(`visible)|],
       ),
-      CSS.selector(
+      CSS.selectorMany(
         [|{js|button|js}, {js|select|js}|],
         [|CSS.textTransform(`none)|],
       ),
-      CSS.selector(
+      CSS.selectorMany(
         [|
           {js|button|js},
           {js|[type="button"]|js},
@@ -96,7 +96,7 @@
         |],
         [|CSS.unsafe({js|WebkitAppearance|js}, {js|button|js})|],
       ),
-      CSS.selector(
+      CSS.selectorMany(
         [|
           {js|button::-moz-focus-inner|js},
           {js|[type="button"]::-moz-focus-inner|js},
@@ -105,7 +105,7 @@
         |],
         [|CSS.borderStyle(`none), CSS.padding(`zero)|],
       ),
-      CSS.selector(
+      CSS.selectorMany(
         [|
           {js|button:-moz-focusring|js},
           {js|[type="button"]:-moz-focusring|js},
@@ -114,11 +114,11 @@
         |],
         [|CSS.unsafe({js|outline|js}, {js|1px dotted ButtonText|js})|],
       ),
-      CSS.selector(
+      CSS.selectorMany(
         [|{js|fieldset|js}|],
         [|CSS.padding3(~top=`em(0.35), ~h=`em(0.75), ~bottom=`em(0.625))|],
       ),
-      CSS.selector(
+      CSS.selectorMany(
         [|{js|legend|js}|],
         [|
           CSS.boxSizing(`borderBox),
@@ -129,42 +129,45 @@
           CSS.whiteSpace(`normal),
         |],
       ),
-      CSS.selector([|{js|progress|js}|], [|CSS.verticalAlign(`baseline)|]),
-      CSS.selector([|{js|textarea|js}|], [|CSS.overflow(`auto)|]),
-      CSS.selector(
+      CSS.selectorMany(
+        [|{js|progress|js}|],
+        [|CSS.verticalAlign(`baseline)|],
+      ),
+      CSS.selectorMany([|{js|textarea|js}|], [|CSS.overflow(`auto)|]),
+      CSS.selectorMany(
         [|{js|[type="checkbox"]|js}, {js|[type="radio"]|js}|],
         [|CSS.boxSizing(`borderBox), CSS.padding(`zero)|],
       ),
-      CSS.selector(
+      CSS.selectorMany(
         [|
           {js|[type="number"]::-webkit-inner-spin-button|js},
           {js|[type="number"]::-webkit-outer-spin-button|js},
         |],
         [|CSS.height(`auto)|],
       ),
-      CSS.selector(
+      CSS.selectorMany(
         [|{js|[type="search"]|js}|],
         [|
           CSS.unsafe({js|WebkitAppearance|js}, {js|textfield|js}),
           CSS.outlineOffset(`pxFloat(-2.)),
         |],
       ),
-      CSS.selector(
+      CSS.selectorMany(
         [|{js|[type="search"]::-webkit-search-decoration|js}|],
         [|CSS.unsafe({js|WebkitAppearance|js}, {js|none|js})|],
       ),
-      CSS.selector(
+      CSS.selectorMany(
         [|{js|::-webkit-file-upload-button|js}|],
         [|
           CSS.unsafe({js|WebkitAppearance|js}, {js|button|js}),
           CSS.unsafe({js|font|js}, {js|inherit|js}),
         |],
       ),
-      CSS.selector([|{js|details|js}|], [|CSS.display(`block)|]),
-      CSS.selector([|{js|summary|js}|], [|CSS.display(`listItem)|]),
-      CSS.selector([|{js|template|js}|], [|CSS.display(`none)|]),
-      CSS.selector([|{js|[hidden]|js}|], [|CSS.display(`none)|]),
-      CSS.selector(
+      CSS.selectorMany([|{js|details|js}|], [|CSS.display(`block)|]),
+      CSS.selectorMany([|{js|summary|js}|], [|CSS.display(`listItem)|]),
+      CSS.selectorMany([|{js|template|js}|], [|CSS.display(`none)|]),
+      CSS.selectorMany([|{js|[hidden]|js}|], [|CSS.display(`none)|]),
+      CSS.selectorMany(
         [|{js|:root|js}|],
         [|CSS.unsafe({js|--shiki-color-text|js}, {js|oklch(37.53% 0 0)|js})|],
       ),

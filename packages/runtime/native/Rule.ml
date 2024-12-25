@@ -18,7 +18,8 @@ let camelCaseToKebabCase str =
 let declaration (property, value) =
   Declaration (camelCaseToKebabCase property, value)
 
-let selector selector rules = Selector (selector, rules)
+let selector selector rules = Selector ([|selector|], rules)
+let selectorMany selector_list rules = Selector (selector_list, rules)
 let media query rules = Selector ([| {|@media |} ^ query |], rules)
 
 let important v =

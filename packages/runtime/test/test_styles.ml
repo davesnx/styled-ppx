@@ -130,7 +130,7 @@ let simple_selector =
     CSS.style
       [|
         CSS.margin @@ CSS.px 10;
-        CSS.selector [| "a" |] [| CSS.margin @@ CSS.px 60 |];
+        CSS.selectorMany [| "a" |] [| CSS.margin @@ CSS.px 60 |];
       |]
   in
   let css = get_string_style_rules () in
@@ -144,9 +144,9 @@ let selector_nested =
     CSS.style
       [|
         CSS.margin @@ CSS.px 10;
-        CSS.selector [| "a" |]
+        CSS.selectorMany [| "a" |]
           [|
-            CSS.display `block; CSS.selector [| "div" |] [| CSS.display `none |];
+            CSS.display `block; CSS.selectorMany [| "div" |] [| CSS.display `none |];
           |];
       |]
   in
@@ -163,10 +163,10 @@ let selector_nested_with_ampersand =
     CSS.style
       [|
         CSS.margin @@ CSS.px 10;
-        CSS.selector [| "& > a" |]
+        CSS.selectorMany [| "& > a" |]
           [|
             CSS.margin @@ CSS.px 11;
-            CSS.selector [| "& > div" |] [| CSS.margin @@ CSS.px 12 |];
+            CSS.selectorMany [| "& > div" |] [| CSS.margin @@ CSS.px 12 |];
           |];
       |]
   in
@@ -183,19 +183,19 @@ let selector_nested_x10 =
     CSS.style
       [|
         CSS.display `flex;
-        CSS.selector [| "a" |]
+        CSS.selectorMany [| "a" |]
           [|
             CSS.display `block;
-            CSS.selector [| "div" |]
+            CSS.selectorMany [| "div" |]
               [|
                 CSS.display `none;
-                CSS.selector [| "span" |]
+                CSS.selectorMany [| "span" |]
                   [|
                     CSS.display `none;
-                    CSS.selector [| "hr" |]
+                    CSS.selectorMany [| "hr" |]
                       [|
                         CSS.display `none;
-                        CSS.selector [| "code" |] [| CSS.display `none |];
+                        CSS.selectorMany [| "code" |] [| CSS.display `none |];
                       |];
                   |];
               |];
@@ -216,7 +216,7 @@ let selector_ampersand_with_space =
     CSS.style
       [|
         CSS.fontSize (`px 42);
-        CSS.selector [| "& .div" |] [| CSS.fontSize (`px 24) |];
+        CSS.selectorMany [| "& .div" |] [| CSS.fontSize (`px 24) |];
       |]
   in
   let css = get_string_style_rules () in
@@ -303,7 +303,7 @@ let selector_ampersand_with_no_space =
     CSS.style
       [|
         CSS.fontSize (`px 42);
-        CSS.selector [| "&.div" |] [| CSS.fontSize (`px 24) |];
+        CSS.selectorMany [| "&.div" |] [| CSS.fontSize (`px 24) |];
       |]
   in
   let css = get_string_style_rules () in
@@ -317,7 +317,7 @@ let selector_ampersand_at_the_middle =
     CSS.style
       [|
         CSS.fontSize (`px 42);
-        CSS.selector [| "& div &" |] [| CSS.fontSize (`px 24) |];
+        CSS.selectorMany [| "& div &" |] [| CSS.fontSize (`px 24) |];
       |]
   in
   let css = get_string_style_rules () in
@@ -376,7 +376,7 @@ let selector_params =
     CSS.style
       [|
         CSS.maxWidth (`px 800);
-        CSS.selector [| {js|:first-child|js} |] [| CSS.width (`px 300) |];
+        CSS.selectorMany [| {js|:first-child|js} |] [| CSS.width (`px 300) |];
       |]
   in
   let css = get_string_style_rules () in
@@ -409,7 +409,7 @@ let keyframe =
 
 let global =
   test "global" @@ fun () ->
-  CSS.global [| CSS.selector [| "html" |] [| CSS.lineHeight (`abs 1.15) |] |];
+  CSS.global [| CSS.selectorMany [| "html" |] [| CSS.lineHeight (`abs 1.15) |] |];
   let css = get_string_style_rules () in
   assert_string css (Printf.sprintf "html{line-height:1.15;}")
 
@@ -441,9 +441,9 @@ let hover_selector =
   let rules =
     [|
       CSS.color `currentColor;
-      CSS.selector [| ":hover" |] [| CSS.color `transparent |];
-      CSS.selector [| "&:hover" |] [| CSS.color `transparent |];
-      CSS.selector [| " :hover" |] [| CSS.color `transparent |];
+      CSS.selectorMany [| ":hover" |] [| CSS.color `transparent |];
+      CSS.selectorMany [| "&:hover" |] [| CSS.color `transparent |];
+      CSS.selectorMany [| " :hover" |] [| CSS.color `transparent |];
     |]
   in
   let classname = CSS.style rules in
@@ -688,7 +688,7 @@ let selector_with_interp_and_pseudo =
   let rules =
     [|
       CSS.cursor `pointer;
-      CSS.selector
+      CSS.selectorMany
         [| {js|&.|js} ^ button_active ^ {js|::before|js} |]
         [| CSS.top (`pxFloat 50.) |];
     |]
@@ -721,7 +721,7 @@ let selector_with_empty_interp =
 
 let style_tag =
   test "style_tag" @@ fun () ->
-  CSS.global [| CSS.selector [| "html" |] [| CSS.lineHeight (`abs 1.15) |] |];
+  CSS.global [| CSS.selectorMany [| "html" |] [| CSS.lineHeight (`abs 1.15) |] |];
   let animationName =
     CSS.keyframes
       [|
@@ -840,7 +840,7 @@ let selector_with_classname_and_mq =
   let rules =
     [|
       CSS.display `block;
-      CSS.selector
+      CSS.selectorMany
         [| ".lola ." ^ nested_classname |]
         [| CSS.media "(min-width: 768px)" [| CSS.height `auto |] |];
     |]
@@ -861,7 +861,7 @@ let mq_with_selectors =
       CSS.media "(min-width: 768px)"
         [|
           CSS.height `auto;
-          CSS.selector [| ".lola" |] [| CSS.color `transparent |];
+          CSS.selectorMany [| ".lola" |] [| CSS.color `transparent |];
         |];
     |]
   in

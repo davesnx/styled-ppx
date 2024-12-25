@@ -21,7 +21,7 @@ If this test fail means that the module is not in sync with the ppx
   let _className =
     CSS.style([|
       CSS.label("_className"),
-      CSS.selector(
+      CSS.selectorMany(
         [|{js|.lolaso :nth-child(2n)|js}|],
         [|CSS.color(CSS.red)|],
       ),
