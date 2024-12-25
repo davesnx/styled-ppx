@@ -1,6 +1,6 @@
 type rule =
   | Declaration of string * string
-  | Selector of string * rule array
+  | Selector of string array * rule array
 
 let explode s =
   let rec exp i l = if i < 0 then l else exp (i - 1) (s.[i] :: l) in
@@ -18,8 +18,9 @@ let camelCaseToKebabCase str =
 let declaration (property, value) =
   Declaration (camelCaseToKebabCase property, value)
 
-let selector selector rules = Selector (selector, rules)
-let media query rules = Selector ({|@media |} ^ query, rules)
+let selector selector rules = Selector ([|selector|], rules)
+let selectorMany selector_list rules = Selector (selector_list, rules)
+let media query rules = Selector ([| {|@media |} ^ query |], rules)
 
 let important v =
   match v with

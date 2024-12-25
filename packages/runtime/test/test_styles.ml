@@ -129,7 +129,8 @@ let simple_selector =
   let classname =
     CSS.style
       [|
-        CSS.margin @@ CSS.px 10; CSS.selector "a" [| CSS.margin @@ CSS.px 60 |];
+        CSS.margin @@ CSS.px 10;
+        CSS.selectorMany [| "a" |] [| CSS.margin @@ CSS.px 60 |];
       |]
   in
   let css = get_string_style_rules () in
@@ -143,8 +144,10 @@ let selector_nested =
     CSS.style
       [|
         CSS.margin @@ CSS.px 10;
-        CSS.selector "a"
-          [| CSS.display `block; CSS.selector "div" [| CSS.display `none |] |];
+        CSS.selectorMany [| "a" |]
+          [|
+            CSS.display `block; CSS.selectorMany [| "div" |] [| CSS.display `none |];
+          |];
       |]
   in
   let css = get_string_style_rules () in
@@ -160,10 +163,10 @@ let selector_nested_with_ampersand =
     CSS.style
       [|
         CSS.margin @@ CSS.px 10;
-        CSS.selector "& > a"
+        CSS.selectorMany [| "& > a" |]
           [|
             CSS.margin @@ CSS.px 11;
-            CSS.selector "& > div" [| CSS.margin @@ CSS.px 12 |];
+            CSS.selectorMany [| "& > div" |] [| CSS.margin @@ CSS.px 12 |];
           |];
       |]
   in
@@ -180,19 +183,19 @@ let selector_nested_x10 =
     CSS.style
       [|
         CSS.display `flex;
-        CSS.selector "a"
+        CSS.selectorMany [| "a" |]
           [|
             CSS.display `block;
-            CSS.selector "div"
+            CSS.selectorMany [| "div" |]
               [|
                 CSS.display `none;
-                CSS.selector "span"
+                CSS.selectorMany [| "span" |]
                   [|
                     CSS.display `none;
-                    CSS.selector "hr"
+                    CSS.selectorMany [| "hr" |]
                       [|
                         CSS.display `none;
-                        CSS.selector "code" [| CSS.display `none |];
+                        CSS.selectorMany [| "code" |] [| CSS.display `none |];
                       |];
                   |];
               |];
@@ -212,7 +215,8 @@ let selector_ampersand_with_space =
   let classname =
     CSS.style
       [|
-        CSS.fontSize (`px 42); CSS.selector "& .div" [| CSS.fontSize (`px 24) |];
+        CSS.fontSize (`px 42);
+        CSS.selectorMany [| "& .div" |] [| CSS.fontSize (`px 24) |];
       |]
   in
   let css = get_string_style_rules () in
@@ -298,7 +302,8 @@ let selector_ampersand_with_no_space =
   let classname =
     CSS.style
       [|
-        CSS.fontSize (`px 42); CSS.selector "&.div" [| CSS.fontSize (`px 24) |];
+        CSS.fontSize (`px 42);
+        CSS.selectorMany [| "&.div" |] [| CSS.fontSize (`px 24) |];
       |]
   in
   let css = get_string_style_rules () in
@@ -312,7 +317,7 @@ let selector_ampersand_at_the_middle =
     CSS.style
       [|
         CSS.fontSize (`px 42);
-        CSS.selector "& div &" [| CSS.fontSize (`px 24) |];
+        CSS.selectorMany [| "& div &" |] [| CSS.fontSize (`px 24) |];
       |]
   in
   let css = get_string_style_rules () in
@@ -371,7 +376,7 @@ let selector_params =
     CSS.style
       [|
         CSS.maxWidth (`px 800);
-        CSS.selector {js|:first-child|js} [| CSS.width (`px 300) |];
+        CSS.selectorMany [| {js|:first-child|js} |] [| CSS.width (`px 300) |];
       |]
   in
   let css = get_string_style_rules () in
@@ -404,7 +409,7 @@ let keyframe =
 
 let global =
   test "global" @@ fun () ->
-  CSS.global [| CSS.selector "html" [| CSS.lineHeight (`abs 1.15) |] |];
+  CSS.global [| CSS.selectorMany [| "html" |] [| CSS.lineHeight (`abs 1.15) |] |];
   let css = get_string_style_rules () in
   assert_string css (Printf.sprintf "html{line-height:1.15;}")
 
@@ -436,9 +441,9 @@ let hover_selector =
   let rules =
     [|
       CSS.color `currentColor;
-      CSS.selector ":hover" [| CSS.color `transparent |];
-      CSS.selector "&:hover" [| CSS.color `transparent |];
-      CSS.selector " :hover" [| CSS.color `transparent |];
+      CSS.selectorMany [| ":hover" |] [| CSS.color `transparent |];
+      CSS.selectorMany [| "&:hover" |] [| CSS.color `transparent |];
+      CSS.selectorMany [| " :hover" |] [| CSS.color `transparent |];
     |]
   in
   let classname = CSS.style rules in
@@ -473,6 +478,74 @@ let multiple_pseudo =
         translateX(-50%%); -ms-transform: translateX(-50%%); transform: \
         translateX(-50%%); }"
        classname classname classname)
+
+let functional_pseudo =
+  test "functional_pseudo" @@ fun () ->
+  let classname =
+    [%cx
+      {|
+           .foo, .bar {
+            :is(ol, ul, menu:unsupported) :is(ol, ul) {
+              color: green;
+            }
+
+            :is(ol, ul) :is(ol, ul) ol {
+              list-style-type: lower-greek;
+              color: chocolate;
+            }
+
+            p:not(.irrelevant) {
+              font-weight: bold;
+            }
+
+            p > :not(strong, b.important) {
+              color: darkmagenta;
+            }
+
+            :where(ol, ul, menu:unsupported) :where(ol, ul) {
+              color: green;
+            }
+
+            :where(ol, ul) :where(ol, ul) ol {
+              list-style-type: lower-greek;
+              color: chocolate;
+            }
+
+            :is(h1, h2, h3):has(+ :is(h2, h3, h4)) {
+              margin: 0 0 0.25rem 0;
+            }
+
+            body:has(video, audio), body:has(video):has(audio) {
+              color: red;
+            }
+           }
+           |}]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s .foo:is(ol, ul, menu:unsupported):is(ol, ul) { color: #008000; } \
+        .%s .foo:is(ol, ul) :is(ol, ul) ol { list-style-type: lower-greek; \
+        color: #D2691E; } .%s .foo p:not(.irrelevant) { font-weight: 700; } \
+        .%s .foo p > :not(strong, b.important) { color: #8B008B; } .%s \
+        .foo:where(ol, ul, menu:unsupported) :where(ol, ul) { color: #008000; \
+        } .%s .foo:where(ol, ul) :where(ol, ul) ol { list-style-type: \
+        lower-greek; color: #D2691E; } .%s .foo:is(h1, h2, h3):has(+ :is(h2, \
+        h3, h4)) { margin: 0 0 0.25rem 0; } .%s .foo body:has(video, audio) { \
+        color: #FF0000; } .%s .foo body:has(video):has(audio) { color: \
+        #FF0000; } .%s .bar:is(ol, ul, menu:unsupported):is(ol, ul) { color: \
+        #008000; } .%s .bar:is(ol, ul) :is(ol, ul) ol { list-style-type: \
+        lower-greek; color: #D2691E; } .%s .bar p:not(.irrelevant) { \
+        font-weight: 700; } .%s .bar p > :not(strong, b.important) { color: \
+        #8B008B; } .%s .bar:where(ol, ul, menu:unsupported) :where(ol, ul) { \
+        color: #008000; } .%s .bar:where(ol, ul) :where(ol, ul) ol { \
+        list-style-type: lower-greek; color: #D2691E; } .%s .bar:is(h1, h2, \
+        h3):has(+ :is(h2, h3, h4)) { margin: 0 0 0.25rem 0; } .%s .bar \
+        body:has(video, audio) { color: #FF0000; } .%s .bar \
+        body:has(video):has(audio) { color: #FF0000; }"
+       classname classname classname classname classname classname classname
+       classname classname classname classname classname classname classname
+       classname classname classname classname)
 
 let nested_selectors =
   test "nested_selectors" @@ fun () ->
@@ -615,8 +688,8 @@ let selector_with_interp_and_pseudo =
   let rules =
     [|
       CSS.cursor `pointer;
-      CSS.selector
-        ({js|&.|js} ^ button_active ^ {js|::before|js})
+      CSS.selectorMany
+        [| {js|&.|js} ^ button_active ^ {js|::before|js} |]
         [| CSS.top (`pxFloat 50.) |];
     |]
   in
@@ -648,7 +721,7 @@ let selector_with_empty_interp =
 
 let style_tag =
   test "style_tag" @@ fun () ->
-  CSS.global [| CSS.selector "html" [| CSS.lineHeight (`abs 1.15) |] |];
+  CSS.global [| CSS.selectorMany [| "html" |] [| CSS.lineHeight (`abs 1.15) |] |];
   let animationName =
     CSS.keyframes
       [|
@@ -767,8 +840,8 @@ let selector_with_classname_and_mq =
   let rules =
     [|
       CSS.display `block;
-      CSS.selector
-        (".lola ." ^ nested_classname)
+      CSS.selectorMany
+        [| ".lola ." ^ nested_classname |]
         [| CSS.media "(min-width: 768px)" [| CSS.height `auto |] |];
     |]
   in
@@ -787,7 +860,8 @@ let mq_with_selectors =
       CSS.display `block;
       CSS.media "(min-width: 768px)"
         [|
-          CSS.height `auto; CSS.selector ".lola" [| CSS.color `transparent |];
+          CSS.height `auto;
+          CSS.selectorMany [| ".lola" |] [| CSS.color `transparent |];
         |];
     |]
   in
@@ -1052,8 +1126,8 @@ let global_with_selector =
 
 let ampersand_everywhere_global =
   test "ampersand_everywhere_global" @@ fun () ->
-    [%global
-      {|
+  [%global
+    {|
       .foo {
         &[data-foo=bar] .lola {
           font-size: 2px;
@@ -1074,9 +1148,10 @@ let ampersand_everywhere_global =
     |}];
   let css = get_string_style_rules () in
   assert_string css
-       ".foo{}.foo[data-foo=bar] .lola{font-size:2px;}.foo .lola .foo::placeholder{font-size:3px;}\
-       .lola .foo:not(a){font-size:4px;}.foo .lola{font-size:5px;}\
-       .lola .foo .foo:focus .foo .foo .lola{font-size:6px;}"
+    ".foo{}.foo[data-foo=bar] .lola{font-size:2px;}.foo .lola \
+     .foo::placeholder{font-size:3px;}.lola .foo:not(a){font-size:4px;}.foo \
+     .lola{font-size:5px;}.lola .foo .foo:focus .foo .foo \
+     .lola{font-size:6px;}"
 
 let tests =
   ( "CSS",
@@ -1114,6 +1189,7 @@ let tests =
       nested_selectors;
       nested_selectors_2;
       multiple_pseudo;
+      functional_pseudo;
       selector_with_interp_and_pseudo;
       pseudo_selectors;
       pseudo_selectors_2;

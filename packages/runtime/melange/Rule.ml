@@ -1,10 +1,11 @@
 type rule =
   | Declaration of string * string
-  | Selector of string * rule array
+  | Selector of string array * rule array
 
 let declaration (property, value) = Declaration (property, value)
-let selector selector rules = Selector (selector, rules)
-let media query rules = Selector ({|@media |} ^ query, rules)
+let selector selector rules = Selector ([| selector |], rules)
+let selectorMany selector_list rules = Selector (selector_list, rules)
+let media query rules = Selector ([| {|@media |} ^ query |], rules)
 
 let important v =
   match v with
@@ -16,7 +17,10 @@ let rec ruleToDict (dict : Js.Json.t Js.Dict.t) (rule : rule) :
   let _ =
     match rule with
     | Declaration (name, value) -> Js.Dict.set dict name (Js.Json.string value)
-    | Selector (name, ruleset) -> Js.Dict.set dict name (toJson ruleset)
+    | Selector (name, ruleset) ->
+      Js.Dict.set dict
+        (Kloth.Array.map_and_join ~sep:", " ~f:(fun v -> v) name)
+        (toJson ruleset)
   in
   dict
 

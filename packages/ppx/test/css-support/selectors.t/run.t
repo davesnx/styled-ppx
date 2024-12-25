@@ -18,25 +18,27 @@ If this test fail means that the module is not in sync with the ppx
     CSS.style([|
       CSS.label("_chart"),
       CSS.userSelect(`none),
-      CSS.selector(
-        {js|.recharts-cartesian-grid-horizontal|js},
+      CSS.selectorMany(
+        [|{js|.recharts-cartesian-grid-horizontal|js}|],
         [|
-          CSS.selector(
-            {js|line|js},
+          CSS.selectorMany(
+            [|{js|line|js}|],
             [|
-              CSS.selector(
-                {js|:nth-last-child(1), :nth-last-child(2)|js},
+              CSS.selectorMany(
+                [|{js|:nth-last-child(1)|js}, {js|:nth-last-child(2)|js}|],
                 [|CSS.SVG.strokeOpacity(`num(0.))|],
               ),
             |],
           ),
         |],
       ),
-      CSS.selector(
-        {js|.recharts-scatter .recharts-scatter-symbol .recharts-symbols|js},
+      CSS.selectorMany(
+        [|
+          {js|.recharts-scatter .recharts-scatter-symbol .recharts-symbols|js},
+        |],
         [|
           CSS.opacity(0.8),
-          CSS.selector({js|:hover|js}, [|CSS.opacity(1.)|]),
+          CSS.selectorMany([|{js|:hover|js}|], [|CSS.opacity(1.)|]),
         |],
       ),
     |]);
