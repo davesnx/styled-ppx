@@ -166,12 +166,15 @@ and render_container_query = (~loc, at_rule: at_rule) => {
   | Error(error_expr) => error_expr
   | Ok(conditions) =>
     let query =
-      String_interpolation.transform(
-        ~attrs,
-        ~delimiter,
-        ~loc=at_rule.loc,
-        "@container " ++ conditions,
-      );
+      [
+        String_interpolation.transform(
+          ~attrs,
+          ~delimiter,
+          ~loc=at_rule.loc,
+          "@container " ++ conditions,
+        ),
+      ]
+      |> Builder.pexp_array(~loc=at_rule.loc);
 
     let rules =
       switch (at_rule.block) {
@@ -336,7 +339,11 @@ and render_selector = (~loc, selector: selector) => {
         ":"
         ++ name
         ++ "("
-        ++ (render_selectors(~loc, payload) |> String.trim)
+        ++ (
+          render_selectors(~loc, payload)
+          |> String.concat(", ")
+          |> String.trim
+        )
         ++ ")";
       }
   and render_pseudo_selector =
@@ -389,8 +396,7 @@ and render_selector = (~loc, selector: selector) => {
 }
 and render_selectors = (~loc, selectors) => {
   selectors
-  |> List.map(((selector, _loc)) => render_selector(~loc, selector))
-  |> String.concat(", ");
+  |> List.map(((selector, _loc)) => render_selector(~loc, selector));
 }
 and render_style_rule = (~loc, rule: style_rule) => {
   let (prelude, prelude_loc) = rule.prelude;
@@ -407,12 +413,15 @@ and render_style_rule = (~loc, rule: style_rule) => {
   let selector_name =
     prelude
     |> render_selectors(~loc=selector_location)
-    |> String.trim
-    |> String_interpolation.transform(
-         ~attrs,
-         ~delimiter,
-         ~loc=selector_location,
-       );
+    |> List.map(String.trim)
+    |> List.map(
+         String_interpolation.transform(
+           ~attrs,
+           ~delimiter,
+           ~loc=selector_location,
+         ),
+       )
+    |> Builder.pexp_array(~loc=selector_location);
 
   Helper.Exp.apply(
     ~loc=selector_location,

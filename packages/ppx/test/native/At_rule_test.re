@@ -257,7 +257,7 @@ let container_query_tests = [
     [%expr [%cx "@container (min-width: 150px) {}"]],
     [%expr
       CSS.style([|
-        CSS.selector({js|@container (min-width: 150px)|js}, [||]),
+        CSS.selector([|{js|@container (min-width: 150px)|js}|], [||]),
       |])
     ],
   ),
@@ -266,7 +266,7 @@ let container_query_tests = [
     [%expr [%cx "@container (max-width: 1000px) {}"]],
     [%expr
       CSS.style([|
-        CSS.selector({js|@container (max-width: 1000px)|js}, [||]),
+        CSS.selector([|{js|@container (max-width: 1000px)|js}|], [||]),
       |])
     ],
   ),
@@ -275,7 +275,7 @@ let container_query_tests = [
     [%expr [%cx "@container name (width >= 150px) {}"]],
     [%expr
       CSS.style([|
-        CSS.selector({js|@container name (width >= 150px)|js}, [||]),
+        CSS.selector([|{js|@container name (width >= 150px)|js}|], [||]),
       |])
     ],
   ),
@@ -283,7 +283,9 @@ let container_query_tests = [
     "(height >= 150px)",
     [%expr [%cx "@container (height >= 150px) {}"]],
     [%expr
-      CSS.style([|CSS.selector({js|@container (height >= 150px)|js}, [||])|])
+      CSS.style([|
+        CSS.selector([|{js|@container (height >= 150px)|js}|], [||]),
+      |])
     ],
   ),
   (
@@ -291,7 +293,7 @@ let container_query_tests = [
     [%expr [%cx "@container (inline-size >= 150px) {}"]],
     [%expr
       CSS.style([|
-        CSS.selector({js|@container (inline-size >= 150px)|js}, [||]),
+        CSS.selector([|{js|@container (inline-size >= 150px)|js}|], [||]),
       |])
     ],
   ),
@@ -300,7 +302,7 @@ let container_query_tests = [
     [%expr [%cx "@container (block-size >= 150px) {}"]],
     [%expr
       CSS.style([|
-        CSS.selector({js|@container (block-size >= 150px)|js}, [||]),
+        CSS.selector([|{js|@container (block-size >= 150px)|js}|], [||]),
       |])
     ],
   ),
@@ -309,7 +311,7 @@ let container_query_tests = [
     [%expr [%cx "@container (aspect-ratio: 1 / 1) {}"]],
     [%expr
       CSS.style([|
-        CSS.selector({js|@container (aspect-ratio: 1 / 1)|js}, [||]),
+        CSS.selector([|{js|@container (aspect-ratio: 1 / 1)|js}|], [||]),
       |])
     ],
   ),
@@ -318,7 +320,7 @@ let container_query_tests = [
     [%expr [%cx "@container (orientation: portrait) {}"]],
     [%expr
       CSS.style([|
-        CSS.selector({js|@container (orientation: portrait)|js}, [||]),
+        CSS.selector([|{js|@container (orientation: portrait)|js}|], [||]),
       |])
     ],
   ),
@@ -328,7 +330,7 @@ let container_query_tests = [
     [%expr
       CSS.style([|
         CSS.selector(
-          {js|@container (width >= 150px) and (orientation: portrait)|js},
+          [|{js|@container (width >= 150px) and (orientation: portrait)|js}|],
           [||],
         ),
       |])
@@ -339,7 +341,7 @@ let container_query_tests = [
     [%expr [%cx "@container name not (width < 150px) {}"]],
     [%expr
       CSS.style([|
-        CSS.selector({js|@container name not (width < 150px)|js}, [||]),
+        CSS.selector([|{js|@container name not (width < 150px)|js}|], [||]),
       |])
     ],
   ),
@@ -349,7 +351,7 @@ let container_query_tests = [
     [%expr
       CSS.style([|
         CSS.selector(
-          {js|@container (width >= 150px) or (orientation: portrait)|js},
+          [|{js|@container (width >= 150px) or (orientation: portrait)|js}|],
           [||],
         ),
       |])
