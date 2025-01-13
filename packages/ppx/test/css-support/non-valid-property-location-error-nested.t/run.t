@@ -23,8 +23,8 @@ If this test fail means that the module is not in sync with the ppx
     CSS.style([|
       CSS.label("selectors"),
       CSS.color(CSS.white),
-      CSS.selector(
-        {js|&:hover|js},
+      CSS.selectorMany(
+        [|{js|&:hover|js}|],
         [|[%ocaml.error "Unknown property 'colorx'"]|],
       ),
     |]);

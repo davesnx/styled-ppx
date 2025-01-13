@@ -69,5 +69,5 @@ let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust
     |]
     |> Kloth.Array.filter_map ~f:(fun i -> i)
   in
-  global [| Rule.Selector ("@font-face", fontFace) |];
+  global [| Rule.Selector ([| "@font-face" |], fontFace) |];
   fontFamily
