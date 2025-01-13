@@ -268,12 +268,18 @@ let media_type =
         | "or"
         | "layer" =>
           Error([
-            "'only', 'not', 'and', 'or', and 'layer' are invalid media types",
+            Format.sprintf("media_type has an invalid value: '%s'", value),
           ])
         | _ => Ok(value)
         };
       }
-    | _ => Error(["expected media_type"]),
+    | token =>
+      Error([
+        Format.sprintf(
+          "expected media_type, got %s instead",
+          show_token(token),
+        ),
+      ]),
   );
 
 let container_name = {
@@ -285,7 +291,9 @@ let container_name = {
     | "and"
     | "not"
     | "or" =>
-      Error(["'none', 'and', 'not', and 'or' are invalid container names"])
+      Error([
+        Format.sprintf("container_name has an invalid value: '%s'", name),
+      ])
     | _ => Ok(name)
     };
   };
