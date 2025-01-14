@@ -271,9 +271,9 @@ let resolve_selectors rules =
        we split those into separate selectors with the same rules *)
     Array.partition_map rules ~f:(function
       (* in case of being at @media, don't do anything to it *)
-      | Rule.Selector (current_selector, selector_rules)
+      | Rule.Selector (current_selector, _) as rule
         when starts_with_at current_selector.(0) ->
-        Right [| Rule.Selector (current_selector, selector_rules) |]
+        Left rule
       | Rule.Selector (current_selector, selector_rules) ->
         (* we derive the new prefix based on the current_selector and the previous "prefix" (aka the prefix added by the parent selector) *)
         let new_prefix =
@@ -297,14 +297,14 @@ let resolve_selectors rules =
         let new_selector = Rule.Selector ([| new_prefix |], selectors) in
         Right (Array.append [| new_selector |] rest_of_declarations)
       | _ as rule -> Left rule)
-    |> fun (selectors, declarations) -> selectors, Array.flatten declarations
+    |> fun (declarations, selectors) -> declarations, Array.flatten selectors
   in
 
   let rules = move_media_at_top rules in
   let rules = split_multiple_selectors rules in
   (* The base case for unnesting is without any prefix *)
   let declarations, selectors = unnest_selectors ~prefix:None rules in
-  Array.append declarations selectors
+  Array.append (move_media_at_top selectors) declarations
 
 let render_keyframes ~buffer animationName keyframes =
   Buffer.add_string buffer "@keyframes ";

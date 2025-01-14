@@ -331,17 +331,22 @@ let selector_nested_with_mq_and_declarations =
   let classname =
     [%cx
       {|
-      li {
-        list-style-type: none;
-
-        ::before {
-          position: absolute;
-          left: -20px;
-          content: "✓";
-        }
-
+      .a {
+        color: red;
         @media $(mobile) {
-          position: relative;
+          height: 1px;
+          .d {
+            color: green;
+          }
+        }
+        .b {
+          color: blue;
+          @media $(mobile) {
+            height: 2px;
+            .c {
+              color: yellow;
+            }
+          }
         }
       }
     |}]
@@ -349,10 +354,11 @@ let selector_nested_with_mq_and_declarations =
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s li { list-style-type: none; } .%s li::before { position: absolute; \
-        left: -20px; content: \"✓\"; } @media (max-width: 767px) { .%s li { \
-        position: relative; } }"
-       classname classname classname)
+       ".%s .a { color: #FF0000; } .%s .a .b { color: #0000FF; } @media \
+        (max-width: 767px) { .%s .a .b { height: 2px; } .%s .a .b .c { color: \
+        #FFFF00; } } @media (max-width: 767px) { .%s .a { height: 1px; } .%s \
+        .a .d { color: #008000; } }"
+       classname classname classname classname classname classname)
 
 let mq =
   test "mq" @@ fun () ->
@@ -1122,7 +1128,7 @@ let global_with_selector =
    |}];
   let css = get_string_style_rules () in
   assert_string css
-    (Printf.sprintf "html{line-height:1.15;}a{}a:hover{padding:0;}")
+    (Printf.sprintf "html{line-height:1.15;}a:hover{padding:0;}")
 
 let ampersand_everywhere_global =
   test "ampersand_everywhere_global" @@ fun () ->
@@ -1148,7 +1154,7 @@ let ampersand_everywhere_global =
     |}];
   let css = get_string_style_rules () in
   assert_string css
-    ".foo{}.foo[data-foo=bar] .lola{font-size:2px;}.foo .lola \
+    ".foo[data-foo=bar] .lola{font-size:2px;}.foo .lola \
      .foo::placeholder{font-size:3px;}.lola .foo:not(a){font-size:4px;}.foo \
      .lola{font-size:5px;}.lola .foo .foo:focus .foo .foo \
      .lola{font-size:6px;}"
