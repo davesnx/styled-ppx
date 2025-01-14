@@ -39,7 +39,15 @@ and render_rule_list = (rule_list: rule_list) => {
       rule_list |> fst |> resolve_selectors |> split_by_kind;
     declarations @ selectors;
   };
-  resolved_rule_list |> List.map(render_rule) |> String.concat("");
+  resolved_rule_list
+  |> List.filter(
+       fun
+       | Style_rule({block: (block, _), _}) when List.length(block) == 0 =>
+         false
+       | _ => true,
+      )
+    |> List.map(render_rule)
+    |> String.concat("");
 }
 and render_declaration = ({name, value, important, _}: declaration) => {
   Printf.sprintf(

@@ -498,7 +498,7 @@ let resolve_selectors = (rules: list(rule)) => {
             });
           Right([new_selector, ...rest_of_declarations]);
         }
-      | At_rule(_) as at_rule => Right([at_rule])
+      | At_rule(_) as at_rule => Left(at_rule)
       | Declaration(_) as dec => Left(dec),
       rules,
     )
@@ -514,5 +514,5 @@ let resolve_selectors = (rules: list(rule)) => {
     |> move_media_at_top
     |> split_multiple_selectors
     |> unnest_selectors(~prefix=None);
-  declarations @ selectors;
+  move_media_at_top(selectors) @ declarations;
 };
