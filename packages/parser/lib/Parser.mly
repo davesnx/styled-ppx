@@ -247,7 +247,7 @@ nth_payload:
   /* 2n */
   | a = DIMENSION { Nth (AN (int_of_string (fst a))) }
   /* 2n-1 */
-  | a = DIMENSION WS? combinator = COMBINATOR b = NUMBER {
+  | a = DIMENSION WS? combinator = COMBINATOR WS? b = NUMBER {
     let b = int_of_string b in
     Nth (ANB (((int_of_string (fst a)), combinator, b)))
   }
@@ -271,7 +271,7 @@ nth_payload:
   /* n-1 */
   /* n */
   /* -n */
-  | n = IDENT WS? combinator = COMBINATOR b = NUMBER {
+  | n = IDENT WS? combinator = COMBINATOR WS? b = NUMBER {
     let first_char = String.get n 0 in
     let a = if first_char = '-' then -1 else 1 in
     Nth (ANB ((a, combinator, int_of_string b)))
