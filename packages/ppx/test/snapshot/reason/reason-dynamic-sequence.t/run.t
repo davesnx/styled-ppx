@@ -968,10 +968,7 @@
     let make = (props: makeProps('size)) => {
       let className =
         styles(~size=sizeGet(props), ()) ++ getOrEmpty(classNameGet(props));
-      let stylesObject = {
-        "className": className,
-        "ref": innerRefGet(props),
-      };
+      let stylesObject = {"className": className, "ref": innerRefGet(props)};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(. newProps, "size"));
       ignore(deleteProp(. newProps, "innerRef"));
@@ -1960,10 +1957,7 @@
       let className =
         styles(~variant=variantGet(props), ())
         ++ getOrEmpty(classNameGet(props));
-      let stylesObject = {
-        "className": className,
-        "ref": innerRefGet(props),
-      };
+      let stylesObject = {"className": className, "ref": innerRefGet(props)};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(. newProps, "variant"));
       ignore(deleteProp(. newProps, "innerRef"));

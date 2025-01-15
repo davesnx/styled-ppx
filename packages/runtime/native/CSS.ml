@@ -93,6 +93,10 @@ let replace_ampersand ~by str =
   in
   replace_ampersand' str by
 
+let pp_selectors =
+  Format.(
+    pp_print_array ~pp_sep:(fun out () -> fprintf out ", ") pp_print_string)
+
 let rec rule_to_debug nesting accumulator rule =
   let next_rule =
     match rule with
@@ -100,10 +104,10 @@ let rec rule_to_debug nesting accumulator rule =
       Printf.sprintf "Declaration (\"%s\", \"%s\")" property value
     | Rule.Selector (selector, rules) ->
       if nesting = 0 then
-        Printf.sprintf "Selector (\"%s\", [%s])" selector
+        Format.asprintf "Selector (\"%a\", [%s])" pp_selectors selector
           (to_debug (nesting + 1) rules)
       else
-        Printf.sprintf "Selector (\"%s\", [%s\n%s])" selector
+        Format.asprintf "Selector (\"%a\", [%s\n%s])" pp_selectors selector
           (to_debug (nesting + 1) rules)
           (String.make (nesting + 1) ' ')
   in
@@ -143,12 +147,14 @@ let join_media left right = left ^ " and " ^ remove_media_from_selector right
 
 let rules_do_not_contain_media rules =
   Array.exists
-    ~f:(function Rule.Selector (s, _) when contains_at s -> false | _ -> true)
+    ~f:(function
+      | Rule.Selector (s, _) when contains_at s.(0) -> false | _ -> true)
     rules
 
 let rules_contain_media rules =
   Array.exists
-    ~f:(function Rule.Selector (s, _) when contains_at s -> true | _ -> false)
+    ~f:(function
+      | Rule.Selector (s, _) when contains_at s.(0) -> true | _ -> false)
     rules
 
 (* media selectors should be at the top. .a { @media () {} }
@@ -168,7 +174,7 @@ let rec move_media_at_top (rule_list : rule array) : rule array =
          }
       *)
       | Rule.Selector (current_selector, rules)
-        when contains_at current_selector && rules_contain_media rules ->
+        when contains_at current_selector.(0) && rules_contain_media rules ->
         let new_rules = swap current_selector rules in
         Array.append acc new_rules
       (* current_selector isn't a media query, but it's a selecotr. It may contain media-queries inside the rules: Example:
@@ -186,7 +192,7 @@ let rec move_media_at_top (rule_list : rule array) : rule array =
         let declarations, selectors = split_by_kind rules in
         let media_selectors, non_media_selectors =
           Array.partition selectors ~f:(function
-            | Rule.Selector (s, _) when contains_at s -> true
+            | Rule.Selector (s, _) when contains_at s.(0) -> true
             | _ -> false)
         in
         let new_media_rules =
@@ -194,7 +200,7 @@ let rec move_media_at_top (rule_list : rule array) : rule array =
             ~f:(fun media_rules ->
               match media_rules with
               | Rule.Selector (nested_media_selector, nested_media_rule_list)
-                when contains_at nested_media_selector ->
+                when contains_at nested_media_selector.(0) ->
                 [|
                   Rule.Selector
                     ( nested_media_selector,
@@ -231,7 +237,7 @@ and swap at_media_selector media_rules =
           [|
             Rule.Selector (at_media_selector, media_declarations);
             Rule.Selector
-              ( join_media at_media_selector nested_media_selector,
+              ( [| join_media at_media_selector.(0) nested_media_selector.(0) |],
                 nested_media_rule_list );
           |]
         | _ -> [||])
@@ -246,13 +252,12 @@ let split_multiple_selectors rule_list =
   Array.fold_left
     ~f:(fun acc rule ->
       match rule with
-      | Rule.Selector (selector, rules) when contains_a_coma selector ->
-        let selector_list = String.split_on_char ',' selector in
+      | Rule.Selector (selectors, rules) when Array.length selectors > 1 ->
         let new_rules =
           (* for each selector, we apply the same rules *)
-          List.map
-            (fun selector -> Rule.Selector (String.trim selector, rules))
-            selector_list
+          selectors
+          |> Array.to_list
+          |> List.map (fun selector -> Rule.Selector ([| selector |], rules))
         in
         List.append acc new_rules
       | rule -> List.append acc [ rule ])
@@ -267,33 +272,29 @@ let resolve_selectors rules =
     Array.partition_map rules ~f:(function
       (* in case of being at @media, don't do anything to it *)
       | Rule.Selector (current_selector, selector_rules)
-        when starts_with_at current_selector ->
+        when starts_with_at current_selector.(0) ->
         Right [| Rule.Selector (current_selector, selector_rules) |]
       | Rule.Selector (current_selector, selector_rules) ->
         (* we derive the new prefix based on the current_selector and the previous "prefix" (aka the prefix added by the parent selector) *)
         let new_prefix =
           match prefix with
-          | None -> current_selector
+          | None -> current_selector.(0)
           | Some prefix ->
-            (* child starts with &, join them without space *)
-            if starts_with_ampersand current_selector then
-              prefix ^ remove_first_ampersand current_selector
-              (* child starts with dot, join them without space *)
-            else if contains_ampersand current_selector then
+            if contains_ampersand current_selector.(0) then
               (* reemplazar el ampersand del current_selector, con el padre *)
-              replace_ampersand ~by:prefix current_selector
-            else if starts_with_double_dot current_selector then
-              prefix ^ current_selector
+              replace_ampersand ~by:prefix current_selector.(0)
+            else if starts_with_double_dot current_selector.(0) then
+              prefix ^ current_selector.(0)
               (* This case is the same as the "else", but I keep it for reference *)
-            else if starts_with_dot current_selector then
-              prefix ^ " " ^ current_selector
-            else prefix ^ " " ^ current_selector
+            else if starts_with_dot current_selector.(0) then
+              prefix ^ " " ^ current_selector.(0)
+            else prefix ^ " " ^ current_selector.(0)
         in
         let selector_rules = split_multiple_selectors selector_rules in
         let selectors, rest_of_declarations =
           unnest_selectors ~prefix:(Some new_prefix) selector_rules
         in
-        let new_selector = Rule.Selector (new_prefix, selectors) in
+        let new_selector = Rule.Selector ([| new_prefix |], selectors) in
         Right (Array.append [| new_selector |] rest_of_declarations)
       | _ as rule -> Left rule)
     |> fun (selectors, declarations) -> selectors, Array.flatten declarations
@@ -343,13 +344,13 @@ let rec render_rules ~buffer className rules =
 
 (* Renders all selectors with the hash given *)
 and render_selectors ~buffer hash (selector, rules) =
-  if contains_at selector then (
-    Buffer.add_string buffer selector;
+  if contains_at selector.(0) then (
+    Buffer.add_string buffer selector.(0);
     Buffer.add_string buffer " { ";
     render_rules ~buffer hash rules;
     Buffer.add_string buffer " }")
   else (
-    Buffer.add_string buffer (resolve_ampersand hash selector);
+    Buffer.add_string buffer (resolve_ampersand hash selector.(0));
     Buffer.add_string buffer " { ";
     render_declarations ~buffer rules;
     Buffer.add_string buffer " }")
@@ -367,7 +368,7 @@ let rules_to_string rules =
         Buffer.add_string buffer value;
         Buffer.add_char buffer ';'
       | Rule.Selector (selector, rules) ->
-        Buffer.add_string buffer selector;
+        Buffer.add_string buffer selector.(0);
         Buffer.add_char buffer '{';
         go rules;
         Buffer.add_char buffer '}')
@@ -509,5 +510,5 @@ let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust
     |]
     |> Kloth.Array.filter_map ~f:(fun i -> i)
   in
-  global [| Rule.Selector ("@font-face", fontFace) |];
+  global [| Rule.Selector ([|"@font-face"|], fontFace) |];
   fontFamily

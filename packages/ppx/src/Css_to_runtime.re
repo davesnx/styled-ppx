@@ -9,7 +9,7 @@ module CSS = {
   /* This is the public API of the CSS module */
   let ident = (~loc, name) =>
     {txt: Ldot(Lident("CSS"), name), loc} |> Builder.pexp_ident(~loc);
-  let selector = (~loc) => ident(~loc, "selector");
+  let selectorMany = (~loc) => ident(~loc, "selectorMany");
   let media = (~loc) => ident(~loc, "media");
   let global = (~loc) => ident(~loc, "global");
   let label = (~loc) => ident(~loc, "label");
@@ -182,12 +182,15 @@ and render_container_query = (~loc, at_rule: at_rule) => {
     )
   | Ok(conditions) =>
     let query =
-      String_interpolation.transform(
-        ~attrs,
-        ~delimiter,
-        ~loc=at_rule.loc,
-        "@container " ++ conditions,
-      );
+      [
+        String_interpolation.transform(
+          ~attrs,
+          ~delimiter,
+          ~loc=at_rule.loc,
+          "@container " ++ conditions,
+        ),
+      ]
+      |> Builder.pexp_array(~loc=at_rule.loc);
 
     let rules =
       switch (at_rule.block) {
@@ -202,7 +205,7 @@ and render_container_query = (~loc, at_rule: at_rule) => {
 
     Helper.Exp.apply(
       ~loc=at_rule.loc,
-      CSS.selector(~loc=at_rule.loc),
+      CSS.selectorMany(~loc=at_rule.loc),
       [(Nolabel, query), (Nolabel, rules)],
     );
   };
@@ -352,7 +355,11 @@ and render_selector = (~loc, selector: selector) => {
         ":"
         ++ name
         ++ "("
-        ++ (render_selectors(~loc, payload) |> String.trim)
+        ++ (
+          render_selectors(~loc, payload)
+          |> String.concat(", ")
+          |> String.trim
+        )
         ++ ")";
       }
   and render_pseudo_selector =
@@ -405,8 +412,7 @@ and render_selector = (~loc, selector: selector) => {
 }
 and render_selectors = (~loc, selectors) => {
   selectors
-  |> List.map(((selector, _loc)) => render_selector(~loc, selector))
-  |> String.concat(", ");
+  |> List.map(((selector, _loc)) => render_selector(~loc, selector));
 }
 and render_style_rule = (~loc, rule: style_rule) => {
   let (prelude, prelude_loc) = rule.prelude;
@@ -423,16 +429,19 @@ and render_style_rule = (~loc, rule: style_rule) => {
   let selector_name =
     prelude
     |> render_selectors(~loc=selector_location)
-    |> String.trim
-    |> String_interpolation.transform(
-         ~attrs,
-         ~delimiter,
-         ~loc=selector_location,
-       );
+    |> List.map(String.trim)
+    |> List.map(
+         String_interpolation.transform(
+           ~attrs,
+           ~delimiter,
+           ~loc=selector_location,
+         ),
+       )
+    |> Builder.pexp_array(~loc=selector_location);
 
   Helper.Exp.apply(
     ~loc=selector_location,
-    CSS.selector(~loc=selector_location),
+    CSS.selectorMany(~loc=selector_location),
     [(Nolabel, selector_name), (Nolabel, selector_expr)],
   );
 };

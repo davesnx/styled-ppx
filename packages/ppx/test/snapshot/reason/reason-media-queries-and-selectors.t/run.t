@@ -969,18 +969,18 @@
           {js|(min-width: 600px)|js},
           [|CSS.backgroundColor(CSS.blue)|],
         ),
-        CSS.selector({js|&:hover|js}, [|CSS.backgroundColor(CSS.green)|]),
-        CSS.selector(
-          {js|& > p|js},
+        CSS.selectorMany(
+          [|{js|&:hover|js}|],
+          [|CSS.backgroundColor(CSS.green)|],
+        ),
+        CSS.selectorMany(
+          [|{js|& > p|js}|],
           [|CSS.color(CSS.pink), CSS.fontSize(`pxFloat(24.))|],
         ),
       |]);
     let make = (props: makeProps) => {
       let className = styles ++ getOrEmpty(classNameGet(props));
-      let stylesObject = {
-        "className": className,
-        "ref": innerRefGet(props),
-      };
+      let stylesObject = {"className": className, "ref": innerRefGet(props)};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(. newProps, "innerRef"));
       let asTag = as_Get(props);
