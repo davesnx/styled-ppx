@@ -331,6 +331,35 @@ let selector_nested_with_mq_and_declarations =
   let classname =
     [%cx
       {|
+      li {
+       list-style-type: none;
+
+       ::before {
+         position: absolute;
+         left: -20px;
+         content: "✓";
+       }
+
+       @media $(mobile) {
+         position: relative;
+       }
+      }
+    |}]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s li { list-style-type: none; } .%s li::before { position: absolute; \
+        left: -20px; content: \"✓\"; } @media (max-width: 767px) { .%s li { \
+        position: relative; } }"
+       classname classname classname)
+
+let selector_nested_with_mq_and_declarations2 =
+  test "selector_nested_with_mq_and_declarations2" @@ fun () ->
+  let mobile = "(max-width: 767px)" in
+  let classname =
+    [%cx
+      {|
       .a {
         color: red;
         @media $(mobile) {
@@ -1204,6 +1233,7 @@ let tests =
       selector_nested_with_pseudo_2;
       selector_nested_with_pseudo_3;
       selector_nested_with_mq_and_declarations;
+      selector_nested_with_mq_and_declarations2;
       selector_nested_interpolation_with_multiple;
       mq_with_selectors;
       mq;
