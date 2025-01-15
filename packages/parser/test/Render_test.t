@@ -24,6 +24,10 @@ Render component values
   >   x-small Arial,
   >   sans-serif;
   > flex-grow: 3;
+  > grid-template-columns:
+  >   [line-name1] 100px [line-name2]
+  >   repeat(auto-fit, [line-name3 line-name4] 300px)
+  >   100px;
   > 
   > /* unicode ranges */
   > unicode-range: U+26; /* single code point */
@@ -32,6 +36,7 @@ Render component values
   > unicode-range: U+4??; /* wildcard range */
   > unicode-range: U+0025-00FF, U+4??; /* multiple values */
   > EOF
+  height:20px;width:20%;width:20.832%;color:red;content:"not emoji";color:lch(from rebeccapurple l c calc(h + 80));color:#f00;opacity:0.7;content:url("../../media/examples/fire.png");content:image-set("image1x.png" 1x, "image2x.png" 2x);content:url("../img/test.png") / "This is the alt text";content:url("https://mozorg.cdn.mozilla.net/media/img/favicon.ico") " - alt text is not supported - ";content:url("https://mozorg.cdn.mozilla.net/media/img/favicon.ico") / " MOZILLA: ";font:x-small Arial, sans-serif;flex-grow:3;grid-template-columns:[line-name1] 100px [line-name2] repeat(auto-fit, [line-name3 line-name4] 300px) 100px;unicode-range:U+26;unicode-range:U+0-7F;unicode-range:U+0025-00FF;unicode-range:U+4??;unicode-range:U+0025-00FF, U+4??;
 
 An+B microsyntax
   $ cat <<"EOF" | run
@@ -45,6 +50,7 @@ An+B microsyntax
   > li:nth-child(3n + 1) { foo: bar; }
   > li:nth-child(-n+ 6) { foo: bar; }
   > EOF
+  li:nth-child(even){foo:bar;}li:nth-child(odd){foo:bar;}li:nth-child(5){foo:bar;}li:nth-child(n){foo:bar;}li:nth-child(-4n+10){foo:bar;}li:nth-child(3n-6){foo:bar;}li:nth-child(3n+-6){foo:bar;}li:nth-child(3n+1){foo:bar;}li:nth-child(-n+6){foo:bar;}
 
 Remove empty rules
   $ cat <<"EOF" | run
@@ -53,16 +59,19 @@ Remove empty rules
   > /* .foo2 rule will be discarded */
   > .foo2 { .bar2 { color: red; } }
   > EOF
+  .bar{color:red;}.foo2 .bar2{color:red;}
 
 Split multiple selectors
   $ cat <<"EOF" | run
   > .foo, .bar { color: red; }
   > EOF
+  .foo{color:red;}.bar{color:red;}
 
 Split multiple selectors
   $ cat <<"EOF" | run
   > .foo, .bar { color: red; }
   > EOF
+  .foo{color:red;}.bar{color:red;}
 
 Resolve ampersand
   $ cat <<"EOF" | run
@@ -85,6 +94,7 @@ Resolve ampersand
   >   }
   > }
   > EOF
+  .foo{font-size:1px;}.foo .lola{font-size:2px;}.foo .lola .foo{font-size:3px;}.lola .foo{font-size:4px;}.foo .lola{font-size:5px;}.lola .foo .foo .foo .foo .lola{font-size:6px;}
 
 Resolve nested pseudo class and pseudo element
   $ cat <<"EOF" | run
@@ -94,6 +104,7 @@ Resolve nested pseudo class and pseudo element
   >   ::first-line { color: red; }
   > }
   > EOF
+  h3.foo#baz[data-foo=bar]:hover{color:red;}h3.foo#baz[data-foo=bar]:nth-child(even){color:red;}h3.foo#baz[data-foo=bar]::first-line{color:red;}
 
 Resolve nested other than pseudo class and pseudo element
   $ cat <<"EOF" | run
@@ -103,6 +114,7 @@ Resolve nested other than pseudo class and pseudo element
   >   [data-foo=bar] { color: red; }
   > }
   > EOF
+  h3.foo#baz[data-foo=bar] .color{color:red;}h3.foo#baz[data-foo=bar] #what{color:red;}h3.foo#baz[data-foo=bar] [data-foo=bar]{color:red;}
 
 Ampersand join
   $ cat <<"EOF" | run
@@ -114,6 +126,7 @@ Ampersand join
   >   &#myid { color: red; }
   > }
   > EOF
+  .foo .bar[data-foo=bar]#baz:nth-child(even){color:red;}.foo .bar[data-foo=bar]#baz:hover{color:red;}.foo .bar[data-foo=bar]#baz.color{color:red;}.foo .bar[data-foo=bar]#baz[data-baz=bar]{color:red;}.foo .bar[data-foo=bar]#baz#myid{color:red;}
 
 Nested with media query
   $ cat <<"EOF" | run
@@ -131,6 +144,7 @@ Nested with media query
   >   }
   > }
   > EOF
+  li{list-style-type:none;}li::before{position:absolute;left:-20px;content:"â";}@media screen and (min-width: 600px) {li{position:relative;}}
 
 Nested pseudo class and selector
   $ cat <<"EOF" | run
@@ -143,6 +157,7 @@ Nested pseudo class and selector
   >   }
   > }
   > EOF
+  li{position:relative;}li:hover::after{top:50px;}
 
 Nested pseduo class and selector with ampersand
   $ cat <<"EOF" | run
@@ -155,6 +170,7 @@ Nested pseduo class and selector with ampersand
   >   }
   > }
   > EOF
+  li{position:relative;}li:hover ::after{top:50px;}
 
 Media query inside selector with declarations
   $ cat <<"EOF" | run
@@ -170,3 +186,60 @@ Media query inside selector with declarations
   >   }
   > }
   > EOF
+  .foo{display:block;}.foo div{display:flex;}@media (min-width: 768px) {.foo div{height:auto;}}
+
+Selector nested
+  $ cat <<"EOF" | run
+  > display: flex;
+  > a {
+  >   display: block;
+  >   div {
+  >     display: none;
+  >     span {
+  >       display: none;
+  >       hr {
+  >         display: none;
+  >         code {
+  >           display: none;
+  >         }
+  >       }
+  >     }
+  >   }
+  > }
+  > EOF
+  display:flex;a{display:block;}a div{display:none;}a div span{display:none;}a div span hr{display:none;}a div span hr code{display:none;}
+
+Media query nested
+  $ cat <<"EOF" | run
+  > max-width: 800px;
+  > @media (min-width: 300px) {
+  >   margin-left: 10px;
+  >   @media (max-width: 768px) {
+  >     position: fixed;
+  >     @media (max-width: 1200px) {
+  >       border: 1px solid transparent;
+  >       @media (max-width: 1200px) {
+  >         border: 1px solid transparent;
+  >         @media (max-width: 1200px) {
+  >         border: 1px solid transparent;
+  >           @media (max-width: 1200px) {
+  >             border: 1px solid transparent;
+  >           }
+  >         }
+  >       }
+  >     }
+  >   }
+  > }
+  > EOF
+  max-width:800px;@media (min-width: 300px) {margin-left:10px;}@media (min-width: 300px) and (max-width: 768px) {position:fixed;}@media (max-width: 768px) and (min-width: 300px) and (max-width: 1200px) {border:1px solid transparent;}@media (max-width: 1200px) and (min-width: 300px) and (max-width: 768px) and (max-width: 1200px) {border:1px solid transparent;}@media (max-width: 1200px) and (max-width: 768px) and (min-width: 300px) and (max-width: 1200px) and (max-width: 1200px) {border:1px solid transparent;}@media (max-width: 1200px) and (max-width: 1200px) and (min-width: 300px) and (max-width: 768px) and (max-width: 1200px) and (max-width: 1200px) {border:1px solid transparent;}
+
+Complex selector test
+  $ cat <<"EOF" | run
+  > div#main.container[data-role="content"]:not(:empty):nth-child(2n+1) > ul li:nth-of-type(odd):first-child a[target="_blank"]:hover,
+  > section[lang|="en"] + article#special ~ aside:last-of-type *,
+  > input[type="checkbox"]:checked:focus,
+  > p::before {
+  >   color: red;
+  > }
+  > EOF
+  div#main.container[data-role="content"]:not(:empty):nth-child(2n+1) > ul li:nth-of-type(odd):first-child a[target="_blank"]:hover{color:red;}section[lang|="en"] + article#special ~ aside:last-of-type *{color:red;}input[type="checkbox"]:checked:focus{color:red;}p::before{color:red;}
