@@ -484,47 +484,47 @@ let functional_pseudo =
   let classname =
     [%cx
       {|
-           .foo, .bar {
-            :is(ol, ul, menu:unsupported) :is(ol, ul) {
-              color: green;
-            }
+        .foo, .bar {
+          :is(ol, ul, menu:unsupported) :is(ol, ul) {
+            color: green;
+          }
 
-            :is(ol, ul) :is(ol, ul) ol {
-              list-style-type: lower-greek;
-              color: chocolate;
-            }
+          :is(ol, ul) :is(ol, ul) ol {
+            list-style-type: lower-greek;
+            color: chocolate;
+          }
 
-            p:not(.irrelevant) {
-              font-weight: bold;
-            }
+          p:not(.irrelevant) {
+            font-weight: bold;
+          }
 
-            p > :not(strong, b.important) {
-              color: darkmagenta;
-            }
+          p > :not(strong, b.important) {
+            color: darkmagenta;
+          }
 
-            :where(ol, ul, menu:unsupported) :where(ol, ul) {
-              color: green;
-            }
+          :where(ol, ul, menu:unsupported) :where(ol, ul) {
+            color: green;
+          }
 
-            :where(ol, ul) :where(ol, ul) ol {
-              list-style-type: lower-greek;
-              color: chocolate;
-            }
+          :where(ol, ul) :where(ol, ul) ol {
+            list-style-type: lower-greek;
+            color: chocolate;
+          }
 
-            :is(h1, h2, h3):has(+ :is(h2, h3, h4)) {
-              margin: 0 0 0.25rem 0;
-            }
+          :is(h1, h2, h3):has(+ :is(h2, h3, h4)) {
+            margin: 0 0 0.25rem 0;
+          }
 
-            body:has(video, audio), body:has(video):has(audio) {
-              color: red;
-            }
-           }
-           |}]
+          body:has(video, audio), body:has(video):has(audio) {
+            color: red;
+          }
+        }
+     |}]
   in
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s .foo:is(ol, ul, menu:unsupported):is(ol, ul) { color: #008000; } \
+       ".%s .foo:is(ol, ul, menu:unsupported) :is(ol, ul) { color: #008000; } \
         .%s .foo:is(ol, ul) :is(ol, ul) ol { list-style-type: lower-greek; \
         color: #D2691E; } .%s .foo p:not(.irrelevant) { font-weight: 700; } \
         .%s .foo p > :not(strong, b.important) { color: #8B008B; } .%s \
@@ -533,7 +533,7 @@ let functional_pseudo =
         lower-greek; color: #D2691E; } .%s .foo:is(h1, h2, h3):has(+ :is(h2, \
         h3, h4)) { margin: 0 0 0.25rem 0; } .%s .foo body:has(video, audio) { \
         color: #FF0000; } .%s .foo body:has(video):has(audio) { color: \
-        #FF0000; } .%s .bar:is(ol, ul, menu:unsupported):is(ol, ul) { color: \
+        #FF0000; } .%s .bar:is(ol, ul, menu:unsupported) :is(ol, ul) { color: \
         #008000; } .%s .bar:is(ol, ul) :is(ol, ul) ol { list-style-type: \
         lower-greek; color: #D2691E; } .%s .bar p:not(.irrelevant) { \
         font-weight: 700; } .%s .bar p > :not(strong, b.important) { color: \
