@@ -51,6 +51,7 @@ type declaration = {
 and component_value_list = list(with_loc(component_value))
 [@deriving show({with_path: false})]
 and component_value =
+  | Whitespace
   | Paren_block(component_value_list)
   | Bracket_block(component_value_list)
   | Percentage(string)
@@ -76,7 +77,7 @@ and brace_block =
 [@deriving show({with_path: false})]
 and at_rule = {
   name: with_loc(string),
-  prelude: with_loc(component_value),
+  prelude: with_loc(component_value_list),
   block: brace_block,
   [@printer location]
   loc,
