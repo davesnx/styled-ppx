@@ -45,34 +45,10 @@ If this test fail means that the module is not in sync with the ppx
   CSS.scrollbarGutter(`stable);
   CSS.scrollbarGutter(`stableBothEdges);
   CSS.scrollbarGutter(`stableBothEdges);
-  CSS.overflowClipMargin2(
-    ~clipEdgeOrigin=?Some(`contentBox),
-    ~margin=?None,
-    (),
-  );
-  CSS.overflowClipMargin2(
-    ~clipEdgeOrigin=?Some(`paddingBox),
-    ~margin=?None,
-    (),
-  );
-  CSS.overflowClipMargin2(
-    ~clipEdgeOrigin=?Some(`borderBox),
-    ~margin=?None,
-    (),
-  );
-  CSS.overflowClipMargin2(
-    ~clipEdgeOrigin=?None,
-    ~margin=?Some(`pxFloat(20.)),
-    (),
-  );
-  CSS.overflowClipMargin2(~clipEdgeOrigin=?None, ~margin=?Some(`em(1.)), ());
-  CSS.overflowClipMargin2(
-    ~clipEdgeOrigin=?Some(`contentBox),
-    ~margin=?Some(`pxFloat(5.)),
-    (),
-  );
-  CSS.overflowClipMargin2(
-    ~clipEdgeOrigin=?Some(`contentBox),
-    ~margin=?Some(`pxFloat(5.)),
-    (),
-  );
+  CSS.overflowClipMargin2(~clipEdgeOrigin=?Some(`contentBox), `pxFloat(0.));
+  CSS.overflowClipMargin2(~clipEdgeOrigin=?Some(`paddingBox), `pxFloat(0.));
+  CSS.overflowClipMargin2(~clipEdgeOrigin=?Some(`borderBox), `pxFloat(0.));
+  CSS.overflowClipMargin2(~clipEdgeOrigin=?None, `pxFloat(20.));
+  CSS.overflowClipMargin2(~clipEdgeOrigin=?None, `em(1.));
+  CSS.overflowClipMargin2(~clipEdgeOrigin=?Some(`contentBox), `pxFloat(5.));
+  CSS.overflowClipMargin2(~clipEdgeOrigin=?Some(`contentBox), `pxFloat(5.));

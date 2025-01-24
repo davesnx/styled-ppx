@@ -2194,18 +2194,19 @@ let overflow =
 let overflow_clip_margin =
   polymorphic(
     Property_parser.property_overflow_clip_margin,
-    (~loc, (clipEdgeOrigin, margin)) =>
-    [
-      [%expr
-        CSS.overflowClipMargin2(
-          ~clipEdgeOrigin=?[%e
-            render_option(~loc, variant_to_expression, clipEdgeOrigin)
-          ],
-          ~margin=?[%e render_option(~loc, render_extended_length, margin)],
-          (),
-        )
-      ],
-    ]
+    (~loc, (clipEdgeOrigin, margin)) => {
+      let margin = Option.value(margin, ~default=`Length(`Px(0.)));
+      [
+        [%expr
+          CSS.overflowClipMargin2(
+            ~clipEdgeOrigin=?[%e
+              render_option(~loc, variant_to_expression, clipEdgeOrigin)
+            ],
+            [%e render_extended_length(~loc, margin)],
+          )
+        ],
+      ];
+    },
   );
 
 let overflow_block =

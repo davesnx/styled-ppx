@@ -449,7 +449,7 @@ let overflowY x = Rule.declaration ({js|overflowY|js}, Overflow.toString x)
 let overflowClipMargin x =
   Rule.declaration ({js|overflowClipMargin|js}, OverflowClipMargin.toString x)
 
-let overflowClipMargin2 ?(clipEdgeOrigin = `paddingBox) ?(margin = `px 0) () =
+let overflowClipMargin2 ?(clipEdgeOrigin = `paddingBox) margin =
   Rule.declaration
     ( {js|overflowClipMargin|js},
       OverflowClipMargin.ClipEdgeOrigin.toString clipEdgeOrigin
