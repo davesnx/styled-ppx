@@ -16,11 +16,8 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   
-  CSS.unsafe({js|scrollbarColor|js}, {js|auto|js});
-  CSS.unsafe({js|scrollbarColor|js}, {js|dark|js});
-  CSS.unsafe({js|scrollbarColor|js}, {js|light|js});
-  CSS.unsafe({js|scrollbarColor|js}, {js|red blue|js});
-  CSS.unsafe({js|scrollbarWidth|js}, {js|auto|js});
-  CSS.unsafe({js|scrollbarWidth|js}, {js|thin|js});
-  CSS.unsafe({js|scrollbarWidth|js}, {js|none|js});
-  CSS.unsafe({js|scrollbarWidth|js}, {js|12px|js});
+  CSS.scrollbarColor(`auto);
+  CSS.scrollbarColor(`thumbTrackColor((CSS.red, CSS.blue)));
+  CSS.scrollbarWidth(`auto);
+  CSS.scrollbarWidth(`thin);
+  CSS.scrollbarWidth(`none);
