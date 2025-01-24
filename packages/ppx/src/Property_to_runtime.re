@@ -2191,8 +2191,22 @@ let overflow =
       }
   );
 
-/* let overflow_clip_margin =
-   unsupportedProperty(Property_parser.property_overflow_clip_margin); */
+let overflow_clip_margin =
+  polymorphic(
+    Property_parser.property_overflow_clip_margin,
+    (~loc, (clipEdgeOrigin, margin)) =>
+    [
+      [%expr
+        CSS.overflowClipMargin2(
+          ~clipEdgeOrigin=?[%e
+            render_option(~loc, variant_to_expression, clipEdgeOrigin)
+          ],
+          ~margin=?[%e render_option(~loc, render_extended_length, margin)],
+          (),
+        )
+      ],
+    ]
+  );
 
 let overflow_block =
   monomorphic(
@@ -5261,6 +5275,7 @@ let properties = [
   ("overflow-anchor", found(overflow_anchor)),
   ("overflow-block", found(overflow_block)),
   ("overflow-clip-box", found(overflow_clip_box)),
+  ("overflow-clip-margin", found(overflow_clip_margin)),
   ("overflow-inline", found(overflow_inline)),
   ("overflow-wrap", found(overflow_wrap)),
   ("overflow-x", found(overflow_x)),

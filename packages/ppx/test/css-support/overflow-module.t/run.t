@@ -45,10 +45,34 @@ If this test fail means that the module is not in sync with the ppx
   CSS.scrollbarGutter(`stable);
   CSS.scrollbarGutter(`stableBothEdges);
   CSS.scrollbarGutter(`stableBothEdges);
-  CSS.unsafe({js|overflowClipMargin|js}, {js|content-box|js});
-  CSS.unsafe({js|overflowClipMargin|js}, {js|padding-box|js});
-  CSS.unsafe({js|overflowClipMargin|js}, {js|border-box|js});
-  CSS.unsafe({js|overflowClipMargin|js}, {js|20px|js});
-  CSS.unsafe({js|overflowClipMargin|js}, {js|1em|js});
-  CSS.unsafe({js|overflowClipMargin|js}, {js|content-box 5px|js});
-  CSS.unsafe({js|overflowClipMargin|js}, {js|5px content-box|js});
+  CSS.overflowClipMargin2(
+    ~clipEdgeOrigin=?Some(`contentBox),
+    ~margin=?None,
+    (),
+  );
+  CSS.overflowClipMargin2(
+    ~clipEdgeOrigin=?Some(`paddingBox),
+    ~margin=?None,
+    (),
+  );
+  CSS.overflowClipMargin2(
+    ~clipEdgeOrigin=?Some(`borderBox),
+    ~margin=?None,
+    (),
+  );
+  CSS.overflowClipMargin2(
+    ~clipEdgeOrigin=?None,
+    ~margin=?Some(`pxFloat(20.)),
+    (),
+  );
+  CSS.overflowClipMargin2(~clipEdgeOrigin=?None, ~margin=?Some(`em(1.)), ());
+  CSS.overflowClipMargin2(
+    ~clipEdgeOrigin=?Some(`contentBox),
+    ~margin=?Some(`pxFloat(5.)),
+    (),
+  );
+  CSS.overflowClipMargin2(
+    ~clipEdgeOrigin=?Some(`contentBox),
+    ~margin=?Some(`pxFloat(5.)),
+    (),
+  );
