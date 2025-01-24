@@ -4244,3 +4244,107 @@ module GridTemplateRows = struct
 end
 
 module GridTemplateColumns = GridTemplateRows
+
+module ScrollbarWidth = struct
+  type t =
+    [ `thin
+    | Auto.t
+    | None.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | `thin -> {js|thin|js}
+    | #Auto.t -> Auto.toString
+    | #None.t -> None.toString
+    | #Var.t as var -> Var.toString var
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+module ScrollbarGutter = struct
+  type t =
+    [ `stable
+    | `stableBothEdges
+    | Auto.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | `stable -> {js|stable|js}
+    | `stableBothEdges -> {js|stable both-edges|js}
+    | #Auto.t -> Auto.toString
+    | #Var.t as var -> Var.toString var
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+module ScrollbarColor = struct
+  type t =
+    [ `thumbTrackColor of Color.t * Color.t
+    | Auto.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | `thumbTrackColor (a, b) -> Color.toString a ^ {js| |js} ^ Color.toString b
+    | #Auto.t -> Auto.toString
+    | #Var.t as var -> Var.toString var
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+module VisualBox = struct
+  type t =
+    [ `contentBox
+    | `borderBox
+    | `paddingBox
+    ]
+
+  let toString x =
+    match x with
+    | `contentBox -> {js|content-box|js}
+    | `borderBox -> {js|border-box|js}
+    | `paddingBox -> {js|padding-box|js}
+end
+
+module OverflowClipMargin = struct
+  module ClipEdgeOrigin = struct
+    type t =
+      [ VisualBox.t
+      | Var.t
+      ]
+
+    let toString x =
+      match x with
+      | #VisualBox.t as vb -> VisualBox.toString vb
+      | #Var.t as va -> Var.toString va
+  end
+
+  module Margin = struct
+    type t =
+      [ Length.t
+      | Var.t
+      ]
+
+    let toString x =
+      match x with
+      | #Length.t as l -> Length.toString l
+      | #Var.t as va -> Var.toString va
+  end
+
+  type t =
+    [ ClipEdgeOrigin.t
+    | Margin.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | #ClipEdgeOrigin.t as ceo -> ClipEdgeOrigin.toString ceo
+    | #Margin.t as m -> Margin.toString m
+    | #Cascading.t as c -> Cascading.toString c
+end
