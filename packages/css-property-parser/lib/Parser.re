@@ -1579,7 +1579,7 @@ and property_scroll_snap_type_x = [%value.rec
 and property_scroll_snap_type_y = [%value.rec
   "'none' | 'mandatory' | 'proximity'"
 ]
-and property_scrollbar_color = [%value.rec "'auto' | [ <color> ]{2}"]
+and property_scrollbar_color = [%value.rec "'auto' | [ <color> <color> ]"]
 and property_scrollbar_width = [%value.rec "'auto' | 'thin' | 'none'"]
 and property_scrollbar_gutter = [%value.rec "'auto' | 'stable' && 'both-edges'?" ]
 and property_scrollbar_3dlight_color = [%value.rec "<color>"]

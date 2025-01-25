@@ -4496,13 +4496,12 @@ let scrollbar_color =
     (~loc, value: Types.property_scrollbar_color) =>
       switch (value) {
       | `Auto => [%expr `auto]
-      | `Color([thumbColor, trackColor]) =>
+      | `Static(thumbColor, trackColor) =>
         [%expr
          `thumbTrackColor((
            [%e render_color(~loc, thumbColor)],
            [%e render_color(~loc, trackColor)],
          ))]
-      | `Color(_) => raise(Unsupported_feature)
       },
   );
 
