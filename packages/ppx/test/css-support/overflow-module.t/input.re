@@ -25,9 +25,16 @@
 [%css {|overflow-block: clip|}];
 [%css {|overflow-block: scroll|}];
 [%css {|overflow-block: auto|}];
-/* [%css {|overflow-clip-margin: content-box|}]; */
-/* [%css {|overflow-clip-margin: padding-box|}]; */
-/* [%css {|overflow-clip-margin: border-box|}]; */
-/* [%css {|overflow-clip-margin: 20px|}]; */
+[%css {|scrollbar-gutter: auto|}];
+[%css {|scrollbar-gutter: stable|}];
+[%css {|scrollbar-gutter: both-edges stable|}];
+[%css {|scrollbar-gutter: stable both-edges|}];
+[%css {|overflow-clip-margin: content-box|}];
+[%css {|overflow-clip-margin: padding-box|}];
+[%css {|overflow-clip-margin: border-box|}];
+[%css {|overflow-clip-margin: 20px|}];
+[%css {|overflow-clip-margin: 1em|}];
+[%css {|overflow-clip-margin: content-box 5px|}];
+[%css {|overflow-clip-margin: 5px content-box|}];
 /* [%css {|continue: auto|}]; */
 /* [%css {|continue: discard|}]; */

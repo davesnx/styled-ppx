@@ -1408,6 +1408,7 @@ and property_overflow_block = [%value.rec
   "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"
 ]
 and property_overflow_clip_box = [%value.rec "'padding-box' | 'content-box'"]
+and property_overflow_clip_margin = [%value.rec "<box> || <extended-length>"]
 and property_overflow_inline = [%value.rec
   "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"
 ]
@@ -1578,12 +1579,9 @@ and property_scroll_snap_type_x = [%value.rec
 and property_scroll_snap_type_y = [%value.rec
   "'none' | 'mandatory' | 'proximity'"
 ]
-and property_scrollbar_color = [%value.rec
-  "'auto' | 'dark' | 'light' | [ <color> ]{2}"
-]
-and property_scrollbar_width = [%value.rec
-  "'auto' | 'thin' | 'none' | <extended-length>"
-]
+and property_scrollbar_color = [%value.rec "'auto' | [ <color> <color> ]"]
+and property_scrollbar_width = [%value.rec "'auto' | 'thin' | 'none'"]
+and property_scrollbar_gutter = [%value.rec "'auto' | 'stable' && 'both-edges'?" ]
 and property_scrollbar_3dlight_color = [%value.rec "<color>"]
 and property_scrollbar_arrow_color = [%value.rec "<color>"]
 and property_scrollbar_base_color = [%value.rec "<color>"]
@@ -3073,6 +3071,7 @@ let check_map =
       ("property-overflow-anchor", check(property_overflow_anchor)),
       ("property-overflow-block", check(property_overflow_block)),
       ("property-overflow-clip-box", check(property_overflow_clip_box)),
+      ("property-overflow-clip-margin", check(property_overflow_clip_margin)),
       ("property-overflow-inline", check(property_overflow_inline)),
       ("property-overflow-wrap", check(property_overflow_wrap)),
       ("property-overflow-x", check(property_overflow_x)),
@@ -3253,6 +3252,7 @@ let check_map =
       ("property-scroll-snap-type-y", check(property_scroll_snap_type_y)),
       ("property-scrollbar-color", check(property_scrollbar_color)),
       ("property-scrollbar-width", check(property_scrollbar_width)),
+      ("property-scrollbar-gutter", check(property_scrollbar_gutter)),
       (
         "property-shape-image-threshold",
         check(property_shape_image_threshold),
