@@ -3022,7 +3022,7 @@ let render_number_percentage = (~loc) =>
 let scale =
   polymorphic(Property_parser.property_scale, (~loc) =>
     fun
-    | `None => [[%expr CSS.translateProperty(`none)]]
+    | `None => [[%expr CSS.scaleProperty(`none)]]
     | `Number_percentage([x, y, z, ..._]) => [
         [%expr
           CSS.scaleProperty3(
