@@ -4844,6 +4844,10 @@ module BorderImageSlice = struct
       | #Percentage.t as x -> Percentage.toString x
   end
 
+  module Fill = struct
+    let toString = {js|fill|js}
+  end
+
   type t =
     [ Value.t
     | Cascading.t
