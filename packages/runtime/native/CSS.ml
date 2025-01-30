@@ -35,20 +35,25 @@ module Array = struct
   let flatten a = Array.concat (Array.to_list a)
 end
 
-let render_declaration rule =
-  match rule with
-  (* https://emotion.sh/docs/labels should be ignored on the rendering *)
-  | Rule.Declaration ("label", _value) -> None
-  | Rule.Declaration (property, value) ->
-    Some (Printf.sprintf "%s: %s;" property value)
-  | _ -> None
+let approximate_chars_in_rules = 50
 
-let render_declarations rules =
+let render_declaration ~buffer (property, value) =
+  Buffer.add_string buffer property;
+  Buffer.add_string buffer ": ";
+  Buffer.add_string buffer value;
+  Buffer.add_char buffer ';'
+
+let render_declarations ~buffer rules =
   rules
   |> Array.map ~f:Autoprefixer.prefix
   |> Array.flatten
-  |> Array.filter_map ~f:render_declaration
-  |> Array.join ~sep:" "
+  |> Array.filter_map ~f:(function
+       | Rule.Declaration ("label", _value) -> None
+       | Rule.Declaration (property, value) -> Some (property, value)
+       | _ -> None)
+  |> Array.iteri ~f:(fun i decl ->
+         if i > 0 then Buffer.add_char buffer ' ';
+         render_declaration ~buffer decl)
 
 let contains_at selector = String.contains selector '@'
 let contains_ampersand selector = String.contains selector '&'
@@ -88,6 +93,10 @@ let replace_ampersand ~by str =
   in
   replace_ampersand' str by
 
+let pp_selectors =
+  Format.(
+    pp_print_array ~pp_sep:(fun out () -> fprintf out ", ") pp_print_string)
+
 let rec rule_to_debug nesting accumulator rule =
   let next_rule =
     match rule with
@@ -95,10 +104,10 @@ let rec rule_to_debug nesting accumulator rule =
       Printf.sprintf "Declaration (\"%s\", \"%s\")" property value
     | Rule.Selector (selector, rules) ->
       if nesting = 0 then
-        Printf.sprintf "Selector (\"%s\", [%s])" selector
+        Format.asprintf "Selector (\"%a\", [%s])" pp_selectors selector
           (to_debug (nesting + 1) rules)
       else
-        Printf.sprintf "Selector (\"%s\", [%s\n%s])" selector
+        Format.asprintf "Selector (\"%a\", [%s\n%s])" pp_selectors selector
           (to_debug (nesting + 1) rules)
           (String.make (nesting + 1) ' ')
   in
@@ -138,12 +147,14 @@ let join_media left right = left ^ " and " ^ remove_media_from_selector right
 
 let rules_do_not_contain_media rules =
   Array.exists
-    ~f:(function Rule.Selector (s, _) when contains_at s -> false | _ -> true)
+    ~f:(function
+      | Rule.Selector (s, _) when contains_at s.(0) -> false | _ -> true)
     rules
 
 let rules_contain_media rules =
   Array.exists
-    ~f:(function Rule.Selector (s, _) when contains_at s -> true | _ -> false)
+    ~f:(function
+      | Rule.Selector (s, _) when contains_at s.(0) -> true | _ -> false)
     rules
 
 (* media selectors should be at the top. .a { @media () {} }
@@ -163,7 +174,7 @@ let rec move_media_at_top (rule_list : rule array) : rule array =
          }
       *)
       | Rule.Selector (current_selector, rules)
-        when contains_at current_selector && rules_contain_media rules ->
+        when contains_at current_selector.(0) && rules_contain_media rules ->
         let new_rules = swap current_selector rules in
         Array.append acc new_rules
       (* current_selector isn't a media query, but it's a selecotr. It may contain media-queries inside the rules: Example:
@@ -181,7 +192,7 @@ let rec move_media_at_top (rule_list : rule array) : rule array =
         let declarations, selectors = split_by_kind rules in
         let media_selectors, non_media_selectors =
           Array.partition selectors ~f:(function
-            | Rule.Selector (s, _) when contains_at s -> true
+            | Rule.Selector (s, _) when contains_at s.(0) -> true
             | _ -> false)
         in
         let new_media_rules =
@@ -189,7 +200,7 @@ let rec move_media_at_top (rule_list : rule array) : rule array =
             ~f:(fun media_rules ->
               match media_rules with
               | Rule.Selector (nested_media_selector, nested_media_rule_list)
-                when contains_at nested_media_selector ->
+                when contains_at nested_media_selector.(0) ->
                 [|
                   Rule.Selector
                     ( nested_media_selector,
@@ -226,7 +237,7 @@ and swap at_media_selector media_rules =
           [|
             Rule.Selector (at_media_selector, media_declarations);
             Rule.Selector
-              ( join_media at_media_selector nested_media_selector,
+              ( [| join_media at_media_selector.(0) nested_media_selector.(0) |],
                 nested_media_rule_list );
           |]
         | _ -> [||])
@@ -241,13 +252,12 @@ let split_multiple_selectors rule_list =
   Array.fold_left
     ~f:(fun acc rule ->
       match rule with
-      | Rule.Selector (selector, rules) when contains_a_coma selector ->
-        let selector_list = String.split_on_char ',' selector in
+      | Rule.Selector (selectors, rules) when Array.length selectors > 1 ->
         let new_rules =
           (* for each selector, we apply the same rules *)
-          List.map
-            (fun selector -> Rule.Selector (String.trim selector, rules))
-            selector_list
+          selectors
+          |> Array.to_list
+          |> List.map (fun selector -> Rule.Selector ([| selector |], rules))
         in
         List.append acc new_rules
       | rule -> List.append acc [ rule ])
@@ -261,107 +271,110 @@ let resolve_selectors rules =
        we split those into separate selectors with the same rules *)
     Array.partition_map rules ~f:(function
       (* in case of being at @media, don't do anything to it *)
-      | Rule.Selector (current_selector, selector_rules)
-        when starts_with_at current_selector ->
-        Right [| Rule.Selector (current_selector, selector_rules) |]
+      | Rule.Selector (current_selector, _) as rule
+        when starts_with_at current_selector.(0) ->
+        Left rule
       | Rule.Selector (current_selector, selector_rules) ->
         (* we derive the new prefix based on the current_selector and the previous "prefix" (aka the prefix added by the parent selector) *)
         let new_prefix =
           match prefix with
-          | None -> current_selector
+          | None -> current_selector.(0)
           | Some prefix ->
-            (* child starts with &, join them without space *)
-            if starts_with_ampersand current_selector then
-              prefix ^ remove_first_ampersand current_selector
-              (* child starts with dot, join them without space *)
-            else if contains_ampersand current_selector then
+            if contains_ampersand current_selector.(0) then
               (* reemplazar el ampersand del current_selector, con el padre *)
-              replace_ampersand ~by:prefix current_selector
-            else if starts_with_double_dot current_selector then
-              prefix ^ current_selector
+              replace_ampersand ~by:prefix current_selector.(0)
+            else if starts_with_double_dot current_selector.(0) then
+              prefix ^ current_selector.(0)
               (* This case is the same as the "else", but I keep it for reference *)
-            else if starts_with_dot current_selector then
-              prefix ^ " " ^ current_selector
-            else prefix ^ " " ^ current_selector
+            else if starts_with_dot current_selector.(0) then
+              prefix ^ " " ^ current_selector.(0)
+            else prefix ^ " " ^ current_selector.(0)
         in
         let selector_rules = split_multiple_selectors selector_rules in
         let selectors, rest_of_declarations =
           unnest_selectors ~prefix:(Some new_prefix) selector_rules
         in
-        let new_selector = Rule.Selector (new_prefix, selectors) in
+        let new_selector = Rule.Selector ([| new_prefix |], selectors) in
         Right (Array.append [| new_selector |] rest_of_declarations)
       | _ as rule -> Left rule)
-    |> fun (selectors, declarations) -> selectors, Array.flatten declarations
+    |> fun (declarations, selectors) -> declarations, Array.flatten selectors
   in
 
   let rules = move_media_at_top rules in
   let rules = split_multiple_selectors rules in
   (* The base case for unnesting is without any prefix *)
   let declarations, selectors = unnest_selectors ~prefix:None rules in
-  Array.append declarations selectors
+  Array.append (move_media_at_top selectors) declarations
 
-let render_keyframes animationName keyframes =
-  let definition =
-    keyframes
-    |> Array.map ~f:(fun (percentage, rules) ->
-           Printf.sprintf "%i%% { %s }" percentage (render_declarations rules))
-    |> Array.join ~sep:" "
-  in
-  Printf.sprintf "@keyframes %s { %s }" animationName definition
+let render_keyframes ~buffer animationName keyframes =
+  Buffer.add_string buffer "@keyframes ";
+  Buffer.add_string buffer animationName;
+  Buffer.add_string buffer " { ";
+  Array.iteri keyframes ~f:(fun i (percentage, rules) ->
+      if i > 0 then Buffer.add_char buffer ' ';
+      Buffer.add_string buffer (string_of_int percentage);
+      Buffer.add_string buffer "% { ";
+      render_declarations ~buffer rules;
+      Buffer.add_string buffer " }");
+  Buffer.add_string buffer " }"
 
 (* Removes nesting on selectors, uplifts media-queries, runs the autoprefixer *)
-let rec render_rules className rules =
+let rec render_rules ~buffer className rules =
   let declarations, selectors = split_by_kind (resolve_selectors rules) in
-
-  let declarations =
-    match declarations with
-    | [||] -> ""
-    | _ ->
-      Printf.sprintf ".%s { %s }" className (render_declarations declarations)
-  in
-
-  let selectors =
-    match selectors with
-    | [||] -> ""
-    | _ ->
-      selectors
-      |> Array.filter_map ~f:(render_selectors className)
-      |> Array.join ~sep:" "
-  in
-
-  (* Trimming is necessary to ensure there isn't an empty space when one of `declarations` or `selectors` is empty. *)
-  String.trim @@ String.concat " " [ declarations; selectors ]
+  (match declarations with
+  | [||] -> ()
+  | _ ->
+    Buffer.add_string buffer ".";
+    Buffer.add_string buffer className;
+    Buffer.add_string buffer " { ";
+    render_declarations ~buffer declarations;
+    Buffer.add_string buffer " }");
+  match selectors with
+  | [||] -> ()
+  | _ ->
+    if Array.length declarations > 0 then Buffer.add_char buffer ' ';
+    selectors
+    |> Array.filter_map ~f:(function
+         | Rule.Selector (_selector, rules) when Array.is_empty rules -> None
+         | Rule.Selector (selector, rules) -> Some (selector, rules)
+         | _ -> None)
+    |> Array.iteri ~f:(fun i rule ->
+           if i > 0 then Buffer.add_char buffer ' ';
+           render_selectors ~buffer className rule)
 
 (* Renders all selectors with the hash given *)
-and render_selectors hash rule =
-  match rule with
-  | Rule.Selector (_selector, rules) when Array.is_empty rules -> None
-  (* In case of being @media (or any at_rule) render the selector first and declarations with the hash inside *)
-  | Rule.Selector (selector, rules) when contains_at selector ->
-    let nested_selectors = render_rules hash rules in
-    Some (Printf.sprintf "%s { %s }" selector nested_selectors)
-  | Rule.Selector (selector, rules) ->
-    let new_selector = resolve_ampersand hash selector in
-    (* Resolving the ampersand means to replace all ampersands by the hash *)
-    Some (Printf.sprintf "%s { %s }" new_selector (render_declarations rules))
-  (* Declarations aren't there *)
-  | _ -> None
+and render_selectors ~buffer hash (selector, rules) =
+  if contains_at selector.(0) then (
+    Buffer.add_string buffer selector.(0);
+    Buffer.add_string buffer " { ";
+    render_rules ~buffer hash rules;
+    Buffer.add_string buffer " }")
+  else (
+    Buffer.add_string buffer (resolve_ampersand hash selector.(0));
+    Buffer.add_string buffer " { ";
+    render_declarations ~buffer rules;
+    Buffer.add_string buffer " }")
 
 (* rules_to_string renders the rule in a format where the hash matches with `@emotion/serialise`. It doesn't render any whitespace. (compared to render_rules) *)
 (* TODO: Ensure Selector is serialised correctly *)
-let rec rules_to_string rules =
-  let buff = Buffer.create 16 in
-  let push = Buffer.add_string buff in
-  let rule_to_string rule =
-    match rule with
-    | Rule.Declaration (property, value) ->
-      push (Printf.sprintf "%s:%s;" property value)
-    | Rule.Selector (selector, rules) ->
-      let rules = rules_to_string rules in
-      push (Printf.sprintf "%s{%s}" selector rules)
+let rules_to_string rules =
+  let initial_size = Array.length rules * approximate_chars_in_rules in
+  let buffer = Buffer.create initial_size in
+  let rec go rules =
+    Array.iter rules ~f:(function
+      | Rule.Declaration (property, value) ->
+        Buffer.add_string buffer property;
+        Buffer.add_char buffer ':';
+        Buffer.add_string buffer value;
+        Buffer.add_char buffer ';'
+      | Rule.Selector (selector, rules) ->
+        Buffer.add_string buffer selector.(0);
+        Buffer.add_char buffer '{';
+        go rules;
+        Buffer.add_char buffer '}')
   in
-  Array.iter ~f:rule_to_string rules;
-  Buffer.contents buff
+  go rules;
+  Buffer.contents buffer
 
 type declarations =
   | Globals of rule array
@@ -399,10 +412,13 @@ module Stylesheet = struct
 end
 
 let keyframes_to_string keyframes =
-  let pp_keyframe (percentage, rules) =
-    Printf.sprintf "%d%%{%s}" percentage (rules_to_string rules)
-  in
-  keyframes |> Array.map ~f:pp_keyframe |> Array.to_list |> String.concat ""
+  let buffer = Buffer.create 1024 in
+  Array.iter keyframes ~f:(fun (percentage, rules) ->
+      Buffer.add_string buffer (string_of_int percentage);
+      Buffer.add_string buffer "%{";
+      Buffer.add_string buffer (rules_to_string rules);
+      Buffer.add_char buffer '}');
+  Buffer.contents buffer
 
 let render_hash hash styles =
   let is_label = function
@@ -442,24 +458,22 @@ let keyframes (keyframes : (int * rule array) array) =
     Types.AnimationName.make animationName
 
 let get_stylesheet () =
-  Stylesheet.get_all instance
-  |> List.fold_left
-       (fun accumulator (_, rules) ->
-         match rules with
-         | Globals rules ->
-           let new_rules = resolve_selectors rules in
-           let rules = String.trim @@ rules_to_string new_rules in
-           Printf.sprintf "%s %s" accumulator rules
-         | Classnames { className; styles } ->
-           let rules = String.trim @@ render_rules className styles in
-           Printf.sprintf "%s %s" accumulator rules
-         | Keyframes { animationName; keyframes } ->
-           let rules =
-             String.trim @@ render_keyframes animationName keyframes
-           in
-           Printf.sprintf "%s %s" accumulator rules)
-       ""
-  |> String.trim
+  let stylesheet = Stylesheet.get_all instance in
+  let initial_size = List.length stylesheet * approximate_chars_in_rules in
+  let buffer = Buffer.create initial_size in
+  List.iteri
+    (fun i (_, rule) ->
+      if i > 0 then Buffer.add_char buffer ' ';
+      match rule with
+      | Globals rule ->
+        let new_rule = resolve_selectors rule in
+        Buffer.add_string buffer (rules_to_string new_rule)
+      | Classnames { className; styles } ->
+        render_rules ~buffer className styles
+      | Keyframes { animationName; keyframes } ->
+        render_keyframes ~buffer animationName keyframes)
+    stylesheet;
+  Buffer.contents buffer
 
 let get_string_style_hashes () =
   Stylesheet.get_all instance
@@ -478,14 +492,15 @@ let style_tag ?key:_ ?children:_ () =
     []
 
 (* This method is a Css_type function, but with side-effects. It pushes the fontFace as global style *)
-let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
-    =
+let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust
+  ?unicodeRange () =
   let fontFace =
     [|
       Kloth.Option.map ~f:Declarations.fontStyle fontStyle;
       Kloth.Option.map ~f:Declarations.fontWeight fontWeight;
       Kloth.Option.map ~f:Declarations.fontDisplay fontDisplay;
       Kloth.Option.map ~f:Declarations.sizeAdjust sizeAdjust;
+      Kloth.Option.map ~f:Declarations.unicodeRange unicodeRange;
       Some (Declarations.fontFamily fontFamily);
       Some
         (Rule.Declaration
@@ -495,5 +510,5 @@ let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
     |]
     |> Kloth.Array.filter_map ~f:(fun i -> i)
   in
-  global [| Rule.Selector ("@font-face", fontFace) |];
+  global [| Rule.Selector ([|"@font-face"|], fontFace) |];
   fontFamily

@@ -969,9 +969,12 @@
           {js|(min-width: 600px)|js},
           [|CSS.backgroundColor(CSS.blue)|],
         ),
-        CSS.selector({js|&:hover|js}, [|CSS.backgroundColor(CSS.green)|]),
-        CSS.selector(
-          {js|& > p|js},
+        CSS.selectorMany(
+          [|{js|&:hover|js}|],
+          [|CSS.backgroundColor(CSS.green)|],
+        ),
+        CSS.selectorMany(
+          [|{js|& > p|js}|],
           [|CSS.color(CSS.pink), CSS.fontSize(`pxFloat(24.))|],
         ),
       |]);

@@ -1,6 +1,14 @@
-# Tell github that .re and .rei files are Reason
+# .re and .rei files are Reason
 *.re linguist-language=Reason
 *.rei linguist-language=Reason
+
+# mli/mly files are OCaml
+*.ml*             text eol=lf linguist-language=OCaml
+
+# Ignore cram test files
+*.t               text eol=lf -linguist-detectable
+
+dune              text eol=lf
 
 # Declare shell files to have LF endings on checkout
 # On Windows, the default git setting for `core.autocrlf`

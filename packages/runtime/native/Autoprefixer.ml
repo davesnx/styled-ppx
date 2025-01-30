@@ -28,6 +28,7 @@ let prefix rule =
   | Declaration (("filter" as property), value)
   | Declaration (("clip-path" as property), value)
   | Declaration (("backface-visibility" as property), value)
+  | Declaration (("backdrop-filter" as property), value)
   | Declaration (("column" as property), value)
   | Declaration (("box-decoration-break" as property), value)
   | Declaration

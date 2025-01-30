@@ -4372,6 +4372,23 @@ module FontVariantEmoji = struct
     | #Cascading.t as c -> Cascading.toString c
 end
 
+module URange = struct
+  type t =
+    [ `single of string
+    | `range of string * string
+    | `wildcard of string * string
+    ]
+    array
+
+  let toString (x : t) =
+    Kloth.Array.map_and_join
+      ~f:(function
+        | `single x -> "U+" ^ x
+        | `range (x, y) -> "U+" ^ x ^ "-" ^ y
+        | `wildcard (x, y) -> "U+" ^ x ^ y)
+      ~sep:{js|, |js} x
+end
+
 module InflexibleBreadth = struct
   type t =
     [ Length.t
@@ -4928,6 +4945,58 @@ module BorderImageRepeat = struct
     | #Var.t as x -> Var.toString x
 end
 
+module ScrollbarWidth = struct
+  type t =
+    [ `thin
+    | Auto.t
+    | None.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | `thin -> {js|thin|js}
+    | #Auto.t -> Auto.toString
+    | #None.t -> None.toString
+    | #Var.t as var -> Var.toString var
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+module ScrollbarGutter = struct
+  type t =
+    [ `stable
+    | `stableBothEdges
+    | Auto.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | `stable -> {js|stable|js}
+    | `stableBothEdges -> {js|stable both-edges|js}
+    | #Auto.t -> Auto.toString
+    | #Var.t as var -> Var.toString var
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+module ScrollbarColor = struct
+  type t =
+    [ `thumbTrackColor of Color.t * Color.t
+    | Auto.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | `thumbTrackColor (a, b) -> Color.toString a ^ {js| |js} ^ Color.toString b
+    | #Auto.t -> Auto.toString
+    | #Var.t as var -> Var.toString var
+    | #Cascading.t as c -> Cascading.toString c
+end
+
 module VisualBox = struct
   type t =
     [ `contentBox
@@ -4943,24 +5012,39 @@ module VisualBox = struct
 end
 
 module OverflowClipMargin = struct
+  module ClipEdgeOrigin = struct
+    type t =
+      [ VisualBox.t
+      | Var.t
+      ]
+
+    let toString x =
+      match x with
+      | #VisualBox.t as vb -> VisualBox.toString vb
+      | #Var.t as va -> Var.toString va
+  end
+
+  module Margin = struct
+    type t =
+      [ Length.t
+      | Var.t
+      ]
+
+    let toString x =
+      match x with
+      | #Length.t as l -> Length.toString l
+      | #Var.t as va -> Var.toString va
+  end
+
   type t =
-    [ `visualBox of VisualBox.t
-    | `length of Length.t
-    | `visualBoxLength of VisualBox.t * Length.t
+    [ ClipEdgeOrigin.t
+    | Margin.t
     | Cascading.t
-    | Var.t
     ]
 
-  let visualBox (x : VisualBox.t) = `visualBox x
-  let length (x : Length.t) = `length x
-  let visualBoxLength (x : VisualBox.t) (y : Length.t) = `visualBoxLength (x, y)
-
-  let toString (x : t) =
+  let toString x =
     match x with
-    | `visualBox x -> VisualBox.toString x
-    | `length x -> Length.toString x
-    | `visualBoxLength (x, y) ->
-      VisualBox.toString x ^ {js| |js} ^ Length.toString y
+    | #ClipEdgeOrigin.t as ceo -> ClipEdgeOrigin.toString ceo
+    | #Margin.t as m -> Margin.toString m
     | #Cascading.t as c -> Cascading.toString c
-    | #Var.t as va -> Var.toString va
 end

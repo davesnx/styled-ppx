@@ -446,6 +446,16 @@ let overflows x =
 let overflowX x = Rule.declaration ({js|overflowX|js}, Overflow.toString x)
 let overflowY x = Rule.declaration ({js|overflowY|js}, Overflow.toString x)
 
+let overflowClipMargin x =
+  Rule.declaration ({js|overflowClipMargin|js}, OverflowClipMargin.toString x)
+
+let overflowClipMargin2 ?(clipEdgeOrigin = `paddingBox) margin =
+  Rule.declaration
+    ( {js|overflowClipMargin|js},
+      OverflowClipMargin.ClipEdgeOrigin.toString clipEdgeOrigin
+      ^ {js| |js}
+      ^ OverflowClipMargin.Margin.toString margin )
+
 let overflowWrap x =
   Rule.declaration ({js|overflowWrap|js}, OverflowWrap.toString x)
 
@@ -609,9 +619,6 @@ let overscrollBehavior x =
 
 let overflowAnchor x =
   Rule.declaration ({js|overflowAnchor|js}, OverflowAnchor.toString x)
-
-let overflowClipMargin x =
-  Rule.declaration ({js|overflowClipMargin|js}, OverflowClipMargin.toString x)
 
 let columnWidth x =
   Rule.declaration ({js|columnWidth|js}, ColumnWidth.toString x)
@@ -1057,3 +1064,19 @@ let borderImageRepeat2 v h =
       BorderImageRepeat.Value.toString v
       ^ {js| |js}
       ^ BorderImageRepeat.Value.toString h )
+
+let unicodeRange x = Rule.declaration ({js|unicodeRange|js}, URange.toString x)
+
+let scrollbarWidth x =
+  Rule.declaration ({js|scrollbarWidth|js}, ScrollbarWidth.toString x)
+
+let scrollbarGutter x =
+  Rule.declaration ({js|scrollbarGutter|js}, ScrollbarGutter.toString x)
+
+let scrollbarColor x =
+  Rule.declaration ({js|scrollbarColor|js}, ScrollbarColor.toString x)
+
+let scrollbarColor2 ~thumbColor ~trackColor =
+  Rule.declaration
+    ( {js|scrollbarColor|js},
+      ScrollbarColor.toString @@ `thumbTrackColor (thumbColor, trackColor) )

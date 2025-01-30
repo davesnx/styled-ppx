@@ -50,20 +50,18 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     | "$" => "dollar"
     | _ => "unknown";
 
-  let value_name_of_css = str =>
-    String.(
-      {
-        let length = length(str);
-        let str =
-          if (is_function(str)) {
-            let str = sub(str, 0, length - 2);
-            function_value_name(str);
-          } else {
-            str;
-          };
-        kebab_case_to_snake_case(str);
-      }
-    );
+  let value_name_of_css = str => {
+    open String;
+    let length = length(str);
+    let str =
+      if (is_function(str)) {
+        let str = sub(str, 0, length - 2);
+        function_value_name(str);
+      } else {
+        str;
+      };
+    kebab_case_to_snake_case(str);
+  };
 
   // TODO: multiplier name
   let rec variant_name = value => {

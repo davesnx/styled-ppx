@@ -1,0 +1,53 @@
+---
+title: Introduction to styled-ppx
+---
+
+### styled components with type-safe CSS for ReScript, Melange and Native
+
+**styled-ppx** is a [ppx](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem) and a library that brings styled components to ReScript, Melange and Native. Create **React Components** with type-safe style definitions with only CSS.
+
+It allows you to style apps safely, quickly, and performant - just as you always done it.
+
+```rescript
+module Center = %styled.div(`
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`)
+
+<Center> {React.string("Hello from the future!")} </Center>
+```
+```reason
+module Center = [%styled.div {|
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+|}];
+
+<Center> {React.string("Hello from the future!")} </Center>
+```
+
+## Type-safe CSS
+
+styled-ppx comes with its own CSS Parser and CSS type-checker, so you can write CSS and be sure it will be valid and all types will be correct. This is a **huge** time-saver when working at large scale with CSS.
+
+## Features
+
+- **Zero abstraction over CSS**
+- **Component-based styling**
+- Supports the power of the underlying language: pattern-matching, composition, labelled arguments, static type-safety.
+- Implements utilities such as `cx` to generate classNames and `css` to generate `Css.rule`
+- Supports [ReScript](https://rescript-lang.org/), [Melange](https://melange.re) and [native](/getting-started/native.mdx).
+- Integrates with [`@rescript-react`](https://rescript-lang.org/docs/react/latest/introduction), [`reason-react`](https://reasonml.github.io/reason-react/), and [`server-reason-react`](https://github.com/ml-in-barcelona/server-reason-react)
+- It can also work without React
+- Adds labels on the className hashes for better DX
+
+The main part of **styled-ppx** is a ppx. Generally speaking, a ppx is the system from OCaml to have some sort of macros; similar to [babel plugins](https://babeljs.io/docs/en/plugins/). A small program that run before the compilation, and can transform your source-code.
+
+In this case, expands those extensions (e.g., `%styled.div{:rescript}` `[%styled.div]{:reason}`, `%cx{:rescript}` `[%cx]{:reason}` and `%css{:rescript}` `[%css]{:reason}`) into valid code. If you are curious about the actual transformation, you can check the [snapshot tests](https://github.com/davesnx/styled-ppx/tree/main/packages/ppx/test/snapshot/reason/reason-classname-cx.t).
+
+You can learn more about them in [Tarides blog: Introduction to OCaml ppx ecosystem](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem).

@@ -50,14 +50,15 @@ let keyframes frames =
 let renderKeyframes _renderer frames = makeAnimation (framesToDict frames)
 
 (* This method is a Css_type function, but with side-effects. It pushes the fontFace as global style *)
-let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
-    =
+let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust
+  ?unicodeRange () =
   let fontFace =
     [|
       Kloth.Option.map ~f:Declarations.fontStyle fontStyle;
       Kloth.Option.map ~f:Declarations.fontWeight fontWeight;
       Kloth.Option.map ~f:Declarations.fontDisplay fontDisplay;
       Kloth.Option.map ~f:Declarations.sizeAdjust sizeAdjust;
+      Kloth.Option.map ~f:Declarations.unicodeRange unicodeRange;
       Some (Declarations.fontFamily fontFamily);
       Some
         (Rule.Declaration
@@ -67,5 +68,5 @@ let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust ()
     |]
     |> Kloth.Array.filter_map ~f:(fun i -> i)
   in
-  global [| Rule.Selector ("@font-face", fontFace) |];
+  global [| Rule.Selector ([|"@font-face"|], fontFace) |];
   fontFamily

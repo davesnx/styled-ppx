@@ -2190,7 +2190,22 @@ let overflow =
   );
 
 let overflow_clip_margin =
-  unsupportedProperty(Property_parser.property_overflow_clip_margin);
+  polymorphic(
+    Property_parser.property_overflow_clip_margin,
+    (~loc, (clipEdgeOrigin, margin)) => {
+      let margin = Option.value(margin, ~default=`Length(`Px(0.)));
+      [
+        [%expr
+          CSS.overflowClipMargin2(
+            ~clipEdgeOrigin=?[%e
+              render_option(~loc, variant_to_expression, clipEdgeOrigin)
+            ],
+            [%e render_extended_length(~loc, margin)],
+          )
+        ],
+      ];
+    },
+  );
 
 let overflow_block =
   monomorphic(
@@ -2212,6 +2227,19 @@ let overflow_inline =
       | `Interpolation(x) => render_variable(~loc, x)
       | (`Visible | `Hidden | `Clip | `Scroll | `Auto) as x =>
         variant_to_expression(~loc, x),
+  );
+
+let scrollbar_gutter =
+  monomorphic(
+    Property_parser.property_scrollbar_gutter,
+    (~loc) => [%expr CSS.scrollbarGutter],
+    (~loc, value: Types.property_scrollbar_gutter) => {
+      switch (value) {
+      | `Auto => [%expr `auto]
+      | `And(_, None) => [%expr `stable]
+      | `And(_, Some(_)) => [%expr `stableBothEdges]
+      }
+    },
   );
 
 let text_overflow =
@@ -4762,7 +4790,20 @@ let scrollbar_base_color =
   unsupportedProperty(Property_parser.property_scrollbar_base_color);
 
 let scrollbar_color =
-  unsupportedProperty(Property_parser.property_scrollbar_color);
+  monomorphic(
+    Property_parser.property_scrollbar_color,
+    (~loc) => [%expr CSS.scrollbarColor],
+    (~loc, value: Types.property_scrollbar_color) =>
+      switch (value) {
+      | `Auto => [%expr `auto]
+      | `Static(thumbColor, trackColor) =>
+        [%expr
+         `thumbTrackColor((
+           [%e render_color(~loc, thumbColor)],
+           [%e render_color(~loc, trackColor)],
+         ))]
+      },
+  );
 
 let scrollbar_darkshadow_color =
   unsupportedProperty(Property_parser.property_scrollbar_darkshadow_color);
@@ -4780,7 +4821,16 @@ let scrollbar_track_color =
   unsupportedProperty(Property_parser.property_scrollbar_track_color);
 
 let scrollbar_width =
-  unsupportedProperty(Property_parser.property_scrollbar_width);
+  monomorphic(
+    Property_parser.property_scrollbar_width,
+    (~loc) => [%expr CSS.scrollbarWidth],
+    (~loc, value: Types.property_scrollbar_width) =>
+      switch (value) {
+      | `Thin => [%expr `thin]
+      | `Auto => [%expr `auto]
+      | `None => [%expr `none]
+      },
+  );
 
 let stroke_dasharray =
   unsupportedProperty(Property_parser.property_stroke_dasharray);
@@ -5577,6 +5627,7 @@ let properties = [
   ("scrollbar-shadow-color", found(scrollbar_shadow_color)),
   ("scrollbar-track-color", found(scrollbar_track_color)),
   ("scrollbar-width", found(scrollbar_width)),
+  ("scrollbar-gutter", found(scrollbar_gutter)),
   ("stroke-opacity", found(stroke_opacity)),
   ("stroke-width", found(stroke_width)),
   ("stroke-dasharray", found(stroke_dasharray)),

@@ -42,7 +42,7 @@ setup-githooks: ## Setup githooks
 
 .PHONY: create-switch
 create-switch: ## Create opam switch
-	opam switch create . 5.1.1 --deps-only --with-test --no-install
+	opam switch create . 5.2.0 --deps-only --with-test --no-install
 
 .PHONY: install
 install: ## Install project dependencies
@@ -162,3 +162,7 @@ lexer: ## Print the command to debug the lexer
 .PHONY: interpreter
 interpreter: ## Run menhir as interpret
 	$(OPAM_EXEC) menhir --interpret --interpret-show-cst packages/parser/lib/Parser.mly
+
+.PHONY: website-watch
+website-watch: ## Run the website locally
+	@cd packages/website && npm run dev

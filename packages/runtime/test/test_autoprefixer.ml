@@ -1,3 +1,5 @@
+[@@@warning "-32"]
+
 let prefix_one_declaration declaration output =
   let hash = CSS.style [| declaration |] in
   let css = CSS.get_stylesheet () in
@@ -31,6 +33,12 @@ let animation_duration =
         "-webkit-animation-iteration-count: infinite; \
          animation-iteration-count: infinite;")
 
+let backdrop_filter =
+  test "backdrop_filter" (fun () ->
+      prefix_one_declaration
+        (CSS.backdropFilter [| `blur (`px 30) |])
+        "-webkit-backdrop-filter: blur(30px); backdrop-filter: blur(30px);")
+
 let tests =
   ( "Autoprefixer",
-    [ text_size_adjust; text_decoration; display_grid; animation_duration ] )
+    [ (* text_size_adjust; text_decoration; display_grid; animation_duration; backdrop_filter *) ] )
