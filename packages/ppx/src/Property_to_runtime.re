@@ -1714,10 +1714,20 @@ let render_background = (~loc, background: Types.property_background) => {
     @ (
       switch (position) {
       | Some((pos, Some(((), size)))) => [
-          [render_bg_position(~loc, pos)],
+          [
+            [%expr
+              CSS.backgroundPosition([%e render_bg_position(~loc, pos)])
+            ],
+          ],
           [[%expr CSS.backgroundSize([%e render_bg_size(~loc, size)])]],
         ]
-      | Some((pos, None)) => [[render_bg_position(~loc, pos)]]
+      | Some((pos, None)) => [
+          [
+            [%expr
+              CSS.backgroundPosition([%e render_bg_position(~loc, pos)])
+            ],
+          ],
+        ]
       | None => []
       }
     );
@@ -1755,7 +1765,21 @@ let render_background = (~loc, background: Types.property_background) => {
     ]
     @ (
       switch (position) {
-      | Some(_) => raise(Unsupported_feature)
+      | Some((pos, Some(((), size)))) => [
+          [
+            [%expr
+              CSS.backgroundPosition([%e render_bg_position(~loc, pos)])
+            ],
+          ],
+          [[%expr CSS.backgroundSize([%e render_bg_size(~loc, size)])]],
+        ]
+      | Some((pos, None)) => [
+          [
+            [%expr
+              CSS.backgroundPosition([%e render_bg_position(~loc, pos)])
+            ],
+          ],
+        ]
       | None => []
       }
     );

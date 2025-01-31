@@ -59,16 +59,13 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|backgroundSize|js}, {js|auto 10%|js});
   CSS.backgroundSize(`size((`em(50.), `percent(50.))));
   
-  CSS.unsafe({js|background|js}, {js|top left / 50% 60%|js});
+  CSS.backgroundPosition(`hvOffset((`left, `top)));
   CSS.backgroundOrigin(`borderBox);
   CSS.backgroundColor(CSS.blue);
   CSS.backgroundColor(CSS.red);
   
   CSS.backgroundClip(`paddingBox);
-  CSS.unsafe(
-    {js|background|js},
-    {js|url(foo.png) bottom right / cover padding-box content-box|js},
-  );
+  CSS.backgroundImage(`url({js|foo.png|js}));
   CSS.borderTopLeftRadius(`zero);
   CSS.borderTopLeftRadius(`percent(50.));
   CSS.unsafe({js|borderTopLeftRadius|js}, {js|250px 100px|js});
