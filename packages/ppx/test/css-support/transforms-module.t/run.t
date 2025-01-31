@@ -67,7 +67,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.translateProperty(`percent(50.));
   CSS.translateProperty2(`percent(50.), `percent(50.));
   CSS.translateProperty3(`percent(50.), `percent(50.), `pxFloat(10.));
-  CSS.translateProperty(`none);
+  CSS.scaleProperty(`none);
   CSS.scaleProperty(`num(2.));
   CSS.scaleProperty2(`num(2.), `num(2.));
   CSS.scaleProperty3(`num(2.), `num(2.), `num(2.));
