@@ -76,16 +76,20 @@ let backgroundPosition x =
 
 let backgroundPosition2 x y =
   Rule.declaration
-    ({js|backgroundPosition|js}, BgPosition.toString (BgPosition.hv x y))
+    ( {js|backgroundPosition|js},
+      BackgroundPosition.Value.toString (BackgroundPosition.Value.hv x y) )
 
 let backgroundPosition4 ~x ~y =
   Rule.declaration
-    ({js|backgroundPosition|js}, BgPosition.toString (BgPosition.hvOffset x y))
+    ( {js|backgroundPosition|js},
+      BackgroundPosition.Value.toString (BackgroundPosition.Value.hvOffset x y)
+    )
 
 let backgroundPositions x =
   Rule.declaration
     ( {js|backgroundPosition|js},
-      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:BgPosition.toString x )
+      Kloth.Array.map_and_join ~sep:{js|, |js}
+        ~f:BackgroundPosition.Value.toString x )
 
 let backgroundRepeat x =
   Rule.declaration ({js|backgroundRepeat|js}, BackgroundRepeat.toString x)

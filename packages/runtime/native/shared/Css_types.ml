@@ -2034,69 +2034,6 @@ module Position = struct
     | #Length.t as l -> Length.toString l
 end
 
-module BgPosition = struct
-  module X = Position.X
-  module Y = Position.Y
-
-  type t =
-    [ X.t
-    | Y.t
-    | `hv of [ X.t | Length.t ] * [ Y.t | Length.t ]
-    | `hvOffset of
-      [ X.t | `leftOffset of Length.t | `rightOffset of Length.t ]
-      * [ Y.t | `topOffset of Length.t | `bottomOffset of Length.t ]
-    | Length.t
-    ]
-
-  let hv = Position.hv
-
-  let hvOffset
-    (x : [ X.t | `leftOffset of Length.t | `rightOffset of Length.t ])
-    (y : [ Y.t | `topOffset of Length.t | `bottomOffset of Length.t ]) =
-    `hvOffset (x, y)
-
-  let top = `top
-  let bottom = `bottom
-  let left = `left
-  let right = `right
-  let center = `center
-  let topOffset (x : Length.t) = `topOffset x
-  let bottomOffset (x : Length.t) = `bottomOffset x
-  let leftOffset (x : Length.t) = `leftOffset x
-  let rightOffset (x : Length.t) = `rightOffset x
-
-  let toString (x : t) =
-    match x with
-    | `left -> {js|left|js}
-    | `right -> {js|right|js}
-    | `top -> {js|top|js}
-    | `bottom -> {js|bottom|js}
-    | `center -> {js|center|js}
-    | `hv (h, v) ->
-      (match h with
-      | #X.t as h -> X.toString h
-      | #Length.t as l -> Length.toString l)
-      ^ {js| |js}
-      ^ begin
-          match v with
-          | #Y.t as v -> Y.toString v
-          | #Length.t as l -> Length.toString l
-        end
-    | `hvOffset (h, v) ->
-      (match h with
-      | #X.t as h -> X.toString h
-      | `leftOffset l -> Length.toString l
-      | `rightOffset l -> Length.toString l)
-      ^ {js| |js}
-      ^ begin
-          match v with
-          | #Y.t as v -> Y.toString v
-          | `topOffset l -> Length.toString l
-          | `bottomOffset l -> Length.toString l
-        end
-    | #Length.t as l -> Length.toString l
-end
-
 module TransformOrigin = struct
   module X = Position.X
   module Y = Position.Y
@@ -2189,15 +2126,78 @@ module PerspectiveOrigin = struct
 end
 
 module BackgroundPosition = struct
+  module Value = struct
+    module X = Position.X
+    module Y = Position.Y
+
+    type t =
+      [ X.t
+      | Y.t
+      | `hv of [ X.t | Length.t ] * [ Y.t | Length.t ]
+      | `hvOffset of
+        [ X.t | `leftOffset of Length.t | `rightOffset of Length.t ]
+        * [ Y.t | `topOffset of Length.t | `bottomOffset of Length.t ]
+      | Length.t
+      ]
+
+    let hv = Position.hv
+
+    let hvOffset
+      (x : [ X.t | `leftOffset of Length.t | `rightOffset of Length.t ])
+      (y : [ Y.t | `topOffset of Length.t | `bottomOffset of Length.t ]) =
+      `hvOffset (x, y)
+
+    let top = `top
+    let bottom = `bottom
+    let left = `left
+    let right = `right
+    let center = `center
+    let topOffset (x : Length.t) = `topOffset x
+    let bottomOffset (x : Length.t) = `bottomOffset x
+    let leftOffset (x : Length.t) = `leftOffset x
+    let rightOffset (x : Length.t) = `rightOffset x
+
+    let toString (x : t) =
+      match x with
+      | `left -> {js|left|js}
+      | `right -> {js|right|js}
+      | `top -> {js|top|js}
+      | `bottom -> {js|bottom|js}
+      | `center -> {js|center|js}
+      | `hv (h, v) ->
+        (match h with
+        | #X.t as h -> X.toString h
+        | #Length.t as l -> Length.toString l)
+        ^ {js| |js}
+        ^ begin
+            match v with
+            | #Y.t as v -> Y.toString v
+            | #Length.t as l -> Length.toString l
+          end
+      | `hvOffset (h, v) ->
+        (match h with
+        | #X.t as h -> X.toString h
+        | `leftOffset l -> Length.toString l
+        | `rightOffset l -> Length.toString l)
+        ^ {js| |js}
+        ^ begin
+            match v with
+            | #Y.t as v -> Y.toString v
+            | `topOffset l -> Length.toString l
+            | `bottomOffset l -> Length.toString l
+          end
+      | #Length.t as l -> Length.toString l
+  end
+
   type t =
-    [ BgPosition.t
+    [ Value.t
     | Cascading.t
     | Var.t
     ]
 
   let toString (x : t) =
     match x with
-    | #BgPosition.t as x -> BgPosition.toString x
+    | #Value.t as x -> Value.toString x
     | #Cascading.t as x -> Cascading.toString x
     | #Var.t as x -> Var.toString x
 end
