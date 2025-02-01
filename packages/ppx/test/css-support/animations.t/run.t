@@ -26,8 +26,8 @@ If this test fail means that the module is not in sync with the ppx
       (100, [|CSS.opacity(1.)|]),
     |]);
   
-  CSS.animationName(CSS.Types.AnimationName.make({js|random|js}));
-  CSS.animationName(foo);
+  CSS.animationNames([|CSS.Types.AnimationName.make({js|random|js})|]);
+  CSS.animationNames([|foo|]);
   CSS.animationNames([|foo, bar|]);
   CSS.animationDuration(`s(0));
   CSS.animationDuration(`s(1));
@@ -66,7 +66,7 @@ If this test fail means that the module is not in sync with the ppx
     ~fillMode=?Some(`both),
     ~playState=?None,
     ~iterationCount=?Some(`infinite),
-    ~name=CSS.Types.AnimationName.make({js|foo|js}),
+    ~name=?Some(CSS.Types.AnimationName.make({js|foo|js})),
     (),
   );
   CSS.animation(
@@ -77,7 +77,7 @@ If this test fail means that the module is not in sync with the ppx
     ~fillMode=?Some(`both),
     ~playState=?Some(`paused),
     ~iterationCount=?Some(`infinite),
-    ~name=CSS.Types.AnimationName.make({js|none|js}),
+    ~name=?None,
     (),
   );
   CSS.animation(
@@ -88,6 +88,6 @@ If this test fail means that the module is not in sync with the ppx
     ~fillMode=?Some(`forwards),
     ~playState=?Some(`running),
     ~iterationCount=?Some(`infinite),
-    ~name=CSS.Types.AnimationName.make({js|a|js}),
+    ~name=?Some(CSS.Types.AnimationName.make({js|a|js})),
     (),
   );

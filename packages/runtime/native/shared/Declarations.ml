@@ -773,9 +773,7 @@ let transitionList x =
     ( {js|transition|js},
       Kloth.Array.map_and_join ~sep:{js|, |js} ~f:Transition.Value.toString x )
 
-let transition x = Rule.declaration ({js|transition|js}, Transition.toString x)
-
-let transition4 ?duration ?delay ?timingFunction ?property () =
+let transition ?duration ?delay ?timingFunction ?property () =
   Rule.declaration
     ( {js|transition|js},
       Transition.toString
@@ -796,16 +794,16 @@ let transitionProperty x =
 let transitionProperties x =
   Rule.declaration
     ( {js|transitionProperty|js},
-      Kloth.Array.map_and_join ~sep:{js|, |js}
-        ~f:SingleTransitionProperty.toString x )
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:TransitionProperty.toString x
+    )
 
 let animation ?duration ?delay ?direction ?timingFunction ?fillMode ?playState
   ?iterationCount ?name () =
   Rule.declaration
     ( {js|animation|js},
       Animation.toString
-      @@ Animation.make ?duration ?delay ?direction ?timingFunction ?fillMode
-           ?playState ?iterationCount ?name () )
+      @@ Animation.Value.make ?duration ?delay ?direction ?timingFunction
+           ?fillMode ?playState ?iterationCount ?name () )
 
 let animations x =
   Rule.declaration

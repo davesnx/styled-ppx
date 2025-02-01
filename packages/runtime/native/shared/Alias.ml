@@ -267,7 +267,7 @@ end
 
 module Animation = struct
   (* backwards compatibility *)
-  let shorthand = Css_types.Animation.make
+  let shorthand = Css_types.Animation.Value.make
 end
 
 module Transition = struct

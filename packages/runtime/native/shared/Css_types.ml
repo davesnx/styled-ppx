@@ -974,11 +974,13 @@ module AnimationName : sig
   type t
 
   val make : string -> t
+  val none : t
   val toString : t -> string
 end = struct
   type t = string
 
   let make x = x
+  let none = {js|none|js}
   let toString (x : t) = x
 end
 
@@ -1050,29 +1052,20 @@ module AnimationPlayState = struct
     | #Cascading.t as c -> Cascading.toString c
 end
 
-module SingleTransitionProperty = struct
-  type t =
-    [ `all
-    | `ident of string
-    ]
+module TransitionProperty : sig
+  type t
 
-  let toString (x : t) = match x with `all -> {js|all|js} | `ident x -> x
-end
+  val make : string -> t
+  val none : t
+  val all : t
+  val toString : t -> string
+end = struct
+  type t = string
 
-module TransitionProperty = struct
-  type t =
-    [ None.t
-    | SingleTransitionProperty.t
-    | Cascading.t
-    | Var.t
-    ]
-
-  let toString (x : t) =
-    match x with
-    | #None.t -> None.toString
-    | #SingleTransitionProperty.t as x -> SingleTransitionProperty.toString x
-    | #Cascading.t as x -> Cascading.toString x
-    | #Var.t as x -> Var.toString x
+  let make x = x
+  let toString (x : t) = x
+  let none = {js|none|js}
+  let all = {js|all|js}
 end
 
 module Transition = struct
@@ -1081,13 +1074,13 @@ module Transition = struct
       duration : Time.t;
       delay : Time.t;
       timingFunction : TimingFunction.t;
-      property : [ SingleTransitionProperty.t | None.t ];
+      property : TransitionProperty.t;
     }
 
     type t = [ `value of value ]
 
     let make ?(duration = `ms 0) ?(delay = `ms 0) ?(timingFunction = `ease)
-      ?(property = `all) () =
+      ?(property = TransitionProperty.make "all") () =
       `value { duration; delay; timingFunction; property }
 
     let toString (x : t) =
@@ -1099,11 +1092,7 @@ module Transition = struct
         ^ {js| |js}
         ^ Time.toString v.delay
         ^ {js| |js}
-        ^
-        (match v.property with
-        | #SingleTransitionProperty.t as x ->
-          SingleTransitionProperty.toString x
-        | #None.t -> None.toString)
+        ^ TransitionProperty.toString v.property
   end
 
   type t =
@@ -1120,58 +1109,64 @@ module Transition = struct
 end
 
 module Animation = struct
-  type animationValue = {
-    duration : Time.t;
-    delay : Time.t;
-    direction : AnimationDirection.t;
-    timingFunction : TimingFunction.t;
-    fillMode : AnimationFillMode.t;
-    playState : AnimationPlayState.t;
-    iterationCount : AnimationIterationCount.t;
-    name : AnimationName.t;
-  }
+  module Value = struct
+    type value = {
+      duration : Time.t;
+      delay : Time.t;
+      direction : AnimationDirection.t;
+      timingFunction : TimingFunction.t;
+      fillMode : AnimationFillMode.t;
+      playState : AnimationPlayState.t;
+      iterationCount : AnimationIterationCount.t;
+      name : AnimationName.t;
+    }
+
+    type t = [ `value of value ]
+
+    let make ?(duration = `ms 0) ?(delay = `ms 0) ?(direction = `normal)
+      ?(timingFunction = `ease) ?(fillMode = `none) ?(playState = `running)
+      ?(iterationCount = `count 1.) ?(name = AnimationName.make "none") () =
+      `value
+        {
+          duration;
+          delay;
+          direction;
+          timingFunction;
+          fillMode;
+          playState;
+          iterationCount;
+          name;
+        }
+
+    let toString (x : t) =
+      match x with
+      | `value v ->
+        AnimationName.toString v.name
+        ^ {js| |js}
+        ^ Time.toString v.duration
+        ^ {js| |js}
+        ^ TimingFunction.toString v.timingFunction
+        ^ {js| |js}
+        ^ Time.toString v.delay
+        ^ {js| |js}
+        ^ AnimationIterationCount.toString v.iterationCount
+        ^ {js| |js}
+        ^ AnimationDirection.toString v.direction
+        ^ {js| |js}
+        ^ AnimationFillMode.toString v.fillMode
+        ^ {js| |js}
+        ^ AnimationPlayState.toString v.playState
+  end
 
   type t =
-    [ None.t
-    | `value of animationValue
+    [ Value.t
     | Var.t
     | Cascading.t
     ]
 
-  let make ?(duration = `ms 0) ?(delay = `ms 0) ?(direction = `normal)
-    ?(timingFunction = `ease) ?(fillMode = `none) ?(playState = `running)
-    ?(iterationCount = `count 1.) ?(name = AnimationName.make "none") () =
-    `value
-      {
-        duration;
-        delay;
-        direction;
-        timingFunction;
-        fillMode;
-        playState;
-        iterationCount;
-        name;
-      }
-
   let toString (x : t) =
     match x with
-    | `value v ->
-      AnimationName.toString v.name
-      ^ {js| |js}
-      ^ Time.toString v.duration
-      ^ {js| |js}
-      ^ TimingFunction.toString v.timingFunction
-      ^ {js| |js}
-      ^ Time.toString v.delay
-      ^ {js| |js}
-      ^ AnimationIterationCount.toString v.iterationCount
-      ^ {js| |js}
-      ^ AnimationDirection.toString v.direction
-      ^ {js| |js}
-      ^ AnimationFillMode.toString v.fillMode
-      ^ {js| |js}
-      ^ AnimationPlayState.toString v.playState
-    | #None.t -> None.toString
+    | #Value.t as x -> Value.toString x
     | #Var.t as var -> Var.toString var
     | #Cascading.t as c -> Cascading.toString c
 end

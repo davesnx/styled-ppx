@@ -13,13 +13,22 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
+  File "input.re", line 22, characters 19-49:
+  Error: This expression has type Rule.rule
+         but an expression was expected of type Css_types.Transition.Value.t
+  [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   
-  CSS.transitionProperty(`none);
-  CSS.transitionProperties([|`all|]);
-  CSS.transitionProperties([|`ident({js|width|js})|]);
-  CSS.transitionProperties([|`ident({js|width|js}), `ident({js|height|js})|]);
+  CSS.transitionProperty(CSS.Types.TransitionProperty.none);
+  CSS.transitionProperties([|CSS.Types.TransitionProperty.all|]);
+  CSS.transitionProperties([|
+    CSS.Types.TransitionProperty.make({js|width|js}),
+  |]);
+  CSS.transitionProperties([|
+    CSS.Types.TransitionProperty.make({js|width|js}),
+    CSS.Types.TransitionProperty.make({js|height|js}),
+  |]);
   CSS.transitionDuration(`s(0));
   CSS.transitionDuration(`s(1));
   CSS.transitionDuration(`ms(100));
@@ -37,59 +46,59 @@ If this test fail means that the module is not in sync with the ppx
   CSS.transitionDelay(`s(1));
   CSS.transitionDelay(`s(-1));
   CSS.transitionList([|
-    CSS.Transition.shorthand(
+    CSS.transition(
       ~duration=?Some(`s(2)),
       ~delay=?None,
       ~timingFunction=?None,
-      ~property=?Some(`ident({js|margin-right|js})),
+      ~property=?Some(CSS.Types.TransitionProperty.make({js|margin-right|js})),
       (),
     ),
-    CSS.Transition.shorthand(
+    CSS.transition(
       ~duration=?Some(`ms(500)),
       ~delay=?None,
       ~timingFunction=?None,
-      ~property=?Some(`ident({js|opacity|js})),
+      ~property=?Some(CSS.Types.TransitionProperty.make({js|opacity|js})),
       (),
     ),
   |]);
   CSS.transitionList([|
-    CSS.Transition.shorthand(
+    CSS.transition(
       ~duration=?Some(`s(1)),
       ~delay=?Some(`s(2)),
       ~timingFunction=?Some(`linear),
-      ~property=?Some(`ident({js|width|js})),
+      ~property=?Some(CSS.Types.TransitionProperty.make({js|width|js})),
       (),
     ),
   |]);
   CSS.transitionList([|
-    CSS.Transition.shorthand(
+    CSS.transition(
       ~duration=?None,
       ~delay=?None,
       ~timingFunction=?None,
-      ~property=?Some(`none),
+      ~property=?Some(CSS.Types.TransitionProperty.none),
       (),
     ),
   |]);
   CSS.transitionList([|
-    CSS.Transition.shorthand(
+    CSS.transition(
       ~duration=?None,
       ~delay=?None,
       ~timingFunction=?None,
-      ~property=?Some(`ident({js|margin-right|js})),
+      ~property=?Some(CSS.Types.TransitionProperty.make({js|margin-right|js})),
       (),
     ),
   |]);
   CSS.transitionList([|
-    CSS.Transition.shorthand(
+    CSS.transition(
       ~duration=?None,
       ~delay=?None,
       ~timingFunction=?Some(`easeIn),
-      ~property=?Some(`ident({js|margin-right|js})),
+      ~property=?Some(CSS.Types.TransitionProperty.make({js|margin-right|js})),
       (),
     ),
   |]);
   CSS.transitionList([|
-    CSS.Transition.shorthand(
+    CSS.transition(
       ~duration=?Some(`ms(500)),
       ~delay=?None,
       ~timingFunction=?None,
@@ -98,7 +107,7 @@ If this test fail means that the module is not in sync with the ppx
     ),
   |]);
   CSS.transitionList([|
-    CSS.Transition.shorthand(
+    CSS.transition(
       ~duration=?Some(`ms(200)),
       ~delay=?Some(`ms(500)),
       ~timingFunction=?None,
@@ -107,7 +116,7 @@ If this test fail means that the module is not in sync with the ppx
     ),
   |]);
   CSS.transitionList([|
-    CSS.Transition.shorthand(
+    CSS.transition(
       ~duration=?None,
       ~delay=?None,
       ~timingFunction=?Some(`linear),
@@ -116,34 +125,34 @@ If this test fail means that the module is not in sync with the ppx
     ),
   |]);
   CSS.transitionList([|
-    CSS.Transition.shorthand(
+    CSS.transition(
       ~duration=?Some(`s(1)),
       ~delay=?Some(`ms(500)),
       ~timingFunction=?Some(`linear),
-      ~property=?Some(`ident({js|margin-right|js})),
+      ~property=?Some(CSS.Types.TransitionProperty.make({js|margin-right|js})),
       (),
     ),
   |]);
   
-  let property = `ident("margin-right");
-  let property2 = `all;
+  let property = CSS.Types.TransitionProperty.make("margin-right");
+  let property2 = CSS.Types.TransitionProperty.all;
   let timingFunction = `easeOut;
   let duration = `ms(200);
   let delay = `s(3);
-  let property3 = `ident("opacity");
+  let property3 = CSS.Types.TransitionProperty.make("opacity");
   
-  CSS.transitionList([|CSS.Transition.shorthand(~property, ())|]);
-  CSS.transitionList([|CSS.Transition.shorthand(~property=property2, ())|]);
+  CSS.transitionList([|CSS.transition(~property, ())|]);
+  CSS.transitionList([|CSS.transition(~property=property2, ())|]);
   
   CSS.transitionList([|
-    CSS.Transition.shorthand(~duration, ~delay, ~timingFunction, ~property, ()),
+    CSS.transition(~duration, ~delay, ~timingFunction, ~property, ()),
   |]);
   CSS.transitionList([|
-    CSS.Transition.shorthand(~duration, ~delay, ~timingFunction, ~property, ()),
-    CSS.Transition.shorthand(~duration=`s(0), ~property=property3, ()),
+    CSS.transition(~duration, ~delay, ~timingFunction, ~property, ()),
+    CSS.transition(~duration=`s(0), ~property=property3, ()),
   |]);
   CSS.transitionList([|
-    CSS.Transition.shorthand(
+    CSS.transition(
       ~duration=`ms(200),
       ~delay=`s(3),
       ~timingFunction=`easeOut,
@@ -152,7 +161,7 @@ If this test fail means that the module is not in sync with the ppx
     ),
   |]);
   CSS.transitionList([|
-    CSS.Transition.shorthand(
+    CSS.transition(
       ~duration=`ms(200),
       ~delay=`s(3),
       ~timingFunction,
@@ -161,116 +170,87 @@ If this test fail means that the module is not in sync with the ppx
     ),
   |]);
   CSS.transitionList([|
-    CSS.Transition.shorthand(
-      ~duration,
-      ~delay=`s(3),
-      ~timingFunction,
-      ~property,
-      (),
-    ),
+    CSS.transition(~duration, ~delay=`s(3), ~timingFunction, ~property, ()),
   |]);
   CSS.transitionList([|
-    CSS.Transition.shorthand(
+    CSS.transition(
       ~duration,
       ~delay,
       ~timingFunction=`easeOut,
-      ~property=`ident({js|margin-right|js}),
+      ~property=CSS.Types.TransitionProperty.make({js|margin-right|js}),
       (),
     ),
   |]);
   CSS.transitionList([|
-    CSS.Transition.shorthand(
-      ~duration,
-      ~delay,
-      ~timingFunction=`easeOut,
-      ~property,
-      (),
-    ),
+    CSS.transition(~duration, ~delay, ~timingFunction=`easeOut, ~property, ()),
   |]);
   CSS.transitionList([|
-    CSS.Transition.shorthand(
+    CSS.transition(
       ~duration=`ms(200),
       ~delay=`s(3),
       ~timingFunction,
-      ~property=`ident({js|margin-right|js}),
+      ~property=CSS.Types.TransitionProperty.make({js|margin-right|js}),
       (),
     ),
   |]);
   CSS.transitionList([|
-    CSS.Transition.shorthand(
+    CSS.transition(
       ~duration=`ms(200),
       ~delay,
       ~timingFunction=`easeOut,
-      ~property=`ident({js|margin-right|js}),
+      ~property=CSS.Types.TransitionProperty.make({js|margin-right|js}),
       (),
     ),
   |]);
   CSS.transitionList([|
-    CSS.Transition.shorthand(
-      ~duration=`ms(200),
-      ~timingFunction=`easeIn,
-      ~property,
-      (),
-    ),
+    CSS.transition(~duration=`ms(200), ~timingFunction=`easeIn, ~property, ()),
   |]);
   CSS.transitionList([|
-    CSS.Transition.shorthand(
-      ~duration=`ms(200),
-      ~timingFunction,
-      ~property,
-      (),
-    ),
+    CSS.transition(~duration=`ms(200), ~timingFunction, ~property, ()),
   |]);
   CSS.transitionList([|
-    CSS.Transition.shorthand(
+    CSS.transition(
       ~duration,
       ~timingFunction=`easeIn,
-      ~property=`ident({js|margin-right|js}),
+      ~property=CSS.Types.TransitionProperty.make({js|margin-right|js}),
       (),
     ),
   |]);
   CSS.transitionList([|
-    CSS.Transition.shorthand(~duration, ~timingFunction=`easeIn, ~property, ()),
+    CSS.transition(~duration, ~timingFunction=`easeIn, ~property, ()),
   |]);
   CSS.transitionList([|
-    CSS.Transition.shorthand(
+    CSS.transition(
       ~duration=`ms(200),
       ~timingFunction,
-      ~property=`ident({js|margin-right|js}),
+      ~property=CSS.Types.TransitionProperty.make({js|margin-right|js}),
       (),
     ),
   |]);
   CSS.transitionList([|
-    CSS.Transition.shorthand(
-      ~duration=`ms(200),
-      ~timingFunction=`easeIn,
-      ~property,
-      (),
-    ),
+    CSS.transition(~duration=`ms(200), ~timingFunction=`easeIn, ~property, ()),
   |]);
   CSS.transitionList([|
-    CSS.Transition.shorthand(
+    CSS.transition(
       ~duration,
       ~timingFunction=`easeIn,
-      ~property=`ident({js|margin-right|js}),
+      ~property=CSS.Types.TransitionProperty.make({js|margin-right|js}),
       (),
     ),
   |]);
   CSS.transitionList([|
-    CSS.Transition.shorthand(
+    CSS.transition(
       ~duration=`ms(200),
       ~timingFunction,
-      ~property=`ident({js|margin-right|js}),
+      ~property=CSS.Types.TransitionProperty.make({js|margin-right|js}),
       (),
     ),
   |]);
+  CSS.transitionList([|CSS.transition(~duration=`ms(200), ~property, ())|]);
   CSS.transitionList([|
-    CSS.Transition.shorthand(~duration=`ms(200), ~property, ()),
-  |]);
-  CSS.transitionList([|
-    CSS.Transition.shorthand(
+    CSS.transition(
       ~duration,
-      ~property=`ident({js|margin-right|js}),
+      ~property=CSS.Types.TransitionProperty.make({js|margin-right|js}),
       (),
     ),
   |]);

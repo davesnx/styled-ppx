@@ -3102,12 +3102,12 @@ let backface_visibility =
     [%expr CSS.backfaceVisibility]
   );
 
-let render_single_transition_property_no_interp = (~loc, value) => {
-  switch (value) {
-  | `All => [%expr `all]
-  | `Custom_ident(v) => [%expr `ident([%e render_string(~loc, v)])]
-  };
-};
+let render_single_transition_property_no_interp = (~loc) =>
+  fun
+  | `All => [%expr CSS.Types.TransitionProperty.all]
+  | `Custom_ident(v) => [%expr
+      CSS.Types.TransitionProperty.make([%e render_string(~loc, v)])
+    ];
 
 let render_single_transition_property = (~loc, value) => {
   switch (value) {
@@ -3121,7 +3121,9 @@ let render_single_transition_property = (~loc, value) => {
 let transition_property =
   polymorphic(Property_parser.property_transition_property, (~loc) =>
     fun
-    | `None => [[%expr CSS.transitionProperty(`none)]]
+    | `None => [
+        [%expr CSS.transitionProperty(CSS.Types.TransitionProperty.none)],
+      ]
     | `Single_transition_property(transition_properties) => {
         let value =
           transition_properties
@@ -3220,7 +3222,7 @@ let transition_delay =
 
 let render_transition_property = (~loc) =>
   fun
-  | `None => [%expr `none]
+  | `None => [%expr CSS.Types.TransitionProperty.none]
   | `Single_transition_property_no_interp(x) =>
     render_single_transition_property_no_interp(~loc, x)
   | `Single_transition_property(x) =>
@@ -3230,14 +3232,14 @@ let render_single_transition = (~loc) =>
   fun
   | `Xor(property) => {
       [%expr
-       CSS.Transition.shorthand(
+       CSS.transition(
          ~property=[%e render_transition_property(~loc, property)],
          (),
        )];
     }
   | `Static_0(property, duration) => {
       [%expr
-       CSS.Transition.shorthand(
+       CSS.transition(
          ~duration=[%e render_extended_time(~loc, duration)],
          ~property=[%e render_transition_property(~loc, property)],
          (),
@@ -3245,7 +3247,7 @@ let render_single_transition = (~loc) =>
     }
   | `Static_1(property, duration, timingFunction) => {
       [%expr
-       CSS.Transition.shorthand(
+       CSS.transition(
          ~duration=[%e render_extended_time(~loc, duration)],
          ~timingFunction=[%e render_timing(~loc, timingFunction)],
          ~property=[%e render_transition_property(~loc, property)],
@@ -3254,7 +3256,7 @@ let render_single_transition = (~loc) =>
     }
   | `Static_2(property, duration, timingFunction, delay) => {
       [%expr
-       CSS.Transition.shorthand(
+       CSS.transition(
          ~duration=[%e render_extended_time(~loc, duration)],
          ~delay=[%e render_extended_time(~loc, delay)],
          ~timingFunction=[%e render_timing(~loc, timingFunction)],
@@ -3269,7 +3271,7 @@ let render_single_transition_no_interp =
       (property, delay, timingFunction, duration): Types.single_transition_no_interp,
     ) => {
   [%expr
-   CSS.Transition.shorthand(
+   CSS.transition(
      ~duration=?[%e
        render_option(~loc, render_extended_time_no_interp, duration)
      ],
@@ -3288,18 +3290,15 @@ let transition =
   monomorphic(
     Property_parser.property_transition,
     (~loc) => [%expr CSS.transitionList],
-    (~loc) =>
-      fun
-      | [] => failwith("impossible")
-      | transitions =>
-        transitions
-        |> List.map(
-             fun
-             | `Single_transition(x) => render_single_transition(~loc, x)
-             | `Single_transition_no_interp(x) =>
-               render_single_transition_no_interp(~loc, x),
-           )
-        |> Builder.pexp_array(~loc),
+    (~loc, transitions) =>
+      transitions
+      |> List.map(
+           fun
+           | `Single_transition(x) => render_single_transition(~loc, x)
+           | `Single_transition_no_interp(x) =>
+             render_single_transition_no_interp(~loc, x),
+         )
+      |> Builder.pexp_array(~loc),
   );
 
 let render_keyframes_name = (~loc) =>
@@ -3309,9 +3308,7 @@ let render_keyframes_name = (~loc) =>
 
 let render_animation_name = (~loc) =>
   fun
-  | `None => [%expr
-      CSS.Types.AnimationName.make([%e render_string(~loc, "none")])
-    ]
+  | `None => [%expr CSS.Types.AnimationName.none]
   | `Keyframes_name(name) => {
       [%expr
        CSS.Types.AnimationName.make([%e render_keyframes_name(~loc, name)])];
@@ -3320,19 +3317,13 @@ let render_animation_name = (~loc) =>
 
 // css-animation-1
 let animation_name =
-  polymorphic(Property_parser.property_animation_name, (~loc) =>
-    fun
-    | [one] => {
-        let value = render_animation_name(~loc, one);
-        [[%expr CSS.animationName([%e value])]];
-      }
-    | many => {
-        let values =
-          many
-          |> List.map(render_animation_name(~loc))
-          |> Builder.pexp_array(~loc);
-        [[%expr CSS.animationNames([%e values])]];
-      }
+  monomorphic(
+    Property_parser.property_animation_name,
+    (~loc) => [%expr CSS.animationNames],
+    (~loc, names) =>
+      names
+      |> List.map(render_animation_name(~loc))
+      |> Builder.pexp_array(~loc),
   );
 
 let animation_duration =
@@ -3461,9 +3452,7 @@ let render_single_animation =
      ~iterationCount=?[%e
        render_option(~loc, render_animation_iteration_count, iterationCount)
      ],
-     ~name=[%e
-       render_animation_name(~loc, Option.value(name, ~default=`None))
-     ],
+     ~name=?[%e render_option(~loc, render_animation_name, name)],
      (),
    )];
 };

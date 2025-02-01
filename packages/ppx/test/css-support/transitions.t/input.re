@@ -30,12 +30,12 @@
 [%css {|transition: 1s .5s linear margin-right|}];
 
 // Interpolation
-let property = `ident("margin-right");
-let property2 = `all;
+let property = CSS.Types.TransitionProperty.make("margin-right");
+let property2 = CSS.Types.TransitionProperty.all;
 let timingFunction = `easeOut;
 let duration = `ms(200);
 let delay = `s(3);
-let property3 = `ident("opacity");
+let property3 = CSS.Types.TransitionProperty.make("opacity");
 
 [%css {|transition: $(property)|}];
 [%css {|transition: $(property2)|}];

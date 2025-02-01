@@ -45,7 +45,7 @@ If this test fail means that the module is not in sync with the ppx
     ~fillMode=?Some(`none),
     ~playState=?None,
     ~iterationCount=?None,
-    ~name=CSS.Types.AnimationName.make({js|none|js}),
+    ~name=?None,
     (),
   );
   CSS.unsafe({js|appearance|js}, {js|none|js});
