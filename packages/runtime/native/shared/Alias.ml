@@ -146,7 +146,7 @@ module Calc = struct
   let ( * ) a b = `calc (`mult (a, b))
 end
 
-let size = BackgroundSize.size
+let size = BackgroundSize.Value.size
 let all = `all
 let backwards = `backwards
 let baseline = `baseline

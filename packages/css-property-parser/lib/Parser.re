@@ -117,9 +117,9 @@ and bg_position = [%value.rec
 ]
 /* one_bg_size isn't part of the spec, helps us with Type generation */
 and one_bg_size = [%value.rec
-  "[ <extended-length> | <extended-percentage> | 'auto' ]{1,2}"
+  "[ <extended-length> | <extended-percentage> | 'auto' ] [ <extended-length> | <extended-percentage> | 'auto' ]?"
 ]
-and bg_size = [%value.rec "<one_bg_size> | 'cover' | 'contain'"]
+and bg_size = [%value.rec "<one-bg-size> | 'cover' | 'contain'"]
 and blend_mode = [%value.rec
   "'normal' | 'multiply' | 'screen' | 'overlay' | 'darken' | 'lighten' | 'color-dodge' | 'color-burn' | 'hard-light' | 'soft-light' | 'difference' | 'exclusion' | 'hue' | 'saturation' | 'color' | 'luminosity'"
 ]

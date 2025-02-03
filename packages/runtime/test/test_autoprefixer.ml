@@ -41,4 +41,10 @@ let backdrop_filter =
 
 let tests =
   ( "Autoprefixer",
-    [ (* text_size_adjust; text_decoration; display_grid; animation_duration; backdrop_filter *) ] )
+    [
+      text_size_adjust;
+      text_decoration;
+      display_grid;
+      animation_duration;
+      backdrop_filter;
+    ] )

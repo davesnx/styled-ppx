@@ -3692,25 +3692,36 @@ module Gradient = struct
 end
 
 module BackgroundSize = struct
+  module Value = struct
+    type t =
+      [ `size of [ Length.t | Auto.t ] * [ Length.t | Auto.t ]
+      | Length.t
+      | Auto.t
+      | `cover
+      | `contain
+      ]
+
+    let size (x : [ Length.t | Auto.t ]) (y : [ Length.t | Auto.t ]) =
+      `size (x, y)
+
+    let rec toString (x : t) =
+      match x with
+      | `size (x, y) -> (toString (x :> t) ^ {js| |js}) ^ toString (y :> t)
+      | `cover -> {js|cover|js}
+      | `contain -> {js|contain|js}
+      | #Length.t -> Auto.toString
+      | #Auto.t -> Auto.toString
+  end
+
   type t =
-    [ None.t
-    | `size of Length.t * Length.t
-    | Auto.t
-    | `cover
-    | `contain
+    [ Value.t
     | Var.t
     | Cascading.t
     ]
 
-  let size (x : Length.t) (y : Length.t) = `size (x, y)
-
   let toString (x : t) =
     match x with
-    | `size (x, y) -> (Length.toString x ^ {js| |js}) ^ Length.toString y
-    | `cover -> {js|cover|js}
-    | `contain -> {js|contain|js}
-    | #None.t -> None.toString
-    | #Auto.t -> Auto.toString
+    | #Value.t as x -> Value.toString x
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
 end

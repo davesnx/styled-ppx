@@ -477,17 +477,13 @@ let render_one_bg_size = (~loc, value) => {
 
 let render_bg_size = (~loc, value: Types.bg_size) =>
   switch (value) {
-  /* bs-css doesn't support auto in each size */
-  | `One_bg_size([`Auto, _]) => raise(Unsupported_feature)
-  | `One_bg_size([_, `Auto]) => raise(Unsupported_feature)
-  | `One_bg_size([one, two]) =>
+  | `One_bg_size(one, None) => render_one_bg_size(~loc, one)
+  | `One_bg_size(one, Some(two)) =>
     [%expr
      `size((
        [%e render_one_bg_size(~loc, one)],
        [%e render_one_bg_size(~loc, two)],
      ))]
-  /* bs-css doesn't support one size */
-  | `One_bg_size(_) => raise(Unsupported_feature)
   | `Cover => variant_to_expression(~loc, `Cover)
   | `Contain => variant_to_expression(~loc, `Contain)
   };

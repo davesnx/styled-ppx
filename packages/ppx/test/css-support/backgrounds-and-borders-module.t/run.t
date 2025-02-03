@@ -50,13 +50,13 @@ If this test fail means that the module is not in sync with the ppx
   CSS.backgroundOrigin(`borderBox);
   CSS.backgroundOrigin(`paddingBox);
   CSS.backgroundOrigin(`contentBox);
-  CSS.unsafe({js|backgroundSize|js}, {js|auto|js});
+  CSS.backgroundSize(`auto);
   CSS.backgroundSize(`cover);
   CSS.backgroundSize(`contain);
-  CSS.unsafe({js|backgroundSize|js}, {js|10px|js});
-  CSS.unsafe({js|backgroundSize|js}, {js|50%|js});
-  CSS.unsafe({js|backgroundSize|js}, {js|10px auto|js});
-  CSS.unsafe({js|backgroundSize|js}, {js|auto 10%|js});
+  CSS.backgroundSize(`pxFloat(10.));
+  CSS.backgroundSize(`percent(50.));
+  CSS.backgroundSize(`size((`pxFloat(10.), `auto)));
+  CSS.backgroundSize(`size((`auto, `percent(10.))));
   CSS.backgroundSize(`size((`em(50.), `percent(50.))));
   
   CSS.backgroundPosition(`hvOffset((`left, `top)));
