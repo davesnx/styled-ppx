@@ -2463,7 +2463,7 @@ let render_font_weight = (~loc) =>
   | `Font_weight_absolute(`Normal) => variant_to_expression(~loc, `Normal)
   | `Font_weight_absolute(`Bold) => variant_to_expression(~loc, `Bold)
   | `Font_weight_absolute(`Integer(num)) => [%expr
-      `numInt([%e render_integer(~loc, num)])
+      `num([%e render_integer(~loc, num)])
     ];
 
 let font_weight =
@@ -3136,12 +3136,11 @@ let transition_property =
 let transition_duration =
   monomorphic(
     Property_parser.property_transition_duration,
-    (~loc) => [%expr CSS.transitionDuration],
-    (~loc) =>
-      fun
-      | [] => [%expr `none]
-      | [one] => render_extended_time(~loc, one)
-      | _ => raise(Unsupported_feature),
+    (~loc) => [%expr CSS.transitionDurations],
+    (~loc, durations) =>
+      durations
+      |> List.map(render_extended_time(~loc))
+      |> Builder.pexp_array(~loc),
   );
 
 let widows =
@@ -3202,22 +3201,42 @@ let render_timing = (~loc) =>
 let transition_timing_function =
   monomorphic(
     Property_parser.property_transition_timing_function,
-    (~loc) => [%expr CSS.transitionTimingFunction],
-    (~loc) =>
-      fun
-      | [t] => render_timing(~loc, t)
-      | _ => raise(Unsupported_feature),
+    (~loc) => [%expr CSS.transitionTimingFunctions],
+    (~loc, timingFunctions) =>
+      timingFunctions
+      |> List.map(render_timing(~loc))
+      |> Builder.pexp_array(~loc),
   );
 
 let transition_delay =
   monomorphic(
     Property_parser.property_transition_delay,
-    (~loc) => [%expr CSS.transitionDelay],
-    (~loc) =>
-      fun
-      | [`Time(t)] => render_time_as_int(~loc, t)
-      | [`Interpolation(v)] => render_variable(~loc, v)
-      | _ => raise(Unsupported_feature),
+    (~loc) => [%expr CSS.transitionDelays],
+    (~loc, delays) =>
+      delays
+      |> List.map(render_extended_time(~loc))
+      |> Builder.pexp_array(~loc),
+  );
+
+let render_transition_behavior_value_no_interp = (~loc) =>
+  fun
+  | `Normal => [%expr `normal]
+  | `Allow_discrete => [%expr `allowDiscrete];
+
+let render_transition_behavior_value = (~loc) =>
+  fun
+  | #Types.transition_behavior_value_no_interp as x =>
+    render_transition_behavior_value_no_interp(~loc, x)
+  | `Interpolation(v) => render_variable(~loc, v);
+
+let transition_behavior =
+  monomorphic(
+    Property_parser.property_transition_behavior,
+    (~loc) => [%expr CSS.transitionBehaviors],
+    (~loc, behaviors) =>
+      behaviors
+      |> List.map(render_transition_behavior_value(~loc))
+      |> Builder.pexp_array(~loc),
   );
 
 let render_transition_property = (~loc) =>
@@ -3232,14 +3251,14 @@ let render_single_transition = (~loc) =>
   fun
   | `Xor(property) => {
       [%expr
-       CSS.transition(
+       CSS.Types.Transition.Value.make(
          ~property=[%e render_transition_property(~loc, property)],
          (),
        )];
     }
   | `Static_0(property, duration) => {
       [%expr
-       CSS.transition(
+       CSS.Types.Transition.Value.make(
          ~duration=[%e render_extended_time(~loc, duration)],
          ~property=[%e render_transition_property(~loc, property)],
          (),
@@ -3247,7 +3266,7 @@ let render_single_transition = (~loc) =>
     }
   | `Static_1(property, duration, timingFunction) => {
       [%expr
-       CSS.transition(
+       CSS.Types.Transition.Value.make(
          ~duration=[%e render_extended_time(~loc, duration)],
          ~timingFunction=[%e render_timing(~loc, timingFunction)],
          ~property=[%e render_transition_property(~loc, property)],
@@ -3256,7 +3275,18 @@ let render_single_transition = (~loc) =>
     }
   | `Static_2(property, duration, timingFunction, delay) => {
       [%expr
-       CSS.transition(
+       CSS.Types.Transition.Value.make(
+         ~duration=[%e render_extended_time(~loc, duration)],
+         ~delay=[%e render_extended_time(~loc, delay)],
+         ~timingFunction=[%e render_timing(~loc, timingFunction)],
+         ~property=[%e render_transition_property(~loc, property)],
+         (),
+       )];
+    }
+  | `Static_3(property, duration, timingFunction, delay, behavior) => {
+      [%expr
+       CSS.Types.Transition.Value.make(
+         ~behavior=[%e render_transition_behavior_value(~loc, behavior)],
          ~duration=[%e render_extended_time(~loc, duration)],
          ~delay=[%e render_extended_time(~loc, delay)],
          ~timingFunction=[%e render_timing(~loc, timingFunction)],
@@ -3268,10 +3298,17 @@ let render_single_transition = (~loc) =>
 let render_single_transition_no_interp =
     (
       ~loc,
-      (property, delay, timingFunction, duration): Types.single_transition_no_interp,
+      (property, delay, timingFunction, duration, behavior): Types.single_transition_no_interp,
     ) => {
   [%expr
-   CSS.transition(
+   CSS.Types.Transition.Value.make(
+     ~behavior=?[%e
+       render_option(
+         ~loc,
+         render_transition_behavior_value_no_interp,
+         behavior,
+       )
+     ],
      ~duration=?[%e
        render_option(~loc, render_extended_time_no_interp, duration)
      ],
@@ -3289,7 +3326,7 @@ let render_single_transition_no_interp =
 let transition =
   monomorphic(
     Property_parser.property_transition,
-    (~loc) => [%expr CSS.transitionList],
+    (~loc) => [%expr CSS.transitions],
     (~loc, transitions) =>
       transitions
       |> List.map(
@@ -3329,99 +3366,234 @@ let animation_name =
 let animation_duration =
   monomorphic(
     Property_parser.property_animation_duration,
-    (~loc) => [%expr CSS.animationDuration],
-    (~loc) =>
-      fun
-      | [] => [%expr `ms(0)]
-      | [one] => render_extended_time(~loc, one)
-      | _ => raise(Unsupported_feature),
+    (~loc) => [%expr CSS.animationDurations],
+    (~loc, durations) =>
+      durations
+      |> List.map(render_extended_time(~loc))
+      |> Builder.pexp_array(~loc),
   );
 
 let animation_timing_function =
   monomorphic(
     Property_parser.property_animation_timing_function,
-    (~loc) => [%expr CSS.animationTimingFunction],
-    (~loc) =>
-      fun
-      | [t] => render_timing(~loc, t)
-      | _ => raise(Unsupported_feature),
+    (~loc) => [%expr CSS.animationTimingFunctions],
+    (~loc, timingFunctions) =>
+      timingFunctions
+      |> List.map(render_timing(~loc))
+      |> Builder.pexp_array(~loc),
   );
 
-let render_animation_iteration_count = (~loc) =>
+let render_single_animation_iteration_count_no_interp = (~loc) =>
   fun
   | `Infinite => [%expr `infinite]
   | `Number(n) => [%expr `count([%e render_float(~loc, n)])];
 
+let render_single_animation_iteration_count = (~loc) =>
+  fun
+  | #Types.single_animation_iteration_count_no_interp as x =>
+    render_single_animation_iteration_count_no_interp(~loc, x)
+  | `Interpolation(v) => render_variable(~loc, v);
+
 let animation_iteration_count =
   monomorphic(
     Property_parser.property_animation_iteration_count,
-    (~loc) => [%expr CSS.animationIterationCount],
-    (~loc) =>
-      fun
-      | [one] => render_animation_iteration_count(~loc, one)
-      | _ => raise(Unsupported_feature),
+    (~loc) => [%expr CSS.animationIterationCounts],
+    (~loc, iterationCounts) =>
+      iterationCounts
+      |> List.map(render_single_animation_iteration_count(~loc))
+      |> Builder.pexp_array(~loc),
   );
 
-let render_animation_direction = (~loc) =>
+let render_single_animation_direction_no_interp = (~loc) =>
   fun
   | `Normal => [%expr `normal]
   | `Reverse => [%expr `reverse]
   | `Alternate => [%expr `alternate]
   | `Alternate_reverse => [%expr `alternateReverse];
 
+let render_single_animation_direction = (~loc) =>
+  fun
+  | #Types.single_animation_direction_no_interp as x =>
+    render_single_animation_direction_no_interp(~loc, x)
+  | `Interpolation(v) => render_variable(~loc, v);
+
 let animation_direction =
   monomorphic(
     Property_parser.property_animation_direction,
-    (~loc) => [%expr CSS.animationDirection],
-    (~loc) =>
-      fun
-      | [one] => render_animation_direction(~loc, one)
-      | _ => raise(Unsupported_feature),
+    (~loc) => [%expr CSS.animationDirections],
+    (~loc, directions) =>
+      directions
+      |> List.map(render_single_animation_direction(~loc))
+      |> Builder.pexp_array(~loc),
   );
 
-let render_animation_play_state = (~loc) =>
+let render_single_animation_play_state_no_interp = (~loc) =>
   fun
   | `Paused => [%expr `paused]
   | `Running => [%expr `running];
 
+let render_single_animation_play_state = (~loc) =>
+  fun
+  | #Types.single_animation_play_state_no_interp as x =>
+    render_single_animation_play_state_no_interp(~loc, x)
+  | `Interpolation(v) => render_variable(~loc, v);
+
 let animation_play_state =
   monomorphic(
     Property_parser.property_animation_play_state,
-    (~loc) => [%expr CSS.animationPlayState],
-    (~loc) =>
-      fun
-      | [one] => render_animation_play_state(~loc, one)
-      | _ => raise(Unsupported_feature),
+    (~loc) => [%expr CSS.animationPlayStates],
+    (~loc, playStates) =>
+      playStates
+      |> List.map(render_single_animation_play_state(~loc))
+      |> Builder.pexp_array(~loc),
   );
 
 let animation_delay =
   monomorphic(
     Property_parser.property_animation_delay,
-    (~loc) => [%expr CSS.animationDelay],
-    (~loc) =>
-      fun
-      | [one] => render_extended_time(~loc, one)
-      | _ => raise(Unsupported_feature),
+    (~loc) => [%expr CSS.animationDelays],
+    (~loc, delays) =>
+      delays
+      |> List.map(render_extended_time(~loc))
+      |> Builder.pexp_array(~loc),
   );
 
-let render_animation_fill_mode = (~loc) =>
+let render_single_animation_fill_mode_no_interp = (~loc) =>
   fun
   | `None => [%expr `none]
   | `Forwards => [%expr `forwards]
   | `Backwards => [%expr `backwards]
   | `Both => [%expr `both];
 
+let render_single_animation_fill_mode = (~loc) =>
+  fun
+  | #Types.single_animation_fill_mode_no_interp as x =>
+    render_single_animation_fill_mode_no_interp(~loc, x)
+  | `Interpolation(v) => render_variable(~loc, v);
+
 let animation_fill_mode =
   monomorphic(
     Property_parser.property_animation_fill_mode,
-    (~loc) => [%expr CSS.animationFillMode],
-    (~loc) =>
-      fun
-      | [one] => render_animation_fill_mode(~loc, one)
-      | _ => raise(Unsupported_feature),
+    (~loc) => [%expr CSS.animationFillModes],
+    (~loc, fillModes) =>
+      fillModes
+      |> List.map(render_single_animation_fill_mode(~loc))
+      |> Builder.pexp_array(~loc),
   );
 
-let render_single_animation =
+let render_single_animation = (~loc) =>
+  fun
+  | `Xor(name) => [%expr
+      CSS.Types.Animation.Value.make(
+        ~name=[%e render_animation_name(~loc, name)],
+        (),
+      )
+    ]
+  | `Static_0(name, duration) => [%expr
+      CSS.Types.Animation.Value.make(
+        ~name=[%e render_animation_name(~loc, name)],
+        ~duration=[%e render_extended_time(~loc, duration)],
+        (),
+      )
+    ]
+  | `Static_1(name, duration, timingFunction) => [%expr
+      CSS.Types.Animation.Value.make(
+        ~name=[%e render_animation_name(~loc, name)],
+        ~duration=[%e render_extended_time(~loc, duration)],
+        ~timingFunction=[%e render_timing(~loc, timingFunction)],
+        (),
+      )
+    ]
+  | `Static_2(name, duration, timingFunction, delay) => [%expr
+      CSS.Types.Animation.Value.make(
+        ~name=[%e render_animation_name(~loc, name)],
+        ~duration=[%e render_extended_time(~loc, duration)],
+        ~timingFunction=[%e render_timing(~loc, timingFunction)],
+        ~delay=[%e render_extended_time(~loc, delay)],
+        (),
+      )
+    ]
+  | `Static_3(name, duration, timingFunction, delay, iterationCount) => [%expr
+      CSS.Types.Animation.Value.make(
+        ~name=[%e render_animation_name(~loc, name)],
+        ~duration=[%e render_extended_time(~loc, duration)],
+        ~timingFunction=[%e render_timing(~loc, timingFunction)],
+        ~delay=[%e render_extended_time(~loc, delay)],
+        ~iterationCount=[%e
+          render_single_animation_iteration_count(~loc, iterationCount)
+        ],
+        (),
+      )
+    ]
+  | `Static_4(
+      name,
+      duration,
+      timingFunction,
+      delay,
+      iterationCount,
+      direction,
+    ) => [%expr
+      CSS.Types.Animation.Value.make(
+        ~name=[%e render_animation_name(~loc, name)],
+        ~duration=[%e render_extended_time(~loc, duration)],
+        ~timingFunction=[%e render_timing(~loc, timingFunction)],
+        ~delay=[%e render_extended_time(~loc, delay)],
+        ~iterationCount=[%e
+          render_single_animation_iteration_count(~loc, iterationCount)
+        ],
+        ~direction=[%e render_single_animation_direction(~loc, direction)],
+        (),
+      )
+    ]
+
+  | `Static_5(
+      name,
+      duration,
+      timingFunction,
+      delay,
+      iterationCount,
+      direction,
+      fillMode,
+    ) => [%expr
+      CSS.Types.Animation.Value.make(
+        ~name=[%e render_animation_name(~loc, name)],
+        ~duration=[%e render_extended_time(~loc, duration)],
+        ~timingFunction=[%e render_timing(~loc, timingFunction)],
+        ~delay=[%e render_extended_time(~loc, delay)],
+        ~iterationCount=[%e
+          render_single_animation_iteration_count(~loc, iterationCount)
+        ],
+        ~direction=[%e render_single_animation_direction(~loc, direction)],
+        ~fillMode=[%e render_single_animation_fill_mode(~loc, fillMode)],
+        (),
+      )
+    ]
+  | `Static_6(
+      name,
+      duration,
+      timingFunction,
+      delay,
+      iterationCount,
+      direction,
+      fillMode,
+      playState,
+    ) => [%expr
+      CSS.Types.Animation.Value.make(
+        ~name=[%e render_animation_name(~loc, name)],
+        ~duration=[%e render_extended_time(~loc, duration)],
+        ~timingFunction=[%e render_timing(~loc, timingFunction)],
+        ~delay=[%e render_extended_time(~loc, delay)],
+        ~iterationCount=[%e
+          render_single_animation_iteration_count(~loc, iterationCount)
+        ],
+        ~direction=[%e render_single_animation_direction(~loc, direction)],
+        ~fillMode=[%e render_single_animation_fill_mode(~loc, fillMode)],
+        ~playState=[%e render_single_animation_play_state(~loc, playState)],
+        (),
+      )
+    ];
+
+let render_single_animation_no_interp =
     (
       ~loc,
       (
@@ -3433,24 +3605,44 @@ let render_single_animation =
         direction,
         fillMode,
         playState,
-      ): Types.single_animation,
+      ): Types.single_animation_no_interp,
     ) => {
   [%expr
-   CSS.animation(
-     ~duration=?[%e render_option(~loc, render_extended_time, duration)],
-     ~delay=?[%e render_option(~loc, render_extended_time, delay)],
-     ~direction=?[%e
-       render_option(~loc, render_animation_direction, direction)
+   CSS.Types.Animation.Value.make(
+     ~duration=?[%e
+       render_option(~loc, render_extended_time_no_interp, duration)
      ],
-     ~timingFunction=?[%e render_option(~loc, render_timing, timingFunction)],
+     ~delay=?[%e render_option(~loc, render_extended_time_no_interp, delay)],
+     ~direction=?[%e
+       render_option(
+         ~loc,
+         render_single_animation_direction_no_interp,
+         direction,
+       )
+     ],
+     ~timingFunction=?[%e
+       render_option(~loc, render_timing_no_interp, timingFunction)
+     ],
      ~fillMode=?[%e
-       render_option(~loc, render_animation_fill_mode, fillMode)
+       render_option(
+         ~loc,
+         render_single_animation_fill_mode_no_interp,
+         fillMode,
+       )
      ],
      ~playState=?[%e
-       render_option(~loc, render_animation_play_state, playState)
+       render_option(
+         ~loc,
+         render_single_animation_play_state_no_interp,
+         playState,
+       )
      ],
      ~iterationCount=?[%e
-       render_option(~loc, render_animation_iteration_count, iterationCount)
+       render_option(
+         ~loc,
+         render_single_animation_iteration_count_no_interp,
+         iterationCount,
+       )
      ],
      ~name=?[%e render_option(~loc, render_animation_name, name)],
      (),
@@ -3458,12 +3650,20 @@ let render_single_animation =
 };
 
 let animation =
-  polymorphic(Property_parser.property_animation, (~loc) => {
-    fun
-    | [one] => [render_single_animation(~loc, one)]
-    /* TODO: Support multiple animations */
-    | _ => raise(Unsupported_feature)
-  });
+  monomorphic(
+    Property_parser.property_animation,
+    (~loc) => [%expr CSS.animations],
+    (~loc, animations) => {
+      animations
+      |> List.map(
+           fun
+           | `Single_animation(x) => render_single_animation(~loc, x)
+           | `Single_animation_no_interp(x) =>
+             render_single_animation_no_interp(~loc, x),
+         )
+      |> Builder.pexp_array(~loc)
+    },
+  );
 
 let render_ratio = (~loc, value: Types.ratio) => {
   switch (value) {
@@ -3851,10 +4051,7 @@ let rec render_track_repeat = (~loc, repeat: Types.track_repeat) => {
   let items =
     List.append(trackSizesExpr, lineNamesExpr) |> Builder.pexp_array(~loc);
   [%expr
-   `repeatFn((
-     `numInt([%e render_integer(~loc, positiveInteger)]),
-     [%e items],
-   ))];
+   `repeat((`num([%e render_integer(~loc, positiveInteger)]), [%e items]))];
 }
 and render_track_size = (~loc, value: Types.track_size) => {
   switch (value) {
@@ -3866,9 +4063,9 @@ and render_track_size = (~loc, value: Types.track_size) => {
        [%e render_track_breadth(~loc, breadth)],
      ))]
   | `Fit_content(`Extended_length(el)) =>
-    [%expr `fitContentFn([%e render_extended_length(~loc, el)])]
+    [%expr `fitContent([%e render_extended_length(~loc, el)])]
   | `Fit_content(`Extended_percentage(ep)) =>
-    [%expr `fitContentFn([%e render_extended_percentage(~loc, ep)])]
+    [%expr `fitContent([%e render_extended_percentage(~loc, ep)])]
   };
 };
 
@@ -3926,7 +4123,7 @@ let render_fixed_repeat = (~loc, value: Types.fixed_repeat) => {
        })
     |> List.append(lineNamesExpr)
     |> Builder.pexp_array(~loc);
-  [%expr `repeatFn((`numInt([%e number]), [%e fixedSizesExpr]))];
+  [%expr `repeat((`num([%e number]), [%e fixedSizesExpr]))];
 };
 
 let render_auto_repeat = (~loc, value: Types.auto_repeat) => {
@@ -3946,7 +4143,7 @@ let render_auto_repeat = (~loc, value: Types.auto_repeat) => {
        });
   let items =
     List.append(lineNamesExpr, fixedExpr) |> Builder.pexp_array(~loc);
-  [%expr `repeatFn(([%e autosExpr], [%e items]))];
+  [%expr `repeat(([%e autosExpr], [%e items]))];
 };
 
 let render_repeat_fixed = (~loc, value) => {
@@ -3982,13 +4179,10 @@ let render_name_repeat = (~loc, value: Types.name_repeat) => {
     |> List.concat_map(render_line_names(~loc))
     |> Builder.pexp_array(~loc);
   switch (repeatValue) {
-  | `Auto_fill => [[%expr `repeatFn((`autoFill, [%e lineNamesExpr]))]]
+  | `Auto_fill => [[%expr `repeat((`autoFill, [%e lineNamesExpr]))]]
   | `Positive_integer(i) => [
       [%expr
-        `repeatFn((
-          `numInt([%e render_integer(~loc, i)]),
-          [%e lineNamesExpr],
-        ))
+        `repeat((`num([%e render_integer(~loc, i)]), [%e lineNamesExpr]))
       ],
     ]
   };
@@ -4152,23 +4346,25 @@ let render_grid_line = (~loc, x: Types.grid_line) =>
   | `Auto => [%expr `auto]
   | `Custom_ident_without_span_or_auto(x) =>
     [%expr `ident([%e render_string(~loc, x)])]
-  | `And_0(num, None) => [%expr `numInt([%e render_integer(~loc, num)])]
+  | `And_0(num, None) => [%expr `num([%e render_integer(~loc, num)])]
   | `And_0(num, Some(ident)) =>
     [%expr
-     `numIntIdent((
+     `numIdent((
        [%e render_integer(~loc, num)],
        [%e render_string(~loc, ident)],
      ))]
   | `And_1(_span, (Some(num), None)) =>
-    [%expr `spanNumInt([%e render_integer(~loc, num)])]
+    [%expr `span(`num([%e render_integer(~loc, num)]))]
   | `And_1(_span, (None, Some(ident))) =>
-    [%expr `spanIdent([%e render_string(~loc, ident)])]
+    [%expr `span(`ident([%e render_string(~loc, ident)]))]
   | `And_1(_span, (Some(num), Some(ident))) =>
     [%expr
-     `spanNumIntIdent((
-       [%e render_integer(~loc, num)],
-       [%e render_string(~loc, ident)],
-     ))]
+     `span(
+       `numIdent((
+         [%e render_integer(~loc, num)],
+         [%e render_string(~loc, ident)],
+       )),
+     )]
   | `And_1(_span, (None, None)) =>
     raise(Invalid_value("This should've not parse."))
   };
@@ -4392,7 +4588,7 @@ let z_index =
       switch (value) {
       | `Auto => [%expr `auto]
       | `Interpolation(v) => render_variable(~loc, v)
-      | `Integer(i) => [%expr `numInt([%e render_integer(~loc, i)])]
+      | `Integer(i) => [%expr `num([%e render_integer(~loc, i)])]
       }
     },
   );
@@ -5165,13 +5361,10 @@ let mask_position =
   monomorphic(
     Property_parser.property_mask_position,
     (~loc) => [%expr CSS.maskPositions],
-    (~loc) =>
-      fun
-      | [] => failwith("impossible")
-      | positions =>
-        positions
-        |> List.map(render_position(~loc))
-        |> Builder.pexp_array(~loc),
+    (~loc, positions) =>
+      positions
+      |> List.map(render_position(~loc))
+      |> Builder.pexp_array(~loc),
   );
 
 let mask_repeat = unsupportedProperty(Property_parser.property_mask_repeat);
@@ -5683,6 +5876,7 @@ let properties = [
   ("transform-origin", found(transform_origin)),
   ("transform-style", found(transform_style)),
   ("transform", found(transform)),
+  ("transition-behavior", found(transition_behavior)),
   ("transition-delay", found(transition_delay)),
   ("transition-duration", found(transition_duration)),
   ("transition-property", found(transition_property)),

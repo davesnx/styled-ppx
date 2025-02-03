@@ -10,26 +10,68 @@ let alignContent x =
 
 let alignItems x = Rule.declaration ({js|alignItems|js}, AlignItems.toString x)
 let alignSelf x = Rule.declaration ({js|alignSelf|js}, AlignSelf.toString x)
-let animationDelay x = Rule.declaration ({js|animationDelay|js}, Time.toString x)
+
+let animationDelay x =
+  Rule.declaration ({js|animationDelay|js}, AnimationDelay.toString x)
+
+let animationDelays x =
+  Rule.declaration
+    ( {js|animationDelay|js},
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:Time.toString x )
 
 let animationDirection x =
   Rule.declaration ({js|animationDirection|js}, AnimationDirection.toString x)
 
+let animationDirections x =
+  Rule.declaration
+    ( {js|animationDirection|js},
+      Kloth.Array.map_and_join ~sep:{js|, |js}
+        ~f:AnimationDirection.Value.toString x )
+
 let animationDuration x =
-  Rule.declaration ({js|animationDuration|js}, Time.toString x)
+  Rule.declaration ({js|animationDuration|js}, AnimationDuration.toString x)
+
+let animationDurations x =
+  Rule.declaration
+    ( {js|animationDuration|js},
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:Time.toString x )
 
 let animationFillMode x =
   Rule.declaration ({js|animationFillMode|js}, AnimationFillMode.toString x)
+
+let animationFillModes x =
+  Rule.declaration
+    ( {js|animationFillMode|js},
+      Kloth.Array.map_and_join ~sep:{js|, |js}
+        ~f:AnimationFillMode.Value.toString x )
 
 let animationIterationCount x =
   Rule.declaration
     ({js|animationIterationCount|js}, AnimationIterationCount.toString x)
 
+let animationIterationCounts x =
+  Rule.declaration
+    ( {js|animationIterationCount|js},
+      Kloth.Array.map_and_join ~sep:{js|, |js}
+        ~f:AnimationIterationCount.Value.toString x )
+
 let animationPlayState x =
   Rule.declaration ({js|animationPlayState|js}, AnimationPlayState.toString x)
 
+let animationPlayStates x =
+  Rule.declaration
+    ( {js|animationPlayState|js},
+      Kloth.Array.map_and_join ~sep:{js|, |js}
+        ~f:AnimationPlayState.Value.toString x )
+
 let animationTimingFunction x =
-  Rule.declaration ({js|animationTimingFunction|js}, TimingFunction.toString x)
+  Rule.declaration
+    ({js|animationTimingFunction|js}, AnimationTimingFunction.toString x)
+
+let animationTimingFunctions x =
+  Rule.declaration
+    ( {js|animationTimingFunction|js},
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:EasingFunction.toString x )
 
 let backfaceVisibility x =
   Rule.declaration ({js|backfaceVisibility|js}, BackfaceVisibility.toString x)
@@ -768,25 +810,45 @@ let textShadows (x : Shadow.text Shadow.t array) =
 let transformStyle x =
   Rule.declaration ({js|transformStyle|js}, TransformStyle.toString x)
 
-let transitionList x =
+let transitions x =
   Rule.declaration
     ( {js|transition|js},
       Kloth.Array.map_and_join ~sep:{js|, |js} ~f:Transition.Value.toString x )
 
-let transition ?duration ?delay ?timingFunction ?property () =
+(* For backward compatibility *)
+let transitionList = transitions
+
+let transition ?behavior ?duration ?delay ?timingFunction ?property () =
   Rule.declaration
     ( {js|transition|js},
       Transition.toString
-        (Transition.Value.make ?duration ?delay ?timingFunction ?property ()) )
+        (Transition.Value.make ?behavior ?duration ?delay ?timingFunction
+           ?property ()) )
 
 let transitionDelay i =
-  Rule.declaration ({js|transitionDelay|js}, Time.toString i)
+  Rule.declaration ({js|transitionDelay|js}, TransitionDuration.toString i)
+
+let transitionDelays i =
+  Rule.declaration
+    ( {js|transitionDelay|js},
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:Time.toString i )
 
 let transitionDuration i =
-  Rule.declaration ({js|transitionDuration|js}, Time.toString i)
+  Rule.declaration ({js|transitionDuration|js}, TransitionDuration.toString i)
+
+let transitionDurations i =
+  Rule.declaration
+    ( {js|transitionDuration|js},
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:Time.toString i )
 
 let transitionTimingFunction x =
-  Rule.declaration ({js|transitionTimingFunction|js}, TimingFunction.toString x)
+  Rule.declaration
+    ({js|transitionTimingFunction|js}, TransitionTimingFunction.toString x)
+
+let transitionTimingFunctions x =
+  Rule.declaration
+    ( {js|transitionTimingFunction|js},
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:EasingFunction.toString x )
 
 let transitionProperty x =
   Rule.declaration ({js|transitionProperty|js}, TransitionProperty.toString x)
@@ -796,6 +858,15 @@ let transitionProperties x =
     ( {js|transitionProperty|js},
       Kloth.Array.map_and_join ~sep:{js|, |js} ~f:TransitionProperty.toString x
     )
+
+let transitionBehavior x =
+  Rule.declaration ({js|transitionBehavior|js}, TransitionBehavior.toString x)
+
+let transitionBehaviors x =
+  Rule.declaration
+    ( {js|transitionBehavior|js},
+      Kloth.Array.map_and_join ~sep:{js|, |js}
+        ~f:TransitionBehavior.Value.toString x )
 
 let animation ?duration ?delay ?direction ?timingFunction ?fillMode ?playState
   ?iterationCount ?name () =
@@ -808,12 +879,12 @@ let animation ?duration ?delay ?direction ?timingFunction ?fillMode ?playState
 let animations x =
   Rule.declaration
     ( {js|animation|js},
-      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:Animation.toString x )
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:Animation.Value.toString x )
 
-let animationName (x : AnimationName.t) =
+let animationName x =
   Rule.declaration ({js|animationName|js}, AnimationName.toString x)
 
-let animationNames (x : AnimationName.t array) =
+let animationNames x =
   Rule.declaration
     ( {js|animationName|js},
       Kloth.Array.map_and_join x ~f:AnimationName.toString ~sep:{js|, |js} )

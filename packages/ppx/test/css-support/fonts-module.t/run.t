@@ -58,10 +58,10 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|fontFeatureSettings|js}, {js|'swsh' 2|js});
   CSS.unsafe({js|fontLanguageOverride|js}, {js|normal|js});
   CSS.unsafe({js|fontLanguageOverride|js}, {js|'SRB'|js});
-  CSS.fontWeight(`numInt(1));
-  CSS.fontWeight(`numInt(90));
-  CSS.fontWeight(`numInt(750));
-  CSS.fontWeight(`numInt(1000));
+  CSS.fontWeight(`num(1));
+  CSS.fontWeight(`num(90));
+  CSS.fontWeight(`num(750));
+  CSS.fontWeight(`num(1000));
   CSS.unsafe({js|fontStyle|js}, {js|oblique 15deg|js});
   CSS.unsafe({js|fontStyle|js}, {js|oblique -15deg|js});
   CSS.unsafe({js|fontStyle|js}, {js|oblique 0deg|js});

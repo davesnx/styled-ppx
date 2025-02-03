@@ -13,10 +13,6 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 22, characters 19-49:
-  Error: This expression has type Rule.rule
-         but an expression was expected of type Css_types.Transition.Value.t
-  [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   
@@ -29,31 +25,41 @@ If this test fail means that the module is not in sync with the ppx
     CSS.Types.TransitionProperty.make({js|width|js}),
     CSS.Types.TransitionProperty.make({js|height|js}),
   |]);
-  CSS.transitionDuration(`s(0));
-  CSS.transitionDuration(`s(1));
-  CSS.transitionDuration(`ms(100));
-  CSS.transitionTimingFunction(`ease);
-  CSS.transitionTimingFunction(`linear);
-  CSS.transitionTimingFunction(`easeIn);
-  CSS.transitionTimingFunction(`easeOut);
-  CSS.transitionTimingFunction(`easeInOut);
-  CSS.transitionTimingFunction(`cubicBezier((0.5, 0.5, 0.5, 0.5)));
-  CSS.transitionTimingFunction(`cubicBezier((0.5, 1.5, 0.5, (-2.5))));
-  CSS.transitionTimingFunction(`stepStart);
-  CSS.transitionTimingFunction(`stepEnd);
-  CSS.transitionTimingFunction(`steps((3, `start)));
-  CSS.transitionTimingFunction(`steps((5, `end_)));
-  CSS.transitionDelay(`s(1));
-  CSS.transitionDelay(`s(-1));
-  CSS.transitionList([|
-    CSS.transition(
+  CSS.transitionDurations([|`s(0)|]);
+  CSS.transitionDurations([|`s(1)|]);
+  CSS.transitionDurations([|`ms(100)|]);
+  CSS.transitionTimingFunctions([|`ease|]);
+  CSS.transitionTimingFunctions([|`linear|]);
+  CSS.transitionTimingFunctions([|`easeIn|]);
+  CSS.transitionTimingFunctions([|`easeOut|]);
+  CSS.transitionTimingFunctions([|`easeInOut|]);
+  CSS.transitionTimingFunctions([|`cubicBezier((0.5, 0.5, 0.5, 0.5))|]);
+  CSS.transitionTimingFunctions([|`cubicBezier((0.5, 1.5, 0.5, (-2.5)))|]);
+  CSS.transitionTimingFunctions([|`stepStart|]);
+  CSS.transitionTimingFunctions([|`stepEnd|]);
+  CSS.transitionTimingFunctions([|`steps((3, `start))|]);
+  CSS.transitionTimingFunctions([|`steps((5, `end_))|]);
+  CSS.transitionTimingFunctions([|
+    `ease,
+    `stepStart,
+    `cubicBezier((0.1, 0.7, 1., 0.1)),
+  |]);
+  CSS.transitionDelays([|`s(1)|]);
+  CSS.transitionDelays([|`s(-1)|]);
+  CSS.transitionBehaviors([|`normal|]);
+  CSS.transitionBehaviors([|`allowDiscrete|]);
+  CSS.transitionBehaviors([|`allowDiscrete, `normal|]);
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
+      ~behavior=?None,
       ~duration=?Some(`s(2)),
       ~delay=?None,
       ~timingFunction=?None,
       ~property=?Some(CSS.Types.TransitionProperty.make({js|margin-right|js})),
       (),
     ),
-    CSS.transition(
+    CSS.Types.Transition.Value.make(
+      ~behavior=?None,
       ~duration=?Some(`ms(500)),
       ~delay=?None,
       ~timingFunction=?None,
@@ -61,8 +67,9 @@ If this test fail means that the module is not in sync with the ppx
       (),
     ),
   |]);
-  CSS.transitionList([|
-    CSS.transition(
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
+      ~behavior=?None,
       ~duration=?Some(`s(1)),
       ~delay=?Some(`s(2)),
       ~timingFunction=?Some(`linear),
@@ -70,8 +77,9 @@ If this test fail means that the module is not in sync with the ppx
       (),
     ),
   |]);
-  CSS.transitionList([|
-    CSS.transition(
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
+      ~behavior=?None,
       ~duration=?None,
       ~delay=?None,
       ~timingFunction=?None,
@@ -79,8 +87,9 @@ If this test fail means that the module is not in sync with the ppx
       (),
     ),
   |]);
-  CSS.transitionList([|
-    CSS.transition(
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
+      ~behavior=?None,
       ~duration=?None,
       ~delay=?None,
       ~timingFunction=?None,
@@ -88,8 +97,9 @@ If this test fail means that the module is not in sync with the ppx
       (),
     ),
   |]);
-  CSS.transitionList([|
-    CSS.transition(
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
+      ~behavior=?None,
       ~duration=?None,
       ~delay=?None,
       ~timingFunction=?Some(`easeIn),
@@ -97,8 +107,9 @@ If this test fail means that the module is not in sync with the ppx
       (),
     ),
   |]);
-  CSS.transitionList([|
-    CSS.transition(
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
+      ~behavior=?None,
       ~duration=?Some(`ms(500)),
       ~delay=?None,
       ~timingFunction=?None,
@@ -106,8 +117,9 @@ If this test fail means that the module is not in sync with the ppx
       (),
     ),
   |]);
-  CSS.transitionList([|
-    CSS.transition(
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
+      ~behavior=?None,
       ~duration=?Some(`ms(200)),
       ~delay=?Some(`ms(500)),
       ~timingFunction=?None,
@@ -115,8 +127,9 @@ If this test fail means that the module is not in sync with the ppx
       (),
     ),
   |]);
-  CSS.transitionList([|
-    CSS.transition(
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
+      ~behavior=?None,
       ~duration=?None,
       ~delay=?None,
       ~timingFunction=?Some(`linear),
@@ -124,12 +137,33 @@ If this test fail means that the module is not in sync with the ppx
       (),
     ),
   |]);
-  CSS.transitionList([|
-    CSS.transition(
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
+      ~behavior=?None,
       ~duration=?Some(`s(1)),
       ~delay=?Some(`ms(500)),
       ~timingFunction=?Some(`linear),
       ~property=?Some(CSS.Types.TransitionProperty.make({js|margin-right|js})),
+      (),
+    ),
+  |]);
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
+      ~behavior=?Some(`allowDiscrete),
+      ~duration=?Some(`s(4)),
+      ~delay=?None,
+      ~timingFunction=?None,
+      ~property=?Some(CSS.Types.TransitionProperty.make({js|display|js})),
+      (),
+    ),
+  |]);
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
+      ~behavior=?Some(`allowDiscrete),
+      ~duration=?Some(`ms(500)),
+      ~delay=?None,
+      ~timingFunction=?Some(`easeOut),
+      ~property=?Some(CSS.Types.TransitionProperty.all),
       (),
     ),
   |]);
@@ -140,19 +174,35 @@ If this test fail means that the module is not in sync with the ppx
   let duration = `ms(200);
   let delay = `s(3);
   let property3 = CSS.Types.TransitionProperty.make("opacity");
+  let behavior = `allowDiscrete;
   
-  CSS.transitionList([|CSS.transition(~property, ())|]);
-  CSS.transitionList([|CSS.transition(~property=property2, ())|]);
+  CSS.transitions([|CSS.Types.Transition.Value.make(~property, ())|]);
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(~property=property2, ()),
+  |]);
   
-  CSS.transitionList([|
-    CSS.transition(~duration, ~delay, ~timingFunction, ~property, ()),
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
+      ~behavior,
+      ~duration,
+      ~delay,
+      ~timingFunction,
+      ~property,
+      (),
+    ),
   |]);
-  CSS.transitionList([|
-    CSS.transition(~duration, ~delay, ~timingFunction, ~property, ()),
-    CSS.transition(~duration=`s(0), ~property=property3, ()),
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
+      ~duration,
+      ~delay,
+      ~timingFunction,
+      ~property,
+      (),
+    ),
+    CSS.Types.Transition.Value.make(~duration=`s(0), ~property=property3, ()),
   |]);
-  CSS.transitionList([|
-    CSS.transition(
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
       ~duration=`ms(200),
       ~delay=`s(3),
       ~timingFunction=`easeOut,
@@ -160,8 +210,8 @@ If this test fail means that the module is not in sync with the ppx
       (),
     ),
   |]);
-  CSS.transitionList([|
-    CSS.transition(
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
       ~duration=`ms(200),
       ~delay=`s(3),
       ~timingFunction,
@@ -169,11 +219,17 @@ If this test fail means that the module is not in sync with the ppx
       (),
     ),
   |]);
-  CSS.transitionList([|
-    CSS.transition(~duration, ~delay=`s(3), ~timingFunction, ~property, ()),
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
+      ~duration,
+      ~delay=`s(3),
+      ~timingFunction,
+      ~property,
+      (),
+    ),
   |]);
-  CSS.transitionList([|
-    CSS.transition(
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
       ~duration,
       ~delay,
       ~timingFunction=`easeOut,
@@ -181,11 +237,17 @@ If this test fail means that the module is not in sync with the ppx
       (),
     ),
   |]);
-  CSS.transitionList([|
-    CSS.transition(~duration, ~delay, ~timingFunction=`easeOut, ~property, ()),
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
+      ~duration,
+      ~delay,
+      ~timingFunction=`easeOut,
+      ~property,
+      (),
+    ),
   |]);
-  CSS.transitionList([|
-    CSS.transition(
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
       ~duration=`ms(200),
       ~delay=`s(3),
       ~timingFunction,
@@ -193,8 +255,8 @@ If this test fail means that the module is not in sync with the ppx
       (),
     ),
   |]);
-  CSS.transitionList([|
-    CSS.transition(
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
       ~duration=`ms(200),
       ~delay,
       ~timingFunction=`easeOut,
@@ -202,53 +264,75 @@ If this test fail means that the module is not in sync with the ppx
       (),
     ),
   |]);
-  CSS.transitionList([|
-    CSS.transition(~duration=`ms(200), ~timingFunction=`easeIn, ~property, ()),
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
+      ~duration=`ms(200),
+      ~timingFunction=`easeIn,
+      ~property,
+      (),
+    ),
   |]);
-  CSS.transitionList([|
-    CSS.transition(~duration=`ms(200), ~timingFunction, ~property, ()),
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
+      ~duration=`ms(200),
+      ~timingFunction,
+      ~property,
+      (),
+    ),
   |]);
-  CSS.transitionList([|
-    CSS.transition(
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
       ~duration,
       ~timingFunction=`easeIn,
       ~property=CSS.Types.TransitionProperty.make({js|margin-right|js}),
       (),
     ),
   |]);
-  CSS.transitionList([|
-    CSS.transition(~duration, ~timingFunction=`easeIn, ~property, ()),
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
+      ~duration,
+      ~timingFunction=`easeIn,
+      ~property,
+      (),
+    ),
   |]);
-  CSS.transitionList([|
-    CSS.transition(
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
       ~duration=`ms(200),
       ~timingFunction,
       ~property=CSS.Types.TransitionProperty.make({js|margin-right|js}),
       (),
     ),
   |]);
-  CSS.transitionList([|
-    CSS.transition(~duration=`ms(200), ~timingFunction=`easeIn, ~property, ()),
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
+      ~duration=`ms(200),
+      ~timingFunction=`easeIn,
+      ~property,
+      (),
+    ),
   |]);
-  CSS.transitionList([|
-    CSS.transition(
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
       ~duration,
       ~timingFunction=`easeIn,
       ~property=CSS.Types.TransitionProperty.make({js|margin-right|js}),
       (),
     ),
   |]);
-  CSS.transitionList([|
-    CSS.transition(
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
       ~duration=`ms(200),
       ~timingFunction,
       ~property=CSS.Types.TransitionProperty.make({js|margin-right|js}),
       (),
     ),
   |]);
-  CSS.transitionList([|CSS.transition(~duration=`ms(200), ~property, ())|]);
-  CSS.transitionList([|
-    CSS.transition(
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(~duration=`ms(200), ~property, ()),
+  |]);
+  CSS.transitions([|
+    CSS.Types.Transition.Value.make(
       ~duration,
       ~property=CSS.Types.TransitionProperty.make({js|margin-right|js}),
       (),

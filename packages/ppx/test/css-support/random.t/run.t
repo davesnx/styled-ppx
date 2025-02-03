@@ -37,17 +37,19 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|WebkitOverflowScrolling|js}, {js|touch|js});
   CSS.unsafe({js|WebkitTapHighlightColor|js}, {js|transparent|js});
   CSS.unsafe({js|WebkitTextFillColor|js}, colorTextString);
-  CSS.animation(
-    ~duration=?None,
-    ~delay=?None,
-    ~direction=?None,
-    ~timingFunction=?None,
-    ~fillMode=?Some(`none),
-    ~playState=?None,
-    ~iterationCount=?None,
-    ~name=?None,
-    (),
-  );
+  CSS.animations([|
+    CSS.Types.Animation.Value.make(
+      ~duration=?None,
+      ~delay=?None,
+      ~direction=?None,
+      ~timingFunction=?None,
+      ~fillMode=?Some(`none),
+      ~playState=?None,
+      ~iterationCount=?None,
+      ~name=?None,
+      (),
+    ),
+  |]);
   CSS.unsafe({js|appearance|js}, {js|none|js});
   CSS.aspectRatio(`ratio((21, 8)));
   
@@ -76,19 +78,19 @@ If this test fail means that the module is not in sync with the ppx
   CSS.gridTemplateColumns(
     `tracks([|
       `minmax((`pxFloat(10.), `auto)),
-      `fitContentFn(`pxFloat(20.)),
-      `fitContentFn(`pxFloat(20.)),
+      `fitContent(`pxFloat(20.)),
+      `fitContent(`pxFloat(20.)),
     |]),
   );
   CSS.gridTemplateColumns(
     `tracks([|
       `minmax((`pxFloat(51.), `auto)),
-      `fitContentFn(`pxFloat(20.)),
-      `fitContentFn(`pxFloat(20.)),
+      `fitContent(`pxFloat(20.)),
+      `fitContent(`pxFloat(20.)),
     |]),
   );
-  CSS.gridTemplateColumns(`tracks([|`repeatFn((`numInt(2), [|`auto|]))|]));
-  CSS.gridTemplateColumns(`tracks([|`repeatFn((`numInt(3), [|`auto|]))|]));
+  CSS.gridTemplateColumns(`tracks([|`repeat((`num(2), [|`auto|]))|]));
+  CSS.gridTemplateColumns(`tracks([|`repeat((`num(3), [|`auto|]))|]));
   CSS.unsafe({js|height|js}, {js|fit-content|js});
   CSS.justifyItems(`start);
   CSS.unsafe({js|justifySelf|js}, {js|unset|js});
@@ -123,8 +125,8 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|width|js}, {js|fit-content|js});
   CSS.width(`maxContent);
   
-  CSS.transitionDelay(`ms(240));
-  CSS.animationDuration(`ms(150));
+  CSS.transitionDelays([|`ms(240)|]);
+  CSS.animationDurations([|`ms(150)|]);
   
   CSS.borderWidth(`thin);
   CSS.outlineWidth(`medium);

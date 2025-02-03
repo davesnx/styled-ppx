@@ -430,7 +430,7 @@ module FontVariant = struct
   let toString (x : t) =
     match x with
     | `normal -> {js|normal|js}
-    | `smallCaps -> {js|smallCaps|js}
+    | `smallCaps -> {js|small-caps|js}
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
 end
@@ -655,7 +655,7 @@ module VerticalAlign = struct
     | #Cascading.t as c -> Cascading.toString c
 end
 
-module TimingFunction = struct
+module EasingFunction = struct
   type t =
     [ `linear
     | `ease
@@ -670,8 +670,6 @@ module TimingFunction = struct
     | `jumpEnd
     | `jumpNone
     | `jumpBoth
-    | Var.t
-    | Cascading.t
     ]
 
   let linear = `linear
@@ -718,8 +716,6 @@ module TimingFunction = struct
     | `jumpEnd -> {js|jump-end|js}
     | `jumpNone -> {js|jump-none|js}
     | `jumpBoth -> {js|jump-both|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module ListStyleType = struct
@@ -806,7 +802,7 @@ end
 
 module FontWeight = struct
   type t =
-    [ `numInt of int
+    [ `num of int
     | `thin
     | `extraLight
     | `light
@@ -834,7 +830,7 @@ module FontWeight = struct
 
   let toString (x : t) =
     match x with
-    | `numInt n -> Kloth.Int.to_string n
+    | `num n -> Kloth.Int.to_string n
     | `thin -> {js|100|js}
     | `extraLight -> {js|200|js}
     | `light -> {js|300|js}
@@ -985,69 +981,129 @@ end = struct
 end
 
 module AnimationDirection = struct
-  type t =
-    [ `normal
-    | `reverse
-    | `alternate
-    | `alternateReverse
-    ]
+  module Value = struct
+    type t =
+      [ `normal
+      | `reverse
+      | `alternate
+      | `alternateReverse
+      ]
 
-  let toString (x : t) =
-    match x with
-    | `normal -> {js|normal|js}
-    | `reverse -> {js|reverse|js}
-    | `alternate -> {js|alternate|js}
-    | `alternateReverse -> {js|alternate-reverse|js}
-end
+    let toString (x : t) =
+      match x with
+      | `normal -> {js|normal|js}
+      | `reverse -> {js|reverse|js}
+      | `alternate -> {js|alternate|js}
+      | `alternateReverse -> {js|alternate-reverse|js}
+  end
 
-module AnimationFillMode = struct
   type t =
-    [ None.t
-    | `forwards
-    | `backwards
-    | `both
+    [ Value.t
     | Var.t
     | Cascading.t
     ]
 
   let toString (x : t) =
     match x with
-    | #None.t -> None.toString
-    | `forwards -> {js|forwards|js}
-    | `backwards -> {js|backwards|js}
-    | `both -> {js|both|js}
+    | #Value.t as x -> Value.toString x
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+module AnimationDuration = struct
+  type t =
+    [ Time.t
+    | Cascading.t
+    | Var.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | #Time.t as x -> Time.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Var.t as x -> Var.toString x
+end
+
+module AnimationDelay = struct
+  include AnimationDuration
+end
+
+module AnimationFillMode = struct
+  module Value = struct
+    type t =
+      [ None.t
+      | `forwards
+      | `backwards
+      | `both
+      ]
+
+    let toString (x : t) =
+      match x with
+      | #None.t -> None.toString
+      | `forwards -> {js|forwards|js}
+      | `backwards -> {js|backwards|js}
+      | `both -> {js|both|js}
+  end
+
+  type t =
+    [ Value.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | #Value.t as x -> Value.toString x
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
 end
 
 module AnimationIterationCount = struct
+  module Value = struct
+    type t =
+      [ `count of float
+      | `infinite
+      ]
+
+    let toString (x : t) =
+      match x with
+      | `count x -> Kloth.Float.to_string x
+      | `infinite -> {js|infinite|js}
+  end
+
   type t =
-    [ `count of float
-    | `infinite
+    [ Value.t
     | Var.t
     | Cascading.t
     ]
 
   let toString (x : t) =
     match x with
-    | `count x -> Kloth.Float.to_string x
-    | `infinite -> {js|infinite|js}
+    | #Value.t as x -> Value.toString x
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
 end
 
 module AnimationPlayState = struct
+  module Value = struct
+    type t =
+      [ `paused
+      | `running
+      ]
+
+    let toString (x : t) =
+      match x with `paused -> {js|paused|js} | `running -> {js|running|js}
+  end
+
   type t =
-    [ `paused
-    | `running
+    [ Value.t
     | Var.t
     | Cascading.t
     ]
 
   let toString (x : t) =
     match x with
-    | `paused -> {js|paused|js}
-    | `running -> {js|running|js}
+    | #Value.t as x -> Value.toString x
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
 end
@@ -1068,31 +1124,82 @@ end = struct
   let all = {js|all|js}
 end
 
+module TransitionDuration = struct
+  include AnimationDuration
+end
+
+module TransitionDelay = struct
+  include TransitionDuration
+end
+
+module TransitionTimingFunction = struct
+  type t =
+    [ EasingFunction.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | #EasingFunction.t as x -> EasingFunction.toString x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module TransitionBehavior = struct
+  module Value = struct
+    type t =
+      [ `normal
+      | `allowDiscrete
+      ]
+
+    let toString (x : t) =
+      match x with
+      | `normal -> {js|normal|js}
+      | `allowDiscrete -> {js|allow-discrete|js}
+  end
+
+  type t =
+    [ Value.t
+    | Cascading.t
+    | Var.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | #Value.t as x -> Value.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Var.t as x -> Var.toString x
+end
+
 module Transition = struct
   module Value = struct
     type value = {
+      behavior : TransitionBehavior.Value.t;
       duration : Time.t;
       delay : Time.t;
-      timingFunction : TimingFunction.t;
+      timingFunction : EasingFunction.t;
       property : TransitionProperty.t;
     }
 
     type t = [ `value of value ]
 
-    let make ?(duration = `ms 0) ?(delay = `ms 0) ?(timingFunction = `ease)
-      ?(property = TransitionProperty.make "all") () =
-      `value { duration; delay; timingFunction; property }
+    let make ?(behavior = `normal) ?(duration = `ms 0) ?(delay = `ms 0)
+      ?(timingFunction = `ease) ?(property = TransitionProperty.make "all") () =
+      `value { behavior; duration; delay; timingFunction; property }
 
     let toString (x : t) =
       match x with
       | `value v ->
-        Time.toString v.duration
+        TransitionProperty.toString v.property
         ^ {js| |js}
-        ^ TimingFunction.toString v.timingFunction
+        ^ Time.toString v.duration
+        ^ {js| |js}
+        ^ EasingFunction.toString v.timingFunction
         ^ {js| |js}
         ^ Time.toString v.delay
         ^ {js| |js}
-        ^ TransitionProperty.toString v.property
+        ^ TransitionBehavior.Value.toString v.behavior
   end
 
   type t =
@@ -1113,11 +1220,11 @@ module Animation = struct
     type value = {
       duration : Time.t;
       delay : Time.t;
-      direction : AnimationDirection.t;
-      timingFunction : TimingFunction.t;
-      fillMode : AnimationFillMode.t;
-      playState : AnimationPlayState.t;
-      iterationCount : AnimationIterationCount.t;
+      direction : AnimationDirection.Value.t;
+      timingFunction : EasingFunction.t;
+      fillMode : AnimationFillMode.Value.t;
+      playState : AnimationPlayState.Value.t;
+      iterationCount : AnimationIterationCount.Value.t;
       name : AnimationName.t;
     }
 
@@ -1145,17 +1252,17 @@ module Animation = struct
         ^ {js| |js}
         ^ Time.toString v.duration
         ^ {js| |js}
-        ^ TimingFunction.toString v.timingFunction
+        ^ EasingFunction.toString v.timingFunction
         ^ {js| |js}
         ^ Time.toString v.delay
         ^ {js| |js}
-        ^ AnimationIterationCount.toString v.iterationCount
+        ^ AnimationIterationCount.Value.toString v.iterationCount
         ^ {js| |js}
-        ^ AnimationDirection.toString v.direction
+        ^ AnimationDirection.Value.toString v.direction
         ^ {js| |js}
-        ^ AnimationFillMode.toString v.fillMode
+        ^ AnimationFillMode.Value.toString v.fillMode
         ^ {js| |js}
-        ^ AnimationPlayState.toString v.playState
+        ^ AnimationPlayState.Value.toString v.playState
   end
 
   type t =
@@ -1169,6 +1276,10 @@ module Animation = struct
     | #Value.t as x -> Value.toString x
     | #Var.t as var -> Var.toString var
     | #Cascading.t as c -> Cascading.toString c
+end
+
+module AnimationTimingFunction = struct
+  include TransitionTimingFunction
 end
 
 module Cursor = struct
@@ -2819,29 +2930,26 @@ module GridLine = struct
   type t =
     [ Auto.t
     | `ident of string
-    | `numInt of int
-    | `numIntIdent of int * string
-    | `spanNumInt of int
-    | `spanIdent of string
-    | `spanNumIntIdent of int * string
+    | `num of int
+    | `numIdent of int * string
+    | `span of [ `num of int | `ident of string | `numIdent of int * string ]
     ]
 
   let ident (x : string) = `ident x
-  let numInt (x : int) = `numInt x
-  let numIntIdent (x : int) (y : string) = `numIntIdent (x, y)
-  let spanNumInt (x : int) = `spanNumInt x
-  let spanIdent (x : string) = `spanIdent x
-  let spanNumIntIdent (x : int) (y : string) = `spanNumIntIdent (x, y)
+  let num (x : int) = `num x
+  let numIdent (x : int) (y : string) = `numIdent (x, y)
 
-  let toString (x : t) =
+  let span (x : [ `num of int | `ident of string | `numIdent of int * string ])
+      =
+    `span x
+
+  let rec toString (x : t) =
     match x with
     | #Auto.t -> Auto.toString
     | `ident s -> s
-    | `numInt i -> string_of_int i
-    | `numIntIdent (i, s) -> (string_of_int i ^ {js| |js}) ^ s
-    | `spanNumInt n -> {js|span |js} ^ string_of_int n
-    | `spanIdent i -> {js|span |js} ^ i
-    | `spanNumIntIdent (n, i) -> {js|span |js} ^ string_of_int n ^ {js| |js} ^ i
+    | `num i -> string_of_int i
+    | `numIdent (i, s) -> (string_of_int i ^ {js| |js}) ^ s
+    | `span e -> {js|span |js} ^ toString (e :> t)
 end
 
 module GridArea = struct
@@ -4126,7 +4234,7 @@ end
 module ZIndex = struct
   type t =
     [ Auto.t
-    | `numInt of int
+    | `num of int
     | Var.t
     | Cascading.t
     ]
@@ -4134,7 +4242,7 @@ module ZIndex = struct
   let toString (x : t) =
     match x with
     | #Auto.t -> Auto.toString
-    | `numInt x -> Kloth.Int.to_string x
+    | `num x -> Kloth.Int.to_string x
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
 end
@@ -4433,16 +4541,16 @@ module TrackSize = struct
   type t =
     [ TrackBreadth.t
     | MinMax.t
-    | `fitContentFn of Length.t
+    | `fitContent of Length.t
     ]
 
-  let fitContentFn (x : Length.t) = `fitContentFn x
+  let fitContent (x : Length.t) = `fitContent x
 
   let toString (x : t) =
     match x with
     | #TrackBreadth.t as x -> TrackBreadth.toString x
     | #MinMax.t as x -> MinMax.toString x
-    | `fitContentFn x ->
+    | `fitContent x ->
       {js|fit-content|js} ^ {js|(|js} ^ Length.toString x ^ {js|)|js}
 end
 
@@ -4483,14 +4591,14 @@ module RepeatValue = struct
   type t =
     [ `autoFill
     | `autoFit
-    | `numInt of int
+    | `num of int
     ]
 
   let toString (x : t) =
     match x with
     | `autoFill -> {js|auto-fill|js}
     | `autoFit -> {js|auto-fit|js}
-    | `numInt x -> Kloth.Int.to_string x
+    | `num x -> Kloth.Int.to_string x
 end
 
 module RepeatTrack = struct
@@ -4508,13 +4616,13 @@ module RepeatTrack = struct
 end
 
 module Repeat = struct
-  type t = [ `repeatFn of RepeatValue.t * RepeatTrack.t array ]
+  type t = [ `repeat of RepeatValue.t * RepeatTrack.t array ]
 
-  let repeatFn (x : RepeatValue.t) (y : RepeatTrack.t array) = `repeatFn (x, y)
+  let repeat (x : RepeatValue.t) (y : RepeatTrack.t array) = `repeat (x, y)
 
   let toString (x : t) =
     match x with
-    | `repeatFn (n, x) ->
+    | `repeat (n, x) ->
       {js|repeat(|js}
       ^ RepeatValue.toString n
       ^ {js|, |js}

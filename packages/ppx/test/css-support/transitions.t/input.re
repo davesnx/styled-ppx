@@ -17,8 +17,12 @@
 [%css {|transition-timing-function: step-end|}];
 [%css {|transition-timing-function: steps(3, start)|}];
 [%css {|transition-timing-function: steps(5, end)|}];
+[%css {|transition-timing-function: ease, step-start, cubic-bezier(0.1, 0.7, 1, 0.1)|}];
 [%css {|transition-delay: 1s|}];
 [%css {|transition-delay: -1s|}];
+[%css {|transition-behavior: normal|}];
+[%css {|transition-behavior: allow-discrete|}];
+[%css {|transition-behavior: allow-discrete, normal|}];
 [%css {|transition: margin-right 2s, opacity 0.5s|}];
 [%css {|transition: 1s 2s width linear|}];
 [%css {|transition: none|}];
@@ -28,6 +32,8 @@
 [%css {|transition: 200ms .5s|}];
 [%css {|transition: linear|}];
 [%css {|transition: 1s .5s linear margin-right|}];
+[%css {|transition: display 4s allow-discrete|}];
+[%css {|transition: all 0.5s ease-out allow-discrete|}];
 
 // Interpolation
 let property = CSS.Types.TransitionProperty.make("margin-right");
@@ -36,11 +42,12 @@ let timingFunction = `easeOut;
 let duration = `ms(200);
 let delay = `s(3);
 let property3 = CSS.Types.TransitionProperty.make("opacity");
+let behavior = `allowDiscrete;
 
 [%css {|transition: $(property)|}];
 [%css {|transition: $(property2)|}];
 // This is the order of interpolation, from left to right.
-[%css {|transition: $(property) $(duration) $(timingFunction) $(delay)|}];
+[%css {|transition: $(property) $(duration) $(timingFunction) $(delay) $(behavior)|}];
 [%css
   {|transition: $(property) $(duration) $(timingFunction) $(delay), $(property3) 0s|}
 ];

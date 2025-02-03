@@ -24,12 +24,12 @@ If this test fail means that the module is not in sync with the ppx
   CSS.gridTemplateColumns(`tracks([|`fr(1.)|]));
   CSS.gridTemplateColumns(`tracks([|`pxFloat(100.), `fr(1.), `auto|]));
   CSS.gridTemplateColumns(
-    `tracks([|`repeatFn((`numInt(2), [|`pxFloat(100.), `fr(1.)|]))|]),
+    `tracks([|`repeat((`num(2), [|`pxFloat(100.), `fr(1.)|]))|]),
   );
   CSS.gridTemplateColumns(
     `tracks([|
-      `repeatFn((
-        `numInt(4),
+      `repeat((
+        `num(4),
         [|
           `pxFloat(10.),
           `lineNames({js|[col-start]|js}),
@@ -49,7 +49,7 @@ If this test fail means that the module is not in sync with the ppx
     |]),
   );
   CSS.gridTemplateColumns(
-    `tracks([|`repeatFn((`autoFill, [|`minmax((`ch(25.), `fr(1.)))|]))|]),
+    `tracks([|`repeat((`autoFill, [|`minmax((`ch(25.), `fr(1.)))|]))|]),
   );
   CSS.gridTemplateColumns(
     `tracks([|
@@ -88,21 +88,21 @@ If this test fail means that the module is not in sync with the ppx
       `lineNames({js|[b]|js}),
       `minmax((`minContent, `fr(1.))),
       `lineNames({js|[b c d]|js}),
-      `repeatFn((`numInt(2), [|`lineNames({js|[e]|js}), `pxFloat(40.)|])),
-      `repeatFn((`numInt(5), [|`auto|])),
+      `repeat((`num(2), [|`lineNames({js|[e]|js}), `pxFloat(40.)|])),
+      `repeat((`num(5), [|`auto|])),
     |]),
   );
   CSS.gridTemplateColumns(
     `tracks([|
       `pxFloat(200.),
-      `repeatFn((`autoFill, [|`pxFloat(100.)|])),
+      `repeat((`autoFill, [|`pxFloat(100.)|])),
       `pxFloat(300.),
     |]),
   );
   CSS.gridTemplateColumns(
     `tracks([|
       `minmax((`pxFloat(100.), `maxContent)),
-      `repeatFn((`autoFill, [|`pxFloat(200.)|])),
+      `repeat((`autoFill, [|`pxFloat(200.)|])),
       `percent(20.),
     |]),
   );
@@ -111,7 +111,7 @@ If this test fail means that the module is not in sync with the ppx
       `lineNames({js|[linename1]|js}),
       `pxFloat(100.),
       `lineNames({js|[linename2]|js}),
-      `repeatFn((
+      `repeat((
         `autoFit,
         [|`lineNames({js|[linename3 linename4]|js}), `pxFloat(300.)|],
       )),
@@ -123,7 +123,7 @@ If this test fail means that the module is not in sync with the ppx
     `tracks([|
       `lineNames({js|[linename1 linename2]|js}),
       `pxFloat(100.),
-      `repeatFn((
+      `repeat((
         `autoFit,
         [|`lineNames({js|[linename1]|js}), `pxFloat(300.)|],
       )),
@@ -150,7 +150,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.gridTemplateRows(`tracks([|`fr(1.)|]));
   CSS.gridTemplateRows(`tracks([|`pxFloat(100.), `fr(1.), `auto|]));
   CSS.gridTemplateRows(
-    `tracks([|`repeatFn((`numInt(2), [|`pxFloat(100.), `fr(1.)|]))|]),
+    `tracks([|`repeat((`num(2), [|`pxFloat(100.), `fr(1.)|]))|]),
   );
   CSS.gridTemplateRows(
     `tracks([|
@@ -221,7 +221,7 @@ If this test fail means that the module is not in sync with the ppx
       `minmax((`pxFloat(100.), `auto)),
       `percent(10.),
       `fr(0.5),
-      `fitContentFn(`pxFloat(400.)),
+      `fitContent(`pxFloat(400.)),
     |]),
   );
   CSS.gridAutoRows(`trackSizes([|`auto|]));
@@ -238,7 +238,7 @@ If this test fail means that the module is not in sync with the ppx
       `minmax((`pxFloat(100.), `auto)),
       `percent(10.),
       `fr(0.5),
-      `fitContentFn(`pxFloat(400.)),
+      `fitContent(`pxFloat(400.)),
     |]),
   );
   CSS.gridAutoFlow(`row);
@@ -252,7 +252,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.gridProperty(`autoRows((false, None, `tracks([|`auto, `fr(1.)|]))));
   CSS.gridProperty(
     `autoColumns((
-      `tracks([|`repeatFn((`autoFill, [|`em(5.)|]))|]),
+      `tracks([|`repeat((`autoFill, [|`em(5.)|]))|]),
       false,
       Some([|`fr(1.)|]),
     )),
@@ -261,7 +261,7 @@ If this test fail means that the module is not in sync with the ppx
     `autoRows((
       false,
       Some([|`fr(1.)|]),
-      `tracks([|`repeatFn((`autoFill, [|`em(5.)|]))|]),
+      `tracks([|`repeat((`autoFill, [|`em(5.)|]))|]),
     )),
   );
   CSS.gridProperty(
@@ -278,46 +278,46 @@ If this test fail means that the module is not in sync with the ppx
     ),
   );
   CSS.gridRowStart(`auto);
-  CSS.gridRowStart(`numInt(4));
+  CSS.gridRowStart(`num(4));
   CSS.gridRowStart(`ident({js|C|js}));
-  CSS.gridRowStart(`numIntIdent((2, {js|C|js})));
-  CSS.gridRowStart(`spanIdent({js|C|js}));
-  CSS.gridRowStart(`spanNumInt(1));
+  CSS.gridRowStart(`numIdent((2, {js|C|js})));
+  CSS.gridRowStart(`span(`ident({js|C|js})));
+  CSS.gridRowStart(`span(`num(1)));
   CSS.gridColumnStart(`auto);
-  CSS.gridColumnStart(`numInt(4));
+  CSS.gridColumnStart(`num(4));
   CSS.gridColumnStart(`ident({js|C|js}));
-  CSS.gridColumnStart(`numIntIdent((2, {js|C|js})));
-  CSS.gridColumnStart(`spanIdent({js|C|js}));
-  CSS.gridColumnStart(`spanNumInt(1));
+  CSS.gridColumnStart(`numIdent((2, {js|C|js})));
+  CSS.gridColumnStart(`span(`ident({js|C|js})));
+  CSS.gridColumnStart(`span(`num(1)));
   CSS.gridRowEnd(`auto);
-  CSS.gridRowEnd(`numInt(4));
+  CSS.gridRowEnd(`num(4));
   CSS.gridRowEnd(`ident({js|C|js}));
-  CSS.gridRowEnd(`numIntIdent((2, {js|C|js})));
-  CSS.gridRowEnd(`spanIdent({js|C|js}));
-  CSS.gridRowEnd(`spanNumInt(1));
+  CSS.gridRowEnd(`numIdent((2, {js|C|js})));
+  CSS.gridRowEnd(`span(`ident({js|C|js})));
+  CSS.gridRowEnd(`span(`num(1)));
   CSS.gridColumnEnd(`auto);
-  CSS.gridColumnEnd(`numInt(4));
+  CSS.gridColumnEnd(`num(4));
   CSS.gridColumnEnd(`ident({js|C|js}));
-  CSS.gridColumnEnd(`numIntIdent((2, {js|C|js})));
-  CSS.gridColumnEnd(`spanIdent({js|C|js}));
-  CSS.gridColumnEnd(`spanNumInt(1));
+  CSS.gridColumnEnd(`numIdent((2, {js|C|js})));
+  CSS.gridColumnEnd(`span(`ident({js|C|js})));
+  CSS.gridColumnEnd(`span(`num(1)));
   CSS.gridColumn(`auto);
-  CSS.gridColumn(`numInt(1));
-  CSS.gridColumn(`numInt(-1));
-  CSS.gridColumn2(`numInt(1), `numInt(1));
-  CSS.gridColumn2(`numInt(1), `numInt(-1));
+  CSS.gridColumn(`num(1));
+  CSS.gridColumn(`num(-1));
+  CSS.gridColumn2(`num(1), `num(1));
+  CSS.gridColumn2(`num(1), `num(-1));
   CSS.gridColumn2(`auto, `auto);
-  CSS.gridColumn2(`numInt(2), `spanNumInt(2));
+  CSS.gridColumn2(`num(2), `span(`num(2)));
   CSS.gridRow(`auto);
-  CSS.gridRow(`numInt(1));
-  CSS.gridRow(`numInt(-1));
-  CSS.gridRow2(`numInt(1), `numInt(1));
-  CSS.gridRow2(`numInt(1), `numInt(-1));
+  CSS.gridRow(`num(1));
+  CSS.gridRow(`num(-1));
+  CSS.gridRow2(`num(1), `num(1));
+  CSS.gridRow2(`num(1), `num(-1));
   CSS.gridRow2(`auto, `auto);
-  CSS.gridRow2(`numInt(2), `spanNumInt(2));
-  CSS.gridArea2(`numInt(1), `numInt(1));
-  CSS.gridArea2(`numInt(1), `spanNumInt(1));
-  CSS.gridArea3(`spanNumInt(1), `numInt(10), `numInt(-1));
+  CSS.gridRow2(`num(2), `span(`num(2)));
+  CSS.gridArea2(`num(1), `num(1));
+  CSS.gridArea2(`num(1), `span(`num(1)));
+  CSS.gridArea3(`span(`num(1)), `num(10), `num(-1));
   CSS.gridColumnGap(`zero);
   CSS.gridColumnGap(`em(1.));
   CSS.gridRowGap(`zero);
@@ -339,14 +339,14 @@ If this test fail means that the module is not in sync with the ppx
   CSS.gridTemplateColumns(
     `tracks([|
       `subgrid,
-      `repeatFn((`numInt(1), [|`lineNames({js|[sub-a]|js})|])),
+      `repeat((`num(1), [|`lineNames({js|[sub-a]|js})|])),
     |]),
   );
   CSS.gridTemplateColumns(
     `tracks([|
       `subgrid,
-      `repeatFn((
-        `numInt(2),
+      `repeat((
+        `num(2),
         [|`lineNames({js|[sub-a]|js}), `lineNames({js|[sub-b]|js})|],
       )),
       `lineNames({js|[sub-c]|js}),
@@ -355,7 +355,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.gridTemplateColumns(
     `tracks([|
       `subgrid,
-      `repeatFn((
+      `repeat((
         `autoFill,
         [|`lineNames({js|[sub-a]|js}), `lineNames({js|[sub-b]|js})|],
       )),
@@ -365,7 +365,7 @@ If this test fail means that the module is not in sync with the ppx
     `tracks([|
       `subgrid,
       `lineNames({js|[sub-a]|js}),
-      `repeatFn((
+      `repeat((
         `autoFill,
         [|
           `lineNames({js|[sub-b]|js}),
@@ -374,7 +374,7 @@ If this test fail means that the module is not in sync with the ppx
         |],
       )),
       `lineNames({js|[sub-e]|js}),
-      `repeatFn((`numInt(1), [|`lineNames({js|[sub-g]|js})|])),
+      `repeat((`num(1), [|`lineNames({js|[sub-g]|js})|])),
     |]),
   );
   CSS.gridTemplateRows(`tracks([|`subgrid|]));
@@ -389,14 +389,14 @@ If this test fail means that the module is not in sync with the ppx
   CSS.gridTemplateRows(
     `tracks([|
       `subgrid,
-      `repeatFn((`numInt(1), [|`lineNames({js|[sub-a]|js})|])),
+      `repeat((`num(1), [|`lineNames({js|[sub-a]|js})|])),
     |]),
   );
   CSS.gridTemplateRows(
     `tracks([|
       `subgrid,
-      `repeatFn((
-        `numInt(2),
+      `repeat((
+        `num(2),
         [|`lineNames({js|[sub-a]|js}), `lineNames({js|[sub-b]|js})|],
       )),
       `lineNames({js|[sub-c]|js}),
@@ -405,7 +405,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.gridTemplateRows(
     `tracks([|
       `subgrid,
-      `repeatFn((
+      `repeat((
         `autoFill,
         [|`lineNames({js|[sub-a]|js}), `lineNames({js|[sub-b]|js})|],
       )),
@@ -415,7 +415,7 @@ If this test fail means that the module is not in sync with the ppx
     `tracks([|
       `subgrid,
       `lineNames({js|[sub-a]|js}),
-      `repeatFn((
+      `repeat((
         `autoFill,
         [|
           `lineNames({js|[sub-b]|js}),
@@ -424,7 +424,7 @@ If this test fail means that the module is not in sync with the ppx
         |],
       )),
       `lineNames({js|[sub-e]|js}),
-      `repeatFn((`numInt(1), [|`lineNames({js|[sub-g]|js})|])),
+      `repeat((`num(1), [|`lineNames({js|[sub-g]|js})|])),
     |]),
   );
   

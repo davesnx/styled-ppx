@@ -66,6 +66,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.maskPositions([|
     `hvOffset((`right, `pxFloat(20.), `bottom, `pxFloat(10.))),
   |]);
+  CSS.maskPositions([|`hv((`rem(1.), `rem(1.))), `center|]);
   CSS.unsafe({js|maskClip|js}, {js|border-box|js});
   CSS.unsafe({js|maskClip|js}, {js|padding-box|js});
   CSS.unsafe({js|maskClip|js}, {js|content-box|js});

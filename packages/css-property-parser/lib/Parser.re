@@ -823,7 +823,7 @@ and property_alignment_baseline = [%value.rec
   "'auto' | 'baseline' | 'before-edge' | 'text-before-edge' | 'middle' | 'central' | 'after-edge' | 'text-after-edge' | 'ideographic' | 'alphabetic' | 'hanging' | 'mathematical'"
 ]
 and property_all = [%value.rec "'initial' | 'inherit' | 'unset' | 'revert'"]
-and property_animation = [%value.rec "[ <single-animation> ]#"]
+and property_animation = [%value.rec "[ <single-animation> | <single-animation-no-interp> ]#"]
 and property_animation_delay = [%value.rec "[ <extended-time> ]#"]
 and property_animation_direction = [%value.rec
   "[ <single-animation-direction> ]#"
@@ -1732,6 +1732,7 @@ and property_transform_style = [%value.rec "'flat' | 'preserve-3d'"]
 and property_transition = [%value.rec
   "[ <single-transition> | <single-transition-no-interp> ]#"
 ]
+and property_transition_behavior = [%value.rec "<transition-behavior-value>#"]
 and property_transition_delay = [%value.rec "[ <extended-time> ]#"]
 and property_transition_duration = [%value.rec "[ <extended-time> ]#"]
 and property_transition_property = [%value.rec
@@ -1843,24 +1844,43 @@ and side_or_corner = [%value.rec
   "[ 'left' | 'right' ] || [ 'top' | 'bottom' ]"
 ]
 and single_animation = [%value.rec
-  "[ <keyframes-name> | 'none' ] || <extended-time> || <timing-function> || <extended-time> || <single-animation-iteration-count> || <single-animation-direction> || <single-animation-fill-mode> || <single-animation-play-state>"
+  "[ [ <keyframes-name> | 'none' | <interpolation> ] ]
+  | [ [ <keyframes-name> | 'none' | <interpolation> ] <extended-time> ]
+  | [ [ <keyframes-name> | 'none' | <interpolation> ] <extended-time> <timing-function> ]
+  | [ [ <keyframes-name> | 'none' | <interpolation> ] <extended-time> <timing-function> <extended-time> ]
+  | [ [ <keyframes-name> | 'none' | <interpolation> ] <extended-time> <timing-function> <extended-time> <single-animation-iteration-count> ]
+  | [ [ <keyframes-name> | 'none' | <interpolation> ] <extended-time> <timing-function> <extended-time> <single-animation-iteration-count> <single-animation-direction> ]
+  | [ [ <keyframes-name> | 'none' | <interpolation> ] <extended-time> <timing-function> <extended-time> <single-animation-iteration-count> <single-animation-direction> <single-animation-fill-mode> ]
+  | [ [ <keyframes-name> | 'none' | <interpolation> ] <extended-time> <timing-function> <extended-time> <single-animation-iteration-count> <single-animation-direction> <single-animation-fill-mode> <single-animation-play-state> ]"
+]
+and single_animation_no_interp = [%value.rec
+  "[ <keyframes-name> | 'none' ] || <extended-time-no-interp> || <timing-function-no-interp> || <extended-time-no-interp> || <single-animation-iteration-count-no-interp> || <single-animation-direction-no-interp> || <single-animation-fill-mode-no-interp> || <single-animation-play-state-no-interp>"
 ]
 and single_animation_direction = [%value.rec
+  "'normal' | 'reverse' | 'alternate' | 'alternate-reverse' | <interpolation>"
+]
+and single_animation_direction_no_interp = [%value.rec
   "'normal' | 'reverse' | 'alternate' | 'alternate-reverse'"
 ]
 and single_animation_fill_mode = [%value.rec
+  "'none' | 'forwards' | 'backwards' | 'both' | <interpolation>"
+]
+and single_animation_fill_mode_no_interp = [%value.rec
   "'none' | 'forwards' | 'backwards' | 'both'"
 ]
-and single_animation_iteration_count = [%value.rec "'infinite' | <number>"]
-and single_animation_play_state = [%value.rec "'running' | 'paused'"]
+and single_animation_iteration_count = [%value.rec "'infinite' | <number> | <interpolation>"]
+and single_animation_iteration_count_no_interp = [%value.rec "'infinite' | <number>"]
+and single_animation_play_state = [%value.rec "'running' | 'paused' | <interpolation>"]
+and single_animation_play_state_no_interp = [%value.rec "'running' | 'paused'"]
 and single_transition_no_interp = [%value.rec
-  "[ <single-transition-property-no-interp> | 'none' ] || <extended-time-no-interp> || <timing-function-no-interp> || <extended-time-no-interp>"
+  "[ <single-transition-property-no-interp> | 'none' ] || <extended-time-no-interp> || <timing-function-no-interp> || <extended-time-no-interp> || <transition-behavior-value-no-interp>"
 ]
 and single_transition = [%value.rec
   "[<single-transition-property> | 'none']
   | [ [<single-transition-property> | 'none'] <extended-time> ]
   | [ [<single-transition-property> | 'none'] <extended-time> <timing-function> ]
-  | [ [<single-transition-property> | 'none'] <extended-time> <timing-function> <extended-time> ]"
+  | [ [<single-transition-property> | 'none'] <extended-time> <timing-function> <extended-time> ]
+  | [ [<single-transition-property> | 'none'] <extended-time> <timing-function> <extended-time> <transition-behavior-value> ]"
 ]
 and single_transition_property = [%value.rec
   "<custom-ident> | <interpolation> | 'all'"
@@ -1958,6 +1978,8 @@ and transform_function = [%value.rec
   "<matrix()> | <translate()> | <translateX()> | <translateY()> | <scale()> | <scaleX()> | <scaleY()> | <rotate()> | <skew()> | <skewX()> | <skewY()> | <matrix3d()> | <translate3d()> | <translateZ()> | <scale3d()> | <scaleZ()> | <rotate3d()> | <rotateX()> | <rotateY()> | <rotateZ()> | <perspective()>"
 ]
 and transform_list = [%value.rec "[ <transform-function> ]+"]
+and transition_behavior_value = [%value.rec "'normal' | 'allow-discrete' | <interpolation>" ]
+and transition_behavior_value_no_interp = [%value.rec "'normal' | 'allow-discrete'" ]
 and type_or_unit = [%value.rec
   "'string' | 'color' | 'url' | 'integer' | 'number' | 'length' | 'angle' | 'time' | 'frequency' | 'cap' | 'ch' | 'em' | 'ex' | 'ic' | 'lh' | 'rlh' | 'rem' | 'vb' | 'vi' | 'vw' | 'vh' | 'vmin' | 'vmax' | 'mm' | 'Q' | 'cm' | 'in' | 'pt' | 'pc' | 'px' | 'deg' | 'grad' | 'rad' | 'turn' | 'ms' | 's' | 'Hz' | 'kHz' | '%'"
 ]
@@ -3355,6 +3377,7 @@ let check_map =
       ("property-transform-origin", check(property_transform_origin)),
       ("property-transform-style", check(property_transform_style)),
       ("property-transition", check(property_transition)),
+      ("property-transition-behavior", check(property_transition_behavior)),
       ("property-transition-delay", check(property_transition_delay)),
       ("property-transition-duration", check(property_transition_duration)),
       ("property-transition-property", check(property_transition_property)),
