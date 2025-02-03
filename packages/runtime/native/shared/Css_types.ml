@@ -1813,158 +1813,89 @@ module WordSpacing = struct
 end
 
 module Display = struct
-  module Old = struct
-    type t =
-      [ `flow
-      | `flowRoot
-      | `ruby
-      | `rubyBase
-      | `rubyBaseContainer
-      | `rubyText
-      | `rubyTextContainer
-      | `runIn
-      | `mozBox
-      | `mozInlineBox
-      | `mozInlineStack
-      | `msFlexbox
-      | `msGrid
-      | `msInlineFlexbox
-      | `msInlineGrid
-      | `webkitBox
-      | `webkitFlex
-      | `webkitInlineBox
-      | `webkitInlineFlex
-      ]
-
-    let toString = function
-      | `flow -> "flow"
-      | `flowRoot -> "flow-root"
-      | `ruby -> "ruby"
-      | `rubyBase -> "ruby-base"
-      | `rubyBaseContainer -> "ruby-base-container"
-      | `rubyText -> "ruby-text"
-      | `rubyTextContainer -> "ruby-text-container"
-      | `runIn -> "run-in"
-      | `mozBox -> "-moz-box"
-      | `mozInlineBox -> "-moz-inline-box"
-      | `mozInlineStack -> "-moz-inline-stack"
-      | `msFlexbox -> "-ms-flexbox"
-      | `msGrid -> "-ms-grid"
-      | `msInlineFlexbox -> "-ms-inline-flexbox"
-      | `msInlineGrid -> "-ms-inline-grid"
-      | `webkitBox -> "-webkit-box"
-      | `webkitFlex -> "-webkit-flex"
-      | `webkitInlineBox -> "-webkit-inline-box"
-      | `webkitInlineFlex -> "-webkit-inline-flex"
-  end
-
-  module Outside = struct
-    type t =
-      [ `block
-      | `inline
-      | `runIn
-      ]
-
-    let toString (x : t) =
-      match x with
-      | `block -> {js|block|js}
-      | `inline -> {js|inline|js}
-      | `runIn -> {js|run-in|js}
-  end
-
-  module Inside = struct
-    type t =
-      [ `table
-      | `flex
-      | `grid
-      ]
-
-    let toString (x : t) =
-      match x with
-      | `table -> {js|table|js}
-      | `flex -> {js|flex|js}
-      | `grid -> {js|grid|js}
-  end
-
-  module ListItem = struct
-    type t = [ `listItem ]
-
-    let toString (x : t) = match x with `listItem -> {js|list-item|js}
-  end
-
-  module Internal = struct
-    type t =
-      [ `tableRowGroup
-      | `tableHeaderGroup
-      | `tableFooterGroup
-      | `tableRow
-      | `tableCell
-      | `tableColumnGroup
-      | `tableColumn
-      | `tableCaption
-      ]
-
-    let toString (x : t) =
-      match x with
-      | `tableRowGroup -> {js|table-row-group|js}
-      | `tableHeaderGroup -> {js|table-header-group|js}
-      | `tableFooterGroup -> {js|table-footer-group|js}
-      | `tableRow -> {js|table-row|js}
-      | `tableCell -> {js|table-cell|js}
-      | `tableColumnGroup -> {js|table-column-group|js}
-      | `tableColumn -> {js|table-column|js}
-      | `tableCaption -> {js|table-caption|js}
-  end
-
-  module Box = struct
-    type t =
-      [ `contents
-      | None.t
-      ]
-
-    let toString (x : t) =
-      match x with `contents -> {js|contents|js} | #None.t -> None.toString
-  end
-
-  module Legacy = struct
-    type t =
-      [ `inlineBlock
-      | `inlineFlex
-      | `inlineGrid
-      | `inlineTable
-      ]
-
-    let toString (x : t) =
-      match x with
-      | `inlineBlock -> {js|inline-block|js}
-      | `inlineFlex -> {js|inline-flex|js}
-      | `inlineGrid -> {js|inline-grid|js}
-      | `inlineTable -> {js|inline-table|js}
-  end
-
   type t =
-    [ Outside.t
-    | Old.t
-    | Inside.t
-    | ListItem.t
-    | Internal.t
-    | Box.t
-    | Legacy.t
-    | Var.t
-    | Cascading.t
+    [ `block
+    | `contents
+    | `flex
+    | `flow
+    | `flowRoot
+    | `grid
+    | `inline
+    | `inlineBlock
+    | `inlineFlex
+    | `inlineGrid
+    | `inlineTable
+    | `listItem
+    | `mozBox
+    | `mozInlineBox
+    | `mozInlineStack
+    | `msFlexbox
+    | `msGrid
+    | `msInlineFlexbox
+    | `msInlineGrid
+    | `ruby
+    | `rubyBase
+    | `rubyBaseContainer
+    | `rubyText
+    | `rubyTextContainer
+    | `runIn
+    | `table
+    | `tableCaption
+    | `tableCell
+    | `tableColumn
+    | `tableColumnGroup
+    | `tableFooterGroup
+    | `tableHeaderGroup
+    | `tableRow
+    | `tableRowGroup
+    | `webkitBox
+    | `webkitFlex
+    | `webkitInlineBox
+    | `webkitInlineFlex
+    | None.t
     ]
 
   let toString (x : t) =
     match x with
-    | #Outside.t as o -> Outside.toString o
-    | #Old.t as o -> Old.toString o
-    | #Inside.t as i -> Inside.toString i
-    | #ListItem.t as l -> ListItem.toString l
-    | #Internal.t as i' -> Internal.toString i'
-    | #Box.t as b -> Box.toString b
-    | #Legacy.t as l' -> Legacy.toString l'
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    | `block -> {js|block|js}
+    | `contents -> {js|contents|js}
+    | `flex -> {js|flex|js}
+    | `flow -> "flow"
+    | `flowRoot -> "flow-root"
+    | `grid -> {js|grid|js}
+    | `inline -> {js|inline|js}
+    | `inlineBlock -> {js|inline-block|js}
+    | `inlineFlex -> {js|inline-flex|js}
+    | `inlineGrid -> {js|inline-grid|js}
+    | `inlineTable -> {js|inline-table|js}
+    | `listItem -> {js|list-item|js}
+    | `mozBox -> "-moz-box"
+    | `mozInlineBox -> "-moz-inline-box"
+    | `mozInlineStack -> "-moz-inline-stack"
+    | `msFlexbox -> "-ms-flexbox"
+    | `msGrid -> "-ms-grid"
+    | `msInlineFlexbox -> "-ms-inline-flexbox"
+    | `msInlineGrid -> "-ms-inline-grid"
+    | `ruby -> "ruby"
+    | `rubyBase -> "ruby-base"
+    | `rubyBaseContainer -> "ruby-base-container"
+    | `rubyText -> "ruby-text"
+    | `rubyTextContainer -> "ruby-text-container"
+    | `runIn -> {js|run-in|js}
+    | `table -> {js|table|js}
+    | `tableCaption -> {js|table-caption|js}
+    | `tableCell -> {js|table-cell|js}
+    | `tableColumn -> {js|table-column|js}
+    | `tableColumnGroup -> {js|table-column-group|js}
+    | `tableFooterGroup -> {js|table-footer-group|js}
+    | `tableHeaderGroup -> {js|table-header-group|js}
+    | `tableRow -> {js|table-row|js}
+    | `tableRowGroup -> {js|table-row-group|js}
+    | `webkitBox -> "-webkit-box"
+    | `webkitFlex -> "-webkit-flex"
+    | `webkitInlineBox -> "-webkit-inline-box"
+    | `webkitInlineFlex -> "-webkit-inline-flex"
+    | #None.t -> None.toString
 end
 
 module TextEmphasisStyle = struct

@@ -823,7 +823,9 @@ and property_alignment_baseline = [%value.rec
   "'auto' | 'baseline' | 'before-edge' | 'text-before-edge' | 'middle' | 'central' | 'after-edge' | 'text-after-edge' | 'ideographic' | 'alphabetic' | 'hanging' | 'mathematical'"
 ]
 and property_all = [%value.rec "'initial' | 'inherit' | 'unset' | 'revert'"]
-and property_animation = [%value.rec "[ <single-animation> | <single-animation-no-interp> ]#"]
+and property_animation = [%value.rec
+  "[ <single-animation> | <single-animation-no-interp> ]#"
+]
 and property_animation_delay = [%value.rec "[ <extended-time> ]#"]
 and property_animation_direction = [%value.rec
   "[ <single-animation-direction> ]#"
@@ -1112,7 +1114,9 @@ and property_font_stretch = [%value.rec "<font-stretch-absolute>"]
 and property_font_style = [%value.rec
   "'normal' | 'italic' | 'oblique' | <interpolation> | [ 'oblique' <extended-angle> ]?"
 ]
-and property_font_synthesis = [%value.rec "'none' | [ 'weight' || 'style' || 'small-caps' || 'position' ]"]
+and property_font_synthesis = [%value.rec
+  "'none' | [ 'weight' || 'style' || 'small-caps' || 'position' ]"
+]
 and property_font_synthesis_weight = [%value.rec "'auto' | 'none'"]
 and property_font_synthesis_style = [%value.rec "'auto' | 'none'"]
 and property_font_synthesis_small_caps = [%value.rec "'auto' | 'none'"]
@@ -1155,7 +1159,9 @@ and property_grid = [%value.rec
 ]
 and property_grid_area = [%value.rec "<grid-line> [ '/' <grid-line> ]{0,3}"]
 and property_grid_auto_columns = [%value.rec "[ <track-size> ]+"]
-and property_grid_auto_flow = [%value.rec "[ [ 'row' | 'column' ] || 'dense' ] | <interpolation>"]
+and property_grid_auto_flow = [%value.rec
+  "[ [ 'row' | 'column' ] || 'dense' ] | <interpolation>"
+]
 and property_grid_auto_rows = [%value.rec "[ <track-size> ]+"]
 and property_grid_column = [%value.rec "<grid-line> [ '/' <grid-line> ]?"]
 and property_grid_column_end = [%value.rec "<grid-line>"]
@@ -1175,7 +1181,9 @@ and property_grid_row_start = [%value.rec "<grid-line>"]
 and property_grid_template = [%value.rec
   "'none' | <'grid-template-rows'> '/' <'grid-template-columns'> | [ [ <line-names> ]? <string> [ <track-size> ]? [ <line-names> ]? ]+ [ '/' <explicit-track-list> ]?"
 ]
-and property_grid_template_areas = [%value.rec "'none' | [ <string> | <interpolation> ]+"]
+and property_grid_template_areas = [%value.rec
+  "'none' | [ <string> | <interpolation> ]+"
+]
 and property_grid_template_columns = [%value.rec
   "'none' | <track-list> | <auto-track-list> | 'subgrid' [ <line-name-list> ]? | 'masonry' | <interpolation>"
 ]
@@ -1320,7 +1328,9 @@ and property_mask_position = [%value.rec "[ <position> ]#"]
 and property_mask_repeat = [%value.rec "[ <repeat-style> ]#"]
 and property_mask_size = [%value.rec "[ <bg-size> ]#"]
 and property_mask_type = [%value.rec "'luminance' | 'alpha'"]
-and property_masonry_auto_flow = [%value.rec "[ 'pack' | 'next' ] || [ 'definite-first' | 'ordered' ]"]
+and property_masonry_auto_flow = [%value.rec
+  "[ 'pack' | 'next' ] || [ 'definite-first' | 'ordered' ]"
+]
 and property_max_block_size = [%value.rec "<'max-width'>"]
 and property_max_height = [%value.rec
   "'auto' | <extended-length> | <extended-percentage> | 'min-content' | 'max-content' | 'fit-content' | fit-content( <extended-length> | <extended-percentage> )"
@@ -1415,7 +1425,9 @@ and property_overflow_anchor = [%value.rec "'auto' | 'none'"]
 and property_overflow_block = [%value.rec
   "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"
 ]
-and property_overflow_clip_margin = [%value.rec "<visual-box> || <extended-length>"]
+and property_overflow_clip_margin = [%value.rec
+  "<visual-box> || <extended-length>"
+]
 and property_overflow_inline = [%value.rec
   "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"
 ]
@@ -1588,7 +1600,9 @@ and property_scroll_snap_type_y = [%value.rec
 ]
 and property_scrollbar_color = [%value.rec "'auto' | [ <color> <color> ]"]
 and property_scrollbar_width = [%value.rec "'auto' | 'thin' | 'none'"]
-and property_scrollbar_gutter = [%value.rec "'auto' | 'stable' && 'both-edges'?" ]
+and property_scrollbar_gutter = [%value.rec
+  "'auto' | 'stable' && 'both-edges'?"
+]
 and property_scrollbar_3dlight_color = [%value.rec "<color>"]
 and property_scrollbar_arrow_color = [%value.rec "<color>"]
 and property_scrollbar_base_color = [%value.rec "<color>"]
@@ -1868,9 +1882,15 @@ and single_animation_fill_mode = [%value.rec
 and single_animation_fill_mode_no_interp = [%value.rec
   "'none' | 'forwards' | 'backwards' | 'both'"
 ]
-and single_animation_iteration_count = [%value.rec "'infinite' | <number> | <interpolation>"]
-and single_animation_iteration_count_no_interp = [%value.rec "'infinite' | <number>"]
-and single_animation_play_state = [%value.rec "'running' | 'paused' | <interpolation>"]
+and single_animation_iteration_count = [%value.rec
+  "'infinite' | <number> | <interpolation>"
+]
+and single_animation_iteration_count_no_interp = [%value.rec
+  "'infinite' | <number>"
+]
+and single_animation_play_state = [%value.rec
+  "'running' | 'paused' | <interpolation>"
+]
 and single_animation_play_state_no_interp = [%value.rec "'running' | 'paused'"]
 and single_transition_no_interp = [%value.rec
   "[ <single-transition-property-no-interp> | 'none' ] || <extended-time-no-interp> || <timing-function-no-interp> || <extended-time-no-interp> || <transition-behavior-value-no-interp>"
@@ -1978,8 +1998,12 @@ and transform_function = [%value.rec
   "<matrix()> | <translate()> | <translateX()> | <translateY()> | <scale()> | <scaleX()> | <scaleY()> | <rotate()> | <skew()> | <skewX()> | <skewY()> | <matrix3d()> | <translate3d()> | <translateZ()> | <scale3d()> | <scaleZ()> | <rotate3d()> | <rotateX()> | <rotateY()> | <rotateZ()> | <perspective()>"
 ]
 and transform_list = [%value.rec "[ <transform-function> ]+"]
-and transition_behavior_value = [%value.rec "'normal' | 'allow-discrete' | <interpolation>" ]
-and transition_behavior_value_no_interp = [%value.rec "'normal' | 'allow-discrete'" ]
+and transition_behavior_value = [%value.rec
+  "'normal' | 'allow-discrete' | <interpolation>"
+]
+and transition_behavior_value_no_interp = [%value.rec
+  "'normal' | 'allow-discrete'"
+]
 and type_or_unit = [%value.rec
   "'string' | 'color' | 'url' | 'integer' | 'number' | 'length' | 'angle' | 'time' | 'frequency' | 'cap' | 'ch' | 'em' | 'ex' | 'ic' | 'lh' | 'rlh' | 'rem' | 'vb' | 'vi' | 'vw' | 'vh' | 'vmin' | 'vmax' | 'mm' | 'Q' | 'cm' | 'in' | 'pt' | 'pc' | 'px' | 'deg' | 'grad' | 'rad' | 'turn' | 'ms' | 's' | 'Hz' | 'kHz' | '%'"
 ]
@@ -3104,7 +3128,10 @@ let check_map =
       ("property-overflow", check(property_overflow)),
       ("property-overflow-anchor", check(property_overflow_anchor)),
       ("property-overflow-block", check(property_overflow_block)),
-      ("property-overflow-clip-margin", check(property_overflow_clip_margin)),
+      (
+        "property-overflow-clip-margin",
+        check(property_overflow_clip_margin),
+      ),
       ("property-overflow-inline", check(property_overflow_inline)),
       ("property-overflow-wrap", check(property_overflow_wrap)),
       ("property-overflow-x", check(property_overflow_x)),
