@@ -5946,8 +5946,7 @@ let render = (~loc: Location.t, property, value, important) =>
     | Error(_) =>
       switch (render_to_expr(~loc, property, value, important)) {
       | Ok(value) => Ok(value)
-      | Error(`Invalid_value(_))
-      | exception (Invalid_value(_)) => Error(`Invalid_value(value))
+      | Error(`Invalid_value(_)) => Error(`Invalid_value(value))
       | Error(_)
       | exception Unsupported_feature =>
         let.ok () = is_valid_string ? Ok() : Error(`Invalid_value(value));
