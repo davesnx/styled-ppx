@@ -99,14 +99,14 @@ jobs:
         run: make release-static
 
       - name: Upload artifacts for ${{ matrix.os }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}
           path: _build/default/packages/bin/bin.exe
 
       - name: Upload runtime artifacts for @davesnx/styled-ppx/runtime
         if: matrix.os == 'ubuntu-20.04'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: runtime-rescript
           path: _build/default/packages/runtime/rescript
