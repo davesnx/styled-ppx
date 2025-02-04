@@ -136,6 +136,16 @@ let backgroundPositions x =
 let backgroundRepeat x =
   Rule.declaration ({js|backgroundRepeat|js}, BackgroundRepeat.toString x)
 
+let backgroundRepeat2 h v =
+  Rule.declaration
+    ({js|backgroundRepeat|js}, BackgroundRepeat.Value.toString @@ `hv (h, v))
+
+let backgroundRepeats x =
+  Rule.declaration
+    ( {js|backgroundRepeat|js},
+      Kloth.Array.map_and_join ~sep:{js|, |js}
+        ~f:BackgroundRepeat.Value.toString x )
+
 let maskPosition x =
   Rule.declaration ({js|maskPosition|js}, MaskPosition.toString x)
 

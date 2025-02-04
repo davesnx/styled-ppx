@@ -26,6 +26,7 @@ module Color = {
 [%css {|background-repeat: space no-repeat|}];
 [%css {|background-repeat: round no-repeat|}];
 [%css {|background-repeat: no-repeat no-repeat|}];
+[%css {|background-repeat: repeat-x, repeat-y|}];
 [%css {|background-attachment: local|}];
 /* [%css {|background-position: bottom 10px right 20px|}]; */
 /* [%css {|background-position: bottom 10px right|}]; */

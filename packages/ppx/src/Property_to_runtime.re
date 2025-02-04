@@ -1540,7 +1540,7 @@ let render_repeat_style = (~loc) =>
   fun
   | `Repeat_x => variant_to_expression(~loc, `Repeat_x)
   | `Repeat_y => variant_to_expression(~loc, `Repeat_y)
-  | `Xor(values) => {
+  | `Static(values) => {
       let render_xor = (
         fun
         | `Repeat => [%expr `repeat]
@@ -1550,10 +1550,9 @@ let render_repeat_style = (~loc) =>
       );
 
       switch (values) {
-      | [x] => [%expr [%e render_xor(x)]]
-      | [x, y] => [%expr `hv(([%e render_xor(x)], [%e render_xor(y)]))]
-      | []
-      | _ => raise(Impossible_state)
+      | (x, None) => [%expr [%e render_xor(x)]]
+      | (x, Some(y)) =>
+        [%expr `hv(([%e render_xor(x)], [%e render_xor(y)]))]
       };
     };
 
@@ -1576,14 +1575,11 @@ let background_image =
 let background_repeat =
   monomorphic(
     Property_parser.property_background_repeat,
-    (~loc) => [%expr CSS.backgroundRepeat],
-    (~loc) =>
-      fun
-      | [] => raise(Impossible_state)
-      | [`Repeat_x] => variant_to_expression(~loc, `Repeat_x)
-      | [`Repeat_y] => variant_to_expression(~loc, `Repeat_y)
-      | [`Xor(_) as v] => render_repeat_style(~loc, v)
-      | _ => raise(Unsupported_feature),
+    (~loc) => [%expr CSS.backgroundRepeats],
+    (~loc, repeats) =>
+      repeats
+      |> List.map(render_repeat_style(~loc))
+      |> Builder.pexp_array(~loc),
   );
 
 let background_attachment =

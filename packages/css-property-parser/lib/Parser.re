@@ -1835,7 +1835,7 @@ and relative_selector = [%value.rec "[ <combinator> ]? <complex-selector>"]
 and relative_selector_list = [%value.rec "[ <relative-selector> ]#"]
 and relative_size = [%value.rec "'larger' | 'smaller'"]
 and repeat_style = [%value.rec
-  "'repeat-x' | 'repeat-y' | [ 'repeat' | 'space' | 'round' | 'no-repeat' ]{1,2}"
+  "'repeat-x' | 'repeat-y' | [ 'repeat' | 'space' | 'round' | 'no-repeat' ] [ 'repeat' | 'space' | 'round' | 'no-repeat' ]?"
 ]
 and right = [%value.rec "<extended-length> | 'auto'"]
 and self_position = [%value.rec

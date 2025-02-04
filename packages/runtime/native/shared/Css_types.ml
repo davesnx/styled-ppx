@@ -3012,37 +3012,43 @@ module BackgroundOrigin = struct
 end
 
 module BackgroundRepeat = struct
-  type twoValue =
-    [ `repeat
-    | `space
-    | `round
-    | `noRepeat
-    ]
+  module Value = struct
+    type style =
+      [ `repeat
+      | `space
+      | `round
+      | `noRepeat
+      ]
+
+    type t =
+      [ `repeatX
+      | `repeatY
+      | style
+      | `hv of style * style
+      ]
+
+    let rec toString (x : t) =
+      match x with
+      | `repeatX -> {js|repeat-x|js}
+      | `repeatY -> {js|repeat-y|js}
+      | `repeat -> {js|repeat|js}
+      | `space -> {js|space|js}
+      | `round -> {js|round|js}
+      | `noRepeat -> {js|no-repeat|js}
+      | `hv (h, v) -> toString (h :> t) ^ {js| |js} ^ toString (v :> t)
+  end
 
   type t =
-    [ `repeatX
-    | `repeatY
-    | twoValue
+    [ Value.t
     | Var.t
     | Cascading.t
     ]
 
-  type horizontal = twoValue
-  type vertical = twoValue
-
-  let rec toString x =
+  let toString (x : t) =
     match x with
-    | `repeatX -> {js|repeat-x|js}
-    | `repeatY -> {js|repeat-y|js}
-    | `repeat -> {js|repeat|js}
-    | `space -> {js|space|js}
-    | `round -> {js|round|js}
-    | `noRepeat -> {js|no-repeat|js}
-    | `hv (h, v) -> hv_to_string h v
+    | #Value.t as x -> Value.toString x
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
-
-  and hv_to_string h v = toString h ^ {js| |js} ^ toString v
 end
 
 module TextOverflow = struct
