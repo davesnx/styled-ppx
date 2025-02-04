@@ -1566,8 +1566,7 @@ let render_attachment = (~loc) =>
 let background_image =
   polymorphic(Property_parser.property_background_image, (~loc) =>
     fun
-    | [] => raise(Impossible_state)
-    | [i] => [[%expr CSS.backgroundImage([%e render_bg_image(~loc, i)])]]
+    | [one] => [[%expr CSS.backgroundImage([%e render_bg_image(~loc, one)])]]
     | more => [
         [%expr CSS.backgroundImages([%e render_bg_images(~loc, more)])],
       ]
