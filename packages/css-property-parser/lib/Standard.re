@@ -19,7 +19,13 @@ let function_call = (name, rule) => {
       fun
       | FUNCTION(called_name) when name == called_name => Ok()
       | token =>
-        Error(["expected a " ++ name ++ ". got an " ++ show_token(token)]),
+        Error([
+          "Expected 'function "
+          ++ name
+          ++ "'. Got '"
+          ++ humanize(token)
+          ++ "' instead.",
+        ]),
     );
   let.bind_match value = rule;
   let.bind_match () = expect(RIGHT_PAREN);
@@ -33,16 +39,17 @@ let integer =
       Float.(
         is_integer(float)
           ? Ok(float |> to_int)
-          : Error(["expected an integer, received a float"])
+          : Error(["Expected an integer, got a float instead."])
       )
-    | _ => Error(["expected an integer"]),
+    | _ => Error(["Expected an integer."]),
   );
 
 let number =
   token(
     fun
     | NUMBER(float) => Ok(float)
-    | token => Error(["expected a number, receveid " ++ show_token(token)]),
+    | token =>
+      Error(["Expected a number. Got '" ++ humanize(token) ++ "' instead."]),
   );
 
 let length =
@@ -78,10 +85,10 @@ let length =
       | "pt" => Ok(`Pt(number))
       | "pc" => Ok(`Pc(number))
       | "px" => Ok(`Px(number))
-      | _ => Error(["unknown dimension"])
+      | dim => Error(["Invalid length unit '" ++ dim ++ "'."])
       }
     | NUMBER(0.) => Ok(`Zero)
-    | _ => Error(["expected length"])
+    | _ => Error(["Expected length."])
     }
   );
 
@@ -95,10 +102,10 @@ let angle =
       | "grad" => Ok(`Grad(number))
       | "rad" => Ok(`Rad(number))
       | "turn" => Ok(`Turn(number))
-      | _ => Error(["unknown dimension"])
+      | dim => Error(["Invalid angle unit '" ++ dim ++ "'."])
       }
     | NUMBER(0.) => Ok(`Deg(0.))
-    | _ => Error(["expected angle"])
+    | _ => Error(["Expected angle."])
     }
   );
 
@@ -110,9 +117,9 @@ let time =
       switch (dimension) {
       | "s" => Ok(`S(number))
       | "ms" => Ok(`Ms(number))
-      | _ => Error(["unknown time unit"])
+      | un => Error(["Invalid time unit '" ++ un ++ "'."])
       }
-    | _ => Error(["expected time"])
+    | _ => Error(["Expected time."])
     }
   );
 
@@ -124,9 +131,9 @@ let frequency =
       switch (dimension |> String.lowercase_ascii) {
       | "hz" => Ok(`Hz(number))
       | "khz" => Ok(`KHz(number))
-      | dim => Error(["unknown dimension " ++ dim])
+      | dim => Error(["Invalid frequency unit '" ++ dim ++ "'."])
       }
-    | token => Error(["expected frequency. got" ++ show_token(token)])
+    | _ => Error(["Expected frequency."])
     }
   );
 
@@ -140,9 +147,9 @@ let resolution =
       | "dpcm" => Ok(`Dpcm(number))
       | "x"
       | "dppx" => Ok(`Dppx(number))
-      | _ => Error(["unknown dimension"])
+      | dim => Error(["Invalid resolution unit '" ++ dim ++ "'."])
       }
-    | _ => Error(["expected resolution"])
+    | _ => Error(["Expected resolution."])
     }
   );
 
@@ -151,7 +158,7 @@ let percentage =
   token(
     fun
     | PERCENTAGE(float) => Ok(float)
-    | _ => Error(["expected percentage"]),
+    | _ => Error(["Expected percentage."]),
   );
 
 // https://drafts.csswg.org/css-values-4/#css-identifier
@@ -160,7 +167,7 @@ let ident =
   token(
     fun
     | IDENT(string) => Ok(string)
-    | _ => Error(["expected an indentifier"]),
+    | _ => Error(["Expected an indentifier."]),
   );
 
 // https://drafts.csswg.org/css-values-4/#textual-values
@@ -180,7 +187,7 @@ let custom_ident =
     fun
     | IDENT(string) => Ok(string)
     | STRING(string) => Ok(string)
-    | _ => Error(["expected an identifier"]),
+    | _ => Error(["Expected an identifier."]),
   );
 
 // https://drafts.csswg.org/css-values-4/#dashed-idents
@@ -188,7 +195,7 @@ let dashed_ident =
   token(
     fun
     | IDENT(string) when String.sub(string, 0, 2) == "--" => Ok(string)
-    | _ => Error(["expected a --variable"]),
+    | _ => Error(["Expected a --variable."]),
   );
 
 // https://drafts.csswg.org/css-values-4/#strings
@@ -196,7 +203,7 @@ let string =
   token(
     fun
     | STRING(string) => Ok(string)
-    | _ => Error(["expected a string"]),
+    | _ => Error(["Expected a string."]),
   );
 
 // TODO: <url-modifier>
@@ -206,7 +213,7 @@ let url = {
     token(
       fun
       | URL(url) => Ok(url)
-      | _ => Error(["expected a url"]),
+      | _ => Error(["Expected a url."]),
     );
   let url_fun = function_call("url", string);
   Combinator.xor([url_token, url_fun]);
@@ -222,7 +229,7 @@ let hex_color =
     fun
     | HASH(str, _) when String.length(str) >= 3 && String.length(str) <= 8 =>
       Ok(str)
-    | _ => Error(["expected a hex-color"]),
+    | _ => Error(["Expected a hex-color."]),
   );
 
 /* <interpolation>, It's not part of the spec.
@@ -271,9 +278,16 @@ let flex_value =
     | DIMENSION(number, dimension) =>
       switch (dimension) {
       | "fr" => Ok(`Fr(number))
-      | _ => Error(["only fr dimension is valid"])
+      | _ =>
+        Error([
+          Format.sprintf(
+            "Invalid flex value %g%s, only fr is valid.",
+            number,
+            dimension,
+          ),
+        ])
       }
-    | _ => Error(["expected flex_value"]),
+    | _ => Error(["Expected flex_value."]),
   );
 
 let custom_ident_without_span_or_auto =
@@ -282,10 +296,10 @@ let custom_ident_without_span_or_auto =
     | IDENT("auto")
     | STRING("auto")
     | IDENT("span")
-    | STRING("span") => Error(["custom ident cannot be span or auto"])
+    | STRING("span") => Error(["Custom ident cannot be span or auto."])
     | IDENT(string) => Ok(string)
     | STRING(string) => Ok(string)
-    | _ => Error(["expected an identifier"]),
+    | _ => Error(["expected an identifier."]),
   );
 
 // TODO: workarounds

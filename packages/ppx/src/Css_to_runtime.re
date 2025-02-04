@@ -261,14 +261,15 @@ and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
         "Unknown property '" ++ property ++ "'",
       ),
     ]
-  | Error(`Invalid_value(value)) => [
+  | Error(`Invalid_value(reason)) => [
       Error.expr(
         ~loc=declaration_location,
-        "Property '"
-        ++ property
-        ++ "' has an invalid value: '"
-        ++ String.trim(value)
-        ++ "'",
+        Format.sprintf(
+          "@[Property@ '%s'@ has@ an@ invalid@ value:@ '%s',@ %s@]",
+          property,
+          value_source,
+          reason,
+        ),
       ),
     ]
   };
