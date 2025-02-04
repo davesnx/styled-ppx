@@ -2297,7 +2297,9 @@ let render_tab_size = (~loc, value: Types.property_tab_size) => {
   switch (value) {
   | `Number(n) =>
     int_of_float(n) < 0
-      ? raise(Invalid_value("Property 'tab-size' value can't be less than 0."))
+      ? raise(
+          Invalid_value("Property 'tab-size' value can't be less than 0."),
+        )
       : [%expr `num([%e render_float(~loc, n)])]
   | `Extended_length(ext) => render_extended_length(~loc, ext)
   };
@@ -3043,7 +3045,7 @@ let scale =
   polymorphic(Property_parser.property_scale, (~loc) =>
     fun
     | `None => [[%expr CSS.scaleProperty(`none)]]
-    | `Number_percentage([x, y, z, ..._]) => [
+    | `Number_percentage([x, y, z]) => [
         [%expr
           CSS.scaleProperty3(
             [%e render_number_percentage(~loc, x)],
@@ -3052,7 +3054,7 @@ let scale =
           )
         ],
       ]
-    | `Number_percentage([x, y, ..._]) => [
+    | `Number_percentage([x, y]) => [
         [%expr
           CSS.scaleProperty2(
             [%e render_number_percentage(~loc, x)],
@@ -3060,10 +3062,10 @@ let scale =
           )
         ],
       ]
-    | `Number_percentage([x, ..._]) => [
+    | `Number_percentage([x]) => [
         [%expr CSS.scaleProperty([%e render_number_percentage(~loc, x)])],
       ]
-    | `Number_percentage([]) => raise(Impossible_state)
+    | `Number_percentage(_) => raise(Impossible_state)
   );
 
 let transform_style =
