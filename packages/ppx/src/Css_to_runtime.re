@@ -261,6 +261,12 @@ and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
         "Unknown property '" ++ property ++ "'",
       ),
     ]
+  | Error(`Impossible_state) => [
+      Error.expr(
+        ~loc=declaration_location,
+        "This is a broken state of the CSS parser and probably a bug. Please report back!",
+      ),
+    ]
   | Error(`Invalid_value(reason)) => [
       Error.expr(
         ~loc=declaration_location,

@@ -14,6 +14,9 @@ let (let.ok) = Result.bind;
 /* TODO: Add payload on those exceptions */
 exception Unsupported_feature;
 
+/* This should be thrown when handling cases impossible to generate by the css property parser */
+exception Impossible_state;
+
 exception Invalid_value(string);
 
 let id = Fun.id;
@@ -350,7 +353,7 @@ and render_calc_sum = (~loc, (product, sums): Types.calc_sum) => {
 }
 and render_function_min_or_max = (~loc, calc_sums: list(Types.calc_sum)) => {
   switch (calc_sums) {
-  | [] => raise(Invalid_value("expected at least one argument"))
+  | [] => raise(Impossible_state)
   | [x, ...xs] =>
     let calc_sums = [x] @ List.map(Fun.id, xs);
     List.map(render_calc_sum(~loc), calc_sums) |> Builder.pexp_array(~loc);
@@ -669,8 +672,8 @@ let margin =
             )
           ],
         ]
-      | [] => failwith("Margin value can't be empty")
-      | _ => failwith("There aren't more margin combinations"),
+      | []
+      | _ => raise(Impossible_state),
   );
 
 let padding_top =
@@ -726,8 +729,8 @@ let padding =
             )
           ],
         ]
-      | [] => failwith("Padding value can't be empty")
-      | _ => failwith("There aren't more padding combinations"),
+      | []
+      | _ => raise(Impossible_state),
   );
 
 let render_named_color = (~loc) =>
@@ -916,7 +919,7 @@ let render_function_rgb = (~loc, ast: Types.function_rgb) => {
   let (red, green, blue) =
     switch (colors) {
     | [red, green, blue] => (red, green, blue)
-    | _ => failwith("unreachable")
+    | _ => raise(Impossible_state)
     };
 
   let alpha =
@@ -958,7 +961,7 @@ let render_function_rgba = (~loc, ast: Types.function_rgba) => {
   let (red, green, blue) =
     switch (colors) {
     | [red, green, blue] => (red, green, blue)
-    | _ => failwith("unreachable")
+    | _ => raise(Impossible_state)
     };
 
   let alpha =
@@ -1244,7 +1247,7 @@ let render_box_shadow = (~loc, shadow) => {
         | [x, y] => (x, y, None, None)
         | [x, y, blur] => (x, y, Some(blur), None)
         | [x, y, blur, spread] => (x, y, Some(blur), Some(spread))
-        | _ => failwith("unreachable")
+        | _ => raise(Impossible_state)
         };
       (color, x, y, blur, spread, inset);
     };
@@ -1549,8 +1552,8 @@ let render_repeat_style = (~loc) =>
       switch (values) {
       | [x] => [%expr [%e render_xor(x)]]
       | [x, y] => [%expr `hv(([%e render_xor(x)], [%e render_xor(y)]))]
-      | [] => failwith("expected at least one value")
-      | _ => failwith("repeat doesn't accept more then 2 values")
+      | []
+      | _ => raise(Impossible_state)
       };
     };
 
@@ -1563,7 +1566,7 @@ let render_attachment = (~loc) =>
 let background_image =
   polymorphic(Property_parser.property_background_image, (~loc) =>
     fun
-    | [] => failwith("expected at least one value")
+    | [] => raise(Impossible_state)
     | [i] => [[%expr CSS.backgroundImage([%e render_bg_image(~loc, i)])]]
     | more => [
         [%expr CSS.backgroundImages([%e render_bg_images(~loc, more)])],
@@ -1576,7 +1579,7 @@ let background_repeat =
     (~loc) => [%expr CSS.backgroundRepeat],
     (~loc) =>
       fun
-      | [] => failwith("expected at least one value")
+      | [] => raise(Impossible_state)
       | [`Repeat_x] => variant_to_expression(~loc, `Repeat_x)
       | [`Repeat_y] => variant_to_expression(~loc, `Repeat_y)
       | [`Xor(_) as v] => render_repeat_style(~loc, v)
@@ -1589,7 +1592,7 @@ let background_attachment =
     (~loc) => [%expr CSS.backgroundAttachment],
     (~loc) =>
       fun
-      | [] => failwith("expected at least one argument")
+      | [] => raise(Impossible_state)
       | [v] => render_attachment(~loc, v)
       | _ => raise(Unsupported_feature),
   );
@@ -1627,13 +1630,10 @@ let background_position =
   monomorphic(
     Property_parser.property_background_position,
     (~loc) => [%expr CSS.backgroundPositions],
-    (~loc) =>
-      fun
-      | [] => failwith("expected at least one argument")
-      | positions =>
-        positions
-        |> List.map(render_bg_position(~loc))
-        |> Builder.pexp_array(~loc),
+    (~loc, positions) =>
+      positions
+      |> List.map(render_bg_position(~loc))
+      |> Builder.pexp_array(~loc),
   );
 
 let background_position_x =
@@ -1648,7 +1648,7 @@ let background_clip =
     (~loc) => [%expr CSS.backgroundClip],
     (~loc) =>
       fun
-      | [] => failwith("expected at least one argument")
+      | [] => raise(Impossible_state)
       | [`Box(b)] => variant_to_expression(~loc, b)
       | [`Text] => variant_to_expression(~loc, `Text)
       | _ => raise(Unsupported_feature),
@@ -1660,7 +1660,7 @@ let background_origin =
     (~loc) => [%expr CSS.backgroundOrigin],
     (~loc) =>
       fun
-      | [] => failwith("expected at least one argument")
+      | [] => raise(Impossible_state)
       | [v] => variant_to_expression(~loc, v)
       | _ => raise(Unsupported_feature),
   );
@@ -1671,7 +1671,7 @@ let background_size =
     (~loc) => [%expr CSS.backgroundSize],
     (~loc) =>
       fun
-      | [] => failwith("expected at least one argument")
+      | [] => raise(Impossible_state)
       | [v] => render_bg_size(~loc, v)
       | _ => raise(Unsupported_feature),
   );
@@ -2297,7 +2297,7 @@ let render_tab_size = (~loc, value: Types.property_tab_size) => {
   switch (value) {
   | `Number(n) =>
     int_of_float(n) < 0
-      ? raise(Invalid_value("tab-size value can not be less than 0!"))
+      ? raise(Invalid_value("Property 'tab-size' value can't be less than 0."))
       : [%expr `num([%e render_float(~loc, n)])]
   | `Extended_length(ext) => render_extended_length(~loc, ext)
   };
@@ -2814,7 +2814,7 @@ let render_text_shadow = (~loc, shadow) => {
     | ([x, y], None) => (x, y, None, None)
     | ([x, y, blur], None) => (x, y, Some(blur), None)
     | ([x, y, blur], color) => (x, y, Some(blur), color)
-    | _ => failwith("unreachable")
+    | _ => raise(Impossible_state)
     };
 
   let args =
@@ -3031,7 +3031,7 @@ let rotate =
             [%e render_extended_angle(~loc, angle)],
           ))
         ]
-      | `And(`Number(_), _angle) => failwith("impossible"),
+      | `And(`Number(_), _angle) => raise(Impossible_state),
   );
 
 let render_number_percentage = (~loc) =>
@@ -3063,7 +3063,7 @@ let scale =
     | `Number_percentage([x, ..._]) => [
         [%expr CSS.scaleProperty([%e render_number_percentage(~loc, x)])],
       ]
-    | `Number_percentage([]) => failwith("impossible")
+    | `Number_percentage([]) => raise(Impossible_state)
   );
 
 let transform_style =
@@ -4334,7 +4334,7 @@ let grid_auto_flow =
       | `Or(None, Some(_)) => [%expr `dense]
       | `Or(Some(`Row), Some(_)) => [%expr `rowDense]
       | `Or(Some(`Column), Some(_)) => [%expr `columnDense]
-      | `Or(None, None) => failwith("impossible 3"),
+      | `Or(None, None) => raise(Impossible_state),
   );
 
 let render_grid_line = (~loc, x: Types.grid_line) =>
@@ -4361,8 +4361,7 @@ let render_grid_line = (~loc, x: Types.grid_line) =>
          [%e render_string(~loc, ident)],
        )),
      )]
-  | `And_1(_span, (None, None)) =>
-    raise(Invalid_value("This should've not parse."))
+  | `And_1(_span, (None, None)) => raise(Impossible_state)
   };
 
 let grid =
@@ -5947,6 +5946,7 @@ let render = (~loc: Location.t, property, value, important) =>
       switch (render_to_expr(~loc, property, value, important)) {
       | Ok(value) => Ok(value)
       | Error(`Invalid_value(_)) as x => x
+      | exception Impossible_state => Error(`Impossible_state)
       | Error(_)
       | exception Unsupported_feature =>
         let.ok () = is_valid_string ? Ok() : Error(`Invalid_value(value));
