@@ -2,8 +2,6 @@
 
 ### Typed styled components for ReScript, Melange and Native
 
-![demo](./.github/demo-dark.png#gh-dark-mode-only)![styled-ppx-demo-dark](./.github/demo-light.png#gh-light-mode-only)
-
 **styled-ppx** is a [ppx](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem) and a library that brings styled components to ReScript, Melange and Native. Create **React Components** or simply `className` with type-safe style definitions with only CSS.
 
  Built on top of [emotion](https://emotion.sh), it allows you to style apps safely, quickly, and performantly - just as you always done it.
