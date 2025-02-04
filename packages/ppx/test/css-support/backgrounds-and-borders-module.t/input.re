@@ -28,12 +28,12 @@ module Color = {
 [%css {|background-repeat: no-repeat no-repeat|}];
 [%css {|background-repeat: repeat-x, repeat-y|}];
 [%css {|background-attachment: local|}];
-/* [%css {|background-position: bottom 10px right 20px|}]; */
-/* [%css {|background-position: bottom 10px right|}]; */
-/* [%css {|background-position: top right 10px|}]; */
 [%css {|background-clip: border-box|}];
 [%css {|background-clip: padding-box|}];
 [%css {|background-clip: content-box|}];
+[%css {|background-clip: text|}];
+[%css {|background-clip: border-area|}];
+[%css {|background-clip: text, border-area|}];
 [%css {|background-origin: border-box|}];
 [%css {|background-origin: padding-box|}];
 [%css {|background-origin: content-box|}];
@@ -401,6 +401,9 @@ let color = `hex("333");
 [%css {|background-position-y: 0;|}];
 [%css {|background-position: 0 0;|}];
 [%css {|background-position: 1rem 0;|}];
+[%css {|background-position: bottom 10px right|}];
+[%css {|background-position: bottom 10px right 20px|}];
+[%css {|background-position: 0 0, center|}];
 
 /* Object Position */
 [%css {| object-position: top |}];

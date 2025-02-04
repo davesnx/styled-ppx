@@ -193,6 +193,7 @@ let variant_to_expression = (~loc) =>
   | `Bold => id([%expr `bold])
   | `Bolder => id([%expr `bolder])
   | `Border_box => id([%expr `borderBox])
+  | `Border_area => id([%expr `borderArea])
   | `Bottom => id([%expr `bottom])
   | `Break_all => id([%expr `breakAll])
   | `Break_spaces => id([%expr `breakSpaces])
@@ -1573,13 +1574,22 @@ let background_image =
   );
 
 let background_repeat =
-  monomorphic(
-    Property_parser.property_background_repeat,
-    (~loc) => [%expr CSS.backgroundRepeats],
-    (~loc, repeats) =>
-      repeats
-      |> List.map(render_repeat_style(~loc))
-      |> Builder.pexp_array(~loc),
+  polymorphic(Property_parser.property_background_repeat, (~loc) =>
+    fun
+    | [one] => [
+        [%expr CSS.backgroundRepeat([%e render_repeat_style(~loc, one)])],
+      ]
+    | more => [
+        [%expr
+          CSS.backgroundRepeats(
+            [%e
+              more
+              |> List.map(render_repeat_style(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
 let background_attachment =
@@ -1599,14 +1609,12 @@ let render_bg_position_three_and_four = (~loc) =>
   | `Static(v, None) => render_position_one(~loc, v)
   | `Static(z, Some(o)) => {
       let offset = render_length_percentage(~loc, o);
-      let side =
-        switch (z) {
-        | `Top => [%expr `topOffset]
-        | `Bottom => [%expr `bottomOffset]
-        | `Left => [%expr `leftOffset]
-        | `Right => [%expr `rightOffset]
-        };
-      [%expr [%e side]([%e offset])];
+      switch (z) {
+      | `Top => [%expr `topOffset([%e offset])]
+      | `Bottom => [%expr `bottomOffset([%e offset])]
+      | `Left => [%expr `leftOffset([%e offset])]
+      | `Right => [%expr `rightOffset([%e offset])]
+      };
     };
 
 let render_bg_position = (~loc, position: Types.bg_position) => {
@@ -1623,13 +1631,22 @@ let render_bg_position = (~loc, position: Types.bg_position) => {
 };
 
 let background_position =
-  monomorphic(
-    Property_parser.property_background_position,
-    (~loc) => [%expr CSS.backgroundPositions],
-    (~loc, positions) =>
-      positions
-      |> List.map(render_bg_position(~loc))
-      |> Builder.pexp_array(~loc),
+  polymorphic(Property_parser.property_background_position, (~loc) =>
+    fun
+    | [one] => [
+        [%expr CSS.backgroundPosition([%e render_bg_position(~loc, one)])],
+      ]
+    | more => [
+        [%expr
+          CSS.backgroundPositions(
+            [%e
+              more
+              |> List.map(render_bg_position(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
 let background_position_x =
@@ -1638,16 +1655,29 @@ let background_position_x =
 let background_position_y =
   unsupportedProperty(Property_parser.property_background_position_y);
 
+let render_background_clip = (~loc) =>
+  fun
+  | `Box(b) => variant_to_expression(~loc, b)
+  | `Text => variant_to_expression(~loc, `Text)
+  | `Border_area => variant_to_expression(~loc, `Border_area);
+
 let background_clip =
-  monomorphic(
-    Property_parser.property_background_clip,
-    (~loc) => [%expr CSS.backgroundClip],
-    (~loc) =>
-      fun
-      | [] => raise(Impossible_state)
-      | [`Box(b)] => variant_to_expression(~loc, b)
-      | [`Text] => variant_to_expression(~loc, `Text)
-      | _ => raise(Unsupported_feature),
+  polymorphic(Property_parser.property_background_clip, (~loc) =>
+    fun
+    | [one] => [
+        [%expr CSS.backgroundClip([%e render_background_clip(~loc, one)])],
+      ]
+    | more => [
+        [%expr
+          CSS.backgroundClips(
+            [%e
+              more
+              |> List.map(render_background_clip(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
 let background_origin =
@@ -3128,13 +3158,22 @@ let transition_property =
   );
 
 let transition_duration =
-  monomorphic(
-    Property_parser.property_transition_duration,
-    (~loc) => [%expr CSS.transitionDurations],
-    (~loc, durations) =>
-      durations
-      |> List.map(render_extended_time(~loc))
-      |> Builder.pexp_array(~loc),
+  polymorphic(Property_parser.property_transition_duration, (~loc) =>
+    fun
+    | [one] => [
+        [%expr CSS.transitionDuration([%e render_extended_time(~loc, one)])],
+      ]
+    | more => [
+        [%expr
+          CSS.transitionDurations(
+            [%e
+              more
+              |> List.map(render_extended_time(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
 let widows =
@@ -3193,23 +3232,41 @@ let render_timing = (~loc) =>
   | `Interpolation(v) => render_variable(~loc, v);
 
 let transition_timing_function =
-  monomorphic(
-    Property_parser.property_transition_timing_function,
-    (~loc) => [%expr CSS.transitionTimingFunctions],
-    (~loc, timingFunctions) =>
-      timingFunctions
-      |> List.map(render_timing(~loc))
-      |> Builder.pexp_array(~loc),
+  polymorphic(Property_parser.property_transition_timing_function, (~loc) =>
+    fun
+    | [one] => [
+        [%expr CSS.transitionTimingFunction([%e render_timing(~loc, one)])],
+      ]
+    | many => [
+        [%expr
+          CSS.transitionTimingFunctions(
+            [%e
+              many
+              |> List.map(render_timing(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
 let transition_delay =
-  monomorphic(
-    Property_parser.property_transition_delay,
-    (~loc) => [%expr CSS.transitionDelays],
-    (~loc, delays) =>
-      delays
-      |> List.map(render_extended_time(~loc))
-      |> Builder.pexp_array(~loc),
+  polymorphic(Property_parser.property_transition_delay, (~loc) =>
+    fun
+    | [one] => [
+        [%expr CSS.transitionDelay([%e render_extended_time(~loc, one)])],
+      ]
+    | more => [
+        [%expr
+          CSS.transitionDelays(
+            [%e
+              more
+              |> List.map(render_extended_time(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
 let render_transition_behavior_value_no_interp = (~loc) =>
@@ -3224,13 +3281,26 @@ let render_transition_behavior_value = (~loc) =>
   | `Interpolation(v) => render_variable(~loc, v);
 
 let transition_behavior =
-  monomorphic(
-    Property_parser.property_transition_behavior,
-    (~loc) => [%expr CSS.transitionBehaviors],
-    (~loc, behaviors) =>
-      behaviors
-      |> List.map(render_transition_behavior_value(~loc))
-      |> Builder.pexp_array(~loc),
+  polymorphic(Property_parser.property_transition_behavior, (~loc) =>
+    fun
+    | [one] => [
+        [%expr
+          CSS.transitionBehavior(
+            [%e render_transition_behavior_value(~loc, one)],
+          )
+        ],
+      ]
+    | more => [
+        [%expr
+          CSS.transitionBehaviors(
+            [%e
+              more
+              |> List.map(render_transition_behavior_value(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
 let render_transition_property = (~loc) =>
@@ -3348,33 +3418,60 @@ let render_animation_name = (~loc) =>
 
 // css-animation-1
 let animation_name =
-  monomorphic(
-    Property_parser.property_animation_name,
-    (~loc) => [%expr CSS.animationNames],
-    (~loc, names) =>
-      names
-      |> List.map(render_animation_name(~loc))
-      |> Builder.pexp_array(~loc),
+  polymorphic(Property_parser.property_animation_name, (~loc) =>
+    fun
+    | [one] => [
+        [%expr CSS.animationName([%e render_animation_name(~loc, one)])],
+      ]
+    | more => [
+        [%expr
+          CSS.animationNames(
+            [%e
+              more
+              |> List.map(render_animation_name(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
 let animation_duration =
-  monomorphic(
-    Property_parser.property_animation_duration,
-    (~loc) => [%expr CSS.animationDurations],
-    (~loc, durations) =>
-      durations
-      |> List.map(render_extended_time(~loc))
-      |> Builder.pexp_array(~loc),
+  polymorphic(Property_parser.property_animation_duration, (~loc) =>
+    fun
+    | [one] => [
+        [%expr CSS.animationDuration([%e render_extended_time(~loc, one)])],
+      ]
+    | more => [
+        [%expr
+          CSS.animationDurations(
+            [%e
+              more
+              |> List.map(render_extended_time(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
 let animation_timing_function =
-  monomorphic(
-    Property_parser.property_animation_timing_function,
-    (~loc) => [%expr CSS.animationTimingFunctions],
-    (~loc, timingFunctions) =>
-      timingFunctions
-      |> List.map(render_timing(~loc))
-      |> Builder.pexp_array(~loc),
+  polymorphic(Property_parser.property_animation_timing_function, (~loc) =>
+    fun
+    | [one] => [
+        [%expr CSS.animationTimingFunction([%e render_timing(~loc, one)])],
+      ]
+    | more => [
+        [%expr
+          CSS.animationTimingFunctions(
+            [%e
+              more
+              |> List.map(render_timing(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
 let render_single_animation_iteration_count_no_interp = (~loc) =>
@@ -3389,13 +3486,26 @@ let render_single_animation_iteration_count = (~loc) =>
   | `Interpolation(v) => render_variable(~loc, v);
 
 let animation_iteration_count =
-  monomorphic(
-    Property_parser.property_animation_iteration_count,
-    (~loc) => [%expr CSS.animationIterationCounts],
-    (~loc, iterationCounts) =>
-      iterationCounts
-      |> List.map(render_single_animation_iteration_count(~loc))
-      |> Builder.pexp_array(~loc),
+  polymorphic(Property_parser.property_animation_iteration_count, (~loc) =>
+    fun
+    | [one] => [
+        [%expr
+          CSS.animationIterationCount(
+            [%e render_single_animation_iteration_count(~loc, one)],
+          )
+        ],
+      ]
+    | more => [
+        [%expr
+          CSS.animationIterationCounts(
+            [%e
+              more
+              |> List.map(render_single_animation_iteration_count(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
 let render_single_animation_direction_no_interp = (~loc) =>
@@ -3412,13 +3522,26 @@ let render_single_animation_direction = (~loc) =>
   | `Interpolation(v) => render_variable(~loc, v);
 
 let animation_direction =
-  monomorphic(
-    Property_parser.property_animation_direction,
-    (~loc) => [%expr CSS.animationDirections],
-    (~loc, directions) =>
-      directions
-      |> List.map(render_single_animation_direction(~loc))
-      |> Builder.pexp_array(~loc),
+  polymorphic(Property_parser.property_animation_direction, (~loc) =>
+    fun
+    | [one] => [
+        [%expr
+          CSS.animationDirection(
+            [%e render_single_animation_direction(~loc, one)],
+          )
+        ],
+      ]
+    | more => [
+        [%expr
+          CSS.animationDirections(
+            [%e
+              more
+              |> List.map(render_single_animation_direction(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
 let render_single_animation_play_state_no_interp = (~loc) =>
@@ -3433,23 +3556,45 @@ let render_single_animation_play_state = (~loc) =>
   | `Interpolation(v) => render_variable(~loc, v);
 
 let animation_play_state =
-  monomorphic(
-    Property_parser.property_animation_play_state,
-    (~loc) => [%expr CSS.animationPlayStates],
-    (~loc, playStates) =>
-      playStates
-      |> List.map(render_single_animation_play_state(~loc))
-      |> Builder.pexp_array(~loc),
+  polymorphic(Property_parser.property_animation_play_state, (~loc) =>
+    fun
+    | [one] => [
+        [%expr
+          CSS.animationPlayState(
+            [%e render_single_animation_play_state(~loc, one)],
+          )
+        ],
+      ]
+    | more => [
+        [%expr
+          CSS.animationPlayStates(
+            [%e
+              more
+              |> List.map(render_single_animation_play_state(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
 let animation_delay =
-  monomorphic(
-    Property_parser.property_animation_delay,
-    (~loc) => [%expr CSS.animationDelays],
-    (~loc, delays) =>
-      delays
-      |> List.map(render_extended_time(~loc))
-      |> Builder.pexp_array(~loc),
+  polymorphic(Property_parser.property_animation_delay, (~loc) =>
+    fun
+    | [one] => [
+        [%expr CSS.animationDelay([%e render_extended_time(~loc, one)])],
+      ]
+    | more => [
+        [%expr
+          CSS.animationDelays(
+            [%e
+              more
+              |> List.map(render_extended_time(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
 let render_single_animation_fill_mode_no_interp = (~loc) =>
@@ -3466,13 +3611,26 @@ let render_single_animation_fill_mode = (~loc) =>
   | `Interpolation(v) => render_variable(~loc, v);
 
 let animation_fill_mode =
-  monomorphic(
-    Property_parser.property_animation_fill_mode,
-    (~loc) => [%expr CSS.animationFillModes],
-    (~loc, fillModes) =>
-      fillModes
-      |> List.map(render_single_animation_fill_mode(~loc))
-      |> Builder.pexp_array(~loc),
+  polymorphic(Property_parser.property_animation_fill_mode, (~loc) =>
+    fun
+    | [one] => [
+        [%expr
+          CSS.animationFillMode(
+            [%e render_single_animation_fill_mode(~loc, one)],
+          )
+        ],
+      ]
+    | more => [
+        [%expr
+          CSS.animationFillModes(
+            [%e
+              more
+              |> List.map(render_single_animation_fill_mode(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
 let render_single_animation = (~loc) =>
@@ -5351,13 +5509,20 @@ let mask_mode = unsupportedProperty(Property_parser.property_mask_mode);
 let mask_origin = unsupportedProperty(Property_parser.property_mask_origin);
 
 let mask_position =
-  monomorphic(
-    Property_parser.property_mask_position,
-    (~loc) => [%expr CSS.maskPositions],
-    (~loc, positions) =>
-      positions
-      |> List.map(render_position(~loc))
-      |> Builder.pexp_array(~loc),
+  polymorphic(Property_parser.property_mask_position, (~loc) =>
+    fun
+    | [one] => [[%expr CSS.maskPosition([%e render_position(~loc, one)])]]
+    | more => [
+        [%expr
+          CSS.maskPositions(
+            [%e
+              more
+              |> List.map(render_position(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
 let mask_repeat = unsupportedProperty(Property_parser.property_mask_repeat);

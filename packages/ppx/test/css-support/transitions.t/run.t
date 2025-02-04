@@ -25,29 +25,31 @@ If this test fail means that the module is not in sync with the ppx
     CSS.Types.TransitionProperty.make({js|width|js}),
     CSS.Types.TransitionProperty.make({js|height|js}),
   |]);
-  CSS.transitionDurations([|`s(0)|]);
-  CSS.transitionDurations([|`s(1)|]);
-  CSS.transitionDurations([|`ms(100)|]);
-  CSS.transitionTimingFunctions([|`ease|]);
-  CSS.transitionTimingFunctions([|`linear|]);
-  CSS.transitionTimingFunctions([|`easeIn|]);
-  CSS.transitionTimingFunctions([|`easeOut|]);
-  CSS.transitionTimingFunctions([|`easeInOut|]);
-  CSS.transitionTimingFunctions([|`cubicBezier((0.5, 0.5, 0.5, 0.5))|]);
-  CSS.transitionTimingFunctions([|`cubicBezier((0.5, 1.5, 0.5, (-2.5)))|]);
-  CSS.transitionTimingFunctions([|`stepStart|]);
-  CSS.transitionTimingFunctions([|`stepEnd|]);
-  CSS.transitionTimingFunctions([|`steps((3, `start))|]);
-  CSS.transitionTimingFunctions([|`steps((5, `end_))|]);
+  CSS.transitionDuration(`s(0));
+  CSS.transitionDuration(`s(1));
+  CSS.transitionDuration(`ms(100));
+  CSS.transitionDurations([|`s(10), `s(30), `ms(230)|]);
+  CSS.transitionTimingFunction(`ease);
+  CSS.transitionTimingFunction(`linear);
+  CSS.transitionTimingFunction(`easeIn);
+  CSS.transitionTimingFunction(`easeOut);
+  CSS.transitionTimingFunction(`easeInOut);
+  CSS.transitionTimingFunction(`cubicBezier((0.5, 0.5, 0.5, 0.5)));
+  CSS.transitionTimingFunction(`cubicBezier((0.5, 1.5, 0.5, (-2.5))));
+  CSS.transitionTimingFunction(`stepStart);
+  CSS.transitionTimingFunction(`stepEnd);
+  CSS.transitionTimingFunction(`steps((3, `start)));
+  CSS.transitionTimingFunction(`steps((5, `end_)));
   CSS.transitionTimingFunctions([|
     `ease,
     `stepStart,
     `cubicBezier((0.1, 0.7, 1., 0.1)),
   |]);
-  CSS.transitionDelays([|`s(1)|]);
-  CSS.transitionDelays([|`s(-1)|]);
-  CSS.transitionBehaviors([|`normal|]);
-  CSS.transitionBehaviors([|`allowDiscrete|]);
+  CSS.transitionDelay(`s(1));
+  CSS.transitionDelay(`s(-1));
+  CSS.transitionDelays([|`s(2), `ms(4)|]);
+  CSS.transitionBehavior(`normal);
+  CSS.transitionBehavior(`allowDiscrete);
   CSS.transitionBehaviors([|`allowDiscrete, `normal|]);
   CSS.transitions([|
     CSS.Types.Transition.Value.make(

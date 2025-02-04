@@ -24,30 +24,32 @@ If this test fail means that the module is not in sync with the ppx
     };
   };
   
-  CSS.backgroundRepeats([|`space|]);
-  CSS.backgroundRepeats([|`round|]);
-  CSS.backgroundRepeats([|`hv((`repeat, `repeat))|]);
-  CSS.backgroundRepeats([|`hv((`space, `repeat))|]);
-  CSS.backgroundRepeats([|`hv((`round, `repeat))|]);
-  CSS.backgroundRepeats([|`hv((`noRepeat, `repeat))|]);
-  CSS.backgroundRepeats([|`hv((`repeat, `space))|]);
-  CSS.backgroundRepeats([|`hv((`space, `space))|]);
-  CSS.backgroundRepeats([|`hv((`round, `space))|]);
-  CSS.backgroundRepeats([|`hv((`noRepeat, `space))|]);
-  CSS.backgroundRepeats([|`hv((`repeat, `round))|]);
-  CSS.backgroundRepeats([|`hv((`space, `round))|]);
-  CSS.backgroundRepeats([|`hv((`round, `round))|]);
-  CSS.backgroundRepeats([|`hv((`noRepeat, `round))|]);
-  CSS.backgroundRepeats([|`hv((`repeat, `noRepeat))|]);
-  CSS.backgroundRepeats([|`hv((`space, `noRepeat))|]);
-  CSS.backgroundRepeats([|`hv((`round, `noRepeat))|]);
-  CSS.backgroundRepeats([|`hv((`noRepeat, `noRepeat))|]);
+  CSS.backgroundRepeat(`space);
+  CSS.backgroundRepeat(`round);
+  CSS.backgroundRepeat(`hv((`repeat, `repeat)));
+  CSS.backgroundRepeat(`hv((`space, `repeat)));
+  CSS.backgroundRepeat(`hv((`round, `repeat)));
+  CSS.backgroundRepeat(`hv((`noRepeat, `repeat)));
+  CSS.backgroundRepeat(`hv((`repeat, `space)));
+  CSS.backgroundRepeat(`hv((`space, `space)));
+  CSS.backgroundRepeat(`hv((`round, `space)));
+  CSS.backgroundRepeat(`hv((`noRepeat, `space)));
+  CSS.backgroundRepeat(`hv((`repeat, `round)));
+  CSS.backgroundRepeat(`hv((`space, `round)));
+  CSS.backgroundRepeat(`hv((`round, `round)));
+  CSS.backgroundRepeat(`hv((`noRepeat, `round)));
+  CSS.backgroundRepeat(`hv((`repeat, `noRepeat)));
+  CSS.backgroundRepeat(`hv((`space, `noRepeat)));
+  CSS.backgroundRepeat(`hv((`round, `noRepeat)));
+  CSS.backgroundRepeat(`hv((`noRepeat, `noRepeat)));
   CSS.backgroundRepeats([|`repeatX, `repeatY|]);
   CSS.backgroundAttachment(`local);
-  
   CSS.backgroundClip(`borderBox);
   CSS.backgroundClip(`paddingBox);
   CSS.backgroundClip(`contentBox);
+  CSS.backgroundClip(`text);
+  CSS.backgroundClip(`borderArea);
+  CSS.backgroundClips([|`text, `borderArea|]);
   CSS.backgroundOrigin(`borderBox);
   CSS.backgroundOrigin(`paddingBox);
   CSS.backgroundOrigin(`contentBox);
@@ -647,11 +649,16 @@ If this test fail means that the module is not in sync with the ppx
   CSS.imageRendering(`pixelated);
   CSS.imageRendering(`crispEdges);
   
-  CSS.backgroundPositions([|`bottom|]);
+  CSS.backgroundPosition(`bottom);
   CSS.unsafe({js|backgroundPositionX|js}, {js|50%|js});
   CSS.unsafe({js|backgroundPositionY|js}, {js|0|js});
-  CSS.backgroundPositions([|`hv((`zero, `zero))|]);
-  CSS.backgroundPositions([|`hv((`rem(1.), `zero))|]);
+  CSS.backgroundPosition(`hv((`zero, `zero)));
+  CSS.backgroundPosition(`hv((`rem(1.), `zero)));
+  CSS.backgroundPosition(`hvOffset((`right, `bottomOffset(`pxFloat(10.)))));
+  CSS.backgroundPosition(
+    `hvOffset((`rightOffset(`pxFloat(20.)), `bottomOffset(`pxFloat(10.)))),
+  );
+  CSS.backgroundPositions([|`hv((`zero, `zero)), `center|]);
   
   CSS.objectPosition(`top);
   CSS.objectPosition(`bottom);
@@ -680,7 +687,7 @@ If this test fail means that the module is not in sync with the ppx
   
   let _loadingKeyframes =
     CSS.keyframes([|
-      (0, [|CSS.backgroundPositions([|`hv((`zero, `zero))|])|]),
-      (100, [|CSS.backgroundPositions([|`hv((`rem(1.), `zero))|])|]),
+      (0, [|CSS.backgroundPosition(`hv((`zero, `zero)))|]),
+      (100, [|CSS.backgroundPosition(`hv((`rem(1.), `zero)))|]),
     |]);
 

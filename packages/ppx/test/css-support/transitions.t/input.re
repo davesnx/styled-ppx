@@ -6,6 +6,7 @@
 [%css {|transition-duration: 0s|}];
 [%css {|transition-duration: 1s|}];
 [%css {|transition-duration: 100ms|}];
+[%css {|transition-duration: 10s, 30s, 230ms|}];
 [%css {|transition-timing-function: ease|}];
 [%css {|transition-timing-function: linear|}];
 [%css {|transition-timing-function: ease-in|}];
@@ -20,6 +21,7 @@
 [%css {|transition-timing-function: ease, step-start, cubic-bezier(0.1, 0.7, 1, 0.1)|}];
 [%css {|transition-delay: 1s|}];
 [%css {|transition-delay: -1s|}];
+[%css {|transition-delay: 2s, 4ms|}];
 [%css {|transition-behavior: normal|}];
 [%css {|transition-behavior: allow-discrete|}];
 [%css {|transition-behavior: allow-discrete, normal|}];

@@ -26,38 +26,55 @@ If this test fail means that the module is not in sync with the ppx
       (100, [|CSS.opacity(1.)|]),
     |]);
   
-  CSS.animationNames([|CSS.Types.AnimationName.make({js|random|js})|]);
-  CSS.animationNames([|foo|]);
+  CSS.animationName(CSS.Types.AnimationName.make({js|random|js}));
+  CSS.animationNames([|
+    CSS.Types.AnimationName.make({js|foo|js}),
+    CSS.Types.AnimationName.make({js|bar|js}),
+  |]);
+  CSS.animationName(foo);
   CSS.animationNames([|foo, bar|]);
-  CSS.animationDurations([|`s(0)|]);
-  CSS.animationDurations([|`s(1)|]);
-  CSS.animationDurations([|`ms(100)|]);
-  CSS.animationTimingFunctions([|`ease|]);
-  CSS.animationTimingFunctions([|`linear|]);
-  CSS.animationTimingFunctions([|`easeIn|]);
-  CSS.animationTimingFunctions([|`easeOut|]);
-  CSS.animationTimingFunctions([|`easeInOut|]);
-  CSS.animationTimingFunctions([|`cubicBezier((0.5, 0.5, 0.5, 0.5))|]);
-  CSS.animationTimingFunctions([|`cubicBezier((0.5, 1.5, 0.5, (-2.5)))|]);
-  CSS.animationTimingFunctions([|`stepStart|]);
-  CSS.animationTimingFunctions([|`stepEnd|]);
-  CSS.animationTimingFunctions([|`steps((3, `start))|]);
-  CSS.animationTimingFunctions([|`steps((5, `end_))|]);
-  CSS.animationIterationCounts([|`infinite|]);
-  CSS.animationIterationCounts([|`count(8.)|]);
-  CSS.animationIterationCounts([|`count(4.35)|]);
-  CSS.animationDirections([|`normal|]);
-  CSS.animationDirections([|`alternate|]);
-  CSS.animationDirections([|`reverse|]);
-  CSS.animationDirections([|`alternateReverse|]);
-  CSS.animationPlayStates([|`running|]);
-  CSS.animationPlayStates([|`paused|]);
-  CSS.animationDelays([|`s(1)|]);
-  CSS.animationDelays([|`s(-1)|]);
-  CSS.animationFillModes([|`none|]);
-  CSS.animationFillModes([|`forwards|]);
-  CSS.animationFillModes([|`backwards|]);
-  CSS.animationFillModes([|`both|]);
+  CSS.animationDuration(`s(0));
+  CSS.animationDuration(`s(1));
+  CSS.animationDuration(`ms(100));
+  CSS.animationDurations([|`s(1), `s(15)|]);
+  CSS.animationDurations([|`s(10), `s(35), `ms(230)|]);
+  CSS.animationTimingFunction(`ease);
+  CSS.animationTimingFunction(`linear);
+  CSS.animationTimingFunction(`easeIn);
+  CSS.animationTimingFunction(`easeOut);
+  CSS.animationTimingFunction(`easeInOut);
+  CSS.animationTimingFunction(`cubicBezier((0.5, 0.5, 0.5, 0.5)));
+  CSS.animationTimingFunction(`cubicBezier((0.5, 1.5, 0.5, (-2.5))));
+  CSS.animationTimingFunction(`stepStart);
+  CSS.animationTimingFunction(`stepEnd);
+  CSS.animationTimingFunction(`steps((3, `start)));
+  CSS.animationTimingFunction(`steps((5, `end_)));
+  CSS.animationTimingFunctions([|
+    `ease,
+    `stepStart,
+    `cubicBezier((0.1, 0.7, 1., 0.1)),
+  |]);
+  CSS.animationIterationCount(`infinite);
+  CSS.animationIterationCount(`count(8.));
+  CSS.animationIterationCount(`count(4.35));
+  CSS.animationIterationCounts([|`count(2.), `count(0.), `infinite|]);
+  CSS.animationDirection(`normal);
+  CSS.animationDirection(`alternate);
+  CSS.animationDirection(`reverse);
+  CSS.animationDirection(`alternateReverse);
+  CSS.animationDirections([|`normal, `reverse|]);
+  CSS.animationDirections([|`alternate, `reverse, `normal|]);
+  CSS.animationPlayState(`running);
+  CSS.animationPlayState(`paused);
+  CSS.animationPlayStates([|`paused, `running, `running|]);
+  CSS.animationDelay(`s(1));
+  CSS.animationDelay(`s(-1));
+  CSS.animationDelays([|`s(2), `ms(480)|]);
+  CSS.animationFillMode(`none);
+  CSS.animationFillMode(`forwards);
+  CSS.animationFillMode(`backwards);
+  CSS.animationFillMode(`both);
+  CSS.animationFillModes([|`both, `forwards, `none|]);
   CSS.animations([|
     CSS.Types.Animation.Value.make(
       ~duration=?Some(`s(1)),

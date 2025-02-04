@@ -120,8 +120,8 @@ module Time = struct
     | `max of t array
     ]
 
-  let s x = `s x
-  let ms x = `ms x
+  let s (x : int) = `s x
+  let ms (x : int) = `ms x
 
   let rec toString (x : t) =
     match x with
@@ -2974,21 +2974,33 @@ module BackgroundAttachment = struct
 end
 
 module BackgroundClip = struct
+  module Value = struct
+    type t =
+      [ `borderBox
+      | `paddingBox
+      | `contentBox
+      | `borderArea
+      | `text
+      ]
+
+    let toString (x : t) =
+      match x with
+      | `borderBox -> {js|border-box|js}
+      | `contentBox -> {js|content-box|js}
+      | `paddingBox -> {js|padding-box|js}
+      | `borderArea -> {js|border-area|js}
+      | `text -> {js|text|js}
+  end
+
   type t =
-    [ `borderBox
-    | `paddingBox
-    | `contentBox
-    | `text
+    [ Value.t
     | Var.t
     | Cascading.t
     ]
 
   let toString (x : t) =
     match x with
-    | `borderBox -> {js|border-box|js}
-    | `contentBox -> {js|content-box|js}
-    | `paddingBox -> {js|padding-box|js}
-    | `text -> {js|text|js}
+    | #Value.t as x -> Value.toString x
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
 end

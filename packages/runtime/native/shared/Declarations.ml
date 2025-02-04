@@ -91,6 +91,12 @@ let backgroundColor x =
 let backgroundClip x =
   Rule.declaration ({js|backgroundClip|js}, BackgroundClip.toString x)
 
+let backgroundClips x =
+  Rule.declaration
+    ( {js|backgroundClip|js},
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:BackgroundClip.Value.toString
+        x )
+
 let backgroundImage x =
   Rule.declaration ({js|backgroundImage|js}, BackgroundImage.toString x)
 

@@ -97,7 +97,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|left|js}, {js|unset|js});
   let maskedImageUrl = `url("https://www.example.com/eye-uncrossed.svg");
   (CSS.maskImage(maskedImageUrl): CSS.rule);
-  CSS.maskPositions([|`hv((`center, `center))|]);
+  CSS.maskPosition(`hv((`center, `center)));
   CSS.unsafe({js|maskRepeat|js}, {js|no-repeat|js});
   CSS.maxWidth(`maxContent);
   CSS.unsafe({js|outline|js}, {js|none|js});
@@ -125,8 +125,8 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|width|js}, {js|fit-content|js});
   CSS.width(`maxContent);
   
-  CSS.transitionDelays([|`ms(240)|]);
-  CSS.animationDurations([|`ms(150)|]);
+  CSS.transitionDelay(`ms(240));
+  CSS.animationDuration(`ms(150));
   
   CSS.borderWidth(`thin);
   CSS.outlineWidth(`medium);

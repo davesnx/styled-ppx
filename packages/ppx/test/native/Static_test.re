@@ -1150,27 +1150,27 @@ let properties_static_css_tests = [
   (
     [%css "transition-duration: 3s"],
     [%expr [%css "transition-duration: 3s"]],
-    [%expr CSS.transitionDurations([|`s(3)|])],
+    [%expr CSS.transitionDuration(`s(3))],
   ),
   (
     [%css "transition-duration: calc(3s + 1ms)"],
     [%expr [%css "transition-duration: calc(3s + 1ms)"]],
-    [%expr CSS.transitionDurations([|`calc(`add((`s(3), `ms(1))))|])],
+    [%expr CSS.transitionDuration(`calc(`add((`s(3), `ms(1)))))],
   ),
   (
     [%css "transition-duration: min(3s)"],
     [%expr [%css "transition-duration: min(3s)"]],
-    [%expr CSS.transitionDurations([|`min([|`s(3)|])|])],
+    [%expr CSS.transitionDuration(`min([|`s(3)|]))],
   ),
   (
     [%css "transition-duration: max(3s, calc(1ms))"],
     [%expr [%css "transition-duration: max(3s, calc(1ms))"]],
-    [%expr CSS.transitionDurations([|`max([|`s(3), `calc(`ms(1))|])|])],
+    [%expr CSS.transitionDuration(`max([|`s(3), `calc(`ms(1))|]))],
   ),
   (
     [%css "transition-duration: max(+3s, calc(-0ms))"],
     [%expr [%css "transition-duration: max(+3s, calc(-0ms))"]],
-    [%expr CSS.transitionDurations([|`max([|`s(3), `calc(`ms(0))|])|])],
+    [%expr CSS.transitionDuration(`max([|`s(3), `calc(`ms(0))|]))],
   ),
   (
     [%css "animation: 3s"],

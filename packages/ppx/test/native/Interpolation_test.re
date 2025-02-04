@@ -151,22 +151,22 @@ let tests =
     (
       "transition-duration: 500ms;",
       [%expr [%css "transition-duration: 500ms"]],
-      [%expr CSS.transitionDurations([|`ms(500)|])],
+      [%expr CSS.transitionDuration(`ms(500))],
     ),
     (
       "transition-duration: $(duration)",
       [%expr [%css "transition-duration: $(duration)"]],
-      [%expr CSS.transitionDurations([|duration|])],
+      [%expr CSS.transitionDuration(duration)],
     ),
     (
       "animation-play-state: $(state)",
       [%expr [%css "animation-play-state: $(state)"]],
-      [%expr CSS.animationPlayStates([|state|])],
+      [%expr CSS.animationPlayState(state)],
     ),
     (
       "animation-play-state: paused;",
       [%expr [%css "animation-play-state: paused"]],
-      [%expr CSS.animationPlayStates([|`paused|])],
+      [%expr CSS.animationPlayState(`paused)],
     ),
     (
       "column-gap: $(Size.px30);",
