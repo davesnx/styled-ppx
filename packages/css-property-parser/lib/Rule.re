@@ -134,8 +134,9 @@ module Pattern = {
           Error([
             "Expected '"
             ++ humanize(expected)
-            ++ "' but instead got "
-            ++ humanize(token),
+            ++ "' but instead got '"
+            ++ humanize(token)
+            ++ "'.",
           ]);
         },
       /* | token => {

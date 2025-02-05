@@ -67,22 +67,13 @@ module Types = {
     | `Rad(number)
     | `Turn(number)
   ]
-  and time = [
-    | `Ms(float)
-    | `S(float)
-  ]
-  and frequency = [
-    | `Hz(float)
-    | `KHz(float)
-  ]
-  and resolution = [
-    | `Dpi(float)
-    | `Dpcm(float)
-    | `Dppx(float)
-  ]
+  and time = [ | `Ms(float) | `S(float)]
+  and frequency = [ | `Hz(float) | `KHz(float)]
+  and resolution = [ | `Dpi(float) | `Dpcm(float) | `Dppx(float)]
   and percentage = float
   and ident = string
   and custom_ident = string
+  and custom_ident_without_span_or_auto = string
   and url = string
   and hex_color = string
   and interpolation = list(string)

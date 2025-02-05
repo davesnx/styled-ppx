@@ -37,17 +37,19 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|WebkitOverflowScrolling|js}, {js|touch|js});
   CSS.unsafe({js|WebkitTapHighlightColor|js}, {js|transparent|js});
   CSS.unsafe({js|WebkitTextFillColor|js}, colorTextString);
-  CSS.animation(
-    ~duration=?None,
-    ~delay=?None,
-    ~direction=?None,
-    ~timingFunction=?None,
-    ~fillMode=?Some(`none),
-    ~playState=?None,
-    ~iterationCount=?None,
-    ~name=CSS.Types.AnimationName.make({js|none|js}),
-    (),
-  );
+  CSS.animations([|
+    CSS.Types.Animation.Value.make(
+      ~duration=?None,
+      ~delay=?None,
+      ~direction=?None,
+      ~timingFunction=?None,
+      ~fillMode=?Some(`none),
+      ~playState=?None,
+      ~iterationCount=?None,
+      ~name=?None,
+      (),
+    ),
+  |]);
   CSS.unsafe({js|appearance|js}, {js|none|js});
   CSS.aspectRatio(`ratio((21, 8)));
   
@@ -72,30 +74,30 @@ If this test fail means that the module is not in sync with the ppx
   
   CSS.unsafe({js|gridColumn|js}, {js|unset|js});
   CSS.unsafe({js|gridRow|js}, {js|unset|js});
-  CSS.gridTemplateColumns(`value([|`maxContent, `maxContent|]));
+  CSS.gridTemplateColumns(`tracks([|`maxContent, `maxContent|]));
   CSS.gridTemplateColumns(
-    `value([|
+    `tracks([|
       `minmax((`pxFloat(10.), `auto)),
       `fitContent(`pxFloat(20.)),
       `fitContent(`pxFloat(20.)),
     |]),
   );
   CSS.gridTemplateColumns(
-    `value([|
+    `tracks([|
       `minmax((`pxFloat(51.), `auto)),
       `fitContent(`pxFloat(20.)),
       `fitContent(`pxFloat(20.)),
     |]),
   );
-  CSS.gridTemplateColumns(`value([|`repeat((`num(2), [|`auto|]))|]));
-  CSS.gridTemplateColumns(`value([|`repeat((`num(3), [|`auto|]))|]));
+  CSS.gridTemplateColumns(`tracks([|`repeat((`num(2), [|`auto|]))|]));
+  CSS.gridTemplateColumns(`tracks([|`repeat((`num(3), [|`auto|]))|]));
   CSS.unsafe({js|height|js}, {js|fit-content|js});
   CSS.justifyItems(`start);
   CSS.unsafe({js|justifySelf|js}, {js|unset|js});
   CSS.unsafe({js|left|js}, {js|unset|js});
   let maskedImageUrl = `url("https://www.example.com/eye-uncrossed.svg");
   (CSS.maskImage(maskedImageUrl): CSS.rule);
-  CSS.unsafe({js|maskPosition|js}, {js|center center|js});
+  CSS.maskPosition(`hv((`center, `center)));
   CSS.unsafe({js|maskRepeat|js}, {js|no-repeat|js});
   CSS.maxWidth(`maxContent);
   CSS.unsafe({js|outline|js}, {js|none|js});
@@ -111,12 +113,12 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|touchAction|js}, {js|none|js});
   CSS.unsafe({js|touchAction|js}, {js|pan-x pan-y|js});
   
-  CSS.transformOrigin2(`center, `left);
-  CSS.transformOrigin2(`center, `right);
+  CSS.transformOrigin(`hv((`left, `center)));
+  CSS.transformOrigin(`hv((`right, `center)));
   CSS.transformOrigin(`pxFloat(2.));
   CSS.transformOrigin(`bottom);
-  CSS.transformOrigin2(`cm(3.), `pxFloat(2.));
-  CSS.transformOrigin2(`pxFloat(2.), `left);
+  CSS.transformOrigin(`hv((`cm(3.), `pxFloat(2.))));
+  CSS.transformOrigin(`hv((`left, `pxFloat(2.))));
   
   CSS.transform(`none);
   

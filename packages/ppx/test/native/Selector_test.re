@@ -51,7 +51,9 @@ let simple_tests = [
   (
     "[title=\"baz\"]",
     [%expr [%cx {js|[title="baz"] {}|js}]],
-    [%expr CSS.style([|CSS.selectorMany([|{js|[title="baz"]|js}|], [||])|])],
+    [%expr
+      CSS.style([|CSS.selectorMany([|{js|[title="baz"]|js}|], [||])|])
+    ],
   ),
   (
     "nth-child(even)",
@@ -63,7 +65,9 @@ let simple_tests = [
   (
     "nth-child(odd)",
     [%expr [%cx "&:nth-child(odd) {}"]],
-    [%expr CSS.style([|CSS.selectorMany([|{js|&:nth-child(odd)|js}|], [||])|])],
+    [%expr
+      CSS.style([|CSS.selectorMany([|{js|&:nth-child(odd)|js}|], [||])|])
+    ],
   ),
   (
     "nth-child(3n+1)",
@@ -75,12 +79,16 @@ let simple_tests = [
   (
     ":nth-child(2n)",
     [%expr [%cx "&:nth-child(2n) {}"]],
-    [%expr CSS.style([|CSS.selectorMany([|{js|&:nth-child(2n)|js}|], [||])|])],
+    [%expr
+      CSS.style([|CSS.selectorMany([|{js|&:nth-child(2n)|js}|], [||])|])
+    ],
   ),
   (
     ":nth-child(n)",
     [%expr [%cx "&:nth-child(n) {}"]],
-    [%expr CSS.style([|CSS.selectorMany([|{js|&:nth-child(n)|js}|], [||])|])],
+    [%expr
+      CSS.style([|CSS.selectorMany([|{js|&:nth-child(n)|js}|], [||])|])
+    ],
   ),
   (
     ":nth-child(10n-1)",
@@ -106,7 +114,9 @@ let simple_tests = [
   (
     ".a, .b {}",
     [%expr [%cx ".a, .b {}"]],
-    [%expr CSS.style([|CSS.selectorMany([|{js|.a|js}, {js|.b|js}|], [||])|])],
+    [%expr
+      CSS.style([|CSS.selectorMany([|{js|.a|js}, {js|.b|js}|], [||])|])
+    ],
   ),
   (
     ":nth-child(-n+2)",
@@ -127,20 +137,26 @@ let compound_tests = [
     "&.bar,&.foo",
     [%expr [%cx {js|&.bar,&.foo {}|js}]],
     [%expr
-      CSS.style([|CSS.selectorMany([|{js|&.bar|js}, {js|&.foo|js}|], [||])|])
+      CSS.style([|
+        CSS.selectorMany([|{js|&.bar|js}, {js|&.foo|js}|], [||]),
+      |])
     ],
   ),
   (
     "&.bar , &.foo",
     [%expr [%cx {js|&.bar , &.foo {}|js}]],
     [%expr
-      CSS.style([|CSS.selectorMany([|{js|&.bar|js}, {js|&.foo|js}|], [||])|])
+      CSS.style([|
+        CSS.selectorMany([|{js|&.bar|js}, {js|&.foo|js}|], [||]),
+      |])
     ],
   ),
   (
     "p:first-child",
     [%expr [%cx {js|p:first-child {}|js}]],
-    [%expr CSS.style([|CSS.selectorMany([|{js|p:first-child|js}|], [||])|])],
+    [%expr
+      CSS.style([|CSS.selectorMany([|{js|p:first-child|js}|], [||])|])
+    ],
   ),
   (
     ".p.p.p.p {}",
@@ -162,12 +178,16 @@ let compound_tests = [
   (
     "p#first-child",
     [%expr [%cx {js|& p#first-child {}|js}]],
-    [%expr CSS.style([|CSS.selectorMany([|{js|& p#first-child|js}|], [||])|])],
+    [%expr
+      CSS.style([|CSS.selectorMany([|{js|& p#first-child|js}|], [||])|])
+    ],
   ),
   (
     "#first-child",
     [%expr [%cx {js|& #first-child {}|js}]],
-    [%expr CSS.style([|CSS.selectorMany([|{js|& #first-child|js}|], [||])|])],
+    [%expr
+      CSS.style([|CSS.selectorMany([|{js|& #first-child|js}|], [||])|])
+    ],
   ),
   (
     ":active",
@@ -188,7 +208,9 @@ let compound_tests = [
     "#first-child::before",
     [%expr [%cx {js|#first-child::before {}|js}]],
     [%expr
-      CSS.style([|CSS.selectorMany([|{js|#first-child::before|js}|], [||])|])
+      CSS.style([|
+        CSS.selectorMany([|{js|#first-child::before|js}|], [||]),
+      |])
     ],
   ),
   (
@@ -226,7 +248,9 @@ let complex_tests = [
   (
     "& #first-child",
     [%expr [%cx {js|& #first-child {}|js}]],
-    [%expr CSS.style([|CSS.selectorMany([|{js|& #first-child|js}|], [||])|])],
+    [%expr
+      CSS.style([|CSS.selectorMany([|{js|& #first-child|js}|], [||])|])
+    ],
   ),
   (
     "& .bar",
@@ -241,7 +265,9 @@ let complex_tests = [
   (
     "& :first-child",
     [%expr [%cx {js|& :first-child {}|js}]],
-    [%expr CSS.style([|CSS.selectorMany([|{js|& :first-child|js}|], [||])|])],
+    [%expr
+      CSS.style([|CSS.selectorMany([|{js|& :first-child|js}|], [||])|])
+    ],
   ),
   (
     "& > div > div > div > div",
@@ -255,7 +281,9 @@ let complex_tests = [
   (
     "& div > .class",
     [%expr [%cx "& div > .class {}"]],
-    [%expr CSS.style([|CSS.selectorMany([|{js|& div > .class|js}|], [||])|])],
+    [%expr
+      CSS.style([|CSS.selectorMany([|{js|& div > .class|js}|], [||])|])
+    ],
   ),
   /* #foo > .bar + div.k1.k2 [id='baz']:hello(2):not(:where(#yolo))::before */
   (
@@ -272,31 +300,41 @@ let complex_tests = [
     "& span, & + &",
     [%expr [%cx "& span, & + & {}"]],
     [%expr
-      CSS.style([|CSS.selectorMany([|{js|& span|js}, {js|& + &|js}|], [||])|])
+      CSS.style([|
+        CSS.selectorMany([|{js|& span|js}, {js|& + &|js}|], [||]),
+      |])
     ],
   ),
   (
     "& p:not(.active)",
     [%expr [%cx "& p:not(.active) {}"]],
-    [%expr CSS.style([|CSS.selectorMany([|{js|& p:not(.active)|js}|], [||])|])],
+    [%expr
+      CSS.style([|CSS.selectorMany([|{js|& p:not(.active)|js}|], [||])|])
+    ],
   ),
   (
     "& #first-child",
     [%expr [%cx {js|& #first-child {}|js}]],
-    [%expr CSS.style([|CSS.selectorMany([|{js|& #first-child|js}|], [||])|])],
+    [%expr
+      CSS.style([|CSS.selectorMany([|{js|& #first-child|js}|], [||])|])
+    ],
   ),
   (
     "& #first-child #second",
     [%expr [%cx {js|& #first-child #second {}|js}]],
     [%expr
-      CSS.style([|CSS.selectorMany([|{js|& #first-child #second|js}|], [||])|])
+      CSS.style([|
+        CSS.selectorMany([|{js|& #first-child #second|js}|], [||]),
+      |])
     ],
   ),
   (
     "& #first-child::before",
     [%expr [%cx {js|& #first-child::before {}|js}]],
     [%expr
-      CSS.style([|CSS.selectorMany([|{js|& #first-child::before|js}|], [||])|])
+      CSS.style([|
+        CSS.selectorMany([|{js|& #first-child::before|js}|], [||]),
+      |])
     ],
   ),
   (
@@ -328,13 +366,17 @@ let complex_tests = [
     {|& div[id$="thumbnail"] { }|},
     [%expr [%cx {|& div[id$="thumbnail"] {}|}]],
     [%expr
-      CSS.style([|CSS.selectorMany([|{js|& div[id$="thumbnail"]|js}|], [||])|])
+      CSS.style([|
+        CSS.selectorMany([|{js|& div[id$="thumbnail"]|js}|], [||]),
+      |])
     ],
   ),
   (
     "& button:hover",
     [%expr [%cx "& button:hover{} "]],
-    [%expr CSS.style([|CSS.selectorMany([|{js|& button:hover|js}|], [||])|])],
+    [%expr
+      CSS.style([|CSS.selectorMany([|{js|& button:hover|js}|], [||])|])
+    ],
   ),
   (
     "& $(Variables.selector_query)",
@@ -367,14 +409,18 @@ let complex_tests = [
     "& a[target=\"_blank\"]",
     [%expr [%cx {|& a[target="_blank"] {}|}]],
     [%expr
-      CSS.style([|CSS.selectorMany([|{js|& a[target="_blank"]|js}|], [||])|])
+      CSS.style([|
+        CSS.selectorMany([|{js|& a[target="_blank"]|js}|], [||]),
+      |])
     ],
   ),
   (
     "& a[target=\"_blank\"]",
     [%expr [%cx {|& a[ target = "_blank" ] {}|}]],
     [%expr
-      CSS.style([|CSS.selectorMany([|{js|& a[target="_blank"]|js}|], [||])|])
+      CSS.style([|
+        CSS.selectorMany([|{js|& a[target="_blank"]|js}|], [||]),
+      |])
     ],
   ),
   (
@@ -395,7 +441,9 @@ let complex_tests = [
     "*:not(:last-child)",
     [%expr [%cx "& > *:not(:last-child) {}"]],
     [%expr
-      CSS.style([|CSS.selectorMany([|{js|& > *:not(:last-child)|js}|], [||])|])
+      CSS.style([|
+        CSS.selectorMany([|{js|& > *:not(:last-child)|js}|], [||]),
+      |])
     ],
   ),
   (
@@ -436,7 +484,9 @@ let stylesheet_tests = [
     [%expr [%styled.global {js|html, body {}|js}]],
     [%expr
       ignore(
-        CSS.global([|CSS.selectorMany([|{js|html|js}, {js|body|js}|], [||])|]),
+        CSS.global([|
+          CSS.selectorMany([|{js|html|js}, {js|body|js}|], [||]),
+        |]),
       )
     ],
   ),
@@ -465,7 +515,9 @@ let stylesheet_tests = [
     "div > span",
     [%expr [%styled.global {js|div > span {}|js}]],
     [%expr
-      ignore(CSS.global([|CSS.selectorMany([|{js|div > span|js}|], [||])|]))
+      ignore(
+        CSS.global([|CSS.selectorMany([|{js|div > span|js}|], [||])|]),
+      )
     ],
   ),
   (

@@ -16,16 +16,6 @@ If this test fail means that the module is not in sync with the ppx
   File "input.re", line 11, characters 21-29:
   Error: This expression has type [> `underlin ]
          but an expression was expected of type
-           [< `inherit_
-            | `initial
-            | `lineThrough
-            | `none
-            | `overline
-            | `revert
-            | `revertLayer
-            | `underline
-            | `unset
-            | `var of string
-            | `varDefault of string * string ]
+           Css_types.TextDecorationLine.Value.t
          The second variant type does not allow tag(s) `underlin
   [1]

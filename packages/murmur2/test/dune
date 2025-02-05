@@ -9,4 +9,12 @@
 (cram
  (package styled-ppx)
  (alias test-murmur2)
- (deps cli_murmur2.exe %{bin:node} ./compare.sh ./murmur2.js ./compare-malformed.sh ./malformed.js ./malformed.exe ./cli_murmur2.js))
+ (deps
+  cli_murmur2.exe
+  %{bin:node}
+  ./compare.sh
+  ./murmur2.js
+  ./compare-malformed.sh
+  ./malformed.js
+  ./malformed.exe
+  ./cli_murmur2.js))

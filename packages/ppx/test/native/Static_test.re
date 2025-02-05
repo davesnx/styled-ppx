@@ -1176,68 +1176,76 @@ let properties_static_css_tests = [
     [%css "animation: 3s"],
     [%expr [%css "animation: 3s"]],
     [%expr
-      CSS.animation(
-        ~duration=?Some(`s(3)),
-        ~delay=?None,
-        ~direction=?None,
-        ~timingFunction=?None,
-        ~fillMode=?None,
-        ~playState=?None,
-        ~iterationCount=?None,
-        ~name=CSS.Types.AnimationName.make({js|none|js}),
-        (),
-      )
+      CSS.animations([|
+        CSS.Types.Animation.Value.make(
+          ~duration=?Some(`s(3)),
+          ~delay=?None,
+          ~direction=?None,
+          ~timingFunction=?None,
+          ~fillMode=?None,
+          ~playState=?None,
+          ~iterationCount=?None,
+          ~name=?None,
+          (),
+        ),
+      |])
     ],
   ),
   (
     [%css "animation: calc(3s + 1ms)"],
     [%expr [%css "animation: calc(3s + 1ms)"]],
     [%expr
-      CSS.animation(
-        ~duration=?Some(`calc(`add((`s(3), `ms(1))))),
-        ~delay=?None,
-        ~direction=?None,
-        ~timingFunction=?None,
-        ~fillMode=?None,
-        ~playState=?None,
-        ~iterationCount=?None,
-        ~name=CSS.Types.AnimationName.make({js|none|js}),
-        (),
-      )
+      CSS.animations([|
+        CSS.Types.Animation.Value.make(
+          ~duration=?Some(`calc(`add((`s(3), `ms(1))))),
+          ~delay=?None,
+          ~direction=?None,
+          ~timingFunction=?None,
+          ~fillMode=?None,
+          ~playState=?None,
+          ~iterationCount=?None,
+          ~name=?None,
+          (),
+        ),
+      |])
     ],
   ),
   (
     [%css "animation: calc(3 + 1)"],
     [%expr [%css "animation: calc(3 + 1)"]],
     [%expr
-      CSS.animation(
-        ~duration=?Some(`calc(`add((`num(3.), `num(1.))))),
-        ~delay=?None,
-        ~direction=?None,
-        ~timingFunction=?None,
-        ~fillMode=?None,
-        ~playState=?None,
-        ~iterationCount=?None,
-        ~name=CSS.Types.AnimationName.make({js|none|js}),
-        (),
-      )
+      CSS.animations([|
+        CSS.Types.Animation.Value.make(
+          ~duration=?Some(`calc(`add((`num(3.), `num(1.))))),
+          ~delay=?None,
+          ~direction=?None,
+          ~timingFunction=?None,
+          ~fillMode=?None,
+          ~playState=?None,
+          ~iterationCount=?None,
+          ~name=?None,
+          (),
+        ),
+      |])
     ],
   ),
   (
     [%css "animation: max(3s, 1ms)"],
     [%expr [%css "animation: max(3s, 1ms)"]],
     [%expr
-      CSS.animation(
-        ~duration=?Some(`max([|`s(3), `ms(1)|])),
-        ~delay=?None,
-        ~direction=?None,
-        ~timingFunction=?None,
-        ~fillMode=?None,
-        ~playState=?None,
-        ~iterationCount=?None,
-        ~name=CSS.Types.AnimationName.make({js|none|js}),
-        (),
-      )
+      CSS.animations([|
+        CSS.Types.Animation.Value.make(
+          ~duration=?Some(`max([|`s(3), `ms(1)|])),
+          ~delay=?None,
+          ~direction=?None,
+          ~timingFunction=?None,
+          ~fillMode=?None,
+          ~playState=?None,
+          ~iterationCount=?None,
+          ~name=?None,
+          (),
+        ),
+      |])
     ],
   ),
   (

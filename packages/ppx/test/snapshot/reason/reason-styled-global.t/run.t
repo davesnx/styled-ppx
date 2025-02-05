@@ -36,8 +36,38 @@
         [|{js|abbr[title]|js}|],
         [|
           CSS.unsafe({js|borderBottom|js}, {js|none|js}),
-          CSS.textDecoration(`underline),
-          CSS.unsafe({js|textDecoration|js}, {js|underline dotted|js}),
+          CSS.textDecoration2(
+            ~line=?
+              Some(
+                CSS.Types.TextDecorationLine.Value.make(
+                  ~underline=?Some(true),
+                  ~overline=?None,
+                  ~lineThrough=?None,
+                  ~blink=?None,
+                  (),
+                ),
+              ),
+            ~thickness=?None,
+            ~style=?None,
+            ~color=?None,
+            (),
+          ),
+          CSS.textDecoration2(
+            ~line=?
+              Some(
+                CSS.Types.TextDecorationLine.Value.make(
+                  ~underline=?Some(true),
+                  ~overline=?None,
+                  ~lineThrough=?None,
+                  ~blink=?None,
+                  (),
+                ),
+              ),
+            ~thickness=?None,
+            ~style=?Some(`dotted),
+            ~color=?None,
+            (),
+          ),
         |],
       ),
       CSS.selectorMany(
