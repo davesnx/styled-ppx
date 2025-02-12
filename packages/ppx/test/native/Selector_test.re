@@ -612,6 +612,22 @@ let nested_tests = [
       |])
     ],
   ),
+  (
+    ".a .b { .a .b {} .a.b {} .a .b {} }",
+    [%expr [%cx ".a .b { .a .b {} .a.b {} .a .b {} }"]],
+    [%expr
+      CSS.style([|
+        CSS.selectorMany(
+          [|{js|.a .b|js}|],
+          [|
+            CSS.selectorMany([|{js|.a .b|js}|], [||]),
+            CSS.selectorMany([|{js|.a.b|js}|], [||]),
+            CSS.selectorMany([|{js|.a .b|js}|], [||]),
+          |],
+        ),
+      |])
+    ],
+  ),
 ];
 
 let comments_tests = [

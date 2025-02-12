@@ -146,7 +146,8 @@ let selector_nested =
         CSS.margin @@ CSS.px 10;
         CSS.selectorMany [| "a" |]
           [|
-            CSS.display `block; CSS.selectorMany [| "div" |] [| CSS.display `none |];
+            CSS.display `block;
+            CSS.selectorMany [| "div" |] [| CSS.display `none |];
           |];
       |]
   in
@@ -444,7 +445,8 @@ let keyframe =
 
 let global =
   test "global" @@ fun () ->
-  CSS.global [| CSS.selectorMany [| "html" |] [| CSS.lineHeight (`abs 1.15) |] |];
+  CSS.global
+    [| CSS.selectorMany [| "html" |] [| CSS.lineHeight (`abs 1.15) |] |];
   let css = get_string_style_rules () in
   assert_string css (Printf.sprintf "html{line-height:1.15;}")
 
@@ -559,7 +561,7 @@ let functional_pseudo =
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s .foo:is(ol, ul, menu:unsupported):is(ol, ul) { color: #008000; } \
+       ".%s .foo:is(ol, ul, menu:unsupported) :is(ol, ul) { color: #008000; } \
         .%s .foo:is(ol, ul) :is(ol, ul) ol { list-style-type: lower-greek; \
         color: #D2691E; } .%s .foo p:not(.irrelevant) { font-weight: 700; } \
         .%s .foo p > :not(strong, b.important) { color: #8B008B; } .%s \
@@ -568,7 +570,7 @@ let functional_pseudo =
         lower-greek; color: #D2691E; } .%s .foo:is(h1, h2, h3):has(+ :is(h2, \
         h3, h4)) { margin: 0 0 0.25rem 0; } .%s .foo body:has(video, audio) { \
         color: #FF0000; } .%s .foo body:has(video):has(audio) { color: \
-        #FF0000; } .%s .bar:is(ol, ul, menu:unsupported):is(ol, ul) { color: \
+        #FF0000; } .%s .bar:is(ol, ul, menu:unsupported) :is(ol, ul) { color: \
         #008000; } .%s .bar:is(ol, ul) :is(ol, ul) ol { list-style-type: \
         lower-greek; color: #D2691E; } .%s .bar p:not(.irrelevant) { \
         font-weight: 700; } .%s .bar p > :not(strong, b.important) { color: \
@@ -756,7 +758,8 @@ let selector_with_empty_interp =
 
 let style_tag =
   test "style_tag" @@ fun () ->
-  CSS.global [| CSS.selectorMany [| "html" |] [| CSS.lineHeight (`abs 1.15) |] |];
+  CSS.global
+    [| CSS.selectorMany [| "html" |] [| CSS.lineHeight (`abs 1.15) |] |];
   let animationName =
     CSS.keyframes
       [|

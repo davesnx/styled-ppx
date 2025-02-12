@@ -85,7 +85,7 @@ skip_ws_left (X): WS? x = X; { x }
 
 /* TODO: Remove empty_brace_block */
 /* {} */
-empty_brace_block: pair(LEFT_BRACE, RIGHT_BRACE) { [] }
+empty_brace_block: LEFT_BRACE WS? RIGHT_BRACE { [] }
 
 /* TODO: Remove SEMI_COLON? from brace_block(X) */
 /* { ... } */
@@ -602,10 +602,6 @@ type_selector:
   | AMPERSAND; { Ampersand } /* & {} https://drafts.csswg.org/css-nesting/#nest-selector */
   | ASTERISK; { Universal } /* * {} */
   | v = INTERPOLATION { Variable v } /* $(Module.value) {} */
-  /* TODO: type_selector should work with IDENTs, but there's a bunch of grammar
-    conflicts with IDENT on value and others, we replaced with TAG, a
-    list of valid HTML tags that does the job done, but this should be fixed. */
-  | type_ = IDENT; { Type type_ } /* a {} */
   | type_ = TAG; { Type type_ } /* a {} */
 
 /* <simple-selector> = <type-selector> | <subclass-selector> */
