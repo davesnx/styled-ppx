@@ -430,7 +430,7 @@ style_rule:
     }
   }
 
-values: xs = nonempty_list(loc(skip_ws(value))) { xs }
+values: xs = list(loc(skip_ws(value))) { xs }
 prelude_any: xs = list(loc(skip_ws(value))) { Paren_block xs }
 
 declarations:
@@ -556,7 +556,7 @@ attribute_selector:
   | LEFT_BRACKET; WS?
     i = wq_name WS?
     m = attr_matcher; WS?
-    v = IDENT WS?
+    v = wq_name WS?
     RIGHT_BRACKET {
     Attribute(
       To_equal({

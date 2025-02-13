@@ -1191,6 +1191,47 @@ let ampersand_everywhere_global =
      .lola{font-size:5px;}.lola .foo .foo:focus .foo .foo \
      .lola{font-size:6px;}"
 
+let css_variable =
+  test "css_variable" @@ fun () ->
+  [%global
+    {|
+      :root {
+        --bs-dropdown-bg: #343a40;
+        --bs-dropdown-border-color: var(--bs-border-color-translucent, black);
+        --bs-dropdown-box-shadow: ;
+      }
+    |}];
+  let css = get_string_style_rules () in
+  assert_string css
+    ":root{--bs-dropdown-bg:#343a40;--bs-dropdown-border-color:var(--bs-border-color-translucent, \
+     black);--bs-dropdown-box-shadow:;}"
+
+let attribute_selector =
+  test "attribute_selector" @@ fun () ->
+  [%global
+    {|
+      [list]:not([type=date]):not([type=datetime-local]):not([type=month]):not([type=week]):not([type=time])::-webkit-calendar-picker-indicator {
+        display: none !important;
+      }
+
+      button,
+      [type=button],
+      [type=reset],
+      [type=submit] {
+        -webkit-appearance: button;
+      }
+      button:not(:disabled),
+      [type=button]:not(:disabled),
+      [type=reset]:not(:disabled),
+      [type=submit]:not(:disabled) {
+        cursor: pointer;
+      }
+    |}];
+  let css = get_string_style_rules () in
+  assert_string css
+    "[list]:not([type=date]):not([type=datetime-local]):not([type=month]):not([type=week]):not([type=time])::-webkit-calendar-picker-indicator{display:none \
+     !important;}button{-webkit-appearance:button;}[type=button]{-webkit-appearance:button;}[type=reset]{-webkit-appearance:button;}[type=submit]{-webkit-appearance:button;}button:not(:disabled){cursor:pointer;}[type=button]:not(:disabled){cursor:pointer;}[type=reset]:not(:disabled){cursor:pointer;}[type=submit]:not(:disabled){cursor:pointer;}"
+
 let tests =
   ( "CSS",
     [
@@ -1251,4 +1292,6 @@ let tests =
       mq_and_selectors_2;
       global_with_selector;
       ampersand_everywhere_global;
+      css_variable;
+      attribute_selector;
     ] )
