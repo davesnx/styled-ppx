@@ -642,7 +642,9 @@ let rec get_next_token = lexbuf => {
   /* TODO: get_dimension and handle_numeric should be the same */
   | number => get_dimension(lexeme(lexbuf), lexbuf)
   | whitespaces => WS
-  | ("-", ident) => IDENT(lexeme(lexbuf))
+  | ("-", ident) =>
+    Sedlexing.rollback(lexbuf);
+    consume_ident_like(lexbuf) |> handle_tokenizer_error(lexbuf);
   /* --variable */
   | ("-", "-", ident) => IDENT(lexeme(lexbuf))
   | identifier_start_code_point =>
