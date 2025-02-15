@@ -647,6 +647,7 @@ let rec get_next_token = lexbuf => {
     consume_ident_like(lexbuf) |> handle_tokenizer_error(lexbuf);
   /* --variable */
   | ("-", "-", ident) => IDENT(lexeme(lexbuf))
+  | escape
   | identifier_start_code_point =>
     let _ = Sedlexing.backtrack(lexbuf);
     consume_ident_like(lexbuf) |> handle_tokenizer_error(lexbuf);
