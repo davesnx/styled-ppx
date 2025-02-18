@@ -187,3 +187,5 @@ Sessionx.vim
 .*.swp
 # Auto-generated tag files
 tags
+# nix flake stuff
+.direnv
