@@ -19,11 +19,11 @@ opam install styled-ppx
 ### Packages available
 
 - `styled-ppx` is the ppx to transform `[%styled.div ""]` and `[%cx ""]`
-- `styled-ppx.native` is the library with the CSS bindings, and the implementation of `emotion.sh` on the server. Capable of storing CSS, hashing it and generating a unique classnames, autoprefixing, etc.
+- `styled-ppx.native` is the library with the CSS bindings, and the implementation of `emotion.sh` on the server: capable of storing CSS, hashing it, generating a unique classnames, and autoprefixing
 
 ### Usage
 
-Add `styled-ppx` under dune's preprocess pps for any library or executable. Add `styled-ppx.native` as libraries.
+Add `styled-ppx` under dune's preprocess pps for any library or executable; and add `styled-ppx.native` as a library. Regardless of being a library or executable:
 
 ```diff
 (library
@@ -34,20 +34,17 @@ Add `styled-ppx` under dune's preprocess pps for any library or executable. Add 
   (preprocess
    (pps
 +   styled-ppx
-    melange.ppx
     server-reason-react-ppx)))
 ```
 
 ```diff
-(melange.emit
-  (target ...)
+(executable
   (libraries
 +  styled-ppx.native
    server-reason-react)
   (preprocess
    (pps
 +   styled-ppx
-    melange.ppx
     server-reason-react-ppx)))
 ```
 
@@ -56,7 +53,7 @@ Note: `server-reason-react` and `server-reason-react-ppx` are optional, and only
 ### API
 
 - `CSS.get_stylesheet` returns a string with all styles
-- `CSS.style_tag` returns a `<style />` React element, with all styles. This is designed to be used with server-reason-react.
+- `CSS.style_tag` returns a `<style />` React element, with all styles. This is designed to be used with server-reason-react
 
 ### Example
 

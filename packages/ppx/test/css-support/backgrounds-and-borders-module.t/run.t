@@ -42,33 +42,33 @@ If this test fail means that the module is not in sync with the ppx
   CSS.backgroundRepeat(`hv((`space, `noRepeat)));
   CSS.backgroundRepeat(`hv((`round, `noRepeat)));
   CSS.backgroundRepeat(`hv((`noRepeat, `noRepeat)));
+  CSS.backgroundRepeats([|`repeatX, `repeatY|]);
   CSS.backgroundAttachment(`local);
-  
   CSS.backgroundClip(`borderBox);
   CSS.backgroundClip(`paddingBox);
   CSS.backgroundClip(`contentBox);
+  CSS.backgroundClip(`text);
+  CSS.backgroundClip(`borderArea);
+  CSS.backgroundClips([|`text, `borderArea|]);
   CSS.backgroundOrigin(`borderBox);
   CSS.backgroundOrigin(`paddingBox);
   CSS.backgroundOrigin(`contentBox);
-  CSS.unsafe({js|backgroundSize|js}, {js|auto|js});
+  CSS.backgroundSize(`auto);
   CSS.backgroundSize(`cover);
   CSS.backgroundSize(`contain);
-  CSS.unsafe({js|backgroundSize|js}, {js|10px|js});
-  CSS.unsafe({js|backgroundSize|js}, {js|50%|js});
-  CSS.unsafe({js|backgroundSize|js}, {js|10px auto|js});
-  CSS.unsafe({js|backgroundSize|js}, {js|auto 10%|js});
+  CSS.backgroundSize(`pxFloat(10.));
+  CSS.backgroundSize(`percent(50.));
+  CSS.backgroundSize(`size((`pxFloat(10.), `auto)));
+  CSS.backgroundSize(`size((`auto, `percent(10.))));
   CSS.backgroundSize(`size((`em(50.), `percent(50.))));
   
-  CSS.unsafe({js|background|js}, {js|top left / 50% 60%|js});
+  CSS.backgroundPosition(`hvOffset((`left, `top)));
   CSS.backgroundOrigin(`borderBox);
   CSS.backgroundColor(CSS.blue);
   CSS.backgroundColor(CSS.red);
   
   CSS.backgroundClip(`paddingBox);
-  CSS.unsafe(
-    {js|background|js},
-    {js|url(foo.png) bottom right / cover padding-box content-box|js},
-  );
+  CSS.backgroundImage(`url({js|foo.png|js}));
   CSS.borderTopLeftRadius(`zero);
   CSS.borderTopLeftRadius(`percent(50.));
   CSS.unsafe({js|borderTopLeftRadius|js}, {js|250px 100px|js});
@@ -652,25 +652,32 @@ If this test fail means that the module is not in sync with the ppx
   CSS.backgroundPosition(`bottom);
   CSS.unsafe({js|backgroundPositionX|js}, {js|50%|js});
   CSS.unsafe({js|backgroundPositionY|js}, {js|0|js});
-  CSS.backgroundPosition2(`zero, `zero);
-  CSS.backgroundPosition2(`rem(1.), `zero);
+  CSS.backgroundPosition(`hv((`zero, `zero)));
+  CSS.backgroundPosition(`hv((`rem(1.), `zero)));
+  CSS.backgroundPosition(`hvOffset((`right, `bottomOffset(`pxFloat(10.)))));
+  CSS.backgroundPosition(
+    `hvOffset((`rightOffset(`pxFloat(20.)), `bottomOffset(`pxFloat(10.)))),
+  );
+  CSS.backgroundPositions([|`hv((`zero, `zero)), `center|]);
   
-  CSS.objectPosition2(`center, `top);
-  CSS.objectPosition2(`center, `bottom);
-  CSS.objectPosition2(`left, `center);
-  CSS.objectPosition2(`right, `center);
-  CSS.objectPosition2(`center, `center);
+  CSS.objectPosition(`top);
+  CSS.objectPosition(`bottom);
+  CSS.objectPosition(`left);
+  CSS.objectPosition(`right);
+  CSS.objectPosition(`center);
   
-  CSS.unsafe({js|objectPosition|js}, {js|25% 75%|js});
-  CSS.objectPosition2(`percent(25.), `center);
+  CSS.objectPosition(`hv((`percent(25.), `percent(75.))));
+  CSS.objectPosition(`percent(25.));
   
-  CSS.objectPosition2(`zero, `zero);
-  CSS.objectPosition2(`cm(1.), `cm(2.));
-  CSS.objectPosition2(`ch(10.), `em(8.));
+  CSS.objectPosition(`hv((`zero, `zero)));
+  CSS.objectPosition(`hv((`cm(1.), `cm(2.))));
+  CSS.objectPosition(`hv((`ch(10.), `em(8.))));
   
-  CSS.unsafe({js|objectPosition|js}, {js|bottom 10px right 20px|js});
-  CSS.unsafe({js|objectPosition|js}, {js|right 3em bottom 10px|js});
-  CSS.unsafe({js|objectPosition|js}, {js|top 0 right 10px|js});
+  CSS.objectPosition(
+    `hvOffset((`right, `pxFloat(20.), `bottom, `pxFloat(10.))),
+  );
+  CSS.objectPosition(`hvOffset((`right, `em(3.), `bottom, `pxFloat(10.))));
+  CSS.objectPosition(`hvOffset((`right, `pxFloat(10.), `top, `zero)));
   
   CSS.unsafe({js|objectPosition|js}, {js|inherit|js});
   CSS.unsafe({js|objectPosition|js}, {js|initial|js});
@@ -680,7 +687,7 @@ If this test fail means that the module is not in sync with the ppx
   
   let _loadingKeyframes =
     CSS.keyframes([|
-      (0, [|CSS.backgroundPosition2(`zero, `zero)|]),
-      (100, [|CSS.backgroundPosition2(`rem(1.), `zero)|]),
+      (0, [|CSS.backgroundPosition(`hv((`zero, `zero)))|]),
+      (100, [|CSS.backgroundPosition(`hv((`rem(1.), `zero)))|]),
     |]);
 

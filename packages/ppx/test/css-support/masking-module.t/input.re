@@ -43,6 +43,7 @@
 [%css {|mask-position: center center|}];
 [%css {|mask-position: left 50%|}];
 [%css {|mask-position: bottom 10px right 20px|}];
+[%css {|mask-position: 1rem 1rem, center|}];
 [%css {|mask-clip: border-box|}];
 [%css {|mask-clip: padding-box|}];
 [%css {|mask-clip: content-box|}];

@@ -77,7 +77,7 @@ skip_ws_left (X): WS? x = X; { x }
 
 /* TODO: Remove empty_brace_block */
 /* {} */
-empty_brace_block: pair(LEFT_BRACE, RIGHT_BRACE) { [] }
+empty_brace_block: LEFT_BRACE WS? RIGHT_BRACE { [] }
 
 /* TODO: Remove SEMI_COLON? from brace_block(X) */
 /* { ... } */
@@ -205,7 +205,7 @@ style_rule:
     }
   }
 
-values: xs = list(loc(value)) { xs }
+values: xs = list(loc(skip_ws(value))) { xs }
 prelude_any: xs = list(loc(skip_ws(value))) { Paren_block xs }
 
 declarations:
@@ -329,7 +329,7 @@ attribute_selector:
   | LEFT_BRACKET; WS?
     i = wq_name WS?
     m = attr_matcher; WS?
-    v = IDENT WS?
+    v = wq_name WS?
     RIGHT_BRACKET {
     Attribute(
       To_equal({
@@ -375,10 +375,6 @@ type_selector:
   | AMPERSAND; { Ampersand } /* & {} https://drafts.csswg.org/css-nesting/#nest-selector */
   | ASTERISK; { Universal } /* * {} */
   | v = INTERPOLATION { Variable v } /* $(Module.value) {} */
-  /* TODO: type_selector should work with IDENTs, but there's a bunch of grammar
-    conflicts with IDENT on value and others, we replaced with TAG, a
-    list of valid HTML tags that does the job done, but this should be fixed. */
-  | type_ = IDENT; { Type type_ } /* a {} */
   | type_ = TAG; { Type type_ } /* a {} */
 
 /* <simple-selector> = <type-selector> | <subclass-selector> */

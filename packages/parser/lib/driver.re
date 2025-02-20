@@ -2,9 +2,7 @@ module Location = Ppxlib.Location;
 
 let menhir = MenhirLib.Convert.Simplified.traditional2revised;
 
-let parse = (~loc: Ppxlib.location, skip_whitespaces, lexbuf, parser) => {
-  Lexer.skip_whitespace.contents = skip_whitespaces;
-
+let parse = (~loc: Ppxlib.location, lexbuf, parser) => {
   let last_token = ref((Parser.EOF, Lexing.dummy_pos, Lexing.dummy_pos));
 
   let next_token = () => {
@@ -31,21 +29,21 @@ let parse = (~loc: Ppxlib.location, skip_whitespaces, lexbuf, parser) => {
 
 let last_buffer = ref(None);
 
-let parse_string = (~skip_whitespace, ~loc, parser, string) => {
+let parse_string = (~loc, parser, string) => {
   let buffer = Sedlexing.Latin1.from_string(string);
   last_buffer := Some(Sedlexing.Latin1.from_string(string));
-  parse(~loc, skip_whitespace, buffer, parser);
+  parse(~loc, buffer, parser);
 };
 
 let parse_declaration_list = (~loc, input: string) => {
-  parse_string(~loc, ~skip_whitespace=false, Parser.declaration_list, input);
+  parse_string(~loc, Parser.declaration_list, input);
 };
 
 let parse_declaration = (~loc, input: string) =>
-  parse_string(~loc, ~skip_whitespace=true, Parser.declaration, input);
+  parse_string(~loc, Parser.declaration, input);
 
 let parse_stylesheet = (~loc, input: string) =>
-  parse_string(~loc, ~skip_whitespace=false, Parser.stylesheet, input);
+  parse_string(~loc, Parser.stylesheet, input);
 
 let parse_keyframes = (~loc, input: string) =>
-  parse_string(~loc, ~skip_whitespace=false, Parser.keyframes, input);
+  parse_string(~loc, Parser.keyframes, input);

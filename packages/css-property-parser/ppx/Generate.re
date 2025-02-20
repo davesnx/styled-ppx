@@ -312,6 +312,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       type_("ident", [%type: string]),
       type_("custom_ident", [%type: string]),
       type_("dashed_ident", [%type: string]),
+      type_("custom_ident_without_span_or_auto", [%type: string]),
       // abstract_type("string"), already represented by OCaml string type
       type_("url", [%type: string]),
       type_("hex_color", [%type: string]),

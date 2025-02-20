@@ -134,6 +134,9 @@ let is_tag =
   | "a"
   | "abbr"
   | "address"
+  | "animate"
+  | "animateMotion"
+  | "animateTransform"
   | "area"
   | "article"
   | "aside"
@@ -148,27 +151,59 @@ let is_tag =
   | "button"
   | "canvas"
   | "caption"
+  | "circle"
   | "cite"
+  | "clipPath"
   | "code"
   | "col"
   | "colgroup"
   | "data"
   | "datalist"
   | "dd"
+  | "defs"
   | "del"
+  | "desc"
   | "details"
   | "dfn"
   | "dialog"
   | "div"
   | "dl"
   | "dt"
+  | "ellipse"
   | "em"
   | "embed"
+  | "feBlend"
+  | "feColorMatrix"
+  | "feComponentTransfer"
+  | "feComposite"
+  | "feConvolveMatrix"
+  | "feDiffuseLighting"
+  | "feDisplacementMap"
+  | "feDistantLight"
+  | "feDropShadow"
+  | "feFlood"
+  | "feFuncA"
+  | "feFuncB"
+  | "feFuncG"
+  | "feFuncR"
+  | "feGaussianBlur"
+  | "feImage"
+  | "feMerge"
+  | "feMergeNode"
+  | "feMorphology"
+  | "feOffset"
+  | "fePointLight"
+  | "feSpecularLighting"
+  | "feSpotLight"
+  | "feTile"
+  | "feTurbulence"
   | "fieldset"
   | "figcaption"
   | "figure"
   | "footer"
+  | "foreignObject"
   | "form"
+  | "g"
   | "h1"
   | "h2"
   | "h3"
@@ -182,6 +217,7 @@ let is_tag =
   | "html"
   | "i"
   | "iframe"
+  | "image"
   | "img"
   | "input"
   | "ins"
@@ -189,15 +225,20 @@ let is_tag =
   | "label"
   | "legend"
   | "li"
+  | "line"
+  | "linearGradient"
   | "link"
   | "main"
   | "map"
   | "mark"
+  | "marker"
   | "math"
   | "menu"
   | "menuitem"
   | "meta"
+  | "metadata"
   | "meter"
+  | "mpath"
   | "nav"
   | "noscript"
   | "object"
@@ -207,11 +248,17 @@ let is_tag =
   | "output"
   | "p"
   | "param"
+  | "path"
+  | "pattern"
   | "picture"
+  | "polygon"
+  | "polyline"
   | "pre"
   | "progress"
   | "q"
+  | "radialGradient"
   | "rb"
+  | "rect"
   | "rp"
   | "rt"
   | "rtc"
@@ -221,21 +268,27 @@ let is_tag =
   | "script"
   | "section"
   | "select"
+  | "set"
   | "slot"
   | "small"
   | "source"
   | "span"
+  | "stop"
   | "strong"
   | "style"
   | "sub"
   | "summary"
   | "sup"
   | "svg"
+  | "switch"
+  | "symbol"
   | "table"
   | "tbody"
   | "td"
   | "template"
+  | "text"
   | "textarea"
+  | "textPath"
   | "tfoot"
   | "th"
   | "thead"
@@ -243,10 +296,13 @@ let is_tag =
   | "title"
   | "tr"
   | "track"
+  | "tspan"
   | "u"
   | "ul"
+  | "use"
   | "var"
   | "video"
+  | "view"
   | "wbr" => true
   | _ => false;
 
@@ -531,24 +587,15 @@ let handle_tokenizer_error = lexbuf => {
     };
 };
 
-let skip_whitespace = ref(false);
-let prev_skip_whitespace = ref(false);
-
 let rec get_next_token = lexbuf => {
   switch%sedlex (lexbuf) {
   | eof => Parser.EOF
   | Star(comment) => get_next_token(lexbuf)
   | "/*" => discard_comments(lexbuf)
   | '.' => DOT
-  | ';' =>
-    skip_whitespace.contents = prev_skip_whitespace.contents;
-    SEMI_COLON;
-  | '}' =>
-    skip_whitespace.contents = false;
-    RIGHT_BRACE;
-  | '{' =>
-    skip_whitespace.contents = true;
-    LEFT_BRACE;
+  | ';' => SEMI_COLON
+  | '}' => RIGHT_BRACE
+  | '{' => LEFT_BRACE
   | "::" => DOUBLE_COLON
   | ':' =>
     prev_skip_whitespace.contents = skip_whitespace.contents;
@@ -559,9 +606,7 @@ let rec get_next_token = lexbuf => {
   | '[' => LEFT_BRACKET
   | ']' => RIGHT_BRACKET
   | '%' => PERCENT
-  | '&' =>
-    skip_whitespace.contents = false;
-    AMPERSAND;
+  | '&' => AMPERSAND
   | '*' => ASTERISK
   | ',' => COMMA
   | variable =>
@@ -572,31 +617,30 @@ let rec get_next_token = lexbuf => {
   | combinator => COMBINATOR(lexeme(lexbuf))
   | string => STRING(lexeme(~skip=1, ~drop=1, lexbuf))
   | important => IMPORTANT
-
-  | at_keyframes =>
-    skip_whitespace.contents = false;
-    AT_KEYFRAMES(lexeme(~skip=1, lexbuf));
-  | at_rule_without_body =>
-    skip_whitespace.contents = false;
-    AT_RULE_STATEMENT(lexeme(~skip=1, lexbuf));
-  | at_rule =>
-    skip_whitespace.contents = false;
-    AT_RULE(lexeme(~skip=1, lexbuf));
+  | equal_sign => EQUAL_SIGN(lexeme(lexbuf))
+  | mq_operator => MEDIA_QUERY_OPERATOR(lexeme(lexbuf))
+  | mq_feature_comparison => MEDIA_FEATURE_COMPARISON(lexeme(lexbuf))
+  | all_media_type => ALL_MEDIA_TYPE(lexeme(lexbuf))
+  | screen_media_type => SCREEN_MEDIA_TYPE(lexeme(lexbuf))
+  | print_media_type => PRINT_MEDIA_TYPE(lexeme(lexbuf))
+  | at_media => AT_MEDIA(lexeme(~skip=1, lexbuf))
+  | at_keyframes => AT_KEYFRAMES(lexeme(~skip=1, lexbuf))
+  | at_container => AT_CONTAINER(lexeme(~skip=1, lexbuf))
+  | at_rule_without_body => AT_RULE_STATEMENT(lexeme(~skip=1, lexbuf))
+  | at_rule => AT_RULE(lexeme(~skip=1, lexbuf))
   /* NOTE: should be placed above ident, otherwise pattern with
    * '-[0-9a-z]{1,6}' cannot be matched */
   | (_u, '+', unicode_range) => UNICODE_RANGE(lexeme(lexbuf))
   | ('#', name) => HASH(lexeme(~skip=1, lexbuf))
   /* TODO: get_dimension and handle_numeric should be the same */
   | number => get_dimension(lexeme(lexbuf), lexbuf)
-  | whitespaces =>
-    if (skip_whitespace^) {
-      get_next_token(lexbuf);
-    } else {
-      WS;
-    }
-  | ("-", ident) => IDENT(lexeme(lexbuf))
+  | whitespaces => WS
+  | ("-", ident) =>
+    Sedlexing.rollback(lexbuf);
+    consume_ident_like(lexbuf) |> handle_tokenizer_error(lexbuf);
   /* --variable */
   | ("-", "-", ident) => IDENT(lexeme(lexbuf))
+  | escape
   | identifier_start_code_point =>
     let _ = Sedlexing.backtrack(lexbuf);
     consume_ident_like(lexbuf) |> handle_tokenizer_error(lexbuf);

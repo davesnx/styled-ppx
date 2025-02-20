@@ -288,7 +288,10 @@ let container_query_tests = [
     [%expr [%cx "@container (inline-size >= 150px) {}"]],
     [%expr
       CSS.style([|
-        CSS.selectorMany([|{js|@container (inline-size >= 150px)|js}|], [||]),
+        CSS.selectorMany(
+          [|{js|@container (inline-size >= 150px)|js}|],
+          [||],
+        ),
       |])
     ],
   ),
@@ -315,7 +318,10 @@ let container_query_tests = [
     [%expr [%cx "@container (orientation: portrait) {}"]],
     [%expr
       CSS.style([|
-        CSS.selectorMany([|{js|@container (orientation: portrait)|js}|], [||]),
+        CSS.selectorMany(
+          [|{js|@container (orientation: portrait)|js}|],
+          [||],
+        ),
       |])
     ],
   ),
@@ -336,7 +342,10 @@ let container_query_tests = [
     [%expr [%cx "@container name not (width < 150px) {}"]],
     [%expr
       CSS.style([|
-        CSS.selectorMany([|{js|@container name not (width < 150px)|js}|], [||]),
+        CSS.selectorMany(
+          [|{js|@container name not (width < 150px)|js}|],
+          [||],
+        ),
       |])
     ],
   ),

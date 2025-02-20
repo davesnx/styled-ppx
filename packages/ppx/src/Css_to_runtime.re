@@ -277,14 +277,21 @@ and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
         "Unknown property '" ++ property ++ "'",
       ),
     ]
-  | Error(`Invalid_value(value)) => [
+  | Error(`Impossible_state) => [
       Error.expr(
         ~loc=declaration_location,
-        "Property '"
-        ++ property
-        ++ "' has an invalid value: '"
-        ++ String.trim(value)
-        ++ "'",
+        "This is a broken state of the CSS parser and probably a bug. Please report back!",
+      ),
+    ]
+  | Error(`Invalid_value(reason)) => [
+      Error.expr(
+        ~loc=declaration_location,
+        Format.sprintf(
+          "@[Property@ '%s'@ has@ an@ invalid@ value:@ '%s',@ %s@]",
+          property,
+          value_source,
+          reason,
+        ),
       ),
     ]
   };

@@ -99,14 +99,14 @@ jobs:
         run: make release-static
 
       - name: Upload artifacts for ${{ matrix.os }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}
           path: _build/default/packages/bin/bin.exe
 
       - name: Upload runtime artifacts for @davesnx/styled-ppx/runtime
         if: matrix.os == 'ubuntu-20.04'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: runtime-rescript
           path: _build/default/packages/runtime/rescript
@@ -154,25 +154,25 @@ jobs:
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
       - name: Download linux artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ubuntu-20.04
           path: _release/platform-linux-x64
 
       - name: Download macOS artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: macos-latest
           path: _release/platform-darwin-x64
 
       # - name: Download windows artifacts
-      #   uses: actions/download-artifact@v3
+      #   uses: actions/download-artifact@v4
       #   with:
       #     name: windows-latest
       #     path: _release/platform-windows-x64
 
       - name: Download runtime-rescript artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: runtime-rescript
           path: _release/rescript

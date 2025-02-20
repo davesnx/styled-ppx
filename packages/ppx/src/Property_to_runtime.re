@@ -14,6 +14,9 @@ let (let.ok) = Result.bind;
 /* TODO: Add payload on those exceptions */
 exception Unsupported_feature;
 
+/* This should be thrown when handling cases impossible to generate by the css property parser */
+exception Impossible_state;
+
 exception Invalid_value(string);
 
 let id = Fun.id;
@@ -107,12 +110,12 @@ let polymorphic = (property, value_to_expr) => {
 };
 
 /* Triggers Unsupported_feature and it's rendered as a string */
-let unsupportedValue = (parser, property) =>
-  transform_with_variable(
-    parser,
-    (~loc as _, _) => raise(Unsupported_feature),
-    (~loc, arg) => [[%expr [%e property(~loc)]([%e arg])]],
-  );
+//let unsupportedValue = (parser, property) =>
+//  transform_with_variable(
+//    parser,
+//    (~loc as _, _) => raise(Unsupported_feature),
+//    (~loc, arg) => [[%expr [%e property(~loc)]([%e arg])]],
+//  );
 
 /* Triggers Unsupported_feature and it's rendered as a string,
    supports interpolation as a string, which is unsafe */
@@ -190,6 +193,7 @@ let variant_to_expression = (~loc) =>
   | `Bold => id([%expr `bold])
   | `Bolder => id([%expr `bolder])
   | `Border_box => id([%expr `borderBox])
+  | `Border_area => id([%expr `borderArea])
   | `Bottom => id([%expr `bottom])
   | `Break_all => id([%expr `breakAll])
   | `Break_spaces => id([%expr `breakSpaces])
@@ -357,7 +361,7 @@ and render_calc_sum = (~loc, (product, sums): Types.calc_sum) => {
 }
 and render_function_min_or_max = (~loc, calc_sums: list(Types.calc_sum)) => {
   switch (calc_sums) {
-  | [] => raise(Invalid_value("expected at least one argument"))
+  | [] => raise(Impossible_state)
   | [x, ...xs] =>
     let calc_sums = [x] @ List.map(Fun.id, xs);
     List.map(render_calc_sum(~loc), calc_sums) |> Builder.pexp_array(~loc);
@@ -484,17 +488,13 @@ let render_one_bg_size = (~loc, value) => {
 
 let render_bg_size = (~loc, value: Types.bg_size) =>
   switch (value) {
-  /* bs-css doesn't support auto in each size */
-  | `One_bg_size([`Auto, _]) => raise(Unsupported_feature)
-  | `One_bg_size([_, `Auto]) => raise(Unsupported_feature)
-  | `One_bg_size([one, two]) =>
+  | `One_bg_size(one, None) => render_one_bg_size(~loc, one)
+  | `One_bg_size(one, Some(two)) =>
     [%expr
      `size((
        [%e render_one_bg_size(~loc, one)],
        [%e render_one_bg_size(~loc, two)],
      ))]
-  /* bs-css doesn't support one size */
-  | `One_bg_size(_) => raise(Unsupported_feature)
   | `Cover => variant_to_expression(~loc, `Cover)
   | `Contain => variant_to_expression(~loc, `Contain)
   };
@@ -680,8 +680,8 @@ let margin =
             )
           ],
         ]
-      | [] => failwith("Margin value can't be empty")
-      | _ => failwith("There aren't more margin combinations"),
+      | []
+      | _ => raise(Impossible_state),
   );
 
 let padding_top =
@@ -737,8 +737,8 @@ let padding =
             )
           ],
         ]
-      | [] => failwith("Padding value can't be empty")
-      | _ => failwith("There aren't more padding combinations"),
+      | []
+      | _ => raise(Impossible_state),
   );
 
 let render_named_color = (~loc) =>
@@ -927,7 +927,7 @@ let render_function_rgb = (~loc, ast: Types.function_rgb) => {
   let (red, green, blue) =
     switch (colors) {
     | [red, green, blue] => (red, green, blue)
-    | _ => failwith("unreachable")
+    | _ => raise(Impossible_state)
     };
 
   let alpha =
@@ -969,7 +969,7 @@ let render_function_rgba = (~loc, ast: Types.function_rgba) => {
   let (red, green, blue) =
     switch (colors) {
     | [red, green, blue] => (red, green, blue)
-    | _ => failwith("unreachable")
+    | _ => raise(Impossible_state)
     };
 
   let alpha =
@@ -1149,55 +1149,46 @@ let opacity =
       | `Extended_percentage(pct) => render_extended_percentage(~loc, pct),
   );
 
+let render_position_one = (~loc) =>
+  fun
+  | `Center => variant_to_expression(~loc, `Center)
+  | `Left => variant_to_expression(~loc, `Left)
+  | `Right => variant_to_expression(~loc, `Right)
+  | `Bottom => variant_to_expression(~loc, `Bottom)
+  | `Top => variant_to_expression(~loc, `Top)
+  | `Length_percentage(l) => render_length_percentage(~loc, l);
+
+let render_position_two = (~loc, x, y) => [%expr
+  `hv((
+    [%e render_position_one(~loc, x)],
+    [%e render_position_one(~loc, y)],
+  ))
+];
+
+let render_position_four = (~loc, x, xo, y, yo) => [%expr
+  `hvOffset((
+    [%e render_position_one(~loc, x)],
+    [%e render_position_one(~loc, xo)],
+    [%e render_position_one(~loc, y)],
+    [%e render_position_one(~loc, yo)],
+  ))
+];
+
 // css-images-4
 let render_position = (~loc, position: Types.position) => {
-  // TODO: Revisit defaults, see https://drafts.csswg.org/css-images-4/#position
-  let pos_to_percentage_offset =
-    fun
-    | `Left
-    | `Top => 0.
-    | `Right
-    | `Bottom => 100.
-    | `Center => 50.;
-
-  let to_value = (~loc) =>
-    fun
-    | `Position(pos) => variant_to_expression(~loc, pos)
-    | `Extended_length(l) => render_extended_length(~loc, l)
-    | `Extended_percentage(percentage) =>
-      render_extended_percentage(~loc, percentage);
-
-  let horizontal =
-    switch (position) {
-    | `Or(Some(pos), _) => `Position(pos)
-    | `Or(None, _) => `Position(`Center)
-    | `Static((`Center | `Left | `Right) as pos, _) => `Position(pos)
-    | `Static(`Extended_length(length), _) => `Extended_length(length)
-    | `Static(`Extended_percentage(percent), _) =>
-      `Extended_percentage(percent)
-    | `And((pos, `Extended_percentage(`Percentage(percentage))), _) =>
-      `Extended_percentage(
-        `Percentage(percentage +. pos_to_percentage_offset(pos)),
-      )
-    | _ => raise(Unsupported_feature)
-    };
-
-  let vertical =
-    switch (position) {
-    | `Or(_, Some(pos)) => `Position(pos)
-    | `Or(_, None) => `Position(`Center)
-    | `Static(_, None) => `Position(`Center)
-    | `Static(_, Some((`Center | `Bottom | `Top) as pos)) => `Position(pos)
-    | `Static(_, Some(`Extended_length(length))) =>
-      `Extended_length(length)
-    | `And(_, (pos, `Extended_percentage(`Percentage(percentage)))) =>
-      `Extended_percentage(
-        `Percentage(percentage +. pos_to_percentage_offset(pos)),
-      )
-    | _ => raise(Unsupported_feature)
-    };
-
-  (to_value(~loc, horizontal), to_value(~loc, vertical));
+  switch (position) {
+  | `Xor(x) => render_position_one(~loc, x)
+  | `And_0(x, y) => render_position_two(~loc, x, y)
+  | `Static(x, y) => render_position_two(~loc, x, y)
+  | `And_1((x, xo), (y, yo)) =>
+    render_position_four(
+      ~loc,
+      x,
+      `Length_percentage(xo),
+      y,
+      `Length_percentage(yo),
+    )
+  };
 };
 
 let object_fit =
@@ -1206,12 +1197,10 @@ let object_fit =
   );
 
 let object_position =
-  polymorphic(
+  monomorphic(
     Property_parser.property_object_position,
-    (~loc, position: Types.position) => {
-      let (x, y) = render_position(~loc, position);
-      [[%expr CSS.objectPosition2([%e x], [%e y])]];
-    },
+    (~loc) => [%expr CSS.objectPosition],
+    render_position,
   );
 
 let pointer_events =
@@ -1266,7 +1255,7 @@ let render_box_shadow = (~loc, shadow) => {
         | [x, y] => (x, y, None, None)
         | [x, y, blur] => (x, y, Some(blur), None)
         | [x, y, blur, spread] => (x, y, Some(blur), Some(spread))
-        | _ => failwith("unreachable")
+        | _ => raise(Impossible_state)
         };
       (color, x, y, blur, spread, inset);
     };
@@ -1472,12 +1461,12 @@ let render_function_radial_gradient =
      ))];
   | (shape, None, Some(((), position)), None | Some (), color_stop_list) =>
     let shape = render_eding_shape(~loc, shape);
-    let (positionX, positionY) = render_position(~loc, position);
+    let position = render_position(~loc, position);
     [%expr
      `radialGradient((
        [%e shape],
        None,
-       Some(([%e positionX], [%e positionY])),
+       Some([%e position]),
        [%e render_color_stop_list(~loc, color_stop_list)]: CSS.Types.Gradient.color_stop_list,
      ))];
   | (
@@ -1489,12 +1478,12 @@ let render_function_radial_gradient =
     ) =>
     let shape = render_eding_shape(~loc, shape);
     let size = render_radial_size(~loc, radial_size);
-    let (positionX, positionY) = render_position(~loc, position);
+    let position = render_position(~loc, position);
     [%expr
      `radialGradient((
        [%e shape],
        Some([%e size]),
-       Some(([%e positionX], [%e positionY])),
+       Some([%e position]),
        [%e render_color_stop_list(~loc, color_stop_list)]: CSS.Types.Gradient.color_stop_list,
      ))];
   };
@@ -1559,7 +1548,7 @@ let render_repeat_style = (~loc) =>
   fun
   | `Repeat_x => variant_to_expression(~loc, `Repeat_x)
   | `Repeat_y => variant_to_expression(~loc, `Repeat_y)
-  | `Xor(values) => {
+  | `Static(values) => {
       let render_xor = (
         fun
         | `Repeat => [%expr `repeat]
@@ -1569,10 +1558,9 @@ let render_repeat_style = (~loc) =>
       );
 
       switch (values) {
-      | [x] => [%expr [%e render_xor(x)]]
-      | [x, y] => [%expr `hv(([%e render_xor(x)], [%e render_xor(y)]))]
-      | [] => failwith("expected at least one value")
-      | _ => failwith("repeat doesn't accept more then 2 values")
+      | (x, None) => [%expr [%e render_xor(x)]]
+      | (x, Some(y)) =>
+        [%expr `hv(([%e render_xor(x)], [%e render_xor(y)]))]
       };
     };
 
@@ -1585,24 +1573,29 @@ let render_attachment = (~loc) =>
 let background_image =
   polymorphic(Property_parser.property_background_image, (~loc) =>
     fun
-    | [] => failwith("expected at least one value")
-    | [i] => [[%expr CSS.backgroundImage([%e render_bg_image(~loc, i)])]]
+    | [one] => [[%expr CSS.backgroundImage([%e render_bg_image(~loc, one)])]]
     | more => [
         [%expr CSS.backgroundImages([%e render_bg_images(~loc, more)])],
       ]
   );
 
 let background_repeat =
-  monomorphic(
-    Property_parser.property_background_repeat,
-    (~loc) => [%expr CSS.backgroundRepeat],
-    (~loc) =>
-      fun
-      | [] => failwith("expected at least one value")
-      | [`Repeat_x] => variant_to_expression(~loc, `Repeat_x)
-      | [`Repeat_y] => variant_to_expression(~loc, `Repeat_y)
-      | [`Xor(_) as v] => render_repeat_style(~loc, v)
-      | _ => raise(Unsupported_feature),
+  polymorphic(Property_parser.property_background_repeat, (~loc) =>
+    fun
+    | [one] => [
+        [%expr CSS.backgroundRepeat([%e render_repeat_style(~loc, one)])],
+      ]
+    | more => [
+        [%expr
+          CSS.backgroundRepeats(
+            [%e
+              more
+              |> List.map(render_repeat_style(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
 let background_attachment =
@@ -1611,50 +1604,55 @@ let background_attachment =
     (~loc) => [%expr CSS.backgroundAttachment],
     (~loc) =>
       fun
-      | [] => failwith("expected at least one argument")
+      | [] => raise(Impossible_state)
       | [v] => render_attachment(~loc, v)
       | _ => raise(Unsupported_feature),
   );
 
-let render_background_position_one = (~loc) =>
+let render_bg_position_three_and_four = (~loc) =>
   fun
   | `Center => variant_to_expression(~loc, `Center)
-  | `Left => variant_to_expression(~loc, `Left)
-  | `Right => variant_to_expression(~loc, `Right)
-  | `Bottom => variant_to_expression(~loc, `Bottom)
-  | `Top => variant_to_expression(~loc, `Top)
-  | `Extended_length(l) => render_extended_length(~loc, l)
-  | `Extended_percentage(p) => render_extended_percentage(~loc, p);
+  | `Static(v, None) => render_position_one(~loc, v)
+  | `Static(z, Some(o)) => {
+      let offset = render_length_percentage(~loc, o);
+      switch (z) {
+      | `Top => [%expr `topOffset([%e offset])]
+      | `Bottom => [%expr `bottomOffset([%e offset])]
+      | `Left => [%expr `leftOffset([%e offset])]
+      | `Right => [%expr `rightOffset([%e offset])]
+      };
+    };
 
-let render_background_position = (~loc, position: Types.bg_position) => {
+let render_bg_position = (~loc, position: Types.bg_position) => {
   switch (position) {
-  | `Center as position
-  | `Left as position
-  | `Right as position
-  | `Bottom as position
-  | `Top as position
-  | `Extended_length(_) as position
-  | `Extended_percentage(_) as position =>
+  | `Xor(x) => render_position_one(~loc, x)
+  | `Static(x, y) => render_position_two(~loc, x, y)
+  | `And(x, y) =>
     [%expr
-     CSS.backgroundPosition(
-       [%e render_background_position_one(~loc, position)],
-     )]
-  | `Static(x, y) =>
-    [%expr
-     CSS.backgroundPosition2(
-       [%e render_background_position_one(~loc, x)],
-       [%e render_background_position_one(~loc, y)],
-     )]
-  | `And(_left, _right) => raise(Unsupported_feature)
+     `hvOffset((
+       [%e render_bg_position_three_and_four(~loc, x)],
+       [%e render_bg_position_three_and_four(~loc, y)],
+     ))]
   };
 };
 
 let background_position =
   polymorphic(Property_parser.property_background_position, (~loc) =>
     fun
-    | [] => failwith("expected at least one argument")
-    | [l] => [render_background_position(~loc, l)]
-    | _ => raise(Unsupported_feature)
+    | [one] => [
+        [%expr CSS.backgroundPosition([%e render_bg_position(~loc, one)])],
+      ]
+    | more => [
+        [%expr
+          CSS.backgroundPositions(
+            [%e
+              more
+              |> List.map(render_bg_position(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
 let background_position_x =
@@ -1663,16 +1661,29 @@ let background_position_x =
 let background_position_y =
   unsupportedProperty(Property_parser.property_background_position_y);
 
+let render_background_clip = (~loc) =>
+  fun
+  | `Box(b) => variant_to_expression(~loc, b)
+  | `Text => variant_to_expression(~loc, `Text)
+  | `Border_area => variant_to_expression(~loc, `Border_area);
+
 let background_clip =
-  monomorphic(
-    Property_parser.property_background_clip,
-    (~loc) => [%expr CSS.backgroundClip],
-    (~loc) =>
-      fun
-      | [] => failwith("expected at least one argument")
-      | [`Box(b)] => variant_to_expression(~loc, b)
-      | [`Text] => variant_to_expression(~loc, `Text)
-      | _ => raise(Unsupported_feature),
+  polymorphic(Property_parser.property_background_clip, (~loc) =>
+    fun
+    | [one] => [
+        [%expr CSS.backgroundClip([%e render_background_clip(~loc, one)])],
+      ]
+    | more => [
+        [%expr
+          CSS.backgroundClips(
+            [%e
+              more
+              |> List.map(render_background_clip(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
 let background_origin =
@@ -1681,7 +1692,7 @@ let background_origin =
     (~loc) => [%expr CSS.backgroundOrigin],
     (~loc) =>
       fun
-      | [] => failwith("expected at least one argument")
+      | [] => raise(Impossible_state)
       | [v] => variant_to_expression(~loc, v)
       | _ => raise(Unsupported_feature),
   );
@@ -1692,7 +1703,7 @@ let background_size =
     (~loc) => [%expr CSS.backgroundSize],
     (~loc) =>
       fun
-      | [] => failwith("expected at least one argument")
+      | [] => raise(Impossible_state)
       | [v] => render_bg_size(~loc, v)
       | _ => raise(Unsupported_feature),
   );
@@ -1731,10 +1742,20 @@ let render_background = (~loc, background: Types.property_background) => {
     @ (
       switch (position) {
       | Some((pos, Some(((), size)))) => [
-          [render_background_position(~loc, pos)],
+          [
+            [%expr
+              CSS.backgroundPosition([%e render_bg_position(~loc, pos)])
+            ],
+          ],
           [[%expr CSS.backgroundSize([%e render_bg_size(~loc, size)])]],
         ]
-      | Some((pos, None)) => [[render_background_position(~loc, pos)]]
+      | Some((pos, None)) => [
+          [
+            [%expr
+              CSS.backgroundPosition([%e render_bg_position(~loc, pos)])
+            ],
+          ],
+        ]
       | None => []
       }
     );
@@ -1773,10 +1794,20 @@ let render_background = (~loc, background: Types.property_background) => {
     @ (
       switch (position) {
       | Some((pos, Some(((), size)))) => [
-          [render_background_position(~loc, pos)],
+          [
+            [%expr
+              CSS.backgroundPosition([%e render_bg_position(~loc, pos)])
+            ],
+          ],
           [[%expr CSS.backgroundSize([%e render_bg_size(~loc, size)])]],
         ]
-      | Some((pos, None)) => [[render_background_position(~loc, pos)]]
+      | Some((pos, None)) => [
+          [
+            [%expr
+              CSS.backgroundPosition([%e render_bg_position(~loc, pos)])
+            ],
+          ],
+        ]
       | None => []
       }
     );
@@ -2155,13 +2186,25 @@ let box_shadow =
 
 // css-overflow-3
 let overflow_x =
-  variants(Property_parser.property_overflow_x, (~loc) =>
-    [%expr CSS.overflowX]
+  monomorphic(
+    Property_parser.property_overflow_x,
+    (~loc) => [%expr CSS.overflowX],
+    (~loc) =>
+      fun
+      | `Interpolation(x) => render_variable(~loc, x)
+      | (`Visible | `Hidden | `Clip | `Scroll | `Auto) as x =>
+        variant_to_expression(~loc, x),
   );
 
 let overflow_y =
-  variants(Property_parser.property_overflow_y, (~loc) =>
-    [%expr CSS.overflowY]
+  monomorphic(
+    Property_parser.property_overflow_y,
+    (~loc) => [%expr CSS.overflowY],
+    (~loc) =>
+      fun
+      | `Interpolation(x) => render_variable(~loc, x)
+      | (`Visible | `Hidden | `Clip | `Scroll | `Auto) as x =>
+        variant_to_expression(~loc, x),
   );
 
 let overflow =
@@ -2198,37 +2241,55 @@ let overflow =
       }
   );
 
-/* let overflow_clip_margin =
-   unsupportedProperty(Property_parser.property_overflow_clip_margin); */
+let overflow_clip_margin =
+  polymorphic(
+    Property_parser.property_overflow_clip_margin,
+    (~loc, (clipEdgeOrigin, margin)) => {
+      let margin = Option.value(margin, ~default=`Length(`Px(0.)));
+      [
+        [%expr
+          CSS.overflowClipMargin2(
+            ~clipEdgeOrigin=?[%e
+              render_option(~loc, variant_to_expression, clipEdgeOrigin)
+            ],
+            [%e render_extended_length(~loc, margin)],
+          )
+        ],
+      ];
+    },
+  );
 
 let overflow_block =
   monomorphic(
     Property_parser.property_overflow_block,
     (~loc) => [%expr CSS.overflowBlock],
-    (~loc, value) => {
-      switch (value) {
-      | `Interpolation(i) => render_variable(~loc, i)
-      | `Auto => variant_to_expression(~loc, `Auto)
-      | `Clip => variant_to_expression(~loc, `Clip)
-      | `Hidden => variant_to_expression(~loc, `Hidden)
-      | `Scroll => variant_to_expression(~loc, `Scroll)
-      | `Visible => variant_to_expression(~loc, `Visible)
-      }
-    },
+    (~loc) =>
+      fun
+      | `Interpolation(x) => render_variable(~loc, x)
+      | (`Visible | `Hidden | `Clip | `Scroll | `Auto) as x =>
+        variant_to_expression(~loc, x),
   );
 
 let overflow_inline =
   monomorphic(
     Property_parser.property_overflow_inline,
     (~loc) => [%expr CSS.overflowInline],
-    (~loc, value) => {
+    (~loc) =>
+      fun
+      | `Interpolation(x) => render_variable(~loc, x)
+      | (`Visible | `Hidden | `Clip | `Scroll | `Auto) as x =>
+        variant_to_expression(~loc, x),
+  );
+
+let scrollbar_gutter =
+  monomorphic(
+    Property_parser.property_scrollbar_gutter,
+    (~loc) => [%expr CSS.scrollbarGutter],
+    (~loc, value: Types.property_scrollbar_gutter) => {
       switch (value) {
-      | `Interpolation(i) => render_variable(~loc, i)
-      | `Auto => variant_to_expression(~loc, `Auto)
-      | `Clip => variant_to_expression(~loc, `Clip)
-      | `Hidden => variant_to_expression(~loc, `Hidden)
-      | `Scroll => variant_to_expression(~loc, `Scroll)
-      | `Visible => variant_to_expression(~loc, `Visible)
+      | `Auto => [%expr `auto]
+      | `And(_, None) => [%expr `stable]
+      | `And(_, Some(_)) => [%expr `stableBothEdges]
       }
     },
   );
@@ -2268,7 +2329,9 @@ let render_tab_size = (~loc, value: Types.property_tab_size) => {
   switch (value) {
   | `Number(n) =>
     int_of_float(n) < 0
-      ? raise(Invalid_value("tab-size value can not be less than 0!"))
+      ? raise(
+          Invalid_value("Property 'tab-size' value can't be less than 0."),
+        )
       : [%expr `num([%e render_float(~loc, n)])]
   | `Extended_length(ext) => render_extended_length(~loc, ext)
   };
@@ -2573,20 +2636,27 @@ let font_variant_emoji =
     [%expr CSS.fontVariantEmoji]
   );
 
-// css-text-decor-3
-let render_text_decoration_line =
-    (~loc, value: Types.property_text_decoration_line) =>
-  switch (value) {
+let render_text_decoration_line = (~loc) =>
+  fun
   | `Interpolation(v) => render_variable(~loc, v)
-  | `None => variant_to_expression(~loc, `None)
-  | `Xor([`Underline]) => variant_to_expression(~loc, `Underline)
-  | `Xor([`Overline]) => variant_to_expression(~loc, `Overline)
-  | `Xor([`Line_through]) => variant_to_expression(~loc, `Line_Through)
-  | `Xor([`Blink]) => variant_to_expression(~loc, `Blink)
-  /* bs-css doesn't support multiple text decoration line */
-  | `Xor(_) => raise(Unsupported_feature)
-  };
+  | `None => [%expr `none]
+  | `Or(underline, overline, lineThrough, blink) => [%expr
+      CSS.Types.TextDecorationLine.Value.make(
+        ~underline=?[%e
+          render_option(~loc, (~loc, _) => [%expr true], underline)
+        ],
+        ~overline=?[%e
+          render_option(~loc, (~loc, _) => [%expr true], overline)
+        ],
+        ~lineThrough=?[%e
+          render_option(~loc, (~loc, _) => [%expr true], lineThrough)
+        ],
+        ~blink=?[%e render_option(~loc, (~loc, _) => [%expr true], blink)],
+        (),
+      )
+    ];
 
+// css-text-decor-3
 let text_decoration_line =
   monomorphic(
     Property_parser.property_text_decoration_line,
@@ -2631,16 +2701,24 @@ let text_decoration_thickness =
   );
 
 let text_decoration =
-  monomorphic(
+  polymorphic(
     Property_parser.property_text_decoration,
-    (~loc) => [%expr CSS.textDecoration],
-    (~loc, v) =>
-      switch (v) {
-      | (line, None, None) => render_text_decoration_line(~loc, line)
-      | (_line, None, Some(_color)) => raise(Unsupported_feature)
-      | (_line, Some(_style), None) => raise(Unsupported_feature)
-      | (_line, Some(_style), Some(_color)) => raise(Unsupported_feature)
-      },
+    (~loc, (color, style, thickness, line)) =>
+    [
+      [%expr
+        CSS.textDecoration2(
+          ~line=?[%e render_option(~loc, render_text_decoration_line, line)],
+          ~thickness=?[%e
+            render_option(~loc, render_text_decoration_thickness, thickness)
+          ],
+          ~style=?[%e
+            render_option(~loc, render_text_decoration_style, style)
+          ],
+          ~color=?[%e render_option(~loc, render_color, color)],
+          (),
+        )
+      ],
+    ]
   );
 
 let text_underline_position =
@@ -2770,7 +2848,7 @@ let render_text_shadow = (~loc, shadow) => {
     | ([x, y], None) => (x, y, None, None)
     | ([x, y, blur], None) => (x, y, Some(blur), None)
     | ([x, y, blur], color) => (x, y, Some(blur), color)
-    | _ => failwith("unreachable")
+    | _ => raise(Impossible_state)
     };
 
   let args =
@@ -2905,47 +2983,26 @@ let transform =
       }
   );
 
-let render_origin = (~loc) =>
-  fun
-  | `Center as x
-  | `Left as x
-  | `Right as x
-  | `Top as x
-  | `Bottom as x => variant_to_expression(~loc, x)
-  | `Function_calc(fc) => render_function_calc(~loc, fc)
-  | `Interpolation(v) => render_variable(~loc, v)
-  | `Length(l) => render_length(~loc, l)
-  | `Extended_length(l) => render_extended_length(~loc, l)
-  | `Extended_percentage(p) => render_extended_percentage(~loc, p);
+let render_transform_origin_3 = (~loc, x, y, z) => [%expr
+  `hvOffset((
+    [%e render_position_one(~loc, x)],
+    [%e render_position_one(~loc, y)],
+    [%e render_length(~loc, z)],
+  ))
+];
 
 let transform_origin =
-  polymorphic(Property_parser.property_transform_origin, (~loc) =>
-    fun
-    /* x, y are swapped on purpose */
-    | `Static((y, x), None) => {
-        [
-          [%expr
-            CSS.transformOrigin2(
-              [%e render_origin(~loc, x)],
-              [%e render_origin(~loc, y)],
-            )
-          ],
-        ];
-      }
-    | `Center => [[%expr CSS.transformOrigin(`center)]]
-    | `Left => [[%expr CSS.transformOrigin(`left)]]
-    | `Right => [[%expr CSS.transformOrigin(`right)]]
-    | `Bottom => [[%expr CSS.transformOrigin(`bottom)]]
-    | `Top => [[%expr CSS.transformOrigin(`top)]]
-    | `Extended_length(el) => [
-        [%expr CSS.transformOrigin([%e render_extended_length(~loc, el)])],
-      ]
-    | `Extended_percentage(ep) => [
-        [%expr
-          CSS.transformOrigin([%e render_extended_percentage(~loc, ep)])
-        ],
-      ]
-    | `Static(_, Some(_)) => raise(Unsupported_feature)
+  monomorphic(
+    Property_parser.property_transform_origin,
+    (~loc) => [%expr CSS.transformOrigin],
+    (~loc) =>
+      fun
+      | `Xor(x) => render_position_one(~loc, x)
+      | `Static_0(h, v, None) => render_position_two(~loc, h, v)
+      | `Static_1((h, v), None) => render_position_two(~loc, h, v)
+      | `Static_0(h, v, Some(o)) => render_transform_origin_3(~loc, h, v, o)
+      | `Static_1((h, v), Some(o)) =>
+        render_transform_origin_3(~loc, h, v, o),
   );
 
 let transform_box =
@@ -2954,18 +3011,93 @@ let transform_box =
   );
 
 let translate =
-  unsupportedValue(Property_parser.property_translate, (~loc) =>
-    [%expr CSS.translate]
+  polymorphic(Property_parser.property_translate, (~loc) =>
+    fun
+    | `None => [[%expr CSS.translateProperty(`none)]]
+    | `Static(x, None) => [
+        [%expr
+          CSS.translateProperty([%e render_length_percentage(~loc, x)])
+        ],
+      ]
+    | `Static(x, Some((y, None))) => [
+        [%expr
+          CSS.translateProperty2(
+            [%e render_length_percentage(~loc, x)],
+            [%e render_length_percentage(~loc, y)],
+          )
+        ],
+      ]
+    | `Static(x, Some((y, Some(z)))) => [
+        [%expr
+          CSS.translateProperty3(
+            [%e render_length_percentage(~loc, x)],
+            [%e render_length_percentage(~loc, y)],
+            [%e render_length(~loc, z)],
+          )
+        ],
+      ]
   );
 
 let rotate =
-  unsupportedValue(Property_parser.property_rotate, (~loc) =>
-    [%expr CSS.rotate]
+  monomorphic(
+    Property_parser.property_rotate,
+    (~loc) => [%expr CSS.rotateProperty],
+    (~loc) =>
+      fun
+      | `None => [%expr `none]
+      | `Extended_angle(x) => [%expr
+          `rotate([%e render_extended_angle(~loc, x)])
+        ]
+      | `And(`X, angle) => [%expr
+          `rotateX([%e render_extended_angle(~loc, angle)])
+        ]
+      | `And(`Y, angle) => [%expr
+          `rotateY([%e render_extended_angle(~loc, angle)])
+        ]
+      | `And(`Z, angle) => [%expr
+          `rotateZ([%e render_extended_angle(~loc, angle)])
+        ]
+      | `And(`Number([x, y, z, ..._]), angle) => [%expr
+          `rotate3d((
+            [%e render_float(~loc, x)],
+            [%e render_float(~loc, y)],
+            [%e render_float(~loc, z)],
+            [%e render_extended_angle(~loc, angle)],
+          ))
+        ]
+      | `And(`Number(_), _angle) => raise(Impossible_state),
   );
 
+let render_number_percentage = (~loc) =>
+  fun
+  | `Number(x) => [%expr `num([%e render_float(~loc, x)])]
+  | `Extended_percentage(x) => render_extended_percentage(~loc, x);
+
 let scale =
-  unsupportedValue(Property_parser.property_scale, (~loc) =>
-    [%expr CSS.scale]
+  polymorphic(Property_parser.property_scale, (~loc) =>
+    fun
+    | `None => [[%expr CSS.scaleProperty(`none)]]
+    | `Number_percentage([x, y, z]) => [
+        [%expr
+          CSS.scaleProperty3(
+            [%e render_number_percentage(~loc, x)],
+            [%e render_number_percentage(~loc, y)],
+            [%e render_number_percentage(~loc, z)],
+          )
+        ],
+      ]
+    | `Number_percentage([x, y]) => [
+        [%expr
+          CSS.scaleProperty2(
+            [%e render_number_percentage(~loc, x)],
+            [%e render_number_percentage(~loc, y)],
+          )
+        ],
+      ]
+    | `Number_percentage([x]) => [
+        [%expr CSS.scaleProperty([%e render_number_percentage(~loc, x)])],
+      ]
+    | `Number_percentage(_) => raise(Impossible_state)
   );
 
 let transform_style =
@@ -2978,15 +3110,21 @@ let transform_style =
       | `Preserve_3d => variant_to_expression(~loc, `Preserve_3d),
   );
 
-let perspective = unsupportedProperty(Property_parser.property_perspective);
+let perspective =
+  monomorphic(
+    Property_parser.property_perspective,
+    (~loc) => [%expr CSS.perspectiveProperty],
+    (~loc) =>
+      fun
+      | `None => [%expr `none]
+      | `Extended_length(x) => render_extended_length(~loc, x),
+  );
 
 let perspective_origin =
-  polymorphic(
+  monomorphic(
     Property_parser.property_perspective_origin,
-    (~loc, position) => {
-      let (x, y) = render_position(~loc, position);
-      [[%expr CSS.perspectiveOrigin2([%e x], [%e y])]];
-    },
+    (~loc) => [%expr CSS.perspectiveOrigin],
+    render_position,
   );
 
 let backface_visibility =
@@ -2994,12 +3132,12 @@ let backface_visibility =
     [%expr CSS.backfaceVisibility]
   );
 
-let render_single_transition_property_no_interp = (~loc, value) => {
-  switch (value) {
-  | `All => render_string(~loc, "all")
-  | `Custom_ident(v) => render_string(~loc, v)
-  };
-};
+let render_single_transition_property_no_interp = (~loc) =>
+  fun
+  | `All => [%expr CSS.Types.TransitionProperty.all]
+  | `Custom_ident(v) => [%expr
+      CSS.Types.TransitionProperty.make([%e render_string(~loc, v)])
+    ];
 
 let render_single_transition_property = (~loc, value) => {
   switch (value) {
@@ -3011,28 +3149,37 @@ let render_single_transition_property = (~loc, value) => {
 
 // css-transition-1
 let transition_property =
-  monomorphic(
-    Property_parser.property_transition_property,
-    (~loc) => [%expr CSS.transitionProperty],
-    (~loc) =>
-      fun
-      | `None => render_string(~loc, "none")
-      | `Single_transition_property([transition]) =>
-        render_single_transition_property(~loc, transition)
-      /* bs-css unsupports multiple transition_properties,
-         but should be easy to bypass with string concatenation */
-      | `Single_transition_property(_) => raise(Unsupported_feature),
+  polymorphic(Property_parser.property_transition_property, (~loc) =>
+    fun
+    | `None => [
+        [%expr CSS.transitionProperty(CSS.Types.TransitionProperty.none)],
+      ]
+    | `Single_transition_property(transition_properties) => {
+        let value =
+          transition_properties
+          |> List.map(render_single_transition_property(~loc))
+          |> Builder.pexp_array(~loc);
+        [[%expr CSS.transitionProperties([%e value])]];
+      }
   );
 
 let transition_duration =
-  monomorphic(
-    Property_parser.property_transition_duration,
-    (~loc) => [%expr CSS.transitionDuration],
-    (~loc) =>
-      fun
-      | [] => [%expr `none]
-      | [one] => render_extended_time(~loc, one)
-      | _ => raise(Unsupported_feature),
+  polymorphic(Property_parser.property_transition_duration, (~loc) =>
+    fun
+    | [one] => [
+        [%expr CSS.transitionDuration([%e render_extended_time(~loc, one)])],
+      ]
+    | more => [
+        [%expr
+          CSS.transitionDurations(
+            [%e
+              more
+              |> List.map(render_extended_time(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
 let widows =
@@ -3091,29 +3238,80 @@ let render_timing = (~loc) =>
   | `Interpolation(v) => render_variable(~loc, v);
 
 let transition_timing_function =
-  monomorphic(
-    Property_parser.property_transition_timing_function,
-    (~loc) => [%expr CSS.transitionTimingFunction],
-    (~loc) =>
-      fun
-      | [t] => render_timing(~loc, t)
-      | _ => raise(Unsupported_feature),
+  polymorphic(Property_parser.property_transition_timing_function, (~loc) =>
+    fun
+    | [one] => [
+        [%expr CSS.transitionTimingFunction([%e render_timing(~loc, one)])],
+      ]
+    | many => [
+        [%expr
+          CSS.transitionTimingFunctions(
+            [%e
+              many
+              |> List.map(render_timing(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
 let transition_delay =
-  monomorphic(
-    Property_parser.property_transition_delay,
-    (~loc) => [%expr CSS.transitionDelay],
-    (~loc) =>
-      fun
-      | [`Time(t)] => render_time_as_int(~loc, t)
-      | [`Interpolation(v)] => render_variable(~loc, v)
-      | _ => raise(Unsupported_feature),
+  polymorphic(Property_parser.property_transition_delay, (~loc) =>
+    fun
+    | [one] => [
+        [%expr CSS.transitionDelay([%e render_extended_time(~loc, one)])],
+      ]
+    | more => [
+        [%expr
+          CSS.transitionDelays(
+            [%e
+              more
+              |> List.map(render_extended_time(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
+  );
+
+let render_transition_behavior_value_no_interp = (~loc) =>
+  fun
+  | `Normal => [%expr `normal]
+  | `Allow_discrete => [%expr `allowDiscrete];
+
+let render_transition_behavior_value = (~loc) =>
+  fun
+  | #Types.transition_behavior_value_no_interp as x =>
+    render_transition_behavior_value_no_interp(~loc, x)
+  | `Interpolation(v) => render_variable(~loc, v);
+
+let transition_behavior =
+  polymorphic(Property_parser.property_transition_behavior, (~loc) =>
+    fun
+    | [one] => [
+        [%expr
+          CSS.transitionBehavior(
+            [%e render_transition_behavior_value(~loc, one)],
+          )
+        ],
+      ]
+    | more => [
+        [%expr
+          CSS.transitionBehaviors(
+            [%e
+              more
+              |> List.map(render_transition_behavior_value(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
 let render_transition_property = (~loc) =>
   fun
-  | `None => render_string(~loc, "none")
+  | `None => [%expr CSS.Types.TransitionProperty.none]
   | `Single_transition_property_no_interp(x) =>
     render_single_transition_property_no_interp(~loc, x)
   | `Single_transition_property(x) =>
@@ -3121,9 +3319,16 @@ let render_transition_property = (~loc) =>
 
 let render_single_transition = (~loc) =>
   fun
+  | `Xor(property) => {
+      [%expr
+       CSS.Types.Transition.Value.make(
+         ~property=[%e render_transition_property(~loc, property)],
+         (),
+       )];
+    }
   | `Static_0(property, duration) => {
       [%expr
-       CSS.Transition.shorthand(
+       CSS.Types.Transition.Value.make(
          ~duration=[%e render_extended_time(~loc, duration)],
          ~property=[%e render_transition_property(~loc, property)],
          (),
@@ -3131,7 +3336,7 @@ let render_single_transition = (~loc) =>
     }
   | `Static_1(property, duration, timingFunction) => {
       [%expr
-       CSS.Transition.shorthand(
+       CSS.Types.Transition.Value.make(
          ~duration=[%e render_extended_time(~loc, duration)],
          ~timingFunction=[%e render_timing(~loc, timingFunction)],
          ~property=[%e render_transition_property(~loc, property)],
@@ -3140,7 +3345,18 @@ let render_single_transition = (~loc) =>
     }
   | `Static_2(property, duration, timingFunction, delay) => {
       [%expr
-       CSS.Transition.shorthand(
+       CSS.Types.Transition.Value.make(
+         ~duration=[%e render_extended_time(~loc, duration)],
+         ~delay=[%e render_extended_time(~loc, delay)],
+         ~timingFunction=[%e render_timing(~loc, timingFunction)],
+         ~property=[%e render_transition_property(~loc, property)],
+         (),
+       )];
+    }
+  | `Static_3(property, duration, timingFunction, delay, behavior) => {
+      [%expr
+       CSS.Types.Transition.Value.make(
+         ~behavior=[%e render_transition_behavior_value(~loc, behavior)],
          ~duration=[%e render_extended_time(~loc, duration)],
          ~delay=[%e render_extended_time(~loc, delay)],
          ~timingFunction=[%e render_timing(~loc, timingFunction)],
@@ -3152,10 +3368,17 @@ let render_single_transition = (~loc) =>
 let render_single_transition_no_interp =
     (
       ~loc,
-      (property, delay, timingFunction, duration): Types.single_transition_no_interp,
+      (property, delay, timingFunction, duration, behavior): Types.single_transition_no_interp,
     ) => {
   [%expr
-   CSS.Transition.shorthand(
+   CSS.Types.Transition.Value.make(
+     ~behavior=?[%e
+       render_option(
+         ~loc,
+         render_transition_behavior_value_no_interp,
+         behavior,
+       )
+     ],
      ~duration=?[%e
        render_option(~loc, render_extended_time_no_interp, duration)
      ],
@@ -3173,23 +3396,16 @@ let render_single_transition_no_interp =
 let transition =
   monomorphic(
     Property_parser.property_transition,
-    (~loc) => [%expr CSS.transitionList],
-    (~loc) =>
-      fun
-      | `Interpolation(v) => render_variable(~loc, v)
-      | `Xor(transitions) =>
-        switch (transitions) {
-        | [] => raise(Invalid_value("expected at least one argument"))
-        | transitions =>
-          transitions
-          |> List.map(
-               fun
-               | `Single_transition(x) => render_single_transition(~loc, x)
-               | `Single_transition_no_interp(x) =>
-                 render_single_transition_no_interp(~loc, x),
-             )
-          |> Builder.pexp_array(~loc)
-        },
+    (~loc) => [%expr CSS.transitions],
+    (~loc, transitions) =>
+      transitions
+      |> List.map(
+           fun
+           | `Single_transition(x) => render_single_transition(~loc, x)
+           | `Single_transition_no_interp(x) =>
+             render_single_transition_no_interp(~loc, x),
+         )
+      |> Builder.pexp_array(~loc),
   );
 
 let render_keyframes_name = (~loc) =>
@@ -3199,9 +3415,7 @@ let render_keyframes_name = (~loc) =>
 
 let render_animation_name = (~loc) =>
   fun
-  | `None => [%expr
-      CSS.Types.AnimationName.make([%e render_string(~loc, "none")])
-    ]
+  | `None => [%expr CSS.Types.AnimationName.none]
   | `Keyframes_name(name) => {
       [%expr
        CSS.Types.AnimationName.make([%e render_keyframes_name(~loc, name)])];
@@ -3212,115 +3426,332 @@ let render_animation_name = (~loc) =>
 let animation_name =
   polymorphic(Property_parser.property_animation_name, (~loc) =>
     fun
-    | [one] => {
-        let value = render_animation_name(~loc, one);
-        [[%expr CSS.animationName([%e value])]];
-      }
-    | many => {
-        let values =
-          many
-          |> List.map(render_animation_name(~loc))
-          |> Builder.pexp_array(~loc);
-        [[%expr CSS.animationNames([%e values])]];
-      }
+    | [one] => [
+        [%expr CSS.animationName([%e render_animation_name(~loc, one)])],
+      ]
+    | more => [
+        [%expr
+          CSS.animationNames(
+            [%e
+              more
+              |> List.map(render_animation_name(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
 let animation_duration =
-  monomorphic(
-    Property_parser.property_animation_duration,
-    (~loc) => [%expr CSS.animationDuration],
-    (~loc) =>
-      fun
-      | [] => [%expr `ms(0)]
-      | [one] => render_extended_time(~loc, one)
-      | _ => raise(Unsupported_feature),
+  polymorphic(Property_parser.property_animation_duration, (~loc) =>
+    fun
+    | [one] => [
+        [%expr CSS.animationDuration([%e render_extended_time(~loc, one)])],
+      ]
+    | more => [
+        [%expr
+          CSS.animationDurations(
+            [%e
+              more
+              |> List.map(render_extended_time(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
 let animation_timing_function =
-  monomorphic(
-    Property_parser.property_animation_timing_function,
-    (~loc) => [%expr CSS.animationTimingFunction],
-    (~loc) =>
-      fun
-      | [t] => render_timing(~loc, t)
-      | _ => raise(Unsupported_feature),
+  polymorphic(Property_parser.property_animation_timing_function, (~loc) =>
+    fun
+    | [one] => [
+        [%expr CSS.animationTimingFunction([%e render_timing(~loc, one)])],
+      ]
+    | more => [
+        [%expr
+          CSS.animationTimingFunctions(
+            [%e
+              more
+              |> List.map(render_timing(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
-let render_animation_iteration_count = (~loc) =>
+let render_single_animation_iteration_count_no_interp = (~loc) =>
   fun
   | `Infinite => [%expr `infinite]
   | `Number(n) => [%expr `count([%e render_float(~loc, n)])];
 
+let render_single_animation_iteration_count = (~loc) =>
+  fun
+  | #Types.single_animation_iteration_count_no_interp as x =>
+    render_single_animation_iteration_count_no_interp(~loc, x)
+  | `Interpolation(v) => render_variable(~loc, v);
+
 let animation_iteration_count =
-  monomorphic(
-    Property_parser.property_animation_iteration_count,
-    (~loc) => [%expr CSS.animationIterationCount],
-    (~loc) =>
-      fun
-      | [one] => render_animation_iteration_count(~loc, one)
-      | _ => raise(Unsupported_feature),
+  polymorphic(Property_parser.property_animation_iteration_count, (~loc) =>
+    fun
+    | [one] => [
+        [%expr
+          CSS.animationIterationCount(
+            [%e render_single_animation_iteration_count(~loc, one)],
+          )
+        ],
+      ]
+    | more => [
+        [%expr
+          CSS.animationIterationCounts(
+            [%e
+              more
+              |> List.map(render_single_animation_iteration_count(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
-let render_animation_direction = (~loc) =>
+let render_single_animation_direction_no_interp = (~loc) =>
   fun
   | `Normal => [%expr `normal]
   | `Reverse => [%expr `reverse]
   | `Alternate => [%expr `alternate]
   | `Alternate_reverse => [%expr `alternateReverse];
 
+let render_single_animation_direction = (~loc) =>
+  fun
+  | #Types.single_animation_direction_no_interp as x =>
+    render_single_animation_direction_no_interp(~loc, x)
+  | `Interpolation(v) => render_variable(~loc, v);
+
 let animation_direction =
-  monomorphic(
-    Property_parser.property_animation_direction,
-    (~loc) => [%expr CSS.animationDirection],
-    (~loc) =>
-      fun
-      | [one] => render_animation_direction(~loc, one)
-      | _ => raise(Unsupported_feature),
+  polymorphic(Property_parser.property_animation_direction, (~loc) =>
+    fun
+    | [one] => [
+        [%expr
+          CSS.animationDirection(
+            [%e render_single_animation_direction(~loc, one)],
+          )
+        ],
+      ]
+    | more => [
+        [%expr
+          CSS.animationDirections(
+            [%e
+              more
+              |> List.map(render_single_animation_direction(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
-let render_animation_play_state = (~loc) =>
+let render_single_animation_play_state_no_interp = (~loc) =>
   fun
   | `Paused => [%expr `paused]
   | `Running => [%expr `running];
 
+let render_single_animation_play_state = (~loc) =>
+  fun
+  | #Types.single_animation_play_state_no_interp as x =>
+    render_single_animation_play_state_no_interp(~loc, x)
+  | `Interpolation(v) => render_variable(~loc, v);
+
 let animation_play_state =
-  monomorphic(
-    Property_parser.property_animation_play_state,
-    (~loc) => [%expr CSS.animationPlayState],
-    (~loc) =>
-      fun
-      | [one] => render_animation_play_state(~loc, one)
-      | _ => raise(Unsupported_feature),
+  polymorphic(Property_parser.property_animation_play_state, (~loc) =>
+    fun
+    | [one] => [
+        [%expr
+          CSS.animationPlayState(
+            [%e render_single_animation_play_state(~loc, one)],
+          )
+        ],
+      ]
+    | more => [
+        [%expr
+          CSS.animationPlayStates(
+            [%e
+              more
+              |> List.map(render_single_animation_play_state(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
 let animation_delay =
-  monomorphic(
-    Property_parser.property_animation_delay,
-    (~loc) => [%expr CSS.animationDelay],
-    (~loc) =>
-      fun
-      | [one] => render_extended_time(~loc, one)
-      | _ => raise(Unsupported_feature),
+  polymorphic(Property_parser.property_animation_delay, (~loc) =>
+    fun
+    | [one] => [
+        [%expr CSS.animationDelay([%e render_extended_time(~loc, one)])],
+      ]
+    | more => [
+        [%expr
+          CSS.animationDelays(
+            [%e
+              more
+              |> List.map(render_extended_time(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
-let render_animation_fill_mode = (~loc) =>
+let render_single_animation_fill_mode_no_interp = (~loc) =>
   fun
   | `None => [%expr `none]
   | `Forwards => [%expr `forwards]
   | `Backwards => [%expr `backwards]
   | `Both => [%expr `both];
 
+let render_single_animation_fill_mode = (~loc) =>
+  fun
+  | #Types.single_animation_fill_mode_no_interp as x =>
+    render_single_animation_fill_mode_no_interp(~loc, x)
+  | `Interpolation(v) => render_variable(~loc, v);
+
 let animation_fill_mode =
-  monomorphic(
-    Property_parser.property_animation_fill_mode,
-    (~loc) => [%expr CSS.animationFillMode],
-    (~loc) =>
-      fun
-      | [one] => render_animation_fill_mode(~loc, one)
-      | _ => raise(Unsupported_feature),
+  polymorphic(Property_parser.property_animation_fill_mode, (~loc) =>
+    fun
+    | [one] => [
+        [%expr
+          CSS.animationFillMode(
+            [%e render_single_animation_fill_mode(~loc, one)],
+          )
+        ],
+      ]
+    | more => [
+        [%expr
+          CSS.animationFillModes(
+            [%e
+              more
+              |> List.map(render_single_animation_fill_mode(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
   );
 
-let render_single_animation =
+let render_single_animation = (~loc) =>
+  fun
+  | `Xor(name) => [%expr
+      CSS.Types.Animation.Value.make(
+        ~name=[%e render_animation_name(~loc, name)],
+        (),
+      )
+    ]
+  | `Static_0(name, duration) => [%expr
+      CSS.Types.Animation.Value.make(
+        ~name=[%e render_animation_name(~loc, name)],
+        ~duration=[%e render_extended_time(~loc, duration)],
+        (),
+      )
+    ]
+  | `Static_1(name, duration, timingFunction) => [%expr
+      CSS.Types.Animation.Value.make(
+        ~name=[%e render_animation_name(~loc, name)],
+        ~duration=[%e render_extended_time(~loc, duration)],
+        ~timingFunction=[%e render_timing(~loc, timingFunction)],
+        (),
+      )
+    ]
+  | `Static_2(name, duration, timingFunction, delay) => [%expr
+      CSS.Types.Animation.Value.make(
+        ~name=[%e render_animation_name(~loc, name)],
+        ~duration=[%e render_extended_time(~loc, duration)],
+        ~timingFunction=[%e render_timing(~loc, timingFunction)],
+        ~delay=[%e render_extended_time(~loc, delay)],
+        (),
+      )
+    ]
+  | `Static_3(name, duration, timingFunction, delay, iterationCount) => [%expr
+      CSS.Types.Animation.Value.make(
+        ~name=[%e render_animation_name(~loc, name)],
+        ~duration=[%e render_extended_time(~loc, duration)],
+        ~timingFunction=[%e render_timing(~loc, timingFunction)],
+        ~delay=[%e render_extended_time(~loc, delay)],
+        ~iterationCount=[%e
+          render_single_animation_iteration_count(~loc, iterationCount)
+        ],
+        (),
+      )
+    ]
+  | `Static_4(
+      name,
+      duration,
+      timingFunction,
+      delay,
+      iterationCount,
+      direction,
+    ) => [%expr
+      CSS.Types.Animation.Value.make(
+        ~name=[%e render_animation_name(~loc, name)],
+        ~duration=[%e render_extended_time(~loc, duration)],
+        ~timingFunction=[%e render_timing(~loc, timingFunction)],
+        ~delay=[%e render_extended_time(~loc, delay)],
+        ~iterationCount=[%e
+          render_single_animation_iteration_count(~loc, iterationCount)
+        ],
+        ~direction=[%e render_single_animation_direction(~loc, direction)],
+        (),
+      )
+    ]
+
+  | `Static_5(
+      name,
+      duration,
+      timingFunction,
+      delay,
+      iterationCount,
+      direction,
+      fillMode,
+    ) => [%expr
+      CSS.Types.Animation.Value.make(
+        ~name=[%e render_animation_name(~loc, name)],
+        ~duration=[%e render_extended_time(~loc, duration)],
+        ~timingFunction=[%e render_timing(~loc, timingFunction)],
+        ~delay=[%e render_extended_time(~loc, delay)],
+        ~iterationCount=[%e
+          render_single_animation_iteration_count(~loc, iterationCount)
+        ],
+        ~direction=[%e render_single_animation_direction(~loc, direction)],
+        ~fillMode=[%e render_single_animation_fill_mode(~loc, fillMode)],
+        (),
+      )
+    ]
+  | `Static_6(
+      name,
+      duration,
+      timingFunction,
+      delay,
+      iterationCount,
+      direction,
+      fillMode,
+      playState,
+    ) => [%expr
+      CSS.Types.Animation.Value.make(
+        ~name=[%e render_animation_name(~loc, name)],
+        ~duration=[%e render_extended_time(~loc, duration)],
+        ~timingFunction=[%e render_timing(~loc, timingFunction)],
+        ~delay=[%e render_extended_time(~loc, delay)],
+        ~iterationCount=[%e
+          render_single_animation_iteration_count(~loc, iterationCount)
+        ],
+        ~direction=[%e render_single_animation_direction(~loc, direction)],
+        ~fillMode=[%e render_single_animation_fill_mode(~loc, fillMode)],
+        ~playState=[%e render_single_animation_play_state(~loc, playState)],
+        (),
+      )
+    ];
+
+let render_single_animation_no_interp =
     (
       ~loc,
       (
@@ -3332,39 +3763,65 @@ let render_single_animation =
         direction,
         fillMode,
         playState,
-      ): Types.single_animation,
+      ): Types.single_animation_no_interp,
     ) => {
   [%expr
-   CSS.animation(
-     ~duration=?[%e render_option(~loc, render_extended_time, duration)],
-     ~delay=?[%e render_option(~loc, render_extended_time, delay)],
-     ~direction=?[%e
-       render_option(~loc, render_animation_direction, direction)
+   CSS.Types.Animation.Value.make(
+     ~duration=?[%e
+       render_option(~loc, render_extended_time_no_interp, duration)
      ],
-     ~timingFunction=?[%e render_option(~loc, render_timing, timingFunction)],
+     ~delay=?[%e render_option(~loc, render_extended_time_no_interp, delay)],
+     ~direction=?[%e
+       render_option(
+         ~loc,
+         render_single_animation_direction_no_interp,
+         direction,
+       )
+     ],
+     ~timingFunction=?[%e
+       render_option(~loc, render_timing_no_interp, timingFunction)
+     ],
      ~fillMode=?[%e
-       render_option(~loc, render_animation_fill_mode, fillMode)
+       render_option(
+         ~loc,
+         render_single_animation_fill_mode_no_interp,
+         fillMode,
+       )
      ],
      ~playState=?[%e
-       render_option(~loc, render_animation_play_state, playState)
+       render_option(
+         ~loc,
+         render_single_animation_play_state_no_interp,
+         playState,
+       )
      ],
      ~iterationCount=?[%e
-       render_option(~loc, render_animation_iteration_count, iterationCount)
+       render_option(
+         ~loc,
+         render_single_animation_iteration_count_no_interp,
+         iterationCount,
+       )
      ],
-     ~name=[%e
-       render_animation_name(~loc, Option.value(name, ~default=`None))
-     ],
+     ~name=?[%e render_option(~loc, render_animation_name, name)],
      (),
    )];
 };
 
 let animation =
-  polymorphic(Property_parser.property_animation, (~loc) => {
-    fun
-    | [one] => [render_single_animation(~loc, one)]
-    /* TODO: Support multiple animations */
-    | _ => raise(Unsupported_feature)
-  });
+  monomorphic(
+    Property_parser.property_animation,
+    (~loc) => [%expr CSS.animations],
+    (~loc, animations) => {
+      animations
+      |> List.map(
+           fun
+           | `Single_animation(x) => render_single_animation(~loc, x)
+           | `Single_animation_no_interp(x) =>
+             render_single_animation_no_interp(~loc, x),
+         )
+      |> Builder.pexp_array(~loc)
+    },
+  );
 
 let render_ratio = (~loc, value: Types.ratio) => {
   switch (value) {
@@ -3770,6 +4227,13 @@ and render_track_size = (~loc, value: Types.track_size) => {
   };
 };
 
+let render_maybe_track_size = (~loc, value) => {
+  switch (value) {
+  | None => []
+  | Some(size) => [render_track_size(~loc, size)]
+  };
+};
+
 let render_track_list = (~loc, track_list, line_names) => {
   let tracks =
     track_list
@@ -3894,72 +4358,231 @@ let render_subgrid = (~loc, line_name_list: Types.line_name_list) => {
   |> Builder.pexp_array(~loc);
 };
 
+let render_grid_template_rows_and_columns = (~loc) =>
+  fun
+  | `Interpolation(v) => render_variable(~loc, v)
+  | `None => [%expr `none]
+  | `Masonry => [%expr `masonry]
+  | `Track_list(track_list, line_names) => [%expr
+      `tracks([%e render_track_list(~loc, track_list, line_names)])
+    ]
+  | `Auto_track_list(list) => [%expr
+      `tracks([%e render_auto_track_list(~loc, list)])
+    ]
+  | `Static((), None) => [%expr `tracks([|`subgrid|])]
+  | `Static((), Some(subgrid)) => [%expr
+      `tracks([%e render_subgrid(~loc, subgrid)])
+    ];
+
 // css-grid-1
 let grid_template_columns =
   monomorphic(
     Property_parser.property_grid_template_columns,
     (~loc) => [%expr CSS.gridTemplateColumns],
-    (~loc, value: Types.property_grid_template_columns) =>
-      switch (value) {
-      | `Interpolation(v) => render_variable(~loc, v)
-      | `None => [%expr `none]
-      | `Track_list(track_list, line_names) =>
-        [%expr `value([%e render_track_list(~loc, track_list, line_names)])]
-      | `Auto_track_list(list) =>
-        [%expr `value([%e render_auto_track_list(~loc, list)])]
-      | `Static((), None) => [%expr `value([|`subgrid|])]
-      | `Static((), Some(subgrid)) =>
-        [%expr `value([%e render_subgrid(~loc, subgrid)])]
-      },
+    render_grid_template_rows_and_columns,
   );
 
 let grid_template_rows =
   monomorphic(
     Property_parser.property_grid_template_rows,
     (~loc) => [%expr CSS.gridTemplateRows],
-    (~loc, value: Types.property_grid_template_rows) =>
-      switch (value) {
-      | `Interpolation(v) => render_variable(~loc, v)
-      | `None => [%expr `none]
-      | `Track_list(track_list, line_names) =>
-        [%expr `value([%e render_track_list(~loc, track_list, line_names)])]
-      | `Auto_track_list(list) =>
-        [%expr `value([%e render_auto_track_list(~loc, list)])]
-      | `Static((), None) => [%expr `value([|`subgrid|])]
-      | `Static((), Some(subgrid)) =>
-        [%expr `value([%e render_subgrid(~loc, subgrid)])]
-      },
+    render_grid_template_rows_and_columns,
   );
 
 let grid_template_areas =
-  unsupportedValue(Property_parser.property_grid_template_areas, (~loc) =>
-    [%expr CSS.gridTemplateAreas]
+  monomorphic(
+    Property_parser.property_grid_template_areas,
+    (~loc) => [%expr CSS.gridTemplateAreas],
+    (~loc) =>
+      fun
+      | `None => [%expr `none]
+      | `Xor(areas) => {
+          let areasExpr =
+            areas
+            |> List.map(area =>
+                 switch (area) {
+                 | `Interpolation(value) => render_variable(~loc, value)
+                 | `String(value) => render_string(~loc, value)
+                 }
+               )
+            |> Builder.pexp_array(~loc);
+          [%expr `areas([%e areasExpr])];
+        },
   );
 
+let render_area_rows = (~loc, area_rows) =>
+  area_rows
+  |> List.concat_map(((names_before, area, track_size, names_after)) => {
+       render_maybe_line_names(~loc, names_before)
+       @ [[%expr `area([%e render_string(~loc, area)])]]
+       @ render_maybe_track_size(~loc, track_size)
+       @ render_maybe_line_names(~loc, names_after)
+     })
+  |> Builder.pexp_array(~loc);
+let render_explicit_track_list = (~loc, track_list, line_names) => {
+  let tracks =
+    track_list
+    |> List.concat_map(((line_name, track)) => {
+         let lineNameExpr = render_maybe_line_names(~loc, line_name);
+         List.append(lineNameExpr, [render_track_size(~loc, track)]);
+       });
+  let lineNamesExpr = render_maybe_line_names(~loc, line_names);
+  List.append(lineNamesExpr, tracks) |> Builder.pexp_array(~loc);
+};
+
+let render_grid_template = (~loc) =>
+  fun
+  | `None => [%expr `none]
+  | `Static_0(rows, _, columns) => [%expr
+      `rowsColumns((
+        [%e render_grid_template_rows_and_columns(~loc, rows)],
+        [%e render_grid_template_rows_and_columns(~loc, columns)],
+      ))
+    ]
+  | `Static_1(area_rows, None) => [%expr
+      `areasRows([%e render_area_rows(~loc, area_rows)])
+    ]
+  | `Static_1(area_rows, Some((_, (explicit_track_list, line_names)))) => [%expr
+      `areasRowsColumns((
+        [%e render_area_rows(~loc, area_rows)],
+        [%e
+          render_explicit_track_list(~loc, explicit_track_list, line_names)
+        ],
+      ))
+    ];
+
 let grid_template =
-  unsupportedProperty(Property_parser.property_grid_template);
+  monomorphic(
+    Property_parser.property_grid_template,
+    (~loc) => [%expr CSS.gridTemplate],
+    render_grid_template,
+  );
 
 let grid_auto_columns =
-  unsupportedValue(Property_parser.property_grid_auto_columns, (~loc) =>
-    [%expr CSS.gridAutoColumns]
+  monomorphic(
+    Property_parser.property_grid_auto_columns,
+    (~loc) => [%expr CSS.gridAutoColumns],
+    (~loc, sizes) => {
+      let sizesExpr =
+        sizes
+        |> List.map(render_track_size(~loc))
+        |> Builder.pexp_array(~loc);
+      [%expr `trackSizes([%e sizesExpr])];
+    },
   );
 
 let grid_auto_rows =
-  unsupportedValue(Property_parser.property_grid_auto_rows, (~loc) =>
-    [%expr CSS.gridAutoRows]
+  monomorphic(
+    Property_parser.property_grid_auto_rows,
+    (~loc) => [%expr CSS.gridAutoRows],
+    (~loc, sizes) => {
+      let sizesExpr =
+        sizes
+        |> List.map(render_track_size(~loc))
+        |> Builder.pexp_array(~loc);
+      [%expr `trackSizes([%e sizesExpr])];
+    },
   );
 
 let grid_auto_flow =
-  unsupportedValue(Property_parser.property_grid_auto_flow, (~loc) =>
-    [%expr CSS.gridAutoFlow]
+  monomorphic(
+    Property_parser.property_grid_auto_flow,
+    (~loc) => [%expr CSS.gridAutoFlow],
+    (~loc) =>
+      fun
+      | `Interpolation(values) => render_variable(~loc, values)
+      | `Or(Some(`Row), None) => [%expr `row]
+      | `Or(Some(`Column), None) => [%expr `column]
+      | `Or(None, Some(_)) => [%expr `dense]
+      | `Or(Some(`Row), Some(_)) => [%expr `rowDense]
+      | `Or(Some(`Column), Some(_)) => [%expr `columnDense]
+      | `Or(None, None) => raise(Impossible_state),
   );
 
-let grid =
-  unsupportedValue(Property_parser.property_grid, (~loc) => [%expr CSS.grid]);
+let render_grid_line = (~loc, x: Types.grid_line) =>
+  switch (x) {
+  | `Auto => [%expr `auto]
+  | `Custom_ident_without_span_or_auto(x) =>
+    [%expr `ident([%e render_string(~loc, x)])]
+  | `And_0(num, None) => [%expr `num([%e render_integer(~loc, num)])]
+  | `And_0(num, Some(ident)) =>
+    [%expr
+     `numIdent((
+       [%e render_integer(~loc, num)],
+       [%e render_string(~loc, ident)],
+     ))]
+  | `And_1(_span, (Some(num), None)) =>
+    [%expr `span(`num([%e render_integer(~loc, num)]))]
+  | `And_1(_span, (None, Some(ident))) =>
+    [%expr `span(`ident([%e render_string(~loc, ident)]))]
+  | `And_1(_span, (Some(num), Some(ident))) =>
+    [%expr
+     `span(
+       `numIdent((
+         [%e render_integer(~loc, num)],
+         [%e render_string(~loc, ident)],
+       )),
+     )]
+  | `And_1(_span, (None, None)) => raise(Impossible_state)
+  };
 
-let grid_row_start =
-  unsupportedValue(Property_parser.property_grid_row_start, (~loc) =>
-    [%expr CSS.gridRowStart]
+let grid =
+  monomorphic(
+    Property_parser.property_grid,
+    (~loc) => [%expr CSS.gridProperty],
+    (~loc) =>
+      fun
+      | `Property_grid_template(x) => [%expr
+          `template([%e render_grid_template(~loc, x)])
+        ]
+      | `Static_0(template_rows, _, (_, dense), auto_columns) => {
+          let template_rows =
+            render_grid_template_rows_and_columns(~loc, template_rows);
+          let dense =
+            switch (dense) {
+            | Some(_) => [%expr true]
+            | None => [%expr false]
+            };
+          let auto_columns =
+            switch (auto_columns) {
+            | Some(cols) =>
+              [%expr
+               Some(
+                 [%e
+                   cols
+                   |> List.map(render_track_size(~loc))
+                   |> Builder.pexp_array(~loc)
+                 ],
+               )]
+            | None => [%expr None]
+            };
+          [%expr
+           `autoColumns(([%e template_rows], [%e dense], [%e auto_columns]))];
+        }
+      | `Static_1((_, dense), auto_rows, _, template_columns) => {
+          let dense =
+            switch (dense) {
+            | Some(_) => [%expr true]
+            | None => [%expr false]
+            };
+          let auto_rows =
+            switch (auto_rows) {
+            | Some(cols) =>
+              [%expr
+               Some(
+                 [%e
+                   cols
+                   |> List.map(render_track_size(~loc))
+                   |> Builder.pexp_array(~loc)
+                 ],
+               )]
+            | None => [%expr None]
+            };
+          let template_columns =
+            render_grid_template_rows_and_columns(~loc, template_columns);
+          [%expr
+           `autoRows(([%e dense], [%e auto_rows], [%e template_columns]))];
+        },
   );
 
 let grid_row_gap =
@@ -3982,51 +4605,103 @@ let grid_column_gap =
       | `Extended_percentage(ep) => render_extended_percentage(~loc, ep),
   );
 
+let grid_row_start =
+  monomorphic(
+    Property_parser.property_grid_row_start,
+    (~loc) => [%expr CSS.gridRowStart],
+    render_grid_line,
+  );
+
 let grid_column_start =
-  unsupportedValue(Property_parser.property_grid_column_start, (~loc) =>
-    [%expr CSS.gridColumnStart]
+  monomorphic(
+    Property_parser.property_grid_column_start,
+    (~loc) => [%expr CSS.gridColumnStart],
+    render_grid_line,
   );
 
 let grid_row_end =
-  unsupportedValue(Property_parser.property_grid_row_end, (~loc) =>
-    [%expr CSS.gridRowEnd]
+  monomorphic(
+    Property_parser.property_grid_row_end,
+    (~loc) => [%expr CSS.gridRowEnd],
+    render_grid_line,
   );
 
 let grid_column_end =
-  unsupportedValue(Property_parser.property_grid_column_end, (~loc) =>
-    [%expr CSS.gridColumnEnd]
-  );
-
-let grid_row =
-  unsupportedValue(Property_parser.property_grid_row, (~loc) =>
-    [%expr CSS.gridRow]
-  );
-
-let grid_column =
-  unsupportedValue(Property_parser.property_grid_column, (~loc) =>
-    [%expr CSS.gridColumn]
+  monomorphic(
+    Property_parser.property_grid_column_end,
+    (~loc) => [%expr CSS.gridColumnEnd],
+    render_grid_line,
   );
 
 let grid_area =
-  unsupportedValue(Property_parser.property_grid_area, (~loc) =>
-    [%expr CSS.gridArea]
+  polymorphic(Property_parser.property_grid_area, (~loc, value) =>
+    switch (value) {
+    | (gl1, [(_, gl2), (_, gl3), (_, gl4), ..._]) => [
+        [%expr
+          CSS.gridArea4(
+            [%e render_grid_line(~loc, gl1)],
+            [%e render_grid_line(~loc, gl2)],
+            [%e render_grid_line(~loc, gl3)],
+            [%e render_grid_line(~loc, gl4)],
+          )
+        ],
+      ]
+    | (gl1, [(_, gl2), (_, gl3), ..._]) => [
+        [%expr
+          CSS.gridArea3(
+            [%e render_grid_line(~loc, gl1)],
+            [%e render_grid_line(~loc, gl2)],
+            [%e render_grid_line(~loc, gl3)],
+          )
+        ],
+      ]
+
+    | (gl1, [(_, gl2), ..._]) => [
+        [%expr
+          CSS.gridArea2(
+            [%e render_grid_line(~loc, gl1)],
+            [%e render_grid_line(~loc, gl2)],
+          )
+        ],
+      ]
+    | (gl1, []) => [[%expr CSS.gridArea([%e render_grid_line(~loc, gl1)])]]
+    }
   );
 
-let grid_gap =
-  monomorphic(
-    Property_parser.property_grid_gap,
-    (~loc) => [%expr CSS.gridGap],
-    (~loc) =>
-      fun
-      | (`Extended_length(el), None) => render_extended_length(~loc, el)
-      | (`Extended_percentage(ep), None) =>
-        render_extended_percentage(~loc, ep)
-      /* gridGrap2 isn't available on bs-css */
-      | _ => raise(Unsupported_feature),
+let grid_row =
+  polymorphic(Property_parser.property_grid_row, (~loc) =>
+    fun
+    | (start, None) => [
+        [%expr CSS.gridRow([%e render_grid_line(~loc, start)])],
+      ]
+    | (start, Some((_, end_))) => [
+        [%expr
+          CSS.gridRow2(
+            [%e render_grid_line(~loc, start)],
+            [%e render_grid_line(~loc, end_)],
+          )
+        ],
+      ]
+  );
+
+let grid_column =
+  polymorphic(Property_parser.property_grid_column, (~loc) =>
+    fun
+    | (start, None) => [
+        [%expr CSS.gridColumn([%e render_grid_line(~loc, start)])],
+      ]
+    | (start, Some((_, end_))) => [
+        [%expr
+          CSS.gridColumn2(
+            [%e render_grid_line(~loc, start)],
+            [%e render_grid_line(~loc, end_)],
+          )
+        ],
+      ]
   );
 
 let render_gap =
-    (~loc, value: [> Types.property_column_gap | Types.property_row_gap]) => {
+    (~loc, value: [< Types.property_column_gap | Types.property_row_gap]) => {
   switch (value) {
   | `Extended_length(el) => render_extended_length(~loc, el)
   | `Extended_percentage(ep) => render_extended_percentage(~loc, ep)
@@ -4034,21 +4709,33 @@ let render_gap =
   };
 };
 
-let render_property_gap = (~loc, value: Types.property_gap) => {
-  switch (value) {
-  | (row, None) => [[%expr CSS.gap([%e render_gap(~loc, row)])]]
-  | (row, Some(column)) => [
-      [%expr
-        CSS.gap2(
-          ~rowGap=[%e render_gap(~loc, row)],
-          ~columnGap=[%e render_gap(~loc, column)],
-        )
-      ],
-    ]
-  };
-};
+let grid_gap =
+  polymorphic(Property_parser.property_grid_gap, (~loc) =>
+    fun
+    | (row, None) => [[%expr CSS.gridGap([%e render_gap(~loc, row)])]]
+    | (row, Some(column)) => [
+        [%expr
+          CSS.gridGap2(
+            ~rowGap=[%e render_gap(~loc, row)],
+            ~columnGap=[%e render_gap(~loc, column)],
+          )
+        ],
+      ]
+  );
 
-let gap = polymorphic(Property_parser.property_gap, render_property_gap);
+let gap =
+  polymorphic(Property_parser.property_gap, (~loc) =>
+    fun
+    | (row, None) => [[%expr CSS.gap([%e render_gap(~loc, row)])]]
+    | (row, Some(column)) => [
+        [%expr
+          CSS.gap2(
+            ~rowGap=[%e render_gap(~loc, row)],
+            ~columnGap=[%e render_gap(~loc, column)],
+          )
+        ],
+      ]
+  );
 
 let z_index =
   monomorphic(
@@ -4469,7 +5156,20 @@ let scrollbar_base_color =
   unsupportedProperty(Property_parser.property_scrollbar_base_color);
 
 let scrollbar_color =
-  unsupportedProperty(Property_parser.property_scrollbar_color);
+  monomorphic(
+    Property_parser.property_scrollbar_color,
+    (~loc) => [%expr CSS.scrollbarColor],
+    (~loc, value: Types.property_scrollbar_color) =>
+      switch (value) {
+      | `Auto => [%expr `auto]
+      | `Static(thumbColor, trackColor) =>
+        [%expr
+         `thumbTrackColor((
+           [%e render_color(~loc, thumbColor)],
+           [%e render_color(~loc, trackColor)],
+         ))]
+      },
+  );
 
 let scrollbar_darkshadow_color =
   unsupportedProperty(Property_parser.property_scrollbar_darkshadow_color);
@@ -4487,7 +5187,16 @@ let scrollbar_track_color =
   unsupportedProperty(Property_parser.property_scrollbar_track_color);
 
 let scrollbar_width =
-  unsupportedProperty(Property_parser.property_scrollbar_width);
+  monomorphic(
+    Property_parser.property_scrollbar_width,
+    (~loc) => [%expr CSS.scrollbarWidth],
+    (~loc, value: Types.property_scrollbar_width) =>
+      switch (value) {
+      | `Thin => [%expr `thin]
+      | `Auto => [%expr `auto]
+      | `None => [%expr `none]
+      },
+  );
 
 let stroke_dasharray =
   unsupportedProperty(Property_parser.property_stroke_dasharray);
@@ -4806,7 +5515,21 @@ let mask_mode = unsupportedProperty(Property_parser.property_mask_mode);
 let mask_origin = unsupportedProperty(Property_parser.property_mask_origin);
 
 let mask_position =
-  unsupportedProperty(Property_parser.property_mask_position);
+  polymorphic(Property_parser.property_mask_position, (~loc) =>
+    fun
+    | [one] => [[%expr CSS.maskPosition([%e render_position(~loc, one)])]]
+    | more => [
+        [%expr
+          CSS.maskPositions(
+            [%e
+              more
+              |> List.map(render_position(~loc))
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
+      ]
+  );
 
 let mask_repeat = unsupportedProperty(Property_parser.property_mask_repeat);
 
@@ -4835,7 +5558,14 @@ let nav_right = unsupportedProperty(Property_parser.property_nav_right);
 let nav_up = unsupportedProperty(Property_parser.property_nav_up);
 
 let offset_anchor =
-  unsupportedProperty(Property_parser.property_offset_anchor);
+  monomorphic(
+    Property_parser.property_offset_anchor,
+    (~loc) => [%expr CSS.offsetAnchor],
+    (~loc) =>
+      fun
+      | `Auto => [%expr `auto]
+      | `Position(x) => render_position(~loc, x),
+  );
 
 let offset_distance =
   unsupportedProperty(Property_parser.property_offset_distance);
@@ -4854,9 +5584,6 @@ let orphans = unsupportedProperty(Property_parser.property_orphans);
 
 let overflow_anchor =
   unsupportedProperty(Property_parser.property_overflow_anchor);
-
-let overflow_clip_box =
-  unsupportedProperty(Property_parser.property_overflow_clip_box);
 
 let padding_block_end =
   unsupportedProperty(Property_parser.property_padding_block_end);
@@ -5231,7 +5958,7 @@ let properties = [
   ("outline-width", found(outline_width)),
   ("overflow-anchor", found(overflow_anchor)),
   ("overflow-block", found(overflow_block)),
-  ("overflow-clip-box", found(overflow_clip_box)),
+  ("overflow-clip-margin", found(overflow_clip_margin)),
   ("overflow-inline", found(overflow_inline)),
   ("overflow-wrap", found(overflow_wrap)),
   ("overflow-x", found(overflow_x)),
@@ -5270,6 +5997,7 @@ let properties = [
   ("scrollbar-shadow-color", found(scrollbar_shadow_color)),
   ("scrollbar-track-color", found(scrollbar_track_color)),
   ("scrollbar-width", found(scrollbar_width)),
+  ("scrollbar-gutter", found(scrollbar_gutter)),
   ("stroke-opacity", found(stroke_opacity)),
   ("stroke-width", found(stroke_width)),
   ("stroke-dasharray", found(stroke_dasharray)),
@@ -5312,6 +6040,7 @@ let properties = [
   ("transform-origin", found(transform_origin)),
   ("transform-style", found(transform_style)),
   ("transform", found(transform)),
+  ("transition-behavior", found(transition_behavior)),
   ("transition-delay", found(transition_delay)),
   ("transition-duration", found(transition_duration)),
   ("transition-property", found(transition_property)),
@@ -5385,8 +6114,8 @@ let render = (~loc: Location.t, property, value, important) =>
     | Error(_) =>
       switch (render_to_expr(~loc, property, value, important)) {
       | Ok(value) => Ok(value)
-      | exception (Invalid_value(v)) =>
-        Error(`Invalid_value(value ++ ". " ++ v))
+      | Error(`Invalid_value(_)) as x => x
+      | exception Impossible_state => Error(`Impossible_state)
       | Error(_)
       | exception Unsupported_feature =>
         let.ok () = is_valid_string ? Ok() : Error(`Invalid_value(value));

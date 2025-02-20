@@ -6,6 +6,10 @@ module Parser = Styled_ppx_css_parser.Parser;
 
 let success_tests =
   [
+    ({|inset-3\.5|}, [IDENT("inset-3.5")]),
+    ({|-inset-3\.5|}, [IDENT("-inset-3.5")]),
+    ({|inset-1\/3|}, [IDENT("inset-1/3")]),
+    ({|\32xl\:container|}, [IDENT("2xl:container")]),
     (" \n\t ", [WS]),
     ({|"something"|}, [STRING("something")]),
     ({|'tuturu'|}, [STRING("tuturu")]),

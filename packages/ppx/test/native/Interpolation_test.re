@@ -156,12 +156,12 @@ let tests =
     (
       "transition-duration: $(duration)",
       [%expr [%css "transition-duration: $(duration)"]],
-      [%expr (CSS.transitionDuration(duration): CSS.rule)],
+      [%expr CSS.transitionDuration(duration)],
     ),
     (
       "animation-play-state: $(state)",
       [%expr [%css "animation-play-state: $(state)"]],
-      [%expr (CSS.animationPlayState(state): CSS.rule)],
+      [%expr CSS.animationPlayState(state)],
     ),
     (
       "animation-play-state: paused;",

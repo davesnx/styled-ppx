@@ -17,10 +17,42 @@ If this test fail means that the module is not in sync with the ppx
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   
   CSS.textDecorationLine(`none);
-  CSS.textDecorationLine(`underline);
-  CSS.textDecorationLine(`overline);
-  CSS.textDecorationLine(`lineThrough);
-  CSS.unsafe({js|textDecorationLine|js}, {js|underline overline|js});
+  CSS.textDecorationLine(
+    CSS.Types.TextDecorationLine.Value.make(
+      ~underline=?Some(true),
+      ~overline=?None,
+      ~lineThrough=?None,
+      ~blink=?None,
+      (),
+    ),
+  );
+  CSS.textDecorationLine(
+    CSS.Types.TextDecorationLine.Value.make(
+      ~underline=?None,
+      ~overline=?Some(true),
+      ~lineThrough=?None,
+      ~blink=?None,
+      (),
+    ),
+  );
+  CSS.textDecorationLine(
+    CSS.Types.TextDecorationLine.Value.make(
+      ~underline=?None,
+      ~overline=?None,
+      ~lineThrough=?Some(true),
+      ~blink=?None,
+      (),
+    ),
+  );
+  CSS.textDecorationLine(
+    CSS.Types.TextDecorationLine.Value.make(
+      ~underline=?Some(true),
+      ~overline=?Some(true),
+      ~lineThrough=?None,
+      ~blink=?None,
+      (),
+    ),
+  );
   CSS.textDecorationColor(CSS.white);
   CSS.textDecorationStyle(`solid);
   CSS.textDecorationStyle(`double);
