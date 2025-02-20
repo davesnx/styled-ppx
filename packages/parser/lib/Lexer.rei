@@ -1,9 +1,6 @@
 /** Signals a lexing error at the provided source location. */
 exception LexingError((Lexing.position, Lexing.position, string));
 
-/** Makes the lexer be aware of whitespaces or not */
-let skip_whitespace: ref(bool);
-
 type token_with_location = {
   txt: result(Tokens.token, (Tokens.token, Tokens.error)),
   loc: Ast.loc,

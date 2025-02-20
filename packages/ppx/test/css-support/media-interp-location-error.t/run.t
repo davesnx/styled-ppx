@@ -13,10 +13,10 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 2, characters 11-20:
-  Error: Parse error while reading token '('
+  File "input.re", line 2, characters 19-21:
+  Error: Parse error while reading token '2'
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   
-  let _className = [%ocaml.error "Parse error while reading token '('"];
+  let _className = [%ocaml.error "Parse error while reading token '2'"];

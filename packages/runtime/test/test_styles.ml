@@ -146,7 +146,8 @@ let selector_nested =
         CSS.margin @@ CSS.px 10;
         CSS.selectorMany [| "a" |]
           [|
-            CSS.display `block; CSS.selectorMany [| "div" |] [| CSS.display `none |];
+            CSS.display `block;
+            CSS.selectorMany [| "div" |] [| CSS.display `none |];
           |];
       |]
   in
@@ -444,7 +445,8 @@ let keyframe =
 
 let global =
   test "global" @@ fun () ->
-  CSS.global [| CSS.selectorMany [| "html" |] [| CSS.lineHeight (`abs 1.15) |] |];
+  CSS.global
+    [| CSS.selectorMany [| "html" |] [| CSS.lineHeight (`abs 1.15) |] |];
   let css = get_string_style_rules () in
   assert_string css (Printf.sprintf "html{line-height:1.15;}")
 
@@ -559,7 +561,7 @@ let functional_pseudo =
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s .foo:is(ol, ul, menu:unsupported):is(ol, ul) { color: #008000; } \
+       ".%s .foo:is(ol, ul, menu:unsupported) :is(ol, ul) { color: #008000; } \
         .%s .foo:is(ol, ul) :is(ol, ul) ol { list-style-type: lower-greek; \
         color: #D2691E; } .%s .foo p:not(.irrelevant) { font-weight: 700; } \
         .%s .foo p > :not(strong, b.important) { color: #8B008B; } .%s \
@@ -568,7 +570,7 @@ let functional_pseudo =
         lower-greek; color: #D2691E; } .%s .foo:is(h1, h2, h3):has(+ :is(h2, \
         h3, h4)) { margin: 0 0 0.25rem 0; } .%s .foo body:has(video, audio) { \
         color: #FF0000; } .%s .foo body:has(video):has(audio) { color: \
-        #FF0000; } .%s .bar:is(ol, ul, menu:unsupported):is(ol, ul) { color: \
+        #FF0000; } .%s .bar:is(ol, ul, menu:unsupported) :is(ol, ul) { color: \
         #008000; } .%s .bar:is(ol, ul) :is(ol, ul) ol { list-style-type: \
         lower-greek; color: #D2691E; } .%s .bar p:not(.irrelevant) { \
         font-weight: 700; } .%s .bar p > :not(strong, b.important) { color: \
@@ -756,7 +758,8 @@ let selector_with_empty_interp =
 
 let style_tag =
   test "style_tag" @@ fun () ->
-  CSS.global [| CSS.selectorMany [| "html" |] [| CSS.lineHeight (`abs 1.15) |] |];
+  CSS.global
+    [| CSS.selectorMany [| "html" |] [| CSS.lineHeight (`abs 1.15) |] |];
   let animationName =
     CSS.keyframes
       [|
@@ -1188,6 +1191,47 @@ let ampersand_everywhere_global =
      .lola{font-size:5px;}.lola .foo .foo:focus .foo .foo \
      .lola{font-size:6px;}"
 
+let css_variable =
+  test "css_variable" @@ fun () ->
+  [%global
+    {|
+      :root {
+        --bs-dropdown-bg: #343a40;
+        --bs-dropdown-border-color: var(--bs-border-color-translucent, black);
+        --bs-dropdown-box-shadow: ;
+      }
+    |}];
+  let css = get_string_style_rules () in
+  assert_string css
+    ":root{--bs-dropdown-bg:#343a40;--bs-dropdown-border-color:var(--bs-border-color-translucent, \
+     black);--bs-dropdown-box-shadow:;}"
+
+let attribute_selector =
+  test "attribute_selector" @@ fun () ->
+  [%global
+    {|
+      [list]:not([type=date]):not([type=datetime-local]):not([type=month]):not([type=week]):not([type=time])::-webkit-calendar-picker-indicator {
+        display: none !important;
+      }
+
+      button,
+      [type=button],
+      [type=reset],
+      [type=submit] {
+        -webkit-appearance: button;
+      }
+      button:not(:disabled),
+      [type=button]:not(:disabled),
+      [type=reset]:not(:disabled),
+      [type=submit]:not(:disabled) {
+        cursor: pointer;
+      }
+    |}];
+  let css = get_string_style_rules () in
+  assert_string css
+    "[list]:not([type=date]):not([type=datetime-local]):not([type=month]):not([type=week]):not([type=time])::-webkit-calendar-picker-indicator{display:none \
+     !important;}button{-webkit-appearance:button;}[type=button]{-webkit-appearance:button;}[type=reset]{-webkit-appearance:button;}[type=submit]{-webkit-appearance:button;}button:not(:disabled){cursor:pointer;}[type=button]:not(:disabled){cursor:pointer;}[type=reset]:not(:disabled){cursor:pointer;}[type=submit]:not(:disabled){cursor:pointer;}"
+
 let tests =
   ( "CSS",
     [
@@ -1248,4 +1292,6 @@ let tests =
       mq_and_selectors_2;
       global_with_selector;
       ampersand_everywhere_global;
+      css_variable;
+      attribute_selector;
     ] )
