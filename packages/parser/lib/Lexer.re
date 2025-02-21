@@ -597,10 +597,7 @@ let rec get_next_token = lexbuf => {
   | '}' => RIGHT_BRACE
   | '{' => LEFT_BRACE
   | "::" => DOUBLE_COLON
-  | ':' =>
-    prev_skip_whitespace.contents = skip_whitespace.contents;
-    skip_whitespace.contents = false;
-    COLON;
+  | ':' => COLON;
   | '(' => LEFT_PAREN
   | ')' => RIGHT_PAREN
   | '[' => LEFT_BRACKET
@@ -617,15 +614,7 @@ let rec get_next_token = lexbuf => {
   | combinator => COMBINATOR(lexeme(lexbuf))
   | string => STRING(lexeme(~skip=1, ~drop=1, lexbuf))
   | important => IMPORTANT
-  | equal_sign => EQUAL_SIGN(lexeme(lexbuf))
-  | mq_operator => MEDIA_QUERY_OPERATOR(lexeme(lexbuf))
-  | mq_feature_comparison => MEDIA_FEATURE_COMPARISON(lexeme(lexbuf))
-  | all_media_type => ALL_MEDIA_TYPE(lexeme(lexbuf))
-  | screen_media_type => SCREEN_MEDIA_TYPE(lexeme(lexbuf))
-  | print_media_type => PRINT_MEDIA_TYPE(lexeme(lexbuf))
-  | at_media => AT_MEDIA(lexeme(~skip=1, lexbuf))
   | at_keyframes => AT_KEYFRAMES(lexeme(~skip=1, lexbuf))
-  | at_container => AT_CONTAINER(lexeme(~skip=1, lexbuf))
   | at_rule_without_body => AT_RULE_STATEMENT(lexeme(~skip=1, lexbuf))
   | at_rule => AT_RULE(lexeme(~skip=1, lexbuf))
   /* NOTE: should be placed above ident, otherwise pattern with

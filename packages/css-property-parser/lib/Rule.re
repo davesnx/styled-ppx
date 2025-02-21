@@ -127,7 +127,9 @@ module Pattern = {
           "Expected '"
           ++ humanize(expected)
           ++ "' but instead got "
-          ++ humanize(token),
+          ++ "'"
+          ++ humanize(token)
+          ++ "'.",
         ]),
     );
   let value = (value, rule) => Match.bind(rule, () => Match.return(value));

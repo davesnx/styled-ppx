@@ -205,7 +205,7 @@ style_rule:
     }
   }
 
-values: xs = list(loc(skip_ws(value))) { xs }
+values: xs = list(loc(value)) { xs }
 prelude_any: xs = list(loc(skip_ws(value))) { Paren_block xs }
 
 declarations:
