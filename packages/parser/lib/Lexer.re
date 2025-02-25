@@ -338,7 +338,7 @@ let important = [%sedlex.regexp?
 ];
 
 let length = [%sedlex.regexp?
-    // relative length units based on font
+  // relative length units based on font
   (_c, _a, _p) | (_c, _h) | (_e, _m) | (_e, _x) | (_i, _c) | (_l, _h) |
   // relative length units based on root element's font
   (_r, _c, _a, _p) |
@@ -597,7 +597,7 @@ let rec get_next_token = lexbuf => {
   | '}' => RIGHT_BRACE
   | '{' => LEFT_BRACE
   | "::" => DOUBLE_COLON
-  | ':' => COLON;
+  | ':' => COLON
   | '(' => LEFT_PAREN
   | ')' => RIGHT_PAREN
   | '[' => LEFT_BRACKET
