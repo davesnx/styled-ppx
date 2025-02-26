@@ -293,8 +293,8 @@ let test_with_location =
       19,
     ),
     ({|--color-main|}, [IDENT("--color-main")], 12),
-    ({|>=|}, [IDENT(">=")], 2),
-    ({|<=|}, [IDENT("<=")], 2),
+    ({|>=|}, [GTE], 2),
+    ({|<=|}, [LTE], 2),
   ]
   |> List.mapi((_index, (input, output, last_position)) => {
        let (loc, values) = parse(input);

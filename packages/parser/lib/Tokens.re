@@ -22,7 +22,10 @@ type token =
   | LEFT_PAREN // <(-token>
   | RIGHT_PAREN // <)-token>
   | LEFT_BRACE // <{-token>
-  | RIGHT_BRACE; // <}-token>
+  | RIGHT_BRACE // <}-token>
+  // handle media query lte and gte explicitly since we don't allow whitespace between gt,lt and eq
+  | GTE
+  | LTE;
 
 let string_of_char = c => String.make(1, c);
 
@@ -62,7 +65,9 @@ let humanize =
   | LEFT_PAREN => "("
   | RIGHT_PAREN => ")"
   | LEFT_BRACE => "{"
-  | RIGHT_BRACE => "}";
+  | RIGHT_BRACE => "}"
+  | GTE => ">="
+  | LTE => "<=";
 
 /* TODO: This should render Token, not Parser.token */
 let token_to_string =
