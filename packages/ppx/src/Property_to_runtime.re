@@ -296,31 +296,38 @@ let render_length = (~loc) =>
   fun
   | `Cap(_n) => raise(Unsupported_feature)
   | `Ch(n) => [%expr `ch([%e render_float(~loc, n)])]
-  | `Cm(n) => [%expr `cm([%e render_float(~loc, n)])]
+  | `Em(n) => [%expr `em([%e render_float(~loc, n)])]
+  | `Ex(n) => [%expr `ex([%e render_float(~loc, n)])]
+  | `Ic(_n) => raise(Unsupported_feature)
+  | `Lh(_n) => raise(Unsupported_feature)
+  | `Rcap(_n) => raise(Unsupported_feature)
+  | `Rch(_n) => raise(Unsupported_feature)
+  | `Rem(n) => [%expr `rem([%e render_float(~loc, n)])]
+  | `Rex(_n) => raise(Unsupported_feature)
+  | `Ric(_n) => raise(Unsupported_feature)
+  | `Rlh(_n) => raise(Unsupported_feature)
+
+  | `Vh(n) => [%expr `vh([%e render_float(~loc, n)])]
+  | `Vw(n) => [%expr `vw([%e render_float(~loc, n)])]
+  | `Vmax(n) => [%expr `vmax([%e render_float(~loc, n)])]
+  | `Vmin(n) => [%expr `vmin([%e render_float(~loc, n)])]
+  | `Vb(_n) => raise(Unsupported_feature)
+  | `Vi(_n) => raise(Unsupported_feature)
+
   | `Cqw(n) => [%expr `cqw([%e render_float(~loc, n)])]
   | `Cqh(n) => [%expr `cqh([%e render_float(~loc, n)])]
   | `Cqi(n) => [%expr `cqi([%e render_float(~loc, n)])]
   | `Cqb(n) => [%expr `cqb([%e render_float(~loc, n)])]
   | `Cqmin(n) => [%expr `cqmin([%e render_float(~loc, n)])]
   | `Cqmax(n) => [%expr `cqmax([%e render_float(~loc, n)])]
-  | `Em(n) => [%expr `em([%e render_float(~loc, n)])]
-  | `Ex(n) => [%expr `ex([%e render_float(~loc, n)])]
-  | `Ic(_n) => raise(Unsupported_feature)
-  | `In(_n) => raise(Unsupported_feature)
-  | `Lh(_n) => raise(Unsupported_feature)
+
+  | `Px(n) => [%expr `pxFloat([%e render_float(~loc, n)])]
+  | `Cm(n) => [%expr `cm([%e render_float(~loc, n)])]
   | `Mm(n) => [%expr `mm([%e render_float(~loc, n)])]
+  | `Q(_n) => raise(Unsupported_feature)
+  | `In(_n) => raise(Unsupported_feature)
   | `Pc(n) => [%expr `pc([%e render_float(~loc, n)])]
   | `Pt(n) => [%expr `pt([%e render_integer(~loc, n |> Float.to_int)])]
-  | `Px(n) => [%expr `pxFloat([%e render_float(~loc, n)])]
-  | `Q(_n) => raise(Unsupported_feature)
-  | `Rem(n) => [%expr `rem([%e render_float(~loc, n)])]
-  | `Rlh(_n) => raise(Unsupported_feature)
-  | `Vb(_n) => raise(Unsupported_feature)
-  | `Vh(n) => [%expr `vh([%e render_float(~loc, n)])]
-  | `Vi(_n) => raise(Unsupported_feature)
-  | `Vmax(n) => [%expr `vmax([%e render_float(~loc, n)])]
-  | `Vmin(n) => [%expr `vmin([%e render_float(~loc, n)])]
-  | `Vw(n) => [%expr `vw([%e render_float(~loc, n)])]
   | `Zero => [%expr `zero];
 
 let rec render_function_calc = (~loc, calc_sum) => {

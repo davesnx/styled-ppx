@@ -261,33 +261,37 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         "length",
         [%type:
           [
-            | `Em(number)
-            | `Ex(number)
             | `Cap(number)
             | `Ch(number)
+            | `Em(number)
+            | `Ex(number)
+            | `Ic(number)
+            | `Lh(number)
+            | `Rcap(number)
+            | `Rch(number)
+            | `Rem(number)
+            | `Rex(number)
+            | `Ric(number)
+            | `Rlh(number)
+            | `Vh(number)
+            | `Vw(number)
+            | `Vmax(number)
+            | `Vmin(number)
+            | `Vb(number)
+            | `Vi(number)
             | `Cqw(number)
             | `Cqh(number)
             | `Cqi(number)
             | `Cqb(number)
             | `Cqmin(number)
             | `Cqmax(number)
-            | `Ic(number)
-            | `Rem(number)
-            | `Lh(number)
-            | `Rlh(number)
-            | `Vw(number)
-            | `Vh(number)
-            | `Vi(number)
-            | `Vb(number)
-            | `Vmin(number)
-            | `Vmax(number)
+            | `Px(number)
             | `Cm(number)
             | `Mm(number)
             | `Q(number)
             | `In(number)
-            | `Pt(number)
             | `Pc(number)
-            | `Px(number)
+            | `Pt(number)
             | `Zero
           ]
         ],
@@ -307,19 +311,20 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       type_("percentage", [%type: float]),
       type_("ident", [%type: string]),
       type_("custom_ident", [%type: string]),
+      type_("dashed_ident", [%type: string]),
       type_("custom_ident_without_span_or_auto", [%type: string]),
       // abstract_type("string"), already represented by OCaml string type
       type_("url", [%type: string]),
       type_("hex_color", [%type: string]),
       type_("interpolation", [%type: list(string)]),
       type_("flex_value", [%type: [ | `Fr(float)]]),
-      type_("line_names", [%type: (unit, list(string), unit)]),
+      type_("media_type", [%type: string]),
+      type_("container_name", [%type: string]),
       // From Parser_helper, those are `invalid` represented here as unit
       type_("ident_token", [%type: unit]),
       type_("function_token", [%type: unit]),
       type_("string_token", [%type: unit]),
       type_("hash_token", [%type: unit]),
-      type_("dimension", [%type: unit]),
       type_("any_value", [%type: unit]),
       type_("declaration_value", [%type: unit]),
       type_("zero", [%type: unit]),

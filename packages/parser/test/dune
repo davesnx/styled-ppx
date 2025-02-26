@@ -1,5 +1,6 @@
 (test
  (name Runner)
+ (modules Lexer_test Parser_test Runner)
  (libraries
   sedlex
   styled-ppx.css-parser
@@ -13,3 +14,11 @@
  (deps Runner.exe)
  (action
   (run %{deps})))
+
+(executable
+ (name Render_test)
+ (modules Render_test)
+ (libraries styled-ppx.css-parser ppxlib))
+
+(cram
+ (deps Render_test.exe))
