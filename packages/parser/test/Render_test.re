@@ -15,7 +15,7 @@ switch (
   )
 ) {
 | Ok(declarations) =>
-  print_endline(Styled_ppx_css_parser.Render.render_rule_list(declarations))
+  print_endline(Styled_ppx_css_parser.Render.rule_list(declarations))
 | Error((loc, msg)) =>
   open Styled_ppx_css_parser.Ast;
   let position = loc.loc_start;
