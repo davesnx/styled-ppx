@@ -505,7 +505,7 @@ and media_feature = [%value.rec
   "'(' [ <mf-plain> | <mf-boolean> | <mf-range> ] ')'"
 ]
 and media_in_parens = [%value.rec
-  "'(' <media-condition> ')' | <media-feature> | <general-enclosed> | <interpolation>"
+  "'(' <media-condition> ')' | <media-feature> | <interpolation>"
 ]
 and media_or = [%value.rec "'or' <media-in-parens>"]
 and media_and = [%value.rec "'and' <media-in-parens>"]
@@ -526,7 +526,7 @@ and container_query = [%value.rec
   "'not' <query-in-parens> | <query-in-parens> [ [ 'and' <query-in-parens> ]* | [ 'or' <query-in-parens> ]* ]"
 ]
 and query_in_parens = [%value.rec
-  "'(' <container-query> ')' | '(' <size-feature> ')' | style( <style-query> ) | <general-enclosed>"
+  "'(' <container-query> ')' | '(' <size-feature> ')' | style( <style-query> )"
 ]
 and size_feature = [%value.rec
   "<mf-plain> | <mf-boolean> | <mf-range>"
@@ -536,7 +536,7 @@ and style_query = [%value.rec
 ]
 and style_feature = [%value.rec "<dashed_ident> ':' <mf-value>"]
 and style_in_parens = [%value.rec
-  "'(' <style-query> ')' | '(' <style-feature> ')' | <general-enclosed>"
+  "'(' <style-query> ')' | '(' <style-feature> ')'"
 ]
 and name_repeat = [%value.rec
   "repeat( [ <positive-integer> | 'auto-fill' ] ',' [ <line-names> ]+ )"
@@ -1955,7 +1955,7 @@ and supports_condition = [%value.rec
 and supports_decl = [%value.rec "'(' <declaration> ')'"]
 and supports_feature = [%value.rec "<supports-decl> | <supports-selector-fn>"]
 and supports_in_parens = [%value.rec
-  "'(' <supports-condition> ')' | <supports-feature> | <general-enclosed>"
+  "'(' <supports-condition> ')' | <supports-feature>"
 ]
 and supports_selector_fn = [%value.rec "selector( <complex-selector> )"]
 and svg_length = [%value.rec
