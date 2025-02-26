@@ -243,3 +243,22 @@ Complex selector test
   > }
   > EOF
   div#main.container[data-role="content"]:not(:empty):nth-child(2n+1) > ul li:nth-of-type(odd):first-child a[target="_blank"]:hover{color:red;}section[lang|="en"] + article#special ~ aside:last-of-type *{color:red;}input[type="checkbox"]:checked:focus{color:red;}p::before{color:red;}
+
+CSS Variable
+  $ cat <<"EOF" | run
+  > :root {
+  >   --bs-dropdown-bg: #343a40;
+  >   --bs-dropdown-border-color: var(--bs-border-color-translucent, black);
+  >   --bs-dropdown-box-shadow: ;
+  > }
+  > EOF
+  :root{--bs-dropdown-bg:#343a40;--bs-dropdown-border-color:var(--bs-border-color-translucent, black);--bs-dropdown-box-shadow:;}
+
+Ampersand on root
+  $ cat <<"EOF" | run
+  > color: green;
+  > & .test {
+  >   color: white;
+  > }
+  > EOF
+  color:green;& .test{color:white;}
