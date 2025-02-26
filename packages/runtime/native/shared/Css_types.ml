@@ -263,6 +263,7 @@ module Length = struct
     | #Percentage.t as p -> Percentage.toString p
     | `calc calc -> calc_value_to_string calc
     | (`min _ | `max _) as x -> minmax_to_string x
+    | #Var.t as x -> Var.toString x
 
   and calc_value_to_string x =
     match x with
@@ -467,10 +468,10 @@ module TabSize = struct
     ]
 
   let toString = function
-    | `num n -> Kloth.Float.to_string n
-    | #Length.t as len -> Length.toString len
     | #Var.t as var -> Var.toString var
     | #Cascading.t as c -> Cascading.toString c
+    | `num n -> Kloth.Float.to_string n
+    | #Length.t as len -> Length.toString len
 end
 
 module Overflow = struct
@@ -506,10 +507,10 @@ module Margin = struct
 
   let toString (x : t) =
     match x with
-    | #Auto.t -> Auto.toString
-    | #Length.t as l -> Length.toString l
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
+    | #Auto.t -> Auto.toString
+    | #Length.t as l -> Length.toString l
 end
 
 module GridAutoFlow = struct
@@ -545,11 +546,11 @@ module Gap = struct
 
   let toString (x : t) =
     match x with
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
     | `normal -> {js|normal|js}
     | #Percentage.t as p -> Percentage.toString p
     | #Length.t as l -> Length.toString l
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module StrokeDashArray = struct
@@ -561,9 +562,9 @@ module StrokeDashArray = struct
 
   let toString (x : t) =
     match x with
-    | #Length.t as l -> Length.toString l
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
+    | #Length.t as l -> Length.toString l
 end
 
 module ScrollBehavior = struct
@@ -643,6 +644,8 @@ module VerticalAlign = struct
 
   let toString (x : t) =
     match x with
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
     | `baseline -> {js|baseline|js}
     | `sub -> {js|sub|js}
     | `super -> {js|super|js}
@@ -652,8 +655,6 @@ module VerticalAlign = struct
     | `bottom -> {js|bottom|js}
     | `textBottom -> {js|text-bottom|js}
     | #Length.t as l -> Length.toString l
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module EasingFunction = struct
@@ -1738,10 +1739,10 @@ module Perspective = struct
 
   let toString (x : t) =
     match x with
-    | #None.t -> None.toString
-    | #Length.t as l -> Length.toString l
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
+    | #None.t -> None.toString
+    | #Length.t as l -> Length.toString l
 end
 
 module LetterSpacing = struct
@@ -1756,10 +1757,10 @@ module LetterSpacing = struct
 
   let toString (x : t) =
     match x with
-    | `normal -> {js|normal|js}
-    | #Length.t as l -> Length.toString l
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
+    | `normal -> {js|normal|js}
+    | #Length.t as l -> Length.toString l
 end
 
 module LineHeight = struct
@@ -1773,11 +1774,11 @@ module LineHeight = struct
 
   let toString (x : t) =
     match x with
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
     | `normal -> {js|normal|js}
     | `abs x -> Kloth.Float.to_string x
     | #Length.t as l -> Length.toString l
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module LineWidth = struct
@@ -1807,10 +1808,10 @@ module WordSpacing = struct
 
   let toString (x : t) =
     match x with
-    | `normal -> {js|normal|js}
-    | #Length.t as l -> Length.toString l
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
+    | `normal -> {js|normal|js}
+    | #Length.t as l -> Length.toString l
 end
 
 module Display = struct
@@ -2099,6 +2100,8 @@ module TransformOrigin = struct
 
   let toString (x : t) =
     match x with
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
     | #X.t as x -> X.toString x
     | #Y.t as x -> Y.toString x
     | #Length.t as x -> Length.toString x
@@ -2121,8 +2124,6 @@ module TransformOrigin = struct
         | #Length.t as l -> Length.toString l)
       ^ {js||js}
       ^ Length.toString o
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module OffsetAnchor = struct
@@ -2135,10 +2136,10 @@ module OffsetAnchor = struct
 
   let toString (x : t) =
     match x with
-    | #Auto.t -> Auto.toString
-    | #Position.t as x -> Position.toString x
     | #Cascading.t as x -> Cascading.toString x
     | #Var.t as x -> Var.toString x
+    | #Auto.t -> Auto.toString
+    | #Position.t as x -> Position.toString x
 end
 
 module MaskPosition = struct
@@ -2150,9 +2151,9 @@ module MaskPosition = struct
 
   let toString (x : t) =
     match x with
-    | #Position.t as x -> Position.toString x
     | #Cascading.t as x -> Cascading.toString x
     | #Var.t as x -> Var.toString x
+    | #Position.t as x -> Position.toString x
 end
 
 module ObjectPosition = struct
@@ -2235,9 +2236,9 @@ module BackgroundPosition = struct
 
   let toString (x : t) =
     match x with
-    | #Value.t as x -> Value.toString x
     | #Cascading.t as x -> Cascading.toString x
     | #Var.t as x -> Var.toString x
+    | #Value.t as x -> Value.toString x
 end
 
 module PositionalAlignment = struct
@@ -3189,9 +3190,9 @@ module TextDecorationThickness = struct
 
   let toString (x : t) =
     match x with
-    | #Value.t as x -> Value.toString x
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
+    | #Value.t as x -> Value.toString x
 end
 
 module TextDecorationSkipInk = struct
@@ -3303,9 +3304,9 @@ module Width = struct
 
   let toString (x : t) =
     match x with
-    | #Value.t as x -> Value.toString x
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
+    | #Value.t as x -> Value.toString x
 end
 
 module MinWidth = struct
@@ -3318,10 +3319,10 @@ module MinWidth = struct
 
   let toString (x : t) =
     match x with
-    | #None.t -> None.toString
-    | #Width.Value.t as w -> Width.Value.toString w
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
+    | #None.t -> None.toString
+    | #Width.Value.t as w -> Width.Value.toString w
 end
 
 module MaxWidth = struct
@@ -3334,10 +3335,10 @@ module MaxWidth = struct
 
   let toString (x : t) =
     match x with
-    | #None.t -> None.toString
-    | #Width.Value.t as mw -> Width.Value.toString mw
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
+    | #None.t -> None.toString
+    | #Width.Value.t as mw -> Width.Value.toString mw
 end
 
 module FlexBasis = struct
@@ -3361,9 +3362,9 @@ module FlexBasis = struct
 
   let toString (x : t) =
     match x with
-    | #Value.t as x -> Value.toString x
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
+    | #Value.t as x -> Value.toString x
 end
 
 module Height = struct
@@ -3379,13 +3380,13 @@ module Height = struct
 
   let toString (x : t) =
     match x with
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
     | #Auto.t -> Auto.toString
     | `fitContent -> {js|fit-content|js}
     | `maxContent -> {js|max-content|js}
     | `minContent -> {js|min-content|js}
     | #Length.t as l -> Length.toString l
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module MaxHeight = struct
@@ -3671,9 +3672,9 @@ module BackgroundSize = struct
 
   let toString (x : t) =
     match x with
-    | #Value.t as x -> Value.toString x
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
+    | #Value.t as x -> Value.toString x
 end
 
 module Image = struct
@@ -3866,11 +3867,11 @@ module Flex = struct
 
   let toString (x : t) =
     match x with
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
     | #None.t -> None.toString
     | #FlexBasis.Value.t as x -> FlexBasis.Value.toString x
     | `num x -> Kloth.Float.to_string x
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module TransformStyle = struct
@@ -4681,8 +4682,8 @@ module Translate = struct
 
     let toString (x : t) =
       match x with
-      | #Length.t as x -> Length.toString x
       | #Var.t as x -> Var.toString x
+      | #Length.t as x -> Length.toString x
   end
 
   type t =
@@ -4832,9 +4833,9 @@ module Bottom = struct
 
   let toString (x : t) =
     match x with
+    | #Var.t as x -> Var.toString x
     | #Length.t as x -> Length.toString x
     | #Cascading.t as x -> Cascading.toString x
-    | #Var.t as x -> Var.toString x
 end
 
 module Top = struct
@@ -4948,9 +4949,9 @@ module BorderImageWidth = struct
 
   let toString (x : t) =
     match x with
-    | #Value.t as x -> Value.toString x
     | #Cascading.t as x -> Cascading.toString x
     | #Var.t as x -> Var.toString x
+    | #Value.t as x -> Value.toString x
 end
 
 module BorderImageOutset = struct
@@ -4974,9 +4975,9 @@ module BorderImageOutset = struct
 
   let toString (x : t) =
     match x with
-    | #Value.t as x -> Value.toString x
     | #Cascading.t as x -> Cascading.toString x
     | #Var.t as x -> Var.toString x
+    | #Value.t as x -> Value.toString x
 end
 
 module BorderImageRepeat = struct
@@ -5096,8 +5097,8 @@ module OverflowClipMargin = struct
 
     let toString x =
       match x with
-      | #Length.t as l -> Length.toString l
       | #Var.t as va -> Var.toString va
+      | #Length.t as l -> Length.toString l
   end
 
   type t =

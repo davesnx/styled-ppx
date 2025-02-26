@@ -157,6 +157,7 @@ let rec modify =
   | `vmin(f) => `vmin(fn_float(f))
   | `vw(f) => `vw(fn_float(f))
   | `zero => `zero
+  | #CSS.Types.Var.t as v => v
   };
 
 let negate_in_calc = (v: calc_value): calc_value =>

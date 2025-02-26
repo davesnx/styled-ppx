@@ -2,7 +2,12 @@ open Styled_ppx_css_parser.Tokens;
 open Rule.Let;
 open Rule.Pattern;
 
-let keyword = string => expect(IDENT(string));
+let keyword =
+  fun
+  | "<=" => expect(LTE)
+  | ">=" => expect(GTE)
+  | s => expect(IDENT(s));
+
 let comma = expect(COMMA);
 let delim =
   fun

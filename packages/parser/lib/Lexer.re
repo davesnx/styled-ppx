@@ -894,8 +894,8 @@ let consume = lexbuf => {
     };
   | ":" => Ok(COLON)
   | ";" => Ok(SEMI_COLON)
-  | "<=" => Ok(IDENT("<="))
-  | ">=" => Ok(IDENT(">="))
+  | "<=" => Ok(LTE)
+  | ">=" => Ok(GTE)
   | "<" => Ok(DELIM("<"))
   | "@" =>
     if (check_if_three_codepoints_would_start_an_identifier(lexbuf)) {
