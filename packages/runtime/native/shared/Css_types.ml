@@ -185,6 +185,7 @@ module Length = struct
     | `pt of int
     | `zero
     | Percentage.t
+    | Var.t
     ]
 
   type calc_value =
