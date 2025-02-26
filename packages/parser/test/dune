@@ -21,4 +21,4 @@
  (libraries styled-ppx.css-parser ppxlib))
 
 (cram
- (deps Render_test.exe ./test.css))
+ (deps Render_test.exe))

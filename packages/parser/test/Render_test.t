@@ -136,7 +136,7 @@ Nested with media query
   >   ::before {
   >     position: absolute;
   >     left: -20px;
-  >     content: "✓";
+  >     content: "check";
   >   }
   > 
   >   @media screen and (min-width: 600px) {
@@ -144,7 +144,7 @@ Nested with media query
   >   }
   > }
   > EOF
-  li{list-style-type:none;}li::before{position:absolute;left:-20px;content:"â";}@media screen and (min-width: 600px) {li{position:relative;}}
+  li{list-style-type:none;}li::before{position:absolute;left:-20px;content:"check";}@media screen and (min-width: 600px) {li{position:relative;}}
 
 Nested pseudo class and selector
   $ cat <<"EOF" | run

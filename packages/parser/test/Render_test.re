@@ -8,26 +8,34 @@ let rec read_and_print = lines =>
 
 let lines = read_and_print([]) |> String.concat("\n");
 
-switch (
-  Styled_ppx_css_parser.Driver.parse_declaration_list(
-    ~loc=Ppxlib.Location.none,
-    lines,
-  )
-) {
-| Ok(declarations) =>
-  print_endline(Styled_ppx_css_parser.Render.rule_list(declarations))
-| Error((loc, msg)) =>
-  open Styled_ppx_css_parser.Ast;
-  let position = loc.loc_start;
-  let curr_char_pos = position.pos_cnum;
-  let lnum = position.pos_lnum;
-  let pos_bol = position.pos_bol;
-  print_endline(
-    Printf.sprintf(
-      "Error parsing CSS: %s on line %i at position %i",
-      msg,
-      lnum,
-      curr_char_pos - pos_bol,
-    ),
-  );
+let parse_exn = css =>
+  switch (
+    Styled_ppx_css_parser.Driver.parse_declaration_list(
+      ~loc=Ppxlib.Location.none,
+      css,
+    )
+  ) {
+  | Ok(declarations) =>
+    Ok(Styled_ppx_css_parser.Render.rule_list(declarations))
+  | Error((loc, msg)) =>
+    open Styled_ppx_css_parser.Ast;
+    let position = loc.loc_start;
+    let curr_char_pos = position.pos_cnum;
+    let lnum = position.pos_lnum;
+    let pos_bol = position.pos_bol;
+    Error(
+      Printf.sprintf(
+        "Error parsing CSS: %s on line %i at position %i",
+        msg,
+        lnum,
+        curr_char_pos - pos_bol,
+      ),
+    );
+  };
+
+let value = parse_exn(lines);
+let value = Result.bind(value, parse_exn);
+switch (value) {
+| Ok(parsed_css) => print_endline(parsed_css)
+| Error(error_msg) => print_endline(error_msg)
 };
