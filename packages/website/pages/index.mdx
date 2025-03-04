@@ -2,11 +2,11 @@
 title: Introduction to styled-ppx
 ---
 
-### styled components with type-safe CSS for ReScript, Melange and Native
+### styled components with type-safe CSS for ReScript, Melange and OCaml.
 
-**styled-ppx** is a [ppx](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem) and a library that brings styled components to ReScript, Melange and Native. Create **React Components** with type-safe style definitions with only CSS.
+**styled-ppx** is a [ppx](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem) and a library that brings styled components to ReScript, Melange and OCaml. Create **React Components** or simply `className` with type-safe style definitions with only CSS.
 
-It allows you to style apps safely, quickly, and performant - just as you always done it.
+It allows you to style apps safely, quickly, and performantly - just as you always done it.
 
 ```rescript
 module Center = %styled.div(`
@@ -19,6 +19,7 @@ module Center = %styled.div(`
 
 <Center> {React.string("Hello from the future!")} </Center>
 ```
+
 ```reason
 module Center = [%styled.div {|
   height: 100vh;
@@ -33,7 +34,7 @@ module Center = [%styled.div {|
 
 ## Type-safe CSS
 
-styled-ppx comes with its own CSS Parser and CSS type-checker, so you can write CSS and be sure it will be valid and all types will be correct. This is a **huge** time-saver when working at large scale with CSS.
+styled-ppx comes with its own CSS Parser and type-checker, so you can write CSS and be sure it will be valid and all types will be correct. This is a **huge** time-saver when working at a large scale with CSS.
 
 ## Features
 
@@ -41,7 +42,7 @@ styled-ppx comes with its own CSS Parser and CSS type-checker, so you can write 
 - **Component-based styling**
 - Supports the power of the underlying language: pattern-matching, composition, labelled arguments, static type-safety.
 - Implements utilities such as `cx` to generate classNames and `css` to generate `Css.rule`
-- Supports [ReScript](https://rescript-lang.org/), [Melange](https://melange.re) and [native](/getting-started/native.mdx).
+- Supports [ReScript](https://rescript-lang.org/), [Melange](https://melange.re) and [OCaml](/getting-started/native.mdx).
 - Integrates with [`@rescript-react`](https://rescript-lang.org/docs/react/latest/introduction), [`reason-react`](https://reasonml.github.io/reason-react/), and [`server-reason-react`](https://github.com/ml-in-barcelona/server-reason-react)
 - It can also work without React
 - Adds labels on the className hashes for better DX
