@@ -3941,13 +3941,43 @@ module FontFace = struct
 end
 
 module FontFamilyName = struct
-  type t = string
+  type t =
+    [ `serif
+    | `sans_serif
+    | `monospace
+    | `cursive
+    | `fantasy
+    | `system_ui
+    | `ui_serif
+    | `ui_sans_serif
+    | `ui_monospace
+    | `ui_rounded
+    | `emoji
+    | `math
+    | `fangsong
+    | `custom of string
+    ]
 
-  let toString (x : t) =
-    match String.get x 0 with
-    | '\'' -> x
-    | '"' -> x
-    | _ -> ({js|"|js} ^ x) ^ {js|"|js}
+    let toString (x : t) =
+      match x with
+      | `serif -> {js|serif|js}
+      | `sans_serif -> {js|sans-serif|js}
+      | `monospace -> {js|monospace|js}
+      | `cursive -> {js|cursive|js}
+      | `fantasy -> {js|fantasy|js}
+      | `system_ui -> {js|system-ui|js}
+      | `ui_serif -> {js|ui-serif|js}
+      | `ui_sans_serif -> {js|ui-sans-serif|js}
+      | `ui_monospace -> {js|ui-monospace|js}
+      | `ui_rounded -> {js|ui-rounded|js}
+      | `emoji -> {js|emoji|js}
+      | `math -> {js|math|js}
+      | `fangsong -> {js|fangsong|js}
+      | `custom s -> 
+        match String.get s 0 with
+        | '\'' -> s
+        | '"' -> s
+        | _ -> ({js|"|js} ^ s) ^ {js|"|js}
 end
 
 module FontDisplay = struct

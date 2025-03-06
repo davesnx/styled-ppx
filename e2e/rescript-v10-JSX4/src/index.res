@@ -116,7 +116,7 @@ module Button = %styled.button(
   }
 )
 
-let fonts = ["Inter"]
+let fonts = [#custom("Inter")]
 
 let title = CSS.style([
   CSS.label("title"),

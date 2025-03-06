@@ -12,8 +12,10 @@ let testData = [
   (Content.toString(#text(`'single'`)), `'single'`),
   (Content.toString(#text(`"double"`)), `"double"`),
   (Content.toString(#text(`'`)), `"'"`),
-  (FontFamily.toString("Inter"), `"Inter"`),
-  (FontFamily.toString(`"Inter Bold"`), `"Inter Bold"`),
+  (FontFamily.toString(#custom("Inter")), `"Inter"`),
+  (FontFamily.toString(#custom("Inter Bold")), `"Inter Bold"`),
+  (FontFamily.toString(#serif), `serif`),
+  (FontFamily.toString(#sans_serif), `sans-serif`),
 ]
 
 describe("content as string", () => {
@@ -30,8 +32,16 @@ let testData = list{
   (%css(`content: '"'`), CSS.contentRule(#text("\""))),
   (%css(`content: "'"`), CSS.contentRule(#text("'"))),
   (%css(`content: 'xxx'`), CSS.contentRule(#text(`xxx`))),
-  (%css(`font-family: "Lola"`), CSS.fontFamily("Lola")),
-  (%css(`font-family: "Lola del rio"`), CSS.fontFamily("Lola del rio")),
+  (%css(`font-family: "Lola"`), CSS.fontFamily(#custom("Lola"))),
+  (%css(`font-family: "Lola del rio"`), CSS.fontFamily(#custom("Lola del rio"))),
+  (%css(`font-family: serif`), CSS.fontFamily(#serif)),
+  (%css(`font-family: sans-serif`), CSS.fontFamily(#sans_serif)),
+  (%css(`font-family: fantasy`), CSS.fontFamily(#fantasy)),
+  (%css(`font-family: cursive`), CSS.fontFamily(#cursive)),
+  (%css(`font-family: monospace`), CSS.fontFamily(#monospace)),
+  (%css(`font-family: serif`), CSS.fontFamily(#serif)),
+  (%css(`font-family: sans-serif`), CSS.fontFamily(#sans_serif)),
+
 }
 
 describe("content to rule", () => {
