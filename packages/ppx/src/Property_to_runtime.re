@@ -2442,19 +2442,27 @@ let hanging_punctuation =
 
 let render_generic_family = (~loc) =>
   fun
-  | `Cursive => [%expr "cursive"]
-  | `Fantasy => [%expr "fantasy"]
-  | `Monospace => [%expr "monospace"]
-  | `Sans_serif => [%expr "sans-serif"]
-  | `Serif => [%expr "serif"]
-  | `_apple_system => [%expr "-apple-system"];
+  | `Cursive => [%expr `cursive]
+  | `Fantasy => [%expr `fantasy]
+  | `Monospace => [%expr `monospace]
+  | `Sans_serif => [%expr `sans_serif]
+  | `Serif => [%expr `serif]
+  | `System_ui => [%expr `system_ui]
+  | `Ui_serif => [%expr `ui_serif]
+  | `Ui_sans_serif => [%expr `ui_sans_serif]
+  | `Ui_monospace => [%expr `ui_monospace]
+  | `Ui_rounded => [%expr `ui_rounded]
+  | `Emoji => [%expr `emoji]
+  | `Math => [%expr `math]
+  | `Fangsong => [%expr `fangsong]
+  | `_apple_system => [%expr `apple_system];
 
 let render_font_family = (~loc, value) =>
   switch (value) {
   | `Interpolation(v) => render_variable(~loc, v)
   | `Generic_family(v) => render_generic_family(~loc, v)
-  | `Family_name(`String(str)) => render_string(~loc, str)
-  | `Family_name(`Custom_ident(ident)) => render_string(~loc, ident)
+  | `Family_name(`String(str)) => [%expr `quoted([%e render_string(~loc, str)])]
+  | `Family_name(`Custom_ident(ident)) => [%expr `quoted([%e render_string(~loc, ident)])]
   };
 
 // css-fonts-4
@@ -2476,7 +2484,7 @@ let font_family =
           CSS.fontFamilies(
             [%e
               font_families
-              |> List.map(render_font_family(~loc))
+              |> List.map(render_font_family(~loc)) 
               |> Builder.pexp_array(~loc)
             ],
           )
