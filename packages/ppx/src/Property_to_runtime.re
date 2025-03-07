@@ -2455,14 +2455,14 @@ let render_generic_family = (~loc) =>
   | `Emoji => [%expr `emoji]
   | `Math => [%expr `math]
   | `Fangsong => [%expr `fangsong]
-  | `_apple_system => [%expr `custom("-apple-system")];
+  | `_apple_system => [%expr `apple_system];
 
 let render_font_family = (~loc, value) =>
   switch (value) {
   | `Interpolation(v) => render_variable(~loc, v)
   | `Generic_family(v) => render_generic_family(~loc, v)
-  | `Family_name(`String(str)) => [%expr `custom([%e render_string(~loc, str)])]
-  | `Family_name(`Custom_ident(ident)) => [%expr `custom([%e render_string(~loc, ident)])]
+  | `Family_name(`String(str)) => [%expr `quoted([%e render_string(~loc, str)])]
+  | `Family_name(`Custom_ident(ident)) => [%expr `quoted([%e render_string(~loc, ident)])]
   };
 
 // css-fonts-4

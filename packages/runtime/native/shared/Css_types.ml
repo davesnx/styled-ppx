@@ -3955,7 +3955,8 @@ module FontFamilyName = struct
     | `emoji
     | `math
     | `fangsong
-    | `custom of string
+    | `apple_system 
+    | `quoted of string
     ]
 
     let toString (x : t) =
@@ -3973,7 +3974,8 @@ module FontFamilyName = struct
       | `emoji -> {js|emoji|js}
       | `math -> {js|math|js}
       | `fangsong -> {js|fangsong|js}
-      | `custom s -> 
+      | `apple_system -> {js|-apple-system|js}
+      | `quoted s -> 
         match String.get s 0 with
         | '\'' -> s
         | '"' -> s
