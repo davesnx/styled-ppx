@@ -246,6 +246,14 @@ let ampersand_everywhere =
       .lola & & & & .lola {
         font-size: 6px;
       }
+      .a {
+        .b & {
+          color: yellow;
+          .c & {
+            margin: 1px;
+          }
+        }
+      }
     |}]
   in
   let css = get_string_style_rules () in
@@ -253,9 +261,10 @@ let ampersand_everywhere =
     (Printf.sprintf
        ".%s { font-size: 1px; } .%s .lola { font-size: 2px; } .%s .lola .%s { \
         font-size: 3px; } .lola .%s { font-size: 4px; } .%s .lola { font-size: \
-        5px; } .lola .%s .%s .%s .%s .lola { font-size: 6px; }"
+        5px; } .lola .%s .%s .%s .%s .lola { font-size: 6px; } .b .%s .a { \
+        color: #FFFF00; } .c .b .%s .a { margin: 1px; }"
        classname classname classname classname classname classname classname
-       classname classname classname)
+       classname classname classname classname classname)
 
 let ampersand_everywhere_2 =
   test "ampersand_everywhere_2" @@ fun () ->
@@ -268,13 +277,57 @@ let ampersand_everywhere_2 =
           display: none;
         }
       }
+      .lola {
+        .felipe & {
+          display: none;
+        }
+      }
+
+      &:first-child {
+        .felipe & {
+          display: none;
+        }
+      }
+      :first-child {
+        .felipe & {
+          display: none;
+        }
+      }
     |}]
   in
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s { font-size: 1px; } .felipe .%s .lola { display: none; }" classname
-       classname)
+       ".%s { font-size: 1px; } .felipe .%s .lola { display: none; } .felipe \
+        .%s .lola { display: none; } .felipe .%s:first-child { display: none; \
+        } .felipe .%s:first-child { display: none; }"
+       classname classname classname classname classname)
+
+let ampersand_everywhere_3 =
+  test "ampersand_everywhere_3" @@ fun () ->
+  let classname =
+    [%cx
+      {|
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+
+        :first-child {
+          .random-class & {
+            @media (min-width: 768px) {
+              color: green;
+            }
+          }
+        }
+    |}]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s { margin: 0; padding: 0; list-style-type: none; } @media \
+        (min-width: 768px) { .random-class .%s:first-child { color: #008000; } \
+        }"
+       classname classname)
 
 let pseudo_selectors_everywhere =
   test "pseudo_selectors_everywhere " @@ fun () ->
@@ -1261,6 +1314,7 @@ let tests =
       selector_ampersand_at_the_middle;
       ampersand_everywhere;
       ampersand_everywhere_2;
+      ampersand_everywhere_3;
       selector_params;
       selectors_with_coma;
       selectors_with_coma_simple;

@@ -139,6 +139,13 @@ let resolve_ampersand hash selector =
     Printf.sprintf ".%s%s" hash resolved_selector
   else Printf.sprintf ".%s %s" hash resolved_selector
 
+let add_ampersand selector =
+  if contains_ampersand selector then selector
+  else if starts_with_at selector then selector
+    (* This is the differente between SASS and Emotion. Emotion doesn't add a space on pseuo-selectors, while SASS does *)
+  else if starts_with_double_dot selector then Printf.sprintf "&%s" selector
+  else Printf.sprintf "& %s" selector
+
 let remove_media_from_selector selector =
   (* replace "@media" from "@media (min-width: 768px)" *)
   chop_prefix ~pre:"@media " selector |> Option.value ~default:selector
@@ -264,7 +271,7 @@ let split_multiple_selectors rule_list =
     ~init:[] rule_list
   |> Array.of_list
 
-let resolve_selectors rules =
+let resolve_selectors ?(prefix_with_ampersand = true) rules =
   (* unnest takes a list of rules and unnest them into a flat list of rules *)
   let rec unnest_selectors ~prefix rules =
     (* multiple selectors are defined with commas: like .a, .b {}
@@ -280,6 +287,9 @@ let resolve_selectors rules =
           match prefix with
           | None -> current_selector.(0)
           | Some prefix ->
+            let prefix =
+              if prefix_with_ampersand then add_ampersand prefix else prefix
+            in
             if contains_ampersand current_selector.(0) then
               (* reemplazar el ampersand del current_selector, con el padre *)
               replace_ampersand ~by:prefix current_selector.(0)
@@ -466,7 +476,7 @@ let get_stylesheet () =
       if i > 0 then Buffer.add_char buffer ' ';
       match rule with
       | Globals rule ->
-        let new_rule = resolve_selectors rule in
+        let new_rule = resolve_selectors ~prefix_with_ampersand:false rule in
         Buffer.add_string buffer (rules_to_string new_rule)
       | Classnames { className; styles } ->
         render_rules ~buffer className styles
