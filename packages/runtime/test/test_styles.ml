@@ -453,7 +453,7 @@ let global =
 let fontFace =
   test "global" @@ fun () ->
   let _ =
-    CSS.fontFace ~fontFamily:"foo" ~fontWeight:`bold
+    CSS.fontFace ~fontFamily:(`quoted "foo") ~fontWeight:`bold
       ~src:[| `url "foo.bar" |]
       ~fontDisplay:`swap ~fontStyle:`normal ()
       ~unicodeRange:
