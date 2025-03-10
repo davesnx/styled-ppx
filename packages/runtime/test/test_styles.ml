@@ -305,6 +305,10 @@ let ampersand_everywhere_2 =
 
 let ampersand_everywhere_3 =
   test "ampersand_everywhere_3" @@ fun () ->
+  let hasTwoColumnList = "css-1t4likh-hasTwoColumnList" in
+  let borderColor = CSS.rgba 255 255 255 (`num 0.3) in
+  let desktopDown = "(max-width: 1279px)" in
+  let px16 = `px 16 in
   let classname =
     [%cx
       {|
@@ -313,9 +317,10 @@ let ampersand_everywhere_3 =
         list-style-type: none;
 
         :first-child {
-          .random-class & {
-            @media (min-width: 768px) {
-              color: green;
+          .$(hasTwoColumnList) & {
+            @media $(desktopDown) {
+              padding-bottom: $(px16);
+              border-bottom: 1px solid $(borderColor);
             }
           }
         }
@@ -325,8 +330,9 @@ let ampersand_everywhere_3 =
   assert_string css
     (Printf.sprintf
        ".%s { margin: 0; padding: 0; list-style-type: none; } @media \
-        (min-width: 768px) { .random-class .%s:first-child { color: #008000; } \
-        }"
+        (max-width: 1279px) { .css-1t4likh-hasTwoColumnList .%s:first-child { \
+        padding-bottom: 16px; border-bottom: 1px solid rgba(255, 255, 255, \
+        0.3); } }"
        classname classname)
 
 let pseudo_selectors_everywhere =
