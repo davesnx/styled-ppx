@@ -1,5 +1,14 @@
 open Ast;
 
+module List = {
+  include List;
+  /* To be compatible with OCaml 4.14 Stdlib */
+  let is_empty =
+    fun
+    | [] => true
+    | [_, ..._] => false;
+};
+
 let rec contains_ampersand = (selector: selector) => {
   switch (selector) {
   | SimpleSelector(Ampersand) => true
@@ -58,28 +67,12 @@ let pop_last_selector =
   | ComplexSelector(Combinator({left, right})) => {
       let (ctor, last) = right |> List.rev |> List.hd;
       let rest = right |> List.rev |> List.tl |> List.rev;
-      (
-        last,
-        ctor,
-        Some(
-          ComplexSelector(
-            Combinator({
-              left,
-              right: rest,
-            }),
-          ),
-        ),
-      );
+      (last, ctor, Some(ComplexSelector(Combinator({left, right: rest}))));
     }
   | _ as sel => (sel, None, None);
 
 let join_selector_with_combinator = (~combinator=None, a, b) => {
-  ComplexSelector(
-    Combinator({
-      left: a,
-      right: [(combinator, b)],
-    }),
-  );
+  ComplexSelector(Combinator({left: a, right: [(combinator, b)]}));
 };
 let join_compound_selector =
     (selector, {subclass_selectors, pseudo_selectors, _}) => {
@@ -178,18 +171,10 @@ let rec replace_ampersand = (replaced_with: selector, selector: selector) => {
     | Some(Ampersand) =>
       join_compound_selector(
         replaced_with,
-        {
-          type_selector,
-          subclass_selectors,
-          pseudo_selectors,
-        },
+        {type_selector, subclass_selectors, pseudo_selectors},
       )
     | _ =>
-      CompoundSelector({
-        type_selector,
-        subclass_selectors,
-        pseudo_selectors,
-      })
+      CompoundSelector({type_selector, subclass_selectors, pseudo_selectors})
     };
   | RelativeSelector({combinator, complex_selector}) =>
     let csel =
@@ -199,10 +184,7 @@ let rec replace_ampersand = (replaced_with: selector, selector: selector) => {
       | ComplexSelector(v) => v
       | _ => failwith("invalid state")
       };
-    RelativeSelector({
-      combinator,
-      complex_selector: csel,
-    });
+    RelativeSelector({combinator, complex_selector: csel});
   | _ as sel => sel
   };
 }
@@ -217,10 +199,7 @@ and pseudo_selector_replace_ampersand = (replaced_with: selector, selector) => {
            (replace_ampersand(replaced_with, selector), loc)
          );
     Pseudoclass(
-      Function({
-        name,
-        payload: (selector_list, selector_list_loc),
-      }),
+      Function({name, payload: (selector_list, selector_list_loc)}),
     );
   | Pseudoclass(
       NthFunction({
@@ -259,11 +238,7 @@ let split_multiple_selectors = (rules: list(rule)) => {
         let new_rules =
           List.map(
             selector =>
-              Style_rule({
-                prelude: ([selector], prelude_loc),
-                block,
-                loc,
-              }),
+              Style_rule({prelude: ([selector], prelude_loc), block, loc}),
             selector_list,
           );
         acc @ new_rules;
