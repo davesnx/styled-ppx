@@ -27,7 +27,7 @@ jobs:
         os: [ubuntu-latest, macos-latest]
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
 
       - uses: dorny/paths-filter@v2
         id: changes
@@ -38,7 +38,7 @@ jobs:
               - '.github/workflows/vscode.yml'
 
       - name: Use Node.js 16.x
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         if: steps.changes.outputs.src == 'true'
         with:
           node-version: 16.x
@@ -47,15 +47,6 @@ jobs:
         if: steps.changes.outputs.src == 'true'
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
-
-      - name: Load global cache
-        if: steps.changes.outputs.src == 'true'
-        uses: actions/cache@v1
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: yarn-${{ matrix.os }}-${{ hashFiles('./packages/editors/vscode/yarn.lock') }}
-          restore-keys: yarn-${{ matrix.os }}-
 
       - name: Install
         if: steps.changes.outputs.src == 'true'
