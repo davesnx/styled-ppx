@@ -27,7 +27,7 @@
       CSS.selectorMany(
         [|{js|pre|js}|],
         [|
-          CSS.fontFamilies([|"monospace", "monospace"|]),
+          CSS.fontFamilies([|`monospace, `monospace|]),
           CSS.fontSize(`em(1.)),
         |],
       ),
@@ -77,7 +77,7 @@
       CSS.selectorMany(
         [|{js|code|js}, {js|kbd|js}, {js|samp|js}|],
         [|
-          CSS.fontFamilies([|"monospace", "monospace"|]),
+          CSS.fontFamilies([|`monospace, `monospace|]),
           CSS.fontSize(`em(1.)),
         |],
       ),
