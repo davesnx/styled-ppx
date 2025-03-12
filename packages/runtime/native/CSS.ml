@@ -497,8 +497,8 @@ let get_string_style_hashes () =
 let style_tag ?key:_ ?children:_ () =
   React.createElement "style"
     [
-      String ("data-emotion", "css " ^ get_string_style_hashes ());
-      Bool ("data-s", true);
+      String ("data-emotion", "data-emotion", "css " ^ get_string_style_hashes ());
+      Bool ("data-s", "data-s", true);
       DangerouslyInnerHtml (get_stylesheet ());
     ]
     []
