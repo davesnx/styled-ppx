@@ -46,6 +46,7 @@ create-switch: ## Create opam switch
 
 .PHONY: pin
 pin: ## Pin dependencies
+	opam pin add quickjs.0.1.2 "git+https://github.com/ml-in-barcelona/quickjs.ml#24b2b0a733aadd069571f683ec6e76eda30fa8ab" -y
 	opam pin add server-reason-react.0.3.1 "git+https://github.com/ml-in-barcelona/server-reason-react#a12bd19a4ad5be3c72b7853997162212baa06f87" -y
 
 .PHONY: install
