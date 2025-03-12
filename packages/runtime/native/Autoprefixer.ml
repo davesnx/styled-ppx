@@ -63,7 +63,7 @@ let prefix rule =
     prefix_property property value [| webkit; ms |] @ [| rule |]
   | Declaration (("tab-size" as property), value) ->
     prefix_property property value [| moz; o |] @ [| rule |]
-  | Declaration ("color-adjust", value) ->
+  | Declaration (("color-adjust" | "print-color-adjust"), value) ->
     prefix_property "print-color-adjust" value [| webkit |] @ [| rule |]
   | Declaration
       ( (( "align-items" | "align-content" | "flex-shrink" | "flex-basis"
