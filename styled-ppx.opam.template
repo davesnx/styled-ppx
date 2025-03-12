@@ -3,5 +3,5 @@ depexts: [
 ]
 
 pin-depends: [
-  ["server-reason-react.0.3.1" "git+https://github.com/ml-in-barcelona/server-reason-react#ea16c107cd41a2e9d01dff358239eec37046951f"]
+  ["server-reason-react.0.3.1" "git+https://github.com/ml-in-barcelona/server-reason-react#03ea46d23d4e624c7cf8f67f9492fb5c60c062ad"]
 ]

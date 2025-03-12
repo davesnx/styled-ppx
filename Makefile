@@ -44,8 +44,12 @@ setup-githooks: ## Setup githooks
 create-switch: ## Create opam switch
 	opam switch create . 5.2.0 --deps-only --with-test --no-install
 
+.PHONY: pin
+pin: ## Pin dependencies
+	opam pin add server-reason-react.0.3.1 "git+https://github.com/ml-in-barcelona/server-reason-react#03ea46d23d4e624c7cf8f67f9492fb5c60c062ad" -y
+
 .PHONY: install
-install: ## Install project dependencies
+install: pin ## Install project dependencies
 	opam install . --deps-only --with-test -y
 	npm install
 
