@@ -46,7 +46,7 @@ create-switch: ## Create opam switch
 
 .PHONY: pin
 pin: ## Pin dependencies
-	opam pin add server-reason-react.0.3.1 "git+https://github.com/ml-in-barcelona/server-reason-react#03ea46d23d4e624c7cf8f67f9492fb5c60c062ad" -y
+	opam pin add server-reason-react.0.3.1 "git+https://github.com/ml-in-barcelona/server-reason-react#a12bd19a4ad5be3c72b7853997162212baa06f87" -y
 
 .PHONY: install
 install: pin ## Install project dependencies
