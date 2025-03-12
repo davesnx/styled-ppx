@@ -93,9 +93,9 @@ let replace_ampersand ~by str =
   in
   replace_ampersand' str by
 
-let pp_selectors =
-  Format.(
-    pp_print_array ~pp_sep:(fun out () -> fprintf out ", ") pp_print_string)
+let pp_selectors_to_string selectors =
+  Array.map ~f:(fun s -> Printf.sprintf "\"%s\"" s) selectors
+  |> Array.join ~sep:", "
 
 let rec rule_to_debug nesting accumulator rule =
   let next_rule =
@@ -104,10 +104,12 @@ let rec rule_to_debug nesting accumulator rule =
       Printf.sprintf "Declaration (\"%s\", \"%s\")" property value
     | Rule.Selector (selector, rules) ->
       if nesting = 0 then
-        Format.asprintf "Selector (\"%a\", [%s])" pp_selectors selector
+        Printf.sprintf "Selector (%s, [%s])"
+          (pp_selectors_to_string selector)
           (to_debug (nesting + 1) rules)
       else
-        Format.asprintf "Selector (\"%a\", [%s\n%s])" pp_selectors selector
+        Printf.sprintf "Selector (%s, [%s\n%s])"
+          (pp_selectors_to_string selector)
           (to_debug (nesting + 1) rules)
           (String.make (nesting + 1) ' ')
   in
@@ -520,5 +522,5 @@ let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust
     |]
     |> Kloth.Array.filter_map ~f:(fun i -> i)
   in
-  global [| Rule.Selector ([|"@font-face"|], fontFace) |];
+  global [| Rule.Selector ([| "@font-face" |], fontFace) |];
   fontFamily
