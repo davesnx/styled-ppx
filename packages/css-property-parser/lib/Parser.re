@@ -130,7 +130,9 @@ and box = [%value.rec "'border-box' | 'padding-box' | 'content-box'"]
 and calc_product = [%value.rec
   "<calc-value> [ '*' <calc-value> | '/' <number> ]*"
 ]
-and dimension = [%value.rec "<extended-length> | <extended-time> | <extended-frequency> | <resolution>"]
+and dimension = [%value.rec
+  "<extended-length> | <extended-time> | <extended-frequency> | <resolution>"
+]
 and calc_sum = [%value.rec "<calc-product> [ [ '+' | '-' ] <calc-product> ]*"]
 /* and calc_value = [%value.rec "<number> | <dimension> | <extended-percentage> | <calc>"] */
 and calc_value = [%value.rec
@@ -447,7 +449,7 @@ and gradient = [%value.rec
   "<linear-gradient()> | <repeating-linear-gradient()> | <radial-gradient()> | <repeating-radial-gradient()> | <conic-gradient()> | <-legacy-gradient>"
 ]
 and grid_line = [%value.rec
-  "<custom-ident-without-span-or-auto> | <integer> && [ <custom-ident-without-span-or-auto> ]? | 'span' && [ <integer> || <custom-ident-without-span-or-auto> ] | 'auto'"
+  "<custom-ident-without-span-or-auto> | <integer> && [ <custom-ident-without-span-or-auto> ]? | 'span' && [ <integer> || <custom-ident-without-span-or-auto> ] | 'auto' | <interpolation>"
 ]
 and historical_lig_values = [%value.rec
   "'historical-ligatures' | 'no-historical-ligatures'"
@@ -494,7 +496,9 @@ and mf_comparison = [%value.rec "<mf-lt> | <mf-gt> | <mf-eq>"]
 and mf_eq = [%value.rec "'='"]
 and mf_gt = [%value.rec "'>=' | '>'"]
 and mf_lt = [%value.rec "'<=' | '<'"]
-and mf_value = [%value.rec "<number> | <dimension> | <ident> | <ratio> | <interpolation>"]
+and mf_value = [%value.rec
+  "<number> | <dimension> | <ident> | <ratio> | <interpolation>"
+]
 and mf_name = [%value.rec "<ident>"]
 and mf_range = [%value.rec
   "<mf-name> <mf-comparison> <mf-value> | <mf-value> <mf-comparison> <mf-name> | <mf-value> <mf-lt> <mf-name> <mf-lt> <mf-value> | <mf-value> <mf-gt> <mf-name> <mf-gt> <mf-value>"
@@ -521,16 +525,16 @@ and media_query = [%value.rec
 ]
 and media_query_list = [%value.rec "[ <media-query> ]# | <interpolation>"]
 and container_condition_list = [%value.rec "<container-condition>#"]
-and container_condition = [%value.rec "[ <container-name> ]? <container-query>"]
+and container_condition = [%value.rec
+  "[ <container-name> ]? <container-query>"
+]
 and container_query = [%value.rec
   "'not' <query-in-parens> | <query-in-parens> [ [ 'and' <query-in-parens> ]* | [ 'or' <query-in-parens> ]* ]"
 ]
 and query_in_parens = [%value.rec
   "'(' <container-query> ')' | '(' <size-feature> ')' | style( <style-query> )"
 ]
-and size_feature = [%value.rec
-  "<mf-plain> | <mf-boolean> | <mf-range>"
-]
+and size_feature = [%value.rec "<mf-plain> | <mf-boolean> | <mf-range>"]
 and style_query = [%value.rec
   "'not' <style-in-parens> | <style-in-parens> [ [ and <style-in-parens> ]* | [ or <style-in-parens> ]* ] | <style-feature>"
 ]
@@ -881,7 +885,9 @@ and property_backface_visibility = [%value.rec "'visible' | 'hidden'"]
 and property_background = [%value.rec "[ <bg-layer> ',' ]* <final-bg-layer>"]
 and property_background_attachment = [%value.rec "[ <attachment> ]#"]
 and property_background_blend_mode = [%value.rec "[ <blend-mode> ]#"]
-and property_background_clip = [%value.rec "[ <box> | 'text' | 'border-area' ]#"]
+and property_background_clip = [%value.rec
+  "[ <box> | 'text' | 'border-area' ]#"
+]
 and property_background_color = [%value.rec "<color>"]
 and property_background_image = [%value.rec "[ <bg-image> ]#"]
 and property_background_origin = [%value.rec "[ <box> ]#"]

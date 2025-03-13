@@ -4590,6 +4590,7 @@ let grid_auto_flow =
 
 let render_grid_line = (~loc, x: Types.grid_line) =>
   switch (x) {
+  | `Interpolation(x) => render_variable(~loc, x)
   | `Auto => [%expr `auto]
   | `Custom_ident_without_span_or_auto(x) => [%expr
      `ident([%e render_string(~loc, x)])
