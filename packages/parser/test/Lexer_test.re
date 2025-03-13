@@ -6,6 +6,10 @@ module Parser = Styled_ppx_css_parser.Parser;
 
 let success_tests =
   [
+    (
+      {|url($(Module.variable))|},
+      [FUNCTION("url"), INTERPOLATION(["Module", "variable"]), RIGHT_PAREN],
+    ),
     ({|inset-3\.5|}, [IDENT("inset-3.5")]),
     ({|-inset-3\.5|}, [IDENT("-inset-3.5")]),
     ({|inset-1\/3|}, [IDENT("inset-1/3")]),
@@ -295,6 +299,20 @@ let test_with_location =
     ({|--color-main|}, [IDENT("--color-main")], 12),
     ({|>=|}, [GTE], 2),
     ({|<=|}, [LTE], 2),
+    (
+      {|url($(Module.variable'))|},
+      [
+        FUNCTION("url"),
+        DELIM("$"),
+        LEFT_PAREN,
+        IDENT("Module"),
+        DELIM("."),
+        IDENT("variable'"),
+        RIGHT_PAREN,
+        RIGHT_PAREN,
+      ],
+      24,
+    ),
   ]
   |> List.mapi((_index, (input, output, last_position)) => {
        let (loc, values) = parse(input);

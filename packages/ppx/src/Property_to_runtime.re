@@ -1555,11 +1555,18 @@ let render_gradient = (~loc, value: Types.gradient) =>
 
 let render_url = (~loc, url) => [%expr `url([%e render_string(~loc, url)])];
 
+let render_url_with_interp = (~loc, url: Types.url_with_interp) => {
+  switch (url) {
+  | `Url_0(v) => render_url(~loc, v)
+  | `Url_1(v) => [%expr `url([%e render_variable(~loc, v)])]
+  };
+};
+
 let render_image = (~loc, value: Types.image) =>
   switch (value) {
   | `Gradient(gradient) => render_gradient(~loc, gradient)
-  | `Url(url) => render_url(~loc, url)
   | `Interpolation(v) => render_variable(~loc, v)
+  | `Url_with_interp(v) => render_url_with_interp(~loc, v)
   | `Function_element(_) => raise(Unsupported_feature)
   | `Function_paint(_) => raise(Unsupported_feature)
   | `Function_image(_) => raise(Unsupported_feature)
@@ -5180,7 +5187,7 @@ let render_filter_function_list = (~loc, value: Types.filter_function_list) => {
   |> List.map(ff =>
        switch (ff) {
        | `Filter_function(f) => render_filter_function(~loc, f)
-       | `Url(u) => render_url(~loc, u)
+       | `Url_with_interp(u) => render_url_with_interp(~loc, u)
        }
      )
   |> Builder.pexp_array(~loc);
@@ -5495,7 +5502,7 @@ let render_content_list = (~loc, content_list: Types.content_list) => {
        | `Contents => [%expr `contents]
        | `Quote(quote) => render_quote(~loc, quote)
        | `String(str) => render_content_string(~loc, str)
-       | `Url(u) => render_url(~loc, u)
+       | `Url_with_interp(u) => render_url_with_interp(~loc, u)
        | `Counter(_label, _, _style) => raise(Unsupported_feature)
        | `Function_attr(_attr) => raise(Unsupported_feature)
        }
