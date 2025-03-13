@@ -40,5 +40,4 @@
    (conf-npm :with-test)
    (reason-react-ppx :with-dev-setup)
    (ocaml-lsp-server :with-dev-setup)
-   (ocamlformat :with-dev-setup)
-   (utop :with-dev-setup)))
+   (ocamlformat :with-dev-setup)))
