@@ -2714,7 +2714,7 @@ let text_decoration =
     (~loc, (color, style, thickness, line)) =>
     [
       [%expr
-        CSS.textDecoration2(
+        CSS.textDecorations(
           ~line=?[%e render_option(~loc, render_text_decoration_line, line)],
           ~thickness=?[%e
             render_option(~loc, render_text_decoration_thickness, thickness)

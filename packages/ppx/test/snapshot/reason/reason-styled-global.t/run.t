@@ -36,7 +36,7 @@
         [|{js|abbr[title]|js}|],
         [|
           CSS.unsafe({js|borderBottom|js}, {js|none|js}),
-          CSS.textDecoration2(
+          CSS.textDecorations(
             ~line=?
               Some(
                 CSS.Types.TextDecorationLine.Value.make(
@@ -52,7 +52,7 @@
             ~color=?None,
             (),
           ),
-          CSS.textDecoration2(
+          CSS.textDecorations(
             ~line=?
               Some(
                 CSS.Types.TextDecorationLine.Value.make(

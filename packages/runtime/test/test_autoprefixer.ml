@@ -16,7 +16,7 @@ let text_size_adjust =
 let text_decoration =
   test "text_decoration" (fun () ->
       prefix_one_declaration
-        (CSS.textDecoration2
+        (CSS.textDecorations
            ~line:(CSS.Types.TextDecorationLine.Value.make ~lineThrough:true ())
            ())
         "-webkit-text-decoration: line-through auto solid currentColor; \

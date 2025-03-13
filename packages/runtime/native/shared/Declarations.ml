@@ -807,9 +807,17 @@ let backgroundSize x =
   Rule.declaration ({js|backgroundSize|js}, BackgroundSize.toString x)
 
 let textDecoration x =
-  Rule.declaration ({js|textDecoration|js}, TextDecoration.toString x)
+  (* For backward compatibility *)
+  let new_x = match x with
+  | `underline -> TextDecorationLine.Value.make ~underline:true ()
+  | `overline -> TextDecorationLine.Value.make ~overline:true ()
+  | `lineThrough -> TextDecorationLine.Value.make ~lineThrough:true ()
+  | `blink -> TextDecorationLine.Value.make ~blink:true ()
+  | `none -> TextDecorationLine.Value.make ()
+  in
+  Rule.declaration ({js|textDecoration|js}, TextDecorationLine.toString new_x)
 
-let textDecoration2 ?line ?thickness ?style ?color () =
+let textDecorations ?line ?thickness ?style ?color () =
   Rule.declaration
     ( {js|textDecoration|js},
       TextDecoration.toString
