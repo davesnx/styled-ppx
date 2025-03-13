@@ -4553,6 +4553,7 @@ module GridAutoRows = struct
     [ `trackSizes of TrackSize.t array
     | Var.t
     | Cascading.t
+    | Auto.t
     ]
 
   let trackSizes (x : TrackSize.t array) = `trackSizes x
@@ -4563,6 +4564,7 @@ module GridAutoRows = struct
       Kloth.Array.map_and_join ~f:TrackSize.toString ~sep:{js| |js} xs
     | #Var.t as var -> Var.toString var
     | #Cascading.t as c -> Cascading.toString c
+    | #Auto.t -> Auto.toString
 end
 
 module GridAutoColumns = struct
@@ -4873,15 +4875,51 @@ module Bottom = struct
 end
 
 module Top = struct
-  include Bottom
+  type t =
+    [ Length.t
+    | Cascading.t
+    | Var.t
+    | Auto.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | #Auto.t -> Auto.toString
+    | #Var.t as x -> Var.toString x
+    | #Length.t as x -> Length.toString x
+    | #Cascading.t as x -> Cascading.toString x
 end
 
 module Right = struct
-  include Bottom
+  type t =
+    [ Length.t
+    | Cascading.t
+    | Var.t
+    | Auto.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | #Auto.t -> Auto.toString
+    | #Var.t as x -> Var.toString x
+    | #Length.t as x -> Length.toString x
+    | #Cascading.t as x -> Cascading.toString x
 end
 
 module Left = struct
-  include Bottom
+  type t =
+    [ Length.t
+    | Cascading.t
+    | Var.t
+    | Auto.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | #Auto.t -> Auto.toString
+    | #Var.t as x -> Var.toString x
+    | #Length.t as x -> Length.toString x
+    | #Cascading.t as x -> Cascading.toString x
 end
 
 module Grid = struct
