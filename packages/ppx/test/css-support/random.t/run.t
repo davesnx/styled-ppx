@@ -159,5 +159,11 @@ If this test fail means that the module is not in sync with the ppx
   CSS.style([|CSS.aspectRatio(`ratio((16, 9)))|]);
   
   CSS.color(`var({js|--color-link|js}));
+  
+  let interpolation = `px(10);
+  CSS.style([|
+    (CSS.right(interpolation): CSS.rule),
+    (CSS.bottom(interpolation): CSS.rule),
+  |]);
 
   $ dune build

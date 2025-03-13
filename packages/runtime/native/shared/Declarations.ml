@@ -808,12 +808,13 @@ let backgroundSize x =
 
 let textDecoration x =
   (* For backward compatibility *)
-  let new_x = match x with
-  | `underline -> TextDecorationLine.Value.make ~underline:true ()
-  | `overline -> TextDecorationLine.Value.make ~overline:true ()
-  | `lineThrough -> TextDecorationLine.Value.make ~lineThrough:true ()
-  | `blink -> TextDecorationLine.Value.make ~blink:true ()
-  | `none -> TextDecorationLine.Value.make ()
+  let new_x =
+    match x with
+    | `underline -> TextDecorationLine.Value.make ~underline:true ()
+    | `overline -> TextDecorationLine.Value.make ~overline:true ()
+    | `lineThrough -> TextDecorationLine.Value.make ~lineThrough:true ()
+    | `blink -> TextDecorationLine.Value.make ~blink:true ()
+    | `none -> TextDecorationLine.Value.make ()
   in
   Rule.declaration ({js|textDecoration|js}, TextDecorationLine.toString new_x)
 

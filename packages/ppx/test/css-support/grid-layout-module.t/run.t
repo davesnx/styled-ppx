@@ -316,6 +316,8 @@ If this test fail means that the module is not in sync with the ppx
   CSS.gridRow2(`auto, `auto);
   CSS.gridRow2(`num(2), `span(`num(2)));
   CSS.gridArea2(`num(1), `num(1));
+  let area = `num(33);
+  CSS.gridArea(area);
   CSS.gridArea2(`num(1), `span(`num(1)));
   CSS.gridArea3(`span(`num(1)), `num(10), `num(-1));
   CSS.gridColumnGap(`zero);
