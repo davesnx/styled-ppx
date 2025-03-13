@@ -357,7 +357,7 @@ and function_paint = [%value.rec
 and function_path = [%value.rec "path( <string> )"]
 and function_perspective = [%value.rec "perspective( <property-perspective> )"]
 and function_polygon = [%value.rec
-  "polygon( [ <fill-rule> ]? ',' [ <extended-length> | <extended-percentage> <extended-length> | <extended-percentage> ]# )"
+  "polygon( [ <fill-rule> ',' ]? [ <length-percentage> <length-percentage> ]# )"
 ]
 and function_radial_gradient = [%value.rec
   "radial-gradient( <ending-shape>? <radial-size>? ['at' <position> ]? ','? <color-stop-list> )"
