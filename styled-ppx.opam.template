@@ -1,3 +1,7 @@
 depexts: [
   ["@emotion/css"] {npm-version = ">=11.0.0"}
 ]
+
+pin-depends: [
+  ["server-reason-react.0.3.1" "git+https://github.com/ml-in-barcelona/server-reason-react#ce006ee5ad5562eee617a4c713b1efa317dc2aab"]
+]
