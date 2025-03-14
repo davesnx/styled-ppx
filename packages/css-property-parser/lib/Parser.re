@@ -1974,6 +1974,7 @@ and symbol = [%value.rec "<string> | <image> | <custom-ident>"]
 and target = [%value.rec
   "<target-counter()> | <target-counters()> | <target-text()>"
 ]
+and url = [%value.rec "<url-no-interp> | url( <interpolation> )"]
 and extended_length = [%value.rec
   "<length> | <calc()> | <interpolation> | <min()> | <max()>"
 ]

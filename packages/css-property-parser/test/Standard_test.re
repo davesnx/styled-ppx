@@ -388,8 +388,8 @@ let tests = [
     expect(parse("--random"), Ok("--random"));
     expect(parse("random'"), Error("Expected a --variable."));
   }),
-  test("<url>", () => {
-    let parse = parse([%value "<url>"]);
+  test("<url-no-interp>", () => {
+    let parse = parse([%value "<url-no-interp>"]);
     let to_check = Alcotest.result(Alcotest.string, Alcotest.string);
     let expect = check(__POS__, to_check);
     expect(parse("url(https://google.com)"), Ok("https://google.com"));

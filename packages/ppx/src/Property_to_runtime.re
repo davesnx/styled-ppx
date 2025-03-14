@@ -1553,7 +1553,14 @@ let render_gradient = (~loc, value: Types.gradient) =>
   | `_legacy_gradient(_) => raise(Unsupported_feature)
   };
 
-let render_url = (~loc, url) => [%expr `url([%e render_string(~loc, url)])];
+let render_url_no_interp = (~loc, url) => [%expr `url([%e render_string(~loc, url)])];
+
+let render_url = (~loc, url: Types.url) => {
+  switch (url) {
+  | `Url(v) => [%expr `url([%e render_variable(~loc, v)])]
+  | `Url_no_interp(v) => render_url_no_interp(~loc, v)
+  };
+};
 
 let render_image = (~loc, value: Types.image) =>
   switch (value) {
