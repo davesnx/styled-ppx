@@ -45,6 +45,7 @@ module Color = {
 [%css {|background-size: 10px auto|}];
 [%css {|background-size: auto 10%|}];
 [%css {|background-size: 50em 50%|}];
+[%css {|background-size: 20px 20px|}];
 /* [%css {|background: url(foo.png), url(bar.svg)|}]; */
 [%css {|background: top left / 50% 60%|}];
 [%css {|background: border-box|}];

@@ -3653,9 +3653,14 @@ module BackgroundSize = struct
     let size (x : [ Length.t | Auto.t ]) (y : [ Length.t | Auto.t ]) =
       `size (x, y)
 
-    let rec toString (x : t) =
+    let size_to_string (x : [ Length.t | Auto.t ]) =
       match x with
-      | `size (x, y) -> (toString (x :> t) ^ {js| |js}) ^ toString (y :> t)
+      | #Length.t as l -> Length.toString l
+      | #Auto.t -> Auto.toString
+
+    let toString (x : t) =
+      match x with
+      | `size (x, y) -> size_to_string x ^ {js| |js} ^ size_to_string y
       | `cover -> {js|cover|js}
       | `contain -> {js|contain|js}
       | #Length.t -> Auto.toString
