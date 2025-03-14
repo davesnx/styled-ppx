@@ -1,6 +1,9 @@
 [%css {|clip-path: url('#clip')|}];
 [%css {|clip-path: inset(50%)|}];
 [%css {|clip-path: path('M 20 20 H 80 V 30')|}];
+[%css {|clip-path: polygon(50% 100%, 0 0, 100% 0)|}];
+[%css {|clip-path: polygon(evenodd, 0% 0%, 50% 50%, 0% 100%)|}];
+[%css {|clip-path: polygon(nonzero, 0% 0%, 50% 50%, 0% 100%)|}];
 [%css {|clip-path: border-box|}];
 [%css {|clip-path: padding-box|}];
 [%css {|clip-path: content-box|}];

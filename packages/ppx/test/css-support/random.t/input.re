@@ -121,3 +121,9 @@ let value = `clip;
 [%cx {|aspect-ratio: 16 / 9;|}];
 
 [%css {|color: var(--color-link);|}];
+
+let interpolation = `px(10);
+[%cx {|
+    right: $(interpolation);
+    bottom: $(interpolation);
+  |}];

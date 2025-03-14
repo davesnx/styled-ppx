@@ -17,6 +17,15 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|clipPath|js}, {js|url('#clip')|js});
   CSS.unsafe({js|clipPath|js}, {js|inset(50%)|js});
   CSS.unsafe({js|clipPath|js}, {js|path('M 20 20 H 80 V 30')|js});
+  CSS.unsafe({js|clipPath|js}, {js|polygon(50% 100%, 0 0, 100% 0)|js});
+  CSS.unsafe(
+    {js|clipPath|js},
+    {js|polygon(evenodd, 0% 0%, 50% 50%, 0% 100%)|js},
+  );
+  CSS.unsafe(
+    {js|clipPath|js},
+    {js|polygon(nonzero, 0% 0%, 50% 50%, 0% 100%)|js},
+  );
   CSS.unsafe({js|clipPath|js}, {js|border-box|js});
   CSS.unsafe({js|clipPath|js}, {js|padding-box|js});
   CSS.unsafe({js|clipPath|js}, {js|content-box|js});

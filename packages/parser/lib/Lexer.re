@@ -558,7 +558,8 @@ let consume_ident_like = lexbuf => {
       check(_ =>
         switch%sedlex (lexbuf) {
         | '\''
-        | '"' => true
+        | '"'
+        | variable => true
         | _ => false
         }
       );
@@ -797,7 +798,8 @@ let consume_ident_like = lexbuf => {
       check(lexbuf =>
         switch%sedlex (lexbuf) {
         | '\''
-        | '"' => true
+        | '"'
+        | variable => true
         | _ => false
         }
       );

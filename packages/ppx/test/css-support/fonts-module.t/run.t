@@ -15,13 +15,13 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   
-  CSS.fontFamilies([|{js|Inter Semi Bold|js}|]);
+  CSS.fontFamilies([|`quoted({js|Inter Semi Bold|js})|]);
   CSS.fontFamilies(fonts: array(CSS.Types.FontFamilyName.t));
-  CSS.fontFamilies([|{js|Inter|js}|]);
+  CSS.fontFamilies([|`quoted({js|Inter|js})|]);
   CSS.fontFamilies(font: array(CSS.Types.FontFamilyName.t));
-  CSS.fontFamilies([|{js|Inter|js}, {js|Sans|js}|]);
-  CSS.fontFamilies([|{js|Inter|js}, font|]);
-  CSS.fontFamilies([|{js|Gill Sans Extrabold|js}, "sans-serif"|]);
+  CSS.fontFamilies([|`quoted({js|Inter|js}), `quoted({js|Sans|js})|]);
+  CSS.fontFamilies([|`quoted({js|Inter|js}), font|]);
+  CSS.fontFamilies([|`quoted({js|Gill Sans Extrabold|js}), `sans_serif|]);
   
   CSS.fontSynthesisWeight(`none);
   CSS.fontSynthesisStyle(`auto);

@@ -50,7 +50,7 @@ let bounce = [%keyframe
 |}
 ];
 
-let code = [| `quoted("Menlo"), `quoted("monospace") |];
+let code = [|`quoted("Menlo"), `quoted("monospace")|];
 let lola = `auto;
 
 let clx = [%cx
@@ -89,9 +89,16 @@ let container = [%cx
 ];
 
 module App = {
+  let blockDefaultBackground = [%cx
+    {|
+       background-size: 20px 20px;
+       background-position: 0 0, 10px 0, 10px -10px, 0 10px;
+     |}
+  ];
+
   [@react.component]
   let make = () =>
-    <>
+    <main className=blockDefaultBackground>
       <div className=post>
         <div className={card ++ " " ++ container}>
           <h2> {React.string("Card title")} </h2>
@@ -102,7 +109,7 @@ module App = {
         <div className=clx> {React.string("code everywhere!")} </div>
         <div className=selectors> {React.string("Red text")} </div>
       </Cositas>
-    </>;
+    </main>;
 };
 
 let color = `hex("333");

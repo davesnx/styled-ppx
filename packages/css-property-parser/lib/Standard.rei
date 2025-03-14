@@ -73,7 +73,7 @@ let dashed_ident: Rule.rule(string);
 
 let string: Rule.rule(string);
 
-let url: Rule.rule(string);
+let url_no_interp: Rule.rule(string);
 
 /* let var: Rule.rule(string); */
 

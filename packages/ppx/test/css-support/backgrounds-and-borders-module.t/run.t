@@ -61,6 +61,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.backgroundSize(`size((`pxFloat(10.), `auto)));
   CSS.backgroundSize(`size((`auto, `percent(10.))));
   CSS.backgroundSize(`size((`em(50.), `percent(50.))));
+  CSS.backgroundSize(`size((`pxFloat(20.), `pxFloat(20.))));
   
   CSS.backgroundPosition(`hvOffset((`left, `top)));
   CSS.backgroundOrigin(`borderBox);

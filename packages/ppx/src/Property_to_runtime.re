@@ -6,7 +6,10 @@ module Standard = Css_property_parser.Standard;
 module Property_parser = Css_property_parser.Parser;
 module Types = Property_parser.Types;
 
-let txt = (~loc, txt) => {Location.loc, txt};
+let txt = (~loc, txt) => {
+  Location.loc,
+  txt,
+};
 
 let (let.ok) = Result.bind;
 
@@ -31,7 +34,14 @@ type transform('ast, 'value) = {
 
 let add_CSS_rule_constraint = (~loc, expr) => {
   let typ =
-    Builder.ptyp_constr(~loc, {txt: Ldot(Lident("CSS"), "rule"), loc}, []);
+    Builder.ptyp_constr(
+      ~loc,
+      {
+        txt: Ldot(Lident("CSS"), "rule"),
+        loc,
+      },
+      [],
+    );
   Builder.pexp_constraint(~loc, expr, typ);
 };
 
@@ -43,7 +53,11 @@ let emit = (property, value_of_ast, value_to_expr) => {
   let string_to_expr = (~loc, string) =>
     ast_of_string(string) |> Result.map(ast_to_expr(~loc));
 
-  {ast_of_string, ast_to_expr, string_to_expr};
+  {
+    ast_of_string,
+    ast_to_expr,
+    string_to_expr,
+  };
 };
 
 let emit_shorthand = (parser, mapper, value_to_expr) => {
@@ -53,7 +67,11 @@ let emit_shorthand = (parser, mapper, value_to_expr) => {
   let string_to_expr = (~loc, string) =>
     ast_of_string(string) |> Result.map(ast_to_expr(~loc));
 
-  {ast_of_string, ast_to_expr, string_to_expr};
+  {
+    ast_of_string,
+    ast_to_expr,
+    string_to_expr,
+  };
 };
 
 let render_option = (~loc, f) =>
@@ -489,12 +507,12 @@ let render_one_bg_size = (~loc, value) => {
 let render_bg_size = (~loc, value: Types.bg_size) =>
   switch (value) {
   | `One_bg_size(one, None) => render_one_bg_size(~loc, one)
-  | `One_bg_size(one, Some(two)) =>
-    [%expr
+  | `One_bg_size(one, Some(two)) => [%expr
      `size((
        [%e render_one_bg_size(~loc, one)],
        [%e render_one_bg_size(~loc, two)],
-     ))]
+     ))
+    ]
   | `Cover => variant_to_expression(~loc, `Cover)
   | `Contain => variant_to_expression(~loc, `Contain)
   };
@@ -1102,22 +1120,22 @@ and render_function_color_mix = (~loc, value: Types.function_color_mix) => {
     switch (color_interpolation_method) {
     | ((), `Rectangular_color_space(x)) => render_rectangular_color_space(x)
     | ((), `Static(pcs, None)) => render_polar_color_space(pcs)
-    | ((), `Static(pcs, Some((size, ())))) =>
-      [%expr
+    | ((), `Static(pcs, Some((size, ())))) => [%expr
        `polar_with_hue((
          [%e render_polar_color_space(pcs)],
          [%e render_hue_size((), size)],
-       ))]
+       ))
+      ]
     };
 
   let render_color_with_percentage = (~loc, (color, percentage)) => {
     switch (percentage) {
-    | Some(percentage) =>
-      [%expr
+    | Some(percentage) => [%expr
        (
          [%e render_color(~loc, color)],
          Some([%e render_percentage(~loc, percentage)]),
-       )]
+       )
+      ]
     | None => [%expr ([%e render_color(~loc, color)], None)]
     };
   };
@@ -1127,7 +1145,8 @@ and render_function_color_mix = (~loc, value: Types.function_color_mix) => {
      [%e color_interpolation_method_expr],
      [%e render_color_with_percentage(~loc, color_x)],
      [%e render_color_with_percentage(~loc, color_y)],
-   ))];
+   ))
+  ];
 };
 
 let color =
@@ -1271,7 +1290,15 @@ let render_box_shadow = (~loc, shadow) => {
   let spread = Option.map(render_length_interp(~loc), spread);
   let inset =
     Option.map(
-      () => Builder.pexp_construct(~loc, {txt: Lident("true"), loc}, None),
+      () =>
+        Builder.pexp_construct(
+          ~loc,
+          {
+            txt: Lident("true"),
+            loc,
+          },
+          None,
+        ),
       inset,
     );
 
@@ -1378,42 +1405,42 @@ let render_angular_color_stop_list =
 let render_function_linear_gradient =
     (~loc, value: Types.function_linear_gradient) => {
   switch (value) {
-  | (None, stops) =>
-    [%expr
+  | (None, stops) => [%expr
      `linearGradient((
        None,
        [%e render_color_stop_list(~loc, stops)]: CSS.Types.Gradient.color_stop_list,
-     ))]
-  | (Some(`Static_0(angle, ())), stops) =>
-    [%expr
+     ))
+    ]
+  | (Some(`Static_0(angle, ())), stops) => [%expr
      `linearGradient((
        Some([%e render_extended_angle(~loc, angle)]),
        [%e render_color_stop_list(~loc, stops)]: CSS.Types.Gradient.color_stop_list,
-     ))]
-  | (Some(`Static_1((), side_or_corner, ())), stops) =>
-    [%expr
+     ))
+    ]
+  | (Some(`Static_1((), side_or_corner, ())), stops) => [%expr
      `linearGradient((
        Some([%e render_side_or_corner(~loc, side_or_corner)]),
        [%e render_color_stop_list(~loc, stops)]: CSS.Types.Gradient.color_stop_list,
-     ))]
+     ))
+    ]
   };
 };
 
 let render_function_repeating_linear_gradient =
     (~loc, value: Types.function_repeating_linear_gradient) => {
   switch (value) {
-  | (Some(`Extended_angle(angle)), (), stops) =>
-    [%expr
+  | (Some(`Extended_angle(angle)), (), stops) => [%expr
      `repeatingLinearGradient((
        Some([%e render_extended_angle(~loc, angle)]),
        [%e render_color_stop_list(~loc, stops)]: CSS.Types.Gradient.color_stop_list,
-     ))]
-  | (None, (), stops) =>
-    [%expr
+     ))
+    ]
+  | (None, (), stops) => [%expr
      `repeatingLinearGradient((
        None,
        [%e render_color_stop_list(~loc, stops)]: CSS.Types.Gradient.color_stop_list,
-     ))]
+     ))
+    ]
   | (Some(_), (), _stops) => raise(Unsupported_feature)
   };
 };
@@ -1448,7 +1475,8 @@ let render_function_radial_gradient =
        None,
        None,
        [%e render_color_stop_list(~loc, color_stop_list)]: CSS.Types.Gradient.color_stop_list,
-     ))];
+     ))
+    ];
   | (shape, Some(radial_size), None, None | Some (), color_stop_list) =>
     let shape = render_eding_shape(~loc, shape);
     let size = render_radial_size(~loc, radial_size);
@@ -1458,7 +1486,8 @@ let render_function_radial_gradient =
        Some([%e size]),
        None,
        [%e render_color_stop_list(~loc, color_stop_list)]: CSS.Types.Gradient.color_stop_list,
-     ))];
+     ))
+    ];
   | (shape, None, Some(((), position)), None | Some (), color_stop_list) =>
     let shape = render_eding_shape(~loc, shape);
     let position = render_position(~loc, position);
@@ -1468,7 +1497,8 @@ let render_function_radial_gradient =
        None,
        Some([%e position]),
        [%e render_color_stop_list(~loc, color_stop_list)]: CSS.Types.Gradient.color_stop_list,
-     ))];
+     ))
+    ];
   | (
       shape,
       Some(radial_size),
@@ -1485,15 +1515,17 @@ let render_function_radial_gradient =
        Some([%e size]),
        Some([%e position]),
        [%e render_color_stop_list(~loc, color_stop_list)]: CSS.Types.Gradient.color_stop_list,
-     ))];
+     ))
+    ];
   };
 };
 
 let render_function_repeating_radial_gradient =
     (~loc, value: Types.function_repeating_radial_gradient) => {
   switch (value) {
-  | (None, None, (), stops) =>
-    [%expr `radialGradient([%e render_color_stop_list(~loc, stops)])]
+  | (None, None, (), stops) => [%expr
+     `radialGradient([%e render_color_stop_list(~loc, stops)])
+    ]
   | _ => raise(Unsupported_feature)
   };
 };
@@ -1501,8 +1533,9 @@ let render_function_repeating_radial_gradient =
 let render_function_conic_gradient =
     (~loc, value: Types.function_conic_gradient) => {
   switch (value) {
-  | (None, None, (), stops) =>
-    [%expr `conicGradient([%e render_angular_color_stop_list(~loc, stops)])]
+  | (None, None, (), stops) => [%expr
+     `conicGradient([%e render_angular_color_stop_list(~loc, stops)])
+    ]
   | _ => raise(Unsupported_feature)
   };
 };
@@ -1520,7 +1553,14 @@ let render_gradient = (~loc, value: Types.gradient) =>
   | `_legacy_gradient(_) => raise(Unsupported_feature)
   };
 
-let render_url = (~loc, url) => [%expr `url([%e render_string(~loc, url)])];
+let render_url_no_interp = (~loc, url) => [%expr `url([%e render_string(~loc, url)])];
+
+let render_url = (~loc, url: Types.url) => {
+  switch (url) {
+  | `Url(v) => [%expr `url([%e render_variable(~loc, v)])]
+  | `Url_no_interp(v) => render_url_no_interp(~loc, v)
+  };
+};
 
 let render_image = (~loc, value: Types.image) =>
   switch (value) {
@@ -1559,8 +1599,9 @@ let render_repeat_style = (~loc) =>
 
       switch (values) {
       | (x, None) => [%expr [%e render_xor(x)]]
-      | (x, Some(y)) =>
-        [%expr `hv(([%e render_xor(x)], [%e render_xor(y)]))]
+      | (x, Some(y)) => [%expr
+         `hv(([%e render_xor(x)], [%e render_xor(y)]))
+        ]
       };
     };
 
@@ -1573,7 +1614,9 @@ let render_attachment = (~loc) =>
 let background_image =
   polymorphic(Property_parser.property_background_image, (~loc) =>
     fun
-    | [one] => [[%expr CSS.backgroundImage([%e render_bg_image(~loc, one)])]]
+    | [one] => [
+        [%expr CSS.backgroundImage([%e render_bg_image(~loc, one)])],
+      ]
     | more => [
         [%expr CSS.backgroundImages([%e render_bg_images(~loc, more)])],
       ]
@@ -1627,12 +1670,12 @@ let render_bg_position = (~loc, position: Types.bg_position) => {
   switch (position) {
   | `Xor(x) => render_position_one(~loc, x)
   | `Static(x, y) => render_position_two(~loc, x, y)
-  | `And(x, y) =>
-    [%expr
+  | `And(x, y) => [%expr
      `hvOffset((
        [%e render_bg_position_three_and_four(~loc, x)],
        [%e render_bg_position_three_and_four(~loc, y)],
-     ))]
+     ))
+    ]
   };
 };
 
@@ -2461,8 +2504,12 @@ let render_font_family = (~loc, value) =>
   switch (value) {
   | `Interpolation(v) => render_variable(~loc, v)
   | `Generic_family(v) => render_generic_family(~loc, v)
-  | `Family_name(`String(str)) => [%expr `quoted([%e render_string(~loc, str)])]
-  | `Family_name(`Custom_ident(ident)) => [%expr `quoted([%e render_string(~loc, ident)])]
+  | `Family_name(`String(str)) => [%expr
+     `quoted([%e render_string(~loc, str)])
+    ]
+  | `Family_name(`Custom_ident(ident)) => [%expr
+     `quoted([%e render_string(~loc, ident)])
+    ]
   };
 
 // css-fonts-4
@@ -2484,7 +2531,7 @@ let font_family =
           CSS.fontFamilies(
             [%e
               font_families
-              |> List.map(render_font_family(~loc)) 
+              |> List.map(render_font_family(~loc))
               |> Builder.pexp_array(~loc)
             ],
           )
@@ -2714,7 +2761,7 @@ let text_decoration =
     (~loc, (color, style, thickness, line)) =>
     [
       [%expr
-        CSS.textDecoration2(
+        CSS.textDecorations(
           ~line=?[%e render_option(~loc, render_text_decoration_line, line)],
           ~thickness=?[%e
             render_option(~loc, render_text_decoration_thickness, thickness)
@@ -2908,69 +2955,82 @@ let render_transform = (~loc, value: Types.transform_function) =>
   | `Function_perspective(_) => raise(Unsupported_feature)
   | `Function_matrix(_) => raise(Unsupported_feature)
   | `Function_matrix3d(_) => raise(Unsupported_feature)
-  | `Function_rotate(v) =>
-    [%expr CSS.rotate([%e render_transform_functions(~loc, v)])]
-  | `Function_rotate3d(x, (), y, (), z, (), a) =>
-    [%expr
+  | `Function_rotate(v) => [%expr
+     CSS.rotate([%e render_transform_functions(~loc, v)])
+    ]
+  | `Function_rotate3d(x, (), y, (), z, (), a) => [%expr
      CSS.rotate3d(
        [%e render_float(~loc, x)],
        [%e render_float(~loc, y)],
        [%e render_float(~loc, z)],
        [%e render_transform_functions(~loc, a)],
-     )]
-  | `Function_rotateX(v) =>
-    [%expr CSS.rotateX([%e render_transform_functions(~loc, v)])]
-  | `Function_rotateY(v) =>
-    [%expr CSS.rotateY([%e render_transform_functions(~loc, v)])]
-  | `Function_rotateZ(v) =>
-    [%expr CSS.rotateZ([%e render_transform_functions(~loc, v)])]
+     )
+    ]
+  | `Function_rotateX(v) => [%expr
+     CSS.rotateX([%e render_transform_functions(~loc, v)])
+    ]
+  | `Function_rotateY(v) => [%expr
+     CSS.rotateY([%e render_transform_functions(~loc, v)])
+    ]
+  | `Function_rotateZ(v) => [%expr
+     CSS.rotateZ([%e render_transform_functions(~loc, v)])
+    ]
   | `Function_skew(a1, a2) =>
     switch (a2) {
-    | Some(((), v)) =>
-      [%expr
+    | Some(((), v)) => [%expr
        CSS.skew(
          [%e render_transform_functions(~loc, a1)],
          [%e render_transform_functions(~loc, v)],
-       )]
-    | None =>
-      [%expr CSS.skew([%e render_transform_functions(~loc, a1)], `deg(0.))]
+       )
+      ]
+    | None => [%expr
+       CSS.skew([%e render_transform_functions(~loc, a1)], `deg(0.))
+      ]
     }
-  | `Function_skewX(v) =>
-    [%expr CSS.skewX([%e render_transform_functions(~loc, v)])]
-  | `Function_skewY(v) =>
-    [%expr CSS.skewY([%e render_transform_functions(~loc, v)])]
-  | `Function_translate(x, None) =>
-    [%expr CSS.translate([%e render_length_percentage(~loc, x)], `zero)]
-  | `Function_translate(x, Some(((), v))) =>
-    [%expr
+  | `Function_skewX(v) => [%expr
+     CSS.skewX([%e render_transform_functions(~loc, v)])
+    ]
+  | `Function_skewY(v) => [%expr
+     CSS.skewY([%e render_transform_functions(~loc, v)])
+    ]
+  | `Function_translate(x, None) => [%expr
+     CSS.translate([%e render_length_percentage(~loc, x)], `zero)
+    ]
+  | `Function_translate(x, Some(((), v))) => [%expr
      CSS.translate(
        [%e render_length_percentage(~loc, x)],
        [%e render_length_percentage(~loc, v)],
-     )]
-  | `Function_translate3d(x, (), y, (), z) =>
-    [%expr
+     )
+    ]
+  | `Function_translate3d(x, (), y, (), z) => [%expr
      CSS.translate3d(
        [%e render_length_percentage(~loc, x)],
        [%e render_length_percentage(~loc, y)],
        [%e render_extended_length(~loc, z)],
-     )]
-  | `Function_translateX(x) =>
-    [%expr CSS.translateX([%e render_length_percentage(~loc, x)])]
-  | `Function_translateY(y) =>
-    [%expr CSS.translateY([%e render_length_percentage(~loc, y)])]
-  | `Function_translateZ(z) =>
-    [%expr CSS.translateZ([%e render_extended_length(~loc, z)])]
-  | `Function_scale(x, None) =>
-    [%expr CSS.scale([%e render_float(~loc, x)], [%e render_float(~loc, x)])]
-  | `Function_scale(x, Some(((), v))) =>
-    [%expr CSS.scale([%e render_float(~loc, x)], [%e render_float(~loc, v)])]
-  | `Function_scale3d(x, (), y, (), z) =>
-    [%expr
+     )
+    ]
+  | `Function_translateX(x) => [%expr
+     CSS.translateX([%e render_length_percentage(~loc, x)])
+    ]
+  | `Function_translateY(y) => [%expr
+     CSS.translateY([%e render_length_percentage(~loc, y)])
+    ]
+  | `Function_translateZ(z) => [%expr
+     CSS.translateZ([%e render_extended_length(~loc, z)])
+    ]
+  | `Function_scale(x, None) => [%expr
+     CSS.scale([%e render_float(~loc, x)], [%e render_float(~loc, x)])
+    ]
+  | `Function_scale(x, Some(((), v))) => [%expr
+     CSS.scale([%e render_float(~loc, x)], [%e render_float(~loc, v)])
+    ]
+  | `Function_scale3d(x, (), y, (), z) => [%expr
      CSS.scale3d(
        [%e render_float(~loc, x)],
        [%e render_float(~loc, y)],
        [%e render_float(~loc, z)],
-     )]
+     )
+    ]
   | `Function_scaleX(x) => [%expr CSS.scaleX([%e render_float(~loc, x)])]
   | `Function_scaleY(y) => [%expr CSS.scaleY([%e render_float(~loc, y)])]
   | `Function_scaleZ(z) => [%expr CSS.scaleZ([%e render_float(~loc, z)])]
@@ -3332,7 +3392,8 @@ let render_single_transition = (~loc) =>
        CSS.Types.Transition.Value.make(
          ~property=[%e render_transition_property(~loc, property)],
          (),
-       )];
+       )
+      ];
     }
   | `Static_0(property, duration) => {
       [%expr
@@ -3340,7 +3401,8 @@ let render_single_transition = (~loc) =>
          ~duration=[%e render_extended_time(~loc, duration)],
          ~property=[%e render_transition_property(~loc, property)],
          (),
-       )];
+       )
+      ];
     }
   | `Static_1(property, duration, timingFunction) => {
       [%expr
@@ -3349,7 +3411,8 @@ let render_single_transition = (~loc) =>
          ~timingFunction=[%e render_timing(~loc, timingFunction)],
          ~property=[%e render_transition_property(~loc, property)],
          (),
-       )];
+       )
+      ];
     }
   | `Static_2(property, duration, timingFunction, delay) => {
       [%expr
@@ -3359,7 +3422,8 @@ let render_single_transition = (~loc) =>
          ~timingFunction=[%e render_timing(~loc, timingFunction)],
          ~property=[%e render_transition_property(~loc, property)],
          (),
-       )];
+       )
+      ];
     }
   | `Static_3(property, duration, timingFunction, delay, behavior) => {
       [%expr
@@ -3370,7 +3434,8 @@ let render_single_transition = (~loc) =>
          ~timingFunction=[%e render_timing(~loc, timingFunction)],
          ~property=[%e render_transition_property(~loc, property)],
          (),
-       )];
+       )
+      ];
     };
 
 let render_single_transition_no_interp =
@@ -3398,7 +3463,8 @@ let render_single_transition_no_interp =
        render_option(~loc, render_transition_property, property)
      ],
      (),
-   )];
+   )
+  ];
 };
 
 let transition =
@@ -3426,7 +3492,8 @@ let render_animation_name = (~loc) =>
   | `None => [%expr CSS.Types.AnimationName.none]
   | `Keyframes_name(name) => {
       [%expr
-       CSS.Types.AnimationName.make([%e render_keyframes_name(~loc, name)])];
+       CSS.Types.AnimationName.make([%e render_keyframes_name(~loc, name)])
+      ];
     }
   | `Interpolation(v) => render_variable(~loc, v);
 
@@ -3812,7 +3879,8 @@ let render_single_animation_no_interp =
      ],
      ~name=?[%e render_option(~loc, render_animation_name, name)],
      (),
-   )];
+   )
+  ];
 };
 
 let animation =
@@ -3835,12 +3903,12 @@ let render_ratio = (~loc, value: Types.ratio) => {
   switch (value) {
   | `Number(n) => [%expr `num([%e render_float(~loc, n)])]
   | `Interpolation(v) => render_variable(~loc, v)
-  | `Static(up, _, down) =>
-    [%expr
+  | `Static(up, _, down) => [%expr
      `ratio((
        [%e render_integer(~loc, up)],
        [%e render_integer(~loc, down)],
-     ))]
+     ))
+    ]
   };
 };
 
@@ -4025,13 +4093,15 @@ let justify_content =
       | `Normal => [%expr `normal]
       | `Content_distribution(distribution) =>
         render_content_distribution(~loc, distribution)
-      | `Static(None, position) =>
-        [%expr [%e render_content_position_left_right(~loc, position)]]
-      | `Static(Some(`Safe), position) =>
-        [%expr `safe([%e render_content_position_left_right(~loc, position)])]
-      | `Static(Some(`Unsafe), position) =>
-        [%expr
-         `unsafe([%e render_content_position_left_right(~loc, position)])]
+      | `Static(None, position) => [%expr
+         [%e render_content_position_left_right(~loc, position)]
+        ]
+      | `Static(Some(`Safe), position) => [%expr
+         `safe([%e render_content_position_left_right(~loc, position)])
+        ]
+      | `Static(Some(`Unsafe), position) => [%expr
+         `unsafe([%e render_content_position_left_right(~loc, position)])
+        ]
       }
     },
   );
@@ -4062,12 +4132,15 @@ let justify_items =
       | `Stretch => [%expr `stretch]
       | `Legacy => [%expr `legacy]
       | `And(_, alignment) => render_legacy_alignment(~loc, alignment)
-      | `Static(None, position) =>
-        [%expr [%e render_self_position_left_right(~loc, position)]]
-      | `Static(Some(`Safe), position) =>
-        [%expr `safe([%e render_self_position_left_right(~loc, position)])]
-      | `Static(Some(`Unsafe), position) =>
-        [%expr `unsafe([%e render_self_position_left_right(~loc, position)])]
+      | `Static(None, position) => [%expr
+         [%e render_self_position_left_right(~loc, position)]
+        ]
+      | `Static(Some(`Safe), position) => [%expr
+         `safe([%e render_self_position_left_right(~loc, position)])
+        ]
+      | `Static(Some(`Unsafe), position) => [%expr
+         `unsafe([%e render_self_position_left_right(~loc, position)])
+        ]
       | `Baseline_position(pos, ()) => render_baseline_position(~loc, pos)
       }
     },
@@ -4082,12 +4155,15 @@ let justify_self =
       | `Auto => [%expr `auto]
       | `Normal => [%expr `normal]
       | `Stretch => [%expr `stretch]
-      | `Static(None, position) =>
-        [%expr [%e render_self_position_left_right(~loc, position)]]
-      | `Static(Some(`Safe), position) =>
-        [%expr `safe([%e render_self_position_left_right(~loc, position)])]
-      | `Static(Some(`Unsafe), position) =>
-        [%expr `unsafe([%e render_self_position_left_right(~loc, position)])]
+      | `Static(None, position) => [%expr
+         [%e render_self_position_left_right(~loc, position)]
+        ]
+      | `Static(Some(`Safe), position) => [%expr
+         `safe([%e render_self_position_left_right(~loc, position)])
+        ]
+      | `Static(Some(`Unsafe), position) => [%expr
+         `unsafe([%e render_self_position_left_right(~loc, position)])
+        ]
       | `Baseline_position(pos, ()) => render_baseline_position(~loc, pos)
       }
     },
@@ -4102,12 +4178,15 @@ let align_items =
       | `Normal => [%expr `normal]
       | `Stretch => [%expr `stretch]
       | `Baseline_position(pos, ()) => render_baseline_position(~loc, pos)
-      | `Static(None, position) =>
-        [%expr [%e render_self_position(~loc, position)]]
-      | `Static(Some(`Safe), position) =>
-        [%expr `safe([%e render_self_position(~loc, position)])]
-      | `Static(Some(`Unsafe), position) =>
-        [%expr `unsafe([%e render_self_position(~loc, position)])]
+      | `Static(None, position) => [%expr
+         [%e render_self_position(~loc, position)]
+        ]
+      | `Static(Some(`Safe), position) => [%expr
+         `safe([%e render_self_position(~loc, position)])
+        ]
+      | `Static(Some(`Unsafe), position) => [%expr
+         `unsafe([%e render_self_position(~loc, position)])
+        ]
       | `Interpolation(v) => render_variable(~loc, v)
       }
     },
@@ -4123,12 +4202,15 @@ let align_self =
       | `Normal => [%expr `normal]
       | `Stretch => [%expr `stretch]
       | `Baseline_position(pos, ()) => render_baseline_position(~loc, pos)
-      | `Static(None, position) =>
-        [%expr [%e render_self_position(~loc, position)]]
-      | `Static(Some(`Safe), position) =>
-        [%expr `safe([%e render_self_position(~loc, position)])]
-      | `Static(Some(`Unsafe), position) =>
-        [%expr `unsafe([%e render_self_position(~loc, position)])]
+      | `Static(None, position) => [%expr
+         [%e render_self_position(~loc, position)]
+        ]
+      | `Static(Some(`Safe), position) => [%expr
+         `safe([%e render_self_position(~loc, position)])
+        ]
+      | `Static(Some(`Unsafe), position) => [%expr
+         `unsafe([%e render_self_position(~loc, position)])
+        ]
       | `Interpolation(v) => render_variable(~loc, v)
       }
     },
@@ -4144,12 +4226,15 @@ let align_content =
       | `Normal => [%expr `normal]
       | `Content_distribution(distribution) =>
         render_content_distribution(~loc, distribution)
-      | `Static(None, position) =>
-        [%expr [%e render_content_position(~loc, position)]]
-      | `Static(Some(`Safe), position) =>
-        [%expr `safe([%e render_content_position(~loc, position)])]
-      | `Static(Some(`Unsafe), position) =>
-        [%expr `unsafe([%e render_content_position(~loc, position)])]
+      | `Static(None, position) => [%expr
+         [%e render_content_position(~loc, position)]
+        ]
+      | `Static(Some(`Safe), position) => [%expr
+         `safe([%e render_content_position(~loc, position)])
+        ]
+      | `Static(Some(`Unsafe), position) => [%expr
+         `unsafe([%e render_content_position(~loc, position)])
+        ]
       }
     },
   );
@@ -4217,21 +4302,24 @@ let rec render_track_repeat = (~loc, repeat: Types.track_repeat) => {
   let items =
     List.append(trackSizesExpr, lineNamesExpr) |> Builder.pexp_array(~loc);
   [%expr
-   `repeat((`num([%e render_integer(~loc, positiveInteger)]), [%e items]))];
+   `repeat((`num([%e render_integer(~loc, positiveInteger)]), [%e items]))
+  ];
 }
 and render_track_size = (~loc, value: Types.track_size) => {
   switch (value) {
   | `Track_breadth(breadth) => render_track_breadth(~loc, breadth)
-  | `Minmax(inflexible, (), breadth) =>
-    [%expr
+  | `Minmax(inflexible, (), breadth) => [%expr
      `minmax((
        [%e render_inflexible_breadth(~loc, inflexible)],
        [%e render_track_breadth(~loc, breadth)],
-     ))]
-  | `Fit_content(`Extended_length(el)) =>
-    [%expr `fitContent([%e render_extended_length(~loc, el)])]
-  | `Fit_content(`Extended_percentage(ep)) =>
-    [%expr `fitContent([%e render_extended_percentage(~loc, ep)])]
+     ))
+    ]
+  | `Fit_content(`Extended_length(el)) => [%expr
+     `fitContent([%e render_extended_length(~loc, el)])
+    ]
+  | `Fit_content(`Extended_percentage(ep)) => [%expr
+     `fitContent([%e render_extended_percentage(~loc, ep)])
+    ]
   };
 };
 
@@ -4261,18 +4349,18 @@ let render_track_list = (~loc, track_list, line_names) => {
 let render_fixed_size = (~loc, value: Types.fixed_size) => {
   switch (value) {
   | `Fixed_breadth(breadth) => render_fixed_breadth(~loc, breadth)
-  | `Minmax_0(fixed, (), breadth) =>
-    [%expr
+  | `Minmax_0(fixed, (), breadth) => [%expr
      `minmax((
        [%e render_fixed_breadth(~loc, fixed)],
        [%e render_track_breadth(~loc, breadth)],
-     ))]
-  | `Minmax_1(inflexible, (), breadth) =>
-    [%expr
+     ))
+    ]
+  | `Minmax_1(inflexible, (), breadth) => [%expr
      `minmax((
        [%e render_inflexible_breadth(~loc, inflexible)],
        [%e render_fixed_breadth(~loc, breadth)],
-     ))]
+     ))
+    ]
   };
 };
 
@@ -4509,28 +4597,32 @@ let grid_auto_flow =
 
 let render_grid_line = (~loc, x: Types.grid_line) =>
   switch (x) {
+  | `Interpolation(x) => render_variable(~loc, x)
   | `Auto => [%expr `auto]
-  | `Custom_ident_without_span_or_auto(x) =>
-    [%expr `ident([%e render_string(~loc, x)])]
+  | `Custom_ident_without_span_or_auto(x) => [%expr
+     `ident([%e render_string(~loc, x)])
+    ]
   | `And_0(num, None) => [%expr `num([%e render_integer(~loc, num)])]
-  | `And_0(num, Some(ident)) =>
-    [%expr
+  | `And_0(num, Some(ident)) => [%expr
      `numIdent((
        [%e render_integer(~loc, num)],
        [%e render_string(~loc, ident)],
-     ))]
-  | `And_1(_span, (Some(num), None)) =>
-    [%expr `span(`num([%e render_integer(~loc, num)]))]
-  | `And_1(_span, (None, Some(ident))) =>
-    [%expr `span(`ident([%e render_string(~loc, ident)]))]
-  | `And_1(_span, (Some(num), Some(ident))) =>
-    [%expr
+     ))
+    ]
+  | `And_1(_span, (Some(num), None)) => [%expr
+     `span(`num([%e render_integer(~loc, num)]))
+    ]
+  | `And_1(_span, (None, Some(ident))) => [%expr
+     `span(`ident([%e render_string(~loc, ident)]))
+    ]
+  | `And_1(_span, (Some(num), Some(ident))) => [%expr
      `span(
        `numIdent((
          [%e render_integer(~loc, num)],
          [%e render_string(~loc, ident)],
        )),
-     )]
+     )
+    ]
   | `And_1(_span, (None, None)) => raise(Impossible_state)
   };
 
@@ -4553,19 +4645,20 @@ let grid =
             };
           let auto_columns =
             switch (auto_columns) {
-            | Some(cols) =>
-              [%expr
+            | Some(cols) => [%expr
                Some(
                  [%e
                    cols
                    |> List.map(render_track_size(~loc))
                    |> Builder.pexp_array(~loc)
                  ],
-               )]
+               )
+              ]
             | None => [%expr None]
             };
           [%expr
-           `autoColumns(([%e template_rows], [%e dense], [%e auto_columns]))];
+           `autoColumns(([%e template_rows], [%e dense], [%e auto_columns]))
+          ];
         }
       | `Static_1((_, dense), auto_rows, _, template_columns) => {
           let dense =
@@ -4575,21 +4668,22 @@ let grid =
             };
           let auto_rows =
             switch (auto_rows) {
-            | Some(cols) =>
-              [%expr
+            | Some(cols) => [%expr
                Some(
                  [%e
                    cols
                    |> List.map(render_track_size(~loc))
                    |> Builder.pexp_array(~loc)
                  ],
-               )]
+               )
+              ]
             | None => [%expr None]
             };
           let template_columns =
             render_grid_template_rows_and_columns(~loc, template_columns);
           [%expr
-           `autoRows(([%e dense], [%e auto_rows], [%e template_columns]))];
+           `autoRows(([%e dense], [%e auto_rows], [%e template_columns]))
+          ];
         },
   );
 
@@ -4709,7 +4803,13 @@ let grid_column =
   );
 
 let render_gap =
-    (~loc, value: [< Types.property_column_gap | Types.property_row_gap]) => {
+    (
+      ~loc,
+      value: [<
+        Types.property_column_gap
+        | Types.property_row_gap
+      ],
+    ) => {
   switch (value) {
   | `Extended_length(el) => render_extended_length(~loc, el)
   | `Extended_percentage(ep) => render_extended_percentage(~loc, ep)
@@ -5040,7 +5140,8 @@ let render_drop_shadow = (~loc, value: Types.function_drop_shadow) => {
      [%e offset2Expr],
      [%e offset3Expr],
      [%e colorExpr],
-   ))];
+   ))
+  ];
 };
 
 let render_float_percentage = (~loc, value: Types.number_percentage) => {
@@ -5053,23 +5154,31 @@ let render_float_percentage = (~loc, value: Types.number_percentage) => {
 let render_filter_function = (~loc, value: Types.filter_function) => {
   switch (value) {
   | `Function_blur(v) => [%expr `blur([%e render_extended_length(~loc, v)])]
-  | `Function_brightness(v) =>
-    [%expr `brightness([%e render_float_percentage(~loc, v)])]
-  | `Function_contrast(v) =>
-    [%expr `contrast([%e render_float_percentage(~loc, v)])]
+  | `Function_brightness(v) => [%expr
+     `brightness([%e render_float_percentage(~loc, v)])
+    ]
+  | `Function_contrast(v) => [%expr
+     `contrast([%e render_float_percentage(~loc, v)])
+    ]
   | `Function_drop_shadow(v) => render_drop_shadow(~loc, v)
-  | `Function_grayscale(v) =>
-    [%expr `grayscale([%e render_float_percentage(~loc, v)])]
-  | `Function_hue_rotate(v) =>
-    [%expr `hueRotate([%e render_extended_angle(~loc, v)])]
-  | `Function_invert(v) =>
-    [%expr `invert([%e render_float_percentage(~loc, v)])]
-  | `Function_opacity(v) =>
-    [%expr `opacity([%e render_float_percentage(~loc, v)])]
-  | `Function_saturate(v) =>
-    [%expr `saturate([%e render_float_percentage(~loc, v)])]
-  | `Function_sepia(v) =>
-    [%expr `sepia([%e render_float_percentage(~loc, v)])]
+  | `Function_grayscale(v) => [%expr
+     `grayscale([%e render_float_percentage(~loc, v)])
+    ]
+  | `Function_hue_rotate(v) => [%expr
+     `hueRotate([%e render_extended_angle(~loc, v)])
+    ]
+  | `Function_invert(v) => [%expr
+     `invert([%e render_float_percentage(~loc, v)])
+    ]
+  | `Function_opacity(v) => [%expr
+     `opacity([%e render_float_percentage(~loc, v)])
+    ]
+  | `Function_saturate(v) => [%expr
+     `saturate([%e render_float_percentage(~loc, v)])
+    ]
+  | `Function_sepia(v) => [%expr
+     `sepia([%e render_float_percentage(~loc, v)])
+    ]
   };
 };
 
@@ -5170,12 +5279,12 @@ let scrollbar_color =
     (~loc, value: Types.property_scrollbar_color) =>
       switch (value) {
       | `Auto => [%expr `auto]
-      | `Static(thumbColor, trackColor) =>
-        [%expr
+      | `Static(thumbColor, trackColor) => [%expr
          `thumbTrackColor((
            [%e render_color(~loc, thumbColor)],
            [%e render_color(~loc, trackColor)],
-         ))]
+         ))
+        ]
       },
   );
 
@@ -6090,7 +6199,8 @@ let render_variable_declaration = (~loc, property, value) => {
    CSS.unsafe(
      [%e render_string(~loc, property)],
      [%e render_string(~loc, value)],
-   )];
+   )
+  ];
 };
 
 let render_to_expr = (~loc, property, value, important) => {

@@ -139,6 +139,8 @@ let value =
 [%css {|grid-row: auto / auto|}];
 [%css {|grid-row: 2 / span 2|}];
 [%css {|grid-area: 1 / 1|}];
+let area = `num(33);
+[%css {|grid-area: $(area)|}];
 [%css {|grid-area: 1 / span 1|}];
 [%css {|grid-area: span 1 / 10 / -1|}];
 [%css {|grid-column-gap: 0|}];
