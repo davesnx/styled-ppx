@@ -27,6 +27,7 @@ jobs:
       matrix:
         os: [ubuntu-20.04, macos-latest] # Missing windows-latest
         ocaml-compiler:
+          - 4.14.1
           - 5.2.0
 
     runs-on: ${{ matrix.os }}
@@ -99,12 +100,13 @@ jobs:
 
       - name: Upload artifacts for ${{ matrix.os }}
         uses: actions/upload-artifact@v4
+        if: matrix.ocaml-compiler == '4.14.1'
         with:
           name: ${{ matrix.os }}
           path: _build/default/packages/bin/bin.exe
 
       - name: Upload runtime artifacts for @davesnx/styled-ppx/runtime
-        if: matrix.os == 'ubuntu-20.04'
+        if: matrix.os == 'ubuntu-20.04' && matrix.ocaml-compiler == '4.14.1'
         uses: actions/upload-artifact@v4
         with:
           name: runtime-rescript
@@ -126,9 +128,6 @@ jobs:
         with:
           path: node_modules
           key: npm-${{ matrix.os }}-${{ hashFiles('package.json') }}
-
-      - name: Grant permission to run ppx
-        run: chmod +x _build/default/packages/bin/bin.exe
 
       - name: Run E2E tests
         run: make test-e2e
