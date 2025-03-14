@@ -100,7 +100,7 @@ jobs:
 
       - name: Upload artifacts for ${{ matrix.os }}
         uses: actions/upload-artifact@v4
-        if: matrix.os == 'ubuntu-20.04' && matrix.ocaml-compiler == '4.14.1'
+        if: matrix.ocaml-compiler == '4.14.1'
         with:
           name: ${{ matrix.os }}
           path: _build/default/packages/bin/bin.exe
