@@ -3251,8 +3251,9 @@ module TextDecoration = struct
 
   type t =
     [ `value of value
-    | Var.t
     | Cascading.t
+    | Var.t
+    | None.t
     ]
 
   let make ?(line = `none) ?(thickness = `auto) ?(style = `solid)
@@ -3271,6 +3272,7 @@ module TextDecoration = struct
       ^ Color.toString x.color
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
+    | #None.t -> None.toString
 end
 
 module Width = struct
