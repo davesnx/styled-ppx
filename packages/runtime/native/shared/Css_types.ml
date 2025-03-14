@@ -3243,10 +3243,10 @@ end
 
 module TextDecoration = struct
   type value = {
-    line : TextDecorationLine.Value.t;
-    thickness : TextDecorationThickness.Value.t;
-    style : TextDecorationStyle.Value.t;
-    color : Color.t;
+    line : TextDecorationLine.Value.t option;
+    thickness : TextDecorationThickness.Value.t option;
+    style : TextDecorationStyle.Value.t option;
+    color : Color.t option;
   }
 
   type t =
@@ -3256,20 +3256,26 @@ module TextDecoration = struct
     | None.t
     ]
 
-  let make ?(line = `none) ?(thickness = `auto) ?(style = `solid)
-    ?(color = `currentColor) () =
+  let make ?line ?thickness ?style ?color () =
     `value { line; thickness; style; color }
 
   let toString x =
     match x with
     | `value x ->
-      TextDecorationLine.Value.toString x.line
-      ^ {js| |js}
-      ^ TextDecorationThickness.Value.toString x.thickness
-      ^ {js| |js}
-      ^ TextDecorationStyle.Value.toString x.style
-      ^ {js| |js}
-      ^ Color.toString x.color
+      (match x.line with
+      | Some line -> TextDecorationLine.Value.toString line ^ {js| |js}
+      | None -> {js||js})
+      ^ (match x.thickness with
+        | Some thickness ->
+          TextDecorationThickness.Value.toString thickness ^ {js| |js}
+        | None -> {js||js})
+      ^ (match x.style with
+        | Some style -> TextDecorationStyle.Value.toString style ^ {js| |js}
+        | None -> {js||js})
+      ^
+      (match x.color with
+      | Some color -> Color.toString color
+      | None -> {js||js})
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
     | #None.t -> None.toString
