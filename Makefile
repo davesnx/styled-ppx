@@ -46,15 +46,15 @@ create-switch: ## Create opam switch
 
 .PHONY: pin
 pin: ## Pin dependencies
-	opam pin add server-reason-react.0.3.1 "https://github.com/ml-in-barcelona/server-reason-react.git#ce006ee5ad5562eee617a4c713b1efa317dc2aab" -y
+	opam pin add server-reason-react.0.3.2 "https://github.com/ml-in-barcelona/server-reason-react.git#ce006ee5ad5562eee617a4c713b1efa317dc2aab" -y
 
 .PHONY: install
-install: ## Install project dependencies
+install: pin ## Install project dependencies
 	opam install . --deps-only --with-test --working-dir . -y
 	npm install
 
 .PHONY: init
-init: setup-githooks create-switch install pin ## Create a local dev enviroment
+init: setup-githooks create-switch install ## Create a local dev enviroment
 
 .PHONY: subst
 subst: ## Run dune substitute
