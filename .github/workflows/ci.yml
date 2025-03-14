@@ -100,7 +100,7 @@ jobs:
 
       - name: Upload artifacts for ${{ matrix.os }}
         uses: actions/upload-artifact@v4
-        if: matrix.os == 'ubuntu-20.04'
+        if: matrix.os == 'ubuntu-20.04' && matrix.ocaml-compiler == '4.14.1'
         with:
           name: ${{ matrix.os }}
           path: _build/default/packages/bin/bin.exe
@@ -128,9 +128,6 @@ jobs:
         with:
           path: node_modules
           key: npm-${{ matrix.os }}-${{ hashFiles('package.json') }}
-
-      - name: Grant permission to run ppx
-        run: chmod +x _build/default/packages/bin/bin.exe
 
       - name: Run E2E tests
         run: make test-e2e
