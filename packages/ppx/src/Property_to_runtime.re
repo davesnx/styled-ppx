@@ -1565,8 +1565,8 @@ let render_url = (~loc, url: Types.url) => {
 let render_image = (~loc, value: Types.image) =>
   switch (value) {
   | `Gradient(gradient) => render_gradient(~loc, gradient)
-  | `Interpolation(v) => render_variable(~loc, v)
   | `Url(v) => render_url(~loc, v)
+  | `Interpolation(v) => render_variable(~loc, v)
   | `Function_element(_) => raise(Unsupported_feature)
   | `Function_paint(_) => raise(Unsupported_feature)
   | `Function_image(_) => raise(Unsupported_feature)
