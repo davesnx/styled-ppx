@@ -217,7 +217,7 @@ let string =
 
 // TODO: <url-modifier>
 // https://drafts.csswg.org/css-values-4/#urls
-let url = {
+let url_no_interp = {
   let url_token =
     token(
       fun

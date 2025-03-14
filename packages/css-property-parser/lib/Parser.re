@@ -141,7 +141,7 @@ and calc_value = [%value.rec
 and cf_final_image = [%value.rec "<image> | <color>"]
 and cf_mixing_image = [%value.rec "[ <extended-percentage> ]? && <image>"]
 and class_selector = [%value.rec "'.' <ident-token>"]
-and clip_source = [%value.rec "<url-with-interp>"]
+and clip_source = [%value.rec "<url>"]
 and color = [%value.rec
   "<rgb()> | <rgba()> | <hsl()> | <hsla()> | <hex-color> | <named-color> | 'currentColor' | <deprecated-system-color> | <interpolation> | <var()> | <color-mix()>"
 ]
@@ -199,7 +199,7 @@ and content_distribution = [%value.rec
   "'space-between' | 'space-around' | 'space-evenly' | 'stretch'"
 ]
 and content_list = [%value.rec
-  "[ <string> | 'contents' | <url-with-interp> | <quote> | <attr()> | counter( <ident> ',' [ <'list-style-type'> ]? ) ]+"
+  "[ <string> | 'contents' | <url> | <quote> | <attr()> | counter( <ident> ',' [ <'list-style-type'> ]? ) ]+"
 ]
 and content_position = [%value.rec
   "'center' | 'start' | 'end' | 'flex-start' | 'flex-end'"
@@ -265,7 +265,7 @@ and fill_rule = [%value.rec "'nonzero' | 'evenodd'"]
 and filter_function = [%value.rec
   "<blur()> | <brightness()> | <contrast()> | <drop-shadow()> | <grayscale()> | <hue-rotate()> | <invert()> | <opacity()> | <saturate()> | <sepia()>"
 ]
-and filter_function_list = [%value.rec "[ <filter-function> | <url-with-interp> ]+"]
+and filter_function_list = [%value.rec "[ <filter-function> | <url> ]+"]
 and final_bg_layer = [%value.rec
   "<'background-color'> || <bg-image> || <bg-position> [ '/' <bg-size> ]? || <repeat-style> || <attachment> || <box> || <box>"
 ]
@@ -408,13 +408,13 @@ and function_skew = [%value.rec
 and function_skewX = [%value.rec "skewX( <extended-angle> | <zero> )"]
 and function_skewY = [%value.rec "skewY( <extended-angle> | <zero> )"]
 and function_target_counter = [%value.rec
-  "target-counter( [ <string> | <url-with-interp> ] ',' <custom-ident> ',' [ <counter-style> ]? )"
+  "target-counter( [ <string> | <url> ] ',' <custom-ident> ',' [ <counter-style> ]? )"
 ]
 and function_target_counters = [%value.rec
-  "target-counters( [ <string> | <url-with-interp> ] ',' <custom-ident> ',' <string> ',' [ <counter-style> ]? )"
+  "target-counters( [ <string> | <url> ] ',' <custom-ident> ',' <string> ',' [ <counter-style> ]? )"
 ]
 and function_target_text = [%value.rec
-  "target-text( [ <string> | <url-with-interp> ] ',' [ 'content' | 'before' | 'after' | 'first-letter' ]? )"
+  "target-text( [ <string> | <url> ] ',' [ 'content' | 'before' | 'after' | 'first-letter' ]? )"
 ]
 and function_translate = [%value.rec
   "translate( [<extended-length> | <extended-percentage>] [',' [ <extended-length> | <extended-percentage> ]]? )"
@@ -457,10 +457,10 @@ and historical_lig_values = [%value.rec
 and hue = [%value.rec "<number> | <extended-angle>"]
 and id_selector = [%value.rec "<hash-token>"]
 and image = [%value.rec
-  "<url-with-interp> | <image()> | <image-set()> | <element()> | <paint()> | <cross-fade()> | <gradient> | <interpolation>"
+  "<url> | <image()> | <image-set()> | <element()> | <paint()> | <cross-fade()> | <gradient> | <interpolation>"
 ]
 and image_set_option = [%value.rec "[ <image> | <string> ] <resolution>"]
-and image_src = [%value.rec "<url-with-interp> | <string>"]
+and image_src = [%value.rec "<url> | <string>"]
 and image_tags = [%value.rec "'ltr' | 'rtl'"]
 and inflexible_breadth = [%value.rec
   "<extended-length> | <extended-percentage> | 'min-content' | 'max-content' | 'auto'"
@@ -490,7 +490,7 @@ and mask_position = [%value.rec
   "[ <extended-length> | <extended-percentage> | 'left' | 'center' | 'right' ] [ <extended-length> | <extended-percentage> | 'top' | 'center' | 'bottom' ]?"
 ]
 and mask_reference = [%value.rec "'none' | <image> | <mask-source>"]
-and mask_source = [%value.rec "<url-with-interp>"]
+and mask_source = [%value.rec "<url>"]
 and masking_mode = [%value.rec "'alpha' | 'luminance' | 'match-source'"]
 and mf_comparison = [%value.rec "<mf-lt> | <mf-gt> | <mf-eq>"]
 and mf_eq = [%value.rec "'='"]
@@ -577,7 +577,7 @@ and page_selector = [%value.rec
 ]
 and page_selector_list = [%value.rec "[ [ <page-selector> ]# ]?"]
 and paint = [%value.rec
-  "'none' | <color> | <url-with-interp> [ 'none' | <color> ]? | 'context-fill' | 'context-stroke' | <interpolation>"
+  "'none' | <color> | <url> [ 'none' | <color> ]? | 'context-fill' | 'context-stroke' | <interpolation>"
 ]
 and position = [%value.rec
   "[ 'left' | 'center' | 'right' | 'top' | 'bottom' | <length-percentage> ]
@@ -590,7 +590,7 @@ and property__moz_appearance = [%value.rec
   "'none' | 'button' | 'button-arrow-down' | 'button-arrow-next' | 'button-arrow-previous' | 'button-arrow-up' | 'button-bevel' | 'button-focus' | 'caret' | 'checkbox' | 'checkbox-container' | 'checkbox-label' | 'checkmenuitem' | 'dualbutton' | 'groupbox' | 'listbox' | 'listitem' | 'menuarrow' | 'menubar' | 'menucheckbox' | 'menuimage' | 'menuitem' | 'menuitemtext' | 'menulist' | 'menulist-button' | 'menulist-text' | 'menulist-textfield' | 'menupopup' | 'menuradio' | 'menuseparator' | 'meterbar' | 'meterchunk' | 'progressbar' | 'progressbar-vertical' | 'progresschunk' | 'progresschunk-vertical' | 'radio' | 'radio-container' | 'radio-label' | 'radiomenuitem' | 'range' | 'range-thumb' | 'resizer' | 'resizerpanel' | 'scale-horizontal' | 'scalethumbend' | 'scalethumb-horizontal' | 'scalethumbstart' | 'scalethumbtick' | 'scalethumb-vertical' | 'scale-vertical' | 'scrollbarbutton-down' | 'scrollbarbutton-left' | 'scrollbarbutton-right' | 'scrollbarbutton-up' | 'scrollbarthumb-horizontal' | 'scrollbarthumb-vertical' | 'scrollbartrack-horizontal' | 'scrollbartrack-vertical' | 'searchfield' | 'separator' | 'sheet' | 'spinner' | 'spinner-downbutton' | 'spinner-textfield' | 'spinner-upbutton' | 'splitter' | 'statusbar' | 'statusbarpanel' | 'tab' | 'tabpanel' | 'tabpanels' | 'tab-scroll-arrow-back' | 'tab-scroll-arrow-forward' | 'textfield' | 'textfield-multiline' | 'toolbar' | 'toolbarbutton' | 'toolbarbutton-dropdown' | 'toolbargripper' | 'toolbox' | 'tooltip' | 'treeheader' | 'treeheadercell' | 'treeheadersortarrow' | 'treeitem' | 'treeline' | 'treetwisty' | 'treetwistyopen' | 'treeview' | '-moz-mac-unified-toolbar' | '-moz-win-borderless-glass' | '-moz-win-browsertabbar-toolbox' | '-moz-win-communicationstext' | '-moz-win-communications-toolbox' | '-moz-win-exclude-glass' | '-moz-win-glass' | '-moz-win-mediatext' | '-moz-win-media-toolbox' | '-moz-window-button-box' | '-moz-window-button-box-maximized' | '-moz-window-button-close' | '-moz-window-button-maximize' | '-moz-window-button-minimize' | '-moz-window-button-restore' | '-moz-window-frame-bottom' | '-moz-window-frame-left' | '-moz-window-frame-right' | '-moz-window-titlebar' | '-moz-window-titlebar-maximized'"
 ]
 and property__moz_background_clip = [%value.rec "'padding' | 'border'"]
-and property__moz_binding = [%value.rec "<url-with-interp> | 'none'"]
+and property__moz_binding = [%value.rec "<url> | 'none'"]
 and property__moz_border_bottom_colors = [%value.rec "[ <color> ]+ | 'none'"]
 and property__moz_border_left_colors = [%value.rec "[ <color> ]+ | 'none'"]
 and property__moz_border_radius_bottomleft = [%value.rec
@@ -794,7 +794,7 @@ and property__webkit_mask = [%value.rec
 ]
 and property__webkit_mask_attachment = [%value.rec "[ <attachment> ]#"]
 and property__webkit_mask_box_image = [%value.rec
-  "[ <url-with-interp> | <gradient> | 'none' ] [ [ <extended-length> | <extended-percentage> ]{4} [ <-webkit-mask-box-repeat> ]{2} ]?"
+  "[ <url> | <gradient> | 'none' ] [ [ <extended-length> | <extended-percentage> ]{4} [ <-webkit-mask-box-repeat> ]{2} ]?"
 ]
 and property__webkit_mask_clip = [%value.rec
   "[ <box> | 'border' | 'padding' | 'content' | 'text' ]#"
@@ -903,7 +903,7 @@ and property_background_size = [%value.rec "[ <bg-size> ]#"]
 and property_baseline_shift = [%value.rec
   "'baseline' | 'sub' | 'super' | <svg-length>"
 ]
-and property_behavior = [%value.rec "[ <url-with-interp> ]+"]
+and property_behavior = [%value.rec "[ <url> ]+"]
 and property_block_overflow = [%value.rec "'clip' | 'ellipsis' | <string>"]
 and property_block_size = [%value.rec "<'width'>"]
 and property_border = [%value.rec
@@ -1079,8 +1079,8 @@ and property_counter_set = [%value.rec
   "[ <custom-ident> [ <integer> ]? ]+ | 'none'"
 ]
 and property_cue = [%value.rec "<'cue-before'> [ <'cue-after'> ]?"]
-and property_cue_after = [%value.rec "<url-with-interp> [ <decibel> ]? | 'none'"]
-and property_cue_before = [%value.rec "<url-with-interp> [ <decibel> ]? | 'none'"]
+and property_cue_after = [%value.rec "<url> [ <decibel> ]? | 'none'"]
+and property_cue_before = [%value.rec "<url> [ <decibel> ]? | 'none'"]
 /* and property_cursor = [%value.rec
      "[ <url> [ <x> <y> ]? ',' ]* [ 'auto' | 'default' | 'none' | 'context-menu' | 'help' | 'pointer' | 'progress' | 'wait' | 'cell' | 'crosshair' | 'text' | 'vertical-text' | 'alias' | 'copy' | 'move' | 'no-drop' | 'not-allowed' | 'e-resize' | 'n-resize' | 'ne-resize' | 'nw-resize' | 's-resize' | 'se-resize' | 'sw-resize' | 'w-resize' | 'ew-resize' | 'ns-resize' | 'nesw-resize' | 'nwse-resize' | 'col-resize' | 'row-resize' | 'all-scroll' | 'zoom-in' | 'zoom-out' | 'grab' | 'grabbing' | 'hand' | '-webkit-grab' | '-webkit-grabbing' | '-webkit-zoom-in' | '-webkit-zoom-out' | '-moz-grab' | '-moz-grabbing' | '-moz-zoom-in' | '-moz-zoom-out' ] | <interpolation>"
    ] */
@@ -1326,10 +1326,10 @@ and property_margin_top = [%value.rec
   "<extended-length> | <extended-percentage> | 'auto'"
 ]
 and property_margin_trim = [%value.rec "'none' | 'in-flow' | 'all'"]
-and property_marker = [%value.rec "'none' | <url-with-interp>"]
-and property_marker_end = [%value.rec "'none' | <url-with-interp>"]
-and property_marker_mid = [%value.rec "'none' | <url-with-interp>"]
-and property_marker_start = [%value.rec "'none' | <url-with-interp>"]
+and property_marker = [%value.rec "'none' | <url>"]
+and property_marker_end = [%value.rec "'none' | <url>"]
+and property_marker_mid = [%value.rec "'none' | <url>"]
+and property_marker_start = [%value.rec "'none' | <url>"]
 and property_mask = [%value.rec "[ <mask-layer> ]#"]
 and property_mask_border = [%value.rec
   "<'mask-border-source'> || <'mask-border-slice'> [ '/' [ <'mask-border-width'> ]? [ '/' <'mask-border-outset'> ]? ]? || <'mask-border-repeat'> || <'mask-border-mode'>"
@@ -1429,7 +1429,7 @@ and property_offset_distance = [%value.rec
   "<extended-length> | <extended-percentage>"
 ]
 and property_offset_path = [%value.rec
-  "'none' | ray( <extended-angle> && [ <ray_size> ]? && [ 'contain' ]? ) | <path()> | <url-with-interp> | <basic-shape> || <geometry-box>"
+  "'none' | ray( <extended-angle> && [ <ray_size> ]? && [ 'contain' ]? ) | <path()> | <url> | <basic-shape> || <geometry-box>"
 ]
 and property_offset_position = [%value.rec "'auto' | <position>"]
 and property_offset_rotate = [%value.rec
@@ -1655,7 +1655,7 @@ and property_speak_as = [%value.rec
   "'normal' | 'spell-out' || 'digits' || [ 'literal-punctuation' | 'no-punctuation' ]"
 ]
 and property_src = [%value.rec
-  "[ <url-with-interp> [ format( [ <string> ]# ) ]? | local( <family-name> ) ]#"
+  "[ <url> [ format( [ <string> ]# ) ]? | local( <family-name> ) ]#"
 ]
 and property_stroke = [%value.rec "<paint>"]
 and property_stroke_dasharray = [%value.rec "'none' | [ [ <svg-length> ]+ ]#"]
@@ -1974,7 +1974,7 @@ and symbol = [%value.rec "<string> | <image> | <custom-ident>"]
 and target = [%value.rec
   "<target-counter()> | <target-counters()> | <target-text()>"
 ]
-and url_with_interp = [%value.rec "<url> | url( <interpolation> )"]
+and url = [%value.rec "<url-no-interp> | url( <interpolation> )"]
 and extended_length = [%value.rec
   "<length> | <calc()> | <interpolation> | <min()> | <max()>"
 ]
