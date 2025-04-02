@@ -61,6 +61,8 @@ module String = struct
       || (i < len_str && prefix.[i] = str.[i] && compare_prefix (i + 1))
     in
     compare_prefix 0
+  
+  let contains = Stdlib.String.contains
 end
 
 module Int = struct

@@ -3,6 +3,7 @@
  (flags
   (:standard -open Alcotest_extra))
  (libraries
+  str
   alcotest
   fmt
   server-reason-react.js

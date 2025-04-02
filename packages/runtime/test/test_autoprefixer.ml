@@ -19,8 +19,7 @@ let text_decoration =
         (CSS.textDecorations
            ~line:(CSS.Types.TextDecorationLine.Value.make ~lineThrough:true ())
            ())
-        "-webkit-text-decoration: line-through auto solid currentColor; \
-         text-decoration: line-through auto solid currentColor;")
+        "-webkit-text-decoration: line-through ; text-decoration: line-through ;")
 
 let display_grid =
   test "display_grid" (fun () ->

@@ -60,7 +60,6 @@ let contains_ampersand selector = String.contains selector '&'
 let contains_a_coma selector = String.contains selector ','
 let starts_with_at selector = String.starts_with ~prefix:"@" selector
 let starts_with_dot selector = String.starts_with ~prefix:"." selector
-let starts_with_double_dot selector = String.starts_with ~prefix:":" selector
 let starts_with_ampersand selector = String.starts_with ~prefix:"&" selector
 
 let prefix ~pre s =
@@ -136,16 +135,11 @@ let resolve_ampersand hash selector =
   let resolved_selector = replace_ampersand ~by:classname selector in
   if contains_ampersand selector then resolved_selector
   else if starts_with_at selector then resolved_selector
-    (* This is the differente between SASS and Emotion. Emotion doesn't add a space on pseuo-selectors, while SASS does *)
-  else if starts_with_double_dot selector then
-    Printf.sprintf ".%s%s" hash resolved_selector
   else Printf.sprintf ".%s %s" hash resolved_selector
 
 let add_ampersand selector =
   if contains_ampersand selector then selector
   else if starts_with_at selector then selector
-    (* This is the differente between SASS and Emotion. Emotion doesn't add a space on pseuo-selectors, while SASS does *)
-  else if starts_with_double_dot selector then Printf.sprintf "&%s" selector
   else Printf.sprintf "& %s" selector
 
 let remove_media_from_selector selector =
@@ -295,8 +289,6 @@ let resolve_selectors ?(prefix_with_ampersand = true) rules =
             if contains_ampersand current_selector.(0) then
               (* reemplazar el ampersand del current_selector, con el padre *)
               replace_ampersand ~by:prefix current_selector.(0)
-            else if starts_with_double_dot current_selector.(0) then
-              prefix ^ current_selector.(0)
               (* This case is the same as the "else", but I keep it for reference *)
             else if starts_with_dot current_selector.(0) then
               prefix ^ " " ^ current_selector.(0)

@@ -300,7 +300,7 @@ let ampersand_everywhere_2 =
     (Printf.sprintf
        ".%s { font-size: 1px; } .felipe .%s .lola { display: none; } .felipe \
         .%s .lola { display: none; } .felipe .%s:first-child { display: none; \
-        } .felipe .%s:first-child { display: none; }"
+        } .felipe .%s :first-child { display: none; }"
        classname classname classname classname classname)
 
 let ampersand_everywhere_3 =
@@ -330,7 +330,7 @@ let ampersand_everywhere_3 =
   assert_string css
     (Printf.sprintf
        ".%s { margin: 0; padding: 0; list-style-type: none; } @media \
-        (max-width: 1279px) { .css-1t4likh-hasTwoColumnList .%s:first-child { \
+        (max-width: 1279px) { .css-1t4likh-hasTwoColumnList .%s :first-child { \
         padding-bottom: 16px; border-bottom: 1px solid rgba(255, 255, 255, \
         0.3); } }"
        classname classname)
@@ -353,8 +353,8 @@ let pseudo_selectors_everywhere =
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s { display: block; } .%s::before { display: none; } \
-        .%s::before::after { display: none; }"
+       ".%s { display: block; } .%s ::before { display: none; } .%s ::before \
+        ::after { display: none; }"
        classname classname classname)
 
 let selector_ampersand_with_no_space =
@@ -409,9 +409,9 @@ let selector_nested_with_mq_and_declarations =
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s li { list-style-type: none; } .%s li::before { position: absolute; \
-        left: -20px; content: \"✓\"; } @media (max-width: 767px) { .%s li { \
-        position: relative; } }"
+       ".%s li { list-style-type: none; } .%s li ::before { position: \
+        absolute; left: -20px; content: \"✓\"; } @media (max-width: 767px) { \
+        .%s li { position: relative; } }"
        classname classname classname)
 
 let selector_nested_with_mq_and_declarations2 =
@@ -477,7 +477,7 @@ let selector_params =
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s { max-width: 800px; } .%s:first-child { width: 300px; }" classname
+       ".%s { max-width: 800px; } .%s :first-child { width: 300px; }" classname
        classname)
 
 let keyframe =
@@ -546,7 +546,7 @@ let hover_selector =
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s { color: currentColor; } .%s:hover { color: transparent; } \
+       ".%s { color: currentColor; } .%s :hover { color: transparent; } \
         .%s:hover { color: transparent; } .%s  :hover { color: transparent; }"
        classname classname classname classname)
 
@@ -620,22 +620,22 @@ let functional_pseudo =
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s .foo:is(ol, ul, menu:unsupported) :is(ol, ul) { color: #008000; } \
-        .%s .foo:is(ol, ul) :is(ol, ul) ol { list-style-type: lower-greek; \
+       ".%s .foo :is(ol, ul, menu:unsupported) :is(ol, ul) { color: #008000; } \
+        .%s .foo :is(ol, ul) :is(ol, ul) ol { list-style-type: lower-greek; \
         color: #D2691E; } .%s .foo p:not(.irrelevant) { font-weight: 700; } \
-        .%s .foo p > :not(strong, b.important) { color: #8B008B; } .%s \
-        .foo:where(ol, ul, menu:unsupported) :where(ol, ul) { color: #008000; \
-        } .%s .foo:where(ol, ul) :where(ol, ul) ol { list-style-type: \
-        lower-greek; color: #D2691E; } .%s .foo:is(h1, h2, h3):has(+ :is(h2, \
+        .%s .foo p > :not(strong, b.important) { color: #8B008B; } .%s .foo \
+        :where(ol, ul, menu:unsupported) :where(ol, ul) { color: #008000; } \
+        .%s .foo :where(ol, ul) :where(ol, ul) ol { list-style-type: \
+        lower-greek; color: #D2691E; } .%s .foo :is(h1, h2, h3):has(+ :is(h2, \
         h3, h4)) { margin: 0 0 0.25rem 0; } .%s .foo body:has(video, audio) { \
         color: #FF0000; } .%s .foo body:has(video):has(audio) { color: \
-        #FF0000; } .%s .bar:is(ol, ul, menu:unsupported) :is(ol, ul) { color: \
-        #008000; } .%s .bar:is(ol, ul) :is(ol, ul) ol { list-style-type: \
+        #FF0000; } .%s .bar :is(ol, ul, menu:unsupported) :is(ol, ul) { color: \
+        #008000; } .%s .bar :is(ol, ul) :is(ol, ul) ol { list-style-type: \
         lower-greek; color: #D2691E; } .%s .bar p:not(.irrelevant) { \
         font-weight: 700; } .%s .bar p > :not(strong, b.important) { color: \
-        #8B008B; } .%s .bar:where(ol, ul, menu:unsupported) :where(ol, ul) { \
-        color: #008000; } .%s .bar:where(ol, ul) :where(ol, ul) ol { \
-        list-style-type: lower-greek; color: #D2691E; } .%s .bar:is(h1, h2, \
+        #8B008B; } .%s .bar :where(ol, ul, menu:unsupported) :where(ol, ul) { \
+        color: #008000; } .%s .bar :where(ol, ul) :where(ol, ul) ol { \
+        list-style-type: lower-greek; color: #D2691E; } .%s .bar :is(h1, h2, \
         h3):has(+ :is(h2, h3, h4)) { margin: 0 0 0.25rem 0; } .%s .bar \
         body:has(video, audio) { color: #FF0000; } .%s .bar \
         body:has(video):has(audio) { color: #FF0000; }"
@@ -756,7 +756,7 @@ let selector_nested_with_pseudo_2 =
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s { position: relative; } .%s:hover::after { top: 50px; }" classname
+       ".%s { position: relative; } .%s :hover ::after { top: 50px; }" classname
        classname)
 
 let selector_nested_with_pseudo_3 =
@@ -1145,9 +1145,9 @@ let pseudo_selectors =
   assert_string css
     (Printf.sprintf
        ".%s { box-sizing: border-box; padding-top: 9px; padding-bottom: 9px; \
-        border-radius: 0; } .%s::placeholder { color: currentColor; } \
-        .%s:hover { border: 1px solid transparent; } .%s:focus { outline: \
-        none; } .%s:disabled { color: transparent; }"
+        border-radius: 0; } .%s ::placeholder { color: currentColor; } .%s \
+        :hover { border: 1px solid transparent; } .%s :focus { outline: none; \
+        } .%s :disabled { color: transparent; }"
        classname classname classname classname classname)
 
 let real_world =
@@ -1171,8 +1171,8 @@ let real_world =
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s { padding: 0; } .%s.%s { margin: 0px; } .%s.%s::before { top: \
-        40px; } .%s.%s::after { top: 40px; }"
+       ".%s { padding: 0; } .%s.%s { margin: 0px; } .%s.%s ::before { top: \
+        40px; } .%s.%s ::after { top: 40px; }"
        classname classname buttonActive classname buttonActive classname
        buttonActive)
 
@@ -1219,7 +1219,7 @@ let global_with_selector =
    |}];
   let css = get_string_style_rules () in
   assert_string css
-    (Printf.sprintf "html{line-height:1.15;}a:hover{padding:0;}")
+    (Printf.sprintf "html{line-height:1.15;}a :hover{padding:0;}")
 
 let ampersand_everywhere_global =
   test "ampersand_everywhere_global" @@ fun () ->

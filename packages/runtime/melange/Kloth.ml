@@ -57,6 +57,8 @@ module String = struct
   [@@mel.send]
 
   external trim : string -> string = "trim" [@@mel.send]
+
+  let contains = Stdlib.String.contains
 end
 
 module Int = struct

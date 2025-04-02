@@ -10,6 +10,7 @@ module String : sig
   val length : string -> int
   val trim : string -> string
   val starts_with : prefix:string -> string -> bool
+  val contains: string -> char -> bool
 end
 
 module Int : sig

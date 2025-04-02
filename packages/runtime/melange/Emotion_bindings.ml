@@ -25,12 +25,19 @@ external makeAnimation : Js.Json.t Js.Dict.t -> string = "keyframes"
 let makeKeyframes frames = makeAnimation frames
 let insertRule css = injectRaw css
 let renderRule renderer css = renderRaw renderer css
-let global rules = injectRules (Rule.toJson rules)
+
+let global rules =
+  rules
+  |> Emotion_bindings_helper.replaceSelectorGlobal
+  |> Rule.toJson
+  |> injectRules
 
 let renderGlobal renderer selector rules =
   renderRules renderer selector (Rule.toJson rules)
 
-let style rules = make (Rule.toJson rules)
+let style rules =
+  rules |> Emotion_bindings_helper.replaceSelector |> Rule.toJson |> make
+
 let merge styles = mergeStyles styles
 let merge2 s s2 = merge [| s; s2 |]
 let merge3 s s2 s3 = merge [| s; s2; s3 |]

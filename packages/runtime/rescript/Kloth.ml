@@ -48,6 +48,7 @@ end
 module String = struct
   external get : string -> int -> char = "%string_safe_get"
   external length : string -> int = "length" [@@bs.get]
+  external jsContains : string -> string -> bool = "includes" [@@bs.send]
 
   (* Public API *)
 
@@ -55,6 +56,10 @@ module String = struct
   [@@bs.send]
 
   external trim : string -> string = "trim" [@@bs.send]
+
+  let contains s c =
+    let needle = String.make 1 c in
+    jsContains s needle
 end
 
 module Int = struct
