@@ -180,6 +180,14 @@ keyframe_style_rule:
     (* TODO: Handle separated_list(COMMA, percentage) *)
   }
 
+combined_selector:
+  | x = selector { x }
+  | x = relative_selector { x }
+
+combined_selector_list:
+  | selector = loc(combined_selector) WS? { [selector] }
+  | selector = loc(combined_selector) WS? COMMA WS? seq = combined_selector_list WS? { selector :: seq }
+
 selector_list:
   | selector = loc(selector) WS? { [selector] }
   | selector = loc(selector) WS? COMMA WS? seq = selector_list WS? { selector :: seq }
@@ -190,14 +198,14 @@ relative_selector_list:
 
 /* .class {} */
 style_rule:
-  | prelude = loc(selector_list) WS?
+  | prelude = loc(combined_selector_list) WS?
     block = loc(empty_brace_block) {
     { prelude;
       block;
       loc = make_loc $startpos $endpos;
     }
   }
-  | prelude = loc(selector_list) WS?
+  | prelude = loc(combined_selector_list) WS?
     declarations = brace_block(loc(declarations)) {
     { prelude;
       block = declarations;

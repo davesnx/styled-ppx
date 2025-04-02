@@ -1291,6 +1291,31 @@ let attribute_selector =
     "[list]:not([type=date]):not([type=datetime-local]):not([type=month]):not([type=week]):not([type=time])::-webkit-calendar-picker-indicator{display:none \
      !important;}button{-webkit-appearance:button;}[type=button]{-webkit-appearance:button;}[type=reset]{-webkit-appearance:button;}[type=submit]{-webkit-appearance:button;}button:not(:disabled){cursor:pointer;}[type=button]:not(:disabled){cursor:pointer;}[type=reset]:not(:disabled){cursor:pointer;}[type=submit]:not(:disabled){cursor:pointer;}"
 
+let update_combinator =
+  test "update_combinator" @@ fun () ->
+  let classname =
+    [%cx
+      {|
+        main {
+          & + article { color: red; }
+          & > p { color: red; }
+          & ~ main { color: red; }
+
+          + article { color: red; }
+          > p { color: red; }
+          ~ main { color: red; }
+        }
+     |}]
+  in
+  let css = get_string_style_rules () in
+  assert_string css
+    (Printf.sprintf
+       ".%s main + article { color: #FF0000; } .%s main > p { color: #FF0000; \
+        } .%s main ~ main { color: #FF0000; } .%s main + article { color: \
+        #FF0000; } .%s main > p { color: #FF0000; } .%s main ~ main { color: \
+        #FF0000; }"
+       classname classname classname classname classname classname)
+
 let tests =
   ( "CSS",
     [
@@ -1354,4 +1379,5 @@ let tests =
       ampersand_everywhere_global;
       css_variable;
       attribute_selector;
+      update_combinator;
     ] )
