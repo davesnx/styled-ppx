@@ -455,7 +455,7 @@ and render_style_rule = (~loc, ~ignore_first_level=false, rule: style_rule) => {
   if (!ignore_first_level && starts_with_double_dot_and_no_ampersand) {
     Error.expr(
       ~loc=selector_location,
-      "Ampersand is needed if selector begins with pseudo-class or pseudo-elements.",
+      "Ampersand is needed if selector begins with pseudo-class or pseudo-element.",
     );
   } else {
     let prelude_transformed =
