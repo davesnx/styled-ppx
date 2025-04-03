@@ -25,7 +25,7 @@ If this test fail means that the module is not in sync with the ppx
             [|{js|line|js}|],
             [|
               CSS.selectorMany(
-                [|{js|:nth-last-child(1)|js}, {js|:nth-last-child(2)|js}|],
+                [|{js|&:nth-last-child(1)|js}, {js|&:nth-last-child(2)|js}|],
                 [|CSS.SVG.strokeOpacity(`num(0.))|],
               ),
             |],
@@ -38,7 +38,7 @@ If this test fail means that the module is not in sync with the ppx
         |],
         [|
           CSS.opacity(0.8),
-          CSS.selectorMany([|{js|:hover|js}|], [|CSS.opacity(1.)|]),
+          CSS.selectorMany([|{js|&:hover|js}|], [|CSS.opacity(1.)|]),
         |],
       ),
     |]);

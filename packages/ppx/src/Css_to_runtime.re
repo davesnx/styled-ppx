@@ -421,36 +421,59 @@ and render_selectors = (~loc, selectors) => {
   selectors
   |> List.map(((selector, _loc)) => render_selector(~loc, selector));
 }
-and render_style_rule = (~loc, rule: style_rule) => {
-  let (prelude, prelude_loc) = rule.prelude;
-  let selector_location =
-    Styled_ppx_css_parser.Parser_location.intersection(loc, prelude_loc);
+and render_style_rule = (~loc, ~ignore_first_level=false, rule: style_rule) => {
+  let starts_with_double_dot = selector =>
+    String.starts_with(~prefix=":", selector);
+  let contains_ampersand = selector => String.contains(selector, '&');
 
-  let selector_expr =
+  let (prelude_ast, prelude_ast_loc) = rule.prelude;
+  let selector_location =
+    Styled_ppx_css_parser.Parser_location.update_pos_lnum(
+      prelude_ast_loc,
+      loc,
+    );
+
+  let declarations =
     render_declarations(~loc, rule.block)
     |> Builder.pexp_array(~loc=selector_location);
 
   let (delimiter, attrs) =
     Platform_attributes.string_delimiter(~loc=selector_location);
 
-  let selector_name =
-    prelude
+  let prelude =
+    prelude_ast
     |> render_selectors(~loc=selector_location)
-    |> List.map(String.trim)
-    |> List.map(
-         String_interpolation.transform(
-           ~attrs,
-           ~delimiter,
-           ~loc=selector_location,
-         ),
-       )
-    |> Builder.pexp_array(~loc=selector_location);
+    |> List.map(String.trim);
 
-  Helper.Exp.apply(
-    ~loc=selector_location,
-    CSS.selectorMany(~loc=selector_location),
-    [(Nolabel, selector_name), (Nolabel, selector_expr)],
-  );
+  let starts_with_double_dot_and_no_ampersand =
+    List.exists(
+      selector => {
+        starts_with_double_dot(selector) && !contains_ampersand(selector)
+      },
+      prelude,
+    );
+  if (!ignore_first_level && starts_with_double_dot_and_no_ampersand) {
+    Error.expr(
+      ~loc=selector_location,
+      "Ampersand is needed if selector begins with pseudo-class or pseudo-elements.",
+    );
+  } else {
+    let prelude_transformed =
+      prelude
+      |> List.map(
+           String_interpolation.transform(
+             ~attrs,
+             ~delimiter,
+             ~loc=selector_location,
+           ),
+         )
+      |> Builder.pexp_array(~loc=selector_location);
+    Helper.Exp.apply(
+      ~loc=selector_location,
+      CSS.selectorMany(~loc=selector_location),
+      [(Nolabel, prelude_transformed), (Nolabel, declarations)],
+    );
+  };
 };
 
 let addLabel = (~loc, label, emotionExprs) => [
@@ -552,7 +575,8 @@ If your intent is to apply the declaration to all elements, use the universal se
     ruleList
     |> List.map(rule => {
          switch (rule) {
-         | Style_rule(style_rule) => render_style_rule(~loc, style_rule)
+         | Style_rule(style_rule) =>
+           render_style_rule(~loc, ~ignore_first_level=true, style_rule)
          | At_rule(at_rule) => render_at_rule(~loc, at_rule)
          | _ =>
            Error.expr(~loc=stylesheet_loc, onlyStyleRulesAndAtRulesSupported)
