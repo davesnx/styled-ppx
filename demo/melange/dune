@@ -1,6 +1,6 @@
 (melange.emit
- (alias e2e-melange)
- (target e2e-melange)
+ (alias demo-melange)
+ (target demo-melange)
  (modules :standard \ server)
  (libraries lib_js styled-ppx.melange reason-react)
  (preprocess
@@ -10,7 +10,7 @@
 
 (executable
  (name server)
- (public_name e2e-melange-server)
+ (public_name demo-melange-server)
  (modules :standard \ client)
  (libraries
   lib_native
