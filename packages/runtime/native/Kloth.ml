@@ -85,7 +85,7 @@ module Option = struct
   let map_with_default opt default fn =
     match opt with Some x -> fn x | None -> default
 
-  let map ~f opt = match opt with Some x -> Some (f x) | None -> None
+  let map fn opt = match opt with Some x -> Some (fn x) | None -> None
 end
 
 module Fun = struct

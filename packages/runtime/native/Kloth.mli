@@ -23,7 +23,7 @@ end
 module Option : sig
   val get_with_default : 'a -> 'a option -> 'a
   val map_with_default : 'a option -> 'b -> ('a -> 'b) -> 'b
-  val map : f:('a -> 'b) -> 'a option -> 'b option
+  val map : ('a -> 'b) -> 'a option -> 'b option
 end
 
 module Fun : sig
