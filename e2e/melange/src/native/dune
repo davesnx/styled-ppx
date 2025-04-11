@@ -8,3 +8,5 @@
   server-reason-react.reactDom)
  (preprocess
   (pps styled-ppx --native server-reason-react.ppx)))
+
+(copy_files "./shared/*.ml")
