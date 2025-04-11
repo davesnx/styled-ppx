@@ -51,11 +51,11 @@ In any other case, follow the generic installation steps from [Reason documentat
 
 Aside from all test suites, check the [Makefile](./Makefile) for all the available commands.
 
-There are some end-to-end tests to ensure all the ppx generation is working as expected, under the `e2e/` folder. Which contains
+There are some end-to-end tests to ensure all the ppx generation is working as expected, under the `demo/` folder. Which contains
 
 ```bash
-$ tree -L 1 e2e
-e2e
+$ tree -L 1 demo
+demo
 ├── melange
 ├── rescript-v10-JSX4
 └── rescript-v9-JSX3
@@ -63,7 +63,7 @@ e2e
 
 ```bash
 make build
-make test_e2e_rescript_v10
+make test_demo_rescript_v10
 ```
 
 ## Release process

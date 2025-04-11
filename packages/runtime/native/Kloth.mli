@@ -9,7 +9,7 @@ module String : sig
   val get : string -> int -> char
   val length : string -> int
   val trim : string -> string
-  val starts_with : prefix:string -> string -> bool
+  val starts_with : string -> prefix:string -> bool
 end
 
 module Int : sig
@@ -23,7 +23,7 @@ end
 module Option : sig
   val get_with_default : 'a -> 'a option -> 'a
   val map_with_default : 'a option -> 'b -> ('a -> 'b) -> 'b
-  val map : f:('a -> 'b) -> 'a option -> 'b option
+  val map : ('a -> 'b) -> 'a option -> 'b option
 end
 
 module Fun : sig

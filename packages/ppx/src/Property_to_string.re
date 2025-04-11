@@ -7,7 +7,10 @@ module Builder = Ppxlib.Ast_builder.Default;
 exception Invalid_value(string);
 
 let loc = Location.none;
-let txt = txt => {Location.loc: Location.none, txt};
+let txt = txt => {
+  Location.loc: Location.none,
+  txt,
+};
 
 let (let.ok) = Result.bind;
 
@@ -35,7 +38,10 @@ let emit = (property, value_of_ast, value_to_expr) => {
   let string_to_expr = string =>
     ast_of_string(string) |> Result.map(ast_to_expr);
 
-  {ast_of_string, string_to_expr};
+  {
+    ast_of_string,
+    string_to_expr,
+  };
 };
 
 let variants_to_string =

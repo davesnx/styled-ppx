@@ -8,7 +8,11 @@ exception Empty_buffer(string);
 module CSS = {
   /* This is the public API of the CSS module */
   let ident = (~loc, name) =>
-    {txt: Ldot(Lident("CSS"), name), loc} |> Builder.pexp_ident(~loc);
+    {
+      txt: Ldot(Lident("CSS"), name),
+      loc,
+    }
+    |> Builder.pexp_ident(~loc);
   let selectorMany = (~loc) => ident(~loc, "selectorMany");
   let media = (~loc) => ident(~loc, "media");
   let global = (~loc) => ident(~loc, "global");
@@ -36,7 +40,10 @@ let string_to_const = (~loc, s) => {
 let render_variable = (~loc, v) => {
   open Ppxlib;
   let txt = v |> String.concat(".") |> Longident.parse;
-  Helper.Exp.ident({loc, txt});
+  Helper.Exp.ident({
+    loc,
+    txt,
+  });
 };
 
 let source_code_of_loc = (loc: Ppxlib.Location.t) => {
@@ -52,7 +59,12 @@ let source_code_of_loc = (loc: Ppxlib.Location.t) => {
   };
 };
 let concat = (~loc, expr, acc) => {
-  let concat_fn = {txt: Lident("^"), loc} |> Helper.Exp.ident(~loc);
+  let concat_fn =
+    {
+      txt: Lident("^"),
+      loc,
+    }
+    |> Helper.Exp.ident(~loc);
   Helper.Exp.apply(~loc, concat_fn, [(Nolabel, expr), (Nolabel, acc)]);
 };
 

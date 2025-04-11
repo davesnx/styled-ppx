@@ -1,5 +1,3 @@
-open Resolve;
-
 let rec stylesheet = (ast: Ast.stylesheet) => {
   ast |> fst |> List.map(rule) |> String.concat("");
 }
@@ -35,7 +33,7 @@ and brace_block = ast => {
 and rule_list = (rule_list: Ast.rule_list) => {
   let resolved_rule_list = {
     let (declarations, selectors) =
-      rule_list |> fst |> resolve_selectors |> split_by_kind;
+      rule_list |> fst |> Resolve.resolve_selectors |> Resolve.split_by_kind;
     declarations @ selectors;
   };
   resolved_rule_list
@@ -57,10 +55,7 @@ and declaration = ({name, value, important, _}: Ast.declaration) => {
   );
 }
 and component_value_list = (ast: Ast.component_value_list) => {
-  ast
-  |> List.map(fst)
-  |> List.map(component_value)
-  |> String.concat("");
+  ast |> List.map(fst) |> List.map(component_value) |> String.concat("");
 }
 
 and variable = v => "$(" ++ String.concat(".", v) ++ ")"

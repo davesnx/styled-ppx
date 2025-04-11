@@ -51,7 +51,7 @@ module String = struct
 
   (* Public API *)
 
-  external starts_with : prefix:string -> string -> bool = "startsWith"
+  external starts_with : string -> prefix:string -> bool = "startsWith"
   [@@bs.send]
 
   external trim : string -> string = "trim" [@@bs.send]
@@ -79,10 +79,10 @@ module Option = struct
   let get_with_default default opt =
     match opt with Some x -> x | None -> default
 
-  let map_with_default opt default ~f =
-    match opt with Some x -> f x | None -> default
+  let map_with_default opt default fn =
+    match opt with Some x -> fn x | None -> default
 
-  let map ~f opt = match opt with Some x -> Some (f x) | None -> None
+  let map fn opt = match opt with Some x -> Some (fn x) | None -> None
 end
 
 module Fun = struct

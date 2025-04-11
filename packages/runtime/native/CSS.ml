@@ -28,9 +28,9 @@ module Array = struct
     firsts, seconds
 
   let partition ~f t =
-    (partition_map t ~f:(fun x ->
-         match f x with true -> Left x | false -> Right x)
-    [@nontail])
+    partition_map t ~f:(fun x ->
+      match f x with true -> Left x | false -> Right x)
+    [@nontail]
 
   let flatten a = Array.concat (Array.to_list a)
 end
@@ -52,8 +52,8 @@ let render_declarations ~buffer rules =
        | Rule.Declaration (property, value) -> Some (property, value)
        | _ -> None)
   |> Array.iteri ~f:(fun i decl ->
-         if i > 0 then Buffer.add_char buffer ' ';
-         render_declaration ~buffer decl)
+       if i > 0 then Buffer.add_char buffer ' ';
+       render_declaration ~buffer decl)
 
 let contains_at selector = String.contains selector '@'
 let contains_ampersand selector = String.contains selector '&'
@@ -293,7 +293,7 @@ let resolve_selectors ?(prefix_with_ampersand = true) rules =
               if prefix_with_ampersand then add_ampersand prefix else prefix
             in
             if contains_ampersand current_selector.(0) then
-              (* reemplazar el ampersand del current_selector, con el padre *)
+              (* replace the ampersand from the current_selector, with the parent's prefix *)
               replace_ampersand ~by:prefix current_selector.(0)
             else if starts_with_double_dot current_selector.(0) then
               prefix ^ current_selector.(0)
@@ -323,11 +323,11 @@ let render_keyframes ~buffer animationName keyframes =
   Buffer.add_string buffer animationName;
   Buffer.add_string buffer " { ";
   Array.iteri keyframes ~f:(fun i (percentage, rules) ->
-      if i > 0 then Buffer.add_char buffer ' ';
-      Buffer.add_string buffer (string_of_int percentage);
-      Buffer.add_string buffer "% { ";
-      render_declarations ~buffer rules;
-      Buffer.add_string buffer " }");
+    if i > 0 then Buffer.add_char buffer ' ';
+    Buffer.add_string buffer (string_of_int percentage);
+    Buffer.add_string buffer "% { ";
+    render_declarations ~buffer rules;
+    Buffer.add_string buffer " }");
   Buffer.add_string buffer " }"
 
 (* Removes nesting on selectors, uplifts media-queries, runs the autoprefixer *)
@@ -351,8 +351,8 @@ let rec render_rules ~buffer className rules =
          | Rule.Selector (selector, rules) -> Some (selector, rules)
          | _ -> None)
     |> Array.iteri ~f:(fun i rule ->
-           if i > 0 then Buffer.add_char buffer ' ';
-           render_selectors ~buffer className rule)
+         if i > 0 then Buffer.add_char buffer ' ';
+         render_selectors ~buffer className rule)
 
 (* Renders all selectors with the hash given *)
 and render_selectors ~buffer hash (selector, rules) =
@@ -426,10 +426,10 @@ end
 let keyframes_to_string keyframes =
   let buffer = Buffer.create 1024 in
   Array.iter keyframes ~f:(fun (percentage, rules) ->
-      Buffer.add_string buffer (string_of_int percentage);
-      Buffer.add_string buffer "%{";
-      Buffer.add_string buffer (rules_to_string rules);
-      Buffer.add_char buffer '}');
+    Buffer.add_string buffer (string_of_int percentage);
+    Buffer.add_string buffer "%{";
+    Buffer.add_string buffer (rules_to_string rules);
+    Buffer.add_char buffer '}');
   Buffer.contents buffer
 
 let render_hash hash styles =
@@ -497,7 +497,8 @@ let get_string_style_hashes () =
 let style_tag ?key:_ ?children:_ () =
   React.createElement "style"
     [
-      String ("data-emotion", "data-emotion", "css " ^ get_string_style_hashes ());
+      String
+        ("data-emotion", "data-emotion", "css " ^ get_string_style_hashes ());
       Bool ("data-s", "data-s", true);
       DangerouslyInnerHtml (get_stylesheet ());
     ]
@@ -508,11 +509,11 @@ let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust
   ?unicodeRange () =
   let fontFace =
     [|
-      Kloth.Option.map ~f:Declarations.fontStyle fontStyle;
-      Kloth.Option.map ~f:Declarations.fontWeight fontWeight;
-      Kloth.Option.map ~f:Declarations.fontDisplay fontDisplay;
-      Kloth.Option.map ~f:Declarations.sizeAdjust sizeAdjust;
-      Kloth.Option.map ~f:Declarations.unicodeRange unicodeRange;
+      Kloth.Option.map Declarations.fontStyle fontStyle;
+      Kloth.Option.map Declarations.fontWeight fontWeight;
+      Kloth.Option.map Declarations.fontDisplay fontDisplay;
+      Kloth.Option.map Declarations.sizeAdjust sizeAdjust;
+      Kloth.Option.map Declarations.unicodeRange unicodeRange;
       Some (Declarations.fontFamily fontFamily);
       Some
         (Rule.Declaration

@@ -14,7 +14,16 @@ type token =
   | ASTERISK // *
   | PLUS // +
   | QUESTION_MARK // ?
-  | RANGE(([ | `Comma | `Space], int, option(int))) // {1} {1,} {1, 2} #{1}
+  | RANGE(
+      (
+        [
+          | `Comma
+          | `Space
+        ],
+        int,
+        option(int),
+      ),
+    ) // {1} {1,} {1, 2} #{1}
   | EXCLAMATION_POINT // !
   // for functions
   | LEFT_PARENS // (

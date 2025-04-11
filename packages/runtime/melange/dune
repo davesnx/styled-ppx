@@ -11,4 +11,5 @@
  (files ../native/shared/**[!.pp].ml))
 
 (copy_files#
- (files ../native/shared/Kloth.mli))
+ (only_sources)
+ (files ./../native/Kloth.mli))

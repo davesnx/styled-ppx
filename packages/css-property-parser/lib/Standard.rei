@@ -50,21 +50,53 @@ let length:
 
 let angle:
   Rule.rule(
-    [> | `Deg(float) | `Grad(float) | `Rad(float) | `Turn(float)],
+    [>
+      | `Deg(float)
+      | `Grad(float)
+      | `Rad(float)
+      | `Turn(float)
+    ],
   );
 
-let time: Rule.rule([> | `Ms(float) | `S(float)]);
+let time:
+  Rule.rule(
+    [>
+      | `Ms(float)
+      | `S(float)
+    ],
+  );
 
-let frequency: Rule.rule([> | `Hz(float) | `KHz(float)]);
+let frequency:
+  Rule.rule(
+    [>
+      | `Hz(float)
+      | `KHz(float)
+    ],
+  );
 
-let resolution: Rule.rule([> | `Dpcm(float) | `Dpi(float) | `Dppx(float)]);
+let resolution:
+  Rule.rule(
+    [>
+      | `Dpcm(float)
+      | `Dpi(float)
+      | `Dppx(float)
+    ],
+  );
 
 let percentage: Rule.rule(float);
 
 let ident: Rule.rule(string);
 
 let css_wide_keywords:
-  Rule.rule([> | `Inherit | `Initial | `Revert | `RevertLayer | `Unset]);
+  Rule.rule(
+    [>
+      | `Inherit
+      | `Initial
+      | `Revert
+      | `RevertLayer
+      | `Unset
+    ],
+  );
 
 let custom_ident: Rule.rule(string);
 let custom_ident_without_span_or_auto: Rule.rule(string);

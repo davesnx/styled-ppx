@@ -3262,9 +3262,10 @@ module TextDecoration = struct
   let toString x =
     match x with
     | `value x ->
-      (match x.line with
-      | Some line -> TextDecorationLine.Value.toString line ^ {js| |js}
-      | None -> {js||js})
+      String.trim
+        (match x.line with
+        | Some line -> TextDecorationLine.Value.toString line ^ {js| |js}
+        | None -> {js||js})
       ^ (match x.thickness with
         | Some thickness ->
           TextDecorationThickness.Value.toString thickness ^ {js| |js}

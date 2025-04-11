@@ -95,6 +95,9 @@ jobs:
       - name: Test
         run: make test
 
+      - name: Format
+        run: make format-check
+
       - name: Release static
         run: make release-static
 
@@ -129,8 +132,8 @@ jobs:
           path: node_modules
           key: npm-${{ matrix.os }}-${{ hashFiles('package.json') }}
 
-      - name: Run E2E tests
-        run: make test-e2e
+      - name: Run demo tests
+        run: make test-demo
 
   publish:
     name: Publish

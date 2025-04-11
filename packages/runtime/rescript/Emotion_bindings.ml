@@ -54,11 +54,11 @@ let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust
   ?unicodeRange () =
   let fontFace =
     [|
-      Kloth.Option.map ~f:Declarations.fontStyle fontStyle;
-      Kloth.Option.map ~f:Declarations.fontWeight fontWeight;
-      Kloth.Option.map ~f:Declarations.fontDisplay fontDisplay;
-      Kloth.Option.map ~f:Declarations.sizeAdjust sizeAdjust;
-      Kloth.Option.map ~f:Declarations.unicodeRange unicodeRange;
+      Kloth.Option.map Declarations.fontStyle fontStyle;
+      Kloth.Option.map Declarations.fontWeight fontWeight;
+      Kloth.Option.map Declarations.fontDisplay fontDisplay;
+      Kloth.Option.map Declarations.sizeAdjust sizeAdjust;
+      Kloth.Option.map Declarations.unicodeRange unicodeRange;
       Some (Declarations.fontFamily fontFamily);
       Some
         (Rule.Declaration
@@ -68,5 +68,5 @@ let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust
     |]
     |> Kloth.Array.filter_map ~f:(fun i -> i)
   in
-  global [| Rule.Selector ([|"@font-face"|], fontFace) |];
+  global [| Rule.Selector ([| "@font-face" |], fontFace) |];
   fontFamily
