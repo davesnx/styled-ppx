@@ -12,9 +12,8 @@ let important v =
   | Declaration (name, value) -> Declaration (name, value ^ {js| !important|js})
   | Selector (_, _) -> v
 
-let rec ruleToDict (dict : Js.Json.t Js.Dict.t) (rule : rule) :
-  Js.Json.t Js.Dict.t =
-  let _ =
+let rec ruleToDict dict rule =
+  let () =
     match rule with
     | Declaration (name, value) -> Js.Dict.set dict name (Js.Json.string value)
     | Selector (name, ruleset) ->
