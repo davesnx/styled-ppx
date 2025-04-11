@@ -58,15 +58,16 @@ let get_utf16_char_codes s =
         let c2 = mask_char_code (Char.code s.[i + 1]) in
         let c3 = mask_char_code (Char.code s.[i + 2]) in
         let c4 = mask_char_code (Char.code s.[i + 3]) in
-        let uchar = (c1 lsl 18) lor (c2 lsl 12) lor (c3 lsl 6) lor c4 in      
+        let uchar = (c1 lsl 18) lor (c2 lsl 12) lor (c3 lsl 6) lor c4 in
         if uchar > 0xFFFF then (
           let high_surrogate = ((uchar - 0x10000) lsr 10) + 0xD800 in
           let low_surrogate = ((uchar - 0x10000) land 0x3FF) + 0xDC00 in
           loop (i + 4) (low_surrogate :: high_surrogate :: acc))
         else loop (i + 4) (uchar :: acc)
-      | _ -> loop (i + code_length) (List.init code_length (fun _ -> 0xFFFD) @ acc))
+      | _ ->
+        loop (i + code_length) (List.init code_length (fun _ -> 0xFFFD) @ acc))
   in
-  try loop 0 [] with _ -> (List.init (String.length s) (fun _ -> 0xFFFD))
+  try loop 0 [] with _ -> List.init (String.length s) (fun _ -> 0xFFFD)
 
 (* The murmur2 hashing algorithm is based on @emotion/hash https://github.com/emotion-js/emotion/blob/main/packages/hash/src/index.js *)
 let murmur2 str =
