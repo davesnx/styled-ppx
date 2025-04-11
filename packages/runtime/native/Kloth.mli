@@ -9,7 +9,7 @@ module String : sig
   val get : string -> int -> char
   val length : string -> int
   val trim : string -> string
-  val starts_with : prefix:string -> string -> bool
+  val starts_with : string -> prefix:string -> bool
 end
 
 module Int : sig

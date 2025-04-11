@@ -36,7 +36,7 @@ module Array = struct
     !r
 
   let map = Stdlib.ArrayLabels.map
-  let filter_map ~f t = (filter_mapi t ~f:(fun _i a -> f a) [@nontail])
+  let filter_map ~f t = filter_mapi t ~f:(fun _i a -> f a) [@nontail]
 
   let map_and_join ~sep ~f strings =
     let len = Stdlib.Array.length strings in
@@ -53,7 +53,7 @@ module String = struct
   let trim = Stdlib.String.trim
   let length = Stdlib.String.length
 
-  let starts_with ~prefix str =
+  let starts_with str ~prefix =
     let len_prefix = String.length prefix in
     let len_str = String.length str in
     let rec compare_prefix i =

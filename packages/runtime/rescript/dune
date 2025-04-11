@@ -2,7 +2,8 @@
  (files ../native/shared/Css_types.{ml,mli}))
 
 (copy_files#
- (files ../native/shared/Kloth.mli))
+ (only_sources)
+ (files ./../native/Kloth.mli))
 
 (copy_files#
  (files ../native/shared/Declarations.ml))

@@ -51,7 +51,7 @@ module String = struct
 
   (* Public API *)
 
-  external starts_with : prefix:string -> string -> bool = "startsWith"
+  external starts_with : string -> prefix:string -> bool = "startsWith"
   [@@bs.send]
 
   external trim : string -> string = "trim" [@@bs.send]
