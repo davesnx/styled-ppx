@@ -1,5 +1,6 @@
 (library
- (name ui_native)
+ (name lib_native)
+ (wrapped false)
  (libraries
   styled-ppx.native
   server-reason-react.react
@@ -9,4 +10,6 @@
  (preprocess
   (pps styled-ppx --native server-reason-react.ppx)))
 
-(copy_files "./shared/*.ml")
+(copy_files
+ (only_sources)
+ (files "./shared/*.{re,ml}"))

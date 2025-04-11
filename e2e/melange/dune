@@ -2,7 +2,7 @@
  (alias e2e-melange)
  (target e2e-melange)
  (modules :standard \ server)
- (libraries ui styled-ppx.melange reason-react)
+ (libraries lib_js styled-ppx.melange reason-react)
  (preprocess
   (pps melange.ppx styled-ppx reason-react-ppx))
  (module_systems
@@ -13,11 +13,11 @@
  (public_name e2e-melange-server)
  (modules :standard \ client)
  (libraries
-  ui_native
+  lib_native
   server-reason-react.js
   server-reason-react.belt
   server-reason-react.react
   server-reason-react.reactDom
   styled-ppx.native)
  (preprocess
-  (pps styled-ppx)))
+  (pps styled-ppx server-reason-react.ppx)))

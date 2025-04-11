@@ -14,6 +14,7 @@
 
 let stack = [%cx "display: flex; flex-direction: column"];
 let stackGap = gap => [%cx "gap: $(gap)"];
+
 module Cositas = [%styled.div
   (~lola=CSS.px(0)) => {|
   display: flex;
@@ -46,7 +47,7 @@ let bounce = [%keyframe
 |}
 ];
 
-let code = [| `quoted("Menlo"), `quoted("monospace") |];
+let code = [|`quoted("Menlo"), `quoted("monospace")|];
 let lola = `auto;
 
 let clx = [%cx
@@ -85,26 +86,9 @@ let container = [%cx
 |}
 ];
 
-module App = {
-  [@react.component]
-  let make = () =>
-    <>
-      <div className=post>
-        <div className={card ++ " " ++ container}>
-          <h2> {React.string("Card title")} </h2>
-          <p> {React.string("Card content")} </p>
-        </div>
-      </div>
-      <Cositas as_="section" lola={CSS.px(10)}>
-        <div className=clx> {React.string("code everywhere!")} </div>
-        <div className=selectors> {React.string("Red text")} </div>
-      </Cositas>
-    </>;
-};
-
 let color = `hex("333");
 
-let _ = [%css
+let gradiend = [%cx
   {|
     background-image:
       repeating-linear-gradient(
@@ -117,6 +101,19 @@ let _ = [%css
     |}
 ];
 
-let getStaticMarkup = () => {
-  ReactDOM.renderToStaticMarkup(<App />);
-};
+[@react.component]
+let make = () =>
+  <main className=gradiend>
+    <div className=Universal.classname>
+      <div className=post>
+        <div className={card ++ " " ++ container}>
+          <h2> {React.string("Card title")} </h2>
+          <p> {React.string("Card content")} </p>
+        </div>
+      </div>
+      <Cositas as_="section" lola={CSS.px(10)}>
+        <div className=clx> {React.string("code everywhere!")} </div>
+        <div className=selectors> {React.string("Red text")} </div>
+      </Cositas>
+    </div>
+  </main>;
