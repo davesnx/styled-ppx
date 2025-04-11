@@ -439,7 +439,13 @@ let tests = [
   }),
   test("custom-ident vs all", () => {
     let parse = parse([%value "<custom-ident> | 'all'"]);
-    let render_output = (x: [> | `All | `Custom_ident(string)]) => {
+    let render_output =
+        (
+          x: [>
+            | `All
+            | `Custom_ident(string)
+          ],
+        ) => {
       switch (x) {
       | `All => "ALL"
       | `Custom_ident(ident) => Printf.sprintf("IDENT(%s)", ident)

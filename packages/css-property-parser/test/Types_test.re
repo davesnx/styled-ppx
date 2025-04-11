@@ -8,7 +8,11 @@ let test = (name, expr, output) => {
     Ppxlib.Ast_builder.Make({
       let loc = expr.pexp_loc;
     });
-  let pattern = Ast_builder.ppat_var({txt: name, loc});
+  let pattern =
+    Ast_builder.ppat_var({
+      txt: name,
+      loc,
+    });
   let value_binding = Ast_builder.value_binding(~pat=pattern, ~expr);
   module Emit = Generate.Make(Ast_builder);
   let (name, core_type) = Emit.make_type(value_binding);
@@ -50,7 +54,15 @@ let tests: list(Alcotest.test_case(unit)) = [
     [%stri
       type nonrec calc_sum = (
         calc_product,
-        list(([ | `Cross(unit) | `Dash(unit)], calc_product)),
+        list(
+          (
+            [
+              | `Cross(unit)
+              | `Dash(unit)
+            ],
+            calc_product,
+          ),
+        ),
       )
     ],
   ),
@@ -58,7 +70,13 @@ let tests: list(Alcotest.test_case(unit)) = [
   test(
     "size",
     [%expr [%value "relative | static | absolute"]],
-    [%stri type nonrec size = [ | `Relative | `Static | `Absolute]],
+    [%stri
+      type nonrec size = [
+        | `Relative
+        | `Static
+        | `Absolute
+      ]
+    ],
   ),
   // And
   test(
@@ -66,8 +84,14 @@ let tests: list(Alcotest.test_case(unit)) = [
     [%expr [%value "[ 'over' | 'under' ] && [ 'right' | 'left' ]"]],
     [%stri
       type nonrec text_emphasis_position = (
-        [ | `Over | `Under],
-        [ | `Right | `Left],
+        [
+          | `Over
+          | `Under
+        ],
+        [
+          | `Right
+          | `Left
+        ],
       )
     ],
   ),
@@ -95,7 +119,12 @@ let tests: list(Alcotest.test_case(unit)) = [
   test(
     "supported",
     [%expr [%value "supported | [not 'supported']"]],
-    [%stri type nonrec supported = [ | `Supported | `Static(unit, unit)]],
+    [%stri
+      type nonrec supported = [
+        | `Supported
+        | `Static(unit, unit)
+      ]
+    ],
   ),
   // Function_call
   test(

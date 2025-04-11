@@ -32,33 +32,37 @@ module Types = {
   and integer = int
   and number = float
   and length = [
-    | `Em(number)
-    | `Ex(number)
     | `Cap(number)
     | `Ch(number)
+    | `Em(number)
+    | `Ex(number)
+    | `Ic(number)
+    | `Lh(number)
+    | `Rcap(number)
+    | `Rch(number)
+    | `Rem(number)
+    | `Rex(number)
+    | `Ric(number)
+    | `Rlh(number)
+    | `Vh(number)
+    | `Vw(number)
+    | `Vmax(number)
+    | `Vmin(number)
+    | `Vb(number)
+    | `Vi(number)
     | `Cqw(number)
     | `Cqh(number)
     | `Cqi(number)
     | `Cqb(number)
     | `Cqmin(number)
     | `Cqmax(number)
-    | `Ic(number)
-    | `Rem(number)
-    | `Lh(number)
-    | `Rlh(number)
-    | `Vw(number)
-    | `Vh(number)
-    | `Vi(number)
-    | `Vb(number)
-    | `Vmin(number)
-    | `Vmax(number)
+    | `Px(number)
     | `Cm(number)
     | `Mm(number)
     | `Q(number)
     | `In(number)
-    | `Pt(number)
     | `Pc(number)
-    | `Px(number)
+    | `Pt(number)
     | `Zero
   ]
   and angle = [
@@ -67,23 +71,34 @@ module Types = {
     | `Rad(number)
     | `Turn(number)
   ]
-  and time = [ | `Ms(float) | `S(float)]
-  and frequency = [ | `Hz(float) | `KHz(float)]
-  and resolution = [ | `Dpi(float) | `Dpcm(float) | `Dppx(float)]
+  and time = [
+    | `Ms(float)
+    | `S(float)
+  ]
+  and frequency = [
+    | `Hz(float)
+    | `KHz(float)
+  ]
+  and resolution = [
+    | `Dpi(float)
+    | `Dpcm(float)
+    | `Dppx(float)
+  ]
   and percentage = float
   and ident = string
   and custom_ident = string
+  and dashed_ident = string
   and custom_ident_without_span_or_auto = string
-  and url = string
+  and url_no_interp = string
   and hex_color = string
   and interpolation = list(string)
   and flex_value = [ | `Fr(float)]
-  and line_names = (unit, list(string), unit)
+  and media_type = string
+  and container_name = string
   and ident_token = unit
   and function_token = unit
   and string_token = unit
   and hash_token = unit
-  and dimension = unit
   and any_value = unit
   and declaration_value = unit
   and zero = unit

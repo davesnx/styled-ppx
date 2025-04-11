@@ -75,7 +75,10 @@ module Mapper = {
     | ListOf(expression)
     | EmptyList;
 
-  let lid = name => {txt: Lident(name), loc: Location.none};
+  let lid = name => {
+    txt: Lident(name),
+    loc: Location.none,
+  };
 
   let css = (className, contents) => {
     Ast_helper.(

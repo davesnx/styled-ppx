@@ -5,7 +5,13 @@ type token =
   | BAD_IDENT // TODO: Since we don't allow broken syntax, is this needed?
   | FUNCTION(string) // <function-token>
   | AT_KEYWORD(string) // <at-keyword-token>
-  | HASH(string, [ | `ID | `UNRESTRICTED]) // <hash-token>
+  | HASH(
+      string,
+      [
+        | `ID
+        | `UNRESTRICTED
+      ],
+    ) // <hash-token>
   | STRING(string) // <string-token>
   | URL(string) // <url-token>
   | BAD_URL // <bad-url-token> TODO: Since we don't allow broken syntax, is this needed?

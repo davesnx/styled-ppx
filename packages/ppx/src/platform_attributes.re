@@ -5,7 +5,10 @@ open Ppxlib;
 module Helper = Ast_helper;
 module Builder = Ppxlib.Ast_builder.Default;
 
-let withLoc = (~loc, txt) => {loc, txt};
+let withLoc = (~loc, txt) => {
+  loc,
+  txt,
+};
 
 module ReasonAttributes = {
   let preserveBraces = (~loc) =>

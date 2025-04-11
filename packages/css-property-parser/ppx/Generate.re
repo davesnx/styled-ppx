@@ -3,7 +3,10 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
   open Builder;
   open Css_spec_parser;
 
-  let txt = txt => {Location.loc: Builder.loc, txt};
+  let txt = txt => {
+    Location.loc: Builder.loc,
+    txt,
+  };
 
   let kebab_case_to_snake_case = name =>
     name |> String.split_on_char('-') |> String.concat("_");
@@ -245,7 +248,10 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
   let standard_types = {
     let type_ = (~kind=Parsetree.Ptype_abstract, name, core_type) => {
       Builder.type_declaration(
-        ~name={txt: name, loc: Location.none},
+        ~name={
+          txt: name,
+          loc: Location.none,
+        },
         ~params=[],
         ~cstrs=[],
         ~private_=Public,
@@ -299,14 +305,41 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       type_(
         "angle",
         [%type:
-          [ | `Deg(number) | `Grad(number) | `Rad(number) | `Turn(number)]
+          [
+            | `Deg(number)
+            | `Grad(number)
+            | `Rad(number)
+            | `Turn(number)
+          ]
         ],
       ),
-      type_("time", [%type: [ | `Ms(float) | `S(float)]]),
-      type_("frequency", [%type: [ | `Hz(float) | `KHz(float)]]),
+      type_(
+        "time",
+        [%type:
+          [
+            | `Ms(float)
+            | `S(float)
+          ]
+        ],
+      ),
+      type_(
+        "frequency",
+        [%type:
+          [
+            | `Hz(float)
+            | `KHz(float)
+          ]
+        ],
+      ),
       type_(
         "resolution",
-        [%type: [ | `Dpi(float) | `Dpcm(float) | `Dppx(float)]],
+        [%type:
+          [
+            | `Dpi(float)
+            | `Dpcm(float)
+            | `Dppx(float)
+          ]
+        ],
       ),
       type_("percentage", [%type: float]),
       type_("ident", [%type: string]),
@@ -402,7 +435,10 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     let core_type =
       Ast_helper.Typ.constr(
         ~loc,
-        {loc: Location.none, txt: Ldot(Lident("Types"), name)},
+        {
+          loc: Location.none,
+          txt: Ldot(Lident("Types"), name),
+        },
         [],
       );
     let type_anotation = [%type:
@@ -428,7 +464,10 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
            | Some(type_name) =>
              let new_expression =
                add_type_to_expr(type_name, value_binding.pvb_expr);
-             {...value_binding, pvb_expr: new_expression};
+             {
+               ...value_binding,
+               pvb_expr: new_expression,
+             };
            | None => value_binding
            };
          });
@@ -439,7 +478,10 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
   let create_variant_name = (type_name, name) =>
     type_name ++ "__make__" ++ name;
 
-  let txt = txt => {Location.loc: Builder.loc, txt};
+  let txt = txt => {
+    Location.loc: Builder.loc,
+    txt,
+  };
 
   let construct = (~expr=None, name) =>
     pexp_construct(txt(Lident(name)), expr);

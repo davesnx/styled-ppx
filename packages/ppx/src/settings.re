@@ -39,7 +39,12 @@ type settings = {
   production: flag(bool),
   native: flag(bool),
 };
-let settings = {jsxVersion, jsxMode, production, native};
+let settings = {
+  jsxVersion,
+  jsxMode,
+  production,
+  native,
+};
 
 let currentSettings = ref(settings);
 let updateSettings = newSettings => currentSettings := newSettings;

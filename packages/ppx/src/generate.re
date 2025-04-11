@@ -3,7 +3,10 @@ open Ppxlib;
 module Helper = Ast_helper;
 module Builder = Ppxlib.Ast_builder.Default;
 
-let withLoc = (~loc, txt) => {loc, txt};
+let withLoc = (~loc, txt) => {
+  loc,
+  txt,
+};
 
 /* (~a, ~b, ~c, _) => args */
 let rec fnWithLabeledArgs = (list, args) =>
@@ -191,8 +194,17 @@ let deleteProp = (~loc, key) => {
 let asAttribute = () =>
   switch (File.get()) {
   | Some(ReScript) =>
-    MakeProps.Attribute({name: "as", type_: String, alias: None})
-  | _ => MakeProps.Attribute({name: "as_", type_: String, alias: Some("as")})
+    MakeProps.Attribute({
+      name: "as",
+      type_: String,
+      alias: None,
+    })
+  | _ =>
+    MakeProps.Attribute({
+      name: "as_",
+      type_: String,
+      alias: Some("as"),
+    })
   };
 
 /*
@@ -1104,7 +1116,13 @@ let stylesCall = (~loc, ~labeledArguments) => {
   /* let styles = styles(...) */
   Builder.pexp_apply(
     ~loc,
-    Builder.pexp_ident(~loc, {txt: Lident(styleVariableName), loc}),
+    Builder.pexp_ident(
+      ~loc,
+      {
+        txt: Lident(styleVariableName),
+        loc,
+      },
+    ),
     /* Last argument is a unit to avoid the warning of optinal labeled args */
     styledArguments @ [(Nolabel, [%expr ()])],
   );
