@@ -1,7 +1,7 @@
-(dirs packages e2e)
+(dirs packages demo)
 
 (subdir
- e2e
+ demo
  (dirs melange))
 
 (subdir
