@@ -1,7 +1,0 @@
-(library
- (name ui)
- (wrapped false)
- (modes melange)
- (libraries melange.belt styled-ppx.melange reason-react)
- (preprocess
-  (pps melange.ppx styled-ppx reason-react-ppx)))

@@ -1,7 +1,7 @@
 (melange.emit
  (alias e2e-melange)
  (target e2e-melange)
- (modules :standard \ debug)
+ (modules :standard \ server)
  (libraries ui styled-ppx.melange reason-react)
  (preprocess
   (pps melange.ppx styled-ppx reason-react-ppx))
@@ -9,9 +9,9 @@
   (commonjs bs.js)))
 
 (executable
- (name debug)
- (public_name e2e-melange-debug)
- (modules :standard \ index)
+ (name server)
+ (public_name e2e-melange-server)
+ (modules :standard \ client)
  (libraries
   ui_native
   server-reason-react.js
