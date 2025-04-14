@@ -78,11 +78,11 @@ let avoid_hash_collision =
       {|
          color: $(color);
 
-         :disabled {
+         &:disabled {
            color: $(disabledColor);
          }
 
-         :hover {
+         &:hover {
            color: $(hoverColor);
          }
        |}]
@@ -93,8 +93,8 @@ let avoid_hash_collision =
       {|
          display: flex;
 
-         :before,
-         :after {
+         &:before,
+         &:after {
            content: '';
            flex: 0 0 $(padding);
          }
@@ -106,8 +106,8 @@ let avoid_hash_collision =
       {|
          display: flex;
 
-         :before,
-         :after {
+         &:before, 
+         &:after {
            content: '';
            flex: 0 1 $(padding);
          }
@@ -288,7 +288,7 @@ let ampersand_everywhere_2 =
           display: none;
         }
       }
-      :first-child {
+      &:first-child {
         .felipe & {
           display: none;
         }
@@ -316,7 +316,7 @@ let ampersand_everywhere_3 =
         padding: 0;
         list-style-type: none;
 
-        :first-child {
+        &:first-child {
           .$(hasTwoColumnList) & {
             @media $(desktopDown) {
               padding-bottom: $(px16);
@@ -342,9 +342,9 @@ let pseudo_selectors_everywhere =
       {|
         display: block;
 
-        ::before {
+        &::before {
           display: none;
-          ::after {
+          &::after {
             display: none;
           }
         }
@@ -394,7 +394,7 @@ let selector_nested_with_mq_and_declarations =
       li {
        list-style-type: none;
 
-       ::before {
+       &::before {
          position: absolute;
          left: -20px;
          content: "✓";
@@ -581,11 +581,11 @@ let functional_pseudo =
     [%cx
       {|
         .foo, .bar {
-          :is(ol, ul, menu:unsupported) :is(ol, ul) {
+          &:is(ol, ul, menu:unsupported) :is(ol, ul) {
             color: green;
           }
 
-          :is(ol, ul) :is(ol, ul) ol {
+          &:is(ol, ul) :is(ol, ul) ol {
             list-style-type: lower-greek;
             color: chocolate;
           }
@@ -598,16 +598,16 @@ let functional_pseudo =
             color: darkmagenta;
           }
 
-          :where(ol, ul, menu:unsupported) :where(ol, ul) {
+          &:where(ol, ul, menu:unsupported) :where(ol, ul) {
             color: green;
           }
 
-          :where(ol, ul) :where(ol, ul) ol {
+          &:where(ol, ul) :where(ol, ul) ol {
             list-style-type: lower-greek;
             color: chocolate;
           }
 
-          :is(h1, h2, h3):has(+ :is(h2, h3, h4)) {
+          &:is(h1, h2, h3):has(+ :is(h2, h3, h4)) {
             margin: 0 0 0.25rem 0;
           }
 
@@ -746,8 +746,8 @@ let selector_nested_with_pseudo_2 =
     [%cx
       {|
          position: relative;
-         :hover {
-           ::after {
+         &:hover {
+           &::after {
              top: 50px;
            }
          }
@@ -1125,19 +1125,19 @@ let pseudo_selectors =
        padding-bottom: 9px;
        border-radius: 0;
 
-       ::placeholder {
+       &::placeholder {
          color: currentColor;
        }
 
-       :hover {
+       &:hover {
          border: 1px solid transparent;
        }
 
-       :focus {
+       &:focus {
          outline: none;
        }
 
-       :disabled {
+       &:disabled {
          color: transparent;
        }|}]
   in
@@ -1161,8 +1161,8 @@ let real_world =
            &.$(buttonActive) {
              margin: 0px;
 
-             ::before,
-             ::after {
+             &::before,
+             &::after {
                top: 40px;
              }
            }
@@ -1215,7 +1215,7 @@ let global_with_selector =
   test "global_with_selector" @@ fun () ->
   [%global
     {| html { line-height: 1.15; }
-    a { :hover { padding: 0; } }
+    a { &:hover { padding: 0; } }
    |}];
   let css = get_string_style_rules () in
   assert_string css
