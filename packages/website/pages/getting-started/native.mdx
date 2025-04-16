@@ -1,6 +1,6 @@
 ---
 title: Getting Started - OCaml
-showAllLanguage: false
+showAllLanguage: true
 ---
 
 import { Callout } from "nextra/components";
@@ -135,7 +135,7 @@ module Page = {
 
 ## A note on missing classNames
 
-If you're using dynamic CSS values, such as [dynamic-components](./dynamic-components) or [interpolation](./interpolation) based on runtime values, you would need to evaluate your app before extracting all the CSS. Let me explain it with a simple example:
+If you're using dynamic CSS values, such as [dynamic-components](../reference/dynamic-components) or [interpolation](../reference/interpolation) based on runtime values, you would need to evaluate your app before extracting all the CSS. Let me explain it with a simple example:
 
 ```reason
 module App = {
@@ -187,15 +187,6 @@ If you don't want to render the stylesheet directly, you can use `CSS.get_styles
 
 To make sure hydration works, you would need the following `<style/>` tag:
 
-```ocaml
-React.createElement "style"
-  [
-    Bool ("data-s", true);
-    String ("data-emotion", "css " ^ CSS.get_string_style_hashes ());
-    DangerouslyInnerHtml (CSS.get_stylesheet ());
-  ]
-  []
-```
 ```reason
 React.createElement("style",
   [
