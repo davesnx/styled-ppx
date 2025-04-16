@@ -1,6 +1,6 @@
 ---
 title: Getting Started - OCaml
-showAllLanguage: true
+showAllLanguage: false
 ---
 
 import { Callout } from "nextra/components";
@@ -116,7 +116,7 @@ let app =
   </div>;
 ```
 
-To generate the CSS on the server, you would need to use `<CSS.style_tag />`. This component will render a `<style>` with all generated stylesheet.
+To generate the CSS on the server, you would need to use `<CSS.style_tag />`. This component will render a `<style>` tag with all the generated styles.
 
 Given a `Page` component to simulate a real-world scenario:
 
@@ -133,10 +133,12 @@ module Page = {
 }
 ```
 
-If you're using dynamic CSS values, such as [dynamic-components](./dynamic-components) or [interpolation](./interpolation) based on runtime values. You would need to evaluate your app before extracting all the CSS.
+## A note on missing classNames
+
+If you're using dynamic CSS values, such as [dynamic-components](./dynamic-components) or [interpolation](./interpolation) based on runtime values, you would need to evaluate your app before extracting all the CSS. Let me explain it with a simple example:
 
 ```reason
-module Component = {
+module App = {
   [@react.component]
   let make = (~value) => {
     let className = switch (value) {
@@ -148,12 +150,14 @@ module Component = {
 };
 ```
 
-This component needs to be rendered before the `CSS.style_tag` otherwise the `[%cx]` calls won't be added to the stylesheet, since they aren't being executed yet.
+This component (App) needs to be rendered before the `CSS.style_tag` otherwise the `[%cx]` calls won't be added to the stylesheet, since they aren't being executed yet.
 
-To solve this, we recommend: render the React application first, and then inject the result as `dangerouslySetInnerHTML`.
+`CSS.style_tag` returns a `<style />` with all styles injected, and you can think of CSS's stylesheet as a global registry for styles. If we place `CSS.style_tag` in the `<head>` and your `App` in the `<body>`, when we are rendering the head (happens before) the global registry won't have the dynamic classNames until App is rendered, which happens later, when React renders the `<body />`.
+
+To solve this, we recommend: render the React application first as a string, and then inject the result as `dangerouslySetInnerHTML` in the `<body />`. This way we ensure that the execution of the `App` happens before collecting all classNames.
 
 ```reason
-/* `App` here is the entry component of your React application, while the `Document` component is only meant to run on the server. */
+/* `App` here is the entry component of your React application with the interactivity from React, while the `Document` component is running on the server and is static. */
 module Document = {
   [@react.component]
   let make = () => {
@@ -164,24 +168,24 @@ module Document = {
         <CSS.style_tag />
       </head>
       <body>
-        <div id="#root" dangerouslySetInnerHTML={"__html": app} />
+        <div id="root" dangerouslySetInnerHTML={"__html": app} />
       </body>
     </html>
   }
 };
 
-/* Let's asume we are running [dream](https://github.com/aantron/dream) */
+/* Let's assume we are using dream (from https://github.com/aantron/dream) */
 let some_server_side_handler = _request => {
   /* Here we render the entire HTML */
   Dream.html(ReactDOM.renderToString(<Document />));
 };
 ```
 
-### Advanced
+## Advanced
 
 If you don't want to render the stylesheet directly, you can use `CSS.get_stylesheet` to obtain the `stylesheet` as a `string`. In this case, the hydration with the client won't be supported.
 
-To make sure hydration works, you would need the following `<style/>` tag
+To make sure hydration works, you would need the following `<style/>` tag:
 
 ```ocaml
 React.createElement "style"
@@ -191,4 +195,13 @@ React.createElement "style"
     DangerouslyInnerHtml (CSS.get_stylesheet ());
   ]
   []
+```
+```reason
+React.createElement("style",
+  [
+    Bool("data-s", true),
+    String("data-emotion", "css " ++ CSS.get_string_style_hashes()),
+    DangerouslyInnerHtml(CSS.get_stylesheet())
+ ], []
+)
 ```
