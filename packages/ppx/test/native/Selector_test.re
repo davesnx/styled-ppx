@@ -5,11 +5,11 @@ let loc = Location.none;
 
 let simple_tests = [
   (
-    ":before { display: none; }",
-    [%expr [%cx ":before { display: none; }"]],
+    "&:before { display: none; }",
+    [%expr [%cx "&:before { display: none; }"]],
     [%expr
       CSS.style([|
-        CSS.selectorMany([|{js|:before|js}|], [|CSS.display(`none)|]),
+        CSS.selectorMany([|{js|&:before|js}|], [|CSS.display(`none)|]),
       |])
     ],
   ),
@@ -465,12 +465,12 @@ let complex_tests = [
     ],
   ),
   (
-    ":is(h1, $(gap), h3):has(+ :is(h2, h3, h4))",
-    [%expr [%cx {| :is(h1, $(gap), h3):has(+ :is(h2, h3, h4)) {} |}]],
+    "&:is(h1, $(gap), h3):has(+ :is(h2, h3, h4))",
+    [%expr [%cx {| &:is(h1, $(gap), h3):has(+ :is(h2, h3, h4)) {} |}]],
     [%expr
       CSS.style([|
         CSS.selectorMany(
-          [|{js|:is(h1, |js} ++ gap ++ {js|, h3):has(+ :is(h2, h3, h4))|js}|],
+          [|{js|&:is(h1, |js} ++ gap ++ {js|, h3):has(+ :is(h2, h3, h4))|js}|],
           [||],
         ),
       |])
