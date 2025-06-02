@@ -488,13 +488,13 @@ let get_stylesheet () =
   Buffer.contents buffer
 
 let get_string_style_hashes () =
-  let buffer = Buffer.create 1024 in
-  let first = ref true in
-  Stylesheet.get_all instance
-  |> List.iter (fun (hash, _) ->
-       if not !first then Buffer.add_char buffer ' ';
-       Buffer.add_string buffer (String.trim hash);
-       first := false);
+  let stylesheet = Stylesheet.get_all instance in
+  let initial_size = List.length stylesheet * approximate_chars_in_rules in
+  let buffer = Buffer.create initial_size in
+  stylesheet
+  |> List.iteri (fun i (hash, _) ->
+       if i > 0 then Buffer.add_char buffer ' ';
+       Buffer.add_string buffer (String.trim hash));
   Buffer.contents buffer
 
 let style_tag ?key:_ ?children:_ () =
