@@ -44,7 +44,24 @@ let escape = [%sedlex.regexp? '\\'];
 
 let alpha = [%sedlex.regexp? 'a' .. 'z' | 'A' .. 'Z'];
 
-let non_ascii = [%sedlex.regexp? '\160' .. '\255'];
+
+// https://drafts.csswg.org/css-syntax-3/#non-ascii-ident-code-point
+let non_ascii = [%sedlex.regexp?
+  0x00B7
+| 0x00C0 .. 0x00D6
+| 0x00D8 .. 0x00F6
+| 0x00F8 .. 0x037D
+| 0x037F .. 0x1FFF
+| 0x200C
+| 0x200D
+| 0x203F
+| 0x2040
+| 0x2070 .. 0x218F
+| 0x2C00 .. 0x2FEF
+| 0x3001 .. 0xD7FF
+| 0xF900 .. 0xFDCF
+| 0xFDF0 .. 0xFFFD
+| Compl (0x0000 .. 0x10000)]
 
 let ident_start = [%sedlex.regexp? '_' | alpha | '$' | non_ascii | escape];
 
@@ -106,10 +123,8 @@ let at_rule_without_body = [%sedlex.regexp?
 let at_rule = [%sedlex.regexp? ("@", ident)];
 let at_keyframes = [%sedlex.regexp? ("@", "keyframes")];
 
-let non_ascii_code_point = [%sedlex.regexp? Sub(any, '\000' .. '\128')]; // greater than \u0080
-
 let identifier_start_code_point = [%sedlex.regexp?
-  alpha | non_ascii | non_ascii_code_point | '_'
+  alpha | non_ascii | '_'
 ];
 let starts_with_a_valid_escape = [%sedlex.regexp? ('\\', Sub(any, '\n'))];
 
