@@ -488,11 +488,14 @@ let get_stylesheet () =
   Buffer.contents buffer
 
 let get_string_style_hashes () =
+  let buffer = Buffer.create 1024 in
+  let first = ref true in
   Stylesheet.get_all instance
-  |> List.fold_left
-       (fun accumulator (hash, _) ->
-         String.trim @@ Printf.sprintf "%s %s" accumulator hash)
-       ""
+  |> List.iter (fun (hash, _) ->
+       if not !first then Buffer.add_char buffer ' ';
+       Buffer.add_string buffer (String.trim hash);
+       first := false);
+  Buffer.contents buffer
 
 let style_tag ?key:_ ?children:_ () =
   React.createElement "style"
