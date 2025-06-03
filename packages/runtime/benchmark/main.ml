@@ -1,4 +1,4 @@
-(* Simple CSS Performance Benchmark *)
+(* Simple Performance Benchmark, not related with the CSS runtime, just used for manually testing some internal functions *)
 
 let time_function name f =
   let start_time = Sys.time () in
