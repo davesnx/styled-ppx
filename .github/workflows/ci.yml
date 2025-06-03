@@ -109,7 +109,7 @@ jobs:
           path: _build/default/packages/bin/bin.exe
 
       - name: Upload runtime artifacts for @davesnx/styled-ppx/runtime
-        if: matrix.os == 'ubuntu-20.04' && matrix.ocaml-compiler == '4.14.1'
+        if: matrix.os == 'ubuntu-latest' && matrix.ocaml-compiler == '4.14.1'
         uses: actions/upload-artifact@v4
         with:
           name: runtime-rescript
@@ -139,7 +139,7 @@ jobs:
     name: Publish
     needs: build
     if: github.repository_owner == 'davesnx'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -157,7 +157,7 @@ jobs:
       - name: Download linux artifacts
         uses: actions/download-artifact@v4
         with:
-          name: ubuntu-20.04
+          name: ubuntu-latest
           path: _release/platform-linux-x64
 
       - name: Download macOS artifacts
