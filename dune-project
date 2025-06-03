@@ -32,7 +32,7 @@
    (ppx_deriving (>= 5.0))
    (ppx_deriving_yojson (>= 3.7.0))
    (ppxlib (and (>= 0.27.0) (<= 0.34.0)))
-   (sedlex (>= 3.2))
+   (sedlex (>= 3.5))
    (melange (>= 3.0.0))
    (server-reason-react (>= 0.3.1))
    (reason-react (>= 0.14.0))
