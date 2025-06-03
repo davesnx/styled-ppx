@@ -25,7 +25,7 @@ jobs:
     name: Build
     strategy:
       matrix:
-        os: [ubuntu-20.04, macos-latest] # Missing windows-latest
+        os: [ubuntu-latest, macos-latest] # windows-latest
         ocaml-compiler:
           - 4.14.1
           - 5.2.0
@@ -50,7 +50,7 @@ jobs:
           key: opam-${{ matrix.os }}-${{ matrix.ocaml-compiler }}-${{ hashFiles('**.opam') }}
 
       - name: Use OCaml ${{ matrix.ocaml-compiler }}
-        uses: ocaml/setup-ocaml@v3.0.15
+        uses: ocaml/setup-ocaml@v3.3.2
         if: steps.opam-cache.outputs.cache-hit != 'true'
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
@@ -109,7 +109,7 @@ jobs:
           path: _build/default/packages/bin/bin.exe
 
       - name: Upload runtime artifacts for @davesnx/styled-ppx/runtime
-        if: matrix.os == 'ubuntu-20.04' && matrix.ocaml-compiler == '4.14.1'
+        if: matrix.os == 'ubuntu-latest' && matrix.ocaml-compiler == '4.14.1'
         uses: actions/upload-artifact@v4
         with:
           name: runtime-rescript
@@ -139,7 +139,7 @@ jobs:
     name: Publish
     needs: build
     if: github.repository_owner == 'davesnx'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -157,7 +157,7 @@ jobs:
       - name: Download linux artifacts
         uses: actions/download-artifact@v4
         with:
-          name: ubuntu-20.04
+          name: ubuntu-latest
           path: _release/platform-linux-x64
 
       - name: Download macOS artifacts
