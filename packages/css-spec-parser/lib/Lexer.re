@@ -4,7 +4,7 @@ open Tokens;
 // TODO: is rgb(255 255 255/0) valid?
 let whitespace = [%sedlex.regexp? Plus(' ' | '\t' | '\n')];
 let digit = [%sedlex.regexp? '0' .. '9'];
-let number = [%sedlex.regexp? (Opt('+' | '-'), digit | Utf8("∞"))];
+let number = [%sedlex.regexp? (Opt('+' | '-'), digit | "∞")];
 let range_restriction = [%sedlex.regexp? ('[', number, ',', number, ']')];
 
 let stop_literal = [%sedlex.regexp?
