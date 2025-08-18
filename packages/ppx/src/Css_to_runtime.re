@@ -38,11 +38,9 @@ let string_to_const = (~loc, s) => {
   };
 };
 let render_variable = (~loc, v) => {
-  open Ppxlib;
-  let txt = v |> String.concat(".") |> Longident.parse;
   Helper.Exp.ident({
     loc,
-    txt,
+    txt: v |> String.concat(".") |> Ppxlib.Longident.parse,
   });
 };
 
