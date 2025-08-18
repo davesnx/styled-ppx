@@ -924,10 +924,10 @@ let rec getArgs = (expr, list) => {
   | Pexp_fun(arg, _, pattern, _) when !getIsLabelled(arg) =>
     Error.raise(
       ~loc=pattern.ppat_loc,
-      ~description="Dynamic components are defined with labeled arguments.",
-      ~example=Some("[%styled.div (~a, ~b) => {}]"),
+      ~examples=["[%styled.div (~a, ~b) => {}]"],
       ~link=
         "https://reasonml.org/docs/manual/latest/function#labeled-arguments",
+      "Dynamic components are defined with labeled arguments.",
     )
   | _ => (expr, list)
   };
@@ -951,20 +951,18 @@ let getLabeledArgs = (label, defaultValue, param, expr) => {
   if (getIsEmpty(param)) {
     Error.raise(
       ~loc=param.ppat_loc,
-      ~description=
-        "A dynamic component without props doesn't make much sense. This component should be static.",
-      ~example=None,
       ~link="https://styled-ppx.vercel.app/usage/dynamic-components",
+      "A dynamic component without props doesn't make much sense. This component should be static.",
     );
   };
 
   if (getNotLabelled(label)) {
     Error.raise(
       ~loc=param.ppat_loc,
-      ~description="Dynamic components are defined with labeled arguments.",
-      ~example=Some("[%styled.div (~a, ~b) => {}]"),
+      ~examples=["[%styled.div (~a, ~b) => {}]"],
       ~link=
         "https://reasonml.org/docs/manual/latest/function#labeled-arguments",
+      "Dynamic components are defined with labeled arguments.",
     );
   };
 
