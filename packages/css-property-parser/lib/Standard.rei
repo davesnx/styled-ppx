@@ -121,13 +121,9 @@ let flex_value: Rule.rule([> | `Fr(float)]);
 
 let invalid: Rule.rule(unit);
 
-let attr_name: Rule.rule(unit);
+let string_token: Rule.rule(string);
 
-let attr_fallback: Rule.rule(unit);
-
-let string_token: Rule.rule(unit);
-
-let ident_token: Rule.rule(unit);
+let ident_token: Rule.rule(string);
 
 let declaration_value: Rule.rule(unit);
 

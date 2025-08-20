@@ -5474,20 +5474,21 @@ let render_quote = (~loc, quote: Types.quote) => {
 
 let render_content_string = (~loc, str) => {
   let length = String.length(str);
+  let get = String.get;
   let str =
     if (length == 0) {
       [%expr {js|''|js}];
-    } else if (length == 1 && str.[0] == '"') {
+    } else if (length == 1 && get(str, 0) == '"') {
       [%expr {js|'"'|js}];
-    } else if (length == 1 && str.[0] == ' ') {
+    } else if (length == 1 && get(str, 0) == ' ') {
       [%expr {js|' '|js}];
-    } else if (length == 1 && str.[0] == '\'') {
+    } else if (length == 1 && get(str, 0) == '\'') {
       [%expr {js|"'"|js}];
-    } else if (length == 2 && str.[0] == '"' && str.[1] == '"') {
+    } else if (length == 2 && get(str, 0) == '"' && get(str, 1) == '"') {
       [%expr {js|""|js}];
     } else {
-      let first = str.[0];
-      let last = str.[length - 1];
+      let first = get(str, 0);
+      let last = get(str, length - 1);
       switch (first, last) {
       | ('\'', '\'') => [%expr [%e render_string(~loc, str)]]
       | ('"', '"') => [%expr [%e render_string(~loc, str)]]
@@ -5495,6 +5496,64 @@ let render_content_string = (~loc, str) => {
       };
     };
   [%expr `text([%e str])];
+};
+
+let render_attr_name = (~loc, attr_name: Types.attr_name) => {
+  switch (attr_name) {
+  | (Some((Some(label), _)), _label) => [%expr
+     [%e render_string(~loc, label)]
+    ]
+  | (Some((None, _)), label) => [%expr [%e render_string(~loc, label)]]
+  | (None, label) => [%expr [%e render_string(~loc, label)]]
+  };
+};
+
+let render_attr_unit = (~loc, attr_unit: Types.attr_unit) => {
+  switch (attr_unit) {
+  | `Percent => [%expr [%e render_string(~loc, "%")]]
+  | `Em => [%expr [%e render_string(~loc, "em")]]
+  | `Vmin => [%expr [%e render_string(~loc, "vmin")]]
+  | `In => [%expr [%e render_string(~loc, "in")]]
+  | `Vw => [%expr [%e render_string(~loc, "vw")]]
+  | `Mm => [%expr [%e render_string(~loc, "mm")]]
+  | `Deg => [%expr [%e render_string(~loc, "deg")]]
+  | `Cm => [%expr [%e render_string(~loc, "cm")]]
+  | `Grad => [%expr [%e render_string(~loc, "grad")]]
+  | `Px => [%expr [%e render_string(~loc, "px")]]
+  | `KHz => [%expr [%e render_string(~loc, "kHz")]]
+  | `Ex => [%expr [%e render_string(~loc, "ex")]]
+  | `Rad => [%expr [%e render_string(~loc, "rad")]]
+  | `Ch => [%expr [%e render_string(~loc, "ch")]]
+  | `Rem => [%expr [%e render_string(~loc, "rem")]]
+  | `Pt => [%expr [%e render_string(~loc, "pt")]]
+  | `Hz => [%expr [%e render_string(~loc, "Hz")]]
+  | `Pc => [%expr [%e render_string(~loc, "pc")]]
+  | `Turn => [%expr [%e render_string(~loc, "turn")]]
+  | `S => [%expr [%e render_string(~loc, "s")]]
+  | `Vmax => [%expr [%e render_string(~loc, "vmax")]]
+  | `Ms => [%expr [%e render_string(~loc, "ms")]]
+  | `Vh => [%expr [%e render_string(~loc, "vh")]]
+  };
+};
+
+let render_attr_type = (~loc, attr_type: Types.attr_type) => {
+  switch (attr_type) {
+  | `Raw_string => [%expr [%e render_string(~loc, "raw-string")]]
+  | `Attr_unit(attr_unit) => [%expr [%e render_attr_unit(~loc, attr_unit)]]
+  };
+};
+
+let render_function_attr =
+    (~loc, attr_name: Types.attr_name, attr_type: option(Types.attr_type)) => {
+  switch (attr_type) {
+  | Some(attr_type) => [%expr
+     `attrWithType((
+       [%e render_attr_name(~loc, attr_name)],
+       [%e render_attr_type(~loc, attr_type)],
+     ))
+    ]
+  | None => [%expr `attr([%e render_attr_name(~loc, attr_name)])]
+  };
 };
 
 let render_content_list = (~loc, content_list: Types.content_list) => {
@@ -5506,7 +5565,8 @@ let render_content_list = (~loc, content_list: Types.content_list) => {
        | `String(str) => render_content_string(~loc, str)
        | `Url(u) => render_url(~loc, u)
        | `Counter(_label, _, _style) => raise(Unsupported_feature)
-       | `Function_attr(_attr) => raise(Unsupported_feature)
+       | `Function_attr((attr_name, attr_type): Types.function_attr) =>
+         render_function_attr(~loc, attr_name, attr_type)
        }
      )
   |> Builder.pexp_array(~loc);

@@ -344,11 +344,23 @@ let custom_ident_without_span_or_auto =
 
 // TODO: workarounds
 let invalid = expect(STRING("not-implemented"));
-let attr_name = invalid;
-let attr_fallback = invalid;
-let string_token = invalid;
-let ident_token = invalid;
+
+let string_token =
+  token(
+    fun
+    | STRING(string) => Ok(string)
+    | _ => Error(["expected a string."]),
+  );
+
+let ident_token =
+  token(
+    fun
+    | IDENT(string) => Ok(string)
+    | _ => Error(["expected an identifier."]),
+  );
+
 let declaration_value = invalid;
+
 let positive_integer = integer;
 let function_token = invalid;
 let any_value = invalid;

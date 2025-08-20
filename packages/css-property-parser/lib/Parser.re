@@ -92,7 +92,6 @@ and attachment = [%value.rec "'scroll' | 'fixed' | 'local'"]
 and attr_fallback = [%value.rec "<any-value>"]
 and attr_matcher = [%value.rec "[ '~' | '|' | '^' | '$' | '*' ]? '='"]
 and attr_modifier = [%value.rec "'i' | 's'"]
-and attr_name = [%value.rec "<wq-name>"]
 and attribute_selector = [%value.rec
   "'[' <wq-name> ']' | '[' <wq-name> <attr-matcher> [ <string-token> | <ident-token> ] [ <attr-modifier> ]? ']'"
 ]
@@ -285,9 +284,11 @@ and font_weight_absolute = [%value.rec "'normal' | 'bold' | <integer>"]
 and function__webkit_gradient = [%value.rec
   "-webkit-gradient( <-webkit-gradient-type> ',' <-webkit-gradient-point> [ ',' <-webkit-gradient-point> | ',' <-webkit-gradient-radius> ',' <-webkit-gradient-point> ] [ ',' <-webkit-gradient-radius> ]? [ ',' <-webkit-gradient-color-stop> ]* )"
 ]
-and function_attr = [%value.rec
-  "attr( <attr-name> [ <type-or-unit> ]? [ ',' <attr-fallback> ]? )"
-]
+/* We don't support attr() with fallback value (since it's a declaration value) yet, original spec is: "attr(<attr-name> <attr-type>? , <declaration-value>?)" */
+and function_attr = [%value.rec "attr(<attr-name> <attr-type>?)"]
+/* and function_attr = [%value.rec
+     "attr(<attr-name> <attr-type>? , <declaration-value>?)"
+   ] */
 and function_blur = [%value.rec "blur( <extended-length> )"]
 and function_brightness = [%value.rec "brightness( <number-percentage> )"]
 and function_calc = [%value.rec "calc( <calc-sum> )"]
@@ -2035,7 +2036,7 @@ and transition_behavior_value_no_interp = [%value.rec
   "'normal' | 'allow-discrete'"
 ]
 and type_or_unit = [%value.rec
-  "'string' | 'color' | 'url' | 'integer' | 'number' | 'length' | 'angle' | 'time' | 'frequency' | 'cap' | 'ch' | 'em' | 'ex' | 'ic' | 'lh' | 'rlh' | 'rem' | 'vb' | 'vi' | 'vw' | 'vh' | 'vmin' | 'vmax' | 'mm' | 'Q' | 'cm' | 'in' | 'pt' | 'pc' | 'px' | 'deg' | 'grad' | 'rad' | 'turn' | 'ms' | 's' | 'Hz' | 'kHz' | '%'"
+  "'string' | 'color' | 'url' | 'integer' | 'number' | 'length' | 'angle' | 'time' | 'frequency' | 'cap' | 'ch' | 'em' | 'ex' | 'ic' | 'lh' | 'rlh' | 'rem' | 'vb' | 'vi' | 'vw' | 'vh' | 'vmin' | 'vmax' | 'mm' | 'Q' | 'cm' | 'in' | 'pt' | 'pc' | 'px' | 'deg' | 'grad' | 'rad' | 'turn' | 'ms' | 's' | 'Hz' | 'kHz'"
 ]
 and type_selector = [%value.rec "<wq-name> | [ <ns-prefix> ]? '*'"]
 and viewport_length = [%value.rec
@@ -2043,6 +2044,28 @@ and viewport_length = [%value.rec
 ]
 and visual_box = [%value.rec "'content-box' | 'padding-box' | 'border-box'"]
 and wq_name = [%value.rec "[ <ns-prefix> ]? <ident-token>"]
+and attr_name = [%value.rec "[ <ident-token>? '|' ]? <ident-token>"]
+and attr_unit = [%value.rec
+  "'%' | 'em' | 'ex' | 'ch' | 'rem' | 'vw' | 'vh' | 'vmin' | 'vmax' | 'cm' | 'mm' | 'in' | 'px' | 'pt' | 'pc' | 'deg' | 'grad' | 'rad' | 'turn' | 'ms' | 's' | 'Hz' | 'kHz'"
+]
+and syntax_type_name = [%value.rec
+  "'angle' | 'color' | 'custom-ident' | 'image' | 'integer' | 'length' | 'length-percentage' | 'number' | 'percentage' | 'resolution' | 'string' | 'time' | 'url' | 'transform-function'"
+]
+and syntax_multiplier = [%value.rec "'#' | '+'"]
+and syntax_single_component = [%value.rec
+  "'<' <syntax-type-name> '>' | <ident>"
+]
+and syntax_string = [%value.rec "<string>"]
+and syntax_combinator = [%value.rec "'|'"]
+and syntax_component = [%value.rec
+  "<syntax-single-component> [ <syntax-multiplier> ]? | '<' 'transform-list' '>'"
+]
+and syntax = [%value.rec
+  "'*' | <syntax-component> [ <syntax-combinator> <syntax-component> ]* | <syntax-string>"
+]
+/*
+ We don't support type() yet, original spec is: "type( <syntax> ) | 'raw-string' | <attr-unit>" */
+and attr_type = [%value.rec "'raw-string' | <attr-unit>"]
 and x = [%value.rec "<number>"]
 and y = [%value.rec "<number>"];
 
@@ -2138,6 +2161,16 @@ let check_map =
       ("-webkit-mask-box-repeat", check(_webkit_mask_box_repeat)),
       ("-webkit-mask-clip-style", check(_webkit_mask_clip_style)),
       ("absolute-size", check(absolute_size)),
+      ("attr-name", check(attr_name)),
+      ("attr-type", check(attr_type)),
+      ("attr-unit", check(attr_unit)),
+      ("syntax", check(syntax)),
+      ("syntax-combinator", check(syntax_combinator)),
+      ("syntax-component", check(syntax_component)),
+      ("syntax-multiplier", check(syntax_multiplier)),
+      ("syntax-single-component", check(syntax_single_component)),
+      ("syntax-string", check(syntax_string)),
+      ("syntax-type-name", check(syntax_type_name)),
       ("age", check(age)),
       ("alpha-value", check(alpha_value)),
       ("angular-color-hint", check(angular_color_hint)),

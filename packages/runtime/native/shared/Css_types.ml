@@ -4172,6 +4172,8 @@ module Content = struct
     | `noOpenQuote -> {js|no-open-quote|js}
     | `noCloseQuote -> {js|no-close-quote|js}
     | `attr name -> ({js|attr(|js} ^ name) ^ {js|)|js}
+    | `attrWithType (name, attr_type) ->
+      ({js|attr(|js} ^ name) ^ {js| |js} ^ attr_type ^ {js|)|js}
     | `text v -> text_to_string v
     | #Image.t as c -> Image.toString c
     | #Counter.t as c -> Counter.toString c
