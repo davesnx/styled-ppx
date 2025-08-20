@@ -5,6 +5,8 @@
 
 [%css {|content: "";|}];
 /* [%css {|content: counter(ol);|}]; */
+[%css {|content: counter(count, decimal);|}];
+[%css {|content: counter(count, decimal) ") ";|}];
 [%css {|content: unset;|}];
 
 /* Keywords that cannot be combined with other values */
