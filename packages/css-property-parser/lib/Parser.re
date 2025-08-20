@@ -205,8 +205,9 @@ and content_position = [%value.rec
 ]
 and content_replacement = [%value.rec "<image>"]
 and contextual_alt_values = [%value.rec "'contextual' | 'no-contextual'"]
-and counter_style = [%value.rec "<counter-style-name>"]
+and counter_style = [%value.rec "<counter-style-name> | <symbols()>"]
 and counter_style_name = [%value.rec "<custom-ident>"]
+and counter_name = [%value.rec "<custom-ident>"]
 and cubic_bezier_timing_function = [%value.rec
   "'ease' | 'ease-in' | 'ease-out' | 'ease-in-out' | cubic-bezier( <number> ',' <number> ',' <number> ',' <number> )"
 ]
@@ -301,7 +302,7 @@ and function_conic_gradient = [%value.rec
 ]
 and function_contrast = [%value.rec "contrast( <number-percentage> )"]
 and function_counter = [%value.rec
-  "counter( <custom-ident> ',' [ <counter-style> ]? )"
+  "counter( <counter-name> , <counter-style>? )"
 ]
 and function_counters = [%value.rec
   "counters( <custom-ident> ',' <string> ',' [ <counter-style> ]? )"
@@ -408,6 +409,9 @@ and function_skew = [%value.rec
 ]
 and function_skewX = [%value.rec "skewX( <extended-angle> | <zero> )"]
 and function_skewY = [%value.rec "skewY( <extended-angle> | <zero> )"]
+and function_symbols = [%value.rec
+  "symbols( [ <symbols-type> ]? [ <string> | <image> ]+ )"
+]
 and function_target_counter = [%value.rec
   "target-counter( [ <string> | <url> ] ',' <custom-ident> ',' [ <counter-style> ]? )"
 ]
@@ -1972,6 +1976,9 @@ and svg_writing_mode = [%value.rec
   "'lr-tb' | 'rl-tb' | 'tb-rl' | 'lr' | 'rl' | 'tb'"
 ]
 and symbol = [%value.rec "<string> | <image> | <custom-ident>"]
+and symbols_type = [%value.rec
+  "'cyclic' | 'numeric' | 'alphabetic' | 'symbolic' | 'fixed'"
+]
 and target = [%value.rec
   "<target-counter()> | <target-counters()> | <target-text()>"
 ]
@@ -2036,7 +2043,7 @@ and transition_behavior_value_no_interp = [%value.rec
   "'normal' | 'allow-discrete'"
 ]
 and type_or_unit = [%value.rec
-  "'string' | 'color' | 'url' | 'integer' | 'number' | 'length' | 'angle' | 'time' | 'frequency' | 'cap' | 'ch' | 'em' | 'ex' | 'ic' | 'lh' | 'rlh' | 'rem' | 'vb' | 'vi' | 'vw' | 'vh' | 'vmin' | 'vmax' | 'mm' | 'Q' | 'cm' | 'in' | 'pt' | 'pc' | 'px' | 'deg' | 'grad' | 'rad' | 'turn' | 'ms' | 's' | 'Hz' | 'kHz'"
+  "'string' | 'color' | 'url' | 'integer' | 'number' | 'length' | 'angle' | 'time' | 'frequency' | 'cap' | 'ch' | 'em' | 'ex' | 'ic' | 'lh' | 'rlh' | 'rem' | 'vb' | 'vi' | 'vw' | 'vh' | 'vmin' | 'vmax' | 'mm' | 'Q' | 'cm' | 'in' | 'pt' | 'pc' | 'px' | 'deg' | 'grad' | 'rad' | 'turn' | 'ms' | 's' | 'Hz' | 'kHz' | '%'"
 ]
 and type_selector = [%value.rec "<wq-name> | [ <ns-prefix> ]? '*'"]
 and viewport_length = [%value.rec
@@ -2326,6 +2333,7 @@ let check_map =
       ("function_skew", check(function_skew)),
       ("function_skewX", check(function_skewX)),
       ("function_skewY", check(function_skewY)),
+      ("function_symbols", check(function_symbols)),
       ("function_target-counter", check(function_target_counter)),
       ("function_target-counters", check(function_target_counters)),
       ("function_target-text", check(function_target_text)),
@@ -3544,6 +3552,7 @@ let check_map =
       ("svg-length", check(svg_length)),
       ("svg-writing-mode", check(svg_writing_mode)),
       ("symbol", check(symbol)),
+      ("symbols-type", check(symbols_type)),
       ("target", check(target)),
       ("timing-function", check(timing_function)),
       ("top", check(top)),

@@ -5556,6 +5556,82 @@ let render_function_attr =
   };
 };
 
+let render_symbols_type = (~loc, symbols_type: Types.symbols_type) => {
+  switch (symbols_type) {
+  | `Cyclic => [%expr `cyclic]
+  | `Numeric => [%expr `numeric]
+  | `Alphabetic => [%expr `alphabetic]
+  | `Symbolic => [%expr `symbolic]
+  | `Fixed => [%expr `fixed]
+  };
+};
+
+let render_list_image_or_string = (~loc, list_image_or_string) => {
+  list_image_or_string
+  |> List.map(image_or_string =>
+       switch (image_or_string) {
+       | `Image(image) => render_image(~loc, image)
+       | `String(str) => render_string(~loc, str)
+       }
+     )
+  |> Builder.pexp_array(~loc);
+};
+
+let render_symbols =
+    (~loc, symbols_type: option(Types.symbols_type), list_image_or_string) => {
+  switch (symbols_type) {
+  | Some(symbols_type) => [%expr
+     `symbols((
+       [%e render_symbols_type(~loc, symbols_type)],
+       [%e render_list_image_or_string(~loc, list_image_or_string)],
+     ))
+    ]
+  | None => [%expr
+     `symbols([%e render_list_image_or_string(~loc, list_image_or_string)])
+    ]
+  };
+};
+
+let render_counter_style_name = (~loc, value: string) => {
+  switch (value) {
+  | "disc" => [%expr `disc]
+  | "circle" => [%expr `circle]
+  | "square" => [%expr `square]
+  | "decimal" => [%expr `decimal]
+  | "lower-alpha" => [%expr `lowerAlpha]
+  | "upper-alpha" => [%expr `upperAlpha]
+  | "lower-greek" => [%expr `lowerGreek]
+  | "lower-latin" => [%expr `lowerLatin]
+  | "upper-latin" => [%expr `upperLatin]
+  | "lower-roman" => [%expr `lowerRoman]
+  | "upper-roman" => [%expr `upperRoman]
+  | "none" => [%expr `none]
+  | _ => [%expr [%e render_string(~loc, value)]]
+  };
+};
+
+let render_counter_style = (~loc, counter_style: Types.counter_style) => {
+  switch (counter_style) {
+  | `Counter_style_name(label) => render_counter_style_name(~loc, label)
+  | `Function_symbols(symbols_type, list_image_or_string) => [%expr
+     [%e render_symbols(~loc, symbols_type, list_image_or_string)]
+    ]
+  };
+};
+
+let render_counter =
+    (~loc, label: string, style: option(Types.counter_style)) => {
+  switch (style) {
+  | Some(counter_style) => [%expr
+     `counter((
+       [%e render_string(~loc, label)],
+       Some([%e render_counter_style(~loc, counter_style)]),
+     ))
+    ]
+  | None => [%expr `counter(([%e render_string(~loc, label)], None))]
+  };
+};
+
 let render_content_list = (~loc, content_list: Types.content_list) => {
   content_list
   |> List.map(content_item =>
@@ -5564,7 +5640,14 @@ let render_content_list = (~loc, content_list: Types.content_list) => {
        | `Quote(quote) => render_quote(~loc, quote)
        | `String(str) => render_content_string(~loc, str)
        | `Url(u) => render_url(~loc, u)
-       | `Counter(_label, _, _style) => raise(Unsupported_feature)
+       | `Counter(counter_name, _, list_style_type_opt) =>
+         let counter_style_opt =
+           switch (list_style_type_opt) {
+           | Some(`Counter_style(cs)) => Some(cs)
+           | Some(`None | `String(_)) => None
+           | None => None
+           };
+         render_counter(~loc, counter_name, counter_style_opt);
        | `Function_attr((attr_name, attr_type): Types.function_attr) =>
          render_function_attr(~loc, attr_name, attr_type)
        }

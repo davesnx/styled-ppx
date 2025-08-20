@@ -4020,33 +4020,75 @@ module FontDisplay = struct
     | #Cascading.t as c -> Cascading.toString c
 end
 
-module CounterStyleType = struct
-  type t = ListStyleType.t
+module SymbolsType = struct
+  type t =
+    [ `cyclic
+    | `numeric
+    | `alphabetic
+    | `symbolic
+    | `fixed
+    ]
 
   let toString x =
-    match x with #ListStyleType.t as c -> ListStyleType.toString c
+    match x with
+    | `cyclic -> {js|cyclic|js}
+    | `numeric -> {js|numeric|js}
+    | `alphabetic -> {js|alphabetic|js}
+    | `symbolic -> {js|symbolic|js}
+    | `fixed -> {js|fixed|js}
 end
 
-module Counter = struct
-  type style =
-    [ CounterStyleType.t
+module Symbols = struct
+  type t =
+    SymbolsType.t option * [ `String of string | `Image of Image.t ] array
+
+  let image_or_string_to_string = function
+    | `String s -> s
+    | `Image i -> Image.toString i
+
+  let toString (x : t) =
+    match x with
+    | Some s, images ->
+      {js|symbols(|js}
+      ^ SymbolsType.toString s
+      ^ {js|, |js}
+      ^ Kloth.Array.map_and_join ~sep:{js|,|js} ~f:image_or_string_to_string
+          images
+    | None, images ->
+      {js|symbols(|js}
+      ^ Kloth.Array.map_and_join ~sep:{js|,|js} ~f:image_or_string_to_string
+          images
+      ^ {js|)|js}
+end
+
+module CounterStyleType = struct
+  type t =
+    [ ListStyleType.t
+    | `Symbols of Symbols.t
     | `unset
     ]
 
-  type t = [ `counter of string * style ]
+  let toString (x : t) =
+    match (x : t) with
+    | #ListStyleType.t as c -> ListStyleType.toString c
+    | `Symbols s -> Symbols.toString s
+end
 
-  let counter ?(style = `unset) name = `counter (name, style)
+module Counter = struct
+  type t = [ `counter of string * CounterStyleType.t option ]
+
+  let counter ?(style = None) name = `counter (name, style)
 
   let toString x =
     match x with
     | `counter (counter, style) ->
       (match style with
-      | `unset -> ({js|counter(|js} ^ counter) ^ {js|)|js}
-      | #CounterStyleType.t as t ->
+      | None -> ({js|counter(|js} ^ counter) ^ {js|)|js}
+      | Some s ->
         {js|counter(|js}
         ^ counter
         ^ {js|,|js}
-        ^ CounterStyleType.toString t
+        ^ CounterStyleType.toString s
         ^ {js|)|js})
 end
 
