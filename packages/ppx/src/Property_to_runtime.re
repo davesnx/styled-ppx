@@ -1,5 +1,5 @@
-open Ppxlib;
-
+module Location = Ppxlib.Location;
+module Parsetree = Ppxlib.Parsetree;
 module Builder = Ppxlib.Ast_builder.Default;
 
 module Standard = Css_property_parser.Standard;
@@ -79,7 +79,8 @@ let render_option = (~loc, f) =>
   | Some(v) => [%expr Some([%e f(~loc, v)])]
   | None => [%expr None];
 
-let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
+let list_to_longident = vars =>
+  vars |> String.concat(".") |> Ppxlib.Longident.parse;
 
 let render_variable = (~loc, name) =>
   list_to_longident(name) |> txt(~loc) |> Builder.pexp_ident(~loc);
@@ -1303,7 +1304,7 @@ let render_box_shadow = (~loc, shadow) => {
     );
 
   let args =
-    [
+    Ppxlib.Asttypes.[
       (Labelled("x"), Some(x)),
       (Labelled("y"), Some(y)),
       (Labelled("blur"), blur),
@@ -2909,7 +2910,7 @@ let render_text_shadow = (~loc, shadow) => {
     };
 
   let args =
-    [
+    Ppxlib.Asttypes.[
       (Labelled("x"), Some(render_length_interp(~loc, x))),
       (Labelled("y"), Some(render_length_interp(~loc, y))),
       (Labelled("blur"), Option.map(render_length_interp(~loc), blur)),
@@ -5199,13 +5200,13 @@ let filter =
   monomorphic(
     Property_parser.property_filter,
     (~loc) => [%expr CSS.filter],
-    (~loc, value) =>
+    (~loc, value) => {
       switch (value) {
       | `None => [%expr [|`none|]]
       | `Interpolation(v) => render_variable(~loc, v)
       | `Filter_function_list(ffl) => render_filter_function_list(~loc, ffl)
-      | `_ms_filter_function_list(_) => raise(Unsupported_feature)
-      },
+      }
+    },
   );
 
 let backdrop_filter =
@@ -5474,20 +5475,21 @@ let render_quote = (~loc, quote: Types.quote) => {
 
 let render_content_string = (~loc, str) => {
   let length = String.length(str);
+  let get = String.get;
   let str =
     if (length == 0) {
       [%expr {js|''|js}];
-    } else if (length == 1 && str.[0] == '"') {
+    } else if (length == 1 && get(str, 0) == '"') {
       [%expr {js|'"'|js}];
-    } else if (length == 1 && str.[0] == ' ') {
+    } else if (length == 1 && get(str, 0) == ' ') {
       [%expr {js|' '|js}];
-    } else if (length == 1 && str.[0] == '\'') {
+    } else if (length == 1 && get(str, 0) == '\'') {
       [%expr {js|"'"|js}];
-    } else if (length == 2 && str.[0] == '"' && str.[1] == '"') {
+    } else if (length == 2 && get(str, 0) == '"' && get(str, 1) == '"') {
       [%expr {js|""|js}];
     } else {
-      let first = str.[0];
-      let last = str.[length - 1];
+      let first = get(str, 0);
+      let last = get(str, length - 1);
       switch (first, last) {
       | ('\'', '\'') => [%expr [%e render_string(~loc, str)]]
       | ('"', '"') => [%expr [%e render_string(~loc, str)]]
@@ -5495,6 +5497,127 @@ let render_content_string = (~loc, str) => {
       };
     };
   [%expr `text([%e str])];
+};
+
+let render_attr_name = (~loc, attr_name: Types.attr_name) => {
+  switch (attr_name) {
+  | (Some((Some(label), _)), _label) => [%expr
+     [%e render_string(~loc, label)]
+    ]
+  | (Some((None, _)), label) => [%expr [%e render_string(~loc, label)]]
+  | (None, label) => [%expr [%e render_string(~loc, label)]]
+  };
+};
+
+let render_attr_unit = (~loc, attr_unit: Types.attr_unit) => {
+  switch (attr_unit) {
+  | `Percent => [%expr [%e render_string(~loc, "%")]]
+  | `Em => [%expr [%e render_string(~loc, "em")]]
+  | `Vmin => [%expr [%e render_string(~loc, "vmin")]]
+  | `In => [%expr [%e render_string(~loc, "in")]]
+  | `Vw => [%expr [%e render_string(~loc, "vw")]]
+  | `Mm => [%expr [%e render_string(~loc, "mm")]]
+  | `Deg => [%expr [%e render_string(~loc, "deg")]]
+  | `Cm => [%expr [%e render_string(~loc, "cm")]]
+  | `Grad => [%expr [%e render_string(~loc, "grad")]]
+  | `Px => [%expr [%e render_string(~loc, "px")]]
+  | `KHz => [%expr [%e render_string(~loc, "kHz")]]
+  | `Ex => [%expr [%e render_string(~loc, "ex")]]
+  | `Rad => [%expr [%e render_string(~loc, "rad")]]
+  | `Ch => [%expr [%e render_string(~loc, "ch")]]
+  | `Rem => [%expr [%e render_string(~loc, "rem")]]
+  | `Pt => [%expr [%e render_string(~loc, "pt")]]
+  | `Hz => [%expr [%e render_string(~loc, "Hz")]]
+  | `Pc => [%expr [%e render_string(~loc, "pc")]]
+  | `Turn => [%expr [%e render_string(~loc, "turn")]]
+  | `S => [%expr [%e render_string(~loc, "s")]]
+  | `Vmax => [%expr [%e render_string(~loc, "vmax")]]
+  | `Ms => [%expr [%e render_string(~loc, "ms")]]
+  | `Vh => [%expr [%e render_string(~loc, "vh")]]
+  };
+};
+
+let render_attr_type = (~loc, attr_type: Types.attr_type) => {
+  switch (attr_type) {
+  | `Raw_string => [%expr [%e render_string(~loc, "raw-string")]]
+  | `Attr_unit(attr_unit) => [%expr [%e render_attr_unit(~loc, attr_unit)]]
+  };
+};
+
+let render_function_attr =
+    (~loc, attr_name: Types.attr_name, attr_type: option(Types.attr_type)) => {
+  switch (attr_type) {
+  | Some(attr_type) => [%expr
+     `attrWithType((
+       [%e render_attr_name(~loc, attr_name)],
+       [%e render_attr_type(~loc, attr_type)],
+     ))
+    ]
+  | None => [%expr `attr([%e render_attr_name(~loc, attr_name)])]
+  };
+};
+
+let render_symbols_type = (~loc, symbols_type: Types.symbols_type) => {
+  switch (symbols_type) {
+  | `Cyclic => [%expr `cyclic]
+  | `Numeric => [%expr `numeric]
+  | `Alphabetic => [%expr `alphabetic]
+  | `Symbolic => [%expr `symbolic]
+  | `Fixed => [%expr `fixed]
+  };
+};
+
+let render_list_image_or_string = (~loc, list_image_or_string) => {
+  list_image_or_string
+  |> List.map(image_or_string =>
+       switch (image_or_string) {
+       | `Image(image) => render_image(~loc, image)
+       | `String(str) => render_string(~loc, str)
+       }
+     )
+  |> Builder.pexp_array(~loc);
+};
+
+let render_symbols =
+    (~loc, symbols_type: option(Types.symbols_type), list_image_or_string) => {
+  switch (symbols_type) {
+  | Some(symbols_type) => [%expr
+     `symbols((
+       [%e render_symbols_type(~loc, symbols_type)],
+       [%e render_list_image_or_string(~loc, list_image_or_string)],
+     ))
+    ]
+  | None => [%expr
+     `symbols((
+       None,
+       [%e render_list_image_or_string(~loc, list_image_or_string)],
+     ))
+    ]
+  };
+};
+
+let render_counter_style = (~loc, counter_style: Types.counter_style) => {
+  switch (counter_style) {
+  | `Counter_style_name(label) => [%expr
+     `Custom([%e render_string(~loc, label)])
+    ]
+  | `Function_symbols(symbols_type, list_image_or_string) => [%expr
+     [%e render_symbols(~loc, symbols_type, list_image_or_string)]
+    ]
+  };
+};
+
+let render_counter =
+    (~loc, label: string, style: option(Types.counter_style)) => {
+  switch (style) {
+  | Some(counter_style) => [%expr
+     `counter((
+       [%e render_string(~loc, label)],
+       Some([%e render_counter_style(~loc, counter_style)]),
+     ))
+    ]
+  | None => [%expr `counter(([%e render_string(~loc, label)], None))]
+  };
 };
 
 let render_content_list = (~loc, content_list: Types.content_list) => {
@@ -5505,8 +5628,16 @@ let render_content_list = (~loc, content_list: Types.content_list) => {
        | `Quote(quote) => render_quote(~loc, quote)
        | `String(str) => render_content_string(~loc, str)
        | `Url(u) => render_url(~loc, u)
-       | `Counter(_label, _, _style) => raise(Unsupported_feature)
-       | `Function_attr(_attr) => raise(Unsupported_feature)
+       | `Counter(counter_name, _, list_style_type_opt) =>
+         let counter_style_opt =
+           switch (list_style_type_opt) {
+           | Some(`Counter_style(cs)) => Some(cs)
+           | Some(`None | `String(_)) => None
+           | None => None
+           };
+         render_counter(~loc, counter_name, counter_style_opt);
+       | `Function_attr((attr_name, attr_type): Types.function_attr) =>
+         render_function_attr(~loc, attr_name, attr_type)
        }
      )
   |> Builder.pexp_array(~loc);

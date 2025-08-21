@@ -33,17 +33,6 @@ and _legacy_repeating_linear_gradient = [%value.rec
 and _legacy_repeating_radial_gradient = [%value.rec
   "-moz-repeating-radial-gradient( <-legacy-radial-gradient-arguments> ) | -webkit-repeating-radial-gradient( <-legacy-radial-gradient-arguments> ) | -o-repeating-radial-gradient( <-legacy-radial-gradient-arguments> )"
 ]
-and _ms_filter = [%value.rec "<string>"]
-and _ms_filter_function = [%value.rec
-  "<-ms-filter-function-progid> | <-ms-filter-function-legacy>"
-]
-and _ms_filter_function_legacy = [%value.rec
-  "<ident-token> | <function-token> [ <any-value> ]? ')'"
-]
-and _ms_filter_function_list = [%value.rec "[ <-ms-filter-function> ]+"]
-and _ms_filter_function_progid = [%value.rec
-  "'progid:' [ <ident-token> '.' ]* [ <ident-token> | <function-token> [ <any-value> ]? ')' ]"
-]
 and _non_standard_color = [%value.rec
   "'-moz-ButtonDefault' | '-moz-ButtonHoverFace' | '-moz-ButtonHoverText' | '-moz-CellHighlight' | '-moz-CellHighlightText' | '-moz-Combobox' | '-moz-ComboboxText' | '-moz-Dialog' | '-moz-DialogText' | '-moz-dragtargetzone' | '-moz-EvenTreeRow' | '-moz-Field' | '-moz-FieldText' | '-moz-html-CellHighlight' | '-moz-html-CellHighlightText' | '-moz-mac-accentdarkestshadow' | '-moz-mac-accentdarkshadow' | '-moz-mac-accentface' | '-moz-mac-accentlightesthighlight' | '-moz-mac-accentlightshadow' | '-moz-mac-accentregularhighlight' | '-moz-mac-accentregularshadow' | '-moz-mac-chrome-active' | '-moz-mac-chrome-inactive' | '-moz-mac-focusring' | '-moz-mac-menuselect' | '-moz-mac-menushadow' | '-moz-mac-menutextselect' | '-moz-MenuHover' | '-moz-MenuHoverText' | '-moz-MenuBarText' | '-moz-MenuBarHoverText' | '-moz-nativehyperlinktext' | '-moz-OddTreeRow' | '-moz-win-communicationstext' | '-moz-win-mediatext' | '-moz-activehyperlinktext' | '-moz-default-background-color' | '-moz-default-color' | '-moz-hyperlinktext' | '-moz-visitedhyperlinktext' | '-webkit-activelink' | '-webkit-focus-ring-color' | '-webkit-link' | '-webkit-text'"
 ]
@@ -92,7 +81,6 @@ and attachment = [%value.rec "'scroll' | 'fixed' | 'local'"]
 and attr_fallback = [%value.rec "<any-value>"]
 and attr_matcher = [%value.rec "[ '~' | '|' | '^' | '$' | '*' ]? '='"]
 and attr_modifier = [%value.rec "'i' | 's'"]
-and attr_name = [%value.rec "<wq-name>"]
 and attribute_selector = [%value.rec
   "'[' <wq-name> ']' | '[' <wq-name> <attr-matcher> [ <string-token> | <ident-token> ] [ <attr-modifier> ]? ']'"
 ]
@@ -206,8 +194,9 @@ and content_position = [%value.rec
 ]
 and content_replacement = [%value.rec "<image>"]
 and contextual_alt_values = [%value.rec "'contextual' | 'no-contextual'"]
-and counter_style = [%value.rec "<counter-style-name>"]
+and counter_style = [%value.rec "<counter-style-name> | <symbols()>"]
 and counter_style_name = [%value.rec "<custom-ident>"]
+and counter_name = [%value.rec "<custom-ident>"]
 and cubic_bezier_timing_function = [%value.rec
   "'ease' | 'ease-in' | 'ease-out' | 'ease-in-out' | cubic-bezier( <number> ',' <number> ',' <number> ',' <number> )"
 ]
@@ -285,9 +274,11 @@ and font_weight_absolute = [%value.rec "'normal' | 'bold' | <integer>"]
 and function__webkit_gradient = [%value.rec
   "-webkit-gradient( <-webkit-gradient-type> ',' <-webkit-gradient-point> [ ',' <-webkit-gradient-point> | ',' <-webkit-gradient-radius> ',' <-webkit-gradient-point> ] [ ',' <-webkit-gradient-radius> ]? [ ',' <-webkit-gradient-color-stop> ]* )"
 ]
-and function_attr = [%value.rec
-  "attr( <attr-name> [ <type-or-unit> ]? [ ',' <attr-fallback> ]? )"
-]
+/* We don't support attr() with fallback value (since it's a declaration value) yet, original spec is: "attr(<attr-name> <attr-type>? , <declaration-value>?)" */
+and function_attr = [%value.rec "attr(<attr-name> <attr-type>?)"]
+/* and function_attr = [%value.rec
+     "attr(<attr-name> <attr-type>? , <declaration-value>?)"
+   ] */
 and function_blur = [%value.rec "blur( <extended-length> )"]
 and function_brightness = [%value.rec "brightness( <number-percentage> )"]
 and function_calc = [%value.rec "calc( <calc-sum> )"]
@@ -300,7 +291,7 @@ and function_conic_gradient = [%value.rec
 ]
 and function_contrast = [%value.rec "contrast( <number-percentage> )"]
 and function_counter = [%value.rec
-  "counter( <custom-ident> ',' [ <counter-style> ]? )"
+  "counter( <counter-name> , <counter-style>? )"
 ]
 and function_counters = [%value.rec
   "counters( <custom-ident> ',' <string> ',' [ <counter-style> ]? )"
@@ -407,6 +398,9 @@ and function_skew = [%value.rec
 ]
 and function_skewX = [%value.rec "skewX( <extended-angle> | <zero> )"]
 and function_skewY = [%value.rec "skewY( <extended-angle> | <zero> )"]
+and function_symbols = [%value.rec
+  "symbols( [ <symbols-type> ]? [ <string> | <image> ]+ )"
+]
 and function_target_counter = [%value.rec
   "target-counter( [ <string> | <url> ] ',' <custom-ident> ',' [ <counter-style> ]? )"
 ]
@@ -653,114 +647,6 @@ and property__moz_window_dragging = [%value.rec "'drag' | 'no-drag'"]
 and property__moz_window_shadow = [%value.rec
   "'default' | 'menu' | 'tooltip' | 'sheet' | 'none'"
 ]
-and property__ms_accelerator = [%value.rec "'false' | 'true'"]
-and property__ms_block_progression = [%value.rec "'tb' | 'rl' | 'bt' | 'lr'"]
-and property__ms_content_zoom_chaining = [%value.rec "'none' | 'chained'"]
-and property__ms_content_zoom_limit = [%value.rec
-  "<'-ms-content-zoom-limit-min'> <'-ms-content-zoom-limit-max'>"
-]
-and property__ms_content_zoom_limit_max = [%value.rec "<extended-percentage>"]
-and property__ms_content_zoom_limit_min = [%value.rec "<extended-percentage>"]
-and property__ms_content_zoom_snap = [%value.rec
-  "<'-ms-content-zoom-snap-type'> || <'-ms-content-zoom-snap-points'>"
-]
-and property__ms_content_zoom_snap_points = [%value.rec
-  "snapInterval( <extended-percentage> ',' <extended-percentage> ) | snapList( [ <extended-percentage> ]# )"
-]
-and property__ms_content_zoom_snap_type = [%value.rec
-  "'none' | 'proximity' | 'mandatory'"
-]
-and property__ms_content_zooming = [%value.rec "'none' | 'zoom'"]
-and property__ms_filter = [%value.rec "<string>"]
-and property__ms_flex_align = [%value.rec
-  "'start' | 'end' | 'center' | 'baseline' | 'stretch'"
-]
-and property__ms_flex_item_align = [%value.rec
-  "'auto' | 'start' | 'end' | 'center' | 'baseline' | 'stretch'"
-]
-and property__ms_flex_line_pack = [%value.rec
-  "'start' | 'end' | 'center' | 'justify' | 'distribute' | 'stretch'"
-]
-and property__ms_flex_negative = [%value.rec "<'flex-shrink'>"]
-and property__ms_flex_order = [%value.rec "<integer>"]
-and property__ms_flex_pack = [%value.rec
-  "'start' | 'end' | 'center' | 'justify' | 'distribute'"
-]
-and property__ms_flex_positive = [%value.rec "<'flex-grow'>"]
-and property__ms_flex_preferred_size = [%value.rec "<'flex-basis'>"]
-and property__ms_flow_from = [%value.rec "[ 'none' | <custom-ident> ]#"]
-and property__ms_flow_into = [%value.rec "[ 'none' | <custom-ident> ]#"]
-and property__ms_grid_column_align = [%value.rec
-  "'start' | 'end' | 'center' | 'stretch'"
-]
-and property__ms_grid_columns = [%value.rec "<track-list-v0>"]
-and property__ms_grid_row_align = [%value.rec
-  "'start' | 'end' | 'center' | 'stretch'"
-]
-and property__ms_grid_rows = [%value.rec "<track-list-v0>"]
-and property__ms_high_contrast_adjust = [%value.rec "'auto' | 'none'"]
-and property__ms_hyphenate_limit_chars = [%value.rec
-  "'auto' | [ <integer> ]{1,3}"
-]
-and property__ms_hyphenate_limit_last = [%value.rec
-  "'none' | 'always' | 'column' | 'page' | 'spread'"
-]
-and property__ms_hyphenate_limit_lines = [%value.rec "'no-limit' | <integer>"]
-and property__ms_hyphenate_limit_zone = [%value.rec
-  "<extended-percentage> | <extended-length>"
-]
-and property__ms_ime_align = [%value.rec "'auto' | 'after'"]
-and property__ms_interpolation_mode = [%value.rec
-  "'nearest-neighbor' | 'bicubic'"
-]
-and property__ms_overflow_style = [%value.rec
-  "'auto' | 'none' | 'scrollbar' | '-ms-autohiding-scrollbar'"
-]
-and property__ms_scroll_chaining = [%value.rec "'chained' | 'none'"]
-and property__ms_scroll_limit = [%value.rec
-  "<'-ms-scroll-limit-x-min'> <'-ms-scroll-limit-y-min'> <'-ms-scroll-limit-x-max'> <'-ms-scroll-limit-y-max'>"
-]
-and property__ms_scroll_limit_x_max = [%value.rec "'auto' | <extended-length>"]
-and property__ms_scroll_limit_x_min = [%value.rec "<extended-length>"]
-and property__ms_scroll_limit_y_max = [%value.rec "'auto' | <extended-length>"]
-and property__ms_scroll_limit_y_min = [%value.rec "<extended-length>"]
-and property__ms_scroll_rails = [%value.rec "'none' | 'railed'"]
-and property__ms_scroll_snap_points_x = [%value.rec
-  "snapInterval( <extended-length> | <extended-percentage> ',' <extended-length> | <extended-percentage> ) | snapList( [ <extended-length> | <extended-percentage> ]# )"
-]
-and property__ms_scroll_snap_points_y = [%value.rec
-  "snapInterval( <extended-length> | <extended-percentage> ',' <extended-length> | <extended-percentage> ) | snapList( [ <extended-length> | <extended-percentage> ]# )"
-]
-and property__ms_scroll_snap_type = [%value.rec
-  "'none' | 'proximity' | 'mandatory'"
-]
-and property__ms_scroll_snap_x = [%value.rec
-  "<'-ms-scroll-snap-type'> <'-ms-scroll-snap-points-x'>"
-]
-and property__ms_scroll_snap_y = [%value.rec
-  "<'-ms-scroll-snap-type'> <'-ms-scroll-snap-points-y'>"
-]
-and property__ms_scroll_translation = [%value.rec
-  "'none' | 'vertical-to-horizontal'"
-]
-and property__ms_scrollbar_3dlight_color = [%value.rec "<color>"]
-and property__ms_scrollbar_arrow_color = [%value.rec "<color>"]
-and property__ms_scrollbar_base_color = [%value.rec "<color>"]
-and property__ms_scrollbar_darkshadow_color = [%value.rec "<color>"]
-and property__ms_scrollbar_face_color = [%value.rec "<color>"]
-and property__ms_scrollbar_highlight_color = [%value.rec "<color>"]
-and property__ms_scrollbar_shadow_color = [%value.rec "<color>"]
-and property__ms_scrollbar_track_color = [%value.rec "<color>"]
-and property__ms_text_autospace = [%value.rec
-  "'none' | 'ideograph-alpha' | 'ideograph-numeric' | 'ideograph-parenthesis' | 'ideograph-space'"
-]
-and property__ms_touch_select = [%value.rec "'grippers' | 'none'"]
-and property__ms_user_select = [%value.rec "'none' | 'element' | 'text'"]
-and property__ms_wrap_flow = [%value.rec
-  "'auto' | 'both' | 'start' | 'end' | 'maximum' | 'clear'"
-]
-and property__ms_wrap_margin = [%value.rec "<extended-length>"]
-and property__ms_wrap_through = [%value.rec "'wrap' | 'none'"]
 and property__webkit_appearance = [%value.rec
   "'none' | 'button' | 'button-bevel' | 'caps-lock-indicator' | 'caret' | 'checkbox' | 'default-button' | 'listbox' | 'listitem' | 'media-fullscreen-button' | 'media-mute-button' | 'media-play-button' | 'media-seek-back-button' | 'media-seek-forward-button' | 'media-slider' | 'media-sliderthumb' | 'menulist' | 'menulist-button' | 'menulist-text' | 'menulist-textfield' | 'push-button' | 'radio' | 'scrollbarbutton-down' | 'scrollbarbutton-left' | 'scrollbarbutton-right' | 'scrollbarbutton-up' | 'scrollbargripper-horizontal' | 'scrollbargripper-vertical' | 'scrollbarthumb-horizontal' | 'scrollbarthumb-vertical' | 'scrollbartrack-horizontal' | 'scrollbartrack-vertical' | 'searchfield' | 'searchfield-cancel-button' | 'searchfield-decoration' | 'searchfield-results-button' | 'searchfield-results-decoration' | 'slider-horizontal' | 'slider-vertical' | 'sliderthumb-horizontal' | 'sliderthumb-vertical' | 'square-button' | 'textarea' | 'textfield'"
 ]
@@ -1090,7 +976,7 @@ and property_cursor = [%value.rec
 ]
 and property_direction = [%value.rec "'ltr' | 'rtl'"]
 and property_display = [%value.rec
-  "'block' | 'contents' | 'flex' | 'flow' | 'flow-root' | 'grid' | 'inline' | 'inline-block' | 'inline-flex' | 'inline-grid' | 'inline-list-item' | 'inline-table' | 'list-item' | 'none' | 'ruby' | 'ruby-base' | 'ruby-base-container' | 'ruby-text' | 'ruby-text-container' | 'run-in' | 'table' | 'table-caption' | 'table-cell' | 'table-column' | 'table-column-group' | 'table-footer-group' | 'table-header-group' | 'table-row' | 'table-row-group' | '-ms-flexbox' | '-ms-inline-flexbox' | '-ms-grid' | '-ms-inline-grid' | '-webkit-flex' | '-webkit-inline-flex' | '-webkit-box' | '-webkit-inline-box' | '-moz-inline-stack' | '-moz-box' | '-moz-inline-box'"
+  "'block' | 'contents' | 'flex' | 'flow' | 'flow-root' | 'grid' | 'inline' | 'inline-block' | 'inline-flex' | 'inline-grid' | 'inline-list-item' | 'inline-table' | 'list-item' | 'none' | 'ruby' | 'ruby-base' | 'ruby-base-container' | 'ruby-text' | 'ruby-text-container' | 'run-in' | 'table' | 'table-caption' | 'table-cell' | 'table-column' | 'table-column-group' | 'table-footer-group' | 'table-header-group' | 'table-row' | 'table-row-group' | '-webkit-flex' | '-webkit-inline-flex' | '-webkit-box' | '-webkit-inline-box' | '-moz-inline-stack' | '-moz-box' | '-moz-inline-box'"
 ]
 and property_dominant_baseline = [%value.rec
   "'auto' | 'use-script' | 'no-change' | 'reset-size' | 'ideographic' | 'alphabetic' | 'hanging' | 'mathematical' | 'central' | 'middle' | 'text-after-edge' | 'text-before-edge'"
@@ -1100,7 +986,7 @@ and property_fill = [%value.rec "<paint>"]
 and property_fill_opacity = [%value.rec "<alpha-value>"]
 and property_fill_rule = [%value.rec "'nonzero' | 'evenodd'"]
 and property_filter = [%value.rec
-  "'none' | <interpolation> | <filter-function-list> | <-ms-filter-function-list>"
+  "'none' | <interpolation> | <filter-function-list>"
 ]
 and property_flex = [%value.rec
   "'none' | [<'flex-grow'> [ <'flex-shrink'> ]? || <'flex-basis'>] | <interpolation>"
@@ -1971,6 +1857,9 @@ and svg_writing_mode = [%value.rec
   "'lr-tb' | 'rl-tb' | 'tb-rl' | 'lr' | 'rl' | 'tb'"
 ]
 and symbol = [%value.rec "<string> | <image> | <custom-ident>"]
+and symbols_type = [%value.rec
+  "'cyclic' | 'numeric' | 'alphabetic' | 'symbolic' | 'fixed'"
+]
 and target = [%value.rec
   "<target-counter()> | <target-counters()> | <target-text()>"
 ]
@@ -2043,6 +1932,28 @@ and viewport_length = [%value.rec
 ]
 and visual_box = [%value.rec "'content-box' | 'padding-box' | 'border-box'"]
 and wq_name = [%value.rec "[ <ns-prefix> ]? <ident-token>"]
+and attr_name = [%value.rec "[ <ident-token>? '|' ]? <ident-token>"]
+and attr_unit = [%value.rec
+  "'%' | 'em' | 'ex' | 'ch' | 'rem' | 'vw' | 'vh' | 'vmin' | 'vmax' | 'cm' | 'mm' | 'in' | 'px' | 'pt' | 'pc' | 'deg' | 'grad' | 'rad' | 'turn' | 'ms' | 's' | 'Hz' | 'kHz'"
+]
+and syntax_type_name = [%value.rec
+  "'angle' | 'color' | 'custom-ident' | 'image' | 'integer' | 'length' | 'length-percentage' | 'number' | 'percentage' | 'resolution' | 'string' | 'time' | 'url' | 'transform-function'"
+]
+and syntax_multiplier = [%value.rec "'#' | '+'"]
+and syntax_single_component = [%value.rec
+  "'<' <syntax-type-name> '>' | <ident>"
+]
+and syntax_string = [%value.rec "<string>"]
+and syntax_combinator = [%value.rec "'|'"]
+and syntax_component = [%value.rec
+  "<syntax-single-component> [ <syntax-multiplier> ]? | '<' 'transform-list' '>'"
+]
+and syntax = [%value.rec
+  "'*' | <syntax-component> [ <syntax-combinator> <syntax-component> ]* | <syntax-string>"
+]
+/*
+ We don't support type() yet, original spec is: "type( <syntax> ) | 'raw-string' | <attr-unit>" */
+and attr_type = [%value.rec "'raw-string' | <attr-unit>"]
 and x = [%value.rec "<number>"]
 and y = [%value.rec "<number>"];
 
@@ -2118,11 +2029,6 @@ let check_map =
         "-legacy-repeating-radial-gradient",
         check(_legacy_repeating_radial_gradient),
       ),
-      ("-ms-filter", check(_ms_filter)),
-      ("-ms-filter-function", check(_ms_filter_function)),
-      ("-ms-filter-function-legacy", check(_ms_filter_function_legacy)),
-      ("-ms-filter-function-list", check(_ms_filter_function_list)),
-      ("-ms-filter-function-progid", check(_ms_filter_function_progid)),
       ("-non-standard-color", check(_non_standard_color)),
       ("-non-standard-font", check(_non_standard_font)),
       (
@@ -2138,6 +2044,16 @@ let check_map =
       ("-webkit-mask-box-repeat", check(_webkit_mask_box_repeat)),
       ("-webkit-mask-clip-style", check(_webkit_mask_clip_style)),
       ("absolute-size", check(absolute_size)),
+      ("attr-name", check(attr_name)),
+      ("attr-type", check(attr_type)),
+      ("attr-unit", check(attr_unit)),
+      ("syntax", check(syntax)),
+      ("syntax-combinator", check(syntax_combinator)),
+      ("syntax-component", check(syntax_component)),
+      ("syntax-multiplier", check(syntax_multiplier)),
+      ("syntax-single-component", check(syntax_single_component)),
+      ("syntax-string", check(syntax_string)),
+      ("syntax-type-name", check(syntax_type_name)),
       ("age", check(age)),
       ("alpha-value", check(alpha_value)),
       ("angular-color-hint", check(angular_color_hint)),
@@ -2293,6 +2209,7 @@ let check_map =
       ("function_skew", check(function_skew)),
       ("function_skewX", check(function_skewX)),
       ("function_skewY", check(function_skewY)),
+      ("function_symbols", check(function_symbols)),
       ("function_target-counter", check(function_target_counter)),
       ("function_target-counters", check(function_target_counters)),
       ("function_target-text", check(function_target_text)),
@@ -2457,162 +2374,6 @@ let check_map =
         check(property__moz_window_dragging),
       ),
       ("property--moz-window-shadow", check(property__moz_window_shadow)),
-      ("property--ms-accelerator", check(property__ms_accelerator)),
-      (
-        "property--ms-block-progression",
-        check(property__ms_block_progression),
-      ),
-      (
-        "property--ms-content-zoom-chaining",
-        check(property__ms_content_zoom_chaining),
-      ),
-      (
-        "property--ms-content-zoom-limit",
-        check(property__ms_content_zoom_limit),
-      ),
-      (
-        "property--ms-content-zoom-limit-max",
-        check(property__ms_content_zoom_limit_max),
-      ),
-      (
-        "property--ms-content-zoom-limit-min",
-        check(property__ms_content_zoom_limit_min),
-      ),
-      (
-        "property--ms-content-zoom-snap",
-        check(property__ms_content_zoom_snap),
-      ),
-      (
-        "property--ms-content-zoom-snap-points",
-        check(property__ms_content_zoom_snap_points),
-      ),
-      (
-        "property--ms-content-zoom-snap-type",
-        check(property__ms_content_zoom_snap_type),
-      ),
-      ("property--ms-content-zooming", check(property__ms_content_zooming)),
-      ("property--ms-filter", check(property__ms_filter)),
-      ("property--ms-flex-align", check(property__ms_flex_align)),
-      ("property--ms-flex-item-align", check(property__ms_flex_item_align)),
-      ("property--ms-flex-line-pack", check(property__ms_flex_line_pack)),
-      ("property--ms-flex-negative", check(property__ms_flex_negative)),
-      ("property--ms-flex-order", check(property__ms_flex_order)),
-      ("property--ms-flex-pack", check(property__ms_flex_pack)),
-      ("property--ms-flex-positive", check(property__ms_flex_positive)),
-      (
-        "property--ms-flex-preferred-size",
-        check(property__ms_flex_preferred_size),
-      ),
-      ("property--ms-flow-from", check(property__ms_flow_from)),
-      ("property--ms-flow-into", check(property__ms_flow_into)),
-      (
-        "property--ms-grid-column-align",
-        check(property__ms_grid_column_align),
-      ),
-      ("property--ms-grid-columns", check(property__ms_grid_columns)),
-      ("property--ms-grid-row-align", check(property__ms_grid_row_align)),
-      ("property--ms-grid-rows", check(property__ms_grid_rows)),
-      (
-        "property--ms-high-contrast-adjust",
-        check(property__ms_high_contrast_adjust),
-      ),
-      (
-        "property--ms-hyphenate-limit-chars",
-        check(property__ms_hyphenate_limit_chars),
-      ),
-      (
-        "property--ms-hyphenate-limit-last",
-        check(property__ms_hyphenate_limit_last),
-      ),
-      (
-        "property--ms-hyphenate-limit-lines",
-        check(property__ms_hyphenate_limit_lines),
-      ),
-      (
-        "property--ms-hyphenate-limit-zone",
-        check(property__ms_hyphenate_limit_zone),
-      ),
-      ("property--ms-ime-align", check(property__ms_ime_align)),
-      (
-        "property--ms-interpolation-mode",
-        check(property__ms_interpolation_mode),
-      ),
-      ("property--ms-overflow-style", check(property__ms_overflow_style)),
-      ("property--ms-scroll-chaining", check(property__ms_scroll_chaining)),
-      ("property--ms-scroll-limit", check(property__ms_scroll_limit)),
-      (
-        "property--ms-scroll-limit-x-max",
-        check(property__ms_scroll_limit_x_max),
-      ),
-      (
-        "property--ms-scroll-limit-x-min",
-        check(property__ms_scroll_limit_x_min),
-      ),
-      (
-        "property--ms-scroll-limit-y-max",
-        check(property__ms_scroll_limit_y_max),
-      ),
-      (
-        "property--ms-scroll-limit-y-min",
-        check(property__ms_scroll_limit_y_min),
-      ),
-      ("property--ms-scroll-rails", check(property__ms_scroll_rails)),
-      (
-        "property--ms-scroll-snap-points-x",
-        check(property__ms_scroll_snap_points_x),
-      ),
-      (
-        "property--ms-scroll-snap-points-y",
-        check(property__ms_scroll_snap_points_y),
-      ),
-      (
-        "property--ms-scroll-snap-type",
-        check(property__ms_scroll_snap_type),
-      ),
-      ("property--ms-scroll-snap-x", check(property__ms_scroll_snap_x)),
-      ("property--ms-scroll-snap-y", check(property__ms_scroll_snap_y)),
-      (
-        "property--ms-scroll-translation",
-        check(property__ms_scroll_translation),
-      ),
-      (
-        "property--ms-scrollbar-3dlight-color",
-        check(property__ms_scrollbar_3dlight_color),
-      ),
-      (
-        "property--ms-scrollbar-arrow-color",
-        check(property__ms_scrollbar_arrow_color),
-      ),
-      (
-        "property--ms-scrollbar-base-color",
-        check(property__ms_scrollbar_base_color),
-      ),
-      (
-        "property--ms-scrollbar-darkshadow-color",
-        check(property__ms_scrollbar_darkshadow_color),
-      ),
-      (
-        "property--ms-scrollbar-face-color",
-        check(property__ms_scrollbar_face_color),
-      ),
-      (
-        "property--ms-scrollbar-highlight-color",
-        check(property__ms_scrollbar_highlight_color),
-      ),
-      (
-        "property--ms-scrollbar-shadow-color",
-        check(property__ms_scrollbar_shadow_color),
-      ),
-      (
-        "property--ms-scrollbar-track-color",
-        check(property__ms_scrollbar_track_color),
-      ),
-      ("property--ms-text-autospace", check(property__ms_text_autospace)),
-      ("property--ms-touch-select", check(property__ms_touch_select)),
-      ("property--ms-user-select", check(property__ms_user_select)),
-      ("property--ms-wrap-flow", check(property__ms_wrap_flow)),
-      ("property--ms-wrap-margin", check(property__ms_wrap_margin)),
-      ("property--ms-wrap-through", check(property__ms_wrap_through)),
       ("property--webkit-appearance", check(property__webkit_appearance)),
       (
         "property--webkit-background-clip",
@@ -3511,6 +3272,7 @@ let check_map =
       ("svg-length", check(svg_length)),
       ("svg-writing-mode", check(svg_writing_mode)),
       ("symbol", check(symbol)),
+      ("symbols-type", check(symbols_type)),
       ("target", check(target)),
       ("timing-function", check(timing_function)),
       ("top", check(top)),

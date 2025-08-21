@@ -66,12 +66,19 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     kebab_case_to_snake_case(str);
   };
 
+  let keyword_to_css = str => {
+    switch (str) {
+    | "%" => "percent"
+    | _ => kebab_case_to_snake_case(str)
+    };
+  };
+
   // TODO: multiplier name
   let rec variant_name = value => {
     let value_name =
       switch (value) {
       | Terminal(Delim(name), _) => value_of_delimiter(name)
-      | Terminal(Keyword(name), _) => kebab_case_to_snake_case(name)
+      | Terminal(Keyword(name), _) => keyword_to_css(name)
       | Terminal(Data_type(name), _) => value_name_of_css(name)
       | Terminal(Property_type(name), _) =>
         property_value_name(name) |> value_name_of_css
@@ -353,10 +360,10 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       type_("flex_value", [%type: [ | `Fr(float)]]),
       type_("media_type", [%type: string]),
       type_("container_name", [%type: string]),
+      type_("ident_token", [%type: string]),
+      type_("string_token", [%type: string]),
       // From Parser_helper, those are `invalid` represented here as unit
-      type_("ident_token", [%type: unit]),
       type_("function_token", [%type: unit]),
-      type_("string_token", [%type: unit]),
       type_("hash_token", [%type: unit]),
       type_("any_value", [%type: unit]),
       type_("declaration_value", [%type: unit]),
@@ -541,18 +548,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         str;
       };
     kebab_case_to_snake_case(str);
-  };
-
-  let value_of_keyword = str => {
-    switch (str) {
-    | "," => "comma"
-    | "+" => "cross"
-    | "-" => "dash"
-    | "*" => "asterisk"
-    | "/" => "bar"
-    | "@" => "at"
-    | s => kebab_case_to_snake_case(s)
-    };
   };
 
   let apply_modifier = {

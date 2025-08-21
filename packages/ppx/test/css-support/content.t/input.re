@@ -5,6 +5,8 @@
 
 [%css {|content: "";|}];
 /* [%css {|content: counter(ol);|}]; */
+[%css {|content: counter(count, decimal);|}];
+[%css {|content: counter(count, decimal) ") ";|}];
 [%css {|content: unset;|}];
 
 /* Keywords that cannot be combined with other values */
@@ -29,7 +31,10 @@
 /* [%css {|content: counters(section_counter, ".", decimal-leading-zero);|}]; */
 
 /* attr() value linked to the HTML attribute value */
-/* [%css {|content: attr(href);|}]; */
+[%css {|content: attr(href);|}];
+[%css {|content: attr(data-width px);|}];
+/* inherit is a declaration value, and current spec parser does not support it */
+/* [%css {|content: attr(data-width px, inherit);|}]; */
 
 /* <quote> values */
 [%css {|content: open-quote;|}];
@@ -61,3 +66,22 @@
 [%css {|content: '';|}];
 [%css {|content: "'";|}];
 [%css {|content: '"';|}];
+
+/* Test attr() with attr-type */
+[%css {|content: attr(href);|}];
+[%css {|content: attr(data-value);|}];
+/* [%css {|content: attr(data-value type(string));|}]; */
+/* [%css {|content: attr(data-value type(color));|}]; */
+/* [%css {|content: attr(data-value type(url));|}]; */
+/* [%css {|content: attr(data-value type(integer));|}]; */
+/* [%css {|content: attr(data-value type(number));|}]; */
+/* [%css {|content: attr(data-value type(length));|}]; */
+/* [%css {|content: attr(data-value type(angle));|}]; */
+/* [%css {|content: attr(data-value type(time));|}]; */
+/* [%css {|content: attr(data-value type(percentage));|}]; */
+[%css {|content: attr(data-value raw-string);|}];
+[%css {|content: attr(data-value em);|}];
+[%css {|content: attr(data-value px);|}];
+/* [%css {|content: attr(data-value type(string), "fallback");|}]; */
+/* [%css {|content: attr(data-value type(color), red);|}]; */
+/* [%css {|content: attr(href type(url), "#");|}]; */

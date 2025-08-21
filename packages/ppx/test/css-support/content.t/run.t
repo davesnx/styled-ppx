@@ -22,6 +22,17 @@ If this test fail means that the module is not in sync with the ppx
   
   CSS.contentsRule([|`text({js|''|js})|], None);
   
+  CSS.contentsRule(
+    [|`counter(({js|count|js}, Some(`Custom({js|decimal|js}))))|],
+    None,
+  );
+  CSS.contentsRule(
+    [|
+      `counter(({js|count|js}, Some(`Custom({js|decimal|js})))),
+      `text({js|) |js}),
+    |],
+    None,
+  );
   CSS.unsafe({js|content|js}, {js|unset|js});
   
   CSS.contentRule(`normal);
@@ -48,6 +59,9 @@ If this test fail means that the module is not in sync with the ppx
   );
   
   CSS.contentsRule([|`text({js|unparsed text|js})|], None);
+  
+  CSS.contentsRule([|`attr({js|href|js})|], None);
+  CSS.contentsRule([|`attrWithType(({js|data-width|js}, {js|px|js}))|], None);
   
   CSS.contentsRule([|`openQuote|], None);
   CSS.contentsRule([|`closeQuote|], None);
@@ -84,3 +98,13 @@ If this test fail means that the module is not in sync with the ppx
   CSS.contentsRule([|`text({js|''|js})|], None);
   CSS.contentsRule([|`text({js|"'"|js})|], None);
   CSS.contentsRule([|`text({js|'"'|js})|], None);
+  
+  CSS.contentsRule([|`attr({js|href|js})|], None);
+  CSS.contentsRule([|`attr({js|data-value|js})|], None);
+  
+  CSS.contentsRule(
+    [|`attrWithType(({js|data-value|js}, {js|raw-string|js}))|],
+    None,
+  );
+  CSS.contentsRule([|`attrWithType(({js|data-value|js}, {js|em|js}))|], None);
+  CSS.contentsRule([|`attrWithType(({js|data-value|js}, {js|px|js}))|], None);
