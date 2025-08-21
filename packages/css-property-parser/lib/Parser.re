@@ -33,17 +33,6 @@ and _legacy_repeating_linear_gradient = [%value.rec
 and _legacy_repeating_radial_gradient = [%value.rec
   "-moz-repeating-radial-gradient( <-legacy-radial-gradient-arguments> ) | -webkit-repeating-radial-gradient( <-legacy-radial-gradient-arguments> ) | -o-repeating-radial-gradient( <-legacy-radial-gradient-arguments> )"
 ]
-and _ms_filter = [%value.rec "<string>"]
-and _ms_filter_function = [%value.rec
-  "<-ms-filter-function-progid> | <-ms-filter-function-legacy>"
-]
-and _ms_filter_function_legacy = [%value.rec
-  "<ident-token> | <function-token> [ <any-value> ]? ')'"
-]
-and _ms_filter_function_list = [%value.rec "[ <-ms-filter-function> ]+"]
-and _ms_filter_function_progid = [%value.rec
-  "'progid:' [ <ident-token> '.' ]* [ <ident-token> | <function-token> [ <any-value> ]? ')' ]"
-]
 and _non_standard_color = [%value.rec
   "'-moz-ButtonDefault' | '-moz-ButtonHoverFace' | '-moz-ButtonHoverText' | '-moz-CellHighlight' | '-moz-CellHighlightText' | '-moz-Combobox' | '-moz-ComboboxText' | '-moz-Dialog' | '-moz-DialogText' | '-moz-dragtargetzone' | '-moz-EvenTreeRow' | '-moz-Field' | '-moz-FieldText' | '-moz-html-CellHighlight' | '-moz-html-CellHighlightText' | '-moz-mac-accentdarkestshadow' | '-moz-mac-accentdarkshadow' | '-moz-mac-accentface' | '-moz-mac-accentlightesthighlight' | '-moz-mac-accentlightshadow' | '-moz-mac-accentregularhighlight' | '-moz-mac-accentregularshadow' | '-moz-mac-chrome-active' | '-moz-mac-chrome-inactive' | '-moz-mac-focusring' | '-moz-mac-menuselect' | '-moz-mac-menushadow' | '-moz-mac-menutextselect' | '-moz-MenuHover' | '-moz-MenuHoverText' | '-moz-MenuBarText' | '-moz-MenuBarHoverText' | '-moz-nativehyperlinktext' | '-moz-OddTreeRow' | '-moz-win-communicationstext' | '-moz-win-mediatext' | '-moz-activehyperlinktext' | '-moz-default-background-color' | '-moz-default-color' | '-moz-hyperlinktext' | '-moz-visitedhyperlinktext' | '-webkit-activelink' | '-webkit-focus-ring-color' | '-webkit-link' | '-webkit-text'"
 ]
@@ -658,114 +647,6 @@ and property__moz_window_dragging = [%value.rec "'drag' | 'no-drag'"]
 and property__moz_window_shadow = [%value.rec
   "'default' | 'menu' | 'tooltip' | 'sheet' | 'none'"
 ]
-and property__ms_accelerator = [%value.rec "'false' | 'true'"]
-and property__ms_block_progression = [%value.rec "'tb' | 'rl' | 'bt' | 'lr'"]
-and property__ms_content_zoom_chaining = [%value.rec "'none' | 'chained'"]
-and property__ms_content_zoom_limit = [%value.rec
-  "<'-ms-content-zoom-limit-min'> <'-ms-content-zoom-limit-max'>"
-]
-and property__ms_content_zoom_limit_max = [%value.rec "<extended-percentage>"]
-and property__ms_content_zoom_limit_min = [%value.rec "<extended-percentage>"]
-and property__ms_content_zoom_snap = [%value.rec
-  "<'-ms-content-zoom-snap-type'> || <'-ms-content-zoom-snap-points'>"
-]
-and property__ms_content_zoom_snap_points = [%value.rec
-  "snapInterval( <extended-percentage> ',' <extended-percentage> ) | snapList( [ <extended-percentage> ]# )"
-]
-and property__ms_content_zoom_snap_type = [%value.rec
-  "'none' | 'proximity' | 'mandatory'"
-]
-and property__ms_content_zooming = [%value.rec "'none' | 'zoom'"]
-and property__ms_filter = [%value.rec "<string>"]
-and property__ms_flex_align = [%value.rec
-  "'start' | 'end' | 'center' | 'baseline' | 'stretch'"
-]
-and property__ms_flex_item_align = [%value.rec
-  "'auto' | 'start' | 'end' | 'center' | 'baseline' | 'stretch'"
-]
-and property__ms_flex_line_pack = [%value.rec
-  "'start' | 'end' | 'center' | 'justify' | 'distribute' | 'stretch'"
-]
-and property__ms_flex_negative = [%value.rec "<'flex-shrink'>"]
-and property__ms_flex_order = [%value.rec "<integer>"]
-and property__ms_flex_pack = [%value.rec
-  "'start' | 'end' | 'center' | 'justify' | 'distribute'"
-]
-and property__ms_flex_positive = [%value.rec "<'flex-grow'>"]
-and property__ms_flex_preferred_size = [%value.rec "<'flex-basis'>"]
-and property__ms_flow_from = [%value.rec "[ 'none' | <custom-ident> ]#"]
-and property__ms_flow_into = [%value.rec "[ 'none' | <custom-ident> ]#"]
-and property__ms_grid_column_align = [%value.rec
-  "'start' | 'end' | 'center' | 'stretch'"
-]
-and property__ms_grid_columns = [%value.rec "<track-list-v0>"]
-and property__ms_grid_row_align = [%value.rec
-  "'start' | 'end' | 'center' | 'stretch'"
-]
-and property__ms_grid_rows = [%value.rec "<track-list-v0>"]
-and property__ms_high_contrast_adjust = [%value.rec "'auto' | 'none'"]
-and property__ms_hyphenate_limit_chars = [%value.rec
-  "'auto' | [ <integer> ]{1,3}"
-]
-and property__ms_hyphenate_limit_last = [%value.rec
-  "'none' | 'always' | 'column' | 'page' | 'spread'"
-]
-and property__ms_hyphenate_limit_lines = [%value.rec "'no-limit' | <integer>"]
-and property__ms_hyphenate_limit_zone = [%value.rec
-  "<extended-percentage> | <extended-length>"
-]
-and property__ms_ime_align = [%value.rec "'auto' | 'after'"]
-and property__ms_interpolation_mode = [%value.rec
-  "'nearest-neighbor' | 'bicubic'"
-]
-and property__ms_overflow_style = [%value.rec
-  "'auto' | 'none' | 'scrollbar' | '-ms-autohiding-scrollbar'"
-]
-and property__ms_scroll_chaining = [%value.rec "'chained' | 'none'"]
-and property__ms_scroll_limit = [%value.rec
-  "<'-ms-scroll-limit-x-min'> <'-ms-scroll-limit-y-min'> <'-ms-scroll-limit-x-max'> <'-ms-scroll-limit-y-max'>"
-]
-and property__ms_scroll_limit_x_max = [%value.rec "'auto' | <extended-length>"]
-and property__ms_scroll_limit_x_min = [%value.rec "<extended-length>"]
-and property__ms_scroll_limit_y_max = [%value.rec "'auto' | <extended-length>"]
-and property__ms_scroll_limit_y_min = [%value.rec "<extended-length>"]
-and property__ms_scroll_rails = [%value.rec "'none' | 'railed'"]
-and property__ms_scroll_snap_points_x = [%value.rec
-  "snapInterval( <extended-length> | <extended-percentage> ',' <extended-length> | <extended-percentage> ) | snapList( [ <extended-length> | <extended-percentage> ]# )"
-]
-and property__ms_scroll_snap_points_y = [%value.rec
-  "snapInterval( <extended-length> | <extended-percentage> ',' <extended-length> | <extended-percentage> ) | snapList( [ <extended-length> | <extended-percentage> ]# )"
-]
-and property__ms_scroll_snap_type = [%value.rec
-  "'none' | 'proximity' | 'mandatory'"
-]
-and property__ms_scroll_snap_x = [%value.rec
-  "<'-ms-scroll-snap-type'> <'-ms-scroll-snap-points-x'>"
-]
-and property__ms_scroll_snap_y = [%value.rec
-  "<'-ms-scroll-snap-type'> <'-ms-scroll-snap-points-y'>"
-]
-and property__ms_scroll_translation = [%value.rec
-  "'none' | 'vertical-to-horizontal'"
-]
-and property__ms_scrollbar_3dlight_color = [%value.rec "<color>"]
-and property__ms_scrollbar_arrow_color = [%value.rec "<color>"]
-and property__ms_scrollbar_base_color = [%value.rec "<color>"]
-and property__ms_scrollbar_darkshadow_color = [%value.rec "<color>"]
-and property__ms_scrollbar_face_color = [%value.rec "<color>"]
-and property__ms_scrollbar_highlight_color = [%value.rec "<color>"]
-and property__ms_scrollbar_shadow_color = [%value.rec "<color>"]
-and property__ms_scrollbar_track_color = [%value.rec "<color>"]
-and property__ms_text_autospace = [%value.rec
-  "'none' | 'ideograph-alpha' | 'ideograph-numeric' | 'ideograph-parenthesis' | 'ideograph-space'"
-]
-and property__ms_touch_select = [%value.rec "'grippers' | 'none'"]
-and property__ms_user_select = [%value.rec "'none' | 'element' | 'text'"]
-and property__ms_wrap_flow = [%value.rec
-  "'auto' | 'both' | 'start' | 'end' | 'maximum' | 'clear'"
-]
-and property__ms_wrap_margin = [%value.rec "<extended-length>"]
-and property__ms_wrap_through = [%value.rec "'wrap' | 'none'"]
 and property__webkit_appearance = [%value.rec
   "'none' | 'button' | 'button-bevel' | 'caps-lock-indicator' | 'caret' | 'checkbox' | 'default-button' | 'listbox' | 'listitem' | 'media-fullscreen-button' | 'media-mute-button' | 'media-play-button' | 'media-seek-back-button' | 'media-seek-forward-button' | 'media-slider' | 'media-sliderthumb' | 'menulist' | 'menulist-button' | 'menulist-text' | 'menulist-textfield' | 'push-button' | 'radio' | 'scrollbarbutton-down' | 'scrollbarbutton-left' | 'scrollbarbutton-right' | 'scrollbarbutton-up' | 'scrollbargripper-horizontal' | 'scrollbargripper-vertical' | 'scrollbarthumb-horizontal' | 'scrollbarthumb-vertical' | 'scrollbartrack-horizontal' | 'scrollbartrack-vertical' | 'searchfield' | 'searchfield-cancel-button' | 'searchfield-decoration' | 'searchfield-results-button' | 'searchfield-results-decoration' | 'slider-horizontal' | 'slider-vertical' | 'sliderthumb-horizontal' | 'sliderthumb-vertical' | 'square-button' | 'textarea' | 'textfield'"
 ]
@@ -1095,7 +976,7 @@ and property_cursor = [%value.rec
 ]
 and property_direction = [%value.rec "'ltr' | 'rtl'"]
 and property_display = [%value.rec
-  "'block' | 'contents' | 'flex' | 'flow' | 'flow-root' | 'grid' | 'inline' | 'inline-block' | 'inline-flex' | 'inline-grid' | 'inline-list-item' | 'inline-table' | 'list-item' | 'none' | 'ruby' | 'ruby-base' | 'ruby-base-container' | 'ruby-text' | 'ruby-text-container' | 'run-in' | 'table' | 'table-caption' | 'table-cell' | 'table-column' | 'table-column-group' | 'table-footer-group' | 'table-header-group' | 'table-row' | 'table-row-group' | '-ms-flexbox' | '-ms-inline-flexbox' | '-ms-grid' | '-ms-inline-grid' | '-webkit-flex' | '-webkit-inline-flex' | '-webkit-box' | '-webkit-inline-box' | '-moz-inline-stack' | '-moz-box' | '-moz-inline-box'"
+  "'block' | 'contents' | 'flex' | 'flow' | 'flow-root' | 'grid' | 'inline' | 'inline-block' | 'inline-flex' | 'inline-grid' | 'inline-list-item' | 'inline-table' | 'list-item' | 'none' | 'ruby' | 'ruby-base' | 'ruby-base-container' | 'ruby-text' | 'ruby-text-container' | 'run-in' | 'table' | 'table-caption' | 'table-cell' | 'table-column' | 'table-column-group' | 'table-footer-group' | 'table-header-group' | 'table-row' | 'table-row-group' | '-webkit-flex' | '-webkit-inline-flex' | '-webkit-box' | '-webkit-inline-box' | '-moz-inline-stack' | '-moz-box' | '-moz-inline-box'"
 ]
 and property_dominant_baseline = [%value.rec
   "'auto' | 'use-script' | 'no-change' | 'reset-size' | 'ideographic' | 'alphabetic' | 'hanging' | 'mathematical' | 'central' | 'middle' | 'text-after-edge' | 'text-before-edge'"
@@ -1105,7 +986,7 @@ and property_fill = [%value.rec "<paint>"]
 and property_fill_opacity = [%value.rec "<alpha-value>"]
 and property_fill_rule = [%value.rec "'nonzero' | 'evenodd'"]
 and property_filter = [%value.rec
-  "'none' | <interpolation> | <filter-function-list> | <-ms-filter-function-list>"
+  "'none' | <interpolation> | <filter-function-list>"
 ]
 and property_flex = [%value.rec
   "'none' | [<'flex-grow'> [ <'flex-shrink'> ]? || <'flex-basis'>] | <interpolation>"
@@ -2148,11 +2029,6 @@ let check_map =
         "-legacy-repeating-radial-gradient",
         check(_legacy_repeating_radial_gradient),
       ),
-      ("-ms-filter", check(_ms_filter)),
-      ("-ms-filter-function", check(_ms_filter_function)),
-      ("-ms-filter-function-legacy", check(_ms_filter_function_legacy)),
-      ("-ms-filter-function-list", check(_ms_filter_function_list)),
-      ("-ms-filter-function-progid", check(_ms_filter_function_progid)),
       ("-non-standard-color", check(_non_standard_color)),
       ("-non-standard-font", check(_non_standard_font)),
       (
@@ -2498,162 +2374,6 @@ let check_map =
         check(property__moz_window_dragging),
       ),
       ("property--moz-window-shadow", check(property__moz_window_shadow)),
-      ("property--ms-accelerator", check(property__ms_accelerator)),
-      (
-        "property--ms-block-progression",
-        check(property__ms_block_progression),
-      ),
-      (
-        "property--ms-content-zoom-chaining",
-        check(property__ms_content_zoom_chaining),
-      ),
-      (
-        "property--ms-content-zoom-limit",
-        check(property__ms_content_zoom_limit),
-      ),
-      (
-        "property--ms-content-zoom-limit-max",
-        check(property__ms_content_zoom_limit_max),
-      ),
-      (
-        "property--ms-content-zoom-limit-min",
-        check(property__ms_content_zoom_limit_min),
-      ),
-      (
-        "property--ms-content-zoom-snap",
-        check(property__ms_content_zoom_snap),
-      ),
-      (
-        "property--ms-content-zoom-snap-points",
-        check(property__ms_content_zoom_snap_points),
-      ),
-      (
-        "property--ms-content-zoom-snap-type",
-        check(property__ms_content_zoom_snap_type),
-      ),
-      ("property--ms-content-zooming", check(property__ms_content_zooming)),
-      ("property--ms-filter", check(property__ms_filter)),
-      ("property--ms-flex-align", check(property__ms_flex_align)),
-      ("property--ms-flex-item-align", check(property__ms_flex_item_align)),
-      ("property--ms-flex-line-pack", check(property__ms_flex_line_pack)),
-      ("property--ms-flex-negative", check(property__ms_flex_negative)),
-      ("property--ms-flex-order", check(property__ms_flex_order)),
-      ("property--ms-flex-pack", check(property__ms_flex_pack)),
-      ("property--ms-flex-positive", check(property__ms_flex_positive)),
-      (
-        "property--ms-flex-preferred-size",
-        check(property__ms_flex_preferred_size),
-      ),
-      ("property--ms-flow-from", check(property__ms_flow_from)),
-      ("property--ms-flow-into", check(property__ms_flow_into)),
-      (
-        "property--ms-grid-column-align",
-        check(property__ms_grid_column_align),
-      ),
-      ("property--ms-grid-columns", check(property__ms_grid_columns)),
-      ("property--ms-grid-row-align", check(property__ms_grid_row_align)),
-      ("property--ms-grid-rows", check(property__ms_grid_rows)),
-      (
-        "property--ms-high-contrast-adjust",
-        check(property__ms_high_contrast_adjust),
-      ),
-      (
-        "property--ms-hyphenate-limit-chars",
-        check(property__ms_hyphenate_limit_chars),
-      ),
-      (
-        "property--ms-hyphenate-limit-last",
-        check(property__ms_hyphenate_limit_last),
-      ),
-      (
-        "property--ms-hyphenate-limit-lines",
-        check(property__ms_hyphenate_limit_lines),
-      ),
-      (
-        "property--ms-hyphenate-limit-zone",
-        check(property__ms_hyphenate_limit_zone),
-      ),
-      ("property--ms-ime-align", check(property__ms_ime_align)),
-      (
-        "property--ms-interpolation-mode",
-        check(property__ms_interpolation_mode),
-      ),
-      ("property--ms-overflow-style", check(property__ms_overflow_style)),
-      ("property--ms-scroll-chaining", check(property__ms_scroll_chaining)),
-      ("property--ms-scroll-limit", check(property__ms_scroll_limit)),
-      (
-        "property--ms-scroll-limit-x-max",
-        check(property__ms_scroll_limit_x_max),
-      ),
-      (
-        "property--ms-scroll-limit-x-min",
-        check(property__ms_scroll_limit_x_min),
-      ),
-      (
-        "property--ms-scroll-limit-y-max",
-        check(property__ms_scroll_limit_y_max),
-      ),
-      (
-        "property--ms-scroll-limit-y-min",
-        check(property__ms_scroll_limit_y_min),
-      ),
-      ("property--ms-scroll-rails", check(property__ms_scroll_rails)),
-      (
-        "property--ms-scroll-snap-points-x",
-        check(property__ms_scroll_snap_points_x),
-      ),
-      (
-        "property--ms-scroll-snap-points-y",
-        check(property__ms_scroll_snap_points_y),
-      ),
-      (
-        "property--ms-scroll-snap-type",
-        check(property__ms_scroll_snap_type),
-      ),
-      ("property--ms-scroll-snap-x", check(property__ms_scroll_snap_x)),
-      ("property--ms-scroll-snap-y", check(property__ms_scroll_snap_y)),
-      (
-        "property--ms-scroll-translation",
-        check(property__ms_scroll_translation),
-      ),
-      (
-        "property--ms-scrollbar-3dlight-color",
-        check(property__ms_scrollbar_3dlight_color),
-      ),
-      (
-        "property--ms-scrollbar-arrow-color",
-        check(property__ms_scrollbar_arrow_color),
-      ),
-      (
-        "property--ms-scrollbar-base-color",
-        check(property__ms_scrollbar_base_color),
-      ),
-      (
-        "property--ms-scrollbar-darkshadow-color",
-        check(property__ms_scrollbar_darkshadow_color),
-      ),
-      (
-        "property--ms-scrollbar-face-color",
-        check(property__ms_scrollbar_face_color),
-      ),
-      (
-        "property--ms-scrollbar-highlight-color",
-        check(property__ms_scrollbar_highlight_color),
-      ),
-      (
-        "property--ms-scrollbar-shadow-color",
-        check(property__ms_scrollbar_shadow_color),
-      ),
-      (
-        "property--ms-scrollbar-track-color",
-        check(property__ms_scrollbar_track_color),
-      ),
-      ("property--ms-text-autospace", check(property__ms_text_autospace)),
-      ("property--ms-touch-select", check(property__ms_touch_select)),
-      ("property--ms-user-select", check(property__ms_user_select)),
-      ("property--ms-wrap-flow", check(property__ms_wrap_flow)),
-      ("property--ms-wrap-margin", check(property__ms_wrap_margin)),
-      ("property--ms-wrap-through", check(property__ms_wrap_through)),
       ("property--webkit-appearance", check(property__webkit_appearance)),
       (
         "property--webkit-background-clip",

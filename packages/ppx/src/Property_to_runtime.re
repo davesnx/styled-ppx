@@ -5200,13 +5200,13 @@ let filter =
   monomorphic(
     Property_parser.property_filter,
     (~loc) => [%expr CSS.filter],
-    (~loc, value) =>
+    (~loc, value) => {
       switch (value) {
       | `None => [%expr [|`none|]]
       | `Interpolation(v) => render_variable(~loc, v)
       | `Filter_function_list(ffl) => render_filter_function_list(~loc, ffl)
-      | `_ms_filter_function_list(_) => raise(Unsupported_feature)
-      },
+      }
+    },
   );
 
 let backdrop_filter =
