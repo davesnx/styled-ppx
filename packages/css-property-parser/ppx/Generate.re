@@ -550,19 +550,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     kebab_case_to_snake_case(str);
   };
 
-  let value_of_keyword = str => {
-    switch (str) {
-    | "," => "comma"
-    | "+" => "cross"
-    | "-" => "dash"
-    | "*" => "asterisk"
-    | "%" => "percent"
-    | "/" => "bar"
-    | "@" => "at"
-    | s => kebab_case_to_snake_case(s)
-    };
-  };
-
   let apply_modifier = {
     let option_int_to_expr =
       fun
