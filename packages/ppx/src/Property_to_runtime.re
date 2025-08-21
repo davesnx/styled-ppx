@@ -1,5 +1,5 @@
-open Ppxlib;
-
+module Location = Ppxlib.Location;
+module Parsetree = Ppxlib.Parsetree;
 module Builder = Ppxlib.Ast_builder.Default;
 
 module Standard = Css_property_parser.Standard;
@@ -79,7 +79,8 @@ let render_option = (~loc, f) =>
   | Some(v) => [%expr Some([%e f(~loc, v)])]
   | None => [%expr None];
 
-let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
+let list_to_longident = vars =>
+  vars |> String.concat(".") |> Ppxlib.Longident.parse;
 
 let render_variable = (~loc, name) =>
   list_to_longident(name) |> txt(~loc) |> Builder.pexp_ident(~loc);
@@ -1303,7 +1304,7 @@ let render_box_shadow = (~loc, shadow) => {
     );
 
   let args =
-    [
+    Ppxlib.Asttypes.[
       (Labelled("x"), Some(x)),
       (Labelled("y"), Some(y)),
       (Labelled("blur"), blur),
@@ -2909,7 +2910,7 @@ let render_text_shadow = (~loc, shadow) => {
     };
 
   let args =
-    [
+    Ppxlib.Asttypes.[
       (Labelled("x"), Some(render_length_interp(~loc, x))),
       (Labelled("y"), Some(render_length_interp(~loc, y))),
       (Labelled("blur"), Option.map(render_length_interp(~loc), blur)),
