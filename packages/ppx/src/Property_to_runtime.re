@@ -5595,23 +5595,9 @@ let render_symbols =
 
 let render_counter_style = (~loc, counter_style: Types.counter_style) => {
   switch (counter_style) {
-  | `Counter_style_name(label) =>
-    /* Map counter style names to their corresponding variants */
-    switch (label) {
-    | "disc" => [%expr `disc]
-    | "circle" => [%expr `circle]
-    | "square" => [%expr `square]
-    | "decimal" => [%expr `decimal]
-    | "lower-alpha" => [%expr `lowerAlpha]
-    | "upper-alpha" => [%expr `upperAlpha]
-    | "lower-greek" => [%expr `lowerGreek]
-    | "lower-latin" => [%expr `lowerLatin]
-    | "upper-latin" => [%expr `upperLatin]
-    | "lower-roman" => [%expr `lowerRoman]
-    | "upper-roman" => [%expr `upperRoman]
-    | "none" => [%expr `none]
-    | _ => [%expr [%e render_string(~loc, label)]] /* fallback for unknown styles */
-    }
+  | `Counter_style_name(label) => [%expr
+     `Custom([%e render_string(~loc, label)])
+    ]
   | `Function_symbols(symbols_type, list_image_or_string) => [%expr
      [%e render_symbols(~loc, symbols_type, list_image_or_string)]
     ]

@@ -22,9 +22,15 @@ If this test fail means that the module is not in sync with the ppx
   
   CSS.contentsRule([|`text({js|''|js})|], None);
   
-  CSS.contentsRule([|`counter(({js|count|js}, Some(`decimal)))|], None);
   CSS.contentsRule(
-    [|`counter(({js|count|js}, Some(`decimal))), `text({js|) |js})|],
+    [|`counter(({js|count|js}, Some(`Custom({js|decimal|js}))))|],
+    None,
+  );
+  CSS.contentsRule(
+    [|
+      `counter(({js|count|js}, Some(`Custom({js|decimal|js})))),
+      `text({js|) |js}),
+    |],
     None,
   );
   CSS.unsafe({js|content|js}, {js|unset|js});

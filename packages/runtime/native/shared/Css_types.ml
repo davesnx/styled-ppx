@@ -718,17 +718,7 @@ end
 
 module ListStyleType = struct
   type t =
-    [ `disc
-    | `circle
-    | `square
-    | `decimal
-    | `lowerAlpha
-    | `upperAlpha
-    | `lowerGreek
-    | `lowerLatin
-    | `upperLatin
-    | `lowerRoman
-    | `upperRoman
+    [ `Custom of string
     | None.t
     | Var.t
     | Cascading.t
@@ -736,17 +726,7 @@ module ListStyleType = struct
 
   let toString x =
     match x with
-    | `disc -> {js|disc|js}
-    | `circle -> {js|circle|js}
-    | `square -> {js|square|js}
-    | `decimal -> {js|decimal|js}
-    | `lowerAlpha -> {js|lower-alpha|js}
-    | `upperAlpha -> {js|upper-alpha|js}
-    | `lowerGreek -> {js|lower-greek|js}
-    | `lowerLatin -> {js|lower-latin|js}
-    | `upperLatin -> {js|upper-latin|js}
-    | `lowerRoman -> {js|lower-roman|js}
-    | `upperRoman -> {js|upper-roman|js}
+    | `Custom o -> o
     | #None.t -> None.toString
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
