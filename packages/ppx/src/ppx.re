@@ -435,6 +435,28 @@ let traverser = {
   }
 };
 
+let rule_is_dynamic = (rule: Styled_ppx_css_parser.Ast.rule) => {
+  switch (rule) {
+  | Declaration(declaration) => declaration_is_dynamic(declaration)
+  | Style_rule(_style_rule) => false
+  | At_rule(_at_rule) => false
+  };
+};
+
+let declaration_is_dynamic =
+    (declaration: Styled_ppx_css_parser.Ast.declaration) => {
+  let (component_value_list, _) = declaration.value;
+  ();
+};
+
+let split_declarations = (declarations: Styled_ppx_css_parser.Ast.rule_list) => {
+  let (rule_list, _) = declarations;
+  List.partition(
+    (_declaration: Styled_ppx_css_parser.Ast.rule) => false,
+    rule_list,
+  );
+};
+
 /* let _ =
    Styled_ppx_css_parser.Driver.add_arg(
      Settings.jsxVersion.flag,
@@ -490,10 +512,11 @@ let _ =
                 Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, txt)
               ) {
               | Ok(declarations) =>
+                let (_static, _dynamic) = split_declarations(declarations);
                 declarations
                 |> Css_to_runtime.render_declarations(~loc)
                 |> Builder.pexp_array(~loc)
-                |> Css_to_runtime.render_style_call(~loc)
+                |> Css_to_runtime.render_style_call(~loc);
               | Error((loc, msg)) => Error.expr(~loc, msg)
               };
             | Pexp_array(arr) =>
