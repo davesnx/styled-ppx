@@ -442,7 +442,24 @@ let render_hash hash styles =
   | None -> Printf.sprintf "%s" hash
 
 let instance = Stylesheet.make ()
-let flush () = Stylesheet.flush instance
+let latest = Stylesheet.make ()
+
+let flush_instance instance = Stylesheet.flush instance
+
+let flush () =
+  flush_instance instance;
+  flush_instance latest
+
+let union (instance: Stylesheet.t) (latest: Stylesheet.t) =
+  instance.hashes <- Stylesheet.Hashes.union instance.hashes latest.hashes;
+  instance.rules <- instance.rules @ latest.rules;
+  flush_instance latest;
+  instance
+
+let push_item ~(instance: Stylesheet.t) ~latest item =
+  let hash = fst item in
+  if Stylesheet.Hashes.mem hash instance.hashes then ()
+  else Stylesheet.push latest item
 
 let style (styles : rule array) =
   match styles with
@@ -450,7 +467,7 @@ let style (styles : rule array) =
   | _ ->
     let hash = render_hash (Murmur2.default (rules_to_string styles)) styles in
     let className = Printf.sprintf "%s-%s" "css" hash in
-    Stylesheet.push instance (hash, Classnames { className; styles });
+    push_item ~instance ~latest (hash, Classnames { className; styles });
     className
 
 let global (styles : rule array) =
@@ -458,7 +475,7 @@ let global (styles : rule array) =
   | [||] -> ()
   | _ ->
     let hash = Murmur2.default (rules_to_string styles) in
-    Stylesheet.push instance (hash, Globals styles)
+    push_item ~instance ~latest (hash, Globals styles)
 
 let keyframes (keyframes : (int * rule array) array) =
   match keyframes with
@@ -466,10 +483,10 @@ let keyframes (keyframes : (int * rule array) array) =
   | _ ->
     let hash = Murmur2.default (keyframes_to_string keyframes) in
     let animationName = Printf.sprintf "%s-%s" "animation" hash in
-    Stylesheet.push instance (hash, Keyframes { animationName; keyframes });
+    push_item ~instance ~latest (hash, Keyframes { animationName; keyframes });
     Types.AnimationName.make animationName
 
-let get_stylesheet () =
+let get_stylesheet_instance instance =
   let stylesheet = Stylesheet.get_all instance in
   let initial_size = List.length stylesheet * approximate_chars_in_rules in
   let buffer = Buffer.create initial_size in
@@ -487,7 +504,18 @@ let get_stylesheet () =
     stylesheet;
   Buffer.contents buffer
 
-let get_string_style_hashes () =
+let get_stylesheet () =
+  let instance = union instance latest in
+  let stylesheet = get_stylesheet_instance instance in
+  flush_instance instance;
+  stylesheet
+
+let get_stylesheet_latest () =
+  let stylesheet = get_stylesheet_instance latest in
+  flush_instance latest;
+  stylesheet
+
+let get_string_style_hashes_instance instance =
   let stylesheet = Stylesheet.get_all instance in
   let initial_size = List.length stylesheet * approximate_chars_in_rules in
   let buffer = Buffer.create initial_size in
@@ -497,15 +525,27 @@ let get_string_style_hashes () =
        Buffer.add_string buffer (String.trim hash));
   Buffer.contents buffer
 
-let style_tag ?key:_ ?children:_ () =
+let get_string_style_hashes () = get_string_style_hashes_instance instance
+
+let style_tag_instance ?key:_ ?children:_ instance =
   React.createElement "style"
     [
       String
-        ("data-emotion", "data-emotion", "css " ^ get_string_style_hashes ());
+        ("data-emotion", "data-emotion", "css " ^ get_string_style_hashes_instance instance);
       Bool ("data-s", "data-s", true);
-      DangerouslyInnerHtml (get_stylesheet ());
+      DangerouslyInnerHtml (get_stylesheet_instance instance);
     ]
     []
+
+let style_tag () =
+  let instance = union instance latest in
+  flush_instance latest;
+  style_tag_instance instance
+
+let style_tag_latest () =
+  let style_tag = style_tag_instance latest in
+  flush_instance latest;
+  style_tag
 
 (* This method is a Css_type function, but with side-effects. It pushes the fontFace as global style *)
 let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust

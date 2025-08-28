@@ -846,6 +846,37 @@ let style_tag =
         rotate(-360deg); } } .%s { display: block; }</style>"
        global_hash animationNameHash classname_hash animationName classname)
 
+let style_tag_latest =
+  test "style_tag_latest" @@ fun () ->
+    CSS.global
+      [| CSS.selectorMany [| "html" |] [| CSS.lineHeight (`abs 1.15) |] |];
+    let animationName =
+      CSS.keyframes
+        [|
+          0, [| CSS.transform (`rotate (`deg 0.)) |];
+          100, [| CSS.transform (`rotate (`deg (-360.))) |];
+        |]
+    in
+    let css = CSS.style_tag () |> ReactDOM.renderToString in
+    let animationName = Css_types.AnimationName.toString animationName in
+    let animationNameHash =
+      String.sub animationName 10 (String.length animationName - 10)
+    in
+    let global_hash = "18zdck7" in
+    assert_string css
+    (Printf.sprintf
+       "<style data-emotion=\"css %s %s\" data-s>html{line-height:1.15;} @keyframes %s { 0%% { -webkit-transform: rotate(0deg); -moz-transform: rotate(0deg); -ms-transform: rotate(0deg); transform: rotate(0deg); } 100%% { -webkit-transform: rotate(-360deg); -moz-transform: rotate(-360deg); -ms-transform: rotate(-360deg); transform: rotate(-360deg); } }</style>"
+       global_hash animationNameHash animationName);
+    let classname = CSS.style [| CSS.display `block |] in
+    let classname_hash = String.sub classname 4 (String.length classname - 4) in
+    let css = CSS.style_tag_latest () |> ReactDOM.renderToString in
+    let _ = CSS.flush () in
+    (* This is the hash of the global styles, since we don't capture it with global, we inline it for the test *)
+    assert_string css
+      (Printf.sprintf
+         "<style data-emotion=\"css %s\" data-s>.css-%s { display: block; }</style>"
+         classname_hash classname_hash)
+
 let mq_inside_selector =
   test "mq_inside_selector" @@ fun () ->
   let classname =
@@ -1354,4 +1385,5 @@ let tests =
       ampersand_everywhere_global;
       css_variable;
       attribute_selector;
+      style_tag_latest
     ] )
