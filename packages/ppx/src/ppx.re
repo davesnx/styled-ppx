@@ -59,8 +59,7 @@ module Mapper = {
       Error.raise(
         ~loc,
         ~examples=["[%styled.div ...]"],
-        ~link=
-          "https://reasonml.org/docs/manual/latest/function#labeled-arguments",
+        ~link="https://styled-ppx.vercel.app/reference/styled-components",
         "This styled component is not valid. Doesn't have the right format.",
       )
     };
@@ -314,7 +313,6 @@ module Mapper = {
           delim,
         );
 
-      /* Extract static CSS to file and get className */
       let _className = Css_gen.extract_static_css(~loc, styles);
 
       let expr =

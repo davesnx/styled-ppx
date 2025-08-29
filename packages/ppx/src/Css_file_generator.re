@@ -51,14 +51,12 @@ let write_file = (~filename: string, content: string) => {
       Log.debug("File content unchanged, skipping write");
       Unchanged;
     | Some(_) =>
-      /* File exists but content is different */
       Log.debug("File content changed, updating file");
       let oc = open_out(filename);
       output_string(oc, content);
       close_out(oc);
       Updated;
     | None =>
-      /* File doesn't exist */
       Log.debug("File doesn't exist");
       let oc = open_out(filename);
       output_string(oc, content);
@@ -136,5 +134,4 @@ let finalize_css_generation = () => {
   Buffer.clear();
 };
 
-/* Register a hook to write CSS file at the end of compilation */
 Stdlib.at_exit(() => finalize_css_generation());

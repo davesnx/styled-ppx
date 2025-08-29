@@ -84,8 +84,8 @@ let cx = [%cx "height: 100%"]
 
 - [x] Understand what it means 0 runtime cost with dynamic styling compiledcssinjs.com https://github.com/callstack/linaria
 - [ ] Read a few resources about it
-	- https://shud.in/posts/ssr-streaming-and-css-in-js
-	- https://github.com/andreipfeiffer/css-in-js
+	- [x] https://shud.in/posts/ssr-streaming-and-css-in-js
+	- [x] https://github.com/andreipfeiffer/css-in-js
 	- https://medium.com/@tkh44/writing-a-css-in-js-library-from-scratch-96cd23a017b4
 	- https://scrimba.com/g/gcssvariables
 	- https://github.com/threepointone/glam/tree/e9bca3950f12503246ed7fccad5cf13e5e9c86e3
