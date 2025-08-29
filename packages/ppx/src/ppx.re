@@ -315,7 +315,7 @@ module Mapper = {
         );
 
       /* Extract static CSS to file and get className */
-      let _className = Css_gen.extract_static_css(~loc, ~valueName, ~styles);
+      let _className = Css_gen.extract_static_css(~loc, styles);
 
       let expr =
         switch (
@@ -477,6 +477,13 @@ let _ =
     ~doc=Settings.native.doc,
   );
 
+let _ =
+  Ppxlib.Driver.add_arg(
+    Settings.debug.flag,
+    Arg.Unit(_ => Settings.Update.debug(true)),
+    ~doc=Settings.debug.doc,
+  );
+
 let (version, mode) = Bsconfig.getJSX();
 
 switch (version) {
@@ -515,12 +522,7 @@ let _ =
                   delimiter,
                 );
               /* Extract static CSS to file */
-              let _className =
-                Css_gen.extract_static_css(
-                  ~loc,
-                  ~valueName="cx_inline",
-                  ~styles=txt,
-                );
+              let _className = Css_gen.extract_static_css(~loc, txt);
 
               switch (
                 Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, txt)

@@ -13,6 +13,7 @@
   ppxlib.astlib
   ppx_deriving_yojson.runtime
   yojson
+  murmur2
   unix)
  (preprocess
   (pps ppxlib.metaquot ppx_deriving_yojson)))
