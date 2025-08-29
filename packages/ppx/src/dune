@@ -12,6 +12,7 @@
   ppxlib
   ppxlib.astlib
   ppx_deriving_yojson.runtime
-  yojson)
+  yojson
+  unix)
  (preprocess
   (pps ppxlib.metaquot ppx_deriving_yojson)))

@@ -6,4 +6,4 @@ let css = main => [%cx
 |}
 ];
 
-<div style={css(CSS.red)} />;
+<div className={css(CSS.red)} />;

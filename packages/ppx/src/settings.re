@@ -39,6 +39,7 @@ type settings = {
   production: flag(bool),
   native: flag(bool),
 };
+
 let settings = {
   jsxVersion,
   jsxMode,

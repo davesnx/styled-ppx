@@ -1,4 +1,5 @@
 module Builder = Ppxlib.Ast_builder.Default;
+module Css_gen = Css_file_generator;
 
 module Mapper = {
   open Ppxlib;
@@ -312,6 +313,10 @@ module Mapper = {
           stringLoc,
           delim,
         );
+
+      /* Extract static CSS to file and get className */
+      let _className = Css_gen.extract_static_css(~loc, ~valueName, ~styles);
+
       let expr =
         switch (
           Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, styles)
@@ -435,18 +440,19 @@ let traverser = {
   }
 };
 
+let declaration_is_dynamic =
+    (declaration: Styled_ppx_css_parser.Ast.declaration) => {
+  let (_component_value_list, _) = declaration.value;
+  /* TODO: implement logic to detect dynamic declarations */
+  false;
+};
+
 let rule_is_dynamic = (rule: Styled_ppx_css_parser.Ast.rule) => {
   switch (rule) {
   | Declaration(declaration) => declaration_is_dynamic(declaration)
   | Style_rule(_style_rule) => false
   | At_rule(_at_rule) => false
   };
-};
-
-let declaration_is_dynamic =
-    (declaration: Styled_ppx_css_parser.Ast.declaration) => {
-  let (component_value_list, _) = declaration.value;
-  ();
 };
 
 let split_declarations = (declarations: Styled_ppx_css_parser.Ast.rule_list) => {
@@ -508,6 +514,14 @@ let _ =
                   stringLoc,
                   delimiter,
                 );
+              /* Extract static CSS to file */
+              let _className =
+                Css_gen.extract_static_css(
+                  ~loc,
+                  ~valueName="cx_inline",
+                  ~styles=txt,
+                );
+
               switch (
                 Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, txt)
               ) {
