@@ -38,7 +38,7 @@ let rec contains_ampersand = (selector: selector) => {
 }
 and pseudo_selector_contains_ampersand =
   fun
-  | Pseudoclass(Function({payload: (selector_list, _), _})) =>
+  | Pseudoclass(PseudoFunction({payload: (selector_list, _), _})) =>
     selector_list |> List.map(fst) |> List.exists(contains_ampersand)
   | Pseudoclass(NthFunction({payload: (NthSelector(csl), _), _})) =>
     csl |> List.exists(cs => contains_ampersand(ComplexSelector(cs)))
@@ -218,7 +218,7 @@ let rec replace_ampersand = (replaced_with: selector, selector: selector) => {
 and pseudo_selector_replace_ampersand = (replaced_with: selector, selector) => {
   switch (selector) {
   | Pseudoclass(
-      Function({name, payload: (selector_list, selector_list_loc)}),
+      PseudoFunction({name, payload: (selector_list, selector_list_loc)}),
     ) =>
     let selector_list =
       selector_list
@@ -226,7 +226,7 @@ and pseudo_selector_replace_ampersand = (replaced_with: selector, selector) => {
            (replace_ampersand(replaced_with, selector), loc)
          );
     Pseudoclass(
-      Function({
+      PseudoFunction({
         name,
         payload: (selector_list, selector_list_loc),
       }),

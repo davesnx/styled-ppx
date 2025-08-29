@@ -104,7 +104,7 @@ and selector = (ast: Ast.selector) => {
   and render_pseudo_class =
     fun
     | Ast.PseudoIdent(i) => ":" ++ i
-    | Function({name, payload: (sl, _)}) =>
+    | PseudoFunction({name, payload: (sl, _)}) =>
       ":" ++ name ++ "(" ++ selector_list(sl) ++ ")"
     | NthFunction({name, payload: (selector, _)}) =>
       ":" ++ name ++ "(" ++ render_nth_payload(selector) ++ ")"

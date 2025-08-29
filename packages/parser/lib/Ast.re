@@ -158,7 +158,7 @@ and pseudo_selector =
 [@deriving show({with_path: false})]
 and pseudoclass_kind =
   | PseudoIdent(string)
-  | Function({
+  | PseudoFunction({
       name: string,
       payload: with_loc(selector_list),
     })

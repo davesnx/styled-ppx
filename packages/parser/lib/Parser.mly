@@ -282,10 +282,10 @@ nth_payload:
 pseudo_class_selector:
   | COLON i = IDENT { (Pseudoclass(PseudoIdent i)) } /* :visited */
   | COLON f = FUNCTION xs = loc(relative_selector_list) RIGHT_PAREN /* :has() */ {
-    (Pseudoclass(Function({ name = f; payload = xs })))
+    (Pseudoclass(PseudoFunction({ name = f; payload = xs })))
   }
   | COLON f = FUNCTION xs = loc(selector_list) RIGHT_PAREN /* :not() */ {
-    (Pseudoclass(Function({ name = f; payload = xs })))
+    (Pseudoclass(PseudoFunction({ name = f; payload = xs })))
   }
   | COLON f = NTH_FUNCTION xs = loc(nth_payload) RIGHT_PAREN /* :nth() */ {
     (Pseudoclass(NthFunction({ name = f; payload = xs })))

@@ -368,7 +368,7 @@ and render_selector = (~loc, selector: selector) => {
       ++ "("
       ++ (render_nth_payload(payload) |> String.trim)
       ++ ")"
-    | Function({name, payload: (payload, _loc)}) => {
+    | PseudoFunction({name, payload: (payload, _loc)}) => {
         ":"
         ++ name
         ++ "("
