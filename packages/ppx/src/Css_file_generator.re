@@ -86,28 +86,8 @@ let get_output_path = () => {
   output_path;
 };
 
-let extract_static_css = (~loc: Ppxlib.Location.t, styles: string) => {
-  let className = {
-    /* TODO: Check if styles are empty */
-    let hash = Murmur2.default(styles);
-    Printf.sprintf("css-%s", hash);
-  };
-
-  let content =
-    switch (Settings.Get.debug()) {
-    | true =>
-      Printf.sprintf(
-        "  /* Generated from [%%cx] in %s at line %d */%s",
-        loc.loc_start.pos_fname,
-        loc.loc_start.pos_lnum,
-        styles,
-      )
-    | _false => styles
-    };
-
-  Buffer.add_rule(className, content);
-
-  className;
+let add_css = (~className: string, ~css: string) => {
+  Buffer.add_rule(className, css);
 };
 
 let finalize_css_generation = () => {

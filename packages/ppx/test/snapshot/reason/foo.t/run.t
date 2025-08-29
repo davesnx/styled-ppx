@@ -1,5 +1,9 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml --debug
+  [styled-ppx] Transformed CSS: color:var(--main);background-color:var(--css-black);display:flex;
+  [styled-ppx] Dynamic vars: 2
+  [styled-ppx]   --main => main
+  [styled-ppx]   --css-black => CSS.black
   [styled-ppx] CSS output path: styled-ppx-css/styles.css
   [styled-ppx] File doesn't exist
   [styled-ppx] CSS file created at: styled-ppx-css/styles.css
@@ -19,10 +23,7 @@ Show the generated CSS file:
   
   .css-ljjfp7 {
     /* Generated from [%cx] in output.ml at line 3 */
-    color: $(main);
-    background-color: $(CSS.black);
-    display: flex;
-  
+  color:var(--main);background-color:var(--css-black);display:flex;
   }
 
   $ rm input.re
@@ -41,6 +42,10 @@ Show the generated CSS file:
 
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml --debug
+  [styled-ppx] Transformed CSS: color:var(--main);background-color:var(--css-black);display:flex;
+  [styled-ppx] Dynamic vars: 2
+  [styled-ppx]   --main => main
+  [styled-ppx]   --css-black => CSS.black
   [styled-ppx] CSS output path: styled-ppx-css/styles.css
   [styled-ppx] File content unchanged, skipping write
   $ refmt --parse ml --print re output.ml
@@ -67,6 +72,10 @@ Test 2: Add new rule - file should be updated:
   > EOF
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml --debug
+  [styled-ppx] Transformed CSS: color:var(--main);background-color:var(--css-black);display:flex;padding:10px;
+  [styled-ppx] Dynamic vars: 2
+  [styled-ppx]   --main => main
+  [styled-ppx]   --css-black => CSS.black
   [styled-ppx] CSS output path: styled-ppx-css/styles.css
   [styled-ppx] File content changed, updating file
   [styled-ppx] CSS file updated at: styled-ppx-css/styles.css
@@ -86,9 +95,5 @@ Test 2: Add new rule - file should be updated:
   
   .css-y0loj0 {
     /* Generated from [%cx] in output.ml at line 3 */
-    color: $(main);
-    background-color: $(CSS.black);
-    display: flex;
-    padding: 10px;
-  
+  color:var(--main);background-color:var(--css-black);display:flex;padding:10px;
   }
