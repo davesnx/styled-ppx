@@ -82,8 +82,10 @@ let render_option = (~loc, f) =>
 let list_to_longident = vars =>
   vars |> String.concat(".") |> Ppxlib.Longident.parse;
 
-let render_variable = (~loc, name) =>
-  list_to_longident(name) |> txt(~loc) |> Builder.pexp_ident(~loc);
+let render_variable = (~loc, name) => {
+  let ident = list_to_longident(name) |> txt(~loc);
+  Builder.pexp_ident(~loc, ident);
+};
 
 let transform_with_variable = (parser, mapper, value_to_expr) => {
   Css_property_parser.(

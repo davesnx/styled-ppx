@@ -8,17 +8,20 @@ exception Empty_buffer(string);
 module CSS = {
   /* This is the public API of the CSS module */
   let ident = (~loc, name) =>
-    {
-      txt: Ldot(Lident("CSS"), name),
-      loc,
-    }
-    |> Builder.pexp_ident(~loc);
+    Builder.pexp_ident(
+      ~loc,
+      {
+        txt: Ldot(Lident("CSS"), name),
+        loc,
+      },
+    );
   let selectorMany = (~loc) => ident(~loc, "selectorMany");
   let media = (~loc) => ident(~loc, "media");
   let global = (~loc) => ident(~loc, "global");
   let label = (~loc) => ident(~loc, "label");
   let style = (~loc) => ident(~loc, "style");
   let keyframes = (~loc) => ident(~loc, "keyframes");
+  let make = (~loc) => ident(~loc, "make");
 };
 
 let string_to_const = (~loc, s) => {
@@ -38,10 +41,8 @@ let string_to_const = (~loc, s) => {
   };
 };
 let render_variable = (~loc, v) => {
-  Helper.Exp.ident({
-    loc,
-    txt: v |> String.concat(".") |> Ppxlib.Longident.parse,
-  });
+  let txt = v |> String.concat(".") |> Ppxlib.Longident.parse;
+  Helper.Exp.ident(~loc, {loc, txt});
 };
 
 let source_code_of_loc = (loc: Ppxlib.Location.t) => {
@@ -465,14 +466,68 @@ and render_style_rule = (~loc, rule: style_rule) => {
 
 let addLabel = (~loc, label, emotionExprs) => [
   Helper.Exp.apply(
+    ~loc,
     CSS.label(~loc),
-    [(Nolabel, Helper.Exp.constant(Pconst_string(label, loc, None)))],
+    [(Nolabel, Helper.Exp.constant(~loc, Pconst_string(label, loc, None)))],
   ),
   ...emotionExprs,
 ];
 
 let render_style_call = (~loc, declaration_list) => {
   Helper.Exp.apply(~loc, CSS.style(~loc), [(Nolabel, declaration_list)]);
+};
+
+let render_make_call = (~loc, ~className, ~dynamic_vars) => {
+  /* Create the className string literal */
+  let className_expr =
+    Helper.Exp.constant(~loc, Pconst_string(className, loc, None));
+
+  /* Create a list of tuples with CSS custom properties */
+  let var_list =
+    dynamic_vars
+    |> List.map(((var_name, original_path)) => {
+         let field_name = "--" ++ var_name;
+         let field_name_expr =
+           Helper.Exp.constant(~loc, Pconst_string(field_name, loc, None));
+         let field_value =
+           render_variable(~loc, String.split_on_char('.', original_path));
+         Builder.pexp_tuple(~loc, [field_name_expr, field_value]);
+       });
+
+  let list_expr =
+    List.fold_right(
+      (item, acc) =>
+        Builder.pexp_construct(
+          ~loc,
+          Builder.Located.lident(~loc, "::"),
+          Some(Builder.pexp_tuple(~loc, [item, acc])),
+        ),
+      var_list,
+      Builder.pexp_construct(~loc, Builder.Located.lident(~loc, "[]"), None),
+    );
+
+  /* Generate CSS.make(className, list).className to extract just the className */
+  let make_call =
+    Helper.Exp.apply(
+      ~loc,
+      CSS.make(~loc),
+      [(Nolabel, className_expr), (Nolabel, list_expr)],
+    );
+
+  /* Access the className field from the returned record */
+  let className_access =
+    Builder.pexp_field(
+      ~loc,
+      make_call,
+      Builder.Located.lident(~loc, "className"),
+    );
+
+  /* Add type constraint to ensure it's a string */
+  Builder.pexp_constraint(
+    ~loc,
+    className_access,
+    Builder.ptyp_constr(~loc, Builder.Located.lident(~loc, "string"), []),
+  );
 };
 
 let render_keyframes = (~loc, declarations: rule_list) => {
