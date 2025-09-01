@@ -892,36 +892,6 @@ let traverser = {
   }
 };
 
-let declaration_is_dynamic =
-    (declaration: Styled_ppx_css_parser.Ast.declaration) => {
-  let (_component_value_list, _) = declaration.value;
-  /* TODO: implement logic to detect dynamic declarations */
-  false;
-};
-
-let rule_is_dynamic = (rule: Styled_ppx_css_parser.Ast.rule) => {
-  switch (rule) {
-  | Declaration(declaration) => declaration_is_dynamic(declaration)
-  | Style_rule(_style_rule) => false
-  | At_rule(_at_rule) => false
-  };
-};
-
-let split_declarations = (declarations: Styled_ppx_css_parser.Ast.rule_list) => {
-  let (rule_list, _) = declarations;
-  List.partition(
-    (_declaration: Styled_ppx_css_parser.Ast.rule) => false,
-    rule_list,
-  );
-};
-
-/* let _ =
-   Styled_ppx_css_parser.Driver.add_arg(
-     Settings.jsxVersion.flag,
-     Arg.Int(Settings.Update.jsxVersion),
-     ~doc=Settings.jsxVersion.doc,
-   ); */
-
 let _ =
   Ppxlib.Driver.add_arg(
     Settings.native.flag,
@@ -952,14 +922,11 @@ let any_module_payload_pattern =
 
 let _ =
   Ppxlib.Driver.register_transformation(
-    /* Instrument is needed to run styled-ppx after metaquote,
-       we rely on this order in native tests */
+    /* Instrument is needed to run styled-ppx after metaquote, we rely on this order in native tests */
     ~instrument=
       Ppxlib.Driver.Instrument.make(~position=Before, traverser#structure),
     ~rules=[
-      /* %cx without let binding, it doesn't have CSS.label
-         %cx is defined in traverser#structure
-         RESTORED TO OLD BEHAVIOR - use cx2 for new CSS file generation */
+      /* %cx without let binding, it doesn't have CSS.label %cx is defined in traverser#structure */
       Ppxlib.Context_free.Rule.extension(
         Ppxlib.Extension.declare(
           "cx",
@@ -979,7 +946,6 @@ let _ =
                 Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, txt)
               ) {
               | Ok(declarations) =>
-                /* OLD BEHAVIOR: Just render declarations without CSS file generation */
                 declarations
                 |> Css_to_runtime.render_declarations(~loc)
                 |> Builder.pexp_array(~loc)
@@ -1021,7 +987,7 @@ let _ =
           },
         ),
       ),
-      /* cx2 extension - NEW VERSION WITH CSS FILE GENERATION */
+      /* cx2 extension */
       Ppxlib.Context_free.Rule.extension(
         Ppxlib.Extension.declare(
           "cx2",
@@ -1089,7 +1055,6 @@ let _ =
                       )
                     : css_string;
                 Css_gen.add_css(~className, ~css=css_content);
-                /* Always use CSS.make to return a consistent styles object */
                 Css_to_runtime.render_make_call(
                   ~loc,
                   ~className,
