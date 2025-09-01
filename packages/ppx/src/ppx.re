@@ -697,6 +697,144 @@ module Mapper = {
   };
 };
 
+/* Helper to detect if a name is an HTML element */
+let is_html_element = name => {
+  /* List of common HTML elements - you can expand this list */
+  let html_elements = [
+    "a",
+    "abbr",
+    "address",
+    "area",
+    "article",
+    "aside",
+    "audio",
+    "b",
+    "base",
+    "bdi",
+    "bdo",
+    "blockquote",
+    "body",
+    "br",
+    "button",
+    "canvas",
+    "caption",
+    "cite",
+    "code",
+    "col",
+    "colgroup",
+    "data",
+    "datalist",
+    "dd",
+    "del",
+    "details",
+    "dfn",
+    "dialog",
+    "div",
+    "dl",
+    "dt",
+    "em",
+    "embed",
+    "fieldset",
+    "figcaption",
+    "figure",
+    "footer",
+    "form",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "head",
+    "header",
+    "hgroup",
+    "hr",
+    "html",
+    "i",
+    "iframe",
+    "img",
+    "input",
+    "ins",
+    "kbd",
+    "keygen",
+    "label",
+    "legend",
+    "li",
+    "link",
+    "main",
+    "map",
+    "mark",
+    "menu",
+    "menuitem",
+    "meta",
+    "meter",
+    "nav",
+    "noscript",
+    "object",
+    "ol",
+    "optgroup",
+    "option",
+    "output",
+    "p",
+    "param",
+    "picture",
+    "pre",
+    "progress",
+    "q",
+    "rp",
+    "rt",
+    "ruby",
+    "s",
+    "samp",
+    "script",
+    "section",
+    "select",
+    "small",
+    "source",
+    "span",
+    "strong",
+    "style",
+    "sub",
+    "summary",
+    "sup",
+    "svg",
+    "table",
+    "tbody",
+    "td",
+    "template",
+    "textarea",
+    "tfoot",
+    "th",
+    "thead",
+    "time",
+    "title",
+    "tr",
+    "track",
+    "u",
+    "ul",
+    "var",
+    "video",
+    "wbr",
+  ];
+  List.mem(name, html_elements);
+};
+
+/* Helper to detect if an expression is a JSX element */
+let is_jsx = expr => {
+  switch (expr.Ppxlib.pexp_desc) {
+  | Pexp_apply(tag, _args) =>
+    switch (tag.pexp_desc) {
+    | Pexp_ident({txt: Lident(name), _}) =>
+      /* Check if it's an HTML element or starts with uppercase (React component) */
+      is_html_element(name)
+      || String.length(name) > 0
+      && Char.uppercase_ascii(name.[0]) == name.[0]
+    | _ => false
+    }
+  | _ => false
+  };
+};
+
 let traverser = {
   as _;
   inherit class Ppxlib.Ast_traverse.map as super;
@@ -704,6 +842,53 @@ let traverser = {
     File.set(expr.pstr_loc.loc_start.pos_fname);
     let expr = super#structure_item(expr);
     Mapper.transform(expr);
+  };
+  pub! expression = expr => {
+    let loc = expr.pexp_loc;
+    /* Transform JSX elements with "styles" prop */
+    switch (expr.pexp_desc) {
+    | Pexp_apply(tag, args) when is_jsx(expr) =>
+      /* Check if there's a "styles" prop */
+      let found_styles = ref(None);
+      let new_args =
+        List.concat_map(
+          ((arg_label, arg)) => {
+            switch (arg_label) {
+            | Ppxlib.Labelled("styles") =>
+              /* Found the styles prop - save it for transformation */
+              found_styles := Some(arg);
+              /* Replace with className and style props */
+              [
+                (
+                  Ppxlib.Optional("className"),
+                  Builder.pexp_field(
+                    ~loc,
+                    arg,
+                    Builder.Located.lident(~loc, "className"),
+                  ),
+                ),
+                (Ppxlib.Optional("style"), [%expr ReactDOM.Style.make()]),
+              ];
+            | _ =>
+              /* Keep other props as-is, but apply transformation recursively */
+              [(arg_label, super#expression(arg))]
+            }
+          },
+          args,
+        );
+
+      switch (found_styles^) {
+      | None =>
+        /* No styles prop found, just recursively transform */
+        super#expression(expr)
+      | Some(_) =>
+        /* The transformation is already done inline in the new_args */
+        Builder.pexp_apply(~loc, super#expression(tag), new_args)
+      };
+    | _ =>
+      /* Not a JSX element, recursively transform */
+      super#expression(expr)
+    };
   }
 };
 
@@ -904,20 +1089,12 @@ let _ =
                       )
                     : css_string;
                 Css_gen.add_css(~className, ~css=css_content);
-                if (List.length(dynamic_vars) > 0) {
-                  /* Use CSS.make when there are dynamic variables */
-                  Css_to_runtime.render_make_call(
-                    ~loc,
-                    ~className,
-                    ~dynamic_vars,
-                  );
-                } else {
-                  /* Use traditional CSS.style for static styles */
-                  declarations
-                  |> Css_to_runtime.render_declarations(~loc)
-                  |> Builder.pexp_array(~loc)
-                  |> Css_to_runtime.render_style_call(~loc);
-                };
+                /* Always use CSS.make to return a consistent styles object */
+                Css_to_runtime.render_make_call(
+                  ~loc,
+                  ~className,
+                  ~dynamic_vars,
+                );
               | Error((loc, msg)) => Error.expr(~loc, msg)
               };
             | Pexp_array(arr) =>

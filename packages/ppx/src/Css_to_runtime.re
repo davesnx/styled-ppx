@@ -538,27 +538,11 @@ let render_make_call = (~loc, ~className, ~dynamic_vars) => {
       Builder.pexp_construct(~loc, Builder.Located.lident(~loc, "[]"), None),
     );
 
-  /* Generate CSS.make(className, list).className to extract just the className */
-  let make_call =
-    Helper.Exp.apply(
-      ~loc,
-      CSS.make(~loc),
-      [(Nolabel, className_expr), (Nolabel, list_expr)],
-    );
-
-  /* Access the className field from the returned record */
-  let className_access =
-    Builder.pexp_field(
-      ~loc,
-      make_call,
-      Builder.Located.lident(~loc, "className"),
-    );
-
-  /* Add type constraint to ensure it's a string */
-  Builder.pexp_constraint(
+  /* Generate CSS.make(className, list) - returns the full styles object */
+  Helper.Exp.apply(
     ~loc,
-    className_access,
-    Builder.ptyp_constr(~loc, Builder.Located.lident(~loc, "string"), []),
+    CSS.make(~loc),
+    [(Nolabel, className_expr), (Nolabel, list_expr)],
   );
 };
 

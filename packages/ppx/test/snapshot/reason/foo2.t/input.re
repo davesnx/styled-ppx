@@ -8,4 +8,4 @@ let css = main => [%cx2
 |}
 ];
 
-<div style={css(CSS.red)} />;
+<div styles={css(CSS.red)} />;

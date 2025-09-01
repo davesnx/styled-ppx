@@ -460,6 +460,16 @@ type styles = {
 
 let make className vars = { className; dynamic = vars }
 
+(* Helper functions for JSX transformation *)
+let get_className = function { className; _ } -> className
+let get_dynamic = function { dynamic; _ } -> dynamic
+
+(* Convert dynamic list to JavaScript object for style prop *)
+let dynamic_to_object dynamic_list =
+  dynamic_list |> List.map (fun (key, value) -> key, value) |> fun pairs ->
+  pairs
+(* For now, return the list - in real implementation this would convert to JS object *)
+
 let global (styles : rule array) =
   match styles with
   | [||] -> ()

@@ -13,3 +13,12 @@ type styles = {
 }
 
 let make className dynamic = { className; dynamic }
+
+(* Helper functions for JSX transformation *)
+let get_className styles = styles.className
+let get_dynamic styles = styles.dynamic
+
+(* Convert dynamic list to JavaScript object for style prop *)
+let dynamic_to_object dynamic_list =
+  (* For now, just return the list - proper implementation would convert to JS object *)
+  dynamic_list
