@@ -2,11 +2,13 @@
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   let css = main =>
-    CSS.style([|
-      (CSS.color(main): CSS.rule),
-      CSS.backgroundColor(CSS.black),
-      CSS.display(`flex),
-    |]);
+    (CSS.make(
+       "css-ljjfp7",
+       [
+         ("--main", main),
+         ("--css-black", CSS.black),
+       ],
+     ).className: string);
   <div className={css(CSS.red)} />;
 
 Show the generated CSS file:

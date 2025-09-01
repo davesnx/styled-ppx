@@ -13,9 +13,7 @@ let fancy = main => [%cx
 /* inject
    .css-123-1 {
      color: var(--main);
-   .css-123-2 {
      background-color: var(--background-color);
-   .css-123-3 {
      display: flex;
    }
    into a style.css file
@@ -104,17 +102,21 @@ let cx = [%cx "height: 100%"]
     - Generate css files similarly to https://github.com/hyper-systems/rescript-sx
     - Create a cache for it (don’t re-generate files that don’t change)
     - Avoid the hashing in testing (or add labels)
-- [ ] Create a CSS minifier pretty printer
-	    - https://github.com/janestreet/ppx_css/blob/master/css_jane/src/css_jane.ml
-	    - https://github.com/astrada/ocaml-css-parser/blob/master/test/css_fmt_printer.ml
-	    - https://git.chimrod.com/css_lib.git/tree/lib/print.ml
 - [ ] Dynamic styling
     - Parser should support CSS variables
     - Render to styles should render to inline styles as well (native-react + to_string)
 - [ ] Support dynamic values. (Transform to CSS variables and inject static CSS)
     - What should we do on interpolation in selectors and mediaqueries?
-- [ ] Remove the "bridge" from css to bs-emotion and move it to inline-styles
+- [ ] Create a CSS minifier pretty printer
+	    - https://github.com/janestreet/ppx_css/blob/master/css_jane/src/css_jane.ml
+	    - https://github.com/astrada/ocaml-css-parser/blob/master/test/css_fmt_printer.ml
+	    - https://git.chimrod.com/css_lib.git/tree/lib/print.ml
 - [x] Implement a vendor-prefixer for unsupported properties https://github.com/kripod/style-vendorizer (styled-ppx.emotion-native)
+- [ ] Generate atomic css
+- [ ] Remove emotion
+  - [ ] Remove the "bridge" from css to bs-emotion and move it to inline-styles
+  - [ ]
+- [ ] Support "label"
 - [ ] Remove array API? and css extension?
 
 ## Similar implementations

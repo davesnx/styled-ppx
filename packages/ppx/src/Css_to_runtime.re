@@ -42,7 +42,13 @@ let string_to_const = (~loc, s) => {
 };
 let render_variable = (~loc, v) => {
   let txt = v |> String.concat(".") |> Ppxlib.Longident.parse;
-  Helper.Exp.ident(~loc, {loc, txt});
+  Builder.pexp_ident(
+    ~loc,
+    {
+      txt,
+      loc,
+    },
+  );
 };
 
 let source_code_of_loc = (loc: Ppxlib.Location.t) => {
@@ -468,7 +474,9 @@ let addLabel = (~loc, label, emotionExprs) => [
   Helper.Exp.apply(
     ~loc,
     CSS.label(~loc),
-    [(Nolabel, Helper.Exp.constant(~loc, Pconst_string(label, loc, None)))],
+    [
+      (Nolabel, Helper.Exp.constant(~loc, Pconst_string(label, loc, None))),
+    ],
   ),
   ...emotionExprs,
 ];

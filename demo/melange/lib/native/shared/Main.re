@@ -23,15 +23,17 @@ module Cositas = [%styled.div
 |}
 ];
 
-let selectors = [%cx {|
+let selectors: string = [%cx
+  {|
   color: red;
 
   &:hover {
     color: blue;
   }
-|}];
+|}
+];
 
-let bounce = [%keyframe
+let bounce: CSS.animationName = [%keyframe
   {|
   40% {
     transform: translate3d(0, -30px, 0);
@@ -50,7 +52,7 @@ let bounce = [%keyframe
 let code = [|`quoted("Menlo"), `quoted("monospace")|];
 let lola = `auto;
 
-let clx = [%cx
+let clx: string = [%cx
   {|
   animation-name: $(bounce);
   font-family: $(code);
@@ -59,12 +61,14 @@ let clx = [%cx
 |}
 ];
 
-let post = [%cx {|
+let post: string = [%cx
+  {|
   border: 2px solid;
   container-type: inline-size;
-|}];
+|}
+];
 
-let card = [%cx
+let card: string = [%cx
   {|
   margin: 10px;
   border: 2px dotted;
@@ -72,7 +76,7 @@ let card = [%cx
   |}
 ];
 
-let container = [%cx
+let container: string = [%cx
   {|
   @container (width < 650px) {
     width: 50%;
@@ -88,7 +92,7 @@ let container = [%cx
 
 let color = `hex("333");
 
-let gradiend = [%cx
+let gradiend: string = [%cx
   {|
     background-image:
       repeating-linear-gradient(

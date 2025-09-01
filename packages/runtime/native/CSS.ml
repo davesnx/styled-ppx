@@ -453,6 +453,13 @@ let style (styles : rule array) =
     Stylesheet.push instance (hash, Classnames { className; styles });
     className
 
+type styles = {
+  className : string;
+  dynamic : (string * string) list;
+}
+
+let make className vars = { className; dynamic = vars }
+
 let global (styles : rule array) =
   match styles with
   | [||] -> ()
