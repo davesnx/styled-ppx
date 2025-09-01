@@ -21,16 +21,22 @@ module Css_transform = {
 
   /* Transform component values, replacing Variables with CSS custom properties */
   let rec transform_component_value =
-          (cv: component_value, dynamic_vars: ref(list((string, string))))
+          (
+            cv: component_value,
+            dynamic_vars: ref(list((string, string, string))),
+            property_name: option(string),
+          )
           : component_value => {
     switch (cv) {
     | Variable(path) =>
       let var_name = variable_to_css_var_name(path);
       let original_path = String.concat(".", path);
 
-      /* Track dynamic variable */
-      if (!List.mem_assoc(var_name, dynamic_vars^)) {
-        dynamic_vars := [(var_name, original_path), ...dynamic_vars^];
+      /* Track dynamic variable with property name */
+      let property = Option.value(property_name, ~default="");
+      if (!List.exists(((vn, _, _)) => vn == var_name, dynamic_vars^)) {
+        dynamic_vars :=
+          [(var_name, original_path, property), ...dynamic_vars^];
       };
 
       /* Return CSS custom property reference */
@@ -46,7 +52,10 @@ module Css_transform = {
       let transformed_body =
         List.map(
           ((value, loc)) =>
-            (transform_component_value(value, dynamic_vars), loc),
+            (
+              transform_component_value(value, dynamic_vars, property_name),
+              loc,
+            ),
           body_values,
         );
       Function(name, (transformed_body, body_loc));
@@ -54,7 +63,10 @@ module Css_transform = {
       let transformed =
         List.map(
           ((value, loc)) =>
-            (transform_component_value(value, dynamic_vars), loc),
+            (
+              transform_component_value(value, dynamic_vars, property_name),
+              loc,
+            ),
           values,
         );
       Paren_block(transformed);
@@ -62,7 +74,10 @@ module Css_transform = {
       let transformed =
         List.map(
           ((value, loc)) =>
-            (transform_component_value(value, dynamic_vars), loc),
+            (
+              transform_component_value(value, dynamic_vars, property_name),
+              loc,
+            ),
           values,
         );
       Bracket_block(transformed);
@@ -72,10 +87,15 @@ module Css_transform = {
 
   /* Transform declarations */
   let transform_declaration = (decl: declaration, dynamic_vars) => {
+    let (property_name, _) = decl.name;
     let (value_list, value_loc) = decl.value;
     let transformed_values =
       List.map(
-        ((cv, loc)) => (transform_component_value(cv, dynamic_vars), loc),
+        ((cv, loc)) =>
+          (
+            transform_component_value(cv, dynamic_vars, Some(property_name)),
+            loc,
+          ),
         value_list,
       );
     {
@@ -443,11 +463,12 @@ module Mapper = {
               List.length(dynamic_vars),
             );
             List.iter(
-              ((var_name, original)) =>
+              ((var_name, original, property)) =>
                 Printf.printf(
-                  "[styled-ppx]   --%s => %s\n",
+                  "[styled-ppx]   --%s => %s (property: %s)\n",
                   var_name,
                   original,
+                  property,
                 ),
               dynamic_vars,
             );
@@ -472,7 +493,7 @@ module Mapper = {
         Nonrecursive,
         [Builder.value_binding(~loc=patternLoc, ~pat, ~expr)],
       );
-    /* [%cx ""] - OLD VERSION (KEEP FOR COMPATIBILITY) */
+    /* [%cx ""] */
     | Pstr_value(
         Nonrecursive,
         [
@@ -862,11 +883,12 @@ let _ =
                     List.length(dynamic_vars),
                   );
                   List.iter(
-                    ((var_name, original)) =>
+                    ((var_name, original, property)) =>
                       Printf.printf(
-                        "[styled-ppx] cx2   --%s => %s\n",
+                        "[styled-ppx] cx2   --%s => %s (property: %s)\n",
                         var_name,
                         original,
+                        property,
                       ),
                     dynamic_vars,
                   );
@@ -882,9 +904,6 @@ let _ =
                       )
                     : css_string;
                 Css_gen.add_css(~className, ~css=css_content);
-
-                /* Generate runtime code */
-                let (_static, _dynamic) = split_declarations(declarations);
                 if (List.length(dynamic_vars) > 0) {
                   /* Use CSS.make when there are dynamic variables */
                   Css_to_runtime.render_make_call(

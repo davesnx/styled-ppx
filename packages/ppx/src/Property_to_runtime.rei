@@ -10,3 +10,7 @@ let render:
       | `Impossible_state
     ],
   );
+
+/* Get the CSS runtime function for a property with a dynamic variable value */
+let get_css_function_for_property:
+  (~loc: Location.t, string, Parsetree.expression) => Parsetree.expression;

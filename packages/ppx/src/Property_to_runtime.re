@@ -5018,7 +5018,29 @@ let line_break =
     },
   );
 
-let found = ({ast_of_string, string_to_expr, _}) => {
+/* Helper to create a property renderer from a property name */
+let property_name_to_renderer = (~loc, property_name) => {
+  /* Convert kebab-case to camelCase for the CSS function name */
+  let css_function_name =
+    property_name
+    |> String.split_on_char('-')
+    |> (
+      fun
+      | [] => ""
+      | [first, ...rest] =>
+        first ++ String.concat("", List.map(String.capitalize_ascii, rest))
+    );
+
+  Builder.pexp_ident(
+    ~loc,
+    {
+      txt: Ldot(Lident("CSS"), css_function_name),
+      loc,
+    },
+  );
+};
+
+let found = ({ast_of_string, string_to_expr}) => {
   /* TODO: Why we have 'check_value' when we don't use it? */
   let check_value = string => {
     let.ok _ = ast_of_string(string);
@@ -6351,6 +6373,50 @@ let render_to_expr = (~loc, property, value, important) => {
   | Ok(expr) => Ok(expr)
   | Error(err) => Error(`Invalid_value(err))
   | exception (Invalid_value(v)) => Error(`Invalid_value(v))
+  };
+};
+
+/* Get the CSS runtime function for a property with a dynamic variable value.
+   This uses the existing property definitions to generate the correct CSS function call.
+
+   The approach is to parse a dummy value through the property's transform
+   and extract the CSS function wrapper. For monomorphic properties, this will give us
+   something like CSS.color(`inherit), from which we can extract CSS.color. */
+let get_css_function_for_property = (~loc, property_name, var_expr) => {
+  switch (findProperty(property_name)) {
+  | Some((_, (_, string_to_expr))) =>
+    /* Try to parse "inherit" which is valid for all CSS properties */
+    switch (string_to_expr(~loc, "inherit")) {
+    | Ok([expr]) =>
+      /* Extract the CSS function from the generated expression.
+         For monomorphic properties, expr will be something like CSS.color(`inherit).
+         We want to replace `inherit with our var_expr. */
+      switch (expr.pexp_desc) {
+      | Pexp_apply(css_function, [(label, _value)]) =>
+        /* Reconstruct the application with our variable */
+        Builder.pexp_apply(~loc, css_function, [(label, var_expr)])
+      | _ =>
+        /* For polymorphic properties or unexpected structures,
+           fall back to using the property name to generate the function */
+        let css_function = property_name_to_renderer(~loc, property_name);
+        Builder.pexp_apply(~loc, css_function, [(Nolabel, var_expr)]);
+      }
+    | Ok(_multiple_exprs) =>
+      /* Some properties generate multiple expressions.
+         Fall back to using the property name. */
+      let css_function = property_name_to_renderer(~loc, property_name);
+      Builder.pexp_apply(~loc, css_function, [(Nolabel, var_expr)]);
+    | Error(_) =>
+      /* If we can't parse "inherit", fall back to the property name approach */
+      let css_function = property_name_to_renderer(~loc, property_name);
+      Builder.pexp_apply(~loc, css_function, [(Nolabel, var_expr)]);
+    }
+  | None =>
+    /* Property not found in our definitions, use CSS.unsafe */
+    let property_camel = to_camel_case(property_name);
+    [%expr
+     CSS.unsafe([%e render_string(~loc, property_camel)], [%e var_expr])
+    ];
   };
 };
 

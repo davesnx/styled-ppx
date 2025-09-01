@@ -1,3 +1,5 @@
+let woo = [%cx2 "display: flex;"];
+
 let css = main => [%cx2
   {|
   color: $(main);
@@ -6,4 +8,4 @@ let css = main => [%cx2
 |}
 ];
 
-<div className={css(CSS.red)} />;
+<div style={css(CSS.red)} />;

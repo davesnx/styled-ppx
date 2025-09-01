@@ -2,6 +2,11 @@ type rule =
   | Declaration of string * string
   | Selector of string array * rule array
 
+let get_value_from_rule rule =
+  match rule with
+  | Declaration (_, value) -> value
+  | Selector (_, _) -> assert false
+
 let declaration (property, value) = Declaration (property, value)
 let selector selector rules = Selector ([| selector |], rules)
 let selectorMany selector_list rules = Selector (selector_list, rules)

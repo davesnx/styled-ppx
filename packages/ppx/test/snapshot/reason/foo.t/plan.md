@@ -31,6 +31,8 @@ let css = main =>
 let x = css(CSS.red);
 <div className={x.className} styles={{ "--amazing": value }} />;
 
+<div style={x} />;
+
 <!-- TODOS -->
 - ppx to generate a css file
 - ppx to split static properties and dynamic properties
@@ -115,9 +117,12 @@ let cx = [%cx "height: 100%"]
 - [ ] Generate atomic css
 - [ ] Remove emotion
   - [ ] Remove the "bridge" from css to bs-emotion and move it to inline-styles
-  - [ ]
 - [ ] Support "label"
-- [ ] Remove array API? and css extension?
+  CSS.style([||])
+- [ ] Hack something for array API?
+- [ ] WTF do we do with css extension?
+  - [ ]
+<!-- ([%css "color: blue"]: string) -->
 
 ## Similar implementations
 

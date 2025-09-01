@@ -1,15 +1,20 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  let css = main =>
-    (CSS.make(
-       "css-ljjfp7",
-       [
-         ("--main", main),
-         ("--css-black", CSS.black),
-       ],
-     ).className: string);
-  <div className={css(CSS.red)} />;
+  let woo: string = CSS.make("css-17vxl0k", []).className;
+  let css = (main): string =>
+    CSS.make(
+      "css-ljjfp7",
+      [
+        ("--main", CSS.get_value_from_rule(CSS.color(main))),
+        (
+          "--css-black",
+          CSS.get_value_from_rule(CSS.backgroundColor(CSS.black)),
+        ),
+      ],
+    ).
+      className;
+  <div style={css(CSS.red)} />;
 
 Show the generated CSS file:
   $ cat styled-ppx-css/styles.css
