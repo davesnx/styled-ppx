@@ -40,12 +40,20 @@ let debug = {
   defaultValue: false,
 };
 
+let output = {
+  flag: "--output",
+  doc: "REQUIRED: Specify the directory where CSS files should be generated (e.g., --output=./styles)",
+  value: None,
+  defaultValue: "",
+};
+
 type settings = {
   jsxVersion: flag(int),
   jsxMode: flag(string),
   production: flag(bool),
   native: flag(bool),
   debug: flag(bool),
+  output: flag(string),
 };
 
 let settings = {
@@ -54,6 +62,7 @@ let settings = {
   production,
   native,
   debug,
+  output,
 };
 
 let currentSettings = ref(settings);
@@ -75,6 +84,7 @@ module Get = {
   let debug = () =>
     currentSettings.contents.debug.value
     |> Option.value(~default=currentSettings.contents.debug.defaultValue);
+  let output = () => currentSettings.contents.output.value;
 };
 
 module Update = {
@@ -115,6 +125,14 @@ module Update = {
       ...currentSettings.contents,
       debug: {
         ...currentSettings.contents.debug,
+        value: Some(value),
+      },
+    });
+  let output = value =>
+    updateSettings({
+      ...currentSettings.contents,
+      output: {
+        ...currentSettings.contents.output,
         value: Some(value),
       },
     });

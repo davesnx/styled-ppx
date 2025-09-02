@@ -892,18 +892,25 @@ let traverser = {
   }
 };
 
-let _ =
+let () =
   Ppxlib.Driver.add_arg(
     Settings.native.flag,
     Arg.Unit(_ => Settings.Update.native(true)),
     ~doc=Settings.native.doc,
   );
 
-let _ =
+let () =
   Ppxlib.Driver.add_arg(
     Settings.debug.flag,
     Arg.Unit(_ => Settings.Update.debug(true)),
     ~doc=Settings.debug.doc,
+  );
+
+let () =
+  Ppxlib.Driver.add_arg(
+    Settings.output.flag,
+    Arg.String(path => Settings.Update.output(path)),
+    ~doc=Settings.output.doc,
   );
 
 let (version, mode) = Bsconfig.getJSX();
@@ -924,7 +931,7 @@ let _ =
   Ppxlib.Driver.register_transformation(
     /* Instrument is needed to run styled-ppx after metaquote, we rely on this order in native tests */
     ~instrument=
-      Ppxlib.Driver.Instrument.make(~position=Before, traverser#structure),
+      Ppxlib.Driver.Instrument.make(~position=After, traverser#structure),
     ~rules=[
       /* %cx without let binding, it doesn't have CSS.label %cx is defined in traverser#structure */
       Ppxlib.Context_free.Rule.extension(
