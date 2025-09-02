@@ -931,7 +931,7 @@ let _ =
   Ppxlib.Driver.register_transformation(
     /* Instrument is needed to run styled-ppx after metaquote, we rely on this order in native tests */
     ~instrument=
-      Ppxlib.Driver.Instrument.make(~position=After, traverser#structure),
+      Ppxlib.Driver.Instrument.make(~position=Before, traverser#structure),
     ~rules=[
       /* %cx without let binding, it doesn't have CSS.label %cx is defined in traverser#structure */
       Ppxlib.Context_free.Rule.extension(

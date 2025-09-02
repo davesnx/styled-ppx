@@ -1,8 +1,8 @@
 (melange.emit
  (alias demo-melange)
  (target demo-melange)
- (libraries lib_js styled-ppx.melange reason-react)
+ (libraries universal_lib_js styled-ppx.melange reason-react)
  (preprocess
-  (pps melange.ppx styled-ppx --output=./styled-ppx-css reason-react-ppx))
+  (pps melange.ppx reason-react-ppx styled-ppx --output=./generated))
  (module_systems
   (commonjs bs.js)))

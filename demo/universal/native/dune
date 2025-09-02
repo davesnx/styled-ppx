@@ -1,5 +1,5 @@
 (library
- (name lib_native)
+ (name universal_lib_native)
  (wrapped false)
  (libraries
   styled-ppx.native
@@ -8,7 +8,7 @@
   server-reason-react.belt
   server-reason-react.reactDom)
  (preprocess
-  (pps styled-ppx --native server-reason-react.ppx)))
+  (pps styled-ppx --native --output=generated server-reason-react.ppx)))
 
 (copy_files
  (only_sources)

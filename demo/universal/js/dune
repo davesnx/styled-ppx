@@ -1,10 +1,10 @@
 (library
- (name lib_js)
+ (name universal_lib_js)
  (wrapped false)
  (modes melange)
  (libraries melange.belt styled-ppx.melange reason-react)
  (preprocess
-  (pps melange.ppx styled-ppx --output=./styled-ppx-css reason-react-ppx)))
+  (pps melange.ppx styled-ppx --output=./generated reason-react-ppx)))
 
 (copy_files
  (only_sources)

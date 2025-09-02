@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "bundle": "webpack",
+    "webpack": "webpack",
+    "webpack-watch": "webpack --watch",
     "serve": "webpack serve --open"
   },
   "dependencies": {

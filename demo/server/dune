@@ -6,7 +6,9 @@
   server-reason-react.belt
   server-reason-react.react
   server-reason-react.reactDom
-  styled-ppx.native)
+  styled-ppx.native
+  ; User deps
+  universal_lib_native)
  (preprocess
   (pps
    styled-ppx

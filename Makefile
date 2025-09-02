@@ -147,13 +147,17 @@ demo-server: ## Run the server demo
 demo-server-watch: ## Run (and watch) the server demo
 	$(DUNE) exec demo-server --watch
 
-.PHONY: demo-melange
-demo-melange: ## Run the melange server demo
-	$(DUNE) exec demo-melange
+.PHONY: demo-melange-build
+demo-melange-build: ## Build the melange demo
+	$(DUNE) build demo/melange
 
-.PHONY: demo-melange-watch
-demo-melange-watch: ## Run (and watch) the melange server demo
-	$(DUNE) exec demo-melange --watch
+.PHONY: demo-melange-build-watch
+demo-melange-build-watch: ## Build the melange demo
+	$(DUNE) build demo/melange --watch
+
+.PHONY: demo-melange-serve
+demo-melange-serve: ## Serve the melange demo
+	npm --prefix 'demo/melange' run serve
 
 # Debug commands
 
