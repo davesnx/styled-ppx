@@ -1,0 +1,14 @@
+(executable
+ (name server)
+ (public_name demo-server)
+ (libraries
+  server-reason-react.js
+  server-reason-react.belt
+  server-reason-react.react
+  server-reason-react.reactDom
+  styled-ppx.native)
+ (preprocess
+  (pps
+   styled-ppx
+   --output=%{project_root}/_build/default/demo/server/generated
+   server-reason-react.ppx)))

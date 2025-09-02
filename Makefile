@@ -135,17 +135,25 @@ test-demo: build test-demo-rescript-v9 test-demo-rescript-v10 ## Run demo tests
 # Demo
 
 .PHONY: demo-demo-rescript-v10
-demo-demo-rescript-v10: build ## Run the ReScript v10 demo with JSX4
+demo-rescript-v10: build ## Run the ReScript v10 demo with JSX4
 	npm --prefix 'demo/rescript-v10-JSX4' install
 	npm --prefix 'demo/rescript-v10-JSX4' run start
 
-.PHONY: demo-demo-melange-server
-demo-demo-melange-server: ## Run the melange server demo
-	$(DUNE) exec demo-melange-server
+.PHONY: demo-server
+demo-server: ## Run the server demo
+	$(DUNE) exec demo-server
 
-.PHONY: demo-demo-melange-server-watch
-demo-demo-melange-server-watch: ## Run (and watch) the melange server demo
-	$(DUNE) exec demo-melange-server --watch
+.PHONY: demo-server-watch
+demo-server-watch: ## Run (and watch) the server demo
+	$(DUNE) exec demo-server --watch
+
+.PHONY: demo-melange
+demo-melange: ## Run the melange server demo
+	$(DUNE) exec demo-melange
+
+.PHONY: demo-melange-watch
+demo-melange-watch: ## Run (and watch) the melange server demo
+	$(DUNE) exec demo-melange --watch
 
 # Debug commands
 

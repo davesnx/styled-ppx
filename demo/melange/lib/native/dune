@@ -8,7 +8,12 @@
   server-reason-react.belt
   server-reason-react.reactDom)
  (preprocess
-  (pps styled-ppx --native server-reason-react.ppx)))
+  (pps
+   styled-ppx
+   --native
+   --output=./styled-ppx-css
+   --
+   server-reason-react.ppx)))
 
 (copy_files
  (only_sources)

@@ -2,7 +2,7 @@
 
 (subdir
  demo
- (dirs melange))
+ (dirs melange server))
 
 (subdir
  packages
