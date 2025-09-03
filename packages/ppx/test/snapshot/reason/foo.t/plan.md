@@ -84,45 +84,44 @@ let cx = [%cx "height: 100%"]
 
 - [x] Understand what it means 0 runtime cost with dynamic styling compiledcssinjs.com https://github.com/callstack/linaria
 - [ ] Read a few resources about it
-	- [x] https://shud.in/posts/ssr-streaming-and-css-in-js
-	- [x] https://github.com/andreipfeiffer/css-in-js
-	- https://medium.com/@tkh44/writing-a-css-in-js-library-from-scratch-96cd23a017b4
-	- https://scrimba.com/g/gcssvariables
-	- https://github.com/threepointone/glam/tree/e9bca3950f12503246ed7fccad5cf13e5e9c86e3
-	- https://www.youtube.com/watch?v=Gw28VgyKGkw&ab_channel=LeeRobinson
-	- https://github.com/tw-in-js/twind
-	- https://joshwcomeau.com/css/css-variables-for-react-devs/
-	- https://www.lekoarts.de/javascript/writing-performant-css-with-vanilla-extract
-	- Rethinking CSS - Introducing Stylex https://youtu.be/ur-sGzUWId4
-	- The problem with importing css https://www.coolcomputerclub.com/posts/importing-css
-	- Take a look at ppx_css from janestreet https://github.com/janestreet/ppx_css/blob/master/inline_css/src/inline_css.ml
-	- React 18's discussion https://github.com/reactwg/react-18/discussions/110
+  - [x] https://shud.in/posts/ssr-streaming-and-css-in-js
+  - [x] https://github.com/andreipfeiffer/css-in-js
+  - https://medium.com/@tkh44/writing-a-css-in-js-library-from-scratch-96cd23a017b4
+  - https://scrimba.com/g/gcssvariables
+  - Stitches CSS-in-JS Demo https://www.youtube.com/watch?v=Gw28VgyKGkw
+  - https://joshwcomeau.com/css/css-variables-for-react-devs/
+  - https://www.lekoarts.de/javascript/writing-performant-css-with-vanilla-extract
+  - [x] Rethinking CSS - Introducing Stylex https://youtu.be/ur-sGzUWId4
+  - [x] The problem with importing css https://www.coolcomputerclub.com/posts/importing-css
+  - [x] Take a look at ppx_css from janestreet https://github.com/janestreet/ppx_css/blob/master/inline_css/src/inline_css.ml
+  - React 18's discussion https://github.com/reactwg/react-18/discussions/110
 - [x] Create the logic at runtime first (styled-ppx.emotion-native)
-- [ ] Implement a CSS printer for static styles
-    - Can we reuse runtime/native/CSS module to print it
-- [ ] Generate static files from the output of the runtime/native/CSS
-    - Generate css files similarly to https://github.com/hyper-systems/rescript-sx
-    - Create a cache for it (don’t re-generate files that don’t change)
-    - Avoid the hashing in testing (or add labels)
-- [ ] Dynamic styling
-    - Parser should support CSS variables
-    - Render to styles should render to inline styles as well (native-react + to_string)
-- [ ] Support dynamic values. (Transform to CSS variables and inject static CSS)
-    - What should we do on interpolation in selectors and mediaqueries?
-- [ ] Create a CSS minifier pretty printer
-	    - https://github.com/janestreet/ppx_css/blob/master/css_jane/src/css_jane.ml
-	    - https://github.com/astrada/ocaml-css-parser/blob/master/test/css_fmt_printer.ml
-	    - https://git.chimrod.com/css_lib.git/tree/lib/print.ml
+- [x] Implement a CSS printer for static styles
+  - Can we reuse runtime/native/CSS module to print it
+- [x] Generate static files from the output of the runtime/native/CSS
+  - [x] Generate css files similarly to https://github.com/hyper-systems/rescript-sx
+  - [x] Create a cache for it (don’t re-generate files that don’t change)
+- [x] Dynamic styling
+  - [x] Parser should support CSS variables
+  - [x] Render to styles should render to inline styles as well (native-react + to_string)
+- [x] Support dynamic values. (Transform to CSS variables and inject static CSS)
+  - What should we do on interpolation in selectors and mediaqueries?
 - [x] Implement a vendor-prefixer for unsupported properties https://github.com/kripod/style-vendorizer (styled-ppx.emotion-native)
-- [ ] Generate atomic css
+- [ ] styles prop should expand to `className + style={ReactDOM.Style.make() |> ...}`
 - [ ] Remove emotion
   - [ ] Remove the "bridge" from css to bs-emotion and move it to inline-styles
-- [ ] Support "label"
-  CSS.style([||])
+- [ ] Support "label" or avoid the hashing in development?
+- [ ] WTF do we do with css extension? Maybe rename cx2 to css and deprecate original css?
+- [ ] Implement CSS.merge
+- [ ] Implement styled.xxx
+- [ ] Generate atomic css
 - [ ] Hack something for array API?
-- [ ] WTF do we do with css extension?
-  - [ ]
-<!-- ([%css "color: blue"]: string) -->
+- [ ] CSS.unsafe?
+- [ ] WTF do we do with CSS.style API?
+- [ ] Create a CSS minifier pretty printer
+  - https://github.com/janestreet/ppx_css/blob/master/css_jane/src/css_jane.ml
+  - https://github.com/astrada/ocaml-css-parser/blob/master/test/css_fmt_printer.ml
+  - https://git.chimrod.com/css_lib.git/tree/lib/print.ml
 
 ## Similar implementations
 
