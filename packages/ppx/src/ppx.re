@@ -867,7 +867,14 @@ let traverser = {
                     Builder.Located.lident(~loc, "className"),
                   ),
                 ),
-                (Ppxlib.Optional("style"), [%expr ReactDOM.Style.make()]),
+                (
+                  Ppxlib.Optional("style"),
+                  Builder.pexp_field(
+                    ~loc,
+                    arg,
+                    Builder.Located.lident(~loc, "style"),
+                  ),
+                ),
               ];
             | _ =>
               /* Keep other props as-is, but apply transformation recursively */

@@ -1,4 +1,4 @@
-let classname = [%cx2
+let _classname = [%cx2
   {|
     display: flex;
     flex-direction: column;

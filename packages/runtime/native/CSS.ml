@@ -455,14 +455,16 @@ let style (styles : rule array) =
 
 type styles = {
   className : string;
-  dynamic : (string * string) list;
+  style : ReactDOM.Style.t;
 }
 
-let make className vars = { className; dynamic = vars }
-
-(* Helper functions for JSX transformation *)
-let get_className = function { className; _ } -> className
-let get_dynamic = function { dynamic; _ } -> dynamic
+let make className (vars : (string * string) list) =
+  let style =
+    List.fold_left
+      (fun style (key, value) -> ReactDOM.Style.unsafeAddProp style key value)
+      (ReactDOM.Style.make ()) vars
+  in
+  { className; style }
 
 (* Convert dynamic list to JavaScript object for style prop *)
 let dynamic_to_object dynamic_list =

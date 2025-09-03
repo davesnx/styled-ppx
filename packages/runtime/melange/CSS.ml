@@ -9,16 +9,13 @@ module Types = Css_types
 
 type styles = {
   className : string;
-  dynamic : (string * string) list;
+  style : ReactDOM.Style.t;
 }
 
-let make className dynamic = { className; dynamic }
-
-(* Helper functions for JSX transformation *)
-let get_className styles = styles.className
-let get_dynamic styles = styles.dynamic
-
-(* Convert dynamic list to JavaScript object for style prop *)
-let dynamic_to_object dynamic_list =
-  (* For now, just return the list - proper implementation would convert to JS object *)
-  dynamic_list
+let make className (vars : (string * string) list) =
+  let style =
+    List.fold_left
+      (fun style (key, value) -> ReactDOM.Style.unsafeAddProp style key value)
+      (ReactDOM.Style.make ()) vars
+  in
+  { className; style }
