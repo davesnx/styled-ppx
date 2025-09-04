@@ -126,6 +126,7 @@ module Css_transform = {
 
 module Mapper = {
   open Ppxlib;
+
   let match = module_expr => {
     open Ast_pattern;
 
@@ -698,9 +699,8 @@ module Mapper = {
 };
 
 /* Helper to detect if a name is an HTML element */
-let is_html_element = name => {
-  /* List of common HTML elements - you can expand this list */
-  let html_elements = [
+let is_html_tag = name => {
+  let tags = [
     "a",
     "abbr",
     "address",
@@ -816,17 +816,16 @@ let is_html_element = name => {
     "video",
     "wbr",
   ];
-  List.mem(name, html_elements);
+  List.mem(name, tags);
 };
 
-/* Helper to detect if an expression is a JSX element */
 let is_jsx = expr => {
   switch (expr.Ppxlib.pexp_desc) {
   | Pexp_apply(tag, _args) =>
     switch (tag.pexp_desc) {
     | Pexp_ident({txt: Lident(name), _}) =>
       /* Check if it's an HTML element or starts with uppercase (React component) */
-      is_html_element(name)
+      is_html_tag(name)
       || String.length(name) > 0
       && Char.uppercase_ascii(name.[0]) == name.[0]
     | _ => false
@@ -934,305 +933,310 @@ let any_payload_pattern = Ppxlib.Ast_pattern.(single_expr_payload(__));
 let any_module_payload_pattern =
   Ppxlib.Ast_pattern.(pstr(pstr_eval(__, nil) ^:: nil));
 
-let _ =
-  Ppxlib.Driver.register_transformation(
-    /* Instrument is needed to run styled-ppx after metaquote, we rely on this order in native tests */
-    ~instrument=
-      Ppxlib.Driver.Instrument.make(~position=Before, traverser#structure),
-    ~rules=[
-      /* %cx without let binding, it doesn't have CSS.label %cx is defined in traverser#structure */
-      Ppxlib.Context_free.Rule.extension(
-        Ppxlib.Extension.declare(
-          "cx",
-          Ppxlib.Extension.Context.Expression,
-          any_payload_pattern,
-          (~loc as _, ~path, payload) => {
-            File.set(path);
-            switch (payload.pexp_desc) {
-            | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
-              let loc =
-                Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-                  stringLoc,
-                  delimiter,
-                );
+let cx_extension_without_let_binding =
+  /* %cx under a let binding is defined in traverser#structure. The difference is that it doesn't have CSS.label */
+  Ppxlib.Context_free.Rule.extension(
+    Ppxlib.Extension.declare(
+      "cx",
+      Ppxlib.Extension.Context.Expression,
+      any_payload_pattern,
+      (~loc as _, ~path, payload) => {
+        File.set(path);
+        switch (payload.pexp_desc) {
+        | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
+          let loc =
+            Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
+              stringLoc,
+              delimiter,
+            );
 
-              switch (
-                Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, txt)
-              ) {
-              | Ok(declarations) =>
-                declarations
-                |> Css_to_runtime.render_declarations(~loc)
-                |> Builder.pexp_array(~loc)
-                |> Css_to_runtime.render_style_call(~loc)
-              | Error((loc, msg)) => Error.expr(~loc, msg)
-              };
-            | Pexp_array(arr) =>
-              /* Valid: [%cx [|...|]] */
-              arr
-              |> Builder.pexp_array(~loc=payload.pexp_loc)
-              |> Css_to_runtime.render_style_call(~loc=payload.pexp_loc)
-            | _ =>
-              let examples =
-                switch (File.get()) {
-                | Some(Reason) =>
-                  Some([
-                    "[%cx \"display: block; color: red\"]",
-                    "[%cx [|CSS.display(`block), CSS.color(CSS.red)|]]",
-                  ])
-                | Some(ReScript) =>
-                  Some([
-                    "[%cx \"display: block; color: red\"]",
-                    "[%cx [CSS.display(#block), CSS.color(#red)]]",
-                  ])
-                | Some(OCaml) =>
-                  Some([
-                    "[%cx \"display: block; color: red\"]",
-                    "[%cx [|CSS.display `block, CSS.color CSS.red |]]",
-                  ])
-                | None => None
-                };
-              Error.raise(
-                ~loc=payload.pexp_loc,
-                ~examples?,
-                ~link="https://styled-ppx.vercel.app/reference/cx",
-                "[%cx] expects either a string of CSS or an array of CSS rules.",
-              );
+          switch (
+            Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, txt)
+          ) {
+          | Ok(declarations) =>
+            declarations
+            |> Css_to_runtime.render_declarations(~loc)
+            |> Builder.pexp_array(~loc)
+            |> Css_to_runtime.render_style_call(~loc)
+          | Error((loc, msg)) => Error.expr(~loc, msg)
+          };
+        | Pexp_array(arr) =>
+          /* Valid: [%cx [|...|]] */
+          arr
+          |> Builder.pexp_array(~loc=payload.pexp_loc)
+          |> Css_to_runtime.render_style_call(~loc=payload.pexp_loc)
+        | _ =>
+          let examples =
+            switch (File.get()) {
+            | Some(Reason) =>
+              Some([
+                "[%cx \"display: block; color: red\"]",
+                "[%cx [|CSS.display(`block), CSS.color(CSS.red)|]]",
+              ])
+            | Some(ReScript) =>
+              Some([
+                "[%cx \"display: block; color: red\"]",
+                "[%cx [CSS.display(#block), CSS.color(#red)]]",
+              ])
+            | Some(OCaml) =>
+              Some([
+                "[%cx \"display: block; color: red\"]",
+                "[%cx [|CSS.display `block, CSS.color CSS.red |]]",
+              ])
+            | None => None
             };
-          },
-        ),
-      ),
-      /* cx2 extension */
-      Ppxlib.Context_free.Rule.extension(
-        Ppxlib.Extension.declare(
-          "cx2",
-          Ppxlib.Extension.Context.Expression,
-          any_payload_pattern,
-          (~loc as _, ~path, payload) => {
-            File.set(path);
-            switch (payload.pexp_desc) {
-            | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
-              let loc =
-                Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-                  stringLoc,
-                  delimiter,
-                );
-
-              switch (
-                Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, txt)
-              ) {
-              | Ok(declarations) =>
-                /* Transform CSS and extract dynamic variables */
-                let (transformed_declarations, dynamic_vars) =
-                  Css_transform.transform_rule_list(declarations);
-
-                /* Generate class name based on original styles */
-                let className = {
-                  let hash = Murmur2.default(txt);
-                  Printf.sprintf("css-%s", hash);
-                };
-
-                /* Render transformed CSS to string and add to CSS file */
-                let css_string =
-                  Styled_ppx_css_parser.Render.rule_list(
-                    transformed_declarations,
-                  );
-
-                /* Debug: Log the transformed CSS */
-                if (Settings.Get.debug()) {
-                  Printf.printf(
-                    "[styled-ppx] cx2 Transformed CSS: %s\n",
-                    css_string,
-                  );
-                  Printf.printf(
-                    "[styled-ppx] cx2 Dynamic vars: %d\n",
-                    List.length(dynamic_vars),
-                  );
-                  List.iter(
-                    ((var_name, original, property)) =>
-                      Printf.printf(
-                        "[styled-ppx] cx2   --%s => %s (property: %s)\n",
-                        var_name,
-                        original,
-                        property,
-                      ),
-                    dynamic_vars,
-                  );
-                };
-
-                let css_content =
-                  Settings.Get.debug()
-                    ? Printf.sprintf(
-                        "  /* Generated from [%%cx2] in %s at line %d */\n%s",
-                        loc.loc_start.pos_fname,
-                        loc.loc_start.pos_lnum,
-                        css_string,
-                      )
-                    : css_string;
-                Css_gen.add_css(~className, ~css=css_content);
-                Css_to_runtime.render_make_call(
-                  ~loc,
-                  ~className,
-                  ~dynamic_vars,
-                );
-              | Error((loc, msg)) => Error.expr(~loc, msg)
-              };
-            | Pexp_array(arr) =>
-              /* Valid: [%cx2 [|...|]] */
-              arr
-              |> Builder.pexp_array(~loc=payload.pexp_loc)
-              |> Css_to_runtime.render_style_call(~loc=payload.pexp_loc)
-            | _ =>
-              let examples =
-                switch (File.get()) {
-                | Some(Reason) =>
-                  Some([
-                    "[%cx2 \"display: block; color: red\"]",
-                    "[%cx2 [|CSS.display(`block), CSS.color(CSS.red)|]]",
-                  ])
-                | Some(ReScript) =>
-                  Some([
-                    "[%cx2 \"display: block; color: red\"]",
-                    "[%cx2 [CSS.display(#block), CSS.color(#red)]]",
-                  ])
-                | Some(OCaml) =>
-                  Some([
-                    "[%cx2 \"display: block; color: red\"]",
-                    "[%cx2 [|CSS.display `block, CSS.color CSS.red |]]",
-                  ])
-                | None => None
-                };
-              Error.raise(
-                ~loc=payload.pexp_loc,
-                ~examples?,
-                ~link="https://styled-ppx.vercel.app/reference/cx",
-                "[%cx2] expects either a string of CSS or an array of CSS rules.",
-              );
-            };
-          },
-        ),
-      ),
-      Ppxlib.Context_free.Rule.extension(
-        Ppxlib.Extension.declare(
-          "css",
-          Ppxlib.Extension.Context.Expression,
-          any_payload_pattern,
-          (~loc as _, ~path, payload) => {
-            File.set(path);
-            switch (payload.pexp_desc) {
-            | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
-              let loc =
-                Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-                  stringLoc,
-                  delimiter,
-                );
-              switch (
-                Styled_ppx_css_parser.Driver.parse_declaration(~loc, txt)
-              ) {
-              | Ok(declarations) =>
-                let declarationListValues =
-                  Css_to_runtime.render_declaration(~loc, declarations);
-                List.nth(declarationListValues, 0);
-              | Error((loc, msg)) => Error.expr(~loc, msg)
-              };
-            /* TODO: Instead of getting the first element,
-                 fail when there's more than one declaration or
-               make a mechanism to flatten all the properties */
-            | _ =>
-              Error.expr(
-                ~loc=payload.pexp_loc,
-                ~examples=[
-                  "[%css \"color: red\"]",
-                  "[%css \"display: block\"]",
-                ],
-                ~link="https://styled-ppx.vercel.app/reference/css",
-                "[%css] expects a string of CSS with a single rule (a property-value pair).",
-              )
-            };
-          },
-        ),
-      ),
-      Ppxlib.Context_free.Rule.extension(
-        Ppxlib.Extension.declare(
-          "styled.global",
-          Ppxlib.Extension.Context.Expression,
-          any_payload_pattern,
-          (~loc as _, ~path, payload) => {
-            File.set(path);
-            switch (payload.pexp_desc) {
-            | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
-              let loc =
-                Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-                  stringLoc,
-                  delimiter,
-                );
-              switch (
-                Styled_ppx_css_parser.Driver.parse_stylesheet(~loc, txt)
-              ) {
-              | Ok(stylesheets) =>
-                Css_to_runtime.render_global(~loc, stylesheets)
-              | Error((loc, msg)) => Error.expr(~loc, msg)
-              };
-            | _ =>
-              Error.expr(
-                ~loc=payload.pexp_loc,
-                ~examples=[
-                  "[%styled.global \"body { margin: 0; } .container { padding: 20px; }\"]",
-                ],
-                ~link="https://styled-ppx.vercel.app/reference/global",
-                "[%styled.global] expects a string of CSS with selectors that apply to the whole document.",
-              )
-            };
-          },
-        ),
-      ),
-      Ppxlib.Context_free.Rule.extension(
-        Ppxlib.Extension.declare(
-          "keyframe",
-          Ppxlib.Extension.Context.Expression,
-          any_payload_pattern,
-          (~loc as _, ~path, payload) => {
-            File.set(path);
-            switch (payload.pexp_desc) {
-            | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
-              let loc =
-                Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-                  stringLoc,
-                  delimiter,
-                );
-              switch (Styled_ppx_css_parser.Driver.parse_keyframes(~loc, txt)) {
-              | Ok(declarations) =>
-                Css_to_runtime.render_keyframes(~loc, declarations)
-              | Error((loc, msg)) => Error.expr(~loc, msg)
-              };
-            | _ =>
-              Error.raise(
-                ~loc=payload.pexp_loc,
-                ~examples=[
-                  "[%keyframe \"0% { opacity: 0; } 100% { opacity: 1; }\"]",
-                ],
-                ~link="https://styled-ppx.vercel.app/reference/keyframe",
-                "[%keyframe] expects a string of CSS with keyframe definitions.",
-              )
-            };
-          },
-        ),
-      ),
-      /* This extension just raises an error to educate, since before 0.20 this was valid */
-      Ppxlib.Context_free.Rule.extension(
-        Ppxlib.Extension.declare(
-          "styled",
-          Ppxlib.Extension.Context.Module_expr,
-          any_module_payload_pattern,
-          (~loc, ~path as _, _payload) => {
           Error.raise(
-            ~loc,
-            ~examples=["[%styled.div \"color: red\"]"],
-            ~link=
-              "https://developer.mozilla.org/en-US/docs/Learn/Accessibility/HTML",
-            "An styled component without a tag is not valid. You must define an HTML tag, like, `styled.div`",
+            ~loc=payload.pexp_loc,
+            ~examples?,
+            ~link="https://styled-ppx.vercel.app/reference/cx",
+            "[%cx] expects either a string of CSS or an array of CSS rules.",
+          );
+        };
+      },
+    ),
+  );
+
+let cx2_extension =
+  Ppxlib.Context_free.Rule.extension(
+    Ppxlib.Extension.declare(
+      "cx2",
+      Ppxlib.Extension.Context.Expression,
+      any_payload_pattern,
+      (~loc as _, ~path, payload) => {
+        File.set(path);
+        switch (payload.pexp_desc) {
+        | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
+          let loc =
+            Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
+              stringLoc,
+              delimiter,
+            );
+
+          switch (
+            Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, txt)
+          ) {
+          | Ok(declarations) =>
+            /* Transform CSS and extract dynamic variables */
+            let (transformed_declarations, dynamic_vars) =
+              Css_transform.transform_rule_list(declarations);
+
+            /* Generate class name based on original styles */
+            let className = {
+              let hash = Murmur2.default(txt);
+              Printf.sprintf("css-%s", hash);
+            };
+
+            /* Render transformed CSS to string and add to CSS file */
+            let css_string =
+              Styled_ppx_css_parser.Render.rule_list(
+                transformed_declarations,
+              );
+
+            /* Debug: Log the transformed CSS */
+            if (Settings.Get.debug()) {
+              Printf.printf(
+                "[styled-ppx] cx2 Transformed CSS: %s\n",
+                css_string,
+              );
+              Printf.printf(
+                "[styled-ppx] cx2 Dynamic vars: %d\n",
+                List.length(dynamic_vars),
+              );
+              List.iter(
+                ((var_name, original, property)) =>
+                  Printf.printf(
+                    "[styled-ppx] cx2   --%s => %s (property: %s)\n",
+                    var_name,
+                    original,
+                    property,
+                  ),
+                dynamic_vars,
+              );
+            };
+
+            let css_content =
+              Settings.Get.debug()
+                ? Printf.sprintf(
+                    "  /* Generated from [%%cx2] in %s at line %d */\n%s",
+                    loc.loc_start.pos_fname,
+                    loc.loc_start.pos_lnum,
+                    css_string,
+                  )
+                : css_string;
+            Css_gen.add_css(~className, ~css=css_content);
+            Css_to_runtime.render_make_call(~loc, ~className, ~dynamic_vars);
+          | Error((loc, msg)) => Error.expr(~loc, msg)
+          };
+        | Pexp_array(arr) =>
+          /* Valid: [%cx2 [|...|]] */
+          arr
+          |> Builder.pexp_array(~loc=payload.pexp_loc)
+          |> Css_to_runtime.render_style_call(~loc=payload.pexp_loc)
+        | _ =>
+          let examples =
+            switch (File.get()) {
+            | Some(Reason) =>
+              Some([
+                "[%cx2 \"display: block; color: red\"]",
+                "[%cx2 [|CSS.display(`block), CSS.color(CSS.red)|]]",
+              ])
+            | Some(ReScript) =>
+              Some([
+                "[%cx2 \"display: block; color: red\"]",
+                "[%cx2 [CSS.display(#block), CSS.color(#red)]]",
+              ])
+            | Some(OCaml) =>
+              Some([
+                "[%cx2 \"display: block; color: red\"]",
+                "[%cx2 [|CSS.display `block, CSS.color CSS.red |]]",
+              ])
+            | None => None
+            };
+          Error.raise(
+            ~loc=payload.pexp_loc,
+            ~examples?,
+            ~link="https://styled-ppx.vercel.app/reference/cx",
+            "[%cx2] expects either a string of CSS or an array of CSS rules.",
+          );
+        };
+      },
+    ),
+  );
+
+let keyframe_extension =
+  Ppxlib.Context_free.Rule.extension(
+    Ppxlib.Extension.declare(
+      "keyframe",
+      Ppxlib.Extension.Context.Expression,
+      any_payload_pattern,
+      (~loc as _, ~path, payload) => {
+        File.set(path);
+        switch (payload.pexp_desc) {
+        | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
+          let loc =
+            Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
+              stringLoc,
+              delimiter,
+            );
+          switch (Styled_ppx_css_parser.Driver.parse_keyframes(~loc, txt)) {
+          | Ok(declarations) =>
+            Css_to_runtime.render_keyframes(~loc, declarations)
+          | Error((loc, msg)) => Error.expr(~loc, msg)
+          };
+        | _ =>
+          Error.raise(
+            ~loc=payload.pexp_loc,
+            ~examples=[
+              "[%keyframe \"0% { opacity: 0; } 100% { opacity: 1; }\"]",
+            ],
+            ~link="https://styled-ppx.vercel.app/reference/keyframe",
+            "[%keyframe] expects a string of CSS with keyframe definitions.",
           )
-        }),
-      ),
+        };
+      },
+    ),
+  );
+
+let css_extension =
+  Ppxlib.Context_free.Rule.extension(
+    Ppxlib.Extension.declare(
+      "css",
+      Ppxlib.Extension.Context.Expression,
+      any_payload_pattern,
+      (~loc as _, ~path, payload) => {
+        File.set(path);
+        switch (payload.pexp_desc) {
+        | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
+          let loc =
+            Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
+              stringLoc,
+              delimiter,
+            );
+          switch (Styled_ppx_css_parser.Driver.parse_declaration(~loc, txt)) {
+          | Ok(declarations) =>
+            let declarationListValues =
+              Css_to_runtime.render_declaration(~loc, declarations);
+            List.nth(declarationListValues, 0);
+          | Error((loc, msg)) => Error.expr(~loc, msg)
+          };
+        /* TODO: Instead of getting the first element,
+             fail when there's more than one declaration or
+           make a mechanism to flatten all the properties */
+        | _ =>
+          Error.expr(
+            ~loc=payload.pexp_loc,
+            ~examples=["[%css \"color: red\"]", "[%css \"display: block\"]"],
+            ~link="https://styled-ppx.vercel.app/reference/css",
+            "[%css] expects a string of CSS with a single rule (a property-value pair).",
+          )
+        };
+      },
+    ),
+  );
+
+let styled_global_extension =
+  Ppxlib.Context_free.Rule.extension(
+    Ppxlib.Extension.declare(
+      "styled.global",
+      Ppxlib.Extension.Context.Expression,
+      any_payload_pattern,
+      (~loc as _, ~path, payload) => {
+        File.set(path);
+        switch (payload.pexp_desc) {
+        | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
+          let loc =
+            Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
+              stringLoc,
+              delimiter,
+            );
+          switch (Styled_ppx_css_parser.Driver.parse_stylesheet(~loc, txt)) {
+          | Ok(stylesheets) =>
+            Css_to_runtime.render_global(~loc, stylesheets)
+          | Error((loc, msg)) => Error.expr(~loc, msg)
+          };
+        | _ =>
+          Error.expr(
+            ~loc=payload.pexp_loc,
+            ~examples=[
+              "[%styled.global \"body { margin: 0; } .container { padding: 20px; }\"]",
+            ],
+            ~link="https://styled-ppx.vercel.app/reference/global",
+            "[%styled.global] expects a string of CSS with selectors that apply to the whole document.",
+          )
+        };
+      },
+    ),
+  );
+
+let legacy_styled_extension =
+  /* This extension just raises an error to educate, since before 0.20 this was valid */
+  Ppxlib.Context_free.Rule.extension(
+    Ppxlib.Extension.declare(
+      "styled",
+      Ppxlib.Extension.Context.Module_expr,
+      any_module_payload_pattern,
+      (~loc, ~path as _, _payload) => {
+      Error.raise(
+        ~loc,
+        ~examples=["[%styled.div \"color: red\"]"],
+        ~link=
+          "https://developer.mozilla.org/en-US/docs/Learn/Accessibility/HTML",
+        "An styled component without a tag is not valid. You must define an HTML tag, like, `styled.div`",
+      )
+    }),
+  );
+
+let () =
+  Ppxlib.Driver.V2.register_transformation(
+    ~instrument=
+      Ppxlib.Driver.Instrument.make(~position=After, traverser#structure),
+    ~rules=[
+      cx_extension_without_let_binding,
+      css_extension,
+      styled_global_extension,
+      keyframe_extension,
+      legacy_styled_extension,
+      cx2_extension,
     ],
     "styled-ppx",
   );
