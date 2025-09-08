@@ -4,6 +4,8 @@ let only_one = [%cx2 {|
     color: transparent;
   |}];
 
+let cositas = <div styles=only_one />;
+
 switch (element) {
 | Some(root) =>
   let root = ReactDOM.Client.createRoot(root);

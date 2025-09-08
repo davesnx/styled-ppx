@@ -241,7 +241,7 @@ module Mapper = {
 
   let transform = expr => {
     switch (expr.pstr_desc) {
-    /* module name = [%styled.div {||}] */
+    /* module Name = [%styled.div {||}] */
     | Pstr_module({
         pmb_name: {loc: _, txt: Some(moduleName)} as name,
         pmb_attributes: _pmb_attributes,
@@ -844,6 +844,75 @@ let traverser = {
   };
   pub! expression = expr => {
     let loc = expr.pexp_loc;
+    let attributes = expr.pexp_attributes;
+    /* Transform JSX elements with "styles" prop */
+    switch (expr.pexp_desc) {
+    | Pexp_apply(tag, args) when is_jsx(expr) =>
+      /* Check if there's a "styles" prop */
+      let found_styles = ref(None);
+      let new_args =
+        List.concat_map(
+          ((arg_label, arg)) => {
+            switch (arg_label) {
+            | Ppxlib.Labelled("styles") =>
+              /* Found the styles prop - save it for transformation */
+              found_styles := Some(arg);
+              /* Replace with className and style props */
+              [
+                (
+                  Ppxlib.Labelled("className"),
+                  Builder.pexp_field(
+                    ~loc,
+                    arg,
+                    Builder.Located.lident(~loc, "className"),
+                  ),
+                ),
+                (
+                  Ppxlib.Labelled("style"),
+                  Builder.pexp_field(
+                    ~loc,
+                    arg,
+                    Builder.Located.lident(~loc, "style"),
+                  ),
+                ),
+              ];
+            | _ =>
+              /* Keep other props as-is, but apply transformation recursively */
+              [(arg_label, super#expression(arg))]
+            }
+          },
+          args,
+        );
+
+      switch (found_styles^) {
+      | None =>
+        /* No styles prop found, just recursively transform */
+        {
+          ...super#expression(expr),
+          pexp_attributes: attributes,
+        }
+      | Some(_) =>
+        /* The transformation is already done inline in the new_args */
+        {
+          ...Builder.pexp_apply(~loc, super#expression(tag), new_args),
+          pexp_attributes: attributes,
+        }
+      };
+    | _ =>
+      /* Not a JSX element, recursively transform */
+      {
+        ...super#expression(expr),
+        pexp_attributes: attributes,
+      }
+    };
+  }
+};
+
+let style_prop_traverser = {
+  as _;
+  inherit class Ppxlib.Ast_traverse.map as super;
+  pub! expression = expr => {
+    let loc = expr.pexp_loc;
     /* Transform JSX elements with "styles" prop */
     switch (expr.pexp_desc) {
     | Pexp_apply(tag, args) when is_jsx(expr) =>
@@ -1226,17 +1295,23 @@ let legacy_styled_extension =
     }),
   );
 
-let () =
-  Ppxlib.Driver.V2.register_transformation(
-    ~instrument=
-      Ppxlib.Driver.Instrument.make(~position=After, traverser#structure),
-    ~rules=[
-      cx_extension_without_let_binding,
-      css_extension,
-      styled_global_extension,
-      keyframe_extension,
-      legacy_styled_extension,
-      cx2_extension,
-    ],
-    "styled-ppx",
-  );
+Ppxlib.Driver.V2.register_transformation(
+  ~instrument=
+    Ppxlib.Driver.Instrument.make(~position=Before, traverser#structure),
+  ~rules=[
+    cx_extension_without_let_binding,
+    css_extension,
+    styled_global_extension,
+    keyframe_extension,
+    legacy_styled_extension,
+    cx2_extension,
+  ],
+  "styled-ppx",
+);
+
+/* Ppxlib.Driver.V2.register_transformation(
+     ~preprocess_impl=
+       (_ctx, structure) => style_prop_traverser#structure(structure),
+     "styled-ppx/styles-prop",
+   );
+    */
