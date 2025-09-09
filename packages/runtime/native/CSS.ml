@@ -453,10 +453,7 @@ let style (styles : rule array) =
     Stylesheet.push instance (hash, Classnames { className; styles });
     className
 
-type styles = {
-  className : string;
-  style : ReactDOM.Style.t;
-}
+type styles = string * ReactDOM.Style.t
 
 let make className (vars : (string * string) list) =
   let style =
@@ -464,7 +461,7 @@ let make className (vars : (string * string) list) =
       (fun style (key, value) -> ReactDOM.Style.unsafeAddProp style key value)
       (ReactDOM.Style.make ()) vars
   in
-  { className; style }
+  className, style
 
 (* Convert dynamic list to JavaScript object for style prop *)
 let dynamic_to_object dynamic_list =

@@ -10,7 +10,8 @@ let only_one = [%cx2 {|
  color: transparent;
 |}];
 
-let cositas = <div styles=only_one />;
+print_endline("\n\n");
+print_endline(ReactDOM.renderToStaticMarkup(<div styles=only_one />));
 
 print_endline("\n\n");
 print_endline(ReactDOM.renderToStaticMarkup(<App />));

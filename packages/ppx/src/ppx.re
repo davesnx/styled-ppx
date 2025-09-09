@@ -842,127 +842,34 @@ let traverser = {
     let expr = super#structure_item(expr);
     Mapper.transform(expr);
   };
+  /* This transformation expands a styles prop into className and style. The same transformation lives on server-reason-react due to ppxlib/dune order issues. It's also implemented here in case of not using server-reason-react.ppx and just using reason-react-ppx. */
   pub! expression = expr => {
     let loc = expr.pexp_loc;
     let attributes = expr.pexp_attributes;
-    /* Transform JSX elements with "styles" prop */
     switch (expr.pexp_desc) {
     | Pexp_apply(tag, args) when is_jsx(expr) =>
-      /* Check if there's a "styles" prop */
-      let found_styles = ref(None);
       let new_args =
         List.concat_map(
           ((arg_label, arg)) => {
             switch (arg_label) {
-            | Ppxlib.Labelled("styles") =>
-              /* Found the styles prop - save it for transformation */
-              found_styles := Some(arg);
-              /* Replace with className and style props */
-              [
-                (
-                  Ppxlib.Labelled("className"),
-                  Builder.pexp_field(
-                    ~loc,
-                    arg,
-                    Builder.Located.lident(~loc, "className"),
-                  ),
-                ),
-                (
-                  Ppxlib.Labelled("style"),
-                  Builder.pexp_field(
-                    ~loc,
-                    arg,
-                    Builder.Located.lident(~loc, "style"),
-                  ),
-                ),
-              ];
-            | _ =>
-              /* Keep other props as-is, but apply transformation recursively */
-              [(arg_label, super#expression(arg))]
+            | Ppxlib.Labelled("styles") => [
+                (Ppxlib.Labelled("className"), [%expr fst([%e arg])]),
+                (Ppxlib.Labelled("style"), [%expr snd([%e arg])]),
+              ]
+            | _ => [(arg_label, super#expression(arg))]
             }
           },
           args,
         );
 
-      switch (found_styles^) {
-      | None =>
-        /* No styles prop found, just recursively transform */
-        {
-          ...super#expression(expr),
-          pexp_attributes: attributes,
-        }
-      | Some(_) =>
-        /* The transformation is already done inline in the new_args */
-        {
-          ...Builder.pexp_apply(~loc, super#expression(tag), new_args),
-          pexp_attributes: attributes,
-        }
-      };
-    | _ =>
-      /* Not a JSX element, recursively transform */
       {
+        ...Builder.pexp_apply(~loc, super#expression(tag), new_args),
+        pexp_attributes: attributes,
+      };
+    | _ => {
         ...super#expression(expr),
         pexp_attributes: attributes,
       }
-    };
-  }
-};
-
-let style_prop_traverser = {
-  as _;
-  inherit class Ppxlib.Ast_traverse.map as super;
-  pub! expression = expr => {
-    let loc = expr.pexp_loc;
-    /* Transform JSX elements with "styles" prop */
-    switch (expr.pexp_desc) {
-    | Pexp_apply(tag, args) when is_jsx(expr) =>
-      /* Check if there's a "styles" prop */
-      let found_styles = ref(None);
-      let new_args =
-        List.concat_map(
-          ((arg_label, arg)) => {
-            switch (arg_label) {
-            | Ppxlib.Labelled("styles") =>
-              /* Found the styles prop - save it for transformation */
-              found_styles := Some(arg);
-              /* Replace with className and style props */
-              [
-                (
-                  Ppxlib.Optional("className"),
-                  Builder.pexp_field(
-                    ~loc,
-                    arg,
-                    Builder.Located.lident(~loc, "className"),
-                  ),
-                ),
-                (
-                  Ppxlib.Optional("style"),
-                  Builder.pexp_field(
-                    ~loc,
-                    arg,
-                    Builder.Located.lident(~loc, "style"),
-                  ),
-                ),
-              ];
-            | _ =>
-              /* Keep other props as-is, but apply transformation recursively */
-              [(arg_label, super#expression(arg))]
-            }
-          },
-          args,
-        );
-
-      switch (found_styles^) {
-      | None =>
-        /* No styles prop found, just recursively transform */
-        super#expression(expr)
-      | Some(_) =>
-        /* The transformation is already done inline in the new_args */
-        Builder.pexp_apply(~loc, super#expression(tag), new_args)
-      };
-    | _ =>
-      /* Not a JSX element, recursively transform */
-      super#expression(expr)
     };
   }
 };
@@ -1308,10 +1215,3 @@ Ppxlib.Driver.V2.register_transformation(
   ],
   "styled-ppx",
 );
-
-/* Ppxlib.Driver.V2.register_transformation(
-     ~preprocess_impl=
-       (_ctx, structure) => style_prop_traverser#structure(structure),
-     "styled-ppx/styles-prop",
-   );
-    */

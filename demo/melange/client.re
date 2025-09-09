@@ -1,8 +1,8 @@
 let element = ReactDOM.querySelector("#root");
 
 let only_one = [%cx2 {|
-    color: transparent;
-  |}];
+  color: transparent;
+|}];
 
 let cositas = <div styles=only_one />;
 
