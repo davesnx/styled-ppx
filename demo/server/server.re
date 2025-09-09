@@ -1,4 +1,4 @@
-let _classname = [%cx2
+let classname = [%cx2
   {|
     display: flex;
     flex-direction: column;
@@ -6,14 +6,14 @@ let _classname = [%cx2
   |}
 ];
 
-let only_one = [%cx2 {|
- color: transparent;
-|}];
+print_endline("\n");
+print_endline(
+  ReactDOM.renderToStaticMarkup(
+    <main styles=classname> <div styles=[%cx2 "color: red"] /> </main>,
+  ),
+);
 
-print_endline("\n\n");
-print_endline(ReactDOM.renderToStaticMarkup(<div styles=only_one />));
-
-print_endline("\n\n");
+print_endline("\n");
 print_endline(ReactDOM.renderToStaticMarkup(<App />));
 
 print_endline("\nStyle tag:");
