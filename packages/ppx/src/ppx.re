@@ -176,6 +176,13 @@ module Mapper = {
     };
   };
 
+  let getHtmlTag2 = str => {
+    switch (String.split_on_char('.', str)) {
+    | ["styled2", tag] => Some(tag)
+    | _ => None
+    };
+  };
+
   let getHtmlTagUnsafe = (~loc, str) => {
     switch (getHtmlTag(str)) {
     | Some(tag) => tag
@@ -191,6 +198,10 @@ module Mapper = {
 
   let isStyled = name => {
     name |> getHtmlTag |> Option.is_some;
+  };
+
+  let isStyled2 = name => {
+    name |> getHtmlTag2 |> Option.is_some;
   };
 
   type contents =
@@ -338,6 +349,79 @@ module Mapper = {
           ~loc=moduleLoc,
           ~name,
           ~expr=Generate.staticComponent(~loc=arrayLoc, ~htmlTag, styles),
+        ),
+      );
+    /* module Name = [%styled2.div {||}] */
+    | Pstr_module({
+        pmb_name: {loc: _, txt: Some(_moduleName)} as name,
+        pmb_attributes: _pmb_attributes,
+        pmb_loc: moduleLoc,
+        pmb_expr:
+          {
+            pmod_desc:
+              Pmod_extension((
+                {txt: extensionName, loc: _extensionLoc},
+                PStr([
+                  {
+                    pstr_desc:
+                      Pstr_eval(
+                        {
+                          pexp_loc: _stringLoc,
+                          pexp_desc:
+                            Pexp_constant(
+                              Pconst_string(str, stringLoc, delimiter),
+                            ),
+                          _,
+                        },
+                        _attributes,
+                      ),
+                    pstr_loc: _,
+                  },
+                ]),
+              )),
+            _,
+          },
+      })
+        when isStyled2(extensionName) =>
+      let htmlTag =
+        switch (getHtmlTag2(extensionName)) {
+        | Some(tag) => tag
+        | None => "div"
+        };
+      let loc =
+        Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
+          stringLoc,
+          delimiter,
+        );
+
+      let stylesExpr =
+        switch (
+          Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, str)
+        ) {
+        | Ok(declarations) =>
+          let (transformed_declarations, dynamic_vars) =
+            Css_transform.transform_rule_list(declarations);
+
+          let className = {
+            let hash = Murmur2.default(str);
+            Printf.sprintf("css-%s", hash);
+          };
+
+          let css_string =
+            Styled_ppx_css_parser.Render.rule_list(transformed_declarations);
+
+          let css_content = css_string;
+          Css_gen.add_css(~className, ~css=css_content);
+          Css_to_runtime.render_make_call(~loc, ~className, ~dynamic_vars);
+        | Error((loc, msg)) => Error.expr(~loc, msg)
+        };
+
+      Builder.pstr_module(
+        ~loc=moduleLoc,
+        Builder.module_binding(
+          ~loc=moduleLoc,
+          ~name,
+          ~expr=Generate.staticComponentStyled2(~loc, ~htmlTag, stylesExpr),
         ),
       );
     /* [%styled.div () => {}] */

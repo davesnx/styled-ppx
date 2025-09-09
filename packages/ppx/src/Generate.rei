@@ -13,3 +13,7 @@ let dynamicComponent:
 let staticComponent:
   (~loc: Ppxlib.location, ~htmlTag: string, Ppxlib.expression) =>
   Ppxlib.module_expr;
+
+let staticComponentStyled2:
+  (~loc: Ppxlib.location, ~htmlTag: string, Ppxlib.expression) =>
+  Ppxlib.module_expr;

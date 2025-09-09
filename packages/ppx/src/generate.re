@@ -387,6 +387,23 @@ let stylesAndRefObject = (~loc) => {
   );
 };
 
+/* let stylesObject = { "className": className, "style": snd(styles), "ref": props.ref }; */
+let stylesAndRefObjectWithStyle = (~loc) => {
+  let className = (
+    withLoc(~loc, Lident("className")),
+    Helper.Exp.ident(~loc, withLoc(Lident("className"), ~loc)),
+  );
+  let styleField = (withLoc(~loc, Lident("style")), [%expr snd(styles)]);
+  let refProp = (withLoc(~loc, Lident("ref")), propItem(~loc, "innerRef"));
+  let record =
+    Helper.Exp.record(~loc, [className, styleField, refProp], None);
+  Helper.Vb.mk(
+    ~loc,
+    Helper.Pat.mk(~loc, Ppat_var(withLoc("stylesObject", ~loc))),
+    Platform_attributes.obj(~loc, record),
+  );
+};
+
 /* let newProps = Js.Obj.assign(Obj.magic(props), stylesObject); */
 let newProps = (~loc) => {
   let valueName = Helper.Pat.mk(~loc, Ppat_var(withLoc("newProps", ~loc)));
@@ -428,6 +445,33 @@ let makeBody = (~loc, ~htmlTag, ~className as classNameValue, ~variables) => {
       ~attrs,
       Nonrecursive,
       [stylesAndRefObject(~loc)],
+      Helper.Exp.let_(
+        ~loc,
+        Nonrecursive,
+        [newProps(~loc)],
+        generateSequence(~loc, sequence),
+      ),
+    ),
+  );
+};
+
+/* styled2: same as makeBody but includes style prop from snd(styles) and uses fst(styles) for className */
+let makeBodyStyled2 =
+    (~loc, ~htmlTag, ~className as classNameValue, ~variables) => {
+  let attrs = Platform_attributes.preserveBraces(~loc);
+  let sequence =
+    [deleteProp(~loc, "innerRef"), variadicElement(~loc, ~htmlTag)]
+    |> List.append(List.map(deleteProp(~loc), variables));
+
+  Helper.Exp.let_(
+    ~loc,
+    Nonrecursive,
+    [className(~loc, classNameValue)],
+    Helper.Exp.let_(
+      ~loc,
+      ~attrs,
+      Nonrecursive,
+      [stylesAndRefObjectWithStyle(~loc)],
       Helper.Exp.let_(
         ~loc,
         Nonrecursive,
@@ -562,6 +606,157 @@ let makeFnJSX4 = (~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames) =>
     makeBody(~loc, ~htmlTag, ~className, ~variables=variableNames),
   );
 };
+
+/* styled2 server: include style field in dom props */
+let serverCreateElementStyled2 = (~loc, ~htmlTag, ~variableNames) => {
+  let finalHtmlTag =
+    switch%expr ([%e Helper.Exp.ident(~loc, withLoc(~loc, Lident("as_")))]) {
+    | Some(v) => v
+    | None => [%e Builder.estring(~loc, htmlTag)]
+    };
+
+  let params =
+    MakeProps.get(["key", "ref", "className"] @ variableNames)
+    |> List.map(value =>
+         switch (value) {
+         | MakeProps.Event({name, _}) => name
+         | MakeProps.Attribute({name, _}) => name
+         }
+       )
+    |> List.map(label =>
+         (
+           Optional(label),
+           Helper.Exp.ident(~loc, withLoc(~loc, Lident(label))),
+         )
+       );
+
+  let domProps =
+    Helper.Exp.apply(
+      [%expr ReactDOM.domProps],
+      [
+        (Labelled("className"), [%expr className]),
+        (Labelled("style"), [%expr snd(styles)]),
+        (Optional("ref"), [%expr innerRef]),
+      ]
+      @ params
+      @ [(Nolabel, [%expr ()])],
+    );
+
+  [%expr React.createElement([%e finalHtmlTag], [%e domProps], [children])];
+};
+
+let makeFnJSXServerStyled2 = (~loc, ~htmlTag, ~styleParams, ~variableNames) => {
+  fnWithLabeledArgs(
+    {
+      let reactDomParams =
+        MakeProps.get(["key"] @ variableNames)
+        |> List.map(domPropParam(~loc, ~isOptional=true));
+      [
+        (Nolabel, None, Builder.ppat_any(~loc), "_", Location.none, None),
+        makeParam(
+          ~loc,
+          ~isOptional=true,
+          ~discard=true,
+          ~coreType=[%type: string],
+          "key",
+        ),
+        makeParam(~loc, ~isOptional=true, "innerRef"),
+        makeParam(~loc, ~isOptional=true, "as_"),
+        makeParam(
+          ~loc,
+          ~isOptional=true,
+          ~default=[%expr React.null],
+          "children",
+        ),
+      ]
+      @ reactDomParams
+      @ styleParams;
+    },
+    serverCreateElementStyled2(~loc, ~htmlTag, ~variableNames),
+  );
+};
+
+/* styled2: className uses fst(styles) and style is merged via stylesObjectWithStyle */
+let makeFnJSX3Styled2 =
+    (~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames) => {
+  let className = [%expr [%e className] ++ getOrEmpty(classNameGet(props))];
+
+  Helper.Exp.fun_(
+    ~loc,
+    Nolabel,
+    None,
+    /* props: makeProps */
+    Helper.Pat.constraint_(
+      ~loc,
+      Helper.Pat.mk(~loc, Ppat_var(withLoc("props", ~loc))),
+      Helper.Typ.constr(
+        ~loc,
+        withLoc(Lident("makeProps"), ~loc),
+        makePropTypes,
+      ),
+    ),
+    makeBodyStyled2(~loc, ~htmlTag, ~className, ~variables=variableNames),
+  );
+};
+
+let makeFnJSX4Styled2 =
+    (~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames) => {
+  let className = [%expr [%e className] ++ getOrEmpty(props.className)];
+  Helper.Exp.fun_(
+    ~loc,
+    Nolabel,
+    None,
+    /* props: props */
+    Helper.Pat.constraint_(
+      ~loc,
+      Helper.Pat.mk(~loc, Ppat_var(withLoc("props", ~loc))),
+      Helper.Typ.constr(
+        ~loc,
+        withLoc(Lident("props"), ~loc),
+        makePropTypes,
+      ),
+    ),
+    makeBodyStyled2(~loc, ~htmlTag, ~className, ~variables=variableNames),
+  );
+};
+
+let componentStyled2 =
+    (~loc, ~htmlTag, ~className, ~makePropTypes, ~labeledArguments) => {
+  let variableNames =
+    List.map(((arg, _, _, _, _, _)) => getLabel(arg), labeledArguments);
+
+  let makeFn =
+    switch (File.get()) {
+    | Some(ReScript) when Settings.Get.jsxVersion() === 4 =>
+      makeFnJSX4Styled2(
+        ~loc,
+        ~htmlTag,
+        ~className,
+        ~makePropTypes,
+        ~variableNames,
+      )
+    | Some(Reason)
+    | Some(OCaml) when Settings.Get.native() =>
+      makeFnJSXServerStyled2(
+        ~loc,
+        ~htmlTag,
+        ~styleParams=makeStyleParams(~labeledArguments),
+        ~variableNames,
+      )
+    | _ =>
+      makeFnJSX3Styled2(
+        ~loc,
+        ~htmlTag,
+        ~className,
+        ~makePropTypes,
+        ~variableNames,
+      )
+    };
+
+  [%stri let make = [%e makeFn]];
+};
+
+/* moved styled2 static codegen below after makeProps/styleVariableName definitions */
 
 /* [@react.component] + makeFn */
 let component =
@@ -1019,6 +1214,38 @@ let staticComponent = (~loc, ~htmlTag, styles) => {
   Builder.pmod_structure(
     ~loc,
     staticComponentCodegenSteps(~loc, ~htmlTag, styles),
+  );
+};
+
+/* styled2 static codegen (after deps are defined) */
+let staticComponentCodegenStepsStyled2 = (~loc, ~htmlTag, stylesExpr) => {
+  (
+    Settings.Get.native()
+      ? [defineGetOrEmptyFn(~loc)]
+      : [
+        makeProps(~loc, None),
+        bindingCreateVariadicElement(~loc),
+        defineGetOrEmptyFn(~loc),
+        defineDeletePropFn(~loc),
+        defineAssign2(~loc),
+      ]
+  )
+  @ [
+    styles(~loc, ~name=styleVariableName, ~expr=stylesExpr),
+    componentStyled2(
+      ~loc,
+      ~htmlTag,
+      ~className=[%expr fst(styles)],
+      ~makePropTypes=[],
+      ~labeledArguments=[],
+    ),
+  ];
+};
+
+let staticComponentStyled2 = (~loc, ~htmlTag, styles) => {
+  Builder.pmod_structure(
+    ~loc,
+    staticComponentCodegenStepsStyled2(~loc, ~htmlTag, styles),
   );
 };
 
