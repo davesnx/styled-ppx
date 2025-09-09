@@ -455,7 +455,7 @@ let style (styles : rule array) =
 
 type styles = string * ReactDOM.Style.t
 
-let make className (vars : (string * string) list) =
+let make className vars : styles =
   let style =
     List.fold_left
       (fun style (key, value) -> ReactDOM.Style.unsafeAddProp style key value)

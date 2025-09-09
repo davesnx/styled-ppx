@@ -856,6 +856,10 @@ let traverser = {
                 (Ppxlib.Labelled("className"), [%expr fst([%e arg])]),
                 (Ppxlib.Labelled("style"), [%expr snd([%e arg])]),
               ]
+            | Ppxlib.Optional("styles") => [
+                (Ppxlib.Optional("className"), [%expr fst([%e arg])]),
+                (Ppxlib.Optional("style"), [%expr snd([%e arg])]),
+              ]
             | _ => [(arg_label, super#expression(arg))]
             }
           },
