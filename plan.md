@@ -89,28 +89,28 @@ let cx = [%cx "height: 100%"]
 - [x] Implement a vendor-prefixer for unsupported properties https://github.com/kripod/style-vendorizer (styled-ppx.emotion-native)
 - [x] `style={ReactDOM.Style.make() |> ...}`
 - [x] Support inline variables
-- [ ] Support render single values, not entire variables
-- [ ] Remove emotion
-  - [ ] Remove the "bridge" from css to bs-emotion and move it to inline-styles
-- [ ] Support "label" or avoid the hashing in development?
-- [ ] Implement styled.xxx
+- [x] Support render single values, not entire variables
+- [x] Implement styled.div/span
+- [ ] Bring back type-safety lol
 - [ ] WTF do we do with css extension? Maybe rename cx2 to css and deprecate original css?
-- [ ] Generate atomic css
+- [ ] Generate atomic
 - [ ] Implement CSS.merge
   ```reason
-  let boring = value => [%cx {|
-    color: $(value);
-  |}];
-
+  let boring = value => [%cx2 {| color: $(value); |}];
   <div style={CSS.merge(fancy(CSS.red), boring(CSS.blue))} />
   ```
+- [ ] Make a beta release
+- [ ] Support "label" or avoid the hashing in development?
 - [ ] Make sure variable names are unique
   - [ ] Maybe hashing with locations?
   - [ ] Enable this only in production?
 - [ ] Hack something for array API?
 - [ ] CSS.unsafe?
 - [ ] WTF do we do with CSS.style API?
+- [ ] Remove emotion
+  - [ ] Remove the "bridge" from css to bs-emotion and move it to inline-styles
 - [ ] Create a CSS minifier pretty printer (enabled disabled by production env?)
   - https://github.com/janestreet/ppx_css/blob/master/css_jane/src/css_jane.ml
   - https://github.com/astrada/ocaml-css-parser/blob/master/test/css_fmt_printer.ml
   - https://git.chimrod.com/css_lib.git/tree/lib/print.ml
+- [ ] Lovely documentation
