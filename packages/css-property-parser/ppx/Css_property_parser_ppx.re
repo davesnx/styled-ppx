@@ -8,8 +8,8 @@ let expander =
       ~path as _: string,
       ~arg as _: option(loc(Longident.t)),
       value: string,
-      _,
-      _,
+      _loc,
+      _rest: list(structure_item),
     ) => {
   switch (Css_spec_parser.value_of_string(value)) {
   | Some(value: Css_spec_parser.value) =>
@@ -34,7 +34,7 @@ let expander =
   };
 };
 
-let payload_pattern =
+let string_patten =
   Ast_pattern.(
     pstr(
       pstr_eval(pexp_constant(pconst_string(__, __', none)), nil) ^:: __,
@@ -45,7 +45,7 @@ let valueExtension =
   Ppxlib.Extension.declare_with_path_arg(
     "value",
     Ppxlib.Extension.Context.Expression,
-    payload_pattern,
+    string_patten,
     expander(~recursive=false),
   );
 
@@ -53,7 +53,7 @@ let valueRecExtension =
   Ppxlib.Extension.declare_with_path_arg(
     "value.rec",
     Ppxlib.Extension.Context.Expression,
-    payload_pattern,
+    string_patten,
     expander(~recursive=true),
   );
 

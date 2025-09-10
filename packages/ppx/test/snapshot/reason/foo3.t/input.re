@@ -7,3 +7,5 @@ let css = (right, bottom, left) => [%cx2
 ];
 
 <div styles={css(CSS.px(10), CSS.px(10), CSS.px(10))} />;
+
+<span styles=[%cx2 "display: flex;"] />;

@@ -232,12 +232,43 @@ let get_output_path = () => {
   output_path;
 };
 
-let add_css = (~hash_by, declarations) => {
+let push = (~hash_by, declarations) => {
   let (transformed_declarations, dynamic_vars) =
     Css_transform.transform_rule_list(declarations);
 
   let className = Printf.sprintf("css-%s", Murmur2.default(hash_by));
 
+  /* /* Debug: Log the transformed CSS */
+              if (Settings.Get.debug()) {
+                Printf.printf("[styled-ppx] Transformed CSS: %s\n", css_string);
+                Printf.printf(
+                  "[styled-ppx] Dynamic vars: %d\n",
+                  List.length(dynamic_vars),
+                );
+                List.iter(
+                  ((var_name, original, property)) =>
+                    Printf.printf(
+                      "[styled-ppx]   --%s => %s (property: %s)\n",
+                      var_name,
+                      original,
+                      property,
+                    ),
+                  dynamic_vars,
+                );
+              };
+     */
+
+  /* let css_content =
+     Settings.Get.debug()
+       ? Printf.sprintf(
+           "  /* Generated from [%%cx] in %s at line %d */\n%s",
+           stringLoc.loc_start.pos_fname,
+           stringLoc.loc_start.pos_lnum,
+           css_string,
+         )
+       : css_string; */
+
+  /* TODO: Allow render minified CSS or not */
   let rendered =
     Styled_ppx_css_parser.Render.rule_list(transformed_declarations);
 

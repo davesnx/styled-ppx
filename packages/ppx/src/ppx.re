@@ -273,7 +273,7 @@ module Mapper = {
         ) {
         | Ok(declarations) =>
           let (className, dynamic_vars) =
-            Css_file.add_css(~hash_by=str, declarations);
+            Css_file.push(~hash_by=str, declarations);
           Css_runtime.render_make_call(
             ~loc=stringLoc,
             ~className,
@@ -348,67 +348,6 @@ module Mapper = {
               ~body=expression,
             ),
         ),
-      );
-    /* [%cx2 ""] - NEW VERSION WITH CSS FILE GENERATION */
-    | Pstr_value(
-        Nonrecursive,
-        [
-          {
-            pvb_pat:
-              {ppat_desc: Ppat_var({loc: patternLoc, txt: _valueName}), _} as pat,
-            pvb_expr:
-              {
-                pexp_desc:
-                  Pexp_extension((
-                    {txt: "cx2", loc: _cxLoc},
-                    PStr([
-                      {
-                        pstr_desc:
-                          Pstr_eval(
-                            {
-                              pexp_loc: _payloadLoc,
-                              pexp_desc:
-                                Pexp_constant(
-                                  Pconst_string(styles, stringLoc, delimiter),
-                                ),
-                              _,
-                            },
-                            _,
-                          ),
-                        _,
-                      },
-                    ]),
-                  )),
-                _,
-              },
-            pvb_loc: _,
-            _,
-          },
-        ],
-      ) =>
-      let expr =
-        switch (
-          Styled_ppx_css_parser.Driver.parse_declaration_list(
-            ~loc=stringLoc,
-            ~delimiter,
-            styles,
-          )
-        ) {
-        | Ok(declarations) =>
-          let (className, dynamic_vars) =
-            Css_file.add_css(~hash_by=styles, declarations);
-          Css_runtime.render_make_call(
-            ~loc=stringLoc,
-            ~className,
-            ~dynamic_vars,
-          );
-        | Error((loc, msg)) => Error.expr(~loc, msg)
-        };
-
-      Builder.pstr_value(
-        ~loc=expr.pexp_loc,
-        Nonrecursive,
-        [Builder.value_binding(~loc=patternLoc, ~pat, ~expr)],
       );
     /* [%cx ""] */
     | Pstr_value(
@@ -514,53 +453,55 @@ module Mapper = {
         Nonrecursive,
         [Builder.value_binding(~loc=patternLoc, ~pat, ~expr)],
       );
-    /* [%cx [] or [%cx2 []] - INVALID SYNTAX */
-    | Pstr_value(
-        Nonrecursive,
-        [
-          {
-            pvb_pat: _pat,
-            pvb_expr:
-              {
-                pexp_desc:
-                  Pexp_extension((
-                    {txt: ("cx" | "cx2") as ext_name, loc: _cxLoc},
-                    PStr([{pstr_desc: Pstr_eval(payload, _), _}]),
-                  )),
-                _,
-              },
-            pvb_loc: _,
-            _,
-          },
-        ],
-      ) =>
-      let examples =
-        switch (File.get()) {
-        | Some(Reason) => [
-            "[%cx \"display: block\"]",
-            "[%cx [|CSS.display(`block)|]]",
-          ]
-        | Some(ReScript) => [
-            "[%cx \"display: block\"]",
-            "[%cx [CSS.display(#block)]]",
-          ]
-        | Some(OCaml) => [
-            "[%cx \"display: block\"]",
-            "[%cx [|CSS.display `block |]]",
-          ]
-        | None => [
-            "[%cx \"display: block\"]",
-            "[%cx [|CSS.display(`block)|]]",
-          ]
-        };
-      Error.raise(
-        ~loc=payload.pexp_loc,
-        ~examples,
-        ~link="https://styled-ppx.vercel.app/reference/cx",
-        "[%"
-        ++ ext_name
-        ++ "] expects either a string of CSS or an array of CSS rules. ",
-      );
+    /* /* [%cx [] or [%cx2 []] - INVALID SYNTAX */
+       | Pstr_value(
+           Nonrecursive,
+           [
+             {
+               pvb_pat: _pat,
+               pvb_expr:
+                 {
+                   pexp_desc:
+                     Pexp_extension((
+                       {txt: ("cx" | "cx2") as ext_name, loc: _cxLoc},
+                       PStr([{pstr_desc: Pstr_eval(payload, _), _}]),
+                     )),
+                   _,
+                 },
+               pvb_loc: _,
+               _,
+             },
+           ],
+         ) =>
+         let examples =
+           switch (File.get()) {
+           | Some(Reason) => [
+               "[%cx \"display: block\"]",
+               "[%cx [|CSS.display(`block)|]]",
+             ]
+           | Some(ReScript) => [
+               "[%cx \"display: block\"]",
+               "[%cx [CSS.display(#block)]]",
+             ]
+           | Some(OCaml) => [
+               "[%cx \"display: block\"]",
+               "[%cx [|CSS.display `block |]]",
+             ]
+           | None => [
+               "[%cx \"display: block\"]",
+               "[%cx [|CSS.display(`block)|]]",
+             ]
+           };
+         let m = Format.asprintf("%a", Ppxlib.Pprintast.expression, payload);
+         failwith(m) |> ignore;
+         Error.raise(
+           ~loc=payload.pexp_loc,
+           ~examples,
+           ~link="https://styled-ppx.vercel.app/reference/cx",
+           "[%"
+           ++ ext_name
+           ++ "] expects either a string of CSS or an array of CSS rules. ",
+         ); */
     | _ => expr
     };
   };
@@ -739,7 +680,7 @@ let cx2_extension =
           ) {
           | Ok(declarations) =>
             let (className, dynamic_vars) =
-              Css_file.add_css(~hash_by=txt, declarations);
+              Css_file.push(~hash_by=txt, declarations);
             Css_runtime.render_make_call(
               ~loc=stringLoc,
               ~className,
