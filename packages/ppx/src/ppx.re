@@ -661,6 +661,60 @@ let cx_extension_without_let_binding =
     ),
   );
 
+let type_check_rule = (rule: Styled_ppx_css_parser.Ast.rule) => {
+  switch (rule) {
+  | Declaration({name: (name, _), value: (value, _), _}) =>
+    let value = Styled_ppx_css_parser.Render.component_value_list(value);
+    Css_property_parser.Parser.check_property(~name, value);
+  | Style_rule(style_rule) =>
+    let (prelude, _) = style_rule.prelude;
+    let _prelude = Styled_ppx_css_parser.Render.selector_list(prelude);
+    /* Css_property_parser.Parser.check_selector_list(~name, prelude); */
+    Error(`Invalid_value("selectors aren't supported yet"));
+  | At_rule(_at_rule) =>
+    Error(`Invalid_value("at rules aren't supported yet"))
+  /* let prelude =
+       Styled_ppx_css_parser.Render.component_value_list(at_rule.prelude);
+     Css_property_parser.Parser.check_at_rule(~name, prelude); */
+  };
+};
+
+let type_check_rule_list =
+    ((rule_list, _): Styled_ppx_css_parser.Ast.rule_list) => {
+  rule_list |> List.map(rule => type_check_rule(rule));
+};
+
+let find_first_error =
+    (
+      validations:
+        list(
+          result(
+            unit,
+            [>
+              | `Invalid_value(string)
+              | `Property_not_found
+            ],
+          ),
+        ),
+    ) => {
+  validations
+  |> List.find_opt(Result.is_error)
+  |> Option.map(Result.get_error);
+};
+
+let error_to_string =
+    (
+      error: [>
+        | `Invalid_value(string)
+        | `Property_not_found
+      ],
+    ) => {
+  switch (error) {
+  | `Invalid_value(string) => string
+  | `Property_not_found => "Property not found"
+  };
+};
+
 let cx2_extension =
   Ppxlib.Context_free.Rule.extension(
     Ppxlib.Extension.declare(
@@ -678,14 +732,20 @@ let cx2_extension =
               txt,
             )
           ) {
-          | Ok(declarations) =>
-            let (className, dynamic_vars) =
-              Css_file.push(~hash_by=txt, declarations);
-            Css_runtime.render_make_call(
-              ~loc=stringLoc,
-              ~className,
-              ~dynamic_vars,
-            );
+          | Ok(rule_list) =>
+            let validations = type_check_rule_list(rule_list);
+            switch (find_first_error(validations)) {
+            | None =>
+              let (className, dynamic_vars) =
+                Css_file.push(~hash_by=txt, rule_list);
+              Css_runtime.render_make_call(
+                ~loc=stringLoc,
+                ~className,
+                ~dynamic_vars,
+              );
+            | Some(error) =>
+              Error.expr(~loc=stringLoc, error_to_string(error))
+            };
           | Error((loc, msg)) => Error.expr(~loc, msg)
           }
         | Pexp_array(arr) =>

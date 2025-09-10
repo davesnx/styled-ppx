@@ -281,23 +281,6 @@ let render_size =
   | `Fit_content_0 => [%expr "fit-content"]
   | `Fit_content_1(lp) => render_length_percentage(lp);
 
-let render_css_global_values = (name, value) => {
-  let.ok value =
-    Parser.parse(Css_property_parser.Standard.css_wide_keywords, value);
-
-  let value =
-    switch (value) {
-    | `Inherit => [%expr "inherit"]
-    | `Initial => [%expr "initial"]
-    | `Unset => [%expr "unset"]
-    | `Revert => [%expr "revert"]
-    | `RevertLayer => [%expr "revert-layer"]
-    };
-
-  /* bs-css doesn't have those */
-  Ok([[%expr CSS.unsafe([%e render_string(name)], [%e value])]]);
-};
-
 let found = ({ast_of_string, string_to_expr, _}) => {
   let check_value = string => {
     let.ok _ = ast_of_string(string);
@@ -606,13 +589,24 @@ let render_to_expr = (property, value) => {
 };
 
 let parse_declarations = (property: string, value: string) => {
-  let.ok _ =
-    Parser.check_property(~name=property, value)
-    |> Result.map_error((`Unknown_value) => `Property_not_found);
-
-  switch (render_css_global_values(property, value)) {
-  | Ok(value) => Ok(value)
-  | exception (Invalid_value(v)) => Error(`Invalid_value(value ++ ". " ++ v))
-  | Error(_) => render_to_expr(property, value)
+  switch (value) {
+  | "inherit"
+  | "initial"
+  | "unset"
+  | "revert"
+  | "revert-layer" =>
+    let unsafe = [%expr
+      CSS.unsafe([%e render_string(property)], [%e render_string(value)])
+    ];
+    Ok([unsafe]);
+  | _ =>
+    switch (Parser.check_property(~name=property, value)) {
+    | Ok () =>
+      switch (render_to_expr(property, value)) {
+      | Ok(value) => Ok(value)
+      | Error(err) => Error(err)
+      }
+    | Error(err) => Error(err)
+    }
   };
 };

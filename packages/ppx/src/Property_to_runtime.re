@@ -179,32 +179,6 @@ let to_camel_case = txt =>
   )
   |> String.concat("");
 
-let render_css_global_values = (~loc, name, value) => {
-  let.ok value =
-    Css_property_parser.Parser.parse(
-      Css_property_parser.Standard.css_wide_keywords,
-      value,
-    );
-
-  let value =
-    switch (value) {
-    | `Inherit => [%expr {js|inherit|js}]
-    | `Initial => [%expr {js|initial|js}]
-    | `Unset => [%expr {js|unset|js}]
-    | `Revert => [%expr {js|revert|js}]
-    | `RevertLayer => [%expr {js|revert-layer|js}]
-    };
-
-  Ok([
-    [%expr
-      CSS.unsafe(
-        [%e name |> to_camel_case |> render_string(~loc)],
-        [%e value],
-      )
-    ],
-  ]);
-};
-
 let variant_to_expression = (~loc) =>
   fun
   | `Anywhere => id([%expr `anywhere])
@@ -6424,21 +6398,33 @@ let render = (~loc: Location.t, property, value, important) =>
   if (isVariableDeclaration(property)) {
     Ok([render_variable_declaration(~loc, property, value)]);
   } else {
-    let.ok is_valid_string =
-      Property_parser.check_property(~name=property, value)
-      |> Result.map_error((`Unknown_value) => `Property_not_found);
-
-    switch (render_css_global_values(~loc, property, value)) {
-    | Ok(value) => Ok(value)
-    | Error(_) =>
+    switch (value) {
+    | "inherit"
+    | "initial"
+    | "unset"
+    | "revert"
+    | "revert-layer" =>
+      Ok([
+        [%expr
+          CSS.unsafe(
+            [%e property |> to_camel_case |> render_string(~loc)],
+            [%e render_string(~loc, value)],
+          )
+        ],
+      ])
+    | value =>
       switch (render_to_expr(~loc, property, value, important)) {
       | Ok(value) => Ok(value)
       | Error(`Invalid_value(_)) as x => x
       | exception Impossible_state => Error(`Impossible_state)
       | Error(_)
       | exception Unsupported_feature =>
-        let.ok () = is_valid_string ? Ok() : Error(`Invalid_value(value));
-        Ok([render_when_unsupported_features(~loc, property, value)]);
+        switch (Property_parser.check_property(~name=property, value)) {
+        | Ok () =>
+          Ok([render_when_unsupported_features(~loc, property, value)])
+        | Error(`Invalid_value(value)) => Error(`Invalid_value(value))
+        | Error(`Property_not_found) => Error(`Property_not_found)
+        }
       }
     };
   };

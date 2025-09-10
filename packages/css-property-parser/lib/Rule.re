@@ -136,5 +136,6 @@ module Pattern = {
           ++ "'.",
         ]),
     );
+
   let value = (value, rule) => Match.bind(rule, () => Match.return(value));
 };

@@ -1,5 +1,4 @@
 open Rule.Let;
-open Modifier;
 
 type combinator('a, 'b) = list(Rule.rule('a)) => Rule.rule('b);
 
@@ -59,4 +58,4 @@ let and_ = rules => {
 };
 
 // [ A || B ] = [ A? && B? ]!
-let or_ = rules => rules |> List.map(optional) |> and_;
+let or_ = rules => rules |> List.map(Modifier.optional) |> and_;

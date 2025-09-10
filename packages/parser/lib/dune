@@ -9,7 +9,7 @@
   sedlex
   menhirLib
   ppxlib
-  (re_export ppx_deriving.runtime) ; We expose show_token from ppx_deriving
+  (re_export ppx_deriving.runtime) ; We expose show_token because of ppx_deriving
   )
  (preprocess
   (pps sedlex.ppx ppx_deriving.show)))
