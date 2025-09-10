@@ -4,7 +4,6 @@ module Buffer = {
   let css_rules: ref(list((string, string))) = ref([]);
 
   let add_rule = (className: string, css: string) => {
-    /* Only add the rule if it doesn't already exist */
     let exists =
       List.exists(
         ((existingClass, _)) => existingClass == className,
@@ -91,9 +90,7 @@ let get_output_path = () => {
       configured_path
     };
 
-  /* Ensure the directory exists */
   if (!Sys.file_exists(css_dir)) {
-    /* Create parent directories if needed */
     let rec create_parent_dirs = path => {
       let parent = Filename.dirname(path);
       if (parent != path && parent != "." && !Sys.file_exists(parent)) {

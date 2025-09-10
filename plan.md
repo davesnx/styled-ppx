@@ -92,7 +92,10 @@ let cx = [%cx "height: 100%"]
 - [x] Support render single values, not entire variables
 - [x] Implement styled.div/span
 - [ ] Bring back type-safety lol
-- [ ] WTF do we do with css extension? Maybe rename cx2 to css and deprecate original css?
+- [ ] selectors
+- [ ] media-queries
+- [ ] keyframes
+- [ ] global
 - [ ] Generate atomic
 - [ ] Implement CSS.merge
   ```reason
@@ -107,6 +110,7 @@ let cx = [%cx "height: 100%"]
 - [ ] Hack something for array API?
 - [ ] CSS.unsafe?
 - [ ] WTF do we do with CSS.style API?
+- [ ] WTF do we do with css extension? Maybe rename cx2 to css and deprecate original css?
 - [ ] Remove emotion
   - [ ] Remove the "bridge" from css to bs-emotion and move it to inline-styles
 - [ ] Create a CSS minifier pretty printer (enabled disabled by production env?)

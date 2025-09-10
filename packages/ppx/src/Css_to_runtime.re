@@ -41,6 +41,7 @@ let string_to_const = (~loc, s) => {
     )
   };
 };
+
 let render_variable = (~loc, v) => {
   let txt = v |> String.concat(".") |> Ppxlib.Longident.parse;
   Builder.pexp_ident(
@@ -64,6 +65,7 @@ let source_code_of_loc = (loc: Ppxlib.Location.t) => {
   | None => raise(Empty_buffer("last buffer not set"))
   };
 };
+
 let concat = (~loc, expr, acc) => {
   let concat_fn =
     {
@@ -471,7 +473,7 @@ and render_style_rule = (~loc, rule: style_rule) => {
   );
 };
 
-let addLabel = (~loc, label, emotionExprs) => [
+let add_label = (~loc, label, emotionExprs) => [
   Helper.Exp.apply(
     ~loc,
     CSS.label(~loc),
@@ -484,66 +486,6 @@ let addLabel = (~loc, label, emotionExprs) => [
 
 let render_style_call = (~loc, declaration_list) => {
   Helper.Exp.apply(~loc, CSS.style(~loc), [(Nolabel, declaration_list)]);
-};
-
-let render_make_call = (~loc, ~className, ~dynamic_vars) => {
-  /* Create the className string literal */
-  let className_expr =
-    Helper.Exp.constant(~loc, Pconst_string(className, loc, None));
-
-  /* Create a list of tuples with CSS custom properties */
-  let var_list =
-    dynamic_vars
-    |> List.map(((var_name, original_path, property_name)) => {
-         let field_name = "--" ++ var_name;
-         let field_name_expr =
-           Helper.Exp.constant(~loc, Pconst_string(field_name, loc, None));
-
-         /* Get the variable value */
-         let var_value =
-           render_variable(~loc, String.split_on_char('.', original_path));
-
-         /* Wrap the value with the appropriate CSS function and get_value_from_rule */
-         let field_value =
-           if (property_name != "") {
-             /* CSS.get_value_from_rule(CSS.propertyFunction(value)) */
-             let property_call =
-               Property_to_runtime.get_css_function_for_property(
-                 ~loc,
-                 property_name,
-                 var_value,
-               );
-             Helper.Exp.apply(
-               ~loc,
-               CSS.get_value_from_rule(~loc),
-               [(Nolabel, property_call)],
-             );
-           } else {
-             /* Fallback to raw value if no property is tracked (shouldn't happen normally) */
-             var_value;
-           };
-
-         Builder.pexp_tuple(~loc, [field_name_expr, field_value]);
-       });
-
-  let list_expr =
-    List.fold_right(
-      (item, acc) =>
-        Builder.pexp_construct(
-          ~loc,
-          Builder.Located.lident(~loc, "::"),
-          Some(Builder.pexp_tuple(~loc, [item, acc])),
-        ),
-      var_list,
-      Builder.pexp_construct(~loc, Builder.Located.lident(~loc, "[]"), None),
-    );
-
-  /* Generate CSS.make(className, list) - returns the full styles object */
-  Helper.Exp.apply(
-    ~loc,
-    CSS.make(~loc),
-    [(Nolabel, className_expr), (Nolabel, list_expr)],
-  );
 };
 
 let render_keyframes = (~loc, declarations: rule_list) => {
@@ -648,4 +590,57 @@ If your intent is to apply the declaration to all elements, use the universal se
       [(Nolabel, styles)],
     );
   [%expr ignore([%e expr])];
+};
+
+let render_make_call = (~loc, ~className, ~dynamic_vars) => {
+  let className_expr =
+    Helper.Exp.constant(~loc, Pconst_string(className, loc, None));
+
+  let var_list =
+    dynamic_vars
+    |> List.map(((var_name, original_path, property_name)) => {
+         let field_name = "--" ++ var_name;
+         let field_name_expr =
+           Helper.Exp.constant(~loc, Pconst_string(field_name, loc, None));
+
+         /* Get the variable value */
+         let var_value =
+           render_variable(~loc, String.split_on_char('.', original_path));
+
+         /* Wrap the value with the appropriate CSS function and get_value_from_rule */
+         let field_value =
+           if (property_name != "") {
+             /* CSS.get_value_from_rule(CSS.propertyFunction(value)) */
+             let property_call =
+               Property_to_runtime.get_css_function_for_property(
+                 ~loc,
+                 property_name,
+                 var_value,
+               );
+             Helper.Exp.apply(
+               ~loc,
+               CSS.get_value_from_rule(~loc),
+               [(Nolabel, property_call)],
+             );
+           } else {
+             /* Fallback to raw value if no property is tracked (shouldn't happen normally) */
+             var_value;
+           };
+
+         Builder.pexp_tuple(~loc, [field_name_expr, field_value]);
+       });
+
+  let list_expr =
+    List.fold_right(
+      (item, acc) =>
+        Builder.pexp_construct(
+          ~loc,
+          Builder.Located.lident(~loc, "::"),
+          Some(Builder.pexp_tuple(~loc, [item, acc])),
+        ),
+      var_list,
+      Builder.pexp_construct(~loc, Builder.Located.lident(~loc, "[]"), None),
+    );
+
+  [%expr CSS.make([%e className_expr], [%e list_expr])];
 };

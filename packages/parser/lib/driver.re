@@ -35,15 +35,26 @@ let parse_string = (~loc, parser, string) => {
   parse(~loc, buffer, parser);
 };
 
-let parse_declaration_list = (~loc, input: string) => {
-  parse_string(~loc, Parser.declaration_list, input);
+let parse_declaration_list = (~loc, ~delimiter=None, input: string) => {
+  let loc_with_delimiter =
+    Parser_location.update_loc_with_delimiter(loc, delimiter);
+  parse_string(~loc=loc_with_delimiter, Parser.declaration_list, input);
 };
 
-let parse_declaration = (~loc, input: string) =>
-  parse_string(~loc, Parser.declaration, input);
+let parse_declaration = (~loc, ~delimiter=None, input: string) => {
+  let loc_with_delimiter =
+    Parser_location.update_loc_with_delimiter(loc, delimiter);
+  parse_string(~loc=loc_with_delimiter, Parser.declaration, input);
+};
 
-let parse_stylesheet = (~loc, input: string) =>
-  parse_string(~loc, Parser.stylesheet, input);
+let parse_stylesheet = (~loc, ~delimiter=None, input: string) => {
+  let loc_with_delimiter =
+    Parser_location.update_loc_with_delimiter(loc, delimiter);
+  parse_string(~loc=loc_with_delimiter, Parser.stylesheet, input);
+};
 
-let parse_keyframes = (~loc, input: string) =>
-  parse_string(~loc, Parser.keyframes, input);
+let parse_keyframes = (~loc, ~delimiter=None, input: string) => {
+  let loc_with_delimiter =
+    Parser_location.update_loc_with_delimiter(loc, delimiter);
+  parse_string(~loc=loc_with_delimiter, Parser.keyframes, input);
+};

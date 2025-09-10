@@ -216,7 +216,7 @@ let variadicElement = (~loc, ~htmlTag) => {
   let asAttributeName =
     switch (asAttribute()) {
     | MakeProps.Attribute({name, _}) => name
-    | _ => failwith("unreachable")
+    | _ => assert(false)
     };
 
   let asTag = {
@@ -1254,27 +1254,27 @@ let dynamicStyles = (~loc, ~moduleName, ~functionExpr, ~labeledArguments) => {
     switch (functionExpr.pexp_desc) {
     /* styled.div () => "string" */
     | Pexp_constant(Pconst_string(str, loc, delimiter)) =>
-      let loc =
-        Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-          loc,
-          delimiter,
-        );
-
-      switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, str)) {
+      switch (
+        Styled_ppx_css_parser.Driver.parse_declaration_list(
+          ~loc,
+          ~delimiter,
+          str,
+        )
+      ) {
       | Ok(declarations) =>
         declarations
         |> Css_to_runtime.render_declarations(~loc)
-        |> Css_to_runtime.addLabel(~loc, moduleName)
+        |> Css_to_runtime.add_label(~loc, moduleName)
         |> Builder.pexp_array(~loc)
         |> Css_to_runtime.render_style_call(~loc)
       | Error((loc, msg)) => Error.expr(~loc, msg)
-      };
+      }
 
     /* styled.div () => "[||]" */
     | Pexp_array(arr) =>
       arr
       |> List.rev
-      |> Css_to_runtime.addLabel(~loc, moduleName)
+      |> Css_to_runtime.add_label(~loc, moduleName)
       |> Builder.pexp_array(~loc)
       |> Css_to_runtime.render_style_call(~loc)
 

@@ -1,11 +1,9 @@
 module Builder = Ppxlib.Ast_builder.Default;
 module Css_gen = Css_file_generator;
 
-/* Transform CSS AST to replace Variables with CSS custom properties */
 module Css_transform = {
   open Styled_ppx_css_parser.Ast;
 
-  /* Convert variable path to CSS custom property name */
   let variable_to_css_var_name = (path: list(string)) => {
     path
     |> String.concat("-")
@@ -32,14 +30,12 @@ module Css_transform = {
       let var_name = variable_to_css_var_name(path);
       let original_path = String.concat(".", path);
 
-      /* Track dynamic variable with property name */
       let property = Option.value(property_name, ~default="");
       if (!List.exists(((vn, _, _)) => vn == var_name, dynamic_vars^)) {
         dynamic_vars :=
           [(var_name, original_path, property), ...dynamic_vars^];
       };
 
-      /* Return CSS custom property reference */
       Function(
         ("var", Ppxlib.Location.none),
         (
@@ -85,7 +81,6 @@ module Css_transform = {
     };
   };
 
-  /* Transform declarations */
   let transform_declaration = (decl: declaration, dynamic_vars) => {
     let (property_name, _) = decl.name;
     let (value_list, value_loc) = decl.value;
@@ -104,7 +99,6 @@ module Css_transform = {
     };
   };
 
-  /* Transform rules */
   let transform_rule = (rule: rule, dynamic_vars) => {
     switch (rule) {
     | Declaration(decl) =>
@@ -113,7 +107,6 @@ module Css_transform = {
     };
   };
 
-  /* Transform rule list and extract dynamic variables */
   let transform_rule_list = (declarations: rule_list) => {
     let dynamic_vars = ref([]);
     let (rule_list, rule_loc) = declarations;
@@ -285,21 +278,20 @@ module Mapper = {
       })
         when isStyled(extensionName) =>
       let htmlTag = getHtmlTagUnsafe(~loc=extensionLoc, extensionName);
-      let loc =
-        Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-          stringLoc,
-          delimiter,
-        );
       let styles =
         switch (
-          Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, str)
+          Styled_ppx_css_parser.Driver.parse_declaration_list(
+            ~loc=stringLoc,
+            ~delimiter,
+            str,
+          )
         ) {
         | Ok(declarations) =>
           declarations
-          |> Css_to_runtime.render_declarations(~loc)
-          |> Css_to_runtime.addLabel(~loc, moduleName)
-          |> Builder.pexp_array(~loc)
-          |> Css_to_runtime.render_style_call(~loc)
+          |> Css_to_runtime.render_declarations(~loc=stringLoc)
+          |> Css_to_runtime.add_label(~loc=stringLoc, moduleName)
+          |> Builder.pexp_array(~loc=stringLoc)
+          |> Css_to_runtime.render_style_call(~loc=stringLoc)
         | Error((loc, msg)) => Error.expr(~loc, msg)
         };
 
@@ -308,7 +300,7 @@ module Mapper = {
         Builder.module_binding(
           ~loc=moduleLoc,
           ~name,
-          ~expr=Generate.staticComponent(~loc, ~htmlTag, styles),
+          ~expr=Generate.staticComponent(~loc=stringLoc, ~htmlTag, styles),
         ),
       );
     /* [%styled.div [||]] */
@@ -339,7 +331,7 @@ module Mapper = {
       let htmlTag = getHtmlTagUnsafe(~loc=extensionLoc, extensionName);
       let styles =
         arr
-        |> Css_to_runtime.addLabel(~loc=arrayLoc, moduleName)
+        |> Css_to_runtime.add_label(~loc=arrayLoc, moduleName)
         |> Builder.pexp_array(~loc=arrayLoc)
         |> Css_to_runtime.render_style_call(~loc=arrayLoc);
 
@@ -388,15 +380,13 @@ module Mapper = {
         | Some(tag) => tag
         | None => "div"
         };
-      let loc =
-        Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-          stringLoc,
-          delimiter,
-        );
-
       let stylesExpr =
         switch (
-          Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, str)
+          Styled_ppx_css_parser.Driver.parse_declaration_list(
+            ~loc=stringLoc,
+            ~delimiter,
+            str,
+          )
         ) {
         | Ok(declarations) =>
           let (transformed_declarations, dynamic_vars) =
@@ -412,7 +402,11 @@ module Mapper = {
 
           let css_content = css_string;
           Css_gen.add_css(~className, ~css=css_content);
-          Css_to_runtime.render_make_call(~loc, ~className, ~dynamic_vars);
+          Css_to_runtime.render_make_call(
+            ~loc=stringLoc,
+            ~className,
+            ~dynamic_vars,
+          );
         | Error((loc, msg)) => Error.expr(~loc, msg)
         };
 
@@ -421,7 +415,12 @@ module Mapper = {
         Builder.module_binding(
           ~loc=moduleLoc,
           ~name,
-          ~expr=Generate.staticComponentStyled2(~loc, ~htmlTag, stylesExpr),
+          ~expr=
+            Generate.staticComponentStyled2(
+              ~loc=stringLoc,
+              ~htmlTag,
+              stylesExpr,
+            ),
         ),
       );
     /* [%styled.div () => {}] */
@@ -498,7 +497,7 @@ module Mapper = {
                               pexp_loc: _payloadLoc,
                               pexp_desc:
                                 Pexp_constant(
-                                  Pconst_string(styles, stringLoc, delim),
+                                  Pconst_string(styles, stringLoc, delimiter),
                                 ),
                               _,
                             },
@@ -515,15 +514,13 @@ module Mapper = {
           },
         ],
       ) =>
-      let loc =
-        Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-          stringLoc,
-          delim,
-        );
-
       let expr =
         switch (
-          Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, styles)
+          Styled_ppx_css_parser.Driver.parse_declaration_list(
+            ~loc=stringLoc,
+            ~delimiter,
+            styles,
+          )
         ) {
         | Ok(declarations) =>
           /* Transform CSS and extract dynamic variables */
@@ -563,13 +560,17 @@ module Mapper = {
             Settings.Get.debug()
               ? Printf.sprintf(
                   "  /* Generated from [%%cx] in %s at line %d */\n%s",
-                  loc.loc_start.pos_fname,
-                  loc.loc_start.pos_lnum,
+                  stringLoc.loc_start.pos_fname,
+                  stringLoc.loc_start.pos_lnum,
                   css_string,
                 )
               : css_string;
           Css_gen.add_css(~className, ~css=css_content);
-          Css_to_runtime.render_make_call(~loc, ~className, ~dynamic_vars);
+          Css_to_runtime.render_make_call(
+            ~loc=stringLoc,
+            ~className,
+            ~dynamic_vars,
+          );
         | Error((loc, msg)) => Error.expr(~loc, msg)
         };
 
@@ -598,7 +599,7 @@ module Mapper = {
                               pexp_loc: _payloadLoc,
                               pexp_desc:
                                 Pexp_constant(
-                                  Pconst_string(styles, stringLoc, delim),
+                                  Pconst_string(styles, stringLoc, delimiter),
                                 ),
                               _,
                             },
@@ -615,73 +616,25 @@ module Mapper = {
           },
         ],
       ) =>
-      let loc =
-        Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-          stringLoc,
-          delim,
-        );
-
       let expr =
         switch (
-          Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, styles)
+          Styled_ppx_css_parser.Driver.parse_declaration_list(
+            ~loc=stringLoc,
+            ~delimiter,
+            styles,
+          )
         ) {
         | Ok(declarations) =>
           declarations
-          |> Css_to_runtime.render_declarations(~loc)
-          |> Css_to_runtime.addLabel(~loc, valueName)
-          |> Builder.pexp_array(~loc)
-          |> Css_to_runtime.render_style_call(~loc)
+          |> Css_to_runtime.render_declarations(~loc=stringLoc)
+          |> Css_to_runtime.add_label(~loc=stringLoc, valueName)
+          |> Builder.pexp_array(~loc=stringLoc)
+          |> Css_to_runtime.render_style_call(~loc=stringLoc)
         | Error((loc, msg)) => Error.expr(~loc, msg)
         };
 
       Builder.pstr_value(
         ~loc=expr.pexp_loc,
-        Nonrecursive,
-        [Builder.value_binding(~loc=patternLoc, ~pat, ~expr)],
-      );
-    /* [%cx2 [||]] - NEW VERSION */
-    | Pstr_value(
-        Nonrecursive,
-        [
-          {
-            pvb_pat:
-              {ppat_desc: Ppat_var({loc: patternLoc, txt: valueName}), _} as pat,
-            pvb_expr:
-              {
-                pexp_desc:
-                  Pexp_extension((
-                    {txt: "cx2", loc: _cxLoc},
-                    PStr([
-                      {
-                        pstr_desc:
-                          Pstr_eval(
-                            {
-                              pexp_loc: payloadLoc,
-                              pexp_desc: Pexp_array(arr),
-                              _,
-                            },
-                            _,
-                          ),
-                        _,
-                      },
-                    ]),
-                  )),
-                _,
-              },
-            pvb_loc: loc,
-            _,
-          },
-        ],
-      ) =>
-      /* For now, cx2 with array fallback to old behavior - can be enhanced later */
-      let expr =
-        arr
-        |> Css_to_runtime.addLabel(~loc=payloadLoc, valueName)
-        |> Builder.pexp_array(~loc=payloadLoc)
-        |> Css_to_runtime.render_style_call(~loc);
-
-      Builder.pstr_value(
-        ~loc,
         Nonrecursive,
         [Builder.value_binding(~loc=patternLoc, ~pat, ~expr)],
       );
@@ -721,7 +674,7 @@ module Mapper = {
       ) =>
       let expr =
         arr
-        |> Css_to_runtime.addLabel(~loc=payloadLoc, valueName)
+        |> Css_to_runtime.add_label(~loc=payloadLoc, valueName)
         |> Builder.pexp_array(~loc=payloadLoc)
         |> Css_to_runtime.render_style_call(~loc);
 
@@ -782,134 +735,12 @@ module Mapper = {
   };
 };
 
-/* Helper to detect if a name is an HTML element */
-let is_html_tag = name => {
-  let tags = [
-    "a",
-    "abbr",
-    "address",
-    "area",
-    "article",
-    "aside",
-    "audio",
-    "b",
-    "base",
-    "bdi",
-    "bdo",
-    "blockquote",
-    "body",
-    "br",
-    "button",
-    "canvas",
-    "caption",
-    "cite",
-    "code",
-    "col",
-    "colgroup",
-    "data",
-    "datalist",
-    "dd",
-    "del",
-    "details",
-    "dfn",
-    "dialog",
-    "div",
-    "dl",
-    "dt",
-    "em",
-    "embed",
-    "fieldset",
-    "figcaption",
-    "figure",
-    "footer",
-    "form",
-    "h1",
-    "h2",
-    "h3",
-    "h4",
-    "h5",
-    "h6",
-    "head",
-    "header",
-    "hgroup",
-    "hr",
-    "html",
-    "i",
-    "iframe",
-    "img",
-    "input",
-    "ins",
-    "kbd",
-    "keygen",
-    "label",
-    "legend",
-    "li",
-    "link",
-    "main",
-    "map",
-    "mark",
-    "menu",
-    "menuitem",
-    "meta",
-    "meter",
-    "nav",
-    "noscript",
-    "object",
-    "ol",
-    "optgroup",
-    "option",
-    "output",
-    "p",
-    "param",
-    "picture",
-    "pre",
-    "progress",
-    "q",
-    "rp",
-    "rt",
-    "ruby",
-    "s",
-    "samp",
-    "script",
-    "section",
-    "select",
-    "small",
-    "source",
-    "span",
-    "strong",
-    "style",
-    "sub",
-    "summary",
-    "sup",
-    "svg",
-    "table",
-    "tbody",
-    "td",
-    "template",
-    "textarea",
-    "tfoot",
-    "th",
-    "thead",
-    "time",
-    "title",
-    "tr",
-    "track",
-    "u",
-    "ul",
-    "var",
-    "video",
-    "wbr",
-  ];
-  List.mem(name, tags);
-};
-
 let is_jsx = expr => {
   switch (expr.Ppxlib.pexp_desc) {
   | Pexp_apply(tag, _args) =>
     switch (tag.pexp_desc) {
     | Pexp_ident({txt: Lident(name), _}) =>
-      /* Check if it's an HTML element or starts with uppercase (React component) */
-      is_html_tag(name)
+      Html.is_tag(name)
       || String.length(name) > 0
       && Char.uppercase_ascii(name.[0]) == name.[0]
     | _ => false
@@ -1008,22 +839,20 @@ let cx_extension_without_let_binding =
         File.set(path);
         switch (payload.pexp_desc) {
         | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
-          let loc =
-            Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-              stringLoc,
-              delimiter,
-            );
-
           switch (
-            Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, txt)
+            Styled_ppx_css_parser.Driver.parse_declaration_list(
+              ~loc=stringLoc,
+              ~delimiter,
+              txt,
+            )
           ) {
           | Ok(declarations) =>
             declarations
-            |> Css_to_runtime.render_declarations(~loc)
-            |> Builder.pexp_array(~loc)
-            |> Css_to_runtime.render_style_call(~loc)
+            |> Css_to_runtime.render_declarations(~loc=stringLoc)
+            |> Builder.pexp_array(~loc=stringLoc)
+            |> Css_to_runtime.render_style_call(~loc=stringLoc)
           | Error((loc, msg)) => Error.expr(~loc, msg)
-          };
+          }
         | Pexp_array(arr) =>
           /* Valid: [%cx [|...|]] */
           arr
@@ -1070,14 +899,12 @@ let cx2_extension =
         File.set(path);
         switch (payload.pexp_desc) {
         | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
-          let loc =
-            Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-              stringLoc,
-              delimiter,
-            );
-
           switch (
-            Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, txt)
+            Styled_ppx_css_parser.Driver.parse_declaration_list(
+              ~loc=stringLoc,
+              ~delimiter,
+              txt,
+            )
           ) {
           | Ok(declarations) =>
             /* Transform CSS and extract dynamic variables */
@@ -1122,15 +949,19 @@ let cx2_extension =
               Settings.Get.debug()
                 ? Printf.sprintf(
                     "  /* Generated from [%%cx2] in %s at line %d */\n%s",
-                    loc.loc_start.pos_fname,
-                    loc.loc_start.pos_lnum,
+                    stringLoc.loc_start.pos_fname,
+                    stringLoc.loc_start.pos_lnum,
                     css_string,
                   )
                 : css_string;
             Css_gen.add_css(~className, ~css=css_content);
-            Css_to_runtime.render_make_call(~loc, ~className, ~dynamic_vars);
+            Css_to_runtime.render_make_call(
+              ~loc=stringLoc,
+              ~className,
+              ~dynamic_vars,
+            );
           | Error((loc, msg)) => Error.expr(~loc, msg)
-          };
+          }
         | Pexp_array(arr) =>
           /* Valid: [%cx2 [|...|]] */
           arr
@@ -1177,16 +1008,17 @@ let keyframe_extension =
         File.set(path);
         switch (payload.pexp_desc) {
         | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
-          let loc =
-            Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-              stringLoc,
-              delimiter,
-            );
-          switch (Styled_ppx_css_parser.Driver.parse_keyframes(~loc, txt)) {
+          switch (
+            Styled_ppx_css_parser.Driver.parse_keyframes(
+              ~loc=stringLoc,
+              ~delimiter,
+              txt,
+            )
+          ) {
           | Ok(declarations) =>
-            Css_to_runtime.render_keyframes(~loc, declarations)
+            Css_to_runtime.render_keyframes(~loc=stringLoc, declarations)
           | Error((loc, msg)) => Error.expr(~loc, msg)
-          };
+          }
         | _ =>
           Error.raise(
             ~loc=payload.pexp_loc,
@@ -1211,18 +1043,19 @@ let css_extension =
         File.set(path);
         switch (payload.pexp_desc) {
         | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
-          let loc =
-            Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-              stringLoc,
-              delimiter,
-            );
-          switch (Styled_ppx_css_parser.Driver.parse_declaration(~loc, txt)) {
+          switch (
+            Styled_ppx_css_parser.Driver.parse_declaration(
+              ~loc=stringLoc,
+              ~delimiter,
+              txt,
+            )
+          ) {
           | Ok(declarations) =>
             let declarationListValues =
-              Css_to_runtime.render_declaration(~loc, declarations);
+              Css_to_runtime.render_declaration(~loc=stringLoc, declarations);
             List.nth(declarationListValues, 0);
           | Error((loc, msg)) => Error.expr(~loc, msg)
-          };
+          }
         /* TODO: Instead of getting the first element,
              fail when there's more than one declaration or
            make a mechanism to flatten all the properties */
@@ -1248,16 +1081,17 @@ let styled_global_extension =
         File.set(path);
         switch (payload.pexp_desc) {
         | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
-          let loc =
-            Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-              stringLoc,
-              delimiter,
-            );
-          switch (Styled_ppx_css_parser.Driver.parse_stylesheet(~loc, txt)) {
+          switch (
+            Styled_ppx_css_parser.Driver.parse_stylesheet(
+              ~loc=stringLoc,
+              ~delimiter,
+              txt,
+            )
+          ) {
           | Ok(stylesheets) =>
-            Css_to_runtime.render_global(~loc, stylesheets)
+            Css_to_runtime.render_global(~loc=stringLoc, stylesheets)
           | Error((loc, msg)) => Error.expr(~loc, msg)
-          };
+          }
         | _ =>
           Error.expr(
             ~loc=payload.pexp_loc,

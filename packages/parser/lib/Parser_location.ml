@@ -30,11 +30,7 @@ let intersection (loc1 : Ppxlib.location) (loc2 : Ppxlib.location) :
         pos_cnum = loc1.loc_start.pos_cnum + loc2.loc_end.pos_cnum;
       }
   in
-  {
-    Ppxlib.Location.loc_start = start_pos;
-    loc_end = end_pos;
-    loc_ghost = false;
-  }
+  { loc_start = start_pos; loc_end = end_pos; loc_ghost = false }
 
 let update_loc_with_delimiter (loc : Ppxlib.location) delimiter :
   Ppxlib.location =

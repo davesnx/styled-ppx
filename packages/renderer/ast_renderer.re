@@ -30,7 +30,6 @@ switch (input, help) {
   | Ok(declarations) =>
     print_endline(Styled_ppx_css_parser.Ast.show_rule_list(declarations))
   | Error((loc, msg)) =>
-    open Styled_ppx_css_parser.Ast;
     let position = loc.loc_start;
     let curr_char_pos = position.pos_cnum;
     let lnum = position.pos_lnum;
