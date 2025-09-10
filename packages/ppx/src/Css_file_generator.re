@@ -15,12 +15,19 @@ module Buffer = {
   };
 
   let get_css_content = () => {
-    let rules =
-      List.rev(css_rules^)
-      |> List.map(((className, css)) =>
-           Printf.sprintf(".%s {\n%s\n}", className, css)
-         );
-    String.concat("\n", rules);
+    let buffer = Buffer.create(1024);
+
+    css_rules^
+    |> List.rev
+    |> List.iter(((className, css)) => {
+         Buffer.add_char(buffer, '.');
+         Buffer.add_string(buffer, className);
+         Buffer.add_string(buffer, " {");
+         Buffer.add_string(buffer, css);
+         Buffer.add_string(buffer, "}");
+         Buffer.add_char(buffer, '\n');
+       });
+    Buffer.contents(buffer);
   };
 
   let clear = () => {
