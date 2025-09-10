@@ -288,10 +288,10 @@ module Mapper = {
         ) {
         | Ok(declarations) =>
           declarations
-          |> Css_to_runtime.render_declarations(~loc=stringLoc)
-          |> Css_to_runtime.add_label(~loc=stringLoc, moduleName)
+          |> Css_runtime.render_declarations(~loc=stringLoc)
+          |> Css_runtime.add_label(~loc=stringLoc, moduleName)
           |> Builder.pexp_array(~loc=stringLoc)
-          |> Css_to_runtime.render_style_call(~loc=stringLoc)
+          |> Css_runtime.render_style_call(~loc=stringLoc)
         | Error((loc, msg)) => Error.expr(~loc, msg)
         };
 
@@ -331,9 +331,9 @@ module Mapper = {
       let htmlTag = getHtmlTagUnsafe(~loc=extensionLoc, extensionName);
       let styles =
         arr
-        |> Css_to_runtime.add_label(~loc=arrayLoc, moduleName)
+        |> Css_runtime.add_label(~loc=arrayLoc, moduleName)
         |> Builder.pexp_array(~loc=arrayLoc)
-        |> Css_to_runtime.render_style_call(~loc=arrayLoc);
+        |> Css_runtime.render_style_call(~loc=arrayLoc);
 
       Builder.pstr_module(
         ~loc=moduleLoc,
@@ -402,7 +402,7 @@ module Mapper = {
 
           let css_content = css_string;
           Css_gen.add_css(~className, ~css=css_content);
-          Css_to_runtime.render_make_call(
+          Css_runtime.render_make_call(
             ~loc=stringLoc,
             ~className,
             ~dynamic_vars,
@@ -566,7 +566,7 @@ module Mapper = {
                 )
               : css_string;
           Css_gen.add_css(~className, ~css=css_content);
-          Css_to_runtime.render_make_call(
+          Css_runtime.render_make_call(
             ~loc=stringLoc,
             ~className,
             ~dynamic_vars,
@@ -626,10 +626,10 @@ module Mapper = {
         ) {
         | Ok(declarations) =>
           declarations
-          |> Css_to_runtime.render_declarations(~loc=stringLoc)
-          |> Css_to_runtime.add_label(~loc=stringLoc, valueName)
+          |> Css_runtime.render_declarations(~loc=stringLoc)
+          |> Css_runtime.add_label(~loc=stringLoc, valueName)
           |> Builder.pexp_array(~loc=stringLoc)
-          |> Css_to_runtime.render_style_call(~loc=stringLoc)
+          |> Css_runtime.render_style_call(~loc=stringLoc)
         | Error((loc, msg)) => Error.expr(~loc, msg)
         };
 
@@ -674,9 +674,9 @@ module Mapper = {
       ) =>
       let expr =
         arr
-        |> Css_to_runtime.add_label(~loc=payloadLoc, valueName)
+        |> Css_runtime.add_label(~loc=payloadLoc, valueName)
         |> Builder.pexp_array(~loc=payloadLoc)
-        |> Css_to_runtime.render_style_call(~loc);
+        |> Css_runtime.render_style_call(~loc);
 
       Builder.pstr_value(
         ~loc,
@@ -848,16 +848,16 @@ let cx_extension_without_let_binding =
           ) {
           | Ok(declarations) =>
             declarations
-            |> Css_to_runtime.render_declarations(~loc=stringLoc)
+            |> Css_runtime.render_declarations(~loc=stringLoc)
             |> Builder.pexp_array(~loc=stringLoc)
-            |> Css_to_runtime.render_style_call(~loc=stringLoc)
+            |> Css_runtime.render_style_call(~loc=stringLoc)
           | Error((loc, msg)) => Error.expr(~loc, msg)
           }
         | Pexp_array(arr) =>
           /* Valid: [%cx [|...|]] */
           arr
           |> Builder.pexp_array(~loc=payload.pexp_loc)
-          |> Css_to_runtime.render_style_call(~loc=payload.pexp_loc)
+          |> Css_runtime.render_style_call(~loc=payload.pexp_loc)
         | _ =>
           let examples =
             switch (File.get()) {
@@ -955,7 +955,7 @@ let cx2_extension =
                   )
                 : css_string;
             Css_gen.add_css(~className, ~css=css_content);
-            Css_to_runtime.render_make_call(
+            Css_runtime.render_make_call(
               ~loc=stringLoc,
               ~className,
               ~dynamic_vars,
@@ -966,7 +966,7 @@ let cx2_extension =
           /* Valid: [%cx2 [|...|]] */
           arr
           |> Builder.pexp_array(~loc=payload.pexp_loc)
-          |> Css_to_runtime.render_style_call(~loc=payload.pexp_loc)
+          |> Css_runtime.render_style_call(~loc=payload.pexp_loc)
         | _ =>
           let examples =
             switch (File.get()) {
@@ -1016,7 +1016,7 @@ let keyframe_extension =
             )
           ) {
           | Ok(declarations) =>
-            Css_to_runtime.render_keyframes(~loc=stringLoc, declarations)
+            Css_runtime.render_keyframes(~loc=stringLoc, declarations)
           | Error((loc, msg)) => Error.expr(~loc, msg)
           }
         | _ =>
@@ -1052,7 +1052,7 @@ let css_extension =
           ) {
           | Ok(declarations) =>
             let declarationListValues =
-              Css_to_runtime.render_declaration(~loc=stringLoc, declarations);
+              Css_runtime.render_declaration(~loc=stringLoc, declarations);
             List.nth(declarationListValues, 0);
           | Error((loc, msg)) => Error.expr(~loc, msg)
           }
@@ -1089,7 +1089,7 @@ let styled_global_extension =
             )
           ) {
           | Ok(stylesheets) =>
-            Css_to_runtime.render_global(~loc=stringLoc, stylesheets)
+            Css_runtime.render_global(~loc=stringLoc, stylesheets)
           | Error((loc, msg)) => Error.expr(~loc, msg)
           }
         | _ =>

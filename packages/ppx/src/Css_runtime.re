@@ -53,19 +53,6 @@ let render_variable = (~loc, v) => {
   );
 };
 
-let source_code_of_loc = (loc: Ppxlib.Location.t) => {
-  let {loc_start, loc_end, _} = loc;
-  switch (Styled_ppx_css_parser.Driver.last_buffer^) {
-  | Some(buffer: Sedlexing.lexbuf) =>
-    /* TODO: pos_offset is hardcoded to 0, unsure about the effects */
-    let pos_offset = 0;
-    let loc_start = loc_start.pos_cnum - pos_offset;
-    let loc_end = loc_end.pos_cnum - pos_offset;
-    Sedlexing.Latin1.sub_lexeme(buffer, loc_start, loc_end - loc_start);
-  | None => raise(Empty_buffer("last buffer not set"))
-  };
-};
-
 let concat = (~loc, expr, acc) => {
   let concat_fn =
     {
@@ -132,7 +119,8 @@ let rec render_at_rule = (~loc, at_rule: at_rule) => {
 and render_media_query = (~loc, at_rule: at_rule) => {
   let (_, at_rule_prelude_loc) = at_rule.prelude;
   let parse_condition = {
-    let prelude = source_code_of_loc(at_rule_prelude_loc) |> String.trim;
+    let prelude =
+      Styled_ppx_css_parser.Driver.source_code_of_loc(at_rule_prelude_loc);
     Css_property_parser.Parser.parse(
       Css_property_parser.Parser.media_query_list,
       prelude,
@@ -179,7 +167,8 @@ and render_media_query = (~loc, at_rule: at_rule) => {
 and render_container_query = (~loc, at_rule: at_rule) => {
   let (_, at_rule_prelude_loc) = at_rule.prelude;
   let parse_condition = {
-    let prelude = source_code_of_loc(at_rule_prelude_loc) |> String.trim;
+    let prelude =
+      Styled_ppx_css_parser.Driver.source_code_of_loc(at_rule_prelude_loc);
     Css_property_parser.Parser.parse(
       Css_property_parser.Parser.container_condition_list,
       prelude,
@@ -234,8 +223,8 @@ and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
   let (property, name_loc) = d.name;
   let (_valueList, value_loc) = d.value;
   let (important, _) = d.important;
-  /* String.trim is a hack, location should be correct and not contain any whitespace */
-  let value_source = source_code_of_loc(value_loc) |> String.trim;
+  let value_source =
+    Styled_ppx_css_parser.Driver.source_code_of_loc(value_loc);
 
   let declaration_location =
     Styled_ppx_css_parser.Parser_location.update_pos_lnum(

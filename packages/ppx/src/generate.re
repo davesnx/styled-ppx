@@ -1263,10 +1263,10 @@ let dynamicStyles = (~loc, ~moduleName, ~functionExpr, ~labeledArguments) => {
       ) {
       | Ok(declarations) =>
         declarations
-        |> Css_to_runtime.render_declarations(~loc)
-        |> Css_to_runtime.add_label(~loc, moduleName)
+        |> Css_runtime.render_declarations(~loc)
+        |> Css_runtime.add_label(~loc, moduleName)
         |> Builder.pexp_array(~loc)
-        |> Css_to_runtime.render_style_call(~loc)
+        |> Css_runtime.render_style_call(~loc)
       | Error((loc, msg)) => Error.expr(~loc, msg)
       }
 
@@ -1274,9 +1274,9 @@ let dynamicStyles = (~loc, ~moduleName, ~functionExpr, ~labeledArguments) => {
     | Pexp_array(arr) =>
       arr
       |> List.rev
-      |> Css_to_runtime.add_label(~loc, moduleName)
+      |> Css_runtime.add_label(~loc, moduleName)
       |> Builder.pexp_array(~loc)
-      |> Css_to_runtime.render_style_call(~loc)
+      |> Css_runtime.render_style_call(~loc)
 
     /* styled.div () => {
          ...
@@ -1287,7 +1287,7 @@ let dynamicStyles = (~loc, ~moduleName, ~functionExpr, ~labeledArguments) => {
       /* Generate a new sequence where the last expression is
          wrapped in render_style_call and render the other expressions. */
       let styles =
-        sequence |> getLastSequence |> Css_to_runtime.render_style_call(~loc);
+        sequence |> getLastSequence |> Css_runtime.render_style_call(~loc);
       Builder.pexp_sequence(~loc, expr, styles);
 
     /* styled.div () => {
@@ -1298,15 +1298,12 @@ let dynamicStyles = (~loc, ~moduleName, ~functionExpr, ~labeledArguments) => {
       /* Generate a new `let in` where the last expression is
          wrapped in render_style_call */
       let styles =
-        expression
-        |> getLastExpression
-        |> Css_to_runtime.render_style_call(~loc);
+        expression |> getLastExpression |> Css_runtime.render_style_call(~loc);
       Builder.pexp_let(~loc, Nonrecursive, value_binding, styles);
 
     /* styled.div () => { styles } */
     | Pexp_ident(ident) =>
-      Builder.pexp_ident(~loc, ident)
-      |> Css_to_runtime.render_style_call(~loc)
+      Builder.pexp_ident(~loc, ident) |> Css_runtime.render_style_call(~loc)
     /* TODO: With this default case we support all expressions here.
        Users might find this confusing, we could give some warnings before the type-checker does. */
     | _ => functionExpr

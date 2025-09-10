@@ -1,8 +1,6 @@
-module Location = Ppxlib.Location;
-
 let menhir = MenhirLib.Convert.Simplified.traditional2revised;
 
-let parse = (~loc: Ppxlib.location, lexbuf, parser) => {
+let parse = (~loc, lexbuf, parser) => {
   let last_token = ref((Parser.EOF, Lexing.dummy_pos, Lexing.dummy_pos));
 
   let next_token = () => {
@@ -53,8 +51,22 @@ let parse_stylesheet = (~loc, ~delimiter=None, input: string) => {
   parse_string(~loc=loc_with_delimiter, Parser.stylesheet, input);
 };
 
-let parse_keyframes = (~loc, ~delimiter=None, input: string) => {
+let parse_keyframes = (~loc, ~delimiter, input: string) => {
   let loc_with_delimiter =
     Parser_location.update_loc_with_delimiter(loc, delimiter);
   parse_string(~loc=loc_with_delimiter, Parser.keyframes, input);
+};
+
+let source_code_of_loc = ({loc_start, loc_end, _}: Ast.loc) => {
+  switch (last_buffer^) {
+  | Some(buffer: Sedlexing.lexbuf) =>
+    /* TODO: pos_offset is hardcoded to 0, unsure about the effects */
+    let pos_offset = 0;
+    let loc_start = loc_start.pos_cnum - pos_offset;
+    let loc_end = loc_end.pos_cnum - pos_offset;
+    Sedlexing.Latin1.sub_lexeme(buffer, loc_start, loc_end - loc_start)
+    /* String.trim is a hack, location should be correct and not contain any whitespace */
+    |> String.trim;
+  | None => assert(false)
+  };
 };
