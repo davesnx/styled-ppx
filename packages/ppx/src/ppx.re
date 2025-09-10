@@ -1,121 +1,4 @@
 module Builder = Ppxlib.Ast_builder.Default;
-module Css_gen = Css_file_generator;
-
-module Css_transform = {
-  open Styled_ppx_css_parser.Ast;
-
-  let variable_to_css_var_name = (path: list(string)) => {
-    path
-    |> String.concat("-")
-    |> String.lowercase_ascii
-    |> String.map(c =>
-         if (c == '.') {
-           '-';
-         } else {
-           c;
-         }
-       );
-  };
-
-  /* Transform component values, replacing Variables with CSS custom properties */
-  let rec transform_component_value =
-          (
-            cv: component_value,
-            dynamic_vars: ref(list((string, string, string))),
-            property_name: option(string),
-          )
-          : component_value => {
-    switch (cv) {
-    | Variable(path) =>
-      let var_name = variable_to_css_var_name(path);
-      let original_path = String.concat(".", path);
-
-      let property = Option.value(property_name, ~default="");
-      if (!List.exists(((vn, _, _)) => vn == var_name, dynamic_vars^)) {
-        dynamic_vars :=
-          [(var_name, original_path, property), ...dynamic_vars^];
-      };
-
-      Function(
-        ("var", Ppxlib.Location.none),
-        (
-          [(Ident("--" ++ var_name), Ppxlib.Location.none)],
-          Ppxlib.Location.none,
-        ),
-      );
-    | Function(name, body) =>
-      let (body_values, body_loc) = body;
-      let transformed_body =
-        List.map(
-          ((value, loc)) =>
-            (
-              transform_component_value(value, dynamic_vars, property_name),
-              loc,
-            ),
-          body_values,
-        );
-      Function(name, (transformed_body, body_loc));
-    | Paren_block(values) =>
-      let transformed =
-        List.map(
-          ((value, loc)) =>
-            (
-              transform_component_value(value, dynamic_vars, property_name),
-              loc,
-            ),
-          values,
-        );
-      Paren_block(transformed);
-    | Bracket_block(values) =>
-      let transformed =
-        List.map(
-          ((value, loc)) =>
-            (
-              transform_component_value(value, dynamic_vars, property_name),
-              loc,
-            ),
-          values,
-        );
-      Bracket_block(transformed);
-    | _ => cv
-    };
-  };
-
-  let transform_declaration = (decl: declaration, dynamic_vars) => {
-    let (property_name, _) = decl.name;
-    let (value_list, value_loc) = decl.value;
-    let transformed_values =
-      List.map(
-        ((cv, loc)) =>
-          (
-            transform_component_value(cv, dynamic_vars, Some(property_name)),
-            loc,
-          ),
-        value_list,
-      );
-    {
-      ...decl,
-      value: (transformed_values, value_loc),
-    };
-  };
-
-  let transform_rule = (rule: rule, dynamic_vars) => {
-    switch (rule) {
-    | Declaration(decl) =>
-      Declaration(transform_declaration(decl, dynamic_vars))
-    | _ => rule
-    };
-  };
-
-  let transform_rule_list = (declarations: rule_list) => {
-    let dynamic_vars = ref([]);
-    let (rule_list, rule_loc) = declarations;
-    let transformed_rules =
-      List.map(rule => transform_rule(rule, dynamic_vars), rule_list);
-    let transformed_declarations = (transformed_rules, rule_loc);
-    (transformed_declarations, List.rev(dynamic_vars^));
-  };
-};
 
 module Mapper = {
   open Ppxlib;
@@ -389,19 +272,8 @@ module Mapper = {
           )
         ) {
         | Ok(declarations) =>
-          let (transformed_declarations, dynamic_vars) =
-            Css_transform.transform_rule_list(declarations);
-
-          let className = {
-            let hash = Murmur2.default(str);
-            Printf.sprintf("css-%s", hash);
-          };
-
-          let css_string =
-            Styled_ppx_css_parser.Render.rule_list(transformed_declarations);
-
-          let css_content = css_string;
-          Css_gen.add_css(~className, ~css=css_content);
+          let (className, dynamic_vars) =
+            Css_file.add_css(~hash_by=str, declarations);
           Css_runtime.render_make_call(
             ~loc=stringLoc,
             ~className,
@@ -523,49 +395,8 @@ module Mapper = {
           )
         ) {
         | Ok(declarations) =>
-          /* Transform CSS and extract dynamic variables */
-          let (transformed_declarations, dynamic_vars) =
-            Css_transform.transform_rule_list(declarations);
-
-          /* Generate class name based on original styles */
-          let className = {
-            let hash = Murmur2.default(styles);
-            Printf.sprintf("css-%s", hash);
-          };
-
-          /* Render transformed CSS to string and add to CSS file */
-          let css_string =
-            Styled_ppx_css_parser.Render.rule_list(transformed_declarations);
-
-          /* Debug: Log the transformed CSS */
-          if (Settings.Get.debug()) {
-            Printf.printf("[styled-ppx] Transformed CSS: %s\n", css_string);
-            Printf.printf(
-              "[styled-ppx] Dynamic vars: %d\n",
-              List.length(dynamic_vars),
-            );
-            List.iter(
-              ((var_name, original, property)) =>
-                Printf.printf(
-                  "[styled-ppx]   --%s => %s (property: %s)\n",
-                  var_name,
-                  original,
-                  property,
-                ),
-              dynamic_vars,
-            );
-          };
-
-          let css_content =
-            Settings.Get.debug()
-              ? Printf.sprintf(
-                  "  /* Generated from [%%cx] in %s at line %d */\n%s",
-                  stringLoc.loc_start.pos_fname,
-                  stringLoc.loc_start.pos_lnum,
-                  css_string,
-                )
-              : css_string;
-          Css_gen.add_css(~className, ~css=css_content);
+          let (className, dynamic_vars) =
+            Css_file.add_css(~hash_by=styles, declarations);
           Css_runtime.render_make_call(
             ~loc=stringLoc,
             ~className,
@@ -846,8 +677,8 @@ let cx_extension_without_let_binding =
               txt,
             )
           ) {
-          | Ok(declarations) =>
-            declarations
+          | Ok(rule_list) =>
+            rule_list
             |> Css_runtime.render_declarations(~loc=stringLoc)
             |> Builder.pexp_array(~loc=stringLoc)
             |> Css_runtime.render_style_call(~loc=stringLoc)
@@ -907,54 +738,8 @@ let cx2_extension =
             )
           ) {
           | Ok(declarations) =>
-            /* Transform CSS and extract dynamic variables */
-            let (transformed_declarations, dynamic_vars) =
-              Css_transform.transform_rule_list(declarations);
-
-            /* Generate class name based on original styles */
-            let className = {
-              let hash = Murmur2.default(txt);
-              Printf.sprintf("css-%s", hash);
-            };
-
-            /* Render transformed CSS to string and add to CSS file */
-            let css_string =
-              Styled_ppx_css_parser.Render.rule_list(
-                transformed_declarations,
-              );
-
-            /* Debug: Log the transformed CSS */
-            if (Settings.Get.debug()) {
-              Printf.printf(
-                "[styled-ppx] cx2 Transformed CSS: %s\n",
-                css_string,
-              );
-              Printf.printf(
-                "[styled-ppx] cx2 Dynamic vars: %d\n",
-                List.length(dynamic_vars),
-              );
-              List.iter(
-                ((var_name, original, property)) =>
-                  Printf.printf(
-                    "[styled-ppx] cx2   --%s => %s (property: %s)\n",
-                    var_name,
-                    original,
-                    property,
-                  ),
-                dynamic_vars,
-              );
-            };
-
-            let css_content =
-              Settings.Get.debug()
-                ? Printf.sprintf(
-                    "  /* Generated from [%%cx2] in %s at line %d */\n%s",
-                    stringLoc.loc_start.pos_fname,
-                    stringLoc.loc_start.pos_lnum,
-                    css_string,
-                  )
-                : css_string;
-            Css_gen.add_css(~className, ~css=css_content);
+            let (className, dynamic_vars) =
+              Css_file.add_css(~hash_by=txt, declarations);
             Css_runtime.render_make_call(
               ~loc=stringLoc,
               ~className,
