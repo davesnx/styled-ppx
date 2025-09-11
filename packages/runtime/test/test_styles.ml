@@ -114,9 +114,9 @@ let avoid_hash_collision =
        |}]
   in
   let _css = get_string_style_rules () in
-  assert_not_equal_string classname1 classname2;
-  assert_not_equal_string classname2 classname3;
-  assert_not_equal_string classname1 classname3
+  assert_string_not_equal classname1 classname2;
+  assert_string_not_equal classname2 classname3;
+  assert_string_not_equal classname1 classname3
 
 let float_values =
   test "float_values" @@ fun () ->

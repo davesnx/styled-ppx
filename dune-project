@@ -7,7 +7,7 @@
 (name styled-ppx)
 
 (generate_opam_files true)
-
+(executables_implicit_empty_intf)
 (implicit_transitive_deps false)
 
 (source (github davesnx/styled-ppx))
