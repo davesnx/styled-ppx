@@ -4,7 +4,7 @@ let parse = input => {
   | Error((loc_start, _loc_end, msg)) =>
     let pos = loc_start;
     let curr_pos = pos.pos_cnum;
-    let lnum = pos.pos_lnum + 1;
+    let lnum = pos.pos_lnum;
     let pos_bol = pos.pos_bol;
     let err =
       Printf.sprintf(

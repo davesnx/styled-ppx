@@ -1,9 +1,7 @@
-let selectors = [%cx
-  {|
+let selectors = [%cx {|
   color: white;
 
   &:hover {
     colorx: red;
   }
-|}
-];
+|}];

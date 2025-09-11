@@ -13,12 +13,16 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 6, characters 4-10:
+  File "input.re", lines 4-5, characters 32-31:
+  1 | .....
+  2 | ...............
+  3 | 
+  4 | ......... {
+  5 |     colo........
   Error: Unknown property 'colorx'
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  
   let selectors =
     CSS.style([|
       CSS.label("selectors"),

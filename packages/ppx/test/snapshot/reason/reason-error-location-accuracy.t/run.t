@@ -17,8 +17,8 @@ Test error location accuracy
   5 | [%cx2 "color: rex"];
             ^^^^^^^^^^^^
   Error: Type error on cx2 definition
-  File "input.re", lines 4-5, characters 0-16:
+  File "input.re", lines 4-5, characters 7-17:
   4 | [%cx2 "color: rex"];
-      ^^^^^^^^^^^^^^^^
+             ^^^^^^^^^^
     Got 'function rgb', did you mean 'function var'?
   [1]

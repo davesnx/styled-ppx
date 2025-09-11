@@ -22,7 +22,9 @@ let bar = [%keyframe {|0% { opacity: 0.0 } 100% { opacity: 1.0 }|}];
 [%css {|animation-timing-function: step-end|}];
 [%css {|animation-timing-function: steps(3, start)|}];
 [%css {|animation-timing-function: steps(5, end)|}];
-[%css {|animation-timing-function: ease, step-start, cubic-bezier(0.1, 0.7, 1, 0.1)|}];
+[%css
+  {|animation-timing-function: ease, step-start, cubic-bezier(0.1, 0.7, 1, 0.1)|}
+];
 [%css {|animation-iteration-count: infinite|}];
 [%css {|animation-iteration-count: 8|}];
 [%css {|animation-iteration-count: 4.35|}];

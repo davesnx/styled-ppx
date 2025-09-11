@@ -17,9 +17,10 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 1, characters 16-22:
-  Error: Property 'display' has an invalid value: 'blocki',
-         Expected '-moz-inline-box' but instead got 'blocki'.
+  File "input.re", line 1, characters 15-21:
+  1 |  [%cx {|display: blocki;|}];
+                     ^^^^^^
+  Error: Property 'display' has an invalid value: 'blocki'
   [1]
 
   $ cat >input.re <<EOF
@@ -27,9 +28,10 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 1, characters 29-35:
-  Error: Property 'display' has an invalid value: 'blocki',
-         Expected '-moz-inline-box' but instead got 'blocki'.
+  File "input.re", line 1, characters 28-34:
+  1 |  [%cx {|width: 100%; display: blocki;|}];
+                                  ^^^^^^
+  Error: Property 'display' has an invalid value: 'blocki'
   [1]
 
   $ cat >input.re <<EOF
@@ -39,9 +41,10 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 2, characters 27-33:
-  Error: Property 'display' has an invalid value: 'blocki',
-         Expected '-moz-inline-box' but instead got 'blocki'.
+  File "input.re", line 2, characters 33-39:
+  1 | .......
+  2 | .........................: bloc...
+  Error: Property 'display' has an invalid value: 'blocki'
   [1]
 
   $ cat >input.re <<EOF
@@ -52,7 +55,8 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 3, characters 14-20:
-  Error: Property 'display' has an invalid value: 'blocki',
-         Expected '-moz-inline-box' but instead got 'blocki'.
+  File "input.re", line 3, characters 20-26:
+  2 | .......
+  3 | ............: bloc...
+  Error: Property 'display' has an invalid value: 'blocki'
   [1]

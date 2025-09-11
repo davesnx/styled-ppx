@@ -4,27 +4,26 @@ open Modifier;
 open Parser;
 open Rule.Match;
 
-let check = (location, testable, recived, expected) =>
-  Alcotest.check(~pos=location, testable, "", expected, recived);
+let check = Alcotest_extra.check;
 
 let tests = [
   // TODO: case insensitive
   test("integer", () => {
     let parse = parse([%value "<integer>"]);
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(Alcotest.int, Alcotest.string),
       parse("54"),
       Ok(54),
     );
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(Alcotest.int, Alcotest.string),
       parse("54.4"),
       Error("Expected an integer, got a float instead."),
     );
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(Alcotest.int, Alcotest.string),
       parse("ident"),
       Error("Expected an integer."),
@@ -33,19 +32,19 @@ let tests = [
   test("<number>", () => {
     let parse = parse([%value "<number>"]);
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(Alcotest.float(1.), Alcotest.string),
       parse("55"),
       Ok(55.),
     );
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(Alcotest.float(1.), Alcotest.string),
       parse("55.5"),
       Ok(55.5),
     );
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(Alcotest.float(1.), Alcotest.string),
       parse("ident"),
       Error("Expected a number. Got 'ident' instead."),
@@ -92,7 +91,7 @@ let tests = [
     let pp_length = (ppf, x) => Fmt.pf(ppf, "%S", render_length(x));
     let length = Alcotest.testable(pp_length, (==));
     let to_check = Alcotest.result(length, Alcotest.string);
-    let expect = check(__POS__, to_check);
+    let expect = check(~__POS__, to_check);
     expect(parse("56cm"), Ok(`Cm(56.)));
     expect(parse("57px"), Ok(`Px(57.)));
     expect(parse("59invalid"), Error("Invalid length unit 'invalid'."));
@@ -112,31 +111,31 @@ let tests = [
     let pp_length = (ppf, x) => Fmt.pf(ppf, "%S", render_angle(x));
     let angle = Alcotest.testable(pp_length, (==));
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(angle, Alcotest.string),
       parse("1deg"),
       Ok(`Deg(1.)),
     );
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(angle, Alcotest.string),
       parse("0.2turn"),
       Ok(`Turn(0.2)),
     );
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(angle, Alcotest.string),
       parse("59px"),
       Error("Invalid angle unit 'px'."),
     );
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(angle, Alcotest.string),
       parse("0"),
       Ok(`Deg(0.)),
     );
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(angle, Alcotest.string),
       parse("60"),
       Error("Expected angle."),
@@ -153,31 +152,31 @@ let tests = [
     let pp_length = (ppf, x) => Fmt.pf(ppf, "%S", render_time(x));
     let time = Alcotest.testable(pp_length, (==));
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(time, Alcotest.string),
       parse(".5s"),
       Ok(`S(0.5)),
     );
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(time, Alcotest.string),
       parse("50ms"),
       Ok(`Ms(50.)),
     );
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(time, Alcotest.string),
       parse("59px"),
       Error("Invalid time unit 'px'."),
     );
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(time, Alcotest.string),
       parse("0"),
       Error("Expected time."),
     );
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(time, Alcotest.string),
       parse("60"),
       Error("Expected time."),
@@ -194,31 +193,31 @@ let tests = [
     let pp_length = (ppf, x) => Fmt.pf(ppf, "%S", render_frequency(x));
     let frequency = Alcotest.testable(pp_length, (==));
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(frequency, Alcotest.string),
       parse("6hz"),
       Ok(`Hz(6.)),
     );
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(frequency, Alcotest.string),
       parse(".6kHz"),
       Ok(`KHz(0.6)),
     );
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(frequency, Alcotest.string),
       parse("59px"),
       Error("Invalid frequency unit 'px'."),
     );
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(frequency, Alcotest.string),
       parse("0"),
       Error("Expected frequency."),
     );
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(frequency, Alcotest.string),
       parse("60"),
       Error("Expected frequency."),
@@ -236,31 +235,31 @@ let tests = [
     let pp_length = (ppf, x) => Fmt.pf(ppf, "%S", render_resolution(x));
     let resolution = Alcotest.testable(pp_length, (==));
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(resolution, Alcotest.string),
       parse("6x"),
       Ok(`Dppx(6.)),
     );
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(resolution, Alcotest.string),
       parse("3dpi"),
       Ok(`Dpi(3.)),
     );
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(resolution, Alcotest.string),
       parse("59px"),
       Error("Invalid resolution unit 'px'."),
     );
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(resolution, Alcotest.string),
       parse("0"),
       Error("Expected resolution."),
     );
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(resolution, Alcotest.string),
       parse("60"),
       Error("Expected resolution."),
@@ -269,19 +268,19 @@ let tests = [
   test("<percentage>", () => {
     let parse = parse([%value "<percentage>"]);
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(Alcotest.float(1.), Alcotest.string),
       parse("61%"),
       Ok(61.),
     );
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(Alcotest.float(1.), Alcotest.string),
       parse("62.3%"),
       Ok(62.3),
     );
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(Alcotest.float(1.), Alcotest.string),
       parse("63.4:"),
       Error("Expected percentage."),
@@ -290,13 +289,13 @@ let tests = [
   test("keyword", () => {
     let parse = parse([%value "gintoki"]);
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(Alcotest.unit, Alcotest.string),
       parse("gintoki"),
       Ok(),
     );
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(Alcotest.unit, Alcotest.string),
       parse("nope"),
       Error("Expected 'gintoki' but instead got 'nope'."),
@@ -305,7 +304,7 @@ let tests = [
   test("<ident>", () => {
     let parse = parse([%value "<ident>"]);
     let to_check = Alcotest.result(Alcotest.string, Alcotest.string);
-    let expect = check(__POS__, to_check);
+    let expect = check(~__POS__, to_check);
     expect(parse("test"), Ok("test"));
     expect(parse("'ohno'"), Error("Expected an indentifier."));
   }),
@@ -324,47 +323,48 @@ let tests = [
       Fmt.pf(ppf, "%S", render_css_wide_keywords(x));
     let css_wide_keywords = Alcotest.testable(pp_css_wide_keywords, (==));
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(css_wide_keywords, Alcotest.string),
       parse("initial"),
       Ok(`Initial),
     );
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(css_wide_keywords, Alcotest.string),
       parse("inherit"),
       Ok(`Inherit),
     );
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(css_wide_keywords, Alcotest.string),
       parse("unset"),
       Ok(`Unset),
     );
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(css_wide_keywords, Alcotest.string),
       parse("revert"),
       Ok(`Revert),
     );
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(css_wide_keywords, Alcotest.string),
       parse("revert-layer"),
       Ok(`RevertLayer),
     );
-    /* TODO: xor should combine the error messages */
     check(
-      __POS__,
+      ~__POS__,
       Alcotest.result(css_wide_keywords, Alcotest.string),
       parse("nope"),
-      Error("Expected 'revert-layer' but instead got 'nope'."),
+      Error(
+        {|Got 'nope', expected 'inherit', 'initial', 'revert', 'revert-layer', or 'unset'.|},
+      ),
     );
   }),
   test("<string>", () => {
     let parse = parse([%value "<string>"]);
     let to_check = Alcotest.result(Alcotest.string, Alcotest.string);
-    let expect = check(__POS__, to_check);
+    let expect = check(~__POS__, to_check);
     expect(parse({|'tuturu'|}), Ok("tuturu"));
     expect(parse({|'67.8'|}), Ok("67.8"));
     expect(parse({|ident|}), Error("Expected a string."));
@@ -382,14 +382,14 @@ let tests = [
   test("<dashed-ident>", () => {
     let parse = parse([%value "<dashed-ident>"]);
     let to_check = Alcotest.result(Alcotest.string, Alcotest.string);
-    let expect = check(__POS__, to_check);
+    let expect = check(~__POS__, to_check);
     expect(parse("--random"), Ok("--random"));
     expect(parse("random'"), Error("Expected a --variable."));
   }),
   test("<url-no-interp>", () => {
     let parse = parse([%value "<url-no-interp>"]);
     let to_check = Alcotest.result(Alcotest.string, Alcotest.string);
-    let expect = check(__POS__, to_check);
+    let expect = check(~__POS__, to_check);
     expect(parse("url(https://google.com)"), Ok("https://google.com"));
     expect(
       parse("url(\"https://duckduckgo.com\")"),
@@ -400,7 +400,7 @@ let tests = [
   test("<hex-color>", () => {
     let parse = parse([%value "<hex-color>"]);
     let to_check = Alcotest.result(Alcotest.string, Alcotest.string);
-    let expect = check(__POS__, to_check);
+    let expect = check(~__POS__, to_check);
     expect(parse("#abc"), Ok("abc"));
     expect(parse("#abcdefgh"), Ok("abcdefgh"));
     expect(parse("#abcdefghi"), Error("Expected a hex-color."));
@@ -416,7 +416,7 @@ let tests = [
         ),
         Alcotest.string,
       );
-    let expect = check(__POS__, to_check);
+    let expect = check(~__POS__, to_check);
     expect(parse("[abc]"), Ok(((), ["abc"], ())));
     expect(parse("[a b]"), Ok(((), ["a", "b"], ())));
     expect(parse("[a b c]"), Ok(((), ["a", "b", "c"], ())));
@@ -432,7 +432,7 @@ let tests = [
         ),
         Alcotest.string,
       );
-    let expect = check(__POS__, to_check);
+    let expect = check(~__POS__, to_check);
     expect(parse("'lola' , 'flores'"), Ok((Some("lola"), (), "flores")));
   }),
   test("custom-ident vs all", () => {
@@ -452,7 +452,7 @@ let tests = [
     let pp_output = (ppf, x) => Fmt.pf(ppf, "%S", render_output(x));
     let output = Alcotest.testable(pp_output, (==));
     let to_check = Alcotest.result(output, Alcotest.string);
-    let expect = check(__POS__, to_check);
+    let expect = check(~__POS__, to_check);
     expect(parse("all"), Ok(`All));
     expect(parse("moar"), Ok(`Custom_ident("moar")));
   }),
@@ -460,7 +460,7 @@ let tests = [
     let parse = parse([%value "<interpolation>"]);
     let to_check =
       Alcotest.result(Alcotest.list(Alcotest.string), Alcotest.string);
-    let expect = check(__POS__, to_check);
+    let expect = check(~__POS__, to_check);
     expect(parse("$(Module.value)"), Ok(["Module", "value"]));
     expect(parse("$(Module'.value')"), Ok(["Module'", "value'"]));
     /* TODO: Add error message into interpolation */

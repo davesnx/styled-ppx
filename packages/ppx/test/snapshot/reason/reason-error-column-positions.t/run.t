@@ -15,5 +15,6 @@ Test that error positions point to the exact location of the error.
 The column position should point to the value, not the start of the property.
 
   $ dune build 2>&1 | grep -E "File.*line.*character|Error:" | head -n 40
-  File "input.re", line 1, characters 0-13:
-  Error: Got 'fley', did you mean 'flex'?
+  File "input.re", line 4, characters 18-33:
+  Error: Type error on cx2 definition
+  File "input.re", lines 3-4, characters 19-32:

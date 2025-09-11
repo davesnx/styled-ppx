@@ -415,7 +415,7 @@ let pattern_helpers_test: tests = [
 open Let;
 
 let rule_tests: tests = [
-  test("Rule using Pattern.expect", _ => {
+  test("Rule using expect", _ => {
     let input = [IDENT("decl"), COLON, IDENT("value")];
 
     let rule = {
@@ -444,9 +444,4 @@ let rule_tests: tests = [
 ];
 
 let tests: tests =
-  List.concat([
-    data_monad_tests,
-    rule_tests,
-    pattern_helpers_test,
-    rule_tests,
-  ]);
+  List.flatten([data_monad_tests, rule_tests, pattern_helpers_test]);

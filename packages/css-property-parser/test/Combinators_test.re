@@ -287,18 +287,18 @@ let tests = [
     let parser = parse_exn([%value "red | blue | green"]);
     let () =
       switch (parser("red")) {
-      | `red => ()
-      | _ => Alcotest.fail("should be `red")
+      | `Red => ()
+      | _ => Alcotest.fail("should be `Red")
       };
     let () =
       switch (parser("blue")) {
-      | `blue => ()
-      | _ => Alcotest.fail("should be `blue")
+      | `Blue => ()
+      | _ => Alcotest.fail("should be `Blue")
       };
     let () =
       switch (parser("green")) {
-      | `green => ()
-      | _ => Alcotest.fail("should be `green")
+      | `Green => ()
+      | _ => Alcotest.fail("should be `Green")
       };
     ();
   }),
@@ -316,8 +316,8 @@ let tests = [
       };
     let () =
       switch (parser("auto")) {
-      | `auto => ()
-      | _ => Alcotest.fail("should be `auto")
+      | `Auto => ()
+      | _ => Alcotest.fail("should be `Auto")
       };
     ();
   }),
@@ -325,13 +325,13 @@ let tests = [
     let parser = parse_exn([%value "[A B] | [C D] | E"]);
     let () =
       switch (parser("A B")) {
-      | `Static((), ()) => ()
-      | _ => Alcotest.fail("should be `Static((), ())")
+      | `Static_0((), ()) => ()
+      | _ => Alcotest.fail("should be `Static_0((), ())")
       };
     let () =
       switch (parser("C D")) {
-      | `Static__0((), ()) => ()
-      | _ => Alcotest.fail("should be `Static__0((), ())")
+      | `Static_1((), ()) => ()
+      | _ => Alcotest.fail("should be `Static_1((), ())")
       };
     let () =
       switch (parser("E")) {
@@ -377,13 +377,13 @@ let tests = [
       };
     let () =
       switch (parser("B")) {
-      | `Static(`B) => ()
-      | _ => Alcotest.fail("should be `Static(`B)")
+      | `Xor(`B) => ()
+      | _ => Alcotest.fail("should be `Xor(`B)")
       };
     let () =
       switch (parser("C")) {
-      | `Static(`C) => ()
-      | _ => Alcotest.fail("should be `Static(`C)")
+      | `Xor(`C) => ()
+      | _ => Alcotest.fail("should be `Xor(`C)")
       };
     ();
   }),
@@ -411,13 +411,13 @@ let tests = [
       };
     let () =
       switch (parser("inherit")) {
-      | `inherit_ => ()
-      | _ => Alcotest.fail("should be `inherit")
+      | `Inherit => ()
+      | _ => Alcotest.fail("should be `Inherit")
       };
     let () =
       switch (parser("initial")) {
-      | `initial => ()
-      | _ => Alcotest.fail("should be `initial")
+      | `Initial => ()
+      | _ => Alcotest.fail("should be `Initial")
       };
     ();
   }),

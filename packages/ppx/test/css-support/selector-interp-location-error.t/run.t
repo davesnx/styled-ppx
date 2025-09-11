@@ -13,7 +13,9 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 8, characters 19-21:
+  File "input.re", line 8, characters 43-45:
+  7 | .......................
+  8 | ...................(2...
   Error: Parse error while reading token '2'
   [1]
 

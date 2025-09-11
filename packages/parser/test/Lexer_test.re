@@ -151,7 +151,7 @@ let success_tests =
          |> List.map(token => (token, Lexing.dummy_pos, Lexing.dummy_pos))
          |> Lexer.to_string;
 
-       test(input, () =>
+       test(Printf.sprintf("parse %s", input), () =>
          check(~__POS__, Alcotest.string, inputTokens, outputTokens)
        );
      });
@@ -333,7 +333,7 @@ let test_with_location =
            list_tokens_to_string(output),
          );
 
-       test(input, assertion);
+       test(Printf.sprintf("parse with loc %S", input), assertion);
      });
 
 let tests: tests =
