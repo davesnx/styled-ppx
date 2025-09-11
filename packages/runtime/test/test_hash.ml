@@ -1,13 +1,3 @@
-let quoted = Printf.sprintf "%S"
-
-let check_equality (input, expected) =
-  ( quoted input,
-    `Quick,
-    fun () ->
-      (Alcotest.check Alcotest.string)
-        ("hash " ^ quoted input ^ " should be")
-        expected (Murmur2.default input) )
-
 let data =
   [
     "", "0";
@@ -52,4 +42,12 @@ let data =
     "z-index: 10", "7au0g0";
   ]
 
-let tests = "Hash", List.map check_equality data
+let tests =
+  List.map
+    (fun (input, expected) ->
+      let quoted = Printf.sprintf "%S" input in
+      test quoted (fun () ->
+        (Alcotest.check Alcotest.string)
+          ("hash " ^ quoted ^ " should be")
+          expected (Murmur2.default input)))
+    data

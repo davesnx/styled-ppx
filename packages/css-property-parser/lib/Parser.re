@@ -5,8 +5,6 @@ open Styled_ppx_css_parser;
 
 module StringMap = Map.Make(String);
 
-let (let.ok) = Result.bind;
-
 /* https://developer.mozilla.org/en-US/docs/Web/CSS/gradient */
 let rec _legacy_gradient = [%value.rec
   "<-webkit-gradient()> | <-legacy-linear-gradient> | <-legacy-repeating-linear-gradient> | <-legacy-radial-gradient> | <-legacy-repeating-radial-gradient>"
@@ -1959,6 +1957,7 @@ and y = [%value.rec "<number>"];
 
 let apply_parser = (parser, tokens_with_loc) => {
   open Styled_ppx_css_parser.Lexer;
+  let (let.ok) = Result.bind;
 
   let tokens =
     tokens_with_loc
@@ -2058,25 +2057,13 @@ let fn = (type a, name: string, rule: Rule.rule(a)): (module RULE) => {
 let packed_rules: list(module RULE) = [
   abs("-legacy-gradient", _legacy_gradient),
   abs("-legacy-linear-gradient", _legacy_linear_gradient),
-  abs(
-    "-legacy-linear-gradient-arguments",
-    _legacy_linear_gradient_arguments,
-  ),
+  abs("-legacy-linear-gradient-arguments", _legacy_linear_gradient_arguments),
   abs("-legacy-radial-gradient", _legacy_radial_gradient),
-  abs(
-    "-legacy-radial-gradient-arguments",
-    _legacy_radial_gradient_arguments,
-  ),
+  abs("-legacy-radial-gradient-arguments", _legacy_radial_gradient_arguments),
   abs("-legacy-radial-gradient-shape", _legacy_radial_gradient_shape),
   abs("-legacy-radial-gradient-size", _legacy_radial_gradient_size),
-  abs(
-    "-legacy-repeating-linear-gradient",
-    _legacy_repeating_linear_gradient,
-  ),
-  abs(
-    "-legacy-repeating-radial-gradient",
-    _legacy_repeating_radial_gradient,
-  ),
+  abs("-legacy-repeating-linear-gradient", _legacy_repeating_linear_gradient),
+  abs("-legacy-repeating-radial-gradient", _legacy_repeating_radial_gradient),
   abs("-non-standard-color", _non_standard_color),
   abs("-non-standard-font", _non_standard_font),
   abs("-non-standard-image-rendering", _non_standard_image_rendering),
@@ -2176,10 +2163,7 @@ let packed_rules: list(module RULE) = [
   abs("feature-value-block", feature_value_block),
   abs("feature-value-block-list", feature_value_block_list),
   abs("feature-value-declaration", feature_value_declaration),
-  abs(
-    "feature-value-declaration-list",
-    feature_value_declaration_list,
-  ),
+  abs("feature-value-declaration-list", feature_value_declaration_list),
   abs("feature-value-name", feature_value_name),
   abs("fill-rule", fill_rule),
   abs("filter-function", filter_function),
@@ -2342,10 +2326,7 @@ let packed_rules: list(module RULE) = [
     property__moz_border_radius_bottomright,
   ),
   prop("-moz-border-radius-topleft", property__moz_border_radius_topleft),
-  prop(
-    "-moz-border-radius-topright",
-    property__moz_border_radius_topright,
-  ),
+  prop("-moz-border-radius-topright", property__moz_border_radius_topright),
   prop("-moz-border-right-colors", property__moz_border_right_colors),
   prop("-moz-border-top-colors", property__moz_border_top_colors),
   prop("-moz-context-properties", property__moz_context_properties),
@@ -2354,10 +2335,7 @@ let packed_rules: list(module RULE) = [
     property__moz_control_character_visibility,
   ),
   prop("-moz-float-edge", property__moz_float_edge),
-  prop(
-    "-moz-force-broken-image-icon",
-    property__moz_force_broken_image_icon,
-  ),
+  prop("-moz-force-broken-image-icon", property__moz_force_broken_image_icon),
   prop("-moz-image-region", property__moz_image_region),
   prop("-moz-orient", property__moz_orient),
   prop("-moz-osx-font-smoothing", property__moz_osx_font_smoothing),
@@ -2370,14 +2348,8 @@ let packed_rules: list(module RULE) = [
     "-moz-outline-radius-bottomright",
     property__moz_outline_radius_bottomright,
   ),
-  prop(
-    "-moz-outline-radius-topleft",
-    property__moz_outline_radius_topleft,
-  ),
-  prop(
-    "-moz-outline-radius-topright",
-    property__moz_outline_radius_topright,
-  ),
+  prop("-moz-outline-radius-topleft", property__moz_outline_radius_topleft),
+  prop("-moz-outline-radius-topright", property__moz_outline_radius_topright),
   prop("-moz-stack-sizing", property__moz_stack_sizing),
   prop("-moz-text-blink", property__moz_text_blink),
   prop("-moz-user-focus", property__moz_user_focus),
@@ -2389,30 +2361,15 @@ let packed_rules: list(module RULE) = [
   prop("-webkit-appearance", property__webkit_appearance),
   prop("-webkit-background-clip", property__webkit_background_clip),
   prop("-webkit-border-before", property__webkit_border_before),
-  prop(
-    "-webkit-border-before-color",
-    property__webkit_border_before_color,
-  ),
-  prop(
-    "-webkit-border-before-style",
-    property__webkit_border_before_style,
-  ),
-  prop(
-    "-webkit-border-before-width",
-    property__webkit_border_before_width,
-  ),
+  prop("-webkit-border-before-color", property__webkit_border_before_color),
+  prop("-webkit-border-before-style", property__webkit_border_before_style),
+  prop("-webkit-border-before-width", property__webkit_border_before_width),
   prop("-webkit-box-reflect", property__webkit_box_reflect),
   prop("-webkit-box-shadow", property_box_shadow),
   prop("-webkit-box-orient", property_box_orient),
   prop("-webkit-column-break-after", property__webkit_column_break_after),
-  prop(
-    "-webkit-column-break-before",
-    property__webkit_column_break_before,
-  ),
-  prop(
-    "-webkit-column-break-inside",
-    property__webkit_column_break_inside,
-  ),
+  prop("-webkit-column-break-before", property__webkit_column_break_before),
+  prop("-webkit-column-break-inside", property__webkit_column_break_inside),
   prop("-webkit-font-smoothing", property__webkit_font_smoothing),
   prop("-webkit-line-clamp", property__webkit_line_clamp),
   prop("-webkit-mask", property__webkit_mask),
@@ -2431,10 +2388,7 @@ let packed_rules: list(module RULE) = [
   prop("-webkit-mask-size", property__webkit_mask_size),
   prop("-webkit-overflow-scrolling", property__webkit_overflow_scrolling),
   prop("-webkit-print-color-adjust", property__webkit_print_color_adjust),
-  prop(
-    "-webkit-tap-highlight-color",
-    property__webkit_tap_highlight_color,
-  ),
+  prop("-webkit-tap-highlight-color", property__webkit_tap_highlight_color),
   prop("-webkit-text-fill-color", property__webkit_text_fill_color),
   prop("-webkit-text-security", property__webkit_text_security),
   prop("-webkit-text-stroke", property__webkit_text_stroke),
@@ -2627,10 +2581,7 @@ let packed_rules: list(module RULE) = [
   prop("font-variation-settings", property_font_variation_settings),
   prop("font-weight", property_font_weight),
   prop("gap", property_gap),
-  prop(
-    "glyph-orientation-horizontal",
-    property_glyph_orientation_horizontal,
-  ),
+  prop("glyph-orientation-horizontal", property_glyph_orientation_horizontal),
   prop("glyph-orientation-vertical", property_glyph_orientation_vertical),
   prop("grid", property_grid),
   prop("grid-area", property_grid_area),
@@ -2836,10 +2787,7 @@ let packed_rules: list(module RULE) = [
   prop("scroll-padding-bottom", property_scroll_padding_bottom),
   prop("scroll-padding-inline", property_scroll_padding_inline),
   prop("scroll-padding-inline-end", property_scroll_padding_inline_end),
-  prop(
-    "scroll-padding-inline-start",
-    property_scroll_padding_inline_start,
-  ),
+  prop("scroll-padding-inline-start", property_scroll_padding_inline_start),
   prop("scroll-padding-left", property_scroll_padding_left),
   prop("scroll-padding-right", property_scroll_padding_right),
   prop("scroll-padding-top", property_scroll_padding_top),
@@ -2960,10 +2908,7 @@ let packed_rules: list(module RULE) = [
   abs("font-families", font_families),
   abs("single-animation-direction", single_animation_direction),
   abs("single-animation-fill-mode", single_animation_fill_mode),
-  abs(
-    "single-animation-iteration-count",
-    single_animation_iteration_count,
-  ),
+  abs("single-animation-iteration-count", single_animation_iteration_count),
   abs("single-animation-play-state", single_animation_play_state),
   abs("single-transition", single_transition),
   abs("single-transition-property", single_transition_property),
@@ -3036,7 +2981,8 @@ let check_rule = (rule, value) => {
   parse(R.rule, value) |> Result.is_ok;
 };
 
-let check_property = (~name, value)
+let check_property =
+    (~name, value)
     : result(
         unit,
         [>

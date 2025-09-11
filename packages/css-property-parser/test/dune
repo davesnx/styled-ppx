@@ -1,7 +1,10 @@
 (test
  (name Runner)
+ (flags
+  (:standard -open Alcotest_extra))
  (libraries
   alcotest
+  alcotest_extra
   styled-ppx.css-property-parser
   reason_css_parser_ppx_lib
   styled-ppx.css-parser

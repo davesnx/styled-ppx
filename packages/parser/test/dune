@@ -1,10 +1,13 @@
 (test
  (name Runner)
  (modules Lexer_test Parser_test Runner)
+ (flags
+  (:standard -open Alcotest_extra))
  (libraries
   sedlex
   styled-ppx.css-parser
   alcotest
+  alcotest_extra
   ppxlib
   ppxlib.astlib
   ppx_deriving.runtime))

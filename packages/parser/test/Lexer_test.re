@@ -1,5 +1,3 @@
-open Alcotest;
-
 module Tokens = Styled_ppx_css_parser.Tokens;
 module Lexer = Styled_ppx_css_parser.Lexer;
 module Parser = Styled_ppx_css_parser.Parser;
@@ -153,8 +151,8 @@ let success_tests =
          |> List.map(token => (token, Lexing.dummy_pos, Lexing.dummy_pos))
          |> Lexer.to_string;
 
-       test_case(input, `Quick, () =>
-         check(string, "should match" ++ input, inputTokens, outputTokens)
+       test(input, () =>
+         check(~__POS__, Alcotest.string, inputTokens, outputTokens)
        );
      });
 
@@ -162,8 +160,8 @@ let error_tests =
   [("/*", "Unterminated comment at the end of the string")]
   |> List.map(((input, output)) => {
        let error = Lexer.tokenize(input) |> Result.get_error;
-       test_case(input, `Quick, () =>
-         check(string, "should match" ++ input, error, output)
+       test(input, () =>
+         check(~__POS__, Alcotest.string, error, output)
        );
      });
 
@@ -328,13 +326,15 @@ let test_with_location =
 
        let assertion = () =>
          Alcotest.check(
+           ~pos=__POS__,
            Alcotest.string,
            "should succeed lexing: " ++ input,
            list_parse_tokens_to_string(values),
            list_tokens_to_string(output),
          );
 
-       Alcotest.test_case(input, `Quick, assertion);
+       test(input, assertion);
      });
 
-let tests = success_tests @ error_tests @ test_with_location;
+let tests: tests =
+  List.concat([success_tests, error_tests, test_with_location]);

@@ -1,10 +1,10 @@
 Alcotest.run(
-  "Reason CSS Parser",
-  [
-    ("Combinators", Combinators_test.tests),
-    ("Modifiers", Modifiers_test.tests),
-    ("Rules", Rules_test.tests),
-    ("Standard", Standard_test.tests),
-    ("Types", Types_test.tests),
-  ],
+  "CSS Property Parser",
+  List.flatten([
+    Combinators_test.tests,
+    Modifiers_test.tests,
+    Rules_test.tests,
+    Standard_test.tests,
+    Types_test.tests,
+  ]),
 );

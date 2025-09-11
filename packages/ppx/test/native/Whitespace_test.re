@@ -1,9 +1,6 @@
-open Alcotest;
-open Ppxlib;
+let loc = Ppxlib.Location.none;
 
-let loc = Location.none;
-
-let tests =
+let tests: tests =
   [
     ("ignore in empty", [%expr [%cx " "]], [%expr [%cx ""]]),
     ("ignore in style_rule", [%expr [%cx ".bar{}"]], [%expr [%cx ".bar {}"]]),
@@ -145,14 +142,13 @@ let tests =
   ]
   |> List.map(item => {
        let (title, input, expected) = item;
-       test_case(
+       test(
          title,
-         `Quick,
          () => {
            let pp_expr = (ppf, x) =>
-             Fmt.pf(ppf, "%S", Pprintast.string_of_expression(x));
-           let check_expr = testable(pp_expr, (==));
-           check(check_expr, "", expected, input);
+             Fmt.pf(ppf, "%S", Ppxlib.Pprintast.string_of_expression(x));
+           let check_expr = Alcotest.testable(pp_expr, (==));
+           check(~__POS__, check_expr, expected, input);
          },
        );
      });

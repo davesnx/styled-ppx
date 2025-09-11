@@ -1,5 +1,3 @@
-open Alcotest;
-
 let parse = input => {
   let pos = Lexing.dummy_pos;
   let loc =
@@ -61,13 +59,13 @@ let error_tests_data =
   |> List.mapi((_index, (input, output)) => {
        let assertion = () =>
          check(
-           string,
-           "should error" ++ input,
+           ~__POS__,
+           Alcotest.string,
            output,
            parse(input) |> Result.get_error,
          );
 
-       test_case(input, `Quick, assertion);
+       test(input, assertion);
      });
 
 let tests = error_tests_data;

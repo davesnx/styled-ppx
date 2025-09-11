@@ -7,8 +7,6 @@ open Rule.Match;
 let check = (location, testable, recived, expected) =>
   Alcotest.check(~pos=location, testable, "", expected, recived);
 
-let test = (title, body) => Alcotest.test_case(title, `Quick, body);
-
 let tests = [
   // TODO: case insensitive
   test("integer", () => {
@@ -301,7 +299,7 @@ let tests = [
       __POS__,
       Alcotest.result(Alcotest.unit, Alcotest.string),
       parse("nope"),
-      Error("Expected 'ident gintoki' but instead got 'ident nope'."),
+      Error("Expected 'gintoki' but instead got 'nope'."),
     );
   }),
   test("<ident>", () => {
@@ -360,7 +358,7 @@ let tests = [
       __POS__,
       Alcotest.result(css_wide_keywords, Alcotest.string),
       parse("nope"),
-      Error("Expected 'ident revert-layer' but instead got 'ident nope'."),
+      Error("Expected 'revert-layer' but instead got 'nope'."),
     );
   }),
   test("<string>", () => {
@@ -466,9 +464,6 @@ let tests = [
     expect(parse("$(Module.value)"), Ok(["Module", "value"]));
     expect(parse("$(Module'.value')"), Ok(["Module'", "value'"]));
     /* TODO: Add error message into interpolation */
-    expect(
-      parse("asd"),
-      Error("Expected 'delimiter $' but instead got 'ident asd'."),
-    );
+    expect(parse("asd"), Error("Expected '$' but instead got 'asd'."));
   }),
 ];

@@ -1,7 +1,4 @@
-open Alcotest;
-open Ppxlib;
-
-let loc = Location.none;
+let loc = Ppxlib.Location.none;
 
 let label: CSS.rule = CSS.label("asdf");
 let block: CSS.rule = CSS.display(`block);
@@ -1301,18 +1298,17 @@ let runner = tests =>
   List.map(
     item => {
       let (_input, input, expected) = item;
-      test_case(
-        Pprintast.string_of_expression(input),
-        `Quick,
+      test(
+        Ppxlib.Pprintast.string_of_expression(input),
         () => {
           let pp_expr = (ppf, x) =>
-            Fmt.pf(ppf, "%S", Pprintast.string_of_expression(x));
-          let check_expr = testable(pp_expr, (==));
-          check(check_expr, "", expected, input);
+            Fmt.pf(ppf, "%S", Ppxlib.Pprintast.string_of_expression(x));
+          let check_expr = Alcotest.testable(pp_expr, (==));
+          check(~__POS__, check_expr, expected, input);
         },
       );
     },
     tests,
   );
 
-let tests = runner(properties_static_css_tests);
+let tests: tests = runner(properties_static_css_tests);

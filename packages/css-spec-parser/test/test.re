@@ -1,7 +1,6 @@
-open Alcotest;
 open Css_spec_parser;
 
-let parse_tests =
+let parse_tests: tests =
   [
     (
       "A? B? C?",
@@ -220,21 +219,21 @@ let parse_tests =
        let result =
          switch (value_of_string(result)) {
          | Some(result) => result
-         | None => failwith("Failed to parse")
+         | None => Alcotest.fail("Failed to parse")
          };
 
        let assertion = () =>
          check(
-           string,
-           "Should match",
+           ~__POS__,
+           Alcotest.string,
            show_value(expected),
            show_value(result),
          );
 
-       test_case(show_value(result), `Quick, assertion);
+       test(show_value(result), assertion);
      });
 
-let print_tests =
+let print_tests: tests =
   [
     ("  a b   |   c ||   d &&   e f", "'a' 'b' | 'c' || 'd' && 'e' 'f'"),
     ("[ a b ] | [ c || [ d && [ e f ]]]", "'a' 'b' | 'c' || 'd' && 'e' 'f'"),
@@ -244,22 +243,12 @@ let print_tests =
        let result =
          switch (value_of_string(input)) {
          | Some(res) => res
-         | None => fail("Failed to parse")
+         | None => Alcotest.fail("Failed to parse")
          };
 
-       let assertion = () =>
-         check(
-           ~pos=__POS__,
-           string,
-           "Should match",
-           string_of_value(result),
-           expected,
-         );
-
-       test_case(show_value(result), `Quick, assertion);
+       test(show_value(result), () => {
+         check(~__POS__, Alcotest.string, expected, show_value(result))
+       });
      });
 
-Alcotest.run(
-  "CSS Spec Parser",
-  [("Parser", parse_tests), ("Printer", print_tests)],
-);
+Alcotest.run("CSS Spec Parser", List.concat([parse_tests, print_tests]));

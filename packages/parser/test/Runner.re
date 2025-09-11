@@ -1,4 +1,4 @@
 Alcotest.run(
   "Lexer and Parser",
-  [("Lexer", Lexer_test.tests), ("Parser", Parser_test.tests)],
+  List.concat([Lexer_test.tests, Parser_test.tests]),
 );

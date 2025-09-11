@@ -1,9 +1,4 @@
-open Ppxlib;
-open Alcotest;
-
-let loc = Location.none;
-
-let test = (name, expr, output) => {
+let test = (name, expr: Ppxlib.expression, output) => {
   module Ast_builder =
     Ppxlib.Ast_builder.Make({
       let loc = expr.pexp_loc;
@@ -11,24 +6,26 @@ let test = (name, expr, output) => {
   let pattern =
     Ast_builder.ppat_var({
       txt: name,
-      loc,
+      loc: Ppxlib.Location.none,
     });
   let value_binding = Ast_builder.value_binding(~pat=pattern, ~expr);
   module Emit = Generate.Make(Ast_builder);
   let (name, core_type) = Emit.make_type(value_binding);
   let type_declaration = Emit.make_type_declaration(name, core_type);
   let expected = Ast_builder.pstr_type(Nonrecursive, [type_declaration]);
-  test_case(name, `Quick, _ =>
-    check(
+  test(name, _ =>
+    Alcotest.check(
       Alcotest.string,
       "",
-      Pprintast.string_of_structure([expected]),
-      Pprintast.string_of_structure([output]),
+      Ppxlib.Pprintast.string_of_structure([expected]),
+      Ppxlib.Pprintast.string_of_structure([output]),
     )
   );
 };
 
-let tests: list(Alcotest.test_case(unit)) = [
+let loc = Ppxlib.Location.none;
+
+let tests: tests = [
   // Keyword
   test(
     "terminal",

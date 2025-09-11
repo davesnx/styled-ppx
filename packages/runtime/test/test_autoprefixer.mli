@@ -1,1 +1,1 @@
-val tests : string * unit Alcotest.test_case list
+val tests : (string * unit Alcotest.test_case list) list

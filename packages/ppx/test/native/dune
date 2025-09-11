@@ -1,7 +1,10 @@
 (test
  (name Runner)
+ (flags
+  (:standard -open Alcotest_extra))
  (libraries
   alcotest
+  alcotest_extra
   styled-ppx
   styled-ppx.native
   ppxlib
