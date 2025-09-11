@@ -753,9 +753,15 @@ let cx2_extension =
             | errors =>
               let error_messages =
                 errors
-                |> List.map(((loc, error)) =>
-                     (loc, error_to_string(error))
-                   );
+                |> List.map(((loc, error)) => {
+                     (
+                       Styled_ppx_css_parser.Parser_location.update_pos_lnum(
+                         loc,
+                         stringLoc,
+                       ),
+                       error_to_string(error),
+                     )
+                   });
               Error.expressions(
                 ~loc=stringLoc,
                 ~description="Type error on cx2 definition",

@@ -5,10 +5,13 @@ let to_ppxlib_location ?(loc_ghost = false) (start_pos : Lexing.position)
 let print_location label ({ loc_start; loc_end; _ } : Ppxlib.location) =
   let loc_start_column = loc_start.pos_cnum - loc_start.pos_bol in
   let loc_end_column = loc_end.pos_cnum - loc_end.pos_bol in
-  Printf.sprintf "%s start %d %d %d (L:%d c:%d) end %d %d %d (L:%d c:%d)" label
-    loc_start.pos_lnum loc_start.pos_bol loc_start.pos_cnum loc_start.pos_lnum
-    loc_start_column loc_end.pos_lnum loc_end.pos_bol loc_end.pos_cnum
-    loc_end.pos_lnum loc_end_column
+  Printf.sprintf
+    "%s\n\
+    \  start %d %d %d (Line %d column %d)\n\
+    \  end %d %d %d (Line %d column %d)"
+    label loc_start.pos_lnum loc_start.pos_bol loc_start.pos_cnum
+    loc_start.pos_lnum loc_start_column loc_end.pos_lnum loc_end.pos_bol
+    loc_end.pos_cnum loc_end.pos_lnum loc_end_column
 
 let intersection (loc1 : Ppxlib.location) (loc2 : Ppxlib.location) :
   Ppxlib.location =
@@ -42,17 +45,78 @@ let update_loc_with_delimiter (loc : Ppxlib.location) delimiter :
   and loc_end = { loc.loc_end with pos_cnum = loc.loc_end.pos_cnum + offset } in
   { loc_start; loc_end; loc_ghost = false }
 
-let update_pos_lnum (a : Ppxlib.location) (b : Ppxlib.location) =
-  let loc_start =
+let update_pos_lnum (css_loc : Ppxlib.location) (source_loc : Ppxlib.location) =
+  (* Map a location from CSS parser (relative to CSS string) to source file location.
+
+     css_loc: location within the CSS string (e.g., "display: fley")
+     source_loc: location of the entire CSS string in the source file (e.g., "{| color: rex; display: fley; |}")
+
+     The CSS parser returns positions relative to the CSS content with line numbers starting from 1.
+     We need to map these to the actual source file positions.
+  *)
+
+  (* Calculate the mapped start position *)
+  let mapped_start_line =
+    source_loc.loc_start.pos_lnum + css_loc.loc_start.pos_lnum - 1
+  in
+
+  let mapped_start_cnum =
+    if css_loc.loc_start.pos_lnum = 1 then
+      (* First line of CSS: add column offset to source start position *)
+      source_loc.loc_start.pos_cnum + css_loc.loc_start.pos_cnum
+    else
+      (* Subsequent lines: calculate based on CSS position *)
+      (* We need to find the actual character position in the source file *)
+      (* For now, use the CSS cnum adjusted by source file base *)
+      source_loc.loc_start.pos_cnum + css_loc.loc_start.pos_cnum
+  in
+
+  let mapped_start_bol =
+    if css_loc.loc_start.pos_lnum = 1 then source_loc.loc_start.pos_bol
+    else
+      (* For lines after the first, calculate the proper beginning of line *)
+      mapped_start_cnum
+      - (css_loc.loc_start.pos_cnum - css_loc.loc_start.pos_bol)
+  in
+
+  (* Calculate the mapped end position *)
+  let mapped_end_line =
+    source_loc.loc_start.pos_lnum + css_loc.loc_end.pos_lnum - 1
+  in
+
+  let mapped_end_cnum =
+    if css_loc.loc_end.pos_lnum = 1 then
+      (* End is on first line of CSS *)
+      source_loc.loc_start.pos_cnum + css_loc.loc_end.pos_cnum
+    else
+      (* End is on a subsequent line *)
+      source_loc.loc_start.pos_cnum + css_loc.loc_end.pos_cnum
+  in
+
+  let mapped_end_bol =
+    if css_loc.loc_end.pos_lnum = 1 then source_loc.loc_start.pos_bol
+    else mapped_end_cnum - (css_loc.loc_end.pos_cnum - css_loc.loc_end.pos_bol)
+  in
+
+  let loc_start : Lexing.position =
     {
-      a.loc_start with
-      pos_lnum = a.loc_start.pos_lnum + b.loc_start.pos_lnum - 1;
+      pos_fname = source_loc.loc_start.pos_fname;
+      pos_lnum = mapped_start_line;
+      pos_bol = mapped_start_bol;
+      pos_cnum = mapped_start_cnum;
     }
   in
-  let loc_end =
-    { a.loc_end with pos_lnum = a.loc_end.pos_lnum + b.loc_start.pos_lnum - 1 }
+
+  let loc_end : Lexing.position =
+    {
+      pos_fname = source_loc.loc_end.pos_fname;
+      pos_lnum = mapped_end_line;
+      pos_bol = mapped_end_bol;
+      pos_cnum = mapped_end_cnum;
+    }
   in
-  { a with loc_start; loc_end }
+
+  ({ loc_start; loc_end; loc_ghost = false } : Ppxlib.location)
 
 let map_to_source_location (source_loc : Ppxlib.location)
   (css_start_pos : Lexing.position) (css_end_pos : Lexing.position) :
