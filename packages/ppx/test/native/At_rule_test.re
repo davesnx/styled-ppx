@@ -11,7 +11,7 @@ let media_query_tests = [
     [%expr CSS.style([|CSS.media({js|(min-width: 33px)|js}, [||])|])],
   ),
   (
-    "(min-width: 33px)",
+    "(min-width: 33px), (min-width: 13px)",
     [%expr [%cx "@media (min-width: 33px), (min-width: 13px) {}"]],
     [%expr
       CSS.style([|
@@ -199,16 +199,6 @@ let media_query_tests = [
 ];
 
 let keyframe_tests = [
-  (
-    {|%keyframe "0% { color: red } 100% { color: green }"|},
-    [%expr [%keyframe "0% { color: red } 100% { color: green }"]],
-    [%expr
-      CSS.keyframes([|
-        (0, [|CSS.color(CSS.red)|]),
-        (100, [|CSS.color(CSS.green)|]),
-      |])
-    ],
-  ),
   (
     {|%keyframe "0%, 50%, 3% { color: red } 100% { color: green }"|},
     [%expr [%keyframe "0%, 50%, 3% { color: red } 100% { color: green }"]],

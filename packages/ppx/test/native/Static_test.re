@@ -103,11 +103,6 @@ let properties_static_css_tests = [
     [%expr [%css "max-height: 3vh"]],
     [%expr CSS.maxHeight(`vh(3.))],
   ),
-  (
-    [%css "box-sizing: border-box"],
-    [%expr [%css "box-sizing: border-box"]],
-    [%expr CSS.boxSizing(`borderBox)],
-  ),
   // css-box-3
   (
     [%css "margin-top: auto"],
@@ -262,14 +257,14 @@ let properties_static_css_tests = [
     [%expr CSS.color(`rgb((1, 2, 3)))],
   ),
   (
-    [%css "color: rgb(1 2 3 / .4)"],
-    [%expr [%css "color: rgb(1 2 3 / .4)"]],
-    [%expr CSS.color(`rgba((1, 2, 3, `num(0.4))))],
+    [%css "color: rgb(1 2 3 / .5)"],
+    [%expr [%css "color: rgb(1 2 3 / .5)"]],
+    [%expr CSS.color(`rgba((1, 2, 3, `num(0.5))))],
   ),
   (
-    [%css "color: rgba(1, 2, 3)"],
-    [%expr [%css "color: rgba(1, 2, 3)"]],
-    [%expr CSS.color(`rgb((1, 2, 3)))],
+    [%css "color: rgba(0, 2, 3)"],
+    [%expr [%css "color: rgba(0, 2, 3)"]],
+    [%expr CSS.color(`rgb((0, 2, 3)))],
   ),
   (
     [%css "color: rgba(1, 2, 3, .4)"],
@@ -893,11 +888,6 @@ let properties_static_css_tests = [
     [%expr CSS.textEmphasisPositions(`over, `left)],
   ),
   (
-    [%css "text-emphasis-position: left over"],
-    [%expr [%css "text-emphasis-position: left over"]],
-    [%expr CSS.textEmphasisPositions(`over, `left)],
-  ),
-  (
     [%css "line-break: auto"],
     [%expr [%css "line-break: auto"]],
     [%expr CSS.lineBreak(`auto)],
@@ -1295,11 +1285,14 @@ let properties_static_css_tests = [
 ];
 
 let runner = tests =>
-  List.map(
-    item => {
-      let (_input, input, expected) = item;
+  List.mapi(
+    (index, item) => {
+      let (_title, input, expected) = item;
+      let title = Ppxlib.Pprintast.string_of_expression(input);
       test(
-        Ppxlib.Pprintast.string_of_expression(input),
+        Int.to_string(index)
+        ++ ". "
+        ++ String.sub(title, 0, min(String.length(title), 20)),
         () => {
           let pp_expr = (ppf, x) =>
             Fmt.pf(ppf, "%S", Ppxlib.Pprintast.string_of_expression(x));

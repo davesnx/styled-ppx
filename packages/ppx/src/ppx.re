@@ -162,20 +162,22 @@ module Mapper = {
         when isStyled(extensionName) =>
       let htmlTag = getHtmlTagUnsafe(~loc=extensionLoc, extensionName);
       let styles =
-        switch (
-          Styled_ppx_css_parser.Driver.parse_declaration_list(
-            ~loc=stringLoc,
-            ~delimiter,
-            str,
-          )
-        ) {
+        switch (Styled_ppx_css_parser.Driver.parse_declaration_list(str)) {
         | Ok(declarations) =>
           declarations
           |> Css_runtime.render_declarations(~loc=stringLoc)
           |> Css_runtime.add_label(~loc=stringLoc, moduleName)
           |> Builder.pexp_array(~loc=stringLoc)
           |> Css_runtime.render_style_call(~loc=stringLoc)
-        | Error((loc, msg)) => Error.expr(~loc, msg)
+        | Error((start_post, end_post, msg)) =>
+          let loc =
+            Styled_ppx_css_parser.Parser_location.make_loc_from_pos(
+              ~loc=stringLoc,
+              ~delimiter,
+              start_post,
+              end_post,
+            );
+          Error.expr(~loc, msg);
         };
 
       Builder.pstr_module(
@@ -264,13 +266,7 @@ module Mapper = {
         | None => "div"
         };
       let stylesExpr =
-        switch (
-          Styled_ppx_css_parser.Driver.parse_declaration_list(
-            ~loc=stringLoc,
-            ~delimiter,
-            str,
-          )
-        ) {
+        switch (Styled_ppx_css_parser.Driver.parse_declaration_list(str)) {
         | Ok(declarations) =>
           let (className, dynamic_vars) =
             Css_file.push(~hash_by=str, declarations);
@@ -279,7 +275,15 @@ module Mapper = {
             ~className,
             ~dynamic_vars,
           );
-        | Error((loc, msg)) => Error.expr(~loc, msg)
+        | Error((start_post, end_post, msg)) =>
+          let loc =
+            Styled_ppx_css_parser.Parser_location.make_loc_from_pos(
+              ~loc=stringLoc,
+              ~delimiter,
+              start_post,
+              end_post,
+            );
+          Error.expr(~loc, msg);
         };
 
       Builder.pstr_module(
@@ -387,20 +391,22 @@ module Mapper = {
         ],
       ) =>
       let expr =
-        switch (
-          Styled_ppx_css_parser.Driver.parse_declaration_list(
-            ~loc=stringLoc,
-            ~delimiter,
-            styles,
-          )
-        ) {
+        switch (Styled_ppx_css_parser.Driver.parse_declaration_list(styles)) {
         | Ok(declarations) =>
           declarations
           |> Css_runtime.render_declarations(~loc=stringLoc)
           |> Css_runtime.add_label(~loc=stringLoc, valueName)
           |> Builder.pexp_array(~loc=stringLoc)
           |> Css_runtime.render_style_call(~loc=stringLoc)
-        | Error((loc, msg)) => Error.expr(~loc, msg)
+        | Error((start_post, end_post, msg)) =>
+          let loc =
+            Styled_ppx_css_parser.Parser_location.make_loc_from_pos(
+              ~loc=stringLoc,
+              ~delimiter,
+              start_post,
+              end_post,
+            );
+          Error.expr(~loc, msg);
         };
 
       Builder.pstr_value(
@@ -611,19 +617,21 @@ let cx_extension_without_let_binding =
         File.set(path);
         switch (payload.pexp_desc) {
         | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
-          switch (
-            Styled_ppx_css_parser.Driver.parse_declaration_list(
-              ~loc=stringLoc,
-              ~delimiter,
-              txt,
-            )
-          ) {
+          switch (Styled_ppx_css_parser.Driver.parse_declaration_list(txt)) {
           | Ok(rule_list) =>
             rule_list
             |> Css_runtime.render_declarations(~loc=stringLoc)
             |> Builder.pexp_array(~loc=stringLoc)
             |> Css_runtime.render_style_call(~loc=stringLoc)
-          | Error((loc, msg)) => Error.expr(~loc, msg)
+          | Error((start_post, end_post, msg)) =>
+            let loc =
+              Styled_ppx_css_parser.Parser_location.make_loc_from_pos(
+                ~loc=stringLoc,
+                ~delimiter,
+                start_post,
+                end_post,
+              );
+            Error.expr(~loc, msg);
           }
         | Pexp_array(arr) =>
           /* Valid: [%cx [|...|]] */
@@ -732,13 +740,7 @@ let cx2_extension =
         File.set(path);
         switch (payload.pexp_desc) {
         | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
-          switch (
-            Styled_ppx_css_parser.Driver.parse_declaration_list(
-              ~loc=stringLoc,
-              ~delimiter,
-              txt,
-            )
-          ) {
+          switch (Styled_ppx_css_parser.Driver.parse_declaration_list(txt)) {
           | Ok(rule_list) =>
             let validations = type_check_rule_list(rule_list);
             switch (get_errors(validations)) {
@@ -755,9 +757,12 @@ let cx2_extension =
                 errors
                 |> List.map(((loc, error)) => {
                      (
-                       Styled_ppx_css_parser.Parser_location.update_pos_lnum(
-                         loc,
-                         stringLoc,
+                       Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
+                         Styled_ppx_css_parser.Parser_location.intersection(
+                           stringLoc,
+                           loc,
+                         ),
+                         delimiter,
                        ),
                        error_to_string(error),
                      )
@@ -768,12 +773,19 @@ let cx2_extension =
                 error_messages,
               );
             };
-          | Error((loc, msg)) =>
+          | Error((start_post, end_post, msg)) =>
+            let loc =
+              Styled_ppx_css_parser.Parser_location.make_loc_from_pos(
+                ~loc=stringLoc,
+                ~delimiter,
+                start_post,
+                end_post,
+              );
             Error.expressions(
               ~loc=stringLoc,
               ~description="Parsing error on cx2 definition",
               [(loc, msg)],
-            )
+            );
           }
         | Pexp_array(arr) =>
           /* Valid: [%cx2 [|...|]] */
@@ -821,16 +833,18 @@ let keyframe_extension =
         File.set(path);
         switch (payload.pexp_desc) {
         | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
-          switch (
-            Styled_ppx_css_parser.Driver.parse_keyframes(
-              ~loc=stringLoc,
-              ~delimiter,
-              txt,
-            )
-          ) {
+          switch (Styled_ppx_css_parser.Driver.parse_keyframes(txt)) {
           | Ok(declarations) =>
             Css_runtime.render_keyframes(~loc=stringLoc, declarations)
-          | Error((loc, msg)) => Error.expr(~loc, msg)
+          | Error((start_post, end_post, msg)) =>
+            let loc =
+              Styled_ppx_css_parser.Parser_location.make_loc_from_pos(
+                ~loc=stringLoc,
+                ~delimiter,
+                start_post,
+                end_post,
+              );
+            Error.expr(~loc, msg);
           }
         | _ =>
           Error.raise(
@@ -856,18 +870,20 @@ let css_extension =
         File.set(path);
         switch (payload.pexp_desc) {
         | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
-          switch (
-            Styled_ppx_css_parser.Driver.parse_declaration(
-              ~loc=stringLoc,
-              ~delimiter,
-              txt,
-            )
-          ) {
+          switch (Styled_ppx_css_parser.Driver.parse_declaration(txt)) {
           | Ok(declarations) =>
             let declarationListValues =
               Css_runtime.render_declaration(~loc=stringLoc, declarations);
             List.nth(declarationListValues, 0);
-          | Error((loc, msg)) => Error.expr(~loc, msg)
+          | Error((start_post, end_post, msg)) =>
+            let loc =
+              Styled_ppx_css_parser.Parser_location.make_loc_from_pos(
+                ~loc=stringLoc,
+                ~delimiter,
+                start_post,
+                end_post,
+              );
+            Error.expr(~loc, msg);
           }
         /* TODO: Instead of getting the first element,
              fail when there's more than one declaration or
@@ -894,16 +910,18 @@ let styled_global_extension =
         File.set(path);
         switch (payload.pexp_desc) {
         | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
-          switch (
-            Styled_ppx_css_parser.Driver.parse_stylesheet(
-              ~loc=stringLoc,
-              ~delimiter,
-              txt,
-            )
-          ) {
+          switch (Styled_ppx_css_parser.Driver.parse_stylesheet(txt)) {
           | Ok(stylesheets) =>
             Css_runtime.render_global(~loc=stringLoc, stylesheets)
-          | Error((loc, msg)) => Error.expr(~loc, msg)
+          | Error((start_post, end_post, msg)) =>
+            let loc =
+              Styled_ppx_css_parser.Parser_location.make_loc_from_pos(
+                ~loc=stringLoc,
+                ~delimiter,
+                start_post,
+                end_post,
+              );
+            Error.expr(~loc, msg);
           }
         | _ =>
           Error.expr(

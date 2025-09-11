@@ -1,12 +1,4 @@
-let css = main => [%cx2
-  {|
-  color: $(main);
-  background-color: $(CSS.black);
-  display: flex;
-|}
-];
-
-let _css2 = [%cx2 {|
+let _css2 = [%cx {|
   color: red;
   padding: 10px;
 |}];
@@ -18,8 +10,6 @@ let classname = [%cx2
     gap: 10px;
   |}
 ];
-
-<div styles={css(CSS.red)} />;
 
 print_endline("\n");
 print_endline(

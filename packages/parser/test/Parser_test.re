@@ -1,12 +1,8 @@
 let parse = input => {
-  let pos = Lexing.dummy_pos;
-  let loc =
-    Styled_ppx_css_parser.Parser_location.to_ppxlib_location(pos, pos);
-  switch (Styled_ppx_css_parser.Driver.parse_stylesheet(~loc, input)) {
+  switch (Styled_ppx_css_parser.Driver.parse_stylesheet(input)) {
   | Ok(ast) => Ok(ast)
-  | Error((loc, msg)) =>
-    open Styled_ppx_css_parser.Ast;
-    let pos = loc.loc_start;
+  | Error((loc_start, _loc_end, msg)) =>
+    let pos = loc_start;
     let curr_pos = pos.pos_cnum;
     let lnum = pos.pos_lnum + 1;
     let pos_bol = pos.pos_bol;

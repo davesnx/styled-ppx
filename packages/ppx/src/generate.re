@@ -1254,20 +1254,22 @@ let dynamicStyles = (~loc, ~moduleName, ~functionExpr, ~labeledArguments) => {
     switch (functionExpr.pexp_desc) {
     /* styled.div () => "string" */
     | Pexp_constant(Pconst_string(str, loc, delimiter)) =>
-      switch (
-        Styled_ppx_css_parser.Driver.parse_declaration_list(
-          ~loc,
-          ~delimiter,
-          str,
-        )
-      ) {
+      switch (Styled_ppx_css_parser.Driver.parse_declaration_list(str)) {
       | Ok(declarations) =>
         declarations
         |> Css_runtime.render_declarations(~loc)
         |> Css_runtime.add_label(~loc, moduleName)
         |> Builder.pexp_array(~loc)
         |> Css_runtime.render_style_call(~loc)
-      | Error((loc, msg)) => Error.expr(~loc, msg)
+      | Error((loc_start, loc_end, msg)) =>
+        let loc =
+          Styled_ppx_css_parser.Parser_location.make_loc_from_pos(
+            ~loc,
+            ~delimiter,
+            loc_start,
+            loc_end,
+          );
+        Error.expr(~loc, msg);
       }
 
     /* styled.div () => "[||]" */

@@ -65,8 +65,10 @@ let concat = (~loc, expr, acc) => {
 
 let rec render_at_rule = (~loc, at_rule: at_rule) => {
   let (at_rule_name, at_rule_name_loc) = at_rule.name;
+  /* TODO: Make sure this location correct */
   let at_rule_name_loc =
-    Styled_ppx_css_parser.Parser_location.update_pos_lnum(
+    Styled_ppx_css_parser.Parser_location.intersection(
+      loc,
       {
         ...at_rule_name_loc,
         loc_start: {
@@ -77,7 +79,6 @@ let rec render_at_rule = (~loc, at_rule: at_rule) => {
           pos_lnum: at_rule_name_loc.loc_end.pos_lnum,
         },
       },
-      loc,
     );
   switch (at_rule_name) {
   | "media" => render_media_query(~loc, at_rule)
@@ -135,9 +136,9 @@ and render_media_query = (~loc, at_rule: at_rule) => {
   | Error(error_msg) =>
     Error.expr(
       ~loc=
-        Styled_ppx_css_parser.Parser_location.update_pos_lnum(
-          at_rule_prelude_loc,
+        Styled_ppx_css_parser.Parser_location.intersection(
           loc,
+          at_rule_prelude_loc,
         ),
       error_msg,
     )
@@ -183,9 +184,9 @@ and render_container_query = (~loc, at_rule: at_rule) => {
   | Error(error_msg) =>
     Error.expr(
       ~loc=
-        Styled_ppx_css_parser.Parser_location.update_pos_lnum(
-          at_rule_prelude_loc,
+        Styled_ppx_css_parser.Parser_location.intersection(
           loc,
+          at_rule_prelude_loc,
         ),
       error_msg,
     )
@@ -220,55 +221,22 @@ and render_container_query = (~loc, at_rule: at_rule) => {
   };
 }
 and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
-  let (property, name_loc) = d.name;
+  let (property, property_loc) = d.name;
   let (_valueList, value_loc) = d.value;
   let (important, _) = d.important;
   let value_source =
     Styled_ppx_css_parser.Driver.source_code_of_loc(value_loc);
 
-  /* Map CSS parser locations (relative to CSS content) to file locations.
-     The CSS parser returns line numbers starting from 1 for the CSS content.
-     We need to add these to the string location to get file locations. */
-  let declaration_location = {
-    let file_line = loc.loc_start.pos_lnum + value_loc.loc_start.pos_lnum - 1;
-    {
-      ...value_loc,
-      loc_start: {
-        ...value_loc.loc_start,
-        pos_fname: loc.loc_start.pos_fname,
-        pos_lnum: file_line,
-      },
-      loc_end: {
-        ...value_loc.loc_end,
-        pos_fname: loc.loc_end.pos_fname,
-        pos_lnum:
-          file_line
-          + (value_loc.loc_end.pos_lnum - value_loc.loc_start.pos_lnum),
-      },
-    };
-  };
-
-  let property_location = {
-    let file_line = loc.loc_start.pos_lnum + name_loc.loc_start.pos_lnum - 1;
-    {
-      ...name_loc,
-      loc_start: {
-        ...name_loc.loc_start,
-        pos_fname: loc.loc_start.pos_fname,
-        pos_lnum: file_line,
-      },
-      loc_end: {
-        ...name_loc.loc_end,
-        pos_fname: loc.loc_end.pos_fname,
-        pos_lnum:
-          file_line + (name_loc.loc_end.pos_lnum - name_loc.loc_start.pos_lnum),
-      },
-    };
-  };
+  let value_loc =
+    Styled_ppx_css_parser.Parser_location.intersection(loc, value_loc);
+  let property_loc =
+    Styled_ppx_css_parser.Parser_location.intersection(loc, property_loc);
+  let declaration_loc =
+    Styled_ppx_css_parser.Parser_location.intersection(loc, property_loc);
 
   switch (
     Property_to_runtime.render(
-      ~loc=declaration_location,
+      ~loc=declaration_loc,
       property,
       value_source,
       important,
@@ -276,25 +244,21 @@ and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
   ) {
   | Ok(exprs) => exprs
   | Error(`Property_not_found) => [
-      Error.expr(
-        ~loc=property_location,
-        "Unknown property '" ++ property ++ "'",
-      ),
+      Error.expr(~loc=property_loc, "Unknown property '" ++ property ++ "'"),
     ]
   | Error(`Impossible_state) => [
       Error.expr(
-        ~loc=declaration_location,
+        ~loc=declaration_loc,
         "This is a broken state of the CSS parser and probably a bug. Please report back!",
       ),
     ]
-  | Error(`Invalid_value(reason)) => [
+  | Error(`Invalid_value(_reason)) => [
       Error.expr(
-        ~loc=declaration_location,
+        ~loc=value_loc,
         Format.sprintf(
-          "@[Property@ '%s'@ has@ an@ invalid@ value:@ '%s',@ %s@]",
+          "@[Property@ '%s'@ has@ an@ invalid@ value:@ '%s'@]",
           property,
           value_source,
-          reason,
         ),
       ),
     ]

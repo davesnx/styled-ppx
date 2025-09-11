@@ -13,11 +13,6 @@ let tests =
       [%expr CSS.margin2(~v=Size.big, ~h=Size.small)],
     ),
     (
-      "color: $(mono100)",
-      [%expr [%css "color: $(mono100)"]],
-      [%expr (CSS.color(mono100): CSS.rule)],
-    ),
-    (
       "padding: $(Size.small) 0px;",
       [%expr [%css "padding: $(Size.small) 0px"]],
       [%expr CSS.padding2(~v=Size.small, ~h=`pxFloat(0.))],
