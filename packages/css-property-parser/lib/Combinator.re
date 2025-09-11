@@ -75,14 +75,20 @@ let format_expected_values = values => {
 };
 
 let create_error_message = (got, expected_values) => {
-  switch (Levenshtein.find_closest_match(got, expected_values)) {
-  | Some(suggestion) =>
-    /* Found a close match - suggest it */
-    ["Got '" ++ got ++ "', did you mean '" ++ suggestion ++ "'?"]
-  | None =>
-    /* No close match - show all valid options */
-    let expected_str = format_expected_values(expected_values);
-    ["Got '" ++ got ++ "', expected " ++ expected_str ++ "."];
+  switch (expected_values) {
+  | [] =>
+    /* No valid expected values to show */
+    ["Got '" ++ got ++ "'"]
+  | values =>
+    switch (Levenshtein.find_closest_match(got, values)) {
+    | Some(suggestion) =>
+      /* Found a close match - suggest it */
+      ["Got '" ++ got ++ "', did you mean '" ++ suggestion ++ "'?"]
+    | None =>
+      /* No close match - show all valid options */
+      let expected_str = format_expected_values(values);
+      ["Got '" ++ got ++ "', expected " ++ expected_str ++ "."];
+    }
   };
 };
 
@@ -99,12 +105,13 @@ let process_error_messages = errors =>
            | _ => None
            }
          )
+      /* Filter out '$' token which comes from the interpolation xor, and we don't want to render it as a valid value suggestion. A bit of a hack. */
+      |> List.filter(value => value != "$")
       |> List.sort_uniq(String.compare);
 
     switch (expected_values) {
-    | [] => List.hd(errors) /* Fall back to first error if no expected values found */
+    | [] => List.hd(errors)
     | values =>
-      /* Extract what we got from the first error */
       let got =
         switch (List.hd(errors)) {
         | [msg, ..._rest] => extract_got_value(msg)
@@ -119,7 +126,6 @@ let xor =
   | [] => failwith("xor doesn't makes sense without a single value")
   | all_rules => {
       let try_rules_with_best_match = rules => {
-        /* Try to find a successful rule using match_longest */
         switch (rules) {
         | [] => failwith("xor doesn't makes sense without a single value")
         | [left, ...rest] =>
@@ -131,7 +137,6 @@ let xor =
       };
 
       let try_all_and_collect_errors = (rules, tokens) => {
-        /* Try all rules and collect errors */
         let rec collect_errors = (remaining_rules, acc_errors) => {
           switch (remaining_rules) {
           | [] =>
@@ -148,10 +153,8 @@ let xor =
         collect_errors(rules, []);
       };
 
-      /* Main xor function */
       (
         tokens => {
-          /* First, try all rules to see if any succeeds */
           let successful_rules =
             all_rules
             |> List.filter_map(rule => {
@@ -163,12 +166,8 @@ let xor =
                });
 
           switch (successful_rules) {
-          | [] =>
-            /* No rules succeeded - collect and combine errors */
-            try_all_and_collect_errors(all_rules, tokens)
-          | _ =>
-            /* At least one rule succeeded - use match_longest to pick the best */
-            try_rules_with_best_match(all_rules, tokens)
+          | [] => try_all_and_collect_errors(all_rules, tokens)
+          | _ => try_rules_with_best_match(all_rules, tokens)
           };
         }
       );
