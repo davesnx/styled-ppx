@@ -53,3 +53,80 @@ let update_pos_lnum (a : Ppxlib.location) (b : Ppxlib.location) =
     { a.loc_end with pos_lnum = a.loc_end.pos_lnum + b.loc_start.pos_lnum - 1 }
   in
   { a with loc_start; loc_end }
+
+let map_to_source_location (source_loc : Ppxlib.location)
+  (css_start_pos : Lexing.position) (css_end_pos : Lexing.position) :
+  Ppxlib.location =
+  (* CSS parser returns positions relative to the CSS string content.
+     In OCaml/Reason, for multi-line strings {|...|}, the source_loc
+     points to the first character of content AFTER the opening delimiter.
+
+     For example, in:
+       let _css2 = [%cx2 {|       <- Line 10
+         color: red;              <- Line 11 (source_loc points here)
+         padding: 10pxx;          <- Line 12 (error is here)
+       |}];                       <- Line 13
+
+     The source_loc.loc_start.pos_lnum would be 11 (first content line).
+     CSS parser sees this as line 1 = "color: red", line 2 = "padding: 10pxx".
+     So when CSS reports error at line 2, we need to map to source line 12.
+  *)
+
+  (* The source_loc already points to the first line of CSS content *)
+  let source_line = source_loc.loc_start.pos_lnum in
+
+  (* Map CSS lines: CSS line N maps to source_line + (N - 1) *)
+  let mapped_start_line = source_line + css_start_pos.pos_lnum - 1 in
+  let mapped_start_cnum =
+    if css_start_pos.pos_lnum = 1 then
+      (* First line of CSS: add offset within the source line *)
+      source_loc.loc_start.pos_cnum + css_start_pos.pos_cnum
+    else
+      (* Subsequent lines: use the CSS position + source file base offset *)
+      source_loc.loc_start.pos_cnum
+      - (source_loc.loc_start.pos_cnum - source_loc.loc_start.pos_bol)
+      + css_start_pos.pos_cnum
+  in
+
+  let mapped_start_bol =
+    if css_start_pos.pos_lnum = 1 then source_loc.loc_start.pos_bol
+    else
+      (* For lines after the first, we need to calculate the proper bol *)
+      mapped_start_cnum - (css_start_pos.pos_cnum - css_start_pos.pos_bol)
+  in
+
+  (* Map the end position similarly *)
+  let mapped_end_line = source_line + css_end_pos.pos_lnum - 1 in
+  let mapped_end_cnum =
+    if css_end_pos.pos_lnum = 1 then
+      source_loc.loc_start.pos_cnum + css_end_pos.pos_cnum
+    else
+      source_loc.loc_start.pos_cnum
+      - (source_loc.loc_start.pos_cnum - source_loc.loc_start.pos_bol)
+      + css_end_pos.pos_cnum
+  in
+
+  let mapped_end_bol =
+    if css_end_pos.pos_lnum = 1 then source_loc.loc_start.pos_bol
+    else mapped_end_cnum - (css_end_pos.pos_cnum - css_end_pos.pos_bol)
+  in
+
+  let mapped_start : Lexing.position =
+    {
+      pos_fname = source_loc.loc_start.pos_fname;
+      pos_lnum = mapped_start_line;
+      pos_bol = mapped_start_bol;
+      pos_cnum = mapped_start_cnum;
+    }
+  in
+
+  let mapped_end : Lexing.position =
+    {
+      pos_fname = source_loc.loc_end.pos_fname;
+      pos_lnum = mapped_end_line;
+      pos_bol = mapped_end_bol;
+      pos_cnum = mapped_end_cnum;
+    }
+  in
+
+  { loc_start = mapped_start; loc_end = mapped_end; loc_ghost = false }

@@ -226,50 +226,45 @@ and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
   let value_source =
     Styled_ppx_css_parser.Driver.source_code_of_loc(value_loc);
 
-  let declaration_location =
-    Styled_ppx_css_parser.Parser_location.update_pos_lnum(
-      {
-        let offset =
-          value_loc.loc_start.pos_lnum == 1
-            ? loc.loc_start.pos_cnum - loc.loc_start.pos_bol + 1 : 0;
-        {
-          ...value_loc,
-          loc_start: {
-            ...value_loc.loc_start,
-            pos_cnum: value_loc.loc_start.pos_cnum + offset,
-          },
-          loc_end: {
-            ...value_loc.loc_end,
-            pos_cnum: value_loc.loc_end.pos_cnum + offset,
-          },
-        };
+  /* Map CSS parser locations (relative to CSS content) to file locations.
+     The CSS parser returns line numbers starting from 1 for the CSS content.
+     We need to add these to the string location to get file locations. */
+  let declaration_location = {
+    let file_line = loc.loc_start.pos_lnum + value_loc.loc_start.pos_lnum - 1;
+    {
+      ...value_loc,
+      loc_start: {
+        ...value_loc.loc_start,
+        pos_fname: loc.loc_start.pos_fname,
+        pos_lnum: file_line,
       },
-      loc,
-    );
+      loc_end: {
+        ...value_loc.loc_end,
+        pos_fname: loc.loc_end.pos_fname,
+        pos_lnum:
+          file_line
+          + (value_loc.loc_end.pos_lnum - value_loc.loc_start.pos_lnum),
+      },
+    };
+  };
 
-  let property_location =
-    Styled_ppx_css_parser.Parser_location.update_pos_lnum(
-      {
-        let offset =
-          name_loc.loc_end.pos_lnum == 1
-            ? loc.loc_start.pos_cnum - loc.loc_start.pos_bol + 1 : 0;
-        {
-          ...name_loc,
-          loc_start: {
-            ...name_loc.loc_start,
-            pos_lnum: name_loc.loc_end.pos_lnum,
-            pos_bol: name_loc.loc_end.pos_bol,
-            pos_cnum:
-              name_loc.loc_end.pos_cnum + offset - String.length(property),
-          },
-          loc_end: {
-            ...name_loc.loc_end,
-            pos_cnum: name_loc.loc_end.pos_cnum + offset,
-          },
-        };
+  let property_location = {
+    let file_line = loc.loc_start.pos_lnum + name_loc.loc_start.pos_lnum - 1;
+    {
+      ...name_loc,
+      loc_start: {
+        ...name_loc.loc_start,
+        pos_fname: loc.loc_start.pos_fname,
+        pos_lnum: file_line,
       },
-      loc,
-    );
+      loc_end: {
+        ...name_loc.loc_end,
+        pos_fname: loc.loc_end.pos_fname,
+        pos_lnum:
+          file_line + (name_loc.loc_end.pos_lnum - name_loc.loc_start.pos_lnum),
+      },
+    };
+  };
 
   switch (
     Property_to_runtime.render(

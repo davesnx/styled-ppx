@@ -2,9 +2,15 @@ let css = main => [%cx2
   {|
   color: $(main);
   background-color: $(CSS.black);
-  display: fley;
+  display: flex;
 |}
 ];
+
+/* Error should be on line 14 */
+let _css2 = [%cx2 {|
+  color: red;
+  padding: 10pxx;
+|}];
 
 let classname = [%cx2
   {|
