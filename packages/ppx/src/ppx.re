@@ -663,16 +663,16 @@ let cx_extension_without_let_binding =
 
 let type_check_rule = (rule: Styled_ppx_css_parser.Ast.rule) => {
   switch (rule) {
-  | Declaration({name: (name, _), value: (value, _), _}) =>
+  | Declaration({name: (name, _), value: (value, _), loc, _}) =>
     let value = Styled_ppx_css_parser.Render.component_value_list(value);
-    Css_property_parser.Parser.check_property(~name, value);
+    Css_property_parser.Parser.check_property(~loc, ~name, value);
   | Style_rule(style_rule) =>
-    let (prelude, _) = style_rule.prelude;
+    let (prelude, loc) = style_rule.prelude;
     let _prelude = Styled_ppx_css_parser.Render.selector_list(prelude);
     /* Css_property_parser.Parser.check_selector_list(~name, prelude); */
-    Error(`Invalid_value("selectors aren't supported yet"));
-  | At_rule(_at_rule) =>
-    Error(`Invalid_value("at rules aren't supported yet"))
+    Error((loc, `Invalid_value("selectors aren't supported yet")));
+  | At_rule(at_rule) =>
+    Error((at_rule.loc, `Invalid_value("at rules aren't supported yet")))
   /* let prelude =
        Styled_ppx_css_parser.Render.component_value_list(at_rule.prelude);
      Css_property_parser.Parser.check_at_rule(~name, prelude); */
@@ -690,10 +690,13 @@ let find_first_error =
         list(
           result(
             unit,
-            [>
-              | `Invalid_value(string)
-              | `Property_not_found
-            ],
+            (
+              Styled_ppx_css_parser.Ast.loc,
+              [>
+                | `Invalid_value(string)
+                | `Property_not_found
+              ],
+            ),
           ),
         ),
     ) => {
@@ -743,8 +746,7 @@ let cx2_extension =
                 ~className,
                 ~dynamic_vars,
               );
-            | Some(error) =>
-              Error.expr(~loc=stringLoc, error_to_string(error))
+            | Some((loc, error)) => Error.expr(~loc, error_to_string(error))
             };
           | Error((loc, msg)) => Error.expr(~loc, msg)
           }

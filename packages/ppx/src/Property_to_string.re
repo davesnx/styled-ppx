@@ -600,13 +600,13 @@ let parse_declarations = (property: string, value: string) => {
     ];
     Ok([unsafe]);
   | _ =>
-    switch (Parser.check_property(~name=property, value)) {
+    switch (Parser.check_property(~loc, ~name=property, value)) {
     | Ok () =>
       switch (render_to_expr(property, value)) {
       | Ok(value) => Ok(value)
-      | Error(err) => Error(err)
+      | Error(error) => Error(error)
       }
-    | Error(err) => Error(err)
+    | Error((_loc, error)) => Error(error)
     }
   };
 };

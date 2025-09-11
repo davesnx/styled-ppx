@@ -2982,21 +2982,24 @@ let check_rule = (rule, value) => {
 };
 
 let check_property =
-    (~name, value)
+    (~loc, ~name, value)
     : result(
         unit,
-        [>
-          | `Invalid_value(string)
-          | `Property_not_found
-        ],
+        (
+          Styled_ppx_css_parser.Ast.loc,
+          [>
+            | `Invalid_value(string)
+            | `Property_not_found
+          ],
+        ),
       ) => {
   switch (find_rule(name)) {
   | Some(rule) =>
     module R = (val rule: RULE);
     switch (parse(R.rule, value)) {
     | Ok(_) => Ok()
-    | Error(message) => Error(`Invalid_value(message))
+    | Error(message) => Error((loc, `Invalid_value(message)))
     };
-  | None => Error(`Property_not_found)
+  | None => Error((loc, `Property_not_found))
   };
 };

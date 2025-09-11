@@ -6419,11 +6419,10 @@ let render = (~loc: Location.t, property, value, important) =>
       | exception Impossible_state => Error(`Impossible_state)
       | Error(_)
       | exception Unsupported_feature =>
-        switch (Property_parser.check_property(~name=property, value)) {
+        switch (Property_parser.check_property(~loc, ~name=property, value)) {
         | Ok () =>
           Ok([render_when_unsupported_features(~loc, property, value)])
-        | Error(`Invalid_value(value)) => Error(`Invalid_value(value))
-        | Error(`Property_not_found) => Error(`Property_not_found)
+        | Error((_, error)) => Error(error)
         }
       }
     };

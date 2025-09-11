@@ -9,6 +9,20 @@ let parse_exn = (prop, str) =>
   | Error(message) => Alcotest.fail(message)
   };
 
+let string_contains = (str, substr) => {
+  let str_len = String.length(str);
+  let substr_len = String.length(substr);
+  let rec check_from = pos =>
+    if (pos + substr_len > str_len) {
+      false;
+    } else if (String.sub(str, pos, substr_len) == substr) {
+      true;
+    } else {
+      check_from(pos + 1);
+    };
+  check_from(0);
+};
+
 // TODO: check static order
 let tests = [
   test("A B", _ => {
@@ -266,6 +280,144 @@ let tests = [
       switch (parser("B A C A")) {
       | ([(None, `B), (Some (), `C)], Some ()) => ()
       | _ => Alcotest.fail("should be ([(None, `B), (Some(), `C)], Some())")
+      };
+    ();
+  }),
+  test("xor with three alternatives", _ => {
+    let parser = parse_exn([%value "red | blue | green"]);
+    let () =
+      switch (parser("red")) {
+      | `red => ()
+      | _ => Alcotest.fail("should be `red")
+      };
+    let () =
+      switch (parser("blue")) {
+      | `blue => ()
+      | _ => Alcotest.fail("should be `blue")
+      };
+    let () =
+      switch (parser("green")) {
+      | `green => ()
+      | _ => Alcotest.fail("should be `green")
+      };
+    ();
+  }),
+  test("xor with data types", () => {
+    let parser = parse_exn([%value "<number> | <percentage> | auto"]);
+    let () =
+      switch (parser("50")) {
+      | `Number(n) => check(~__POS__, Alcotest.float(1.), n, 50.0)
+      | _ => Alcotest.fail("should be `Number")
+      };
+    let () =
+      switch (parser("50%")) {
+      | `Percentage(p) => check(~__POS__, Alcotest.float(1.), p, 50.0)
+      | _ => Alcotest.fail("should be `Percentage")
+      };
+    let () =
+      switch (parser("auto")) {
+      | `auto => ()
+      | _ => Alcotest.fail("should be `auto")
+      };
+    ();
+  }),
+  test("xor with complex combinations", _ => {
+    let parser = parse_exn([%value "[A B] | [C D] | E"]);
+    let () =
+      switch (parser("A B")) {
+      | `Static((), ()) => ()
+      | _ => Alcotest.fail("should be `Static((), ())")
+      };
+    let () =
+      switch (parser("C D")) {
+      | `Static__0((), ()) => ()
+      | _ => Alcotest.fail("should be `Static__0((), ())")
+      };
+    let () =
+      switch (parser("E")) {
+      | `E => ()
+      | _ => Alcotest.fail("should be `E")
+      };
+    ();
+  }),
+  test("xor error handling - invalid input", _ => {
+    let parser = Parser.parse([%value "red | blue | green"], "yellow");
+    switch (parser) {
+    | Error(msg) =>
+      let has_red = string_contains(msg, "red");
+      let has_blue = string_contains(msg, "blue");
+      let has_green = string_contains(msg, "green");
+      if (!has_red || !has_blue || !has_green) {
+        Alcotest.fail(
+          "Error message should mention all valid options: " ++ msg,
+        );
+      };
+    | Ok(_) => Alcotest.fail("Should have failed for invalid input")
+    };
+  }),
+  test("xor error handling - typo suggestion", _ => {
+    let parser = Parser.parse([%value "red | blue | green"], "gren");
+    switch (parser) {
+    | Error(msg) =>
+      if (!string_contains(msg, "did you mean")) {
+        Alcotest.fail("Error message should suggest correction: " ++ msg);
+      };
+      if (!string_contains(msg, "green")) {
+        Alcotest.fail("Error message should suggest 'green': " ++ msg);
+      };
+    | Ok(_) => Alcotest.fail("Should have failed for typo input")
+    };
+  }),
+  test("xor with nested alternatives", _ => {
+    let parser = parse_exn([%value "A | [B | C]"]);
+    let () =
+      switch (parser("A")) {
+      | `A => ()
+      | _ => Alcotest.fail("should be `A")
+      };
+    let () =
+      switch (parser("B")) {
+      | `Static(`B) => ()
+      | _ => Alcotest.fail("should be `Static(`B)")
+      };
+    let () =
+      switch (parser("C")) {
+      | `Static(`C) => ()
+      | _ => Alcotest.fail("should be `Static(`C)")
+      };
+    ();
+  }),
+  test("xor prefers longest match", _ => {
+    let parser = parse_exn([%value "A | A B"]);
+    /* When both match, xor should prefer the longer match */
+    let () =
+      switch (parser("A B")) {
+      | `Static((), ()) => ()
+      | _ => Alcotest.fail("should prefer longer match A B")
+      };
+    let () =
+      switch (parser("A")) {
+      | `A => ()
+      | _ => Alcotest.fail("should match single A when B is not present")
+      };
+    ();
+  }),
+  test("xor with mixed types and keywords", () => {
+    let parser = parse_exn([%value "<number> | inherit | initial"]);
+    let () =
+      switch (parser("42")) {
+      | `Number(n) => check(~__POS__, Alcotest.float(1.), n, 42.0)
+      | _ => Alcotest.fail("should be `Number")
+      };
+    let () =
+      switch (parser("inherit")) {
+      | `inherit_ => ()
+      | _ => Alcotest.fail("should be `inherit")
+      };
+    let () =
+      switch (parser("initial")) {
+      | `initial => ()
+      | _ => Alcotest.fail("should be `initial")
       };
     ();
   }),

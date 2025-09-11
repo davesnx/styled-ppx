@@ -29,14 +29,149 @@ let static = rules => {
   match_everything([], rules);
 };
 
+/* Helper functions for xor error handling */
+let extract_expected_value = error_msg =>
+  /* Extract the expected value from error message like "Expected 'X' but instead got 'Y'." */
+  if (!String.contains(error_msg, 'E')) {
+    None;
+  } else {
+    try({
+      let start = String.index(error_msg, '\'') + 1;
+      let end_idx = String.index_from(error_msg, start, '\'');
+      Some(String.sub(error_msg, start, end_idx - start));
+    }) {
+    | _ => None
+    };
+  };
+
+let extract_got_value = error_msg =>
+  /* Extract what we got from error message */
+  if (!String.contains(error_msg, 'i')) {
+    "the provided value";
+  } else {
+    try({
+      let start = String.rindex(error_msg, '\'');
+      let before_quote = String.sub(error_msg, 0, start);
+      let second_last = String.rindex(before_quote, '\'') + 1;
+      String.sub(error_msg, second_last, start - second_last);
+    }) {
+    | _ => "the provided value"
+    };
+  };
+
+let format_expected_values = values => {
+  switch (values) {
+  | [] => ""
+  | [single] => "'" ++ single ++ "'"
+  | _ =>
+    let rec format_list = lst =>
+      switch (lst) {
+      | [] => ""
+      | [x] => "or '" ++ x ++ "'"
+      | [x, ...xs] => "'" ++ x ++ "', " ++ format_list(xs)
+      };
+    format_list(values);
+  };
+};
+
+let create_error_message = (got, expected_values) => {
+  switch (Levenshtein.find_closest_match(got, expected_values)) {
+  | Some(suggestion) =>
+    /* Found a close match - suggest it */
+    ["Got '" ++ got ++ "', did you mean '" ++ suggestion ++ "'?"]
+  | None =>
+    /* No close match - show all valid options */
+    let expected_str = format_expected_values(expected_values);
+    ["Got '" ++ got ++ "', expected " ++ expected_str ++ "."];
+  };
+};
+
+let process_error_messages = errors =>
+  if (List.is_empty(errors)) {
+    ["No alternatives matched"];
+  } else {
+    /* Extract expected values from all error messages */
+    let expected_values =
+      errors
+      |> List.filter_map(error_list =>
+           switch (error_list) {
+           | [msg, ..._rest] => extract_expected_value(msg)
+           | _ => None
+           }
+         )
+      |> List.sort_uniq(String.compare);
+
+    switch (expected_values) {
+    | [] => List.hd(errors) /* Fall back to first error if no expected values found */
+    | values =>
+      /* Extract what we got from the first error */
+      let got =
+        switch (List.hd(errors)) {
+        | [msg, ..._rest] => extract_got_value(msg)
+        | _ => "the provided value"
+        };
+      create_error_message(got, values);
+    };
+  };
+
 let xor =
   fun
   | [] => failwith("xor doesn't makes sense without a single value")
-  | [left, ...rules] => {
-      let rules: list((unit, Rule.rule('a))) =
-        List.map(rule => ((), rule), rules);
-      let.map_match ((), value) = match_longest(((), left), rules);
-      value;
+  | all_rules => {
+      let try_rules_with_best_match = rules => {
+        /* Try to find a successful rule using match_longest */
+        switch (rules) {
+        | [] => failwith("xor doesn't makes sense without a single value")
+        | [left, ...rest] =>
+          let rules_with_unit = List.map(rule => ((), rule), rest);
+          let.map_match ((), value) =
+            match_longest(((), left), rules_with_unit);
+          value;
+        };
+      };
+
+      let try_all_and_collect_errors = (rules, tokens) => {
+        /* Try all rules and collect errors */
+        let rec collect_errors = (remaining_rules, acc_errors) => {
+          switch (remaining_rules) {
+          | [] =>
+            let combined_error = process_error_messages(acc_errors);
+            Rule.Data.return(Error(combined_error), tokens);
+          | [rule, ...rest] =>
+            let (data, remaining) = rule(tokens);
+            switch (data) {
+            | Ok(value) => Rule.Data.return(Ok(value), remaining)
+            | Error(err) => collect_errors(rest, acc_errors @ [err])
+            };
+          };
+        };
+        collect_errors(rules, []);
+      };
+
+      /* Main xor function */
+      (
+        tokens => {
+          /* First, try all rules to see if any succeeds */
+          let successful_rules =
+            all_rules
+            |> List.filter_map(rule => {
+                 let (data, remaining) = rule(tokens);
+                 switch (data) {
+                 | Ok(_) => Some((rule, remaining))
+                 | Error(_) => None
+                 };
+               });
+
+          switch (successful_rules) {
+          | [] =>
+            /* No rules succeeded - collect and combine errors */
+            try_all_and_collect_errors(all_rules, tokens)
+          | _ =>
+            /* At least one rule succeeded - use match_longest to pick the best */
+            try_rules_with_best_match(all_rules, tokens)
+          };
+        }
+      );
     };
 
 let and_ = rules => {
