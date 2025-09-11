@@ -51,8 +51,10 @@ let update_pos_lnum (css_loc : Ppxlib.location) (source_loc : Ppxlib.location) =
      css_loc: location within the CSS string (e.g., "display: fley")
      source_loc: location of the entire CSS string in the source file (e.g., "{| color: rex; display: fley; |}")
 
-     The CSS parser returns positions relative to the CSS content with line numbers starting from 1.
-     We need to map these to the actual source file positions.
+     The CSS parser returns positions relative to the CSS content with:
+     - Line numbers starting from 1
+     - pos_cnum as absolute character positions from start of CSS string
+     - pos_bol as the position of the beginning of the current line
   *)
 
   (* Calculate the mapped start position *)
@@ -60,23 +62,26 @@ let update_pos_lnum (css_loc : Ppxlib.location) (source_loc : Ppxlib.location) =
     source_loc.loc_start.pos_lnum + css_loc.loc_start.pos_lnum - 1
   in
 
+  (* Calculate column offset within the CSS line *)
+  let css_start_column =
+    css_loc.loc_start.pos_cnum - css_loc.loc_start.pos_bol
+  in
+
   let mapped_start_cnum =
     if css_loc.loc_start.pos_lnum = 1 then
       (* First line of CSS: add column offset to source start position *)
-      source_loc.loc_start.pos_cnum + css_loc.loc_start.pos_cnum
+      source_loc.loc_start.pos_cnum + css_start_column
     else
-      (* Subsequent lines: calculate based on CSS position *)
-      (* We need to find the actual character position in the source file *)
-      (* For now, use the CSS cnum adjusted by source file base *)
-      source_loc.loc_start.pos_cnum + css_loc.loc_start.pos_cnum
+      (* Subsequent lines: need to calculate the actual position in source file *)
+      (* This is complex for multi-line strings - for now, approximate *)
+      source_loc.loc_start.pos_bol + css_start_column
   in
 
   let mapped_start_bol =
     if css_loc.loc_start.pos_lnum = 1 then source_loc.loc_start.pos_bol
     else
       (* For lines after the first, calculate the proper beginning of line *)
-      mapped_start_cnum
-      - (css_loc.loc_start.pos_cnum - css_loc.loc_start.pos_bol)
+      mapped_start_cnum - css_start_column
   in
 
   (* Calculate the mapped end position *)
@@ -84,18 +89,21 @@ let update_pos_lnum (css_loc : Ppxlib.location) (source_loc : Ppxlib.location) =
     source_loc.loc_start.pos_lnum + css_loc.loc_end.pos_lnum - 1
   in
 
+  (* Calculate column offset for end position *)
+  let css_end_column = css_loc.loc_end.pos_cnum - css_loc.loc_end.pos_bol in
+
   let mapped_end_cnum =
     if css_loc.loc_end.pos_lnum = 1 then
       (* End is on first line of CSS *)
-      source_loc.loc_start.pos_cnum + css_loc.loc_end.pos_cnum
+      source_loc.loc_start.pos_cnum + css_end_column
     else
       (* End is on a subsequent line *)
-      source_loc.loc_start.pos_cnum + css_loc.loc_end.pos_cnum
+      source_loc.loc_start.pos_bol + css_end_column
   in
 
   let mapped_end_bol =
     if css_loc.loc_end.pos_lnum = 1 then source_loc.loc_start.pos_bol
-    else mapped_end_cnum - (css_loc.loc_end.pos_cnum - css_loc.loc_end.pos_bol)
+    else mapped_end_cnum - css_end_column
   in
 
   let loc_start : Lexing.position =
