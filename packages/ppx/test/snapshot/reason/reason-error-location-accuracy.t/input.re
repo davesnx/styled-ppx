@@ -21,8 +21,8 @@ let multiple_errors = [%cx
 |}
 ];
 
-/* Test 4: Error in cx2 with interpolation */
-let cx2_error = main => [%cx2
+/* Test 4: Error in cx with interpolation */
+let cx_error = main => [%cx2
   {|
   color: $(main);
   background-color: $(CSS.black);

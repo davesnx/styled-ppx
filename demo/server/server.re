@@ -6,10 +6,9 @@ let css = main => [%cx2
 |}
 ];
 
-/* Error should be on line 14 */
 let _css2 = [%cx2 {|
   color: red;
-  padding: 10pxx;
+  padding: 10px;
 |}];
 
 let classname = [%cx2

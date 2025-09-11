@@ -1,6 +1,6 @@
 let menhir = MenhirLib.Convert.Simplified.traditional2revised;
 
-let parse = (~loc, lexbuf, parser) => {
+let parse = (~loc as _, lexbuf, parser) => {
   let last_token = ref((Parser.EOF, Lexing.dummy_pos, Lexing.dummy_pos));
 
   let next_token = () => {
@@ -11,13 +11,22 @@ let parse = (~loc, lexbuf, parser) => {
   try(Ok(menhir(parser, next_token))) {
   | Lexer.LexingError((start_pos, end_pos, msg)) =>
     /* Map CSS-relative positions back to source file positions */
-    let loc = Parser_location.map_to_source_location(loc, start_pos, end_pos);
+    let loc =
+      Parser_location.to_ppxlib_location(
+        ~loc_ghost=false,
+        start_pos,
+        end_pos,
+      );
     Error((loc, msg));
   | _ =>
     let (token, start_pos, end_pos) = last_token^;
     /* Map CSS-relative positions back to source file positions */
     let token_loc =
-      Parser_location.map_to_source_location(loc, start_pos, end_pos);
+      Parser_location.to_ppxlib_location(
+        ~loc_ghost=false,
+        start_pos,
+        end_pos,
+      );
     let msg =
       Printf.sprintf(
         "Parse error while reading token '%s'",

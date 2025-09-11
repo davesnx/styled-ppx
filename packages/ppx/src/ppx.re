@@ -684,7 +684,7 @@ let type_check_rule_list =
   rule_list |> List.map(rule => type_check_rule(rule));
 };
 
-let find_first_error =
+let get_errors =
     (
       validations:
         list(
@@ -701,8 +701,12 @@ let find_first_error =
         ),
     ) => {
   validations
-  |> List.find_opt(Result.is_error)
-  |> Option.map(Result.get_error);
+  |> List.filter_map(result =>
+       switch (result) {
+       | Error((loc, error)) => Some((loc, error))
+       | Ok(_) => None
+       }
+     );
 };
 
 let error_to_string =
@@ -737,8 +741,8 @@ let cx2_extension =
           ) {
           | Ok(rule_list) =>
             let validations = type_check_rule_list(rule_list);
-            switch (find_first_error(validations)) {
-            | None =>
+            switch (get_errors(validations)) {
+            | [] =>
               let (className, dynamic_vars) =
                 Css_file.push(~hash_by=txt, rule_list);
               Css_runtime.render_make_call(
@@ -746,9 +750,24 @@ let cx2_extension =
                 ~className,
                 ~dynamic_vars,
               );
-            | Some((loc, error)) => Error.expr(~loc, error_to_string(error))
+            | errors =>
+              let error_messages =
+                errors
+                |> List.map(((loc, error)) =>
+                     (loc, error_to_string(error))
+                   );
+              Error.expressions(
+                ~loc=stringLoc,
+                ~description="Type error on cx2 definition",
+                error_messages,
+              );
             };
-          | Error((loc, msg)) => Error.expr(~loc, msg)
+          | Error((loc, msg)) =>
+            Error.expressions(
+              ~loc=stringLoc,
+              ~description="Parsing error on cx2 definition",
+              [(loc, msg)],
+            )
           }
         | Pexp_array(arr) =>
           /* Valid: [%cx2 [|...|]] */
