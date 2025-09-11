@@ -16,11 +16,11 @@ Testing improved error message for list syntax with %cx
   File "input.re", line 3, characters 23-25:
   3 | let invalid_css = [%cx []];
                              ^^
-  Error: [%cx] expects either a string of CSS or an array of CSS rules. 
+  Error: [%cx] expects either a string of CSS or an array of CSS rules.
   
   Example:
-    [%cx "display: block"]
-    [%cx [|CSS.display(`block)|]]
+    [%cx "display: block; color: red"]
+    [%cx [|CSS.display(`block), CSS.color(CSS.red)|]]
   
   More info: https://styled-ppx.vercel.app/reference/cx
   [1]
