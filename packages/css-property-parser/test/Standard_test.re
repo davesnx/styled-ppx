@@ -50,7 +50,7 @@ let tests = [
       __POS__,
       Alcotest.result(Alcotest.float(1.), Alcotest.string),
       parse("ident"),
-      Error("Expected a number. Got 'ident ident' instead."),
+      Error("Expected a number. Got 'ident' instead."),
     );
   }),
   test("<length>", () => {

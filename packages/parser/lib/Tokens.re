@@ -49,19 +49,18 @@ let show_error =
 let humanize =
   fun
   | EOF => "the end"
-  | IDENT(str) => "ident " ++ str
+  | IDENT(str) => str
   | BAD_IDENT => "bad ident"
   | FUNCTION(f) => "function " ++ f
-  | AT_KEYWORD(at) => "@ " ++ at
-  | HASH(h, _) => "hash: #" ++ h
-  | STRING(s) => {|string "|} ++ s ++ {|"|}
+  | AT_KEYWORD(at) => "@" ++ at
+  | HASH(h, _) => "#" ++ h
+  | STRING(s) => {|"|} ++ s ++ {|"|}
   | URL(u) => "url " ++ u
   | BAD_URL => "bad url"
-  | DELIM(d) => "delimiter " ++ d
-  | NUMBER(f) => "number: " ++ string_of_float(f)
-  | PERCENTAGE(f) =>
-    "percentage: " ++ string_of_float(f) ++ string_of_char('%')
-  | DIMENSION(f, s) => "dimension: " ++ string_of_float(f) ++ s
+  | DELIM(d) => d
+  | NUMBER(f) => string_of_float(f)
+  | PERCENTAGE(f) => string_of_float(f) ++ string_of_char('%')
+  | DIMENSION(f, s) => string_of_float(f) ++ s
   | WS => "whitespace"
   | COLON => ":"
   | SEMI_COLON => ";"
