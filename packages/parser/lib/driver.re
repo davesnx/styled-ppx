@@ -38,10 +38,6 @@ let parse_declaration = (input: string) => {
   parse_string(Parser.declaration, input);
 };
 
-let parse_stylesheet = (input: string) => {
-  parse_string(Parser.stylesheet, input);
-};
-
 let parse_keyframes = (input: string) => {
   parse_string(Parser.keyframes, input);
 };

@@ -669,27 +669,27 @@ let cx_extension_without_let_binding =
     ),
   );
 
-let type_check_rule = (rule: Styled_ppx_css_parser.Ast.rule) => {
+let rec type_check_rule = (rule: Styled_ppx_css_parser.Ast.rule) => {
   switch (rule) {
   | Declaration({name: (name, _), value: (value, _), loc, _}) =>
     let value = Styled_ppx_css_parser.Render.component_value_list(value);
-    Css_property_parser.Parser.check_property(~loc, ~name, value);
+    [Css_property_parser.Parser.check_property(~loc, ~name, value)];
   | Style_rule(style_rule) =>
-    let (prelude, loc) = style_rule.prelude;
-    let _prelude = Styled_ppx_css_parser.Render.selector_list(prelude);
-    /* Css_property_parser.Parser.check_selector_list(~name, prelude); */
-    Error((loc, `Invalid_value("selectors aren't supported yet")));
-  | At_rule(at_rule) =>
-    Error((at_rule.loc, `Invalid_value("at rules aren't supported yet")))
+    let rule_list = style_rule.block;
+    /* TODO: Currently we don't typecheck prelude selectors */
+    type_check_rule_list(rule_list);
+  | At_rule(at_rule) => [
+      Error((at_rule.loc, `Invalid_value("at rules aren't supported yet"))),
+    ]
   /* let prelude =
        Styled_ppx_css_parser.Render.component_value_list(at_rule.prelude);
      Css_property_parser.Parser.check_at_rule(~name, prelude); */
   };
-};
+}
 
-let type_check_rule_list =
+and type_check_rule_list =
     ((rule_list, _): Styled_ppx_css_parser.Ast.rule_list) => {
-  rule_list |> List.map(rule => type_check_rule(rule));
+  rule_list |> List.concat_map(rule => type_check_rule(rule));
 };
 
 let get_errors =
@@ -910,9 +910,9 @@ let styled_global_extension =
         File.set(path);
         switch (payload.pexp_desc) {
         | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
-          switch (Styled_ppx_css_parser.Driver.parse_stylesheet(txt)) {
-          | Ok(stylesheets) =>
-            Css_runtime.render_global(~loc=stringLoc, stylesheets)
+          switch (Styled_ppx_css_parser.Driver.parse_declaration_list(txt)) {
+          | Ok(rule_list) =>
+            Css_runtime.render_global(~loc=stringLoc, rule_list)
           | Error((start_post, end_post, msg)) =>
             let loc =
               Styled_ppx_css_parser.Parser_location.make_loc_from_pos(

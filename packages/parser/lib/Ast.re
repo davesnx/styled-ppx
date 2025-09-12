@@ -70,7 +70,6 @@ and component_value =
 and brace_block =
   | Empty
   | Rule_list(rule_list)
-  | Stylesheet(stylesheet)
 [@deriving show({with_path: false})]
 and at_rule = {
   name: with_loc(string),
@@ -93,8 +92,6 @@ and style_rule = {
   [@printer location]
   loc,
 }
-[@deriving show({with_path: false})]
-and stylesheet = with_loc(list(rule))
 [@deriving show({with_path: false})]
 and selector =
   | SimpleSelector(simple_selector)

@@ -44,15 +44,11 @@ let make_loc = Parser_location.to_ppxlib_location
 %token <string * string> DIMENSION
 %token <string list> INTERPOLATION
 
-%start <stylesheet> stylesheet
 %start <rule_list> declaration_list
 %start <declaration> declaration
 %start <rule_list> keyframes
 
 %%
-
-stylesheet: s = stylesheet_without_eof; EOF { s }
-stylesheet_without_eof: rs = loc(list(rule)) { rs }
 
 declaration_list:
   | WS? EOF { ([], make_loc $startpos $endpos) }
@@ -132,10 +128,10 @@ at_rule:
   /* @{{rule}} { ... } */
   | name = loc(AT_RULE) WS?
     xs = loc(skip_ws(values)) WS?
-    s = brace_block(stylesheet_without_eof) WS? {
+    s = brace_block(list(rule)) WS? {
     { name;
       prelude = xs;
-      block = Stylesheet s;
+      block = Rule_list (s, make_loc $startpos $endpos);
       loc = make_loc $startpos $endpos;
     }
   }

@@ -153,9 +153,6 @@ and render_media_query = (~loc, at_rule: at_rule) => {
       | Rule_list(declaration) =>
         render_declarations(~loc, declaration)
         |> Builder.pexp_array(~loc=at_rule.loc)
-      | Stylesheet(stylesheet) =>
-        render_declarations(~loc, stylesheet)
-        |> Builder.pexp_array(~loc=at_rule.loc)
       };
 
     Helper.Exp.apply(
@@ -207,9 +204,6 @@ and render_container_query = (~loc, at_rule: at_rule) => {
       | Empty => Builder.pexp_array(~loc=at_rule.loc, [])
       | Rule_list(declaration) =>
         render_declarations(~loc, declaration)
-        |> Builder.pexp_array(~loc=at_rule.loc)
-      | Stylesheet(stylesheet) =>
-        render_declarations(~loc, stylesheet)
         |> Builder.pexp_array(~loc=at_rule.loc)
       };
 
@@ -511,7 +505,7 @@ let render_keyframes = (~loc, declarations: rule_list) => {
   );
 };
 
-let render_global = (~loc, (ruleList, stylesheet_loc): stylesheet) => {
+let render_global = (~loc, (rule_list, stylesheet_loc): rule_list) => {
   let onlyStyleRulesAndAtRulesSupported = {|Declarations does not make sense in global styles. Global should consists of style rules or at-rules (e.g @media, @print, etc.)
 
 If your intent is to apply the declaration to all elements, use the universal selector
@@ -520,7 +514,7 @@ If your intent is to apply the declaration to all elements, use the universal se
 }|};
 
   let styles =
-    ruleList
+    rule_list
     |> List.map(rule => {
          switch (rule) {
          | Style_rule(style_rule) => render_style_rule(~loc, style_rule)

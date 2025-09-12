@@ -48,10 +48,6 @@ let rec brace_block_contain_media =
   fun
   | Empty => false
   | Rule_list(rule_list) => rule_list_contain_media(rule_list)
-  | Stylesheet(stylesheet) => stylesheet_contain_media(stylesheet)
-and stylesheet_contain_media = ((stylesheet, _): stylesheet) => {
-  List.exists(rule_contain_media, stylesheet);
-}
 and rule_list_contain_media = ((rule_list, _): rule_list) => {
   List.exists(rule_contain_media, rule_list);
 }
@@ -370,7 +366,6 @@ let rec move_media_at_top = (rules: list(rule)) => {
                   switch (block) {
                   | Empty => []
                   | Rule_list((block, _)) => block
-                  | Stylesheet((block, _)) => block
                   };
                 [
                   At_rule({
@@ -411,9 +406,6 @@ let rec move_media_at_top = (rules: list(rule)) => {
       | At_rule({block: Rule_list((block, _)), _})
           when !List.is_empty(block) =>
         acc @ [rule]
-      | At_rule({block: Stylesheet((block, _)), _})
-          when !List.is_empty(block) =>
-        acc @ [rule]
       | Declaration(_) => acc @ [rule]
       | _ => acc
       }
@@ -427,7 +419,6 @@ and swap = ({prelude: swap_prelude, block, loc, _}: at_rule) => {
     switch (block) {
     | Empty => []
     | Rule_list((rule_list, _)) => rule_list
-    | Stylesheet((stylesheet, _)) => stylesheet
     };
   let (media_declarations, media_rules_selectors) = split_by_kind(rules);
   let resolved_media_selectors =

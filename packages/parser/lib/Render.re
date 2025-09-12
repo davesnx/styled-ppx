@@ -1,7 +1,4 @@
-let rec stylesheet = (ast: Ast.stylesheet) => {
-  ast |> fst |> List.map(rule) |> String.concat("");
-}
-and rule = (ast: Ast.rule) => {
+let rec rule = (ast: Ast.rule) => {
   switch (ast) {
   | Declaration(d) => declaration(d)
   | Style_rule(sr) => style_rule(sr)
@@ -27,7 +24,6 @@ and brace_block = ast => {
   switch ((ast: Ast.brace_block)) {
   | Empty => ""
   | Rule_list(rl) => rule_list(rl)
-  | Stylesheet(s) => stylesheet(s)
   };
 }
 and rule_list = (rule_list: Ast.rule_list) => {
