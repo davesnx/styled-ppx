@@ -7,6 +7,3 @@ let assert_string_not_equal left right =
   Alcotest.check (Alcotest.neg Alcotest.string) "should not be equal" right left
 
 let test title fn = title, [ Alcotest.test_case "" `Quick fn ]
-
-let check ~__POS__ testable received expected =
-  Alcotest.check ~pos:__POS__ testable "" expected received

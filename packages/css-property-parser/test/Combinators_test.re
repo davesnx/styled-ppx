@@ -104,7 +104,7 @@ let tests = [
       | `B => Alcotest.fail("should be <number>")
       };
 
-    check(~__POS__, Alcotest.float(1.), number, 16.0);
+    Alcotest.check(~pos=__POS__, Alcotest.float(1.), "", number, 16.0);
 
     let () =
       switch (parser("B")) {
@@ -133,10 +133,10 @@ let tests = [
   test("<number> && B", () => {
     let parser = parse_exn([%value "<number> && B"]);
     let (number, ()) = parser("17 B");
-    check(~__POS__, Alcotest.float(1.), number, 17.0);
+    Alcotest.check(~pos=__POS__, Alcotest.float(1.), "", number, 17.0);
 
     let (number, ()) = parser("B 18");
-    check(~__POS__, Alcotest.float(1.), number, 18.0);
+    Alcotest.check(~pos=__POS__, Alcotest.float(1.), "", number, 18.0);
   }),
   test("[ A && [A B] ]", _ => {
     let parser = parse_exn([%value "[ A && [A B] ]"]);
@@ -232,19 +232,19 @@ let tests = [
     let () =
       switch (parser("19 B")) {
       | (Some(number), Some ()) =>
-        check(~__POS__, Alcotest.float(1.), number, 19.0)
+        Alcotest.check(~pos=__POS__, Alcotest.float(1.), "", number, 19.0)
       | (_, _) => Alcotest.fail("should be (Some(number), Some())")
       };
     let () =
       switch (parser("B 20")) {
       | (Some(number), Some ()) =>
-        check(~__POS__, Alcotest.float(1.), number, 20.0)
+        Alcotest.check(~pos=__POS__, Alcotest.float(1.), "", number, 20.0)
       | (_, _) => Alcotest.fail("should be (Some(number), Some())")
       };
     let () =
       switch (parser("21")) {
       | (Some(number), None) =>
-        check(~__POS__, Alcotest.float(1.), number, 21.0)
+        Alcotest.check(~pos=__POS__, Alcotest.float(1.), "", number, 21.0)
       | (_, _) => Alcotest.fail("should be (Some(number), None)")
       };
     let () =
@@ -306,12 +306,14 @@ let tests = [
     let parser = parse_exn([%value "<number> | <percentage> | auto"]);
     let () =
       switch (parser("50")) {
-      | `Number(n) => check(~__POS__, Alcotest.float(1.), n, 50.0)
+      | `Number(n) =>
+        Alcotest.check(~pos=__POS__, Alcotest.float(1.), "", n, 50.0)
       | _ => Alcotest.fail("should be `Number")
       };
     let () =
       switch (parser("50%")) {
-      | `Percentage(p) => check(~__POS__, Alcotest.float(1.), p, 50.0)
+      | `Percentage(p) =>
+        Alcotest.check(~pos=__POS__, Alcotest.float(1.), "", p, 50.0)
       | _ => Alcotest.fail("should be `Percentage")
       };
     let () =
@@ -406,7 +408,8 @@ let tests = [
     let parser = parse_exn([%value "<number> | inherit | initial"]);
     let () =
       switch (parser("42")) {
-      | `Number(n) => check(~__POS__, Alcotest.float(1.), n, 42.0)
+      | `Number(n) =>
+        Alcotest.check(~pos=__POS__, Alcotest.float(1.), "", n, 42.0)
       | _ => Alcotest.fail("should be `Number")
       };
     let () =

@@ -7,6 +7,7 @@
   alcotest_extra
   styled-ppx
   styled-ppx.native
+  styled-ppx.css-parser
   ppxlib
   ppxlib.astlib
   server-reason-react.belt

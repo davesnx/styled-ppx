@@ -180,7 +180,7 @@ let tests =
            let pp_expr = (ppf, x) =>
              Fmt.pf(ppf, "%S", Ppxlib.Pprintast.string_of_expression(x));
            let check_expr = Alcotest.testable(pp_expr, (==));
-           check(~__POS__, check_expr, expected, input);
+           Alcotest.check(check_expr, "", expected, input);
          },
        );
      });

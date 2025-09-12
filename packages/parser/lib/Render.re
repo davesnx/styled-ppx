@@ -7,14 +7,14 @@ let rec rule = (ast: Ast.rule) => {
 }
 and style_rule = ({prelude, block, _}: Ast.style_rule) => {
   Printf.sprintf(
-    "%s{%s}",
+    "%s { %s }",
     prelude |> fst |> selector_list,
     rule_list(block),
   );
 }
 and at_rule = ({name, prelude, block, _}: Ast.at_rule) => {
   Printf.sprintf(
-    "@%s %s{%s}",
+    "@%s %s { %s }",
     name |> fst,
     prelude |> fst |> component_value_list,
     brace_block(block),
@@ -27,12 +27,8 @@ and brace_block = ast => {
   };
 }
 and rule_list = (rule_list: Ast.rule_list) => {
-  let resolved_rule_list = {
-    let (declarations, selectors) =
-      rule_list |> fst |> Resolve.resolve_selectors |> Resolve.split_by_kind;
-    declarations @ selectors;
-  };
-  resolved_rule_list
+  let (rule_list, _) = rule_list;
+  rule_list
   |> List.filter(
        fun
        | Ast.Style_rule({block: (block, _), _}) when List.length(block) == 0 =>
@@ -40,11 +36,11 @@ and rule_list = (rule_list: Ast.rule_list) => {
        | _ => true,
      )
   |> List.map(rule)
-  |> String.concat("");
+  |> String.concat(" ");
 }
 and declaration = ({name, value, important, _}: Ast.declaration) => {
   Printf.sprintf(
-    "%s:%s%s;",
+    "%s: %s%s;",
     name |> fst,
     value |> fst |> component_value_list,
     important |> fst ? " !important" : "",

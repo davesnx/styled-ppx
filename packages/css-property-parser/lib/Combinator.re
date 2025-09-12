@@ -121,57 +121,57 @@ let process_error_messages = errors =>
     };
   };
 
-let xor =
-  fun
+let xor = rules =>
+  switch (rules) {
   | [] => failwith("xor doesn't makes sense without a single value")
-  | all_rules => {
-      let try_rules_with_best_match = rules => {
-        switch (rules) {
-        | [] => failwith("xor doesn't makes sense without a single value")
-        | [left, ...rest] =>
-          let rules_with_unit = List.map(rule => ((), rule), rest);
-          let.map_match ((), value) =
-            match_longest(((), left), rules_with_unit);
-          value;
-        };
+  | all_rules =>
+    let try_rules_with_best_match = rules => {
+      switch (rules) {
+      | [] => failwith("xor doesn't makes sense without a single value")
+      | [left, ...rest] =>
+        let rules_with_unit = List.map(rule => ((), rule), rest);
+        let.map_match ((), value) =
+          match_longest(((), left), rules_with_unit);
+        value;
       };
-
-      let try_all_and_collect_errors = (rules, tokens) => {
-        let rec collect_errors = (remaining_rules, acc_errors) => {
-          switch (remaining_rules) {
-          | [] =>
-            let combined_error = process_error_messages(acc_errors);
-            Rule.Data.return(Error(combined_error), tokens);
-          | [rule, ...rest] =>
-            let (data, remaining) = rule(tokens);
-            switch (data) {
-            | Ok(value) => Rule.Data.return(Ok(value), remaining)
-            | Error(err) => collect_errors(rest, acc_errors @ [err])
-            };
-          };
-        };
-        collect_errors(rules, []);
-      };
-
-      (
-        tokens => {
-          let successful_rules =
-            all_rules
-            |> List.filter_map(rule => {
-                 let (data, remaining) = rule(tokens);
-                 switch (data) {
-                 | Ok(_) => Some((rule, remaining))
-                 | Error(_) => None
-                 };
-               });
-
-          switch (successful_rules) {
-          | [] => try_all_and_collect_errors(all_rules, tokens)
-          | _ => try_rules_with_best_match(all_rules, tokens)
-          };
-        }
-      );
     };
+
+    let try_all_and_collect_errors = (rules, tokens) => {
+      let rec collect_errors = (remaining_rules, acc_errors) => {
+        switch (remaining_rules) {
+        | [] =>
+          let combined_error = process_error_messages(acc_errors);
+          Rule.Data.return(Error(combined_error), tokens);
+        | [rule, ...rest] =>
+          let (data, remaining) = rule(tokens);
+          switch (data) {
+          | Ok(value) => Rule.Data.return(Ok(value), remaining)
+          | Error(err) => collect_errors(rest, acc_errors @ [err])
+          };
+        };
+      };
+      collect_errors(rules, []);
+    };
+
+    (
+      tokens => {
+        let successful_rules =
+          all_rules
+          |> List.filter_map(rule => {
+               let (data, remaining) = rule(tokens);
+               switch (data) {
+               | Ok(_) => Some((rule, remaining))
+               | Error(_) => None
+               };
+             });
+
+        switch (successful_rules) {
+        | [] => try_all_and_collect_errors(all_rules, tokens)
+        | _ => try_rules_with_best_match(all_rules, tokens)
+        };
+      }
+    );
+  };
 
 let and_ = rules => {
   // TODO: an array is a better choice

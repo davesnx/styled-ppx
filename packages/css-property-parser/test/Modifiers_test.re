@@ -4,8 +4,6 @@ open Modifier;
 open Parser;
 open Rule.Match;
 
-let check = Alcotest_extra.check;
-
 let parse_exn = (prop, str) =>
   switch (parse(prop, str)) {
   | Ok(data) => data
@@ -15,57 +13,93 @@ let parse_exn = (prop, str) =>
 let tests: tests = [
   test("<integer>?", () => {
     let parse = parse_exn([%value "<integer>?"]);
-    check(~__POS__, Alcotest.option(Alcotest.int), parse("13"), Some(13));
-    check(~__POS__, Alcotest.option(Alcotest.int), parse(""), None);
+    Alcotest.check(
+      ~pos=__POS__,
+      Alcotest.option(Alcotest.int),
+      "",
+      parse("13"),
+      Some(13),
+    );
+    Alcotest.check(
+      ~pos=__POS__,
+      Alcotest.option(Alcotest.int),
+      "",
+      parse(""),
+      None,
+    );
   }),
   test("'['", () => {
     let parse = parse_exn([%value "'['"]);
-    check(~__POS__, Alcotest.unit, parse("["), ());
+    Alcotest.check(~pos=__POS__, Alcotest.unit, "", parse("["), ());
   }),
   test("[<integer> A]?", () => {
     let parse = parse_exn([%value "[<integer> A]?"]);
     check(
       ~__POS__,
       Alcotest.option(Alcotest.pair(Alcotest.int, Alcotest.unit)),
+      "",
       parse("14 A"),
       Some((14, ())),
     );
     check(
       ~__POS__,
       Alcotest.option(Alcotest.pair(Alcotest.int, Alcotest.unit)),
+      "",
       parse("14 A"),
       Some((14, ())),
     );
     check(
       ~__POS__,
       Alcotest.option(Alcotest.pair(Alcotest.int, Alcotest.unit)),
+      "",
       parse(""),
       None,
     );
   }),
   test("<integer>*", () => {
     let parse = parse_exn([%value "<integer>*"]);
-    check(~__POS__, Alcotest.list(Alcotest.int), parse(""), []);
-    check(~__POS__, Alcotest.list(Alcotest.int), parse("15"), [15]);
-    check(~__POS__, Alcotest.list(Alcotest.int), parse("16 17"), [16, 17]);
+    Alcotest.check(
+      ~pos=__POS__,
+      Alcotest.list(Alcotest.int),
+      "",
+      parse(""),
+      [],
+    );
+    Alcotest.check(
+      ~pos=__POS__,
+      Alcotest.list(Alcotest.int),
+      "",
+      parse("15"),
+      [15],
+    );
+    Alcotest.check(
+      ~pos=__POS__,
+      Alcotest.list(Alcotest.int),
+      "",
+      parse("16 17"),
+      [16, 17],
+    );
   }),
   test("[<integer> A]*", () => {
     let parse = parse_exn([%value "[<integer> A]*"]);
     check(
       ~__POS__,
       Alcotest.list(Alcotest.pair(Alcotest.int, Alcotest.unit)),
+      "",
       parse(""),
       [],
     );
     check(
       ~__POS__,
       Alcotest.list(Alcotest.pair(Alcotest.int, Alcotest.unit)),
+      "",
       parse("18 A"),
       [(18, ())],
     );
     check(
       ~__POS__,
       Alcotest.list(Alcotest.pair(Alcotest.int, Alcotest.unit)),
+      "",
       parse("19 A 20 A"),
       [(19, ()), (20, ())],
     );
@@ -75,18 +109,21 @@ let tests: tests = [
     check(
       ~__POS__,
       Alcotest.result(Alcotest.list(Alcotest.int), Alcotest.string),
+      "",
       parse(""),
       Error("Expected an integer."),
     );
     check(
       ~__POS__,
       Alcotest.result(Alcotest.list(Alcotest.int), Alcotest.string),
+      "",
       parse("21"),
       Ok([21]),
     );
     check(
       ~__POS__,
       Alcotest.result(Alcotest.list(Alcotest.int), Alcotest.string),
+      "",
       parse("22 23"),
       Ok([22, 23]),
     );
@@ -98,11 +135,18 @@ let tests: tests = [
         Alcotest.list(Alcotest.pair(Alcotest.int, Alcotest.unit)),
         Alcotest.string,
       );
-    check(~__POS__, to_check, parse(""), Error("Expected an integer."));
-    check(~__POS__, to_check, parse("24 A"), Ok([(24, ())]));
+    Alcotest.check(
+      ~pos=__POS__,
+      to_check,
+      "",
+      parse(""),
+      Error("Expected an integer."),
+    );
+    Alcotest.check(~pos=__POS__, to_check, parse("24 A"), Ok([(24, ())]));
     check(
       ~__POS__,
       to_check,
+      "",
       parse("25 A 26 A"),
       Ok([(25, ()), (26, ())]),
     );
@@ -111,12 +155,25 @@ let tests: tests = [
     let parse = parse([%value "<integer>{2}"]);
     let to_check =
       Alcotest.result(Alcotest.list(Alcotest.int), Alcotest.string);
-    check(~__POS__, to_check, parse(""), Error("Expected an integer."));
-    check(~__POS__, to_check, parse("27"), Error("Expected an integer."));
-    check(~__POS__, to_check, parse("28 29"), Ok([28, 29]));
+    Alcotest.check(
+      ~pos=__POS__,
+      to_check,
+      "",
+      parse(""),
+      Error("Expected an integer."),
+    );
+    Alcotest.check(
+      ~pos=__POS__,
+      to_check,
+      "",
+      parse("27"),
+      Error("Expected an integer."),
+    );
+    Alcotest.check(~pos=__POS__, to_check, parse("28 29"), Ok([28, 29]));
     check(
       ~__POS__,
       to_check,
+      "",
       parse("30 31 32"),
       Error("tokens remaining: (NUMBER 32.), EOF"),
     );
@@ -128,12 +185,31 @@ let tests: tests = [
         Alcotest.pair(Alcotest.list(Alcotest.int), Alcotest.int),
         Alcotest.string,
       );
-    check(~__POS__, to_check, parse(""), Error("Expected an integer."));
-    check(~__POS__, to_check, parse("27"), Error("Expected an integer."));
-    check(~__POS__, to_check, parse("28 29 30"), Ok(([28, 29], 30)));
+    Alcotest.check(
+      ~pos=__POS__,
+      to_check,
+      "",
+      parse(""),
+      Error("Expected an integer."),
+    );
+    Alcotest.check(
+      ~pos=__POS__,
+      to_check,
+      "",
+      parse("27"),
+      Error("Expected an integer."),
+    );
+    Alcotest.check(
+      ~pos=__POS__,
+      to_check,
+      "",
+      parse("28 29 30"),
+      Ok(([28, 29], 30)),
+    );
     check(
       ~__POS__,
       to_check,
+      "",
       parse("30 31 32 33"),
       Error("tokens remaining: (NUMBER 33.), EOF"),
     );
@@ -142,13 +218,32 @@ let tests: tests = [
     let parse = parse([%value "<integer>{2,3}"]);
     let to_check =
       Alcotest.result(Alcotest.list(Alcotest.int), Alcotest.string);
-    check(~__POS__, to_check, parse(""), Error("Expected an integer."));
-    check(~__POS__, to_check, parse("33"), Error("Expected an integer."));
-    check(~__POS__, to_check, parse("34 35"), Ok([34, 35]));
-    check(~__POS__, to_check, parse("36 37 38"), Ok([36, 37, 38]));
+    Alcotest.check(
+      ~pos=__POS__,
+      to_check,
+      "",
+      parse(""),
+      Error("Expected an integer."),
+    );
+    Alcotest.check(
+      ~pos=__POS__,
+      to_check,
+      "",
+      parse("33"),
+      Error("Expected an integer."),
+    );
+    Alcotest.check(~pos=__POS__, to_check, parse("34 35"), Ok([34, 35]));
+    Alcotest.check(
+      ~pos=__POS__,
+      to_check,
+      "",
+      parse("36 37 38"),
+      Ok([36, 37, 38]),
+    );
     check(
       ~__POS__,
       to_check,
+      "",
       parse("39 40 41 42"),
       Error("tokens remaining: (NUMBER 42.), EOF"),
     );
@@ -157,34 +252,72 @@ let tests: tests = [
     let parse = parse([%value "<integer>{2,}"]);
     let to_check =
       Alcotest.result(Alcotest.list(Alcotest.int), Alcotest.string);
-    check(~__POS__, to_check, parse(""), Error("Expected an integer."));
-    check(~__POS__, to_check, parse("43"), Error("Expected an integer."));
-    check(~__POS__, to_check, parse("44 45"), Ok([44, 45]));
-    check(~__POS__, to_check, parse("46 47 48"), Ok([46, 47, 48]));
-    check(~__POS__, to_check, parse("49 50 51 52"), Ok([49, 50, 51, 52]));
+    Alcotest.check(
+      ~pos=__POS__,
+      to_check,
+      parse(""),
+      Error("Expected an integer."),
+    );
+    Alcotest.check(
+      ~pos=__POS__,
+      to_check,
+      "",
+      parse("43"),
+      Error("Expected an integer."),
+    );
+    Alcotest.check(~pos=__POS__, to_check, parse("44 45"), Ok([44, 45]));
+    Alcotest.check(
+      ~pos=__POS__,
+      to_check,
+      "",
+      parse("46 47 48"),
+      Ok([46, 47, 48]),
+    );
+    Alcotest.check(
+      ~pos=__POS__,
+      to_check,
+      "",
+      parse("49 50 51 52"),
+      Ok([49, 50, 51, 52]),
+    );
   }),
   test("<integer>#{2,3}", () => {
     let parse = parse([%value "<integer>#{2,3}"]);
     let to_check =
       Alcotest.result(Alcotest.list(Alcotest.int), Alcotest.string);
-    check(~__POS__, to_check, parse(""), Error("Expected an integer."));
+    Alcotest.check(
+      ~pos=__POS__,
+      to_check,
+      "",
+      parse(""),
+      Error("Expected an integer."),
+    );
     check(
       ~__POS__,
       to_check,
+      "",
       parse("53"),
       Error("Expected ',' but instead got 'the end'."),
     );
-    check(~__POS__, to_check, parse("54, 55"), Ok([54, 55]));
-    check(~__POS__, to_check, parse("56, 57, 58"), Ok([56, 57, 58]));
+    Alcotest.check(~pos=__POS__, to_check, parse("54, 55"), Ok([54, 55]));
+    Alcotest.check(
+      ~pos=__POS__,
+      to_check,
+      "",
+      parse("56, 57, 58"),
+      Ok([56, 57, 58]),
+    );
     check(
       ~__POS__,
       to_check,
+      "",
       parse("59, 60, 61,"),
       Error("tokens remaining: COMMA, EOF"),
     );
     check(
       ~__POS__,
       to_check,
+      "",
       parse("59, 60, 61, 62"),
       Error("tokens remaining: COMMA, (NUMBER 62.), EOF"),
     );
@@ -200,29 +333,45 @@ let tests: tests = [
         ),
         Alcotest.string,
       );
-    check(~__POS__, to_check, parse(""), Error("Expected an integer."));
+    Alcotest.check(
+      ~pos=__POS__,
+      to_check,
+      "",
+      parse(""),
+      Error("Expected an integer."),
+    );
     check(
       ~__POS__,
       to_check,
+      "",
       parse("53"),
       Error("Expected ',' but instead got 'the end'."),
     );
     check(
       ~__POS__,
       to_check,
+      "",
       parse("54, 55"),
       Error("Expected ',' but instead got 'the end'."),
     );
-    check(~__POS__, to_check, parse("56, 57, 58"), Ok(([56, 57], (), 58)));
+    Alcotest.check(
+      ~pos=__POS__,
+      to_check,
+      "",
+      parse("56, 57, 58"),
+      Ok(([56, 57], (), 58)),
+    );
     check(
       ~__POS__,
       to_check,
+      "",
       parse("59, 60, 61,"),
       Error("tokens remaining: COMMA, EOF"),
     );
     check(
       ~__POS__,
       to_check,
+      "",
       parse("59, 60, 61, 62"),
       Error("tokens remaining: COMMA, (NUMBER 62.), EOF"),
     );
@@ -231,14 +380,33 @@ let tests: tests = [
     let parse = parse([%value "<integer>{2,3}"]);
     let to_check =
       Alcotest.result(Alcotest.list(Alcotest.int), Alcotest.string);
-    check(~__POS__, to_check, parse(""), Error("Expected an integer."));
-    check(~__POS__, to_check, parse("63"), Error("Expected an integer."));
-    check(~__POS__, to_check, parse("64 65"), Ok([64, 65]));
-    check(~__POS__, to_check, parse("66 67 68"), Ok([66, 67, 68]));
+    Alcotest.check(
+      ~pos=__POS__,
+      to_check,
+      "",
+      parse(""),
+      Error("Expected an integer."),
+    );
+    Alcotest.check(
+      ~pos=__POS__,
+      to_check,
+      "",
+      parse("63"),
+      Error("Expected an integer."),
+    );
+    Alcotest.check(~pos=__POS__, to_check, parse("64 65"), Ok([64, 65]));
+    Alcotest.check(
+      ~pos=__POS__,
+      to_check,
+      "",
+      parse("66 67 68"),
+      Ok([66, 67, 68]),
+    );
     /* TODO: Remove "tokens remaining" message */
-    check(
+    Alcotest.check(
       ~__POS__,
       to_check,
+      "",
       parse("69 70 71 72"),
       Error("tokens remaining: (NUMBER 72.), EOF"),
     );
