@@ -1,14 +1,5 @@
 open Ast;
 
-module List = {
-  include List;
-  /* To be compatible with OCaml 4.14 Stdlib */
-  let is_empty =
-    fun
-    | [] => true
-    | _ => false;
-};
-
 let rec contains_ampersand = (selector: selector) => {
   switch (selector) {
   | SimpleSelector(Ampersand) => true
@@ -401,10 +392,8 @@ let rec move_media_at_top = (rules: list(rule)) => {
           }),
         ];
         acc @ selector_without_media @ new_media_rules;
-      | Style_rule({block: (block, _), _}) when !List.is_empty(block) =>
-        acc @ [rule]
-      | At_rule({block: Rule_list((block, _)), _})
-          when !List.is_empty(block) =>
+      | Style_rule({block: (block, _), _}) when block != [] => acc @ [rule]
+      | At_rule({block: Rule_list((block, _)), _}) when block != [] =>
         acc @ [rule]
       | Declaration(_) => acc @ [rule]
       | _ => acc
@@ -515,4 +504,10 @@ let resolve_selectors = (rules: list(rule)) => {
     |> split_multiple_selectors
     |> unnest_selectors(~prefix=None);
   move_media_at_top(selectors) @ declarations;
+};
+
+let run = ((rule_list, _loc): rule_list) => {
+  let (declarations, selectors) =
+    rule_list |> resolve_selectors |> split_by_kind;
+  declarations @ selectors;
 };

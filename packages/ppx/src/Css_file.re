@@ -141,11 +141,13 @@ module Css_transform = {
     };
   };
 
-  let transform_rule_list = (declarations: rule_list) => {
+  let transform_rule_list = (rule_list: rule_list) => {
     let dynamic_vars = ref([]);
-    let (rule_list, rule_loc) = declarations;
+    let (_rule_list, rule_loc) = rule_list;
     let transformed_rules =
-      List.map(rule => transform_rule(rule, dynamic_vars), rule_list);
+      rule_list
+      |> Styled_ppx_css_parser.Transform.run
+      |> List.map(rule => transform_rule(rule, dynamic_vars));
     let transformed_declarations = (transformed_rules, rule_loc);
     (transformed_declarations, List.rev(dynamic_vars^));
   };

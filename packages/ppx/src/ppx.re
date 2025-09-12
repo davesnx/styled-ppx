@@ -169,13 +169,13 @@ module Mapper = {
           |> Css_runtime.add_label(~loc=stringLoc, moduleName)
           |> Builder.pexp_array(~loc=stringLoc)
           |> Css_runtime.render_style_call(~loc=stringLoc)
-        | Error((start_post, end_post, msg)) =>
+        | Error((start_pos, end_pos, msg)) =>
           let loc =
             Styled_ppx_css_parser.Parser_location.make_loc_from_pos(
               ~loc=stringLoc,
               ~delimiter,
-              start_post,
-              end_post,
+              start_pos,
+              end_pos,
             );
           Error.expr(~loc, msg);
         };
@@ -267,21 +267,21 @@ module Mapper = {
         };
       let stylesExpr =
         switch (Styled_ppx_css_parser.Driver.parse_declaration_list(str)) {
-        | Ok(declarations) =>
+        | Ok(rule_list) =>
           let (className, dynamic_vars) =
-            Css_file.push(~hash_by=str, declarations);
+            Css_file.push(~hash_by=str, rule_list);
           Css_runtime.render_make_call(
             ~loc=stringLoc,
             ~className,
             ~dynamic_vars,
           );
-        | Error((start_post, end_post, msg)) =>
+        | Error((start_pos, end_pos, msg)) =>
           let loc =
             Styled_ppx_css_parser.Parser_location.make_loc_from_pos(
               ~loc=stringLoc,
               ~delimiter,
-              start_post,
-              end_post,
+              start_pos,
+              end_pos,
             );
           Error.expr(~loc, msg);
         };
@@ -392,19 +392,19 @@ module Mapper = {
       ) =>
       let expr =
         switch (Styled_ppx_css_parser.Driver.parse_declaration_list(styles)) {
-        | Ok(declarations) =>
-          declarations
+        | Ok(rule_list) =>
+          rule_list
           |> Css_runtime.render_declarations(~loc=stringLoc)
           |> Css_runtime.add_label(~loc=stringLoc, valueName)
           |> Builder.pexp_array(~loc=stringLoc)
           |> Css_runtime.render_style_call(~loc=stringLoc)
-        | Error((start_post, end_post, msg)) =>
+        | Error((start_pos, end_pos, msg)) =>
           let loc =
             Styled_ppx_css_parser.Parser_location.make_loc_from_pos(
               ~loc=stringLoc,
               ~delimiter,
-              start_post,
-              end_post,
+              start_pos,
+              end_pos,
             );
           Error.expr(~loc, msg);
         };
@@ -623,13 +623,13 @@ let cx_extension_without_let_binding =
             |> Css_runtime.render_declarations(~loc=stringLoc)
             |> Builder.pexp_array(~loc=stringLoc)
             |> Css_runtime.render_style_call(~loc=stringLoc)
-          | Error((start_post, end_post, msg)) =>
+          | Error((start_pos, end_pos, msg)) =>
             let loc =
               Styled_ppx_css_parser.Parser_location.make_loc_from_pos(
                 ~loc=stringLoc,
                 ~delimiter,
-                start_post,
-                end_post,
+                start_pos,
+                end_pos,
               );
             Error.expr(~loc, msg);
           }
@@ -676,14 +676,16 @@ let rec type_check_rule = (rule: Styled_ppx_css_parser.Ast.rule) => {
     [Css_property_parser.Parser.check_property(~loc, ~name, value)];
   | Style_rule(style_rule) =>
     let rule_list = style_rule.block;
-    /* TODO: Currently we don't typecheck prelude selectors */
+    /* TODO: we don't typecheck prelude selectors */
     type_check_rule_list(rule_list);
-  | At_rule(at_rule) => [
-      Error((at_rule.loc, `Invalid_value("at rules aren't supported yet"))),
-    ]
-  /* let prelude =
-       Styled_ppx_css_parser.Render.component_value_list(at_rule.prelude);
-     Css_property_parser.Parser.check_at_rule(~name, prelude); */
+  | At_rule(at_rule) =>
+    /* TODO: we don't typecheck at_rules */
+    switch (at_rule.block) {
+    | Empty =>
+      /* TODO: We don't type-check empty at-rules */
+      [Ok()]
+    | Rule_list(rule_list) => type_check_rule_list(rule_list)
+    }
   };
 }
 
@@ -773,13 +775,13 @@ let cx2_extension =
                 error_messages,
               );
             };
-          | Error((start_post, end_post, msg)) =>
+          | Error((start_pos, end_pos, msg)) =>
             let loc =
               Styled_ppx_css_parser.Parser_location.make_loc_from_pos(
                 ~loc=stringLoc,
                 ~delimiter,
-                start_post,
-                end_post,
+                start_pos,
+                end_pos,
               );
             Error.expressions(
               ~loc=stringLoc,
@@ -836,13 +838,13 @@ let keyframe_extension =
           switch (Styled_ppx_css_parser.Driver.parse_keyframes(txt)) {
           | Ok(declarations) =>
             Css_runtime.render_keyframes(~loc=stringLoc, declarations)
-          | Error((start_post, end_post, msg)) =>
+          | Error((start_pos, end_pos, msg)) =>
             let loc =
               Styled_ppx_css_parser.Parser_location.make_loc_from_pos(
                 ~loc=stringLoc,
                 ~delimiter,
-                start_post,
-                end_post,
+                start_pos,
+                end_pos,
               );
             Error.expr(~loc, msg);
           }
@@ -875,13 +877,13 @@ let css_extension =
             let declarationListValues =
               Css_runtime.render_declaration(~loc=stringLoc, declarations);
             List.nth(declarationListValues, 0);
-          | Error((start_post, end_post, msg)) =>
+          | Error((start_pos, end_pos, msg)) =>
             let loc =
               Styled_ppx_css_parser.Parser_location.make_loc_from_pos(
                 ~loc=stringLoc,
                 ~delimiter,
-                start_post,
-                end_post,
+                start_pos,
+                end_pos,
               );
             Error.expr(~loc, msg);
           }
@@ -913,13 +915,13 @@ let styled_global_extension =
           switch (Styled_ppx_css_parser.Driver.parse_declaration_list(txt)) {
           | Ok(rule_list) =>
             Css_runtime.render_global(~loc=stringLoc, rule_list)
-          | Error((start_post, end_post, msg)) =>
+          | Error((start_pos, end_pos, msg)) =>
             let loc =
               Styled_ppx_css_parser.Parser_location.make_loc_from_pos(
                 ~loc=stringLoc,
                 ~delimiter,
-                start_post,
-                end_post,
+                start_pos,
+                end_pos,
               );
             Error.expr(~loc, msg);
           }

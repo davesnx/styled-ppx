@@ -93,9 +93,9 @@ let create_error_message = (got, expected_values) => {
 };
 
 let process_error_messages = errors =>
-  if (List.is_empty(errors)) {
-    ["No alternatives matched"];
-  } else {
+  switch (errors) {
+  | [] => ["No alternatives matched"]
+  | errors =>
     /* Extract expected values from all error messages */
     let expected_values =
       errors
