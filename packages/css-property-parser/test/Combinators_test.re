@@ -37,7 +37,7 @@ let tests = [
   }),
   test("<number> B", () => {
     let (number, ()) = parse_exn([%value "<number> B"], "15 B");
-    check(~__POS__, Alcotest.float(1.), number, 15.0);
+    Alcotest.check(~pos=__POS__, Alcotest.float(1.), "", number, 15.0);
   }),
   /* test{
        let parser = parse_exn([%value "<number> B"]);
