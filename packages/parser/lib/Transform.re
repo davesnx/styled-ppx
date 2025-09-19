@@ -135,7 +135,7 @@ let join_compound_selector =
         pseudo_selectors: last_pseudo_selectors @ pseudo_selectors,
       }),
     )
-  | _ => failwith("invalid state")
+  | _ => assert(false)
   };
 };
 // this mimics the structure of contains_ampersand
@@ -195,7 +195,7 @@ let rec replace_ampersand = (replaced_with: selector, selector: selector) => {
         replace_ampersand(replaced_with, ComplexSelector(complex_selector))
       ) {
       | ComplexSelector(v) => v
-      | _ => failwith("invalid state")
+      | _ => assert(false)
       };
     RelativeSelector({
       combinator,
@@ -237,7 +237,7 @@ and pseudo_selector_replace_ampersand = (replaced_with: selector, selector) => {
       |> List.map(
            fun
            | ComplexSelector(complex_selector) => complex_selector
-           | _ => failwith("invalid state"),
+           | _ => assert(false),
          );
     Pseudoclass(
       NthFunction({
@@ -349,12 +349,11 @@ let rec move_media_at_top = (rules: list(rule)) => {
           List.map(
             fun
             | At_rule({
-                name: (name, _) as name_with_loc,
+                name: ("media", _) as name_with_loc,
                 prelude: nested_media_selector,
                 block,
                 _,
-              })
-                when name == "media" => {
+              }) => {
                 let nested_media_rule_list =
                   switch (block) {
                   | Empty => []
@@ -439,95 +438,120 @@ and swap = ({prelude: swap_prelude, block, loc, _}: at_rule) => {
   move_media_at_top(resolved_media_selectors);
 };
 
+let rec unnest_selectors = (~prefix, rules) => {
+  List.partition_map(
+    fun
+    | Style_rule({prelude: (prelude, _), block: (rules, _), _}) => {
+        let current_selector = prelude |> List.hd |> fst;
+        let new_prefix =
+          switch (prefix) {
+          | None => current_selector
+          | Some(prefix) =>
+            if (contains_ampersand(current_selector)) {
+              replace_ampersand(prefix, current_selector);
+            } else if (starts_with_double_dot(current_selector)) {
+              switch (current_selector) {
+              | ComplexSelector(Selector(CompoundSelector(selector))) =>
+                ComplexSelector(
+                  Selector(join_compound_selector(prefix, selector)),
+                )
+              | ComplexSelector(
+                  Combinator({left: CompoundSelector(selector), right}),
+                ) =>
+                ComplexSelector(
+                  Combinator({
+                    left: join_compound_selector(prefix, selector),
+                    right,
+                  }),
+                )
+              | _ => assert(false)
+              };
+            } else {
+              join_selector_with_combinator(prefix, current_selector);
+            }
+          };
+        let selector_rules = split_multiple_selectors(rules);
+        let (selectors, rest_of_declarations) =
+          unnest_selectors(~prefix=Some(new_prefix), selector_rules);
+        let new_selector =
+          Style_rule({
+            prelude: ([(new_prefix, loc_none)], loc_none),
+            block: (selectors, Ppxlib.Location.none),
+            loc: Ppxlib.Location.none,
+          });
+        Right([new_selector, ...rest_of_declarations]);
+      }
+    | At_rule({
+        /* Special handling for @keyframes and @font-face - don't add className */
+        name: ("keyframes" | "font-face", _) as name,
+        prelude,
+        block,
+        loc,
+      }) => {
+        let processed_block =
+          switch (block) {
+          | Empty => Empty
+          | Rule_list((rule_list, rule_list_loc)) =>
+            let (processed_declarations, processed_selectors) =
+              unnest_selectors(~prefix=None, rule_list);
+            Rule_list((
+              processed_declarations @ processed_selectors,
+              rule_list_loc,
+            ));
+          };
+        Left(
+          At_rule({
+            name,
+            prelude,
+            block: processed_block,
+            loc,
+          }),
+        );
+      }
+    | At_rule({name, prelude, block, loc}) => {
+        /* Process other at-rules (like @media, @supports, @container) normally */
+        let processed_block =
+          switch (block) {
+          | Empty => Empty
+          | Rule_list((rule_list, rule_list_loc)) =>
+            let (processed_declarations, processed_selectors) =
+              unnest_selectors(~prefix, rule_list);
+            /* If we have declarations and a prefix, wrap them in a Style_rule */
+            let final_rules =
+              switch (prefix, processed_declarations) {
+              | (Some(className), decls) when List.length(decls) > 0 =>
+                let wrapped_decls =
+                  Style_rule({
+                    prelude: (
+                      [(className, Ppxlib.Location.none)],
+                      Ppxlib.Location.none,
+                    ),
+                    block: (decls, Ppxlib.Location.none),
+                    loc: Ppxlib.Location.none,
+                  });
+                [wrapped_decls] @ processed_selectors;
+              | _ => processed_declarations @ processed_selectors
+              };
+            Rule_list((final_rules, rule_list_loc));
+          };
+        Left(
+          At_rule({
+            name,
+            prelude,
+            block: processed_block,
+            loc,
+          }),
+        );
+      }
+    | Declaration(_) as dec => Left(dec),
+    rules,
+  )
+  |> (
+    ((declarations, selectors)) => (declarations, List.flatten(selectors))
+  );
+};
+
 let resolve_selectors = (~className, rules: list(rule)) => {
-  let rec unnest_selectors = (~prefix, rules) => {
-    List.partition_map(
-      fun
-      | Style_rule({prelude: (prelude, _), block: (rules, _), _}) => {
-          let current_selector = prelude |> List.hd |> fst;
-          let new_prefix =
-            switch (prefix) {
-            | None => current_selector
-            | Some(prefix) =>
-              if (contains_ampersand(current_selector)) {
-                replace_ampersand(prefix, current_selector);
-              } else if (starts_with_double_dot(current_selector)) {
-                switch (current_selector) {
-                | ComplexSelector(Selector(CompoundSelector(selector))) =>
-                  ComplexSelector(
-                    Selector(join_compound_selector(prefix, selector)),
-                  )
-                | ComplexSelector(
-                    Combinator({left: CompoundSelector(selector), right}),
-                  ) =>
-                  ComplexSelector(
-                    Combinator({
-                      left: join_compound_selector(prefix, selector),
-                      right,
-                    }),
-                  )
-                | _ => failwith("invalid state")
-                };
-              } else {
-                join_selector_with_combinator(prefix, current_selector);
-              }
-            };
-          let selector_rules = split_multiple_selectors(rules);
-          let (selectors, rest_of_declarations) =
-            unnest_selectors(~prefix=Some(new_prefix), selector_rules);
-          let new_selector =
-            Style_rule({
-              prelude: ([(new_prefix, loc_none)], loc_none),
-              block: (selectors, Ppxlib.Location.none),
-              loc: Ppxlib.Location.none,
-            });
-          Right([new_selector, ...rest_of_declarations]);
-        }
-      | At_rule({name, prelude, block, loc}) => {
-          /* Process the content of at-rules (like @media) to handle ampersands */
-          let processed_block =
-            switch (block) {
-            | Empty => Empty
-            | Rule_list((rule_list, rule_list_loc)) =>
-              let (processed_declarations, processed_selectors) =
-                unnest_selectors(~prefix, rule_list);
-              /* If we have declarations and a prefix, wrap them in a Style_rule */
-              let final_rules =
-                switch (prefix, processed_declarations) {
-                | (Some(className), decls) when List.length(decls) > 0 =>
-                  let wrapped_decls =
-                    Style_rule({
-                      prelude: (
-                        [(className, Ppxlib.Location.none)],
-                        Ppxlib.Location.none,
-                      ),
-                      block: (decls, Ppxlib.Location.none),
-                      loc: Ppxlib.Location.none,
-                    });
-                  [wrapped_decls] @ processed_selectors;
-                | _ => processed_declarations @ processed_selectors
-                };
-              Rule_list((final_rules, rule_list_loc));
-            };
-          Left(
-            At_rule({
-              name,
-              prelude,
-              block: processed_block,
-              loc,
-            }),
-          );
-        }
-      | Declaration(_) as dec => Left(dec),
-      rules,
-    )
-    |> (
-      ((declarations, selectors)) => (
-        declarations,
-        List.flatten(selectors),
-      )
-    );
-  };
   let initial_prefix =
     Some(
       CompoundSelector({

@@ -122,19 +122,36 @@ and selector = (ast: Ast.selector) => {
   and render_complex_selector = complex => {
     switch (complex) {
     | Combinator({left, right}) =>
-      let left = selector(left);
-      let right = render_right_combinator(right);
-      left ++ right;
+      let is_class_selector = s => {
+        switch (s) {
+        | Ast.CompoundSelector({
+            type_selector: None,
+            subclass_selectors: [Ast.Class(_), ..._],
+            _,
+          }) =>
+          true
+        | _ => false
+        };
+      };
+
+      let right_str =
+        right
+        |> List.map(((combinator, s)) => {
+             let s_str = selector(s);
+             switch (
+               combinator,
+               is_class_selector(left),
+               is_class_selector(s),
+             ) {
+             | (None, true, true) => s_str
+             | (None, _, _) => " " ++ s_str
+             | (Some(comb), _, _) => " " ++ comb ++ " " ++ s_str
+             };
+           })
+        |> String.concat("");
+      selector(left) ++ right_str;
     | Selector(s) => selector(s)
     };
-  }
-  and render_right_combinator = right => {
-    right
-    |> List.map(((combinator, s)) => {
-         Option.fold(~none=" ", ~some=o => " " ++ o ++ " ", combinator)
-         ++ selector(s)
-       })
-    |> String.concat("");
   }
   and render_relative_selector =
       ({combinator, complex_selector}: Ast.relative_selector) => {
