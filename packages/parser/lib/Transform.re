@@ -1,5 +1,7 @@
 open Ast;
 
+let loc_none = Ppxlib.Location.none;
+
 let rec contains_ampersand = (selector: selector) => {
   switch (selector) {
   | SimpleSelector(Ampersand) => true
@@ -307,9 +309,9 @@ let join_media =
   (
     trim_right(left)
     @ [
-      (Whitespace, Ppxlib.Location.none),
-      (Ident("and"), Ppxlib.Location.none),
-      (Whitespace, Ppxlib.Location.none),
+      (Whitespace, loc_none),
+      (Ident("and"), loc_none),
+      (Whitespace, loc_none),
     ]
     @ right,
     new_loc,
@@ -367,14 +369,11 @@ let rec move_media_at_top = (rules: list(rule)) => {
                         [
                           Style_rule({
                             prelude,
-                            block: (
-                              nested_media_rule_list,
-                              Ppxlib.Location.none,
-                            ),
+                            block: (nested_media_rule_list, loc_none),
                             loc,
                           }),
                         ],
-                        Ppxlib.Location.none,
+                        loc_none,
                       )),
                     loc,
                   }),
@@ -387,7 +386,7 @@ let rec move_media_at_top = (rules: list(rule)) => {
         let selector_without_media = [
           Style_rule({
             prelude,
-            block: (declarations @ non_media_selectors, Ppxlib.Location.none),
+            block: (declarations @ non_media_selectors, loc_none),
             loc,
           }),
         ];
@@ -423,7 +422,7 @@ and swap = ({prelude: swap_prelude, block, loc, _}: at_rule) => {
           At_rule({
             name: nested_name,
             prelude: swap_prelude,
-            block: Rule_list((media_declarations, Ppxlib.Location.none)),
+            block: Rule_list((media_declarations, loc_none)),
             loc,
           }),
           At_rule({
@@ -440,7 +439,7 @@ and swap = ({prelude: swap_prelude, block, loc, _}: at_rule) => {
   move_media_at_top(resolved_media_selectors);
 };
 
-let resolve_selectors = (rules: list(rule)) => {
+let resolve_selectors = (~className, rules: list(rule)) => {
   let rec unnest_selectors = (~prefix, rules) => {
     List.partition_map(
       fun
@@ -478,16 +477,47 @@ let resolve_selectors = (rules: list(rule)) => {
             unnest_selectors(~prefix=Some(new_prefix), selector_rules);
           let new_selector =
             Style_rule({
-              prelude: (
-                [(new_prefix, Ppxlib.Location.none)],
-                Ppxlib.Location.none,
-              ),
+              prelude: ([(new_prefix, loc_none)], loc_none),
               block: (selectors, Ppxlib.Location.none),
               loc: Ppxlib.Location.none,
             });
           Right([new_selector, ...rest_of_declarations]);
         }
-      | At_rule(_) as at_rule => Left(at_rule)
+      | At_rule({name, prelude, block, loc}) => {
+          /* Process the content of at-rules (like @media) to handle ampersands */
+          let processed_block =
+            switch (block) {
+            | Empty => Empty
+            | Rule_list((rule_list, rule_list_loc)) =>
+              let (processed_declarations, processed_selectors) =
+                unnest_selectors(~prefix, rule_list);
+              /* If we have declarations and a prefix, wrap them in a Style_rule */
+              let final_rules =
+                switch (prefix, processed_declarations) {
+                | (Some(className), decls) when List.length(decls) > 0 =>
+                  let wrapped_decls =
+                    Style_rule({
+                      prelude: (
+                        [(className, Ppxlib.Location.none)],
+                        Ppxlib.Location.none,
+                      ),
+                      block: (decls, Ppxlib.Location.none),
+                      loc: Ppxlib.Location.none,
+                    });
+                  [wrapped_decls] @ processed_selectors;
+                | _ => processed_declarations @ processed_selectors
+                };
+              Rule_list((final_rules, rule_list_loc));
+            };
+          Left(
+            At_rule({
+              name,
+              prelude,
+              block: processed_block,
+              loc,
+            }),
+          );
+        }
       | Declaration(_) as dec => Left(dec),
       rules,
     )
@@ -498,16 +528,24 @@ let resolve_selectors = (rules: list(rule)) => {
       )
     );
   };
+  let initial_prefix =
+    Some(
+      CompoundSelector({
+        type_selector: None,
+        subclass_selectors: [Class(className)],
+        pseudo_selectors: [],
+      }),
+    );
   let (declarations, selectors) =
     rules
     |> move_media_at_top
     |> split_multiple_selectors
-    |> unnest_selectors(~prefix=None);
+    |> unnest_selectors(~prefix=initial_prefix);
   move_media_at_top(selectors) @ declarations;
 };
 
-let run = ((rule_list, _loc): rule_list) => {
+let run = (~className, (rule_list, _loc): rule_list) => {
   let (declarations, selectors) =
-    rule_list |> resolve_selectors |> split_by_kind;
+    rule_list |> resolve_selectors(~className) |> split_by_kind;
   declarations @ selectors;
 };

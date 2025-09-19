@@ -141,12 +141,12 @@ module Css_transform = {
     };
   };
 
-  let transform_rule_list = (rule_list: rule_list) => {
+  let transform_rule_list = (~className, rule_list: rule_list) => {
     let dynamic_vars = ref([]);
     let (_rule_list, rule_loc) = rule_list;
     let transformed_rules =
       rule_list
-      |> Styled_ppx_css_parser.Transform.run
+      |> Styled_ppx_css_parser.Transform.run(~className)
       |> List.map(rule => transform_rule(rule, dynamic_vars));
     let transformed_declarations = (transformed_rules, rule_loc);
     (transformed_declarations, List.rev(dynamic_vars^));
@@ -235,10 +235,9 @@ let get_output_path = () => {
 };
 
 let push = (~hash_by, declarations) => {
-  let (transformed_declarations, dynamic_vars) =
-    Css_transform.transform_rule_list(declarations);
-
   let className = Printf.sprintf("css-%s", Murmur2.default(hash_by));
+  let (transformed_declarations, dynamic_vars) =
+    Css_transform.transform_rule_list(~className, declarations);
 
   /* /* Debug: Log the transformed CSS */
               if (Settings.Get.debug()) {
