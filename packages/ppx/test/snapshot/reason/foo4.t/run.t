@@ -1,5 +1,5 @@
   $ refmt --parse re --print ml input.re > output.ml
-  $ standalone --impl output.ml -o output.ml --output=./generated
+  $ standalone --impl output.ml -o output.ml --output=./$TEST_OUTPUT/generated
   $ refmt --parse ml --print re output.ml
   module C = {
     [@deriving (jsProperties, getSet)]

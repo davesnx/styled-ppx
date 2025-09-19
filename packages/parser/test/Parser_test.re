@@ -1,5 +1,5 @@
 let parse = input => {
-  switch (Styled_ppx_css_parser.Driver.parse_stylesheet(input)) {
+  switch (Styled_ppx_css_parser.Driver.parse_declaration_list(input)) {
   | Ok(ast) => Ok(ast)
   | Error((loc_start, _loc_end, msg)) =>
     let pos = loc_start;

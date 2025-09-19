@@ -72,6 +72,12 @@ let pop_last_selector =
   | _ as sel => (sel, None, None);
 
 let join_selector_with_combinator = (~combinator=None, a, b) => {
+  /* by default the Descendant combinator is used to specify the relationship between the two selectors */
+  /*   let comb =
+       switch (combinator) {
+       | None => Some(" ")
+       | Some(c) => Some(c)
+       }; */
   ComplexSelector(
     Combinator({
       left: a,
@@ -571,5 +577,33 @@ let resolve_selectors = (~className, rules: list(rule)) => {
 let run = (~className, (rule_list, _loc): rule_list) => {
   let (declarations, selectors) =
     rule_list |> resolve_selectors(~className) |> split_by_kind;
-  declarations @ selectors;
+
+  /* In case of some rules being bare declarations, wrap them in a Style_rule with the className selector */
+  let wrapped_declarations =
+    if (List.length(declarations) > 0) {
+      [
+        Style_rule({
+          prelude: (
+            [
+              (
+                CompoundSelector({
+                  type_selector: None,
+                  subclass_selectors: [Class(className)],
+                  pseudo_selectors: [],
+                }),
+                loc_none,
+              ),
+            ],
+            loc_none,
+          ),
+          block: (declarations, loc_none),
+          loc: loc_none,
+        }),
+      ];
+    } else {
+      [];
+    };
+
+  /* Return wrapped declarations followed by other style rules */
+  wrapped_declarations @ selectors;
 };

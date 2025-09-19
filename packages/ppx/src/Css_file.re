@@ -1,37 +1,38 @@
 module Buffer = {
-  /* In-memory buffer to accumulate CSS rules during compilation */
-  /* Using a list of (className, css) pairs to track unique rules */
-  let css_rules: ref(list((string, string))) = ref([]);
+  /* In-memory accumulator for CSS rules during compilation.
+     Each rule is stored as (className, cssText) to ensure uniqueness by className. */
+  type rule = (string, string);
+  let accumulated_rules: ref(list(rule)) = ref([]);
 
-  let add_rule = (className: string, css: string) => {
-    let exists =
+  let add_rule = (className: string, cssText: string) => {
+    /* Only add if this className hasn't been processed yet */
+    let already_exists =
       List.exists(
         ((existingClass, _)) => existingClass == className,
-        css_rules^,
+        accumulated_rules^,
       );
-    if (!exists) {
-      css_rules := [(className, css), ...css_rules^];
+
+    if (!already_exists) {
+      accumulated_rules := [(className, cssText), ...accumulated_rules^];
     };
   };
 
-  let get_css_content = () => {
+  let get_all_css = () => {
     let buffer = Buffer.create(1024);
 
-    css_rules^
+    /* Reverse to maintain order of addition, then concatenate all CSS */
+    accumulated_rules^
     |> List.rev
-    |> List.iter(((className, css)) => {
-         Buffer.add_char(buffer, '.');
-         Buffer.add_string(buffer, className);
-         Buffer.add_string(buffer, " {");
-         Buffer.add_string(buffer, css);
-         Buffer.add_string(buffer, "}");
+    |> List.iter(((_, cssText)) => {
+         Buffer.add_string(buffer, cssText);
          Buffer.add_char(buffer, '\n');
        });
+
     Buffer.contents(buffer);
   };
 
   let clear = () => {
-    css_rules := [];
+    accumulated_rules := [];
   };
 };
 
@@ -111,7 +112,103 @@ module Css_transform = {
           values,
         );
       Bracket_block(transformed);
+    | Selector(selector_list) =>
+      let transformed_selectors =
+        List.map(
+          ((sel, loc)) => (transform_selector(sel, dynamic_vars), loc),
+          selector_list,
+        );
+      Selector(transformed_selectors);
     | _ => cv
+    };
+  }
+
+  and transform_selector = (sel: selector, dynamic_vars) => {
+    switch (sel) {
+    | SimpleSelector(Variable(path)) =>
+      /* Transform selector variable to CSS var */
+      let var_name = variable_to_css_var_name(path);
+      let original_path = String.concat(".", path);
+      if (!List.exists(((vn, _, _)) => vn == var_name, dynamic_vars^)) {
+        dynamic_vars := [(var_name, original_path, ""), ...dynamic_vars^];
+      };
+      /* Return as-is for now, will need special handling in render */
+      SimpleSelector(Variable(path));
+    | SimpleSelector(simple) => SimpleSelector(simple)
+    | ComplexSelector(complex) =>
+      ComplexSelector(transform_complex_selector(complex, dynamic_vars))
+    | CompoundSelector(compound) =>
+      CompoundSelector(transform_compound_selector(compound, dynamic_vars))
+    | RelativeSelector(relative) =>
+      RelativeSelector({
+        ...relative,
+        complex_selector:
+          transform_complex_selector(relative.complex_selector, dynamic_vars),
+      })
+    };
+  }
+
+  and transform_complex_selector = (complex: complex_selector, dynamic_vars) => {
+    switch (complex) {
+    | Selector(sel) => Selector(transform_selector(sel, dynamic_vars))
+    | Combinator({left, right}) =>
+      Combinator({
+        left: transform_selector(left, dynamic_vars),
+        right:
+          List.map(
+            ((combinator, sel)) =>
+              (combinator, transform_selector(sel, dynamic_vars)),
+            right,
+          ),
+      })
+    };
+  }
+
+  and transform_compound_selector =
+      (compound: compound_selector, dynamic_vars) => {
+    {
+      ...compound,
+      type_selector:
+        Option.map(
+          simple =>
+            switch (transform_simple_selector(simple, dynamic_vars)) {
+            | SimpleSelector(s) => s
+            | _ => simple
+            },
+          compound.type_selector,
+        ),
+      subclass_selectors:
+        List.map(
+          subclass => transform_subclass_selector(subclass, dynamic_vars),
+          compound.subclass_selectors,
+        ),
+    };
+  }
+
+  and transform_simple_selector = (simple: simple_selector, dynamic_vars) => {
+    switch (simple) {
+    | Variable(path) =>
+      let var_name = variable_to_css_var_name(path);
+      let original_path = String.concat(".", path);
+      if (!List.exists(((vn, _, _)) => vn == var_name, dynamic_vars^)) {
+        dynamic_vars := [(var_name, original_path, ""), ...dynamic_vars^];
+      };
+      SimpleSelector(Variable(path));
+    | _ => SimpleSelector(simple)
+    };
+  }
+
+  and transform_subclass_selector =
+      (subclass: subclass_selector, dynamic_vars) => {
+    switch (subclass) {
+    | ClassVariable(path) =>
+      let var_name = variable_to_css_var_name(path);
+      let original_path = String.concat(".", path);
+      if (!List.exists(((vn, _, _)) => vn == var_name, dynamic_vars^)) {
+        dynamic_vars := [(var_name, original_path, ""), ...dynamic_vars^];
+      };
+      ClassVariable(path);
+    | _ => subclass
     };
   };
 
@@ -133,21 +230,72 @@ module Css_transform = {
     };
   };
 
-  let transform_rule = (rule: rule, dynamic_vars) => {
+  let rec transform_rule = (rule: rule, dynamic_vars) => {
     switch (rule) {
     | Declaration(decl) =>
       Declaration(transform_declaration(decl, dynamic_vars))
-    | _ => rule
+    | Style_rule(style_rule) =>
+      Style_rule(transform_style_rule(style_rule, dynamic_vars))
+    | At_rule(at_rule) => At_rule(transform_at_rule(at_rule, dynamic_vars))
+    };
+  }
+
+  and transform_style_rule = (style_rule: style_rule, dynamic_vars) => {
+    let {prelude, block, loc} = style_rule;
+    let (selector_list, selector_loc) = prelude;
+    let transformed_selectors =
+      List.map(
+        ((sel, sel_loc)) =>
+          (transform_selector(sel, dynamic_vars), sel_loc),
+        selector_list,
+      );
+    let (rule_list, rule_loc) = block;
+    let transformed_rules =
+      List.map(rule => transform_rule(rule, dynamic_vars), rule_list);
+    {
+      prelude: (transformed_selectors, selector_loc),
+      block: (transformed_rules, rule_loc),
+      loc,
+    };
+  }
+
+  and transform_at_rule = (at_rule: at_rule, dynamic_vars) => {
+    let {name, prelude, block, loc} = at_rule;
+    let (prelude_values, prelude_loc) = prelude;
+    let transformed_prelude =
+      List.map(
+        ((cv, cv_loc)) =>
+          (transform_component_value(cv, dynamic_vars, None), cv_loc),
+        prelude_values,
+      );
+    let transformed_block =
+      switch (block) {
+      | Empty => Empty
+      | Rule_list((rule_list, rule_loc)) =>
+        let transformed_rules =
+          List.map(rule => transform_rule(rule, dynamic_vars), rule_list);
+        Rule_list((transformed_rules, rule_loc));
+      };
+    {
+      name,
+      prelude: (transformed_prelude, prelude_loc),
+      block: transformed_block,
+      loc,
     };
   };
 
   let transform_rule_list = (~className, rule_list: rule_list) => {
     let dynamic_vars = ref([]);
-    let (_rule_list, rule_loc) = rule_list;
+
+    /* Transform.run now returns properly wrapped rules, no bare declarations */
+    let unnested_rules =
+      Styled_ppx_css_parser.Transform.run(~className, rule_list);
+
+    /* Transform variables to CSS custom properties */
     let transformed_rules =
-      rule_list
-      |> Styled_ppx_css_parser.Transform.run(~className)
-      |> List.map(rule => transform_rule(rule, dynamic_vars));
+      List.map(rule => transform_rule(rule, dynamic_vars), unnested_rules);
+
+    let (_rules, rule_loc) = rule_list;
     let transformed_declarations = (transformed_rules, rule_loc);
     (transformed_declarations, List.rev(dynamic_vars^));
   };
@@ -234,61 +382,44 @@ let get_output_path = () => {
   output_path;
 };
 
-let push = (~hash_by, declarations) => {
+/*
+ * Main entry point for processing CSS rules.
+ * Takes CSS declarations and:
+ * 1. Generates a unique className based on the hash
+ * 2. Unnests nested selectors and media queries
+ * 3. Transforms dynamic variables to CSS custom properties
+ * 4. Renders the final CSS and stores it in the buffer
+ *
+ * Returns: (className, list_of_dynamic_variables)
+ */
+let push =
+    (~hash_by: string, declarations: Styled_ppx_css_parser.Ast.rule_list) => {
+  /* Generate unique className from hash */
   let className = Printf.sprintf("css-%s", Murmur2.default(hash_by));
+
+  /* Transform CSS: unnest selectors, handle variables */
   let (transformed_declarations, dynamic_vars) =
     Css_transform.transform_rule_list(~className, declarations);
 
-  /* /* Debug: Log the transformed CSS */
-              if (Settings.Get.debug()) {
-                Printf.printf("[styled-ppx] Transformed CSS: %s\n", css_string);
-                Printf.printf(
-                  "[styled-ppx] Dynamic vars: %d\n",
-                  List.length(dynamic_vars),
-                );
-                List.iter(
-                  ((var_name, original, property)) =>
-                    Printf.printf(
-                      "[styled-ppx]   --%s => %s (property: %s)\n",
-                      var_name,
-                      original,
-                      property,
-                    ),
-                  dynamic_vars,
-                );
-              };
-     */
-
-  /* let css_content =
-     Settings.Get.debug()
-       ? Printf.sprintf(
-           "  /* Generated from [%%cx] in %s at line %d */\n%s",
-           stringLoc.loc_start.pos_fname,
-           stringLoc.loc_start.pos_lnum,
-           css_string,
-         )
-       : css_string; */
-
-  /* TODO: Allow render minified CSS or not */
-  let rendered =
+  /* Render to CSS string */
+  let rendered_css =
     Styled_ppx_css_parser.Render.rule_list(transformed_declarations);
 
-  Buffer.add_rule(className, rendered);
+  /* Store in buffer for later file generation */
+  Buffer.add_rule(className, rendered_css);
+
   (className, dynamic_vars);
 };
 
 let finalize_css_generation = () => {
-  let file_content = Buffer.get_css_content();
-  if (String.length(file_content) > 0) {
+  let css_content = Buffer.get_all_css();
+
+  if (String.length(css_content) > 0) {
     let filename = get_output_path();
+    let header = "/* This file is generated by styled-ppx, do not edit manually */\n\n";
+    let final_content = header ++ css_content ++ "\n";
 
-    let content =
-      Printf.sprintf(
-        "/* This file is generated by styled-ppx, do not edit manually */\n\n%s\n",
-        file_content,
-      );
-
-    switch (File.write(~filename, content)) {
+    switch (File.write(~filename, final_content)) {
     | Created =>
       Log.debug(Printf.sprintf("CSS file created at: %s", filename))
     | Updated =>
@@ -298,6 +429,7 @@ let finalize_css_generation = () => {
   } else {
     Log.debug("No CSS content to generate");
   };
+
   Buffer.clear();
 };
 

@@ -137,16 +137,15 @@ and selector = (ast: Ast.selector) => {
       let right_str =
         right
         |> List.map(((combinator, s)) => {
-             let s_str = selector(s);
              switch (
                combinator,
                is_class_selector(left),
                is_class_selector(s),
              ) {
-             | (None, true, true) => s_str
-             | (None, _, _) => " " ++ s_str
-             | (Some(comb), _, _) => " " ++ comb ++ " " ++ s_str
-             };
+             | (None, true, true) => selector(s)
+             | (None, _, _) => " " ++ selector(s)
+             | (Some(comb), _, _) => " " ++ comb ++ " " ++ selector(s)
+             }
            })
         |> String.concat("");
       selector(left) ++ right_str;
