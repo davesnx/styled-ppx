@@ -28,8 +28,8 @@ let selector () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"parent" rule_list in
   check ~pos:__POS__ (render list_of_rules)
-    "margin: 10px; .parent a { display: block; } .parent a div { display: \
-     none; }"
+    ".parent { margin: 10px; } .parent a { display: block; } .parent a div { \
+     display: none; }"
 
 let selector_with_ampersand () =
   let input =
@@ -46,8 +46,8 @@ let selector_with_ampersand () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"hash" rule_list in
   check ~pos:__POS__ (render list_of_rules)
-    "margin: 10px; .hash > a { margin: 11px; } .hash > a > div { margin: 12px; \
-     }"
+    ".hash { margin: 10px; } .hash > a { margin: 11px; } .hash > a > div { \
+     margin: 12px; }"
 
 let ampersand_space_ampersand () =
   let input =
@@ -61,7 +61,7 @@ let ampersand_space_ampersand () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"hash" rule_list in
   check ~pos:__POS__ (render list_of_rules)
-    "margin: 10px; .hash.hash > a { margin: 11px; }"
+    ".hash { margin: 10px; } .hash.hash > a { margin: 11px; }"
 
 let ampersand_ampersand () =
   let input =
@@ -75,21 +75,22 @@ let ampersand_ampersand () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"hash" rule_list in
   check ~pos:__POS__ (render list_of_rules)
-    "margin: 10px; .hash.hash > a { margin: 11px; }"
+    ".hash { margin: 10px; } .hash.hash > a { margin: 11px; }"
 
 let selector_with_class () =
   let input = "margin: 10px; .test { display: block; }" in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"hash" rule_list in
   check ~pos:__POS__ (render list_of_rules)
-    "margin: 10px; .hash .test { display: block; }"
+    ".hash { margin: 10px; } .hash .test { display: block; }"
 
 let mediaqueries () =
   let input = "margin: 10px; @media (min-width: 768px) { display: block; }" in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"hash" rule_list in
   check ~pos:__POS__ (render list_of_rules)
-    "margin: 10px; @media (min-width: 768px)  { .hash { display: block; } }"
+    ".hash { margin: 10px; } @media (min-width: 768px)  { .hash { display: \
+     block; } }"
 
 let mediaqueries_and_selectors () =
   let input =
@@ -99,8 +100,8 @@ let mediaqueries_and_selectors () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"hash" rule_list in
   check ~pos:__POS__ (render list_of_rules)
-    "margin: 10px; @media (min-width: 768px)  { .hash { display: block; } \
-     .hash .test { display: block; } }"
+    ".hash { margin: 10px; } @media (min-width: 768px)  { .hash { display: \
+     block; } .hash .test { display: block; } }"
 
 let nested_mediaqueries_and_selectors () =
   let input =
@@ -111,16 +112,16 @@ let nested_mediaqueries_and_selectors () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"hash" rule_list in
   check ~pos:__POS__ (render list_of_rules)
-    "margin: 10px; @media (min-width: 768px)  { .hash { display: block; } \
-     .hash .test { display: block; } } @media (min-width: 768px)  { .hash { \
-     display: block; } .hash .test { display: block; } }"
+    ".hash { margin: 10px; } @media (min-width: 768px)  { .hash { display: \
+     block; } .hash .test { display: block; } } @media (min-width: 768px)  { \
+     .hash { display: block; } .hash .test { display: block; } }"
 
 let ampersand_with_classname () =
   let input = "margin: 10px; & { display: block; }" in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"my-class" rule_list in
   check ~pos:__POS__ (render list_of_rules)
-    "margin: 10px; .my-class { display: block; }"
+    ".my-class { margin: 10px; } .my-class { display: block; }"
 
 let nested_ampersand_with_classname () =
   let input =
@@ -129,8 +130,8 @@ let nested_ampersand_with_classname () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"my-class" rule_list in
   check ~pos:__POS__ (render list_of_rules)
-    "margin: 10px; .my-class div { display: block; } .my-class div span { \
-     color: red; }"
+    ".my-class { margin: 10px; } .my-class div { display: block; } .my-class \
+     div span { color: red; }"
 
 let ampersand_with_hover_and_classname () =
   let input = "&:hover { background: blue; }" in
@@ -451,11 +452,12 @@ let deeply_nested_structure () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"app" rule_list in
   check ~pos:__POS__ (render list_of_rules)
-    "padding: 20px; .app > header { background: gray; } .app > header nav { \
-     display: flex; } .app > header nav ul { list-style: none; } .app > header \
-     nav ul li { display: inline; } .app > header nav ul li:not(:last-child) { \
-     margin-right: 10px; } .app > header nav ul li a { color: white; } .app > \
-     header nav ul li a:hover { text-decoration: underline; }"
+    ".app { padding: 20px; } .app > header { background: gray; } .app > header \
+     nav { display: flex; } .app > header nav ul { list-style: none; } .app > \
+     header nav ul li { display: inline; } .app > header nav ul \
+     li:not(:last-child) { margin-right: 10px; } .app > header nav ul li a { \
+     color: white; } .app > header nav ul li a:hover { text-decoration: \
+     underline; }"
 
 let media_query_with_nested_selectors_and_pseudo () =
   let input =
@@ -487,8 +489,8 @@ let media_query_with_nested_selectors_and_pseudo () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"theme" rule_list in
   check ~pos:__POS__ (render list_of_rules)
-    "color: black; @media (prefers-color-scheme: dark)  { .theme { color: \
-     white; background: black; } .theme a { color: lightblue; } .theme \
+    ".theme { color: black; } @media (prefers-color-scheme: dark)  { .theme { \
+     color: white; background: black; } .theme a { color: lightblue; } .theme \
      a:visited { color: purple; } .theme a::after { content: \"yoo\"; } } \
      @media (max-width: 768px)  { .theme footer { padding: 10px; } .theme \
      footer .copyright { font-size: 12px; } }"
@@ -557,8 +559,8 @@ let keyframes_with_nesting () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"animated" rule_list in
   check ~pos:__POS__ (render list_of_rules)
-    "animation: slide 2s ease-in-out; @keyframes slide { from { transform: \
-     translateX(0); } to { transform: translateX(100px); } }"
+    ".animated { animation: slide 2s ease-in-out; } @keyframes slide { from { \
+     transform: translateX(0); } to { transform: translateX(100px); } }"
 
 let font_face_rule () =
   let input =
@@ -573,8 +575,9 @@ let font_face_rule () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"custom-text" rule_list in
   check ~pos:__POS__ (render list_of_rules)
-    "font-family: \"Custom Font\", sans-serif; @font-face  { font-family: \
-     \"Custom Font\"; src: url(\"/fonts/custom.woff2\") format(\"woff2\"); }"
+    ".custom-text { font-family: \"Custom Font\", sans-serif; } @font-face  { \
+     font-family: \"Custom Font\"; src: url(\"/fonts/custom.woff2\") \
+     format(\"woff2\"); }"
 
 let keyframes_with_percentages () =
   let input =
@@ -590,8 +593,8 @@ let keyframes_with_percentages () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"fade-element" rule_list in
   check ~pos:__POS__ (render list_of_rules)
-    "animation: fade 1s; @keyframes fade { 0% { opacity: 0; } 50% { opacity: \
-     0.5; } 100% { opacity: 1; } }"
+    ".fade-element { animation: fade 1s; } @keyframes fade { 0% { opacity: 0; \
+     } 50% { opacity: 0.5; } 100% { opacity: 1; } }"
 
 let empty_selectors () =
   let input = "& { }" in
@@ -622,8 +625,8 @@ let nested_without_ampersand () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"parent" rule_list in
   check ~pos:__POS__ (render list_of_rules)
-    "color: blue; .parent div { padding: 10px; } .parent div span { font-size: \
-     14px; }"
+    ".parent { color: blue; } .parent div { padding: 10px; } .parent div span \
+     { font-size: 14px; }"
 
 let pseudo_class_functions_complex () =
   let input =
@@ -692,9 +695,10 @@ let nested_at_rules_priority () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"complex" rule_list in
   check ~pos:__POS__ (render list_of_rules)
-    "color: red; @media (min-width: 768px)  { .complex { color: green; \
-     @supports (display: grid)  { .complex { display: grid; @media (min-width: \
-     1024px)  { .complex { grid-template-columns: repeat(3, 1fr); } } } } } }"
+    ".complex { color: red; } @media (min-width: 768px)  { .complex { color: \
+     green; @supports (display: grid)  { .complex { display: grid; @media \
+     (min-width: 1024px)  { .complex { grid-template-columns: repeat(3, 1fr); \
+     } } } } } }"
 
 (* Parser doesn't support &-suffix notation yet *)
 (* let ampersand_suffix_selector () =
@@ -707,7 +711,6 @@ let nested_at_rules_priority () =
 
 let tests : tests =
   [
-    (* Original tests *)
     test "split_by_kind" split_by_kind;
     test "selector" selector;
     test "selector_with_ampersand" selector_with_ampersand;
