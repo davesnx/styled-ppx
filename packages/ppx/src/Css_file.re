@@ -1,11 +1,11 @@
 module Buffer = {
   /* In-memory accumulator for CSS rules during compilation.
-     Each rule is stored as (className, cssText) to ensure uniqueness by className. */
+     Ensures uniqueness of CSS rules by className */
   type rule = (string, string);
   let accumulated_rules: ref(list(rule)) = ref([]);
 
+  /* Adds a CSS rule if not already present */
   let add_rule = (className: string, cssText: string) => {
-    /* Only add if this className hasn't been processed yet */
     let already_exists =
       List.exists(
         ((existingClass, _)) => existingClass == className,
@@ -17,10 +17,11 @@ module Buffer = {
     };
   };
 
+  /* Generates the final CSS content */
   let get_all_css = () => {
     let buffer = Buffer.create(1024);
 
-    /* Reverse to maintain order of addition, then concatenate all CSS */
+    /* Reverse to maintain insertion order, then concatenate */
     accumulated_rules^
     |> List.rev
     |> List.iter(((_, cssText)) => {
@@ -50,6 +51,10 @@ module Css_transform = {
            c;
          }
        );
+  };
+
+  let generate_class_from_content = (content: string): string => {
+    Printf.sprintf("css-%s", Murmur2.default(content));
   };
 
   /* Transform component values, replacing Variables with CSS custom properties */
@@ -282,22 +287,144 @@ module Css_transform = {
       block: transformed_block,
       loc,
     };
+  }
+  and transform_variables_to_custom_properties =
+      (
+        rules: list(rule),
+        dynamic_vars: ref(list((string, string, string))),
+      ) => {
+    List.map(r => transform_rule(r, dynamic_vars), rules);
   };
 
-  let transform_rule_list = (~className, rule_list: rule_list) => {
+  /* Split rules into atomic units (individual declarations) */
+  let atomize_rules = (rules: list(rule)): list((string, rule)) => {
+    let rec extract_atomic_rules = (rule: rule): list((string, rule)) => {
+      switch (rule) {
+      | Declaration(decl) =>
+        /* Single declaration - generate className from its content */
+        let decl_string = Styled_ppx_css_parser.Render.declaration(decl);
+        let className = generate_class_from_content(decl_string);
+        [(className, Declaration(decl))];
+
+      | Style_rule({prelude, block: (rules, _), loc: _}) =>
+        /* Extract each declaration with its own className */
+        rules
+        |> List.concat_map(r => {
+             switch (r) {
+             | Declaration(decl) =>
+               /* Generate className from the complete rule (selector + declaration) */
+               let style_rule =
+                 Style_rule({
+                   prelude,
+                   block: ([Declaration(decl)], Ppxlib.Location.none),
+                   loc: Ppxlib.Location.none,
+                 });
+               let rule_string =
+                 Styled_ppx_css_parser.Render.rule(style_rule);
+               let className = generate_class_from_content(rule_string);
+               [(className, style_rule)];
+
+             | Style_rule(_) as nested =>
+               /* Recursively handle nested rules */
+               extract_atomic_rules(nested)
+
+             | _ => extract_atomic_rules(r)
+             }
+           })
+
+      | At_rule({name, prelude, block, loc}) =>
+        switch (block) {
+        | Empty =>
+          /* Empty at-rule - use as is */
+          let at_string = Styled_ppx_css_parser.Render.rule(rule);
+          let className = generate_class_from_content(at_string);
+          [(className, rule)];
+
+        | Rule_list((rules, rule_loc)) =>
+          /* Extract atomic rules from inside at-rule */
+          rules
+          |> List.concat_map(extract_atomic_rules)
+          |> List.map(((_className, inner_rule)) => {
+               /* Wrap each atomic rule in the at-rule */
+               let wrapped =
+                 At_rule({
+                   name,
+                   prelude,
+                   block: Rule_list(([inner_rule], rule_loc)),
+                   loc,
+                 });
+               /* Generate new className for the wrapped rule */
+               let wrapped_string =
+                 Styled_ppx_css_parser.Render.rule(wrapped);
+               let new_className =
+                 generate_class_from_content(wrapped_string);
+               (new_className, wrapped);
+             })
+        }
+      };
+    };
+
+    List.concat_map(extract_atomic_rules, rules);
+  };
+
+  let transform_rule_list = (rule_list: rule_list) => {
     let dynamic_vars = ref([]);
+    let (rules, loc) = rule_list;
 
-    /* Transform.run now returns properly wrapped rules, no bare declarations */
-    let unnested_rules =
-      Styled_ppx_css_parser.Transform.run(~className, rule_list);
+    let atomic_rules = atomize_rules(rules);
 
-    /* Transform variables to CSS custom properties */
-    let transformed_rules =
-      List.map(rule => transform_rule(rule, dynamic_vars), unnested_rules);
+    let processed_rules =
+      atomic_rules
+      |> List.map(((className, rule)) => {
+           let single_rule_list = ([rule], loc);
 
-    let (_rules, rule_loc) = rule_list;
-    let transformed_declarations = (transformed_rules, rule_loc);
-    (transformed_declarations, List.rev(dynamic_vars^));
+           /* Only run Transform.run for rules that need unnesting/selector resolution */
+           let transformed =
+             switch (rule) {
+             | Declaration(decl) =>
+               /* Bare declarations need to be wrapped with className */
+               let wrapped =
+                 Style_rule({
+                   prelude: (
+                     [
+                       (
+                         CompoundSelector({
+                           type_selector: None,
+                           subclass_selectors: [Class(className)],
+                           pseudo_selectors: [],
+                         }),
+                         Ppxlib.Location.none,
+                       ),
+                     ],
+                     Ppxlib.Location.none,
+                   ),
+                   block: ([Declaration(decl)], Ppxlib.Location.none),
+                   loc: Ppxlib.Location.none,
+                 });
+               [wrapped];
+
+             | Style_rule(_)
+             | At_rule(_) =>
+               /* Run through Transform to handle nesting and selector resolution */
+               Styled_ppx_css_parser.Transform.run(
+                 ~className,
+                 single_rule_list,
+               )
+             };
+
+           /* transform variables to CSS custom properties */
+           let final_rules =
+             transform_variables_to_custom_properties(
+               transformed,
+               dynamic_vars,
+             );
+
+           /* Return className paired with transformed rules */
+           List.map(r => (className, r), final_rules);
+         })
+      |> List.concat;
+
+    (processed_rules, List.rev(dynamic_vars^));
   };
 };
 
@@ -330,7 +457,7 @@ module File = {
         close_out(oc);
         Updated;
       | None =>
-        Log.debug("File doesn't exist");
+        Log.debug("File doesn't exist, creating new file");
         let oc = open_out(filename);
         output_string(oc, content);
         close_out(oc);
@@ -383,32 +510,24 @@ let get_output_path = () => {
 };
 
 /*
- * Main entry point for processing CSS rules.
  * Takes CSS declarations and:
- * 1. Generates a unique className based on the hash
- * 2. Unnests nested selectors and media queries
- * 3. Transforms dynamic variables to CSS custom properties
- * 4. Renders the final CSS and stores it in the buffer
+ * 1. Unnests nested selectors and media queries
+ * 2. Transforms dynamic variables to CSS custom properties
+ * 3. Atomizes rules - creates individual classNames for each declaration
+ * 4. Pushes the rendered CSS into the Buffer
  *
- * Returns: (className, list_of_dynamic_variables)
  */
-let push =
-    (~hash_by: string, declarations: Styled_ppx_css_parser.Ast.rule_list) => {
-  /* Generate unique className from hash */
-  let className = Printf.sprintf("css-%s", Murmur2.default(hash_by));
+let push = (declarations: Styled_ppx_css_parser.Ast.rule_list) => {
+  let (atomic_classnames, dynamic_vars) =
+    Css_transform.transform_rule_list(declarations);
 
-  /* Transform CSS: unnest selectors, handle variables */
-  let (transformed_declarations, dynamic_vars) =
-    Css_transform.transform_rule_list(~className, declarations);
+  atomic_classnames
+  |> List.iter(((className, rule)) => {
+       let rendered_css = Styled_ppx_css_parser.Render.rule(rule);
+       Buffer.add_rule(className, rendered_css);
+     });
 
-  /* Render to CSS string */
-  let rendered_css =
-    Styled_ppx_css_parser.Render.rule_list(transformed_declarations);
-
-  /* Store in buffer for later file generation */
-  Buffer.add_rule(className, rendered_css);
-
-  (className, dynamic_vars);
+  (atomic_classnames, dynamic_vars);
 };
 
 let finalize_css_generation = () => {

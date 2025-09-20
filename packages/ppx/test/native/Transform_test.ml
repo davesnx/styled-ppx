@@ -1,4 +1,4 @@
-open Styled_ppx_css_parser
+module Transform = Styled_ppx_css_parser.Transform
 
 let loc = Ppxlib.Location.none
 let with_loc x = x, loc

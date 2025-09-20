@@ -268,11 +268,11 @@ module Mapper = {
       let stylesExpr =
         switch (Styled_ppx_css_parser.Driver.parse_declaration_list(str)) {
         | Ok(rule_list) =>
-          let (className, dynamic_vars) =
+          let (classNames, dynamic_vars) =
             Css_file.push(~hash_by=str, rule_list);
           Css_runtime.render_make_call(
             ~loc=stringLoc,
-            ~className,
+            ~classNames,
             ~dynamic_vars,
           );
         | Error((start_pos, end_pos, msg)) =>
@@ -747,11 +747,11 @@ let cx2_extension =
             let validations = type_check_rule_list(rule_list);
             switch (get_errors(validations)) {
             | [] =>
-              let (className, dynamic_vars) =
+              let (classNames, dynamic_vars) =
                 Css_file.push(~hash_by=txt, rule_list);
               Css_runtime.render_make_call(
                 ~loc=stringLoc,
-                ~className,
+                ~classNames,
                 ~dynamic_vars,
               );
             | errors =>

@@ -534,9 +534,11 @@ If your intent is to apply the declaration to all elements, use the universal se
   [%expr ignore([%e expr])];
 };
 
-let render_make_call = (~loc, ~className, ~dynamic_vars) => {
+let render_make_call = (~loc, ~classNames, ~dynamic_vars) => {
+  /* Join multiple classNames with spaces for atomic CSS */
+  let className_string = String.concat(" ", classNames);
   let className_expr =
-    Helper.Exp.constant(~loc, Pconst_string(className, loc, None));
+    Helper.Exp.constant(~loc, Pconst_string(className_string, loc, None));
 
   let var_list =
     dynamic_vars

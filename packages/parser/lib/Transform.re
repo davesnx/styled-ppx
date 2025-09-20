@@ -72,12 +72,6 @@ let pop_last_selector =
   | _ as sel => (sel, None, None);
 
 let join_selector_with_combinator = (~combinator=None, a, b) => {
-  /* by default the Descendant combinator is used to specify the relationship between the two selectors */
-  /*   let comb =
-       switch (combinator) {
-       | None => Some(" ")
-       | Some(c) => Some(c)
-       }; */
   ComplexSelector(
     Combinator({
       left: a,
@@ -144,12 +138,12 @@ let join_compound_selector =
   | _ => assert(false)
   };
 };
-// this mimics the structure of contains_ampersand
+
 let rec replace_ampersand = (replaced_with: selector, selector: selector) => {
   switch (selector) {
   | SimpleSelector(Ampersand) => replaced_with
-  | ComplexSelector(Selector(sel)) =>
-    ComplexSelector(Selector(replace_ampersand(replaced_with, sel)))
+  | ComplexSelector(Selector(selector)) =>
+    ComplexSelector(Selector(replace_ampersand(replaced_with, selector)))
   | ComplexSelector(Combinator({left, right})) =>
     ComplexSelector(
       Combinator({
@@ -196,7 +190,7 @@ let rec replace_ampersand = (replaced_with: selector, selector: selector) => {
       })
     };
   | RelativeSelector({combinator, complex_selector}) =>
-    let csel =
+    let complex_selector =
       switch (
         replace_ampersand(replaced_with, ComplexSelector(complex_selector))
       ) {
@@ -205,7 +199,7 @@ let rec replace_ampersand = (replaced_with: selector, selector: selector) => {
       };
     RelativeSelector({
       combinator,
-      complex_selector: csel,
+      complex_selector,
     });
   | _ as sel => sel
   };
@@ -289,10 +283,7 @@ let rec starts_with_double_dot =
         subclass_selectors,
       );
     }
-  // :hover {}
   | ComplexSelector(Selector(selector)) => starts_with_double_dot(selector)
-  // :hover h1 ... {}
-  // :hover + h1 ... {}
   | ComplexSelector(Combinator({left, _})) => starts_with_double_dot(left)
   | _ => false;
 
@@ -482,13 +473,13 @@ let rec unnest_selectors = (~prefix, rules) => {
         let new_selector =
           Style_rule({
             prelude: ([(new_prefix, loc_none)], loc_none),
-            block: (selectors, Ppxlib.Location.none),
-            loc: Ppxlib.Location.none,
+            block: (selectors, loc_none),
+            loc: loc_none,
           });
         Right([new_selector, ...rest_of_declarations]);
       }
     | At_rule({
-        /* Special handling for @keyframes and @font-face - don't add className */
+        /* don't add className for @keyframes and @font-face */
         name: ("keyframes" | "font-face", _) as name,
         prelude,
         block,
@@ -528,12 +519,9 @@ let rec unnest_selectors = (~prefix, rules) => {
               | (Some(className), decls) when List.length(decls) > 0 =>
                 let wrapped_decls =
                   Style_rule({
-                    prelude: (
-                      [(className, Ppxlib.Location.none)],
-                      Ppxlib.Location.none,
-                    ),
-                    block: (decls, Ppxlib.Location.none),
-                    loc: Ppxlib.Location.none,
+                    prelude: ([(className, loc_none)], loc_none),
+                    block: (decls, loc_none),
+                    loc: loc_none,
                   });
                 [wrapped_decls] @ processed_selectors;
               | _ => processed_declarations @ processed_selectors
@@ -604,6 +592,5 @@ let run = (~className, (rule_list, _loc): rule_list) => {
       [];
     };
 
-  /* Return wrapped declarations followed by other style rules */
   wrapped_declarations @ selectors;
 };
