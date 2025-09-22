@@ -1,0 +1,5 @@
+(rule
+ (target styles.css)
+ (mode promote)
+ (action
+  (copy "%{project_root}/demo/universal/js/generated/styles.css" %{target})))
