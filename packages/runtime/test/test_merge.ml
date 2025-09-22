@@ -22,9 +22,6 @@ let get_style_prop propName (style : ReactDOM.Style.t) =
   in
   find_last None style
 
-let has_style_prop propName (style : ReactDOM.Style.t) =
-  match get_style_prop propName style with Some _ -> true | None -> false
-
 let merge_classnames_only () =
   let className, _styles =
     CSS.merge (CSS.make "class1" []) (CSS.make "class2" [])
