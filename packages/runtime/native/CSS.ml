@@ -463,11 +463,10 @@ let make className vars : styles =
   in
   className, style
 
-(* Convert dynamic list to JavaScript object for style prop *)
-let dynamic_to_object dynamic_list =
-  dynamic_list |> List.map (fun (key, value) -> key, value) |> fun pairs ->
-  pairs
-(* For now, return the list - in real implementation this would convert to JS object *)
+let merge (styles1 : styles) (styles2 : styles) : styles =
+  let className = Printf.sprintf "%s %s" (fst styles1) (fst styles2) in
+  let style = ReactDOM.Style.combine (snd styles1) (snd styles2) in
+  String.trim className, style
 
 let global (styles : rule array) =
   match styles with

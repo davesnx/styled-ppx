@@ -521,13 +521,15 @@ let push = (declarations: Styled_ppx_css_parser.Ast.rule_list) => {
   let (atomic_classnames, dynamic_vars) =
     Css_transform.transform_rule_list(declarations);
 
-  atomic_classnames
-  |> List.iter(((className, rule)) => {
-       let rendered_css = Styled_ppx_css_parser.Render.rule(rule);
-       Buffer.add_rule(className, rendered_css);
-     });
+  let classNames =
+    atomic_classnames
+    |> List.map(((className, rule)) => {
+         let rendered_css = Styled_ppx_css_parser.Render.rule(rule);
+         Buffer.add_rule(className, rendered_css);
+         className;
+       });
 
-  (atomic_classnames, dynamic_vars);
+  (classNames, dynamic_vars);
 };
 
 let finalize_css_generation = () => {

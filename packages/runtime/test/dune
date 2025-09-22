@@ -3,8 +3,9 @@
  (flags
   (:standard -open Alcotest_extra))
  (libraries
-  alcotest
+  str
   fmt
+  alcotest
   server-reason-react.js
   server-reason-react.belt
   server-reason-react.reactDom

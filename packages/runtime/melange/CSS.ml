@@ -16,3 +16,8 @@ let make className vars : styles =
       (ReactDOM.Style.make ()) vars
   in
   className, style
+
+let merge (styles1 : styles) (styles2 : styles) =
+  let className = Printf.sprintf "%s %s" (fst styles1) (fst styles2) in
+  let style = ReactDOM.Style.combine (snd styles1) (snd styles2) in
+  String.trim className, style
