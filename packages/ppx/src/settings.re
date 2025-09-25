@@ -42,7 +42,7 @@ let debug = {
 
 let output = {
   flag: "--output",
-  doc: "REQUIRED: Specify the directory where CSS files should be generated (e.g., --output=./styles)",
+  doc: "Required when using %cx2. Specify the directory where CSS files should be generated (e.g., --output=./styles)",
   value: None,
   defaultValue: "",
 };

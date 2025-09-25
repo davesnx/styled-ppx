@@ -40,17 +40,10 @@ module Buffer = {
 module Css_transform = {
   open Styled_ppx_css_parser.Ast;
 
-  let variable_to_css_var_name = (path: list(string)) => {
-    path
-    |> String.concat("-")
-    |> String.lowercase_ascii
-    |> String.map(c =>
-         if (c == '.') {
-           '-';
-         } else {
-           c;
-         }
-       );
+  let variable_to_css_var_name = path => {
+    let original_path = String.concat(".", path);
+    let hash = Murmur2.default(original_path);
+    Printf.sprintf("var-%s", hash);
   };
 
   let generate_class_from_content = (content: string): string => {
@@ -131,13 +124,11 @@ module Css_transform = {
   and transform_selector = (sel: selector, dynamic_vars) => {
     switch (sel) {
     | SimpleSelector(Variable(path)) =>
-      /* Transform selector variable to CSS var */
       let var_name = variable_to_css_var_name(path);
       let original_path = String.concat(".", path);
       if (!List.exists(((vn, _, _)) => vn == var_name, dynamic_vars^)) {
         dynamic_vars := [(var_name, original_path, ""), ...dynamic_vars^];
       };
-      /* Return as-is for now, will need special handling in render */
       SimpleSelector(Variable(path));
     | SimpleSelector(simple) => SimpleSelector(simple)
     | ComplexSelector(complex) =>
@@ -301,13 +292,11 @@ module Css_transform = {
     let rec extract_atomic_rules = (rule: rule): list((string, rule)) => {
       switch (rule) {
       | Declaration(decl) =>
-        /* Single declaration - generate className from its content */
         let decl_string = Styled_ppx_css_parser.Render.declaration(decl);
         let className = generate_class_from_content(decl_string);
         [(className, Declaration(decl))];
 
       | Style_rule({prelude, block: (rules, _), loc: _}) =>
-        /* Extract each declaration with its own className */
         rules
         |> List.concat_map(r => {
              switch (r) {
@@ -323,11 +312,7 @@ module Css_transform = {
                  Styled_ppx_css_parser.Render.rule(style_rule);
                let className = generate_class_from_content(rule_string);
                [(className, style_rule)];
-
-             | Style_rule(_) as nested =>
-               /* Recursively handle nested rules */
-               extract_atomic_rules(nested)
-
+             | Style_rule(_) as nested => extract_atomic_rules(nested)
              | _ => extract_atomic_rules(r)
              }
            })
@@ -335,17 +320,14 @@ module Css_transform = {
       | At_rule({name, prelude, block, loc}) =>
         switch (block) {
         | Empty =>
-          /* Empty at-rule - use as is */
           let at_string = Styled_ppx_css_parser.Render.rule(rule);
           let className = generate_class_from_content(at_string);
           [(className, rule)];
 
         | Rule_list((rules, rule_loc)) =>
-          /* Extract atomic rules from inside at-rule */
           rules
           |> List.concat_map(extract_atomic_rules)
           |> List.map(((_className, inner_rule)) => {
-               /* Wrap each atomic rule in the at-rule */
                let wrapped =
                  At_rule({
                    name,
@@ -378,7 +360,6 @@ module Css_transform = {
       |> List.map(((className, rule)) => {
            let single_rule_list = ([rule], loc);
 
-           /* Only run Transform.run for rules that need unnesting/selector resolution */
            let transformed =
              switch (rule) {
              | Declaration(decl) =>
@@ -405,21 +386,18 @@ module Css_transform = {
 
              | Style_rule(_)
              | At_rule(_) =>
-               /* Run through Transform to handle nesting and selector resolution */
                Styled_ppx_css_parser.Transform.run(
                  ~className,
                  single_rule_list,
                )
              };
 
-           /* transform variables to CSS custom properties */
            let final_rules =
              transform_variables_to_custom_properties(
                transformed,
                dynamic_vars,
              );
 
-           /* Return className paired with transformed rules */
            List.map(r => (className, r), final_rules);
          })
       |> List.concat;
