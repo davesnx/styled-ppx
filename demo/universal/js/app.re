@@ -6,36 +6,36 @@ type user = {
   status: string,
 };
 
-let mockUsers = [|
+let mockUsers = [
   {
     id: 1,
     name: "Alice Johnson",
     email: "alice@example.com",
-    avatar: "🦊",
+    avatar: {js|🦊|js},
     status: "online",
   },
   {
     id: 2,
     name: "Bob Smith",
     email: "bob@example.com",
-    avatar: "🐻",
+    avatar: {js|🐻|js},
     status: "offline",
   },
   {
     id: 3,
     name: "Charlie Brown",
     email: "charlie@example.com",
-    avatar: "🦁",
+    avatar: {js|🦁|js},
     status: "online",
   },
   {
     id: 4,
     name: "Diana Prince",
     email: "diana@example.com",
-    avatar: "🦋",
+    avatar: {js|🦋|js},
     status: "away",
   },
-|];
+];
 
 let container = [%cx2
   {|
@@ -94,7 +94,6 @@ let sectionTitle = [%cx2
 |}
 ];
 
-/* User grid layout */
 let userGrid = [%cx2
   {|
   display: grid;
@@ -104,9 +103,9 @@ let userGrid = [%cx2
 |}
 ];
 
-/* User card */
 let userCardBase = [%cx2
   {|
+  user-select: none;
   background: white;
   border: 2px solid #e5e7eb;
   border-radius: 12px;
@@ -119,6 +118,7 @@ let userCardBase = [%cx2
 
 let userCardSelected = [%cx2
   {|
+  user-select: none;
   background: #f0f9ff;
   border: 2px solid #3b82f6;
   border-radius: 12px;
@@ -151,7 +151,6 @@ let userEmail = [%cx2 {|
   font-size: 0.9rem;
 |}];
 
-/* Status indicator base */
 let statusIndicator = [%cx2
   {|
   position: absolute;
@@ -219,6 +218,161 @@ let badge = [%cx2
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-left: 1rem;
+  position: relative;
+|}
+];
+
+let arrowLink = [%cx2
+  {|
+  color: #3b82f6;
+  text-decoration: none;
+  position: relative;
+  padding-left: 1.5rem;
+  display: inline-block;
+
+  &::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    transition: transform 0.2s ease;
+  }
+
+  &:hover::before {
+    transform: translateX(4px);
+  }
+|}
+];
+
+let quotedText = [%cx2
+  {|
+  font-style: italic;
+  color: #4b5563;
+  position: relative;
+  padding: 0 0.5rem;
+  display: block;
+
+  &::before {
+    content: "“";
+    font-size: 1.5em;
+    color: #9ca3af;
+    position: absolute;
+    left: -0.5rem;
+    top: -0.25rem;
+  }
+
+  &::after {
+    content: "“";
+    font-size: 1.5em;
+    color: #9ca3af;
+    position: absolute;
+    right: -0.5rem;
+    bottom: -0.25rem;
+  }
+|}
+];
+
+let tooltipElement = [%cx2
+  {|
+  position: relative;
+  cursor: help;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 2px;
+
+  &::after {
+    content: "This is a tooltip example";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1f2937;
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    margin-bottom: 0.5rem;
+  }
+
+  &:hover::after {
+    opacity: 1;
+  }
+|}
+];
+
+let listWithCustomBullets = [%cx2
+  {|
+  list-style: none;
+  padding-left: 1.5rem;
+
+  li::before {
+    content: "✦";
+    color: #3b82f6;
+    font-weight: bold;
+    margin-right: 0.5rem;
+    margin-left: -1.5rem;
+  }
+|}
+];
+
+let numberedList = [%cx2
+  {|
+  counter-reset: item-counter;
+  list-style: none;
+  padding-left: 2rem;
+
+  li {
+    counter-increment: item-counter;
+    position: relative;
+    margin-bottom: 0.5rem;
+  }
+
+  li::before {
+    content: counter(item-counter, decimal-leading-zero);
+    position: absolute;
+    left: -2rem;
+    background: #3b82f6;
+    color: white;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: bold;
+  }
+|}
+];
+
+let contentExamplesSection = [%cx2
+  {|
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+|}
+];
+
+/* Small heading for examples */
+let exampleHeading = [%cx2
+  {|
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+
+  &::before {
+    content: "💡";
+    margin-right: 0.5rem;
+    font-size: 1.25rem;
+  }
 |}
 ];
 
@@ -286,7 +440,6 @@ let buttonContainer = [%cx2
 |}
 ];
 
-/* UserCard component */
 module UserCard = {
   [@react.component]
   let make = (~user, ~isSelected, ~onClick) => {
@@ -317,7 +470,6 @@ let make = () => {
 
   let filteredUsers =
     mockUsers
-    |> Array.to_list
     |> List.filter(user => {
          searchTerm == ""
          || Js.String.includes(
@@ -328,100 +480,111 @@ let make = () => {
               ~search=Js.String.toLowerCase(searchTerm),
               Js.String.toLowerCase(user.email),
             )
-       })
-    |> Array.of_list;
+       });
 
   let onlineCount =
-    mockUsers
-    |> Array.to_list
-    |> List.filter(u => u.status == "online")
-    |> List.length;
-  let totalCount = Array.length(mockUsers);
+    mockUsers |> List.filter(u => u.status == "online") |> List.length;
+  let totalCount = List.length(mockUsers);
 
   <div styles=container>
     <div styles=card>
       <div styles=header>
-        <h1 styles=title> {React.string("🎨 styled-ppx Demo")} </h1>
+        <h1 styles=title> {React.string({js|🎨 styled-ppx Demo|js})} </h1>
         <p styles=subtitle>
           {React.string("Showcasing CSS-in-Reason with styled-ppx")}
         </p>
       </div>
-      <h2 styles=sectionTitle> {React.string("User Directory")} </h2>
-      <input
-        type_="text"
-        styles=searchInput
-        placeholder="Search users by name or email..."
-        value=searchTerm
-        onChange={e => {
-          let target = React.Event.Form.target(e);
-          let value = target##value;
-          setSearchTerm(_ => value);
-        }}
-      />
-      <div styles=buttonContainer>
-        <button
-          styles=buttonPrimary onClick={_ => setShowStats(prev => !prev)}>
-          {React.string(showStats ? "Hide Stats" : "Show Stats")}
-        </button>
-        <button
-          styles=buttonSecondary onClick={_ => setSelectedUserId(_ => None)}>
-          {React.string("Clear Selection")}
-        </button>
-        <span styles=badge>
-          {React.string(string_of_int(onlineCount) ++ " Online")}
-        </span>
-      </div>
-      {showStats
-         ? <div styles=statsBar>
-             <div styles=statItem>
-               <div styles=statValue>
-                 {React.string(string_of_int(totalCount))}
+      <div styles=contentExamplesSection>
+        <h3 styles=exampleHeading>
+          {React.string("EMOJI on content property")}
+        </h3>
+        <p styles=quotedText>
+          {React.string(
+             "This demonstrates the content property with quotation marks",
+           )}
+        </p>
+        <a
+          href="#"
+          styles=arrowLink
+          onClick={e => React.Event.Mouse.preventDefault(e)}>
+          {React.string("Hover me to see the arrow animation")}
+        </a>
+        <h2 styles=sectionTitle> {React.string("User Directory")} </h2>
+        <input
+          type_="text"
+          styles=searchInput
+          placeholder="Search users by name or email..."
+          value=searchTerm
+          onChange={e => {
+            let target = React.Event.Form.target(e);
+            let value = target##value;
+            setSearchTerm(_ => value);
+          }}
+        />
+        <div styles=buttonContainer>
+          <button
+            styles=buttonPrimary onClick={_ => setShowStats(prev => !prev)}>
+            {React.string(showStats ? "Hide Stats" : "Show Stats")}
+          </button>
+          <button
+            styles=buttonSecondary onClick={_ => setSelectedUserId(_ => None)}>
+            {React.string("Clear Selection")}
+          </button>
+          <span styles=badge>
+            {React.string(string_of_int(onlineCount) ++ " Online")}
+          </span>
+        </div>
+        {showStats
+           ? <div styles=statsBar>
+               <div styles=statItem>
+                 <div styles=statValue>
+                   {React.string(string_of_int(totalCount))}
+                 </div>
+                 <div styles=statLabel> {React.string("Total Users")} </div>
                </div>
-               <div styles=statLabel> {React.string("Total Users")} </div>
-             </div>
-             <div styles=statItem>
-               <div styles=statValue>
-                 {React.string(string_of_int(onlineCount))}
+               <div styles=statItem>
+                 <div styles=statValue>
+                   {React.string(string_of_int(onlineCount))}
+                 </div>
+                 <div styles=statLabel> {React.string("Online")} </div>
                </div>
-               <div styles=statLabel> {React.string("Online")} </div>
-             </div>
-             <div styles=statItem>
-               <div styles=statValue>
-                 {React.string(string_of_int(Array.length(filteredUsers)))}
+               <div styles=statItem>
+                 <div styles=statValue>
+                   {React.int(List.length(filteredUsers))}
+                 </div>
+                 <div styles=statLabel> {React.string("Filtered")} </div>
                </div>
-               <div styles=statLabel> {React.string("Filtered")} </div>
              </div>
-           </div>
-         : React.null}
-      <div styles=userGrid>
-        {filteredUsers
-         |> Array.map(user =>
-              <UserCard
-                key={string_of_int(user.id)}
-                user
-                isSelected={Some(user.id) == selectedUserId}
-                onClick={_ => setSelectedUserId(_ => Some(user.id))}
-              />
-            )
-         |> React.array}
-      </div>
-      {selectedUserId != None
-         ? <div styles=selectedInfo>
-             {switch (selectedUserId) {
-              | Some(id) =>
-                switch (
-                  mockUsers |> Array.to_list |> List.find_opt(u => u.id == id)
-                ) {
-                | Some(user) =>
-                  React.string(
-                    "Selected: " ++ user.name ++ " (" ++ user.email ++ ")",
-                  )
+           : React.null}
+        <div styles=userGrid>
+          {filteredUsers
+           |> List.map(user =>
+                <UserCard
+                  key={string_of_int(user.id)}
+                  user
+                  isSelected={Some(user.id) == selectedUserId}
+                  onClick={_ => setSelectedUserId(_ => Some(user.id))}
+                />
+              )
+           |> Array.of_list
+           |> React.array}
+        </div>
+        {selectedUserId != None
+           ? <div styles=selectedInfo>
+               {switch (selectedUserId) {
+                | Some(id) =>
+                  switch (mockUsers |> List.find_opt(u => u.id == id)) {
+                  | Some(user) =>
+                    React.string(
+                      "Selected: " ++ user.name ++ " (" ++ user.email ++ ")",
+                    )
+                  | None => React.null
+                  }
                 | None => React.null
-                }
-              | None => React.null
-              }}
-           </div>
-         : React.null}
+                }}
+             </div>
+           : React.null}
+      </div>
     </div>
   </div>;
 };

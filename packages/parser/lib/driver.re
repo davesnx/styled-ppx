@@ -25,8 +25,8 @@ let parse = (lexbuf, parser) => {
 let last_buffer = ref(None);
 
 let parse_string = (parser, string) => {
-  let buffer = Sedlexing.Latin1.from_string(string);
-  last_buffer := Some(Sedlexing.Latin1.from_string(string));
+  let buffer = Sedlexing.Utf8.from_string(string);
+  last_buffer := Some(Sedlexing.Utf8.from_string(string));
   parse(buffer, parser);
 };
 
@@ -49,7 +49,7 @@ let source_code_of_loc = ({loc_start, loc_end, _}: Ast.loc) => {
     let pos_offset = 0;
     let loc_start = loc_start.pos_cnum - pos_offset;
     let loc_end = loc_end.pos_cnum - pos_offset;
-    Sedlexing.Latin1.sub_lexeme(buffer, loc_start, loc_end - loc_start)
+    Sedlexing.Utf8.sub_lexeme(buffer, loc_start, loc_end - loc_start)
     /* String.trim is a hack, location should be correct and not contain any whitespace */
     |> String.trim;
   | None => assert(false)
