@@ -5476,13 +5476,13 @@ let render_content_string = (~loc, str) => {
   let get = String.get;
   let str =
     if (length == 0) {
-      [%expr {js|''|js}];
+      [%expr {js||js}];
     } else if (length == 1 && get(str, 0) == '"') {
-      [%expr {js|'"'|js}];
+      [%expr {js|"|js}];
     } else if (length == 1 && get(str, 0) == ' ') {
-      [%expr {js|' '|js}];
+      [%expr {js| |js}];
     } else if (length == 1 && get(str, 0) == '\'') {
-      [%expr {js|"'"|js}];
+      [%expr {js|'|js}];
     } else if (length == 2 && get(str, 0) == '"' && get(str, 1) == '"') {
       [%expr {js|""|js}];
     } else {

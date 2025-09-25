@@ -4171,16 +4171,11 @@ module Content = struct
     ]
 
   let text_to_string value =
-    if Kloth.String.length value = 0 then {js|''|js} (* value = "" -> '' *)
+    if Kloth.String.length value = 0 then {js|""|js}
     else if Kloth.String.length value = 1 && Kloth.String.get value 0 = '"' then
-      {js|'"'|js}
+      {js|'\"'|js}
     else if Kloth.String.length value = 1 && Kloth.String.get value 0 = '\''
     then {js|"'"|js}
-    else if
-      Kloth.String.length value = 2
-      && Kloth.String.get value 0 = '"'
-      && Kloth.String.get value 1 = '"'
-    then {js|''|js}
     else (
       match Kloth.String.get value 0 with
       | '\'' | '"' -> value

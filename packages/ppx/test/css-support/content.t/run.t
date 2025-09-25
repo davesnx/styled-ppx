@@ -20,7 +20,7 @@ If this test fail means that the module is not in sync with the ppx
   
   CSS.contentsRule([|`text({js|►|js})|], Some({js||js}));
   
-  CSS.contentsRule([|`text({js|''|js})|], None);
+  CSS.contentsRule([|`text({js||js})|], None);
   
   CSS.contentsRule(
     [|`counter(({js|count|js}, Some(`Custom({js|decimal|js}))))|],
@@ -92,12 +92,12 @@ If this test fail means that the module is not in sync with the ppx
   CSS.contentsRule([|`text({js|点|js})|], None);
   CSS.contentsRule([|`text({js|lola|js})|], None);
   CSS.contentsRule([|`text({js|lola|js})|], None);
-  CSS.contentsRule([|`text({js|''|js})|], None);
-  CSS.contentsRule([|`text({js|' '|js})|], None);
-  CSS.contentsRule([|`text({js|' '|js})|], None);
-  CSS.contentsRule([|`text({js|''|js})|], None);
-  CSS.contentsRule([|`text({js|"'"|js})|], None);
-  CSS.contentsRule([|`text({js|'"'|js})|], None);
+  CSS.contentsRule([|`text({js||js})|], None);
+  CSS.contentsRule([|`text({js| |js})|], None);
+  CSS.contentsRule([|`text({js| |js})|], None);
+  CSS.contentsRule([|`text({js||js})|], None);
+  CSS.contentsRule([|`text({js|'|js})|], None);
+  CSS.contentsRule([|`text({js|"|js})|], None);
   
   CSS.contentsRule([|`attr({js|href|js})|], None);
   CSS.contentsRule([|`attr({js|data-value|js})|], None);
@@ -108,3 +108,62 @@ If this test fail means that the module is not in sync with the ppx
   );
   CSS.contentsRule([|`attrWithType(({js|data-value|js}, {js|em|js}))|], None);
   CSS.contentsRule([|`attrWithType(({js|data-value|js}, {js|px|js}))|], None);
+  
+  CSS.contentsRule([|`text({js|→|js})|], None);
+  CSS.contentsRule([|`text({js|←|js})|], None);
+  CSS.contentsRule([|`text({js|↑|js})|], None);
+  CSS.contentsRule([|`text({js|↓|js})|], None);
+  
+  CSS.contentsRule([|`text({js|“|js})|], None);
+  
+  CSS.contentsRule([|`text({js|‘|js})|], None);
+  CSS.contentsRule([|`text({js|’|js})|], None);
+  
+  CSS.contentsRule([|`text({js|•|js})|], None);
+  CSS.contentsRule([|`text({js|—|js})|], None);
+  CSS.contentsRule([|`text({js|…|js})|], None);
+  CSS.contentsRule([|`text({js|♥|js})|], None);
+  CSS.contentsRule([|`text({js|✓|js})|], None);
+  CSS.contentsRule([|`text({js|✗|js})|], None);
+  CSS.contentsRule([|`text({js|✦|js})|], None);
+  
+  CSS.contentsRule(
+    [|`text({js||js}), `attr({js|data-title|js}), `text({js|”|js})|],
+    None,
+  );
+  CSS.contentsRule([|`text({js|→|js}), `text({js| Click here|js})|], None);
+  CSS.contentsRule(
+    [|
+      `text({js|Step |js}),
+      `counter(({js|step|js}, Some(`Custom({js|decimal|js})))),
+      `text({js|: |js}),
+    |],
+    None,
+  );
+  
+  CSS.contentsRule([|`text({js|💡|js})|], None);
+  CSS.contentsRule([|`text({js|👍|js})|], None);
+  
+  CSS.contentsRule([|`text({js|»|js})|], None);
+  CSS.contentsRule([|`text({js|§|js})|], None);
+  
+  CSS.contentsRule([|`text({js|→|js})|], None);
+  CSS.contentsRule([|`text({js| |js})|], None);
+  
+  CSS.contentsRule([|`text({js|→|js})|], None);
+  CSS.contentsRule([|`text({js|•|js})|], None);
+  CSS.contentsRule([|`text({js|—|js})|], None);
+  CSS.contentsRule([|`text({js|…|js})|], None);
+  CSS.contentsRule([|`text({js|"|js})|], None);
+  CSS.contentsRule([|`text({js|"|js})|], None);
+  CSS.contentsRule([|`text({js|✓|js})|], None);
+  CSS.contentsRule([|`text({js|♥|js})|], None);
+  CSS.contentsRule([|`text({js|→ |js}), `attr({js|href|js})|], None);
+  CSS.contentsRule(
+    [|
+      `text({js|• |js}),
+      `counter(({js|item|js}, Some(`Custom({js|decimal|js})))),
+      `text({js| |js}),
+    |],
+    None,
+  );
