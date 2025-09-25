@@ -526,80 +526,6 @@ let is_jsx = expr => {
   };
 };
 
-let traverser = {
-  as _;
-  inherit class Ppxlib.Ast_traverse.map as super;
-  pub! structure_item = expr => {
-    File.set(expr.pstr_loc.loc_start.pos_fname);
-    let expr = super#structure_item(expr);
-    Mapper.transform(expr);
-  };
-  /* This transformation expands a styles prop into className and style. The same transformation lives on server-reason-react due to ppxlib/dune order issues. It's also implemented here in case of not using server-reason-react.ppx and just using reason-react-ppx. */
-  pub! expression = expr => {
-    let loc = expr.pexp_loc;
-    let attributes = expr.pexp_attributes;
-    switch (expr.pexp_desc) {
-    | Pexp_apply(tag, args) when is_jsx(expr) =>
-      let new_args =
-        List.concat_map(
-          ((arg_label, arg)) => {
-            switch (arg_label) {
-            | Ppxlib.Labelled("styles") => [
-                (Ppxlib.Labelled("className"), [%expr fst([%e arg])]),
-                (Ppxlib.Labelled("style"), [%expr snd([%e arg])]),
-              ]
-            | Ppxlib.Optional("styles") => [
-                (Ppxlib.Optional("className"), [%expr fst([%e arg])]),
-                (Ppxlib.Optional("style"), [%expr snd([%e arg])]),
-              ]
-            | _ => [(arg_label, super#expression(arg))]
-            }
-          },
-          args,
-        );
-
-      {
-        ...Builder.pexp_apply(~loc, super#expression(tag), new_args),
-        pexp_attributes: attributes,
-      };
-    | _ => {
-        ...super#expression(expr),
-        pexp_attributes: attributes,
-      }
-    };
-  }
-};
-
-let () =
-  Ppxlib.Driver.add_arg(
-    Settings.native.flag,
-    Arg.Unit(_ => Settings.Update.native(true)),
-    ~doc=Settings.native.doc,
-  );
-
-let () =
-  Ppxlib.Driver.add_arg(
-    Settings.debug.flag,
-    Arg.Unit(_ => Settings.Update.debug(true)),
-    ~doc=Settings.debug.doc,
-  );
-
-let () =
-  Ppxlib.Driver.add_arg(
-    Settings.output.flag,
-    Arg.String(path => Settings.Update.output(path)),
-    ~doc=Settings.output.doc,
-  );
-
-let (version, mode) = Bsconfig.getJSX();
-
-switch (version) {
-| Some(version) =>
-  Settings.Update.jsxVersion(version);
-  Settings.Update.jsxMode(mode);
-| None => ()
-};
-
 let any_payload_pattern = Ppxlib.Ast_pattern.(single_expr_payload(__));
 
 let any_module_payload_pattern =
@@ -955,16 +881,93 @@ let legacy_styled_extension =
     }),
   );
 
-Ppxlib.Driver.V2.register_transformation(
-  ~instrument=
-    Ppxlib.Driver.Instrument.make(~position=Before, traverser#structure),
-  ~rules=[
-    cx_extension_without_let_binding,
-    css_extension,
-    styled_global_extension,
-    keyframe_extension,
-    legacy_styled_extension,
-    cx2_extension,
-  ],
-  "styled-ppx",
-);
+let expands_styles_prop = (~traverse, expr: Ppxlib.expression) => {
+  /* This transformation expands a styles prop into className and style. The same transformation lives on server-reason-react due to ppxlib/dune order issues. It's also implemented here in case of not using server-reason-react.ppx and just using reason-react-ppx, or only using styled-ppx */
+  let loc = expr.pexp_loc;
+  let attributes = expr.pexp_attributes;
+  switch (expr.pexp_desc) {
+  | Pexp_apply(tag, args) when is_jsx(expr) =>
+    let new_args =
+      List.concat_map(
+        ((arg_label, arg)) => {
+          switch (arg_label) {
+          | Ppxlib.Labelled("styles") => [
+              (Ppxlib.Labelled("className"), [%expr fst([%e arg])]),
+              (Ppxlib.Labelled("style"), [%expr snd([%e arg])]),
+            ]
+          | Ppxlib.Optional("styles") => [
+              (Ppxlib.Optional("className"), [%expr fst([%e arg])]),
+              (Ppxlib.Optional("style"), [%expr snd([%e arg])]),
+            ]
+          | _ => [(arg_label, traverse(arg))]
+          }
+        },
+        args,
+      );
+
+    {
+      ...Builder.pexp_apply(~loc, traverse(tag), new_args),
+      pexp_attributes: attributes,
+    };
+  | _ => {
+      ...traverse(expr),
+      pexp_attributes: attributes,
+    }
+  };
+};
+
+let () = {
+  Ppxlib.Driver.add_arg(
+    ~doc=Settings.native.doc,
+    Settings.native.flag,
+    Arg.Unit(_ => Settings.Update.native(true)),
+  );
+
+  Ppxlib.Driver.add_arg(
+    ~doc=Settings.debug.doc,
+    Settings.debug.flag,
+    Arg.Unit(_ => Settings.Update.debug(true)),
+  );
+
+  Ppxlib.Driver.add_arg(
+    ~doc=Settings.output.doc,
+    Settings.output.flag,
+    Arg.String(path => Settings.Update.output(path)),
+  );
+
+  let (version, mode) = Bsconfig.getJSX();
+
+  switch (version) {
+  | Some(version) =>
+    Settings.Update.jsxVersion(version);
+    Settings.Update.jsxMode(mode);
+  | None => ()
+  };
+
+  let traverser = {
+    as _;
+    inherit class Ppxlib.Ast_traverse.map as super;
+    pub! structure_item = expr => {
+      File.set(expr.pstr_loc.loc_start.pos_fname);
+      let expr = super#structure_item(expr);
+      Mapper.transform(expr);
+    };
+    pub! expression = expr => {
+      expands_styles_prop(~traverse=super#expression, expr);
+    }
+  };
+
+  Ppxlib.Driver.V2.register_transformation(
+    ~instrument=
+      Ppxlib.Driver.Instrument.make(~position=Before, traverser#structure),
+    ~rules=[
+      cx_extension_without_let_binding,
+      css_extension,
+      styled_global_extension,
+      keyframe_extension,
+      legacy_styled_extension,
+      cx2_extension,
+    ],
+    "styled-ppx",
+  );
+};
