@@ -55,9 +55,9 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|fontVariantAlternates|js}, {js|ornaments(leaves)|js});
   CSS.unsafe({js|fontVariantAlternates|js}, {js|annotation(blocky)|js});
   CSS.unsafe({js|fontFeatureSettings|js}, {js|normal|js});
-  CSS.unsafe({js|fontFeatureSettings|js}, {js|'swsh' 2|js});
+  CSS.unsafe({js|fontFeatureSettings|js}, {js|"swsh" 2|js});
   CSS.unsafe({js|fontLanguageOverride|js}, {js|normal|js});
-  CSS.unsafe({js|fontLanguageOverride|js}, {js|'SRB'|js});
+  CSS.unsafe({js|fontLanguageOverride|js}, {js|"SRB"|js});
   CSS.fontWeight(`num(1));
   CSS.fontWeight(`num(90));
   CSS.fontWeight(`num(750));
@@ -151,7 +151,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|fontVariantEastAsian|js}, {js|ruby|js});
   CSS.unsafe({js|fontVariantEastAsian|js}, {js|simplified full-width ruby|js});
   CSS.unsafe({js|fontFeatureSettings|js}, {js|normal|js});
-  CSS.unsafe({js|fontFeatureSettings|js}, {js|'c2sc'|js});
-  CSS.unsafe({js|fontFeatureSettings|js}, {js|'smcp' on|js});
-  CSS.unsafe({js|fontFeatureSettings|js}, {js|'liga' off|js});
-  CSS.unsafe({js|fontFeatureSettings|js}, {js|'smcp', 'swsh' 2|js});
+  CSS.unsafe({js|fontFeatureSettings|js}, {js|"c2sc"|js});
+  CSS.unsafe({js|fontFeatureSettings|js}, {js|"smcp" on|js});
+  CSS.unsafe({js|fontFeatureSettings|js}, {js|"liga" off|js});
+  CSS.unsafe({js|fontFeatureSettings|js}, {js|"smcp", "swsh" 2|js});

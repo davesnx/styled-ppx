@@ -89,7 +89,7 @@ let mediaqueries () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"hash" rule_list in
   check ~pos:__POS__ (render list_of_rules)
-    ".hash { margin: 10px; } @media (min-width: 768px)  { .hash { display: \
+    ".hash { margin: 10px; } @media (min-width: 768px) { .hash { display: \
      block; } }"
 
 let mediaqueries_and_selectors () =
@@ -100,7 +100,7 @@ let mediaqueries_and_selectors () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"hash" rule_list in
   check ~pos:__POS__ (render list_of_rules)
-    ".hash { margin: 10px; } @media (min-width: 768px)  { .hash { display: \
+    ".hash { margin: 10px; } @media (min-width: 768px) { .hash { display: \
      block; } .hash .test { display: block; } }"
 
 let nested_mediaqueries_and_selectors () =
@@ -112,8 +112,8 @@ let nested_mediaqueries_and_selectors () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"hash" rule_list in
   check ~pos:__POS__ (render list_of_rules)
-    ".hash { margin: 10px; } @media (min-width: 768px)  { .hash { display: \
-     block; } .hash .test { display: block; } } @media (min-width: 768px)  { \
+    ".hash { margin: 10px; } @media (min-width: 768px) { .hash { display: \
+     block; } .hash .test { display: block; } } @media (min-width: 768px) { \
      .hash { display: block; } .hash .test { display: block; } }"
 
 let ampersand_with_classname () =
@@ -181,7 +181,7 @@ let media_query_with_ampersand_and_classname () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"responsive" rule_list in
   check ~pos:__POS__ (render list_of_rules)
-    "@media (min-width: 768px)  { .responsive { display: flex; } }"
+    "@media (min-width: 768px) { .responsive { display: flex; } }"
 
 (* === CSS Combinators === *)
 
@@ -398,7 +398,7 @@ let supports_rule () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"layout" rule_list in
   check ~pos:__POS__ (render list_of_rules)
-    "@supports (display: grid)  { .layout { display: grid; } .layout > div { \
+    "@supports (display: grid) { .layout { display: grid; } .layout > div { \
      grid-column: span 2; } }"
 
 let nested_supports_and_media () =
@@ -417,7 +417,7 @@ let nested_supports_and_media () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"flexible" rule_list in
   check ~pos:__POS__ (render list_of_rules)
-    "@supports (display: flex)  { .flexible { @media (min-width: 1024px)  { \
+    "@supports (display: flex) { .flexible { @media (min-width: 1024px) { \
      .flexible { display: flex; } .flexible > * { flex: 1; } } } }"
 
 (* === Complex nested scenarios === *)
@@ -489,10 +489,10 @@ let media_query_with_nested_selectors_and_pseudo () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"theme" rule_list in
   check ~pos:__POS__ (render list_of_rules)
-    ".theme { color: black; } @media (prefers-color-scheme: dark)  { .theme { \
+    ".theme { color: black; } @media (prefers-color-scheme: dark) { .theme { \
      color: white; background: black; } .theme a { color: lightblue; } .theme \
      a:visited { color: purple; } .theme a::after { content: \"yoo\"; } } \
-     @media (max-width: 768px)  { .theme footer { padding: 10px; } .theme \
+     @media (max-width: 768px) { .theme footer { padding: 10px; } .theme \
      footer .copyright { font-size: 12px; } }"
 
 let mixed_combinators_and_pseudo () =
@@ -542,7 +542,7 @@ let mixed_combinators_and_pseudo () =
     Transform.run ~className:"responsive-container" rule_list
   in
   check ~pos:__POS__ (render list_of_rules)
-    "container-type: inline-size; @container (min-width: 400px)  { \
+    "container-type: inline-size; @container (min-width: 400px) { \
      .responsive-container { display: flex; } .responsive-container .item { \
      flex: 1; } }" *)
 
@@ -695,10 +695,10 @@ let nested_at_rules_priority () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"complex" rule_list in
   check ~pos:__POS__ (render list_of_rules)
-    ".complex { color: red; } @media (min-width: 768px)  { .complex { color: \
-     green; @supports (display: grid)  { .complex { display: grid; @media \
-     (min-width: 1024px)  { .complex { grid-template-columns: repeat(3, 1fr); \
-     } } } } } }"
+    ".complex { color: red; } @media (min-width: 768px) { .complex { color: \
+     green; @supports (display: grid) { .complex { display: grid; @media \
+     (min-width: 1024px) { .complex { grid-template-columns: repeat(3, 1fr); } \
+     } } } } }"
 
 (* Parser doesn't support &-suffix notation yet *)
 (* let ampersand_suffix_selector () =

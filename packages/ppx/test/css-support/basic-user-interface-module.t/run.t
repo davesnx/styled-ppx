@@ -71,16 +71,16 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|textOverflow|js}, {js|clip clip|js});
   CSS.unsafe({js|textOverflow|js}, {js|ellipsis clip|js});
   
-  CSS.unsafe({js|textOverflow|js}, {js|'foo' clip|js});
+  CSS.unsafe({js|textOverflow|js}, {js|"foo" clip|js});
   CSS.unsafe({js|textOverflow|js}, {js|clip ellipsis|js});
   CSS.unsafe({js|textOverflow|js}, {js|ellipsis ellipsis|js});
   
-  CSS.unsafe({js|textOverflow|js}, {js|'foo' ellipsis|js});
+  CSS.unsafe({js|textOverflow|js}, {js|"foo" ellipsis|js});
   
-  CSS.unsafe({js|textOverflow|js}, {js|clip 'foo'|js});
-  CSS.unsafe({js|textOverflow|js}, {js|ellipsis 'foo'|js});
+  CSS.unsafe({js|textOverflow|js}, {js|clip "foo"|js});
+  CSS.unsafe({js|textOverflow|js}, {js|ellipsis "foo"|js});
   
-  CSS.unsafe({js|textOverflow|js}, {js|'foo' 'foo'|js});
+  CSS.unsafe({js|textOverflow|js}, {js|"foo" "foo"|js});
   CSS.userSelect(`auto);
   CSS.userSelect(`text);
   CSS.userSelect(`none);

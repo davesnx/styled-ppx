@@ -29,8 +29,8 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|offset|js}, {js|stroke-box|js});
   CSS.unsafe({js|offset|js}, {js|view-box|js});
   
-  CSS.unsafe({js|offset|js}, {js|path('M 20 20 H 80 V 30')|js});
-  CSS.unsafe({js|offset|js}, {js|url(image.png)|js});
+  CSS.unsafe({js|offset|js}, {js|path("M 20 20 H 80 V 30")|js});
+  CSS.unsafe({js|offset|js}, {js|url("image.png")|js});
   CSS.unsafe({js|offset|js}, {js|ray(45deg closest-side)|js});
   CSS.unsafe({js|offset|js}, {js|ray(45deg closest-side) 10%|js});
   CSS.unsafe({js|offset|js}, {js|ray(45deg closest-side) 10% reverse|js});

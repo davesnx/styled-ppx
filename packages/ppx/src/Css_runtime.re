@@ -118,10 +118,10 @@ let rec render_at_rule = (~loc, at_rule: at_rule) => {
   };
 }
 and render_media_query = (~loc, at_rule: at_rule) => {
-  let (_, at_rule_prelude_loc) = at_rule.prelude;
+  let (at_rule_prelude_ast, at_rule_prelude_loc) = at_rule.prelude;
   let parse_condition = {
     let prelude =
-      Styled_ppx_css_parser.Driver.source_code_of_loc(at_rule_prelude_loc);
+      Styled_ppx_css_parser.Render.component_value_list(at_rule_prelude_ast);
     Css_property_parser.Parser.parse(
       Css_property_parser.Parser.media_query_list,
       prelude,
@@ -163,10 +163,10 @@ and render_media_query = (~loc, at_rule: at_rule) => {
   };
 }
 and render_container_query = (~loc, at_rule: at_rule) => {
-  let (_, at_rule_prelude_loc) = at_rule.prelude;
+  let (at_rule_prelude_ast, at_rule_prelude_loc) = at_rule.prelude;
   let parse_condition = {
     let prelude =
-      Styled_ppx_css_parser.Driver.source_code_of_loc(at_rule_prelude_loc);
+      Styled_ppx_css_parser.Render.component_value_list(at_rule_prelude_ast);
     Css_property_parser.Parser.parse(
       Css_property_parser.Parser.container_condition_list,
       prelude,
@@ -216,10 +216,10 @@ and render_container_query = (~loc, at_rule: at_rule) => {
 }
 and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
   let (property, property_loc) = d.name;
-  let (_valueList, value_loc) = d.value;
+  let (valueList, value_loc) = d.value;
   let (important, _) = d.important;
   let value_source =
-    Styled_ppx_css_parser.Driver.source_code_of_loc(value_loc);
+    Styled_ppx_css_parser.Render.component_value_list(valueList);
 
   let value_loc =
     Styled_ppx_css_parser.Parser_location.intersection(loc, value_loc);

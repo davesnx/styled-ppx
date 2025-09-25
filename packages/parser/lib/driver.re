@@ -22,11 +22,8 @@ let parse = (lexbuf, parser) => {
   };
 };
 
-let last_buffer = ref(None);
-
 let parse_string = (parser, string) => {
   let buffer = Sedlexing.Utf8.from_string(string);
-  last_buffer := Some(Sedlexing.Utf8.from_string(string));
   parse(buffer, parser);
 };
 
@@ -40,18 +37,4 @@ let parse_declaration = (input: string) => {
 
 let parse_keyframes = (input: string) => {
   parse_string(Parser.keyframes, input);
-};
-
-let source_code_of_loc = ({loc_start, loc_end, _}: Ast.loc) => {
-  switch (last_buffer^) {
-  | Some(buffer: Sedlexing.lexbuf) =>
-    /* TODO: pos_offset is hardcoded to 0, unsure about the effects */
-    let pos_offset = 0;
-    let loc_start = loc_start.pos_cnum - pos_offset;
-    let loc_end = loc_end.pos_cnum - pos_offset;
-    Sedlexing.Utf8.sub_lexeme(buffer, loc_start, loc_end - loc_start)
-    /* String.trim is a hack, location should be correct and not contain any whitespace */
-    |> String.trim;
-  | None => assert(false)
-  };
 };

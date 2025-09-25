@@ -13,6 +13,11 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
+  File "input.re", line 54, characters 23-32:
+  54 | [%css {|list-style-type: \32 style|}];
+                              ^^^^^^^^^
+  Error: Property 'list-style-type' has an invalid value: '2style'
+  [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   
@@ -68,9 +73,9 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|listStyleType|js}, {js|other-style|js});
   CSS.unsafe({js|listStyleType|js}, {js|inside|js});
   CSS.unsafe({js|listStyleType|js}, {js|outside|js});
-  CSS.unsafe({js|listStyleType|js}, {js|\32 style|js});
+  [%ocaml.error "Property 'list-style-type' has an invalid value: '2style'"];
   CSS.unsafe({js|listStyleType|js}, {js|"-"|js});
-  CSS.unsafe({js|listStyleType|js}, {js|'-'|js});
+  CSS.unsafe({js|listStyleType|js}, {js|"-"|js});
   
   CSS.unsafe({js|counterReset|js}, {js|foo|js});
   CSS.unsafe({js|counterReset|js}, {js|foo 1|js});

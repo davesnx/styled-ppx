@@ -13,10 +13,11 @@ and style_rule = ({prelude, block, _}: Ast.style_rule) => {
   );
 }
 and at_rule = ({name, prelude, block, _}: Ast.at_rule) => {
+  let rendered_prelude = prelude |> fst |> component_value_list |> String.trim;
   Printf.sprintf(
     "@%s %s { %s }",
     name |> fst,
-    prelude |> fst |> component_value_list,
+    rendered_prelude,
     brace_block(block),
   );
 }

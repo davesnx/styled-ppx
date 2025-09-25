@@ -13,6 +13,11 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
+  File "input.re", line 427, characters 24-32:
+  427 | [%css {| object-position: inherit |}];
+                                ^^^^^^^^
+  Error: Property 'object-position' has an invalid value: 'inherit '
+  [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   module Color = {
@@ -172,17 +177,17 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|borderImageRepeat|js}, {js|repeat space|js});
   CSS.unsafe({js|borderImageRepeat|js}, {js|round space|js});
   CSS.unsafe({js|borderImageRepeat|js}, {js|space space|js});
-  CSS.unsafe({js|borderImage|js}, {js|url(foo.png) 10|js});
-  CSS.unsafe({js|borderImage|js}, {js|url(foo.png) 10%|js});
-  CSS.unsafe({js|borderImage|js}, {js|url(foo.png) 10% fill|js});
-  CSS.unsafe({js|borderImage|js}, {js|url(foo.png) 10 round|js});
-  CSS.unsafe({js|borderImage|js}, {js|url(foo.png) 10 stretch repeat|js});
-  CSS.unsafe({js|borderImage|js}, {js|url(foo.png) 10 / 10px|js});
-  CSS.unsafe({js|borderImage|js}, {js|url(foo.png) 10 / 10% / 10px|js});
-  CSS.unsafe({js|borderImage|js}, {js|url(foo.png) fill 10 / 10% / 10px|js});
+  CSS.unsafe({js|borderImage|js}, {js|url("foo.png") 10|js});
+  CSS.unsafe({js|borderImage|js}, {js|url("foo.png") 10%|js});
+  CSS.unsafe({js|borderImage|js}, {js|url("foo.png") 10% fill|js});
+  CSS.unsafe({js|borderImage|js}, {js|url("foo.png") 10 round|js});
+  CSS.unsafe({js|borderImage|js}, {js|url("foo.png") 10 stretch repeat|js});
+  CSS.unsafe({js|borderImage|js}, {js|url("foo.png") 10 / 10px|js});
+  CSS.unsafe({js|borderImage|js}, {js|url("foo.png") 10 / 10% / 10px|js});
+  CSS.unsafe({js|borderImage|js}, {js|url("foo.png") fill 10 / 10% / 10px|js});
   CSS.unsafe(
     {js|borderImage|js},
-    {js|url(foo.png) fill 10 / 10% / 10px space|js},
+    {js|url("foo.png") fill 10 / 10% / 10px space|js},
   );
   
   CSS.boxShadows([|
@@ -680,11 +685,13 @@ If this test fail means that the module is not in sync with the ppx
   CSS.objectPosition(`hvOffset((`right, `em(3.), `bottom, `pxFloat(10.))));
   CSS.objectPosition(`hvOffset((`right, `pxFloat(10.), `top, `zero)));
   
-  CSS.unsafe({js|objectPosition|js}, {js|inherit|js});
-  CSS.unsafe({js|objectPosition|js}, {js|initial|js});
-  CSS.unsafe({js|objectPosition|js}, {js|revert|js});
-  CSS.unsafe({js|objectPosition|js}, {js|revert-layer|js});
-  CSS.unsafe({js|objectPosition|js}, {js|unset|js});
+  [%ocaml.error "Property 'object-position' has an invalid value: 'inherit '"];
+  [%ocaml.error "Property 'object-position' has an invalid value: 'initial '"];
+  [%ocaml.error "Property 'object-position' has an invalid value: 'revert '"];
+  [%ocaml.error
+    "Property 'object-position' has an invalid value: 'revert-layer '"
+  ];
+  [%ocaml.error "Property 'object-position' has an invalid value: 'unset '"];
   
   let _loadingKeyframes =
     CSS.keyframes([|

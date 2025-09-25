@@ -4,6 +4,11 @@ open Ast
 
 let make_loc = Parser_location.to_ppxlib_location
 
+let rec remove_trailing_whitespace values =
+  match List.rev values with
+  | (Whitespace, _) :: rest -> remove_trailing_whitespace (List.rev rest)
+  | _ -> values
+
 %}
 
 %token EOF
@@ -117,8 +122,10 @@ at_rule:
   /* @charset */
   | name = loc(AT_RULE_STATEMENT) WS?
     xs = loc(values) WS? SEMI_COLON {
+    let (values_list, values_loc) = xs in
+    let cleaned_values = remove_trailing_whitespace values_list in
     { name;
-      prelude = xs;
+      prelude = (cleaned_values, values_loc);
       block = Empty;
       loc = make_loc $startpos $endpos;
     }
@@ -129,8 +136,10 @@ at_rule:
   | name = loc(AT_RULE) WS?
     xs = loc(skip_ws(values)) WS?
     s = brace_block(list(rule)) WS? {
+    let (values_list, values_loc) = xs in
+    let cleaned_values = remove_trailing_whitespace values_list in
     { name;
-      prelude = xs;
+      prelude = (cleaned_values, values_loc);
       block = Rule_list (s, make_loc $startpos $endpos);
       loc = make_loc $startpos $endpos;
     }
