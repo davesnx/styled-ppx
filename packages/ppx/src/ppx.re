@@ -947,10 +947,9 @@ let () = {
   let traverser = {
     as _;
     inherit class Ppxlib.Ast_traverse.map as super;
-    pub! structure_item = expr => {
-      File.set(expr.pstr_loc.loc_start.pos_fname);
-      let expr = super#structure_item(expr);
-      Mapper.transform(expr);
+    pub! structure_item = item => {
+      File.set(item.pstr_loc.loc_start.pos_fname);
+      Mapper.transform(super#structure_item(item));
     };
     pub! expression = expr => {
       expands_styles_prop(~traverse=super#expression, expr);
