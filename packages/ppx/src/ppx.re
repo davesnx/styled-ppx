@@ -882,7 +882,7 @@ let legacy_styled_extension =
   );
 
 let expands_styles_prop = (~traverse, expr: Ppxlib.expression) => {
-  /* This transformation expands a styles prop into className and style. The same transformation lives on server-reason-react due to ppxlib/dune order issues. It's also implemented here in case of not using server-reason-react.ppx and just using reason-react-ppx, or only using styled-ppx */
+  /* This transformation expands a styles prop into className and style. The same transformation lives on server-reason-react due to ppxlib/dune order issues. It's also implemented here in case of not using server-reason-react.ppx and just using reason-react-ppx, or only using styled-ppx. */
   let loc = expr.pexp_loc;
   let attributes = expr.pexp_attributes;
   switch (expr.pexp_desc) {

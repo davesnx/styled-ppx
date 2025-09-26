@@ -1,5 +1,7 @@
 let element = ReactDOM.querySelector("#root");
 
+let _css = [%cx2 {| color: #C33; |}];
+
 switch (element) {
 | Some(root) =>
   let root = ReactDOM.Client.createRoot(root);

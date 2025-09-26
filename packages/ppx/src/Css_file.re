@@ -456,18 +456,11 @@ module File = {
  * - Pass --output=/path/to/output when invoking the ppx
  */
 let get_output_path = () => {
-  let css_dir =
-    switch (Settings.Get.output()) {
-    | Some(configured_path) => configured_path
-    | None =>
-      raise(
-        Failure(
-          "styled-ppx: CSS output directory must be specified using --output flag. Example: --output=./styles",
-        ),
-      )
-    };
+  /* TODO: Check if is a valid path */
+  /* TODO: Catch all errors from mkdir */
+  let output_directory = Settings.Get.output();
 
-  if (!Sys.file_exists(css_dir)) {
+  if (!Sys.file_exists(output_directory)) {
     let rec create_parent_dirs = path => {
       let parent = Filename.dirname(path);
       if (parent != path && parent != "." && !Sys.file_exists(parent)) {
@@ -476,13 +469,13 @@ let get_output_path = () => {
       };
     };
 
-    create_parent_dirs(css_dir);
-    if (!Sys.file_exists(css_dir)) {
-      Unix.mkdir(css_dir, 0o755);
+    create_parent_dirs(output_directory);
+    if (!Sys.file_exists(output_directory)) {
+      Unix.mkdir(output_directory, 0o755);
     };
   };
 
-  let output_path = Filename.concat(css_dir, "styles.css");
+  let output_path = Filename.concat(output_directory, "styles.css");
   Log.debug(Printf.sprintf("CSS output path: %s", output_path));
   output_path;
 };
