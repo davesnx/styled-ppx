@@ -108,10 +108,10 @@ module Types = {
   and an_plus_b = unit;
 };
 let rec _legacy_gradient:
-  list(Tokens.token) =>
+  list(Styled_ppx_css_parser.Tokens.t) =>
   (
     Css_property_parser__Rule.data(Types._legacy_gradient),
-    list(Tokens.token),
+    list(Styled_ppx_css_parser.Tokens.t),
   ) =
   tokens =>
     Combinator.xor(
@@ -129,10 +129,10 @@ let rec _legacy_gradient:
       tokens,
     )
 and _legacy_linear_gradient:
-  list(Tokens.token) =>
+  list(Styled_ppx_css_parser.Tokens.t) =>
   (
     Css_property_parser__Rule.data(Types._legacy_linear_gradient),
-    list(Tokens.token),
+    list(Styled_ppx_css_parser.Tokens.t),
   ) =
   tokens =>
     Combinator.xor(
@@ -165,10 +165,10 @@ and _legacy_linear_gradient:
       tokens,
     )
 and property_height:
-  list(Tokens.token) =>
+  list(Styled_ppx_css_parser.Tokens.t) =>
   (
     Css_property_parser__Rule.data(Types.property_height),
-    list(Tokens.token),
+    list(Styled_ppx_css_parser.Tokens.t),
   ) =
   tokens =>
     Combinator.xor(

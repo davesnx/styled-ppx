@@ -24,7 +24,7 @@ let error_tests_data =
       {|div
         { color: red; _ }
       |},
-      "Parse error while reading token '}' on line 2 at position 23",
+      "Parse error while reading token '}' on line 2 at position 24",
     ),
     (
       "@media $",

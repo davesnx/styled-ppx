@@ -1,7 +1,7 @@
 open Css_property_parser;
 open Rule;
 open! Data;
-open Styled_ppx_css_parser.Tokens;
+open Styled_ppx_css_parser.Parser;
 
 let data_monad_tests: tests = [
   // TODO: check static order

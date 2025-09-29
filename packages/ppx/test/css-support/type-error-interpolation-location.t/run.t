@@ -13,9 +13,9 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", lines 19-20, characters 10-29:
-  Error: This expression has type [> `underlin ]
+  File "input.re", line 20, characters 10-29:
+  Error: This expression has type [> `bold ]
          but an expression was expected of type
            Css_types.TextDecorationLine.Value.t
-         The second variant type does not allow tag(s) `underlin
+         The second variant type does not allow tag(s) `bold
   [1]
