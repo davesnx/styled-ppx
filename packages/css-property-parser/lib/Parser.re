@@ -1969,7 +1969,7 @@ let apply_parser = (parser, tokens_with_loc) => {
        )
     |> List.rev;
 
-  let tokens_without_ws = tokens |> List.filter((!=)(Tokens.WS));
+  let tokens_without_ws = tokens |> List.filter((!=)(Styled_ppx_css_parser.Parser.WS));
 
   let (output, remaining_tokens) = parser(tokens_without_ws);
   let.ok output =
@@ -1982,7 +1982,7 @@ let apply_parser = (parser, tokens_with_loc) => {
   let.ok () =
     switch (remaining_tokens) {
     | []
-    | [Tokens.EOF] => Ok()
+    | [Styled_ppx_css_parser.Parser.EOF] => Ok()
     | tokens =>
       let tokens =
         tokens |> List.map(Tokens.show_token) |> String.concat(", ");

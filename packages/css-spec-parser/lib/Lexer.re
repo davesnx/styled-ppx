@@ -1,5 +1,4 @@
 open Sedlexing.Utf8;
-open Tokens;
 
 // TODO: is rgb(255 255 255/0) valid?
 let whitespace = [%sedlex.regexp? Plus(' ' | '\t' | '\n')];
@@ -45,8 +44,8 @@ let slice = (start, end_, string) => {
 
 let eat_literal = buf => {
   switch%sedlex (buf) {
-  | literal => LITERAL(lexeme(buf))
-  | single_token_literal => LITERAL(lexeme(buf))
+  | literal => Tokens.LITERAL(lexeme(buf))
+  | single_token_literal => Tokens.LITERAL(lexeme(buf))
   | _ => failwith("something is wrong here")
   };
 };
@@ -63,35 +62,35 @@ let eat_range = str => {
     | [min, max] => (int(min), Some(int(max)))
     | _ => failwith("cannot understand " ++ content)
     };
-  RANGE((kind, min, max));
+  Tokens.RANGE((kind, min, max));
 };
 
 let rec tokenizer = buf =>
   switch%sedlex (buf) {
   | whitespace => tokenizer(buf)
-  | property => PROPERTY(lexeme(buf) |> slice(2, -2))
+  | property => Tokens.PROPERTY(lexeme(buf) |> slice(2, -2))
   | data =>
     switch (lexeme(buf) |> slice(1, -1) |> String.split_on_char(' ')) {
-    | [value, ..._] => DATA(value)
+    | [value, ..._] => Tokens.DATA(value)
     | [] => failwith("unreachable")
     }
-  | '*' => ASTERISK
-  | '+' => PLUS
-  | '?' => QUESTION_MARK
-  | '#' => RANGE((`Comma, 1, None))
+  | '*' => Tokens.ASTERISK
+  | '+' => Tokens.PLUS
+  | '?' => Tokens.QUESTION_MARK
+  | '#' => Tokens.RANGE((`Comma, 1, None))
   | range => eat_range(lexeme(buf))
-  | '!' => EXCLAMATION_POINT
+  | '!' => Tokens.EXCLAMATION_POINT
   // combinators
-  | "&&" => DOUBLE_AMPERSAND
-  | "||" => DOUBLE_BAR
-  | "|" => BAR
-  | "[" => LEFT_BRACKET
-  | "]" => RIGHT_BRACKET
+  | "&&" => Tokens.DOUBLE_AMPERSAND
+  | "||" => Tokens.DOUBLE_BAR
+  | "|" => Tokens.BAR
+  | "[" => Tokens.LEFT_BRACKET
+  | "]" => Tokens.RIGHT_BRACKET
   // functions
-  | '(' => LEFT_PARENS
-  | ')' => RIGHT_PARENS
-  | quoted_delimiter => CHAR(lexeme(buf) |> slice(1, -1))
-  | string => LITERAL(lexeme(buf) |> slice(1, -1))
-  | eof => EOF
+  | '(' => Tokens.LEFT_PARENS
+  | ')' => Tokens.RIGHT_PARENS
+  | quoted_delimiter => Tokens.CHAR(lexeme(buf) |> slice(1, -1))
+  | string => Tokens.LITERAL(lexeme(buf) |> slice(1, -1))
+  | eof => Tokens.EOF
   | _ => eat_literal(buf)
   };

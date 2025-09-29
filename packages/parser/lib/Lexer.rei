@@ -2,7 +2,7 @@
 exception LexingError((Lexing.position, Lexing.position, string));
 
 type token_with_location = {
-  txt: result(Tokens.token, (Tokens.token, Tokens.error)),
+  txt: result(Parser.token, (Parser.token, Tokens.error)),
   loc: Ast.loc,
 };
 
