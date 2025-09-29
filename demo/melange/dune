@@ -12,4 +12,4 @@
  (deps
   (glob_files_rec %{project_root}/**.pp.ml))
  (action
-  (run styled-ppx.generate --output %{target} --verbose %{deps})))
+  (run styled-ppx.generate --output %{target} %{deps})))
