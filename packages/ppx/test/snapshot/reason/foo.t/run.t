@@ -1,5 +1,5 @@
   $ refmt --parse re --print ml input.re > output.ml
-  $ standalone --impl output.ml -o output.ml --output=./$TEST_OUTPUT/generated
+  $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css
     ".css-3tpy8b { color: var(--var-19ja411); }\n.css-1uzc9um { background-color: var(--var-1xt8d8f); }\n.css-17vxl0k { display: flex; }\n.css-1lr2y8 .lola { display: flex; }\n"

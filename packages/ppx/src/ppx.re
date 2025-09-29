@@ -398,12 +398,18 @@ module Mapper = {
           |> Builder.pexp_array(~loc=stringLoc)
           |> Css_runtime.render_style_call(~loc=stringLoc)
         | Error((start_pos, end_pos, msg)) =>
-          let loc =
-            Styled_ppx_css_parser.Parser_location.make_loc_from_pos(
-              ~loc=stringLoc,
-              ~delimiter,
+          let ppxlibloc =
+            Styled_ppx_css_parser.Parser_location.to_ppxlib_location(
               start_pos,
               end_pos,
+            );
+          let loc =
+            Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
+              Styled_ppx_css_parser.Parser_location.intersection(
+                stringLoc,
+                ppxlibloc,
+              ),
+              delimiter,
             );
           Error.expr(~loc, msg);
         };
@@ -568,12 +574,18 @@ let cx_extension_without_let_binding =
             |> Builder.pexp_array(~loc=stringLoc)
             |> Css_runtime.render_style_call(~loc=stringLoc)
           | Error((start_pos, end_pos, msg)) =>
-            let loc =
-              Styled_ppx_css_parser.Parser_location.make_loc_from_pos(
-                ~loc=stringLoc,
-                ~delimiter,
+            let ppxlibloc =
+              Styled_ppx_css_parser.Parser_location.to_ppxlib_location(
                 start_pos,
                 end_pos,
+              );
+            let loc =
+              Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
+                Styled_ppx_css_parser.Parser_location.intersection(
+                  stringLoc,
+                  ppxlibloc,
+                ),
+                delimiter,
               );
             Error.expr(~loc, msg);
           }
