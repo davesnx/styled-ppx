@@ -33,6 +33,8 @@ let delim =
   | "]" => expect(RIGHT_BRACKET)
   | ":" => expect(COLON)
   | ";" => expect(SEMI_COLON)
+  | "*" => expect(ASTERISK)
+  | "." => expect(DOT)
   // Combinators can appear as delimiters in value context (e.g., calc)
   | "+" => expect(COMBINATOR("+"))
   | "~" => expect(COMBINATOR("~"))

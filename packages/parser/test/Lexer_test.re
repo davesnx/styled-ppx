@@ -25,7 +25,6 @@ let success_tests =
     (__POS__, {|-45.6|}, [NUMBER("-45.6")]),
     (__POS__, {|45%|}, [NUMBER("45"), PERCENT]),
     (__POS__, {|2n|}, [DIMENSION(("2", "n"))]),
-    /* TODO: Store Float_dimension as float/int */
     /* TODO: Store dimension as a variant */
     (__POS__, {|45.6px|}, [FLOAT_DIMENSION(("45.6", "px"))]),
     (__POS__, {|10px|}, [FLOAT_DIMENSION(("10", "px"))]),
@@ -68,6 +67,7 @@ let success_tests =
         FUNCTION("calc"),
         FLOAT_DIMENSION(("10", "px")),
         WS,
+        /* TODO: is + a combinator? */
         COMBINATOR("+"),
         WS,
         FLOAT_DIMENSION(("10", "px")),
@@ -139,6 +139,34 @@ let success_tests =
     (__POS__, {|@import|}, [AT_RULE_STATEMENT("import")]),
     (__POS__, {|@charset|}, [AT_RULE_STATEMENT("charset")]),
     (__POS__, {|@namespace|}, [AT_RULE_STATEMENT("namespace")]),
+    // Test calc with multiplication and division
+    (
+      __POS__,
+      {|calc(3 * 25px)|},
+      [
+        FUNCTION("calc"),
+        NUMBER("3"),
+        WS,
+        ASTERISK,
+        WS,
+        FLOAT_DIMENSION(("25", "px")),
+        RIGHT_PAREN,
+      ],
+    ),
+    (
+      __POS__,
+      {|calc(100% / 2)|},
+      [
+        FUNCTION("calc"),
+        NUMBER("100"),
+        PERCENT,
+        WS,
+        DELIM("/"),
+        WS,
+        NUMBER("2"),
+        RIGHT_PAREN,
+      ],
+    ),
     (
       __POS__,
       {|

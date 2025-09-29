@@ -730,14 +730,48 @@ let is_float_unit = unit => {
   };
 };
 
+// Consume identifier for dimension units, but stop at +/- if followed by digit
+// This handles nth-child cases like "10n-1" -> dimension("10", "n") not dimension("10", "n-1")
+let consume_identifier_for_dimension = lexbuf => {
+  let should_stop_at_nth_pattern = acc =>
+    // Check if current acc ends with 'n' and next is '-' or '+' followed by digit
+    if (String.length(acc) > 0 && acc.[String.length(acc) - 1] == 'n') {
+      Sedlexing.mark(lexbuf, 0);
+      let result =
+        switch%sedlex (lexbuf) {
+        | ('+' | '-', digit) => true
+        | _ => false
+        };
+      let _ = Sedlexing.backtrack(lexbuf);
+      result;
+    } else {
+      false;
+    };
+
+  let rec read = acc =>
+    if (should_stop_at_nth_pattern(acc)) {
+      Ok(acc);
+    } else {
+      switch%sedlex (lexbuf) {
+      | identifier_code_point => read(acc ++ lexeme(lexbuf))
+      | escape =>
+        let.ok char = consume_escaped(lexbuf);
+        read(acc ++ char);
+      | _ => Ok(acc)
+      };
+    };
+  read("");
+};
+
 // https://drafts.csswg.org/css-syntax-3/#consume-numeric-token
 let consume_numeric = lexbuf => {
   // consume_number now returns (repr_string, kind) instead of (float_value, kind)
   let (number_str, _kind) = consume_number(lexbuf);
 
   if (check_if_three_codepoints_would_start_an_identifier(lexbuf)) {
-    // TODO: should it be BAD_IDENT?
-    let.ok string = consume_identifier(lexbuf) |> handle_consume_identifier;
+    // Use dimension-aware identifier consumer to handle nth patterns correctly
+    let.ok string =
+      consume_identifier_for_dimension(lexbuf) |> handle_consume_identifier;
     // Determine if it's a float dimension or regular dimension based on unit type
     // TODO: is there any difference between float and regular dimension?
     is_float_unit(string)

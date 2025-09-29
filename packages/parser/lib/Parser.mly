@@ -256,11 +256,11 @@ nth_payload:
     let b = int_of_string b in
     Nth (ANB (((int_of_string (fst a)), combinator, b)))
   }
-  /* This is a hackish solution where combinator isn't catched because the lexer
-  assignes the `-` to NUMBER. This could be solved by leftassoc or the lexer */
+  /* 3n+1, 3n-1 (lexer ensures these come as DIMENSION + signed NUMBER) */
   | a = DIMENSION WS? b = NUMBER {
-    let b = Int.abs (int_of_string (b)) in
-    Nth (ANB (((int_of_string (fst a)), "-", b)))
+    let combinator = if String.get b 0 = '+' then "+" else "-" in
+    let b_value = Int.abs (int_of_string b) in
+    Nth (ANB (((int_of_string (fst a)), combinator, b_value)))
   }
   | n = IDENT WS? {
     match n with
@@ -280,6 +280,13 @@ nth_payload:
     let first_char = String.get n 0 in
     let a = if first_char = '-' then -1 else 1 in
     Nth (ANB ((a, combinator, int_of_string b)))
+  }
+  /* n+1, -n+1 without space (lexer ensures these come as IDENT + signed NUMBER) */
+  | n = IDENT WS? b = NUMBER {
+    let a = if String.get n 0 = '-' then -1 else 1 in
+    let combinator = if String.get b 0 = '+' then "+" else "-" in
+    let b_value = Int.abs (int_of_string b) in
+    Nth (ANB ((a, combinator, b_value)))
   }
   /* TODO: Support "An+B of Selector" */
 

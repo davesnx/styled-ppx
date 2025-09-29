@@ -352,7 +352,7 @@ module Mapper = {
             ),
         ),
       );
-    /* [%cx ""] */
+    /* let value = [%cx ""] */
     | Pstr_value(
         Nonrecursive,
         [
