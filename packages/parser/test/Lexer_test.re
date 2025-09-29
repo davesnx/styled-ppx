@@ -18,8 +18,8 @@ let success_tests =
     (__POS__, {|(|}, [LEFT_PAREN]),
     (__POS__, {|)|}, [RIGHT_PAREN]),
     (__POS__, {|+12.3|}, [NUMBER("+12.3")]),
-    (__POS__, {|+ 12.3|}, [DELIM("+"), WS, NUMBER("12.3")]),
-    (__POS__, {|+|}, [DELIM("+")]),
+    (__POS__, {|+ 12.3|}, [COMBINATOR("+"), WS, NUMBER("12.3")]),
+    (__POS__, {|+|}, [COMBINATOR("+")]),
     (__POS__, {|,|}, [COMMA]),
     (__POS__, {|45.6|}, [NUMBER("45.6")]),
     (__POS__, {|-45.6|}, [NUMBER("-45.6")]),
@@ -68,7 +68,7 @@ let success_tests =
         FUNCTION("calc"),
         FLOAT_DIMENSION(("10", "px")),
         WS,
-        DELIM("+"),
+        COMBINATOR("+"),
         WS,
         FLOAT_DIMENSION(("10", "px")),
         RIGHT_PAREN,
@@ -81,7 +81,7 @@ let success_tests =
       [
         FUNCTION("calc"),
         FLOAT_DIMENSION(("10", "px")),
-        DELIM("+"),
+        COMBINATOR("+"),
         WS,
         FLOAT_DIMENSION(("10", "px")),
         RIGHT_PAREN,
@@ -118,6 +118,27 @@ let success_tests =
     ),
     (__POS__, {|-moz|}, [IDENT("-moz")]),
     (__POS__, {|--color-main|}, [IDENT("--color-main")]),
+    // Test IMPORTANT token
+    (__POS__, {|!important|}, [IMPORTANT]),
+    (__POS__, {|! important|}, [IMPORTANT]),
+    // Test OPERATOR tokens
+    (__POS__, {|~=|}, [OPERATOR("~=")]),
+    (__POS__, {||=|}, [OPERATOR("|=")]),
+    (__POS__, {|^=|}, [OPERATOR("^=")]),
+    (__POS__, {|$=|}, [OPERATOR("$=")]),
+    (__POS__, {|*=|}, [OPERATOR("*=")]),
+    (__POS__, {|=|}, [OPERATOR("=")]),
+    // Test COMBINATOR tokens
+    (__POS__, {|>|}, [COMBINATOR(">")]),
+    (__POS__, {|~|}, [COMBINATOR("~")]),
+    // + is COMBINATOR unless part of number
+    (__POS__, {|+ |}, [COMBINATOR("+"), WS]),
+    // Test AT_KEYFRAMES
+    (__POS__, {|@keyframes|}, [AT_KEYFRAMES("keyframes")]),
+    // Test AT_RULE_STATEMENT
+    (__POS__, {|@import|}, [AT_RULE_STATEMENT("import")]),
+    (__POS__, {|@charset|}, [AT_RULE_STATEMENT("charset")]),
+    (__POS__, {|@namespace|}, [AT_RULE_STATEMENT("namespace")]),
     (
       __POS__,
       {|
@@ -238,7 +259,7 @@ let test_with_location =
     (__POS__, {|(|}, [LEFT_PAREN], 1),
     (__POS__, {|)|}, [RIGHT_PAREN], 1),
     (__POS__, {|+12.3|}, [NUMBER("+12.3")], 5),
-    (__POS__, {|+|}, [DELIM("+")], 1),
+    (__POS__, {|+|}, [COMBINATOR("+")], 1),
     (__POS__, {|,|}, [COMMA], 1),
     (__POS__, {|-45.6|}, [NUMBER("-45.6")], 5),
     (__POS__, {|--potato|}, [IDENT("--potato")], 8),
@@ -264,7 +285,7 @@ let test_with_location =
         FUNCTION("calc"),
         FLOAT_DIMENSION(("10", "px")),
         WS,
-        DELIM("+"),
+        COMBINATOR("+"),
         WS,
         FLOAT_DIMENSION(("10", "px")),
         RIGHT_PAREN,
@@ -290,7 +311,7 @@ let test_with_location =
       [
         FUNCTION("calc"),
         FLOAT_DIMENSION(("10", "px")),
-        DELIM("+"),
+        COMBINATOR("+"),
         WS,
         FLOAT_DIMENSION(("10", "px")),
         RIGHT_PAREN,

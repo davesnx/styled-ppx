@@ -283,7 +283,7 @@ let tests = [
       ~__POS__,
       Alcotest.result(Alcotest.float(1.), Alcotest.string),
       parse("63.4:"),
-      Error("Expected percentage."),
+      Error("Expected '%' but instead got ':'."),
     );
   }),
   test("keyword", () => {
@@ -464,6 +464,6 @@ let tests = [
     expect(parse("$(Module.value)"), Ok(["Module", "value"]));
     expect(parse("$(Module'.value')"), Ok(["Module'", "value'"]));
     /* TODO: Add error message into interpolation */
-    expect(parse("asd"), Error("Expected '$' but instead got 'asd'."));
+    expect(parse("asd"), Error("Expected interpolation."));
   }),
 ];

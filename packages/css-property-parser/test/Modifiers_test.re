@@ -119,7 +119,7 @@ let tests: tests = [
       ~__POS__,
       to_check,
       parse("30 31 32"),
-      Error("tokens remaining: (NUMBER 32.), EOF"),
+      Error("tokens remaining: NUMBER(\"32\"), EOF"),
     );
   }),
   test("<integer>{2} <integer>", () => {
@@ -136,7 +136,7 @@ let tests: tests = [
       ~__POS__,
       to_check,
       parse("30 31 32 33"),
-      Error("tokens remaining: (NUMBER 33.), EOF"),
+      Error("tokens remaining: NUMBER(\"33\"), EOF"),
     );
   }),
   test("<integer>{2,3}", () => {
@@ -151,7 +151,7 @@ let tests: tests = [
       ~__POS__,
       to_check,
       parse("39 40 41 42"),
-      Error("tokens remaining: (NUMBER 42.), EOF"),
+      Error("tokens remaining: NUMBER(\"42\"), EOF"),
     );
   }),
   test("<integer>{2,}", () => {
@@ -187,7 +187,7 @@ let tests: tests = [
       ~__POS__,
       to_check,
       parse("59, 60, 61, 62"),
-      Error("tokens remaining: COMMA, (NUMBER 62.), EOF"),
+      Error("tokens remaining: COMMA, NUMBER(\"62\"), EOF"),
     );
   }),
   test("<integer>#{2}, <integer>", () => {
@@ -225,7 +225,7 @@ let tests: tests = [
       ~__POS__,
       to_check,
       parse("59, 60, 61, 62"),
-      Error("tokens remaining: COMMA, (NUMBER 62.), EOF"),
+      Error("tokens remaining: COMMA, NUMBER(\"62\"), EOF"),
     );
   }),
   test("[<integer> A]{2,3}", () => {
@@ -241,7 +241,7 @@ let tests: tests = [
       ~__POS__,
       to_check,
       parse("69 70 71 72"),
-      Error("tokens remaining: (NUMBER 72.), EOF"),
+      Error("tokens remaining: NUMBER(\"72\"), EOF"),
     );
   }),
 ];

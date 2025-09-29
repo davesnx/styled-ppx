@@ -10,7 +10,7 @@ exception LexingError((Lexing.position, Lexing.position, string));
 /* Regexes */
 let newline = [%sedlex.regexp? '\n' | "\r\n" | '\r' | '\012'];
 
-// comment		\/\*[^*]*\*+([^/*][^*]*\*+)*\/ (https://www.w3.org/TR/CSS21/grammar.html)
+// comment \/\*[^*]*\*+([^/*][^*]*\*+)*\/ (https://www.w3.org/TR/CSS21/grammar.html)
 let comment = [%sedlex.regexp?
   (
     "/*",
@@ -342,7 +342,7 @@ let _y = [%sedlex.regexp? 'Y' | 'y'];
 let _z = [%sedlex.regexp? 'Z' | 'z'];
 
 let important = [%sedlex.regexp?
-  ("!", whitespaces, _i, _m, _p, _o, _r, _t, _a, _n, _t)
+  ("!", Star(whitespace), _i, _m, _p, _o, _r, _t, _a, _n, _t)
 ];
 
 let length = [%sedlex.regexp?
@@ -490,7 +490,8 @@ let consume_identifier = lexbuf => {
       read(acc ++ char);
     | _ => Ok(acc)
     };
-  read(lexeme(lexbuf));
+  // Start reading from current position (after backtrack, lexeme is empty)
+  read("");
 };
 
 // https://drafts.csswg.org/css-syntax-3/#consume-remnants-of-bad-url
@@ -586,114 +587,10 @@ let consume_ident_like = lexbuf => {
   };
 };
 
-let handle_tokenizer_error = lexbuf => {
-  let (start_pos, curr_pos) = Sedlexing.lexing_positions(lexbuf);
-  fun
-  | Ok(value) => value
-  | Error((_, msg)) => {
-      let error = Tokens.show_error(msg);
-      raise(LexingError((start_pos, curr_pos, error)));
-    };
-};
-
-let rec get_next_token = lexbuf => {
-  switch%sedlex (lexbuf) {
-  | eof => Parser.EOF
-  | Star(comment) => get_next_token(lexbuf)
-  | "/*" => discard_comments(lexbuf)
-  | '.' => DOT
-  | ';' => SEMI_COLON
-  | '}' => RIGHT_BRACE
-  | '{' => LEFT_BRACE
-  | "::" => DOUBLE_COLON
-  | ':' => COLON
-  | '(' => LEFT_PAREN
-  | ')' => RIGHT_PAREN
-  | '[' => LEFT_BRACKET
-  | ']' => RIGHT_BRACKET
-  | '%' => PERCENT
-  | '&' => AMPERSAND
-  | '*' => ASTERISK
-  | ',' => COMMA
-  | variable =>
-    INTERPOLATION(
-      lexeme(~skip=2, ~drop=1, lexbuf) |> String.split_on_char('.'),
-    )
-  | operator => OPERATOR(lexeme(lexbuf))
-  | combinator => COMBINATOR(lexeme(lexbuf))
-  | string => STRING(lexeme(~skip=1, ~drop=1, lexbuf))
-  | important => IMPORTANT
-  | at_keyframes => AT_KEYFRAMES(lexeme(~skip=1, lexbuf))
-  | at_rule_without_body => AT_RULE_STATEMENT(lexeme(~skip=1, lexbuf))
-  | at_rule => AT_RULE(lexeme(~skip=1, lexbuf))
-  /* NOTE: should be placed above ident, otherwise pattern with
-   * '-[0-9a-z]{1,6}' cannot be matched */
-  | (_u, '+', unicode_range) => UNICODE_RANGE(lexeme(lexbuf))
-  | ('#', name) => HASH(lexeme(~skip=1, lexbuf))
-  /* TODO: get_dimension and handle_numeric should be the same */
-  | number => get_dimension(lexeme(lexbuf), lexbuf)
-  | whitespaces => WS
-  | ("-", ident) =>
-    Sedlexing.rollback(lexbuf);
-    consume_ident_like(lexbuf) |> handle_tokenizer_error(lexbuf);
-  /* --variable */
-  | ("-", "-", ident) => IDENT(lexeme(lexbuf))
-  | escape
-  | identifier_start_code_point =>
-    let _ = Sedlexing.backtrack(lexbuf);
-    consume_ident_like(lexbuf) |> handle_tokenizer_error(lexbuf);
-  | any => DELIM(lexeme(lexbuf))
-  | _ => unreachable(lexbuf)
-  };
-}
-and get_dimension = (n, lexbuf) => {
-  switch%sedlex (lexbuf) {
-  | length => FLOAT_DIMENSION((n, lexeme(lexbuf)))
-  | angle => FLOAT_DIMENSION((n, lexeme(lexbuf)))
-  | time => FLOAT_DIMENSION((n, lexeme(lexbuf)))
-  | frequency => FLOAT_DIMENSION((n, lexeme(lexbuf)))
-  | 'n' => DIMENSION((n, lexeme(lexbuf)))
-  | _ => NUMBER(n)
-  };
-}
-and discard_comments = lexbuf => {
-  let (start_pos, curr_pos) = Sedlexing.lexing_positions(lexbuf);
-  switch%sedlex (lexbuf) {
-  | "*/" => get_next_token(lexbuf)
-  | any => discard_comments(lexbuf)
-  | eof =>
-    raise(
-      LexingError((
-        start_pos,
-        curr_pos,
-        "Unterminated comment at the end of the string",
-      )),
-    )
-  | _ => get_next_token(lexbuf)
-  };
-};
-
-let get_next_tokens_with_location = lexbuf => {
-  let (position_start, _) = Sedlexing.lexing_positions(lexbuf);
-  let token = get_next_token(lexbuf);
-  let (_, position_end) = Sedlexing.lexing_positions(lexbuf);
-
-  (token, position_start, position_end);
-};
-
 let check_if_three_codepoints_would_start_an_identifier =
   check(check_if_three_codepoints_would_start_an_identifier);
 let check_if_three_code_points_would_start_a_number =
   check(check_if_three_code_points_would_start_a_number);
-
-let consume_whitespace_ = lexbuf => {
-  let _ =
-    switch%sedlex (lexbuf) {
-    | Star(whitespace) => ()
-    | _ => ()
-    };
-  Parser.WS;
-};
 
 // TODO: check 5. without the 0 or .5 without the 0
 let consume_number = lexbuf => {
@@ -737,43 +634,6 @@ let consume_number = lexbuf => {
   (repr, kind); // 6
 };
 
-// https://drafts.csswg.org/css-syntax-3/#consume-url-token
-let consume_url_ = lexbuf => {
-  let _ = consume_whitespace_(lexbuf);
-  let rec read = acc => {
-    let when_whitespace = () => {
-      let _ = consume_whitespace_(lexbuf);
-      switch%sedlex (lexbuf) {
-      | ')' => Ok(Parser.URL(acc))
-      | eof => Error((Parser.URL(acc), Tokens.Eof))
-      | _ =>
-        consume_remnants_bad_url(lexbuf);
-        Ok(Parser.BAD_URL);
-      };
-    };
-    switch%sedlex (lexbuf) {
-    | ')' => Ok(Parser.URL(acc))
-    | eof => Error((Parser.URL(acc), Tokens.Eof))
-    | whitespace => when_whitespace()
-    | '"'
-    | '\''
-    | '('
-    | non_printable_code_point =>
-      consume_remnants_bad_url(lexbuf);
-      // TODO: location on error
-      Error((Parser.BAD_URL, Tokens.Invalid_code_point));
-    | escape =>
-      switch (consume_escaped(lexbuf)) {
-      | Ok(char) => read(acc ++ char)
-      | Error((_, error)) => Error((Parser.BAD_URL, error))
-      }
-    | any => read(acc ++ lexeme(lexbuf))
-    | _ => unreachable(lexbuf)
-    };
-  };
-  read(lexeme(lexbuf));
-};
-
 // https://drafts.csswg.org/css-syntax-3/#consume-string-token
 // TODO: when EOF is bad-string-token or string-token
 // TODO: currently it is a little bit different than the specification
@@ -813,38 +673,6 @@ let handle_consume_identifier =
   fun
   | Error((_, error)) => Error((Parser.BAD_IDENT, error))
   | Ok(string) => Ok(string);
-
-// https://drafts.csswg.org/css-syntax-3/#consume-ident-like-token
-let consume_ident_like = lexbuf => {
-  let read_url = string => {
-    // TODO: the whitespace trickery here?
-    let _ = consume_whitespace_(lexbuf);
-    let is_function =
-      check(lexbuf =>
-        switch%sedlex (lexbuf) {
-        | '\''
-        | '"'
-        | variable => true
-        | _ => false
-        }
-      );
-    is_function(lexbuf)
-      ? Ok(Parser.FUNCTION(string)) : consume_url_(lexbuf);
-  };
-
-  // TODO: should it return IDENT() when error?
-  let.ok string = consume_identifier(lexbuf) |> handle_consume_identifier;
-
-  switch%sedlex (lexbuf) {
-  | '(' =>
-    switch (string) {
-    | "url" => read_url(string)
-    | _ => Ok(Parser.FUNCTION(string))
-    }
-  | _ =>
-    is_tag(string) ? Ok(Parser.TAG(string)) : Ok(Parser.IDENT(string))
-  };
-};
 
 // Check if a unit is a length/angle/time/frequency unit (should use FLOAT_DIMENSION)
 let is_float_unit = unit => {
@@ -960,7 +788,7 @@ let consume = lexbuf => {
         lexeme(~skip=2, ~drop=1, lexbuf) |> String.split_on_char('.'),
       ),
     )
-  | whitespace => Ok(consume_whitespace_(lexbuf))
+  | whitespace => Ok(consume_whitespace(lexbuf))
   | "\"" => consume_string("\"", lexbuf)
   | "#" => consume_hash()
   | "'" => consume_string("'", lexbuf)
@@ -976,9 +804,10 @@ let consume = lexbuf => {
       consume_numeric(lexbuf);
     | _ =>
       let _ = Sedlexing.next(lexbuf);
-      Ok(Parser.DELIM("+"));
+      Ok(Parser.COMBINATOR("+"));
     };
   | "," => Ok(Parser.COMMA)
+  | combinator => Ok(Parser.COMBINATOR(lexeme(lexbuf)))
   | "-" =>
     Sedlexing.rollback(lexbuf);
     consume_minus();
@@ -995,19 +824,16 @@ let consume = lexbuf => {
   | "*" => Ok(Parser.ASTERISK)
   | "&" => Ok(Parser.AMPERSAND)
   | "%" => Ok(Parser.PERCENT)
-  | ">" => Ok(Parser.COMBINATOR(">"))
-  | "~" => Ok(Parser.COMBINATOR("~"))
   | ";" => Ok(Parser.SEMI_COLON)
+  | operator => Ok(Parser.OPERATOR(lexeme(lexbuf)))
   | "<=" => Ok(Parser.DELIM("<="))
   | ">=" => Ok(Parser.DELIM(">="))
   | "<" => Ok(Parser.DELIM("<"))
-  | "@" =>
-    if (check_if_three_codepoints_would_start_an_identifier(lexbuf)) {
-      let.ok string = consume_identifier(lexbuf) |> handle_consume_identifier;
-      Ok(Parser.AT_RULE(string));
-    } else {
-      Ok(Parser.DELIM("@"));
-    }
+  | at_keyframes => Ok(Parser.AT_KEYFRAMES(lexeme(~skip=1, lexbuf)))
+  | at_rule_without_body =>
+    Ok(Parser.AT_RULE_STATEMENT(lexeme(~skip=1, lexbuf)))
+  | at_rule => Ok(Parser.AT_RULE(lexeme(~skip=1, lexbuf)))
+  | "@" => Ok(Parser.DELIM("@"))
   | "[" => Ok(Parser.LEFT_BRACKET)
   | "]" => Ok(Parser.RIGHT_BRACKET)
   | "\\" =>
@@ -1019,6 +845,7 @@ let consume = lexbuf => {
     // TODO: this error should be different
     | _ => Error((Parser.DELIM("/"), Invalid_code_point))
     };
+  | important => Ok(Parser.IMPORTANT)
   | digit =>
     let _ = Sedlexing.backtrack(lexbuf);
     consume_numeric(lexbuf);
@@ -1079,6 +906,21 @@ let tokenize = input => {
   try(loop([])) {
   | LexingError((_start_pos, _end_pos, msg)) => Error(msg)
   };
+};
+
+let get_next_tokens_with_location = lexbuf => {
+  let (position_start, _) = Sedlexing.lexing_positions(lexbuf);
+  let result = consume(lexbuf);
+  let (_, position_end) = Sedlexing.lexing_positions(lexbuf);
+
+  // Handle Result type - return token regardless of Ok/Error
+  let token =
+    switch (result) {
+    | Ok(tok) => tok
+    | Error((tok, _err)) => tok // Return error token, store error in token_with_location
+    };
+
+  (token, position_start, position_end);
 };
 
 let render_token =

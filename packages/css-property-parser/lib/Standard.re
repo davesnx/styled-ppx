@@ -2,11 +2,27 @@ open Styled_ppx_css_parser.Tokens;
 open Rule.Let;
 open Rule.Pattern;
 
-let keyword =
-  fun
+let keyword = kw => {
+  switch (kw) {
   | "<=" => expect(DELIM("<="))
   | ">=" => expect(DELIM(">="))
-  | s => expect(IDENT(s));
+  | _ =>
+    // Keywords can be TAG or IDENT tokens (e.g., "sub" is both a CSS keyword and HTML tag)
+    token(
+      fun
+      | IDENT(s) when s == kw => Ok()
+      | TAG(s) when s == kw => Ok()
+      | token =>
+        Error([
+          "Expected '"
+          ++ kw
+          ++ "' but instead got '"
+          ++ humanize(token)
+          ++ "'.",
+        ]),
+    )
+  };
+};
 
 let comma = expect(COMMA);
 let delim =
@@ -17,6 +33,10 @@ let delim =
   | "]" => expect(RIGHT_BRACKET)
   | ":" => expect(COLON)
   | ";" => expect(SEMI_COLON)
+  // Combinators can appear as delimiters in value context (e.g., calc)
+  | "+" => expect(COMBINATOR("+"))
+  | "~" => expect(COMBINATOR("~"))
+  | ">" => expect(COMBINATOR(">"))
   | s => expect(DELIM(s));
 
 let function_call = (name, rule) => {
@@ -61,6 +81,7 @@ let number =
 let length =
   token(token =>
     switch (token) {
+    | FLOAT_DIMENSION((number_str, dimension))
     | DIMENSION((number_str, dimension)) =>
       let number = Float.of_string(number_str);
       switch (dimension) {
@@ -107,6 +128,7 @@ let length =
 let angle =
   token(token =>
     switch (token) {
+    | FLOAT_DIMENSION((number_str, dimension))
     | DIMENSION((number_str, dimension)) =>
       let number = Float.of_string(number_str);
       switch (dimension) {
@@ -125,6 +147,7 @@ let angle =
 let time =
   token(token =>
     switch (token) {
+    | FLOAT_DIMENSION((number_str, dimension))
     | DIMENSION((number_str, dimension)) =>
       let number = Float.of_string(number_str);
       switch (dimension) {
@@ -140,6 +163,7 @@ let time =
 let frequency =
   token(token =>
     switch (token) {
+    | FLOAT_DIMENSION((number_str, dimension))
     | DIMENSION((number_str, dimension)) =>
       let number = Float.of_string(number_str);
       switch (dimension |> String.lowercase_ascii) {
@@ -155,6 +179,7 @@ let frequency =
 let resolution =
   token(token =>
     switch (token) {
+    | FLOAT_DIMENSION((number_str, dimension))
     | DIMENSION((number_str, dimension)) =>
       let number = Float.of_string(number_str);
       switch (dimension |> String.lowercase_ascii) {
@@ -181,6 +206,7 @@ let ident =
   token(
     fun
     | IDENT(string) => Ok(string)
+    | TAG(string) => Ok(string)
     | _ => Error(["Expected an indentifier."]),
   );
 
@@ -200,6 +226,7 @@ let custom_ident =
   token(
     fun
     | IDENT(string) => Ok(string)
+    | TAG(string) => Ok(string)
     | STRING(string) => Ok(string)
     | _ => Error(["Expected an identifier."]),
   );
@@ -251,28 +278,12 @@ let hex_color =
      `$()` only supports variables and Module accessors to variables.
      In compile-time the bs-css bindings would enforce the types of those variables.
    */
-let interpolation = {
-  open Rule;
-  open Rule.Let;
-
-  let.bind_match _ = Pattern.expect(DELIM("$"));
-  let.bind_match _ = Pattern.expect(LEFT_PAREN);
-  let.bind_match path = {
-    let.bind_match path =
-      Modifier.zero_or_more(
-        {
-          let.bind_match ident = ident;
-          let.bind_match _ = Pattern.expect(DELIM("."));
-          Match.return(ident);
-        },
-      );
-    let.bind_match ident = ident;
-    Match.return(path @ [ident]);
-  };
-  let.bind_match _ = Pattern.expect(RIGHT_PAREN);
-
-  Match.return(path);
-};
+let interpolation =
+  token(
+    fun
+    | INTERPOLATION(parts) => Ok(parts)
+    | _ => Error(["Expected interpolation."]),
+  );
 
 let media_type =
   token(
@@ -341,10 +352,13 @@ let custom_ident_without_span_or_auto =
   token(
     fun
     | IDENT("auto")
+    | TAG("auto")
     | STRING("auto")
     | IDENT("span")
+    | TAG("span")
     | STRING("span") => Error(["Custom ident cannot be span or auto."])
     | IDENT(string) => Ok(string)
+    | TAG(string) => Ok(string)
     | STRING(string) => Ok(string)
     | _ => Error(["expected an identifier."]),
   );
@@ -363,6 +377,7 @@ let ident_token =
   token(
     fun
     | IDENT(string) => Ok(string)
+    | TAG(string) => Ok(string)
     | _ => Error(["expected an identifier."]),
   );
 
