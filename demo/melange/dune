@@ -3,6 +3,13 @@
  (target demo-melange)
  (libraries universal_lib_js styled-ppx.melange reason-react)
  (preprocess
-  (pps melange.ppx reason-react-ppx styled-ppx --output=./generated))
+  (pps melange.ppx reason-react-ppx styled-ppx))
  (module_systems
   (commonjs bs.js)))
+
+(rule
+ (target styles.css)
+ (deps
+  (glob_files_rec %{project_root}/**.pp.ml))
+ (action
+  (run styled-ppx.generate --output %{target} --verbose %{deps})))

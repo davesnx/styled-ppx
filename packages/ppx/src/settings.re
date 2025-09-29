@@ -40,20 +40,12 @@ let debug = {
   defaultValue: false,
 };
 
-let output = {
-  flag: "--output",
-  doc: "Required when using %cx2. Specify the directory where CSS files should be generated (e.g., --output=./styles)",
-  value: None,
-  defaultValue: ".",
-};
-
 type settings = {
   jsxVersion: flag(int),
   jsxMode: flag(string),
   production: flag(bool),
   native: flag(bool),
   debug: flag(bool),
-  output: flag(string),
 };
 
 let currentSettings =
@@ -63,7 +55,6 @@ let currentSettings =
     production,
     native,
     debug,
-    output,
   });
 
 let updateSettings = newSettings => currentSettings := newSettings;
@@ -84,9 +75,6 @@ module Get = {
   let debug = () =>
     currentSettings.contents.debug.value
     |> Option.value(~default=currentSettings.contents.debug.defaultValue);
-  let output = () =>
-    currentSettings.contents.output.value
-    |> Option.value(~default=currentSettings.contents.output.defaultValue);
 };
 
 module Update = {
@@ -127,14 +115,6 @@ module Update = {
       ...currentSettings.contents,
       debug: {
         ...currentSettings.contents.debug,
-        value: Some(value),
-      },
-    });
-  let output = value =>
-    updateSettings({
-      ...currentSettings.contents,
-      output: {
-        ...currentSettings.contents.output,
         value: Some(value),
       },
     });

@@ -1,8 +1,6 @@
 (rule
  (target styles.css)
- (deps
-  (:universal-css-file
-   %{project_root}/demo/universal/js/generated/styles.css))
  (mode promote)
+ (deps ../styles.css)
  (action
-  (copy %{universal-css-file} %{target})))
+  (copy %{deps} %{target})))

@@ -8,7 +8,7 @@ This test ensures error locations are reported accurately for CSS property error
   > (executable
   >  (name input)
   >  (libraries styled-ppx.native server-reason-react.react)
-  >  (preprocess (pps server-reason-react.ppx styled-ppx --output=./styles)))
+  >  (preprocess (pps server-reason-react.ppx styled-ppx)))
   > EOF
 
 Test error location accuracy

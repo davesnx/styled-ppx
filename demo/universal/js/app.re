@@ -435,7 +435,7 @@ let selectedInfo = [%cx2
 
 let buttonContainer = [%cx2
   {|
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
   text-align: center;
 |}
 ];

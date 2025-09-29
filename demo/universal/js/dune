@@ -4,7 +4,7 @@
  (modes melange)
  (libraries melange.belt styled-ppx.melange reason-react)
  (preprocess
-  (pps melange.ppx styled-ppx --output=./generated reason-react-ppx)))
+  (pps melange.ppx styled-ppx reason-react-ppx)))
 
 (copy_files
  (only_sources)

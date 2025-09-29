@@ -1,0 +1,25 @@
+(library
+ (name mylib)
+ (modules mylib)
+ (modes melange)
+ (libraries styled-ppx.melange reason-react melange.belt melange.dom)
+ (preprocess
+  (pps styled-ppx --debug)))
+
+(rule
+ (target styles.css)
+ (mode promote)
+ (deps
+  (glob_files *.pp.ml))
+ (action
+  (with-stdout-to
+   %{target}
+   (run styled-ppx.generate %{deps}))))
+
+(melange.emit
+ (alias melange-emit-only)
+ (target melange-emit-only)
+ (modules app)
+ (libraries mylib styled-ppx.melange reason-react melange.belt melange.dom)
+ (preprocess
+  (pps styled-ppx)))

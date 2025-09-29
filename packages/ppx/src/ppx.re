@@ -512,6 +512,25 @@ module Mapper = {
   };
 };
 
+/* let createAttribute = (~loc, ~name, value) => {
+     let attrName: Ppxlib.loc(string) = {
+       Ppxlib.txt: name,
+       loc,
+     };
+     let attrPayload =
+       Ppxlib.PStr([
+         Builder.pstr_eval(~loc, Builder.estring(~loc, value), []),
+       ]);
+
+     let attribute: Ppxlib.attribute = {
+       attr_loc: loc,
+       attr_name: attrName,
+       attr_payload: attrPayload,
+     };
+
+     Builder.pstr_attribute(~loc, attribute);
+   }; */
+
 let is_jsx = expr => {
   switch (expr.Ppxlib.pexp_desc) {
   | Pexp_apply(tag, _args) =>
@@ -929,12 +948,6 @@ let () = {
     Arg.Unit(_ => Settings.Update.debug(true)),
   );
 
-  Ppxlib.Driver.add_arg(
-    ~doc=Settings.output.doc,
-    Settings.output.flag,
-    Arg.String(path => Settings.Update.output(path)),
-  );
-
   let (version, mode) = Bsconfig.getJSX();
 
   switch (version) {
@@ -956,7 +969,14 @@ let () = {
     }
   };
 
+  let impl = (_ctx, str: Ppxlib.structure) => {
+    let loc = Ppxlib.Location.none;
+    let css = Css_file.get();
+    [[%stri [@css [%e Builder.estring(~loc, css)]]], ...str];
+  };
+
   Ppxlib.Driver.V2.register_transformation(
+    ~impl,
     ~instrument=
       Ppxlib.Driver.Instrument.make(~position=Before, traverser#structure),
     ~rules=[

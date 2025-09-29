@@ -3,9 +3,3 @@
  (public_name styled-ppx)
  (modules bin)
  (libraries styled-ppx ppxlib))
-
-(executable
- (name extract)
- (public_name styled-ppx-extract)
- (modules extract)
- (libraries ppxlib unix))
