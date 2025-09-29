@@ -971,8 +971,10 @@ let () = {
 
   let impl = (_ctx, str: Ppxlib.structure) => {
     let loc = Ppxlib.Location.none;
-    let css = Css_file.get();
-    [[%stri [@css [%e Builder.estring(~loc, css)]]], ...str];
+    switch (Css_file.get()) {
+    | "" => str
+    | css => [[%stri [@css [%e Builder.estring(~loc, css)]]], ...str]
+    };
   };
 
   Ppxlib.Driver.V2.register_transformation(
