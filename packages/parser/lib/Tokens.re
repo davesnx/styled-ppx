@@ -119,7 +119,7 @@ let token_to_debug =
   | Parser.NUMBER(s) => "NUMBER(\"" ++ s ++ "\")"
   | Parser.UNICODE_RANGE(s) => "UNICODE_RANGE(\"" ++ s ++ "\")"
   | Parser.FLOAT_DIMENSION((n, s)) =>
-    "FLOAT_DIMENSION(\"" ++ n ++ "', \"" ++ s ++ "\")"
+    "FLOAT_DIMENSION(\"" ++ n ++ "\", \"" ++ s ++ "\")"
   | Parser.DIMENSION((n, d)) => "DIMENSION(\"" ++ n ++ "\", \"" ++ d ++ "\")"
   | Parser.INTERPOLATION(v) => "VARIABLE(\"" ++ String.concat(".", v) ++ "\")"
   | Parser.COMBINATOR(s) => "COMBINATOR(" ++ s ++ ")"
