@@ -1,4 +1,4 @@
-open Styled_ppx_css_parser.Tokens;
+module Tokens = Styled_ppx_css_parser.Tokens;
 
 /*
    A rule is a function that maps a list of tokens into a tuple where
@@ -8,7 +8,7 @@ open Styled_ppx_css_parser.Tokens;
 
 type error = list(string);
 type data('a) = result('a, error);
-type rule('a) = list(token) => (data('a), list(token));
+type rule('a) = list(Tokens.t) => (data('a), list(Tokens.t));
 
 type return('a, 'b) = 'b => rule('a);
 type bind('a, 'b, 'c) = (rule('a), 'b => rule('c)) => rule('c);
@@ -70,8 +70,8 @@ module Let: {
  */
 module Pattern: {
   let identity: rule(unit);
-  let next: rule(token);
-  let token: (token => data('a)) => rule('a);
-  let expect: token => rule(unit);
+  let next: rule(Tokens.t);
+  let token: (Tokens.t => data('a)) => rule('a);
+  let expect: Tokens.t => rule(unit);
   let value: ('a, rule(unit)) => rule('a);
 };

@@ -1,4 +1,4 @@
-let cosas = `underlin;
+let cosas = `bold;
 
 [%cx
   {|

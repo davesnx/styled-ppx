@@ -1,8 +1,8 @@
-open Styled_ppx_css_parser.Tokens;
+module Tokens = Styled_ppx_css_parser.Tokens;
 
 type error = list(string);
 type data('a) = result('a, error);
-type rule('a) = list(token) => (data('a), list(token));
+type rule('a) = list(Tokens.t) => (data('a), list(Tokens.t));
 
 type return('a, 'b) = 'b => rule('a);
 type bind('a, 'b, 'c) = (rule('a), 'b => rule('c)) => rule('c);
@@ -129,10 +129,10 @@ module Pattern = {
       | token =>
         Error([
           "Expected '"
-          ++ humanize(expected)
+          ++ Tokens.humanize(expected)
           ++ "' but instead got "
           ++ "'"
-          ++ humanize(token)
+          ++ Tokens.humanize(token)
           ++ "'.",
         ]),
     );

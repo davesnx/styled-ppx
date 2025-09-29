@@ -1966,10 +1966,10 @@ let apply_parser = (parser, tokens_with_loc) => {
          | Ok(token) => token
          | Error((token, _)) => token
          }
-       )
-    |> List.rev;
+       );
 
-  let tokens_without_ws = tokens |> List.filter((!=)(Tokens.WS));
+  let tokens_without_ws =
+    tokens |> List.filter((!=)(Styled_ppx_css_parser.Parser.WS));
 
   let (output, remaining_tokens) = parser(tokens_without_ws);
   let.ok output =
@@ -1982,7 +1982,7 @@ let apply_parser = (parser, tokens_with_loc) => {
   let.ok () =
     switch (remaining_tokens) {
     | []
-    | [Tokens.EOF] => Ok()
+    | [Styled_ppx_css_parser.Parser.EOF] => Ok()
     | tokens =>
       let tokens =
         tokens |> List.map(Tokens.show_token) |> String.concat(", ");
@@ -1993,7 +1993,7 @@ let apply_parser = (parser, tokens_with_loc) => {
 
 let parse = (rule_parser: Rule.rule('a), input) => {
   let tokens_with_loc = Styled_ppx_css_parser.Lexer.from_string(input);
-  apply_parser(rule_parser, tokens_with_loc)
+  apply_parser(rule_parser, tokens_with_loc);
 };
 
 let check = (prop: Rule.rule('a), value) =>

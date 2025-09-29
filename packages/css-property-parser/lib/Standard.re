@@ -2,11 +2,27 @@ open Styled_ppx_css_parser.Tokens;
 open Rule.Let;
 open Rule.Pattern;
 
-let keyword =
-  fun
-  | "<=" => expect(LTE)
-  | ">=" => expect(GTE)
-  | s => expect(IDENT(s));
+let keyword = kw => {
+  switch (kw) {
+  | "<=" => expect(DELIM("<="))
+  | ">=" => expect(DELIM(">="))
+  | _ =>
+    // Keywords can be TAG or IDENT tokens (e.g., "sub" is both a CSS keyword and HTML tag)
+    token(
+      fun
+      | IDENT(s) when s == kw => Ok()
+      | TAG(s) when s == kw => Ok()
+      | token =>
+        Error([
+          "Expected '"
+          ++ kw
+          ++ "' but instead got '"
+          ++ humanize(token)
+          ++ "'.",
+        ]),
+    )
+  };
+};
 
 let comma = expect(COMMA);
 let delim =
@@ -17,6 +33,12 @@ let delim =
   | "]" => expect(RIGHT_BRACKET)
   | ":" => expect(COLON)
   | ";" => expect(SEMI_COLON)
+  | "*" => expect(ASTERISK)
+  | "." => expect(DOT)
+  // Combinators can appear as delimiters in value context (e.g., calc)
+  | "+" => expect(COMBINATOR("+"))
+  | "~" => expect(COMBINATOR("~"))
+  | ">" => expect(COMBINATOR(">"))
   | s => expect(DELIM(s));
 
 let function_call = (name, rule) => {
@@ -41,10 +63,10 @@ let function_call = (name, rule) => {
 let integer =
   token(
     fun
-    | NUMBER(float) =>
+    | NUMBER(string) =>
       Float.(
-        is_integer(float)
-          ? Ok(float |> to_int)
+        is_integer(Float.of_string(string))
+          ? Ok(Float.of_string(string) |> to_int)
           : Error(["Expected an integer, got a float instead."])
       )
     | _ => Error(["Expected an integer."]),
@@ -53,7 +75,7 @@ let integer =
 let number =
   token(
     fun
-    | NUMBER(float) => Ok(float)
+    | NUMBER(num_str) => Ok(Float.of_string(num_str))
     | token =>
       Error(["Expected a number. Got '" ++ humanize(token) ++ "' instead."]),
   );
@@ -61,7 +83,9 @@ let number =
 let length =
   token(token =>
     switch (token) {
-    | DIMENSION(number, dimension) =>
+    | FLOAT_DIMENSION((number_str, dimension))
+    | DIMENSION((number_str, dimension)) =>
+      let number = Float.of_string(number_str);
       switch (dimension) {
       | "cap" => Ok(`Cap(number))
       | "ch" => Ok(`Ch(number))
@@ -96,8 +120,8 @@ let length =
       | "pc" => Ok(`Pc(number))
       | "pt" => Ok(`Pt(number))
       | dim => Error(["Invalid length unit '" ++ dim ++ "'."])
-      }
-    | NUMBER(0.) => Ok(`Zero)
+      };
+    | NUMBER("0") => Ok(`Zero)
     | _ => Error(["Expected length."])
     }
   );
@@ -106,15 +130,17 @@ let length =
 let angle =
   token(token =>
     switch (token) {
-    | DIMENSION(number, dimension) =>
+    | FLOAT_DIMENSION((number_str, dimension))
+    | DIMENSION((number_str, dimension)) =>
+      let number = Float.of_string(number_str);
       switch (dimension) {
       | "deg" => Ok(`Deg(number))
       | "grad" => Ok(`Grad(number))
       | "rad" => Ok(`Rad(number))
       | "turn" => Ok(`Turn(number))
       | dim => Error(["Invalid angle unit '" ++ dim ++ "'."])
-      }
-    | NUMBER(0.) => Ok(`Deg(0.))
+      };
+    | NUMBER("0") => Ok(`Deg(0.))
     | _ => Error(["Expected angle."])
     }
   );
@@ -123,12 +149,14 @@ let angle =
 let time =
   token(token =>
     switch (token) {
-    | DIMENSION(number, dimension) =>
+    | FLOAT_DIMENSION((number_str, dimension))
+    | DIMENSION((number_str, dimension)) =>
+      let number = Float.of_string(number_str);
       switch (dimension) {
       | "s" => Ok(`S(number))
       | "ms" => Ok(`Ms(number))
       | un => Error(["Invalid time unit '" ++ un ++ "'."])
-      }
+      };
     | _ => Error(["Expected time."])
     }
   );
@@ -137,12 +165,14 @@ let time =
 let frequency =
   token(token =>
     switch (token) {
-    | DIMENSION(number, dimension) =>
+    | FLOAT_DIMENSION((number_str, dimension))
+    | DIMENSION((number_str, dimension)) =>
+      let number = Float.of_string(number_str);
       switch (dimension |> String.lowercase_ascii) {
       | "hz" => Ok(`Hz(number))
       | "khz" => Ok(`KHz(number))
       | dim => Error(["Invalid frequency unit '" ++ dim ++ "'."])
-      }
+      };
     | _ => Error(["Expected frequency."])
     }
   );
@@ -151,25 +181,26 @@ let frequency =
 let resolution =
   token(token =>
     switch (token) {
-    | DIMENSION(number, dimension) =>
+    | FLOAT_DIMENSION((number_str, dimension))
+    | DIMENSION((number_str, dimension)) =>
+      let number = Float.of_string(number_str);
       switch (dimension |> String.lowercase_ascii) {
       | "dpi" => Ok(`Dpi(number))
       | "dpcm" => Ok(`Dpcm(number))
       | "x"
       | "dppx" => Ok(`Dppx(number))
       | dim => Error(["Invalid resolution unit '" ++ dim ++ "'."])
-      }
+      };
     | _ => Error(["Expected resolution."])
     }
   );
 
 // TODO: positive numbers like <number [0,infinity]>
-let percentage =
-  token(
-    fun
-    | PERCENTAGE(float) => Ok(float)
-    | _ => Error(["Expected percentage."]),
-  );
+let percentage = {
+  let.bind_match num = number;
+  let.bind_match () = expect(PERCENT);
+  Rule.Match.return(num);
+};
 
 // https://drafts.csswg.org/css-values-4/#css-identifier
 // TODO: differences between <ident> and keyword
@@ -177,6 +208,7 @@ let ident =
   token(
     fun
     | IDENT(string) => Ok(string)
+    | TAG(string) => Ok(string)
     | _ => Error(["Expected an indentifier."]),
   );
 
@@ -196,6 +228,7 @@ let custom_ident =
   token(
     fun
     | IDENT(string) => Ok(string)
+    | TAG(string) => Ok(string)
     | STRING(string) => Ok(string)
     | _ => Error(["Expected an identifier."]),
   );
@@ -237,7 +270,7 @@ let url_no_interp = {
 let hex_color =
   token(
     fun
-    | HASH(str, _) when String.length(str) >= 3 && String.length(str) <= 8 =>
+    | HASH(str) when String.length(str) >= 3 && String.length(str) <= 8 =>
       Ok(str)
     | _ => Error(["Expected a hex-color."]),
   );
@@ -247,28 +280,12 @@ let hex_color =
      `$()` only supports variables and Module accessors to variables.
      In compile-time the bs-css bindings would enforce the types of those variables.
    */
-let interpolation = {
-  open Rule;
-  open Rule.Let;
-
-  let.bind_match _ = Pattern.expect(DELIM("$"));
-  let.bind_match _ = Pattern.expect(LEFT_PAREN);
-  let.bind_match path = {
-    let.bind_match path =
-      Modifier.zero_or_more(
-        {
-          let.bind_match ident = ident;
-          let.bind_match _ = Pattern.expect(DELIM("."));
-          Match.return(ident);
-        },
-      );
-    let.bind_match ident = ident;
-    Match.return(path @ [ident]);
-  };
-  let.bind_match _ = Pattern.expect(RIGHT_PAREN);
-
-  Match.return(path);
-};
+let interpolation =
+  token(
+    fun
+    | INTERPOLATION(parts) => Ok(parts)
+    | _ => Error(["Expected interpolation."]),
+  );
 
 let media_type =
   token(
@@ -316,17 +333,19 @@ let container_name = {
 let flex_value =
   token(
     fun
-    | DIMENSION(number, dimension) =>
-      switch (dimension) {
-      | "fr" => Ok(`Fr(number))
-      | _ =>
-        Error([
-          Format.sprintf(
-            "Invalid flex value %g%s, only fr is valid.",
-            number,
-            dimension,
-          ),
-        ])
+    | DIMENSION((number_str, dimension)) => {
+        let num = Float.of_string(number_str);
+        switch (dimension) {
+        | "fr" => Ok(`Fr(num))
+        | _ =>
+          Error([
+            Format.sprintf(
+              "Invalid flex value %g%s, only fr is valid.",
+              num,
+              dimension,
+            ),
+          ])
+        };
       }
     | _ => Error(["Expected flex_value."]),
   );
@@ -335,10 +354,13 @@ let custom_ident_without_span_or_auto =
   token(
     fun
     | IDENT("auto")
+    | TAG("auto")
     | STRING("auto")
     | IDENT("span")
+    | TAG("span")
     | STRING("span") => Error(["Custom ident cannot be span or auto."])
     | IDENT(string) => Ok(string)
+    | TAG(string) => Ok(string)
     | STRING(string) => Ok(string)
     | _ => Error(["expected an identifier."]),
   );
@@ -357,6 +379,7 @@ let ident_token =
   token(
     fun
     | IDENT(string) => Ok(string)
+    | TAG(string) => Ok(string)
     | _ => Error(["expected an identifier."]),
   );
 
