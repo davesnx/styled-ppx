@@ -1992,10 +1992,8 @@ let apply_parser = (parser, tokens_with_loc) => {
 };
 
 let parse = (rule_parser: Rule.rule('a), input) => {
-  switch (Styled_ppx_css_parser.Lexer.from_string(input)) {
-  | Ok(tokens_with_loc) => apply_parser(rule_parser, tokens_with_loc)
-  | Error(`Frozen) => Error("frozen")
-  };
+  let tokens_with_loc = Styled_ppx_css_parser.Lexer.from_string(input);
+  apply_parser(rule_parser, tokens_with_loc)
 };
 
 let check = (prop: Rule.rule('a), value) =>

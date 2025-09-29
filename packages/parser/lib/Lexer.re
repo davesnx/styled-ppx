@@ -963,8 +963,7 @@ let from_string = string => {
 
     let acc = [token_with_loc, ...acc];
     switch (value) {
-    | Ok(EOF) => Ok(acc)
-    | _ when loc_start.pos_cnum == loc_end.pos_cnum => Error(`Frozen)
+    | Ok(EOF) => acc
     | _ => read(acc)
     };
   };

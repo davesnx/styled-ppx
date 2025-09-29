@@ -166,15 +166,10 @@ let error_tests =
      });
 
 let parse = input => {
-  let values =
-    switch (Lexer.from_string(input)) {
-    | Ok(values) => values
-    | Error(`Frozen) => failwith("Lexer got frozen")
-    };
-
-  let Lexer.{loc, _} = List.hd(values);
+  let values = Lexer.from_string(input);
+  let {loc: first_loc, _}: Lexer.token_with_location = List.hd(values);
   let values = values |> List.map((Lexer.{txt, _}) => txt);
-  (loc, values);
+  (first_loc, values);
 };
 
 let render_token =
