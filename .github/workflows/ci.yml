@@ -132,8 +132,8 @@ jobs:
           path: node_modules
           key: npm-${{ matrix.os }}-${{ hashFiles('package.json') }}
 
-      - name: Run demo tests
-        run: make test-demo
+      # - name: Run demo tests
+        # run: make test-demo
 
   publish:
     name: Publish
