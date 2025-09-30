@@ -1,14 +1,13 @@
-open Ppxlib;
 open Css_property_parser;
 
-module Helper = Ast_helper;
+module Helper = Ppxlib.Ast_helper;
 module Builder = Ppxlib.Ast_builder.Default;
 
 exception Invalid_value(string);
 
-let loc = Location.none;
+let loc = Ppxlib.Location.none;
 let txt = txt => {
-  Location.loc: Location.none,
+  Ppxlib.Location.loc: Ppxlib.Location.none,
   txt,
 };
 
@@ -22,14 +21,16 @@ let render_string = string =>
 let render_integer = integer =>
   Helper.Const.int(integer) |> Helper.Exp.constant;
 
-let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
+let list_to_longident = vars =>
+  vars |> String.concat(".") |> Ppxlib.Longident.parse;
 
 let render_variable = name =>
   list_to_longident(name) |> txt |> Helper.Exp.ident;
 
 type transform('ast, 'value) = {
   ast_of_string: string => result('ast, string),
-  string_to_expr: string => result(list(Parsetree.expression), string),
+  string_to_expr:
+    string => result(list(Ppxlib.Parsetree.expression), string),
 };
 
 let emit = (property, value_of_ast, value_to_expr) => {

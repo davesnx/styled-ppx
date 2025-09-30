@@ -1,12 +1,10 @@
 /* This file aims at abstracing away the differences between Melange and ReScript attributes. */
 
-open Ppxlib;
-
-module Helper = Ast_helper;
+module Helper = Ppxlib.Ast_helper;
 module Builder = Ppxlib.Ast_builder.Default;
 
 let withLoc = (~loc, txt) => {
-  loc,
+  Ppxlib.Location.loc,
   txt,
 };
 
@@ -43,7 +41,10 @@ module ReScriptAttributes = {
         Helper.Str.mk(
           ~loc,
           Pstr_eval(
-            Helper.Exp.ident(~loc, withLoc(Lident("abstract"), ~loc)),
+            Helper.Exp.ident(
+              ~loc,
+              withLoc(Ppxlib.Lident("abstract"), ~loc),
+            ),
             [],
           ),
         ),
@@ -105,9 +106,12 @@ module MelangeAttributes = {
               [
                 Helper.Exp.ident(
                   ~loc,
-                  withLoc(Lident("jsProperties"), ~loc),
+                  withLoc(Ppxlib.Lident("jsProperties"), ~loc),
                 ),
-                Helper.Exp.ident(~loc, withLoc(Lident("getSet"), ~loc)),
+                Helper.Exp.ident(
+                  ~loc,
+                  withLoc(Ppxlib.Lident("getSet"), ~loc),
+                ),
               ],
             ),
             [],
