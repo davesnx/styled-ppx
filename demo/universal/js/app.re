@@ -42,6 +42,7 @@ let container = [%cx2
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
 |}
 ];
 
