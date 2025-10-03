@@ -6,7 +6,7 @@
   alcotest
   alcotest_extra
   styled-ppx.css-property-parser
-  reason_css_parser_ppx_lib
+  reason_css_parser_ppx_generate
   styled-ppx.css-parser
   ppxlib
   ppxlib.astlib
