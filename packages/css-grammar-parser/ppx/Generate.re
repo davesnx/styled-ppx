@@ -451,7 +451,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     let type_anotation = [%type:
       list(Styled_ppx_css_parser.Tokens.t) =>
       (
-        Css_property_parser__Rule.data([%t core_type]),
+        Css_grammar_parser__Rule.data([%t core_type]),
         list(Styled_ppx_css_parser.Tokens.t),
       )
     ];
@@ -704,5 +704,81 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     | Combinator(kind, values) => combinator_op(kind, values)
     | Function_call(name, value) => function_call(name, value)
     };
+  };
+
+  /* Module rec support - generate toString stub */
+  let make_to_string = (_value: Css_spec_parser.value) => {
+    [%expr fun (_v : t) => ""]
+  };
+
+  /* Extract module binding info from module rec */
+  let get_module_binding_info = (mb: Ppxlib.module_binding) => {
+    switch (mb) {
+    | {
+        pmb_name: {txt: Some(module_name), _},
+        pmb_expr: {
+          pmod_desc: Pmod_extension((
+            {txt: "value.rec", _},
+            PStr([{
+              pstr_desc: Pstr_eval({
+                pexp_desc: Pexp_constant(Pconst_string(value_spec, _loc, _delim)),
+                _
+              }, _attrs),
+              _
+            }]),
+          )),
+          _
+        },
+        _
+      } => Some((module_name, value_spec))
+    | _ => None
+    };
+  };
+
+  /* Generate a complete module with signature */
+  let make_module = (module_name: string, value_spec: string) => {
+    switch (Css_spec_parser.value_of_string(value_spec)) {
+    | Some(ast) =>
+      let core_type = create_type_parser(ast);
+      let parse_expr = make_value(ast);
+      let to_string_expr = make_to_string(ast);
+
+      /* Module signature */
+      let sig_t = [%sigi: type t];
+      let sig_parse = Ast_helper.Sig.value(~loc,
+        Ast_helper.Val.mk(~loc, {txt: "parse", loc}, [%type:
+          list(Styled_ppx_css_parser.Tokens.t) =>
+          (Css_grammar_parser__Rule.data(t), list(Styled_ppx_css_parser.Tokens.t))
+        ])
+      );
+      let sig_toString = Ast_helper.Sig.value(~loc,
+        Ast_helper.Val.mk(~loc, {txt: "toString", loc}, [%type: t => string])
+      );
+      let module_type = Ast_helper.Mty.signature(~loc, [sig_t, sig_parse, sig_toString]);
+
+      /* Module implementation */
+      let type_decl = make_type_declaration("t", core_type);
+      let type_item = Ast_helper.Str.type_(~loc, Nonrecursive, [type_decl]);
+
+      let parse_val = [%stri let parse = [%e parse_expr]];
+      let toString_val = [%stri let toString = [%e to_string_expr]];
+
+      let module_struct = Ast_helper.Mod.structure(~loc, [type_item, parse_val, toString_val]);
+      let mb = Ast_helper.Mb.mk(~loc, {txt: Some(module_name), loc}, Ast_helper.Mod.constraint_(~loc, module_struct, module_type));
+
+      Some(mb);
+    | None => None
+    };
+  };
+
+  /* Generate all modules from module rec bindings */
+  let make_modules = (module_bindings: list(Ppxlib.module_binding)) => {
+    module_bindings
+    |> List.filter_map(mb => {
+         switch (get_module_binding_info(mb)) {
+         | Some((module_name, value_spec)) => make_module(module_name, value_spec)
+         | None => None
+         }
+       });
   };
 };

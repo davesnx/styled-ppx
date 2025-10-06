@@ -1,0 +1,12 @@
+(executable
+ (name as_standalone)
+ (public_name as_standalone)
+ (libraries reason_css_parser_ppx ppxlib))
+
+(cram
+ (alias test-css-spec-types)
+ (deps
+  %{exe:as_standalone.exe}
+  %{bin:refmt}
+  %{bin:ocamlformat}
+  (package styled-ppx)))

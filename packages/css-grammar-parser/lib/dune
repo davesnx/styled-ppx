@@ -1,6 +1,6 @@
 (library
- (name Css_property_parser)
- (public_name styled-ppx.css-property-parser)
+ (name Css_grammar_parser)
+ (public_name styled-ppx.css-grammar-parser)
  (libraries
   sedlex
   styled-ppx.css-parser ; since we use the Tokens from the CSS parser

@@ -66,7 +66,7 @@ release-static:
 
 # Testing commands
 
-TEST_TARGETS := test-parser test-css-property-parser test-ppx-native test-ppx-snapshot-reason  test-css-support test-css-spec-types test-runtime test-murmur2 test-css-spec-parser test-string-interpolation
+TEST_TARGETS := test-parser test-css-grammar-parser test-ppx-native test-ppx-snapshot-reason  test-css-support test-css-spec-types test-runtime test-murmur2 test-css-spec-parser test-string-interpolation
 # Disabled test-ppx-snapshot-rescript
 
 # Create targets with the format "test-{{target_name}}-{{ "watch" | "promote" }}"

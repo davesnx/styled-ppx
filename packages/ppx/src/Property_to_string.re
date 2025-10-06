@@ -1,4 +1,4 @@
-open Css_property_parser;
+open Css_grammar_parser;
 
 module Helper = Ppxlib.Ast_helper;
 module Builder = Ppxlib.Ast_builder.Default;
@@ -150,7 +150,7 @@ let render_length =
   | `Zero => render_string("0");
 
 let rec render_function_calc =
-        (calc_sum: Css_property_parser.Parser.Types.calc_sum) => {
+        (calc_sum: Css_grammar_parser.Parser.Types.calc_sum) => {
   [%expr "calc(" ++ [%e render_calc_sum(calc_sum)] ++ ")"];
 }
 and render_calc_sum = ((product, sums)) => {

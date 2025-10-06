@@ -2,8 +2,8 @@ module Location = Ppxlib.Location;
 module Parsetree = Ppxlib.Parsetree;
 module Builder = Ppxlib.Ast_builder.Default;
 
-module Standard = Css_property_parser.Standard;
-module Property_parser = Css_property_parser.Parser;
+module Standard = Css_grammar_parser.Standard;
+module Property_parser = Css_grammar_parser.Parser;
 module Types = Property_parser.Types;
 
 let txt = (~loc, txt) => {
@@ -47,7 +47,7 @@ let add_CSS_rule_constraint = (~loc, expr) => {
 
 /* TODO: emit is better to keep value_of_ast and value_to_expr in the same fn */
 let emit = (property, value_of_ast, value_to_expr) => {
-  let ast_of_string = Css_property_parser.Parser.parse(property);
+  let ast_of_string = Css_grammar_parser.Parser.parse(property);
   let ast_to_expr = (~loc, ast) =>
     value_of_ast(~loc, ast) |> value_to_expr(~loc);
   let string_to_expr = (~loc, string) =>
@@ -61,7 +61,7 @@ let emit = (property, value_of_ast, value_to_expr) => {
 };
 
 let emit_shorthand = (parser, mapper, value_to_expr) => {
-  let ast_of_string = Css_property_parser.Parser.parse(parser);
+  let ast_of_string = Css_grammar_parser.Parser.parse(parser);
   let ast_to_expr = (~loc, ast) =>
     ast |> List.map(mapper(~loc)) |> value_to_expr(~loc);
   let string_to_expr = (~loc, string) =>
@@ -88,7 +88,7 @@ let render_variable = (~loc, name) => {
 };
 
 let transform_with_variable = (parser, mapper, value_to_expr) => {
-  Css_property_parser.(
+  Css_grammar_parser.(
     emit(
       Combinator.xor([
         /* If the entire CSS value is interpolated, we treat it as a `Variable */

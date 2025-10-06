@@ -1,4 +1,4 @@
-open Css_property_parser;
+open Css_grammar_parser;
 open Rule;
 open! Data;
 open Styled_ppx_css_parser.Parser;
