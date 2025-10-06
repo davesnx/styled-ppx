@@ -706,9 +706,170 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     };
   };
 
-  /* Module rec support - generate toString stub */
-  let make_to_string = (_value: Css_spec_parser.value) => {
-    [%expr fun (_v : t) => ""]
+  /* Module rec support - generate toString */
+  let make_to_string = (value: Css_spec_parser.value) => {
+    let rec make_to_string_expr = (value: Css_spec_parser.value, expr) => {
+      switch (value) {
+      | Terminal(kind, multiplier) =>
+        let make_base = (var_expr) =>
+          switch (kind) {
+          | Keyword(name) => estring(name)
+          | Delim(d) => estring(d)
+          | Data_type(name) =>
+            let type_name = value_name_of_css(name);
+            let lower_name = String.uncapitalize_ascii(type_name);
+            eapply(evar(lower_name ++ ".toString"), [var_expr])
+          | Property_type(name) =>
+            let type_name = property_value_name(name) |> value_name_of_css;
+            let lower_name = String.uncapitalize_ascii(type_name);
+            eapply(evar(lower_name ++ ".toString"), [var_expr])
+          };
+        apply_to_string_multiplier(multiplier, make_base, expr);
+      | Combinator(kind, values) =>
+        switch (kind) {
+        | Xor =>
+          let names = variant_names(values);
+          let pairs = List.combine(names, values);
+          let cases =
+            List.map(
+              ((variant_name, value)) => {
+                let pattern =
+                  switch (value) {
+                  | Terminal(Keyword(_), _)
+                  | Terminal(Delim(_), _) =>
+                    ppat_variant(variant_name, None)
+                  | _ =>
+                    let var_name = "v";
+                    ppat_variant(variant_name, Some(pvar(var_name)));
+                  };
+                let body =
+                  switch (value) {
+                  | Terminal(Keyword(name), _) => estring(name)
+                  | Terminal(Delim(d), _) => estring(d)
+                  | _ =>
+                    make_to_string_expr(value, evar("v"))
+                  };
+                case(~lhs=pattern, ~guard=None, ~rhs=body);
+              },
+              pairs,
+            );
+          pexp_match(expr, cases);
+        | Static
+        | And =>
+          let var_names = List.mapi((i, _) => "v" ++ string_of_int(i), values);
+          let pattern = ppat_tuple(List.map(pvar, var_names));
+          let exprs = List.map2((var_name, value) => {
+            make_to_string_expr(value, evar(var_name));
+          }, var_names, values);
+          let combined =
+            List.fold_left(
+              (acc, e) => {
+                [%expr [%e acc] ++ " " ++ [%e e]]
+              },
+              List.hd(exprs),
+              List.tl(exprs)
+            );
+          pexp_let(Nonrecursive, [value_binding(~pat=pattern, ~expr)], combined);
+        | Or =>
+          let var_names = List.mapi((i, _) => "v" ++ string_of_int(i), values);
+          let pattern = ppat_tuple(List.map(pvar, var_names));
+          let exprs = List.map2((var_name, value) => {
+            let inner_expr = make_to_string_expr(value, evar("x"));
+            pexp_match(
+              evar(var_name),
+              [
+                case(
+                  ~lhs=ppat_construct(txt(Lident("Some")), Some(pvar("x"))),
+                  ~guard=None,
+                  ~rhs=inner_expr
+                ),
+                case(
+                  ~lhs=ppat_construct(txt(Lident("None")), None),
+                  ~guard=None,
+                  ~rhs=estring("")
+                )
+              ]
+            );
+          }, var_names, values);
+          // Build nested let expressions to combine strings
+          let rec build_combine = (exprs) => {
+            switch (exprs) {
+            | [] => estring("")
+            | [single] => single
+            | [first, ...rest] =>
+              let rest_combined = build_combine(rest);
+              let s1_name = "s" ++ string_of_int(List.length(exprs));
+              let s2_name = "s" ++ string_of_int(List.length(exprs) + 1);
+              pexp_let(
+                Nonrecursive,
+                [value_binding(~pat=pvar(s1_name), ~expr=first)],
+                pexp_let(
+                  Nonrecursive,
+                  [value_binding(~pat=pvar(s2_name), ~expr=rest_combined)],
+                  pexp_ifthenelse(
+                    eapply(evar("=="), [evar(s1_name), estring("")]),
+                    evar(s2_name),
+                    Some(pexp_ifthenelse(
+                      eapply(evar("=="), [evar(s2_name), estring("")]),
+                      evar(s1_name),
+                      Some(eapply(evar("++"), [
+                        eapply(evar("++"), [evar(s1_name), estring(" ")]),
+                        evar(s2_name)
+                      ]))
+                    ))
+                  )
+                )
+              )
+            };
+          };
+          let combined = build_combine(exprs);
+          pexp_let(Nonrecursive, [value_binding(~pat=pattern, ~expr)], combined);
+        }
+      | Group(value, multiplier) =>
+        let make_inner = (var_expr) => make_to_string_expr(value, var_expr);
+        apply_to_string_multiplier(multiplier, make_inner, expr);
+      | Function_call(name, value) =>
+        let inner = make_to_string_expr(value, expr);
+        [%expr
+          [%e estring(name ++ "(")] ++ [%e inner] ++ ")"
+        ]
+      };
+    }
+    and apply_to_string_multiplier = (multiplier, make_base, expr) => {
+      switch (multiplier) {
+      | One => make_base(expr)
+      | Optional =>
+        pexp_match(
+          expr,
+          [
+            case(
+              ~lhs=ppat_construct(txt(Lident("Some")), Some(pvar("x"))),
+              ~guard=None,
+              ~rhs=make_base(evar("x"))
+            ),
+            case(
+              ~lhs=ppat_construct(txt(Lident("None")), None),
+              ~guard=None,
+              ~rhs=estring("")
+            )
+          ]
+        )
+      | Zero_or_more
+      | One_or_more
+      | At_least_one
+      | Repeat(_)
+      | Repeat_by_comma(_, _) =>
+        let mapper = pexp_fun(Nolabel, None, pvar("x"), make_base(evar("x")));
+        [%expr
+          [%e expr]
+          |> List.map([%e mapper])
+          |> String.concat(" ")
+        ]
+      };
+    };
+
+    let body = make_to_string_expr(value, evar("value"));
+    [%expr fun (value : t) => [%e body]];
   };
 
   /* Extract module binding info from module rec */
@@ -744,7 +905,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       let to_string_expr = make_to_string(ast);
 
       /* Module signature */
-      let sig_t = [%sigi: type t];
+      let sig_t = Ast_helper.Sig.type_(~loc, Nonrecursive, [make_type_declaration("t", core_type)]);
       let sig_parse = Ast_helper.Sig.value(~loc,
         Ast_helper.Val.mk(~loc, {txt: "parse", loc}, [%type:
           list(Styled_ppx_css_parser.Tokens.t) =>

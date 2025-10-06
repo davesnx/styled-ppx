@@ -4,7 +4,18 @@
   open Rule.Match
   
   module rec Color : sig
-    type t
+    type nonrec t =
+      [ `Function_rgb of function_rgb
+      | `Function_rgba of function_rgba
+      | `Function_hsl of function_hsl
+      | `Function_hsla of function_hsla
+      | `Hex_color of hex_color
+      | `Named_color of named_color
+      | `CurrentColor
+      | `Deprecated_system_color of deprecated_system_color
+      | `Interpolation of interpolation
+      | `Function_var of function_var
+      | `Function_color_mix of function_color_mix ]
   
     val parse :
       Styled_ppx_css_parser.Tokens.t list ->
@@ -41,11 +52,27 @@
           map function_color_mix (fun v -> `Function_color_mix v);
         ]
   
-    let toString (_v : t) = ""
+    let toString (value : t) =
+      match value with
+      | `Function_rgb v -> function_rgb.toString v
+      | `Function_rgba v -> function_rgba.toString v
+      | `Function_hsl v -> function_hsl.toString v
+      | `Function_hsla v -> function_hsla.toString v
+      | `Hex_color v -> hex_color.toString v
+      | `Named_color v -> named_color.toString v
+      | `CurrentColor -> "currentColor"
+      | `Deprecated_system_color v -> deprecated_system_color.toString v
+      | `Interpolation v -> interpolation.toString v
+      | `Function_var v -> function_var.toString v
+      | `Function_color_mix v -> function_color_mix.toString v
   end
   
   and Function_rgb : sig
-    type t
+    type nonrec t =
+      [ `Rgb_0 of extended_percentage list * (unit * alpha_value) option
+      | `Rgb_1 of number list * (unit * alpha_value) option
+      | `Rgb_2 of extended_percentage list * (unit * alpha_value) option
+      | `Rgb_3 of number list * (unit * alpha_value) option ]
   
     val parse :
       Styled_ppx_css_parser.Tokens.t list ->
@@ -148,11 +175,68 @@
             (fun v -> `Rgb_3 v);
         ]
   
-    let toString (_v : t) = ""
+    let toString (value : t) =
+      match value with
+      | `Rgb_0 v ->
+          "rgb("
+          ^ (let v0, v1 = v in
+             (v0
+             |> List.map (fun x -> extended_percentage.toString x)
+             |> String.concat " ")
+             ^ " "
+             ^
+             match v1 with
+             | Some x ->
+                 let v0, v1 = x in
+                 "/" ^ " " ^ alpha_value.toString v1
+             | None -> "")
+          ^ ")"
+      | `Rgb_1 v ->
+          "rgb("
+          ^ (let v0, v1 = v in
+             (v0 |> List.map (fun x -> number.toString x) |> String.concat " ")
+             ^ " "
+             ^
+             match v1 with
+             | Some x ->
+                 let v0, v1 = x in
+                 "/" ^ " " ^ alpha_value.toString v1
+             | None -> "")
+          ^ ")"
+      | `Rgb_2 v ->
+          "rgb("
+          ^ (let v0, v1 = v in
+             (v0
+             |> List.map (fun x -> extended_percentage.toString x)
+             |> String.concat " ")
+             ^ " "
+             ^
+             match v1 with
+             | Some x ->
+                 let v0, v1 = x in
+                 "," ^ " " ^ alpha_value.toString v1
+             | None -> "")
+          ^ ")"
+      | `Rgb_3 v ->
+          "rgb("
+          ^ (let v0, v1 = v in
+             (v0 |> List.map (fun x -> number.toString x) |> String.concat " ")
+             ^ " "
+             ^
+             match v1 with
+             | Some x ->
+                 let v0, v1 = x in
+                 "," ^ " " ^ alpha_value.toString v1
+             | None -> "")
+          ^ ")"
   end
   
   and Function_rgba : sig
-    type t
+    type nonrec t =
+      [ `Rgba_0 of extended_percentage list * (unit * alpha_value) option
+      | `Rgba_1 of number list * (unit * alpha_value) option
+      | `Rgba_2 of extended_percentage list * (unit * alpha_value) option
+      | `Rgba_3 of number list * (unit * alpha_value) option ]
   
     val parse :
       Styled_ppx_css_parser.Tokens.t list ->
@@ -255,11 +339,76 @@
             (fun v -> `Rgba_3 v);
         ]
   
-    let toString (_v : t) = ""
+    let toString (value : t) =
+      match value with
+      | `Rgba_0 v ->
+          "rgba("
+          ^ (let v0, v1 = v in
+             (v0
+             |> List.map (fun x -> extended_percentage.toString x)
+             |> String.concat " ")
+             ^ " "
+             ^
+             match v1 with
+             | Some x ->
+                 let v0, v1 = x in
+                 "/" ^ " " ^ alpha_value.toString v1
+             | None -> "")
+          ^ ")"
+      | `Rgba_1 v ->
+          "rgba("
+          ^ (let v0, v1 = v in
+             (v0 |> List.map (fun x -> number.toString x) |> String.concat " ")
+             ^ " "
+             ^
+             match v1 with
+             | Some x ->
+                 let v0, v1 = x in
+                 "/" ^ " " ^ alpha_value.toString v1
+             | None -> "")
+          ^ ")"
+      | `Rgba_2 v ->
+          "rgba("
+          ^ (let v0, v1 = v in
+             (v0
+             |> List.map (fun x -> extended_percentage.toString x)
+             |> String.concat " ")
+             ^ " "
+             ^
+             match v1 with
+             | Some x ->
+                 let v0, v1 = x in
+                 "," ^ " " ^ alpha_value.toString v1
+             | None -> "")
+          ^ ")"
+      | `Rgba_3 v ->
+          "rgba("
+          ^ (let v0, v1 = v in
+             (v0 |> List.map (fun x -> number.toString x) |> String.concat " ")
+             ^ " "
+             ^
+             match v1 with
+             | Some x ->
+                 let v0, v1 = x in
+                 "," ^ " " ^ alpha_value.toString v1
+             | None -> "")
+          ^ ")"
   end
   
   and Function_hsl : sig
-    type t
+    type nonrec t =
+      [ `Hsl_0 of
+        hue
+        * extended_percentage
+        * extended_percentage
+        * (unit * alpha_value) option
+      | `Hsl_1 of
+        hue
+        * unit
+        * extended_percentage
+        * unit
+        * extended_percentage
+        * (unit * alpha_value) option ]
   
     val parse :
       Styled_ppx_css_parser.Tokens.t list ->
@@ -341,11 +490,64 @@
             (fun v -> `Hsl_1 v);
         ]
   
-    let toString (_v : t) = ""
+    let toString (value : t) =
+      match value with
+      | `Hsl_0 v ->
+          "hsl("
+          ^ (let v0, v1, v2, v3 = v in
+             ((hue.toString v0 ^ " " ^ extended_percentage.toString v1)
+             ^ " "
+             ^ extended_percentage.toString v2)
+             ^ " "
+             ^
+             match v3 with
+             | Some x ->
+                 let v0, v1 = x in
+                 "/" ^ " " ^ alpha_value.toString v1
+             | None -> "")
+          ^ ")"
+      | `Hsl_1 v ->
+          "hsl("
+          ^ (let v0, v1, v2, v3, v4, v5 = v in
+             ((((hue.toString v0 ^ " " ^ ",")
+               ^ " "
+               ^ extended_percentage.toString v2)
+              ^ " " ^ ",")
+             ^ " "
+             ^ extended_percentage.toString v4)
+             ^ " "
+             ^
+             match v5 with
+             | Some x ->
+                 let v0, v1 = x in
+                 "," ^ " " ^ alpha_value.toString v1
+             | None -> "")
+          ^ ")"
   end
   
   and Function_hsla : sig
-    type t
+    type nonrec t =
+      [ `Hsla_0 of
+        hue
+        * extended_percentage
+        * extended_percentage
+        * (unit * alpha_value) option
+      | `Hsla_1 of
+        hue
+        * unit
+        * extended_percentage
+        * unit
+        * extended_percentage
+        * unit
+        * alpha_value option
+      | `Hsla_2 of
+        hue
+        * unit
+        * extended_percentage
+        * unit
+        * extended_percentage
+        * unit
+        * alpha_value option ]
   
     val parse :
       Styled_ppx_css_parser.Tokens.t list ->
@@ -452,11 +654,52 @@
             (fun v -> `Hsla_2 v);
         ]
   
-    let toString (_v : t) = ""
+    let toString (value : t) =
+      match value with
+      | `Hsla_0 v ->
+          "hsla("
+          ^ (let v0, v1, v2, v3 = v in
+             ((hue.toString v0 ^ " " ^ extended_percentage.toString v1)
+             ^ " "
+             ^ extended_percentage.toString v2)
+             ^ " "
+             ^
+             match v3 with
+             | Some x ->
+                 let v0, v1 = x in
+                 "/" ^ " " ^ alpha_value.toString v1
+             | None -> "")
+          ^ ")"
+      | `Hsla_1 v ->
+          "hsla("
+          ^ (let v0, v1, v2, v3, v4, v5, v6 = v in
+             (((((hue.toString v0 ^ " " ^ ",")
+                ^ " "
+                ^ extended_percentage.toString v2)
+               ^ " " ^ ",")
+              ^ " "
+              ^ extended_percentage.toString v4)
+             ^ " " ^ ",")
+             ^ " "
+             ^ match v6 with Some x -> alpha_value.toString x | None -> "")
+          ^ ")"
+      | `Hsla_2 v ->
+          "hsla("
+          ^ (let v0, v1, v2, v3, v4, v5, v6 = v in
+             (((((hue.toString v0 ^ " " ^ ",")
+                ^ " "
+                ^ extended_percentage.toString v2)
+               ^ " " ^ ",")
+              ^ " "
+              ^ extended_percentage.toString v4)
+             ^ " " ^ ",")
+             ^ " "
+             ^ match v6 with Some x -> alpha_value.toString x | None -> "")
+          ^ ")"
   end
   
   and Hue : sig
-    type t
+    type nonrec t = [ `Number of number | `Extended_angle of extended_angle ]
   
     val parse :
       Styled_ppx_css_parser.Tokens.t list ->
@@ -473,11 +716,164 @@
           map extended_angle (fun v -> `Extended_angle v);
         ]
   
-    let toString (_v : t) = ""
+    let toString (value : t) =
+      match value with
+      | `Number v -> number.toString v
+      | `Extended_angle v -> extended_angle.toString v
   end
   
   and Named_color : sig
-    type t
+    type nonrec t =
+      [ `Transparent
+      | `Aliceblue
+      | `Antiquewhite
+      | `Aqua
+      | `Aquamarine
+      | `Azure
+      | `Beige
+      | `Bisque
+      | `Black
+      | `Blanchedalmond
+      | `Blue
+      | `Blueviolet
+      | `Brown
+      | `Burlywood
+      | `Cadetblue
+      | `Chartreuse
+      | `Chocolate
+      | `Coral
+      | `Cornflowerblue
+      | `Cornsilk
+      | `Crimson
+      | `Cyan
+      | `Darkblue
+      | `Darkcyan
+      | `Darkgoldenrod
+      | `Darkgray
+      | `Darkgreen
+      | `Darkgrey
+      | `Darkkhaki
+      | `Darkmagenta
+      | `Darkolivegreen
+      | `Darkorange
+      | `Darkorchid
+      | `Darkred
+      | `Darksalmon
+      | `Darkseagreen
+      | `Darkslateblue
+      | `Darkslategray
+      | `Darkslategrey
+      | `Darkturquoise
+      | `Darkviolet
+      | `Deeppink
+      | `Deepskyblue
+      | `Dimgray
+      | `Dimgrey
+      | `Dodgerblue
+      | `Firebrick
+      | `Floralwhite
+      | `Forestgreen
+      | `Fuchsia
+      | `Gainsboro
+      | `Ghostwhite
+      | `Gold
+      | `Goldenrod
+      | `Gray
+      | `Green
+      | `Greenyellow
+      | `Grey
+      | `Honeydew
+      | `Hotpink
+      | `Indianred
+      | `Indigo
+      | `Ivory
+      | `Khaki
+      | `Lavender
+      | `Lavenderblush
+      | `Lawngreen
+      | `Lemonchiffon
+      | `Lightblue
+      | `Lightcoral
+      | `Lightcyan
+      | `Lightgoldenrodyellow
+      | `Lightgray
+      | `Lightgreen
+      | `Lightgrey
+      | `Lightpink
+      | `Lightsalmon
+      | `Lightseagreen
+      | `Lightskyblue
+      | `Lightslategray
+      | `Lightslategrey
+      | `Lightsteelblue
+      | `Lightyellow
+      | `Lime
+      | `Limegreen
+      | `Linen
+      | `Magenta
+      | `Maroon
+      | `Mediumaquamarine
+      | `Mediumblue
+      | `Mediumorchid
+      | `Mediumpurple
+      | `Mediumseagreen
+      | `Mediumslateblue
+      | `Mediumspringgreen
+      | `Mediumturquoise
+      | `Mediumvioletred
+      | `Midnightblue
+      | `Mintcream
+      | `Mistyrose
+      | `Moccasin
+      | `Navajowhite
+      | `Navy
+      | `Oldlace
+      | `Olive
+      | `Olivedrab
+      | `Orange
+      | `Orangered
+      | `Orchid
+      | `Palegoldenrod
+      | `Palegreen
+      | `Paleturquoise
+      | `Palevioletred
+      | `Papayawhip
+      | `Peachpuff
+      | `Peru
+      | `Pink
+      | `Plum
+      | `Powderblue
+      | `Purple
+      | `Rebeccapurple
+      | `Red
+      | `Rosybrown
+      | `Royalblue
+      | `Saddlebrown
+      | `Salmon
+      | `Sandybrown
+      | `Seagreen
+      | `Seashell
+      | `Sienna
+      | `Silver
+      | `Skyblue
+      | `Slateblue
+      | `Slategray
+      | `Slategrey
+      | `Snow
+      | `Springgreen
+      | `Steelblue
+      | `Tan
+      | `Teal
+      | `Thistle
+      | `Tomato
+      | `Turquoise
+      | `Violet
+      | `Wheat
+      | `White
+      | `Whitesmoke
+      | `Yellow
+      | `Yellowgreen
+      | `_non_standard_color of _non_standard_color ]
   
     val parse :
       Styled_ppx_css_parser.Tokens.t list ->
@@ -792,11 +1188,190 @@
           map _non_standard_color (fun v -> `_non_standard_color v);
         ]
   
-    let toString (_v : t) = ""
+    let toString (value : t) =
+      match value with
+      | `Transparent -> "transparent"
+      | `Aliceblue -> "aliceblue"
+      | `Antiquewhite -> "antiquewhite"
+      | `Aqua -> "aqua"
+      | `Aquamarine -> "aquamarine"
+      | `Azure -> "azure"
+      | `Beige -> "beige"
+      | `Bisque -> "bisque"
+      | `Black -> "black"
+      | `Blanchedalmond -> "blanchedalmond"
+      | `Blue -> "blue"
+      | `Blueviolet -> "blueviolet"
+      | `Brown -> "brown"
+      | `Burlywood -> "burlywood"
+      | `Cadetblue -> "cadetblue"
+      | `Chartreuse -> "chartreuse"
+      | `Chocolate -> "chocolate"
+      | `Coral -> "coral"
+      | `Cornflowerblue -> "cornflowerblue"
+      | `Cornsilk -> "cornsilk"
+      | `Crimson -> "crimson"
+      | `Cyan -> "cyan"
+      | `Darkblue -> "darkblue"
+      | `Darkcyan -> "darkcyan"
+      | `Darkgoldenrod -> "darkgoldenrod"
+      | `Darkgray -> "darkgray"
+      | `Darkgreen -> "darkgreen"
+      | `Darkgrey -> "darkgrey"
+      | `Darkkhaki -> "darkkhaki"
+      | `Darkmagenta -> "darkmagenta"
+      | `Darkolivegreen -> "darkolivegreen"
+      | `Darkorange -> "darkorange"
+      | `Darkorchid -> "darkorchid"
+      | `Darkred -> "darkred"
+      | `Darksalmon -> "darksalmon"
+      | `Darkseagreen -> "darkseagreen"
+      | `Darkslateblue -> "darkslateblue"
+      | `Darkslategray -> "darkslategray"
+      | `Darkslategrey -> "darkslategrey"
+      | `Darkturquoise -> "darkturquoise"
+      | `Darkviolet -> "darkviolet"
+      | `Deeppink -> "deeppink"
+      | `Deepskyblue -> "deepskyblue"
+      | `Dimgray -> "dimgray"
+      | `Dimgrey -> "dimgrey"
+      | `Dodgerblue -> "dodgerblue"
+      | `Firebrick -> "firebrick"
+      | `Floralwhite -> "floralwhite"
+      | `Forestgreen -> "forestgreen"
+      | `Fuchsia -> "fuchsia"
+      | `Gainsboro -> "gainsboro"
+      | `Ghostwhite -> "ghostwhite"
+      | `Gold -> "gold"
+      | `Goldenrod -> "goldenrod"
+      | `Gray -> "gray"
+      | `Green -> "green"
+      | `Greenyellow -> "greenyellow"
+      | `Grey -> "grey"
+      | `Honeydew -> "honeydew"
+      | `Hotpink -> "hotpink"
+      | `Indianred -> "indianred"
+      | `Indigo -> "indigo"
+      | `Ivory -> "ivory"
+      | `Khaki -> "khaki"
+      | `Lavender -> "lavender"
+      | `Lavenderblush -> "lavenderblush"
+      | `Lawngreen -> "lawngreen"
+      | `Lemonchiffon -> "lemonchiffon"
+      | `Lightblue -> "lightblue"
+      | `Lightcoral -> "lightcoral"
+      | `Lightcyan -> "lightcyan"
+      | `Lightgoldenrodyellow -> "lightgoldenrodyellow"
+      | `Lightgray -> "lightgray"
+      | `Lightgreen -> "lightgreen"
+      | `Lightgrey -> "lightgrey"
+      | `Lightpink -> "lightpink"
+      | `Lightsalmon -> "lightsalmon"
+      | `Lightseagreen -> "lightseagreen"
+      | `Lightskyblue -> "lightskyblue"
+      | `Lightslategray -> "lightslategray"
+      | `Lightslategrey -> "lightslategrey"
+      | `Lightsteelblue -> "lightsteelblue"
+      | `Lightyellow -> "lightyellow"
+      | `Lime -> "lime"
+      | `Limegreen -> "limegreen"
+      | `Linen -> "linen"
+      | `Magenta -> "magenta"
+      | `Maroon -> "maroon"
+      | `Mediumaquamarine -> "mediumaquamarine"
+      | `Mediumblue -> "mediumblue"
+      | `Mediumorchid -> "mediumorchid"
+      | `Mediumpurple -> "mediumpurple"
+      | `Mediumseagreen -> "mediumseagreen"
+      | `Mediumslateblue -> "mediumslateblue"
+      | `Mediumspringgreen -> "mediumspringgreen"
+      | `Mediumturquoise -> "mediumturquoise"
+      | `Mediumvioletred -> "mediumvioletred"
+      | `Midnightblue -> "midnightblue"
+      | `Mintcream -> "mintcream"
+      | `Mistyrose -> "mistyrose"
+      | `Moccasin -> "moccasin"
+      | `Navajowhite -> "navajowhite"
+      | `Navy -> "navy"
+      | `Oldlace -> "oldlace"
+      | `Olive -> "olive"
+      | `Olivedrab -> "olivedrab"
+      | `Orange -> "orange"
+      | `Orangered -> "orangered"
+      | `Orchid -> "orchid"
+      | `Palegoldenrod -> "palegoldenrod"
+      | `Palegreen -> "palegreen"
+      | `Paleturquoise -> "paleturquoise"
+      | `Palevioletred -> "palevioletred"
+      | `Papayawhip -> "papayawhip"
+      | `Peachpuff -> "peachpuff"
+      | `Peru -> "peru"
+      | `Pink -> "pink"
+      | `Plum -> "plum"
+      | `Powderblue -> "powderblue"
+      | `Purple -> "purple"
+      | `Rebeccapurple -> "rebeccapurple"
+      | `Red -> "red"
+      | `Rosybrown -> "rosybrown"
+      | `Royalblue -> "royalblue"
+      | `Saddlebrown -> "saddlebrown"
+      | `Salmon -> "salmon"
+      | `Sandybrown -> "sandybrown"
+      | `Seagreen -> "seagreen"
+      | `Seashell -> "seashell"
+      | `Sienna -> "sienna"
+      | `Silver -> "silver"
+      | `Skyblue -> "skyblue"
+      | `Slateblue -> "slateblue"
+      | `Slategray -> "slategray"
+      | `Slategrey -> "slategrey"
+      | `Snow -> "snow"
+      | `Springgreen -> "springgreen"
+      | `Steelblue -> "steelblue"
+      | `Tan -> "tan"
+      | `Teal -> "teal"
+      | `Thistle -> "thistle"
+      | `Tomato -> "tomato"
+      | `Turquoise -> "turquoise"
+      | `Violet -> "violet"
+      | `Wheat -> "wheat"
+      | `White -> "white"
+      | `Whitesmoke -> "whitesmoke"
+      | `Yellow -> "yellow"
+      | `Yellowgreen -> "yellowgreen"
+      | `_non_standard_color v -> _non_standard_color.toString v
   end
   
   and Deprecated_system_color : sig
-    type t
+    type nonrec t =
+      [ `ActiveBorder
+      | `ActiveCaption
+      | `AppWorkspace
+      | `Background
+      | `ButtonFace
+      | `ButtonHighlight
+      | `ButtonShadow
+      | `ButtonText
+      | `CaptionText
+      | `GrayText
+      | `Highlight
+      | `HighlightText
+      | `InactiveBorder
+      | `InactiveCaption
+      | `InactiveCaptionText
+      | `InfoBackground
+      | `InfoText
+      | `Menu
+      | `MenuText
+      | `Scrollbar
+      | `ThreeDDarkShadow
+      | `ThreeDFace
+      | `ThreeDHighlight
+      | `ThreeDLightShadow
+      | `ThreeDShadow
+      | `Window
+      | `WindowFrame
+      | `WindowText ]
   
     val parse :
       Styled_ppx_css_parser.Tokens.t list ->
@@ -867,11 +1442,43 @@
           map (keyword "WindowText") (fun _v -> `WindowText);
         ]
   
-    let toString (_v : t) = ""
+    let toString (value : t) =
+      match value with
+      | `ActiveBorder -> "ActiveBorder"
+      | `ActiveCaption -> "ActiveCaption"
+      | `AppWorkspace -> "AppWorkspace"
+      | `Background -> "Background"
+      | `ButtonFace -> "ButtonFace"
+      | `ButtonHighlight -> "ButtonHighlight"
+      | `ButtonShadow -> "ButtonShadow"
+      | `ButtonText -> "ButtonText"
+      | `CaptionText -> "CaptionText"
+      | `GrayText -> "GrayText"
+      | `Highlight -> "Highlight"
+      | `HighlightText -> "HighlightText"
+      | `InactiveBorder -> "InactiveBorder"
+      | `InactiveCaption -> "InactiveCaption"
+      | `InactiveCaptionText -> "InactiveCaptionText"
+      | `InfoBackground -> "InfoBackground"
+      | `InfoText -> "InfoText"
+      | `Menu -> "Menu"
+      | `MenuText -> "MenuText"
+      | `Scrollbar -> "Scrollbar"
+      | `ThreeDDarkShadow -> "ThreeDDarkShadow"
+      | `ThreeDFace -> "ThreeDFace"
+      | `ThreeDHighlight -> "ThreeDHighlight"
+      | `ThreeDLightShadow -> "ThreeDLightShadow"
+      | `ThreeDShadow -> "ThreeDShadow"
+      | `Window -> "Window"
+      | `WindowFrame -> "WindowFrame"
+      | `WindowText -> "WindowText"
   end
   
   and Color_stop_list : sig
-    type t
+    type nonrec t =
+      [ `Static_0 of color option * length_percentage
+      | `Static_1 of color * length_percentage option ]
+      list
   
     val parse :
       Styled_ppx_css_parser.Tokens.t list ->
@@ -908,11 +1515,29 @@
                (fun v -> `Static_1 v);
            ])
   
-    let toString (_v : t) = ""
+    let toString (value : t) =
+      value
+      |> List.map (fun x ->
+             match x with
+             | `Static_0 v ->
+                 let v0, v1 = v in
+                 (match v0 with Some x -> color.toString x | None -> "")
+                 ^ " "
+                 ^ length_percentage.toString v1
+             | `Static_1 v -> (
+                 let v0, v1 = v in
+                 color.toString v0 ^ " "
+                 ^
+                 match v1 with
+                 | Some x -> length_percentage.toString x
+                 | None -> ""))
+      |> String.concat " "
   end
   
   and Color_stop : sig
-    type t
+    type nonrec t =
+      [ `Color_stop_length of color_stop_length
+      | `Color_stop_angle of color_stop_angle ]
   
     val parse :
       Styled_ppx_css_parser.Tokens.t list ->
@@ -931,11 +1556,16 @@
           map color_stop_angle (fun v -> `Color_stop_angle v);
         ]
   
-    let toString (_v : t) = ""
+    let toString (value : t) =
+      match value with
+      | `Color_stop_length v -> color_stop_length.toString v
+      | `Color_stop_angle v -> color_stop_angle.toString v
   end
   
   and Color_stop_length : sig
-    type t
+    type nonrec t =
+      [ `Extended_length of extended_length
+      | `Extended_percentage of extended_percentage ]
   
     val parse :
       Styled_ppx_css_parser.Tokens.t list ->
@@ -954,11 +1584,14 @@
           map extended_percentage (fun v -> `Extended_percentage v);
         ]
   
-    let toString (_v : t) = ""
+    let toString (value : t) =
+      match value with
+      | `Extended_length v -> extended_length.toString v
+      | `Extended_percentage v -> extended_percentage.toString v
   end
   
   and Color_stop_angle : sig
-    type t
+    type nonrec t = extended_angle list
   
     val parse :
       Styled_ppx_css_parser.Tokens.t list ->
@@ -969,11 +1602,13 @@
     type nonrec t = extended_angle list
   
     let parse = repeat (1, Some 2) extended_angle
-    let toString (_v : t) = ""
+  
+    let toString (value : t) =
+      value |> List.map (fun x -> extended_angle.toString x) |> String.concat " "
   end
   
   and Linear_color_stop : sig
-    type t
+    type nonrec t = color * length_percentage option
   
     val parse :
       Styled_ppx_css_parser.Tokens.t list ->
@@ -992,11 +1627,16 @@
            ])
         (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] -> (v0, v1))
   
-    let toString (_v : t) = ""
+    let toString (value : t) =
+      let v0, v1 = value in
+      color.toString v0 ^ " "
+      ^ match v1 with Some x -> length_percentage.toString x | None -> ""
   end
   
   and Linear_color_hint : sig
-    type t
+    type nonrec t =
+      [ `Extended_length of extended_length
+      | `Extended_percentage of extended_percentage ]
   
     val parse :
       Styled_ppx_css_parser.Tokens.t list ->
@@ -1015,11 +1655,14 @@
           map extended_percentage (fun v -> `Extended_percentage v);
         ]
   
-    let toString (_v : t) = ""
+    let toString (value : t) =
+      match value with
+      | `Extended_length v -> extended_length.toString v
+      | `Extended_percentage v -> extended_percentage.toString v
   end
   
   and Angular_color_stop : sig
-    type t
+    type nonrec t = color * color_stop_angle option
   
     val parse :
       Styled_ppx_css_parser.Tokens.t list ->
@@ -1038,11 +1681,16 @@
            ])
         (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] -> (v0, v1))
   
-    let toString (_v : t) = ""
+    let toString (value : t) =
+      let v0, v1 = value in
+      color.toString v0 ^ " "
+      ^ match v1 with Some x -> color_stop_angle.toString x | None -> ""
   end
   
   and Angular_color_hint : sig
-    type t
+    type nonrec t =
+      [ `Extended_angle of extended_angle
+      | `Extended_percentage of extended_percentage ]
   
     val parse :
       Styled_ppx_css_parser.Tokens.t list ->
@@ -1061,11 +1709,17 @@
           map extended_percentage (fun v -> `Extended_percentage v);
         ]
   
-    let toString (_v : t) = ""
+    let toString (value : t) =
+      match value with
+      | `Extended_angle v -> extended_angle.toString v
+      | `Extended_percentage v -> extended_percentage.toString v
   end
   
   and Angular_color_stop_list : sig
-    type t
+    type nonrec t =
+      (angular_color_stop * (unit * angular_color_hint) option) list
+      * unit
+      * angular_color_stop
   
     val parse :
       Styled_ppx_css_parser.Tokens.t list ->
@@ -1107,11 +1761,27 @@
            ])
         (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1; `V2 v2 ] -> (v0, v1, v2))
   
-    let toString (_v : t) = ""
+    let toString (value : t) =
+      let v0, v1, v2 = value in
+      ((v0
+       |> List.map (fun x ->
+              let v0, v1 = x in
+              angular_color_stop.toString v0
+              ^ " "
+              ^
+              match v1 with
+              | Some x ->
+                  let v0, v1 = x in
+                  "," ^ " " ^ angular_color_hint.toString v1
+              | None -> "")
+       |> String.concat " ")
+      ^ " " ^ ",")
+      ^ " "
+      ^ angular_color_stop.toString v2
   end
   
   and Hue_interpolation_method : sig
-    type t
+    type nonrec t = [ `Shorter | `Longer | `Increasing | `Decreasing ] * unit
   
     val parse :
       Styled_ppx_css_parser.Tokens.t list ->
@@ -1138,11 +1808,18 @@
            ])
         (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] -> (v0, v1))
   
-    let toString (_v : t) = ""
+    let toString (value : t) =
+      let v0, v1 = value in
+      (match v0 with
+      | `Shorter -> "shorter"
+      | `Longer -> "longer"
+      | `Increasing -> "increasing"
+      | `Decreasing -> "decreasing")
+      ^ " " ^ "hue"
   end
   
   and Polar_color_space : sig
-    type t
+    type nonrec t = [ `Hsl | `Hwb | `Lch | `Oklch ]
   
     val parse :
       Styled_ppx_css_parser.Tokens.t list ->
@@ -1161,11 +1838,27 @@
           map (keyword "oklch") (fun _v -> `Oklch);
         ]
   
-    let toString (_v : t) = ""
+    let toString (value : t) =
+      match value with
+      | `Hsl -> "hsl"
+      | `Hwb -> "hwb"
+      | `Lch -> "lch"
+      | `Oklch -> "oklch"
   end
   
   and Rectangular_color_space : sig
-    type t
+    type nonrec t =
+      [ `Srgb
+      | `Srgb_linear
+      | `Display_p3
+      | `A98_rgb
+      | `Prophoto_rgb
+      | `Rec2020
+      | `Lab
+      | `Oklab
+      | `Xyz
+      | `Xyz_d50
+      | `Xyz_d65 ]
   
     val parse :
       Styled_ppx_css_parser.Tokens.t list ->
@@ -1202,11 +1895,26 @@
           map (keyword "xyz-d65") (fun _v -> `Xyz_d65);
         ]
   
-    let toString (_v : t) = ""
+    let toString (value : t) =
+      match value with
+      | `Srgb -> "srgb"
+      | `Srgb_linear -> "srgb-linear"
+      | `Display_p3 -> "display-p3"
+      | `A98_rgb -> "a98-rgb"
+      | `Prophoto_rgb -> "prophoto-rgb"
+      | `Rec2020 -> "rec2020"
+      | `Lab -> "lab"
+      | `Oklab -> "oklab"
+      | `Xyz -> "xyz"
+      | `Xyz_d50 -> "xyz-d50"
+      | `Xyz_d65 -> "xyz-d65"
   end
   
   and Color_interpolation_method : sig
-    type t
+    type nonrec t =
+      unit
+      * [ `Rectangular_color_space of rectangular_color_space
+        | `Static of polar_color_space * hue_interpolation_method option ]
   
     val parse :
       Styled_ppx_css_parser.Tokens.t list ->
@@ -1245,11 +1953,29 @@
            ])
         (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] -> (v0, v1))
   
-    let toString (_v : t) = ""
+    let toString (value : t) =
+      let v0, v1 = value in
+      "in" ^ " "
+      ^
+      match v1 with
+      | `Rectangular_color_space v -> rectangular_color_space.toString v
+      | `Static v -> (
+          let v0, v1 = v in
+          polar_color_space.toString v0
+          ^ " "
+          ^
+          match v1 with
+          | Some x -> hue_interpolation_method.toString x
+          | None -> "")
   end
   
   and Function_color_mix : sig
-    type t
+    type nonrec t =
+      color_interpolation_method
+      * unit
+      * (color * percentage option)
+      * unit
+      * (color * percentage option)
   
     val parse :
       Styled_ppx_css_parser.Tokens.t list ->
@@ -1294,11 +2020,32 @@
            (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1; `V2 v2; `V3 v3; `V4 v4 ]
                                     -> (v0, v1, v2, v3, v4)))
   
-    let toString (_v : t) = ""
+    let toString (value : t) =
+      "color-mix("
+      ^ (let v0, v1, v2, v3, v4 = value in
+         (((color_interpolation_method.toString v0 ^ " " ^ ",")
+          ^ " "
+          ^
+          let v0, v1 = v2 in
+          color.toString v0 ^ " "
+          ^ match v1 with Some x -> percentage.toString x | None -> "")
+         ^ " " ^ ",")
+         ^ " "
+         ^
+         let v0, v1 = v4 in
+         color.toString v0 ^ " "
+         ^ match v1 with Some x -> percentage.toString x | None -> "")
+      ^ ")"
   end
   
   and Paint : sig
-    type t
+    type nonrec t =
+      [ `None
+      | `Color of color
+      | `Static of url * [ `None | `Color of color ] option
+      | `Context_fill
+      | `Context_stroke
+      | `Interpolation of interpolation ]
   
     val parse :
       Styled_ppx_css_parser.Tokens.t list ->
@@ -1340,11 +2087,70 @@
           map interpolation (fun v -> `Interpolation v);
         ]
   
-    let toString (_v : t) = ""
+    let toString (value : t) =
+      match value with
+      | `None -> "none"
+      | `Color v -> color.toString v
+      | `Static v -> (
+          let v0, v1 = v in
+          url.toString v0 ^ " "
+          ^
+          match v1 with
+          | Some x -> (
+              match x with `None -> "none" | `Color v -> color.toString v)
+          | None -> "")
+      | `Context_fill -> "context-fill"
+      | `Context_stroke -> "context-stroke"
+      | `Interpolation v -> interpolation.toString v
   end
   
   and Non_standard_color : sig
-    type t
+    type nonrec t =
+      [ `_moz_ButtonDefault
+      | `_moz_ButtonHoverFace
+      | `_moz_ButtonHoverText
+      | `_moz_CellHighlight
+      | `_moz_CellHighlightText
+      | `_moz_Combobox
+      | `_moz_ComboboxText
+      | `_moz_Dialog
+      | `_moz_DialogText
+      | `_moz_dragtargetzone
+      | `_moz_EvenTreeRow
+      | `_moz_Field
+      | `_moz_FieldText
+      | `_moz_html_CellHighlight
+      | `_moz_html_CellHighlightText
+      | `_moz_mac_accentdarkestshadow
+      | `_moz_mac_accentdarkshadow
+      | `_moz_mac_accentface
+      | `_moz_mac_accentlightesthighlight
+      | `_moz_mac_accentlightshadow
+      | `_moz_mac_accentregularhighlight
+      | `_moz_mac_accentregularshadow
+      | `_moz_mac_chrome_active
+      | `_moz_mac_chrome_inactive
+      | `_moz_mac_focusring
+      | `_moz_mac_menuselect
+      | `_moz_mac_menushadow
+      | `_moz_mac_menutextselect
+      | `_moz_MenuHover
+      | `_moz_MenuHoverText
+      | `_moz_MenuBarText
+      | `_moz_MenuBarHoverText
+      | `_moz_nativehyperlinktext
+      | `_moz_OddTreeRow
+      | `_moz_win_communicationstext
+      | `_moz_win_mediatext
+      | `_moz_activehyperlinktext
+      | `_moz_default_background_color
+      | `_moz_default_color
+      | `_moz_hyperlinktext
+      | `_moz_visitedhyperlinktext
+      | `_webkit_activelink
+      | `_webkit_focus_ring_color
+      | `_webkit_link
+      | `_webkit_text ]
   
     val parse :
       Styled_ppx_css_parser.Tokens.t list ->
@@ -1467,5 +2273,51 @@
           map (keyword "-webkit-text") (fun _v -> `_webkit_text);
         ]
   
-    let toString (_v : t) = ""
+    let toString (value : t) =
+      match value with
+      | `_moz_ButtonDefault -> "-moz-ButtonDefault"
+      | `_moz_ButtonHoverFace -> "-moz-ButtonHoverFace"
+      | `_moz_ButtonHoverText -> "-moz-ButtonHoverText"
+      | `_moz_CellHighlight -> "-moz-CellHighlight"
+      | `_moz_CellHighlightText -> "-moz-CellHighlightText"
+      | `_moz_Combobox -> "-moz-Combobox"
+      | `_moz_ComboboxText -> "-moz-ComboboxText"
+      | `_moz_Dialog -> "-moz-Dialog"
+      | `_moz_DialogText -> "-moz-DialogText"
+      | `_moz_dragtargetzone -> "-moz-dragtargetzone"
+      | `_moz_EvenTreeRow -> "-moz-EvenTreeRow"
+      | `_moz_Field -> "-moz-Field"
+      | `_moz_FieldText -> "-moz-FieldText"
+      | `_moz_html_CellHighlight -> "-moz-html-CellHighlight"
+      | `_moz_html_CellHighlightText -> "-moz-html-CellHighlightText"
+      | `_moz_mac_accentdarkestshadow -> "-moz-mac-accentdarkestshadow"
+      | `_moz_mac_accentdarkshadow -> "-moz-mac-accentdarkshadow"
+      | `_moz_mac_accentface -> "-moz-mac-accentface"
+      | `_moz_mac_accentlightesthighlight -> "-moz-mac-accentlightesthighlight"
+      | `_moz_mac_accentlightshadow -> "-moz-mac-accentlightshadow"
+      | `_moz_mac_accentregularhighlight -> "-moz-mac-accentregularhighlight"
+      | `_moz_mac_accentregularshadow -> "-moz-mac-accentregularshadow"
+      | `_moz_mac_chrome_active -> "-moz-mac-chrome-active"
+      | `_moz_mac_chrome_inactive -> "-moz-mac-chrome-inactive"
+      | `_moz_mac_focusring -> "-moz-mac-focusring"
+      | `_moz_mac_menuselect -> "-moz-mac-menuselect"
+      | `_moz_mac_menushadow -> "-moz-mac-menushadow"
+      | `_moz_mac_menutextselect -> "-moz-mac-menutextselect"
+      | `_moz_MenuHover -> "-moz-MenuHover"
+      | `_moz_MenuHoverText -> "-moz-MenuHoverText"
+      | `_moz_MenuBarText -> "-moz-MenuBarText"
+      | `_moz_MenuBarHoverText -> "-moz-MenuBarHoverText"
+      | `_moz_nativehyperlinktext -> "-moz-nativehyperlinktext"
+      | `_moz_OddTreeRow -> "-moz-OddTreeRow"
+      | `_moz_win_communicationstext -> "-moz-win-communicationstext"
+      | `_moz_win_mediatext -> "-moz-win-mediatext"
+      | `_moz_activehyperlinktext -> "-moz-activehyperlinktext"
+      | `_moz_default_background_color -> "-moz-default-background-color"
+      | `_moz_default_color -> "-moz-default-color"
+      | `_moz_hyperlinktext -> "-moz-hyperlinktext"
+      | `_moz_visitedhyperlinktext -> "-moz-visitedhyperlinktext"
+      | `_webkit_activelink -> "-webkit-activelink"
+      | `_webkit_focus_ring_color -> "-webkit-focus-ring-color"
+      | `_webkit_link -> "-webkit-link"
+      | `_webkit_text -> "-webkit-text"
   end
