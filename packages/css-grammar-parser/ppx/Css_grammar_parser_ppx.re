@@ -41,7 +41,7 @@ let string_patten =
     )
   );
 
-let value_expression =
+let valueExtension =
   Ppxlib.Extension.declare_with_path_arg(
     "value",
     Ppxlib.Extension.Context.Expression,
@@ -49,7 +49,7 @@ let value_expression =
     expander(~recursive=false),
   );
 
-let value_dot_rec_expression =
+let valueRecExtension =
   Ppxlib.Extension.declare_with_path_arg(
     "value.rec",
     Ppxlib.Extension.Context.Expression,
@@ -57,41 +57,49 @@ let value_dot_rec_expression =
     expander(~recursive=true),
   );
 
-/* Structure item rewriter to handle module rec declarations */
-let module_rec_rewriter = (structure: Ppxlib.structure) => {
-  open Ppxlib;
+let is_structure_item_recursive =
+  fun
+  | {pstr_desc: Pstr_value(Recursive, _), pstr_loc: _loc} => true
+  | _ => false;
 
-  let rewrite_structure_item = (item: structure_item) => {
-    switch (item.pstr_desc) {
-    | Pstr_recmodule(module_bindings) =>
-      module Ast_builder = Ast_builder.Make({let loc = item.pstr_loc;});
-      module Emit = Generate.Make(Ast_builder);
+let is_structure_item_recmodule =
+  fun
+  | {pstr_desc: Pstr_recmodule(_), pstr_loc: _loc} => true
+  | _ => false;
 
-      let new_bindings =
-        List.filter_map(
-          (mb: module_binding) => {
-            switch (Emit.get_module_binding_info(mb)) {
-            | Some((module_name, value_spec)) =>
-              Emit.make_module(module_name, value_spec)
-            | None => Some(mb)
-            }
-          },
-          module_bindings,
-        );
+let is_open =
+  fun
+  | {pstr_desc: Pstr_open(_), pstr_loc: _loc} => true
+  | _ => false;
 
-      {...item, pstr_desc: Pstr_recmodule(new_bindings)};
-    | _ => item
+let preprocess_impl = structure_items => {
+  let (module_bindings, rest) =
+    List.partition(is_structure_item_recmodule, structure_items);
+
+  switch (module_bindings) {
+  | [{pstr_desc: Pstr_recmodule(module_bindings), pstr_loc, _}] =>
+    module Ast_builder =
+      Ppxlib.Ast_builder.Make({
+        let loc = pstr_loc;
+      });
+    module Emit = Generate.Make(Ast_builder);
+    let generated_module_bindings = Emit.make_modules(module_bindings);
+    let (open_bindings, rest) = List.partition(is_open, rest);
+
+    switch (generated_module_bindings) {
+    | [] => structure_items
+    | bindings =>
+      let rec_modules = Ast_helper.Str.rec_module(~loc=pstr_loc, bindings);
+      open_bindings @ [rec_modules] @ rest;
     };
+  | [_more_than_one_rec_module] =>
+    failwith("expected a single recursive module binding")
+  | _ => structure_items
   };
-
-  List.map(rewrite_structure_item, structure);
 };
 
 Driver.register_transformation(
-  ~extensions=[
-    value_expression,
-    value_dot_rec_expression,
-  ],
-  ~impl=module_rec_rewriter,
+  ~preprocess_impl,
+  ~extensions=[valueExtension, valueRecExtension],
   "css-grammar-ppx",
 );
