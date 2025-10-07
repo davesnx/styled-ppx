@@ -52,7 +52,7 @@ let tests = [
   }),
   test("<length>", () => {
     let parse = parse([%value "<length>"]);
-    let render_length = (x: Types.length) => {
+    let render_length = (x: Standard.Length.t) => {
       switch (x) {
       | `Cap(n) => string_of_float(n) ++ "cap"
       | `Ch(n) => string_of_float(n) ++ "ch"
@@ -100,7 +100,7 @@ let tests = [
   }),
   test("<angle>", () => {
     let parse = parse([%value "<angle>"]);
-    let render_angle = (x: Types.angle) => {
+    let render_angle = (x: Standard.Angle.t) => {
       switch (x) {
       | `Deg(x) => string_of_float(x) ++ "deg"
       | `Grad(x) => string_of_float(x) ++ "grad"
@@ -143,7 +143,7 @@ let tests = [
   }),
   test("<time>", () => {
     let parse = parse([%value "<time>"]);
-    let render_time = (x: Types.time) => {
+    let render_time = (x: Standard.Time.t) => {
       switch (x) {
       | `S(x) => string_of_float(x) ++ "s"
       | `Ms(x) => string_of_float(x) ++ "ms"
@@ -184,7 +184,7 @@ let tests = [
   }),
   test("<frequency>", () => {
     let parse = parse([%value "<frequency>"]);
-    let render_frequency = (x: Types.frequency) => {
+    let render_frequency = (x: Standard.Frequency.t) => {
       switch (x) {
       | `Hz(x) => string_of_float(x) ++ "hz"
       | `KHz(x) => string_of_float(x) ++ "khz"
@@ -225,7 +225,7 @@ let tests = [
   }),
   test("<resolution>", () => {
     let parse = parse([%value "<resolution>"]);
-    let render_resolution = (x: Types.resolution) => {
+    let render_resolution = (x: Standard.Resolution.t) => {
       switch (x) {
       | `Dpi(x) => string_of_float(x) ++ "dpi"
       | `Dppx(x) => string_of_float(x) ++ "dppx"

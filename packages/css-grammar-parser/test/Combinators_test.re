@@ -343,7 +343,7 @@ let tests = [
     ();
   }),
   test("xor error handling - invalid input", _ => {
-    let parser = Parser.parse([%value "red | blue | green"], "yellow");
+    let parser = Parser.parse([%value "red | blue | green"].parser, "yellow");
     switch (parser) {
     | Error(msg) =>
       let has_red = string_contains(msg, "red");
@@ -358,7 +358,7 @@ let tests = [
     };
   }),
   test("xor error handling - typo suggestion", _ => {
-    let parser = Parser.parse([%value "red | blue | green"], "gren");
+    let parser = Parser.parse([%value "red | blue | green"].parser, "gren");
     switch (parser) {
     | Error(msg) =>
       if (!string_contains(msg, "did you mean")) {

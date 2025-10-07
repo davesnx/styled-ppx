@@ -1,5 +1,5 @@
 module Parser = Parser;
 module Rule = Rule;
 module Standard = Standard;
-module Combinator = Combinator;
+module Combinators = Combinators;
 module Modifier = Modifier;
