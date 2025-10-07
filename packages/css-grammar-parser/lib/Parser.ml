@@ -2772,7 +2772,7 @@ let apply_parser (parser, tokens_with_loc) =
     match remaining_tokens with
     | [] | [ Styled_ppx_css_parser.Parser.EOF ] -> Ok ()
     | tokens ->
-      let tokens = tokens |> List.map Tokens.show_token |> String.concat " " in
+      let tokens = tokens |> List.map Tokens.show_token |> String.concat ", " in
       Error ("tokens remaining: " ^ tokens)
   in
   Ok output

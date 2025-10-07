@@ -4,7 +4,7 @@
  (modes melange)
  (libraries styled-ppx.melange reason-react melange.belt melange.dom)
  (preprocess
-  (pps styled-ppx --debug)))
+  (pps styled-ppx --debug reason-react-ppx)))
 
 (rule
  (target styles.css)
@@ -22,4 +22,4 @@
  (modules app)
  (libraries mylib styled-ppx.melange reason-react melange.belt melange.dom)
  (preprocess
-  (pps styled-ppx)))
+  (pps styled-ppx reason-react-ppx)))

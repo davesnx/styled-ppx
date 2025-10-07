@@ -10,7 +10,7 @@ let parse_exn = (prop, str) =>
   | Error(message) => Alcotest.fail(message)
   };
 
-/* check is shadowed by Parser.check and Alcotest_extra.check */
+/* check is shadowed by Parser.check */
 let check = Alcotest_extra.check;
 
 let tests: tests = [

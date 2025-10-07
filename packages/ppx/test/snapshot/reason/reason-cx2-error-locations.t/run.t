@@ -22,8 +22,7 @@ The error should be on line 5, not lines 3-4.
   5 |   display: fley;
   6 | |}
   Error: Type error on cx2 definition
-  File "input.re", lines 4-5, characters 37-20:
-  3 | ...
-  4 | .................................
+  File "input.re", line 5, characters 4-20:
+  4 | ...
   5 |   display: fley;
     Got 'fley', did you mean 'flex'?
