@@ -613,7 +613,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     };
   };
 
-  /* Module rec support - generate toString */
   let make_to_string = (value: Css_spec_parser.value) => {
     let rec make_to_string_expr = (value: Css_spec_parser.value, expr) => {
       switch (value) {
@@ -718,7 +717,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
               var_names,
               values,
             );
-          // Build nested let expressions to combine strings
+
           let rec build_combine = exprs => {
             switch (exprs) {
             | [] => estring("")
@@ -771,7 +770,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         apply_to_string_multiplier(multiplier, make_inner, expr);
       | Function_call(name, value) =>
         let inner = make_to_string_expr(value, expr);
-        /* Generate: name ++ "(" ++ inner ++ ")" using ^ operator */
         eapply(
           evar("^"),
           [
@@ -818,7 +816,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     [%expr (value: t) => [%e body]];
   };
 
-  /* Extract module binding info from module rec */
   let get_module_binding_info = (mb: Ppxlib.module_binding) => {
     switch (mb) {
     | {
@@ -854,7 +851,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     };
   };
 
-  /* Generate a complete module with signature */
   let make_module = (module_name: string, value_spec: string) => {
     switch (Css_spec_parser.value_of_string(value_spec)) {
     | Some(ast) =>
@@ -862,7 +858,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       let parse_expr = make_value(ast);
       let to_string_expr = make_to_string(ast);
 
-      /* Module signature */
       let sig_t =
         Ast_helper.Sig.type_(
           ~loc,
@@ -955,7 +950,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     };
   };
 
-  /* Generate all modules from module rec bindings */
   let make_modules = (module_bindings: list(Ppxlib.module_binding)) => {
     module_bindings
     |> List.filter_map(mb => {

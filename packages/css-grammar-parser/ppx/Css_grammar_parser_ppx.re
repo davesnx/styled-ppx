@@ -41,7 +41,7 @@ let string_patten =
     )
   );
 
-let valueExtension =
+let value_extension =
   Ppxlib.Extension.declare_with_path_arg(
     "value",
     Ppxlib.Extension.Context.Expression,
@@ -49,18 +49,13 @@ let valueExtension =
     expander(~recursive=false),
   );
 
-let valueRecExtension =
+let value_dot_rec_extension =
   Ppxlib.Extension.declare_with_path_arg(
     "value.rec",
     Ppxlib.Extension.Context.Expression,
     string_patten,
     expander(~recursive=true),
   );
-
-let is_structure_item_recursive =
-  fun
-  | {pstr_desc: Pstr_value(Recursive, _), pstr_loc: _loc} => true
-  | _ => false;
 
 let is_structure_item_recmodule =
   fun
@@ -85,7 +80,6 @@ let preprocess_impl = structure_items => {
     module Emit = Generate.Make(Ast_builder);
     let generated_module_bindings = Emit.make_modules(module_bindings);
     let (open_bindings, rest) = List.partition(is_open, rest);
-
     switch (generated_module_bindings) {
     | [] => structure_items
     | bindings =>
@@ -100,6 +94,6 @@ let preprocess_impl = structure_items => {
 
 Driver.register_transformation(
   ~preprocess_impl,
-  ~extensions=[valueExtension, valueRecExtension],
+  ~extensions=[value_extension, value_dot_rec_extension],
   "css-grammar-ppx",
 );
