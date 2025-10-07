@@ -36,13 +36,13 @@ let tests: tests = [
   test(
     "ident",
     [%expr [%value "<string>"]],
-    [%stri type nonrec ident = string],
+    [%stri type nonrec ident = String_value.t],
   ),
   // Property_type
   test(
     "color",
     [%expr [%value "<'color'>"]],
-    [%stri type nonrec color = property_color],
+    [%stri type nonrec color = Property_color.t],
   ),
   // Delim
   test(
@@ -50,14 +50,14 @@ let tests: tests = [
     [%expr [%value "<calc-product> [ [ '+' | '-' ] <calc-product> ]*"]],
     [%stri
       type nonrec calc_sum = (
-        calc_product,
+        Calc_product.t,
         list(
           (
             [
-              | `Cross(unit)
-              | `Dash(unit)
+              | `Cross
+              | `Dash
             ],
-            calc_product,
+            Calc_product.t,
           ),
         ),
       )
@@ -100,8 +100,8 @@ let tests: tests = [
     ],
     [%stri
       type nonrec property_clip_path = [
-        | `Clip_source(clip_source)
-        | `Or(option(basic_shape), option(geometry_box))
+        | `Clip_source(Clip_source.t)
+        | `Or(option(Basic_shape.t), option(Geometry_box.t))
         | `None
       ]
     ],
@@ -110,7 +110,7 @@ let tests: tests = [
   test(
     "contradiction",
     [%expr [%value "'not' <string>"]],
-    [%stri type nonrec contradiction = (unit, string)],
+    [%stri type nonrec contradiction = (unit, String_value.t)],
   ),
   // Group
   test(
@@ -127,7 +127,7 @@ let tests: tests = [
   test(
     "calc",
     [%expr [%value "calc( <calc-sum> )"]],
-    [%stri type nonrec calc = calc_sum],
+    [%stri type nonrec calc = Calc_sum.t],
   ),
   // Polymorphism
   test(
@@ -142,10 +142,16 @@ let tests: tests = [
     ],
     [%stri
       type nonrec function_color = [
-        | `Rgb_0(list(extended_percentage), option((unit, alpha_value)))
-        | `Rgb_1(list(number), option((unit, alpha_value)))
-        | `Rgb_2(list(extended_percentage), option((unit, alpha_value)))
-        | `Rgb_3(list(number), option((unit, alpha_value)))
+        | `Rgb_0(
+            list(Extended_percentage.t),
+            option((unit, Alpha_value.t)),
+          )
+        | `Rgb_1(list(Number.t), option((unit, Alpha_value.t)))
+        | `Rgb_2(
+            list(Extended_percentage.t),
+            option((unit, Alpha_value.t)),
+          )
+        | `Rgb_3(list(Number.t), option((unit, Alpha_value.t)))
       ]
     ],
   ),

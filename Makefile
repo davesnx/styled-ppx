@@ -32,7 +32,7 @@ deps: $(opam_file) ## Alias to update the opam file and install the needed deps
 format-check: ## Checks if format is correct
 	$(DUNE) build @fmt
 
-.PHONY: format
+.PHONY: fmt format
 fmt format: ## Formats code
 	$(DUNE) build @fmt --auto-promote
 
@@ -50,7 +50,7 @@ install: ## Install project dependencies
 	npm install
 
 .PHONY: init
-init: setup-githooks create-switch install ## Create a local dev enviroment
+init: setup-githooks create-switch install ## Create a local dev environment
 
 .PHONY: subst
 subst: ## Run dune substitute
@@ -61,12 +61,12 @@ dev: ## Run the project in dev mode
 	$(DUNE) build --promote-install-files --root . --watch
 
 .PHONY: release-static
-release-static:
+release-static: ## Build static release
 	$(DUNE) build --root . --ignore-promoted-rules --profile release-static --only-packages styled-ppx
 
 # Testing commands
 
-TEST_TARGETS := test-parser test-css-grammar-parser test-ppx-native test-ppx-snapshot-reason  test-css-support test-css-spec-types test-runtime test-murmur2 test-css-spec-parser test-string-interpolation
+TEST_TARGETS := test-parser test-css-grammar-parser test-ppx-native test-ppx-snapshot-reason test-css-support test-css-spec-types test-runtime test-murmur2 test-css-spec-parser test-string-interpolation
 # Disabled test-ppx-snapshot-rescript
 
 # Create targets with the format "test-{{target_name}}-{{ "watch" | "promote" }}"
@@ -135,7 +135,7 @@ test-demo: build test-demo-rescript-v9 test-demo-rescript-v10 ## Run demo tests
 
 # Demo
 
-.PHONY: demo-demo-rescript-v10
+.PHONY: demo-rescript-v10
 demo-rescript-v10: build ## Run the ReScript v10 demo with JSX4
 	npm --prefix 'demo/rescript-v10-JSX4' install
 	npm --prefix 'demo/rescript-v10-JSX4' run start
@@ -175,6 +175,8 @@ lexer: ## Print the command to debug the lexer
 .PHONY: interpreter
 interpreter: ## Run menhir as interpret
 	$(OPAM_EXEC) menhir --interpret --interpret-show-cst packages/parser/lib/Parser.mly
+
+# Website
 
 .PHONY: website-watch
 website-watch: ## Run the website locally
